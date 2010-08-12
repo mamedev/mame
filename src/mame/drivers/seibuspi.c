@@ -2800,36 +2800,6 @@ ROM_START( rdftau )
 	ROM_LOAD("gd_8.216",   0x200000, 0x080000, CRC(f88cb6e4) SHA1(fb35b41307b490d5d08e4b8a70f8ff4ce2ca8105) )
 ROM_END
 
-ROM_START( rdftdi )
-	ROM_REGION32_LE(0x200000, "user1", 0)	/* i386 program */
-	ROM_LOAD32_BYTE("u211.bin", 0x000000, 0x80000, CRC(fc0e2885) SHA1(79621155d992d504e993bd3ee0d6ff3903bd5415) )
-	ROM_LOAD32_BYTE("u212.bin", 0x000001, 0x80000, CRC(58ccb10c) SHA1(0cce4057bfada78121d9586574b98d46cdd7dd46) )
-	ROM_LOAD32_BYTE("u210.bin", 0x000002, 0x80000, CRC(47fc3c96) SHA1(7378f8caa847f89f235b5be6779118721076873b) )
-	ROM_LOAD32_BYTE("u29.bin",  0x000003, 0x80000, CRC(271bdd4b) SHA1(0a805568cbd6a9c18bdb755a41972ff6bba9e6eb) )
-
-	ROM_REGION( 0x30000, "gfx1", 0)	/* text layer roms */
-	ROM_LOAD24_BYTE("gd_5.423", 0x000000, 0x10000, CRC(8f8d4e14) SHA1(06c803975767ae98f40ba7ac5764a5bc8baa3a30) )
-	ROM_LOAD24_BYTE("gd_6.424", 0x000001, 0x10000, CRC(6ac64968) SHA1(ec395205c24c4f864a1f805bb0d4641562d4faa9) )
-	ROM_LOAD24_BYTE("gd_7.48",  0x000002, 0x10000, CRC(4d87e1ea) SHA1(3230e9b643fad773e61ab8ce09c0cd7d4d0558e3) )
-
-	ROM_REGION( 0x600000, "gfx2", 0)	/* background layer roms */
-	ROM_LOAD24_WORD("gd_bg1-d.415", 0x000000, 0x200000, CRC(6a68054c) SHA1(5cbfc4ac90045f1401c2dda7a51936558c9de07e) )
-	ROM_LOAD24_BYTE("gd_bg1-p.410", 0x000002, 0x100000, CRC(3400794a) SHA1(719808f7442bac612cefd7b7fffcd665e6337ad0) )
-	ROM_LOAD24_WORD("gd_bg2-d.416", 0x300000, 0x200000, CRC(61cd2991) SHA1(bb608e3948bf9ea35b5e1615d2ba6858d029dcbe) )
-	ROM_LOAD24_BYTE("gd_bg2-p.49",  0x300002, 0x100000, CRC(502d5799) SHA1(c3a0e1a4f5a7b35572ae1ff31315da4ed08aa2fe) )
-
-	ROM_REGION( 0xc00000, "gfx3", 0)	/* sprites */
-	ROM_LOAD("gd_obj-1.322", 0x000000, 0x400000, CRC(59d86c99) SHA1(d3c9241e7b51fe21f8351051b063f91dc69bf905) )
-	ROM_LOAD("gd_obj-2.324", 0x400000, 0x400000, CRC(1ceb0b6f) SHA1(97225a9b3e7be18080aa52f6570af2cce8f25c06) )
-	ROM_LOAD("gd_obj-3.323", 0x800000, 0x400000, CRC(36e93234) SHA1(51917a80b7da5c32a9434a1076fc2916d62e6a3e) )
-
-	ROM_REGION(0x200000, "ymf", ROMREGION_ERASE00)
-
-	ROM_REGION(0x280000, "user2", ROMREGION_ERASE00)	/* sound roms */
-	ROM_LOAD("gd_pcm.217", 0x000000, 0x200000, CRC(31253ad7) SHA1(c81c8d50f8f287f5cbfaec77b30d969b01ce11a9) )
-	ROM_LOAD("gd_8.216",   0x200000, 0x080000, CRC(f88cb6e4) SHA1(fb35b41307b490d5d08e4b8a70f8ff4ce2ca8105) )
-ROM_END
-
 ROM_START( rdftit )
 	ROM_REGION32_LE(0x200000, "user1", 0)	/* i386 program */
 	ROM_LOAD32_BYTE("seibu1",   0x000000, 0x80000, CRC(de0c3e3c) SHA1(b00225bad282e46b5825608f76eea6670bfe5527) )
@@ -2889,6 +2859,79 @@ ROM_START( rdfta )
 	ROM_LOAD("gd_pcm.217", 0x000000, 0x200000, CRC(31253ad7) SHA1(c81c8d50f8f287f5cbfaec77b30d969b01ce11a9) )
 	ROM_LOAD("gd_8.216",   0x200000, 0x080000, CRC(f88cb6e4) SHA1(fb35b41307b490d5d08e4b8a70f8ff4ce2ca8105) )
 ROM_END
+
+// These next two (Asian?) sets run on an identical SPI cart pcb: (C)1996 SXX2C ROM SUB4 (with "SEI252 // SB05-106" 208-pin custom in the middle)
+// and have the prg2 and prg3 roms combined as one larger rom, and somewhat different locations for the pcb roms; the only difference between the two sets is the region byte in seibu__1.u0211 at 0x7ffff, which changes the message on the titlescreen.
+ROM_START( rdftadi ) // Dream Island license
+	ROM_REGION32_LE(0x200000, "user1", 0)	/* i386 program */
+	ROM_LOAD32_BYTE("seibu__1.u0211", 0x000000, 0x80000, CRC(fc0e2885) SHA1(79621155d992d504e993bd3ee0d6ff3903bd5415) ) // socket is silkscreened on pcb PRG0
+	ROM_LOAD32_BYTE("raiden-f__prg2.u0212", 0x000001, 0x80000, BAD_DUMP CRC(58ccb10c) SHA1(0cce4057bfada78121d9586574b98d46cdd7dd46) ) // socket is silkscreened on pcb PRG1
+	ROM_LOAD32_WORD("raiden-f__prg34.u0219", 0x000002, 0x100000, NO_DUMP )//the real rom used here is actually a 0x100000 long rom located at u0219 which contains the combined data of the two roms normally at 221 and 222 (210 and 29 on older cart pcbs); pads are silkscreened PRG23
+	ROM_LOAD32_BYTE("prg3.u0221", 0x000002, 0x80000, BAD_DUMP CRC(47fc3c96) SHA1(7378f8caa847f89f235b5be6779118721076873b) ) // socket is silkscreened on pcb PRG2
+	ROM_LOAD32_BYTE("prg4.u0222",  0x000003, 0x80000, BAD_DUMP CRC(271bdd4b) SHA1(0a805568cbd6a9c18bdb755a41972ff6bba9e6eb) ) // socket is silkscreened on pcb PRG3
+
+
+	ROM_REGION( 0x30000, "gfx1", 0)	/* text layer roms */
+	ROM_LOAD24_WORD("raiden-f__fix.u0425", 0x000000, 0x20000, NO_DUMP )//the real rom used here is actually a 0x100000 long rom located at u0425 which contains the combined data of the two roms normally at 427 and 428 (423 and 424 on older cart pcbs); pads are silkscreened FIX LH531024
+	ROM_LOAD24_BYTE("gd_5.u0427", 0x000000, 0x10000, BAD_DUMP CRC(8f8d4e14) SHA1(06c803975767ae98f40ba7ac5764a5bc8baa3a30) ) // socket is silkscreened on pcb FIX0
+	ROM_LOAD24_BYTE("gd_6.u0428", 0x000001, 0x10000, BAD_DUMP CRC(6ac64968) SHA1(ec395205c24c4f864a1f805bb0d4641562d4faa9) ) // socket is silkscreened on pcb FIX1
+	ROM_LOAD24_BYTE("seibu__7.u048",  0x000002, 0x10000, CRC(4d87e1ea) SHA1(3230e9b643fad773e61ab8ce09c0cd7d4d0558e3) ) // socket is silkscreened on pcb FIXP
+
+	ROM_REGION( 0x600000, "gfx2", 0)	/* background layer roms */
+	ROM_LOAD24_WORD("gun_dogs__bg1-d.u0415", 0x000000, 0x200000, CRC(6a68054c) SHA1(5cbfc4ac90045f1401c2dda7a51936558c9de07e) ) // pads are silkscreened on pcb BG12
+	ROM_LOAD24_BYTE("gun_dogs__bg1-p.u0410", 0x000002, 0x100000, CRC(3400794a) SHA1(719808f7442bac612cefd7b7fffcd665e6337ad0) ) // pads are silkscreened on pcb BG12P
+	ROM_LOAD24_WORD("gun_dogs__bg2-d.u0424", 0x300000, 0x200000, CRC(61cd2991) SHA1(bb608e3948bf9ea35b5e1615d2ba6858d029dcbe) ) // pads are silkscreened on pcb BG3
+	ROM_LOAD24_BYTE("gun_dogs__bg2-p.u049",  0x300002, 0x100000, CRC(502d5799) SHA1(c3a0e1a4f5a7b35572ae1ff31315da4ed08aa2fe) ) // pads are silkscreened on pcb BG3P
+
+	ROM_REGION( 0xc00000, "gfx3", 0)	/* sprites */
+	ROM_LOAD("gun_dogs__obj-1.u0322", 0x000000, 0x400000, CRC(59d86c99) SHA1(d3c9241e7b51fe21f8351051b063f91dc69bf905) ) // pads are silkscreened on pcb OBJ1
+	ROM_LOAD("gun_dogs__obj-2.u0324", 0x400000, 0x400000, CRC(1ceb0b6f) SHA1(97225a9b3e7be18080aa52f6570af2cce8f25c06) ) // pads are silkscreened on pcb OBJ2
+	ROM_LOAD("gun_dogs__obj-3.u0323", 0x800000, 0x400000, CRC(36e93234) SHA1(51917a80b7da5c32a9434a1076fc2916d62e6a3e) ) // pads are silkscreened on pcb OBJ3
+
+	ROM_REGION(0x200000, "ymf", ROMREGION_ERASE00)
+
+	ROM_REGION(0x400000, "user2", ROMREGION_ERASE00)	/* sound roms */
+	ROM_LOAD("raiden-f__pcm.u0217", 0x000000, 0x400000, NO_DUMP )//the real rom used here is actually a 0x100000 long rom located at u0217 which contains the combined data of the two smaller roms on the older cart pcb at 217 and 216; pads are silkscreened SOUND0
+	//u0222 (unpopulated) is silkscreend SOUND1 and would expect a 27040 similar to the old gd_8 rom. 
+	ROM_LOAD("gun_dogs__pcm.217", 0x000000, 0x200000, BAD_DUMP CRC(31253ad7) SHA1(c81c8d50f8f287f5cbfaec77b30d969b01ce11a9) )
+	ROM_LOAD("gd_8.216",   0x200000, 0x080000, BAD_DUMP CRC(f88cb6e4) SHA1(fb35b41307b490d5d08e4b8a70f8ff4ce2ca8105) )
+ROM_END
+
+ROM_START( rdftam ) // Metrotainment license
+	ROM_REGION32_LE(0x200000, "user1", 0)	/* i386 program */
+	ROM_LOAD32_BYTE("seibu__1.u0211", 0x000000, 0x80000, CRC(156D8DB0) SHA1(93662B3EE494E37A56428A7AA3DAD7A957835950) ) // socket is silkscreened on pcb PRG0
+	ROM_LOAD32_BYTE("raiden-f__prg2.u0212", 0x000001, 0x80000, BAD_DUMP CRC(58ccb10c) SHA1(0cce4057bfada78121d9586574b98d46cdd7dd46) ) // socket is silkscreened on pcb PRG1
+	ROM_LOAD32_WORD("raiden-f__prg34.u0219", 0x000002, 0x100000, NO_DUMP )//the real rom used here is actually a 0x100000 long rom located at u0219 which contains the combined data of the two roms normally at 221 and 222 (210 and 29 on older cart pcbs); pads are silkscreened PRG23
+	ROM_LOAD32_BYTE("prg3.u0221", 0x000002, 0x80000, BAD_DUMP CRC(47fc3c96) SHA1(7378f8caa847f89f235b5be6779118721076873b) ) // socket is silkscreened on pcb PRG2
+	ROM_LOAD32_BYTE("prg4.u0222",  0x000003, 0x80000, BAD_DUMP CRC(271bdd4b) SHA1(0a805568cbd6a9c18bdb755a41972ff6bba9e6eb) ) // socket is silkscreened on pcb PRG3
+
+
+	ROM_REGION( 0x30000, "gfx1", 0)	/* text layer roms */
+	ROM_LOAD24_WORD("raiden-f__fix.u0425", 0x000000, 0x20000, NO_DUMP )//the real rom used here is actually a 0x100000 long rom located at u0425 which contains the combined data of the two roms normally at 427 and 428 (423 and 424 on older cart pcbs); pads are silkscreened FIX LH531024
+	ROM_LOAD24_BYTE("gd_5.u0427", 0x000000, 0x10000, BAD_DUMP CRC(8f8d4e14) SHA1(06c803975767ae98f40ba7ac5764a5bc8baa3a30) ) // socket is silkscreened on pcb FIX0
+	ROM_LOAD24_BYTE("gd_6.u0428", 0x000001, 0x10000, BAD_DUMP CRC(6ac64968) SHA1(ec395205c24c4f864a1f805bb0d4641562d4faa9) ) // socket is silkscreened on pcb FIX1
+	ROM_LOAD24_BYTE("seibu__7.u048",  0x000002, 0x10000, CRC(4d87e1ea) SHA1(3230e9b643fad773e61ab8ce09c0cd7d4d0558e3) ) // socket is silkscreened on pcb FIXP
+
+	ROM_REGION( 0x600000, "gfx2", 0)	/* background layer roms */
+	ROM_LOAD24_WORD("gun_dogs__bg1-d.u0415", 0x000000, 0x200000, CRC(6a68054c) SHA1(5cbfc4ac90045f1401c2dda7a51936558c9de07e) ) // pads are silkscreened on pcb BG12
+	ROM_LOAD24_BYTE("gun_dogs__bg1-p.u0410", 0x000002, 0x100000, CRC(3400794a) SHA1(719808f7442bac612cefd7b7fffcd665e6337ad0) ) // pads are silkscreened on pcb BG12P
+	ROM_LOAD24_WORD("gun_dogs__bg2-d.u0424", 0x300000, 0x200000, CRC(61cd2991) SHA1(bb608e3948bf9ea35b5e1615d2ba6858d029dcbe) ) // pads are silkscreened on pcb BG3
+	ROM_LOAD24_BYTE("gun_dogs__bg2-p.u049",  0x300002, 0x100000, CRC(502d5799) SHA1(c3a0e1a4f5a7b35572ae1ff31315da4ed08aa2fe) ) // pads are silkscreened on pcb BG3P
+
+	ROM_REGION( 0xc00000, "gfx3", 0)	/* sprites */
+	ROM_LOAD("gun_dogs__obj-1.u0322", 0x000000, 0x400000, CRC(59d86c99) SHA1(d3c9241e7b51fe21f8351051b063f91dc69bf905) ) // pads are silkscreened on pcb OBJ1
+	ROM_LOAD("gun_dogs__obj-2.u0324", 0x400000, 0x400000, CRC(1ceb0b6f) SHA1(97225a9b3e7be18080aa52f6570af2cce8f25c06) ) // pads are silkscreened on pcb OBJ2
+	ROM_LOAD("gun_dogs__obj-3.u0323", 0x800000, 0x400000, CRC(36e93234) SHA1(51917a80b7da5c32a9434a1076fc2916d62e6a3e) ) // pads are silkscreened on pcb OBJ3
+
+	ROM_REGION(0x200000, "ymf", ROMREGION_ERASE00)
+
+	ROM_REGION(0x400000, "user2", ROMREGION_ERASE00)	/* sound roms */
+	ROM_LOAD("raiden-f__pcm.u0217", 0x000000, 0x400000, NO_DUMP )//the real rom used here is actually a 0x100000 long rom located at u0217 which contains the combined data of the two smaller roms on the older cart pcb at 217 and 216; pads are silkscreened SOUND0
+	//u0222 (unpopulated) is silkscreend SOUND1 and would expect a 27040 similar to the old gd_8 rom. 
+	ROM_LOAD("gun_dogs__pcm.217", 0x000000, 0x200000, BAD_DUMP CRC(31253ad7) SHA1(c81c8d50f8f287f5cbfaec77b30d969b01ce11a9) )
+	ROM_LOAD("gd_8.216",   0x200000, 0x080000, BAD_DUMP CRC(f88cb6e4) SHA1(fb35b41307b490d5d08e4b8a70f8ff4ce2ca8105) )
+ROM_END
+
 
 ROM_START( rdft2us )	/* Single board version SXX2F */
 	ROM_REGION32_LE(0x200000, "user1", 0)	/* i386 program */
@@ -3551,7 +3594,8 @@ GAME( 1996, rdft,      0,       spi,      spi_3button, rdft,   ROT270, "Seibu Ka
 GAME( 1996, rdftu,     rdft,    spi,      spi_3button, rdft,   ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden Fighters (US)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 GAME( 1996, rdftau,    rdft,    spi,      spi_3button, rdft,   ROT270, "Seibu Kaihatsu", "Raiden Fighters (Australia)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 GAME( 1996, rdftj,     rdft,    spi,      spi_3button, rdft,   ROT270, "Seibu Kaihatsu", "Raiden Fighters (Japan set 2)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
-GAME( 1996, rdftdi,    rdft,    spi,      spi_3button, rdft,   ROT270, "Seibu Kaihatsu (Dream Island license)", "Raiden Fighters (Dream Island Co. license)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
+GAME( 1996, rdftadi,    rdft,    spi,      spi_3button, rdft,   ROT270, "Seibu Kaihatsu (Dream Island license)", "Raiden Fighters (Asia?, Dream Island Co. license)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
+GAME( 1996, rdftam,    rdft,    spi,      spi_3button, rdft,   ROT270, "Seibu Kaihatsu (Dream Island license)", "Raiden Fighters (Asia?, Metrotainment license)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 GAME( 1996, rdftit,    rdft,    spi,      spi_3button, rdft,   ROT270, "Seibu Kaihatsu", "Raiden Fighters (Italy)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 GAME( 1996, rdfta,     rdft,    spi,      spi_3button, rdft,   ROT270, "Seibu Kaihatsu", "Raiden Fighters (Austria)",  GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 

@@ -7352,7 +7352,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( rdftu )		/* (c) 1996 Seibu Kaihatsu (Fabtek license) */
 	DRIVER( rdftau )	/* (c) 1996 Seibu Kaihatsu */
 	DRIVER( rdftj )		/* (c) 1996 Seibu Kaihatsu */
-	DRIVER( rdftdi )	/* (c) 1996 Seibu Kaihatsu (Dream Island license) */
+	DRIVER( rdftadi )	/* (c) 1996 Seibu Kaihatsu (Dream Island license) */
+	DRIVER( rdftam )	/* (c) 1996 Seibu Kaihatsu (Metrotainment license) */
 	DRIVER( rdftit )	/* (c) 1996 Seibu Kaihatsu */
 	DRIVER( rdfta )		/* (c) 1996 Seibu Kaihatsu */
 
