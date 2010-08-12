@@ -392,6 +392,13 @@ SOUNDOBJS += $(SOUNDOBJ)/rf5c400.o
 endif
 
 
+#-------------------------------------------------
+# S2636 wave generator
+#-------------------------------------------------
+
+ifneq ($(filter S2636,$(SOUNDS)),)
+SOUNDOBJS += $(SOUNDOBJ)/s2636.o
+endif
 
 #-------------------------------------------------
 # Sega custom sound chips

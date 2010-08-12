@@ -685,21 +685,24 @@ static const s2636_interface s2636_1_config =
 {
 	"screen",
 	0x100,
-	0, -19
+	0, -19,
+	NULL
 };
 
 static const s2636_interface s2636_2_config =
 {
 	"screen",
 	0x100,
-	0, -19
+	0, -19,
+	NULL
 };
 
 static const s2636_interface s2636_3_config =
 {
 	"screen",
 	0x100,
-	0, -19
+	0, -19,
+	NULL
 };
 
 static MACHINE_START( laserbat )

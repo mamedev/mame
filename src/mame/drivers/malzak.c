@@ -65,6 +65,7 @@
 #include "emu.h"
 #include "cpu/s2650/s2650.h"
 #include "sound/sn76477.h"
+#include "sound/s2636.h"
 #include "video/s2636.h"
 #include "video/saa5050.h"
 #include "includes/malzak.h"
@@ -347,14 +348,16 @@ static const s2636_interface malzac_s2636_0_config =
 {
 	"screen",
 	0x100,
-	0, -16	/* -8, -16 */
+	0, -16,	/* -8, -16 */
+	"s2636snd_0"
 };
 
 static const s2636_interface malzac_s2636_1_config =
 {
 	"screen",
 	0x100,
-	0, -16	/* -9, -16 */
+	0, -16,	/* -9, -16 */
+	"s2636snd_1"
 };
 
 static const saa5050_interface malzac_saa5050_intf =
@@ -432,6 +435,12 @@ static MACHINE_DRIVER_START( malzak )
 	MDRV_SOUND_ADD("sn2", SN76477, 0)
 	MDRV_SOUND_CONFIG(sn76477_intf)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	MDRV_SOUND_ADD("s2636snd_0", S2636, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
+	MDRV_SOUND_ADD("s2636snd_1", S2636, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( malzak2 )
@@ -489,5 +498,5 @@ ROM_START( malzak2 )
 ROM_END
 
 
-GAME( 19??, malzak,   0,       malzak,  malzak,  0,        ROT0, "Kitronix", "Malzak", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 19??, malzak2, malzak,   malzak2, malzak2, 0,        ROT0, "Kitronix", "Malzak II", GAME_NOT_WORKING | GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 19??, malzak,   0,       malzak,  malzak,  0,        ROT0, "Kitronix", "Malzak", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 19??, malzak2, malzak,   malzak2, malzak2, 0,        ROT0, "Kitronix", "Malzak II", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )

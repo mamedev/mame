@@ -222,6 +222,7 @@ SOUNDS += CDP1863
 SOUNDS += CDP1864
 SOUNDS += ZSG2
 SOUNDS += MOS656X
+SOUNDS += S2636
 
 #-------------------------------------------------
 # this is the list of driver libraries that

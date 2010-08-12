@@ -77,6 +77,7 @@
 
 #include "emu.h"
 #include "video/s2636.h"
+#include "sound/s2636.h"
 
 /*************************************
  *
@@ -317,6 +318,15 @@ WRITE8_DEVICE_HANDLER( s2636_work_ram_w )
 	s2636_state *s2636 = get_safe_token(device);
 
 	assert(offset < s2636->work_ram_size);
+
+	if ( offset == 0xc7 )
+	{
+		const s2636_interface *intf = get_interface(device);
+		if ( intf->sound && *intf->sound )
+		{
+			s2636_soundport_w(device->machine->device(intf->sound), 0, data);
+		}
+	}
 
 	s2636->work_ram[offset] = data;
 }

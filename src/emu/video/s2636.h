@@ -26,6 +26,7 @@ struct _s2636_interface
 	int        work_ram_size;
 	int        y_offset;
 	int        x_offset;
+	const char *sound;
 };
 
 /*************************************
