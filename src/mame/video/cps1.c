@@ -113,12 +113,12 @@ Knights of the Round* (USA 911127)                             91635B-2   KR63B 
 Knights of the Round* (Japan 911127)                           91634B-2   KR63B    BPRG1   IOB1  90631C-5     CPS-B-21  DL-0921-10014  C632    IOC1
 
 Street Fighter II': Champion Edition (World 920313)      1992  91635B-2   S9263B   BPRG1   IOB1  92631C-6     CPS-B-21  DL-0921-10014  C632    IOC1
-Street Fighter II': Champion Edition (USA 920313)              91635B-2   S9263B   BPRG1   IOB1  92631C-6     CPS-B-21  DL-0921-10014  C632    IOC1
-Street Fighter II': Champion Edition (USA 920513)              91635B-2   S9263B   BPRG1   IOB1  92631C-6     CPS-B-21  DL-0921-10014  C632    IOC1
+Street Fighter II': Champion Edition (USA 920313)              91635B-?   S9263B   BPRG1   IOB1  ?            CPS-B-21  DL-0921-10014  C632    IOC1
+Street Fighter II': Champion Edition (USA 920513)              91635B-?   S9263B   BPRG1   IOB1  ?            CPS-B-21  DL-0921-10014  C632    IOC1
 Street Fighter II': Champion Edition (USA 920803)              91635B-?   S9263B   BPRG1   IOB1  ?            CPS-B-21  DL-0921-10014  C632    IOC1
-Street Fighter II': Champion Edition (Japan 920513)            91634B-2   S9263B   BPRG1   IOB1  92631C-6     CPS-B-21  DL-0921-10014  C632    IOC1
+Street Fighter II': Champion Edition (Japan 920513)            91634B-2   S9263B   BPRG1   IOB1  ?            CPS-B-21  DL-0921-10014  C632    IOC1
 
-Adventure Quiz Capcom World 2* (Japan 920611)            1992  89625B-1   Q522B            LWIO  92641C-1     CPS-B-21  DL-0921-10014          IOC1
+Adventure Quiz Capcom World 2* (Japan 920611)            1992  89625B-1   Q522B            LWIO  92641C-6     CPS-B-21  DL-0921-10014          IOC1
 
 Varth: Operation Thunderstorm (World 920612)             1992  89624B-?   VA24B            IOB1  ?            CPS-B-04  DL-0411-10005
 Varth: Operation Thunderstorm (World 920714)                   89624B-3   VA24B            IOB1  88622-C-5    CPS-B-04  DL-0411-10005  None
@@ -1263,7 +1263,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"strider",    CPS_B_01,     mapper_ST24M1 },
 	{"striderua",  CPS_B_01,     mapper_ST24M1 },	// wrong, this set uses ST24B2, still non dumped
 	{"striderj",   CPS_B_01,     mapper_ST22B },	// equivalent to ST24M1
-	{"striderjr",  CPS_B_01,     mapper_ST24M1 },	// wrong, this set uses STH63B, still non dumped
+	{"striderjr",  CPS_B_21_DEF, mapper_ST24M1 },	// wrong, this set uses STH63B, still non dumped
 	{"dynwar",     CPS_B_02,     mapper_TK22B },	// wrong, this set uses TK24B1, dumped but equations still not added
 	{"dynwara",    CPS_B_02,     mapper_TK22B },
 	{"dynwarj",    CPS_B_02,     mapper_TK22B },
@@ -1282,7 +1282,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"1941j",      CPS_B_05,     mapper_YI24B },	// PAL used could be YI22B
 	{"unsquad",    CPS_B_11,     mapper_AR24B },
 	{"area88",     CPS_B_11,     mapper_AR22B },	// equivalent to AR24B
-	{"area88r",    CPS_B_11,     mapper_AR22B },	// wrong, this set uses ARA63B, still non dumped
+	{"area88r",    CPS_B_21_DEF, mapper_AR22B },	// wrong, this set uses ARA63B, still non dumped
 	{"mercs",      CPS_B_12,     mapper_O224B,  0x36, 0, 0x34 },
 	{"mercsu",     CPS_B_12,     mapper_O224B,  0x36, 0, 0x34 },
 	{"mercsua",    CPS_B_12,     mapper_O224B,  0x36, 0, 0x34 },
