@@ -319,10 +319,19 @@ static GFXDECODE_START( ace )
 	GFXDECODE_ENTRY( NULL          , 0x8000, scorelayout, 0, 2 )    /* the game dynamically modifies this */
 GFXDECODE_END
 
+static STATE_POSTLOAD( ace_postload )
+{
+	gfx_element_mark_dirty(machine->gfx[1], 0);
+	gfx_element_mark_dirty(machine->gfx[2], 0);
+	gfx_element_mark_dirty(machine->gfx[3], 0);
+	gfx_element_mark_dirty(machine->gfx[4], 0);
+}
+
 static MACHINE_START( ace )
 {
 	ace_state *state = machine->driver_data<ace_state>();
 	state_save_register_global_array(machine, state->objpos);
+	state_save_register_postload(machine, ace_postload, NULL);
 }
 
 static MACHINE_RESET( ace )
