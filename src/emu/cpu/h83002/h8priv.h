@@ -45,7 +45,6 @@ struct _h83xx_state
 
 	int mode_8bit;
 };
-extern h83xx_state h8;
 
 INLINE h83xx_state *get_safe_token(running_device *device)
 {

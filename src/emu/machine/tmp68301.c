@@ -11,7 +11,7 @@
 #include "emu.h"
 #include "machine/tmp68301.h"
 
-UINT16 *tmp68301_regs;
+static UINT16 tmp68301_regs[0x400];
 
 static UINT8 tmp68301_IE[3];		// 3 External Interrupt Lines
 static emu_timer *tmp68301_timer[3];		// 3 Timers
@@ -153,6 +153,11 @@ static void update_irq_state(running_machine *machine)
 			cpu_set_input_line(machine->firstcpu,level,HOLD_LINE);
 		}
 	}
+}
+
+READ16_HANDLER( tmp68301_regs_r )
+{
+	return tmp68301_regs[offset];
 }
 
 WRITE16_HANDLER( tmp68301_regs_w )

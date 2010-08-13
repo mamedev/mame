@@ -139,9 +139,6 @@ typedef struct
 
 
 
-UINT8 *vectorram;
-size_t vectorram_size;
-
 static int flicker;                              /* beam flicker value     */
 static float flicker_correction = 0.0f;
 

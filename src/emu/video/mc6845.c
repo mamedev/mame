@@ -138,7 +138,7 @@ static void update_hsync_changed_timers(mc6845_t *mc6845);
 static void update_vsync_changed_timers(mc6845_t *mc6845);
 
 
-mc6845_interface mc6845_null_interface = { 0 };
+const mc6845_interface mc6845_null_interface = { 0 };
 
 
 /* makes sure that the passed in device is the right type */

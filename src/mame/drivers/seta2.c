@@ -593,7 +593,7 @@ static ADDRESS_MAP_START( grdians_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc50000, 0xc5ffff) AM_RAM								// cleared
 	AM_RANGE(0xc60000, 0xc6003f) AM_WRITE(seta2_vregs_w) AM_BASE_MEMBER(seta2_state, vregs)	// Video Registers
 	AM_RANGE(0xe00010, 0xe0001f) AM_WRITE(seta2_sound_bank_w)		// Samples Banks
-	AM_RANGE(0xfffc00, 0xffffff) AM_RAM_WRITE(tmp68301_regs_w) AM_BASE(&tmp68301_regs)	// TMP68301 Registers
+	AM_RANGE(0xfffc00, 0xffffff) AM_READWRITE(tmp68301_regs_r, tmp68301_regs_w)	// TMP68301 Registers
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -632,7 +632,7 @@ static ADDRESS_MAP_START( gundamex_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc60000, 0xc6003f) AM_WRITE(seta2_vregs_w) AM_BASE_MEMBER(seta2_state, vregs)	// Video Registers
 	AM_RANGE(0xe00010, 0xe0001f) AM_WRITE(seta2_sound_bank_w)		// Samples Banks
 	AM_RANGE(0xfffd0a, 0xfffd0b) AM_DEVREADWRITE("eeprom", gundamex_eeprom_r,gundamex_eeprom_w)	// parallel data register
-	AM_RANGE(0xfffc00, 0xffffff) AM_RAM_WRITE(tmp68301_regs_w) AM_BASE(&tmp68301_regs)	// TMP68301 Registers
+	AM_RANGE(0xfffc00, 0xffffff) AM_READWRITE(tmp68301_regs_r, tmp68301_regs_w)	// TMP68301 Registers
 ADDRESS_MAP_END
 
 
@@ -694,7 +694,7 @@ static ADDRESS_MAP_START( mj4simai_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_BASE_SIZE_MEMBER(seta2_state, spriteram, spriteram_size)	// Sprites
 	AM_RANGE(0xc40000, 0xc4ffff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// Palette
 	AM_RANGE(0xc60000, 0xc6003f) AM_WRITE(seta2_vregs_w) AM_BASE_MEMBER(seta2_state, vregs)	// Video Registers
-	AM_RANGE(0xfffc00, 0xffffff) AM_RAM_WRITE(tmp68301_regs_w) AM_BASE(&tmp68301_regs)	// TMP68301 Registers
+	AM_RANGE(0xfffc00, 0xffffff) AM_READWRITE(tmp68301_regs_r, tmp68301_regs_w)	// TMP68301 Registers
 ADDRESS_MAP_END
 
 
@@ -717,7 +717,7 @@ static ADDRESS_MAP_START( myangel_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_BASE_SIZE_MEMBER(seta2_state, spriteram, spriteram_size)		// Sprites
 	AM_RANGE(0xc40000, 0xc4ffff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// Palette
 	AM_RANGE(0xc60000, 0xc6003f) AM_WRITE(seta2_vregs_w) AM_BASE_MEMBER(seta2_state, vregs)				// Video Registers
-	AM_RANGE(0xfffc00, 0xffffff) AM_RAM_WRITE(tmp68301_regs_w) AM_BASE(&tmp68301_regs)		// TMP68301 Registers
+	AM_RANGE(0xfffc00, 0xffffff) AM_READWRITE(tmp68301_regs_r, tmp68301_regs_w)		// TMP68301 Registers
 ADDRESS_MAP_END
 
 
@@ -740,7 +740,7 @@ static ADDRESS_MAP_START( myangel2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xd00000, 0xd3ffff) AM_RAM AM_BASE_SIZE_MEMBER(seta2_state, spriteram, spriteram_size)		// Sprites
 	AM_RANGE(0xd40000, 0xd4ffff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// Palette
 	AM_RANGE(0xd60000, 0xd6003f) AM_WRITE(seta2_vregs_w) AM_BASE_MEMBER(seta2_state, vregs)			// Video Registers
-	AM_RANGE(0xfffc00, 0xffffff) AM_RAM_WRITE(tmp68301_regs_w) AM_BASE(&tmp68301_regs)		// TMP68301 Registers
+	AM_RANGE(0xfffc00, 0xffffff) AM_READWRITE(tmp68301_regs_r, tmp68301_regs_w)		// TMP68301 Registers
 ADDRESS_MAP_END
 
 
@@ -785,7 +785,7 @@ static ADDRESS_MAP_START( pzlbowl_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x840000, 0x84ffff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// Palette
 	AM_RANGE(0x860000, 0x86003f) AM_WRITE(seta2_vregs_w) AM_BASE_MEMBER(seta2_state, vregs)				// Video Registers
 	AM_RANGE(0x900000, 0x903fff) AM_DEVREADWRITE("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
-	AM_RANGE(0xfffc00, 0xffffff) AM_RAM_WRITE(tmp68301_regs_w) AM_BASE(&tmp68301_regs)		// TMP68301 Registers
+	AM_RANGE(0xfffc00, 0xffffff) AM_READWRITE(tmp68301_regs_r, tmp68301_regs_w)		// TMP68301 Registers
 ADDRESS_MAP_END
 
 
@@ -811,7 +811,7 @@ static ADDRESS_MAP_START( penbros_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xb40000, 0xb4ffff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)	// Palette
 	AM_RANGE(0xb60000, 0xb6003f) AM_WRITE(seta2_vregs_w) AM_BASE_MEMBER(seta2_state, vregs)
 	AM_RANGE(0xa00000, 0xa03fff) AM_DEVREADWRITE("x1snd", seta_sound_word_r,seta_sound_word_w)	// Sound
-	AM_RANGE(0xfffc00, 0xffffff) AM_RAM_WRITE(tmp68301_regs_w) AM_BASE(&tmp68301_regs)		// TMP68301 Registers
+	AM_RANGE(0xfffc00, 0xffffff) AM_READWRITE(tmp68301_regs_r, tmp68301_regs_w)		// TMP68301 Registers
 ADDRESS_MAP_END
 
 
@@ -857,7 +857,7 @@ static ADDRESS_MAP_START( samshoot_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x900000, 0x903fff ) AM_DEVREADWRITE( "x1snd", seta_sound_word_r, seta_sound_word_w	)	// Sound
 
 	AM_RANGE( 0xfffd0a, 0xfffd0b ) AM_READ_PORT("DSW2")				// parallel data register (DSW 2)
-	AM_RANGE( 0xfffc00, 0xffffff ) AM_RAM_WRITE( tmp68301_regs_w) AM_BASE(&tmp68301_regs )	// TMP68301 Registers
+	AM_RANGE( 0xfffc00, 0xffffff ) AM_READWRITE(tmp68301_regs_r, tmp68301_regs_w)	// TMP68301 Registers
 ADDRESS_MAP_END
 
 

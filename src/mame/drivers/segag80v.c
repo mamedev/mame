@@ -137,7 +137,6 @@
 #include "sound/ay8910.h"
 #include "sound/samples.h"
 #include "audio/segasnd.h"
-#include "video/vector.h"
 #include "includes/segag80r.h"
 #include "includes/segag80v.h"
 
@@ -158,8 +157,6 @@
  *  Global variables
  *
  *************************************/
-
-extern UINT8 (*sega_decrypt)(offs_t, UINT8);
 
 static UINT8 *mainram;
 static UINT8 has_usb;
@@ -226,7 +223,7 @@ static offs_t decrypt_offset(const address_space *space, offs_t offset)
 
 static WRITE8_HANDLER( mainram_w ) { mainram[decrypt_offset(space, offset)] = data; }
 static WRITE8_HANDLER( usb_ram_w ) { sega_usb_ram_w(space, decrypt_offset(space, offset), data); }
-static WRITE8_HANDLER( vectorram_w ) { vectorram[decrypt_offset(space, offset)] = data; }
+static WRITE8_HANDLER( vectorram_w ) { segag80v_vectorram[decrypt_offset(space, offset)] = data; }
 
 
 
@@ -396,7 +393,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM		/* CPU board ROM */
 	AM_RANGE(0x0800, 0xbfff) AM_ROM		/* PROM board ROM area */
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(mainram_w) AM_BASE(&mainram)
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(vectorram_w) AM_BASE(&vectorram) AM_SIZE(&vectorram_size)
+	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(vectorram_w) AM_BASE(&segag80v_vectorram) AM_SIZE(&segag80v_vectorram_size)
 ADDRESS_MAP_END
 
 
@@ -929,8 +926,8 @@ static MACHINE_DRIVER_START( g80v_base )
 	MDRV_SCREEN_SIZE(400, 300)
 	MDRV_SCREEN_VISIBLE_AREA(512, 1536, 640-32, 1408+32)
 
-	MDRV_VIDEO_START(sega)
-	MDRV_VIDEO_UPDATE(sega)
+	MDRV_VIDEO_START(segag80v)
+	MDRV_VIDEO_UPDATE(segag80v)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

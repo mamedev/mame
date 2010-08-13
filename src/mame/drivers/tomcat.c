@@ -257,7 +257,7 @@ static ADDRESS_MAP_START( tomcat_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x40e01a, 0x40e01b) AM_WRITE(tomcat_errh_w)
 	AM_RANGE(0x40e01c, 0x40e01d) AM_WRITE(tomcat_ackh_w)
 	AM_RANGE(0x40e01e, 0x40e01f) AM_WRITE(tomcat_txbuffh_w)
-	AM_RANGE(0x800000, 0x803fff) AM_RAM AM_BASE((UINT16**)&vectorram) AM_SIZE(&vectorram_size)
+	AM_RANGE(0x800000, 0x803fff) AM_RAM AM_BASE((UINT16**)&avgdvg_vectorram) AM_SIZE(&avgdvg_vectorram_size)
 	AM_RANGE(0xffa000, 0xffbfff) AM_READWRITE(tomcat_shared_ram_r, tomcat_shared_ram_w)
 	AM_RANGE(0xffc000, 0xffcfff) AM_RAM
 	AM_RANGE(0xffd000, 0xffdfff) AM_DEVREADWRITE8("m48t02", timekeeper_r, timekeeper_w, 0xff00)

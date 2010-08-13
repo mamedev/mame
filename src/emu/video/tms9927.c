@@ -56,7 +56,7 @@ static STATE_POSTLOAD( tms9927_state_save_postload );
 static void recompute_parameters(tms9927_state *tms, int postload);
 
 
-tms9927_interface tms9927_null_interface = { 0 };
+const tms9927_interface tms9927_null_interface = { 0 };
 
 
 /* makes sure that the passed in device is the right type */

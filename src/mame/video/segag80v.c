@@ -5,7 +5,6 @@
 *************************************************************************/
 
 #include "emu.h"
-#include "avgdvg.h"
 #include "video/vector.h"
 #include "includes/segag80v.h"
 
@@ -16,6 +15,8 @@
 #define IRQ_CLOCK			(U34_CLOCK/0x1f788)	/* 40Hz interrupt */
 
 
+UINT8 *segag80v_vectorram;
+size_t segag80v_vectorram_size;
 static int min_x, min_y;
 
 
@@ -114,6 +115,7 @@ static void sega_generate_vector_list(running_machine *machine)
 	UINT8 *sintable = memory_region(machine, "proms");
 	double total_time = 1.0 / (double)IRQ_CLOCK;
 	UINT16 symaddr = 0;
+	UINT8 *vectorram = segag80v_vectorram;
 
 	vector_clear_list();
 
@@ -323,9 +325,9 @@ static void sega_generate_vector_list(running_machine *machine)
 
 ***************************************************************************/
 
-VIDEO_START( sega )
+VIDEO_START( segag80v )
 {
-	assert_always(vectorram_size != 0, "vectorram==0");
+	assert_always(segag80v_vectorram_size != 0, "segag80v_vectorram==0");
 
 	min_x =machine->primary_screen->visible_area().min_x;
 	min_y =machine->primary_screen->visible_area().min_y;
@@ -334,7 +336,7 @@ VIDEO_START( sega )
 }
 
 
-VIDEO_UPDATE( sega )
+VIDEO_UPDATE( segag80v )
 {
 	sega_generate_vector_list(screen->machine);
 	VIDEO_UPDATE_CALL(vector);

@@ -10,7 +10,6 @@
 #include "emu.h"
 #include "includes/starwars.h"
 #include "machine/x2212.h"
-#include "video/avgdvg.h"
 
 
 /* Control select values for ADC_R */

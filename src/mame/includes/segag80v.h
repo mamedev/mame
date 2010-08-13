@@ -17,5 +17,8 @@ WRITE8_HANDLER( zektor2_sh_w );
 
 /*----------- defined in video/segag80v.c -----------*/
 
-VIDEO_START( sega );
-VIDEO_UPDATE( sega );
+extern UINT8 *segag80v_vectorram;
+extern size_t segag80v_vectorram_size;
+
+VIDEO_START( segag80v );
+VIDEO_UPDATE( segag80v );

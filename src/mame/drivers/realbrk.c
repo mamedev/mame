@@ -166,7 +166,7 @@ static ADDRESS_MAP_START( base_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x605000, 0x61ffff) AM_RAM							            	//
 	AM_RANGE(0x800000, 0x800003) AM_DEVREADWRITE8("ymz", ymz280b_r, ymz280b_w, 0xff00)	// YMZ280
 	AM_RANGE(0xfe0000, 0xfeffff) AM_RAM						                	// RAM
-	AM_RANGE(0xfffc00, 0xffffff) AM_RAM_WRITE(tmp68301_regs_w) AM_BASE(&tmp68301_regs	)	// TMP68301 Registers
+	AM_RANGE(0xfffc00, 0xffffff) AM_READWRITE(tmp68301_regs_r, tmp68301_regs_w)	// TMP68301 Registers
 ADDRESS_MAP_END
 
 /*realbrk specific memory map*/

@@ -11,7 +11,6 @@
 
 #include "emu.h"
 #include "streams.h"
-#include "includes/segag80v.h"
 #include "cpu/mcs48/mcs48.h"
 #include "sound/sp0250.h"
 #include "segasnd.h"

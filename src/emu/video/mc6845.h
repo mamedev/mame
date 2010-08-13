@@ -83,7 +83,7 @@ struct _mc6845_interface
 	mc6845_on_update_addr_changed_func	on_update_addr_changed;
 };
 
-extern mc6845_interface mc6845_null_interface;
+extern const mc6845_interface mc6845_null_interface;
 
 
 /* select one of the registers for reading or writing */

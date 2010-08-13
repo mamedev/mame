@@ -10,9 +10,6 @@
 #define VECTOR_COLOR444(c) \
 	MAKE_RGB(pal4bit((c) >> 8), pal4bit((c) >> 4), pal4bit((c) >> 0))
 
-extern UINT8 *vectorram;
-extern size_t vectorram_size;
-
 VIDEO_START( vector );
 VIDEO_UPDATE( vector );
 

@@ -39,7 +39,7 @@ struct _tms9927_interface
 	const char *selfload_region;	/* name of the region with self-load data */
 };
 
-extern tms9927_interface tms9927_null_interface;
+extern const tms9927_interface tms9927_null_interface;
 
 
 /* basic read/write handlers */

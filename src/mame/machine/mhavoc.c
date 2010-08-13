@@ -5,7 +5,6 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "video/avgdvg.h"
 #include "sound/tms5220.h"
 #include "cpu/m6502/m6502.h"
 #include "includes/mhavoc.h"
