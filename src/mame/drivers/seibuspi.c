@@ -24,12 +24,6 @@
       SYS386 seems like a lower-cost version of single-board SPI.
       It has a 40MHz AMD 386 and a considerably weaker sound system (dual MSM6295).
 
-NOTES:
-
-    rjetus:
-    - If you get a blank screen on startup you need to press F2 and choose "Reset settings",
-      followed by "Exit". This will create a proper NVRAM
-
 TODO:
 - Alpha blending. Screen shot on www.system16.com show that during attract mode
   in Viper Phase 1 the "Viper" part of the logo (the red part) should be partially
@@ -2277,7 +2271,7 @@ static MACHINE_DRIVER_START( sys386f2 )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(54)
+	MDRV_SCREEN_REFRESH_RATE(57.59)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
