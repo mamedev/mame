@@ -3308,7 +3308,7 @@ ROM_START( rfjeta ) /* SPI Cart, Asia */
 	ROM_LOAD("sound1.u0222", 0x200000, 0x080000, CRC(d4fc3da1) SHA1(a03bd97e36a21d27a834b9691b27a7eb7ac51ff2) )
 ROM_END
 
-ROM_START( rfjetus )	/* Single board version SXX2G */
+ROM_START( rfjets )	/* Single board version SXX2G */
 	ROM_REGION32_LE(0x200000, "user1", 0)	/* i386 program */
 	ROM_LOAD32_BYTE("rfj-06.u0259", 0x000000, 0x80000, CRC(c835aa7a) SHA1(291eada97ceb907dfea15688ce6055e63b3aa675) ) /* PRG0 */
 	ROM_LOAD32_BYTE("rfj-07.u0258", 0x000001, 0x80000, CRC(3b6ca1ca) SHA1(9db019c0ddecfb58e2be5c345d78352f700035bf) ) /* PRG1 */
@@ -3339,7 +3339,7 @@ ROM_START( rfjetus )	/* Single board version SXX2G */
 	ROM_LOAD("rfj-04.u0107", 0x200000, 0x080000, CRC(c050da03) SHA1(1002dac51a3a4932c4f0074c1f3d97a597d98755) ) /* SOUND1 */
 
 	ROM_REGION16_BE( 0x80, "eeprom", 0 )
-	ROM_LOAD16_WORD( "93c46-rfjetus.bin", 0x0000, 0x0080, CRC(8fe8063b) SHA1(afb0141580e1b2bd149092a9cc9e8b4072b1ef10) )
+	ROM_LOAD16_WORD( "93c46-rfjets.bin", 0x0000, 0x0080, CRC(8fe8063b) SHA1(afb0141580e1b2bd149092a9cc9e8b4072b1ef10) )
 ROM_END
 
 
@@ -3610,7 +3610,7 @@ GAME( 1998, rfjetj,    rfjet,   spi,      spi_2button, rfjet,  ROT270, "Seibu Ka
 GAME( 1997, rdft2us,   rdft2,   sxx2f,    spi_2button, rdft2us,  ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden Fighters 2.1 (US, Single Board)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND ) // title screen shows '2.1'
 
 /* SXX2G */
-GAME( 1999, rfjetus,   rfjet,   sxx2g,    spi_2button, rfjet,    ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden Fighters Jet (US, Single Board)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND  ) // has 1998-99 copyright + planes unlocked
+GAME( 1999, rfjets,    rfjet,   sxx2g,    spi_2button, rfjet,    ROT270, "Seibu Kaihatsu", "Raiden Fighters Jet (Single Board)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND  ) // has 1998-99 copyright + planes unlocked
 
 /* SYS386 */
 GAME( 2000, rdft22kc,  rdft2,   seibu386, seibu386_2button, rdft22kc, ROT270, "Seibu Kaihatsu", "Raiden Fighters 2 - 2000 (China)", GAME_IMPERFECT_GRAPHICS )
