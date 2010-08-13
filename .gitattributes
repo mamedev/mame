@@ -1762,6 +1762,7 @@ src/mame/drivers/homedata.c svneol=native#text/plain
 src/mame/drivers/homerun.c svneol=native#text/plain
 src/mame/drivers/hornet.c svneol=native#text/plain
 src/mame/drivers/hotblock.c svneol=native#text/plain
+src/mame/drivers/hotstuff.c svneol=native#text/plain
 src/mame/drivers/hshavoc.c svneol=native#text/plain
 src/mame/drivers/hvyunit.c svneol=native#text/plain
 src/mame/drivers/hyhoo.c svneol=native#text/plain

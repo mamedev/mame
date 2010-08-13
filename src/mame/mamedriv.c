@@ -10303,4 +10303,7 @@ Other Sun games
 	/* Blitz System Inc. */
 	DRIVER( megadpkr )	/* (c) 1990 Blitz System Inc */
 
+	/* Olympic Video Gaming */
+	DRIVER( hotstuff )
+
 #endif	/* DRIVER_RECURSIVE */
