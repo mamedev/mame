@@ -51,6 +51,7 @@ public:
 	tilemap_t *tilemap_3;	// Layer 1
 	int tilemaps_flip;
 	int samples_bank;
+	int taitox_banknum;
 
 	uPD71054_state uPD71054;
 	const game_offset *global_offsets;
