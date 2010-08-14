@@ -24,6 +24,8 @@ To do :
  - unknown R/W
  - 13th bit in color defs (priority? bit is set for all colors in spot1,
                            for 3/4 screen cols in spot2 etc)
+ - handle coin counters and coin lockout
+
 Notes :
 
  $d000 - MCU data read/write
@@ -129,17 +131,60 @@ RAM :
 
 Stephh's additional notes (based on the game Z80 code and some tests) :
 
+1) 'nycaptor' and clones
+
+1a) 'nycaptor'
+
   - You need to press SERVICE1 while resetting the game to enter the "test mode".
     Note that the grid is always displayed, so it's IMPOSSIBLE to see what's in it 8(
-
   - When "Infinite Bullets" is set to ON, there is no timer to reload the bullets.
   - When "No Hit" Dip Switch is ON, damage is still incremented, but there are
     no test made if it reaches the limit (0x0a).
-
-  - Bit 2 of 0xd802 also determines the precision of a shot
+  - DSWC bit 2 also determines the precision of a shot
     (= range around a bullet where the enemies can be killed) :
-      * 0 : small range (0x0a)
-      * 1 : high  range (0x0c)
+      * 0 : small range (0x0a or 0x10)
+      * 1 : high  range (0x0c or 0x12)
+  - Even when "Coin Slots" is set to "1", pressing COIN2 will be based on "Coin B" settings.
+
+1b) 'colt'
+
+  - Due to patched code at 0x9fd, lives (BCD coded) settings are different than in 'nycaptor'.
+    Display at start will be lives-1, but it will also display "0" when you select 100 lives.
+  - The game is much harder than 'nycaptor' :
+      * Due to the 4 'nop' instructions at 0x0b03, you can't get any extra life.
+      * Due to patched code from 0x0bea to 0x0bf4, you lose a life as soon as you get hit
+        by en enemy or when you shoot at an innocent.
+        Furthermore, shooting birds kills you instead of recovering 3 "steps" of damage !
+  - I can't tell if it's an ingame bug of this bootleg, but the game hangs after bonus stage
+    (level 4) instead of looping back to level 1 with higher difficulty.
+    The game also frezees sometimes for some unknown reasons.
+
+2) 'cyclshtg' and clones
+
+2a) 'cyclshtg'
+
+  - Lives (BCD coded) settings are not read from MCU, but from table at 0x0fee.
+  - Even if it isn't mentionned in the manual, DSWB bit 7 allows you to reset damage to 0
+    at the end of a level (check code at 0x328d).
+  - When "Infinite Bullets" is set to ON, there is no timer to reload the bullets.
+    However, it's hard to notice as you don't see an indicator as in 'nycaptor'.
+  - There is a leftover from 'nycaptor' in CPU1 which reads DSWA bits 0 and 1 to determine
+    "Bonus Lives" settings (code at 0x009b). These values are overwritten via code in CPU 0.
+
+2b) 'bronx'
+
+  - Lives (BCD coded) settings are different than in 'cyclshtg' (table at 0x0fea).
+  - The game is much harder than 'cyclshtg' :
+      * You start with less lives with default settings (2 instead of 3).
+      * Due to the 'add  a,$00' instruction at 0x1131, you can't get any extra life
+        (when you get enough points, or even when you hit the "1UP" bonus).
+      * Due to extra code at 0x3062, you start the game as if you had already sustained
+        8 "steps" of damage. However, when you end a level, if "Damage Reset" Dip Switch
+        is ON, your damage will be reset to 0.
+        Furthermore, the game starts as if you had completed the 6 stages 8 times.
+      * Due to the 'ld   (ix+$0e),$08' instruction at 0x32b1, you also start the
+        other lives as if you had already sustained 8 "steps" of damage. However, again,
+        when you end a level, if "Damage Reset" Dip Switch is ON, your damage will be reset to 0.
 
 ***************************************************************************/
 
@@ -149,6 +194,7 @@ Stephh's additional notes (based on the game Z80 code and some tests) :
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6805/m6805.h"
+#include "includes/taitoipt.h"
 #include "sound/ay8910.h"
 #include "sound/msm5232.h"
 #include "includes/nycaptor.h"
@@ -309,9 +355,9 @@ static ADDRESS_MAP_START( nycaptor_master_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd400, 0xd400) AM_READWRITE(from_snd_r, sound_command_w)
 	AM_RANGE(0xd401, 0xd401) AM_READNOP
 	AM_RANGE(0xd403, 0xd403) AM_WRITE(sound_cpu_reset_w)
-	AM_RANGE(0xd800, 0xd800) AM_READ_PORT("DSW0")
-	AM_RANGE(0xd801, 0xd801) AM_READ_PORT("DSW1")
-	AM_RANGE(0xd802, 0xd802) AM_READ_PORT("DSW2")
+	AM_RANGE(0xd800, 0xd800) AM_READ_PORT("DSWA")
+	AM_RANGE(0xd801, 0xd801) AM_READ_PORT("DSWB")
+	AM_RANGE(0xd802, 0xd802) AM_READ_PORT("DSWC")
 	AM_RANGE(0xd803, 0xd803) AM_READ_PORT("IN0")
 	AM_RANGE(0xd804, 0xd804) AM_READ_PORT("IN1")
 	AM_RANGE(0xd805, 0xd805) AM_READ(nycaptor_mcu_status_r1)
@@ -328,9 +374,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( nycaptor_slave_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_READWRITE(nycaptor_videoram_r, nycaptor_videoram_w) AM_BASE_SIZE_MEMBER(nycaptor_state, videoram, videoram_size)
-	AM_RANGE(0xd800, 0xd800) AM_READ_PORT("DSW0")
-	AM_RANGE(0xd801, 0xd801) AM_READ_PORT("DSW1")
-	AM_RANGE(0xd802, 0xd802) AM_READ_PORT("DSW2")
+	AM_RANGE(0xd800, 0xd800) AM_READ_PORT("DSWA")
+	AM_RANGE(0xd801, 0xd801) AM_READ_PORT("DSWB")
+	AM_RANGE(0xd802, 0xd802) AM_READ_PORT("DSWC")
 	AM_RANGE(0xd803, 0xd803) AM_READ_PORT("IN0")
 	AM_RANGE(0xd804, 0xd804) AM_READ_PORT("IN1")
 	AM_RANGE(0xdc00, 0xdc9f) AM_READWRITE(nycaptor_spriteram_r, nycaptor_spriteram_w)
@@ -415,9 +461,9 @@ static ADDRESS_MAP_START( cyclshtg_master_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd002, 0xd002) AM_READWRITE(nycaptor_generic_control_r, cyclshtg_generic_control_w)
 	AM_RANGE(0xd400, 0xd400) AM_READWRITE(from_snd_r, sound_command_w)
 	AM_RANGE(0xd403, 0xd403) AM_WRITE(sound_cpu_reset_w)
-	AM_RANGE(0xd800, 0xd800) AM_READ_PORT("DSW0")
-	AM_RANGE(0xd801, 0xd801) AM_READ_PORT("DSW1")
-	AM_RANGE(0xd802, 0xd802) AM_READ_PORT("DSW2")
+	AM_RANGE(0xd800, 0xd800) AM_READ_PORT("DSWA")
+	AM_RANGE(0xd801, 0xd801) AM_READ_PORT("DSWB")
+	AM_RANGE(0xd802, 0xd802) AM_READ_PORT("DSWC")
 	AM_RANGE(0xd803, 0xd803) AM_READ_PORT("IN0")
 	AM_RANGE(0xd804, 0xd804) AM_READ_PORT("IN1")
 	AM_RANGE(0xd805, 0xd805) AM_READ(cyclshtg_mcu_status_r)
@@ -434,9 +480,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( cyclshtg_slave_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(nycaptor_videoram_r, nycaptor_videoram_w) AM_BASE_SIZE_MEMBER(nycaptor_state, videoram, videoram_size)
-	AM_RANGE(0xd800, 0xd800) AM_READ_PORT("DSW0")
-	AM_RANGE(0xd801, 0xd801) AM_READ_PORT("DSW1")
-	AM_RANGE(0xd802, 0xd802) AM_READ_PORT("DSW2")
+	AM_RANGE(0xd800, 0xd800) AM_READ_PORT("DSWA")
+	AM_RANGE(0xd801, 0xd801) AM_READ_PORT("DSWB")
+	AM_RANGE(0xd802, 0xd802) AM_READ_PORT("DSWC")
 	AM_RANGE(0xd803, 0xd803) AM_READ_PORT("IN0")
 	AM_RANGE(0xd804, 0xd804) AM_READ_PORT("IN1")
 	AM_RANGE(0xdc00, 0xdc9f) AM_READWRITE(nycaptor_spriteram_r, nycaptor_spriteram_w)
@@ -465,9 +511,9 @@ static ADDRESS_MAP_START( bronx_master_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd400, 0xd400) AM_READWRITE(from_snd_r, sound_command_w)
 	AM_RANGE(0xd401, 0xd401) AM_READ(unk_r)
 	AM_RANGE(0xd403, 0xd403) AM_WRITE(sound_cpu_reset_w)
-	AM_RANGE(0xd800, 0xd800) AM_READ_PORT("DSW0")
-	AM_RANGE(0xd801, 0xd801) AM_READ_PORT("DSW1")
-	AM_RANGE(0xd802, 0xd802) AM_READ_PORT("DSW2")
+	AM_RANGE(0xd800, 0xd800) AM_READ_PORT("DSWA")
+	AM_RANGE(0xd801, 0xd801) AM_READ_PORT("DSWB")
+	AM_RANGE(0xd802, 0xd802) AM_READ_PORT("DSWC")
 	AM_RANGE(0xd803, 0xd803) AM_READ_PORT("IN0")
 	AM_RANGE(0xd804, 0xd804) AM_READ_PORT("IN1")
 	AM_RANGE(0xd805, 0xd805) AM_READ(cyclshtg_mcu_status_r)
@@ -483,9 +529,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bronx_slave_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_READWRITE(nycaptor_videoram_r, nycaptor_videoram_w) AM_BASE_SIZE_MEMBER(nycaptor_state, videoram, videoram_size)
-	AM_RANGE(0xd800, 0xd800) AM_READ_PORT("DSW0")
-	AM_RANGE(0xd801, 0xd801) AM_READ_PORT("DSW1")
-	AM_RANGE(0xd802, 0xd802) AM_READ_PORT("DSW2")
+	AM_RANGE(0xd800, 0xd800) AM_READ_PORT("DSWA")
+	AM_RANGE(0xd801, 0xd801) AM_READ_PORT("DSWB")
+	AM_RANGE(0xd802, 0xd802) AM_READ_PORT("DSWC")
 	AM_RANGE(0xd803, 0xd803) AM_READ_PORT("IN0")
 	AM_RANGE(0xd804, 0xd804) AM_READ_PORT("IN1")
 	AM_RANGE(0xd805, 0xd805) AM_READ(cyclshtg_mcu_status_r1)
@@ -505,68 +551,18 @@ static ADDRESS_MAP_START( bronx_slave_io_map, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
-/* Cycle Shooting */
-
-static INPUT_PORTS_START( cyclshtg )
-	PORT_START("DSW0")
-	PORT_DIPNAME( 0x04, 0x04, "Test Mode" )
-	PORT_DIPSETTING(	0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
-
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(	0x10, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(	0x30, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(	0x20, DEF_STR( 1C_2C ) )
-
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(	0x40, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(	0xc0, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(	0x80, DEF_STR( 1C_2C ) )
-
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x08, DEF_STR( On ) )
-
-	PORT_START("DSW1")
-
-	PORT_START("DSW2")
-
-	PORT_START("IN0")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )//?
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Tilt ) )
-	PORT_DIPSETTING(	0x08, DEF_STR( No ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( Yes ) )
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNKNOWN )
-
-
-	PORT_START("IN1")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
-
-	PORT_START("LIGHTX")
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(1)
-
-	PORT_START("LIGHTY")
-	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(Y, -1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(1)
-INPUT_PORTS_END
-
-
+/* verified from Z80 code */
 static INPUT_PORTS_START( nycaptor )
-	PORT_START("DSW0")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(	0x02, "20k, 80k then every 80k" )
-	PORT_DIPSETTING(	0x03, "50k, 150k then every 200k" )
-	PORT_DIPSETTING(	0x01, "100k, 300k then every 300k" )
-	PORT_DIPSETTING(	0x00, "150k, 300k then every 300k" )
-	PORT_DIPNAME( 0x04, 0x04, "Infinite Bullets (Cheat)")
+	PORT_START("DSWA")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Bonus_Life ) )       /* table at 0x00e5 in CPU1 - see notes for 'colt' */
+	PORT_DIPSETTING(	0x02, "20k 80k 80k+" )
+	PORT_DIPSETTING(	0x03, "50k 150k 200k+" )
+	PORT_DIPSETTING(	0x01, "100k 300k 300k+" )
+	PORT_DIPSETTING(	0x00, "150k 300k 300k+" )
+	PORT_DIPNAME( 0x04, 0x04, "Infinite Bullets")           /* see notes */
 	PORT_DIPSETTING(	0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Lives ) )            /* values are read from the MCU */
 	PORT_DIPSETTING(	0x08, "1" )
 	PORT_DIPSETTING(	0x00, "2" )
 	PORT_DIPSETTING(	0x18, "3" )
@@ -581,7 +577,7 @@ static INPUT_PORTS_START( nycaptor )
 	PORT_DIPSETTING(	0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(	0x80, DEF_STR( On ) )
 
-	PORT_START("DSW1")
+	PORT_START("DSWB")
 	PORT_DIPNAME( 0x0f, 0x00, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(	0x0f, DEF_STR( 9C_1C ) )
 	PORT_DIPSETTING(	0x0e, DEF_STR( 8C_1C ) )
@@ -617,7 +613,7 @@ static INPUT_PORTS_START( nycaptor )
 	PORT_DIPSETTING(	0x60, DEF_STR( 1C_7C ) )
 	PORT_DIPSETTING(	0x70, DEF_STR( 1C_8C ) )
 
-	PORT_START("DSW2")
+	PORT_START("DSWC")
 	PORT_DIPNAME( 0x01, 0x01, "Freeze" )
 	PORT_DIPSETTING(	0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
@@ -644,17 +640,17 @@ static INPUT_PORTS_START( nycaptor )
 
 	PORT_START("IN0")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* IPT_START2 is some similar Taito games (eg: 'flstory') */
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )            /* IPT_START2 is some similar Taito games (eg: 'flstory') */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* "I/O ERROR" if active */
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* "I/O ERROR" if active */
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )            /* "I/O ERROR" if active - code at 0x083d */
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )            /* "I/O ERROR" if active - code at 0x083d */
 
 	PORT_START("IN1")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0xfe, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("LIGHTX")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(1)
@@ -662,6 +658,90 @@ static INPUT_PORTS_START( nycaptor )
 	PORT_START("LIGHTY")
 	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(Y, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(1)
 INPUT_PORTS_END
+
+/* verified from Z80 code */
+static INPUT_PORTS_START( colt )
+	PORT_INCLUDE( nycaptor )
+
+	PORT_MODIFY("DSWA")
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Lives ) )            /* see notes */
+	PORT_DIPSETTING(	0x08, "1" )
+	PORT_DIPSETTING(	0x10, "2" )
+	PORT_DIPSETTING(	0x18, "3" )
+	PORT_DIPSETTING(	0x00, "100" )
+INPUT_PORTS_END
+
+
+/* verified from Z80 code */
+static INPUT_PORTS_START( cyclshtg )
+	PORT_START("DSWA")
+	PORT_DIPUNUSED( 0x01, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x02, IP_ACTIVE_LOW )
+	TAITO_DSWA_BITS_2_TO_3
+	TAITO_COINAGE_JAPAN_OLD                                 /* coinage B isn't mentionned in the manual */
+
+	PORT_START("DSWB")
+	TAITO_DIFFICULTY
+	PORT_DIPNAME( 0x0c, 0x08, DEF_STR( Bonus_Life ) )       /* table at 0x100f - see notes for 'bronx' */
+	PORT_DIPSETTING(	0x0c, "150k 350k 200k+" )
+	PORT_DIPSETTING(	0x08, "200k 500k 300k+" )
+	PORT_DIPSETTING(	0x04, "300k 700k 400k+" )
+	PORT_DIPSETTING(	0x00, "400k 900k 500k+" )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )            /* see notes */
+	PORT_DIPSETTING(	0x00, "1" )
+	PORT_DIPSETTING(	0x30, "3" )
+	PORT_DIPSETTING(	0x10, "4" )
+	PORT_DIPSETTING(	0x20, "5" )
+	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )
+	PORT_DIPNAME( 0x80, 0x80, "Reset Damage (Cheat)" )      /* see notes */
+	PORT_DIPSETTING(	0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+
+	PORT_START("DSWC")
+	PORT_DIPUNUSED( 0x01, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x02, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x04, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x08, IP_ACTIVE_LOW )
+	PORT_DIPNAME( 0x10, 0x10, "Infinite Bullets" )          /* see notes */
+	PORT_DIPSETTING(	0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x40, IP_ACTIVE_LOW )
+	PORT_DIPUNUSED( 0x80, IP_ACTIVE_LOW )
+
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )            /* IPT_START2 is some similar Taito games (eg: 'flstory') */
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_TILT )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0xfe, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("LIGHTX")
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_Y ) PORT_CROSSHAIR(X, 1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(1)
+
+	PORT_START("LIGHTY")
+	PORT_BIT( 0xff, 0x80, IPT_LIGHTGUN_X ) PORT_CROSSHAIR(Y, -1.0, 0.0, 0) PORT_SENSITIVITY(25) PORT_KEYDELTA(15) PORT_PLAYER(1)
+INPUT_PORTS_END
+
+/* verified from Z80 code */
+static INPUT_PORTS_START( bronx )
+	PORT_INCLUDE( cyclshtg )
+
+	PORT_MODIFY("DSWB")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )            /* see notes */
+	PORT_DIPSETTING(	0x00, "1" )
+	PORT_DIPSETTING(	0x30, "2" )
+	PORT_DIPSETTING(	0x10, "4" )
+	PORT_DIPSETTING(	0x20, "5" )
+INPUT_PORTS_END
+
 
 static const gfx_layout charlayout =
 {
@@ -1282,6 +1362,18 @@ ROM_START( colt )
 	ROM_LOAD( "a50_14",   0x1c000, 0x4000, CRC(24b2f1bf) SHA1(4757aec2e4b99ce33d993ce1e19ee46a4eb76e86) )
 ROM_END
 
+static DRIVER_INIT( nycaptor )
+{
+	nycaptor_state *state = machine->driver_data<nycaptor_state>();
+	state->gametype = 0;
+}
+
+static DRIVER_INIT( cyclshtg )
+{
+	nycaptor_state *state = machine->driver_data<nycaptor_state>();
+	state->gametype = 1;
+}
+
 static DRIVER_INIT( bronx )
 {
 	nycaptor_state *state = machine->driver_data<nycaptor_state>();
@@ -1306,20 +1398,8 @@ static DRIVER_INIT( colt )
 	state->gametype = 2;
 }
 
-static DRIVER_INIT( nycaptor )
-{
-	nycaptor_state *state = machine->driver_data<nycaptor_state>();
-	state->gametype = 0;
-}
-
-static DRIVER_INIT( cyclshtg )
-{
-	nycaptor_state *state = machine->driver_data<nycaptor_state>();
-	state->gametype = 1;
-}
-
 GAME( 1985, nycaptor, 0,        nycaptor, nycaptor, nycaptor, ROT0,  "Taito",   "N.Y. Captor", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1986, cyclshtg, 0,        cyclshtg, cyclshtg, cyclshtg, ROT90, "Taito",   "Cycle Shooting", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 /* bootlegs */
-GAME( 1986, bronx,    cyclshtg, bronx,    cyclshtg, bronx,    ROT90, "bootleg", "Bronx", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1986, colt ,    nycaptor, bronx,    nycaptor, colt,     ROT0,  "bootleg", "Colt", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1986, bronx,    cyclshtg, bronx,    bronx,    bronx,    ROT90, "bootleg", "Bronx", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1986, colt,     nycaptor, bronx,    colt,     colt,     ROT0,  "bootleg", "Colt", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
