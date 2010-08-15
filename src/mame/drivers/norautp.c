@@ -14,7 +14,7 @@
    * Noraut Deluxe Poker (console),       198?,  Noraut Ltd.
    * Noraut Deluxe Poker (bootleg),       198?,  Unknown.
    * Noraut Joker Poker (original),       198?,  Noraut Ltd.
-   * Noraut Joker Poker (Prologic HW),    198?,  Prologic / Noraut Ltd.
+   * Noraut Joker Poker (Prologic HW),    198?,  Video Fun Games Ltd.
    * Noraut Joker Poker (alt),            1988,  Noraut Ltd.
    * Noraut Red Hot Joker Poker,          1988,  Noraut Ltd.
    * Noraut Red Hot Joker Poker (alt HW), 198?,  Noraut Ltd.
@@ -3477,7 +3477,7 @@ GAMEL( 1988, norautp,  0,       norautp,  norautp,  0,   ROT0, "Noraut Ltd.",   
 GAMEL( 198?, norautdx, 0,       norautp,  norautpn, 0,   ROT0, "Noraut Ltd.",              "Noraut Deluxe Poker (console)",       0,                layout_noraut12 )
 GAMEL( 198?, norautpn, norautp, norautp,  norautpn, 0,   ROT0, "bootleg",                  "Noraut Deluxe Poker (bootleg)",       0,                layout_noraut12 )
 GAMEL( 198?, norautjo, 0,       norautp,  mainline, 0,   ROT0, "Noraut Ltd.",              "Noraut Joker Poker (original)",       0,                layout_noraut12 )
-GAMEL( 198?, norautpl, 0,       norautpl, mainline, 0,   ROT0, "Prologic / Noraut Ltd.",   "Noraut Joker Poker (Prologic HW)",    0,                layout_noraut12 )
+GAMEL( 198?, norautpl, 0,       norautpl, mainline, 0,   ROT0, "Video Fun Games Ltd.",     "Noraut Joker Poker (Prologic HW)",    0,                layout_noraut12 )
 GAMEL( 1988, norautjp, norautp, norautp,  norautp,  0,   ROT0, "Noraut Ltd.",              "Noraut Joker Poker (alt)",            0,                layout_noraut11 )
 GAMEL( 1988, norautrh, 0,       norautp,  norautrh, 0,   ROT0, "Noraut Ltd.",              "Noraut Red Hot Joker Poker",          0,                layout_noraut12 )
 GAMEL( 198?, norautra, 0,       norautp,  norautrh, 0,   ROT0, "Noraut Ltd.",              "Noraut Red Hot Joker Poker (alt HW)", 0,                layout_noraut12 ) // 1-bet?? where??...
