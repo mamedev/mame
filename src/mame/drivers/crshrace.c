@@ -155,20 +155,9 @@ static READ16_HANDLER( extrarom2_r )
 	return rom[offset] | (rom[offset + 1] << 8);
 }
 
-static void set_sound_bank(running_machine *machine)
-{
-	crshrace_state *state = machine->driver_data<crshrace_state>();
-	UINT8 *rom = memory_region(machine, "audiocpu") + 0x10000;
-
-	memory_set_bankptr(machine, "bank1", rom + state->sound_bank * 0x8000);
-}
-
 static WRITE8_HANDLER( crshrace_sh_bankswitch_w )
 {
-	crshrace_state *state = space->machine->driver_data<crshrace_state>();
-
-	state->sound_bank = data & 0x03;
-	set_sound_bank(space->machine);
+	memory_set_bank(space->machine, "bank1", data & 0x03);
 }
 
 static WRITE16_HANDLER( sound_command_w )
@@ -453,14 +442,11 @@ static const k053936_interface crshrace_k053936_intf =
 };
 
 
-static STATE_POSTLOAD( crshrace_postload )
-{
-	set_sound_bank(machine);
-}
-
 static MACHINE_START( crshrace )
 {
 	crshrace_state *state = machine->driver_data<crshrace_state>();
+
+	memory_configure_bank(machine, "bank1", 0, 4, memory_region(machine, "audiocpu") + 0x10000, 0x8000);
 
 	state->audiocpu = machine->device("audiocpu");
 	state->k053936 = machine->device("k053936");
@@ -469,8 +455,6 @@ static MACHINE_START( crshrace )
 	state_save_register_global(machine, state->gfxctrl);
 	state_save_register_global(machine, state->flipscreen);
 	state_save_register_global(machine, state->pending_command);
-	state_save_register_global(machine, state->sound_bank);
-	state_save_register_postload(machine, crshrace_postload, NULL);
 }
 
 static MACHINE_RESET( crshrace )

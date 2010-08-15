@@ -20,7 +20,6 @@ public:
 
 	/* misc */
 	int pending_command;
-	int sound_bank;
 
 	/* devices */
 	running_device *audiocpu;
