@@ -10303,6 +10303,9 @@ Other Sun games
 	/* Blitz System Inc. */
 	DRIVER( megadpkr )	/* (c) 1990 Blitz System Inc */
 
+	/* Video Fun Games Ltd. */
+	DRIVER( genie )		/* (c) 198? Video Fun Games Ltd. */
+
 	/* Olympic Video Gaming */
 	DRIVER( hotstuff )
 

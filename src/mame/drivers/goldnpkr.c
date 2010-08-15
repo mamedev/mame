@@ -54,6 +54,7 @@
     * Buena Suerte (Spanish, set 20).           1991, Unknown.
     * Buena Suerte (Spanish, set 21).           1991, Unknown.
     * Buena Suerte (Spanish, set 22).           1991, Unknown.
+    * Genie.                                    198?, Video Fun Games Ltd.
 
 
 *******************************************************************************
@@ -626,9 +627,9 @@
 #include "goldnpkr.lh"
 
 
-/*************************
-*     Video Hardware     *
-*************************/
+/*********************************************
+*               Video Hardware               *
+*********************************************/
 
 static UINT8 *videoram;
 static UINT8 *colorram;
@@ -766,9 +767,9 @@ static PALETTE_INIT( witchcrd )
 }
 
 
-/***********************
-*     R/W Handlers     *
-***********************/
+/*******************************************
+*               R/W Handlers               *
+*******************************************/
 
 static int mux_data = 0;
 static UINT8 pia0_PA_data;
@@ -889,9 +890,9 @@ static WRITE8_DEVICE_HANDLER( sound_w )
 }
 
 
-/*************************
-* Memory Map Information *
-*************************/
+/*********************************************
+*           Memory Map Information           *
+*********************************************/
 
 static ADDRESS_MAP_START( goldnpkr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
@@ -943,9 +944,22 @@ ADDRESS_MAP_END
 
 */
 
-/*************************
-*      Input Ports       *
-*************************/
+static ADDRESS_MAP_START( genie_map, ADDRESS_SPACE_PROGRAM, 8 )
+	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
+	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)	/* battery backed RAM */
+	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("crtc", mc6845_address_w)
+	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
+	AM_RANGE(0x0844, 0x0847) AM_DEVREADWRITE("pia0", pia6821_r, pia6821_w)
+	AM_RANGE(0x0848, 0x084b) AM_DEVREADWRITE("pia1", pia6821_r, pia6821_w)
+	AM_RANGE(0x1000, 0x17ff) AM_RAM_WRITE(goldnpkr_videoram_w) AM_BASE(&videoram)
+	AM_RANGE(0x1800, 0x1fff) AM_RAM_WRITE(goldnpkr_colorram_w) AM_BASE(&colorram)
+	AM_RANGE(0x2000, 0x3fff) AM_ROM
+ADDRESS_MAP_END
+
+
+/*********************************************
+*                Input Ports                 *
+*********************************************/
 
 static INPUT_PORTS_START( goldnpkr )
 	/* Multiplexed - 4x5bits */
@@ -1960,10 +1974,80 @@ static INPUT_PORTS_START( poker91 )
 	PORT_DIPSETTING(    0x00, "Oculta" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( genie )
+	/* Multiplexed - 4x5bits */
+	PORT_START("IN0-0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_GAMBLE_BET )   PORT_CODE(KEYCODE_1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_BOOK )  PORT_NAME("Bookkeeping")
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_D_UP )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )  PORT_NAME("Play")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_CANCEL )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
-/*************************
-*    Graphics Layouts    *
-*************************/
+	PORT_START("IN0-1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_OTHER )        PORT_NAME("Collect") PORT_CODE(KEYCODE_W)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_GAMBLE_TAKE )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_HIGH )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_GAMBLE_LOW )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN0-2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN0-3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SERVICE ) PORT_NAME("Settings") PORT_CODE(KEYCODE_9)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 )   PORT_NAME("Coupon (Note In)")
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 )   PORT_IMPULSE(3) PORT_NAME("Coin In")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("SW1")
+	/* only bits 4-7 are connected here and were routed to SW1 1-4 */
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, "Min Wining Hand" )	PORT_DIPLOCATION("SW1:1")
+	PORT_DIPSETTING(    0x10, "Double Pair" )
+	PORT_DIPSETTING(    0x00, "Pair of 11's" )
+	PORT_DIPNAME( 0x20, 0x20, "50hz/60hz" )			PORT_DIPLOCATION("SW1:2")
+	PORT_DIPSETTING(    0x20, "50hz" )
+	PORT_DIPSETTING(    0x00, "60hz" )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW1:4")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
+/*********************************************
+*              Graphics Layouts              *
+*********************************************/
 
 static const gfx_layout tilelayout =
 {
@@ -1977,9 +2061,9 @@ static const gfx_layout tilelayout =
 };
 
 
-/******************************
-* Graphics Decode Information *
-******************************/
+/**************************************************
+*           Graphics Decode Information           *
+**************************************************/
 
 static GFXDECODE_START( goldnpkr )
 	GFXDECODE_ENTRY( "gfx1", 0, tilelayout, 0, 16 )
@@ -1987,9 +2071,9 @@ static GFXDECODE_START( goldnpkr )
 GFXDECODE_END
 
 
-/***********************
-*    PIA Interfaces    *
-***********************/
+/*******************************************
+*              PIA Interfaces              *
+*******************************************/
 
 /***** Golden Poker Double Up *****/
 
@@ -2044,9 +2128,9 @@ static const pia6821_interface pottnpkr_pia0_intf =
 };
 
 
-/************************
-*    CRTC Interface    *
-************************/
+/*******************************************
+*              CRTC Interface              *
+*******************************************/
 
 static const mc6845_interface mc6845_intf =
 {
@@ -2063,9 +2147,9 @@ static const mc6845_interface mc6845_intf =
 };
 
 
-/**************************************
-*       Discrete Sound Routines       *
-***************************************
+/**********************************************************
+*                 Discrete Sound Routines                 *
+***********************************************************
 
     Golden Poker Double-Up discrete sound circuitry.
     ------------------------------------------------
@@ -2199,9 +2283,9 @@ static DISCRETE_SOUND_START( pottnpkr )
 DISCRETE_SOUND_END
 
 
-/*************************
-*    Machine Drivers     *
-*************************/
+/*********************************************
+*              Machine Drivers               *
+*********************************************/
 
 static MACHINE_DRIVER_START( goldnpkr_base )
 
@@ -2262,6 +2346,7 @@ static MACHINE_DRIVER_START( pottnpkr )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
+
 static MACHINE_DRIVER_START( witchcrd )
 
 	MDRV_IMPORT_FROM(goldnpkr_base)
@@ -2283,9 +2368,30 @@ static MACHINE_DRIVER_START( witchcrd )
 MACHINE_DRIVER_END
 
 
-/*************************
-*        Rom Load        *
-*************************/
+static MACHINE_DRIVER_START( genie )
+
+	MDRV_IMPORT_FROM(goldnpkr_base)
+
+	/* basic machine hardware */
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_PROGRAM_MAP(genie_map)
+
+	MDRV_PIA6821_MODIFY("pia0", pottnpkr_pia0_intf)
+
+	/* video hardware */
+	MDRV_PALETTE_INIT(witchcrd)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
+	MDRV_SOUND_CONFIG_DISCRETE(goldnpkr)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_DRIVER_END
+
+
+/*********************************************
+*                  Rom Load                  *
+*********************************************/
 
 /*  the original goldnpkr u40_4a.bin rom is bit corrupted.
     U43_2A.bin        BADADDR      --xxxxxxxxxxx
@@ -2463,7 +2569,7 @@ ROM_START( potnpkrc )
 ROM_END
 
 
-/***************** NEW SETS **************************/
+/************************* NEW SETS **************************/
 
 
 ROM_START( potnpkrd )
@@ -2796,7 +2902,7 @@ ROM_START( poker91 )
 ROM_END
 
 
-/******************************* bsuerte sets **************************/
+/******************************* bsuerte sets *******************************/
 /*
     checksum routine at $5827
     protect $4000+ & $7ff9.
@@ -3177,10 +3283,61 @@ ROM_START( bsuerteu )
 	ROM_LOAD( "82s129.9c",		0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
 ROM_END
 
+/******************************* Other sets *******************************/
 
-/*************************
-*      Driver Init       *
-*************************/
+/****************************************************
+
+  Genie (Video Fun Games Ltd.)
+  Skill game. Only for amusement.
+
+  PCB is a heavily modified Golden Poker hardware.
+  Silkscreened "ICP-1".
+
+  CPU:   1x SY6502.
+  Video: 1x HD6845P CRTC.
+  I/O:   2x HD6821P PIAs.
+
+  Sound: Discrete.
+
+  RAMs:  2x M5L5101LP-1.
+
+  ROMs:  2x 2732 for program. (2m.16a, 3m.17a)
+         1x 2716 for char gen. (4.8a)
+         3x 2716 for gfx bitplanes. (1.4a, 2.6a, 3.7a)
+
+  1x Reset switch. (R.SW) 
+  1x 8 DIP switches bank.
+  1x 2x10 Edge connector. (GM1)
+  1x 2x22 Edge connector. (GM2)
+
+
+*****************************************************/
+
+ROM_START( genie )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "2m.16a",	0x2000, 0x1000, CRC(30df75f5) SHA1(0696fb3db0b9927e6366db7316d605914ff8d464) )
+	ROM_LOAD( "3m.17a",	0x3000, 0x1000, CRC(9d67f5c9) SHA1(d3bc13ce07a7b1713544756d7723dd0bcd59cd1a) )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_FILL(			0x0000, 0x1000, 0 ) /* filling the R-G bitplanes */
+	ROM_LOAD( "4.8a",	0x1000, 0x0800, CRC(1cdd1db9) SHA1(1940c6654b4a892abc3e4557666d341f407ac54f) )  /* chars gfx */
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "1.4a",	0x0000, 0x0800, CRC(40c52b9d) SHA1(64145bd2aa19b584fa56022303dc595320952c24) )  /* tiles, bitplane1 */
+	ROM_LOAD( "2.6a",	0x0800, 0x0800, CRC(b0b61ffa) SHA1(d0a01027bd6acd7c72eb5bbdb37d6dd97df8aced) )  /* tiles, bitplane2 */
+	ROM_LOAD( "3.7a",	0x1000, 0x0800, CRC(151e4af7) SHA1(a44feaa69a00a6db31c018267b8b67a248e7c66e) )  /* tiles, bitplane3 */
+
+	ROM_REGION( 0x0800,	"nvram", 0 )	/* default NVRAM, otherwise the game isn't stable */
+	ROM_LOAD( "genie_nvram.bin", 0x0000, 0x0800, CRC(1b062ae7) SHA1(9d01635f3968d4b91b4a5d9fadfaf6edd0dea7ba) )
+
+	ROM_REGION( 0x0100, "proms", 0 )	/* using original golden poker color prom */
+	ROM_LOAD( "n82s129.9c",	0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+ROM_END
+
+
+/*********************************************
+*                Driver Init                 *
+*********************************************/
 
 /*
     Golden Poker H/W sets:
@@ -3229,9 +3386,9 @@ static DRIVER_INIT( royale )
 //  ROM[0x60bc] = 0xea;
 }
 
-/*************************
-*      Game Drivers      *
-*************************/
+/*********************************************
+*                Game Drivers                *
+*********************************************/
 
 /*     YEAR  NAME      PARENT    MACHINE   INPUT     INIT      ROT      COMPANY                      FULLNAME                                  FLAGS             LAYOUT  */
 GAMEL( 1981, goldnpkr, 0,        goldnpkr, goldnpkr, 0,        ROT0,   "Bonanza Enterprises, Ltd",  "Golden Poker Double Up (Big Boy)",        0,                layout_goldnpkr )
@@ -3280,3 +3437,4 @@ GAMEL( 1991, bsuerter, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown
 GAMEL( 1991, bsuertes, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                 "Buena Suerte (Spanish, set 20)",          0,                layout_goldnpkr )
 GAMEL( 1991, bsuertet, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                 "Buena Suerte (Spanish, set 21)",          0,                layout_goldnpkr )
 GAMEL( 1991, bsuerteu, bsuerte,  witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                 "Buena Suerte (Spanish, set 22)",          0,                layout_goldnpkr )
+GAME(  198?, genie,    0,        genie,    genie,    0,        ROT0,   "Video Fun Games Ltd.",      "Genie",                                   0 )
