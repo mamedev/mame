@@ -30,6 +30,7 @@
 #include "cpu/arm/arm.h"
 #include "sound/dac.h"
 #include "includes/archimds.h"
+#include "machine/i2cmem.h"
 
 #ifdef MESS
 #include "machine/wd17xx.h"
@@ -49,6 +50,7 @@ static UINT32 vidc_sndstart, vidc_sndend, vidc_sndcur;
 static emu_timer *timer[4], *snd_timer;
 emu_timer  *vbl_timer;
 
+#define CONTROL			0
 #define IRQ_STATUS_A 	4
 #define IRQ_MASK_A 		6
 #define IRQ_STATUS_B	8
@@ -342,6 +344,16 @@ READ32_HANDLER(archimedes_ioc_r)
 
 		switch (offset & 0x1f)
 		{
+			case CONTROL:
+			{
+				UINT8 i2c_clk,i2c_data;
+
+				i2c_clk = ((i2cmem_scl_read(space->machine->device("i2cmem")) & 1) << 1);
+				i2c_data = (i2cmem_sda_read(space->machine->device("i2cmem")) & 1);
+
+				return (ioc_regs[CONTROL] & 0xfc) | i2c_clk | i2c_data;
+			}
+
 			case 1:	// keyboard read
 				archimedes_request_irq_b(space->machine, ARCHIMEDES_IRQB_KBD_XMIT_EMPTY);
 				break;
@@ -402,6 +414,8 @@ WRITE32_HANDLER(archimedes_ioc_w)
 		{
 			case 0:	// I2C bus control
 				//logerror("IOC I2C: CLK %d DAT %d\n", (data>>1)&1, data&1);
+				i2cmem_sda_write(space->machine->device("i2cmem"), data & 0x01);
+				i2cmem_scl_write(space->machine->device("i2cmem"), (data & 0x02) >> 1);
 				break;
 
 			case IRQ_MASK_A:

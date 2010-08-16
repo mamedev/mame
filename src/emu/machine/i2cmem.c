@@ -384,7 +384,6 @@ void i2cmem_device::set_sda_line( int state )
 	}
 }
 
-
 WRITE_LINE_DEVICE_HANDLER( i2cmem_scl_write )
 {
 	downcast<i2cmem_device *>( device )->set_scl_line( state );
@@ -580,6 +579,21 @@ int i2cmem_device::read_sda_line()
 
 	return res;
 }
+
+READ_LINE_DEVICE_HANDLER( i2cmem_scl_read )
+{
+	return downcast<i2cmem_device *>( device )->read_scl_line();
+}
+
+int i2cmem_device::read_scl_line()
+{
+	int res = m_scl & 1;
+
+	verboselog( this, 2, "read scl %d\n", res );
+
+	return res;
+}
+
 
 
 //**************************************************************************

@@ -16,7 +16,8 @@
 			- R0 == 1: IRQ status A force IRQ flag check failed
 			- R0 == 2: FIQ status force IRQ flag check failed
 			- R0 == 3: Timer 1 latch low val == 0xf5
-		- bp 0x34002a8: SRAM Check branch test
+		- bp 0x34002a8: SRAM Check branch test (I2C)
+			bp 0x34002a4:
 		- bp 0x34002d0: 2KHz Timer branch test
 		- bp 0x34002f8: DRAM emulator branch tests
 			- R0 == 0 "DRAM emulator found"
@@ -32,6 +33,7 @@
 #include "cpu/arm/arm.h"
 #include "sound/dac.h"
 #include "includes/archimds.h"
+#include "machine/i2cmem.h"
 
 extern UINT8 ioc_regs[0x80/4];
 extern INT16 memc_pages[(32*1024*1024)/(4096)];	// the logical RAM area is 32 megs, and the smallest page size is 4k
@@ -69,9 +71,16 @@ static VIDEO_UPDATE(aristmk5)
 	return 0;
 }
 
+static WRITE32_HANDLER( mk5_i2c_w )
+{
+	i2cmem_sda_write(space->machine->device("i2cmem"), (data & 0x40) >> 6);
+	i2cmem_scl_write(space->machine->device("i2cmem"), (data & 0x80) >> 7);
+}
+
 static ADDRESS_MAP_START( aristmk5_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x01ffffff) AM_READWRITE(archimedes_memc_logical_r, archimedes_memc_logical_w)
 	AM_RANGE(0x02000000, 0x02ffffff) AM_RAM AM_BASE(&archimedes_memc_physmem) /* physical RAM - 16 MB for now, should be 512k for the A310 */
+	AM_RANGE(0x03010420, 0x03010423) AM_WRITE(mk5_i2c_w)
 	AM_RANGE(0x03010810, 0x03010813) AM_READNOP //MK-5 specific, watchdog
 	AM_RANGE(0x03000000, 0x033fffff) AM_READWRITE(archimedes_ioc_r, archimedes_ioc_w)
 	AM_RANGE(0x03400000, 0x035fffff) AM_ROM AM_REGION("maincpu", 0) AM_WRITE(archimedes_memc_page_w)
@@ -111,12 +120,23 @@ static MACHINE_RESET( aristmk5 )
 	}
 }
 
+#define	NVRAM_SIZE 1024
+#define	NVRAM_PAGE_SIZE	16	/* max size of one write request */
+
+static const i2cmem_interface i2cmem_interface =
+{
+	I2CMEM_SLAVE_ADDRESS, NVRAM_PAGE_SIZE, NVRAM_SIZE
+};
+
+
 static MACHINE_DRIVER_START( aristmk5 )
 	MDRV_CPU_ADD("maincpu", ARM, 10000000) // ?
 	MDRV_CPU_PROGRAM_MAP(aristmk5_map)
 
-	MDRV_MACHINE_RESET( aristmk5 )
 	MDRV_MACHINE_START( aristmk5 )
+	MDRV_MACHINE_RESET( aristmk5 )
+
+	MDRV_I2CMEM_ADD("i2cmem",i2cmem_interface)
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
