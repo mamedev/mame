@@ -49,11 +49,18 @@ static UINT32 vidc_sndstart, vidc_sndend, vidc_sndcur;
 static emu_timer *timer[4], *snd_timer;
 emu_timer  *vbl_timer;
 
+#define IRQ_STATUS_A 	4
+#define IRQ_MASK_A 		6
+#define IRQ_STATUS_B	8
+#define IRQ_MASK_B		10
+#define FIQ_STATUS		12
+#define FIQ_MASK		14
+
 void archimedes_request_irq_a(running_machine *machine, int mask)
 {
-	ioc_regs[4] |= mask;
+	ioc_regs[IRQ_STATUS_A] |= mask;
 
-	if (ioc_regs[6] & mask)
+	if (ioc_regs[IRQ_MASK_A] & mask)
 	{
 		cputag_set_input_line(machine, "maincpu", ARM_IRQ_LINE, ASSERT_LINE);
 	}
@@ -61,9 +68,9 @@ void archimedes_request_irq_a(running_machine *machine, int mask)
 
 void archimedes_request_irq_b(running_machine *machine, int mask)
 {
-	ioc_regs[8] |= mask;
+	ioc_regs[IRQ_STATUS_B] |= mask;
 
-	if (ioc_regs[10] & mask)
+	if (ioc_regs[IRQ_MASK_B] & mask)
 	{
 		generic_pulse_irq_line(machine->device("maincpu"), ARM_IRQ_LINE);
 	}
@@ -71,9 +78,9 @@ void archimedes_request_irq_b(running_machine *machine, int mask)
 
 void archimedes_request_fiq(running_machine *machine, int mask)
 {
-	ioc_regs[12] |= mask;
+	ioc_regs[FIQ_STATUS] |= mask;
 
-	if (ioc_regs[14] & mask)
+	if (ioc_regs[FIQ_MASK] & mask)
 	{
 		generic_pulse_irq_line(machine->device("maincpu"), ARM_FIRQ_LINE);
 	}
@@ -81,17 +88,17 @@ void archimedes_request_fiq(running_machine *machine, int mask)
 
 void archimedes_clear_irq_a(running_machine *machine, int mask)
 {
-	ioc_regs[4] &= ~mask;
+	ioc_regs[IRQ_STATUS_A] &= ~mask;
 }
 
 void archimedes_clear_irq_b(running_machine *machine, int mask)
 {
-	ioc_regs[8] &= ~mask;
+	ioc_regs[IRQ_STATUS_B] &= ~mask;
 }
 
 void archimedes_clear_fiq(running_machine *machine, int mask)
 {
-	ioc_regs[12] &= ~mask;
+	ioc_regs[FIQ_STATUS] &= ~mask;
 }
 
 static TIMER_CALLBACK( vidc_vblank )
@@ -119,7 +126,7 @@ static void a310_set_timer(int tmr)
 	if(ioc_timercnt[tmr] != 0) // FIXME: dmdtouch does a divide by zero?
 	{
 		freq = 2000000.0 / (double)ioc_timercnt[tmr];
-	//  logerror("IOC: starting timer %d, %d ticks, freq %f Hz\n", tmr, ioc_timercnt[tmr], freq);
+//	  logerror("IOC: starting timer %d, %d ticks, freq %f Hz\n", tmr, ioc_timercnt[tmr], freq);
 		timer_adjust_oneshot(timer[tmr], ATTOTIME_IN_HZ(freq), tmr);
 	}
 }
@@ -155,8 +162,13 @@ void archimedes_reset(running_machine *machine)
 		memc_pages[i] = -1;		// indicate unmapped
 	}
 
-	ioc_regs[4] = 0x10; //set up POR (Power On Reset) at start-up
-	ioc_regs[8] = 0x02; //set up IL[1] On
+	ioc_regs[IRQ_STATUS_A] = 0x10 | 0x80; //set up POR (Power On Reset) and Force IRQ at start-up
+	ioc_regs[IRQ_STATUS_B] = 0x02; //set up IL[1] On
+	ioc_regs[FIQ_STATUS] = 0x80;   //set up Force FIQ
+
+	/* Aristocrat MK-5 tests this inside the CPU check routine *without* firing a latch command in the POST, could be open bus, fixed value or undefined behaviour,
+	   almost surely something checked as an anti-cheat measure */
+	ioc_timerout[1] = 0xf5;
 }
 
 void archimedes_init(running_machine *machine)
@@ -326,11 +338,19 @@ READ32_HANDLER(archimedes_ioc_r)
 	#endif
 	if (offset*4 >= 0x200000 && offset*4 < 0x300000)
 	{
+		logerror("IOC: R %s = %02x (PC=%x) %02x\n", ioc_regnames[offset&0x1f], ioc_regs[offset&0x1f], cpu_get_pc( space->cpu ),offset & 0x1f);
+
 		switch (offset & 0x1f)
 		{
 			case 1:	// keyboard read
 				archimedes_request_irq_b(space->machine, ARCHIMEDES_IRQB_KBD_XMIT_EMPTY);
 				break;
+
+			case IRQ_STATUS_A:
+				return (ioc_regs[IRQ_STATUS_A] & 0x7f) | 0x80; // Force IRQ is always '1'
+
+			case FIQ_STATUS:
+				return (ioc_regs[FIQ_STATUS] & 0x7f) | 0x80; // Force FIQ is always '1'
 
 			case 16:	// timer 0 read
 				return ioc_timerout[0]&0xff;
@@ -350,7 +370,6 @@ READ32_HANDLER(archimedes_ioc_r)
 				return (ioc_timerout[3]>>8)&0xff;
 		}
 
-		logerror("IOC: R %s = %02x (PC=%x) %02x\n", ioc_regnames[offset&0x1f], ioc_regs[offset&0x1f], cpu_get_pc( space->cpu ),offset & 0x1f);
 		return ioc_regs[offset&0x1f];
 	}
 	#ifdef MESS
@@ -377,7 +396,7 @@ WRITE32_HANDLER(archimedes_ioc_w)
 
 	if (offset*4 >= 0x200000 && offset*4 < 0x300000)
 	{
-//     	logerror("IOC: W %02x @ reg %s (PC=%x)\n", data&0xff, ioc_regnames[offset&0x1f], cpu_get_pc( space->cpu ));
+     	logerror("IOC: W %02x @ reg %s (PC=%x)\n", data&0xff, ioc_regnames[offset&0x1f], cpu_get_pc( space->cpu ));
 
 		switch (offset&0x1f)
 		{
@@ -385,11 +404,27 @@ WRITE32_HANDLER(archimedes_ioc_w)
 				//logerror("IOC I2C: CLK %d DAT %d\n", (data>>1)&1, data&1);
 				break;
 
+			case IRQ_MASK_A:
+				ioc_regs[IRQ_MASK_A] = data & 0xff;
+
+				if(data & 0x80) //force an IRQ
+					archimedes_request_irq_a(space->machine,ARCHIMEDES_IRQA_FORCE);
+
+				break;
+
+			case FIQ_MASK:
+				ioc_regs[FIQ_MASK] = data & 0xff;
+
+				if(data & 0x80) //force a FIRQ
+					archimedes_request_fiq(space->machine,ARCHIMEDES_FIQ_FORCE);
+
+				break;
+
 			case 5: 	// IRQ clear A
-				ioc_regs[4] &= ~(data&0xff);
+				ioc_regs[IRQ_STATUS_A] &= ~(data&0xff);
 
 				// if that did it, clear the IRQ
-				if (ioc_regs[4] == 0)
+				if (ioc_regs[IRQ_STATUS_A] == 0)
 				{
 					cputag_set_input_line(space->machine, "maincpu", ARM_IRQ_LINE, CLEAR_LINE);
 				}

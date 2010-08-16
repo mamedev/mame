@@ -11,6 +11,11 @@
 		- bp 0x3400230: EPROM checksum branch test
 		- bp 0x3400258: DRAM Check branch test
 		- bp 0x3400280: CPU Check branch test
+			bp 0x340027c: checks IRQ status A and FIQ status bit 7 (force IRQ flag)
+			- R0 == 0: CPU Check OK
+			- R0 == 1: IRQ status A force IRQ flag check failed
+			- R0 == 2: FIQ status force IRQ flag check failed
+			- R0 == 3: Timer 1 latch low val == 0xf5
 		- bp 0x34002a8: SRAM Check branch test
 		- bp 0x34002d0: 2KHz Timer branch test
 		- bp 0x34002f8: DRAM emulator branch tests
