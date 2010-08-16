@@ -66,7 +66,8 @@ struct _bsmt2000_chip
 
 	bsmt2000_voice voice[MAX_VOICES];	/* the voices */
 	UINT16 *	regmap[128];			/* mapping of registers to voice params */
-
+	UINT8		mode;					/* current mode */
+	
 	UINT32		clock;					/* original clock on the chip */
 	UINT8		stereo;					/* stereo output? */
 	UINT8		voices;					/* number of voices */
@@ -109,6 +110,17 @@ INLINE bsmt2000_chip *get_safe_token(running_device *device)
 ***************************************************************************/
 
 /*-------------------------------------------------
+    bsmt2000_postload - save-state load callback
+-------------------------------------------------*/
+
+static STATE_POSTLOAD( bsmt2000_postload )
+{
+	bsmt2000_chip *chip = (bsmt2000_chip*)param;
+	set_mode(chip);
+}
+
+
+/*-------------------------------------------------
     DEVICE_START( bsmt2000 ) - initialization callback
 -------------------------------------------------*/
 
@@ -126,7 +138,9 @@ static DEVICE_START( bsmt2000 )
 	chip->total_banks = device->region()->bytes() / 0x10000;
 
 	/* register chip-wide data for save states */
+	state_save_register_postload(device->machine, bsmt2000_postload, chip);
 	state_save_register_device_item(device, 0, chip->last_register);
+	state_save_register_device_item(device, 0, chip->mode);
 	state_save_register_device_item(device, 0, chip->stereo);
 	state_save_register_device_item(device, 0, chip->voices);
 	state_save_register_device_item(device, 0, chip->adpcm);
@@ -168,7 +182,8 @@ static DEVICE_RESET( bsmt2000 )
 		voice->rightvol = 0x7fff;
 	}
 
-	/* recompute the mode */
+	/* recompute the mode - this comes from the address of the last register accessed */
+	chip->mode = chip->last_register;
 	set_mode(chip);
 }
 
@@ -360,8 +375,7 @@ static void set_mode(bsmt2000_chip *chip)
 	/* force an update */
 	stream_update(chip->stream);
 
-	/* the mode comes from the address of the last register accessed */
-	switch (chip->last_register)
+	switch (chip->mode)
 	{
 		/* mode 0: 24kHz, 12 channel PCM, 1 channel ADPCM, mono */
 		default:
