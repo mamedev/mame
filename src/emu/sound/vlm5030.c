@@ -1,10 +1,44 @@
 /*
     vlm5030.c
 
-    VLM5030 emulator
+    Sanyo VLM5030 emulator
 
     Written by Tatsuyuki Satoh
     Based on TMS5220 simulator (tms5220.c)
+
+                 +-------,_,-------+
+        GND   -- |  1           40 | <-    RST
+  (gnd) TST1  -> |  2           39 | ??    TST4
+        OSC2  ck |  3     _     38 | ??    TST3
+        OSC1  ck |  4    (_)    37 | ??    TST2
+        D0    -> |  5           36 | ->    DAO
+        D1    -> |  6           35 | --    VREF (+5v thru 5.6k resistor)
+        D2    -> |  7           34 | ->    MTE
+        D3    -> |  8      V    33 | ->    /ME
+        D4    -> |  9      L    32 | <-    VCU
+        D5    -> | 10      M    31 | <-    START
+        D6    -> | 11      5    30 | ->    BSY
+        D7    -> | 12      0    29 | --    Vdd (+5v)
+        A0    <- | 13      3    28 | ->    A15
+        A1    <- | 14      0    27 | ->    A14
+        A2    <- | 15           26 | ->    A13
+        A3    <- | 16     _     25 | ->    A12
+        A4    <- | 17    (_)    24 | ->    A11
+        A5    <- | 18           23 | ->    A10
+        A6    <- | 19           22 | ->    A9
+        A7    <- | 20           21 | ->    A8
+                 +-----------------+
+
+TST1 is probably a test mode enable pin, must be grounded for normal operation.
+TST2-4 are some sort of test pins but can be left floating?
+VREF is probably the 0v ref for the output dac
+DAO is the output dac
+/ME is connected to the voice data rom /OE enable
+START strobes in a byte of data over the data bus from host cpu
+OSC1/2 are to both ends of a 3.579545MHz xtal with a 100pf cap from each end to gnd
+VCU makes the data bus select the upper 8 bits of the word register internally instead of the lower 8 bits. it is only useful if you need more than 256 phrases in rom? (recheck this)
+MTE is an output for roms which need to be clocked to latch address before use, or for a latch sitting in front of the voice rom address lines? (recheck this)
+RST not only resets the chip on its rising edge but grabs a byte of mode state data from the data bus on its falling edge? (recheck this)
 
   note:
     memory read cycle(==sampling rate) = 122.9u(440clock)
