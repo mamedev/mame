@@ -41,12 +41,13 @@ UINT32 *archimedes_memc_physmem;
 static UINT32 memc_pagesize;
 static int memc_latchrom;
 static INT16 memc_pages[(32*1024*1024)/(4096)];	// the logical RAM area is 32 megs, and the smallest page size is 4k
-static UINT32 vidc_regs[256];
-static UINT8 ioc_regs[0x80/4];
+UINT32 vidc_regs[256];
+UINT8 ioc_regs[0x80/4];
 static UINT32 ioc_timercnt[4], ioc_timerout[4];
 static UINT32 vidc_sndstart, vidc_sndend, vidc_sndcur;
 
-static emu_timer *vbl_timer, *timer[4], *snd_timer;
+static emu_timer *timer[4], *snd_timer;
+emu_timer  *vbl_timer;
 
 void archimedes_request_irq_a(running_machine *machine, int mask)
 {
@@ -205,7 +206,8 @@ READ32_HANDLER(archimedes_memc_logical_r)
 		}
 		else
 		{
-			logerror("ARCHIMEDES_MEMC: Reading unmapped page, what do we do?\n");
+			logerror("ARCHIMEDES_MEMC: Reading unmapped page\n");
+			return 0xdeadbeef;
 		}
 	}
 
@@ -525,6 +527,7 @@ WRITE32_HANDLER(archimedes_vidc_w)
 		"vertical cursor end",
 	};
 	#endif
+
 
 	// 0x00 - 0x3c Video Palette Logical Colors (16 colors)
 	// 0x40 Border Color

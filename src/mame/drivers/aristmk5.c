@@ -12,28 +12,53 @@
 #include "sound/dac.h"
 #include "includes/archimds.h"
 
-static ADDRESS_MAP_START( aristmk5_map, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x01ffffff) AM_READWRITE(archimedes_memc_logical_r, archimedes_memc_logical_w)
-	AM_RANGE(0x02000000, 0x02ffffff) AM_RAM AM_BASE(&archimedes_memc_physmem) /* physical RAM - 16 MB for now, should be 512k for the A310 */
-	AM_RANGE(0x03000000, 0x033fffff) AM_READWRITE(archimedes_ioc_r, archimedes_ioc_w)
-	AM_RANGE(0x03400000, 0x035fffff) AM_ROM AM_REGION("maincpu", 0) AM_WRITE(archimedes_memc_page_w)
-	AM_RANGE(0x03600000, 0x037fffff) AM_READWRITE(archimedes_memc_r, archimedes_memc_w)
-	AM_RANGE(0x03800000, 0x039fffff) AM_READWRITE(archimedes_vidc_r, archimedes_vidc_w)
-ADDRESS_MAP_END
-
-
-static INPUT_PORTS_START( aristmk5 )
-INPUT_PORTS_END
+extern UINT8 ioc_regs[0x80/4];
+extern void archimedes_request_irq_a(running_machine *machine, int mask);
+extern UINT32 *archimedes_memc_physmem;
 
 static VIDEO_START(aristmk5)
 {
 
 }
 
+/* just a quick hack to check out error printing, AA video emulation is A LOT more complex */
 static VIDEO_UPDATE(aristmk5)
 {
+	int count;
+	int x,y,xi;
+	UINT32 *vram = archimedes_memc_physmem;
+
+	// sets video DMA to 0x400 - 0x400 - 0xfe00
+	count = 0x800/4; // 0x400 text is offset???
+
+	for(y=0;y<480;y++)
+	{
+		for(x=0;x<640;x+=4)
+		{
+			for(xi=0;xi<4;xi++)
+				if ((x+xi) <= screen->visible_area().max_x && (y) <= screen->visible_area().max_y)
+					*BITMAP_ADDR32(bitmap, y, x+xi) = screen->machine->pens[(vram[count]>>(xi*8))&0xff];
+
+			count++;
+		}
+	}
+
 	return 0;
 }
+
+static ADDRESS_MAP_START( aristmk5_map, ADDRESS_SPACE_PROGRAM, 32 )
+	AM_RANGE(0x00000000, 0x01ffffff) AM_READWRITE(archimedes_memc_logical_r, archimedes_memc_logical_w)
+	AM_RANGE(0x02000000, 0x02ffffff) AM_RAM AM_BASE(&archimedes_memc_physmem) /* physical RAM - 16 MB for now, should be 512k for the A310 */
+	AM_RANGE(0x03010810, 0x03010813) AM_READNOP //MK-5 specific, watchdog
+	AM_RANGE(0x03000000, 0x033fffff) AM_READWRITE(archimedes_ioc_r, archimedes_ioc_w)
+	AM_RANGE(0x03400000, 0x035fffff) AM_ROM AM_REGION("maincpu", 0) AM_WRITE(archimedes_memc_page_w)
+	AM_RANGE(0x03600000, 0x037fffff) AM_READWRITE(archimedes_memc_r, archimedes_memc_w)
+	AM_RANGE(0x03800000, 0x039fffff) AM_READWRITE(archimedes_vidc_r, archimedes_vidc_w) //TODO: this is different here, it appears to contain palette data only
+ADDRESS_MAP_END
+
+
+static INPUT_PORTS_START( aristmk5 )
+INPUT_PORTS_END
 
 static DRIVER_INIT( aristmk5 )
 {
@@ -51,6 +76,7 @@ static MACHINE_START( aristmk5 )
 static MACHINE_RESET( aristmk5 )
 {
 	archimedes_reset(machine);
+	ioc_regs[4]|=1; //set printer busy irq?
 }
 
 static MACHINE_DRIVER_START( aristmk5 )
@@ -63,9 +89,9 @@ static MACHINE_DRIVER_START( aristmk5 )
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(8*8, 48*8-1, 2*8, 30*8-1)
+	MDRV_SCREEN_VISIBLE_AREA(8*8, 64*8-1, 0*8, 32*8-1)
 
 	MDRV_PALETTE_LENGTH(0x200)
 
