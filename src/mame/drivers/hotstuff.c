@@ -58,7 +58,7 @@ static ADDRESS_MAP_START( hotstuff_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x400000, 0x40ffff) AM_RAM
 
-	AM_RANGE(0x980000, 0x9bffff) AM_RAM AM_BASE(&hotstuff_bitmapram)	
+	AM_RANGE(0x980000, 0x9bffff) AM_RAM AM_BASE(&hotstuff_bitmapram)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( hotstuff )
