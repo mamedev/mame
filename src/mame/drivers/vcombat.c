@@ -102,7 +102,7 @@ static int crtc_select;
 static VIDEO_UPDATE( vcombat )
 {
 	int y;
-	const rgb_t *const pens = tlc34076_get_pens();
+	const rgb_t *const pens = tlc34076_get_pens(screen->machine->device("tlc34076"));
 	running_device *aux = screen->machine->device("aux");
 
 	UINT16 *m68k_buf = m68k_framebuffer[(*framebuffer_ctrl & 0x20) ? 1 : 0];
@@ -335,7 +335,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	//AM_RANGE(0x703000, 0x703001)      /* Headset rotation axis? */
 	//AM_RANGE(0x704000, 0x704001)      /* Headset rotation axis? */
 
-	AM_RANGE(0x706000, 0x70601f) AM_READWRITE(tlc34076_lsb_r, tlc34076_lsb_w)
+	AM_RANGE(0x706000, 0x70601f) AM_DEVREADWRITE8("tlc34076", tlc34076_r, tlc34076_w, 0x00ff)
 ADDRESS_MAP_END
 
 
@@ -375,9 +375,6 @@ ADDRESS_MAP_END
 
 static MACHINE_RESET( vcombat )
 {
-	/* Setup the Bt476 VGA RAMDAC palette chip */
-	tlc34076_reset(6);
-
 	i860_set_pin(machine->device("vid_0"), DEC_PIN_BUS_HOLD, 1);
 	i860_set_pin(machine->device("vid_1"), DEC_PIN_BUS_HOLD, 1);
 
@@ -386,9 +383,6 @@ static MACHINE_RESET( vcombat )
 
 static MACHINE_RESET( shadfgtr )
 {
-	/* Setup the Bt476 VGA RAMDAC palette chip */
-	tlc34076_reset(6);
-
 	i860_set_pin(machine->device("vid_0"), DEC_PIN_BUS_HOLD, 1);
 
 	crtc_select = 0;
@@ -575,6 +569,8 @@ static MACHINE_DRIVER_START( vcombat )
 	MDRV_QUANTUM_PERFECT_CPU("maincpu")
 #endif
 
+	MDRV_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
+
 	/* Disabled for now as it can't handle multiple screens */
 //  MDRV_MC6845_ADD("crtc", MC6845, 6000000 / 16, mc6845_intf)
 	MDRV_DEFAULT_LAYOUT(layout_dualhsxs)
@@ -611,6 +607,8 @@ static MACHINE_DRIVER_START( shadfgtr )
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 	MDRV_MACHINE_RESET(shadfgtr)
+
+	MDRV_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
 
 	MDRV_MC6845_ADD("crtc", MC6845, XTAL_20MHz / 4 / 16, mc6845_intf)
 

@@ -680,9 +680,6 @@ static MACHINE_RESET( itech8 )
 		machine->device("maincpu")->reset();
 	}
 
-	/* reset the palette chip */
-	tlc34076_reset(6);
-
 	/* set the visible area */
 	if (visarea)
 	{
@@ -1730,6 +1727,8 @@ static MACHINE_DRIVER_START( itech8_core_lo )
 	MDRV_TICKET_DISPENSER_ADD("ticket", 200, TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
 
 	/* video hardware */
+	MDRV_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
+
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 	MDRV_VIDEO_START(itech8)
 

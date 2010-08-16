@@ -150,13 +150,13 @@ WRITE16_HANDLER( btoads_scroll1_w )
 
 WRITE16_HANDLER( btoads_paletteram_w )
 {
-	tlc34076_lsb_w(space, offset/2, data, mem_mask);
+	tlc34076_w(space->machine->device("tlc34076"), offset/2, data);
 }
 
 
 READ16_HANDLER( btoads_paletteram_r )
 {
-	return tlc34076_lsb_r(space, offset/2, mem_mask);
+	return tlc34076_r(space->machine->device("tlc34076"), offset/2);
 }
 
 
@@ -350,7 +350,7 @@ void btoads_scanline_update(screen_device &screen, bitmap_t *bitmap, int scanlin
 	UINT16 *bg1_base = &btoads_vram_bg1[(fulladdr + (yscroll1 << 10)) & 0x3fc00];
 	UINT8 *spr_base = &vram_fg_display[fulladdr & 0x3fc00];
 	UINT32 *dst = BITMAP_ADDR32(bitmap, scanline, 0);
-	const rgb_t *pens = tlc34076_get_pens();
+	const rgb_t *pens = tlc34076_get_pens(screen.machine->device("tlc34076"));
 	int coladdr = fulladdr & 0x3ff;
 	int x;
 

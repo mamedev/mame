@@ -216,7 +216,7 @@ VIDEO_START( itech8 )
 
 WRITE8_HANDLER( itech8_palette_w )
 {
-	tlc34076_w(space, offset/2, data);
+	tlc34076_w(space->machine->device("tlc34076"), offset/2, data);
 }
 
 
@@ -625,7 +625,7 @@ VIDEO_UPDATE( itech8_2layer )
 {
 	UINT32 page_offset;
 	int x, y;
-	const rgb_t *pens = tlc34076_get_pens();
+	const rgb_t *pens = tlc34076_get_pens(screen->machine->device("tlc34076"));
 
 	/* first get the current display state */
 	tms34061_get_display_state(&tms_state);
@@ -708,7 +708,7 @@ VIDEO_UPDATE( itech8_2page )
 {
 	UINT32 page_offset;
 	int x, y;
-	const rgb_t *pens = tlc34076_get_pens();
+	const rgb_t *pens = tlc34076_get_pens(screen->machine->device("tlc34076"));
 
 	/* first get the current display state */
 	tms34061_get_display_state(&tms_state);
@@ -739,7 +739,7 @@ VIDEO_UPDATE( itech8_2page_large )
 {
 	UINT32 page_offset;
 	int x, y;
-	const rgb_t *pens = tlc34076_get_pens();
+	const rgb_t *pens = tlc34076_get_pens(screen->machine->device("tlc34076"));
 
 	/* first get the current display state */
 	tms34061_get_display_state(&tms_state);

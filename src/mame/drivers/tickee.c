@@ -134,7 +134,7 @@ static void scanline_update(screen_device &screen, bitmap_t *bitmap, int scanlin
 {
 	UINT16 *src = &tickee_vram[(params->rowaddr << 8) & 0x3ff00];
 	UINT32 *dest = BITMAP_ADDR32(bitmap, scanline, 0);
-	const rgb_t *pens = tlc34076_get_pens();
+	const rgb_t *pens = tlc34076_get_pens(screen.machine->device("tlc34076"));
 	int coladdr = params->coladdr << 1;
 	int x;
 
@@ -159,7 +159,7 @@ static void rapidfir_scanline_update(screen_device &screen, bitmap_t *bitmap, in
 {
 	UINT16 *src = &tickee_vram[(params->rowaddr << 8) & 0x3ff00];
 	UINT32 *dest = BITMAP_ADDR32(bitmap, scanline, 0);
-	const rgb_t *pens = tlc34076_get_pens();
+	const rgb_t *pens = tlc34076_get_pens(screen.machine->device("tlc34076"));
 	int coladdr = params->coladdr << 1;
 	int x;
 
@@ -195,14 +195,12 @@ static MACHINE_RESET( tickee )
 {
 	beamxadd = 50;
 	beamyadd = 0;
-	tlc34076_reset(6);
 }
 
 static MACHINE_RESET( rapidfir )
 {
 	beamxadd = 0;
 	beamyadd = -5;
-	tlc34076_reset(6);
 }
 
 
@@ -355,7 +353,7 @@ static ADDRESS_MAP_START( tickee_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_BASE(&tickee_vram)
 	AM_RANGE(0x02000000, 0x02ffffff) AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0x04000000, 0x04003fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
-	AM_RANGE(0x04100000, 0x041000ff) AM_READWRITE(tlc34076_lsb_r, tlc34076_lsb_w)
+	AM_RANGE(0x04100000, 0x041000ff) AM_DEVREADWRITE8("tlc34076", tlc34076_r, tlc34076_w, 0x00ff)
 	AM_RANGE(0x04200000, 0x0420000f) AM_DEVREAD8("ym1", ay8910_r, 0x00ff)
 	AM_RANGE(0x04200000, 0x0420001f) AM_DEVWRITE8("ym1", ay8910_address_data_w, 0x00ff)
 	AM_RANGE(0x04200100, 0x0420010f) AM_DEVREAD8("ym2", ay8910_r, 0x00ff)
@@ -373,7 +371,7 @@ static ADDRESS_MAP_START( ghoshunt_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_BASE(&tickee_vram)
 	AM_RANGE(0x02000000, 0x02ffffff) AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0x04100000, 0x04103fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
-	AM_RANGE(0x04200000, 0x042000ff) AM_READWRITE(tlc34076_lsb_r, tlc34076_lsb_w)
+	AM_RANGE(0x04200000, 0x042000ff) AM_DEVREADWRITE8("tlc34076", tlc34076_r, tlc34076_w, 0x00ff)
 	AM_RANGE(0x04300000, 0x0430000f) AM_DEVREAD8("ym1", ay8910_r, 0x00ff)
 	AM_RANGE(0x04300000, 0x0430001f) AM_DEVWRITE8("ym1", ay8910_address_data_w, 0x00ff)
 	AM_RANGE(0x04300100, 0x0430010f) AM_DEVREAD8("ym2", ay8910_r, 0x00ff)
@@ -389,7 +387,7 @@ static ADDRESS_MAP_START( mouseatk_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_BASE(&tickee_vram)
 	AM_RANGE(0x02000000, 0x02ffffff) AM_ROM AM_REGION("user1", 0)
 	AM_RANGE(0x04000000, 0x04003fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
-	AM_RANGE(0x04100000, 0x041000ff) AM_READWRITE(tlc34076_lsb_r, tlc34076_lsb_w)
+	AM_RANGE(0x04100000, 0x041000ff) AM_DEVREADWRITE8("tlc34076", tlc34076_r, tlc34076_w, 0x00ff)
 	AM_RANGE(0x04200000, 0x0420000f) AM_DEVREAD8("ym", ay8910_r, 0x00ff)
 	AM_RANGE(0x04200000, 0x0420000f) AM_DEVWRITE8("ym", ay8910_address_data_w, 0x00ff)
 	AM_RANGE(0x04200100, 0x0420010f) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)
@@ -418,7 +416,7 @@ static ADDRESS_MAP_START( rapidfir_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfc000b00, 0xfc000b0f) AM_READ_PORT("DSW0")
 	AM_RANGE(0xfc000c00, 0xfc000c1f) AM_READ_PORT("DSW1")
 	AM_RANGE(0xfc000e00, 0xfc000e1f) AM_READ(watchdog_reset16_r)
-	AM_RANGE(0xfc100000, 0xfc1000ff) AM_READWRITE(tlc34076_lsb_r, tlc34076_lsb_w)
+	AM_RANGE(0xfc100000, 0xfc1000ff) AM_DEVREADWRITE8("tlc34076", tlc34076_r, tlc34076_w, 0x00ff)
 	AM_RANGE(0xfc200000, 0xfc207fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0xfc300000, 0xfc30000f) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)
 	AM_RANGE(0xfc400010, 0xfc40001f) AM_READ(ff7f_r)
@@ -740,6 +738,8 @@ static MACHINE_DRIVER_START( tickee )
 	MDRV_TICKET_DISPENSER_ADD("ticket2", 100, TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH)
 
 	/* video hardware */
+	MDRV_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
+
 	MDRV_VIDEO_START(tickee)
 	MDRV_VIDEO_UPDATE(tms340x0)
 
@@ -780,6 +780,8 @@ static MACHINE_DRIVER_START( rapidfir )
 	MDRV_NVRAM_HANDLER(generic_1fill)
 
 	/* video hardware */
+	MDRV_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
+
 	MDRV_VIDEO_START(tickee)
 	MDRV_VIDEO_UPDATE(tms340x0)
 
@@ -805,10 +807,13 @@ static MACHINE_DRIVER_START( mouseatk )
 	MDRV_MACHINE_RESET(tickee)
 	MDRV_NVRAM_HANDLER(generic_1fill)
 
-	/* video hardware */
-	MDRV_VIDEO_UPDATE(tms340x0)
 	MDRV_TICKET_DISPENSER_ADD("ticket1", 100, TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH)
 	MDRV_TICKET_DISPENSER_ADD("ticket2", 100, TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH)
+
+	/* video hardware */
+	MDRV_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
+
+	MDRV_VIDEO_UPDATE(tms340x0)
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)

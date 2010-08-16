@@ -7,16 +7,37 @@
 
 ***************************************************************************/
 
-void tlc34076_reset(int dacwidth);
-void tlc34076_state_save(running_machine *machine);
+#define TLC34076_6_BIT		0
+#define TLC34076_8_BIT		1
 
-const pen_t *tlc34076_get_pens(void);
+const pen_t *tlc34076_get_pens(running_device *device);
 
-READ8_HANDLER( tlc34076_r );
-WRITE8_HANDLER( tlc34076_w );
 
-READ16_HANDLER( tlc34076_lsb_r );
-WRITE16_HANDLER( tlc34076_lsb_w );
-READ16_HANDLER( tlc34076_msb_r );
-WRITE16_HANDLER( tlc34076_msb_w );
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
 
+typedef struct _tlc34076_config tlc34076_config;
+struct _tlc34076_config
+{
+	int res_sel;
+};
+
+DECLARE_LEGACY_DEVICE(TLC34076, tlc34076);
+
+
+/***************************************************************************
+    DEVICE CONFIGURATION MACROS
+***************************************************************************/
+
+#define MDRV_TLC34076_ADD(_tag, _res_sel) \
+	MDRV_DEVICE_ADD(_tag, TLC34076, 0) \
+	MDRV_DEVICE_CONFIG_DATA32(tlc34076_config, res_sel, _res_sel)
+
+
+/***************************************************************************
+    DEVICE I/O FUNCTIONS
+***************************************************************************/
+
+WRITE8_DEVICE_HANDLER( tlc34076_w );
+READ8_DEVICE_HANDLER( tlc34076_r );

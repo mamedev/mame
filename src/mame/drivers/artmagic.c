@@ -93,7 +93,6 @@ static MACHINE_RESET( artmagic )
 {
 	tms_irq = hack_irq = 0;
 	update_irq_state(machine);
-	tlc34076_reset(6);
 }
 
 
@@ -486,7 +485,7 @@ static ADDRESS_MAP_START( tms_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_BASE(&artmagic_vram0)
 	AM_RANGE(0x00400000, 0x005fffff) AM_RAM AM_BASE(&artmagic_vram1)
 	AM_RANGE(0x00800000, 0x0080007f) AM_READWRITE(artmagic_blitter_r, artmagic_blitter_w)
-	AM_RANGE(0x00c00000, 0x00c000ff) AM_READWRITE(tlc34076_lsb_r, tlc34076_lsb_w)
+	AM_RANGE(0x00c00000, 0x00c000ff) AM_DEVREADWRITE8("tlc34076", tlc34076_r, tlc34076_w, 0x00ff)
 	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE(tms34010_io_register_r, tms34010_io_register_w)
 	AM_RANGE(0xffe00000, 0xffffffff) AM_RAM
 ADDRESS_MAP_END
@@ -496,7 +495,7 @@ static ADDRESS_MAP_START( stonebal_tms_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_BASE(&artmagic_vram0)
 	AM_RANGE(0x00400000, 0x005fffff) AM_RAM AM_BASE(&artmagic_vram1)
 	AM_RANGE(0x00800000, 0x0080007f) AM_READWRITE(artmagic_blitter_r, artmagic_blitter_w)
-	AM_RANGE(0x00c00000, 0x00c000ff) AM_READWRITE(tlc34076_lsb_r, tlc34076_lsb_w)
+	AM_RANGE(0x00c00000, 0x00c000ff) AM_DEVREADWRITE8("tlc34076", tlc34076_r, tlc34076_w, 0x00ff)
 	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE(tms34010_io_register_r, tms34010_io_register_w)
 	AM_RANGE(0xffc00000, 0xffffffff) AM_RAM
 ADDRESS_MAP_END
@@ -722,6 +721,8 @@ static MACHINE_DRIVER_START( artmagic )
 	MDRV_NVRAM_HANDLER(generic_1fill)
 
 	/* video hardware */
+	MDRV_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
+
 	MDRV_VIDEO_START(artmagic)
 	MDRV_VIDEO_UPDATE(tms340x0)
 

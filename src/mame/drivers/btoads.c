@@ -51,12 +51,6 @@ static MACHINE_START( btoads )
 }
 
 
-static MACHINE_RESET( btoads )
-{
-	tlc34076_reset(6);
-}
-
-
 
 /*************************************
  *
@@ -349,10 +343,11 @@ static MACHINE_DRIVER_START( btoads )
 	MDRV_CPU_PERIODIC_INT(irq0_line_assert, 183)
 
 	MDRV_MACHINE_START(btoads)
-	MDRV_MACHINE_RESET(btoads)
 	MDRV_NVRAM_HANDLER(generic_1fill)
 
 	/* video hardware */
+	MDRV_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
+
 	MDRV_VIDEO_START(btoads)
 	MDRV_VIDEO_UPDATE(tms340x0)
 

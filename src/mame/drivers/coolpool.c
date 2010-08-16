@@ -92,7 +92,7 @@ static void coolpool_scanline(screen_device &screen, bitmap_t *bitmap, int scanl
 
 	UINT16 *vram = &state->vram_base[(params->rowaddr << 8) & 0x1ff00];
 	UINT32 *dest = BITMAP_ADDR32(bitmap, scanline, 0);
-	const rgb_t *pens = tlc34076_get_pens();
+	const rgb_t *pens = tlc34076_get_pens(screen.machine->device("tlc34076"));
 	int coladdr = params->coladdr;
 	int x;
 
@@ -148,7 +148,6 @@ static MACHINE_RESET( amerdart )
 
 static MACHINE_RESET( coolpool )
 {
-	tlc34076_reset(6);
 	nvram_write_enable = 0;
 }
 
@@ -666,7 +665,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( coolpool_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_BASE_MEMBER(coolpool_state,vram_base)
-	AM_RANGE(0x01000000, 0x010000ff) AM_READWRITE(tlc34076_lsb_r, tlc34076_lsb_w)	// IMSG176P-40
+	AM_RANGE(0x01000000, 0x010000ff) AM_DEVREADWRITE8("tlc34076", tlc34076_r, tlc34076_w, 0x00ff)	// IMSG176P-40
 	AM_RANGE(0x02000000, 0x020000ff) AM_READWRITE(coolpool_iop_r, coolpool_iop_w)
 	AM_RANGE(0x03000000, 0x0300000f) AM_WRITE(coolpool_misc_w)
 	AM_RANGE(0x03000000, 0x03ffffff) AM_ROM AM_REGION("gfx1", 0)
@@ -680,7 +679,7 @@ static ADDRESS_MAP_START( nballsht_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000000, 0x001fffff) AM_RAM AM_BASE_MEMBER(coolpool_state,vram_base)
 	AM_RANGE(0x02000000, 0x020000ff) AM_READWRITE(coolpool_iop_r, coolpool_iop_w)
 	AM_RANGE(0x03000000, 0x0300000f) AM_WRITE(coolpool_misc_w)
-	AM_RANGE(0x04000000, 0x040000ff) AM_READWRITE(tlc34076_lsb_r, tlc34076_lsb_w)	// IMSG176P-40
+	AM_RANGE(0x04000000, 0x040000ff) AM_DEVREADWRITE8("tlc34076", tlc34076_r, tlc34076_w, 0x00ff)	// IMSG176P-40
 	AM_RANGE(0x06000000, 0x0601ffff) AM_MIRROR(0x00020000) AM_RAM_WRITE(nvram_thrash_data_w) AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0xc0000000, 0xc00001ff) AM_READWRITE(tms34010_io_register_r, tms34010_io_register_w)
 	AM_RANGE(0xff000000, 0xff7fffff) AM_ROM AM_REGION("gfx1", 0)
@@ -917,6 +916,8 @@ static MACHINE_DRIVER_START( coolpool )
 	MDRV_TIMER_ADD("nvram_timer", nvram_write_timeout)
 
 	/* video hardware */
+	MDRV_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
+
 	MDRV_VIDEO_UPDATE(tms340x0)
 
 	MDRV_SCREEN_ADD("screen", RASTER)

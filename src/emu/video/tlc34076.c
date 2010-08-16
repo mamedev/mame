@@ -10,14 +10,6 @@
 #include "emu.h"
 #include "tlc34076.h"
 
-static UINT8 local_paletteram[0x300];
-static UINT8 regs[0x10];
-static UINT8 palettedata[3];
-static UINT8 writeindex, readindex;
-static UINT8 dacbits;
-
-static rgb_t pens[0x100];
-
 #define PALETTE_WRITE_ADDR	0x00
 #define PALETTE_DATA		0x01
 #define PIXEL_READ_MASK		0x02
@@ -30,7 +22,33 @@ static rgb_t pens[0x100];
 #define TEST_REGISTER		0x0e
 #define RESET_STATE			0x0f
 
+typedef struct _tlc34076_state  tlc34076_state;
+struct _tlc34076_state
+{
+	UINT8 local_paletteram[0x300];
+	UINT8 regs[0x10];
+	UINT8 palettedata[3];
+	UINT8 writeindex;
+	UINT8 readindex;
+	UINT8 dacbits;
 
+	rgb_t pens[0x100];
+};
+
+
+/*************************************
+ *
+ *  Inline functions
+ *
+ *************************************/
+
+INLINE tlc34076_state *get_safe_token( running_device *device )
+{
+	assert(device != NULL);
+	assert(device->type() == TLC34076);
+
+	return (tlc34076_state *)downcast<legacy_device_base *>(device)->token();
+}
 
 /*************************************
  *
@@ -38,21 +56,22 @@ static rgb_t pens[0x100];
  *
  *************************************/
 
-const pen_t *tlc34076_get_pens(void)
+const pen_t *tlc34076_get_pens(running_device *device)
 {
+	tlc34076_state *state = get_safe_token(device);
 	offs_t i;
 
 	for (i = 0; i < 0x100; i++)
 	{
 		int r, g, b;
 
-		if ((i & regs[PIXEL_READ_MASK]) == i)
+		if ((i & state->regs[PIXEL_READ_MASK]) == i)
 		{
-			r = local_paletteram[3 * i + 0];
-			g = local_paletteram[3 * i + 1];
-			b = local_paletteram[3 * i + 2];
+			r = state->local_paletteram[3 * i + 0];
+			g = state->local_paletteram[3 * i + 1];
+			b = state->local_paletteram[3 * i + 2];
 
-			if (dacbits == 6)
+			if (state->dacbits == 6)
 			{
 				r = pal6bit(r);
 				g = pal6bit(g);
@@ -66,10 +85,10 @@ const pen_t *tlc34076_get_pens(void)
 			b = 0;
 		}
 
-		pens[i] = MAKE_RGB(r, g, b);
+		state->pens[i] = MAKE_RGB(r, g, b);
 	}
 
-	return pens;
+	return state->pens;
 }
 
 
@@ -80,40 +99,19 @@ const pen_t *tlc34076_get_pens(void)
  *
  *************************************/
 
-void tlc34076_reset(int dacwidth)
+static DEVICE_RESET( tlc34076 )
 {
-	assert_always((dacbits == 6) || (dacbits != 8), "tlc34076_reset: dacwidth must be 6 or 8!");
-
-	dacbits = dacwidth;
+	tlc34076_state *state = get_safe_token(device);
 
 	/* reset the registers */
-	regs[PIXEL_READ_MASK]		= 0xff;
-	regs[GENERAL_CONTROL]		= 0x03;
-	regs[INPUT_CLOCK_SEL]		= 0x00;
-	regs[OUTPUT_CLOCK_SEL]		= 0x3f;
-	regs[MUX_CONTROL]			= 0x2d;
-	regs[PALETTE_PAGE]			= 0x00;
-	regs[TEST_REGISTER]			= 0x00;
-	regs[RESET_STATE]			= 0x00;
-}
-
-
-
-/*************************************
- *
- *  Save State
- *
- *************************************/
-
-void tlc34076_state_save(running_machine *machine)
-{
-	state_save_register_global_array(machine, local_paletteram);
-	state_save_register_global_array(machine, regs);
-	state_save_register_global_array(machine, pens);
-
-	state_save_register_global(machine, writeindex);
-	state_save_register_global(machine, readindex);
-	state_save_register_global(machine, dacbits);
+	state->regs[PIXEL_READ_MASK]	= 0xff;
+	state->regs[GENERAL_CONTROL]	= 0x03;
+	state->regs[INPUT_CLOCK_SEL]	= 0x00;
+	state->regs[OUTPUT_CLOCK_SEL]	= 0x3f;
+	state->regs[MUX_CONTROL]		= 0x2d;
+	state->regs[PALETTE_PAGE]		= 0x00;
+	state->regs[TEST_REGISTER]		= 0x00;
+	state->regs[RESET_STATE]		= 0x00;
 }
 
 
@@ -123,29 +121,30 @@ void tlc34076_state_save(running_machine *machine)
  *
  *************************************/
 
-READ8_HANDLER( tlc34076_r )
+READ8_DEVICE_HANDLER( tlc34076_r )
 {
+	tlc34076_state *state = get_safe_token(device);
 	UINT8 result;
 
 	/* keep in range */
 	offset &= 0x0f;
-	result = regs[offset];
+	result = state->regs[offset];
 
 	/* switch off the offset */
 	switch (offset)
 	{
 		case PALETTE_DATA:
-			if (readindex == 0)
+			if (state->readindex == 0)
 			{
-				palettedata[0] = local_paletteram[3 * regs[PALETTE_READ_ADDR] + 0];
-				palettedata[1] = local_paletteram[3 * regs[PALETTE_READ_ADDR] + 1];
-				palettedata[2] = local_paletteram[3 * regs[PALETTE_READ_ADDR] + 2];
+				state->palettedata[0] = state->local_paletteram[3 * state->regs[PALETTE_READ_ADDR] + 0];
+				state->palettedata[1] = state->local_paletteram[3 * state->regs[PALETTE_READ_ADDR] + 1];
+				state->palettedata[2] = state->local_paletteram[3 * state->regs[PALETTE_READ_ADDR] + 2];
 			}
-			result = palettedata[readindex++];
-			if (readindex == 3)
+			result = state->palettedata[state->readindex++];
+			if (state->readindex == 3)
 			{
-				readindex = 0;
-				regs[PALETTE_READ_ADDR]++;
+				state->readindex = 0;
+				state->regs[PALETTE_READ_ADDR]++;
 			}
 			break;
 	}
@@ -161,36 +160,37 @@ READ8_HANDLER( tlc34076_r )
  *
  *************************************/
 
-WRITE8_HANDLER( tlc34076_w )
+WRITE8_DEVICE_HANDLER( tlc34076_w )
 {
+	tlc34076_state *state = get_safe_token(device);
 	UINT8 oldval;
 
 	/* keep in range */
 	offset &= 0x0f;
-	oldval = regs[offset];
-	regs[offset] = data;
+	oldval = state->regs[offset];
+	state->regs[offset] = data;
 
 	/* switch off the offset */
 	switch (offset)
 	{
 		case PALETTE_WRITE_ADDR:
-			writeindex = 0;
+			state->writeindex = 0;
 			break;
 
 		case PALETTE_DATA:
-			palettedata[writeindex++] = data;
-			if (writeindex == 3)
+			state->palettedata[state->writeindex++] = data;
+			if (state->writeindex == 3)
 			{
-				local_paletteram[3 * regs[PALETTE_WRITE_ADDR] + 0] = palettedata[0];
-				local_paletteram[3 * regs[PALETTE_WRITE_ADDR] + 1] = palettedata[1];
-				local_paletteram[3 * regs[PALETTE_WRITE_ADDR] + 2] = palettedata[2];
-				writeindex = 0;
-				regs[PALETTE_WRITE_ADDR]++;
+				state->local_paletteram[3 * state->regs[PALETTE_WRITE_ADDR] + 0] = state->palettedata[0];
+				state->local_paletteram[3 * state->regs[PALETTE_WRITE_ADDR] + 1] = state->palettedata[1];
+				state->local_paletteram[3 * state->regs[PALETTE_WRITE_ADDR] + 2] = state->palettedata[2];
+				state->writeindex = 0;
+				state->regs[PALETTE_WRITE_ADDR]++;
 			}
 			break;
 
 		case PALETTE_READ_ADDR:
-			readindex = 0;
+			state->readindex = 0;
 			break;
 
 		case GENERAL_CONTROL:
@@ -247,7 +247,7 @@ WRITE8_HANDLER( tlc34076_w )
 			break;
 
 		case RESET_STATE:
-			tlc34076_reset(dacbits);
+			DEVICE_RESET_CALL(tlc34076);
 			break;
 	}
 }
@@ -256,29 +256,33 @@ WRITE8_HANDLER( tlc34076_w )
 
 /*************************************
  *
- *  16-bit accessors
+ *  Device interface
  *
  *************************************/
 
-READ16_HANDLER( tlc34076_lsb_r )
+static DEVICE_START( tlc34076 )
 {
-	return tlc34076_r(space, offset);
+	tlc34076_config *config = (tlc34076_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
+	tlc34076_state *state = get_safe_token(device);
+
+	state->dacbits = config->res_sel ? 8 : 6;
+
+	state_save_register_global_array(device->machine, state->local_paletteram);
+	state_save_register_global_array(device->machine, state->regs);
+	state_save_register_global_array(device->machine, state->pens);
+
+	state_save_register_global(device->machine, state->writeindex);
+	state_save_register_global(device->machine, state->readindex);
+	state_save_register_global(device->machine, state->dacbits);
 }
 
-WRITE16_HANDLER( tlc34076_lsb_w )
-{
-	if (ACCESSING_BITS_0_7)
-		tlc34076_w(space, offset, data);
-}
+static const char DEVTEMPLATE_SOURCE[] = __FILE__;
 
-READ16_HANDLER( tlc34076_msb_r )
-{
-	return tlc34076_r(space, offset) << 8;
-}
+#define DEVTEMPLATE_ID( p, s )	p##tlc34076##s
+#define DEVTEMPLATE_FEATURES	DT_HAS_START | DT_HAS_RESET | DT_HAS_INLINE_CONFIG
+#define DEVTEMPLATE_NAME		"TLC34076"
+#define DEVTEMPLATE_FAMILY		"RAMDAC"
+#include "devtempl.h"
 
-WRITE16_HANDLER( tlc34076_msb_w )
-{
-	if (ACCESSING_BITS_8_15)
-		tlc34076_w(space, offset, data >> 8);
-}
 
+DEFINE_LEGACY_DEVICE(TLC34076, tlc34076);

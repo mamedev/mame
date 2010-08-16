@@ -27,19 +27,6 @@ static UINT8 bitvals[32];
 
 /*************************************
  *
- *  Machine init
- *
- *************************************/
-
-static MACHINE_RESET( xtheball )
-{
-	tlc34076_reset(6);
-}
-
-
-
-/*************************************
- *
  *  Video update
  *
  *************************************/
@@ -48,7 +35,7 @@ static void xtheball_scanline_update(screen_device &screen, bitmap_t *bitmap, in
 {
 	UINT16 *srcbg = &vram_bg[(params->rowaddr << 8) & 0xff00];
 	UINT32 *dest = BITMAP_ADDR32(bitmap, scanline, 0);
-	const rgb_t *pens = tlc34076_get_pens();
+	const rgb_t *pens = tlc34076_get_pens(screen.machine->device("tlc34076"));
 	int coladdr = params->coladdr;
 	int x;
 
@@ -215,7 +202,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000000, 0x0001ffff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 	AM_RANGE(0x01000000, 0x010fffff) AM_RAM AM_BASE(&vram_bg)
 	AM_RANGE(0x02000000, 0x020fffff) AM_RAM AM_BASE(&vram_fg)
-	AM_RANGE(0x03000000, 0x030000ff) AM_READWRITE(tlc34076_lsb_r, tlc34076_lsb_w)
+	AM_RANGE(0x03000000, 0x030000ff) AM_DEVREADWRITE8("tlc34076", tlc34076_r, tlc34076_w, 0x00ff)
 	AM_RANGE(0x03040000, 0x030401ff) AM_WRITE(bit_controls_w)
 	AM_RANGE(0x03040080, 0x0304008f) AM_READ_PORT("DSW")
 	AM_RANGE(0x03040100, 0x0304010f) AM_READ(analogx_r)
@@ -338,14 +325,15 @@ static MACHINE_DRIVER_START( xtheball )
 	MDRV_CPU_ADD("maincpu", TMS34010, 40000000)
 	MDRV_CPU_CONFIG(tms_config)
 	MDRV_CPU_PROGRAM_MAP(main_map)
-	MDRV_CPU_PERIODIC_INT(irq1_line_hold,15000)
+	MDRV_CPU_PERIODIC_INT(irq1_line_hold, 15000)
 
-	MDRV_MACHINE_RESET(xtheball)
 	MDRV_NVRAM_HANDLER(generic_1fill)
 
 	MDRV_TICKET_DISPENSER_ADD("ticket", 100, TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
 
 	/* video hardware */
+	MDRV_TLC34076_ADD("tlc34076", TLC34076_6_BIT)
+
 	MDRV_VIDEO_UPDATE(tms340x0)
 
 	MDRV_SCREEN_ADD("screen", RASTER)
