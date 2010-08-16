@@ -1,9 +1,25 @@
 /*
 
-   Aristocrat MK5 / MKV hardware
-   possibly 'Acorn Archimedes on a chip' hardware
+	Aristocrat MK5 / MKV hardware
+	possibly 'Acorn Archimedes on a chip' hardware
 
-   Note: ARM250 mapping is not identical to
+	Note: ARM250 mapping is not identical to plain AA
+
+	code DASMing of POST (Adonis):
+	- bp 0x3400224:
+	  checks work RAM [0x87000], if bit 0 active high then all tests are ok, otherwise check what went wrong;
+		- bp 0x3400230: EPROM checksum branch test
+		- bp 0x3400258: DRAM Check branch test
+		- bp 0x3400280: CPU Check branch test
+		- bp 0x34002a8: SRAM Check branch test
+		- bp 0x34002d0: 2KHz Timer branch test
+		- bp 0x34002f8: DRAM emulator branch tests
+			- R0 == 0 "DRAM emulator found"
+			- R0 == 1 "DRAM emulator found"
+			- R0 == 3 "DRAM emulator not found - Error"
+			- R0 == 4 "DRAM emulator found instead of DRAM - Error"
+			- R0 == x "Undefined error in DRAM emulator area"
+
 
 */
 
@@ -13,6 +29,7 @@
 #include "includes/archimds.h"
 
 extern UINT8 ioc_regs[0x80/4];
+extern INT16 memc_pages[(32*1024*1024)/(4096)];	// the logical RAM area is 32 megs, and the smallest page size is 4k
 extern void archimedes_request_irq_a(running_machine *machine, int mask);
 extern UINT32 *archimedes_memc_physmem;
 
@@ -30,6 +47,7 @@ static VIDEO_UPDATE(aristmk5)
 
 	// sets video DMA to 0x400 - 0x400 - 0xfe00
 	count = 0x800/4; // 0x400 text is offset???
+
 
 	for(y=0;y<480;y++)
 	{
@@ -77,6 +95,15 @@ static MACHINE_RESET( aristmk5 )
 {
 	archimedes_reset(machine);
 	ioc_regs[4]|=1; //set printer busy irq?
+
+	{
+		int i;
+		// kludge, set up MMU pages to a normal value, in order to draw all of the vram
+		for (i = 0; i < (32*1024*1024)/(4096); i++)
+		{
+			memc_pages[i] = i;
+		}
+	}
 }
 
 static MACHINE_DRIVER_START( aristmk5 )

@@ -40,7 +40,7 @@ static const int page_sizes[4] = { 4096, 8192, 16384, 32768 };
 UINT32 *archimedes_memc_physmem;
 static UINT32 memc_pagesize;
 static int memc_latchrom;
-static INT16 memc_pages[(32*1024*1024)/(4096)];	// the logical RAM area is 32 megs, and the smallest page size is 4k
+INT16 memc_pages[(32*1024*1024)/(4096)];	// the logical RAM area is 32 megs, and the smallest page size is 4k
 UINT32 vidc_regs[256];
 UINT8 ioc_regs[0x80/4];
 static UINT32 ioc_timercnt[4], ioc_timerout[4];
@@ -206,7 +206,7 @@ READ32_HANDLER(archimedes_memc_logical_r)
 		}
 		else
 		{
-			logerror("ARCHIMEDES_MEMC: Reading unmapped page\n");
+			logerror("ARCHIMEDES_MEMC: Reading unmapped page %02x\n",page);
 			return 0xdeadbeef;
 		}
 	}
@@ -237,7 +237,7 @@ WRITE32_HANDLER(archimedes_memc_logical_w)
 		}
 		else
 		{
-			logerror("ARCHIMEDES_MEMC: Writing unmapped page, what do we do?\n");
+			logerror("ARCHIMEDES_MEMC: Writing unmapped page %02x, what do we do?\n",page);
 		}
 	}
 }
