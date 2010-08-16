@@ -46,6 +46,7 @@ UINT32 vidc_regs[256];
 UINT8 ioc_regs[0x80/4];
 static UINT32 ioc_timercnt[4], ioc_timerout[4];
 static UINT32 vidc_sndstart, vidc_sndend, vidc_sndcur;
+UINT8 i2c_clk;
 
 static emu_timer *timer[4], *snd_timer;
 emu_timer  *vbl_timer;
@@ -352,12 +353,11 @@ READ32_HANDLER(archimedes_ioc_r)
 		{
 			case CONTROL:
 			{
-				UINT8 i2c_clk,i2c_data;
+				UINT8 i2c_data;
 
-				i2c_clk = ((i2cmem_scl_read(space->machine->device("i2cmem")) & 1) << 1);
 				i2c_data = (i2cmem_sda_read(space->machine->device("i2cmem")) & 1);
 
-				return (ioc_regs[CONTROL] & 0xfc) | i2c_clk | i2c_data;
+				return (ioc_regs[CONTROL] & 0xfc) | (i2c_clk<<1) | i2c_data;
 			}
 
 			case 1:	// keyboard read
@@ -422,6 +422,7 @@ WRITE32_HANDLER(archimedes_ioc_w)
 				//logerror("IOC I2C: CLK %d DAT %d\n", (data>>1)&1, data&1);
 				i2cmem_sda_write(space->machine->device("i2cmem"), data & 0x01);
 				i2cmem_scl_write(space->machine->device("i2cmem"), (data & 0x02) >> 1);
+				i2c_clk = (data & 2) >> 1;
 				break;
 
 			case IRQ_MASK_A:

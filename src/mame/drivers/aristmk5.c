@@ -17,7 +17,7 @@
 			- R0 == 2: FIQ status force IRQ flag check failed
 			- R0 == 3: Timer 1 latch low val == 0xf5
 		- bp 0x34002a8: SRAM Check branch test (I2C)
-			bp 0x34002a4:
+			- basically writes to the I2C clock/data then read-backs it
 		- bp 0x34002d0: 2KHz Timer branch test
 		- bp 0x34002f8: DRAM emulator branch tests
 			- R0 == 0 "DRAM emulator found"
@@ -39,6 +39,7 @@ extern UINT8 ioc_regs[0x80/4];
 extern INT16 memc_pages[(32*1024*1024)/(4096)];	// the logical RAM area is 32 megs, and the smallest page size is 4k
 extern void archimedes_request_irq_a(running_machine *machine, int mask);
 extern UINT32 *archimedes_memc_physmem;
+extern UINT8 i2c_clk;
 
 static VIDEO_START(aristmk5)
 {
@@ -71,10 +72,12 @@ static VIDEO_UPDATE(aristmk5)
 	return 0;
 }
 
+/* bit mirrors of I2C that are inside the IOC space */
 static WRITE32_HANDLER( mk5_i2c_w )
 {
 	i2cmem_sda_write(space->machine->device("i2cmem"), (data & 0x40) >> 6);
 	i2cmem_scl_write(space->machine->device("i2cmem"), (data & 0x80) >> 7);
+	i2c_clk = (data & 0x80) >> 7;
 }
 
 static ADDRESS_MAP_START( aristmk5_map, ADDRESS_SPACE_PROGRAM, 32 )

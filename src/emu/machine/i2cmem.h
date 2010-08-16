@@ -102,7 +102,6 @@ public:
 	void set_scl_line( int state );
 	void set_wc_line( int state );
 	int read_sda_line();
-	int read_scl_line();
 
 protected:
 	// device-level overrides
@@ -155,6 +154,5 @@ WRITE_LINE_DEVICE_HANDLER( i2cmem_sda_write );
 WRITE_LINE_DEVICE_HANDLER( i2cmem_scl_write );
 WRITE_LINE_DEVICE_HANDLER( i2cmem_wc_write );
 READ_LINE_DEVICE_HANDLER( i2cmem_sda_read );
-READ_LINE_DEVICE_HANDLER( i2cmem_scl_read );
 
 #endif	/* __I2CMEM_H__ */
