@@ -4702,6 +4702,7 @@ ROM_START( sfz3ugd )
 	ROM_LOAD("317-5072-com.pic", 0x00, 0x4000, CRC(3238ba01) SHA1(07c28f17c19eaa652295bbf2d3a96aa27c3748ae) )
 ROM_END
 
+
 ROM_START( cvsgd )
 	NAOMIGD_BIOS
 	NAOMI_DEFAULT_EEPROM
@@ -4716,6 +4717,28 @@ ROM_START( cvsgd )
 	//PIC16C622A (317-5076-JPN)
 	//(sticker 253-5509-5076J)
 	ROM_LOAD("317-5076-jpn.pic", 0x00, 0x4000, CRC(7c125b10) SHA1(557675e33bb45e4969560bbfd61f48d1784a728d) )
+ROM_END
+
+
+ROM_START( starseek )
+	NAOMIGD_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gdl-0005", 0, SHA1(f5513c88528741798ee49f936b9b69480360f103) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+
+	/*
+	Note:
+	There was no sticker or silk screen markings on this PIC.
+	I have used the product number as a label instead.
+
+	PIC16C621A-20 (317-0005-JPN)
+	Sticker: 253-5509-0005J
+	*/
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	ROM_LOAD("317-0005-jpn.pic", 0x00, 0x4000, CRC(19f8d4d0) SHA1(d256f26f757d7019cab7950d81992902cdb65e07) )
 ROM_END
 
 
@@ -4751,6 +4774,7 @@ ROM_START( cvs2gd )
 	//(sticker 253-5509-5078)
 	ROM_LOAD("317-5078-com.pic", 0x00, 0x4000, CRC(e7bb621d) SHA1(0882d0e12ca4fb81dda2268cd12724a10278c220) )
 ROM_END
+
 
 ROM_START( ikaruga )
 	NAOMIGD_BIOS
@@ -5750,7 +5774,7 @@ GAME( 2001, gundmgd,   naomigd,  naomigd,  naomi,    naomi,   ROT0,   "Capcom", 
 GAME( 2001, sfz3ugd,   naomigd,  naomigd,  naomi,    sfz3ugd, ROT0,   "Capcom",                 "Street Fighter Zero 3 Upper (GDL-0002)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 //GDL-0003
 GAME( 2001, cvsgd,     naomigd,  naomigd,  naomi,    naomi,   ROT0,   "Capcom / SNK",           "Capcom Vs. SNK Millenium Fight 2000 Pro (GDL-0004)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-//GDL-0005 Doki Doki Idol Star Seeker
+GAME( 2001, starseek,  naomigd,  naomigd,  naomi,    naomi,   ROT0,   "G-Rev",                  "Doki Doki Idol Star Seeker (GDL-0005)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 GAME( 2001, gundmxgd,  naomigd,  naomigd,  naomi,    naomi,   ROT0,   "Capcom",                 "Mobile Suit Gundam: Federation VS Zeon DX  (GDL-0006)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 //GDL-0007 Capcom Vs. SNK 2
 GAME( 2001, cvs2gd,    naomigd,  naomigd,  naomi,    naomi,   ROT0,   "Capcom / SNK",           "Capcom Vs. SNK 2 Millionaire Fighting 2001 (Rev A) (GDL-0007A)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )

@@ -4651,7 +4651,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( wsbbgd )	/* 2001.06 Super Major League */
 	DRIVER( spkrbtl )	/* 2001.07 Spikers Battle */
 	DRIVER( gunsur2 )	/* 2001.07 Gun Survivor 2: Bio Hazard Code Veronica */
-						/* 2001.07 Dokidoki Idol Star Seeker */
+	DRIVER( starseek )	/* 2001.07 Dokidoki Idol Star Seeker */
 	DRIVER( cvs2gd )	/* 2001.08 Capcom vs. SNK 2 */
 	DRIVER( gundmxgd )	/* 2001.09 Kidou Senshi Gundam Renpou vs. Zeon DX */
 						/* 2001.09 Alien Front */
