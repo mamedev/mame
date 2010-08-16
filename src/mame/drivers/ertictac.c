@@ -14,6 +14,10 @@ TODO:
      - 4 chn?? ( masks $000000ff, $0000ff00, $00ff0000, $ff000000)
      - INT7 (bit 1 in IRQRQB) = sound hw 'ready' flag (checked at $56c)
      - writes to 3600000 - 3ffffff related to snd hardware
+   - additional notes (- AS):
+     Sound HW is mostly hooked up, but games seems to use some kind of
+     auto-repeat flag, plus data buffered is quite wrong, possibly something
+     to do with missing memory paging emulation (see machine/archimds.c).
 
  - game doesn't work with 'demo sound' disabled
  - get rid of dirty hack in DRIVER_INIT (bug in the ARM core?)
@@ -28,16 +32,19 @@ TODO:
 **********************************************************************/
 #include "emu.h"
 #include "cpu/arm/arm.h"
+#include "sound/dac.h"
 
 #define NUM_PENS	(0x100)
 
 static UINT32 *ertictac_mainram;
 static UINT32 *ertictac_videoram;
-static UINT32 IRQSTA, IRQMSKA, IRQMSKB, FIQMSK, T1low, T1high;
+static UINT32 IRQSTA, IRQSTB, IRQMSKA, IRQMSKB, FIQMSK, T1low, T1high;
 static UINT32 vidFIFO[256];
 static pen_t pens[NUM_PENS];
+static emu_timer *snd_timer;
+static UINT32 vidc_sndstart, vidc_sndend, vidc_sndcur;
 
-static WRITE32_HANDLER(video_fifo_w)
+static WRITE32_HANDLER(ertictac_vidc_w)
 {
 	vidFIFO[data >> 24] = data & 0xffffff;
 }
@@ -56,6 +63,11 @@ static WRITE32_HANDLER(IOCR_w)
 static READ32_HANDLER(IRQSTA_r)
 {
 	return (IRQSTA & (~2)) | 0x80;
+}
+
+static READ32_HANDLER(IRQSTB_r)
+{
+	return (IRQSTB);
 }
 
 static READ32_HANDLER(IRQRQA_r)
@@ -82,7 +94,7 @@ static WRITE32_HANDLER(IRQMSKA_w)
 
 static READ32_HANDLER(IRQRQB_r)
 {
-	return mame_rand(space->machine) & IRQMSKB; /* hack  0x20 - controls,  0x02 - ?sound? */
+	return (IRQSTB & IRQMSKB); /* 0x20 - controls,  0x02 - sound */
 }
 
 static READ32_HANDLER(IRQMSKB_r)
@@ -151,6 +163,76 @@ static WRITE32_HANDLER(T1GO_w)
 	startTimer(space->machine);
 }
 
+/* porting code from machine/archimds.c, in the hope that someday that this driver uses that code ... */
+static TIMER_CALLBACK( ertictac_audio_tick )
+{
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+
+	dac_signed_data_w(space->machine->device("dac"), (0x80) | (memory_read_byte(space,vidc_sndcur)));
+
+	vidc_sndcur++;
+
+	if (vidc_sndcur >= vidc_sndend)
+	{
+		IRQSTB |= 0x02;
+		if(IRQMSKB & 0x02)
+		{
+			cputag_set_input_line(machine, "maincpu", ARM_IRQ_LINE, HOLD_LINE);
+		}
+		timer_adjust_oneshot(snd_timer, attotime_never, 0);
+		dac_signed_data_w(space->machine->device("dac"), 0x80);
+	}
+}
+
+static WRITE32_HANDLER( ertictac_memc_w )
+{
+	if ((data & 0x0fe00000) == 0x03600000)
+	{
+//		printf("MEMC: %x to Unk reg %d\n", data&0x1ffff, (data >> 17) & 7);
+
+		switch ((data >> 17) & 7)
+		{
+			case 4:	/* sound start */
+				vidc_sndstart = ((data>>2)&0x7fff)*16;
+				IRQSTB &= ~0x02;
+				break;
+
+			case 5: /* sound end */
+				vidc_sndend = ((data>>2)&0x7fff)*16;
+				break;
+
+			case 7:	/* Control */
+				//memc_pagesize = ((data>>2) & 3);
+
+				//logerror("MEMC: %x to Control (page size %d, %s, %s)\n", data & 0x1ffc, page_sizes[memc_pagesize], ((data>>10)&1) ? "Video DMA on" : "Video DMA off", ((data>>11)&1) ? "Sound DMA on" : "Sound DMA off");
+				logerror("MEMC: %x to Control ( %s, %s)\n", data & 0x1ffc, ((data>>10)&1) ? "Video DMA on" : "Video DMA off", ((data>>11)&1) ? "Sound DMA on" : "Sound DMA off");
+
+				if ((data>>11)&1)
+				{
+					double sndhz;
+
+					/* FIXME: is the frequency correct? */
+					sndhz = (125000.0 / 2) / (double)((vidFIFO[0xc0]&0xff)+2);
+
+					logerror("MEMC: Starting audio DMA at %f Hz, buffer from %x to %x\n", sndhz, vidc_sndstart, vidc_sndend);
+
+					vidc_sndcur = vidc_sndstart;
+
+					timer_adjust_periodic(snd_timer, ATTOTIME_IN_HZ(sndhz), 0, ATTOTIME_IN_HZ(sndhz));
+				}
+				else
+				{
+					//timer_adjust_oneshot(snd_timer, attotime_never, 0);
+					//dac_signed_data_w(space->machine->device("dac"), 0x80);
+				}
+				break;
+
+			default:
+				break;
+		}
+	}
+}
+
 static ADDRESS_MAP_START( ertictac_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_BASE (&ertictac_mainram)
 	AM_RANGE(0x01f00000, 0x01ffffff) AM_RAM AM_BASE (&ertictac_videoram)
@@ -158,6 +240,7 @@ static ADDRESS_MAP_START( ertictac_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x03200010, 0x03200013) AM_READ(IRQSTA_r)
 	AM_RANGE(0x03200014, 0x03200017) AM_READWRITE(IRQRQA_r, IRQRQA_w)
 	AM_RANGE(0x03200018, 0x0320001b) AM_READWRITE(IRQMSKA_r, IRQMSKA_w)
+	AM_RANGE(0x03200010, 0x03200013) AM_READ(IRQSTB_r)
 	AM_RANGE(0x03200024, 0x03200027) AM_READ(IRQRQB_r)
 	AM_RANGE(0x03200028, 0x0320002b) AM_READWRITE(IRQMSKB_r, IRQMSKB_w)
 	AM_RANGE(0x03200038, 0x0320003b) AM_READWRITE(FIQMSK_r, FIQMSK_w)
@@ -177,8 +260,9 @@ static ADDRESS_MAP_START( ertictac_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x033c0014, 0x033c0017) AM_READ_PORT("P2")
 	AM_RANGE(0x033c0018, 0x033c001b) AM_READ_PORT("P1")
 
-	AM_RANGE(0x03400000, 0x03400003) AM_WRITE(video_fifo_w)
-	AM_RANGE(0x03800000, 0x03ffffff) AM_ROM AM_REGION("user1", 0)
+	AM_RANGE(0x03400000, 0x035fffff) AM_WRITE(ertictac_vidc_w)
+	AM_RANGE(0x03600000, 0x037fffff) AM_WRITE(ertictac_memc_w)
+	AM_RANGE(0x03800000, 0x03ffffff) AM_ROM AM_REGION("user1", 0) AM_WRITENOP
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( ertictac )
@@ -251,40 +335,48 @@ static INPUT_PORTS_START( ertictac )
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
 INPUT_PORTS_END
 
+static INPUT_CHANGED( podule_irq_ack )
+{
+	//if (newval)
+	//	IRQSTB &= ~0x20;
+}
+
 static INPUT_PORTS_START( poizone )
 	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START2 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 )
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED(podule_irq_ack, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED(podule_irq_ack, 0)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1) PORT_CHANGED(podule_irq_ack, 0)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED(podule_irq_ack, 0)
 
 	PORT_START("P1")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_CHANGED(podule_irq_ack, 0)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1) PORT_CHANGED(podule_irq_ack, 0)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1) PORT_CHANGED(podule_irq_ack, 0)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1) PORT_CHANGED(podule_irq_ack, 0)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1) PORT_CHANGED(podule_irq_ack, 0)
+	PORT_BIT( 0x00c4, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("P2")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_CHANGED(podule_irq_ack, 0)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2) PORT_CHANGED(podule_irq_ack, 0)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2) PORT_CHANGED(podule_irq_ack, 0)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2) PORT_CHANGED(podule_irq_ack, 0)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2) PORT_CHANGED(podule_irq_ack, 0)
+	PORT_BIT( 0x00c4, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Language ) ) // 01
-	PORT_DIPSETTING(    0x01, DEF_STR( English ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( French ) )
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Language ) ) // 01
+	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( French ) )
 	PORT_DIPNAME( 0x02, 0x02, "1-2" ) // 02
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Service_Mode ) ) // 04
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "Demo Sound" ) // 08
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Demo Sound" ) // 08
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( On ) )
 	PORT_DIPNAME( 0x30, 0x40, "Coinage 1 (1-5, 1-6)" ) // 10 20
 	PORT_DIPSETTING(	0x30, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(	0x10, DEF_STR( 3C_1C ) )
@@ -296,36 +388,42 @@ static INPUT_PORTS_START( poizone )
 	PORT_DIPSETTING(	0x40, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(	0xC0, DEF_STR( 1C_4C ) )
 
-	PORT_START("DSW2") /* DSW 2 doesn't work, may not be hooked up properly */
-//  PORT_DIPNAME( 0x01, 0x01, "2-1" )
-//  PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-//  PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-//  PORT_DIPNAME( 0x01, 0x02, "2-2" )
-//  PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-//  PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-//  PORT_DIPNAME( 0x01, 0x04, "2-3" )
-//  PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-//  PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-//  PORT_DIPNAME( 0x01, 0x08, "2-4" )
-//  PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-//  PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-//  PORT_DIPNAME( 0x01, 0x10, "2-5" )
-//  PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-//  PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-//  PORT_DIPNAME( 0x01, 0x20, "2-6" )
-//  PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-//  PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-//  PORT_DIPNAME( 0x01, 0x40, "2-7" )
-//  PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-//  PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-//  PORT_DIPNAME( 0x01, 0x80, "2-8" )
-//  PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-//  PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_START("DSW2") /* uses conditional dip-switches */
+	PORT_DIPNAME( 0x01, 0x01, "2-1" )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "2-2" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, "2-3" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "2-4" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, "2-5" )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, "2-6" )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "2-7" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "2-8" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 
 
 	PORT_START("dummy")
 	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
 INPUT_PORTS_END
+
+static MACHINE_START( ertictac )
+{
+	snd_timer = timer_alloc(machine, ertictac_audio_tick, NULL);
+	timer_adjust_oneshot(snd_timer, attotime_never, 0);
+}
 
 static MACHINE_RESET( ertictac )
 {
@@ -336,6 +434,16 @@ static INTERRUPT_GEN( ertictac_interrupt )
 {
 	IRQSTA|=0x08;
 	if(IRQMSKA&0x08)
+	{
+		cpu_set_input_line(device, ARM_IRQ_LINE, HOLD_LINE);
+	}
+}
+
+/* hack */
+static INTERRUPT_GEN( ertictac_podule_irq )
+{
+	IRQSTB|=0x20;
+	if(IRQMSKB&0x20)
 	{
 		cpu_set_input_line(device, ARM_IRQ_LINE, HOLD_LINE);
 	}
@@ -382,7 +490,9 @@ static MACHINE_DRIVER_START( ertictac )
 	MDRV_CPU_ADD("maincpu", ARM, 16000000) /* guess */
 	MDRV_CPU_PROGRAM_MAP(ertictac_map)
 	MDRV_CPU_VBLANK_INT("screen", ertictac_interrupt)
+	MDRV_CPU_PERIODIC_INT(ertictac_podule_irq,60)
 
+	MDRV_MACHINE_START(ertictac)
 	MDRV_MACHINE_RESET(ertictac)
 
 
@@ -395,6 +505,10 @@ static MACHINE_DRIVER_START( ertictac )
 
 	MDRV_VIDEO_START(ertictac)
 	MDRV_VIDEO_UPDATE(ertictac)
+
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD("dac", DAC, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_DRIVER_END
 
 ROM_START( ertictac )
