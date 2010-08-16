@@ -261,26 +261,22 @@ To Do / Unknowns:
 #include "includes/toaplan2.h"
 #include "rendlay.h"
 
-/**************** Machine stuff ******************/
-//#define USE_HD64x180          /* Define if CPU support is available */
-//#define USE_ENCRYPTED_V25S    /* Define to enable V25 even on games where it is encrypted */
-
-#define CPU_2_NONE		0x00
-#define CPU_2_Z80		0x5a
-#define CPU_2_HD647180	0xa5
-#define CPU_2_V25		0xff
-
 /************ Machine RAM related values ************/
-static UINT8 *toaplan2_shared_ram;
-static UINT8 *raizing_shared_ram;		/* Shared ram used in Shippumd and Mahoudai */
+static UINT8 *z80_shared_ram;
 static UINT16 *toaplan2_shared_ram16;	/* Really 8bit RAM connected to Z180 */
 #ifndef USE_ENCRYPTED_V25S
 static UINT16 *V25_shared_ram;			/* Really 8bit RAM connected to Z180 */
 #endif
-static UINT16 *fixeight_sec_cpu_mem;
+
+static UINT8* batsugun_share;
+#ifdef USE_ENCRYPTED_V25S
+static UINT8* batsugun_share2;
+#endif
 
 /********** Status related values **********/
 int toaplan2_sub_cpu = 0;
+static running_device *sub_cpu = NULL;
+
 static UINT16 mcu_data = 0;
 static UINT16 video_status;
 static INT8 old_p1_paddle_h;		/* For Ghox */
@@ -298,15 +294,9 @@ static READ16_HANDLER( batsugun_share2_r );
 static WRITE16_HANDLER( batsugun_share2_w );
 #endif
 
-
-
-
-
 /***************************************************************************
   Initialisation handlers
 ***************************************************************************/
-
-static running_device *sub_cpu = NULL;
 
 static void toaplan2_reset(running_device *device)
 {
@@ -395,19 +385,17 @@ static DRIVER_INIT( T2_V25 )
 static DRIVER_INIT( T2_noZ80 )
 {
 	toaplan2_sub_cpu = CPU_2_NONE;
+	sub_cpu = NULL;
 	register_state_save(machine);
 }
 
 static DRIVER_INIT( fixeight )
 {
+	toaplan2_sub_cpu = CPU_2_V25;
 	sub_cpu = machine->device("audiocpu");
 
-	if (fixeight_sec_cpu_mem)
-	{
-		memory_install_ram(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x28f002, 0x28fbff, 0, 0, fixeight_sec_cpu_mem );
-	}
+	memory_install_ram(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x28f002, 0x28fbff, 0, 0, NULL);
 
-	toaplan2_sub_cpu = CPU_2_V25;
 	register_state_save(machine);
 }
 
@@ -417,6 +405,7 @@ static DRIVER_INIT( fixeighb )
 	memory_set_bankptr(machine, "bank1", &bgdata[0x40000]); /* $80000 - $fffff */
 
 	toaplan2_sub_cpu = CPU_2_NONE;
+	sub_cpu = NULL;
 	register_state_save(machine);
 }
 
@@ -668,16 +657,16 @@ static WRITE16_HANDLER( shippumd_coin_word_w )
 	}
 }
 
-static READ16_HANDLER( toaplan2_shared_r )
+static READ16_HANDLER( z80_shared_r )
 {
-	return toaplan2_shared_ram[offset] & 0xff;
+	return z80_shared_ram[offset] & 0xff;
 }
 
-static WRITE16_HANDLER( toaplan2_shared_w )
+static WRITE16_HANDLER( z80_shared_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		toaplan2_shared_ram[offset] = data & 0xff;
+		z80_shared_ram[offset] = data & 0xff;
 	}
 }
 
@@ -690,7 +679,7 @@ static WRITE16_HANDLER( toaplan2_hd647180_cpu_w )
 	{
 		if (toaplan2_sub_cpu == CPU_2_Z80)			/* Whoopee */
 		{
-			toaplan2_shared_ram[0] = data & 0xff;
+			z80_shared_ram[0] = data & 0xff;
 		}
 		else										/* Teki Paki */
 		{
@@ -707,25 +696,12 @@ static CUSTOM_INPUT( c2map_r )
 	/* bit 5 is tested low before V-Blank bit ??? */
 	switch (toaplan2_sub_cpu)
 	{
-		case CPU_2_Z80:			mcu_data = toaplan2_shared_ram[0]; break; /* Whoopee */
+		case CPU_2_Z80:			mcu_data = z80_shared_ram[0]; break; /* Whoopee */
 		case CPU_2_HD647180:	mcu_data = 0xff; break;					  /* Teki Paki */
 		default:				mcu_data = 0x00; break;
 	}
 
 	return (mcu_data == 0xff) ? 0x01 : 0x00;
-}
-
-static READ16_HANDLER( pipibibi_z80_status_r )
-{
-	return toaplan2_shared_ram[0] & 0xff;
-}
-
-static WRITE16_HANDLER( pipibibi_z80_task_w )
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		toaplan2_shared_ram[0] = data & 0xff;
-	}
 }
 
 static READ16_HANDLER( ghox_p1_h_analog_r )
@@ -930,7 +906,7 @@ static WRITE16_HANDLER( fixeight_sec_cpu_w )
 			/* game keeping service mode. It writes/reads the settings to/from */
 			/* these shared RAM locations. The secondary CPU reads/writes them */
 			/* from/to nvram to store the settings (a 93C45 EEPROM) */
-			//memory_install_ram(space, 0x28f002, 0x28fbff, 0, 0, fixeight_sec_cpu_mem);
+			//memory_install_ram(space, 0x28f002, 0x28fbff, 0, 0, NULL);
 			memory_install_read_port(space, 0x28f004, 0x28f005, 0, 0, "DSWA");	/* Dip Switch A - Wrong !!! */
 			memory_install_read_port(space, 0x28f006, 0x28f007, 0, 0, "DSWB");	/* Dip Switch B - Wrong !!! */
 			memory_install_read_port(space, 0x28f008, 0x28f009, 0, 0, "JMPR");	/* Territory Jumper block - Wrong !!! */
@@ -1023,21 +999,6 @@ static WRITE16_DEVICE_HANDLER( fixeighb_oki_bankswitch_w )
 /***************************************************************************
   Raizing games
 ***************************************************************************/
-
-
-static READ16_HANDLER( raizing_shared_ram_r )
-{
-	return raizing_shared_ram[offset] & 0xff;
-}
-
-
-static WRITE16_HANDLER( raizing_shared_ram_w )
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		raizing_shared_ram[offset] = data & 0xff;
-	}
-}
 
 
 static WRITE16_HANDLER( bgaregga_soundlatch_w )
@@ -1445,7 +1406,7 @@ static ADDRESS_MAP_START( pipibibs_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0c0000, 0x0c0fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x140000, 0x14000d) AM_DEVREADWRITE("gp9001vdp0", gp9001_vdp_r, gp9001_vdp_w)
 
-	AM_RANGE(0x190000, 0x190fff) AM_READWRITE(toaplan2_shared_r, toaplan2_shared_w)
+	AM_RANGE(0x190000, 0x190fff) AM_READWRITE(z80_shared_r, z80_shared_w)
 	AM_RANGE(0x19c01c, 0x19c01d) AM_WRITE(toaplan2_coin_word_w)		/* Coin count/lock */
 	AM_RANGE(0x19c020, 0x19c021) AM_READ_PORT("DSWA")
 	AM_RANGE(0x19c024, 0x19c025) AM_READ_PORT("DSWB")
@@ -1466,8 +1427,8 @@ static ADDRESS_MAP_START( pipibibi_bootleg_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 //  AM_RANGE(0x13f000, 0x13f001) AM_WRITENOP        /* ??? */
 	AM_RANGE(0x180000, 0x182fff) AM_DEVREADWRITE("gp9001vdp0", pipibibi_bootleg_videoram16_r, pipibibi_bootleg_videoram16_w )		/* TileRAM */
 	AM_RANGE(0x188000, 0x18800f) AM_DEVWRITE("gp9001vdp0", pipibibi_bootleg_scroll_w)
-	AM_RANGE(0x190002, 0x190003) AM_READ(pipibibi_z80_status_r)	/* Z80 ready ? */
-	AM_RANGE(0x190010, 0x190011) AM_WRITE(pipibibi_z80_task_w)	/* Z80 task to perform */
+	AM_RANGE(0x190002, 0x190003) AM_READ(z80_shared_r)	/* Z80 ready ? */
+	AM_RANGE(0x190010, 0x190011) AM_WRITE(z80_shared_w)	/* Z80 task to perform */
 	AM_RANGE(0x19c01c, 0x19c01d) AM_WRITE(toaplan2_coin_word_w)	/* Coin count/lock */
 	AM_RANGE(0x19c020, 0x19c021) AM_READ_PORT("DSWA")
 	AM_RANGE(0x19c024, 0x19c025) AM_READ_PORT("DSWB")
@@ -1504,7 +1465,7 @@ static ADDRESS_MAP_START( fixeight_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 #else
 	AM_RANGE(0x280000, 0x28dfff) AM_RAM							/* part of shared ram ? */
 	AM_RANGE(0x28e000, 0x28efff) AM_READWRITE(shared_ram_r, shared_ram_w) AM_BASE(&toaplan2_shared_ram16)
-	AM_RANGE(0x28f000, 0x28f001) AM_READWRITE(fixeight_sec_cpu_r, fixeight_sec_cpu_w) AM_BASE(&fixeight_sec_cpu_mem)	/* V25+ Command/Status port */
+	AM_RANGE(0x28f000, 0x28f001) AM_READWRITE(fixeight_sec_cpu_r, fixeight_sec_cpu_w)	/* V25+ Command/Status port */
 //  AM_RANGE(0x28f002, 0x28f003) AM_READONLY             /* part of shared ram */
 //  AM_RANGE(0x28f004, 0x28f005) AM_READ_PORT("DSWA") /* Dip Switch A - Wrong !!! */
 //  AM_RANGE(0x28f006, 0x28f007) AM_READ_PORT("DSWB") /* Dip Switch B - Wrong !!! */
@@ -1570,11 +1531,6 @@ static ADDRESS_MAP_START( vfive_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static UINT8* batsugun_share;
-#ifdef USE_ENCRYPTED_V25S
-static UINT8* batsugun_share2;
-#endif
-
 static READ16_HANDLER( batsugun_share_r )
 {
 	return batsugun_share[offset] | batsugun_share[offset]<<8;
@@ -1583,12 +1539,13 @@ static READ16_HANDLER( batsugun_share_r )
 
 static WRITE16_HANDLER( batsugun_share_w )
 {
-	/*
-    if (ACCESSING_BITS_8_15)
-    {
-        batsugun_share[offset] = data >> 8;
-    }
-    */
+#if 0
+	if (ACCESSING_BITS_8_15)
+	{
+		batsugun_share[offset] = data >> 8;
+	}
+#endif
+
 	if (ACCESSING_BITS_0_7)
 	{
 		batsugun_share[offset] = data;
@@ -1604,12 +1561,12 @@ static READ16_HANDLER( batsugun_share2_r )
 
 static WRITE16_HANDLER( batsugun_share2_w )
 {
-	/*
-    if (ACCESSING_BITS_8_15)
-    {
-        batsugun_share2[offset] = data >> 8;
-    }
-    */
+#if 0
+	if (ACCESSING_BITS_8_15)
+	{
+		batsugun_share2[offset] = data >> 8;
+	}
+#endif
 
 	if (ACCESSING_BITS_0_7)
 	{
@@ -1668,7 +1625,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( mahoudai_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
-	AM_RANGE(0x218000, 0x21bfff) AM_READWRITE(raizing_shared_ram_r, raizing_shared_ram_w)
+	AM_RANGE(0x218000, 0x21bfff) AM_READWRITE(z80_shared_r, z80_shared_w)
 	AM_RANGE(0x21c01c, 0x21c01d) AM_WRITE(toaplan2_coin_word_w)
 	AM_RANGE(0x21c020, 0x21c021) AM_READ_PORT("IN1")
 	AM_RANGE(0x21c024, 0x21c025) AM_READ_PORT("IN2")
@@ -1691,7 +1648,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( shippumd_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
-	AM_RANGE(0x218000, 0x21bfff) AM_READWRITE(raizing_shared_ram_r, raizing_shared_ram_w)
+	AM_RANGE(0x218000, 0x21bfff) AM_READWRITE(z80_shared_r, z80_shared_w)
 //  AM_RANGE(0x21c008, 0x21c009) AM_WRITENOP                    /* ??? */
 	AM_RANGE(0x21c01c, 0x21c01d) AM_WRITE(shippumd_coin_word_w)
 	AM_RANGE(0x21c020, 0x21c021) AM_READ_PORT("IN1")
@@ -1715,7 +1672,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bgaregga_68k_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	AM_RANGE(0x100000, 0x10ffff) AM_RAM
-	AM_RANGE(0x218000, 0x21bfff) AM_READWRITE(raizing_shared_ram_r, raizing_shared_ram_w)
+	AM_RANGE(0x218000, 0x21bfff) AM_READWRITE(z80_shared_r, z80_shared_w)
 	AM_RANGE(0x21c01c, 0x21c01d) AM_WRITE(toaplan2_coin_word_w)
 	AM_RANGE(0x21c020, 0x21c021) AM_READ_PORT("IN1")
 	AM_RANGE(0x21c024, 0x21c025) AM_READ_PORT("IN2")
@@ -1792,16 +1749,16 @@ ADDRESS_MAP_END
 
 
 
-static ADDRESS_MAP_START( sound_z80_mem, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( pipibibs_sound_z80_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE(&toaplan2_shared_ram)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE(&z80_shared_ram)
 	AM_RANGE(0xe000, 0xe001) AM_DEVREADWRITE("ymsnd", ym3812_r, ym3812_w)
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( raizing_sound_z80_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE(&raizing_shared_ram)
+	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE(&z80_shared_ram)
 	AM_RANGE(0xe000, 0xe001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0xe004, 0xe004) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
 	AM_RANGE(0xe00e, 0xe00e) AM_WRITE(toaplan2_coin_w)
@@ -1811,7 +1768,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( bgaregga_sound_z80_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE(&raizing_shared_ram)
+	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE(&z80_shared_ram)
 	AM_RANGE(0xe000, 0xe001) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0xe004, 0xe004) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
 	AM_RANGE(0xe006, 0xe006) AM_WRITE(raizing_okim6295_bankselect_0)
@@ -4082,8 +4039,8 @@ static MACHINE_DRIVER_START( pipibibs )
 	MDRV_CPU_PROGRAM_MAP(pipibibs_68k_mem)
 	MDRV_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
 
-	MDRV_CPU_ADD("audiocpu", Z80,XTAL_27MHz/8)			/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(sound_z80_mem)
+	MDRV_CPU_ADD("audiocpu", Z80, XTAL_27MHz/8)			/* verified on pcb */
+	MDRV_CPU_PROGRAM_MAP(pipibibs_sound_z80_mem)
 
 	MDRV_QUANTUM_TIME(HZ(600))
 
@@ -4171,7 +4128,7 @@ static MACHINE_DRIVER_START( pipibibi_bootleg )
 	MDRV_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
 
 	MDRV_CPU_ADD("audiocpu", Z80, XTAL_27MHz/8)			/* ??? 3.37MHz */
-	MDRV_CPU_PROGRAM_MAP(sound_z80_mem)
+	MDRV_CPU_PROGRAM_MAP(pipibibs_sound_z80_mem)
 
 	MDRV_QUANTUM_TIME(HZ(600))
 

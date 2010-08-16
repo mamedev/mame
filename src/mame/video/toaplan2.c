@@ -28,18 +28,12 @@
 
 #define RAIZING_TX_GFXRAM_SIZE  0x8000	/* GFX data decode RAM size */
 
-#define CPU_2_NONE		0x00
-#define CPU_2_Z80		0x5a
-#define CPU_2_HD647180	0xa5
-#define CPU_2_V25		0xff
-
 
 
 UINT16 *toaplan2_txvideoram16;		/* Video ram for extra text layer */
 UINT16 *toaplan2_txvideoram16_offs;	/* Text layer tile flip and positon ? */
 UINT16 *toaplan2_txscrollram16;		/* Text layer scroll ? */
 UINT16 *toaplan2_tx_gfxram16;			/* Text Layer RAM based tiles */
-UINT16 *raizing_tx_gfxram16;			/* Text Layer RAM based tiles (Batrider) */
 
 size_t toaplan2_tx_vram_size;		 /* 0x2000 Text layer RAM size */
 size_t toaplan2_tx_offs_vram_size;	 /* 0x200 Text layer tile flip and positon ? */
@@ -162,9 +156,9 @@ VIDEO_START( batrider )
 	state->vdp0->spriteram16_n = state->vdp0->spriteram16_new;
 
 	/* Create the Text tilemap for this game */
-	raizing_tx_gfxram16 = auto_alloc_array_clear(machine, UINT16, RAIZING_TX_GFXRAM_SIZE/2);
-	state_save_register_global_pointer(machine, raizing_tx_gfxram16, RAIZING_TX_GFXRAM_SIZE/2);
-	gfx_element_set_source(machine->gfx[2], (UINT8 *)raizing_tx_gfxram16);
+	toaplan2_tx_gfxram16 = auto_alloc_array_clear(machine, UINT16, RAIZING_TX_GFXRAM_SIZE/2);
+	state_save_register_global_pointer(machine, toaplan2_tx_gfxram16, RAIZING_TX_GFXRAM_SIZE/2);
+	gfx_element_set_source(machine->gfx[2], (UINT8 *)toaplan2_tx_gfxram16);
 	truxton2_create_tx_tilemap(machine);
 	tilemap_set_scrolldx(tx_tilemap, 0x1d4, 0x2a);
 
@@ -257,18 +251,19 @@ WRITE16_HANDLER( toaplan2_tx_gfxram16_w )
 READ16_HANDLER( raizing_tx_gfxram16_r )
 {
 	offset += 0x3400/2;
-	return raizing_tx_gfxram16[offset];
+	return toaplan2_tx_gfxram16[offset];
 }
 WRITE16_HANDLER( raizing_tx_gfxram16_w )
 {
 	/*** Dynamic Text GFX decoding for Batrider ***/
 
-	UINT16 oldword = raizing_tx_gfxram16[offset + (0x3400 / 2)];
+	UINT16 oldword;
 
+	offset += 0x3400/2;
+	oldword = toaplan2_tx_gfxram16[offset];
 	if (oldword != data)
 	{
-		offset += 0x3400/2;
-		COMBINE_DATA(&raizing_tx_gfxram16[offset]);
+		COMBINE_DATA(&toaplan2_tx_gfxram16[offset]);
 	}
 }
 
@@ -278,7 +273,7 @@ WRITE16_HANDLER( batrider_textdata_decode )
 	/*** Only done once during start-up ***/
 
 	int code;
-	UINT16 *dest = (UINT16 *)raizing_tx_gfxram16;
+	UINT16 *dest = (UINT16 *)toaplan2_tx_gfxram16;
 
 	memcpy(dest, toaplan2_txvideoram16, toaplan2_tx_vram_size);
 	dest += (toaplan2_tx_vram_size/2);

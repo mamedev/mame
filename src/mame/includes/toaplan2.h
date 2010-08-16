@@ -1,3 +1,13 @@
+/**************** Machine stuff ******************/
+//#define USE_HD64x180          /* Define if CPU support is available */
+//#define USE_ENCRYPTED_V25S    /* Define to enable V25 even on games where it is encrypted */
+
+/* sub cpu */
+#define CPU_2_NONE		0x00
+#define CPU_2_Z80		0x5a
+#define CPU_2_HD647180	0xa5
+#define CPU_2_V25		0xff
+
 /* vdp related */
 
 // mixing debug, render each VDP to it's own screen - be sure to recompile both driver and video after changing
