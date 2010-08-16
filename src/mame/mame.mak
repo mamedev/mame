@@ -1113,12 +1113,12 @@ $(MAMEOBJ)/sega.a: \
 	$(DRIVERS)/deniam.o $(VIDEO)/deniam.o \
 	$(DRIVERS)/dotrikun.o \
 	$(VIDEO)/genesis.o \
-	$(DRIVERS)/genesisb.o \
 	$(DRIVERS)/gpworld.o \
 	$(DRIVERS)/hikaru.o \
 	$(DRIVERS)/hshavoc.o \
 	$(DRIVERS)/kopunch.o $(VIDEO)/kopunch.o \
 	$(DRIVERS)/megadriv.o \
+	$(DRIVERS)/megadrvb.o \
 	$(DRIVERS)/megaplay.o \
 	$(DRIVERS)/megatech.o \
 	$(DRIVERS)/model1.o $(MACHINE)/model1.o $(VIDEO)/model1.o \
@@ -1149,7 +1149,6 @@ $(MAMEOBJ)/sega.a: \
 	$(DRIVERS)/system1.o $(VIDEO)/system1.o \
 	$(DRIVERS)/system16.o $(VIDEO)/system16.o \
 	$(DRIVERS)/timetrv.o \
-	$(DRIVERS)/topshoot.o \
 	$(DRIVERS)/turbo.o $(AUDIO)/turbo.o $(VIDEO)/turbo.o \
 	$(DRIVERS)/vicdual.o $(AUDIO)/vicdual.o $(VIDEO)/vicdual.o \
 	$(DRIVERS)/zaxxon.o $(AUDIO)/zaxxon.o $(VIDEO)/zaxxon.o \
