@@ -71,7 +71,7 @@ static void get_pens(running_machine *machine, pen_t *pens)
 
 	offs_t offs;
 	double scaler;
-	double bitmap_weight[1];
+	double bitmap_weight[2];
 	double charmap_rg_weights[3];
 	double charmap_b_weights[2];
 	double back_r_weight[1];
