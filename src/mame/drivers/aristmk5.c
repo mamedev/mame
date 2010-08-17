@@ -5,7 +5,7 @@
 
 	Note: ARM250 mapping is not identical to plain AA
 
-	code DASMing of POST (Adonis):
+	code DASMing of POST (adonis):
 	- bp 0x3400224:
 	  checks work RAM [0x87000], if bit 0 active high then all tests are ok, otherwise check what went wrong;
 		- bp 0x3400230: EPROM checksum branch test
@@ -23,12 +23,15 @@
 						  IRQA status bit 0, that's "printer busy" on original AA but here it have a completely
 						  different meaning.
 		- bp 0x34002f8: DRAM emulator branch tests
+			bp 0x34002f4:
 			- R0 == 0 "DRAM emulator found"
 			- R0 == 1 "DRAM emulator found"
 			- R0 == 3 "DRAM emulator not found - Error"
 			- R0 == 4 "DRAM emulator found instead of DRAM - Error"
 			- R0 == x "Undefined error in DRAM emulator area"
+			It r/w RAM location 0 and it expects to NOT read-back value written.
 
+	goldprmd: checks if a "keyboard IRQ" fires (IRQ status B bit 6), returns an External Video Crystal Error (bp 3400278)
 
 */
 
@@ -274,7 +277,7 @@ ROM_START( magicmsk )
 	ROM_REGION( 0x800000, "maincpu", 0 ) /* ARM Code */
 	ROM_LOAD32_WORD( "magicmsk.u7",  0x000000, 0x80000, CRC(17317eb9) SHA1(3ddb8d61f23461c3194af534928164550208bbee) )
 	ROM_LOAD32_WORD( "magicmsk.u11", 0x000002, 0x80000, CRC(23aefb5a) SHA1(ba4488754794f75f53b9c81b74b6ccd992c64acc) )
-	ROM_LOAD32_WORD( "magicmsk.u8",  0x100000, 0x80000, CRC(23aefb5a) SHA1(ba4488754794f75f53b9c81b74b6ccd992c64acc) )
+	ROM_LOAD32_WORD( "magicmsk.u8",  0x100000, 0x80000, BAD_DUMP CRC(971bbf63) SHA1(082f81115209c7089c76fb207248da3c347a080b) ) //same as dmdtouch u8 ROM
 	ROM_LOAD32_WORD( "magicmsk.u12", 0x100002, 0x80000, CRC(6829a7bf) SHA1(97eed83763d0ec5e753d6ad194e906b1307c4940) )
 ROM_END
 
