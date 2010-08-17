@@ -19,6 +19,9 @@
 		- bp 0x34002a8: SRAM Check branch test (I2C)
 			- basically writes to the I2C clock/data then read-backs it
 		- bp 0x34002d0: 2KHz Timer branch test
+			bp 0x34002cc: it does various test with GO command reads (that are undefined on plain AA) and
+						  IRQA status bit 0, that's "printer busy" on original AA but here it have a completely
+						  different meaning.
 		- bp 0x34002f8: DRAM emulator branch tests
 			- R0 == 0 "DRAM emulator found"
 			- R0 == 1 "DRAM emulator found"
@@ -40,6 +43,7 @@ extern INT16 memc_pages[(32*1024*1024)/(4096)];	// the logical RAM area is 32 me
 extern void archimedes_request_irq_a(running_machine *machine, int mask);
 extern UINT32 *archimedes_memc_physmem;
 extern UINT8 i2c_clk;
+static emu_timer *mk5_2KHz_timer;
 
 static VIDEO_START(aristmk5)
 {
@@ -80,12 +84,27 @@ static WRITE32_HANDLER( mk5_i2c_w )
 	i2c_clk = (data & 0x80) >> 7;
 }
 
+static READ32_HANDLER( mk5_ioc_r )
+{
+	if (offset*4 >= 0x200000 && offset*4 < 0x300000)
+	{
+		if((offset & 0x1f) == 18 || (offset & 0x1f) == 22 || (offset & 0x1f) == 26 || (offset & 0x1f) == 30)
+		{
+			/* reset 2KHz timer if a timer GO command is read */
+			ioc_regs[4] &= 0xfe;
+			timer_adjust_oneshot(mk5_2KHz_timer, ATTOTIME_IN_HZ(2000), 0);
+		}
+	}
+
+	return archimedes_ioc_r(space,offset,mem_mask);
+}
+
 static ADDRESS_MAP_START( aristmk5_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x01ffffff) AM_READWRITE(archimedes_memc_logical_r, archimedes_memc_logical_w)
 	AM_RANGE(0x02000000, 0x02ffffff) AM_RAM AM_BASE(&archimedes_memc_physmem) /* physical RAM - 16 MB for now, should be 512k for the A310 */
 	AM_RANGE(0x03010420, 0x03010423) AM_WRITE(mk5_i2c_w)
 	AM_RANGE(0x03010810, 0x03010813) AM_READNOP //MK-5 specific, watchdog
-	AM_RANGE(0x03000000, 0x033fffff) AM_READWRITE(archimedes_ioc_r, archimedes_ioc_w)
+	AM_RANGE(0x03000000, 0x033fffff) AM_READWRITE(mk5_ioc_r, archimedes_ioc_w)
 	AM_RANGE(0x03400000, 0x035fffff) AM_ROM AM_REGION("maincpu", 0) AM_WRITE(archimedes_memc_page_w)
 	AM_RANGE(0x03600000, 0x037fffff) AM_READWRITE(archimedes_memc_r, archimedes_memc_w)
 	AM_RANGE(0x03800000, 0x039fffff) AM_READWRITE(archimedes_vidc_r, archimedes_vidc_w) //TODO: this is different here, it appears to contain palette data only
@@ -100,18 +119,27 @@ static DRIVER_INIT( aristmk5 )
 	archimedes_driver_init(machine);
 }
 
+static TIMER_CALLBACK( mk5_2KHz_callback )
+{
+	ioc_regs[4] |= 1;
+
+	timer_adjust_oneshot(mk5_2KHz_timer, attotime_never, 0);
+}
+
 static MACHINE_START( aristmk5 )
 {
 	archimedes_init(machine);
 
 	// reset the DAC to centerline
 	dac_signed_data_w(machine->device("dac"), 0x80);
+
+	mk5_2KHz_timer = timer_alloc(machine, mk5_2KHz_callback, 0);
 }
 
 static MACHINE_RESET( aristmk5 )
 {
 	archimedes_reset(machine);
-	ioc_regs[4]|=1; //set printer busy irq?
+	timer_adjust_oneshot(mk5_2KHz_timer, ATTOTIME_IN_HZ(2000), 0);
 
 	{
 		int i;
