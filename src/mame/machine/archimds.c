@@ -51,20 +51,35 @@ UINT8 i2c_clk;
 static emu_timer *timer[4], *snd_timer;
 emu_timer  *vbl_timer;
 
-#define CONTROL			0x00/4
+#define CONTROL			0
+#define IRQ_STATUS_A 	4
+#define IRQ_REQUEST_A   5
+#define IRQ_MASK_A 		6
+#define IRQ_STATUS_B	8
+#define IRQ_REQUEST_B   9
+#define IRQ_MASK_B		10
+#define FIQ_STATUS		12
+#define FIQ_REQUEST     13
+#define FIQ_MASK		14
 
 
-#define IRQ_STATUS_A 	0x10/4
-#define IRQ_REQUEST_A   0x14/4
-#define IRQ_MASK_A 		0x18/4
+#define VIDC_HCR		0x80
+#define VIDC_HSWR		0x84
+#define VIDC_HBSR		0x88
+#define VIDC_HDSR		0x8c
+#define VIDC_HDER		0x90
+#define VIDC_HBER		0x94
+#define VIDC_HCSR		0x98
+#define VIDC_HIR		0x9c
 
-#define IRQ_STATUS_B	0x20/4
-#define IRQ_REQUEST_B   0x24/4
-#define IRQ_MASK_B		0x28/4
-
-#define FIQ_STATUS		0x30/4
-#define FIQ_REQUEST     0x34/4
-#define FIQ_MASK		0x38/4
+#define VIDC_VCR		0xa0
+#define VIDC_VSWR		0xa4
+#define VIDC_VBSR		0xa8
+#define VIDC_VDSR		0xac
+#define VIDC_VDER		0xb0
+#define VIDC_VBER		0xb4
+#define VIDC_VCSR		0xb8
+#define VIDC_VCER		0xbc
 
 void archimedes_request_irq_a(running_machine *machine, int mask)
 {
@@ -354,8 +369,8 @@ READ32_HANDLER(archimedes_ioc_r)
 	#endif
 	if (offset*4 >= 0x200000 && offset*4 < 0x300000)
 	{
-//		if(((offset & 0x1f) != 16) && ((offset & 0x1f) != 17) && ((offset & 0x1f) != 24) && ((offset & 0x1f) != 25))
-//		logerror("IOC: R %s = %02x (PC=%x) %02x\n", ioc_regnames[offset&0x1f], ioc_regs[offset&0x1f], cpu_get_pc( space->cpu ),offset & 0x1f);
+		if(((offset & 0x1f) != 16) && ((offset & 0x1f) != 17) && ((offset & 0x1f) != 24) && ((offset & 0x1f) != 25))
+		logerror("IOC: R %s = %02x (PC=%x) %02x\n", ioc_regnames[offset&0x1f], ioc_regs[offset&0x1f], cpu_get_pc( space->cpu ),offset & 0x1f);
 
 		switch (offset & 0x1f)
 		{
@@ -592,7 +607,7 @@ WRITE32_HANDLER(archimedes_vidc_w)
 {
 	UINT32 reg = data>>24;
 	UINT32 val = data & 0xffffff;
-	#ifdef DEBUG
+	//#ifdef DEBUG
 	static const char *const vrnames[] =
 	{
 		"horizontal total",
@@ -612,7 +627,7 @@ WRITE32_HANDLER(archimedes_vidc_w)
 		"vertical cursor start",
 		"vertical cursor end",
 	};
-	#endif
+	//#endif
 
 
 	// 0x00 - 0x3c Video Palette Logical Colors (16 colors)
@@ -635,30 +650,64 @@ WRITE32_HANDLER(archimedes_vidc_w)
 	}
 	else if (reg >= 0x80 && reg <= 0xbc)
 	{
-		#ifdef DEBUG
-		logerror("VIDC: %s = %d\n", vrnames[(reg-0x80)/4], val>>12);
-		#endif
-
-		if ((reg == 0xb0) & ((val>>12) != 0))
+		switch(reg)
 		{
-			rectangle visarea;
+			case VIDC_HCR:  vidc_regs[VIDC_HCR] =  (val >> 14)+1; 	break;
+//			case VIDC_HSWR: vidc_regs[VIDC_HSWR] = (val >> 14)+1; 	break;
+			case VIDC_HBSR: vidc_regs[VIDC_HBSR] = (val >> 14)+1; 	break;
+			case VIDC_HDSR: vidc_regs[VIDC_HDSR] = (val >> 14); 	break;
+			case VIDC_HDER: vidc_regs[VIDC_HDER] = (val >> 14); 	break;
+			case VIDC_HBER: vidc_regs[VIDC_HBER] = (val >> 14)+1; 	break;
+//			#define VIDC_HCSR		0x98
+//			#define VIDC_HIR		0x9c
 
-			visarea.min_x = 0;
-			visarea.min_y = 0;
-			visarea.max_x = vidc_regs[0x94] - vidc_regs[0x88];
-			visarea.max_y = vidc_regs[0xb4] - vidc_regs[0xa8];
-
-			logerror("Configuring: htotal %d vtotal %d vis %d,%d\n",
-				vidc_regs[0x80], vidc_regs[0xa0],
-				visarea.max_x, visarea.max_y);
-
-			space->machine->primary_screen->configure(vidc_regs[0x80], vidc_regs[0xa0], visarea, space->machine->primary_screen->frame_period().attoseconds);
-
-			// slightly hacky: fire off a VBL right now.  the BIOS doesn't wait long enough otherwise.
-			timer_adjust_oneshot(vbl_timer, attotime_zero, 0);
+			case VIDC_VCR:  vidc_regs[VIDC_VCR] = (val >> 14)+1;	break;
+//			#define VIDC_VSWR		0xa4
+			case VIDC_VBSR: vidc_regs[VIDC_VBSR] = (val >> 14)+1; 	break;
+			case VIDC_VDSR: vidc_regs[VIDC_VDSR] = (val >> 14)+1;	break;
+			case VIDC_VDER: vidc_regs[VIDC_VDER] = (val >> 14)+1;	break;
+			case VIDC_VBER: vidc_regs[VIDC_VBER] = (val >> 14)+1;	break;
+//			#define VIDC_VCSR		0xb8
+//			#define VIDC_VCER		0xbc
 		}
 
-		vidc_regs[reg] = val>>12;
+
+		//#ifdef DEBUG
+		logerror("VIDC: %s = %d\n", vrnames[(reg-0x80)/4], vidc_regs[reg]);
+		//#endif
+
+		/* sanity checks - first pass */
+		/*
+			total cycles + border start/end
+		*/
+		if(vidc_regs[VIDC_HCR] && vidc_regs[VIDC_HBSR] && vidc_regs[VIDC_HBER] &&
+		   vidc_regs[VIDC_VCR] && vidc_regs[VIDC_VBSR] && vidc_regs[VIDC_VBER])
+		{
+			/* sanity checks - second pass */
+			/*
+			total cycles > border end > border start
+			*/
+			if((vidc_regs[VIDC_HCR] >= vidc_regs[VIDC_HBER]) &&
+			   (vidc_regs[VIDC_HBER] >= vidc_regs[VIDC_HBSR]) &&
+			   (vidc_regs[VIDC_VCR] >= vidc_regs[VIDC_VBER]) &&
+			   (vidc_regs[VIDC_VBER] >= vidc_regs[VIDC_VBSR]))
+			{
+				rectangle visarea;
+
+				visarea.min_x = 0;
+				visarea.min_y = 0;
+				visarea.max_x = vidc_regs[VIDC_HBER] - vidc_regs[VIDC_HBSR] - 1;
+				visarea.max_y = vidc_regs[VIDC_VBER] - vidc_regs[VIDC_VBSR];
+
+				logerror("Configuring: htotal %d vtotal %d border %d x %d display %d x %d\n",
+					vidc_regs[VIDC_HCR], vidc_regs[VIDC_VCR],
+					visarea.max_x, visarea.max_y,
+					vidc_regs[VIDC_HDER]-vidc_regs[VIDC_HDSR],vidc_regs[VIDC_VDER]-vidc_regs[VIDC_VDSR]+1);
+
+				space->machine->primary_screen->configure(vidc_regs[VIDC_HCR], vidc_regs[VIDC_VCR], visarea, space->machine->primary_screen->frame_period().attoseconds);
+			}
+		}
+
 	}
 	else
 	{
