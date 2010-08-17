@@ -33,6 +33,14 @@
 
 	goldprmd: checks if a "keyboard IRQ" fires (IRQ status B bit 6), returns an External Video Crystal Error (bp 3400278)
 
+	dmdtouch:
+		bp 3400640: checks 2MByte DRAM
+			- writes from 0x1000 to 0x100000, with 0x400 bytes index increment and 0xfb data increment
+			- writes from 0x100000 to 0x200000, with 0x400 bytes index increment and 0xfb data increment
+			- bp 3400720 checks if the aforementioned checks are ok (currently fails at the very first work RAM check at 0x1000, it returns the
+			  value that actually should be at 0x141000)
+		bp 340064c: if R0 == 0 2MB DRAM is ok, otherwise there's an error
+
 */
 
 #include "emu.h"
@@ -292,16 +300,16 @@ ROM_START( geishanz )
 ROM_END
 
 
-GAME( 1995, swthrt2v, 0, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Sweet Hearts II (C - 07/09/95, Venezuela version)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1995, enchfrst, 0, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Enchanted Forest (E - 23/06/95, Local)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1996, dolphntr, 0, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Dolphin Treasure (B - 06/12/96, NSW/ACT, Rev 1.24.4.0)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1996, dolphtra, 0, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Dolphin Treasure (B - 06/12/96, NSW/ACT, Rev 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1997, goldprmd, 0, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Golden Pyramids (B - 13-05-97, USA)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1997, qotn,     0, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Queen of the Nile (B - 13-05-97, NSW/ACT)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1997, dmdtouch, 0, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Diamond Touch (E - 30-06-97, Local)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1998, adonis,   0, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Adonis (A - 25-05-98, NSW/ACT)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1998, reelrock, 0, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Reelin-n-Rockin (A - 13/07/98, Local)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1998, indiandr, 0, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Indian Dreaming (B - 15/12/98, Local)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, magicmsk, 0, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Magic Mask (A - 09/05/2000, Export))", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, margmgc,  0, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Margarita Magic (A - 07/07/2000, NSW/ACT)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2001, geishanz, 0, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Geisha (A - 05/03/01, New Zealand)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1995, swthrt2v, 0,        aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Sweet Hearts II (C - 07/09/95, Venezuela version)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1995, enchfrst, 0,        aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Enchanted Forest (E - 23/06/95, Local)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1996, dolphntr, 0,        aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Dolphin Treasure (B - 06/12/96, NSW/ACT, Rev 1.24.4.0)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1996, dolphtra, dolphntr, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Dolphin Treasure (B - 06/12/96, NSW/ACT, Rev 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1997, goldprmd, 0,        aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Golden Pyramids (B - 13-05-97, USA)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1997, qotn,     0,        aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Queen of the Nile (B - 13-05-97, NSW/ACT)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1997, dmdtouch, 0,        aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Diamond Touch (E - 30-06-97, Local)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1998, adonis,   0,        aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Adonis (A - 25-05-98, NSW/ACT)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1998, reelrock, 0,        aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Reelin-n-Rockin (A - 13/07/98, Local)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1998, indiandr, 0,        aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Indian Dreaming (B - 15/12/98, Local)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, magicmsk, 0,        aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Magic Mask (A - 09/05/2000, Export))", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2000, margmgc,  0,        aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Margarita Magic (A - 07/07/2000, NSW/ACT)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 2001, geishanz, 0,        aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Geisha (A - 05/03/01, New Zealand)", GAME_NOT_WORKING|GAME_NO_SOUND )

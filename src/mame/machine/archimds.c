@@ -51,16 +51,20 @@ UINT8 i2c_clk;
 static emu_timer *timer[4], *snd_timer;
 emu_timer  *vbl_timer;
 
-#define CONTROL			0
-#define IRQ_STATUS_A 	4
-#define IRQ_REQUEST_A   5
-#define IRQ_MASK_A 		6
-#define IRQ_STATUS_B	8
-#define IRQ_REQUEST_B   9
-#define IRQ_MASK_B		10
-#define FIQ_STATUS		12
-#define FIQ_REQUEST     13
-#define FIQ_MASK		14
+#define CONTROL			0x00/4
+
+
+#define IRQ_STATUS_A 	0x10/4
+#define IRQ_REQUEST_A   0x14/4
+#define IRQ_MASK_A 		0x18/4
+
+#define IRQ_STATUS_B	0x20/4
+#define IRQ_REQUEST_B   0x24/4
+#define IRQ_MASK_B		0x28/4
+
+#define FIQ_STATUS		0x30/4
+#define FIQ_REQUEST     0x34/4
+#define FIQ_MASK		0x38/4
 
 void archimedes_request_irq_a(running_machine *machine, int mask)
 {
@@ -350,8 +354,8 @@ READ32_HANDLER(archimedes_ioc_r)
 	#endif
 	if (offset*4 >= 0x200000 && offset*4 < 0x300000)
 	{
-		if(((offset & 0x1f) != 16) && ((offset & 0x1f) != 17) && ((offset & 0x1f) != 24) && ((offset & 0x1f) != 25))
-		logerror("IOC: R %s = %02x (PC=%x) %02x\n", ioc_regnames[offset&0x1f], ioc_regs[offset&0x1f], cpu_get_pc( space->cpu ),offset & 0x1f);
+//		if(((offset & 0x1f) != 16) && ((offset & 0x1f) != 17) && ((offset & 0x1f) != 24) && ((offset & 0x1f) != 25))
+//		logerror("IOC: R %s = %02x (PC=%x) %02x\n", ioc_regnames[offset&0x1f], ioc_regs[offset&0x1f], cpu_get_pc( space->cpu ),offset & 0x1f);
 
 		switch (offset & 0x1f)
 		{
