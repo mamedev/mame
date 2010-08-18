@@ -138,7 +138,7 @@ static TIMER_CALLBACK( a310_audio_tick )
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
-	dac_signed_data_w(space->machine->device("dac"), 0x80 | (memory_read_byte(space,vidc_sndcur)));
+	dac_signed_data_w(space->machine->device("dac"), (memory_read_byte(space,vidc_sndcur)));
 
 	vidc_sndcur++;
 
@@ -747,7 +747,7 @@ WRITE32_HANDLER(archimedes_memc_w)
 					double sndhz;
 
 					/* FIXME: is the frequency correct? */
-					sndhz = (125000.0 / 2) / (double)((vidc_regs[0xc0]&0xff)+2);
+					sndhz = (250000.0) / (double)((vidc_regs[0xc0]&0xff)+2);
 
 					logerror("MEMC: Starting audio DMA at %f Hz, buffer from %x to %x\n", sndhz, vidc_sndstart, vidc_sndend);
 

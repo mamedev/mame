@@ -64,23 +64,26 @@ static VIDEO_START(aristmk5)
 /* just a quick hack to check out error printing, AA video emulation is A LOT more complex */
 static VIDEO_UPDATE(aristmk5)
 {
+	const address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int count;
 	int x,y,xi;
-	UINT32 *vram = archimedes_memc_physmem;
+	UINT8 pen;
 
 	// sets video DMA to 0x400 - 0x400 - 0xfe00
-	count = 0x380/4; // 0x400 text is offset???
+	count = 0x400/4; // 0x400 text is offset???
 
 	for(y=0;y<400;y+=2)
 	{
-		for(x=0;x<640;x+=4)
+		for(x=0;x<640;x++)
 		{
-			for(xi=0;xi<4;xi++)
+			for(xi=0;xi<1;xi++)
 			{
+				pen = memory_read_byte(space, count);
+
 				if ((x+xi) <= screen->visible_area().max_x && (y) <= screen->visible_area().max_y)
-					*BITMAP_ADDR32(bitmap, y, x+xi) = screen->machine->pens[(vram[count]>>(xi*8))&0xff];
+					*BITMAP_ADDR32(bitmap, y, x+xi) = screen->machine->pens[pen&0xff];
 				if ((x+xi) <= screen->visible_area().max_x && (y+1) <= screen->visible_area().max_y)
-					*BITMAP_ADDR32(bitmap, y+1, x+xi) = screen->machine->pens[(vram[count]>>(xi*8))&0xff];
+					*BITMAP_ADDR32(bitmap, y+1, x+xi) = screen->machine->pens[pen&0xff];
 			}
 
 			count++;
