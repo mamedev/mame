@@ -187,6 +187,15 @@ VIDEO_START( snk6502 )
 	gfx_element_set_source(machine->gfx[0], snk6502_charram);
 }
 
+VIDEO_START( pballoon )
+{
+	VIDEO_START_CALL( snk6502 );
+
+	tilemap_set_scrolldy(bg_tilemap, -24, 0);
+	tilemap_set_scrolldy(fg_tilemap, -24, 0);
+}
+
+
 VIDEO_UPDATE( snk6502 )
 {
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);

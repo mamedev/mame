@@ -976,9 +976,7 @@ static MACHINE_DRIVER_START( pballoon )
 
 	MDRV_MACHINE_RESET(pballoon)
 
-	// video hardware
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MDRV_VIDEO_START( pballoon )
 MACHINE_DRIVER_END
 
 
@@ -1311,6 +1309,33 @@ ROM_START( pballoon )
 	ROM_LOAD( "sk7_ic53.bin", 0x1000, 0x0800, CRC(a4c505cd) SHA1(47eea7e7ffa3dc8b35dc050ac1a1d77d6a5c4ece) )
 ROM_END
 
+
+ROM_START( pballoonr )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "sk7_ic12.bin",        0x3000, 0x1000, CRC(dfe2ae05) SHA1(21c98bef9d4d5fcb65ce5e9b20cde2259840459e) )
+	ROM_LOAD( "rock-ola_skpb1.ic7",  0x4000, 0x1000, CRC(dfd802e8) SHA1(2014295c678d0534585e27d9b5c7ac525113cd0c) )
+	ROM_LOAD( "rock-ola_skpb1.ic8",  0x5000, 0x1000, CRC(c433c062) SHA1(63df947c56f51a623b378d2a8a5b2cd05c23c414) )
+	ROM_LOAD( "rock-ola_skpb1.ic9",  0x6000, 0x1000, CRC(f85b9c37) SHA1(905eb162436a0a46688df9343296c140480d00cb) )
+	ROM_LOAD( "rock-ola_skpb1.ic10", 0x7000, 0x1000, CRC(8020e52d) SHA1(fbe2a27560904225b4406171c1cdbae9941887bd) )
+	ROM_LOAD( "sk7_ic14.bin",        0x8000, 0x1000, CRC(6a8817a5) SHA1(4cf8eda68d21b1fad0f12eedaeb88b256bba44da) )
+	ROM_RELOAD(                      0xf000, 0x1000 )  /* for the reset and interrupt vectors */
+	ROM_LOAD( "sk7_ic15.bin",        0x9000, 0x1000, CRC(1f78d814) SHA1(7e618971f1bbf8859284531e94989c43c3285b4a) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "sk8_ic50.bin", 0x0000, 0x1000, CRC(560df07f) SHA1(e57945de829d22d39390a649eddaf78c989af679) )
+	ROM_LOAD( "sk8_ic51.bin", 0x1000, 0x1000, CRC(d415de51) SHA1(257cf939efec8adee87baf827315c69fde90da4c) )
+
+	ROM_REGION( 0x0040, "proms", 0 )
+	ROM_LOAD( "sk8_ic7.bin",  0x0000, 0x0020, CRC(ef6c82a0) SHA1(95b522d6389f25bf5fa2fca5f3f826ef43b2885b) ) /* foreground colors */
+	ROM_LOAD( "sk8_ic6.bin",  0x0020, 0x0020, CRC(eabc6a00) SHA1(942af5e22e49e578c6a24651476e3b60d40e2076) ) /* background colors */
+
+	ROM_REGION( 0x1800, "snk6502", 0 )	/* sound ROMs */
+	ROM_LOAD( "sk7_ic51.bin", 0x0000, 0x0800, CRC(0345f8b7) SHA1(c00992dc7222cc53d9fdff4ab47a7abdf90c5116) )
+	ROM_LOAD( "sk7_ic52.bin", 0x0800, 0x0800, CRC(5d6d68ea) SHA1(d3e03720eff5c85c1c2fb1d4bf960f45a99dc86a) )
+	ROM_LOAD( "sk7_ic53.bin", 0x1000, 0x0800, CRC(a4c505cd) SHA1(47eea7e7ffa3dc8b35dc050ac1a1d77d6a5c4ece) )
+ROM_END
+
+
 ROM_START( nibbler )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "g-0960-52.ic12", 0x3000, 0x1000, CRC(ac6a802b) SHA1(ac1072e30994f13097663dc24d9d1dc35a95d874) )
@@ -1437,6 +1462,7 @@ GAME( 1981, fantasy,  0,        fantasy,  fantasy,  0, ROT90, "SNK", "Fantasy (W
 GAME( 1981, fantasyu, fantasy,  fantasy,  fantasyu, 0, ROT90, "SNK (Rock-Ola license)", "Fantasy (US)", GAME_IMPERFECT_SOUND )
 GAME( 1981, fantasyj, fantasy,  fantasy,  fantasyu, 0, ROT90, "SNK", "Fantasy (Japan)", GAME_IMPERFECT_SOUND )
 GAME( 1982, pballoon, 0,        pballoon, pballoon, 0, ROT90, "SNK", "Pioneer Balloon", 0 )
+GAME( 1982, pballoonr,pballoon, pballoon, pballoon, 0, ROT90, "SNK (Rock-Ola license)", "Pioneer Balloon (Rock-Ola license)", 0 )
 GAME( 1982, nibbler,  0,        nibbler,  nibbler,  0, ROT90, "Rock-Ola", "Nibbler (set 1)", 0 )
 GAME( 1982, nibblera, nibbler,  nibbler,  nibblera, 0, ROT90, "Rock-Ola", "Nibbler (set 2)", 0 )
 GAME( 1982, nibblerb, nibbler,  nibbler,  nibblerb, 0, ROT90, "Rock-Ola", "Nibbler (set 3)", 0 )

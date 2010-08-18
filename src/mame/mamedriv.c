@@ -6362,9 +6362,10 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( vanguardc )	/* (c) 1981 SNK + Centuri */
 	DRIVER( vanguardj )	/* (c) 1981 SNK */
 	DRIVER( fantasy )	/* (c) 1981 SNK */
-	DRIVER( fantasyu )	/* (c) 1981 Rock-ola */
+	DRIVER( fantasyu )	/* (c) 1981 Rock-Ola */
 	DRIVER( fantasyj )	/* (c) 1981 SNK */
 	DRIVER( pballoon )	/* (c) 1982 SNK */
+	DRIVER( pballoonr )	/* (c) 1982 SNK (Rock-Ola license) */
 	DRIVER( nibbler )	/* (c) 1982 Rock-ola */
 	DRIVER( nibblera )	/* (c) 1982 Rock-ola */
 	DRIVER( nibblerb )	/* (c) 1982 Rock-ola */

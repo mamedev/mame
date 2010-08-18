@@ -57,6 +57,7 @@ WRITE8_HANDLER( snk6502_scrolly_w );
 PALETTE_INIT( snk6502 );
 VIDEO_START( snk6502 );
 VIDEO_UPDATE( snk6502 );
+VIDEO_START( pballoon );
 
 WRITE8_HANDLER( satansat_b002_w );
 WRITE8_HANDLER( satansat_backcolor_w );
