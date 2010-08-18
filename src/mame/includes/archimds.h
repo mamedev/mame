@@ -64,6 +64,7 @@ extern INT16 memc_pages[(32*1024*1024)/(4096)];	// the logical RAM area is 32 me
 extern UINT32 vidc_regs[256];
 extern UINT8 ioc_regs[0x80/4];
 extern UINT8 vidc_bpp_mode;
+extern UINT8 vidc_interlace;
 
 #define CONTROL			0x00/4
 #define IRQ_STATUS_A 	0x10/4

@@ -50,6 +50,7 @@ INT16 memc_pages[(32*1024*1024)/(4096)];	// the logical RAM area is 32 megs, and
 UINT32 vidc_regs[256];
 UINT8 ioc_regs[0x80/4];
 UINT8 vidc_bpp_mode;
+UINT8 vidc_interlace;
 
 static emu_timer *timer[4], *snd_timer, *vid_timer;
 emu_timer  *vbl_timer;
@@ -724,6 +725,7 @@ WRITE32_HANDLER(archimedes_vidc_w)
 	else if(reg == 0xe0)
 	{
 		vidc_bpp_mode = ((val & 0xc) >> 2);
+		vidc_interlace = ((val & 0x40) >> 6);
 	}
 	else
 	{

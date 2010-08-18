@@ -14,15 +14,16 @@ VIDEO_START( archimds_vidc )
 VIDEO_UPDATE( archimds_vidc )
 {
 	int xstart,ystart,xend,yend;
+	int res_x,res_y;
 
 	/* border color */
 	bitmap_fill(bitmap, cliprect, screen->machine->pens[0x10]);
 
 	/* display area x/y */
-	xstart = vidc_regs[VIDC_HDSR];
-	ystart = vidc_regs[VIDC_VDSR];
-	xend = vidc_regs[VIDC_HDER];
-	yend = vidc_regs[VIDC_VDER];
+	xstart = vidc_regs[VIDC_HBSR]-vidc_regs[VIDC_HDSR];
+	ystart = vidc_regs[VIDC_VBSR]-vidc_regs[VIDC_VDSR];
+	xend = vidc_regs[VIDC_HDER]+xstart;
+	yend = vidc_regs[VIDC_VDER]+ystart;
 
 	/* disable the screen if display params are invalid */
 	if(xstart > xend || ystart > yend)
@@ -34,7 +35,7 @@ VIDEO_UPDATE( archimds_vidc )
 		UINT8 pen;
 		static UINT8 *vram = memory_region(screen->machine,"vram");
 
-		count = 0;
+		count = (0);
 
 		switch(vidc_bpp_mode)
 		{
@@ -48,9 +49,21 @@ VIDEO_UPDATE( archimds_vidc )
 
 						for(xi=0;xi<8;xi++)
 						{
-							if ((x+xi+xstart) <= screen->visible_area().max_x && (y+ystart) <= screen->visible_area().max_y &&
-							    (x+xi+xstart) <= xend && (y+ystart) <= yend)
-								*BITMAP_ADDR32(bitmap, y+ystart, x+xi+xstart) = screen->machine->pens[(pen>>(xi))&0x1];
+							res_x = x+xi+xstart;
+							res_y = (y+ystart)*(vidc_interlace+1);
+
+							if(vidc_interlace)
+							{
+								if ((res_x) <= screen->visible_area().max_x && (res_y) <= screen->visible_area().max_y && (res_x) <= xend && (res_y) <= yend)
+									*BITMAP_ADDR32(bitmap, res_y, res_x) = screen->machine->pens[(pen>>(xi))&0x1];
+								if ((res_x) <= screen->visible_area().max_x && (res_y+1) <= screen->visible_area().max_y && (res_x) <= xend && (res_y+1) <= yend)
+									*BITMAP_ADDR32(bitmap, res_y+1, res_x) = screen->machine->pens[(pen>>(xi))&0x1];
+							}
+							else
+							{
+								if ((res_x) <= screen->visible_area().max_x && (res_y) <= screen->visible_area().max_y && (res_x) <= xend && (res_y) <= yend)
+									*BITMAP_ADDR32(bitmap, res_y, res_x) = screen->machine->pens[(pen>>(xi))&0x1];
+							}
 						}
 
 						count++;
@@ -66,9 +79,21 @@ VIDEO_UPDATE( archimds_vidc )
 					{
 						pen = vram[count];
 
-						if ((x+xstart) <= screen->visible_area().max_x && (y+ystart) <= screen->visible_area().max_y &&
-						    (x+xstart) <= xend && (y+ystart) <= yend)
-								*BITMAP_ADDR32(bitmap, y+ystart, x+xstart) = screen->machine->pens[(pen&0xff)+0x100];
+						res_x = x+xstart;
+						res_y = (y+ystart)*(vidc_interlace+1);
+
+						if(vidc_interlace)
+						{
+							if ((res_x) <= screen->visible_area().max_x && (res_y) <= screen->visible_area().max_y && (res_x) <= xend && (res_y) <= yend)
+								*BITMAP_ADDR32(bitmap, res_y, res_x) = screen->machine->pens[(pen&0xff)+0x100];
+							if ((res_x) <= screen->visible_area().max_x && (res_y+1) <= screen->visible_area().max_y && (res_x) <= xend && (res_y+1) <= yend)
+								*BITMAP_ADDR32(bitmap, res_y+1, res_x) = screen->machine->pens[(pen&0xff)+0x100];
+						}
+						else
+						{
+							if ((res_x) <= screen->visible_area().max_x && (res_y) <= screen->visible_area().max_y && (res_x) <= xend && (res_y) <= yend)
+								*BITMAP_ADDR32(bitmap, res_y, res_x) = screen->machine->pens[(pen&0xff)+0x100];
+						}
 
 						count++;
 					}
