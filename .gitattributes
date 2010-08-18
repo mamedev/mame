@@ -3335,6 +3335,7 @@ src/mame/video/appoooh.c svneol=native#text/plain
 src/mame/video/aquarium.c svneol=native#text/plain
 src/mame/video/arabian.c svneol=native#text/plain
 src/mame/video/arcadecl.c svneol=native#text/plain
+src/mame/video/archimds.c svneol=native#text/plain
 src/mame/video/argus.c svneol=native#text/plain
 src/mame/video/arkanoid.c svneol=native#text/plain
 src/mame/video/armedf.c svneol=native#text/plain

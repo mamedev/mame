@@ -59,4 +59,45 @@ extern WRITE32_HANDLER(archimedes_ioc_w);
 extern READ32_HANDLER(archimedes_vidc_r);
 extern WRITE32_HANDLER(archimedes_vidc_w);
 
+extern UINT8 i2c_clk;
+extern INT16 memc_pages[(32*1024*1024)/(4096)];	// the logical RAM area is 32 megs, and the smallest page size is 4k
+extern UINT32 vidc_regs[256];
+extern UINT8 ioc_regs[0x80/4];
+extern UINT8 vidc_bpp_mode;
+
+#define CONTROL			0x00/4
+#define IRQ_STATUS_A 	0x10/4
+#define IRQ_REQUEST_A   0x14/4
+#define IRQ_MASK_A 		0x18/4
+#define IRQ_STATUS_B	0x20/4
+#define IRQ_REQUEST_B   0x24/4
+#define IRQ_MASK_B		0x28/4
+
+#define FIQ_STATUS		0x30/4
+#define FIQ_REQUEST     0x34/4
+#define FIQ_MASK		0x38/4
+
+/*----------- defined in video/archimds.c -----------*/
+
+extern VIDEO_START( archimds_vidc );
+extern VIDEO_UPDATE( archimds_vidc );
+
+#define VIDC_HCR		0x80
+#define VIDC_HSWR		0x84
+#define VIDC_HBSR		0x88
+#define VIDC_HDSR		0x8c
+#define VIDC_HDER		0x90
+#define VIDC_HBER		0x94
+#define VIDC_HCSR		0x98
+#define VIDC_HIR		0x9c
+
+#define VIDC_VCR		0xa0
+#define VIDC_VSWR		0xa4
+#define VIDC_VBSR		0xa8
+#define VIDC_VDSR		0xac
+#define VIDC_VDER		0xb0
+#define VIDC_VBER		0xb4
+#define VIDC_VCSR		0xb8
+#define VIDC_VCER		0xbc
+
 #endif	// _ARCHIMEDES_H_

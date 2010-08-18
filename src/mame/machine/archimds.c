@@ -41,45 +41,18 @@ static const int page_sizes[4] = { 4096, 8192, 16384, 32768 };
 UINT32 *archimedes_memc_physmem;
 static UINT32 memc_pagesize;
 static int memc_latchrom;
+static UINT32 ioc_timercnt[4], ioc_timerout[4];
+static UINT32 vidc_vidstart, vidc_vidend, vidc_vidinit,vidc_vidcur;
+static UINT32 vidc_sndstart, vidc_sndend, vidc_sndcur;
+static UINT8 video_dma_on;
+UINT8 i2c_clk;
 INT16 memc_pages[(32*1024*1024)/(4096)];	// the logical RAM area is 32 megs, and the smallest page size is 4k
 UINT32 vidc_regs[256];
 UINT8 ioc_regs[0x80/4];
-static UINT32 ioc_timercnt[4], ioc_timerout[4];
-static UINT32 vidc_sndstart, vidc_sndend, vidc_sndcur;
-UINT8 i2c_clk;
+UINT8 vidc_bpp_mode;
 
-static emu_timer *timer[4], *snd_timer;
+static emu_timer *timer[4], *snd_timer, *vid_timer;
 emu_timer  *vbl_timer;
-
-#define CONTROL			0
-#define IRQ_STATUS_A 	4
-#define IRQ_REQUEST_A   5
-#define IRQ_MASK_A 		6
-#define IRQ_STATUS_B	8
-#define IRQ_REQUEST_B   9
-#define IRQ_MASK_B		10
-#define FIQ_STATUS		12
-#define FIQ_REQUEST     13
-#define FIQ_MASK		14
-
-
-#define VIDC_HCR		0x80
-#define VIDC_HSWR		0x84
-#define VIDC_HBSR		0x88
-#define VIDC_HDSR		0x8c
-#define VIDC_HDER		0x90
-#define VIDC_HBER		0x94
-#define VIDC_HCSR		0x98
-#define VIDC_HIR		0x9c
-
-#define VIDC_VCR		0xa0
-#define VIDC_VSWR		0xa4
-#define VIDC_VBSR		0xa8
-#define VIDC_VDSR		0xac
-#define VIDC_VDER		0xb0
-#define VIDC_VBER		0xb4
-#define VIDC_VCSR		0xb8
-#define VIDC_VCER		0xbc
 
 void archimedes_request_irq_a(running_machine *machine, int mask)
 {
@@ -134,7 +107,28 @@ static TIMER_CALLBACK( vidc_vblank )
 	timer_adjust_oneshot(vbl_timer, machine->primary_screen->time_until_pos(vidc_regs[0xb4]), 0);
 }
 
-static TIMER_CALLBACK( a310_audio_tick )
+/* at about every ~4/4 USEC do a DMA transfer byte */
+static TIMER_CALLBACK( vidc_video_tick )
+{
+	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	static UINT8 *vram = memory_region(machine,"vram");
+
+	vram[vidc_vidcur] = (memory_read_byte(space,vidc_vidstart+vidc_vidcur));
+
+	vidc_vidcur++;
+
+	if(video_dma_on)
+	{
+		if (vidc_vidcur >= vidc_vidend)
+			vidc_vidcur = 0;
+
+		timer_adjust_oneshot(vid_timer, ATTOTIME_IN_USEC(1), 0);
+	}
+	else
+		timer_adjust_oneshot(vid_timer, attotime_never, 0);
+}
+
+static TIMER_CALLBACK( vidc_audio_tick )
 {
 	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
@@ -145,6 +139,8 @@ static TIMER_CALLBACK( a310_audio_tick )
 	if (vidc_sndcur >= vidc_sndend)
 	{
 		archimedes_request_irq_b(machine, ARCHIMEDES_IRQB_SOUND_EMPTY);
+
+		/* TODO */
 		timer_adjust_oneshot(snd_timer, attotime_never, 0);
 		dac_signed_data_w(space->machine->device("dac"), 0x80);
 	}
@@ -218,7 +214,8 @@ void archimedes_init(running_machine *machine)
 	timer_adjust_oneshot(timer[2], attotime_never, 0);
 	timer_adjust_oneshot(timer[3], attotime_never, 0);
 
-	snd_timer = timer_alloc(machine, a310_audio_tick, NULL);
+	vid_timer = timer_alloc(machine, vidc_video_tick, NULL);
+	snd_timer = timer_alloc(machine, vidc_audio_tick, NULL);
 	timer_adjust_oneshot(snd_timer, attotime_never, 0);
 }
 
@@ -638,7 +635,6 @@ WRITE32_HANDLER(archimedes_vidc_w)
 	{
 		int r,g,b;
 
-		//TODO: 8bpp mode uses a different formula
 		//i = (val & 0x1000) >> 12; //supremacy bit
 		b = (val & 0x0f00) >> 8;
 		g = (val & 0x00f0) >> 4;
@@ -648,6 +644,21 @@ WRITE32_HANDLER(archimedes_vidc_w)
 			logerror("WARNING: border color write here (PC=%08x)!\n",cpu_get_pc(space->cpu));
 
 		palette_set_color_rgb(space->machine, reg >> 2, pal4bit(r), pal4bit(g), pal4bit(b) );
+
+		/* handle 8bpp colors here */
+		{
+			int i;
+
+			for(i=0;i<0x100;i+=0x10)
+			{
+				b = ((val & 0x700) >> 8) | ((i & 0x80) >> 4);
+				g = ((val & 0x030) >> 4) | ((i & 0x20) >> 3) | ((i & 0x40) >> 3);
+				r = ((val & 0x007) >> 0) | ((i & 0x10) >> 1);
+
+				palette_set_color_rgb(space->machine, (reg >> 2) + 0x100 + i, pal4bit(r), pal4bit(g), pal4bit(b) );
+			}
+		}
+
 	}
 	else if (reg >= 0x80 && reg <= 0xbc)
 	{
@@ -710,6 +721,10 @@ WRITE32_HANDLER(archimedes_vidc_w)
 		}
 
 	}
+	else if(reg == 0xe0)
+	{
+		vidc_bpp_mode = ((val & 0xc) >> 2);
+	}
 	else
 	{
 		logerror("VIDC: %x to register %x\n", val, reg);
@@ -729,6 +744,18 @@ WRITE32_HANDLER(archimedes_memc_w)
 	{
 		switch ((data >> 17) & 7)
 		{
+			case 0: /* video init */
+				vidc_vidinit = ((data>>2)&0x7fff)*16;
+				break;
+
+			case 1: /* video start */
+				vidc_vidstart = ((data>>2)&0x7fff)*16;
+				break;
+
+			case 2: /* video end */
+				vidc_vidend = ((data>>2)&0x7fff)*16;
+				break;
+
 			case 4:	/* sound start */
 				vidc_sndstart = ((data>>2)&0x7fff)*16;
 				break;
@@ -741,6 +768,14 @@ WRITE32_HANDLER(archimedes_memc_w)
 				memc_pagesize = ((data>>2) & 3);
 
 				logerror("MEMC: %x to Control (page size %d, %s, %s)\n", data & 0x1ffc, page_sizes[memc_pagesize], ((data>>10)&1) ? "Video DMA on" : "Video DMA off", ((data>>11)&1) ? "Sound DMA on" : "Sound DMA off");
+
+				video_dma_on = ((data>>10)&1);
+
+				if ((data>>10)&1)
+				{
+					vidc_vidcur = 0;
+					timer_adjust_oneshot(vid_timer, ATTOTIME_IN_USEC(1), 0);
+				}
 
 				if ((data>>11)&1)
 				{

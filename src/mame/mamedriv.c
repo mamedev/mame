@@ -9731,6 +9731,8 @@ Other Sun games
 	DRIVER( ffortune )	/* (c) 1998 */
 
 	/* Aristocrat Mk5 hardware */
+	DRIVER( aristmk5 )	/* (c) 1995 */
+
 	DRIVER( swthrt2v )	/* (c) 1995 */
 	DRIVER( enchfrst )	/* (c) 1995 */
 	DRIVER( dolphntr )	/* (c) 1996 */

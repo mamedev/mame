@@ -375,6 +375,7 @@ $(MAMEOBJ)/aristocr.a: \
 	$(DRIVERS)/aristmk4.o \
 	$(DRIVERS)/aristmk5.o \
 	$(MACHINE)/archimds.o \
+	$(VIDEO)/archimds.o \
 
 $(MAMEOBJ)/atari.a: \
 	$(DRIVERS)/atarigx2.o $(VIDEO)/atarigx2.o \
