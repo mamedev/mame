@@ -360,241 +360,301 @@ static void latch_timer_cnt(int tmr)
 	ioc_timerout[tmr] = ioc_timercnt[tmr] - (UINT32)time;
 }
 
+/* TODO: should be a 8-bit device */
+static READ32_HANDLER( ioc_ctrl_r )
+{
+	//if(((offset & 0x1f) != 16) && ((offset & 0x1f) != 17) && ((offset & 0x1f) != 24) && ((offset & 0x1f) != 25))
+	//logerror("IOC: R %s = %02x (PC=%x) %02x\n", ioc_regnames[offset&0x1f], ioc_regs[offset&0x1f], cpu_get_pc( space->cpu ),offset & 0x1f);
+
+	switch (offset & 0x1f)
+	{
+		case CONTROL:
+		{
+			UINT8 i2c_data;
+
+			i2c_data = (i2cmem_sda_read(space->machine->device("i2cmem")) & 1);
+
+			return (ioc_regs[CONTROL] & 0xfc) | (i2c_clk<<1) | i2c_data;
+		}
+
+		case 1:	// keyboard read
+			archimedes_request_irq_b(space->machine, ARCHIMEDES_IRQB_KBD_XMIT_EMPTY);
+			break;
+
+		case IRQ_STATUS_A:
+			return (ioc_regs[IRQ_STATUS_A] & 0x7f) | 0x80; // Force IRQ is always '1'
+
+		case IRQ_REQUEST_A:
+			return (ioc_regs[IRQ_STATUS_A] & ioc_regs[IRQ_MASK_A]);
+
+		case IRQ_MASK_A:
+			return (ioc_regs[IRQ_MASK_A]);
+
+		case IRQ_STATUS_B:
+			return (ioc_regs[IRQ_STATUS_B]);
+
+		case IRQ_REQUEST_B:
+			return (ioc_regs[IRQ_STATUS_B] & ioc_regs[IRQ_MASK_B]);
+
+		case IRQ_MASK_B:
+			return (ioc_regs[IRQ_MASK_B]);
+
+		case FIQ_STATUS:
+			return (ioc_regs[FIQ_STATUS] & 0x7f) | 0x80; // Force FIQ is always '1'
+
+		case FIQ_REQUEST:
+			return (ioc_regs[FIQ_STATUS] & ioc_regs[FIQ_MASK]);
+
+		case FIQ_MASK:
+			return (ioc_regs[FIQ_MASK]);
+
+		case 16:	// timer 0 read
+			return ioc_timerout[0]&0xff;
+		case 17:
+			return (ioc_timerout[0]>>8)&0xff;
+		case 20:	// timer 1 read
+			return ioc_timerout[1]&0xff;
+		case 21:
+			return (ioc_timerout[1]>>8)&0xff;
+		case 24:	// timer 2 read
+			return ioc_timerout[2]&0xff;
+		case 25:
+			return (ioc_timerout[2]>>8)&0xff;
+		case 28:	// timer 3 read
+			return ioc_timerout[3]&0xff;
+		case 29:
+			return (ioc_timerout[3]>>8)&0xff;
+	}
+
+	return ioc_regs[offset&0x1f];
+}
+
+/* TODO: should be a 8-bit device */
+static WRITE32_HANDLER( ioc_ctrl_w )
+{
+	if(((offset & 0x1f) != 16) && ((offset & 0x1f) != 17) && ((offset & 0x1f) != 24) && ((offset & 0x1f) != 25))
+     	if((offset & 0x1f) != 1)
+     		logerror("IOC: W %02x @ reg %s (PC=%x)\n", data&0xff, ioc_regnames[offset&0x1f], cpu_get_pc( space->cpu ));
+
+	switch (offset&0x1f)
+	{
+		case 0:	// I2C bus control
+			//logerror("IOC I2C: CLK %d DAT %d\n", (data>>1)&1, data&1);
+			i2cmem_sda_write(space->machine->device("i2cmem"), data & 0x01);
+			i2cmem_scl_write(space->machine->device("i2cmem"), (data & 0x02) >> 1);
+			i2c_clk = (data & 2) >> 1;
+			break;
+
+		case 1:
+			if(data == 0x0d)
+				printf("\n");
+			else
+				printf("%c",data);
+			break;
+
+		case IRQ_MASK_A:
+			ioc_regs[IRQ_MASK_A] = data & 0xff;
+
+			if(data & 0x80) //force an IRQ
+				archimedes_request_irq_a(space->machine,ARCHIMEDES_IRQA_FORCE);
+
+			break;
+
+		case FIQ_MASK:
+			ioc_regs[FIQ_MASK] = data & 0xff;
+
+			if(data & 0x80) //force a FIRQ
+				archimedes_request_fiq(space->machine,ARCHIMEDES_FIQ_FORCE);
+
+			break;
+
+		case 5: 	// IRQ clear A
+			ioc_regs[IRQ_STATUS_A] &= ~(data&0xff);
+
+			// if that did it, clear the IRQ
+			if (ioc_regs[IRQ_STATUS_A] == 0)
+			{
+				printf("IRQ clear A\n");
+				cputag_set_input_line(space->machine, "maincpu", ARM_IRQ_LINE, CLEAR_LINE);
+			}
+			break;
+
+		case 16:
+		case 17:
+			ioc_regs[offset&0x1f] = data & 0xff;
+			break;
+
+		case 20:
+		case 21:
+			ioc_regs[offset&0x1f] = data & 0xff;
+			break;
+
+		case 24:
+		case 25:
+			ioc_regs[offset&0x1f] = data & 0xff;
+			break;
+
+		case 28:
+		case 29:
+			ioc_regs[offset&0x1f] = data & 0xff;
+			break;
+
+		case 19:	// Timer 0 latch
+			latch_timer_cnt(0);
+			break;
+
+		case 23:	// Timer 1 latch
+			latch_timer_cnt(1);
+			break;
+
+		case 27:	// Timer 2 latch
+			latch_timer_cnt(2);
+			break;
+
+		case 31:	// Timer 3 latch
+			latch_timer_cnt(3);
+			break;
+
+		case 18:	// Timer 0 start
+			ioc_timercnt[0] = ioc_regs[17]<<8 | ioc_regs[16];
+			a310_set_timer(0);
+			break;
+
+		case 22:	// Timer 1 start
+			ioc_timercnt[1] = ioc_regs[21]<<8 | ioc_regs[20];
+			a310_set_timer(1);
+			break;
+
+		case 26:	// Timer 2 start
+			ioc_timercnt[2] = ioc_regs[25]<<8 | ioc_regs[24];
+			a310_set_timer(2);
+			break;
+
+		case 30:	// Timer 3 start
+			ioc_timercnt[3] = ioc_regs[29]<<8 | ioc_regs[28];
+			a310_set_timer(3);
+			break;
+
+		default:
+			ioc_regs[offset&0x1f] = data & 0xff;
+			break;
+	}
+}
+
 READ32_HANDLER(archimedes_ioc_r)
 {
+	UINT32 ioc_addr;
 	#ifdef MESS
 	running_device *fdc = (running_device *)space->machine->device("wd1772");
 	#endif
-	if (offset*4 >= 0x200000 && offset*4 < 0x300000)
-	{
-		if(((offset & 0x1f) != 16) && ((offset & 0x1f) != 17) && ((offset & 0x1f) != 24) && ((offset & 0x1f) != 25))
-		logerror("IOC: R %s = %02x (PC=%x) %02x\n", ioc_regnames[offset&0x1f], ioc_regs[offset&0x1f], cpu_get_pc( space->cpu ),offset & 0x1f);
 
-		switch (offset & 0x1f)
+	ioc_addr = offset*4;
+
+	switch((ioc_addr & 0x300000) >> 20)
+	{
+		/*82c711*/
+		case 0:
+			logerror("82c711 read at address %08x\n",ioc_addr);
+			return 0;
+		case 2:
+		case 3:
 		{
-			case CONTROL:
+			switch((ioc_addr & 0x70000) >> 16)
 			{
-				UINT8 i2c_data;
-
-				i2c_data = (i2cmem_sda_read(space->machine->device("i2cmem")) & 1);
-
-				return (ioc_regs[CONTROL] & 0xfc) | (i2c_clk<<1) | i2c_data;
+				case 0: return ioc_ctrl_r(space,offset,mem_mask);
+				case 1:
+					#ifdef MESS
+						logerror("17XX: R @ addr %x mask %08x\n", offset*4, mem_mask);
+						return wd17xx_data_r(fdc, offset&0xf);
+					#else
+						logerror("Read from FDC device?\n");
+						return 0;
+					#endif
+				case 2:
+					logerror("IOC: Econet Read\n");
+					return 0xffff;
+				case 3:
+					logerror("IOC: Serial Read\n");
+					return 0xffff;
+				case 4:
+					logerror("IOC: Internal Podule Read\n");
+					return 0xffff;
+				case 5:
+					logerror("IOC: Internal Latches Read\n");
+					return 0xffff;
 			}
-
-			case 1:	// keyboard read
-				archimedes_request_irq_b(space->machine, ARCHIMEDES_IRQB_KBD_XMIT_EMPTY);
-				break;
-
-			case IRQ_STATUS_A:
-				return (ioc_regs[IRQ_STATUS_A] & 0x7f) | 0x80; // Force IRQ is always '1'
-
-			case IRQ_REQUEST_A:
-				return (ioc_regs[IRQ_STATUS_A] & ioc_regs[IRQ_MASK_A]);
-
-			case IRQ_MASK_A:
-				return (ioc_regs[IRQ_MASK_A]);
-
-			case IRQ_STATUS_B:
-				return (ioc_regs[IRQ_STATUS_B]);
-
-			case IRQ_REQUEST_B:
-				return (ioc_regs[IRQ_STATUS_B] & ioc_regs[IRQ_MASK_B]);
-
-			case IRQ_MASK_B:
-				return (ioc_regs[IRQ_MASK_B]);
-
-			case FIQ_STATUS:
-				return (ioc_regs[FIQ_STATUS] & 0x7f) | 0x80; // Force FIQ is always '1'
-
-			case FIQ_REQUEST:
-				return (ioc_regs[FIQ_STATUS] & ioc_regs[FIQ_MASK]);
-
-			case FIQ_MASK:
-				return (ioc_regs[FIQ_MASK]);
-
-			case 16:	// timer 0 read
-				return ioc_timerout[0]&0xff;
-			case 17:
-				return (ioc_timerout[0]>>8)&0xff;
-			case 20:	// timer 1 read
-				return ioc_timerout[1]&0xff;
-			case 21:
-				return (ioc_timerout[1]>>8)&0xff;
-			case 24:	// timer 2 read
-				return ioc_timerout[2]&0xff;
-			case 25:
-				return (ioc_timerout[2]>>8)&0xff;
-			case 28:	// timer 3 read
-				return ioc_timerout[3]&0xff;
-			case 29:
-				return (ioc_timerout[3]>>8)&0xff;
 		}
-
-		return ioc_regs[offset&0x1f];
-	}
-	#ifdef MESS
-	else if (offset*4 >= 0x310000 && offset*4 < 0x310040)
-	{
-		logerror("17XX: R @ addr %x mask %08x\n", offset*4, mem_mask);
-		return wd17xx_data_r(fdc, offset&0xf);
-	}
-	#endif
-	else
-	{
-		logerror("IOC: R @ %x (mask %08x)\n", (offset*4)+0x3000000, mem_mask);
 	}
 
+	logerror("IOC: Unknown read at %08x\n",ioc_addr);
 
 	return 0;
 }
 
 WRITE32_HANDLER(archimedes_ioc_w)
 {
+	UINT32 ioc_addr;
 	#ifdef MESS
 	running_device *fdc = (running_device *)space->machine->device("wd1772");
 	#endif
 
-	if (offset*4 >= 0x200000 && offset*4 < 0x300000)
+	ioc_addr = offset*4;
+
+	switch((ioc_addr & 0x300000) >> 20)
 	{
-		if(((offset & 0x1f) != 16) && ((offset & 0x1f) != 17) && ((offset & 0x1f) != 24) && ((offset & 0x1f) != 25))
-     	logerror("IOC: W %02x @ reg %s (PC=%x)\n", data&0xff, ioc_regnames[offset&0x1f], cpu_get_pc( space->cpu ));
-
-		switch (offset&0x1f)
+		/*82c711*/
+		case 0:
+			logerror("82c711 write %08x to address %08x\n",data,ioc_addr);
+			return;
+		case 2:
+		case 3:
 		{
-			case 0:	// I2C bus control
-				//logerror("IOC I2C: CLK %d DAT %d\n", (data>>1)&1, data&1);
-				i2cmem_sda_write(space->machine->device("i2cmem"), data & 0x01);
-				i2cmem_scl_write(space->machine->device("i2cmem"), (data & 0x02) >> 1);
-				i2c_clk = (data & 2) >> 1;
-				break;
+			switch((ioc_addr & 0x70000) >> 16)
+			{
+				case 0: ioc_ctrl_w(space,offset,data,mem_mask); return;
+				case 1:
+					#ifdef MESS
+						logerror("17XX: %x to addr %x mask %08x\n", data, offset*4, mem_mask);
+						wd17xx_data_w(fdc, offset&0xf, data&0xff);
+					#else
+						logerror("Write to FDC device?\n");
+					#endif
+						return;
+				case 2:
+					logerror("IOC: Econet Write\n");
+					return;
+				case 3:
+					logerror("IOC: Serial Write\n");
+					return;
+				case 4:
+					logerror("IOC: Internal Podule Write\n");
+					return;
+				case 5:
+					switch(ioc_addr & 0xfffc)
+					{
+						#ifdef MESS
+						case 0x18: // latch B
+							wd17xx_dden_w(fdc, BIT(data, 1));
+							return;
 
-			case IRQ_MASK_A:
-				ioc_regs[IRQ_MASK_A] = data & 0xff;
+						case 0x40: // latch A
+							if (data & 1) { wd17xx_set_drive(fdc,0); }
+							if (data & 2) {	wd17xx_set_drive(fdc,1); }
+							if (data & 4) { wd17xx_set_drive(fdc,2); }
+							if (data & 8) {	wd17xx_set_drive(fdc,3); }
 
-				if(data & 0x80) //force an IRQ
-					archimedes_request_irq_a(space->machine,ARCHIMEDES_IRQA_FORCE);
-
-				break;
-
-			case FIQ_MASK:
-				ioc_regs[FIQ_MASK] = data & 0xff;
-
-				if(data & 0x80) //force a FIRQ
-					archimedes_request_fiq(space->machine,ARCHIMEDES_FIQ_FORCE);
-
-				break;
-
-			case 5: 	// IRQ clear A
-				ioc_regs[IRQ_STATUS_A] &= ~(data&0xff);
-
-				// if that did it, clear the IRQ
-				if (ioc_regs[IRQ_STATUS_A] == 0)
-				{
-					printf("IRQ clear A\n");
-					cputag_set_input_line(space->machine, "maincpu", ARM_IRQ_LINE, CLEAR_LINE);
-				}
-				break;
-
-			case 16:
-			case 17:
-				ioc_regs[offset&0x1f] = data & 0xff;
-				break;
-
-			case 20:
-			case 21:
-				ioc_regs[offset&0x1f] = data & 0xff;
-				break;
-
-			case 24:
-			case 25:
-				ioc_regs[offset&0x1f] = data & 0xff;
-				break;
-
-			case 28:
-			case 29:
-				ioc_regs[offset&0x1f] = data & 0xff;
-				break;
-
-			case 19:	// Timer 0 latch
-				latch_timer_cnt(0);
-				break;
-
-			case 23:	// Timer 1 latch
-				latch_timer_cnt(1);
-				break;
-
-			case 27:	// Timer 2 latch
-				latch_timer_cnt(2);
-				break;
-
-			case 31:	// Timer 3 latch
-				latch_timer_cnt(3);
-				break;
-
-			case 18:	// Timer 0 start
-				ioc_timercnt[0] = ioc_regs[17]<<8 | ioc_regs[16];
-				a310_set_timer(0);
-				break;
-
-			case 22:	// Timer 1 start
-				ioc_timercnt[1] = ioc_regs[21]<<8 | ioc_regs[20];
-				a310_set_timer(1);
-				break;
-
-			case 26:	// Timer 2 start
-				ioc_timercnt[2] = ioc_regs[25]<<8 | ioc_regs[24];
-				a310_set_timer(2);
-				break;
-
-			case 30:	// Timer 3 start
-				ioc_timercnt[3] = ioc_regs[29]<<8 | ioc_regs[28];
-				a310_set_timer(3);
-				break;
-
-			default:
-				ioc_regs[offset&0x1f] = data & 0xff;
-				break;
+							wd17xx_set_side(fdc,(data & 0x10)>>4);
+							//bit 5 is motor on
+							return;
+						#endif
+					}
+					break;
+			}
 		}
 	}
-	#ifdef MESS
-	else if (offset*4 >= 0x310000 && offset*4 < 0x310040)
-	{
-		logerror("17XX: %x to addr %x mask %08x\n", data, offset*4, mem_mask);
-		wd17xx_data_w(fdc, offset&0xf, data&0xff);
-	}
-	else if (offset*4 == 0x350018)
-	{
-		// latch A
-		if (data & 1)
-		{
-			wd17xx_set_drive(fdc,0);
-		}
-		if (data & 2)
-		{
-			wd17xx_set_drive(fdc,1);
-		}
-		if (data & 4)
-		{
-			wd17xx_set_drive(fdc,2);
-		}
-		if (data & 8)
-		{
-			wd17xx_set_drive(fdc,3);
-		}
 
-		wd17xx_set_side(fdc,(data & 0x10)>>4);
 
-	}
-	else if (offset*4 == 0x350040)
-	{
-		// latch B
-		wd17xx_dden_w(fdc, BIT(data, 1));
-	}
-	#endif
-	else
-	{
-		logerror("I/O: W %x @ %x (mask %08x)\n", data, (offset*4)+0x3000000, mem_mask);
-	}
+	logerror("I/O: W %x @ %x (mask %08x)\n", data, (offset*4)+0x3000000, mem_mask);
 }
 
 READ32_HANDLER(archimedes_vidc_r)

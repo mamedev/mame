@@ -10,7 +10,7 @@
 
 	code DASMing of POST (adonis):
 	- bp 0x3400224:
-	  checks work RAM [0x87000], if bit 0 active high then all tests are ok, otherwise check what went wrong;
+	  checks work RAM [0x87000], if bit 0 active high then all tests are skipped (presumably for debugging), otherwise check stuff;
 		- bp 0x3400230: EPROM checksum branch test
 		- bp 0x3400258: DRAM Check branch test
 		- bp 0x3400280: CPU Check branch test
@@ -34,7 +34,8 @@
 			- R0 == x "Undefined error in DRAM emulator area"
 			It r/w RAM location 0 and it expects to NOT read-back value written.
 
-	goldprmd: checks if a "keyboard IRQ" fires (IRQ status B bit 6), returns an External Video Crystal Error (bp 3400278)
+	goldprmd: checks if a "keyboard IRQ" fires (IRQ status B bit 6), it seems a serial port with data on it,
+	          returns an External Video Crystal Error (bp 3400278)
 
 	dmdtouch:
 		bp 3400640: checks 2MByte DRAM
@@ -43,6 +44,10 @@
 			- bp 3400720 checks if the aforementioned checks are ok (currently fails at the very first work RAM check at 0x1000, it returns the
 			  value that actually should be at 0x141000)
 		bp 340064c: if R0 == 0 2MB DRAM is ok, otherwise there's an error
+
+	set chip (BIOS):
+		same as goldprmd (serial + ext video crystal check)
+		bp 3400110: External Video Crystal test
 
 */
 
@@ -126,6 +131,8 @@ static MACHINE_RESET( aristmk5 )
 {
 	archimedes_reset(machine);
 	timer_adjust_oneshot(mk5_2KHz_timer, ATTOTIME_IN_HZ(2000), 0);
+
+	ioc_regs[IRQ_STATUS_B] |= 0x40; //hack, set keyboard irq empty to be ON
 
 	/* load the roms according to what the operator wants */
 	{
