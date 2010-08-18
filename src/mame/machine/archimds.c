@@ -665,7 +665,7 @@ WRITE32_HANDLER(archimedes_vidc_w)
 	{
 		switch(reg)
 		{
-			case VIDC_HCR:  vidc_regs[VIDC_HCR] =  (val >> 14)+1; 	break;
+			case VIDC_HCR:  vidc_regs[VIDC_HCR] =  ((val >> 14)<<1)+1; 	break;
 //			case VIDC_HSWR: vidc_regs[VIDC_HSWR] = (val >> 14)+1; 	break;
 			case VIDC_HBSR: vidc_regs[VIDC_HBSR] = (val >> 14)+1; 	break;
 			case VIDC_HDSR: vidc_regs[VIDC_HDSR] = (val >> 14); 	break;
@@ -674,7 +674,7 @@ WRITE32_HANDLER(archimedes_vidc_w)
 //			#define VIDC_HCSR		0x98
 //			#define VIDC_HIR		0x9c
 
-			case VIDC_VCR:  vidc_regs[VIDC_VCR] = (val >> 14)+1;	break;
+			case VIDC_VCR:  vidc_regs[VIDC_VCR] = ((val >> 14)<<1)+1;	break;
 //			#define VIDC_VSWR		0xa4
 			case VIDC_VBSR: vidc_regs[VIDC_VBSR] = (val >> 14)+1; 	break;
 			case VIDC_VDSR: vidc_regs[VIDC_VDSR] = (val >> 14)+1;	break;
@@ -691,14 +691,14 @@ WRITE32_HANDLER(archimedes_vidc_w)
 
 		/* sanity checks - first pass */
 		/*
-			total cycles + border start/end
+			total cycles + border end
 		*/
-		if(vidc_regs[VIDC_HCR] && vidc_regs[VIDC_HBSR] && vidc_regs[VIDC_HBER] &&
-		   vidc_regs[VIDC_VCR] && vidc_regs[VIDC_VBSR] && vidc_regs[VIDC_VBER])
+		if(vidc_regs[VIDC_HCR] && vidc_regs[VIDC_HBER] &&
+		   vidc_regs[VIDC_VCR] && vidc_regs[VIDC_VBER])
 		{
 			/* sanity checks - second pass */
 			/*
-			total cycles > border end > border start
+			total cycles >= border end >= border start
 			*/
 			if((vidc_regs[VIDC_HCR] >= vidc_regs[VIDC_HBER]) &&
 			   (vidc_regs[VIDC_HBER] >= vidc_regs[VIDC_HBSR]) &&
@@ -712,10 +712,10 @@ WRITE32_HANDLER(archimedes_vidc_w)
 				visarea.max_x = vidc_regs[VIDC_HBER] - vidc_regs[VIDC_HBSR] - 1;
 				visarea.max_y = vidc_regs[VIDC_VBER] - vidc_regs[VIDC_VBSR];
 
-				logerror("Configuring: htotal %d vtotal %d border %d x %d display %d x %d\n",
-					vidc_regs[VIDC_HCR], vidc_regs[VIDC_VCR],
-					visarea.max_x, visarea.max_y,
-					vidc_regs[VIDC_HDER]-vidc_regs[VIDC_HDSR],vidc_regs[VIDC_VDER]-vidc_regs[VIDC_VDSR]+1);
+				//printf("Configuring: htotal %d vtotal %d border %d x %d display %d x %d\n",
+				//	vidc_regs[VIDC_HCR], vidc_regs[VIDC_VCR],
+				//	visarea.max_x, visarea.max_y,
+				//	vidc_regs[VIDC_HDER]-vidc_regs[VIDC_HDSR],vidc_regs[VIDC_VDER]-vidc_regs[VIDC_VDSR]+1);
 
 				space->machine->primary_screen->configure(vidc_regs[VIDC_HCR], vidc_regs[VIDC_VCR], visarea, space->machine->primary_screen->frame_period().attoseconds);
 			}
