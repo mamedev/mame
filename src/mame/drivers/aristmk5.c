@@ -69,16 +69,19 @@ static VIDEO_UPDATE(aristmk5)
 	UINT32 *vram = archimedes_memc_physmem;
 
 	// sets video DMA to 0x400 - 0x400 - 0xfe00
-	count = 0x800/4; // 0x400 text is offset???
+	count = 0x380/4; // 0x400 text is offset???
 
-
-	for(y=0;y<480;y++)
+	for(y=0;y<400;y+=2)
 	{
 		for(x=0;x<640;x+=4)
 		{
 			for(xi=0;xi<4;xi++)
+			{
 				if ((x+xi) <= screen->visible_area().max_x && (y) <= screen->visible_area().max_y)
 					*BITMAP_ADDR32(bitmap, y, x+xi) = screen->machine->pens[(vram[count]>>(xi*8))&0xff];
+				if ((x+xi) <= screen->visible_area().max_x && (y+1) <= screen->visible_area().max_y)
+					*BITMAP_ADDR32(bitmap, y+1, x+xi) = screen->machine->pens[(vram[count]>>(xi*8))&0xff];
+			}
 
 			count++;
 		}
@@ -116,9 +119,9 @@ static ADDRESS_MAP_START( aristmk5_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x03010420, 0x03010423) AM_WRITE(mk5_i2c_w)
 	AM_RANGE(0x03010810, 0x03010813) AM_READNOP //MK-5 specific, watchdog
 	AM_RANGE(0x03000000, 0x033fffff) AM_READWRITE(mk5_ioc_r, archimedes_ioc_w)
-	AM_RANGE(0x03400000, 0x035fffff) AM_ROM AM_REGION("maincpu", 0) AM_WRITE(archimedes_memc_page_w)
+	AM_RANGE(0x03400000, 0x035fffff) AM_ROM AM_REGION("maincpu", 0) AM_WRITE(archimedes_vidc_w)
 	AM_RANGE(0x03600000, 0x037fffff) AM_READWRITE(archimedes_memc_r, archimedes_memc_w)
-	AM_RANGE(0x03800000, 0x039fffff) AM_READWRITE(archimedes_vidc_r, archimedes_vidc_w) //TODO: this is different here, it appears to contain palette data only
+	AM_RANGE(0x03800000, 0x039fffff) AM_WRITE(archimedes_memc_page_w)
 ADDRESS_MAP_END
 
 
@@ -151,15 +154,6 @@ static MACHINE_RESET( aristmk5 )
 {
 	archimedes_reset(machine);
 	timer_adjust_oneshot(mk5_2KHz_timer, ATTOTIME_IN_HZ(2000), 0);
-
-	{
-		int i;
-		// kludge, set up MMU pages to a normal value, in order to draw all of the vram
-		for (i = 0; i < (32*1024*1024)/(4096); i++)
-		{
-			memc_pages[i] = i;
-		}
-	}
 }
 
 #define	NVRAM_SIZE 1024

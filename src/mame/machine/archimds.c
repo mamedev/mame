@@ -492,6 +492,7 @@ WRITE32_HANDLER(archimedes_ioc_w)
 				// if that did it, clear the IRQ
 				if (ioc_regs[IRQ_STATUS_A] == 0)
 				{
+					printf("IRQ clear A\n");
 					cputag_set_input_line(space->machine, "maincpu", ARM_IRQ_LINE, CLEAR_LINE);
 				}
 				break;
@@ -837,6 +838,7 @@ WRITE32_HANDLER(archimedes_memc_page_w)
 			log <<= 23;
 			log |= (data & 0x7f8000);
 			memc = ((data & 0x80) ? 1 : 0) | ((data & 0x1000) ? 2 : 0);
+			//printf("Mapping %08X to %08X\n",0x2000000+(phys*32768),(((data >> 15)&0xff)|((data >> 2)&0x300)));
 			break;
 	}
 
@@ -846,7 +848,7 @@ WRITE32_HANDLER(archimedes_memc_page_w)
 	memc_latchrom = 0;
 
 	// now go ahead and set the mapping in the page table
-	memc_pages[log] = phys * memc;
+	memc_pages[log] = phys + (memc*0x80);
 
 //  printf("MEMC_PAGE(%d): W %08x: log %x to phys %x, MEMC %d, perms %d\n", memc_pagesize, data, log, phys, memc, perms);
 }
