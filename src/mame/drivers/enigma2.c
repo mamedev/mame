@@ -173,7 +173,6 @@ static MACHINE_RESET( enigma2 )
 	cputag_set_input_line(machine, "audiocpu", INPUT_LINE_NMI, CLEAR_LINE);
 
 	state->last_sound_data = 0;
-	state->protection_data = 0;
 	state->flip_screen = 0;
 	state->sound_latch = 0;
 	state->blink_count = 0;
@@ -359,6 +358,8 @@ static READ8_HANDLER( dip_switch_r )
 	switch (offset)
 	{
 	case 0x01:
+		/* For the DIP switches to be read, protection_data must be
+		   0xff on reset. The AY8910 reset ensures this. */
 		if (state->protection_data != 0xff)
 			ret = state->protection_data ^ 0x88;
 		else
