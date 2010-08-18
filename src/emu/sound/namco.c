@@ -397,6 +397,7 @@ static DEVICE_START( namco )
 	chip->sound_enable = 1;
 
 	/* register with the save state system */
+	state_save_register_device_item_pointer(device, 0, chip->soundregs, 0x400);
 	state_save_register_device_item(device, 0, chip->num_voices);
 	state_save_register_device_item(device, 0, chip->sound_enable);
 	state_save_register_device_item_pointer(device, 0, chip->waveform[0],
