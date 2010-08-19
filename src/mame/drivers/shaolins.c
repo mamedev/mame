@@ -232,6 +232,7 @@ static MACHINE_DRIVER_START( shaolins )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
 
+#if 0 // a bootleg board was found with downgraded sound hardware, but is otherwise the same
 static MACHINE_DRIVER_START( shaolinb )
 	MDRV_IMPORT_FROM(shaolins)
 
@@ -241,6 +242,7 @@ static MACHINE_DRIVER_START( shaolinb )
 	MDRV_SOUND_REPLACE("sn2", SN76489, MASTER_CLOCK/6)  /* only type verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
+#endif
 
 /***************************************************************************
 
@@ -293,7 +295,7 @@ ROM_START( shaolins )
 ROM_END
 
 /*
-    Shao-lin's Road (Bootleg)
+    Shao-lin's Road (Bootleg) - has also been found on an original board
 
     Main Board:    VWXYZ
     Daughterboard: QSTU (Replaces 3 custom Konami chips)
@@ -337,8 +339,8 @@ ROM_START( shaolinb )
 	ROM_LOAD( "7.j1", 0x2000, 0x4000, CRC(d9a7cff6) SHA1(47244426b9a674326c5303347112aa9d33bcf1df) ) /* 27128 */
 
 	ROM_REGION( 0x8000, "gfx2", 0 ) /* All roms are 27128 */
-	ROM_LOAD( "1.l8", 0x0000, 0x4000, CRC(a79959b2) SHA1(9c58975c55f7be32add0dccb259d9680410fa9bc) )
-	ROM_LOAD( "2.m8", 0x4000, 0x4000, CRC(560521c7) SHA1(f8a50c66364995041e29ed7be2e4ea1ad16aa735) )
+	ROM_LOAD( "2.m8", 0x0000, 0x4000, CRC(560521c7) SHA1(f8a50c66364995041e29ed7be2e4ea1ad16aa735) )
+	ROM_LOAD( "1.l8", 0x4000, 0x4000, CRC(a79959b2) SHA1(9c58975c55f7be32add0dccb259d9680410fa9bc) )
 
 	ROM_REGION( 0x0500, "proms", 0 ) /* All proms are N82S129N */
 	ROM_LOAD( "3.k1", 0x0000, 0x0100, CRC(b09db4b4) SHA1(d21176cdc7def760da109083eb52e5b6a515021f) ) /* palette red component */
@@ -349,7 +351,7 @@ ROM_START( shaolinb )
 ROM_END
 
 
-/*    YEAR, NAME,     PARENT, MACHINE,  INPUT,    INIT, MONITOR, COMPANY,  FULLNAME,                    FLAGS */
-GAME( 1985, kicker,   0,      shaolins, shaolins, 0,    ROT90,  "Konami",  "Kicker",                    0 )
-GAME( 1985, shaolins, kicker, shaolins, shaolins, 0,    ROT90,  "Konami",  "Shao-lin's Road",           0 )
-GAME( 1985, shaolinb, kicker, shaolinb, shaolins, 0,    ROT90,  "bootleg", "Shao-lin's Road (bootleg)", GAME_IMPERFECT_COLORS )
+/*    YEAR, NAME,     PARENT, MACHINE,  INPUT,    INIT, MONITOR, COMPANY,  FULLNAME,                  FLAGS */
+GAME( 1985, kicker,   0,      shaolins, shaolins, 0,    ROT90,  "Konami",  "Kicker",                  0 )
+GAME( 1985, shaolins, kicker, shaolins, shaolins, 0,    ROT90,  "Konami",  "Shao-lin's Road (set 1)", 0 )
+GAME( 1985, shaolinb, kicker, shaolins, shaolins, 0,    ROT90,  "Konami",  "Shao-lin's Road (set 2)", 0 )
