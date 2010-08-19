@@ -940,273 +940,266 @@ void m68k_set_encrypted_opcode_range(running_device *device, offs_t start, offs_
 	m68k->encrypted_end = end;
 }
 
-static UINT8 memory_read_byte(address_space *space, offs_t address) { return space->read_byte(address); }
-static void memory_write_byte(address_space *space, offs_t address, UINT8 data) { space->write_byte(address, data); }
-static UINT16 memory_read_word(address_space *space, offs_t address) { return space->read_word(address); }
-static void memory_write_word(address_space *space, offs_t address, UINT16 data) { space->write_word(address, data); }
-static UINT32 memory_read_dword(address_space *space, offs_t address) { return space->read_dword(address); }
-static void memory_write_dword(address_space *space, offs_t address, UINT32 data) { space->write_dword(address, data); }
-
 /****************************************************************************
  * 8-bit data memory interface
  ****************************************************************************/
 
-static UINT16 m68008_read_immediate_16(address_space *space, offs_t address)
+UINT16 m68k_memory_interface::m68008_read_immediate_16(offs_t address)
 {
-	offs_t addr = address;
-	return (memory_decrypted_read_byte(space, addr) << 8) | (memory_decrypted_read_byte(space, addr + 1));
+	return (m_direct->read_decrypted_byte(address) << 8) | (m_direct->read_decrypted_byte(address + 1));
 }
 
-/* interface for 20/22-bit address bus, 8-bit data bus (68008) */
-static const m68k_memory_interface interface_d8 =
+void m68k_memory_interface::init8(address_space &space)
 {
-	0,
-	m68008_read_immediate_16,
-	memory_read_byte,
-	memory_read_word,
-	memory_read_dword,
-	memory_write_byte,
-	memory_write_word,
-	memory_write_dword
-};
+	m_space = &space;
+	m_direct = &space.direct();
+	m_cpustate = get_safe_token(&space.device());
+	opcode_xor = 0;
+
+	readimm16 = m68k_readimm16_delegate(m68k_readimm16_proto_delegate::create_member(m68k_memory_interface, m68008_read_immediate_16), *this);
+	read8 = m68k_read8_delegate(m68k_read8_proto_delegate::create_member(address_space, read_byte), space);
+	read16 = m68k_read16_delegate(m68k_read16_proto_delegate::create_member(address_space, read_word), space);
+	read32 = m68k_read32_delegate(m68k_read32_proto_delegate::create_member(address_space, read_dword), space);
+	write8 = m68k_write8_delegate(m68k_write8_proto_delegate::create_member(address_space, write_byte), space);
+	write16 = m68k_write16_delegate(m68k_write16_proto_delegate::create_member(address_space, write_word), space);
+	write32 = m68k_write32_delegate(m68k_write32_proto_delegate::create_member(address_space, write_dword), space);
+}
 
 /****************************************************************************
  * 16-bit data memory interface
  ****************************************************************************/
 
-static UINT16 read_immediate_16(address_space *space, offs_t address)
+UINT16 m68k_memory_interface::read_immediate_16(offs_t address)
 {
-	m68ki_cpu_core *m68k = get_safe_token(space->cpu);
-	return memory_decrypted_read_word(space, (address) ^ m68k->memory.opcode_xor);
+	return m_direct->read_decrypted_word((address) ^ opcode_xor);
 }
 
-static UINT16 simple_read_immediate_16(address_space *space, offs_t address)
+UINT16 m68k_memory_interface::simple_read_immediate_16(offs_t address)
 {
-	return memory_decrypted_read_word(space, address);
+	return m_direct->read_decrypted_word(address);
 }
 
-/* interface for 24-bit address bus, 16-bit data bus (68000, 68010) */
-static const m68k_memory_interface interface_d16 =
+void m68k_memory_interface::init16(address_space &space)
 {
-	0,
-	simple_read_immediate_16,
-	memory_read_byte,
-	memory_read_word,
-	memory_read_dword,
-	memory_write_byte,
-	memory_write_word,
-	memory_write_dword
-};
+	m_space = &space;
+	m_direct = &space.direct();
+	m_cpustate = get_safe_token(&space.device());
+	opcode_xor = 0;
+	
+	readimm16 = m68k_readimm16_delegate(m68k_readimm16_proto_delegate::create_member(m68k_memory_interface, simple_read_immediate_16), *this);
+	read8 = m68k_read8_delegate(m68k_read8_proto_delegate::create_member(address_space, read_byte), space);
+	read16 = m68k_read16_delegate(m68k_read16_proto_delegate::create_member(address_space, read_word), space);
+	read32 = m68k_read32_delegate(m68k_read32_proto_delegate::create_member(address_space, read_dword), space);
+	write8 = m68k_write8_delegate(m68k_write8_proto_delegate::create_member(address_space, write_byte), space);
+	write16 = m68k_write16_delegate(m68k_write16_proto_delegate::create_member(address_space, write_word), space);
+	write32 = m68k_write32_delegate(m68k_write32_proto_delegate::create_member(address_space, write_dword), space);
+}
 
 /****************************************************************************
  * 32-bit data memory interface
  ****************************************************************************/
 
 /* potentially misaligned 16-bit reads with a 32-bit data bus (and 24-bit address bus) */
-static UINT16 readword_d32(address_space *space, offs_t address)
+UINT16 m68k_memory_interface::readword_d32(offs_t address, UINT16 mask)
 {
 	UINT16 result;
 
 	if (!(address & 1))
-		return space->read_word(address);
-	result = space->read_byte(address) << 8;
-	return result | space->read_byte(address + 1);
+		return m_space->read_word(address);
+	result = m_space->read_byte(address) << 8;
+	return result | m_space->read_byte(address + 1);
 }
 
 /* potentially misaligned 16-bit writes with a 32-bit data bus (and 24-bit address bus) */
-static void writeword_d32(address_space *space, offs_t address, UINT16 data)
+void m68k_memory_interface::writeword_d32(offs_t address, UINT16 data, UINT16 mask)
 {
 	if (!(address & 1))
 	{
-		space->write_word(address, data);
+		m_space->write_word(address, data);
 		return;
 	}
-	space->write_byte(address, data >> 8);
-	space->write_byte(address + 1, data);
+	m_space->write_byte(address, data >> 8);
+	m_space->write_byte(address + 1, data);
 }
 
 /* potentially misaligned 32-bit reads with a 32-bit data bus (and 24-bit address bus) */
-static UINT32 readlong_d32(address_space *space, offs_t address)
+UINT32 m68k_memory_interface::readlong_d32(offs_t address, UINT32 mask)
 {
 	UINT32 result;
 
 	if (!(address & 3))
-		return space->read_dword(address);
+		return m_space->read_dword(address);
 	else if (!(address & 1))
 	{
-		result = space->read_word(address) << 16;
-		return result | space->read_word(address + 2);
+		result = m_space->read_word(address) << 16;
+		return result | m_space->read_word(address + 2);
 	}
-	result = space->read_byte(address) << 24;
-	result |= space->read_word(address + 1) << 8;
-	return result | space->read_byte(address + 3);
+	result = m_space->read_byte(address) << 24;
+	result |= m_space->read_word(address + 1) << 8;
+	return result | m_space->read_byte(address + 3);
 }
 
 /* potentially misaligned 32-bit writes with a 32-bit data bus (and 24-bit address bus) */
-static void writelong_d32(address_space *space, offs_t address, UINT32 data)
+void m68k_memory_interface::writelong_d32(offs_t address, UINT32 data, UINT32 mask)
 {
 	if (!(address & 3))
 	{
-		space->write_dword(address, data);
+		m_space->write_dword(address, data);
 		return;
 	}
 	else if (!(address & 1))
 	{
-		space->write_word(address, data >> 16);
-		space->write_word(address + 2, data);
+		m_space->write_word(address, data >> 16);
+		m_space->write_word(address + 2, data);
 		return;
 	}
-	space->write_byte(address, data >> 24);
-	space->write_word(address + 1, data >> 8);
-	space->write_byte(address + 3, data);
+	m_space->write_byte(address, data >> 24);
+	m_space->write_word(address + 1, data >> 8);
+	m_space->write_byte(address + 3, data);
 }
 
 /* interface for 32-bit data bus (68EC020, 68020) */
-static const m68k_memory_interface interface_d32 =
+void m68k_memory_interface::init32(address_space &space)
 {
-	WORD_XOR_BE(0),
-	read_immediate_16,
-	memory_read_byte,
-	readword_d32,
-	readlong_d32,
-	memory_write_byte,
-	writeword_d32,
-	writelong_d32
-};
+	m_space = &space;
+	m_direct = &space.direct();
+	m_cpustate = get_safe_token(&space.device());
+	opcode_xor = WORD_XOR_BE(0);
+	
+	readimm16 = m68k_readimm16_delegate(m68k_readimm16_proto_delegate::create_member(m68k_memory_interface, read_immediate_16), *this);
+	read8 = m68k_read8_delegate(m68k_read8_proto_delegate::create_member(address_space, read_byte), space);
+	read16 = m68k_read16_delegate(m68k_read16_proto_delegate::create_member(m68k_memory_interface, readword_d32), *this);
+	read32 = m68k_read32_delegate(m68k_read32_proto_delegate::create_member(m68k_memory_interface, readlong_d32), *this);
+	write8 = m68k_write8_delegate(m68k_write8_proto_delegate::create_member(address_space, write_byte), space);
+	write16 = m68k_write16_delegate(m68k_write16_proto_delegate::create_member(m68k_memory_interface, writeword_d32), *this);
+	write32 = m68k_write32_delegate(m68k_write32_proto_delegate::create_member(m68k_memory_interface, writelong_d32), *this);
+}
 
 /* interface for 32-bit data bus with PMMU (68EC020, 68020) */
-static UINT8 read_byte_32_mmu(address_space *space, offs_t address)
+UINT8 m68k_memory_interface::read_byte_32_mmu(offs_t address)
 {
-	m68ki_cpu_core *m68k = get_safe_token(space->cpu);
-
-	if (m68k->pmmu_enabled)
+	if (m_cpustate->pmmu_enabled)
 	{
-		address = pmmu_translate_addr(m68k, address);
+		address = pmmu_translate_addr(m_cpustate, address);
 	}
 
-	return space->read_byte(address);
+	return m_space->read_byte(address);
 }
 
-static void write_byte_32_mmu(address_space *space, offs_t address, UINT8 data)
+void m68k_memory_interface::write_byte_32_mmu(offs_t address, UINT8 data)
 {
-	m68ki_cpu_core *m68k = get_safe_token(space->cpu);
-
-	if (m68k->pmmu_enabled)
+	if (m_cpustate->pmmu_enabled)
 	{
-		address = pmmu_translate_addr(m68k, address);
+		address = pmmu_translate_addr(m_cpustate, address);
 	}
 
-	space->write_byte(address, data);
+	m_space->write_byte(address, data);
 }
 
-static UINT16 read_immediate_16_mmu(address_space *space, offs_t address)
+UINT16 m68k_memory_interface::read_immediate_16_mmu(offs_t address)
 {
-	m68ki_cpu_core *m68k = get_safe_token(space->cpu);
-
-	if (m68k->pmmu_enabled)
+	if (m_cpustate->pmmu_enabled)
 	{
-		address = pmmu_translate_addr(m68k, address);
+		address = pmmu_translate_addr(m_cpustate, address);
 	}
 
-	return memory_decrypted_read_word(space, (address) ^ m68k->memory.opcode_xor);
+	return memory_decrypted_read_word(m_space, (address) ^ m_cpustate->memory.opcode_xor);
 }
 
 /* potentially misaligned 16-bit reads with a 32-bit data bus (and 24-bit address bus) */
-static UINT16 readword_d32_mmu(address_space *space, offs_t address)
+UINT16 m68k_memory_interface::readword_d32_mmu(offs_t address, UINT16 mask)
 {
-	m68ki_cpu_core *m68k = get_safe_token(space->cpu);
 	UINT16 result;
 
-	if (m68k->pmmu_enabled)
+	if (m_cpustate->pmmu_enabled)
 	{
-		address = pmmu_translate_addr(m68k, address);
+		address = pmmu_translate_addr(m_cpustate, address);
 	}
 
 	if (!(address & 1))
-		return space->read_word(address);
-	result = space->read_byte(address) << 8;
-	return result | space->read_byte(address + 1);
+		return m_space->read_word(address);
+	result = m_space->read_byte(address) << 8;
+	return result | m_space->read_byte(address + 1);
 }
 
 /* potentially misaligned 16-bit writes with a 32-bit data bus (and 24-bit address bus) */
-static void writeword_d32_mmu(address_space *space, offs_t address, UINT16 data)
+void m68k_memory_interface::writeword_d32_mmu(offs_t address, UINT16 data, UINT16 mask)
 {
-	m68ki_cpu_core *m68k = get_safe_token(space->cpu);
-
-	if (m68k->pmmu_enabled)
+	if (m_cpustate->pmmu_enabled)
 	{
-		address = pmmu_translate_addr(m68k, address);
+		address = pmmu_translate_addr(m_cpustate, address);
 	}
 
 	if (!(address & 1))
 	{
-		space->write_word(address, data);
+		m_space->write_word(address, data);
 		return;
 	}
-	space->write_byte(address, data >> 8);
-	space->write_byte(address + 1, data);
+	m_space->write_byte(address, data >> 8);
+	m_space->write_byte(address + 1, data);
 }
 
 /* potentially misaligned 32-bit reads with a 32-bit data bus (and 24-bit address bus) */
-static UINT32 readlong_d32_mmu(address_space *space, offs_t address)
+UINT32 m68k_memory_interface::readlong_d32_mmu(offs_t address, UINT32 mask)
 {
-	m68ki_cpu_core *m68k = get_safe_token(space->cpu);
 	UINT32 result;
 
-	if (m68k->pmmu_enabled)
+	if (m_cpustate->pmmu_enabled)
 	{
-		address = pmmu_translate_addr(m68k, address);
+		address = pmmu_translate_addr(m_cpustate, address);
 	}
 
 	if (!(address & 3))
-		return space->read_dword(address);
+		return m_space->read_dword(address);
 	else if (!(address & 1))
 	{
-		result = space->read_word(address) << 16;
-		return result | space->read_word(address + 2);
+		result = m_space->read_word(address) << 16;
+		return result | m_space->read_word(address + 2);
 	}
-	result = space->read_byte(address) << 24;
-	result |= space->read_word(address + 1) << 8;
-	return result | space->read_byte(address + 3);
+	result = m_space->read_byte(address) << 24;
+	result |= m_space->read_word(address + 1) << 8;
+	return result | m_space->read_byte(address + 3);
 }
 
 /* potentially misaligned 32-bit writes with a 32-bit data bus (and 24-bit address bus) */
-static void writelong_d32_mmu(address_space *space, offs_t address, UINT32 data)
+void m68k_memory_interface::writelong_d32_mmu(offs_t address, UINT32 data, UINT32 mask)
 {
-	m68ki_cpu_core *m68k = get_safe_token(space->cpu);
-
-	if (m68k->pmmu_enabled)
+	if (m_cpustate->pmmu_enabled)
 	{
-		address = pmmu_translate_addr(m68k, address);
+		address = pmmu_translate_addr(m_cpustate, address);
 	}
 
 	if (!(address & 3))
 	{
-		space->write_dword(address, data);
+		m_space->write_dword(address, data);
 		return;
 	}
 	else if (!(address & 1))
 	{
-		space->write_word(address, data >> 16);
-		space->write_word(address + 2, data);
+		m_space->write_word(address, data >> 16);
+		m_space->write_word(address + 2, data);
 		return;
 	}
-	space->write_byte(address, data >> 24);
-	space->write_word(address + 1, data >> 8);
-	space->write_byte(address + 3, data);
+	m_space->write_byte(address, data >> 24);
+	m_space->write_word(address + 1, data >> 8);
+	m_space->write_byte(address + 3, data);
 }
 
-static const m68k_memory_interface interface_d32_mmu =
+void m68k_memory_interface::init32mmu(address_space &space)
 {
-	WORD_XOR_BE(0),
-	read_immediate_16_mmu,
-	read_byte_32_mmu,
-	readword_d32_mmu,
-	readlong_d32_mmu,
-	write_byte_32_mmu,
-	writeword_d32_mmu,
-	writelong_d32_mmu
-};
+	m_space = &space;
+	m_direct = &space.direct();
+	m_cpustate = get_safe_token(&space.device());
+	opcode_xor = WORD_XOR_BE(0);
+	
+	readimm16 = m68k_readimm16_delegate(m68k_readimm16_proto_delegate::create_member(m68k_memory_interface, read_immediate_16_mmu), *this);
+	read8 = m68k_read8_delegate(m68k_read8_proto_delegate::create_member(m68k_memory_interface, read_byte_32_mmu), *this);
+	read16 = m68k_read16_delegate(m68k_read16_proto_delegate::create_member(m68k_memory_interface, readword_d32_mmu), *this);
+	read32 = m68k_read32_delegate(m68k_read32_proto_delegate::create_member(m68k_memory_interface, readlong_d32_mmu), *this);
+	write8 = m68k_write8_delegate(m68k_write8_proto_delegate::create_member(m68k_memory_interface, write_byte_32_mmu), *this);
+	write16 = m68k_write16_delegate(m68k_write16_proto_delegate::create_member(m68k_memory_interface, writeword_d32_mmu), *this);
+	write32 = m68k_write32_delegate(m68k_write32_proto_delegate::create_member(m68k_memory_interface, writelong_d32_mmu), *this);
+}
 
 
 void m68k_set_reset_callback(running_device *device, m68k_reset_func callback)
@@ -1301,7 +1294,11 @@ static CPU_INIT( m68000 )
 
 	m68k->cpu_type         = CPU_TYPE_000;
 	m68k->dasm_type        = M68K_CPU_TYPE_68000;
-	m68k->memory           = interface_d16;
+// hack alert: we use placement new to ensure we are properly initialized
+// because we live in the device state which is allocated as bytes
+// remove me when we have a real C++ device
+	new(&m68k->memory) m68k_memory_interface;
+	m68k->memory.init16(*m68k->program);
 	m68k->sr_mask          = 0xa71f; /* T1 -- S  -- -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
 	m68k->cyc_instruction  = m68ki_cycles[0];
 	m68k->cyc_exception    = m68ki_exception_cycle_table[0];
@@ -1346,7 +1343,11 @@ static CPU_INIT( m68008 )
 
 	m68k->cpu_type         = CPU_TYPE_008;
 	m68k->dasm_type        = M68K_CPU_TYPE_68008;
-	m68k->memory           = interface_d8;
+// hack alert: we use placement new to ensure we are properly initialized
+// because we live in the device state which is allocated as bytes
+// remove me when we have a real C++ device
+	new(&m68k->memory) m68k_memory_interface;
+	m68k->memory.init8(*m68k->program);
 	m68k->sr_mask          = 0xa71f; /* T1 -- S  -- -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
 	m68k->cyc_instruction  = m68ki_cycles[0];
 	m68k->cyc_exception    = m68ki_exception_cycle_table[0];
@@ -1395,7 +1396,11 @@ static CPU_INIT( m68010 )
 
 	m68k->cpu_type         = CPU_TYPE_010;
 	m68k->dasm_type        = M68K_CPU_TYPE_68010;
-	m68k->memory           = interface_d16;
+// hack alert: we use placement new to ensure we are properly initialized
+// because we live in the device state which is allocated as bytes
+// remove me when we have a real C++ device
+	new(&m68k->memory) m68k_memory_interface;
+	m68k->memory.init16(*m68k->program);
 	m68k->sr_mask          = 0xa71f; /* T1 -- S  -- -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
 	m68k->cyc_instruction  = m68ki_cycles[1];
 	m68k->cyc_exception    = m68ki_exception_cycle_table[1];
@@ -1440,7 +1445,11 @@ static CPU_INIT( m68020 )
 
 	m68k->cpu_type         = CPU_TYPE_020;
 	m68k->dasm_type        = M68K_CPU_TYPE_68020;
-	m68k->memory           = interface_d32;
+// hack alert: we use placement new to ensure we are properly initialized
+// because we live in the device state which is allocated as bytes
+// remove me when we have a real C++ device
+	new(&m68k->memory) m68k_memory_interface;
+	m68k->memory.init32(*m68k->program);
 	m68k->sr_mask          = 0xf71f; /* T1 T0 S  M  -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
 	m68k->cyc_instruction  = m68ki_cycles[2];
 	m68k->cyc_exception    = m68ki_exception_cycle_table[2];
@@ -1488,7 +1497,11 @@ static CPU_INIT( m68020pmmu )
 	CPU_INIT_CALL(m68020);
 
 	m68k->has_pmmu	       = 1;
-	m68k->memory           = interface_d32_mmu;
+// hack alert: we use placement new to ensure we are properly initialized
+// because we live in the device state which is allocated as bytes
+// remove me when we have a real C++ device
+	new(&m68k->memory) m68k_memory_interface;
+	m68k->memory.init32mmu(*m68k->program);
 }
 
 CPU_GET_INFO( m68020pmmu )
@@ -1517,7 +1530,11 @@ static CPU_INIT( m68ec020 )
 
 	m68k->cpu_type         = CPU_TYPE_EC020;
 	m68k->dasm_type        = M68K_CPU_TYPE_68EC020;
-	m68k->memory           = interface_d32;
+// hack alert: we use placement new to ensure we are properly initialized
+// because we live in the device state which is allocated as bytes
+// remove me when we have a real C++ device
+	new(&m68k->memory) m68k_memory_interface;
+	m68k->memory.init32(*m68k->program);
 	m68k->sr_mask          = 0xf71f; /* T1 T0 S  M  -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
 	m68k->cyc_instruction  = m68ki_cycles[2];
 	m68k->cyc_exception    = m68ki_exception_cycle_table[2];
@@ -1564,7 +1581,11 @@ static CPU_INIT( m68030 )
 
 	m68k->cpu_type         = CPU_TYPE_030;
 	m68k->dasm_type        = M68K_CPU_TYPE_68030;
-	m68k->memory           = interface_d32_mmu;
+// hack alert: we use placement new to ensure we are properly initialized
+// because we live in the device state which is allocated as bytes
+// remove me when we have a real C++ device
+	new(&m68k->memory) m68k_memory_interface;
+	m68k->memory.init32mmu(*m68k->program);
 	m68k->sr_mask          = 0xf71f; /* T1 T0 S  M  -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
 	m68k->cyc_instruction  = m68ki_cycles[3];
 	m68k->cyc_exception    = m68ki_exception_cycle_table[3];
@@ -1617,7 +1638,11 @@ static CPU_INIT( m68ec030 )
 
 	m68k->cpu_type         = CPU_TYPE_EC030;
 	m68k->dasm_type        = M68K_CPU_TYPE_68EC030;
-	m68k->memory           = interface_d32;
+// hack alert: we use placement new to ensure we are properly initialized
+// because we live in the device state which is allocated as bytes
+// remove me when we have a real C++ device
+	new(&m68k->memory) m68k_memory_interface;
+	m68k->memory.init32(*m68k->program);
 	m68k->sr_mask          = 0xf71f; /* T1 T0 S  M  -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
 	m68k->cyc_instruction  = m68ki_cycles[3];
 	m68k->cyc_exception    = m68ki_exception_cycle_table[3];
@@ -1661,7 +1686,11 @@ static CPU_INIT( m68040 )
 
 	m68k->cpu_type         = CPU_TYPE_040;
 	m68k->dasm_type        = M68K_CPU_TYPE_68040;
-	m68k->memory           = interface_d32_mmu;
+// hack alert: we use placement new to ensure we are properly initialized
+// because we live in the device state which is allocated as bytes
+// remove me when we have a real C++ device
+	new(&m68k->memory) m68k_memory_interface;
+	m68k->memory.init32mmu(*m68k->program);
 	m68k->sr_mask          = 0xf71f; /* T1 T0 S  M  -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
 	m68k->cyc_instruction  = m68ki_cycles[4];
 	m68k->cyc_exception    = m68ki_exception_cycle_table[4];
@@ -1713,7 +1742,11 @@ static CPU_INIT( m68ec040 )
 
 	m68k->cpu_type         = CPU_TYPE_EC040;
 	m68k->dasm_type        = M68K_CPU_TYPE_68EC040;
-	m68k->memory           = interface_d32;
+// hack alert: we use placement new to ensure we are properly initialized
+// because we live in the device state which is allocated as bytes
+// remove me when we have a real C++ device
+	new(&m68k->memory) m68k_memory_interface;
+	m68k->memory.init32(*m68k->program);
 	m68k->sr_mask          = 0xf71f; /* T1 T0 S  M  -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
 	m68k->cyc_instruction  = m68ki_cycles[4];
 	m68k->cyc_exception    = m68ki_exception_cycle_table[4];
@@ -1757,7 +1790,11 @@ static CPU_INIT( m68lc040 )
 
 	m68k->cpu_type         = CPU_TYPE_LC040;
 	m68k->dasm_type        = M68K_CPU_TYPE_68LC040;
-	m68k->memory           = interface_d32;
+// hack alert: we use placement new to ensure we are properly initialized
+// because we live in the device state which is allocated as bytes
+// remove me when we have a real C++ device
+	new(&m68k->memory) m68k_memory_interface;
+	m68k->memory.init32(*m68k->program);
 	m68k->sr_mask          = 0xf71f; /* T1 T0 S  M  -- I2 I1 I0 -- -- -- X  N  Z  V  C  */
 	m68k->cyc_instruction  = m68ki_cycles[4];
 	m68k->cyc_exception    = m68ki_exception_cycle_table[4];

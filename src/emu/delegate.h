@@ -124,9 +124,9 @@
 #endif
 
 // nicer macros to hide the template gobblety-gook and to pass the names
-#define bind_member_name(_class, _member, _name) _bind_member<_class, &_class::_member>(_name)
-#define bind_member(_class, _member) 			bind_member_name(_class, _member, #_class "::" #_member)
-#define bind_static(_class, _func) 				_bind_static<_class, &_func>(#_func)
+#define create_member_name(_class, _member, _name)	_create_member<_class, &_class::_member>(_name)
+#define create_member(_class, _member) 				_create_member<_class, &_class::_member>(#_class "::" #_member)
+#define create_static(_class, _func) 				_crate_static<_class, &_func>(#_func)
 
 
 
