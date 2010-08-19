@@ -102,12 +102,12 @@ extern int gp9001_displog;
 /* vdp map 0, gfx region 0 */
 #define MDRV_DEVICE_ADD_VDP0 \
 	MDRV_DEVICE_ADD("gp9001vdp0", gp9001vdp_, 0) \
-	MDRV_DEVICE_ADDRESS_MAP(0, gp9001vdp0_map) MDRV_DEVICE_INLINE_DATA16(0, 0) \
+	MDRV_DEVICE_INLINE_DATA16(0, 0) \
 
 /* vdp map 1, gfx region 2 */
 #define MDRV_DEVICE_ADD_VDP1 \
 	MDRV_DEVICE_ADD("gp9001vdp1", gp9001vdp_, 0) \
-	MDRV_DEVICE_ADDRESS_MAP(0, gp9001vdp1_map) MDRV_DEVICE_INLINE_DATA16(0, 2) \
+	MDRV_DEVICE_INLINE_DATA16(0, 2) \
 
 
 // access to VDP

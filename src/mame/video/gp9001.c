@@ -182,28 +182,11 @@ static WRITE16_DEVICE_HANDLER( gp9001_spram_w )
 	COMBINE_DATA(&vdp->spriteram16_new[offset]);
 }
 
-/* how to create a generic map which uses the CURRENT device? we have to create specific ones below at the moment */
 static ADDRESS_MAP_START( gp9001vdp_map, 0, 16 )
-//  AM_RANGE(0x0000, 0x0fff) AM_DEVREADWRITE( this, gp9001_bg_tilemap_r, gp9001_bg_tilemap_w)
-//  AM_RANGE(0x1000, 0x1fff) AM_DEVREADWRITE( this, gp9001_fg_tilemap_r, gp9001_fg_tilemap_w)
-//  AM_RANGE(0x2000, 0x2fff) AM_DEVREADWRITE( this, gp9001_top_tilemap_r, gp9001_top_tilemap_w)
-//  AM_RANGE(0x3000, 0x37ff) AM_DEVREADWRITE( this, gp9001_spram_r, gp9001_spram_w)
-//  AM_RANGE(0x3800, 0x3fff) AM_RAM // sprite mirror?
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START( gp9001vdp0_map, 0, 16 )
-	AM_RANGE(0x0000, 0x0fff) AM_DEVREADWRITE("gp9001vdp0", gp9001_bg_tilemap_r, gp9001_bg_tilemap_w)
-	AM_RANGE(0x1000, 0x1fff) AM_DEVREADWRITE("gp9001vdp0", gp9001_fg_tilemap_r, gp9001_fg_tilemap_w)
-	AM_RANGE(0x2000, 0x2fff) AM_DEVREADWRITE("gp9001vdp0", gp9001_top_tilemap_r, gp9001_top_tilemap_w)
-	AM_RANGE(0x3000, 0x37ff) AM_DEVREADWRITE("gp9001vdp0", gp9001_spram_r, gp9001_spram_w)
-	AM_RANGE(0x3800, 0x3fff) AM_RAM // sprite mirror?
-ADDRESS_MAP_END
-
-ADDRESS_MAP_START( gp9001vdp1_map, 0, 16 )
-	AM_RANGE(0x0000, 0x0fff) AM_DEVREADWRITE("gp9001vdp1", gp9001_bg_tilemap_r, gp9001_bg_tilemap_w)
-	AM_RANGE(0x1000, 0x1fff) AM_DEVREADWRITE("gp9001vdp1", gp9001_fg_tilemap_r, gp9001_fg_tilemap_w)
-	AM_RANGE(0x2000, 0x2fff) AM_DEVREADWRITE("gp9001vdp1", gp9001_top_tilemap_r, gp9001_top_tilemap_w)
-	AM_RANGE(0x3000, 0x37ff) AM_DEVREADWRITE("gp9001vdp1", gp9001_spram_r, gp9001_spram_w)
+	AM_RANGE(0x0000, 0x0fff) AM_DEVREADWRITE(DEVICE_SELF, gp9001_bg_tilemap_r, gp9001_bg_tilemap_w)
+	AM_RANGE(0x1000, 0x1fff) AM_DEVREADWRITE(DEVICE_SELF, gp9001_fg_tilemap_r, gp9001_fg_tilemap_w)
+	AM_RANGE(0x2000, 0x2fff) AM_DEVREADWRITE(DEVICE_SELF, gp9001_top_tilemap_r, gp9001_top_tilemap_w)
+	AM_RANGE(0x3000, 0x37ff) AM_DEVREADWRITE(DEVICE_SELF, gp9001_spram_r, gp9001_spram_w)
 	AM_RANGE(0x3800, 0x3fff) AM_RAM // sprite mirror?
 ADDRESS_MAP_END
 
