@@ -517,7 +517,7 @@ byte #4:
 
 static void bootleg_draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, const UINT8 *source, int circuit )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	const gfx_element *gfx = machine->gfx[circuit + 2];
 
 	int limit = circuit ? (memory_read_byte(space, 0xc2) * 256 + memory_read_byte(space, 0xc3)) : (memory_read_byte(space, 0xc0) * 256 + memory_read_byte(space, 0xc1));

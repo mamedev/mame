@@ -198,7 +198,7 @@ static CUSTOM_INPUT( lightgun_holster_r )
 
 static WRITE8_DEVICE_HANDLER( alg_cia_0_porta_w )
 {
-	const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* switch banks as appropriate */
 	memory_set_bank(device->machine, "bank1", data & 1);

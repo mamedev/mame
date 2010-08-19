@@ -944,7 +944,7 @@ void m68k_set_encrypted_opcode_range(running_device *device, offs_t start, offs_
  * 8-bit data memory interface
  ****************************************************************************/
 
-static UINT16 m68008_read_immediate_16(const address_space *space, offs_t address)
+static UINT16 m68008_read_immediate_16(address_space *space, offs_t address)
 {
 	offs_t addr = address;
 	return (memory_decrypted_read_byte(space, addr) << 8) | (memory_decrypted_read_byte(space, addr + 1));
@@ -967,13 +967,13 @@ static const m68k_memory_interface interface_d8 =
  * 16-bit data memory interface
  ****************************************************************************/
 
-static UINT16 read_immediate_16(const address_space *space, offs_t address)
+static UINT16 read_immediate_16(address_space *space, offs_t address)
 {
 	m68ki_cpu_core *m68k = get_safe_token(space->cpu);
 	return memory_decrypted_read_word(space, (address) ^ m68k->memory.opcode_xor);
 }
 
-static UINT16 simple_read_immediate_16(const address_space *space, offs_t address)
+static UINT16 simple_read_immediate_16(address_space *space, offs_t address)
 {
 	return memory_decrypted_read_word(space, address);
 }
@@ -996,7 +996,7 @@ static const m68k_memory_interface interface_d16 =
  ****************************************************************************/
 
 /* potentially misaligned 16-bit reads with a 32-bit data bus (and 24-bit address bus) */
-static UINT16 readword_d32(const address_space *space, offs_t address)
+static UINT16 readword_d32(address_space *space, offs_t address)
 {
 	UINT16 result;
 
@@ -1007,7 +1007,7 @@ static UINT16 readword_d32(const address_space *space, offs_t address)
 }
 
 /* potentially misaligned 16-bit writes with a 32-bit data bus (and 24-bit address bus) */
-static void writeword_d32(const address_space *space, offs_t address, UINT16 data)
+static void writeword_d32(address_space *space, offs_t address, UINT16 data)
 {
 	if (!(address & 1))
 	{
@@ -1019,7 +1019,7 @@ static void writeword_d32(const address_space *space, offs_t address, UINT16 dat
 }
 
 /* potentially misaligned 32-bit reads with a 32-bit data bus (and 24-bit address bus) */
-static UINT32 readlong_d32(const address_space *space, offs_t address)
+static UINT32 readlong_d32(address_space *space, offs_t address)
 {
 	UINT32 result;
 
@@ -1036,7 +1036,7 @@ static UINT32 readlong_d32(const address_space *space, offs_t address)
 }
 
 /* potentially misaligned 32-bit writes with a 32-bit data bus (and 24-bit address bus) */
-static void writelong_d32(const address_space *space, offs_t address, UINT32 data)
+static void writelong_d32(address_space *space, offs_t address, UINT32 data)
 {
 	if (!(address & 3))
 	{
@@ -1068,7 +1068,7 @@ static const m68k_memory_interface interface_d32 =
 };
 
 /* interface for 32-bit data bus with PMMU (68EC020, 68020) */
-static UINT8 read_byte_32_mmu(const address_space *space, offs_t address)
+static UINT8 read_byte_32_mmu(address_space *space, offs_t address)
 {
 	m68ki_cpu_core *m68k = get_safe_token(space->cpu);
 
@@ -1080,7 +1080,7 @@ static UINT8 read_byte_32_mmu(const address_space *space, offs_t address)
 	return memory_read_byte_32be(space, address);
 }
 
-static void write_byte_32_mmu(const address_space *space, offs_t address, UINT8 data)
+static void write_byte_32_mmu(address_space *space, offs_t address, UINT8 data)
 {
 	m68ki_cpu_core *m68k = get_safe_token(space->cpu);
 
@@ -1092,7 +1092,7 @@ static void write_byte_32_mmu(const address_space *space, offs_t address, UINT8 
 	memory_write_byte_32be(space, address, data);
 }
 
-static UINT16 read_immediate_16_mmu(const address_space *space, offs_t address)
+static UINT16 read_immediate_16_mmu(address_space *space, offs_t address)
 {
 	m68ki_cpu_core *m68k = get_safe_token(space->cpu);
 
@@ -1105,7 +1105,7 @@ static UINT16 read_immediate_16_mmu(const address_space *space, offs_t address)
 }
 
 /* potentially misaligned 16-bit reads with a 32-bit data bus (and 24-bit address bus) */
-static UINT16 readword_d32_mmu(const address_space *space, offs_t address)
+static UINT16 readword_d32_mmu(address_space *space, offs_t address)
 {
 	m68ki_cpu_core *m68k = get_safe_token(space->cpu);
 	UINT16 result;
@@ -1122,7 +1122,7 @@ static UINT16 readword_d32_mmu(const address_space *space, offs_t address)
 }
 
 /* potentially misaligned 16-bit writes with a 32-bit data bus (and 24-bit address bus) */
-static void writeword_d32_mmu(const address_space *space, offs_t address, UINT16 data)
+static void writeword_d32_mmu(address_space *space, offs_t address, UINT16 data)
 {
 	m68ki_cpu_core *m68k = get_safe_token(space->cpu);
 
@@ -1141,7 +1141,7 @@ static void writeword_d32_mmu(const address_space *space, offs_t address, UINT16
 }
 
 /* potentially misaligned 32-bit reads with a 32-bit data bus (and 24-bit address bus) */
-static UINT32 readlong_d32_mmu(const address_space *space, offs_t address)
+static UINT32 readlong_d32_mmu(address_space *space, offs_t address)
 {
 	m68ki_cpu_core *m68k = get_safe_token(space->cpu);
 	UINT32 result;
@@ -1164,7 +1164,7 @@ static UINT32 readlong_d32_mmu(const address_space *space, offs_t address)
 }
 
 /* potentially misaligned 32-bit writes with a 32-bit data bus (and 24-bit address bus) */
-static void writelong_d32_mmu(const address_space *space, offs_t address, UINT32 data)
+static void writelong_d32_mmu(address_space *space, offs_t address, UINT32 data)
 {
 	m68ki_cpu_core *m68k = get_safe_token(space->cpu);
 

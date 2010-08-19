@@ -524,7 +524,7 @@ static ADDRESS_MAP_START( defender_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-void defender_install_io_space(const address_space *space)
+void defender_install_io_space(address_space *space)
 {
 	running_device *pia_0 = space->machine->device("pia_0");
 	running_device *pia_1 = space->machine->device("pia_1");

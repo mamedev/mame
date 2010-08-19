@@ -62,7 +62,7 @@ struct _superfx_state
 	pixelcache_t pixelcache[2];
 
 	legacy_cpu_device *device;
-	const address_space *program;
+	address_space *program;
 	int icount;
 };
 

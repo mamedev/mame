@@ -453,7 +453,7 @@ static READ32_HANDLER( dsp32c_2_r )
 
 static WRITE32_HANDLER( host_gsp_w )
 {
-	const address_space *gsp_space = cputag_get_address_space(space->machine, "gsp", ADDRESS_SPACE_PROGRAM);
+	address_space *gsp_space = cputag_get_address_space(space->machine, "gsp", ADDRESS_SPACE_PROGRAM);
 
 	memory_write_word(gsp_space, (0xc0000000 + (offset << 5) + 0x10) / 8, data);
 	memory_write_word(gsp_space, (0xc0000000 + (offset << 5))/ 8 , data >> 16);
@@ -461,7 +461,7 @@ static WRITE32_HANDLER( host_gsp_w )
 
 static READ32_HANDLER( host_gsp_r )
 {
-	const address_space *gsp_space = cputag_get_address_space(space->machine, "gsp", ADDRESS_SPACE_PROGRAM);
+	address_space *gsp_space = cputag_get_address_space(space->machine, "gsp", ADDRESS_SPACE_PROGRAM);
 	UINT32 val;
 
 	val  = memory_read_word(gsp_space, (0xc0000000 + (offset << 5) + 0x10) / 8);

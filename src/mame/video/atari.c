@@ -1174,7 +1174,7 @@ static TIMER_CALLBACK( antic_steal_cycles )
  *****************************************************************************/
 static TIMER_CALLBACK( antic_scanline_render )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	VIDEO *video = antic.video[antic.scanline];
 	LOG(("           @cycle #%3d render mode $%X lines to go #%d\n", cycle(machine), (antic.cmd & 0x0f), antic.modelines));
@@ -1244,7 +1244,7 @@ INLINE void LMS(running_machine *machine, int new_cmd)
      **************************************************************/
     if( new_cmd & ANTIC_LMS )
     {
-    	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+    	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 		int addr = RDANTIC(space);
         antic.doffs = (antic.doffs + 1) & DOFFS;
         addr += 256 * RDANTIC(space);
@@ -1269,7 +1269,7 @@ INLINE void LMS(running_machine *machine, int new_cmd)
  *****************************************************************************/
 static void antic_scanline_dma(running_machine *machine, int param)
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	LOG(("           @cycle #%3d DMA fetch\n", cycle(machine)));
 	if (antic.scanline == VBL_END)
 		antic.r.nmist &= ~VBL_NMI;

@@ -32,7 +32,7 @@
 
 ***************************************************************************/
 
-static void mrokumei_handleblit( const address_space *space, int rom_base )
+static void mrokumei_handleblit( address_space *space, int rom_base )
 {
 	homedata_state *state = space->machine->driver_data<homedata_state>();
 	int i;
@@ -119,7 +119,7 @@ finish:
 	cpu_set_input_line(state->maincpu, M6809_FIRQ_LINE, HOLD_LINE);
 }
 
-static void reikaids_handleblit( const address_space *space, int rom_base )
+static void reikaids_handleblit( address_space *space, int rom_base )
 {
 	homedata_state *state = space->machine->driver_data<homedata_state>();
 	int i;
@@ -217,7 +217,7 @@ finish:
 	cpu_set_input_line(state->maincpu, M6809_FIRQ_LINE, HOLD_LINE);
 }
 
-static void pteacher_handleblit( const address_space *space, int rom_base )
+static void pteacher_handleblit( address_space *space, int rom_base )
 {
 	homedata_state *state = space->machine->driver_data<homedata_state>();
 	int i;

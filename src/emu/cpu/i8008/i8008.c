@@ -34,8 +34,8 @@ struct _i8008_state
 	UINT8	HALT;
 	UINT8	flags; // temporary I/O only
 	legacy_cpu_device *device;
-	const address_space *program;
-	const address_space *io;
+	address_space *program;
+	address_space *io;
 	int					icount;
 	int 				pc_pos; // PC possition in ADDR
 

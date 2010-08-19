@@ -4229,7 +4229,7 @@ static DRIVER_INIT( multiwin )
 ******************************************************/
 {
 	UINT8 *ROM = memory_region(machine, "maincpu");
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	int x;
 
@@ -4262,7 +4262,7 @@ static DRIVER_INIT( royalcdc )
 ******************************************************/
 
 	UINT8 *ROM = memory_region(machine, "maincpu");
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	int x;
 

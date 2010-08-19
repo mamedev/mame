@@ -137,7 +137,7 @@ static MACHINE_RESET( quizpun2 )
 	prot.addr = 0;
 }
 
-static void log_protection( const address_space *space, const char *warning )
+static void log_protection( address_space *space, const char *warning )
 {
 	logerror("%04x: protection - %s (state %x, wait %x, param %02x, cmd %02x, addr %02x)\n", cpu_get_pc(space->cpu), warning,
 		prot.state,

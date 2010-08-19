@@ -213,7 +213,7 @@ enum
 struct _drcbe_state
 {
 	running_device *	device;					/* CPU device we are associated with */
-	const address_space *	space[ADDRESS_SPACES];	/* pointers to CPU's address space */
+	address_space *	space[ADDRESS_SPACES];	/* pointers to CPU's address space */
 	drcuml_state *			drcuml;					/* pointer back to our owner */
 	drccache *				cache;					/* pointer to the cache */
 	drcuml_machine_state	state;					/* state of the machine */

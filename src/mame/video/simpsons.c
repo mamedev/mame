@@ -97,7 +97,7 @@ static WRITE8_HANDLER( simpsons_k053247_w )
 void simpsons_video_banking( running_machine *machine, int bank )
 {
 	simpsons_state *state = machine->driver_data<simpsons_state>();
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	if (bank & 1)
 	{

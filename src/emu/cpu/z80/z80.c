@@ -150,8 +150,8 @@ struct _z80_state
 	UINT32			ea;
 	device_irq_callback irq_callback;
 	legacy_cpu_device *device;
-	const address_space *program;
-	const address_space *io;
+	address_space *program;
+	address_space *io;
 	int				icount;
 	z80_daisy_chain daisy;
 	UINT8			rtemp;

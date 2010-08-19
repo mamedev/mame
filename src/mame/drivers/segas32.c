@@ -489,7 +489,7 @@ static TIMER_DEVICE_CALLBACK( signal_v60_irq_callback )
 }
 
 
-static void int_control_w(const address_space *space, int offset, UINT8 data)
+static void int_control_w(address_space *space, int offset, UINT8 data)
 {
 	int duration;
 
@@ -628,7 +628,7 @@ static INTERRUPT_GEN( start_of_vblank_int )
  *
  *************************************/
 
-static UINT16 common_io_chip_r(const address_space *space, int which, offs_t offset, UINT16 mem_mask)
+static UINT16 common_io_chip_r(address_space *space, int which, offs_t offset, UINT16 mem_mask)
 {
 	static const char *const portnames[2][8] =
 			{
@@ -679,7 +679,7 @@ static UINT16 common_io_chip_r(const address_space *space, int which, offs_t off
 }
 
 
-static void common_io_chip_w(const address_space *space, int which, offs_t offset, UINT16 data, UINT16 mem_mask)
+static void common_io_chip_w(address_space *space, int which, offs_t offset, UINT16 data, UINT16 mem_mask)
 {
 	UINT8 old;
 

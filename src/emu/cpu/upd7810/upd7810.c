@@ -500,8 +500,8 @@ struct _upd7810_state
 	UPD7810_CONFIG config;
 	device_irq_callback irq_callback;
 	legacy_cpu_device *device;
-	const address_space *program;
-	const address_space *io;
+	address_space *program;
+	address_space *io;
 	int icount;
 };
 

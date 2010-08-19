@@ -506,13 +506,13 @@ static int collision_check(UINT8* p1, UINT8* p2, int x1, int x2)
 }
 
 
-INLINE int current_x(const address_space *space)
+INLINE int current_x(address_space *space)
 {
 	return 3 * ((space->machine->firstcpu->total_cycles() - frame_cycles) % 76) - 68;
 }
 
 
-INLINE int current_y(const address_space *space)
+INLINE int current_y(address_space *space)
 {
 	return (space->machine->firstcpu->total_cycles() - frame_cycles) / 76;
 }

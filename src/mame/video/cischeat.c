@@ -1336,7 +1336,7 @@ if ( input_code_pressed(screen->machine, KEYCODE_Z) || input_code_pressed(screen
 	if (msk != 0) megasys1_active_layers &= msk;
 #if 1
 	{
-		const address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+		address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 		popmessage("Cmd: %04X Pos:%04X Lim:%04X Inp:%04X",
 							scudhamm_motor_command,

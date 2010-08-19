@@ -65,7 +65,7 @@ struct _tx0_state
 	int icount;
 
 	legacy_cpu_device *device;
-	const address_space *program;
+	address_space *program;
 };
 
 INLINE tx0_state *get_safe_token(running_device *device)

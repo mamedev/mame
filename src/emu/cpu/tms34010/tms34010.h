@@ -198,8 +198,8 @@ struct _tms34010_config
 	int		pixperclock;						/* pixels per clock */
 	void	(*scanline_callback)(screen_device &screen, bitmap_t *bitmap, int scanline, const tms34010_display_params *params);
 	void	(*output_int)(running_device *device, int state);			/* output interrupt callback */
-	void	(*to_shiftreg)(const address_space *space, offs_t, UINT16 *);	/* shift register write */
-	void	(*from_shiftreg)(const address_space *space, offs_t, UINT16 *);	/* shift register read */
+	void	(*to_shiftreg)(address_space *space, offs_t, UINT16 *);	/* shift register write */
+	void	(*from_shiftreg)(address_space *space, offs_t, UINT16 *);	/* shift register read */
 };
 
 

@@ -54,7 +54,7 @@ To do:
 /* Only used by ghostb, gondo, garyoret, other games can control buffering */
 static VIDEO_EOF( dec8 )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	buffer_spriteram_w(space, 0, 0);
 }
 
@@ -3444,7 +3444,7 @@ static DRIVER_INIT( dec8 )
 static DRIVER_INIT( deco222 )
 {
 	dec8_state *state = machine->driver_data<dec8_state>();
-	const address_space *space = cputag_get_address_space(machine, "audiocpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "audiocpu", ADDRESS_SPACE_PROGRAM);
 	int A;
 	UINT8 *decrypt;
 	UINT8 *rom;

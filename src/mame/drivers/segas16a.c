@@ -597,7 +597,7 @@ static void dumpmtmt_i8751_sim(running_machine *machine)
 static void quartet_i8751_sim(running_machine *machine)
 {
 	segas1x_state *state = machine->driver_data<segas1x_state>();
-	const address_space *space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
 
 	/* signal a VBLANK to the main CPU */
 	cpu_set_input_line(state->maincpu, 4, HOLD_LINE);

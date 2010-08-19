@@ -98,7 +98,7 @@ typedef struct
 	UINT16 *sound_data;
 
 	legacy_cpu_device *device;
-	const address_space *program;
+	address_space *program;
 	int icount;
 } cquestsnd_state;
 
@@ -139,7 +139,7 @@ typedef struct
 
 	legacy_cpu_device *device;
 	legacy_cpu_device *lindevice;
-	const address_space *program;
+	address_space *program;
 	int icount;
 } cquestrot_state;
 
@@ -185,7 +185,7 @@ typedef struct
 
 	legacy_cpu_device *device;
 	legacy_cpu_device *rotdevice;
-	const address_space *program;
+	address_space *program;
 	int icount;
 } cquestlin_state;
 

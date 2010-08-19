@@ -233,8 +233,8 @@ typedef struct
 	int				interrupt_cycles;
 	void			(*output_pins_changed)(UINT32 pins);
 	legacy_cpu_device *device;
-	const address_space *program;
-	const address_space *data;
+	address_space *program;
+	address_space *data;
 
 	UINT16 peripheral_ram[0x40];
 	UINT16 program_ram[0x800];

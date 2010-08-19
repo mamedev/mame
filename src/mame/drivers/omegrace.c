@@ -231,7 +231,7 @@
 
 static MACHINE_RESET( omegrace )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	/* Omega Race expects the vector processor to be ready. */
 	avgdvg_reset_w(space, 0, 0);
 }

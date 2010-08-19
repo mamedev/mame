@@ -65,8 +65,8 @@ struct _mn102_info
 	int cycles;
 
 	legacy_cpu_device *device;
-	const address_space *program;
-	const address_space *io;
+	address_space *program;
+	address_space *io;
 };
 
 static void mn10200_w(mn102_info *mn102, UINT32 adr, UINT32 data, int type);

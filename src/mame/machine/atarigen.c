@@ -802,7 +802,7 @@ static void update_6502_irq(running_machine *machine)
 static TIMER_CALLBACK( delayed_sound_reset )
 {
 	atarigen_state *state = machine->driver_data<atarigen_state>();
-	const address_space *space = cpu_get_address_space(state->sound_cpu, ADDRESS_SPACE_PROGRAM);
+	address_space *space = cpu_get_address_space(state->sound_cpu, ADDRESS_SPACE_PROGRAM);
 
 	/* unhalt and reset the sound CPU */
 	if (param == 0)

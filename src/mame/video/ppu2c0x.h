@@ -108,7 +108,7 @@ DECLARE_LEGACY_MEMORY_DEVICE(PPU_2C07, ppu2c07);		// PAL NES
 void ppu2c0x_init_palette(running_machine *machine, int first_entry ) ATTR_NONNULL(1);
 void ppu2c0x_init_palette_rgb(running_machine *machine, int first_entry ) ATTR_NONNULL(1);
 
-void ppu2c0x_spriteram_dma(const address_space *space, running_device *device, const UINT8 page ) ATTR_NONNULL(1);
+void ppu2c0x_spriteram_dma(address_space *space, running_device *device, const UINT8 page ) ATTR_NONNULL(1);
 void ppu2c0x_render( running_device *device, bitmap_t *bitmap, int flipx, int flipy, int sx, int sy ) ATTR_NONNULL(1);
 int ppu2c0x_get_pixel( running_device *device, int x, int y ) ATTR_NONNULL(1);
 int ppu2c0x_get_colorbase( running_device *device ) ATTR_NONNULL(1);

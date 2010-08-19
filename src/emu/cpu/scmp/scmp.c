@@ -33,8 +33,8 @@ struct _scmp_state
 	UINT8	SR;
 
 	legacy_cpu_device *device;
-	const address_space *program;
-	const address_space *io;
+	address_space *program;
+	address_space *io;
 	int					icount;
 
 	devcb_resolved_write8		flag_out_func;

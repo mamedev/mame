@@ -56,7 +56,7 @@ struct _sc61860_state
     struct { int t2ms, t512ms; int count;} timer;
 
     legacy_cpu_device *device;
-    const address_space *program;
+    address_space *program;
     int icount;
 };
 

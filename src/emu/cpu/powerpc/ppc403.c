@@ -906,7 +906,7 @@ static void ppc403_dma_exec(int ch)
 
 /*********************************************************************************/
 
-static UINT8 ppc403_read8(const address_space *space, UINT32 a)
+static UINT8 ppc403_read8(address_space *space, UINT32 a)
 {
 	if(a >= 0x40000000 && a <= 0x4000000f)		/* Serial Port */
 		return ppc403_spu_r(a);
@@ -916,7 +916,7 @@ static UINT8 ppc403_read8(const address_space *space, UINT32 a)
 #define ppc403_read16	memory_read_word_32be
 #define ppc403_read32	memory_read_dword_32be
 
-static void ppc403_write8(const address_space *space, UINT32 a, UINT8 d)
+static void ppc403_write8(address_space *space, UINT32 a, UINT8 d)
 {
 	if( a >= 0x40000000 && a <= 0x4000000f )		/* Serial Port */
 	{
@@ -929,24 +929,24 @@ static void ppc403_write8(const address_space *space, UINT32 a, UINT8 d)
 #define ppc403_write16	memory_write_word_32be
 #define ppc403_write32	memory_write_dword_32be
 
-static UINT16 ppc403_read16_unaligned(const address_space *space, UINT32 a)
+static UINT16 ppc403_read16_unaligned(address_space *space, UINT32 a)
 {
 	fatalerror("ppc: Unaligned read16 %08X at %08X", a, ppc.pc);
 	return 0;
 }
 
-static UINT32 ppc403_read32_unaligned(const address_space *space, UINT32 a)
+static UINT32 ppc403_read32_unaligned(address_space *space, UINT32 a)
 {
 	fatalerror("ppc: Unaligned read32 %08X at %08X", a, ppc.pc);
 	return 0;
 }
 
-static void ppc403_write16_unaligned(const address_space *space, UINT32 a, UINT16 d)
+static void ppc403_write16_unaligned(address_space *space, UINT32 a, UINT16 d)
 {
 	fatalerror("ppc: Unaligned write16 %08X, %04X at %08X", a, d, ppc.pc);
 }
 
-static void ppc403_write32_unaligned(const address_space *space, UINT32 a, UINT32 d)
+static void ppc403_write32_unaligned(address_space *space, UINT32 a, UINT32 d)
 {
 	fatalerror("ppc: Unaligned write32 %08X, %08X at %08X", a, d, ppc.pc);
 }

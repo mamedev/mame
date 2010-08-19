@@ -1262,8 +1262,8 @@ static int kram3_decrypt(int address, int value)
 
 static DRIVER_INIT( kram3 )
 {
-	const address_space *mainspace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	const address_space *videospace = cputag_get_address_space(machine, "videocpu", ADDRESS_SPACE_PROGRAM);
+	address_space *mainspace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *videospace = cputag_get_address_space(machine, "videocpu", ADDRESS_SPACE_PROGRAM);
 	//const UINT8 *patch;
 	UINT8 *rom, *decrypted;
 	int i;

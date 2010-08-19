@@ -47,7 +47,7 @@ struct _cp1610_state
 	int		intrm_pending;
 	int		mask_interrupts;
 	legacy_cpu_device *device;
-	const address_space *program;
+	address_space *program;
 	int icount;
 };
 

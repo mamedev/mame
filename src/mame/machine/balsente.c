@@ -132,7 +132,7 @@ MACHINE_START( balsente )
 
 MACHINE_RESET( balsente )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	balsente_state *state = machine->driver_data<balsente_state>();
 	int numbanks;
 

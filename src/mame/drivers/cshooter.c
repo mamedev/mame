@@ -661,7 +661,7 @@ static DRIVER_INIT( cshooter )
 
 static DRIVER_INIT( cshootere )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int A;
 	UINT8 *rom = memory_region(machine, "maincpu");
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x8000);

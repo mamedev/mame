@@ -285,9 +285,9 @@ struct _mcs51_state_t
 	legacy_cpu_device *device;
 
 	/* Memory spaces */
-    const address_space *program;
-    const address_space *data;
-    const address_space *io;
+    address_space *program;
+    address_space *data;
+    address_space *io;
 
 	/* Serial Port TX/RX Callbacks */
 	// TODO: Move to special port r/w

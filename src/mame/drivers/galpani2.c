@@ -82,7 +82,7 @@ static MACHINE_RESET( galpani2 )
 
 static void galpani2_write_kaneko(running_device *device)
 {
-	const address_space *dstspace = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
+	address_space *dstspace = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
 	int i,x,tpattidx;
 	unsigned char testpattern[] = {0xFF,0x55,0xAA,0xDD,0xBB,0x99};
 
@@ -112,8 +112,8 @@ static void galpani2_write_kaneko(running_device *device)
 static WRITE8_HANDLER( galpani2_mcu_init_w )
 {
 	running_machine *machine = space->machine;
-	const address_space *srcspace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	const address_space *dstspace = cputag_get_address_space(machine, "sub", ADDRESS_SPACE_PROGRAM);
+	address_space *srcspace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *dstspace = cputag_get_address_space(machine, "sub", ADDRESS_SPACE_PROGRAM);
 	UINT32 mcu_address, mcu_data;
 
 	for ( mcu_address = 0x100010; mcu_address < (0x100010 + 6); mcu_address += 1 )
@@ -126,8 +126,8 @@ static WRITE8_HANDLER( galpani2_mcu_init_w )
 
 static void galpani2_mcu_nmi1(running_machine *machine)
 {
-	const address_space *srcspace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	const address_space *dstspace = cputag_get_address_space(machine, "sub", ADDRESS_SPACE_PROGRAM);
+	address_space *srcspace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *dstspace = cputag_get_address_space(machine, "sub", ADDRESS_SPACE_PROGRAM);
 	UINT32 mcu_list, mcu_command, mcu_address, mcu_extra, mcu_src, mcu_dst, mcu_size;
 
 	for ( mcu_list = 0x100021; mcu_list < (0x100021 + 0x40); mcu_list += 4 )

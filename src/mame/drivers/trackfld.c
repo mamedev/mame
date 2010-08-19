@@ -1369,7 +1369,7 @@ static DRIVER_INIT( trackfld )
 
 static DRIVER_INIT( atlantol )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *rom = memory_region(machine, "maincpu");
 	UINT8 *decrypt;
 	int A;

@@ -137,7 +137,7 @@ struct _m68_state_t
 	PAIR	ea; 		/* effective address */
 
 	/* Memory spaces */
-    const address_space *program;
+    address_space *program;
 
 	UINT8	int_state;	/* SYNC and CWAI flags */
 	UINT8	nmi_state;

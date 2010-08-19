@@ -1014,7 +1014,7 @@ static WRITE64_HANDLER(scsi_w)
 
 static UINT32 scsi_fetch(running_machine *machine, UINT32 dsp)
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT32 result;
 	result = memory_read_dword(space, dsp);
 	return FLIPENDIAN_INT32(result);
@@ -1119,7 +1119,7 @@ static WRITE64_HANDLER( real3d_dma_w )
 
 static void real3d_dma_callback(running_machine *machine, UINT32 src, UINT32 dst, int length, int byteswap)
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	switch(dst >> 24)
 	{
 		case 0x88:		/* Display List End Trigger */

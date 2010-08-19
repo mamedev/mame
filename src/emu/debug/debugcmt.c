@@ -281,7 +281,7 @@ UINT32 debug_comment_all_change_count(running_machine *machine)
 
 UINT32 debug_comment_get_opcode_crc32(device_t *device, offs_t address)
 {
-	const address_space *space = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
+	address_space *space = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
 	int i;
 	UINT32 crc;
 	UINT8 opbuf[64], argbuf[64];

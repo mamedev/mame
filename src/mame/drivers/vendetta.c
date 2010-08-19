@@ -166,7 +166,7 @@ static WRITE8_HANDLER( vendetta_K052109_w )
 static void vendetta_video_banking( running_machine *machine, int select )
 {
 	vendetta_state *state = machine->driver_data<vendetta_state>();
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	if (select & 1)
 	{

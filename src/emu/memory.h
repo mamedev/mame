@@ -101,14 +101,14 @@ typedef void (*address_map_constructor)(address_map &map, const device_config &d
 
 
 // legacy space read/write handlers
-typedef UINT8	(*read8_space_func)  (ATTR_UNUSED const address_space *space, ATTR_UNUSED offs_t offset);
-typedef void	(*write8_space_func) (ATTR_UNUSED const address_space *space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT8 data);
-typedef UINT16	(*read16_space_func) (ATTR_UNUSED const address_space *space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 mem_mask);
-typedef void	(*write16_space_func)(ATTR_UNUSED const address_space *space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 data, ATTR_UNUSED UINT16 mem_mask);
-typedef UINT32	(*read32_space_func) (ATTR_UNUSED const address_space *space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT32 mem_mask);
-typedef void	(*write32_space_func)(ATTR_UNUSED const address_space *space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT32 data, ATTR_UNUSED UINT32 mem_mask);
-typedef UINT64	(*read64_space_func) (ATTR_UNUSED const address_space *space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT64 mem_mask);
-typedef void	(*write64_space_func)(ATTR_UNUSED const address_space *space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT64 data, ATTR_UNUSED UINT64 mem_mask);
+typedef UINT8	(*read8_space_func)  (ATTR_UNUSED address_space *space, ATTR_UNUSED offs_t offset);
+typedef void	(*write8_space_func) (ATTR_UNUSED address_space *space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT8 data);
+typedef UINT16	(*read16_space_func) (ATTR_UNUSED address_space *space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 mem_mask);
+typedef void	(*write16_space_func)(ATTR_UNUSED address_space *space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 data, ATTR_UNUSED UINT16 mem_mask);
+typedef UINT32	(*read32_space_func) (ATTR_UNUSED address_space *space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT32 mem_mask);
+typedef void	(*write32_space_func)(ATTR_UNUSED address_space *space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT32 data, ATTR_UNUSED UINT32 mem_mask);
+typedef UINT64	(*read64_space_func) (ATTR_UNUSED address_space *space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT64 mem_mask);
+typedef void	(*write64_space_func)(ATTR_UNUSED address_space *space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT64 data, ATTR_UNUSED UINT64 mem_mask);
 
 // legacy device read/write handlers
 typedef UINT8	(*read8_device_func)  (ATTR_UNUSED device_t *device, ATTR_UNUSED offs_t offset);
@@ -124,21 +124,21 @@ typedef void	(*write64_device_func)(ATTR_UNUSED device_t *device, ATTR_UNUSED of
 // struct with function pointers for accessors; use is generally discouraged unless necessary
 struct data_accessors
 {
-	UINT8		(*read_byte)(const address_space *space, offs_t byteaddress);
-	UINT16		(*read_word)(const address_space *space, offs_t byteaddress);
-	UINT16		(*read_word_masked)(const address_space *space, offs_t byteaddress, UINT16 mask);
-	UINT32		(*read_dword)(const address_space *space, offs_t byteaddress);
-	UINT32		(*read_dword_masked)(const address_space *space, offs_t byteaddress, UINT32 mask);
-	UINT64		(*read_qword)(const address_space *space, offs_t byteaddress);
-	UINT64		(*read_qword_masked)(const address_space *space, offs_t byteaddress, UINT64 mask);
+	UINT8		(*read_byte)(address_space *space, offs_t byteaddress);
+	UINT16		(*read_word)(address_space *space, offs_t byteaddress);
+	UINT16		(*read_word_masked)(address_space *space, offs_t byteaddress, UINT16 mask);
+	UINT32		(*read_dword)(address_space *space, offs_t byteaddress);
+	UINT32		(*read_dword_masked)(address_space *space, offs_t byteaddress, UINT32 mask);
+	UINT64		(*read_qword)(address_space *space, offs_t byteaddress);
+	UINT64		(*read_qword_masked)(address_space *space, offs_t byteaddress, UINT64 mask);
 
-	void		(*write_byte)(const address_space *space, offs_t byteaddress, UINT8 data);
-	void		(*write_word)(const address_space *space, offs_t byteaddress, UINT16 data);
-	void		(*write_word_masked)(const address_space *space, offs_t byteaddress, UINT16 data, UINT16 mask);
-	void		(*write_dword)(const address_space *space, offs_t byteaddress, UINT32 data);
-	void		(*write_dword_masked)(const address_space *space, offs_t byteaddress, UINT32 data, UINT32 mask);
-	void		(*write_qword)(const address_space *space, offs_t byteaddress, UINT64 data);
-	void		(*write_qword_masked)(const address_space *space, offs_t byteaddress, UINT64 data, UINT64 mask);
+	void		(*write_byte)(address_space *space, offs_t byteaddress, UINT8 data);
+	void		(*write_word)(address_space *space, offs_t byteaddress, UINT16 data);
+	void		(*write_word_masked)(address_space *space, offs_t byteaddress, UINT16 data, UINT16 mask);
+	void		(*write_dword)(address_space *space, offs_t byteaddress, UINT32 data);
+	void		(*write_dword_masked)(address_space *space, offs_t byteaddress, UINT32 data, UINT32 mask);
+	void		(*write_qword)(address_space *space, offs_t byteaddress, UINT64 data);
+	void		(*write_qword_masked)(address_space *space, offs_t byteaddress, UINT64 data, UINT64 mask);
 };
 
 
@@ -511,14 +511,14 @@ protected:
 
 
 // space read/write handler function macros
-#define READ8_HANDLER(name) 			UINT8  name(ATTR_UNUSED const address_space *space, ATTR_UNUSED offs_t offset)
-#define WRITE8_HANDLER(name)			void   name(ATTR_UNUSED const address_space *space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT8 data)
-#define READ16_HANDLER(name)			UINT16 name(ATTR_UNUSED const address_space *space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 mem_mask)
-#define WRITE16_HANDLER(name)			void   name(ATTR_UNUSED const address_space *space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 data, ATTR_UNUSED UINT16 mem_mask)
-#define READ32_HANDLER(name)			UINT32 name(ATTR_UNUSED const address_space *space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT32 mem_mask)
-#define WRITE32_HANDLER(name)			void   name(ATTR_UNUSED const address_space *space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT32 data, ATTR_UNUSED UINT32 mem_mask)
-#define READ64_HANDLER(name)			UINT64 name(ATTR_UNUSED const address_space *space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT64 mem_mask)
-#define WRITE64_HANDLER(name)			void   name(ATTR_UNUSED const address_space *space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT64 data, ATTR_UNUSED UINT64 mem_mask)
+#define READ8_HANDLER(name) 			UINT8  name(ATTR_UNUSED address_space *space, ATTR_UNUSED offs_t offset)
+#define WRITE8_HANDLER(name)			void   name(ATTR_UNUSED address_space *space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT8 data)
+#define READ16_HANDLER(name)			UINT16 name(ATTR_UNUSED address_space *space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 mem_mask)
+#define WRITE16_HANDLER(name)			void   name(ATTR_UNUSED address_space *space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 data, ATTR_UNUSED UINT16 mem_mask)
+#define READ32_HANDLER(name)			UINT32 name(ATTR_UNUSED address_space *space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT32 mem_mask)
+#define WRITE32_HANDLER(name)			void   name(ATTR_UNUSED address_space *space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT32 data, ATTR_UNUSED UINT32 mem_mask)
+#define READ64_HANDLER(name)			UINT64 name(ATTR_UNUSED address_space *space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT64 mem_mask)
+#define WRITE64_HANDLER(name)			void   name(ATTR_UNUSED address_space *space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT64 data, ATTR_UNUSED UINT64 mem_mask)
 
 
 // device read/write handler function macros
@@ -838,37 +838,37 @@ inline UINT64 direct_read_data::read_decrypted_qword(offs_t byteaddress)
 //  LEGACY FUNCTIONS TO REMOVE
 //**************************************************************************
 
-static inline UINT8 memory_read_byte(const address_space *space, offs_t byteaddress)
+static inline UINT8 memory_read_byte(address_space *space, offs_t byteaddress)
 {
 	return const_cast<address_space *>(space)->read_byte(byteaddress);
 }
 
-static inline UINT16 memory_read_word(const address_space *space, offs_t byteaddress)
+static inline UINT16 memory_read_word(address_space *space, offs_t byteaddress)
 {
 	return const_cast<address_space *>(space)->read_word(byteaddress);
 }
 
-static inline UINT16 memory_read_word_masked(const address_space *space, offs_t byteaddress, UINT16 mask)
+static inline UINT16 memory_read_word_masked(address_space *space, offs_t byteaddress, UINT16 mask)
 {
 	return const_cast<address_space *>(space)->read_word(byteaddress, mask);
 }
 
-static inline UINT32 memory_read_dword(const address_space *space, offs_t byteaddress)
+static inline UINT32 memory_read_dword(address_space *space, offs_t byteaddress)
 {
 	return const_cast<address_space *>(space)->read_dword(byteaddress);
 }
 
-static inline UINT32 memory_read_dword_masked(const address_space *space, offs_t byteaddress, UINT32 mask)
+static inline UINT32 memory_read_dword_masked(address_space *space, offs_t byteaddress, UINT32 mask)
 {
 	return const_cast<address_space *>(space)->read_dword(byteaddress, mask);
 }
 
-static inline UINT64 memory_read_qword(const address_space *space, offs_t byteaddress)
+static inline UINT64 memory_read_qword(address_space *space, offs_t byteaddress)
 {
 	return const_cast<address_space *>(space)->read_qword(byteaddress);
 }
 
-static inline UINT64 memory_read_qword_masked(const address_space *space, offs_t byteaddress, UINT64 mask)
+static inline UINT64 memory_read_qword_masked(address_space *space, offs_t byteaddress, UINT64 mask)
 {
 	return const_cast<address_space *>(space)->read_qword(byteaddress, mask);
 }
@@ -879,222 +879,222 @@ static inline UINT64 memory_read_qword_masked(const address_space *space, offs_t
     value to the specified address space
 -------------------------------------------------*/
 
-static inline void memory_write_byte(const address_space *space, offs_t byteaddress, UINT8 data)
+static inline void memory_write_byte(address_space *space, offs_t byteaddress, UINT8 data)
 {
 	const_cast<address_space *>(space)->write_byte(byteaddress, data);
 }
 
-static inline void memory_write_word(const address_space *space, offs_t byteaddress, UINT16 data)
+static inline void memory_write_word(address_space *space, offs_t byteaddress, UINT16 data)
 {
 	const_cast<address_space *>(space)->write_word(byteaddress, data);
 }
 
-static inline void memory_write_word_masked(const address_space *space, offs_t byteaddress, UINT16 data, UINT16 mask)
+static inline void memory_write_word_masked(address_space *space, offs_t byteaddress, UINT16 data, UINT16 mask)
 {
 	const_cast<address_space *>(space)->write_word(byteaddress, data, mask);
 }
 
-static inline void memory_write_dword(const address_space *space, offs_t byteaddress, UINT32 data)
+static inline void memory_write_dword(address_space *space, offs_t byteaddress, UINT32 data)
 {
 	const_cast<address_space *>(space)->write_dword(byteaddress, data);
 }
 
-static inline void memory_write_dword_masked(const address_space *space, offs_t byteaddress, UINT32 data, UINT32 mask)
+static inline void memory_write_dword_masked(address_space *space, offs_t byteaddress, UINT32 data, UINT32 mask)
 {
 	const_cast<address_space *>(space)->write_dword(byteaddress, data, mask);
 }
 
-static inline void memory_write_qword(const address_space *space, offs_t byteaddress, UINT64 data)
+static inline void memory_write_qword(address_space *space, offs_t byteaddress, UINT64 data)
 {
 	const_cast<address_space *>(space)->write_qword(byteaddress, data);
 }
 
-static inline void memory_write_qword_masked(const address_space *space, offs_t byteaddress, UINT64 data, UINT64 mask)
+static inline void memory_write_qword_masked(address_space *space, offs_t byteaddress, UINT64 data, UINT64 mask)
 {
 	const_cast<address_space *>(space)->write_qword(byteaddress, data, mask);
 }
 
 
-static inline void *memory_raw_read_ptr(const address_space *space, offs_t byteaddress) { return space->direct().read_raw_ptr(byteaddress); }
-static inline UINT8 memory_raw_read_byte(const address_space *space, offs_t byteaddress) { return space->direct().read_raw_byte(byteaddress); }
-static inline UINT16 memory_raw_read_word(const address_space *space, offs_t byteaddress) { return space->direct().read_raw_word(byteaddress); }
-static inline UINT32 memory_raw_read_dword(const address_space *space, offs_t byteaddress) { return space->direct().read_raw_dword(byteaddress); }
-static inline UINT64 memory_raw_read_qword(const address_space *space, offs_t byteaddress) { return space->direct().read_raw_qword(byteaddress); }
+static inline void *memory_raw_read_ptr(address_space *space, offs_t byteaddress) { return space->direct().read_raw_ptr(byteaddress); }
+static inline UINT8 memory_raw_read_byte(address_space *space, offs_t byteaddress) { return space->direct().read_raw_byte(byteaddress); }
+static inline UINT16 memory_raw_read_word(address_space *space, offs_t byteaddress) { return space->direct().read_raw_word(byteaddress); }
+static inline UINT32 memory_raw_read_dword(address_space *space, offs_t byteaddress) { return space->direct().read_raw_dword(byteaddress); }
+static inline UINT64 memory_raw_read_qword(address_space *space, offs_t byteaddress) { return space->direct().read_raw_qword(byteaddress); }
 
-static inline void *memory_decrypted_read_ptr(const address_space *space, offs_t byteaddress) { return space->direct().read_decrypted_ptr(byteaddress); }
-static inline UINT8 memory_decrypted_read_byte(const address_space *space, offs_t byteaddress) { return space->direct().read_decrypted_byte(byteaddress); }
-static inline UINT16 memory_decrypted_read_word(const address_space *space, offs_t byteaddress) { return space->direct().read_decrypted_word(byteaddress); }
-static inline UINT32 memory_decrypted_read_dword(const address_space *space, offs_t byteaddress) { return space->direct().read_decrypted_dword(byteaddress); }
-static inline UINT64 memory_decrypted_read_qword(const address_space *space, offs_t byteaddress) { return space->direct().read_decrypted_qword(byteaddress); }
-
-
+static inline void *memory_decrypted_read_ptr(address_space *space, offs_t byteaddress) { return space->direct().read_decrypted_ptr(byteaddress); }
+static inline UINT8 memory_decrypted_read_byte(address_space *space, offs_t byteaddress) { return space->direct().read_decrypted_byte(byteaddress); }
+static inline UINT16 memory_decrypted_read_word(address_space *space, offs_t byteaddress) { return space->direct().read_decrypted_word(byteaddress); }
+static inline UINT32 memory_decrypted_read_dword(address_space *space, offs_t byteaddress) { return space->direct().read_decrypted_dword(byteaddress); }
+static inline UINT64 memory_decrypted_read_qword(address_space *space, offs_t byteaddress) { return space->direct().read_decrypted_qword(byteaddress); }
 
 
-static inline void memory_set_decrypted_region(const address_space *space, offs_t addrstart, offs_t addrend, void *base)
+
+
+static inline void memory_set_decrypted_region(address_space *space, offs_t addrstart, offs_t addrend, void *base)
 {
 	const_cast<address_space *>(space)->set_decrypted_region(addrstart, addrend, base);
 }
 
-static inline void *memory_get_read_ptr(const address_space *space, offs_t byteaddress)
+static inline void *memory_get_read_ptr(address_space *space, offs_t byteaddress)
 {
 	return const_cast<address_space *>(space)->get_read_ptr(byteaddress);
 }
 
-static inline void *memory_get_write_ptr(const address_space *space, offs_t byteaddress)
+static inline void *memory_get_write_ptr(address_space *space, offs_t byteaddress)
 {
 	return const_cast<address_space *>(space)->get_write_ptr(byteaddress);
 }
 
-static inline const char *memory_get_handler_string(const address_space *space, read_or_write readorwrite, offs_t byteaddress)
+static inline const char *memory_get_handler_string(address_space *space, read_or_write readorwrite, offs_t byteaddress)
 {
 	return const_cast<address_space *>(space)->get_handler_string(readorwrite, byteaddress);
 }
 
-static inline void memory_enable_read_watchpoints(const address_space *space, bool enable)
+static inline void memory_enable_read_watchpoints(address_space *space, bool enable)
 {
 	const_cast<address_space *>(space)->enable_read_watchpoints(enable);
 }
 
-static inline void memory_enable_write_watchpoints(const address_space *space, bool enable)
+static inline void memory_enable_write_watchpoints(address_space *space, bool enable)
 {
 	const_cast<address_space *>(space)->enable_write_watchpoints(enable);
 }
 
-static inline void memory_set_debugger_access(const address_space *space, bool debugger)
+static inline void memory_set_debugger_access(address_space *space, bool debugger)
 {
 	const_cast<address_space *>(space)->set_debugger_access(debugger);
 }
 
-static inline void memory_set_log_unmap(const address_space *space, bool log)
+static inline void memory_set_log_unmap(address_space *space, bool log)
 {
 	const_cast<address_space *>(space)->set_log_unmap(log);
 }
 
-static inline bool memory_get_log_unmap(const address_space *space)
+static inline bool memory_get_log_unmap(address_space *space)
 {
 	return space->log_unmap();
 }
 
 
 // declare generic address space handlers
-static inline UINT8 memory_read_byte_8le(const address_space *space, offs_t address) { return (const_cast<address_space *>(space))->read_byte(address); }
-static inline UINT16 memory_read_word_8le(const address_space *space, offs_t address) { return (const_cast<address_space *>(space))->read_word(address); }
-static inline UINT16 memory_read_word_masked_8le(const address_space *space, offs_t address, UINT16 mask) { return (const_cast<address_space *>(space))->read_word(address, mask); }
-static inline UINT32 memory_read_dword_8le(const address_space *space, offs_t address) { return (const_cast<address_space *>(space))->read_dword(address); }
-static inline UINT32 memory_read_dword_masked_8le(const address_space *space, offs_t address, UINT32 mask) { return (const_cast<address_space *>(space))->read_dword(address, mask); }
-static inline UINT64 memory_read_qword_8le(const address_space *space, offs_t address) { return (const_cast<address_space *>(space))->read_qword(address); }
-static inline UINT64 memory_read_qword_masked_8le(const address_space *space, offs_t address, UINT64 mask) { return (const_cast<address_space *>(space))->read_qword(address, mask); }
-static inline void memory_write_byte_8le(const address_space *space, offs_t address, UINT8 data) { return (const_cast<address_space *>(space))->write_byte(address, data); }
-static inline void memory_write_word_8le(const address_space *space, offs_t address, UINT16 data) { return (const_cast<address_space *>(space))->write_word(address, data); }
-static inline void memory_write_word_masked_8le(const address_space *space, offs_t address, UINT16 data, UINT16 mask) { return (const_cast<address_space *>(space))->write_word(address, data, mask); }
-static inline void memory_write_dword_8le(const address_space *space, offs_t address, UINT32 data) { return (const_cast<address_space *>(space))->write_dword(address, data); }
-static inline void memory_write_dword_masked_8le(const address_space *space, offs_t address, UINT32 data, UINT32 mask) { return (const_cast<address_space *>(space))->write_dword(address, data, mask); }
-static inline void memory_write_qword_8le(const address_space *space, offs_t address, UINT64 data) { return (const_cast<address_space *>(space))->write_qword(address, data); }
-static inline void memory_write_qword_masked_8le(const address_space *space, offs_t address, UINT64 data, UINT64 mask) { return (const_cast<address_space *>(space))->write_qword(address, data, mask); }
+static inline UINT8 memory_read_byte_8le(address_space *space, offs_t address) { return (const_cast<address_space *>(space))->read_byte(address); }
+static inline UINT16 memory_read_word_8le(address_space *space, offs_t address) { return (const_cast<address_space *>(space))->read_word(address); }
+static inline UINT16 memory_read_word_masked_8le(address_space *space, offs_t address, UINT16 mask) { return (const_cast<address_space *>(space))->read_word(address, mask); }
+static inline UINT32 memory_read_dword_8le(address_space *space, offs_t address) { return (const_cast<address_space *>(space))->read_dword(address); }
+static inline UINT32 memory_read_dword_masked_8le(address_space *space, offs_t address, UINT32 mask) { return (const_cast<address_space *>(space))->read_dword(address, mask); }
+static inline UINT64 memory_read_qword_8le(address_space *space, offs_t address) { return (const_cast<address_space *>(space))->read_qword(address); }
+static inline UINT64 memory_read_qword_masked_8le(address_space *space, offs_t address, UINT64 mask) { return (const_cast<address_space *>(space))->read_qword(address, mask); }
+static inline void memory_write_byte_8le(address_space *space, offs_t address, UINT8 data) { return (const_cast<address_space *>(space))->write_byte(address, data); }
+static inline void memory_write_word_8le(address_space *space, offs_t address, UINT16 data) { return (const_cast<address_space *>(space))->write_word(address, data); }
+static inline void memory_write_word_masked_8le(address_space *space, offs_t address, UINT16 data, UINT16 mask) { return (const_cast<address_space *>(space))->write_word(address, data, mask); }
+static inline void memory_write_dword_8le(address_space *space, offs_t address, UINT32 data) { return (const_cast<address_space *>(space))->write_dword(address, data); }
+static inline void memory_write_dword_masked_8le(address_space *space, offs_t address, UINT32 data, UINT32 mask) { return (const_cast<address_space *>(space))->write_dword(address, data, mask); }
+static inline void memory_write_qword_8le(address_space *space, offs_t address, UINT64 data) { return (const_cast<address_space *>(space))->write_qword(address, data); }
+static inline void memory_write_qword_masked_8le(address_space *space, offs_t address, UINT64 data, UINT64 mask) { return (const_cast<address_space *>(space))->write_qword(address, data, mask); }
 
-static inline UINT8 memory_read_byte_8be(const address_space *space, offs_t address) { return (const_cast<address_space *>(space))->read_byte(address); }
-static inline UINT16 memory_read_word_8be(const address_space *space, offs_t address) { return (const_cast<address_space *>(space))->read_word(address); }
-static inline UINT16 memory_read_word_masked_8be(const address_space *space, offs_t address, UINT16 mask) { return (const_cast<address_space *>(space))->read_word(address, mask); }
-static inline UINT32 memory_read_dword_8be(const address_space *space, offs_t address) { return (const_cast<address_space *>(space))->read_dword(address); }
-static inline UINT32 memory_read_dword_masked_8be(const address_space *space, offs_t address, UINT32 mask) { return (const_cast<address_space *>(space))->read_dword(address, mask); }
-static inline UINT64 memory_read_qword_8be(const address_space *space, offs_t address) { return (const_cast<address_space *>(space))->read_qword(address); }
-static inline UINT64 memory_read_qword_masked_8be(const address_space *space, offs_t address, UINT64 mask) { return (const_cast<address_space *>(space))->read_qword(address, mask); }
-static inline void memory_write_byte_8be(const address_space *space, offs_t address, UINT8 data) { return (const_cast<address_space *>(space))->write_byte(address, data); }
-static inline void memory_write_word_8be(const address_space *space, offs_t address, UINT16 data) { return (const_cast<address_space *>(space))->write_word(address, data); }
-static inline void memory_write_word_masked_8be(const address_space *space, offs_t address, UINT16 data, UINT16 mask) { return (const_cast<address_space *>(space))->write_word(address, data, mask); }
-static inline void memory_write_dword_8be(const address_space *space, offs_t address, UINT32 data) { return (const_cast<address_space *>(space))->write_dword(address, data); }
-static inline void memory_write_dword_masked_8be(const address_space *space, offs_t address, UINT32 data, UINT32 mask) { return (const_cast<address_space *>(space))->write_dword(address, data, mask); }
-static inline void memory_write_qword_8be(const address_space *space, offs_t address, UINT64 data) { return (const_cast<address_space *>(space))->write_qword(address, data); }
-static inline void memory_write_qword_masked_8be(const address_space *space, offs_t address, UINT64 data, UINT64 mask) { return (const_cast<address_space *>(space))->write_qword(address, data, mask); }
+static inline UINT8 memory_read_byte_8be(address_space *space, offs_t address) { return (const_cast<address_space *>(space))->read_byte(address); }
+static inline UINT16 memory_read_word_8be(address_space *space, offs_t address) { return (const_cast<address_space *>(space))->read_word(address); }
+static inline UINT16 memory_read_word_masked_8be(address_space *space, offs_t address, UINT16 mask) { return (const_cast<address_space *>(space))->read_word(address, mask); }
+static inline UINT32 memory_read_dword_8be(address_space *space, offs_t address) { return (const_cast<address_space *>(space))->read_dword(address); }
+static inline UINT32 memory_read_dword_masked_8be(address_space *space, offs_t address, UINT32 mask) { return (const_cast<address_space *>(space))->read_dword(address, mask); }
+static inline UINT64 memory_read_qword_8be(address_space *space, offs_t address) { return (const_cast<address_space *>(space))->read_qword(address); }
+static inline UINT64 memory_read_qword_masked_8be(address_space *space, offs_t address, UINT64 mask) { return (const_cast<address_space *>(space))->read_qword(address, mask); }
+static inline void memory_write_byte_8be(address_space *space, offs_t address, UINT8 data) { return (const_cast<address_space *>(space))->write_byte(address, data); }
+static inline void memory_write_word_8be(address_space *space, offs_t address, UINT16 data) { return (const_cast<address_space *>(space))->write_word(address, data); }
+static inline void memory_write_word_masked_8be(address_space *space, offs_t address, UINT16 data, UINT16 mask) { return (const_cast<address_space *>(space))->write_word(address, data, mask); }
+static inline void memory_write_dword_8be(address_space *space, offs_t address, UINT32 data) { return (const_cast<address_space *>(space))->write_dword(address, data); }
+static inline void memory_write_dword_masked_8be(address_space *space, offs_t address, UINT32 data, UINT32 mask) { return (const_cast<address_space *>(space))->write_dword(address, data, mask); }
+static inline void memory_write_qword_8be(address_space *space, offs_t address, UINT64 data) { return (const_cast<address_space *>(space))->write_qword(address, data); }
+static inline void memory_write_qword_masked_8be(address_space *space, offs_t address, UINT64 data, UINT64 mask) { return (const_cast<address_space *>(space))->write_qword(address, data, mask); }
 
-static inline UINT8 memory_read_byte_16le(const address_space *space, offs_t address) { return (const_cast<address_space *>(space))->read_byte(address); }
-static inline UINT16 memory_read_word_16le(const address_space *space, offs_t address) { return (const_cast<address_space *>(space))->read_word(address); }
-static inline UINT16 memory_read_word_masked_16le(const address_space *space, offs_t address, UINT16 mask) { return (const_cast<address_space *>(space))->read_word(address, mask); }
-static inline UINT32 memory_read_dword_16le(const address_space *space, offs_t address) { return (const_cast<address_space *>(space))->read_dword(address); }
-static inline UINT32 memory_read_dword_masked_16le(const address_space *space, offs_t address, UINT32 mask) { return (const_cast<address_space *>(space))->read_dword(address, mask); }
-static inline UINT64 memory_read_qword_16le(const address_space *space, offs_t address) { return (const_cast<address_space *>(space))->read_qword(address); }
-static inline UINT64 memory_read_qword_masked_16le(const address_space *space, offs_t address, UINT64 mask) { return (const_cast<address_space *>(space))->read_qword(address, mask); }
-static inline void memory_write_byte_16le(const address_space *space, offs_t address, UINT8 data) { return (const_cast<address_space *>(space))->write_byte(address, data); }
-static inline void memory_write_word_16le(const address_space *space, offs_t address, UINT16 data) { return (const_cast<address_space *>(space))->write_word(address, data); }
-static inline void memory_write_word_masked_16le(const address_space *space, offs_t address, UINT16 data, UINT16 mask) { return (const_cast<address_space *>(space))->write_word(address, data, mask); }
-static inline void memory_write_dword_16le(const address_space *space, offs_t address, UINT32 data) { return (const_cast<address_space *>(space))->write_dword(address, data); }
-static inline void memory_write_dword_masked_16le(const address_space *space, offs_t address, UINT32 data, UINT32 mask) { return (const_cast<address_space *>(space))->write_dword(address, data, mask); }
-static inline void memory_write_qword_16le(const address_space *space, offs_t address, UINT64 data) { return (const_cast<address_space *>(space))->write_qword(address, data); }
-static inline void memory_write_qword_masked_16le(const address_space *space, offs_t address, UINT64 data, UINT64 mask) { return (const_cast<address_space *>(space))->write_qword(address, data, mask); }
+static inline UINT8 memory_read_byte_16le(address_space *space, offs_t address) { return (const_cast<address_space *>(space))->read_byte(address); }
+static inline UINT16 memory_read_word_16le(address_space *space, offs_t address) { return (const_cast<address_space *>(space))->read_word(address); }
+static inline UINT16 memory_read_word_masked_16le(address_space *space, offs_t address, UINT16 mask) { return (const_cast<address_space *>(space))->read_word(address, mask); }
+static inline UINT32 memory_read_dword_16le(address_space *space, offs_t address) { return (const_cast<address_space *>(space))->read_dword(address); }
+static inline UINT32 memory_read_dword_masked_16le(address_space *space, offs_t address, UINT32 mask) { return (const_cast<address_space *>(space))->read_dword(address, mask); }
+static inline UINT64 memory_read_qword_16le(address_space *space, offs_t address) { return (const_cast<address_space *>(space))->read_qword(address); }
+static inline UINT64 memory_read_qword_masked_16le(address_space *space, offs_t address, UINT64 mask) { return (const_cast<address_space *>(space))->read_qword(address, mask); }
+static inline void memory_write_byte_16le(address_space *space, offs_t address, UINT8 data) { return (const_cast<address_space *>(space))->write_byte(address, data); }
+static inline void memory_write_word_16le(address_space *space, offs_t address, UINT16 data) { return (const_cast<address_space *>(space))->write_word(address, data); }
+static inline void memory_write_word_masked_16le(address_space *space, offs_t address, UINT16 data, UINT16 mask) { return (const_cast<address_space *>(space))->write_word(address, data, mask); }
+static inline void memory_write_dword_16le(address_space *space, offs_t address, UINT32 data) { return (const_cast<address_space *>(space))->write_dword(address, data); }
+static inline void memory_write_dword_masked_16le(address_space *space, offs_t address, UINT32 data, UINT32 mask) { return (const_cast<address_space *>(space))->write_dword(address, data, mask); }
+static inline void memory_write_qword_16le(address_space *space, offs_t address, UINT64 data) { return (const_cast<address_space *>(space))->write_qword(address, data); }
+static inline void memory_write_qword_masked_16le(address_space *space, offs_t address, UINT64 data, UINT64 mask) { return (const_cast<address_space *>(space))->write_qword(address, data, mask); }
 
-static inline UINT8 memory_read_byte_16be(const address_space *space, offs_t address) { return (const_cast<address_space *>(space))->read_byte(address); }
-static inline UINT16 memory_read_word_16be(const address_space *space, offs_t address) { return (const_cast<address_space *>(space))->read_word(address); }
-static inline UINT16 memory_read_word_masked_16be(const address_space *space, offs_t address, UINT16 mask) { return (const_cast<address_space *>(space))->read_word(address, mask); }
-static inline UINT32 memory_read_dword_16be(const address_space *space, offs_t address) { return (const_cast<address_space *>(space))->read_dword(address); }
-static inline UINT32 memory_read_dword_masked_16be(const address_space *space, offs_t address, UINT32 mask) { return (const_cast<address_space *>(space))->read_dword(address, mask); }
-static inline UINT64 memory_read_qword_16be(const address_space *space, offs_t address) { return (const_cast<address_space *>(space))->read_qword(address); }
-static inline UINT64 memory_read_qword_masked_16be(const address_space *space, offs_t address, UINT64 mask) { return (const_cast<address_space *>(space))->read_qword(address, mask); }
-static inline void memory_write_byte_16be(const address_space *space, offs_t address, UINT8 data) { return (const_cast<address_space *>(space))->write_byte(address, data); }
-static inline void memory_write_word_16be(const address_space *space, offs_t address, UINT16 data) { return (const_cast<address_space *>(space))->write_word(address, data); }
-static inline void memory_write_word_masked_16be(const address_space *space, offs_t address, UINT16 data, UINT16 mask) { return (const_cast<address_space *>(space))->write_word(address, data, mask); }
-static inline void memory_write_dword_16be(const address_space *space, offs_t address, UINT32 data) { return (const_cast<address_space *>(space))->write_dword(address, data); }
-static inline void memory_write_dword_masked_16be(const address_space *space, offs_t address, UINT32 data, UINT32 mask) { return (const_cast<address_space *>(space))->write_dword(address, data, mask); }
-static inline void memory_write_qword_16be(const address_space *space, offs_t address, UINT64 data) { return (const_cast<address_space *>(space))->write_qword(address, data); }
-static inline void memory_write_qword_masked_16be(const address_space *space, offs_t address, UINT64 data, UINT64 mask) { return (const_cast<address_space *>(space))->write_qword(address, data, mask); }
+static inline UINT8 memory_read_byte_16be(address_space *space, offs_t address) { return (const_cast<address_space *>(space))->read_byte(address); }
+static inline UINT16 memory_read_word_16be(address_space *space, offs_t address) { return (const_cast<address_space *>(space))->read_word(address); }
+static inline UINT16 memory_read_word_masked_16be(address_space *space, offs_t address, UINT16 mask) { return (const_cast<address_space *>(space))->read_word(address, mask); }
+static inline UINT32 memory_read_dword_16be(address_space *space, offs_t address) { return (const_cast<address_space *>(space))->read_dword(address); }
+static inline UINT32 memory_read_dword_masked_16be(address_space *space, offs_t address, UINT32 mask) { return (const_cast<address_space *>(space))->read_dword(address, mask); }
+static inline UINT64 memory_read_qword_16be(address_space *space, offs_t address) { return (const_cast<address_space *>(space))->read_qword(address); }
+static inline UINT64 memory_read_qword_masked_16be(address_space *space, offs_t address, UINT64 mask) { return (const_cast<address_space *>(space))->read_qword(address, mask); }
+static inline void memory_write_byte_16be(address_space *space, offs_t address, UINT8 data) { return (const_cast<address_space *>(space))->write_byte(address, data); }
+static inline void memory_write_word_16be(address_space *space, offs_t address, UINT16 data) { return (const_cast<address_space *>(space))->write_word(address, data); }
+static inline void memory_write_word_masked_16be(address_space *space, offs_t address, UINT16 data, UINT16 mask) { return (const_cast<address_space *>(space))->write_word(address, data, mask); }
+static inline void memory_write_dword_16be(address_space *space, offs_t address, UINT32 data) { return (const_cast<address_space *>(space))->write_dword(address, data); }
+static inline void memory_write_dword_masked_16be(address_space *space, offs_t address, UINT32 data, UINT32 mask) { return (const_cast<address_space *>(space))->write_dword(address, data, mask); }
+static inline void memory_write_qword_16be(address_space *space, offs_t address, UINT64 data) { return (const_cast<address_space *>(space))->write_qword(address, data); }
+static inline void memory_write_qword_masked_16be(address_space *space, offs_t address, UINT64 data, UINT64 mask) { return (const_cast<address_space *>(space))->write_qword(address, data, mask); }
 
-static inline UINT8 memory_read_byte_32le(const address_space *space, offs_t address) { return (const_cast<address_space *>(space))->read_byte(address); }
-static inline UINT16 memory_read_word_32le(const address_space *space, offs_t address) { return (const_cast<address_space *>(space))->read_word(address); }
-static inline UINT16 memory_read_word_masked_32le(const address_space *space, offs_t address, UINT16 mask) { return (const_cast<address_space *>(space))->read_word(address, mask); }
-static inline UINT32 memory_read_dword_32le(const address_space *space, offs_t address) { return (const_cast<address_space *>(space))->read_dword(address); }
-static inline UINT32 memory_read_dword_masked_32le(const address_space *space, offs_t address, UINT32 mask) { return (const_cast<address_space *>(space))->read_dword(address, mask); }
-static inline UINT64 memory_read_qword_32le(const address_space *space, offs_t address) { return (const_cast<address_space *>(space))->read_qword(address); }
-static inline UINT64 memory_read_qword_masked_32le(const address_space *space, offs_t address, UINT64 mask) { return (const_cast<address_space *>(space))->read_qword(address, mask); }
-static inline void memory_write_byte_32le(const address_space *space, offs_t address, UINT8 data) { return (const_cast<address_space *>(space))->write_byte(address, data); }
-static inline void memory_write_word_32le(const address_space *space, offs_t address, UINT16 data) { return (const_cast<address_space *>(space))->write_word(address, data); }
-static inline void memory_write_word_masked_32le(const address_space *space, offs_t address, UINT16 data, UINT16 mask) { return (const_cast<address_space *>(space))->write_word(address, data, mask); }
-static inline void memory_write_dword_32le(const address_space *space, offs_t address, UINT32 data) { return (const_cast<address_space *>(space))->write_dword(address, data); }
-static inline void memory_write_dword_masked_32le(const address_space *space, offs_t address, UINT32 data, UINT32 mask) { return (const_cast<address_space *>(space))->write_dword(address, data, mask); }
-static inline void memory_write_qword_32le(const address_space *space, offs_t address, UINT64 data) { return (const_cast<address_space *>(space))->write_qword(address, data); }
-static inline void memory_write_qword_masked_32le(const address_space *space, offs_t address, UINT64 data, UINT64 mask) { return (const_cast<address_space *>(space))->write_qword(address, data, mask); }
+static inline UINT8 memory_read_byte_32le(address_space *space, offs_t address) { return (const_cast<address_space *>(space))->read_byte(address); }
+static inline UINT16 memory_read_word_32le(address_space *space, offs_t address) { return (const_cast<address_space *>(space))->read_word(address); }
+static inline UINT16 memory_read_word_masked_32le(address_space *space, offs_t address, UINT16 mask) { return (const_cast<address_space *>(space))->read_word(address, mask); }
+static inline UINT32 memory_read_dword_32le(address_space *space, offs_t address) { return (const_cast<address_space *>(space))->read_dword(address); }
+static inline UINT32 memory_read_dword_masked_32le(address_space *space, offs_t address, UINT32 mask) { return (const_cast<address_space *>(space))->read_dword(address, mask); }
+static inline UINT64 memory_read_qword_32le(address_space *space, offs_t address) { return (const_cast<address_space *>(space))->read_qword(address); }
+static inline UINT64 memory_read_qword_masked_32le(address_space *space, offs_t address, UINT64 mask) { return (const_cast<address_space *>(space))->read_qword(address, mask); }
+static inline void memory_write_byte_32le(address_space *space, offs_t address, UINT8 data) { return (const_cast<address_space *>(space))->write_byte(address, data); }
+static inline void memory_write_word_32le(address_space *space, offs_t address, UINT16 data) { return (const_cast<address_space *>(space))->write_word(address, data); }
+static inline void memory_write_word_masked_32le(address_space *space, offs_t address, UINT16 data, UINT16 mask) { return (const_cast<address_space *>(space))->write_word(address, data, mask); }
+static inline void memory_write_dword_32le(address_space *space, offs_t address, UINT32 data) { return (const_cast<address_space *>(space))->write_dword(address, data); }
+static inline void memory_write_dword_masked_32le(address_space *space, offs_t address, UINT32 data, UINT32 mask) { return (const_cast<address_space *>(space))->write_dword(address, data, mask); }
+static inline void memory_write_qword_32le(address_space *space, offs_t address, UINT64 data) { return (const_cast<address_space *>(space))->write_qword(address, data); }
+static inline void memory_write_qword_masked_32le(address_space *space, offs_t address, UINT64 data, UINT64 mask) { return (const_cast<address_space *>(space))->write_qword(address, data, mask); }
 
-static inline UINT8 memory_read_byte_32be(const address_space *space, offs_t address) { return (const_cast<address_space *>(space))->read_byte(address); }
-static inline UINT16 memory_read_word_32be(const address_space *space, offs_t address) { return (const_cast<address_space *>(space))->read_word(address); }
-static inline UINT16 memory_read_word_masked_32be(const address_space *space, offs_t address, UINT16 mask) { return (const_cast<address_space *>(space))->read_word(address, mask); }
-static inline UINT32 memory_read_dword_32be(const address_space *space, offs_t address) { return (const_cast<address_space *>(space))->read_dword(address); }
-static inline UINT32 memory_read_dword_masked_32be(const address_space *space, offs_t address, UINT32 mask) { return (const_cast<address_space *>(space))->read_dword(address, mask); }
-static inline UINT64 memory_read_qword_32be(const address_space *space, offs_t address) { return (const_cast<address_space *>(space))->read_qword(address); }
-static inline UINT64 memory_read_qword_masked_32be(const address_space *space, offs_t address, UINT64 mask) { return (const_cast<address_space *>(space))->read_qword(address, mask); }
-static inline void memory_write_byte_32be(const address_space *space, offs_t address, UINT8 data) { return (const_cast<address_space *>(space))->write_byte(address, data); }
-static inline void memory_write_word_32be(const address_space *space, offs_t address, UINT16 data) { return (const_cast<address_space *>(space))->write_word(address, data); }
-static inline void memory_write_word_masked_32be(const address_space *space, offs_t address, UINT16 data, UINT16 mask) { return (const_cast<address_space *>(space))->write_word(address, data, mask); }
-static inline void memory_write_dword_32be(const address_space *space, offs_t address, UINT32 data) { return (const_cast<address_space *>(space))->write_dword(address, data); }
-static inline void memory_write_dword_masked_32be(const address_space *space, offs_t address, UINT32 data, UINT32 mask) { return (const_cast<address_space *>(space))->write_dword(address, data, mask); }
-static inline void memory_write_qword_32be(const address_space *space, offs_t address, UINT64 data) { return (const_cast<address_space *>(space))->write_qword(address, data); }
-static inline void memory_write_qword_masked_32be(const address_space *space, offs_t address, UINT64 data, UINT64 mask) { return (const_cast<address_space *>(space))->write_qword(address, data, mask); }
+static inline UINT8 memory_read_byte_32be(address_space *space, offs_t address) { return (const_cast<address_space *>(space))->read_byte(address); }
+static inline UINT16 memory_read_word_32be(address_space *space, offs_t address) { return (const_cast<address_space *>(space))->read_word(address); }
+static inline UINT16 memory_read_word_masked_32be(address_space *space, offs_t address, UINT16 mask) { return (const_cast<address_space *>(space))->read_word(address, mask); }
+static inline UINT32 memory_read_dword_32be(address_space *space, offs_t address) { return (const_cast<address_space *>(space))->read_dword(address); }
+static inline UINT32 memory_read_dword_masked_32be(address_space *space, offs_t address, UINT32 mask) { return (const_cast<address_space *>(space))->read_dword(address, mask); }
+static inline UINT64 memory_read_qword_32be(address_space *space, offs_t address) { return (const_cast<address_space *>(space))->read_qword(address); }
+static inline UINT64 memory_read_qword_masked_32be(address_space *space, offs_t address, UINT64 mask) { return (const_cast<address_space *>(space))->read_qword(address, mask); }
+static inline void memory_write_byte_32be(address_space *space, offs_t address, UINT8 data) { return (const_cast<address_space *>(space))->write_byte(address, data); }
+static inline void memory_write_word_32be(address_space *space, offs_t address, UINT16 data) { return (const_cast<address_space *>(space))->write_word(address, data); }
+static inline void memory_write_word_masked_32be(address_space *space, offs_t address, UINT16 data, UINT16 mask) { return (const_cast<address_space *>(space))->write_word(address, data, mask); }
+static inline void memory_write_dword_32be(address_space *space, offs_t address, UINT32 data) { return (const_cast<address_space *>(space))->write_dword(address, data); }
+static inline void memory_write_dword_masked_32be(address_space *space, offs_t address, UINT32 data, UINT32 mask) { return (const_cast<address_space *>(space))->write_dword(address, data, mask); }
+static inline void memory_write_qword_32be(address_space *space, offs_t address, UINT64 data) { return (const_cast<address_space *>(space))->write_qword(address, data); }
+static inline void memory_write_qword_masked_32be(address_space *space, offs_t address, UINT64 data, UINT64 mask) { return (const_cast<address_space *>(space))->write_qword(address, data, mask); }
 
-static inline UINT8 memory_read_byte_64le(const address_space *space, offs_t address) { return (const_cast<address_space *>(space))->read_byte(address); }
-static inline UINT16 memory_read_word_64le(const address_space *space, offs_t address) { return (const_cast<address_space *>(space))->read_word(address); }
-static inline UINT16 memory_read_word_masked_64le(const address_space *space, offs_t address, UINT16 mask) { return (const_cast<address_space *>(space))->read_word(address, mask); }
-static inline UINT32 memory_read_dword_64le(const address_space *space, offs_t address) { return (const_cast<address_space *>(space))->read_dword(address); }
-static inline UINT32 memory_read_dword_masked_64le(const address_space *space, offs_t address, UINT32 mask) { return (const_cast<address_space *>(space))->read_dword(address, mask); }
-static inline UINT64 memory_read_qword_64le(const address_space *space, offs_t address) { return (const_cast<address_space *>(space))->read_qword(address); }
-static inline UINT64 memory_read_qword_masked_64le(const address_space *space, offs_t address, UINT64 mask) { return (const_cast<address_space *>(space))->read_qword(address, mask); }
-static inline void memory_write_byte_64le(const address_space *space, offs_t address, UINT8 data) { return (const_cast<address_space *>(space))->write_byte(address, data); }
-static inline void memory_write_word_64le(const address_space *space, offs_t address, UINT16 data) { return (const_cast<address_space *>(space))->write_word(address, data); }
-static inline void memory_write_word_masked_64le(const address_space *space, offs_t address, UINT16 data, UINT16 mask) { return (const_cast<address_space *>(space))->write_word(address, data, mask); }
-static inline void memory_write_dword_64le(const address_space *space, offs_t address, UINT32 data) { return (const_cast<address_space *>(space))->write_dword(address, data); }
-static inline void memory_write_dword_masked_64le(const address_space *space, offs_t address, UINT32 data, UINT32 mask) { return (const_cast<address_space *>(space))->write_dword(address, data, mask); }
-static inline void memory_write_qword_64le(const address_space *space, offs_t address, UINT64 data) { return (const_cast<address_space *>(space))->write_qword(address, data); }
-static inline void memory_write_qword_masked_64le(const address_space *space, offs_t address, UINT64 data, UINT64 mask) { return (const_cast<address_space *>(space))->write_qword(address, data, mask); }
+static inline UINT8 memory_read_byte_64le(address_space *space, offs_t address) { return (const_cast<address_space *>(space))->read_byte(address); }
+static inline UINT16 memory_read_word_64le(address_space *space, offs_t address) { return (const_cast<address_space *>(space))->read_word(address); }
+static inline UINT16 memory_read_word_masked_64le(address_space *space, offs_t address, UINT16 mask) { return (const_cast<address_space *>(space))->read_word(address, mask); }
+static inline UINT32 memory_read_dword_64le(address_space *space, offs_t address) { return (const_cast<address_space *>(space))->read_dword(address); }
+static inline UINT32 memory_read_dword_masked_64le(address_space *space, offs_t address, UINT32 mask) { return (const_cast<address_space *>(space))->read_dword(address, mask); }
+static inline UINT64 memory_read_qword_64le(address_space *space, offs_t address) { return (const_cast<address_space *>(space))->read_qword(address); }
+static inline UINT64 memory_read_qword_masked_64le(address_space *space, offs_t address, UINT64 mask) { return (const_cast<address_space *>(space))->read_qword(address, mask); }
+static inline void memory_write_byte_64le(address_space *space, offs_t address, UINT8 data) { return (const_cast<address_space *>(space))->write_byte(address, data); }
+static inline void memory_write_word_64le(address_space *space, offs_t address, UINT16 data) { return (const_cast<address_space *>(space))->write_word(address, data); }
+static inline void memory_write_word_masked_64le(address_space *space, offs_t address, UINT16 data, UINT16 mask) { return (const_cast<address_space *>(space))->write_word(address, data, mask); }
+static inline void memory_write_dword_64le(address_space *space, offs_t address, UINT32 data) { return (const_cast<address_space *>(space))->write_dword(address, data); }
+static inline void memory_write_dword_masked_64le(address_space *space, offs_t address, UINT32 data, UINT32 mask) { return (const_cast<address_space *>(space))->write_dword(address, data, mask); }
+static inline void memory_write_qword_64le(address_space *space, offs_t address, UINT64 data) { return (const_cast<address_space *>(space))->write_qword(address, data); }
+static inline void memory_write_qword_masked_64le(address_space *space, offs_t address, UINT64 data, UINT64 mask) { return (const_cast<address_space *>(space))->write_qword(address, data, mask); }
 
-static inline UINT8 memory_read_byte_64be(const address_space *space, offs_t address) { return (const_cast<address_space *>(space))->read_byte(address); }
-static inline UINT16 memory_read_word_64be(const address_space *space, offs_t address) { return (const_cast<address_space *>(space))->read_word(address); }
-static inline UINT16 memory_read_word_masked_64be(const address_space *space, offs_t address, UINT16 mask) { return (const_cast<address_space *>(space))->read_word(address, mask); }
-static inline UINT32 memory_read_dword_64be(const address_space *space, offs_t address) { return (const_cast<address_space *>(space))->read_dword(address); }
-static inline UINT32 memory_read_dword_masked_64be(const address_space *space, offs_t address, UINT32 mask) { return (const_cast<address_space *>(space))->read_dword(address, mask); }
-static inline UINT64 memory_read_qword_64be(const address_space *space, offs_t address) { return (const_cast<address_space *>(space))->read_qword(address); }
-static inline UINT64 memory_read_qword_masked_64be(const address_space *space, offs_t address, UINT64 mask) { return (const_cast<address_space *>(space))->read_qword(address, mask); }
-static inline void memory_write_byte_64be(const address_space *space, offs_t address, UINT8 data) { return (const_cast<address_space *>(space))->write_byte(address, data); }
-static inline void memory_write_word_64be(const address_space *space, offs_t address, UINT16 data) { return (const_cast<address_space *>(space))->write_word(address, data); }
-static inline void memory_write_word_masked_64be(const address_space *space, offs_t address, UINT16 data, UINT16 mask) { return (const_cast<address_space *>(space))->write_word(address, data, mask); }
-static inline void memory_write_dword_64be(const address_space *space, offs_t address, UINT32 data) { return (const_cast<address_space *>(space))->write_dword(address, data); }
-static inline void memory_write_dword_masked_64be(const address_space *space, offs_t address, UINT32 data, UINT32 mask) { return (const_cast<address_space *>(space))->write_dword(address, data, mask); }
-static inline void memory_write_qword_64be(const address_space *space, offs_t address, UINT64 data) { return (const_cast<address_space *>(space))->write_qword(address, data); }
-static inline void memory_write_qword_masked_64be(const address_space *space, offs_t address, UINT64 data, UINT64 mask) { return (const_cast<address_space *>(space))->write_qword(address, data, mask); }
+static inline UINT8 memory_read_byte_64be(address_space *space, offs_t address) { return (const_cast<address_space *>(space))->read_byte(address); }
+static inline UINT16 memory_read_word_64be(address_space *space, offs_t address) { return (const_cast<address_space *>(space))->read_word(address); }
+static inline UINT16 memory_read_word_masked_64be(address_space *space, offs_t address, UINT16 mask) { return (const_cast<address_space *>(space))->read_word(address, mask); }
+static inline UINT32 memory_read_dword_64be(address_space *space, offs_t address) { return (const_cast<address_space *>(space))->read_dword(address); }
+static inline UINT32 memory_read_dword_masked_64be(address_space *space, offs_t address, UINT32 mask) { return (const_cast<address_space *>(space))->read_dword(address, mask); }
+static inline UINT64 memory_read_qword_64be(address_space *space, offs_t address) { return (const_cast<address_space *>(space))->read_qword(address); }
+static inline UINT64 memory_read_qword_masked_64be(address_space *space, offs_t address, UINT64 mask) { return (const_cast<address_space *>(space))->read_qword(address, mask); }
+static inline void memory_write_byte_64be(address_space *space, offs_t address, UINT8 data) { return (const_cast<address_space *>(space))->write_byte(address, data); }
+static inline void memory_write_word_64be(address_space *space, offs_t address, UINT16 data) { return (const_cast<address_space *>(space))->write_word(address, data); }
+static inline void memory_write_word_masked_64be(address_space *space, offs_t address, UINT16 data, UINT16 mask) { return (const_cast<address_space *>(space))->write_word(address, data, mask); }
+static inline void memory_write_dword_64be(address_space *space, offs_t address, UINT32 data) { return (const_cast<address_space *>(space))->write_dword(address, data); }
+static inline void memory_write_dword_masked_64be(address_space *space, offs_t address, UINT32 data, UINT32 mask) { return (const_cast<address_space *>(space))->write_dword(address, data, mask); }
+static inline void memory_write_qword_64be(address_space *space, offs_t address, UINT64 data) { return (const_cast<address_space *>(space))->write_qword(address, data); }
+static inline void memory_write_qword_masked_64be(address_space *space, offs_t address, UINT64 data, UINT64 mask) { return (const_cast<address_space *>(space))->write_qword(address, data, mask); }
 
 #endif	/* __MEMORY_H__ */

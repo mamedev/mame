@@ -217,7 +217,7 @@ static void sega_decode(running_machine *machine, const char *cputag, const UINT
 {
 	int A;
 
-	const address_space *space = cputag_get_address_space(machine, cputag, ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, cputag, ADDRESS_SPACE_PROGRAM);
 	int length = memory_region_length(machine, cputag);
 	int cryptlen = MIN(length, 0x8000);
 	UINT8 *rom = memory_region(machine, cputag);
@@ -439,7 +439,7 @@ void toprollr_decode(running_machine *machine, const char *cputag, const char *r
 
 	int A;
 
-	const address_space *space = cputag_get_address_space(machine, cputag, ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, cputag, ADDRESS_SPACE_PROGRAM);
 	UINT8 *rom = memory_region(machine, regiontag);
 	int bankstart;
 	decrypted = auto_alloc_array(machine, UINT8, 0x6000*3);
@@ -797,7 +797,7 @@ void jongkyo_decode(running_machine *machine, const char *cputag)
 
 	int A;
 
-	const address_space *space = cputag_get_address_space(machine, cputag, ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, cputag, ADDRESS_SPACE_PROGRAM);
 	UINT8 *rom = memory_region(machine, cputag);
 	decrypted = auto_alloc_array(machine, UINT8, 0x9000);
 

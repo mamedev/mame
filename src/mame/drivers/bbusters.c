@@ -716,7 +716,7 @@ static NVRAM_HANDLER( bbusters )
 
 static VIDEO_EOF( bbuster )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	buffer_spriteram16_w(space,0,0,0xffff);
 	buffer_spriteram16_2_w(space,0,0,0xffff);
@@ -724,7 +724,7 @@ static VIDEO_EOF( bbuster )
 
 static VIDEO_EOF( mechatt )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	buffer_spriteram16_w(space,0,0,0xffff);
 }
 

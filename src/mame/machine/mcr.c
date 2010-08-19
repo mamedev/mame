@@ -592,7 +592,7 @@ WRITE8_DEVICE_HANDLER( zwackery_pia1_w )
 
 WRITE_LINE_DEVICE_HANDLER( zwackery_ca2_w )
 {
-	const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	csdeluxe_data_w(space, 0, (state << 4) | zwackery_sound_data);
 }
 

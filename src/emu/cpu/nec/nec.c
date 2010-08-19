@@ -135,10 +135,10 @@ typedef struct
 {
 	offs_t	fetch_xor;
 
-	UINT8	(*rbyte)(const address_space *, offs_t);
-	UINT16	(*rword)(const address_space *, offs_t);
-	void	(*wbyte)(const address_space *, offs_t, UINT8);
-	void	(*wword)(const address_space *, offs_t, UINT16);
+	UINT8	(*rbyte)(address_space *, offs_t);
+	UINT16	(*rword)(address_space *, offs_t);
+	void	(*wbyte)(address_space *, offs_t, UINT8);
+	void	(*wword)(address_space *, offs_t, UINT16);
 } memory_interface;
 
 
@@ -162,8 +162,8 @@ struct _nec_state_t
 
 	device_irq_callback irq_callback;
 	legacy_cpu_device *device;
-	const address_space *program;
-	const address_space *io;
+	address_space *program;
+	address_space *io;
 	int		icount;
 
 	memory_interface	mem;
@@ -1153,7 +1153,7 @@ static void configure_memory_8bit(nec_state_t *nec_state)
     16-bit memory accessors
  *****************************************************************************/
 
-static UINT16 read_word_16le(const address_space *space, offs_t addr)
+static UINT16 read_word_16le(address_space *space, offs_t addr)
 {
 	if (!(addr & 1))
 		return memory_read_word_16le(space, addr);
@@ -1164,7 +1164,7 @@ static UINT16 read_word_16le(const address_space *space, offs_t addr)
 	}
 }
 
-static void write_word_16le(const address_space *space, offs_t addr, UINT16 data)
+static void write_word_16le(address_space *space, offs_t addr, UINT16 data)
 {
 	if (!(addr & 1))
 		memory_write_word_16le(space, addr, data);

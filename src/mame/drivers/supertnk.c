@@ -286,7 +286,7 @@ static VIDEO_UPDATE( supertnk )
 
 static MACHINE_RESET( supertnk )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	supertnk_bankswitch_0_w(space, 0, 0);
 	supertnk_bankswitch_1_w(space, 0, 0);
 

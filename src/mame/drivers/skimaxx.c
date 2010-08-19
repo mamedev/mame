@@ -150,12 +150,12 @@ static VIDEO_UPDATE( skimaxx )
  *************************************/
 
 // TODO: Might not be used
-static void skimaxx_to_shiftreg(const address_space *space, UINT32 address, UINT16 *shiftreg)
+static void skimaxx_to_shiftreg(address_space *space, UINT32 address, UINT16 *shiftreg)
 {
 	memcpy(shiftreg, &fg_buffer[TOWORD(address)], 512 * sizeof(UINT16));
 }
 
-static void skimaxx_from_shiftreg(const address_space *space, UINT32 address, UINT16 *shiftreg)
+static void skimaxx_from_shiftreg(address_space *space, UINT32 address, UINT16 *shiftreg)
 {
 	memcpy(&fg_buffer[TOWORD(address)], shiftreg, 512 * sizeof(UINT16));
 }

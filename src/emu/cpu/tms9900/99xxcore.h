@@ -437,8 +437,8 @@ struct _tms99xx_state
     retreive the value on IC0-IC3 (non-standard behaviour) */
 	device_irq_callback irq_callback;
 	legacy_cpu_device *device;
-	const address_space *program;
-	const address_space *io;
+	address_space *program;
+	address_space *io;
 	int icount;
 
 	UINT8 IDLE;       /* nonzero if processor is IDLE - i.e waiting for interrupt while writing

@@ -36,8 +36,8 @@ public:
 
 	UINT32 *		mo_command;
 
-	void			(*protection_w)(const address_space *space, offs_t offset, UINT16 data);
-	void			(*protection_r)(const address_space *space, offs_t offset, UINT16 *data);
+	void			(*protection_w)(address_space *space, offs_t offset, UINT16 data);
+	void			(*protection_r)(address_space *space, offs_t offset, UINT16 *data);
 };
 
 

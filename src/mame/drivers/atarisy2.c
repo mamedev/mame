@@ -346,7 +346,7 @@ static WRITE16_HANDLER( bankselect_w )
 
 static STATE_POSTLOAD( bankselect_postload )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	atarisy2_state *state = machine->driver_data<atarisy2_state>();
 
 	bankselect_w(space, 0, state->bankselect[0], 0xffff);

@@ -112,7 +112,7 @@ static void coolpool_scanline(screen_device &screen, bitmap_t *bitmap, int scanl
  *
  *************************************/
 
-static void coolpool_to_shiftreg(const address_space *space, UINT32 address, UINT16 *shiftreg)
+static void coolpool_to_shiftreg(address_space *space, UINT32 address, UINT16 *shiftreg)
 {
 	coolpool_state *state = space->machine->driver_data<coolpool_state>();
 
@@ -120,7 +120,7 @@ static void coolpool_to_shiftreg(const address_space *space, UINT32 address, UIN
 }
 
 
-static void coolpool_from_shiftreg(const address_space *space, UINT32 address, UINT16 *shiftreg)
+static void coolpool_from_shiftreg(address_space *space, UINT32 address, UINT16 *shiftreg)
 {
 	coolpool_state *state = space->machine->driver_data<coolpool_state>();
 
@@ -317,7 +317,7 @@ static int amerdart_trackball_dec(int data)
 	return data;
 }
 
-static int amerdart_trackball_direction(const address_space *space, int num, int data)
+static int amerdart_trackball_direction(address_space *space, int num, int data)
 {
 	coolpool_state *state = space->machine->driver_data<coolpool_state>();
 

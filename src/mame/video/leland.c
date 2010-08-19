@@ -169,7 +169,7 @@ static void leland_video_addr_w(int offset, int data, int num)
  *
  *************************************/
 
-static int leland_vram_port_r(const address_space *space, int offset, int num)
+static int leland_vram_port_r(address_space *space, int offset, int num)
 {
 	struct vram_state_data *state = vram_state + num;
 	int addr = state->addr;
@@ -216,7 +216,7 @@ static int leland_vram_port_r(const address_space *space, int offset, int num)
  *
  *************************************/
 
-static void leland_vram_port_w(const address_space *space, int offset, int data, int num)
+static void leland_vram_port_w(address_space *space, int offset, int data, int num)
 {
 	struct vram_state_data *state = vram_state + num;
 	int addr = state->addr;
@@ -306,7 +306,7 @@ WRITE8_HANDLER( leland_master_video_addr_w )
 
 static TIMER_CALLBACK( leland_delayed_mvram_w )
 {
-	const address_space *space = cputag_get_address_space(machine, "master", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "master", ADDRESS_SPACE_PROGRAM);
 
 	int num = (param >> 16) & 1;
 	int offset = (param >> 8) & 0xff;

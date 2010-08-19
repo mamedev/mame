@@ -667,7 +667,7 @@ MACHINE_RESET( jpopnics )
 static STATE_POSTLOAD( tnzs_postload )
 {
 	tnzs_state *state = machine->driver_data<tnzs_state>();
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	memory_set_bank(machine, "bank1", state->bank1);
 	memory_set_bank(machine, "bank2", state->bank2);

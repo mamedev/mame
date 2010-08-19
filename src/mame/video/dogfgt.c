@@ -224,7 +224,7 @@ VIDEO_UPDATE( dogfgt )
 
 	if (state->lastflip != flip_screen_get(screen->machine) || state->lastpixcolor != state->pixcolor)
 	{
-		const address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+		address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 		state->lastflip = flip_screen_get(screen->machine);
 		state->lastpixcolor = state->pixcolor;

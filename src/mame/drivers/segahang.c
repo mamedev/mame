@@ -285,7 +285,7 @@ static WRITE16_HANDLER( sharrier_io_w )
 static WRITE8_DEVICE_HANDLER( sound_latch_w )
 {
 	segas1x_state *state = device->machine->driver_data<segas1x_state>();
-	const address_space *space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
 	soundlatch_w(space, offset, data);
 }
 
@@ -1866,7 +1866,7 @@ static DRIVER_INIT( enduror )
 
 static DRIVER_INIT( endurobl )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
 	UINT16 *decrypt = auto_alloc_array(machine, UINT16, 0x40000/2);
 
@@ -1880,7 +1880,7 @@ static DRIVER_INIT( endurobl )
 
 static DRIVER_INIT( endurob2 )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
 	UINT16 *decrypt = auto_alloc_array(machine, UINT16, 0x40000/2);
 

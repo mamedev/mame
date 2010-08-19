@@ -100,13 +100,13 @@ static INTERRUPT_GEN( z80_irq )
 
 static READ16_HANDLER( z80_shared_r )
 {
-	const address_space *cpu2space = cputag_get_address_space(space->machine, "audio_cpu", ADDRESS_SPACE_PROGRAM);
+	address_space *cpu2space = cputag_get_address_space(space->machine, "audio_cpu", ADDRESS_SPACE_PROGRAM);
 	return memory_read_byte(cpu2space, offset);
 }
 
 static WRITE16_HANDLER( z80_shared_w )
 {
-	const address_space *cpu2space = cputag_get_address_space(space->machine, "audio_cpu", ADDRESS_SPACE_PROGRAM);
+	address_space *cpu2space = cputag_get_address_space(space->machine, "audio_cpu", ADDRESS_SPACE_PROGRAM);
 	memory_write_byte(cpu2space, offset, data & 0xff);
 }
 

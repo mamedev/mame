@@ -678,7 +678,7 @@ static void set_bank(running_machine *machine, int banknum, const bankhandler *h
 		"bank9", "bank10", "bank11", "bank12", "bank13", "bank14", "bank15", "bank16"
 	};
 	static const char *const cputags[] = { "maincpu", "sub" };
-	const address_space *space = cputag_get_address_space(machine, cputags[(banknum >> 3) & 1], ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, cputags[(banknum >> 3) & 1], ADDRESS_SPACE_PROGRAM);
 	int bankstart = (banknum & 7) * 0x2000;
 
 	/* for BANK handlers , memory direct and OP-code base */

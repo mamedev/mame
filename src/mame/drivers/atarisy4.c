@@ -776,7 +776,7 @@ static inline UINT8 hex_to_ascii(UINT8 in)
 		return in;
 }
 
-void load_ldafile(const address_space *space, const UINT8 *file)
+void load_ldafile(address_space *space, const UINT8 *file)
 {
 #define READ_CHAR()		file[i++]
 	int i = 0;
@@ -830,7 +830,7 @@ void load_ldafile(const address_space *space, const UINT8 *file)
 }
 
 /* Load memory space with data from a Tektronix-Extended HEX file */
-void load_hexfile(const address_space *space, const UINT8 *file)
+void load_hexfile(address_space *space, const UINT8 *file)
 {
 #define READ_HEX_CHAR()		hex_to_ascii(file[i++])
 
@@ -935,7 +935,7 @@ next_line:
 
 static DRIVER_INIT( laststar )
 {
-	const address_space *main = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *main = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* Allocate 16kB of shared RAM */
 	shared_ram[0] = auto_alloc_array_clear(machine, UINT16, 0x2000);

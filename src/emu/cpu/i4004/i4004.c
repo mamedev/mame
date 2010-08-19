@@ -34,9 +34,9 @@ struct _i4004_state
 	UINT8	flags; // used for I/O only
 
 	legacy_cpu_device *device;
-	const address_space *program;
-	const address_space *data;
-	const address_space *io;
+	address_space *program;
+	address_space *data;
+	address_space *io;
 	int					icount;
 	int 				pc_pos; // PC possition in ADDR
 	int					addr_mask;

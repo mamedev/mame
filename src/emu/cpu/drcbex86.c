@@ -179,7 +179,7 @@ struct _drcbe_state
 	double					fptemp;					/* temporary storage for floating point */
 
 	data_accessors			accessors[ADDRESS_SPACES];	/* memory accessors */
-	const address_space *	space[ADDRESS_SPACES];	/* address spaces */
+	address_space *	space[ADDRESS_SPACES];	/* address spaces */
 
 	UINT8					sse3;					/* do we have SSE3 support? */
 	UINT16					fpumode;				/* saved FPU mode */

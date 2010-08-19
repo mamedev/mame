@@ -218,7 +218,7 @@ static DRIVER_INIT(hshavoc)
 */
 
 	{
-		const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+		address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 		memory_nop_write(space, 0x200000, 0x201fff, 0, 0);
 	}
 

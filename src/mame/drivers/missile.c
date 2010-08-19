@@ -512,7 +512,7 @@ static MACHINE_RESET( missile )
  *
  *************************************/
 
-INLINE int get_madsel(const address_space *space)
+INLINE int get_madsel(address_space *space)
 {
 	UINT16 pc = cpu_get_previouspc(space->cpu);
 
@@ -549,7 +549,7 @@ INLINE offs_t get_bit3_addr(offs_t pixaddr)
 }
 
 
-static void write_vram(const address_space *space, offs_t address, UINT8 data)
+static void write_vram(address_space *space, offs_t address, UINT8 data)
 {
 	static const UINT8 data_lookup[4] = { 0x00, 0x0f, 0xf0, 0xff };
 	offs_t vramaddr;
@@ -579,7 +579,7 @@ static void write_vram(const address_space *space, offs_t address, UINT8 data)
 }
 
 
-static UINT8 read_vram(const address_space *space, offs_t address)
+static UINT8 read_vram(address_space *space, offs_t address)
 {
 	offs_t vramaddr;
 	UINT8 vramdata;

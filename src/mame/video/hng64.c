@@ -1484,7 +1484,7 @@ VIDEO_UPDATE( hng64 )
 	// but it could be useful
 	if ( input_code_pressed_once(screen->machine, KEYCODE_L) )
 	{
-		const address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+		address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 		memory_write_byte(space, 0x2f27c8, 0x2);
 	}
 #endif

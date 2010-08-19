@@ -154,7 +154,7 @@ static int is_ntsc(running_machine *machine)
 static void gtia_reset(running_machine &machine)
 {
 	int i;
-	const address_space *space = cputag_get_address_space(&machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(&machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* reset the GTIA read/write/helper registers */
 	for (i = 0; i < 32; i++)

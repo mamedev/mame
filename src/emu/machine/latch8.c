@@ -83,7 +83,7 @@ READ8_DEVICE_HANDLER( latch8_r )
 	if (latch8->has_read)
 	{
 		/*  temporary hack until all relevant systems are devices */
-		const address_space *space = cpu_get_address_space(device->machine->firstcpu, ADDRESS_SPACE_PROGRAM);
+		address_space *space = cpu_get_address_space(device->machine->firstcpu, ADDRESS_SPACE_PROGRAM);
 		int i;
 		for (i=0; i<8; i++)
 		{

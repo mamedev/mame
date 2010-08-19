@@ -788,7 +788,7 @@ INLINE void increment_dest(UINT8 curwidth)
 }
 
 
-static void execute_blit(const address_space *space)
+static void execute_blit(address_space *space)
 {
 	/*
         pattern_source = counter set U7/U16/U25/U34

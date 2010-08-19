@@ -186,7 +186,7 @@ static WRITE8_HANDLER( playmark_oki_w )
 static WRITE8_DEVICE_HANDLER( playmark_snd_control_w )
 {
 	playmark_state *state = device->machine->driver_data<playmark_state>();
-//  const address_space *space = cputag_get_address_space(device->machine, "audiocpu", ADDRESS_SPACE_PROGRAM);
+//  address_space *space = cputag_get_address_space(device->machine, "audiocpu", ADDRESS_SPACE_PROGRAM);
 
     /*  This port controls communications to and from the 68K, and the OKI
         device.

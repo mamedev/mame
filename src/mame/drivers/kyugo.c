@@ -465,7 +465,7 @@ static MACHINE_START( kyugo )
 static MACHINE_RESET( kyugo )
 {
 	kyugo_state *state = machine->driver_data<kyugo_state>();
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	// must start with interrupts and sub CPU disabled
 	cpu_interrupt_enable(machine->device("maincpu"), 0);
 	kyugo_sub_cpu_control_w(space, 0, 0);

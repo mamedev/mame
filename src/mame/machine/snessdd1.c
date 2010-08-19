@@ -569,7 +569,7 @@ static void sdd1_init(running_machine* machine)
 	snes_sdd1.buffer.ready = 0;
 }
 
-static UINT8 sdd1_mmio_read(const address_space *space, UINT32 addr)
+static UINT8 sdd1_mmio_read(address_space *space, UINT32 addr)
 {
 	addr &= 0xffff;
 
@@ -593,7 +593,7 @@ static UINT8 sdd1_mmio_read(const address_space *space, UINT32 addr)
 	return snes_open_bus_r(space, 0);
 }
 
-static void sdd1_mmio_write(const address_space *space, UINT32 addr, UINT8 data)
+static void sdd1_mmio_write(address_space *space, UINT32 addr, UINT8 data)
 {
 	addr &= 0xffff;
 

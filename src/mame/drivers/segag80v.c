@@ -210,7 +210,7 @@ static MACHINE_RESET( g80v )
  *
  *************************************/
 
-static offs_t decrypt_offset(const address_space *space, offs_t offset)
+static offs_t decrypt_offset(address_space *space, offs_t offset)
 {
 	/* ignore anything but accesses via opcode $32 (LD $(XXYY),A) */
 	offs_t pc = cpu_get_previouspc(space->cpu);
@@ -1315,7 +1315,7 @@ ROM_END
 
 static DRIVER_INIT( elim2 )
 {
-	const address_space *iospace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
+	address_space *iospace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
 
 	/* configure security */
 	sega_security(70);
@@ -1329,7 +1329,7 @@ static DRIVER_INIT( elim2 )
 
 static DRIVER_INIT( elim4 )
 {
-	const address_space *iospace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
+	address_space *iospace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
 
 	/* configure security */
 	sega_security(76);
@@ -1347,7 +1347,7 @@ static DRIVER_INIT( elim4 )
 
 static DRIVER_INIT( spacfury )
 {
-	const address_space *iospace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
+	address_space *iospace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
 
 	/* configure security */
 	sega_security(64);
@@ -1363,7 +1363,7 @@ static DRIVER_INIT( spacfury )
 
 static DRIVER_INIT( zektor )
 {
-	const address_space *iospace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
+	address_space *iospace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
 	running_device *ay = machine->device("aysnd");
 
 	/* configure security */
@@ -1385,8 +1385,8 @@ static DRIVER_INIT( zektor )
 
 static DRIVER_INIT( tacscan )
 {
-	const address_space *pgmspace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	const address_space *iospace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
+	address_space *pgmspace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *iospace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
 
 	/* configure security */
 	sega_security(76);
@@ -1404,8 +1404,8 @@ static DRIVER_INIT( tacscan )
 
 static DRIVER_INIT( startrek )
 {
-	const address_space *pgmspace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	const address_space *iospace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
+	address_space *pgmspace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *iospace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
 
 	/* configure security */
 	sega_security(64);

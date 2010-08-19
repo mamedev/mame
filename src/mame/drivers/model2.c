@@ -199,7 +199,7 @@ static void copro_fifoin_push(running_device *device, UINT32 data)
 static int copro_fifoout_rpos, copro_fifoout_wpos;
 static UINT32 copro_fifoout_data[COPRO_FIFOOUT_SIZE];
 static int copro_fifoout_num = 0;
-static UINT32 copro_fifoout_pop(const address_space *space)
+static UINT32 copro_fifoout_pop(address_space *space)
 {
 	UINT32 r;
 
@@ -1012,7 +1012,7 @@ static WRITE32_HANDLER(model2_irq_w)
 
 static int to_68k;
 
-static int snd_68k_ready_r(const address_space *space)
+static int snd_68k_ready_r(address_space *space)
 {
 	int sr = cpu_get_reg(space->machine->device("audiocpu"), M68K_SR);
 
@@ -1025,7 +1025,7 @@ static int snd_68k_ready_r(const address_space *space)
 	return 0xff;
 }
 
-static void snd_latch_to_68k_w(const address_space *space, int data)
+static void snd_latch_to_68k_w(address_space *space, int data)
 {
 	if (!snd_68k_ready_r(space))
 	{

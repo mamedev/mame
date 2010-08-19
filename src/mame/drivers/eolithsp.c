@@ -17,7 +17,7 @@ static int eolith_speedup_resume_scanline;
 static int eolith_vblank = 0;
 static int eolith_scanline = 0;
 
-void eolith_speedup_read(const address_space *space)
+void eolith_speedup_read(address_space *space)
 {
 	/* for debug */
 //  if ((cpu_get_pc(space->cpu)!=eolith_speedup_address) && (eolith_vblank!=1) )

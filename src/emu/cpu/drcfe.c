@@ -55,7 +55,7 @@ struct _drcfe_state
 
 	/* CPU parameters */
 	cpu_device *		cpudevice;					/* CPU device object */
-	const address_space *program;					/* program address space for this CPU */
+	address_space *program;					/* program address space for this CPU */
 	offs_t				pageshift;					/* shift to convert address to a page index */
 
 	/* opcode descriptor arrays */

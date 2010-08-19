@@ -834,7 +834,7 @@ static DRIVER_INIT(jujub)
 
 	/* Decrypt data for z80 program */
 	{
-		const address_space *space = cputag_get_address_space(machine, "audiocpu", ADDRESS_SPACE_PROGRAM);
+		address_space *space = cputag_get_address_space(machine, "audiocpu", ADDRESS_SPACE_PROGRAM);
 		UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x20000);
 		UINT8 *rom = memory_region(machine, "audiocpu");
 		int i;

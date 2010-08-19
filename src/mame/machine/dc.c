@@ -229,7 +229,7 @@ static TIMER_CALLBACK( yuv_fifo_irq )
 	dc_update_interrupt_status(machine);
 }
 
-static void wave_dma_execute(const address_space *space)
+static void wave_dma_execute(address_space *space)
 {
 	UINT32 src,dst,size;
 	dst = wave_dma.aica_addr;
@@ -268,7 +268,7 @@ static void wave_dma_execute(const address_space *space)
 	timer_set(space->machine, ATTOTIME_IN_USEC(300), NULL, 0, aica_dma_irq);
 }
 
-static void pvr_dma_execute(const address_space *space)
+static void pvr_dma_execute(address_space *space)
 {
 	UINT32 src,dst,size;
 	dst = pvr_dma.pvr_addr;
@@ -416,7 +416,7 @@ void dc_update_interrupt_status(running_machine *machine)
 	{
 		if((dc_sysctrl_regs[SB_G2DTNRM] & dc_sysctrl_regs[SB_ISTNRM]) || (dc_sysctrl_regs[SB_G2DTEXT] & dc_sysctrl_regs[SB_ISTEXT]))
 		{
-			const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+			address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 			printf("Wave DMA HW trigger\n");
 			wave_dma_execute(space);
@@ -428,7 +428,7 @@ void dc_update_interrupt_status(running_machine *machine)
 	{
 		if((dc_sysctrl_regs[SB_PDTNRM] & dc_sysctrl_regs[SB_ISTNRM]) || (dc_sysctrl_regs[SB_PDTEXT] & dc_sysctrl_regs[SB_ISTEXT]))
 		{
-			const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+			address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 			printf("PVR-DMA HW trigger\n");
 			pvr_dma_execute(space);

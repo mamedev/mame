@@ -759,7 +759,7 @@ static UINT8 sb_coin_latch = 0;
 
 static UINT8 ejsakura_input_port = 0;
 
-static UINT8 z80_fifoout_pop(const address_space *space)
+static UINT8 z80_fifoout_pop(address_space *space)
 {
 	UINT8 r;
 	if (fifoout_wpos == fifoout_rpos)
@@ -780,7 +780,7 @@ static UINT8 z80_fifoout_pop(const address_space *space)
 	return r;
 }
 
-static void z80_fifoout_push(const address_space *space, UINT8 data)
+static void z80_fifoout_push(address_space *space, UINT8 data)
 {
 	fifoout_data[fifoout_wpos++] = data;
 	if (fifoout_wpos == FIFO_SIZE)
@@ -795,7 +795,7 @@ static void z80_fifoout_push(const address_space *space, UINT8 data)
 	fifoout_read_request = 1;
 }
 
-static UINT8 z80_fifoin_pop(const address_space *space)
+static UINT8 z80_fifoin_pop(address_space *space)
 {
 	UINT8 r;
 	if (fifoin_wpos == fifoin_rpos)
@@ -816,7 +816,7 @@ static UINT8 z80_fifoin_pop(const address_space *space)
 	return r;
 }
 
-static void z80_fifoin_push(const address_space *space, UINT8 data)
+static void z80_fifoin_push(address_space *space, UINT8 data)
 {
 	fifoin_data[fifoin_wpos++] = data;
 	if(fifoin_wpos == FIFO_SIZE)

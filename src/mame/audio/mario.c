@@ -448,7 +448,7 @@ DISCRETE_SOUND_END
  *
  ****************************************************************/
 
-static void set_ea(const address_space *space, int ea)
+static void set_ea(address_space *space, int ea)
 {
 	mario_state	*state = space->machine->driver_data<mario_state>();
 	//printf("ea: %d\n", ea);
@@ -489,7 +489,7 @@ static SOUND_START( mario )
 static SOUND_RESET( mario )
 {
 	mario_state	*state = machine->driver_data<mario_state>();
-	const address_space *space = cputag_get_address_space(machine, "audiocpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "audiocpu", ADDRESS_SPACE_PROGRAM);
 
 #if USE_8039
     set_ea(machine, 1);

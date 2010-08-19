@@ -236,7 +236,7 @@ typedef struct
 	UINT8 pendingFiq;
 	device_irq_callback irq_callback;
 	legacy_cpu_device *device;
-	const address_space *program;
+	address_space *program;
 	endianness_t endian;
 } ARM_REGS;
 

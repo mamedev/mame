@@ -91,7 +91,7 @@ READ16_HANDLER( demonwld_dsp_r )
 {
 	/* DSP can read data from main CPU RAM via DSP IO port 1 */
 
-	const address_space *mainspace;
+	address_space *mainspace;
 	UINT16 input_data = 0;
 	switch (main_ram_seg) {
 		case 0xc00000:	mainspace = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
@@ -105,7 +105,7 @@ READ16_HANDLER( demonwld_dsp_r )
 
 WRITE16_HANDLER( demonwld_dsp_w )
 {
-	const address_space *mainspace;
+	address_space *mainspace;
 
 	/* Data written to main CPU RAM via DSP IO port 1 */
 	dsp_execute = 0;

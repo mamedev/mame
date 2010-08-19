@@ -7900,7 +7900,7 @@ static WRITE16_HANDLER( gigamn2_dummyqsound_w )
 static DRIVER_INIT( gigamn2 )
 {
 	cps_state *state = machine->driver_data<cps_state>();
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
 	int length = memory_region_length(machine, "maincpu");
 

@@ -887,7 +887,7 @@ static MACHINE_START( galaga )
 
 static void bosco_latch_reset(running_machine *machine)
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int i;
 
 	/* Reset all latches */

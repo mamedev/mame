@@ -697,7 +697,7 @@ static MACHINE_START( combatsc )
 static MACHINE_RESET( combatsc )
 {
 	combatsc_state *state = machine->driver_data<combatsc_state>();
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int i;
 
 	memset(state->io_ram,  0x00, 0x4000);

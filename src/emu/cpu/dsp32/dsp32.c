@@ -185,7 +185,7 @@ struct _dsp32_state
 	UINT32			ppc;
 	void			(*output_pins_changed)(running_device *device, UINT32 pins);
 	legacy_cpu_device *	device;
-	const address_space *program;
+	address_space *program;
 };
 
 

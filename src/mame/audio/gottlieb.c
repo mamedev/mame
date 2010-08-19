@@ -42,7 +42,7 @@ static int random_offset;
 
 
 static void gottlieb1_sh_w(running_device *riot, UINT8 data);
-static void gottlieb2_sh_w(const address_space *space, UINT8 data);
+static void gottlieb2_sh_w(address_space *space, UINT8 data);
 static void trigger_sample(running_device *samples, UINT8 data);
 
 
@@ -369,7 +369,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static void gottlieb2_sh_w(const address_space *space, UINT8 data)
+static void gottlieb2_sh_w(address_space *space, UINT8 data)
 {
 	/* when data is not 0xff, the transparent latch at A3 allows it to pass through unmolested */
 	if (data != 0xff)

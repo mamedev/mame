@@ -128,7 +128,7 @@ static READ16_HANDLER( deco_71_r )
 
 static MACHINE_RESET( sshangha )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	/* Such thing is needed as there is no code to turn the screen
        to normal orientation when the game is reset.
        I'm using the value that forces the screen to be in normal

@@ -129,7 +129,7 @@ static READ16_HANDLER( metro_irq_cause_r )
 static void update_irq_state( running_machine *machine )
 {
 	metro_state *state = machine->driver_data<metro_state>();
-	const address_space *space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
 
 	/*  Get the pending IRQs (only the enabled ones, e.g. where irq_enable is *0*)  */
 	UINT16 irq = metro_irq_cause_r(space, 0, 0xffff) & ~*state->irq_enable;
@@ -340,7 +340,7 @@ static void ymf278b_interrupt( running_device *device, int active )
 static int metro_io_callback( running_device *device, int ioline, int state )
 {
 	metro_state *driver_state = device->machine->driver_data<metro_state>();
-	const address_space *space = cpu_get_address_space(driver_state->maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *space = cpu_get_address_space(driver_state->maincpu, ADDRESS_SPACE_PROGRAM);
 	UINT8 data = 0;
 
 	switch (ioline)
@@ -665,7 +665,7 @@ INLINE int blt_read( const UINT8 *ROM, const int offs )
 	return ROM[offs];
 }
 
-INLINE void blt_write( const address_space *space, const int tmap, const offs_t offs, const UINT16 data, const UINT16 mask )
+INLINE void blt_write( address_space *space, const int tmap, const offs_t offs, const UINT16 data, const UINT16 mask )
 {
 	switch(tmap)
 	{
@@ -6095,7 +6095,7 @@ static void metro_common( running_machine *machine )
 static DRIVER_INIT( metro )
 {
 	metro_state *state = machine->driver_data<metro_state>();
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	metro_common(machine);
 
@@ -6128,7 +6128,7 @@ static DRIVER_INIT( karatour )
 static DRIVER_INIT( daitorid )
 {
 	metro_state *state = machine->driver_data<metro_state>();
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	metro_common(machine);
 

@@ -36,7 +36,7 @@ static const UINT8 ga2_v25_opcode_table[256] = {
 static void nec_v25_cpu_decrypt(running_machine *machine)
 {
 	int i;
-	const address_space *space = cputag_get_address_space(machine, "mcu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "mcu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *rom = memory_region(machine, "mcu");
 	UINT8* decrypted = auto_alloc_array(machine, UINT8, 0x100000);
 	UINT8* temp = auto_alloc_array(machine, UINT8, 0x100000);
@@ -228,7 +228,7 @@ WRITE16_HANDLER(brival_protection_w)
 
 void darkedge_fd1149_vblank(running_device *device)
 {
-	const address_space *space = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
+	address_space *space = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
 
 	memory_write_word(space, 0x20f072, 0);
 	memory_write_word(space, 0x20f082, 0);

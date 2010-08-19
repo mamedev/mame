@@ -511,7 +511,7 @@ ROM_END
 static DRIVER_INIT( progolf )
 {
 	int A;
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *rom = memory_region(machine, "maincpu");
 	UINT8* decrypted = auto_alloc_array(machine, UINT8, 0x10000);
 
@@ -525,7 +525,7 @@ static DRIVER_INIT( progolf )
 static DRIVER_INIT( progolfa )
 {
 	int A;
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *rom = memory_region(machine, "maincpu");
 	UINT8* decrypted = auto_alloc_array(machine, UINT8, 0x10000);
 

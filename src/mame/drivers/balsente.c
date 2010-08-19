@@ -2135,45 +2135,45 @@ static DRIVER_INIT( minigolf2 ) { expand_roms(machine, 0x0c);        config_shoo
 static DRIVER_INIT( toggle )   { expand_roms(machine, EXPAND_ALL);  config_shooter_adc(machine, FALSE, 0 /* noanalog */); }
 static DRIVER_INIT( nametune )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	memory_install_write8_handler(space, 0x9f00, 0x9f00, 0, 0, balsente_rombank2_select_w);
 	expand_roms(machine, EXPAND_NONE | SWAP_HALVES); config_shooter_adc(machine, FALSE, 0 /* noanalog */);
 }
 static DRIVER_INIT( nstocker )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	memory_install_write8_handler(space, 0x9f00, 0x9f00, 0, 0, balsente_rombank2_select_w);
 	expand_roms(machine, EXPAND_NONE | SWAP_HALVES); config_shooter_adc(machine, TRUE, 1);
 }
 static DRIVER_INIT( sfootbal )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	memory_install_write8_handler(space, 0x9f00, 0x9f00, 0, 0, balsente_rombank2_select_w);
 	expand_roms(machine, EXPAND_ALL  | SWAP_HALVES); config_shooter_adc(machine, FALSE, 0);
 }
 static DRIVER_INIT( spiker )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	memory_install_readwrite8_handler(space, 0x9f80, 0x9f8f, 0, 0, spiker_expand_r, spiker_expand_w);
 	memory_install_write8_handler(space, 0x9f00, 0x9f00, 0, 0, balsente_rombank2_select_w);
 	expand_roms(machine, EXPAND_ALL  | SWAP_HALVES); config_shooter_adc(machine, FALSE, 1);
 }
 static DRIVER_INIT( stompin )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	memory_install_write8_handler(space, 0x9f00, 0x9f00, 0, 0, balsente_rombank2_select_w);
 	expand_roms(machine, 0x0c | SWAP_HALVES); config_shooter_adc(machine, FALSE, 32);
 }
 static DRIVER_INIT( rescraid ) { expand_roms(machine, EXPAND_NONE); config_shooter_adc(machine, FALSE, 0 /* noanalog */); }
 static DRIVER_INIT( grudge )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	memory_install_read8_handler(space, 0x9400, 0x9400, 0, 0, grudge_steering_r);
 	expand_roms(machine, EXPAND_NONE); config_shooter_adc(machine, FALSE, 0);
 }
 static DRIVER_INIT( shrike )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	memory_install_readwrite8_handler(space, 0x9e00, 0x9fff, 0, 0, shrike_shared_6809_r, shrike_shared_6809_w);
 	memory_install_write8_handler(space, 0x9e01, 0x9e01, 0, 0, shrike_sprite_select_w );
 	memory_install_readwrite16_handler(cputag_get_address_space(machine, "68k", ADDRESS_SPACE_PROGRAM), 0x10000, 0x1001f, 0, 0, shrike_io_68k_r, shrike_io_68k_w);

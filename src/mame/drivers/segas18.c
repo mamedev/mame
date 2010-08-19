@@ -139,7 +139,7 @@ static const segaic16_memory_map_entry *const region_info_list[] =
 static void sound_w(running_machine *machine, UINT8 data)
 {
 	segas1x_state *state = machine->driver_data<segas1x_state>();
-	const address_space *space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
 
 	soundlatch_w(space, 0, data & 0xff);
 	cpu_set_input_line(state->soundcpu, INPUT_LINE_NMI, PULSE_LINE);

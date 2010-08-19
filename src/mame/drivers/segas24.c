@@ -696,7 +696,7 @@ static void reset_reset(running_machine *machine)
 	prev_resetcontrol = resetcontrol;
 }
 
-static void resetcontrol_w(const address_space *space, UINT8 data)
+static void resetcontrol_w(address_space *space, UINT8 data)
 {
 	resetcontrol = data;
 	logerror("Reset control %02x ('%s':%x)\n", resetcontrol, space->cpu->tag(), cpu_get_pc(space->cpu));

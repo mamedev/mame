@@ -308,7 +308,7 @@ INLINE void consume_rle(int count)
  *
  *************************************/
 
-static void perform_blit(const address_space *space)
+static void perform_blit(address_space *space)
 {
 	offs_t addr = tms_state.regs[TMS34061_XYADDRESS] | ((tms_state.regs[TMS34061_XYOFFSET] & 0x300) << 8);
 	UINT8 shift = (BLITTER_FLAGS & BLITFLAG_SHIFT) ? 4 : 0;

@@ -24,7 +24,7 @@ struct _se3208_state_t
 
 	device_irq_callback irq_callback;
 	legacy_cpu_device *device;
-	const address_space *program;
+	address_space *program;
 	UINT8 IRQ;
 	UINT8 NMI;
 
@@ -65,7 +65,7 @@ INLINE se3208_state_t *get_safe_token(running_device *device)
 	return (se3208_state_t *)downcast<legacy_cpu_device *>(device)->token();
 }
 
-INLINE UINT32 read_dword_unaligned(const address_space *space, UINT32 address)
+INLINE UINT32 read_dword_unaligned(address_space *space, UINT32 address)
 {
 	if (address & 3)
 		return memory_read_byte_32le(space,address) | memory_read_byte_32le(space,address+1)<<8 | memory_read_byte_32le(space,address+2)<<16 | memory_read_byte_32le(space,address+3)<<24;
@@ -73,7 +73,7 @@ INLINE UINT32 read_dword_unaligned(const address_space *space, UINT32 address)
 		return memory_read_dword_32le(space,address);
 }
 
-INLINE UINT16 read_word_unaligned(const address_space *space, UINT32 address)
+INLINE UINT16 read_word_unaligned(address_space *space, UINT32 address)
 {
 	if (address & 1)
 		return memory_read_byte_32le(space,address) | memory_read_byte_32le(space,address+1)<<8;
@@ -81,7 +81,7 @@ INLINE UINT16 read_word_unaligned(const address_space *space, UINT32 address)
 		return memory_read_word_32le(space,address);
 }
 
-INLINE void write_dword_unaligned(const address_space *space, UINT32 address, UINT32 data)
+INLINE void write_dword_unaligned(address_space *space, UINT32 address, UINT32 data)
 {
 	if (address & 3)
 	{
@@ -96,7 +96,7 @@ INLINE void write_dword_unaligned(const address_space *space, UINT32 address, UI
 	}
 }
 
-INLINE void write_word_unaligned(const address_space *space, UINT32 address, UINT16 data)
+INLINE void write_word_unaligned(address_space *space, UINT32 address, UINT16 data)
 {
 	if (address & 1)
 	{

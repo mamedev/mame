@@ -74,8 +74,8 @@ struct _tms7000_state
 	UINT8		pf[0x100];	/* Perpherial file */
 	device_irq_callback irq_callback;
 	legacy_cpu_device *device;
-	const address_space *program;
-	const address_space *io;
+	address_space *program;
+	address_space *io;
 	int			icount;
 	int 		div_by_16_trigger;
 	int			cycles_per_INT2;

@@ -51,7 +51,7 @@ struct _lh5810_state
 {
 	const lh5801_cpu_core *config;
 	legacy_cpu_device *device;
-	const address_space *program;
+	address_space *program;
 
 	PAIR s, p, u, x, y;
 	int tm; //9 bit

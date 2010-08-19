@@ -786,7 +786,7 @@ static void cde_handle_reports(void)
 	}
 }
 
-static void cde_dma_transfer(const address_space *space, int channel, int next)
+static void cde_dma_transfer(address_space *space, int channel, int next)
 {
 	UINT32 address;
 	//int length;

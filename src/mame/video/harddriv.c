@@ -96,7 +96,7 @@ VIDEO_START( harddriv )
  *
  *************************************/
 
-void hdgsp_write_to_shiftreg(const address_space *space, UINT32 address, UINT16 *shiftreg)
+void hdgsp_write_to_shiftreg(address_space *space, UINT32 address, UINT16 *shiftreg)
 {
 	harddriv_state *state = space->machine->driver_data<harddriv_state>();
 
@@ -124,7 +124,7 @@ void hdgsp_write_to_shiftreg(const address_space *space, UINT32 address, UINT16 
 }
 
 
-void hdgsp_read_from_shiftreg(const address_space *space, UINT32 address, UINT16 *shiftreg)
+void hdgsp_read_from_shiftreg(address_space *space, UINT32 address, UINT16 *shiftreg)
 {
 	harddriv_state *state = space->machine->driver_data<harddriv_state>();
 

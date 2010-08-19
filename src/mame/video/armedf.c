@@ -368,7 +368,7 @@ VIDEO_UPDATE( armedf )
 
 VIDEO_EOF( armedf )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	buffer_spriteram16_w(space, 0, 0, 0xffff);
 }

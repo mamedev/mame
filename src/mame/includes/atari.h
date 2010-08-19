@@ -210,7 +210,7 @@ typedef struct {
     UINT16  data[HWIDTH];       /* graphics data buffer (text through chargen) */
 }   VIDEO;
 
-typedef void (*atari_renderer_func)(const address_space *space, VIDEO *video);
+typedef void (*atari_renderer_func)(address_space *space, VIDEO *video);
 
 typedef struct {
 	atari_renderer_func	renderer;	/* current renderer */
@@ -534,7 +534,7 @@ void antic_reset(void);
  READ8_HANDLER ( atari_antic_r );
 WRITE8_HANDLER ( atari_antic_w );
 
-#define ANTIC_RENDERER(name) void name(const address_space *space, VIDEO *video)
+#define ANTIC_RENDERER(name) void name(address_space *space, VIDEO *video)
 
 ANTIC_RENDERER( antic_mode_0_xx );
 ANTIC_RENDERER( antic_mode_2_32 );

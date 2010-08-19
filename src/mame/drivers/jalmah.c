@@ -634,7 +634,7 @@ static WRITE16_HANDLER( urashima_dma_w )
 /*same as $f00c0 sub-routine,but with additional work-around,to remove from here...*/
 static void daireika_palette_dma(running_machine *machine, UINT16 val)
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT32 index_1, index_2, src_addr, tmp_addr;
 	/*a0=301c0+jm_shared_ram[0x540/2] & 0xf00 */
 	/*a1=88000*/

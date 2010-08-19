@@ -110,8 +110,8 @@ struct _m37710i_cpu_struct
 	uint destination;	/* temp register */
 	device_irq_callback int_ack;
 	legacy_cpu_device *device;
-	const address_space *program;
-	const address_space *io;
+	address_space *program;
+	address_space *io;
 	uint stopped;		/* Sets how the CPU is stopped */
 	void (*const *opcodes)(m37710i_cpu_struct *cpustate);		/* opcodes with no prefix */
 	void (*const *opcodes42)(m37710i_cpu_struct *cpustate);	/* opcodes with 0x42 prefix */

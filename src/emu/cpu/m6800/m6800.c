@@ -116,9 +116,9 @@ struct _m6800_state
 	legacy_cpu_device *device;
 
 	/* Memory spaces */
-    const address_space *program;
-    const address_space *data;
-    const address_space *io;
+    address_space *program;
+    address_space *data;
+    address_space *io;
 
 	void	(* const * insn)(m6800_state *);	/* instruction table */
 	const UINT8 *cycles;			/* clock cycle of instruction table */

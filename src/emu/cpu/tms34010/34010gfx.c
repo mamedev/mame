@@ -201,7 +201,7 @@ static int compute_pixblt_b_cycles(int left_partials, int right_partials, int fu
 
 
 /* Shift register handling */
-static void shiftreg_w(const address_space *space, offs_t offset,UINT16 data)
+static void shiftreg_w(address_space *space, offs_t offset,UINT16 data)
 {
 	tms34010_state *tms = get_safe_token(space->cpu);
 	if (tms->config->from_shiftreg)
@@ -210,7 +210,7 @@ static void shiftreg_w(const address_space *space, offs_t offset,UINT16 data)
 		logerror("From ShiftReg function not set. PC = %08X\n", tms->pc);
 }
 
-static UINT16 shiftreg_r(const address_space *space, offs_t offset)
+static UINT16 shiftreg_r(address_space *space, offs_t offset)
 {
 	tms34010_state *tms = get_safe_token(space->cpu);
 	if (tms->config->to_shiftreg)
@@ -220,7 +220,7 @@ static UINT16 shiftreg_r(const address_space *space, offs_t offset)
 	return tms->shiftreg[0];
 }
 
-static UINT16 dummy_shiftreg_r(const address_space *space, offs_t offset)
+static UINT16 dummy_shiftreg_r(address_space *space, offs_t offset)
 {
 	tms34010_state *tms = get_safe_token(space->cpu);
 	return tms->shiftreg[0];
@@ -1028,8 +1028,8 @@ static void FUNCTION_NAME(pixblt)(tms34010_state *tms, int src_is_linear, int ds
 	if (!P_FLAG(tms))
 	{
 		int dx, dy, x, y, /*words,*/ yreverse;
-		void (*word_write)(const address_space *space,offs_t address,UINT16 data);
-		UINT16 (*word_read)(const address_space *space,offs_t address);
+		void (*word_write)(address_space *space,offs_t address,UINT16 data);
+		UINT16 (*word_read)(address_space *space,offs_t address);
 		UINT32 readwrites = 0;
 		UINT32 saddr, daddr;
 		XY dstxy = { 0 };
@@ -1375,8 +1375,8 @@ static void FUNCTION_NAME(pixblt_r)(tms34010_state *tms, int src_is_linear, int 
 	if (!P_FLAG(tms))
 	{
 		int dx, dy, x, y, words, yreverse;
-		void (*word_write)(const address_space *space,offs_t address,UINT16 data);
-		UINT16 (*word_read)(const address_space *space,offs_t address);
+		void (*word_write)(address_space *space,offs_t address,UINT16 data);
+		UINT16 (*word_read)(address_space *space,offs_t address);
 		UINT32 saddr, daddr;
 		XY dstxy = { 0 };
 
@@ -1640,8 +1640,8 @@ static void FUNCTION_NAME(pixblt_b)(tms34010_state *tms, int dst_is_linear)
 	if (!P_FLAG(tms))
 	{
 		int dx, dy, x, y, words, left_partials, right_partials, full_words;
-		void (*word_write)(const address_space *space,offs_t address,UINT16 data);
-		UINT16 (*word_read)(const address_space *space,offs_t address);
+		void (*word_write)(address_space *space,offs_t address,UINT16 data);
+		UINT16 (*word_read)(address_space *space,offs_t address);
 		UINT32 saddr, daddr;
 		XY dstxy = { 0 };
 
@@ -1854,8 +1854,8 @@ static void FUNCTION_NAME(fill)(tms34010_state *tms, int dst_is_linear)
 	if (!P_FLAG(tms))
 	{
 		int dx, dy, x, y, words, left_partials, right_partials, full_words;
-		void (*word_write)(const address_space *space,offs_t address,UINT16 data);
-		UINT16 (*word_read)(const address_space *space,offs_t address);
+		void (*word_write)(address_space *space,offs_t address,UINT16 data);
+		UINT16 (*word_read)(address_space *space,offs_t address);
 		UINT32 daddr;
 		XY dstxy = { 0 };
 

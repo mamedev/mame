@@ -62,8 +62,8 @@ struct _hc11_state
 	device_irq_callback irq_callback;
 	UINT8 irq_state[2];
 	legacy_cpu_device *device;
-	const address_space *program;
-	const address_space *io;
+	address_space *program;
+	address_space *io;
 	int icount;
 
 	int ram_position;

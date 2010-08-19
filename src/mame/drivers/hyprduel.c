@@ -277,7 +277,7 @@ INLINE int blt_read( const UINT8 *ROM, const int offs )
 	return ROM[offs];
 }
 
-INLINE void blt_write( const address_space *space, const int tmap, const offs_t offs, const UINT16 data, const UINT16 mask )
+INLINE void blt_write( address_space *space, const int tmap, const offs_t offs, const UINT16 data, const UINT16 mask )
 {
 	switch( tmap )
 	{

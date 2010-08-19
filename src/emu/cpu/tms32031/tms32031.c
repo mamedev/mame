@@ -120,7 +120,7 @@ struct _tms32031_state
 	tms32031_iack_func	iack_w;
 	device_irq_callback	irq_callback;
 	legacy_cpu_device *device;
-	const address_space *program;
+	address_space *program;
 };
 
 INLINE tms32031_state *get_safe_token(running_device *device)

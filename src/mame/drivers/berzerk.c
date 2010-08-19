@@ -544,7 +544,7 @@ static READ8_HANDLER( berzerk_audio_r )
 
 static SOUND_RESET(berzerk)
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
 	/* clears the flip-flop controlling the volume and freq on the speech chip */
 	berzerk_audio_w(space, 4, 0x40);
 }
@@ -1185,7 +1185,7 @@ ROM_END
 
 static DRIVER_INIT( moonwarp )
 {
-	const address_space *io = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
+	address_space *io = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
 	memory_install_read8_handler (io, 0x48, 0x48, 0, 0, moonwarp_p1_r);
 	memory_install_read8_handler (io, 0x4a, 0x4a, 0, 0, moonwarp_p2_r);
 }

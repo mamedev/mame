@@ -539,13 +539,13 @@ typedef struct _m68k_memory_interface m68k_memory_interface;
 struct _m68k_memory_interface
 {
 	offs_t	opcode_xor;						// Address Calculation
-	UINT16	(*readimm16)(const address_space *, offs_t);			// Immediate read 16 bit
-	UINT8	(*read8)(const address_space *, offs_t);				// Normal read 8 bit
-	UINT16	(*read16)(const address_space *, offs_t);				// Normal read 16 bit
-	UINT32	(*read32)(const address_space *, offs_t);				// Normal read 32 bit
-	void	(*write8)(const address_space *, offs_t, UINT8);		// Write 8 bit
-	void	(*write16)(const address_space *, offs_t, UINT16);		// Write 16 bit
-	void	(*write32)(const address_space *, offs_t, UINT32);		// Write 32 bit
+	UINT16	(*readimm16)(address_space *, offs_t);			// Immediate read 16 bit
+	UINT8	(*read8)(address_space *, offs_t);				// Normal read 8 bit
+	UINT16	(*read16)(address_space *, offs_t);				// Normal read 16 bit
+	UINT32	(*read32)(address_space *, offs_t);				// Normal read 32 bit
+	void	(*write8)(address_space *, offs_t, UINT8);		// Write 8 bit
+	void	(*write16)(address_space *, offs_t, UINT16);		// Write 16 bit
+	void	(*write32)(address_space *, offs_t, UINT32);		// Write 32 bit
 };
 
 struct _m68ki_cpu_core
@@ -628,7 +628,7 @@ struct _m68ki_cpu_core
 	m68k_tas_func tas_instr_callback;             /* Called when a TAS instruction is encountered, allows / disallows writeback */
 
 	legacy_cpu_device *device;
-	const address_space *program;
+	address_space *program;
 	m68k_memory_interface memory;
 	offs_t encrypted_start;
 	offs_t encrypted_end;

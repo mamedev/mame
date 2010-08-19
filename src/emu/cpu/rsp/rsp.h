@@ -210,7 +210,7 @@ struct _rsp_state
 
 	device_irq_callback irq_callback;
 	legacy_cpu_device *device;
-	const address_space *program;
+	address_space *program;
 	int icount;
 
 	rspimp_state* impstate;

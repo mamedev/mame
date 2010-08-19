@@ -682,13 +682,13 @@ WRITE16_HANDLER(sprcpt_flags_2_w)
 // XXX
 // write only: 4c0 4c1 500 501 502 503
 
-static UINT16 handle_io_r(const address_space *space, int offset)
+static UINT16 handle_io_r(address_space *space, int offset)
 {
 	logerror("io_r %04x, %04x (%x)\n", offset*2, mainram[offset], cpu_get_pc(space->cpu));
 	return mainram[offset];
 }
 
-static void handle_io_w(const address_space *space, int offset, UINT16 data, UINT16 mem_mask)
+static void handle_io_w(address_space *space, int offset, UINT16 data, UINT16 mem_mask)
 {
 	COMBINE_DATA(&mainram[offset]);
 	switch(offset) {

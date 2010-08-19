@@ -194,7 +194,7 @@ static WRITE_LINE_DEVICE_HANDLER( r6532_irq )
 
 static WRITE8_DEVICE_HANDLER( r6532_soundlatch_w )
 {
-	const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	soundlatch_w(space, 0, data);
 }
 

@@ -90,7 +90,7 @@ VIDEO_START( blstroid )
 
 static TIMER_CALLBACK( irq_off )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* clear the interrupt */
 	atarigen_scanline_int_ack_w(space, 0, 0, 0xffff);

@@ -42,7 +42,7 @@ static UINT16 ram_adr, ram_latch[2], ram_scanadr;
 static UINT32 *ram_data;
 static float tgp_vr_base[4];
 
-static UINT32 fifoout_pop(const address_space *space)
+static UINT32 fifoout_pop(address_space *space)
 {
 	UINT32 v;
 	if(fifoout_wpos == fifoout_rpos) {
@@ -88,7 +88,7 @@ static UINT32 fifoin_pop(void)
 	return v;
 }
 
-static void fifoin_push(const address_space *space, UINT32 data)
+static void fifoin_push(address_space *space, UINT32 data)
 {
 	//  logerror("TGP FIFOIN write %08x (%x)\n", data, cpu_get_pc(space->cpu));
 	fifoin_data[fifoin_wpos++] = data;
@@ -2010,7 +2010,7 @@ static int copro_fifoin_pop(running_device *device, UINT32 *result)
 	return 1;
 }
 
-static void copro_fifoin_push(const address_space *space, UINT32 data)
+static void copro_fifoin_push(address_space *space, UINT32 data)
 {
 	if (copro_fifoin_num == FIFO_SIZE)
 	{
@@ -2028,7 +2028,7 @@ static void copro_fifoin_push(const address_space *space, UINT32 data)
 	copro_fifoin_num++;
 }
 
-static UINT32 copro_fifoout_pop(const address_space *space)
+static UINT32 copro_fifoout_pop(address_space *space)
 {
 	UINT32 r;
 

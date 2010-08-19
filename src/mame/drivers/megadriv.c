@@ -174,7 +174,7 @@ static bitmap_t* render_bitmap;
 #ifdef UNUSED_FUNCTION
 /* taken from segaic16.c */
 /* doesn't seem to meet my needs, not used */
-static UINT16 read_next_instruction(const address_space *space)
+static UINT16 read_next_instruction(address_space *space)
 {
 	static UINT8 recurse = 0;
 	UINT16 result;
@@ -3545,7 +3545,7 @@ INLINE void overwrite_write(UINT16 *dst, UINT16 d)
 	if (d & 0x000f) { *dst &= ~0x000f; *dst |= d & 0x000f; }
 }
 
-static UINT32 pm_io(const address_space *space, int reg, int write, UINT32 d)
+static UINT32 pm_io(address_space *space, int reg, int write, UINT32 d)
 {
 	if (svp.emu_status & SSP_PMC_SET)
 	{

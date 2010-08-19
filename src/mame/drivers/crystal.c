@@ -161,7 +161,7 @@ public:
 static void IntReq( running_machine *machine, int num )
 {
 	crystal_state *state = machine->driver_data<crystal_state>();
-	const address_space *space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
 	UINT32 IntEn = memory_read_dword(space, 0x01800c08);
 	UINT32 IntPend = memory_read_dword(space, 0x01800c0c);
 	if (IntEn & (1 << num))
@@ -243,7 +243,7 @@ static WRITE32_HANDLER( IntAck_w )
 static IRQ_CALLBACK( icallback )
 {
 	crystal_state *state = device->machine->driver_data<crystal_state>();
-	const address_space *space = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
+	address_space *space = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
 	UINT32 IntPend = memory_read_dword(space, 0x01800c0c);
 	int i;
 
@@ -280,7 +280,7 @@ static TIMER_CALLBACK( Timercb )
 	IntReq(machine, num[which]);
 }
 
-INLINE void Timer_w( const address_space *space, int which, UINT32 data, UINT32 mem_mask )
+INLINE void Timer_w( address_space *space, int which, UINT32 data, UINT32 mem_mask )
 {
 	crystal_state *state = space->machine->driver_data<crystal_state>();
 
@@ -399,7 +399,7 @@ static WRITE32_HANDLER( PIO_w )
 	COMBINE_DATA(&state->PIO);
 }
 
-INLINE void DMA_w( const address_space *space, int which, UINT32 data, UINT32 mem_mask )
+INLINE void DMA_w( address_space *space, int which, UINT32 data, UINT32 mem_mask )
 {
 	crystal_state *state = space->machine->driver_data<crystal_state>();
 
@@ -621,12 +621,12 @@ static MACHINE_RESET( crystal )
 	PatchReset(machine);
 }
 
-static UINT16 GetVidReg( const address_space *space, UINT16 reg )
+static UINT16 GetVidReg( address_space *space, UINT16 reg )
 {
 	return memory_read_word(space, 0x03000000 + reg);
 }
 
-static void SetVidReg( const address_space *space, UINT16 reg, UINT16 val )
+static void SetVidReg( address_space *space, UINT16 reg, UINT16 val )
 {
 	memory_write_word(space, 0x03000000 + reg, val);
 }
@@ -635,7 +635,7 @@ static void SetVidReg( const address_space *space, UINT16 reg, UINT16 val )
 static VIDEO_UPDATE( crystal )
 {
 	crystal_state *state = screen->machine->driver_data<crystal_state>();
-	const address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int DoFlip;
 
 	UINT32 B0 = 0x0;
@@ -696,7 +696,7 @@ static VIDEO_UPDATE( crystal )
 static VIDEO_EOF(crystal)
 {
 	crystal_state *state = machine->driver_data<crystal_state>();
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT16 head, tail;
 	int DoFlip = 0;
 

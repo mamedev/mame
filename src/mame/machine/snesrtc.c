@@ -109,7 +109,7 @@ static UINT8 srtc_weekday( UINT32 year, UINT32 month, UINT32 day )
 	return (sum + 1) % 7; // 1900-01-01 was a Monday
 }
 
-static UINT8 srtc_read( const address_space *space, UINT16 addr )
+static UINT8 srtc_read( address_space *space, UINT16 addr )
 {
 	addr &= 0xffff;
 

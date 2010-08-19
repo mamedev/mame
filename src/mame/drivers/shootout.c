@@ -413,7 +413,7 @@ ROM_END
 
 static DRIVER_INIT( shootout )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int length = memory_region_length(machine, "maincpu");
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, length - 0x8000);
 	UINT8 *rom = memory_region(machine, "maincpu");

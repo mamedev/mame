@@ -111,7 +111,7 @@ static TIMER_CALLBACK( vidc_vblank )
 /* at about every ~4/4 USEC do a DMA transfer byte */
 static TIMER_CALLBACK( vidc_video_tick )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	static UINT8 *vram = memory_region(machine,"vram");
 
 	vram[vidc_vidcur] = (memory_read_byte(space,vidc_vidstart+vidc_vidcur));
@@ -131,7 +131,7 @@ static TIMER_CALLBACK( vidc_video_tick )
 
 static TIMER_CALLBACK( vidc_audio_tick )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	dac_signed_data_w(space->machine->device("dac"), (memory_read_byte(space,vidc_sndcur)));
 

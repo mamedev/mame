@@ -126,7 +126,7 @@ struct _ide_state
 	UINT8			verify_only;
 
 	UINT8			dma_active;
-	const address_space *dma_space;
+	address_space *dma_space;
 	UINT8			dma_address_xor;
 	UINT8			dma_last_buffer;
 	offs_t			dma_address;

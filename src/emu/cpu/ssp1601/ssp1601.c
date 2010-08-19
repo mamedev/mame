@@ -53,8 +53,8 @@ struct _ssp1601_state_t
 	int g_cycles;
 
 	legacy_cpu_device *device;
-	const address_space *program;
-	const address_space *io;
+	address_space *program;
+	address_space *io;
 };
 
 INLINE ssp1601_state_t *get_safe_token(running_device *device)

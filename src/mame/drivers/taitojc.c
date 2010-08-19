@@ -479,7 +479,7 @@ static WRITE32_HANDLER (jc_control1_w)
 
 
 
-static UINT8 mcu_comm_reg_r(const address_space *space, int reg)
+static UINT8 mcu_comm_reg_r(address_space *space, int reg)
 {
 	taitojc_state *state = space->machine->driver_data<taitojc_state>();
 	UINT8 r = 0;
@@ -506,7 +506,7 @@ static UINT8 mcu_comm_reg_r(const address_space *space, int reg)
 	return r;
 }
 
-static void mcu_comm_reg_w(const address_space *space, int reg, UINT8 data)
+static void mcu_comm_reg_w(address_space *space, int reg, UINT8 data)
 {
 	taitojc_state *state = space->machine->driver_data<taitojc_state>();
 

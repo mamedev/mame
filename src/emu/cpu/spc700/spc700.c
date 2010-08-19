@@ -88,7 +88,7 @@ typedef struct
 	uint ir;		/* Instruction Register */
 	device_irq_callback int_ack;
 	legacy_cpu_device *device;
-	const address_space *program;
+	address_space *program;
 	uint stopped;	/* stopped status */
 	int ICount;
 	uint source;

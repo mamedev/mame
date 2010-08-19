@@ -314,13 +314,13 @@ static void pokey_reset(running_machine &machine)
 }
 
 
-static UINT8 console_read(const address_space *space)
+static UINT8 console_read(address_space *space)
 {
 	return input_port_read(space->machine, "console");
 }
 
 
-static void console_write(const address_space *space, UINT8 data)
+static void console_write(address_space *space, UINT8 data)
 {
 	running_device *dac = space->machine->device("dac");
 	if (data & 0x08)

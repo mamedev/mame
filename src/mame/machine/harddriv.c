@@ -689,7 +689,7 @@ static TIMER_CALLBACK( stmsp_sync_update )
 }
 
 
-INLINE void stmsp_sync_w(const address_space *space, offs_t offset, UINT16 data, UINT16 mem_mask, int which)
+INLINE void stmsp_sync_w(address_space *space, offs_t offset, UINT16 data, UINT16 mem_mask, int which)
 {
 	harddriv_state *state = space->machine->driver_data<harddriv_state>();
 	UINT16 newdata = state->stmsp_sync[which][offset];

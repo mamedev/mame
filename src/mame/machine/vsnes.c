@@ -201,7 +201,7 @@ static void v_set_videorom_bank( running_machine* machine, int start, int count,
 
 MACHINE_START( vsnes )
 {
-	const address_space *ppu1_space = cpu_get_address_space(machine->device("ppu1"), ADDRESS_SPACE_PROGRAM);
+	address_space *ppu1_space = cpu_get_address_space(machine->device("ppu1"), ADDRESS_SPACE_PROGRAM);
 	int i;
 
 	/* establish nametable ram */

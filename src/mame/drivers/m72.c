@@ -319,9 +319,9 @@ static READ8_HANDLER( m72_snd_cpu_sample_r )
 
 INLINE DRIVER_INIT( m72_8751 )
 {
-	const address_space *program = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	const address_space *io = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
-	const address_space *sndio = cputag_get_address_space(machine, "soundcpu", ADDRESS_SPACE_IO);
+	address_space *program = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *io = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
+	address_space *sndio = cputag_get_address_space(machine, "soundcpu", ADDRESS_SPACE_IO);
 	running_device *dac = machine->device("dac");
 
 	protection_ram = auto_alloc_array(machine, UINT16, 0x10000/2);
@@ -403,7 +403,7 @@ static int find_sample(int num)
 
 static INTERRUPT_GEN(fake_nmi)
 {
-	const address_space *space = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
+	address_space *space = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
 	int sample = m72_sample_r(space,0);
 	if (sample)
 		m72_sample_w(device->machine->device("dac"),0,sample);

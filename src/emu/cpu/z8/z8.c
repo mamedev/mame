@@ -159,9 +159,9 @@ enum
 typedef struct _z8_state z8_state;
 struct _z8_state
 {
-    const address_space *program;
-    const address_space *data;
-    const address_space *io;
+    address_space *program;
+    address_space *data;
+    address_space *io;
 
 	/* registers */
 	UINT16 pc;				/* program counter */

@@ -212,7 +212,7 @@ static UINT32 dsp_comm_sharc_r(int board, int offset)
 	return dsp_comm_ppc[board][offset];
 }
 
-static void dsp_comm_sharc_w(const address_space *space, int board, int offset, UINT32 data)
+static void dsp_comm_sharc_w(address_space *space, int board, int offset, UINT32 data)
 {
 	if (offset >= 2)
 	{
@@ -351,7 +351,7 @@ WRITE32_HANDLER( cgboard_1_shared_sharc_w )
 
 /*****************************************************************************/
 
-static UINT32 nwk_fifo_r(const address_space *space, int board)
+static UINT32 nwk_fifo_r(address_space *space, int board)
 {
 	const char *dsptag = (board == 0) ? "dsp" : "dsp2";
 	running_device *device = space->machine->device(dsptag);

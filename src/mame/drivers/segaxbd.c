@@ -386,7 +386,7 @@ static void timer_ack_callback(running_machine *machine)
 static TIMER_CALLBACK( delayed_sound_data_w )
 {
 	segas1x_state *state = machine->driver_data<segas1x_state>();
-	const address_space *space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
 
 	soundlatch_w(space, 0, param);
 	cpu_set_input_line(state->soundcpu, INPUT_LINE_NMI, ASSERT_LINE);

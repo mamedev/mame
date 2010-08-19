@@ -52,7 +52,7 @@ struct _sm8500_state
 	int icount;
 	device_irq_callback irq_callback;
 	legacy_cpu_device *device;
-	const address_space *program;
+	address_space *program;
 	UINT8 internal_ram[0x500];
 };
 

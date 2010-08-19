@@ -184,7 +184,7 @@ static MACHINE_RESET( pignewt )
  *
  *************************************/
 
-static offs_t decrypt_offset(const address_space *space, offs_t offset)
+static offs_t decrypt_offset(address_space *space, offs_t offset)
 {
 	/* ignore anything but accesses via opcode $32 (LD $(XXYY),A) */
 	offs_t pc = cpu_get_previouspc(space->cpu);
@@ -297,7 +297,7 @@ static WRITE8_HANDLER( coin_count_w )
 
 static WRITE8_DEVICE_HANDLER( sindbadm_soundport_w )
 {
-	const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	soundlatch_w(space, 0, data);
 	cputag_set_input_line(device->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE);
 	cpuexec_boost_interleave(device->machine, attotime_zero, ATTOTIME_IN_USEC(50));

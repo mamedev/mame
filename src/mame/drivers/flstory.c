@@ -126,7 +126,7 @@ ADDRESS_MAP_END
 static CUSTOM_INPUT( victnine_mcu_status_bit01_r )
 {
 	flstory_state *state = field->port->machine->driver_data<flstory_state>();
-	const address_space *space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
 
 	return (victnine_mcu_status_r(space, 0) & 3);
 }

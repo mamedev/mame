@@ -186,7 +186,7 @@ struct _psxcpu_state
 	UINT32 multiplier_operand2;
 	device_irq_callback irq_callback;
 	legacy_cpu_device *device;
-	const address_space *program;
+	address_space *program;
 	int bus_attached;
 	UINT32 bad_byte_address_mask;
 	UINT32 bad_half_address_mask;
@@ -1300,7 +1300,7 @@ static WRITE32_HANDLER( psx_berr_w )
 	psxcpu->berr = 1;
 }
 
-static void mips_update_scratchpad( const address_space *space )
+static void mips_update_scratchpad( address_space *space )
 {
 	psxcpu_state *psxcpu = get_safe_token(space->cpu);
 

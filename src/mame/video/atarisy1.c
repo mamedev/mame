@@ -386,7 +386,7 @@ WRITE16_HANDLER( atarisy1_spriteram_w )
 
 TIMER_DEVICE_CALLBACK( atarisy1_int3off_callback )
 {
-	const address_space *space = cputag_get_address_space(timer.machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(timer.machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* clear the state */
 	atarigen_scanline_int_ack_w(space, 0, 0, 0xffff);

@@ -456,7 +456,7 @@ static READ8_HANDLER( rambankswitch_r )
 	return state->cur_rambank[offset];
 }
 
-static void bank_w(const address_space *space, offs_t offset, UINT8 data, int banknum )
+static void bank_w(address_space *space, offs_t offset, UINT8 data, int banknum )
 {
 	taitol_state *state = space->machine->driver_data<taitol_state>();
 

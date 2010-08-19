@@ -493,7 +493,7 @@ static void jaguar_set_palette(UINT16 vmode)
 
 static UINT8 *get_jaguar_memory(running_machine *machine, UINT32 offset)
 {
-	const address_space *space = cputag_get_address_space(machine, "gpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "gpu", ADDRESS_SPACE_PROGRAM);
 	return (UINT8 *)memory_get_read_ptr(space, offset);
 }
 

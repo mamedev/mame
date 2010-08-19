@@ -455,7 +455,7 @@ static WRITE8_HANDLER( profpac_banksw_w )
 
 static STATE_POSTLOAD( profbank_banksw_restore )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
 
 	profpac_banksw_w(space, 0, profpac_bank);
 }
@@ -1766,7 +1766,7 @@ static DRIVER_INIT( robby )
 
 static DRIVER_INIT( profpac )
 {
-	const address_space *iospace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
+	address_space *iospace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
 
 	astrocade_video_config = AC_SOUND_PRESENT;
 	memory_install_read8_handler(iospace, 0x14, 0x14, 0x0fff, 0xff00, profpac_io_1_r);
@@ -1780,7 +1780,7 @@ static DRIVER_INIT( profpac )
 
 static DRIVER_INIT( demndrgn )
 {
-	const address_space *iospace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
+	address_space *iospace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
 
 	astrocade_video_config = 0x00;
 	memory_install_read8_handler(iospace, 0x14, 0x14, 0x1fff, 0xff00, demndrgn_io_r);
@@ -1796,7 +1796,7 @@ static DRIVER_INIT( demndrgn )
 
 static DRIVER_INIT( tenpindx )
 {
-	const address_space *iospace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
+	address_space *iospace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
 
 	astrocade_video_config = 0x00;
 	memory_install_read_port(iospace, 0x60, 0x60, 0x0000, 0xff00, "P60");

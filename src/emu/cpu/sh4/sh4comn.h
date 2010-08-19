@@ -63,9 +63,9 @@ typedef struct
 	INT8	irq_line_state[17];
 	device_irq_callback irq_callback;
 	legacy_cpu_device *device;
-	const address_space *internal;
-	const address_space *program;
-	const address_space *io;
+	address_space *internal;
+	address_space *program;
+	address_space *io;
 	UINT32	*m;
 	INT8	nmi_line_state;
 

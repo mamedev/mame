@@ -1364,7 +1364,7 @@ ROM_END
 
 static void sound_cpu_decrypt(running_machine *machine)
 {
-	const address_space *space = cputag_get_address_space(machine, "audiocpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "audiocpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x4000);
 	UINT8 *rom = memory_region(machine, "audiocpu");
 	int i;
@@ -1398,7 +1398,7 @@ static DRIVER_INIT( yellowcb )
 static DRIVER_INIT( liberate )
 {
 	int A;
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x10000);
 	UINT8 *ROM = memory_region(machine, "maincpu");
 

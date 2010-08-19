@@ -131,9 +131,9 @@ typedef struct _am29000_state
 	UINT32			exec_pc;
 	UINT32			next_pc;
 
-	const address_space *program;
-	const address_space *data;
-	const address_space *io;
+	address_space *program;
+	address_space *data;
+	address_space *io;
 } am29000_state;
 
 

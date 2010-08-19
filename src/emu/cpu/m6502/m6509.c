@@ -79,7 +79,7 @@ struct _m6509_Regs {
 	UINT8	so_state;
 	device_irq_callback irq_callback;
 	legacy_cpu_device *device;
-	const address_space *space;
+	address_space *space;
 
 	int 	icount;
 
@@ -134,8 +134,8 @@ static ADDRESS_MAP_START(m6509_mem, ADDRESS_SPACE_PROGRAM, 8)
 	AM_RANGE(0x00001, 0x00001) AM_MIRROR(0xF0000) AM_READWRITE(m6509_read_00001, m6509_write_00001)
 ADDRESS_MAP_END
 
-static UINT8 default_rdmem_id(const address_space *space, offs_t address) { return memory_read_byte_8le(space, address); }
-static void default_wdmem_id(const address_space *space, offs_t address, UINT8 data) { memory_write_byte_8le(space, address, data); }
+static UINT8 default_rdmem_id(address_space *space, offs_t address) { return memory_read_byte_8le(space, address); }
+static void default_wdmem_id(address_space *space, offs_t address, UINT8 data) { memory_write_byte_8le(space, address, data); }
 
 static CPU_INIT( m6509 )
 {

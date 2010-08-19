@@ -206,7 +206,7 @@ INLINE UINT8 swap_bits_5_6(UINT8 data)
 }
 
 
-static void btime_decrypt( const address_space *space )
+static void btime_decrypt( address_space *space )
 {
 	btime_state *state = space->machine->driver_data<btime_state>();
 	UINT8 *src, *src1;
@@ -2077,7 +2077,7 @@ ROM_END
 
 static void decrypt_C10707_cpu(running_machine *machine, const char *cputag)
 {
-	const address_space *space = cputag_get_address_space(machine, cputag, ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, cputag, ADDRESS_SPACE_PROGRAM);
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x10000);
 	UINT8 *rom = memory_region(machine, cputag);
 	offs_t addr;
@@ -2107,7 +2107,7 @@ static READ8_HANDLER( wtennis_reset_hack_r )
 
 static void init_rom1(running_machine *machine)
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *rom = memory_region(machine, "maincpu");
 
 	decrypted = auto_alloc_array(machine, UINT8, 0x10000);

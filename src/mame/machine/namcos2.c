@@ -110,7 +110,7 @@ MACHINE_START( namcos2 )
 
 MACHINE_RESET( namcos2 )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	mFinalLapProtCount = 0;
 	namcos2_mcu_analog_ctrl = 0;
 	namcos2_mcu_analog_data = 0xaa;
@@ -486,7 +486,7 @@ static void InitC148(void)
 }
 
 static UINT16
-ReadWriteC148( const address_space *space, offs_t offset, UINT16 data, int bWrite )
+ReadWriteC148( address_space *space, offs_t offset, UINT16 data, int bWrite )
 {
 	offs_t addr = ((offset * 2) + 0x1c0000) & 0x1fe000;
 	running_device *altcpu = NULL;

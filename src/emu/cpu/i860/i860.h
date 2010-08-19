@@ -169,7 +169,7 @@ typedef struct {
      * MAME-specific stuff.
      */
 	legacy_cpu_device *device;
-	const address_space *program;
+	address_space *program;
 	UINT32 ppc;
 	int icount;
 

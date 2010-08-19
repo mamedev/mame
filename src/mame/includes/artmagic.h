@@ -13,8 +13,8 @@ extern int artmagic_xor[16], artmagic_is_stoneball;
 
 VIDEO_START( artmagic );
 
-void artmagic_to_shiftreg(const address_space *space, offs_t address, UINT16 *data);
-void artmagic_from_shiftreg(const address_space *space, offs_t address, UINT16 *data);
+void artmagic_to_shiftreg(address_space *space, offs_t address, UINT16 *data);
+void artmagic_from_shiftreg(address_space *space, offs_t address, UINT16 *data);
 
 READ16_HANDLER( artmagic_blitter_r );
 WRITE16_HANDLER( artmagic_blitter_w );

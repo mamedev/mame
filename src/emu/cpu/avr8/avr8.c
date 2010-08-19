@@ -27,8 +27,8 @@ struct _avr8_state
     UINT32 pc;
 
     legacy_cpu_device *device;
-    const address_space *program;
-    const address_space *io;
+    address_space *program;
+    address_space *io;
     int icount;
 };
 

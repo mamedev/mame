@@ -1621,7 +1621,7 @@ ROM_START( aoh )
 	ROM_COPY( "user2", 0x060000, 0x0e0000, 0x020000)
 ROM_END
 
-static int irq_active(const address_space *space)
+static int irq_active(address_space *space)
 {
 	UINT32 FCR = cpu_get_reg(space->cpu, 27);
 	if( !(FCR&(1<<29)) ) // int 2 (irq 4)

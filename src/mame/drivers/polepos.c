@@ -458,7 +458,7 @@ static const namco_53xx_interface namco_53xx_intf =
 
 static MACHINE_RESET( polepos )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int i;
 
 	/* Reset all latches */

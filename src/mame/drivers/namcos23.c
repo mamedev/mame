@@ -1911,7 +1911,7 @@ static void p3d_flush(const UINT16 *p, int size)
 	render_count[render_cur]++;
 }
 
-static void p3d_dma(const address_space *space, UINT32 adr, UINT32 size)
+static void p3d_dma(address_space *space, UINT32 adr, UINT32 size)
 {
 	adr &= 0x1fffffff;
 	UINT16 buffer[256];

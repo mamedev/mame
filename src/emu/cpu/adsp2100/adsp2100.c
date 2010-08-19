@@ -263,9 +263,9 @@ typedef struct
 	adsp21xx_timer_func timer_fired;
 
 	/* memory spaces */
-    const address_space *program;
-    const address_space *data;
-    const address_space *io;
+    address_space *program;
+    address_space *data;
+    address_space *io;
 
 } adsp2100_state;
 

@@ -112,10 +112,10 @@ static void process_source_file(running_machine *machine);
 
 /* expression handlers */
 static UINT64 expression_read_memory(void *param, const char *name, int space, UINT32 address, int size);
-static UINT64 expression_read_program_direct(const address_space *space, int opcode, offs_t address, int size);
+static UINT64 expression_read_program_direct(address_space *space, int opcode, offs_t address, int size);
 static UINT64 expression_read_memory_region(running_machine *machine, const char *rgntag, offs_t address, int size);
 static void expression_write_memory(void *param, const char *name, int space, UINT32 address, int size, UINT64 data);
-static void expression_write_program_direct(const address_space *space, int opcode, offs_t address, int size, UINT64 data);
+static void expression_write_program_direct(address_space *space, int opcode, offs_t address, int size, UINT64 data);
 static void expression_write_memory_region(running_machine *machine, const char *rgntag, offs_t address, int size, UINT64 data);
 static EXPRERR expression_validate(void *param, const char *name, int space);
 
@@ -323,7 +323,7 @@ void debug_cpu_source_script(running_machine *machine, const char *file)
     address
 -------------------------------------------------*/
 
-int debug_cpu_translate(const address_space *space, int intention, offs_t *address)
+int debug_cpu_translate(address_space *space, int intention, offs_t *address)
 {
 	device_memory_interface *memory;
 	if (space->cpu->interface(memory))
@@ -341,7 +341,7 @@ int debug_cpu_translate(const address_space *space, int intention, offs_t *addre
     the specified memory space
 -------------------------------------------------*/
 
-UINT8 debug_read_byte(const address_space *_space, offs_t address, int apply_translation)
+UINT8 debug_read_byte(address_space *_space, offs_t address, int apply_translation)
 {
 	address_space *space = const_cast<address_space *>(_space);
 	debugcpu_private *global = space->machine->debugcpu_data;
@@ -377,7 +377,7 @@ UINT8 debug_read_byte(const address_space *_space, offs_t address, int apply_tra
     specified memory space
 -------------------------------------------------*/
 
-UINT16 debug_read_word(const address_space *_space, offs_t address, int apply_translation)
+UINT16 debug_read_word(address_space *_space, offs_t address, int apply_translation)
 {
 	address_space *space = const_cast<address_space *>(_space);
 	debugcpu_private *global = space->machine->debugcpu_data;
@@ -432,7 +432,7 @@ UINT16 debug_read_word(const address_space *_space, offs_t address, int apply_tr
     specified memory space
 -------------------------------------------------*/
 
-UINT32 debug_read_dword(const address_space *_space, offs_t address, int apply_translation)
+UINT32 debug_read_dword(address_space *_space, offs_t address, int apply_translation)
 {
 	address_space *space = const_cast<address_space *>(_space);
 	debugcpu_private *global = space->machine->debugcpu_data;
@@ -487,7 +487,7 @@ UINT32 debug_read_dword(const address_space *_space, offs_t address, int apply_t
     specified memory space
 -------------------------------------------------*/
 
-UINT64 debug_read_qword(const address_space *_space, offs_t address, int apply_translation)
+UINT64 debug_read_qword(address_space *_space, offs_t address, int apply_translation)
 {
 	address_space *space = const_cast<address_space *>(_space);
 	debugcpu_private *global = space->machine->debugcpu_data;
@@ -542,7 +542,7 @@ UINT64 debug_read_qword(const address_space *_space, offs_t address, int apply_t
     from the specified memory space
 -------------------------------------------------*/
 
-UINT64 debug_read_memory(const address_space *space, offs_t address, int size, int apply_translation)
+UINT64 debug_read_memory(address_space *space, offs_t address, int size, int apply_translation)
 {
 	UINT64 result = ~(UINT64)0 >> (64 - 8*size);
 	switch (size)
@@ -561,7 +561,7 @@ UINT64 debug_read_memory(const address_space *space, offs_t address, int size, i
     specified memory space
 -------------------------------------------------*/
 
-void debug_write_byte(const address_space *_space, offs_t address, UINT8 data, int apply_translation)
+void debug_write_byte(address_space *_space, offs_t address, UINT8 data, int apply_translation)
 {
 	address_space *space = const_cast<address_space *>(_space);
 	debugcpu_private *global = space->machine->debugcpu_data;
@@ -595,7 +595,7 @@ void debug_write_byte(const address_space *_space, offs_t address, UINT8 data, i
     specified memory space
 -------------------------------------------------*/
 
-void debug_write_word(const address_space *_space, offs_t address, UINT16 data, int apply_translation)
+void debug_write_word(address_space *_space, offs_t address, UINT16 data, int apply_translation)
 {
 	address_space *space = const_cast<address_space *>(_space);
 	debugcpu_private *global = space->machine->debugcpu_data;
@@ -648,7 +648,7 @@ void debug_write_word(const address_space *_space, offs_t address, UINT16 data, 
     specified memory space
 -------------------------------------------------*/
 
-void debug_write_dword(const address_space *_space, offs_t address, UINT32 data, int apply_translation)
+void debug_write_dword(address_space *_space, offs_t address, UINT32 data, int apply_translation)
 {
 	address_space *space = const_cast<address_space *>(_space);
 	debugcpu_private *global = space->machine->debugcpu_data;
@@ -701,7 +701,7 @@ void debug_write_dword(const address_space *_space, offs_t address, UINT32 data,
     specified memory space
 -------------------------------------------------*/
 
-void debug_write_qword(const address_space *_space, offs_t address, UINT64 data, int apply_translation)
+void debug_write_qword(address_space *_space, offs_t address, UINT64 data, int apply_translation)
 {
 	address_space *space = const_cast<address_space *>(_space);
 	debugcpu_private *global = space->machine->debugcpu_data;
@@ -754,7 +754,7 @@ void debug_write_qword(const address_space *_space, offs_t address, UINT64 data,
     to the specified memory space
 -------------------------------------------------*/
 
-void debug_write_memory(const address_space *space, offs_t address, UINT64 data, int size, int apply_translation)
+void debug_write_memory(address_space *space, offs_t address, UINT64 data, int size, int apply_translation)
 {
 	switch (size)
 	{
@@ -771,7 +771,7 @@ void debug_write_memory(const address_space *space, offs_t address, UINT64 data,
     the given offset from opcode space
 -------------------------------------------------*/
 
-UINT64 debug_read_opcode(const address_space *_space, offs_t address, int size, int arg)
+UINT64 debug_read_opcode(address_space *_space, offs_t address, int size, int arg)
 {
 	address_space *space = const_cast<address_space *>(_space);
 	UINT64 result = ~(UINT64)0 & (~(UINT64)0 >> (64 - 8*size)), result2;
@@ -1039,7 +1039,7 @@ static UINT64 expression_read_memory(void *param, const char *name, int spacenum
 	running_machine *machine = (running_machine *)param;
 	UINT64 result = ~(UINT64)0 >> (64 - 8*size);
 	device_t *device = NULL;
-	const address_space *space;
+	address_space *space;
 
 	switch (spacenum)
 	{
@@ -1093,7 +1093,7 @@ static UINT64 expression_read_memory(void *param, const char *name, int spacenum
     directly from an opcode or RAM pointer
 -------------------------------------------------*/
 
-static UINT64 expression_read_program_direct(const address_space *_space, int opcode, offs_t address, int size)
+static UINT64 expression_read_program_direct(address_space *_space, int opcode, offs_t address, int size)
 {
 	address_space *space = const_cast<address_space *>(_space);
 	UINT64 result = ~(UINT64)0 >> (64 - 8*size);
@@ -1207,7 +1207,7 @@ static void expression_write_memory(void *param, const char *name, int spacenum,
 {
 	running_machine *machine = (running_machine *)param;
 	device_t *device = NULL;
-	const address_space *space;
+	address_space *space;
 
 	switch (spacenum)
 	{
@@ -1260,7 +1260,7 @@ static void expression_write_memory(void *param, const char *name, int spacenum,
     directly to an opcode or RAM pointer
 -------------------------------------------------*/
 
-static void expression_write_program_direct(const address_space *_space, int opcode, offs_t address, int size, UINT64 data)
+static void expression_write_program_direct(address_space *_space, int opcode, offs_t address, int size, UINT64 data)
 {
 	address_space *space = const_cast<address_space *>(_space);
 	if (space != NULL)
@@ -1905,7 +1905,7 @@ void device_debug::instruction_hook(offs_t curpc)
 //  memory read happens
 //-------------------------------------------------
 
-void device_debug::memory_read_hook(const address_space &space, offs_t address, UINT64 mem_mask)
+void device_debug::memory_read_hook(address_space &space, offs_t address, UINT64 mem_mask)
 {
 	// check watchpoints
 	watchpoint_check(space, WATCHPOINT_READ, address, 0, mem_mask);
@@ -1922,7 +1922,7 @@ void device_debug::memory_read_hook(const address_space &space, offs_t address, 
 //  memory write happens
 //-------------------------------------------------
 
-void device_debug::memory_write_hook(const address_space &space, offs_t address, UINT64 data, UINT64 mem_mask)
+void device_debug::memory_write_hook(address_space &space, offs_t address, UINT64 data, UINT64 mem_mask)
 {
 	watchpoint_check(space, WATCHPOINT_WRITE, address, data, mem_mask);
 }
@@ -1966,7 +1966,7 @@ offs_t device_debug::disassemble(char *buffer, offs_t pc, const UINT8 *oprom, co
 #ifdef MAME_DEBUG
 if (m_memory != NULL && m_disasm != NULL)
 {
-	const address_space *space = m_memory->space(AS_PROGRAM);
+	address_space *space = m_memory->space(AS_PROGRAM);
 	int bytes = space->address_to_byte(result & DASMFLAG_LENGTHMASK);
 	assert(bytes >= m_disasm->min_opcode_bytes());
 	assert(bytes <= m_disasm->max_opcode_bytes());
@@ -2279,7 +2279,7 @@ void device_debug::breakpoint_enable_all(bool enable)
 //  returning its index
 //-------------------------------------------------
 
-int device_debug::watchpoint_set(const address_space &space, int type, offs_t address, offs_t length, parsed_expression *condition, const char *action)
+int device_debug::watchpoint_set(address_space &space, int type, offs_t address, offs_t length, parsed_expression *condition, const char *action)
 {
 	assert(space.spacenum() < ARRAY_LENGTH(m_wplist));
 
@@ -2309,7 +2309,7 @@ bool device_debug::watchpoint_clear(int index)
 			if ((*wp)->m_index == index)
 			{
 				watchpoint *deleteme = *wp;
-				const address_space &space = deleteme->m_space;
+				address_space &space = deleteme->m_space;
 				*wp = deleteme->m_next;
 				auto_free(m_device.machine, deleteme);
 				watchpoint_update_flags(space);
@@ -2573,7 +2573,7 @@ void device_debug::breakpoint_check(offs_t pc)
 //  watchpoint flags
 //-------------------------------------------------
 
-void device_debug::watchpoint_update_flags(const address_space &space)
+void device_debug::watchpoint_update_flags(address_space &space)
 {
 	// if hotspots are enabled, turn on all reads
 	bool enableread = false;
@@ -2602,7 +2602,7 @@ void device_debug::watchpoint_update_flags(const address_space &space)
 //  for a given CPU and address space
 //-------------------------------------------------
 
-void device_debug::watchpoint_check(const address_space &space, int type, offs_t address, UINT64 value_to_write, UINT64 mem_mask)
+void device_debug::watchpoint_check(address_space &space, int type, offs_t address, UINT64 value_to_write, UINT64 mem_mask)
 {
 	debugcpu_private *global = space.machine->debugcpu_data;
 
@@ -2688,7 +2688,7 @@ void device_debug::watchpoint_check(const address_space &space, int type, offs_t
 //  memory read access
 //-------------------------------------------------
 
-void device_debug::hotspot_check(const address_space &space, offs_t address)
+void device_debug::hotspot_check(address_space &space, offs_t address)
 {
 	offs_t curpc = pc();
 
@@ -2739,7 +2739,7 @@ UINT32 device_debug::dasm_wrapped(astring &buffer, offs_t pc)
 	assert(m_memory != NULL && m_disasm != NULL);
 
 	// determine the adjusted PC
-	const address_space *space = m_memory->space(AS_PROGRAM);
+	address_space *space = m_memory->space(AS_PROGRAM);
 	offs_t pcbyte = space->address_to_byte(pc) & space->bytemask();
 
 	// fetch the bytes up to the maximum
@@ -2788,7 +2788,7 @@ UINT64 device_debug::get_cycles(void *globalref, void *ref)
 
 UINT64 device_debug::get_logunmap(void *globalref, void *ref)
 {
-	const address_space *space = reinterpret_cast<const address_space *>(ref);
+	address_space *space = reinterpret_cast<address_space *>(ref);
 	return memory_get_log_unmap(space);
 }
 
@@ -2892,7 +2892,7 @@ bool device_debug::breakpoint::hit(offs_t pc)
 //  watchpoint - constructor
 //-------------------------------------------------
 
-device_debug::watchpoint::watchpoint(int index, const address_space &space, int type, offs_t address, offs_t length, parsed_expression *condition, const char *action)
+device_debug::watchpoint::watchpoint(int index, address_space &space, int type, offs_t address, offs_t length, parsed_expression *condition, const char *action)
 	: m_next(NULL),
 	  m_space(space),
 	  m_index(index),

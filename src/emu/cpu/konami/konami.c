@@ -62,7 +62,7 @@ struct _konami_state
 	UINT8	nmi_pending;
 	int		icount;
 	legacy_cpu_device *device;
-	const address_space *program;
+	address_space *program;
 	konami_set_lines_func setlines_callback;
 };
 

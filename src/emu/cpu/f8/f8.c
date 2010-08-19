@@ -54,8 +54,8 @@ struct _f8_Regs
 	UINT16  irq_vector;
 	device_irq_callback irq_callback;
 	legacy_cpu_device *device;
-	const address_space *program;
-	const address_space *iospace;
+	address_space *program;
+	address_space *iospace;
 	int icount;
 	UINT8   r[64];  /* scratchpad RAM */
 	int     irq_request;

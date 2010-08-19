@@ -47,8 +47,8 @@ READ16_HANDLER( midtunit_vram_r );
 READ16_HANDLER( midtunit_vram_data_r );
 READ16_HANDLER( midtunit_vram_color_r );
 
-void midtunit_to_shiftreg(const address_space *space, UINT32 address, UINT16 *shiftreg);
-void midtunit_from_shiftreg(const address_space *space, UINT32 address, UINT16 *shiftreg);
+void midtunit_to_shiftreg(address_space *space, UINT32 address, UINT16 *shiftreg);
+void midtunit_from_shiftreg(address_space *space, UINT32 address, UINT16 *shiftreg);
 
 WRITE16_HANDLER( midtunit_control_w );
 WRITE16_HANDLER( midwunit_control_w );

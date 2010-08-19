@@ -57,7 +57,7 @@ static WRITE8_HANDLER( srumbler_bankswitch_w )
 
 static MACHINE_RESET( srumbler )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	/* initialize banked ROM pointers */
 	srumbler_bankswitch_w(space,0,0);
 }

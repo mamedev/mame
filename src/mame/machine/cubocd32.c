@@ -469,7 +469,7 @@ static void akiko_start_dma( void )
 	timer_adjust_oneshot( akiko.dma_timer, ATTOTIME_IN_USEC( CD_SECTOR_TIME / akiko.cdrom_speed ), 0 );
 }
 
-static void akiko_setup_response( const address_space *space, int len, UINT8 *r1 )
+static void akiko_setup_response( address_space *space, int len, UINT8 *r1 )
 {
 	int		resp_addr = akiko.cdrom_address[1];
 	UINT8	resp_csum = 0xff;
@@ -516,7 +516,7 @@ static TIMER_CALLBACK( akiko_cd_delayed_cmd )
 
 	if ( param == 0x05 )
 	{
-		const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+		address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 		if (LOG_AKIKO_CD) logerror( "AKIKO: Completing Command %d\n", param );
 
 		resp[0] = 0x06;
@@ -538,7 +538,7 @@ static TIMER_CALLBACK( akiko_cd_delayed_cmd )
 	}
 }
 
-static void akiko_update_cdrom(const address_space *space)
+static void akiko_update_cdrom(address_space *space)
 {
 	UINT8	resp[32], cmdbuf[32];
 

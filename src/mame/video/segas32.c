@@ -433,7 +433,7 @@ INLINE UINT16 common_paletteram_r(int which, offs_t offset)
 }
 
 
-static void common_paletteram_w(const address_space *space, int which, offs_t offset, UINT16 data, UINT16 mem_mask)
+static void common_paletteram_w(address_space *space, int which, offs_t offset, UINT16 data, UINT16 mem_mask)
 {
 	UINT16 value;
 	int convert;

@@ -42,7 +42,7 @@ static UINT8 konami1_decodebyte( UINT8 opcode, UINT16 address )
 
 UINT8 *konami1_decode(running_machine *machine, const char *cpu)
 {
-	const address_space *space = cputag_get_address_space(machine, cpu, ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, cpu, ADDRESS_SPACE_PROGRAM);
 	const UINT8 *rom = memory_region(machine, cpu);
 	int size = memory_region_length(machine, cpu);
 	int A;

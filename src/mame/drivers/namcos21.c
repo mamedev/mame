@@ -562,7 +562,7 @@ namcos21_kickstart( running_machine *machine, int internal )
 }
 
 static UINT16
-ReadWordFromSlaveInput( const address_space *space )
+ReadWordFromSlaveInput( address_space *space )
 {
 	UINT16 data = 0;
 	if( mpDspState->slaveBytesAvailable>0 )

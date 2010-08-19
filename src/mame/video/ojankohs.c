@@ -192,7 +192,7 @@ static TILE_GET_INFO( ojankoy_get_tile_info )
 
 ******************************************************************************/
 
-void ojankoc_flipscreen( const address_space *space, int data )
+void ojankoc_flipscreen( address_space *space, int data )
 {
 	ojankohs_state *state = space->machine->driver_data<ojankohs_state>();
 	int x, y;
@@ -332,7 +332,7 @@ VIDEO_UPDATE( ojankoc )
 
 	if (state->screen_refresh)
 	{
-		const address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+		address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 		/* redraw bitmap */
 		for (offs = 0; offs < 0x8000; offs++)

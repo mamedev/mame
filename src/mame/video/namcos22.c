@@ -172,7 +172,7 @@ Clamp256( int v )
 } /* Clamp256 */
 
 #ifdef MAME_DEBUG
-static void Dump( const address_space *space, FILE *f, unsigned addr1, unsigned addr2, const char *name );
+static void Dump( address_space *space, FILE *f, unsigned addr1, unsigned addr2, const char *name );
 #endif
 
 static struct
@@ -2273,7 +2273,7 @@ VIDEO_UPDATE( namcos22s )
       FILE *f = fopen( "dump.txt", "wb" );
       if( f )
       {
-         const address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+         address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
          {
             int i,bank;
@@ -2323,7 +2323,7 @@ VIDEO_UPDATE( namcos22 )
       FILE *f = fopen( "dump.txt", "wb" );
       if( f )
       {
-         const address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+         address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 //         Dump(space, f,0x90000000, 0x90000003, "led?" );
 //         Dump(space, f,0x90010000, 0x90017fff, "cz_ram");
@@ -2395,7 +2395,7 @@ WRITE16_HANDLER( namcos22_dspram16_w )
 
 #ifdef MAME_DEBUG
 static void
-Dump( const address_space *space, FILE *f, unsigned addr1, unsigned addr2, const char *name )
+Dump( address_space *space, FILE *f, unsigned addr1, unsigned addr2, const char *name )
 {
    unsigned addr;
    fprintf( f, "%s:\n", name );

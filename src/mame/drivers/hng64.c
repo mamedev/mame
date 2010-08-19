@@ -596,7 +596,7 @@ static READ32_HANDLER( hng64_sysregs_r )
 /* preliminary dma code, dma is used to copy program code -> ram */
 static INT32 hng_dma_start,hng_dma_dst,hng_dma_len;
 
-static void hng64_do_dma(const address_space *space)
+static void hng64_do_dma(address_space *space)
 {
 //  printf("Performing DMA Start %08x Len %08x Dst %08x\n",hng_dma_start, hng_dma_len, hng_dma_dst);
 

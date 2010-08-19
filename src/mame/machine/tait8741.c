@@ -122,7 +122,7 @@ void TAITO8741_reset(int num)
 }
 
 /* 8741 update */
-static void taito8741_update(const address_space *space, int num)
+static void taito8741_update(address_space *space, int num)
 {
 	I8741 *st,*sst;
 	int next = num;
@@ -273,7 +273,7 @@ int TAITO8741_start(const struct TAITO8741interface *taito8741intf)
 }
 
 /* read status port */
-static int I8741_status_r(const address_space *space, int num)
+static int I8741_status_r(address_space *space, int num)
 {
 	I8741 *st = &taito8741[num];
 	taito8741_update(space, num);
@@ -282,7 +282,7 @@ static int I8741_status_r(const address_space *space, int num)
 }
 
 /* read data port */
-static int I8741_data_r(const address_space *space, int num)
+static int I8741_data_r(address_space *space, int num)
 {
 	I8741 *st = &taito8741[num];
 	int ret = st->toData;
@@ -302,7 +302,7 @@ static int I8741_data_r(const address_space *space, int num)
 }
 
 /* Write data port */
-static void I8741_data_w(const address_space *space, int num, int data)
+static void I8741_data_w(address_space *space, int num, int data)
 {
 	I8741 *st = &taito8741[num];
 	LOG(("%s:8741-%d DATA Write %02x\n",cpuexec_describe_context(space->machine),num,data));
@@ -313,7 +313,7 @@ static void I8741_data_w(const address_space *space, int num, int data)
 }
 
 /* Write command port */
-static void I8741_command_w(const address_space *space, int num, int data)
+static void I8741_command_w(address_space *space, int num, int data)
 {
 	I8741 *st = &taito8741[num];
 	LOG(("%s:8741-%d CMD Write %02x\n",cpuexec_describe_context(space->machine),num,data));
@@ -444,7 +444,7 @@ static void josvolly_8741_do(running_machine *machine, int num)
 	}
 }
 
-static void josvolly_8741_w(const address_space *space, int num, int offset, int data)
+static void josvolly_8741_w(address_space *space, int num, int offset, int data)
 {
 	JV8741 *mcu = &i8741[num];
 
@@ -507,7 +507,7 @@ static void josvolly_8741_w(const address_space *space, int num, int offset, int
 	josvolly_8741_do(space->machine, num);
 }
 
-static INT8 josvolly_8741_r(const address_space *space,int num,int offset)
+static INT8 josvolly_8741_r(address_space *space,int num,int offset)
 {
 	JV8741 *mcu = &i8741[num];
 	int ret;
@@ -548,7 +548,7 @@ void cyclemb_8741_reset(running_machine *machine)
 	cyclemb_mcu.rst = 1;
 }
 
-static void cyclemb_8741_w(const address_space *space, int num, int offset, int data)
+static void cyclemb_8741_w(address_space *space, int num, int offset, int data)
 {
 	if(offset == 1) //command port
 	{
@@ -590,7 +590,7 @@ static void cyclemb_8741_w(const address_space *space, int num, int offset, int 
 	}
 }
 
-static INT8 cyclemb_8741_r(const address_space *space,int num,int offset)
+static INT8 cyclemb_8741_r(address_space *space,int num,int offset)
 {
 	if(offset == 1) //status port
 	{

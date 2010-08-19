@@ -1356,7 +1356,7 @@ ROM_END
 static DRIVER_INIT( decocass )
 {
 	decocass_state *state = machine->driver_data<decocass_state>();
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *rom = memory_region(machine, "maincpu");
 	int A;
 

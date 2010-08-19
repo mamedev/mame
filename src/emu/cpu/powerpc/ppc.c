@@ -307,7 +307,7 @@ typedef struct {
 
 	device_irq_callback irq_callback;
 	legacy_cpu_device *device;
-	const address_space *program;
+	address_space *program;
 
 	// STUFF added for the 6xx series
 	UINT32 dec, dec_frac;
@@ -330,20 +330,20 @@ typedef struct {
 
 	/* PowerPC function pointers for memory accesses/exceptions */
 	jmp_buf exception_jmpbuf;
-	UINT8 (*read8)(const address_space *space, offs_t address);
-	UINT16 (*read16)(const address_space *space, offs_t address);
-	UINT32 (*read32)(const address_space *space, offs_t address);
-	UINT64 (*read64)(const address_space *space, offs_t address);
-	void (*write8)(const address_space *space, offs_t address, UINT8 data);
-	void (*write16)(const address_space *space, offs_t address, UINT16 data);
-	void (*write32)(const address_space *space, offs_t address, UINT32 data);
-	void (*write64)(const address_space *space, offs_t address, UINT64 data);
-	UINT16 (*read16_unaligned)(const address_space *space, offs_t address);
-	UINT32 (*read32_unaligned)(const address_space *space, offs_t address);
-	UINT64 (*read64_unaligned)(const address_space *space, offs_t address);
-	void (*write16_unaligned)(const address_space *space, offs_t address, UINT16 data);
-	void (*write32_unaligned)(const address_space *space, offs_t address, UINT32 data);
-	void (*write64_unaligned)(const address_space *space, offs_t address, UINT64 data);
+	UINT8 (*read8)(address_space *space, offs_t address);
+	UINT16 (*read16)(address_space *space, offs_t address);
+	UINT32 (*read32)(address_space *space, offs_t address);
+	UINT64 (*read64)(address_space *space, offs_t address);
+	void (*write8)(address_space *space, offs_t address, UINT8 data);
+	void (*write16)(address_space *space, offs_t address, UINT16 data);
+	void (*write32)(address_space *space, offs_t address, UINT32 data);
+	void (*write64)(address_space *space, offs_t address, UINT64 data);
+	UINT16 (*read16_unaligned)(address_space *space, offs_t address);
+	UINT32 (*read32_unaligned)(address_space *space, offs_t address);
+	UINT64 (*read64_unaligned)(address_space *space, offs_t address);
+	void (*write16_unaligned)(address_space *space, offs_t address, UINT16 data);
+	void (*write32_unaligned)(address_space *space, offs_t address, UINT32 data);
+	void (*write64_unaligned)(address_space *space, offs_t address, UINT64 data);
 
 	void (* optable19[1024])(UINT32);
 	void (* optable31[1024])(UINT32);
@@ -786,14 +786,14 @@ INLINE UINT32 ppc_get_spr(int spr)
 	return 0;
 }
 
-static UINT8 ppc_read8_translated(const address_space *space, offs_t address);
-static UINT16 ppc_read16_translated(const address_space *space, offs_t address);
-static UINT32 ppc_read32_translated(const address_space *space, offs_t address);
-static UINT64 ppc_read64_translated(const address_space *space, offs_t address);
-static void ppc_write8_translated(const address_space *space, offs_t address, UINT8 data);
-static void ppc_write16_translated(const address_space *space, offs_t address, UINT16 data);
-static void ppc_write32_translated(const address_space *space, offs_t address, UINT32 data);
-static void ppc_write64_translated(const address_space *space, offs_t address, UINT64 data);
+static UINT8 ppc_read8_translated(address_space *space, offs_t address);
+static UINT16 ppc_read16_translated(address_space *space, offs_t address);
+static UINT32 ppc_read32_translated(address_space *space, offs_t address);
+static UINT64 ppc_read64_translated(address_space *space, offs_t address);
+static void ppc_write8_translated(address_space *space, offs_t address, UINT8 data);
+static void ppc_write16_translated(address_space *space, offs_t address, UINT16 data);
+static void ppc_write32_translated(address_space *space, offs_t address, UINT32 data);
+static void ppc_write64_translated(address_space *space, offs_t address, UINT64 data);
 
 INLINE void ppc_set_msr(UINT32 value)
 {

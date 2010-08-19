@@ -312,7 +312,7 @@ static UINT32 dsp_get_mem_source_dma( UINT32 memcode, UINT32 counter )
 	return 0;
 }
 
-void dsp_prg_ctrl(const address_space *space, UINT32 data)
+void dsp_prg_ctrl(address_space *space, UINT32 data)
 {
 	if(LEF) dsp_reg.pc = (data & 0xff);
 	if(EXF) dsp_execute_program(space);
@@ -590,7 +590,7 @@ static void dsp_move_immediate( void )
 }
 
 
-static void dsp_dma( const address_space *space )
+static void dsp_dma( address_space *space )
 {
 	UINT8 hold = (opcode &  0x4000) >> 14;
 	UINT32 add = (opcode & 0x38000) >> 15;
@@ -786,7 +786,7 @@ static void dsp_dump_mem( FILE *f )
 }
 #endif
 
-void dsp_execute_program(const address_space *dmaspace)
+void dsp_execute_program(address_space *dmaspace)
 {
 	UINT32 cycles_run = 0;
 	UINT8 cont = 1;

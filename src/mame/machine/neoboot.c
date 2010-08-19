@@ -139,7 +139,7 @@ void kog_px_decrypt( running_machine *machine )
 
 static UINT16 kof10thExtraRAMB[0x01000];
 
-static void kof10thBankswitch(const address_space *space, UINT16 nBank)
+static void kof10thBankswitch(address_space *space, UINT16 nBank)
 {
 	UINT32 bank = 0x100000 + ((nBank & 7) << 20);
 	if (bank >= 0x700000)

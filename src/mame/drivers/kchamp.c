@@ -736,7 +736,7 @@ ROM_END
 
 static UINT8 *decrypt_code(running_machine *machine)
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x10000);
 	UINT8 *rom = memory_region(machine, "maincpu");
 	int A;

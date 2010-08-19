@@ -483,10 +483,10 @@ public:
 	void set_delegate(read64_delegate delegate, UINT64 mask = 0);
 
 	// configure legacy address space functions	
-	void set_legacy_func(const address_space &space, read8_space_func func, const char *name, UINT64 mask = 0);
-	void set_legacy_func(const address_space &space, read16_space_func func, const char *name, UINT64 mask = 0);
-	void set_legacy_func(const address_space &space, read32_space_func func, const char *name, UINT64 mask = 0);
-	void set_legacy_func(const address_space &space, read64_space_func func, const char *name, UINT64 mask = 0);
+	void set_legacy_func(address_space &space, read8_space_func func, const char *name, UINT64 mask = 0);
+	void set_legacy_func(address_space &space, read16_space_func func, const char *name, UINT64 mask = 0);
+	void set_legacy_func(address_space &space, read32_space_func func, const char *name, UINT64 mask = 0);
+	void set_legacy_func(address_space &space, read64_space_func func, const char *name, UINT64 mask = 0);
 
 	// configure legacy device functions	
 	void set_legacy_func(device_t &device, read8_device_func func, const char *name, UINT64 mask = 0);
@@ -532,7 +532,7 @@ private:
 	// unions to hold legacy objects and callbacks
 	union
 	{
-		const address_space *	space;
+		address_space *	space;
 		device_t *				device;
 	} m_legacy_object;
 
@@ -574,10 +574,10 @@ public:
 	void set_delegate(write64_delegate delegate, UINT64 mask = 0);
 	
 	// configure legacy address space functions	
-	void set_legacy_func(const address_space &space, write8_space_func func, const char *name, UINT64 mask = 0);
-	void set_legacy_func(const address_space &space, write16_space_func func, const char *name, UINT64 mask = 0);
-	void set_legacy_func(const address_space &space, write32_space_func func, const char *name, UINT64 mask = 0);
-	void set_legacy_func(const address_space &space, write64_space_func func, const char *name, UINT64 mask = 0);
+	void set_legacy_func(address_space &space, write8_space_func func, const char *name, UINT64 mask = 0);
+	void set_legacy_func(address_space &space, write16_space_func func, const char *name, UINT64 mask = 0);
+	void set_legacy_func(address_space &space, write32_space_func func, const char *name, UINT64 mask = 0);
+	void set_legacy_func(address_space &space, write64_space_func func, const char *name, UINT64 mask = 0);
 
 	// configure legacy device functions	
 	void set_legacy_func(device_t &device, write8_device_func func, const char *name, UINT64 mask = 0);
@@ -623,7 +623,7 @@ private:
 	// unions to hold legacy objects and callbacks
 	union
 	{
-		const address_space *	space;
+		address_space *	space;
 		device_t *				device;
 	} m_legacy_object;
 
@@ -876,20 +876,20 @@ public:
 	// generate accessor table
 	virtual void accessors(data_accessors &accessors) const
 	{
-		accessors.read_byte = reinterpret_cast<UINT8 (*)(const address_space *, offs_t)>(&read_byte_static);
-		accessors.read_word = reinterpret_cast<UINT16 (*)(const address_space *, offs_t)>(&read_word_static);
-		accessors.read_word_masked = reinterpret_cast<UINT16 (*)(const address_space *, offs_t, UINT16)>(&read_word_masked_static);
-		accessors.read_dword = reinterpret_cast<UINT32 (*)(const address_space *, offs_t)>(&read_dword_static);
-		accessors.read_dword_masked = reinterpret_cast<UINT32 (*)(const address_space *, offs_t, UINT32)>(&read_dword_masked_static);
-		accessors.read_qword = reinterpret_cast<UINT64 (*)(const address_space *, offs_t)>(&read_qword_static);
-		accessors.read_qword_masked = reinterpret_cast<UINT64 (*)(const address_space *, offs_t, UINT64)>(&read_qword_masked_static);
-		accessors.write_byte = reinterpret_cast<void (*)(const address_space *, offs_t, UINT8)>(&write_byte_static);
-		accessors.write_word = reinterpret_cast<void (*)(const address_space *, offs_t, UINT16)>(&write_word_static);
-		accessors.write_word_masked = reinterpret_cast<void (*)(const address_space *, offs_t, UINT16, UINT16)>(&write_word_masked_static);
-		accessors.write_dword = reinterpret_cast<void (*)(const address_space *, offs_t, UINT32)>(&write_dword_static);
-		accessors.write_dword_masked = reinterpret_cast<void (*)(const address_space *, offs_t, UINT32, UINT32)>(&write_dword_masked_static);
-		accessors.write_qword = reinterpret_cast<void (*)(const address_space *, offs_t, UINT64)>(&write_qword_static);
-		accessors.write_qword_masked = reinterpret_cast<void (*)(const address_space *, offs_t, UINT64, UINT64)>(&write_qword_masked_static);
+		accessors.read_byte = reinterpret_cast<UINT8 (*)(address_space *, offs_t)>(&read_byte_static);
+		accessors.read_word = reinterpret_cast<UINT16 (*)(address_space *, offs_t)>(&read_word_static);
+		accessors.read_word_masked = reinterpret_cast<UINT16 (*)(address_space *, offs_t, UINT16)>(&read_word_masked_static);
+		accessors.read_dword = reinterpret_cast<UINT32 (*)(address_space *, offs_t)>(&read_dword_static);
+		accessors.read_dword_masked = reinterpret_cast<UINT32 (*)(address_space *, offs_t, UINT32)>(&read_dword_masked_static);
+		accessors.read_qword = reinterpret_cast<UINT64 (*)(address_space *, offs_t)>(&read_qword_static);
+		accessors.read_qword_masked = reinterpret_cast<UINT64 (*)(address_space *, offs_t, UINT64)>(&read_qword_masked_static);
+		accessors.write_byte = reinterpret_cast<void (*)(address_space *, offs_t, UINT8)>(&write_byte_static);
+		accessors.write_word = reinterpret_cast<void (*)(address_space *, offs_t, UINT16)>(&write_word_static);
+		accessors.write_word_masked = reinterpret_cast<void (*)(address_space *, offs_t, UINT16, UINT16)>(&write_word_masked_static);
+		accessors.write_dword = reinterpret_cast<void (*)(address_space *, offs_t, UINT32)>(&write_dword_static);
+		accessors.write_dword_masked = reinterpret_cast<void (*)(address_space *, offs_t, UINT32, UINT32)>(&write_dword_masked_static);
+		accessors.write_qword = reinterpret_cast<void (*)(address_space *, offs_t, UINT64)>(&write_qword_static);
+		accessors.write_qword_masked = reinterpret_cast<void (*)(address_space *, offs_t, UINT64, UINT64)>(&write_qword_masked_static);
 	}
 
 	// 
@@ -4065,28 +4065,28 @@ void handler_entry_read::set_delegate(read64_delegate delegate, UINT64 mask)
 //  space stub of the appropriate size
 //-------------------------------------------------
 
-void handler_entry_read::set_legacy_func(const address_space &space, read8_space_func func, const char *name, UINT64 mask)
+void handler_entry_read::set_legacy_func(address_space &space, read8_space_func func, const char *name, UINT64 mask)
 {
 	m_legacy_handler.space8 = func;
 	m_legacy_object.space = &space;
 	set_delegate(read8_delegate(read8_proto_delegate::_create_member<handler_entry_read, &handler_entry_read::read_stub_legacy>(name), *this), mask);
 }
 
-void handler_entry_read::set_legacy_func(const address_space &space, read16_space_func func, const char *name, UINT64 mask)
+void handler_entry_read::set_legacy_func(address_space &space, read16_space_func func, const char *name, UINT64 mask)
 {
 	m_legacy_handler.space16 = func;
 	m_legacy_object.space = &space;
 	set_delegate(read16_delegate(read16_proto_delegate::_create_member<handler_entry_read, &handler_entry_read::read_stub_legacy>(name), *this), mask);
 }
 
-void handler_entry_read::set_legacy_func(const address_space &space, read32_space_func func, const char *name, UINT64 mask)
+void handler_entry_read::set_legacy_func(address_space &space, read32_space_func func, const char *name, UINT64 mask)
 {
 	m_legacy_handler.space32 = func;
 	m_legacy_object.space = &space;
 	set_delegate(read32_delegate(read32_proto_delegate::_create_member<handler_entry_read, &handler_entry_read::read_stub_legacy>(name), *this), mask);
 }
 
-void handler_entry_read::set_legacy_func(const address_space &space, read64_space_func func, const char *name, UINT64 mask)
+void handler_entry_read::set_legacy_func(address_space &space, read64_space_func func, const char *name, UINT64 mask)
 {
 	m_legacy_handler.space64 = func;
 	m_legacy_object.space = &space;
@@ -4392,28 +4392,28 @@ void handler_entry_write::set_delegate(write64_delegate delegate, UINT64 mask)
 //  space stub of the appropriate size
 //-------------------------------------------------
 
-void handler_entry_write::set_legacy_func(const address_space &space, write8_space_func func, const char *name, UINT64 mask)
+void handler_entry_write::set_legacy_func(address_space &space, write8_space_func func, const char *name, UINT64 mask)
 {
 	m_legacy_handler.space8 = func;
 	m_legacy_object.space = &space;
 	set_delegate(write8_delegate(write8_proto_delegate::_create_member<handler_entry_write, &handler_entry_write::write_stub_legacy>(name), *this), mask);
 }
 
-void handler_entry_write::set_legacy_func(const address_space &space, write16_space_func func, const char *name, UINT64 mask)
+void handler_entry_write::set_legacy_func(address_space &space, write16_space_func func, const char *name, UINT64 mask)
 {
 	m_legacy_handler.space16 = func;
 	m_legacy_object.space = &space;
 	set_delegate(write16_delegate(write16_proto_delegate::_create_member<handler_entry_write, &handler_entry_write::write_stub_legacy>(name), *this), mask);
 }
 
-void handler_entry_write::set_legacy_func(const address_space &space, write32_space_func func, const char *name, UINT64 mask)
+void handler_entry_write::set_legacy_func(address_space &space, write32_space_func func, const char *name, UINT64 mask)
 {
 	m_legacy_handler.space32 = func;
 	m_legacy_object.space = &space;
 	set_delegate(write32_delegate(write32_proto_delegate::_create_member<handler_entry_write, &handler_entry_write::write_stub_legacy>(name), *this), mask);
 }
 
-void handler_entry_write::set_legacy_func(const address_space &space, write64_space_func func, const char *name, UINT64 mask)
+void handler_entry_write::set_legacy_func(address_space &space, write64_space_func func, const char *name, UINT64 mask)
 {
 	m_legacy_handler.space64 = func;
 	m_legacy_object.space = &space;

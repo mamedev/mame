@@ -80,7 +80,7 @@ static void xtheball_scanline_update(screen_device &screen, bitmap_t *bitmap, in
  *
  *************************************/
 
-static void xtheball_to_shiftreg(const address_space *space, UINT32 address, UINT16 *shiftreg)
+static void xtheball_to_shiftreg(address_space *space, UINT32 address, UINT16 *shiftreg)
 {
 	if (address >= 0x01000000 && address <= 0x010fffff)
 		memcpy(shiftreg, &vram_bg[TOWORD(address & 0xff000)], TOBYTE(0x1000));
@@ -91,7 +91,7 @@ static void xtheball_to_shiftreg(const address_space *space, UINT32 address, UIN
 }
 
 
-static void xtheball_from_shiftreg(const address_space *space, UINT32 address, UINT16 *shiftreg)
+static void xtheball_from_shiftreg(address_space *space, UINT32 address, UINT16 *shiftreg)
 {
 	if (address >= 0x01000000 && address <= 0x010fffff)
 		memcpy(&vram_bg[TOWORD(address & 0xff000)], shiftreg, TOBYTE(0x1000));

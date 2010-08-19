@@ -110,7 +110,7 @@ static READ16_HANDLER( exterm_host_data_r )
  *
  *************************************/
 
-static UINT16 exterm_trackball_port_r(const address_space *space, int which, UINT16 mem_mask)
+static UINT16 exterm_trackball_port_r(address_space *space, int which, UINT16 mem_mask)
 {
 	UINT16 port;
 

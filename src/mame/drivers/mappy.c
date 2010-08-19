@@ -717,7 +717,7 @@ static WRITE8_HANDLER( mappy_latch_w )
 
 static MACHINE_RESET( superpac )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int i;
 
 	/* Reset all latches */
@@ -727,7 +727,7 @@ static MACHINE_RESET( superpac )
 
 static MACHINE_RESET( phozon )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int i;
 
 	/* Reset all latches */
@@ -737,7 +737,7 @@ static MACHINE_RESET( phozon )
 
 static MACHINE_RESET( mappy )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int i;
 
 	/* Reset all latches */

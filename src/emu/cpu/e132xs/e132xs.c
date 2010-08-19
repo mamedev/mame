@@ -320,8 +320,8 @@ struct _hyperstone_state
 
 	device_irq_callback irq_callback;
 	legacy_cpu_device *device;
-	const address_space *program;
-	const address_space *io;
+	address_space *program;
+	address_space *io;
 	UINT32 opcodexor;
 
 	INT32 instruction_length;

@@ -76,7 +76,7 @@ static const pen_t default_colortable[] =
 typedef struct _ppu2c0x_state  ppu2c0x_state;
 struct _ppu2c0x_state
 {
-	const address_space 		*space;					/* memory space */
+	address_space 		*space;					/* memory space */
 	bitmap_t                    *bitmap;			/* target bitmap */
 	UINT8                       *spriteram;			/* sprite ram */
 	pen_t                       *colortable;			/* color table modified at run time */
@@ -1179,7 +1179,7 @@ WRITE8_DEVICE_HANDLER( ppu2c0x_w )
  *
  *************************************/
 
-void ppu2c0x_spriteram_dma( const address_space *space, running_device *device, const UINT8 page )
+void ppu2c0x_spriteram_dma( address_space *space, running_device *device, const UINT8 page )
 {
 	int i;
 	int address = page << 8;

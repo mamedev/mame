@@ -693,7 +693,7 @@ INLINE void log_blit( running_machine *machine, int data )
 #endif
 }
 
-static void blitter_w( const address_space *space, int blitter, offs_t offset, UINT8 data, int irq_vector )
+static void blitter_w( address_space *space, int blitter, offs_t offset, UINT8 data, int irq_vector )
 {
 	dynax_state *state = space->machine->driver_data<dynax_state>();
 	int hi_bits;
@@ -3060,7 +3060,7 @@ ADDRESS_MAP_END
                              Hanafuda Hana Gokou
 ***************************************************************************/
 
-static UINT8 hgokou_player_r( const address_space *space, int player )
+static UINT8 hgokou_player_r( address_space *space, int player )
 {
 	dynax_state *state = space->machine->driver_data<dynax_state>();
 	UINT8 hopper_bit = ((state->hopper && !(space->machine->primary_screen->frame_number() % 10)) ? 0 : (1 << 6));

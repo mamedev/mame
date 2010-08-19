@@ -26,9 +26,9 @@
 /* -- Globals -- */
 UINT8  *snes_ram = NULL;		/* 65816 ram */
 
-static void snes_dma(const address_space *space, UINT8 channels);
-static void snes_hdma_init(const address_space *space);
-static void snes_hdma(const address_space *space);
+static void snes_dma(address_space *space, UINT8 channels);
+static void snes_hdma_init(address_space *space);
+static void snes_hdma(address_space *space);
 
 static READ8_HANDLER(snes_io_dma_r);
 static WRITE8_HANDLER(snes_io_dma_w);
@@ -88,7 +88,7 @@ static TIMER_CALLBACK( snes_reset_oam_address )
 {
 	snes_state *state = machine->driver_data<snes_state>();
 	// make sure we're in the 65816's context since we're messing with the OAM and stuff
-	const address_space *space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
 
 	if (!(snes_ppu.screen_disabled)) //Reset OAM address, byuu says it happens at H=10
 	{
@@ -101,14 +101,14 @@ static TIMER_CALLBACK( snes_reset_oam_address )
 static TIMER_CALLBACK( snes_reset_hdma )
 {
 	snes_state *state = machine->driver_data<snes_state>();
-	const address_space *cpu0space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *cpu0space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
 	snes_hdma_init(cpu0space);
 }
 
 static TIMER_CALLBACK( snes_update_io )
 {
 	snes_state *state = machine->driver_data<snes_state>();
-	const address_space *cpu0space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *cpu0space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
 	state->io_read(cpu0space->machine);
 	snes_ram[HVBJOY] &= 0xfe;		/* Clear busy bit */
 
@@ -186,7 +186,7 @@ static TIMER_CALLBACK( snes_scanline_tick )
 	// hdma reset happens at scanline 0, H=~6
 	if (snes_ppu.beam.current_vert == 0)
 	{
-		const address_space *cpu0space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
+		address_space *cpu0space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
 		snes_hdma_init(cpu0space);
 	}
 
@@ -210,7 +210,7 @@ static TIMER_CALLBACK( snes_scanline_tick )
 static TIMER_CALLBACK( snes_hblank_tick )
 {
 	snes_state *state = machine->driver_data<snes_state>();
-	const address_space *cpu0space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
+	address_space *cpu0space = cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM);
 	int nextscan;
 
 	snes_ppu.beam.current_vert = machine->primary_screen->vpos();
@@ -1604,7 +1604,7 @@ static void snes_init_timers( running_machine *machine )
 static void snes_init_ram( running_machine *machine )
 {
 	snes_state *state = machine->driver_data<snes_state>();
-	const address_space *cpu0space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *cpu0space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int i;
 
 	/* Init work RAM - 0x55 isn't exactly right but it's close */
@@ -1836,7 +1836,7 @@ MACHINE_RESET( snes )
 DRIVER_INIT( snes )
 {
 	snes_state *state = machine->driver_data<snes_state>();
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT16 total_blocks, read_blocks;
 	UINT8 *rom;
 
@@ -1902,7 +1902,7 @@ DRIVER_INIT( snes )
 DRIVER_INIT( snes_hirom )
 {
 	snes_state *state = machine->driver_data<snes_state>();
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT16 total_blocks, read_blocks;
 	UINT8  *rom;
 
@@ -1976,7 +1976,7 @@ INLINE int dma_abus_valid( UINT32 address )
 	return 1;
 }
 
-INLINE UINT8 snes_abus_read( const address_space *space, UINT32 abus )
+INLINE UINT8 snes_abus_read( address_space *space, UINT32 abus )
 {
 	if (!dma_abus_valid(abus))
 		return 0;
@@ -1984,7 +1984,7 @@ INLINE UINT8 snes_abus_read( const address_space *space, UINT32 abus )
 	return memory_read_byte(space, abus);
 }
 
-INLINE void snes_dma_transfer( const address_space *space, UINT8 dma, UINT32 abus, UINT16 bbus )
+INLINE void snes_dma_transfer( address_space *space, UINT8 dma, UINT32 abus, UINT16 bbus )
 {
 	snes_state *state = space->machine->driver_data<snes_state>();
 
@@ -2055,7 +2055,7 @@ INLINE int is_last_active_channel( running_machine *machine, int dma )
 	return 1;
 }
 
-static void snes_hdma_update( const address_space *space, int dma )
+static void snes_hdma_update( address_space *space, int dma )
 {
 	snes_state *state = space->machine->driver_data<snes_state>();
 	UINT32 abus = snes_get_hdma_addr(space->machine, dma);
@@ -2086,7 +2086,7 @@ static void snes_hdma_update( const address_space *space, int dma )
 	state->dma_channel[dma].do_transfer = 1;
 }
 
-static void snes_hdma_init( const address_space *space )
+static void snes_hdma_init( address_space *space )
 {
 	snes_state *state = space->machine->driver_data<snes_state>();
 	int i;
@@ -2102,7 +2102,7 @@ static void snes_hdma_init( const address_space *space )
 	}
 }
 
-static void snes_hdma( const address_space *space )
+static void snes_hdma( address_space *space )
 {
 	snes_state *state = space->machine->driver_data<snes_state>();
 	UINT16 bbus;
@@ -2186,7 +2186,7 @@ static void snes_hdma( const address_space *space )
 	}
 }
 
-static void snes_dma( const address_space *space, UINT8 channels )
+static void snes_dma( address_space *space, UINT8 channels )
 {
 	snes_state *state = space->machine->driver_data<snes_state>();
 	int i;

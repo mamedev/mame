@@ -1022,7 +1022,7 @@ static const ppi8255_interface scorpion_ppi8255_1_intf =
 
 static INPUT_CHANGED( gmgalax_game_changed )
 {
-	const address_space *space = cputag_get_address_space(field->port->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(field->port->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* new value is the selected game */
 	gmgalax_selected_game = newval;
@@ -2601,7 +2601,7 @@ static void common_init(
 
 static void unmap_galaxian_sound(running_machine *machine, offs_t base)
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	memory_unmap_write(space, base + 0x0004, base + 0x0007, 0, 0x07f8);
 	memory_unmap_write(space, base + 0x0800, base + 0x0807, 0, 0x07f8);
@@ -2624,7 +2624,7 @@ static DRIVER_INIT( galaxian )
 
 static DRIVER_INIT( nolock )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* same as galaxian... */
 	DRIVER_INIT_CALL(galaxian);
@@ -2636,7 +2636,7 @@ static DRIVER_INIT( nolock )
 
 static DRIVER_INIT( azurian )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* yellow bullets instead of white ones */
 	common_init(machine, scramble_draw_bullet, galaxian_draw_background, NULL, NULL);
@@ -2648,7 +2648,7 @@ static DRIVER_INIT( azurian )
 
 static DRIVER_INIT( gmgalax )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* video extensions */
 	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, gmgalax_extend_tile_info, gmgalax_extend_sprite_info);
@@ -2665,7 +2665,7 @@ static DRIVER_INIT( gmgalax )
 
 static DRIVER_INIT( pisces )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* video extensions */
 	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, pisces_extend_tile_info, pisces_extend_sprite_info);
@@ -2677,7 +2677,7 @@ static DRIVER_INIT( pisces )
 
 static DRIVER_INIT( batman2 )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* video extensions */
 	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, batman2_extend_tile_info, upper_extend_sprite_info);
@@ -2689,7 +2689,7 @@ static DRIVER_INIT( batman2 )
 
 static DRIVER_INIT( frogg )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* same as galaxian... */
 	common_init(machine, galaxian_draw_bullet, frogger_draw_background, frogger_extend_tile_info, frogger_extend_sprite_info);
@@ -2725,7 +2725,7 @@ static DRIVER_INIT( mooncrsu )
 
 static DRIVER_INIT( mooncrgx )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* video extensions */
 	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, mooncrst_extend_tile_info, mooncrst_extend_sprite_info);
@@ -2737,7 +2737,7 @@ static DRIVER_INIT( mooncrgx )
 
 static DRIVER_INIT( moonqsr )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x8000);
 
 	/* video extensions */
@@ -2755,7 +2755,7 @@ static WRITE8_HANDLER( artic_gfxbank_w )
 
 static DRIVER_INIT( pacmanbl )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* same as galaxian... */
 	DRIVER_INIT_CALL(galaxian);
@@ -2821,7 +2821,7 @@ void tenspot_set_game_bank(running_machine* machine, int bank, int from_game)
 
 static DRIVER_INIT( tenspot )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* these are needed for batman part 2 to work properly, this banking is probably a property of the artic board,
        which tenspot appears to have copied */
@@ -2858,7 +2858,7 @@ static DRIVER_INIT( devilfsg )
 
 static DRIVER_INIT( zigzag )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* video extensions */
 	common_init(machine, NULL, galaxian_draw_background, NULL, NULL);
@@ -2898,8 +2898,8 @@ static DRIVER_INIT( jumpbug )
 
 static DRIVER_INIT( checkman )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	const address_space *iospace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *iospace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
 
 	/* video extensions */
 	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, mooncrst_extend_tile_info, mooncrst_extend_sprite_info);
@@ -2918,7 +2918,7 @@ static DRIVER_INIT( checkman )
 
 static DRIVER_INIT( checkmaj )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* video extensions */
 	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, NULL, NULL);
@@ -2933,7 +2933,7 @@ static DRIVER_INIT( checkmaj )
 
 static DRIVER_INIT( dingo )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* video extensions */
 	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, NULL, NULL);
@@ -2948,8 +2948,8 @@ static DRIVER_INIT( dingo )
 
 static DRIVER_INIT( dingoe )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	const address_space *iospace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *iospace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
 
 	/* video extensions */
 	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, mooncrst_extend_tile_info, mooncrst_extend_sprite_info);
@@ -2970,7 +2970,7 @@ static DRIVER_INIT( dingoe )
 
 static DRIVER_INIT( skybase )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* video extensions */
 	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, pisces_extend_tile_info, pisces_extend_sprite_info);
@@ -3014,7 +3014,7 @@ static DRIVER_INIT( mshuttlj )
 
 static DRIVER_INIT( kingball )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* video extensions */
 	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, NULL, NULL);
@@ -3031,7 +3031,7 @@ static DRIVER_INIT( kingball )
 
 static DRIVER_INIT( scorpnmc )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* video extensions */
 	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, batman2_extend_tile_info, upper_extend_sprite_info);
@@ -3052,7 +3052,7 @@ static DRIVER_INIT( scorpnmc )
 
 static DRIVER_INIT( thepitm )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* video extensions */
 	common_init(machine, galaxian_draw_bullet, galaxian_draw_background, mooncrst_extend_tile_info, mooncrst_extend_sprite_info);
@@ -3076,7 +3076,7 @@ static DRIVER_INIT( thepitm )
 
 static DRIVER_INIT( theend )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* video extensions */
 	common_init(machine, theend_draw_bullet, galaxian_draw_background, NULL, NULL);
@@ -3095,7 +3095,7 @@ static DRIVER_INIT( scramble )
 
 static DRIVER_INIT( explorer )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* video extensions */
 	common_init(machine, scramble_draw_bullet, scramble_draw_background, NULL, NULL);
@@ -3128,7 +3128,7 @@ static DRIVER_INIT( sfx )
 
 static DRIVER_INIT( atlantis )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* video extensions */
 	common_init(machine, scramble_draw_bullet, scramble_draw_background, NULL, NULL);
@@ -3170,7 +3170,7 @@ static DRIVER_INIT( frogger )
 
 static DRIVER_INIT( froggrmc )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* video extensions */
 	common_init(machine, NULL, frogger_draw_background, frogger_extend_tile_info, frogger_extend_sprite_info);
@@ -3215,7 +3215,7 @@ static DRIVER_INIT( amidar )
 
 static DRIVER_INIT( scorpion )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	common_init(machine, scramble_draw_bullet, scramble_draw_background, batman2_extend_tile_info, upper_extend_sprite_info);
 

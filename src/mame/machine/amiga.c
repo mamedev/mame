@@ -293,7 +293,7 @@ void amiga_machine_config(running_machine *machine, const amiga_machine_interfac
 
 static void amiga_m68k_reset(running_device *device)
 {
-	const address_space *space = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
+	address_space *space = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
 
 	logerror("Executed RESET at PC=%06x\n", cpu_get_pc(space->cpu));
 
@@ -973,7 +973,7 @@ static TIMER_CALLBACK( amiga_blitter_proc )
  *
  *************************************/
 
-static void blitter_setup(const address_space *space)
+static void blitter_setup(address_space *space)
 {
 	int ticks, width, height, blittime;
 
@@ -1535,7 +1535,7 @@ WRITE16_HANDLER( amiga_custom_w )
 
 void amiga_serial_in_w(running_machine *machine, UINT16 data)
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int mask = (CUSTOM_REG(REG_SERPER) & 0x8000) ? 0x1ff : 0xff;
 
 	/* copy the data to the low 8 bits of SERDATR and set RBF */

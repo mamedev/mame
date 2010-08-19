@@ -126,8 +126,8 @@ struct _SHARC_REGS
 
 	device_irq_callback irq_callback;
 	legacy_cpu_device *device;
-	const address_space *program;
-	const address_space *data;
+	address_space *program;
+	address_space *data;
 	void (*opcode_handler)(SHARC_REGS *cpustate);
 	int icount;
 	UINT64 opcode;

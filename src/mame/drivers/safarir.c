@@ -146,7 +146,7 @@ static PALETTE_INIT( safarir )
 static TILE_GET_INFO( get_bg_tile_info )
 {
 	int color;
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 code = ram_r(space,tile_index | 0x400);
 
 	if (code & 0x80)
@@ -168,7 +168,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 static TILE_GET_INFO( get_fg_tile_info )
 {
 	int color, flags;
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	UINT8 code = ram_r(space,tile_index);
 

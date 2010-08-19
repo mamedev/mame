@@ -154,9 +154,9 @@ struct _mcs48_state
 	int			icount;
 
 	/* Memory spaces */
-    const address_space *program;
-    const address_space *data;
-    const address_space *io;
+    address_space *program;
+    address_space *data;
+    address_space *io;
 
 	UINT8		feature_mask;		/* processor feature flags */
 	UINT16		int_rom_size;		/* internal rom size */

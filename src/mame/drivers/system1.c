@@ -4600,8 +4600,8 @@ static READ8_HANDLER( nob_start_r )
 
 static DRIVER_INIT( nob )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	const address_space *iospace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *iospace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
 
 	DRIVER_INIT_CALL(bank44);
 
@@ -4632,7 +4632,7 @@ static DRIVER_INIT( nobb )
 //  ROM[0x10000 + 0 * 0x8000 + 0x3347] = 0x18;  // 'jr' instead of 'jr z'
 
 	/* Patch to get sound in later levels(the program enters into a tight loop)*/
-	const address_space *iospace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
+	address_space *iospace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
 	UINT8 *ROM2 = memory_region(machine, "soundcpu");
 
 	ROM2[0x02f9] = 0x28;//'jr z' instead of 'jr'
@@ -4648,7 +4648,7 @@ static DRIVER_INIT( nobb )
 
 static DRIVER_INIT( bootleg )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	memory_set_decrypted_region(space, 0x0000, 0x7fff, memory_region(machine, "maincpu") + 0x10000);
 	DRIVER_INIT_CALL(bank00);
 }
@@ -4656,7 +4656,7 @@ static DRIVER_INIT( bootleg )
 
 static DRIVER_INIT( bootsys2 )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	memory_set_decrypted_region(space, 0x0000, 0x7fff, memory_region(machine, "maincpu") + 0x20000);
 	memory_configure_bank_decrypted(machine, "bank1", 0, 4, memory_region(machine, "maincpu") + 0x30000, 0x4000);
 	DRIVER_INIT_CALL(bank0c);
@@ -4676,7 +4676,7 @@ static DRIVER_INIT( choplift )
 
 static DRIVER_INIT( shtngmst )
 {
-	const address_space *iospace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
+	address_space *iospace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
 	memory_install_read_port(iospace, 0x12, 0x12, 0x00, 0x00, "TRIGGER");
 	memory_install_read_port(iospace, 0x18, 0x18, 0x00, 0x03, "18");
 	memory_install_read_port(iospace, 0x1c, 0x1c, 0x00, 0x02, "GUNX");

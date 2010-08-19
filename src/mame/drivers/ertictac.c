@@ -166,7 +166,7 @@ static WRITE32_HANDLER(T1GO_w)
 /* porting code from machine/archimds.c, in the hope that someday that this driver uses that code ... */
 static TIMER_CALLBACK( ertictac_audio_tick )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	dac_signed_data_w(space->machine->device("dac"), (0x80) | (memory_read_byte(space,vidc_sndcur)));
 

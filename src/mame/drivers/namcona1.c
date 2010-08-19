@@ -499,7 +499,7 @@ static READ16_HANDLER( namcona1_vreg_r )
 static int transfer_dword( running_machine *machine, UINT32 dest, UINT32 source )
 {
 	UINT16 data;
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	if( source>=0x400000 && source<0xc00000 )
 	{

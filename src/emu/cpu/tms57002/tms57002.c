@@ -104,7 +104,7 @@ typedef struct {
 
 	cd cache;
 
-	const address_space *program, *data;
+	address_space *program, *data;
 	int icount;
 	int unsupported_inst_warning;
 } tms57002_t;

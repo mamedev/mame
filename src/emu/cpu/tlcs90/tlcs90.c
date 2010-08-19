@@ -32,8 +32,8 @@ typedef struct
 	UINT16		irq_state, irq_mask;
 	device_irq_callback irq_callback;
 	legacy_cpu_device *device;
-	const address_space *program;
-	const address_space *io;
+	address_space *program;
+	address_space *io;
 	int		icount;
 	int			extra_cycles;		// extra cycles for interrupts
 	UINT8		internal_registers[48];

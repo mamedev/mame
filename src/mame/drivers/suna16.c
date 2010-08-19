@@ -358,7 +358,7 @@ ADDRESS_MAP_END
 
 static MACHINE_RESET(uballoon)
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	uballoon_pcm_1_bankswitch_w(space, 0, 0);
 }
 

@@ -65,14 +65,14 @@ static WRITE16_HANDLER( adrst_w )
 static READ16_HANDLER( main_gnd_r )
 {
 	lockon_state *state = space->machine->driver_data<lockon_state>();
-	const address_space *gndspace = cpu_get_address_space(state->ground, ADDRESS_SPACE_PROGRAM);
+	address_space *gndspace = cpu_get_address_space(state->ground, ADDRESS_SPACE_PROGRAM);
 	return memory_read_word(gndspace, V30_GND_ADDR | offset * 2);
 }
 
 static WRITE16_HANDLER( main_gnd_w )
 {
 	lockon_state *state = space->machine->driver_data<lockon_state>();
-	const address_space *gndspace = cpu_get_address_space(state->ground, ADDRESS_SPACE_PROGRAM);
+	address_space *gndspace = cpu_get_address_space(state->ground, ADDRESS_SPACE_PROGRAM);
 
 	if (ACCESSING_BITS_0_7)
 		memory_write_byte(gndspace, V30_GND_ADDR | (offset * 2 + 0), data);
@@ -83,14 +83,14 @@ static WRITE16_HANDLER( main_gnd_w )
 static READ16_HANDLER( main_obj_r )
 {
 	lockon_state *state = space->machine->driver_data<lockon_state>();
-	const address_space *objspace = cpu_get_address_space(state->object, ADDRESS_SPACE_PROGRAM);
+	address_space *objspace = cpu_get_address_space(state->object, ADDRESS_SPACE_PROGRAM);
 	return memory_read_word(objspace, V30_OBJ_ADDR | offset * 2);
 }
 
 static WRITE16_HANDLER( main_obj_w )
 {
 	lockon_state *state = space->machine->driver_data<lockon_state>();
-	const address_space *objspace = cpu_get_address_space(state->object, ADDRESS_SPACE_PROGRAM);
+	address_space *objspace = cpu_get_address_space(state->object, ADDRESS_SPACE_PROGRAM);
 
 	if (ACCESSING_BITS_0_7)
 		memory_write_byte(objspace, V30_OBJ_ADDR | (offset * 2 + 0), data);
@@ -104,8 +104,8 @@ static WRITE16_HANDLER( tst_w )
 
 	if (offset < 0x800)
 	{
-		const address_space *gndspace = cpu_get_address_space(state->ground, ADDRESS_SPACE_PROGRAM);
-		const address_space *objspace = cpu_get_address_space(state->object, ADDRESS_SPACE_PROGRAM);
+		address_space *gndspace = cpu_get_address_space(state->ground, ADDRESS_SPACE_PROGRAM);
+		address_space *objspace = cpu_get_address_space(state->object, ADDRESS_SPACE_PROGRAM);
 
 		if (ACCESSING_BITS_0_7)
 			memory_write_byte(gndspace, V30_GND_ADDR | (offset * 2 + 0), data);
@@ -122,14 +122,14 @@ static WRITE16_HANDLER( tst_w )
 static READ16_HANDLER( main_z80_r )
 {
 	lockon_state *state = space->machine->driver_data<lockon_state>();
-	const address_space *sndspace = cpu_get_address_space(state->audiocpu, ADDRESS_SPACE_PROGRAM);
+	address_space *sndspace = cpu_get_address_space(state->audiocpu, ADDRESS_SPACE_PROGRAM);
 	return 0xff00 | memory_read_byte(sndspace, offset);
 }
 
 static WRITE16_HANDLER( main_z80_w )
 {
 	lockon_state *state = space->machine->driver_data<lockon_state>();
-	const address_space *sndspace = cpu_get_address_space(state->audiocpu, ADDRESS_SPACE_PROGRAM);
+	address_space *sndspace = cpu_get_address_space(state->audiocpu, ADDRESS_SPACE_PROGRAM);
 	memory_write_byte(sndspace, offset, data);
 }
 

@@ -418,7 +418,7 @@ struct _pdp1_state
 	int type_20_sbs;
 
 	legacy_cpu_device *device;
-	const address_space *program;
+	address_space *program;
 	int icount;
 };
 

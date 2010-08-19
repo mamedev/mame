@@ -62,8 +62,8 @@ typedef struct
 	UINT8 irq_pending;
 	device_irq_callback irq_callback;
 	legacy_cpu_device *device;
-	const address_space *program;
-	const address_space *io;
+	address_space *program;
+	address_space *io;
 
 #if LAZY_FLAGS
     INT32 NZ;			/* last value (lazy N and Z flag) */

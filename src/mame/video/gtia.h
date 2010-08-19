@@ -16,8 +16,8 @@
 typedef struct _gtia_interface gtia_interface;
 struct _gtia_interface
 {
-	UINT8 (*console_read)(const address_space *space);
-	void (*console_write)(const address_space *space, UINT8 data);
+	UINT8 (*console_read)(address_space *space);
+	void (*console_write)(address_space *space, UINT8 data);
 };
 
 

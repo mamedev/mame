@@ -505,7 +505,7 @@ VIDEO_UPDATE( toaplan0 )
 
 VIDEO_EOF( toaplan0 )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* Spriteram is always 1 frame ahead, suggesting spriteram buffering.
         There are no CPU output registers that control this so we

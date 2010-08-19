@@ -227,7 +227,7 @@ struct _SCSP
 	running_device *device;
 };
 
-static void dma_scsp(const address_space *space, struct _SCSP *SCSP);		/*SCSP DMA transfer function*/
+static void dma_scsp(address_space *space, struct _SCSP *SCSP);		/*SCSP DMA transfer function*/
 #define	scsp_dgate		scsp_regs[0x16/2] & 0x4000
 #define	scsp_ddir		scsp_regs[0x16/2] & 0x2000
 #define scsp_dexe		scsp_regs[0x16/2] & 0x1000
@@ -698,7 +698,7 @@ static void SCSP_UpdateSlotReg(struct _SCSP *SCSP,int s,int r)
 static void SCSP_UpdateReg(struct _SCSP *SCSP, int reg)
 {
 	/* temporary hack until this is converted to a device */
-	const address_space *space = device_get_space(SCSP->device->machine->firstcpu, AS_PROGRAM);
+	address_space *space = device_get_space(SCSP->device->machine->firstcpu, AS_PROGRAM);
 	switch(reg&0x3f)
 	{
 		case 0x2:
@@ -1168,7 +1168,7 @@ static void SCSP_DoMasterSamples(struct _SCSP *SCSP, int nsamples)
 	}
 }
 
-static void dma_scsp(const address_space *space, struct _SCSP *SCSP)
+static void dma_scsp(address_space *space, struct _SCSP *SCSP)
 {
 	static UINT16 tmp_dma[3], *scsp_regs;
 

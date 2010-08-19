@@ -814,7 +814,7 @@ void real3d_display_list_end(running_machine *machine)
 //  real3d_display_list = 1;
 }
 
-void real3d_display_list1_dma(const address_space *space, UINT32 src, UINT32 dst, int length, int byteswap)
+void real3d_display_list1_dma(address_space *space, UINT32 src, UINT32 dst, int length, int byteswap)
 {
 	int i;
 	int d = (dst & 0xffffff) / 4;
@@ -830,7 +830,7 @@ void real3d_display_list1_dma(const address_space *space, UINT32 src, UINT32 dst
 	}
 }
 
-void real3d_display_list2_dma(const address_space *space, UINT32 src, UINT32 dst, int length, int byteswap)
+void real3d_display_list2_dma(address_space *space, UINT32 src, UINT32 dst, int length, int byteswap)
 {
 	int i;
 	int d = (dst & 0xffffff) / 4;
@@ -846,7 +846,7 @@ void real3d_display_list2_dma(const address_space *space, UINT32 src, UINT32 dst
 	}
 }
 
-void real3d_vrom_texture_dma(const address_space *space, UINT32 src, UINT32 dst, int length, int byteswap)
+void real3d_vrom_texture_dma(address_space *space, UINT32 src, UINT32 dst, int length, int byteswap)
 {
 	if((dst & 0xff) == 0) {
 
@@ -863,7 +863,7 @@ void real3d_vrom_texture_dma(const address_space *space, UINT32 src, UINT32 dst,
 	}
 }
 
-void real3d_texture_fifo_dma(const address_space *space, UINT32 src, int length, int byteswap)
+void real3d_texture_fifo_dma(address_space *space, UINT32 src, int length, int byteswap)
 {
 	int i;
 	for(i=0; i < length; i+=4) {
@@ -879,7 +879,7 @@ void real3d_texture_fifo_dma(const address_space *space, UINT32 src, int length,
 	}
 }
 
-void real3d_polygon_ram_dma(const address_space *space, UINT32 src, UINT32 dst, int length, int byteswap)
+void real3d_polygon_ram_dma(address_space *space, UINT32 src, UINT32 dst, int length, int byteswap)
 {
 	int i;
 	int d = (dst & 0xffffff) / 4;

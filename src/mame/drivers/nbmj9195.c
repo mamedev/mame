@@ -496,7 +496,7 @@ static Z80CTC_INTERFACE( ctc_intf_audio )
 
 static MACHINE_RESET( sailorws )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int i;
 
 	// initialize TMPZ84C011 PIO
@@ -509,7 +509,7 @@ static MACHINE_RESET( sailorws )
 
 static DRIVER_INIT( nbmj9195 )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *ROM = memory_region(machine, "audiocpu");
 
 	// sound program patch

@@ -198,7 +198,7 @@ inline device_memory_interface *device_memory(device_t *device)
 //  given address space on this device
 //-------------------------------------------------
 
-inline const address_space *device_get_space(device_t *device, int spacenum = 0)
+inline address_space *device_get_space(device_t *device, int spacenum = 0)
 {
 	return device_memory(device)->space(spacenum);
 }

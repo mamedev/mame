@@ -75,7 +75,7 @@ VIDEO_START( artmagic )
  *
  *************************************/
 
-void artmagic_to_shiftreg(const address_space *space, offs_t address, UINT16 *data)
+void artmagic_to_shiftreg(address_space *space, offs_t address, UINT16 *data)
 {
 	UINT16 *vram = address_to_vram(&address);
 	if (vram)
@@ -83,7 +83,7 @@ void artmagic_to_shiftreg(const address_space *space, offs_t address, UINT16 *da
 }
 
 
-void artmagic_from_shiftreg(const address_space *space, offs_t address, UINT16 *data)
+void artmagic_from_shiftreg(address_space *space, offs_t address, UINT16 *data)
 {
 	UINT16 *vram = address_to_vram(&address);
 	if (vram)

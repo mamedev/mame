@@ -81,7 +81,7 @@ static MACHINE_RESET( atarigt )
 
 static void cage_irq_callback(running_machine *machine, int reason)
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	if (reason)
 		atarigen_sound_int_gen(machine->device("maincpu"));
@@ -280,7 +280,7 @@ static void tmek_update_mode(offs_t offset)
 }
 
 
-static void tmek_protection_w(const address_space *space, offs_t offset, UINT16 data)
+static void tmek_protection_w(address_space *space, offs_t offset, UINT16 data)
 {
 /*
     T-Mek init:
@@ -303,7 +303,7 @@ static void tmek_protection_w(const address_space *space, offs_t offset, UINT16 
 	}
 }
 
-static void tmek_protection_r(const address_space *space, offs_t offset, UINT16 *data)
+static void tmek_protection_r(address_space *space, offs_t offset, UINT16 *data)
 {
 	if (LOG_PROTECTION) logerror("%06X:Protection R@%06X\n", cpu_get_previouspc(space->cpu), offset);
 
@@ -369,7 +369,7 @@ static void primage_update_mode(offs_t offset)
 
 
 
-static void primrage_protection_w(const address_space *space, offs_t offset, UINT16 data)
+static void primrage_protection_w(address_space *space, offs_t offset, UINT16 data)
 {
 	if (LOG_PROTECTION)
 	{
@@ -439,7 +439,7 @@ static void primrage_protection_w(const address_space *space, offs_t offset, UIN
 
 
 
-static void primrage_protection_r(const address_space *space, offs_t offset, UINT16 *data)
+static void primrage_protection_r(address_space *space, offs_t offset, UINT16 *data)
 {
 	/* track accesses */
 	primage_update_mode(offset);

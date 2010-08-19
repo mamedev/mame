@@ -57,7 +57,7 @@ static MACHINE_RESET( starwars )
 	/* ESB-specific */
 	if (starwars_is_esb)
 	{
-		const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+		address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 		/* reset the slapstic */
 		slapstic_reset();
@@ -93,7 +93,7 @@ static WRITE8_HANDLER( irq_ack_w )
  *
  *************************************/
 
-static void esb_slapstic_tweak(const address_space *space, offs_t offset)
+static void esb_slapstic_tweak(address_space *space, offs_t offset)
 {
 	int new_bank = slapstic_tweak(space, offset);
 

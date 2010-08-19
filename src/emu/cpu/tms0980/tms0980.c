@@ -268,8 +268,8 @@ struct _tms0980_state
 	UINT8	byte_size;		/* 8 or 9 bit bytes */
 	const UINT32 *decode_table;
 	const tms0980_config	*config;
-	const address_space *program;
-	const address_space *data;
+	address_space *program;
+	address_space *data;
 };
 
 

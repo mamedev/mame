@@ -101,7 +101,7 @@ struct _jaguar_state
 	device_irq_callback irq_callback;
 	jaguar_int_func cpu_interrupt;
 	legacy_cpu_device *device;
-	const address_space *program;
+	address_space *program;
 };
 
 

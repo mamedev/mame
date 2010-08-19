@@ -176,7 +176,7 @@ static Z80CTC_INTERFACE( ctc_intf )
 
 static MACHINE_RESET( niyanpai )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int i;
 
 	// initialize TMPZ84C011 PIO
@@ -246,7 +246,7 @@ static READ16_HANDLER( musobana_inputport_0_r )
 
 static CUSTOM_INPUT( musobana_outcoin_flag_r )
 {
-	const address_space *space = cputag_get_address_space(field->port->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(field->port->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	// tmp68301_parallel_interface[0x05]
 	//  bit 0   coin counter
 	//  bit 2   motor on

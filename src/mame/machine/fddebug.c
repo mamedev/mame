@@ -277,7 +277,7 @@ static void execute_fdcset(running_machine *machine, int ref, int params, const 
 static void execute_fdclist(running_machine *machine, int ref, int params, const char **param);
 static void execute_fdcsearch(running_machine *machine, int ref, int params, const char **param);
 
-static fd1094_possibility *try_all_possibilities(const address_space *space, int basepc, int offset, int length, UINT8 *instrbuffer, UINT8 *keybuffer, fd1094_possibility *possdata);
+static fd1094_possibility *try_all_possibilities(address_space *space, int basepc, int offset, int length, UINT8 *instrbuffer, UINT8 *keybuffer, fd1094_possibility *possdata);
 static void tag_possibility(running_machine *machine, fd1094_possibility *possdata, UINT8 status);
 
 static void perform_constrained_search(running_machine *machine);
@@ -287,8 +287,8 @@ static int does_key_work_for_constraints(const UINT16 *base, UINT8 *key);
 static UINT32 reconstruct_base_seed(int keybaseaddr, UINT32 startseed);
 
 static void build_optable(running_machine *machine);
-static int validate_ea(const address_space *space, UINT32 pc, UINT8 modereg, const UINT8 *parambase, UINT32 flags);
-static int validate_opcode(const address_space *space, UINT32 pc, const UINT8 *opdata, int maxwords);
+static int validate_ea(address_space *space, UINT32 pc, UINT8 modereg, const UINT8 *parambase, UINT32 flags);
+static int validate_opcode(address_space *space, UINT32 pc, const UINT8 *opdata, int maxwords);
 
 
 
@@ -429,7 +429,7 @@ INLINE void print_possibilities(running_machine *machine)
     0=no, 1=yes, 2=unlikely
 -----------------------------------------------*/
 
-INLINE int pc_is_valid(const address_space *space, UINT32 pc, UINT32 flags)
+INLINE int pc_is_valid(address_space *space, UINT32 pc, UINT32 flags)
 {
 	/* if we're odd or out of range, fail */
 	if ((pc & 1) == 1)
@@ -447,7 +447,7 @@ INLINE int pc_is_valid(const address_space *space, UINT32 pc, UINT32 flags)
     valid? 0=no, 1=yes, 2=unlikely
 -----------------------------------------------*/
 
-INLINE int addr_is_valid(const address_space *space, UINT32 addr, UINT32 flags)
+INLINE int addr_is_valid(address_space *space, UINT32 addr, UINT32 flags)
 {
 	/* if this a JMP, the address is a PC */
 	if (flags & OF_JMP)
@@ -1052,7 +1052,7 @@ static void execute_fdpc(running_machine *machine, int ref, int params, const ch
 
 static void execute_fdsearch(running_machine *machine, int ref, int params, const char **param)
 {
-	const address_space *space = cpu_get_address_space(debug_cpu_get_visible_cpu(machine), ADDRESS_SPACE_PROGRAM);
+	address_space *space = cpu_get_address_space(debug_cpu_get_visible_cpu(machine), ADDRESS_SPACE_PROGRAM);
 	int pc = cpu_get_pc(space->cpu);
 	int length, first = TRUE;
 	UINT8 instrdata[2];
@@ -1178,7 +1178,7 @@ static void execute_fdsearch(running_machine *machine, int ref, int params, cons
 
 static void execute_fddasm(running_machine *machine, int ref, int params, const char **param)
 {
-	const address_space *space = cpu_get_address_space(debug_cpu_get_visible_cpu(machine), ADDRESS_SPACE_PROGRAM);
+	address_space *space = cpu_get_address_space(debug_cpu_get_visible_cpu(machine), ADDRESS_SPACE_PROGRAM);
 	int origstate = fd1094_set_state(keyregion, -1);
 	const char *filename;
 	int skipped = FALSE;
@@ -1385,7 +1385,7 @@ static void execute_fdcsearch(running_machine *machine, int ref, int params, con
     length
 -----------------------------------------------*/
 
-static fd1094_possibility *try_all_possibilities(const address_space *space, int basepc, int offset, int length, UINT8 *instrbuffer, UINT8 *keybuffer, fd1094_possibility *possdata)
+static fd1094_possibility *try_all_possibilities(address_space *space, int basepc, int offset, int length, UINT8 *instrbuffer, UINT8 *keybuffer, fd1094_possibility *possdata)
 {
 	UINT8 keymask, keystat;
 	UINT16 possvalue[4];
@@ -2226,7 +2226,7 @@ static void build_optable(running_machine *machine)
     valid or not, and return the length
 -----------------------------------------------*/
 
-static int validate_ea(const address_space *space, UINT32 pc, UINT8 modereg, const UINT8 *parambase, UINT32 flags)
+static int validate_ea(address_space *space, UINT32 pc, UINT8 modereg, const UINT8 *parambase, UINT32 flags)
 {
 	UINT32 addr;
 	int valid;
@@ -2296,7 +2296,7 @@ static int validate_ea(const address_space *space, UINT32 pc, UINT8 modereg, con
     the length specified
 -----------------------------------------------*/
 
-static int validate_opcode(const address_space *space, UINT32 pc, const UINT8 *opdata, int maxwords)
+static int validate_opcode(address_space *space, UINT32 pc, const UINT8 *opdata, int maxwords)
 {
 	UINT32 immvalue = 0;
 	int iffy = FALSE;

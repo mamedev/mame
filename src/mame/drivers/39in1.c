@@ -79,7 +79,7 @@ static WRITE32_HANDLER( pxa255_intc_w );
 static READ32_HANDLER( pxa255_gpio_r );
 static WRITE32_HANDLER( pxa255_gpio_w );
 
-static void pxa255_lcd_load_dma_descriptor(const address_space* space, UINT32 address, int channel);
+static void pxa255_lcd_load_dma_descriptor(address_space* space, UINT32 address, int channel);
 static void pxa255_lcd_irq_check(running_machine* machine);
 static void pxa255_lcd_dma_kickoff(running_machine* machine, int channel);
 static void pxa255_lcd_check_load_next_branch(running_machine* machine, int channel);
@@ -1048,7 +1048,7 @@ static WRITE32_HANDLER( pxa255_gpio_w )
 
 */
 
-static void pxa255_lcd_load_dma_descriptor(const address_space* space, UINT32 address, int channel)
+static void pxa255_lcd_load_dma_descriptor(address_space* space, UINT32 address, int channel)
 {
 	_39in1_state *state = space->machine->driver_data<_39in1_state>();
 	PXA255_LCD_Regs *lcd_regs = &state->lcd_regs;

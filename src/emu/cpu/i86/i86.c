@@ -60,8 +60,8 @@ struct _i8086_state
 	memory_interface	mem;
 
 	legacy_cpu_device *device;
-	const address_space *program;
-	const address_space *io;
+	address_space *program;
+	address_space *io;
 	int icount;
 
 	unsigned prefix_base;		   /* base address of the latest prefix segment */

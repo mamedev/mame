@@ -63,7 +63,7 @@ struct _tms34010_state
 	UINT8				executing;
 	device_irq_callback	irq_callback;
 	legacy_cpu_device *device;
-	const address_space *program;
+	address_space *program;
 	const tms34010_config *config;
 	screen_device *screen;
 	emu_timer *			scantimer;
@@ -1556,7 +1556,7 @@ static STATE_POSTLOAD( tms34010_state_postload )
 
 void tms34010_host_w(running_device *cpu, int reg, int data)
 {
-	const address_space *space;
+	address_space *space;
 	tms34010_state *tms = get_safe_token(cpu);
 	unsigned int addr;
 

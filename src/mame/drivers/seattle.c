@@ -470,7 +470,7 @@ static void vblank_assert(running_device *device, int state);
 static void update_vblank_irq(running_machine *machine);
 static void galileo_reset(void);
 static TIMER_CALLBACK( galileo_timer_callback );
-static void galileo_perform_dma(const address_space *space, int which);
+static void galileo_perform_dma(address_space *space, int which);
 static void voodoo_stall(running_device *device, int stall);
 static void widget_reset(running_machine *machine);
 static void update_widget_irq(running_machine *machine);
@@ -758,7 +758,7 @@ static void vblank_assert(running_device *device, int state)
  *
  *************************************/
 
-static UINT32 pci_bridge_r(const address_space *space, UINT8 reg, UINT8 type)
+static UINT32 pci_bridge_r(address_space *space, UINT8 reg, UINT8 type)
 {
 	UINT32 result = galileo.pci_bridge_regs[reg];
 
@@ -779,7 +779,7 @@ static UINT32 pci_bridge_r(const address_space *space, UINT8 reg, UINT8 type)
 }
 
 
-static void pci_bridge_w(const address_space *space, UINT8 reg, UINT8 type, UINT32 data)
+static void pci_bridge_w(address_space *space, UINT8 reg, UINT8 type, UINT32 data)
 {
 	galileo.pci_bridge_regs[reg] = data;
 	if (LOG_PCI)
@@ -794,7 +794,7 @@ static void pci_bridge_w(const address_space *space, UINT8 reg, UINT8 type, UINT
  *
  *************************************/
 
-static UINT32 pci_3dfx_r(const address_space *space, UINT8 reg, UINT8 type)
+static UINT32 pci_3dfx_r(address_space *space, UINT8 reg, UINT8 type)
 {
 	UINT32 result = galileo.pci_3dfx_regs[reg];
 
@@ -815,7 +815,7 @@ static UINT32 pci_3dfx_r(const address_space *space, UINT8 reg, UINT8 type)
 }
 
 
-static void pci_3dfx_w(const address_space *space, UINT8 reg, UINT8 type, UINT32 data)
+static void pci_3dfx_w(address_space *space, UINT8 reg, UINT8 type, UINT32 data)
 {
 	galileo.pci_3dfx_regs[reg] = data;
 
@@ -843,7 +843,7 @@ static void pci_3dfx_w(const address_space *space, UINT8 reg, UINT8 type, UINT32
  *
  *************************************/
 
-static UINT32 pci_ide_r(const address_space *space, UINT8 reg, UINT8 type)
+static UINT32 pci_ide_r(address_space *space, UINT8 reg, UINT8 type)
 {
 	UINT32 result = galileo.pci_ide_regs[reg];
 
@@ -864,7 +864,7 @@ static UINT32 pci_ide_r(const address_space *space, UINT8 reg, UINT8 type)
 }
 
 
-static void pci_ide_w(const address_space *space, UINT8 reg, UINT8 type, UINT32 data)
+static void pci_ide_w(address_space *space, UINT8 reg, UINT8 type, UINT32 data)
 {
 	galileo.pci_ide_regs[reg] = data;
 	if (LOG_PCI)
@@ -925,7 +925,7 @@ static TIMER_CALLBACK( galileo_timer_callback )
  *
  *************************************/
 
-static int galileo_dma_fetch_next(const address_space *space, int which)
+static int galileo_dma_fetch_next(address_space *space, int which)
 {
 	offs_t address = 0;
 	UINT32 data;
@@ -965,7 +965,7 @@ static int galileo_dma_fetch_next(const address_space *space, int which)
 }
 
 
-static void galileo_perform_dma(const address_space *space, int which)
+static void galileo_perform_dma(address_space *space, int which)
 {
 	do
 	{
@@ -1347,7 +1347,7 @@ static void voodoo_stall(running_device *device, int stall)
 		for (which = 0; which < 4; which++)
 			if (galileo.dma_stalled_on_voodoo[which])
 			{
-				const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+				address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 				if (LOG_DMA) logerror("Resuming DMA%d on voodoo\n", which);
 
 				/* mark this DMA as no longer stalled */

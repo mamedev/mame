@@ -73,7 +73,7 @@ static UINT8 ls259_buf[8] = {0,0,0,0,0,0,0,0};
 
 static WRITE8_DEVICE_HANDLER( bagman_ls259_w )
 {
-	const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	bagman_pal16r6_w(space, offset,data); /*this is just a simulation*/
 
 	if (ls259_buf[offset] != (data&1) )

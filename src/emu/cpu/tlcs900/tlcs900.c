@@ -73,7 +73,7 @@ struct _tlcs900_state
 	int regbank;
 	device_irq_callback irqcallback;
 	legacy_cpu_device *device;
-	const address_space *program;
+	address_space *program;
 };
 
 

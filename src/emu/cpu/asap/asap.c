@@ -86,7 +86,7 @@ struct _asap_state
 	UINT8		irq_state;
 	int			icount;
 	device_irq_callback irq_callback;
-	const address_space *program;
+	address_space *program;
 	legacy_cpu_device *device;
 
 	/* src2val table, registers are at the end */

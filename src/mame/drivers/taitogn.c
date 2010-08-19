@@ -513,7 +513,7 @@ static WRITE32_HANDLER(flash_s3_w)
 
 static void install_handlers(running_machine *machine, int mode)
 {
-	const address_space *a = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *a = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	if(mode == 0) {
 		// Mode 0 has access to the subbios, the mn102 flash and the rf5c296 mem zone
 		memory_install_readwrite32_handler(a, 0x1f000000, 0x1f1fffff, 0, 0, flash_subbios_r, flash_subbios_w);

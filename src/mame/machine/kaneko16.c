@@ -1714,7 +1714,7 @@ static int calc3_decompress_table(running_machine* machine, int tabnum, UINT8* d
 
 
 
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8* rom = memory_region(machine,"cpu1");
 	UINT8 numregions;
 	UINT16 length;
@@ -1814,7 +1814,7 @@ static int calc3_decompress_table(running_machine* machine, int tabnum, UINT8* d
 					//printf("save to eeprom\n");
 
 					{
-						const address_space *eeprom_space = space->machine->device<eeprom_device>("eeprom")->space();
+						address_space *eeprom_space = space->machine->device<eeprom_device>("eeprom")->space();
 
 						for (i=0;i<0x80;i++)
 						{
@@ -2107,7 +2107,7 @@ void calc3_mcu_run(running_machine *machine)
 {
 	UINT16 mcu_command;
 	int i;
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	if ( calc3_mcu_status != (1|2|4|8) )	return;
 
@@ -2164,7 +2164,7 @@ void calc3_mcu_run(running_machine *machine)
             */
 
 			{
-				const address_space *eeprom_space = space->machine->device<eeprom_device>("eeprom")->space();
+				address_space *eeprom_space = space->machine->device<eeprom_device>("eeprom")->space();
 
 				for (i=0;i<0x80;i++)
 				{

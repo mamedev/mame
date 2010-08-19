@@ -907,14 +907,14 @@ VIDEO_START( popbingo )
 
 VIDEO_EOF( dooyong )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	buffer_spriteram_w(space, 0, 0);
 }
 
 VIDEO_EOF( rshark )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	buffer_spriteram16_w(space, 0, 0, 0xffff);
 }

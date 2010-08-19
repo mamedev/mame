@@ -308,7 +308,7 @@ VIDEO_UPDATE( madgear )
 
 VIDEO_EOF( lastduel )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* Spriteram is always 1 frame ahead, suggesting buffering.  I can't find
         a register to control this so I assume it happens automatically

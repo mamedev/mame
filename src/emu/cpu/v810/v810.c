@@ -31,8 +31,8 @@ struct _v810_state
 	UINT8 nmi_line;
 	device_irq_callback irq_cb;
 	legacy_cpu_device *device;
-	const address_space *program;
-	const address_space *io;
+	address_space *program;
+	address_space *io;
 	UINT32 PPC;
 	int icount;
 };

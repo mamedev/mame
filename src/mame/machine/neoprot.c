@@ -500,7 +500,7 @@ static void pvc_prot2( running_machine *machine ) // on writes to e8/e9/ea/eb
 }
 
 
-static void pvc_write_bankswitch( const address_space *space )
+static void pvc_write_bankswitch( address_space *space )
 {
 	neogeo_state *state = space->machine->driver_data<neogeo_state>();
 	UINT32 bankaddress;

@@ -1222,7 +1222,7 @@ static MACHINE_RESET( homedata )
 static MACHINE_RESET( pteacher )
 {
 	homedata_state *state = machine->driver_data<homedata_state>();
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* on reset, ports are set as input (high impedance), therefore 0xff output */
 	pteacher_upd7807_portc_w(space, 0, 0xff);
@@ -1239,7 +1239,7 @@ static MACHINE_RESET( pteacher )
 static MACHINE_RESET( reikaids )
 {
 	homedata_state *state = machine->driver_data<homedata_state>();
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* on reset, ports are set as input (high impedance), therefore 0xff output */
 	reikaids_upd7807_portc_w(space, 0, 0xff);

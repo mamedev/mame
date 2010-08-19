@@ -185,7 +185,7 @@ ADDRESS_MAP_END
 
 /* sub 6809 */
 
-static void unlock_shared_ram(const address_space *space)
+static void unlock_shared_ram(address_space *space)
 {
     if(!space->machine->device<cpu_device>("sub")->suspended(SUSPEND_REASON_HALT))
     {

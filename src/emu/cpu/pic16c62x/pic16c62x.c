@@ -88,9 +88,9 @@ struct _pic16c62x_state
 
 
 	legacy_cpu_device *device;
-	const	address_space *program;
-	const	address_space *data;
-	const	address_space *io;
+	address_space *program;
+	address_space *data;
+	address_space *io;
 };
 
 INLINE pic16c62x_state *get_safe_token(running_device *device)

@@ -806,7 +806,7 @@ INLINE UINT32 tmnt2_get_word( running_machine *machine, UINT32 addr )
 	return 0;
 }
 
-static void tmnt2_put_word( const address_space *space, UINT32 addr, UINT16 data )
+static void tmnt2_put_word( address_space *space, UINT32 addr, UINT16 data )
 {
 	tmnt_state *state = space->machine->driver_data<tmnt_state>();
 

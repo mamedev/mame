@@ -864,7 +864,7 @@ int slapstic_bank(void)
  *
  *************************************/
 
-static int alt2_kludge(const address_space *space, offs_t offset)
+static int alt2_kludge(address_space *space, offs_t offset)
 {
 	/* Of the 3 alternate addresses, only the middle one needs to actually hit
        in the slapstic region; the first and third ones can be anywhere in the
@@ -911,7 +911,7 @@ static int alt2_kludge(const address_space *space, offs_t offset)
  *
  *************************************/
 
-int slapstic_tweak(const address_space *space, offs_t offset)
+int slapstic_tweak(address_space *space, offs_t offset)
 {
 	/* reset is universal */
 	if (offset == 0x0000)

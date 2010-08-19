@@ -35,7 +35,7 @@ struct _i960_state_t {
 
 	device_irq_callback irq_cb;
 	legacy_cpu_device *device;
-	const address_space *program;
+	address_space *program;
 
 	int icount;
 };

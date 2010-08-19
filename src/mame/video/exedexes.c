@@ -247,7 +247,7 @@ VIDEO_UPDATE( exedexes )
 
 VIDEO_EOF( exedexes )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	buffer_spriteram_w(space, 0, 0);
 }

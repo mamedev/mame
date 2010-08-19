@@ -726,7 +726,7 @@ static READ8_HANDLER( sound_data_buffer_r )
 
 static WRITE8_DEVICE_HANDLER( drivedge_portb_out )
 {
-	const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 //  logerror("PIA port B write = %02x\n", data);
 
 	/* bit 0 controls the fan light */
@@ -751,7 +751,7 @@ static WRITE8_DEVICE_HANDLER( drivedge_turbo_light )
 
 static WRITE8_DEVICE_HANDLER( pia_portb_out )
 {
-	const address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 //  logerror("PIA port B write = %02x\n", data);
 
 	/* bit 4 controls the ticket dispenser */

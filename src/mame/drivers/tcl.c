@@ -180,7 +180,7 @@ static DRIVER_INIT(tcl)
 {
 	/* only the first part is decrypted (and verified)*/
 
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *dest = memory_region(machine, "maincpu");
 	int len = memory_region_length(machine, "maincpu");
 	UINT8 *src = auto_alloc_array(machine, UINT8, len);

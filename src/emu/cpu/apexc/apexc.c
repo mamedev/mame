@@ -359,8 +359,8 @@ struct _apexc_state
 	UINT32 pc;	/* address of next instruction for the disassembler */
 
 	legacy_cpu_device *device;
-	const address_space *program;
-	const address_space *io;
+	address_space *program;
+	address_space *io;
 	int icount;
 };
 

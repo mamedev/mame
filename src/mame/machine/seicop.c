@@ -1505,7 +1505,7 @@ static UINT8 xy_check;
 /*      -the second value should be end of calculation (in other words,check everything between the two values) */
 #define PLAYER 0
 #define ENEMY 1
-static void protection_move_jsr(const address_space *space,UINT32 work_ram,UINT8 k)
+static void protection_move_jsr(address_space *space,UINT32 work_ram,UINT8 k)
 {
 	static UINT32 move_data,x_data,y_data;
 	/*Read the movement data to execute*/
@@ -1563,7 +1563,7 @@ static void protection_move_jsr(const address_space *space,UINT32 work_ram,UINT8
 
 static UINT16 hit_check;
 
-static void protection_hit_jsr(const address_space *space,UINT32 work_ram1,UINT32 work_ram2)
+static void protection_hit_jsr(address_space *space,UINT32 work_ram1,UINT32 work_ram2)
 {
 	int x1,y1,x2,y2/*,hit1,hit2*/;
 	x1 = (memory_read_word(space, work_ram1+0x8));
@@ -1585,7 +1585,7 @@ static void protection_hit_jsr(const address_space *space,UINT32 work_ram1,UINT3
 }
 
 /*directional movement protection*/
-static void moveprot_jsr(const address_space *space)
+static void moveprot_jsr(address_space *space)
 {
 	static INT16 x_axis,y_axis;
 	static UINT16 move_data,distance,move_type;
@@ -1651,7 +1651,7 @@ static void moveprot_jsr(const address_space *space)
 
 */
 /*sprite "look" protection*/
-static void move2prot_jsr(const address_space *space)
+static void move2prot_jsr(address_space *space)
 {
 	static INT16 x_pl,y_pl,x_en,y_en,res;
 	x_pl = memory_read_word(space, cop_register[1]+0x8);
@@ -1674,7 +1674,7 @@ static void move2prot_jsr(const address_space *space)
 
 #ifdef UNUSED_FUNCTION
 /*"To point" movement protection*/
-static void move3x_prot_jsr(const address_space *space)
+static void move3x_prot_jsr(address_space *space)
 {
 	static INT16 x_pl,x_en,x_dis;
 	x_pl = memory_read_word(space, cop_register[1]+0x8);
@@ -1688,7 +1688,7 @@ static void move3x_prot_jsr(const address_space *space)
 	memory_write_word(space, cop_register[0]+0x14,x_dis);
 }
 
-static void move3y_prot_jsr(const address_space *space)
+static void move3y_prot_jsr(address_space *space)
 {
 	static INT16 y_pl,y_en,y_dis;
 	y_pl = memory_read_word(space, cop_register[1]+0x4);
@@ -1804,7 +1804,7 @@ x/y check [2]
 
 static UINT16 s_i;
 
-static void dma_transfer(const address_space *space)
+static void dma_transfer(address_space *space)
 {
 	static UINT16 rel_xy;
 	static UINT16 abs_x,abs_y;
@@ -1861,7 +1861,7 @@ static UINT16 check_calc(UINT16 param)
 	return num;
 }
 
-static UINT16 hit_check_jsr(const address_space *space)
+static UINT16 hit_check_jsr(address_space *space)
 {
 	static INT16 xsrc,xdst,ysrc,ydst,xparam,yparam;
 	xsrc = (memory_read_word(space, 0x110008));
@@ -1897,7 +1897,7 @@ static UINT16 hit_check_jsr(const address_space *space)
 /*Heated Barrel*/
 /*command 0x8100 will check for the direction of the sprite*/
 /*command 0x8900 will check the "point" movement*/
-static void cop2_move3_prot(const address_space *space)
+static void cop2_move3_prot(address_space *space)
 {
 	static INT16 x_pl,x_en;
 	static INT16 y_pl,y_en;
@@ -1975,7 +1975,7 @@ static void cop2_move3_prot(const address_space *space)
 }
 
 /**/
-static UINT16 cop2_hit_prot(const address_space *space)
+static UINT16 cop2_hit_prot(address_space *space)
 {
 	static INT16 xsrc,xdst;
 	static INT16 ysrc,ydst;
@@ -2014,7 +2014,7 @@ static UINT16 cop2_hit_prot(const address_space *space)
 		return 3;
 }
 
-static void cop2_move2_prot(const address_space *space)
+static void cop2_move2_prot(address_space *space)
 {
 	static INT16 xsrc,ysrc;
 	static INT16 param2;

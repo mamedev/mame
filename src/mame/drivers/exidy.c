@@ -1458,7 +1458,7 @@ static DRIVER_INIT( pepper2 )
 
 static DRIVER_INIT( fax )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	exidy_video_config(0x04, 0x04, TRUE);
 

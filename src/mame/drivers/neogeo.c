@@ -260,7 +260,7 @@ void neogeo_set_display_position_interrupt_control( running_machine *machine, UI
 }
 
 
-void neogeo_set_display_counter_msb( const address_space *space, UINT16 data )
+void neogeo_set_display_counter_msb( address_space *space, UINT16 data )
 {
 	neogeo_state *state = space->machine->driver_data<neogeo_state>();
 
@@ -270,7 +270,7 @@ void neogeo_set_display_counter_msb( const address_space *space, UINT16 data )
 }
 
 
-void neogeo_set_display_counter_lsb( const address_space *space, UINT16 data )
+void neogeo_set_display_counter_lsb( address_space *space, UINT16 data )
 {
 	neogeo_state *state = space->machine->driver_data<neogeo_state>();
 
@@ -717,7 +717,7 @@ static void _set_main_cpu_bank_address( running_machine *machine )
 }
 
 
-void neogeo_set_main_cpu_bank_address( const address_space *space, UINT32 bank_address )
+void neogeo_set_main_cpu_bank_address( address_space *space, UINT32 bank_address )
 {
 	neogeo_state *state = space->machine->driver_data<neogeo_state>();
 
@@ -753,7 +753,7 @@ static WRITE16_HANDLER( main_cpu_bank_select_w )
 
 static void main_cpu_banking_init( running_machine *machine )
 {
-	const address_space *mainspace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *mainspace = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* create vector banks */
 	memory_configure_bank(machine, NEOGEO_BANK_VECTORS, 0, 1, memory_region(machine, "mainbios"), 0);
@@ -784,7 +784,7 @@ static void set_audio_cpu_banking( running_machine *machine )
 }
 
 
-static void audio_cpu_bank_select( const address_space *space, int region, UINT8 bank )
+static void audio_cpu_bank_select( address_space *space, int region, UINT8 bank )
 {
 	neogeo_state *state = space->machine->driver_data<neogeo_state>();
 
@@ -828,7 +828,7 @@ static READ8_HANDLER( audio_cpu_bank_select_8000_bfff_r )
 }
 
 
-static void _set_audio_cpu_rom_source( const address_space *space )
+static void _set_audio_cpu_rom_source( address_space *space )
 {
 	neogeo_state *state = space->machine->driver_data<neogeo_state>();
 
@@ -849,7 +849,7 @@ static void _set_audio_cpu_rom_source( const address_space *space )
 }
 
 
-static void set_audio_cpu_rom_source( const address_space *space, UINT8 data )
+static void set_audio_cpu_rom_source( address_space *space, UINT8 data )
 {
 	neogeo_state *state = space->machine->driver_data<neogeo_state>();
 	state->audio_cpu_rom_source = data;
@@ -1117,7 +1117,7 @@ static MACHINE_RESET( neogeo )
 {
 	neogeo_state *state = machine->driver_data<neogeo_state>();
 	offs_t offs;
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* reset system control registers */
 	for (offs = 0; offs < 8; offs++)

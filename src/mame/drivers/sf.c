@@ -54,7 +54,7 @@ static WRITE16_HANDLER( soundcmd_w )
 /* The protection of the Japanese (and alt US) version */
 /* I'd love to see someone dump the 68705 / i8751 roms */
 
-static void write_dword( const address_space *space, offs_t offset, UINT32 data )
+static void write_dword( address_space *space, offs_t offset, UINT32 data )
 {
 	memory_write_word(space, offset, data >> 16);
 	memory_write_word(space, offset + 2, data);

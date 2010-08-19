@@ -237,7 +237,7 @@ static TIMER_DEVICE_CALLBACK( dma_timer_callback )
 }
 
 
-static void update_dma_state(const address_space *space)
+static void update_dma_state(address_space *space)
 {
 	/* determine the new enabled state */
 	int enabled = ((tms32031_io_regs[DMA_GLOBAL_CTL] & 3) == 3) && (tms32031_io_regs[DMA_TRANSFER_COUNT] != 0);
@@ -517,7 +517,7 @@ static READ32_HANDLER( cage_io_status_r )
 }
 
 
-UINT16 main_from_cage_r(const address_space *space)
+UINT16 main_from_cage_r(address_space *space)
 {
 	if (LOG_COMM)
 		logerror("%s:main read data = %04X\n", cpuexec_describe_context(space->machine), soundlatch_word_r(space, 0, 0));

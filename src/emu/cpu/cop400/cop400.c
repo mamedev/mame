@@ -89,9 +89,9 @@ struct _cop400_state
 {
 	const cop400_interface *intf;
 
-    const address_space *program;
-    const address_space *data;
-    const address_space *io;
+    address_space *program;
+    address_space *data;
+    address_space *io;
 
     UINT8 featuremask;
 

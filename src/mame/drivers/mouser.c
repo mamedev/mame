@@ -286,7 +286,7 @@ static DRIVER_INIT( mouser )
 	/* Decode the opcodes */
 
 	offs_t i;
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *rom = memory_region(machine, "maincpu");
 	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x6000);
 	UINT8 *table = memory_region(machine, "user1");

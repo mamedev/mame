@@ -66,7 +66,7 @@ typedef struct {
 	int	ei_delay;
 	device_irq_callback irq_callback;
 	legacy_cpu_device *device;
-	const address_space *program;
+	address_space *program;
 	int icount;
 	/* Timer stuff */
 	lr35902_timer_fired_func timer_fired_func;

@@ -67,7 +67,7 @@ READ16_HANDLER( twincobr_dsp_r )
 {
 	/* DSP can read data from main CPU RAM via DSP IO port 1 */
 
-	const address_space *mainspace;
+	address_space *mainspace;
 	UINT16 input_data = 0;
 	switch (main_ram_seg) {
 		case 0x30000:
@@ -83,7 +83,7 @@ READ16_HANDLER( twincobr_dsp_r )
 
 WRITE16_HANDLER( twincobr_dsp_w )
 {
-	const address_space *mainspace;
+	address_space *mainspace;
 
 	/* Data written to main CPU RAM via DSP IO port 1 */
 	dsp_execute = 0;
@@ -117,7 +117,7 @@ READ16_HANDLER( wardner_dsp_r )
 {
 	/* DSP can read data from main CPU RAM via DSP IO port 1 */
 
-	const address_space *mainspace;
+	address_space *mainspace;
 	UINT16 input_data = 0;
 	switch (main_ram_seg) {
 		case 0x7000:
@@ -134,7 +134,7 @@ READ16_HANDLER( wardner_dsp_r )
 
 WRITE16_HANDLER( wardner_dsp_w )
 {
-	const address_space *mainspace;
+	address_space *mainspace;
 
 	/* Data written to main CPU RAM via DSP IO port 1 */
 	dsp_execute = 0;
@@ -271,7 +271,7 @@ WRITE16_HANDLER( twincobr_sharedram_w )
 }
 
 
-static void toaplan0_coin_dsp_w(const address_space *space, int offset, int data)
+static void toaplan0_coin_dsp_w(address_space *space, int offset, int data)
 {
 	if (data > 1)
 		LOG(("%s:Writing %08x to %08x.\n",cpuexec_describe_context(space->machine),data,toaplan_port_type[toaplan_main_cpu] - offset));

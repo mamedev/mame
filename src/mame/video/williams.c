@@ -158,7 +158,7 @@ static UINT8 williams2_fg_color;
 static void blitter_init(running_machine *machine, int blitter_config, const UINT8 *remap_prom);
 static void create_palette_lookup(running_machine *machine);
 static TILE_GET_INFO( get_tile_info );
-static int blitter_core(const address_space *space, int sstart, int dstart, int w, int h, int data);
+static int blitter_core(address_space *space, int sstart, int dstart, int w, int h, int data);
 
 
 
@@ -603,7 +603,7 @@ WRITE8_HANDLER( williams2_blit_window_enable_w )
  *
  *************************************/
 
-INLINE void blit_pixel(const address_space *space, int offset, int srcdata, int data, int mask, int solid)
+INLINE void blit_pixel(address_space *space, int offset, int srcdata, int data, int mask, int solid)
 {
 	/* always read from video RAM regardless of the bank setting */
 	int pix = (offset < 0xc000) ? williams_videoram[offset] : memory_read_byte(space, offset);
@@ -630,7 +630,7 @@ INLINE void blit_pixel(const address_space *space, int offset, int srcdata, int 
 }
 
 
-static int blitter_core(const address_space *space, int sstart, int dstart, int w, int h, int data)
+static int blitter_core(address_space *space, int sstart, int dstart, int w, int h, int data)
 {
 	int source, sxadv, syadv;
 	int dest, dxadv, dyadv;

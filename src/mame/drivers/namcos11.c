@@ -573,7 +573,7 @@ static INTERRUPT_GEN( namcos11_vblank )
 
 static UINT32 m_n_bankoffset;
 
-INLINE void bankswitch_rom8( const address_space *space, const char *bank, int n_data )
+INLINE void bankswitch_rom8( address_space *space, const char *bank, int n_data )
 {
 	memory_set_bank( space->machine, bank, ( ( n_data & 0xc0 ) >> 4 ) + ( n_data & 0x03 ) );
 }
@@ -608,7 +608,7 @@ static WRITE32_HANDLER( bankswitch_rom64_upper_w )
 	}
 }
 
-INLINE void bankswitch_rom64( const address_space *space, const char *bank, int n_data )
+INLINE void bankswitch_rom64( address_space *space, const char *bank, int n_data )
 {
 	/* todo: verify behaviour */
 	memory_set_bank( space->machine,  bank, ( ( ( ( n_data & 0xc0 ) >> 3 ) + ( n_data & 0x07 ) ) ^ m_n_bankoffset ) );

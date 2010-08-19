@@ -409,7 +409,7 @@ INLINE UINT8* blitter_get_addr(running_machine *machine, UINT32 addr)
     The Flare One blitter is a simpler design with slightly different parameters
     and will require hardware tests to figure everything out correctly.
 */
-static void RunBlit(const address_space *space)
+static void RunBlit(address_space *space)
 {
 #define BLITPRG_READ(x)		blitter.x = *(blitter_get_addr(space->machine, blitter.program.addr++))
 

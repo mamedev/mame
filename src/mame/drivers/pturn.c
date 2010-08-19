@@ -440,7 +440,7 @@ static INTERRUPT_GEN( pturn_main_intgen )
 
 static MACHINE_RESET( pturn )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	soundlatch_clear_w(space,0,0);
 }
 

@@ -278,7 +278,7 @@ struct _drcbe_state
 	x86code *				debug_log_hashjmp;		/* hashjmp debugging */
 	x86code *				drcmap_get_value;		/* map lookup helper */
 	data_accessors			accessors[ADDRESS_SPACES];	/* memory accessors */
-	const address_space *	space[ADDRESS_SPACES];	/* address spaces */
+	address_space *	space[ADDRESS_SPACES];	/* address spaces */
 
 	UINT8					sse41;					/* do we have SSE4.1 support? */
 	UINT32					ssemode;				/* saved SSE mode */

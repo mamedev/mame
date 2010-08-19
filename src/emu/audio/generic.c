@@ -85,7 +85,7 @@ static TIMER_CALLBACK( latch_callback )
     latch_w - handle a write to a given latch
 -------------------------------------------------*/
 
-INLINE void latch_w(const address_space *space, int which, UINT16 value)
+INLINE void latch_w(address_space *space, int which, UINT16 value)
 {
 	timer_call_after_resynch(space->machine, NULL, which | (value << 8), latch_callback);
 }
@@ -95,7 +95,7 @@ INLINE void latch_w(const address_space *space, int which, UINT16 value)
     latch_r - handle a read from a given latch
 -------------------------------------------------*/
 
-INLINE UINT16 latch_r(const address_space *space, int which)
+INLINE UINT16 latch_r(address_space *space, int which)
 {
 	generic_audio_private *state = space->machine->generic_audio_data;
 	state->latch_read[which] = 1;
@@ -107,7 +107,7 @@ INLINE UINT16 latch_r(const address_space *space, int which)
     latch_clear - clear a given latch
 -------------------------------------------------*/
 
-INLINE void latch_clear(const address_space *space, int which)
+INLINE void latch_clear(address_space *space, int which)
 {
 	generic_audio_private *state = space->machine->generic_audio_data;
 	state->latched_value[which] = state->latch_clear_value;

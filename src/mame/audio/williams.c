@@ -486,7 +486,7 @@ void williams_cvsd_data_w(running_machine *machine, int data)
 
 void williams_cvsd_reset_w(int state)
 {
-	const address_space *space = cpu_get_address_space(sound_cpu, ADDRESS_SPACE_PROGRAM);
+	address_space *space = cpu_get_address_space(sound_cpu, ADDRESS_SPACE_PROGRAM);
 
 	/* going high halts the CPU */
 	if (state)
@@ -581,7 +581,7 @@ static WRITE8_HANDLER( narc_slave_sync_w )
 
 void williams_narc_data_w(int data)
 {
-	const address_space *space = cpu_get_address_space(sound_cpu, ADDRESS_SPACE_PROGRAM);
+	address_space *space = cpu_get_address_space(sound_cpu, ADDRESS_SPACE_PROGRAM);
 
 	soundlatch_w(space, 0, data & 0xff);
 	cpu_set_input_line(sound_cpu, INPUT_LINE_NMI, (data & 0x100) ? CLEAR_LINE : ASSERT_LINE);
@@ -598,7 +598,7 @@ void williams_narc_reset_w(int state)
 	/* going high halts the CPU */
 	if (state)
 	{
-		const address_space *space = cpu_get_address_space(sound_cpu, ADDRESS_SPACE_PROGRAM);
+		address_space *space = cpu_get_address_space(sound_cpu, ADDRESS_SPACE_PROGRAM);
 		narc_master_bank_select_w(space, 0, 0);
 		narc_slave_bank_select_w(space, 0, 0);
 		init_audio_state(space->machine);
@@ -668,7 +668,7 @@ static WRITE8_HANDLER( adpcm_talkback_w )
 
 void williams_adpcm_data_w(int data)
 {
-	const address_space *space = cpu_get_address_space(sound_cpu, ADDRESS_SPACE_PROGRAM);
+	address_space *space = cpu_get_address_space(sound_cpu, ADDRESS_SPACE_PROGRAM);
 	soundlatch_w(space, 0, data & 0xff);
 	if (!(data & 0x200))
 	{
@@ -684,7 +684,7 @@ void williams_adpcm_reset_w(int state)
 	/* going high halts the CPU */
 	if (state)
 	{
-		const address_space *space = cpu_get_address_space(sound_cpu, ADDRESS_SPACE_PROGRAM);
+		address_space *space = cpu_get_address_space(sound_cpu, ADDRESS_SPACE_PROGRAM);
 		adpcm_bank_select_w(space, 0, 0);
 		init_audio_state(space->machine);
 		cpu_set_input_line(sound_cpu, INPUT_LINE_RESET, ASSERT_LINE);

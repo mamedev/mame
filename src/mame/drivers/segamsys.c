@@ -485,7 +485,7 @@ static UINT8 vdp_data_r(struct sms_vdp *chip)
 	return retdata;
 }
 
-static void vdp_data_w(const address_space *space, UINT8 data, struct sms_vdp* chip)
+static void vdp_data_w(address_space *space, UINT8 data, struct sms_vdp* chip)
 {
 	/* data writes clear the pending flag */
 	chip->cmd_pend = 0;
@@ -549,7 +549,7 @@ static void vdp_data_w(const address_space *space, UINT8 data, struct sms_vdp* c
 
 }
 
-static UINT8 vdp_ctrl_r(const address_space *space, struct sms_vdp *chip)
+static UINT8 vdp_ctrl_r(address_space *space, struct sms_vdp *chip)
 {
 	UINT8 retvalue;
 
@@ -613,7 +613,7 @@ static void vdp_set_register(running_machine *machine, struct sms_vdp *chip)
 //  printf("VDP: setting register %01x to %02x\n",reg, chip->cmd_part1);
 }
 
-static void vdp_ctrl_w(const address_space *space, UINT8 data, struct sms_vdp *chip)
+static void vdp_ctrl_w(address_space *space, UINT8 data, struct sms_vdp *chip)
 {
 	if (chip->cmd_pend)
 	{ /* Part 2 of a command word write */
@@ -1480,7 +1480,7 @@ READ8_HANDLER( sms_ioport_gg00_r )
 
 void init_extra_gg_ports(running_machine* machine, const char* tag)
 {
-	const address_space *io = cputag_get_address_space(machine, tag, ADDRESS_SPACE_IO);
+	address_space *io = cputag_get_address_space(machine, tag, ADDRESS_SPACE_IO);
 	memory_install_read8_handler     (io, 0x00, 0x00, 0, 0, sms_ioport_gg00_r);
 }
 
@@ -1643,7 +1643,7 @@ static void megatech_set_genz80_as_sms_standard_ports(running_machine *machine, 
 {
 	/* INIT THE PORTS *********************************************************************************************/
 
-	const address_space *io = cputag_get_address_space(machine, tag, ADDRESS_SPACE_IO);
+	address_space *io = cputag_get_address_space(machine, tag, ADDRESS_SPACE_IO);
 	running_device *sn = machine->device("snsnd");
 
 	memory_install_readwrite8_handler(io, 0x0000, 0xffff, 0, 0, z80_unmapped_port_r, z80_unmapped_port_w);

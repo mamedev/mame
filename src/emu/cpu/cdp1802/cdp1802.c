@@ -26,8 +26,8 @@ struct _cdp1802_state
 {
 	const cdp1802_interface *intf;
 
-    const address_space *program;
-    const address_space *io;
+    address_space *program;
+    address_space *io;
 
 	devcb_resolved_write_line	out_q_func;
 	devcb_resolved_read8		in_dma_func;

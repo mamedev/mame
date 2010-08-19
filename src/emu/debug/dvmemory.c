@@ -72,7 +72,7 @@ const debug_view_memory::memory_view_pos debug_view_memory::s_memory_pos_table[9
 //  debug_view_memory_source - constructors
 //-------------------------------------------------
 
-debug_view_memory_source::debug_view_memory_source(const char *name, const address_space &space)
+debug_view_memory_source::debug_view_memory_source(const char *name, address_space &space)
 	: debug_view_source(name, space.cpu),
 	  m_space(&space),
 	  m_memintf(dynamic_cast<device_memory_interface *>(space.cpu)),
@@ -156,7 +156,7 @@ void debug_view_memory::enumerate_sources()
 	for (bool gotone = m_machine.m_devicelist.first(memintf); gotone; gotone = memintf->next(memintf))
 		for (int spacenum = 0; spacenum < ADDRESS_SPACES; spacenum++)
 		{
-			const address_space *space = memintf->space(spacenum);
+			address_space *space = memintf->space(spacenum);
 			if (space != NULL)
 			{
 				name.printf("%s '%s' %s space memory", memintf->device().name(), memintf->device().tag(), space->name());

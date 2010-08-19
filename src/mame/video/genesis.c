@@ -43,10 +43,10 @@
 static int  vdp_data_r(running_machine *machine);
 static void vdp_data_w(running_machine *machine, int data);
 static int  vdp_control_r(running_machine *machine);
-static void vdp_control_w(const address_space *space, int data);
+static void vdp_control_w(address_space *space, int data);
 static void vdp_register_w(running_machine *machine, int data, int vblank);
-static void vdp_control_dma(const address_space *space, int data);
-static void vdp_dma_68k(const address_space *space);
+static void vdp_control_dma(address_space *space, int data);
+static void vdp_dma_68k(address_space *space);
 static void vdp_dma_fill(int);
 static void vdp_dma_copy(void);
 
@@ -490,7 +490,7 @@ static int vdp_control_r(running_machine *machine)
 }
 
 
-static void vdp_control_w(const address_space *space, int data)
+static void vdp_control_w(address_space *space, int data)
 {
 	/* case 1: we're not expecting the 2nd half of a command */
 	if (!vdp_cmdpart)
@@ -629,7 +629,7 @@ static void vdp_register_w(running_machine *machine, int data, int vblank)
 }
 
 
-static void vdp_control_dma(const address_space *space, int data)
+static void vdp_control_dma(address_space *space, int data)
 {
 	if ((vdp_code & 0x20) && (genesis_vdp_regs[1] & 0x10))
 	{
@@ -661,7 +661,7 @@ static void vdp_control_dma(const address_space *space, int data)
 
 ******************************************************************************/
 
-static void vdp_dma_68k(const address_space *space)
+static void vdp_dma_68k(address_space *space)
 {
 	int length = genesis_vdp_regs[19] | (genesis_vdp_regs[20] << 8);
 	int source = (genesis_vdp_regs[21] << 1) | (genesis_vdp_regs[22] << 9) | ((genesis_vdp_regs[23] & 0x7f) << 17);

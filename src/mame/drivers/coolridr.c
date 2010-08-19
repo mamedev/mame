@@ -485,7 +485,7 @@ static WRITE32_HANDLER( sysh1_pal_w )
 
 
 /* FIXME: this seems to do a hell lot of stuff, it's not ST-V SCU but still somewhat complex :/ */
-static void sysh1_dma_transfer( const address_space *space, UINT16 dma_index )
+static void sysh1_dma_transfer( address_space *space, UINT16 dma_index )
 {
 	static UINT32 src,dst,size,type,s_i;
 	static UINT8 end_dma_mark;

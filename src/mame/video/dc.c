@@ -130,7 +130,7 @@ static UINT32 dilated1[15][1024];
 static int dilatechose[64];
 static float wbuffer[480][640];
 static UINT32 debug_dip_status;
-static void pvr_accumulationbuffer_to_framebuffer(const address_space *space, int x,int y);
+static void pvr_accumulationbuffer_to_framebuffer(address_space *space, int x,int y);
 
 UINT64 *dc_framebuffer_ram; // '32-bit access area'
 UINT64 *dc_texture_ram; // '64-bit access area'
@@ -1963,7 +1963,7 @@ static void render_tri(bitmap_t *bitmap, texinfo *ti, const vert *v)
 
 static void render_to_accumulation_buffer(running_machine *machine,bitmap_t *bitmap,const rectangle *cliprect)
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	int cs,rs,ns;
 	UINT32 c;
 #if 0
@@ -2033,7 +2033,7 @@ static void render_to_accumulation_buffer(running_machine *machine,bitmap_t *bit
 
 */
 
-static void pvr_accumulationbuffer_to_framebuffer(const address_space *space, int x,int y)
+static void pvr_accumulationbuffer_to_framebuffer(address_space *space, int x,int y)
 {
 	// the accumulation buffer is always 8888
 	//

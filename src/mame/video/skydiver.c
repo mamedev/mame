@@ -17,7 +17,7 @@ static int width = 0;
 
 MACHINE_RESET( skydiver )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* reset all latches */
 	skydiver_start_lamp_1_w(space, 0, 0);

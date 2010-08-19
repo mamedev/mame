@@ -83,7 +83,7 @@ struct _saturn_state
 	int		monitor_in;
 	device_irq_callback irq_callback;
 	legacy_cpu_device *device;
-	const address_space *program;
+	address_space *program;
 	int icount;
 };
 

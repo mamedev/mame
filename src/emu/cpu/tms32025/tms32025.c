@@ -174,9 +174,9 @@ struct _tms32025_state
 	int		waiting_for_serial_frame;
 
 	legacy_cpu_device *device;
-	const address_space *program;
-	const address_space *data;
-	const address_space *io;
+	address_space *program;
+	address_space *data;
+	address_space *io;
 
 	UINT16 *pgmmap[0x200];
 	UINT16 *datamap[0x200];

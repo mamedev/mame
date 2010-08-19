@@ -881,7 +881,7 @@ static WRITE16_HANDLER( igs011_prot_addr_w )
 
 //  igs011_prot2 = 0x00;
 
-	const address_space *sp = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *sp = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *rom = memory_region(space->machine, "maincpu");
 
 	// Plug previous address range with ROM access

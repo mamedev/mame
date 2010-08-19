@@ -44,7 +44,7 @@ MACHINE_START( taitosj )
 
 MACHINE_RESET( taitosj )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	/* set the default ROM bank (many games only have one bank and */
 	/* never write to the bank selector register) */
 	taitosj_bankswitch_w(space, 0, 0);
@@ -216,7 +216,7 @@ WRITE8_HANDLER( taitosj_68705_portB_w )
 	}
 	if (~data & 0x10)
 	{
-		const address_space *cpu0space = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+		address_space *cpu0space = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 		LOG(("%04x: 68705 write %02x to address %04x\n",cpu_get_pc(space->cpu), portA_out, address));
 
 		memory_write_byte(cpu0space, address, portA_out);
@@ -226,7 +226,7 @@ WRITE8_HANDLER( taitosj_68705_portB_w )
 	}
 	if (~data & 0x20)
 	{
-		const address_space *cpu0space = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+		address_space *cpu0space = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 		portA_in = memory_read_byte(cpu0space, address);
 		LOG(("%04x: 68705 read %02x from address %04x\n", cpu_get_pc(space->cpu), portA_in, address));
 	}

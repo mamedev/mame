@@ -185,7 +185,7 @@ static struct sprite_entry {
 	UINT32 adr;
 } sprites[0x100];
 
-static void generate_sprites(const address_space *space, UINT32 src, UINT32 spr, int count)
+static void generate_sprites(address_space *space, UINT32 src, UINT32 spr, int count)
 {
 	int i;
 	int scount;
@@ -323,39 +323,39 @@ static void generate_sprites(const address_space *space, UINT32 src, UINT32 spr,
 	}
 }
 
-static void tkmmpzdm_esc(const address_space *space, UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4)
+static void tkmmpzdm_esc(address_space *space, UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4)
 {
 	konamigx_esc_alert(gx_workram, 0x0142, 0x100, 0);
 }
 
-static void dragoonj_esc(const address_space *space, UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4)
+static void dragoonj_esc(address_space *space, UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4)
 {
 	konamigx_esc_alert(gx_workram, 0x5c00, 0x100, 0);
 }
 
-static void sal2_esc(const address_space *space, UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4)
+static void sal2_esc(address_space *space, UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4)
 {
 	konamigx_esc_alert(gx_workram, 0x1c8c, 0x172, 1);
 }
 
-static void sexyparo_esc(const address_space *space, UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4)
+static void sexyparo_esc(address_space *space, UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4)
 {
 	// The d20000 should probably be p3
 	generate_sprites(space, 0xc00604, 0xd20000, 0xfc);
 }
 
-static void tbyahhoo_esc(const address_space *space, UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4)
+static void tbyahhoo_esc(address_space *space, UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4)
 {
 	generate_sprites(space, 0xc00000, 0xd20000, 0x100);
 }
 
-static void daiskiss_esc(const address_space *space, UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4)
+static void daiskiss_esc(address_space *space, UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4)
 {
 	generate_sprites(space, 0xc00000, 0xd20000, 0x100);
 }
 
 static UINT8 esc_program[4096];
-static void (*esc_cb)(const address_space *space, UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4);
+static void (*esc_cb)(address_space *space, UINT32 p1, UINT32 p2, UINT32 p3, UINT32 p4);
 
 static WRITE32_HANDLER( esc_w )
 {

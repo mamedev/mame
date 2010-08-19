@@ -164,7 +164,7 @@ static TIMER_CALLBACK( tms34061_interrupt )
  *
  *************************************/
 
-static void register_w(const address_space *space, offs_t offset, UINT8 data)
+static void register_w(address_space *space, offs_t offset, UINT8 data)
 {
 	int scanline;
 	int regnum = offset >> 2;
@@ -235,7 +235,7 @@ static void register_w(const address_space *space, offs_t offset, UINT8 data)
  *
  *************************************/
 
-static UINT8 register_r(const address_space *space, offs_t offset)
+static UINT8 register_r(address_space *space, offs_t offset)
 {
 	int regnum = offset >> 2;
 	UINT16 result;
@@ -357,7 +357,7 @@ INLINE void adjust_xyaddress(int offset)
 }
 
 
-static void xypixel_w(const address_space *space, int offset, UINT8 data)
+static void xypixel_w(address_space *space, int offset, UINT8 data)
 {
 	/* determine the offset, then adjust it */
 	offs_t pixeloffs = tms34061.regs[TMS34061_XYADDRESS];
@@ -377,7 +377,7 @@ static void xypixel_w(const address_space *space, int offset, UINT8 data)
 }
 
 
-static UINT8 xypixel_r(const address_space *space, int offset)
+static UINT8 xypixel_r(address_space *space, int offset)
 {
 	/* determine the offset, then adjust it */
 	offs_t pixeloffs = tms34061.regs[TMS34061_XYADDRESS];
@@ -402,7 +402,7 @@ static UINT8 xypixel_r(const address_space *space, int offset)
  *
  *************************************/
 
-void tms34061_w(const address_space *space, int col, int row, int func, UINT8 data)
+void tms34061_w(address_space *space, int col, int row, int func, UINT8 data)
 {
 	offs_t offs;
 
@@ -464,7 +464,7 @@ void tms34061_w(const address_space *space, int col, int row, int func, UINT8 da
 }
 
 
-UINT8 tms34061_r(const address_space *space, int col, int row, int func)
+UINT8 tms34061_r(address_space *space, int col, int row, int func)
 {
 	int result = 0;
 	offs_t offs;

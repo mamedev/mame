@@ -219,7 +219,7 @@ UINT8 line;
 
 MACHINE_RESET( bagman )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	bagman_pal16r6_w(space, 0, 1);	/*pin 2*/
 	bagman_pal16r6_w(space, 1, 1);	/*pin 3*/
 	bagman_pal16r6_w(space, 2, 1);	/*pin 4*/

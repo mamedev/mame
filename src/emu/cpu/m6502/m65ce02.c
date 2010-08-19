@@ -76,7 +76,7 @@ struct	_m65ce02_Regs {
 	int		icount;
 	device_irq_callback irq_callback;
 	legacy_cpu_device *device;
-	const address_space *space;
+	address_space *space;
 	read8_space_func rdmem_id;					/* readmem callback for indexed instructions */
 	write8_space_func wrmem_id;					/* writemem callback for indexed instructions */
 };
@@ -94,8 +94,8 @@ INLINE m65ce02_Regs *get_safe_token(running_device *device)
 
 #include "t65ce02.c"
 
-static UINT8 default_rdmem_id(const address_space *space, offs_t address) { return memory_read_byte_8le(space, address); }
-static void default_wdmem_id(const address_space *space, offs_t address, UINT8 data) { memory_write_byte_8le(space, address, data); }
+static UINT8 default_rdmem_id(address_space *space, offs_t address) { return memory_read_byte_8le(space, address); }
+static void default_wdmem_id(address_space *space, offs_t address, UINT8 data) { memory_write_byte_8le(space, address, data); }
 
 static CPU_INIT( m65ce02 )
 {

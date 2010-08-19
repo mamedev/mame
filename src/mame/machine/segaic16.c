@@ -163,7 +163,7 @@ void segaic16_memory_mapper_set_decrypted(running_machine *machine, UINT8 *decry
 }
 
 
-static void memory_mapper_w(const address_space *space, struct memory_mapper_chip *chip, offs_t offset, UINT8 data)
+static void memory_mapper_w(address_space *space, struct memory_mapper_chip *chip, offs_t offset, UINT8 data)
 {
 	UINT8 oldval;
 
@@ -212,13 +212,13 @@ static void memory_mapper_w(const address_space *space, struct memory_mapper_chi
 			/*   02 - read data into latches 00,01 from 2 * (address in 07,08,09) */
 			if (data == 0x01)
 			{
-				const address_space *targetspace = cpu_get_address_space(chip->cpu, ADDRESS_SPACE_PROGRAM);
+				address_space *targetspace = cpu_get_address_space(chip->cpu, ADDRESS_SPACE_PROGRAM);
 				offs_t addr = (chip->regs[0x0a] << 17) | (chip->regs[0x0b] << 9) | (chip->regs[0x0c] << 1);
 				memory_write_word(targetspace, addr, (chip->regs[0x00] << 8) | chip->regs[0x01]);
 			}
 			else if (data == 0x02)
 			{
-				const address_space *targetspace = cpu_get_address_space(chip->cpu, ADDRESS_SPACE_PROGRAM);
+				address_space *targetspace = cpu_get_address_space(chip->cpu, ADDRESS_SPACE_PROGRAM);
 				offs_t addr = (chip->regs[0x07] << 17) | (chip->regs[0x08] << 9) | (chip->regs[0x09] << 1);
 				UINT16 result;
 				result = memory_read_word(targetspace, addr);

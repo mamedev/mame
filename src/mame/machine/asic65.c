@@ -144,7 +144,7 @@ void asic65_config(running_machine *machine, int asictype)
 
 void asic65_reset(running_machine *machine, int state)
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	/* rom-based means reset and clear states */
 	if (asic65.cpu != NULL)

@@ -342,7 +342,7 @@ GFXDECODE_END
 
 static MACHINE_RESET( crballoon )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
 	running_device *discrete = machine->device("discrete");
 
 	pc3092_reset();

@@ -1079,7 +1079,7 @@ static MACHINE_RESET( multigam )
 
 static MACHINE_RESET( multigm3 )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	/* reset the ppu */
 	multigm3_switch_prg_rom(space, 0, 0x01 );
 };
@@ -1309,7 +1309,7 @@ ROM_END
 
 static DRIVER_INIT( multigam )
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	multigam_switch_prg_rom(space, 0x0, 0x01);
 }
 
@@ -1324,7 +1324,7 @@ static void multigm3_decrypt(UINT8* mem, int memsize, const UINT8* decode_nibble
 
 static DRIVER_INIT(multigm3)
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	const UINT8 decode[16]  = { 0x09, 0x08, 0x07, 0x06, 0x05, 0x04, 0x03, 0x02, 0x01, 0x00, 0x0f, 0x0e, 0x0d, 0x0c, 0x0b, 0x0a };
 
@@ -1338,7 +1338,7 @@ static DRIVER_INIT(multigm3)
 
 static DRIVER_INIT(multigmt)
 {
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	UINT8* buf = auto_alloc_array(machine, UINT8, 0x80000);
 	UINT8 *rom;

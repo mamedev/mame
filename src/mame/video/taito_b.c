@@ -28,7 +28,7 @@ WRITE16_HANDLER( hitice_pixel_scroll_w )
 static void hitice_clear_pixel_bitmap( running_machine *machine )
 {
 	int i;
-	const address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	for (i = 0; i < 0x40000; i++)
 		hitice_pixelram_w(space, i, 0, 0xffff);

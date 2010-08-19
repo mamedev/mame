@@ -239,12 +239,12 @@ static struct
 	UINT8 abus;
 }stv_irq;
 
-static void dma_direct_lv0(const address_space *space);	/*DMA level 0 direct transfer function*/
-static void dma_direct_lv1(const address_space *space);   /*DMA level 1 direct transfer function*/
-static void dma_direct_lv2(const address_space *space);   /*DMA level 2 direct transfer function*/
-static void dma_indirect_lv0(const address_space *space); /*DMA level 0 indirect transfer function*/
-static void dma_indirect_lv1(const address_space *space); /*DMA level 1 indirect transfer function*/
-static void dma_indirect_lv2(const address_space *space); /*DMA level 2 indirect transfer function*/
+static void dma_direct_lv0(address_space *space);	/*DMA level 0 direct transfer function*/
+static void dma_direct_lv1(address_space *space);   /*DMA level 1 direct transfer function*/
+static void dma_direct_lv2(address_space *space);   /*DMA level 2 direct transfer function*/
+static void dma_indirect_lv0(address_space *space); /*DMA level 0 indirect transfer function*/
+static void dma_indirect_lv1(address_space *space); /*DMA level 1 indirect transfer function*/
+static void dma_indirect_lv2(address_space *space); /*DMA level 2 indirect transfer function*/
 
 
 int minit_boost,sinit_boost;
@@ -463,7 +463,7 @@ static void system_reset()
 	/*Order is surely wrong but whatever...*/
 }
 
-static UINT8 stv_SMPC_r8 (const address_space *space, int offset)
+static UINT8 stv_SMPC_r8 (address_space *space, int offset)
 {
 	int return_data;
 
@@ -490,7 +490,7 @@ static UINT8 stv_SMPC_r8 (const address_space *space, int offset)
 	return return_data;
 }
 
-static void stv_SMPC_w8 (const address_space *space, int offset, UINT8 data)
+static void stv_SMPC_w8 (address_space *space, int offset, UINT8 data)
 {
 	system_time systime;
 
@@ -1432,7 +1432,7 @@ static TIMER_CALLBACK( dma_lv2_ended )
 	D2MV_0;
 }
 
-static void dma_direct_lv0(const address_space *space)
+static void dma_direct_lv0(address_space *space)
 {
 	static UINT32 tmp_src,tmp_dst,tmp_size;
 	if(LOG_SCU) logerror("DMA lv 0 transfer START\n"
@@ -1541,7 +1541,7 @@ static void dma_direct_lv0(const address_space *space)
 	}
 }
 
-static void dma_direct_lv1(const address_space *space)
+static void dma_direct_lv1(address_space *space)
 {
 	static UINT32 tmp_src,tmp_dst,tmp_size;
 	if(LOG_SCU) logerror("DMA lv 1 transfer START\n"
@@ -1642,7 +1642,7 @@ static void dma_direct_lv1(const address_space *space)
 	}
 }
 
-static void dma_direct_lv2(const address_space *space)
+static void dma_direct_lv2(address_space *space)
 {
 	static UINT32 tmp_src,tmp_dst,tmp_size;
 	if(LOG_SCU) logerror("DMA lv 2 transfer START\n"
@@ -1743,7 +1743,7 @@ static void dma_direct_lv2(const address_space *space)
 	}
 }
 
-static void dma_indirect_lv0(const address_space *space)
+static void dma_indirect_lv0(address_space *space)
 {
 	/*Helper to get out of the cycle*/
 	UINT8 job_done = 0;
@@ -1811,7 +1811,7 @@ static void dma_indirect_lv0(const address_space *space)
 	timer_set(space->machine, ATTOTIME_IN_USEC(300), NULL, 0, dma_lv0_ended);
 }
 
-static void dma_indirect_lv1(const address_space *space)
+static void dma_indirect_lv1(address_space *space)
 {
 	/*Helper to get out of the cycle*/
 	UINT8 job_done = 0;
@@ -1880,7 +1880,7 @@ static void dma_indirect_lv1(const address_space *space)
 	timer_set(space->machine, ATTOTIME_IN_USEC(300), NULL, 0, dma_lv1_ended);
 }
 
-static void dma_indirect_lv2(const address_space *space)
+static void dma_indirect_lv2(address_space *space)
 {
 	/*Helper to get out of the cycle*/
 	UINT8 job_done = 0;

@@ -85,7 +85,7 @@
  *
  *************************************/
 
-INLINE UINT16 read16be_with_read8_handler(read8_space_func handler, const address_space *space, offs_t offset, UINT16 mem_mask)
+INLINE UINT16 read16be_with_read8_handler(read8_space_func handler, address_space *space, offs_t offset, UINT16 mem_mask)
 {
 	UINT16 result = 0;
 	if (ACCESSING_BITS_8_15)
@@ -96,7 +96,7 @@ INLINE UINT16 read16be_with_read8_handler(read8_space_func handler, const addres
 }
 
 
-INLINE void write16be_with_write8_handler(write8_space_func handler, const address_space *space, offs_t offset, UINT16 data, UINT16 mem_mask)
+INLINE void write16be_with_write8_handler(write8_space_func handler, address_space *space, offs_t offset, UINT16 data, UINT16 mem_mask)
 {
 	if (ACCESSING_BITS_8_15)
 		(*handler)(space, offset * 2 + 0, data >> 8);
@@ -111,7 +111,7 @@ INLINE void write16be_with_write8_handler(write8_space_func handler, const addre
  *
  *************************************/
 
-INLINE UINT16 read16le_with_read8_handler(read8_space_func handler, const address_space *space, offs_t offset, UINT16 mem_mask)
+INLINE UINT16 read16le_with_read8_handler(read8_space_func handler, address_space *space, offs_t offset, UINT16 mem_mask)
 {
 	UINT16 result = 0;
 	if (ACCESSING_BITS_0_7)
@@ -122,7 +122,7 @@ INLINE UINT16 read16le_with_read8_handler(read8_space_func handler, const addres
 }
 
 
-INLINE void write16le_with_write8_handler(write8_space_func handler, const address_space *space, offs_t offset, UINT16 data, UINT16 mem_mask)
+INLINE void write16le_with_write8_handler(write8_space_func handler, address_space *space, offs_t offset, UINT16 data, UINT16 mem_mask)
 {
 	if (ACCESSING_BITS_0_7)
 		(*handler)(space, offset * 2 + 0, data >> 0);
@@ -137,7 +137,7 @@ INLINE void write16le_with_write8_handler(write8_space_func handler, const addre
  *
  *************************************/
 
-INLINE UINT32 read32be_with_read8_handler(read8_space_func handler, const address_space *space, offs_t offset, UINT32 mem_mask)
+INLINE UINT32 read32be_with_read8_handler(read8_space_func handler, address_space *space, offs_t offset, UINT32 mem_mask)
 {
 	UINT32 result = 0;
 	if (ACCESSING_BITS_16_31)
@@ -148,7 +148,7 @@ INLINE UINT32 read32be_with_read8_handler(read8_space_func handler, const addres
 }
 
 
-INLINE void write32be_with_write8_handler(write8_space_func handler, const address_space *space, offs_t offset, UINT32 data, UINT32 mem_mask)
+INLINE void write32be_with_write8_handler(write8_space_func handler, address_space *space, offs_t offset, UINT32 data, UINT32 mem_mask)
 {
 	if (ACCESSING_BITS_16_31)
 		write16be_with_write8_handler(handler, space, offset * 2 + 0, data >> 16, mem_mask >> 16);
@@ -163,7 +163,7 @@ INLINE void write32be_with_write8_handler(write8_space_func handler, const addre
  *
  *************************************/
 
-INLINE UINT32 read32le_with_read8_handler(read8_space_func handler, const address_space *space, offs_t offset, UINT32 mem_mask)
+INLINE UINT32 read32le_with_read8_handler(read8_space_func handler, address_space *space, offs_t offset, UINT32 mem_mask)
 {
 	UINT32 result = 0;
 	if (ACCESSING_BITS_0_15)
@@ -174,7 +174,7 @@ INLINE UINT32 read32le_with_read8_handler(read8_space_func handler, const addres
 }
 
 
-INLINE void write32le_with_write8_handler(write8_space_func handler, const address_space *space, offs_t offset, UINT32 data, UINT32 mem_mask)
+INLINE void write32le_with_write8_handler(write8_space_func handler, address_space *space, offs_t offset, UINT32 data, UINT32 mem_mask)
 {
 	if (ACCESSING_BITS_0_15)
 		write16le_with_write8_handler(handler, space, offset * 2 + 0, data, mem_mask);
@@ -189,7 +189,7 @@ INLINE void write32le_with_write8_handler(write8_space_func handler, const addre
  *
  *************************************/
 
-INLINE UINT32 read32be_with_16be_handler(read16_space_func handler, const address_space *space, offs_t offset, UINT32 mem_mask)
+INLINE UINT32 read32be_with_16be_handler(read16_space_func handler, address_space *space, offs_t offset, UINT32 mem_mask)
 {
 	UINT32 result = 0;
 	if (ACCESSING_BITS_16_31)
@@ -200,7 +200,7 @@ INLINE UINT32 read32be_with_16be_handler(read16_space_func handler, const addres
 }
 
 
-INLINE void write32be_with_16be_handler(write16_space_func handler, const address_space *space, offs_t offset, UINT32 data, UINT32 mem_mask)
+INLINE void write32be_with_16be_handler(write16_space_func handler, address_space *space, offs_t offset, UINT32 data, UINT32 mem_mask)
 {
 	if (ACCESSING_BITS_16_31)
 		(*handler)(space, offset * 2 + 0, data >> 16, mem_mask >> 16);
@@ -215,7 +215,7 @@ INLINE void write32be_with_16be_handler(write16_space_func handler, const addres
  *
  *************************************/
 
-INLINE UINT32 read32le_with_16le_handler(read16_space_func handler, const address_space *space, offs_t offset, UINT32 mem_mask)
+INLINE UINT32 read32le_with_16le_handler(read16_space_func handler, address_space *space, offs_t offset, UINT32 mem_mask)
 {
 	UINT32 result = 0;
 	if (ACCESSING_BITS_0_15)
@@ -226,7 +226,7 @@ INLINE UINT32 read32le_with_16le_handler(read16_space_func handler, const addres
 }
 
 
-INLINE void write32le_with_16le_handler(write16_space_func handler, const address_space *space, offs_t offset, UINT32 data, UINT32 mem_mask)
+INLINE void write32le_with_16le_handler(write16_space_func handler, address_space *space, offs_t offset, UINT32 data, UINT32 mem_mask)
 {
 	if (ACCESSING_BITS_0_15)
 		(*handler)(space, offset * 2 + 0, data, mem_mask);
@@ -241,7 +241,7 @@ INLINE void write32le_with_16le_handler(write16_space_func handler, const addres
  *
  *************************************/
 
-INLINE UINT32 read32be_with_16le_handler(read16_space_func handler, const address_space *space, offs_t offset, UINT32 mem_mask)
+INLINE UINT32 read32be_with_16le_handler(read16_space_func handler, address_space *space, offs_t offset, UINT32 mem_mask)
 {
 	UINT32 result = 0;
 	mem_mask = FLIPENDIAN_INT32(mem_mask);
@@ -250,7 +250,7 @@ INLINE UINT32 read32be_with_16le_handler(read16_space_func handler, const addres
 }
 
 
-INLINE void write32be_with_16le_handler(write16_space_func handler, const address_space *space, offs_t offset, UINT32 data, UINT32 mem_mask)
+INLINE void write32be_with_16le_handler(write16_space_func handler, address_space *space, offs_t offset, UINT32 data, UINT32 mem_mask)
 {
 	data = FLIPENDIAN_INT32(data);
 	mem_mask = FLIPENDIAN_INT32(mem_mask);
@@ -264,7 +264,7 @@ INLINE void write32be_with_16le_handler(write16_space_func handler, const addres
  *
  *************************************/
 
-INLINE UINT32 read32le_with_16be_handler(read16_space_func handler, const address_space *space, offs_t offset, UINT32 mem_mask)
+INLINE UINT32 read32le_with_16be_handler(read16_space_func handler, address_space *space, offs_t offset, UINT32 mem_mask)
 {
 	UINT32 result = 0;
 	mem_mask = FLIPENDIAN_INT32(mem_mask);
@@ -273,7 +273,7 @@ INLINE UINT32 read32le_with_16be_handler(read16_space_func handler, const addres
 }
 
 
-INLINE void write32le_with_16be_handler(write16_space_func handler, const address_space *space, offs_t offset, UINT32 data, UINT32 mem_mask)
+INLINE void write32le_with_16be_handler(write16_space_func handler, address_space *space, offs_t offset, UINT32 data, UINT32 mem_mask)
 {
 	data = FLIPENDIAN_INT32(data);
 	mem_mask = FLIPENDIAN_INT32(mem_mask);
@@ -287,7 +287,7 @@ INLINE void write32le_with_16be_handler(write16_space_func handler, const addres
  *
  *************************************/
 
-INLINE UINT64 read64be_with_read8_handler(read8_space_func handler, const address_space *space, offs_t offset, UINT64 mem_mask)
+INLINE UINT64 read64be_with_read8_handler(read8_space_func handler, address_space *space, offs_t offset, UINT64 mem_mask)
 {
 	UINT64 result = 0;
 	if (ACCESSING_BITS_32_63)
@@ -298,7 +298,7 @@ INLINE UINT64 read64be_with_read8_handler(read8_space_func handler, const addres
 }
 
 
-INLINE void write64be_with_write8_handler(write8_space_func handler, const address_space *space, offs_t offset, UINT64 data, UINT64 mem_mask)
+INLINE void write64be_with_write8_handler(write8_space_func handler, address_space *space, offs_t offset, UINT64 data, UINT64 mem_mask)
 {
 	if (ACCESSING_BITS_32_63)
 		write32be_with_write8_handler(handler, space, offset * 2 + 0, data >> 32, mem_mask >> 32);
@@ -313,7 +313,7 @@ INLINE void write64be_with_write8_handler(write8_space_func handler, const addre
  *
  *************************************/
 
-INLINE UINT64 read64le_with_read8_handler(read8_space_func handler, const address_space *space, offs_t offset, UINT64 mem_mask)
+INLINE UINT64 read64le_with_read8_handler(read8_space_func handler, address_space *space, offs_t offset, UINT64 mem_mask)
 {
 	UINT64 result = 0;
 	if (ACCESSING_BITS_0_31)
@@ -324,7 +324,7 @@ INLINE UINT64 read64le_with_read8_handler(read8_space_func handler, const addres
 }
 
 
-INLINE void write64le_with_write8_handler(write8_space_func handler, const address_space *space, offs_t offset, UINT64 data, UINT64 mem_mask)
+INLINE void write64le_with_write8_handler(write8_space_func handler, address_space *space, offs_t offset, UINT64 data, UINT64 mem_mask)
 {
 	if (ACCESSING_BITS_0_31)
 		write32le_with_write8_handler(handler, space, offset * 2 + 0, data >> 0, mem_mask >> 0);
@@ -339,7 +339,7 @@ INLINE void write64le_with_write8_handler(write8_space_func handler, const addre
  *
  *************************************/
 
-INLINE UINT32 read64be_with_16be_handler(read16_space_func handler, const address_space *space, offs_t offset, UINT64 mem_mask)
+INLINE UINT32 read64be_with_16be_handler(read16_space_func handler, address_space *space, offs_t offset, UINT64 mem_mask)
 {
 	UINT64 result = 0;
 	if (ACCESSING_BITS_32_63)
@@ -350,7 +350,7 @@ INLINE UINT32 read64be_with_16be_handler(read16_space_func handler, const addres
 }
 
 
-INLINE void write64be_with_16be_handler(write16_space_func handler, const address_space *space, offs_t offset, UINT64 data, UINT64 mem_mask)
+INLINE void write64be_with_16be_handler(write16_space_func handler, address_space *space, offs_t offset, UINT64 data, UINT64 mem_mask)
 {
 	if (ACCESSING_BITS_32_63)
 		write32be_with_16be_handler(handler, space, offset * 2 + 0, data >> 32, mem_mask >> 32);
@@ -365,7 +365,7 @@ INLINE void write64be_with_16be_handler(write16_space_func handler, const addres
  *
  *************************************/
 
-INLINE UINT32 read64le_with_16le_handler(read16_space_func handler, const address_space *space, offs_t offset, UINT64 mem_mask)
+INLINE UINT32 read64le_with_16le_handler(read16_space_func handler, address_space *space, offs_t offset, UINT64 mem_mask)
 {
 	UINT64 result = 0;
 	if (ACCESSING_BITS_0_31)
@@ -376,7 +376,7 @@ INLINE UINT32 read64le_with_16le_handler(read16_space_func handler, const addres
 }
 
 
-INLINE void write64le_with_16le_handler(write16_space_func handler, const address_space *space, offs_t offset, UINT64 data, UINT64 mem_mask)
+INLINE void write64le_with_16le_handler(write16_space_func handler, address_space *space, offs_t offset, UINT64 data, UINT64 mem_mask)
 {
 	if (ACCESSING_BITS_0_31)
 		write32le_with_16le_handler(handler, space, offset * 2 + 0, data >> 0, mem_mask >> 0);
@@ -391,7 +391,7 @@ INLINE void write64le_with_16le_handler(write16_space_func handler, const addres
  *
  *************************************/
 
-INLINE UINT32 read64be_with_16le_handler(read16_space_func handler, const address_space *space, offs_t offset, UINT64 mem_mask)
+INLINE UINT32 read64be_with_16le_handler(read16_space_func handler, address_space *space, offs_t offset, UINT64 mem_mask)
 {
 	UINT64 result = 0;
 	if (ACCESSING_BITS_32_63)
@@ -402,7 +402,7 @@ INLINE UINT32 read64be_with_16le_handler(read16_space_func handler, const addres
 }
 
 
-INLINE void write64be_with_16le_handler(write16_space_func handler, const address_space *space, offs_t offset, UINT64 data, UINT64 mem_mask)
+INLINE void write64be_with_16le_handler(write16_space_func handler, address_space *space, offs_t offset, UINT64 data, UINT64 mem_mask)
 {
 	if (ACCESSING_BITS_32_63)
 		write32be_with_16le_handler(handler, space, offset * 2 + 0, data >> 32, mem_mask >> 32);
@@ -417,7 +417,7 @@ INLINE void write64be_with_16le_handler(write16_space_func handler, const addres
  *
  *************************************/
 
-INLINE UINT32 read64le_with_16be_handler(read16_space_func handler, const address_space *space, offs_t offset, UINT64 mem_mask)
+INLINE UINT32 read64le_with_16be_handler(read16_space_func handler, address_space *space, offs_t offset, UINT64 mem_mask)
 {
 	UINT64 result = 0;
 	if (ACCESSING_BITS_0_31)
@@ -428,7 +428,7 @@ INLINE UINT32 read64le_with_16be_handler(read16_space_func handler, const addres
 }
 
 
-INLINE void write64le_with_16be_handler(write16_space_func handler, const address_space *space, offs_t offset, UINT64 data, UINT64 mem_mask)
+INLINE void write64le_with_16be_handler(write16_space_func handler, address_space *space, offs_t offset, UINT64 data, UINT64 mem_mask)
 {
 	if (ACCESSING_BITS_0_31)
 		write32le_with_16be_handler(handler, space, offset * 2 + 0, data >> 0, mem_mask >> 0);
@@ -443,7 +443,7 @@ INLINE void write64le_with_16be_handler(write16_space_func handler, const addres
  *
  *************************************/
 
-INLINE UINT64 read64be_with_32be_handler(read32_space_func handler, const address_space *space, offs_t offset, UINT64 mem_mask)
+INLINE UINT64 read64be_with_32be_handler(read32_space_func handler, address_space *space, offs_t offset, UINT64 mem_mask)
 {
 	UINT64 result = 0;
 	if (ACCESSING_BITS_32_63)
@@ -454,7 +454,7 @@ INLINE UINT64 read64be_with_32be_handler(read32_space_func handler, const addres
 }
 
 
-INLINE void write64be_with_32be_handler(write32_space_func handler, const address_space *space, offs_t offset, UINT64 data, UINT64 mem_mask)
+INLINE void write64be_with_32be_handler(write32_space_func handler, address_space *space, offs_t offset, UINT64 data, UINT64 mem_mask)
 {
 	if (ACCESSING_BITS_32_63)
 		(*handler)(space, offset * 2 + 0, data >> 32, mem_mask >> 32);
@@ -469,7 +469,7 @@ INLINE void write64be_with_32be_handler(write32_space_func handler, const addres
  *
  *************************************/
 
-INLINE UINT64 read64le_with_32le_handler(read32_space_func handler, const address_space *space, offs_t offset, UINT64 mem_mask)
+INLINE UINT64 read64le_with_32le_handler(read32_space_func handler, address_space *space, offs_t offset, UINT64 mem_mask)
 {
 	UINT64 result = 0;
 	if (ACCESSING_BITS_0_31)
@@ -480,7 +480,7 @@ INLINE UINT64 read64le_with_32le_handler(read32_space_func handler, const addres
 }
 
 
-INLINE void write64le_with_32le_handler(write32_space_func handler, const address_space *space, offs_t offset, UINT64 data, UINT64 mem_mask)
+INLINE void write64le_with_32le_handler(write32_space_func handler, address_space *space, offs_t offset, UINT64 data, UINT64 mem_mask)
 {
 	if (ACCESSING_BITS_0_31)
 		(*handler)(space, offset * 2 + 0, data >> 0, mem_mask >> 0);
@@ -495,7 +495,7 @@ INLINE void write64le_with_32le_handler(write32_space_func handler, const addres
  *
  *************************************/
 
-INLINE UINT64 read64be_with_32le_handler(read32_space_func handler, const address_space *space, offs_t offset, UINT64 mem_mask)
+INLINE UINT64 read64be_with_32le_handler(read32_space_func handler, address_space *space, offs_t offset, UINT64 mem_mask)
 {
 	UINT64 result;
 	mem_mask = FLIPENDIAN_INT64(mem_mask);
@@ -504,7 +504,7 @@ INLINE UINT64 read64be_with_32le_handler(read32_space_func handler, const addres
 }
 
 
-INLINE void write64be_with_32le_handler(write32_space_func handler, const address_space *space, offs_t offset, UINT64 data, UINT64 mem_mask)
+INLINE void write64be_with_32le_handler(write32_space_func handler, address_space *space, offs_t offset, UINT64 data, UINT64 mem_mask)
 {
 	data = FLIPENDIAN_INT64(data);
 	mem_mask = FLIPENDIAN_INT64(mem_mask);
@@ -518,7 +518,7 @@ INLINE void write64be_with_32le_handler(write32_space_func handler, const addres
  *
  *************************************/
 
-INLINE UINT64 read64le_with_32be_handler(read32_space_func handler, const address_space *space, offs_t offset, UINT64 mem_mask)
+INLINE UINT64 read64le_with_32be_handler(read32_space_func handler, address_space *space, offs_t offset, UINT64 mem_mask)
 {
 	UINT64 result;
 	mem_mask = FLIPENDIAN_INT64(mem_mask);
@@ -527,7 +527,7 @@ INLINE UINT64 read64le_with_32be_handler(read32_space_func handler, const addres
 }
 
 
-INLINE void write64le_with_32be_handler(write32_space_func handler, const address_space *space, offs_t offset, UINT64 data, UINT64 mem_mask)
+INLINE void write64le_with_32be_handler(write32_space_func handler, address_space *space, offs_t offset, UINT64 data, UINT64 mem_mask)
 {
 	data = FLIPENDIAN_INT64(data);
 	mem_mask = FLIPENDIAN_INT64(mem_mask);

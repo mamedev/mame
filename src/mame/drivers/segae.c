@@ -363,7 +363,7 @@ static void init_ports_systeme(running_machine *machine)
 {
 	/* INIT THE PORTS *********************************************************************************************/
 
-	const address_space *io = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
+	address_space *io = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
 	running_device *sn1 = machine->device("sn1");
 	running_device *sn2 = machine->device("sn2");
 
