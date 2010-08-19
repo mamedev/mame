@@ -30,10 +30,10 @@ public:
 	size_t evalSize() const;
 
 	// Peek through to the instruction
-	const std::string& instSource() const;
-	const std::string& instDestination() const;
+	const reg_id& instSource() const;
+	const reg_id& instDestination() const;
 	const size_t instAccumulatorBitsModified() const;
-
+	
 private:
 	Instruction* m_instruction;
 	ParallelMove* m_parallelMove;

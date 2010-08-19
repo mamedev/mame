@@ -41,7 +41,7 @@ struct _typed_pointer
 };
 typedef struct _typed_pointer typed_pointer;
 
-#define ADDRESS(X) (X<<1)
+//#define ADDRESS(X) (X<<1)
 #define BITS(CUR,MASK) (Dsp56kOpMask(CUR,MASK))
 
 /*********************/

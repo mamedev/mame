@@ -5,8 +5,8 @@ namespace DSP56K
 {
 
 // Factory
-Instruction* Instruction::decodeInstruction(const Opcode* opc,
-											const UINT16 word0,
+Instruction* Instruction::decodeInstruction(const Opcode* opc, 
+											const UINT16 word0, 
 											const UINT16 word1,
 											bool shifted)
 {
@@ -18,7 +18,7 @@ Instruction* Instruction::decodeInstruction(const Opcode* opc,
 		w0 = w1;
 		w1 = 0x0000;
 	}
-
+	
 	/**************************************************************************/
 	/* The very funky case of the XMemoryDataMoveWithShortDisplacement        */
 	/**************************************************************************/
@@ -112,8 +112,8 @@ Instruction* Instruction::decodeInstruction(const Opcode* opc,
 	/* No Parallel Data Move :   0100 1010 .... .... : A-131 */
 	/* Register to Register Data Move : 0100 IIII .... .... : A-133 */
 	/* Address Register Update : 0011 0zRR .... .... : A-135 */
-	/* X Memory Data Move :   1mRR HHHW .... .... : A-137 */
-	/* X Memory Data Move :   0101 HHHW .... .... : A-137 */
+	/* X Memory Data Move :	  1mRR HHHW .... .... : A-137 */
+	/* X Memory Data Move :	  0101 HHHW .... .... : A-137 */
 	/* Quote: (32 General parallel move instructions) */
 	/****************************************************************/
 	else if (((w0 & 0xff00) == 0x4a00) ||
@@ -333,12 +333,12 @@ Instruction* Instruction::decodeInstruction(const Opcode* opc,
 	else if (((w0 & 0xfff0) == 0x14b0) && ((w1 & 0x1f00) == 0x1200))
 	// NEW // else if (((w0 & 0xffe0) == 0x14a0) && ((w1 & 0x1f00) == 0x1200))
 	{
-		return global_alloc(BfInstruction(opc, w0, w1));
+		return global_alloc(BfInstruction_2(opc, w0, w1));
 	}
 	/* BFCHG : 0001 0100 100D DDDD BBB1 0010 iiii iiii : A-38 */
 	else if (((w0 & 0xffe0) == 0x1480) && ((w1 & 0x1f00) == 0x1200))
 	{
-		return global_alloc(BfInstruction(opc, w0, w1));
+		return global_alloc(BfInstruction_3(opc, w0, w1));
 	}
 	/* BFCLR : 0001 0100 11Pp pppp BBB0 0100 iiii iiii : A-40 */
 	else if (((w0 & 0xffc0) == 0x14c0) && ((w1 & 0x1f00) == 0x0400))
@@ -349,12 +349,12 @@ Instruction* Instruction::decodeInstruction(const Opcode* opc,
 	else if (((w0 & 0xfff0) == 0x14b0) && ((w1 & 0x1f00) == 0x0400))
 	// NEW // else if (((w0 & 0xffe0) == 0x14a0) && ((w1 & 0x1f00) == 0x0400))
 	{
-		return global_alloc(BfInstruction(opc, w0, w1));
+		return global_alloc(BfInstruction_2(opc, w0, w1));
 	}
 	/* BFCLR : 0001 0100 100D DDDD BBB0 0100 iiii iiii : A-40 */
 	else if (((w0 & 0xffe0) == 0x1480) && ((w1 & 0x1f00) == 0x0400))
 	{
-		return global_alloc(BfInstruction(opc, w0, w1));
+		return global_alloc(BfInstruction_3(opc, w0, w1));
 	}
 	/* BFSET : 0001 0100 11Pp pppp BBB1 1000 iiii iiii : A-42 */
 	else if (((w0 & 0xffc0) == 0x14c0) && ((w1 & 0x1f00) == 0x1800))
@@ -365,12 +365,12 @@ Instruction* Instruction::decodeInstruction(const Opcode* opc,
 	else if (((w0 & 0xfff0) == 0x14b0) && ((w1 & 0x1f00) == 0x1800))
 	// NEW // else if (((w0 & 0xffe0) == 0x14a0) && ((w1 & 0x1f00) == 0x1800))
 	{
-		return global_alloc(BfInstruction(opc, w0, w1));
+		return global_alloc(BfInstruction_2(opc, w0, w1));
 	}
 	/* BFSET : 0001 0100 100D DDDD BBB1 1000 iiii iiii : A-42 */
 	else if (((w0 & 0xffe0) == 0x1480) && ((w1 & 0x1f00) == 0x1800))
 	{
-		return global_alloc(BfInstruction(opc, w0, w1));
+		return global_alloc(BfInstruction_3(opc, w0, w1));
 	}
 	/* BFTSTH : 0001 0100 01Pp pppp BBB1 0000 iiii iiii : A-44 */
 	else if (((w0 & 0xffc0) == 0x1440) && ((w1 & 0x1f00) == 0x1000))
@@ -381,12 +381,12 @@ Instruction* Instruction::decodeInstruction(const Opcode* opc,
 	else if (((w0 & 0xfff0) == 0x1430) && ((w1 & 0x1f00) == 0x1000))
 	// NEW // else if (((w0 & 0xffe0) == 0x1420) && ((w1 & 0x1f00) == 0x1000))
 	{
-		return global_alloc(BfInstruction(opc, w0, w1));
+		return global_alloc(BfInstruction_2(opc, w0, w1));
 	}
 	/* BFTSTH : 0001 0100 000D DDDD BBB1 0000 iiii iiii : A-44 */
 	else if (((w0 & 0xffe0) == 0x1400) && ((w1 & 0x1f00) == 0x1000))
 	{
-		return global_alloc(BfInstruction(opc, w0, w1));
+		return global_alloc(BfInstruction_3(opc, w0, w1));
 	}
 	/* BFTSTL : 0001 0100 01Pp pppp BBB0 0000 iiii iiii : A-46 */
 	else if (((w0 & 0xffc0) == 0x1440) && ((w1 & 0x1f00) == 0x0000))
@@ -397,12 +397,12 @@ Instruction* Instruction::decodeInstruction(const Opcode* opc,
 	else if (((w0 & 0xfff0) == 0x1430) && ((w1 & 0x1f00) == 0x0000))
 	// NEW // else if (((w0 & 0xffe0) == 0x1420) && ((w1 & 0x1f00) == 0x0000))
 	{
-		return global_alloc(BfInstruction(opc, w0, w1));
+		return global_alloc(BfInstruction_2(opc, w0, w1));
 	}
 	/* BFTSTL : 0001 0100 000D DDDD BBB0 0000 iiii iiii : A-46 */
 	else if (((w0 & 0xffe0) == 0x1400) && ((w1 & 0x1f00) == 0x0000))
 	{
-		return global_alloc(BfInstruction(opc, w0, w1));
+		return global_alloc(BfInstruction_3(opc, w0, w1));
 	}
 	/* Bcc : 0000 0111 --11 cccc xxxx xxxx xxxx xxxx : A-48 */
 	else if (((w0 & 0xff30) == 0x0730) && ((w1 & 0x0000) == 0x0000))
@@ -548,6 +548,9 @@ Instruction* Instruction::decodeInstruction(const Opcode* opc,
 	/* JMP : 0000 0001 0010 01RR : A-110 */
 	else if ((w0 & 0xfffc) == 0x0124)
 	{
+		//JMP2->m_oco = opc;
+		//JMP2->decode(w0, w1);
+		//return JMP2;
 		return global_alloc(Jmp_2(opc, w0, w1));
 	}
 	/* JScc : 0000 0110 --01 cccc xxxx xxxx xxxx xxxx : A-112 */

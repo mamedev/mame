@@ -30,8 +30,8 @@ public:
 	const bool valid() const { return m_valid; }
 
 	// Peek through the opcode to see the instruction
-	const std::string& opSource() const;
-	const std::string& opDestination() const;
+	const reg_id& opSource() const;
+	const reg_id& opDestination() const;
 	const size_t opAccumulatorBitsModified() const;
 
 protected:
@@ -54,20 +54,20 @@ public:
 	}
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
-		INT8 rNum;
-		decode_RR_table(BITSn(word0,0x3000), rNum);
+		reg_id r;
+		decode_RR_table(BITSn(word0,0x3000), r);
 
-		std::string SD;
+		reg_id SD;
 		decode_HHH_table(BITSn(word0,0x0e00), SD);
 
 		std::string ea;
-		assemble_ea_from_m_table(BITSn(word0,0x4000), rNum, ea);
+		assemble_ea_from_m_table(BITSn(word0,0x4000), regIDAsNum(r), ea);
 
-		assemble_arguments_from_W_table(BITSn(word0,0x0100), 'X', SD, ea,
+		assemble_arguments_from_W_table(BITSn(word0,0x0100), 'X', SD, ea, 
 										m_source, m_destination);
 
 		// If the destination of the instruction overlaps with our destination, abort.
-		if (registerOverlap(opDestination(), opAccumulatorBitsModified(), m_destination))
+		if (registerOverlap(opDestination(), opAccumulatorBitsModified(), stringAsRegID(m_destination)))
 			return false;
 
 		return true;
@@ -95,21 +95,21 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		std::string ea;
-		if (opDestination() == "B")
+		if (opDestination() == iB)
 			ea = "(A1)";
-		else if (opDestination() == "A")
+		else if (opDestination() == iA)
 			ea = "(B1)";
 		else
 			ea = "(A1)";
 
-		std::string SD;
+		reg_id SD;
 		decode_HHH_table(BITSn(word0,0x0e00), SD);
 
-		assemble_arguments_from_W_table(BITSn(word0,0x0100), 'X', SD, ea,
+		assemble_arguments_from_W_table(BITSn(word0,0x0100), 'X', SD, ea, 
 										m_source, m_destination);
 
 		// If the destination of the instruction overlaps with our destination, abort.
-		if (registerOverlap(opDestination(), opAccumulatorBitsModified(), m_destination))
+		if (registerOverlap(opDestination(), opAccumulatorBitsModified(), stringAsRegID(m_destination)))
 			return false;
 
 		return true;
@@ -119,7 +119,7 @@ public:
 		retString = m_source + "," + m_destination;
 	}
 	void evaluate() {}
-
+	
 private:
 	std::string m_source;
 	std::string m_destination;
@@ -136,34 +136,34 @@ public:
 	}
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
-		INT8 rNum;
-		std::string D1 = "";
-		std::string D2 = "";
+		reg_id r;
+		reg_id D1;
+		reg_id D2;
 		std::string ea1 = "";
 		std::string ea2 = "";
 
-		decode_rr_table(BITSn(word0,0x0060), rNum);
+		decode_rr_table(BITSn(word0,0x0060), r);
 		decode_KKK_table(BITSn(word0,0x0700), D1, D2);
-		assemble_eas_from_mm_table(BITSn(word0,0x1800), rNum, 3, ea1, ea2);
+		assemble_eas_from_mm_table(BITSn(word0,0x1800), regIDAsNum(r), 3, ea1, ea2);
 
 		/* Not documented, but extrapolated from docs on page A-133 */
-		if (D1 == "^F")
+		if (D1 == iFHAT)
 		{
-			if (opDestination() == "B")
-				D1 = "A";
-			else if (opDestination() == "A")
-				D1 = "B";
+			if (opDestination() == iB)
+				D1 = iA;
+			else if (opDestination() == iA)
+				D1 = iB;
 			else
-				D1 = "A";   /* In the case of no data ALU instruction */
+				D1 = iA;   /* In the case of no data ALU instruction */
 		}
 
 		/* D1 and D2 may not specify the same register : A-142 */
-		if (rNum == 3) return false;
+		if (r == iR3) return false;
 
 		char temp[32];
-		sprintf(temp,  "X:%s,%s", ea1.c_str(), D1.c_str());
+		sprintf(temp,  "X:%s,%s", ea1.c_str(), regIdAsString(D1).c_str());
 		parallelMove = temp;
-		sprintf(temp, "X:%s,%s", ea2.c_str(), D2.c_str());
+		sprintf(temp, "X:%s,%s", ea2.c_str(), regIdAsString(D2).c_str());
 		parallelMove2 = temp;
 
 		return true;
@@ -190,44 +190,44 @@ public:
 	}
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
-		decode_IIIIx_table(BITSn(word0,0x0f00), BITSn(word0,0x0008),
+		decode_IIIIx_table(BITSn(word0,0x0f00), BITSn(word0,0x0008), 
 						   m_source, m_destination);
 
-		if (m_source == "!")
+		if (m_source == iINVALID)
 			return false;
 
-		if (m_source == "F")
+		if (m_source == iF)
 			m_source = opDestination();
 
-		if (m_destination == "^F")
+		if (m_destination == iFHAT)
 		{
-			if (opDestination() == "B")
-				m_destination = "A";
-			else if (opDestination() == "A")
-				m_destination = "B";
+			if (opDestination() == iB)
+				m_destination = iA;
+			else if (opDestination() == iA)
+				m_destination = iB;
 			else
-				m_destination = "A";	/* In the case of no data ALU instruction */
+				m_destination = iA;	/* In the case of no data ALU instruction */
 		}
 
 		// Don't return a failure, just let everything fall through (nop).
 		//if (m_source == "?" && m_destination == "?")
-		//  return false;
+		//	return false;
 
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
 		// (?,?) is a parallel nop
-		if (m_source == "?" && m_destination == "?")
+		if (m_source == iWEIRD && m_destination == iWEIRD)
 			retString = "";
 		else
-			retString = m_source + "," + m_destination;
+			retString = regIdAsString(m_source) + "," + regIdAsString(m_destination);
 	}
 	void evaluate() {}
-
+	
 private:
-	std::string m_source;
-	std::string m_destination;
+	reg_id m_source;
+	reg_id m_destination;
 };
 
 
@@ -243,21 +243,21 @@ public:
 	}
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
-		INT8 rNum;
-		std::string S;
-		std::string Dnot;
+		reg_id r;
+		reg_id S;
+		reg_id Dnot;
 		char parallel_move_str[128];
 		char parallel_move_str2[128];
 
-		if (opDestination() == "A") Dnot = "B";
-		else                        Dnot = "A";
+		if (opDestination() == iA) Dnot = iB;
+		else                       Dnot = iA;
 
 		// NEW // decode_k_table(BITSn(word0,0x0100), Dnot);
-		decode_RR_table(BITSn(word0,0x00c0), rNum);
+		decode_RR_table(BITSn(word0,0x00c0), r);
 		decode_DD_table(BITSn(word0,0x0030), S);
 
-		sprintf(parallel_move_str,  "%s,X:(R%d)+N%d", Dnot.c_str(), rNum, rNum);
-		sprintf(parallel_move_str2, "%s,%s", S.c_str(), Dnot.c_str());
+		sprintf(parallel_move_str,  "%s,X:(R%d)+N%d", regIdAsString(Dnot).c_str(), regIDAsNum(r), regIDAsNum(r));
+		sprintf(parallel_move_str2, "%s,%s", regIdAsString(S).c_str(), regIdAsString(Dnot).c_str());
 		pms = parallel_move_str;
 		pms2 = parallel_move_str2;
 		return true;
@@ -267,7 +267,7 @@ public:
 		retString = pms + " " + pms2;
 	}
 	void evaluate() {}
-
+	
 private:
 	std::string pms;    // TODO
 	std::string pms2;
@@ -285,9 +285,9 @@ public:
 	}
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
-		INT8 rNum;
-		decode_RR_table(BITSn(word0,0x0300), rNum);
-		assemble_ea_from_z_table(BITSn(word0,0x0400), rNum, m_ea);
+		reg_id r;
+		decode_RR_table(BITSn(word0,0x0300), r);
+		assemble_ea_from_z_table(BITSn(word0,0x0400), regIDAsNum(r), m_ea);
 
 		return true;
 	}
@@ -296,7 +296,7 @@ public:
 		retString = m_ea;
 	}
 	void evaluate() {}
-
+	
 private:
 	std::string m_ea;
 };
@@ -315,7 +315,7 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		INT8 b;
-		std::string SD;
+		reg_id SD;
 		std::string args;
 
 		b = (char)(word0 & 0x00ff);
@@ -329,7 +329,7 @@ public:
 		retString = m_source + "," + m_destination;
 	}
 	void evaluate() {}
-
+	
 private:
 	std::string m_source;
 	std::string m_destination;
