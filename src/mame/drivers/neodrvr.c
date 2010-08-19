@@ -2296,7 +2296,7 @@ ROM_START( kof94 ) /* MVS AND AES VERSION */
 ROM_END
 
 ROM_START( aof2 ) /* MVS AND AES VERSION */
-	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "056-p1.bin", 0x000000, 0x100000, CRC(a3b1d021) SHA1(ee42f3ca4516226b0088d0303ed28e3ecdabcd71) )
 
 	NEO_SFIX_128K( "056-s1.bin", CRC(8b02638e) SHA1(aa4d28804ca602da776948b5f223ea89e427906b) )
@@ -2322,7 +2322,7 @@ ROM_START( aof2 ) /* MVS AND AES VERSION */
 ROM_END
 
 ROM_START( aof2a ) /* MVS AND AES VERSION */
-	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "056-p1.bin",  0x000000, 0x100000, CRC(a3b1d021) SHA1(ee42f3ca4516226b0088d0303ed28e3ecdabcd71) )
 	/* the rom below acts as a patch to the program rom in the cart, replacing the first 512kb */
 	ROM_LOAD16_WORD_SWAP( "056-ep1.bin", 0x000000, 0x80000, CRC(75d6301c) SHA1(e72d15fba55f96be7b4fa29e705a7b78f56edf7d) )
@@ -2453,7 +2453,7 @@ ROM_START( savagere )
 ROM_END
 
 ROM_START( fightfev ) /* MVS ONLY RELEASE */
-	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "060-p1.bin", 0x000000, 0x080000, CRC(3032041b) SHA1(4b8ed2e6f74579ea35a53e06ccac42d6905b0f51) )
 	ROM_LOAD16_WORD_SWAP( "060-p2.bin", 0x080000, 0x080000, CRC(b0801d5f) SHA1(085746d8f5d271d5f84ccbb7f577193c391f88d4) )
 
@@ -2475,7 +2475,7 @@ ROM_START( fightfev ) /* MVS ONLY RELEASE */
 ROM_END
 
 ROM_START( fightfeva ) /* MVS ONLY RELEASE */
-	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "060-p1.rom", 0x0000000, 0x100000, CRC(2a104b50) SHA1(3eb663d3df7074e1cdf4c0e450a35c9cf55d8979) )
 	/* There was also a copy of the 060-p1.bin with the name 060-p2.bin maybe it should be loaded over the top or this
     larger rom is an older revision... */
@@ -3987,7 +3987,7 @@ ROM_START( rbffspeck ) /* KOREAN VERSION */
 ROM_END
 
 ROM_START( twinspri )
-	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_REGION( 0x200000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "224-p1.bin", 0x100000, 0x100000, CRC(7697e445) SHA1(5b55ca120f77a931d40719b14e0bfc8cac1d628c) )
 	ROM_CONTINUE( 0x000000, 0x100000 )
 
@@ -4055,7 +4055,7 @@ ROM_START( stakwin2 )
 ROM_END
 
 ROM_START( ghostlop )
-	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "gl-p1.bin", 0x000000, 0x100000, CRC(6033172e) SHA1(f57fb706aa8dd9e5f9e992a5d35c1799578b59f8) )
 
 	NEO_SFIX_128K( "gl-s1.bin", CRC(83c24e81) SHA1(585ef209d8bfc23bdccc1f37d8b764eeedfedc1c) )
@@ -4283,7 +4283,8 @@ ROM_END
 
 ROM_START( irrmaze ) /* MVS ONLY RELEASE */
 	ROM_REGION( 0x200000, "maincpu", 0 )
-	ROM_LOAD16_WORD_SWAP( "236-p1.bin", 0x000000, 0x200000, CRC(6d536c6e) SHA1(87d66683304a6617da8af7dfdfcbf4a3ab63056a) )
+	ROM_LOAD16_WORD_SWAP( "236-p1.bin", 0x100000, 0x100000, CRC(4c2ff660) SHA1(4a0cbd09044648ff9ec67723729f16d422c34bda) )
+	ROM_CONTINUE( 0x000000, 0x100000 )
 
 	NEO_SFIX_128K( "236-s1.bin", CRC(5d1ca640) SHA1(40a9668a1742a44597a07ce72273d17119815637) )
 
