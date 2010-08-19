@@ -4262,7 +4262,7 @@ static MACHINE_DRIVER_START( fixeighb )
 
 	MDRV_DEVICE_ADD_VDP0
 
-	MDRV_VIDEO_START(truxton2)
+	MDRV_VIDEO_START(fixeighb)
 	MDRV_VIDEO_EOF(toaplan2)
 	MDRV_VIDEO_UPDATE(truxton2)
 
