@@ -650,7 +650,7 @@ static bool validate_gfx(int drivnum, const machine_config *config, region_array
 			for (rgnnum = 0; rgnnum < ARRAY_LENGTH(rgninfo->entries); rgnnum++)
 			{
 				/* stop if we hit an empty */
-				if (rgninfo->entries[rgnnum].tag == NULL)
+				if (rgninfo->entries[rgnnum].tag.len() == 0)
 				{
 					mame_printf_error("%s: %s has gfx[%d] referencing non-existent region '%s'\n", driver->source_file, driver->name, gfxnum, region);
 					error = true;
