@@ -875,7 +875,7 @@ WRITE32_HANDLER(archimedes_memc_w)
 }
 
 /*
-      22 2222 1111 1111 1100 0000 0000
+          22 2222 1111 1111 1100 0000 0000
           54 3210 9876 5432 1098 7654 3210
 4k  page: 11 1LLL LLLL LLLL LLAA MPPP PPPP
 8k  page: 11 1LLL LLLL LLLM LLAA MPPP PPPP
@@ -911,39 +911,31 @@ WRITE32_HANDLER(archimedes_memc_page_w)
 	{
 		case 0:
 			phys = data & 0x7f;
-			log = (data & 0xc00)>>10;
-			log <<= 23;
-			log |= (data & 0x7ff000);
+			log = ((data & 0x7ff000)>>12) | (data & 0xc00);
 			memc = (data & 0x80) ? 1 : 0;
 			break;
 
 		case 1:
 			phys = ((data & 0x7f) >> 1) | ((data & 1) << 6);
-			log = (data & 0xc00)>>10;
-			log <<= 23;
-			log |= (data & 0x7fe000);
+			log = ((data & 0x7fe000)>>13) | (data & 0xc00);
 			memc = ((data & 0x80) ? 1 : 0) | ((data & 0x1000) ? 2 : 0);
 			break;
 
 		case 2:
 			phys = ((data & 0x7f) >> 2) | ((data & 3) << 5);
-			log = (data & 0xc00)>>10;
-			log <<= 23;
-			log |= (data & 0x7fc000);
+			log = ((data & 0x7fc000)>>14) | (data & 0xc00);
 			memc = ((data & 0x80) ? 1 : 0) | ((data & 0x1000) ? 2 : 0);
 			break;
 
 		case 3:
 			phys = ((data & 0x7f) >> 3) | ((data & 1)<<4) | ((data & 2) << 5) | ((data & 4)<<3);
-			log = (data & 0xc00)>>10;
-			log <<= 23;
-			log |= (data & 0x7f8000);
+			log = ((data & 0x7f8000)>>15) | (data & 0xc00);
 			memc = ((data & 0x80) ? 1 : 0) | ((data & 0x1000) ? 2 : 0);
 			//printf("Mapping %08X to %08X\n",0x2000000+(phys*32768),(((data >> 15)&0xff)|((data >> 2)&0x300)));
 			break;
 	}
 
-	log >>= (12 + memc_pagesize);
+//	log >>= (12 + memc_pagesize);
 
 	// always make sure ROM mode is disconnected when this occurs
 	memc_latchrom = 0;
