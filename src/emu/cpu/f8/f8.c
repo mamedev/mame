@@ -145,7 +145,7 @@ static void ROMC_02(f8_Regs *cpustate)
      * the memory location addressed by DC0; then all devices increment
      * DC0.
      */
-    cpustate->dbus = memory_read_byte_8be(cpustate->program, cpustate->dc0);
+    cpustate->dbus = cpustate->program->read_byte(cpustate->dc0);
     cpustate->dc0 += 1;
     cpustate->icount -= cL;
 }
@@ -176,7 +176,7 @@ static void ROMC_05(f8_Regs *cpustate)
      * Store the data bus contents into the memory location pointed
      * to by DC0; increment DC0.
      */
-    memory_write_byte_8be(cpustate->program, cpustate->dc0, cpustate->dbus);
+    cpustate->program->write_byte(cpustate->dc0, cpustate->dbus);
     cpustate->dc0 += 1;
     cpustate->icount -= cL;
 }
@@ -412,7 +412,7 @@ static void ROMC_1A(f8_Regs *cpustate)
      * register was addressed; the device containing the addressed port
      * must place the contents of the data bus into the address port.
      */
-    memory_write_byte_8be(cpustate->iospace, cpustate->io, cpustate->dbus);
+    cpustate->iospace->write_byte(cpustate->io, cpustate->dbus);
     cpustate->icount -= cL;
 }
 
@@ -425,7 +425,7 @@ static void ROMC_1B(f8_Regs *cpustate)
      * contents of timer and interrupt control registers cannot be read
      * back onto the data bus).
      */
-	cpustate->dbus = memory_read_byte_8be(cpustate->iospace, cpustate->io);
+	cpustate->dbus = cpustate->iospace->read_byte(cpustate->io);
     cpustate->icount -= cL;
 }
 
@@ -1267,7 +1267,7 @@ static void f8_ins_0(f8_Regs *cpustate, int n)
 {
     ROMC_1C(cpustate, cS);
     CLR_OZCS;
-    cpustate->a = memory_read_byte_8be(cpustate->iospace, n);
+    cpustate->a = cpustate->iospace->read_byte(n);
     SET_SZ(cpustate->a);
 }
 
@@ -1292,7 +1292,7 @@ static void f8_ins_1(f8_Regs *cpustate, int n)
 static void f8_outs_0(f8_Regs *cpustate, int n)
 {
     ROMC_1C(cpustate, cS);
-    memory_write_byte_8be(cpustate->iospace, n, cpustate->a);
+    cpustate->iospace->write_byte(n, cpustate->a);
 }
 
 /***************************************************

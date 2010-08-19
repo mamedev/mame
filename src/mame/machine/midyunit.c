@@ -95,7 +95,7 @@ WRITE16_HANDLER( midyunit_cmos_enable_w )
 		{
 			if (data == 0x500)
 			{
-				prot_result = memory_read_word(space, TOBYTE(0x10a4390)) << 4;
+				prot_result = space->read_word(TOBYTE(0x10a4390)) << 4;
 				logerror("  desired result = %04X\n", prot_result);
 			}
 		}

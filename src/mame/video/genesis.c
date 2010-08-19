@@ -674,7 +674,7 @@ static void vdp_dma_68k(address_space *space)
 	/* handle the DMA */
 	for (count = 0; count < length; count++)
 	{
-		vdp_data_w(space->machine, memory_read_word(space, source));
+		vdp_data_w(space->machine, space->read_word(source));
 		source += 2;
 	}
 }

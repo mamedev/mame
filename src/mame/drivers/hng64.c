@@ -604,8 +604,8 @@ static void hng64_do_dma(address_space *space)
 	{
 		UINT32 dat;
 
-		dat = memory_read_dword(space,hng_dma_start);
-		memory_write_dword(space,hng_dma_dst,dat);
+		dat = space->read_dword(hng_dma_start);
+		space->write_dword(hng_dma_dst,dat);
 		hng_dma_start+=4;
 		hng_dma_dst+=4;
 		hng_dma_len--;
@@ -995,17 +995,17 @@ static WRITE32_HANDLER( hng64_sprite_clear_even_w )
 
 	if(ACCESSING_BITS_16_31)
 	{
-		memory_write_dword(space, 0x20000000+0x00+0x00+spr_offs, 0x00000000);
-		memory_write_dword(space, 0x20000000+0x08+0x00+spr_offs, 0x00000000);
-		memory_write_dword(space, 0x20000000+0x10+0x00+spr_offs, 0x00000000);
-		memory_write_dword(space, 0x20000000+0x18+0x00+spr_offs, 0x00000000);
+		space->write_dword(0x20000000+0x00+0x00+spr_offs, 0x00000000);
+		space->write_dword(0x20000000+0x08+0x00+spr_offs, 0x00000000);
+		space->write_dword(0x20000000+0x10+0x00+spr_offs, 0x00000000);
+		space->write_dword(0x20000000+0x18+0x00+spr_offs, 0x00000000);
 	}
 	if(ACCESSING_BITS_8_15)
 	{
-		memory_write_dword(space, 0x20000000+0x00+0x20+spr_offs, 0x00000000);
-		memory_write_dword(space, 0x20000000+0x08+0x20+spr_offs, 0x00000000);
-		memory_write_dword(space, 0x20000000+0x10+0x20+spr_offs, 0x00000000);
-		memory_write_dword(space, 0x20000000+0x18+0x20+spr_offs, 0x00000000);
+		space->write_dword(0x20000000+0x00+0x20+spr_offs, 0x00000000);
+		space->write_dword(0x20000000+0x08+0x20+spr_offs, 0x00000000);
+		space->write_dword(0x20000000+0x10+0x20+spr_offs, 0x00000000);
+		space->write_dword(0x20000000+0x18+0x20+spr_offs, 0x00000000);
 	}
 }
 
@@ -1017,17 +1017,17 @@ static WRITE32_HANDLER( hng64_sprite_clear_odd_w )
 
 	if(ACCESSING_BITS_16_31)
 	{
-		memory_write_dword(space, 0x20000000+0x04+0x00+spr_offs, 0x00000000);
-		memory_write_dword(space, 0x20000000+0x0c+0x00+spr_offs, 0x00000000);
-		memory_write_dword(space, 0x20000000+0x14+0x00+spr_offs, 0x00000000);
-		memory_write_dword(space, 0x20000000+0x1c+0x00+spr_offs, 0x00000000);
+		space->write_dword(0x20000000+0x04+0x00+spr_offs, 0x00000000);
+		space->write_dword(0x20000000+0x0c+0x00+spr_offs, 0x00000000);
+		space->write_dword(0x20000000+0x14+0x00+spr_offs, 0x00000000);
+		space->write_dword(0x20000000+0x1c+0x00+spr_offs, 0x00000000);
 	}
 	if(ACCESSING_BITS_0_15)
 	{
-		memory_write_dword(space, 0x20000000+0x04+0x20+spr_offs, 0x00000000);
-		memory_write_dword(space, 0x20000000+0x0c+0x20+spr_offs, 0x00000000);
-		memory_write_dword(space, 0x20000000+0x14+0x20+spr_offs, 0x00000000);
-		memory_write_dword(space, 0x20000000+0x1c+0x20+spr_offs, 0x00000000);
+		space->write_dword(0x20000000+0x04+0x20+spr_offs, 0x00000000);
+		space->write_dword(0x20000000+0x0c+0x20+spr_offs, 0x00000000);
+		space->write_dword(0x20000000+0x14+0x20+spr_offs, 0x00000000);
+		space->write_dword(0x20000000+0x1c+0x20+spr_offs, 0x00000000);
 	}
 }
 

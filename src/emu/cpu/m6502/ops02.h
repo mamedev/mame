@@ -81,12 +81,12 @@
 /***************************************************************
  *  RDMEM   read memory
  ***************************************************************/
-#define RDMEM(addr) memory_read_byte_8le(cpustate->space, addr); cpustate->icount -= 1
+#define RDMEM(addr) cpustate->space->read_byte(addr); cpustate->icount -= 1
 
 /***************************************************************
  *  WRMEM   write memory
  ***************************************************************/
-#define WRMEM(addr,data) memory_write_byte_8le(cpustate->space, addr,data); cpustate->icount -= 1
+#define WRMEM(addr,data) cpustate->space->write_byte(addr,data); cpustate->icount -= 1
 
 /***************************************************************
  *  BRA  branch relative

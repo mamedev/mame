@@ -22,11 +22,11 @@
 #undef M37710_CALL_DEBUGGER
 
 #define M37710_CALL_DEBUGGER(x) 		debugger_instruction_hook(cpustate->device, x)
-#define m37710_read_8(addr) 			memory_read_byte_16le(cpustate->program, addr)
-#define m37710_write_8(addr,data)		memory_write_byte_16le(cpustate->program, addr,data)
-#define m37710_read_8_immediate(A)		memory_read_byte_16le(cpustate->program, A)
-#define m37710_read_16(addr)			memory_read_word_16le(cpustate->program, addr)
-#define m37710_write_16(addr,data)		memory_write_word_16le(cpustate->program, addr,data)
+#define m37710_read_8(addr) 			cpustate->program->read_byte(addr)
+#define m37710_write_8(addr,data)		cpustate->program->write_byte(addr,data)
+#define m37710_read_8_immediate(A)		cpustate->program->read_byte(A)
+#define m37710_read_16(addr)			cpustate->program->read_word(addr)
+#define m37710_write_16(addr,data)		cpustate->program->write_word(addr,data)
 #define m37710_jumping(A)
 #define m37710_branching(A)
 

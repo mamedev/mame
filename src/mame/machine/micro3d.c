@@ -755,7 +755,7 @@ DRIVER_INIT( micro3d )
 
 	/* The Am29000 program seems to rely on RAM from 0x00470000 onwards being
     non-zero on a reset, otherwise the 3D object data doesn't get uploaded! */
-	memory_write_dword(space, 0x00470000, 0xa5a5a5a5);
+	space->write_dword(0x00470000, 0xa5a5a5a5);
 
 	state->mc68901.timer_a = timer_alloc(machine, mfp_timer_a_cb, NULL);
 

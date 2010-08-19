@@ -217,15 +217,15 @@ INLINE dsp32_state *get_safe_token(running_device *device)
 
 #define ROPCODE(cs,pc)			memory_decrypted_read_dword((cs)->program, pc)
 
-#define RBYTE(cs,addr)			memory_read_byte_32le((cs)->program, addr)
-#define WBYTE(cs,addr,data)		memory_write_byte_32le((cs)->program, (addr), data)
+#define RBYTE(cs,addr)			(cs)->program->read_byte(addr)
+#define WBYTE(cs,addr,data)		(cs)->program->write_byte((addr), data)
 
 #if (!DETECT_MISALIGNED_MEMORY)
 
-#define RWORD(cs,addr)			memory_read_word_32le((cs)->program, addr)
-#define WWORD(cs,addr,data)		memory_write_word_32le((cs)->program, (addr), data)
-#define RLONG(cs,addr)			memory_read_dword_32le((cs)->program, addr)
-#define WLONG(cs,addr,data)		memory_write_dword_32le((cs)->program, (addr), data)
+#define RWORD(cs,addr)			(cs)->program->read_word(addr)
+#define WWORD(cs,addr,data)		(cs)->program->write_word((addr), data)
+#define RLONG(cs,addr)			(cs)->program->read_dword(addr)
+#define WLONG(cs,addr,data)		(cs)->program->write_dword((addr), data)
 
 #else
 
@@ -233,7 +233,7 @@ INLINE UINT16 RWORD(dsp32_state *cpustate, offs_t addr)
 {
 	UINT16 data;
 	if (addr & 1) fprintf(stderr, "Unaligned word read @ %06X, PC=%06X\n", addr, cpustate->PC);
-	data = memory_read_word_32le(cpustate->program, addr);
+	data = cpustate->program->read_word(addr);
 	return data;
 }
 
@@ -241,20 +241,20 @@ INLINE UINT32 RLONG(dsp32_state *cpustate, offs_t addr)
 {
 	UINT32 data;
 	if (addr & 3) fprintf(stderr, "Unaligned long read @ %06X, PC=%06X\n", addr, cpustate->PC);
-	data = memory_write_word_32le(cpustate->program, addr);
+	data = cpustate->program->write_word(addr);
 	return data;
 }
 
 INLINE void WWORD(dsp32_state *cpustate, offs_t addr, UINT16 data)
 {
 	if (addr & 1) fprintf(stderr, "Unaligned word write @ %06X, PC=%06X\n", addr, cpustate->PC);
-	memory_read_dword_32le(cpustate->program, (addr), data);
+	cpustate->program->read_dword((addr), data);
 }
 
 INLINE void WLONG(dsp32_state *cpustate, offs_t addr, UINT32 data)
 {
 	if (addr & 3) fprintf(stderr, "Unaligned long write @ %06X, PC=%06X\n", addr, cpustate->PC);
-	memory_write_dword_32le(cpustate->program, (addr), data);
+	cpustate->program->write_dword((addr), data);
 }
 
 #endif

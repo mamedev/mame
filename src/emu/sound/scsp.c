@@ -1191,7 +1191,7 @@ static void dma_scsp(address_space *space, struct _SCSP *SCSP)
 	{
 		for(;SCSP->scsp_dtlg > 0;SCSP->scsp_dtlg-=2)
 		{
-			memory_write_word(space,SCSP->scsp_dmea, memory_read_word(space,0x100000|SCSP->scsp_drga));
+			space->write_word(SCSP->scsp_dmea, space->read_word(0x100000|SCSP->scsp_drga));
 			SCSP->scsp_dmea+=2;
 			SCSP->scsp_drga+=2;
 		}
@@ -1200,7 +1200,7 @@ static void dma_scsp(address_space *space, struct _SCSP *SCSP)
 	{
 		for(;SCSP->scsp_dtlg > 0;SCSP->scsp_dtlg-=2)
 		{
-			memory_write_word(space,0x100000|SCSP->scsp_drga,memory_read_word(space,SCSP->scsp_dmea));
+			space->write_word(0x100000|SCSP->scsp_drga,space->read_word(SCSP->scsp_dmea));
 			SCSP->scsp_dmea+=2;
 			SCSP->scsp_drga+=2;
 		}

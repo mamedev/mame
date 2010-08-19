@@ -73,7 +73,7 @@ READ16_HANDLER( twincobr_dsp_r )
 		case 0x30000:
 		case 0x40000:
 		case 0x50000:	mainspace = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-						input_data = memory_read_word(mainspace, main_ram_seg + dsp_addr_w);
+						input_data = mainspace->read_word(main_ram_seg + dsp_addr_w);
 						break;
 		default:		logerror("DSP PC:%04x Warning !!! IO reading from %08x (port 1)\n",cpu_get_previouspc(space->cpu),main_ram_seg + dsp_addr_w); break;
 	}
@@ -91,7 +91,7 @@ WRITE16_HANDLER( twincobr_dsp_w )
 		case 0x30000:	if ((dsp_addr_w < 3) && (data == 0)) dsp_execute = 1;
 		case 0x40000:
 		case 0x50000:	mainspace = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-						memory_write_word(mainspace, main_ram_seg + dsp_addr_w, data);
+						mainspace->write_word(main_ram_seg + dsp_addr_w, data);
 						break;
 		default:		logerror("DSP PC:%04x Warning !!! IO writing to %08x (port 1)\n",cpu_get_previouspc(space->cpu),main_ram_seg + dsp_addr_w); break;
 	}
@@ -123,8 +123,8 @@ READ16_HANDLER( wardner_dsp_r )
 		case 0x7000:
 		case 0x8000:
 		case 0xa000:	mainspace = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-						input_data =  memory_read_byte(mainspace, main_ram_seg + (dsp_addr_w + 0))
-								   | (memory_read_byte(mainspace, main_ram_seg + (dsp_addr_w + 1)) << 8);
+						input_data =  mainspace->read_byte(main_ram_seg + (dsp_addr_w + 0))
+								   | (mainspace->read_byte(main_ram_seg + (dsp_addr_w + 1)) << 8);
 						break;
 		default:		logerror("DSP PC:%04x Warning !!! IO reading from %08x (port 1)\n",cpu_get_previouspc(space->cpu),main_ram_seg + dsp_addr_w); break;
 	}
@@ -142,8 +142,8 @@ WRITE16_HANDLER( wardner_dsp_w )
 		case 0x7000:	if ((dsp_addr_w < 3) && (data == 0)) dsp_execute = 1;
 		case 0x8000:
 		case 0xa000:	mainspace = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-						memory_write_byte(mainspace, main_ram_seg + (dsp_addr_w + 0), (data & 0xff));
-						memory_write_byte(mainspace, main_ram_seg + (dsp_addr_w + 1), ((data >> 8) & 0xff));
+						mainspace->write_byte(main_ram_seg + (dsp_addr_w + 0), (data & 0xff));
+						mainspace->write_byte(main_ram_seg + (dsp_addr_w + 1), ((data >> 8) & 0xff));
 						break;
 		default:		logerror("DSP PC:%04x Warning !!! IO writing to %08x (port 1)\n",cpu_get_previouspc(space->cpu),main_ram_seg + dsp_addr_w); break;
 	}

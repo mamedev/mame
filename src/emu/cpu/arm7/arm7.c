@@ -104,7 +104,7 @@ enum
 INLINE UINT32 arm7_tlb_get_first_level_descriptor( arm_state *cpustate, UINT32 vaddr )
 {
     UINT32 entry_paddr = ( COPRO_TLB_BASE & COPRO_TLB_BASE_MASK ) | ( ( vaddr & COPRO_TLB_VADDR_FLTI_MASK ) >> COPRO_TLB_VADDR_FLTI_MASK_SHIFT );
-    return memory_read_dword_32le( cpustate->program, entry_paddr );
+    return cpustate->program->read_dword( entry_paddr );
 }
 
 INLINE UINT32 arm7_tlb_get_second_level_descriptor( arm_state *cpustate, UINT32 granularity, UINT32 first_desc, UINT32 vaddr )
@@ -125,7 +125,7 @@ INLINE UINT32 arm7_tlb_get_second_level_descriptor( arm_state *cpustate, UINT32 
             break;
     }
 
-    return memory_read_dword_32le( cpustate->program, desc_lvl2 );
+    return cpustate->program->read_dword( desc_lvl2 );
 }
 
 INLINE UINT32 arm7_tlb_translate(arm_state *cpustate, UINT32 vaddr)

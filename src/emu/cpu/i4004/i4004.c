@@ -73,8 +73,8 @@ INLINE UINT8 READ_ROM(i4004_state *cpustate)
 
 INLINE void WPM(i4004_state *cpustate)
 {
-	UINT8 t =  (memory_read_byte_8le(cpustate->program, cpustate->RAM.d) << 4) | cpustate->A;
-	memory_write_byte_8le(cpustate->program, (GET_PC.w.l & 0x0f00) | cpustate->RAM.d, t);
+	UINT8 t =  (cpustate->program->read_byte(cpustate->RAM.d) << 4) | cpustate->A;
+	cpustate->program->write_byte((GET_PC.w.l & 0x0f00) | cpustate->RAM.d, t);
 }
 
 
@@ -88,40 +88,40 @@ INLINE UINT8 ARG(i4004_state *cpustate)
 
 INLINE UINT8 RM(i4004_state *cpustate)
 {
-	return memory_read_byte_8le(cpustate->data, cpustate->RAM.d) & 0x0f;
+	return cpustate->data->read_byte(cpustate->RAM.d) & 0x0f;
 }
 
 INLINE UINT8 RMS(i4004_state *cpustate, UINT32 a)
 {
-	return memory_read_byte_8le(cpustate->data, (cpustate->RAM.d & 0xff0) + a) >> 4;
+	return cpustate->data->read_byte((cpustate->RAM.d & 0xff0) + a) >> 4;
 }
 
 INLINE void WM(i4004_state *cpustate, UINT8 v)
 {
-	UINT8 t =  memory_read_byte_8le(cpustate->data, cpustate->RAM.d);
-	memory_write_byte_8le(cpustate->data, cpustate->RAM.d, (t & 0xf0) | v);
+	UINT8 t =  cpustate->data->read_byte(cpustate->RAM.d);
+	cpustate->data->write_byte(cpustate->RAM.d, (t & 0xf0) | v);
 }
 
 
 INLINE void WMP(i4004_state *cpustate, UINT8 v)
 {
-	memory_write_byte_8le(cpustate->io, (cpustate->RAM.d >> 6) | 0x10, v & 0x0f);
+	cpustate->io->write_byte((cpustate->RAM.d >> 6) | 0x10, v & 0x0f);
 }
 
 INLINE void WMS(i4004_state *cpustate, UINT32 a, UINT8 v)
 {
-	UINT8 t =  memory_read_byte_8le(cpustate->data, (cpustate->RAM.d & 0xff0) + a);
-	memory_write_byte_8le(cpustate->data,(cpustate->RAM.d & 0xff0) + a, (t & 0x0f) | (v<<4));
+	UINT8 t =  cpustate->data->read_byte((cpustate->RAM.d & 0xff0) + a);
+	cpustate->data->write_byte((cpustate->RAM.d & 0xff0) + a, (t & 0x0f) | (v<<4));
 }
 
 INLINE UINT8 RIO(i4004_state *cpustate)
 {
-	return memory_read_byte_8le(cpustate->io, cpustate->RAM.b.l >> 4) & 0x0f;
+	return cpustate->io->read_byte(cpustate->RAM.b.l >> 4) & 0x0f;
 }
 
 INLINE void WIO(i4004_state *cpustate, UINT8 v)
 {
-	memory_write_byte_8le(cpustate->io, cpustate->RAM.b.l >> 4, v & 0x0f);
+	cpustate->io->write_byte(cpustate->RAM.b.l >> 4, v & 0x0f);
 }
 
 INLINE UINT8 GET_REG(i4004_state *cpustate, UINT8 num)

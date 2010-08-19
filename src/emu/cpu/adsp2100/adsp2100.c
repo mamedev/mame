@@ -318,32 +318,32 @@ INLINE adsp2100_state *get_safe_token(running_device *device)
 
 INLINE UINT16 RWORD_DATA(adsp2100_state *adsp, UINT32 addr)
 {
-	return memory_read_word_16le(adsp->data, addr << 1);
+	return adsp->data->read_word(addr << 1);
 }
 
 INLINE void WWORD_DATA(adsp2100_state *adsp, UINT32 addr, UINT16 data)
 {
-	memory_write_word_16le(adsp->data, addr << 1, data);
+	adsp->data->write_word(addr << 1, data);
 }
 
 INLINE UINT16 RWORD_IO(adsp2100_state *adsp, UINT32 addr)
 {
-	return memory_read_word_16le(adsp->io, addr << 1);
+	return adsp->io->read_word(addr << 1);
 }
 
 INLINE void WWORD_IO(adsp2100_state *adsp, UINT32 addr, UINT16 data)
 {
-	memory_write_word_16le(adsp->io, addr << 1, data);
+	adsp->io->write_word(addr << 1, data);
 }
 
 INLINE UINT32 RWORD_PGM(adsp2100_state *adsp, UINT32 addr)
 {
-	return memory_read_dword_32le(adsp->program, addr << 2);
+	return adsp->program->read_dword(addr << 2);
 }
 
 INLINE void WWORD_PGM(adsp2100_state *adsp, UINT32 addr, UINT32 data)
 {
-	memory_write_dword_32le(adsp->program, addr << 2, data & 0xffffff);
+	adsp->program->write_dword(addr << 2, data & 0xffffff);
 }
 
 #define ROPCODE(a) memory_decrypted_read_dword((a)->program, (a)->pc << 2)

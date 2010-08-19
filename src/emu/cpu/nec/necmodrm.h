@@ -13,15 +13,15 @@ static struct {
 #define RegByte(ModRM) nec_state->regs.b[Mod_RM.reg.b[ModRM]]
 
 #define GetRMWord(ModRM) \
-	((ModRM) >= 0xc0 ? nec_state->regs.w[Mod_RM.RM.w[ModRM]] : ( (*GetEA[ModRM])(nec_state), read_word( EA ) ))
+	((ModRM) >= 0xc0 ? nec_state->regs.w[Mod_RM.RM.w[ModRM]] : ( (*GetEA[ModRM])(nec_state), read_mem_word( EA ) ))
 
 #define PutbackRMWord(ModRM,val)			     \
 {							     \
 	if (ModRM >= 0xc0) nec_state->regs.w[Mod_RM.RM.w[ModRM]]=val; \
-    else write_word(EA,val);  \
+    else write_mem_word(EA,val);  \
 }
 
-#define GetnextRMWord read_word((EA&0xf0000)|((EA+2)&0xffff))
+#define GetnextRMWord read_mem_word((EA&0xf0000)|((EA+2)&0xffff))
 
 #define PutRMWord(ModRM,val)				\
 {							\
@@ -29,7 +29,7 @@ static struct {
 		nec_state->regs.w[Mod_RM.RM.w[ModRM]]=val;	\
 	else {						\
 		(*GetEA[ModRM])(nec_state);			\
-		write_word( EA ,val);			\
+		write_mem_word( EA ,val);			\
 	}						\
 }
 
@@ -41,19 +41,19 @@ static struct {
 	else {						\
 		(*GetEA[ModRM])(nec_state);			\
 		val = FETCHWORD();				\
-		write_word( EA , val);			\
+		write_mem_word( EA , val);			\
 	}						\
 }
 
 #define GetRMByte(ModRM) \
-	((ModRM) >= 0xc0 ? nec_state->regs.b[Mod_RM.RM.b[ModRM]] : read_byte( (*GetEA[ModRM])(nec_state) ))
+	((ModRM) >= 0xc0 ? nec_state->regs.b[Mod_RM.RM.b[ModRM]] : read_mem_byte( (*GetEA[ModRM])(nec_state) ))
 
 #define PutRMByte(ModRM,val)				\
 {							\
 	if (ModRM >= 0xc0)				\
 		nec_state->regs.b[Mod_RM.RM.b[ModRM]]=val;	\
 	else						\
-		write_byte( (*GetEA[ModRM])(nec_state) ,val);	\
+		write_mem_byte( (*GetEA[ModRM])(nec_state) ,val);	\
 }
 
 #define PutImmRMByte(ModRM) 				\
@@ -62,7 +62,7 @@ static struct {
 		nec_state->regs.b[Mod_RM.RM.b[ModRM]]=FETCH();	\
 	else {						\
 		(*GetEA[ModRM])(nec_state);			\
-		write_byte( EA , FETCH() );		\
+		write_mem_byte( EA , FETCH() );		\
 	}						\
 }
 
@@ -71,7 +71,7 @@ static struct {
 	if (ModRM >= 0xc0)				\
 		nec_state->regs.b[Mod_RM.RM.b[ModRM]]=val;	\
 	else						\
-		write_byte(EA,val);			\
+		write_mem_byte(EA,val);			\
 }
 
 #define DEF_br8							\

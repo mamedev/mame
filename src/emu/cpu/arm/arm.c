@@ -263,18 +263,18 @@ INLINE void cpu_write32( ARM_REGS* cpustate, int addr, UINT32 data )
 {
 	/* Unaligned writes are treated as normal writes */
 	if ( cpustate->endian == ENDIANNESS_BIG )
-		memory_write_dword_32be(cpustate->program, addr&ADDRESS_MASK,data);
+		cpustate->program->write_dword(addr&ADDRESS_MASK,data);
 	else
-		memory_write_dword_32le(cpustate->program, addr&ADDRESS_MASK,data);
+		cpustate->program->write_dword(addr&ADDRESS_MASK,data);
 	if (ARM_DEBUG_CORE && addr&3) logerror("%08x: Unaligned write %08x\n",R15,addr);
 }
 
 INLINE void cpu_write8( ARM_REGS* cpustate, int addr, UINT8 data )
 {
 	if ( cpustate->endian == ENDIANNESS_BIG )
-		memory_write_byte_32be(cpustate->program,addr,data);
+		cpustate->program->write_byte(addr,data);
 	else
-		memory_write_byte_32le(cpustate->program,addr,data);
+		cpustate->program->write_byte(addr,data);
 }
 
 INLINE UINT32 cpu_read32( ARM_REGS* cpustate, int addr )
@@ -282,9 +282,9 @@ INLINE UINT32 cpu_read32( ARM_REGS* cpustate, int addr )
 	UINT32 result;
 
 	if ( cpustate->endian == ENDIANNESS_BIG )
-		result = memory_read_dword_32be(cpustate->program,addr&ADDRESS_MASK);
+		result = cpustate->program->read_dword(addr&ADDRESS_MASK);
 	else
-		result = memory_read_dword_32le(cpustate->program,addr&ADDRESS_MASK);
+		result = cpustate->program->read_dword(addr&ADDRESS_MASK);
 
 	/* Unaligned reads rotate the word, they never combine words */
 	if (addr&3) {
@@ -305,9 +305,9 @@ INLINE UINT32 cpu_read32( ARM_REGS* cpustate, int addr )
 INLINE UINT8 cpu_read8( ARM_REGS* cpustate, int addr )
 {
 	if ( cpustate->endian == ENDIANNESS_BIG )
-		return memory_read_byte_32be(cpustate->program, addr);
+		return cpustate->program->read_byte(addr);
 	else
-		return memory_read_byte_32le(cpustate->program, addr);
+		return cpustate->program->read_byte(addr);
 }
 
 INLINE UINT32 GetRegister( ARM_REGS* cpustate, int rIndex )

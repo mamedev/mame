@@ -171,7 +171,7 @@ static READ16_HANDLER( bankrom_r )
         ROM bank area, we need to return the correct value to give the proper checksum */
 	if ((offset == 0x3000 || offset == 0x3001) && cpu_get_previouspc(space->cpu) > 0x37000)
 	{
-		UINT32 checksum = (memory_read_word(space, 0x3fd210) << 16) | memory_read_word(space, 0x3fd212);
+		UINT32 checksum = (space->read_word(0x3fd210) << 16) | space->read_word(0x3fd212);
 		UINT32 us = 0xaaaa5555 - checksum;
 		if (offset == 0x3001)
 			return us & 0xffff;

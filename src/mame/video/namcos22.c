@@ -2406,7 +2406,7 @@ Dump( address_space *space, FILE *f, unsigned addr1, unsigned addr2, const char 
       int i;
       for( i=0; i<16; i++ )
       {
-         data[i] = memory_read_byte(space, addr+i );
+         data[i] = space->read_byte(addr+i );
          if( data[i] )
          {
             bHasNonZero = 1;

@@ -634,7 +634,7 @@ static void ppc403_spu_w(UINT32 a, UINT8 d)
 
 						for (i=0; i < length; i++)
 						{
-							memory_write_byte_32be(ppc.program, ppc.dma[ch].da++, spu_rx_dma_ptr[i]);
+							ppc.program->write_byte(ppc.dma[ch].da++, spu_rx_dma_ptr[i]);
 						}
 					}
 
@@ -809,7 +809,7 @@ static void ppc403_dma_exec(int ch)
 							int length = ppc.dma[ch].ct;
 
 							for( i=0; i < length; i++ ) {
-								spu_tx_dma_ptr[i] = memory_read_byte_32be(ppc.program, ppc.dma[ch].da++);
+								spu_tx_dma_ptr[i] = ppc.program->read_byte(ppc.dma[ch].da++);
 							}
 							spu_tx_dma_handler(length);
 						}
@@ -910,7 +910,7 @@ static UINT8 ppc403_read8(address_space *space, UINT32 a)
 {
 	if(a >= 0x40000000 && a <= 0x4000000f)		/* Serial Port */
 		return ppc403_spu_r(a);
-	return memory_read_byte_32be(space, a);
+	return space->read_byte(a);
 }
 
 #define ppc403_read16	memory_read_word_32be
@@ -923,7 +923,7 @@ static void ppc403_write8(address_space *space, UINT32 a, UINT8 d)
 		ppc403_spu_w(a, d);
 		return;
 	}
-	memory_write_byte_32be(space, a, d);
+	space->write_byte(a, d);
 }
 
 #define ppc403_write16	memory_write_word_32be

@@ -109,24 +109,24 @@ INLINE v810_state *get_safe_token(running_device *device)
 #define SET_NP(val)				(cpustate->PSW = (cpustate->PSW & ~0x00020000) | ((val) << 17))
 #define SET_AE(val)				(cpustate->PSW = (cpustate->PSW & ~0x00040000) | ((val) << 18))
 
-#define R_B(cs, addr) (memory_read_byte_32le((cs)->program, addr))
-#define R_H(cs, addr) (memory_read_word_32le((cs)->program, addr))
-#define R_W(cs, addr) (memory_read_dword_32le((cs)->program, addr))
+#define R_B(cs, addr) ((cs)->program->read_byte(addr))
+#define R_H(cs, addr) ((cs)->program->read_word(addr))
+#define R_W(cs, addr) ((cs)->program->read_dword(addr))
 
 
-#define W_B(cs, addr, val) (memory_write_byte_32le((cs)->program, addr,val))
-#define W_H(cs, addr, val) (memory_write_word_32le((cs)->program, addr,val))
-#define W_W(cs, addr, val) (memory_write_dword_32le((cs)->program, addr,val))
+#define W_B(cs, addr, val) ((cs)->program->write_byte(addr,val))
+#define W_H(cs, addr, val) ((cs)->program->write_word(addr,val))
+#define W_W(cs, addr, val) ((cs)->program->write_dword(addr,val))
 
 
-#define RIO_B(cs, addr) (memory_read_byte_32le((cs)->io, addr))
-#define RIO_H(cs, addr) (memory_read_word_32le((cs)->io, addr))
-#define RIO_W(cs, addr) (memory_read_dword_32le((cs)->io, addr))
+#define RIO_B(cs, addr) ((cs)->io->read_byte(addr))
+#define RIO_H(cs, addr) ((cs)->io->read_word(addr))
+#define RIO_W(cs, addr) ((cs)->io->read_dword(addr))
 
 
-#define WIO_B(cs, addr, val) (memory_write_byte_32le((cs)->io, addr,val))
-#define WIO_H(cs, addr, val) (memory_write_word_32le((cs)->io, addr,val))
-#define WIO_W(cs, addr, val) (memory_write_dword_32le((cs)->io, addr,val))
+#define WIO_B(cs, addr, val) ((cs)->io->write_byte(addr,val))
+#define WIO_H(cs, addr, val) ((cs)->io->write_word(addr,val))
+#define WIO_W(cs, addr, val) ((cs)->io->write_dword(addr,val))
 
 #define R_OP(cs, addr)	(memory_decrypted_read_word((cs)->program, addr))
 

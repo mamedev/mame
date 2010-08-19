@@ -45,12 +45,12 @@ INLINE UINT16 READ_OP_ARG_WORD(sc61860_state *cpustate)
 
 INLINE UINT8 READ_BYTE(sc61860_state *cpustate, UINT16 adr)
 {
-	return memory_read_byte(cpustate->program, adr);
+	return cpustate->program->read_byte(adr);
 }
 
 INLINE void WRITE_BYTE(sc61860_state *cpustate, UINT16 a,UINT8 v)
 {
-	memory_write_byte(cpustate->program, a,v);
+	cpustate->program->write_byte(a,v);
 }
 
 #define PUSH(v) cpustate->ram[--cpustate->r]=v

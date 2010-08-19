@@ -3969,12 +3969,12 @@ static READ32_HANDLER( rddsp32_speedup_r )
 	if (cpu_get_pc(space->cpu) == state->rddsp32_speedup_pc && (*state->rddsp32_speedup >> 16) == 0)
 	{
 		UINT32 r14 = cpu_get_reg(space->cpu, DSP32_R14);
-		UINT32 r1 = memory_read_word(space, r14 - 0x14);
+		UINT32 r1 = space->read_word(r14 - 0x14);
 		int cycles_to_burn = 17 * 4 * (0x2bc - r1 - 2);
 		if (cycles_to_burn > 20 * 4)
 		{
 			cpu_eat_cycles(space->cpu, cycles_to_burn);
-			memory_write_word(space, r14 - 0x14, r1 + cycles_to_burn / 17);
+			space->write_word(r14 - 0x14, r1 + cycles_to_burn / 17);
 		}
 		state->msp_speedup_count[0]++;
 	}

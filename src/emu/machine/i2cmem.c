@@ -233,7 +233,7 @@ void i2cmem_device::nvram_default()
 	UINT16 default_value = 0xff;
 	for( offs_t offs = 0; offs < i2cmem_bytes; offs++ )
 	{
-		memory_write_byte( m_addrspace[ 0 ], offs, default_value );
+		m_addrspace[ 0 ]->write_byte( offs, default_value );
 	}
 
 	/* populate from a memory region if present */
@@ -251,7 +251,7 @@ void i2cmem_device::nvram_default()
 
 		for( offs_t offs = 0; offs < i2cmem_bytes; offs++ )
 		{
-			memory_write_byte( m_addrspace[ 0 ], offs, m_region->u8( offs ) );
+			m_addrspace[ 0 ]->write_byte( offs, m_region->u8( offs ) );
 		}
 	}
 }
@@ -271,7 +271,7 @@ void i2cmem_device::nvram_read( mame_file &file )
 
 	for( offs_t offs = 0; offs < i2cmem_bytes; offs++ )
 	{
-		memory_write_byte( m_addrspace[ 0 ], offs, buffer[ offs ] );
+		m_addrspace[ 0 ]->write_byte( offs, buffer[ offs ] );
 	}
 
 	auto_free( &m_machine, buffer );
@@ -289,7 +289,7 @@ void i2cmem_device::nvram_write( mame_file &file )
 
 	for( offs_t offs = 0; offs < i2cmem_bytes; offs++ )
 	{
-		buffer[ offs ] = memory_read_byte( m_addrspace[ 0 ], offs );
+		buffer[ offs ] = m_addrspace[ 0 ]->read_byte( offs );
 	}
 
 	mame_fwrite( &file, buffer, i2cmem_bytes );
@@ -464,7 +464,7 @@ void i2cmem_device::set_scl_line( int state )
 
 								for( int i = 0; i < m_page_size; i++ )
 								{
-									memory_write_byte( m_addrspace[ 0 ], offset + i, m_page[ i ] );
+									m_addrspace[ 0 ]->write_byte( offset + i, m_page[ i ] );
 								}
 
 								m_page_offset = 0;
@@ -475,7 +475,7 @@ void i2cmem_device::set_scl_line( int state )
 							int offset = data_offset();
 
 							verboselog( this, 1, "data[ %04x ] <- %02x\n", offset, m_shift );
-							memory_write_byte( m_addrspace[ 0 ], offset, m_shift );
+							m_addrspace[ 0 ]->write_byte( offset, m_shift );
 
 							m_byteaddr++;
 						}
@@ -508,7 +508,7 @@ void i2cmem_device::set_scl_line( int state )
 					{
 						int offset = data_offset();
 
-						m_shift = memory_read_byte( m_addrspace[ 0 ], offset );
+						m_shift = m_addrspace[ 0 ]->read_byte( offset );
 						verboselog( this, 1, "data[ %04x ] -> %02x\n", offset, m_shift );
 						m_byteaddr++;
 					}

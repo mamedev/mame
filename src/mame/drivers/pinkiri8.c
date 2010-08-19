@@ -438,7 +438,7 @@ static WRITE8_HANDLER( pinkiri8_vram_w )
 			prev_writes++;
 			vram_addr++;
 
-			memory_write_byte_8le(vdp_space, vram_addr, data);
+			vdp_space->write_byte(vram_addr, data);
 			break;
 	}
 }

@@ -155,7 +155,7 @@ void at28c16_device::nvram_default()
 	UINT16 default_value = 0xff;
 	for( offs_t offs = 0; offs < AT28C16_TOTAL_BYTES; offs++ )
 	{
-		memory_write_byte( m_addrspace[ 0 ], offs, default_value );
+		m_addrspace[ 0 ]->write_byte( offs, default_value );
 	}
 
 	/* populate from a memory region if present */
@@ -173,7 +173,7 @@ void at28c16_device::nvram_default()
 
 		for( offs_t offs = 0; offs < AT28C16_DATA_BYTES; offs++ )
 		{
-			memory_write_byte( m_addrspace[ 0 ], offs, m_region->u8( offs ) );
+			m_addrspace[ 0 ]->write_byte( offs, m_region->u8( offs ) );
 		}
 	}
 }
@@ -192,7 +192,7 @@ void at28c16_device::nvram_read( mame_file &file )
 
 	for( offs_t offs = 0; offs < AT28C16_TOTAL_BYTES; offs++ )
 	{
-		memory_write_byte( m_addrspace[ 0 ], offs, buffer[ offs ] );
+		m_addrspace[ 0 ]->write_byte( offs, buffer[ offs ] );
 	}
 
 	auto_free( &m_machine, buffer );
@@ -209,7 +209,7 @@ void at28c16_device::nvram_write( mame_file &file )
 
 	for( offs_t offs = 0; offs < AT28C16_TOTAL_BYTES; offs++ )
 	{
-		buffer[ offs ] = memory_read_byte( m_addrspace[ 0 ], offs );
+		buffer[ offs ] = m_addrspace[ 0 ]->read_byte( offs );
 	}
 
 	mame_fwrite( &file, buffer, AT28C16_TOTAL_BYTES );
@@ -241,7 +241,7 @@ void at28c16_device::write( offs_t offset, UINT8 data )
 		{
 			for( offs_t offs = 0; offs < AT28C16_TOTAL_BYTES; offs++ )
 			{
-				memory_write_byte( m_addrspace[ 0 ], offs, 0xff );
+				m_addrspace[ 0 ]->write_byte( offs, 0xff );
 			}
 
 			m_last_write = 0xff;
@@ -256,9 +256,9 @@ void at28c16_device::write( offs_t offset, UINT8 data )
 		}
 
 //      logerror( "%s: AT28C16: write( %04x, %02x )\n", cpuexec_describe_context(machine), offset, data );
-		if( m_last_write < 0 && memory_read_byte( m_addrspace[ 0 ], offset ) != data )
+		if( m_last_write < 0 && m_addrspace[ 0 ]->read_byte( offset ) != data )
 		{
-			memory_write_byte( m_addrspace[ 0 ], offset, data );
+			m_addrspace[ 0 ]->write_byte( offset, data );
 			m_last_write = data;
 			timer_adjust_oneshot( m_write_timer, ATTOTIME_IN_USEC( 200 ), 0 );
 		}
@@ -286,7 +286,7 @@ UINT8 at28c16_device::read( offs_t offset )
 			offset += AT28C16_ID_BYTES;
 		}
 
-		UINT8 data = memory_read_byte( m_addrspace[ 0 ], offset );
+		UINT8 data = m_addrspace[ 0 ]->read_byte( offset );
 //      logerror( "%s: AT28C16: read( %04x ) data %02x\n", cpuexec_describe_context(machine), offset, data );
 		return data;
 	}

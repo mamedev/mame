@@ -94,18 +94,18 @@ static void galpani2_write_kaneko(running_device *device)
 	{
 		for (tpattidx = 0; tpattidx < 6; tpattidx++)
 		{
-			if (memory_read_byte(dstspace,i) == testpattern[tpattidx]) x = 1; //ram test fragment present
+			if (dstspace->read_byte(i) == testpattern[tpattidx]) x = 1; //ram test fragment present
 		}
 	}
 
 	if	( x == 0 )
 	{
-		memory_write_byte(dstspace,0x100000,0x4b); //K
-		memory_write_byte(dstspace,0x100001,0x41); //A
-		memory_write_byte(dstspace,0x100002,0x4e); //N
-		memory_write_byte(dstspace,0x100003,0x45); //E
-		memory_write_byte(dstspace,0x100004,0x4b); //K
-		memory_write_byte(dstspace,0x100005,0x4f); //O
+		dstspace->write_byte(0x100000,0x4b); //K
+		dstspace->write_byte(0x100001,0x41); //A
+		dstspace->write_byte(0x100002,0x4e); //N
+		dstspace->write_byte(0x100003,0x45); //E
+		dstspace->write_byte(0x100004,0x4b); //K
+		dstspace->write_byte(0x100005,0x4f); //O
 	}
 }
 
@@ -118,8 +118,8 @@ static WRITE8_HANDLER( galpani2_mcu_init_w )
 
 	for ( mcu_address = 0x100010; mcu_address < (0x100010 + 6); mcu_address += 1 )
 	{
-		mcu_data	=	memory_read_byte(srcspace, mcu_address );
-		memory_write_byte(dstspace, mcu_address-0x10, mcu_data);
+		mcu_data	=	srcspace->read_byte(mcu_address );
+		dstspace->write_byte(mcu_address-0x10, mcu_data);
 	}
 	cputag_set_input_line(machine, "sub", INPUT_LINE_IRQ7, HOLD_LINE); //MCU Initialised
 }
@@ -132,20 +132,20 @@ static void galpani2_mcu_nmi1(running_machine *machine)
 
 	for ( mcu_list = 0x100021; mcu_list < (0x100021 + 0x40); mcu_list += 4 )
 	{
-		mcu_command		=	memory_read_byte(srcspace, mcu_list);
+		mcu_command		=	srcspace->read_byte(mcu_list);
 
 		mcu_address		=	0x100000 +
-							(memory_read_byte(srcspace, mcu_list + 1)<<8) +
-							(memory_read_byte(srcspace, mcu_list + 2)<<0) ;
+							(srcspace->read_byte(mcu_list + 1)<<8) +
+							(srcspace->read_byte(mcu_list + 2)<<0) ;
 
-		mcu_extra		=	memory_read_byte(srcspace, mcu_list + 3); //0xff for command $A and $2, 0x02 for others
+		mcu_extra		=	srcspace->read_byte(mcu_list + 3); //0xff for command $A and $2, 0x02 for others
 
 		if (mcu_command != 0)
 		{
 			logerror("%s : MCU [$%06X] endidx = $%02X / command = $%02X addr = $%04X ? = $%02X.\n",
 			cpuexec_describe_context(machine),
 			mcu_list,
-			memory_read_byte(srcspace, 0x100020),
+			srcspace->read_byte(0x100020),
 			mcu_command,
 			mcu_address,
 			mcu_extra
@@ -158,51 +158,51 @@ static void galpani2_mcu_nmi1(running_machine *machine)
 			break;
 
 		case 0x02: //Copy N bytes from RAM2 to RAM1?, gp2se is the only one to use it, often!
-			mcu_src		=	(memory_read_byte(srcspace, mcu_address + 2)<<8) +
-							(memory_read_byte(srcspace, mcu_address + 3)<<0) ;
+			mcu_src		=	(srcspace->read_byte(mcu_address + 2)<<8) +
+							(srcspace->read_byte(mcu_address + 3)<<0) ;
 
-			mcu_dst		=	(memory_read_byte(srcspace, mcu_address + 6)<<8) +
-							(memory_read_byte(srcspace, mcu_address + 7)<<0) ;
+			mcu_dst		=	(srcspace->read_byte(mcu_address + 6)<<8) +
+							(srcspace->read_byte(mcu_address + 7)<<0) ;
 
-			mcu_size	=	(memory_read_byte(srcspace, mcu_address + 8)<<8) +
-							(memory_read_byte(srcspace, mcu_address + 9)<<0) ;
+			mcu_size	=	(srcspace->read_byte(mcu_address + 8)<<8) +
+							(srcspace->read_byte(mcu_address + 9)<<0) ;
 			logerror("%s : MCU executes command $%02X, %04X %02X-> %04x\n",cpuexec_describe_context(machine),mcu_command,mcu_src,mcu_size,mcu_dst);
 
 			for( ; mcu_size > 0 ; mcu_size-- )
 			{
 				mcu_src &= 0xffff;	mcu_dst &= 0xffff;
-				memory_write_byte(srcspace,0x100000 + mcu_dst,memory_read_byte(dstspace,0x100000 + mcu_src));
+				srcspace->write_byte(0x100000 + mcu_dst,dstspace->read_byte(0x100000 + mcu_src));
 				mcu_src ++;			mcu_dst ++;
 			}
 
 			/* Raise a "job done" flag */
-			memory_write_byte(srcspace,mcu_address+0,0xff);
-			memory_write_byte(srcspace,mcu_address+1,0xff);
+			srcspace->write_byte(mcu_address+0,0xff);
+			srcspace->write_byte(mcu_address+1,0xff);
 
 			break;
 
 		case 0x0a:	// Copy N bytes from RAM1 to RAM2
-			mcu_src		=	(memory_read_byte(srcspace, mcu_address + 2)<<8) +
-							(memory_read_byte(srcspace, mcu_address + 3)<<0) ;
+			mcu_src		=	(srcspace->read_byte(mcu_address + 2)<<8) +
+							(srcspace->read_byte(mcu_address + 3)<<0) ;
 
-			mcu_dst		=	(memory_read_byte(srcspace, mcu_address + 6)<<8) +
-							(memory_read_byte(srcspace, mcu_address + 7)<<0) ;
+			mcu_dst		=	(srcspace->read_byte(mcu_address + 6)<<8) +
+							(srcspace->read_byte(mcu_address + 7)<<0) ;
 
-			mcu_size	=	(memory_read_byte(srcspace, mcu_address + 8)<<8) +
-							(memory_read_byte(srcspace, mcu_address + 9)<<0) ;
+			mcu_size	=	(srcspace->read_byte(mcu_address + 8)<<8) +
+							(srcspace->read_byte(mcu_address + 9)<<0) ;
 
 			logerror("%s : MCU executes command $%02X, %04X %02X-> %04x\n",cpuexec_describe_context(machine),mcu_command,mcu_src,mcu_size,mcu_dst);
 
 			for( ; mcu_size > 0 ; mcu_size-- )
 			{
 				mcu_src &= 0xffff;	mcu_dst &= 0xffff;
-				memory_write_byte(dstspace,0x100000 + mcu_dst,memory_read_byte(srcspace,0x100000 + mcu_src));
+				dstspace->write_byte(0x100000 + mcu_dst,srcspace->read_byte(0x100000 + mcu_src));
 				mcu_src ++;			mcu_dst ++;
 			}
 
 			/* Raise a "job done" flag */
-			memory_write_byte(srcspace,mcu_address+0,0xff);
-			memory_write_byte(srcspace,mcu_address+1,0xff);
+			srcspace->write_byte(mcu_address+0,0xff);
+			srcspace->write_byte(mcu_address+1,0xff);
 
 			break;
 
@@ -216,14 +216,14 @@ static void galpani2_mcu_nmi1(running_machine *machine)
 		//case 0x85: //? Do what?
 		default:
 			/* Raise a "job done" flag */
-			memory_write_byte(srcspace,mcu_address+0,0xff);
-			memory_write_byte(srcspace,mcu_address+1,0xff);
+			srcspace->write_byte(mcu_address+0,0xff);
+			srcspace->write_byte(mcu_address+1,0xff);
 
 			logerror("%s : MCU ERROR, unknown command $%02X\n",cpuexec_describe_context(machine),mcu_command);
 		}
 
 		/* Erase command (so that it won't be processed again)? */
-		memory_write_byte(srcspace,mcu_list,0x00);
+		srcspace->write_byte(mcu_list,0x00);
 	}
 }
 

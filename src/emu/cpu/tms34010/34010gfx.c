@@ -201,6 +201,16 @@ static int compute_pixblt_b_cycles(int left_partials, int right_partials, int fu
 
 
 /* Shift register handling */
+static void memory_w(address_space *space, offs_t offset,UINT16 data)
+{
+	space->write_word(offset, data);
+}
+
+static UINT16 memory_r(address_space *space, offs_t offset)
+{
+	return space->read_word(offset);
+}
+
 static void shiftreg_w(address_space *space, offs_t offset,UINT16 data)
 {
 	tms34010_state *tms = get_safe_token(space->cpu);
@@ -1042,8 +1052,8 @@ static void FUNCTION_NAME(pixblt)(tms34010_state *tms, int src_is_linear, int ds
 		}
 		else
 		{
-			word_write = memory_write_word_16le;
-			word_read = memory_read_word_16le;
+			word_write = memory_w;
+			word_read = memory_r;
 		}
 
 		/* compute the starting addresses */
@@ -1388,8 +1398,8 @@ static void FUNCTION_NAME(pixblt_r)(tms34010_state *tms, int src_is_linear, int 
 		}
 		else
 		{
-			word_write = memory_write_word_16le;
-			word_read = memory_read_word_16le;
+			word_write = memory_w;
+			word_read = memory_r;
 		}
 
 		/* compute the starting addresses */
@@ -1653,8 +1663,8 @@ static void FUNCTION_NAME(pixblt_b)(tms34010_state *tms, int dst_is_linear)
 		}
 		else
 		{
-			word_write = memory_write_word_16le;
-			word_read = memory_read_word_16le;
+			word_write = memory_w;
+			word_read = memory_r;
 		}
 
 		/* compute the starting addresses */
@@ -1867,8 +1877,8 @@ static void FUNCTION_NAME(fill)(tms34010_state *tms, int dst_is_linear)
 		}
 		else
 		{
-			word_write = memory_write_word_16le;
-			word_read = memory_read_word_16le;
+			word_write = memory_w;
+			word_read = memory_r;
 		}
 
 		/* compute the bounds of the operation */

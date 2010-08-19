@@ -108,9 +108,10 @@ static void CX4_transfer_data(running_machine *machine)
 	count = (cx4.reg[0x43]) | (cx4.reg[0x44] << 8);
 	dest  = (cx4.reg[0x45]) | (cx4.reg[0x46] << 8);
 
+	address_space *space = machine->device<cpu_device>("maincpu")->space(AS_PROGRAM);
 	for(i=0;i<count;i++)
 	{
-		CX4_write(machine, dest++, memory_read_byte(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), src++));
+		CX4_write(machine, dest++, space->read_byte(src++));
 	}
 }
 

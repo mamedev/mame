@@ -343,8 +343,8 @@
 #define LOG_EXTRA 0
 #define LOG_IOT_EXTRA 0
 
-#define READ_PDP_18BIT(A) ((signed)memory_read_dword_32be(cpustate->program, (A)<<2))
-#define WRITE_PDP_18BIT(A,V) (memory_write_dword_32be(cpustate->program, (A)<<2,(V)))
+#define READ_PDP_18BIT(A) ((signed)cpustate->program->read_dword((A)<<2))
+#define WRITE_PDP_18BIT(A,V) (cpustate->program->write_dword((A)<<2,(V)))
 
 
 /* PDP1 Registers */

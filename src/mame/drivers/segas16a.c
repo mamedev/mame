@@ -858,14 +858,14 @@ static void sjryuko_lamp_changed_w(running_machine *machine, UINT8 changed, UINT
 INLINE UINT8 maincpu_byte_r(running_machine *machine, offs_t offset)
 {
 	segas1x_state *state = machine->driver_data<segas1x_state>();
-	return memory_read_byte(cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM), offset);
+	return downcast<cpu_device *>(state->maincpu)->space(AS_PROGRAM)->read_byte(offset);
 }
 
 
 INLINE void maincpu_byte_w(running_machine *machine, offs_t offset, UINT8 data)
 {
 	segas1x_state *state = machine->driver_data<segas1x_state>();
-	memory_write_byte(cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM), offset, data);
+	downcast<cpu_device *>(state->maincpu)->space(AS_PROGRAM)->write_byte(offset, data);
 }
 
 

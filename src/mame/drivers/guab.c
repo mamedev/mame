@@ -576,8 +576,8 @@ static INPUT_CHANGED( coin_inserted )
 		address_space *space = cputag_get_address_space(field->port->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 		/* Get the current credit value and add the new coin value */
-		credit = memory_read_dword(space, 0x8002c) + (UINT32)(FPTR)param;
-		memory_write_dword(space, 0x8002c, credit);
+		credit = space->read_dword(0x8002c) + (UINT32)(FPTR)param;
+		space->write_dword(0x8002c, credit);
 	}
 }
 

@@ -115,32 +115,32 @@ INLINE bool avr8_is_long_opcode(UINT16 op)
 
 INLINE UINT8 READ_PRG_8(avr8_state *cpustate, UINT32 address)
 {
-    return memory_read_byte_16le(cpustate->program, address);
+    return cpustate->program->read_byte(address);
 }
 
 INLINE UINT16 READ_PRG_16(avr8_state *cpustate, UINT32 address)
 {
-    return memory_read_word_16le(cpustate->program, address << 1);
+    return cpustate->program->read_word(address << 1);
 }
 
 INLINE void WRITE_PRG_8(avr8_state *cpustate, UINT32 address, UINT8 data)
 {
-    memory_write_byte_16le(cpustate->program, address, data);
+    cpustate->program->write_byte(address, data);
 }
 
 INLINE void WRITE_PRG_16(avr8_state *cpustate, UINT32 address, UINT16 data)
 {
-    memory_write_word_16le(cpustate->program, address, data);
+    cpustate->program->write_word(address, data);
 }
 
 INLINE UINT8 READ_IO_8(avr8_state *cpustate, UINT16 address)
 {
-    return memory_read_byte(cpustate->io, address);
+    return cpustate->io->read_byte(address);
 }
 
 INLINE void WRITE_IO_8(avr8_state *cpustate, UINT16 address, UINT8 data)
 {
-    memory_write_byte(cpustate->io, address, data);
+    cpustate->io->write_byte(address, data);
 }
 
 INLINE void PUSH(avr8_state *cpustate, UINT8 val)

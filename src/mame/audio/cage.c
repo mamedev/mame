@@ -260,7 +260,7 @@ static void update_dma_state(address_space *space)
 		inc = (tms32031_io_regs[DMA_GLOBAL_CTL] >> 4) & 1;
 		for (i = 0; i < tms32031_io_regs[DMA_TRANSFER_COUNT]; i++)
 		{
-			sound_data[i % STACK_SOUND_BUFSIZE] = memory_read_dword(space, addr * 4);
+			sound_data[i % STACK_SOUND_BUFSIZE] = space->read_dword(addr * 4);
 			addr += inc;
 			if (i % STACK_SOUND_BUFSIZE == STACK_SOUND_BUFSIZE - 1)
 				dmadac_transfer(&dmadac[0], DAC_BUFFER_CHANNELS, 1, DAC_BUFFER_CHANNELS, STACK_SOUND_BUFSIZE / DAC_BUFFER_CHANNELS, sound_data);

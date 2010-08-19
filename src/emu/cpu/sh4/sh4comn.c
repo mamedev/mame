@@ -480,7 +480,7 @@ static int sh4_dma_transfer(sh4_state *sh4, int channel, int timermode, UINT32 c
 				src --;
 			if(incd == 2)
 				dst --;
-			memory_write_byte_64le(sh4->program, dst, memory_read_byte_64le(sh4->program, src));
+			sh4->program->write_byte(dst, sh4->program->read_byte(src));
 			if(incs == 1)
 				src ++;
 			if(incd == 1)
@@ -496,7 +496,7 @@ static int sh4_dma_transfer(sh4_state *sh4, int channel, int timermode, UINT32 c
 				src -= 2;
 			if(incd == 2)
 				dst -= 2;
-			memory_write_word_64le(sh4->program, dst, memory_read_word_64le(sh4->program, src));
+			sh4->program->write_word(dst, sh4->program->read_word(src));
 			if(incs == 1)
 				src += 2;
 			if(incd == 1)
@@ -512,7 +512,7 @@ static int sh4_dma_transfer(sh4_state *sh4, int channel, int timermode, UINT32 c
 				src -= 8;
 			if(incd == 2)
 				dst -= 8;
-			memory_write_qword_64le(sh4->program, dst, memory_read_qword_64le(sh4->program, src));
+			sh4->program->write_qword(dst, sh4->program->read_qword(src));
 			if(incs == 1)
 				src += 8;
 			if(incd == 1)
@@ -529,7 +529,7 @@ static int sh4_dma_transfer(sh4_state *sh4, int channel, int timermode, UINT32 c
 				src -= 4;
 			if(incd == 2)
 				dst -= 4;
-			memory_write_dword_64le(sh4->program, dst, memory_read_dword_64le(sh4->program, src));
+			sh4->program->write_dword(dst, sh4->program->read_dword(src));
 			if(incs == 1)
 				src += 4;
 			if(incd == 1)
@@ -546,10 +546,10 @@ static int sh4_dma_transfer(sh4_state *sh4, int channel, int timermode, UINT32 c
 				src -= 32;
 			if(incd == 2)
 				dst -= 32;
-			memory_write_qword_64le(sh4->program, dst, memory_read_qword_64le(sh4->program, src));
-			memory_write_qword_64le(sh4->program, dst+8, memory_read_qword_64le(sh4->program, src+8));
-			memory_write_qword_64le(sh4->program, dst+16, memory_read_qword_64le(sh4->program, src+16));
-			memory_write_qword_64le(sh4->program, dst+24, memory_read_qword_64le(sh4->program, src+24));
+			sh4->program->write_qword(dst, sh4->program->read_qword(src));
+			sh4->program->write_qword(dst+8, sh4->program->read_qword(src+8));
+			sh4->program->write_qword(dst+16, sh4->program->read_qword(src+16));
+			sh4->program->write_qword(dst+24, sh4->program->read_qword(src+24));
 			if(incs == 1)
 				src += 32;
 			if(incd == 1)
@@ -910,11 +910,11 @@ WRITE32_HANDLER( sh4_internal_w )
 		sh4->ioport16_direction &= 0xffff;
 		sh4->ioport16_pullup = (sh4->ioport16_pullup | sh4->ioport16_direction) ^ 0xffff;
 		if (sh4->m[BCR2] & 1)
-			memory_write_dword_64le(sh4->io, SH4_IOPORT_16, (UINT64)(sh4->m[PDTRA] & sh4->ioport16_direction) | ((UINT64)sh4->m[PCTRA] << 16));
+			sh4->io->write_dword(SH4_IOPORT_16, (UINT64)(sh4->m[PDTRA] & sh4->ioport16_direction) | ((UINT64)sh4->m[PCTRA] << 16));
 		break;
 	case PDTRA:
 		if (sh4->m[BCR2] & 1)
-			memory_write_dword_64le(sh4->io, SH4_IOPORT_16, (UINT64)(sh4->m[PDTRA] & sh4->ioport16_direction) | ((UINT64)sh4->m[PCTRA] << 16));
+			sh4->io->write_dword(SH4_IOPORT_16, (UINT64)(sh4->m[PDTRA] & sh4->ioport16_direction) | ((UINT64)sh4->m[PCTRA] << 16));
 		break;
 	case PCTRB:
 		sh4->ioport4_pullup = 0;
@@ -926,11 +926,11 @@ WRITE32_HANDLER( sh4_internal_w )
 		sh4->ioport4_direction &= 0xf;
 		sh4->ioport4_pullup = (sh4->ioport4_pullup | sh4->ioport4_direction) ^ 0xf;
 		if (sh4->m[BCR2] & 1)
-			memory_write_dword_64le(sh4->io, SH4_IOPORT_4, (sh4->m[PDTRB] & sh4->ioport4_direction) | (sh4->m[PCTRB] << 16));
+			sh4->io->write_dword(SH4_IOPORT_4, (sh4->m[PDTRB] & sh4->ioport4_direction) | (sh4->m[PCTRB] << 16));
 		break;
 	case PDTRB:
 		if (sh4->m[BCR2] & 1)
-			memory_write_dword_64le(sh4->io, SH4_IOPORT_4, (sh4->m[PDTRB] & sh4->ioport4_direction) | (sh4->m[PCTRB] << 16));
+			sh4->io->write_dword(SH4_IOPORT_4, (sh4->m[PDTRB] & sh4->ioport4_direction) | (sh4->m[PCTRB] << 16));
 		break;
 
 	case SCBRR2:
@@ -981,11 +981,11 @@ READ32_HANDLER( sh4_internal_r )
 		// I/O ports
 	case PDTRA:
 		if (sh4->m[BCR2] & 1)
-			return (memory_read_dword_64le(sh4->io, SH4_IOPORT_16) & ~sh4->ioport16_direction) | (sh4->m[PDTRA] & sh4->ioport16_direction);
+			return (sh4->io->read_dword(SH4_IOPORT_16) & ~sh4->ioport16_direction) | (sh4->m[PDTRA] & sh4->ioport16_direction);
 		break;
 	case PDTRB:
 		if (sh4->m[BCR2] & 1)
-			return (memory_read_dword_64le(sh4->io, SH4_IOPORT_4) & ~sh4->ioport4_direction) | (sh4->m[PDTRB] & sh4->ioport4_direction);
+			return (sh4->io->read_dword(SH4_IOPORT_4) & ~sh4->ioport4_direction) | (sh4->m[PDTRB] & sh4->ioport4_direction);
 		break;
 
 		// SCIF (UART with FIFO)
@@ -1278,7 +1278,7 @@ void sh4_dma_ddt(running_device *device, struct sh4_ddt_dma *s)
 				len = s->length;
 				p32bits = (UINT32 *)(s->buffer);
 				for (pos = 0;pos < len;pos++) {
-					*p32bits = memory_read_dword_64le(sh4->program, s->source);
+					*p32bits = sh4->program->read_dword(s->source);
 					p32bits++;
 					s->source = s->source + 4;
 				}
@@ -1286,7 +1286,7 @@ void sh4_dma_ddt(running_device *device, struct sh4_ddt_dma *s)
 				len = s->length;
 				p32bits = (UINT32 *)(s->buffer);
 				for (pos = 0;pos < len;pos++) {
-					memory_write_dword_64le(sh4->program, s->destination, *p32bits);
+					sh4->program->write_dword(s->destination, *p32bits);
 					p32bits++;
 					s->destination = s->destination + 4;
 				}
@@ -1297,7 +1297,7 @@ void sh4_dma_ddt(running_device *device, struct sh4_ddt_dma *s)
 				len = s->length * 4;
 				p32bytes = (UINT64 *)(s->buffer);
 				for (pos = 0;pos < len;pos++) {
-					*p32bytes = memory_read_qword_64le(sh4->program, s->source);
+					*p32bytes = sh4->program->read_qword(s->source);
 					p32bytes++;
 					s->destination = s->destination + 8;
 				}
@@ -1305,7 +1305,7 @@ void sh4_dma_ddt(running_device *device, struct sh4_ddt_dma *s)
 				len = s->length * 4;
 				p32bytes = (UINT64 *)(s->buffer);
 				for (pos = 0;pos < len;pos++) {
-					memory_write_qword_64le(sh4->program, s->destination, *p32bytes);
+					sh4->program->write_qword(s->destination, *p32bytes);
 					p32bytes++;
 					s->destination = s->destination + 8;
 				}

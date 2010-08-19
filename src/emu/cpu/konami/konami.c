@@ -118,8 +118,8 @@ INLINE konami_state *get_safe_token(running_device *device)
 #define KONAMI_SYNC		16	/* set when SYNC is waiting for an interrupt */
 #define KONAMI_LDS		32	/* set when LDS occured at least once */
 
-#define RM(cs,Addr)				memory_read_byte_8be((cs)->program, Addr)
-#define WM(cs,Addr,Value)		memory_write_byte_8be((cs)->program, Addr,Value)
+#define RM(cs,Addr)				(cs)->program->read_byte(Addr)
+#define WM(cs,Addr,Value)		(cs)->program->write_byte(Addr,Value)
 #define ROP(cs,Addr)			memory_decrypted_read_byte((cs)->program, Addr)
 #define ROP_ARG(cs,Addr)		memory_raw_read_byte((cs)->program, Addr)
 

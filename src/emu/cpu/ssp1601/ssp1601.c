@@ -84,7 +84,7 @@ INLINE ssp1601_state_t *get_safe_token(running_device *device)
 #define PPC    ssp1601_state->ppc.w.h
 
 #define FETCH() memory_decrypted_read_word(ssp1601_state->program, rPC++ << 1)
-#define PROGRAM_WORD(a) memory_read_word(ssp1601_state->program, (a) << 1)
+#define PROGRAM_WORD(a) ssp1601_state->program->read_word((a) << 1)
 #define GET_PPC_OFFS() PPC
 
 #define REG_READ(ssp1601_state,r) (((r) <= 4) ? ssp1601_state->gr[r].w.h : reg_read_handlers[r](ssp1601_state, r))
@@ -255,13 +255,13 @@ static void write_unknown(ssp1601_state_t *ssp1601_state, int reg, UINT32 d)
 static UINT32 read_ext(ssp1601_state_t *ssp1601_state, int reg)
 {
 	reg &= 7;
-	return memory_read_word_16be(ssp1601_state->io, (reg << 1));
+	return ssp1601_state->io->read_word((reg << 1));
 }
 
 static void write_ext(ssp1601_state_t *ssp1601_state, int reg, UINT32 d)
 {
 	reg &= 7;
-	memory_write_word_16be(ssp1601_state->io, (reg << 1), d);
+	ssp1601_state->io->write_word((reg << 1), d);
 }
 
 // 4

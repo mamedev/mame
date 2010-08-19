@@ -22,20 +22,20 @@
     MEMORY I/O MACROS
 ***************************************************************************/
 
-#define TMS34010_RDMEM(T,A)			((unsigned)memory_read_byte_16le ((T)->program, A))
-#define TMS34010_RDMEM_WORD(T,A)	((unsigned)memory_read_word_16le ((T)->program, A))
+#define TMS34010_RDMEM(T,A)			((unsigned)(T)->program->read_byte (A))
+#define TMS34010_RDMEM_WORD(T,A)	((unsigned)(T)->program->read_word (A))
 INLINE UINT32 TMS34010_RDMEM_DWORD(tms34010_state *tms, offs_t A)
 {
-	UINT32 result = memory_read_word_16le(tms->program, A);
-	return result | (memory_read_word_16le(tms->program, A+2)<<16);
+	UINT32 result = tms->program->read_word(A);
+	return result | (tms->program->read_word(A+2)<<16);
 }
 
-#define TMS34010_WRMEM(T,A,V)		(memory_write_byte_16le((T)->program, A,V))
-#define TMS34010_WRMEM_WORD(T,A,V)	(memory_write_word_16le((T)->program, A,V))
+#define TMS34010_WRMEM(T,A,V)		((T)->program->write_byte(A,V))
+#define TMS34010_WRMEM_WORD(T,A,V)	((T)->program->write_word(A,V))
 INLINE void TMS34010_WRMEM_DWORD(tms34010_state *tms, offs_t A,UINT32 V)
 {
-	memory_write_word_16le(tms->program, A,V);
-	memory_write_word_16le(tms->program, A+2,V>>16);
+	tms->program->write_word(A,V);
+	tms->program->write_word(A+2,V>>16);
 }
 
 

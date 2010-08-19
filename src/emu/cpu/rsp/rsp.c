@@ -109,7 +109,7 @@ INLINE rsp_state *get_safe_token(running_device *device)
 INLINE UINT8 READ8(rsp_state *rsp, UINT32 address)
 {
 	address = 0x04000000 | (address & 0xfff);
-	return memory_read_byte_32be(rsp->program, address);
+	return rsp->program->read_byte(address);
 }
 
 INLINE UINT16 READ16(rsp_state *rsp, UINT32 address)
@@ -119,10 +119,10 @@ INLINE UINT16 READ16(rsp_state *rsp, UINT32 address)
 	if (address & 1)
 	{
 		//osd_die("RSP: READ16: unaligned %08X at %08X\n", address, rsp->ppc);
-		return ((memory_read_byte_32be(rsp->program, address+0) & 0xff) << 8) | (memory_read_byte_32be(rsp->program, address+1) & 0xff);
+		return ((rsp->program->read_byte(address+0) & 0xff) << 8) | (rsp->program->read_byte(address+1) & 0xff);
 	}
 
-	return memory_read_word_32be(rsp->program, address);
+	return rsp->program->read_word(address);
 }
 
 INLINE UINT32 READ32(rsp_state *rsp, UINT32 address)
@@ -132,19 +132,19 @@ INLINE UINT32 READ32(rsp_state *rsp, UINT32 address)
 	if (address & 3)
 	{
 		//osd_die("RSP: READ32: unaligned %08X at %08X\n", address, rsp->ppc);
-		return ((memory_read_byte_32be(rsp->program, address + 0) & 0xff) << 24) |
-			   ((memory_read_byte_32be(rsp->program, address + 1) & 0xff) << 16) |
-			   ((memory_read_byte_32be(rsp->program, address + 2) & 0xff) << 8) |
-			   ((memory_read_byte_32be(rsp->program, address + 3) & 0xff) << 0);
+		return ((rsp->program->read_byte(address + 0) & 0xff) << 24) |
+			   ((rsp->program->read_byte(address + 1) & 0xff) << 16) |
+			   ((rsp->program->read_byte(address + 2) & 0xff) << 8) |
+			   ((rsp->program->read_byte(address + 3) & 0xff) << 0);
 	}
 
-	return memory_read_dword_32be(rsp->program, address);
+	return rsp->program->read_dword(address);
 }
 
 INLINE void WRITE8(rsp_state *rsp, UINT32 address, UINT8 data)
 {
 	address = 0x04000000 | (address & 0xfff);
-	memory_write_byte_32be(rsp->program, address, data);
+	rsp->program->write_byte(address, data);
 }
 
 INLINE void WRITE16(rsp_state *rsp, UINT32 address, UINT16 data)
@@ -154,12 +154,12 @@ INLINE void WRITE16(rsp_state *rsp, UINT32 address, UINT16 data)
 	if (address & 1)
 	{
 		//fatalerror("RSP: WRITE16: unaligned %08X, %04X at %08X\n", address, data, rsp->ppc);
-		memory_write_byte_32be(rsp->program, address + 0, (data >> 8) & 0xff);
-		memory_write_byte_32be(rsp->program, address + 1, (data >> 0) & 0xff);
+		rsp->program->write_byte(address + 0, (data >> 8) & 0xff);
+		rsp->program->write_byte(address + 1, (data >> 0) & 0xff);
 		return;
 	}
 
-	memory_write_word_32be(rsp->program, address, data);
+	rsp->program->write_word(address, data);
 }
 
 INLINE void WRITE32(rsp_state *rsp, UINT32 address, UINT32 data)
@@ -169,14 +169,14 @@ INLINE void WRITE32(rsp_state *rsp, UINT32 address, UINT32 data)
 	if (address & 3)
 	{
 		//osd_die("RSP: WRITE32: unaligned %08X, %08X at %08X\n", address, data, rsp->ppc);
-		memory_write_byte_32be(rsp->program, address + 0, (data >> 24) & 0xff);
-		memory_write_byte_32be(rsp->program, address + 1, (data >> 16) & 0xff);
-		memory_write_byte_32be(rsp->program, address + 2, (data >> 8) & 0xff);
-		memory_write_byte_32be(rsp->program, address + 3, (data >> 0) & 0xff);
+		rsp->program->write_byte(address + 0, (data >> 24) & 0xff);
+		rsp->program->write_byte(address + 1, (data >> 16) & 0xff);
+		rsp->program->write_byte(address + 2, (data >> 8) & 0xff);
+		rsp->program->write_byte(address + 3, (data >> 0) & 0xff);
 		return;
 	}
 
-	memory_write_dword_32be(rsp->program, address, data);
+	rsp->program->write_dword(address, data);
 }
 
 /*****************************************************************************/

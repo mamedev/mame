@@ -940,6 +940,13 @@ void m68k_set_encrypted_opcode_range(running_device *device, offs_t start, offs_
 	m68k->encrypted_end = end;
 }
 
+static UINT8 memory_read_byte(address_space *space, offs_t address) { return space->read_byte(address); }
+static void memory_write_byte(address_space *space, offs_t address, UINT8 data) { space->write_byte(address, data); }
+static UINT16 memory_read_word(address_space *space, offs_t address) { return space->read_word(address); }
+static void memory_write_word(address_space *space, offs_t address, UINT16 data) { space->write_word(address, data); }
+static UINT32 memory_read_dword(address_space *space, offs_t address) { return space->read_dword(address); }
+static void memory_write_dword(address_space *space, offs_t address, UINT32 data) { space->write_dword(address, data); }
+
 /****************************************************************************
  * 8-bit data memory interface
  ****************************************************************************/
@@ -955,12 +962,12 @@ static const m68k_memory_interface interface_d8 =
 {
 	0,
 	m68008_read_immediate_16,
-	memory_read_byte_8be,
-	memory_read_word_8be,
-	memory_read_dword_8be,
-	memory_write_byte_8be,
-	memory_write_word_8be,
-	memory_write_dword_8be
+	memory_read_byte,
+	memory_read_word,
+	memory_read_dword,
+	memory_write_byte,
+	memory_write_word,
+	memory_write_dword
 };
 
 /****************************************************************************
@@ -983,12 +990,12 @@ static const m68k_memory_interface interface_d16 =
 {
 	0,
 	simple_read_immediate_16,
-	memory_read_byte_16be,
-	memory_read_word_16be,
-	memory_read_dword_16be,
-	memory_write_byte_16be,
-	memory_write_word_16be,
-	memory_write_dword_16be
+	memory_read_byte,
+	memory_read_word,
+	memory_read_dword,
+	memory_write_byte,
+	memory_write_word,
+	memory_write_dword
 };
 
 /****************************************************************************
@@ -1001,9 +1008,9 @@ static UINT16 readword_d32(address_space *space, offs_t address)
 	UINT16 result;
 
 	if (!(address & 1))
-		return memory_read_word_32be(space, address);
-	result = memory_read_byte_32be(space, address) << 8;
-	return result | memory_read_byte_32be(space, address + 1);
+		return space->read_word(address);
+	result = space->read_byte(address) << 8;
+	return result | space->read_byte(address + 1);
 }
 
 /* potentially misaligned 16-bit writes with a 32-bit data bus (and 24-bit address bus) */
@@ -1011,11 +1018,11 @@ static void writeword_d32(address_space *space, offs_t address, UINT16 data)
 {
 	if (!(address & 1))
 	{
-		memory_write_word_32be(space, address, data);
+		space->write_word(address, data);
 		return;
 	}
-	memory_write_byte_32be(space, address, data >> 8);
-	memory_write_byte_32be(space, address + 1, data);
+	space->write_byte(address, data >> 8);
+	space->write_byte(address + 1, data);
 }
 
 /* potentially misaligned 32-bit reads with a 32-bit data bus (and 24-bit address bus) */
@@ -1024,15 +1031,15 @@ static UINT32 readlong_d32(address_space *space, offs_t address)
 	UINT32 result;
 
 	if (!(address & 3))
-		return memory_read_dword_32be(space, address);
+		return space->read_dword(address);
 	else if (!(address & 1))
 	{
-		result = memory_read_word_32be(space, address) << 16;
-		return result | memory_read_word_32be(space, address + 2);
+		result = space->read_word(address) << 16;
+		return result | space->read_word(address + 2);
 	}
-	result = memory_read_byte_32be(space, address) << 24;
-	result |= memory_read_word_32be(space, address + 1) << 8;
-	return result | memory_read_byte_32be(space, address + 3);
+	result = space->read_byte(address) << 24;
+	result |= space->read_word(address + 1) << 8;
+	return result | space->read_byte(address + 3);
 }
 
 /* potentially misaligned 32-bit writes with a 32-bit data bus (and 24-bit address bus) */
@@ -1040,18 +1047,18 @@ static void writelong_d32(address_space *space, offs_t address, UINT32 data)
 {
 	if (!(address & 3))
 	{
-		memory_write_dword_32be(space, address, data);
+		space->write_dword(address, data);
 		return;
 	}
 	else if (!(address & 1))
 	{
-		memory_write_word_32be(space, address, data >> 16);
-		memory_write_word_32be(space, address + 2, data);
+		space->write_word(address, data >> 16);
+		space->write_word(address + 2, data);
 		return;
 	}
-	memory_write_byte_32be(space, address, data >> 24);
-	memory_write_word_32be(space, address + 1, data >> 8);
-	memory_write_byte_32be(space, address + 3, data);
+	space->write_byte(address, data >> 24);
+	space->write_word(address + 1, data >> 8);
+	space->write_byte(address + 3, data);
 }
 
 /* interface for 32-bit data bus (68EC020, 68020) */
@@ -1059,10 +1066,10 @@ static const m68k_memory_interface interface_d32 =
 {
 	WORD_XOR_BE(0),
 	read_immediate_16,
-	memory_read_byte_32be,
+	memory_read_byte,
 	readword_d32,
 	readlong_d32,
-	memory_write_byte_32be,
+	memory_write_byte,
 	writeword_d32,
 	writelong_d32
 };
@@ -1077,7 +1084,7 @@ static UINT8 read_byte_32_mmu(address_space *space, offs_t address)
 		address = pmmu_translate_addr(m68k, address);
 	}
 
-	return memory_read_byte_32be(space, address);
+	return space->read_byte(address);
 }
 
 static void write_byte_32_mmu(address_space *space, offs_t address, UINT8 data)
@@ -1089,7 +1096,7 @@ static void write_byte_32_mmu(address_space *space, offs_t address, UINT8 data)
 		address = pmmu_translate_addr(m68k, address);
 	}
 
-	memory_write_byte_32be(space, address, data);
+	space->write_byte(address, data);
 }
 
 static UINT16 read_immediate_16_mmu(address_space *space, offs_t address)
@@ -1116,9 +1123,9 @@ static UINT16 readword_d32_mmu(address_space *space, offs_t address)
 	}
 
 	if (!(address & 1))
-		return memory_read_word_32be(space, address);
-	result = memory_read_byte_32be(space, address) << 8;
-	return result | memory_read_byte_32be(space, address + 1);
+		return space->read_word(address);
+	result = space->read_byte(address) << 8;
+	return result | space->read_byte(address + 1);
 }
 
 /* potentially misaligned 16-bit writes with a 32-bit data bus (and 24-bit address bus) */
@@ -1133,11 +1140,11 @@ static void writeword_d32_mmu(address_space *space, offs_t address, UINT16 data)
 
 	if (!(address & 1))
 	{
-		memory_write_word_32be(space, address, data);
+		space->write_word(address, data);
 		return;
 	}
-	memory_write_byte_32be(space, address, data >> 8);
-	memory_write_byte_32be(space, address + 1, data);
+	space->write_byte(address, data >> 8);
+	space->write_byte(address + 1, data);
 }
 
 /* potentially misaligned 32-bit reads with a 32-bit data bus (and 24-bit address bus) */
@@ -1152,15 +1159,15 @@ static UINT32 readlong_d32_mmu(address_space *space, offs_t address)
 	}
 
 	if (!(address & 3))
-		return memory_read_dword_32be(space, address);
+		return space->read_dword(address);
 	else if (!(address & 1))
 	{
-		result = memory_read_word_32be(space, address) << 16;
-		return result | memory_read_word_32be(space, address + 2);
+		result = space->read_word(address) << 16;
+		return result | space->read_word(address + 2);
 	}
-	result = memory_read_byte_32be(space, address) << 24;
-	result |= memory_read_word_32be(space, address + 1) << 8;
-	return result | memory_read_byte_32be(space, address + 3);
+	result = space->read_byte(address) << 24;
+	result |= space->read_word(address + 1) << 8;
+	return result | space->read_byte(address + 3);
 }
 
 /* potentially misaligned 32-bit writes with a 32-bit data bus (and 24-bit address bus) */
@@ -1175,18 +1182,18 @@ static void writelong_d32_mmu(address_space *space, offs_t address, UINT32 data)
 
 	if (!(address & 3))
 	{
-		memory_write_dword_32be(space, address, data);
+		space->write_dword(address, data);
 		return;
 	}
 	else if (!(address & 1))
 	{
-		memory_write_word_32be(space, address, data >> 16);
-		memory_write_word_32be(space, address + 2, data);
+		space->write_word(address, data >> 16);
+		space->write_word(address + 2, data);
 		return;
 	}
-	memory_write_byte_32be(space, address, data >> 24);
-	memory_write_word_32be(space, address + 1, data >> 8);
-	memory_write_byte_32be(space, address + 3, data);
+	space->write_byte(address, data >> 24);
+	space->write_word(address + 1, data >> 8);
+	space->write_byte(address + 3, data);
 }
 
 static const m68k_memory_interface interface_d32_mmu =

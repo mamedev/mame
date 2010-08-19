@@ -814,7 +814,7 @@ static CPU_EXECUTE( tms0980 )
 			/* fetch: rom address 0 */
 			/* execute: read ram, alu input, execute br/call, k input valid */
 			tms0980_set_cki_bus( device );
-			cpustate->ram_data = memory_read_byte_8le( cpustate->data, cpustate->ram_address );
+			cpustate->ram_data = cpustate->data->read_byte( cpustate->ram_address );
 			cpustate->status = 1;
 			cpustate->p = 0;
 			cpustate->n = 0;
@@ -909,22 +909,22 @@ static CPU_EXECUTE( tms0980 )
 				}
 				if ( cpustate->decode & M_STO )
 				{
-					memory_write_byte_8le( cpustate->data, cpustate->ram_address, cpustate->a );
+					cpustate->data->write_byte( cpustate->ram_address, cpustate->a );
 				}
 				if ( cpustate->decode & M_CKM )
 				{
-					memory_write_byte_8le( cpustate->data, cpustate->ram_address, cpustate->cki_bus );
+					cpustate->data->write_byte( cpustate->ram_address, cpustate->cki_bus );
 				}
 			}
 			else
 			{
 				if ( cpustate->decode & F_SBIT )
 				{
-					memory_write_byte_8le( cpustate->data, cpustate->ram_address, cpustate->ram_data | tms0980_bit_value[ cpustate->opcode & 0x03 ] );
+					cpustate->data->write_byte( cpustate->ram_address, cpustate->ram_data | tms0980_bit_value[ cpustate->opcode & 0x03 ] );
 				}
 				if ( cpustate->decode & F_RBIT )
 				{
-					memory_write_byte_8le( cpustate->data, cpustate->ram_address, cpustate->ram_data & tms0980_nbit_value[ cpustate->opcode & 0x03 ] );
+					cpustate->data->write_byte( cpustate->ram_address, cpustate->ram_data & tms0980_nbit_value[ cpustate->opcode & 0x03 ] );
 				}
 				if ( cpustate->decode & F_SETR )
 				{
@@ -1028,12 +1028,12 @@ static CPU_EXECUTE( tms0980 )
 			if ( cpustate->byte_size > 8 )
 			{
 				debugger_instruction_hook( device, cpustate->rom_address << 1 );
-				cpustate->opcode = memory_read_word_16be( cpustate->program, cpustate->rom_address << 1 ) & 0x1FF;
+				cpustate->opcode = cpustate->program->read_word( cpustate->rom_address << 1 ) & 0x1FF;
 			}
 			else
 			{
 				debugger_instruction_hook( device, cpustate->rom_address );
-				cpustate->opcode = memory_read_word_8le( cpustate->program, cpustate->rom_address ) & 0xFF;
+				cpustate->opcode = cpustate->program->read_word( cpustate->rom_address ) & 0xFF;
 			}
 			tms0980_next_pc( cpustate );
 			if (LOG)

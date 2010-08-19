@@ -76,8 +76,8 @@ INLINE tx0_state *get_safe_token(running_device *device)
 	return (tx0_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
-#define READ_TX0_18BIT(A) ((signed)memory_read_dword_32be(cpustate->program, (A)<<2))
-#define WRITE_TX0_18BIT(A,V) (memory_write_dword_32be(cpustate->program, (A)<<2,(V)))
+#define READ_TX0_18BIT(A) ((signed)cpustate->program->read_dword((A)<<2))
+#define WRITE_TX0_18BIT(A,V) (cpustate->program->write_dword((A)<<2,(V)))
 
 
 #define io_handler_rim 3

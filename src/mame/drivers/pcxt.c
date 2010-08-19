@@ -563,7 +563,7 @@ static READ8_HANDLER( pc_dma_read_byte )
 	offs_t page_offset = (((offs_t) dma_offset[0][dma_channel]) << 16)
 		& 0xFF0000;
 
-	return memory_read_byte(space, page_offset + offset);
+	return space->read_byte(page_offset + offset);
 }
 
 
@@ -572,7 +572,7 @@ static WRITE8_HANDLER( pc_dma_write_byte )
 	offs_t page_offset = (((offs_t) dma_offset[0][dma_channel]) << 16)
 		& 0xFF0000;
 
-	memory_write_byte(space, page_offset + offset, data);
+	space->write_byte(page_offset + offset, data);
 }
 
 static READ8_HANDLER(dma_page_select_r)

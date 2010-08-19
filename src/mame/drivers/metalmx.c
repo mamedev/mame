@@ -455,8 +455,8 @@ static WRITE32_HANDLER( host_gsp_w )
 {
 	address_space *gsp_space = cputag_get_address_space(space->machine, "gsp", ADDRESS_SPACE_PROGRAM);
 
-	memory_write_word(gsp_space, (0xc0000000 + (offset << 5) + 0x10) / 8, data);
-	memory_write_word(gsp_space, (0xc0000000 + (offset << 5))/ 8 , data >> 16);
+	gsp_space->write_word((0xc0000000 + (offset << 5) + 0x10) / 8, data);
+	gsp_space->write_word((0xc0000000 + (offset << 5))/ 8 , data >> 16);
 }
 
 static READ32_HANDLER( host_gsp_r )
@@ -464,8 +464,8 @@ static READ32_HANDLER( host_gsp_r )
 	address_space *gsp_space = cputag_get_address_space(space->machine, "gsp", ADDRESS_SPACE_PROGRAM);
 	UINT32 val;
 
-	val  = memory_read_word(gsp_space, (0xc0000000 + (offset << 5) + 0x10) / 8);
-	val |= memory_read_word(gsp_space, (0xc0000000 + (offset << 5)) / 8) << 16;
+	val  = gsp_space->read_word((0xc0000000 + (offset << 5) + 0x10) / 8);
+	val |= gsp_space->read_word((0xc0000000 + (offset << 5)) / 8) << 16;
 	return val;
 }
 

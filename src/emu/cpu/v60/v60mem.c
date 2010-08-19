@@ -21,28 +21,31 @@ struct cpu_info {
 /* Memory accesses for 16-bit data bus, 24-bit address bus (V60) */
 /*****************************************************************/
 
-#define MemRead8_16		memory_read_byte_16le
-#define MemWrite8_16	memory_write_byte_16le
+static UINT8 memory_read_byte(address_space *space, offs_t address) { return space->read_byte(address); }
+static void memory_write_byte(address_space *space, offs_t address, UINT8 data) { space->write_byte(address, data); }
+
+#define MemRead8_16					memory_read_byte
+#define MemWrite8_16				memory_write_byte
 
 static UINT16 MemRead16_16(address_space *space, offs_t address)
 {
 	if (!(address & 1))
-		return memory_read_word_16le(space, address);
+		return space->read_word(address);
 	else
 	{
-		UINT16 result = memory_read_byte_16le(space, address);
-		return result | memory_read_byte_16le(space, address + 1) << 8;
+		UINT16 result = space->read_byte(address);
+		return result | space->read_byte(address + 1) << 8;
 	}
 }
 
 static void MemWrite16_16(address_space *space, offs_t address, UINT16 data)
 {
 	if (!(address & 1))
-		memory_write_word_16le(space, address, data);
+		space->write_word(address, data);
 	else
 	{
-		memory_write_byte_16le(space, address, data);
-		memory_write_byte_16le(space, address + 1, data >> 8);
+		space->write_byte(address, data);
+		space->write_byte(address + 1, data >> 8);
 	}
 }
 
@@ -50,14 +53,14 @@ static UINT32 MemRead32_16(address_space *space, offs_t address)
 {
 	if (!(address & 1))
 	{
-		UINT32 result = memory_read_word_16le(space, address);
-		return result | (memory_read_word_16le(space, address + 2) << 16);
+		UINT32 result = space->read_word(address);
+		return result | (space->read_word(address + 2) << 16);
 	}
 	else
 	{
-		UINT32 result = memory_read_byte_16le(space, address);
-		result |= memory_read_word_16le(space, address + 1) << 8;
-		return result | memory_read_byte_16le(space, address + 3) << 24;
+		UINT32 result = space->read_byte(address);
+		result |= space->read_word(address + 1) << 8;
+		return result | space->read_byte(address + 3) << 24;
 	}
 }
 
@@ -65,14 +68,14 @@ static void MemWrite32_16(address_space *space, offs_t address, UINT32 data)
 {
 	if (!(address & 1))
 	{
-		memory_write_word_16le(space, address, data);
-		memory_write_word_16le(space, address + 2, data >> 16);
+		space->write_word(address, data);
+		space->write_word(address + 2, data >> 16);
 	}
 	else
 	{
-		memory_write_byte_16le(space, address, data);
-		memory_write_word_16le(space, address + 1, data >> 8);
-		memory_write_byte_16le(space, address + 3, data >> 24);
+		space->write_byte(address, data);
+		space->write_word(address + 1, data >> 8);
+		space->write_byte(address + 3, data >> 24);
 	}
 }
 
@@ -103,62 +106,62 @@ static UINT32 OpRead32_16(address_space *space, offs_t address)
 /* Memory accesses for 32-bit data bus, 32-bit address bus (V70) */
 /*****************************************************************/
 
-#define MemRead8_32		memory_read_byte_32le
-#define MemWrite8_32	memory_write_byte_32le
+#define MemRead8_32		memory_read_byte
+#define MemWrite8_32	memory_write_byte
 
 static UINT16 MemRead16_32(address_space *space, offs_t address)
 {
 	if (!(address & 1))
-		return memory_read_word_32le(space, address);
+		return space->read_word(address);
 	else
 	{
-		UINT16 result = memory_read_byte_32le(space, address);
-		return result | memory_read_byte_32le(space, address + 1) << 8;
+		UINT16 result = space->read_byte(address);
+		return result | space->read_byte(address + 1) << 8;
 	}
 }
 
 static void MemWrite16_32(address_space *space, offs_t address, UINT16 data)
 {
 	if (!(address & 1))
-		memory_write_word_32le(space, address, data);
+		space->write_word(address, data);
 	else
 	{
-		memory_write_byte_32le(space, address, data);
-		memory_write_byte_32le(space, address + 1, data >> 8);
+		space->write_byte(address, data);
+		space->write_byte(address + 1, data >> 8);
 	}
 }
 
 static UINT32 MemRead32_32(address_space *space, offs_t address)
 {
 	if (!(address & 3))
-		return memory_read_dword_32le(space, address);
+		return space->read_dword(address);
 	else if (!(address & 1))
 	{
-		UINT32 result = memory_read_word_32le(space, address);
-		return result | (memory_read_word_32le(space, address + 2) << 16);
+		UINT32 result = space->read_word(address);
+		return result | (space->read_word(address + 2) << 16);
 	}
 	else
 	{
-		UINT32 result = memory_read_byte_32le(space, address);
-		result |= memory_read_word_32le(space, address + 1) << 8;
-		return result | memory_read_byte_32le(space, address + 3) << 24;
+		UINT32 result = space->read_byte(address);
+		result |= space->read_word(address + 1) << 8;
+		return result | space->read_byte(address + 3) << 24;
 	}
 }
 
 static void MemWrite32_32(address_space *space, offs_t address, UINT32 data)
 {
 	if (!(address & 3))
-		memory_write_dword_32le(space, address, data);
+		space->write_dword(address, data);
 	else if (!(address & 1))
 	{
-		memory_write_word_32le(space, address, data);
-		memory_write_word_32le(space, address + 2, data >> 16);
+		space->write_word(address, data);
+		space->write_word(address + 2, data >> 16);
 	}
 	else
 	{
-		memory_write_byte_32le(space, address, data);
-		memory_write_word_32le(space, address + 1, data >> 8);
-		memory_write_byte_32le(space, address + 3, data >> 24);
+		space->write_byte(address, data);
+		space->write_word(address + 1, data >> 8);
+		space->write_byte(address + 3, data >> 24);
 	}
 }
 

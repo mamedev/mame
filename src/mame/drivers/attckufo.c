@@ -172,13 +172,13 @@ static VIDEO_UPDATE( attckufo )
 static int attckufo_dma_read( running_machine *machine, int offset )
 {
 	attckufo_state *state = machine->driver_data<attckufo_state>();
-	return memory_read_byte(state->maincpu->space(AS_PROGRAM), offset);
+	return state->maincpu->space(AS_PROGRAM)->read_byte(offset);
 }
 
 static int attckufo_dma_read_color( running_machine *machine, int offset )
 {
 	attckufo_state *state = machine->driver_data<attckufo_state>();
-	return memory_read_byte(state->maincpu->space(AS_PROGRAM), offset + 0x400);
+	return state->maincpu->space(AS_PROGRAM)->read_byte(offset + 0x400);
 }
 
 static const mos6560_interface attckufo_6560_intf =

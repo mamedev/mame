@@ -79,12 +79,12 @@ INLINE m6805_Regs *get_safe_token(running_device *device)
 /****************************************************************************/
 /* Read a byte from given memory location                                   */
 /****************************************************************************/
-#define M6805_RDMEM(Addr) ((unsigned)memory_read_byte_8be(cpustate->program, Addr))
+#define M6805_RDMEM(Addr) ((unsigned)cpustate->program->read_byte(Addr))
 
 /****************************************************************************/
 /* Write a byte to given memory location                                    */
 /****************************************************************************/
-#define M6805_WRMEM(Addr,Value) (memory_write_byte_8be(cpustate->program, Addr,Value))
+#define M6805_WRMEM(Addr,Value) (cpustate->program->write_byte(Addr,Value))
 
 /****************************************************************************/
 /* M6805_RDOP() is identical to M6805_RDMEM() except it is used for reading */

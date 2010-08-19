@@ -232,7 +232,7 @@ static WRITE8_HANDLER( i8257_LMSR_w )
 
 		for(i = 0; i < size; i++)
 		{
-			memory_write_byte(space, dst++, memory_read_byte(space, src++));
+			space->write_byte(dst++, space->read_byte(src++));
 		}
 
 		state->e00x_l[0] = 0;

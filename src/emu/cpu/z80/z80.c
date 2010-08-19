@@ -595,17 +595,17 @@ INLINE void BURNODD(z80_state *z80, int cycles, int opcodes, int cyclesum)
 /***************************************************************
  * Input a byte from given I/O port
  ***************************************************************/
-#define IN(Z,port)  		memory_read_byte_8le((Z)->io, port)
+#define IN(Z,port)  		(Z)->io->read_byte(port)
 
 /***************************************************************
  * Output a byte to given I/O port
  ***************************************************************/
-#define OUT(Z,port,value)	memory_write_byte_8le((Z)->io, port, value)
+#define OUT(Z,port,value)	(Z)->io->write_byte(port, value)
 
 /***************************************************************
  * Read a byte from given memory location
  ***************************************************************/
-#define RM(Z,addr)			memory_read_byte_8le((Z)->program, addr)
+#define RM(Z,addr)			(Z)->program->read_byte(addr)
 
 /***************************************************************
  * Read a word from given memory location
@@ -619,7 +619,7 @@ INLINE void RM16(z80_state *z80, UINT32 addr, PAIR *r)
 /***************************************************************
  * Write a byte to given memory location
  ***************************************************************/
-#define WM(Z,addr,value)	memory_write_byte_8le((Z)->program, addr, value)
+#define WM(Z,addr,value)	(Z)->program->write_byte(addr, value)
 
 /***************************************************************
  * Write a word to given memory location

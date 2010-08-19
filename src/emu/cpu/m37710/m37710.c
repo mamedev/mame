@@ -405,56 +405,56 @@ static UINT8 m37710_internal_r(m37710i_cpu_struct *cpustate, int offset)
 	switch (offset)
 	{
 		case 2: // p0
-			return memory_read_byte_8le(cpustate->io, M37710_PORT0);
+			return cpustate->io->read_byte(M37710_PORT0);
 		case 3: // p1
-			return memory_read_byte_8le(cpustate->io, M37710_PORT1);
+			return cpustate->io->read_byte(M37710_PORT1);
 		case 6: // p2
-			return memory_read_byte_8le(cpustate->io, M37710_PORT2);
+			return cpustate->io->read_byte(M37710_PORT2);
 		case 7: // p3
-			return memory_read_byte_8le(cpustate->io, M37710_PORT3);
+			return cpustate->io->read_byte(M37710_PORT3);
 		case 0xa: // p4
-			return memory_read_byte_8le(cpustate->io, M37710_PORT4);
+			return cpustate->io->read_byte(M37710_PORT4);
 		case 0xb: // p5
-			return memory_read_byte_8le(cpustate->io, M37710_PORT5);
+			return cpustate->io->read_byte(M37710_PORT5);
 		case 0xe: // p6
-			return memory_read_byte_8le(cpustate->io, M37710_PORT6);
+			return cpustate->io->read_byte(M37710_PORT6);
 		case 0xf: // p7
-			return memory_read_byte_8le(cpustate->io, M37710_PORT7);
+			return cpustate->io->read_byte(M37710_PORT7);
 		case 0x12: // p8
-			return memory_read_byte_8le(cpustate->io, M37710_PORT8);
+			return cpustate->io->read_byte(M37710_PORT8);
 
 		case 0x20:
-			return memory_read_byte_8le(cpustate->io, M37710_ADC0_L);
+			return cpustate->io->read_byte(M37710_ADC0_L);
 		case 0x21:
-			return memory_read_byte_8le(cpustate->io, M37710_ADC0_H);
+			return cpustate->io->read_byte(M37710_ADC0_H);
 		case 0x22:
-			return memory_read_byte_8le(cpustate->io, M37710_ADC1_L);
+			return cpustate->io->read_byte(M37710_ADC1_L);
 		case 0x23:
-			return memory_read_byte_8le(cpustate->io, M37710_ADC1_H);
+			return cpustate->io->read_byte(M37710_ADC1_H);
 		case 0x24:
-			return memory_read_byte_8le(cpustate->io, M37710_ADC2_L);
+			return cpustate->io->read_byte(M37710_ADC2_L);
 		case 0x25:
-			return memory_read_byte_8le(cpustate->io, M37710_ADC2_H);
+			return cpustate->io->read_byte(M37710_ADC2_H);
 		case 0x26:
-			return memory_read_byte_8le(cpustate->io, M37710_ADC3_L);
+			return cpustate->io->read_byte(M37710_ADC3_L);
 		case 0x27:
-			return memory_read_byte_8le(cpustate->io, M37710_ADC3_H);
+			return cpustate->io->read_byte(M37710_ADC3_H);
 		case 0x28:
-			return memory_read_byte_8le(cpustate->io, M37710_ADC4_L);
+			return cpustate->io->read_byte(M37710_ADC4_L);
 		case 0x29:
-			return memory_read_byte_8le(cpustate->io, M37710_ADC4_H);
+			return cpustate->io->read_byte(M37710_ADC4_H);
 		case 0x2a:
-			return memory_read_byte_8le(cpustate->io, M37710_ADC5_L);
+			return cpustate->io->read_byte(M37710_ADC5_L);
 		case 0x2b:
-			return memory_read_byte_8le(cpustate->io, M37710_ADC5_H);
+			return cpustate->io->read_byte(M37710_ADC5_H);
 		case 0x2c:
-			return memory_read_byte_8le(cpustate->io, M37710_ADC6_L);
+			return cpustate->io->read_byte(M37710_ADC6_L);
 		case 0x2d:
-			return memory_read_byte_8le(cpustate->io, M37710_ADC6_H);
+			return cpustate->io->read_byte(M37710_ADC6_H);
 		case 0x2e:
-			return memory_read_byte_8le(cpustate->io, M37710_ADC7_L);
+			return cpustate->io->read_byte(M37710_ADC7_L);
 		case 0x2f:
-			return memory_read_byte_8le(cpustate->io, M37710_ADC7_H);
+			return cpustate->io->read_byte(M37710_ADC7_H);
 		case 0x35:
 			return 0xff;	// UART control
 
@@ -472,31 +472,31 @@ static void m37710_internal_w(m37710i_cpu_struct *cpustate, int offset, UINT8 da
 	switch(offset)
 	{
 		case 2: // p0
-			memory_write_byte_8le(cpustate->io, M37710_PORT0, data);
+			cpustate->io->write_byte(M37710_PORT0, data);
 			return;
 		case 3: // p1
-			memory_write_byte_8le(cpustate->io, M37710_PORT1, data);
+			cpustate->io->write_byte(M37710_PORT1, data);
 			return;
 		case 6: // p2
-			memory_write_byte_8le(cpustate->io, M37710_PORT2, data);
+			cpustate->io->write_byte(M37710_PORT2, data);
 			return;
 		case 7: // p3
-			memory_write_byte_8le(cpustate->io, M37710_PORT3, data);
+			cpustate->io->write_byte(M37710_PORT3, data);
 			return;
 		case 0xa: // p4
-			memory_write_byte_8le(cpustate->io, M37710_PORT4, data);
+			cpustate->io->write_byte(M37710_PORT4, data);
 			return;
 		case 0xb: // p5
-			memory_write_byte_8le(cpustate->io, M37710_PORT5, data);
+			cpustate->io->write_byte(M37710_PORT5, data);
 			return;
 		case 0xe: // p6
-			memory_write_byte_8le(cpustate->io, M37710_PORT6, data);
+			cpustate->io->write_byte(M37710_PORT6, data);
 			return;
 		case 0xf: // p7
-			memory_write_byte_8le(cpustate->io, M37710_PORT7, data);
+			cpustate->io->write_byte(M37710_PORT7, data);
 			return;
 		case 0x12: // p8
-			memory_write_byte_8le(cpustate->io, M37710_PORT8, data);
+			cpustate->io->write_byte(M37710_PORT8, data);
 			return;
 
 		case 0x40:	// count start

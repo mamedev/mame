@@ -287,33 +287,33 @@ INLINE asap_state *get_safe_token(running_device *device)
 INLINE UINT8 READBYTE(asap_state *asap, offs_t address)
 {
 	/* no alignment issues with bytes */
-	return memory_read_byte_32le(asap->program, address);
+	return asap->program->read_byte(address);
 }
 
 INLINE UINT16 READWORD(asap_state *asap, offs_t address)
 {
 	/* aligned reads are easy */
 	if (!(address & 1))
-		return memory_read_word_32le(asap->program, address);
+		return asap->program->read_word(address);
 
 	/* misaligned reads are tricky */
-	return memory_read_dword_32le(asap->program, address & ~3) >> (address & 3);
+	return asap->program->read_dword(address & ~3) >> (address & 3);
 }
 
 INLINE UINT32 READLONG(asap_state *asap, offs_t address)
 {
 	/* aligned reads are easy */
 	if (!(address & 3))
-		return memory_read_dword_32le(asap->program, address);
+		return asap->program->read_dword(address);
 
 	/* misaligned reads are tricky */
-	return memory_read_dword_32le(asap->program, address & ~3) >> (address & 3);
+	return asap->program->read_dword(address & ~3) >> (address & 3);
 }
 
 INLINE void WRITEBYTE(asap_state *asap, offs_t address, UINT8 data)
 {
 	/* no alignment issues with bytes */
-	memory_write_byte_32le(asap->program, address, data);
+	asap->program->write_byte(address, data);
 }
 
 INLINE void WRITEWORD(asap_state *asap, offs_t address, UINT16 data)
@@ -321,18 +321,18 @@ INLINE void WRITEWORD(asap_state *asap, offs_t address, UINT16 data)
 	/* aligned writes are easy */
 	if (!(address & 1))
 	{
-		memory_write_word_32le(asap->program, address, data);
+		asap->program->write_word(address, data);
 		return;
 	}
 
 	/* misaligned writes are tricky */
 	if (!(address & 2))
 	{
-		memory_write_byte_32le(asap->program, address + 1, data);
-		memory_write_byte_32le(asap->program, address + 2, data >> 8);
+		asap->program->write_byte(address + 1, data);
+		asap->program->write_byte(address + 2, data >> 8);
 	}
 	else
-		memory_write_byte_32le(asap->program, address + 1, data);
+		asap->program->write_byte(address + 1, data);
 }
 
 INLINE void WRITELONG(asap_state *asap, offs_t address, UINT32 data)
@@ -340,7 +340,7 @@ INLINE void WRITELONG(asap_state *asap, offs_t address, UINT32 data)
 	/* aligned writes are easy */
 	if (!(address & 3))
 	{
-		memory_write_dword_32le(asap->program, address, data);
+		asap->program->write_dword(address, data);
 		return;
 	}
 
@@ -348,14 +348,14 @@ INLINE void WRITELONG(asap_state *asap, offs_t address, UINT32 data)
 	switch (address & 3)
 	{
 		case 1:
-			memory_write_byte_32le(asap->program, address, data);
-			memory_write_word_32le(asap->program, address + 1, data >> 8);
+			asap->program->write_byte(address, data);
+			asap->program->write_word(address + 1, data >> 8);
 			break;
 		case 2:
-			memory_write_word_32le(asap->program, address, data);
+			asap->program->write_word(address, data);
 			break;
 		case 3:
-			memory_write_byte_32le(asap->program, address, data);
+			asap->program->write_byte(address, data);
 			break;
 	}
 }

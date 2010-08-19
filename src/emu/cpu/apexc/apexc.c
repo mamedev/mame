@@ -328,8 +328,8 @@ field:      X address   D           Function    Y address   D (part 2)
 #include "apexc.h"
 
 #ifndef SUPPORT_ODD_WORD_SIZES
-#define apexc_readmem(address)	memory_read_dword_32be(cpustate->program, (address)<<2)
-#define apexc_writemem(address, data)	memory_write_dword_32be(cpustate->program, (address)<<2, (data))
+#define apexc_readmem(address)	cpustate->program->read_dword((address)<<2)
+#define apexc_writemem(address, data)	cpustate->program->write_dword((address)<<2, (data))
 /* eewww ! - Fortunately, there is no memory mapped I/O, so we can simulate masked write
 without danger */
 #define apexc_writemem_masked(address, data, mask)										\
@@ -474,12 +474,12 @@ static void word_write(apexc_state *cpustate, int address, UINT32 data, UINT32 m
 
 static int papertape_read(apexc_state *cpustate)
 {
-	return memory_read_byte_8be(cpustate->io, 0) & 0x1f;
+	return cpustate->io->read_byte(0) & 0x1f;
 }
 
 static void papertape_punch(apexc_state *cpustate, int data)
 {
-	memory_write_byte_8be(cpustate->io, 0, data);
+	cpustate->io->write_byte(0, data);
 }
 
 /*

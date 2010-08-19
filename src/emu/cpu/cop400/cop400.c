@@ -161,10 +161,10 @@ struct _cop400_opcode_map {
 ***************************************************************************/
 
 #define ROM(a)			memory_decrypted_read_byte(cpustate->program, a)
-#define RAM_R(a)		memory_read_byte_8le(cpustate->data, a)
-#define RAM_W(a, v)		memory_write_byte_8le(cpustate->data, a, v)
-#define IN(a)			memory_read_byte_8le(cpustate->io, a)
-#define OUT(a, v)		memory_write_byte_8le(cpustate->io, a, v)
+#define RAM_R(a)		cpustate->data->read_byte(a)
+#define RAM_W(a, v)		cpustate->data->write_byte(a, v)
+#define IN(a)			cpustate->io->read_byte(a)
+#define OUT(a, v)		cpustate->io->write_byte(a, v)
 
 #define IN_G()			(IN(COP400_PORT_G) & cpustate->g_mask)
 #define IN_L()			IN(COP400_PORT_L)

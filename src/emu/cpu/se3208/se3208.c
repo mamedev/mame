@@ -68,31 +68,31 @@ INLINE se3208_state_t *get_safe_token(running_device *device)
 INLINE UINT32 read_dword_unaligned(address_space *space, UINT32 address)
 {
 	if (address & 3)
-		return memory_read_byte_32le(space,address) | memory_read_byte_32le(space,address+1)<<8 | memory_read_byte_32le(space,address+2)<<16 | memory_read_byte_32le(space,address+3)<<24;
+		return space->read_byte(address) | space->read_byte(address+1)<<8 | space->read_byte(address+2)<<16 | space->read_byte(address+3)<<24;
 	else
-		return memory_read_dword_32le(space,address);
+		return space->read_dword(address);
 }
 
 INLINE UINT16 read_word_unaligned(address_space *space, UINT32 address)
 {
 	if (address & 1)
-		return memory_read_byte_32le(space,address) | memory_read_byte_32le(space,address+1)<<8;
+		return space->read_byte(address) | space->read_byte(address+1)<<8;
 	else
-		return memory_read_word_32le(space,address);
+		return space->read_word(address);
 }
 
 INLINE void write_dword_unaligned(address_space *space, UINT32 address, UINT32 data)
 {
 	if (address & 3)
 	{
-		memory_write_byte_32le(space, address, data & 0xff);
-		memory_write_byte_32le(space, address+1, (data>>8)&0xff);
-		memory_write_byte_32le(space, address+2, (data>>16)&0xff);
-		memory_write_byte_32le(space, address+3, (data>>24)&0xff);
+		space->write_byte(address, data & 0xff);
+		space->write_byte(address+1, (data>>8)&0xff);
+		space->write_byte(address+2, (data>>16)&0xff);
+		space->write_byte(address+3, (data>>24)&0xff);
 	}
 	else
 	{
-		memory_write_dword_32le(space, address, data);
+		space->write_dword(address, data);
 	}
 }
 
@@ -100,19 +100,19 @@ INLINE void write_word_unaligned(address_space *space, UINT32 address, UINT16 da
 {
 	if (address & 1)
 	{
-		memory_write_byte_32le(space, address, data & 0xff);
-		memory_write_byte_32le(space, address+1, (data>>8)&0xff);
+		space->write_byte(address, data & 0xff);
+		space->write_byte(address+1, (data>>8)&0xff);
 	}
 	else
 	{
-		memory_write_word_32le(space, address, data);
+		space->write_word(address, data);
 	}
 }
 
 
 INLINE UINT8 SE3208_Read8(se3208_state_t *se3208_state, UINT32 addr)
 {
-	return memory_read_byte_32le(se3208_state->program,addr);
+	return se3208_state->program->read_byte(addr);
 }
 
 INLINE UINT16 SE3208_Read16(se3208_state_t *se3208_state, UINT32 addr)
@@ -127,7 +127,7 @@ INLINE UINT32 SE3208_Read32(se3208_state_t *se3208_state, UINT32 addr)
 
 INLINE void SE3208_Write8(se3208_state_t *se3208_state, UINT32 addr,UINT8 val)
 {
-	memory_write_byte_32le(se3208_state->program,addr,val);
+	se3208_state->program->write_byte(addr,val);
 }
 
 INLINE void SE3208_Write16(se3208_state_t *se3208_state, UINT32 addr,UINT16 val)

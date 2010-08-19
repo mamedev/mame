@@ -96,8 +96,8 @@ INLINE mb86233_state *get_safe_token(running_device *device)
 #define GETREPCNT()			cpustate->repcnt
 
 #define ROPCODE(a)			memory_decrypted_read_dword(cpustate->program, a<<2)
-#define RDMEM(a)			memory_read_dword_32le(cpustate->program, (a<<2))
-#define WRMEM(a,v)			memory_write_dword_32le(cpustate->program, (a<<2), v)
+#define RDMEM(a)			cpustate->program->read_dword((a<<2))
+#define WRMEM(a,v)			cpustate->program->write_dword((a<<2), v)
 
 /***************************************************************************
     Initialization and Shutdown

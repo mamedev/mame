@@ -247,15 +247,15 @@ INLINE int MAKE_INT_8(int A) {return (A & 0x80) ? A | ~0xff : A & 0xff;}
 /* ================================= MAME ================================= */
 /* ======================================================================== */
 
-#define spc700_read_8(addr) memory_read_byte_8le(cpustate->program,addr)
-#define spc700_write_8(addr,data) memory_write_byte_8le(cpustate->program,addr,data)
+#define spc700_read_8(addr) cpustate->program->read_byte(addr)
+#define spc700_write_8(addr,data) cpustate->program->write_byte(addr,data)
 
 #define spc700_read_8_direct(A)     spc700_read_8(A)
 #define spc700_write_8_direct(A, V) spc700_write_8(A, V)
 //#define spc700_read_instruction(A)    memory_decrypted_read_byte(cpustate->program,A)
 //#define spc700_read_8_immediate(A)    memory_raw_read_byte(cpustate->program,A)
-#define spc700_read_instruction(A)    memory_read_byte_8le(cpustate->program,A)
-#define spc700_read_8_immediate(A)    memory_read_byte_8le(cpustate->program,A)
+#define spc700_read_instruction(A)    cpustate->program->read_byte(A)
+#define spc700_read_8_immediate(A)    cpustate->program->read_byte(A)
 #define spc700_jumping(A)
 #define spc700_branching(A)
 

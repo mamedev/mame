@@ -206,12 +206,12 @@ static UINT32 timer_next;
 /****************************************************************************/
 /* Read a byte from given memory location                                   */
 /****************************************************************************/
-#define RM(Addr) ((unsigned)memory_read_byte_8be(cpustate->program, Addr))
+#define RM(Addr) ((unsigned)cpustate->program->read_byte(Addr))
 
 /****************************************************************************/
 /* Write a byte to given memory location                                    */
 /****************************************************************************/
-#define WM(Addr,Value) (memory_write_byte_8be(cpustate->program, Addr,Value))
+#define WM(Addr,Value) (cpustate->program->write_byte(Addr,Value))
 
 /****************************************************************************/
 /* M6800_RDOP() is identical to M6800_RDMEM() except it is used for reading */
@@ -675,15 +675,15 @@ static void m6800_tx(m6800_state *cpustate, int value)
 	cpustate->port2_data = (cpustate->port2_data & 0xef) | (value << 4);
 
 	if(cpustate->port2_ddr == 0xff)
-		memory_write_byte_8be(cpustate->io, M6803_PORT2,cpustate->port2_data);
+		cpustate->io->write_byte(M6803_PORT2,cpustate->port2_data);
 	else
-		memory_write_byte_8be(cpustate->io, M6803_PORT2,(cpustate->port2_data & cpustate->port2_ddr)
-			| (memory_read_byte_8be(cpustate->io, M6803_PORT2) & (cpustate->port2_ddr ^ 0xff)));
+		cpustate->io->write_byte(M6803_PORT2,(cpustate->port2_data & cpustate->port2_ddr)
+			| (cpustate->io->read_byte(M6803_PORT2) & (cpustate->port2_ddr ^ 0xff)));
 }
 
 static int m6800_rx(m6800_state *cpustate)
 {
-	return (memory_read_byte_8be(cpustate->io, M6803_PORT2) & M6800_PORT2_IO3) >> 3;
+	return (cpustate->io->read_byte(M6803_PORT2) & M6800_PORT2_IO3) >> 3;
 }
 
 static TIMER_CALLBACK(m6800_tx_tick)
@@ -2360,20 +2360,20 @@ static READ8_HANDLER( m6803_internal_registers_r )
 		case 0x01:
 			return cpustate->port2_ddr;
 		case 0x02:
-			return (memory_read_byte_8be(cpustate->io, M6803_PORT1) & (cpustate->port1_ddr ^ 0xff))
+			return (cpustate->io->read_byte(M6803_PORT1) & (cpustate->port1_ddr ^ 0xff))
 					| (cpustate->port1_data & cpustate->port1_ddr);
 		case 0x03:
-			return (memory_read_byte_8be(cpustate->io, M6803_PORT2) & (cpustate->port2_ddr ^ 0xff))
+			return (cpustate->io->read_byte(M6803_PORT2) & (cpustate->port2_ddr ^ 0xff))
 					| (cpustate->port2_data & cpustate->port2_ddr);
 		case 0x04:
 			return cpustate->port3_ddr;
 		case 0x05:
 			return cpustate->port4_ddr;
 		case 0x06:
-			return (memory_read_byte_8be(cpustate->io, M6803_PORT3) & (cpustate->port3_ddr ^ 0xff))
+			return (cpustate->io->read_byte(M6803_PORT3) & (cpustate->port3_ddr ^ 0xff))
 					| (cpustate->port3_data & cpustate->port3_ddr);
 		case 0x07:
-			return (memory_read_byte_8be(cpustate->io, M6803_PORT4) & (cpustate->port4_ddr ^ 0xff))
+			return (cpustate->io->read_byte(M6803_PORT4) & (cpustate->port4_ddr ^ 0xff))
 					| (cpustate->port4_data & cpustate->port4_ddr);
 		case 0x08:
 			cpustate->pending_tcsr = 0;
@@ -2458,10 +2458,10 @@ static WRITE8_HANDLER( m6803_internal_registers_w )
 			{
 				cpustate->port1_ddr = data;
 				if(cpustate->port1_ddr == 0xff)
-					memory_write_byte_8be(cpustate->io, M6803_PORT1,cpustate->port1_data);
+					cpustate->io->write_byte(M6803_PORT1,cpustate->port1_data);
 				else
-					memory_write_byte_8be(cpustate->io, M6803_PORT1,(cpustate->port1_data & cpustate->port1_ddr)
-						| (memory_read_byte_8be(cpustate->io, M6803_PORT1) & (cpustate->port1_ddr ^ 0xff)));
+					cpustate->io->write_byte(M6803_PORT1,(cpustate->port1_data & cpustate->port1_ddr)
+						| (cpustate->io->read_byte(M6803_PORT1) & (cpustate->port1_ddr ^ 0xff)));
 			}
 			break;
 		case 0x01:
@@ -2469,10 +2469,10 @@ static WRITE8_HANDLER( m6803_internal_registers_w )
 			{
 				cpustate->port2_ddr = data;
 				if(cpustate->port2_ddr == 0xff)
-					memory_write_byte_8be(cpustate->io, M6803_PORT2,cpustate->port2_data);
+					cpustate->io->write_byte(M6803_PORT2,cpustate->port2_data);
 				else
-					memory_write_byte_8be(cpustate->io, M6803_PORT2,(cpustate->port2_data & cpustate->port2_ddr)
-						| (memory_read_byte_8be(cpustate->io, M6803_PORT2) & (cpustate->port2_ddr ^ 0xff)));
+					cpustate->io->write_byte(M6803_PORT2,(cpustate->port2_data & cpustate->port2_ddr)
+						| (cpustate->io->read_byte(M6803_PORT2) & (cpustate->port2_ddr ^ 0xff)));
 
 				if (cpustate->port2_ddr & 2)
 					logerror("CPU '%s' PC %04x: warning - port 2 bit 1 set as output (OLVL) - not supported\n",space->cpu->tag(),cpu_get_pc(space->cpu));
@@ -2481,10 +2481,10 @@ static WRITE8_HANDLER( m6803_internal_registers_w )
 		case 0x02:
 			cpustate->port1_data = data;
 			if(cpustate->port1_ddr == 0xff)
-				memory_write_byte_8be(cpustate->io, M6803_PORT1,cpustate->port1_data);
+				cpustate->io->write_byte(M6803_PORT1,cpustate->port1_data);
 			else
-				memory_write_byte_8be(cpustate->io, M6803_PORT1,(cpustate->port1_data & cpustate->port1_ddr)
-					| (memory_read_byte_8be(cpustate->io, M6803_PORT1) & (cpustate->port1_ddr ^ 0xff)));
+				cpustate->io->write_byte(M6803_PORT1,(cpustate->port1_data & cpustate->port1_ddr)
+					| (cpustate->io->read_byte(M6803_PORT1) & (cpustate->port1_ddr ^ 0xff)));
 			break;
 		case 0x03:
 			if (cpustate->trcsr & M6800_TRCSR_TE)
@@ -2496,20 +2496,20 @@ static WRITE8_HANDLER( m6803_internal_registers_w )
 				cpustate->port2_data = data;
 			}
 			if(cpustate->port2_ddr == 0xff)
-				memory_write_byte_8be(cpustate->io, M6803_PORT2,cpustate->port2_data);
+				cpustate->io->write_byte(M6803_PORT2,cpustate->port2_data);
 			else
-				memory_write_byte_8be(cpustate->io, M6803_PORT2,(cpustate->port2_data & cpustate->port2_ddr)
-					| (memory_read_byte_8be(cpustate->io, M6803_PORT2) & (cpustate->port2_ddr ^ 0xff)));
+				cpustate->io->write_byte(M6803_PORT2,(cpustate->port2_data & cpustate->port2_ddr)
+					| (cpustate->io->read_byte(M6803_PORT2) & (cpustate->port2_ddr ^ 0xff)));
 			break;
 		case 0x04:
 			if (cpustate->port3_ddr != data)
 			{
 				cpustate->port3_ddr = data;
 				if(cpustate->port3_ddr == 0xff)
-					memory_write_byte_8be(cpustate->io, M6803_PORT3,cpustate->port3_data);
+					cpustate->io->write_byte(M6803_PORT3,cpustate->port3_data);
 				else
-					memory_write_byte_8be(cpustate->io, M6803_PORT3,(cpustate->port3_data & cpustate->port3_ddr)
-						| (memory_read_byte_8be(cpustate->io, M6803_PORT3) & (cpustate->port3_ddr ^ 0xff)));
+					cpustate->io->write_byte(M6803_PORT3,(cpustate->port3_data & cpustate->port3_ddr)
+						| (cpustate->io->read_byte(M6803_PORT3) & (cpustate->port3_ddr ^ 0xff)));
 			}
 			break;
 		case 0x05:
@@ -2517,27 +2517,27 @@ static WRITE8_HANDLER( m6803_internal_registers_w )
 			{
 				cpustate->port4_ddr = data;
 				if(cpustate->port4_ddr == 0xff)
-					memory_write_byte_8be(cpustate->io, M6803_PORT4,cpustate->port4_data);
+					cpustate->io->write_byte(M6803_PORT4,cpustate->port4_data);
 				else
-					memory_write_byte_8be(cpustate->io, M6803_PORT4,(cpustate->port4_data & cpustate->port4_ddr)
-						| (memory_read_byte_8be(cpustate->io, M6803_PORT4) & (cpustate->port4_ddr ^ 0xff)));
+					cpustate->io->write_byte(M6803_PORT4,(cpustate->port4_data & cpustate->port4_ddr)
+						| (cpustate->io->read_byte(M6803_PORT4) & (cpustate->port4_ddr ^ 0xff)));
 			}
 			break;
 		case 0x06:
 			cpustate->port3_data = data;
 			if(cpustate->port3_ddr == 0xff)
-				memory_write_byte_8be(cpustate->io, M6803_PORT3,cpustate->port3_data);
+				cpustate->io->write_byte(M6803_PORT3,cpustate->port3_data);
 			else
-				memory_write_byte_8be(cpustate->io, M6803_PORT3,(cpustate->port3_data & cpustate->port3_ddr)
-					| (memory_read_byte_8be(cpustate->io, M6803_PORT3) & (cpustate->port3_ddr ^ 0xff)));
+				cpustate->io->write_byte(M6803_PORT3,(cpustate->port3_data & cpustate->port3_ddr)
+					| (cpustate->io->read_byte(M6803_PORT3) & (cpustate->port3_ddr ^ 0xff)));
 			break;
 		case 0x07:
 			cpustate->port4_data = data;
 			if(cpustate->port4_ddr == 0xff)
-				memory_write_byte_8be(cpustate->io, M6803_PORT4,cpustate->port4_data);
+				cpustate->io->write_byte(M6803_PORT4,cpustate->port4_data);
 			else
-				memory_write_byte_8be(cpustate->io, M6803_PORT4,(cpustate->port4_data & cpustate->port4_ddr)
-					| (memory_read_byte_8be(cpustate->io, M6803_PORT4) & (cpustate->port4_ddr ^ 0xff)));
+				cpustate->io->write_byte(M6803_PORT4,(cpustate->port4_data & cpustate->port4_ddr)
+					| (cpustate->io->read_byte(M6803_PORT4) & (cpustate->port4_ddr ^ 0xff)));
 			break;
 		case 0x08:
 			cpustate->tcsr = data;

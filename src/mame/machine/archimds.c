@@ -114,7 +114,7 @@ static TIMER_CALLBACK( vidc_video_tick )
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	static UINT8 *vram = memory_region(machine,"vram");
 
-	vram[vidc_vidcur] = (memory_read_byte(space,vidc_vidstart+vidc_vidcur));
+	vram[vidc_vidcur] = (space->read_byte(vidc_vidstart+vidc_vidcur));
 
 	vidc_vidcur++;
 
@@ -133,7 +133,7 @@ static TIMER_CALLBACK( vidc_audio_tick )
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
-	dac_signed_data_w(space->machine->device("dac"), (memory_read_byte(space,vidc_sndcur)));
+	dac_signed_data_w(space->machine->device("dac"), (space->read_byte(vidc_sndcur)));
 
 	vidc_sndcur++;
 

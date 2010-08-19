@@ -304,11 +304,11 @@ WRITE8_HANDLER( congo_sprite_custom_w )
 		/* this is just a guess; the chip is hardwired to the spriteram */
 		while (count-- >= 0)
 		{
-			UINT8 daddr = memory_read_byte(space, saddr + 0) * 4;
-			spriteram[(daddr + 0) & 0xff] = memory_read_byte(space, saddr + 1);
-			spriteram[(daddr + 1) & 0xff] = memory_read_byte(space, saddr + 2);
-			spriteram[(daddr + 2) & 0xff] = memory_read_byte(space, saddr + 3);
-			spriteram[(daddr + 3) & 0xff] = memory_read_byte(space, saddr + 4);
+			UINT8 daddr = space->read_byte(saddr + 0) * 4;
+			spriteram[(daddr + 0) & 0xff] = space->read_byte(saddr + 1);
+			spriteram[(daddr + 1) & 0xff] = space->read_byte(saddr + 2);
+			spriteram[(daddr + 2) & 0xff] = space->read_byte(saddr + 3);
+			spriteram[(daddr + 3) & 0xff] = space->read_byte(saddr + 4);
 			saddr += 0x20;
 		}
 	}

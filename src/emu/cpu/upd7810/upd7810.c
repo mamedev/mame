@@ -644,8 +644,8 @@ struct opcode_s {
 
 #define RDOP(O) 	O = memory_decrypted_read_byte(cpustate->program, PCD); PC++
 #define RDOPARG(A)	A = memory_raw_read_byte(cpustate->program, PCD); PC++
-#define RM(A)		memory_read_byte_8le(cpustate->program, A)
-#define WM(A,V) 	memory_write_byte_8le(cpustate->program, A,V)
+#define RM(A)		cpustate->program->read_byte(A)
+#define WM(A,V) 	cpustate->program->write_byte(A,V)
 
 #define ZHC_ADD(after,before,carry) 	\
 	if (after == 0) PSW |= Z; else PSW &= ~Z; \
@@ -686,17 +686,17 @@ static UINT8 RP(upd7810_state *cpustate, offs_t port)
 	{
 	case UPD7810_PORTA:
 		if (cpustate->ma)	// NS20031301 no need to read if the port is set as output
-			cpustate->pa_in = memory_read_byte_8le(cpustate->io, port);
+			cpustate->pa_in = cpustate->io->read_byte(port);
 		data = (cpustate->pa_in & cpustate->ma) | (cpustate->pa_out & ~cpustate->ma);
 		break;
 	case UPD7810_PORTB:
 		if (cpustate->mb)	// NS20031301 no need to read if the port is set as output
-			cpustate->pb_in = memory_read_byte_8le(cpustate->io, port);
+			cpustate->pb_in = cpustate->io->read_byte(port);
 		data = (cpustate->pb_in & cpustate->mb) | (cpustate->pb_out & ~cpustate->mb);
 		break;
 	case UPD7810_PORTC:
 		if (cpustate->mc)	// NS20031301 no need to read if the port is set as output
-			cpustate->pc_in = memory_read_byte_8le(cpustate->io, port);
+			cpustate->pc_in = cpustate->io->read_byte(port);
 		data = (cpustate->pc_in & cpustate->mc) | (cpustate->pc_out & ~cpustate->mc);
 		if (cpustate->mcc & 0x01)	/* PC0 = TxD output */
 			data = (data & ~0x01) | (cpustate->txd & 1 ? 0x01 : 0x00);
@@ -716,7 +716,7 @@ static UINT8 RP(upd7810_state *cpustate, offs_t port)
 			data = (data & ~0x80) | (cpustate->co1 & 1 ? 0x80 : 0x00);
 		break;
 	case UPD7810_PORTD:
-		cpustate->pd_in = memory_read_byte_8le(cpustate->io, port);
+		cpustate->pd_in = cpustate->io->read_byte(port);
 		switch (cpustate->mm & 0x07)
 		{
 		case 0x00:			/* PD input mode, PF port mode */
@@ -731,7 +731,7 @@ static UINT8 RP(upd7810_state *cpustate, offs_t port)
 		}
 		break;
 	case UPD7810_PORTF:
-		cpustate->pf_in = memory_read_byte_8le(cpustate->io, port);
+		cpustate->pf_in = cpustate->io->read_byte(port);
 		switch (cpustate->mm & 0x06)
 		{
 		case 0x00:			/* PD input/output mode, PF port mode */
@@ -751,7 +751,7 @@ static UINT8 RP(upd7810_state *cpustate, offs_t port)
 		}
 		break;
 	case UPD7807_PORTT:	// NS20031301 partial implementation
-		data = memory_read_byte_8le(cpustate->io, port);
+		data = cpustate->io->read_byte(port);
 		break;
 	default:
 		logerror("uPD7810 internal error: RP(cpustate) called with invalid port number\n");
@@ -767,13 +767,13 @@ static void WP(upd7810_state *cpustate, offs_t port, UINT8 data)
 		cpustate->pa_out = data;
 //      data = (data & ~cpustate->ma) | (cpustate->pa_in & cpustate->ma);
 		data = (data & ~cpustate->ma) | (cpustate->ma);	// NS20031401
-		memory_write_byte_8le(cpustate->io, port, data);
+		cpustate->io->write_byte(port, data);
 		break;
 	case UPD7810_PORTB:
 		cpustate->pb_out = data;
 //      data = (data & ~cpustate->mb) | (cpustate->pb_in & cpustate->mb);
 		data = (data & ~cpustate->mb) | (cpustate->mb);	// NS20031401
-		memory_write_byte_8le(cpustate->io, port, data);
+		cpustate->io->write_byte(port, data);
 		break;
 	case UPD7810_PORTC:
 		cpustate->pc_out = data;
@@ -795,7 +795,7 @@ static void WP(upd7810_state *cpustate, offs_t port, UINT8 data)
 			data = (data & ~0x40) | (cpustate->co0 & 1 ? 0x40 : 0x00);
 		if (cpustate->mcc & 0x80)	/* PC7 = CO1 output */
 			data = (data & ~0x80) | (cpustate->co1 & 1 ? 0x80 : 0x00);
-		memory_write_byte_8le(cpustate->io, port, data);
+		cpustate->io->write_byte(port, data);
 		break;
 	case UPD7810_PORTD:
 		cpustate->pd_out = data;
@@ -810,7 +810,7 @@ static void WP(upd7810_state *cpustate, offs_t port, UINT8 data)
 		default:			/* PD extension mode, PF port/extension mode */
 			return;
 		}
-		memory_write_byte_8le(cpustate->io, port, data);
+		cpustate->io->write_byte(port, data);
 		break;
 	case UPD7810_PORTF:
 		cpustate->pf_out = data;
@@ -829,7 +829,7 @@ static void WP(upd7810_state *cpustate, offs_t port, UINT8 data)
 			data |= 0xff;	/* what would come out for the lower bits here? */
 			break;
 		}
-		memory_write_byte_8le(cpustate->io, port, data);
+		cpustate->io->write_byte(port, data);
 		break;
 	default:
 		logerror("uPD7810 internal error: RP(cpustate) called with invalid port number\n");

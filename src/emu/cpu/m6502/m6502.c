@@ -99,8 +99,8 @@ INLINE m6502_Regs *get_safe_token(running_device *device)
 	return (m6502_Regs *)downcast<legacy_cpu_device *>(device)->token();
 }
 
-static UINT8 default_rdmem_id(address_space *space, offs_t offset) { return memory_read_byte_8le(space, offset); }
-static void default_wdmem_id(address_space *space, offs_t offset, UINT8 data) { memory_write_byte_8le(space, offset, data); }
+static UINT8 default_rdmem_id(address_space *space, offs_t offset) { return space->read_byte(offset); }
+static void default_wdmem_id(address_space *space, offs_t offset, UINT8 data) { space->write_byte(offset, data); }
 
 /***************************************************************
  * include the opcode macros, functions and tables

@@ -94,8 +94,8 @@ INLINE m65ce02_Regs *get_safe_token(running_device *device)
 
 #include "t65ce02.c"
 
-static UINT8 default_rdmem_id(address_space *space, offs_t address) { return memory_read_byte_8le(space, address); }
-static void default_wdmem_id(address_space *space, offs_t address, UINT8 data) { memory_write_byte_8le(space, address, data); }
+static UINT8 default_rdmem_id(address_space *space, offs_t address) { return space->read_byte(address); }
+static void default_wdmem_id(address_space *space, offs_t address, UINT8 data) { space->write_byte(address, data); }
 
 static CPU_INIT( m65ce02 )
 {

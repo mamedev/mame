@@ -100,11 +100,11 @@ static TIMER_CALLBACK( serial_timer );
 
 #define READOP(a)			(memory_decrypted_read_byte(cpustate->program, a))
 
-#define RDMEM(a)			(memory_read_byte_8be(cpustate->data, a))
-#define WRMEM(a,v)			(memory_write_byte_8be(cpustate->data, (a), (v)))
+#define RDMEM(a)			(cpustate->data->read_byte(a))
+#define WRMEM(a,v)			(cpustate->data->write_byte((a), (v)))
 
-#define READPORT(a)			(memory_read_byte_8be(cpustate->io, a))
-#define WRITEPORT(a,v)		(memory_write_byte_8be(cpustate->io, (a), (v)))
+#define READPORT(a)			(cpustate->io->read_byte(a))
+#define WRITEPORT(a,v)		(cpustate->io->write_byte((a), (v)))
 
 #define TEST_ST()			(cpustate->st & 1)
 #define TEST_ZF()			(cpustate->zf & 1)

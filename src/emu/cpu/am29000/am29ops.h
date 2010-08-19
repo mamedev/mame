@@ -956,7 +956,7 @@ static void LOAD(am29000_state *am29000)
 				return;
 			}
 
-			r = memory_read_dword_32be(am29000->data, addr);
+			r = am29000->data->read_dword(addr);
 		}
 	}
 
@@ -1020,7 +1020,7 @@ static void LOADM(am29000_state *am29000)
 				return;
 			}
 
-			r = memory_read_dword_32be(am29000->data, addr);
+			r = am29000->data->read_dword(addr);
 		}
 	}
 
@@ -1045,7 +1045,7 @@ static void LOADM(am29000_state *am29000)
 		int cnt;
 		for (cnt = 0; cnt <= GET_CHC_CR; ++cnt)
 		{
-			am29000->r[r] = memory_read_dword_32be(am29000->data, addr);
+			am29000->r[r] = am29000->data->read_dword(addr);
 
 //          SET_CHC_CR(cnt - 1);
 			addr += 4;
@@ -1086,7 +1086,7 @@ static void STORE(am29000_state *am29000)
 		}
 	}
 
-	memory_write_dword_32be(am29000->data, addr, am29000->r[RA]);
+	am29000->data->write_dword(addr, am29000->r[RA]);
 
 	if (!FREEZE_MODE)
 	{
@@ -1159,7 +1159,7 @@ static void STOREM(am29000_state *am29000)
 		int cnt;
 		for (cnt = 0; cnt <= GET_CHC_CR; ++cnt)
 		{
-			memory_write_dword_32be(am29000->data, addr, am29000->r[r]);
+			am29000->data->write_dword(addr, am29000->r[r]);
 
 //          SET_CHC_CR(cnt - 1);
 			addr += 4;

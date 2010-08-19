@@ -627,7 +627,7 @@ static WRITE16_HANDLER( urashima_dma_w )
 	{
 		UINT32 i;
 		for(i = 0; i < 0x200; i += 2)
-			memory_write_word(space, 0x88200 + i, memory_read_word(space, 0x88400 + i));
+			space->write_word(0x88200 + i, space->read_word(0x88400 + i));
 	}
 }
 
@@ -643,10 +643,10 @@ static void daireika_palette_dma(running_machine *machine, UINT16 val)
 	for(index_1 = 0; index_1 < 0x200; index_1 += 0x20)
 	{
 		tmp_addr = src_addr;
-		src_addr = memory_read_dword(space,src_addr);
+		src_addr = space->read_dword(src_addr);
 
 		for(index_2 = 0; index_2 < 0x20; index_2 += 2)
-			memory_write_word(space, 0x88000 + index_2 + index_1, memory_read_word(space, src_addr + index_2));
+			space->write_word(0x88000 + index_2 + index_1, space->read_word(src_addr + index_2));
 
 		src_addr = tmp_addr + 4;
 	}

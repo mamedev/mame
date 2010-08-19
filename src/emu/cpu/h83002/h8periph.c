@@ -328,62 +328,62 @@ UINT8 h8_register_read8(h83xx_state *h8, UINT32 address)
 			val |= 0xc4;		// transmit finished, receive ready, no errors
 			break;
 		case 0xb5: // serial port A receive
-			val = memory_read_byte(h8->io, H8_SERIAL_0);
+			val = h8->io->read_byte(H8_SERIAL_0);
 			break;
 		case 0xbc: // serial port B status
 			val = h8->per_regs[reg];
 			val |= 0xc4;		// transmit finished, receive ready, no errors
 			break;
 		case 0xbd: // serial port B receive
-			val = memory_read_byte(h8->io, H8_SERIAL_1);
+			val = h8->io->read_byte(H8_SERIAL_1);
 			break;
 		case 0xe0:
-			val = memory_read_byte(h8->io, H8_ADC_0_H);
+			val = h8->io->read_byte(H8_ADC_0_H);
 			break;
 		case 0xe1:
-			val = memory_read_byte(h8->io, H8_ADC_0_L);
+			val = h8->io->read_byte(H8_ADC_0_L);
 			break;
 		case 0xe2:
-			val = memory_read_byte(h8->io, H8_ADC_1_H);
+			val = h8->io->read_byte(H8_ADC_1_H);
 			break;
 		case 0xe3:
-			val = memory_read_byte(h8->io, H8_ADC_1_L);
+			val = h8->io->read_byte(H8_ADC_1_L);
 			break;
 		case 0xe4:
-			val = memory_read_byte(h8->io, H8_ADC_2_H);
+			val = h8->io->read_byte(H8_ADC_2_H);
 			break;
 		case 0xe5:
-			val = memory_read_byte(h8->io, H8_ADC_2_L);
+			val = h8->io->read_byte(H8_ADC_2_L);
 			break;
 		case 0xe6:
-			val = memory_read_byte(h8->io, H8_ADC_3_H);
+			val = h8->io->read_byte(H8_ADC_3_H);
 			break;
 		case 0xe7:
-			val = memory_read_byte(h8->io, H8_ADC_3_L);
+			val = h8->io->read_byte(H8_ADC_3_L);
 			break;
 		case 0xe8:		// adc status
 			val = 0x80;
 			break;
 		case 0xc7:  		// port 4 data
-			val = memory_read_byte(h8->io, H8_PORT_4);
+			val = h8->io->read_byte(H8_PORT_4);
 			break;
 		case 0xcb:  		// port 6 data
-			val = memory_read_byte(h8->io, H8_PORT_6);
+			val = h8->io->read_byte(H8_PORT_6);
 			break;
 		case 0xce:		// port 7 data
-			val = memory_read_byte(h8->io, H8_PORT_7);
+			val = h8->io->read_byte(H8_PORT_7);
 			break;
 		case 0xcf:		// port 8 data
-			val = memory_read_byte(h8->io, H8_PORT_8);
+			val = h8->io->read_byte(H8_PORT_8);
 			break;
 		case 0xd2:		// port 9 data
-			val = memory_read_byte(h8->io, H8_PORT_9);
+			val = h8->io->read_byte(H8_PORT_9);
 			break;
 		case 0xd3:		// port a data
-			val = memory_read_byte(h8->io, H8_PORT_A);
+			val = h8->io->read_byte(H8_PORT_A);
 			break;
 		case 0xd6:		// port b data
-			val = memory_read_byte(h8->io, H8_PORT_B);
+			val = h8->io->read_byte(H8_PORT_B);
 			break;
 		case 0xf6:
 			val = h8_ISR_r(h8);
@@ -414,35 +414,35 @@ void h8_register_write8(h83xx_state *h8, UINT32 address, UINT8 val)
 	switch (reg)
 	{
 		case 0xb3:	// serial 0 send
-			memory_write_byte(h8->io, H8_SERIAL_0, val);
+			h8->io->write_byte(H8_SERIAL_0, val);
 			h8_3002_InterruptRequest(h8, 54, 1);
 			h8_3002_InterruptRequest(h8, 55, 1);
 			break;
 		case 0xbb:	// serial 1 send
-			memory_write_byte(h8->io, H8_SERIAL_1, val);
+			h8->io->write_byte(H8_SERIAL_1, val);
 			h8_3002_InterruptRequest(h8, 58, 1);
 			h8_3002_InterruptRequest(h8, 59, 1);
 			break;
 		case 0xc7:
-			memory_write_byte(h8->io, H8_PORT_4, val);
+			h8->io->write_byte(H8_PORT_4, val);
 			break;
 		case 0xcb:  		// port 6 data
-			memory_write_byte(h8->io, H8_PORT_6, val);
+			h8->io->write_byte(H8_PORT_6, val);
 			break;
 		case 0xce:		// port 7 data
-			memory_write_byte(h8->io, H8_PORT_7, val);
+			h8->io->write_byte(H8_PORT_7, val);
 			break;
 		case 0xcf:		// port 8 data
-			memory_write_byte(h8->io, H8_PORT_8, val);
+			h8->io->write_byte(H8_PORT_8, val);
 			break;
 		case 0xd2:		// port 9 data
-			memory_write_byte(h8->io, H8_PORT_9, val);
+			h8->io->write_byte(H8_PORT_9, val);
 			break;
 		case 0xd3:		// port a data
-			memory_write_byte(h8->io, H8_PORT_A, val);
+			h8->io->write_byte(H8_PORT_A, val);
 			break;
 		case 0xd6:		// port b data
-			memory_write_byte(h8->io, H8_PORT_B, val);
+			h8->io->write_byte(H8_PORT_B, val);
 			break;
 		case 0xf6:
 			h8_ISR_w(h8, val);
@@ -624,63 +624,63 @@ UINT8 h8_3007_register_read8(h83xx_state *h8, UINT32 address)
 			val |= 0xc4;		// transmit finished, receive ready, no errors
 			break;
 		case 0xb5: // serial port A receive
-			val = memory_read_byte(h8->io, H8_SERIAL_0);
+			val = h8->io->read_byte(H8_SERIAL_0);
 			break;
 		case 0xbc: // serial port B status
 			val = h8->per_regs[reg];
 			val |= 0xc4;		// transmit finished, receive ready, no errors
 			break;
 		case 0xbd: // serial port B receive
-			val = memory_read_byte(h8->io, H8_SERIAL_1);
+			val = h8->io->read_byte(H8_SERIAL_1);
 			break;
 		case 0xe0:
-			val = memory_read_byte(h8->io, H8_ADC_0_H);
+			val = h8->io->read_byte(H8_ADC_0_H);
 			break;
 		case 0xe1:
-			val = memory_read_byte(h8->io, H8_ADC_0_L);
+			val = h8->io->read_byte(H8_ADC_0_L);
 			break;
 		case 0xe2:
-			val = memory_read_byte(h8->io, H8_ADC_1_H);
+			val = h8->io->read_byte(H8_ADC_1_H);
 			break;
 		case 0xe3:
-			val = memory_read_byte(h8->io, H8_ADC_1_L);
+			val = h8->io->read_byte(H8_ADC_1_L);
 			break;
 		case 0xe4:
-			val = memory_read_byte(h8->io, H8_ADC_2_H);
+			val = h8->io->read_byte(H8_ADC_2_H);
 			break;
 		case 0xe5:
-			val = memory_read_byte(h8->io, H8_ADC_2_L);
+			val = h8->io->read_byte(H8_ADC_2_L);
 			break;
 		case 0xe6:
-			val = memory_read_byte(h8->io, H8_ADC_3_H);
+			val = h8->io->read_byte(H8_ADC_3_H);
 			break;
 		case 0xe7:
-			val = memory_read_byte(h8->io, H8_ADC_3_L);
+			val = h8->io->read_byte(H8_ADC_3_L);
 			break;
 		case 0xe8:		// adc status
 			val = 0x80;
 			break;
 
 		case 0xd3:  		// port 4 data
-			val = memory_read_byte(h8->io, H8_PORT_4);
+			val = h8->io->read_byte(H8_PORT_4);
 			break;
 		case 0xd5:  		// port 6 data
-			val = memory_read_byte(h8->io, H8_PORT_6);
+			val = h8->io->read_byte(H8_PORT_6);
 			break;
 		case 0xd6:		// port 7 data
-			val = memory_read_byte(h8->io, H8_PORT_7);
+			val = h8->io->read_byte(H8_PORT_7);
 			break;
 		case 0xd7:		// port 8 data
-			val = memory_read_byte(h8->io, H8_PORT_8);
+			val = h8->io->read_byte(H8_PORT_8);
 			break;
 		case 0xd8:		// port 9 data
-			val = memory_read_byte(h8->io, H8_PORT_9);
+			val = h8->io->read_byte(H8_PORT_9);
 			break;
 		case 0xd9:		// port a data
-			val = memory_read_byte(h8->io, H8_PORT_A);
+			val = h8->io->read_byte(H8_PORT_A);
 			break;
 		case 0xda:		// port b data
-			val = memory_read_byte(h8->io, H8_PORT_B);
+			val = h8->io->read_byte(H8_PORT_B);
 			break;
 		default:
 			val = h8->per_regs[reg];
@@ -710,31 +710,31 @@ void h8_3007_register_write8(h83xx_state *h8, UINT32 address, UINT8 val)
 		switch (reg)
 		{
 			case 0xb3:
-				memory_write_byte(h8->io, H8_SERIAL_0, val);
+				h8->io->write_byte(H8_SERIAL_0, val);
 				break;
 			case 0xbb:
-				memory_write_byte(h8->io, H8_SERIAL_1, val);
+				h8->io->write_byte(H8_SERIAL_1, val);
 				break;
 			case 0xd3:
-				memory_write_byte(h8->io, H8_PORT_4, val);
+				h8->io->write_byte(H8_PORT_4, val);
 				break;
 			case 0xd5:		// port 6 data
-				memory_write_byte(h8->io, H8_PORT_6, val);
+				h8->io->write_byte(H8_PORT_6, val);
 				break;
 			case 0xd6:		// port 7 data
-				memory_write_byte(h8->io, H8_PORT_7, val);
+				h8->io->write_byte(H8_PORT_7, val);
 				break;
 			case 0xd7:		// port 8 data
-				memory_write_byte(h8->io, H8_PORT_8, val);
+				h8->io->write_byte(H8_PORT_8, val);
 				break;
 			case 0xd8:		// port 9 data
-				memory_write_byte(h8->io, H8_PORT_9, val);
+				h8->io->write_byte(H8_PORT_9, val);
 				break;
 			case 0xd9:		// port a data
-				memory_write_byte(h8->io, H8_PORT_A, val);
+				h8->io->write_byte(H8_PORT_A, val);
 				break;
 			case 0xda:		// port b data
-				memory_write_byte(h8->io, H8_PORT_B, val);
+				h8->io->write_byte(H8_PORT_B, val);
 				break;
 		}
 	}

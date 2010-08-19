@@ -214,11 +214,11 @@ static offs_t decrypt_offset(address_space *space, offs_t offset)
 {
 	/* ignore anything but accesses via opcode $32 (LD $(XXYY),A) */
 	offs_t pc = cpu_get_previouspc(space->cpu);
-	if ((UINT16)pc == 0xffff || memory_read_byte(space, pc) != 0x32)
+	if ((UINT16)pc == 0xffff || space->read_byte(pc) != 0x32)
 		return offset;
 
 	/* fetch the low byte of the address and munge it */
-	return (offset & 0xff00) | (*sega_decrypt)(pc, memory_read_byte(space, pc + 1));
+	return (offset & 0xff00) | (*sega_decrypt)(pc, space->read_byte(pc + 1));
 }
 
 static WRITE8_HANDLER( mainram_w ) { mainram[decrypt_offset(space, offset)] = data; }

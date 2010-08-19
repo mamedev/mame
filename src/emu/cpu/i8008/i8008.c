@@ -91,7 +91,7 @@ INLINE UINT8 GET_REG(i8008_state *cpustate,UINT8 reg)
 		case 4 : retVal = cpustate->E; break;
 		case 5 : retVal = cpustate->H; break;
 		case 6 : retVal = cpustate->L; break;
-		default: retVal = memory_read_byte_8le(cpustate->program, (cpustate->H << 8) + cpustate->L); break;
+		default: retVal = cpustate->program->read_byte((cpustate->H << 8) + cpustate->L); break;
 	}
 	return retVal;
 }
@@ -106,7 +106,7 @@ INLINE void SET_REG(i8008_state *cpustate,UINT8 reg, UINT8 val)
 		case 4 : cpustate->E = val; break;
 		case 5 : cpustate->H = val; break;
 		case 6 : cpustate->L = val; break;
-		default: memory_write_byte_8le(cpustate->program, (cpustate->H << 8) + cpustate->L, val); break;
+		default: cpustate->program->write_byte((cpustate->H << 8) + cpustate->L, val); break;
 	}
 }
 
@@ -391,11 +391,11 @@ static void execute_one(i8008_state *cpustate, int opcode)
 							if (((opcode>>4)&3)==0) {
 								// INP
 								cpustate->icount -= 8;
-								cpustate->A = memory_read_byte_8le(cpustate->io, (opcode >> 1) & 0x1f);
+								cpustate->A = cpustate->io->read_byte((opcode >> 1) & 0x1f);
 							} else {
 								// OUT
 								cpustate->icount -= 6;
-								memory_write_byte_8le(cpustate->io, (opcode >> 1) & 0x1f, cpustate->A);
+								cpustate->io->write_byte((opcode >> 1) & 0x1f, cpustate->A);
 							}
 							break;
 					}

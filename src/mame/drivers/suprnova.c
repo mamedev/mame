@@ -876,7 +876,7 @@ MACHINE_DRIVER_END
 static READ32_HANDLER( bios_skip_r )
 {
 #if BIOS_SKIP
-	if ((cpu_get_pc(space->cpu)==0x6f8) || (cpu_get_pc(space->cpu)==0x6fa)) memory_write_byte(space, 0x06000029,1);
+	if ((cpu_get_pc(space->cpu)==0x6f8) || (cpu_get_pc(space->cpu)==0x6fa)) space->write_byte(0x06000029,1);
 #endif
 	return skns_main_ram[0x00028/4];
 }

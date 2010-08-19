@@ -53,7 +53,7 @@ INLINE UINT32 pmmu_translate_addr(m68ki_cpu_core *m68k, UINT32 addr_in)
 		case 2:	// valid 4 byte descriptors
 			tofs *= 4;
 //          logerror("PMMU: reading table A entry at %08x\n", tofs + (root_aptr & 0xfffffffc));
-			tbl_entry = memory_read_dword_32be(m68k->program, tofs + (root_aptr & 0xfffffffc));
+			tbl_entry = m68k->program->read_dword(tofs + (root_aptr & 0xfffffffc));
 			tamode = tbl_entry & 3;
 //          logerror("PMMU: addr %08x entry %08x mode %x tofs %x\n", addr_in, tbl_entry, tamode, tofs);
 			break;
@@ -61,8 +61,8 @@ INLINE UINT32 pmmu_translate_addr(m68ki_cpu_core *m68k, UINT32 addr_in)
 		case 3: // valid 8 byte descriptors
 			tofs *= 8;
 //          logerror("PMMU: reading table A entries at %08x\n", tofs + (root_aptr & 0xfffffffc));
-			tbl_entry2 = memory_read_dword_32be(m68k->program, tofs + (root_aptr & 0xfffffffc));
-			tbl_entry = memory_read_dword_32be(m68k->program, tofs + (root_aptr & 0xfffffffc)+4);
+			tbl_entry2 = m68k->program->read_dword(tofs + (root_aptr & 0xfffffffc));
+			tbl_entry = m68k->program->read_dword(tofs + (root_aptr & 0xfffffffc)+4);
 			tamode = tbl_entry2 & 3;
 //          logerror("PMMU: addr %08x entry %08x entry2 %08x mode %x tofs %x\n", addr_in, tbl_entry, tbl_entry2, tamode, tofs);
 			break;
@@ -82,7 +82,7 @@ INLINE UINT32 pmmu_translate_addr(m68ki_cpu_core *m68k, UINT32 addr_in)
 		case 2: // 4-byte table B descriptor
 			tofs *= 4;
 //          logerror("PMMU: reading table B entry at %08x\n", tofs + tptr);
-			tbl_entry = memory_read_dword_32be(m68k->program, tofs + tptr);
+			tbl_entry = m68k->program->read_dword(tofs + tptr);
 			tbmode = tbl_entry & 3;
 //          logerror("PMMU: addr %08x entry %08x mode %x tofs %x\n", addr_in, tbl_entry, tbmode, tofs);
 			break;
@@ -90,8 +90,8 @@ INLINE UINT32 pmmu_translate_addr(m68ki_cpu_core *m68k, UINT32 addr_in)
 		case 3: // 8-byte table B descriptor
 			tofs *= 8;
 //          logerror("PMMU: reading table B entries at %08x\n", tofs + tptr);
-			tbl_entry2 = memory_read_dword_32be(m68k->program, tofs + tptr);
-			tbl_entry = memory_read_dword_32be(m68k->program, tofs + tptr + 4);
+			tbl_entry2 = m68k->program->read_dword(tofs + tptr);
+			tbl_entry = m68k->program->read_dword(tofs + tptr + 4);
 			tbmode = tbl_entry2 & 3;
 //          logerror("PMMU: addr %08x entry %08x entry2 %08x mode %x tofs %x\n", addr_in, tbl_entry, tbl_entry2, tbmode, tofs);
 			break;
@@ -121,7 +121,7 @@ INLINE UINT32 pmmu_translate_addr(m68ki_cpu_core *m68k, UINT32 addr_in)
 			case 2: // 4-byte table C descriptor
 				tofs *= 4;
 //              logerror("PMMU: reading table C entry at %08x\n", tofs + tptr);
-				tbl_entry = memory_read_dword_32be(m68k->program, tofs + tptr);
+				tbl_entry = m68k->program->read_dword(tofs + tptr);
 				tcmode = tbl_entry & 3;
 //              logerror("PMMU: addr %08x entry %08x mode %x tofs %x\n", addr_in, tbl_entry, tbmode, tofs);
 				break;
@@ -129,8 +129,8 @@ INLINE UINT32 pmmu_translate_addr(m68ki_cpu_core *m68k, UINT32 addr_in)
 			case 3: // 8-byte table C descriptor
 				tofs *= 8;
 //              logerror("PMMU: reading table C entries at %08x\n", tofs + tptr);
-				tbl_entry2 = memory_read_dword_32be(m68k->program, tofs + tptr);
-				tbl_entry = memory_read_dword_32be(m68k->program, tofs + tptr + 4);
+				tbl_entry2 = m68k->program->read_dword(tofs + tptr);
+				tbl_entry = m68k->program->read_dword(tofs + tptr + 4);
 				tcmode = tbl_entry2 & 3;
 //              logerror("PMMU: addr %08x entry %08x entry2 %08x mode %x tofs %x\n", addr_in, tbl_entry, tbl_entry2, tbmode, tofs);
 				break;

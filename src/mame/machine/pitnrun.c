@@ -121,11 +121,11 @@ WRITE8_HANDLER( pitnrun_68705_portB_w )
 	}
 	if (~data & 0x10)
 	{
-		memory_write_byte(cpu0space, address, portA_out);
+		cpu0space->write_byte(address, portA_out);
 	}
 	if (~data & 0x20)
 	{
-		portA_in = memory_read_byte(cpu0space, address);
+		portA_in = cpu0space->read_byte(address);
 	}
 	if (~data & 0x40)
 	{

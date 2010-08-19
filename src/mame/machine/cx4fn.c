@@ -101,45 +101,46 @@ static void CX4_C4DrawWireFrame(running_machine *machine)
 	UINT8 Color;
 	INT32 i;
 
+	address_space *space = machine->device<cpu_device>("maincpu")->space(AS_PROGRAM);
 	for(i = cx4.ram[0x0295]; i > 0; i--, line += 5)
 	{
-		if(memory_read_byte(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), line) == 0xff &&
-		   memory_read_byte(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), line + 1) == 0xff)
+		if(space->read_byte(line) == 0xff &&
+		   space->read_byte(line + 1) == 0xff)
 		{
 			INT32 tmp = line - 5;
-			while(memory_read_byte(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), tmp + 2) == 0xff &&
-				  memory_read_byte(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), tmp + 3) == 0xff &&
+			while(space->read_byte(tmp + 2) == 0xff &&
+				  space->read_byte(tmp + 3) == 0xff &&
 				  (tmp + 2) >= 0)
 			{
 				tmp -= 5;
 			}
 			point1 = (CX4_read(0x1f82) << 16) |
-					 (memory_read_byte(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), tmp + 2) << 8) |
-					  memory_read_byte(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), tmp + 3);
+					 (space->read_byte(tmp + 2) << 8) |
+					  space->read_byte(tmp + 3);
 		}
 		else
 		{
 			point1 = (CX4_read(0x1f82) << 16) |
-					 (memory_read_byte(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), line) << 8) |
-					  memory_read_byte(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), line + 1);
+					 (space->read_byte(line) << 8) |
+					  space->read_byte(line + 1);
 		}
 		point2 = (CX4_read(0x1f82) << 16) |
-				 (memory_read_byte(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), line + 2) << 8) |
-				  memory_read_byte(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), line + 3);
+				 (space->read_byte(line + 2) << 8) |
+				  space->read_byte(line + 3);
 
-		X1=(memory_read_byte(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), point1 + 0) << 8) |
-			memory_read_byte(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), point1 + 1);
-		Y1=(memory_read_byte(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), point1 + 2) << 8) |
-			memory_read_byte(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), point1 + 3);
-		Z1=(memory_read_byte(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), point1 + 4) << 8) |
-			memory_read_byte(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), point1 + 5);
-		X2=(memory_read_byte(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), point2 + 0) << 8) |
-			memory_read_byte(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), point2 + 1);
-		Y2=(memory_read_byte(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), point2 + 2) << 8) |
-			memory_read_byte(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), point2 + 3);
-		Z2=(memory_read_byte(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), point2 + 4) << 8) |
-			memory_read_byte(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), point2 + 5);
-		Color = memory_read_byte(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), line + 4);
+		X1=(space->read_byte(point1 + 0) << 8) |
+			space->read_byte(point1 + 1);
+		Y1=(space->read_byte(point1 + 2) << 8) |
+			space->read_byte(point1 + 3);
+		Z1=(space->read_byte(point1 + 4) << 8) |
+			space->read_byte(point1 + 5);
+		X2=(space->read_byte(point2 + 0) << 8) |
+			space->read_byte(point2 + 1);
+		Y2=(space->read_byte(point2 + 2) << 8) |
+			space->read_byte(point2 + 3);
+		Z2=(space->read_byte(point2 + 4) << 8) |
+			space->read_byte(point2 + 5);
+		Color = space->read_byte(line + 4);
 		CX4_C4DrawLine(X1, Y1, Z1, X2, Y2, Z2, Color);
 	}
 }

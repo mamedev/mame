@@ -839,7 +839,7 @@ static CPU_SET_INFO( z180 );
 static UINT8 z180_readcontrol(z180_state *cpustate, offs_t port)
 {
 	/* normal external readport */
-	UINT8 data = memory_read_byte_8le(cpustate->iospace, port);
+	UINT8 data = cpustate->iospace->read_byte(port);
 
 	/* remap internal I/O registers */
 	if((port & (cpustate->IO_IOCR & 0xc0)) == (cpustate->IO_IOCR & 0xc0))
@@ -1267,7 +1267,7 @@ data |= 0x02; // kludge for 20pacgal
 static void z180_writecontrol(z180_state *cpustate, offs_t port, UINT8 data)
 {
 	/* normal external write port */
-	memory_write_byte_8le(cpustate->iospace, port, data);
+	cpustate->iospace->write_byte(port, data);
 
 	/* remap internal I/O registers */
 	if((port & (cpustate->IO_IOCR & 0xc0)) == (cpustate->IO_IOCR & 0xc0))
@@ -1642,18 +1642,18 @@ static int z180_dma0(z180_state *cpustate, int max_cycles)
 		switch( cpustate->IO_DMODE & (Z180_DMODE_SM | Z180_DMODE_DM) )
 		{
 		case 0x00:	/* memory SAR0+1 to memory DAR0+1 */
-			memory_write_byte_8le(cpustate->program, dar0++, memory_read_byte_8le(cpustate->program, sar0++));
+			cpustate->program->write_byte(dar0++, cpustate->program->read_byte(sar0++));
 			break;
 		case 0x04:	/* memory SAR0-1 to memory DAR0+1 */
-			memory_write_byte_8le(cpustate->program, dar0++, memory_read_byte_8le(cpustate->program, sar0--));
+			cpustate->program->write_byte(dar0++, cpustate->program->read_byte(sar0--));
 			break;
 		case 0x08:	/* memory SAR0 fixed to memory DAR0+1 */
-			memory_write_byte_8le(cpustate->program, dar0++, memory_read_byte_8le(cpustate->program, sar0));
+			cpustate->program->write_byte(dar0++, cpustate->program->read_byte(sar0));
 			break;
 		case 0x0c:	/* I/O SAR0 fixed to memory DAR0+1 */
 			if (cpustate->iol & Z180_DREQ0)
 			{
-				memory_write_byte_8le(cpustate->program, dar0++, IN(cpustate, sar0));
+				cpustate->program->write_byte(dar0++, IN(cpustate, sar0));
 				/* edge sensitive DREQ0 ? */
 				if (cpustate->IO_DCNTL & Z180_DCNTL_DIM0)
 				{
@@ -1663,18 +1663,18 @@ static int z180_dma0(z180_state *cpustate, int max_cycles)
 			}
 			break;
 		case 0x10:	/* memory SAR0+1 to memory DAR0-1 */
-			memory_write_byte_8le(cpustate->program, dar0--, memory_read_byte_8le(cpustate->program, sar0++));
+			cpustate->program->write_byte(dar0--, cpustate->program->read_byte(sar0++));
 			break;
 		case 0x14:	/* memory SAR0-1 to memory DAR0-1 */
-			memory_write_byte_8le(cpustate->program, dar0--, memory_read_byte_8le(cpustate->program, sar0--));
+			cpustate->program->write_byte(dar0--, cpustate->program->read_byte(sar0--));
 			break;
 		case 0x18:	/* memory SAR0 fixed to memory DAR0-1 */
-			memory_write_byte_8le(cpustate->program, dar0--, memory_read_byte_8le(cpustate->program, sar0));
+			cpustate->program->write_byte(dar0--, cpustate->program->read_byte(sar0));
 			break;
 		case 0x1c:	/* I/O SAR0 fixed to memory DAR0-1 */
 			if (cpustate->iol & Z180_DREQ0)
             {
-				memory_write_byte_8le(cpustate->program, dar0--, IN(cpustate, sar0));
+				cpustate->program->write_byte(dar0--, IN(cpustate, sar0));
 				/* edge sensitive DREQ0 ? */
 				if (cpustate->IO_DCNTL & Z180_DCNTL_DIM0)
 				{
@@ -1684,10 +1684,10 @@ static int z180_dma0(z180_state *cpustate, int max_cycles)
 			}
 			break;
 		case 0x20:	/* memory SAR0+1 to memory DAR0 fixed */
-			memory_write_byte_8le(cpustate->program, dar0, memory_read_byte_8le(cpustate->program, sar0++));
+			cpustate->program->write_byte(dar0, cpustate->program->read_byte(sar0++));
 			break;
 		case 0x24:	/* memory SAR0-1 to memory DAR0 fixed */
-			memory_write_byte_8le(cpustate->program, dar0, memory_read_byte_8le(cpustate->program, sar0--));
+			cpustate->program->write_byte(dar0, cpustate->program->read_byte(sar0--));
 			break;
 		case 0x28:	/* reserved */
 			break;
@@ -1696,7 +1696,7 @@ static int z180_dma0(z180_state *cpustate, int max_cycles)
 		case 0x30:	/* memory SAR0+1 to I/O DAR0 fixed */
 			if (cpustate->iol & Z180_DREQ0)
             {
-				OUT(cpustate, dar0, memory_read_byte_8le(cpustate->program, sar0++));
+				OUT(cpustate, dar0, cpustate->program->read_byte(sar0++));
 				/* edge sensitive DREQ0 ? */
 				if (cpustate->IO_DCNTL & Z180_DCNTL_DIM0)
 				{
@@ -1708,7 +1708,7 @@ static int z180_dma0(z180_state *cpustate, int max_cycles)
 		case 0x34:	/* memory SAR0-1 to I/O DAR0 fixed */
 			if (cpustate->iol & Z180_DREQ0)
             {
-				OUT(cpustate, dar0, memory_read_byte_8le(cpustate->program, sar0--));
+				OUT(cpustate, dar0, cpustate->program->read_byte(sar0--));
 				/* edge sensitive DREQ0 ? */
 				if (cpustate->IO_DCNTL & Z180_DCNTL_DIM0)
 				{
@@ -1776,16 +1776,16 @@ static int z180_dma1(z180_state *cpustate)
 	switch (cpustate->IO_DCNTL & (Z180_DCNTL_DIM1 | Z180_DCNTL_DIM0))
 	{
 	case 0x00:	/* memory MAR1+1 to I/O IAR1 fixed */
-		memory_write_byte_8le(cpustate->iospace, iar1, memory_read_byte_8le(cpustate->program, mar1++));
+		cpustate->iospace->write_byte(iar1, cpustate->program->read_byte(mar1++));
 		break;
 	case 0x01:	/* memory MAR1-1 to I/O IAR1 fixed */
-		memory_write_byte_8le(cpustate->iospace, iar1, memory_read_byte_8le(cpustate->program, mar1--));
+		cpustate->iospace->write_byte(iar1, cpustate->program->read_byte(mar1--));
 		break;
 	case 0x02:	/* I/O IAR1 fixed to memory MAR1+1 */
-		memory_write_byte_8le(cpustate->program, mar1++, memory_read_byte_8le(cpustate->iospace, iar1));
+		cpustate->program->write_byte(mar1++, cpustate->iospace->read_byte(iar1));
 		break;
 	case 0x03:	/* I/O IAR1 fixed to memory MAR1-1 */
-		memory_write_byte_8le(cpustate->program, mar1--, memory_read_byte_8le(cpustate->iospace, iar1));
+		cpustate->program->write_byte(mar1--, cpustate->iospace->read_byte(iar1));
 		break;
 	}
 

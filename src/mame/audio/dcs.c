@@ -1778,11 +1778,11 @@ static void reset_timer(running_machine *machine)
 	{
 		/* Road Burners: @ 28: JMP $0032  18032F, same code at $32 */
 
-		if (memory_read_dword(dcs.program, 0x18*4) == 0x0c0030 &&		/* ENA SEC_REG */
-			memory_read_dword(dcs.program, 0x19*4) == 0x804828 &&		/* SI = DM($0482) */
-			memory_read_dword(dcs.program, 0x1a*4) == 0x904828 &&		/* DM($0482) = SI */
-			memory_read_dword(dcs.program, 0x1b*4) == 0x0C0020 &&		/* DIS SEC_REG */
-			memory_read_dword(dcs.program, 0x1c*4) == 0x0A001F)			/* RTI */
+		if (dcs.program->read_dword(0x18*4) == 0x0c0030 &&		/* ENA SEC_REG */
+			dcs.program->read_dword(0x19*4) == 0x804828 &&		/* SI = DM($0482) */
+			dcs.program->read_dword(0x1a*4) == 0x904828 &&		/* DM($0482) = SI */
+			dcs.program->read_dword(0x1b*4) == 0x0C0020 &&		/* DIS SEC_REG */
+			dcs.program->read_dword(0x1c*4) == 0x0A001F)			/* RTI */
 		{
 			dcs.timer_ignore = TRUE;
 		}
@@ -1952,7 +1952,7 @@ static TIMER_DEVICE_CALLBACK( dcs_irq )
 
 		for (i = 0; i < count; i++)
 		{
-			buffer[i] = memory_read_word(dcs.data, reg * 2);
+			buffer[i] = dcs.data->read_word(reg * 2);
 			reg += dcs.incs;
 		}
 
@@ -2252,10 +2252,10 @@ static int preprocess_stage_1(running_machine *machine, UINT16 data)
 					if (transfer.writes_left & 1)
 						transfer.temp = data;
 					else
-						memory_write_dword(dcs.program, transfer.start++ * 4, (transfer.temp << 8) | (data & 0xff));
+						dcs.program->write_dword(transfer.start++ * 4, (transfer.temp << 8) | (data & 0xff));
 				}
 				else
-					memory_write_word(dcs.data, transfer.start++ * 2, data);
+					dcs.data->write_word(transfer.start++ * 2, data);
 
 				/* if we're done, start a timer to send the response words */
 				if (transfer.state == 0)

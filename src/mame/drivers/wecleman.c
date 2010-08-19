@@ -495,7 +495,7 @@ static WRITE16_HANDLER( blitter_w )
 			for ( ; size > 0 ; size--)
 			{
 				/* maybe slower than a memcpy but safer (and errors are logged) */
-				memory_write_word(space, dest, memory_read_word(space, src));
+				space->write_word(dest, space->read_word(src));
 				src += 2;
 				dest += 2;
 			}
@@ -508,23 +508,23 @@ static WRITE16_HANDLER( blitter_w )
 				int i, j, destptr;
 
 				/* Read offset of source from the list of blits */
-				i = src + memory_read_word(space, list+2);
+				i = src + space->read_word(list+2);
 				j = i + (size<<1);
 				destptr = dest;
 
 				for (; i<j; destptr+=2, i+=2)
-					memory_write_word(space, destptr, memory_read_word(space, i));
+					space->write_word(destptr, space->read_word(i));
 
 				destptr = dest + 14;
-				i = memory_read_word(space, list) + spr_color_offs;
-				memory_write_word(space, destptr, i);
+				i = space->read_word(list) + spr_color_offs;
+				space->write_word(destptr, i);
 
 				dest += 16;
 				list += 4;
 			}
 
 			/* hack for the blit to Sprites RAM - Sprite list end-marker */
-			memory_write_word(space, dest, 0xFFFF);
+			space->write_word(dest, 0xFFFF);
 		}
 	}
 }

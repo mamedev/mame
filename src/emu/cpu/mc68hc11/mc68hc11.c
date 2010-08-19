@@ -97,21 +97,21 @@ static UINT8 hc11_regs_r(hc11_state *cpustate, UINT32 address)
 	switch(reg)
 	{
 		case 0x00:		/* PORTA */
-			return memory_read_byte(cpustate->io, MC68HC11_IO_PORTA);
+			return cpustate->io->read_byte(MC68HC11_IO_PORTA);
 		case 0x01:		/* DDRA */
 			return 0;
 		case 0x02:		/* PIOC */
 			return 0;
 		case 0x03:		/* PORTC */
-			return memory_read_byte(cpustate->io, MC68HC11_IO_PORTC);
+			return cpustate->io->read_byte(MC68HC11_IO_PORTC);
 		case 0x04:		/* PORTB */
-			return memory_read_byte(cpustate->io, MC68HC11_IO_PORTB);
+			return cpustate->io->read_byte(MC68HC11_IO_PORTB);
 		case 0x08:		/* PORTD */
-			return memory_read_byte(cpustate->io, MC68HC11_IO_PORTD);
+			return cpustate->io->read_byte(MC68HC11_IO_PORTD);
 		case 0x09:		/* DDRD */
 			return 0;
 		case 0x0a:		/* PORTE */
-			return memory_read_byte(cpustate->io, MC68HC11_IO_PORTE);
+			return cpustate->io->read_byte(MC68HC11_IO_PORTE);
 		case 0x23:
 			return cpustate->tflg1;
 		case 0x28:		/* SPCR1 */
@@ -122,44 +122,44 @@ static UINT8 hc11_regs_r(hc11_state *cpustate, UINT32 address)
 		{
 			if (cpustate->adctl & 0x10)
 			{
-				return memory_read_byte(cpustate->io, (cpustate->adctl & 0x4) + MC68HC11_IO_AD0);
+				return cpustate->io->read_byte((cpustate->adctl & 0x4) + MC68HC11_IO_AD0);
 			}
 			else
 			{
-				return memory_read_byte(cpustate->io, (cpustate->adctl & 0x7) + MC68HC11_IO_AD0);
+				return cpustate->io->read_byte((cpustate->adctl & 0x7) + MC68HC11_IO_AD0);
 			}
 		}
 		case 0x32:		/* ADR2 */
 		{
 			if (cpustate->adctl & 0x10)
 			{
-				return memory_read_byte(cpustate->io, (cpustate->adctl & 0x4) + MC68HC11_IO_AD1);
+				return cpustate->io->read_byte((cpustate->adctl & 0x4) + MC68HC11_IO_AD1);
 			}
 			else
 			{
-				return memory_read_byte(cpustate->io, (cpustate->adctl & 0x7) + MC68HC11_IO_AD0);
+				return cpustate->io->read_byte((cpustate->adctl & 0x7) + MC68HC11_IO_AD0);
 			}
 		}
 		case 0x33:		/* ADR3 */
 		{
 			if (cpustate->adctl & 0x10)
 			{
-				return memory_read_byte(cpustate->io, (cpustate->adctl & 0x4) + MC68HC11_IO_AD2);
+				return cpustate->io->read_byte((cpustate->adctl & 0x4) + MC68HC11_IO_AD2);
 			}
 			else
 			{
-				return memory_read_byte(cpustate->io, (cpustate->adctl & 0x7) + MC68HC11_IO_AD0);
+				return cpustate->io->read_byte((cpustate->adctl & 0x7) + MC68HC11_IO_AD0);
 			}
 		}
 		case 0x34:		/* ADR4 */
 		{
 			if (cpustate->adctl & 0x10)
 			{
-				return memory_read_byte(cpustate->io, (cpustate->adctl & 0x4) + MC68HC11_IO_AD3);
+				return cpustate->io->read_byte((cpustate->adctl & 0x4) + MC68HC11_IO_AD3);
 			}
 			else
 			{
-				return memory_read_byte(cpustate->io, (cpustate->adctl & 0x7) + MC68HC11_IO_AD0);
+				return cpustate->io->read_byte((cpustate->adctl & 0x7) + MC68HC11_IO_AD0);
 			}
 		}
 		case 0x38:		/* OPT2 */
@@ -175,9 +175,9 @@ static UINT8 hc11_regs_r(hc11_state *cpustate, UINT32 address)
 		case 0x74:		/* SCSR1 */
 			return 0x40;
 		case 0x7c:		/* PORTH */
-			return memory_read_byte(cpustate->io, MC68HC11_IO_PORTH);
+			return cpustate->io->read_byte(MC68HC11_IO_PORTH);
 		case 0x7e:		/* PORTG */
-			return memory_read_byte(cpustate->io, MC68HC11_IO_PORTG);
+			return cpustate->io->read_byte(MC68HC11_IO_PORTG);
 		case 0x7f:		/* DDRG */
 			return 0;
 
@@ -186,7 +186,7 @@ static UINT8 hc11_regs_r(hc11_state *cpustate, UINT32 address)
 		case 0x89:		/* SPSR2 */
 			return 0x80;
 		case 0x8a:		/* SPDR2 */
-			return memory_read_byte(cpustate->io, MC68HC11_IO_SPI2_DATA);
+			return cpustate->io->read_byte(MC68HC11_IO_SPI2_DATA);
 
 		case 0x8b:		/* OPT4 */
 			return 0;
@@ -203,25 +203,25 @@ static void hc11_regs_w(hc11_state *cpustate, UINT32 address, UINT8 value)
 	switch(reg)
 	{
 		case 0x00:		/* PORTA */
-			memory_write_byte(cpustate->io, MC68HC11_IO_PORTA, value);
+			cpustate->io->write_byte(MC68HC11_IO_PORTA, value);
 			return;
 		case 0x01:		/* DDRA */
 			//mame_printf_debug("HC11: ddra = %02X\n", value);
 			return;
 		case 0x03:		/* PORTC */
-			memory_write_byte(cpustate->io, MC68HC11_IO_PORTC, value);
+			cpustate->io->write_byte(MC68HC11_IO_PORTC, value);
 			return;
 		case 0x04:		/* PORTC */
-			memory_write_byte(cpustate->io, MC68HC11_IO_PORTB, value);
+			cpustate->io->write_byte(MC68HC11_IO_PORTB, value);
 			return;
 		case 0x08:		/* PORTD */
-			memory_write_byte(cpustate->io, MC68HC11_IO_PORTD, value); //mask & 0x3f?
+			cpustate->io->write_byte(MC68HC11_IO_PORTD, value); //mask & 0x3f?
 			return;
 		case 0x09:		/* DDRD */
 			//mame_printf_debug("HC11: ddrd = %02X\n", value);
 			return;
 		case 0x0a:		/* PORTE */
-			memory_write_byte(cpustate->io, MC68HC11_IO_PORTE, value);
+			cpustate->io->write_byte(MC68HC11_IO_PORTE, value);
 			return;
 		case 0x22:		/* TMSK1 */
 			return;
@@ -271,13 +271,13 @@ static void hc11_regs_w(hc11_state *cpustate, UINT32 address, UINT8 value)
 		case 0x77:		/* SCDRL */
 			return;
 		case 0x7c:		/* PORTH */
-			memory_write_byte(cpustate->io, MC68HC11_IO_PORTH, value);
+			cpustate->io->write_byte(MC68HC11_IO_PORTH, value);
 			return;
 		case 0x7d:		/* DDRH */
 			//mame_printf_debug("HC11: ddrh = %02X at %04X\n", value, cpustate->pc);
 			return;
 		case 0x7e:		/* PORTG */
-			memory_write_byte(cpustate->io, MC68HC11_IO_PORTG, value);
+			cpustate->io->write_byte(MC68HC11_IO_PORTG, value);
 			return;
 		case 0x7f:		/* DDRG */
 			//mame_printf_debug("HC11: ddrg = %02X at %04X\n", value, cpustate->pc);
@@ -288,7 +288,7 @@ static void hc11_regs_w(hc11_state *cpustate, UINT32 address, UINT8 value)
 		case 0x89:		/* SPSR2 */
 			return;
 		case 0x8a:		/* SPDR2 */
-			memory_write_byte(cpustate->io, MC68HC11_IO_SPI2_DATA, value);
+			cpustate->io->write_byte(MC68HC11_IO_SPI2_DATA, value);
 			return;
 
 		case 0x8b:		/* OPT4 */
@@ -324,7 +324,7 @@ INLINE UINT8 READ8(hc11_state *cpustate, UINT32 address)
 	{
 		return cpustate->internal_ram[address-cpustate->ram_position];
 	}
-	return memory_read_byte(cpustate->program, address);
+	return cpustate->program->read_byte(address);
 }
 
 INLINE void WRITE8(hc11_state *cpustate, UINT32 address, UINT8 value)
@@ -339,7 +339,7 @@ INLINE void WRITE8(hc11_state *cpustate, UINT32 address, UINT8 value)
 		cpustate->internal_ram[address-cpustate->ram_position] = value;
 		return;
 	}
-	memory_write_byte(cpustate->program, address, value);
+	cpustate->program->write_byte(address, value);
 }
 
 INLINE UINT16 READ16(hc11_state *cpustate, UINT32 address)

@@ -573,7 +573,7 @@ static WRITE8_HANDLER( sranger_prot_w )
 {
 	/* check code at 0x2ce2 (in sranger), protection is so dire that I can't even exactly
        estabilish if what I'm doing can be considered or not a kludge... -AS */
-	memory_write_byte(space,0xcd99,0xff);
+	space->write_byte(0xcd99,0xff);
 }
 
 static ADDRESS_MAP_START( rranger_map, ADDRESS_SPACE_PROGRAM, 8 )

@@ -131,12 +131,12 @@ INLINE UINT8 RB(sh2_state *sh2, offs_t A)
 		return sh2_internal_r(sh2->internal, (A & 0x1fc)>>2, 0xff << (((~A) & 3)*8)) >> (((~A) & 3)*8);
 
 	if (A >= 0xc0000000)
-		return memory_read_byte_32be(sh2->program, A);
+		return sh2->program->read_byte(A);
 
 	if (A >= 0x40000000)
 		return 0xa5;
 
-	return memory_read_byte_32be(sh2->program, A & AM);
+	return sh2->program->read_byte(A & AM);
 }
 
 INLINE UINT16 RW(sh2_state *sh2, offs_t A)
@@ -145,12 +145,12 @@ INLINE UINT16 RW(sh2_state *sh2, offs_t A)
 		return sh2_internal_r(sh2->internal, (A & 0x1fc)>>2, 0xffff << (((~A) & 2)*8)) >> (((~A) & 2)*8);
 
 	if (A >= 0xc0000000)
-		return memory_read_word_32be(sh2->program, A);
+		return sh2->program->read_word(A);
 
 	if (A >= 0x40000000)
 		return 0xa5a5;
 
-	return memory_read_word_32be(sh2->program, A & AM);
+	return sh2->program->read_word(A & AM);
 }
 
 INLINE UINT32 RL(sh2_state *sh2, offs_t A)
@@ -159,12 +159,12 @@ INLINE UINT32 RL(sh2_state *sh2, offs_t A)
 		return sh2_internal_r(sh2->internal, (A & 0x1fc)>>2, 0xffffffff);
 
 	if (A >= 0xc0000000)
-		return memory_read_dword_32be(sh2->program, A);
+		return sh2->program->read_dword(A);
 
 	if (A >= 0x40000000)
 		return 0xa5a5a5a5;
 
-  return memory_read_dword_32be(sh2->program, A & AM);
+  return sh2->program->read_dword(A & AM);
 }
 
 INLINE void WB(sh2_state *sh2, offs_t A, UINT8 V)
@@ -178,14 +178,14 @@ INLINE void WB(sh2_state *sh2, offs_t A, UINT8 V)
 
 	if (A >= 0xc0000000)
 	{
-		memory_write_byte_32be(sh2->program, A,V);
+		sh2->program->write_byte(A,V);
 		return;
 	}
 
 	if (A >= 0x40000000)
 		return;
 
-	memory_write_byte_32be(sh2->program, A & AM,V);
+	sh2->program->write_byte(A & AM,V);
 }
 
 INLINE void WW(sh2_state *sh2, offs_t A, UINT16 V)
@@ -198,14 +198,14 @@ INLINE void WW(sh2_state *sh2, offs_t A, UINT16 V)
 
 	if (A >= 0xc0000000)
 	{
-		memory_write_word_32be(sh2->program, A,V);
+		sh2->program->write_word(A,V);
 		return;
 	}
 
 	if (A >= 0x40000000)
 		return;
 
-	memory_write_word_32be(sh2->program, A & AM,V);
+	sh2->program->write_word(A & AM,V);
 }
 
 INLINE void WL(sh2_state *sh2, offs_t A, UINT32 V)
@@ -218,14 +218,14 @@ INLINE void WL(sh2_state *sh2, offs_t A, UINT32 V)
 
 	if (A >= 0xc0000000)
 	{
-		memory_write_dword_32be(sh2->program, A,V);
+		sh2->program->write_dword(A,V);
 		return;
 	}
 
 	if (A >= 0x40000000)
 		return;
 
-	memory_write_dword_32be(sh2->program, A & AM,V);
+	sh2->program->write_dword(A & AM,V);
 }
 
 /*  code                 cycles  t-bit

@@ -161,7 +161,7 @@ static void load_to_memory(z8_state *cpustate, address_space *space)
 	UINT16 address = register_pair_read(cpustate, dst);
 	UINT8 data = register_read(cpustate, src);
 
-	memory_write_byte(cpustate->program, address, data);
+	cpustate->program->write_byte(address, data);
 }
 
 static void load_from_memory_autoinc(z8_state *cpustate, address_space *space)
@@ -190,7 +190,7 @@ static void load_to_memory_autoinc(z8_state *cpustate, address_space *space)
 	UINT16 address = register_pair_read(cpustate, dst);
 	UINT8 data = register_read(cpustate, real_src);
 
-	memory_write_byte(cpustate->program, address, data);
+	cpustate->program->write_byte(address, data);
 
 	register_pair_write(cpustate, dst, address + 1);
 	register_write(cpustate, src, real_src + 1);

@@ -555,11 +555,11 @@ static WRITE8_HANDLER( mcu_io_w )
 	switch ((mcu_control >> 3) & 3)
 	{
 		case 0:
-			memory_write_byte(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), offset, data);
+			space->machine->device<z80_device>("maincpu")->space(AS_PROGRAM)->write_byte(offset, data);
 			break;
 
 		case 2:
-			memory_write_byte(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_IO), offset, data);
+			space->machine->device<z80_device>("maincpu")->space(AS_IO)->write_byte(offset, data);
 			break;
 
 		default:
@@ -575,13 +575,13 @@ static READ8_HANDLER( mcu_io_r )
 	switch ((mcu_control >> 3) & 3)
 	{
 		case 0:
-			return memory_read_byte(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), offset);
+			return space->machine->device<z80_device>("maincpu")->space(AS_PROGRAM)->read_byte(offset);
 
 		case 1:
 			return memory_region(space->machine, "maincpu")[offset + 0x10000];
 
 		case 2:
-			return memory_read_byte(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_IO), offset);
+			return space->machine->device<z80_device>("maincpu")->space(AS_IO)->read_byte(offset);
 
 		default:
 			logerror("%03X: MCU movx read mode %02X offset %04X\n",

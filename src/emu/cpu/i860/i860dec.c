@@ -369,7 +369,7 @@ static UINT32 ifetch (i860s *cpustate, UINT32 pc)
 
 	/* Since i860 instructions are always stored LSB first (regardless of
        the BE bit), we need to adjust the instruction below on MSB hosts.  */
-	w1 = memory_read_dword_64le(cpustate->program, phys_pc);
+	w1 = cpustate->program->read_dword(phys_pc);
 #ifdef HOST_MSB
 	BYTE_REV32 (w1);
 #endif /* HOST_MSB.  */
@@ -407,7 +407,7 @@ static UINT32 get_address_translation (i860s *cpustate, UINT32 vaddr, int is_dat
 
 	/* Get page directory entry at DTB:DIR:00.  */
 	pg_dir_entry_a = dtb | (vdir << 2);
-	pg_dir_entry = memory_read_dword_64le(cpustate->program, pg_dir_entry_a);
+	pg_dir_entry = cpustate->program->read_dword(pg_dir_entry_a);
 #ifdef HOST_MSB
 	BYTE_REV32 (pg_dir_entry);
 #endif
@@ -455,7 +455,7 @@ static UINT32 get_address_translation (i860s *cpustate, UINT32 vaddr, int is_dat
 	/* Get page table entry at PFA1:PAGE:00.  */
 	pfa1 = pg_dir_entry & 0xfffff000;
 	pg_tbl_entry_a = pfa1 | (vpage << 2);
-	pg_tbl_entry = memory_read_dword_64le(cpustate->program, pg_tbl_entry_a);
+	pg_tbl_entry = cpustate->program->read_dword(pg_tbl_entry_a);
 #ifdef HOST_MSB
 	BYTE_REV32 (pg_tbl_entry);
 #endif
@@ -505,8 +505,8 @@ static UINT32 get_address_translation (i860s *cpustate, UINT32 vaddr, int is_dat
 	BYTE_REV32 (ttpde);
 	BYTE_REV32 (ttpte);
 #endif
-	memory_write_dword_64le(cpustate->program, pg_dir_entry_a, ttpde);
-	memory_write_dword_64le(cpustate->program, pg_tbl_entry_a, ttpte);
+	cpustate->program->write_dword(pg_dir_entry_a, ttpde);
+	cpustate->program->write_dword(pg_tbl_entry_a, ttpte);
 
 	if (is_write && is_dataref && (pg_tbl_entry & 0x40) == 0)
 	{
@@ -567,12 +567,12 @@ static UINT32 readmemi_emu (i860s *cpustate, UINT32 addr, int size)
 	/* Now do the actual read.  */
 	if (size == 1)
 	{
-		UINT32 ret = memory_read_byte_64le(cpustate->program, addr);
+		UINT32 ret = cpustate->program->read_byte(addr);
 		return ret & 0xff;
 	}
 	else if (size == 2)
 	{
-		UINT32 ret = memory_read_word_64le(cpustate->program, addr);
+		UINT32 ret = cpustate->program->read_word(addr);
 #ifdef HOST_MSB
 		BYTE_REV16 (ret);
 #endif
@@ -580,7 +580,7 @@ static UINT32 readmemi_emu (i860s *cpustate, UINT32 addr, int size)
 	}
 	else if (size == 4)
 	{
-		UINT32 ret = memory_read_dword_64le(cpustate->program, addr);
+		UINT32 ret = cpustate->program->read_dword(addr);
 #ifdef HOST_MSB
 		BYTE_REV32 (ret);
 #endif
@@ -630,20 +630,20 @@ static void writememi_emu (i860s *cpustate, UINT32 addr, int size, UINT32 data)
 
 	/* Now do the actual write.  */
 	if (size == 1)
-		memory_write_byte_64le(cpustate->program, addr, data);
+		cpustate->program->write_byte(addr, data);
 	else if (size == 2)
 	{
 #ifdef HOST_MSB
 		BYTE_REV16 (data);
 #endif
-		memory_write_word_64le(cpustate->program, addr, data);
+		cpustate->program->write_word(addr, data);
 	}
 	else if (size == 4)
 	{
 #ifdef HOST_MSB
 		BYTE_REV32 (data);
 #endif
-		memory_write_dword_64le(cpustate->program, addr, data);
+		cpustate->program->write_dword(addr, data);
 	}
 	else
 		assert (0);
@@ -689,28 +689,28 @@ static void fp_readmem_emu (i860s *cpustate, UINT32 addr, int size, UINT8 *dest)
 
 	if (size == 4)
 	{
-		dest[0] = memory_read_byte_64le(cpustate->program, addr+3);
-		dest[1] = memory_read_byte_64le(cpustate->program, addr+2);
-		dest[2] = memory_read_byte_64le(cpustate->program, addr+1);
-		dest[3] = memory_read_byte_64le(cpustate->program, addr+0);
+		dest[0] = cpustate->program->read_byte(addr+3);
+		dest[1] = cpustate->program->read_byte(addr+2);
+		dest[2] = cpustate->program->read_byte(addr+1);
+		dest[3] = cpustate->program->read_byte(addr+0);
 	}
 	else if (size == 8)
 	{
-		dest[0] = memory_read_byte_64le(cpustate->program, addr+7);
-		dest[1] = memory_read_byte_64le(cpustate->program, addr+6);
-		dest[2] = memory_read_byte_64le(cpustate->program, addr+5);
-		dest[3] = memory_read_byte_64le(cpustate->program, addr+4);
-		dest[4] = memory_read_byte_64le(cpustate->program, addr+3);
-		dest[5] = memory_read_byte_64le(cpustate->program, addr+2);
-		dest[6] = memory_read_byte_64le(cpustate->program, addr+1);
-		dest[7] = memory_read_byte_64le(cpustate->program, addr+0);
+		dest[0] = cpustate->program->read_byte(addr+7);
+		dest[1] = cpustate->program->read_byte(addr+6);
+		dest[2] = cpustate->program->read_byte(addr+5);
+		dest[3] = cpustate->program->read_byte(addr+4);
+		dest[4] = cpustate->program->read_byte(addr+3);
+		dest[5] = cpustate->program->read_byte(addr+2);
+		dest[6] = cpustate->program->read_byte(addr+1);
+		dest[7] = cpustate->program->read_byte(addr+0);
 	}
 	else if (size == 16)
 	{
 		int i;
 		for (i = 0; i < 16; i++)
 		{
-			dest[i] = memory_read_byte_64le(cpustate->program, addr+15-i);
+			dest[i] = cpustate->program->read_byte(addr+15-i);
 		}
 	}
 }
@@ -757,13 +757,13 @@ static void fp_writemem_emu (i860s *cpustate, UINT32 addr, int size, UINT8 *data
 	if (size == 4)
 	{
 #if 1
-		memory_write_byte_64le(cpustate->program, addr+3, data[0]);
-		memory_write_byte_64le(cpustate->program, addr+2, data[1]);
-		memory_write_byte_64le(cpustate->program, addr+1, data[2]);
-		memory_write_byte_64le(cpustate->program, addr+0, data[3]);
+		cpustate->program->write_byte(addr+3, data[0]);
+		cpustate->program->write_byte(addr+2, data[1]);
+		cpustate->program->write_byte(addr+1, data[2]);
+		cpustate->program->write_byte(addr+0, data[3]);
 #else
 		UINT32 ddd = (data[3]) | (data[2] << 8) | (data[1] << 16) |(data[0] << 24);
-		memory_write_dword_64le(cpustate->program, addr+0, ddd);
+		cpustate->program->write_dword(addr+0, ddd);
 #endif
 	}
 	else if (size == 8)
@@ -771,25 +771,25 @@ static void fp_writemem_emu (i860s *cpustate, UINT32 addr, int size, UINT8 *data
 		/* Special: watch for wmask != 0xff, which means we're doing pst.d.  */
 		if (wmask == 0xff)
 		{
-			memory_write_byte_64le(cpustate->program, addr+7, data[0]);
-			memory_write_byte_64le(cpustate->program, addr+6, data[1]);
-			memory_write_byte_64le(cpustate->program, addr+5, data[2]);
-			memory_write_byte_64le(cpustate->program, addr+4, data[3]);
-			memory_write_byte_64le(cpustate->program, addr+3, data[4]);
-			memory_write_byte_64le(cpustate->program, addr+2, data[5]);
-			memory_write_byte_64le(cpustate->program, addr+1, data[6]);
-			memory_write_byte_64le(cpustate->program, addr+0, data[7]);
+			cpustate->program->write_byte(addr+7, data[0]);
+			cpustate->program->write_byte(addr+6, data[1]);
+			cpustate->program->write_byte(addr+5, data[2]);
+			cpustate->program->write_byte(addr+4, data[3]);
+			cpustate->program->write_byte(addr+3, data[4]);
+			cpustate->program->write_byte(addr+2, data[5]);
+			cpustate->program->write_byte(addr+1, data[6]);
+			cpustate->program->write_byte(addr+0, data[7]);
 		}
 		else
 		{
-			if (wmask & 0x80) memory_write_byte_64le(cpustate->program, addr+7, data[0]);
-			if (wmask & 0x40) memory_write_byte_64le(cpustate->program, addr+6, data[1]);
-			if (wmask & 0x20) memory_write_byte_64le(cpustate->program, addr+5, data[2]);
-			if (wmask & 0x10) memory_write_byte_64le(cpustate->program, addr+4, data[3]);
-			if (wmask & 0x08) memory_write_byte_64le(cpustate->program, addr+3, data[4]);
-			if (wmask & 0x04) memory_write_byte_64le(cpustate->program, addr+2, data[5]);
-			if (wmask & 0x02) memory_write_byte_64le(cpustate->program, addr+1, data[6]);
-			if (wmask & 0x01) memory_write_byte_64le(cpustate->program, addr+0, data[7]);
+			if (wmask & 0x80) cpustate->program->write_byte(addr+7, data[0]);
+			if (wmask & 0x40) cpustate->program->write_byte(addr+6, data[1]);
+			if (wmask & 0x20) cpustate->program->write_byte(addr+5, data[2]);
+			if (wmask & 0x10) cpustate->program->write_byte(addr+4, data[3]);
+			if (wmask & 0x08) cpustate->program->write_byte(addr+3, data[4]);
+			if (wmask & 0x04) cpustate->program->write_byte(addr+2, data[5]);
+			if (wmask & 0x02) cpustate->program->write_byte(addr+1, data[6]);
+			if (wmask & 0x01) cpustate->program->write_byte(addr+0, data[7]);
 		}
 	}
 	else if (size == 16)
@@ -797,7 +797,7 @@ static void fp_writemem_emu (i860s *cpustate, UINT32 addr, int size, UINT8 *data
 		int i;
 		for (i = 0; i < 16; i++)
 		{
-			memory_write_byte_64le(cpustate->program, addr+15-i, data[i]);
+			cpustate->program->write_byte(addr+15-i, data[i]);
 		}
 	}
 
@@ -4552,7 +4552,7 @@ static void disasm (i860s *cpustate, UINT32 addr, int len)
 		/* Note that we print the incoming (possibly virtual) address as the
            PC rather than the translated address.  */
 		fprintf (stderr, "  (%s) 0x%08x: ", cpustate->device->tag(), addr);
-		insn = memory_read_dword_64le(cpustate->program, phys_addr);
+		insn = cpustate->program->read_dword(phys_addr);
 #ifdef HOST_MSB
 		BYTE_REV32 (insn);
 #endif /* HOST_MSB.  */
@@ -4584,7 +4584,7 @@ static void dbg_db (i860s *cpustate, UINT32 addr, int len)
 			if (GET_DIRBASE_ATE ())
 				phys_addr = get_address_translation (cpustate, addr, 1	/* is_dataref */, 0	/* is_write */);
 
-			b[i] = memory_read_byte_64le(cpustate->program, phys_addr);
+			b[i] = cpustate->program->read_byte(phys_addr);
 			fprintf (stderr, "%02x ", b[i]);
 			addr++;
 		}

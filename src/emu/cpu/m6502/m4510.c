@@ -185,12 +185,12 @@ INLINE int m4510_cpu_readop_arg(m4510_Regs *cpustate)
 static UINT8 default_rdmem_id(address_space *space, offs_t address)
 {
 	m4510_Regs *cpustate = get_safe_token(space->cpu);
-	return memory_read_byte_8le(space, M4510_MEM(address));
+	return space->read_byte(M4510_MEM(address));
 }
 static void default_wrmem_id(address_space *space, offs_t address, UINT8 data)
 {
 	m4510_Regs *cpustate = get_safe_token(space->cpu);
-	memory_write_byte_8le(space, M4510_MEM(address), data);
+	space->write_byte(M4510_MEM(address), data);
 }
 
 static CPU_INIT( m4510 )

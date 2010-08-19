@@ -92,8 +92,8 @@ static TIMER_CALLBACK( snes_reset_oam_address )
 
 	if (!(snes_ppu.screen_disabled)) //Reset OAM address, byuu says it happens at H=10
 	{
-		memory_write_byte(space, OAMADDL, snes_ppu.oam.saved_address_low); /* Reset oam address */
-		memory_write_byte(space, OAMADDH, snes_ppu.oam.saved_address_high);
+		space->write_byte(OAMADDL, snes_ppu.oam.saved_address_low); /* Reset oam address */
+		space->write_byte(OAMADDH, snes_ppu.oam.saved_address_high);
 		snes_ppu.oam.first_sprite = snes_ppu.oam.priority_rotation ? (snes_ppu.oam.address >> 1) & 127 : 0;
 	}
 }
@@ -296,7 +296,7 @@ READ8_HANDLER( snes_open_bus_r )
 		return 0xff;
 
 	recurse = 1;
-	result = memory_read_byte_8le(space, cpu_get_pc(space->cpu) - 1); //LAST opcode that's fetched on the bus
+	result = space->read_byte(cpu_get_pc(space->cpu) - 1); //LAST opcode that's fetched on the bus
 	recurse = 0;
 	return result;
 }
@@ -476,7 +476,7 @@ READ8_HANDLER( snes_r_io )
 	switch (offset)
 	{
 		case WMDATA:	/* Data to read from WRAM */
-			value = memory_read_byte(space, 0x7e0000 + state->wram_address++);
+			value = space->read_byte(0x7e0000 + state->wram_address++);
 			state->wram_address &= 0x1ffff;
 			return value;
 		case OLDJOY1:	/* Data for old NES controllers (JOYSER1) */
@@ -625,7 +625,7 @@ WRITE8_HANDLER( snes_w_io )
 	switch (offset)
 	{
 		case WMDATA:	/* Data to write to WRAM */
-			memory_write_byte(space, 0x7e0000 + state->wram_address++, data );
+			space->write_byte(0x7e0000 + state->wram_address++, data );
 			state->wram_address &= 0x1ffff;
 			return;
 		case WMADDL:	/* Address to read/write to wram (low) */
@@ -914,7 +914,7 @@ READ8_HANDLER( snes_r_bank1 )
 	UINT16 address = offset & 0xffff;
 
 	if (address < 0x2000)											/* Mirror of Low RAM */
-		value = memory_read_byte(space, 0x7e0000 + address);
+		value = space->read_byte(0x7e0000 + address);
 	else if (address < 0x6000)										/* I/O */
 	{
 		if (state->cart[0].mode == SNES_MODE_BSX && address >= 0x5000)
@@ -971,7 +971,7 @@ READ8_HANDLER( snes_r_bank2 )
 	UINT16 address = offset & 0xffff;
 
 	if (address < 0x2000)											/* Mirror of Low RAM */
-		value = memory_read_byte(space, 0x7e0000 + address);
+		value = space->read_byte(0x7e0000 + address);
 	else if (address < 0x6000)										/* I/O */
 	{
 		if (state->cart[0].mode == SNES_MODE_BSX && address >= 0x5000)
@@ -1149,17 +1149,17 @@ READ8_HANDLER( snes_r_bank6 )
 	UINT16 address = offset & 0xffff;
 
 	if (state->has_addon_chip == HAS_SUPERFX)
-		value = memory_read_byte(space, offset);
+		value = space->read_byte(offset);
 	else if (address < 0x8000)
 	{
 		if (state->cart[0].mode != SNES_MODE_25)
-			value = memory_read_byte(space, offset);
+			value = space->read_byte(offset);
 		else if ((state->has_addon_chip == HAS_CX4) && (address >= 0x6000))
 			value = CX4_read(address - 0x6000);
 		else							/* Mode 25 has SRAM not mirrored from lower banks */
 		{
 			if (address < 0x6000)
-				value = memory_read_byte(space, offset);
+				value = space->read_byte(offset);
 			else if ((offset >= 0x300000) && (state->cart[0].sram > 0))
 			{
 //              int mask = state->cart[0].sram - 1; /* Limit SRAM size to what's actually present */
@@ -1229,7 +1229,7 @@ READ8_HANDLER( snes_r_bank7 )
 	else if ((state->cart[0].mode & 5) && !(state->has_addon_chip == HAS_SUPERFX))		/* Mode 20 & 22 */
 	{
 		if (address < 0x8000)
-			value = memory_read_byte(space, 0x400000 + offset);
+			value = space->read_byte(0x400000 + offset);
 		else
 			value = snes_ram[0xc00000 + offset];
 	}
@@ -1250,7 +1250,7 @@ WRITE8_HANDLER( snes_w_bank1 )
 	UINT16 address = offset & 0xffff;
 
 	if (address < 0x2000)							/* Mirror of Low RAM */
-		memory_write_byte(space, 0x7e0000 + address, data);
+		space->write_byte(0x7e0000 + address, data);
 	else if (address < 0x6000)						/* I/O */
 	{
 		if (state->cart[0].mode == SNES_MODE_BSX && address >= 0x5000)
@@ -1301,7 +1301,7 @@ WRITE8_HANDLER( snes_w_bank2 )
 	UINT16 address = offset & 0xffff;
 
 	if (address < 0x2000)							/* Mirror of Low RAM */
-		memory_write_byte(space, 0x7e0000 + address, data);
+		space->write_byte(0x7e0000 + address, data);
 	else if (address < 0x6000)						/* I/O */
 	{
 		if (state->cart[0].mode == SNES_MODE_BSX && address >= 0x5000)
@@ -1410,17 +1410,17 @@ WRITE8_HANDLER( snes_w_bank6 )
 	UINT16 address = offset & 0xffff;
 
 	if (state->has_addon_chip == HAS_SUPERFX)
-		memory_write_byte(space, offset, data);
+		space->write_byte(offset, data);
 	else if (address < 0x8000)
 	{
 		if ((state->has_addon_chip == HAS_CX4) && (address >= 0x6000))
 			CX4_write(space->machine, address - 0x6000, data);
 		else if (state->cart[0].mode != SNES_MODE_25)
-			memory_write_byte(space, offset, data);
+			space->write_byte(offset, data);
 		else	/* Mode 25 has SRAM not mirrored from lower banks */
 		{
 			if (address < 0x6000)
-				memory_write_byte(space, offset, data);
+				space->write_byte(offset, data);
 			else if ((offset >= 0x300000) && (state->cart[0].sram > 0))
 			{
 //              int mask = state->cart[0].sram - 1; /* Limit SRAM size to what's actually present */
@@ -1611,7 +1611,7 @@ static void snes_init_ram( running_machine *machine )
 	/* make sure it happens to the 65816 (CPU 0) */
 	for (i = 0; i < (128*1024); i++)
 	{
-		memory_write_byte(cpu0space, 0x7e0000 + i, 0x55);
+		cpu0space->write_byte(0x7e0000 + i, 0x55);
 	}
 
 	/* Inititialize registers/variables */
@@ -1981,7 +1981,7 @@ INLINE UINT8 snes_abus_read( address_space *space, UINT32 abus )
 	if (!dma_abus_valid(abus))
 		return 0;
 
-	return memory_read_byte(space, abus);
+	return space->read_byte(abus);
 }
 
 INLINE void snes_dma_transfer( address_space *space, UINT8 dma, UINT32 abus, UINT16 bbus )
@@ -1997,7 +1997,7 @@ INLINE void snes_dma_transfer( address_space *space, UINT8 dma, UINT32 abus, UIN
 		{
 			//illegal WRAM->WRAM transfer (bus conflict)
 			//no read occurs; write does occur
-			memory_write_byte(space, abus, 0x00);
+			space->write_byte(abus, 0x00);
 			return;
 		}
 		else
@@ -2005,7 +2005,7 @@ INLINE void snes_dma_transfer( address_space *space, UINT8 dma, UINT32 abus, UIN
 			if (!dma_abus_valid(abus))
 				return;
 
-			memory_write_byte(space, abus, memory_read_byte(space, bbus));
+			space->write_byte(abus, space->read_byte(bbus));
 			return;
 		}
 	}
@@ -2020,7 +2020,7 @@ INLINE void snes_dma_transfer( address_space *space, UINT8 dma, UINT32 abus, UIN
 		}
 		else
 		{
-			memory_write_byte(space, bbus, snes_abus_read(space, abus));
+			space->write_byte(bbus, snes_abus_read(space, abus));
 			return;
 		}
 	}

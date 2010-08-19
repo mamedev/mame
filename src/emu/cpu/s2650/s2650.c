@@ -151,7 +151,7 @@ static const int S2650_relative[0x100] =
  * RDMEM
  * read memory byte from addr
  ***************************************************************/
-#define RDMEM(addr) memory_read_byte_8le(s2650c->program, addr)
+#define RDMEM(addr) s2650c->program->read_byte(addr)
 
 static void s2650_set_sense(s2650_regs *s2650c, int state);
 
@@ -161,7 +161,7 @@ INLINE void set_psu(s2650_regs *s2650c, UINT8 new_val)
 
     s2650c->psu = new_val;
     if ((new_val ^ old) & FO)
-    	memory_write_byte_8le(s2650c->io, S2650_FO_PORT, (new_val & FO) ? 1 : 0);
+    	s2650c->io->write_byte(S2650_FO_PORT, (new_val & FO) ? 1 : 0);
 }
 
 INLINE UINT8 get_sp(s2650_regs *s2650c)
@@ -532,7 +532,7 @@ INLINE UINT8 ARG(s2650_regs *s2650c)
  * Store source register to memory addr (CC unchanged)
  ***************************************************************/
 #define M_STR(address,source)									\
-	memory_write_byte_8le(s2650c->program, address, source)
+	s2650c->program->write_byte(address, source)
 
 /***************************************************************
  * M_AND
@@ -677,7 +677,7 @@ INLINE UINT8 ARG(s2650_regs *s2650c)
  ***************************************************************/
 #define M_SPSU()												\
 {																\
-	R0 = ((s2650c->psu & ~PSU34) | (memory_read_byte_8le(s2650c->io, S2650_SENSE_PORT) ? SI : 0)); \
+	R0 = ((s2650c->psu & ~PSU34) | (s2650c->io->read_byte(S2650_SENSE_PORT) ? SI : 0)); \
 	SET_CC(R0); 												\
 }
 
@@ -746,7 +746,7 @@ INLINE UINT8 ARG(s2650_regs *s2650c)
 #define M_TPSU()												\
 {																\
 	UINT8 tpsu = ARG(s2650c);										\
-    UINT8 rpsu = (s2650c->psu | (memory_read_byte_8le(s2650c->io, S2650_SENSE_PORT) ? SI : 0)); \
+    UINT8 rpsu = (s2650c->psu | (s2650c->io->read_byte(S2650_SENSE_PORT) ? SI : 0)); \
 	s2650c->psl &= ~CC;												\
 	if( (rpsu & tpsu) != tpsu )									\
 		s2650c->psl |= 0x80;											\
@@ -879,7 +879,7 @@ static int s2650_get_sense(s2650_regs *s2650c)
 {
 	/* OR'd with Input to allow for external connections */
 
-    return (((s2650c->psu & SI) ? 1 : 0) | ((memory_read_byte_8le(s2650c->io, S2650_SENSE_PORT) & SI) ? 1 : 0));
+    return (((s2650c->psu & SI) ? 1 : 0) | ((s2650c->io->read_byte(S2650_SENSE_PORT) & SI) ? 1 : 0));
 }
 
 static CPU_EXECUTE( s2650 )
@@ -1018,7 +1018,7 @@ static CPU_EXECUTE( s2650 )
 			case 0x32:		/* REDC,2 */
 			case 0x33:		/* REDC,3 */
 				s2650c->icount -= 6;
-				s2650c->reg[s2650c->r] = memory_read_byte_8le(s2650c->io, S2650_CTRL_PORT);
+				s2650c->reg[s2650c->r] = s2650c->io->read_byte(S2650_CTRL_PORT);
 				SET_CC( s2650c->reg[s2650c->r] );
 				break;
 
@@ -1108,7 +1108,7 @@ static CPU_EXECUTE( s2650 )
 			case 0x56:		/* REDE,2 v */
 			case 0x57:		/* REDE,3 v */
 				s2650c->icount -= 9;
-				s2650c->reg[s2650c->r] = memory_read_byte_8le( s2650c->io, ARG(s2650c) );
+				s2650c->reg[s2650c->r] = s2650c->io->read_byte( ARG(s2650c) );
 				SET_CC(s2650c->reg[s2650c->r]);
 				break;
 
@@ -1167,7 +1167,7 @@ static CPU_EXECUTE( s2650 )
 			case 0x72:		/* REDD,2 */
 			case 0x73:		/* REDD,3 */
 				s2650c->icount -= 6;
-				s2650c->reg[s2650c->r] = memory_read_byte_8le(s2650c->io, S2650_DATA_PORT);
+				s2650c->reg[s2650c->r] = s2650c->io->read_byte(S2650_DATA_PORT);
 				SET_CC(s2650c->reg[s2650c->r]);
 				break;
 
@@ -1323,7 +1323,7 @@ static CPU_EXECUTE( s2650 )
 			case 0xb2:		/* WRTC,2 */
 			case 0xb3:		/* WRTC,3 */
 				s2650c->icount -= 6;
-				memory_write_byte_8le(s2650c->io, S2650_CTRL_PORT,s2650c->reg[s2650c->r]);
+				s2650c->io->write_byte(S2650_CTRL_PORT,s2650c->reg[s2650c->r]);
 				break;
 
 			case 0xb4:		/* TPSU */
@@ -1409,7 +1409,7 @@ static CPU_EXECUTE( s2650 )
 			case 0xd6:		/* WRTE,2 v */
 			case 0xd7:		/* WRTE,3 v */
 				s2650c->icount -= 9;
-				memory_write_byte_8le( s2650c->io, ARG(s2650c), s2650c->reg[s2650c->r] );
+				s2650c->io->write_byte( ARG(s2650c), s2650c->reg[s2650c->r] );
 				break;
 
 			case 0xd8:		/* BIRR,0 (*)a */
@@ -1467,7 +1467,7 @@ static CPU_EXECUTE( s2650 )
 			case 0xf2:		/* WRTD,2 */
 			case 0xf3:		/* WRTD,3 */
 				s2650c->icount -= 6;
-				memory_write_byte_8le(s2650c->io, S2650_DATA_PORT, s2650c->reg[s2650c->r]);
+				s2650c->io->write_byte(S2650_DATA_PORT, s2650c->reg[s2650c->r]);
 				break;
 
 			case 0xf4:		/* TMI,0  v */

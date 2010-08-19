@@ -903,43 +903,43 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_READ1, 4, 0):		/* READ    dst,src1,space_BYTE    */
-				PARAM0 = memory_read_byte(drcbe->space[PARAM2 / 16], PARAM1);
+				PARAM0 = drcbe->space[PARAM2 / 16]->read_byte(PARAM1);
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_READ2, 4, 0):		/* READ    dst,src1,space_WORD    */
-				PARAM0 = memory_read_word(drcbe->space[PARAM2 / 16], PARAM1);
+				PARAM0 = drcbe->space[PARAM2 / 16]->read_word(PARAM1);
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_READ4, 4, 0):		/* READ    dst,src1,space_DWORD   */
-				PARAM0 = memory_read_dword(drcbe->space[PARAM2 / 16], PARAM1);
+				PARAM0 = drcbe->space[PARAM2 / 16]->read_dword(PARAM1);
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_READM2, 4, 0):		/* READM   dst,src1,mask,space_WORD */
-				PARAM0 = memory_read_word_masked(drcbe->space[PARAM3 / 16], PARAM1, PARAM2);
+				PARAM0 = drcbe->space[PARAM3 / 16]->read_word(PARAM1, PARAM2);
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_READM4, 4, 0):		/* READM   dst,src1,mask,space_DWORD */
-				PARAM0 = memory_read_dword_masked(drcbe->space[PARAM3 / 16], PARAM1, PARAM2);
+				PARAM0 = drcbe->space[PARAM3 / 16]->read_dword(PARAM1, PARAM2);
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_WRITE1, 4, 0):		/* WRITE   dst,src1,space_BYTE     */
-				memory_write_byte(drcbe->space[PARAM2 / 16], PARAM0, PARAM1);
+				drcbe->space[PARAM2 / 16]->write_byte(PARAM0, PARAM1);
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_WRITE2, 4, 0):		/* WRITE   dst,src1,space_WORD     */
-				memory_write_word(drcbe->space[PARAM2 / 16], PARAM0, PARAM1);
+				drcbe->space[PARAM2 / 16]->write_word(PARAM0, PARAM1);
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_WRITE4, 4, 0):		/* WRITE   dst,src1,space_DWORD    */
-				memory_write_dword(drcbe->space[PARAM2 / 16], PARAM0, PARAM1);
+				drcbe->space[PARAM2 / 16]->write_dword(PARAM0, PARAM1);
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_WRITEM2, 4, 0):	/* WRITEM  dst,src1,mask,space_WORD */
-				memory_write_word_masked(drcbe->space[PARAM3 / 16], PARAM0, PARAM1, PARAM2);
+				drcbe->space[PARAM3 / 16]->write_word(PARAM0, PARAM1, PARAM2);
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_WRITEM4, 4, 0):	/* WRITEM  dst,src1,mask,space_DWORD */
-				memory_write_dword_masked(drcbe->space[PARAM3 / 16], PARAM0, PARAM1, PARAM2);
+				drcbe->space[PARAM3 / 16]->write_dword(PARAM0, PARAM1, PARAM2);
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_CARRY, 4, 1):		/* CARRY   src,bitnum             */
@@ -1482,59 +1482,59 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_READ1, 8, 0):		/* DREAD   dst,src1,space_BYTE    */
-				DPARAM0 = memory_read_byte(drcbe->space[PARAM2 / 16], PARAM1);
+				DPARAM0 = drcbe->space[PARAM2 / 16]->read_byte(PARAM1);
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_READ2, 8, 0):		/* DREAD   dst,src1,space_WORD    */
-				DPARAM0 = memory_read_word(drcbe->space[PARAM2 / 16], PARAM1);
+				DPARAM0 = drcbe->space[PARAM2 / 16]->read_word(PARAM1);
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_READ4, 8, 0):		/* DREAD   dst,src1,space_DWORD   */
-				DPARAM0 = memory_read_dword(drcbe->space[PARAM2 / 16], PARAM1);
+				DPARAM0 = drcbe->space[PARAM2 / 16]->read_dword(PARAM1);
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_READ8, 8, 0):		/* DREAD   dst,src1,space_QOWRD   */
-				DPARAM0 = memory_read_qword(drcbe->space[PARAM2 / 16], PARAM1);
+				DPARAM0 = drcbe->space[PARAM2 / 16]->read_qword(PARAM1);
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_READM2, 8, 0):		/* DREADM  dst,src1,mask,space_WORD */
-				DPARAM0 = memory_read_word_masked(drcbe->space[PARAM3 / 16], PARAM1, PARAM2);
+				DPARAM0 = drcbe->space[PARAM3 / 16]->read_word(PARAM1, PARAM2);
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_READM4, 8, 0):		/* DREADM  dst,src1,mask,space_DWORD */
-				DPARAM0 = memory_read_dword_masked(drcbe->space[PARAM3 / 16], PARAM1, PARAM2);
+				DPARAM0 = drcbe->space[PARAM3 / 16]->read_dword(PARAM1, PARAM2);
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_READM8, 8, 0):		/* DREADM  dst,src1,mask,space_QWORD */
-				DPARAM0 = memory_read_qword_masked(drcbe->space[PARAM3 / 16], PARAM1, PARAM2);
+				DPARAM0 = drcbe->space[PARAM3 / 16]->read_qword(PARAM1, PARAM2);
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_WRITE1, 8, 0):		/* DWRITE  dst,src1,space_BYTE    */
-				memory_write_byte(drcbe->space[PARAM2 / 16], PARAM0, PARAM1);
+				drcbe->space[PARAM2 / 16]->write_byte(PARAM0, PARAM1);
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_WRITE2, 8, 0):		/* DWRITE  dst,src1,space_WORD    */
-				memory_write_word(drcbe->space[PARAM2 / 16], PARAM0, PARAM1);
+				drcbe->space[PARAM2 / 16]->write_word(PARAM0, PARAM1);
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_WRITE4, 8, 0):		/* DWRITE  dst,src1,space_DWORD   */
-				memory_write_dword(drcbe->space[PARAM2 / 16], PARAM0, PARAM1);
+				drcbe->space[PARAM2 / 16]->write_dword(PARAM0, PARAM1);
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_WRITE8, 8, 0):		/* DWRITE  dst,src1,space_QWORD   */
-				memory_write_qword(drcbe->space[PARAM2 / 16], PARAM0, DPARAM1);
+				drcbe->space[PARAM2 / 16]->write_qword(PARAM0, DPARAM1);
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_WRITEM2, 8, 0):	/* DWRITEM dst,src1,mask,space_WORD */
-				memory_write_word_masked(drcbe->space[PARAM3 / 16], PARAM0, DPARAM1, DPARAM2);
+				drcbe->space[PARAM3 / 16]->write_word(PARAM0, DPARAM1, DPARAM2);
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_WRITEM4, 8, 0):	/* DWRITEM dst,src1,mask,space_DWORD */
-				memory_write_dword_masked(drcbe->space[PARAM3 / 16], PARAM0, DPARAM1, DPARAM2);
+				drcbe->space[PARAM3 / 16]->write_dword(PARAM0, DPARAM1, DPARAM2);
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_WRITEM8, 8, 0):	/* DWRITEM dst,src1,mask,space_QWORD */
-				memory_write_qword_masked(drcbe->space[PARAM3 / 16], PARAM0, DPARAM1, DPARAM2);
+				drcbe->space[PARAM3 / 16]->write_qword(PARAM0, DPARAM1, DPARAM2);
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_CARRY, 8, 0):		/* DCARRY  src,bitnum             */
@@ -1895,11 +1895,11 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_FREAD, 4, 0):		/* FSREAD  dst,src1,space         */
-				PARAM0 = memory_read_dword(drcbe->space[PARAM2], PARAM1);
+				PARAM0 = drcbe->space[PARAM2]->read_dword(PARAM1);
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_FWRITE, 4, 0):		/* FSWRITE dst,src1,space         */
-				memory_write_dword(drcbe->space[PARAM2], PARAM0, PARAM1);
+				drcbe->space[PARAM2]->write_dword(PARAM0, PARAM1);
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_FMOV, 4, 1):		/* FSMOV   dst,src[,c]            */
@@ -2030,11 +2030,11 @@ static int drcbec_execute(drcbe_state *drcbe, drcuml_codehandle *entry)
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_FREAD, 8, 0):		/* FDREAD  dst,src1,space         */
-				DPARAM0 = memory_read_qword(drcbe->space[PARAM2], PARAM1);
+				DPARAM0 = drcbe->space[PARAM2]->read_qword(PARAM1);
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_FWRITE, 8, 0):		/* FDWRITE dst,src1,space         */
-				memory_write_qword(drcbe->space[PARAM2], PARAM0, DPARAM1);
+				drcbe->space[PARAM2]->write_qword(PARAM0, DPARAM1);
 				break;
 
 			case MAKE_OPCODE_SHORT(DRCUML_OP_FMOV, 8, 1):		/* FDMOV   dst,src[,c]            */

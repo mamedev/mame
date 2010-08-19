@@ -545,7 +545,7 @@ static WRITE32_HANDLER( tattass_control_w )
 				int d=readBitCount/8;
 				int m=7-(readBitCount%8);
 				int a=(byteAddr+d)%1024;
-				int b=memory_read_byte(eeprom_space, a);
+				int b=eeprom_space->read_byte(a);
 
 				tattass_eprom_bit=(b>>m)&1;
 
@@ -562,7 +562,7 @@ static WRITE32_HANDLER( tattass_control_w )
 					int b=(buffer[24]<<7)|(buffer[25]<<6)|(buffer[26]<<5)|(buffer[27]<<4)
 						|(buffer[28]<<3)|(buffer[29]<<2)|(buffer[30]<<1)|(buffer[31]<<0);
 
-					memory_write_byte(eeprom_space, byteAddr, b);
+					eeprom_space->write_byte(byteAddr, b);
 				}
 				lastClock=data&0x20;
 				return;
@@ -577,7 +577,7 @@ static WRITE32_HANDLER( tattass_control_w )
 
 				/* Check for read command */
 				if (buffer[0] && buffer[1]) {
-					tattass_eprom_bit=(memory_read_byte(eeprom_space, byteAddr)>>7)&1;
+					tattass_eprom_bit=(eeprom_space->read_byte(byteAddr)>>7)&1;
 					readBitCount=1;
 					pendingCommand=1;
 				}

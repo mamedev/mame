@@ -127,10 +127,10 @@ Table 3-2.  TMS32025/26 Memory Blocks
 
 #define SET_PC(x)	do { cpustate->PC = (x); } while (0)
 
-#define P_IN(A)			(memory_read_word_16be(cpustate->io, (A)<<1))
-#define P_OUT(A,V)		(memory_write_word_16be(cpustate->io, ((A)<<1),(V)))
-#define S_IN(A)			(memory_read_word_16be(cpustate->io, (A)<<1))
-#define S_OUT(A,V)		(memory_write_word_16be(cpustate->io, ((A)<<1),(V)))
+#define P_IN(A)			(cpustate->io->read_word((A)<<1))
+#define P_OUT(A,V)		(cpustate->io->write_word(((A)<<1),(V)))
+#define S_IN(A)			(cpustate->io->read_word((A)<<1))
+#define S_OUT(A,V)		(cpustate->io->write_word(((A)<<1),(V)))
 
 #define M_RDOP(A)		((cpustate->pgmmap[(A) >> 7]) ? (cpustate->pgmmap[(A) >> 7][(A) & 0x7f]) : memory_decrypted_read_word(cpustate->program, (A)<<1))
 #define M_RDOP_ARG(A)	((cpustate->pgmmap[(A) >> 7]) ? (cpustate->pgmmap[(A) >> 7][(A) & 0x7f]) : memory_decrypted_read_word(cpustate->program, (A)<<1))
@@ -324,7 +324,7 @@ INLINE UINT16 M_RDROM(tms32025_state *cpustate, offs_t addr)
 	addr &= 0xffff;
 	ram = cpustate->pgmmap[addr >> 7];
 	if (ram) return ram[addr & 0x7f];
-	return memory_read_word_16be(cpustate->program, addr << 1);
+	return cpustate->program->read_word(addr << 1);
 }
 
 INLINE void M_WRTROM(tms32025_state *cpustate, offs_t addr, UINT16 data)
@@ -333,7 +333,7 @@ INLINE void M_WRTROM(tms32025_state *cpustate, offs_t addr, UINT16 data)
 	addr &= 0xffff;
 	ram = cpustate->pgmmap[addr >> 7];
 	if (ram) { ram[addr & 0x7f] = data; }
-	else memory_write_word_16be(cpustate->program, addr << 1, data);
+	else cpustate->program->write_word(addr << 1, data);
 }
 
 INLINE UINT16 M_RDRAM(tms32025_state *cpustate, offs_t addr)
@@ -342,7 +342,7 @@ INLINE UINT16 M_RDRAM(tms32025_state *cpustate, offs_t addr)
 	addr &= 0xffff;
 	ram = cpustate->datamap[addr >> 7];
 	if (ram) return ram[addr & 0x7f];
-	return memory_read_word_16be(cpustate->data, addr << 1);
+	return cpustate->data->read_word(addr << 1);
 }
 
 INLINE void M_WRTRAM(tms32025_state *cpustate, offs_t addr, UINT16 data)
@@ -359,7 +359,7 @@ INLINE void M_WRTRAM(tms32025_state *cpustate, offs_t addr, UINT16 data)
 				cpustate->IFR |= 0x20;
 		}
 	}
-	else memory_write_word_16be(cpustate->data, addr << 1, data);
+	else cpustate->data->write_word(addr << 1, data);
 }
 
 

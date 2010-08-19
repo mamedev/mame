@@ -168,7 +168,7 @@ static TIMER_CALLBACK( ertictac_audio_tick )
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
-	dac_signed_data_w(space->machine->device("dac"), (0x80) | (memory_read_byte(space,vidc_sndcur)));
+	dac_signed_data_w(space->machine->device("dac"), (0x80) | (space->read_byte(vidc_sndcur)));
 
 	vidc_sndcur++;
 

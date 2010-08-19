@@ -1506,18 +1506,18 @@ static void dma_direct_lv0(address_space *space)
 	for (; scu_size_0 > 0; scu_size_0-=scu_dst_add_0)
 	{
 		if(scu_dst_add_0 == 2)
-			memory_write_word(space,scu_dst_0,memory_read_word(space,scu_src_0));
+			space->write_word(scu_dst_0,space->read_word(scu_src_0));
 		else if(scu_dst_add_0 == 8)
 		{
-			memory_write_word(space,scu_dst_0,memory_read_word(space,scu_src_0));
-			memory_write_word(space,scu_dst_0+2,memory_read_word(space,scu_src_0));
-			memory_write_word(space,scu_dst_0+4,memory_read_word(space,scu_src_0+2));
-			memory_write_word(space,scu_dst_0+6,memory_read_word(space,scu_src_0+2));
+			space->write_word(scu_dst_0,space->read_word(scu_src_0));
+			space->write_word(scu_dst_0+2,space->read_word(scu_src_0));
+			space->write_word(scu_dst_0+4,space->read_word(scu_src_0+2));
+			space->write_word(scu_dst_0+6,space->read_word(scu_src_0+2));
 		}
 		else
 		{
-			memory_write_word(space,scu_dst_0,memory_read_word(space,scu_src_0));
-			memory_write_word(space,scu_dst_0+2,memory_read_word(space,scu_src_0+2));
+			space->write_word(scu_dst_0,space->read_word(scu_src_0));
+			space->write_word(scu_dst_0+2,space->read_word(scu_src_0+2));
 		}
 
 		scu_dst_0+=scu_dst_add_0;
@@ -1615,11 +1615,11 @@ static void dma_direct_lv1(address_space *space)
 	for (; scu_size_1 > 0; scu_size_1-=scu_dst_add_1)
 	{
 		if(scu_dst_add_1 == 2)
-			memory_write_word(space,scu_dst_1,memory_read_word(space,scu_src_1));
+			space->write_word(scu_dst_1,space->read_word(scu_src_1));
 		else
 		{
-			memory_write_word(space,scu_dst_1,memory_read_word(space,scu_src_1));
-			memory_write_word(space,scu_dst_1+2,memory_read_word(space,scu_src_1+2));
+			space->write_word(scu_dst_1,space->read_word(scu_src_1));
+			space->write_word(scu_dst_1+2,space->read_word(scu_src_1+2));
 		}
 
 		scu_dst_1+=scu_dst_add_1;
@@ -1716,11 +1716,11 @@ static void dma_direct_lv2(address_space *space)
 	for (; scu_size_2 > 0; scu_size_2-=scu_dst_add_2)
 	{
 		if(scu_dst_add_2 == 2)
-			memory_write_word(space,scu_dst_2,memory_read_word(space,scu_src_2));
+			space->write_word(scu_dst_2,space->read_word(scu_src_2));
 		else
 		{
-			memory_write_word(space,scu_dst_2,memory_read_word(space,scu_src_2));
-			memory_write_word(space,scu_dst_2+2,memory_read_word(space,scu_src_2+2));
+			space->write_word(scu_dst_2,space->read_word(scu_src_2));
+			space->write_word(scu_dst_2+2,space->read_word(scu_src_2+2));
 		}
 
 		scu_dst_2+=scu_dst_add_2;
@@ -1760,9 +1760,9 @@ static void dma_indirect_lv0(address_space *space)
 		tmp_src = scu_index_0;
 
 		/*Thanks for Runik of Saturnin for pointing this out...*/
-		scu_size_0 = memory_read_dword(space,scu_index_0);
-		scu_src_0 =  memory_read_dword(space,scu_index_0+8);
-		scu_dst_0 =  memory_read_dword(space,scu_index_0+4);
+		scu_size_0 = space->read_dword(scu_index_0);
+		scu_src_0 =  space->read_dword(scu_index_0+8);
+		scu_dst_0 =  space->read_dword(scu_index_0+4);
 
 		/*Indirect Mode end factor*/
 		if(scu_src_0 & 0x80000000)
@@ -1786,7 +1786,7 @@ static void dma_indirect_lv0(address_space *space)
 		for (; scu_size_0 > 0; scu_size_0-=scu_dst_add_0)
 		{
 			if(scu_dst_add_0 == 2)
-				memory_write_word(space,scu_dst_0,memory_read_word(space,scu_src_0));
+				space->write_word(scu_dst_0,space->read_word(scu_src_0));
 			else
 			{
 				/* some games, eg columns97 are a bit weird, I'm not sure this is correct
@@ -1794,15 +1794,15 @@ static void dma_indirect_lv0(address_space *space)
                   can't access 2 byte boundaries, and the end of the sprite list never gets marked,
                   the length of the transfer is also set to a 2 byte boundary, maybe the add values
                   should be different, I don't know */
-				memory_write_word(space,scu_dst_0,memory_read_word(space,scu_src_0));
-				memory_write_word(space,scu_dst_0+2,memory_read_word(space,scu_src_0+2));
+				space->write_word(scu_dst_0,space->read_word(scu_src_0));
+				space->write_word(scu_dst_0+2,space->read_word(scu_src_0+2));
 			}
 			scu_dst_0+=scu_dst_add_0;
 			scu_src_0+=scu_src_add_0;
 		}
 
-		//if(DRUP(0))   memory_write_dword(space,tmp_src+8,scu_src_0|job_done ? 0x80000000 : 0);
-		//if(DWUP(0)) memory_write_dword(space,tmp_src+4,scu_dst_0);
+		//if(DRUP(0))   space->write_dword(tmp_src+8,scu_src_0|job_done ? 0x80000000 : 0);
+		//if(DWUP(0)) space->write_dword(tmp_src+4,scu_dst_0);
 
 		scu_index_0 = tmp_src+0xc;
 
@@ -1827,9 +1827,9 @@ static void dma_indirect_lv1(address_space *space)
 	do{
 		tmp_src = scu_index_1;
 
-		scu_size_1 = memory_read_dword(space,scu_index_1);
-		scu_src_1 =  memory_read_dword(space,scu_index_1+8);
-		scu_dst_1 =  memory_read_dword(space,scu_index_1+4);
+		scu_size_1 = space->read_dword(scu_index_1);
+		scu_src_1 =  space->read_dword(scu_index_1+8);
+		scu_dst_1 =  space->read_dword(scu_index_1+4);
 
 		/*Indirect Mode end factor*/
 		if(scu_src_1 & 0x80000000)
@@ -1855,7 +1855,7 @@ static void dma_indirect_lv1(address_space *space)
 		{
 
 			if(scu_dst_add_1 == 2)
-				memory_write_word(space,scu_dst_1,memory_read_word(space,scu_src_1));
+				space->write_word(scu_dst_1,space->read_word(scu_src_1));
 			else
 			{
 				/* some games, eg columns97 are a bit weird, I'm not sure this is correct
@@ -1863,15 +1863,15 @@ static void dma_indirect_lv1(address_space *space)
                   can't access 2 byte boundaries, and the end of the sprite list never gets marked,
                   the length of the transfer is also set to a 2 byte boundary, maybe the add values
                   should be different, I don't know */
-				memory_write_word(space,scu_dst_1,memory_read_word(space,scu_src_1));
-				memory_write_word(space,scu_dst_1+2,memory_read_word(space,scu_src_1+2));
+				space->write_word(scu_dst_1,space->read_word(scu_src_1));
+				space->write_word(scu_dst_1+2,space->read_word(scu_src_1+2));
 			}
 			scu_dst_1+=scu_dst_add_1;
 			scu_src_1+=scu_src_add_1;
 		}
 
-		//if(DRUP(1))   memory_write_dword(space,tmp_src+8,scu_src_1|job_done ? 0x80000000 : 0);
-		//if(DWUP(1)) memory_write_dword(space,tmp_src+4,scu_dst_1);
+		//if(DRUP(1))   space->write_dword(tmp_src+8,scu_src_1|job_done ? 0x80000000 : 0);
+		//if(DWUP(1)) space->write_dword(tmp_src+4,scu_dst_1);
 
 		scu_index_1 = tmp_src+0xc;
 
@@ -1896,9 +1896,9 @@ static void dma_indirect_lv2(address_space *space)
 	do{
 		tmp_src = scu_index_2;
 
-		scu_size_2 = memory_read_dword(space,scu_index_2);
-		scu_src_2 =  memory_read_dword(space,scu_index_2+8);
-		scu_dst_2 =  memory_read_dword(space,scu_index_2+4);
+		scu_size_2 = space->read_dword(scu_index_2);
+		scu_src_2 =  space->read_dword(scu_index_2+8);
+		scu_dst_2 =  space->read_dword(scu_index_2+4);
 
 		/*Indirect Mode end factor*/
 		if(scu_src_2 & 0x80000000)
@@ -1922,7 +1922,7 @@ static void dma_indirect_lv2(address_space *space)
 		for (; scu_size_2 > 0; scu_size_2-=scu_dst_add_2)
 		{
 			if(scu_dst_add_2 == 2)
-				memory_write_word(space,scu_dst_2,memory_read_word(space,scu_src_2));
+				space->write_word(scu_dst_2,space->read_word(scu_src_2));
 			else
 			{
 				/* some games, eg columns97 are a bit weird, I'm not sure this is correct
@@ -1930,16 +1930,16 @@ static void dma_indirect_lv2(address_space *space)
                   can't access 2 byte boundaries, and the end of the sprite list never gets marked,
                   the length of the transfer is also set to a 2 byte boundary, maybe the add values
                   should be different, I don't know */
-				memory_write_word(space,scu_dst_2,memory_read_word(space,scu_src_2));
-				memory_write_word(space,scu_dst_2+2,memory_read_word(space,scu_src_2+2));
+				space->write_word(scu_dst_2,space->read_word(scu_src_2));
+				space->write_word(scu_dst_2+2,space->read_word(scu_src_2+2));
 			}
 
 			scu_dst_2+=scu_dst_add_2;
 			scu_src_2+=scu_src_add_2;
 		}
 
-		//if(DRUP(2))   memory_write_dword(space,tmp_src+8,scu_src_2|job_done ? 0x80000000 : 0);
-		//if(DWUP(2)) memory_write_dword(space,tmp_src+4,scu_dst_2);
+		//if(DRUP(2))   space->write_dword(tmp_src+8,scu_src_2|job_done ? 0x80000000 : 0);
+		//if(DWUP(2)) space->write_dword(tmp_src+4,scu_dst_2);
 
 		scu_index_2 = tmp_src+0xc;
 

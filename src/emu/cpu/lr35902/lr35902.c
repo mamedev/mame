@@ -129,8 +129,8 @@ typedef int (*OpcodeEmulator) (lr35902_state *cpustate);
 /* Memory functions                                                         */
 /****************************************************************************/
 
-#define mem_ReadByte(cs,A)		((UINT8)memory_read_byte_8le((cs)->w.program,A))
-#define mem_WriteByte(cs,A,V)	(memory_write_byte_8le((cs)->w.program,A,V))
+#define mem_ReadByte(cs,A)		((UINT8)(cs)->w.program->read_byte(A))
+#define mem_WriteByte(cs,A,V)	((cs)->w.program->write_byte(A,V))
 
 INLINE UINT16 mem_ReadWord (lr35902_state *cpustate, UINT32 address)
 {

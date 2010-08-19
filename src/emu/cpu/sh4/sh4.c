@@ -126,9 +126,9 @@ INLINE UINT8 RB(sh4_state *sh4, offs_t A)
 		return sh4_internal_r(sh4->internal, ((A & 0x0fc) >> 2) | ((A & 0x1fe0000) >> 11), 0xff << ((A & 3)*8)) >> ((A & 3)*8);
 
 	if (A >= 0xe0000000)
-		return memory_read_byte_64le(sh4->program, A);
+		return sh4->program->read_byte(A);
 
-	return memory_read_byte_64le(sh4->program, A & AM);
+	return sh4->program->read_byte(A & AM);
 }
 
 INLINE UINT16 RW(sh4_state *sh4, offs_t A)
@@ -137,9 +137,9 @@ INLINE UINT16 RW(sh4_state *sh4, offs_t A)
 		return sh4_internal_r(sh4->internal, ((A & 0x0fc) >> 2) | ((A & 0x1fe0000) >> 11), 0xffff << ((A & 2)*8)) >> ((A & 2)*8);
 
 	if (A >= 0xe0000000)
-		return memory_read_word_64le(sh4->program, A);
+		return sh4->program->read_word(A);
 
-	return memory_read_word_64le(sh4->program, A & AM);
+	return sh4->program->read_word(A & AM);
 }
 
 INLINE UINT32 RL(sh4_state *sh4, offs_t A)
@@ -148,9 +148,9 @@ INLINE UINT32 RL(sh4_state *sh4, offs_t A)
 		return sh4_internal_r(sh4->internal, ((A & 0x0fc) >> 2) | ((A & 0x1fe0000) >> 11), 0xffffffff);
 
 	if (A >= 0xe0000000)
-		return memory_read_dword_64le(sh4->program, A);
+		return sh4->program->read_dword(A);
 
-  return memory_read_dword_64le(sh4->program, A & AM);
+  return sh4->program->read_dword(A & AM);
 }
 
 INLINE void WB(sh4_state *sh4, offs_t A, UINT8 V)
@@ -164,11 +164,11 @@ INLINE void WB(sh4_state *sh4, offs_t A, UINT8 V)
 
 	if (A >= 0xe0000000)
 	{
-		memory_write_byte_64le(sh4->program, A,V);
+		sh4->program->write_byte(A,V);
 		return;
 	}
 
-	memory_write_byte_64le(sh4->program, A & AM,V);
+	sh4->program->write_byte(A & AM,V);
 }
 
 INLINE void WW(sh4_state *sh4, offs_t A, UINT16 V)
@@ -181,11 +181,11 @@ INLINE void WW(sh4_state *sh4, offs_t A, UINT16 V)
 
 	if (A >= 0xe0000000)
 	{
-		memory_write_word_64le(sh4->program, A,V);
+		sh4->program->write_word(A,V);
 		return;
 	}
 
-	memory_write_word_64le(sh4->program, A & AM,V);
+	sh4->program->write_word(A & AM,V);
 }
 
 INLINE void WL(sh4_state *sh4, offs_t A, UINT32 V)
@@ -198,14 +198,14 @@ INLINE void WL(sh4_state *sh4, offs_t A, UINT32 V)
 
 	if (A >= 0xe0000000)
 	{
-		memory_write_dword_64le(sh4->program, A,V);
+		sh4->program->write_dword(A,V);
 		return;
 	}
 
 /*  if (A >= 0x40000000)
         return;*/
 
-	memory_write_dword_64le(sh4->program, A & AM,V);
+	sh4->program->write_dword(A & AM,V);
 }
 
 /*  code                 cycles  t-bit
@@ -2129,7 +2129,7 @@ INLINE void PREFM(sh4_state *sh4, UINT32 n)
 		for (a = 0;a < 4;a++)
 		{
 			// shouldn't be causing a memory read, should store sq writes in registers.
-			memory_write_qword_64le(sh4->program, dest, memory_read_qword_64le(sh4->program, addr));
+			sh4->program->write_qword(dest, sh4->program->read_qword(addr));
 			addr += 8;
 			dest += 8;
 		}

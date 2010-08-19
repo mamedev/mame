@@ -1164,7 +1164,7 @@ READ16_HANDLER( hd68k_ds3_gdata_r )
 
 		while (count68k > 0 && state->adsp_data_memory[0x16e6] > 0)
 		{
-			memory_write_word(space, destaddr, state->ds3_gdata);
+			space->write_word(destaddr, state->ds3_gdata);
 			{
 				state->adsp_data_memory[0x16e6]--;
 				state->ds3_gdata = state->adsp_pgm_memory[i6] >> 8;

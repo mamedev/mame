@@ -129,7 +129,7 @@ static READ16_HANDLER( thunderj_atarivc_r )
 	/* Use these lines to detect when things go south: */
 
 #if 0
-	if (memory_read_word(space, 0x163482) > 0xfff)
+	if (space->read_word(0x163482) > 0xfff)
 		mame_printf_debug("You're screwed!");
 #endif
 

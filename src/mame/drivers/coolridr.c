@@ -450,7 +450,7 @@ static WRITE32_HANDLER( sysh1_txt_blit_w )
 					size = (attr_buff[6] / 4)+1;
 					for(txt_index = 0;txt_index < size; txt_index++)
 					{
-						memory_write_dword(space,(dst_addr),txt_buff[txt_index]);
+						space->write_dword((dst_addr),txt_buff[txt_index]);
 						dst_addr+=4;
 					}
 				}
@@ -459,7 +459,7 @@ static WRITE32_HANDLER( sysh1_txt_blit_w )
 			{
 				static UINT32 clear_vram;
 				for(clear_vram=0x3f40000;clear_vram < 0x3f4ffff;clear_vram+=4)
-					memory_write_dword(space,(clear_vram),0x00000000);
+					space->write_dword((clear_vram),0x00000000);
 			}
 			//else
 			//  printf("CMD = %04x PARAM = %04x DATA = %08x\n",cmd,param,data);
@@ -542,7 +542,7 @@ static void sysh1_dma_transfer( address_space *space, UINT16 dma_index )
 		{
 			for(s_i=0;s_i<size;s_i+=4)
 			{
-				memory_write_dword(space,dst,memory_read_dword(space,src));
+				space->write_dword(dst,space->read_dword(src));
 				dst+=4;
 				src+=4;
 			}

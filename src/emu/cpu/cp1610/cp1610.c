@@ -58,9 +58,9 @@ INLINE cp1610_state *get_safe_token(running_device *device)
 	return (cp1610_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
-#define cp1610_readop(A) memory_read_word_16be(cpustate->program, (A)<<1)
-#define cp1610_readmem16(A) memory_read_word_16be(cpustate->program, (A)<<1)
-#define cp1610_writemem16(A,B) memory_write_word_16be(cpustate->program, (A)<<1,B)
+#define cp1610_readop(A) cpustate->program->read_word((A)<<1)
+#define cp1610_readmem16(A) cpustate->program->read_word((A)<<1)
+#define cp1610_writemem16(A,B) cpustate->program->write_word((A)<<1,B)
 
 /* clear all flags */
 #define CLR_SZOC                \

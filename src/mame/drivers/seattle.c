@@ -947,19 +947,19 @@ static int galileo_dma_fetch_next(address_space *space, int which)
 	}
 
 	/* fetch the byte count */
-	data = memory_read_dword(space, address); address += 4;
+	data = space->read_dword(address); address += 4;
 	galileo.reg[GREG_DMA0_COUNT + which] = data;
 
 	/* fetch the source address */
-	data = memory_read_dword(space, address); address += 4;
+	data = space->read_dword(address); address += 4;
 	galileo.reg[GREG_DMA0_SOURCE + which] = data;
 
 	/* fetch the dest address */
-	data = memory_read_dword(space, address); address += 4;
+	data = space->read_dword(address); address += 4;
 	galileo.reg[GREG_DMA0_DEST + which] = data;
 
 	/* fetch the next record address */
-	data = memory_read_dword(space, address); address += 4;
+	data = space->read_dword(address); address += 4;
 	galileo.reg[GREG_DMA0_NEXT + which] = data;
 	return 1;
 }
@@ -1016,7 +1016,7 @@ static void galileo_perform_dma(address_space *space, int which)
 				}
 
 				/* write the data and advance */
-				voodoo_w(voodoo, (dstaddr & 0xffffff) / 4, memory_read_dword(space, srcaddr), 0xffffffff);
+				voodoo_w(voodoo, (dstaddr & 0xffffff) / 4, space->read_dword(srcaddr), 0xffffffff);
 				srcaddr += srcinc;
 				dstaddr += dstinc;
 				bytesleft -= 4;
@@ -1028,7 +1028,7 @@ static void galileo_perform_dma(address_space *space, int which)
 		{
 			while (bytesleft > 0)
 			{
-				memory_write_byte(space, dstaddr, memory_read_byte(space, srcaddr));
+				space->write_byte(dstaddr, space->read_byte(srcaddr));
 				srcaddr += srcinc;
 				dstaddr += dstinc;
 				bytesleft--;

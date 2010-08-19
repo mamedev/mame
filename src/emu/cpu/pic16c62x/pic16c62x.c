@@ -130,12 +130,12 @@ INLINE void update_internalram_ptr(pic16c62x_state *cpustate)
 }
 
 #define PIC16C62x_RDOP(A)         (memory_decrypted_read_word(cpustate->program, (A)<<1))
-#define PIC16C62x_RAM_RDMEM(A)    ((UINT8)memory_read_byte_8le(cpustate->data, A))
-#define PIC16C62x_RAM_WRMEM(A,V)  (memory_write_byte_8le(cpustate->data, A,V))
-#define PIC16C62x_In(Port)        ((UINT8)memory_read_byte_8le(cpustate->io, (Port)))
-#define PIC16C62x_Out(Port,Value) (memory_write_byte_8le(cpustate->io, (Port),Value))
+#define PIC16C62x_RAM_RDMEM(A)    ((UINT8)cpustate->data->read_byte(A))
+#define PIC16C62x_RAM_WRMEM(A,V)  (cpustate->data->write_byte(A,V))
+#define PIC16C62x_In(Port)        ((UINT8)cpustate->io->read_byte((Port)))
+#define PIC16C62x_Out(Port,Value) (cpustate->io->write_byte((Port),Value))
 /************  Read the state of the T0 Clock input signal  ************/
-#define PIC16C62x_T0_In           (memory_read_byte_8le(cpustate->io, PIC16C62x_T0) >> 4)
+#define PIC16C62x_T0_In           (cpustate->io->read_byte(PIC16C62x_T0) >> 4)
 
 #define M_RDRAM(A)		(((A) == 0) ? cpustate->internalram[0] : PIC16C62x_RAM_RDMEM(A))
 #define M_WRTRAM(A,V)	do { if ((A) == 0) cpustate->internalram[0] = (V); else PIC16C62x_RAM_WRMEM(A,V); } while (0)

@@ -30,12 +30,12 @@ INLINE UINT32 RL(sh2_state *sh2, offs_t A)
 		return sh2_internal_r(sh2->internal, (A & 0x1fc)>>2, 0xffffffff);
 
 	if (A >= 0xc0000000)
-		return memory_read_dword_32be(sh2->program, A);
+		return sh2->program->read_dword(A);
 
 	if (A >= 0x40000000)
 		return 0xa5a5a5a5;
 
-  return memory_read_dword_32be(sh2->program, A & AM);
+  return sh2->program->read_dword(A & AM);
 }
 
 INLINE void WL(sh2_state *sh2, offs_t A, UINT32 V)
@@ -48,14 +48,14 @@ INLINE void WL(sh2_state *sh2, offs_t A, UINT32 V)
 
 	if (A >= 0xc0000000)
 	{
-		memory_write_dword_32be(sh2->program, A,V);
+		sh2->program->write_dword(A,V);
 		return;
 	}
 
 	if (A >= 0x40000000)
 		return;
 
-	memory_write_dword_32be(sh2->program, A & AM,V);
+	sh2->program->write_dword(A & AM,V);
 }
 
 static void sh2_timer_resync(sh2_state *sh2)
@@ -185,9 +185,9 @@ static void sh2_dmac_check(sh2_state *sh2, int dma)
 					if(incd == 2)
 						dst --;
 
-					dmadata = memory_read_byte_32be(sh2->program, src);
+					dmadata = sh2->program->read_byte(src);
 					if (sh2->dma_callback_kludge) dmadata = sh2->dma_callback_kludge(src, dst, dmadata, size);
-					memory_write_byte_32be(sh2->program, dst, dmadata);
+					sh2->program->write_byte(dst, dmadata);
 
 					if(incs == 1)
 						src ++;
@@ -207,9 +207,9 @@ static void sh2_dmac_check(sh2_state *sh2, int dma)
 						dst -= 2;
 
 					// check: should this really be using read_word_32 / write_word_32?
-					dmadata	= memory_read_word_32be(sh2->program, src);
+					dmadata	= sh2->program->read_word(src);
 					if (sh2->dma_callback_kludge) dmadata = sh2->dma_callback_kludge(src, dst, dmadata, size);
-					memory_write_word_32be(sh2->program, dst, dmadata);
+					sh2->program->write_word(dst, dmadata);
 
 					if(incs == 1)
 						src += 2;
@@ -227,9 +227,9 @@ static void sh2_dmac_check(sh2_state *sh2, int dma)
 					if(incd == 2)
 						dst -= 4;
 
-					dmadata	= memory_read_dword_32be(sh2->program, src);
+					dmadata	= sh2->program->read_dword(src);
 					if (sh2->dma_callback_kludge) dmadata = sh2->dma_callback_kludge(src, dst, dmadata, size);
-					memory_write_dword_32be(sh2->program, dst, dmadata);
+					sh2->program->write_dword(dst, dmadata);
 
 					if(incs == 1)
 						src += 4;
@@ -247,21 +247,21 @@ static void sh2_dmac_check(sh2_state *sh2, int dma)
 					if(incd == 2)
 						dst -= 16;
 
-					dmadata = memory_read_dword_32be(sh2->program, src);
+					dmadata = sh2->program->read_dword(src);
 					if (sh2->dma_callback_kludge) dmadata = sh2->dma_callback_kludge(src, dst, dmadata, size);
-					memory_write_dword_32be(sh2->program, dst, dmadata);
+					sh2->program->write_dword(dst, dmadata);
 
-					dmadata = memory_read_dword_32be(sh2->program, src+4);
+					dmadata = sh2->program->read_dword(src+4);
 					if (sh2->dma_callback_kludge) dmadata = sh2->dma_callback_kludge(src, dst, dmadata, size);
-					memory_write_dword_32be(sh2->program, dst+4, dmadata);
+					sh2->program->write_dword(dst+4, dmadata);
 
-					dmadata = memory_read_dword_32be(sh2->program, src+8);
+					dmadata = sh2->program->read_dword(src+8);
 					if (sh2->dma_callback_kludge) dmadata = sh2->dma_callback_kludge(src, dst, dmadata, size);
-					memory_write_dword_32be(sh2->program, dst+8, dmadata);
+					sh2->program->write_dword(dst+8, dmadata);
 
-					dmadata = memory_read_dword_32be(sh2->program, src+12);
+					dmadata = sh2->program->read_dword(src+12);
 					if (sh2->dma_callback_kludge) dmadata = sh2->dma_callback_kludge(src, dst, dmadata, size);
-					memory_write_dword_32be(sh2->program, dst+12, dmadata);
+					sh2->program->write_dword(dst+12, dmadata);
 
 					src += 16;
 					if(incd == 1)

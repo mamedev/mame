@@ -175,23 +175,23 @@ typedef int (*mcs48_ophandler)(mcs48_state *state);
 ***************************************************************************/
 
 /* ROM is mapped to ADDRESS_SPACE_PROGRAM */
-#define program_r(a)	memory_read_byte_8le(cpustate->program, a)
+#define program_r(a)	cpustate->program->read_byte(a)
 
 /* RAM is mapped to ADDRESS_SPACE_DATA */
-#define ram_r(a)		memory_read_byte_8le(cpustate->data, a)
-#define ram_w(a,V)		memory_write_byte_8le(cpustate->data, a, V)
+#define ram_r(a)		cpustate->data->read_byte(a)
+#define ram_w(a,V)		cpustate->data->write_byte(a, V)
 
 /* ports are mapped to ADDRESS_SPACE_IO */
-#define ext_r(a)		memory_read_byte_8le(cpustate->io, a)
-#define ext_w(a,V)		memory_write_byte_8le(cpustate->io, a, V)
-#define port_r(a)		memory_read_byte_8le(cpustate->io, MCS48_PORT_P0 + a)
-#define port_w(a,V)		memory_write_byte_8le(cpustate->io, MCS48_PORT_P0 + a, V)
-#define test_r(a)		memory_read_byte_8le(cpustate->io, MCS48_PORT_T0 + a)
-#define test_w(a,V)		memory_write_byte_8le(cpustate->io, MCS48_PORT_T0 + a, V)
-#define bus_r()			memory_read_byte_8le(cpustate->io, MCS48_PORT_BUS)
-#define bus_w(V)		memory_write_byte_8le(cpustate->io, MCS48_PORT_BUS, V)
-#define ea_r()			memory_read_byte_8le(cpustate->io, MCS48_PORT_EA)
-#define prog_w(V)		memory_write_byte_8le(cpustate->io, MCS48_PORT_PROG, V)
+#define ext_r(a)		cpustate->io->read_byte(a)
+#define ext_w(a,V)		cpustate->io->write_byte(a, V)
+#define port_r(a)		cpustate->io->read_byte(MCS48_PORT_P0 + a)
+#define port_w(a,V)		cpustate->io->write_byte(MCS48_PORT_P0 + a, V)
+#define test_r(a)		cpustate->io->read_byte(MCS48_PORT_T0 + a)
+#define test_w(a,V)		cpustate->io->write_byte(MCS48_PORT_T0 + a, V)
+#define bus_r()			cpustate->io->read_byte(MCS48_PORT_BUS)
+#define bus_w(V)		cpustate->io->write_byte(MCS48_PORT_BUS, V)
+#define ea_r()			cpustate->io->read_byte(MCS48_PORT_EA)
+#define prog_w(V)		cpustate->io->write_byte(MCS48_PORT_PROG, V)
 
 /* r0-r7 map to memory via the regptr */
 #define R0				regptr[0]

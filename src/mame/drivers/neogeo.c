@@ -507,7 +507,7 @@ READ16_HANDLER( neogeo_unmapped_r )
 	else
 	{
 		state->recurse = 1;
-		ret = memory_read_word(space, cpu_get_pc(space->cpu));
+		ret = space->read_word(cpu_get_pc(space->cpu));
 		state->recurse = 0;
 	}
 

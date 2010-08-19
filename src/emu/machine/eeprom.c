@@ -239,14 +239,14 @@ void eeprom_device::nvram_default()
 		default_value = m_config.m_default_value;
 	for (offs_t offs = 0; offs < eeprom_length; offs++)
 		if (m_config.m_data_bits == 8)
-			memory_write_byte(m_addrspace[0], offs, default_value);
+			m_addrspace[0]->write_byte(offs, default_value);
 		else
-			memory_write_word(m_addrspace[0], offs * 2, default_value);
+			m_addrspace[0]->write_word(offs * 2, default_value);
 
 	/* handle hard-coded data from the driver */
 	if (m_config.m_default_data != NULL)
 		for (offs_t offs = 0; offs < m_config.m_default_data_size; offs++)
-			memory_write_byte(m_addrspace[0], offs, m_config.m_default_data[offs]);
+			m_addrspace[0]->write_byte(offs, m_config.m_default_data[offs]);
 
 	/* populate from a memory region if present */
 	if (m_region != NULL)
@@ -260,9 +260,9 @@ void eeprom_device::nvram_default()
 
 		for (offs_t offs = 0; offs < eeprom_length; offs++)
 			if (m_config.m_data_bits == 8)
-				memory_write_byte(m_addrspace[0], offs, m_region->u8(offs));
+				m_addrspace[0]->write_byte(offs, m_region->u8(offs));
 			else
-				memory_write_word(m_addrspace[0], offs * 2, m_region->u16(offs));
+				m_addrspace[0]->write_word(offs * 2, m_region->u16(offs));
 	}
 }
 
@@ -280,7 +280,7 @@ void eeprom_device::nvram_read(mame_file &file)
 	UINT8 *buffer = auto_alloc_array(&m_machine, UINT8, eeprom_bytes);
 	mame_fread(&file, buffer, eeprom_bytes);
 	for (offs_t offs = 0; offs < eeprom_bytes; offs++)
-		memory_write_byte(m_addrspace[0], offs, buffer[offs]);
+		m_addrspace[0]->write_byte(offs, buffer[offs]);
 	auto_free(&m_machine, buffer);
 }
 
@@ -297,7 +297,7 @@ void eeprom_device::nvram_write(mame_file &file)
 
 	UINT8 *buffer = auto_alloc_array(&m_machine, UINT8, eeprom_bytes);
 	for (offs_t offs = 0; offs < eeprom_bytes; offs++)
-		buffer[offs] = memory_read_byte(m_addrspace[0], offs);
+		buffer[offs] = m_addrspace[0]->read_byte(offs);
 	mame_fwrite(&file, buffer, eeprom_bytes);
 	auto_free(&m_machine, buffer);
 }
@@ -391,9 +391,9 @@ void eeprom_device::set_clock_line(int state)
 				{
 					m_read_address = (m_read_address + 1) & ((1 << m_config.m_address_bits) - 1);
 					if (m_config.m_data_bits == 16)
-						m_data_bits = memory_read_word(m_addrspace[0], m_read_address * 2);
+						m_data_bits = m_addrspace[0]->read_word(m_read_address * 2);
 					else
-						m_data_bits = memory_read_byte(m_addrspace[0], m_read_address);
+						m_data_bits = m_addrspace[0]->read_byte(m_read_address);
 					m_clock_count = 0;
 logerror("EEPROM read %04x from address %02x\n",m_data_bits,m_read_address);
 				}
@@ -439,9 +439,9 @@ void eeprom_device::write(int bit)
 			if (m_serial_buffer[i] == '1') address |= 1;
 		}
 		if (m_config.m_data_bits == 16)
-			m_data_bits = memory_read_word(m_addrspace[0], address * 2);
+			m_data_bits = m_addrspace[0]->read_word(address * 2);
 		else
-			m_data_bits = memory_read_byte(m_addrspace[0], address);
+			m_data_bits = m_addrspace[0]->read_byte(address);
 		m_read_address = address;
 		m_clock_count = 0;
 		m_sending = 1;
@@ -463,9 +463,9 @@ logerror("EEPROM erase address %02x\n",address);
 		if (m_locked == 0)
 		{
 			if (m_config.m_data_bits == 16)
-				memory_write_word(m_addrspace[0], address * 2, 0x0000);
+				m_addrspace[0]->write_word(address * 2, 0x0000);
 			else
-				memory_write_byte(m_addrspace[0], address, 0x00);
+				m_addrspace[0]->write_byte(address, 0x00);
 		}
 		else
 logerror("Error: EEPROM is m_locked\n");
@@ -492,9 +492,9 @@ logerror("EEPROM write %04x to address %02x\n",data,address);
 		if (m_locked == 0)
 		{
 			if (m_config.m_data_bits == 16)
-				memory_write_word(m_addrspace[0], address * 2, data);
+				m_addrspace[0]->write_word(address * 2, data);
 			else
-				memory_write_byte(m_addrspace[0], address, data);
+				m_addrspace[0]->write_byte(address, data);
 		}
 		else
 logerror("Error: EEPROM is m_locked\n");

@@ -83,7 +83,7 @@ READ16_HANDLER( segaic16_open_bus_r )
 
 	/* read original encrypted memory at that address */
 	recurse = 1;
-	result = memory_read_word_16be(space, cpu_get_pc(space->cpu));
+	result = space->read_word(cpu_get_pc(space->cpu));
 	recurse = 0;
 	return result;
 }
@@ -214,14 +214,14 @@ static void memory_mapper_w(address_space *space, struct memory_mapper_chip *chi
 			{
 				address_space *targetspace = cpu_get_address_space(chip->cpu, ADDRESS_SPACE_PROGRAM);
 				offs_t addr = (chip->regs[0x0a] << 17) | (chip->regs[0x0b] << 9) | (chip->regs[0x0c] << 1);
-				memory_write_word(targetspace, addr, (chip->regs[0x00] << 8) | chip->regs[0x01]);
+				targetspace->write_word(addr, (chip->regs[0x00] << 8) | chip->regs[0x01]);
 			}
 			else if (data == 0x02)
 			{
 				address_space *targetspace = cpu_get_address_space(chip->cpu, ADDRESS_SPACE_PROGRAM);
 				offs_t addr = (chip->regs[0x07] << 17) | (chip->regs[0x08] << 9) | (chip->regs[0x09] << 1);
 				UINT16 result;
-				result = memory_read_word(targetspace, addr);
+				result = targetspace->read_word(addr);
 				chip->regs[0x00] = result >> 8;
 				chip->regs[0x01] = result;
 			}

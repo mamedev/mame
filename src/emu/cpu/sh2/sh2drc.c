@@ -151,9 +151,9 @@ INLINE UINT16 RW(sh2_state *sh2, offs_t A)
 		return sh2_internal_r(sh2->internal, (A & 0x1fc)>>2, 0xffff << (((~A) & 2)*8)) >> (((~A) & 2)*8);
 
 	if (A >= 0xc0000000)
-		return memory_read_word_32be(sh2->program, A);
+		return sh2->program->read_word(A);
 
-	return memory_read_word_32be(sh2->program, A & AM);
+	return sh2->program->read_word(A & AM);
 }
 
 INLINE UINT32 RL(sh2_state *sh2, offs_t A)
@@ -162,9 +162,9 @@ INLINE UINT32 RL(sh2_state *sh2, offs_t A)
 		return sh2_internal_r(sh2->internal, (A & 0x1fc)>>2, 0xffffffff);
 
 	if (A >= 0xc0000000)
-		return memory_read_dword_32be(sh2->program, A);
+		return sh2->program->read_dword(A);
 
-	return memory_read_dword_32be(sh2->program, A & AM);
+	return sh2->program->read_dword(A & AM);
 }
 
 /*-------------------------------------------------
@@ -827,8 +827,8 @@ static CPU_RESET( sh2 )
 	sh2->m = m;
 	memset(sh2->m, 0, 0x200);
 
-	sh2->pc = memory_read_dword_32be(sh2->program, 0);
-	sh2->r[15] = memory_read_dword_32be(sh2->program, 4);
+	sh2->pc = sh2->program->read_dword(0);
+	sh2->r[15] = sh2->program->read_dword(4);
 	sh2->sr = I;
 
 	sh2->internal_irq_level = -1;

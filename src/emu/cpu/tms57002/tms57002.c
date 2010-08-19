@@ -192,7 +192,7 @@ WRITE8_DEVICE_HANDLER(tms57002_data_w)
 				s->sti = (s->sti & ~SU_MASK) | SU_PRG;
 				break;
 			case SU_PRG:
-				memory_write_dword_32le(s->program, (s->pc++) << 2, val);
+				s->program->write_dword((s->pc++) << 2, val);
 				break;
 			}
 		}
@@ -391,7 +391,7 @@ static void tms57002_xm_init(tms57002_t *s)
 static void tms57002_xm_step_read(tms57002_t *s)
 {
 	UINT32 adr = s->xm_adr;
-	UINT8 v = memory_read_byte_8le(s->data, adr);
+	UINT8 v = s->data->read_byte(adr);
 	int done;
 	if(s->st0 & ST0_WORD) {
 		if(s->st0 & ST0_SEL) {
@@ -451,7 +451,7 @@ static void tms57002_xm_step_write(tms57002_t *s)
 			done = off == 12;
 		}
 	}
-	memory_write_byte_8le(s->data, adr, v);
+	s->data->write_byte(adr, v);
 	if(done) {
 		s->sti &= ~S_WRITE;
 		s->xm_adr = 0;
@@ -986,7 +986,7 @@ static void tms57002_execute_cat3(tms57002_t *s, UINT32 opcode)
 void tms57002_execute(tms57002_t *s)
 {
 	while(!(s->sti & (S_IDLE | IN_PLOAD | IN_CLOAD))) {
-		UINT32 opcode = memory_read_dword_32le(s->program, s->pc << 2);
+		UINT32 opcode = s->program->read_dword(s->pc << 2);
 
 		if(s->sti & (S_READ|S_WRITE)) {
 			if(s->sti & S_READ)
@@ -1245,7 +1245,7 @@ static int tms57002_decode_get_pc(tms57002_t *s)
 
 	for(;;) {
 		short ipc;
-		UINT32 opcode = memory_read_dword_32le(s->program, adr << 2);
+		UINT32 opcode = s->program->read_dword(adr << 2);
 
 		if((opcode & 0xfc0000) == 0xfc0000)
 			tms57002_decode_one(s, opcode, &cs, tms57002_decode_cat3);

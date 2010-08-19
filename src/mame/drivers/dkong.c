@@ -335,6 +335,9 @@ static WRITE8_DEVICE_HANDLER( p8257_ctl_w );
  *
  *************************************/
 
+static UINT8 memory_read_byte(address_space *space, offs_t address) { return space->read_byte(address); }
+static void memory_write_byte(address_space *space, offs_t address, UINT8 data) { space->write_byte(address, data); }
+
 static Z80DMA_INTERFACE( dk3_dma )
 {
 	DEVCB_CPU_INPUT_LINE("maincpu", INPUT_LINE_HALT),
@@ -513,7 +516,7 @@ static READ8_HANDLER( hb_dma_read_byte )
 
     addr = ((bucket << 7) & 0x7c00) | (offset & 0x3ff);
 
-    return memory_read_byte(space, addr);
+    return space->read_byte(addr);
 }
 
 static WRITE8_HANDLER( hb_dma_write_byte )
@@ -527,7 +530,7 @@ static WRITE8_HANDLER( hb_dma_write_byte )
 
     addr = ((bucket << 7) & 0x7c00) | (offset & 0x3ff);
 
-    memory_write_byte(space, addr, data);
+    space->write_byte(addr, data);
 }
 
 static READ8_DEVICE_HANDLER( p8257_ctl_r )
@@ -589,13 +592,13 @@ static READ8_HANDLER( dkongjr_in2_r )
 
 static READ8_HANDLER( s2650_mirror_r )
 {
-    return memory_read_byte(space, 0x1000 + offset);
+    return space->read_byte(0x1000 + offset);
 }
 
 
 static WRITE8_HANDLER( s2650_mirror_w )
 {
-    memory_write_byte(space, 0x1000 + offset, data);
+    space->write_byte(0x1000 + offset, data);
 }
 
 

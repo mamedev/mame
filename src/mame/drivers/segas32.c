@@ -4063,7 +4063,7 @@ static WRITE16_HANDLER( f1en_comms_echo_w )
 {
 	// pretend that slave is following master op, enables attract mode video with sound
 	if (ACCESSING_BITS_0_7)
-		memory_write_byte( space, 0x810049, data );
+		space->write_byte( 0x810049, data );
 }
 
 static DRIVER_INIT( f1en )

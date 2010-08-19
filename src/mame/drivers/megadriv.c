@@ -193,7 +193,7 @@ static UINT16 read_next_instruction(address_space *space)
 
 	/* read original encrypted memory at that address */
 	recurse = 1;
-	result = memory_read_word(space, cpu_get_pc(space->cpu));
+	result = space->read_word(cpu_get_pc(space->cpu));
 	recurse = 0;
 	return result;
 }

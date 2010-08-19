@@ -112,7 +112,7 @@ static CPU_RESET( lh5801 )
 {
 	lh5801_state *cpustate = get_safe_token(device);
 
-	P = (memory_read_byte(cpustate->program, 0xfffe)<<8) | memory_read_byte(cpustate->program, 0xffff);
+	P = (cpustate->program->read_byte(0xfffe)<<8) | cpustate->program->read_byte(0xffff);
 
 	cpustate->idle=0;
 }

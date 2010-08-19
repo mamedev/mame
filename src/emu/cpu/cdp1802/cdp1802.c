@@ -75,10 +75,10 @@ INLINE cdp1802_state *get_safe_token(running_device *device)
 }
 
 #define OPCODE_R(addr)		memory_decrypted_read_byte(cpustate->program, addr)
-#define RAM_R(addr)			memory_read_byte_8be(cpustate->program, addr)
-#define RAM_W(addr, data)	memory_write_byte_8be(cpustate->program, addr, data)
-#define IO_R(addr)			memory_read_byte_8be(cpustate->io, addr)
-#define IO_W(addr, data)	memory_write_byte_8be(cpustate->io, addr, data)
+#define RAM_R(addr)			cpustate->program->read_byte(addr)
+#define RAM_W(addr, data)	cpustate->program->write_byte(addr, data)
+#define IO_R(addr)			cpustate->io->read_byte(addr)
+#define IO_W(addr, data)	cpustate->io->write_byte(addr, data)
 
 #define P	cpustate->p
 #define X	cpustate->x

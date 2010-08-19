@@ -1818,7 +1818,7 @@ static int calc3_decompress_table(running_machine* machine, int tabnum, UINT8* d
 
 						for (i=0;i<0x80;i++)
 						{
-							memory_write_byte(eeprom_space, i, memory_read_byte(space, calc3_eeprom_addr+0x200000+i));
+							eeprom_space->write_byte(i, space->read_byte(calc3_eeprom_addr+0x200000+i));
 						}
 
 					}
@@ -1918,7 +1918,7 @@ static int calc3_decompress_table(running_machine* machine, int tabnum, UINT8* d
 					{
 						if (space)
 						{
-							memory_write_byte(space, dstoffset+i, dat);
+							space->write_byte(dstoffset+i, dat);
 						}
 
 						// debug, used to output tables at the start
@@ -1992,7 +1992,7 @@ static int calc3_decompress_table(running_machine* machine, int tabnum, UINT8* d
 					{
 						if (space)
 						{
-							memory_write_byte(space, dstoffset+i, dat);
+							space->write_byte(dstoffset+i, dat);
 						}
 
 						// debug, used to output tables at the start
@@ -2111,7 +2111,7 @@ void calc3_mcu_run(running_machine *machine)
 
 	if ( calc3_mcu_status != (1|2|4|8) )	return;
 
-	if (calc3_dsw_addr) memory_write_byte(space, calc3_dsw_addr+0x200000, ( ~input_port_read(machine, "DSW1"))&0xff); // // DSW // dsw actually updates in realtime - mcu reads+writes it every frame
+	if (calc3_dsw_addr) space->write_byte(calc3_dsw_addr+0x200000, ( ~input_port_read(machine, "DSW1"))&0xff); // // DSW // dsw actually updates in realtime - mcu reads+writes it every frame
 
 
 	//calc3_mcu_status = 0;
@@ -2152,7 +2152,7 @@ void calc3_mcu_run(running_machine *machine)
 			printf("Calc 3 Init Command - %04x ROM Checksum Address\n",  cakc3_checkumaddress);
 			printf("Calc 3 Init Command - %08x Data Write Address\n",  calc3_writeaddress);
 #endif
-	//      memory_write_byte(space, calc3_dsw_addr+0x200000, ( ~input_port_read(machine, "DSW1"))&0xff); // // DSW // dsw actually updates in realtime - mcu reads+writes it every frame
+	//      space->write_byte(calc3_dsw_addr+0x200000, ( ~input_port_read(machine, "DSW1"))&0xff); // // DSW // dsw actually updates in realtime - mcu reads+writes it every frame
 
 			kaneko16_mcu_ram[cakc3_checkumaddress / 2] = calc3_mcu_crc;				// MCU Rom Checksum!
 
@@ -2168,7 +2168,7 @@ void calc3_mcu_run(running_machine *machine)
 
 				for (i=0;i<0x80;i++)
 				{
-					memory_write_byte(space, calc3_eeprom_addr+0x200000+i, memory_read_byte(eeprom_space, i));
+					space->write_byte(calc3_eeprom_addr+0x200000+i, eeprom_space->read_byte(i));
 				}
 
 			}
@@ -2207,12 +2207,12 @@ void calc3_mcu_run(running_machine *machine)
 						printf("writing back address %08x to %08x %08x\n", calc3_writeaddress_current, commandaddr,write);
 #endif
 
-						memory_write_byte(space,write+0x200000, data_header[0]);
-						memory_write_byte(space,write+0x200001, data_header[1]);
+						space->write_byte(write+0x200000, data_header[0]);
+						space->write_byte(write+0x200001, data_header[1]);
 
 						write=commandaddr+(char)commandunk;
-						memory_write_word(space,write+0x200000, (calc3_writeaddress_current>>16)&0xffff);
-						memory_write_word(space,write+0x200002,  (calc3_writeaddress_current&0xffff));
+						space->write_word(write+0x200000, (calc3_writeaddress_current>>16)&0xffff);
+						space->write_word(write+0x200002,  (calc3_writeaddress_current&0xffff));
 
 						calc3_writeaddress_current += ((length+3)&(~1));
 					}

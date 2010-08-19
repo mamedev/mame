@@ -384,7 +384,7 @@ static int8 apu_dpcm(nesapu_state *info, dpcm_t *chan)
 			bit_pos = 7 - (chan->bits_left & 7);
 			if (7 == bit_pos)
 			{
-				chan->cur_byte = memory_read_byte(info->APU.dpcm.memory, chan->address);
+				chan->cur_byte = info->APU.dpcm.memory->read_byte(chan->address);
 				chan->address++;
 				chan->length--;
 			}

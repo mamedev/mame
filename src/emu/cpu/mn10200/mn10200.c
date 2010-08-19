@@ -79,7 +79,7 @@ INLINE UINT8 mn102_read_byte(mn102_info *mn102, UINT32 address)
 		return mn10200_r(mn102, address-0xfc00, MEM_BYTE);
 	}
 
-	return memory_read_byte_16le(mn102->program, address);
+	return mn102->program->read_byte(address);
 }
 
 INLINE UINT16 mn102_read_word(mn102_info *mn102, UINT32 address)
@@ -91,10 +91,10 @@ INLINE UINT16 mn102_read_word(mn102_info *mn102, UINT32 address)
 
 	if (address & 1)
 	{
-		return memory_read_byte_16le(mn102->program, address) | (memory_read_byte_16le(mn102->program, address+1)<<8);
+		return mn102->program->read_byte(address) | (mn102->program->read_byte(address+1)<<8);
 	}
 
-	return memory_read_word_16le(mn102->program, address);
+	return mn102->program->read_word(address);
 }
 
 INLINE void mn102_write_byte(mn102_info *mn102, UINT32 address, UINT8 data)
@@ -105,7 +105,7 @@ INLINE void mn102_write_byte(mn102_info *mn102, UINT32 address, UINT8 data)
 		return;
 	}
 
-	memory_write_byte_16le(mn102->program, address, data);
+	mn102->program->write_byte(address, data);
 }
 
 INLINE void mn102_write_word(mn102_info *mn102, UINT32 address, UINT16 data)
@@ -118,12 +118,12 @@ INLINE void mn102_write_word(mn102_info *mn102, UINT32 address, UINT16 data)
 
 	if (address & 1)
 	{
-		memory_write_byte_16le(mn102->program, address, data&0xff);
-		memory_write_byte_16le(mn102->program, address+1, (data>>8)&0xff);
+		mn102->program->write_byte(address, data&0xff);
+		mn102->program->write_byte(address+1, (data>>8)&0xff);
 		return;
 	}
 
-	memory_write_word_16le(mn102->program, address, data);
+	mn102->program->write_word(address, data);
 }
 
 INLINE INT32 r24u(mn102_info *mn102, offs_t adr)
@@ -2057,7 +2057,7 @@ static void mn10200_w(mn102_info *mn102, UINT32 adr, UINT32 data, int type)
     break;
 
   case 0x264:
-	memory_write_byte_8le(mn102->io, MN10200_PORT1, data);
+	mn102->io->write_byte(MN10200_PORT1, data);
     break;
 
   case 0x280: case 0x290: case 0x2a0: case 0x2b0: case 0x2c0: case 0x2d0: case 0x2e0: case 0x2f0: {
@@ -2211,15 +2211,15 @@ static void mn10200_w(mn102_info *mn102, UINT32 adr, UINT32 data, int type)
     break;
 
 	case 0x3c0:	// port 0 data
-		memory_write_byte_8le(mn102->io, MN10200_PORT0, data);
+		mn102->io->write_byte(MN10200_PORT0, data);
 		break;
 
 	case 0x3c2:	// port 2 data
-		memory_write_byte_8le(mn102->io, MN10200_PORT2, data);
+		mn102->io->write_byte(MN10200_PORT2, data);
 		break;
 
 	case 0x3c3:	// port 3 data
-		memory_write_byte_8le(mn102->io, MN10200_PORT3, data);
+		mn102->io->write_byte(MN10200_PORT3, data);
 		break;
 
 	case 0x3e0:	// port0 ddr
@@ -2304,7 +2304,7 @@ static UINT32 mn10200_r(mn102_info *mn102, UINT32 adr, int type)
 		break;
 
 	case 0x264:	// port 1 data
-		return memory_read_byte_8le(mn102->io, MN10200_PORT1);
+		return mn102->io->read_byte(MN10200_PORT1);
 
 	case 0x28c: case 0x29c: case 0x2ac: case 0x2bc: case 0x2cc: case 0x2dc: case 0x2ec: case 0x2fc:
 		{
@@ -2313,13 +2313,13 @@ static UINT32 mn10200_r(mn102_info *mn102, UINT32 adr, int type)
 		}
 
 	case 0x3c0:	// port 0 data
-		return memory_read_byte_8le(mn102->io, MN10200_PORT0);
+		return mn102->io->read_byte(MN10200_PORT0);
 
 	case 0x3c2:	// port 2 data
-		return memory_read_byte_8le(mn102->io, MN10200_PORT2);
+		return mn102->io->read_byte(MN10200_PORT2);
 
 	case 0x3c3:	// port 3 data
-		return memory_read_byte_8le(mn102->io, MN10200_PORT3);
+		return mn102->io->read_byte(MN10200_PORT3);
 
   default:
     log_event("MN102", "internal_r %04x (%03x)", adr+0xfc00, adr);

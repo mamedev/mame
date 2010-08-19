@@ -52,8 +52,8 @@ static UINT16 bcd_sub( UINT16 a, UINT16 b);
 
 /* Static variables */
 
-#define RM(Addr) ((unsigned)memory_read_byte_8be(cpustate->program, Addr))
-#define WM(Addr,Value) (memory_write_byte_8be(cpustate->program, Addr, Value))
+#define RM(Addr) ((unsigned)cpustate->program->read_byte(Addr))
+#define WM(Addr,Value) (cpustate->program->write_byte(Addr, Value))
 
 #define IMMBYTE(b)	b = ((unsigned)memory_raw_read_byte(cpustate->program, pPC)); pPC++
 #define SIMMBYTE(b)	b = ((signed)memory_raw_read_byte(cpustate->program, pPC)); pPC++
@@ -599,19 +599,19 @@ static WRITE8_HANDLER( tms70x0_pf_w )	/* Perpherial file write */
 			break;
 
 		case 0x06: /* Port B write */
-			memory_write_byte_8be( cpustate->io, TMS7000_PORTB, data );
+			cpustate->io->write_byte( TMS7000_PORTB, data );
 			cpustate->pf[ 0x06 ] = data;
 			break;
 
 		case 0x08: /* Port C write */
 			temp1 = data & cpustate->pf[ 0x09 ];	/* Mask off input bits */
-			memory_write_byte_8be( cpustate->io, TMS7000_PORTC, temp1 );
+			cpustate->io->write_byte( TMS7000_PORTC, temp1 );
 			cpustate->pf[ 0x08 ] = temp1;
 			break;
 
 		case 0x0a: /* Port D write */
 			temp1 = data & cpustate->pf[ 0x0b ];	/* Mask off input bits */
-			memory_write_byte_8be( cpustate->io, TMS7000_PORTD, temp1 );
+			cpustate->io->write_byte( TMS7000_PORTD, temp1 );
 			cpustate->pf[ 0x0a ] = temp1;
 			break;
 
@@ -647,7 +647,7 @@ static READ8_HANDLER( tms70x0_pf_r )	/* Perpherial file read */
 			break;
 
 		case 0x04: /* Port A read */
-			result = memory_read_byte_8be( cpustate->io, TMS7000_PORTA );
+			result = cpustate->io->read_byte( TMS7000_PORTA );
 			break;
 
 
@@ -658,14 +658,14 @@ static READ8_HANDLER( tms70x0_pf_r )	/* Perpherial file read */
 
 		case 0x08: /* Port C read */
 			temp1 = cpustate->pf[ 0x08 ] & cpustate->pf[ 0x09 ];	/* Get previous output bits */
-			temp2 = memory_read_byte_8be( cpustate->io, TMS7000_PORTC );			/* Read port */
+			temp2 = cpustate->io->read_byte( TMS7000_PORTC );			/* Read port */
 			temp3 = temp2 & (~cpustate->pf[ 0x09 ]);				/* Mask off output bits */
 			result = temp1 | temp3;								/* OR together */
 			break;
 
 		case 0x0a: /* Port D read */
 			temp1 = cpustate->pf[ 0x0a ] & cpustate->pf[ 0x0b ];	/* Get previous output bits */
-			temp2 = memory_read_byte_8be( cpustate->io, TMS7000_PORTD );			/* Read port */
+			temp2 = cpustate->io->read_byte( TMS7000_PORTD );			/* Read port */
 			temp3 = temp2 & (~cpustate->pf[ 0x0b ]);				/* Mask off output bits */
 			result = temp1 | temp3;								/* OR together */
 			break;

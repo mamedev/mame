@@ -243,7 +243,7 @@ static void wave_dma_execute(address_space *space)
 	{
 		for(;size<wave_dma.size;size+=4)
 		{
-			memory_write_dword_64le(space,dst,memory_read_dword(space,src));
+			space->write_dword(dst,space->read_dword(src));
 			src+=4;
 			dst+=4;
 		}
@@ -252,7 +252,7 @@ static void wave_dma_execute(address_space *space)
 	{
 		for(;size<wave_dma.size;size+=4)
 		{
-			memory_write_dword_64le(space,src,memory_read_dword(space,dst));
+			space->write_dword(src,space->read_dword(dst));
 			src+=4;
 			dst+=4;
 		}
@@ -287,7 +287,7 @@ static void pvr_dma_execute(address_space *space)
 	{
 		for(;size<pvr_dma.size;size+=4)
 		{
-			memory_write_dword_64le(space,dst,memory_read_dword(space,src));
+			space->write_dword(dst,space->read_dword(src));
 			src+=4;
 			dst+=4;
 		}
@@ -296,7 +296,7 @@ static void pvr_dma_execute(address_space *space)
 	{
 		for(;size<pvr_dma.size;size+=4)
 		{
-			memory_write_dword_64le(space,src,memory_read_dword(space,dst));
+			space->write_dword(src,space->read_dword(dst));
 			src+=4;
 			dst+=4;
 		}

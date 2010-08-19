@@ -98,12 +98,12 @@ static void unimplemented_opcode(unsp_state *unsp, UINT16 op)
 
 INLINE UINT16 READ16(unsp_state *unsp, UINT32 address)
 {
-	return memory_read_word_16be(unsp->program, address << 1);
+	return unsp->program->read_word(address << 1);
 }
 
 INLINE void WRITE16(unsp_state *unsp, UINT32 address, UINT16 data)
 {
-	memory_write_word_16be(unsp->program, address << 1, data);
+	unsp->program->write_word(address << 1, data);
 }
 
 /*****************************************************************************/

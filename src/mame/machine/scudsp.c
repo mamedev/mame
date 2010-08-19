@@ -649,7 +649,7 @@ static void dsp_dma( address_space *space )
 
 			if ( source >= 0x06000000 && source <= 0x060fffff )
 			{
-				data = memory_read_dword(space, source );
+				data = space->read_dword(source );
 			}
 			else
 			{
@@ -687,7 +687,7 @@ static void dsp_dma( address_space *space )
 #endif
 		for ( counter = 0; counter < transfer_cnt; counter++ )
 		{
-			memory_write_dword(space, dest, dsp_get_mem_source_dma( dsp_mem, counter ) );
+			space->write_dword(dest, dsp_get_mem_source_dma( dsp_mem, counter ) );
 			dest += add;
 		}
 

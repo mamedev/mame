@@ -229,12 +229,12 @@ INLINE void fetch_effective_address( m68_state_t *m68_state );
 /****************************************************************************/
 /* Read a byte from given memory location                                   */
 /****************************************************************************/
-#define RM(Addr) ((unsigned)memory_read_byte_8be(m68_state->program, Addr))
+#define RM(Addr) ((unsigned)m68_state->program->read_byte(Addr))
 
 /****************************************************************************/
 /* Write a byte to given memory location                                    */
 /****************************************************************************/
-#define WM(Addr,Value) (memory_write_byte_8be(m68_state->program, Addr,Value))
+#define WM(Addr,Value) (m68_state->program->write_byte(Addr,Value))
 
 /****************************************************************************/
 /* Z80_RDOP() is identical to Z80_RDMEM() except it is used for reading     */

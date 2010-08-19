@@ -56,8 +56,8 @@ static WRITE16_HANDLER( soundcmd_w )
 
 static void write_dword( address_space *space, offs_t offset, UINT32 data )
 {
-	memory_write_word(space, offset, data >> 16);
-	memory_write_word(space, offset + 2, data);
+	space->write_word(offset, data >> 16);
+	space->write_word(offset + 2, data);
 }
 
 static WRITE16_HANDLER( protection_w )
@@ -71,10 +71,10 @@ static WRITE16_HANDLER( protection_w )
 	int map;
 
 	map = maplist
-		[memory_read_byte(space, 0xffc006)]
-		[(memory_read_byte(space, 0xffc003) << 1) + (memory_read_word(space, 0xffc004) >> 8)];
+		[space->read_byte(0xffc006)]
+		[(space->read_byte(0xffc003) << 1) + (space->read_word(0xffc004) >> 8)];
 
-	switch (memory_read_byte(space, 0xffc684))
+	switch (space->read_byte(0xffc684))
 	{
 	case 1:
 		{
@@ -111,10 +111,10 @@ static WRITE16_HANDLER( protection_w )
 			int d1 = delta1[map] + 0xc0;
 			int d2 = delta2[map];
 
-			memory_write_word(space, 0xffc680, d1);
-			memory_write_word(space, 0xffc682, d2);
-			memory_write_word(space, 0xffc00c, 0xc0);
-			memory_write_word(space, 0xffc00e, 0);
+			space->write_word(0xffc680, d1);
+			space->write_word(0xffc682, d2);
+			space->write_word(0xffc00c, 0xc0);
+			space->write_word(0xffc00e, 0);
 
 			sf_fg_scroll_w(space, 0, d1, 0xffff);
 			sf_bg_scroll_w(space, 0, d2, 0xffff);
@@ -122,13 +122,13 @@ static WRITE16_HANDLER( protection_w )
 		}
 	case 4:
 		{
-			int pos = memory_read_byte(space, 0xffc010);
+			int pos = space->read_byte(0xffc010);
 			pos = (pos + 1) & 3;
-			memory_write_byte(space, 0xffc010, pos);
+			space->write_byte(0xffc010, pos);
 			if(!pos)
 			{
-				int d1 = memory_read_word(space, 0xffc682);
-				int off = memory_read_word(space, 0xffc00e);
+				int d1 = space->read_word(0xffc682);
+				int off = space->read_word(0xffc00e);
 				if (off!=512)
 				{
 					off++;
@@ -139,8 +139,8 @@ static WRITE16_HANDLER( protection_w )
 					off = 0;
 					d1 -= 512;
 				}
-				memory_write_word(space, 0xffc682, d1);
-				memory_write_word(space, 0xffc00e, off);
+				space->write_word(0xffc682, d1);
+				space->write_word(0xffc00e, off);
 				sf_bg_scroll_w(space, 0, d1, 0xffff);
 			}
 			break;
@@ -148,7 +148,7 @@ static WRITE16_HANDLER( protection_w )
 	default:
 		{
 			logerror("Write protection at %06x (%04x)\n", cpu_get_pc(space->cpu), data & 0xffff);
-			logerror("*** Unknown protection %d\n", memory_read_byte(space, 0xffc684));
+			logerror("*** Unknown protection %d\n", space->read_byte(0xffc684));
 			break;
 		}
 	}

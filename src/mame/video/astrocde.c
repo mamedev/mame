@@ -727,7 +727,7 @@ WRITE8_HANDLER( astrocade_funcgen_w )
 	/* OR/XOR */
 	if (funcgen_control & 0x30)
 	{
-		UINT8 olddata = memory_read_byte(space, 0x4000 + offset);
+		UINT8 olddata = space->read_byte(0x4000 + offset);
 
 		/* compute any intercepts */
 		funcgen_intercept &= 0x0f;
@@ -748,7 +748,7 @@ WRITE8_HANDLER( astrocade_funcgen_w )
 	}
 
 	/* write the result */
-	memory_write_byte(space, 0x4000 + offset, data);
+	space->write_byte(0x4000 + offset, data);
 }
 
 
@@ -842,7 +842,7 @@ static void execute_blit(address_space *space)
 			if (curwidth == 0 && (pattern_mode & 0x08) != 0)
 				busdata = 0;
 			else
-				busdata = memory_read_byte(space, busaddr);
+				busdata = space->read_byte(busaddr);
 
 			/* increment the appropriate address */
 			if ((pattern_mode & 0x01) == 0)
@@ -854,7 +854,7 @@ static void execute_blit(address_space *space)
 
 			/* address is selected between source/dest based on mode.d0 */
 			busaddr = ((pattern_mode & 0x01) != 0) ? pattern_source : pattern_dest;
-			memory_write_byte(space, busaddr, busdata);
+			space->write_byte(busaddr, busdata);
 
 			/* increment the appropriate address */
 			if ((pattern_mode & 0x01) == 0)

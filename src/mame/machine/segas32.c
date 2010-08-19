@@ -230,15 +230,15 @@ void darkedge_fd1149_vblank(running_device *device)
 {
 	address_space *space = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
 
-	memory_write_word(space, 0x20f072, 0);
-	memory_write_word(space, 0x20f082, 0);
+	space->write_word(0x20f072, 0);
+	space->write_word(0x20f082, 0);
 
-	if( memory_read_byte(space, 0x20a12c) != 0 )
+	if( space->read_byte(0x20a12c) != 0 )
 	{
-		memory_write_byte(space, 0x20a12c, memory_read_byte(space, 0x20a12c)-1 );
+		space->write_byte(0x20a12c, space->read_byte(0x20a12c)-1 );
 
-		if( memory_read_byte(space, 0x20a12c) == 0 )
-			memory_write_byte(space, 0x20a12e, 1);
+		if( space->read_byte(0x20a12c) == 0 )
+			space->write_byte(0x20a12e, 1);
 	}
 }
 
@@ -267,7 +267,7 @@ READ16_HANDLER( darkedge_protection_r )
 
 WRITE16_HANDLER( dbzvrvs_protection_w )
 {
-	memory_write_word( space, 0x2080c8, memory_read_word( space, 0x200044 ) );
+	space->write_word( 0x2080c8, space->read_word( 0x200044 ) );
 }
 
 
@@ -331,12 +331,12 @@ WRITE16_HANDLER( jleague_protection_w )
 		// Map team browser selection to opponent browser selection
 		// using same lookup table that V60 uses for sound sample mapping.
 		case 0:
-			memory_write_byte( space, 0x20f708, memory_read_word( space, 0x7bbc0 + data*2 ) );
+			space->write_byte( 0x20f708, space->read_word( 0x7bbc0 + data*2 ) );
 			break;
 
 		// move on to team browser
 		case 4/2:
-			memory_write_byte( space, 0x200016, data & 0xff );
+			space->write_byte( 0x200016, data & 0xff );
 			break;
 
 		default:

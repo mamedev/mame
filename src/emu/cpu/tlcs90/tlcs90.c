@@ -177,16 +177,16 @@ static const char *const cc_names[]	=	{	"f",	"lt",	"le",	"ule",	"ov",	"mi",	"z",
 #define R16D8( N,R,I )		cpustate->mode##N = MODE_R16D8;	cpustate->r##N = R;	cpustate->r##N##b = I;
 #define R16R8( N,R,g )		cpustate->mode##N = MODE_R16R8;	cpustate->r##N = R;	cpustate->r##N##b = g;
 
-INLINE UINT8  RM8 (t90_Regs *cpustate, UINT32 a)	{ return memory_read_byte_8le( cpustate->program, a ); }
+INLINE UINT8  RM8 (t90_Regs *cpustate, UINT32 a)	{ return cpustate->program->read_byte( a ); }
 INLINE UINT16 RM16(t90_Regs *cpustate, UINT32 a)	{ return RM8(cpustate,a) | (RM8( cpustate, (a+1) & 0xffff ) << 8); }
 
-INLINE void WM8 (t90_Regs *cpustate, UINT32 a, UINT8  v)	{ memory_write_byte_8le( cpustate->program, a, v ); }
+INLINE void WM8 (t90_Regs *cpustate, UINT32 a, UINT8  v)	{ cpustate->program->write_byte( a, v ); }
 INLINE void WM16(t90_Regs *cpustate, UINT32 a, UINT16 v)	{ WM8(cpustate,a,v);	WM8( cpustate, (a+1) & 0xffff, v >> 8); }
 
-INLINE UINT8  RX8 (t90_Regs *cpustate, UINT32 a, UINT32 base)	{ return memory_read_byte_8le( cpustate->program, base | a ); }
+INLINE UINT8  RX8 (t90_Regs *cpustate, UINT32 a, UINT32 base)	{ return cpustate->program->read_byte( base | a ); }
 INLINE UINT16 RX16(t90_Regs *cpustate, UINT32 a, UINT32 base)	{ return RX8(cpustate,a,base) | (RX8( cpustate, (a+1) & 0xffff, base ) << 8); }
 
-INLINE void WX8 (t90_Regs *cpustate, UINT32 a, UINT8  v, UINT32 base)	{ memory_write_byte_8le( cpustate->program, base | a, v ); }
+INLINE void WX8 (t90_Regs *cpustate, UINT32 a, UINT8  v, UINT32 base)	{ cpustate->program->write_byte( base | a, v ); }
 INLINE void WX16(t90_Regs *cpustate, UINT32 a, UINT16 v, UINT32 base)	{ WX8(cpustate,a,v,base);	WX8( cpustate, (a+1) & 0xffff, v >> 8, base); }
 
 INLINE UINT8  READ8(t90_Regs *cpustate)	{ UINT8 b0 = RM8( cpustate, cpustate->addr++ ); cpustate->addr &= 0xffff; return b0; }
@@ -2284,7 +2284,7 @@ static READ8_HANDLER( t90_internal_registers_r )
 {
 	t90_Regs *cpustate = get_safe_token(space->cpu);
 
-	#define RIO		memory_read_byte_8le( cpustate->io, T90_IOBASE+offset )
+	#define RIO		cpustate->io->read_byte( T90_IOBASE+offset )
 
 	UINT8 data = cpustate->internal_registers[offset];
 	switch ( T90_IOBASE + offset )
@@ -2495,7 +2495,7 @@ static TIMER_CALLBACK( t90_timer4_callback )
 
 static WRITE8_HANDLER( t90_internal_registers_w )
 {
-	#define WIO		memory_write_byte_8le( cpustate->io, T90_IOBASE+offset, data )
+	#define WIO		cpustate->io->write_byte( T90_IOBASE+offset, data )
 
 	t90_Regs *cpustate = get_safe_token(space->cpu);
 	UINT8 out_mask;

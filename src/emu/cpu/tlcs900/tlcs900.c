@@ -195,8 +195,8 @@ struct _tlcs900_state
 #define FLAG_SF		0x80
 
 
-#define RDMEM(addr)			memory_read_byte_8le( cpustate->program, addr )
-#define WRMEM(addr,data)	memory_write_byte_8le( cpustate->program, addr, data )
+#define RDMEM(addr)			cpustate->program->read_byte( addr )
+#define WRMEM(addr,data)	cpustate->program->write_byte( addr, data )
 #define RDOP()				RDMEM( cpustate->pc.d ); cpustate->pc.d++
 #define RDMEMW(addr)			( RDMEM(addr) | ( RDMEM(addr+1) << 8 ) )
 #define RDMEML(addr)			( RDMEMW(addr) | ( RDMEMW(addr+2) << 16 ) )

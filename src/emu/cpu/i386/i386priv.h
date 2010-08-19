@@ -349,15 +349,15 @@ INLINE int translate_address(i386_state *cpustate, UINT32 *address)
 	UINT32 page_entry;
 
 	// TODO: 4MB pages
-	UINT32 page_dir = memory_read_dword_32le(cpustate->program, pdbr + directory * 4);
+	UINT32 page_dir = cpustate->program->read_dword(pdbr + directory * 4);
 	if (!(cpustate->cr[4] & 0x10)) {
-		page_entry = memory_read_dword_32le(cpustate->program, (page_dir & 0xfffff000) + (table * 4));
+		page_entry = cpustate->program->read_dword((page_dir & 0xfffff000) + (table * 4));
 		*address = (page_entry & 0xfffff000) | offset;
 	} else {
 		if (page_dir & 0x80)
 			*address = (page_dir & 0xffc00000) | (a & 0x003fffff);
 		else {
-			page_entry = memory_read_dword_32le(cpustate->program, (page_dir & 0xfffff000) + (table * 4));
+			page_entry = cpustate->program->read_dword((page_dir & 0xfffff000) + (table * 4));
 			*address = (page_entry & 0xfffff000) | offset;
 		}
 	}
@@ -461,7 +461,7 @@ INLINE UINT8 READ8(i386_state *cpustate,UINT32 ea)
 	}
 
 	address &= cpustate->a20_mask;
-	return memory_read_byte_32le(cpustate->program, address);
+	return cpustate->program->read_byte(address);
 }
 INLINE UINT16 READ16(i386_state *cpustate,UINT32 ea)
 {
@@ -478,7 +478,7 @@ INLINE UINT16 READ16(i386_state *cpustate,UINT32 ea)
 		}
 
 		address &= cpustate->a20_mask;
-		value = memory_read_word_32le( cpustate->program, address );
+		value = cpustate->program->read_word( address );
 	}
 	return value;
 }
@@ -499,7 +499,7 @@ INLINE UINT32 READ32(i386_state *cpustate,UINT32 ea)
 		}
 
 		address &= cpustate->a20_mask;
-		value = memory_read_dword_32le( cpustate->program, address );
+		value = cpustate->program->read_dword( address );
 	}
 	return value;
 }
@@ -525,8 +525,8 @@ INLINE UINT64 READ64(i386_state *cpustate,UINT32 ea)
 		}
 
 		address &= cpustate->a20_mask;
-		value = (((UINT64) memory_read_dword_32le( cpustate->program, address+0 )) << 0) |
-				(((UINT64) memory_read_dword_32le( cpustate->program, address+4 )) << 32);
+		value = (((UINT64) cpustate->program->read_dword( address+0 )) << 0) |
+				(((UINT64) cpustate->program->read_dword( address+4 )) << 32);
 	}
 	return value;
 }
@@ -541,7 +541,7 @@ INLINE void WRITE8(i386_state *cpustate,UINT32 ea, UINT8 value)
 	}
 
 	address &= cpustate->a20_mask;
-	memory_write_byte_32le(cpustate->program, address, value);
+	cpustate->program->write_byte(address, value);
 }
 INLINE void WRITE16(i386_state *cpustate,UINT32 ea, UINT16 value)
 {
@@ -557,7 +557,7 @@ INLINE void WRITE16(i386_state *cpustate,UINT32 ea, UINT16 value)
 		}
 
 		address &= cpustate->a20_mask;
-		memory_write_word_32le(cpustate->program, address, value);
+		cpustate->program->write_word(address, value);
 	}
 }
 INLINE void WRITE32(i386_state *cpustate,UINT32 ea, UINT32 value)
@@ -576,7 +576,7 @@ INLINE void WRITE32(i386_state *cpustate,UINT32 ea, UINT32 value)
 		}
 
 		ea &= cpustate->a20_mask;
-		memory_write_dword_32le(cpustate->program, address, value);
+		cpustate->program->write_dword(address, value);
 	}
 }
 
@@ -600,8 +600,8 @@ INLINE void WRITE64(i386_state *cpustate,UINT32 ea, UINT64 value)
 		}
 
 		ea &= cpustate->a20_mask;
-		memory_write_dword_32le(cpustate->program, address+0, value & 0xffffffff);
-		memory_write_dword_32le(cpustate->program, address+4, (value >> 32) & 0xffffffff);
+		cpustate->program->write_dword(address+0, value & 0xffffffff);
+		cpustate->program->write_dword(address+4, (value >> 32) & 0xffffffff);
 	}
 }
 
@@ -892,11 +892,11 @@ INLINE void BUMP_DI(i386_state *cpustate,int adjustment)
 
 /***********************************************************************************/
 
-#define READPORT8(port)		    	(memory_read_byte_32le(cpustate->io, port))
-#define READPORT16(port)	    	(memory_read_word_32le(cpustate->io, port))
-#define READPORT32(port)	    	(memory_read_dword_32le(cpustate->io, port))
-#define WRITEPORT8(port, value)		(memory_write_byte_32le(cpustate->io, port, value))
-#define WRITEPORT16(port, value)	(memory_write_word_32le(cpustate->io, port, value))
-#define WRITEPORT32(port, value)	(memory_write_dword_32le(cpustate->io, port, value))
+#define READPORT8(port)		    	(cpustate->io->read_byte(port))
+#define READPORT16(port)	    	(cpustate->io->read_word(port))
+#define READPORT32(port)	    	(cpustate->io->read_dword(port))
+#define WRITEPORT8(port, value)		(cpustate->io->write_byte(port, value))
+#define WRITEPORT16(port, value)	(cpustate->io->write_word(port, value))
+#define WRITEPORT32(port, value)	(cpustate->io->write_dword(port, value))
 
 #endif /* __I386_H__ */

@@ -819,7 +819,7 @@ void load_ldafile(address_space *space, const UINT8 *file)
 		{
 			UINT8 data = READ_CHAR();
 			sum += data;
-			memory_write_byte(space, addr++, data);
+			space->write_byte(addr++, data);
 		} while (--len);
 
 		sum += READ_CHAR();
@@ -914,7 +914,7 @@ void load_hexfile(address_space *space, const UINT8 *file)
 			sum += data & 0xf;
 
 			if (record == 6)
-				memory_write_byte(space, addr++, data);
+				space->write_byte(addr++, data);
 
 			len -= 2;
 		}

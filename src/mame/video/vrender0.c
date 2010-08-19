@@ -397,7 +397,7 @@ static const _DrawTemplate DrawTile[]=
 	TILENAME(16,1,2),
 };
 
-#define Packet(i) memory_read_word(space, PacketPtr + 2 * i)
+#define Packet(i) space->read_word(PacketPtr + 2 * i)
 
 //Returns TRUE if the operation was a flip (sync or async)
 int vrender0_ProcessPacket(running_device *device, UINT32 PacketPtr, UINT16 *Dest, UINT8 *TEXTURE)

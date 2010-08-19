@@ -357,8 +357,8 @@ static void nec_interrupt(nec_state_t *nec_state, unsigned int_num,BOOLEAN md_fl
 		nec_state->pending_irq &= ~INT_IRQ;
 	}
 
-    dest_off = read_word(int_num*4);
-    dest_seg = read_word(int_num*4+2);
+    dest_off = read_mem_word(int_num*4);
+    dest_seg = read_mem_word(int_num*4+2);
 
 	PUSH(nec_state->sregs[PS]);
 	PUSH(nec_state->ip);
@@ -1138,14 +1138,20 @@ static void nec_init(legacy_cpu_device *device, device_irq_callback irqcallback,
     8-bit memory accessors
  *****************************************************************************/
 
+static UINT8 memory_read_byte(address_space *space, offs_t address) { return space->read_byte(address); }
+static void memory_write_byte(address_space *space, offs_t address, UINT8 data) { space->write_byte(address, data); }
+static UINT16 memory_read_word(address_space *space, offs_t address) { return space->read_word(address); }
+static void memory_write_word(address_space *space, offs_t address, UINT16 data) { space->write_word(address, data); }
+
+
 static void configure_memory_8bit(nec_state_t *nec_state)
 {
 	nec_state->mem.fetch_xor = 0;
 
-	nec_state->mem.rbyte = memory_read_byte_8le;
-	nec_state->mem.rword = memory_read_word_8le;
-	nec_state->mem.wbyte = memory_write_byte_8le;
-	nec_state->mem.wword = memory_write_word_8le;
+	nec_state->mem.rbyte = memory_read_byte;
+	nec_state->mem.rword = memory_read_word;
+	nec_state->mem.wbyte = memory_write_byte;
+	nec_state->mem.wword = memory_write_word;
 }
 
 
@@ -1156,22 +1162,22 @@ static void configure_memory_8bit(nec_state_t *nec_state)
 static UINT16 read_word_16le(address_space *space, offs_t addr)
 {
 	if (!(addr & 1))
-		return memory_read_word_16le(space, addr);
+		return space->read_word(addr);
 	else
 	{
-		UINT16 result = memory_read_byte_16le(space, addr);
-		return result | (memory_read_byte_16le(space, addr + 1) << 8);
+		UINT16 result = space->read_byte(addr);
+		return result | (space->read_byte(addr + 1) << 8);
 	}
 }
 
 static void write_word_16le(address_space *space, offs_t addr, UINT16 data)
 {
 	if (!(addr & 1))
-		memory_write_word_16le(space, addr, data);
+		space->write_word(addr, data);
 	else
 	{
-		memory_write_byte_16le(space, addr, data);
-		memory_write_byte_16le(space, addr + 1, data >> 8);
+		space->write_byte(addr, data);
+		space->write_byte(addr + 1, data >> 8);
 	}
 }
 
@@ -1179,9 +1185,9 @@ static void configure_memory_16bit(nec_state_t *nec_state)
 {
 	nec_state->mem.fetch_xor = BYTE_XOR_LE(0);
 
-	nec_state->mem.rbyte = memory_read_byte_16le;
+	nec_state->mem.rbyte = memory_read_byte;
 	nec_state->mem.rword = read_word_16le;
-	nec_state->mem.wbyte = memory_write_byte_16le;
+	nec_state->mem.wbyte = memory_write_byte;
 	nec_state->mem.wword = write_word_16le;
 }
 

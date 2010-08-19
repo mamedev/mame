@@ -85,7 +85,7 @@ READ16_HANDLER( apache3_v30_v20_r )
 		offset += 0x00000; // main ram
 	else
 		logerror("%08x: unmapped read z80 rom %08x\n", cpu_get_pc(space->cpu), offset);
-	return 0xff00 | memory_read_byte(targetspace, offset);
+	return 0xff00 | targetspace->read_byte(offset);
 }
 
 WRITE16_HANDLER( apache3_v30_v20_w )
@@ -98,7 +98,7 @@ WRITE16_HANDLER( apache3_v30_v20_w )
 	/* Only 8 bits of the V30 data bus are connected - ignore writes to the other half */
 	if (ACCESSING_BITS_0_7)
 	{
-		memory_write_byte(targetspace, offset, data & 0xff);
+		targetspace->write_byte(offset, data & 0xff);
 	}
 }
 
@@ -156,7 +156,7 @@ READ16_HANDLER( roundup_v30_z80_r )
 	if (tatsumi_control_word & 0x20)
 		offset += 0x8000; /* Upper half */
 
-	return 0xff00 | memory_read_byte(targetspace, offset);
+	return 0xff00 | targetspace->read_byte(offset);
 }
 
 WRITE16_HANDLER( roundup_v30_z80_w )
@@ -169,7 +169,7 @@ WRITE16_HANDLER( roundup_v30_z80_w )
 		if (tatsumi_control_word & 0x20)
 			offset += 0x8000; /* Upper half of Z80 address space */
 
-		memory_write_byte(targetspace, offset, data & 0xff);
+		targetspace->write_byte(offset, data & 0xff);
 	}
 }
 

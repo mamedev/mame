@@ -125,7 +125,7 @@
  ***************************************************************/
 INLINE UINT8 RDMEM(h6280_Regs* cpustate, offs_t addr) {
 	CHECK_VDC_VCE_PENALTY(addr);
-	return memory_read_byte_8le(cpustate->program, TRANSLATED(addr));
+	return cpustate->program->read_byte(TRANSLATED(addr));
 }
 
 /***************************************************************
@@ -133,48 +133,48 @@ INLINE UINT8 RDMEM(h6280_Regs* cpustate, offs_t addr) {
  ***************************************************************/
 INLINE void WRMEM(h6280_Regs* cpustate, offs_t addr, UINT8 data) {
 	CHECK_VDC_VCE_PENALTY(addr);
-	memory_write_byte_8le(cpustate->program, TRANSLATED(addr),data);
+	cpustate->program->write_byte(TRANSLATED(addr),data);
 }
 
 /***************************************************************
  *  RDMEMZ   read memory - zero page
  ***************************************************************/
 #define RDMEMZ(addr)											\
-	memory_read_byte_8le(cpustate->program, (cpustate->mmr[1] << 13) | ((addr)&0x1fff));
+	cpustate->program->read_byte((cpustate->mmr[1] << 13) | ((addr)&0x1fff));
 
 /***************************************************************
  *  WRMEMZ   write memory - zero page
  ***************************************************************/
 #define WRMEMZ(addr,data)										\
-	memory_write_byte_8le(cpustate->program, (cpustate->mmr[1] << 13) | ((addr)&0x1fff),data);
+	cpustate->program->write_byte((cpustate->mmr[1] << 13) | ((addr)&0x1fff),data);
 
 /***************************************************************
  *  RDMEMW   read word from memory
  ***************************************************************/
 #define RDMEMW(addr)											\
-	memory_read_byte_8le(cpustate->program, TRANSLATED(addr)) \
-| ( memory_read_byte_8le(cpustate->program, TRANSLATED(addr+1)) << 8 )
+	cpustate->program->read_byte(TRANSLATED(addr)) \
+| ( cpustate->program->read_byte(TRANSLATED(addr+1)) << 8 )
 
 /***************************************************************
  *  RDZPWORD    read a word from a zero page address
  ***************************************************************/
 #define RDZPWORD(addr)											\
 	((addr&0xff)==0xff) ?										\
-		memory_read_byte_8le(cpustate->program, (cpustate->mmr[1] << 13) | ((addr)&0x1fff))				\
-		+(memory_read_byte_8le(cpustate->program, (cpustate->mmr[1] << 13) | ((addr-0xff)&0x1fff))<<8) : \
-		memory_read_byte_8le(cpustate->program, (cpustate->mmr[1] << 13) | ((addr)&0x1fff))				\
-		+(memory_read_byte_8le(cpustate->program, (cpustate->mmr[1] << 13) | ((addr+1)&0x1fff))<<8)
+		cpustate->program->read_byte((cpustate->mmr[1] << 13) | ((addr)&0x1fff))				\
+		+(cpustate->program->read_byte((cpustate->mmr[1] << 13) | ((addr-0xff)&0x1fff))<<8) : \
+		cpustate->program->read_byte((cpustate->mmr[1] << 13) | ((addr)&0x1fff))				\
+		+(cpustate->program->read_byte((cpustate->mmr[1] << 13) | ((addr+1)&0x1fff))<<8)
 
 
 /***************************************************************
  * push a register onto the stack
  ***************************************************************/
-#define PUSH(Rg) memory_write_byte_8le(cpustate->program, (cpustate->mmr[1] << 13) | cpustate->sp.d,Rg); S--
+#define PUSH(Rg) cpustate->program->write_byte((cpustate->mmr[1] << 13) | cpustate->sp.d,Rg); S--
 
 /***************************************************************
  * pull a register from the stack
  ***************************************************************/
-#define PULL(Rg) S++; Rg = memory_read_byte_8le(cpustate->program, (cpustate->mmr[1] << 13) | cpustate->sp.d)
+#define PULL(Rg) S++; Rg = cpustate->program->read_byte((cpustate->mmr[1] << 13) | cpustate->sp.d)
 
 /***************************************************************
  *  RDOP    read an opcode
@@ -1111,21 +1111,21 @@ INLINE void WRMEM(h6280_Regs* cpustate, offs_t addr, UINT8 data) {
  ***************************************************************/
 #define ST0                                                     \
 	CLEAR_T;													\
-    memory_write_byte_8le(cpustate->io,0x0000,tmp)
+    cpustate->io->write_byte(0x0000,tmp)
 
 /* 6280 ********************************************************
  *  ST1 Store at hardware address 2
  ***************************************************************/
 #define ST1                                                     \
 	CLEAR_T;													\
-    memory_write_byte_8le(cpustate->io,0x0002,tmp)
+    cpustate->io->write_byte(0x0002,tmp)
 
 /* 6280 ********************************************************
  *  ST2 Store at hardware address 3
  ***************************************************************/
 #define ST2                                                     \
 	CLEAR_T;													\
-    memory_write_byte_8le(cpustate->io,0x0003,tmp)
+    cpustate->io->write_byte(0x0003,tmp)
 
 /* 6280 ********************************************************
  *  STA Store accumulator

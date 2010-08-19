@@ -1016,7 +1016,7 @@ static UINT32 scsi_fetch(running_machine *machine, UINT32 dsp)
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	UINT32 result;
-	result = memory_read_dword(space, dsp);
+	result = space->read_dword(dsp);
 	return FLIPENDIAN_INT32(result);
 }
 

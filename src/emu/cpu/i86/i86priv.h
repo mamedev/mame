@@ -84,10 +84,10 @@ typedef enum {
 
 /************************************************************************/
 
-#define read_byte(a)			(*cpustate->mem.rbyte)(cpustate->program, a)
-#define read_word(a)			(*cpustate->mem.rword)(cpustate->program, a)
-#define write_byte(a,d)			(*cpustate->mem.wbyte)(cpustate->program, (a),(d))
-#define write_word(a,d)			(*cpustate->mem.wword)(cpustate->program, (a),(d))
+#define read_mem_byte(a)			(*cpustate->mem.rbyte)(cpustate->program, a)
+#define read_mem_word(a)			(*cpustate->mem.rword)(cpustate->program, a)
+#define write_mem_byte(a,d)			(*cpustate->mem.wbyte)(cpustate->program, (a),(d))
+#define write_mem_word(a,d)			(*cpustate->mem.wword)(cpustate->program, (a),(d))
 
 #define read_port_byte(a)		(*cpustate->mem.rbyte)(cpustate->io, a)
 #define read_port_word(a)		(*cpustate->mem.rword)(cpustate->io, a)
@@ -100,16 +100,16 @@ typedef enum {
 
 #define DefaultBase(Seg)		((cpustate->seg_prefix && (Seg == DS || Seg == SS)) ? cpustate->prefix_base : cpustate->base[Seg])
 
-#define GetMemB(Seg,Off)		(read_byte((DefaultBase(Seg) + (Off)) & AMASK))
-#define GetMemW(Seg,Off)		(read_word((DefaultBase(Seg) + (Off)) & AMASK))
-#define PutMemB(Seg,Off,x)		write_byte((DefaultBase(Seg) + (Off)) & AMASK, (x))
-#define PutMemW(Seg,Off,x)		write_word((DefaultBase(Seg) + (Off)) & AMASK, (x))
+#define GetMemB(Seg,Off)		(read_mem_byte((DefaultBase(Seg) + (Off)) & AMASK))
+#define GetMemW(Seg,Off)		(read_mem_word((DefaultBase(Seg) + (Off)) & AMASK))
+#define PutMemB(Seg,Off,x)		write_mem_byte((DefaultBase(Seg) + (Off)) & AMASK, (x))
+#define PutMemW(Seg,Off,x)		write_mem_word((DefaultBase(Seg) + (Off)) & AMASK, (x))
 
-#define PEEKBYTE(ea)			(read_byte((ea) & AMASK))
-#define ReadByte(ea)			(read_byte((ea) & AMASK))
-#define ReadWord(ea)			(read_word((ea) & AMASK))
-#define WriteByte(ea,val)		write_byte((ea) & AMASK, val);
-#define WriteWord(ea,val)		write_word((ea) & AMASK, val);
+#define PEEKBYTE(ea)			(read_mem_byte((ea) & AMASK))
+#define ReadByte(ea)			(read_mem_byte((ea) & AMASK))
+#define ReadWord(ea)			(read_mem_word((ea) & AMASK))
+#define WriteByte(ea,val)		write_mem_byte((ea) & AMASK, val);
+#define WriteWord(ea,val)		write_mem_word((ea) & AMASK, val);
 
 #define FETCH_XOR(a)			((a) ^ cpustate->mem.fetch_xor)
 #define FETCH					(memory_raw_read_byte(cpustate->program, FETCH_XOR(cpustate->pc++)))

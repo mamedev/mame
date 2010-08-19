@@ -259,11 +259,11 @@ typedef struct {
 	UINT8   *uc_g3;				/* used colors for gfx GTIA 3 */
 }   ANTIC;
 
-#define RDANTIC(space)		memory_read_byte(space, antic.dpage+antic.doffs)
-#define RDVIDEO(space,o)	memory_read_byte(space, antic.vpage+((antic.voffs+(o))&VOFFS))
-#define RDCHGEN(space,o)	memory_read_byte(space, antic.chbase+(o))
-#define RDPMGFXS(space,o)	memory_read_byte(space, antic.pmbase_s+(o)+(antic.scanline>>1))
-#define RDPMGFXD(space,o)	memory_read_byte(space, antic.pmbase_d+(o)+antic.scanline)
+#define RDANTIC(space)		space->read_byte(antic.dpage+antic.doffs)
+#define RDVIDEO(space,o)	space->read_byte(antic.vpage+((antic.voffs+(o))&VOFFS))
+#define RDCHGEN(space,o)	space->read_byte(antic.chbase+(o))
+#define RDPMGFXS(space,o)	space->read_byte(antic.pmbase_s+(o)+(antic.scanline>>1))
+#define RDPMGFXD(space,o)	space->read_byte(antic.pmbase_d+(o)+antic.scanline)
 
 #define PREPARE()												\
 	UINT32 *dst = (UINT32 *)&antic.cclock[PMOFFSET]

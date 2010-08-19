@@ -805,7 +805,7 @@ static void cde_dma_transfer(address_space *space, int channel, int next)
 
 	for (i=0; i < cde_dma[channel].next_length; i++)
 	{
-		memory_write_byte(space, address, 0xff);		// TODO: do the real transfer...
+		space->write_byte(address, 0xff);		// TODO: do the real transfer...
 		address++;
 	}
 }

@@ -314,11 +314,11 @@ struct _mcs51_state_t
 #define ROP_ARG(pc)		memory_raw_read_byte(mcs51_state->program, pc)
 
 /* Read a byte from External Code Memory (Usually Program Rom(s) Space) */
-#define CODEMEM_R(a)	(UINT8)memory_read_byte_8le(mcs51_state->program, a)
+#define CODEMEM_R(a)	(UINT8)mcs51_state->program->read_byte(a)
 
 /* Read/Write a byte from/to External Data Memory (Usually RAM or other I/O) */
-#define DATAMEM_R(a)	(UINT8)memory_read_byte_8le(mcs51_state->io, a)
-#define DATAMEM_W(a,v)	memory_write_byte_8le(mcs51_state->io, a, v)
+#define DATAMEM_R(a)	(UINT8)mcs51_state->io->read_byte(a)
+#define DATAMEM_W(a,v)	mcs51_state->io->write_byte(a, v)
 
 /* Read/Write a byte from/to the Internal RAM */
 
@@ -327,8 +327,8 @@ struct _mcs51_state_t
 
 /* Read/Write a byte from/to the Internal RAM indirectly */
 /* (called from indirect addressing)                     */
-INLINE UINT8 iram_iread(mcs51_state_t *mcs51_state, offs_t a) { return (a <= mcs51_state->ram_mask) ? memory_read_byte_8le(mcs51_state->data, a) : 0xff; }
-INLINE void iram_iwrite(mcs51_state_t *mcs51_state, offs_t a, UINT8 d) { if (a <= mcs51_state->ram_mask) memory_write_byte_8le(mcs51_state->data, a, d); }
+INLINE UINT8 iram_iread(mcs51_state_t *mcs51_state, offs_t a) { return (a <= mcs51_state->ram_mask) ? mcs51_state->data->read_byte(a) : 0xff; }
+INLINE void iram_iwrite(mcs51_state_t *mcs51_state, offs_t a, UINT8 d) { if (a <= mcs51_state->ram_mask) mcs51_state->data->write_byte(a, d); }
 
 #define IRAM_IR(a)		iram_iread(mcs51_state, a)
 #define IRAM_IW(a, d)	iram_iwrite(mcs51_state, a, d)
@@ -342,8 +342,8 @@ INLINE void iram_iwrite(mcs51_state_t *mcs51_state, offs_t a, UINT8 d) { if (a <
 #define BIT_W(a,v)		bit_address_w(mcs51_state, a, v)
 
 /* Input/Output a byte from given I/O port */
-#define IN(port)		((UINT8)memory_read_byte(mcs51_state->io, port))
-#define OUT(port,value) memory_write_byte(mcs51_state->io, port,value)
+#define IN(port)		((UINT8)mcs51_state->io->read_byte(port))
+#define OUT(port,value) mcs51_state->io->write_byte(port,value)
 
 
 /***************************************************************************
@@ -757,13 +757,13 @@ INLINE offs_t external_ram_iaddr(mcs51_state_t *mcs51_state, offs_t offset, offs
 
 INLINE UINT8 iram_read(mcs51_state_t *mcs51_state, size_t offset)
 {
-	return (((offset) < 0x80) ? memory_read_byte_8le(mcs51_state->data, offset) : mcs51_state->sfr_read(mcs51_state, offset));
+	return (((offset) < 0x80) ? mcs51_state->data->read_byte(offset) : mcs51_state->sfr_read(mcs51_state, offset));
 }
 
 INLINE void iram_write(mcs51_state_t *mcs51_state, size_t offset, UINT8 data)
 {
 	if ((offset) < 0x80)
-		memory_write_byte_8le(mcs51_state->data, offset, data);
+		mcs51_state->data->write_byte(offset, data);
 	else
 		mcs51_state->sfr_write(mcs51_state, offset, data);
 }
@@ -2024,7 +2024,7 @@ static void mcs51_sfr_write(mcs51_state_t *mcs51_state, size_t offset, UINT8 dat
 			/* no write in this case according to manual */
 			return;
 	}
-	memory_write_byte_8le(mcs51_state->data, (size_t)offset | 0x100, data);
+	mcs51_state->data->write_byte((size_t)offset | 0x100, data);
 }
 
 static UINT8 mcs51_sfr_read(mcs51_state_t *mcs51_state, size_t offset)
@@ -2057,7 +2057,7 @@ static UINT8 mcs51_sfr_read(mcs51_state_t *mcs51_state, size_t offset)
 		case ADDR_SBUF:
 		case ADDR_IE:
 		case ADDR_IP:
-			return memory_read_byte_8le(mcs51_state->data, (size_t) offset | 0x100);
+			return mcs51_state->data->read_byte((size_t) offset | 0x100);
 		/* Illegal or non-implemented sfr */
 		default:
 			LOG(("mcs51 '%s': attemping to read an invalid/non-implemented SFR address: %x at 0x%04x\n", mcs51_state->device->tag(), (UINT32)offset,PC));
@@ -2212,7 +2212,7 @@ static void i8052_sfr_write(mcs51_state_t *mcs51_state, size_t offset, UINT8 dat
 		case ADDR_RCAP2H:
 		case ADDR_TL2:
 		case ADDR_TH2:
-			memory_write_byte_8le(mcs51_state->data, (size_t) offset | 0x100, data);
+			mcs51_state->data->write_byte((size_t) offset | 0x100, data);
 			break;
 
 		default:
@@ -2230,7 +2230,7 @@ static UINT8 i8052_sfr_read(mcs51_state_t *mcs51_state, size_t offset)
 		case ADDR_RCAP2H:
 		case ADDR_TL2:
 		case ADDR_TH2:
-			return memory_read_byte_8le(mcs51_state->data, (size_t) offset | 0x100);
+			return mcs51_state->data->read_byte((size_t) offset | 0x100);
 		default:
 			return mcs51_sfr_read(mcs51_state, offset);
 	}
@@ -2272,7 +2272,7 @@ static void i80c52_sfr_write(mcs51_state_t *mcs51_state, size_t offset, UINT8 da
 			i8052_sfr_write(mcs51_state, offset, data);
 			return;
 	}
-	memory_write_byte_8le(mcs51_state->data, (size_t) offset | 0x100, data);
+	mcs51_state->data->write_byte((size_t) offset | 0x100, data);
 }
 
 static UINT8 i80c52_sfr_read(mcs51_state_t *mcs51_state, size_t offset)
@@ -2283,7 +2283,7 @@ static UINT8 i80c52_sfr_read(mcs51_state_t *mcs51_state, size_t offset)
 		case ADDR_IPH:
 		case ADDR_SADDR:
 		case ADDR_SADEN:
-			return memory_read_byte_8le(mcs51_state->data, (size_t) offset | 0x100);
+			return mcs51_state->data->read_byte((size_t) offset | 0x100);
 		default:
 			return i8052_sfr_read(mcs51_state, offset);
 	}
@@ -2355,7 +2355,7 @@ static void ds5002fp_sfr_write(mcs51_state_t *mcs51_state, size_t offset, UINT8 
 			mcs51_sfr_write(mcs51_state, offset, data);
 			return;
 	}
-	memory_write_byte_8le(mcs51_state->data, (size_t) offset | 0x100, data);
+	mcs51_state->data->write_byte((size_t) offset | 0x100, data);
 }
 
 static UINT8 ds5002fp_sfr_read(mcs51_state_t *mcs51_state, size_t offset)
@@ -2376,7 +2376,7 @@ static UINT8 ds5002fp_sfr_read(mcs51_state_t *mcs51_state, size_t offset)
 		default:
 			return mcs51_sfr_read(mcs51_state, offset);
 	}
-	return memory_read_byte_8le(mcs51_state->data, (size_t) offset | 0x100);
+	return mcs51_state->data->read_byte((size_t) offset | 0x100);
 }
 
 static CPU_INIT( ds5002fp )

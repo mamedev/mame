@@ -1917,7 +1917,7 @@ static void p3d_dma(address_space *space, UINT32 adr, UINT32 size)
 	UINT16 buffer[256];
 	int pos = 0;
 	while(pos < size) {
-		UINT16 h = memory_read_word(space, adr+pos);
+		UINT16 h = space->read_word(adr+pos);
 
 		pos += 2;
 
@@ -1937,7 +1937,7 @@ static void p3d_dma(address_space *space, UINT32 adr, UINT32 size)
 		}
 
 		for(int i=0; i < psize; i++) {
-			buffer[i] = memory_read_word(space, adr+pos);
+			buffer[i] = space->read_word(adr+pos);
 			pos += 2;
 		}
 

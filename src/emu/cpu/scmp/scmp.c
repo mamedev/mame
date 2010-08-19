@@ -81,12 +81,12 @@ INLINE UINT8 ARG(scmp_state *cpustate)
 
 INLINE UINT8 RM(scmp_state *cpustate,UINT32 a)
 {
-	return memory_read_byte_8le(cpustate->program, a);
+	return cpustate->program->read_byte(a);
 }
 
 INLINE void WM(scmp_state *cpustate,UINT32 a, UINT8 v)
 {
-	memory_write_byte_8le(cpustate->program, a, v);
+	cpustate->program->write_byte(a, v);
 }
 
 INLINE void illegal(scmp_state *cpustate,UINT8 opcode)

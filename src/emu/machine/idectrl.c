@@ -693,17 +693,17 @@ static void write_buffer_to_dma(ide_state *ide)
 			}
 
 			/* fetch the address */
-			ide->dma_address = memory_read_byte(ide->dma_space, ide->dma_descriptor++ ^ ide->dma_address_xor);
-			ide->dma_address |= memory_read_byte(ide->dma_space, ide->dma_descriptor++ ^ ide->dma_address_xor) << 8;
-			ide->dma_address |= memory_read_byte(ide->dma_space, ide->dma_descriptor++ ^ ide->dma_address_xor) << 16;
-			ide->dma_address |= memory_read_byte(ide->dma_space, ide->dma_descriptor++ ^ ide->dma_address_xor) << 24;
+			ide->dma_address = ide->dma_space->read_byte(ide->dma_descriptor++ ^ ide->dma_address_xor);
+			ide->dma_address |= ide->dma_space->read_byte(ide->dma_descriptor++ ^ ide->dma_address_xor) << 8;
+			ide->dma_address |= ide->dma_space->read_byte(ide->dma_descriptor++ ^ ide->dma_address_xor) << 16;
+			ide->dma_address |= ide->dma_space->read_byte(ide->dma_descriptor++ ^ ide->dma_address_xor) << 24;
 			ide->dma_address &= 0xfffffffe;
 
 			/* fetch the length */
-			ide->dma_bytes_left = memory_read_byte(ide->dma_space, ide->dma_descriptor++ ^ ide->dma_address_xor);
-			ide->dma_bytes_left |= memory_read_byte(ide->dma_space, ide->dma_descriptor++ ^ ide->dma_address_xor) << 8;
-			ide->dma_bytes_left |= memory_read_byte(ide->dma_space, ide->dma_descriptor++ ^ ide->dma_address_xor) << 16;
-			ide->dma_bytes_left |= memory_read_byte(ide->dma_space, ide->dma_descriptor++ ^ ide->dma_address_xor) << 24;
+			ide->dma_bytes_left = ide->dma_space->read_byte(ide->dma_descriptor++ ^ ide->dma_address_xor);
+			ide->dma_bytes_left |= ide->dma_space->read_byte(ide->dma_descriptor++ ^ ide->dma_address_xor) << 8;
+			ide->dma_bytes_left |= ide->dma_space->read_byte(ide->dma_descriptor++ ^ ide->dma_address_xor) << 16;
+			ide->dma_bytes_left |= ide->dma_space->read_byte(ide->dma_descriptor++ ^ ide->dma_address_xor) << 24;
 			ide->dma_last_buffer = (ide->dma_bytes_left >> 31) & 1;
 			ide->dma_bytes_left &= 0xfffe;
 			if (ide->dma_bytes_left == 0)
@@ -713,7 +713,7 @@ static void write_buffer_to_dma(ide_state *ide)
 		}
 
 		/* write the next byte */
-		memory_write_byte(ide->dma_space, ide->dma_address++, *data++);
+		ide->dma_space->write_byte(ide->dma_address++, *data++);
 		ide->dma_bytes_left--;
 	}
 }
@@ -897,17 +897,17 @@ static void read_buffer_from_dma(ide_state *ide)
 			}
 
 			/* fetch the address */
-			ide->dma_address = memory_read_byte(ide->dma_space, ide->dma_descriptor++ ^ ide->dma_address_xor);
-			ide->dma_address |= memory_read_byte(ide->dma_space, ide->dma_descriptor++ ^ ide->dma_address_xor) << 8;
-			ide->dma_address |= memory_read_byte(ide->dma_space, ide->dma_descriptor++ ^ ide->dma_address_xor) << 16;
-			ide->dma_address |= memory_read_byte(ide->dma_space, ide->dma_descriptor++ ^ ide->dma_address_xor) << 24;
+			ide->dma_address = ide->dma_space->read_byte(ide->dma_descriptor++ ^ ide->dma_address_xor);
+			ide->dma_address |= ide->dma_space->read_byte(ide->dma_descriptor++ ^ ide->dma_address_xor) << 8;
+			ide->dma_address |= ide->dma_space->read_byte(ide->dma_descriptor++ ^ ide->dma_address_xor) << 16;
+			ide->dma_address |= ide->dma_space->read_byte(ide->dma_descriptor++ ^ ide->dma_address_xor) << 24;
 			ide->dma_address &= 0xfffffffe;
 
 			/* fetch the length */
-			ide->dma_bytes_left = memory_read_byte(ide->dma_space, ide->dma_descriptor++ ^ ide->dma_address_xor);
-			ide->dma_bytes_left |= memory_read_byte(ide->dma_space, ide->dma_descriptor++ ^ ide->dma_address_xor) << 8;
-			ide->dma_bytes_left |= memory_read_byte(ide->dma_space, ide->dma_descriptor++ ^ ide->dma_address_xor) << 16;
-			ide->dma_bytes_left |= memory_read_byte(ide->dma_space, ide->dma_descriptor++ ^ ide->dma_address_xor) << 24;
+			ide->dma_bytes_left = ide->dma_space->read_byte(ide->dma_descriptor++ ^ ide->dma_address_xor);
+			ide->dma_bytes_left |= ide->dma_space->read_byte(ide->dma_descriptor++ ^ ide->dma_address_xor) << 8;
+			ide->dma_bytes_left |= ide->dma_space->read_byte(ide->dma_descriptor++ ^ ide->dma_address_xor) << 16;
+			ide->dma_bytes_left |= ide->dma_space->read_byte(ide->dma_descriptor++ ^ ide->dma_address_xor) << 24;
 			ide->dma_last_buffer = (ide->dma_bytes_left >> 31) & 1;
 			ide->dma_bytes_left &= 0xfffe;
 			if (ide->dma_bytes_left == 0)
@@ -917,7 +917,7 @@ static void read_buffer_from_dma(ide_state *ide)
 		}
 
 		/* read the next byte */
-		*data++ = memory_read_byte(ide->dma_space, ide->dma_address++);
+		*data++ = ide->dma_space->read_byte(ide->dma_address++);
 		ide->dma_bytes_left--;
 	}
 }

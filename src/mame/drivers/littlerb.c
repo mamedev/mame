@@ -216,7 +216,7 @@ static void littlerb_data_write(running_machine *machine, UINT16 data, UINT16 me
 	address_space *vdp_space = machine->device<littlerb_vdp_device>("littlerbvdp")->space();
 
 
-	memory_write_word_masked(vdp_space, addr*2, data, mem_mask);
+	vdp_space->write_word(addr*2, data, mem_mask);
 
 
 	// e000 / 2000 are used for palette writes, which should go to a RAMDAC, so probably mean no auto inc.

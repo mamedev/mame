@@ -429,7 +429,7 @@ static STREAM_UPDATE( leland_80186_dma_update )
 				/* sample-rate convert to the output frequency */
 				for (j = 0; j < samples && count > 0; j++)
 				{
-					buffer[j] += ((int)memory_read_byte(dmaspace, source) - 0x80) * volume;
+					buffer[j] += ((int)dmaspace->read_byte(source) - 0x80) * volume;
 					frac += step;
 					source += frac >> 24;
 					count -= frac >> 24;

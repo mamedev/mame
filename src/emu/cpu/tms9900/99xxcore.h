@@ -529,7 +529,7 @@ static void reset_decrementer(tms99xx_state *cpustate);
 READ16_HANDLER(ti990_10_internal_r)
 {
 	//return cpustate->ROM[offset];
-	return memory_read_word_16be(space, 0x1ffc00+offset);
+	return space->read_word(0x1ffc00+offset);
 }
 
 #endif
@@ -579,14 +579,14 @@ WRITE8_HANDLER(tms9995_internal2_w)
 		{	/* intercept TPCS and CPU ROM */
 			if (addr < 0xfc00)
 				/* TPCS */
-				return memory_read_word_16be(cpustate->program, 0x1f0000+addr);
+				return cpustate->program->read_word(0x1f0000+addr);
 			else
 				/* CPU ROM */
-				return memory_read_word_16be(cpustate->program, 0x1f0000+addr);	/* hack... */
+				return cpustate->program->read_word(0x1f0000+addr);	/* hack... */
 		}
 		else if (! cpustate->mapping_on)
 		{
-			return memory_read_word_16be(cpustate->program, addr);
+			return cpustate->program->read_word(addr);
 		}
 		else
 		{
@@ -607,13 +607,13 @@ WRITE8_HANDLER(tms9995_internal2_w)
 					cpustate->error_interrupt_register |= EIR_MAPERR;
 					cpustate->write_inhibit = 1;
 				}
-				return memory_read_word_16be(cpustate->program, addr);
+				return cpustate->program->read_word(addr);
 			}
 			if ((! (cpustate->error_interrupt_register & EIR_MAPERR)) && ! (cpustate->diaglat))
 				cpustate->mapper_address_latch = cpustate->map_files[map_file].bias[map_index]+addr;
 			if ((cpustate->latch_control[map_index]) && (! cpustate->reset_maperr))
 				cpustate->diaglat = 1;
-			return memory_read_word_16be(cpustate->program, cpustate->map_files[map_file].bias[map_index]+addr);
+			return cpustate->program->read_word(cpustate->map_files[map_file].bias[map_index]+addr);
 		}
 	}
 
@@ -624,14 +624,14 @@ WRITE8_HANDLER(tms9995_internal2_w)
 		{	/* intercept TPCS and CPU ROM */
 			if (addr < 0xfc00)
 				/* TPCS */
-				memory_write_word_16be(cpustate->program, 0x1f0000+addr, data);
+				cpustate->program->write_word(0x1f0000+addr, data);
 			else
 				/* CPU ROM */
-				memory_write_word_16be(cpustate->program, 0x1f0000+addr, data);	/* hack... */
+				cpustate->program->write_word(0x1f0000+addr, data);	/* hack... */
 		}
 		else if (! cpustate->mapping_on)
 		{
-			memory_write_word_16be(cpustate->program, addr, data);
+			cpustate->program->write_word(addr, data);
 		}
 		else
 		{
@@ -653,16 +653,16 @@ WRITE8_HANDLER(tms9995_internal2_w)
 					cpustate->write_inhibit = 1;
 				}
 				if (cpustate->write_inhibit)
-					(void)memory_read_word_16be(cpustate->program, addr);
+					(void)cpustate->program->read_word(addr);
 				else
-					memory_write_word_16be(cpustate->program, addr, data);
+					cpustate->program->write_word(addr, data);
 				return;
 			}
 			if ((! (cpustate->error_interrupt_register & EIR_MAPERR)) && ! (cpustate->diaglat))
 				cpustate->mapper_address_latch = cpustate->map_files[map_file].bias[map_index]+addr;
 			if ((cpustate->latch_control[map_index]) && (! cpustate->reset_maperr))
 				cpustate->diaglat = 1;
-			memory_write_word_16be(cpustate->program, cpustate->map_files[map_file].bias[map_index]+addr, data);
+			cpustate->program->write_word(cpustate->map_files[map_file].bias[map_index]+addr, data);
 		}
 	}
 
@@ -673,14 +673,14 @@ WRITE8_HANDLER(tms9995_internal2_w)
 		{	/* intercept TPCS and CPU ROM */
 			if (addr < 0xfc00)
 				/* TPCS */
-				return memory_read_byte_16be(cpustate->program, 0x1f0000+addr);
+				return cpustate->program->read_byte(0x1f0000+addr);
 			else
 				/* CPU ROM */
-				return memory_read_byte_16be(cpustate->program, 0x1f0000+addr);	/* hack... */
+				return cpustate->program->read_byte(0x1f0000+addr);	/* hack... */
 		}
 		else if (! cpustate->mapping_on)
 		{
-			return memory_read_byte_16be(cpustate->program, addr);
+			return cpustate->program->read_byte(addr);
 		}
 		else
 		{
@@ -701,13 +701,13 @@ WRITE8_HANDLER(tms9995_internal2_w)
 					cpustate->error_interrupt_register |= EIR_MAPERR;
 					cpustate->write_inhibit = 1;
 				}
-				return memory_read_byte_16be(cpustate->program, addr);
+				return cpustate->program->read_byte(addr);
 			}
 			if ((! (cpustate->error_interrupt_register & EIR_MAPERR)) && ! (cpustate->diaglat))
 				cpustate->mapper_address_latch = cpustate->map_files[map_file].bias[map_index]+addr;
 			if ((cpustate->latch_control[map_index]) && (! cpustate->reset_maperr))
 				cpustate->diaglat = 1;
-			return memory_read_byte_16be(cpustate->program, cpustate->map_files[map_file].bias[map_index]+addr);
+			return cpustate->program->read_byte(cpustate->map_files[map_file].bias[map_index]+addr);
 		}
 	}
 
@@ -718,14 +718,14 @@ WRITE8_HANDLER(tms9995_internal2_w)
 		{	/* intercept TPCS and CPU ROM */
 			if (addr < 0xfc00)
 				/* TPCS */
-				memory_write_byte_16be(cpustate->program, 0x1f0000+addr, data);
+				cpustate->program->write_byte(0x1f0000+addr, data);
 			else
 				/* CPU ROM */
-				memory_write_byte_16be(cpustate->program, 0x1f0000+addr, data);	/* hack... */
+				cpustate->program->write_byte(0x1f0000+addr, data);	/* hack... */
 		}
 		else if (! cpustate->mapping_on)
 		{
-			memory_write_byte_16be(cpustate->program, addr, data);
+			cpustate->program->write_byte(addr, data);
 		}
 		else
 		{
@@ -747,16 +747,16 @@ WRITE8_HANDLER(tms9995_internal2_w)
 					cpustate->write_inhibit = 1;
 				}
 				if (cpustate->write_inhibit)
-					(void)memory_read_byte_16be(cpustate->program, addr);
+					(void)cpustate->program->read_byte(addr);
 				else
-					memory_write_byte_16be(cpustate->program, addr, data);
+					cpustate->program->write_byte(addr, data);
 				return;
 			}
 			if ((! (cpustate->error_interrupt_register & EIR_MAPERR)) && ! (cpustate->diaglat))
 				cpustate->mapper_address_latch = cpustate->map_files[map_file].bias[map_index]+addr;
 			if ((cpustate->latch_control[map_index]) && (! cpustate->reset_maperr))
 				cpustate->diaglat = 1;
-			memory_write_byte_16be(cpustate->program, cpustate->map_files[map_file].bias[map_index]+addr, data);
+			cpustate->program->write_byte(cpustate->map_files[map_file].bias[map_index]+addr, data);
 		}
 	}
 
@@ -767,11 +767,11 @@ WRITE8_HANDLER(tms9995_internal2_w)
     remember this when writing memory handlers.*/
 	/*This does not apply to tms9995 and tms99xxx, but does apply to tms9980 (see below).*/
 
-	#define readword(cs, addr)        memory_read_word_16be((cs)->program, addr)
-	#define writeword(cs, addr,data)  memory_write_word_16be((cs)->program, (addr), (data))
+	#define readword(cs, addr)        (cs)->program->read_word(addr)
+	#define writeword(cs, addr,data)  (cs)->program->write_word((addr), (data))
 
-	#define readbyte(cs, addr)        memory_read_byte_16be((cs)->program, addr)
-	#define writebyte(cs, addr,data)  memory_write_byte_16be((cs)->program, (addr),(data))
+	#define readbyte(cs, addr)        (cs)->program->read_byte(addr)
+	#define writebyte(cs, addr,data)  (cs)->program->write_byte((addr),(data))
 
 #elif (TMS99XX_MODEL == TMS9980_ID)
 	/*8-bit data bus, 14-bit address*/
@@ -784,14 +784,14 @@ WRITE8_HANDLER(tms9995_internal2_w)
 		int val;
 
 		cpustate->icount -= 2;
-		val = memory_read_byte_8be(cpustate->program, addr);
-		return (val << 8) | memory_read_byte_8be(cpustate->program, addr+1);
+		val = cpustate->program->read_byte(addr);
+		return (val << 8) | cpustate->program->read_byte(addr+1);
 	}
-	#define writeword(cs, addr,data)  { (cs)->icount -= 2; memory_write_byte_8be((cs)->program, (addr), (data) >> 8); memory_write_byte_8be(cpustate->program, (addr) + 1, (data) & 0xff); }
+	#define writeword(cs, addr,data)  { (cs)->icount -= 2; (cs)->program->write_byte((addr), (data) >> 8); cpustate->program->write_byte((addr) + 1, (data) & 0xff); }
 
 #if 0
-	#define readbyte(cs, addr)        ((cs)->icount -= 2, memory_read_byte_8be((cs)->program, addr))
-	#define writebyte(cs, addr,data)  { (cs)->icount -= 2; memory_write_byte_8be((cs)->program, (addr),(data)); }
+	#define readbyte(cs, addr)        ((cs)->icount -= 2, (cs)->program->read_byte(addr))
+	#define writebyte(cs, addr,data)  { (cs)->icount -= 2; (cs)->program->write_byte((addr),(data)); }
 #else
 	/*This is how it really works*/
 	/*Note that every writebyte must match a readbyte (which is indeed the case)*/
@@ -801,13 +801,13 @@ WRITE8_HANDLER(tms9995_internal2_w)
 		cpustate->icount -= 2;
 		if (addr & 1)
 		{
-			cpustate->extra_byte = memory_read_byte_8be(cpustate->program, addr-1);
-			return memory_read_byte_8be(cpustate->program, addr);
+			cpustate->extra_byte = cpustate->program->read_byte(addr-1);
+			return cpustate->program->read_byte(addr);
 		}
 		else
 		{
-			int val = memory_read_byte_8be(cpustate->program, addr);
-			cpustate->extra_byte = memory_read_byte_8be(cpustate->program, addr+1);
+			int val = cpustate->program->read_byte(addr);
+			cpustate->extra_byte = cpustate->program->read_byte(addr+1);
 			return val;
 		}
 	}
@@ -816,13 +816,13 @@ WRITE8_HANDLER(tms9995_internal2_w)
 		cpustate->icount -= 2;
 		if (addr & 1)
 		{
-			memory_write_byte_8be(cpustate->program, addr-1, cpustate->extra_byte);
-			memory_write_byte_8be(cpustate->program, addr, data);
+			cpustate->program->write_byte(addr-1, cpustate->extra_byte);
+			cpustate->program->write_byte(addr, data);
 		}
 		else
 		{
-			memory_write_byte_8be(cpustate->program, addr, data);
-			memory_write_byte_8be(cpustate->program, addr+1, cpustate->extra_byte);
+			cpustate->program->write_byte(addr, data);
+			cpustate->program->write_byte(addr+1, cpustate->extra_byte);
 		}
 	}
 #endif
@@ -841,7 +841,7 @@ WRITE8_HANDLER(tms9995_internal2_w)
 		else
 		{
 			cpustate->icount -= 2;
-			return (memory_read_byte_8be(cpustate->program, addr) << 8) + memory_read_byte_8be(cpustate->program, addr + 1);
+			return (cpustate->program->read_byte(addr) << 8) + cpustate->program->read_byte(addr + 1);
 		}
 	}
 	static void writeword(tms99xx_state *cpustate, int addr, int data)
@@ -852,8 +852,8 @@ WRITE8_HANDLER(tms9995_internal2_w)
 		else if (!(addr < 0x2000))
 		{
 			cpustate->icount -= 2;
-			memory_write_byte_8be(cpustate->program, addr, data >> 8);
-			memory_write_byte_8be(cpustate->program, addr + 1, data & 0xff);
+			cpustate->program->write_byte(addr, data >> 8);
+			cpustate->program->write_byte(addr + 1, data & 0xff);
 		}
 	}
 
@@ -870,13 +870,13 @@ WRITE8_HANDLER(tms9995_internal2_w)
 			cpustate->icount -= 2;
 			if (addr & 1)
 			{
-				cpustate->extra_byte = memory_read_byte_8be(cpustate->program, addr-1);
-				return memory_read_byte_8be(cpustate->program, addr);
+				cpustate->extra_byte = cpustate->program->read_byte(addr-1);
+				return cpustate->program->read_byte(addr);
 			}
 			else
 			{
-				int val = memory_read_byte_8be(cpustate->program, addr);
-				cpustate->extra_byte = memory_read_byte_8be(cpustate->program, addr+1);
+				int val = cpustate->program->read_byte(addr);
+				cpustate->extra_byte = cpustate->program->read_byte(addr+1);
 				return val;
 			}
 		}
@@ -891,13 +891,13 @@ WRITE8_HANDLER(tms9995_internal2_w)
 			cpustate->icount -= 2;
 			if (addr & 1)
 			{
-				memory_write_byte_8be(cpustate->program, addr-1, cpustate->extra_byte);
-				memory_write_byte_8be(cpustate->program, addr, data);
+				cpustate->program->write_byte(addr-1, cpustate->extra_byte);
+				cpustate->program->write_byte(addr, data);
 			}
 			else
 			{
-				memory_write_byte_8be(cpustate->program, addr, data);
-				memory_write_byte_8be(cpustate->program, addr+1, cpustate->extra_byte);
+				cpustate->program->write_byte(addr, data);
+				cpustate->program->write_byte(addr+1, cpustate->extra_byte);
 			}
 		}
 	}
@@ -914,8 +914,8 @@ WRITE8_HANDLER(tms9995_internal2_w)
 		{
 			int reply;
 			cpustate->icount -= cpustate->memory_wait_states_word;
-			reply = memory_read_byte_8be(cpustate->program, addr);
-			return (reply << 8) | memory_read_byte_8be(cpustate->program, addr + 1);
+			reply = cpustate->program->read_byte(addr);
+			return (reply << 8) | cpustate->program->read_byte(addr + 1);
 		}
 		else if (addr < 0xf0fc)
 		{
@@ -925,8 +925,8 @@ WRITE8_HANDLER(tms9995_internal2_w)
 		{
 			int reply;
 			cpustate->icount -= cpustate->memory_wait_states_word;
-			reply = memory_read_byte_8be(cpustate->program, addr);
-			return (reply << 8) | memory_read_byte_8be(cpustate->program, addr + 1);
+			reply = cpustate->program->read_byte(addr);
+			return (reply << 8) | cpustate->program->read_byte(addr + 1);
 		}
 		else if (addr < 0xfffc)
 		{
@@ -949,8 +949,8 @@ WRITE8_HANDLER(tms9995_internal2_w)
 		if ((addr < 0xf000) || (cpustate->is_mp9537))
 		{
 			cpustate->icount -= cpustate->memory_wait_states_word;
-			memory_write_byte_8be(cpustate->program, addr, data >> 8);
-			memory_write_byte_8be(cpustate->program, addr + 1, data & 0xff);
+			cpustate->program->write_byte(addr, data >> 8);
+			cpustate->program->write_byte(addr + 1, data & 0xff);
 		}
 		else if (addr < 0xf0fc)
 		{
@@ -959,8 +959,8 @@ WRITE8_HANDLER(tms9995_internal2_w)
 		else if (addr < 0xfffa)
 		{
 			cpustate->icount -= cpustate->memory_wait_states_word;
-			memory_write_byte_8be(cpustate->program, addr, data >> 8);
-			memory_write_byte_8be(cpustate->program, addr + 1, data & 0xff);
+			cpustate->program->write_byte(addr, data >> 8);
+			cpustate->program->write_byte(addr + 1, data & 0xff);
 		}
 		else if (addr < 0xfffc)
 		{
@@ -979,7 +979,7 @@ WRITE8_HANDLER(tms9995_internal2_w)
 		if ((addr < 0xf000) || (cpustate->is_mp9537))
 		{
 			cpustate->icount -= cpustate->memory_wait_states_byte;
-			return memory_read_byte_8be(cpustate->program, addr);
+			return cpustate->program->read_byte(addr);
 		}
 		else if (addr < 0xf0fc)
 		{
@@ -988,7 +988,7 @@ WRITE8_HANDLER(tms9995_internal2_w)
 		else if (addr < 0xfffa)
 		{
 			cpustate->icount -= cpustate->memory_wait_states_byte;
-			return memory_read_byte_8be(cpustate->program, addr);
+			return cpustate->program->read_byte(addr);
 		}
 		else if (addr < 0xfffc)
 		{
@@ -1018,7 +1018,7 @@ WRITE8_HANDLER(tms9995_internal2_w)
 		if ((addr < 0xf000) || (cpustate->is_mp9537))
 		{
 			cpustate->icount -= cpustate->memory_wait_states_byte;
-			memory_write_byte_8be(cpustate->program, addr, data);
+			cpustate->program->write_byte(addr, data);
 		}
 		else if (addr < 0xf0fc)
 		{
@@ -1027,7 +1027,7 @@ WRITE8_HANDLER(tms9995_internal2_w)
 		else if (addr < 0xfffa)
 		{
 			cpustate->icount -= cpustate->memory_wait_states_byte;
-			memory_write_byte_8be(cpustate->program, addr, data);
+			cpustate->program->write_byte(addr, data);
 		}
 		else if (addr < 0xfffc)
 		{
@@ -1999,7 +1999,7 @@ typedef enum
 	CRU_PRIVILEGE_VIOLATION = -1
 } cru_error_code;
 
-#define WRITEPORT(cs, port, data) memory_write_byte_8be((cs)->io, port, data)
+#define WRITEPORT(cs, port, data) (cs)->io->write_byte(port, data)
 
 #if (TMS99XX_MODEL == TMS9940_ID) || (TMS99XX_MODEL == TMS9985_ID)
 /* on tms9940, we have to handle internal CRU ports */
@@ -2218,7 +2218,7 @@ static void external_instruction_notify(tms99xx_state *cpustate, int ext_op_ID)
     read at the same address.  This seems to be impossible to emulate efficiently, so, if you need
     to emulate this, you're in trouble.
 */
-#define READPORT(cs, port) memory_read_byte_8be((cs)->io, port)
+#define READPORT(cs, port) (cs)->io->read_byte(port)
 
 
 #if (TMS99XX_MODEL == TMS9940_ID) || (TMS99XX_MODEL == TMS9985_ID)
@@ -2429,10 +2429,10 @@ static void load_map_file(tms99xx_state *cpustate, UINT16 src_addr, int src_map_
 
 	for (i=0; i<3; i++)
 	{
-		cpustate->map_files[dst_file].L[i] = memory_read_word_16be(cpustate->program, cpustate->mapper_address_latch) & 0xffe0;
+		cpustate->map_files[dst_file].L[i] = cpustate->program->read_word(cpustate->mapper_address_latch) & 0xffe0;
 		cpustate->map_files[dst_file].limit[i] = (cpustate->map_files[dst_file].L[i] ^ 0xffe0) | 0x001f;
 		cpustate->mapper_address_latch = (cpustate->mapper_address_latch+2) & 0x1fffff;
-		cpustate->map_files[dst_file].B[i] = memory_read_word_16be(cpustate->program, cpustate->mapper_address_latch);
+		cpustate->map_files[dst_file].B[i] = cpustate->program->read_word(cpustate->mapper_address_latch);
 		cpustate->map_files[dst_file].bias[i] = ((unsigned int) cpustate->map_files[dst_file].B[i]) << 5;
 		cpustate->mapper_address_latch = (cpustate->mapper_address_latch+2) & 0x1fffff;
 	}

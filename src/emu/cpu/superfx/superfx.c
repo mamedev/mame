@@ -179,12 +179,12 @@ static void superfx_memory_reset(superfx_state *cpustate)
 
 INLINE UINT8 superfx_bus_read(superfx_state *cpustate, UINT32 addr)
 {
-	return memory_read_byte(cpustate->program, addr);
+	return cpustate->program->read_byte(addr);
 }
 
 INLINE void superfx_bus_write(superfx_state *cpustate, UINT32 addr, UINT8 data)
 {
-	memory_write_byte(cpustate->program, addr, data);
+	cpustate->program->write_byte(addr, data);
 }
 
 INLINE void superfx_pixelcache_flush(superfx_state *cpustate, INT32 line)

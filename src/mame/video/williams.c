@@ -606,7 +606,7 @@ WRITE8_HANDLER( williams2_blit_window_enable_w )
 INLINE void blit_pixel(address_space *space, int offset, int srcdata, int data, int mask, int solid)
 {
 	/* always read from video RAM regardless of the bank setting */
-	int pix = (offset < 0xc000) ? williams_videoram[offset] : memory_read_byte(space, offset);
+	int pix = (offset < 0xc000) ? williams_videoram[offset] : space->read_byte(offset);
 
 	/* handle transparency */
 	if (data & 0x08)
@@ -626,7 +626,7 @@ INLINE void blit_pixel(address_space *space, int offset, int srcdata, int data, 
 	/* note that we have to allow blits to non-video RAM (e.g. tileram) because those */
 	/* are not blocked by the window enable */
 	if (!williams_blitter_window_enable || offset < williams_blitter_clip_address || offset >= 0xc000)
-		memory_write_byte(space, offset, pix);
+		space->write_byte(offset, pix);
 }
 
 
@@ -666,7 +666,7 @@ static int blitter_core(address_space *space, int sstart, int dstart, int w, int
 			/* loop over the width */
 			for (j = w; j > 0; j--)
 			{
-				blit_pixel(space, dest, blitter_remap[memory_read_byte(space, source)], data, keepmask, solid);
+				blit_pixel(space, dest, blitter_remap[space->read_byte(source)], data, keepmask, solid);
 				accesses += 2;
 
 				/* advance */
@@ -700,7 +700,7 @@ static int blitter_core(address_space *space, int sstart, int dstart, int w, int
 			dest = dstart & 0xffff;
 
 			/* left edge case */
-			pixdata = blitter_remap[memory_read_byte(space, source)];
+			pixdata = blitter_remap[space->read_byte(source)];
 			blit_pixel(space, dest, (pixdata >> 4) & 0x0f, data, keepmask | 0xf0, solid);
 			accesses += 2;
 
@@ -710,7 +710,7 @@ static int blitter_core(address_space *space, int sstart, int dstart, int w, int
 			/* loop over the width */
 			for (j = w - 1; j > 0; j--)
 			{
-				pixdata = (pixdata << 8) | blitter_remap[memory_read_byte(space, source)];
+				pixdata = (pixdata << 8) | blitter_remap[space->read_byte(source)];
 				blit_pixel(space, dest, (pixdata >> 4) & 0xff, data, keepmask, solid);
 				accesses += 2;
 

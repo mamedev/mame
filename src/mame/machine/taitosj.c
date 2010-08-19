@@ -219,7 +219,7 @@ WRITE8_HANDLER( taitosj_68705_portB_w )
 		address_space *cpu0space = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 		LOG(("%04x: 68705 write %02x to address %04x\n",cpu_get_pc(space->cpu), portA_out, address));
 
-		memory_write_byte(cpu0space, address, portA_out);
+		cpu0space->write_byte(address, portA_out);
 
 		/* increase low 8 bits of latched address for burst writes */
 		address = (address & 0xff00) | ((address + 1) & 0xff);
@@ -227,7 +227,7 @@ WRITE8_HANDLER( taitosj_68705_portB_w )
 	if (~data & 0x20)
 	{
 		address_space *cpu0space = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-		portA_in = memory_read_byte(cpu0space, address);
+		portA_in = cpu0space->read_byte(address);
 		LOG(("%04x: 68705 read %02x from address %04x\n", cpu_get_pc(space->cpu), portA_in, address));
 	}
 	if (~data & 0x40)

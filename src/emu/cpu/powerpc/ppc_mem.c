@@ -309,56 +309,56 @@ static int ppc_translate_address_cb(int space, offs_t *addr)
 static UINT8 ppc_read8_translated(address_space *space, offs_t address)
 {
 	ppc_translate_address(&address, PPC_TRANSLATE_DATA | PPC_TRANSLATE_READ);
-	return memory_read_byte_64be(space, address);
+	return space->read_byte(address);
 }
 
 static UINT16 ppc_read16_translated(address_space *space, offs_t address)
 {
 	ppc_translate_address(&address, PPC_TRANSLATE_DATA | PPC_TRANSLATE_READ);
-	return memory_read_word_64be(space, address);
+	return space->read_word(address);
 }
 
 static UINT32 ppc_read32_translated(address_space *space, offs_t address)
 {
 	ppc_translate_address(&address, PPC_TRANSLATE_DATA | PPC_TRANSLATE_READ);
-	return memory_read_dword_64be(space, address);
+	return space->read_dword(address);
 }
 
 static UINT64 ppc_read64_translated(address_space *space, offs_t address)
 {
 	ppc_translate_address(&address, PPC_TRANSLATE_DATA | PPC_TRANSLATE_READ);
-	return memory_read_qword_64be(space, address);
+	return space->read_qword(address);
 }
 
 static void ppc_write8_translated(address_space *space, offs_t address, UINT8 data)
 {
 	ppc_translate_address(&address, PPC_TRANSLATE_DATA | PPC_TRANSLATE_WRITE);
-	memory_write_byte_64be(space, address, data);
+	space->write_byte(address, data);
 }
 
 static void ppc_write16_translated(address_space *space, offs_t address, UINT16 data)
 {
 	ppc_translate_address(&address, PPC_TRANSLATE_DATA | PPC_TRANSLATE_WRITE);
-	memory_write_word_64be(space, address, data);
+	space->write_word(address, data);
 }
 
 static void ppc_write32_translated(address_space *space, offs_t address, UINT32 data)
 {
 	ppc_translate_address(&address, PPC_TRANSLATE_DATA | PPC_TRANSLATE_WRITE);
-	memory_write_dword_64be(space, address, data);
+	space->write_dword(address, data);
 }
 
 static void ppc_write64_translated(address_space *space, offs_t address, UINT64 data)
 {
 	ppc_translate_address(&address, PPC_TRANSLATE_DATA | PPC_TRANSLATE_WRITE);
-	memory_write_qword_64be(space, address, data);
+	space->write_qword(address, data);
 }
 
 #ifndef PPC_DRC
 static UINT32 ppc_readop_translated(address_space *space, offs_t address)
 {
 	ppc_translate_address(&address, PPC_TRANSLATE_CODE | PPC_TRANSLATE_READ);
-	return memory_read_dword_64be(space, address);
+	return space->read_dword(address);
 }
 #endif
 
@@ -385,10 +385,10 @@ static CPU_READOP( ppc )
 	{
 		switch(size)
 		{
-			case 1:	*value = memory_read_byte(ppc.program, offset);	break;
-			case 2:	*value = memory_read_word(ppc.program, offset);	break;
-			case 4:	*value = memory_read_dword(ppc.program, offset);	break;
-			case 8:	*value = memory_read_qword(ppc.program, offset);	break;
+			case 1:	*value = ppc.program->read_byte(offset);	break;
+			case 2:	*value = ppc.program->read_word(offset);	break;
+			case 4:	*value = ppc.program->read_dword(offset);	break;
+			case 8:	*value = ppc.program->read_qword(offset);	break;
 		}
 	}
 
@@ -406,10 +406,10 @@ static CPU_READ( ppc )
 	{
 		switch(size)
 		{
-			case 1:	*value = memory_read_byte(ppc.program, offset);	break;
-			case 2:	*value = memory_read_word(ppc.program, offset);	break;
-			case 4:	*value = memory_read_dword(ppc.program, offset);	break;
-			case 8:	*value = memory_read_qword(ppc.program, offset);	break;
+			case 1:	*value = ppc.program->read_byte(offset);	break;
+			case 2:	*value = ppc.program->read_word(offset);	break;
+			case 4:	*value = ppc.program->read_dword(offset);	break;
+			case 8:	*value = ppc.program->read_qword(offset);	break;
 		}
 	}
 
@@ -425,10 +425,10 @@ static CPU_WRITE( ppc )
 	{
 		switch(size)
 		{
-			case 1:	memory_write_byte(ppc.program, offset, value);	break;
-			case 2:	memory_write_word(ppc.program, offset, value);	break;
-			case 4:	memory_write_dword(ppc.program, offset, value);	break;
-			case 8:	memory_write_qword(ppc.program, offset, value);	break;
+			case 1:	ppc.program->write_byte(offset, value);	break;
+			case 2:	ppc.program->write_word(offset, value);	break;
+			case 4:	ppc.program->write_dword(offset, value);	break;
+			case 8:	ppc.program->write_qword(offset, value);	break;
 		}
 	}
 

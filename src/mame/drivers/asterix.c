@@ -107,8 +107,8 @@ static WRITE16_HANDLER( protection_w )
 		{
 		case 0x64:
 			{
-			UINT32 param1 = (memory_read_word(space, cmd & 0xffffff) << 16) | memory_read_word(space, (cmd & 0xffffff) + 2);
-			UINT32 param2 = (memory_read_word(space, (cmd & 0xffffff) + 4) << 16) | memory_read_word(space, (cmd & 0xffffff) + 6);
+			UINT32 param1 = (space->read_word(cmd & 0xffffff) << 16) | space->read_word((cmd & 0xffffff) + 2);
+			UINT32 param2 = (space->read_word((cmd & 0xffffff) + 4) << 16) | space->read_word((cmd & 0xffffff) + 6);
 
 			switch (param1 >> 24)
 			{
@@ -119,7 +119,7 @@ static WRITE16_HANDLER( protection_w )
 					param2 &= 0xffffff;
 					while(size >= 0)
 					{
-						memory_write_word(space, param2, memory_read_word(space, param1));
+						space->write_word(param2, space->read_word(param1));
 						param1 += 2;
 						param2 += 2;
 						size--;
@@ -147,10 +147,10 @@ static WRITE16_HANDLER( protection_w )
 		{
 		case 0x64:
 		{
-			UINT32 param1 = (memory_read_word(space, cmd & 0xffffff) << 16)
-				| memory_read_word(space, (cmd & 0xffffff) + 2);
-			UINT32 param2 = (memory_read_word(space, (cmd & 0xffffff) + 4) << 16)
-				| memory_read_word(space, (cmd & 0xffffff) + 6);
+			UINT32 param1 = (space->read_word(cmd & 0xffffff) << 16)
+				| space->read_word((cmd & 0xffffff) + 2);
+			UINT32 param2 = (space->read_word((cmd & 0xffffff) + 4) << 16)
+				| space->read_word((cmd & 0xffffff) + 6);
 
 			switch (param1 >> 24)
 			{
@@ -161,7 +161,7 @@ static WRITE16_HANDLER( protection_w )
 				param2 &= 0xffffff;
 				while(size >= 0)
 				{
-					memory_write_word(space, param2, memory_read_word(space, param1));
+					space->write_word(param2, space->read_word(param1));
 					param1 += 2;
 					param2 += 2;
 					size--;

@@ -233,7 +233,7 @@ INLINE UINT8 register_read(z8_state *cpustate, UINT8 offset)
 
 		if (!(P3M & Z8_P3M_P0_STROBED))
 		{
-			if (mask) cpustate->input[offset] = memory_read_byte_8be(cpustate->io, offset);
+			if (mask) cpustate->input[offset] = cpustate->io->read_byte(offset);
 		}
 
 		data |= cpustate->input[offset] & mask;
@@ -249,7 +249,7 @@ INLINE UINT8 register_read(z8_state *cpustate, UINT8 offset)
 
 		if ((P3M & Z8_P3M_P33_P34_MASK) != Z8_P3M_P33_P34_DAV1_RDY1)
 		{
-			if (mask) cpustate->input[offset] = memory_read_byte_8be(cpustate->io, offset);
+			if (mask) cpustate->input[offset] = cpustate->io->read_byte(offset);
 		}
 
 		data |= cpustate->input[offset] & mask;
@@ -260,7 +260,7 @@ INLINE UINT8 register_read(z8_state *cpustate, UINT8 offset)
 
 		if (!(P3M & Z8_P3M_P2_STROBED))
 		{
-			if (mask) cpustate->input[offset] = memory_read_byte_8be(cpustate->io, offset);
+			if (mask) cpustate->input[offset] = cpustate->io->read_byte(offset);
 		}
 
 		data = (cpustate->input[offset] & mask) | (cpustate->output[offset] & ~mask);
@@ -273,7 +273,7 @@ INLINE UINT8 register_read(z8_state *cpustate, UINT8 offset)
 			mask = 0x0f;
 		}
 
-		if (mask) cpustate->input[offset] = memory_read_byte_8be(cpustate->io, offset);
+		if (mask) cpustate->input[offset] = cpustate->io->read_byte(offset);
 
 		data = (cpustate->input[offset] & mask) | (cpustate->output[offset] & ~mask);
 		break;
@@ -318,19 +318,19 @@ INLINE void register_write(z8_state *cpustate, UINT8 offset, UINT8 data)
 		cpustate->output[offset] = data;
 		if ((P01M & Z8_P01M_P0L_MODE_MASK) == Z8_P01M_P0L_MODE_OUTPUT) mask |= 0x0f;
 		if ((P01M & Z8_P01M_P0H_MODE_MASK) == Z8_P01M_P0H_MODE_OUTPUT) mask |= 0xf0;
-		if (mask) memory_write_byte_8be(cpustate->io, offset, data & mask);
+		if (mask) cpustate->io->write_byte(offset, data & mask);
 		break;
 
 	case Z8_REGISTER_P1:
 		cpustate->output[offset] = data;
 		if ((P01M & Z8_P01M_P1_MODE_MASK) == Z8_P01M_P1_MODE_OUTPUT) mask = 0xff;
-		if (mask) memory_write_byte_8be(cpustate->io, offset, data & mask);
+		if (mask) cpustate->io->write_byte(offset, data & mask);
 		break;
 
 	case Z8_REGISTER_P2:
 		cpustate->output[offset] = data;
 		mask = cpustate->r[Z8_REGISTER_P2M] ^ 0xff;
-		if (mask) memory_write_byte_8be(cpustate->io, offset, data & mask);
+		if (mask) cpustate->io->write_byte(offset, data & mask);
 		break;
 
 	case Z8_REGISTER_P3:
@@ -342,7 +342,7 @@ INLINE void register_write(z8_state *cpustate, UINT8 offset, UINT8 data)
 			mask = 0xf0;
 		}
 
-		if (mask) memory_write_byte_8be(cpustate->io, offset, data & mask);
+		if (mask) cpustate->io->write_byte(offset, data & mask);
 		break;
 
 	case Z8_REGISTER_SIO:
@@ -436,7 +436,7 @@ INLINE void stack_push_byte(z8_state *cpustate, UINT8 src)
 		register_pair_write(cpustate, Z8_REGISTER_SPH, sp);
 
 		/* @SP <- src */
-		memory_write_byte(cpustate->data, sp, src);
+		cpustate->data->write_byte(sp, src);
 	}
 }
 
@@ -458,7 +458,7 @@ INLINE void stack_push_word(z8_state *cpustate, UINT16 src)
 		register_pair_write(cpustate, Z8_REGISTER_SPH, sp);
 
 		/* @SP <- src */
-		memory_write_word_8le(cpustate->data, sp, src);
+		cpustate->data->write_word(sp, src);
 	}
 }
 
@@ -480,7 +480,7 @@ INLINE UINT8 stack_pop_byte(z8_state *cpustate)
 		register_pair_write(cpustate, Z8_REGISTER_SPH, sp);
 
 		/* @SP <- src */
-		return memory_read_byte(cpustate->data, sp);
+		return cpustate->data->read_byte(sp);
 	}
 }
 
@@ -502,7 +502,7 @@ INLINE UINT16 stack_pop_word(z8_state *cpustate)
 		register_pair_write(cpustate, Z8_REGISTER_SPH, sp);
 
 		/* @SP <- src */
-		return memory_read_word_8le(cpustate->data, sp);
+		return cpustate->data->read_word(sp);
 	}
 }
 
@@ -694,7 +694,7 @@ static CPU_EXECUTE( z8 )
 		debugger_instruction_hook(device, cpustate->pc);
 
 		/* TODO: sample interrupts */
-		cpustate->input[3] = memory_read_byte_8be(cpustate->io, 3);
+		cpustate->input[3] = cpustate->io->read_byte(3);
 
 		/* fetch opcode */
 		opcode = fetch(cpustate);

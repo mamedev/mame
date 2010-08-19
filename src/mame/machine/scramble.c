@@ -140,12 +140,12 @@ static WRITE8_HANDLER( cavelon_banksw_w )
 
 READ8_HANDLER( hunchbks_mirror_r )
 {
-	return memory_read_byte(space, 0x1000+offset);
+	return space->read_byte(0x1000+offset);
 }
 
 WRITE8_HANDLER( hunchbks_mirror_w )
 {
-	memory_write_byte(space, 0x1000+offset,data);
+	space->write_byte(0x1000+offset,data);
 }
 
 const ppi8255_interface scramble_ppi_0_intf =
