@@ -367,10 +367,15 @@ static READ32_HANDLER( ioc_ctrl_r )
 		case CONTROL:
 		{
 			UINT8 i2c_data;
+			static UINT8 flyback;
+			int vert_pos;
+
+			vert_pos = space->machine->primary_screen->vpos();
+			flyback = (vert_pos <= vidc_regs[VIDC_VDSR] || vert_pos >= vidc_regs[VIDC_VDER]) ? 0x80 : 0x00;
 
 			i2c_data = (i2cmem_sda_read(space->machine->device("i2cmem")) & 1);
 
-			return (ioc_regs[CONTROL] & 0xfc) | (i2c_clk<<1) | i2c_data;
+			return (flyback) | (ioc_regs[CONTROL] & 0x7c) | (i2c_clk<<1) | i2c_data;
 		}
 
 		case 1:	// keyboard read
@@ -705,6 +710,7 @@ WRITE32_HANDLER(archimedes_vidc_w)
 		palette_set_color_rgb(space->machine, reg >> 2, pal4bit(r), pal4bit(g), pal4bit(b) );
 
 		/* handle 8bpp colors here */
+		if(reg <= 0x3c)
 		{
 			int i;
 
