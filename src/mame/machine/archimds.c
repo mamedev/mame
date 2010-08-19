@@ -193,10 +193,6 @@ void archimedes_reset(running_machine *machine)
 	ioc_regs[IRQ_STATUS_A] = 0x10 | 0x80; //set up POR (Power On Reset) and Force IRQ at start-up
 	ioc_regs[IRQ_STATUS_B] = 0x02; //set up IL[1] On
 	ioc_regs[FIQ_STATUS] = 0x80;   //set up Force FIQ
-
-	/* Aristocrat MK-5 tests this inside the CPU check routine *without* firing a latch command in the POST, could be open bus, fixed value or undefined behaviour,
-	   almost surely something checked as an anti-cheat measure */
-	ioc_timerout[1] = 0xf5;
 }
 
 void archimedes_init(running_machine *machine)
@@ -360,7 +356,7 @@ static void latch_timer_cnt(int tmr)
 	ioc_timerout[tmr] = ioc_timercnt[tmr] - (UINT32)time;
 }
 
-/* TODO: should be a 8-bit device */
+/* TODO: should be a 8-bit handler */
 static READ32_HANDLER( ioc_ctrl_r )
 {
 	//if(((offset & 0x1f) != 16) && ((offset & 0x1f) != 17) && ((offset & 0x1f) != 24) && ((offset & 0x1f) != 25))
@@ -429,7 +425,7 @@ static READ32_HANDLER( ioc_ctrl_r )
 	return ioc_regs[offset&0x1f];
 }
 
-/* TODO: should be a 8-bit device */
+/* TODO: should be a 8-bit handler */
 static WRITE32_HANDLER( ioc_ctrl_w )
 {
 	if(((offset & 0x1f) != 16) && ((offset & 0x1f) != 17) && ((offset & 0x1f) != 24) && ((offset & 0x1f) != 25))
@@ -446,10 +442,12 @@ static WRITE32_HANDLER( ioc_ctrl_w )
 			break;
 
 		case 1:
+			#if 0
 			if(data == 0x0d)
 				printf("\n");
 			else
 				printf("%c",data);
+			#endif
 			break;
 
 		case IRQ_MASK_A:
@@ -571,7 +569,7 @@ READ32_HANDLER(archimedes_ioc_r)
 						return 0;
 					#endif
 				case 2:
-					logerror("IOC: Econet Read\n");
+					logerror("IOC: Econet Read %08x\n",ioc_addr);
 					return 0xffff;
 				case 3:
 					logerror("IOC: Serial Read\n");
@@ -580,7 +578,7 @@ READ32_HANDLER(archimedes_ioc_r)
 					logerror("IOC: Internal Podule Read\n");
 					return 0xffff;
 				case 5:
-					logerror("IOC: Internal Latches Read\n");
+					logerror("IOC: Internal Latches Read %08x\n",ioc_addr);
 					return 0xffff;
 			}
 		}
@@ -621,7 +619,7 @@ WRITE32_HANDLER(archimedes_ioc_w)
 					#endif
 						return;
 				case 2:
-					logerror("IOC: Econet Write\n");
+					logerror("IOC: Econet Write %02x at %08x\n",data,ioc_addr);
 					return;
 				case 3:
 					logerror("IOC: Serial Write\n");

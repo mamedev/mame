@@ -8,6 +8,12 @@
 	BIOS ROMs are actually nowhere to be found on a regular MK5 system. They can be used to change the system configurations on a PCB board
 	by swapping them with the game ROMs u7/u11 locations.
 
+	TODO (MK-5 specific):
+	- Fix remaining errors
+	- If all tests passes, this msg is printed on the keyboard serial port:
+	"System Startup Code Entered \n Gos_create could not allocate stack for the new process \n Unrecoverable error occured. System will now restart"
+	Apparently it looks like some sort of protection device ...
+
 	code DASMing of POST (adonis):
 	- bp 0x3400224:
 	  checks work RAM [0x87000], if bit 0 active high then all tests are skipped (presumably for debugging), otherwise check stuff;
@@ -18,7 +24,7 @@
 			- R0 == 0: CPU Check OK
 			- R0 == 1: IRQ status A force IRQ flag check failed
 			- R0 == 2: FIQ status force IRQ flag check failed
-			- R0 == 3: Timer 1 latch low val == 0xf5
+			- R0 == 3: Internal Latch check 0x3250050 == 0xf5
 		- bp 0x34002a8: SRAM Check branch test (I2C)
 			- basically writes to the I2C clock/data then read-backs it
 		- bp 0x34002d0: 2KHz Timer branch test
@@ -59,8 +65,9 @@
 
 extern void archimedes_request_irq_a(running_machine *machine, int mask);
 static emu_timer *mk5_2KHz_timer;
+static UINT8 ext_latch;
 
-/* bit mirrors of I2C that are inside the IOC space */
+/* bit mirrors of I2C */
 static WRITE32_HANDLER( mk5_i2c_w )
 {
 	i2cmem_sda_write(space->machine->device("i2cmem"), (data & 0x40) >> 6);
@@ -68,27 +75,69 @@ static WRITE32_HANDLER( mk5_i2c_w )
 	i2c_clk = (data & 0x80) >> 7;
 }
 
+static WRITE32_HANDLER( mk5_ext_latch_w )
+{
+	/* this banks "something" */
+	ext_latch = data & 1;
+}
+
+static READ32_HANDLER( ext_timer_latch_r )
+{
+	/* reset 2KHz timer */
+	ioc_regs[IRQ_STATUS_A] &= 0xfe;
+	timer_adjust_oneshot(mk5_2KHz_timer, ATTOTIME_IN_HZ(2000), 0);
+
+	return 0xffffffff; //value doesn't matter apparently
+}
+
 static READ32_HANDLER( mk5_ioc_r )
 {
-	if (offset*4 >= 0x200000 && offset*4 < 0x300000)
-	{
-		if((offset & 0x1f) == 18 || (offset & 0x1f) == 22 || (offset & 0x1f) == 26 || (offset & 0x1f) == 30)
-		{
-			/* reset 2KHz timer if a timer GO command is read */
-			ioc_regs[4] &= 0xfe;
-			timer_adjust_oneshot(mk5_2KHz_timer, ATTOTIME_IN_HZ(2000), 0);
-		}
-	}
-
 	return archimedes_ioc_r(space,offset,mem_mask);
+}
+
+static WRITE32_HANDLER( mk5_ioc_w )
+{
+	if(!ext_latch)
+		archimedes_ioc_w(space,offset,data,mem_mask);
+}
+
+static READ32_HANDLER( mk5_unk_r )
+{
+	return 0xf5; // checked inside the CPU check, unknown meaning
+}
+
+/* I'm not really optimistic that this thing really uses I2C ... */
+static READ32_HANDLER( mk5_econet_r )
+{
+	UINT8 i2c_data;
+
+	i2c_data = (i2cmem_sda_read(space->machine->device("i2cmem")) & 1);
+
+	return (ioc_regs[CONTROL] & 0xfc) | (i2c_clk<<1) | i2c_data;
+}
+
+static WRITE32_HANDLER( mk5_econet_w )
+{
+	//logerror("IOC I2C: CLK %d DAT %d\n", (data>>1)&1, data&1);
+	i2cmem_sda_write(space->machine->device("i2cmem"), data & 0x01);
+	i2cmem_scl_write(space->machine->device("i2cmem"), (data & 0x02) >> 1);
+	i2c_clk = (data & 2) >> 1;
 }
 
 static ADDRESS_MAP_START( aristmk5_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x01ffffff) AM_READWRITE(archimedes_memc_logical_r, archimedes_memc_logical_w)
 	AM_RANGE(0x02000000, 0x02ffffff) AM_RAM AM_BASE(&archimedes_memc_physmem) /* physical RAM - 16 MB for now, should be 512k for the A310 */
-	AM_RANGE(0x03010420, 0x03010423) AM_WRITE(mk5_i2c_w)
+
+	/* MK-5 overrides */
+	AM_RANGE(0x03010420, 0x03010423) AM_RAM_WRITE(mk5_i2c_w)
 	AM_RANGE(0x03010810, 0x03010813) AM_READNOP //MK-5 specific, watchdog
-	AM_RANGE(0x03000000, 0x033fffff) AM_READWRITE(mk5_ioc_r, archimedes_ioc_w)
+//	System Startup Code Enabled protection appears to be located at 0x3010400 - 0x30104ff
+	AM_RANGE(0x03220000, 0x03220003) AM_READWRITE(mk5_econet_r,mk5_econet_w)
+	AM_RANGE(0x03250048, 0x0325004b) AM_WRITE(mk5_ext_latch_w)
+	AM_RANGE(0x03250050, 0x03250053) AM_READ(mk5_unk_r)
+	AM_RANGE(0x03250058, 0x0325005b) AM_READ(ext_timer_latch_r)
+
+	AM_RANGE(0x03000000, 0x033fffff) AM_READWRITE(mk5_ioc_r, mk5_ioc_w)
 	AM_RANGE(0x03400000, 0x035fffff) AM_ROM AM_REGION("maincpu", 0) AM_WRITE(archimedes_vidc_w)
 	AM_RANGE(0x03600000, 0x037fffff) AM_READWRITE(archimedes_memc_r, archimedes_memc_w)
 	AM_RANGE(0x03800000, 0x039fffff) AM_WRITE(archimedes_memc_page_w)
