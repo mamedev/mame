@@ -6479,7 +6479,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( kotm )		/* 0016 (c) 1991 SNK */
 	DRIVER( kotmh )		/* 0016 (c) 1991 SNK */
 	DRIVER( sengoku )	/* 0017 (c) 1991 SNK */
-	DRIVER( sengokh )	/* 0017 (c) 1991 SNK */
+	DRIVER( sengokuh )	/* 0017 (c) 1991 SNK */
 	DRIVER( burningf )	/* 0018 (c) 1991 SNK */
 	DRIVER( burningfh )	/* 0018 (c) 1991 SNK */
 	DRIVER( lbowling )	/* 0019 (c) 1990 SNK */
@@ -6532,7 +6532,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( aof2a )		/* 0056 (c) 1994 SNK */
 	DRIVER( wh2 )		/* 0057 (c) 1993 ADK */
 	DRIVER( fatfursp )	/* 0058 (c) 1993 SNK */
-	DRIVER( fatfursa )	/* 0058 (c) 1993 SNK */
+	DRIVER( fatfurspa )	/* 0058 (c) 1993 SNK */
 	DRIVER( savagere )	/* 0059 (c) 1995 SNK */
 	DRIVER( fightfev )	/* 0060 (c) 1994 Viccom */
 	DRIVER( fightfeva )	/* 0060 (c) 1994 Viccom */
@@ -6541,7 +6541,6 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( samsho2 )	/* 0063 (c) 1994 SNK */
 	DRIVER( samsho2k )	/* 0063 (c) 1994 SNK (Korean hack) */
 	DRIVER( wh2j )		/* 0064 (c) 1994 ADK / SNK */
-	DRIVER( wh2jh )		/* 0064 (c) 1994 ADK / SNK */
 	DRIVER( wjammers )	/* 0065 (c) 1994 Data East Corporation */
 	DRIVER( karnovr )	/* 0066 (c) 1994 Data East Corporation */
 	DRIVER( gururin )	/* 0067 (c) 1994 Face */
@@ -6634,7 +6633,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( irrmaze )	/* 0236 (c) 1997 SNK / Saurus */
 	DRIVER( popbounc )	/* 0237 (c) 1997 Video System Co. */
 	DRIVER( shocktro )	/* 0238 (c) 1997 Saurus */
-	DRIVER( shocktra )	/* 0238 (c) 1997 Saurus */
+	DRIVER( shocktroa )	/* 0238 (c) 1997 Saurus */
 	DRIVER( blazstar )	/* 0239 (c) 1998 Yumekobo */
 	DRIVER( rbff2 )		/* 0240 (c) 1998 SNK */
 	DRIVER( rbff2h )	/* 0240 (c) 1998 SNK */
@@ -6654,7 +6653,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( ctomaday )	/* 0249 (c) 1999 Visco */
 	DRIVER( mslugx )	/* 0250 (c) 1999 SNK */
 	DRIVER( kof99 )		/* 0251 (c) 1999 SNK */
-	DRIVER( kof99a )	/* 0251 (c) 1999 SNK */
+	DRIVER( kof99h )	/* 0251 (c) 1999 SNK */
 	DRIVER( kof99e )	/* 0251 (c) 1999 SNK */
 	DRIVER( kof99k )	/* 0152 (c) 1999 SNK */
 	DRIVER( kof99p )	/* 0251 (c) 1999 SNK */
