@@ -957,7 +957,7 @@ READ8_HANDLER( snes_r_bank1 )
 	else
 		value = snes_ram[offset];
 
-	if(!space->debugger_access)
+	if(!space->debugger_access())
 		cpu_adjust_icount(space->cpu, -snes_bank_0x00_0x3f_cycles(space->machine, offset));
 
 	return value;
@@ -1020,7 +1020,7 @@ READ8_HANDLER( snes_r_bank2 )
 	else
 		value = snes_ram[0x300000 + offset];
 
-	if(!space->debugger_access)
+	if(!space->debugger_access())
 		cpu_adjust_icount(space->cpu, -snes_bank_0x00_0x3f_cycles(space->machine, offset));
 
 	return value;
@@ -1061,7 +1061,7 @@ READ8_HANDLER( snes_r_bank3 )
 	else											/* Mode 21 & 25 + SuperFX games */
 		value = snes_ram[0x400000 + offset];
 
-	if(!space->debugger_access)
+	if(!space->debugger_access())
 		cpu_adjust_icount(space->cpu, -8);
 
 	return value;
@@ -1099,7 +1099,7 @@ READ8_HANDLER( snes_r_bank4 )
 	else if (state->cart[0].mode & 0x0a)					/* Mode 21 & 25 */
 		value = snes_ram[0x600000 + offset];
 
-	if(!space->debugger_access)
+	if(!space->debugger_access())
 		cpu_adjust_icount(space->cpu, -8);
 
 	return value;
@@ -1135,7 +1135,7 @@ READ8_HANDLER( snes_r_bank5 )
 	else
 		value = snes_ram[0x700000 + offset];
 
-	if(!space->debugger_access)
+	if(!space->debugger_access())
 		cpu_adjust_icount(space->cpu, -8);
 
 	return value;
@@ -1183,7 +1183,7 @@ READ8_HANDLER( snes_r_bank6 )
 	else
 		value = snes_ram[0x800000 + offset];
 
-	if(!space->debugger_access)
+	if(!space->debugger_access())
 		cpu_adjust_icount(space->cpu, -snes_bank_0x80_0xbf_cycles(space->machine, offset));
 
 	return value;
@@ -1236,7 +1236,7 @@ READ8_HANDLER( snes_r_bank7 )
 	else								/* Mode 21 & 25 + SuperFX Games */
 		value = snes_ram[0xc00000 + offset];
 
-	if(!space->debugger_access)
+	if(!space->debugger_access())
 		cpu_adjust_icount(space->cpu, -((snes_ram[MEMSEL] & 1) ? 6 : 8));
 
 	return value;
@@ -1290,7 +1290,7 @@ WRITE8_HANDLER( snes_w_bank1 )
 	else
 		logerror( "(PC=%06x) Attempt to write to ROM address: %X\n",cpu_get_pc(space->cpu),offset );
 
-	if(!space->debugger_access)
+	if(!space->debugger_access())
 		cpu_adjust_icount(space->cpu, -snes_bank_0x00_0x3f_cycles(space->machine, offset));
 }
 
@@ -1347,7 +1347,7 @@ WRITE8_HANDLER( snes_w_bank2 )
 	else
 		logerror("(PC=%06x) Attempt to write to ROM address: %X\n",cpu_get_pc(space->cpu),offset + 0x300000);
 
-	if(!space->debugger_access)
+	if(!space->debugger_access())
 		cpu_adjust_icount(space->cpu, -snes_bank_0x00_0x3f_cycles(space->machine, offset));
 }
 
@@ -1373,7 +1373,7 @@ WRITE8_HANDLER( snes_w_bank4 )
 	else if (state->cart[0].mode & 0x0a)
 		logerror("(PC=%06x) Attempt to write to ROM address: %X\n",cpu_get_pc(space->cpu),offset + 0x600000);
 
-	if(!space->debugger_access)
+	if(!space->debugger_access())
 		cpu_adjust_icount(space->cpu, -8);
 }
 
@@ -1398,7 +1398,7 @@ WRITE8_HANDLER( snes_w_bank5 )
 	else if (state->cart[0].mode & 0x0a)
 		logerror("(PC=%06x) Attempt to write to ROM address: %X\n",cpu_get_pc(space->cpu),offset + 0x700000);
 
-	if(!space->debugger_access)
+	if(!space->debugger_access())
 		cpu_adjust_icount(space->cpu, -8);
 }
 
@@ -1446,7 +1446,7 @@ WRITE8_HANDLER( snes_w_bank6 )
 	else
 		logerror("(PC=%06x) Attempt to write to ROM address: %X\n",cpu_get_pc(space->cpu),offset + 0x800000);
 
-	if(!space->debugger_access)
+	if(!space->debugger_access())
 		cpu_adjust_icount(space->cpu, -snes_bank_0x80_0xbf_cycles(space->machine, offset));
 }
 
@@ -1486,7 +1486,7 @@ WRITE8_HANDLER( snes_w_bank7 )
 	else if (state->cart[0].mode & 0x0a)
 		logerror("(PC=%06x) Attempt to write to ROM address: %X\n",cpu_get_pc(space->cpu),offset + 0xc00000);
 
-	if(!space->debugger_access)
+	if(!space->debugger_access())
 		cpu_adjust_icount(space->cpu, -((snes_ram[MEMSEL] & 1) ? 6 : 8));
 }
 
@@ -1677,15 +1677,15 @@ static void snes_init_ram( running_machine *machine )
 }
 
 
-static DIRECT_UPDATE_HANDLER( spc_direct )
+DIRECT_UPDATE_HANDLER( snes_spc_direct )
 {
-	direct->raw = direct->decrypted = spc_get_ram(space->machine->device("spc700"));
+	direct.explicit_configure(0x0000, 0xffff, 0xffff, spc_get_ram(machine->device("spc700")));
 	return ~0;
 }
 
-static DIRECT_UPDATE_HANDLER( snes_direct )
+DIRECT_UPDATE_HANDLER( snes_direct )
 {
-	direct->raw = direct->decrypted = snes_ram;
+	direct.explicit_configure(0x0000, 0xffff, 0xffff, snes_ram);
 	return ~0;
 }
 
@@ -1694,13 +1694,13 @@ MACHINE_START( snes )
 	snes_state *state = machine->driver_data<snes_state>();
 	int i;
 
-	memory_set_direct_update_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), snes_direct);
-	memory_set_direct_update_handler(cputag_get_address_space(machine, "soundcpu", ADDRESS_SPACE_PROGRAM), spc_direct);
-
 	state->maincpu = machine->device<_5a22_device>("maincpu");
 	state->soundcpu = machine->device<spc700_device>("soundcpu");
 	state->spc700 = machine->device<snes_sound_sound_device>("spc700");
 	state->superfx = machine->device<cpu_device>("superfx");
+
+	state->maincpu->space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(snes_direct, *machine));
+	state->soundcpu->space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(snes_spc_direct, *machine));
 
 	// power-on sets these registers like this
 	snes_ram[WRIO] = 0xff;

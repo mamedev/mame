@@ -98,7 +98,7 @@ void mips3com_init(mips3_state *mips, mips3_flavor flavor, int bigendian, legacy
 	}
 
 	/* set up the endianness */
-	mips->memory = mips->program->accessors;
+	mips->program->accessors(mips->memory);
 
 	/* allocate the virtual TLB */
 	mips->vtlb = vtlb_alloc(device, ADDRESS_SPACE_PROGRAM, 2 * mips->tlbentries + 2, 0);

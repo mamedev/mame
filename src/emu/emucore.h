@@ -355,6 +355,100 @@ inline _Dest crosscast(_Source *src)
 //  COMMON TEMPLATES
 //**************************************************************************
 
+// ======================> simple_list
+
+template<class T>
+class simple_list
+{
+	DISABLE_COPYING(simple_list);
+
+	T *m_head;
+	T *m_tail;
+	resource_pool &m_pool;
+	int m_count;
+
+public:
+	simple_list(resource_pool &pool = global_resource_pool) :
+		m_head(NULL),
+		m_tail(NULL),
+		m_pool(pool),
+		m_count(0) { }
+
+	virtual ~simple_list() { reset(); }
+
+	T *first() const { return m_head; }
+	T *last() const { return m_tail; }
+	int count() const { return m_count; }
+
+	void reset() { while (m_head != NULL) remove(*m_head); }
+
+	int index(T *object) const
+	{
+		int num = 0;
+		for (T *cur = m_head; cur != NULL; cur = cur->m_next)
+			if (cur == object)
+				return num;
+			else
+				num++;
+		return -1;
+	}
+	
+	T &prepend(T &object)
+	{
+		object.m_next = m_head;
+		m_head = &object;
+		if (m_tail == NULL)
+			m_tail = m_head;
+		m_count++;
+		return object;
+	}
+
+	T &append(T &object)
+	{
+		object.m_next = NULL;
+		if (m_tail != NULL)
+			m_tail = m_tail->m_next = &object;
+		else
+			m_tail = m_head = &object;
+		m_count++;
+		return object;
+	}
+
+	void detach(T &object)
+	{
+		T *prev = NULL;
+		for (T *cur = m_head; cur != NULL; prev = cur, cur = cur->m_next)
+			if (cur == &object)
+			{
+				if (prev != NULL)
+					prev->m_next = object.m_next;
+				else
+					m_head = object.m_next;
+				if (m_tail == &object)
+					m_tail = prev;
+				m_count--;
+				return;
+			}
+	}
+
+	void remove(T &object)
+	{
+		detach(object);
+		pool_free(m_pool, &object);
+	}
+
+	T *find(int index) const
+	{
+		for (T *cur = m_head; cur != NULL; cur = cur->m_next)
+			if (index-- == 0)
+				return cur;
+		return NULL;
+	}
+};
+
+
+// ======================> tagged_list
+
 template<class T>
 class tagged_list
 {

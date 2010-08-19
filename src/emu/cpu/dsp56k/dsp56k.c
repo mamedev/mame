@@ -67,12 +67,12 @@ static CPU_RESET( dsp56k );
 /***************************************************************************
     Direct Update Handler
 ***************************************************************************/
-static DIRECT_UPDATE_HANDLER( dsp56k_direct_handler )
+DIRECT_UPDATE_HANDLER( dsp56k_direct_handler )
 {
 	if (address >= (0x0000<<1) && address <= (0x07ff<<1))
 	{
-		dsp56k_core* cpustate = get_safe_token(space->cpu);
-		direct->raw = direct->decrypted = (UINT8 *)(cpustate->program_ram - (0x0000<<1));
+		dsp56k_core* cpustate = get_safe_token(direct.space().cpu);
+		direct.explicit_configure(0x0000<<1, 0x07ff<<1, 0x07ff<<1, cpustate->program_ram);
 		return ~0;
 	}
 
@@ -237,7 +237,7 @@ static CPU_INIT( dsp56k )
 
 	/* Setup the direct memory handler for this CPU */
 	/* NOTE: Be sure to grab this guy and call him if you ever install another direct_update_hander in a driver! */
-	memory_set_direct_update_handler(cpustate->program, dsp56k_direct_handler);
+	const_cast<address_space *>(cpustate->program)->set_direct_update_handler(direct_update_delegate_create_static(dsp56k_direct_handler, *device->machine));
 }
 
 

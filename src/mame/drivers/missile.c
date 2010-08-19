@@ -445,7 +445,7 @@ static TIMER_CALLBACK( adjust_cpu_speed )
 }
 
 
-static DIRECT_UPDATE_HANDLER( missile_direct_handler )
+DIRECT_UPDATE_HANDLER( missile_direct_handler )
 {
 	/* offset accounts for lack of A15 decoding */
 	int offset = address & 0x8000;
@@ -454,14 +454,14 @@ static DIRECT_UPDATE_HANDLER( missile_direct_handler )
 	/* RAM? */
 	if (address < 0x4000)
 	{
-		direct->raw = direct->decrypted = space->machine->generic.videoram.u8 - offset;
+		direct.explicit_configure(0x0000 | offset, 0x3fff | offset, 0x3fff, direct.space().m_machine.generic.videoram.u8);
 		return ~0;
 	}
 
 	/* ROM? */
 	else if (address >= 0x5000)
 	{
-		direct->raw = direct->decrypted = memory_region(space->machine, "maincpu") - offset;
+		direct.explicit_configure(0x5000 | offset, 0x7fff | offset, 0x7fff, direct.space().m_machine.region("maincpu")->base() + 0x5000);
 		return ~0;
 	}
 
@@ -477,7 +477,8 @@ static MACHINE_START( missile )
 	flipscreen = 0;
 
 	/* set up an opcode base handler since we use mapped handlers for RAM */
-	memory_set_direct_update_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), missile_direct_handler);
+	address_space *space = machine->device<m6502_device>("maincpu")->space(AS_PROGRAM);
+	space->set_direct_update_handler(direct_update_delegate_create_static(missile_direct_handler, *machine));
 
 	/* create a timer to speed/slow the CPU */
 	cpu_timer = timer_alloc(machine, adjust_cpu_speed, NULL);

@@ -277,7 +277,7 @@ struct _drcbe_state
 	x86code *				debug_cpu_instruction_hook;/* debugger callback */
 	x86code *				debug_log_hashjmp;		/* hashjmp debugging */
 	x86code *				drcmap_get_value;		/* map lookup helper */
-	data_accessors			accessors[ADDRESS_SPACES];/* memory accessors */
+	data_accessors			accessors[ADDRESS_SPACES];	/* memory accessors */
 	const address_space *	space[ADDRESS_SPACES];	/* address spaces */
 
 	UINT8					sse41;					/* do we have SSE4.1 support? */
@@ -386,7 +386,6 @@ static const UINT8 fprnd_map[4] =
 	FPRND_UP,		/* DRCUML_FMOD_CEIL,        round up */
 	FPRND_DOWN		/* DRCUML_FMOD_FLOOR        round down */
 };
-
 
 
 /***************************************************************************
@@ -716,7 +715,7 @@ static drcbe_state *drcbex64_alloc(drcuml_state *drcuml, drccache *cache, runnin
 	{
 		drcbe->space[spacenum] = downcast<cpu_device *>(device)->space(spacenum);
 		if (drcbe->space[spacenum] != NULL)
-			drcbe->accessors[spacenum] = drcbe->space[spacenum]->accessors;
+			drcbe->space[spacenum]->accessors(drcbe->accessors[spacenum]);
 	}
 
 	/* build up necessary arrays */

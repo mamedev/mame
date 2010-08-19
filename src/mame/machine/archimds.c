@@ -279,7 +279,7 @@ WRITE32_HANDLER(archimedes_memc_logical_w)
 	}
 }
 
-static DIRECT_UPDATE_HANDLER( a310_setopbase )
+DIRECT_UPDATE_HANDLER( a310_setopbase )
 {
 	// if we're not in logical memory, MAME can do the right thing
 	if (address > 0x1ffffff)
@@ -290,19 +290,14 @@ static DIRECT_UPDATE_HANDLER( a310_setopbase )
 	// if the boot ROM is mapped in, do some trickery to make it show up
 	if (memc_latchrom)
 	{
-		direct->bytemask = 0x1fffff;
-		direct->bytestart = 0;
-		direct->byteend = 0x1fffff;
-		direct->raw = direct->decrypted = memory_region(space->machine, "maincpu");
+		direct.explicit_configure(0x000000, 0x1fffff, 0x1fffff, *direct.space().m_machine.region("maincpu"));
 	}
 	else	// executing from logical memory
 	{
-		UINT32 page = address / page_sizes[memc_pagesize];
-
-		direct->bytemask = page_sizes[memc_pagesize]-1;
-		direct->bytestart = page * page_sizes[memc_pagesize];
-		direct->byteend = direct->bytestart + direct->bytemask;
-		direct->raw = direct->decrypted = (UINT8 *)&archimedes_memc_physmem[(memc_pages[page] * page_sizes[memc_pagesize])>>2];
+		offs_t pagesize = page_sizes[memc_pagesize];
+		UINT32 page = address / pagesize;
+		
+		direct.explicit_configure(page * pagesize, page * pagesize - 1, pagesize - 1, &archimedes_memc_physmem[(memc_pages[page] * pagesize)>>2]);
 	}
 
 	return ~0;
@@ -310,7 +305,8 @@ static DIRECT_UPDATE_HANDLER( a310_setopbase )
 
 void archimedes_driver_init(running_machine *machine)
 {
-	memory_set_direct_update_handler( cputag_get_address_space( machine, "maincpu", ADDRESS_SPACE_PROGRAM ), a310_setopbase);
+	address_space *space = machine->device<arm_device>("maincpu")->space(AS_PROGRAM);
+	space->set_direct_update_handler(direct_update_delegate_create_static(a310_setopbase, *machine));
 }
 
 static const char *const ioc_regnames[] =

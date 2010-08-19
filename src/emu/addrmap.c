@@ -41,31 +41,22 @@
 
 
 //**************************************************************************
-//  MACROS
+//  ADDRESS MAP ENTRY
 //**************************************************************************
 
-// maps a full 64-bit mask down to an 8-bit byte mask
-#define UNITMASK8(x) \
-	((((UINT64)(x) >> (63-7)) & 0x80) | \
-	 (((UINT64)(x) >> (55-6)) & 0x40) | \
-	 (((UINT64)(x) >> (47-5)) & 0x20) | \
-	 (((UINT64)(x) >> (39-4)) & 0x10) | \
-	 (((UINT64)(x) >> (31-3)) & 0x08) | \
-	 (((UINT64)(x) >> (23-2)) & 0x04) | \
-	 (((UINT64)(x) >> (15-1)) & 0x02) | \
-	 (((UINT64)(x) >> ( 7-0)) & 0x01))
+//-------------------------------------------------
+//  set_tag - set the appropriate tag for a device
+//-------------------------------------------------
 
-// maps a full 64-bit mask down to a 4-bit word mask
-#define UNITMASK16(x) \
-	((((UINT64)(x) >> (63-3)) & 0x08) | \
-	 (((UINT64)(x) >> (47-2)) & 0x04) | \
-	 (((UINT64)(x) >> (31-1)) & 0x02) | \
-	 (((UINT64)(x) >> (15-0)) & 0x01))
-
-// maps a full 64-bit mask down to a 2-bit dword mask
-#define UNITMASK32(x) \
-	((((UINT64)(x) >> (63-1)) & 0x02) | \
-	 (((UINT64)(x) >> (31-0)) & 0x01))
+inline void map_handler_data::set_tag(const device_config &devconfig, const char *tag)
+{
+	if (tag == NULL)
+		m_tag = NULL;
+	else if (strcmp(tag, DEVICE_SELF) == 0)
+		m_tag = devconfig.tag();
+	else
+		m_tag = devconfig.siblingtag(m_derived_tag, tag);
+}
 
 
 
@@ -93,6 +84,22 @@ address_map_entry::address_map_entry(address_map &map, offs_t start, offs_t end)
 	  m_gensizeptroffs_plus1(0),
 	  m_region(NULL),
 	  m_rgnoffs(0),
+	  m_rspace8(NULL),
+	  m_rspace16(NULL),
+	  m_rspace32(NULL),
+	  m_rspace64(NULL),
+	  m_rdevice8(NULL),
+	  m_rdevice16(NULL),
+	  m_rdevice32(NULL),
+	  m_rdevice64(NULL),
+	  m_wspace8(NULL),
+	  m_wspace16(NULL),
+	  m_wspace32(NULL),
+	  m_wspace64(NULL),
+	  m_wdevice8(NULL),
+	  m_wdevice16(NULL),
+	  m_wdevice32(NULL),
+	  m_wdevice64(NULL),
 	  m_memory(NULL),
 	  m_bytestart(0),
 	  m_byteend(0),
@@ -121,8 +128,8 @@ void address_map_entry::set_mask(offs_t _mask)
 
 void address_map_entry::set_read_port(const device_config &devconfig, const char *tag)
 {
-	m_read.type = AMH_PORT;
-	m_read.tag = devconfig.siblingtag(m_read.derived_tag, tag);
+	m_read.m_type = AMH_PORT;
+	m_read.set_tag(devconfig, tag);
 }
 
 
@@ -133,8 +140,8 @@ void address_map_entry::set_read_port(const device_config &devconfig, const char
 
 void address_map_entry::set_write_port(const device_config &devconfig, const char *tag)
 {
-	m_write.type = AMH_PORT;
-	m_write.tag = devconfig.siblingtag(m_write.derived_tag, tag);
+	m_write.m_type = AMH_PORT;
+	m_write.set_tag(devconfig, tag);
 }
 
 
@@ -145,10 +152,10 @@ void address_map_entry::set_write_port(const device_config &devconfig, const cha
 
 void address_map_entry::set_readwrite_port(const device_config &devconfig, const char *tag)
 {
-	m_read.type = AMH_PORT;
-	m_read.tag = devconfig.siblingtag(m_read.derived_tag, tag);
-	m_write.type = AMH_PORT;
-	m_write.tag = devconfig.siblingtag(m_write.derived_tag, tag);
+	m_read.m_type = AMH_PORT;
+	m_read.set_tag(devconfig, tag);
+	m_write.m_type = AMH_PORT;
+	m_write.set_tag(devconfig, tag);
 }
 
 
@@ -159,8 +166,8 @@ void address_map_entry::set_readwrite_port(const device_config &devconfig, const
 
 void address_map_entry::set_read_bank(const device_config &devconfig, const char *tag)
 {
-	m_read.type = AMH_BANK;
-	m_read.tag = devconfig.siblingtag(m_read.derived_tag, tag);
+	m_read.m_type = AMH_BANK;
+	m_read.set_tag(devconfig, tag);
 }
 
 
@@ -171,8 +178,8 @@ void address_map_entry::set_read_bank(const device_config &devconfig, const char
 
 void address_map_entry::set_write_bank(const device_config &devconfig, const char *tag)
 {
-	m_write.type = AMH_BANK;
-	m_write.tag = devconfig.siblingtag(m_write.derived_tag, tag);
+	m_write.m_type = AMH_BANK;
+	m_write.set_tag(devconfig, tag);
 }
 
 
@@ -183,10 +190,10 @@ void address_map_entry::set_write_bank(const device_config &devconfig, const cha
 
 void address_map_entry::set_readwrite_bank(const device_config &devconfig, const char *tag)
 {
-	m_read.type = AMH_BANK;
-	m_read.tag = devconfig.siblingtag(m_read.derived_tag, tag);
-	m_write.type = AMH_BANK;
-	m_write.tag = devconfig.siblingtag(m_write.derived_tag, tag);
+	m_read.m_type = AMH_BANK; 
+	m_read.set_tag(devconfig, tag);
+	m_write.m_type = AMH_BANK; 
+	m_write.set_tag(devconfig, tag);
 }
 
 
@@ -197,23 +204,25 @@ void address_map_entry::set_readwrite_bank(const device_config &devconfig, const
 
 void address_map_entry::internal_set_handler(read8_space_func func, const char *string, UINT64 unitmask)
 {
+	assert(func != NULL);
 	assert(unitmask_is_appropriate(8, unitmask, string));
-	m_read.type = AMH_HANDLER;
-	m_read.bits = (unitmask == 0) ? 0 : 8;
-	m_read.mask = UNITMASK8(unitmask);
-	m_read.handler.read.shandler8 = func;
-	m_read.name = string;
+	m_read.m_type = AMH_LEGACY_SPACE_HANDLER;
+	m_read.m_bits = 8;
+	m_read.m_mask = unitmask;
+	m_read.m_name = string;
+	m_rspace8 = func;
 }
 
 
 void address_map_entry::internal_set_handler(write8_space_func func, const char *string, UINT64 unitmask)
 {
+	assert(func != NULL);
 	assert(unitmask_is_appropriate(8, unitmask, string));
-	m_write.type = AMH_HANDLER;
-	m_write.bits = (unitmask == 0) ? 0 : 8;
-	m_write.mask = UNITMASK8(unitmask);
-	m_write.handler.write.shandler8 = func;
-	m_write.name = string;
+	m_write.m_type = AMH_LEGACY_SPACE_HANDLER;
+	m_write.m_bits = 8;
+	m_write.m_mask = unitmask;
+	m_write.m_name = string;
+	m_wspace8 = func;
 }
 
 
@@ -226,25 +235,27 @@ void address_map_entry::internal_set_handler(read8_space_func rfunc, const char 
 
 void address_map_entry::internal_set_handler(const device_config &devconfig, const char *tag, read8_device_func func, const char *string, UINT64 unitmask)
 {
+	assert(func != NULL);
 	assert(unitmask_is_appropriate(8, unitmask, string));
-	m_read.type = AMH_DEVICE_HANDLER;
-	m_read.bits = (unitmask == 0) ? 0 : 8;
-	m_read.mask = UNITMASK8(unitmask);
-	m_read.handler.read.dhandler8 = func;
-	m_read.name = string;
-	m_read.tag = devconfig.siblingtag(m_read.derived_tag, tag);
+	m_read.m_type = AMH_LEGACY_DEVICE_HANDLER;
+	m_read.m_bits = 8;
+	m_read.m_mask = unitmask;
+	m_read.m_name = string;
+	m_read.set_tag(devconfig, tag);
+	m_rdevice8 = func;
 }
 
 
 void address_map_entry::internal_set_handler(const device_config &devconfig, const char *tag, write8_device_func func, const char *string, UINT64 unitmask)
 {
+	assert(func != NULL);
 	assert(unitmask_is_appropriate(8, unitmask, string));
-	m_write.type = AMH_DEVICE_HANDLER;
-	m_write.bits = (unitmask == 0) ? 0 : 8;
-	m_write.mask = UNITMASK8(unitmask);
-	m_write.handler.write.dhandler8 = func;
-	m_write.name = string;
-	m_write.tag = devconfig.siblingtag(m_write.derived_tag, tag);
+	m_write.m_type = AMH_LEGACY_DEVICE_HANDLER;
+	m_write.m_bits = 8;
+	m_write.m_mask = unitmask;
+	m_write.m_name = string;
+	m_write.set_tag(devconfig, tag);
+	m_wdevice8 = func;
 }
 
 
@@ -255,6 +266,39 @@ void address_map_entry::internal_set_handler(const device_config &devconfig, con
 }
 
 
+void address_map_entry::internal_set_handler(const device_config &devconfig, const char *tag, read8_proto_delegate func, UINT64 unitmask)
+{
+	assert(!func.isnull());
+	assert(unitmask_is_appropriate(8, unitmask, func.name()));
+	m_read.m_type = (tag == NULL) ? AMH_DRIVER_DELEGATE : AMH_DEVICE_DELEGATE;
+	m_read.m_bits = 8;
+	m_read.m_mask = unitmask;
+	m_read.m_name = func.name();
+	m_read.set_tag(devconfig, tag);
+	m_rproto8 = func;
+}
+
+
+void address_map_entry::internal_set_handler(const device_config &devconfig, const char *tag, write8_proto_delegate func, UINT64 unitmask)
+{
+	assert(!func.isnull());
+	assert(unitmask_is_appropriate(8, unitmask, func.name()));
+	m_write.m_type = (tag == NULL) ? AMH_DRIVER_DELEGATE : AMH_DEVICE_DELEGATE;;
+	m_write.m_bits = 8;
+	m_write.m_mask = unitmask;
+	m_write.m_name = func.name();
+	m_write.set_tag(devconfig, tag);
+	m_wproto8 = func;
+}
+
+
+void address_map_entry::internal_set_handler(const device_config &devconfig, const char *tag, read8_proto_delegate rfunc, write8_proto_delegate wfunc, UINT64 unitmask)
+{
+	internal_set_handler(devconfig, tag, rfunc, unitmask);
+	internal_set_handler(devconfig, tag, wfunc, unitmask);
+}
+
+
 //-------------------------------------------------
 //  internal_set_handler - handler setters for
 //  16-bit read/write handlers
@@ -262,23 +306,25 @@ void address_map_entry::internal_set_handler(const device_config &devconfig, con
 
 void address_map_entry::internal_set_handler(read16_space_func func, const char *string, UINT64 unitmask)
 {
+	assert(func != NULL);
 	assert(unitmask_is_appropriate(16, unitmask, string));
-	m_read.type = AMH_HANDLER;
-	m_read.bits = (unitmask == 0) ? 0 : 16;
-	m_read.mask = UNITMASK16(unitmask);
-	m_read.handler.read.shandler16 = func;
-	m_read.name = string;
+	m_read.m_type = AMH_LEGACY_SPACE_HANDLER;
+	m_read.m_bits = 16;
+	m_read.m_mask = unitmask;
+	m_read.m_name = string;
+	m_rspace16 = func;
 }
 
 
 void address_map_entry::internal_set_handler(write16_space_func func, const char *string, UINT64 unitmask)
 {
+	assert(func != NULL);
 	assert(unitmask_is_appropriate(16, unitmask, string));
-	m_write.type = AMH_HANDLER;
-	m_write.bits = (unitmask == 0) ? 0 : 16;
-	m_write.mask = UNITMASK16(unitmask);
-	m_write.handler.write.shandler16 = func;
-	m_write.name = string;
+	m_write.m_type = AMH_LEGACY_SPACE_HANDLER;
+	m_write.m_bits = 16;
+	m_write.m_mask = unitmask;
+	m_write.m_name = string;
+	m_wspace16 = func;
 }
 
 
@@ -291,25 +337,27 @@ void address_map_entry::internal_set_handler(read16_space_func rfunc, const char
 
 void address_map_entry::internal_set_handler(const device_config &devconfig, const char *tag, read16_device_func func, const char *string, UINT64 unitmask)
 {
+	assert(func != NULL);
 	assert(unitmask_is_appropriate(16, unitmask, string));
-	m_read.type = AMH_DEVICE_HANDLER;
-	m_read.bits = (unitmask == 0) ? 0 : 16;
-	m_read.mask = UNITMASK16(unitmask);
-	m_read.handler.read.dhandler16 = func;
-	m_read.name = string;
-	m_read.tag = devconfig.siblingtag(m_read.derived_tag, tag);
+	m_read.m_type = AMH_LEGACY_DEVICE_HANDLER;
+	m_read.m_bits = 16;
+	m_read.m_mask = unitmask;
+	m_read.m_name = string;
+	m_read.set_tag(devconfig, tag);
+	m_rdevice16 = func;
 }
 
 
 void address_map_entry::internal_set_handler(const device_config &devconfig, const char *tag, write16_device_func func, const char *string, UINT64 unitmask)
 {
+	assert(func != NULL);
 	assert(unitmask_is_appropriate(16, unitmask, string));
-	m_write.type = AMH_DEVICE_HANDLER;
-	m_write.bits = (unitmask == 0) ? 0 : 16;
-	m_write.mask = UNITMASK16(unitmask);
-	m_write.handler.write.dhandler16 = func;
-	m_write.name = string;
-	m_write.tag = devconfig.siblingtag(m_write.derived_tag, tag);
+	m_write.m_type = AMH_LEGACY_DEVICE_HANDLER;
+	m_write.m_bits = 16;
+	m_write.m_mask = unitmask;
+	m_write.m_name = string;
+	m_write.set_tag(devconfig, tag);
+	m_wdevice16 = func;
 }
 
 
@@ -320,6 +368,39 @@ void address_map_entry::internal_set_handler(const device_config &devconfig, con
 }
 
 
+void address_map_entry::internal_set_handler(const device_config &devconfig, const char *tag, read16_proto_delegate func, UINT64 unitmask)
+{
+	assert(!func.isnull());
+	assert(unitmask_is_appropriate(16, unitmask, func.name()));
+	m_read.m_type = (tag == NULL) ? AMH_DRIVER_DELEGATE : AMH_DEVICE_DELEGATE;;
+	m_read.m_bits = 16;
+	m_read.m_mask = unitmask;
+	m_read.m_name = func.name();
+	m_read.set_tag(devconfig, tag);
+	m_rproto16 = func;
+}
+
+
+void address_map_entry::internal_set_handler(const device_config &devconfig, const char *tag, write16_proto_delegate func, UINT64 unitmask)
+{
+	assert(!func.isnull());
+	assert(unitmask_is_appropriate(16, unitmask, func.name()));
+	m_write.m_type = (tag == NULL) ? AMH_DRIVER_DELEGATE : AMH_DEVICE_DELEGATE;;
+	m_write.m_bits = 16;
+	m_write.m_mask = unitmask;
+	m_write.m_name = func.name();
+	m_write.set_tag(devconfig, tag);
+	m_wproto16 = func;
+}
+
+
+void address_map_entry::internal_set_handler(const device_config &devconfig, const char *tag, read16_proto_delegate rfunc, write16_proto_delegate wfunc, UINT64 unitmask)
+{
+	internal_set_handler(devconfig, tag, rfunc, unitmask);
+	internal_set_handler(devconfig, tag, wfunc, unitmask);
+}
+
+
 //-------------------------------------------------
 //  internal_set_handler - handler setters for
 //  32-bit read/write handlers
@@ -327,23 +408,25 @@ void address_map_entry::internal_set_handler(const device_config &devconfig, con
 
 void address_map_entry::internal_set_handler(read32_space_func func, const char *string, UINT64 unitmask)
 {
+	assert(func != NULL);
 	assert(unitmask_is_appropriate(32, unitmask, string));
-	m_read.type = AMH_HANDLER;
-	m_read.bits = (unitmask == 0) ? 0 : 32;
-	m_read.mask = UNITMASK32(unitmask);
-	m_read.handler.read.shandler32 = func;
-	m_read.name = string;
+	m_read.m_type = AMH_LEGACY_SPACE_HANDLER;
+	m_read.m_bits = 32;
+	m_read.m_mask = unitmask;
+	m_read.m_name = string;
+	m_rspace32 = func;
 }
 
 
 void address_map_entry::internal_set_handler(write32_space_func func, const char *string, UINT64 unitmask)
 {
+	assert(func != NULL);
 	assert(unitmask_is_appropriate(32, unitmask, string));
-	m_write.type = AMH_HANDLER;
-	m_write.bits = (unitmask == 0) ? 0 : 32;
-	m_write.mask = UNITMASK32(unitmask);
-	m_write.handler.write.shandler32 = func;
-	m_write.name = string;
+	m_write.m_type = AMH_LEGACY_SPACE_HANDLER;
+	m_write.m_bits = 32;
+	m_write.m_mask = unitmask;
+	m_write.m_name = string;
+	m_wspace32 = func;
 }
 
 
@@ -356,25 +439,27 @@ void address_map_entry::internal_set_handler(read32_space_func rfunc, const char
 
 void address_map_entry::internal_set_handler(const device_config &devconfig, const char *tag, read32_device_func func, const char *string, UINT64 unitmask)
 {
+	assert(func != NULL);
 	assert(unitmask_is_appropriate(32, unitmask, string));
-	m_read.type = AMH_DEVICE_HANDLER;
-	m_read.bits = (unitmask == 0) ? 0 : 32;
-	m_read.mask = UNITMASK32(unitmask);
-	m_read.handler.read.dhandler32 = func;
-	m_read.name = string;
-	m_read.tag = devconfig.siblingtag(m_read.derived_tag, tag);
+	m_read.m_type = AMH_LEGACY_DEVICE_HANDLER;
+	m_read.m_bits = 32;
+	m_read.m_mask = unitmask;
+	m_read.m_name = string;
+	m_read.set_tag(devconfig, tag);
+	m_rdevice32 = func;
 }
 
 
 void address_map_entry::internal_set_handler(const device_config &devconfig, const char *tag, write32_device_func func, const char *string, UINT64 unitmask)
 {
+	assert(func != NULL);
 	assert(unitmask_is_appropriate(32, unitmask, string));
-	m_write.type = AMH_DEVICE_HANDLER;
-	m_write.bits = (unitmask == 0) ? 0 : 32;
-	m_write.mask = UNITMASK32(unitmask);
-	m_write.handler.write.dhandler32 = func;
-	m_write.name = string;
-	m_write.tag = devconfig.siblingtag(m_write.derived_tag, tag);
+	m_write.m_type = AMH_LEGACY_DEVICE_HANDLER;
+	m_write.m_bits = 32;
+	m_write.m_mask = unitmask;
+	m_write.m_name = string;
+	m_write.set_tag(devconfig, tag);
+	m_wdevice32 = func;
 }
 
 
@@ -385,6 +470,39 @@ void address_map_entry::internal_set_handler(const device_config &devconfig, con
 }
 
 
+void address_map_entry::internal_set_handler(const device_config &devconfig, const char *tag, read32_proto_delegate func, UINT64 unitmask)
+{
+	assert(!func.isnull());
+	assert(unitmask_is_appropriate(32, unitmask, func.name()));
+	m_read.m_type = (tag == NULL) ? AMH_DRIVER_DELEGATE : AMH_DEVICE_DELEGATE;;
+	m_read.m_bits = 32;
+	m_read.m_mask = unitmask;
+	m_read.m_name = func.name();
+	m_read.set_tag(devconfig, tag);
+	m_rproto32 = func;
+}
+
+
+void address_map_entry::internal_set_handler(const device_config &devconfig, const char *tag, write32_proto_delegate func, UINT64 unitmask)
+{
+	assert(!func.isnull());
+	assert(unitmask_is_appropriate(32, unitmask, func.name()));
+	m_write.m_type = (tag == NULL) ? AMH_DRIVER_DELEGATE : AMH_DEVICE_DELEGATE;;
+	m_write.m_bits = 32;
+	m_write.m_mask = unitmask;
+	m_write.m_name = func.name();
+	m_write.set_tag(devconfig, tag);
+	m_wproto32 = func;
+}
+
+
+void address_map_entry::internal_set_handler(const device_config &devconfig, const char *tag, read32_proto_delegate rfunc, write32_proto_delegate wfunc, UINT64 unitmask)
+{
+	internal_set_handler(devconfig, tag, rfunc, unitmask);
+	internal_set_handler(devconfig, tag, wfunc, unitmask);
+}
+
+
 //-------------------------------------------------
 //  internal_set_handler - handler setters for
 //  64-bit read/write handlers
@@ -392,23 +510,25 @@ void address_map_entry::internal_set_handler(const device_config &devconfig, con
 
 void address_map_entry::internal_set_handler(read64_space_func func, const char *string, UINT64 unitmask)
 {
+	assert(func != NULL);
 	assert(unitmask_is_appropriate(64, unitmask, string));
-	m_read.type = AMH_HANDLER;
-	m_read.bits = (unitmask == 0) ? 0 : 64;
-	m_read.mask = 0;
-	m_read.handler.read.shandler64 = func;
-	m_read.name = string;
+	m_read.m_type = AMH_LEGACY_SPACE_HANDLER;
+	m_read.m_bits = 64;
+	m_read.m_mask = 0;
+	m_read.m_name = string;
+	m_rspace64 = func;
 }
 
 
 void address_map_entry::internal_set_handler(write64_space_func func, const char *string, UINT64 unitmask)
 {
+	assert(func != NULL);
 	assert(unitmask_is_appropriate(64, unitmask, string));
-	m_write.type = AMH_HANDLER;
-	m_write.bits = (unitmask == 0) ? 0 : 64;
-	m_write.mask = 0;
-	m_write.handler.write.shandler64 = func;
-	m_write.name = string;
+	m_write.m_type = AMH_LEGACY_SPACE_HANDLER;
+	m_write.m_bits = 64;
+	m_write.m_mask = 0;
+	m_write.m_name = string;
+	m_wspace64 = func;
 }
 
 
@@ -421,25 +541,27 @@ void address_map_entry::internal_set_handler(read64_space_func rfunc, const char
 
 void address_map_entry::internal_set_handler(const device_config &devconfig, const char *tag, read64_device_func func, const char *string, UINT64 unitmask)
 {
+	assert(func != NULL);
 	assert(unitmask_is_appropriate(64, unitmask, string));
-	m_read.type = AMH_DEVICE_HANDLER;
-	m_read.bits = (unitmask == 0) ? 0 : 64;
-	m_read.mask = 0;
-	m_read.handler.read.dhandler64 = func;
-	m_read.name = string;
-	m_read.tag = devconfig.siblingtag(m_read.derived_tag, tag);
+	m_read.m_type = AMH_LEGACY_DEVICE_HANDLER;
+	m_read.m_bits = 64;
+	m_read.m_mask = 0;
+	m_read.m_name = string;
+	m_read.set_tag(devconfig, tag);
+	m_rdevice64 = func;
 }
 
 
 void address_map_entry::internal_set_handler(const device_config &devconfig, const char *tag, write64_device_func func, const char *string, UINT64 unitmask)
 {
+	assert(func != NULL);
 	assert(unitmask_is_appropriate(64, unitmask, string));
-	m_write.type = AMH_DEVICE_HANDLER;
-	m_write.bits = (unitmask == 0) ? 0 : 64;
-	m_write.mask = 0;
-	m_write.handler.write.dhandler64 = func;
-	m_write.name = string;
-	m_write.tag = devconfig.siblingtag(m_write.derived_tag, tag);
+	m_write.m_type = AMH_LEGACY_DEVICE_HANDLER;
+	m_write.m_bits = 64;
+	m_write.m_mask = 0;
+	m_write.m_name = string;
+	m_write.set_tag(devconfig, tag);
+	m_wdevice64 = func;
 }
 
 
@@ -447,6 +569,39 @@ void address_map_entry::internal_set_handler(const device_config &devconfig, con
 {
 	internal_set_handler(devconfig, tag, rfunc, rstring, unitmask);
 	internal_set_handler(devconfig, tag, wfunc, wstring, unitmask);
+}
+
+
+void address_map_entry::internal_set_handler(const device_config &devconfig, const char *tag, read64_proto_delegate func, UINT64 unitmask)
+{
+	assert(!func.isnull());
+	assert(unitmask_is_appropriate(64, unitmask, func.name()));
+	m_read.m_type = (tag == NULL) ? AMH_DRIVER_DELEGATE : AMH_DEVICE_DELEGATE;;
+	m_read.m_bits = 64;
+	m_read.m_mask = 0;
+	m_read.m_name = func.name();
+	m_read.set_tag(devconfig, tag);
+	m_rproto64 = func;
+}
+
+
+void address_map_entry::internal_set_handler(const device_config &devconfig, const char *tag, write64_proto_delegate func, UINT64 unitmask)
+{
+	assert(!func.isnull());
+	assert(unitmask_is_appropriate(64, unitmask, func.name()));
+	m_write.m_type = (tag == NULL) ? AMH_DRIVER_DELEGATE : AMH_DEVICE_DELEGATE;;
+	m_write.m_bits = 64;
+	m_write.m_mask = 0;
+	m_write.m_name = func.name();
+	m_write.set_tag(devconfig, tag);
+	m_wproto64 = func;
+}
+
+
+void address_map_entry::internal_set_handler(const device_config &devconfig, const char *tag, read64_proto_delegate rfunc, write64_proto_delegate wfunc, UINT64 unitmask)
+{
+	internal_set_handler(devconfig, tag, rfunc, unitmask);
+	internal_set_handler(devconfig, tag, wfunc, unitmask);
 }
 
 
@@ -540,9 +695,7 @@ address_map::address_map(const device_config &devconfig, int spacenum)
 	: m_spacenum(spacenum),
 	  m_databits(0xff),
 	  m_unmapval(0),
-	  m_globalmask(0),
-	  m_entrylist(NULL),
-	  m_tailptr(&m_entrylist)
+	  m_globalmask(0)
 {
 	// get our memory interface
 	const device_config_memory_interface *memintf;
@@ -574,13 +727,6 @@ address_map::address_map(const device_config &devconfig, int spacenum)
 
 address_map::~address_map()
 {
-	// free all entries */
-	while (m_entrylist != NULL)
-	{
-		address_map_entry *entry = m_entrylist;
-		m_entrylist = entry->m_next;
-		global_free(entry);
-	}
 }
 
 
@@ -621,8 +767,7 @@ void address_map::set_global_mask(offs_t mask)
 address_map_entry8 *address_map::add(offs_t start, offs_t end, address_map_entry8 *ptr)
 {
 	ptr = global_alloc(address_map_entry8(*this, start, end));
-	*m_tailptr = ptr;
-	m_tailptr = &ptr->m_next;
+	m_entrylist.append(*ptr);
 	return ptr;
 }
 
@@ -630,8 +775,7 @@ address_map_entry8 *address_map::add(offs_t start, offs_t end, address_map_entry
 address_map_entry16 *address_map::add(offs_t start, offs_t end, address_map_entry16 *ptr)
 {
 	ptr = global_alloc(address_map_entry16(*this, start, end));
-	*m_tailptr = ptr;
-	m_tailptr = &ptr->m_next;
+	m_entrylist.append(*ptr);
 	return ptr;
 }
 
@@ -639,8 +783,7 @@ address_map_entry16 *address_map::add(offs_t start, offs_t end, address_map_entr
 address_map_entry32 *address_map::add(offs_t start, offs_t end, address_map_entry32 *ptr)
 {
 	ptr = global_alloc(address_map_entry32(*this, start, end));
-	*m_tailptr = ptr;
-	m_tailptr = &ptr->m_next;
+	m_entrylist.append(*ptr);
 	return ptr;
 }
 
@@ -648,244 +791,6 @@ address_map_entry32 *address_map::add(offs_t start, offs_t end, address_map_entr
 address_map_entry64 *address_map::add(offs_t start, offs_t end, address_map_entry64 *ptr)
 {
 	ptr = global_alloc(address_map_entry64(*this, start, end));
-	*m_tailptr = ptr;
-	m_tailptr = &ptr->m_next;
+	m_entrylist.append(*ptr);
 	return ptr;
 }
-
-
-
-#if 0
-
-// old code for reference
-
-/***************************************************************************
-    ADDRESS MAP HELPERS
-***************************************************************************/
-
-/*-------------------------------------------------
-    map_detokenize - detokenize an array of
-    address map tokens
--------------------------------------------------*/
-
-#define check_map(field) do { \
-	if (map->field != 0 && map->field != tmap.field) \
-		fatalerror("%s: %s included a mismatched address map (%s %d) for an existing map with %s %d!\n", driver->source_file, driver->name, #field, tmap.field, #field, map->field); \
-	} while (0)
-
-#define check_entry_handler(row) do { \
-	if (entry->row.type != AMH_NONE) \
-		fatalerror("%s: %s AM_RANGE(0x%x, 0x%x) %s handler already set!\n", driver->source_file, driver->name, entry->addrstart, entry->addrend, #row); \
-	} while (0)
-
-#define check_entry_field(field) do { \
-	if (entry->field != 0) \
-		fatalerror("%s: %s AM_RANGE(0x%x, 0x%x) setting %s already set!\n", driver->source_file, driver->name, entry->addrstart, entry->addrend, #field); \
-	} while (0)
-
-static void map_detokenize(memory_private *memdata, address_map *map, const game_driver *driver, const device_config *devconfig, const addrmap_token *tokens)
-{
-	address_map_entry **firstentryptr;
-	address_map_entry **entryptr;
-	address_map_entry *entry;
-	address_map tmap = {0};
-	UINT32 entrytype;
-	int maptype;
-
-	/* check the first token */
-	TOKEN_GET_UINT32_UNPACK3(tokens, entrytype, 8, tmap.spacenum, 8, tmap.databits, 8);
-	if (entrytype != ADDRMAP_TOKEN_START)
-		fatalerror("%s: %s Address map missing ADDRMAP_TOKEN_START!\n", driver->source_file, driver->name);
-	if (tmap.spacenum >= ADDRESS_SPACES)
-		fatalerror("%s: %s Invalid address space %d for memory map!\n", driver->source_file, driver->name, tmap.spacenum);
-	if (tmap.databits != 8 && tmap.databits != 16 && tmap.databits != 32 && tmap.databits != 64)
-		fatalerror("%s: %s Invalid data bits %d for memory map!\n", driver->source_file, driver->name, tmap.databits);
-	check_map(spacenum);
-	check_map(databits);
-
-	/* fill in the map values */
-	map->spacenum = tmap.spacenum;
-	map->databits = tmap.databits;
-
-	/* find the end of the list */
-	for (entryptr = &map->entrylist; *entryptr != NULL; entryptr = &(*entryptr)->next) ;
-	firstentryptr = entryptr;
-	entry = NULL;
-
-	/* loop over tokens until we hit the end */
-	while (entrytype != ADDRMAP_TOKEN_END)
-	{
-		/* unpack the token from the first entry */
-		TOKEN_GET_UINT32_UNPACK1(tokens, entrytype, 8);
-		switch (entrytype)
-		{
-			/* end */
-			case ADDRMAP_TOKEN_END:
-				break;
-
-			/* including */
-			case ADDRMAP_TOKEN_INCLUDE:
-				map_detokenize(memdata, map, driver, devconfig, TOKEN_GET_PTR(tokens, tokenptr));
-				for (entryptr = &map->entrylist; *entryptr != NULL; entryptr = &(*entryptr)->next) ;
-				entry = NULL;
-				break;
-
-			/* global flags */
-			case ADDRMAP_TOKEN_GLOBAL_MASK:
-				TOKEN_UNGET_UINT32(tokens);
-				TOKEN_GET_UINT64_UNPACK2(tokens, entrytype, 8, tmap.globalmask, 32);
-				check_map(globalmask);
-				map->globalmask = tmap.globalmask;
-				break;
-
-			case ADDRMAP_TOKEN_UNMAP_VALUE:
-				TOKEN_UNGET_UINT32(tokens);
-				TOKEN_GET_UINT32_UNPACK2(tokens, entrytype, 8, tmap.unmapval, 1);
-				check_map(unmapval);
-				map->unmapval = tmap.unmapval;
-				break;
-
-			/* start a new range */
-			case ADDRMAP_TOKEN_RANGE:
-				entry = *entryptr = global_alloc_clear(address_map_entry);
-				entryptr = &entry->next;
-				TOKEN_GET_UINT64_UNPACK2(tokens, entry->addrstart, 32, entry->addrend, 32);
-				break;
-
-			case ADDRMAP_TOKEN_MASK:
-				check_entry_field(addrmask);
-				TOKEN_UNGET_UINT32(tokens);
-				TOKEN_GET_UINT64_UNPACK2(tokens, entrytype, 8, entry->addrmask, 32);
-				break;
-
-			case ADDRMAP_TOKEN_MIRROR:
-				check_entry_field(addrmirror);
-				TOKEN_UNGET_UINT32(tokens);
-				TOKEN_GET_UINT64_UNPACK2(tokens, entrytype, 8, entry->addrmirror, 32);
-				if (entry->addrmirror != 0)
-				{
-					entry->addrstart &= ~entry->addrmirror;
-					entry->addrend &= ~entry->addrmirror;
-				}
-				break;
-
-			case ADDRMAP_TOKEN_READ:
-				check_entry_handler(read);
-				TOKEN_UNGET_UINT32(tokens);
-				TOKEN_GET_UINT32_UNPACK4(tokens, entrytype, 8, maptype, 8, entry->read.bits, 8, entry->read.mask, 8);
-				entry->read.type = (map_handler_type)maptype;
-				if (entry->read.type == AMH_HANDLER || entry->read.type == AMH_DEVICE_HANDLER)
-				{
-					entry->read.handler.read = TOKEN_GET_PTR(tokens, read);
-					entry->read.name = TOKEN_GET_STRING(tokens);
-				}
-				if (entry->read.type == AMH_DEVICE_HANDLER || entry->read.type == AMH_PORT || entry->read.type == AMH_BANK)
-					entry->read.tag = devconfig->siblingtag(entry->read.derived_tag, TOKEN_GET_STRING(tokens));
-				break;
-
-			case ADDRMAP_TOKEN_WRITE:
-				check_entry_handler(write);
-				TOKEN_UNGET_UINT32(tokens);
-				TOKEN_GET_UINT32_UNPACK4(tokens, entrytype, 8, maptype, 8, entry->write.bits, 8, entry->write.mask, 8);
-				entry->write.type = (map_handler_type)maptype;
-				if (entry->write.type == AMH_HANDLER || entry->write.type == AMH_DEVICE_HANDLER)
-				{
-					entry->write.handler.write = TOKEN_GET_PTR(tokens, write);
-					entry->write.name = TOKEN_GET_STRING(tokens);
-				}
-				if (entry->write.type == AMH_DEVICE_HANDLER || entry->write.type == AMH_PORT || entry->write.type == AMH_BANK)
-					entry->write.tag = devconfig->siblingtag(entry->write.derived_tag, TOKEN_GET_STRING(tokens));
-				break;
-
-			case ADDRMAP_TOKEN_READWRITE:
-				check_entry_handler(read);
-				check_entry_handler(write);
-				TOKEN_UNGET_UINT32(tokens);
-				TOKEN_GET_UINT32_UNPACK4(tokens, entrytype, 8, maptype, 8, entry->read.bits, 8, entry->read.mask, 8);
-				entry->write.type = entry->read.type = (map_handler_type)maptype;
-				entry->write.bits = entry->read.bits;
-				entry->write.mask = entry->read.mask;
-				if (entry->read.type == AMH_HANDLER || entry->read.type == AMH_DEVICE_HANDLER)
-				{
-					entry->read.handler.read = TOKEN_GET_PTR(tokens, read);
-					entry->read.name = TOKEN_GET_STRING(tokens);
-					entry->write.handler.write = TOKEN_GET_PTR(tokens, write);
-					entry->write.name = TOKEN_GET_STRING(tokens);
-				}
-				if (entry->read.type == AMH_DEVICE_HANDLER || entry->read.type == AMH_PORT || entry->read.type == AMH_BANK)
-				{
-					const char *basetag = TOKEN_GET_STRING(tokens);
-					entry->read.tag = devconfig->siblingtag(entry->read.derived_tag, basetag);
-					entry->write.tag = devconfig->siblingtag(entry->write.derived_tag, basetag);
-				}
-				break;
-
-			case ADDRMAP_TOKEN_REGION:
-				check_entry_field(region);
-				TOKEN_UNGET_UINT32(tokens);
-				TOKEN_GET_UINT64_UNPACK2(tokens, entrytype, 8, entry->rgnoffs, 32);
-				entry->region = devconfig->siblingtag(entry->region_string, TOKEN_GET_STRING(tokens));
-				break;
-
-			case ADDRMAP_TOKEN_SHARE:
-				check_entry_field(share);
-				entry->share = TOKEN_GET_STRING(tokens);
-				if (memdata != NULL)
-					memdata->sharemap.add(entry->share, UNMAPPED_SHARE_PTR, FALSE);
-				break;
-
-			case ADDRMAP_TOKEN_BASEPTR:
-				check_entry_field(baseptr);
-				entry->baseptr = (void **)TOKEN_GET_PTR(tokens, voidptr);
-				break;
-
-			case ADDRMAP_TOKEN_BASE_MEMBER:
-				check_entry_field(baseptroffs_plus1);
-				TOKEN_UNGET_UINT32(tokens);
-				TOKEN_GET_UINT32_UNPACK2(tokens, entrytype, 8, entry->baseptroffs_plus1, 24);
-				entry->baseptroffs_plus1++;
-				break;
-
-			case ADDRMAP_TOKEN_BASE_GENERIC:
-				check_entry_field(genbaseptroffs_plus1);
-				TOKEN_UNGET_UINT32(tokens);
-				TOKEN_GET_UINT32_UNPACK2(tokens, entrytype, 8, entry->genbaseptroffs_plus1, 24);
-				entry->genbaseptroffs_plus1++;
-				break;
-
-			case ADDRMAP_TOKEN_SIZEPTR:
-				check_entry_field(sizeptr);
-				entry->sizeptr = TOKEN_GET_PTR(tokens, sizeptr);
-				break;
-
-			case ADDRMAP_TOKEN_SIZE_MEMBER:
-				check_entry_field(sizeptroffs_plus1);
-				TOKEN_UNGET_UINT32(tokens);
-				TOKEN_GET_UINT32_UNPACK2(tokens, entrytype, 8, entry->sizeptroffs_plus1, 24);
-				entry->sizeptroffs_plus1++;
-				break;
-
-			case ADDRMAP_TOKEN_SIZE_GENERIC:
-				check_entry_field(gensizeptroffs_plus1);
-				TOKEN_UNGET_UINT32(tokens);
-				TOKEN_GET_UINT32_UNPACK2(tokens, entrytype, 8, entry->gensizeptroffs_plus1, 24);
-				entry->gensizeptroffs_plus1++;
-				break;
-
-			default:
-				fatalerror("Invalid token %d in address map\n", entrytype);
-				break;
-		}
-	}
-
-	/* post-process to apply the global mask */
-	if (map->globalmask != 0)
-		for (entry = map->entrylist; entry != NULL; entry = entry->next)
-		{
-			entry->addrstart &= map->globalmask;
-			entry->addrend &= map->globalmask;
-			entry->addrmask &= map->globalmask;
-		}
-}
-
-#endif

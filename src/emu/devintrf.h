@@ -347,7 +347,7 @@ protected:
 // ======================> device_t
 
 // device_t represents a device that is live and attached to a running_machine
-class device_t
+class device_t : public bindable_object
 {
 	DISABLE_COPYING(device_t);
 

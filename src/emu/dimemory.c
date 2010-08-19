@@ -191,7 +191,7 @@ bool device_config_memory_interface::interface_validity_check(const game_driver 
 			::address_map *map = global_alloc(::address_map(*devconfig, spacenum));
 
 			// if this is an empty map, just skip it
-			if (map->m_entrylist == NULL)
+			if (map->m_entrylist.first() == NULL)
 			{
 				global_free(map);
 				continue;
@@ -210,7 +210,7 @@ bool device_config_memory_interface::interface_validity_check(const game_driver 
 			}
 
 			// loop over entries and look for errors
-			for (address_map_entry *entry = map->m_entrylist; entry != NULL; entry = entry->m_next)
+			for (address_map_entry *entry = map->m_entrylist.first(); entry != NULL; entry = entry->next())
 			{
 				UINT32 bytestart = spaceconfig->addr2byte(entry->m_addrstart);
 				UINT32 byteend = spaceconfig->addr2byte_end(entry->m_addrend);
@@ -219,12 +219,12 @@ bool device_config_memory_interface::interface_validity_check(const game_driver 
 				if (!detected_overlap)
 				{
 					address_map_entry *scan;
-					for (scan = map->m_entrylist; scan != entry; scan = scan->m_next)
+					for (scan = map->m_entrylist.first(); scan != entry; scan = scan->next())
 						if (entry->m_addrstart <= scan->m_addrend && entry->m_addrend >= scan->m_addrstart &&
-							((entry->m_read.type != AMH_NONE && scan->m_read.type != AMH_NONE) ||
-							 (entry->m_write.type != AMH_NONE && scan->m_write.type != AMH_NONE)))
+							((entry->m_read.m_type != AMH_NONE && scan->m_read.m_type != AMH_NONE) ||
+							 (entry->m_write.m_type != AMH_NONE && scan->m_write.m_type != AMH_NONE)))
 						{
-							mame_printf_warning("%s: %s '%s' %s space has overlapping memory (%X-%X,%d,%d) vs (%X-%X,%d,%d)\n", driver.source_file, driver.name, devconfig->tag(), spaceconfig->m_name, entry->m_addrstart, entry->m_addrend, entry->m_read.type, entry->m_write.type, scan->m_addrstart, scan->m_addrend, scan->m_read.type, scan->m_write.type);
+							mame_printf_warning("%s: %s '%s' %s space has overlapping memory (%X-%X,%d,%d) vs (%X-%X,%d,%d)\n", driver.source_file, driver.name, devconfig->tag(), spaceconfig->m_name, entry->m_addrstart, entry->m_addrend, entry->m_read.m_type, entry->m_write.m_type, scan->m_addrstart, scan->m_addrend, scan->m_read.m_type, scan->m_write.m_type);
 							detected_overlap = true;
 							break;
 						}
@@ -245,7 +245,7 @@ bool device_config_memory_interface::interface_validity_check(const game_driver 
 				}
 
 				// if this is a program space, auto-assign implicit ROM entries
-				if (entry->m_read.type == AMH_ROM && entry->m_region == NULL)
+				if (entry->m_read.m_type == AMH_ROM && entry->m_region == NULL)
 				{
 					entry->m_region = devconfig->tag();
 					entry->m_rgnoffs = entry->m_addrstart;
@@ -287,25 +287,25 @@ bool device_config_memory_interface::interface_validity_check(const game_driver 
 				}
 
 				// make sure all devices exist
-				if ((entry->m_read.type == AMH_DEVICE_HANDLER && entry->m_read.tag != NULL && m_machine_config.m_devicelist.find(entry->m_read.tag) == NULL) ||
-					(entry->m_write.type == AMH_DEVICE_HANDLER && entry->m_write.tag != NULL && m_machine_config.m_devicelist.find(entry->m_write.tag) == NULL))
+				if ((entry->m_read.m_type == AMH_LEGACY_DEVICE_HANDLER && entry->m_read.m_tag != NULL && m_machine_config.m_devicelist.find(entry->m_read.m_tag) == NULL) ||
+					(entry->m_write.m_type == AMH_LEGACY_DEVICE_HANDLER && entry->m_write.m_tag != NULL && m_machine_config.m_devicelist.find(entry->m_write.m_tag) == NULL))
 				{
-					mame_printf_error("%s: %s device '%s' %s space memory map entry references nonexistant device '%s'\n", driver.source_file, driver.name, devconfig->tag(), spaceconfig->m_name, entry->m_write.tag);
+					mame_printf_error("%s: %s device '%s' %s space memory map entry references nonexistant device '%s'\n", driver.source_file, driver.name, devconfig->tag(), spaceconfig->m_name, entry->m_write.m_tag);
 					error = true;
 				}
 
 				// make sure ports exist
-//              if ((entry->m_read.type == AMH_PORT && entry->m_read.tag != NULL && portlist.find(entry->m_read.tag) == NULL) ||
-//                  (entry->m_write.type == AMH_PORT && entry->m_write.tag != NULL && portlist.find(entry->m_write.tag) == NULL))
+//              if ((entry->m_read.m_type == AMH_PORT && entry->m_read.m_tag != NULL && portlist.find(entry->m_read.m_tag) == NULL) ||
+//                  (entry->m_write.m_type == AMH_PORT && entry->m_write.m_tag != NULL && portlist.find(entry->m_write.m_tag) == NULL))
 //              {
 //                  mame_printf_error("%s: %s device '%s' %s space memory map entry references nonexistant port tag '%s'\n", driver.source_file, driver.name, devconfig->tag(), spaceconfig->m_name, entry->m_read.tag);
 //                  error = true;
 //              }
 
 				// validate bank and share tags
-				if (entry->m_read.type == AMH_BANK && !validate_tag(&driver, "bank", entry->m_read.tag))
+				if (entry->m_read.m_type == AMH_BANK && !validate_tag(&driver, "bank", entry->m_read.m_tag))
 					error = true ;
-				if (entry->m_write.type == AMH_BANK && !validate_tag(&driver, "bank", entry->m_write.tag))
+				if (entry->m_write.m_type == AMH_BANK && !validate_tag(&driver, "bank", entry->m_write.m_tag))
 					error = true;
 				if (entry->m_share != NULL && !validate_tag(&driver, "share", entry->m_share))
 					error = true;
@@ -350,10 +350,10 @@ device_memory_interface::~device_memory_interface()
 //  to a device
 //-------------------------------------------------
 
-void device_memory_interface::set_address_space(int spacenum, const address_space *space)
+void device_memory_interface::set_address_space(int spacenum, address_space &space)
 {
 	assert(spacenum < ARRAY_LENGTH(m_addrspace));
-	m_addrspace[spacenum] = space;
+	m_addrspace[spacenum] = &space;
 }
 
 

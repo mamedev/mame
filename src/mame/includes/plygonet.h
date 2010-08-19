@@ -18,7 +18,7 @@ public:
 	UINT16* dsp56k_bank04_ram;
 	int cur_sound_region;
 
-	direct_update_func dsp56k_update_handler;
+	direct_update_delegate dsp56k_update_handler;
 
 	/* TTL text plane stuff */
 	int ttl_gfx_index;

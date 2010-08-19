@@ -78,6 +78,8 @@ legacy_cpu_device_config::legacy_cpu_device_config(const machine_config &mconfig
 		m_space_config[spacenum].m_addrbus_width = get_legacy_config_int(DEVINFO_INT_ADDRBUS_WIDTH + spacenum);
 		m_space_config[spacenum].m_addrbus_shift = get_legacy_config_int(DEVINFO_INT_ADDRBUS_SHIFT + spacenum);
 		m_space_config[spacenum].m_logaddr_width = get_legacy_config_int(CPUINFO_INT_LOGADDR_WIDTH + spacenum);
+		if (m_space_config[spacenum].m_logaddr_width == 0)
+			m_space_config[spacenum].m_logaddr_width = m_space_config[spacenum].m_addrbus_width;
 		m_space_config[spacenum].m_page_shift = get_legacy_config_int(CPUINFO_INT_PAGE_SHIFT + spacenum);
 		m_space_config[spacenum].m_internal_map = reinterpret_cast<address_map_constructor>(get_legacy_config_fct(DEVINFO_PTR_INTERNAL_MEMORY_MAP + spacenum));
 		m_space_config[spacenum].m_default_map = reinterpret_cast<address_map_constructor>(get_legacy_config_fct(DEVINFO_PTR_DEFAULT_MEMORY_MAP + spacenum));

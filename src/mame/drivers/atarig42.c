@@ -138,12 +138,12 @@ static WRITE16_HANDLER( mo_command_w )
  *
  *************************************/
 
-static DIRECT_UPDATE_HANDLER( sloop_direct_handler )
+DIRECT_UPDATE_HANDLER( atarig42_sloop_direct_handler )
 {
-	atarig42_state *state = space->machine->driver_data<atarig42_state>();
 	if (address < 0x80000)
 	{
-		direct->raw = direct->decrypted = (UINT8 *)state->sloop_base;
+		atarig42_state *state = machine->driver_data<atarig42_state>();
+		direct.explicit_configure(0x00000, 0x7ffff, 0x7ffff, state->sloop_base);
 		return (offs_t)-1;
 	}
 	return address;
@@ -696,8 +696,9 @@ static DRIVER_INIT( roadriot )
 	state->motion_object_base = 0x200;
 	state->motion_object_mask = 0x1ff;
 
-	state->sloop_base = memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x000000, 0x07ffff, 0, 0, roadriot_sloop_data_r, roadriot_sloop_data_w);
-	memory_set_direct_update_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), sloop_direct_handler);
+	address_space *main = machine->device<m68000_device>("maincpu")->space(AS_PROGRAM);
+	state->sloop_base = memory_install_readwrite16_handler(main, 0x000000, 0x07ffff, 0, 0, roadriot_sloop_data_r, roadriot_sloop_data_w);
+	main->set_direct_update_handler(direct_update_delegate_create_static(atarig42_sloop_direct_handler, *machine));
 
 	asic65_config(machine, ASIC65_ROMBASED);
 /*
@@ -750,8 +751,9 @@ static DRIVER_INIT( guardian )
 	/* put an RTS there so we don't die */
 	*(UINT16 *)&memory_region(machine, "maincpu")[0x80000] = 0x4E75;
 
-	state->sloop_base = memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x000000, 0x07ffff, 0, 0, guardians_sloop_data_r, guardians_sloop_data_w);
-	memory_set_direct_update_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), sloop_direct_handler);
+	address_space *main = machine->device<m68000_device>("maincpu")->space(AS_PROGRAM);
+	state->sloop_base = memory_install_readwrite16_handler(main, 0x000000, 0x07ffff, 0, 0, guardians_sloop_data_r, guardians_sloop_data_w);
+	main->set_direct_update_handler(direct_update_delegate_create_static(atarig42_sloop_direct_handler, *machine));
 
 	asic65_config(machine, ASIC65_GUARDIANS);
 /*

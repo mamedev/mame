@@ -122,8 +122,8 @@ public:
 	void set_bank_base(offs_t base);
 	void set_pin7(int pin7);
 
-	UINT8 status_read();
-	void data_write(UINT8 data);
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
 
 protected:
 	// device-level overrides
@@ -141,7 +141,7 @@ protected:
 	{
 	public:
 		okim_voice();
-		void generate_adpcm(const address_space *space, stream_sample_t *buffer, int samples);
+		void generate_adpcm(direct_read_data &direct, stream_sample_t *buffer, int samples);
 
 		adpcm_state m_adpcm;			// current ADPCM state
 		bool		m_playing;
@@ -156,12 +156,13 @@ protected:
 
 	const okim6295_device_config &m_config;
 
-	okim_voice		m_voice[OKIM6295_VOICES];
-	INT32			m_command;
-	bool			m_bank_installed;
-	offs_t			m_bank_offs;
-	sound_stream *	m_stream;
-	UINT8			m_pin7_state;
+	okim_voice			m_voice[OKIM6295_VOICES];
+	INT32				m_command;
+	bool				m_bank_installed;
+	offs_t				m_bank_offs;
+	sound_stream *		m_stream;
+	UINT8				m_pin7_state;
+	direct_read_data *	m_direct;
 
 	static const UINT8 s_volume_table[16];
 };

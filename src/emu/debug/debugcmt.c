@@ -289,7 +289,7 @@ UINT32 debug_comment_get_opcode_crc32(device_t *device, offs_t address)
 	offs_t numbytes;
 	cpu_device *cpudevice = downcast<cpu_device *>(device);
 	int maxbytes = cpudevice->max_opcode_bytes();
-	UINT32 addrmask = space->logaddrmask;
+	UINT32 addrmask = space->logaddrmask();
 
 	memset(opbuf, 0x00, sizeof(opbuf));
 	memset(argbuf, 0x00, sizeof(argbuf));
@@ -302,7 +302,7 @@ UINT32 debug_comment_get_opcode_crc32(device_t *device, offs_t address)
 	}
 
 	numbytes = device->debug()->disassemble(buff, address & addrmask, opbuf, argbuf) & DASMFLAG_LENGTHMASK;
-	numbytes = memory_address_to_byte(space, numbytes);
+	numbytes = space->address_to_byte(numbytes);
 
 	crc = crc32(0, argbuf, numbytes);
 

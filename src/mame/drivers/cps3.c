@@ -607,7 +607,7 @@ INLINE void cps3_drawgfxzoom(bitmap_t *dest_bmp,const rectangle *clip,const gfx_
 
 
 
-static DIRECT_UPDATE_HANDLER( cps3_direct_handler );
+DIRECT_UPDATE_HANDLER( cps3_direct_handler );
 
 /* Encryption */
 
@@ -706,7 +706,9 @@ static DRIVER_INIT( cps3 )
 
 
 	cps3_0xc0000000_ram_decrypted = auto_alloc_array(machine, UINT32, 0x400/4);
-	memory_set_direct_update_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), cps3_direct_handler);
+
+	address_space *main = machine->device<sh2_device>("maincpu")->space(AS_PROGRAM);
+	main->set_direct_update_handler(direct_update_delegate_create_static(cps3_direct_handler, *machine));
 
 	// flash roms
 
@@ -1263,38 +1265,37 @@ static WRITE32_HANDLER( cps3_0xc0000000_ram_w )
 
 
 
-static DIRECT_UPDATE_HANDLER( cps3_direct_handler )
+DIRECT_UPDATE_HANDLER( cps3_direct_handler )
 {
 //  if(DEBUG_PRINTF) printf("address %04x\n",address);
 
 	/* BIOS ROM */
 	if (address < 0x80000)
 	{
-		direct->raw = direct->decrypted = memory_region(space->machine, "user1");
+		direct.explicit_configure(0x00000, 0x7ffff, 0x7ffff, *direct.space().m_machine.region("user1"));
 		return ~0;
 	}
 	/* RAM */
 	else if (address >= 0x06000000 && address <= 0x06ffffff)
 	{
-		direct->decrypted = (UINT8*)decrypted_gamerom-0x06000000;
-		direct->raw = (UINT8*)decrypted_gamerom-0x06000000;
+		UINT8 *decrypted = (UINT8*)decrypted_gamerom;
+		UINT8 *raw = decrypted;
 
-		if (cps3_altEncryption) direct->raw = (UINT8*) cps3_user4region-0x06000000;
+		if (cps3_altEncryption) raw = (UINT8*) cps3_user4region;
 
+		direct.explicit_configure(0x06000000, 0x06ffffff, 0x00ffffff, raw, decrypted);
 
 		return ~0;
 	}
 	else if (address >= 0xc0000000 && address <= 0xc00003ff)
 	{
 		//direct->decrypted = (void*)cps3_0xc0000000_ram_decrypted;
-		direct->decrypted = (UINT8*)cps3_0xc0000000_ram_decrypted-0xc0000000;
-		direct->raw = (UINT8*)cps3_0xc0000000_ram-0xc0000000;
+		direct.explicit_configure(0xc0000000, 0xc00003ff, 0x3ff, (UINT8*)cps3_0xc0000000_ram, (UINT8*)cps3_0xc0000000_ram_decrypted);
 		return ~0;
 	}
 
 	/* anything else falls through to NOPs */
-	direct->decrypted = (UINT8*)cps3_nops-address;
-	direct->raw = (UINT8*)cps3_nops-address;
+	direct.explicit_configure(address, address, 0, (UINT8*)cps3_nops, (UINT8*)cps3_nops);
 	return ~0;
 }
 

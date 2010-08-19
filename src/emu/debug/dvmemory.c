@@ -79,8 +79,8 @@ debug_view_memory_source::debug_view_memory_source(const char *name, const addre
 	  m_base(NULL),
 	  m_length(0),
 	  m_offsetxor(0),
-	  m_endianness(space.endianness),
-	  m_prefsize(space.dbits / 8)
+	  m_endianness(space.endianness()),
+	  m_prefsize(space.data_width() / 8)
 {
 }
 
@@ -159,7 +159,7 @@ void debug_view_memory::enumerate_sources()
 			const address_space *space = memintf->space(spacenum);
 			if (space != NULL)
 			{
-				name.printf("%s '%s' %s space memory", memintf->device().name(), memintf->device().tag(), space->name);
+				name.printf("%s '%s' %s space memory", memintf->device().name(), memintf->device().tag(), space->name());
 				m_source_list.append(*auto_alloc(&m_machine, debug_view_memory_source(name, *space)));
 			}
 		}
@@ -263,7 +263,7 @@ void debug_view_memory::view_update()
 		if (effrow < m_total.y)
 		{
 			offs_t addrbyte = m_byte_offset + effrow * m_bytes_per_row;
-			offs_t address = (source.m_space != NULL) ? memory_byte_to_address(source.m_space, addrbyte) : addrbyte;
+			offs_t address = (source.m_space != NULL) ? source.m_space->byte_to_address(addrbyte) : addrbyte;
 			char addrtext[20];
 
 			// generate the address
@@ -441,8 +441,8 @@ void debug_view_memory::recompute()
 	int addrchars;
 	if (source.m_space != NULL)
 	{
-		m_maxaddr = m_no_translation ? source.m_space->bytemask : source.m_space->logbytemask;
-		addrchars = m_no_translation ? source.m_space->addrchars : source.m_space->logaddrchars;
+		m_maxaddr = m_no_translation ? source.m_space->bytemask() : source.m_space->logbytemask();
+		addrchars = m_no_translation ? source.m_space->addrchars() : source.m_space->logaddrchars();
 	}
 	else
 	{
@@ -457,9 +457,9 @@ void debug_view_memory::recompute()
 		m_addrformat.printf("%%0%dX%*s", addrchars, 8 - addrchars, "");
 
 	// if we are viewing a space with a minimum chunk size, clamp the bytes per chunk
-	if (source.m_space != NULL && source.m_space->ashift < 0)
+	if (source.m_space != NULL && source.m_space->byte_to_address(1) > 1)
 	{
-		UINT32 min_bytes_per_chunk = 1 << -source.m_space->ashift;
+		UINT32 min_bytes_per_chunk = source.m_space->byte_to_address(1);
 		while (m_bytes_per_chunk < min_bytes_per_chunk)
 		{
 			m_bytes_per_chunk *= 2;
@@ -521,7 +521,7 @@ bool debug_view_memory::needs_recompute()
 		const debug_view_memory_source &source = downcast<const debug_view_memory_source &>(*m_source);
 		offs_t resultbyte;
 		if (source.m_space != NULL)
-			resultbyte  = memory_address_to_byte(source.m_space, m_expression.value()) & source.m_space->logbytemask;
+			resultbyte  = source.m_space->address_to_byte(m_expression.value()) & source.m_space->logbytemask();
 		else
 			resultbyte = m_expression.value();
 
@@ -621,7 +621,7 @@ bool debug_view_memory::read(UINT8 size, offs_t offs, UINT64 &data)
 	{
 		offs_t dummyaddr = offs;
 
-		bool ismapped = m_no_translation ? true : source.m_memintf->translate(source.m_space->spacenum, TRANSLATE_READ_DEBUG, dummyaddr);
+		bool ismapped = m_no_translation ? true : source.m_memintf->translate(source.m_space->spacenum(), TRANSLATE_READ_DEBUG, dummyaddr);
 		data = ~(UINT64)0;
 		if (ismapped)
 		{

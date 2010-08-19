@@ -62,6 +62,7 @@
 #include "attotime.h"
 #include "fileio.h" // remove me once NVRAM is implemented as device
 #include "tokenize.h"
+#include "delegate.h"
 
 // memory and address spaces
 #include "memory.h"

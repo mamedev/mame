@@ -1819,7 +1819,7 @@ static DEVICE_START( ide_controller )
 		ide->dma_space = memory->space(config->bmspace);
 		if (ide->dma_space == NULL)
 			throw emu_fatalerror("IDE controller '%s' bus master target '%s' does not have specified space %d!", device->tag(), config->bmcpu, config->bmspace);
-		ide->dma_address_xor = (ide->dma_space->endianness == ENDIANNESS_LITTLE) ? 0 : 3;
+		ide->dma_address_xor = (ide->dma_space->endianness() == ENDIANNESS_LITTLE) ? 0 : 3;
 	}
 
 	/* get and copy the geometry */

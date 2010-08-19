@@ -389,21 +389,21 @@ static MACHINE_RESET( shadfgtr )
 }
 
 
-static DIRECT_UPDATE_HANDLER( vid_0_direct_handler )
+DIRECT_UPDATE_HANDLER( vcombat_vid_0_direct_handler )
 {
 	if (address >= 0xfffc0000 && address <= 0xffffffff)
 	{
-		direct->raw = direct->decrypted = ((UINT8*)vid_0_shared_RAM) - 0xfffc0000;
+		direct.explicit_configure(0xfffc0000, 0xffffffff, 0x3ffff, vid_0_shared_RAM);
 		return ~0;
 	}
 	return address;
 }
 
-static DIRECT_UPDATE_HANDLER( vid_1_direct_handler )
+DIRECT_UPDATE_HANDLER( vcombat_vid_1_direct_handler )
 {
 	if (address >= 0xfffc0000 && address <= 0xffffffff)
 	{
-		direct->raw = direct->decrypted = ((UINT8*)vid_1_shared_RAM) - 0xfffc0000;
+		direct.explicit_configure(0xfffc0000, 0xffffffff, 0x3ffff, vid_1_shared_RAM);
 		return ~0;
 	}
 	return address;
@@ -415,8 +415,11 @@ static DRIVER_INIT( vcombat )
 	UINT8 *ROM = memory_region(machine, "maincpu");
 
 	/* The two i860s execute out of RAM */
-	memory_set_direct_update_handler(cputag_get_address_space(machine, "vid_0", ADDRESS_SPACE_PROGRAM), vid_0_direct_handler);
-	memory_set_direct_update_handler(cputag_get_address_space(machine, "vid_1", ADDRESS_SPACE_PROGRAM), vid_1_direct_handler);
+	address_space *space = machine->device<i860_device>("vid_0")->space(AS_PROGRAM);
+	space->set_direct_update_handler(direct_update_delegate_create_static(vcombat_vid_0_direct_handler, *machine));
+
+	space = machine->device<i860_device>("vid_1")->space(AS_PROGRAM);
+	space->set_direct_update_handler(direct_update_delegate_create_static(vcombat_vid_1_direct_handler, *machine));
 
 	/* Allocate the 68000 framebuffers */
 	m68k_framebuffer[0] = auto_alloc_array(machine, UINT16, 0x8000);
@@ -459,7 +462,8 @@ static DRIVER_INIT( shadfgtr )
 	i860_framebuffer[1][1] = NULL;
 
 	/* The i860 executes out of RAM */
-	memory_set_direct_update_handler(cputag_get_address_space(machine, "vid_0", ADDRESS_SPACE_PROGRAM), vid_0_direct_handler);
+	address_space *space = machine->device<i860_device>("vid_0")->space(AS_PROGRAM);
+	space->set_direct_update_handler(direct_update_delegate_create_static(vcombat_vid_0_direct_handler, *machine));
 }
 
 

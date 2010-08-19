@@ -491,9 +491,9 @@ static STATE_POSTLOAD( slapstic_postload )
 }
 
 
-static DIRECT_UPDATE_HANDLER( atarigen_slapstic_setdirect )
+DIRECT_UPDATE_HANDLER( atarigen_slapstic_setdirect )
 {
-	atarigen_state *state = space->machine->driver_data<atarigen_state>();
+	atarigen_state *state = machine->driver_data<atarigen_state>();
 
 	/* if we jump to an address in the slapstic region, tweak the slapstic
        at that address and return ~0; this will cause us to be called on
@@ -501,12 +501,12 @@ static DIRECT_UPDATE_HANDLER( atarigen_slapstic_setdirect )
 	address &= ~state->slapstic_mirror;
 	if (address >= state->slapstic_base && address < state->slapstic_base + 0x8000)
 	{
-		offs_t pc = cpu_get_previouspc(space->cpu);
+		offs_t pc = cpu_get_previouspc(&direct.space().device());
 		if (pc != state->slapstic_last_pc || address != state->slapstic_last_address)
 		{
 			state->slapstic_last_pc = pc;
 			state->slapstic_last_address = address;
-			atarigen_slapstic_r(space, (address >> 1) & 0x3fff, 0xffff);
+			atarigen_slapstic_r(&direct.space(), (address >> 1) & 0x3fff, 0xffff);
 		}
 		return ~0;
 	}
@@ -548,7 +548,9 @@ void atarigen_slapstic_init(running_device *device, offs_t base, offs_t mirror, 
 		/* install an opcode base handler if we are a 68000 or variant */
 		state->slapstic_base = base;
 		state->slapstic_mirror = mirror;
-		memory_set_direct_update_handler(cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM), atarigen_slapstic_setdirect);
+
+		address_space *space = downcast<cpu_device *>(device)->space(AS_PROGRAM);
+		space->set_direct_update_handler(direct_update_delegate_create_static(atarigen_slapstic_setdirect, *device->machine));
 	}
 }
 

@@ -127,12 +127,12 @@ static WRITE8_HANDLER( esb_slapstic_w )
  *
  *************************************/
 
-static DIRECT_UPDATE_HANDLER( esb_setdirect )
+DIRECT_UPDATE_HANDLER( esb_setdirect )
 {
 	/* if we are in the slapstic region, process it */
 	if ((address & 0xe000) == 0x8000)
 	{
-		offs_t pc = cpu_get_pc(space->cpu);
+		offs_t pc = cpu_get_pc(&direct.space().device());
 
 		/* filter out duplicates; we get these because the handler gets called for
            multiple reasons:
@@ -143,7 +143,7 @@ static DIRECT_UPDATE_HANDLER( esb_setdirect )
 		{
 			slapstic_last_pc = pc;
 			slapstic_last_address = address;
-			esb_slapstic_tweak(space, address & 0x1fff);
+			esb_slapstic_tweak(&direct.space(), address & 0x1fff);
 		}
 		return ~0;
 	}
@@ -527,7 +527,8 @@ static DRIVER_INIT( esb )
 	slapstic_base = &rom[0x08000];
 
 	/* install an opcode base handler */
-	memory_set_direct_update_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), esb_setdirect);
+	address_space *space = machine->device<m6809_device>("maincpu")->space(AS_PROGRAM);
+	space->set_direct_update_handler(direct_update_delegate_create_static(esb_setdirect, *machine));
 
 	/* install read/write handlers for it */
 	memory_install_readwrite8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x8000, 0x9fff, 0, 0, esb_slapstic_r, esb_slapstic_w);

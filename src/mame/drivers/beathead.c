@@ -98,9 +98,6 @@
 
 
 #include "emu.h"
-#include "cpu/asap/asap.h"
-#include "machine/atarigen.h"
-#include "audio/atarijsa.h"
 #include "includes/beathead.h"
 
 
@@ -114,8 +111,6 @@
  *  Machine init
  *
  *************************************/
-
-static void update_interrupts(running_machine *machine);
 
 static TIMER_DEVICE_CALLBACK( scanline_callback )
 {
@@ -135,11 +130,11 @@ static TIMER_DEVICE_CALLBACK( scanline_callback )
 		scanline = 0;
 
 	/* set the scanline IRQ */
-	state->irq_state[2] = 1;
-	update_interrupts(timer.machine);
+	state->m_irq_state[2] = 1;
+	state->update_interrupts();
 
 	/* set the timer for the next one */
-	timer.adjust(double_to_attotime(attotime_to_double(timer.machine->primary_screen->time_until_pos(scanline)) - state->hblank_offset), scanline);
+	timer.adjust(double_to_attotime(attotime_to_double(timer.machine->primary_screen->time_until_pos(scanline)) - state->m_hblank_offset), scanline);
 }
 
 
@@ -149,6 +144,7 @@ static MACHINE_START( beathead )
 }
 
 
+static void update_interrupts(running_machine *machine) { machine->driver_data<beathead_state>()->update_interrupts(); }
 static MACHINE_RESET( beathead )
 {
 	beathead_state *state = machine->driver_data<beathead_state>();
@@ -160,17 +156,17 @@ static MACHINE_RESET( beathead )
 
 	/* the code is temporarily mapped at 0 at startup */
 	/* just copying the first 0x40 bytes is sufficient */
-	memcpy(state->ram_base, state->rom_base, 0x40);
+	memcpy(state->m_ram_base, state->m_rom_base, 0x40);
 
 	/* compute the timing of the HBLANK interrupt and set the first timer */
-	state->hblank_offset = attotime_to_double(machine->primary_screen->scan_period()) * ((455. - 336. - 25.) / 455.);
+	state->m_hblank_offset = attotime_to_double(machine->primary_screen->scan_period()) * ((455. - 336. - 25.) / 455.);
 	timer_device *scanline_timer = machine->device<timer_device>("scan_timer");
-	scanline_timer->adjust(double_to_attotime(attotime_to_double(machine->primary_screen->time_until_pos(0)) - state->hblank_offset));
+	scanline_timer->adjust(double_to_attotime(attotime_to_double(machine->primary_screen->time_until_pos(0)) - state->m_hblank_offset));
 
 	/* reset IRQs */
-	state->irq_line_state = CLEAR_LINE;
-	state->irq_state[0] = state->irq_state[1] = state->irq_state[2] = 0;
-	state->irq_enable[0] = state->irq_enable[1] = state->irq_enable[2] = 0;
+	state->m_irq_line_state = CLEAR_LINE;
+	state->m_irq_state[0] = state->m_irq_state[1] = state->m_irq_state[2] = 0;
+	state->m_irq_enable[0] = state->m_irq_enable[1] = state->m_irq_enable[2] = 0;
 }
 
 
@@ -181,54 +177,50 @@ static MACHINE_RESET( beathead )
  *
  *************************************/
 
-static void update_interrupts(running_machine *machine)
+void beathead_state::update_interrupts()
 {
-	beathead_state *state = machine->driver_data<beathead_state>();
 	int gen_int;
 
 	/* compute the combined interrupt signal */
-	gen_int  = state->irq_state[0] & state->irq_enable[0];
-	gen_int |= state->irq_state[1] & state->irq_enable[1];
-	gen_int |= state->irq_state[2] & state->irq_enable[2];
+	gen_int  = m_irq_state[0] & m_irq_enable[0];
+	gen_int |= m_irq_state[1] & m_irq_enable[1];
+	gen_int |= m_irq_state[2] & m_irq_enable[2];
 	gen_int  = gen_int ? ASSERT_LINE : CLEAR_LINE;
 
 	/* if it's changed since the last time, call through */
-	if (state->irq_line_state != gen_int)
+	if (m_irq_line_state != gen_int)
 	{
-		state->irq_line_state = gen_int;
-		//if (state->irq_line_state != CLEAR_LINE)
-			cputag_set_input_line(machine, "maincpu", ASAP_IRQ0, state->irq_line_state);
+		m_irq_line_state = gen_int;
+		//if (m_irq_line_state != CLEAR_LINE)
+			cputag_set_input_line(&m_machine, "maincpu", ASAP_IRQ0, m_irq_line_state);
 		//else
-			//asap_set_irq_line(ASAP_IRQ0, state->irq_line_state);
+			//asap_set_irq_line(ASAP_IRQ0, m_irq_line_state);
 	}
 }
 
 
-static WRITE32_HANDLER( interrupt_control_w )
+WRITE32_MEMBER( beathead_state::interrupt_control_w )
 {
-	beathead_state *state = space->machine->driver_data<beathead_state>();
 	int irq = offset & 3;
 	int control = (offset >> 2) & 1;
 
 	/* offsets 1-3 seem to be the enable latches for the IRQs */
 	if (irq != 0)
-		state->irq_enable[irq - 1] = control;
+		m_irq_enable[irq - 1] = control;
 
 	/* offset 0 seems to be the interrupt ack */
 	else
-		state->irq_state[0] = state->irq_state[1] = state->irq_state[2] = 0;
+		m_irq_state[0] = m_irq_state[1] = m_irq_state[2] = 0;
 
 	/* update the current state */
-	update_interrupts(space->machine);
+	update_interrupts();
 }
 
 
-static READ32_HANDLER( interrupt_control_r )
+READ32_MEMBER( beathead_state::interrupt_control_r )
 {
-	beathead_state *state = space->machine->driver_data<beathead_state>();
-
 	/* return the enables as a bitfield */
-	return (state->irq_enable[0]) | (state->irq_enable[1] << 1) | (state->irq_enable[2] << 2);
+	return (m_irq_enable[0]) | (m_irq_enable[1] << 1) | (m_irq_enable[2] << 2);
 }
 
 
@@ -239,24 +231,20 @@ static READ32_HANDLER( interrupt_control_r )
  *
  *************************************/
 
-static WRITE32_HANDLER( eeprom_data_w )
+WRITE32_MEMBER( beathead_state::eeprom_data_w )
 {
-	beathead_state *state = space->machine->driver_data<beathead_state>();
-
-	if (state->eeprom_enabled)
+	if (m_eeprom_enabled)
 	{
 		mem_mask &= 0x000000ff;
-		COMBINE_DATA(space->machine->generic.nvram.u32 + offset);
-		state->eeprom_enabled = 0;
+		COMBINE_DATA(m_machine.generic.nvram.u32 + offset);
+		m_eeprom_enabled = 0;
 	}
 }
 
 
-static WRITE32_HANDLER( eeprom_enable_w )
+WRITE32_MEMBER( beathead_state::eeprom_enable_w )
 {
-	beathead_state *state = space->machine->driver_data<beathead_state>();
-
-	state->eeprom_enabled = 1;
+	m_eeprom_enabled = 1;
 }
 
 
@@ -267,12 +255,11 @@ static WRITE32_HANDLER( eeprom_enable_w )
  *
  *************************************/
 
-static READ32_HANDLER( input_2_r )
+READ32_MEMBER( beathead_state::input_2_r )
 {
-	beathead_state *state = space->machine->driver_data<beathead_state>();
-	int result = input_port_read(space->machine, "IN2");
-	if (state->sound_to_cpu_ready) result ^= 0x10;
-	if (state->cpu_to_sound_ready) result ^= 0x20;
+	int result = input_port_read(&m_machine, "IN2");
+	if (sound_to_cpu_ready) result ^= 0x10;
+	if (cpu_to_sound_ready) result ^= 0x20;
 	return result;
 }
 
@@ -284,23 +271,23 @@ static READ32_HANDLER( input_2_r )
  *
  *************************************/
 
-static READ32_HANDLER( sound_data_r )
+READ32_MEMBER( beathead_state::sound_data_r )
 {
-	return atarigen_sound_r(space,offset,0xffff);
+	return atarigen_sound_r(&space, offset, 0xffff);
 }
 
 
-static WRITE32_HANDLER( sound_data_w )
+WRITE32_MEMBER( beathead_state::sound_data_w )
 {
 	if (ACCESSING_BITS_0_7)
-		atarigen_sound_w(space,offset, data, mem_mask);
+		atarigen_sound_w(&space, offset, data, mem_mask);
 }
 
 
-static WRITE32_HANDLER( sound_reset_w )
+WRITE32_MEMBER( beathead_state::sound_reset_w )
 {
 	logerror("Sound reset = %d\n", !offset);
-	cputag_set_input_line(space->machine, "jsa", INPUT_LINE_RESET, offset ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(&m_machine, "jsa", INPUT_LINE_RESET, offset ? CLEAR_LINE : ASSERT_LINE);
 }
 
 
@@ -311,9 +298,9 @@ static WRITE32_HANDLER( sound_reset_w )
  *
  *************************************/
 
-static WRITE32_HANDLER( coin_count_w )
+WRITE32_MEMBER( beathead_state::coin_count_w )
 {
-	coin_counter_w(space->machine, 0, !offset);
+	coin_counter_w(&m_machine, 0, !offset);
 }
 
 
@@ -325,31 +312,31 @@ static WRITE32_HANDLER( coin_count_w )
  *************************************/
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x0001ffff) AM_RAM AM_BASE_MEMBER(beathead_state, ram_base)
-	AM_RANGE(0x01800000, 0x01bfffff) AM_ROM AM_REGION("user1", 0) AM_BASE_MEMBER(beathead_state, rom_base)
-	AM_RANGE(0x40000000, 0x400007ff) AM_RAM_WRITE(eeprom_data_w) AM_BASE_SIZE_GENERIC(nvram)
-	AM_RANGE(0x41000000, 0x41000003) AM_READWRITE(sound_data_r, sound_data_w)
-	AM_RANGE(0x41000100, 0x41000103) AM_READ(interrupt_control_r)
-	AM_RANGE(0x41000100, 0x4100011f) AM_WRITE(interrupt_control_w)
+	AM_RANGE(0x00000000, 0x0001ffff) AM_RAM AM_BASE_MEMBER(beathead_state, m_ram_base)
+	AM_RANGE(0x01800000, 0x01bfffff) AM_ROM AM_REGION("user1", 0) AM_BASE_MEMBER(beathead_state, m_rom_base)
+	AM_RANGE(0x40000000, 0x400007ff) AM_RAM_WRITE_MEMBER(beathead_state, eeprom_data_w) AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x41000000, 0x41000003) AM_READWRITE_MEMBER(beathead_state, sound_data_r, sound_data_w)
+	AM_RANGE(0x41000100, 0x41000103) AM_READ_MEMBER(beathead_state, interrupt_control_r)
+	AM_RANGE(0x41000100, 0x4100011f) AM_WRITE_MEMBER(beathead_state, interrupt_control_w)
 	AM_RANGE(0x41000200, 0x41000203) AM_READ_PORT("IN1")
 	AM_RANGE(0x41000204, 0x41000207) AM_READ_PORT("IN0")
-	AM_RANGE(0x41000208, 0x4100020f) AM_WRITE(sound_reset_w)
-	AM_RANGE(0x41000220, 0x41000227) AM_WRITE(coin_count_w)
-	AM_RANGE(0x41000300, 0x41000303) AM_READ(input_2_r)
+	AM_RANGE(0x41000208, 0x4100020f) AM_WRITE_MEMBER(beathead_state, sound_reset_w)
+	AM_RANGE(0x41000220, 0x41000227) AM_WRITE_MEMBER(beathead_state, coin_count_w)
+	AM_RANGE(0x41000300, 0x41000303) AM_READ_MEMBER(beathead_state, input_2_r)
 	AM_RANGE(0x41000304, 0x41000307) AM_READ_PORT("IN3")
-	AM_RANGE(0x41000400, 0x41000403) AM_WRITEONLY AM_BASE_MEMBER(beathead_state, palette_select)
-	AM_RANGE(0x41000500, 0x41000503) AM_WRITE(eeprom_enable_w)
-	AM_RANGE(0x41000600, 0x41000603) AM_WRITE(beathead_finescroll_w)
+	AM_RANGE(0x41000400, 0x41000403) AM_WRITEONLY AM_BASE_MEMBER(beathead_state, m_palette_select)
+	AM_RANGE(0x41000500, 0x41000503) AM_WRITE_MEMBER(beathead_state, eeprom_enable_w)
+	AM_RANGE(0x41000600, 0x41000603) AM_WRITE_MEMBER(beathead_state, finescroll_w)
 	AM_RANGE(0x41000700, 0x41000703) AM_WRITE(watchdog_reset32_w)
-	AM_RANGE(0x42000000, 0x4201ffff) AM_RAM_WRITE(beathead_palette_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x43000000, 0x43000007) AM_READWRITE(beathead_hsync_ram_r, beathead_hsync_ram_w)
+	AM_RANGE(0x42000000, 0x4201ffff) AM_RAM_WRITE_MEMBER(beathead_state, palette_w) AM_BASE_MEMBER(beathead_state, m_paletteram)
+	AM_RANGE(0x43000000, 0x43000007) AM_READWRITE_MEMBER(beathead_state, hsync_ram_r, hsync_ram_w)
 	AM_RANGE(0x8df80000, 0x8df80003) AM_READNOP	/* noisy x4 during scanline int */
-	AM_RANGE(0x8f380000, 0x8f3fffff) AM_WRITE(beathead_vram_latch_w)
-	AM_RANGE(0x8f900000, 0x8f97ffff) AM_WRITE(beathead_vram_transparent_w)
-	AM_RANGE(0x8f980000, 0x8f9fffff) AM_RAM AM_BASE_GENERIC(videoram)
-	AM_RANGE(0x8fb80000, 0x8fbfffff) AM_WRITE(beathead_vram_bulk_w)
-	AM_RANGE(0x8fff8000, 0x8fff8003) AM_WRITEONLY AM_BASE_MEMBER(beathead_state, vram_bulk_latch)
-	AM_RANGE(0x9e280000, 0x9e2fffff) AM_WRITE(beathead_vram_copy_w)
+	AM_RANGE(0x8f380000, 0x8f3fffff) AM_WRITE_MEMBER(beathead_state, vram_latch_w)
+	AM_RANGE(0x8f900000, 0x8f97ffff) AM_WRITE_MEMBER(beathead_state, vram_transparent_w)
+	AM_RANGE(0x8f980000, 0x8f9fffff) AM_RAM AM_BASE_MEMBER(beathead_state, m_videoram)
+	AM_RANGE(0x8fb80000, 0x8fbfffff) AM_WRITE_MEMBER(beathead_state, vram_bulk_w)
+	AM_RANGE(0x8fff8000, 0x8fff8003) AM_WRITEONLY AM_BASE_MEMBER(beathead_state, m_vram_bulk_latch)
+	AM_RANGE(0x9e280000, 0x9e2fffff) AM_WRITE_MEMBER(beathead_state, vram_copy_w)
 ADDRESS_MAP_END
 
 
@@ -480,26 +467,24 @@ ROM_END
 */
 
 
-static UINT32 *speedup_data;
-static READ32_HANDLER( speedup_r )
+READ32_MEMBER( beathead_state::speedup_r )
 {
-	int result = *speedup_data;
-	if ((cpu_get_previouspc(space->cpu) & 0xfffff) == 0x006f0 && result == cpu_get_reg(space->cpu, ASAP_R3))
-		cpu_spinuntil_int(space->cpu);
+	int result = *m_speedup_data;
+	if ((cpu_get_previouspc(space.cpu) & 0xfffff) == 0x006f0 && result == cpu_get_reg(space.cpu, ASAP_R3))
+		cpu_spinuntil_int(space.cpu);
 	return result;
 }
 
 
-static UINT32 *movie_speedup_data;
-static READ32_HANDLER( movie_speedup_r )
+READ32_MEMBER( beathead_state::movie_speedup_r )
 {
-	int result = *movie_speedup_data;
-	if ((cpu_get_previouspc(space->cpu) & 0xfffff) == 0x00a88 && (cpu_get_reg(space->cpu, ASAP_R28) & 0xfffff) == 0x397c0 &&
-		movie_speedup_data[4] == cpu_get_reg(space->cpu, ASAP_R1))
+	int result = *m_movie_speedup_data;
+	if ((cpu_get_previouspc(space.cpu) & 0xfffff) == 0x00a88 && (cpu_get_reg(space.cpu, ASAP_R28) & 0xfffff) == 0x397c0 &&
+		m_movie_speedup_data[4] == cpu_get_reg(space.cpu, ASAP_R1))
 	{
-		UINT32 temp = (INT16)result + movie_speedup_data[4] * 262;
-		if (temp - (UINT32)cpu_get_reg(space->cpu, ASAP_R15) < (UINT32)cpu_get_reg(space->cpu, ASAP_R23))
-			cpu_spinuntil_int(space->cpu);
+		UINT32 temp = (INT16)result + m_movie_speedup_data[4] * 262;
+		if (temp - (UINT32)cpu_get_reg(space.cpu, ASAP_R15) < (UINT32)cpu_get_reg(space.cpu, ASAP_R23))
+			cpu_spinuntil_int(space.cpu);
 	}
 	return result;
 }
@@ -514,12 +499,14 @@ static READ32_HANDLER( movie_speedup_r )
 
 static DRIVER_INIT( beathead )
 {
+	beathead_state *state = machine->driver_data<beathead_state>();
+
 	/* initialize the common systems */
 	atarijsa_init(machine, "IN2", 0x0040);
 
 	/* prepare the speedups */
-	speedup_data = memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x00000ae8, 0x00000aeb, 0, 0, speedup_r);
-	movie_speedup_data = memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x00000804, 0x00000807, 0, 0, movie_speedup_r);
+	state->m_speedup_data = state->m_maincpu.space(AS_PROGRAM)->install_handler(0x00000ae8, 0x00000aeb, 0, 0, read32_delegate_create(beathead_state, speedup_r, *state));
+	state->m_movie_speedup_data = state->m_maincpu.space(AS_PROGRAM)->install_handler(0x00000804, 0x00000807, 0, 0, read32_delegate_create(beathead_state, movie_speedup_r, *state));
 }
 
 

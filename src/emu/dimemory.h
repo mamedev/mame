@@ -100,48 +100,6 @@ const int TRANSLATE_FETCH_DEBUG		= (TRANSLATE_FETCH | TRANSLATE_DEBUG_MASK);
 //  TYPE DEFINITIONS
 //**************************************************************************
 
-// ======================> address_space_config
-
-class address_space_config
-{
-public:
-	address_space_config();
-	address_space_config(const char *name, endianness_t endian, UINT8 datawidth, UINT8 addrwidth, INT8 addrshift = 0, address_map_constructor internal = NULL, address_map_constructor defmap = NULL);
-	address_space_config(const char *name, endianness_t endian, UINT8 datawidth, UINT8 addrwidth, INT8 addrshift, UINT8 logwidth, UINT8 pageshift, address_map_constructor internal = NULL, address_map_constructor defmap = NULL);
-
-	inline offs_t addr2byte(offs_t address) const
-	{
-		return (m_addrbus_shift < 0) ? (address << -m_addrbus_shift) : (address >> m_addrbus_shift);
-	}
-
-	inline offs_t addr2byte_end(offs_t address) const
-	{
-		return (m_addrbus_shift < 0) ? ((address << -m_addrbus_shift) | ((1 << -m_addrbus_shift) - 1)) : (address >> m_addrbus_shift);
-	}
-
-	inline offs_t byte2addr(offs_t address) const
-	{
-		return (m_addrbus_shift > 0) ? (address << m_addrbus_shift) : (address >> -m_addrbus_shift);
-	}
-
-	inline offs_t byte2addr_end(offs_t address) const
-	{
-		return (m_addrbus_shift > 0) ? ((address << m_addrbus_shift) | ((1 << -m_addrbus_shift) - 1)) : (address >> -m_addrbus_shift);
-	}
-
-	const char *		m_name;
-	endianness_t		m_endianness;
-	UINT8				m_databus_width;
-	UINT8				m_addrbus_width;
-	INT8				m_addrbus_shift;
-	UINT8				m_logaddr_width;
-	UINT8				m_page_shift;
-	address_map_constructor m_internal_map;
-	address_map_constructor m_default_map;
-};
-
-
-
 // ======================> device_config_memory_interface
 
 // class representing interface-specific configuration state
@@ -187,11 +145,11 @@ public:
 
 	// basic information getters
 	const address_space_config *space_config(int spacenum = 0) const { return m_memory_config.space_config(spacenum); }
-	const address_space *space(int index = 0) const { return m_addrspace[index]; }
-	const address_space *space(device_space index) const { return m_addrspace[static_cast<int>(index)]; }
+	address_space *space(int index = 0) const { return m_addrspace[index]; }
+	address_space *space(device_space index) const { return m_addrspace[static_cast<int>(index)]; }
 
 	// address space accessors
-	void set_address_space(int spacenum, const address_space *space);
+	void set_address_space(int spacenum, address_space &space);
 
 	// address translation
 	bool translate(int spacenum, int intention, offs_t &address) { return memory_translate(spacenum, intention, address); }
@@ -212,7 +170,7 @@ protected:
 
 	// configuration
 	const device_config_memory_interface &m_memory_config;	// reference to our device_config_execute_interface
-	const address_space *	m_addrspace[ADDRESS_SPACES]; // reported address spaces
+	address_space *		m_addrspace[ADDRESS_SPACES]; // reported address spaces
 };
 
 

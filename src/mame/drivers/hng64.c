@@ -1106,9 +1106,9 @@ ADDRESS_MAP_END
 #define KL5C_MMU_A(xxx) ( (xxx==0) ? 0x0000 : (hng64_com_mmu_mem[((xxx-1)*2)+1] << 2) | ((hng64_com_mmu_mem[(xxx-1)*2] & 0xc0) >> 6) )
 #define KL5C_MMU_B(xxx) ( (xxx==0) ? 0x0000 : (hng64_com_mmu_mem[(xxx-1)*2] & 0x3f) )
 
-static DIRECT_UPDATE_HANDLER( KL5C80_direct_handler )
+DIRECT_UPDATE_HANDLER( KL5C80_direct_handler )
 {
-	direct->raw = direct->decrypted = hng64_com_op_base;
+	direct.explicit_configure(0x0000, 0xffff, 0xffff, hng64_com_op_base);
 	return ~0;
 }
 
@@ -1677,7 +1677,9 @@ static MACHINE_RESET(hyperneo)
 		hng64_com_virtual_mem[i] = rom[i];
 
 	KL5C80_virtual_mem_sync();
-	memory_set_direct_update_handler(cputag_get_address_space(machine, "comm", ADDRESS_SPACE_PROGRAM), KL5C80_direct_handler);
+
+	address_space *space = machine->device<z80_device>("comm")->space(AS_PROGRAM);
+	space->set_direct_update_handler(direct_update_delegate_create_static(KL5C80_direct_handler, *machine));
 
 	cputag_set_input_line(machine, "comm", INPUT_LINE_RESET, PULSE_LINE);     // reset the CPU and let 'er rip
 //  cputag_set_input_line(machine, "comm", INPUT_LINE_HALT, ASSERT_LINE);     // hold on there pardner...

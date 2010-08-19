@@ -1675,6 +1675,8 @@ static void remap_dynamic_addresses(running_machine *machine)
 
 	/* now remap everything */
 	if (LOG_DYNAMIC) logerror("remap_dynamic_addresses:\n");
+	address_space *space = const_cast<address_space *>(machine->device<cpu_device>("maincpu")->space(AS_PROGRAM));
+	assert(space != NULL);
 	for (addr = 0; addr < dynamic_count; addr++)
 	{
 		if (LOG_DYNAMIC) logerror("  installing: %08X-%08X %s,%s\n", dynamic[addr].start, dynamic[addr].end, dynamic[addr].rdname, dynamic[addr].wrname);
@@ -1682,12 +1684,15 @@ static void remap_dynamic_addresses(running_machine *machine)
 		if (dynamic[addr].mread == NOP_HANDLER)
 			memory_nop_read(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), dynamic[addr].start, dynamic[addr].end, 0, 0);
 		else if (dynamic[addr].mread != NULL)
-			_memory_install_handler32(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), dynamic[addr].start, dynamic[addr].end, 0, 0, dynamic[addr].mread, dynamic[addr].rdname, NULL, NULL, 0);
+			space->install_legacy_handler(dynamic[addr].start, dynamic[addr].end, 0, 0, dynamic[addr].mread, dynamic[addr].rdname);
 		if (dynamic[addr].mwrite != NULL)
-			_memory_install_handler32(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), dynamic[addr].start, dynamic[addr].end, 0, 0, NULL, NULL, dynamic[addr].mwrite, dynamic[addr].wrname, 0);
+			space->install_legacy_handler(dynamic[addr].start, dynamic[addr].end, 0, 0, dynamic[addr].mwrite, dynamic[addr].wrname);
 
 		if (dynamic[addr].dread != NULL || dynamic[addr].dwrite != NULL)
-			_memory_install_device_handler32(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), dynamic[addr].device, dynamic[addr].start, dynamic[addr].end, 0, 0, dynamic[addr].dread, dynamic[addr].rdname, dynamic[addr].dwrite, dynamic[addr].wrname, 0);
+		{
+			space->install_legacy_handler(*dynamic[addr].device, dynamic[addr].start, dynamic[addr].end, 0, 0, dynamic[addr].dread, dynamic[addr].rdname);
+			space->install_legacy_handler(*dynamic[addr].device, dynamic[addr].start, dynamic[addr].end, 0, 0, dynamic[addr].dwrite, dynamic[addr].wrname);
+		}
 	}
 
 	if (LOG_DYNAMIC)

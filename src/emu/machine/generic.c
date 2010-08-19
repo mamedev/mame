@@ -816,7 +816,7 @@ INTERRUPT_GEN( irq7_line_assert )	{ if (interrupt_enabled(device)) cpu_set_input
 -------------------------------------------------*/
 
 WRITE8_HANDLER( watchdog_reset_w ) { watchdog_reset(space->machine); }
-READ8_HANDLER( watchdog_reset_r ) { watchdog_reset(space->machine); return space->unmap; }
+READ8_HANDLER( watchdog_reset_r ) { watchdog_reset(space->machine); return space->unmap(); }
 
 
 /*-------------------------------------------------
@@ -824,7 +824,7 @@ READ8_HANDLER( watchdog_reset_r ) { watchdog_reset(space->machine); return space
 -------------------------------------------------*/
 
 WRITE16_HANDLER( watchdog_reset16_w ) {	watchdog_reset(space->machine); }
-READ16_HANDLER( watchdog_reset16_r ) { watchdog_reset(space->machine); return space->unmap; }
+READ16_HANDLER( watchdog_reset16_r ) { watchdog_reset(space->machine); return space->unmap(); }
 
 
 /*-------------------------------------------------
@@ -832,7 +832,7 @@ READ16_HANDLER( watchdog_reset16_r ) { watchdog_reset(space->machine); return sp
 -------------------------------------------------*/
 
 WRITE32_HANDLER( watchdog_reset32_w ) {	watchdog_reset(space->machine); }
-READ32_HANDLER( watchdog_reset32_r ) { watchdog_reset(space->machine); return space->unmap; }
+READ32_HANDLER( watchdog_reset32_r ) { watchdog_reset(space->machine); return space->unmap(); }
 
 
 
