@@ -286,6 +286,7 @@ struct _mcs51_state_t
 
 	/* Memory spaces */
     address_space *program;
+    direct_read_data *direct;
     address_space *data;
     address_space *io;
 
@@ -310,8 +311,8 @@ struct _mcs51_state_t
 ***************************************************************************/
 
 /* Read Opcode/Opcode Arguments from Program Code */
-#define ROP(pc)			memory_decrypted_read_byte(mcs51_state->program, pc)
-#define ROP_ARG(pc)		memory_raw_read_byte(mcs51_state->program, pc)
+#define ROP(pc)			mcs51_state->direct->read_decrypted_byte(pc)
+#define ROP_ARG(pc)		mcs51_state->direct->read_raw_byte(pc)
 
 /* Read a byte from External Code Memory (Usually Program Rom(s) Space) */
 #define CODEMEM_R(a)	(UINT8)mcs51_state->program->read_byte(a)
@@ -1957,7 +1958,7 @@ static CPU_EXECUTE( mcs51 )
 		/* Read next opcode */
 		PPC = PC;
 		debugger_instruction_hook(device, PC);
-		op = memory_decrypted_read_byte(mcs51_state->program, PC++);
+		op = mcs51_state->direct->read_decrypted_byte(PC++);
 
 		/* process opcode and count cycles */
 		mcs51_state->inst_cycles = mcs51_cycles[op];
@@ -2075,6 +2076,7 @@ static CPU_INIT( mcs51 )
 	mcs51_state->device = device;
 
 	mcs51_state->program = device->space(AS_PROGRAM);
+	mcs51_state->direct = &mcs51_state->program->direct();
 	mcs51_state->data = device->space(AS_DATA);
 	mcs51_state->io = device->space(AS_IO);
 

@@ -45,6 +45,7 @@ struct _ccpu_state
 
 	legacy_cpu_device *device;
 	address_space *program;
+	direct_read_data *direct;
 	address_space *data;
 	address_space *io;
 };
@@ -62,7 +63,7 @@ INLINE ccpu_state *get_safe_token(running_device *device)
     MACROS
 ***************************************************************************/
 
-#define READOP(C,a)			(memory_decrypted_read_byte((C)->program, a))
+#define READOP(C,a)			((C)->direct->read_decrypted_byte(a))
 
 #define RDMEM(C,a)			((C)->data->read_word((a) * 2) & 0xfff)
 #define WRMEM(C,a,v)		((C)->data->write_word((a) * 2, (v)))
@@ -131,6 +132,7 @@ static CPU_INIT( ccpu )
 	cpustate->vector_callback = configdata->vector_callback;
 	cpustate->device = device;
 	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->direct = &cpustate->program->direct();
 	cpustate->data = device->space(AS_DATA);
 	cpustate->io = device->space(AS_IO);
 

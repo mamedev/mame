@@ -28,18 +28,18 @@
 
 INLINE UINT8 READ_OP(sc61860_state *cpustate)
 {
-	return memory_decrypted_read_byte(cpustate->program, cpustate->pc++);
+	return cpustate->direct->read_decrypted_byte(cpustate->pc++);
 }
 
 INLINE UINT8 READ_OP_ARG(sc61860_state *cpustate)
 {
-	return memory_raw_read_byte(cpustate->program, cpustate->pc++);
+	return cpustate->direct->read_raw_byte(cpustate->pc++);
 }
 
 INLINE UINT16 READ_OP_ARG_WORD(sc61860_state *cpustate)
 {
-	UINT16 t=memory_decrypted_read_byte(cpustate->program, cpustate->pc++)<<8;
-	t|=memory_decrypted_read_byte(cpustate->program, cpustate->pc++);
+	UINT16 t=cpustate->direct->read_decrypted_byte(cpustate->pc++)<<8;
+	t|=cpustate->direct->read_decrypted_byte(cpustate->pc++);
 	return t;
 }
 

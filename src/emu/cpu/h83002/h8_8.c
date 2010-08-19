@@ -42,8 +42,8 @@ INLINE UINT16 h8_mem_read16(h83xx_state *h8, offs_t address)
 
 INLINE UINT16 h8_readop16(h83xx_state *h8, offs_t address)
 {
-	UINT16 result =  memory_decrypted_read_byte(h8->program, address)<<8;
-	return result | memory_decrypted_read_byte(h8->program, address+1);
+	UINT16 result =  h8->direct->read_decrypted_byte(address)<<8;
+	return result | h8->direct->read_decrypted_byte(address+1);
 }
 
 INLINE void h8_mem_write16(h83xx_state *h8, offs_t address, UINT16 data)
@@ -238,6 +238,7 @@ static CPU_INIT(h8bit)
 	h8->mode_8bit = 1;
 
 	h8->program = device->space(AS_PROGRAM);
+	h8->direct = &h8->program->direct();
 	h8->io = device->space(AS_IO);
 
 	h8->timer[0] = timer_alloc(h8->device->machine, h8_timer_0_cb, h8);

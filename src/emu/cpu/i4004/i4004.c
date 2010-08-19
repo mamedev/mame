@@ -35,6 +35,7 @@ struct _i4004_state
 
 	legacy_cpu_device *device;
 	address_space *program;
+	direct_read_data *direct;
 	address_space *data;
 	address_space *io;
 	int					icount;
@@ -60,7 +61,7 @@ INLINE i4004_state *get_safe_token(running_device *device)
 
 INLINE UINT8 ROP(i4004_state *cpustate)
 {
-	UINT8 retVal = memory_decrypted_read_byte(cpustate->program, GET_PC.w.l);
+	UINT8 retVal = cpustate->direct->read_decrypted_byte(GET_PC.w.l);
 	GET_PC.w.l = (GET_PC.w.l + 1) & 0x0fff;
 	cpustate->PC = GET_PC;
 	return retVal;
@@ -68,7 +69,7 @@ INLINE UINT8 ROP(i4004_state *cpustate)
 
 INLINE UINT8 READ_ROM(i4004_state *cpustate)
 {
-	return memory_decrypted_read_byte(cpustate->program, (GET_PC.w.l & 0x0f00) | cpustate->R[0]);
+	return cpustate->direct->read_decrypted_byte((GET_PC.w.l & 0x0f00) | cpustate->R[0]);
 }
 
 INLINE void WPM(i4004_state *cpustate)
@@ -80,7 +81,7 @@ INLINE void WPM(i4004_state *cpustate)
 
 INLINE UINT8 ARG(i4004_state *cpustate)
 {
-	UINT8 retVal = memory_raw_read_byte(cpustate->program, GET_PC.w.l);
+	UINT8 retVal = cpustate->direct->read_raw_byte(GET_PC.w.l);
 	GET_PC.w.l = (GET_PC.w.l + 1) & 0x0fff;
 	cpustate->PC = GET_PC;
 	return retVal;
@@ -463,6 +464,7 @@ static CPU_INIT( i4004 )
 	cpustate->device = device;
 
 	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->direct = &cpustate->program->direct();
 	cpustate->data = device->space(AS_DATA);
 	cpustate->io = device->space(AS_IO);
 

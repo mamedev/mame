@@ -3282,6 +3282,7 @@ static CPU_RESET( sh4 )
 	sh4->device = device;
 	sh4->internal = device->space(AS_PROGRAM);
 	sh4->program = device->space(AS_PROGRAM);
+	sh4->direct = &sh4->program->direct();
 	sh4->io = device->space(AS_IO);
 
 	sh4->dma_timer[0] = tsaved[0];
@@ -3340,11 +3341,11 @@ static CPU_EXECUTE( sh4 )
 
 		if (sh4->delay)
 		{
-			opcode = memory_decrypted_read_word(sh4->program, WORD2_XOR_LE((UINT32)(sh4->delay & AM)));
+			opcode = sh4->direct->read_decrypted_word(WORD2_XOR_LE((UINT32)(sh4->delay & AM)));
 			sh4->pc -= 2;
 		}
 		else
-			opcode = memory_decrypted_read_word(sh4->program, WORD2_XOR_LE((UINT32)(sh4->pc & AM)));
+			opcode = sh4->direct->read_decrypted_word(WORD2_XOR_LE((UINT32)(sh4->pc & AM)));
 
 		debugger_instruction_hook(device, sh4->pc & AM);
 

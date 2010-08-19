@@ -185,6 +185,7 @@ struct _i8085_state
 	device_irq_callback	irq_callback;
 	legacy_cpu_device *device;
 	address_space *program;
+	direct_read_data *direct;
 	address_space *io;
 	int					icount;
 };
@@ -353,20 +354,20 @@ INLINE void break_halt_for_interrupt(i8085_state *cpustate)
 INLINE UINT8 ROP(i8085_state *cpustate)
 {
 	set_status(cpustate, 0xa2); // instruction fetch
-	return memory_decrypted_read_byte(cpustate->program, cpustate->PC.w.l++);
+	return cpustate->direct->read_decrypted_byte(cpustate->PC.w.l++);
 }
 
 INLINE UINT8 ARG(i8085_state *cpustate)
 {
-	return memory_raw_read_byte(cpustate->program, cpustate->PC.w.l++);
+	return cpustate->direct->read_raw_byte(cpustate->PC.w.l++);
 }
 
 INLINE UINT16 ARG16(i8085_state *cpustate)
 {
 	UINT16 w;
-	w  = memory_raw_read_byte(cpustate->program, cpustate->PC.d);
+	w  = cpustate->direct->read_raw_byte(cpustate->PC.d);
 	cpustate->PC.w.l++;
-	w += memory_raw_read_byte(cpustate->program, cpustate->PC.d) << 8;
+	w += cpustate->direct->read_raw_byte(cpustate->PC.d) << 8;
 	cpustate->PC.w.l++;
 	return w;
 }
@@ -1006,6 +1007,7 @@ static void init_808x_common(legacy_cpu_device *device, device_irq_callback irqc
 	cpustate->device = device;
 
 	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->direct = &cpustate->program->direct();
 	cpustate->io = device->space(AS_IO);
 
 	/* resolve callbacks */

@@ -34,13 +34,13 @@
  *  RDOP    read an opcode
  ***************************************************************/
 #undef RDOP
-#define RDOP() memory_decrypted_read_byte(cpustate->space, (PCW++)|PB); cpustate->icount -= 1
+#define RDOP() cpustate->direct->read_decrypted_byte((PCW++)|PB); cpustate->icount -= 1
 
 /***************************************************************
  *  RDOPARG read an opcode argument
  ***************************************************************/
 #undef RDOPARG
-#define RDOPARG() memory_raw_read_byte(cpustate->space, (PCW++)|PB); cpustate->icount -= 1
+#define RDOPARG() cpustate->direct->read_raw_byte((PCW++)|PB); cpustate->icount -= 1
 
 /***************************************************************
  *  RDMEM   read memory
@@ -203,4 +203,4 @@
 #undef KIL
 #define KIL 													\
 	PCW--;														\
-	logerror("M6509 KILL opcode %05x: %02x\n", PCD, memory_decrypted_read_byte(cpustate->space, PCD))
+	logerror("M6509 KILL opcode %05x: %02x\n", PCD, cpustate->direct->read_decrypted_byte(PCD))

@@ -27,7 +27,7 @@ CPU_DISASSEMBLE(h8_32);
 #define h8_mem_read16(z, x) h8->program->read_word(x)
 #define h8_mem_write8(x, y)  h8->program->write_byte(x, y)
 #define h8_mem_write16(z, x, y) h8->program->write_word(x, y)
-#define h8_readop16(x, y) memory_decrypted_read_word(x->program, y)
+#define h8_readop16(x, y) x->direct->read_decrypted_word(y)
 
 // timing macros
 // note: we assume a system 12 - type setup where external access is 3+1 states
@@ -221,6 +221,7 @@ static CPU_INIT(h8)
 	h8->mode_8bit = 0;
 
 	h8->program = device->space(AS_PROGRAM);
+	h8->direct = &h8->program->direct();
 	h8->io = device->space(AS_IO);
 
 	state_save_register_device_item(device, 0, h8->h8err);

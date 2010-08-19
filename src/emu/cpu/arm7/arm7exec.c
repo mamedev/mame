@@ -62,7 +62,7 @@
 	    {
 	    	raddr = arm7_tlb_translate(cpustate, raddr);
 	    }
-            insn = memory_decrypted_read_word(cpustate->program, raddr);
+            insn = cpustate->direct->read_decrypted_word(raddr);
             ARM7_ICOUNT -= (3 - thumbCycles[insn >> 8]);
             switch ((insn & THUMB_INSN_TYPE) >> THUMB_INSN_TYPE_SHIFT)
             {
@@ -1172,7 +1172,7 @@
 	    {
 	    	pc = arm7_tlb_translate(cpustate, pc);
 	    }
-            insn = memory_decrypted_read_dword(cpustate->program, pc);
+            insn = cpustate->direct->read_decrypted_dword(pc);
 
             /* process condition codes for this instruction */
             switch (insn >> INSN_COND_SHIFT)

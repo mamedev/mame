@@ -114,7 +114,7 @@ INLINE UINT8 ROP(z180_state *cpustate)
 {
 	offs_t addr = cpustate->_PCD;
 	cpustate->_PC++;
-	return memory_decrypted_read_byte(cpustate->program, MMU_REMAP_ADDR(cpustate, addr));
+	return cpustate->direct->read_decrypted_byte(MMU_REMAP_ADDR(cpustate, addr));
 }
 
 /****************************************************************
@@ -127,14 +127,14 @@ INLINE UINT8 ARG(z180_state *cpustate)
 {
 	offs_t addr = cpustate->_PCD;
 	cpustate->_PC++;
-	return memory_raw_read_byte(cpustate->program, MMU_REMAP_ADDR(cpustate, addr));
+	return cpustate->direct->read_raw_byte(MMU_REMAP_ADDR(cpustate, addr));
 }
 
 INLINE UINT32 ARG16(z180_state *cpustate)
 {
 	offs_t addr = cpustate->_PCD;
 	cpustate->_PC += 2;
-	return memory_raw_read_byte(cpustate->program, MMU_REMAP_ADDR(cpustate, addr)) | (memory_raw_read_byte(cpustate->program, MMU_REMAP_ADDR(cpustate, addr+1)) << 8);
+	return cpustate->direct->read_raw_byte(MMU_REMAP_ADDR(cpustate, addr)) | (cpustate->direct->read_raw_byte(MMU_REMAP_ADDR(cpustate, addr+1)) << 8);
 }
 
 /***************************************************************

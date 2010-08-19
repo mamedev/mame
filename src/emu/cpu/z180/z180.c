@@ -141,6 +141,7 @@ struct _z180_state
 	device_irq_callback irq_callback;
 	legacy_cpu_device *device;
 	address_space *program;
+	direct_read_data *direct;
 	address_space *iospace;
 	UINT8	rtemp;
 	UINT32	ioltemp;
@@ -2212,6 +2213,7 @@ static CPU_RESET( z180 )
 	cpustate->after_EI = 0;
 	cpustate->ea = 0;
 	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->direct = &cpustate->program->direct();
 	cpustate->iospace = device->space(AS_IO);
 	cpustate->device = device;
 

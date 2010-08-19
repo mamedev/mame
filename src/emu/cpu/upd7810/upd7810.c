@@ -501,6 +501,7 @@ struct _upd7810_state
 	device_irq_callback irq_callback;
 	legacy_cpu_device *device;
 	address_space *program;
+	direct_read_data *direct;
 	address_space *io;
 	int icount;
 };
@@ -642,8 +643,8 @@ struct opcode_s {
 	UINT8 mask_l0_l1;
 };
 
-#define RDOP(O) 	O = memory_decrypted_read_byte(cpustate->program, PCD); PC++
-#define RDOPARG(A)	A = memory_raw_read_byte(cpustate->program, PCD); PC++
+#define RDOP(O) 	O = cpustate->direct->read_decrypted_byte(PCD); PC++
+#define RDOPARG(A)	A = cpustate->direct->read_raw_byte(PCD); PC++
 #define RM(A)		cpustate->program->read_byte(A)
 #define WM(A,V) 	cpustate->program->write_byte(A,V)
 
@@ -1703,6 +1704,7 @@ static CPU_INIT( upd7810 )
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
 	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->direct = &cpustate->program->direct();
 	cpustate->io = device->space(AS_IO);
 
 	state_save_register_device_item(device, 0, cpustate->ppc.w.l);
@@ -1787,6 +1789,7 @@ static CPU_RESET( upd7810 )
 	cpustate->irq_callback = save_irqcallback;
 	cpustate->device = device;
 	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->direct = &cpustate->program->direct();
 	cpustate->io = device->space(AS_IO);
 
 	cpustate->opXX = opXX_7810;

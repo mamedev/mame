@@ -140,6 +140,7 @@ struct _r3000_state
 	device_irq_callback irq_callback;
 	legacy_cpu_device *device;
 	address_space *program;
+	direct_read_data *direct;
 
 	/* endian-dependent load/store */
 	void		(*lwl)(r3000_state *r3000, UINT32 op);
@@ -225,7 +226,7 @@ static const data_accessors le_cache =
     MEMORY ACCESSORS
 ***************************************************************************/
 
-#define ROPCODE(R,pc)		memory_decrypted_read_dword((R)->program, pc)
+#define ROPCODE(R,pc)		(R)->direct->read_decrypted_dword(pc)
 
 
 
@@ -312,6 +313,7 @@ static CPU_INIT( r3000 )
 	r3000->irq_callback = irqcallback;
 	r3000->device = device;
 	r3000->program = device->space(AS_PROGRAM);
+	r3000->direct = &r3000->program->direct();
 }
 
 

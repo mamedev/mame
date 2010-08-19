@@ -132,8 +132,8 @@ Table 3-2.  TMS32025/26 Memory Blocks
 #define S_IN(A)			(cpustate->io->read_word((A)<<1))
 #define S_OUT(A,V)		(cpustate->io->write_word(((A)<<1),(V)))
 
-#define M_RDOP(A)		((cpustate->pgmmap[(A) >> 7]) ? (cpustate->pgmmap[(A) >> 7][(A) & 0x7f]) : memory_decrypted_read_word(cpustate->program, (A)<<1))
-#define M_RDOP_ARG(A)	((cpustate->pgmmap[(A) >> 7]) ? (cpustate->pgmmap[(A) >> 7][(A) & 0x7f]) : memory_decrypted_read_word(cpustate->program, (A)<<1))
+#define M_RDOP(A)		((cpustate->pgmmap[(A) >> 7]) ? (cpustate->pgmmap[(A) >> 7][(A) & 0x7f]) : cpustate->direct->read_decrypted_word((A)<<1))
+#define M_RDOP_ARG(A)	((cpustate->pgmmap[(A) >> 7]) ? (cpustate->pgmmap[(A) >> 7][(A) & 0x7f]) : cpustate->direct->read_decrypted_word((A)<<1))
 
 
 
@@ -175,6 +175,7 @@ struct _tms32025_state
 
 	legacy_cpu_device *device;
 	address_space *program;
+	direct_read_data *direct;
 	address_space *data;
 	address_space *io;
 
@@ -1722,6 +1723,7 @@ static CPU_INIT( tms32025 )
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
 	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->direct = &cpustate->program->direct();
 	cpustate->data = device->space(AS_DATA);
 	cpustate->io = device->space(AS_IO);
 

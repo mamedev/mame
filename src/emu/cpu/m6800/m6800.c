@@ -117,6 +117,7 @@ struct _m6800_state
 
 	/* Memory spaces */
     address_space *program;
+    direct_read_data *direct;
     address_space *data;
     address_space *io;
 
@@ -218,14 +219,14 @@ static UINT32 timer_next;
 /* opcodes. In case of system with memory mapped I/O, this function can be  */
 /* used to greatly speed up emulation                                       */
 /****************************************************************************/
-#define M_RDOP(Addr) ((unsigned)memory_decrypted_read_byte(cpustate->program, Addr))
+#define M_RDOP(Addr) ((unsigned)cpustate->direct->read_decrypted_byte(Addr))
 
 /****************************************************************************/
 /* M6800_RDOP_ARG() is identical to M6800_RDOP() but it's used for reading  */
 /* opcode arguments. This difference can be used to support systems that    */
 /* use different encoding mechanisms for opcodes and opcode arguments       */
 /****************************************************************************/
-#define M_RDOP_ARG(Addr) ((unsigned)memory_raw_read_byte(cpustate->program, Addr))
+#define M_RDOP_ARG(Addr) ((unsigned)cpustate->direct->read_raw_byte(Addr))
 
 /* macros to access memory */
 #define IMMBYTE(b)	b = M_RDOP_ARG(PCD); PC++
@@ -911,6 +912,7 @@ static CPU_INIT( m6800 )
 	m6800_state *cpustate = get_safe_token(device);
 
 	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->direct = &cpustate->program->direct();
 	cpustate->data = device->space(AS_DATA);
 	cpustate->io = device->space(AS_IO);
 
@@ -1304,6 +1306,7 @@ static CPU_INIT( m6801 )
 	cpustate->device = device;
 
 	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->direct = &cpustate->program->direct();
 	cpustate->data = device->space(AS_DATA);
 	cpustate->io = device->space(AS_IO);
 
@@ -1327,6 +1330,7 @@ static CPU_INIT( m6802 )
 	cpustate->device = device;
 
 	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->direct = &cpustate->program->direct();
 	cpustate->data = device->space(AS_DATA);
 	cpustate->io = device->space(AS_IO);
 
@@ -1346,6 +1350,7 @@ static CPU_INIT( m6803 )
 	cpustate->device = device;
 
 	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->direct = &cpustate->program->direct();
 	cpustate->data = device->space(AS_DATA);
 	cpustate->io = device->space(AS_IO);
 
@@ -1677,6 +1682,7 @@ static CPU_INIT( m6808 )
 	cpustate->device = device;
 
 	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->direct = &cpustate->program->direct();
 	cpustate->data = device->space(AS_DATA);
 	cpustate->io = device->space(AS_IO);
 
@@ -1697,6 +1703,7 @@ static CPU_INIT( hd63701 )
 	cpustate->device = device;
 
 	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->direct = &cpustate->program->direct();
 	cpustate->data = device->space(AS_DATA);
 	cpustate->io = device->space(AS_IO);
 
@@ -2042,6 +2049,7 @@ static CPU_INIT( nsc8105 )
 	cpustate->device = device;
 
 	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->direct = &cpustate->program->direct();
 	cpustate->data = device->space(AS_DATA);
 	cpustate->io = device->space(AS_IO);
 

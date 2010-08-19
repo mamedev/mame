@@ -44,6 +44,7 @@ struct _s2650_regs {
 	device_irq_callback irq_callback;
 	legacy_cpu_device *device;
 	address_space *program;
+	direct_read_data *direct;
 	address_space *io;
 };
 
@@ -235,7 +236,7 @@ INLINE int check_irq_line(s2650_regs *s2650c)
  ***************************************************************/
 INLINE UINT8 ROP(s2650_regs *s2650c)
 {
-	UINT8 result = memory_decrypted_read_byte(s2650c->program, s2650c->page + s2650c->iar);
+	UINT8 result = s2650c->direct->read_decrypted_byte(s2650c->page + s2650c->iar);
 	s2650c->iar = (s2650c->iar + 1) & PMSK;
 	return result;
 }
@@ -246,7 +247,7 @@ INLINE UINT8 ROP(s2650_regs *s2650c)
  ***************************************************************/
 INLINE UINT8 ARG(s2650_regs *s2650c)
 {
-	UINT8 result = memory_raw_read_byte(s2650c->program, s2650c->page + s2650c->iar);
+	UINT8 result = s2650c->direct->read_raw_byte(s2650c->page + s2650c->iar);
 	s2650c->iar = (s2650c->iar + 1) & PMSK;
 	return result;
 }
@@ -796,6 +797,7 @@ static CPU_INIT( s2650 )
 	s2650c->irq_callback = irqcallback;
 	s2650c->device = device;
 	s2650c->program = device->space(AS_PROGRAM);
+	s2650c->direct = &s2650c->program->direct();
 	s2650c->io = device->space(AS_IO);
 
 	state_save_register_device_item(device, 0, s2650c->ppc);
@@ -828,6 +830,7 @@ static CPU_RESET( s2650 )
 
 	s2650c->device = device;
 	s2650c->program = device->space(AS_PROGRAM);
+	s2650c->direct = &s2650c->program->direct();
 	s2650c->io = device->space(AS_IO);
 	s2650c->psl = COM | WC;
 	/* force write */

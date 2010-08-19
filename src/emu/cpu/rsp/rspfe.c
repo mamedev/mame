@@ -38,7 +38,7 @@ int rspfe_describe(void *param, opcode_desc *desc, const opcode_desc *prev)
 	UINT32 op, opswitch;
 
 	/* fetch the opcode */
-	op = desc->opptr.l[0] = memory_decrypted_read_dword(rsp->program, desc->physpc | 0x1000);
+	op = desc->opptr.l[0] = rsp->direct->read_decrypted_dword(desc->physpc | 0x1000);
 
 	/* all instructions are 4 bytes and default to a single cycle each */
 	desc->length = 4;

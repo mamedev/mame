@@ -167,8 +167,8 @@ Timming
 
 #define M_RDMEM(A)		cpustate->program->read_byte(A)
 #define M_WRMEM(A,V)	cpustate->program->write_byte(A, V)
-#define M_RDOP(A)		memory_decrypted_read_byte(cpustate->program, A)
-#define M_RDOP_ARG(A)	memory_raw_read_byte(cpustate->program, A)
+#define M_RDOP(A)		cpustate->direct->read_decrypted_byte(A)
+#define M_RDOP_ARG(A)	cpustate->direct->read_raw_byte(A)
 
 typedef struct _alpha8201_state alpha8201_state;
 struct _alpha8201_state
@@ -199,6 +199,7 @@ struct _alpha8201_state
 
 	legacy_cpu_device *device;
 	address_space *program;
+	direct_read_data *direct;
 	int icount;
 	int inst_cycles;
 };
@@ -669,6 +670,7 @@ static CPU_INIT( alpha8201 )
 
 	cpustate->device = device;
 	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->direct = &cpustate->program->direct();
 
 	state_save_register_device_item_array(device, 0, cpustate->RAM);
 	state_save_register_device_item(device, 0, cpustate->PREVPC);

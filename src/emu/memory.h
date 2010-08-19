@@ -832,23 +832,4 @@ inline UINT64 direct_read_data::read_decrypted_qword(offs_t byteaddress)
 }
 		
 
-
-
-//**************************************************************************
-//  LEGACY FUNCTIONS TO REMOVE
-//**************************************************************************
-
-static inline void *memory_raw_read_ptr(address_space *space, offs_t byteaddress) { return space->direct().read_raw_ptr(byteaddress); }
-static inline UINT8 memory_raw_read_byte(address_space *space, offs_t byteaddress) { return space->direct().read_raw_byte(byteaddress); }
-static inline UINT16 memory_raw_read_word(address_space *space, offs_t byteaddress) { return space->direct().read_raw_word(byteaddress); }
-static inline UINT32 memory_raw_read_dword(address_space *space, offs_t byteaddress) { return space->direct().read_raw_dword(byteaddress); }
-static inline UINT64 memory_raw_read_qword(address_space *space, offs_t byteaddress) { return space->direct().read_raw_qword(byteaddress); }
-
-static inline void *memory_decrypted_read_ptr(address_space *space, offs_t byteaddress) { return space->direct().read_decrypted_ptr(byteaddress); }
-static inline UINT8 memory_decrypted_read_byte(address_space *space, offs_t byteaddress) { return space->direct().read_decrypted_byte(byteaddress); }
-static inline UINT16 memory_decrypted_read_word(address_space *space, offs_t byteaddress) { return space->direct().read_decrypted_word(byteaddress); }
-static inline UINT32 memory_decrypted_read_dword(address_space *space, offs_t byteaddress) { return space->direct().read_decrypted_dword(byteaddress); }
-static inline UINT64 memory_decrypted_read_qword(address_space *space, offs_t byteaddress) { return space->direct().read_decrypted_qword(byteaddress); }
-
-
 #endif	/* __MEMORY_H__ */

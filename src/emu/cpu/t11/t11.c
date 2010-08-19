@@ -35,6 +35,7 @@ struct _t11_state
 	device_irq_callback	irq_callback;
 	legacy_cpu_device *		device;
 	address_space *program;
+	direct_read_data *direct;
 };
 
 
@@ -74,7 +75,7 @@ INLINE t11_state *get_safe_token(running_device *device)
 
 INLINE int ROPCODE(t11_state *cpustate)
 {
-	int val = memory_decrypted_read_word(cpustate->program, cpustate->PC);
+	int val = cpustate->direct->read_decrypted_word(cpustate->PC);
 	cpustate->PC += 2;
 	return val;
 }
@@ -264,6 +265,7 @@ static CPU_INIT( t11 )
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
 	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->direct = &cpustate->program->direct();
 
 	state_save_register_device_item(device, 0, cpustate->ppc.w.l);
 	state_save_register_device_item(device, 0, cpustate->reg[0].w.l);

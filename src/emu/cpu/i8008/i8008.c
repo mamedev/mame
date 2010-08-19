@@ -35,6 +35,7 @@ struct _i8008_state
 	UINT8	flags; // temporary I/O only
 	legacy_cpu_device *device;
 	address_space *program;
+	direct_read_data *direct;
 	address_space *io;
 	int					icount;
 	int 				pc_pos; // PC possition in ADDR
@@ -74,7 +75,7 @@ INLINE void POP_STACK(i8008_state *cpustate)
 
 INLINE UINT8 ROP(i8008_state *cpustate)
 {
-	UINT8 retVal = memory_decrypted_read_byte(cpustate->program, GET_PC.w.l);
+	UINT8 retVal = cpustate->direct->read_decrypted_byte(GET_PC.w.l);
 	GET_PC.w.l = (GET_PC.w.l + 1) & 0x3fff;
 	cpustate->PC = GET_PC;
 	return retVal;
@@ -112,7 +113,7 @@ INLINE void SET_REG(i8008_state *cpustate,UINT8 reg, UINT8 val)
 
 INLINE UINT8 ARG(i8008_state *cpustate)
 {
-	UINT8 retVal = memory_raw_read_byte(cpustate->program, GET_PC.w.l);
+	UINT8 retVal = cpustate->direct->read_raw_byte(GET_PC.w.l);
 	GET_PC.w.l = (GET_PC.w.l + 1) & 0x3fff;
 	cpustate->PC = GET_PC;
 	return retVal;
@@ -543,6 +544,7 @@ static CPU_INIT( i8008 )
 	cpustate->device = device;
 
 	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->direct = &cpustate->program->direct();
 	cpustate->io = device->space(AS_IO);
 
 	cpustate->irq_callback = irqcallback;

@@ -186,6 +186,7 @@ struct _dsp32_state
 	void			(*output_pins_changed)(running_device *device, UINT32 pins);
 	legacy_cpu_device *	device;
 	address_space *program;
+	direct_read_data *direct;
 };
 
 
@@ -215,7 +216,7 @@ INLINE dsp32_state *get_safe_token(running_device *device)
     MEMORY ACCESSORS
 ***************************************************************************/
 
-#define ROPCODE(cs,pc)			memory_decrypted_read_dword((cs)->program, pc)
+#define ROPCODE(cs,pc)			(cs)->direct->read_decrypted_dword(pc)
 
 #define RBYTE(cs,addr)			(cs)->program->read_byte(addr)
 #define WBYTE(cs,addr,data)		(cs)->program->write_byte((addr), data)
@@ -359,6 +360,7 @@ static CPU_INIT( dsp32c )
 
 	cpustate->device = device;
 	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->direct = &cpustate->program->direct();
 
 	dsp32_register_save(device);
 }

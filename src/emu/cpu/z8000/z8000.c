@@ -84,6 +84,7 @@ struct _z8000_state
 	device_irq_callback irq_callback;
 	legacy_cpu_device *device;
 	address_space *program;
+	direct_read_data *direct;
 	address_space *io;
 	int icount;
 };
@@ -108,7 +109,7 @@ static UINT8 z8000_zsp[256];
 
 INLINE UINT16 RDOP(z8000_state *cpustate)
 {
-	UINT16 res = memory_decrypted_read_word(cpustate->program, cpustate->pc);
+	UINT16 res = cpustate->direct->read_decrypted_word(cpustate->pc);
     cpustate->pc += 2;
     return res;
 }
@@ -204,7 +205,7 @@ INLINE void WRPORT_W(z8000_state *cpustate, int mode, UINT16 addr, UINT16 value)
 
 INLINE UINT16 fetch(z8000_state *cpustate)
 {
-	UINT16 data = memory_decrypted_read_word(cpustate->program, cpustate->pc);
+	UINT16 data = cpustate->direct->read_decrypted_word(cpustate->pc);
 
 	cpustate->pc+=2;
 
@@ -365,6 +366,7 @@ static CPU_INIT( z8001 )
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
 	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->direct = &cpustate->program->direct();
 	cpustate->io = device->space(AS_IO);
 
 	/* already initialized? */
@@ -379,6 +381,7 @@ static CPU_INIT( z8002 )
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
 	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->direct = &cpustate->program->direct();
 	cpustate->io = device->space(AS_IO);
 
 	/* already initialized? */
@@ -395,6 +398,7 @@ static CPU_RESET( z8001 )
 	cpustate->irq_callback = save_irqcallback;
 	cpustate->device = device;
 	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->direct = &cpustate->program->direct();
 	cpustate->io = device->space(AS_IO);
 	cpustate->fcw = RDMEM_W(cpustate,  2); /* get reset cpustate->fcw */
 	if(cpustate->fcw & F_SEG)
@@ -416,6 +420,7 @@ static CPU_RESET( z8002 )
 	cpustate->irq_callback = save_irqcallback;
 	cpustate->device = device;
 	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->direct = &cpustate->program->direct();
 	cpustate->io = device->space(AS_IO);
 	cpustate->fcw = RDMEM_W(cpustate,  2); /* get reset cpustate->fcw */
 	cpustate->pc = RDMEM_W(cpustate,  4); /* get reset cpustate->pc  */

@@ -192,6 +192,7 @@ typedef struct
 	void			(*output_pins_changed)(UINT32 pins);
 	legacy_cpu_device *device;
 	address_space *program;
+	direct_read_data *direct;
 	address_space *data;
 
 	UINT16 peripheral_ram[0x40];

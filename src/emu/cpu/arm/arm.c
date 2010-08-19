@@ -237,6 +237,7 @@ typedef struct
 	device_irq_callback irq_callback;
 	legacy_cpu_device *device;
 	address_space *program;
+	direct_read_data *direct;
 	endianness_t endian;
 } ARM_REGS;
 
@@ -334,6 +335,7 @@ static CPU_RESET( arm )
 	cpustate->endian = save_endian;
 	cpustate->device = device;
 	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->direct = &cpustate->program->direct();
 
 	/* start up in SVC mode with interrupts disabled. */
 	R15 = eARM_MODE_SVC|I_MASK|F_MASK;
@@ -356,7 +358,7 @@ static CPU_EXECUTE( arm )
 
 		/* load instruction */
 		pc = R15;
-		insn = memory_decrypted_read_dword( cpustate->program, pc & ADDRESS_MASK );
+		insn = cpustate->direct->read_decrypted_dword( pc & ADDRESS_MASK );
 
 		switch (insn >> INSN_COND_SHIFT)
 		{

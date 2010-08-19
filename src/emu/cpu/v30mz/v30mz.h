@@ -89,15 +89,15 @@ typedef enum {
 #define read_port(port) cpustate->io->read_byte(port)
 #define write_port(port,val) cpustate->io->write_byte(port,val)
 
-#define FETCH (memory_raw_read_byte(cpustate->program, (cpustate->sregs[CS]<<4)+cpustate->ip++))
-#define FETCHOP (memory_decrypted_read_byte(cpustate->program, (cpustate->sregs[CS]<<4)+cpustate->ip++))
-#define FETCHWORD(var) { var=memory_raw_read_byte(cpustate->program, (((cpustate->sregs[CS]<<4)+cpustate->ip)))+(memory_raw_read_byte(cpustate->program, (((cpustate->sregs[CS]<<4)+cpustate->ip+1)))<<8); cpustate->ip+=2; }
+#define FETCH (cpustate->direct->read_raw_byte((cpustate->sregs[CS]<<4)+cpustate->ip++))
+#define FETCHOP (cpustate->direct->read_decrypted_byte((cpustate->sregs[CS]<<4)+cpustate->ip++))
+#define FETCHWORD(var) { var=cpustate->direct->read_raw_byte((((cpustate->sregs[CS]<<4)+cpustate->ip)))+(cpustate->direct->read_raw_byte((((cpustate->sregs[CS]<<4)+cpustate->ip+1)))<<8); cpustate->ip+=2; }
 #define PUSH(val) { cpustate->regs.w[SP]-=2; WriteWord((((cpustate->sregs[SS]<<4)+cpustate->regs.w[SP])),val); }
 #define POP(var) { var = ReadWord((((cpustate->sregs[SS]<<4)+cpustate->regs.w[SP]))); cpustate->regs.w[SP]+=2; }
-#define PEEK(addr) ((BYTE)memory_raw_read_byte(cpustate->program, addr))
-#define PEEKOP(addr) ((BYTE)memory_decrypted_read_byte(cpustate->program, addr))
+#define PEEK(addr) ((BYTE)cpustate->direct->read_raw_byte(addr))
+#define PEEKOP(addr) ((BYTE)cpustate->direct->read_decrypted_byte(addr))
 
-#define GetModRM UINT32 ModRM=memory_raw_read_byte(cpustate->program, (cpustate->sregs[CS]<<4)+cpustate->ip++)
+#define GetModRM UINT32 ModRM=cpustate->direct->read_raw_byte((cpustate->sregs[CS]<<4)+cpustate->ip++)
 
 /* Cycle count macros:
     CLK  - cycle count is the same on all processors

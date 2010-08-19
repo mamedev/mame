@@ -99,6 +99,7 @@ struct _tms32010_state
 
 	legacy_cpu_device *device;
 	address_space *program;
+	direct_read_data *direct;
 	address_space *data;
 	address_space *io;
 };
@@ -202,7 +203,7 @@ INLINE int add_branch_cycle(tms32010_state *cpustate);
  *  used to greatly speed up emulation
  */
 
-#define TMS32010_RDOP(A) (memory_decrypted_read_word(cpustate->program, (A)<<1))
+#define TMS32010_RDOP(A) (cpustate->direct->read_decrypted_word((A)<<1))
 
 
 /****************************************************************************
@@ -211,7 +212,7 @@ INLINE int add_branch_cycle(tms32010_state *cpustate);
  *  that use different encoding mechanisms for opcodes and opcode arguments
  */
 
-#define TMS32010_RDOP_ARG(A) (memory_raw_read_word(cpustate->program, (A)<<1))
+#define TMS32010_RDOP_ARG(A) (cpustate->direct->read_raw_word((A)<<1))
 
 
 /************************************************************************
@@ -828,6 +829,7 @@ static CPU_INIT( tms32010 )
 
 	cpustate->device = device;
 	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->direct = &cpustate->program->direct();
 	cpustate->data = device->space(AS_DATA);
 	cpustate->io = device->space(AS_IO);
 }

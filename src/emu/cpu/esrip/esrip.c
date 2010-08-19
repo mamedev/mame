@@ -111,6 +111,7 @@ typedef struct
 
 	legacy_cpu_device *device;
 	address_space *program;
+	direct_read_data *direct;
 	int		icount;
 
 	read16_device_func	fdt_r;
@@ -264,6 +265,7 @@ static CPU_INIT( esrip )
 
 	cpustate->device = device;
 	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->direct = &cpustate->program->direct();
 
 	/* Create the instruction decode lookup table */
 	cpustate->optable = auto_alloc_array(device->machine, UINT8, 65536);
@@ -1777,7 +1779,7 @@ static CPU_EXECUTE( esrip )
 		cpustate->pl7 = cpustate->l7;
 
 		/* Latch instruction */
-		inst = memory_decrypted_read_qword(cpustate->program, RIP_PC << 3);
+		inst = cpustate->direct->read_decrypted_qword(RIP_PC << 3);
 
 		in_h = inst >> 32;
 		in_l = inst & 0xffffffff;

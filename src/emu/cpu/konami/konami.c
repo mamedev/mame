@@ -63,6 +63,7 @@ struct _konami_state
 	int		icount;
 	legacy_cpu_device *device;
 	address_space *program;
+	direct_read_data *direct;
 	konami_set_lines_func setlines_callback;
 };
 
@@ -120,8 +121,8 @@ INLINE konami_state *get_safe_token(running_device *device)
 
 #define RM(cs,Addr)				(cs)->program->read_byte(Addr)
 #define WM(cs,Addr,Value)		(cs)->program->write_byte(Addr,Value)
-#define ROP(cs,Addr)			memory_decrypted_read_byte((cs)->program, Addr)
-#define ROP_ARG(cs,Addr)		memory_raw_read_byte((cs)->program, Addr)
+#define ROP(cs,Addr)			(cs)->direct->read_decrypted_byte(Addr)
+#define ROP_ARG(cs,Addr)		(cs)->direct->read_raw_byte(Addr)
 
 #define SIGNED(a)	(UINT16)(INT16)(INT8)(a)
 
@@ -404,6 +405,7 @@ static CPU_INIT( konami )
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
 	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->direct = &cpustate->program->direct();
 
 	state_save_register_device_item(device, 0, PC);
 	state_save_register_device_item(device, 0, U);

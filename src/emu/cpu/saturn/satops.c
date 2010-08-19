@@ -7,7 +7,7 @@ INLINE int READ_OP(saturn_state *cpustate)
 {
 	UINT8 data;
 	cpustate->icount-=3;
-        data=memory_decrypted_read_byte(cpustate->program, cpustate->pc);
+        data=cpustate->direct->read_decrypted_byte(cpustate->pc);
 	saturn_assert(data<0x10);
 	cpustate->pc=(cpustate->pc+1)&0xfffff;
 	return data;
@@ -17,7 +17,7 @@ INLINE int READ_OP_ARG(saturn_state *cpustate)
 {
 	UINT8 data;
 	cpustate->icount-=3;
-        data=memory_raw_read_byte(cpustate->program, cpustate->pc);
+        data=cpustate->direct->read_raw_byte(cpustate->pc);
 	saturn_assert(data<0x10);
 	cpustate->pc=(cpustate->pc+1)&0xfffff;
 	return data;

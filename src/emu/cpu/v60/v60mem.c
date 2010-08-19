@@ -86,18 +86,18 @@ static void MemWrite32_16(address_space *space, offs_t address, UINT32 data)
 
 static UINT8 OpRead8_16(address_space *space, offs_t address)
 {
-	return memory_decrypted_read_byte(space, BYTE_XOR_LE(address));
+	return space->direct().read_decrypted_byte(BYTE_XOR_LE(address));
 }
 
 static UINT16 OpRead16_16(address_space *space, offs_t address)
 {
-	return memory_decrypted_read_byte(space, BYTE_XOR_LE(address)) | (memory_decrypted_read_byte(space, BYTE_XOR_LE(address + 1)) << 8);
+	return space->direct().read_decrypted_byte(BYTE_XOR_LE(address)) | (space->direct().read_decrypted_byte(BYTE_XOR_LE(address + 1)) << 8);
 }
 
 static UINT32 OpRead32_16(address_space *space, offs_t address)
 {
-	return memory_decrypted_read_byte(space, BYTE_XOR_LE(address)) | (memory_decrypted_read_byte(space, BYTE_XOR_LE(address + 1)) << 8) |
-			(memory_decrypted_read_byte(space, BYTE_XOR_LE(address + 2)) << 16) | (memory_decrypted_read_byte(space, BYTE_XOR_LE(address + 3)) << 24);
+	return space->direct().read_decrypted_byte(BYTE_XOR_LE(address)) | (space->direct().read_decrypted_byte(BYTE_XOR_LE(address + 1)) << 8) |
+			(space->direct().read_decrypted_byte(BYTE_XOR_LE(address + 2)) << 16) | (space->direct().read_decrypted_byte(BYTE_XOR_LE(address + 3)) << 24);
 }
 
 
@@ -173,18 +173,18 @@ static void MemWrite32_32(address_space *space, offs_t address, UINT32 data)
 
 static UINT8 OpRead8_32(address_space *space, offs_t address)
 {
-	return memory_decrypted_read_byte(space, BYTE4_XOR_LE(address));
+	return space->direct().read_decrypted_byte(BYTE4_XOR_LE(address));
 }
 
 static UINT16 OpRead16_32(address_space *space, offs_t address)
 {
-	return memory_decrypted_read_byte(space, BYTE4_XOR_LE(address)) | (memory_decrypted_read_byte(space, BYTE4_XOR_LE(address + 1)) << 8);
+	return space->direct().read_decrypted_byte(BYTE4_XOR_LE(address)) | (space->direct().read_decrypted_byte(BYTE4_XOR_LE(address + 1)) << 8);
 }
 
 static UINT32 OpRead32_32(address_space *space, offs_t address)
 {
-	return memory_decrypted_read_byte(space, BYTE4_XOR_LE(address)) | (memory_decrypted_read_byte(space, BYTE4_XOR_LE(address + 1)) << 8) |
-			(memory_decrypted_read_byte(space, BYTE4_XOR_LE(address + 2)) << 16) | (memory_decrypted_read_byte(space, BYTE4_XOR_LE(address + 3)) << 24);
+	return space->direct().read_decrypted_byte(BYTE4_XOR_LE(address)) | (space->direct().read_decrypted_byte(BYTE4_XOR_LE(address + 1)) << 8) |
+			(space->direct().read_decrypted_byte(BYTE4_XOR_LE(address + 2)) << 16) | (space->direct().read_decrypted_byte(BYTE4_XOR_LE(address + 3)) << 24);
 }
 
 
@@ -221,9 +221,9 @@ static const struct cpu_info v70_i =
 #define MemWrite32  cpustate->info.mw32
 
 #if defined(LSB_FIRST) && !defined(ALIGN_INTS)
-#define OpRead8(s, a)	(memory_decrypted_read_byte(s, a))
-#define OpRead16(s, a)	(memory_decrypted_read_word(s, a))
-#define OpRead32(s, a)	(memory_decrypted_read_dword(s, a))
+#define OpRead8(s, a)	((s)->direct().read_decrypted_byte(a))
+#define OpRead16(s, a)	((s)->direct().read_decrypted_word(a))
+#define OpRead32(s, a)	((s)->direct().read_decrypted_dword(a))
 #else
 #define OpRead8     cpustate->info.or8
 #define OpRead16    cpustate->info.or16

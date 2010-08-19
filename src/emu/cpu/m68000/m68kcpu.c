@@ -1103,7 +1103,7 @@ UINT16 m68k_memory_interface::read_immediate_16_mmu(offs_t address)
 		address = pmmu_translate_addr(m_cpustate, address);
 	}
 
-	return memory_decrypted_read_word(m_space, (address) ^ m_cpustate->memory.opcode_xor);
+	return m_direct->read_decrypted_word((address) ^ m_cpustate->memory.opcode_xor);
 }
 
 /* potentially misaligned 16-bit reads with a 32-bit data bus (and 24-bit address bus) */

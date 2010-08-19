@@ -163,6 +163,7 @@ struct _nec_state_t
 	device_irq_callback irq_callback;
 	legacy_cpu_device *device;
 	address_space *program;
+	direct_read_data *direct;
 	address_space *io;
 	int		icount;
 
@@ -240,7 +241,7 @@ static void do_prefetch(nec_state_t *nec_state, int previous_ICount)
 INLINE UINT8 fetch(nec_state_t *nec_state)
 {
 	prefetch(nec_state);
-	return memory_raw_read_byte(nec_state->program, FETCH_XOR((nec_state->sregs[PS]<<4)+nec_state->ip++));
+	return nec_state->direct->read_raw_byte(FETCH_XOR((nec_state->sregs[PS]<<4)+nec_state->ip++));
 }
 
 INLINE UINT16 fetchword(nec_state_t *nec_state)
@@ -263,7 +264,7 @@ static UINT8 fetchop(nec_state_t *nec_state)
 	UINT8 ret;
 
 	prefetch(nec_state);
-	ret = memory_decrypted_read_byte(nec_state->program, FETCH_XOR( ( nec_state->sregs[PS]<<4)+nec_state->ip++));
+	ret = nec_state->direct->read_decrypted_byte(FETCH_XOR( ( nec_state->sregs[PS]<<4)+nec_state->ip++));
 
 	if (nec_state->MF == 1)
 		if (nec_state->config->v25v35_decryptiontable)
@@ -1130,6 +1131,7 @@ static void nec_init(legacy_cpu_device *device, device_irq_callback irqcallback,
 	nec_state->irq_callback = irqcallback;
 	nec_state->device = device;
 	nec_state->program = device->space(AS_PROGRAM);
+	nec_state->direct = &nec_state->program->direct();
 	nec_state->io = device->space(AS_IO);
 }
 

@@ -36,6 +36,7 @@ struct _i960_state_t {
 	device_irq_callback irq_cb;
 	legacy_cpu_device *device;
 	address_space *program;
+	direct_read_data *direct;
 
 	int icount;
 };
@@ -136,22 +137,22 @@ INLINE UINT32 get_ea(i960_state_t *i960, UINT32 opcode)
 			return i960->r[abase] + (i960->r[index] << scale);
 
 		case 0xc:
-			ret = memory_decrypted_read_dword(i960->program, i960->IP);
+			ret = i960->direct->read_decrypted_dword(i960->IP);
 			i960->IP += 4;
 			return ret;
 
 		case 0xd:
-			ret = memory_decrypted_read_dword(i960->program, i960->IP) + i960->r[abase];
+			ret = i960->direct->read_decrypted_dword(i960->IP) + i960->r[abase];
 			i960->IP += 4;
 			return ret;
 
 		case 0xe:
-			ret = memory_decrypted_read_dword(i960->program, i960->IP) + (i960->r[index] << scale);
+			ret = i960->direct->read_decrypted_dword(i960->IP) + (i960->r[index] << scale);
 			i960->IP += 4;
 			return ret;
 
 		case 0xf:
-			ret = memory_decrypted_read_dword(i960->program, i960->IP) + i960->r[abase] + (i960->r[index] << scale);
+			ret = i960->direct->read_decrypted_dword(i960->IP) + i960->r[abase] + (i960->r[index] << scale);
 			i960->IP += 4;
 			return ret;
 
@@ -1964,7 +1965,7 @@ static CPU_EXECUTE( i960 )
 
 		i960->bursting = 0;
 
-		opcode = memory_decrypted_read_dword(i960->program, i960->IP);
+		opcode = i960->direct->read_decrypted_dword(i960->IP);
 		i960->IP += 4;
 
 		execute_op(i960, opcode);
@@ -2068,6 +2069,7 @@ static CPU_INIT( i960 )
 	i960->irq_cb = irqcallback;
 	i960->device = device;
 	i960->program = device->space(AS_PROGRAM);
+	i960->direct = &i960->program->direct();
 
 	state_save_register_device_item(device, 0, i960->PIP);
 	state_save_register_device_item(device, 0, i960->SAT);

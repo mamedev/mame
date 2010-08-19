@@ -155,6 +155,7 @@ struct _mcs48_state
 
 	/* Memory spaces */
     address_space *program;
+    direct_read_data *direct;
     address_space *data;
     address_space *io;
 
@@ -247,7 +248,7 @@ INLINE mcs48_state *get_safe_token(running_device *device)
 
 INLINE UINT8 opcode_fetch(mcs48_state *cpustate)
 {
-	return memory_decrypted_read_byte(cpustate->program, cpustate->pc++);
+	return cpustate->direct->read_decrypted_byte(cpustate->pc++);
 }
 
 
@@ -258,7 +259,7 @@ INLINE UINT8 opcode_fetch(mcs48_state *cpustate)
 
 INLINE UINT8 argument_fetch(mcs48_state *cpustate)
 {
-	return memory_raw_read_byte(cpustate->program, cpustate->pc++);
+	return cpustate->direct->read_raw_byte(cpustate->pc++);
 }
 
 
@@ -857,6 +858,7 @@ static void mcs48_init(legacy_cpu_device *device, device_irq_callback irqcallbac
 	cpustate->feature_mask = feature_mask;
 
 	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->direct = &cpustate->program->direct();
 	cpustate->data = device->space(AS_DATA);
 	cpustate->io = device->space(AS_IO);
 

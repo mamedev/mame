@@ -102,6 +102,7 @@ struct _jaguar_state
 	jaguar_int_func cpu_interrupt;
 	legacy_cpu_device *device;
 	address_space *program;
+	direct_read_data *direct;
 };
 
 
@@ -240,7 +241,7 @@ static void (*const dsp_op_table[64])(jaguar_state *jaguar, UINT16 op) =
     MEMORY ACCESSORS
 ***************************************************************************/
 
-#define ROPCODE(J,pc)		(memory_decrypted_read_word((J)->program, WORD_XOR_BE((UINT32)(pc))))
+#define ROPCODE(J,pc)		((J)->direct->read_decrypted_word(WORD_XOR_BE((UINT32)(pc))))
 
 
 
@@ -421,6 +422,7 @@ static void init_common(int isdsp, legacy_cpu_device *device, device_irq_callbac
 	jaguar->irq_callback = irqcallback;
 	jaguar->device = device;
 	jaguar->program = device->space(AS_PROGRAM);
+	jaguar->direct = &jaguar->program->direct();
 	if (configdata != NULL)
 		jaguar->cpu_interrupt = configdata->cpu_int_callback;
 

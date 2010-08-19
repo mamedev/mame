@@ -76,6 +76,7 @@ struct _mb88_state
     device_irq_callback irqcallback;
     legacy_cpu_device *device;
     address_space *program;
+    direct_read_data *direct;
     address_space *data;
     address_space *io;
     int icount;
@@ -98,7 +99,7 @@ static TIMER_CALLBACK( serial_timer );
     MACROS
 ***************************************************************************/
 
-#define READOP(a)			(memory_decrypted_read_byte(cpustate->program, a))
+#define READOP(a)			(cpustate->direct->read_decrypted_byte(a))
 
 #define RDMEM(a)			(cpustate->data->read_byte(a))
 #define WRMEM(a,v)			(cpustate->data->write_byte((a), (v)))
@@ -144,6 +145,7 @@ static CPU_INIT( mb88 )
 	cpustate->irqcallback = irqcallback;
 	cpustate->device = device;
 	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->direct = &cpustate->program->direct();
 	cpustate->data = device->space(AS_DATA);
 	cpustate->io = device->space(AS_IO);
 

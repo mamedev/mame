@@ -65,6 +65,7 @@ typedef struct
 	legacy_cpu_device *device;
 	address_space *internal;
 	address_space *program;
+	direct_read_data *direct;
 	address_space *io;
 	UINT32	*m;
 	INT8	nmi_line_state;

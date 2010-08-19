@@ -180,13 +180,13 @@ INLINE void WRMEM(h6280_Regs* cpustate, offs_t addr, UINT8 data) {
  *  RDOP    read an opcode
  ***************************************************************/
 #define RDOP()													\
-	memory_decrypted_read_byte(cpustate->program, TRANSLATED(PCW))
+	cpustate->direct->read_decrypted_byte(TRANSLATED(PCW))
 
 /***************************************************************
  *  RDOPARG read an opcode argument
  ***************************************************************/
 #define RDOPARG()												\
-	memory_raw_read_byte(cpustate->program, TRANSLATED(PCW))
+	cpustate->direct->read_raw_byte(TRANSLATED(PCW))
 
 /***************************************************************
  *  BRA  branch relative

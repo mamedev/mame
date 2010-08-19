@@ -56,14 +56,14 @@
 /***************************************************************
  *  RDOP    read an opcode
  ***************************************************************/
-#define RDOP()	memory_decrypted_read_byte(cpustate->space, PCW++); cpustate->icount -= 1
+#define RDOP()	cpustate->direct->read_decrypted_byte(PCW++); cpustate->icount -= 1
 
 /***************************************************************
  *  RDOPARG read an opcode argument
  ***************************************************************/
-#define RDOPARG()	memory_raw_read_byte(cpustate->space, PCW++); cpustate->icount -= 1
+#define RDOPARG()	cpustate->direct->read_raw_byte(PCW++); cpustate->icount -= 1
 
-#define PEEK_OP()	memory_decrypted_read_byte(cpustate->space, PCW)
+#define PEEK_OP()	cpustate->direct->read_decrypted_byte(PCW)
 
 #define RDMEM(addr)			cpustate->space->read_byte(addr); cpustate->icount -= 1
 #define WRMEM(addr,data)	cpustate->space->write_byte(addr,data); cpustate->icount -= 1

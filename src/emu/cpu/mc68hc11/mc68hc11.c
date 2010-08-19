@@ -62,6 +62,7 @@ struct _hc11_state
 	device_irq_callback irq_callback;
 	UINT8 irq_state[2];
 	legacy_cpu_device *device;
+	direct_read_data *direct;
 	address_space *program;
 	address_space *io;
 	int icount;
@@ -303,13 +304,13 @@ static void hc11_regs_w(hc11_state *cpustate, UINT32 address, UINT8 value)
 
 INLINE UINT8 FETCH(hc11_state *cpustate)
 {
-	return memory_decrypted_read_byte(cpustate->program, cpustate->pc++);
+	return cpustate->direct->read_decrypted_byte(cpustate->pc++);
 }
 
 INLINE UINT16 FETCH16(hc11_state *cpustate)
 {
 	UINT16 w;
-	w = (memory_decrypted_read_byte(cpustate->program, cpustate->pc) << 8) | (memory_decrypted_read_byte(cpustate->program, cpustate->pc+1));
+	w = (cpustate->direct->read_decrypted_byte(cpustate->pc) << 8) | (cpustate->direct->read_decrypted_byte(cpustate->pc+1));
 	cpustate->pc += 2;
 	return w;
 }
@@ -416,6 +417,7 @@ static CPU_INIT( hc11 )
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
 	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->direct = &cpustate->program->direct();
 	cpustate->io = device->space(AS_IO);
 }
 

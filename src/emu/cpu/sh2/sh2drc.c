@@ -1515,7 +1515,7 @@ static void generate_checksum_block(sh2_state *sh2, drcuml_block *block, compile
 	{
 		if (!(seqhead->flags & OPFLAG_VIRTUAL_NOOP))
 		{
-			void *base = memory_decrypted_read_ptr(sh2->program, SH2_CODE_XOR(seqhead->physpc));
+			void *base = sh2->direct->read_decrypted_ptr(SH2_CODE_XOR(seqhead->physpc));
 			UML_LOAD(block, IREG(0), base, IMM(0), WORD);							// load    i0,base,word
 			UML_CMP(block, IREG(0), IMM(seqhead->opptr.w[0]));						// cmp     i0,*opptr
 			UML_EXHc(block, IF_NE, sh2->nocode, IMM(epc(seqhead)));		// exne    nocode,seqhead->pc
@@ -1529,20 +1529,20 @@ static void generate_checksum_block(sh2_state *sh2, drcuml_block *block, compile
 		for (curdesc = seqhead->next; curdesc != seqlast->next; curdesc = curdesc->next)
 			if (!(curdesc->flags & OPFLAG_VIRTUAL_NOOP))
 			{
-				base = memory_decrypted_read_ptr(sh2->program, SH2_CODE_XOR(curdesc->physpc));
+				base = sh2->direct->read_decrypted_ptr(SH2_CODE_XOR(curdesc->physpc));
 				UML_LOAD(block, IREG(0), curdesc->opptr.w, IMM(0), WORD);			// load    i0,*opptr,0,word
 				UML_CMP(block, IREG(0), IMM(curdesc->opptr.w[0]));					// cmp     i0,*opptr
 				UML_EXHc(block, IF_NE, sh2->nocode, IMM(epc(seqhead)));	// exne    nocode,seqhead->pc
 			}
 #else
 		UINT32 sum = 0;
-		void *base = memory_decrypted_read_ptr(sh2->program, SH2_CODE_XOR(seqhead->physpc));
+		void *base = sh2->direct->read_decrypted_ptr(SH2_CODE_XOR(seqhead->physpc));
 		UML_LOAD(block, IREG(0), base, IMM(0), WORD);								// load    i0,base,word
 		sum += seqhead->opptr.w[0];
 		for (curdesc = seqhead->next; curdesc != seqlast->next; curdesc = curdesc->next)
 			if (!(curdesc->flags & OPFLAG_VIRTUAL_NOOP))
 			{
-				base = memory_decrypted_read_ptr(sh2->program, SH2_CODE_XOR(curdesc->physpc));
+				base = sh2->direct->read_decrypted_ptr(SH2_CODE_XOR(curdesc->physpc));
 				UML_LOAD(block, IREG(1), base, IMM(0), WORD);						// load    i1,*opptr,word
 				UML_ADD(block, IREG(0), IREG(0), IREG(1));							// add     i0,i0,i1
 				sum += curdesc->opptr.w[0];

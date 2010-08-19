@@ -160,6 +160,7 @@ typedef struct _z8_state z8_state;
 struct _z8_state
 {
     address_space *program;
+    direct_read_data *direct;
     address_space *data;
     address_space *io;
 
@@ -202,7 +203,7 @@ INLINE z8_state *get_safe_token(running_device *device)
 
 INLINE UINT8 fetch(z8_state *cpustate)
 {
-	UINT8 data = memory_decrypted_read_byte(cpustate->program, cpustate->pc);
+	UINT8 data = cpustate->direct->read_decrypted_byte(cpustate->pc);
 
 	cpustate->pc++;
 
@@ -663,6 +664,7 @@ static CPU_INIT( z8 )
 
 	/* find address spaces */
 	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->direct = &cpustate->program->direct();
 	cpustate->data = device->space(AS_DATA);
 	cpustate->io = device->space(AS_IO);
 

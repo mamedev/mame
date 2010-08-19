@@ -211,6 +211,7 @@ struct _rsp_state
 	device_irq_callback irq_callback;
 	legacy_cpu_device *device;
 	address_space *program;
+	direct_read_data *direct;
 	int icount;
 
 	rspimp_state* impstate;

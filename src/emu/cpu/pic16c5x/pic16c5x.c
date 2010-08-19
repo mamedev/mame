@@ -99,6 +99,7 @@ struct _pic16c5x_state
 
 	legacy_cpu_device *device;
 	address_space *program;
+	direct_read_data *direct;
 	address_space *data;
 	address_space *io;
 };
@@ -132,7 +133,7 @@ INLINE void update_internalram_ptr(pic16c5x_state *cpustate)
 
 
 
-#define PIC16C5x_RDOP(A)         (memory_decrypted_read_word(cpustate->program, (A)<<1))
+#define PIC16C5x_RDOP(A)         (cpustate->direct->read_decrypted_word((A)<<1))
 #define PIC16C5x_RAM_RDMEM(A)    ((UINT8)cpustate->data->read_byte(A))
 #define PIC16C5x_RAM_WRMEM(A,V)  (cpustate->data->write_byte(A,V))
 #define PIC16C5x_In(Port)        ((UINT8)cpustate->io->read_byte((Port)))
@@ -729,6 +730,7 @@ static CPU_INIT( pic16c5x )
 
 	cpustate->device = device;
 	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->direct = &cpustate->program->direct();
 	cpustate->data = device->space(AS_DATA);
 	cpustate->io = device->space(AS_IO);
 

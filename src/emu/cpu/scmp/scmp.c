@@ -34,6 +34,7 @@ struct _scmp_state
 
 	legacy_cpu_device *device;
 	address_space *program;
+	direct_read_data *direct;
 	address_space *io;
 	int					icount;
 
@@ -69,14 +70,14 @@ INLINE UINT8 ROP(scmp_state *cpustate)
 {
 	UINT16 pc = cpustate->PC.w.l;
 	cpustate->PC.w.l = ADD12(cpustate->PC.w.l,1);
-	return memory_decrypted_read_byte(cpustate->program,  pc);
+	return cpustate->direct->read_decrypted_byte( pc);
 }
 
 INLINE UINT8 ARG(scmp_state *cpustate)
 {
 	UINT16 pc = cpustate->PC.w.l;
 	cpustate->PC.w.l = ADD12(cpustate->PC.w.l,1);
-	return memory_raw_read_byte(cpustate->program, pc);
+	return cpustate->direct->read_raw_byte(pc);
 }
 
 INLINE UINT8 RM(scmp_state *cpustate,UINT32 a)
@@ -514,6 +515,7 @@ static CPU_INIT( scmp )
 	cpustate->device = device;
 
 	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->direct = &cpustate->program->direct();
 
 	/* resolve callbacks */
 	devcb_resolve_write8(&cpustate->flag_out_func, &cpustate->config.flag_out_func, device);

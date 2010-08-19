@@ -53,7 +53,7 @@ int mips3fe_describe(void *param, opcode_desc *desc, const opcode_desc *prev)
 	}
 
 	/* fetch the opcode */
-	op = desc->opptr.l[0] = memory_decrypted_read_dword(mips->program, desc->physpc);
+	op = desc->opptr.l[0] = mips->direct->read_decrypted_dword(desc->physpc);
 
 	/* all instructions are 4 bytes and default to a single cycle each */
 	desc->length = 4;

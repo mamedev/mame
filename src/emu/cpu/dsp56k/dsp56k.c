@@ -83,7 +83,7 @@ DIRECT_UPDATE_HANDLER( dsp56k_direct_handler )
 /***************************************************************************
     MEMORY ACCESSORS
 ***************************************************************************/
-#define ROPCODE(pc)   memory_decrypted_read_word(cpustate->program, pc)
+#define ROPCODE(pc)   cpustate->direct->read_decrypted_word(pc)
 
 
 /***************************************************************************
@@ -233,6 +233,7 @@ static CPU_INIT( dsp56k )
 	//cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
 	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->direct = &cpustate->program->direct();
 	cpustate->data = device->space(AS_DATA);
 
 	/* Setup the direct memory handler for this CPU */

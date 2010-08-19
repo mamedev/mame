@@ -87,6 +87,7 @@ struct _asap_state
 	int			icount;
 	device_irq_callback irq_callback;
 	address_space *program;
+	direct_read_data *direct;
 	legacy_cpu_device *device;
 
 	/* src2val table, registers are at the end */
@@ -281,7 +282,7 @@ INLINE asap_state *get_safe_token(running_device *device)
     MEMORY ACCESSORS
 ***************************************************************************/
 
-#define ROPCODE(A,pc)	memory_decrypted_read_dword((A)->program, pc)
+#define ROPCODE(A,pc)	(A)->direct->read_decrypted_dword(pc)
 
 
 INLINE UINT8 READBYTE(asap_state *asap, offs_t address)
@@ -446,6 +447,7 @@ static CPU_INIT( asap )
 	asap->irq_callback = irqcallback;
 	asap->device = device;
 	asap->program = device->space(AS_PROGRAM);
+	asap->direct = &asap->program->direct();
 
 
 	state_save_register_device_item(device, 0, asap->pc);

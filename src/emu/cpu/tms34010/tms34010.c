@@ -64,6 +64,7 @@ struct _tms34010_state
 	device_irq_callback	irq_callback;
 	legacy_cpu_device *device;
 	address_space *program;
+	direct_read_data *direct;
 	const tms34010_config *config;
 	screen_device *screen;
 	emu_timer *			scantimer;
@@ -220,32 +221,32 @@ INLINE UINT32 ROPCODE(tms34010_state *tms)
 {
 	UINT32 pc = TOBYTE(tms->pc);
 	tms->pc += 2 << 3;
-	return memory_decrypted_read_word(tms->program, pc);
+	return tms->direct->read_decrypted_word(pc);
 }
 
 INLINE INT16 PARAM_WORD(tms34010_state *tms)
 {
 	UINT32 pc = TOBYTE(tms->pc);
 	tms->pc += 2 << 3;
-	return memory_raw_read_word(tms->program, pc);
+	return tms->direct->read_raw_word(pc);
 }
 
 INLINE INT32 PARAM_LONG(tms34010_state *tms)
 {
 	UINT32 pc = TOBYTE(tms->pc);
 	tms->pc += 4 << 3;
-	return (UINT16)memory_raw_read_word(tms->program, pc) | (memory_raw_read_word(tms->program, pc + 2) << 16);
+	return (UINT16)tms->direct->read_raw_word(pc) | (tms->direct->read_raw_word(pc + 2) << 16);
 }
 
 INLINE INT16 PARAM_WORD_NO_INC(tms34010_state *tms)
 {
-	return memory_raw_read_word(tms->program, TOBYTE(tms->pc));
+	return tms->direct->read_raw_word(TOBYTE(tms->pc));
 }
 
 INLINE INT32 PARAM_LONG_NO_INC(tms34010_state *tms)
 {
 	UINT32 pc = TOBYTE(tms->pc);
-	return (UINT16)memory_raw_read_word(tms->program, pc) | (memory_raw_read_word(tms->program, pc + 2) << 16);
+	return (UINT16)tms->direct->read_raw_word(pc) | (tms->direct->read_raw_word(pc + 2) << 16);
 }
 
 /* read memory byte */
@@ -628,6 +629,7 @@ static CPU_INIT( tms34010 )
 	tms->irq_callback = irqcallback;
 	tms->device = device;
 	tms->program = device->space(AS_PROGRAM);
+	tms->direct = &tms->program->direct();
 	tms->screen = downcast<screen_device *>(device->machine->device(configdata->screen_tag));
 
 	/* set up the state table */
@@ -689,6 +691,7 @@ static CPU_RESET( tms34010 )
 	tms->scantimer = save_scantimer;
 	tms->device = device;
 	tms->program = device->space(AS_PROGRAM);
+	tms->direct = &tms->program->direct();
 
 	/* fetch the initial PC and reset the state */
 	tms->pc = RLONG(tms, 0xffffffe0) & 0xfffffff0;

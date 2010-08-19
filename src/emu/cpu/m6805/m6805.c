@@ -63,6 +63,7 @@ typedef struct
 	device_irq_callback irq_callback;
 	legacy_cpu_device *device;
 	address_space *program;
+	direct_read_data *direct;
 	int 	irq_state[9];		/* KW Additional lines for HD63705 */
 	int		nmi_state;
 } m6805_Regs;
@@ -91,14 +92,14 @@ INLINE m6805_Regs *get_safe_token(running_device *device)
 /* opcodes. In case of system with memory mapped I/O, this function can be  */
 /* used to greatly speed up emulation                                       */
 /****************************************************************************/
-#define M6805_RDOP(Addr) ((unsigned)memory_decrypted_read_byte(cpustate->program, Addr))
+#define M6805_RDOP(Addr) ((unsigned)cpustate->direct->read_decrypted_byte(Addr))
 
 /****************************************************************************/
 /* M6805_RDOP_ARG() is identical to M6805_RDOP() but it's used for reading  */
 /* opcode arguments. This difference can be used to support systems that    */
 /* use different encoding mechanisms for opcodes and opcode arguments       */
 /****************************************************************************/
-#define M6805_RDOP_ARG(Addr) ((unsigned)memory_raw_read_byte(cpustate->program, Addr))
+#define M6805_RDOP_ARG(Addr) ((unsigned)cpustate->direct->read_raw_byte(Addr))
 
 #define SUBTYPE	cpustate->subtype	/* CPU Type */
 #define SP_MASK cpustate->sp_mask	/* stack pointer mask */
@@ -459,6 +460,7 @@ static CPU_INIT( m6805 )
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
 	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->direct = &cpustate->program->direct();
 }
 
 static CPU_RESET( m6805 )
@@ -472,6 +474,7 @@ static CPU_RESET( m6805 )
 	cpustate->irq_callback = save_irqcallback;
 	cpustate->device = device;
 	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->direct = &cpustate->program->direct();
 
 	/* Force CPU sub-type and relevant masks */
 	cpustate->subtype = SUBTYPE_M6805;

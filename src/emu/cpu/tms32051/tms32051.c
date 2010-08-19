@@ -145,6 +145,7 @@ struct _tms32051_state
 	device_irq_callback irq_callback;
 	legacy_cpu_device *device;
 	address_space *program;
+	direct_read_data *direct;
 	address_space *data;
 	int icount;
 };
@@ -164,7 +165,7 @@ static void check_interrupts(tms32051_state *cpustate);
 
 #define CYCLES(x)		(cpustate->icount -= x)
 
-#define ROPCODE(cpustate)		memory_decrypted_read_word(cpustate->program, (cpustate->pc++) << 1)
+#define ROPCODE(cpustate)		cpustate->direct->read_decrypted_word((cpustate->pc++) << 1)
 
 INLINE void CHANGE_PC(tms32051_state *cpustate, UINT16 new_pc)
 {
@@ -224,6 +225,7 @@ static CPU_INIT( tms )
 
 	cpustate->device = device;
 	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->direct = &cpustate->program->direct();
 	cpustate->data = device->space(AS_DATA);
 }
 

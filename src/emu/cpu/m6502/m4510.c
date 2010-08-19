@@ -145,6 +145,7 @@ struct _m4510_Regs {
 	device_irq_callback irq_callback;
 	legacy_cpu_device *device;
 	address_space *space;
+	direct_read_data *direct;
 	int 	icount;
 
 	read8_space_func rdmem_id;					/* readmem callback for indexed instructions */
@@ -170,13 +171,13 @@ INLINE m4510_Regs *get_safe_token(running_device *device)
 INLINE int m4510_cpu_readop(m4510_Regs *cpustate)
 {
 	register UINT16 t=cpustate->pc.w.l++;
-	return memory_decrypted_read_byte(cpustate->space, M4510_MEM(t));
+	return cpustate->direct->read_decrypted_byte(M4510_MEM(t));
 }
 
 INLINE int m4510_cpu_readop_arg(m4510_Regs *cpustate)
 {
 	register UINT16 t=cpustate->pc.w.l++;
-	return memory_raw_read_byte(cpustate->space, M4510_MEM(t));
+	return cpustate->direct->read_raw_byte(M4510_MEM(t));
 }
 
 #define M4510
@@ -206,6 +207,7 @@ static CPU_INIT( m4510 )
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
 	cpustate->space = device->space(AS_PROGRAM);
+	cpustate->direct = &cpustate->space->direct();
 
 	if ( intf )
 	{

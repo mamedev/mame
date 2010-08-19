@@ -99,6 +99,7 @@ typedef struct
 
 	legacy_cpu_device *device;
 	address_space *program;
+	direct_read_data *direct;
 	int icount;
 } cquestsnd_state;
 
@@ -140,6 +141,7 @@ typedef struct
 	legacy_cpu_device *device;
 	legacy_cpu_device *lindevice;
 	address_space *program;
+	direct_read_data *direct;
 	int icount;
 } cquestrot_state;
 
@@ -186,6 +188,7 @@ typedef struct
 	legacy_cpu_device *device;
 	legacy_cpu_device *rotdevice;
 	address_space *program;
+	direct_read_data *direct;
 	int icount;
 } cquestlin_state;
 
@@ -287,6 +290,7 @@ static CPU_INIT( cquestsnd )
 
 	cpustate->device = device;
 	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->direct = &cpustate->program->direct();
 
 	/* Allocate RAM shared with 68000 */
 	cpustate->sram = auto_alloc_array(device->machine, UINT16, 4096/2);
@@ -361,6 +365,7 @@ static CPU_INIT( cquestrot )
 	cpustate->device = device;
 	cpustate->lindevice = device->machine->device<legacy_cpu_device>(rotconfig->lin_cpu_tag);
 	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->direct = &cpustate->program->direct();
 
 	cquestrot_state_register(device);
 }
@@ -446,6 +451,7 @@ static CPU_INIT( cquestlin )
 	cpustate->device = device;
 	cpustate->rotdevice = device->machine->device<legacy_cpu_device>(linconfig->rot_cpu_tag);
 	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->direct = &cpustate->program->direct();
 
 	cquestlin_state_register(device);
 }
@@ -503,7 +509,7 @@ static CPU_EXECUTE( cquestsnd )
 	do
 	{
 		/* Decode the instruction */
-		UINT64 inst = memory_decrypted_read_qword(cpustate->program, SND_PC << 3);
+		UINT64 inst = cpustate->direct->read_decrypted_qword(SND_PC << 3);
 		UINT32 inslow = inst & 0xffffffff;
 		UINT32 inshig = inst >> 32;
 
@@ -764,7 +770,7 @@ static CPU_EXECUTE( cquestrot )
 	do
 	{
 		/* Decode the instruction */
-		UINT64 inst = memory_decrypted_read_qword(cpustate->program, ROT_PC << 3);
+		UINT64 inst = cpustate->direct->read_decrypted_qword(ROT_PC << 3);
 
 		UINT32 inslow = inst & 0xffffffff;
 		UINT32 inshig = inst >> 32;
@@ -1193,7 +1199,7 @@ static CPU_EXECUTE( cquestlin )
 		/* Are we executing the foreground or backgroud program? */
 		int prog = (cpustate->clkcnt & 3) ? BACKGROUND : FOREGROUND;
 
-		UINT64 inst = memory_decrypted_read_qword(cpustate->program, LINE_PC << 3);
+		UINT64 inst = cpustate->direct->read_decrypted_qword(LINE_PC << 3);
 
 		UINT32 inslow = inst & 0xffffffff;
 		UINT32 inshig = inst >> 32;

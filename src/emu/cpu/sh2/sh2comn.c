@@ -729,6 +729,7 @@ void sh2_common_init(sh2_state *sh2, legacy_cpu_device *device, device_irq_callb
 	sh2->irq_callback = irqcallback;
 	sh2->device = device;
 	sh2->program = device->space(AS_PROGRAM);
+	sh2->direct = &sh2->program->direct();
 	sh2->internal = device->space(AS_PROGRAM);
 
 	state_save_register_device_item(device, 0, sh2->pc);

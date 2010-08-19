@@ -80,6 +80,7 @@ struct _m6509_Regs {
 	device_irq_callback irq_callback;
 	legacy_cpu_device *device;
 	address_space *space;
+	direct_read_data *direct;
 
 	int 	icount;
 
@@ -147,6 +148,7 @@ static CPU_INIT( m6509 )
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
 	cpustate->space = device->space(AS_PROGRAM);
+	cpustate->direct = &cpustate->space->direct();
 
 	if ( intf )
 	{

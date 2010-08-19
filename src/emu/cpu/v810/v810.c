@@ -32,6 +32,7 @@ struct _v810_state
 	device_irq_callback irq_cb;
 	legacy_cpu_device *device;
 	address_space *program;
+	direct_read_data *direct;
 	address_space *io;
 	UINT32 PPC;
 	int icount;
@@ -128,7 +129,7 @@ INLINE v810_state *get_safe_token(running_device *device)
 #define WIO_H(cs, addr, val) ((cs)->io->write_word(addr,val))
 #define WIO_W(cs, addr, val) ((cs)->io->write_dword(addr,val))
 
-#define R_OP(cs, addr)	(memory_decrypted_read_word((cs)->program, addr))
+#define R_OP(cs, addr)	((cs)->direct->read_decrypted_word(addr))
 
 #define GET1 (op&0x1f)
 #define GET2 ((op>>5)&0x1f)
@@ -1002,6 +1003,7 @@ static CPU_INIT( v810 )
 	cpustate->irq_cb = irqcallback;
 	cpustate->device = device;
 	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->direct = &cpustate->program->direct();
 	cpustate->io = device->space(AS_IO);
 
 	state_save_register_device_item_array(device, 0, cpustate->reg);

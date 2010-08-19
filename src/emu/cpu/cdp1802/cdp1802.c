@@ -27,6 +27,7 @@ struct _cdp1802_state
 	const cdp1802_interface *intf;
 
     address_space *program;
+    direct_read_data *direct;
     address_space *io;
 
 	devcb_resolved_write_line	out_q_func;
@@ -74,7 +75,7 @@ INLINE cdp1802_state *get_safe_token(running_device *device)
 	return (cdp1802_state *)downcast<legacy_cpu_device *>(device)->token();
 }
 
-#define OPCODE_R(addr)		memory_decrypted_read_byte(cpustate->program, addr)
+#define OPCODE_R(addr)		cpustate->direct->read_decrypted_byte(addr)
 #define RAM_R(addr)			cpustate->program->read_byte(addr)
 #define RAM_W(addr, data)	cpustate->program->write_byte(addr, data)
 #define IO_R(addr)			cpustate->io->read_byte(addr)
@@ -988,6 +989,7 @@ static CPU_INIT( cdp1802 )
 
 	/* find address spaces */
 	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->direct = &cpustate->program->direct();
 	cpustate->io = device->space(AS_IO);
 
 	/* set initial values */

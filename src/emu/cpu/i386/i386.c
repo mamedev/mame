@@ -549,6 +549,7 @@ static CPU_INIT( i386 )
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
 	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->direct = &cpustate->program->direct();
 	cpustate->io = device->space(AS_IO);
 
 	state_save_register_device_item_array(device, 0,	cpustate->reg.d);
@@ -648,6 +649,7 @@ static CPU_RESET( i386 )
 	cpustate->irq_callback = save_irqcallback;
 	cpustate->device = device;
 	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->direct = &cpustate->program->direct();
 	cpustate->io = device->space(AS_IO);
 
 	cpustate->sreg[CS].selector = 0xf000;
@@ -1103,6 +1105,7 @@ static CPU_RESET( i486 )
 	cpustate->irq_callback = save_irqcallback;
 	cpustate->device = device;
 	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->direct = &cpustate->program->direct();
 	cpustate->io = device->space(AS_IO);
 
 	cpustate->sreg[CS].selector = 0xf000;
@@ -1219,6 +1222,7 @@ static CPU_RESET( pentium )
 	cpustate->irq_callback = save_irqcallback;
 	cpustate->device = device;
 	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->direct = &cpustate->program->direct();
 	cpustate->io = device->space(AS_IO);
 
 	cpustate->sreg[CS].selector = 0xf000;
@@ -1350,6 +1354,7 @@ static CPU_RESET( mediagx )
 	cpustate->irq_callback = save_irqcallback;
 	cpustate->device = device;
 	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->direct = &cpustate->program->direct();
 	cpustate->io = device->space(AS_IO);
 
 	cpustate->sreg[CS].selector = 0xf000;

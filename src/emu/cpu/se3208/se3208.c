@@ -25,6 +25,7 @@ struct _se3208_state_t
 	device_irq_callback irq_callback;
 	legacy_cpu_device *device;
 	address_space *program;
+	direct_read_data *direct;
 	UINT8 IRQ;
 	UINT8 NMI;
 
@@ -1718,6 +1719,7 @@ static CPU_RESET( se3208 )
 	se3208_state->irq_callback = save_irqcallback;
 	se3208_state->device = device;
 	se3208_state->program = device->space(AS_PROGRAM);
+	se3208_state->direct = &se3208_state->program->direct();
 	se3208_state->PC=SE3208_Read32(se3208_state, 0);
 	se3208_state->SR=0;
 	se3208_state->IRQ=CLEAR_LINE;
@@ -1758,7 +1760,7 @@ static CPU_EXECUTE( se3208 )
 
 	do
 	{
-		UINT16 Opcode=memory_decrypted_read_word(se3208_state->program, WORD_XOR_LE(se3208_state->PC));
+		UINT16 Opcode=se3208_state->direct->read_decrypted_word(WORD_XOR_LE(se3208_state->PC));
 
 		debugger_instruction_hook(device, se3208_state->PC);
 
@@ -1788,6 +1790,7 @@ static CPU_INIT( se3208 )
 	se3208_state->irq_callback = irqcallback;
 	se3208_state->device = device;
 	se3208_state->program = device->space(AS_PROGRAM);
+	se3208_state->direct = &se3208_state->program->direct();
 }
 
 static CPU_EXIT( se3208 )

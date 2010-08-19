@@ -163,7 +163,8 @@ enum
 	endianness_t endian;				\
     device_irq_callback irq_callback;		\
     legacy_cpu_device *device;		\
-    address_space *program;
+    address_space *program;			\
+    direct_read_data *direct;
 
 
 /* CPU state struct */

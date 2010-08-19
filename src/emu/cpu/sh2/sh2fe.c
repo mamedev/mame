@@ -43,7 +43,7 @@ int sh2_describe(void *param, opcode_desc *desc, const opcode_desc *prev)
 	UINT16 opcode;
 
 	/* fetch the opcode */
-	opcode = desc->opptr.w[0] = memory_decrypted_read_word(context->program, SH2_CODE_XOR(desc->physpc));
+	opcode = desc->opptr.w[0] = context->direct->read_decrypted_word(SH2_CODE_XOR(desc->physpc));
 
 	/* all instructions are 2 bytes and most are a single cycle */
 	desc->length = 2;

@@ -57,6 +57,7 @@ struct _sc61860_state
 
     legacy_cpu_device *device;
     address_space *program;
+    direct_read_data *direct;
     int icount;
 };
 
@@ -106,6 +107,7 @@ static CPU_INIT( sc61860 )
 	timer_pulse(device->machine, ATTOTIME_IN_HZ(500), cpustate, 0, sc61860_2ms_tick);
 	cpustate->device = device;
 	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->direct = &cpustate->program->direct();
 }
 
 static CPU_EXECUTE( sc61860 )

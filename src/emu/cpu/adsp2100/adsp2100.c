@@ -264,6 +264,7 @@ typedef struct
 
 	/* memory spaces */
     address_space *program;
+    direct_read_data *direct;
     address_space *data;
     address_space *io;
 
@@ -346,7 +347,7 @@ INLINE void WWORD_PGM(adsp2100_state *adsp, UINT32 addr, UINT32 data)
 	adsp->program->write_dword(addr << 2, data & 0xffffff);
 }
 
-#define ROPCODE(a) memory_decrypted_read_dword((a)->program, (a)->pc << 2)
+#define ROPCODE(a) (a)->direct->read_decrypted_dword((a)->pc << 2)
 
 
 /***************************************************************************
@@ -578,6 +579,7 @@ static adsp2100_state *adsp21xx_init(legacy_cpu_device *device, device_irq_callb
 	/* fetch device parameters */
 	adsp->device = device;
 	adsp->program = device->space(AS_PROGRAM);
+	adsp->direct = &adsp->program->direct();
 	adsp->data = device->space(AS_DATA);
 	adsp->io = device->space(AS_IO);
 

@@ -71,6 +71,7 @@ struct _m6502_Regs
 	device_irq_callback irq_callback;
 	legacy_cpu_device *device;
 	address_space *space;
+	direct_read_data *direct;
 	address_space *io;
 	int		int_occured;
 	int		icount;
@@ -135,6 +136,7 @@ static void m6502_common_init(legacy_cpu_device *device, device_irq_callback irq
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
 	cpustate->space = device->space(AS_PROGRAM);
+	cpustate->direct = &cpustate->space->direct();
 	cpustate->subtype = subtype;
 	cpustate->insn = insn;
 	cpustate->rdmem_id = default_rdmem_id;

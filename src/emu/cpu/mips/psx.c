@@ -187,6 +187,7 @@ struct _psxcpu_state
 	device_irq_callback irq_callback;
 	legacy_cpu_device *device;
 	address_space *program;
+	direct_read_data *direct;
 	int bus_attached;
 	UINT32 bad_byte_address_mask;
 	UINT32 bad_half_address_mask;
@@ -1342,7 +1343,7 @@ INLINE void mips_set_cp0r( psxcpu_state *psxcpu, int reg, UINT32 value )
 		( psxcpu->cp0r[ CP0_SR ] & SR_IEC ) != 0 &&
 		( psxcpu->cp0r[ CP0_SR ] & psxcpu->cp0r[ CP0_CAUSE ] & CAUSE_IP ) != 0 )
 	{
-		psxcpu->op = memory_decrypted_read_dword( psxcpu->program, psxcpu->pc );
+		psxcpu->op = psxcpu->direct->read_decrypted_dword( psxcpu->pc );
 		mips_execute_unstoppable_instructions( psxcpu, 1 );
 		mips_exception( psxcpu, EXC_INT );
 	}
@@ -1375,11 +1376,11 @@ static void mips_fetch_next_op( psxcpu_state *psxcpu )
 	{
 		UINT32 safepc = psxcpu->delayv & ~psxcpu->bad_word_address_mask;
 
-		psxcpu->op = memory_decrypted_read_dword( psxcpu->program, safepc );
+		psxcpu->op = psxcpu->direct->read_decrypted_dword( safepc );
 	}
 	else
 	{
-		psxcpu->op = memory_decrypted_read_dword( psxcpu->program, psxcpu->pc + 4 );
+		psxcpu->op = psxcpu->direct->read_decrypted_dword( psxcpu->pc + 4 );
 	}
 }
 
@@ -1636,6 +1637,7 @@ static CPU_INIT( psxcpu )
 	psxcpu->irq_callback = irqcallback;
 	psxcpu->device = device;
 	psxcpu->program = device->space(AS_PROGRAM);
+	psxcpu->direct = &psxcpu->program->direct();
 
 	mips_state_register( "psxcpu", device );
 }
@@ -1852,7 +1854,7 @@ static CPU_EXECUTE( psxcpu )
 		if (LOG_BIOSCALL) log_bioscall( psxcpu );
 		debugger_instruction_hook(device,  psxcpu->pc );
 
-		psxcpu->op = memory_decrypted_read_dword( psxcpu->program, psxcpu->pc );
+		psxcpu->op = psxcpu->direct->read_decrypted_dword( psxcpu->pc );
 		switch( INS_OP( psxcpu->op ) )
 		{
 		case OP_SPECIAL:

@@ -132,7 +132,9 @@ typedef struct _am29000_state
 	UINT32			next_pc;
 
 	address_space *program;
+	direct_read_data *direct;
 	address_space *data;
+	direct_read_data *datadirect;
 	address_space *io;
 } am29000_state;
 
@@ -153,7 +155,9 @@ static CPU_INIT( am29000 )
 	am29000_state *am29000 = get_safe_token(device);
 
 	am29000->program = device->space(AS_PROGRAM);
+	am29000->direct = &am29000->program->direct();
 	am29000->data = device->space(AS_DATA);
+	am29000->datadirect = &am29000->data->direct();
 	am29000->io = device->space(AS_IO);
 	am29000->cfg = (PRL_AM29000 | PRL_REV_D) << CFG_PRL_SHIFT;
 
@@ -267,7 +271,7 @@ static UINT32 read_program_word(am29000_state *state, UINT32 address)
 {
 	/* TODO: ROM enable? */
 	if (state->cps & CPS_PI || state->cps & CPS_RE)
-		return memory_decrypted_read_dword(state->program, address);
+		return state->direct->read_decrypted_dword(address);
 	else
 	{
 		fatalerror("Am29000 instruction MMU translation enabled!");
@@ -414,7 +418,7 @@ static CPU_EXECUTE( am29000 )
 			if (am29000->cfg & CFG_VF)
 			{
 				UINT32 vaddr = am29000->vab | am29000->exception_queue[0] * 4;
-				UINT32 vect = memory_decrypted_read_dword(am29000->data, vaddr);
+				UINT32 vect = am29000->datadirect->read_decrypted_dword(vaddr);
 
 				am29000->pc = vect & ~3;
 				am29000->next_pc = am29000->pc;

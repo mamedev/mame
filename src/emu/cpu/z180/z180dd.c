@@ -1,6 +1,6 @@
 OP(illegal,1) {
 	logerror("Z180 '%s' ill. opcode $%02x $%02x\n",
-			cpustate->device->tag(), memory_decrypted_read_byte(cpustate->program, (cpustate->_PCD-1)&0xffff), memory_decrypted_read_byte(cpustate->program, cpustate->_PCD));
+			cpustate->device->tag(), cpustate->direct->read_decrypted_byte((cpustate->_PCD-1)&0xffff), cpustate->direct->read_decrypted_byte(cpustate->_PCD));
 }
 
 /**********************************************************

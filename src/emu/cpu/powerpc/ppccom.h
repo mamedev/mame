@@ -553,6 +553,7 @@ struct _powerpc_state
 	device_irq_callback irq_callback;
 	legacy_cpu_device *	device;
 	address_space *program;
+	direct_read_data *direct;
 	offs_t			codexor;
 	UINT32			irq_pending;
 	UINT32			system_clock;

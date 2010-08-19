@@ -55,6 +55,7 @@ struct _f8_Regs
 	device_irq_callback irq_callback;
 	legacy_cpu_device *device;
 	address_space *program;
+	direct_read_data *direct;
 	address_space *iospace;
 	int icount;
 	UINT8   r[64];  /* scratchpad RAM */
@@ -118,7 +119,7 @@ static void ROMC_00(f8_Regs *cpustate, int insttim)	/* SKR - added parameter to 
      * of PC0.
      */
 
-	cpustate->dbus = memory_decrypted_read_byte(cpustate->program, cpustate->pc0);
+	cpustate->dbus = cpustate->direct->read_decrypted_byte(cpustate->pc0);
     cpustate->pc0 += 1;
     cpustate->icount -= insttim;	/* SKR - ROMC00 is usually short, not short+long, */
                             /* but DS is long */
@@ -132,7 +133,7 @@ static void ROMC_01(f8_Regs *cpustate)
      * location addressed by PC0; then all devices add the 8-bit value
      * on the data bus as signed binary number to PC0.
      */
-	cpustate->dbus = memory_raw_read_byte(cpustate->program, cpustate->pc0);
+	cpustate->dbus = cpustate->direct->read_raw_byte(cpustate->pc0);
 	cpustate->pc0 += (INT8)cpustate->dbus;
     cpustate->icount -= cL;
 }
@@ -156,7 +157,7 @@ static void ROMC_03(f8_Regs *cpustate, int insttim)	/* SKR - added parameter to 
      * Similiar to 0x00, except that it is used for immediate operands
      * fetches (using PC0) instead of instruction fetches.
      */
-    cpustate->dbus = cpustate->io = memory_raw_read_byte(cpustate->program, cpustate->pc0);
+    cpustate->dbus = cpustate->io = cpustate->direct->read_raw_byte(cpustate->pc0);
     cpustate->pc0 += 1;
     cpustate->icount -= insttim;
 }
@@ -250,7 +251,7 @@ static void ROMC_0C(f8_Regs *cpustate)
      * by PC0 into the data bus; then all devices move the value that
      * has just been placed on the data bus into the low order byte of PC0.
      */
-    cpustate->dbus = memory_raw_read_byte(cpustate->program, cpustate->pc0);
+    cpustate->dbus = cpustate->direct->read_raw_byte(cpustate->pc0);
     cpustate->pc0 = (cpustate->pc0 & 0xff00) | cpustate->dbus;
     cpustate->icount -= cL;
 }
@@ -273,7 +274,7 @@ static void ROMC_0E(f8_Regs *cpustate)
      * The value on the data bus is then moved to the low order byte
      * of DC0 by all devices.
      */
-    cpustate->dbus = memory_raw_read_byte(cpustate->program, cpustate->pc0);
+    cpustate->dbus = cpustate->direct->read_raw_byte(cpustate->pc0);
     cpustate->dc0 = (cpustate->dc0 & 0xff00) | cpustate->dbus;
     cpustate->icount -= cL;
 }
@@ -313,7 +314,7 @@ static void ROMC_11(f8_Regs *cpustate)
      * data bus. All devices must then move the contents of the
      * data bus to the upper byte of DC0.
      */
-    cpustate->dbus = memory_raw_read_byte(cpustate->program, cpustate->pc0);
+    cpustate->dbus = cpustate->direct->read_raw_byte(cpustate->pc0);
 	cpustate->dc0 = (cpustate->dc0 & 0x00ff) | (cpustate->dbus << 8);
     cpustate->icount -= cL;
 }
@@ -1551,6 +1552,7 @@ static CPU_RESET( f8 )
 	cpustate->irq_callback = save_callback;
 	cpustate->device = device;
 	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->direct = &cpustate->program->direct();
 	cpustate->iospace = device->space(AS_IO);
 	cpustate->w&=~I;
 
@@ -1898,6 +1900,7 @@ static CPU_INIT( f8 )
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
 	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->direct = &cpustate->program->direct();
 	cpustate->iospace = device->space(AS_IO);
 
 	state_save_register_device_item(device, 0, cpustate->pc0);
@@ -1923,14 +1926,14 @@ static CPU_SET_INFO( f8 )
 	case CPUINFO_INT_SP:			cpustate->pc1 = info->i;						break;
 	case CPUINFO_INT_PC:
 		cpustate->pc0 = info->i;
-		cpustate->dbus = memory_decrypted_read_byte(cpustate->program, cpustate->pc0);
+		cpustate->dbus = cpustate->direct->read_decrypted_byte(cpustate->pc0);
     	cpustate->pc0 += 1;
 		break;
 	case CPUINFO_INT_PREVIOUSPC:	break;	/* TODO? */
 	case CPUINFO_INT_INPUT_STATE:		cpustate->irq_request = info->i;				break;
 	case CPUINFO_INT_REGISTER + F8_PC0:
 		cpustate->pc0 = info->i;
-		cpustate->dbus = memory_decrypted_read_byte(cpustate->program, cpustate->pc0);
+		cpustate->dbus = cpustate->direct->read_decrypted_byte(cpustate->pc0);
     	cpustate->pc0 += 1;
 		break;
 	case CPUINFO_INT_REGISTER + F8_PC1: cpustate->pc1 = info->i; break;

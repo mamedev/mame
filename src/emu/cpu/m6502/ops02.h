@@ -70,13 +70,13 @@
 /***************************************************************
  *  RDOP    read an opcode
  ***************************************************************/
-#define RDOP() memory_decrypted_read_byte(cpustate->space, PCW++); cpustate->icount -= 1
-#define PEEKOP() memory_decrypted_read_byte(cpustate->space, PCW)
+#define RDOP() cpustate->direct->read_decrypted_byte(PCW++); cpustate->icount -= 1
+#define PEEKOP() cpustate->direct->read_decrypted_byte(PCW)
 
 /***************************************************************
  *  RDOPARG read an opcode argument
  ***************************************************************/
-#define RDOPARG() memory_raw_read_byte(cpustate->space, PCW++); cpustate->icount -= 1
+#define RDOPARG() cpustate->direct->read_raw_byte(PCW++); cpustate->icount -= 1
 
 /***************************************************************
  *  RDMEM   read memory
@@ -507,7 +507,7 @@
  *  ILL Illegal opcode
  ***************************************************************/
 #define ILL 													\
-	logerror("M6502 illegal opcode %04x: %02x\n",(PCW-1)&0xffff, memory_decrypted_read_byte(cpustate->space, (PCW-1)&0xffff))
+	logerror("M6502 illegal opcode %04x: %02x\n",(PCW-1)&0xffff, cpustate->direct->read_decrypted_byte((PCW-1)&0xffff))
 
 /* 6502 ********************************************************
  *  INC Increment memory

@@ -54,6 +54,7 @@ struct _ssp1601_state_t
 
 	legacy_cpu_device *device;
 	address_space *program;
+	direct_read_data *direct;
 	address_space *io;
 };
 
@@ -83,7 +84,7 @@ INLINE ssp1601_state_t *get_safe_token(running_device *device)
 
 #define PPC    ssp1601_state->ppc.w.h
 
-#define FETCH() memory_decrypted_read_word(ssp1601_state->program, rPC++ << 1)
+#define FETCH() ssp1601_state->direct->read_decrypted_word(rPC++ << 1)
 #define PROGRAM_WORD(a) ssp1601_state->program->read_word((a) << 1)
 #define GET_PPC_OFFS() PPC
 
@@ -529,6 +530,7 @@ static CPU_INIT( ssp1601 )
 	ssp1601_state->gr[0].w.h = 0xffff; // constant reg
 	ssp1601_state->device = device;
 	ssp1601_state->program = device->space(AS_PROGRAM);
+	ssp1601_state->direct = &ssp1601_state->program->direct();
 	ssp1601_state->io = device->space(AS_IO);
 
 }

@@ -84,6 +84,7 @@ struct _saturn_state
 	device_irq_callback irq_callback;
 	legacy_cpu_device *device;
 	address_space *program;
+	direct_read_data *direct;
 	int icount;
 };
 
@@ -115,6 +116,7 @@ static CPU_INIT( saturn )
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
 	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->direct = &cpustate->program->direct();
 
 	state_save_register_device_item_array(device, 0,cpustate->reg[R0]);
 	state_save_register_device_item_array(device, 0,cpustate->reg[R1]);

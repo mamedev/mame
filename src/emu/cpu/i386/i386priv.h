@@ -229,6 +229,7 @@ struct _i386_state
 	device_irq_callback irq_callback;
 	legacy_cpu_device *device;
 	address_space *program;
+	direct_read_data *direct;
 	address_space *io;
 	UINT32 a20_mask;
 
@@ -402,7 +403,7 @@ INLINE UINT8 FETCH(i386_state *cpustate)
 		translate_address(cpustate,&address);
 	}
 
-	value = memory_decrypted_read_byte(cpustate->program, address & cpustate->a20_mask);
+	value = cpustate->direct->read_decrypted_byte(address & cpustate->a20_mask);
 	cpustate->eip++;
 	cpustate->pc++;
 	return value;
@@ -421,7 +422,7 @@ INLINE UINT16 FETCH16(i386_state *cpustate)
 			translate_address(cpustate,&address);
 		}
 		address &= cpustate->a20_mask;
-		value = memory_decrypted_read_word(cpustate->program, address);
+		value = cpustate->direct->read_decrypted_word(address);
 		cpustate->eip += 2;
 		cpustate->pc += 2;
 	}
@@ -444,7 +445,7 @@ INLINE UINT32 FETCH32(i386_state *cpustate)
 		}
 
 		address &= cpustate->a20_mask;
-		value = memory_decrypted_read_dword(cpustate->program, address);
+		value = cpustate->direct->read_decrypted_dword(address);
 		cpustate->eip += 4;
 		cpustate->pc += 4;
 	}

@@ -55,9 +55,9 @@ static UINT16 bcd_sub( UINT16 a, UINT16 b);
 #define RM(Addr) ((unsigned)cpustate->program->read_byte(Addr))
 #define WM(Addr,Value) (cpustate->program->write_byte(Addr, Value))
 
-#define IMMBYTE(b)	b = ((unsigned)memory_raw_read_byte(cpustate->program, pPC)); pPC++
-#define SIMMBYTE(b)	b = ((signed)memory_raw_read_byte(cpustate->program, pPC)); pPC++
-#define IMMWORD(w)	w.b.h = (unsigned)memory_raw_read_byte(cpustate->program, pPC++); w.b.l = (unsigned)memory_raw_read_byte(cpustate->program, pPC++)
+#define IMMBYTE(b)	b = ((unsigned)cpustate->direct->read_raw_byte(pPC)); pPC++
+#define SIMMBYTE(b)	b = ((signed)cpustate->direct->read_raw_byte(pPC)); pPC++
+#define IMMWORD(w)	w.b.h = (unsigned)cpustate->direct->read_raw_byte(pPC++); w.b.l = (unsigned)cpustate->direct->read_raw_byte(pPC++)
 
 #define PUSHBYTE(b) pSP++; WM(pSP,b)
 #define PUSHWORD(w) pSP++; WM(pSP,w.b.h); pSP++; WM(pSP,w.b.l)
@@ -75,6 +75,7 @@ struct _tms7000_state
 	device_irq_callback irq_callback;
 	legacy_cpu_device *device;
 	address_space *program;
+	direct_read_data *direct;
 	address_space *io;
 	int			icount;
 	int 		div_by_16_trigger;
@@ -165,6 +166,7 @@ static CPU_INIT( tms7000 )
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
 	cpustate->program = device->space(AS_PROGRAM);
+	cpustate->direct = &cpustate->program->direct();
 	cpustate->io = device->space(AS_IO);
 
 	memset(cpustate->pf, 0, 0x100);
@@ -454,7 +456,7 @@ static CPU_EXECUTE( tms7000 )
 
 		if( cpustate->idle_state == 0 )
 		{
-			op = memory_decrypted_read_byte(cpustate->program, pPC++);
+			op = cpustate->direct->read_decrypted_byte(pPC++);
 
 			opfn[op](cpustate);
 		}
@@ -495,7 +497,7 @@ static CPU_EXECUTE( tms7000_exl )
 		if( cpustate->idle_state == 0 )
 		{
 
-			op = memory_decrypted_read_byte(cpustate->program, pPC++);
+			op = cpustate->direct->read_decrypted_byte(pPC++);
 
 			opfn_exl[op](cpustate);
 		}

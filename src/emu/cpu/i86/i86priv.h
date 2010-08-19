@@ -112,10 +112,10 @@ typedef enum {
 #define WriteWord(ea,val)		write_mem_word((ea) & AMASK, val);
 
 #define FETCH_XOR(a)			((a) ^ cpustate->mem.fetch_xor)
-#define FETCH					(memory_raw_read_byte(cpustate->program, FETCH_XOR(cpustate->pc++)))
-#define FETCHOP					(memory_decrypted_read_byte(cpustate->program, FETCH_XOR(cpustate->pc++)))
-#define PEEKOP(addr)			(memory_decrypted_read_byte(cpustate->program, FETCH_XOR(addr)))
-#define FETCHWORD(var)			{ var = memory_raw_read_byte(cpustate->program, FETCH_XOR(cpustate->pc)); var += (memory_raw_read_byte(cpustate->program, FETCH_XOR(cpustate->pc + 1)) << 8); cpustate->pc += 2; }
+#define FETCH					(cpustate->direct->read_raw_byte(FETCH_XOR(cpustate->pc++)))
+#define FETCHOP					(cpustate->direct->read_decrypted_byte(FETCH_XOR(cpustate->pc++)))
+#define PEEKOP(addr)			(cpustate->direct->read_decrypted_byte(FETCH_XOR(addr)))
+#define FETCHWORD(var)			{ var = cpustate->direct->read_raw_byte(FETCH_XOR(cpustate->pc)); var += (cpustate->direct->read_raw_byte(FETCH_XOR(cpustate->pc + 1)) << 8); cpustate->pc += 2; }
 #define CHANGE_PC(addr)
 #define PUSH(val)				{ cpustate->regs.w[SP] -= 2; WriteWord(((cpustate->base[SS] + cpustate->regs.w[SP]) & AMASK), val); }
 #define POP(var)				{ var = ReadWord(((cpustate->base[SS] + cpustate->regs.w[SP]) & AMASK)); cpustate->regs.w[SP] += 2; }

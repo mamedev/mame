@@ -151,6 +151,7 @@ struct _z80_state
 	device_irq_callback irq_callback;
 	legacy_cpu_device *device;
 	address_space *program;
+	direct_read_data *direct;
 	address_space *io;
 	int				icount;
 	z80_daisy_chain daisy;
@@ -639,7 +640,7 @@ INLINE UINT8 ROP(z80_state *z80)
 {
 	unsigned pc = z80->PCD;
 	z80->PC++;
-	return memory_decrypted_read_byte(z80->program, pc);
+	return z80->direct->read_decrypted_byte(pc);
 }
 
 /****************************************************************
@@ -652,14 +653,14 @@ INLINE UINT8 ARG(z80_state *z80)
 {
 	unsigned pc = z80->PCD;
 	z80->PC++;
-	return memory_raw_read_byte(z80->program, pc);
+	return z80->direct->read_raw_byte(pc);
 }
 
 INLINE UINT32 ARG16(z80_state *z80)
 {
 	unsigned pc = z80->PCD;
 	z80->PC += 2;
-	return memory_raw_read_byte(z80->program, pc) | (memory_raw_read_byte(z80->program, (pc+1)&0xffff) << 8);
+	return z80->direct->read_raw_byte(pc) | (z80->direct->read_raw_byte((pc+1)&0xffff) << 8);
 }
 
 /***************************************************************
@@ -2036,7 +2037,7 @@ OP(xycb,ff) { z80->A = SET(7, RM(z80, z80->ea)); WM(z80, z80->ea,z80->A);			} /*
 
 OP(illegal,1) {
 	logerror("Z80 '%s' ill. opcode $%02x $%02x\n",
-			z80->device->tag(), memory_decrypted_read_byte(z80->program, (z80->PCD-1)&0xffff), memory_decrypted_read_byte(z80->program, z80->PCD));
+			z80->device->tag(), z80->direct->read_decrypted_byte((z80->PCD-1)&0xffff), z80->direct->read_decrypted_byte(z80->PCD));
 }
 
 /**********************************************************
@@ -2624,7 +2625,7 @@ OP(fd,ff) { illegal_1(z80); op_ff(z80);												} /* DB   FD          */
 OP(illegal,2)
 {
 	logerror("Z80 '%s' ill. opcode $ed $%02x\n",
-			z80->device->tag(), memory_decrypted_read_byte(z80->program, (z80->PCD-1)&0xffff));
+			z80->device->tag(), z80->direct->read_decrypted_byte((z80->PCD-1)&0xffff));
 }
 
 /**********************************************************
@@ -3470,6 +3471,7 @@ static CPU_INIT( z80 )
 	z80->irq_callback = irqcallback;
 	z80->device = device;
 	z80->program = device->space(AS_PROGRAM);
+	z80->direct = &z80->program->direct();
 	z80->io = device->space(AS_IO);
 	z80->IX = z80->IY = 0xffff; /* IX and IY are FFFF after a reset! */
 	z80->F = ZF;			/* Zero flag is set */

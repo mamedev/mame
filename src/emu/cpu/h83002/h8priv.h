@@ -29,6 +29,7 @@ struct _h83xx_state
 	legacy_cpu_device *device;
 
 	address_space *program;
+	direct_read_data *direct;
 	address_space *io;
 
 	// onboard peripherals stuff
