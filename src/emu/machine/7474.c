@@ -168,17 +168,17 @@ static DEVICE_START( ttl7474 )
 	devcb_resolve_write_line(&state->output_cb, &config->output_cb, device);
 	devcb_resolve_write_line(&state->comp_output_cb, &config->comp_output_cb, device);
 
-    state->device = device;
+	state->device = device;
 
-    state_save_register_device_item(device, 0, state->clear);
-    state_save_register_device_item(device, 0, state->preset);
-    state_save_register_device_item(device, 0, state->clock);
-    state_save_register_device_item(device, 0, state->d);
-    state_save_register_device_item(device, 0, state->output);
-    state_save_register_device_item(device, 0, state->output_comp);
-    state_save_register_device_item(device, 0, state->last_clock);
-    state_save_register_device_item(device, 0, state->last_output);
-    state_save_register_device_item(device, 0, state->last_output_comp);
+	state_save_register_device_item(device, 0, state->clear);
+	state_save_register_device_item(device, 0, state->preset);
+	state_save_register_device_item(device, 0, state->clock);
+	state_save_register_device_item(device, 0, state->d);
+	state_save_register_device_item(device, 0, state->output);
+	state_save_register_device_item(device, 0, state->output_comp);
+	state_save_register_device_item(device, 0, state->last_clock);
+	state_save_register_device_item(device, 0, state->last_output);
+	state_save_register_device_item(device, 0, state->last_output_comp);
 }
 
 
@@ -187,14 +187,15 @@ static DEVICE_RESET( ttl7474 )
 	ttl7474_state *state = get_safe_token(device);
 
 	/* all inputs are open first */
-    state->clear = 1;
-    state->preset = 1;
-    state->clock = 1;
-    state->d = 1;
+	state->clear = 1;
+	state->preset = 1;
+	state->clock = 1;
+	state->d = 1;
 
-    state->last_clock = 1;
-    state->last_output = -1;
-    state->last_output_comp = -1;
+	state->output = -1;
+	state->last_clock = 1;
+	state->last_output = -1;
+	state->last_output_comp = -1;
 }
 
 
