@@ -3963,25 +3963,6 @@ static DRIVER_INIT( stunrun )
 }
 
 
-static READ32_HANDLER( rddsp32_speedup_r )
-{
-	harddriv_state *state = space->machine->driver_data<harddriv_state>();
-	if (cpu_get_pc(space->cpu) == state->rddsp32_speedup_pc && (*state->rddsp32_speedup >> 16) == 0)
-	{
-		UINT32 r14 = cpu_get_reg(space->cpu, DSP32_R14);
-		UINT32 r1 = space->read_word(r14 - 0x14);
-		int cycles_to_burn = 17 * 4 * (0x2bc - r1 - 2);
-		if (cycles_to_burn > 20 * 4)
-		{
-			cpu_eat_cycles(space->cpu, cycles_to_burn);
-			space->write_word(r14 - 0x14, r1 + cycles_to_burn / 17);
-		}
-		state->msp_speedup_count[0]++;
-	}
-	return *state->rddsp32_speedup;
-}
-
-
 static DRIVER_INIT( racedriv )
 {
 	harddriv_state *state = machine->driver_data<harddriv_state>();
@@ -4002,10 +3983,6 @@ static DRIVER_INIT( racedriv )
 
 	/* set up adsp speedup handlers */
 	memory_install_read16_handler(cpu_get_address_space(state->adsp, ADDRESS_SPACE_DATA), 0x1fff, 0x1fff, 0, 0, hdadsp_speedup_r);
-
-	/* set up dsp32 speedup handlers */
-	state->rddsp32_speedup = memory_install_read32_handler(cpu_get_address_space(state->dsp32, ADDRESS_SPACE_PROGRAM), 0x613e04, 0x613e07, 0, 0, rddsp32_speedup_r);
-	state->rddsp32_speedup_pc = 0x6054b0;
 }
 
 
@@ -4037,10 +4014,6 @@ static void racedrivc_init_common(running_machine *machine, offs_t gsp_protectio
 
 	/* set up adsp speedup handlers */
 	memory_install_read16_handler(cpu_get_address_space(state->adsp, ADDRESS_SPACE_DATA), 0x1fff, 0x1fff, 0, 0, hdadsp_speedup_r);
-
-	/* set up dsp32 speedup handlers */
-	state->rddsp32_speedup = memory_install_read32_handler(cpu_get_address_space(state->dsp32, ADDRESS_SPACE_PROGRAM), 0x613e04, 0x613e07, 0, 0, rddsp32_speedup_r);
-	state->rddsp32_speedup_pc = 0x6054b0;
 }
 
 static DRIVER_INIT( racedrivc ) { racedrivc_init_common(machine, 0xfff95cd0); }

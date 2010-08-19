@@ -75,10 +75,6 @@ public:
 	UINT16 *				gsp_paletteram_hi;
 	size_t					gsp_vram_size;
 
-	/* driver state */
-	UINT32 *				rddsp32_speedup;
-	offs_t					rddsp32_speedup_pc;
-
 	/* machine state */
 	UINT8					irq_state;
 	UINT8					gsp_irq_state;
