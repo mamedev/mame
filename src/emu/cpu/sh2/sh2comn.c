@@ -773,7 +773,6 @@ void sh2_common_init(sh2_state *sh2, legacy_cpu_device *device, device_irq_callb
 	state_save_register_device_item(device, 0, sh2->frt_input);
 	state_save_register_device_item(device, 0, sh2->internal_irq_level);
 	state_save_register_device_item(device, 0, sh2->internal_irq_vector);
-	state_save_register_device_item(device, 0, sh2->icount);
 	state_save_register_device_item_array(device, 0, sh2->dma_timer_active);
 }
 
