@@ -606,7 +606,7 @@ static DRIVER_INIT(robowres)
 static DRIVER_INIT(robowresb)
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	memory_set_decrypted_region(space, 0x0000, 0x7fff, memory_region(machine, "maincpu") + 0x1c000);
+	space->set_decrypted_region(0x0000, 0x7fff, memory_region(machine, "maincpu") + 0x1c000);
 }
 
 

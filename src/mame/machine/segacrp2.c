@@ -64,7 +64,7 @@ static void sega_decode_2(running_machine *machine,const char *cputag,
 	UINT8 *rom = memory_region(machine, cputag);
 	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x8000);
 
-	memory_set_decrypted_region(space, 0x0000, 0x7fff, decrypted);
+	space->set_decrypted_region(0x0000, 0x7fff, decrypted);
 
 
 	for (A = 0x0000;A < 0x8000;A++)

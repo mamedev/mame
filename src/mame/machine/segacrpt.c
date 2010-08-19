@@ -223,7 +223,7 @@ static void sega_decode(running_machine *machine, const char *cputag, const UINT
 	UINT8 *rom = memory_region(machine, cputag);
 	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0xc000);
 
-	memory_set_decrypted_region(space, 0x0000, cryptlen - 1, decrypted);
+	space->set_decrypted_region(0x0000, cryptlen - 1, decrypted);
 
 	for (A = 0x0000;A < cryptlen;A++)
 	{
@@ -473,7 +473,7 @@ void toprollr_decode(running_machine *machine, const char *cputag, const char *r
 
 	memory_configure_bank(machine, "bank1",0,3, memory_region(machine, regiontag),0x6000);
 	memory_configure_bank_decrypted(machine, "bank1",0,3,decrypted,0x6000);
-	memory_set_decrypted_region(space, 0x0000, 0x5fff, decrypted);
+	space->set_decrypted_region(0x0000, 0x5fff, decrypted);
 	memory_set_bank(space->machine, "bank1", 0);
 }
 
@@ -832,7 +832,7 @@ void jongkyo_decode(running_machine *machine, const char *cputag)
 
 	memory_configure_bank(machine, "bank1",0,8, memory_region(machine, cputag)+0x7000,0x0400);
 	memory_configure_bank_decrypted(machine, "bank1",0,8,decrypted+0x7000,0x0400);
-	memory_set_decrypted_region(space, 0x0000, 0x6bff, decrypted);
+	space->set_decrypted_region(0x0000, 0x6bff, decrypted);
 	memory_set_bank(space->machine, "bank1", 0);
 }
 

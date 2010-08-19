@@ -385,7 +385,7 @@ void mc8123_decrypt_rom(running_machine *machine, const char *cpu, const char *k
 	UINT8 *key = memory_region(machine, keyrgn);
 	int A, bank;
 
-	memory_set_decrypted_region(space, 0x0000, fixed_length-1, decrypted1);
+	space->set_decrypted_region(0x0000, fixed_length-1, decrypted1);
 
 	for (A = 0x0000;A < fixed_length;A++)
 	{

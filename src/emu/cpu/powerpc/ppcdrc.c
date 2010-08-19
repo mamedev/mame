@@ -999,7 +999,7 @@ static void code_compile_block(powerpc_state *ppc, UINT8 mode, offs_t pc)
 		}
 
 		/* validate this code block if we're not pointing into ROM */
-		if (memory_get_write_ptr(ppc->program, seqhead->physpc) != NULL)
+		if (ppc->program->get_write_ptr(seqhead->physpc) != NULL)
 			generate_checksum_block(ppc, block, &compiler, seqhead, seqlast);				// <checksum>
 
 		/* label this instruction, if it may be jumped to locally */

@@ -83,7 +83,7 @@ static DRIVER_INIT( hardhead )
 static DRIVER_INIT( hardhedb )
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	memory_set_decrypted_region(space, 0x0000, 0x7fff, memory_region(machine, "maincpu") + 0x48000);
+	space->set_decrypted_region(0x0000, 0x7fff, memory_region(machine, "maincpu") + 0x48000);
 	memory_configure_bank(machine, "bank1", 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x4000);
 }
 
@@ -101,7 +101,7 @@ static UINT8 *brickzn_decrypt(running_machine *machine)
 	UINT8   *decrypt = auto_alloc_array(machine, UINT8, size);
 	int i;
 
-	memory_set_decrypted_region(space, 0x0000, 0x7fff, decrypt);
+	space->set_decrypted_region(0x0000, 0x7fff, decrypt);
 
 	/* Opcodes and data */
 	for (i = 0; i < 0x50000; i++)
@@ -212,7 +212,7 @@ static DRIVER_INIT( hardhea2 )
 	UINT8 x;
 	int i;
 
-	memory_set_decrypted_region(space, 0x0000, 0x7fff, decrypt);
+	space->set_decrypted_region(0x0000, 0x7fff, decrypt);
 
 	/* Address lines scrambling */
 	memcpy(decrypt, RAM, size);
@@ -299,7 +299,7 @@ static DRIVER_INIT( starfigh )
 	UINT8 x;
 	int i;
 
-	memory_set_decrypted_region(space, 0x0000, 0x7fff, decrypt);
+	space->set_decrypted_region(0x0000, 0x7fff, decrypt);
 
 	/* Address lines scrambling */
 	memcpy(decrypt, RAM, size);
@@ -367,7 +367,7 @@ static DRIVER_INIT( sparkman )
 	UINT8 x;
 	int i;
 
-	memory_set_decrypted_region(space, 0x0000, 0x7fff, decrypt);
+	space->set_decrypted_region(0x0000, 0x7fff, decrypt);
 
 	/* Address lines scrambling */
 	memcpy(decrypt, RAM, size);

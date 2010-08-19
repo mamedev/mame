@@ -126,7 +126,7 @@ struct _pic16c62x_instruction
 
 INLINE void update_internalram_ptr(pic16c62x_state *cpustate)
 {
-	cpustate->internalram = (UINT8 *)memory_get_write_ptr(cpustate->data, 0x00);
+	cpustate->internalram = (UINT8 *)cpustate->data->get_write_ptr(0x00);
 }
 
 #define PIC16C62x_RDOP(A)         (memory_decrypted_read_word(cpustate->program, (A)<<1))

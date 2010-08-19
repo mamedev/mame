@@ -3375,7 +3375,7 @@ static DRIVER_INIT( goldnaxeb1 )
 		state->decrypted_region[i] = ROM[i] ^ data[(i & 0xfff) ^ 1];
 	}
 
-	memory_set_decrypted_region(space, 0x00000, 0xbffff, state->decrypted_region);
+	space->set_decrypted_region(0x00000, 0xbffff, state->decrypted_region);
 
 	DRIVER_INIT_CALL(common);
 

@@ -794,7 +794,7 @@ static void code_compile_block(mips3_state *mips3, UINT8 mode, offs_t pc)
 		}
 
 		/* validate this code block if we're not pointing into ROM */
-		if (memory_get_write_ptr(mips3->program, seqhead->physpc) != NULL)
+		if (mips3->program->get_write_ptr(seqhead->physpc) != NULL)
 			generate_checksum_block(mips3, block, &compiler, seqhead, seqlast);
 
 		/* label this instruction, if it may be jumped to locally */

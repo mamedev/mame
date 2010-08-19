@@ -720,7 +720,7 @@ static void cps2_decrypt(running_machine *machine, const UINT32 *master_key, UIN
 		}
 	}
 
-	memory_set_decrypted_region(space, 0x000000, length - 1, dec);
+	space->set_decrypted_region(0x000000, length - 1, dec);
 	m68k_set_encrypted_opcode_range(machine->device("maincpu"), 0, length);
 }
 

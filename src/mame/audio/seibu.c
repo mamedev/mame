@@ -109,7 +109,7 @@ void seibu_sound_decrypt(running_machine *machine,const char *cpu,int length)
 	UINT8 *rom = memory_region(machine, cpu);
 	int i;
 
-	memory_set_decrypted_region(space, 0x0000, (length < 0x10000) ? (length - 1) : 0x1fff, decrypt);
+	space->set_decrypted_region(0x0000, (length < 0x10000) ? (length - 1) : 0x1fff, decrypt);
 
 	for (i = 0;i < length;i++)
 	{

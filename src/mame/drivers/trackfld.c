@@ -1381,7 +1381,7 @@ static DRIVER_INIT( atlantol )
 	for (A = 0; A < 0x6000; A++)
 		decrypt[A] = rom[A];
 
-	memory_set_decrypted_region(space, 0x0000, 0xffff, decrypt);
+	space->set_decrypted_region(0x0000, 0xffff, decrypt);
 
 	memory_install_write8_handler(space, 0x0800, 0x0800, 0, 0, atlantol_gfxbank_w);
 	memory_nop_write(space, 0x1000, 0x1000, 0, 0);

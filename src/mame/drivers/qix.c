@@ -1287,7 +1287,7 @@ static DRIVER_INIT( kram3 )
 	rom = memory_region(machine, "maincpu");
 	decrypted = auto_alloc_array(machine, UINT8, 0x6000);
 
-	memory_set_decrypted_region(mainspace, 0xa000, 0xffff, decrypted);
+	mainspace->set_decrypted_region(0xa000, 0xffff, decrypted);
 
 	memcpy(decrypted,&rom[0xa000],0x6000);
 	for (i = 0xa000; i < 0x10000; ++i)
@@ -1300,7 +1300,7 @@ static DRIVER_INIT( kram3 )
 	rom = memory_region(machine, "videocpu");
 	decrypted = auto_alloc_array(machine, UINT8, 0x6000);
 
-	memory_set_decrypted_region(videospace, 0xa000, 0xffff, decrypted);
+	videospace->set_decrypted_region(0xa000, 0xffff, decrypted);
 
 	memcpy(decrypted,&rom[0xa000],0x6000);
 	for (i = 0xa000; i < 0x10000; ++i)

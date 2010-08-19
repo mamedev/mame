@@ -556,7 +556,7 @@ static DRIVER_INIT( calorie )
 static DRIVER_INIT( calorieb )
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	memory_set_decrypted_region(space, 0x0000, 0x7fff, memory_region(machine, "maincpu") + 0x10000);
+	space->set_decrypted_region(0x0000, 0x7fff, memory_region(machine, "maincpu") + 0x10000);
 }
 
 

@@ -2120,7 +2120,7 @@ ROM_END
 static void bootleg_decode( running_machine *machine )
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	memory_set_decrypted_region(space, 0x0000, 0x7fff, memory_region(machine, "maincpu") + 0x50000);
+	space->set_decrypted_region(0x0000, 0x7fff, memory_region(machine, "maincpu") + 0x50000);
 	memory_configure_bank_decrypted(machine, "bank1", 0, 16, memory_region(machine, "maincpu") + 0x60000, 0x4000);
 }
 

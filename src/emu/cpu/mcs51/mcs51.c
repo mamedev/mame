@@ -689,8 +689,8 @@ INLINE UINT8 r_psw(mcs51_state_t *mcs51_state) { return SFR_A(ADDR_PSW); }
 
 INLINE void update_ptrs(mcs51_state_t *mcs51_state)
 {
-	mcs51_state->internal_ram = (UINT8 *)memory_get_write_ptr(mcs51_state->data, 0x00);
-	mcs51_state->sfr_ram = (UINT8 *)memory_get_write_ptr(mcs51_state->data, 0x100);
+	mcs51_state->internal_ram = (UINT8 *)mcs51_state->data->get_write_ptr(0x00);
+	mcs51_state->sfr_ram = (UINT8 *)mcs51_state->data->get_write_ptr(0x100);
 }
 
 

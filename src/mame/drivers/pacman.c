@@ -5354,7 +5354,7 @@ static void maketrax_rom_decode(running_machine *machine)
 
 	/* patch protection using a copy of the opcodes so ROM checksum */
 	/* tests will not fail */
-	memory_set_decrypted_region(space, 0x0000, 0x3fff, decrypted);
+	space->set_decrypted_region(0x0000, 0x3fff, decrypted);
 
 	memcpy(decrypted,rom,0x4000);
 
@@ -5386,7 +5386,7 @@ static void korosuke_rom_decode(running_machine *machine)
 
 	/* patch protection using a copy of the opcodes so ROM checksum */
 	/* tests will not fail */
-	memory_set_decrypted_region(space, 0x0000, 0x3fff, decrypted);
+	space->set_decrypted_region(0x0000, 0x3fff, decrypted);
 
 	memcpy(decrypted,rom,0x4000);
 

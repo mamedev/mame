@@ -48,7 +48,7 @@ UINT8 *konami1_decode(running_machine *machine, const char *cpu)
 	int A;
 
 	UINT8 *decrypted = auto_alloc_array(machine, UINT8, size);
-	memory_set_decrypted_region(space, 0x0000, 0xffff, decrypted);
+	space->set_decrypted_region(0x0000, 0xffff, decrypted);
 
 	for (A = 0;A < size;A++)
 	{

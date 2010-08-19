@@ -1871,7 +1871,7 @@ static DRIVER_INIT( endurobl )
 	UINT16 *decrypt = auto_alloc_array(machine, UINT16, 0x40000/2);
 
 	hangon_generic_init(machine);
-	memory_set_decrypted_region(space, 0x000000, 0x03ffff, decrypt);
+	space->set_decrypted_region(0x000000, 0x03ffff, decrypt);
 
 	memcpy(decrypt + 0x00000/2, rom + 0x30000/2, 0x10000);
 	memcpy(decrypt + 0x10000/2, rom + 0x10000/2, 0x20000);
@@ -1885,7 +1885,7 @@ static DRIVER_INIT( endurob2 )
 	UINT16 *decrypt = auto_alloc_array(machine, UINT16, 0x40000/2);
 
 	hangon_generic_init(machine);
-	memory_set_decrypted_region(space, 0x000000, 0x03ffff, decrypt);
+	space->set_decrypted_region(0x000000, 0x03ffff, decrypt);
 
 	memcpy(decrypt, rom, 0x30000);
 	/* missing data ROM */

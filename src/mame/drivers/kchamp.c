@@ -741,7 +741,7 @@ static UINT8 *decrypt_code(running_machine *machine)
 	UINT8 *rom = memory_region(machine, "maincpu");
 	int A;
 
-	memory_set_decrypted_region(space, 0x0000, 0xffff, decrypted);
+	space->set_decrypted_region(0x0000, 0xffff, decrypted);
 
 	for (A = 0; A < 0x10000; A++)
 		decrypted[A] = (rom[A] & 0x55) | ((rom[A] & 0x88) >> 2) | ((rom[A] & 0x22) << 2);

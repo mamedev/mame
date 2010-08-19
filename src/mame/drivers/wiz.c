@@ -1056,7 +1056,7 @@ static DRIVER_INIT( stinger )
 	int A;
 	const UINT8 *tbl;
 
-	memory_set_decrypted_region(space, 0x0000, 0xffff, decrypt);
+	space->set_decrypted_region(0x0000, 0xffff, decrypt);
 
 	for (A = 0x0000;A < 0x10000;A++)
 	{

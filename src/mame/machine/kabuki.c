@@ -167,7 +167,7 @@ static void mitchell_decode(running_machine *machine, int swap_key1,int swap_key
 	int numbanks = (memory_region_length(machine, "maincpu") - 0x10000) / 0x4000;
 	int i;
 
-	memory_set_decrypted_region(space, 0x0000, 0x7fff, decrypt);
+	space->set_decrypted_region(0x0000, 0x7fff, decrypt);
 	kabuki_decode(rom,decrypt,rom,0x0000,0x8000, swap_key1,swap_key2,addr_key,xor_key);
 
 	rom += 0x10000;
@@ -206,7 +206,7 @@ static void cps1_decode(running_machine *machine,int swap_key1,int swap_key2,int
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x8000);
 	UINT8 *rom = memory_region(machine, "audiocpu");
 
-	memory_set_decrypted_region(space, 0x0000, 0x7fff, decrypt);
+	space->set_decrypted_region(0x0000, 0x7fff, decrypt);
 	kabuki_decode(rom,decrypt,rom,0x0000,0x8000, swap_key1,swap_key2,addr_key,xor_key);
 }
 

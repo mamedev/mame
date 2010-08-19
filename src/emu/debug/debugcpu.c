@@ -1133,7 +1133,7 @@ static UINT64 expression_read_program_direct(address_space *_space, int opcode, 
 			if (opcode & 1)
 				base = (UINT8 *)memory_decrypted_read_ptr(space, address & ~lowmask);
 			else
-				base = (UINT8 *)memory_get_read_ptr(space, address & ~lowmask);
+				base = (UINT8 *)space->get_read_ptr(address & ~lowmask);
 
 			/* if we have a valid base, return the appropriate byte */
 			if (base != NULL)
@@ -1306,7 +1306,7 @@ static void expression_write_program_direct(address_space *_space, int opcode, o
 			if (opcode & 1)
 				base = (UINT8 *)memory_decrypted_read_ptr(space, address & ~lowmask);
 			else
-				base = (UINT8 *)memory_get_read_ptr(space, address & ~lowmask);
+				base = (UINT8 *)space->get_read_ptr(address & ~lowmask);
 
 			/* if we have a valid base, write the appropriate byte */
 			if (base != NULL)
@@ -2592,8 +2592,8 @@ void device_debug::watchpoint_update_flags(address_space &space)
 		}
 
 	// push the flags out globally
-	memory_enable_read_watchpoints(&space, enableread);
-	memory_enable_write_watchpoints(&space, enablewrite);
+	space.enable_read_watchpoints(enableread);
+	space.enable_write_watchpoints(enablewrite);
 }
 
 
@@ -2789,7 +2789,7 @@ UINT64 device_debug::get_cycles(void *globalref, void *ref)
 UINT64 device_debug::get_logunmap(void *globalref, void *ref)
 {
 	address_space *space = reinterpret_cast<address_space *>(ref);
-	return memory_get_log_unmap(space);
+	return space->log_unmap();
 }
 
 

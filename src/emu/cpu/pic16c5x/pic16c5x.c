@@ -126,7 +126,7 @@ struct _pic16c5x_opcode
 
 INLINE void update_internalram_ptr(pic16c5x_state *cpustate)
 {
-	cpustate->internalram = (UINT8 *)memory_get_write_ptr(cpustate->data, 0x00);
+	cpustate->internalram = (UINT8 *)cpustate->data->get_write_ptr(0x00);
 }
 
 

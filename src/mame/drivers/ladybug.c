@@ -1073,7 +1073,7 @@ static DRIVER_INIT( dorodon )
 	UINT8 *rom = memory_region(machine, "maincpu");
 	UINT8 *table = memory_region(machine, "user1");
 
-	memory_set_decrypted_region(space, 0x0000, 0x5fff, decrypted);
+	space->set_decrypted_region(0x0000, 0x5fff, decrypted);
 
 	for (i = 0; i < 0x6000; i++)
 		decrypted[i] = table[rom[i]];

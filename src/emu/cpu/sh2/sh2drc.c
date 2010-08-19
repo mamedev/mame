@@ -977,7 +977,7 @@ static void code_compile_block(sh2_state *sh2, UINT8 mode, offs_t pc)
 		}
 
 		/* validate this code block if we're not pointing into ROM */
-		if (memory_get_write_ptr(sh2->program, seqhead->physpc) != NULL)
+		if (sh2->program->get_write_ptr(seqhead->physpc) != NULL)
 			generate_checksum_block(sh2, block, &compiler, seqhead, seqlast);
 
 		/* label this instruction, if it may be jumped to locally */

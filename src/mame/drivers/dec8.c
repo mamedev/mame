@@ -3453,7 +3453,7 @@ static DRIVER_INIT( deco222 )
 	rom = memory_region(machine, "audiocpu");
 	decrypt = auto_alloc_array(machine, UINT8, 0x8000);
 
-	memory_set_decrypted_region(space, 0x8000, 0xffff, decrypt);
+	space->set_decrypted_region(0x8000, 0xffff, decrypt);
 
 	for (A = 0x8000; A < 0x10000; A++)
 		decrypt[A - 0x8000] = (rom[A] & 0x9f) | ((rom[A] & 0x20) << 1) | ((rom[A] & 0x40) >> 1);

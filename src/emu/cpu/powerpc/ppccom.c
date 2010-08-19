@@ -537,7 +537,7 @@ static UINT32 ppccom_translate_address_internal(powerpc_state *ppc, int intentio
 	for (hashnum = 0; hashnum < 2; hashnum++)
 	{
 		offs_t ptegaddr = hashbase | ((hash << 6) & hashmask);
-		UINT32 *ptegptr = (UINT32 *)memory_get_read_ptr(ppc->program, ptegaddr);
+		UINT32 *ptegptr = (UINT32 *)ppc->program->get_read_ptr(ptegaddr);
 
 		/* should only have valid memory here, but make sure */
 		if (ptegptr != NULL)

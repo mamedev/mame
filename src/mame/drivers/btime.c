@@ -2082,7 +2082,7 @@ static void decrypt_C10707_cpu(running_machine *machine, const char *cputag)
 	UINT8 *rom = memory_region(machine, cputag);
 	offs_t addr;
 
-	memory_set_decrypted_region(space, 0x0000, 0xffff, decrypt);
+	space->set_decrypted_region(0x0000, 0xffff, decrypt);
 
 	/* Swap bits 5 & 6 for opcodes */
 	for (addr = 0; addr < 0x10000; addr++)
@@ -2111,7 +2111,7 @@ static void init_rom1(running_machine *machine)
 	UINT8 *rom = memory_region(machine, "maincpu");
 
 	decrypted = auto_alloc_array(machine, UINT8, 0x10000);
-	memory_set_decrypted_region(space, 0x0000, 0xffff, decrypted);
+	space->set_decrypted_region(0x0000, 0xffff, decrypted);
 
 	/* For now, just copy the RAM array over to ROM. Decryption will happen */
 	/* at run time, since the CPU applies the decryption only if the previous */

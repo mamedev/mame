@@ -841,7 +841,7 @@ static DRIVER_INIT(jujub)
 
 		memcpy(decrypt,rom,0x20000);
 
-		memory_set_decrypted_region(space, 0x0000, 0x1fff, decrypt);
+		space->set_decrypted_region(0x0000, 0x1fff, decrypt);
 
 		for (i = 0;i < 0x2000;i++)
 		{

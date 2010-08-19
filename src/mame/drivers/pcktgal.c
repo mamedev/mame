@@ -418,7 +418,7 @@ static DRIVER_INIT( deco222 )
 	UINT8 *decrypted = auto_alloc_array(machine, UINT8, 0x10000);
 	UINT8 *rom = memory_region(machine, "audiocpu");
 
-	memory_set_decrypted_region(space, 0x8000, 0xffff, decrypted);
+	space->set_decrypted_region(0x8000, 0xffff, decrypted);
 
 	/* bits 5 and 6 of the opcodes are swapped */
 	for (A = 0x8000;A < 0x18000;A++)

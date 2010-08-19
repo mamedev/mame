@@ -1455,7 +1455,7 @@ static void zaxxonj_decode(running_machine *machine, const char *cputag)
 	int size = memory_region_length(machine, cputag);
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, size);
 
-	memory_set_decrypted_region(space, 0x0000, size - 1, decrypt);
+	space->set_decrypted_region(0x0000, size - 1, decrypt);
 
 	for (A = 0x0000; A < size; A++)
 	{

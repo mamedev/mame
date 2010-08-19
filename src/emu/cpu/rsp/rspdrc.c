@@ -7258,7 +7258,7 @@ static void code_compile_block(rsp_state *rsp, offs_t pc)
 		}
 
 		/* validate this code block if we're not pointing into ROM */
-		if (memory_get_write_ptr(rsp->program, seqhead->physpc) != NULL)
+		if (rsp->program->get_write_ptr(seqhead->physpc) != NULL)
 			generate_checksum_block(rsp, block, &compiler, seqhead, seqlast);
 
 		/* label this instruction, if it may be jumped to locally */

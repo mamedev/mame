@@ -1317,7 +1317,7 @@ static void treahunt_decode( running_machine *machine )
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x4000);
 	int data;
 
-	memory_set_decrypted_region(space, 0x0000, 0x3fff, decrypt);
+	space->set_decrypted_region(0x0000, 0x3fff, decrypt);
 
 	/* Thanks to Mike Balfour for helping out with the decryption */
 	for (A = 0; A < 0x4000; A++)

@@ -55,7 +55,7 @@ static void s24_fd1094_setstate_and_decrypt(running_machine *machine, int state)
 		{
 			/* copy cached state */
 			s24_fd1094_userregion = s24_fd1094_cacheregion[i];
-			memory_set_decrypted_region(cputag_get_address_space(machine, "sub", ADDRESS_SPACE_PROGRAM), 0, s24_fd1094_cpuregionsize - 1, s24_fd1094_userregion);
+			machine->device<cpu_device>("sub")->space(AS_PROGRAM)->set_decrypted_region(0, s24_fd1094_cpuregionsize - 1, s24_fd1094_userregion);
 			m68k_set_encrypted_opcode_range(machine->device("sub"), 0, s24_fd1094_cpuregionsize);
 
 			return;
@@ -76,7 +76,7 @@ static void s24_fd1094_setstate_and_decrypt(running_machine *machine, int state)
 
 	/* copy newly decrypted data to user region */
 	s24_fd1094_userregion = s24_fd1094_cacheregion[fd1094_current_cacheposition];
-	memory_set_decrypted_region(cputag_get_address_space(machine, "sub", ADDRESS_SPACE_PROGRAM), 0, s24_fd1094_cpuregionsize - 1, s24_fd1094_userregion);
+	machine->device<cpu_device>("sub")->space(AS_PROGRAM)->set_decrypted_region(0, s24_fd1094_cpuregionsize - 1, s24_fd1094_userregion);
 	m68k_set_encrypted_opcode_range(machine->device("sub"), 0, s24_fd1094_cpuregionsize);
 
 	fd1094_current_cacheposition++;

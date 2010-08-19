@@ -7910,7 +7910,7 @@ static DRIVER_INIT( gigamn2 )
 	state_save_register_global_pointer(machine, state->gigamn2_dummyqsound_ram, 0x20000 / 2);
 
 	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x618000, 0x619fff, 0, 0, gigamn2_dummyqsound_r, gigamn2_dummyqsound_w); // no qsound..
-	memory_set_decrypted_region(space, 0x000000, (length) - 1, &rom[length/4]);
+	space->set_decrypted_region(0x000000, (length) - 1, &rom[length/4]);
 	m68k_set_encrypted_opcode_range(machine->device("maincpu"), 0, length);
 }
 

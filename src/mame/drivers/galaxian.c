@@ -2745,7 +2745,7 @@ static DRIVER_INIT( moonqsr )
 
 	/* decrypt program code */
 	decode_mooncrst(machine, 0x8000, decrypt);
-	memory_set_decrypted_region(space, 0x0000, 0x7fff, decrypt);
+	space->set_decrypted_region(0x0000, 0x7fff, decrypt);
 }
 
 static WRITE8_HANDLER( artic_gfxbank_w )

@@ -526,7 +526,7 @@ static DRIVER_INIT( commando )
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0xc000);
 	int A;
 
-	memory_set_decrypted_region(space, 0x0000, 0xbfff, decrypt);
+	space->set_decrypted_region(0x0000, 0xbfff, decrypt);
 
 	// the first opcode is *not* encrypted
 	decrypt[0] = rom[0];
@@ -546,7 +546,7 @@ static DRIVER_INIT( spaceinv )
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0xc000);
 	int A;
 
-	memory_set_decrypted_region(space, 0x0000, 0xbfff, decrypt);
+	space->set_decrypted_region(0x0000, 0xbfff, decrypt);
 
 	// the first opcode *is* encrypted
 	for (A = 0; A < 0xc000; A++)

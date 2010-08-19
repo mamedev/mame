@@ -666,7 +666,7 @@ static DRIVER_INIT( cshootere )
 	UINT8 *rom = memory_region(machine, "maincpu");
 	UINT8 *decrypt = auto_alloc_array(machine, UINT8, 0x8000);
 
-	memory_set_decrypted_region(space, 0x0000, 0x7fff, decrypt);
+	space->set_decrypted_region(0x0000, 0x7fff, decrypt);
 
 	for (A = 0x0000;A < 0x8000;A++)
 	{

@@ -42,7 +42,7 @@ static void nec_v25_cpu_decrypt(running_machine *machine)
 	UINT8* temp = auto_alloc_array(machine, UINT8, 0x100000);
 
 	// set CPU3 opcode base
-	memory_set_decrypted_region(space, 0x00000, 0xfffff, decrypted);
+	space->set_decrypted_region(0x00000, 0xfffff, decrypted);
 
 	// make copy of ROM so original can be overwritten
 	memcpy(temp, rom, 0x10000);

@@ -206,7 +206,7 @@ static DRIVER_INIT(tcl)
 	}
 	auto_free(machine, src);
 
-	memory_set_decrypted_region(space, 0x0000, 0x7fff, dest+0x10000);
+	space->set_decrypted_region(0x0000, 0x7fff, dest+0x10000);
 }
 
 GAME( 1995, tcl,  0,       tcl,  tcl,  tcl, ROT0, "Uniwang", "Taiwan Chess Legend", GAME_NOT_WORKING )
