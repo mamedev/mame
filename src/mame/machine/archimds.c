@@ -918,7 +918,7 @@ WRITE32_HANDLER(archimedes_memc_page_w)
 			break;
 
 		case 1:
-			phys = ((data & 0x7f) >> 1) | (data & 1) ? 0x40 : 0;
+			phys = ((data & 0x7f) >> 1) | ((data & 1) << 6);
 			log = (data & 0xc00)>>10;
 			log <<= 23;
 			log |= (data & 0x7fe000);
@@ -934,7 +934,7 @@ WRITE32_HANDLER(archimedes_memc_page_w)
 			break;
 
 		case 3:
-			phys = ((data & 0x7f) >> 3) | (data & 1)<<4 | (data & 2) << 5 | (data & 4)<<3;
+			phys = ((data & 0x7f) >> 3) | ((data & 1)<<4) | ((data & 2) << 5) | ((data & 4)<<3);
 			log = (data & 0xc00)>>10;
 			log <<= 23;
 			log |= (data & 0x7f8000);
