@@ -223,6 +223,8 @@ z80dart_device::z80dart_device(running_machine &_machine, const z80dart_device_c
 	  device_z80daisy_interface(_machine, config, *this),
 	  m_config(config)
 {
+	for (int i = 0; i < 8; i++)
+		m_int_state[i] = 0;
 }
 
 
