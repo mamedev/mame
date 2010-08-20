@@ -710,10 +710,9 @@ WRITE16_HANDLER( jaguar_tom_regs_w )
 				break;
 			case PIT0:
 			case PIT1:
-				if (gpu_regs[PIT0])
+				if (gpu_regs[PIT0] && gpu_regs[PIT0] != 0xffff) //FIXME: avoid too much small timers for now
 				{
 					sample_period = ATTOTIME_IN_NSEC(((space->machine->device("gpu")->unscaled_clock()*PIT_MULT_DBG_HACK) / (1+gpu_regs[PIT0])) / (1+gpu_regs[PIT1]));
-					//printf("%08x %08x",gpu_regs[PIT0]+1,gpu_regs[PIT1]+1);
 					timer_set(space->machine, sample_period, NULL, 0, jaguar_pit);
 				}
 				break;
