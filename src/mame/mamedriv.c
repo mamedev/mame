@@ -9486,9 +9486,11 @@ Other Sun games
 	DRIVER( comg230 )	/* (c) 1984 Cal Omega Inc. */
 	DRIVER( comg236 )	/* (c) 1984 Cal Omega Inc. */
 	DRIVER( comg239 )	/* (c) 1985 Cal Omega / Casino Electronics Inc. */
+	DRIVER( comg240 )	/* (c) 1985 Cal Omega / Casino Electronics Inc. */
 	DRIVER( comg246 )	/* (c) 1985 Cal Omega Inc. */
 	DRIVER( comg272a )	/* (c) 1985 Cal Omega Inc. */
 	DRIVER( comg272b )	/* (c) 1985 Cal Omega Inc. */
+	DRIVER( comg5108 )	/* (c) 1985 Cal Omega Inc. */
 	DRIVER( comg903d )	/* (c) 198? Cal Omega Inc. */
 	DRIVER( comg905d )	/* (c) 198? Cal Omega Inc. */
 	DRIVER( elgrande )	/* (c) 1982 Tuni Electro Service / E.T. Marketing */
