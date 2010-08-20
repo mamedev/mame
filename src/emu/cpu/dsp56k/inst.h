@@ -26,7 +26,6 @@ public:
 	Instruction(const Opcode* oco) : m_valid(false),
 									 m_oco(oco),
 									 m_sizeIncrement(0),
-									 m_opcode(""),
 									 m_source(iINVALID), 
 									 m_destination(iINVALID) { }
 	virtual ~Instruction() {}
@@ -58,7 +57,6 @@ protected:
 	size_t m_sizeIncrement;
 
 	// Parameters nearly everyone has
-	std::string m_opcode;
 	reg_id m_source;
 	reg_id m_destination;
 };
@@ -79,12 +77,11 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		decode_F_table(BITSn(word0,0x08), m_destination);
-		m_opcode = "abs";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode + " " + regIdAsString(m_destination);
+		retString = "abs " + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -103,12 +100,11 @@ public:
 	{
 		decode_JF_table(BITSn(word0,0x0001), BITSn(word0,0x0008), 
 						m_source, m_destination);
-		m_opcode = "adc";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode + " " + regIdAsString(m_source) + "," + regIdAsString(m_destination);
+		retString = "adc " + regIdAsString(m_source) + "," + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -127,12 +123,11 @@ public:
 	{
 		decode_JJJF_table(BITSn(word0,0x07), BITSn(word0,0x08), 
 						  m_source, m_destination);
-		m_opcode = "add";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode + " " + regIdAsString(m_source) + "," + regIdAsString(m_destination);
+		retString = "add " + regIdAsString(m_source) + "," + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -147,6 +142,7 @@ public:
 	Add_2(const Opcode* oco, const UINT16 word0, const UINT16 word1) : Instruction(oco)
 	{
 		m_arg = "";
+        m_opcode = "";
 		m_valid = decode(word0, word1);
 	}
 	bool decode(const UINT16 word0, const UINT16 word1)
@@ -165,6 +161,7 @@ public:
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 
 private:
+    std::string m_opcode;
 	std::string m_arg;  // TODO: get rid of this Add|Sub thing.
 };
 
@@ -180,12 +177,11 @@ public:
 	{
 		decode_JJF_table(BITSn(word0,0x03),BITSn(word0,0x08), 
 						 m_source, m_destination);
-		m_opcode = "and";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode + " " + regIdAsString(m_source) + "," + regIdAsString(m_destination);
+		retString = "and " + regIdAsString(m_source) + "," + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -205,16 +201,14 @@ public:
 	{
 		m_immediate = BITSn(word0,0x00ff);
 		decode_EE_table(BITSn(word0,0x0600), m_destination);
-		
-		m_opcode = "andi";
-		// NEW // sprintf(opcode_str, "and(i)");
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
 		char temp[32];
 		sprintf(temp, "#$%x,%s", m_immediate, regIdAsString(m_destination).c_str());
-		retString = m_opcode + " " + std::string(temp);
+		retString = "andi " + std::string(temp);
+		// NEW // sprintf(opcode_str, "and(i)");
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -235,12 +229,11 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		decode_F_table(BITSn(word0,0x08), m_destination);
-		m_opcode = "asl";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode + " " + regIdAsString(m_destination);
+		retString = "asl " + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -258,12 +251,11 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		decode_F_table(BITSn(word0,0x0008), m_destination);
-		m_opcode = "asl4";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode + " " + regIdAsString(m_destination);
+		retString = "asl4 " + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -281,12 +273,11 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		decode_F_table(BITSn(word0,0x08), m_destination);
-		m_opcode = "asr";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode + " " + regIdAsString(m_destination);
+		retString = "asr " + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -304,12 +295,11 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		decode_F_table(BITSn(word0,0x0008), m_destination);
-		m_opcode = "asr4";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode + " " + regIdAsString(m_destination);
+		retString = "asr4 " + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -327,12 +317,11 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		decode_F_table(BITSn(word0,0x0008), m_destination);
-		m_opcode = "asr16";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode + " " + regIdAsString(m_destination);
+		retString = "asr16 " + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -350,6 +339,7 @@ public:
 	BfInstruction(const Opcode* oco, const UINT16 word0, const UINT16 word1) : Instruction(oco)
 	{
         dString = "";
+        m_opcode = "";
         m_iVal = 0x0000;
 		m_valid = decode(word0, word1);
 	}
@@ -387,16 +377,15 @@ public:
 	{
 		char temp[32];
 		sprintf(temp, "#$%x", m_iVal);
+		retString = m_opcode + " " + std::string(temp) + "," + dString;
 		// NEW // sprintf(temp, "#$%04x", iVal);
-		std::string source = temp;
-
-		retString = m_opcode + " " + source + "," + dString;
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 2; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 private:
     UINT16 m_iVal;
+    std::string m_opcode;
     std::string dString;
 };
 
@@ -410,6 +399,7 @@ class BfInstruction_2: public Instruction
 public:
 	BfInstruction_2(const Opcode* oco, const UINT16 word0, const UINT16 word1) : Instruction(oco)
 	{
+        m_opcode = "";
         m_r = iINVALID;
         m_iVal = 0x0000;
 		m_valid = decode(word0, word1);
@@ -448,13 +438,13 @@ public:
 	{
 		char temp[32];
 		sprintf(temp, "#$%x", m_iVal);
-		// NEW // sprintf(temp, "#$%04x", m_iVal);
 		std::string source = temp;
 
 		sprintf(temp, "X:(%s)", regIdAsString(m_r).c_str());
 		std::string destination = temp;
 
 		retString = m_opcode + " " + source + "," + destination;
+		// NEW // sprintf(temp, "#$%04x", m_iVal);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 2; }
@@ -463,6 +453,7 @@ public:
 private:
     reg_id m_r;
     UINT16 m_iVal;
+    std::string m_opcode;
 };
 
 /* BFCHG  : 0001 0100 100D DDDD BBB1 0010 iiii iiii : A-38 */
@@ -475,6 +466,7 @@ class BfInstruction_3: public Instruction
 public:
 	BfInstruction_3(const Opcode* oco, const UINT16 word0, const UINT16 word1) : Instruction(oco)
 	{
+        m_opcode = "";
         m_iVal = 0x0000;
 		m_valid = decode(word0, word1);
 	}
@@ -512,10 +504,10 @@ public:
 	{
 		char temp[32];
 		sprintf(temp, "#$%x", m_iVal);
-		// NEW // sprintf(temp, "#$%04x", m_iVal);
 		std::string source = temp;
 
 		retString = m_opcode + " " + source + "," + regIdAsString(m_destination);
+		// NEW // sprintf(temp, "#$%04x", m_iVal);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 2; }
@@ -523,6 +515,7 @@ public:
 
 private:
     UINT16 m_iVal;
+    std::string m_opcode;
 };
 
 // Bcc : 0000 0111 --11 cccc xxxx xxxx xxxx xxxx : A-48 ////////////////////////
@@ -531,31 +524,32 @@ class Bcc: public Instruction
 public:
 	Bcc(const Opcode* oco, const UINT16 word0, const UINT16 word1) : Instruction(oco)
 	{
+        m_mnem = oINVALID;
 		m_immediate = 0;
 		m_valid = decode(word0, word1);
 	}
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		m_immediate = (INT16)word1;
-		
-		std::string M;
-		decode_cccc_table(BITSn(word0,0x000f), M);
-		m_opcode = "b" + M;
-		// NEW // sprintf(opcode_str, "b.%s", M);
+		decode_cccc_table(BITSn(word0,0x000f), m_mnem);
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
+        std::string opcode = "b" + opMnemonicAsString(m_mnem);
+		// NEW // sprintf(opcode_str, "b.%s", M);
+        
 		char temp[32];
 		sprintf(temp, ">*+$%x", 2 + m_immediate);
 		// NEW // sprintf(temp, "$%04x (%d)", pc + 2 + (INT16)word1, (INT16)word1);
-		retString = m_opcode + " " + std::string(temp);
+		retString = opcode + " " + std::string(temp);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 2; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 	
 private:
+    op_mnem m_mnem;
 	INT16 m_immediate;
 };
 
@@ -566,30 +560,33 @@ public:
 	Bcc_2(const Opcode* oco, const UINT16 word0, const UINT16 word1) : Instruction(oco)
 	{
 		m_immediate = 0;
+        m_mnem = oINVALID;
 		m_valid = decode(word0, word1);
 	}
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
-		std::string M;
-		decode_cccc_table(BITSn(word0,0x3c0), M);
+		decode_cccc_table(BITSn(word0,0x3c0), m_mnem);
 		m_immediate = get_6_bit_signed_value(BITSn(word0,0x003f));
-		m_opcode = "b" + M;
-		// NEW // sprintf(opcode_str, "b.%s", M);
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
+        std::string opcode = "b" + opMnemonicAsString(m_mnem);
+		// NEW // sprintf(opcode_str, "b.%s", M);
+        
 		char temp[32];
 		if (m_immediate >= 0) sprintf(temp, "<*+$%x", m_immediate + 1);
 		else                  sprintf(temp, "<*-$%x", 1 - m_immediate - 2);
 		// NEW // sprintf(temp, "$%04x (%d)", pc + 1 + relativeInt, relativeInt);
-		retString = m_opcode + " " + std::string(temp);
+
+		retString = opcode + " " + std::string(temp);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 
 private:
+    op_mnem m_mnem;
 	INT8 m_immediate;
 };
 
@@ -599,25 +596,27 @@ class Bcc_3: public Instruction
 public:
 	Bcc_3(const Opcode* oco, const UINT16 word0, const UINT16 word1) : Instruction(oco)
 	{
+        m_mnem = oINVALID;
 		m_valid = decode(word0, word1);
 	}
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		decode_RR_table(BITSn(word0,0x00c0), m_destination);
-
-		std::string M;
-		decode_cccc_table(BITSn(word0,0x000f), M);
-		m_opcode = "b" + M;
-		// NEW // sprintf(opcode_str, "b.%s", M);
+		decode_cccc_table(BITSn(word0,0x000f), m_mnem);
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode + " " + regIdAsString(m_destination);
+        std::string opcode = "b" + opMnemonicAsString(m_mnem);
+		retString = opcode + " " + regIdAsString(m_destination);
+		// NEW // sprintf(opcode_str, "b.%s", M);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
+
+private:
+    op_mnem m_mnem;
 };
 
 // BRA : 0000 0001 0011 11-- xxxx xxxx xxxx xxxx : A-50 ////////////////////////
@@ -632,8 +631,6 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		m_immediate = (INT16)word1;
-		
-		m_opcode = "bra";
 		return true;
 	}
 	void disassemble(std::string& retString) const
@@ -641,7 +638,7 @@ public:
 		char temp[32];
 		sprintf(temp, ">*+$%x", 2 + m_immediate);
 		// NEW // sprintf(temp, "$%04x (%d)", pc + 2 + word1, (INT16)word1);
-		retString = m_opcode + " " + std::string(temp);
+		retString = "bra " + std::string(temp);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 2; }
@@ -663,7 +660,6 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		m_immediate = (INT8)BITSn(word0,0x00ff);
-		m_opcode = "bra";
 		return true;
 	}
 	void disassemble(std::string& retString) const
@@ -672,7 +668,7 @@ public:
 		if (m_immediate >= 0) sprintf(temp, "<*+$%x", 1 + m_immediate);
 		else                  sprintf(temp, "<*-$%x", 1 - m_immediate - 2);
 		// NEW // sprintf(temp, "$%04x (%d)", pc + 1 + iVal, iVal);
-		retString = m_opcode + " " + std::string(temp);
+		retString = "bra " + std::string(temp);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -693,13 +689,11 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		decode_RR_table(BITSn(word0,0x0003), m_destination);
-		
-		m_opcode = "bra";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode + " " + regIdAsString(m_destination);
+		retString = "bra " + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -712,23 +706,26 @@ class Brkcc: public Instruction
 public:
 	Brkcc(const Opcode* oco, const UINT16 word0, const UINT16 word1) : Instruction(oco)
 	{
+        m_mnem = oINVALID;
 		m_valid = decode(word0, word1);
 	}
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
-		std::string M;
-		decode_cccc_table(BITSn(word0,0x000f), M);
-		m_opcode = "brk" + M;
-		// NEW // sprintf(opcode_str, "brk.%s", M);
+		decode_cccc_table(BITSn(word0,0x000f), m_mnem);
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode;
+        std::string opcode = "brk" + opMnemonicAsString(m_mnem);
+		retString = opcode;
+		// NEW // sprintf(opcode_str, "brk.%s", M);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
+
+private:
+    op_mnem m_mnem;
 };
 
 // BScc : 0000 0111 --01 cccc xxxx xxxx xxxx xxxx : A-54 ///////////////////////
@@ -738,26 +735,26 @@ public:
 	Bscc(const Opcode* oco, const UINT16 word0, const UINT16 word1) : Instruction(oco)
 	{
 		m_immediate = 0;
+        m_mnem = oINVALID;
 		m_valid = decode(word0, word1);
 	}
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		m_immediate = (INT16)word1;
-		
-		std::string M;
-		decode_cccc_table(BITSn(word0,0x000f), M);
-		m_opcode = "bs" + M;
-		// NEW // sprintf(opcode_str, "bs.%s", M);
+		decode_cccc_table(BITSn(word0,0x000f), m_mnem);
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
+        std::string opcode = "bs" + opMnemonicAsString(m_mnem);
+		// NEW // sprintf(opcode_str, "bs.%s", M);
+
 		char temp[32];
 		if (m_immediate >= 0) sprintf(temp, ">*+$%x", 2 + m_immediate);
 		else                  sprintf(temp, ">*-$%x", 1 - m_immediate - 1 - 2);
 		//sprintf(temp, ">*+$%x", 2 + m_immediate);
 		// NEW // sprintf(temp, "$%04x (%d)", pc + 2 + (INT16)word1, (INT16)word1);
-		retString = m_opcode + " " + std::string(temp);
+		retString = opcode + " " + std::string(temp);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 2; }
@@ -765,6 +762,7 @@ public:
 	size_t flags() { return DASMFLAG_STEP_OVER; }
 	
 private:
+    op_mnem m_mnem;
 	INT16 m_immediate;
 };
 
@@ -774,27 +772,28 @@ class Bscc_2: public Instruction
 public:
 	Bscc_2(const Opcode* oco, const UINT16 word0, const UINT16 word1) : Instruction(oco)
 	{
+        m_mnem = oINVALID;
 		m_valid = decode(word0, word1);
 	}
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		decode_RR_table(BITSn(word0,0x00c0), m_destination);
-
-		std::string M;
-		decode_cccc_table(BITSn(word0,0x000f), M);
-		
-		m_opcode = "bs" + M;
-		// NEW // sprintf(opcode_str, "bs.%s", M);
+		decode_cccc_table(BITSn(word0,0x000f), m_mnem);
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode + " " + regIdAsString(m_destination);
+        std::string opcode = "bs" + opMnemonicAsString(m_mnem);
+		retString = opcode + " " + regIdAsString(m_destination);
+		// NEW // sprintf(opcode_str, "bs.%s", M);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 	size_t flags() { return DASMFLAG_STEP_OVER; }
+
+private:
+    op_mnem m_mnem;
 };
 
 // BSR : 0000 0001 0011 10-- xxxx xxxx xxxx xxxx : A-56 ////////////////////////
@@ -809,8 +808,6 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		m_immediate = (INT16)word1;
-				
-		m_opcode = "bsr";
 		return true;
 	}
 	void disassemble(std::string& retString) const
@@ -819,7 +816,7 @@ public:
 		if (m_immediate >= 0) sprintf(temp, ">*+$%x", 2 + m_immediate);
 		else                  sprintf(temp, ">*-$%x", 1 - m_immediate - 1 - 2);
 		// NEW // sprintf(temp, "$%04x (%d)", pc + 2 + (INT16)word1, (INT16)word1);
-		retString = m_opcode + " " + std::string(temp);
+		retString = "bsr " + std::string(temp);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 2; }
@@ -841,13 +838,11 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		decode_RR_table(BITSn(word0,0x0003), m_destination);
-		
-		m_opcode = "bsr";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode + " " + regIdAsString(m_destination);
+		retString = "bsr " + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -865,12 +860,11 @@ public:
 	}
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
-		m_opcode = "chkaau";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode;
+		retString = "chkaau";
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -888,12 +882,11 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		decode_F_table(BITSn(word0,0x08), m_destination);
-		m_opcode = "clr";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode + " " + regIdAsString(m_destination);
+		retString = "clr " + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -911,12 +904,11 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		decode_F_table(BITSn(word0,0x08), m_destination);
-		m_opcode = "clr24";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode + " " + regIdAsString(m_destination);
+		retString = "clr24 " + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -937,12 +929,11 @@ public:
 				 in before cmp, so the same decode function can be used. */
 		decode_JJJF_table(BITSn(word0,0x07), BITSn(word0,0x08), 
 						  m_source, m_destination);
-		m_opcode = "cmp";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode + " " + regIdAsString(m_source) + "," + regIdAsString(m_destination);
+		retString = "cmp " + regIdAsString(m_source) + "," + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -963,12 +954,11 @@ public:
 				 in before cmp, so the same decode function can be used. */
 		decode_JJJF_table(BITSn(word0,0x07), BITSn(word0,0x08), 
 						  m_source, m_destination);
-		m_opcode = "cmpm";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode + " " + regIdAsString(m_source) + "," + regIdAsString(m_destination);
+		retString = "cmpm " + regIdAsString(m_source) + "," + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -985,12 +975,11 @@ public:
 	}
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
-		m_opcode = "debug";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode;
+		retString = "debug";
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -1003,23 +992,26 @@ class Debugcc: public Instruction
 public:
 	Debugcc(const Opcode* oco, const UINT16 word0, const UINT16 word1) : Instruction(oco)
 	{
+        m_mnem = oINVALID;
 		m_valid = decode(word0, word1);
 	}
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
-		std::string M;
-		decode_cccc_table(BITSn(word0,0x000f), M);
-		m_opcode = "debug" + M;
-		// NEW // sprintf(opcode_str, "debug.%s", M);
+		decode_cccc_table(BITSn(word0,0x000f), m_mnem);
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode;
+        std::string opcode = "debug" + opMnemonicAsString(m_mnem);
+		retString = opcode;
+		// NEW // sprintf(opcode_str, "debug.%s", M);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
+
+private:
+    op_mnem m_mnem;
 };
 
 // DEC : .... .... 0110 F010 : A-72 ////////////////////////////////////////////
@@ -1033,12 +1025,11 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		decode_F_table(BITSn(word0,0x08), m_destination);
-		m_opcode = "dec";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode + " " + regIdAsString(m_destination);
+		retString = "dec " + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -1056,12 +1047,11 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		decode_F_table(BITSn(word0,0x08), m_destination);
-		m_opcode = "dec24";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode + " " + regIdAsString(m_destination);
+		retString = "dec24 " + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -1080,12 +1070,11 @@ public:
 	{
 		decode_DDF_table(BITSn(word0,0x0003), BITSn(word0,0x0008), 
 						 m_source, m_destination);
-		m_opcode = "div";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode + " " + regIdAsString(m_source) + "," + regIdAsString(m_destination);
+		retString = "div " + regIdAsString(m_source) + "," + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -1098,6 +1087,7 @@ class Dmac: public Instruction
 public:
 	Dmac(const Opcode* oco, const UINT16 word0, const UINT16 word1) : Instruction(oco)
 	{
+        m_mnem = oINVALID;
 		m_source2 = iINVALID;
 		m_valid = decode(word0, word1);
 	}
@@ -1106,25 +1096,25 @@ public:
 		decode_QQF_special_table(BITSn(word0,0x0003), BITSn(word0,0x0008), 
 								 m_source, m_source2, m_destination);
 
-		std::string a;
-		decode_ss_table(BITSn(word0,0x0024), a);
-		if (a == "!!") return false;
-		
-		m_opcode = "dmac" + a;
-		// NEW // sprintf(opcode_str, "dmac(%s)", A);
+		decode_ss_table(BITSn(word0,0x0024), m_mnem);
+		if (m_mnem == oINVALID) return false;
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode + " " + 
+        std::string opcode = "dmac" + opMnemonicAsString(m_mnem);
+        
+		retString = opcode + " " + 
 					regIdAsString(m_source) + "," + 
 					regIdAsString(m_source2) + "," + regIdAsString(m_destination);
+		// NEW // sprintf(opcode_str, "dmac(%s)", A);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 	
 private:
+    op_mnem m_mnem;
 	reg_id m_source2;
 };
 
@@ -1140,10 +1130,7 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		m_immediate = word1;
-
 		decode_RR_table(BITSn(word0,0x0003), m_source);
-		
-		m_opcode = "do";
 		return true;
 	}
 	void disassemble(std::string& retString) const
@@ -1156,7 +1143,7 @@ public:
 		sprintf(temp, "X:(%s)", regIdAsString(m_source).c_str());
 		std::string source = temp;
        
-		retString = m_opcode + " " + source + "," + destination;
+		retString = "do " + source + "," + destination;
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 2; }
@@ -1180,8 +1167,6 @@ public:
 	{
 		m_immediate = BITSn(word0,0x00ff);
 		m_displacement = word1;
-		
-		m_opcode = "do";
 		return true;
 	}
 	void disassemble(std::string& retString) const
@@ -1189,7 +1174,7 @@ public:
 		char temp[32];
 		sprintf(temp, "#<$%x,*+$%x", m_immediate, 2 + m_displacement);
 		// NEW // sprintf(temp, "#$%02x,$%04x", BITSn(word0,0x00ff), pc + 2 + word1);
-		retString = m_opcode + " " + std::string(temp);
+		retString = "do " + std::string(temp);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 2; }
@@ -1214,9 +1199,8 @@ public:
 		m_displacement = word1;
 		
 		decode_DDDDD_table(BITSn(word0,0x001f), m_source);
-		if (m_source == iSSH) return false; // NEW //
-		if (m_source == iINVALID) return false;  // NEW //
-		m_opcode = "do";
+		if (m_source == iSSH) return false;
+		if (m_source == iINVALID) return false;
 		return true;
 	}
 	void disassemble(std::string& retString) const
@@ -1224,7 +1208,7 @@ public:
 		char temp[32];
 		sprintf(temp, "*+$%x", 2 + m_displacement);
 		// NEW // sprintf(temp, "%s,$%04x", S1, pc + 2 + word1);
-		retString = m_opcode + " " + regIdAsString(m_source) + "," + std::string(temp);
+		retString = "do " + regIdAsString(m_source) + "," + std::string(temp);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 2; }
@@ -1246,7 +1230,6 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		m_displacement = word1;
-		m_opcode = "do forever";
 		return true;
 	}
 	void disassemble(std::string& retString) const
@@ -1255,7 +1238,7 @@ public:
 		sprintf(temp, "*+$%x", m_displacement + 2);
 		// NEW // sprintf(temp, "*+$%x", pc + word1);
 		// NEW // sprintf(temp, "$%04x", pc + 2 + word1);
-		retString = m_opcode + ", " + std::string(temp);
+		retString = "do forever, " + std::string(temp);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 2; }
@@ -1275,12 +1258,11 @@ public:
 	}
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
-		m_opcode = "enddo";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode;
+		retString = "enddo";
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -1299,12 +1281,11 @@ public:
 	{
 		decode_JJF_table(BITSn(word0,0x03),BITSn(word0,0x08), 
 						 m_source, m_destination);
-		m_opcode = "eor";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode + " " + regIdAsString(m_source) + "," + regIdAsString(m_destination);
+		retString = "eor " + regIdAsString(m_source) + "," + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -1322,12 +1303,11 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		decode_F_table(BITSn(word0,0x0008), m_destination);
-		m_opcode = "ext";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode + " " + regIdAsString(m_destination);
+		retString = "ext " + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -1344,12 +1324,11 @@ public:
 	}
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
-		m_opcode = "illegal";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode;
+		retString = "illegal";
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -1369,12 +1348,11 @@ public:
 	{
 		decode_QQQF_table(BITSn(word0,0x0007), BITSn(word0,0x0008), 
 						  m_source, m_source2, m_destination);
-		m_opcode = "imac";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode + " " + 
+		retString = "imac " + 
 					regIdAsString(m_source) + "," + 
 					regIdAsString(m_source2) + "," + regIdAsString(m_destination);
 	}
@@ -1399,12 +1377,11 @@ public:
 	{
 		decode_QQQF_table(BITSn(word0,0x0007), BITSn(word0,0x0008), 
 						  m_source, m_source2, m_destination);
-		m_opcode = "impy";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode + " " + 
+		retString = "impy " + 
 					regIdAsString(m_source) + "," +
 					regIdAsString(m_source2) + "," + regIdAsString(m_destination);
 	}
@@ -1427,12 +1404,11 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		decode_F_table(BITSn(word0,0x08), m_destination);
-		m_opcode = "inc";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode + " " + regIdAsString(m_destination);
+		retString = "inc " + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -1450,12 +1426,11 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		decode_F_table(BITSn(word0,0x08), m_destination);
-		m_opcode = "inc24";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode + " " + regIdAsString(m_destination);
+		retString = "inc24 " + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -1468,31 +1443,32 @@ class Jcc: public Instruction
 public:
 	Jcc(const Opcode* oco, const UINT16 word0, const UINT16 word1) : Instruction(oco)
 	{
+        m_mnem = oINVALID;
 		m_displacement = 0;
 		m_valid = decode(word0, word1);
 	}
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		m_displacement = word1;
-		
-		std::string M;
-		decode_cccc_table(BITSn(word0,0x000f), M);
-		m_opcode = "j" + M;
-		// NEW // sprintf(opcode_str, "j.%s", M);
+		decode_cccc_table(BITSn(word0,0x000f), m_mnem);
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
+        std::string opcode = "j" + opMnemonicAsString(m_mnem);
+		// NEW // sprintf(opcode_str, "j.%s", M);
+        
 		char temp[32];
 		sprintf(temp, ">$%x", m_displacement);
 		// NEW // sprintf(temp, "$%04x", word1);
-		retString = m_opcode + " " + std::string(temp);
+		retString = opcode + " " + std::string(temp);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 2; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 
 private:
+    op_mnem m_mnem;
 	UINT16 m_displacement;
 };
 
@@ -1502,25 +1478,27 @@ class Jcc_2: public Instruction
 public:
 	Jcc_2(const Opcode* oco, const UINT16 word0, const UINT16 word1) : Instruction(oco)
 	{
+        m_mnem = oINVALID;
 		m_valid = decode(word0, word1);
 	}
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		decode_RR_table(BITSn(word0,0x00c0), m_destination);
-
-		std::string M;
-		decode_cccc_table(BITSn(word0,0x000f), M);
-		m_opcode = "j" + M;
-		// NEW // sprintf(opcode_str, "j.%s", M);
+		decode_cccc_table(BITSn(word0,0x000f), m_mnem);
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode + " " + regIdAsString(m_destination);
+        std::string opcode = "j" + opMnemonicAsString(m_mnem);
+		retString = opcode + " " + regIdAsString(m_destination);
+		// NEW // sprintf(opcode_str, "j.%s", M);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
+
+private:
+    op_mnem m_mnem;
 };
 
 // JMP : 0000 0001 0011 01-- xxxx xxxx xxxx xxxx : A-110 ///////////////////////
@@ -1535,8 +1513,6 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		m_displacement = word1;
-		
-		m_opcode = "jmp";
 		return true;
 	}
 	void disassemble(std::string& retString) const
@@ -1544,7 +1520,7 @@ public:
 		char temp[32];
 		sprintf(temp, ">$%x", m_displacement);
 		// NEW // sprintf(temp, "$%04x", word1);
-		retString = m_opcode + " " + std::string(temp);
+		retString = "jmp " + std::string(temp);
 	}
 	void evaluate(dsp56k_core* cpustate)
 	{
@@ -1573,13 +1549,11 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		decode_RR_table(BITSn(word0,0x0003), m_destination);
-		
-		m_opcode = "jmp";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode + " " + regIdAsString(m_destination);
+		retString = "jmp " + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56k_core* cpustate)
 	{
@@ -1602,25 +1576,25 @@ class Jscc: public Instruction
 public:
 	Jscc(const Opcode* oco, const UINT16 word0, const UINT16 word1) : Instruction(oco)
 	{
+        m_mnem = oINVALID;
 		m_displacement = 0;
 		m_valid = decode(word0, word1);
 	}
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		m_displacement = word1;
-		
-		std::string M;
-		decode_cccc_table(BITSn(word0,0x000f), M);
-		m_opcode = "js" + M;
-		// NEW // sprintf(opcode_str, "js.%s", M);
+		decode_cccc_table(BITSn(word0,0x000f), m_mnem);
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
+        std::string opcode = "js" + opMnemonicAsString(m_mnem);
+		// NEW // sprintf(opcode_str, "js.%s", M);
+        
 		char temp[32];
 		sprintf(temp, ">$%x", m_displacement);
 		// NEW // sprintf(temp, "$%04x", word1);
-		retString = m_opcode + " " + std::string(temp);
+		retString = opcode + " " + std::string(temp);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 2; }
@@ -1628,6 +1602,7 @@ public:
 	size_t flags() { return DASMFLAG_STEP_OVER; }
 
 private:
+    op_mnem m_mnem;
 	UINT16 m_displacement;
 };
 
@@ -1637,26 +1612,28 @@ class Jscc_2: public Instruction
 public:
 	Jscc_2(const Opcode* oco, const UINT16 word0, const UINT16 word1) : Instruction(oco)
 	{
+        m_mnem = oINVALID;
 		m_valid = decode(word0, word1);
 	}
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		decode_RR_table(BITSn(word0,0x00c0), m_destination);
-
-		std::string M;
-		decode_cccc_table(BITSn(word0,0x000f), M);
-		m_opcode = "js" + M;
-		// NEW // sprintf(opcode_str, "js.%s", M);
+		decode_cccc_table(BITSn(word0,0x000f), m_mnem);
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode + " " + regIdAsString(m_destination);
+        std::string opcode = "js" + opMnemonicAsString(m_mnem);
+		retString = opcode + " " + regIdAsString(m_destination);
+		// NEW // sprintf(opcode_str, "js.%s", M);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 	size_t flags() { return DASMFLAG_STEP_OVER; }
+
+private:
+    op_mnem m_mnem;
 };
 
 // JSR : 0000 0001 0011 00-- xxxx xxxx xxxx xxxx : A-114 ///////////////////////
@@ -1671,8 +1648,6 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		m_displacement = word1;
-		
-		m_opcode = "jsr";
 		return true;
 	}
 	void disassemble(std::string& retString) const
@@ -1680,7 +1655,7 @@ public:
 		char temp[32];
 		sprintf(temp, ">$%x", m_displacement);
 		// NEW // sprintf(temp, "$%04x", word1);
-		retString = m_opcode + " " + std::string(temp);
+		retString = "jsr " + std::string(temp);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 2; }
@@ -1703,8 +1678,6 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		m_bAddr = BITSn(word0,0x00ff);
-		
-		m_opcode = "jsr";
 		return true;
 	}
 	void disassemble(std::string& retString) const
@@ -1712,7 +1685,7 @@ public:
 		char temp[32];
 		sprintf(temp, "<$%x", m_bAddr);
 		// NEW // sprintf(temp, "#$%02x", BITSn(word0,0x00ff));
-		retString = m_opcode + " " + std::string(temp);
+		retString = "jsr " + std::string(temp);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -1734,13 +1707,11 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		decode_RR_table(BITSn(word0,0x0003), m_destination);
-
-		m_opcode = "jsr";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode + " " + regIdAsString(m_destination);
+		retString = "jsr " + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -1765,14 +1736,13 @@ public:
 
 		INT8 rNum = BITSn(word0,0x0003);
 		assemble_ea_from_MM_table(BITSn(word0,0x000c), rNum, m_ea);
-		
-		m_opcode = "lea";
+
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
         // HACK
-		retString = m_opcode + " " + m_ea + "," + regIdAsString(m_destination);
+		retString = "lea " + m_ea + "," + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -1799,13 +1769,12 @@ public:
 		INT8 rNum = BITSn(word0,0x0003);
 		assemble_ea_from_MM_table(BITSn(word0,0x000c), rNum, m_ea);
 
-		m_opcode = "lea";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
         // HACK
-		retString = m_opcode + " " + m_ea + "," + regIdAsString(m_destination);
+		retString = "lea " + m_ea + "," + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -1826,12 +1795,11 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		decode_F_table(BITSn(word0,0x08), m_destination);
-		m_opcode = "lsl";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode + " " + regIdAsString(m_destination);
+		retString = "lsl " + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -1849,12 +1817,11 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		decode_F_table(BITSn(word0,0x08), m_destination);
-		m_opcode = "lsr";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode + " " + regIdAsString(m_destination);
+		retString = "lsr " + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -1877,15 +1844,13 @@ public:
 						  m_source, m_source2, m_destination);
 
 		decode_kSign_table(BITSn(word0,0x40), m_sign);
-
-		m_opcode = "mac";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
         std::string ts = m_sign;
         if (ts != "-") ts = "";
-		retString = m_opcode + " " + 
+		retString = "mac " + 
                 	ts +
 					regIdAsString(m_source) + "," + 
 					regIdAsString(m_source2) + "," + regIdAsString(m_destination);
@@ -1912,13 +1877,11 @@ public:
 	{
 		decode_QQF_table(BITSn(word0,0x03), BITSn(word0,0x08), 
 						 m_source, m_source2, m_destination);
-
-		m_opcode = "mac";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode + " " + 
+		retString = "mac " + 
 					regIdAsString(m_source) + "," +
 					regIdAsString(m_source2) + "," + regIdAsString(m_destination);
 	}
@@ -1943,12 +1906,11 @@ public:
 	{
 		decode_QQQF_table(BITSn(word0,0x0007), BITSn(word0,0x0008), 
 						  m_source, m_source2, m_destination);
-		m_opcode = "mac";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode + " " + 
+		retString = "mac " + 
 					regIdAsString(m_source) + "," +
 					regIdAsString(m_source2) + "," + regIdAsString(m_destination);
 	}
@@ -1976,15 +1938,13 @@ public:
 						  m_source, m_source2, m_destination);
 
 		decode_kSign_table(BITSn(word0,0x40), m_sign);
-
-		m_opcode = "macr";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
         std::string ts = m_sign;
         if (ts != "-") ts = "";
-		retString = m_opcode + " " + 
+		retString = "macr " + 
                 	ts +
 					regIdAsString(m_source) + "," + 
 					regIdAsString(m_source2) + "," + regIdAsString(m_destination);
@@ -2011,12 +1971,11 @@ public:
 	{
 		decode_QQF_table(BITSn(word0,0x03), BITSn(word0,0x08), 
 						 m_source, m_source2, m_destination);
-		m_opcode = "macr";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode + " " + 
+		retString = "macr " + 
 					regIdAsString(m_source) + "," + 
 					regIdAsString(m_source2) + "," + regIdAsString(m_destination);
 	}
@@ -2034,6 +1993,7 @@ class Macsuuu: public Instruction
 public:
 	Macsuuu(const Opcode* oco, const UINT16 word0, const UINT16 word1) : Instruction(oco)
 	{
+        m_mnem = oINVALID;
 		m_source2 = iINVALID;
 		m_valid = decode(word0, word1);
 	}
@@ -2043,23 +2003,24 @@ public:
 		decode_QQF_special_table(BITSn(word0,0x0003), BITSn(word0,0x0008), 
 								 m_source, m_source2, m_destination);
 
-		std::string a;
-		decode_s_table(BITSn(word0,0x0004), a);
-		m_opcode = "mac" + a;
-		// NEW // sprintf(opcode_str, "mac(%s)", A);
+		decode_s_table(BITSn(word0,0x0004), m_mnem);
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode + " " + 
+        std::string opcode = "mac" + opMnemonicAsString(m_mnem);
+        
+		retString = opcode + " " + 
 					regIdAsString(m_source) + "," + 
 					regIdAsString(m_source2) + "," + regIdAsString(m_destination);
+		// NEW // sprintf(opcode_str, "mac(%s)", A);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 
 private:
+    op_mnem m_mnem;
 	reg_id m_source2;
 };
 
@@ -2088,7 +2049,6 @@ public:
 		if (BITSn == 0x4a || BITSn == 0x4b)
 			m_isNop = true;
 
-		m_opcode = "move";
 		return true;
 	}
 	void disassemble(std::string& retString) const
@@ -2096,7 +2056,7 @@ public:
 		if (m_isNop)
 			retString = "nop";
 		else
-			retString = m_opcode;
+			retString = "move";
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -2123,12 +2083,11 @@ public:
 		else
 			m_destination = iA;
 
-		m_opcode = "move";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode;
+		retString = "move";
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -2151,8 +2110,6 @@ public:
 		m_b = BITSn(word0,0x00ff);
         m_W = BITSn(word1,0x0100);
 		decode_HHH_table(BITSn(word1,0x0e00), m_SD);
-
-		m_opcode = "move";
 		return true;
 	}
 	void disassemble(std::string& retString) const
@@ -2160,7 +2117,7 @@ public:
         std::string source;
         std::string destination;
 		assemble_reg_from_W_table(m_W, 'X', m_SD, m_b, source, destination);
-		retString = m_opcode + " " + source + "," + destination;
+		retString = "move " + source + "," + destination;
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 2; }
@@ -2191,9 +2148,6 @@ public:
         m_W = BITSn(word0,0x0400);
 		decode_DDDDD_table(BITSn(word0,0x03e0), m_SD);
 		if (m_SD == iINVALID) return false;
-
-		m_opcode = "move";
-		// NEW // sprintf(opcode_str, "move(c)");
 		return true;
 	}
 	void disassemble(std::string& retString) const
@@ -2201,7 +2155,8 @@ public:
         std::string source;
         std::string destination;
 		assemble_arguments_from_W_table(m_W, 'X', m_SD, m_ea, source, destination);
-		retString = m_opcode + " " + source + "," + destination;
+		retString = "move " + source + "," + destination;
+		// NEW // sprintf(opcode_str, "move(c)");
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -2232,9 +2187,6 @@ public:
 		decode_DDDDD_table(BITSn(word0,0x03e0), m_SD);
         m_W = BITSn(word0,0x0400);
 		if (m_SD == iINVALID) return false;
-
-		m_opcode = "move";
-		// NEW // sprintf(opcode_str, "move(c)");
 		return true;
 	}
 	void disassemble(std::string& retString) const
@@ -2242,7 +2194,8 @@ public:
         std::string source;
         std::string destination;
 		assemble_arguments_from_W_table(m_W, 'X', m_SD, m_ea, source, destination);
-		retString = m_opcode + " " + source + "," + destination;
+		retString = "move " + source + "," + destination;
+		// NEW // sprintf(opcode_str, "move(c)");
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -2272,9 +2225,6 @@ public:
 		decode_DDDDD_table(BITSn(word0,0x03e0), m_SD);
         m_W = BITSn(word0,0x0400);
 		if (m_SD == iINVALID) return false;
-
-		m_opcode = "move";
-		// NEW // sprintf(opcode_str, "move(c)");
 		return true;
 	}
 	void disassemble(std::string& retString) const
@@ -2282,7 +2232,8 @@ public:
         std::string source;
         std::string destination;
 		assemble_arguments_from_W_table(m_W, 'X', m_SD, m_ea, source, destination);
-		retString = m_opcode + " " + source + "," + destination;
+		retString = "move " + source + "," + destination;
+		// NEW // sprintf(opcode_str, "move(c)");
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -2318,8 +2269,6 @@ public:
 		if ((word0 & 0x000c) == 0x000c && (word0 & 0x0400) == 0x0000)
 			return false;
 
-		m_opcode = "move";
-		// NEW // sprintf(opcode_str, "move(c)");
 		return true;
 	}
 	void disassemble(std::string& retString) const
@@ -2327,9 +2276,10 @@ public:
         std::string ea;
         assemble_ea_from_t_table(m_t, m_value, ea);
 
-        retString = m_opcode + " ";
+        retString = "move ";
         if (m_W) retString += ea + "," + regIdAsString(m_sd);
         else	 retString += regIdAsString(m_sd) + "," + ea;
+		// NEW // sprintf(opcode_str, "move(c)");
 	}
 	void evaluate(dsp56k_core* cpustate)
     {
@@ -2389,14 +2339,12 @@ public:
 
 		if (m_source == iINVALID || m_destination == iINVALID) return false;
 		if (m_source == iSSH && m_destination == iSSH) return false;
-
-		m_opcode = "move";
-		// NEW // sprintf(opcode_str, "move(c)");
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode + " " + regIdAsString(m_source) + "," + regIdAsString(m_destination);
+		retString = "move " + regIdAsString(m_source) + "," + regIdAsString(m_destination);
+		// NEW // sprintf(opcode_str, "move(c)");
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -2412,6 +2360,7 @@ public:
         m_W = 0;
 		m_b = 0;
         m_SD = iINVALID;
+        m_mnem = oINVALID;
 		m_valid = decode(word0, word1);
 	}
 	bool decode(const UINT16 word0, const UINT16 word1)
@@ -2419,9 +2368,6 @@ public:
 		m_b = BITSn(word0,0x00ff);
         m_W = BITSn(word1,0x0400);
 		decode_DDDDD_table(BITSn(word1,0x03e0), m_SD);
-
-		m_opcode = "move";
-		// NEW // m_opcode = "move(c)";
 		return true;
 	}
 	void disassemble(std::string& retString) const
@@ -2429,7 +2375,8 @@ public:
         std::string source;
         std::string destination;
 		assemble_reg_from_W_table(m_W, 'X', m_SD, m_b, source, destination);
-		retString = m_opcode + " " + source + "," + destination;
+		retString = "move " + source + "," + destination;
+		// NEW // opcode = "move(c)";
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 2; }
@@ -2439,6 +2386,7 @@ private:
 	INT8 m_b;
     UINT8 m_W;
     reg_id m_SD;
+    op_mnem m_mnem;
 };
 
 // MOVE(I) : 0010 00DD BBBB BBBB : A-150 ///////////////////////////////////////
@@ -2453,11 +2401,7 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		m_immediate = (INT8)BITSn(word0,0x00ff);
-
 		decode_DD_table(BITSn(word0,0x0300), m_destination);
-
-		m_opcode = "move";
-		// NEW // sprintf(opcode_str, "move(i)");
 		return true;
 	}
 	void disassemble(std::string& retString) const
@@ -2467,8 +2411,9 @@ public:
 		else                  sprintf(temp, "#<-$%x", 1 - m_immediate - 1);
 		// NEW // sprintf(temp, "#$%02x,%s", BITSn(word0,0x00ff), D1);
 
-		retString = m_opcode + " " + 
+		retString = "move " + 
 					std::string(temp) + "," + regIdAsString(m_destination);
+		// NEW // sprintf(opcode_str, "move(i)");
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -2496,9 +2441,6 @@ public:
 		decode_HHH_table(BITSn(word0,0x0007), m_SD);
 		assemble_ea_from_MM_table(BITSn(word0,0x0018), rNum, m_ea);
         m_W = BITSn(word0,0x0100);
-
-		m_opcode = "move";
-		// NEW // sprintf(opcode_str, "move(m)");
 		return true;
 	}
 	void disassemble(std::string& retString) const
@@ -2506,7 +2448,8 @@ public:
         std::string source;
         std::string destination;
 		assemble_arguments_from_W_table(m_W, 'P', m_SD, m_ea, source, destination);
-		retString = m_opcode + " " + source + "," + destination;
+		retString = "move " + source + "," + destination;
+		// NEW // sprintf(opcode_str, "move(m)");
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -2533,9 +2476,6 @@ public:
 	{
         m_W = BITSn(word0,0x0100);
 		assemble_eas_from_mm_table(BITSn(word0,0x000c), BITSn(word0,0x00c0), BITSn(word0,0x0003), m_ea, m_ea2);
-
-		m_opcode = "move";
-		// NEW // sprintf(opcode_str, "move(m)*");
 		return true;
 	}
 	void disassemble(std::string& retString) const
@@ -2552,7 +2492,8 @@ public:
 			source = "P:" + m_ea;
 			destination = "X:" + m_ea2;
 		}
-		retString = m_opcode + " " + source + "," + destination;
+		retString = "move " + source + "," + destination;
+		// NEW // sprintf(opcode_str, "move(m)*");
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -2572,6 +2513,7 @@ public:
 	{
         m_b = 0;
         m_SD = iINVALID;
+        m_mnem = oINVALID;
 		m_valid = decode(word0, word1);
 	}
 	bool decode(const UINT16 word0, const UINT16 word1)
@@ -2579,9 +2521,6 @@ public:
 		m_b = BITSn(word0,0x00ff);
         m_W = BITSn(word1,0x0100);
 		decode_HHH_table(BITSn(word1,0x0007), m_SD);
-
-		m_opcode = "move";
-		// NEW // m_opcode = "move(m)";
 		return true;
 	}
 	void disassemble(std::string& retString) const
@@ -2589,7 +2528,8 @@ public:
         std::string source;
         std::string destination;
 		assemble_reg_from_W_table(m_W, 'P', m_SD, m_b, source, destination);
-		retString = m_opcode + " " + source + "," + destination;
+		retString = "move " + source + "," + destination;
+		// NEW // opcode = "move(m)";
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 2; }
@@ -2599,6 +2539,7 @@ private:
     INT8 m_b;
     UINT8 m_W;
     reg_id m_SD;
+    op_mnem m_mnem;
 };
 
 // MOVE(P) : 0001 100W HH1p pppp : A-156 ///////////////////////////////////////
@@ -2620,9 +2561,6 @@ public:
 		m_ea = "<<$" + m_ea;
 
 		m_W = BITSn(word0,0x0100);
-
-		m_opcode = "movep";
-		// NEW // sprintf(opcode_str, "move(p)");
 		return true;
 	}
 	void disassemble(std::string& retString) const
@@ -2630,7 +2568,8 @@ public:
         std::string source;
         std::string destination;
 		assemble_arguments_from_W_table(m_W, 'X', m_SD, m_ea, source, destination);
-		retString = m_opcode + " " + source + "," + destination;
+		retString = "movep " + source + "," + destination;
+		// NEW // sprintf(opcode_str, "move(p)");
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -2665,9 +2604,6 @@ public:
         m_W = BITSn(word0,0x0100);
 		m_SD = "X:<<$" + fullAddy;
 		// NEW // sprintf(SD, "X:$%s", fullAddy);
-
-		m_opcode = "movep";
-		// NEW // sprintf(opcode_str, "move(p)*");
 		return true;
 	}
 	void disassemble(std::string& retString) const
@@ -2675,7 +2611,8 @@ public:
         std::string source;
         std::string destination;
 		assemble_arguments_from_W_table(m_W, 'X', m_SD, m_ea, source, destination);
-		retString = m_opcode + " " + source + "," + destination;
+		retString = "movep " + source + "," + destination;
+		// NEW // sprintf(opcode_str, "move(p)*");
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -2707,9 +2644,6 @@ public:
 		m_ea = temp;
 
         m_W = BITSn(word0,0x0100);
-		
-		m_opcode = "moves";
-		// NEW // sprintf(opcode_str, "move(s)");
 		return true;
 	}
 	void disassemble(std::string& retString) const
@@ -2717,7 +2651,8 @@ public:
         std::string source;
         std::string destination;
 		assemble_arguments_from_W_table(m_W, 'X', m_SD, m_ea, source, destination);
-		retString = m_opcode + " " + source + "," + destination;
+		retString = "moves " + source + "," + destination;
+		// NEW // sprintf(opcode_str, "move(s)");
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -2747,15 +2682,13 @@ public:
 						  m_source, m_source2, m_destination);
 
 		decode_kSign_table(BITSn(word0,0x40), m_sign);
-
-		m_opcode = "mpy";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
         std::string ts = m_sign;
         if (ts != "-") ts = "";
-		retString = m_opcode + " " + 
+		retString = "mpy " + 
                 	ts +
 					regIdAsString(m_source) + "," +
 					regIdAsString(m_source2) + "," + regIdAsString(m_destination);
@@ -2782,13 +2715,11 @@ public:
 	{
 		decode_QQF_table(BITSn(word0,0x03), BITSn(word0,0x08), 
 						 m_source, m_source2, m_destination);
-
-		m_opcode = "mpy";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode + " " + 
+		retString = "mpy " + 
 					regIdAsString(m_source) + "," +
 					regIdAsString(m_source2) + "," + regIdAsString(m_destination);
 	}
@@ -2813,13 +2744,11 @@ public:
 	{
 		decode_QQQF_table(BITSn(word0,0x0007), BITSn(word0,0x0008), 
 						  m_source, m_source2, m_destination);
-		
-		m_opcode = "mpy";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode + " " + 
+		retString = "mpy " + 
 					regIdAsString(m_source) + "," +
 					regIdAsString(m_source2) + "," + regIdAsString(m_destination);
 	}
@@ -2849,15 +2778,13 @@ public:
 						  m_source, m_source2, m_destination);
 
 		decode_kSign_table(BITSn(word0,0x40), m_sign);
-
-		m_opcode = "mpyr";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
         std::string ts = m_sign;
         if (ts != "-") ts = "";
-		retString = m_opcode + " " + 
+		retString = "mpyr " + 
 					ts +
                 	regIdAsString(m_source) + "," +
 					regIdAsString(m_source2) + "," + regIdAsString(m_destination);
@@ -2884,13 +2811,11 @@ public:
 	{
 		decode_QQF_table(BITSn(word0,0x03), BITSn(word0,0x08), 
 						 m_source, m_source2, m_destination);
-
-		m_opcode = "mpyr";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode + " " + 
+		retString = "mpyr " + 
 					regIdAsString(m_source) + "," +
 					regIdAsString(m_source2) + "," + regIdAsString(m_destination);
 	}
@@ -2908,6 +2833,7 @@ class Mpysuuu: public Instruction
 public:
 	Mpysuuu(const Opcode* oco, const UINT16 word0, const UINT16 word1) : Instruction(oco)
 	{
+        m_mnem = oINVALID;
 		m_source2 = iINVALID;
 		m_valid = decode(word0, word1);
 	}
@@ -2916,23 +2842,24 @@ public:
 		decode_QQF_special_table(BITSn(word0,0x0003), BITSn(word0,0x0008), 
 								 m_source, m_source2, m_destination);
 
-		std::string a;
-		decode_s_table(BITSn(word0,0x0004), a);
-		m_opcode = "mpy" + a;
-		// NEW // sprintf(opcode_str, "mpy(%s)", A);
+		decode_s_table(BITSn(word0,0x0004), m_mnem);
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode + " " + 
+        std::string opcode = "mpy" + opMnemonicAsString(m_mnem);
+        
+		retString = opcode + " " + 
 					regIdAsString(m_source) + "," +
 					regIdAsString(m_source2) + "," + regIdAsString(m_destination);
+		// NEW // sprintf(opcode_str, "mpy(%s)", A);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 	
 private:
+    op_mnem m_mnem;
 	reg_id m_source2;
 };
 
@@ -2947,13 +2874,11 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		decode_F_table(BITSn(word0,0x08), m_destination);
-
-		m_opcode = "neg";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode + " " + regIdAsString(m_destination);
+		retString = "neg " + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -2971,12 +2896,11 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		decode_F_table(BITSn(word0,0x0008), m_destination);
-		m_opcode = "negc";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode + " " + regIdAsString(m_destination);
+		retString = "negc " + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -2993,12 +2917,11 @@ public:
 	}
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
-		m_opcode = "nop";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode;
+		retString = "nop";
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -3018,13 +2941,11 @@ public:
 		decode_F_table(BITSn(word0,0x0008), m_destination);
 
 		decode_RR_table(BITSn(word0,0x0003), m_source);
-
-		m_opcode = "norm";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode + " " + regIdAsString(m_source) + "," + regIdAsString(m_destination);
+		retString = "norm " + regIdAsString(m_source) + "," + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -3042,13 +2963,11 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		decode_F_table(BITSn(word0,0x08), m_destination);
-
-		m_opcode = "not";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode + " " + regIdAsString(m_destination);
+		retString = "not " + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -3067,12 +2986,11 @@ public:
 	{
 		decode_JJF_table(BITSn(word0,0x03),BITSn(word0,0x08), 
 						 m_source, m_destination);
-		m_opcode = "or";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode + " " + regIdAsString(m_source) + "," + regIdAsString(m_destination);
+		retString = "or " + regIdAsString(m_source) + "," + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -3091,10 +3009,7 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		m_immediate = BITSn(word0,0x00ff);
-		
 		decode_EE_table(BITSn(word0,0x0600), m_destination);
-		m_opcode = "ori";
-		// NEW // sprintf(opcode_str, "or(i)");
 		return true;
 	}
 	void disassemble(std::string& retString) const
@@ -3102,7 +3017,8 @@ public:
 		char temp[32];
 		sprintf(temp, "#$%x", m_immediate);
 		// NEW // sprintf(temp, "#$%02x", BITSn(word0,0x00ff));
-		retString = m_opcode + " " + std::string(temp) + "," + regIdAsString(m_destination);
+		retString = "ori " + std::string(temp) + "," + regIdAsString(m_destination);
+		// NEW // sprintf(opcode_str, "or(i)");
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -3123,15 +3039,13 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		decode_RR_table(BITSn(word0,0x0003), m_source);
-
-		m_opcode = "rep";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
 		char temp[32];
 		sprintf(temp, "X:(%s)", regIdAsString(m_source).c_str());
-		retString = m_opcode + " " + std::string(temp);
+		retString = "rep " + std::string(temp);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -3150,7 +3064,6 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		m_immediate = BITSn(word0,0x00ff);
-		m_opcode = "rep";
 		return true;
 	}
 	void disassemble(std::string& retString) const
@@ -3158,7 +3071,7 @@ public:
 		char temp[32];
 		sprintf(temp, "#$%x", m_immediate);
 		// NEW // sprintf(temp, "#$%02x (%d)", BITSn(word0,0x00ff), BITSn(word0,0x00ff));
-		retString = m_opcode + " " + std::string(temp);
+		retString = "rep " + std::string(temp);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -3180,13 +3093,11 @@ public:
 	{
 		decode_DDDDD_table(BITSn(word0,0x001f), m_source);
 		if (m_source == iINVALID) return false;
-		
-		m_opcode = "rep";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode + " " + regIdAsString(m_source);
+		retString = "rep " + regIdAsString(m_source);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -3199,23 +3110,26 @@ class Repcc: public Instruction
 public:
 	Repcc(const Opcode* oco, const UINT16 word0, const UINT16 word1) : Instruction(oco)
 	{
+        m_mnem = oINVALID;
 		m_valid = decode(word0, word1);
 	}
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
-		std::string M;
-		decode_cccc_table(BITSn(word0,0x000f), M);
-		m_opcode = "rep" + M;
-		// NEW // sprintf(opcode_str, "rep.%s", M);
+		decode_cccc_table(BITSn(word0,0x000f), m_mnem);
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode;
+        std::string opcode = "rep" + opMnemonicAsString(m_mnem);
+		retString = opcode;
+		// NEW // sprintf(opcode_str, "rep.%s", M);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
+
+private:
+    op_mnem m_mnem;
 };
 
 // RESET : 0000 0000 0000 1000 : A-186 /////////////////////////////////////////
@@ -3228,12 +3142,11 @@ public:
 	}
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
-		m_opcode = "reset";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode;
+		retString = "reset";
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -3251,13 +3164,11 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		decode_F_table(BITSn(word0,0x08), m_destination);
-
-		m_opcode = "rnd";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode + " " + regIdAsString(m_destination);
+		retString = "rnd " + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -3275,13 +3186,11 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		decode_F_table(BITSn(word0,0x08), m_destination);
-
-		m_opcode = "rol";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode + " " + regIdAsString(m_destination);
+		retString = "rol " + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -3299,13 +3208,11 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		decode_F_table(BITSn(word0,0x08), m_destination);
-
-		m_opcode = "ror";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode + " " + regIdAsString(m_destination);
+		retString = "ror " + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -3322,12 +3229,11 @@ public:
 	}
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
-		m_opcode = "rti";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode;
+		retString = "rti";
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -3345,12 +3251,11 @@ public:
 	}
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
-		m_opcode = "rts";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode;
+		retString = "rts";
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -3370,13 +3275,11 @@ public:
 	{
 		decode_JF_table(BITSn(word0,0x01), BITSn(word0,0x08), 
 						m_source, m_destination);
-
-		m_opcode = "sbc";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode + " " + regIdAsString(m_source) + "," + regIdAsString(m_destination);
+		retString = "sbc " + regIdAsString(m_source) + "," + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -3393,12 +3296,11 @@ public:
 	}
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
-		m_opcode = "stop";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode;
+		retString = "stop";
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -3417,12 +3319,11 @@ public:
 	{
 		decode_JJJF_table(BITSn(word0,0x07), BITSn(word0,0x08), 
 						  m_source, m_destination);
-		m_opcode = "sub";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode + " " + regIdAsString(m_source) + "," + regIdAsString(m_destination);
+		retString = "sub " + regIdAsString(m_source) + "," + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -3435,6 +3336,7 @@ class Sub_2: public Instruction
 public:
 	Sub_2(const Opcode* oco, const UINT16 word0, const UINT16 word1) : Instruction(oco)
 	{
+        m_opcode = "";
 		m_valid = decode(word0, word1);
 	}
 	bool decode(const UINT16 word0, const UINT16 word1)
@@ -3452,6 +3354,9 @@ public:
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
+    
+private:
+    std::string m_opcode;
 };
 
 // SUBL : .... .... 0100 F001 : A-204 //////////////////////////////////////////
@@ -3475,13 +3380,11 @@ public:
 			m_source = iA;
 			m_destination = iB;
 		}
-
-		m_opcode = "subl";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode + " " + regIdAsString(m_source) + "," + regIdAsString(m_destination);
+		retString = "subl " + regIdAsString(m_source) + "," + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -3499,13 +3402,11 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		decode_F_table(BITSn(word0,0x0008), m_destination);
-
-		m_opcode = "swap";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode + " " + regIdAsString(m_destination);
+		retString = "swap " + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -3522,12 +3423,11 @@ public:
 	}
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
-		m_opcode = "swi";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode;
+		retString = "swi";
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -3540,6 +3440,7 @@ class Tcc: public Instruction
 public:
 	Tcc(const Opcode* oco, const UINT16 word0, const UINT16 word1) : Instruction(oco)
 	{
+        m_mnem = oINVALID;
 		m_destination2 = iINVALID;
 		m_valid = decode(word0, word1);
 	}
@@ -3550,10 +3451,7 @@ public:
 		
 		decode_RR_table(BITSn(word0,0x0030), m_destination2);
 
-		std::string M;
-		decode_cccc_table(BITSn(word0,0x03c0), M);
-		m_opcode = "t" + M;
-		// NEW // sprintf(opcode_str, "t.%s", M);
+		decode_cccc_table(BITSn(word0,0x03c0), m_mnem);
 		if (m_source != m_destination)
 			return true;
 		if (m_destination2 != iR0)
@@ -3563,7 +3461,10 @@ public:
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode;
+        std::string opcode = "t" + opMnemonicAsString(m_mnem);
+		// NEW // sprintf(opcode_str, "t.%s", M);
+        
+		retString = opcode;
 		if (m_source != m_destination)
 			retString += std::string(" ") + regIdAsString(m_source) + "," + regIdAsString(m_destination);
 		
@@ -3575,6 +3476,7 @@ public:
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 	
 private:
+    op_mnem m_mnem;
 	reg_id m_destination2;
 };
 
@@ -3590,13 +3492,11 @@ public:
 	{
 		decode_JJJF_table(BITSn(word0,0x07), BITSn(word0,0x08), 
 						  m_source, m_destination);
-
-		m_opcode = "tfr";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode + " " + regIdAsString(m_source) + "," + regIdAsString(m_destination);
+		retString = "tfr " + regIdAsString(m_source) + "," + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -3615,13 +3515,11 @@ public:
 	{
 		decode_DDF_table(BITSn(word0,0x03), BITSn(word0,0x08), 
 						 m_source, m_destination);
-
-		m_opcode = "tfr";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode + " " + regIdAsString(m_source) + "," + regIdAsString(m_destination);
+		retString = "tfr " + regIdAsString(m_source) + "," + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -3640,13 +3538,11 @@ public:
 	{
 		decode_JF_table(BITSn(word0,0x0001),BITSn(word0,0x0008), 
 						m_destination, m_source);
-
-		m_opcode = "tfr2";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode + " " + regIdAsString(m_source) + "," + regIdAsString(m_destination);
+		retString = "tfr2 " + regIdAsString(m_source) + "," + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -3679,8 +3575,6 @@ public:
 		assemble_ea_from_m_table(BITSn(word0,0x0200), rNum, m_ea);
 
         m_W = BITSn(word0,0x0100);
-
-		m_opcode = "tfr3";
 		return true;
 	}
 	void disassemble(std::string& retString) const
@@ -3688,7 +3582,7 @@ public:
         std::string source2;
         std::string destination2;
 		assemble_arguments_from_W_table(m_W, 'X', m_SD, m_ea, source2, destination2);
-		retString = m_opcode + " " + 
+		retString = "tfr3 " + 
 					regIdAsString(m_source) + "," + regIdAsString(m_destination) + " " + 
                     source2 + "," + destination2;
 	}
@@ -3715,13 +3609,11 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		decode_F_table(BITSn(word0,0x08), m_destination);
-
-		m_opcode = "tst";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode + " " + regIdAsString(m_destination);
+		retString = "tst " + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -3739,13 +3631,11 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		decode_DD_table(BITSn(word0,0x0003), m_source);
-
-		m_opcode = "tst2";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode + " " + regIdAsString(m_source);
+		retString = "tst2 " + regIdAsString(m_source);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -3762,12 +3652,11 @@ public:
 	}
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
-		m_opcode = "wait";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode;
+		retString = "wait";
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -3785,13 +3674,11 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		decode_F_table(BITSn(word0,0x0008), m_destination);
-
-		m_opcode = "zero";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode + " " + regIdAsString(m_destination);
+		retString = "zero " + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
@@ -3826,13 +3713,11 @@ public:
 			m_source  = iX1;
 			m_source2 = iY1;
 		}
-		
-		m_opcode = "shfl";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode + " " + 
+		retString = "shfl " + 
 					regIdAsString(m_source) + "," +
 					regIdAsString(m_source2) + "," + regIdAsString(m_destination);
 	}
@@ -3872,13 +3757,11 @@ public:
 			m_source  = iX1;
 			m_source2 = iY1;
 		}
-		
-		m_opcode = "shfr";
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = m_opcode + " " + 
+		retString = "shfr " + 
 					regIdAsString(m_source) + "," +
 					regIdAsString(m_source2) + "," + regIdAsString(m_destination);
 	}

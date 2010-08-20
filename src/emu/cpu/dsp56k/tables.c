@@ -24,26 +24,26 @@ bfShift decode_BBB_table(UINT16 BBB)
 	return BBB_INVALID;
 }
 
-void decode_cccc_table(const UINT16 cccc, std::string& mnemonic)
+void decode_cccc_table(const UINT16 cccc, op_mnem& mnemonic)
 {
 	switch (cccc)
 	{
-		case 0x0: mnemonic = "cc"; break;
-		case 0x1: mnemonic = "ge"; break;
-		case 0x2: mnemonic = "ne"; break;
-		case 0x3: mnemonic = "pl"; break;
-		case 0x4: mnemonic = "nn"; break;
-		case 0x5: mnemonic = "ec"; break;
-		case 0x6: mnemonic = "lc"; break;
-		case 0x7: mnemonic = "gt"; break;
-		case 0x8: mnemonic = "cs"; break;
-		case 0x9: mnemonic = "lt"; break;
-		case 0xa: mnemonic = "eq"; break;
-		case 0xb: mnemonic = "mi"; break;
-		case 0xc: mnemonic = "nr"; break;
-		case 0xd: mnemonic = "es"; break;
-		case 0xe: mnemonic = "ls"; break;
-		case 0xf: mnemonic = "le"; break;
+		case 0x0: mnemonic = oCC; break;
+		case 0x1: mnemonic = oGE; break;
+		case 0x2: mnemonic = oNE; break;
+		case 0x3: mnemonic = oPL; break;
+		case 0x4: mnemonic = oNN; break;
+		case 0x5: mnemonic = oEC; break;
+		case 0x6: mnemonic = oLC; break;
+		case 0x7: mnemonic = oGT; break;
+		case 0x8: mnemonic = oCS; break;
+		case 0x9: mnemonic = oLT; break;
+		case 0xa: mnemonic = oEQ; break;
+		case 0xb: mnemonic = oMI; break;
+		case 0xc: mnemonic = oNR; break;
+		case 0xd: mnemonic = oES; break;
+		case 0xe: mnemonic = oLS; break;
+		case 0xf: mnemonic = oLE; break;
 	}
 
 // NEW //   switch (cccc)
@@ -412,24 +412,24 @@ void decode_rr_table(UINT16 rr, reg_id& ret)
     }
 }
 
-void decode_s_table(const UINT16 s, std::string& arithmetic)
+void decode_s_table(const UINT16 s, op_mnem& arithmetic)
 {
 	switch(s)
 	{
-		case 0x0: arithmetic = "su"; break;
-		case 0x1: arithmetic = "uu"; break;
+		case 0x0: arithmetic = oSU; break;
+		case 0x1: arithmetic = oUU; break;
 	}
 }
 
-void decode_ss_table(const UINT16 ss, std::string& arithmetic)
+void decode_ss_table(const UINT16 ss, op_mnem& arithmetic)
 {
 	switch(ss)
 	{
-		case 0x0: arithmetic = "ss"; break;
-		case 0x1: arithmetic = "!!"; break;
-	  //case 0x1: arithmetic = "ss"; break;
-		case 0x2: arithmetic = "su"; break;
-		case 0x3: arithmetic = "uu"; break;
+		case 0x0: arithmetic = oSS; break;
+		case 0x1: arithmetic = oINVALID; break;
+		// NEW // case 0x1: arithmetic = "ss"; break;
+		case 0x2: arithmetic = oSU; break;
+		case 0x3: arithmetic = oUU; break;
 	}
 }
 
@@ -799,6 +799,36 @@ std::string regIdAsString(const reg_id& regId)
     }
     
     return "INVALID_REG_ID";
+}
+
+std::string opMnemonicAsString(const op_mnem& mnem)
+{
+    switch(mnem)
+    {
+        case oCC: return "cc"; break;
+        case oGE: return "ge"; break;
+        case oNE: return "ne"; break;
+        case oPL: return "pl"; break;
+        case oNN: return "nn"; break;
+        case oEC: return "ec"; break;
+        case oLC: return "lc"; break;
+        case oGT: return "gt"; break;
+        case oCS: return "cs"; break;
+        case oLT: return "lt"; break;
+        case oEQ: return "eq"; break;
+        case oMI: return "mi"; break;
+        case oNR: return "nr"; break;
+        case oES: return "es"; break;
+        case oLS: return "ls"; break;
+        case oLE: return "le"; break;
+        
+        case oSS: return "ss"; break;
+        case oSU: return "su"; break;
+        case oUU: return "uu"; break;
+        case oINVALID: return "!!"; break;
+    }
+    
+    return "INVALID_OPCODE_MNEMONIC";
 }
 
 reg_id stringAsRegID(const std::string& str)

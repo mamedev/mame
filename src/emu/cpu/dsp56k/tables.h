@@ -26,11 +26,16 @@ enum reg_id {iX,  iX0, iX1,
              iLC, iSR, iOMR, iSP, iSSH, iSSL, iLA, iMR, iCCR, 
              iF, iFHAT, 
              iINVALID, iWEIRD};
-                
+
+enum op_mnem {oCC, oGE, oNE, oPL,
+              oNN, oEC, oLC, oGT,
+              oCS, oLT, oEQ, oMI,
+              oNR, oES, oLS, oLE,
+              oSS, oSU, oUU, oINVALID};
 
 
 bfShift decode_BBB_table(UINT16 BBB);
-void decode_cccc_table(const UINT16 cccc, std::string& mnemonic);
+void decode_cccc_table(const UINT16 cccc, op_mnem& mnemonic);
 void decode_DDDDD_table(const UINT16 DDDDD, reg_id& SD);
 void decode_DD_table(const UINT16 DD, reg_id& SD);
 void decode_DDF_table(const UINT16 DD, const UINT16 F, reg_id& S, reg_id& D);
@@ -52,8 +57,8 @@ void decode_QQF_special_table(const UINT16 QQ, const UINT16 F, reg_id& S1, reg_i
 void decode_QQQF_table(const UINT16 QQQ, const UINT16 F, reg_id& S1, reg_id& S2, reg_id& D);
 void decode_RR_table(UINT16 RR, reg_id& ret);
 void decode_rr_table(UINT16 rr, reg_id& ret);
-void decode_s_table(const UINT16 s, std::string& arithmetic);
-void decode_ss_table(const UINT16 ss, std::string& arithmetic);
+void decode_s_table(const UINT16 s, op_mnem& arithmetic);
+void decode_ss_table(const UINT16 ss, op_mnem& arithmetic);
 void decode_uuuuF_table(const UINT16 uuuu, const UINT16 F, std::string& arg, reg_id& S, reg_id& D);
 void decode_Z_table(const UINT16 Z, std::string& ea);
 
@@ -80,6 +85,7 @@ UINT16 regValue16(dsp56k_core* cpustate, const reg_id& reg);
 void setReg16(dsp56k_core* cpustate, const UINT16& value, const reg_id& reg);
 
 std::string regIdAsString(const reg_id& regId);
+std::string opMnemonicAsString(const op_mnem& mnem);
 reg_id stringAsRegID(const std::string& str);
 UINT8 regIDAsNum(const reg_id& regId);
 
