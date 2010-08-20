@@ -575,6 +575,7 @@ static void arm7_core_reset(legacy_cpu_device *device)
     cpustate->device = device;
     cpustate->program = device->space(AS_PROGRAM);
 	cpustate->endian = ENDIANNESS_LITTLE;
+	cpustate->direct = &cpustate->program->direct();
 
     /* start up in SVC mode with interrupts disabled. */
     SwitchMode(cpustate, eARM7_MODE_SVC);
