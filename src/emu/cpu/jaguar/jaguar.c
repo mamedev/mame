@@ -482,7 +482,7 @@ static CPU_EXECUTE( jaguargpu )
 	/* if we're halted, we shouldn't be here */
 	if (!(jaguar->ctrl[G_CTRL] & 1))
 	{
-		cpu_set_input_line(device, INPUT_LINE_HALT, ASSERT_LINE);
+		//cpu_set_input_line(device, INPUT_LINE_HALT, ASSERT_LINE);
 		jaguar->icount = 0;
 		return;
 	}
@@ -521,7 +521,7 @@ static CPU_EXECUTE( jaguardsp )
 	/* if we're halted, we shouldn't be here */
 	if (!(jaguar->ctrl[G_CTRL] & 1))
 	{
-		cpu_set_input_line(device, INPUT_LINE_HALT, ASSERT_LINE);
+		//cpu_set_input_line(device, INPUT_LINE_HALT, ASSERT_LINE);
 		jaguar->icount = 0;
 		return;
 	}
