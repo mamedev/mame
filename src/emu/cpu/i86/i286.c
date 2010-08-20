@@ -295,6 +295,7 @@ static CPU_INIT( i80286 )
 	cpustate->device = device;
 	cpustate->program = device->space(AS_PROGRAM);
 	cpustate->io = device->space(AS_IO);
+	cpustate->direct = &cpustate->program->direct();
 
 	/* If a reset parameter is given, take it as pointer to an address mask */
 	if( device->baseconfig().static_config() )
