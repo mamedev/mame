@@ -2929,7 +2929,7 @@ ROM_START( comg080 )	/* Cal Omega v8.0 (Arcade Black Jack) */
 	ROM_LOAD( "08-02.u6",	0x2000, 0x0800, CRC(abf8c48e) SHA1(fea059af900fd6d17725ccf7a5ff2eb0af5c8e0a) )
 	ROM_LOAD( "08-03.u7",	0x2800, 0x0800, CRC(e9ccb5af) SHA1(68a45d839afba3c6eafb7c75e5660de3a6be4eb5) )
 	ROM_LOAD( "08-04.u8",	0x3000, 0x0800, CRC(325bdae8) SHA1(5a94c96ec3980361570da58fb407a1dba38064b8) )
-	ROM_LOAD( "08-05.u9",	0x3800, 0x0800, BAD_DUMP CRC(71bd14d2) SHA1(00b3e2d965ac7ae1fc994b81246ad2c29ef4834c) ) /* bad dump */
+	ROM_LOAD( "08-05.u9",	0x3800, 0x0800, BAD_DUMP CRC(71bd14d2) SHA1(00b3e2d965ac7ae1fc994b81246ad2c29ef4834c) ) /* bad dump. 2nd half is blank */
 
 	ROM_REGION( 0x0800, "gfx1", 0 )
 	ROM_LOAD( "gpkcg0.u67",	0x0000, 0x0800, CRC(b626ad89) SHA1(551b75f4559d11a4f8f56e38982114a21c77d4e7) )
