@@ -392,6 +392,24 @@
     The whole map is mirrored to $8000-$FFFF.
 
 
+    --- System 906 III ---
+
+    $0000 - $07FF   NVRAM           ; All registers and settings.
+    $2C08 - $2C08   AY-8912         ; Read/Control.
+    $2C09 - $2C09   AY-8912         ; Write.
+    $280C - $280F   PIAT0           ; I/O unknown.
+    $2824 - $2827   PIAT1           ; I/O unknown.
+    $2C04 - $2C04   CRTC6845        ; MC6845 adressing.
+    $2C05 - $2C05   CRTC6845        ; MC6845 Read/Write.
+
+    $2000 - $23FF   VideoRAM
+    $2400 - $27FF   ColorRAM
+
+    $6000 - $FFFF   ROM space.      ; System 906.
+
+    No mirrors... Using the whole CPU addressing.
+
+
 
     *** MC6545 Initialization (60Hz) ***
 
@@ -401,7 +419,6 @@
     value:     0x27  0x20  0x23  0x03  0x1F  0x04  0x1F  0x1F  0x00  0x07  0x00  0x00  0x00  0x00  0x00  0x00  0x00  0x00.
 
 
-
     *** MC6545 conditional 50Hz change for elgrande if 0x8c4 (PIA0) has bit7 deactivated ***
 
     ---------------------------------------------------------
@@ -409,66 +426,6 @@
     ---------------------------------------------------------
     value:     0x27  0x20  0x23  0x03  0x26  0x00  0x20  0x22
 
-
-
-***********************************************************************************
-
-
-    Dumper notes (old)
-
-
-    -- Gaming Draw Poker --------------------------------------------------------
-
-    Program roms are roms 23*.*, on the board, there is a number near each roms
-    looks to be the address of the rom :
-
-            23-91   1800
-            23-92   2000
-            23-93   2800
-            23-94   3000
-            23-9    3800
-
-    Graphics are in roms CG*.*, there is no type indication on these rams, i hope
-    i read them correctly.
-
-    There is also 3 sets of switches on the board :
-
-            SW1     1       300     SW2     1       OPT1
-                    2       600             2       OPT2
-                    3       1200            3       OPT3
-                    4       2400            4       OPT4
-                    5       4800            5       OPT5
-                    6       9600            6       DIS
-                    7       -               7       +VPOL
-                    8       -               8       +HPOL
-
-            SW3     no indications on the board
-
-    The sound rom is missing on the board :(
-
-
-    -- El Grande 5 Card Draw ----------------------------------------------------
-
-    ROM text showed poker stuff and "TUNI" "1982"
-
-    .u6    2716
-    .u7    2516
-    .u8    2516
-    .u9    2516
-    .u67   2516
-    .u68   2516
-    .u69   2716
-    .u70   2716
-    .u28   82s129
-
-    6502
-    HD46505
-    AY-3-8912
-    MC6821P x2
-    TC5501  x2
-    10MHz Crystal
-
-    empty socket at u5
 
 
 ***********************************************************************************
@@ -499,6 +456,12 @@
         - Documented the hardware specs.
         - Added Game 51.08 (CEI Video Poker, Jacks or Better),
           running in CEI 906III hardware. The game is not working.
+        - Corrected docs about the 906III memory map.
+        - Mapped the AY8912.
+        - Added AY8912 proper interfase. Tied SW2 to AY8912 port.
+        - PIA0, portA is polled constantly. Tied some debug handlers
+	       to understand how the input system works.
+        - Added notes about the PIAs R/W.
 
 
     [2009-09-03]
@@ -703,9 +666,9 @@ VIDEO_START( calomega );
 VIDEO_UPDATE( calomega );
 
 
-/****************************
-*    Read/Write Handlers    *
-****************************/
+/**************************************************
+*               Read/Write Handlers               *
+**************************************************/
 
 static WRITE_LINE_DEVICE_HANDLER( tx_rx_clk )
 {
@@ -758,7 +721,74 @@ static WRITE8_DEVICE_HANDLER( s905_mux_w )
 }
 
 
-/****  Lamps debug  ****
+/********* 906III PIAs debug *********/
+
+static READ8_DEVICE_HANDLER( pia0_ain_r )
+{
+	/* Valid input port. Each polled value is stored at $0538 */
+	logerror("PIA0: Port A in\n");
+	return input_port_read(device->machine, "IN0");
+}
+
+static READ8_DEVICE_HANDLER( pia0_bin_r )
+{
+	logerror("PIA0: Port B in\n");
+	return 0xff;
+}
+
+static WRITE8_DEVICE_HANDLER( pia0_aout_w )
+{
+	logerror("PIA0: Port A out: %02X\n", data);
+}
+
+static WRITE8_DEVICE_HANDLER( pia0_bout_w )
+{
+	logerror("PIA0: Port B out: %02X\n", data);
+}
+
+static WRITE8_DEVICE_HANDLER( pia0_ca2_w )
+{
+	/* Seems a kind of "heartbit" watchdog, switching 1's and 0's */
+	logerror("PIA0: CA2: %02X\n", data);
+}
+
+
+
+static READ8_DEVICE_HANDLER( pia1_ain_r )
+{
+	logerror("PIA1: Port A in\n");
+	return 0xff;
+}
+
+static READ8_DEVICE_HANDLER( pia1_bin_r )
+{
+	logerror("PIA1: Port B in\n");
+	return 0xff;
+}
+
+static WRITE8_DEVICE_HANDLER( pia1_aout_w )
+{
+	logerror("PIA1: Port A out: %02X\n", data);
+}
+
+static WRITE8_DEVICE_HANDLER( pia1_bout_w )
+{
+	logerror("PIA1: Port B out: %02X\n", data);
+}
+
+
+static WRITE8_DEVICE_HANDLER( ay_aout_w )
+{
+	logerror("AY8910: Port A out: %02X\n", data);
+}
+
+static WRITE8_DEVICE_HANDLER( ay_bout_w )
+{
+	logerror("AY8910: Port B out: %02X\n", data);
+}
+
+
+/********  Lamps debug  ********
 
     PIA0-B  PIA1-A
 
@@ -811,9 +841,9 @@ static WRITE8_DEVICE_HANDLER( lamps_905_w )
 }
 
 
-/*************************
-* Memory map information *
-*************************/
+/*************************************************
+*             Memory map information             *
+*************************************************/
 
 static ADDRESS_MAP_START( sys903_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
@@ -862,15 +892,16 @@ static ADDRESS_MAP_START( sys906_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2824, 0x2827) AM_DEVREADWRITE("pia1", pia6821_r, pia6821_w)
 	AM_RANGE(0x2c04, 0x2c04) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0x2c05, 0x2c05) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
+	AM_RANGE(0x2c08, 0x2c09) AM_DEVREADWRITE("ay8912", ay8910_r, ay8910_address_data_w)
 	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(calomega_videoram_w) AM_BASE(&calomega_videoram)
 	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE(calomega_colorram_w) AM_BASE(&calomega_colorram)
 	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
-/*************************
-*      Input ports       *
-*************************/
+/*************************************************
+*                  Input ports                   *
+*************************************************/
 
 static INPUT_PORTS_START( stand903 )
 	PORT_START("IN0-0")
@@ -2259,12 +2290,48 @@ static INPUT_PORTS_START( ssipkr )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( stand906 )
+
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("0-1") PORT_CODE(KEYCODE_1)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("0-2") PORT_CODE(KEYCODE_2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("0-3") PORT_CODE(KEYCODE_3)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("0-4") PORT_CODE(KEYCODE_4)
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("0-5") PORT_CODE(KEYCODE_5)
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("0-6") PORT_CODE(KEYCODE_6)
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("0-7") PORT_CODE(KEYCODE_7)
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_NAME("0-8") PORT_CODE(KEYCODE_8)
+
+	PORT_START("SW2")	/* Tied to AY8912 port. Covered with tape except SW2-8 */
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW2:3")
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW2:4")
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW2:5")
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW2:6")
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW2:7")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )	PORT_DIPLOCATION("SW2:8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 
-/*************************
-*    Graphics Layouts    *
-*************************/
+/*************************************************
+*                Graphics Layouts                *
+*************************************************/
 
 static const gfx_layout charlayout =
 {
@@ -2289,9 +2356,9 @@ static const gfx_layout tilelayout =
 };
 
 
-/******************************
-* Graphics Decode Information *
-******************************/
+/*************************************************
+*          Graphics Decode Information           *
+*************************************************/
 
 static GFXDECODE_START( calomega )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout, 0, 16 )
@@ -2304,9 +2371,9 @@ static GFXDECODE_START( sys906 )
 GFXDECODE_END
 
 
-/***********************
-*    PIA Interfaces    *
-***********************/
+/*************************************************
+*                 PIA Interfaces                 *
+*************************************************/
 
 /********** System 903/904 PIA-0 (U54) wiring **********
 
@@ -2556,18 +2623,19 @@ static const pia6821_interface sys905_pia1_intf =
 	DEVCB_NULL					/* IRQB */
 };
 
+
 /********** System 906 PIA-0  **********/
 static const pia6821_interface sys906_pia0_intf =
 {
-	DEVCB_NULL,						/* port A in */
-	DEVCB_NULL,						/* port B in */
+	DEVCB_HANDLER(pia0_ain_r),		/* port A in */		/* Valid input port. Each polled value is stored at $0538 */
+	DEVCB_HANDLER(pia0_bin_r),		/* port B in */
 	DEVCB_NULL,						/* line CA1 in */
 	DEVCB_NULL,						/* line CB1 in */
 	DEVCB_NULL,						/* line CA2 in */
 	DEVCB_NULL,						/* line CB2 in */
-	DEVCB_NULL,						/* port A out */
-	DEVCB_NULL,						/* port B out */
-	DEVCB_NULL,						/* line CA2 out */
+	DEVCB_HANDLER(pia0_aout_w),		/* port A out */
+	DEVCB_HANDLER(pia0_bout_w),		/* port B out */
+	DEVCB_HANDLER(pia0_ca2_w),		/* line CA2 out */	/* Seems a kind of "heartbit" watchdog, switching 1's and 0's */
 	DEVCB_NULL,						/* port CB2 out */
 	DEVCB_NULL,						/* IRQA */
 	DEVCB_NULL						/* IRQB */
@@ -2576,14 +2644,14 @@ static const pia6821_interface sys906_pia0_intf =
 /********** System 906 PIA-1  **********/
 static const pia6821_interface sys906_pia1_intf =
 {
-	DEVCB_NULL,						/* port A in */
-	DEVCB_NULL,						/* port B in */
+	DEVCB_HANDLER(pia1_ain_r),		/* port A in */
+	DEVCB_HANDLER(pia1_bin_r),		/* port B in */
 	DEVCB_NULL,						/* line CA1 in */
 	DEVCB_NULL,						/* line CB1 in */
 	DEVCB_NULL,						/* line CA2 in */
 	DEVCB_NULL,						/* line CB2 in */
-	DEVCB_NULL,						/* port A out */
-	DEVCB_NULL,						/* port B out */
+	DEVCB_HANDLER(pia1_aout_w),		/* port A out */
+	DEVCB_HANDLER(pia1_bout_w),		/* port B out */
 	DEVCB_NULL,						/* line CA2 out */
 	DEVCB_NULL,						/* port CB2 out */
 	DEVCB_NULL,						/* IRQA */
@@ -2591,9 +2659,9 @@ static const pia6821_interface sys906_pia1_intf =
 };
 
 
-/***********************
-*    ACIA Interface    *
-***********************/
+/*************************************************
+*                 ACIA Interface                 *
+*************************************************/
 
 static READ_LINE_DEVICE_HANDLER( acia_rx_r )
 {
@@ -2618,9 +2686,9 @@ static ACIA6850_INTERFACE( acia6850_intf )
 };
 
 
-/*************************
-*    Sound Interfaces    *
-*************************/
+/*************************************************
+*                Sound Interfaces                *
+*************************************************/
 
 static const ay8910_interface sys903_ay8912_intf =
 {
@@ -2646,16 +2714,16 @@ static const ay8910_interface sys906_ay8912_intf =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
+	DEVCB_INPUT_PORT("SW2"),	/* From PCB pic. Value is stored at $0539 */
 	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL,
-	DEVCB_NULL
+	DEVCB_HANDLER(ay_aout_w),
+	DEVCB_HANDLER(ay_bout_w)
 };
 
 
-/************************
-*    CRTC Interface    *
-************************/
+/*************************************************
+*                CRTC Interface                  *
+*************************************************/
 
 static const mc6845_interface mc6845_intf =
 {
@@ -2672,9 +2740,9 @@ static const mc6845_interface mc6845_intf =
 };
 
 
-/*************************
-*    Machine Drivers     *
-*************************/
+/*************************************************
+*                Machine Drivers                 *
+*************************************************/
 
 static MACHINE_DRIVER_START( sys903 )
 	/* basic machine hardware */
@@ -2771,17 +2839,16 @@ static MACHINE_DRIVER_START( sys906 )
 MACHINE_DRIVER_END
 
 
-/*************************
-*        ROM Load        *
-*************************/
-/*
-
-Notes:
-
-jkrpkr, jkr2, jkrtwo: graphics are identical.
-cpkcg, pkcg:          graphics are identical.
-
-*/
+/*************************************************
+*                    ROM Load                    *
+**************************************************
+*
+* Notes:
+*
+*  jkrpkr, jkr2, jkrtwo: graphics are identical.
+*  cpkcg, pkcg:          graphics are identical.
+*
+*************************************************/
 
 ROM_START( comg074 )	/* Cal Omega v7.4 (Gaming Poker) */
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -3457,6 +3524,39 @@ ROM_START( comg236 )	/* Cal Omega v23.6 (Hotline) */
 	ROM_RELOAD(				0x0300, 0x0100 )
 ROM_END
 
+/*
+
+  Gaming Draw Poker.
+
+  Program roms are roms 23*.*, on the board, there is a number near each roms
+  looks to be the address of the rom :
+
+          23-91   1800
+          23-92   2000
+          23-93   2800
+          23-94   3000
+          23-9    3800
+
+  Graphics are in roms CG*.*, there is no type indication on these rams, i hope
+  i read them correctly.
+
+  There is also 3 sets of switches on the board :
+
+          SW1     1       300     SW2     1       OPT1
+                  2       600             2       OPT2
+                  3       1200            3       OPT3
+                  4       2400            4       OPT4
+                  5       4800            5       OPT5
+                  6       9600            6       DIS
+                  7       -               7       +VPOL
+                  8       -               8       +HPOL
+
+          SW3     no indications on the board
+
+  The sound rom is missing on the board :(
+
+*/
+
 ROM_START( comg239 )	/* Cal Omega v23.9 (Gaming Draw Poker) */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "23-91.u5",	0x1800, 0x0800, CRC(b49035e2) SHA1(b94a0245ca64d15b1496d1b272ffc0ce80f85526) )
@@ -3573,13 +3673,16 @@ ROM_START( comg272b )	/* Cal Omega v27.2 (Keno (gaming)) */
 ROM_END
 
 /*
-CEI Video Poker
-Jacks or Better
-V 51.08
-Pay Schedule 05F Controled by EPR1- 50.081
-906 board
-PROMS 2764
+
+  CEI Video Poker
+  Jacks or Better
+  V 51.08
+  Pay Schedule 05F Controled by EPR1- 50.081
+  906 board
+  PROMS 2764
+
 */
+
 ROM_START( comg5108 )	/* Cal Omega v51.08 (Gaming Poker) */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "epr1.u28",	0x6000, 0x2000, CRC(3d6abca9) SHA1(54a802f89bd64380abf269a2b507513c8db5319b) )	/* checked in offset $8034 */
@@ -3599,7 +3702,8 @@ ROM_START( comg5108 )	/* Cal Omega v51.08 (Gaming Poker) */
 ROM_END
 
 
-/******* Diagnostic PROMs *******/
+
+/*********************** Diagnostic PROMs ***********************/
 
 ROM_START( comg903d )	/* Cal Omega 903d (System 903 diag.PROM) */
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -3644,7 +3748,35 @@ ROM_START( comg905d )	/* Cal Omega 905d (System 905 diag.PROM) */
 ROM_END
 
 
-/******* Unofficial / 3rd part games *******/
+
+/****************** Unofficial / 3rd part games *****************/
+
+/*
+
+  El Grande 5 Card Draw
+
+  ROM text showed poker stuff and "TUNI" "1982"
+
+  .u6    2716
+  .u7    2516
+  .u8    2516
+  .u9    2516
+  .u67   2516
+  .u68   2516
+  .u69   2716
+  .u70   2716
+  .u28   82s129
+
+  6502
+  HD46505
+  AY-3-8912
+  MC6821P x2
+  TC5501  x2
+  10MHz Crystal
+
+  empty socket at u5
+
+*/
 
 ROM_START( elgrande )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -3785,9 +3917,9 @@ ROM_START( ssipkr40 )	/* (gfx and prom from jjpoker) */
 ROM_END
 
 
-/*************************
-*      Driver Init       *
-*************************/
+/*************************************************
+*                  Driver Init                   *
+*************************************************/
 
 static DRIVER_INIT( standard )
 {
@@ -3856,9 +3988,9 @@ static DRIVER_INIT( comg080 )
 }
 
 
-/*************************
-*      Game Drivers      *
-*************************/
+/*************************************************
+*                  Game Drivers                  *
+*************************************************/
 
 /*    YEAR  NAME      PARENT    MACHINE   INPUT     INIT      ROT    COMPANY                                  FULLNAME                                                    FLAGS   */
 GAME( 1981, comg074,  0,        sys903,   comg074,  standard, ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 7.4 (Gaming Poker, W.Export)",             0 )
@@ -3897,11 +4029,11 @@ GAME( 1985, comg272a, 0,        sys903,   stand903, standard, ROT0, "Cal Omega I
 GAME( 1985, comg272b, 0,        sys903,   stand903, standard, ROT0, "Cal Omega Inc.",                        "Cal Omega - Game 27.2 (Keno, gaming)",                      GAME_NOT_WORKING )
 GAME( 198?, comg5108, 0,        sys906,   stand906, standard, ROT0, "Cal Omega / Casino Electronics Inc.",   "Cal Omega - Game 51.08 (CEI Video Poker, Jacks or Better)", GAME_NOT_WORKING )
 
-/****** Diagnostic PROMs ******/
+/************ Diagnostic PROMs ************/
 GAME( 198?, comg903d, 0,        sys903,   stand903, standard, ROT0, "Cal Omega Inc.",                        "Cal Omega - System 903 Diag.PROM",                          GAME_NOT_WORKING )
 GAME( 198?, comg905d, 0,        sys905,   stand905, standard, ROT0, "Cal Omega Inc.",                        "Cal Omega - System 905 Diag.PROM",                          GAME_NOT_WORKING )
 
-/****** Unofficial / 3rd part games ******/
+/****** Unofficial / 3rd part games *******/
 GAME( 1982, elgrande, 0,        s903mod,  elgrande, elgrande, ROT0, "Tuni Electro Service / E.T. Marketing", "El Grande - 5 Card Draw (New)",                             0 )
 GAME( 1983, jjpoker,  0,        s903mod,  jjpoker,  jjpoker,  ROT0, "Enter-Tech (ETL)",                      "Jackpot Joker Poker (set 1)",                               0 )
 GAME( 1983, jjpokerb, jjpoker,  s903mod,  jjpoker,  jjpoker,  ROT0, "Enter-Tech (ETL)",                      "Jackpot Joker Poker (set 2)",                               0 )
