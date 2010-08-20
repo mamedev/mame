@@ -9713,6 +9713,7 @@ Other Sun games
 	DRIVER( caswin )	/* (c) 1985 */
 
 	/* Aristocrat Mk4 hardware */
+	DRIVER( 3bagflvt )	/* (c) 1994 */
 	DRIVER( 3bagflnz )	/* (c) 1994 */
 	DRIVER( blkrhino )	/* (c) 1996 */
 	DRIVER( coralr2 )	/* (c) 2002 */

@@ -53,6 +53,11 @@
         30/5/10 - Palindrome
         Now using mc146818 rtc driver instead of rtc_get_reg.
 
+        19/8/10 - Roberto Fresca.
+		Added 3 Bags Full - 5VXFC790 (Victorian).
+		Set is now parent. Replaced the bad dumped GFX from NZ set with the new ones,
+		since they match 4 of 6 bitplanes.
+
         The mc146818 driver is buggy - reported problem to Firewave and issues will be addressed.
         In this driver, the wrong day of the month is shown, wrong hours are shown.
         rtc causes game to freeze if the game is left in audit mode with continuous writes to 0xA reg - 0x80 data.
@@ -1212,6 +1217,30 @@ static MACHINE_DRIVER_START( aristmk4 )
 
 MACHINE_DRIVER_END
 
+ROM_START( 3bagflvt )
+
+	ROM_REGION(0x10000, "maincpu", 0 )
+	 /* VIDEO AND SOUND EPROM */
+	ROM_LOAD("3_bag_full_video_sound.u59",  0x02000, 0x2000, CRC(84226547) SHA1(df9c2c01a7ac4d930c06a8c4863853ddb1a2adbe)) // sound and video rom
+
+	 /* GAME EPROMS */
+	ROM_LOAD("5vxfc790_3_bag_full_1-2.u87", 0x06000, 0x2000, CRC(79ee932f) SHA1(de85de107310315b69bd7564f1921c7501b679b2)) // game code
+	ROM_LOAD("5vxfc790_3_bag_full_2-2.u86", 0x08000, 0x8000, CRC(b6185f3b) SHA1(db642d7b1d1fd93483642bae518eb99a3e99aec9)) // game code
+
+	/* SHAPE EPROMS */
+	ROM_REGION(0xc000, "tile_gfx", 0 )
+	ROM_LOAD("1vlsh224_3_bag_full_1-6.u20", 0x00000, 0x2000, CRC(b02d4ce8) SHA1(eace41f870bfbc253124efd72f1c7d6021f2e99f)) // gfx
+	ROM_LOAD("1vlsh224_3_bag_full_3-6.u21", 0x02000, 0x2000, CRC(06218c95) SHA1(cbda8e50fd4e9c8a3c51a006921a85d4bfaa6f78))
+	ROM_LOAD("1vlsh224_3_bag_full_5-6.u22", 0x04000, 0x2000, CRC(191e73f1) SHA1(e6d510b155f9cd3427a70346e5ff28969309be4e))
+	ROM_LOAD("1vlsh224_3_bag_full_2-6.u45", 0x06000, 0x2000, CRC(054c55cb) SHA1(3df1893095f867220f3d6a52a40bcdffbfc8b529))
+	ROM_LOAD("1vlsh224_3_bag_full_4-6.u46", 0x08000, 0x2000, CRC(f33970b3) SHA1(8814a4d29383545c7c48e5b44f16a53e38b67fc3))
+	ROM_LOAD("1vlsh224_3_bag_full_6-6.u47", 0x0a000, 0x2000, CRC(609ecf9e) SHA1(9d819bb71f62eb4dd1b3d71748e87c7d77e2afe6))
+
+	 /* COLOR PROM */
+	ROM_REGION(0x200, "proms", 0 )
+	ROM_LOAD("1cm48.u71", 0x0000, 0x0200, CRC(81daeeb0) SHA1(7dfe198c6def5c4ae4ecac488d65c2911fb3a890))
+ROM_END
+
 ROM_START( 3bagflnz )
 
 	ROM_REGION(0x10000, "maincpu", 0 )
@@ -1223,13 +1252,13 @@ ROM_START( 3bagflnz )
 	ROM_LOAD("u86.bin", 0x08000, 0x8000, CRC(c632c7c7) SHA1(f3090d037f71a0cf099bb55abbc509cf95f0cbba)) // game code
 
 	/* SHAPE EPROMS */
-	ROM_REGION(0xc000, "tile_gfx", 0 )
-	ROM_LOAD("u20.bin", 0x00000, 0x2000, BAD_DUMP CRC(44babe95) SHA1(047c00ebb21030563921108b8e24f62e9ef44a10)) // gfx
-	ROM_LOAD("u21.bin", 0x02000, 0x2000, BAD_DUMP CRC(06218c95) SHA1(cbda8e50fd4e9c8a3c51a006921a85d4bfaa6f78))
-	ROM_LOAD("u22.bin", 0x04000, 0x2000, BAD_DUMP CRC(191e73f1) SHA1(e6d510b155f9cd3427a70346e5ff28969309be4e))
-	ROM_LOAD("u45.bin", 0x06000, 0x2000, BAD_DUMP CRC(054c55cb) SHA1(3df1893095f867220f3d6a52a40bcdffbfc8b529))
-	ROM_LOAD("u46.bin", 0x08000, 0x2000, BAD_DUMP CRC(7a4e8b80) SHA1(35711d6a8f5675ad6c6496bf8e7e5a73504f2409))
-	ROM_LOAD("u47.bin", 0x0a000, 0x2000, BAD_DUMP CRC(609ecf9e) SHA1(9d819bb71f62eb4dd1b3d71748e87c7d77e2afe6))
+	ROM_REGION(0xc000, "tile_gfx", 0 )	/* GFX from parent set. They match 4 of 6 bitplanes */
+	ROM_LOAD("1vlsh224_3_bag_full_1-6.u20", 0x00000, 0x2000, CRC(b02d4ce8) SHA1(eace41f870bfbc253124efd72f1c7d6021f2e99f)) // gfx
+	ROM_LOAD("1vlsh224_3_bag_full_3-6.u21", 0x02000, 0x2000, CRC(06218c95) SHA1(cbda8e50fd4e9c8a3c51a006921a85d4bfaa6f78))
+	ROM_LOAD("1vlsh224_3_bag_full_5-6.u22", 0x04000, 0x2000, CRC(191e73f1) SHA1(e6d510b155f9cd3427a70346e5ff28969309be4e))
+	ROM_LOAD("1vlsh224_3_bag_full_2-6.u45", 0x06000, 0x2000, CRC(054c55cb) SHA1(3df1893095f867220f3d6a52a40bcdffbfc8b529))
+	ROM_LOAD("1vlsh224_3_bag_full_4-6.u46", 0x08000, 0x2000, CRC(f33970b3) SHA1(8814a4d29383545c7c48e5b44f16a53e38b67fc3))
+	ROM_LOAD("1vlsh224_3_bag_full_6-6.u47", 0x0a000, 0x2000, CRC(609ecf9e) SHA1(9d819bb71f62eb4dd1b3d71748e87c7d77e2afe6))
 
 	 /* COLOR PROM */
 	ROM_REGION(0x200, "proms", 0 )
@@ -1574,18 +1603,19 @@ ROM_END
 
 
 
-GAMEL( 1994, eforest,		0,aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "Enchanted Forest - 12XF528902", GAME_NOT_WORKING,layout_aristmk4)
-GAMEL( 1995, eforesta,eforest,aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "Enchanted Forest - 4VXFC818", 0,layout_aristmk4 )
-GAMEL( 1996, eforestb,		0,aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "Enchanted Forest - 3VXFC5343 (New Zealand)", 0,layout_aristmk4 )
-GAMEL( 1994, 3bagflnz,		0,aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "3 Bags Full - 3VXFC5345 (New Zealand)", 0,layout_aristmk4 )
-GAMEL( 1996, blkrhino,		0,aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "Black Rhino - 3VXFC5344 (New Zealand)", 0,layout_aristmk4 )
-GAMEL( 1996, kgbird,		0,aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "K.G Bird - 4VXFC5341 (New Zealand, 87.98%)", 0,layout_aristmk4 )
-GAMEL( 1996, kgbirda,  kgbird,aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "K.G Bird - 4VXFC5341 (New Zealand, 91.97%)", 0,layout_aristmk4 )
-GAMEL( 1998, swtht2nz,		0,aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "Sweet Hearts II - 1VXFC5461 (New Zealand)", 0,layout_aristmk4 )
-GAMEL( 1996, goldenc,		0,aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "Golden Canaries - 1VXFC5462", 0,layout_aristmk4 )
-GAMEL( 1996, topgear,		0,aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "Top Gear - 4VXFC969", GAME_NOT_WORKING,layout_aristmk4 )
-GAMEL( 1996, wtigernz,		0,aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "White Tiger - 3VXFC5342 (New Zealand)", 0,layout_aristmk4 )
-GAMEL( 1998, phantomp,		0,aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "Phantom Pays - 4VXFC5431 (New Zealand)", 0,layout_aristmk4 )
-GAMEL( 2000, coralr2,		0,aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "Coral Riches II - 1VXFC5472 (New Zealand)", 0,layout_aristmk4 )
-GAMEL( 1999, ffortune,      0,aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "Fantasy Fortune", 0,layout_aristmk4 )
-GAMEL( 1999, autmoon,       0,aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "Autumn Moon", 0,layout_aristmk4 )
+GAMEL( 1994, eforest,  0,        aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "Enchanted Forest - 12XF528902",              GAME_NOT_WORKING, layout_aristmk4)
+GAMEL( 1995, eforesta, eforest,  aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "Enchanted Forest - 4VXFC818",                0,                layout_aristmk4 )
+GAMEL( 1996, eforestb, 0,        aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "Enchanted Forest - 3VXFC5343 (New Zealand)", 0,                layout_aristmk4 )
+GAMEL( 1994, 3bagflvt, 0,        aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "3 Bags Full - 5VXFC790 (Victorian)",         0,                layout_aristmk4 )
+GAMEL( 1994, 3bagflnz, 3bagflvt, aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "3 Bags Full - 3VXFC5345 (New Zealand)",      0,                layout_aristmk4 )
+GAMEL( 1996, blkrhino, 0,        aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "Black Rhino - 3VXFC5344 (New Zealand)",      0,                layout_aristmk4 )
+GAMEL( 1996, kgbird,   0,        aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "K.G Bird - 4VXFC5341 (New Zealand, 87.98%)", 0,                layout_aristmk4 )
+GAMEL( 1996, kgbirda,  kgbird,   aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "K.G Bird - 4VXFC5341 (New Zealand, 91.97%)", 0,                layout_aristmk4 )
+GAMEL( 1998, swtht2nz, 0,        aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "Sweet Hearts II - 1VXFC5461 (New Zealand)",  0,                layout_aristmk4 )
+GAMEL( 1996, goldenc,  0,        aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "Golden Canaries - 1VXFC5462",                0,                layout_aristmk4 )
+GAMEL( 1996, topgear,  0,        aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "Top Gear - 4VXFC969",                        GAME_NOT_WORKING, layout_aristmk4 )
+GAMEL( 1996, wtigernz, 0,        aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "White Tiger - 3VXFC5342 (New Zealand)",      0,                layout_aristmk4 )
+GAMEL( 1998, phantomp, 0,        aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "Phantom Pays - 4VXFC5431 (New Zealand)",     0,                layout_aristmk4 )
+GAMEL( 2000, coralr2,  0,        aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "Coral Riches II - 1VXFC5472 (New Zealand)",  0,                layout_aristmk4 )
+GAMEL( 1999, ffortune, 0,        aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "Fantasy Fortune",                            0,                layout_aristmk4 )
+GAMEL( 1999, autmoon,  0,        aristmk4, aristmk4, aristmk4, ROT0,  "Aristocrat", "Autumn Moon",                                0,                layout_aristmk4 )
