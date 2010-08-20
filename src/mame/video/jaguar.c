@@ -673,7 +673,12 @@ READ16_HANDLER( jaguar_tom_regs_r )
 	return gpu_regs[offset];
 }
 
-#if 0
+/*
+FIXME: this should be 1, but then MAME performance will be s*** with this (i.e. it drops the performance from 400% to 6% on an i5 machine).
+But the PIT irq is definitely needed by some games (for example Pitfall refuses to enter into gameplay without this enabled).
+*/
+#define PIT_MULT_DBG_HACK 64
+
 static TIMER_CALLBACK( jaguar_pit )
 {
 	attotime sample_period;
@@ -682,16 +687,16 @@ static TIMER_CALLBACK( jaguar_pit )
 
 	if (gpu_regs[PIT0])
 	{
-		sample_period = ATTOTIME_IN_NSEC(machine->device("gpu")->unscaled_clock() / (1+gpu_regs[PIT0]) / (1+gpu_regs[PIT1]));
-//      timer_set(machine, sample_period, NULL, 0, jaguar_pit);
+		sample_period = ATTOTIME_IN_NSEC(((machine->device("gpu")->unscaled_clock()*PIT_MULT_DBG_HACK) / (1+gpu_regs[PIT0])) / (1+gpu_regs[PIT1]));
+		timer_set(machine, sample_period, NULL, 0, jaguar_pit);
 	}
 }
-#endif
+
 
 WRITE16_HANDLER( jaguar_tom_regs_w )
 {
 	UINT32 reg_store = gpu_regs[offset];
-//  attotime sample_period;
+	attotime sample_period;
 	if (offset < GPU_REGS)
 	{
 		COMBINE_DATA(&gpu_regs[offset]);
@@ -705,18 +710,14 @@ WRITE16_HANDLER( jaguar_tom_regs_w )
 				break;
 			case PIT0:
 			case PIT1:
-				if(gpu_regs[PIT0] && reg_store != gpu_regs[offset])
-					printf("Warning: PIT irq used\n");
-				break;
-#if 0
-			case PIT1:
 				if (gpu_regs[PIT0])
 				{
-					sample_period = ATTOTIME_IN_NSEC(space->machine->device("gpu")->unscaled_clock() / (1+gpu_regs[PIT0]) / (1+gpu_regs[PIT1]));
+					sample_period = ATTOTIME_IN_NSEC(((space->machine->device("gpu")->unscaled_clock()*PIT_MULT_DBG_HACK) / (1+gpu_regs[PIT0])) / (1+gpu_regs[PIT1]));
+					//printf("%08x %08x",gpu_regs[PIT0]+1,gpu_regs[PIT1]+1);
 					timer_set(space->machine, sample_period, NULL, 0, jaguar_pit);
 				}
 				break;
-#endif
+
 			case INT1:
 				cpu_irq_state &= ~(gpu_regs[INT1] >> 8);
 				update_cpu_irq(space->machine);
