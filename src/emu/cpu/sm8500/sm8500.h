@@ -36,6 +36,4 @@ DECLARE_LEGACY_CPU_DEVICE(SM8500, sm8500);
 
 extern CPU_DISASSEMBLE( sm8500 );
 
-UINT8 *sm8500_get_internal_ram(legacy_cpu_device *device);
-
 #endif /* __SM8500_H__ */

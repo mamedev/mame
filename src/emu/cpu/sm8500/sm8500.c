@@ -7,6 +7,14 @@
   this cpu, and made educated guesses on the number of cycles for each instruction.
 
   Code by Wilbert Pol
+
+
+There is some internal ram for the main cpu registers. They are offset by an index value.
+The address is (PS0 & 0xF8) + register number. It is not known what happens when PS0 >= F8.
+The assumption is that F8 to 107 is used, but it might wrap around instead.
+The registers also mirror out to main RAM, appearing at 0000 to 000F regardless of where
+they are internally.
+
 */
 
 #include "emu.h"
@@ -27,33 +35,25 @@ struct _sm8500_state
 {
 	SM8500_CONFIG config;
 	UINT16 PC;
-	UINT8 *register_base;
 	UINT8 IE0;
 	UINT8 IE1;
 	UINT8 IR0;
 	UINT8 IR1;
-	UINT8 P0;
-	UINT8 P1;
-	UINT8 P2;
-	UINT8 P3;
 	UINT8 SYS;
 	UINT8 CKC;
 	UINT8 clock_changed;
 	UINT16 SP;
 	UINT8 PS0;
 	UINT8 PS1;
-	UINT8 P0C;
-	UINT8 P1C;
-	UINT8 P2C;
-	UINT8 P3C;
-	UINT8 IFLAGS;
+	UINT16 IFLAGS;
 	UINT8 CheckInterrupts;
 	int halted;
 	int icount;
 	device_irq_callback irq_callback;
 	legacy_cpu_device *device;
 	address_space *program;
-	UINT8 internal_ram[0x500];
+	UINT16 oldpc;
+	UINT8 register_ram[0x108];
 };
 
 INLINE sm8500_state *get_safe_token(running_device *device)
@@ -67,29 +67,56 @@ static const UINT8 sm8500_b2w[8] = {
         0, 8, 2, 10, 4, 12, 6, 14
 };
 
-static UINT8 sm85cpu_mem_readbyte( sm8500_state *cpustate, UINT32 offset ) {
-	return ( offset < 0x10 ) ? cpustate->register_base[offset] : cpustate->program->read_byte( offset );
+INLINE void sm8500_get_sp( sm8500_state *cpustate )
+{
+	UINT16 data = cpustate->program->read_byte(0x1c) << 8;
+	cpustate->SP = cpustate->program->read_byte(0x1d);
+	if (cpustate->SYS&0x40) cpustate->SP |= data;
 }
 
-static void sm85cpu_mem_writebyte( sm8500_state *cpustate, UINT32 offset, UINT8 data ) {
-	if ( offset < 0x10 ) {
-		cpustate->register_base[offset] = data;
-	} else {
-		cpustate->program->write_byte( offset, data );
+static UINT8 sm85cpu_mem_readbyte( sm8500_state *cpustate, UINT32 offset )
+{
+	offset &= 0xffff;
+	return (offset < 0x10) ? cpustate->register_ram[offset + (cpustate->PS0 & 0xF8)]
+		: cpustate->program->read_byte( offset );
+}
+
+static void sm85cpu_mem_writebyte( sm8500_state *cpustate, UINT32 offset, UINT8 data )
+{
+	UINT8 i;
+	offset &= 0xffff;
+	if (offset < 0x10)
+		cpustate->register_ram[offset + (cpustate->PS0 & 0xF8)] = data;
+
+	cpustate->program->write_byte ( offset, data );
+
+	switch (offset)
+	{
+		case 0x10: cpustate->IE0 = data; break;
+		case 0x11: cpustate->IE1 = data; break;
+		case 0x12: cpustate->IR0 = data; break;
+		case 0x13: cpustate->IR1 = data; break;
+		case 0x19: cpustate->SYS = data; break;
+		case 0x1a: cpustate->CKC = data; break;
+		case 0x1c:
+		case 0x1d: sm8500_get_sp(cpustate); break;
+		case 0x1e: cpustate->PS0 = data;
+				for (i = 0; i < 16; i++)	// refresh register contents in debugger
+					cpustate->program->write_byte(i, sm85cpu_mem_readbyte(cpustate, i)); break;
+		case 0x1f: cpustate->PS1 = data; break;
 	}
 }
 
+
 INLINE UINT16 sm85cpu_mem_readword( sm8500_state *cpustate, UINT32 address )
 {
-	UINT16 value = (UINT16) sm85cpu_mem_readbyte( cpustate, address ) << 8;
-	value |= sm85cpu_mem_readbyte( cpustate, ( address + 1 ) & 0xffff );
-	return value;
+	return (sm85cpu_mem_readbyte( cpustate, address ) << 8) | (sm85cpu_mem_readbyte( cpustate, address+1 ));
 }
 
 INLINE void sm85cpu_mem_writeword( sm8500_state *cpustate, UINT32 address, UINT16 value )
 {
 	sm85cpu_mem_writebyte( cpustate, address, value >> 8 );
-	sm85cpu_mem_writebyte( cpustate, ( address + 1 ) & 0xffff, value & 0xff );
+	sm85cpu_mem_writebyte( cpustate, address+1, value );
 }
 
 static CPU_INIT( sm8500 )
@@ -106,7 +133,6 @@ static CPU_INIT( sm8500 )
 		cpustate->config.handle_dma = NULL;
 		cpustate->config.handle_timers = NULL;
 	}
-	cpustate->register_base = cpustate->internal_ram;
 }
 
 static CPU_RESET( sm8500 )
@@ -114,32 +140,33 @@ static CPU_RESET( sm8500 )
 	sm8500_state *cpustate = get_safe_token(device);
 
 	cpustate->PC = 0x1020;
-	cpustate->IE0 = 0;
-	cpustate->IE1 = 0;
-	cpustate->IR0 = 0;
-	cpustate->IR1 = 0;
-	cpustate->P0 = 0xFF;
-	cpustate->P1 = 0xFF;
-	cpustate->P2 = 0xFF;
-	cpustate->P3 = 0;
-	cpustate->SYS = 0;
-	cpustate->CKC = 0; cpustate->clock_changed = 0;
-	cpustate->PS1 = 0;
-	cpustate->register_base = cpustate->internal_ram;
+	cpustate->clock_changed = 0;
 	cpustate->halted = 0;
+	sm85cpu_mem_writeword(cpustate, 0x10, 0);                 // IE0, IE1
+	sm85cpu_mem_writeword(cpustate, 0x12, 0);                 // IR0, IR1
+	sm85cpu_mem_writeword(cpustate, 0x14, 0xffff);            // P0, P1
+	sm85cpu_mem_writeword(cpustate, 0x16, 0xff00);            // P2, P3
+	sm85cpu_mem_writebyte(cpustate, 0x19, 0);                 // SYS
+	sm85cpu_mem_writebyte(cpustate, 0x1a, 0);                 // CKC
+	sm85cpu_mem_writebyte(cpustate, 0x1f, 0);                 // PS1
+	sm85cpu_mem_writebyte(cpustate, 0x2b, 0xff);              // URTT
+	sm85cpu_mem_writebyte(cpustate, 0x2d, 0x42);              // URTS
+	sm85cpu_mem_writebyte(cpustate, 0x5f, 0x38);              // WDTC
 }
 
 static CPU_EXIT( sm8500 )
 {
 }
 
-#define PUSH_BYTE(X)	cpustate->SP = cpustate->SP - 1; \
-			if ( ( cpustate->SYS & 0x40 ) == 0 ) { \
-				cpustate->SP = cpustate->SP & 0xFF; \
-			} \
+#define PUSH_BYTE(X)	cpustate->SP--; \
+			if ( ( cpustate->SYS & 0x40 ) == 0 ) cpustate->SP &= 0xFF; \
 			sm85cpu_mem_writebyte( cpustate, cpustate->SP, X );
 
 INLINE void sm8500_do_interrupt(sm8500_state *cpustate, UINT16 vector) {
+	/* Get regs from ram */
+	sm8500_get_sp(cpustate);
+	cpustate->SYS = cpustate->program->read_byte(0x19);	
+	cpustate->PS1 = cpustate->program->read_byte(0x1f);	
 	/* Push PC */
 	PUSH_BYTE( cpustate->PC & 0xFF );
 	PUSH_BYTE( cpustate->PC >> 8 );
@@ -147,6 +174,10 @@ INLINE void sm8500_do_interrupt(sm8500_state *cpustate, UINT16 vector) {
 	PUSH_BYTE( cpustate->PS1 );
 	/* Clear I flag */
 	cpustate->PS1 &= ~ 0x01;
+	/* save regs to ram */
+	cpustate->program->write_byte (0x1f, cpustate->PS1);
+	cpustate->program->write_byte (0x1d, cpustate->SP&0xFF);
+	if (cpustate->SYS&0x40) cpustate->program->write_byte(0x1c, cpustate->SP>>8);
 	/* Change PC to address stored at "vector" */
 	cpustate->PC = sm85cpu_mem_readword( cpustate, vector );
 }
@@ -157,13 +188,17 @@ INLINE void sm8500_process_interrupts(sm8500_state *cpustate) {
 		while( irqline < 11 ) {
 			if ( cpustate->IFLAGS & ( 1 << irqline ) ) {
 				cpustate->halted = 0;
+				cpustate->IE0 = cpustate->program->read_byte(0x10);
+				cpustate->IE1 = cpustate->program->read_byte(0x11);
+				cpustate->IR0 = cpustate->program->read_byte(0x12);
+				cpustate->IR1 = cpustate->program->read_byte(0x13);
+				cpustate->PS0 = cpustate->program->read_byte(0x1e);
+				cpustate->PS1 = cpustate->program->read_byte(0x1f);
 				switch( irqline ) {
-				case ILL_INT:
+				case WDT_INT:
 					sm8500_do_interrupt( cpustate, 0x101C );
 					break;
-				case WDT_INT:
-					sm8500_do_interrupt( cpustate, 0x101E );
-					break;
+				case ILL_INT:
 				case NMI_INT:
 					sm8500_do_interrupt( cpustate, 0x101E );
 					break;
@@ -217,6 +252,8 @@ INLINE void sm8500_process_interrupts(sm8500_state *cpustate) {
 					break;
 				}
 				cpustate->IFLAGS &= ~ ( 1 << irqline );
+				cpustate->program->write_byte(0x12, cpustate->IR0);
+				cpustate->program->write_byte(0x13, cpustate->IR1);
 			}
 			irqline++;
 		}
@@ -227,7 +264,6 @@ static CPU_EXECUTE( sm8500 )
 {
 	sm8500_state *cpustate = get_safe_token(device);
 	UINT8	op;
-	UINT16 oldpc;
 	int	mycycles;
 
 	do
@@ -238,15 +274,23 @@ static CPU_EXECUTE( sm8500 )
 		UINT32	res;
 
 		debugger_instruction_hook(device, cpustate->PC);
-		oldpc = cpustate->PC;
+		cpustate->oldpc = cpustate->PC;
 		mycycles = 0;
 		sm8500_process_interrupts(cpustate);
 		if ( !cpustate->halted ) {
 			op = sm85cpu_mem_readbyte( cpustate, cpustate->PC++ );
+			cpustate->SYS = cpustate->program->read_byte(0x19);
+			cpustate->PS0 = cpustate->program->read_byte(0x1e);
+			cpustate->PS1 = cpustate->program->read_byte(0x1f);
+			sm8500_get_sp(cpustate);
 			switch( op )
 			{
 #include "sm85ops.h"
 			}
+			if (cpustate->SYS&0x40) cpustate->program->write_byte(0x1c,cpustate->SP>>8);
+			cpustate->program->write_byte(0x1d,cpustate->SP&0xFF);
+			sm85cpu_mem_writebyte(cpustate,0x1e,cpustate->PS0);	// need to update debugger
+			cpustate->program->write_byte(0x1f,cpustate->PS1);
 		} else {
 			mycycles = 4;
 			if ( cpustate->config.handle_dma ) {
@@ -278,8 +322,8 @@ static unsigned sm8500_get_reg( sm8500_state *cpustate, int regnum )
 	case STATE_GENPC:
 	case SM8500_PC:		return cpustate->PC;
 	case STATE_GENSP:
-	case SM8500_SP:		return ( cpustate->SYS & 0x40 ) ? cpustate->SP : cpustate->SP & 0xFF ;
-	case SM8500_PS:		return ( cpustate->PS0 << 8 ) | cpustate->PS1;
+	case SM8500_SP:		return cpustate->SP;
+	case SM8500_PS:		return sm85cpu_mem_readword( cpustate, 0x1e );
 	case SM8500_SYS16:	return cpustate->SYS;
 	case SM8500_RR0:	return sm85cpu_mem_readword( cpustate, 0x00 );
 	case SM8500_RR2:	return sm85cpu_mem_readword( cpustate, 0x02 );
@@ -289,24 +333,24 @@ static unsigned sm8500_get_reg( sm8500_state *cpustate, int regnum )
 	case SM8500_RR10:	return sm85cpu_mem_readword( cpustate, 0x0A );
 	case SM8500_RR12:	return sm85cpu_mem_readword( cpustate, 0x0C );
 	case SM8500_RR14:	return sm85cpu_mem_readword( cpustate, 0x0E );
-	case SM8500_IE0:	return cpustate->IE0;
-	case SM8500_IE1:	return cpustate->IE1;
-	case SM8500_IR0:	return cpustate->IR0;
-	case SM8500_IR1:	return cpustate->IR1;
-	case SM8500_P0:		return cpustate->P0;
-	case SM8500_P1:		return cpustate->P1;
-	case SM8500_P2:		return cpustate->P2;
-	case SM8500_P3:		return cpustate->P3;
-	case SM8500_SYS:	return cpustate->SYS;
-	case SM8500_CKC:	return cpustate->CKC;
-	case SM8500_SPH:	return (cpustate->SP >> 8);
-	case SM8500_SPL:	return cpustate->SP & 0xFF;
-	case SM8500_PS0:	return cpustate->PS0;
-	case SM8500_PS1:	return cpustate->PS1;
-	case SM8500_P0C:	return cpustate->P0C;
-	case SM8500_P1C:	return cpustate->P1C;
-	case SM8500_P2C:	return cpustate->P2C;
-	case SM8500_P3C:	return cpustate->P3C;
+	case SM8500_IE0:	return sm85cpu_mem_readbyte( cpustate, 0x10 );
+	case SM8500_IE1:	return sm85cpu_mem_readbyte( cpustate, 0x11 );
+	case SM8500_IR0:	return sm85cpu_mem_readbyte( cpustate, 0x12 );
+	case SM8500_IR1:	return sm85cpu_mem_readbyte( cpustate, 0x13 );
+	case SM8500_P0:		return sm85cpu_mem_readbyte( cpustate, 0x14 );
+	case SM8500_P1:		return sm85cpu_mem_readbyte( cpustate, 0x15 );
+	case SM8500_P2:		return sm85cpu_mem_readbyte( cpustate, 0x16 );
+	case SM8500_P3:		return sm85cpu_mem_readbyte( cpustate, 0x17 );
+	case SM8500_SYS:	return sm85cpu_mem_readbyte( cpustate, 0x19 );
+	case SM8500_CKC:	return sm85cpu_mem_readbyte( cpustate, 0x1a );
+	case SM8500_SPH:	return sm85cpu_mem_readbyte( cpustate, 0x1c );
+	case SM8500_SPL:	return sm85cpu_mem_readbyte( cpustate, 0x1d );
+	case SM8500_PS0:	return sm85cpu_mem_readbyte( cpustate, 0x1e );
+	case SM8500_PS1:	return sm85cpu_mem_readbyte( cpustate, 0x1f );
+	case SM8500_P0C:	return sm85cpu_mem_readbyte( cpustate, 0x20 );
+	case SM8500_P1C:	return sm85cpu_mem_readbyte( cpustate, 0x21 );
+	case SM8500_P2C:	return sm85cpu_mem_readbyte( cpustate, 0x22 );
+	case SM8500_P3C:	return sm85cpu_mem_readbyte( cpustate, 0x23 );
 	}
 	return 0;
 }
@@ -318,9 +362,9 @@ static void sm8500_set_reg( sm8500_state *cpustate, int regnum, unsigned val )
 	case STATE_GENPC:
 	case SM8500_PC:		cpustate->PC = val; break;
 	case STATE_GENSP:
-	case SM8500_SP:		cpustate->SP = val; break;
-	case SM8500_PS:		sm8500_set_reg( cpustate, SM8500_PS0, ( val >> 8 ) & 0xFF ); sm8500_set_reg( cpustate, SM8500_PS1, val & 0xFF ); break;
-	case SM8500_SYS16:	cpustate->SYS = val; break;
+	case SM8500_SP:		cpustate->SP = val; cpustate->program->write_byte(0x1d, val&0xff); if (cpustate->SYS&0x40) cpustate->program->write_byte(0x1c, val>>8); break;
+	case SM8500_PS:		sm85cpu_mem_writeword( cpustate, 0x1e, val); break;
+	case SM8500_SYS16:	val&=0xff; sm85cpu_mem_writebyte( cpustate, 0x19, val); break;
 	case SM8500_RR0:	sm85cpu_mem_writeword( cpustate, 0x00, val); break;
 	case SM8500_RR2:	sm85cpu_mem_writeword( cpustate, 0x02, val); break;
 	case SM8500_RR4:	sm85cpu_mem_writeword( cpustate, 0x04, val); break;
@@ -329,29 +373,31 @@ static void sm8500_set_reg( sm8500_state *cpustate, int regnum, unsigned val )
 	case SM8500_RR10:	sm85cpu_mem_writeword( cpustate, 0x0A, val); break;
 	case SM8500_RR12:	sm85cpu_mem_writeword( cpustate, 0x0C, val); break;
 	case SM8500_RR14:	sm85cpu_mem_writeword( cpustate, 0x0E, val); break;
-	case SM8500_IE0:	cpustate->IE0 = val; break;
-	case SM8500_IE1:	cpustate->IE1 = val; break;
-	case SM8500_IR0:	cpustate->IR0 = val; break;
-	case SM8500_IR1:	cpustate->IR1 = val; break;
-	case SM8500_P0:		cpustate->P0 = val; break;
-	case SM8500_P1:		cpustate->P1 = val; break;
-	case SM8500_P2:		cpustate->P2 = val; break;
-	case SM8500_P3:		cpustate->P3 = val; break;
-	case SM8500_SYS:	cpustate->SYS = val; break;
-	case SM8500_CKC:	cpustate->CKC = val; if ( val & 0x80 ) { cpustate->clock_changed = 1; }; break;
-	case SM8500_SPH:	cpustate->SP = ( ( val & 0xFF ) << 8 ) | ( cpustate->SP & 0xFF ); break;
-	case SM8500_SPL:	cpustate->SP = ( cpustate->SP & 0xFF00 ) | ( val & 0xFF ); break;
-	case SM8500_PS0:	cpustate->PS0 = val; cpustate->register_base = cpustate->internal_ram + ( val & 0xF8 ); break;
-	case SM8500_PS1:	cpustate->PS1 = val; break;
-	case SM8500_P0C:	cpustate->P0C = val; break;
-	case SM8500_P1C:	cpustate->P1C = val; break;
-	case SM8500_P2C:	cpustate->P2C = val; break;
-	case SM8500_P3C:	cpustate->P3C = val; break;
+	case SM8500_IE0:	sm85cpu_mem_writebyte( cpustate, 0x10, val); break;
+	case SM8500_IE1:	sm85cpu_mem_writebyte( cpustate, 0x11, val); break;
+	case SM8500_IR0:	sm85cpu_mem_writebyte( cpustate, 0x12, val); break;
+	case SM8500_IR1:	sm85cpu_mem_writebyte( cpustate, 0x13, val); break;
+	case SM8500_P0:		sm85cpu_mem_writebyte( cpustate, 0x14, val); break;
+	case SM8500_P1:		sm85cpu_mem_writebyte( cpustate, 0x15, val); break;
+	case SM8500_P2:		sm85cpu_mem_writebyte( cpustate, 0x16, val); break;
+	case SM8500_P3:		sm85cpu_mem_writebyte( cpustate, 0x17, val); break;
+	case SM8500_SYS:	sm85cpu_mem_writebyte( cpustate, 0x19, val); break;
+	case SM8500_CKC:	sm85cpu_mem_writebyte( cpustate, 0x1a, val); if ( val & 0x80 ) { cpustate->clock_changed = 1; }; break;
+	case SM8500_SPH:	sm85cpu_mem_writebyte( cpustate, 0x1c, val); break;
+	case SM8500_SPL:	sm85cpu_mem_writebyte( cpustate, 0x1d, val); break;
+	case SM8500_PS0:	sm85cpu_mem_writebyte( cpustate, 0x1e, val); break;
+	case SM8500_PS1:	sm85cpu_mem_writebyte( cpustate, 0x1f, val); break;
+	case SM8500_P0C:	sm85cpu_mem_writebyte( cpustate, 0x20, val); break;
+	case SM8500_P1C:	sm85cpu_mem_writebyte( cpustate, 0x21, val); break;
+	case SM8500_P2C:	sm85cpu_mem_writebyte( cpustate, 0x22, val); break;
+	case SM8500_P3C:	sm85cpu_mem_writebyte( cpustate, 0x23, val); break;
 	}
 }
 
 static void sm8500_set_irq_line( sm8500_state *cpustate, int irqline, int state )
 {
+	cpustate->IR0 = cpustate->program->read_byte(0x12);
+	cpustate->IR1 = cpustate->program->read_byte(0x13);
 	if ( state == ASSERT_LINE ) {
 		cpustate->IFLAGS |= ( 0x01 << irqline );
 		cpustate->CheckInterrupts = 1;
@@ -381,12 +427,8 @@ static void sm8500_set_irq_line( sm8500_state *cpustate, int irqline, int state 
 			cpustate->CheckInterrupts = 0;
 		}
 	}
-}
-
-UINT8 *sm8500_get_internal_ram(legacy_cpu_device *device)
-{
-	sm8500_state *cpustate = get_safe_token(device);
-	return cpustate->internal_ram;
+	cpustate->program->write_byte(0x12, cpustate->IR0);
+	cpustate->program->write_byte(0x13, cpustate->IR1);
 }
 
 static CPU_SET_INFO( sm8500 )
@@ -438,7 +480,7 @@ static CPU_SET_INFO( sm8500 )
 	case CPUINFO_INT_REGISTER + SM8500_P1C:
 	case CPUINFO_INT_REGISTER + SM8500_P2C:
 	case CPUINFO_INT_REGISTER + SM8500_P3C:
-							sm8500_set_reg( cpustate, state - CPUINFO_INT_REGISTER, info->i ); break;
+		sm8500_set_reg( cpustate, state - CPUINFO_INT_REGISTER, info->i ); break;
 
 	}
 }
@@ -475,7 +517,10 @@ CPU_GET_INFO( sm8500 )
 	case CPUINFO_INT_INPUT_STATE + 4:
 	case CPUINFO_INT_INPUT_STATE + 5:
 	case CPUINFO_INT_INPUT_STATE + 6:
-	case CPUINFO_INT_INPUT_STATE + 7:			info->i = cpustate->IFLAGS & ( 1 << (state - CPUINFO_INT_INPUT_STATE)); break;
+	case CPUINFO_INT_INPUT_STATE + 7:
+	case CPUINFO_INT_INPUT_STATE + 8:
+	case CPUINFO_INT_INPUT_STATE + 9:
+	case CPUINFO_INT_INPUT_STATE + 10:			info->i = cpustate->IFLAGS & ( 1 << (state - CPUINFO_INT_INPUT_STATE)); break;
 	case CPUINFO_INT_REGISTER + SM8500_RR0:
 	case CPUINFO_INT_REGISTER + SM8500_RR2:
 	case CPUINFO_INT_REGISTER + SM8500_RR4:
@@ -509,7 +554,7 @@ CPU_GET_INFO( sm8500 )
 								info->i = sm8500_get_reg( cpustate, state - CPUINFO_INT_REGISTER ); break;
 	case CPUINFO_INT_REGISTER + STATE_GENPC:			info->i = sm8500_get_reg( cpustate, SM8500_PC ); break;
 	case CPUINFO_INT_REGISTER + STATE_GENSP:			info->i = sm8500_get_reg( cpustate, SM8500_SP ); break;
-	case CPUINFO_INT_PREVIOUSPC:				info->i = 0x0000; break;
+	case CPUINFO_INT_PREVIOUSPC:				info->i = cpustate->oldpc; break;
 
 
 	case CPUINFO_FCT_SET_INFO:				info->setinfo = CPU_SET_INFO_NAME(sm8500); break;
@@ -548,7 +593,7 @@ CPU_GET_INFO( sm8500 )
 	case CPUINFO_STR_REGISTER + SM8500_PC:			sprintf(info->s, "PC:%04X", cpustate->PC); break;
 	case CPUINFO_STR_REGISTER + SM8500_SP:			sprintf(info->s, "SP:%04X", cpustate->SP); break;
 	case CPUINFO_STR_REGISTER + SM8500_PS:			sprintf(info->s, "PS:%04X", ( cpustate->PS0 << 8 ) | cpustate->PS1 ); break;
-	case CPUINFO_STR_REGISTER + SM8500_SYS16:		sprintf(info->s, "SYS:%04X", cpustate->SYS ); break;
+	case CPUINFO_STR_REGISTER + SM8500_SYS16:		sprintf(info->s, "SYS:%02X", cpustate->SYS ); break;
 	}
 }
 

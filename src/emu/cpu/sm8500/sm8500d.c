@@ -41,7 +41,7 @@ static const char *const s_mnemonic[] =
 	"iret", "jmp",  "mov",  "movm", "movw",  "mult", "neg",  "nop",  "or",
 	"orw",  "pop",  "popw", "push", "pushw", "ret",  "rl",   "rlc",
 	"rr",   "rrc",  "sbc",  "sbcw", "setc", "sll",   "sra",  "srl",  "stop",
-	"sub",  "subw", "swap", "xor",  "xorw", "mov PS0,", "invalid", "dm?",
+	"sub",  "subw", "swap", "xor",  "xorw", "mov  PS0,", "invalid", "dm?",
 /* unknowns */
 "unk5A", "unk5B",
 
