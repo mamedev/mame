@@ -31,12 +31,15 @@
 #include "sound/dac.h"
 #include "includes/archimds.h"
 #include "machine/i2cmem.h"
+#include "devices/messram.h"
 
 #ifdef MESS
 #include "machine/wd17xx.h"
 #endif
 
 static const int page_sizes[4] = { 4096, 8192, 16384, 32768 };
+
+#define IOC_LOG 1
 
 UINT32 *archimedes_memc_physmem;
 static UINT32 memc_pagesize;
@@ -235,7 +238,7 @@ READ32_HANDLER(archimedes_memc_logical_r)
 		page = (offset<<2) / page_sizes[memc_pagesize];
 		poffs = (offset<<2) % page_sizes[memc_pagesize];
 
-//      printf("Reading offset %x (addr %x): page %x (size %d %d) offset %x ==> %x %x\n", offset, offset<<2, page, memc_pagesize, page_sizes[memc_pagesize], poffs, memc_pages[page], memc_pages[page]*page_sizes[memc_pagesize]);
+//		printf("Reading offset %x (addr %x): page %x (size %d %d) offset %x ==> %x %x\n", offset, offset<<2, page, memc_pagesize, page_sizes[memc_pagesize], poffs, memc_pages[page], memc_pages[page]*page_sizes[memc_pagesize]);
 
 		if (memc_pages[page] != -1)
 		{
@@ -243,7 +246,7 @@ READ32_HANDLER(archimedes_memc_logical_r)
 		}
 		else
 		{
-			logerror("ARCHIMEDES_MEMC: Reading unmapped page %02x\n",page);
+			//printf("ARCHIMEDES_MEMC: Reading unmapped page %02x\n",page);
 			return 0xdeadbeef;
 		}
 	}
@@ -274,11 +277,12 @@ WRITE32_HANDLER(archimedes_memc_logical_w)
 		}
 		else
 		{
-			logerror("ARCHIMEDES_MEMC: Writing unmapped page %02x, what do we do?\n",page);
+			//printf("ARCHIMEDES_MEMC: Writing unmapped page %02x, what do we do?\n",page);
 		}
 	}
 }
 
+#if 0
 DIRECT_UPDATE_HANDLER( a310_setopbase )
 {
 	// if we're not in logical memory, MAME can do the right thing
@@ -296,17 +300,18 @@ DIRECT_UPDATE_HANDLER( a310_setopbase )
 	{
 		offs_t pagesize = page_sizes[memc_pagesize];
 		UINT32 page = address / pagesize;
-		
+
 		direct.explicit_configure(page * pagesize, page * pagesize - 1, pagesize - 1, &archimedes_memc_physmem[(memc_pages[page] * pagesize)>>2]);
 	}
 
 	return ~0;
 }
+#endif
 
 void archimedes_driver_init(running_machine *machine)
 {
-	address_space *space = machine->device<arm_device>("maincpu")->space(AS_PROGRAM);
-	space->set_direct_update_handler(direct_update_delegate_create_static(a310_setopbase, *machine));
+//	address_space *space = machine->device<arm_device>("maincpu")->space(AS_PROGRAM);
+//	space->set_direct_update_handler(direct_update_delegate_create_static(a310_setopbase, *machine));
 }
 
 static const char *const ioc_regnames[] =
@@ -355,8 +360,8 @@ static void latch_timer_cnt(int tmr)
 /* TODO: should be a 8-bit handler */
 static READ32_HANDLER( ioc_ctrl_r )
 {
-	//if(((offset & 0x1f) != 16) && ((offset & 0x1f) != 17) && ((offset & 0x1f) != 24) && ((offset & 0x1f) != 25))
-	//logerror("IOC: R %s = %02x (PC=%x) %02x\n", ioc_regnames[offset&0x1f], ioc_regs[offset&0x1f], cpu_get_pc( space->cpu ),offset & 0x1f);
+	if(IOC_LOG)
+	logerror("IOC: R %s = %02x (PC=%x) %02x\n", ioc_regnames[offset&0x1f], ioc_regs[offset&0x1f], cpu_get_pc( space->cpu ),offset & 0x1f);
 
 	switch (offset & 0x1f)
 	{
@@ -421,6 +426,10 @@ static READ32_HANDLER( ioc_ctrl_r )
 			return ioc_timerout[3]&0xff;
 		case 29:
 			return (ioc_timerout[3]>>8)&0xff;
+		default:
+			if(!IOC_LOG)
+				logerror("IOC: R %s = %02x (PC=%x) %02x\n", ioc_regnames[offset&0x1f], ioc_regs[offset&0x1f], cpu_get_pc( space->cpu ),offset & 0x1f);
+			break;
 	}
 
 	return ioc_regs[offset&0x1f];
@@ -429,9 +438,8 @@ static READ32_HANDLER( ioc_ctrl_r )
 /* TODO: should be a 8-bit handler */
 static WRITE32_HANDLER( ioc_ctrl_w )
 {
-	if(((offset & 0x1f) != 16) && ((offset & 0x1f) != 17) && ((offset & 0x1f) != 24) && ((offset & 0x1f) != 25))
-     	if((offset & 0x1f) != 1)
-     		logerror("IOC: W %02x @ reg %s (PC=%x)\n", data&0xff, ioc_regnames[offset&0x1f], cpu_get_pc( space->cpu ));
+	if(IOC_LOG)
+	logerror("IOC: W %02x @ reg %s (PC=%x)\n", data&0xff, ioc_regnames[offset&0x1f], cpu_get_pc( space->cpu ));
 
 	switch (offset&0x1f)
 	{
@@ -467,7 +475,7 @@ static WRITE32_HANDLER( ioc_ctrl_w )
 
 			break;
 
-		case 5: 	// IRQ clear A
+		case IRQ_REQUEST_A: 	// IRQ clear A
 			ioc_regs[IRQ_STATUS_A] &= ~(data&0xff);
 
 			// if that did it, clear the IRQ
@@ -535,6 +543,9 @@ static WRITE32_HANDLER( ioc_ctrl_w )
 			break;
 
 		default:
+			if(!IOC_LOG)
+				logerror("IOC: W %02x @ reg %s (PC=%x)\n", data&0xff, ioc_regnames[offset&0x1f], cpu_get_pc( space->cpu ));
+
 			ioc_regs[offset&0x1f] = data & 0xff;
 			break;
 	}
@@ -772,10 +783,10 @@ WRITE32_HANDLER(archimedes_vidc_w)
 				visarea.max_x = vidc_regs[VIDC_HBER] - vidc_regs[VIDC_HBSR] - 1;
 				visarea.max_y = vidc_regs[VIDC_VBER] - vidc_regs[VIDC_VBSR];
 
-				//printf("Configuring: htotal %d vtotal %d border %d x %d display %d x %d\n",
-				//	vidc_regs[VIDC_HCR], vidc_regs[VIDC_VCR],
-				//	visarea.max_x, visarea.max_y,
-				//	vidc_regs[VIDC_HDER]-vidc_regs[VIDC_HDSR],vidc_regs[VIDC_VDER]-vidc_regs[VIDC_VDSR]+1);
+				logerror("Configuring: htotal %d vtotal %d border %d x %d display %d x %d\n",
+					vidc_regs[VIDC_HCR], vidc_regs[VIDC_VCR],
+					visarea.max_x, visarea.max_y,
+					vidc_regs[VIDC_HDER]-vidc_regs[VIDC_HDSR],vidc_regs[VIDC_VDER]-vidc_regs[VIDC_VDSR]+1);
 
 				space->machine->primary_screen->configure(vidc_regs[VIDC_HCR], vidc_regs[VIDC_VCR], visarea, space->machine->primary_screen->frame_period().attoseconds);
 			}
@@ -807,22 +818,27 @@ WRITE32_HANDLER(archimedes_memc_w)
 		switch ((data >> 17) & 7)
 		{
 			case 0: /* video init */
+				logerror("MEMC: VIDINIT %08x\n",data);
 				vidc_vidinit = ((data>>2)&0x7fff)*16;
 				break;
 
 			case 1: /* video start */
+				logerror("MEMC: VIDSTART %08x\n",data);
 				vidc_vidstart = ((data>>2)&0x7fff)*16;
 				break;
 
 			case 2: /* video end */
+				logerror("MEMC: VIDEND %08x\n",data);
 				vidc_vidend = ((data>>2)&0x7fff)*16;
 				break;
 
 			case 4:	/* sound start */
+				logerror("MEMC: VIDSNDSTART %08x\n",data);
 				vidc_sndstart = ((data>>2)&0x7fff)*16;
 				break;
 
 			case 5: /* sound end */
+				logerror("MEMC: VIDSNDEND %08x\n",data);
 				vidc_sndend = ((data>>2)&0x7fff)*16;
 				break;
 
@@ -907,7 +923,7 @@ WRITE32_HANDLER(archimedes_memc_page_w)
 	{
 		case 0:
 			phys = data & 0x7f;
-			log = ((data & 0x7ff000)>>12) | (data & 0xc00);
+			log = ((data & 0x7ff000)>>12) | ((data & 0xc00)<<1);
 			memc = (data & 0x80) ? 1 : 0;
 			break;
 
@@ -919,13 +935,13 @@ WRITE32_HANDLER(archimedes_memc_page_w)
 
 		case 2:
 			phys = ((data & 0x7f) >> 2) | ((data & 3) << 5);
-			log = ((data & 0x7fc000)>>14) | (data & 0xc00);
+			log = ((data & 0x7fc000)>>14) | ((data & 0xc00)>>1);
 			memc = ((data & 0x80) ? 1 : 0) | ((data & 0x1000) ? 2 : 0);
 			break;
 
 		case 3:
 			phys = ((data & 0x7f) >> 3) | ((data & 1)<<4) | ((data & 2) << 5) | ((data & 4)<<3);
-			log = ((data & 0x7f8000)>>15) | (data & 0xc00);
+			log = ((data & 0x7f8000)>>15) | ((data & 0xc00)>>2);
 			memc = ((data & 0x80) ? 1 : 0) | ((data & 0x1000) ? 2 : 0);
 			//printf("Mapping %08X to %08X\n",0x2000000+(phys*32768),(((data >> 15)&0xff)|((data >> 2)&0x300)));
 			break;
@@ -939,6 +955,6 @@ WRITE32_HANDLER(archimedes_memc_page_w)
 	// now go ahead and set the mapping in the page table
 	memc_pages[log] = phys + (memc*0x80);
 
-//  printf("MEMC_PAGE(%d): W %08x: log %x to phys %x, MEMC %d, perms %d\n", memc_pagesize, data, log, phys, memc, perms);
+//	printf("MEMC_PAGE(%d): W %08x: log %x to phys %x, MEMC %d, perms %d\n", memc_pagesize, data, log, phys, memc, perms);
 }
 
