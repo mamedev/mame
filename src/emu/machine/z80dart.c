@@ -5,12 +5,19 @@
     Copyright (c) 2008, The MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
 
+	The z80dart/z80sio itself is based on an older intel serial chip, the i8274 MPSC 
+	(see http://doc.chipfind.ru/pdf/intel/8274.pdf), which also has almost identical
+	behavior, except lacks the interrupt daisy chaining and has its own interrupt/dma
+	scheme which uses write register 2 on channel A, that register which is unused on
+	the z80dart and z80sio.
+
 ***************************************************************************/
 
 /*
 
     TODO:
 
+	- synchronous mode (Z80-SIO/1,2)
     - break detection
     - wr0 reset tx interrupt pending
     - wait/ready
@@ -193,17 +200,19 @@ void z80dart_device_config::device_config_complete()
 	// or initialize to defaults if none provided
 	else
 	{
-		m_rx_clock_a = m_tx_clock_a = m_rx_tx_clock_b = 0;
+		m_rx_clock_a = m_tx_clock_a = m_rx_clock_b = m_tx_clock_b = 0;
 		memset(&m_in_rxda_func, 0, sizeof(m_in_rxda_func));
 		memset(&m_out_txda_func, 0, sizeof(m_out_txda_func));
 		memset(&m_out_dtra_func, 0, sizeof(m_out_dtra_func));
 		memset(&m_out_rtsa_func, 0, sizeof(m_out_rtsa_func));
 		memset(&m_out_wrdya_func, 0, sizeof(m_out_wrdya_func));
+		memset(&m_out_synca_func, 0, sizeof(m_out_synca_func));
 		memset(&m_in_rxdb_func, 0, sizeof(m_in_rxdb_func));
 		memset(&m_out_txdb_func, 0, sizeof(m_out_txdb_func));
 		memset(&m_out_dtrb_func, 0, sizeof(m_out_dtrb_func));
 		memset(&m_out_rtsb_func, 0, sizeof(m_out_rtsb_func));
 		memset(&m_out_wrdyb_func, 0, sizeof(m_out_wrdyb_func));
+		memset(&m_out_syncb_func, 0, sizeof(m_out_syncb_func));
 		memset(&m_out_int_func, 0, sizeof(m_out_int_func));
 	}
 }
@@ -237,28 +246,35 @@ void z80dart_device::device_start()
 	// resolve callbacks
 	devcb_resolve_write_line(&m_out_int_func, &m_config.m_out_int_func, this);
 
-	m_channel[Z80DART_CH_A].start(this, Z80DART_CH_A, m_config.m_in_rxda_func, m_config.m_out_txda_func, m_config.m_out_dtra_func, m_config.m_out_rtsa_func, m_config.m_out_wrdya_func);
-	m_channel[Z80DART_CH_B].start(this, Z80DART_CH_B, m_config.m_in_rxdb_func, m_config.m_out_txdb_func, m_config.m_out_dtrb_func, m_config.m_out_rtsb_func, m_config.m_out_wrdyb_func);
+	m_channel[Z80DART_CH_A].start(this, Z80DART_CH_A, m_config.m_in_rxda_func, m_config.m_out_txda_func, m_config.m_out_dtra_func, m_config.m_out_rtsa_func, m_config.m_out_wrdya_func, m_config.m_out_synca_func);
+	m_channel[Z80DART_CH_B].start(this, Z80DART_CH_B, m_config.m_in_rxdb_func, m_config.m_out_txdb_func, m_config.m_out_dtrb_func, m_config.m_out_rtsb_func, m_config.m_out_wrdyb_func, m_config.m_out_syncb_func);
 
 	if (m_config.m_rx_clock_a != 0)
 	{
 		// allocate channel A receive timer
-		m_rxca_timer = timer_alloc(&m_machine, dart_channel::static_rxca_tick, (void *)&m_channel[Z80DART_CH_A]);
+		m_rxca_timer = timer_alloc(&m_machine, dart_channel::static_rxc_tick, (void *)&m_channel[Z80DART_CH_A]);
 		timer_adjust_periodic(m_rxca_timer, attotime_zero, 0, ATTOTIME_IN_HZ(m_config.m_rx_clock_a));
 	}
 
 	if (m_config.m_tx_clock_a != 0)
 	{
 		// allocate channel A transmit timer
-		m_txca_timer = timer_alloc(&m_machine, dart_channel::static_txca_tick, (void *)&m_channel[Z80DART_CH_A]);
+		m_txca_timer = timer_alloc(&m_machine, dart_channel::static_txc_tick, (void *)&m_channel[Z80DART_CH_A]);
 		timer_adjust_periodic(m_txca_timer, attotime_zero, 0, ATTOTIME_IN_HZ(m_config.m_tx_clock_a));
 	}
 
-	if (m_config.m_rx_tx_clock_b != 0)
+	if (m_config.m_rx_clock_b != 0)
 	{
-		// allocate channel B receive/transmit timer
-		m_rxtxcb_timer = timer_alloc(&m_machine, dart_channel::static_rxtxcb_tick, (void *)&m_channel[Z80DART_CH_B]);
-		timer_adjust_periodic(m_rxtxcb_timer, attotime_zero, 0, ATTOTIME_IN_HZ(m_config.m_rx_tx_clock_b));
+		// allocate channel B receive timer
+		m_rxcb_timer = timer_alloc(&m_machine, dart_channel::static_rxc_tick, (void *)&m_channel[Z80DART_CH_B]);
+		timer_adjust_periodic(m_rxcb_timer, attotime_zero, 0, ATTOTIME_IN_HZ(m_config.m_rx_clock_b));
+	}
+
+	if (m_config.m_tx_clock_b != 0)
+	{
+		// allocate channel B transmit timer
+		m_txcb_timer = timer_alloc(&m_machine, dart_channel::static_txc_tick, (void *)&m_channel[Z80DART_CH_B]);
+		timer_adjust_periodic(m_txcb_timer, attotime_zero, 0, ATTOTIME_IN_HZ(m_config.m_tx_clock_b));
 	}
 
 	state_save_register_device_item_array(this, 0, m_int_state);
@@ -456,7 +472,7 @@ z80dart_device::dart_channel::dart_channel()
 //  start - channel startup
 //-------------------------------------------------
 
-void z80dart_device::dart_channel::start(z80dart_device *device, int index, const devcb_read_line &in_rxd, const devcb_write_line &out_txd, const devcb_write_line &out_dtr, const devcb_write_line &out_rts, const devcb_write_line &out_wrdy)
+void z80dart_device::dart_channel::start(z80dart_device *device, int index, const devcb_read_line &in_rxd, const devcb_write_line &out_txd, const devcb_write_line &out_dtr, const devcb_write_line &out_rts, const devcb_write_line &out_wrdy, const devcb_write_line &out_sync)
 {
 	m_index = index;
 	m_device = device;
@@ -466,6 +482,7 @@ void z80dart_device::dart_channel::start(z80dart_device *device, int index, cons
 	devcb_resolve_write_line(&m_out_dtr_func, &out_dtr, m_device);
 	devcb_resolve_write_line(&m_out_rts_func, &out_rts, m_device);
 	devcb_resolve_write_line(&m_out_wrdy_func, &out_wrdy, m_device);
+	devcb_resolve_write_line(&m_out_sync_func, &out_sync, m_device);
 
 	state_save_register_device_item_array(m_device, m_index, m_rr);
 	state_save_register_device_item_array(m_device, m_index, m_wr);
@@ -1315,6 +1332,16 @@ void z80dart_device::dart_channel::ri_w(int state)
 
 
 //-------------------------------------------------
+//  sync_w - sync handler
+//-------------------------------------------------
+
+void z80dart_device::dart_channel::sync_w(int state)
+{
+	LOG(("Z80DART \"%s\" Channel %c : SYNC %u\n", m_device->tag(), 'A' + m_index, state));
+}
+
+
+//-------------------------------------------------
 //  rx_w - receive clock
 //-------------------------------------------------
 
@@ -1373,9 +1400,13 @@ WRITE_LINE_DEVICE_HANDLER( z80dart_dcda_w ) { downcast<z80dart_device *>(device)
 WRITE_LINE_DEVICE_HANDLER( z80dart_dcdb_w ) { downcast<z80dart_device *>(device)->dcd_w(Z80DART_CH_B, state); }
 WRITE_LINE_DEVICE_HANDLER( z80dart_ria_w ) { downcast<z80dart_device *>(device)->ri_w(Z80DART_CH_A, state); }
 WRITE_LINE_DEVICE_HANDLER( z80dart_rib_w ) { downcast<z80dart_device *>(device)->ri_w(Z80DART_CH_B, state); }
+WRITE_LINE_DEVICE_HANDLER( z80dart_synca_w ) { downcast<z80dart_device *>(device)->sync_w(Z80DART_CH_A, state); }
+WRITE_LINE_DEVICE_HANDLER( z80dart_syncb_w ) { downcast<z80dart_device *>(device)->sync_w(Z80DART_CH_B, state); }
 
 WRITE_LINE_DEVICE_HANDLER( z80dart_rxca_w ) { downcast<z80dart_device *>(device)->rx_w(Z80DART_CH_A, state); }
 WRITE_LINE_DEVICE_HANDLER( z80dart_txca_w ) { downcast<z80dart_device *>(device)->tx_w(Z80DART_CH_A, state); }
+WRITE_LINE_DEVICE_HANDLER( z80dart_rxcb_w ) { downcast<z80dart_device *>(device)->rx_w(Z80DART_CH_B, state); }
+WRITE_LINE_DEVICE_HANDLER( z80dart_txcb_w ) { downcast<z80dart_device *>(device)->tx_w(Z80DART_CH_B, state); }
 WRITE_LINE_DEVICE_HANDLER( z80dart_rxtxcb_w ) { downcast<z80dart_device *>(device)->rx_w(Z80DART_CH_B, state); downcast<z80dart_device *>(device)->tx_w(Z80DART_CH_B, state); }
 
 READ8_DEVICE_HANDLER( z80dart_cd_ba_r )
@@ -1409,3 +1440,6 @@ WRITE8_DEVICE_HANDLER( z80dart_ba_cd_w )
 }
 
 const device_type Z80DART = z80dart_device_config::static_alloc_device_config;
+const device_type Z80SIO0 = z80dart_device_config::static_alloc_device_config; // FIXME
+const device_type Z80SIO1 = z80dart_device_config::static_alloc_device_config; // FIXME
+const device_type Z80SIO2 = z80dart_device_config::static_alloc_device_config; // FIXME

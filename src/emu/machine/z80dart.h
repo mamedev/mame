@@ -17,10 +17,54 @@
                    _M1   8 |             | 33  C/_D
                    Vdd   9 |             | 32  _RD
                _W/RDYA  10 |  Z80-DART   | 31  GND
-                  _RIA  11 |             | 30  _W/RDYB
+                  _RIA  11 |  Z80-SIO/0  | 30  _W/RDYB
                   RxDA  12 |             | 29  _RIB
                  _RxCA  13 |             | 28  RxDB
                  _TxCA  14 |             | 27  _RxTxCB
+                  TxDA  15 |             | 26  TxDB
+                 _DTRA  16 |             | 25  _DTRB
+                 _RTSA  17 |             | 24  _RTSB
+                 _CTSA  18 |             | 23  _CTSB
+                 _DCDA  19 |             | 22  _DCDB
+                   CLK  20 |_____________| 21  _RESET
+
+                            _____   _____
+                    D1   1 |*    \_/     | 40  D0
+                    D3   2 |             | 39  D2
+                    D5   3 |             | 38  D4
+                    D7   4 |             | 37  D6
+                  _INT   5 |             | 36  _IORQ
+                   IEI   6 |             | 35  _CE
+                   IEO   7 |             | 34  B/_A
+                   _M1   8 |             | 33  C/_D
+                   Vdd   9 |             | 32  _RD
+               _W/RDYA  10 |  Z80-SIO/1  | 31  GND
+                _SYNCA  11 |             | 30  _W/RDYB
+                  RxDA  12 |             | 29  _SYNCB
+                 _RxCA  13 |             | 28  RxDB
+                 _TxCA  14 |             | 27  _RxCB
+                  TxDA  15 |             | 26  _TxCB
+                 _DTRA  16 |             | 25  TxDB
+                 _RTSA  17 |             | 24  _RTSB
+                 _CTSA  18 |             | 23  _CTSB
+                 _DCDA  19 |             | 22  _DCDB
+                   CLK  20 |_____________| 21  _RESET
+
+                            _____   _____
+                    D1   1 |*    \_/     | 40  D0
+                    D3   2 |             | 39  D2
+                    D5   3 |             | 38  D4
+                    D7   4 |             | 37  D6
+                  _INT   5 |             | 36  _IORQ
+                   IEI   6 |             | 35  _CE
+                   IEO   7 |             | 34  B/_A
+                   _M1   8 |             | 33  C/_D
+                   Vdd   9 |             | 32  _RD
+               _W/RDYA  10 |  Z80-SIO/2  | 31  GND
+                _SYNCA  11 |             | 30  _W/RDYB
+                  RxDA  12 |             | 29  _RxDB
+                 _RxCA  13 |             | 28  _RxCB
+                 _TxCA  14 |             | 27  _TxCB
                   TxDA  15 |             | 26  TxDB
                  _DTRA  16 |             | 25  _DTRB
                  _RTSA  17 |             | 24  _RTSB
@@ -57,6 +101,18 @@ enum
 	MDRV_DEVICE_ADD(_tag, Z80DART, _clock) \
 	MDRV_DEVICE_CONFIG(_config)
 
+#define MDRV_Z80SIO0_ADD(_tag, _clock, _config) \
+	MDRV_DEVICE_ADD(_tag, Z80SIO0, _clock) \
+	MDRV_DEVICE_CONFIG(_config)
+
+#define MDRV_Z80SIO1_ADD(_tag, _clock, _config) \
+	MDRV_DEVICE_ADD(_tag, Z80SIO1, _clock) \
+	MDRV_DEVICE_CONFIG(_config)
+
+#define MDRV_Z80SIO2_ADD(_tag, _clock, _config) \
+	MDRV_DEVICE_ADD(_tag, Z80SIO2, _clock) \
+	MDRV_DEVICE_CONFIG(_config)
+
 #define MDRV_Z80DART_REMOVE(_tag) \
 	MDRV_DEVICE_REMOVE(_tag)
 
@@ -76,19 +132,22 @@ struct z80dart_interface
 {
 	int m_rx_clock_a;			// channel A receive clock
 	int m_tx_clock_a;			// channel A transmit clock
-	int m_rx_tx_clock_b;		// channel B receive/transmit clock
+	int m_rx_clock_b;			// channel B receive clock
+	int m_tx_clock_b;			// channel B transmit clock
 
 	devcb_read_line		m_in_rxda_func;
 	devcb_write_line	m_out_txda_func;
 	devcb_write_line	m_out_dtra_func;
 	devcb_write_line	m_out_rtsa_func;
 	devcb_write_line	m_out_wrdya_func;
+	devcb_write_line	m_out_synca_func;
 
 	devcb_read_line		m_in_rxdb_func;
 	devcb_write_line	m_out_txdb_func;
 	devcb_write_line	m_out_dtrb_func;
 	devcb_write_line	m_out_rtsb_func;
 	devcb_write_line	m_out_wrdyb_func;
+	devcb_write_line	m_out_syncb_func;
 
 	devcb_write_line	m_out_int_func;
 };
@@ -147,6 +206,7 @@ public:
 	void ri_w(int which, int state) { m_channel[which].ri_w(state); }
 	void rx_w(int which, int state) { m_channel[which].rx_w(state); }
 	void tx_w(int which, int state) { m_channel[which].tx_w(state); }
+	void sync_w(int which, int state) { m_channel[which].sync_w(state); }
 
 private:
 	// device-level overrides
@@ -170,7 +230,7 @@ private:
 	public:
 		dart_channel();
 
-		void start(z80dart_device *device, int index, const devcb_read_line &in_rxd, const devcb_write_line &out_txd, const devcb_write_line &out_dtr, const devcb_write_line &out_rts, const devcb_write_line &out_wrdy);
+		void start(z80dart_device *device, int index, const devcb_read_line &in_rxd, const devcb_write_line &out_txd, const devcb_write_line &out_dtr, const devcb_write_line &out_rts, const devcb_write_line &out_wrdy, const devcb_write_line &out_sync);
 		void reset();
 
 		UINT8 control_read();
@@ -186,6 +246,7 @@ private:
 		void ri_w(int state);
 		void rx_w(int state);
 		void tx_w(int state);
+		void sync_w(int state);
 
 	private:
 		void take_interrupt(int level);
@@ -201,9 +262,8 @@ private:
 		void receive();
 		void transmit();
 
-		static TIMER_CALLBACK( static_rxca_tick ) { reinterpret_cast<dart_channel *>(ptr)->rx_w(1); }
-		static TIMER_CALLBACK( static_txca_tick ) { reinterpret_cast<dart_channel *>(ptr)->tx_w(1); }
-		static TIMER_CALLBACK( static_rxtxcb_tick ) { reinterpret_cast<dart_channel *>(ptr)->rx_w(1); reinterpret_cast<dart_channel *>(ptr)->tx_w(1); }
+		static TIMER_CALLBACK( static_rxc_tick ) { reinterpret_cast<dart_channel *>(ptr)->rx_w(1); }
+		static TIMER_CALLBACK( static_txc_tick ) { reinterpret_cast<dart_channel *>(ptr)->tx_w(1); }
 
 		z80dart_device *m_device;
 		int	m_index;
@@ -213,6 +273,7 @@ private:
 		devcb_resolved_write_line	m_out_dtr_func;
 		devcb_resolved_write_line	m_out_rts_func;
 		devcb_resolved_write_line	m_out_wrdy_func;
+		devcb_resolved_write_line	m_out_sync_func;
 
 		// register state
 		UINT8 m_rr[3];				// read register
@@ -259,12 +320,16 @@ private:
 	// timers
 	emu_timer *						m_rxca_timer;
 	emu_timer *						m_txca_timer;
-	emu_timer *						m_rxtxcb_timer;
+	emu_timer *						m_rxcb_timer;
+	emu_timer *						m_txcb_timer;
 };
 
 
 // device type definition
 extern const device_type Z80DART;
+extern const device_type Z80SIO0;
+extern const device_type Z80SIO1;
+extern const device_type Z80SIO2;
 /*
 #define Z8470   DEVICE_GET_INFO_NAME(z8470)
 #define LH0081  DEVICE_GET_INFO_NAME(lh0088)
@@ -295,6 +360,8 @@ READ8_DEVICE_HANDLER( z80dart_d_r );
 // serial clocks
 WRITE_LINE_DEVICE_HANDLER( z80dart_rxca_w );
 WRITE_LINE_DEVICE_HANDLER( z80dart_txca_w );
+WRITE_LINE_DEVICE_HANDLER( z80dart_rxcb_w );
+WRITE_LINE_DEVICE_HANDLER( z80dart_txcb_w );
 WRITE_LINE_DEVICE_HANDLER( z80dart_rxtxcb_w );
 
 // ring indicator
@@ -309,5 +376,8 @@ WRITE_LINE_DEVICE_HANDLER( z80dart_dcdb_w );
 WRITE_LINE_DEVICE_HANDLER( z80dart_ctsa_w );
 WRITE_LINE_DEVICE_HANDLER( z80dart_ctsb_w );
 
+// sync
+WRITE_LINE_DEVICE_HANDLER( z80dart_synca_w );
+WRITE_LINE_DEVICE_HANDLER( z80dart_syncb_w );
 
 #endif
