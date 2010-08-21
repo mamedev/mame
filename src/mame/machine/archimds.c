@@ -31,7 +31,6 @@
 #include "sound/dac.h"
 #include "includes/archimds.h"
 #include "machine/i2cmem.h"
-#include "devices/messram.h"
 
 #ifdef MESS
 #include "machine/wd17xx.h"
