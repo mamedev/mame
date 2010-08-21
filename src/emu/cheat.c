@@ -518,7 +518,7 @@ void cheat_render_text(running_machine *machine, render_container *container)
 
 		/* render any text and free it along the way */
 		for (linenum = 0; linenum < ARRAY_LENGTH(cheatinfo->output); linenum++)
-			if (cheatinfo->output[linenum].len() != 0)
+			if (cheatinfo->output[linenum])
 			{
 				/* output the text */
 				ui_draw_text_full(container, cheatinfo->output[linenum],
@@ -956,7 +956,7 @@ static void cheat_execute_script(cheat_private *cheatinfo, cheat_entry *cheat, s
 		}
 
 		/* if there is a string to display, compute it */
-		if (entry->format.len() != 0)
+		if (entry->format)
 		{
 			UINT64 params[MAX_ARGUMENTS];
 			output_argument *arg;
@@ -1283,14 +1283,14 @@ static void cheat_entry_save(mame_file *cheatfile, const cheat_entry *cheat)
 	mame_fprintf(cheatfile, "\t<cheat desc=\"%s\"", cheat->description.cstr());
 	if (cheat->numtemp != DEFAULT_TEMP_VARIABLES)
 		mame_fprintf(cheatfile, " tempvariables=\"%d\"", cheat->numtemp);
-	if (cheat->comment.len() == 0 && cheat->parameter == NULL && scriptcount == 0)
+	if (!cheat->comment && cheat->parameter == NULL && scriptcount == 0)
 		mame_fprintf(cheatfile, " />\n");
 	else
 	{
 		mame_fprintf(cheatfile, ">\n");
 
 		/* save the comment */
-		if (cheat->comment.len() != 0)
+		if (cheat->comment)
 			mame_fprintf(cheatfile, "\t\t<comment><![CDATA[\n%s\n\t\t]]></comment>\n", cheat->comment.cstr());
 
 		/* output the parameter, if present */
@@ -1704,7 +1704,7 @@ static void script_entry_save(mame_file *cheatfile, const script_entry *entry)
 	astring tempstring;
 
 	/* output an action */
-	if (entry->format.len() == 0)
+	if (!entry->format)
 	{
 		mame_fprintf(cheatfile, "\t\t\t<action");
 		if (entry->condition != NULL)

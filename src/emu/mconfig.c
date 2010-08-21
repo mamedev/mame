@@ -145,7 +145,7 @@ void machine_config::detokenize(const machine_config_token *tokens, const device
 
 			case MCONFIG_TOKEN_DEVICE_MODIFY:
 				tag = TOKEN_GET_STRING(tokens);
-				device = m_devicelist.find(owner->subtag(tempstring, tag));
+				device = m_devicelist.find(owner->subtag(tempstring, tag).cstr());
 				if (device == NULL)
 					fatalerror("Unable to find device: tag=%s\n", tempstring.cstr());
 				break;

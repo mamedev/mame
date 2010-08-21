@@ -2557,7 +2557,7 @@ void device_debug::breakpoint_check(offs_t pc)
 			global->execution_state = EXECUTION_STATE_STOPPED;
 
 			// if we hit, evaluate the action
-			if (bp->m_action.len() != 0)
+			if (bp->m_action)
 				debug_console_execute_command(m_device.machine, bp->m_action, 0);
 
 			// print a notification, unless the action made us go again
@@ -2650,7 +2650,7 @@ void device_debug::watchpoint_check(address_space &space, int type, offs_t addre
 			global->execution_state = EXECUTION_STATE_STOPPED;
 
 			// if we hit, evaluate the action
-			if (wp->m_action != NULL)
+			if (wp->m_action)
 				debug_console_execute_command(space.machine, wp->m_action, 0);
 
 			// print a notification, unless the action made us go again
@@ -3011,7 +3011,7 @@ void device_debug::tracer::update(offs_t pc)
 	m_loops = 0;
 
 	// execute any trace actions first
-	if (m_action != NULL)
+	if (m_action)
 		debug_console_execute_command(m_debug.m_device.machine, m_action, 0);
 
 	// print the address
