@@ -306,13 +306,40 @@ WRITE16_HANDLER( batrider_objectbank_w )
 	}
 }
 
+// Dogyuun doesn't appear to require fancy mixing?
+VIDEO_UPDATE( toaplan2_dual )
+{
+	toaplan2_state *state = screen->machine->driver_data<toaplan2_state>();
+
+	if (state->vdp1)
+	{
+		gp9001_log_vram(state->vdp1, screen->machine);
+
+		bitmap_fill(bitmap,cliprect,0);
+		bitmap_fill(gp9001_custom_priority_bitmap, cliprect, 0);
+		state->vdp1->gp9001_render_vdp(screen->machine, bitmap, cliprect);
+	}
+	if (state->vdp0)
+	{
+		gp9001_log_vram(state->vdp0, screen->machine);
+
+	//	bitmap_fill(bitmap,cliprect,0);
+		bitmap_fill(gp9001_custom_priority_bitmap, cliprect, 0);
+		state->vdp0->gp9001_render_vdp(screen->machine, bitmap, cliprect);
+	}
+
+
+	return 0;
+}
+
+
 // renders to 2 bitmaps, and mixes output
 VIDEO_UPDATE( toaplan2_mixed )
 {
 	toaplan2_state *state = screen->machine->driver_data<toaplan2_state>();
 
-	bitmap_fill(bitmap,cliprect,0);
-	bitmap_fill(gp9001_custom_priority_bitmap, cliprect, 0);
+//	bitmap_fill(bitmap,cliprect,0);
+//	bitmap_fill(gp9001_custom_priority_bitmap, cliprect, 0);
 
 	if (state->vdp0)
 	{
@@ -331,10 +358,6 @@ VIDEO_UPDATE( toaplan2_mixed )
 		state->vdp1->gp9001_render_vdp(screen->machine, gp9001_secondary_render_bitmap, cliprect);
 	}
 	
-	// this is meant to mix the layers together based on the PAL equation.
-	// the VDP chips apparently don't output any level of priority information, just the pen lookup pixel
-	// this would indicate that the priority mixing between the VDPs must be based on the palette #, however
-	// I can't get it working?!
 
 	// key test places in batsugun
 	// level 2 - the two layers of clouds (will appear under background, or over ships if wrong)
@@ -343,7 +366,8 @@ VIDEO_UPDATE( toaplan2_mixed )
 	// high score entry - letters will be missing if wrong
 	// end credits - various issues if wrong, clouds like level 2
 	//
-	// the current implementation seems to pick vdp1 at times when it shouldn't, causing missing pixels in the vdp0 layer
+	// when implemented based directly on the PAL equation it doesn't work, however, my own equations roughly based
+	// on that do.
 	// 
 
 	if (state->vdp0 && state->vdp1)
@@ -494,7 +518,7 @@ VIDEO_UPDATE( dogyuun )
 #ifdef DUAL_SCREEN_VDPS
 	VIDEO_UPDATE_CALL( toaplan2 );
 #else
-	VIDEO_UPDATE_CALL( toaplan2_mixed );
+	VIDEO_UPDATE_CALL( toaplan2_dual );
 #endif
 
 	return 0;
