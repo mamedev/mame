@@ -213,7 +213,7 @@
 #define VERBOSE			(0)
 #define TEST_HANDLER	(0)
 
-#define VPRINTF(x)	do { if (VERBOSE) mame_printf_debug x; } while (0)
+#define VPRINTF(x)	do { if (VERBOSE) printf x; } while (0)
 
 
 
@@ -2357,6 +2357,12 @@ void address_space::dump_map(FILE *file, read_or_write readorwrite)
 
 void address_space::unmap(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read_or_write readorwrite, bool quiet)
 {
+	VPRINTF(("address_space::unmap(%s-%s mask=%s mirror=%s, %s, %s)\n",
+			 core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars), 
+			 core_i64_hex_format(addrmask, m_addrchars), core_i64_hex_format(addrmirror, m_addrchars), 
+			 (readorwrite == ROW_READ) ? "read" : (readorwrite == ROW_WRITE) ? "write" : (readorwrite == ROW_READWRITE) ? "read/write" : "??",
+			 quiet ? "quiet" : "normal"));
+
 	// read space
 	if (readorwrite == ROW_READ || readorwrite == ROW_READWRITE)
 		read().map_range(addrstart, addrend, addrmask, addrmirror, quiet ? STATIC_NOP : STATIC_UNMAP);
@@ -2374,6 +2380,11 @@ void address_space::unmap(offs_t addrstart, offs_t addrend, offs_t addrmask, off
 
 void address_space::install_port(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, const char *rtag, const char *wtag)
 {
+	VPRINTF(("address_space::install_port(%s-%s mask=%s mirror=%s, read=\"%s\" / write=\"%s\")\n",
+			 core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars), 
+			 core_i64_hex_format(addrmask, m_addrchars), core_i64_hex_format(addrmirror, m_addrchars), 
+			 (rtag != NULL) ? rtag : "(none)", (wtag != NULL) ? wtag : "(none)"));
+
 	// read handler
 	if (rtag != NULL)
 	{
@@ -2411,6 +2422,11 @@ void address_space::install_port(offs_t addrstart, offs_t addrend, offs_t addrma
 
 void address_space::install_bank(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, const char *rtag, const char *wtag)
 {
+	VPRINTF(("address_space::install_bank(%s-%s mask=%s mirror=%s, read=\"%s\" / write=\"%s\")\n",
+			 core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars), 
+			 core_i64_hex_format(addrmask, m_addrchars), core_i64_hex_format(addrmirror, m_addrchars), 
+			 (rtag != NULL) ? rtag : "(none)", (wtag != NULL) ? wtag : "(none)"));
+
 	// map the read bank
 	if (rtag != NULL)
 	{
@@ -2438,6 +2454,12 @@ void address_space::install_bank(offs_t addrstart, offs_t addrend, offs_t addrma
 void *address_space::install_ram(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read_or_write readorwrite, void *baseptr)
 {
 	memory_private *memdata = m_machine.memory_data;
+
+	VPRINTF(("address_space::install_ram(%s-%s mask=%s mirror=%s, %s, %p)\n",
+			 core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars), 
+			 core_i64_hex_format(addrmask, m_addrchars), core_i64_hex_format(addrmirror, m_addrchars), 
+			 (readorwrite == ROW_READ) ? "read" : (readorwrite == ROW_WRITE) ? "write" : (readorwrite == ROW_READWRITE) ? "read/write" : "??",
+			 baseptr));
 
 	// map for read
 	if (readorwrite == ROW_READ || readorwrite == ROW_READWRITE)
@@ -2508,6 +2530,11 @@ void *address_space::install_ram(offs_t addrstart, offs_t addrend, offs_t addrma
 
 UINT8 *address_space::install_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read8_delegate handler, UINT64 unitmask)
 {
+	VPRINTF(("address_space::install_handler(%s-%s mask=%s mirror=%s, %s, %s)\n",
+			 core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars), 
+			 core_i64_hex_format(addrmask, m_addrchars), core_i64_hex_format(addrmirror, m_addrchars), 
+			 handler.name(), core_i64_hex_format(unitmask, data_width() / 4)));
+
 	UINT32 entry = read().map_range(addrstart, addrend, addrmask, addrmirror);
 	read().handler_read(entry).set_delegate(handler, unitmask);
 	generate_memdump(machine);
@@ -2516,6 +2543,11 @@ UINT8 *address_space::install_handler(offs_t addrstart, offs_t addrend, offs_t a
 
 UINT8 *address_space::install_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, write8_delegate handler, UINT64 unitmask)
 {
+	VPRINTF(("address_space::install_handler(%s-%s mask=%s mirror=%s, %s, %s)\n",
+			 core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars), 
+			 core_i64_hex_format(addrmask, m_addrchars), core_i64_hex_format(addrmirror, m_addrchars), 
+			 handler.name(), core_i64_hex_format(unitmask, data_width() / 4)));
+
 	UINT32 entry = write().map_range(addrstart, addrend, addrmask, addrmirror);
 	write().handler_write(entry).set_delegate(handler, unitmask);
 	generate_memdump(machine);
@@ -2537,6 +2569,11 @@ UINT8 *address_space::install_handler(offs_t addrstart, offs_t addrend, offs_t a
 
 UINT8 *address_space::install_legacy_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read8_space_func rhandler, const char *rname, UINT64 unitmask)
 {
+	VPRINTF(("address_space::install_legacy_handler(%s-%s mask=%s mirror=%s, %s, %s) [read8]\n",
+			 core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars), 
+			 core_i64_hex_format(addrmask, m_addrchars), core_i64_hex_format(addrmirror, m_addrchars), 
+			 rname, core_i64_hex_format(unitmask, data_width() / 4)));
+
 	UINT32 entry = read().map_range(addrstart, addrend, addrmask, addrmirror);
 	read().handler_read(entry).set_legacy_func(*this, rhandler, rname, unitmask);
 	generate_memdump(machine);
@@ -2545,6 +2582,11 @@ UINT8 *address_space::install_legacy_handler(offs_t addrstart, offs_t addrend, o
 
 UINT8 *address_space::install_legacy_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, write8_space_func whandler, const char *wname, UINT64 unitmask)
 {
+	VPRINTF(("address_space::install_legacy_handler(%s-%s mask=%s mirror=%s, %s, %s) [write8]\n",
+			 core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars), 
+			 core_i64_hex_format(addrmask, m_addrchars), core_i64_hex_format(addrmirror, m_addrchars), 
+			 wname, core_i64_hex_format(unitmask, data_width() / 4)));
+
 	UINT32 entry = write().map_range(addrstart, addrend, addrmask, addrmirror);
 	write().handler_write(entry).set_legacy_func(*this, whandler, wname, unitmask);
 	generate_memdump(machine);
@@ -2565,6 +2607,11 @@ UINT8 *address_space::install_legacy_handler(offs_t addrstart, offs_t addrend, o
 
 UINT8 *address_space::install_legacy_handler(device_t &device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read8_device_func rhandler, const char *rname, UINT64 unitmask)
 {
+	VPRINTF(("address_space::install_legacy_handler(%s-%s mask=%s mirror=%s, %s, %s, \"%s\") [read8]\n",
+			 core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars), 
+			 core_i64_hex_format(addrmask, m_addrchars), core_i64_hex_format(addrmirror, m_addrchars), 
+			 rname, core_i64_hex_format(unitmask, data_width() / 4), device.tag()));
+
 	UINT32 entry = read().map_range(addrstart, addrend, addrmask, addrmirror);
 	read().handler_read(entry).set_legacy_func(device, rhandler, rname, unitmask);
 	generate_memdump(machine);
@@ -2573,6 +2620,11 @@ UINT8 *address_space::install_legacy_handler(device_t &device, offs_t addrstart,
 
 UINT8 *address_space::install_legacy_handler(device_t &device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, write8_device_func whandler, const char *wname, UINT64 unitmask)
 {
+	VPRINTF(("address_space::install_legacy_handler(%s-%s mask=%s mirror=%s, %s, %s, \"%s\") [write8]\n",
+			 core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars), 
+			 core_i64_hex_format(addrmask, m_addrchars), core_i64_hex_format(addrmirror, m_addrchars), 
+			 wname, core_i64_hex_format(unitmask, data_width() / 4), device.tag()));
+
 	UINT32 entry = write().map_range(addrstart, addrend, addrmask, addrmirror);
 	write().handler_write(entry).set_legacy_func(device, whandler, wname, unitmask);
 	generate_memdump(machine);
@@ -3049,10 +3101,12 @@ UINT8 address_table::map_range(offs_t addrstart, offs_t addrend, offs_t addrmask
 			{
 				handler_entry &curentry = handler(scanentry);
 
-				// exact match takes precedence, and in fact doesn't need any
-				// further configuration or population
+				// exact match takes precedence
 				if (curentry.matches_exactly(bytestart, byteend, bytemask))
-					return scanentry;
+				{
+					entry = scanentry;
+					break;
+				}
 
 				// unpopulated is our second choice
 				if (entry == STATIC_INVALID && !curentry.populated())
