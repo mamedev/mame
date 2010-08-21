@@ -438,9 +438,22 @@ public:
 //  ADDRESS MAP MACROS
 //**************************************************************************
 
+//
+// There are two versions of the macros below
+//
+// By default, the legacy forms are enabled; however, if ADDRESS_MAP_MODERN is #defined
+// prior to including this file, the new format are enabled instead.
+//
+
 // so that "0" can be used for unneeded address maps
 #define construct_address_map_0 NULL
 
+
+#ifndef ADDRESS_MAP_MODERN
+
+//
+// Legacy ADDRESS_MAPs
+//
 
 // start/end tags for the address map
 #define ADDRESS_MAP_NAME(_name) construct_address_map_##_name
@@ -573,90 +586,6 @@ void ADDRESS_MAP_NAME(_name)(address_map &map, const device_config &devconfig) \
 	curentry->set_handler(devconfig, _tag, _rhandler, #_rhandler, _whandler, #_whandler, _unitmask); \
 
 
-// driver data reads
-#define AM_READ_MEMBER(_class, _handler) \
-	curentry->set_handler(devconfig, NULL, read_proto_delegate::_create_member<_class, &_class::_handler>(#_class "::" #_handler)); \
-
-#define AM_READ8_MEMBER(_class, _handler, _unitmask) \
-	curentry->set_handler(devconfig, NULL, read8_proto_delegate::_create_member<_class, &_class::_handler>(#_class "::" #_handler), _unitmask); \
-
-#define AM_READ16_MEMBER(_class, _handler, _unitmask) \
-	curentry->set_handler(devconfig, NULL, read16_proto_delegate::_create_member<_class, &_class::_handler>(#_class "::" #_handler), _unitmask); \
-
-#define AM_READ32_MEMBER(_class, _handler, _unitmask) \
-	curentry->set_handler(devconfig, NULL, read32_proto_delegate::_create_member<_class, &_class::_handler>(#_class "::" #_handler), _unitmask); \
-
-
-// driver data writes
-#define AM_WRITE_MEMBER(_class, _handler) \
-	curentry->set_handler(devconfig, NULL, write_proto_delegate::_create_member<_class, &_class::_handler>(#_class "::" #_handler)); \
-
-#define AM_WRITE8_MEMBER(_class, _handler, _unitmask) \
-	curentry->set_handler(devconfig, NULL, write8_proto_delegate::_create_member<_class, &_class::_handler>(#_class "::" #_handler), _unitmask); \
-
-#define AM_WRITE16_MEMBER(_class, _handler, _unitmask) \
-	curentry->set_handler(devconfig, NULL, write16_proto_delegate::_create_member<_class, &_class::_handler>(#_class "::" #_handler), _unitmask); \
-
-#define AM_WRITE32_MEMBER(_class, _handler, _unitmask) \
-	curentry->set_handler(devconfig, NULL, write32_proto_delegate::_create_member<_class, &_class::_handler>(#_class "::" #_handler), _unitmask); \
-
-
-// driver data reads/writes
-#define AM_READWRITE_MEMBER(_class, _rhandler, _whandler) \
-	curentry->set_handler(devconfig, NULL, read_proto_delegate::_create_member<_class, &_class::_rhandler>(#_class "::" #_rhandler), write_proto_delegate::_create_member<_class, &_class::_whandler>(#_class "::" #_whandler)); \
-
-#define AM_READWRITE8_MEMBER(_class, _rhandler, _whandler, _unitmask) \
-	curentry->set_handler(devconfig, NULL, read8_proto_delegate::_create_member<_class, &_class::_rhandler>(#_class "::" #_rhandler), write8_proto_delegate::_create_member<_class, &_class::_whandler>(#_class "::" #_whandler), _unitmask); \
-
-#define AM_READWRITE16_MEMBER(_class, _rhandler, _whandler, _unitmask) \
-	curentry->set_handler(devconfig, NULL, read16_proto_delegate::_create_member<_class, &_class::_rhandler>(#_class "::" #_rhandler), write16_proto_delegate::_create_member<_class, &_class::_whandler>(#_class "::" #_whandler), _unitmask); \
-
-#define AM_READWRITE32_MEMBER(_class, _rhandler, _whandler, _unitmask) \
-	curentry->set_handler(devconfig, NULL, read32_proto_delegate::_create_member<_class, &_class::_rhandler>(#_class "::" #_rhandler), write32_proto_delegate::_create_member<_class, &_class::_whandler>(#_class "::" #_whandler), _unitmask); \
-
-
-// device reads
-#define AM_DEVREAD_MEMBER(_tag, _class, _handler) \
-	curentry->set_handler(devconfig, _tag, read_proto_delegate::_create_member<_class, &_class::_handler>(#_class "::" #_handler)); \
-
-#define AM_DEVREAD8_MEMBER(_tag, _class, _handler, _unitmask) \
-	curentry->set_handler(devconfig, _tag, read8_proto_delegate::_create_member<_class, &_class::_handler>(#_class "::" #_handler), _unitmask); \
-
-#define AM_DEVREAD16_MEMBER(_tag, _class, _handler, _unitmask) \
-	curentry->set_handler(devconfig, _tag, read16_proto_delegate::_create_member<_class, &_class::_handler>(#_class "::" #_handler), _unitmask); \
-
-#define AM_DEVREAD32_MEMBER(_tag, _class, _handler, _unitmask) \
-	curentry->set_handler(devconfig, _tag, read32_proto_delegate::_create_member<_class, &_class::_handler>(#_class "::" #_handler), _unitmask); \
-
-
-// device writes
-#define AM_DEVWRITE_MEMBER(_tag, _class, _handler) \
-	curentry->set_handler(devconfig, _tag, write_proto_delegate::_create_member<_class, &_class::_handler>(#_class "::" #_handler)); \
-
-#define AM_DEVWRITE8_MEMBER(_tag, _class, _handler, _unitmask) \
-	curentry->set_handler(devconfig, _tag, write8_proto_delegate::_create_member<_class, &_class::_handler>(#_class "::" #_handler), _unitmask); \
-
-#define AM_DEVWRITE16_MEMBER(_tag, _class, _handler, _unitmask) \
-	curentry->set_handler(devconfig, _tag, write16_proto_delegate::_create_member<_class, &_class::_handler>(#_class "::" #_handler), _unitmask); \
-
-#define AM_DEVWRITE32_MEMBER(_tag, _class, _handler, _unitmask) \
-	curentry->set_handler(devconfig, _tag, write32_proto_delegate::_create_member<_class, &_class::_handler>(#_class "::" #_handler), _unitmask); \
-
-
-// device reads/writes
-#define AM_DEVREADWRITE_MEMBER(_tag, _class, _rhandler, _whandler) \
-	curentry->set_handler(devconfig, _tag, read_proto_delegate::_create_member<_class, &_class::_rhandler>(#_class "::" #_rhandler), write_proto_delegate::_create_member<_class, &_class::_whandler>(#_class "::" #_whandler)); \
-
-#define AM_DEVREADWRITE8_MEMBER(_tag, _class, _rhandler, _whandler, _unitmask) \
-	curentry->set_handler(devconfig, _tag, read8_proto_delegate::_create_member<_class, &_class::_rhandler>(#_class "::" #_rhandler), write8_proto_delegate::_create_member<_class, &_class::_whandler>(#_class "::" #_whandler), _unitmask); \
-
-#define AM_DEVREADWRITE16_MEMBER(_tag, _class, _rhandler, _whandler, _unitmask) \
-	curentry->set_handler(devconfig, _tag, read16_proto_delegate::_create_member<_class, &_class::_rhandler>(#_class "::" #_rhandler), write16_proto_delegate::_create_member<_class, &_class::_whandler>(#_class "::" #_whandler), _unitmask); \
-
-#define AM_DEVREADWRITE32_MEMBER(_tag, _class, _rhandler, _whandler, _unitmask) \
-	curentry->set_handler(devconfig, _tag, read32_proto_delegate::_create_member<_class, &_class::_rhandler>(#_class "::" #_rhandler), write32_proto_delegate::_create_member<_class, &_class::_whandler>(#_class "::" #_whandler), _unitmask); \
-
-
 // special-case accesses
 #define AM_ROM \
 	curentry->set_read_type(AMH_ROM); \
@@ -739,16 +668,326 @@ void ADDRESS_MAP_NAME(_name)(address_map &map, const device_config &devconfig) \
 #define AM_ROMBANK(_bank)					AM_READ_BANK(_bank)
 #define AM_RAMBANK(_bank)					AM_READWRITE_BANK(_bank)
 #define AM_RAM_READ(_read)					AM_READ(_read) AM_WRITEONLY
-#define AM_RAM_READ_MEMBER(_class, _read)	AM_READ_MEMBER(_class, _read) AM_WRITEONLY
 #define AM_RAM_WRITE(_write)				AM_READONLY AM_WRITE(_write)
-#define AM_RAM_WRITE_MEMBER(_class, _write)	AM_READONLY AM_WRITE_MEMBER(_class, _write)
 #define AM_RAM_DEVREAD(_tag, _read) 		AM_DEVREAD(_tag, _read) AM_WRITEONLY
-#define AM_RAM_DEVREAD_MEMBER(_tag, _class, _read) AM_DEVREAD_MEMBER(_tag, _class, _read) AM_WRITEONLY
 #define AM_RAM_DEVWRITE(_tag, _write) 		AM_READONLY AM_DEVWRITE(_tag, _write)
-#define AM_RAM_DEVWRITE_MEMBER(_tag, _class, _write) AM_READONLY AM_DEVWRITE_MEMBER(_tag, _class, _write)
 
 #define AM_BASE_SIZE_MEMBER(_struct, _base, _size)	AM_BASE_MEMBER(_struct, _base) AM_SIZE_MEMBER(_struct, _size)
 #define AM_BASE_SIZE_GENERIC(_member)		AM_BASE_GENERIC(_member) AM_SIZE_GENERIC(_member)
+
+
+#else
+
+//
+// Modern ADDRESS_MAPs
+//
+
+// start/end tags for the address map
+#define ADDRESS_MAP_NAME(_name) construct_address_map_##_name
+
+#define ADDRESS_MAP_START(_name, _space, _bits, _class) \
+void ADDRESS_MAP_NAME(_name)(address_map &map, const device_config &devconfig) \
+{ \
+	typedef read##_bits##_proto_delegate read_proto_delegate; \
+	typedef write##_bits##_proto_delegate write_proto_delegate; \
+	address_map_entry##_bits *curentry = NULL; \
+	(void)curentry; \
+	map.configure(_space, _bits); \
+	typedef _class drivdata_class; \
+
+#define ADDRESS_MAP_END \
+}
+
+// use this to declare external references to an address map
+#define ADDRESS_MAP_EXTERN(_name, _bits) \
+	extern void ADDRESS_MAP_NAME(_name)(address_map &map, const device_config &devconfig)
+
+
+// global controls
+#define ADDRESS_MAP_GLOBAL_MASK(_mask) \
+	map.set_global_mask(_mask); \
+
+#define ADDRESS_MAP_UNMAP_LOW \
+	map.set_unmap_value(0); \
+
+#define ADDRESS_MAP_UNMAP_HIGH \
+	map.set_unmap_value(~0); \
+
+
+// importing data from other address maps
+#define AM_IMPORT_FROM(_name) \
+	ADDRESS_MAP_NAME(_name)(map, devconfig); \
+
+
+// address ranges
+#define AM_RANGE(_start, _end) \
+	curentry = map.add(_start, _end, curentry); \
+
+#define AM_MASK(_mask) \
+	curentry->set_mask(_mask); \
+
+#define AM_MIRROR(_mirror) \
+	curentry->set_mirror(_mirror); \
+
+
+// legacy space reads
+#define AM_READ_LEGACY(_handler) \
+	curentry->set_handler(_handler, #_handler); \
+
+#define AM_READ8_LEGACY(_handler, _unitmask) \
+	curentry->set_handler(_handler, #_handler, _unitmask); \
+
+#define AM_READ16_LEGACY(_handler, _unitmask) \
+	curentry->set_handler(_handler, #_handler, _unitmask); \
+
+#define AM_READ32_LEGACY(_handler, _unitmask) \
+	curentry->set_handler(_handler, #_handler, _unitmask); \
+
+
+// legacy space writes
+#define AM_WRITE_LEGACY(_handler) \
+	curentry->set_handler(_handler, #_handler); \
+
+#define AM_WRITE8_LEGACY(_handler, _unitmask) \
+	curentry->set_handler(_handler, #_handler, _unitmask); \
+
+#define AM_WRITE16_LEGACY(_handler, _unitmask) \
+	curentry->set_handler(_handler, #_handler, _unitmask); \
+
+#define AM_WRITE32_LEGACY(_handler, _unitmask) \
+	curentry->set_handler(_handler, #_handler, _unitmask); \
+
+
+// legacy space reads/writes
+#define AM_READWRITE_LEGACY(_rhandler, _whandler) \
+	curentry->set_handler(_rhandler, #_rhandler, _whandler, #_whandler); \
+
+#define AM_READWRITE8_LEGACY(_rhandler, _whandler, _unitmask) \
+	curentry->set_handler(_rhandler, #_rhandler, _whandler, #_whandler, _unitmask); \
+
+#define AM_READWRITE16_LEGACY(_rhandler, _whandler, _unitmask) \
+	curentry->set_handler(_rhandler, #_rhandler, _whandler, #_whandler, _unitmask); \
+
+#define AM_READWRITE32_LEGACY(_rhandler, _whandler, _unitmask) \
+	curentry->set_handler(_rhandler, #_rhandler, _whandler, #_whandler, _unitmask); \
+
+
+// legacy device reads
+#define AM_DEVREAD_LEGACY(_tag, _handler) \
+	curentry->set_handler(devconfig, _tag, _handler, #_handler); \
+
+#define AM_DEVREAD8_LEGACY(_tag, _handler, _unitmask) \
+	curentry->set_handler(devconfig, _tag, _handler, #_handler, _unitmask); \
+
+#define AM_DEVREAD16_LEGACY(_tag, _handler, _unitmask) \
+	curentry->set_handler(devconfig, _tag, _handler, #_handler, _unitmask); \
+
+#define AM_DEVREAD32_LEGACY(_tag, _handler, _unitmask) \
+	curentry->set_handler(devconfig, _tag, _handler, #_handler, _unitmask); \
+
+
+// legacy device writes
+#define AM_DEVWRITE_LEGACY(_tag, _handler) \
+	curentry->set_handler(devconfig, _tag, _handler, #_handler); \
+
+#define AM_DEVWRITE8_LEGACY(_tag, _handler, _unitmask) \
+	curentry->set_handler(devconfig, _tag, _handler, #_handler, _unitmask); \
+
+#define AM_DEVWRITE16_LEGACY(_tag, _handler, _unitmask) \
+	curentry->set_handler(devconfig, _tag, _handler, #_handler, _unitmask); \
+
+#define AM_DEVWRITE32_LEGACY(_tag, _handler, _unitmask) \
+	curentry->set_handler(devconfig, _tag, _handler, #_handler, _unitmask); \
+
+
+// legacy device reads/writes
+#define AM_DEVREADWRITE_LEGACY(_tag, _rhandler, _whandler) \
+	curentry->set_handler(devconfig, _tag, _rhandler, #_rhandler, _whandler, #_whandler); \
+
+#define AM_DEVREADWRITE8_LEGACY(_tag, _rhandler, _whandler, _unitmask) \
+	curentry->set_handler(devconfig, _tag, _rhandler, #_rhandler, _whandler, #_whandler, _unitmask); \
+
+#define AM_DEVREADWRITE16_LEGACY(_tag, _rhandler, _whandler, _unitmask) \
+	curentry->set_handler(devconfig, _tag, _rhandler, #_rhandler, _whandler, #_whandler, _unitmask); \
+
+#define AM_DEVREADWRITE32_LEGACY(_tag, _rhandler, _whandler, _unitmask) \
+	curentry->set_handler(devconfig, _tag, _rhandler, #_rhandler, _whandler, #_whandler, _unitmask); \
+
+
+// driver data reads
+#define AM_READ(_handler) \
+	curentry->set_handler(devconfig, NULL, read_proto_delegate::_create_member<drivdata_class, &drivdata_class::_handler>("driver_data::" #_handler)); \
+
+#define AM_READ8(_handler, _unitmask) \
+	curentry->set_handler(devconfig, NULL, read8_proto_delegate::_create_member<drivdata_class, &drivdata_class::_handler>("driver_data::" #_handler), _unitmask); \
+
+#define AM_READ16(_handler, _unitmask) \
+	curentry->set_handler(devconfig, NULL, read16_proto_delegate::_create_member<drivdata_class, &drivdata_class::_handler>("driver_data::" #_handler), _unitmask); \
+
+#define AM_READ32(_handler, _unitmask) \
+	curentry->set_handler(devconfig, NULL, read32_proto_delegate::_create_member<drivdata_class, &drivdata_class::_handler>("driver_data::" #_handler), _unitmask); \
+
+
+// driver data writes
+#define AM_WRITE(_handler) \
+	curentry->set_handler(devconfig, NULL, write_proto_delegate::_create_member<drivdata_class, &drivdata_class::_handler>("driver_data::" #_handler)); \
+
+#define AM_WRITE8(_handler, _unitmask) \
+	curentry->set_handler(devconfig, NULL, write8_proto_delegate::_create_member<drivdata_class, &drivdata_class::_handler>("driver_data::" #_handler), _unitmask); \
+
+#define AM_WRITE16(_handler, _unitmask) \
+	curentry->set_handler(devconfig, NULL, write16_proto_delegate::_create_member<drivdata_class, &drivdata_class::_handler>("driver_data::" #_handler), _unitmask); \
+
+#define AM_WRITE32(_handler, _unitmask) \
+	curentry->set_handler(devconfig, NULL, write32_proto_delegate::_create_member<drivdata_class, &drivdata_class::_handler>("driver_data::" #_handler), _unitmask); \
+
+
+// driver data reads/writes
+#define AM_READWRITE(_rhandler, _whandler) \
+	curentry->set_handler(devconfig, NULL, read_proto_delegate::_create_member<drivdata_class, &drivdata_class::_rhandler>("driver_data::" #_rhandler), write_proto_delegate::_create_member<drivdata_class, &drivdata_class::_whandler>("driver_data::" #_whandler)); \
+
+#define AM_READWRITE8(_rhandler, _whandler, _unitmask) \
+	curentry->set_handler(devconfig, NULL, read8_proto_delegate::_create_member<drivdata_class, &drivdata_class::_rhandler>("driver_data::" #_rhandler), write8_proto_delegate::_create_member<drivdata_class, &drivdata_class::_whandler>("driver_data::" #_whandler), _unitmask); \
+
+#define AM_READWRITE16(_rhandler, _whandler, _unitmask) \
+	curentry->set_handler(devconfig, NULL, read16_proto_delegate::_create_member<drivdata_class, &drivdata_class::_rhandler>("driver_data::" #_rhandler), write16_proto_delegate::_create_member<drivdata_class, &drivdata_class::_whandler>("driver_data::" #_whandler), _unitmask); \
+
+#define AM_READWRITE32(_rhandler, _whandler, _unitmask) \
+	curentry->set_handler(devconfig, NULL, read32_proto_delegate::_create_member<drivdata_class, &drivdata_class::_rhandler>("driver_data::" #_rhandler), write32_proto_delegate::_create_member<drivdata_class, &drivdata_class::_whandler>("driver_data::" #_whandler), _unitmask); \
+
+
+// device reads
+#define AM_DEVREAD(_tag, _class, _handler) \
+	curentry->set_handler(devconfig, _tag, read_proto_delegate::_create_member<_class, &_class::_handler>(#_class "::" #_handler)); \
+
+#define AM_DEVREAD8(_tag, _class, _handler, _unitmask) \
+	curentry->set_handler(devconfig, _tag, read8_proto_delegate::_create_member<_class, &_class::_handler>(#_class "::" #_handler), _unitmask); \
+
+#define AM_DEVREAD16(_tag, _class, _handler, _unitmask) \
+	curentry->set_handler(devconfig, _tag, read16_proto_delegate::_create_member<_class, &_class::_handler>(#_class "::" #_handler), _unitmask); \
+
+#define AM_DEVREAD32(_tag, _class, _handler, _unitmask) \
+	curentry->set_handler(devconfig, _tag, read32_proto_delegate::_create_member<_class, &_class::_handler>(#_class "::" #_handler), _unitmask); \
+
+
+// device writes
+#define AM_DEVWRITE(_tag, _class, _handler) \
+	curentry->set_handler(devconfig, _tag, write_proto_delegate::_create_member<_class, &_class::_handler>(#_class "::" #_handler)); \
+
+#define AM_DEVWRITE8(_tag, _class, _handler, _unitmask) \
+	curentry->set_handler(devconfig, _tag, write8_proto_delegate::_create_member<_class, &_class::_handler>(#_class "::" #_handler), _unitmask); \
+
+#define AM_DEVWRITE16(_tag, _class, _handler, _unitmask) \
+	curentry->set_handler(devconfig, _tag, write16_proto_delegate::_create_member<_class, &_class::_handler>(#_class "::" #_handler), _unitmask); \
+
+#define AM_DEVWRITE32(_tag, _class, _handler, _unitmask) \
+	curentry->set_handler(devconfig, _tag, write32_proto_delegate::_create_member<_class, &_class::_handler>(#_class "::" #_handler), _unitmask); \
+
+
+// device reads/writes
+#define AM_DEVREADWRITE(_tag, _class, _rhandler, _whandler) \
+	curentry->set_handler(devconfig, _tag, read_proto_delegate::_create_member<_class, &_class::_rhandler>(#_class "::" #_rhandler), write_proto_delegate::_create_member<_class, &_class::_whandler>(#_class "::" #_whandler)); \
+
+#define AM_DEVREADWRITE8(_tag, _class, _rhandler, _whandler, _unitmask) \
+	curentry->set_handler(devconfig, _tag, read8_proto_delegate::_create_member<_class, &_class::_rhandler>(#_class "::" #_rhandler), write8_proto_delegate::_create_member<_class, &_class::_whandler>(#_class "::" #_whandler), _unitmask); \
+
+#define AM_DEVREADWRITE16(_tag, _class, _rhandler, _whandler, _unitmask) \
+	curentry->set_handler(devconfig, _tag, read16_proto_delegate::_create_member<_class, &_class::_rhandler>(#_class "::" #_rhandler), write16_proto_delegate::_create_member<_class, &_class::_whandler>(#_class "::" #_whandler), _unitmask); \
+
+#define AM_DEVREADWRITE32(_tag, _class, _rhandler, _whandler, _unitmask) \
+	curentry->set_handler(devconfig, _tag, read32_proto_delegate::_create_member<_class, &_class::_rhandler>(#_class "::" #_rhandler), write32_proto_delegate::_create_member<_class, &_class::_whandler>(#_class "::" #_whandler), _unitmask); \
+
+
+// special-case accesses
+#define AM_ROM \
+	curentry->set_read_type(AMH_ROM); \
+
+#define AM_RAM \
+	curentry->set_read_type(AMH_RAM); \
+	curentry->set_write_type(AMH_RAM); \
+
+#define AM_READONLY \
+	curentry->set_read_type(AMH_RAM); \
+
+#define AM_WRITEONLY \
+	curentry->set_write_type(AMH_RAM); \
+
+#define AM_UNMAP \
+	curentry->set_read_type(AMH_UNMAP); \
+	curentry->set_write_type(AMH_UNMAP); \
+
+#define AM_NOP \
+	curentry->set_read_type(AMH_NOP); \
+	curentry->set_write_type(AMH_NOP); \
+
+#define AM_READNOP \
+	curentry->set_read_type(AMH_NOP); \
+
+#define AM_WRITENOP \
+	curentry->set_write_type(AMH_NOP); \
+
+
+// port accesses
+#define AM_READ_PORT(_tag) \
+	curentry->set_read_port(devconfig, _tag); \
+
+#define AM_WRITE_PORT(_tag) \
+	curentry->set_write_port(devconfig, _tag); \
+
+#define AM_READWRITE_PORT(_tag) \
+	curentry->set_readwrite_port(devconfig, _tag); \
+
+
+// bank accesses
+#define AM_READ_BANK(_tag) \
+	curentry->set_read_bank(devconfig, _tag); \
+
+#define AM_WRITE_BANK(_tag) \
+	curentry->set_write_bank(devconfig, _tag); \
+
+#define AM_READWRITE_BANK(_tag) \
+	curentry->set_readwrite_bank(devconfig, _tag); \
+
+
+// attributes for accesses
+#define AM_REGION(_tag, _offs) \
+	curentry->set_region(_tag, _offs); \
+
+#define AM_SHARE(_tag) \
+	curentry->set_share(_tag); \
+
+#define AM_BASE_LEGACY(_base) \
+	curentry->set_baseptr(_base); \
+
+#define myoffsetof(_struct, _member)  ((FPTR)&((_struct *)0x1000)->_member - 0x1000)
+#define AM_BASE(_member) \
+	curentry->set_member_baseptr(myoffsetof(drivdata_class, _member)); \
+
+#define AM_BASE_GENERIC(_member) \
+	curentry->set_generic_baseptr(myoffsetof(generic_pointers, _member)); \
+
+#define AM_SIZE_LEGACY(_size) \
+	curentry->set_sizeptr(_size); \
+
+#define AM_SIZE(_struct, _member) \
+	curentry->set_member_sizeptr(myoffsetof(drivdata_class, _member)); \
+
+#define AM_SIZE_GENERIC(_member) \
+	curentry->set_generic_sizeptr(myoffsetof(generic_pointers, _member##_size)); \
+
+
+// common shortcuts
+#define AM_ROMBANK(_bank)					AM_READ_BANK(_bank)
+#define AM_RAMBANK(_bank)					AM_READWRITE_BANK(_bank)
+#define AM_RAM_READ(_read)					AM_READ(_read) AM_WRITEONLY
+#define AM_RAM_WRITE(_write)				AM_READONLY AM_WRITE(_write)
+#define AM_RAM_DEVREAD(_tag, _class, _read) AM_DEVREAD(_tag, _class, _read) AM_WRITEONLY
+#define AM_RAM_DEVWRITE(_tag, _class, _write) AM_READONLY AM_DEVWRITE(_tag, _class, _write)
+
+#define AM_BASE_SIZE(_base, _size)			AM_BASE_MEMBER(_base) AM_SIZE_MEMBER(_size)
+#define AM_BASE_SIZE_GENERIC(_member)		AM_BASE_GENERIC(_member) AM_SIZE_GENERIC(_member)
+
+#endif
 
 
 
