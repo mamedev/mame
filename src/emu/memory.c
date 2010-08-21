@@ -265,14 +265,14 @@ public:
 	memory_block(address_space &space, offs_t bytestart, offs_t byteend, void *memory = NULL);
 	~memory_block();
 
-	// getters	
+	// getters
 	memory_block *next() const { return m_next; }
 	offs_t bytestart() const { return m_bytestart; }
 	offs_t byteend() const { return m_byteend; }
 	UINT8 *data() const { return m_data; }
 
 	// is the given range contained by this memory block?
-	bool contains(address_space &space, offs_t bytestart, offs_t byteend) const 
+	bool contains(address_space &space, offs_t bytestart, offs_t byteend) const
 	{
 		return (&space == &m_space && m_bytestart <= bytestart && m_byteend >= byteend);
 	}
@@ -295,13 +295,13 @@ class memory_bank
 {
 	friend class simple_list<memory_bank>;
 	friend resource_pool_object<memory_bank>::~resource_pool_object();
-	
+
 	// a bank reference is an entry in a list of address spaces that reference a given bank
 	class bank_reference
 	{
 		friend class simple_list<bank_reference>;
 		friend resource_pool_object<bank_reference>::~resource_pool_object();
-		
+
 	public:
 		// construction/destruction
 		bank_reference(address_space &space, read_or_write readorwrite)
@@ -312,7 +312,7 @@ class memory_bank
 		// getters
 		bank_reference *next() const { return m_next; }
 		address_space &space() const { return m_space; }
-		
+
 		// does this reference match the space+read/write combination?
 		bool matches(address_space &space, read_or_write readorwrite) const
 		{
@@ -325,7 +325,7 @@ class memory_bank
 		address_space &			m_space;			// address space that references us
 		read_or_write			m_readorwrite;		// used for read or write?
 	};
-	
+
 	// a bank_entry contains a raw and decrypted pointer
 	struct bank_entry
 	{
@@ -337,7 +337,7 @@ public:
 	// construction/destruction
 	memory_bank(address_space &space, int index, offs_t bytestart, offs_t byteend, const char *tag = NULL);
 	~memory_bank();
-	
+
 	// getters
 	memory_bank *next() const { return m_next; }
 	int index() const { return m_index; }
@@ -366,7 +366,7 @@ public:
 	void configure(int entrynum, void *base);
 	void configure_decrypted(int entrynum, void *base);
 	void set_entry(int entrynum);
-	
+
 private:
 	// internal helpers
 	void invalidate_references();
@@ -401,7 +401,7 @@ protected:
 	// construction/destruction
 	handler_entry(UINT8 width, endianness_t endianness, UINT8 **rambaseptr);
 	virtual ~handler_entry();
-	
+
 public:
 	// getters
 	bool populated() const { return m_populated; }
@@ -430,7 +430,7 @@ public:
 		end = m_byteend | mirrorbits;
 	}
 
-	// configure the handler addresses, and mark as populated	
+	// configure the handler addresses, and mark as populated
 	void configure(offs_t bytestart, offs_t byteend, offs_t bytemask)
 	{
 		m_populated = true;
@@ -472,7 +472,7 @@ public:
 		m_legacy_object.space = NULL;
 		m_legacy_handler.space8 = NULL;
 	}
-	
+
 	// getters
 	virtual const char *name() const;
 
@@ -482,21 +482,21 @@ public:
 	void set_delegate(read32_delegate delegate, UINT64 mask = 0);
 	void set_delegate(read64_delegate delegate, UINT64 mask = 0);
 
-	// configure legacy address space functions	
+	// configure legacy address space functions
 	void set_legacy_func(address_space &space, read8_space_func func, const char *name, UINT64 mask = 0);
 	void set_legacy_func(address_space &space, read16_space_func func, const char *name, UINT64 mask = 0);
 	void set_legacy_func(address_space &space, read32_space_func func, const char *name, UINT64 mask = 0);
 	void set_legacy_func(address_space &space, read64_space_func func, const char *name, UINT64 mask = 0);
 
-	// configure legacy device functions	
+	// configure legacy device functions
 	void set_legacy_func(device_t &device, read8_device_func func, const char *name, UINT64 mask = 0);
 	void set_legacy_func(device_t &device, read16_device_func func, const char *name, UINT64 mask = 0);
 	void set_legacy_func(device_t &device, read32_device_func func, const char *name, UINT64 mask = 0);
 	void set_legacy_func(device_t &device, read64_device_func func, const char *name, UINT64 mask = 0);
 
-	// configure I/O port access	
+	// configure I/O port access
 	void set_ioport(const input_port_config &ioport);
-	
+
 	// read via the underlying delegates
 	UINT8 read8(address_space &space, offs_t offset, UINT8 mask) const { return m_read8(space, offset, mask); }
 	UINT16 read16(address_space &space, offs_t offset, UINT16 mask) const { return m_read16(space, offset, mask); }
@@ -512,7 +512,7 @@ private:
 	UINT64 read_stub_64_from_16(address_space &space, offs_t offset, UINT64 mask);
 	UINT64 read_stub_64_from_32(address_space &space, offs_t offset, UINT64 mask);
 
-	// stubs for calling legacy read handlers	
+	// stubs for calling legacy read handlers
 	UINT8 read_stub_legacy(address_space &space, offs_t offset, UINT8 mask);
 	UINT16 read_stub_legacy(address_space &space, offs_t offset, UINT16 mask);
 	UINT32 read_stub_legacy(address_space &space, offs_t offset, UINT32 mask);
@@ -563,7 +563,7 @@ public:
 		m_legacy_object.space = NULL;
 		m_legacy_handler.space8 = NULL;
 	}
-	
+
 	// getters
 	virtual const char *name() const;
 
@@ -572,20 +572,20 @@ public:
 	void set_delegate(write16_delegate delegate, UINT64 mask = 0);
 	void set_delegate(write32_delegate delegate, UINT64 mask = 0);
 	void set_delegate(write64_delegate delegate, UINT64 mask = 0);
-	
-	// configure legacy address space functions	
+
+	// configure legacy address space functions
 	void set_legacy_func(address_space &space, write8_space_func func, const char *name, UINT64 mask = 0);
 	void set_legacy_func(address_space &space, write16_space_func func, const char *name, UINT64 mask = 0);
 	void set_legacy_func(address_space &space, write32_space_func func, const char *name, UINT64 mask = 0);
 	void set_legacy_func(address_space &space, write64_space_func func, const char *name, UINT64 mask = 0);
 
-	// configure legacy device functions	
+	// configure legacy device functions
 	void set_legacy_func(device_t &device, write8_device_func func, const char *name, UINT64 mask = 0);
 	void set_legacy_func(device_t &device, write16_device_func func, const char *name, UINT64 mask = 0);
 	void set_legacy_func(device_t &device, write32_device_func func, const char *name, UINT64 mask = 0);
 	void set_legacy_func(device_t &device, write64_device_func func, const char *name, UINT64 mask = 0);
-	
-	// configure I/O port access	
+
+	// configure I/O port access
 	void set_ioport(const input_port_config &ioport);
 
 	// write via the underlying delegates
@@ -602,13 +602,13 @@ private:
 	void write_stub_32_from_16(address_space &space, offs_t offset, UINT32 data, UINT32 mask);
 	void write_stub_64_from_16(address_space &space, offs_t offset, UINT64 data, UINT64 mask);
 	void write_stub_64_from_32(address_space &space, offs_t offset, UINT64 data, UINT64 mask);
-	
-	// stubs for calling legacy write handlers	
+
+	// stubs for calling legacy write handlers
 	void write_stub_legacy(address_space &space, offs_t offset, UINT8 data, UINT8 mask);
 	void write_stub_legacy(address_space &space, offs_t offset, UINT16 data, UINT16 mask);
 	void write_stub_legacy(address_space &space, offs_t offset, UINT32 data, UINT32 mask);
 	void write_stub_legacy(address_space &space, offs_t offset, UINT64 data, UINT64 mask);
-	
+
 	// stubs for writing I/O ports
 	template<typename _UintType>
 	void write_stub_ioport(address_space &space, offs_t offset, _UintType data, _UintType mask) { input_port_write_direct(m_ioport, data, mask); }
@@ -660,7 +660,7 @@ public:
 	// construction/destruction
 	address_table(address_space &space, bool large);
 	~address_table();
-	
+
 	// getters
 	virtual handler_entry &handler(UINT32 index) const = 0;
 	bool watchpoints_enabled() const { return (m_live_lookup == s_watchpoint_table); }
@@ -685,7 +685,7 @@ public:
 		return entry;
 	}
 
-	// enable watchpoints by swapping in the watchpoint table	
+	// enable watchpoints by swapping in the watchpoint table
 	void enable_watchpoints(bool enable = true) { m_live_lookup = enable ? s_watchpoint_table : m_table; }
 
 	// table mapping helpers
@@ -731,14 +731,14 @@ protected:
 			: m_checksum_valid(false),
 			  m_checksum(0),
 			  m_usecount(0) { }
-			  
+
 		bool				m_checksum_valid;			// is the checksum valid
 		UINT32				m_checksum;					// checksum over all the bytes
 		UINT32				m_usecount;					// number of times this has been used
 	};
 	subtable_data *			m_subtable;					// info about each subtable
 	UINT8					m_subtable_alloc;			// number of subtables allocated
-	
+
 	// static global read-only watchpoint table
 	static UINT8			s_watchpoint_table[1 << LEVEL1_BITS];
 };
@@ -757,17 +757,17 @@ public:
 	// getters
 	virtual handler_entry &handler(UINT32 index) const;
 	handler_entry_read &handler_read(UINT32 index) const { assert(index < ARRAY_LENGTH(m_handlers)); return *m_handlers[index]; }
-	
+
 private:
 	// internal unmapped handler
 	template<typename _UintType>
 	_UintType unmap_r(address_space &space, offs_t offset, _UintType mask)
 	{
-		if (m_space.log_unmap() && !m_space.debugger_access()) 
+		if (m_space.log_unmap() && !m_space.debugger_access())
 			logerror("%s: unmapped %s memory read from %s\n", cpuexec_describe_context(&m_space.m_machine), m_space.name(), core_i64_hex_format(m_space.byte_to_address(offset), m_space.addrchars()));
 		return m_space.unmap();
 	}
-	
+
 	// internal no-op handler
 	template<typename _UintType>
 	_UintType nop_r(address_space &space, offs_t offset, _UintType mask)
@@ -817,7 +817,7 @@ private:
 	void unmap_w(address_space &space, offs_t offset, _UintType data, _UintType mask)
 	{
 		if (m_space.log_unmap() && !m_space.debugger_access())
-			logerror("%s: unmapped %s memory write to %s\n", cpuexec_describe_context(&m_space.m_machine), m_space.name(), core_i64_hex_format(m_space.byte_to_address(offset), m_space.addrchars()));
+			logerror("%s: unmapped %s memory write to %s = %x & %x\n", cpuexec_describe_context(&m_space.m_machine), m_space.name(), core_i64_hex_format(m_space.byte_to_address(offset), m_space.addrchars()),(UINT32)data,(UINT32)mask);
 	}
 
 	template<typename _UintType>
@@ -852,7 +852,7 @@ class address_space_specific : public address_space
 {
 	typedef address_space_specific<_NativeType, _Endian, _Large> this_type;
 
-	// helpers to simplify core code	
+	// helpers to simplify core code
 	offs_t endian_xor(offs_t value) { if (_Endian == ENDIANNESS_BIG) value = ~value; return value; }
 	int endian_shift(int levalue, int bevalue) { return (_Endian == ENDIANNESS_LITTLE) ? levalue : bevalue; }
 	UINT32 read_lookup(offs_t byteaddress) const { return _Large ? m_read.lookup_live_large(byteaddress) : m_read.lookup_live_small(byteaddress); }
@@ -864,7 +864,7 @@ public:
 		: address_space(memory, spacenum, _Large),
 		  m_read(*this, _Large),
 		  m_write(*this, _Large) { }
-	
+
 	// accessors
 	virtual address_table_read &read() { return m_read; }
 	virtual address_table_write &write() { return m_write; }
@@ -892,7 +892,7 @@ public:
 		accessors.write_qword_masked = reinterpret_cast<void (*)(address_space *, offs_t, UINT64, UINT64)>(&write_qword_masked_static);
 	}
 
-	// 
+	//
 	virtual void *get_read_ptr(offs_t byteaddress)
 	{
 		// perform the lookup
@@ -972,14 +972,14 @@ public:
 	{
 		if (sizeof(_NativeType) == 1)
 			return read_native(address, 0xff);
-		
+
 		if (sizeof(_NativeType) > 1)
 		{
 			UINT32 shift = (endian_xor(address) & (sizeof(_NativeType) - 1)) * 8;
 			return read_native(address, (_NativeType)0xff << shift) >> shift;
 		}
 	}
-	
+
 	// read word
 	UINT16 read_word_direct(offs_t address, UINT16 mask)
 	{
@@ -991,7 +991,7 @@ public:
 			UINT32 shift = (endian_xor(address) & (sizeof(_NativeType) - 2)) * 8;
 			return read_native(address, (_NativeType)mask << shift) >> shift;
 		}
-		
+
 		if (sizeof(_NativeType) < 2)
 		{
 			UINT16 result = 0;
@@ -1012,7 +1012,7 @@ public:
 			UINT32 shift = (endian_xor(address) & (sizeof(_NativeType) - 4)) * 8;
 			return read_native(address, (_NativeType)mask << shift) >> shift;
 		}
-		
+
 		if (sizeof(_NativeType) < 4)
 		{
 			UINT32 result = 0;
@@ -1042,20 +1042,20 @@ public:
 	{
 		if (sizeof(_NativeType) == 1)
 			return write_native(address, data, 0xff);
-		
+
 		if (sizeof(_NativeType) > 1)
 		{
 			UINT32 shift = (endian_xor(address) & (sizeof(_NativeType) - 1)) * 8;
 			return write_native(address, (_NativeType)data << shift, (_NativeType)0xff << shift);
 		}
 	}
-	
+
 	// write word
 	void write_word_direct(offs_t address, UINT16 data, UINT16 mask)
 	{
 		if (sizeof(_NativeType) == 2)
 			return write_native(address, data, mask);
-		
+
 		if (sizeof(_NativeType) > 2)
 		{
 			UINT32 shift = (endian_xor(address) & (sizeof(_NativeType) - 2)) * 8;
@@ -1068,13 +1068,13 @@ public:
 			if (EXPECTED(mask & (0xff << endian_shift(8,0)))) write_byte_direct(address + 1, data >> endian_shift(8,0));
 		}
 	}
-	
+
 	// write dword
 	void write_dword_direct(offs_t address, UINT32 data, UINT32 mask)
 	{
 		if (sizeof(_NativeType) == 4)
 			return write_native(address, data, mask);
-		
+
 		if (sizeof(_NativeType) > 4)
 		{
 			UINT32 shift = (endian_xor(address) & (sizeof(_NativeType) - 4)) * 8;
@@ -1087,20 +1087,20 @@ public:
 			if (EXPECTED(mask & (0xffff << endian_shift(16,0)))) write_word_direct(address + 2, data >> endian_shift(16,0), mask >> endian_shift(16,0));
 		}
 	}
-	
+
 	// write qword
 	void write_qword_direct(offs_t address, UINT64 data, UINT64 mask)
 	{
 		if (sizeof(_NativeType) == 8)
 			return write_native(address, data, mask);
-		
+
 		if (sizeof(_NativeType) < 8)
 		{
 			if (EXPECTED(mask & (U64(0xffffffff) << endian_shift(0,32)))) write_dword_direct(address + 0, data >> endian_shift(0,32), mask >> endian_shift(0,32));
 			if (EXPECTED(mask & (U64(0xffffffff) << endian_shift(32,0)))) write_dword_direct(address + 4, data >> endian_shift(32,0), mask >> endian_shift(32,0));
 		}
 	}
-	
+
 	// virtual access to these functions
 	UINT8 read_byte(offs_t address) { return read_byte_direct(address); }
 	UINT16 read_word(offs_t address, UINT16 mask) { return read_word_direct(address, mask); }
@@ -1110,7 +1110,7 @@ public:
 	void write_word(offs_t address, UINT16 data, UINT16 mask) { write_word_direct(address, data, mask); }
 	void write_dword(offs_t address, UINT32 data, UINT32 mask) { write_dword_direct(address, data, mask); }
 	void write_qword(offs_t address, UINT64 data, UINT64 mask) { write_qword_direct(address, data, mask); }
-	
+
 	// static access to these functions
 	static UINT8 read_byte_static(this_type *space, offs_t address) { return space->read_byte_direct(address); }
 	static UINT16 read_word_static(this_type *space, offs_t address) { return space->read_word_direct(address, 0xffff); }
@@ -1206,7 +1206,7 @@ void memory_init(running_machine *machine)
 	// allocate our private data
 	memory_private *memdata = machine->memory_data = auto_alloc_clear(machine, memory_private);
 	memdata->banknext = STATIC_BANK1;
-	
+
 	// loop over devices and spaces within each device
 	device_memory_interface *memory = NULL;
 	for (bool gotone = machine->m_devicelist.first(memory); gotone; gotone = memory->next(memory))
@@ -1454,7 +1454,7 @@ address_space::~address_space()
 //-------------------------------------------------
 
 address_space &address_space::allocate(running_machine &machine, const address_space_config &config, device_memory_interface &memory, int spacenum)
-{			
+{
 	// allocate one of the appropriate type
 	bool large = (config.addr2byte_end(0xffffffffUL >> (32 - config.m_addrbus_width)) >= (1 << 18));
 
@@ -1579,7 +1579,7 @@ void address_space::prepare_map()
 		// if we have a share entry, add it to our map
 		if (entry->m_share != NULL)
 			m_machine.memory_data->sharemap.add(entry->m_share, UNMAPPED_SHARE_PTR, false);
-	
+
 		// computed adjusted addresses first
 		entry->m_bytestart = entry->m_addrstart;
 		entry->m_byteend = entry->m_addrend;
@@ -1777,7 +1777,7 @@ void address_space::populate_map_entry(const address_map_entry &entry, read_or_w
 
 //-------------------------------------------------
 //  allocate_memory - determine all neighboring
-//  address ranges and allocate memory to back 
+//  address ranges and allocate memory to back
 //  them
 //-------------------------------------------------
 
@@ -2037,7 +2037,7 @@ void address_space::unmap(offs_t addrstart, offs_t addrend, offs_t addrmask, off
 
 
 //-------------------------------------------------
-//  install_port - install a new I/O port handler 
+//  install_port - install a new I/O port handler
 //  into this address space
 //-------------------------------------------------
 
@@ -2051,7 +2051,7 @@ void address_space::install_port(offs_t addrstart, offs_t addrend, offs_t addrma
 		if (port == NULL)
 			throw emu_fatalerror("Attempted to map non-existent port '%s' for read in space %s of device '%s'\n", rtag, m_name, m_device.tag());
 
-		// map the range and set the ioport		
+		// map the range and set the ioport
 		UINT32 entry = read().map_range(addrstart, addrend, addrmask, addrmirror);
 		read().handler_read(entry).set_ioport(*port);
 	}
@@ -2063,7 +2063,7 @@ void address_space::install_port(offs_t addrstart, offs_t addrend, offs_t addrma
 		if (port == NULL)
 			fatalerror("Attempted to map non-existent port '%s' for write in space %s of device '%s'\n", wtag, m_name, m_device.tag());
 
-		// map the range and set the ioport		
+		// map the range and set the ioport
 		UINT32 entry = write().map_range(addrstart, addrend, addrmask, addrmirror);
 		write().handler_write(entry).set_ioport(*port);
 	}
@@ -2171,7 +2171,7 @@ void *address_space::install_ram(offs_t addrstart, offs_t addrend, offs_t addrma
 
 
 //-------------------------------------------------
-//  install_handler - install 8-bit read/write 
+//  install_handler - install 8-bit read/write
 //  delegate handlers for the space
 //-------------------------------------------------
 
@@ -2256,7 +2256,7 @@ UINT8 *address_space::install_legacy_handler(device_t &device, offs_t addrstart,
 
 
 //-------------------------------------------------
-//  install_handler - install 16-bit read/write 
+//  install_handler - install 16-bit read/write
 //  delegate handlers for the space
 //-------------------------------------------------
 
@@ -2341,7 +2341,7 @@ UINT16 *address_space::install_legacy_handler(device_t &device, offs_t addrstart
 
 
 //-------------------------------------------------
-//  install_handler - install 32-bit read/write 
+//  install_handler - install 32-bit read/write
 //  delegate handlers for the space
 //-------------------------------------------------
 
@@ -2426,7 +2426,7 @@ UINT32 *address_space::install_legacy_handler(device_t &device, offs_t addrstart
 
 
 //-------------------------------------------------
-//  install_handler64 - install 64-bit read/write 
+//  install_handler64 - install 64-bit read/write
 //  delegate handlers for the space
 //-------------------------------------------------
 
@@ -2714,17 +2714,17 @@ UINT8 address_table::map_range(offs_t addrstart, offs_t addrend, offs_t addrmask
 			for (UINT8 scanentry = STATIC_COUNT; scanentry < SUBTABLE_BASE; scanentry++)
 			{
 				handler_entry &curentry = handler(scanentry);
-				
+
 				// exact match takes precedence, and in fact doesn't need any
 				// further configuration or population
 				if (curentry.matches_exactly(bytestart, byteend, bytemask))
 					return scanentry;
-				
+
 				// unpopulated is our second choice
 				if (entry == STATIC_INVALID && !curentry.populated())
 					entry = scanentry;
 			}
-			
+
 			// if we didn't find anything, find something to depopulate
 			if (entry != STATIC_INVALID)
 				break;
@@ -2742,7 +2742,7 @@ UINT8 address_table::map_range(offs_t addrstart, offs_t addrend, offs_t addrmask
 
 	// populate it
 	populate_range_mirrored(bytestart, byteend, bytemirror, entry);
-	
+
 	// recompute any direct access on this space if it is a read modification
 	m_space.m_direct.force_update(entry);
 	return entry;
@@ -2815,7 +2815,7 @@ void address_table::populate_range(offs_t bytestart, offs_t byteend, UINT8 handl
 
 //-------------------------------------------------
 //  populate_range_mirrored - assign a memory
-//  handler to a range of addresses including 
+//  handler to a range of addresses including
 //  mirrors
 //-------------------------------------------------
 
@@ -2827,7 +2827,7 @@ void address_table::populate_range_mirrored(offs_t bytestart, offs_t byteend, of
 	for (int bit = 0; bit < level2_bits(); bit++)
 		if (bytemirror & (1 << bit))
 			lmirrorbit[lmirrorbits++] = 1 << bit;
-	
+
 	offs_t hmirrorbits = 0;
 	offs_t hmirrorbit[32];
 	for (int bit = level2_bits(); bit < 32; bit++)
@@ -2910,8 +2910,8 @@ void address_table::depopulate_unused()
 
 
 //-------------------------------------------------
-//  derive_range - look up the entry for a memory 
-//  range, and then compute the extent of that 
+//  derive_range - look up the entry for a memory
+//  range, and then compute the extent of that
 //  range based on the lookup tables
 //-------------------------------------------------
 
@@ -3448,7 +3448,7 @@ direct_read_data::direct_read_data(address_space &space)
 	  m_entry(STATIC_UNMAP)
 {
 }
-	
+
 
 //-------------------------------------------------
 //  ~direct_read_data - destructor
@@ -3460,7 +3460,7 @@ direct_read_data::~direct_read_data()
 
 
 //-------------------------------------------------
-//  set_direct_region - called by device cores to 
+//  set_direct_region - called by device cores to
 //  update the opcode base for the given address
 //-------------------------------------------------
 
@@ -3581,7 +3581,7 @@ direct_update_delegate direct_read_data::set_direct_update(direct_update_delegat
 
 //-------------------------------------------------
 //  explicit_configure - explicitly configure
-//  the start/end/mask and the pointers from 
+//  the start/end/mask and the pointers from
 //  within a custom callback
 //-------------------------------------------------
 
@@ -3756,7 +3756,7 @@ void memory_bank::set_base(void *base)
 
 
 //-------------------------------------------------
-//  set_base_decrypted - set the decrypted base 
+//  set_base_decrypted - set the decrypted base
 //  explicitly
 //-------------------------------------------------
 
@@ -3805,7 +3805,7 @@ void memory_bank::set_entry(int entrynum)
 void memory_bank::expand_entries(int entrynum)
 {
 	int newcount = entrynum + 1;
-	
+
 	// allocate a new array and copy from the old one; zero out the new entries
 	bank_entry *newentry = auto_alloc_array(&m_machine, bank_entry, newcount);
 	memcpy(newentry, m_entry, sizeof(m_entry[0]) * m_entry_count);
@@ -3977,7 +3977,7 @@ void handler_entry_read::set_delegate(read8_delegate delegate, UINT64 mask)
 	// make sure this is a valid size
 	assert(m_datawidth >= 8);
 	m_read8 = delegate;
-	
+
 	// if mismatched bus width, configure a stub
 	if (m_datawidth != 8)
 	{
@@ -4033,7 +4033,7 @@ void handler_entry_read::set_delegate(read32_delegate delegate, UINT64 mask)
 	// make sure this is a valid size
 	assert(m_datawidth >= 32);
 	m_read32 = delegate;
-	
+
 	// if mismatched bus width, configure a stub
 	if (m_datawidth != 32)
 	{
@@ -4095,7 +4095,7 @@ void handler_entry_read::set_legacy_func(address_space &space, read64_space_func
 
 
 //-------------------------------------------------
-//  set_legacy_func - configure a legacy device 
+//  set_legacy_func - configure a legacy device
 //  stub of the appropriate size
 //-------------------------------------------------
 
@@ -4319,7 +4319,7 @@ void handler_entry_write::set_delegate(write8_delegate delegate, UINT64 mask)
 {
 	assert(m_datawidth >= 8);
 	m_write8 = delegate;
-	
+
 	// if mismatched bus width, configure a stub
 	if (m_datawidth != 8)
 	{
@@ -4343,7 +4343,7 @@ void handler_entry_write::set_delegate(write16_delegate delegate, UINT64 mask)
 {
 	assert(m_datawidth >= 16);
 	m_write16 = delegate;
-	
+
 	// if mismatched bus width, configure a stub
 	if (m_datawidth != 16)
 	{
@@ -4365,7 +4365,7 @@ void handler_entry_write::set_delegate(write32_delegate delegate, UINT64 mask)
 {
 	assert(m_datawidth >= 32);
 	m_write32 = delegate;
-	
+
 	// if mismatched bus width, configure a stub
 	if (m_datawidth != 32)
 	{
@@ -4422,7 +4422,7 @@ void handler_entry_write::set_legacy_func(address_space &space, write64_space_fu
 
 
 //-------------------------------------------------
-//  set_legacy_func - configure a legacy device 
+//  set_legacy_func - configure a legacy device
 //  stub of the appropriate size
 //-------------------------------------------------
 
@@ -4526,7 +4526,7 @@ void handler_entry_write::write_stub_64_from_8(address_space &space, offs_t offs
 
 
 //-------------------------------------------------
-//  write_stub_32_from_16 - construct a 32-bit 
+//  write_stub_32_from_16 - construct a 32-bit
 //  write from 16-bit sources
 //-------------------------------------------------
 
@@ -4543,7 +4543,7 @@ void handler_entry_write::write_stub_32_from_16(address_space &space, offs_t off
 
 
 //-------------------------------------------------
-//  write_stub_64_from_16 - construct a 64-bit 
+//  write_stub_64_from_16 - construct a 64-bit
 //  write from 16-bit sources
 //-------------------------------------------------
 
@@ -4560,7 +4560,7 @@ void handler_entry_write::write_stub_64_from_16(address_space &space, offs_t off
 
 
 //-------------------------------------------------
-//  write_stub_64_from_32 - construct a 64-bit 
+//  write_stub_64_from_32 - construct a 64-bit
 //  write from 32-bit sources
 //-------------------------------------------------
 
@@ -4577,7 +4577,7 @@ void handler_entry_write::write_stub_64_from_32(address_space &space, offs_t off
 
 
 //-------------------------------------------------
-//  write_stub_legacy - perform a write using 
+//  write_stub_legacy - perform a write using
 //  legacy handler callbacks
 //-------------------------------------------------
 
