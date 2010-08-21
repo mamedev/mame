@@ -4420,7 +4420,7 @@ static time_t playback_init(running_machine *machine)
 
 	/* verify the header against the current game */
 	if (memcmp(machine->gamedrv->name, header + 0x14, strlen(machine->gamedrv->name) + 1) != 0)
-		fatalerror("Input file is for " GAMENOUN " '%s', not for current " GAMENOUN " '%s'\n", header + 0x14, machine->gamedrv->name);
+		mame_printf_info("Input file is for " GAMENOUN " '%s', not for current " GAMENOUN " '%s'\n", header + 0x14, machine->gamedrv->name);
 
 	/* enable compression */
 	mame_fcompress(portdata->playback_file, FCOMPRESS_MEDIUM);
