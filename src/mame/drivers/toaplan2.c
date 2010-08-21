@@ -205,7 +205,7 @@ Game status:
 
 Teki Paki                      Working, but no sound. Missing sound MCU dump. Chip is protected. It's a QFP80 Hitachi HD647180.
 Ghox                           Working, but no sound. Missing sound MCU dump. It's a QFP80 Hitachi HD647180.
-Dogyuun                        Broken VDP mixing, no sound. MCU type is likely a NEC V25+. Chip is a PLCC94 stamped 'TS-002-MACH'.
+Dogyuun                        Working, no sound. MCU type is likely a NEC V25+. Chip is a PLCC94 stamped 'TS-002-MACH'.
 Knuckle Bash                   Working, but sound FX only (missing music). MCU type is a NEC V25+. Chip is a PLCC94 stamped 'TS-004-DASH'.
                                         Some PCBs use another version stamped 'NITRO' which is the same chip type.
 Truxton 2                      Working.
@@ -216,8 +216,8 @@ FixEight                       Not working properly. Missing background GFX, and
 FixEight bootleg               Working. One unknown ROM (same as pipibibi one). Region hardcoded to Korea (@ $4d8)
 Grind Stormer                  Working, but no sound. MCU type is a NEC V25+. Chip is a PLCC94 stamped 'TS-007-SPY'.
 VFive                          Working, but no sound. MCU type is a NEC V25+. Chip is a PLCC94 stamped 'TS-007-SPY'.
-Batsugun                       Broken VDP mixing, but sound FX only (missing music) and wrong GFX priorities. MCU type is a NEC V25+. Chip is a PLCC94 stamped 'TS-007-SPY'.
-Batsugun Sp'                   Broken VDP mixing, but sound FX only (missing music) and wrong GFX priorities. MCU type is a NEC V25+. Chip is a PLCC94 stamped 'TS-007-SPY'.
+Batsugun                       Working, but sound FX only (missing music) and wrong GFX priorities. MCU type is a NEC V25+. Chip is a PLCC94 stamped 'TS-007-SPY'.
+Batsugun Sp'                  Working, but sound FX only (missing music) and wrong GFX priorities. MCU type is a NEC V25+. Chip is a PLCC94 stamped 'TS-007-SPY'.
 Snow Bros. 2                   Working.
 Mahou Daisakusen               Working.
 Shippu Mahou Daisakusen        Working.
@@ -5818,8 +5818,8 @@ GAME( 1991, tekipaki, 0,        tekipaki, tekipaki, T2_Z180,  ROT0,   "Toaplan",
 GAME( 1991, ghox,     0,        ghox,     ghox,     T2_Z180,  ROT270, "Toaplan", "Ghox (Spinner with Up/Down Axis)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1991, ghoxj,    ghox,     ghox,     ghox,     T2_Z180,  ROT270, "Toaplan", "Ghox (8-Way Joystick)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
 
-GAME( 1992, dogyuun,  0,        dogyuun,  dogyuun,  T2_V25,   ROT270, "Toaplan", "Dogyuun", GAME_NO_SOUND | GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
-GAME( 1992, dogyuunk, dogyuun,  dogyuun,  dogyuunk, T2_V25,   ROT270, "Toaplan", "Dogyuun (Unite Trading license)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE | GAME_NOT_WORKING )
+GAME( 1992, dogyuun,  0,        dogyuun,  dogyuun,  T2_V25,   ROT270, "Toaplan", "Dogyuun", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1992, dogyuunk, dogyuun,  dogyuun,  dogyuunk, T2_V25,   ROT270, "Toaplan", "Dogyuun (Unite Trading license)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
 
 GAME( 1993, kbash,    0,        kbash,    kbash,    T2_V25,   ROT0,   "Toaplan", "Knuckle Bash", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 
@@ -5839,9 +5839,9 @@ GAME( 1992, grindstm, vfive,    vfive,    grindstm, T2_V25,   ROT270, "Toaplan",
 GAME( 1992, grindstma,vfive,    vfive,    grindstm, T2_V25,   ROT270, "Toaplan", "Grind Stormer (older set)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1993, vfive,    0,        vfive,    vfive,    T2_V25,   ROT270, "Toaplan", "V-Five (Japan)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
 
-GAME( 1993, batsugun,  0,        batsugun, batsugun, T2_V25,   ROT270, "Toaplan", "Batsugun (set 1)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE | GAME_NOT_WORKING ) // dual vdp mixing is broken ATM
-GAME( 1993, batsuguna, batsugun, batsugun, batsugun, T2_V25,   ROT270, "Toaplan", "Batsugun (set 2)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE | GAME_NOT_WORKING ) // dual vdp mixing is broken ATM
-GAME( 1993, batsugunsp,batsugun, batsugun, batsugun, T2_V25,   ROT270, "Toaplan", "Batsugun (Special Ver.)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE | GAME_NOT_WORKING ) // dual vdp mixing is broken ATM
+GAME( 1993, batsugun,  0,        batsugun, batsugun, T2_V25,   ROT270, "Toaplan", "Batsugun (set 1)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1993, batsuguna, batsugun, batsugun, batsugun, T2_V25,   ROT270, "Toaplan", "Batsugun (set 2)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1993, batsugunsp,batsugun, batsugun, batsugun, T2_V25,   ROT270, "Toaplan", "Batsugun (Special Ver.)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 
 GAME( 1994, snowbro2, 0,        snowbro2, snowbro2, T2_noZ80, ROT0,   "Hanafram", "Snow Bros. 2 - With New Elves / Otenki Paradise", GAME_SUPPORTS_SAVE )
 

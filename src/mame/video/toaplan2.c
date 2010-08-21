@@ -369,7 +369,7 @@ VIDEO_UPDATE( toaplan2_mixed )
 				int COMPARISON = ((GPU0_LUTaddr & 0x0780) > (GPU1_LUTaddr & 0x0780));
 				
 				// note: GPU1_LUTaddr & 0x000f - transparency check for vdp1? (gfx are 4bpp, the low 4 bits of the lookup would be the pixel data value)
-
+#if 0
 				int result =
 					     ((GPU0_LUTaddr & 0x0008) & !COMPARISON)
 					   | ((GPU0_LUTaddr & 0x0008) & !(GPU1_LUTaddr & 0x000f))
@@ -382,6 +382,31 @@ VIDEO_UPDATE( toaplan2_mixed )
 
 				if (result) src_vdp0[x] = GPU0_LUTaddr;
 				else src_vdp0[x] = GPU1_LUTaddr;
+#endif
+				// this seems to work tho?
+				if (!(GPU1_LUTaddr & 0x000f))
+				{
+					src_vdp0[x] = GPU0_LUTaddr;
+				}
+				else
+				{
+					if (!(GPU0_LUTaddr & 0x000f))
+					{
+						src_vdp0[x] = GPU1_LUTaddr; // bg pen
+					}
+					else
+					{
+						if (COMPARISON)
+						{
+							src_vdp0[x] = GPU1_LUTaddr;
+						}
+						else
+						{
+							src_vdp0[x] = GPU0_LUTaddr;
+						}
+
+					}
+				}
 			}
 		}
 	}
