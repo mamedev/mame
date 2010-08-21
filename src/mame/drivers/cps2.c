@@ -8408,6 +8408,33 @@ ROM_START( ddsomud )
 	ROM_LOAD16_WORD_SWAP( "dd2.12m",   0x200000, 0x200000, CRC(5ea2e7fa) SHA1(0e6a9fd007f637adcb2226c902394f07de45e803) )
 ROM_END
 
+ROM_START( ecofghtrd )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
+	ROM_LOAD16_WORD_SWAP( "ueced.03", 0x000000, 0x80000, CRC(ac725d2b) SHA1(f77a37d160aed34319ef810728de88a87bccb7a5) )
+	ROM_LOAD16_WORD_SWAP( "ueced.04", 0x080000, 0x80000, CRC(f800138d) SHA1(a8c05da5d33c338a82fed4f7b59c6ba8c10e8597) )
+	ROM_LOAD16_WORD_SWAP( "ueced.05", 0x100000, 0x80000, CRC(eb6a12f2) SHA1(5253a193a38b566eefbb8644511f283ac4a69850) )
+	ROM_LOAD16_WORD_SWAP( "ueced.06", 0x180000, 0x80000, CRC(8380ec9a) SHA1(4f3a95a2580f89ae214b588df9258bd9dc06f993) )
+	
+	ROM_REGION( 0xc00000, "gfx", 0 )
+	ROMX_LOAD( "uec.13m",   0x000000, 0x200000, CRC(dcaf1436) SHA1(ba124cc0bb10c1d1c07592a3623add4ed054182e) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "uec.15m",   0x000002, 0x200000, CRC(2807df41) SHA1(66a9800af435055737ce50a0b0ced7c5718c2004) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "uec.17m",   0x000004, 0x200000, CRC(8a708d02) SHA1(95ec527edc904a66e325667521b4d07d72579211) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "uec.19m",   0x000006, 0x200000, CRC(de7be0ef) SHA1(bf8df9a31f8923f4b726ea12fe8327368463ebe1) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "uec.14m",   0x800000, 0x100000, CRC(1a003558) SHA1(64bbd89e65dc0cf6f4ab5ea93a4cc6312d0d0802) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "uec.16m",   0x800002, 0x100000, CRC(4ff8a6f9) SHA1(03968a301417e8843d42d4e0db42aa0a3a38664b) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "uec.18m",   0x800004, 0x100000, CRC(b167ae12) SHA1(48c552d02caad27d680aa51170560794f2a51478) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "uec.20m",   0x800006, 0x100000, CRC(1064bdc2) SHA1(c51f75ac8d3f02a771feda0a933314a928555c4e) , ROM_GROUPWORD | ROM_SKIP(6) )
+
+	ROM_REGION( QSOUND_SIZE, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_LOAD( "uec.01",   0x00000, 0x08000, CRC(c235bd15) SHA1(feb7cd7db9dc0b9887b33eed9796bb0205fb719d) )
+	ROM_CONTINUE(         0x10000, 0x18000 )
+
+	ROM_REGION( 0x400000, "qsound", 0 ) /* QSound samples */
+	ROM_LOAD16_WORD_SWAP( "uec.11m",   0x000000, 0x200000, CRC(81b25d39) SHA1(448adfcc7d98873a48c710d857225cdd1580e5c9) )
+	ROM_LOAD16_WORD_SWAP( "uec.12m",   0x200000, 0x200000, CRC(27729e52) SHA1(a55c8159adf766dda70cb047f5ac85ce6bc0a3f3) )
+ROM_END
+
+
 ROM_START( gwingjd )
 	ROM_REGION(CODE_SIZE, "maincpu", 0 )      /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "ggwjd.03a", 0x000000, 0x80000, CRC(cb1c756e) SHA1(f8b37120b429e14aad6e7d2106f8f8c422f2ce2b) )
@@ -9111,6 +9138,7 @@ ROM_END
 
 GAME( 1993, ssf2ud,   ssf2,     dead_cps2, cps2_2p6b, cps2,    ROT0,   "bootleg", "Super Street Fighter II: The New Challengers (USA 930911 Phoenix Edition) (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1993, ddtodd,   ddtod,    dead_cps2, cps2_4p4b, cps2,    ROT0,   "bootleg", "Dungeons & Dragons: Tower of Doom (Euro 940412 Phoenix Edition) (bootleg)", GAME_SUPPORTS_SAVE )
+GAME( 1993, ecofghtrd,ecofghtr, dead_cps2, cps2_2p3b, cps2,    ROT0,   "bootleg", "Eco Fighters (World 931203 Phoenix Edition) (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1994, armwar1d, armwar,   dead_cps2, cps2_3p3b, cps2,    ROT0,   "bootleg", "Armored Warriors (Euro 941011 Phoenix Edition) (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1994, avspd,    avsp,     dead_cps2, cps2_3p3b, cps2,    ROT0,   "bootleg", "Alien vs. Predator (Euro 940520 Phoenix Edition) (bootleg)", GAME_SUPPORTS_SAVE )
 GAME( 1994, dstlku1d, dstlk,    dead_cps2, cps2_2p6b, cps2,    ROT0,   "bootleg", "Darkstalkers: The Night Warriors (USA 940705 Phoenix Edition) (bootleg)", GAME_SUPPORTS_SAVE )

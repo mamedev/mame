@@ -3036,6 +3036,7 @@ V-V                           TP-027
 	/* CPS2 'Phoenix' bootlegs */
 	DRIVER( ssf2ud )
 	DRIVER( ddtodd )
+	DRIVER( ecofghtrd )
 	DRIVER( avspd )
 	DRIVER( dstlku1d )
 	DRIVER( ringdstd )
