@@ -492,23 +492,22 @@ static bool validate_roms(int drivnum, const machine_config *config, region_arra
 				else
 				{
 					astring fulltag;
-					int rgnnum;
 
 					/* iterate over all regions found so far */
 					rom_region_name(fulltag, driver, source, romp);
-					for (rgnnum = 0; rgnnum < ARRAY_LENGTH(rgninfo->entries); rgnnum++)
+					for (int rgnnum = 0; rgnnum < ARRAY_LENGTH(rgninfo->entries); rgnnum++)
 					{
 						/* stop when we hit an empty */
 						if (!rgninfo->entries[rgnnum].tag)
 						{
 							currgn = &rgninfo->entries[rgnnum];
-							currgn->tag.cpy(fulltag);
+							currgn->tag = fulltag;
 							currgn->length = ROMREGION_GETLENGTH(romp);
 							break;
 						}
 
 						/* fail if we hit a duplicate */
-						if (fulltag.cmp(rgninfo->entries[rgnnum].tag) == 0)
+						if (fulltag == rgninfo->entries[rgnnum].tag)
 						{
 							mame_printf_error("%s: %s has duplicate ROM_REGION tag '%s'\n", driver->source_file, driver->name, fulltag.cstr());
 							error = true;
@@ -563,6 +562,10 @@ static bool validate_roms(int drivnum, const machine_config *config, region_arra
 					error = true;
 				}
 			}
+			
+			// count copies/fills as valid items
+			else if (ROMENTRY_ISCOPY(romp) || ROMENTRY_ISFILL(romp))
+				items_since_region++;
 
 			/* for any non-region ending entries, make sure they don't extend past the end */
 			if (!ROMENTRY_ISREGIONEND(romp) && currgn != NULL)
@@ -658,7 +661,7 @@ static bool validate_gfx(int drivnum, const machine_config *config, region_array
 				}
 
 				/* if we hit a match, check against the length */
-				if (rgninfo->entries[rgnnum].tag.cmp(region) == 0)
+				if (rgninfo->entries[rgnnum].tag == region)
 				{
 					/* if we have a valid region, and we're not using auto-sizing, check the decode against the region length */
 					if (!IS_FRAC(total))
