@@ -11,7 +11,7 @@
 /* vdp related */
 
 // mixing debug, render each VDP to it's own screen - be sure to recompile both driver and video after changing
-#define DUAL_SCREEN_VDPS
+//#define DUAL_SCREEN_VDPS
 
 #include "video/gp9001.h"
 

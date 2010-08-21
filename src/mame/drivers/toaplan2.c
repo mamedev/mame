@@ -197,6 +197,7 @@ Armed Police Batrider
 Battle Garegga
 Mahou Daisakusen
 Battle Bakraid
+(emulated in video/gp9001.c)
 
 *********************************************************************
 
@@ -204,7 +205,7 @@ Game status:
 
 Teki Paki                      Working, but no sound. Missing sound MCU dump. Chip is protected. It's a QFP80 Hitachi HD647180.
 Ghox                           Working, but no sound. Missing sound MCU dump. It's a QFP80 Hitachi HD647180.
-Dogyuun                        Working, but no sound. MCU type is likely a NEC V25+. Chip is a PLCC94 stamped 'TS-002-MACH'.
+Dogyuun                        Broken VDP mixing, no sound. MCU type is likely a NEC V25+. Chip is a PLCC94 stamped 'TS-002-MACH'.
 Knuckle Bash                   Working, but sound FX only (missing music). MCU type is a NEC V25+. Chip is a PLCC94 stamped 'TS-004-DASH'.
                                         Some PCBs use another version stamped 'NITRO' which is the same chip type.
 Truxton 2                      Working.
@@ -215,8 +216,8 @@ FixEight                       Not working properly. Missing background GFX, and
 FixEight bootleg               Working. One unknown ROM (same as pipibibi one). Region hardcoded to Korea (@ $4d8)
 Grind Stormer                  Working, but no sound. MCU type is a NEC V25+. Chip is a PLCC94 stamped 'TS-007-SPY'.
 VFive                          Working, but no sound. MCU type is a NEC V25+. Chip is a PLCC94 stamped 'TS-007-SPY'.
-Batsugun                       Working, but sound FX only (missing music) and wrong GFX priorities. MCU type is a NEC V25+. Chip is a PLCC94 stamped 'TS-007-SPY'.
-Batsugun Sp'                   Working, but sound FX only (missing music) and wrong GFX priorities. MCU type is a NEC V25+. Chip is a PLCC94 stamped 'TS-007-SPY'.
+Batsugun                       Broken VDP mixing, but sound FX only (missing music) and wrong GFX priorities. MCU type is a NEC V25+. Chip is a PLCC94 stamped 'TS-007-SPY'.
+Batsugun Sp'                   Broken VDP mixing, but sound FX only (missing music) and wrong GFX priorities. MCU type is a NEC V25+. Chip is a PLCC94 stamped 'TS-007-SPY'.
 Snow Bros. 2                   Working.
 Mahou Daisakusen               Working.
 Shippu Mahou Daisakusen        Working.

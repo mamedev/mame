@@ -1,6 +1,7 @@
 /* GP9001 Video Controller */
 
 extern bitmap_t* gp9001_custom_priority_bitmap;
+extern bitmap_t* gp9001_secondary_render_bitmap;
 
 class gp9001vdp_device_config : public device_config,
 								 public device_config_memory_interface
@@ -71,6 +72,7 @@ public:
 	void gp9001_draw_custom_tilemap(running_machine* machine, bitmap_t* bitmap, tilemap_t* tilemap, const UINT8* priremap, const UINT8* pri_enable );
 	void gp9001_render_vdp(running_machine* machine, bitmap_t* bitmap, const rectangle* cliprect);
 	void gp9001_video_eof(void);
+	void create_tilemaps(int region);
 
 	// offset kludges, needed by fixeight bootleg
 	int extra_xoffset[4];

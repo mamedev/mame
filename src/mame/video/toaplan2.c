@@ -101,6 +101,9 @@ VIDEO_START( toaplan2 )
 	/* our current VDP implementation needs this bitmap to work with */
 	gp9001_custom_priority_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED8);
 
+	if (state->vdp1)
+		gp9001_secondary_render_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
+
 	gp9001_displog = 0; // debug flag
 
 	display_tx = 1;
@@ -303,6 +306,88 @@ WRITE16_HANDLER( batrider_objectbank_w )
 	}
 }
 
+// renders to 2 bitmaps, and mixes output
+VIDEO_UPDATE( toaplan2_mixed )
+{
+	toaplan2_state *state = screen->machine->driver_data<toaplan2_state>();
+
+	bitmap_fill(bitmap,cliprect,0);
+	bitmap_fill(gp9001_custom_priority_bitmap, cliprect, 0);
+
+	if (state->vdp0)
+	{
+		gp9001_log_vram(state->vdp0, screen->machine);
+
+		bitmap_fill(bitmap,cliprect,0);
+		bitmap_fill(gp9001_custom_priority_bitmap, cliprect, 0);
+		state->vdp0->gp9001_render_vdp(screen->machine, bitmap, cliprect);
+	}
+	if (state->vdp1)
+	{
+		gp9001_log_vram(state->vdp1, screen->machine);
+
+		bitmap_fill(gp9001_secondary_render_bitmap,cliprect,0);
+		bitmap_fill(gp9001_custom_priority_bitmap, cliprect, 0);
+		state->vdp1->gp9001_render_vdp(screen->machine, gp9001_secondary_render_bitmap, cliprect);
+	}
+	
+	// this is meant to mix the layers together based on the PAL equation.
+	// the VDP chips apparently don't output any level of priority information, just the pen lookup pixel
+	// this would indicate that the priority mixing between the VDPs must be based on the palette #, however
+	// I can't get it working?!
+
+	// key test places in batsugun
+	// level 2 - the two layers of clouds (will appear under background, or over ships if wrong)
+	// level 3 - the special effect 'layer' which should be under everything (will appear over background if wrong)
+	// level 4(?) - the large clouds (will obscure player if wrong)
+	// high score entry - letters will be missing if wrong
+	// end credits - various issues if wrong, clouds like level 2
+	//
+	// the current implementation seems to pick vdp1 at times when it shouldn't, causing missing pixels in the vdp0 layer
+	// 
+
+	if (state->vdp0 && state->vdp1)
+	{
+		int width = screen->width();
+		int height = screen->height();
+		int y,x;
+		UINT16* src_vdp0; // output buffer of vdp0
+		UINT16* src_vdp1; // output buffer of vdp1
+
+		for (y=0;y<height;y++)
+		{
+			src_vdp0 = BITMAP_ADDR16(bitmap, y, 0);
+			src_vdp1 = BITMAP_ADDR16(gp9001_secondary_render_bitmap, y, 0);
+
+			for (x=0;x<width;x++)
+			{
+				UINT16 GPU0_LUTaddr = src_vdp0[x];
+				UINT16 GPU1_LUTaddr = src_vdp1[x];
+				
+				// these equations is derived from the PAL, but doesn't seem to work?
+
+				int COMPARISON = ((GPU0_LUTaddr & 0x0780) > (GPU1_LUTaddr & 0x0780));
+				
+				// note: GPU1_LUTaddr & 0x000f - transparency check for vdp1? (gfx are 4bpp, the low 4 bits of the lookup would be the pixel data value)
+
+				int result =
+					     ((GPU0_LUTaddr & 0x0008) & !COMPARISON)
+					   | ((GPU0_LUTaddr & 0x0008) & !(GPU1_LUTaddr & 0x000f))
+					   | ((GPU0_LUTaddr & 0x0004) & !COMPARISON)
+					   | ((GPU0_LUTaddr & 0x0004) & !(GPU1_LUTaddr & 0x000f))
+					   | ((GPU0_LUTaddr & 0x0002) & !COMPARISON)
+					   | ((GPU0_LUTaddr & 0x0002) & !(GPU1_LUTaddr & 0x000f))
+					   | ((GPU0_LUTaddr & 0x0001) & !COMPARISON)
+					   | ((GPU0_LUTaddr & 0x0001) & !(GPU1_LUTaddr & 0x000f));
+
+				if (result) src_vdp0[x] = GPU0_LUTaddr;
+				else src_vdp0[x] = GPU1_LUTaddr;
+			}
+		}
+	}
+
+	return 0;
+}
 
 VIDEO_UPDATE( toaplan2 )
 {
@@ -384,20 +469,7 @@ VIDEO_UPDATE( dogyuun )
 #ifdef DUAL_SCREEN_VDPS
 	VIDEO_UPDATE_CALL( toaplan2 );
 #else
-	toaplan2_state *state = screen->machine->driver_data<toaplan2_state>();
-
-	bitmap_fill(bitmap,cliprect,0);
-	bitmap_fill(gp9001_custom_priority_bitmap, cliprect, 0);
-
-	state->vdp1->toaplan2_draw_custom_tilemap( screen->machine, bitmap, state->vdp1->bg_tilemap, toaplan2_primap1, batsugun_prienable0);
-	state->vdp0->toaplan2_draw_custom_tilemap( screen->machine, bitmap, state->vdp0->bg_tilemap, toaplan2_primap1, batsugun_prienable0);
-	state->vdp1->toaplan2_draw_custom_tilemap( screen->machine, bitmap, state->vdp1->fg_tilemap, toaplan2_primap1, batsugun_prienable0);
-	state->vdp0->toaplan2_draw_custom_tilemap( screen->machine, bitmap, state->vdp0->fg_tilemap, toaplan2_primap1, batsugun_prienable0);
-	state->vdp1->toaplan2_draw_custom_tilemap( screen->machine, bitmap, state->vdp1->top_tilemap, toaplan2_primap1, batsugun_prienable0);
-	state->vdp0->toaplan2_draw_custom_tilemap( screen->machine, bitmap, state->vdp0->top_tilemap, toaplan2_primap1, batsugun_prienable0);
-
-	state->vdp1->draw_sprites(screen->machine,bitmap,cliprect, toaplan2_sprprimap1);
-	state->vdp0->draw_sprites(screen->machine,bitmap,cliprect, toaplan2_sprprimap1);
+	VIDEO_UPDATE_CALL( toaplan2_mixed );
 #endif
 
 	return 0;
@@ -412,19 +484,7 @@ VIDEO_UPDATE( batsugun )
 #ifdef DUAL_SCREEN_VDPS
 	VIDEO_UPDATE_CALL( toaplan2 );
 #else
-	bitmap_fill(bitmap,cliprect,0);
-	bitmap_fill(gp9001_custom_priority_bitmap, cliprect, 0);
-
-
-	state->vdp1->toaplan2_draw_custom_tilemap( screen->machine, bitmap, state->vdp1->bg_tilemap, toaplan2_primap1, batsugun_prienable0);
-	state->vdp0->toaplan2_draw_custom_tilemap( screen->machine, bitmap, state->vdp0->bg_tilemap, toaplan2_primap1, batsugun_prienable0);
-	state->vdp1->toaplan2_draw_custom_tilemap( screen->machine, bitmap, state->vdp1->fg_tilemap, toaplan2_primap1, batsugun_prienable0);
-	state->vdp0->toaplan2_draw_custom_tilemap( screen->machine, bitmap, state->vdp0->fg_tilemap, toaplan2_primap1, batsugun_prienable0);
-	state->vdp1->toaplan2_draw_custom_tilemap( screen->machine, bitmap, state->vdp1->top_tilemap, toaplan2_primap1, batsugun_prienable0);
-	state->vdp0->toaplan2_draw_custom_tilemap( screen->machine, bitmap, state->vdp0->top_tilemap, toaplan2_primap1, batsugun_prienable0);
-
-	state->vdp1->draw_sprites(screen->machine,bitmap,cliprect, toaplan2_sprprimap1);
-	state->vdp0->draw_sprites(screen->machine,bitmap,cliprect, toaplan2_sprprimap1);
+	VIDEO_UPDATE_CALL( toaplan2_mixed );
 #endif
 
 	return 0;

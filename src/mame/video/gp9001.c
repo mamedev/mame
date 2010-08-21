@@ -129,6 +129,8 @@ Pipi & Bibis     | Fix Eight        | V-Five           | Snow Bros. 2     |
 #include "gp9001.h"
 
 bitmap_t* gp9001_custom_priority_bitmap;
+bitmap_t* gp9001_secondary_render_bitmap;
+
 int gp9001_displog = 0;
 
 static WRITE16_DEVICE_HANDLER( gp9001_bg_tilemap_w )
@@ -325,17 +327,17 @@ static TILE_GET_INFO_DEVICE( get_bg0_tile_info )
 	//tileinfo->category = (attrib & 0x0f00) >> 8;
 }
 
-static void create_tilemaps(gp9001vdp_device* vdp, int region)
+void gp9001vdp_device::create_tilemaps(int region)
 {
-	vdp->tile_region = region;
+	tile_region = region;
 
-	vdp->top_tilemap = tilemap_create_device(vdp, get_top0_tile_info,tilemap_scan_rows,16,16,32,32);
-	vdp->fg_tilemap = tilemap_create_device(vdp, get_fg0_tile_info,tilemap_scan_rows,16,16,32,32);
-	vdp->bg_tilemap = tilemap_create_device(vdp, get_bg0_tile_info,tilemap_scan_rows,16,16,32,32);
+	top_tilemap = tilemap_create_device(this, get_top0_tile_info,tilemap_scan_rows,16,16,32,32);
+	fg_tilemap = tilemap_create_device(this, get_fg0_tile_info,tilemap_scan_rows,16,16,32,32);
+	bg_tilemap = tilemap_create_device(this, get_bg0_tile_info,tilemap_scan_rows,16,16,32,32);
 
-	tilemap_set_transparent_pen(vdp->top_tilemap,0);
-	tilemap_set_transparent_pen(vdp->fg_tilemap,0);
-	tilemap_set_transparent_pen(vdp->bg_tilemap,0);
+	tilemap_set_transparent_pen(top_tilemap,0);
+	tilemap_set_transparent_pen(fg_tilemap,0);
+	tilemap_set_transparent_pen(bg_tilemap,0);
 }
 
 
@@ -350,7 +352,7 @@ void gp9001vdp_device::device_start()
 
 	spriteram16_n = spriteram16_now;
 
-	create_tilemaps(this, m_gfxregion);
+	create_tilemaps(m_gfxregion);
 
 	state_save_register_device_item_pointer(this, 0, spriteram16_new, GP9001_SPRITERAM_SIZE/2);
 	state_save_register_device_item_pointer(this, 0, spriteram16_now, GP9001_SPRITERAM_SIZE/2);
@@ -458,8 +460,10 @@ READ16_DEVICE_HANDLER( gp9001_vdpstatus_r )
 	return ((device->machine->primary_screen->vpos() + 15) % 262) >= 245;
 }
 
-static void t2_scroll_reg_select_w(gp9001vdp_device *vdp, offs_t offset, UINT16 data, UINT16 mem_mask)
+WRITE16_DEVICE_HANDLER( gp9001_scroll_reg_select_w )
 {
+	gp9001vdp_device *vdp = (gp9001vdp_device *)device;
+
 	if (ACCESSING_BITS_0_7)
 	{
 		vdp->gp9001_scroll_reg = data & 0x8f;
@@ -470,12 +474,6 @@ static void t2_scroll_reg_select_w(gp9001vdp_device *vdp, offs_t offset, UINT16 
 	{
 		logerror("Hmmm, selecting unknown MSB video control register (%04x)  Video controller %01x  \n",vdp->gp9001_scroll_reg,vdp->tile_region>>1);
 	}
-}
-
-WRITE16_DEVICE_HANDLER( gp9001_scroll_reg_select_w )
-{
-	gp9001vdp_device *vdp = (gp9001vdp_device *)device;
-	t2_scroll_reg_select_w(vdp, offset, data, mem_mask);
 }
 
 static void gp9001_scroll_reg_data_w(gp9001vdp_device *vdp, offs_t offset, UINT16 data, UINT16 mem_mask)
