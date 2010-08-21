@@ -17,6 +17,12 @@ public:
 		: atarigen_state(machine),
 		  m_maincpu(*machine.device<asap_device>("maincpu")) { }
 	
+	virtual void machine_start();
+	virtual void machine_reset();
+	
+	virtual void video_start();
+	virtual bool video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	
 	asap_device &	m_maincpu;
 
 	UINT32 *		m_videoram;
@@ -70,9 +76,3 @@ public:
 	DECLARE_READ32_MEMBER( hsync_ram_r );
 	DECLARE_WRITE32_MEMBER( hsync_ram_w );
 };
-
-
-/*----------- defined in video/beathead.c -----------*/
-
-VIDEO_START( beathead );
-VIDEO_UPDATE( beathead );

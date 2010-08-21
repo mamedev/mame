@@ -297,8 +297,7 @@ void video_init(running_machine *machine)
 		init_buffered_spriteram(machine);
 
 	/* call the PALETTE_INIT function */
-	if (machine->config->m_init_palette != NULL)
-		(*machine->config->m_init_palette)(machine, memory_region(machine, "proms"));
+	machine->driver_data<driver_data_t>()->palette_init(memory_region(machine, "proms"));
 
 	/* create a render target for snapshots */
 	viewname = options_get_string(machine->options(), OPTION_SNAPVIEW);
@@ -485,10 +484,10 @@ void video_frame_update(running_machine *machine, int debug)
 			machine->primary_screen->scanline0_callback();
 
 		/* otherwise, call the video EOF callback */
-		else if (machine->config->m_video_eof != NULL)
+		else
 		{
 			g_profiler.start(PROFILER_VIDEO);
-			(*machine->config->m_video_eof)(machine);
+			machine->driver_data<driver_data_t>()->video_eof();
 			g_profiler.stop();
 		}
 	}
@@ -2121,8 +2120,7 @@ bool screen_device::update_partial(int scanline)
 		g_profiler.start(PROFILER_VIDEO);
 		LOG_PARTIAL_UPDATES(("updating %d-%d\n", clip.min_y, clip.max_y));
 
-		if (machine->config->m_video_update != NULL)
-			flags = (*machine->config->m_video_update)(this, m_bitmap[m_curbitmap], &clip);
+		flags = machine->driver_data<driver_data_t>()->video_update(*this, *m_bitmap[m_curbitmap], clip);
 		global.partial_updates_this_frame++;
 		g_profiler.stop();
 

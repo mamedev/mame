@@ -160,9 +160,26 @@ typedef tagged_list<region_info> region_list;
 // base class for all driver data structures
 class driver_data_t : public bindable_object
 {
+	friend class running_machine;
+	
 public:
 	driver_data_t(running_machine &machine);
 	virtual ~driver_data_t();
+
+	virtual void machine_start();
+	virtual void machine_reset();
+	
+	virtual void sound_start();
+	virtual void sound_reset();
+	
+	virtual void palette_init(const UINT8 *color_prom);
+	virtual void video_start();
+	virtual void video_reset();
+	virtual bool video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	virtual void video_eof();
+
+	virtual void pre_save();
+	virtual void post_load();
 
 	running_machine &	m_machine;
 };
@@ -406,6 +423,8 @@ private:
 	void set_saveload_filename(const char *filename);
 	void fill_systime(system_time &systime, time_t t);
 	void handle_saveload();
+	static STATE_PRESAVE( pre_save_static );
+	static STATE_POSTLOAD( post_load_static );
 
 	static TIMER_CALLBACK( static_soft_reset );
 	void soft_reset();

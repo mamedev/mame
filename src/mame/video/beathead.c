@@ -15,14 +15,13 @@
  *
  *************************************/
 
-VIDEO_START( beathead )
+void beathead_state::video_start()
 {
-	beathead_state *state = machine->driver_data<beathead_state>();
-	state_save_register_global(machine, state->m_finescroll);
-	state_save_register_global(machine, state->m_vram_latch_offset);
-	state_save_register_global(machine, state->m_hsyncram_offset);
-	state_save_register_global(machine, state->m_hsyncram_start);
-	state_save_register_global_array(machine, state->m_hsyncram);
+	state_save_register_global(&m_machine, m_finescroll);
+	state_save_register_global(&m_machine, m_vram_latch_offset);
+	state_save_register_global(&m_machine, m_hsyncram_offset);
+	state_save_register_global(&m_machine, m_hsyncram_start);
+	state_save_register_global_array(&m_machine, m_hsyncram);
 }
 
 
@@ -155,36 +154,35 @@ WRITE32_MEMBER( beathead_state::hsync_ram_w )
  *
  *************************************/
 
-VIDEO_UPDATE( beathead )
+bool beathead_state::video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect)
 {
-	beathead_state *state = screen->machine->driver_data<beathead_state>();
-	UINT8 *videoram = reinterpret_cast<UINT8 *>(state->m_videoram);
+	UINT8 *videoram = reinterpret_cast<UINT8 *>(m_videoram);
 	int x, y;
 
 	/* generate the final screen */
-	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
+	for (y = cliprect.min_y; y <= cliprect.max_y; y++)
 	{
-		pen_t pen_base = (*state->m_palette_select & 0x7f) * 256;
+		pen_t pen_base = (*m_palette_select & 0x7f) * 256;
 		UINT16 scanline[336];
 
 		/* blanking */
-		if (state->m_finescroll & 8)
-			for (x = cliprect->min_x; x <= cliprect->max_x; x++)
+		if (m_finescroll & 8)
+			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 				scanline[x] = pen_base;
 
 		/* non-blanking */
 		else
 		{
-			offs_t scanline_offset = state->m_vram_latch_offset + (state->m_finescroll & 3);
-			offs_t src = scanline_offset + cliprect->min_x;
+			offs_t scanline_offset = m_vram_latch_offset + (m_finescroll & 3);
+			offs_t src = scanline_offset + cliprect.min_x;
 
 			/* unswizzle the scanline first */
-			for (x = cliprect->min_x; x <= cliprect->max_x; x++)
+			for (x = cliprect.min_x; x <= cliprect.max_x; x++)
 				scanline[x] = pen_base | videoram[BYTE4_XOR_LE(src++)];
 		}
 
 		/* then draw it */
-		draw_scanline16(bitmap, cliprect->min_x, y, cliprect->max_x - cliprect->min_x + 1, &scanline[cliprect->min_x], NULL);
+		draw_scanline16(&bitmap, cliprect.min_x, y, cliprect.max_x - cliprect.min_x + 1, &scanline[cliprect.min_x], NULL);
 	}
 	return 0;
 }

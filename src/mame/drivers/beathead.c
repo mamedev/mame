@@ -138,35 +138,33 @@ static TIMER_DEVICE_CALLBACK( scanline_callback )
 }
 
 
-static MACHINE_START( beathead )
+void beathead_state::machine_start()
 {
-	atarigen_init(machine);
+	atarigen_init(&m_machine);
 }
 
 
 static void update_interrupts(running_machine *machine) { machine->driver_data<beathead_state>()->update_interrupts(); }
-static MACHINE_RESET( beathead )
+void beathead_state::machine_reset()
 {
-	beathead_state *state = machine->driver_data<beathead_state>();
-
 	/* reset the common subsystems */
-	atarigen_eeprom_reset(state);
-	atarigen_interrupt_reset(state, update_interrupts);
+	atarigen_eeprom_reset(this);
+	atarigen_interrupt_reset(this, ::update_interrupts);
 	atarijsa_reset();
 
 	/* the code is temporarily mapped at 0 at startup */
 	/* just copying the first 0x40 bytes is sufficient */
-	memcpy(state->m_ram_base, state->m_rom_base, 0x40);
+	memcpy(m_ram_base, m_rom_base, 0x40);
 
 	/* compute the timing of the HBLANK interrupt and set the first timer */
-	state->m_hblank_offset = attotime_to_double(machine->primary_screen->scan_period()) * ((455. - 336. - 25.) / 455.);
-	timer_device *scanline_timer = machine->device<timer_device>("scan_timer");
-	scanline_timer->adjust(double_to_attotime(attotime_to_double(machine->primary_screen->time_until_pos(0)) - state->m_hblank_offset));
+	m_hblank_offset = attotime_to_double(m_machine.primary_screen->scan_period()) * ((455. - 336. - 25.) / 455.);
+	timer_device *scanline_timer = m_machine.device<timer_device>("scan_timer");
+	scanline_timer->adjust(double_to_attotime(attotime_to_double(m_machine.primary_screen->time_until_pos(0)) - m_hblank_offset));
 
 	/* reset IRQs */
-	state->m_irq_line_state = CLEAR_LINE;
-	state->m_irq_state[0] = state->m_irq_state[1] = state->m_irq_state[2] = 0;
-	state->m_irq_enable[0] = state->m_irq_enable[1] = state->m_irq_enable[2] = 0;
+	m_irq_line_state = CLEAR_LINE;
+	m_irq_state[0] = m_irq_state[1] = m_irq_state[2] = 0;
+	m_irq_enable[0] = m_irq_enable[1] = m_irq_enable[2] = 0;
 }
 
 
@@ -401,8 +399,6 @@ static MACHINE_DRIVER_START( beathead )
 	MDRV_CPU_ADD("maincpu", ASAP, ATARI_CLOCK_14MHz)
 	MDRV_CPU_PROGRAM_MAP(main_map)
 
-	MDRV_MACHINE_START(beathead)
-	MDRV_MACHINE_RESET(beathead)
 	MDRV_NVRAM_HANDLER(generic_1fill)
 
 	MDRV_TIMER_ADD("scan_timer", scanline_callback)
@@ -416,9 +412,6 @@ static MACHINE_DRIVER_START( beathead )
 	MDRV_SCREEN_SIZE(42*8, 262)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 42*8-1, 0*8, 30*8-1)
 	MDRV_PALETTE_LENGTH(32768)
-
-	MDRV_VIDEO_START(beathead)
-	MDRV_VIDEO_UPDATE(beathead)
 
 	/* sound hardware */
 	MDRV_IMPORT_FROM(jsa_iii_mono)
