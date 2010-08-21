@@ -510,9 +510,6 @@ VIDEO_UPDATE( batrider )
 
 
 
-/* How do the dual VDP games mix? The internal mixing of each VDP chip is independent, if you view only a single
-   VDP then the priorities for that VDP are correct, however, it is completely unclear how the priorities of the
-   two VDPs should actually mix together, as a result these games are broken for now. */
 VIDEO_UPDATE( dogyuun )
 {
 #ifdef DUAL_SCREEN_VDPS
@@ -526,10 +523,6 @@ VIDEO_UPDATE( dogyuun )
 
 VIDEO_UPDATE( batsugun )
 {
-	toaplan2_state *state = screen->machine->driver_data<toaplan2_state>();
-	state->vdp1->tile_limit = 0x1fff; // 0x2000-0x3fff seem to be for sprites only? (corruption on level 1 otherwise)
-
-
 #ifdef DUAL_SCREEN_VDPS
 	VIDEO_UPDATE_CALL( toaplan2 );
 #else

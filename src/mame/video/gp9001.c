@@ -251,13 +251,6 @@ static TILE_GET_INFO_DEVICE( get_top0_tile_info )
 	{
 		tile_number = ( vdp->gp9001_gfxrom_bank[(tile_number >> 13) & 7] << 13 ) | ( tile_number & 0x1fff );
 	}
-	else
-	{
-		if (tile_number>vdp->tile_limit)
-		{
-			tile_number = 0;
-		}
-	}
 
 	color = attrib & 0x0fff; // 0x0f00 priority, 0x007f colour
 	SET_TILE_INFO_DEVICE(
@@ -285,11 +278,6 @@ static TILE_GET_INFO_DEVICE( get_fg0_tile_info )
 	{
 		tile_number = ( vdp->gp9001_gfxrom_bank[(tile_number >> 13) & 7] << 13 ) | ( tile_number & 0x1fff );
 	}
-	else
-	{
-		if (tile_number>vdp->tile_limit) tile_number = 0;
-	}
-
 
 	color = attrib & 0x0fff; // 0x0f00 priority, 0x007f colour
 	SET_TILE_INFO_DEVICE(
@@ -312,10 +300,6 @@ static TILE_GET_INFO_DEVICE( get_bg0_tile_info )
 	if (vdp->gp9001_gfxrom_is_banked)
 	{
 		tile_number = ( vdp->gp9001_gfxrom_bank[(tile_number >> 13) & 7] << 13 ) | ( tile_number & 0x1fff );
-	}
-	else
-	{
-		if (tile_number>vdp->tile_limit) tile_number = 0;
 	}
 
 	color = attrib & 0x0fff; // 0x0f00 priority, 0x007f colour
@@ -403,8 +387,6 @@ void gp9001vdp_device::device_reset()
 	fg_flip = 0;
 	top_flip = 0;
 	sprite_flip = 0;
-
-	tile_limit = 0xffff;
 
 	/* debug */
 	display_bg = 1;
