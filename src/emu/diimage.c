@@ -271,7 +271,7 @@ const image_device_format *device_image_interface::device_get_named_creatable_fo
 void device_image_interface::clear_error()
 {
     m_err = IMAGE_ERROR_SUCCESS;
-    if (m_err_message.len()!=0)
+    if (m_err_message)
     {
         m_err_message.reset();
     }
@@ -297,7 +297,7 @@ static const char *const messages[] =
 
 const char *device_image_interface::error()
 {
-    return (m_err_message.len()!=0) ? m_err_message.cstr() : messages[m_err];
+    return (m_err_message) ? m_err_message.cstr() : messages[m_err];
 }
 
 
@@ -413,7 +413,7 @@ void device_image_interface::setup_working_directory()
 const char * device_image_interface::working_directory()
 {
    /* check to see if we've never initialized the working directory */
-    if (m_working_directory.len() == 0)
+    if (!m_working_directory)
         setup_working_directory();
 
     return m_working_directory;
@@ -593,7 +593,7 @@ void device_image_interface::image_checkhash()
     int rc;
 
     /* only calculate CRC if it hasn't been calculated, and the open_mode is read only */
-    if (m_hash.len()==0 && !m_writeable && !m_created)
+    if (!m_hash && !m_writeable && !m_created)
     {
         /* do not cause a linear read of 600 megs please */
         /* TODO: use SHA/MD5 in the CHD header as the hash */
@@ -628,7 +628,7 @@ UINT32 device_image_interface::crc()
     UINT32 crc = 0;
 
 	image_checkhash();
-    if (m_hash.len()!= 0)
+    if (m_hash)
         crc = hash_data_extract_crc32(m_hash.cstr());
 
     return crc;

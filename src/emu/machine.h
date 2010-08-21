@@ -298,7 +298,7 @@ public:
 	machine_phase phase() const { return m_current_phase; }
 	bool paused() const { return m_paused || (m_current_phase != MACHINE_PHASE_RUNNING); }
 	bool scheduled_event_pending() const { return m_exit_pending || m_hard_reset_pending; }
-	bool save_or_load_pending() const { return (m_saveload_pending_file.len() != 0); }
+	bool save_or_load_pending() const { return (m_saveload_pending_file); }
 	bool exit_pending() const { return m_exit_pending; }
 	bool new_driver_pending() const { return (m_new_driver_pending != NULL); }
 	const char *new_driver_name() const { return m_new_driver_pending->name; }

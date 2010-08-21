@@ -998,14 +998,14 @@ static void execute_ignore(running_machine *machine, int ref, int params, const 
 			/* build up a comma-separated list */
 			if (!exec->device().debug()->observing())
 			{
-				if (buffer.len() == 0)
+				if (!buffer)
 					buffer.printf("Currently ignoring device '%s'", exec->device().tag());
 				else
 					buffer.catprintf(", '%s'", exec->device().tag());
 			}
 
 		/* special message for none */
-		if (buffer.len() == 0)
+		if (!buffer)
 			buffer.printf("Not currently ignoring any devices");
 		debug_console_printf(machine, "%s\n", buffer.cstr());
 	}
@@ -1060,14 +1060,14 @@ static void execute_observe(running_machine *machine, int ref, int params, const
 			/* build up a comma-separated list */
 			if (exec->device().debug()->observing())
 			{
-				if (buffer.len() == 0)
+				if (!buffer)
 					buffer.printf("Currently observing CPU '%s'", exec->device().tag());
 				else
 					buffer.catprintf(", '%s'", exec->device().tag());
 			}
 
 		/* special message for none */
-		if (buffer.len() == 0)
+		if (!buffer)
 			buffer.printf("Not currently observing any devices");
 		debug_console_printf(machine, "%s\n", buffer.cstr());
 	}

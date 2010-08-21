@@ -499,7 +499,7 @@ static bool validate_roms(int drivnum, const machine_config *config, region_arra
 					for (rgnnum = 0; rgnnum < ARRAY_LENGTH(rgninfo->entries); rgnnum++)
 					{
 						/* stop when we hit an empty */
-						if (rgninfo->entries[rgnnum].tag.len() == 0)
+						if (!rgninfo->entries[rgnnum].tag)
 						{
 							currgn = &rgninfo->entries[rgnnum];
 							currgn->tag.cpy(fulltag);
@@ -650,7 +650,7 @@ static bool validate_gfx(int drivnum, const machine_config *config, region_array
 			for (rgnnum = 0; rgnnum < ARRAY_LENGTH(rgninfo->entries); rgnnum++)
 			{
 				/* stop if we hit an empty */
-				if (rgninfo->entries[rgnnum].tag.len() == 0)
+				if (!rgninfo->entries[rgnnum].tag)
 				{
 					mame_printf_error("%s: %s has gfx[%d] referencing non-existent region '%s'\n", driver->source_file, driver->name, gfxnum, region);
 					error = true;

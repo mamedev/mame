@@ -789,7 +789,7 @@ void running_machine::handle_saveload()
 	file_error filerr = FILERR_NONE;
 
 	// if no name, bail
-	if (m_saveload_pending_file.len() == 0)
+	if (!m_saveload_pending_file)
 		goto cancel;
 
 	// if there are anonymous timers, we can't save just yet, and we can't load yet either

@@ -222,11 +222,11 @@ public:
 	void seterror(image_error_t err, const char *message);
 	void message(const char *format, ...);
 
-	bool exists() { return m_name.len() != 0; }
-	const char *filename() { if (m_name.len()==0) return NULL; else return m_name; }
-	const char *basename() { if (m_basename.len()==0) return NULL; else return m_basename; }
-	const char *basename_noext()  { if (m_basename_noext.len()==0) return NULL; else return m_basename_noext; }
-	const char *filetype()  { if (m_filetype.len()==0) return NULL; else return m_filetype; }
+	bool exists() { return m_name; }
+	const char *filename() { if (!m_name) return NULL; else return m_name; }
+	const char *basename() { if (!m_basename) return NULL; else return m_basename; }
+	const char *basename_noext()  { if (!m_basename_noext) return NULL; else return m_basename_noext; }
+	const char *filetype()  { if (!m_filetype) return NULL; else return m_filetype; }
 	core_file *image_core_file() { return m_file; }
 	UINT64 length() { check_for_file(); return core_fsize(m_file); }
 	bool is_writable() { return m_writeable; }

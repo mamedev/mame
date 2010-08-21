@@ -1353,7 +1353,7 @@ astring &input_code_to_token(running_machine *machine, astring &string, input_co
 		devindex[0] = 0;
 
 	/* determine the itemid part; look up in the table if we don't have a token */
-	if (item != NULL && item->token.len() != 0)
+	if (item != NULL && item->token)
 		devcode = item->token;
 	else
 	{

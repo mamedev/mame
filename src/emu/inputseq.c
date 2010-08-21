@@ -418,7 +418,7 @@ astring &input_seq_name(running_machine *machine, astring &string, const input_s
 		input_code code = seq->code[codenum];
 
 		/* if this is a code item which is not valid, don't copy it and remove any preceding ORs/NOTs */
-		if (!INPUT_CODE_IS_INTERNAL(code) && input_code_name(machine, codestr, code).len() == 0)
+		if (!INPUT_CODE_IS_INTERNAL(code) && !input_code_name(machine, codestr, code))
 		{
 			while (copycodenum > 0 && INPUT_CODE_IS_INTERNAL(seqcopy.code[copycodenum - 1]))
 				copycodenum--;
