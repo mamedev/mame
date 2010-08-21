@@ -1286,6 +1286,51 @@ ROM_START( legend )
 	ROM_LOAD( "epl12p6.9j", 0x0200, 0x0034, CRC(dcae870d) SHA1(2224724a3faf0608083f5d6ff76712adc7616a54) )
 ROM_END
 
+ROM_START( legendb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "06.s02",    0x0000, 0x2000, CRC(227f3e88) SHA1(d31da7fe685f3249af6f42940d22d17399b9582c) )
+	ROM_LOAD( "07.s03",    0x2000, 0x2000, CRC(9352e9dc) SHA1(ad7e0edce658bc6c0069025512ea4a2050a61533) )
+	ROM_LOAD( "08.s04",    0x4000, 0x2000, CRC(41cee2b2) SHA1(166c0581aa83ba67f1912ebed80c1f02bd843ab6) )
+	ROM_LOAD( "05.n03",    0x6000, 0x2000, CRC(d8fd4e37) SHA1(7c9d2d48a57a4d75682e0f910151a5c0e3229413) )
+
+	ROM_REGION( 0x10000, "sub", 0 )
+	ROM_LOAD( "02.s07",    0x0000, 0x2000, CRC(abfe5eb4) SHA1(fbeb5ee14aaebb6321fe97fe523f08833fad9c7c) )
+	ROM_LOAD( "03.s08",    0x2000, 0x2000, CRC(7e7b9ba9) SHA1(897779129108b0f3936234ea797d47cf46cb7a16) )
+	ROM_LOAD( "04.s09",    0x4000, 0x2000, CRC(0dd50aa7) SHA1(001ba0d5e0b50fb030a95fdbeba40005ffc5c182) )
+	ROM_LOAD( "01.n07",    0x6000, 0x2000, CRC(13915a53) SHA1(25ba3babc8eb0df413bdfe7dbcd8642e4c658120) )
+	
+	ROM_REGION(  0x1000, "gfx1", 0 )	/* fg tiles */
+	ROM_LOAD( "15.b05",    0x0000, 0x1000, CRC(6c879f76) SHA1(9da84446e463264ed86e912589d826d86c27bf59) )
+
+	ROM_REGION(  0x6000, "gfx2", 0 )	/* bg tiles */
+	ROM_LOAD( "18.j09",   0x0000, 0x2000, CRC(3bdcd028) SHA1(2fb2ecc5333e50834badb4b00093ca8e9a64bce4) )
+	ROM_LOAD( "17.j10",   0x2000, 0x2000, CRC(105c5b53) SHA1(269da6bdef55024e593ea0178597e37ff2fefc10) )
+	ROM_LOAD( "16.j11",   0x4000, 0x2000, CRC(b9ca4efd) SHA1(680c3ca88c65c1643ae82945b937d34579c0efeb) )
+
+	ROM_REGION( 0x18000, "gfx3", 0 )	/* sprites */
+	ROM_LOAD( "14.b06",   0x00000, 0x4000, CRC(1689f21c) SHA1(fafb13dc8ca27a7506065bbf08102afc6d722843) )
+	ROM_LOAD( "13.b07",   0x04000, 0x4000, CRC(f527c909) SHA1(40f44828502018c73283965eb7a2a68ed25ebfe5) )
+	ROM_LOAD( "12.b08",   0x08000, 0x4000, CRC(8d618629) SHA1(3cc49fd8066464ee940de010da3f33ed8573df3d) )
+	ROM_LOAD( "11.b09",   0x0c000, 0x4000, CRC(7d7e2d55) SHA1(efd4817a0f5e14cb5a3d0c1f69e6ad408a813202) )
+	ROM_LOAD( "10.b10",   0x10000, 0x4000, CRC(f12232fe) SHA1(2d8accc10f0703eeb075c4053d4165b90552e6a7) )
+	ROM_LOAD( "09.b11",   0x14000, 0x4000, CRC(8c09243d) SHA1(8f0f68921f8ab6c016b7481714febb68abb7ce79) )
+
+	ROM_REGION( 0x0340, "proms", 0 )
+	ROM_LOAD( "82s129.1j",   0x0000, 0x0100, CRC(40590ac0) SHA1(30a8e24e34c4ee0a7df91c0633becfce1c8d856c) ) /* red */
+	ROM_LOAD( "82s129.1h",   0x0100, 0x0100, CRC(e542b363) SHA1(6775209b9a4aaf374878c06cf4dc693b921abd87) ) /* green */
+	ROM_LOAD( "82s129.1f",   0x0200, 0x0100, CRC(75536fc8) SHA1(e713efafcdc7f2a595444af75d2083eb3e38a480) ) /* blue */
+	ROM_LOAD( "82s123.5j",   0x0300, 0x0020, CRC(c98f0651) SHA1(4f1b95213c28ad017c8d6542e8d522e4d69f91e3) ) /* char lookup table */
+	ROM_LOAD( "m1.2c",       0x0320, 0x0020, CRC(83a39201) SHA1(4fdc722c9e20ee152c890342ef0dce18e35e2ef8) ) /* timing? not used */
+
+	ROM_REGION( 0x0300, "plds", 0 )
+	ROM_LOAD( "epl10p8.2j", 0x0000, 0x002c, CRC(8abc03bf) SHA1(05a7085583f76cb46ec623adfc1e0dd35c6a36e6) )
+	ROM_LOAD( "epl12p6.9k", 0x0100, 0x0034, CRC(9b0bd6f8) SHA1(9dceb37245969537301b1f3c74f2c4ee088faa93) )
+	ROM_LOAD( "epl12p6.9j", 0x0200, 0x0034, CRC(dcae870d) SHA1(2224724a3faf0608083f5d6ff76712adc7616a54) )
+ROM_END
+
+   
+
+
 
 /*************************************
  *
@@ -1331,7 +1376,8 @@ GAME( 1985, flashgal,  0,        flashgal, flashgal, 0,        ROT0,  "Sega", "F
 GAME( 1985, flashgala, flashgal, flashgala,flashgal, 0,        ROT0,  "Sega", "Flashgal (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1986, srdmissn,  0,        srdmissn, srdmissn, srdmissn, ROT90, "Taito Corporation", "S.R.D. Mission", GAME_SUPPORTS_SAVE )
 GAME( 1986, fx,        srdmissn, srdmissn, srdmissn, srdmissn, ROT90, "bootleg", "F-X", GAME_SUPPORTS_SAVE )
-GAME( 1986, legend,    0,        legend,   legend,   srdmissn, ROT0,  "Sega / Coreland", "Legend", GAME_SUPPORTS_SAVE )
+GAME( 1986, legend,    0,        legend,   legend,   srdmissn, ROT0,  "Sega / Coreland", "Legend", GAME_SUPPORTS_SAVE ) // no copyright (maybe also a bootleg?)
+GAME( 1986, legendb,   legend,   legend,   legend,   srdmissn, ROT0,  "bootleg", "Legion (bootleg of Legend)", GAME_SUPPORTS_SAVE ) // no copyright
 GAME( 1987, airwolf,   0,        srdmissn, airwolf,  srdmissn, ROT0,  "Kyugo", "Airwolf", GAME_SUPPORTS_SAVE )
 GAME( 1987, airwolfa,  airwolf,  srdmissn, airwolf,  srdmissn, ROT0,  "Kyugo (UA Theatre license)", "Airwolf (US)", GAME_SUPPORTS_SAVE )
 GAME( 1987, skywolf,   airwolf,  srdmissn, skywolf,  srdmissn, ROT0,  "bootleg", "Sky Wolf (set 1)", GAME_SUPPORTS_SAVE )
