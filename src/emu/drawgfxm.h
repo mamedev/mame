@@ -370,7 +370,7 @@ while (0)																			\
 
 #define DRAWGFX_CORE(PIXEL_TYPE, PIXEL_OP, PRIORITY_TYPE)								\
 do {																					\
-	profiler_mark_start(PROFILER_DRAWGFX);												\
+	g_profiler.start(PROFILER_DRAWGFX);												\
 	do {																				\
 		const UINT8 *srcdata;															\
 		INT32 destendx, destendy;														\
@@ -613,7 +613,7 @@ do {																					\
 			}																			\
 		}																				\
 	} while (0);																		\
-	profiler_mark_end();														\
+	g_profiler.stop();														\
 } while (0)
 
 
@@ -642,7 +642,7 @@ do {																					\
 
 #define DRAWGFXZOOM_CORE(PIXEL_TYPE, PIXEL_OP, PRIORITY_TYPE)							\
 do {																					\
-	profiler_mark_start(PROFILER_DRAWGFX);													\
+	g_profiler.start(PROFILER_DRAWGFX);													\
 	do {																				\
 		const UINT8 *srcdata;															\
 		UINT32 dstwidth, dstheight;														\
@@ -698,7 +698,7 @@ do {																					\
 		destendy = desty + dstheight - 1;												\
 		if (desty > cliprect->max_y || destendy < cliprect->min_y)						\
 		{																				\
-			profiler_mark_end();													\
+			g_profiler.stop();													\
 			return;																		\
 		}																				\
 																						\
@@ -797,7 +797,7 @@ do {																					\
 			}																			\
 		}																				\
 	} while (0);																		\
-	profiler_mark_end();														\
+	g_profiler.stop();														\
 } while (0)
 
 
@@ -821,7 +821,7 @@ do {																					\
 
 #define COPYBITMAP_CORE(PIXEL_TYPE, PIXEL_OP, PRIORITY_TYPE)							\
 do {																					\
-	profiler_mark_start(PROFILER_COPYBITMAP);													\
+	g_profiler.start(PROFILER_COPYBITMAP);													\
 	do {																				\
 		const PIXEL_TYPE *srcdata;														\
 		UINT32 numblocks, leftovers;													\
@@ -975,7 +975,7 @@ do {																					\
 			}																			\
 		}																				\
 	} while (0);																		\
-	profiler_mark_end();														\
+	g_profiler.stop();														\
 } while (0)
 
 
@@ -1006,7 +1006,7 @@ do {																				\
 	UINT32 numblocks, leftovers;													\
 	INT32 curx, cury;																\
 																					\
-	profiler_mark_start(PROFILER_COPYBITMAP);										\
+	g_profiler.start(PROFILER_COPYBITMAP);										\
 																					\
 	assert(dest != NULL);															\
 	assert(src != NULL);															\
@@ -1280,7 +1280,7 @@ do {																				\
 			}																		\
 		}																			\
 	}																				\
-	profiler_mark_end();															\
+	g_profiler.stop();															\
 } while (0)
 
 

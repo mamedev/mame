@@ -822,16 +822,8 @@ int ui_get_show_fps(void)
 
 void ui_set_show_profiler(int show)
 {
-	if (show)
-	{
-		show_profiler = TRUE;
-		profiler_start();
-	}
-	else
-	{
-		show_profiler = FALSE;
-		profiler_stop();
-	}
+	show_profiler = show;
+	g_profiler.enable(show);
 }
 
 
@@ -1302,7 +1294,7 @@ static UINT32 handler_ingame(running_machine *machine, render_container *contain
 	if (show_profiler)
 	{
 		astring profilertext;
-		profiler_get_text(machine, profilertext);
+		g_profiler.text(*machine, profilertext);
 		ui_draw_text_full(container, profilertext, 0.0f, 0.0f, 1.0f, JUSTIFY_LEFT, WRAP_WORD, DRAW_OPAQUE, ARGB_WHITE, ARGB_BLACK, NULL, NULL);
 	}
 

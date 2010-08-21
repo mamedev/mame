@@ -1004,7 +1004,7 @@ static void hng64_tilemap_draw_roz_primask(running_machine* machine, bitmap_t *d
 	//if (!tmap->enable)
 	//  return;
 
-profiler_mark_start(PROFILER_TILEMAP_DRAW_ROZ);
+g_profiler.start(PROFILER_TILEMAP_DRAW_ROZ);
 	/* configure the blit parameters */
 	hng64_configure_blit_parameters(&blit, tmap, dest, cliprect, flags, priority, priority_mask, drawformat);
 
@@ -1013,7 +1013,7 @@ profiler_mark_start(PROFILER_TILEMAP_DRAW_ROZ);
 
 	/* then do the roz copy */
 	hng64_tilemap_draw_roz_core(machine, tmap, &blit, startx, starty, incxx, incxy, incyx, incyy, wraparound);
-profiler_mark_end();
+g_profiler.stop();
 }
 
 

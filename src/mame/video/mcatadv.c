@@ -241,12 +241,12 @@ VIDEO_UPDATE( mcatadv )
 				mcatadv_draw_tilemap_part(state->scroll2, state->videoram2, i, state->tilemap2, bitmap, cliprect);
 	}
 
-	profiler_mark_start(PROFILER_USER1);
+	g_profiler.start(PROFILER_USER1);
 #ifdef MAME_DEBUG
 	if (!input_code_pressed(screen->machine, KEYCODE_E))
 #endif
 		draw_sprites (screen->machine, bitmap, cliprect);
-	profiler_mark_end();
+	g_profiler.stop();
 	return 0;
 }
 

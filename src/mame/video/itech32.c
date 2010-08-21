@@ -1202,7 +1202,7 @@ static void handle_video_command(running_machine *machine)
 	{
 		/* command 1: blit raw data */
 		case 1:
-			profiler_mark_start(PROFILER_USER1);
+			g_profiler.start(PROFILER_USER1);
 			if (BLIT_LOGGING) logblit(machine, "Blit Raw");
 
 			if (is_drivedge)
@@ -1215,18 +1215,18 @@ static void handle_video_command(running_machine *machine)
 				if (enable_latch[1]) draw_raw(videoplane[1], color_latch[1]);
 			}
 
-			profiler_mark_end();
+			g_profiler.stop();
 			break;
 
 		/* command 2: blit RLE-compressed data */
 		case 2:
-			profiler_mark_start(PROFILER_USER2);
+			g_profiler.start(PROFILER_USER2);
 			if (BLIT_LOGGING) logblit(machine, "Blit RLE");
 
 			if (enable_latch[0]) draw_rle(videoplane[0], color_latch[0]);
 			if (enable_latch[1]) draw_rle(videoplane[1], color_latch[1]);
 
-			profiler_mark_end();
+			g_profiler.stop();
 			break;
 
 		/* command 3: set up raw data transfer */
@@ -1248,7 +1248,7 @@ static void handle_video_command(running_machine *machine)
 
 		/* command 6: perform shift register copy */
 		case 6:
-			profiler_mark_start(PROFILER_USER3);
+			g_profiler.start(PROFILER_USER3);
 			if (BLIT_LOGGING) logblit(machine, "ShiftReg");
 
 			if (is_drivedge)
@@ -1261,7 +1261,7 @@ static void handle_video_command(running_machine *machine)
 				if (enable_latch[1]) shiftreg_clear(videoplane[1], NULL);
 			}
 
-			profiler_mark_end();
+			g_profiler.stop();
 			break;
 
 		default:

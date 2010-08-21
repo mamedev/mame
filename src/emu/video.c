@@ -461,9 +461,9 @@ void video_frame_update(running_machine *machine, int debug)
 		update_throttle(machine, current_time);
 
 	/* ask the OSD to update */
-	profiler_mark_start(PROFILER_BLIT);
+	g_profiler.start(PROFILER_BLIT);
 	osd_update(machine, !debug && skipped_it);
-	profiler_mark_end();
+	g_profiler.stop();
 
 	/* perform tasks for this frame */
 	if (!debug)
@@ -487,9 +487,9 @@ void video_frame_update(running_machine *machine, int debug)
 		/* otherwise, call the video EOF callback */
 		else if (machine->config->m_video_eof != NULL)
 		{
-			profiler_mark_start(PROFILER_VIDEO);
+			g_profiler.start(PROFILER_VIDEO);
 			(*machine->config->m_video_eof)(machine);
-			profiler_mark_end();
+			g_profiler.stop();
 		}
 	}
 }
@@ -882,7 +882,7 @@ static osd_ticks_t throttle_until_ticks(running_machine *machine, osd_ticks_t ta
     	allowed_to_sleep = TRUE;
 
 	/* loop until we reach our target */
-	profiler_mark_start(PROFILER_IDLE);
+	g_profiler.start(PROFILER_IDLE);
 	while (current_ticks < target_ticks)
 	{
 		osd_ticks_t delta;
@@ -920,7 +920,7 @@ static osd_ticks_t throttle_until_ticks(running_machine *machine, osd_ticks_t ta
 		}
 		current_ticks = new_ticks;
 	}
-	profiler_mark_end();
+	g_profiler.stop();
 
 	return current_ticks;
 }
@@ -1370,7 +1370,7 @@ static void video_mng_record_frame(running_machine *machine)
 		png_info pnginfo = { 0 };
 		png_error error;
 
-		profiler_mark_start(PROFILER_MOVIE_REC);
+		g_profiler.start(PROFILER_MOVIE_REC);
 
 		/* create the bitmap */
 		create_snapshot_bitmap(NULL);
@@ -1406,7 +1406,7 @@ static void video_mng_record_frame(running_machine *machine)
 			global.movie_frame++;
 		}
 
-		profiler_mark_end();
+		g_profiler.stop();
 	}
 }
 
@@ -1505,7 +1505,7 @@ static void video_avi_record_frame(running_machine *machine)
 		attotime curtime = timer_get_time(machine);
 		avi_error avierr;
 
-		profiler_mark_start(PROFILER_MOVIE_REC);
+		g_profiler.start(PROFILER_MOVIE_REC);
 
 		/* create the bitmap */
 		create_snapshot_bitmap(NULL);
@@ -1526,7 +1526,7 @@ static void video_avi_record_frame(running_machine *machine)
 			global.movie_frame++;
 		}
 
-		profiler_mark_end();
+		g_profiler.stop();
 	}
 }
 
@@ -1543,7 +1543,7 @@ void video_avi_add_sound(running_machine *machine, const INT16 *sound, int numsa
 	{
 		avi_error avierr;
 
-		profiler_mark_start(PROFILER_MOVIE_REC);
+		g_profiler.start(PROFILER_MOVIE_REC);
 
 		/* write the next frame */
 		avierr = avi_append_sound_samples(global.avifile, 0, sound + 0, numsamples, 1);
@@ -1552,7 +1552,7 @@ void video_avi_add_sound(running_machine *machine, const INT16 *sound, int numsa
 		if (avierr != AVIERR_NONE)
 			video_avi_end_recording(machine);
 
-		profiler_mark_end();
+		g_profiler.stop();
 	}
 }
 
@@ -2118,13 +2118,13 @@ bool screen_device::update_partial(int scanline)
 	{
 		UINT32 flags = UPDATE_HAS_NOT_CHANGED;
 
-		profiler_mark_start(PROFILER_VIDEO);
+		g_profiler.start(PROFILER_VIDEO);
 		LOG_PARTIAL_UPDATES(("updating %d-%d\n", clip.min_y, clip.max_y));
 
 		if (machine->config->m_video_update != NULL)
 			flags = (*machine->config->m_video_update)(this, m_bitmap[m_curbitmap], &clip);
 		global.partial_updates_this_frame++;
-		profiler_mark_end();
+		g_profiler.stop();
 
 		// if we modified the bitmap, we have to commit
 		m_changed |= ~flags & UPDATE_HAS_NOT_CHANGED;

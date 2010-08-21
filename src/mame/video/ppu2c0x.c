@@ -717,7 +717,7 @@ static void render_scanline( running_device *device )
 	int *ppu_regs = &ppu2c0x->regs[0];
 
 	/* lets see how long it takes */
-	profiler_mark_start(PROFILER_USER1);
+	g_profiler.start(PROFILER_USER1);
 
 	/* clear the line priority for this scanline */
 	memset(line_priority, 0, VISIBLE_SCREEN_WIDTH);
@@ -751,7 +751,7 @@ static void render_scanline( running_device *device )
 	draw_sprites(device, line_priority);
 
 	/* done updating, whew */
-	profiler_mark_end();
+	g_profiler.stop();
 }
 
 static void update_scanline( running_device *device )

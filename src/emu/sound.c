@@ -404,7 +404,7 @@ static TIMER_CALLBACK( sound_update )
 
 	VPRINTF(("sound_update\n"));
 
-	profiler_mark_start(PROFILER_SOUND);
+	g_profiler.start(PROFILER_SOUND);
 
 	leftmix = global->leftmix;
 	rightmix = global->rightmix;
@@ -452,7 +452,7 @@ static TIMER_CALLBACK( sound_update )
 	/* update the streamer */
 	streams_update(machine);
 
-	profiler_mark_end();
+	g_profiler.stop();
 }
 
 

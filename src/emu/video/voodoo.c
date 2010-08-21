@@ -3417,7 +3417,7 @@ WRITE32_DEVICE_HANDLER( voodoo_w )
 	voodoo_state *v = get_safe_token(device);
 	int stall = FALSE;
 
-	profiler_mark_start(PROFILER_USER1);
+	g_profiler.start(PROFILER_USER1);
 
 	/* should not be getting accesses while stalled */
 	if (v->pci.stall_state != NOT_STALLED)
@@ -3445,7 +3445,7 @@ WRITE32_DEVICE_HANDLER( voodoo_w )
 					if (offset & 0x40000/4)
 						data = FLIPENDIAN_INT32(data);
 					cmdfifo_w(v, &v->fbi.cmdfifo[0], offset & 0xffff, data);
-					profiler_mark_end();
+					g_profiler.stop();
 					return;
 				}
 
@@ -3458,7 +3458,7 @@ WRITE32_DEVICE_HANDLER( voodoo_w )
 						v->fbi.swaps_pending++;
 
 					logerror("Ignoring write to %s in CMDFIFO mode\n", v->regnames[offset & 0xff]);
-					profiler_mark_end();
+					g_profiler.stop();
 					return;
 				}
 			}
@@ -3475,7 +3475,7 @@ WRITE32_DEVICE_HANDLER( voodoo_w )
 		/* ignore if writes aren't allowed */
 		if (!(access & REGISTER_WRITE))
 		{
-			profiler_mark_end();
+			g_profiler.stop();
 			return;
 		}
 
@@ -3511,7 +3511,7 @@ WRITE32_DEVICE_HANDLER( voodoo_w )
 				timer_get_time(device->machine).seconds, (UINT32)(timer_get_time(device->machine).attoseconds >> 32), (UINT32)timer_get_time(device->machine).attoseconds,
 				v->pci.op_end_time.seconds, (UINT32)(v->pci.op_end_time.attoseconds >> 32), (UINT32)v->pci.op_end_time.attoseconds);
 		}
-		profiler_mark_end();
+		g_profiler.stop();
 		return;
 	}
 
@@ -3577,7 +3577,7 @@ WRITE32_DEVICE_HANDLER( voodoo_w )
 		stall_cpu(v, STALLED_UNTIL_FIFO_EMPTY, timer_get_time(device->machine));
 	}
 
-	profiler_mark_end();
+	g_profiler.stop();
 }
 
 
@@ -4788,7 +4788,7 @@ static INT32 triangle(voodoo_state *v)
 	int destbuf;
 	int pixels;
 
-	profiler_mark_start(PROFILER_USER2);
+	g_profiler.start(PROFILER_USER2);
 
 	/* determine the number of TMUs involved */
 	texcount = 0;
@@ -4859,7 +4859,7 @@ static INT32 triangle(voodoo_state *v)
 	/* update stats */
 	v->stats.total_triangles++;
 
-	profiler_mark_end();
+	g_profiler.stop();
 
 	/* 1 pixel per clock, plus some setup time */
 	if (LOG_REGISTERS) logerror("cycles = %d\n", TRIANGLE_SETUP_CLOCKS + pixels);

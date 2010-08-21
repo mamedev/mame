@@ -1508,7 +1508,7 @@ static void snes_refresh_scanline( running_machine *machine, bitmap_t *bitmap, U
 	UINT16 prev_colour = 0;
 	int blurring = input_port_read_safe(machine, "OPTIONS", 0) & 0x01;
 
-	profiler_mark_start(PROFILER_VIDEO);
+	g_profiler.start(PROFILER_VIDEO);
 
 	if (snes_ppu.screen_disabled) /* screen is forced blank */
 		for (x = 0; x < SNES_SCR_WIDTH * 2; x++)
@@ -1556,7 +1556,7 @@ static void snes_refresh_scanline( running_machine *machine, bitmap_t *bitmap, U
 #ifdef SNES_LAYER_DEBUG
 		if (snes_dbg_video(machine, curline))
 		{
-			profiler_mark_end();
+			g_profiler.stop();
 			return;
 		}
 
@@ -1654,7 +1654,7 @@ static void snes_refresh_scanline( running_machine *machine, bitmap_t *bitmap, U
 		}
 	}
 
-	profiler_mark_end();
+	g_profiler.stop();
 }
 
 VIDEO_START( snes )

@@ -371,9 +371,9 @@ void timer_execute_timers(running_machine *machine)
 		if (was_enabled && timer->callback != NULL)
 		{
 			LOG(("Timer %s:%d[%s] fired (expire=%s)\n", timer->file, timer->line, timer->func, attotime_string(timer->expire, 9)));
-			profiler_mark_start(PROFILER_TIMER_CALLBACK);
+			g_profiler.start(PROFILER_TIMER_CALLBACK);
 			(*timer->callback)(machine, timer->ptr, timer->param);
-			profiler_mark_end();
+			g_profiler.stop();
 		}
 
 		/* clear the callback timer global */

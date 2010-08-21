@@ -170,7 +170,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	int offs;
 	const UINT8 *gfx;
 
-	profiler_mark_start(PROFILER_USER1);
+	g_profiler.start(PROFILER_USER1);
 
 	gfx = memory_region(machine, "gfx2");
 	for (offs = 0; offs < state->spriteram_size; offs += 4)
@@ -232,7 +232,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 		}
 	}
 
-	profiler_mark_end();
+	g_profiler.stop();
 }
 
 

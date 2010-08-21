@@ -511,7 +511,7 @@ static void blitter_run(running_machine *machine)
 	UINT32 a1flags = blitter_regs[A1_FLAGS] & STATIC_FLAGS_MASK;
 	UINT32 a2flags = blitter_regs[A2_FLAGS] & STATIC_FLAGS_MASK;
 
-	profiler_mark_start(PROFILER_USER1);
+	g_profiler.start(PROFILER_USER1);
 
 	if (a1flags == a2flags)
 	{
@@ -600,7 +600,7 @@ if (++reps % 100 == 99)
 }
 
 	generic_blitter(machine, blitter_regs[B_CMD], blitter_regs[A1_FLAGS], blitter_regs[A2_FLAGS]);
-	profiler_mark_end();
+	g_profiler.stop();
 }
 
 static TIMER_CALLBACK( blitter_done )

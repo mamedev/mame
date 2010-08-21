@@ -322,7 +322,7 @@ protected:
 	attotime				m_partial_frame_period;		// the length of one partial frame for interrupt purposes
 
 	// cycle counting and executing
-	int						m_profiler;					// profiler tag
+	profile_type			m_profiler;					// profiler tag
 	int *					m_icount;					// pointer to the icount
 	int 					m_cycles_running;			// number of cycles we are executing
 	int						m_cycles_stolen;			// number of cycles we artificially stole

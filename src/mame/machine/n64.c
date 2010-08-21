@@ -764,9 +764,9 @@ WRITE32_DEVICE_HANDLER( n64_dp_reg_w )
 
 		case 0x04/4:		// DP_END_REG
 			state->m_rdp.SetEndReg(data);
-			profiler_mark_start(PROFILER_USER1);
+			g_profiler.start(PROFILER_USER1);
 			state->m_rdp.ProcessList();
-			profiler_mark_end();
+			g_profiler.stop();
 			break;
 
 		case 0x0c/4:		// DP_STATUS_REG

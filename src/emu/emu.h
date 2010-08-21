@@ -52,6 +52,7 @@
 // core emulator headers -- must be first
 #include "emucore.h"
 #include "eminline.h"
+#include "profiler.h"
 
 // commonly-referenecd utilities imported from lib/util
 #include "chd.h"

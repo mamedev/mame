@@ -116,7 +116,7 @@ WRITE16_HANDLER( shangha3_blitter_go_w )
 	int offs;
 
 
-	profiler_mark_start(PROFILER_VIDEO);
+	g_profiler.start(PROFILER_VIDEO);
 
 	for (offs = gfxlist_addr << 3;offs < shangha3_ram_size/2;offs += 16)
 	{
@@ -259,7 +259,7 @@ else
 		}
 	}
 
-	profiler_mark_end();
+	g_profiler.stop();
 }
 
 

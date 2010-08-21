@@ -403,7 +403,7 @@ int running_machine::run(bool firstrun)
 		m_hard_reset_pending = false;
 		while ((!m_hard_reset_pending && !m_exit_pending) || m_saveload_schedule != SLS_NONE)
 		{
-			profiler_mark_start(PROFILER_EXTRA);
+			g_profiler.start(PROFILER_EXTRA);
 
 			// execute CPUs if not paused
 			if (!m_paused)
@@ -417,7 +417,7 @@ int running_machine::run(bool firstrun)
 			if (m_saveload_schedule != SLS_NONE)
 				handle_saveload();
 
-			profiler_mark_end();
+			g_profiler.stop();
 		}
 
 		// and out via the exit phase
@@ -713,7 +713,7 @@ void CLIB_DECL running_machine::vlogerror(const char *format, va_list args)
 	// process only if there is a target
 	if (m_logerror_list != NULL)
 	{
-		profiler_mark_start(PROFILER_LOGERROR);
+		g_profiler.start(PROFILER_LOGERROR);
 
 		// dump to the buffer
 		vsnprintf(giant_string_buffer, ARRAY_LENGTH(giant_string_buffer), format, args);
@@ -722,7 +722,7 @@ void CLIB_DECL running_machine::vlogerror(const char *format, va_list args)
 		for (logerror_callback_item *cb = m_logerror_list; cb != NULL; cb = cb->m_next)
 			(*cb->m_func)(*this, giant_string_buffer);
 
-		profiler_mark_end();
+		g_profiler.stop();
 	}
 }
 

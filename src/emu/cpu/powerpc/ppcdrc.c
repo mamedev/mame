@@ -947,7 +947,7 @@ static void code_compile_block(powerpc_state *ppc, UINT8 mode, offs_t pc)
 	drcuml_block *block;
 	jmp_buf errorbuf;
 
-	profiler_mark_start(PROFILER_DRC_COMPILE);
+	g_profiler.start(PROFILER_DRC_COMPILE);
 
 	/* get a description of this sequence */
 	desclist = drcfe_describe_code(ppc->impstate->drcfe, pc);
@@ -1030,7 +1030,7 @@ static void code_compile_block(powerpc_state *ppc, UINT8 mode, offs_t pc)
 
 	/* end the sequence */
 	drcuml_block_end(block);
-	profiler_mark_end();
+	g_profiler.stop();
 }
 
 

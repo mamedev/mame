@@ -698,7 +698,7 @@ static void blitter_w( address_space *space, int blitter, offs_t offset, UINT8 d
 	dynax_state *state = space->machine->driver_data<dynax_state>();
 	int hi_bits;
 
-profiler_mark_start(PROFILER_VIDEO);
+g_profiler.start(PROFILER_VIDEO);
 
 	switch (offset)
 	{
@@ -849,7 +849,7 @@ profiler_mark_start(PROFILER_VIDEO);
 		}
 	}
 
-profiler_mark_end();
+g_profiler.stop();
 }
 
 
@@ -861,7 +861,7 @@ static void blitter_w_funkyfig( running_machine *machine, int blitter, offs_t of
 	dynax_state *state = machine->driver_data<dynax_state>();
 	int hi_bits;
 
-profiler_mark_start(PROFILER_VIDEO);
+g_profiler.start(PROFILER_VIDEO);
 
 	switch(offset)
 	{
@@ -1007,7 +1007,7 @@ profiler_mark_start(PROFILER_VIDEO);
 		}
 	}
 
-profiler_mark_end();
+g_profiler.stop();
 }
 
 
@@ -1025,7 +1025,7 @@ static WRITE8_HANDLER( hanakanz_blitter_data_w )
 	dynax_state *state = space->machine->driver_data<dynax_state>();
 	int hi_bits;
 
-profiler_mark_start(PROFILER_VIDEO);
+g_profiler.start(PROFILER_VIDEO);
 
 	hi_bits = (state->ddenlovr_blit_latch & 0x03) << 8;
 
@@ -1207,7 +1207,7 @@ profiler_mark_start(PROFILER_VIDEO);
 			break;
 	}
 
-profiler_mark_end();
+g_profiler.stop();
 }
 
 

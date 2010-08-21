@@ -438,14 +438,14 @@ static void draw_bglayerscroll( running_machine *machine, int layer, bitmap_t *b
 				cache_bitmap(tilemap_scanline, state, gfx, size, tilebank, alpha, last_bank);
 
 				/* zoomy and 'wibbly' effects - extract an entire row from tilemap */
-				profiler_mark_start(PROFILER_USER2);
+				g_profiler.start(PROFILER_USER2);
 				UINT32 tilemap_line[32 * 16];
 				UINT32 scr_line[64 * 8];
 				extract_scanline32(state->bg_bitmap, 0, tilemap_scanline, width, tilemap_line);
-				profiler_mark_end();
+				g_profiler.stop();
 
 				/* slow bit, needs optimising. apply scrollx and zoomx by assembling scanline from row */
-				profiler_mark_start(PROFILER_USER3);
+				g_profiler.start(PROFILER_USER3);
 				if(zoom) {
 					int step = state->bg_zoom[zoom];
 					int jj = 0x400 << 10; // ensure +ve for mod
@@ -459,10 +459,10 @@ static void draw_bglayerscroll( running_machine *machine, int layer, bitmap_t *b
 						scr_line[ii] = tilemap_line[(ii - scrollx + 0x400) % width];
 					}
 				}
-				profiler_mark_end();
+				g_profiler.stop();
 
 				/* blend line into output */
-				profiler_mark_start(PROFILER_USER4);
+				g_profiler.start(PROFILER_USER4);
 				if(alpha == 0xff) {
 					draw_scanline32_transpen(bitmap, 0, scanline, scr_width, scr_line);
 				}
@@ -472,7 +472,7 @@ static void draw_bglayerscroll( running_machine *machine, int layer, bitmap_t *b
 				else if (alpha < 0) {
 					draw_scanline32_argb(bitmap, 0, scanline, scr_width, scr_line);
 				}
-				profiler_mark_end();
+				g_profiler.stop();
 			}
 		}
 
@@ -542,7 +542,7 @@ static void psikyosh_drawgfxzoom( running_machine *machine,
 	if (!zoomx || !zoomy)
 		return;
 
-	profiler_mark_start(PROFILER_DRAWGFX);
+	g_profiler.start(PROFILER_DRAWGFX);
 
 	assert(dest_bmp->bpp == 32);
 
@@ -1065,7 +1065,7 @@ static void psikyosh_drawgfxzoom( running_machine *machine,
 			}
 		}
 	}
-	profiler_mark_end();
+	g_profiler.stop();
 }
 
 
@@ -1203,7 +1203,7 @@ static void psikyosh_prelineblend( running_machine *machine, bitmap_t *bitmap, c
 
 	assert(bitmap->bpp == 32);
 
-	profiler_mark_start(PROFILER_USER8);
+	g_profiler.start(PROFILER_USER8);
 	for (y = cliprect->min_y; y <= cliprect->max_y; y += 1) {
 
 		dstline = BITMAP_ADDR32(bitmap, y, 0);
@@ -1212,7 +1212,7 @@ static void psikyosh_prelineblend( running_machine *machine, bitmap_t *bitmap, c
 		for (x = cliprect->min_x; x <= cliprect->max_x; x += 1)
 			dstline[x] = linefill[y] >> 8;
 	}
-	profiler_mark_end();
+	g_profiler.stop();
 }
 
 
@@ -1231,7 +1231,7 @@ static void psikyosh_postlineblend( running_machine *machine, bitmap_t *bitmap, 
 		return;
 	}
 
-	profiler_mark_start(PROFILER_USER8);
+	g_profiler.start(PROFILER_USER8);
 	for (y = cliprect->min_y; y <= cliprect->max_y; y += 1) {
 
 		dstline = BITMAP_ADDR32(bitmap, y, 0);
@@ -1247,7 +1247,7 @@ static void psikyosh_postlineblend( running_machine *machine, bitmap_t *bitmap, 
 				dstline[x] = alpha_blend_r32(dstline[x], lineblend[y] >> 8, 2 * (lineblend[y] & 0x7f));
 		}
 	}
-	profiler_mark_end();
+	g_profiler.stop();
 }
 
 

@@ -258,7 +258,7 @@ static void draw_framebuffer( running_machine *machine, bitmap_t *bitmap, const 
 	UINT8 video_control = tc0180vcu_get_videoctrl(state->tc0180vcu, 0);
 	UINT8 framebuffer_page = tc0180vcu_get_fb_page(state->tc0180vcu, 0);
 
-profiler_mark_start(PROFILER_USER1);
+g_profiler.start(PROFILER_USER1);
 
 	priority <<= 4;
 
@@ -266,7 +266,7 @@ profiler_mark_start(PROFILER_USER1);
 	{
 		if (priority)
 		{
-			profiler_mark_end();
+			g_profiler.stop();
 			return;
 		}
 
@@ -352,7 +352,7 @@ profiler_mark_start(PROFILER_USER1);
 			}
 		}
 	}
-profiler_mark_end();
+g_profiler.stop();
 }
 
 VIDEO_UPDATE( taitob )

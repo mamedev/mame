@@ -180,7 +180,7 @@ if (TEMPLOG)
 					// if we're not suspended, actually execute
 					if (exec->m_suspend == 0)
 					{
-						profiler_mark_start(exec->m_profiler);
+						g_profiler.start(exec->m_profiler);
 
 						// note that this global variable cycles_stolen can be modified
 						// via the call to cpu_execute
@@ -202,7 +202,7 @@ if (TEMPLOG) printf("Executing %s for %d cycles\n", exec->device().tag(), ran);
 						ran -= *exec->m_icount;
 						assert(ran >= exec->m_cycles_stolen);
 						ran -= exec->m_cycles_stolen;
-						profiler_mark_end();
+						g_profiler.stop();
 					}
 else
 if (TEMPLOG) printf("Skipping %s for %d cycles\n", exec->device().tag(), ran);

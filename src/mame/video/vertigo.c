@@ -482,7 +482,7 @@ void vertigo_vproc(int cycles, int irq4)
 
 	if (irq4) vector_clear_list();
 
-	profiler_mark_start(PROFILER_USER1);
+	g_profiler.start(PROFILER_USER1);
 
 	while (cycles--)
 	{
@@ -658,5 +658,5 @@ void vertigo_vproc(int cycles, int irq4)
 		}
 	}
 
-	profiler_mark_end();
+	g_profiler.stop();
 }

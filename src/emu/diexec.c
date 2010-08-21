@@ -267,7 +267,7 @@ device_execute_interface::device_execute_interface(running_machine &machine, con
 	  m_timedint_timer(NULL),
 	  m_iloops(0),
 	  m_partial_frame_timer(NULL),
-	  m_profiler(0),
+	  m_profiler(PROFILER_IDLE),
 	  m_icount(NULL),
 	  m_cycles_running(0),
 	  m_cycles_stolen(0),
@@ -538,7 +538,7 @@ void device_execute_interface::interface_pre_start()
 	// fill in the initial states
 	int index = m_machine.m_devicelist.index(&m_device);
 	m_suspend = SUSPEND_REASON_RESET;
-	m_profiler = index + PROFILER_DEVICE_FIRST;
+	m_profiler = profile_type(index + PROFILER_DEVICE_FIRST);
 	m_inttrigger = index + TRIGGER_INT;
 
 	// fill in the input states and IRQ callback information

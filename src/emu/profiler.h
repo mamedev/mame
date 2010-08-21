@@ -4,16 +4,47 @@
 
     Functions to manage profiling of MAME execution.
 
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
+****************************************************************************
+
+    Copyright Aaron Giles
+    All rights reserved.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are
+    met:
+
+        * Redistributions of source code must retain the above copyright
+          notice, this list of conditions and the following disclaimer.
+        * Redistributions in binary form must reproduce the above copyright
+          notice, this list of conditions and the following disclaimer in
+          the documentation and/or other materials provided with the
+          distribution.
+        * Neither the name 'MAME' nor the names of its contributors may be
+          used to endorse or promote products derived from this software
+          without specific prior written permission.
+
+    THIS SOFTWARE IS PROVIDED BY AARON GILES ''AS IS'' AND ANY EXPRESS OR
+    IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+    DISCLAIMED. IN NO EVENT SHALL AARON GILES BE LIABLE FOR ANY DIRECT,
+    INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+    SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+    HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+    STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+    IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
 
 ****************************************************************************
 
-    To start profiling a certain section, e.g. video:
-    profiler_mark_start(PROFILER_VIDEO);
+	Profiling is scope-based. To start profiling, put a profiler_scope
+	object on the stack. To end profiling, just end the scope:
 
-    to end profiling the current section:
-    profiler_mark_end();
+	{
+	    profiler_scope scope(PROFILER_VIDEO);
+	    
+	    your_work_here();
+	}
 
     the profiler handles a FILO list so calls may be nested.
 
@@ -26,16 +57,16 @@
 
 
 
-/***************************************************************************
-    CONSTANTS
-***************************************************************************/
+//**************************************************************************
+//  CONSTANTS
+//**************************************************************************
 
-/* profiling */
-enum
+enum profile_type
 {
 	PROFILER_DEVICE_FIRST = 0,
 	PROFILER_DEVICE_MAX = PROFILER_DEVICE_FIRST + 256,
 	PROFILER_DRC_COMPILE,
+	PROFILER_MEM_REMAP,
 	PROFILER_MEMREAD,
 	PROFILER_MEMWRITE,
 	PROFILER_VIDEO,
@@ -47,13 +78,13 @@ enum
 	PROFILER_BLIT,
 	PROFILER_SOUND,
 	PROFILER_TIMER_CALLBACK,
-	PROFILER_INPUT,		/* input.c and inptport.c */
-	PROFILER_MOVIE_REC,	/* movie recording */
-	PROFILER_LOGERROR,	/* logerror */
-	PROFILER_EXTRA,		/* everything else */
+	PROFILER_INPUT,				// input.c and inptport.c
+	PROFILER_MOVIE_REC,			// movie recording
+	PROFILER_LOGERROR,			// logerror
+	PROFILER_EXTRA,				// everything else
 
-	/* the USER types are available to driver writers to profile */
-	/* custom sections of the code */
+	// the USER types are available to driver writers to profile
+	// custom sections of the code
 	PROFILER_USER1,
 	PROFILER_USER2,
 	PROFILER_USER3,
@@ -67,89 +98,111 @@ enum
 	PROFILER_IDLE,
 	PROFILER_TOTAL
 };
+DECLARE_ENUM_OPERATORS(profile_type);
 
 
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
 
-typedef struct _profiler_filo_entry profiler_filo_entry;
-struct _profiler_filo_entry
+
+// ======================> real_profiler_state
+
+class real_profiler_state
 {
-	int				type;				/* type of entry */
-	osd_ticks_t		start;				/* start time */
+	friend class profile_scope;
+
+public:
+	// construction/destruction
+	real_profiler_state();
+	
+	// getters
+	bool enabled() const { return m_enabled; }
+	const char *text(running_machine &machine, astring &string);
+
+	// enable/disable
+	void enable(bool state = true)
+	{
+		if (state != m_enabled)
+		{
+			m_enabled = state;
+			if (m_enabled)
+			{
+				m_dataready = false;
+				m_filoindex = m_dataindex = 0;
+			}
+		}
+	}
+
+	// start/stop
+	void start(profile_type type) { if (m_enabled) real_start(type); }
+	void stop() { if (m_enabled) real_stop(); }
+
+private:
+	void real_start(profile_type type);
+	void real_stop();
+
+	// an entry in the FILO
+	struct filo_entry
+	{
+		int				type;						// type of entry
+		osd_ticks_t		start;						// start time
+	};
+
+	// item in the array of recent states
+	struct history_data
+	{
+		UINT32			context_switches;			// number of context switches seen
+		osd_ticks_t		duration[PROFILER_TOTAL];	// duration spent in each entry
+	};
+
+	// internal state
+	bool				m_enabled;					// are we enabled?
+	bool				m_dataready;				// are we to display the data yet?
+	UINT8				m_filoindex;				// current FILO index
+	UINT8				m_dataindex;				// current data index
+	filo_entry			m_filo[16];					// array of FILO entries
+	history_data		m_data[16];					// array of data
 };
 
 
-typedef struct _profiler_data profiler_data;
-struct _profiler_data
+// ======================> dummy_profiler_state
+
+class dummy_profiler_state
 {
-	UINT32			context_switches;	/* number of context switches seen */
-	osd_ticks_t		duration[PROFILER_TOTAL]; /* duration spent in each entry */
+public:
+	// construction/destruction
+	dummy_profiler_state();
+
+	// getters
+	bool enabled() const { return false; }
+	const char *text(running_machine &machine, astring &string) { return string.cpy(""); }
+
+	// enable/disable
+	void enable(bool state = true) { }
+
+	// start/stop
+	void start(profile_type type) { }
+	void stop() { }
 };
 
 
-typedef struct _profiler_state profiler_state;
-struct _profiler_state
-{
-	UINT8			enabled;			/* are we enabled? */
-	UINT8			filoindex;			/* current FILO index */
-	UINT8			dataindex;			/* current data index */
-	UINT8			dataready;			/* are we to display the data yet? */
-	profiler_filo_entry filo[16];		/* array of FILO entries */
-	profiler_data	data[16];			/* array of data */
-};
-
-
-
-/***************************************************************************
-    GLOBAL VARIABLES
-***************************************************************************/
-
-extern profiler_state global_profiler;
-
-
-
-/***************************************************************************
-    MACROS
-***************************************************************************/
+// ======================> profiler_state
 
 #ifdef MAME_PROFILER
-
-#define profiler_mark_start(x)	do { if (global_profiler.enabled) _profiler_mark_start(x); } while (0)
-#define profiler_mark_end()		do { if (global_profiler.enabled) _profiler_mark_end(); } while (0)
-#define profiler_start()		do { global_profiler.enabled = TRUE; global_profiler.filoindex = global_profiler.dataindex = global_profiler.dataready = 0; } while (0)
-#define profiler_stop()			do { global_profiler.enabled = FALSE; } while (0)
-#define profiler_get_text(x,s)	_profiler_get_text(x, s)
-
+typedef real_profiler_state profiler_state;
 #else
-
-#define profiler_mark_start(x)	do { } while (0)
-#define profiler_mark_end()		do { } while (0)
-#define profiler_start()		do { } while (0)
-#define profiler_stop()			do { } while (0)
-#define profiler_get_text(x,s)	(s).reset()
-
+typedef dummy_profiler_state profiler_state;
 #endif
 
 
 
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
 
-
-/* ----- core functions (do not call directly; use macros) ----- */
-
-/* mark the beginning of a profiler entry */
-void _profiler_mark_start(int type);
-
-/* mark the end of a profiler entry */
-void _profiler_mark_end(void);
-
-/* return the current text in an astring */
-astring &_profiler_get_text(running_machine *machine, astring &string);
+extern profiler_state g_profiler;
 
 
 #endif	/* __PROFILER_H__ */
