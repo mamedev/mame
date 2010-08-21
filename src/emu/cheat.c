@@ -411,22 +411,20 @@ void cheat_reload(running_machine *machine)
        and MAME will load gamename.xml */
 	device_image_interface *image = NULL;
 	for (bool gotone = machine->m_devicelist.first(image); gotone; gotone = image->next(image))
-	{
 		if (image->exists())
 		{
-			char mess_cheat_filename[9];
-			UINT32	crc = image->crc();
-			sprintf(mess_cheat_filename, "%08X", crc);
-			if (crc!=0) {
-				cheatinfo->cheatlist = cheat_list_load(machine, mess_cheat_filename);
+			UINT32 crc = image->crc();
+			if (crc != 0)
+			{
+				astring filename;
+				filename.printf("%08X", crc);
+				cheatinfo->cheatlist = cheat_list_load(machine, filename);
 				break;
 			}
 		}
-	}
+
 	if (cheatinfo->cheatlist == NULL)
-	{
 		cheatinfo->cheatlist = cheat_list_load(machine, machine->basename());
-	}
 
 	/* temporary: save the file back out as output.xml for comparison */
 	if (cheatinfo->cheatlist != NULL)
@@ -458,9 +456,7 @@ int cheat_get_global_enable(running_machine *machine)
 	cheat_private *cheatinfo = machine->cheat_data;
 
 	if (cheatinfo != NULL)
-	{
 		return !cheatinfo->disabled;
-	}
 
 	return 0;
 }
@@ -1077,7 +1073,7 @@ static cheat_entry *cheat_list_load(running_machine *machine, const char *filena
 			scannode = NULL;
 			if (REMOVE_DUPLICATE_CHEATS)
 				for (scannode = cheatlist; scannode != NULL; scannode = scannode->next)
-					if (scannode->description.cmp(curcheat->description) == 0)
+					if (scannode->description == curcheat->description)
 					{
 						mame_printf_verbose("Ignoring duplicate cheat '%s' from file %s\n", curcheat->description.cstr(), mame_file_full_name(cheatfile).cstr());
 						break;
@@ -1193,7 +1189,7 @@ static cheat_entry *cheat_entry_load(running_machine *machine, const char *filen
 		mame_printf_error("%s.xml(%d): empty or missing desc attribute on cheat\n", filename, cheatnode->line);
 		return NULL;
 	}
-	cheat->description.cpy(description);
+	cheat->description = description;
 
 	/* create the symbol table */
 	cheat->symbols = symtable_alloc(NULL, machine);
@@ -1213,7 +1209,7 @@ static cheat_entry *cheat_entry_load(running_machine *machine, const char *filen
 	if (commentnode != NULL)
 	{
 		if (commentnode->value != NULL && commentnode->value[0] != 0)
-			cheat->comment.cpy(commentnode->value);
+			cheat->comment = commentnode->value;
 
 		/* only one comment is kept */
 		commentnode = xml_get_sibling(commentnode->next, "comment");
@@ -1708,7 +1704,7 @@ static void script_entry_save(mame_file *cheatfile, const script_entry *entry)
 	astring tempstring;
 
 	/* output an action */
-	if (entry->format == NULL)
+	if (entry->format.len() == 0)
 	{
 		mame_fprintf(cheatfile, "\t\t\t<action");
 		if (entry->condition != NULL)
