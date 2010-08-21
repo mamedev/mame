@@ -537,19 +537,19 @@ union _fp_reg
 
 typedef proto_delegate_1param<UINT8, offs_t> m68k_read8_proto_delegate;
 typedef proto_delegate_1param<UINT16, offs_t> m68k_readimm16_proto_delegate;
-typedef proto_delegate_2param<UINT16, offs_t, UINT16> m68k_read16_proto_delegate;
-typedef proto_delegate_2param<UINT32, offs_t, UINT32> m68k_read32_proto_delegate;
+typedef proto_delegate_1param<UINT16, offs_t> m68k_read16_proto_delegate;
+typedef proto_delegate_1param<UINT32, offs_t> m68k_read32_proto_delegate;
 typedef proto_delegate_2param<void, offs_t, UINT8> m68k_write8_proto_delegate;
-typedef proto_delegate_3param<void, offs_t, UINT16, UINT16> m68k_write16_proto_delegate;
-typedef proto_delegate_3param<void, offs_t, UINT32, UINT32> m68k_write32_proto_delegate;
+typedef proto_delegate_2param<void, offs_t, UINT16> m68k_write16_proto_delegate;
+typedef proto_delegate_2param<void, offs_t, UINT32> m68k_write32_proto_delegate;
 
 typedef delegate_1param<UINT8, offs_t> m68k_read8_delegate;
 typedef delegate_1param<UINT16, offs_t> m68k_readimm16_delegate;
-typedef delegate_2param<UINT16, offs_t, UINT16> m68k_read16_delegate;
-typedef delegate_2param<UINT32, offs_t, UINT32> m68k_read32_delegate;
+typedef delegate_1param<UINT16, offs_t> m68k_read16_delegate;
+typedef delegate_1param<UINT32, offs_t> m68k_read32_delegate;
 typedef delegate_2param<void, offs_t, UINT8> m68k_write8_delegate;
-typedef delegate_3param<void, offs_t, UINT16, UINT16> m68k_write16_delegate;
-typedef delegate_3param<void, offs_t, UINT32, UINT32> m68k_write32_delegate;
+typedef delegate_2param<void, offs_t, UINT16> m68k_write16_delegate;
+typedef delegate_2param<void, offs_t, UINT32> m68k_write32_delegate;
 
 class m68k_memory_interface : public bindable_object
 {
@@ -572,18 +572,14 @@ private:
 	UINT16 m68008_read_immediate_16(offs_t address);
 	UINT16 read_immediate_16(offs_t address);
 	UINT16 simple_read_immediate_16(offs_t address);
-	UINT16 readword_d32(offs_t address, UINT16 mask);
-	void writeword_d32(offs_t address, UINT16 data, UINT16 mask);
-	UINT32 readlong_d32(offs_t address, UINT32 mask);
-	void writelong_d32(offs_t address, UINT32 data, UINT32 mask);
 
 	UINT8 read_byte_32_mmu(offs_t address);
 	void write_byte_32_mmu(offs_t address, UINT8 data);
 	UINT16 read_immediate_16_mmu(offs_t address);
-	UINT16 readword_d32_mmu(offs_t address, UINT16 mask);
-	void writeword_d32_mmu(offs_t address, UINT16 data, UINT16 mask);
-	UINT32 readlong_d32_mmu(offs_t address, UINT32 mask);
-	void writelong_d32_mmu(offs_t address, UINT32 data, UINT32 mask);
+	UINT16 readword_d32_mmu(offs_t address);
+	void writeword_d32_mmu(offs_t address, UINT16 data);
+	UINT32 readlong_d32_mmu(offs_t address);
+	void writelong_d32_mmu(offs_t address, UINT32 data);
 
 	address_space *m_space;
 	direct_read_data *m_direct;
@@ -837,7 +833,7 @@ INLINE unsigned int m68k_read_pcrelative_16(m68ki_cpu_core *m68k, unsigned int a
 	if (address >= m68k->encrypted_start && address < m68k->encrypted_end)
 		return m68k->memory.readimm16(address);
 
-	return m68k->memory.read16(address, 0xffff);
+	return m68k->memory.read16(address);
 }
 
 INLINE unsigned int m68k_read_pcrelative_32(m68ki_cpu_core *m68k, unsigned int address)
@@ -845,7 +841,7 @@ INLINE unsigned int m68k_read_pcrelative_32(m68ki_cpu_core *m68k, unsigned int a
 	if (address >= m68k->encrypted_start && address < m68k->encrypted_end)
 		return m68k_read_immediate_32(m68k, address);
 
-	return m68k->memory.read32(address, 0xffffffff);
+	return m68k->memory.read32(address);
 }
 
 
@@ -856,8 +852,8 @@ INLINE unsigned int m68k_read_pcrelative_32(m68ki_cpu_core *m68k, unsigned int a
  */
 INLINE void m68kx_write_memory_32_pd(m68ki_cpu_core *m68k, unsigned int address, unsigned int value)
 {
-	m68k->memory.write16(address+2, value>>16, 0xffff);
-	m68k->memory.write16(address, value&0xffff, 0xffff);
+	m68k->memory.write16(address+2, value>>16);
+	m68k->memory.write16(address, value&0xffff);
 }
 
 
@@ -928,7 +924,7 @@ INLINE UINT32 m68ki_read_16_fc(m68ki_cpu_core *m68k, UINT32 address, UINT32 fc)
 	{
 		m68ki_check_address_error(m68k, address, MODE_READ, fc);
 	}
-	return m68k->memory.read16(address, 0xffff);
+	return m68k->memory.read16(address);
 }
 INLINE UINT32 m68ki_read_32_fc(m68ki_cpu_core *m68k, UINT32 address, UINT32 fc)
 {
@@ -936,7 +932,7 @@ INLINE UINT32 m68ki_read_32_fc(m68ki_cpu_core *m68k, UINT32 address, UINT32 fc)
 	{
 		m68ki_check_address_error(m68k, address, MODE_READ, fc);
 	}
-	return m68k->memory.read32(address, 0xffffffff);
+	return m68k->memory.read32(address);
 }
 
 INLINE void m68ki_write_8_fc(m68ki_cpu_core *m68k, UINT32 address, UINT32 fc, UINT32 value)
@@ -949,7 +945,7 @@ INLINE void m68ki_write_16_fc(m68ki_cpu_core *m68k, UINT32 address, UINT32 fc, U
 	{
 		m68ki_check_address_error(m68k, address, MODE_WRITE, fc);
 	}
-	m68k->memory.write16(address, value, 0xffff);
+	m68k->memory.write16(address, value);
 }
 INLINE void m68ki_write_32_fc(m68ki_cpu_core *m68k, UINT32 address, UINT32 fc, UINT32 value)
 {
@@ -957,7 +953,7 @@ INLINE void m68ki_write_32_fc(m68ki_cpu_core *m68k, UINT32 address, UINT32 fc, U
 	{
 		m68ki_check_address_error(m68k, address, MODE_WRITE, fc);
 	}
-	m68k->memory.write32(address, value, 0xffffffff);
+	m68k->memory.write32(address, value);
 }
 
 /* Special call to simulate undocumented 68k behavior when move.l with a
@@ -971,8 +967,8 @@ INLINE void m68ki_write_32_pd_fc(m68ki_cpu_core *m68k, UINT32 address, UINT32 fc
 	{
 		m68ki_check_address_error(m68k, address, MODE_WRITE, fc);
 	}
-	m68k->memory.write16(address+2, value>>16, 0xffff);
-	m68k->memory.write16(address, value&0xffff, 0xffff);
+	m68k->memory.write16(address+2, value>>16);
+	m68k->memory.write16(address, value&0xffff);
 }
 
 

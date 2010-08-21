@@ -20,37 +20,37 @@
 	if ((cs)->flag##num)								\
 		appb = (UINT8)(cs)->reg[(cs)->op##num];			\
 	else												\
-		appb = MemRead8((cs)->program, (cs)->op##num);
+		appb = (cs)->program->read_byte((cs)->op##num);
 
 #define F12LOADOPHALF(cs, num)							\
 	if ((cs)->flag##num)								\
 		apph = (UINT16)(cs)->reg[(cs)->op##num];		\
 	else												\
-		apph = MemRead16((cs)->program, (cs)->op##num);
+		apph = (cs)->program->read_word_unaligned((cs)->op##num);
 
 #define F12LOADOPWORD(cs, num)							\
 	if ((cs)->flag##num)								\
 		appw = (cs)->reg[(cs)->op##num];				\
 	else												\
-		appw = MemRead32((cs)->program,(cs)->op##num);
+		appw = (cs)->program->read_dword_unaligned((cs)->op##num);
 
 #define F12STOREOPBYTE(cs, num)							\
 	if ((cs)->flag##num)								\
 		SETREG8((cs)->reg[(cs)->op##num], appb);		\
 	else												\
-		MemWrite8((cs)->program, (cs)->op##num, appb);
+		(cs)->program->write_byte((cs)->op##num, appb);
 
 #define F12STOREOPHALF(cs, num)							\
 	if ((cs)->flag##num)								\
 		SETREG16((cs)->reg[(cs)->op##num], apph);		\
 	else												\
-		MemWrite16((cs)->program, (cs)->op##num, apph);
+		(cs)->program->write_word_unaligned((cs)->op##num, apph);
 
 #define F12STOREOPWORD(cs, num)							\
 	if ((cs)->flag##num)								\
 		(cs)->reg[(cs)->op##num] = appw;				\
 	else												\
-		MemWrite32((cs)->program, (cs)->op##num, appw);
+		(cs)->program->write_dword_unaligned((cs)->op##num, appw);
 
 #define F12LOADOP1BYTE(cs)  F12LOADOPBYTE(cs, 1)
 #define F12LOADOP1HALF(cs)  F12LOADOPHALF(cs, 1)
@@ -76,7 +76,7 @@
 // writing to the second operand.
 static void F12DecodeFirstOperand(v60_state *cpustate, UINT32 (*DecodeOp1)(v60_state *), UINT8 dim1)
 {
-	cpustate->instflags = OpRead8(cpustate->program, cpustate->PC + 1);
+	cpustate->instflags = OpRead8(cpustate, cpustate->PC + 1);
 
 	// Check if F1 or F2
 	if (cpustate->instflags & 0x80)
@@ -177,7 +177,7 @@ static void F12WriteSecondOperand(v60_state *cpustate, UINT8 dim2)
 // Decode both format 1 / 2 operands
 static void F12DecodeOperands(v60_state *cpustate, UINT32 (*DecodeOp1)(v60_state *), UINT8 dim1, UINT32 (*DecodeOp2)(v60_state *), UINT8 dim2)
 {
-	UINT8 _if12 = OpRead8(cpustate->program, cpustate->PC + 1);
+	UINT8 _if12 = OpRead8(cpustate, cpustate->PC + 1);
 
 	// Check if F1 or F2
 	if (_if12 & 0x80)
@@ -402,11 +402,11 @@ static UINT32 opCALL(v60_state *cpustate) /* TRUSTED */
 	F12DecodeOperands(cpustate, ReadAMAddress, 0,ReadAMAddress, 2);
 
 	cpustate->SP -= 4;
-	MemWrite32(cpustate->program, cpustate->SP, cpustate->AP);
+	cpustate->program->write_dword_unaligned(cpustate->SP, cpustate->AP);
 	cpustate->AP = cpustate->op2;
 
 	cpustate->SP -= 4;
-	MemWrite32(cpustate->program, cpustate->SP, cpustate->PC + cpustate->amlength1 + cpustate->amlength2 + 2);
+	cpustate->program->write_dword_unaligned(cpustate->SP, cpustate->PC + cpustate->amlength1 + cpustate->amlength2 + 2);
 	cpustate->PC = cpustate->op1;
 
 	return 0;
@@ -462,16 +462,16 @@ static UINT32 opCHLVL(v60_state *cpustate)
 	oldPSW = v60_update_psw_for_exception(cpustate, 0, cpustate->op1);
 
 	cpustate->SP -= 4;
-	MemWrite32(cpustate->program, cpustate->SP, cpustate->op2);
+	cpustate->program->write_dword_unaligned(cpustate->SP, cpustate->op2);
 
 	cpustate->SP -= 4;
-	MemWrite32(cpustate->program, cpustate->SP, EXCEPTION_CODE_AND_SIZE(0x1800 + cpustate->op1 * 0x100, 8));
+	cpustate->program->write_dword_unaligned(cpustate->SP, EXCEPTION_CODE_AND_SIZE(0x1800 + cpustate->op1 * 0x100, 8));
 
 	cpustate->SP -= 4;
-	MemWrite32(cpustate->program, cpustate->SP, oldPSW);
+	cpustate->program->write_dword_unaligned(cpustate->SP, oldPSW);
 
 	cpustate->SP -= 4;
-	MemWrite32(cpustate->program, cpustate->SP, cpustate->PC + cpustate->amlength1 + cpustate->amlength2 + 2);
+	cpustate->program->write_dword_unaligned(cpustate->SP, cpustate->PC + cpustate->amlength1 + cpustate->amlength2 + 2);
 
 	cpustate->PC = GETINTVECT(cpustate, 24 + cpustate->op1);
 
@@ -591,8 +591,8 @@ static UINT32 opDIVX(v60_state *cpustate)
 	}
 	else
 	{
-		a = MemRead32(cpustate->program, cpustate->op2);
-		b = MemRead32(cpustate->program, cpustate->op2 + 4);
+		a = cpustate->program->read_dword_unaligned(cpustate->op2);
+		b = cpustate->program->read_dword_unaligned(cpustate->op2 + 4);
 	}
 
 	dv = ((UINT64)b << 32) | ((UINT64)a);
@@ -610,8 +610,8 @@ static UINT32 opDIVX(v60_state *cpustate)
 	}
 	else
 	{
-		MemWrite32(cpustate->program, cpustate->op2, a);
-		MemWrite32(cpustate->program, cpustate->op2 + 4, b);
+		cpustate->program->write_dword_unaligned(cpustate->op2, a);
+		cpustate->program->write_dword_unaligned(cpustate->op2 + 4, b);
 	}
 
 	F12END(cpustate);
@@ -631,8 +631,8 @@ static UINT32 opDIVUX(v60_state *cpustate)
 	}
 	else
 	{
-		a = MemRead32(cpustate->program, cpustate->op2);
-		b = MemRead32(cpustate->program, cpustate->op2 + 4);
+		a = cpustate->program->read_dword_unaligned(cpustate->op2);
+		b = cpustate->program->read_dword_unaligned(cpustate->op2 + 4);
 	}
 
 	dv = (UINT64)(((UINT64)b << 32) | (UINT64)a);
@@ -649,8 +649,8 @@ static UINT32 opDIVUX(v60_state *cpustate)
 	}
 	else
 	{
-		MemWrite32(cpustate->program, cpustate->op2, a);
-		MemWrite32(cpustate->program, cpustate->op2 + 4, b);
+		cpustate->program->write_dword_unaligned(cpustate->op2, a);
+		cpustate->program->write_dword_unaligned(cpustate->op2 + 4, b);
 	}
 
 	F12END(cpustate);
@@ -708,7 +708,7 @@ static UINT32 opDIVUW(v60_state *cpustate) /* TRUSTED */
 static UINT32 opINB(v60_state *cpustate)
 {
 	F12DecodeFirstOperand(cpustate, ReadAMAddress, 0);
-	cpustate->modwritevalb = MemRead8(cpustate->io, cpustate->op1);
+	cpustate->modwritevalb = cpustate->io->read_byte(cpustate->op1);
 
 	if ( cpustate->stall_io )
 	{
@@ -723,7 +723,7 @@ static UINT32 opINB(v60_state *cpustate)
 static UINT32 opINH(v60_state *cpustate)
 {
 	F12DecodeFirstOperand(cpustate, ReadAMAddress, 1);
-	cpustate->modwritevalh = MemRead16(cpustate->io, cpustate->op1);
+	cpustate->modwritevalh = cpustate->io->read_word_unaligned(cpustate->op1);
 
 	if ( cpustate->stall_io )
 	{
@@ -738,7 +738,7 @@ static UINT32 opINH(v60_state *cpustate)
 static UINT32 opINW(v60_state *cpustate)
 {
 	F12DecodeFirstOperand(cpustate, ReadAMAddress, 2);
-	cpustate->modwritevalw = MemRead32(cpustate->io, cpustate->op1);
+	cpustate->modwritevalw = cpustate->io->read_dword_unaligned(cpustate->op1);
 
 	if ( cpustate->stall_io )
 	{
@@ -755,7 +755,7 @@ static UINT32 opLDPR(v60_state *cpustate)
 	F12DecodeOperands(cpustate, ReadAMAddress, 2,ReadAM, 2);
 	if (cpustate->op2 >= 0 && cpustate->op2 <= 28)
 	{
-	  if (cpustate->flag1 &&(!(OpRead8(cpustate->program, cpustate->PC + 1)&0x80 && OpRead8(cpustate->program, cpustate->PC + 2) == 0xf4 ) ))
+	  if (cpustate->flag1 &&(!(OpRead8(cpustate, cpustate->PC + 1)&0x80 && OpRead8(cpustate, cpustate->PC + 2) == 0xf4 ) ))
 			cpustate->reg[cpustate->op2 + 36] = cpustate->reg[cpustate->op1];
 		else
 			cpustate->reg[cpustate->op2 + 36] = cpustate->op1;
@@ -776,22 +776,22 @@ static UINT32 opLDTASK(v60_state *cpustate)
 
 	cpustate->TR = cpustate->op2;
 
-	cpustate->TKCW = MemRead32(cpustate->program, cpustate->op2);
+	cpustate->TKCW = cpustate->program->read_dword_unaligned(cpustate->op2);
 	cpustate->op2 += 4;
 	if(cpustate->SYCW & 0x100) {
-		cpustate->L0SP = MemRead32(cpustate->program, cpustate->op2);
+		cpustate->L0SP = cpustate->program->read_dword_unaligned(cpustate->op2);
 		cpustate->op2 += 4;
 	}
 	if(cpustate->SYCW & 0x200) {
-		cpustate->L1SP = MemRead32(cpustate->program, cpustate->op2);
+		cpustate->L1SP = cpustate->program->read_dword_unaligned(cpustate->op2);
 		cpustate->op2 += 4;
 	}
 	if(cpustate->SYCW & 0x400) {
-		cpustate->L2SP = MemRead32(cpustate->program, cpustate->op2);
+		cpustate->L2SP = cpustate->program->read_dword_unaligned(cpustate->op2);
 		cpustate->op2 += 4;
 	}
 	if(cpustate->SYCW & 0x800) {
-		cpustate->L3SP = MemRead32(cpustate->program, cpustate->op2);
+		cpustate->L3SP = cpustate->program->read_dword_unaligned(cpustate->op2);
 		cpustate->op2 += 4;
 	}
 
@@ -800,7 +800,7 @@ static UINT32 opLDTASK(v60_state *cpustate)
 	// 31 registers supported, _not_ 32
 	for(i = 0; i < 31; i++)
 		if(cpustate->op1 & (1 << i)) {
-			cpustate->reg[i] = MemRead32(cpustate->program, cpustate->op2);
+			cpustate->reg[i] = cpustate->program->read_dword_unaligned(cpustate->op2);
 			cpustate->op2 += 4;
 		}
 
@@ -822,8 +822,8 @@ static UINT32 opMOVD(v60_state *cpustate) /* TRUSTED */
 	}
 	else
 	{
-		a = MemRead32(cpustate->program, cpustate->op1);
-		b = MemRead32(cpustate->program, cpustate->op1 + 4);
+		a = cpustate->program->read_dword_unaligned(cpustate->op1);
+		b = cpustate->program->read_dword_unaligned(cpustate->op1 + 4);
 	}
 
 	if (cpustate->flag2)
@@ -833,8 +833,8 @@ static UINT32 opMOVD(v60_state *cpustate) /* TRUSTED */
 	}
 	else
 	{
-		MemWrite32(cpustate->program, cpustate->op2, a);
-		MemWrite32(cpustate->program, cpustate->op2 + 4, b);
+		cpustate->program->write_dword_unaligned(cpustate->op2, a);
+		cpustate->program->write_dword_unaligned(cpustate->op2 + 4, b);
 	}
 
 	F12END(cpustate);
@@ -1235,21 +1235,21 @@ static UINT32 opORW(v60_state *cpustate) /* TRUSTED (C too!) */
 static UINT32 opOUTB(v60_state *cpustate)
 {
 	F12DecodeOperands(cpustate, ReadAM, 0,ReadAMAddress, 2);
-	MemWrite8(cpustate->io, cpustate->op2,(UINT8)cpustate->op1);
+	cpustate->io->write_byte(cpustate->op2,(UINT8)cpustate->op1);
 	F12END(cpustate);
 }
 
 static UINT32 opOUTH(v60_state *cpustate)
 {
 	F12DecodeOperands(cpustate, ReadAM, 1,ReadAMAddress, 2);
-	MemWrite16(cpustate->io, cpustate->op2,(UINT16)cpustate->op1);
+	cpustate->io->write_word_unaligned(cpustate->op2,(UINT16)cpustate->op1);
 	F12END(cpustate);
 }
 
 static UINT32 opOUTW(v60_state *cpustate)
 {
 	F12DecodeOperands(cpustate, ReadAM, 2,ReadAMAddress, 2);
-	MemWrite32(cpustate->io, cpustate->op2, cpustate->op1);
+	cpustate->io->write_dword_unaligned(cpustate->op2, cpustate->op1);
 	F12END(cpustate);
 }
 
@@ -2328,7 +2328,7 @@ static UINT32 opMULX(v60_state *cpustate)
 	}
 	else
 	{
-		a = MemRead32(cpustate->program, cpustate->op2);
+		a = cpustate->program->read_dword_unaligned(cpustate->op2);
 	}
 
 	res = (INT64)a * (INT64)(INT32)cpustate->op1;
@@ -2346,8 +2346,8 @@ static UINT32 opMULX(v60_state *cpustate)
 	}
 	else
 	{
-		MemWrite32(cpustate->program, cpustate->op2, a);
-		MemWrite32(cpustate->program, cpustate->op2 + 4, b);
+		cpustate->program->write_dword_unaligned(cpustate->op2, a);
+		cpustate->program->write_dword_unaligned(cpustate->op2 + 4, b);
 	}
 
 	F12END(cpustate);
@@ -2366,7 +2366,7 @@ static UINT32 opMULUX(v60_state *cpustate)
 	}
 	else
 	{
-		a = MemRead32(cpustate->program, cpustate->op2);
+		a = cpustate->program->read_dword_unaligned(cpustate->op2);
 	}
 
 	res = (UINT64)a * (UINT64)cpustate->op1;
@@ -2383,8 +2383,8 @@ static UINT32 opMULUX(v60_state *cpustate)
 	}
 	else
 	{
-		MemWrite32(cpustate->program, cpustate->op2, a);
-		MemWrite32(cpustate->program, cpustate->op2 + 4, b);
+		cpustate->program->write_dword_unaligned(cpustate->op2, a);
+		cpustate->program->write_dword_unaligned(cpustate->op2 + 4, b);
 	}
 
 	F12END(cpustate);

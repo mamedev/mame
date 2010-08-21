@@ -22,7 +22,6 @@
 
 
 #include "i86time.c"
-#include "i86mem.h"
 
 /***************************************************************************/
 /* cpu state                                                               */
@@ -38,6 +37,7 @@ typedef struct _i80286_state i80286_state;
 struct _i80286_state
 {
     i80286basicregs regs;
+    offs_t fetch_xor;
 	UINT32	amask;			/* address mask */
     UINT32  pc;
     UINT32  prevpc;
@@ -74,7 +74,6 @@ struct _i80286_state
 
 	int halted;         /* Is the CPU halted ? */
 
-	memory_interface	mem;
 	int icount;
 	unsigned prefix_base;
 	char seg_prefix;
@@ -114,7 +113,6 @@ static struct i80x86_timing timing;
 #include "instr86.c"
 #include "instr186.c"
 #include "instr286.c"
-#include "i86mem.c"
 
 static void i80286_urinit(void)
 {
@@ -303,7 +301,7 @@ static CPU_INIT( i80286 )
 	else
 		cpustate->amask = 0x00ffff;
 
-	configure_memory_16bit(cpustate);
+	cpustate->fetch_xor = BYTE_XOR_LE(0);
 }
 
 

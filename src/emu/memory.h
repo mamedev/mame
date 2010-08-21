@@ -384,15 +384,33 @@ public:
 
 	// read accessors
 	virtual UINT8 read_byte(offs_t byteaddress) = 0;
-	virtual UINT16 read_word(offs_t byteaddress, UINT16 mask = 0xffff) = 0;
-	virtual UINT32 read_dword(offs_t byteaddress, UINT32 mask = 0xffffffff) = 0;
-	virtual UINT64 read_qword(offs_t byteaddress, UINT64 mask = U64(0xffffffffffffffff)) = 0;
+	virtual UINT16 read_word(offs_t byteaddress) = 0;
+	virtual UINT16 read_word(offs_t byteaddress, UINT16 mask) = 0;
+	virtual UINT16 read_word_unaligned(offs_t byteaddress) = 0;
+	virtual UINT16 read_word_unaligned(offs_t byteaddress, UINT16 mask) = 0;
+	virtual UINT32 read_dword(offs_t byteaddress) = 0;
+	virtual UINT32 read_dword(offs_t byteaddress, UINT32 mask) = 0;
+	virtual UINT32 read_dword_unaligned(offs_t byteaddress) = 0;
+	virtual UINT32 read_dword_unaligned(offs_t byteaddress, UINT32 mask) = 0;
+	virtual UINT64 read_qword(offs_t byteaddress) = 0;
+	virtual UINT64 read_qword(offs_t byteaddress, UINT64 mask) = 0;
+	virtual UINT64 read_qword_unaligned(offs_t byteaddress) = 0;
+	virtual UINT64 read_qword_unaligned(offs_t byteaddress, UINT64 mask) = 0;
 
 	// write accessors
 	virtual void write_byte(offs_t byteaddress, UINT8 data) = 0;
-	virtual void write_word(offs_t byteaddress, UINT16 data, UINT16 mask = 0xffff) = 0;
-	virtual void write_dword(offs_t byteaddress, UINT32 data, UINT32 mask = 0xffffffff) = 0;
-	virtual void write_qword(offs_t byteaddress, UINT64 data, UINT64 mask = U64(0xffffffffffffffff)) = 0;
+	virtual void write_word(offs_t byteaddress, UINT16 data) = 0;
+	virtual void write_word(offs_t byteaddress, UINT16 data, UINT16 mask) = 0;
+	virtual void write_word_unaligned(offs_t byteaddress, UINT16 data) = 0;
+	virtual void write_word_unaligned(offs_t byteaddress, UINT16 data, UINT16 mask) = 0;
+	virtual void write_dword(offs_t byteaddress, UINT32 data) = 0;
+	virtual void write_dword(offs_t byteaddress, UINT32 data, UINT32 mask) = 0;
+	virtual void write_dword_unaligned(offs_t byteaddress, UINT32 data) = 0;
+	virtual void write_dword_unaligned(offs_t byteaddress, UINT32 data, UINT32 mask) = 0;
+	virtual void write_qword(offs_t byteaddress, UINT64 data) = 0;
+	virtual void write_qword(offs_t byteaddress, UINT64 data, UINT64 mask) = 0;
+	virtual void write_qword_unaligned(offs_t byteaddress, UINT64 data) = 0;
+	virtual void write_qword_unaligned(offs_t byteaddress, UINT64 data, UINT64 mask) = 0;
 
 	// address-to-byte conversion helpers
 	offs_t address_to_byte(offs_t address) const { return m_config.addr2byte(address); }

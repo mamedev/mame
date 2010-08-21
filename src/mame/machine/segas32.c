@@ -38,11 +38,12 @@ static void nec_v25_cpu_decrypt(running_machine *machine)
 	int i;
 	address_space *space = cputag_get_address_space(machine, "mcu", ADDRESS_SPACE_PROGRAM);
 	UINT8 *rom = memory_region(machine, "mcu");
-	UINT8* decrypted = auto_alloc_array(machine, UINT8, 0x100000);
+	UINT8* decrypted = auto_alloc_array(machine, UINT8, 0x10000);
 	UINT8* temp = auto_alloc_array(machine, UINT8, 0x100000);
 
 	// set CPU3 opcode base
-	space->set_decrypted_region(0x00000, 0xfffff, decrypted);
+	space->set_decrypted_region(0x00000, 0x0ffff, decrypted);
+	space->set_decrypted_region(0xf0000, 0xfffff, decrypted);
 
 	// make copy of ROM so original can be overwritten
 	memcpy(temp, rom, 0x10000);
@@ -57,9 +58,6 @@ static void nec_v25_cpu_decrypt(running_machine *machine)
 		// decryped opcodes with address swap undone
 		decrypted[i] = ga2_v25_opcode_table[ temp[j] ];
 	}
-
-	memcpy(rom+0xf0000, rom, 0x10000);
-	memcpy(decrypted+0xf0000, decrypted, 0x10000);
 
 	auto_free(machine, temp);
 }

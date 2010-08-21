@@ -84,15 +84,15 @@ typedef enum {
 
 /************************************************************************/
 
-#define read_mem_byte(a)			(*cpustate->mem.rbyte)(cpustate->program, a)
-#define read_mem_word(a)			(*cpustate->mem.rword)(cpustate->program, a)
-#define write_mem_byte(a,d)			(*cpustate->mem.wbyte)(cpustate->program, (a),(d))
-#define write_mem_word(a,d)			(*cpustate->mem.wword)(cpustate->program, (a),(d))
+#define read_mem_byte(a)			cpustate->program->read_byte(a)
+#define read_mem_word(a)			cpustate->program->read_word_unaligned(a)
+#define write_mem_byte(a,d)			cpustate->program->write_byte((a),(d))
+#define write_mem_word(a,d)			cpustate->program->write_word_unaligned((a),(d))
 
-#define read_port_byte(a)		(*cpustate->mem.rbyte)(cpustate->io, a)
-#define read_port_word(a)		(*cpustate->mem.rword)(cpustate->io, a)
-#define write_port_byte(a,d)	(*cpustate->mem.wbyte)(cpustate->io, (a),(d))
-#define write_port_word(a,d)	(*cpustate->mem.wword)(cpustate->io, (a),(d))
+#define read_port_byte(a)		cpustate->io->read_byte(a)
+#define read_port_word(a)		cpustate->io->read_word_unaligned(a)
+#define write_port_byte(a,d)	cpustate->io->write_byte((a),(d))
+#define write_port_word(a,d)	cpustate->io->write_word_unaligned((a),(d))
 
 /************************************************************************/
 
@@ -111,7 +111,7 @@ typedef enum {
 #define WriteByte(ea,val)		write_mem_byte((ea) & AMASK, val);
 #define WriteWord(ea,val)		write_mem_word((ea) & AMASK, val);
 
-#define FETCH_XOR(a)			((a) ^ cpustate->mem.fetch_xor)
+#define FETCH_XOR(a)			((a) ^ cpustate->fetch_xor)
 #define FETCH					(cpustate->direct->read_raw_byte(FETCH_XOR(cpustate->pc++)))
 #define FETCHOP					(cpustate->direct->read_decrypted_byte(FETCH_XOR(cpustate->pc++)))
 #define PEEKOP(addr)			(cpustate->direct->read_decrypted_byte(FETCH_XOR(addr)))

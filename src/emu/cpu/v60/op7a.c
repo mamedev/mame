@@ -39,7 +39,7 @@ static void F7aDecodeOperands(v60_state *cpustate, UINT32 (*DecodeOp1)(v60_state
 	cpustate->op1 = cpustate->amout;
 
 	// Decode length
-	appb = OpRead8(cpustate->program, cpustate->PC + 2 + cpustate->amlength1);
+	appb = OpRead8(cpustate, cpustate->PC + 2 + cpustate->amlength1);
 	if (appb & 0x80)
 		cpustate->lenop1 = cpustate->reg[appb & 0x1F];
 	else
@@ -54,7 +54,7 @@ static void F7aDecodeOperands(v60_state *cpustate, UINT32 (*DecodeOp1)(v60_state
 	cpustate->op2 = cpustate->amout;
 
 	// Decode length
-	appb = OpRead8(cpustate->program, cpustate->PC + 3 + cpustate->amlength1 + cpustate->amlength2);
+	appb = OpRead8(cpustate, cpustate->PC + 3 + cpustate->amlength1 + cpustate->amlength2);
 	if (appb & 0x80)
 		cpustate->lenop2 = cpustate->reg[appb & 0x1F];
 	else
@@ -73,7 +73,7 @@ static void F7bDecodeFirstOperand(v60_state *cpustate, UINT32 (*DecodeOp1)(v60_s
 	cpustate->op1 = cpustate->amout;
 
 	// Decode ext
-	appb = OpRead8(cpustate->program, cpustate->PC + 2 + cpustate->amlength1);
+	appb = OpRead8(cpustate, cpustate->PC + 2 + cpustate->amlength1);
 	if (appb & 0x80)
 		cpustate->lenop1 = cpustate->reg[appb & 0x1F];
 	else
@@ -126,7 +126,7 @@ static void F7cDecodeOperands(v60_state *cpustate, UINT32 (*DecodeOp1)(v60_state
 	cpustate->op2 = cpustate->amout;
 
 	// Decode ext
-	appb = OpRead8(cpustate->program, cpustate->PC + 2 + cpustate->amlength1 + cpustate->amlength2);
+	appb = OpRead8(cpustate, cpustate->PC + 2 + cpustate->amlength1 + cpustate->amlength2);
 	if (appb & 0x80)
 		cpustate->lenop1 = cpustate->reg[appb & 0x1F];
 	else
@@ -137,26 +137,26 @@ static void F7cDecodeOperands(v60_state *cpustate, UINT32 (*DecodeOp1)(v60_state
 	if ((cs)->flag1) \
 		appb = (UINT8)((cs)->reg[(cs)->op1]&0xFF); \
 	else \
-		appb = MemRead8((cs)->program, (cs)->op1);
+		appb = (cs)->program->read_byte((cs)->op1);
 
 #define F7CLOADOP2BYTE(cs,appb) \
 	if ((cs)->flag2) \
 		appb = (UINT8)((cs)->reg[(cs)->op2]&0xFF); \
 	else \
-		appb = MemRead8((cs)->program, (cs)->op2);
+		appb = (cs)->program->read_byte((cs)->op2);
 
 
 #define F7CSTOREOP2BYTE(cs) \
 	if ((cs)->flag2) \
 		SETREG8((cs)->reg[(cs)->op2], appb); \
 	else \
-		MemWrite8((cs)->program, (cs)->op2, appb);
+		(cs)->program->write_byte((cs)->op2, appb);
 
 #define F7CSTOREOP2HALF(cs) \
 	if ((cs)->flag2) \
 		SETREG16((cs)->reg[(cs)->op2], apph); \
 	else \
-		MemWrite16((cs)->program, (cs)->op2, apph);
+		(cs)->program->write_word_unaligned((cs)->op2, apph);
 
 static UINT32 opCMPSTRB(v60_state *cpustate, UINT8 bFill, UINT8 bStop)
 {
@@ -171,12 +171,12 @@ static UINT32 opCMPSTRB(v60_state *cpustate, UINT8 bFill, UINT8 bStop)
 		if (cpustate->lenop1 < cpustate->lenop2)
 		{
 			for (i = cpustate->lenop1; i < cpustate->lenop2; i++)
-				MemWrite8(cpustate->program, cpustate->op1 + i,(UINT8)cpustate->R26);
+				cpustate->program->write_byte(cpustate->op1 + i,(UINT8)cpustate->R26);
 		}
 		else if (cpustate->lenop2 < cpustate->lenop1)
 		{
 			for (i = cpustate->lenop2; i < cpustate->lenop1; i++)
-				MemWrite8(cpustate->program, cpustate->op2 + i,(UINT8)cpustate->R26);
+				cpustate->program->write_byte(cpustate->op2 + i,(UINT8)cpustate->R26);
 		}
 	}
 
@@ -188,8 +188,8 @@ static UINT32 opCMPSTRB(v60_state *cpustate, UINT8 bFill, UINT8 bStop)
 
 	for (i = 0; i < dest; i++)
 	{
-		c1 = MemRead8(cpustate->program, cpustate->op1 + i);
-		c2 = MemRead8(cpustate->program, cpustate->op2 + i);
+		c1 = cpustate->program->read_byte(cpustate->op1 + i);
+		c2 = cpustate->program->read_byte(cpustate->op2 + i);
 
 		if (c1 > c2)
 		{
@@ -237,12 +237,12 @@ static UINT32 opCMPSTRH(v60_state *cpustate, UINT8 bFill, UINT8 bStop)
 		if (cpustate->lenop1 < cpustate->lenop2)
 		{
 			for (i = cpustate->lenop1; i < cpustate->lenop2; i++)
-				MemWrite16(cpustate->program, cpustate->op1 + i * 2,(UINT16)cpustate->R26);
+				cpustate->program->write_word_unaligned(cpustate->op1 + i * 2,(UINT16)cpustate->R26);
 		}
 		else if (cpustate->lenop2 < cpustate->lenop1)
 		{
 			for (i = cpustate->lenop2; i < cpustate->lenop1; i++)
-				MemWrite16(cpustate->program, cpustate->op2 + i * 2,(UINT16)cpustate->R26);
+				cpustate->program->write_word_unaligned(cpustate->op2 + i * 2,(UINT16)cpustate->R26);
 		}
 	}
 
@@ -254,8 +254,8 @@ static UINT32 opCMPSTRH(v60_state *cpustate, UINT8 bFill, UINT8 bStop)
 
 	for (i = 0; i < dest; i++)
 	{
-		c1 = MemRead16(cpustate->program, cpustate->op1 + i * 2);
-		c2 = MemRead16(cpustate->program, cpustate->op2 + i * 2);
+		c1 = cpustate->program->read_word_unaligned(cpustate->op1 + i * 2);
+		c2 = cpustate->program->read_word_unaligned(cpustate->op2 + i * 2);
 
 		if (c1 > c2)
 		{
@@ -308,7 +308,7 @@ static UINT32 opMOVSTRUB(v60_state *cpustate, UINT8 bFill, UINT8 bStop) /* TRUST
 
 	for (i = 0; i < dest; i++)
 	{
-		MemWrite8(cpustate->program, cpustate->op2 + i,(c1 = MemRead8(cpustate->program, cpustate->op1 + i)));
+		cpustate->program->write_byte(cpustate->op2 + i,(c1 = cpustate->program->read_byte(cpustate->op1 + i)));
 
 		if (bStop && c1 == (UINT8)cpustate->R26)
 			break;
@@ -320,7 +320,7 @@ static UINT32 opMOVSTRUB(v60_state *cpustate, UINT8 bFill, UINT8 bStop) /* TRUST
 	if (bFill && cpustate->lenop1 < cpustate->lenop2)
 	{
 		for (;i < cpustate->lenop2; i++)
-			MemWrite8(cpustate->program, cpustate->op2 + i,(UINT8)cpustate->R26);
+			cpustate->program->write_byte(cpustate->op2 + i,(UINT8)cpustate->R26);
 
 		cpustate->R27 = cpustate->op2 + i;
 	}
@@ -340,7 +340,7 @@ static UINT32 opMOVSTRDB(v60_state *cpustate, UINT8 bFill, UINT8 bStop)
 
 	for (i = 0; i < dest; i++)
 	{
-		MemWrite8(cpustate->program, cpustate->op2 + (dest - i - 1),(c1 = MemRead8(cpustate->program, cpustate->op1 + (dest - i - 1))));
+		cpustate->program->write_byte(cpustate->op2 + (dest - i - 1),(c1 = cpustate->program->read_byte(cpustate->op1 + (dest - i - 1))));
 
 		if (bStop && c1 == (UINT8)cpustate->R26)
 			break;
@@ -352,7 +352,7 @@ static UINT32 opMOVSTRDB(v60_state *cpustate, UINT8 bFill, UINT8 bStop)
 	if (bFill && cpustate->lenop1 < cpustate->lenop2)
 	{
 		for (;i < cpustate->lenop2; i++)
-			MemWrite8(cpustate->program, cpustate->op2 + dest + (cpustate->lenop2 - i - 1),(UINT8)cpustate->R26);
+			cpustate->program->write_byte(cpustate->op2 + dest + (cpustate->lenop2 - i - 1),(UINT8)cpustate->R26);
 
 		cpustate->R27 = cpustate->op2 + (cpustate->lenop2 - i - 1);
 	}
@@ -376,7 +376,7 @@ static UINT32 opMOVSTRUH(v60_state *cpustate, UINT8 bFill, UINT8 bStop) /* TRUST
 
 	for (i = 0; i < dest; i++)
 	{
-		MemWrite16(cpustate->program, cpustate->op2 + i * 2,(c1 = MemRead16(cpustate->program, cpustate->op1 + i * 2)));
+		cpustate->program->write_word_unaligned(cpustate->op2 + i * 2,(c1 = cpustate->program->read_word_unaligned(cpustate->op1 + i * 2)));
 
 		if (bStop && c1 == (UINT16)cpustate->R26)
 			break;
@@ -388,7 +388,7 @@ static UINT32 opMOVSTRUH(v60_state *cpustate, UINT8 bFill, UINT8 bStop) /* TRUST
 	if (bFill && cpustate->lenop1 < cpustate->lenop2)
 	{
 		for (;i < cpustate->lenop2; i++)
-			MemWrite16(cpustate->program, cpustate->op2 + i * 2,(UINT16)cpustate->R26);
+			cpustate->program->write_word_unaligned(cpustate->op2 + i * 2,(UINT16)cpustate->R26);
 
 		cpustate->R27 = cpustate->op2 + i * 2;
 	}
@@ -413,7 +413,7 @@ static UINT32 opMOVSTRDH(v60_state *cpustate, UINT8 bFill, UINT8 bStop)
 
 	for (i = 0; i < dest; i++)
 	{
-		MemWrite16(cpustate->program, cpustate->op2 + (dest - i - 1) * 2,(c1 = MemRead16(cpustate->program, cpustate->op1 + (dest - i - 1) * 2)));
+		cpustate->program->write_word_unaligned(cpustate->op2 + (dest - i - 1) * 2,(c1 = cpustate->program->read_word_unaligned(cpustate->op1 + (dest - i - 1) * 2)));
 
 		if (bStop && c1 == (UINT16)cpustate->R26)
 			break;
@@ -425,7 +425,7 @@ static UINT32 opMOVSTRDH(v60_state *cpustate, UINT8 bFill, UINT8 bStop)
 	if (bFill && cpustate->lenop1 < cpustate->lenop2)
 	{
 		for (;i < cpustate->lenop2; i++)
-			MemWrite16(cpustate->program, cpustate->op2 + (cpustate->lenop2 - i - 1) * 2,(UINT16)cpustate->R26);
+			cpustate->program->write_word_unaligned(cpustate->op2 + (cpustate->lenop2 - i - 1) * 2,(UINT16)cpustate->R26);
 
 		cpustate->R27 = cpustate->op2 + (cpustate->lenop2 - i - 1) * 2;
 	}
@@ -442,7 +442,7 @@ static UINT32 opSEARCHUB(v60_state *cpustate, UINT8 bSearch)
 
 	for (i = 0; i < cpustate->lenop1; i++)
 	{
-		appb = (MemRead8(cpustate->program, cpustate->op1 + i) == (UINT8)cpustate->op2);
+		appb = (cpustate->program->read_byte(cpustate->op1 + i) == (UINT8)cpustate->op2);
 		if ((bSearch && appb) || (!bSearch && !appb))
 			break;
 	}
@@ -468,7 +468,7 @@ static UINT32 opSEARCHUH(v60_state *cpustate, UINT8 bSearch)
 
 	for (i = 0; i < cpustate->lenop1; i++)
 	{
-		appb = (MemRead16(cpustate->program, cpustate->op1 + i * 2) == (UINT16)cpustate->op2);
+		appb = (cpustate->program->read_word_unaligned(cpustate->op1 + i * 2) == (UINT16)cpustate->op2);
 		if ((bSearch && appb) || (!bSearch && !appb))
 			break;
 	}
@@ -493,7 +493,7 @@ static UINT32 opSEARCHDB(v60_state *cpustate, UINT8 bSearch)
 
 	for (i = cpustate->lenop1; i >= 0; i--)
 	{
-		appb = (MemRead8(cpustate->program, cpustate->op1 + i) == (UINT8)cpustate->op2);
+		appb = (cpustate->program->read_byte(cpustate->op1 + i) == (UINT8)cpustate->op2);
 		if ((bSearch && appb) || (!bSearch && !appb))
 			break;
 	}
@@ -519,7 +519,7 @@ static UINT32 opSEARCHDH(v60_state *cpustate, UINT8 bSearch)
 
 	for (i = cpustate->lenop1 - 1; i >= 0; i--)
 	{
-		appb = (MemRead16(cpustate->program, cpustate->op1 + i * 2) == (UINT16)cpustate->op2);
+		appb = (cpustate->program->read_word_unaligned(cpustate->op1 + i * 2) == (UINT16)cpustate->op2);
 		if ((bSearch && appb) || (!bSearch && !appb))
 			break;
 	}
@@ -618,7 +618,7 @@ static UINT32 opSCHBS(v60_state *cpustate, UINT32 bSearch1)
 
 	// Read first UINT8
 	cpustate->op1 += cpustate->bamoffset / 8;
-	data = MemRead8(cpustate->program, cpustate->op1);
+	data = cpustate->program->read_byte(cpustate->op1);
 	offset = cpustate->bamoffset & 7;
 
 	// Scan bitstring
@@ -639,7 +639,7 @@ static UINT32 opSCHBS(v60_state *cpustate, UINT32 bSearch1)
 			// Next UINT8 please
 			offset = 0;
 			cpustate->op1++;
-			data = MemRead8(cpustate->program, cpustate->op1);
+			data = cpustate->program->read_byte(cpustate->op1);
 		}
 	}
 
@@ -664,13 +664,13 @@ static UINT32 opINSBFR(v60_state *cpustate)
 	F7CCREATEBITMASK(cpustate->lenop1);
 
 	cpustate->op2 += cpustate->bamoffset / 8;
-	appw = MemRead32(cpustate->program, cpustate->op2);
+	appw = cpustate->program->read_dword_unaligned(cpustate->op2);
 	cpustate->bamoffset &= 7;
 
 	appw &= ~(cpustate->lenop1 << cpustate->bamoffset);
 	appw |=  (cpustate->lenop1 & cpustate->op1) << cpustate->bamoffset;
 
-	MemWrite32(cpustate->program, cpustate->op2, appw);
+	cpustate->program->write_dword_unaligned(cpustate->op2, appw);
 
 	F7CEND(cpustate);
 }
@@ -685,13 +685,13 @@ static UINT32 opINSBFL(v60_state *cpustate)
 	F7CCREATEBITMASK(cpustate->lenop1);
 
 	cpustate->op2 += cpustate->bamoffset / 8;
-	appw = MemRead32(cpustate->program, cpustate->op2);
+	appw = cpustate->program->read_dword_unaligned(cpustate->op2);
 	cpustate->bamoffset &= 7;
 
 	appw &= ~(cpustate->lenop1 << cpustate->bamoffset);
 	appw |=  (cpustate->lenop1 & cpustate->op1) << cpustate->bamoffset;
 
-	MemWrite32(cpustate->program, cpustate->op2, appw);
+	cpustate->program->write_dword_unaligned(cpustate->op2, appw);
 
 	F7CEND(cpustate);
 }
@@ -715,8 +715,8 @@ static UINT32 opMOVBSD(v60_state *cpustate)
 	cpustate->bamoffset1 &= 7;
 	cpustate->bamoffset2 &= 7;
 
-	srcdata = MemRead8(cpustate->program, cpustate->op1);
-	dstdata = MemRead8(cpustate->program, cpustate->op2);
+	srcdata = cpustate->program->read_byte(cpustate->op1);
+	dstdata = cpustate->program->read_byte(cpustate->op2);
 
 	for (i = 0; i < cpustate->lenop1; i++)
 	{
@@ -731,14 +731,14 @@ static UINT32 opMOVBSD(v60_state *cpustate)
 		{
 			cpustate->bamoffset1 = 8;
 			cpustate->op1--;
-			srcdata = MemRead8(cpustate->program, cpustate->op1);
+			srcdata = cpustate->program->read_byte(cpustate->op1);
 		}
 		if (cpustate->bamoffset2 == 0)
 		{
-			MemWrite8(cpustate->program, cpustate->op2, dstdata);
+			cpustate->program->write_byte(cpustate->op2, dstdata);
 			cpustate->bamoffset2 = 8;
 			cpustate->op2--;
-			dstdata = MemRead8(cpustate->program, cpustate->op2);
+			dstdata = cpustate->program->read_byte(cpustate->op2);
 		}
 
 		cpustate->bamoffset1--;
@@ -747,7 +747,7 @@ static UINT32 opMOVBSD(v60_state *cpustate)
 
 	// Flush of the final data
 	if (cpustate->bamoffset2 != 7)
-		MemWrite8(cpustate->program, cpustate->op2, dstdata);
+		cpustate->program->write_byte(cpustate->op2, dstdata);
 
 	F7BEND(cpustate);
 }
@@ -765,8 +765,8 @@ static UINT32 opMOVBSU(v60_state *cpustate)
 	cpustate->bamoffset1 &= 7;
 	cpustate->bamoffset2 &= 7;
 
-	srcdata = MemRead8(cpustate->program, cpustate->op1);
-	dstdata = MemRead8(cpustate->program, cpustate->op2);
+	srcdata = cpustate->program->read_byte(cpustate->op1);
+	dstdata = cpustate->program->read_byte(cpustate->op2);
 
 	for (i = 0; i < cpustate->lenop1; i++)
 	{
@@ -783,20 +783,20 @@ static UINT32 opMOVBSU(v60_state *cpustate)
 		{
 			cpustate->bamoffset1 = 0;
 			cpustate->op1++;
-			srcdata = MemRead8(cpustate->program, cpustate->op1);
+			srcdata = cpustate->program->read_byte(cpustate->op1);
 		}
 		if (cpustate->bamoffset2 == 8)
 		{
-			MemWrite8(cpustate->program, cpustate->op2, dstdata);
+			cpustate->program->write_byte(cpustate->op2, dstdata);
 			cpustate->bamoffset2 = 0;
 			cpustate->op2++;
-			dstdata = MemRead8(cpustate->program, cpustate->op2);
+			dstdata = cpustate->program->read_byte(cpustate->op2);
 		}
 	}
 
 	// Flush of the final data
 	if (cpustate->bamoffset2 != 0)
-		MemWrite8(cpustate->program, cpustate->op2, dstdata);
+		cpustate->program->write_byte(cpustate->op2, dstdata);
 
 	F7BEND(cpustate);
 }
@@ -1177,35 +1177,35 @@ static UINT32 (*const Op5ATable[32])(v60_state *) =
 
 static UINT32 op58(v60_state *cpustate)
 {
-	cpustate->subop = OpRead8(cpustate->program, cpustate->PC + 1);
+	cpustate->subop = OpRead8(cpustate, cpustate->PC + 1);
 
 	return Op58Table[cpustate->subop & 0x1F](cpustate);
 }
 
 static UINT32 op5A(v60_state *cpustate)
 {
-	cpustate->subop = OpRead8(cpustate->program, cpustate->PC + 1);
+	cpustate->subop = OpRead8(cpustate, cpustate->PC + 1);
 
 	return Op5ATable[cpustate->subop & 0x1F](cpustate);
 }
 
 static UINT32 op5B(v60_state *cpustate)
 {
-	cpustate->subop = OpRead8(cpustate->program, cpustate->PC + 1);
+	cpustate->subop = OpRead8(cpustate, cpustate->PC + 1);
 
 	return Op5BTable[cpustate->subop & 0x1F](cpustate);
 }
 
 static UINT32 op5D(v60_state *cpustate)
 {
-	cpustate->subop = OpRead8(cpustate->program, cpustate->PC + 1);
+	cpustate->subop = OpRead8(cpustate, cpustate->PC + 1);
 
 	return Op5DTable[cpustate->subop & 0x1F](cpustate);
 }
 
 static UINT32 op59(v60_state *cpustate)
 {
-	cpustate->subop = OpRead8(cpustate->program, cpustate->PC + 1);
+	cpustate->subop = OpRead8(cpustate, cpustate->PC + 1);
 
 	return Op59Table[cpustate->subop & 0x1F](cpustate);
 }

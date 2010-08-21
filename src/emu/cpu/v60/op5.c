@@ -9,11 +9,11 @@ static UINT32 opBRK(v60_state *cpustate)
     UINT32 oldPSW = v60_update_psw_for_exception(cpustate, 0, 0);
 
     cpustate->SP -=4;
-    MemWrite32(cpustate->program, cpustate->SP, EXCEPTION_CODE_AND_SIZE(0x0d00, 4));
+    cpustate->program->write_dword_unaligned(cpustate->SP, EXCEPTION_CODE_AND_SIZE(0x0d00, 4));
     cpustate->SP -=4;
-    MemWrite32(cpustate->program, cpustate->SP, oldPSW);
+    cpustate->program->write_dword_unaligned(cpustate->SP, oldPSW);
     cpustate->SP -=4;
-    MemWrite32(cpustate->program, cpustate->SP, cpustate->PC + 1);
+    cpustate->program->write_dword_unaligned(cpustate->SP, cpustate->PC + 1);
     cpustate->PC = GETINTVECT(cpustate, 13);
 */
 	logerror("Skipping BRK opcode! cpustate->PC=%x", cpustate->PC);
@@ -26,13 +26,13 @@ static UINT32 opBRKV(v60_state *cpustate)
 	UINT32 oldPSW = v60_update_psw_for_exception(cpustate, 0, 0);
 
 	cpustate->SP -=4;
-	MemWrite32(cpustate->program, cpustate->SP, cpustate->PC);
+	cpustate->program->write_dword_unaligned(cpustate->SP, cpustate->PC);
 	cpustate->SP -=4;
-	MemWrite32(cpustate->program, cpustate->SP, EXCEPTION_CODE_AND_SIZE(0x1501, 4));
+	cpustate->program->write_dword_unaligned(cpustate->SP, EXCEPTION_CODE_AND_SIZE(0x1501, 4));
 	cpustate->SP -=4;
-	MemWrite32(cpustate->program, cpustate->SP, oldPSW);
+	cpustate->program->write_dword_unaligned(cpustate->SP, oldPSW);
 	cpustate->SP -=4;
-	MemWrite32(cpustate->program, cpustate->SP, cpustate->PC + 1);
+	cpustate->program->write_dword_unaligned(cpustate->SP, cpustate->PC + 1);
 	cpustate->PC = GETINTVECT(cpustate, 21);
 
 	return 0;
@@ -48,7 +48,7 @@ static UINT32 opCLRTLBA(v60_state *cpustate)
 static UINT32 opDISPOSE(v60_state *cpustate)
 {
 	cpustate->SP = cpustate->FP;
-	cpustate->FP = MemRead32(cpustate->program, cpustate->SP);
+	cpustate->FP = cpustate->program->read_dword_unaligned(cpustate->SP);
 	cpustate->SP +=4;
 
 	return 1;
@@ -68,7 +68,7 @@ static UINT32 opNOP(v60_state *cpustate) /* TRUSTED */
 
 static UINT32 opRSR(v60_state *cpustate)
 {
-	cpustate->PC = MemRead32(cpustate->program, cpustate->SP);
+	cpustate->PC = cpustate->program->read_dword_unaligned(cpustate->SP);
 	cpustate->SP +=4;
 
 	return 0;

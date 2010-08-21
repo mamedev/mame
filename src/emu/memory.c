@@ -211,6 +211,7 @@
 
 #define MEM_DUMP		(0)
 #define VERBOSE			(0)
+#define TEST_HANDLER	(0)
 
 #define VPRINTF(x)	do { if (VERBOSE) mame_printf_debug x; } while (0)
 
@@ -351,8 +352,8 @@ public:
 
 	// compare a range against our range
 	bool matches_exactly(offs_t bytestart, offs_t byteend) const { return (m_bytestart == bytestart && m_byteend == byteend); }
-	bool fully_covers(offs_t bytestart, offs_t byteend) const { return m_bytestart <= bytestart && m_byteend >= byteend; }
-	bool partially_covers(offs_t bytestart, offs_t byteend) const { return m_bytestart <= byteend && m_byteend >= bytestart; }
+	bool fully_covers(offs_t bytestart, offs_t byteend) const { return (m_bytestart <= bytestart && m_byteend >= byteend); }
+	bool partially_covers(offs_t bytestart, offs_t byteend) const { return (m_bytestart <= byteend && m_byteend >= bytestart); }
 
 	// track and verify address space references to this bank
 	bool references_space(address_space &space, read_or_write readorwrite) const;
@@ -764,7 +765,10 @@ private:
 	_UintType unmap_r(address_space &space, offs_t offset, _UintType mask)
 	{
 		if (m_space.log_unmap() && !m_space.debugger_access())
-			logerror("%s: unmapped %s memory read from %s\n", cpuexec_describe_context(&m_space.m_machine), m_space.name(), core_i64_hex_format(m_space.byte_to_address(offset), m_space.addrchars()));
+			logerror("%s: unmapped %s memory read from %s & %s\n", 
+						cpuexec_describe_context(&m_space.m_machine), m_space.name(), 
+						core_i64_hex_format(m_space.byte_to_address(offset), m_space.addrchars()),
+						core_i64_hex_format(mask, 2 * sizeof(_UintType)));
 		return m_space.unmap();
 	}
 
@@ -817,7 +821,11 @@ private:
 	void unmap_w(address_space &space, offs_t offset, _UintType data, _UintType mask)
 	{
 		if (m_space.log_unmap() && !m_space.debugger_access())
-			logerror("%s: unmapped %s memory write to %s = %x & %x\n", cpuexec_describe_context(&m_space.m_machine), m_space.name(), core_i64_hex_format(m_space.byte_to_address(offset), m_space.addrchars()),(UINT32)data,(UINT32)mask);
+			logerror("%s: unmapped %s memory write to %s = %s & %s\n", 
+					cpuexec_describe_context(&m_space.m_machine), m_space.name(), 
+					core_i64_hex_format(m_space.byte_to_address(offset), m_space.addrchars()),
+					core_i64_hex_format(data, 2 * sizeof(_UintType)),
+					core_i64_hex_format(mask, 2 * sizeof(_UintType)));
 	}
 
 	template<typename _UintType>
@@ -851,10 +859,13 @@ template<typename _NativeType, endianness_t _Endian, bool _Large>
 class address_space_specific : public address_space
 {
 	typedef address_space_specific<_NativeType, _Endian, _Large> this_type;
+	
+	// constants describing the native size
+	static const UINT32 NATIVE_BYTES = sizeof(_NativeType);
+	static const UINT32 NATIVE_MASK = NATIVE_BYTES - 1;
+	static const UINT32 NATIVE_BITS = 8 * NATIVE_BYTES;
 
 	// helpers to simplify core code
-	offs_t endian_xor(offs_t value) { if (_Endian == ENDIANNESS_BIG) value = ~value; return value; }
-	int endian_shift(int levalue, int bevalue) { return (_Endian == ENDIANNESS_LITTLE) ? levalue : bevalue; }
 	UINT32 read_lookup(offs_t byteaddress) const { return _Large ? m_read.lookup_live_large(byteaddress) : m_read.lookup_live_small(byteaddress); }
 	UINT32 write_lookup(offs_t byteaddress) const { return _Large ? m_write.lookup_live_large(byteaddress) : m_write.lookup_live_small(byteaddress); }
 
@@ -863,7 +874,144 @@ public:
 	address_space_specific(device_memory_interface &memory, int spacenum)
 		: address_space(memory, spacenum, _Large),
 		  m_read(*this, _Large),
-		  m_write(*this, _Large) { }
+		  m_write(*this, _Large)
+	{
+#if (TEST_HANDLER)
+		// test code to verify the read/write handlers are touching the correct bits
+		// and returning the correct results
+		
+		// install some dummy RAM for the first 16 bytes with well-known values
+		UINT8 buffer[16];
+		for (int index = 0; index < 16; index++)
+			buffer[index ^ ((_Endian == ENDIANNESS_NATIVE) ? 0 : (data_width()/8 - 1))] = index * 0x11;
+		install_ram(0x00, 0x0f, 0x0f, 0, ROW_READWRITE, buffer);
+		printf("\n\naddress_space(%d, %s, %s)\n", NATIVE_BITS, (_Endian == ENDIANNESS_LITTLE) ? "little" : "big", _Large ? "large" : "small");
+
+		// walk through the first 8 addresses
+		for (int address = 0; address < 8; address++)
+		{
+			// determine expected values
+			UINT64 expected64 = ((UINT64)((address + ((_Endian == ENDIANNESS_LITTLE) ? 7 : 0)) * 0x11) << 56) |
+							    ((UINT64)((address + ((_Endian == ENDIANNESS_LITTLE) ? 6 : 1)) * 0x11) << 48) |
+							    ((UINT64)((address + ((_Endian == ENDIANNESS_LITTLE) ? 5 : 2)) * 0x11) << 40) |
+							    ((UINT64)((address + ((_Endian == ENDIANNESS_LITTLE) ? 4 : 3)) * 0x11) << 32) |
+							    ((UINT64)((address + ((_Endian == ENDIANNESS_LITTLE) ? 3 : 4)) * 0x11) << 24) |
+							    ((UINT64)((address + ((_Endian == ENDIANNESS_LITTLE) ? 2 : 5)) * 0x11) << 16) |
+							    ((UINT64)((address + ((_Endian == ENDIANNESS_LITTLE) ? 1 : 6)) * 0x11) <<  8) |
+							    ((UINT64)((address + ((_Endian == ENDIANNESS_LITTLE) ? 0 : 7)) * 0x11) <<  0);
+			UINT32 expected32 = (_Endian == ENDIANNESS_LITTLE) ? expected64 : (expected64 >> 32);
+			UINT16 expected16 = (_Endian == ENDIANNESS_LITTLE) ? expected32 : (expected32 >> 16);
+			UINT8 expected8 = (_Endian == ENDIANNESS_LITTLE) ? expected16 : (expected16 >> 8);
+			
+			UINT64 result64;
+			UINT32 result32;
+			UINT16 result16;
+			UINT8 result8;
+		
+			// validate byte accesses
+			printf("\nAddress %d\n", address);
+			printf("   read_byte = "); printf("%02X\n", result8 = read_byte(address)); assert(result8 == expected8);
+
+			// validate word accesses (if aligned)
+			if (address % 2 == 0) { printf("   read_word = "); printf("%04X\n", result16 = read_word(address)); assert(result16 == expected16); }
+			if (address % 2 == 0) { printf("   read_word (0xff00) = "); printf("%04X\n", result16 = read_word(address, 0xff00)); assert((result16 & 0xff00) == (expected16 & 0xff00)); }
+			if (address % 2 == 0) { printf("             (0x00ff) = "); printf("%04X\n", result16 = read_word(address, 0x00ff)); assert((result16 & 0x00ff) == (expected16 & 0x00ff)); }
+
+			// validate unaligned word accesses
+			printf("   read_word_unaligned = "); printf("%04X\n", result16 = read_word_unaligned(address)); assert(result16 == expected16);
+			printf("   read_word_unaligned (0xff00) = "); printf("%04X\n", result16 = read_word_unaligned(address, 0xff00)); assert((result16 & 0xff00) == (expected16 & 0xff00));
+			printf("                       (0x00ff) = "); printf("%04X\n", result16 = read_word_unaligned(address, 0x00ff)); assert((result16 & 0x00ff) == (expected16 & 0x00ff));
+
+			// validate dword acceses (if aligned)
+			if (address % 4 == 0) { printf("   read_dword = "); printf("%08X\n", result32 = read_dword(address)); assert(result32 == expected32); }
+			if (address % 4 == 0) { printf("   read_dword (0xff000000) = "); printf("%08X\n", result32 = read_dword(address, 0xff000000)); assert((result32 & 0xff000000) == (expected32 & 0xff000000)); }
+			if (address % 4 == 0) { printf("              (0x00ff0000) = "); printf("%08X\n", result32 = read_dword(address, 0x00ff0000)); assert((result32 & 0x00ff0000) == (expected32 & 0x00ff0000)); }
+			if (address % 4 == 0) { printf("              (0x0000ff00) = "); printf("%08X\n", result32 = read_dword(address, 0x0000ff00)); assert((result32 & 0x0000ff00) == (expected32 & 0x0000ff00)); }
+			if (address % 4 == 0) { printf("              (0x000000ff) = "); printf("%08X\n", result32 = read_dword(address, 0x000000ff)); assert((result32 & 0x000000ff) == (expected32 & 0x000000ff)); }
+			if (address % 4 == 0) { printf("              (0xffff0000) = "); printf("%08X\n", result32 = read_dword(address, 0xffff0000)); assert((result32 & 0xffff0000) == (expected32 & 0xffff0000)); }
+			if (address % 4 == 0) { printf("              (0x0000ffff) = "); printf("%08X\n", result32 = read_dword(address, 0x0000ffff)); assert((result32 & 0x0000ffff) == (expected32 & 0x0000ffff)); }
+			if (address % 4 == 0) { printf("              (0xffffff00) = "); printf("%08X\n", result32 = read_dword(address, 0xffffff00)); assert((result32 & 0xffffff00) == (expected32 & 0xffffff00)); }
+			if (address % 4 == 0) { printf("              (0x00ffffff) = "); printf("%08X\n", result32 = read_dword(address, 0x00ffffff)); assert((result32 & 0x00ffffff) == (expected32 & 0x00ffffff)); }
+
+			// validate unaligned dword accesses
+			printf("   read_dword_unaligned = "); printf("%08X\n", result32 = read_dword_unaligned(address)); assert(result32 == expected32); 
+			printf("   read_dword_unaligned (0xff000000) = "); printf("%08X\n", result32 = read_dword_unaligned(address, 0xff000000)); assert((result32 & 0xff000000) == (expected32 & 0xff000000));
+			printf("                        (0x00ff0000) = "); printf("%08X\n", result32 = read_dword_unaligned(address, 0x00ff0000)); assert((result32 & 0x00ff0000) == (expected32 & 0x00ff0000));
+			printf("                        (0x0000ff00) = "); printf("%08X\n", result32 = read_dword_unaligned(address, 0x0000ff00)); assert((result32 & 0x0000ff00) == (expected32 & 0x0000ff00));
+			printf("                        (0x000000ff) = "); printf("%08X\n", result32 = read_dword_unaligned(address, 0x000000ff)); assert((result32 & 0x000000ff) == (expected32 & 0x000000ff));
+			printf("                        (0xffff0000) = "); printf("%08X\n", result32 = read_dword_unaligned(address, 0xffff0000)); assert((result32 & 0xffff0000) == (expected32 & 0xffff0000));
+			printf("                        (0x0000ffff) = "); printf("%08X\n", result32 = read_dword_unaligned(address, 0x0000ffff)); assert((result32 & 0x0000ffff) == (expected32 & 0x0000ffff));
+			printf("                        (0xffffff00) = "); printf("%08X\n", result32 = read_dword_unaligned(address, 0xffffff00)); assert((result32 & 0xffffff00) == (expected32 & 0xffffff00));
+			printf("                        (0x00ffffff) = "); printf("%08X\n", result32 = read_dword_unaligned(address, 0x00ffffff)); assert((result32 & 0x00ffffff) == (expected32 & 0x00ffffff));
+
+			// validate qword acceses (if aligned)
+			if (address % 8 == 0) { printf("   read_qword = "); printf("%s\n", core_i64_hex_format(result64 = read_qword(address), 16)); assert(result64 == expected64); }
+			if (address % 8 == 0) { printf("   read_qword (0xff00000000000000) = "); printf("%s\n", core_i64_hex_format(result64 = read_qword(address, U64(0xff00000000000000)), 16)); assert((result64 & U64(0xff00000000000000)) == (expected64 & U64(0xff00000000000000))); }
+			if (address % 8 == 0) { printf("              (0x00ff000000000000) = "); printf("%s\n", core_i64_hex_format(result64 = read_qword(address, U64(0x00ff000000000000)), 16)); assert((result64 & U64(0x00ff000000000000)) == (expected64 & U64(0x00ff000000000000))); }
+			if (address % 8 == 0) { printf("              (0x0000ff0000000000) = "); printf("%s\n", core_i64_hex_format(result64 = read_qword(address, U64(0x0000ff0000000000)), 16)); assert((result64 & U64(0x0000ff0000000000)) == (expected64 & U64(0x0000ff0000000000))); }
+			if (address % 8 == 0) { printf("              (0x000000ff00000000) = "); printf("%s\n", core_i64_hex_format(result64 = read_qword(address, U64(0x000000ff00000000)), 16)); assert((result64 & U64(0x000000ff00000000)) == (expected64 & U64(0x000000ff00000000))); }
+			if (address % 8 == 0) { printf("              (0x00000000ff000000) = "); printf("%s\n", core_i64_hex_format(result64 = read_qword(address, U64(0x00000000ff000000)), 16)); assert((result64 & U64(0x00000000ff000000)) == (expected64 & U64(0x00000000ff000000))); }
+			if (address % 8 == 0) { printf("              (0x0000000000ff0000) = "); printf("%s\n", core_i64_hex_format(result64 = read_qword(address, U64(0x0000000000ff0000)), 16)); assert((result64 & U64(0x0000000000ff0000)) == (expected64 & U64(0x0000000000ff0000))); }
+			if (address % 8 == 0) { printf("              (0x000000000000ff00) = "); printf("%s\n", core_i64_hex_format(result64 = read_qword(address, U64(0x000000000000ff00)), 16)); assert((result64 & U64(0x000000000000ff00)) == (expected64 & U64(0x000000000000ff00))); }
+			if (address % 8 == 0) { printf("              (0x00000000000000ff) = "); printf("%s\n", core_i64_hex_format(result64 = read_qword(address, U64(0x00000000000000ff)), 16)); assert((result64 & U64(0x00000000000000ff)) == (expected64 & U64(0x00000000000000ff))); }
+			if (address % 8 == 0) { printf("              (0xffff000000000000) = "); printf("%s\n", core_i64_hex_format(result64 = read_qword(address, U64(0xffff000000000000)), 16)); assert((result64 & U64(0xffff000000000000)) == (expected64 & U64(0xffff000000000000))); }
+			if (address % 8 == 0) { printf("              (0x0000ffff00000000) = "); printf("%s\n", core_i64_hex_format(result64 = read_qword(address, U64(0x0000ffff00000000)), 16)); assert((result64 & U64(0x0000ffff00000000)) == (expected64 & U64(0x0000ffff00000000))); }
+			if (address % 8 == 0) { printf("              (0x00000000ffff0000) = "); printf("%s\n", core_i64_hex_format(result64 = read_qword(address, U64(0x00000000ffff0000)), 16)); assert((result64 & U64(0x00000000ffff0000)) == (expected64 & U64(0x00000000ffff0000))); }
+			if (address % 8 == 0) { printf("              (0x000000000000ffff) = "); printf("%s\n", core_i64_hex_format(result64 = read_qword(address, U64(0x000000000000ffff)), 16)); assert((result64 & U64(0x000000000000ffff)) == (expected64 & U64(0x000000000000ffff))); }
+			if (address % 8 == 0) { printf("              (0xffffff0000000000) = "); printf("%s\n", core_i64_hex_format(result64 = read_qword(address, U64(0xffffff0000000000)), 16)); assert((result64 & U64(0xffffff0000000000)) == (expected64 & U64(0xffffff0000000000))); }
+			if (address % 8 == 0) { printf("              (0x0000ffffff000000) = "); printf("%s\n", core_i64_hex_format(result64 = read_qword(address, U64(0x0000ffffff000000)), 16)); assert((result64 & U64(0x0000ffffff000000)) == (expected64 & U64(0x0000ffffff000000))); }
+			if (address % 8 == 0) { printf("              (0x000000ffffff0000) = "); printf("%s\n", core_i64_hex_format(result64 = read_qword(address, U64(0x000000ffffff0000)), 16)); assert((result64 & U64(0x000000ffffff0000)) == (expected64 & U64(0x000000ffffff0000))); }
+			if (address % 8 == 0) { printf("              (0x0000000000ffffff) = "); printf("%s\n", core_i64_hex_format(result64 = read_qword(address, U64(0x0000000000ffffff)), 16)); assert((result64 & U64(0x0000000000ffffff)) == (expected64 & U64(0x0000000000ffffff))); }
+			if (address % 8 == 0) { printf("              (0xffffffff00000000) = "); printf("%s\n", core_i64_hex_format(result64 = read_qword(address, U64(0xffffffff00000000)), 16)); assert((result64 & U64(0xffffffff00000000)) == (expected64 & U64(0xffffffff00000000))); }
+			if (address % 8 == 0) { printf("              (0x00ffffffff000000) = "); printf("%s\n", core_i64_hex_format(result64 = read_qword(address, U64(0x00ffffffff000000)), 16)); assert((result64 & U64(0x00ffffffff000000)) == (expected64 & U64(0x00ffffffff000000))); }
+			if (address % 8 == 0) { printf("              (0x0000ffffffff0000) = "); printf("%s\n", core_i64_hex_format(result64 = read_qword(address, U64(0x0000ffffffff0000)), 16)); assert((result64 & U64(0x0000ffffffff0000)) == (expected64 & U64(0x0000ffffffff0000))); }
+			if (address % 8 == 0) { printf("              (0x000000ffffffff00) = "); printf("%s\n", core_i64_hex_format(result64 = read_qword(address, U64(0x000000ffffffff00)), 16)); assert((result64 & U64(0x000000ffffffff00)) == (expected64 & U64(0x000000ffffffff00))); }
+			if (address % 8 == 0) { printf("              (0x00000000ffffffff) = "); printf("%s\n", core_i64_hex_format(result64 = read_qword(address, U64(0x00000000ffffffff)), 16)); assert((result64 & U64(0x00000000ffffffff)) == (expected64 & U64(0x00000000ffffffff))); }
+			if (address % 8 == 0) { printf("              (0xffffffffff000000) = "); printf("%s\n", core_i64_hex_format(result64 = read_qword(address, U64(0xffffffffff000000)), 16)); assert((result64 & U64(0xffffffffff000000)) == (expected64 & U64(0xffffffffff000000))); }
+			if (address % 8 == 0) { printf("              (0x00ffffffffff0000) = "); printf("%s\n", core_i64_hex_format(result64 = read_qword(address, U64(0x00ffffffffff0000)), 16)); assert((result64 & U64(0x00ffffffffff0000)) == (expected64 & U64(0x00ffffffffff0000))); }
+			if (address % 8 == 0) { printf("              (0x0000ffffffffff00) = "); printf("%s\n", core_i64_hex_format(result64 = read_qword(address, U64(0x0000ffffffffff00)), 16)); assert((result64 & U64(0x0000ffffffffff00)) == (expected64 & U64(0x0000ffffffffff00))); }
+			if (address % 8 == 0) { printf("              (0x000000ffffffffff) = "); printf("%s\n", core_i64_hex_format(result64 = read_qword(address, U64(0x000000ffffffffff)), 16)); assert((result64 & U64(0x000000ffffffffff)) == (expected64 & U64(0x000000ffffffffff))); }
+			if (address % 8 == 0) { printf("              (0xffffffffffff0000) = "); printf("%s\n", core_i64_hex_format(result64 = read_qword(address, U64(0xffffffffffff0000)), 16)); assert((result64 & U64(0xffffffffffff0000)) == (expected64 & U64(0xffffffffffff0000))); }
+			if (address % 8 == 0) { printf("              (0x00ffffffffffff00) = "); printf("%s\n", core_i64_hex_format(result64 = read_qword(address, U64(0x00ffffffffffff00)), 16)); assert((result64 & U64(0x00ffffffffffff00)) == (expected64 & U64(0x00ffffffffffff00))); }
+			if (address % 8 == 0) { printf("              (0x0000ffffffffffff) = "); printf("%s\n", core_i64_hex_format(result64 = read_qword(address, U64(0x0000ffffffffffff)), 16)); assert((result64 & U64(0x0000ffffffffffff)) == (expected64 & U64(0x0000ffffffffffff))); }
+			if (address % 8 == 0) { printf("              (0xffffffffffffff00) = "); printf("%s\n", core_i64_hex_format(result64 = read_qword(address, U64(0xffffffffffffff00)), 16)); assert((result64 & U64(0xffffffffffffff00)) == (expected64 & U64(0xffffffffffffff00))); }
+			if (address % 8 == 0) { printf("              (0x00ffffffffffffff) = "); printf("%s\n", core_i64_hex_format(result64 = read_qword(address, U64(0x00ffffffffffffff)), 16)); assert((result64 & U64(0x00ffffffffffffff)) == (expected64 & U64(0x00ffffffffffffff))); }
+
+			// validate unaligned qword accesses
+			printf("   read_qword_unaligned = "); printf("%s\n", core_i64_hex_format(result64 = read_qword_unaligned(address), 16)); assert(result64 == expected64); 
+			printf("   read_qword_unaligned (0xff00000000000000) = "); printf("%s\n", core_i64_hex_format(result64 = read_qword_unaligned(address, U64(0xff00000000000000)), 16)); assert((result64 & U64(0xff00000000000000)) == (expected64 & U64(0xff00000000000000)));
+			printf("                        (0x00ff000000000000) = "); printf("%s\n", core_i64_hex_format(result64 = read_qword_unaligned(address, U64(0x00ff000000000000)), 16)); assert((result64 & U64(0x00ff000000000000)) == (expected64 & U64(0x00ff000000000000)));
+			printf("                        (0x0000ff0000000000) = "); printf("%s\n", core_i64_hex_format(result64 = read_qword_unaligned(address, U64(0x0000ff0000000000)), 16)); assert((result64 & U64(0x0000ff0000000000)) == (expected64 & U64(0x0000ff0000000000)));
+			printf("                        (0x000000ff00000000) = "); printf("%s\n", core_i64_hex_format(result64 = read_qword_unaligned(address, U64(0x000000ff00000000)), 16)); assert((result64 & U64(0x000000ff00000000)) == (expected64 & U64(0x000000ff00000000)));
+			printf("                        (0x00000000ff000000) = "); printf("%s\n", core_i64_hex_format(result64 = read_qword_unaligned(address, U64(0x00000000ff000000)), 16)); assert((result64 & U64(0x00000000ff000000)) == (expected64 & U64(0x00000000ff000000)));
+			printf("                        (0x0000000000ff0000) = "); printf("%s\n", core_i64_hex_format(result64 = read_qword_unaligned(address, U64(0x0000000000ff0000)), 16)); assert((result64 & U64(0x0000000000ff0000)) == (expected64 & U64(0x0000000000ff0000)));
+			printf("                        (0x000000000000ff00) = "); printf("%s\n", core_i64_hex_format(result64 = read_qword_unaligned(address, U64(0x000000000000ff00)), 16)); assert((result64 & U64(0x000000000000ff00)) == (expected64 & U64(0x000000000000ff00)));
+			printf("                        (0x00000000000000ff) = "); printf("%s\n", core_i64_hex_format(result64 = read_qword_unaligned(address, U64(0x00000000000000ff)), 16)); assert((result64 & U64(0x00000000000000ff)) == (expected64 & U64(0x00000000000000ff)));
+			printf("                        (0xffff000000000000) = "); printf("%s\n", core_i64_hex_format(result64 = read_qword_unaligned(address, U64(0xffff000000000000)), 16)); assert((result64 & U64(0xffff000000000000)) == (expected64 & U64(0xffff000000000000)));
+			printf("                        (0x0000ffff00000000) = "); printf("%s\n", core_i64_hex_format(result64 = read_qword_unaligned(address, U64(0x0000ffff00000000)), 16)); assert((result64 & U64(0x0000ffff00000000)) == (expected64 & U64(0x0000ffff00000000)));
+			printf("                        (0x00000000ffff0000) = "); printf("%s\n", core_i64_hex_format(result64 = read_qword_unaligned(address, U64(0x00000000ffff0000)), 16)); assert((result64 & U64(0x00000000ffff0000)) == (expected64 & U64(0x00000000ffff0000)));
+			printf("                        (0x000000000000ffff) = "); printf("%s\n", core_i64_hex_format(result64 = read_qword_unaligned(address, U64(0x000000000000ffff)), 16)); assert((result64 & U64(0x000000000000ffff)) == (expected64 & U64(0x000000000000ffff)));
+			printf("                        (0xffffff0000000000) = "); printf("%s\n", core_i64_hex_format(result64 = read_qword_unaligned(address, U64(0xffffff0000000000)), 16)); assert((result64 & U64(0xffffff0000000000)) == (expected64 & U64(0xffffff0000000000)));
+			printf("                        (0x0000ffffff000000) = "); printf("%s\n", core_i64_hex_format(result64 = read_qword_unaligned(address, U64(0x0000ffffff000000)), 16)); assert((result64 & U64(0x0000ffffff000000)) == (expected64 & U64(0x0000ffffff000000)));
+			printf("                        (0x000000ffffff0000) = "); printf("%s\n", core_i64_hex_format(result64 = read_qword_unaligned(address, U64(0x000000ffffff0000)), 16)); assert((result64 & U64(0x000000ffffff0000)) == (expected64 & U64(0x000000ffffff0000)));
+			printf("                        (0x0000000000ffffff) = "); printf("%s\n", core_i64_hex_format(result64 = read_qword_unaligned(address, U64(0x0000000000ffffff)), 16)); assert((result64 & U64(0x0000000000ffffff)) == (expected64 & U64(0x0000000000ffffff)));
+			printf("                        (0xffffffff00000000) = "); printf("%s\n", core_i64_hex_format(result64 = read_qword_unaligned(address, U64(0xffffffff00000000)), 16)); assert((result64 & U64(0xffffffff00000000)) == (expected64 & U64(0xffffffff00000000)));
+			printf("                        (0x00ffffffff000000) = "); printf("%s\n", core_i64_hex_format(result64 = read_qword_unaligned(address, U64(0x00ffffffff000000)), 16)); assert((result64 & U64(0x00ffffffff000000)) == (expected64 & U64(0x00ffffffff000000)));
+			printf("                        (0x0000ffffffff0000) = "); printf("%s\n", core_i64_hex_format(result64 = read_qword_unaligned(address, U64(0x0000ffffffff0000)), 16)); assert((result64 & U64(0x0000ffffffff0000)) == (expected64 & U64(0x0000ffffffff0000)));
+			printf("                        (0x000000ffffffff00) = "); printf("%s\n", core_i64_hex_format(result64 = read_qword_unaligned(address, U64(0x000000ffffffff00)), 16)); assert((result64 & U64(0x000000ffffffff00)) == (expected64 & U64(0x000000ffffffff00)));
+			printf("                        (0x00000000ffffffff) = "); printf("%s\n", core_i64_hex_format(result64 = read_qword_unaligned(address, U64(0x00000000ffffffff)), 16)); assert((result64 & U64(0x00000000ffffffff)) == (expected64 & U64(0x00000000ffffffff)));
+			printf("                        (0xffffffffff000000) = "); printf("%s\n", core_i64_hex_format(result64 = read_qword_unaligned(address, U64(0xffffffffff000000)), 16)); assert((result64 & U64(0xffffffffff000000)) == (expected64 & U64(0xffffffffff000000)));
+			printf("                        (0x00ffffffffff0000) = "); printf("%s\n", core_i64_hex_format(result64 = read_qword_unaligned(address, U64(0x00ffffffffff0000)), 16)); assert((result64 & U64(0x00ffffffffff0000)) == (expected64 & U64(0x00ffffffffff0000)));
+			printf("                        (0x0000ffffffffff00) = "); printf("%s\n", core_i64_hex_format(result64 = read_qword_unaligned(address, U64(0x0000ffffffffff00)), 16)); assert((result64 & U64(0x0000ffffffffff00)) == (expected64 & U64(0x0000ffffffffff00)));
+			printf("                        (0x000000ffffffffff) = "); printf("%s\n", core_i64_hex_format(result64 = read_qword_unaligned(address, U64(0x000000ffffffffff)), 16)); assert((result64 & U64(0x000000ffffffffff)) == (expected64 & U64(0x000000ffffffffff)));
+			printf("                        (0xffffffffffff0000) = "); printf("%s\n", core_i64_hex_format(result64 = read_qword_unaligned(address, U64(0xffffffffffff0000)), 16)); assert((result64 & U64(0xffffffffffff0000)) == (expected64 & U64(0xffffffffffff0000)));
+			printf("                        (0x00ffffffffffff00) = "); printf("%s\n", core_i64_hex_format(result64 = read_qword_unaligned(address, U64(0x00ffffffffffff00)), 16)); assert((result64 & U64(0x00ffffffffffff00)) == (expected64 & U64(0x00ffffffffffff00)));
+			printf("                        (0x0000ffffffffffff) = "); printf("%s\n", core_i64_hex_format(result64 = read_qword_unaligned(address, U64(0x0000ffffffffffff)), 16)); assert((result64 & U64(0x0000ffffffffffff)) == (expected64 & U64(0x0000ffffffffffff)));
+			printf("                        (0xffffffffffffff00) = "); printf("%s\n", core_i64_hex_format(result64 = read_qword_unaligned(address, U64(0xffffffffffffff00)), 16)); assert((result64 & U64(0xffffffffffffff00)) == (expected64 & U64(0xffffffffffffff00)));
+			printf("                        (0x00ffffffffffffff) = "); printf("%s\n", core_i64_hex_format(result64 = read_qword_unaligned(address, U64(0x00ffffffffffffff)), 16)); assert((result64 & U64(0x00ffffffffffffff)) == (expected64 & U64(0x00ffffffffffffff)));
+		}
+#endif
+	}
 
 	// accessors
 	virtual address_table_read &read() { return m_read; }
@@ -892,7 +1040,7 @@ public:
 		accessors.write_qword_masked = reinterpret_cast<void (*)(address_space *, offs_t, UINT64, UINT64)>(&write_qword_masked_static);
 	}
 
-	//
+	// return a pointer to the read bank, or NULL if none
 	virtual void *get_read_ptr(offs_t byteaddress)
 	{
 		// perform the lookup
@@ -906,6 +1054,7 @@ public:
 		return handler.ramptr(handler.byteoffset(byteaddress));
 	}
 
+	// return a pointer to the write bank, or NULL if none
 	virtual void *get_write_ptr(offs_t byteaddress)
 	{
 		// perform the lookup
@@ -924,19 +1073,46 @@ public:
 	{
 		profiler_mark_start(PROFILER_MEMREAD);
 
+		if (TEST_HANDLER) printf("[r%X,%s]", offset, core_i64_hex_format(mask, sizeof(_NativeType) * 2));
+
 		// look up the handler
 		offs_t byteaddress = offset & m_bytemask;
 		UINT32 entry = read_lookup(byteaddress);
 		const handler_entry_read &handler = m_read.handler_read(entry);
 
 		// either read directly from RAM, or call the delegate
-		offset = handler.byteoffset(byteaddress) / sizeof(_NativeType);
+		offset = handler.byteoffset(byteaddress);
 		_NativeType result;
-		if (entry < STATIC_RAM) result = *reinterpret_cast<_NativeType *>(handler.ramptr(offset * sizeof(_NativeType)));
+		if (entry < STATIC_RAM) result = *reinterpret_cast<_NativeType *>(handler.ramptr(offset));
 		else if (sizeof(_NativeType) == 1) result = handler.read8(*this, offset, mask);
-		else if (sizeof(_NativeType) == 2) result = handler.read16(*this, offset, mask);
-		else if (sizeof(_NativeType) == 4) result = handler.read32(*this, offset, mask);
-		else if (sizeof(_NativeType) == 8) result = handler.read64(*this, offset, mask);
+		else if (sizeof(_NativeType) == 2) result = handler.read16(*this, offset >> 1, mask);
+		else if (sizeof(_NativeType) == 4) result = handler.read32(*this, offset >> 2, mask);
+		else if (sizeof(_NativeType) == 8) result = handler.read64(*this, offset >> 3, mask);
+
+		profiler_mark_end();
+		return result;
+	}
+
+	// mask-less native read
+	_NativeType read_native(offs_t offset)
+	{
+		profiler_mark_start(PROFILER_MEMREAD);
+
+		if (TEST_HANDLER) printf("[r%X]", offset);
+
+		// look up the handler
+		offs_t byteaddress = offset & m_bytemask;
+		UINT32 entry = read_lookup(byteaddress);
+		const handler_entry_read &handler = m_read.handler_read(entry);
+
+		// either read directly from RAM, or call the delegate
+		offset = handler.byteoffset(byteaddress);
+		_NativeType result;
+		if (entry < STATIC_RAM) result = *reinterpret_cast<_NativeType *>(handler.ramptr(offset));
+		else if (sizeof(_NativeType) == 1) result = handler.read8(*this, offset, 0xff);
+		else if (sizeof(_NativeType) == 2) result = handler.read16(*this, offset >> 1, 0xffff);
+		else if (sizeof(_NativeType) == 4) result = handler.read32(*this, offset >> 2, 0xffffffff);
+		else if (sizeof(_NativeType) == 8) result = handler.read64(*this, offset >> 3, U64(0xffffffffffffffff));
 
 		profiler_mark_end();
 		return result;
@@ -953,179 +1129,334 @@ public:
 		const handler_entry_write &handler = m_write.handler_write(entry);
 
 		// either write directly to RAM, or call the delegate
-		offset = handler.byteoffset(byteaddress) / sizeof(_NativeType);
+		offset = handler.byteoffset(byteaddress);
 		if (entry < STATIC_RAM)
 		{
-			_NativeType *dest = reinterpret_cast<_NativeType *>(handler.ramptr(offset * sizeof(_NativeType)));
+			_NativeType *dest = reinterpret_cast<_NativeType *>(handler.ramptr(offset));
 			*dest = (*dest & ~mask) | (data & mask);
 		}
 		else if (sizeof(_NativeType) == 1) handler.write8(*this, offset, data, mask);
-		else if (sizeof(_NativeType) == 2) handler.write16(*this, offset, data, mask);
-		else if (sizeof(_NativeType) == 4) handler.write32(*this, offset, data, mask);
-		else if (sizeof(_NativeType) == 8) handler.write64(*this, offset, data, mask);
+		else if (sizeof(_NativeType) == 2) handler.write16(*this, offset >> 1, data, mask);
+		else if (sizeof(_NativeType) == 4) handler.write32(*this, offset >> 2, data, mask);
+		else if (sizeof(_NativeType) == 8) handler.write64(*this, offset >> 3, data, mask);
 
 		profiler_mark_end();
 	}
 
-	// read byte
-	UINT8 read_byte_direct(offs_t address)
+	// mask-less native write
+	void write_native(offs_t offset, _NativeType data)
 	{
-		if (sizeof(_NativeType) == 1)
-			return read_native(address, 0xff);
+		profiler_mark_start(PROFILER_MEMWRITE);
 
-		if (sizeof(_NativeType) > 1)
-		{
-			UINT32 shift = (endian_xor(address) & (sizeof(_NativeType) - 1)) * 8;
-			return read_native(address, (_NativeType)0xff << shift) >> shift;
-		}
+		// look up the handler
+		offs_t byteaddress = offset & m_bytemask;
+		UINT32 entry = write_lookup(byteaddress);
+		const handler_entry_write &handler = m_write.handler_write(entry);
+
+		// either write directly to RAM, or call the delegate
+		offset = handler.byteoffset(byteaddress);
+		if (entry < STATIC_RAM) *reinterpret_cast<_NativeType *>(handler.ramptr(offset)) = data;
+		else if (sizeof(_NativeType) == 1) handler.write8(*this, offset, data, 0xff);
+		else if (sizeof(_NativeType) == 2) handler.write16(*this, offset >> 1, data, 0xffff);
+		else if (sizeof(_NativeType) == 4) handler.write32(*this, offset >> 2, data, 0xffffffff);
+		else if (sizeof(_NativeType) == 8) handler.write64(*this, offset >> 3, data, U64(0xffffffffffffffff));
+
+		profiler_mark_end();
 	}
 
-	// read word
-	UINT16 read_word_direct(offs_t address, UINT16 mask)
+	// generic direct read
+	template<typename _TargetType, bool _Aligned>
+	_TargetType read_direct(offs_t address, _TargetType mask)
 	{
-		if (sizeof(_NativeType) == 2)
-			return read_native(address, mask);
+		const UINT32 TARGET_BYTES = sizeof(_TargetType);
+		const UINT32 TARGET_BITS = 8 * TARGET_BYTES;
 
-		if (sizeof(_NativeType) > 2)
+		// equal to native size and aligned; simple pass-through to the native reader
+		if (NATIVE_BYTES == TARGET_BYTES && (_Aligned || (address & NATIVE_MASK) == 0))
+			return read_native(address & ~NATIVE_MASK, mask);
+
+		// if native size is larger, see if we can do a single masked read (guaranteed if we're aligned)
+		if (NATIVE_BYTES > TARGET_BYTES)
 		{
-			UINT32 shift = (endian_xor(address) & (sizeof(_NativeType) - 2)) * 8;
-			return read_native(address, (_NativeType)mask << shift) >> shift;
+			UINT32 offsbits = 8 * (address & (NATIVE_BYTES - (_Aligned ? TARGET_BYTES : 1)));
+			if (_Aligned || (offsbits + TARGET_BITS <= NATIVE_BITS))
+			{
+				if (_Endian != ENDIANNESS_LITTLE) offsbits = NATIVE_BITS - TARGET_BITS - offsbits;
+				return read_native(address & ~NATIVE_MASK, (_NativeType)mask << offsbits) >> offsbits;
+			}
 		}
 
-		if (sizeof(_NativeType) < 2)
+		// determine our alignment against the native boundaries, and mask the address		
+		UINT32 offsbits = 8 * (address & (NATIVE_BYTES - 1));
+		address &= ~NATIVE_MASK;
+
+		// if we're here, and native size is larger or equal to the target, we need exactly 2 reads
+		if (NATIVE_BYTES >= TARGET_BYTES)
 		{
-			UINT16 result = 0;
-			if (EXPECTED(mask & (0xff << endian_shift(0,8)))) result |= read_byte_direct(address + 0) << endian_shift(0,8);
-			if (EXPECTED(mask & (0xff << endian_shift(8,0)))) result |= read_byte_direct(address + 1) << endian_shift(8,0);
+			// little-endian case
+			if (_Endian == ENDIANNESS_LITTLE)
+			{
+				// read lower bits from lower address
+				_TargetType result = 0;
+				_NativeType curmask = (_NativeType)mask << offsbits;
+				if (curmask != 0) result = read_native(address, curmask) >> offsbits;
+
+				// read upper bits from upper address
+				offsbits = NATIVE_BITS - offsbits;
+				curmask = mask >> offsbits;
+				if (curmask != 0) result |= read_native(address + NATIVE_BYTES, curmask) << offsbits;
+				return result;
+			}
+
+			// big-endian case
+			else
+			{
+				// left-justify the mask to the target type
+				const UINT32 LEFT_JUSTIFY_TARGET_TO_NATIVE_SHIFT = ((NATIVE_BITS >= TARGET_BITS) ? (NATIVE_BITS - TARGET_BITS) : 0);
+				_NativeType result = 0;
+				_NativeType ljmask = (_NativeType)mask << LEFT_JUSTIFY_TARGET_TO_NATIVE_SHIFT;
+				_NativeType curmask = ljmask >> offsbits;
+
+				// read upper bits from lower address
+				if (curmask != 0) result = read_native(address, curmask) << offsbits;
+				offsbits = NATIVE_BITS - offsbits;
+
+				// read lower bits from upper address
+				curmask = ljmask << offsbits;
+				if (curmask != 0) result |= read_native(address + NATIVE_BYTES, curmask) >> offsbits;
+				
+				// return the un-justified result
+				return result >> LEFT_JUSTIFY_TARGET_TO_NATIVE_SHIFT;
+			}
+		}
+
+		// if we're here, then we have 2 or more reads needed to get our final result
+		else
+		{
+			// compute the maximum number of loops; we do it this way so that there are
+			// a fixed number of loops for the compiler to unroll if it desires
+			const UINT32 MAX_SPLITS_MINUS_ONE = TARGET_BYTES / NATIVE_BYTES - 1;
+			_TargetType result = 0;
+			
+			// little-endian case
+			if (_Endian == ENDIANNESS_LITTLE)
+			{
+				// read lowest bits from first address
+				_NativeType curmask = mask << offsbits;
+				if (curmask != 0) result = read_native(address, curmask) >> offsbits;
+
+				// read middle bits from subsequent addresses
+				offsbits = NATIVE_BITS - offsbits;
+				for (UINT32 index = 0; index < MAX_SPLITS_MINUS_ONE; index++)
+				{
+					address += NATIVE_BYTES;
+					curmask = mask >> offsbits;
+					if (curmask != 0) result |= (_TargetType)read_native(address, curmask) << offsbits;
+					offsbits += NATIVE_BITS;
+				}
+
+				// if we're not aligned and we still have bits left, read uppermost bits from last address
+				if (!_Aligned && offsbits < TARGET_BITS)
+				{
+					curmask = mask >> offsbits;
+					if (curmask != 0) result |= (_TargetType)read_native(address + NATIVE_BYTES, curmask) << offsbits;
+				}
+			}
+
+			// big-endian case
+			else
+			{
+				// read highest bits from first address
+				offsbits = TARGET_BITS - (NATIVE_BITS - offsbits);
+				_NativeType curmask = mask >> offsbits;
+				if (curmask != 0) result = (_TargetType)read_native(address, curmask) << offsbits;
+				
+				// read middle bits from subsequent addresses
+				for (UINT32 index = 0; index < MAX_SPLITS_MINUS_ONE; index++)
+				{
+					offsbits -= NATIVE_BITS;
+					address += NATIVE_BYTES;
+					curmask = mask >> offsbits;
+					if (curmask != 0) result |= (_TargetType)read_native(address, curmask) << offsbits;
+				}
+				
+				// if we're not aligned and we still have bits left, read lowermost bits from the last address
+				if (!_Aligned && offsbits != 0)
+				{
+					offsbits = NATIVE_BITS - offsbits;
+					curmask = mask << offsbits;
+					if (curmask != 0) result |= read_native(address + NATIVE_BYTES, curmask) >> offsbits;
+				}
+			}
 			return result;
 		}
 	}
-
-	// read dword
-	UINT32 read_dword_direct(offs_t address, UINT32 mask)
+	
+	// generic direct write
+	template<typename _TargetType, bool _Aligned>
+	void write_direct(offs_t address, _TargetType data, _TargetType mask)
 	{
-		if (sizeof(_NativeType) == 4)
-			return read_native(address, mask);
+		const UINT32 TARGET_BYTES = sizeof(_TargetType);
+		const UINT32 TARGET_BITS = 8 * TARGET_BYTES;
 
-		if (sizeof(_NativeType) > 4)
+		// equal to native size and aligned; simple pass-through to the native writer
+		if (NATIVE_BYTES == TARGET_BYTES && (_Aligned || (address & NATIVE_MASK) == 0))
+			return write_native(address & ~NATIVE_MASK, data, mask);
+
+		// if native size is larger, see if we can do a single masked write (guaranteed if we're aligned)
+		if (NATIVE_BYTES > TARGET_BYTES)
 		{
-			UINT32 shift = (endian_xor(address) & (sizeof(_NativeType) - 4)) * 8;
-			return read_native(address, (_NativeType)mask << shift) >> shift;
+			UINT32 offsbits = 8 * (address & (NATIVE_BYTES - (_Aligned ? TARGET_BYTES : 1)));
+			if (_Aligned || (offsbits + TARGET_BITS <= NATIVE_BITS))
+			{
+				if (_Endian != ENDIANNESS_LITTLE) offsbits = NATIVE_BITS - TARGET_BITS - offsbits;
+				return write_native(address & ~NATIVE_MASK, (_NativeType)data << offsbits, (_NativeType)mask << offsbits);
+			}
 		}
 
-		if (sizeof(_NativeType) < 4)
+		// determine our alignment against the native boundaries, and mask the address		
+		UINT32 offsbits = 8 * (address & (NATIVE_BYTES - 1));
+		address &= ~NATIVE_MASK;
+
+		// if we're here, and native size is larger or equal to the target, we need exactly 2 writes
+		if (NATIVE_BYTES >= TARGET_BYTES)
 		{
-			UINT32 result = 0;
-			if (EXPECTED(mask & (0xffff << endian_shift(0,16)))) result |= read_word_direct(address + 0, mask >> endian_shift(0,16)) << endian_shift(0,16);
-			if (EXPECTED(mask & (0xffff << endian_shift(16,0)))) result |= read_word_direct(address + 2, mask >> endian_shift(16,0)) << endian_shift(16,0);
-			return result;
-		}
-	}
+			// little-endian case
+			if (_Endian == ENDIANNESS_LITTLE)
+			{
+				// write lower bits to lower address
+				_NativeType curmask = (_NativeType)mask << offsbits;
+				if (curmask != 0) write_native(address, (_NativeType)data << offsbits, curmask);
+				
+				// write upper bits to upper address
+				offsbits = NATIVE_BITS - offsbits;
+				curmask = mask >> offsbits;
+				if (curmask != 0) write_native(address + NATIVE_BYTES, data >> offsbits, curmask);
+			}
 
-	// read qword
-	UINT64 read_qword_direct(offs_t address, UINT64 mask)
-	{
-		if (sizeof(_NativeType) == 8)
-			return read_native(address, mask);
-
-		if (sizeof(_NativeType) < 8)
-		{
-			UINT64 result = 0;
-			if (EXPECTED(mask & (U64(0xffffffff) << endian_shift(0,32)))) result |= (UINT64)read_dword_direct(address + 0, mask >> endian_shift(0,32)) << endian_shift(0,32);
-			if (EXPECTED(mask & (U64(0xffffffff) << endian_shift(32,0)))) result |= (UINT64)read_dword_direct(address + 4, mask >> endian_shift(32,0)) << endian_shift(32,0);
-			return result;
-		}
-	}
-
-	// write byte
-	void write_byte_direct(offs_t address, UINT8 data)
-	{
-		if (sizeof(_NativeType) == 1)
-			return write_native(address, data, 0xff);
-
-		if (sizeof(_NativeType) > 1)
-		{
-			UINT32 shift = (endian_xor(address) & (sizeof(_NativeType) - 1)) * 8;
-			return write_native(address, (_NativeType)data << shift, (_NativeType)0xff << shift);
-		}
-	}
-
-	// write word
-	void write_word_direct(offs_t address, UINT16 data, UINT16 mask)
-	{
-		if (sizeof(_NativeType) == 2)
-			return write_native(address, data, mask);
-
-		if (sizeof(_NativeType) > 2)
-		{
-			UINT32 shift = (endian_xor(address) & (sizeof(_NativeType) - 2)) * 8;
-			return write_native(address, (_NativeType)data << shift, (_NativeType)mask << shift);
+			// big-endian case
+			else
+			{
+				// left-justify the mask and data to the target type
+				const UINT32 LEFT_JUSTIFY_TARGET_TO_NATIVE_SHIFT = ((NATIVE_BITS >= TARGET_BITS) ? (NATIVE_BITS - TARGET_BITS) : 0);
+				_NativeType ljdata = (_NativeType)data << LEFT_JUSTIFY_TARGET_TO_NATIVE_SHIFT;
+				_NativeType ljmask = (_NativeType)mask << LEFT_JUSTIFY_TARGET_TO_NATIVE_SHIFT;
+				
+				// write upper bits to lower address
+				_NativeType curmask = ljmask >> offsbits;
+				if (curmask != 0) write_native(address, ljdata >> offsbits, curmask);
+				
+				// write lower bits to upper address
+				offsbits = NATIVE_BITS - offsbits;
+				curmask = ljmask << offsbits;
+				if (curmask != 0) write_native(address + NATIVE_BYTES, ljdata << offsbits, curmask);
+			}
 		}
 
-		if (sizeof(_NativeType) < 2)
+		// if we're here, then we have 2 or more writes needed to get our final result
+		else
 		{
-			if (EXPECTED(mask & (0xff << endian_shift(0,8)))) write_byte_direct(address + 0, data >> endian_shift(0,8));
-			if (EXPECTED(mask & (0xff << endian_shift(8,0)))) write_byte_direct(address + 1, data >> endian_shift(8,0));
-		}
-	}
+			// compute the maximum number of loops; we do it this way so that there are
+			// a fixed number of loops for the compiler to unroll if it desires
+			const UINT32 MAX_SPLITS_MINUS_ONE = TARGET_BYTES / NATIVE_BYTES - 1;
+			
+			// little-endian case
+			if (_Endian == ENDIANNESS_LITTLE)
+			{
+				// write lowest bits to first address
+				_NativeType curmask = mask << offsbits;
+				if (curmask != 0) write_native(address, data << offsbits, curmask);
+				
+				// write middle bits to subsequent addresses
+				offsbits = NATIVE_BITS - offsbits;
+				for (UINT32 index = 0; index < MAX_SPLITS_MINUS_ONE; index++)
+				{
+					address += NATIVE_BYTES;
+					curmask = mask >> offsbits;
+					if (curmask != 0) write_native(address, data >> offsbits, curmask);
+					offsbits += NATIVE_BITS;
+				}
+				
+				// if we're not aligned and we still have bits left, write uppermost bits to last address
+				if (!_Aligned && offsbits < TARGET_BITS)
+				{
+					curmask = mask >> offsbits;
+					if (curmask != 0) write_native(address + NATIVE_BYTES, data >> offsbits, curmask);
+				}
+			}
 
-	// write dword
-	void write_dword_direct(offs_t address, UINT32 data, UINT32 mask)
-	{
-		if (sizeof(_NativeType) == 4)
-			return write_native(address, data, mask);
-
-		if (sizeof(_NativeType) > 4)
-		{
-			UINT32 shift = (endian_xor(address) & (sizeof(_NativeType) - 4)) * 8;
-			return write_native(address, (_NativeType)data << shift, (_NativeType)mask << shift);
-		}
-
-		if (sizeof(_NativeType) < 4)
-		{
-			if (EXPECTED(mask & (0xffff << endian_shift(0,16)))) write_word_direct(address + 0, data >> endian_shift(0,16), mask >> endian_shift(0,16));
-			if (EXPECTED(mask & (0xffff << endian_shift(16,0)))) write_word_direct(address + 2, data >> endian_shift(16,0), mask >> endian_shift(16,0));
-		}
-	}
-
-	// write qword
-	void write_qword_direct(offs_t address, UINT64 data, UINT64 mask)
-	{
-		if (sizeof(_NativeType) == 8)
-			return write_native(address, data, mask);
-
-		if (sizeof(_NativeType) < 8)
-		{
-			if (EXPECTED(mask & (U64(0xffffffff) << endian_shift(0,32)))) write_dword_direct(address + 0, data >> endian_shift(0,32), mask >> endian_shift(0,32));
-			if (EXPECTED(mask & (U64(0xffffffff) << endian_shift(32,0)))) write_dword_direct(address + 4, data >> endian_shift(32,0), mask >> endian_shift(32,0));
+			// big-endian case
+			else
+			{
+				// write highest bits to first address
+				offsbits = TARGET_BITS - (NATIVE_BITS - offsbits);
+				_NativeType curmask = mask >> offsbits;
+				if (curmask != 0) write_native(address, data >> offsbits, curmask);
+				
+				// write middle bits to subsequent addresses
+				for (UINT32 index = 0; index < MAX_SPLITS_MINUS_ONE; index++)
+				{
+					offsbits -= NATIVE_BITS;
+					address += NATIVE_BYTES;
+					curmask = mask >> offsbits;
+					if (curmask != 0) write_native(address, data >> offsbits, curmask);
+				}
+				
+				// if we're not aligned and we still have bits left, write lowermost bits to the last address
+				if (!_Aligned && offsbits != 0)
+				{
+					offsbits = NATIVE_BITS - offsbits;
+					curmask = mask << offsbits;
+					if (curmask != 0) write_native(address + NATIVE_BYTES, data << offsbits, curmask);
+				}
+			}
 		}
 	}
 
 	// virtual access to these functions
-	UINT8 read_byte(offs_t address) { return read_byte_direct(address); }
-	UINT16 read_word(offs_t address, UINT16 mask) { return read_word_direct(address, mask); }
-	UINT32 read_dword(offs_t address, UINT32 mask) { return read_dword_direct(address, mask); }
-	UINT64 read_qword(offs_t address, UINT64 mask) { return read_qword_direct(address, mask); }
-	void write_byte(offs_t address, UINT8 data) { write_byte_direct(address, data); }
-	void write_word(offs_t address, UINT16 data, UINT16 mask) { write_word_direct(address, data, mask); }
-	void write_dword(offs_t address, UINT32 data, UINT32 mask) { write_dword_direct(address, data, mask); }
-	void write_qword(offs_t address, UINT64 data, UINT64 mask) { write_qword_direct(address, data, mask); }
+	UINT8 read_byte(offs_t address) { return (NATIVE_BITS == 8) ? read_native(address & ~NATIVE_MASK) : read_direct<UINT8, true>(address, 0xff); }
+	UINT16 read_word(offs_t address) { return (NATIVE_BITS == 16) ? read_native(address & ~NATIVE_MASK) : read_direct<UINT16, true>(address, 0xffff); }
+	UINT16 read_word(offs_t address, UINT16 mask) { return read_direct<UINT16, true>(address, mask); }
+	UINT16 read_word_unaligned(offs_t address) { return read_direct<UINT16, false>(address, 0xffff); }
+	UINT16 read_word_unaligned(offs_t address, UINT16 mask) { return read_direct<UINT16, false>(address, mask); }
+	UINT32 read_dword(offs_t address) { return (NATIVE_BITS == 32) ? read_native(address & ~NATIVE_MASK) : read_direct<UINT32, true>(address, 0xffffffff); }
+	UINT32 read_dword(offs_t address, UINT32 mask) { return read_direct<UINT32, true>(address, mask); }
+	UINT32 read_dword_unaligned(offs_t address) { return read_direct<UINT32, false>(address, 0xffffffff); }
+	UINT32 read_dword_unaligned(offs_t address, UINT32 mask) { return read_direct<UINT32, false>(address, mask); }
+	UINT64 read_qword(offs_t address) { return (NATIVE_BITS == 64) ? read_native(address & ~NATIVE_MASK) : read_direct<UINT64, true>(address, U64(0xffffffffffffffff)); }
+	UINT64 read_qword(offs_t address, UINT64 mask) { return read_direct<UINT64, true>(address, mask); }
+	UINT64 read_qword_unaligned(offs_t address) { return read_direct<UINT64, false>(address, U64(0xffffffffffffffff)); }
+	UINT64 read_qword_unaligned(offs_t address, UINT64 mask) { return read_direct<UINT64, false>(address, mask); }
+
+	void write_byte(offs_t address, UINT8 data) { if (NATIVE_BITS == 8) write_native(address & ~NATIVE_MASK, data); else write_direct<UINT8, true>(address, data, 0xff); }
+	void write_word(offs_t address, UINT16 data) { if (NATIVE_BITS == 16) write_native(address & ~NATIVE_MASK, data); else write_direct<UINT16, true>(address, data, 0xffff); }
+	void write_word(offs_t address, UINT16 data, UINT16 mask) { write_direct<UINT16, true>(address, data, mask); }
+	void write_word_unaligned(offs_t address, UINT16 data) { write_direct<UINT16, false>(address, data, 0xffff); }
+	void write_word_unaligned(offs_t address, UINT16 data, UINT16 mask) { write_direct<UINT16, false>(address, data, mask); }
+	void write_dword(offs_t address, UINT32 data) { if (NATIVE_BITS == 32) write_native(address & ~NATIVE_MASK, data); else write_direct<UINT32, true>(address, data, 0xffffffff); }
+	void write_dword(offs_t address, UINT32 data, UINT32 mask) { write_direct<UINT32, true>(address, data, mask); }
+	void write_dword_unaligned(offs_t address, UINT32 data) { write_direct<UINT32, false>(address, data, 0xffffffff); }
+	void write_dword_unaligned(offs_t address, UINT32 data, UINT32 mask) { write_direct<UINT32, false>(address, data, mask); }
+	void write_qword(offs_t address, UINT64 data) { if (NATIVE_BITS == 64) write_native(address & ~NATIVE_MASK, data); else write_direct<UINT64, true>(address, data, U64(0xffffffffffffffff)); }
+	void write_qword(offs_t address, UINT64 data, UINT64 mask) { write_direct<UINT64, true>(address, data, mask); }
+	void write_qword_unaligned(offs_t address, UINT64 data) { write_direct<UINT64, false>(address, data, U64(0xffffffffffffffff)); }
+	void write_qword_unaligned(offs_t address, UINT64 data, UINT64 mask) { write_direct<UINT64, false>(address, data, mask); }
 
 	// static access to these functions
-	static UINT8 read_byte_static(this_type *space, offs_t address) { return space->read_byte_direct(address); }
-	static UINT16 read_word_static(this_type *space, offs_t address) { return space->read_word_direct(address, 0xffff); }
-	static UINT16 read_word_masked_static(this_type *space, offs_t address, UINT16 mask) { return space->read_word_direct(address, mask); }
-	static UINT32 read_dword_static(this_type *space, offs_t address) { return space->read_dword_direct(address, 0xffffffff); }
-	static UINT32 read_dword_masked_static(this_type *space, offs_t address, UINT32 mask) { return space->read_dword_direct(address, mask); }
-	static UINT64 read_qword_static(this_type *space, offs_t address) { return space->read_qword_direct(address, U64(0xffffffffffffffff)); }
-	static UINT64 read_qword_masked_static(this_type *space, offs_t address, UINT64 mask) { return space->read_qword_direct(address, mask); }
-	static void write_byte_static(this_type *space, offs_t address, UINT8 data) { space->write_byte_direct(address, data); }
-	static void write_word_static(this_type *space, offs_t address, UINT16 data) { space->write_word_direct(address, data, 0xffff); }
-	static void write_word_masked_static(this_type *space, offs_t address, UINT16 data, UINT16 mask) { space->write_word_direct(address, data, mask); }
-	static void write_dword_static(this_type *space, offs_t address, UINT32 data) { space->write_dword_direct(address, data, 0xffffffff); }
-	static void write_dword_masked_static(this_type *space, offs_t address, UINT32 data, UINT32 mask) { space->write_dword_direct(address, data, mask); }
-	static void write_qword_static(this_type *space, offs_t address, UINT64 data) { space->write_qword_direct(address, data, U64(0xffffffffffffffff)); }
-	static void write_qword_masked_static(this_type *space, offs_t address, UINT64 data, UINT64 mask) { space->write_qword_direct(address, data, mask); }
+	static UINT8 read_byte_static(this_type *space, offs_t address) { return (NATIVE_BITS == 8) ? space->read_native(address & ~NATIVE_MASK) : space->read_direct<UINT8, true>(address, 0xff); }
+	static UINT16 read_word_static(this_type *space, offs_t address) { return (NATIVE_BITS == 16) ? space->read_native(address & ~NATIVE_MASK) : space->read_direct<UINT16, true>(address, 0xffff); }
+	static UINT16 read_word_masked_static(this_type *space, offs_t address, UINT16 mask) { return space->read_direct<UINT16, true>(address, mask); }
+	static UINT32 read_dword_static(this_type *space, offs_t address) { return (NATIVE_BITS == 32) ? space->read_native(address & ~NATIVE_MASK) : space->read_direct<UINT32, true>(address, 0xffffffff); }
+	static UINT32 read_dword_masked_static(this_type *space, offs_t address, UINT32 mask) { return space->read_direct<UINT32, true>(address, mask); }
+	static UINT64 read_qword_static(this_type *space, offs_t address) { return (NATIVE_BITS == 64) ? space->read_native(address & ~NATIVE_MASK) : space->read_direct<UINT64, true>(address, U64(0xffffffffffffffff)); }
+	static UINT64 read_qword_masked_static(this_type *space, offs_t address, UINT64 mask) { return space->read_direct<UINT64, true>(address, mask); }
+	static void write_byte_static(this_type *space, offs_t address, UINT8 data) { if (NATIVE_BITS == 8) space->write_native(address & ~NATIVE_MASK, data); else space->write_direct<UINT8, true>(address, data, 0xff); }
+	static void write_word_static(this_type *space, offs_t address, UINT16 data) { if (NATIVE_BITS == 16) space->write_native(address & ~NATIVE_MASK, data); else space->write_direct<UINT16, true>(address, data, 0xffff); }
+	static void write_word_masked_static(this_type *space, offs_t address, UINT16 data, UINT16 mask) { space->write_direct<UINT16, true>(address, data, mask); }
+	static void write_dword_static(this_type *space, offs_t address, UINT32 data) { if (NATIVE_BITS == 32) space->write_native(address & ~NATIVE_MASK, data); else space->write_direct<UINT32, true>(address, data, 0xffffffff); }
+	static void write_dword_masked_static(this_type *space, offs_t address, UINT32 data, UINT32 mask) { space->write_direct<UINT32, true>(address, data, mask); }
+	static void write_qword_static(this_type *space, offs_t address, UINT64 data) { if (NATIVE_BITS == 64) space->write_native(address & ~NATIVE_MASK, data); else space->write_direct<UINT64, true>(address, data, U64(0xffffffffffffffff)); }
+	static void write_qword_masked_static(this_type *space, offs_t address, UINT64 data, UINT64 mask) { space->write_direct<UINT64, true>(address, data, mask); }
 
 	address_table_read		m_read;				// memory read lookup table
 	address_table_write		m_write;			// memory write lookup table
@@ -2532,6 +2863,9 @@ void *address_space::find_backing_memory(offs_t addrstart, offs_t addrend)
 	offs_t byteend = address_to_byte_end(addrend);
 
 	VPRINTF(("address_space::find_backing_memory('%s',%s,%08X-%08X) -> ", m_device.tag(), m_name, bytestart, byteend));
+
+	if (m_map == NULL)
+		return NULL;
 
 	// look in the address map first
 	for (address_map_entry *entry = m_map->m_entrylist.first(); entry != NULL; entry = entry->next())

@@ -131,21 +131,11 @@ typedef union
     UINT8  b[16];   /* or as 8 bit registers */
 } necbasicregs;
 
-typedef struct
-{
-	offs_t	fetch_xor;
-
-	UINT8	(*rbyte)(address_space *, offs_t);
-	UINT16	(*rword)(address_space *, offs_t);
-	void	(*wbyte)(address_space *, offs_t, UINT8);
-	void	(*wword)(address_space *, offs_t, UINT16);
-} memory_interface;
-
-
 typedef struct _nec_state_t nec_state_t;
 struct _nec_state_t
 {
 	necbasicregs regs;
+	offs_t	fetch_xor;
 	UINT16	sregs[4];
 
 	UINT16	ip;
@@ -166,8 +156,6 @@ struct _nec_state_t
 	direct_read_data *direct;
 	address_space *io;
 	int		icount;
-
-	memory_interface	mem;
 
 	const nec_config *config;
 
@@ -1136,62 +1124,6 @@ static void nec_init(legacy_cpu_device *device, device_irq_callback irqcallback,
 }
 
 
-/*****************************************************************************
-    8-bit memory accessors
- *****************************************************************************/
-
-static UINT8 memory_read_byte(address_space *space, offs_t address) { return space->read_byte(address); }
-static void memory_write_byte(address_space *space, offs_t address, UINT8 data) { space->write_byte(address, data); }
-static UINT16 memory_read_word(address_space *space, offs_t address) { return space->read_word(address); }
-static void memory_write_word(address_space *space, offs_t address, UINT16 data) { space->write_word(address, data); }
-
-
-static void configure_memory_8bit(nec_state_t *nec_state)
-{
-	nec_state->mem.fetch_xor = 0;
-
-	nec_state->mem.rbyte = memory_read_byte;
-	nec_state->mem.rword = memory_read_word;
-	nec_state->mem.wbyte = memory_write_byte;
-	nec_state->mem.wword = memory_write_word;
-}
-
-
-/*****************************************************************************
-    16-bit memory accessors
- *****************************************************************************/
-
-static UINT16 read_word_16le(address_space *space, offs_t addr)
-{
-	if (!(addr & 1))
-		return space->read_word(addr);
-	else
-	{
-		UINT16 result = space->read_byte(addr);
-		return result | (space->read_byte(addr + 1) << 8);
-	}
-}
-
-static void write_word_16le(address_space *space, offs_t addr, UINT16 data)
-{
-	if (!(addr & 1))
-		space->write_word(addr, data);
-	else
-	{
-		space->write_byte(addr, data);
-		space->write_byte(addr + 1, data >> 8);
-	}
-}
-
-static void configure_memory_16bit(nec_state_t *nec_state)
-{
-	nec_state->mem.fetch_xor = BYTE_XOR_LE(0);
-
-	nec_state->mem.rbyte = memory_read_byte;
-	nec_state->mem.rword = read_word_16le;
-	nec_state->mem.wbyte = memory_write_byte;
-	nec_state->mem.wword = write_word_16le;
-}
 
 static CPU_EXECUTE( necv )
 {
@@ -1225,7 +1157,7 @@ static CPU_INIT( v20 )
 	nec_state_t *nec_state = get_safe_token(device);
 
 	nec_init(device, irqcallback, 0);
-	configure_memory_8bit(nec_state);
+	nec_state->fetch_xor = 0;
 	nec_state->chip_type=V20_TYPE;
 	nec_state->prefetch_size = 4;		/* 3 words */
 	nec_state->prefetch_cycles = 4;		/* four cycles per byte */
@@ -1236,7 +1168,7 @@ static CPU_INIT( v30 )
 	nec_state_t *nec_state = get_safe_token(device);
 
 	nec_init(device, irqcallback, 1);
-	configure_memory_16bit(nec_state);
+	nec_state->fetch_xor = BYTE_XOR_LE(0);
 	nec_state->chip_type=V30_TYPE;
 	nec_state->prefetch_size = 6;		/* 3 words */
 	nec_state->prefetch_cycles = 2;		/* two cycles per byte / four per word */
@@ -1255,7 +1187,7 @@ static CPU_INIT( v33 )
      * properly without. */
 	nec_state->prefetch_cycles = 1;		/* two cycles per byte / four per word */
 
-	configure_memory_16bit(nec_state);
+	nec_state->fetch_xor = BYTE_XOR_LE(0);
 }
 
 

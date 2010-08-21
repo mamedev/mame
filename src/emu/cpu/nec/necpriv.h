@@ -80,15 +80,15 @@ typedef enum {
 
 /************************************************************************/
 
-#define read_mem_byte(a)			(*nec_state->mem.rbyte)(nec_state->program, a)
-#define read_mem_word(a)			(*nec_state->mem.rword)(nec_state->program, a)
-#define write_mem_byte(a,d)			(*nec_state->mem.wbyte)(nec_state->program, (a),(d))
-#define write_mem_word(a,d)			(*nec_state->mem.wword)(nec_state->program, (a),(d))
+#define read_mem_byte(a)			nec_state->program->read_byte(a)
+#define read_mem_word(a)			nec_state->program->read_word_unaligned(a)
+#define write_mem_byte(a,d)			nec_state->program->write_byte((a),(d))
+#define write_mem_word(a,d)			nec_state->program->write_word_unaligned((a),(d))
 
-#define read_port_byte(a)		(*nec_state->mem.rbyte)(nec_state->io, a)
-#define read_port_word(a)		(*nec_state->mem.rword)(nec_state->io, a)
-#define write_port_byte(a,d)	(*nec_state->mem.wbyte)(nec_state->io, (a),(d))
-#define write_port_word(a,d)	(*nec_state->mem.wword)(nec_state->io, (a),(d))
+#define read_port_byte(a)		nec_state->io->read_byte(a)
+#define read_port_word(a)		nec_state->io->read_word_unaligned(a)
+#define write_port_byte(a,d)	nec_state->io->write_byte((a),(d))
+#define write_port_word(a,d)	nec_state->io->write_word_unaligned((a),(d))
 
 /************************************************************************/
 
@@ -107,7 +107,7 @@ typedef enum {
 /* prefetch timing */
 
 #define FETCH() 			fetch(nec_state)
-#define FETCH_XOR(a)		((a) ^ nec_state->mem.fetch_xor)
+#define FETCH_XOR(a)		((a) ^ nec_state->fetch_xor)
 #define FETCHWORD()			fetchword(nec_state)
 #define EMPTY_PREFETCH()	nec_state->prefetch_reset = 1
 

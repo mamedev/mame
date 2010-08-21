@@ -999,65 +999,6 @@ void m68k_memory_interface::init16(address_space &space)
  * 32-bit data memory interface
  ****************************************************************************/
 
-/* potentially misaligned 16-bit reads with a 32-bit data bus (and 24-bit address bus) */
-UINT16 m68k_memory_interface::readword_d32(offs_t address, UINT16 mask)
-{
-	UINT16 result;
-
-	if (!(address & 1))
-		return m_space->read_word(address);
-	result = m_space->read_byte(address) << 8;
-	return result | m_space->read_byte(address + 1);
-}
-
-/* potentially misaligned 16-bit writes with a 32-bit data bus (and 24-bit address bus) */
-void m68k_memory_interface::writeword_d32(offs_t address, UINT16 data, UINT16 mask)
-{
-	if (!(address & 1))
-	{
-		m_space->write_word(address, data);
-		return;
-	}
-	m_space->write_byte(address, data >> 8);
-	m_space->write_byte(address + 1, data);
-}
-
-/* potentially misaligned 32-bit reads with a 32-bit data bus (and 24-bit address bus) */
-UINT32 m68k_memory_interface::readlong_d32(offs_t address, UINT32 mask)
-{
-	UINT32 result;
-
-	if (!(address & 3))
-		return m_space->read_dword(address);
-	else if (!(address & 1))
-	{
-		result = m_space->read_word(address) << 16;
-		return result | m_space->read_word(address + 2);
-	}
-	result = m_space->read_byte(address) << 24;
-	result |= m_space->read_word(address + 1) << 8;
-	return result | m_space->read_byte(address + 3);
-}
-
-/* potentially misaligned 32-bit writes with a 32-bit data bus (and 24-bit address bus) */
-void m68k_memory_interface::writelong_d32(offs_t address, UINT32 data, UINT32 mask)
-{
-	if (!(address & 3))
-	{
-		m_space->write_dword(address, data);
-		return;
-	}
-	else if (!(address & 1))
-	{
-		m_space->write_word(address, data >> 16);
-		m_space->write_word(address + 2, data);
-		return;
-	}
-	m_space->write_byte(address, data >> 24);
-	m_space->write_word(address + 1, data >> 8);
-	m_space->write_byte(address + 3, data);
-}
-
 /* interface for 32-bit data bus (68EC020, 68020) */
 void m68k_memory_interface::init32(address_space &space)
 {
@@ -1068,11 +1009,11 @@ void m68k_memory_interface::init32(address_space &space)
 	
 	readimm16 = m68k_readimm16_delegate(m68k_readimm16_proto_delegate::create_member(m68k_memory_interface, read_immediate_16), *this);
 	read8 = m68k_read8_delegate(m68k_read8_proto_delegate::create_member(address_space, read_byte), space);
-	read16 = m68k_read16_delegate(m68k_read16_proto_delegate::create_member(m68k_memory_interface, readword_d32), *this);
-	read32 = m68k_read32_delegate(m68k_read32_proto_delegate::create_member(m68k_memory_interface, readlong_d32), *this);
+	read16 = m68k_read16_delegate(m68k_read16_proto_delegate::create_member(address_space, read_word_unaligned), space);
+	read32 = m68k_read32_delegate(m68k_read32_proto_delegate::create_member(address_space, read_dword_unaligned), space);
 	write8 = m68k_write8_delegate(m68k_write8_proto_delegate::create_member(address_space, write_byte), space);
-	write16 = m68k_write16_delegate(m68k_write16_proto_delegate::create_member(m68k_memory_interface, writeword_d32), *this);
-	write32 = m68k_write32_delegate(m68k_write32_proto_delegate::create_member(m68k_memory_interface, writelong_d32), *this);
+	write16 = m68k_write16_delegate(m68k_write16_proto_delegate::create_member(address_space, write_word_unaligned), space);
+	write32 = m68k_write32_delegate(m68k_write32_proto_delegate::create_member(address_space, write_dword_unaligned), space);
 }
 
 /* interface for 32-bit data bus with PMMU (68EC020, 68020) */
@@ -1107,7 +1048,7 @@ UINT16 m68k_memory_interface::read_immediate_16_mmu(offs_t address)
 }
 
 /* potentially misaligned 16-bit reads with a 32-bit data bus (and 24-bit address bus) */
-UINT16 m68k_memory_interface::readword_d32_mmu(offs_t address, UINT16 mask)
+UINT16 m68k_memory_interface::readword_d32_mmu(offs_t address)
 {
 	UINT16 result;
 
@@ -1123,7 +1064,7 @@ UINT16 m68k_memory_interface::readword_d32_mmu(offs_t address, UINT16 mask)
 }
 
 /* potentially misaligned 16-bit writes with a 32-bit data bus (and 24-bit address bus) */
-void m68k_memory_interface::writeword_d32_mmu(offs_t address, UINT16 data, UINT16 mask)
+void m68k_memory_interface::writeword_d32_mmu(offs_t address, UINT16 data)
 {
 	if (m_cpustate->pmmu_enabled)
 	{
@@ -1140,7 +1081,7 @@ void m68k_memory_interface::writeword_d32_mmu(offs_t address, UINT16 data, UINT1
 }
 
 /* potentially misaligned 32-bit reads with a 32-bit data bus (and 24-bit address bus) */
-UINT32 m68k_memory_interface::readlong_d32_mmu(offs_t address, UINT32 mask)
+UINT32 m68k_memory_interface::readlong_d32_mmu(offs_t address)
 {
 	UINT32 result;
 
@@ -1162,7 +1103,7 @@ UINT32 m68k_memory_interface::readlong_d32_mmu(offs_t address, UINT32 mask)
 }
 
 /* potentially misaligned 32-bit writes with a 32-bit data bus (and 24-bit address bus) */
-void m68k_memory_interface::writelong_d32_mmu(offs_t address, UINT32 data, UINT32 mask)
+void m68k_memory_interface::writelong_d32_mmu(offs_t address, UINT32 data)
 {
 	if (m_cpustate->pmmu_enabled)
 	{

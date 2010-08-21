@@ -7,13 +7,13 @@
 	if ((cs)->flag##num)									\
 		appf = u2f((cs)->reg[(cs)->op##num]);				\
 	else													\
-		appf = u2f(MemRead32((cs)->program, (cs)->op##num));
+		appf = u2f((cs)->program->read_dword_unaligned((cs)->op##num));
 
 #define F2STOREOPFLOAT(cs,num)								\
 	if ((cs)->flag##num)									\
 		(cs)->reg[(cs)->op##num] = f2u(appf);				\
 	else													\
-		MemWrite32((cs)->program, (cs)->op##num, f2u(appf));
+		(cs)->program->write_dword_unaligned((cs)->op##num, f2u(appf));
 
 static void F2DecodeFirstOperand(v60_state *cpustate, UINT32 (*DecodeOp1)(v60_state *), UINT8 dim1)
 {
@@ -341,13 +341,13 @@ static UINT32 (*const Op5CTable[32])(v60_state *) =
 
 static UINT32 op5F(v60_state *cpustate)
 {
-	cpustate->instflags = OpRead8(cpustate->program, cpustate->PC + 1);
+	cpustate->instflags = OpRead8(cpustate, cpustate->PC + 1);
 	return Op5FTable[cpustate->instflags & 0x1F](cpustate);
 }
 
 
 static UINT32 op5C(v60_state *cpustate)
 {
-	cpustate->instflags = OpRead8(cpustate->program, cpustate->PC + 1);
+	cpustate->instflags = OpRead8(cpustate, cpustate->PC + 1);
 	return Op5CTable[cpustate->instflags & 0x1F](cpustate);
 }

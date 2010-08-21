@@ -658,7 +658,6 @@ I86DEPS = \
 
 $(CPUOBJ)/i86/i86.o:	$(CPUSRC)/i86/i86.c \
 						$(CPUSRC)/i86/i86.h \
-						$(CPUSRC)/i86/i86mem.c \
 						$(CPUSRC)/i86/i86time.c \
 						$(CPUSRC)/i86/instr86.c \
 						$(CPUSRC)/i86/instr186.c \
@@ -666,7 +665,6 @@ $(CPUOBJ)/i86/i86.o:	$(CPUSRC)/i86/i86.c \
 
 $(CPUOBJ)/i86/i286.o:	$(CPUSRC)/i86/i286.c \
 						$(CPUSRC)/i86/i286.h \
-						$(CPUSRC)/i86/i86mem.c \
 						$(CPUSRC)/i86/i86time.c \
 						$(CPUSRC)/i86/instr86.c \
 						$(CPUSRC)/i86/instr186.c \
@@ -1199,7 +1197,6 @@ $(CPUOBJ)/v60/v60.o:	$(CPUSRC)/v60/am.c \
 						$(CPUSRC)/v60/optable.c \
 						$(CPUSRC)/v60/v60.c \
 						$(CPUSRC)/v60/v60.h \
-						$(CPUSRC)/v60/v60mem.c \
 						$(CPUSRC)/v60/v60d.c
 
 
