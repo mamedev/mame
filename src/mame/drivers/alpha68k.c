@@ -2964,7 +2964,7 @@ ROM_START( gangwars )
 	ROM_LOAD( "gwb_ic.307",     0x070000, 0x10000, CRC(28082a7f) SHA1(e30bade13e03bca49c1f7001c9440ce251ece15d) )
 	ROM_LOAD( "gwb_ic.280",     0x080000, 0x10000, CRC(222b3dcd) SHA1(f9afe24c01daefe61939672efa2cb68bcc7235f0) )
 	ROM_LOAD( "gwb_ic.321",     0x090000, 0x10000, CRC(6b421c7b) SHA1(d96f91dc7e5f46990b05701483edf43a828a8879) )
-	
+
 	ROM_LOAD( "gwb_ic.300",     0x100000, 0x10000, CRC(f3fa0877) SHA1(7950ef86ee66d19693f0b7071a3a34d9200f5a19) )
 	ROM_LOAD( "gwb_ic.301",     0x110000, 0x10000, CRC(f8c866de) SHA1(c6baa41bab35d4d9e80c5c52db74e9eb6b9605f5) )
 	ROM_LOAD( "gwb_ic.302",     0x120000, 0x10000, CRC(5b0d587d) SHA1(852bec7d37d8cee33e5bc30080bf8a6a8d2472e5) )
@@ -2976,7 +2976,7 @@ ROM_START( gangwars )
 	ROM_LOAD( "gwb_ic.320",     0x180000, 0x10000, CRC(9a7b51d8) SHA1(0ab01972d838c938bfd07d7b4661a0ecd009b2cb) )
 	ROM_LOAD( "gwb_ic.319",     0x190000, 0x10000, CRC(c5b862b7) SHA1(a48be3e32ae5a656d8d239796e6e7bddd4a0805b) )
 
-	ROM_LOAD( "gwb_ic.292",     0x200000, 0x10000, CRC(c125f7be) SHA1(5d68abd91fa4fa18275c0597c51ce6d3e743d84d) )	
+	ROM_LOAD( "gwb_ic.292",     0x200000, 0x10000, CRC(c125f7be) SHA1(5d68abd91fa4fa18275c0597c51ce6d3e743d84d) )
 	ROM_LOAD( "gwb_ic.293",     0x210000, 0x10000, CRC(c04fce8e) SHA1(499edd3b16770d20368f49e5c66c299740831ff0) )
 	ROM_LOAD( "gwb_ic.294",     0x220000, 0x10000, CRC(4eda3df5) SHA1(574fef723ebd8fa116b4a379036ee5ec3eb10c90) )
 	ROM_LOAD( "gwb_ic.295",     0x230000, 0x10000, CRC(6e60c475) SHA1(928494400bbdc3571cb5b1ccb51d39537c5fd904) )
@@ -2986,7 +2986,7 @@ ROM_START( gangwars )
 	ROM_LOAD( "gwb_ic.291",     0x270000, 0x10000, CRC(beb07a2e) SHA1(f2751bef1850db7173f119fc0cfeefdf47ed7a86) )
 	ROM_LOAD( "gwb_ic.318",     0x280000, 0x10000, CRC(9aeaddf9) SHA1(d609314015376672be8147b9eabbfe4c5611ab73) )
 	ROM_LOAD( "gwb_ic.317",     0x290000, 0x10000, CRC(1622fadd) SHA1(240eaf117145773e388220513c2906ad2ac5d68b) )
-	
+
 	ROM_LOAD( "gwb_ic.284",     0x300000, 0x10000, CRC(4aa95d66) SHA1(e5bb51fd32a7e9dc23aa13de35b8757dc11f7908) )
 	ROM_LOAD( "gwb_ic.285",     0x310000, 0x10000, CRC(3a1f3ce0) SHA1(edd8820111a3ef9558286280dc819c6d9f21212f) )
 	ROM_LOAD( "gwb_ic.286",     0x320000, 0x10000, CRC(886e298b) SHA1(8e8b35a0b24c9c3a1d00079b60bdbaa6c8ce597b) )
@@ -3229,7 +3229,12 @@ static DRIVER_INIT( sbasebal )
 	alpha68k_state *state = machine->driver_data<alpha68k_state>();
 	UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
 
-	/* Game hangs on divide by zero?!  Patch it */
+	/* Patch protection check, it does a divide by zero because the MCU is trying to
+	   calculate the ball speed when a strike is scored, notice that current emulation
+	   just returns 49 mi/h every time that this event happens.
+	   68k reads at [0x4023e], then subtracts this value with [0x41838], presumably it's raw speed minus angle.
+	   main CPU then writes the result to RAM location [0x41866], probably just to signal the result to the MCU.
+	   */
 	rom[0xb672/2] = 0x4e71;
 
 	/* And patch the ROM checksums */
@@ -3286,7 +3291,7 @@ GAME( 1989, skyadvntj, skyadvnt, alpha68k_V,     skyadvnt, skyadvnt, ROT90, "Alp
 GAME( 1989, gangwars,  0,        alpha68k_V,     gangwars, gangwars, ROT0,  "Alpha Denshi Co.",                                  "Gang Wars", GAME_SUPPORTS_SAVE )
 GAME( 1989, gangwarsu, gangwars, alpha68k_V,     gangwarsu,gangwarsu,ROT0,  "Alpha Denshi Co.",                                  "Gang Wars (US)", GAME_SUPPORTS_SAVE )
 
-GAME( 1989, sbasebal,  0,        alpha68k_V_sb,  sbasebal, sbasebal, ROT0,  "Alpha Denshi Co. (SNK of America license)",         "Super Champion Baseball (US)", GAME_SUPPORTS_SAVE )
+GAME( 1989, sbasebal,  0,        alpha68k_V_sb,  sbasebal, sbasebal, ROT0,  "Alpha Denshi Co. (SNK of America license)",         "Super Champion Baseball (US)", GAME_SUPPORTS_SAVE | GAME_UNEMULATED_PROTECTION )
 
 GAME( 1989, tnextspc,  0,        tnextspc,       tnextspc, tnextspc, ROT90, "SNK",                                               "The Next Space", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
 GAME( 1989, tnextspcj, tnextspc, tnextspc,       tnextspc, tnextspc, ROT90, "SNK (Pasadena International Corp. license)",        "The Next Space (Japan)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
