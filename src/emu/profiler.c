@@ -208,7 +208,7 @@ const char *real_profiler_state::text(running_machine &machine, astring &string)
 		{ PROFILER_IDLE,             "Idle" }
 	};
 
-	profiler_scope profile(PROFILER_PROFILER);
+	g_profiler.start(PROFILER_PROFILER);
 
 	// compute the total time for all bits, not including profiler or idle
 	UINT64 computed = 0;
@@ -227,7 +227,10 @@ const char *real_profiler_state::text(running_machine &machine, astring &string)
 	UINT64 total = computed;
 	string.reset();
 	if (total == 0 || normalize == 0)
+	{
+		g_profiler.stop();
 		return string;
+	}
 
 	// loop over all types and generate the string
 	for (curtype = PROFILER_DEVICE_FIRST; curtype < PROFILER_TOTAL; curtype++)
@@ -279,5 +282,7 @@ const char *real_profiler_state::text(running_machine &machine, astring &string)
 	// we are ready once we have wrapped around
 	if (m_dataindex == 0)
 		m_dataready = true;
+	
+	g_profiler.stop();
 	return string;
 }
