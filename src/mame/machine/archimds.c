@@ -139,18 +139,16 @@ static TIMER_CALLBACK( vidc_audio_tick )
 
 	vidc_sndcur++;
 
-	if(audio_dma_on)
+	if (vidc_sndcur >= vidc_sndend-vidc_sndstart)
 	{
-		if (vidc_sndcur >= vidc_sndend-vidc_sndstart)
+		vidc_sndcur = 0;
+		archimedes_request_irq_b(machine, ARCHIMEDES_IRQB_SOUND_EMPTY);
+
+		if(!audio_dma_on)
 		{
-			vidc_sndcur = 0;
-			archimedes_request_irq_b(machine, ARCHIMEDES_IRQB_SOUND_EMPTY);
+			timer_adjust_oneshot(snd_timer, attotime_never, 0);
+			dac_signed_data_w(space->machine->device("dac"), 0x80);
 		}
-	}
-	else
-	{
-		//timer_adjust_oneshot(snd_timer, attotime_never, 0);
-		//dac_signed_data_w(space->machine->device("dac"), 0x80);
 	}
 }
 
@@ -646,7 +644,7 @@ WRITE32_HANDLER(archimedes_ioc_w)
 					logerror("IOC: Econet Write %02x at %08x\n",data,ioc_addr);
 					return;
 				case 3:
-					logerror("IOC: Serial Write\n");
+					logerror("IOC: Serial Write %02x (%c) at %08x\n",data,data,ioc_addr);
 					return;
 				case 4:
 					logerror("IOC: Internal Podule Write\n");
