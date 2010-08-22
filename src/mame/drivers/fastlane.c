@@ -103,6 +103,7 @@ ADDRESS_MAP_END
 
 ***************************************************************************/
 
+/* verified from HD6309 code */
 static INPUT_PORTS_START( fastlane )
 	PORT_START("DSW1")
 	KONAMI_COINAGE(DEF_STR( Free_Play ), "No Coin B")
@@ -114,21 +115,21 @@ static INPUT_PORTS_START( fastlane )
 	PORT_DIPSETTING(	0x02, "3" )
 	PORT_DIPSETTING(	0x01, "4" )
 	PORT_DIPSETTING(	0x00, "7" )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(	0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) )
 	/* The bonus life affects the starting high score too, 20000 or 30000 */
 	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(	0x18, "20000 100000" )
-	PORT_DIPSETTING(	0x10, "30000 150000" )
-	PORT_DIPSETTING(	0x08, "20000" )
-	PORT_DIPSETTING(	0x00, "30000" )
+	PORT_DIPSETTING(	0x18, "20k 100k 200k 400k 800k" )
+	PORT_DIPSETTING(	0x10, "30k 150k 300k 600k" )
+	PORT_DIPSETTING(	0x08, "20k only" )
+	PORT_DIPSETTING(	0x00, "30k only" )
 	PORT_DIPNAME( 0x60, 0x40, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(	0x60, DEF_STR( Easy ) )
 	PORT_DIPSETTING(	0x40, DEF_STR( Medium ) )
 	PORT_DIPSETTING(	0x20, DEF_STR( Hard ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPNAME( 0x80, 0x00, "Demo Music" )                /* when levels are played by the computer */
 	PORT_DIPSETTING(	0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
 
@@ -136,9 +137,9 @@ static INPUT_PORTS_START( fastlane )
 	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )
 	PORT_DIPSETTING(	0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(	0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "Upright Controls" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Single ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Dual ) )
 	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x08, 0x08, "Continue" )
 	PORT_DIPSETTING(	0x08, "3" )
@@ -279,4 +280,4 @@ ROM_START( fastlane )
 ROM_END
 
 
-GAME( 1987, fastlane, 0, fastlane, fastlane, 0, ROT90, "Konami", "Fast Lane", GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1987, fastlane, 0, fastlane, fastlane, 0, ROT90, "Konami", "Fast Lane", GAME_NO_COCKTAIL | GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )
