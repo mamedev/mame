@@ -188,7 +188,7 @@ MAIN BOARD:
 #include "sound/dac.h"
 #include "sound/msm5205.h"
 #include "includes/trackfld.h"
-
+#include "includes/konamipt.h"
 
 #define MASTER_CLOCK          XTAL_18_432MHz
 #define SOUND_CLOCK           XTAL_14_31818MHz
@@ -278,6 +278,35 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1282, 0x1282) AM_MIRROR(0x007c) AM_READ_PORT("IN1")
 	AM_RANGE(0x1283, 0x1283) AM_MIRROR(0x007c) AM_READ_PORT("DSW1")
 	/* not used according to schems: AM_RANGE(0x1300, 0x1300) AM_MIRROR(0x007f) AM_READ_PORT("DSW3") */
+	AM_RANGE(0x1800, 0x183f) AM_RAM AM_BASE_MEMBER(trackfld_state, spriteram2)
+	AM_RANGE(0x1840, 0x185f) AM_RAM AM_BASE_MEMBER(trackfld_state, scroll)
+	AM_RANGE(0x1860, 0x1bff) AM_RAM
+	AM_RANGE(0x1c00, 0x1c3f) AM_RAM AM_BASE_SIZE_MEMBER(trackfld_state, spriteram, spriteram_size)
+	AM_RANGE(0x1c40, 0x1c5f) AM_RAM AM_BASE_MEMBER(trackfld_state, scroll2)
+	AM_RANGE(0x1c60, 0x1fff) AM_RAM
+	AM_RANGE(0x2800, 0x2fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x3000, 0x37ff) AM_RAM_WRITE(trackfld_videoram_w) AM_BASE_MEMBER(trackfld_state, videoram)
+	AM_RANGE(0x3800, 0x3fff) AM_RAM_WRITE(trackfld_colorram_w) AM_BASE_MEMBER(trackfld_state, colorram)
+	AM_RANGE(0x6000, 0xffff) AM_ROM
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( yieartf_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x007f) AM_WRITE(watchdog_reset_w)		/* AFE */
+	AM_RANGE(0x1080, 0x1080) AM_MIRROR(0x0078) AM_WRITE(trackfld_flipscreen_w)	/* FLIP */
+	AM_RANGE(0x1081, 0x1081) AM_MIRROR(0x0078) AM_WRITE(konami_sh_irqtrigger_w)	/* 26 */ /* cause interrupt on audio CPU */
+	AM_RANGE(0x1082, 0x1082) AM_MIRROR(0x0078) AM_WRITENOP						/* 25 */
+	AM_RANGE(0x1083, 0x1084) AM_MIRROR(0x0078) AM_WRITE(coin_w)					/* 24, 23 */
+	AM_RANGE(0x1085, 0x1085) AM_MIRROR(0x0078) AM_WRITENOP						/* CN3.2 */
+	AM_RANGE(0x1086, 0x1086) AM_MIRROR(0x0078) AM_WRITENOP						/* CN3.4 */
+	AM_RANGE(0x1087, 0x1087) AM_MIRROR(0x0078) AM_WRITE(interrupt_enable_w)		/* INT */
+//	AM_RANGE(0x1100, 0x1100) AM_MIRROR(0x007f) AM_WRITE(soundlatch_w)			/* 32 */
+	AM_RANGE(0x1200, 0x1200) AM_MIRROR(0x007f) AM_READ_PORT("DSW2")
+	AM_RANGE(0x1280, 0x1280) AM_MIRROR(0x007c) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0x1281, 0x1281) AM_MIRROR(0x007c) AM_READ_PORT("IN0")
+	AM_RANGE(0x1282, 0x1282) AM_MIRROR(0x007c) AM_READ_PORT("IN1")
+	AM_RANGE(0x1283, 0x1283) AM_MIRROR(0x007c) AM_READ_PORT("DSW1")
+	AM_RANGE(0x1300, 0x1300) AM_MIRROR(0x007f) AM_READ_PORT("DSW3")
 	AM_RANGE(0x1800, 0x183f) AM_RAM AM_BASE_MEMBER(trackfld_state, spriteram2)
 	AM_RANGE(0x1840, 0x185f) AM_RAM AM_BASE_MEMBER(trackfld_state, scroll)
 	AM_RANGE(0x1860, 0x1bff) AM_RAM
@@ -809,6 +838,62 @@ static INPUT_PORTS_START( reaktor )
 	PORT_DIPSETTING(      0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
+
+static INPUT_PORTS_START( yieartf )
+	PORT_START("SYSTEM")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("IN0")
+	KONAMI8_MONO_B12_UNK
+
+	PORT_START("IN1")
+	KONAMI8_COCKTAIL_B12_UNK
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x03, "1" )
+	PORT_DIPSETTING(    0x02, "2" )
+	PORT_DIPSETTING(    0x01, "3" )
+	PORT_DIPSETTING(    0x00, "5" )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Bonus_Life ) )
+	PORT_DIPSETTING(    0x08, "30000 80000" )
+	PORT_DIPSETTING(    0x00, "40000 90000" )
+	PORT_DIPNAME( 0x30, 0x10, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Difficult ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Very_Difficult ) )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW3")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "Upright Controls" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Single ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Dual ) )
+	PORT_SERVICE( 0x04, IP_ACTIVE_LOW )
+	PORT_BIT( 0xf8, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("DSW1")
+	KONAMI_COINAGE(DEF_STR( Free_Play ), "Invalid")
+	/* "Invalid" = both coin slots disabled */
+INPUT_PORTS_END
+
+
 static const gfx_layout charlayout =
 {
 	8,8,
@@ -836,6 +921,36 @@ static const gfx_layout spritelayout =
 static GFXDECODE_START( trackfld )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,     0, 16 )
 	GFXDECODE_ENTRY( "gfx2", 0, charlayout,   16*16, 16 )
+GFXDECODE_END
+
+
+static const gfx_layout yieartf_charlayout =
+{
+	8,8,
+	RGN_FRAC(1,1),
+	4,
+	{ 3, 2, 1, 0 },
+	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4 },
+	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
+	32*8
+};
+
+static const gfx_layout yieartf_spritelayout =
+{
+	16,16,
+	RGN_FRAC(1,2),
+	4,
+	{ 4, 0, RGN_FRAC(1,2)+4, RGN_FRAC(1,2)+0 },
+	{ 0*8*8+0, 0*8*8+1, 0*8*8+2, 0*8*8+3, 1*8*8+0, 1*8*8+1, 1*8*8+2, 1*8*8+3,
+	  2*8*8+0, 2*8*8+1, 2*8*8+2, 2*8*8+3, 3*8*8+0, 3*8*8+1, 3*8*8+2, 3*8*8+3 },
+	{  0*8,  1*8,  2*8,  3*8,  4*8,  5*8,  6*8,  7*8,
+	  32*8, 33*8, 34*8, 35*8, 36*8, 37*8, 38*8, 39*8 },
+	64*8
+};
+
+static GFXDECODE_START( yieartf )
+	GFXDECODE_ENTRY( "gfx1", 0, yieartf_spritelayout,     0, 1 )
+	GFXDECODE_ENTRY( "gfx2", 0, yieartf_charlayout,       16, 1 )
 GFXDECODE_END
 
 
@@ -951,6 +1066,54 @@ static MACHINE_DRIVER_START( trackfld )
 	MDRV_SOUND_ADD("vlm", VLM5030, VLM_CLOCK)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
+
+
+static MACHINE_DRIVER_START( yieartf )
+
+	/* driver data */
+	MDRV_DRIVER_DATA(trackfld_state)
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD("maincpu", M6809, MASTER_CLOCK/6/2)	/* a guess for now */
+	MDRV_CPU_PROGRAM_MAP(yieartf_map)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+
+// no sound cpu?
+//	MDRV_CPU_ADD("audiocpu", Z80, SOUND_CLOCK/4)
+//	MDRV_CPU_PROGRAM_MAP(sound_map)
+
+	MDRV_MACHINE_START(trackfld)
+	MDRV_MACHINE_RESET(trackfld)
+	MDRV_NVRAM_HANDLER(generic_0fill)
+
+	/* video hardware */
+	MDRV_SCREEN_ADD("screen", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(32*8, 32*8)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+
+	MDRV_GFXDECODE(yieartf)
+	MDRV_PALETTE_LENGTH(32)
+
+	MDRV_PALETTE_INIT(yiear)
+	MDRV_VIDEO_START(trackfld)
+	MDRV_VIDEO_UPDATE(yieartf)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD("dac", DAC, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+
+	MDRV_SOUND_ADD("snsnd", SN76496, SOUND_CLOCK/8)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MDRV_SOUND_ADD("vlm", VLM5030, VLM_CLOCK)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_DRIVER_END
+
 
 /* same as the original, but uses ADPCM instead of VLM5030 */
 /* also different memory handlers do handle that */
@@ -1362,6 +1525,32 @@ ROM_START( reaktor )
 	ROM_LOAD( "c9_d15.bin",   0x0000, 0x2000, CRC(f546a56b) SHA1(caee3d8546eb7a75ce2a578c6a1a630246aec6b8) )
 ROM_END
 
+ROM_START( yieartf )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "2.2a",      0x08000, 0x2000, CRC(349430e9) SHA1(0cd1ac9b949cc53679a67d47f1eae0daf2012550) )
+	ROM_LOAD( "3.3a",      0x0a000, 0x2000, CRC(17d8337b) SHA1(aa6b92ff42a5b5282170bd280f7c0bb5a38607ec) )
+	ROM_LOAD( "4.4a",      0x0c000, 0x2000, CRC(a89a2166) SHA1(e9e72ae9631d86ff884d1ab718b4884c38a5ae2d) )
+	ROM_LOAD( "5.5a",      0x0e000, 0x2000, CRC(ff1599eb) SHA1(6f345a1b230f5f8016b47034c74a87b29d16682b) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "a.15c",    0x00000, 0x4000, CRC(45109b29) SHA1(0794935b490497b21b99045c90231b7bac151d42) )
+	ROM_LOAD( "b.16c",    0x04000, 0x4000, CRC(1d650790) SHA1(5f2a4983b20251c712358547a7c62c0331c6cb6f) )
+	ROM_LOAD( "c.17c",    0x08000, 0x4000, CRC(e6aa945b) SHA1(c5757d16c28f5966fd04675c0c640ef9b6b76ca5) )
+	ROM_LOAD( "d.18c",    0x0c000, 0x4000, CRC(cc187c22) SHA1(555ba18a9648681e5140b3fd84af16959ee5296d) )
+
+	ROM_REGION( 0x04000, "gfx2", 0 )
+	ROM_LOAD( "6.16h",      0x00000, 0x2000, CRC(05a23af3) SHA1(d588a5d31e106a3c5b1e37b1826863108b87f02d) )
+	ROM_LOAD( "7.15h",      0x02000, 0x2000, CRC(988154fa) SHA1(981273ef70ae6a947c24559750a8e7dc3d032444) )
+	
+	// is this prom correct for this hardware? - check - track+field boards have 3 proms usually
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "yiear.clr",    0x00000, 0x0020, CRC(c283d71f) SHA1(10cd39f4e951ba6ca5610081c8c1fcd9d68b34d2) )
+
+	ROM_REGION( 0x2000, "vlm", 0 )	/* 8k for the VLM5030 data */
+	ROM_LOAD( "01.snd",    0x00000, 0x2000, CRC(f75a1539) SHA1(f139f6cb41351eb81ee47d777db03012aa5fadb1) )
+ROM_END
+
+
 static DRIVER_INIT( trackfld )
 {
 	konami1_decode(machine, "maincpu");
@@ -1447,3 +1636,4 @@ GAME( 1982, trackfldnz,trackfld, trackfld, trackfld, trackfld, ROT0,  "bootleg? 
 GAME( 1985, wizzquiz,  0,        wizzquiz, wizzquiz, wizzquiz, ROT0,  "Zilec-Zenitone (Konami license)", "Wizz Quiz (Konami version)", GAME_SUPPORTS_SAVE )
 GAME( 1985, wizzquiza, wizzquiz, wizzquiz, wizzquiz, wizzquiz, ROT0,  "Zilec-Zenitone", "Wizz Quiz (version 4)", GAME_SUPPORTS_SAVE )
 GAME( 1987, reaktor,   0,        reaktor,  reaktor,  0,        ROT90, "Zilec", "Reaktor (Track & Field conversion)", GAME_SUPPORTS_SAVE )
+GAME( 1985, yieartf,   yiear,    yieartf,  yieartf, 0,         ROT0,  "Konami", "Yie Ar Kung-Fu (GX361 conversion)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE ) // the conversion looks of bootleg quality, but the code is clearly a very different revision to either original hardware set...

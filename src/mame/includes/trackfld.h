@@ -81,7 +81,7 @@ WRITE8_HANDLER( atlantol_gfxbank_w );
 PALETTE_INIT( trackfld );
 VIDEO_START( trackfld );
 VIDEO_UPDATE( trackfld );
-
+VIDEO_UPDATE( yieartf );
 
 /*----------- defined in video/hyperspt.c -----------*/
 
@@ -93,7 +93,6 @@ PALETTE_INIT( hyperspt );
 VIDEO_START( hyperspt );
 VIDEO_UPDATE( hyperspt );
 VIDEO_START( roadf );
-
 
 /*----------- defined in video/sbasketb.c -----------*/
 
