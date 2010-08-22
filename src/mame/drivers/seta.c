@@ -9664,8 +9664,8 @@ ROM_END
 
 ROM_START( neobattl )	// 1CC74: "SD GUNDAM v0.00. 1992/11/04 10:04:33"
 	ROM_REGION( 0x100000, "maincpu", 0 )		/* 68000 Code */
-	ROM_LOAD16_BYTE( "BP923001.u45", 0x000000, 0x020000, CRC(0d0aeb73) SHA1(5ca631d5d68e53029f379d9877a056997c6c6afa) ) /* Alt label X1-001 which is also a Seta custom chip number */
-	ROM_LOAD16_BYTE( "BP923002.u46", 0x000001, 0x020000, CRC(9731fbbc) SHA1(196c913fb67496f9da2943ad1e69edf89cb65fdf) ) /* Alt label X1-002A which is also a Seta custom chip number */
+	ROM_LOAD16_BYTE( "bp923001.u45", 0x000000, 0x020000, CRC(0d0aeb73) SHA1(5ca631d5d68e53029f379d9877a056997c6c6afa) ) /* Alt label X1-001 which is also a Seta custom chip number */
+	ROM_LOAD16_BYTE( "bp923002.u46", 0x000001, 0x020000, CRC(9731fbbc) SHA1(196c913fb67496f9da2943ad1e69edf89cb65fdf) ) /* Alt label X1-002A which is also a Seta custom chip number */
 
 	ROM_REGION( 0x100000, "gfx1", 0 )	/* Sprites */
 	ROM_LOAD( "bp923-003.u15", 0x00000, 0x80000, CRC(91ca98a1) SHA1(b02b362e3a6118f52d9e1a262ca11aecef887b00) )
