@@ -2753,7 +2753,7 @@ UINT32 device_debug::dasm_wrapped(astring &buffer, offs_t pc)
 
 	// disassemble to our buffer
 	buffer.expand(200);
-	return disassemble(buffer, pc, opbuf, argbuf);
+	return disassemble(buffer.text, pc, opbuf, argbuf);
 }
 
 
