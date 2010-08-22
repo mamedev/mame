@@ -57,7 +57,7 @@
 ***************************************************************************/
 
 
-// ======================> z80dart_interface
+// ======================> via6522_interface
 
 struct via6522_interface
 {
@@ -78,7 +78,7 @@ struct via6522_interface
 
 
 
-// ======================> z80dart_device_config
+// ======================> via6522_device_config
 
 class via6522_device_config :   public device_config,
                                 public via6522_interface

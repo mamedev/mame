@@ -114,7 +114,7 @@
 //-------------------------------------------------
 
 via6522_device_config::via6522_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-    : device_config(mconfig, static_alloc_device_config, "OKI6295", tag, owner, clock)
+    : device_config(mconfig, static_alloc_device_config, "RIOT6532", tag, owner, clock)
 {
 }
 
