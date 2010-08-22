@@ -40,171 +40,209 @@
 #include "emu.h"
 #include "7474.h"
 
+//**************************************************************************
+//  DEVICE CONFIGURATION
+//**************************************************************************
 
-typedef struct _ttl7474_state ttl7474_state;
-struct _ttl7474_state
+//-------------------------------------------------
+//  ttl7474_device_config - constructor
+//-------------------------------------------------
+
+ttl7474_device_config::ttl7474_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+    : device_config(mconfig, static_alloc_device_config, "TTL7474", tag, owner, clock)
 {
-	/* callbacks */
-	devcb_resolved_write_line output_cb;
-	devcb_resolved_write_line comp_output_cb;
-
-	/* inputs */
-	UINT8 clear;			/* pin 1/13 */
-	UINT8 preset;			/* pin 4/10 */
-	UINT8 clock;			/* pin 3/11 */
-	UINT8 d;				/* pin 2/12 */
-
-	/* outputs */
-	UINT8 output;			/* pin 5/9 */
-	UINT8 output_comp;	/* pin 6/8 */
-
-	/* internal */
-	UINT8 last_clock;
-	UINT8 last_output;
-	UINT8 last_output_comp;
-
-	running_device *device;
-};
-
-INLINE ttl7474_state *get_safe_token(running_device *device)
-{
-	assert(device != NULL);
-	assert(device->type() == TTL7474);
-
-	return (ttl7474_state *)downcast<legacy_device_base *>(device)->token();
 }
 
 
-static void ttl7474_update(ttl7474_state *state)
+//-------------------------------------------------
+//  static_alloc_device_config - allocate a new
+//  configuration object
+//-------------------------------------------------
+
+device_config *ttl7474_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
 {
-	if (!state->preset && state->clear)			  /* line 1 in truth table */
+    return global_alloc(ttl7474_device_config(mconfig, tag, owner, clock));
+}
+
+
+//-------------------------------------------------
+//  alloc_device - allocate a new device object
+//-------------------------------------------------
+
+device_t *ttl7474_device_config::alloc_device(running_machine &machine) const
+{
+    return auto_alloc(&machine, ttl7474_device(machine, *this));
+}
+
+
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+//-------------------------------------------------
+//  ttl7474_device - constructor
+//-------------------------------------------------
+
+ttl7474_device::ttl7474_device(running_machine &_machine, const ttl7474_device_config &config)
+    : device_t(_machine, config),
+      m_config(config)
+{
+    init();
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void ttl7474_device::device_start()
+{
+    register_globals();
+
+    devcb_resolve_write_line(&m_output_cb, &m_config.m_output_cb, this);
+    devcb_resolve_write_line(&m_comp_output_cb, &m_config.m_comp_output_cb, this);
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void ttl7474_device::device_reset()
+{
+    init();
+}
+
+void ttl7474_device::update()
+{
+    if (!m_preset && m_clear)             /* line 1 in truth table */
 	{
-		state->output	 = 1;
-		state->output_comp = 0;
+        m_output    = 1;
+        m_output_comp = 0;
 	}
-	else if (state->preset && !state->clear)	  /* line 2 in truth table */
+    else if (m_preset && !m_clear)      /* line 2 in truth table */
 	{
-		state->output	 = 0;
-		state->output_comp = 1;
+        m_output    = 0;
+        m_output_comp = 1;
 	}
-	else if (!state->preset && !state->clear)	  /* line 3 in truth table */
+    else if (!m_preset && !m_clear)     /* line 3 in truth table */
 	{
-		state->output	 = 1;
-		state->output_comp = 1;
+        m_output    = 1;
+        m_output_comp = 1;
 	}
-	else if (!state->last_clock && state->clock)  /* line 4 in truth table */
+    else if (!m_last_clock && m_clock)  /* line 4 in truth table */
 	{
-		state->output	 =  state->d;
-		state->output_comp = !state->d;
+        m_output    =  m_d;
+        m_output_comp = !m_d;
 	}
 
-	state->last_clock = state->clock;
+    m_last_clock = m_clock;
 
 
 	/* call callback if any of the outputs changed */
-	if (state->output != state->last_output)
+    if (m_output != m_last_output)
 	{
-		state->last_output = state->output;
-		if (state->output_cb.write != NULL)
-			devcb_call_write_line(&state->output_cb, state->output);
+        m_last_output = m_output;
+        if (m_output_cb.write != NULL)
+            devcb_call_write_line(&m_output_cb, m_output);
 	}
 	/* call callback if any of the outputs changed */
-	if (state->output_comp != state->last_output_comp)
+    if (m_output_comp != m_last_output_comp)
 	{
-		state->last_output_comp = state->output_comp;
-		if (state->comp_output_cb.write != NULL)
-			devcb_call_write_line(&state->comp_output_cb, state->output_comp);
+        m_last_output_comp = m_output_comp;
+        if (m_comp_output_cb.write != NULL)
+            devcb_call_write_line(&m_comp_output_cb, m_output_comp);
 	}
 }
 
 
 WRITE_LINE_DEVICE_HANDLER( ttl7474_clear_w )
 {
-	ttl7474_state *dev_state = get_safe_token(device);
-	dev_state->clear = state & 1;
-	ttl7474_update(dev_state);
+    downcast<ttl7474_device *>(device)->clear_w(state);
+}
+
+void ttl7474_device::clear_w(UINT8 state)
+{
+    m_clear = state & 1;
+	update();
 }
 
 WRITE_LINE_DEVICE_HANDLER( ttl7474_preset_w )
 {
-	ttl7474_state *dev_state = get_safe_token(device);
-	dev_state->preset = state & 1;
-	ttl7474_update(dev_state);
+    downcast<ttl7474_device *>(device)->preset_w(state);
+}
+
+void ttl7474_device::preset_w(UINT8 state)
+{
+    m_preset = state & 1;
+	update();
 }
 
 WRITE_LINE_DEVICE_HANDLER( ttl7474_clock_w )
 {
-	ttl7474_state *dev_state = get_safe_token(device);
-	dev_state->clock = state & 1;
-	ttl7474_update(dev_state);
+    downcast<ttl7474_device *>(device)->clock_w(state);
+}
+
+void ttl7474_device::clock_w(UINT8 state)
+{
+    m_clock = state & 1;
+	update();
 }
 
 WRITE_LINE_DEVICE_HANDLER( ttl7474_d_w )
 {
-	ttl7474_state *dev_state = get_safe_token(device);
-	dev_state->d = state & 1;
-	ttl7474_update(dev_state);
+    downcast<ttl7474_device *>(device)->d_w(state);
+}
+
+void ttl7474_device::d_w(UINT8 state)
+{
+    m_d = state & 1;
+	update();
 }
 
 
 READ_LINE_DEVICE_HANDLER( ttl7474_output_r )
 {
-	ttl7474_state *dev_state = get_safe_token(device);
-	return dev_state->output;
+    return downcast<ttl7474_device *>(device)->output_r();
+}
+
+UINT8 ttl7474_device::output_r()
+{
+    return m_output;
 }
 
 READ_LINE_DEVICE_HANDLER( ttl7474_output_comp_r )
 {
-	ttl7474_state *dev_state = get_safe_token(device);
-	return dev_state->output_comp;
+    return downcast<ttl7474_device *>(device)->output_comp_r();
 }
 
-
-static DEVICE_START( ttl7474 )
+UINT8 ttl7474_device::output_comp_r()
 {
-	ttl7474_config *config = (ttl7474_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
-	ttl7474_state *state = get_safe_token(device);
-
-	devcb_resolve_write_line(&state->output_cb, &config->output_cb, device);
-	devcb_resolve_write_line(&state->comp_output_cb, &config->comp_output_cb, device);
-
-	state->device = device;
-
-	state_save_register_device_item(device, 0, state->clear);
-	state_save_register_device_item(device, 0, state->preset);
-	state_save_register_device_item(device, 0, state->clock);
-	state_save_register_device_item(device, 0, state->d);
-	state_save_register_device_item(device, 0, state->output);
-	state_save_register_device_item(device, 0, state->output_comp);
-	state_save_register_device_item(device, 0, state->last_clock);
-	state_save_register_device_item(device, 0, state->last_output);
-	state_save_register_device_item(device, 0, state->last_output_comp);
+    return m_output_comp;
 }
 
-
-static DEVICE_RESET( ttl7474 )
+void ttl7474_device::init()
 {
-	ttl7474_state *state = get_safe_token(device);
+    m_clear = 1;
+    m_preset = 1;
+    m_clock = 1;
+    m_d = 1;
 
-	/* all inputs are open first */
-	state->clear = 1;
-	state->preset = 1;
-	state->clock = 1;
-	state->d = 1;
-
-	state->output = -1;
-	state->last_clock = 1;
-	state->last_output = -1;
-	state->last_output_comp = -1;
+    m_output = -1;
+    m_last_clock = 1;
+    m_last_output = -1;
 }
 
+void ttl7474_device::register_globals()
+{
+    state_save_register_device_item(this, 0, m_clear);
+    state_save_register_device_item(this, 0, m_preset);
+    state_save_register_device_item(this, 0, m_clock);
+    state_save_register_device_item(this, 0, m_d);
+    state_save_register_device_item(this, 0, m_output);
+    state_save_register_device_item(this, 0, m_output_comp);
+    state_save_register_device_item(this, 0, m_last_clock);
+    state_save_register_device_item(this, 0, m_last_output);
+    state_save_register_device_item(this, 0, m_last_output_comp);
+}
 
-static const char DEVTEMPLATE_SOURCE[] = __FILE__;
-
-#define DEVTEMPLATE_ID(p,s)		p##ttl7474##s
-#define DEVTEMPLATE_FEATURES	DT_HAS_START | DT_HAS_RESET | DT_HAS_INLINE_CONFIG
-#define DEVTEMPLATE_NAME		"7474"
-#define DEVTEMPLATE_FAMILY		"TTL"
-#include "devtempl.h"
-
-DEFINE_LEGACY_DEVICE(TTL7474, ttl7474);
+const device_type MACHINE_TTL7474 = ttl7474_device_config::static_alloc_device_config;
