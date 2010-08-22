@@ -116,7 +116,7 @@ static TIMER_CALLBACK( vidc_video_tick )
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	static UINT8 *vram = memory_region(machine,"vram");
 
-	vram[vidc_vidcur] = (space->read_byte(vidc_vidstart+vidc_vidcur));
+	vram[vidc_vidcur] = (space->read_byte(vidc_vidstart+vidc_vidcur+vidc_vidinit));
 
 	vidc_vidcur++;
 
@@ -466,6 +466,9 @@ static WRITE32_HANDLER( ioc_ctrl_w )
 
 			if(data & 0x80) //force an IRQ
 				archimedes_request_irq_a(space->machine,ARCHIMEDES_IRQA_FORCE);
+
+			if(data & 0x08) //set up the VBLANK timer
+				timer_adjust_oneshot(vbl_timer, space->machine->primary_screen->time_until_pos(vidc_regs[0xb4]), 0);
 
 			break;
 
@@ -828,27 +831,27 @@ WRITE32_HANDLER(archimedes_memc_w)
 		switch ((data >> 17) & 7)
 		{
 			case 0: /* video init */
-				logerror("MEMC: VIDINIT %08x\n",data);
 				vidc_vidinit = ((data>>2)&0x7fff)*16;
+				//logerror("MEMC: VIDINIT %08x\n",vidc_vidinit);
 				break;
 
 			case 1: /* video start */
-				logerror("MEMC: VIDSTART %08x\n",data);
 				vidc_vidstart = 0x2000000 | (((data>>2)&0x7fff)*16);
+				//logerror("MEMC: VIDSTART %08x\n",vidc_vidstart);
 				break;
 
 			case 2: /* video end */
-				logerror("MEMC: VIDEND %08x\n",data);
 				vidc_vidend = 0x2000000 | (((data>>2)&0x7fff)*16);
+				//logerror("MEMC: VIDEND %08x\n",vidc_vidend);
 				break;
 
 			case 4:	/* sound start */
-				logerror("MEMC: VIDSNDSTART %08x\n",data);
+				//logerror("MEMC: VIDSNDSTART %08x\n",data);
 				vidc_sndstart = 0x2000000 | ((data>>2)&0x7fff)*16;
 				break;
 
 			case 5: /* sound end */
-				logerror("MEMC: VIDSNDEND %08x\n",data);
+				//logerror("MEMC: VIDSNDEND %08x\n",data);
 				vidc_sndend = 0x2000000 | ((data>>2)&0x7fff)*16;
 				break;
 
