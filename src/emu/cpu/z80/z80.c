@@ -3543,6 +3543,8 @@ static CPU_RESET( z80 )
 	z80->nmi_pending = FALSE;
 	z80->irq_state = CLEAR_LINE;
 	z80->after_ei = FALSE;
+	z80->iff1 = 0;
+	z80->iff2 = 0;
 
 	z80->daisy.reset();
 
