@@ -129,6 +129,41 @@ Notes:
       HSync - 15.6137kHz
       VSync - 57.4034Hz
 
+
+Stephh's notes (based on the games Z80 code and some tests) :
+
+1) 'firetrap' :
+
+  - US? version, licensed to Data East.
+  - MCU missing and simulated (init command = 0x13).
+  - No warning screen.
+  - Instructions in English
+  - Initials : 3 letters.
+  - Bugs in test mode :
+      * when lives are set to "2", it displays "1".
+      * bonus lives is still the same as the Japan version even if table at 0x0ca3 has changed.
+
+2) 'firetrapj' :
+
+  - Japan version.
+  - MCU missing and simulated (init command = 0xf5).
+  - Additional warning screen.
+  - Instructions in Japanese
+  - Initials : 5 letters.
+  - Bugs in test mode :
+      * when lives are set to "2", it displays "1".
+
+3) 'firetrapbl' :
+
+  - Bootleg based on 'firetrapj'.
+  - Most MCU writes are patched while reads are handled differently.
+  - Additional ROM with code at 0xf800 to simulate the MCU initialisation routine.
+  - No warning screen.
+  - Instructions in Japanese
+  - Initials : 5 letters.
+  - Bugs in test mode :
+      * when lives are set to "2", it displays "1".
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -158,8 +193,24 @@ static READ8_HANDLER( firetrap_8751_bootleg_r )
 	/* Check for coin insertion */
 	/* the following only works in the bootleg version, which doesn't have an */
 	/* 8751 - the real thing is much more complicated than that. */
-	if ((input_port_read(space->machine, "IN2") & 0x70) != 0x70)
+	firetrap_state *state = space->machine->driver_data<firetrap_state>();
+	UINT8 coin = 0;
+	UINT8 port = input_port_read(space->machine, "IN2") & 0x70;
+
+	if (cpu_get_pc(space->cpu) == 0x1188)
+		return ~state->coin_command_pending;
+
+	if (port != 0x70)
+	{
+		if (!(port & 0x20)) /* COIN1 */
+			coin = 1;
+		if (!(port & 0x40)) /* COIN2 */
+			coin = 2;
+		if (!(port & 0x10)) /* SERVICE1 */
+			coin = 3;
+		state->coin_command_pending = coin;
 		return 0xff;
+	}
 
 	return 0;
 }
@@ -204,8 +255,8 @@ static WRITE8_HANDLER( firetrap_8751_w )
 		return;
 	}
 
-	/* Init sequence command */
-	else if (data == 0x13)
+	/* Init sequence command (0x13 : US - 0xf5 : Japan) */
+	else if ((data == 0x13) || (data == 0xf5))
 	{
 		if (!state->i8751_current_command)
 			state->i8751_init_ptr = 0;
@@ -363,26 +414,26 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
-
+/* verified from Z80 code */
 static INPUT_PORTS_START( firetrap )
 	PORT_START("IN0")	/* IN0 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP ) PORT_4WAY
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN ) PORT_4WAY
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_LEFT ) PORT_4WAY
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_RIGHT ) PORT_4WAY
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP ) PORT_4WAY
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN ) PORT_4WAY
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_LEFT ) PORT_4WAY
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP )     PORT_4WAY
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN )   PORT_4WAY
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_LEFT )   PORT_4WAY
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_RIGHT )  PORT_4WAY
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP )    PORT_4WAY
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN )  PORT_4WAY
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_LEFT )  PORT_4WAY
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_RIGHT ) PORT_4WAY
 
 	PORT_START("IN1")	/* IN1 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP ) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN ) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_LEFT ) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_RIGHT ) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP ) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN ) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_LEFT ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP )     PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN )   PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_LEFT )   PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_RIGHT )  PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP )    PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN )  PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_LEFT )  PORT_4WAY PORT_COCKTAIL
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_RIGHT ) PORT_4WAY PORT_COCKTAIL
 
 	PORT_START("IN2")	/* IN2 */
@@ -427,15 +478,15 @@ static INPUT_PORTS_START( firetrap )
 	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x00, "1" )
+	PORT_DIPSETTING(    0x00, "2" )                         /* "1" in the "test mode" */
 	PORT_DIPSETTING(    0x0c, "3" )
 	PORT_DIPSETTING(    0x08, "4" )
 	PORT_DIPSETTING(    0x04, "5" )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x30, "50000 70000" )
-	PORT_DIPSETTING(    0x20, "60000 80000" )
-	PORT_DIPSETTING(    0x10, "80000 100000" )
-	PORT_DIPSETTING(    0x00, "50000" )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )       /* table at 0x0ca3 - 4*30 bytes */
+	PORT_DIPSETTING(    0x10, "30k and 70k" )
+	PORT_DIPSETTING(    0x00, "50k and 100k" )
+	PORT_DIPSETTING(    0x30, "30k only" )
+	PORT_DIPSETTING(    0x20, "50k only" )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )
@@ -447,82 +498,29 @@ static INPUT_PORTS_START( firetrap )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 INPUT_PORTS_END
 
+/* verified from Z80 code */
+static INPUT_PORTS_START( firetrapj )
+	PORT_INCLUDE( firetrap )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )       /* table at 0x0ca3 - 4*30 bytes */
+	PORT_DIPSETTING(    0x30, "50k 120k 70k+" )             /* last bonus life at 960k */
+	PORT_DIPSETTING(    0x20, "60k 140k 80k+" )             /* last bonus life at 940k */
+	PORT_DIPSETTING(    0x10, "80k 180k 100k+" )            /* last bonus life at 980k */
+	PORT_DIPSETTING(    0x00, "50k only" )
+INPUT_PORTS_END
+
+/* verified from Z80 code */
 static INPUT_PORTS_START( firetrapbl )
-	PORT_START("IN0")	/* IN0 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP ) PORT_4WAY
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN ) PORT_4WAY
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_LEFT ) PORT_4WAY
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_RIGHT ) PORT_4WAY
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP ) PORT_4WAY
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN ) PORT_4WAY
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_LEFT ) PORT_4WAY
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_RIGHT ) PORT_4WAY
+	PORT_INCLUDE( firetrapj )
 
-	PORT_START("IN1")	/* IN1 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_UP ) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_DOWN ) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_LEFT ) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_RIGHT ) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_UP ) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_DOWN ) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_LEFT ) PORT_4WAY PORT_COCKTAIL
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICKRIGHT_RIGHT ) PORT_4WAY PORT_COCKTAIL
+	PORT_MODIFY("IN2")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 
-	PORT_START("IN2")	/* IN2 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_COIN3 )	/* bootleg only */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )	/* bootleg only */
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )	/* bootleg only */
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
-
-	PORT_START("DSW0")	/* DSW0 */
-	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )
-//  PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
-//  PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ) )
-//  PORT_DIPSETTING(    0x02, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x06, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 1C_6C ) )
-	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x18, DEF_STR( 1C_1C ) )
-	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("DSW1")	/* DSW1 */
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x00, "1" )
-	PORT_DIPSETTING(    0x0c, "3" )
-	PORT_DIPSETTING(    0x08, "4" )
-	PORT_DIPSETTING(    0x04, "5" )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x30, "50000 70000" )
-	PORT_DIPSETTING(    0x20, "60000 80000" )
-	PORT_DIPSETTING(    0x10, "80000 100000" )
-	PORT_DIPSETTING(    0x00, "50000" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Allow_Continue ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Yes ) )
-	PORT_SERVICE( 0x80, IP_ACTIVE_LOW )
+	PORT_MODIFY("COIN")
+	PORT_BIT( 0x07, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -579,16 +577,24 @@ static const msm5205_interface msm5205_config =
 static INTERRUPT_GEN( firetrap )
 {
 	firetrap_state *state = device->machine->driver_data<firetrap_state>();
+	UINT8 coin = 0;
+	UINT8 port = input_port_read(device->machine, "COIN") & 0x07;
 
 	/* Check for coin IRQ */
 	if (cpu_getiloops(device))
 	{
-		if ((input_port_read(device->machine, "COIN") & 0x7) != 0x7 && !state->int_latch)
+		if (port != 0x07 && !state->int_latch)
 		{
-			state->coin_command_pending = ~input_port_read(device->machine, "COIN");
+			if (!(port & 0x01)) /* COIN1 */
+				coin = 1;
+			if (!(port & 0x02)) /* COIN2 */
+				coin = 2;
+			if (!(port & 0x04)) /* SERVICE1 */
+				coin = 3;
+			state->coin_command_pending = coin;
 			state->int_latch = 1;
 		}
-		if ((input_port_read(device->machine, "COIN") & 0x7) == 0x7)
+		if (port == 0x07)
 			state->int_latch = 0;
 
 		/* Make sure coin IRQ's aren't generated when another command is pending, the main cpu
@@ -955,5 +961,5 @@ ROM_END
 
 
 GAME( 1986, firetrap,   0,        firetrap,   firetrap,   0, ROT90, "Wood Place Inc. (Data East USA license)", "Fire Trap (US)", GAME_SUPPORTS_SAVE )
-GAME( 1986, firetrapj,  firetrap, firetrap,   firetrap,   0, ROT90, "Wood Place Inc.", "Fire Trap (Japan)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
+GAME( 1986, firetrapj,  firetrap, firetrap,   firetrapj,  0, ROT90, "Wood Place Inc.", "Fire Trap (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1986, firetrapbl, firetrap, firetrapbl, firetrapbl, 0, ROT90, "bootleg", "Fire Trap (Japan bootleg)", GAME_SUPPORTS_SAVE )
