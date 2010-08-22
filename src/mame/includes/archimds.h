@@ -60,7 +60,7 @@ extern READ32_HANDLER(archimedes_vidc_r);
 extern WRITE32_HANDLER(archimedes_vidc_w);
 
 extern UINT8 i2c_clk;
-extern INT16 memc_pages[(32*1024*1024)/(4096)];	// the logical RAM area is 32 megs, and the smallest page size is 4k
+extern INT16 memc_pages[0x2000];	// the logical RAM area is 32 megs, and the smallest page size is 4k
 extern UINT32 vidc_regs[256];
 extern UINT8 ioc_regs[0x80/4];
 extern UINT8 vidc_bpp_mode;

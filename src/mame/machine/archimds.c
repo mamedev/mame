@@ -46,9 +46,9 @@ static int memc_latchrom;
 static UINT32 ioc_timercnt[4], ioc_timerout[4];
 static UINT32 vidc_vidstart, vidc_vidend, vidc_vidinit,vidc_vidcur;
 static UINT32 vidc_sndstart, vidc_sndend, vidc_sndcur;
-static UINT8 video_dma_on;
+static UINT8 video_dma_on,audio_dma_on;
 UINT8 i2c_clk;
-INT16 memc_pages[(32*1024*1024)/(4096)];	// the logical RAM area is 32 megs, and the smallest page size is 4k
+INT16 memc_pages[0x2000];	// the logical RAM area is 32 megs, and the smallest page size is 4k
 UINT32 vidc_regs[256];
 UINT8 ioc_regs[0x80/4];
 UINT8 vidc_bpp_mode;
@@ -122,7 +122,7 @@ static TIMER_CALLBACK( vidc_video_tick )
 
 	if(video_dma_on)
 	{
-		if (vidc_vidcur >= vidc_vidend)
+		if (vidc_vidcur >= vidc_vidend-vidc_vidstart)
 			vidc_vidcur = 0;
 
 		timer_adjust_oneshot(vid_timer, ATTOTIME_IN_USEC(1), 0);
@@ -135,17 +135,22 @@ static TIMER_CALLBACK( vidc_audio_tick )
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
-	dac_signed_data_w(space->machine->device("dac"), (space->read_byte(vidc_sndcur)));
+	dac_signed_data_w(space->machine->device("dac"), (space->read_byte(vidc_sndstart+vidc_sndcur)));
 
 	vidc_sndcur++;
 
-	if (vidc_sndcur >= vidc_sndend)
+	if(audio_dma_on)
 	{
-		archimedes_request_irq_b(machine, ARCHIMEDES_IRQB_SOUND_EMPTY);
-
-		/* TODO */
-		timer_adjust_oneshot(snd_timer, attotime_never, 0);
-		dac_signed_data_w(space->machine->device("dac"), 0x80);
+		if (vidc_sndcur >= vidc_sndend-vidc_sndstart)
+		{
+			vidc_sndcur = 0;
+			archimedes_request_irq_b(machine, ARCHIMEDES_IRQB_SOUND_EMPTY);
+		}
+	}
+	else
+	{
+		//timer_adjust_oneshot(snd_timer, attotime_never, 0);
+		//dac_signed_data_w(space->machine->device("dac"), 0x80);
 	}
 }
 
@@ -831,22 +836,22 @@ WRITE32_HANDLER(archimedes_memc_w)
 
 			case 1: /* video start */
 				logerror("MEMC: VIDSTART %08x\n",data);
-				vidc_vidstart = ((data>>2)&0x7fff)*16;
+				vidc_vidstart = 0x2000000 | (((data>>2)&0x7fff)*16);
 				break;
 
 			case 2: /* video end */
 				logerror("MEMC: VIDEND %08x\n",data);
-				vidc_vidend = ((data>>2)&0x7fff)*16;
+				vidc_vidend = 0x2000000 | (((data>>2)&0x7fff)*16);
 				break;
 
 			case 4:	/* sound start */
 				logerror("MEMC: VIDSNDSTART %08x\n",data);
-				vidc_sndstart = ((data>>2)&0x7fff)*16;
+				vidc_sndstart = 0x2000000 | ((data>>2)&0x7fff)*16;
 				break;
 
 			case 5: /* sound end */
 				logerror("MEMC: VIDSNDEND %08x\n",data);
-				vidc_sndend = ((data>>2)&0x7fff)*16;
+				vidc_sndend = 0x2000000 | ((data>>2)&0x7fff)*16;
 				break;
 
 			case 7:	/* Control */
@@ -855,6 +860,7 @@ WRITE32_HANDLER(archimedes_memc_w)
 				logerror("(PC = %08x) MEMC: %x to Control (page size %d, %s, %s)\n", cpu_get_pc(space->cpu), data & 0x1ffc, page_sizes[memc_pagesize], ((data>>10)&1) ? "Video DMA on" : "Video DMA off", ((data>>11)&1) ? "Sound DMA on" : "Sound DMA off");
 
 				video_dma_on = ((data>>10)&1);
+				audio_dma_on = ((data>>11)&1);
 
 				if ((data>>10)&1)
 				{
@@ -869,17 +875,13 @@ WRITE32_HANDLER(archimedes_memc_w)
 					/* FIXME: is the frequency correct? */
 					sndhz = (250000.0) / (double)((vidc_regs[0xc0]&0xff)+2);
 
-					logerror("MEMC: Starting audio DMA at %f Hz, buffer from %x to %x\n", sndhz, vidc_sndstart, vidc_sndend);
+					printf("MEMC: Starting audio DMA at %f Hz, buffer from %x to %x\n", sndhz, vidc_sndstart, vidc_sndend);
 
-					vidc_sndcur = vidc_sndstart;
+					vidc_sndcur = 0;
 
 					timer_adjust_periodic(snd_timer, ATTOTIME_IN_HZ(sndhz), 0, ATTOTIME_IN_HZ(sndhz));
 				}
-				else
-				{
-					//timer_adjust_oneshot(snd_timer, attotime_never, 0);
-					//dac_signed_data_w(space->machine->device("dac"), 0x80);
-				}
+
 				break;
 
 			default:
