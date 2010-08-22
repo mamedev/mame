@@ -15,14 +15,20 @@ VIDEO_UPDATE( archimds_vidc )
 {
 	int xstart,ystart,xend,yend;
 	int res_x,res_y;
+	int calc_dxs = 0,calc_dxe = 0;
+	const UINT8 x_step[4] = { 5, 7, 11, 19 };
 
 	/* border color */
 	bitmap_fill(bitmap, cliprect, screen->machine->pens[0x10]);
 
-	/* display area x/y */
-	xstart = vidc_regs[VIDC_HBSR]-vidc_regs[VIDC_HDSR];
-	ystart = vidc_regs[VIDC_VBSR]-vidc_regs[VIDC_VDSR];
-	xend = vidc_regs[VIDC_HDER]+xstart;
+	/* define X display area thru BPP mode register */
+	calc_dxs = (vidc_regs[VIDC_HDSR]*2)+x_step[vidc_bpp_mode & 3];
+	calc_dxe = (vidc_regs[VIDC_HDER]*2)+x_step[vidc_bpp_mode & 3];
+
+	/* now calculate display clip rectangle start/end areas */
+	xstart = (calc_dxs)-vidc_regs[VIDC_HBSR];
+	ystart = (vidc_regs[VIDC_VDSR])-vidc_regs[VIDC_VBSR];
+	xend = (calc_dxe)+xstart;
 	yend = vidc_regs[VIDC_VDER]+ystart;
 
 	/* disable the screen if display params are invalid */

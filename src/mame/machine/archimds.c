@@ -38,7 +38,7 @@
 
 static const int page_sizes[4] = { 4096, 8192, 16384, 32768 };
 
-#define IOC_LOG 1
+#define IOC_LOG 0
 
 UINT32 *archimedes_memc_physmem;
 static UINT32 memc_pagesize;
@@ -589,7 +589,15 @@ READ32_HANDLER(archimedes_ioc_r)
 					logerror("IOC: Internal Podule Read\n");
 					return 0xffff;
 				case 5:
+					switch(ioc_addr & 0xfffc)
+					{
+						#ifdef MESS
+						case 0x50: return 0; //fdc type, new model returns 5 here
+						#endif
+					}
+
 					logerror("IOC: Internal Latches Read %08x\n",ioc_addr);
+
 					return 0xffff;
 			}
 		}
@@ -663,7 +671,7 @@ WRITE32_HANDLER(archimedes_ioc_w)
 	}
 
 
-	logerror("I/O: W %x @ %x (mask %08x)\n", data, (offset*4)+0x3000000, mem_mask);
+	logerror("(PC=%08x) I/O: W %x @ %x (mask %08x)\n", cpu_get_pc(space->cpu), data, (offset*4)+0x3000000, mem_mask);
 }
 
 READ32_HANDLER(archimedes_vidc_r)
@@ -737,10 +745,10 @@ WRITE32_HANDLER(archimedes_vidc_w)
 		{
 			case VIDC_HCR:  vidc_regs[VIDC_HCR] =  ((val >> 14)<<1)+1; 	break;
 //			case VIDC_HSWR: vidc_regs[VIDC_HSWR] = (val >> 14)+1; 	break;
-			case VIDC_HBSR: vidc_regs[VIDC_HBSR] = (val >> 14)+1; 	break;
+			case VIDC_HBSR: vidc_regs[VIDC_HBSR] = ((val >> 14)<<1)+1; 	break;
 			case VIDC_HDSR: vidc_regs[VIDC_HDSR] = (val >> 14); 	break;
 			case VIDC_HDER: vidc_regs[VIDC_HDER] = (val >> 14); 	break;
-			case VIDC_HBER: vidc_regs[VIDC_HBER] = (val >> 14)+1; 	break;
+			case VIDC_HBER: vidc_regs[VIDC_HBER] = ((val >> 14)<<1)+1; 	break;
 //			#define VIDC_HCSR		0x98
 //			#define VIDC_HIR		0x9c
 
@@ -844,7 +852,7 @@ WRITE32_HANDLER(archimedes_memc_w)
 			case 7:	/* Control */
 				memc_pagesize = ((data>>2) & 3);
 
-				logerror("MEMC: %x to Control (page size %d, %s, %s)\n", data & 0x1ffc, page_sizes[memc_pagesize], ((data>>10)&1) ? "Video DMA on" : "Video DMA off", ((data>>11)&1) ? "Sound DMA on" : "Sound DMA off");
+				logerror("(PC = %08x) MEMC: %x to Control (page size %d, %s, %s)\n", cpu_get_pc(space->cpu), data & 0x1ffc, page_sizes[memc_pagesize], ((data>>10)&1) ? "Video DMA on" : "Video DMA off", ((data>>11)&1) ? "Sound DMA on" : "Sound DMA off");
 
 				video_dma_on = ((data>>10)&1);
 
@@ -954,6 +962,6 @@ WRITE32_HANDLER(archimedes_memc_page_w)
 	// now go ahead and set the mapping in the page table
 	memc_pages[log] = phys + (memc*0x80);
 
-//	printf("MEMC_PAGE(%d): W %08x: log %x to phys %x, MEMC %d, perms %d\n", memc_pagesize, data, log, phys, memc, perms);
+	printf("PC=%08x = MEMC_PAGE(%d): W %08x: log %x to phys %x, MEMC %d, perms %d\n", cpu_get_pc(space->cpu),memc_pagesize, data, log, phys, memc, perms);
 }
 
