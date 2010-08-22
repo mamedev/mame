@@ -4792,9 +4792,9 @@ ROM_END
 
 /*          rom       parent    machine   inp       init */
 GAME( 1991, cdi,      0,        cdi,      cdi,      0,        ROT0,     "Philips", "CD-i (Mono-I) BIOS", GAME_IS_BIOS_ROOT )
-GAME( 1996, quizard,  cdi,      cdi,      cdi,      0,        ROT0,     "Disney",  "Quizard 3.2",   GAME_NOT_WORKING )
-GAME( 1995, quizrd22, cdi,      cdi,      cdi,      0,        ROT0,     "Disney",  "Quizard 2.2",   GAME_NOT_WORKING )
-GAME( 1995, quizrd17, cdi,      cdi,      cdi,      0,        ROT0,     "Disney",  "Quizard 1.7",   GAME_NOT_WORKING )
-GAME( 1995, quizrd12, cdi,      cdi,      cdi,      0,        ROT0,     "Disney",  "Quizard 1.2",   GAME_NOT_WORKING )
-GAME( 1998, quizrr42, cdi,      cdi,      cdi,      0,        ROT0,     "Disney",  "Quizard Rainbow 4.2",   GAME_NOT_WORKING )
-GAME( 1998, quizrr41, cdi,      cdi,      cdi,      0,        ROT0,     "Disney",  "Quizard Rainbow 4.1",   GAME_NOT_WORKING )
+GAME( 1996, quizard,  cdi,      cdi,      cdi,      0,        ROT0,     "TAB Austria",  "Quizard 3.2",   GAME_NOT_WORKING )
+GAME( 1995, quizrd22, cdi,      cdi,      cdi,      0,        ROT0,     "TAB Austria",  "Quizard 2.2",   GAME_NOT_WORKING )
+GAME( 1995, quizrd17, cdi,      cdi,      cdi,      0,        ROT0,     "TAB Austria",  "Quizard 1.7",   GAME_NOT_WORKING )
+GAME( 1995, quizrd12, cdi,      cdi,      cdi,      0,        ROT0,     "TAB Austria",  "Quizard 1.2",   GAME_NOT_WORKING )
+GAME( 1998, quizrr42, cdi,      cdi,      cdi,      0,        ROT0,     "TAB Austria",  "Quizard Rainbow 4.2",   GAME_NOT_WORKING )
+GAME( 1998, quizrr41, cdi,      cdi,      cdi,      0,        ROT0,     "TAB Austria",  "Quizard Rainbow 4.1",   GAME_NOT_WORKING )
