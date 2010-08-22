@@ -16,9 +16,31 @@
                    IEO   7 |             | 34  B/_A
                    _M1   8 |             | 33  C/_D
                    Vdd   9 |             | 32  _RD
-               _W/RDYA  10 |  Z80-DART   | 31  GND
-                  _RIA  11 |  Z80-SIO/0  | 30  _W/RDYB
+               _W/RDYA  10 |   Z80-DART  | 31  GND
+                  _RIA  11 |             | 30  _W/RDYB
                   RxDA  12 |             | 29  _RIB
+                 _RxCA  13 |             | 28  RxDB
+                 _TxCA  14 |             | 27  _RxTxCB
+                  TxDA  15 |             | 26  TxDB
+                 _DTRA  16 |             | 25  _DTRB
+                 _RTSA  17 |             | 24  _RTSB
+                 _CTSA  18 |             | 23  _CTSB
+                 _DCDA  19 |             | 22  _DCDB
+                   CLK  20 |_____________| 21  _RESET
+
+                            _____   _____
+                    D1   1 |*    \_/     | 40  D0
+                    D3   2 |             | 39  D2
+                    D5   3 |             | 38  D4
+                    D7   4 |             | 37  D6
+                  _INT   5 |             | 36  _IORQ
+                   IEI   6 |             | 35  _CE
+                   IEO   7 |             | 34  B/_A
+                   _M1   8 |             | 33  C/_D
+                   Vdd   9 |             | 32  _RD
+               _W/RDYA  10 |  Z80-SIO/0  | 31  GND
+                _SYNCA  11 |             | 30  _W/RDYB
+                  RxDA  12 |             | 29  _SYNCB
                  _RxCA  13 |             | 28  RxDB
                  _TxCA  14 |             | 27  _RxTxCB
                   TxDA  15 |             | 26  TxDB
@@ -82,18 +104,6 @@
 
 
 //**************************************************************************
-//  CONSTANTS
-//**************************************************************************
-
-enum
-{
-	Z80DART_CH_A = 0,
-	Z80DART_CH_B
-};
-
-
-
-//**************************************************************************
 //  DEVICE CONFIGURATION MACROS
 //**************************************************************************
 
@@ -111,6 +121,14 @@ enum
 
 #define MDRV_Z80SIO2_ADD(_tag, _clock, _config) \
 	MDRV_DEVICE_ADD(_tag, Z80SIO2, _clock) \
+	MDRV_DEVICE_CONFIG(_config)
+
+#define MDRV_Z80SIO3_ADD(_tag, _clock, _config) \
+	MDRV_DEVICE_ADD(_tag, Z80SIO3, _clock) \
+	MDRV_DEVICE_CONFIG(_config)
+
+#define MDRV_Z80SIO4_ADD(_tag, _clock, _config) \
+	MDRV_DEVICE_ADD(_tag, Z80SIO4, _clock) \
 	MDRV_DEVICE_CONFIG(_config)
 
 #define MDRV_Z80DART_REMOVE(_tag) \
@@ -309,6 +327,9 @@ private:
 
 		int m_dtr;					// data terminal ready
 		int m_rts;					// request to send
+
+		// synchronous state
+		UINT16 m_sync;				// sync character
 	};
 
 	// internal state
@@ -330,11 +351,8 @@ extern const device_type Z80DART;
 extern const device_type Z80SIO0;
 extern const device_type Z80SIO1;
 extern const device_type Z80SIO2;
-/*
-#define Z8470   DEVICE_GET_INFO_NAME(z8470)
-#define LH0081  DEVICE_GET_INFO_NAME(lh0088)
-#define MK3881  DEVICE_GET_INFO_NAME(mk3888)
-*/
+extern const device_type Z80SIO3;
+extern const device_type Z80SIO4;
 
 
 
