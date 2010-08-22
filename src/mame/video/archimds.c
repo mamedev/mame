@@ -15,6 +15,7 @@ VIDEO_UPDATE( archimds_vidc )
 {
 	int xstart,ystart,xend,yend;
 	int res_x,res_y;
+	int xsize,ysize;
 	int calc_dxs = 0,calc_dxe = 0;
 	const UINT8 x_step[4] = { 5, 7, 11, 19 };
 
@@ -35,6 +36,9 @@ VIDEO_UPDATE( archimds_vidc )
 	if(xstart > xend || ystart > yend)
 		return 0;
 
+	xsize = calc_dxe-calc_dxs;
+	ysize = vidc_regs[VIDC_VDER]-vidc_regs[VIDC_VDSR];
+
 	{
 		int count;
 		int x,y,xi;
@@ -47,9 +51,9 @@ VIDEO_UPDATE( archimds_vidc )
 		{
 			case 0: //1 bpp
 			{
-				for(y=0;y<400;y++)
+				for(y=0;y<ysize;y++)
 				{
-					for(x=0;x<640;x+=8)
+					for(x=0;x<xsize;x+=8)
 					{
 						pen = vram[count];
 
@@ -85,9 +89,9 @@ VIDEO_UPDATE( archimds_vidc )
 			break;
 			case 3: //8 bpp
 			{
-				for(y=0;y<400;y++)
+				for(y=0;y<ysize;y++)
 				{
-					for(x=0;x<640;x++)
+					for(x=0;x<xsize;x++)
 					{
 						pen = vram[count];
 
