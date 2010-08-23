@@ -3049,6 +3049,8 @@ V-V                           TP-027
 	DRIVER( mshud )
 	DRIVER( 19xxd )
 	DRIVER( sfz2ad )
+	DRIVER( sfz2jd )
+	DRIVER( spf2td )
 	DRIVER( spf2xjd )
 	DRIVER( ddsomud )
 	DRIVER( megamn2d )
@@ -3058,9 +3060,12 @@ V-V                           TP-027
 	DRIVER( vsavd )
 	DRIVER( mvscud )
 	DRIVER( sfa3ud )
-	DRIVER( gwingjd )
+	DRIVER( gigawingd )
+	DRIVER( gigawingjd )
 	DRIVER( 1944d )
-	DRIVER( progerjd )
+	DRIVER( progearud )
+	DRIVER( progearjd )
+	DRIVER( progearjbl )
 	DRIVER( hsf2d )
 	DRIVER( ssf2tbd )
 	DRIVER( ssf2xjd )
@@ -3068,8 +3073,14 @@ V-V                           TP-027
 	DRIVER( armwar1d )
 	DRIVER( dimahoud )
 	DRIVER( mmatrixd )
+	DRIVER( vhunt2d )
+	DRIVER( vsav2d )
+	DRIVER( csclub1d )
+	DRIVER( cybotsud )
+	DRIVER( mshvsfu1d )
+	DRIVER( sfz3jr2d )
 
-	/* Capcom CPS3 games */
+	 /* Capcom CPS3 games */
 	DRIVER( sfiii )		/* 04/02/1997 (c) 1997 Capcom */
 	DRIVER( sfiiij )	/* 04/02/1997 (c) 1997 Capcom */
 	DRIVER( sfiii2 )	/* 30/09/1997 (c) 1997 Capcom */
