@@ -66,7 +66,11 @@ extern UINT8 ioc_regs[0x80/4];
 extern UINT8 vidc_bpp_mode;
 extern UINT8 vidc_interlace;
 
+/* IOC registers */
+
 #define CONTROL			0x00/4
+#define KART			0x04/4 // Keyboard Asynchronous Receiver Transmitter
+
 #define IRQ_STATUS_A 	0x10/4
 #define IRQ_REQUEST_A   0x14/4
 #define IRQ_MASK_A 		0x18/4
@@ -77,6 +81,27 @@ extern UINT8 vidc_interlace;
 #define FIQ_STATUS		0x30/4
 #define FIQ_REQUEST     0x34/4
 #define FIQ_MASK		0x38/4
+
+#define T0_LATCH_LO	0x40/4
+#define T0_LATCH_HI 0x44/4
+#define T0_GO		0x48/4
+#define T0_LATCH	0x4c/4
+
+#define T1_LATCH_LO	0x50/4
+#define T1_LATCH_HI 0x54/4
+#define T1_GO		0x58/4
+#define T1_LATCH	0x5c/4
+
+#define T2_LATCH_LO	0x60/4
+#define T2_LATCH_HI 0x64/4
+#define T2_GO		0x68/4
+#define T2_LATCH	0x6c/4
+
+#define T3_LATCH_LO	0x70/4
+#define T3_LATCH_HI 0x74/4
+#define T3_GO		0x78/4
+#define T3_LATCH	0x7c/4
+
 
 /*----------- defined in video/archimds.c -----------*/
 

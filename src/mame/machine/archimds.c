@@ -31,6 +31,7 @@
 #include "sound/dac.h"
 #include "includes/archimds.h"
 #include "machine/i2cmem.h"
+#include "debugger.h"
 
 #ifdef MESS
 #include "machine/wd17xx.h"
@@ -139,7 +140,7 @@ static TIMER_CALLBACK( vidc_audio_tick )
 
 	vidc_sndcur++;
 
-	if (vidc_sndcur >= vidc_sndend-vidc_sndstart)
+	if (vidc_sndcur >= (vidc_sndend-vidc_sndstart)+0x10)
 	{
 		vidc_sndcur = 0;
 		archimedes_request_irq_b(machine, ARCHIMEDES_IRQB_SOUND_EMPTY);
@@ -156,11 +157,20 @@ static void a310_set_timer(int tmr)
 {
 	double freq;
 
-	if(ioc_timercnt[tmr] != 0) // FIXME: dmdtouch does a divide by zero?
+	switch(tmr)
 	{
-		freq = 2000000.0 / (double)ioc_timercnt[tmr];
-//	  logerror("IOC: starting timer %d, %d ticks, freq %f Hz\n", tmr, ioc_timercnt[tmr], freq);
-		timer_adjust_oneshot(timer[tmr], ATTOTIME_IN_HZ(freq), tmr);
+		case 0:
+		case 1:
+			timer_adjust_oneshot(timer[tmr], ATTOTIME_IN_USEC(ioc_timercnt[tmr]/8), tmr); // TODO: ARM timings are quite off there, it should be latch and not latch/8
+			break;
+		case 2:
+			freq = 1000000.0 / (double)(ioc_timercnt[tmr]+1);
+			timer_adjust_oneshot(timer[tmr], ATTOTIME_IN_HZ(freq), tmr);
+			break;
+		case 3:
+			freq = 1000000.0 / (double)((ioc_timercnt[tmr]+1)*16);
+			timer_adjust_oneshot(timer[tmr], ATTOTIME_IN_HZ(freq), tmr);
+			break;
 	}
 }
 
@@ -198,6 +208,7 @@ void archimedes_reset(running_machine *machine)
 	ioc_regs[IRQ_STATUS_A] = 0x10 | 0x80; //set up POR (Power On Reset) and Force IRQ at start-up
 	ioc_regs[IRQ_STATUS_B] = 0x02; //set up IL[1] On
 	ioc_regs[FIQ_STATUS] = 0x80;   //set up Force FIQ
+	ioc_regs[CONTROL] = 0xff;
 }
 
 void archimedes_init(running_machine *machine)
@@ -365,6 +376,9 @@ static READ32_HANDLER( ioc_ctrl_r )
 	if(IOC_LOG)
 	logerror("IOC: R %s = %02x (PC=%x) %02x\n", ioc_regnames[offset&0x1f], ioc_regs[offset&0x1f], cpu_get_pc( space->cpu ),offset & 0x1f);
 
+	if((offset & 0x1f) >= 0x40/4)
+	printf("IOC: R %s = %02x (PC=%x) %02x\n", ioc_regnames[offset&0x1f], ioc_regs[offset&0x1f], cpu_get_pc( space->cpu ),offset & 0x1f);
+
 	switch (offset & 0x1f)
 	{
 		case CONTROL:
@@ -381,7 +395,7 @@ static READ32_HANDLER( ioc_ctrl_r )
 			return (flyback) | (ioc_regs[CONTROL] & 0x7c) | (i2c_clk<<1) | i2c_data;
 		}
 
-		case 1:	// keyboard read
+		case KART:	// keyboard read
 			archimedes_request_irq_b(space->machine, ARCHIMEDES_IRQB_KBD_XMIT_EMPTY);
 			break;
 
@@ -412,22 +426,17 @@ static READ32_HANDLER( ioc_ctrl_r )
 		case FIQ_MASK:
 			return (ioc_regs[FIQ_MASK]);
 
-		case 16:	// timer 0 read
-			return ioc_timerout[0]&0xff;
-		case 17:
-			return (ioc_timerout[0]>>8)&0xff;
-		case 20:	// timer 1 read
-			return ioc_timerout[1]&0xff;
-		case 21:
-			return (ioc_timerout[1]>>8)&0xff;
-		case 24:	// timer 2 read
-			return ioc_timerout[2]&0xff;
-		case 25:
-			return (ioc_timerout[2]>>8)&0xff;
-		case 28:	// timer 3 read
-			return ioc_timerout[3]&0xff;
-		case 29:
-			return (ioc_timerout[3]>>8)&0xff;
+		case T0_LATCH_LO: return ioc_timerout[0]&0xff;
+		case T0_LATCH_HI: return (ioc_timerout[0]>>8)&0xff;
+
+		case T1_LATCH_LO: return ioc_timerout[1]&0xff;
+		case T1_LATCH_HI: return (ioc_timerout[1]>>8)&0xff;
+
+		case T2_LATCH_LO: return ioc_timerout[2]&0xff;
+		case T2_LATCH_HI: return (ioc_timerout[2]>>8)&0xff;
+
+		case T3_LATCH_LO: return ioc_timerout[3]&0xff;
+		case T3_LATCH_HI: return (ioc_timerout[3]>>8)&0xff;
 		default:
 			if(!IOC_LOG)
 				logerror("IOC: R %s = %02x (PC=%x) %02x\n", ioc_regnames[offset&0x1f], ioc_regs[offset&0x1f], cpu_get_pc( space->cpu ),offset & 0x1f);
@@ -443,16 +452,20 @@ static WRITE32_HANDLER( ioc_ctrl_w )
 	if(IOC_LOG)
 	logerror("IOC: W %02x @ reg %s (PC=%x)\n", data&0xff, ioc_regnames[offset&0x1f], cpu_get_pc( space->cpu ));
 
+	if((offset & 0x1f) >= 0x40/4)
+	printf("IOC: W %02x @ reg %s (PC=%x)\n", data&0xff, ioc_regnames[offset&0x1f], cpu_get_pc( space->cpu ));
+
+
 	switch (offset&0x1f)
 	{
-		case 0:	// I2C bus control
+		case CONTROL:	// I2C bus control
 			//logerror("IOC I2C: CLK %d DAT %d\n", (data>>1)&1, data&1);
 			i2cmem_sda_write(space->machine->device("i2cmem"), data & 0x01);
 			i2cmem_scl_write(space->machine->device("i2cmem"), (data & 0x02) >> 1);
 			i2c_clk = (data & 2) >> 1;
 			break;
 
-		case 1:
+		case KART:
 			#if 0
 			if(data == 0x0d)
 				printf("\n");
@@ -484,66 +497,66 @@ static WRITE32_HANDLER( ioc_ctrl_w )
 			ioc_regs[IRQ_STATUS_A] &= ~(data&0xff);
 
 			// if that did it, clear the IRQ
-			if (ioc_regs[IRQ_STATUS_A] == 0)
+			//if (ioc_regs[IRQ_STATUS_A] == 0)
 			{
-				printf("IRQ clear A\n");
+				//printf("IRQ clear A\n");
 				cputag_set_input_line(space->machine, "maincpu", ARM_IRQ_LINE, CLEAR_LINE);
 			}
 			break;
 
-		case 16:
-		case 17:
+		case T0_LATCH_LO:
+		case T0_LATCH_HI:
 			ioc_regs[offset&0x1f] = data & 0xff;
 			break;
 
-		case 20:
-		case 21:
+		case T1_LATCH_LO:
+		case T1_LATCH_HI:
 			ioc_regs[offset&0x1f] = data & 0xff;
 			break;
 
-		case 24:
-		case 25:
+		case T2_LATCH_LO:
+		case T2_LATCH_HI:
 			ioc_regs[offset&0x1f] = data & 0xff;
 			break;
 
-		case 28:
-		case 29:
+		case T3_LATCH_LO:
+		case T3_LATCH_HI:
 			ioc_regs[offset&0x1f] = data & 0xff;
 			break;
 
-		case 19:	// Timer 0 latch
+		case T0_LATCH:	// Timer 0 latch
 			latch_timer_cnt(0);
 			break;
 
-		case 23:	// Timer 1 latch
+		case T1_LATCH:	// Timer 1 latch
 			latch_timer_cnt(1);
 			break;
 
-		case 27:	// Timer 2 latch
+		case T2_LATCH:	// Timer 2 latch
 			latch_timer_cnt(2);
 			break;
 
-		case 31:	// Timer 3 latch
+		case T3_LATCH:	// Timer 3 latch
 			latch_timer_cnt(3);
 			break;
 
-		case 18:	// Timer 0 start
-			ioc_timercnt[0] = ioc_regs[17]<<8 | ioc_regs[16];
+		case T0_GO:	// Timer 0 start
+			ioc_timercnt[0] = ioc_regs[T0_LATCH_HI]<<8 | ioc_regs[T0_LATCH_LO];
 			a310_set_timer(0);
 			break;
 
-		case 22:	// Timer 1 start
-			ioc_timercnt[1] = ioc_regs[21]<<8 | ioc_regs[20];
+		case T1_GO:	// Timer 1 start
+			ioc_timercnt[1] = ioc_regs[T1_LATCH_HI]<<8 | ioc_regs[T1_LATCH_LO];
 			a310_set_timer(1);
 			break;
 
-		case 26:	// Timer 2 start
-			ioc_timercnt[2] = ioc_regs[25]<<8 | ioc_regs[24];
+		case T2_GO:	// Timer 2 start
+			ioc_timercnt[2] = ioc_regs[T2_LATCH_HI]<<8 | ioc_regs[T2_LATCH_LO];
 			a310_set_timer(2);
 			break;
 
-		case 30:	// Timer 3 start
-			ioc_timercnt[3] = ioc_regs[29]<<8 | ioc_regs[28];
+		case T3_GO:	// Timer 3 start
+			ioc_timercnt[3] = ioc_regs[T3_LATCH_HI]<<8 | ioc_regs[T3_LATCH_LO];
 			a310_set_timer(3);
 			break;
 
@@ -846,13 +859,15 @@ WRITE32_HANDLER(archimedes_memc_w)
 				break;
 
 			case 4:	/* sound start */
-				//logerror("MEMC: VIDSNDSTART %08x\n",data);
+				//logerror("MEMC: SNDSTART %08x\n",data);
 				vidc_sndstart = 0x2000000 | ((data>>2)&0x7fff)*16;
+				ioc_regs[IRQ_STATUS_B] &= ~ARCHIMEDES_IRQB_SOUND_EMPTY;
 				break;
 
 			case 5: /* sound end */
-				//logerror("MEMC: VIDSNDEND %08x\n",data);
+				//logerror("MEMC: SNDEND %08x\n",data);
 				vidc_sndend = 0x2000000 | ((data>>2)&0x7fff)*16;
+				archimedes_request_irq_b(space->machine, ARCHIMEDES_IRQB_SOUND_EMPTY);
 				break;
 
 			case 7:	/* Control */
