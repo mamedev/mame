@@ -1041,7 +1041,7 @@ static void print_game_info(FILE *out, const game_driver *game)
 		fprintf(out, "\t\t<description>%s</description>\n", xml_normalize_string(game->description));
 
 	/* print the year only if is a number */
-	if (game->year != NULL && strspn(game->year, "0123456789") == strlen(game->year))
+	if (game->year != NULL && strspn(game->year, "0123456789?+") == strlen(game->year))
 		fprintf(out, "\t\t<year>%s</year>\n", xml_normalize_string(game->year));
 
 	/* print the manufacturer information */
