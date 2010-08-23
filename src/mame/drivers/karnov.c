@@ -35,6 +35,44 @@
     Karnov - put 0x30 at 0x60201 to skip a level
     Chelnov - level number at 0x60189 - enter a value at cartoon intro
 
+
+Stephh's notes (based on the games M68000 code and some tests) :
+
+1) 'karnov' and its clones :
+
+  - DSW1 bit 7 is called "No Die Mode" in the manual. It used to give invulnerability
+    to shots (but not to falls), but it has no effect due to the "bra" instruction
+    at 0x001334 ('karnov') or 0x00131a ('karnov').
+
+2) 'wndrplnt'
+
+  - There is code at 0x01c000 which tests DSW2 bit 6 which seems to act as a "Freeze"
+    Dip Switch, but this address doesn't seem to be reached. Leftover from another game ?
+  - DSW2 bit 7 used to give invulnerability, but it has no effect due to
+    the "andi.w  #$7fff, D5" instruction at 0x0011a2.
+
+3) 'chelnov' and its clones :
+
+3a) 'chelnov'
+
+  - DSW2 bit 6 isn't tested in this set.
+  - DSW2 bit 7 used to give invulnerability, but it has no effect due to
+    the "andi.w  #$3fff, D5" instruction at 0x000ed0.
+
+3b) 'chelnovu'
+
+  - DSW2 bit 6 freezes the game (code at 0x000654), but when you turn
+    the Dip Swicth back to "Off", it adds credits as if COIN1 was pressed.
+    Is that the correct behaviour ?
+  - Even if there is a "andi.w  #$ffff, D5" instruction at 0x000ef0,
+    DSW2 bit 7 isn't tested in this set.
+
+3c) 'chelnovj'
+
+  - DSW2 bit 6 isn't tested in this set.
+  - DSW2 bit 7 used to give invulnerability, but it has no effect due to
+    the "andi.w  #$3fff, D5" instruction at 0x000ed8.
+
 *******************************************************************************/
 
 #include "emu.h"
@@ -65,11 +103,11 @@ static void karnov_i8751_w( running_machine *machine, int data )
 
 	state->i8751_return = 0;
 
-	if (data == 0x100 && state->microcontroller_id == KARNOVJ)	/* Japan version */
-		state->i8751_return = 0x56a;
-
 	if (data == 0x100 && state->microcontroller_id == KARNOV)	/* USA version */
 		state->i8751_return = 0x56b;
+
+	if (data == 0x100 && state->microcontroller_id == KARNOVJ)	/* Japan version */
+		state->i8751_return = 0x56a;
 
 	if ((data & 0xf00) == 0x300)
 		state->i8751_return = (data & 0xff) * 0x12; /* Player sprite mapping */
@@ -164,28 +202,28 @@ static void chelnov_i8751_w( running_machine *machine, int data )
 
 	state->i8751_return = 0;
 
+	if (data == 0x200 && state->microcontroller_id == CHELNOV)	/* World version */
+		state->i8751_return = 0x7736;
+
+	if (data == 0x200 && state->microcontroller_id == CHELNOVU)	/* USA version */
+		state->i8751_return = 0x783e;
+
 	if (data == 0x200 && state->microcontroller_id == CHELNOVJ)	/* Japan version */
 		state->i8751_return = 0x7734;
 
-	if (data == 0x200 && state->microcontroller_id == CHELNOV)	/* USA version */
-		state->i8751_return = 0x783e;
+	if (data == 0x100 && state->microcontroller_id == CHELNOV)	/* World version */
+		state->i8751_return = 0x71c;
 
-	if (data == 0x200 && state->microcontroller_id == CHELNOVW)	/* World version */
-		state->i8751_return = 0x7736;
+	if (data == 0x100 && state->microcontroller_id == CHELNOVU)	/* USA version */
+		state->i8751_return = 0x71b;
 
 	if (data == 0x100 && state->microcontroller_id == CHELNOVJ)	/* Japan version */
 		state->i8751_return = 0x71a;
 
-	if (data == 0x100 && state->microcontroller_id == CHELNOV)	/* USA version */
-		state->i8751_return = 0x71b;
-
-	if (data == 0x100 && state->microcontroller_id == CHELNOVW)	/* World version */
-		state->i8751_return = 0x71c;
-
 	if (data >= 0x6000 && data < 0x8000)
 		state->i8751_return = 1;  /* patched */
 
-	if ((data & 0xf000) == 0x1000) state->i8751_level = 1;	/* Level 1 */
+	if ((data & 0xf000) == 0x1000) state->i8751_level = 1;		/* Level 1 */
 	if ((data & 0xf000) == 0x2000) state->i8751_level++;		/* Level Increment */
 
 	if ((data & 0xf000) == 0x3000)
@@ -195,7 +233,7 @@ static void chelnov_i8751_w( running_machine *machine, int data )
 		switch (state->i8751_level)
 		{
 			case 1: /* Level 1, Sprite mapping tables */
-				if (state->microcontroller_id == CHELNOV) /* USA */
+				if (state->microcontroller_id == CHELNOVU) /* USA */
 				{
 					if (b < 2) state->i8751_return = 0;
 					else if (b < 6) state->i8751_return = 1;
@@ -217,7 +255,7 @@ static void chelnov_i8751_w( running_machine *machine, int data )
 					else state->i8751_return = 8;
 				}
 				break;
-			case 2: /* Level 2, Sprite mapping tables, USA & Japan are the same */
+			case 2: /* Level 2, Sprite mapping tables, all sets are the same */
 				if (b < 3) state->i8751_return = 0;
 				else if (b < 9) state->i8751_return = 1;
 				else if (b < 0x11) state->i8751_return = 2;
@@ -226,7 +264,7 @@ static void chelnov_i8751_w( running_machine *machine, int data )
 				else if (b < 0x28) state->i8751_return = 5;
 				else state->i8751_return = 6;
 				break;
-			case 3: /* Level 3, Sprite mapping tables, USA & Japan are the same */
+			case 3: /* Level 3, Sprite mapping tables, all sets are the same */
 				if (b < 5) state->i8751_return = 0;
 				else if (b < 9) state->i8751_return = 1;
 				else if (b < 0xd) state->i8751_return = 2;
@@ -237,7 +275,7 @@ static void chelnov_i8751_w( running_machine *machine, int data )
 				else if (b < 0x27) state->i8751_return = 7;
 				else state->i8751_return = 8;
 				break;
-			case 4: /* Level 4, Sprite mapping tables, USA & Japan are the same */
+			case 4: /* Level 4, Sprite mapping tables, all sets are the same */
 				if (b < 4) state->i8751_return = 0;
 				else if (b < 0xc) state->i8751_return = 1;
 				else if (b < 0xf) state->i8751_return = 2;
@@ -247,7 +285,7 @@ static void chelnov_i8751_w( running_machine *machine, int data )
 				else if (b < 0x29) state->i8751_return = 6;
 				else state->i8751_return = 7;
 				break;
-			case 5: /* Level 5, Sprite mapping tables */
+			case 5: /* Level 5, Sprite mapping tables, all sets are the same  */
 				if (b < 7) state->i8751_return = 0;
 				else if (b < 0xe) state->i8751_return = 1;
 				else if (b < 0x14) state->i8751_return = 2;
@@ -256,7 +294,7 @@ static void chelnov_i8751_w( running_machine *machine, int data )
 				else if (b < 0x27) state->i8751_return = 5;
 				else state->i8751_return = 6;
 				break;
-			case 6: /* Level 6, Sprite mapping tables */
+			case 6: /* Level 6, Sprite mapping tables, all sets are the same  */
 				if (b < 3) state->i8751_return = 0;
 				else if (b < 0xb) state->i8751_return = 1;
 				else if (b < 0x11) state->i8751_return = 2;
@@ -265,7 +303,7 @@ static void chelnov_i8751_w( running_machine *machine, int data )
 				else if (b < 0x24) state->i8751_return = 5;
 				else state->i8751_return = 6;
 				break;
-			case 7: /* Level 7, Sprite mapping tables */
+			case 7: /* Level 7, Sprite mapping tables, all sets are the same  */
 				if (b < 5) state->i8751_return = 0;
 				else if (b < 0xb) state->i8751_return = 1;
 				else if (b < 0x11) state->i8751_return = 2;
@@ -334,7 +372,7 @@ static WRITE16_HANDLER( karnov_control_w )
 		case 6: /* SECREQ (Interrupt & Data to i8751) */
 			if (state->microcontroller_id == KARNOV || state->microcontroller_id == KARNOVJ)
 				karnov_i8751_w(space->machine, data);
-			if (state->microcontroller_id == CHELNOV || state->microcontroller_id == CHELNOVJ || state->microcontroller_id == CHELNOVW)
+			if (state->microcontroller_id == CHELNOV || state->microcontroller_id == CHELNOVU || state->microcontroller_id == CHELNOVJ)
 				chelnov_i8751_w(space->machine, data);
 			if (state->microcontroller_id == WNDRPLNT)
 				wndrplnt_i8751_w(space->machine, data);
@@ -418,18 +456,18 @@ ADDRESS_MAP_END
 
 static INPUT_PORTS_START( common )
 	PORT_START("P1_P2")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
-	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 )
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 )
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED ) /* Button 4 on karnov schematics */
 
-	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
-	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
@@ -448,78 +486,84 @@ static INPUT_PORTS_START( common )
 INPUT_PORTS_END
 
 
+/* verified from M68000 code */
 static INPUT_PORTS_START( karnov )
 	PORT_INCLUDE( common )
 
 	PORT_START("FAKE")	/* Dummy input for i8751 */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Coin_B ) ) PORT_DIPLOCATION("SW1:3,4")
+	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Coin_A ) )       PORT_DIPLOCATION("SW1:1,2")
 	PORT_DIPSETTING(      0x0000, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x0003, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(      0x0002, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x000c, 0x000c, DEF_STR( Coin_A ) ) PORT_DIPLOCATION("SW1:1,2")
+	PORT_DIPNAME( 0x000c, 0x000c, DEF_STR( Coin_B ) )       PORT_DIPLOCATION("SW1:3,4")
 	PORT_DIPSETTING(      0x0000, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x000c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(      0x0004, DEF_STR( 1C_3C ) )
-	PORT_DIPUNUSED_DIPLOC( 0x0010, 0x0000, "SW1:5" )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Flip_Screen ) ) PORT_DIPLOCATION("SW1:6")
+	PORT_DIPUNUSED_DIPLOC( 0x0010, 0x0010, "SW1:5" )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Flip_Screen ) )  PORT_DIPLOCATION("SW1:6")
 	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW1:7")
+	PORT_DIPNAME( 0x0040, 0x0000, DEF_STR( Cabinet ) )      PORT_DIPLOCATION("SW1:7")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Upright ) )
 	PORT_DIPSETTING(      0x0040, DEF_STR( Cocktail ) )
-	PORT_DIPUNKNOWN_DIPLOC( 0x0080, 0x0080, "SW1:8" )
-	/* 0x0080 called No Die Mode according to the manual, but it doesn't seem to have any effect */
+	PORT_DIPUNUSED_DIPLOC( 0x0080, 0x0080, "SW1:8" )        /* see notes */
 
-	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:1,2")
+	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Lives ) )        PORT_DIPLOCATION("SW2:1,2")
 	PORT_DIPSETTING(      0x0100, "1" )
 	PORT_DIPSETTING(      0x0300, "3" )
 	PORT_DIPSETTING(      0x0200, "5" )
 	PORT_DIPSETTING(      0x0000, "Infinite (Cheat)")
-	PORT_DIPNAME( 0x0c00, 0x0c00, DEF_STR( Bonus_Life ) ) PORT_DIPLOCATION("SW2:3,4")
-	PORT_DIPSETTING(      0x0c00, "50 K" )
-	PORT_DIPSETTING(      0x0800, "70 K" )
-	PORT_DIPSETTING(      0x0400, "90 K" )
-	PORT_DIPSETTING(      0x0000, "100 K" )
-	PORT_DIPNAME( 0x3000, 0x3000, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPNAME( 0x0c00, 0x0c00, DEF_STR( Bonus_Life ) )   PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPSETTING(      0x0c00, "50 'K'" )
+	PORT_DIPSETTING(      0x0800, "70 'K'" )
+	PORT_DIPSETTING(      0x0400, "90 'K'" )
+	PORT_DIPSETTING(      0x0000, "100 'K'" )
+	PORT_DIPNAME( 0x3000, 0x3000, DEF_STR( Difficulty ) )   PORT_DIPLOCATION("SW2:5,6")
 	PORT_DIPSETTING(      0x2000, DEF_STR( Easy ) )
 	PORT_DIPSETTING(      0x3000, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x1000, DEF_STR( Hard ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Very_Hard ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("SW2:7")
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Demo_Sounds ) )  PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x4000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, "Timer Speed" ) PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x8000, 0x8000, "Timer Speed" )           PORT_DIPLOCATION("SW2:8")
 	PORT_DIPSETTING(      0x8000, DEF_STR( Normal ) )
 	PORT_DIPSETTING(      0x0000, "Fast" )
 INPUT_PORTS_END
 
+
+/* verified from M68000 code */
 static INPUT_PORTS_START( wndrplnt )
 	PORT_INCLUDE( common )
 
+	PORT_MODIFY("P1_P2")
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON3 */
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )           /* BUTTON3 PORT_COCKTAIL */
+
 	PORT_START("FAKE")	/* Dummy input for i8751 */
-	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 )
 	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 )
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SERVICE1 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x0003, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(      0x0002, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x000c, 0x000c, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x000c, 0x000c, DEF_STR( Coin_B ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x000c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(      0x0004, DEF_STR( 1C_3C ) )
-	PORT_DIPUNKNOWN( 0x0010, 0x0000 )
+	PORT_DIPUNUSED( 0x0010, 0x0010 )
 	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0020, DEF_STR( On ) )
@@ -535,44 +579,41 @@ static INPUT_PORTS_START( wndrplnt )
 	PORT_DIPSETTING(      0x0300, "3" )
 	PORT_DIPSETTING(      0x0200, "5" )
 	PORT_DIPSETTING(      0x0000, "Infinite (Cheat)")
-	PORT_DIPUNKNOWN( 0x0400, 0x0400 )
-	PORT_DIPUNKNOWN( 0x0800, 0x0800 )
+	PORT_DIPNAME( 0x0c00, 0x0c00, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( Easy ) )
+	PORT_DIPSETTING(      0x0c00, DEF_STR( Normal ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( Hard ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
 	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Allow_Continue ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )
 	PORT_DIPSETTING(      0x1000, DEF_STR( Yes ) )
-	PORT_DIPUNKNOWN( 0x2000, 0x2000 )
-	PORT_DIPNAME( 0xc000, 0xc000, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(      0x8000, DEF_STR( Easy ) )
-	PORT_DIPSETTING(      0xc000, DEF_STR( Normal ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( Hard ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
+	PORT_DIPUNUSED( 0x2000, 0x2000 )
+	PORT_DIPUNUSED( 0x4000, 0x4000 )                        /* see notes */
+	PORT_DIPUNUSED( 0x8000, 0x8000 )                        /* see notes */
 INPUT_PORTS_END
 
+
+/* verified from M68000 code */
 static INPUT_PORTS_START( chelnov )
 	PORT_INCLUDE( common )
 
-	PORT_MODIFY("SYSTEM")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-
 	PORT_START("FAKE")	/* Dummy input for i8751 */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN2 )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
 
 	PORT_START("DSW")
-	PORT_DIPNAME( 0x000c, 0x000c, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(      0x000c, DEF_STR( 1C_1C ) )
 	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(      0x0003, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(      0x0002, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( 1C_4C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_6C ) )
-	PORT_DIPUNKNOWN( 0x0010, 0x0010 )
+	PORT_DIPNAME( 0x000c, 0x000c, DEF_STR( Coin_B ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x000c, DEF_STR( 1C_1C ) )
+	PORT_DIPUNUSED( 0x0010, 0x0010 )
 	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0020, DEF_STR( On ) )
@@ -588,74 +629,44 @@ static INPUT_PORTS_START( chelnov )
 	PORT_DIPSETTING(      0x0300, "3" )
 	PORT_DIPSETTING(      0x0200, "5" )
 	PORT_DIPSETTING(      0x0000, "Infinite (Cheat)")
-	PORT_DIPNAME( 0x0c00, 0x0c00, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( Easy ) )
-	PORT_DIPSETTING(      0x0c00, DEF_STR( Normal ) )
-	PORT_DIPSETTING(      0x0800, DEF_STR( Hard ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
+	PORT_DIPNAME( 0x0c00, 0x0c00, DEF_STR( Difficulty ) )   /* also determines "Bonus Life" settings */
+	PORT_DIPSETTING(      0x0800, DEF_STR( Easy ) )         /* bonus life at 30k 60k 100k 150k 250k 100k+ */
+	PORT_DIPSETTING(      0x0c00, DEF_STR( Normal ) )       /* bonus life at 50k 120k 200k 300k 100k+ */
+	PORT_DIPSETTING(      0x0400, DEF_STR( Hard ) )         /* bonus life at 80k 160k 260k 100k+ */
+	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )      /* bonus life at every 100k */
 	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Allow_Continue ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )
 	PORT_DIPSETTING(      0x1000, DEF_STR( Yes ) )
-	PORT_DIPUNKNOWN( 0x2000, 0x2000 )
-	PORT_DIPNAME( 0x4000, 0x4000, "Freeze" )
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPUNUSED( 0x8000, 0x8000 )
+	PORT_DIPUNUSED( 0x2000, 0x2000 )
+	PORT_DIPUNUSED( 0x4000, 0x4000 )                        /* see notes */
+	PORT_DIPUNUSED( 0x8000, 0x8000 )                        /* see notes */
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( chelnovu )
-	PORT_INCLUDE( common )
+/* verified from M68000 code */
+static INPUT_PORTS_START( chelnovj )
+	PORT_INCLUDE( chelnov )
 
-	PORT_MODIFY("SYSTEM")
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("FAKE")	/* Dummy input for i8751 */
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_SERVICE1 )
-
-	PORT_START("DSW")
-	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Coin_B ) )
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x0003, 0x0003, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x0003, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(      0x0002, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(      0x0001, DEF_STR( 1C_3C ) )
-	PORT_DIPNAME( 0x000c, 0x000c, DEF_STR( Coin_A ) )
+	PORT_DIPNAME( 0x000c, 0x000c, DEF_STR( Coin_B ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(      0x000c, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(      0x0008, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(      0x0004, DEF_STR( 1C_3C ) )
-	PORT_DIPUNKNOWN( 0x0010, 0x0010 )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Demo_Sounds ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0000, DEF_STR( Cabinet ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Upright ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Cocktail ) )
+INPUT_PORTS_END
 
-	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Lives ) )
-	PORT_DIPSETTING(      0x0100, "1" )
-	PORT_DIPSETTING(      0x0300, "3" )
-	PORT_DIPSETTING(      0x0200, "5" )
-	PORT_DIPSETTING(      0x0000, "Infinite (Cheat)")
-	PORT_DIPNAME( 0x0c00, 0x0c00, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( Easy ) )
-	PORT_DIPSETTING(      0x0c00, DEF_STR( Normal ) )
-	PORT_DIPSETTING(      0x0800, DEF_STR( Hard ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Allow_Continue ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )
-	PORT_DIPSETTING(      0x1000, DEF_STR( Yes ) )
-	PORT_DIPUNKNOWN( 0x2000, 0x2000 )
-	PORT_DIPNAME( 0x4000, 0x4000, "Freeze" )
+/* verified from M68000 code */
+static INPUT_PORTS_START( chelnovu )
+	PORT_INCLUDE( chelnovj )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x4000, 0x4000, "Freeze" )                /* see notes */
 	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPUNUSED( 0x8000, 0x8000 )
 INPUT_PORTS_END
 
 
@@ -718,21 +729,22 @@ GFXDECODE_END
 static INTERRUPT_GEN( karnov_interrupt )
 {
 	karnov_state *state = device->machine->driver_data<karnov_state>();
-
+	UINT8 port = input_port_read(device->machine, "FAKE");
+	
 	/* Coin input to the i8751 generates an interrupt to the main cpu */
-	if (input_port_read(device->machine, "FAKE") == state->coin_mask)
+	if (port == state->coin_mask)
 		state->latch = 1;
 
-	if (input_port_read(device->machine, "FAKE") != state->coin_mask && state->latch)
+	if (port != state->coin_mask && state->latch)
 	{
 		if (state->i8751_needs_ack)
 		{
 			/* i8751 is busy - queue the command */
-			state->i8751_coin_pending = input_port_read(device->machine, "FAKE") | 0x8000;
+			state->i8751_coin_pending = port | 0x8000;
 		}
 		else
 		{
-			state->i8751_return = input_port_read(device->machine, "FAKE") | 0x8000;
+			state->i8751_return = port | 0x8000;
 			cpu_set_input_line(device, 6, HOLD_LINE);
 			state->i8751_needs_ack = 1;
 		}
@@ -1002,12 +1014,12 @@ ROM_START( wndrplnt )
 	ROM_LOAD( "ea20.prm",      0x0400, 0x0400, CRC(619f9d1e) SHA1(17fe49b6c9ce17be4a03e3400229e3ef4998a46f) )
 ROM_END
 
-ROM_START( chelnovu )
+ROM_START( chelnov )
 	ROM_REGION( 0x60000, "maincpu", 0 )	/* 6*64k for 68000 code */
-	ROM_LOAD16_BYTE( "ee08-a.j15",   0x00000, 0x10000, CRC(2f2fb37b) SHA1(f89b424099097a95cf184d20a15b876c5b639552) )
-	ROM_LOAD16_BYTE( "ee11-a.j20",   0x00001, 0x10000, CRC(f306d05f) SHA1(e523ffd17fb0104fe28eac288b6ebf7fc0ea2908) )
-	ROM_LOAD16_BYTE( "ee07-a.j14",   0x20000, 0x10000, CRC(9c69ed56) SHA1(23606d2fc7c550eaddf0fd4b0da1a4e2c9263e14) )
-	ROM_LOAD16_BYTE( "ee10-a.j18",   0x20001, 0x10000, CRC(d5c5fe4b) SHA1(183b2f5dfa4e0a9067674a29abab2744a887fd19) )
+	ROM_LOAD16_BYTE( "ee08-e.j16",   0x00000, 0x10000, CRC(8275cc3a) SHA1(961166226b68744eef15fed6a306010757b83556) )
+	ROM_LOAD16_BYTE( "ee11-e.j19",   0x00001, 0x10000, CRC(889e40a0) SHA1(e927f32d9bc448a331fb7b3478b2d07154f5013b) )
+	ROM_LOAD16_BYTE( "a-j14.bin",    0x20000, 0x10000, CRC(51465486) SHA1(e165e754eb756db3abc1f8477171ab817d03a890) )
+	ROM_LOAD16_BYTE( "a-j18.bin",    0x20001, 0x10000, CRC(d09dda33) SHA1(1764215606eec61e4fe30c0fc82ea2faf17821dc) )
 	ROM_LOAD16_BYTE( "ee06-e.j13",   0x40000, 0x10000, CRC(55acafdb) SHA1(9dc0528c888dd73617f8cab76690b9296715680a) )
 	ROM_LOAD16_BYTE( "ee09-e.j17",   0x40001, 0x10000, CRC(303e252c) SHA1(d5d2570e42aa1e1b3600d14cc694677248e12750) )
 
@@ -1035,12 +1047,12 @@ ROM_START( chelnovu )
 	ROM_LOAD( "ee20.l6",      0x0400, 0x0400, CRC(41816132) SHA1(89a1194bd8bf39f13419df685e489440bdb05676) )
 ROM_END
 
-ROM_START( chelnov )
+ROM_START( chelnovu )
 	ROM_REGION( 0x60000, "maincpu", 0 )	/* 6*64k for 68000 code */
-	ROM_LOAD16_BYTE( "ee08-e.j16",   0x00000, 0x10000, CRC(8275cc3a) SHA1(961166226b68744eef15fed6a306010757b83556) )
-	ROM_LOAD16_BYTE( "ee11-e.j19",   0x00001, 0x10000, CRC(889e40a0) SHA1(e927f32d9bc448a331fb7b3478b2d07154f5013b) )
-	ROM_LOAD16_BYTE( "a-j14.bin",    0x20000, 0x10000, CRC(51465486) SHA1(e165e754eb756db3abc1f8477171ab817d03a890) )
-	ROM_LOAD16_BYTE( "a-j18.bin",    0x20001, 0x10000, CRC(d09dda33) SHA1(1764215606eec61e4fe30c0fc82ea2faf17821dc) )
+	ROM_LOAD16_BYTE( "ee08-a.j15",   0x00000, 0x10000, CRC(2f2fb37b) SHA1(f89b424099097a95cf184d20a15b876c5b639552) )
+	ROM_LOAD16_BYTE( "ee11-a.j20",   0x00001, 0x10000, CRC(f306d05f) SHA1(e523ffd17fb0104fe28eac288b6ebf7fc0ea2908) )
+	ROM_LOAD16_BYTE( "ee07-a.j14",   0x20000, 0x10000, CRC(9c69ed56) SHA1(23606d2fc7c550eaddf0fd4b0da1a4e2c9263e14) )
+	ROM_LOAD16_BYTE( "ee10-a.j18",   0x20001, 0x10000, CRC(d5c5fe4b) SHA1(183b2f5dfa4e0a9067674a29abab2744a887fd19) )
 	ROM_LOAD16_BYTE( "ee06-e.j13",   0x40000, 0x10000, CRC(55acafdb) SHA1(9dc0528c888dd73617f8cab76690b9296715680a) )
 	ROM_LOAD16_BYTE( "ee09-e.j17",   0x40001, 0x10000, CRC(303e252c) SHA1(d5d2570e42aa1e1b3600d14cc694677248e12750) )
 
@@ -1112,21 +1124,21 @@ static DRIVER_INIT( karnov )
 {
 	karnov_state *state = machine->driver_data<karnov_state>();
 	state->microcontroller_id = KARNOV;
-	state->coin_mask = 0;
+	state->coin_mask = 0x07;
 }
 
 static DRIVER_INIT( karnovj )
 {
 	karnov_state *state = machine->driver_data<karnov_state>();
 	state->microcontroller_id = KARNOVJ;
-	state->coin_mask = 0;
+	state->coin_mask = 0x07;
 }
 
 static DRIVER_INIT( wndrplnt )
 {
 	karnov_state *state = machine->driver_data<karnov_state>();
 	state->microcontroller_id = WNDRPLNT;
-	state->coin_mask = 0;
+	state->coin_mask = 0x00;
 }
 
 static DRIVER_INIT( chelnov )
@@ -1140,12 +1152,12 @@ static DRIVER_INIT( chelnov )
 	RAM[0x062a/2] = 0x4e71;  /* hangs waiting on i8751 int */
 }
 
-static DRIVER_INIT( chelnovw )
+static DRIVER_INIT( chelnovu )
 {
 	karnov_state *state = machine->driver_data<karnov_state>();
 	UINT16 *RAM = (UINT16 *)memory_region(machine, "maincpu");
 
-	state->microcontroller_id = CHELNOVW;
+	state->microcontroller_id = CHELNOVU;
 	state->coin_mask = 0xe0;
 	RAM[0x0a26/2] = 0x4e71;  /* removes a protection lookup table */
 	RAM[0x062a/2] = 0x4e71;  /* hangs waiting on i8751 int */
@@ -1172,6 +1184,6 @@ static DRIVER_INIT( chelnovj )
 GAME( 1987, karnov,   0,       karnov,   karnov,   karnov,   ROT0,   "Data East USA",         "Karnov (US)", GAME_SUPPORTS_SAVE )
 GAME( 1987, karnovj,  karnov,  karnov,   karnov,   karnovj,  ROT0,   "Data East Corporation", "Karnov (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1987, wndrplnt, 0,       wndrplnt, wndrplnt, wndrplnt, ROT270, "Data East Corporation", "Wonder Planet (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1988, chelnov,  0,       karnov,   chelnov,  chelnovw, ROT0,   "Data East Corporation", "Chelnov - Atomic Runner (World)", GAME_SUPPORTS_SAVE )
-GAME( 1988, chelnovu, chelnov, karnov,   chelnovu, chelnov,  ROT0,   "Data East USA",         "Chelnov - Atomic Runner (US)", GAME_SUPPORTS_SAVE )
-GAME( 1988, chelnovj, chelnov, karnov,   chelnovu, chelnovj, ROT0,   "Data East Corporation", "Chelnov - Atomic Runner (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1988, chelnov,  0,       karnov,   chelnov,  chelnov,  ROT0,   "Data East Corporation", "Chelnov - Atomic Runner (World)", GAME_SUPPORTS_SAVE )
+GAME( 1988, chelnovu, chelnov, karnov,   chelnovu, chelnovu, ROT0,   "Data East USA",         "Chelnov - Atomic Runner (US)", GAME_SUPPORTS_SAVE )
+GAME( 1988, chelnovj, chelnov, karnov,   chelnovj, chelnovj, ROT0,   "Data East Corporation", "Chelnov - Atomic Runner (Japan)", GAME_SUPPORTS_SAVE )
