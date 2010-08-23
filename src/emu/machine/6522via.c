@@ -857,6 +857,8 @@ void via6522_device::reg_w(UINT8 offset, UINT8 data)
 		}
 		else
 		{
+			timer_adjust_oneshot(m_t2, cycles_to_time(TIMER2_VALUE), 0);
+			m_t2_active = 1;
 			m_time2 = timer_get_time(&m_machine);
 		}
 		break;
