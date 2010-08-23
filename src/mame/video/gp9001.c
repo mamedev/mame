@@ -128,11 +128,6 @@ Pipi & Bibis     | Fix Eight        | V-Five           | Snow Bros. 2     |
 #include "emu.h"
 #include "gp9001.h"
 
-bitmap_t* gp9001_custom_priority_bitmap;
-bitmap_t* gp9001_secondary_render_bitmap;
-
-int gp9001_displog = 0;
-
 static WRITE16_DEVICE_HANDLER( gp9001_bg_tilemap_w )
 {
 	gp9001vdp_device *vdp = (gp9001vdp_device*)device;
@@ -995,10 +990,10 @@ void gp9001_log_vram(gp9001vdp_device* vdp, running_machine *machine)
 
 	if ( input_code_pressed_once(machine, KEYCODE_E) )
 	{
-		gp9001_displog += 1;
-		gp9001_displog &= 1;
+		*vdp->displog += 1;
+		*vdp->displog &= 1;
 	}
-	if (gp9001_displog)
+	if (*vdp->displog)
 	{
 		logerror("Scrolls   BG-X  BG-Y   FG-X  FG-Y   TOP-X  TOP-Y   Sprite-X  Sprite-Y\n");
 
@@ -1176,7 +1171,7 @@ void gp9001vdp_device::draw_sprites( running_machine *machine, bitmap_t *bitmap,
 								{
 									UINT8 pix = srcdata[count];
 									UINT16* dstptr = BITMAP_ADDR16(bitmap,drawyy,drawxx);
-									UINT8* dstpri = BITMAP_ADDR8(gp9001_custom_priority_bitmap, drawyy, drawxx);
+									UINT8* dstpri = BITMAP_ADDR8(this->custom_priority_bitmap, drawyy, drawxx);
 
 									if (priority >= dstpri[0])
 									{
@@ -1228,7 +1223,7 @@ void gp9001vdp_device::gp9001_draw_custom_tilemap(running_machine* machine, bitm
 
 		srcptr = BITMAP_ADDR16(tmb, realy, 0);
 		dstptr = BITMAP_ADDR16(bitmap, y, 0);
-		dstpriptr = BITMAP_ADDR8(gp9001_custom_priority_bitmap, y, 0);
+		dstpriptr = BITMAP_ADDR8(this->custom_priority_bitmap, y, 0);
 
 		for (x=0;x<width;x++)
 		{
@@ -1257,7 +1252,7 @@ void gp9001vdp_device::gp9001_draw_custom_tilemap(running_machine* machine, bitm
 
 
 static const UINT8 gp9001_primap1[16] =  { 0x00, 0x04, 0x08, 0x0c, 0x10, 0x14, 0x18, 0x1c, 0x20, 0x24, 0x28, 0x2c, 0x30, 0x34, 0x38, 0x3c };
-//UINT8 gp9001_sprprimap1[16] =  { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f };
+//static const UINT8 gp9001_sprprimap1[16] =  { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f };
 static const UINT8 gp9001_sprprimap1[16] =  { 0x00, 0x04, 0x08, 0x0c, 0x10, 0x14, 0x18, 0x1c, 0x20, 0x24, 0x28, 0x2c, 0x30, 0x34, 0x38, 0x3c };
 
 static const UINT8 batsugun_prienable0[16]={ 1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1,    1 };

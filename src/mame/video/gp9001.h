@@ -1,8 +1,5 @@
 /* GP9001 Video Controller */
 
-extern bitmap_t* gp9001_custom_priority_bitmap;
-extern bitmap_t* gp9001_secondary_render_bitmap;
-
 class gp9001vdp_device_config : public device_config,
 								 public device_config_memory_interface
 {
@@ -77,6 +74,9 @@ public:
 	int extra_xoffset[4];
 	int extra_yoffset[4];
 
+	bitmap_t *custom_priority_bitmap;
+	int *displog;
+
 protected:
 	virtual void device_start();
 	virtual void device_reset();
@@ -97,7 +97,6 @@ const device_type gp9001vdp_ = gp9001vdp_device_config::static_alloc_device_conf
 
 ADDRESS_MAP_EXTERN( gp9001vdp0_map, 16 );
 ADDRESS_MAP_EXTERN( gp9001vdp1_map, 16 );
-extern int gp9001_displog;
 
 
 /* vdp map 0, gfx region 0 */
