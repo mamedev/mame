@@ -193,6 +193,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 		int attr = spriteram_2[offs];
 		int code = spriteram[offs + 1];
 		int color = attr & 0x0f;
+		if (attr&1) code|=0x100; // extra tile# bit for the yiear conversion, trackfld doesn't have this many sprites so it will just get masked
 		int flipx = ~attr & 0x40;
 		int flipy = attr & 0x80;
 		int sx = spriteram[offs] - 1;
@@ -208,6 +209,14 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 		/* proving that this is a hardware related "feature" */
 		sy += 1;
 
+		// to fix the title screen in yieartf it would have to be like this, the same as yiear.c, this should be verified on the hw
+		//
+		//if (offs < 0x26)
+		//{
+		//	sy++;	/* fix title screen & garbage at the bottom of the screen */
+		//}
+
+
 		drawgfx_transmask(bitmap, cliprect,
 			machine->gfx[0],
 			code + state->sprite_bank1 + state->sprite_bank2, color,
@@ -222,56 +231,6 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 			flipx, flipy,
 			sx - 256, sy,
 			colortable_get_transpen_mask(machine->colortable, machine->gfx[0], color, 0));
-	}
-}
-
-
-static void draw_sprites_yieartf( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
-{
-	trackfld_state *state = machine->driver_data<trackfld_state>();
-	UINT8 *spriteram = state->spriteram;
-	UINT8 *spriteram_2 = state->spriteram2;
-	int offs;
-
-	for (offs = state->spriteram_size - 2; offs >= 0; offs -= 2)
-	{
-		int attr = spriteram_2[offs];
-		int code = spriteram[offs + 1];
-		int color = 0;//attr & 0x0f;
-		if (attr&1) code|=0x100; // extra tile# bit
-		int flipx = ~attr & 0x40;
-		int flipy = attr & 0x80;
-		int sx = spriteram[offs] - 1;
-		int sy = 240 - spriteram_2[offs + 1];
-
-		if (flip_screen_get(machine))
-		{
-			sy = 240 - sy;
-			flipy = !flipy;
-		}
-
-		/* Note that this adjustement must be done AFTER handling flip screen, thus */
-		/* proving that this is a hardware related "feature" */
-		/* note, yieartf title screen is broken unless you only apply this to *some* sprites, same as yiear.c */
-		if (offs < 0x26)
-		{
-			sy++;	/* fix title screen & garbage at the bottom of the screen */
-		}
-
-		drawgfx_transpen(bitmap, cliprect,
-			machine->gfx[0],
-			code + state->sprite_bank1 + state->sprite_bank2, color,
-			flipx, flipy,
-			sx, sy,
-			0);
-
-		/* redraw with wraparound */
-		drawgfx_transpen(bitmap,cliprect,
-			machine->gfx[0],
-			code + state->sprite_bank1 + state->sprite_bank2, color,
-			flipx, flipy,
-			sx - 256, sy,
-			0);
 	}
 }
 
@@ -292,19 +251,3 @@ VIDEO_UPDATE( trackfld )
 	return 0;
 }
 
-VIDEO_UPDATE( yieartf )
-{
-	trackfld_state *state = screen->machine->driver_data<trackfld_state>();
-	int row, scrollx;
-
-	for (row = 0; row < 32; row++)
-	{
-		scrollx = state->scroll[row] + 256 * (state->scroll2[row] & 0x01);
-		if (flip_screen_get(screen->machine)) scrollx = -scrollx;
-		tilemap_set_scrollx(state->bg_tilemap, row, scrollx);
-	}
-
-	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
-	draw_sprites_yieartf(screen->machine, bitmap, cliprect);
-	return 0;
-}

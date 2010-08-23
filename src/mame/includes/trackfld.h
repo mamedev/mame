@@ -81,7 +81,6 @@ WRITE8_HANDLER( atlantol_gfxbank_w );
 PALETTE_INIT( trackfld );
 VIDEO_START( trackfld );
 VIDEO_UPDATE( trackfld );
-VIDEO_UPDATE( yieartf );
 
 /*----------- defined in video/hyperspt.c -----------*/
 

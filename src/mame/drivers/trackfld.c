@@ -924,35 +924,6 @@ static GFXDECODE_START( trackfld )
 GFXDECODE_END
 
 
-static const gfx_layout yieartf_charlayout =
-{
-	8,8,
-	RGN_FRAC(1,1),
-	4,
-	{ 3, 2, 1, 0 },
-	{ 0*4, 1*4, 2*4, 3*4, 4*4, 5*4, 6*4, 7*4 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	32*8
-};
-
-static const gfx_layout yieartf_spritelayout =
-{
-	16,16,
-	RGN_FRAC(1,2),
-	4,
-	{ 4, 0, RGN_FRAC(1,2)+4, RGN_FRAC(1,2)+0 },
-	{ 0*8*8+0, 0*8*8+1, 0*8*8+2, 0*8*8+3, 1*8*8+0, 1*8*8+1, 1*8*8+2, 1*8*8+3,
-	  2*8*8+0, 2*8*8+1, 2*8*8+2, 2*8*8+3, 3*8*8+0, 3*8*8+1, 3*8*8+2, 3*8*8+3 },
-	{  0*8,  1*8,  2*8,  3*8,  4*8,  5*8,  6*8,  7*8,
-	  32*8, 33*8, 34*8, 35*8, 36*8, 37*8, 38*8, 39*8 },
-	64*8
-};
-
-static GFXDECODE_START( yieartf )
-	GFXDECODE_ENTRY( "gfx1", 0, yieartf_spritelayout,     0, 1 )
-	GFXDECODE_ENTRY( "gfx2", 0, yieartf_charlayout,       16, 1 )
-GFXDECODE_END
-
 
 static void adpcm_vck_callback( running_device *device )
 {
@@ -1078,7 +1049,7 @@ static MACHINE_DRIVER_START( yieartf )
 	MDRV_CPU_PROGRAM_MAP(yieartf_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-// no sound cpu?
+//  z80 isn't used
 //	MDRV_CPU_ADD("audiocpu", Z80, SOUND_CLOCK/4)
 //	MDRV_CPU_PROGRAM_MAP(sound_map)
 
@@ -1094,12 +1065,12 @@ static MACHINE_DRIVER_START( yieartf )
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(yieartf)
-	MDRV_PALETTE_LENGTH(32)
+	MDRV_GFXDECODE(trackfld)
+	MDRV_PALETTE_LENGTH(16*16+16*16)
 
-	MDRV_PALETTE_INIT(yiear)
+	MDRV_PALETTE_INIT(trackfld)
 	MDRV_VIDEO_START(trackfld)
-	MDRV_VIDEO_UPDATE(yieartf)
+	MDRV_VIDEO_UPDATE(trackfld)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -1113,7 +1084,6 @@ static MACHINE_DRIVER_START( yieartf )
 	MDRV_SOUND_ADD("vlm", VLM5030, VLM_CLOCK)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
-
 
 /* same as the original, but uses ADPCM instead of VLM5030 */
 /* also different memory handlers do handle that */
@@ -1542,13 +1512,15 @@ ROM_START( yieartf )
 	ROM_LOAD( "6.16h",      0x00000, 0x2000, CRC(05a23af3) SHA1(d588a5d31e106a3c5b1e37b1826863108b87f02d) )
 	ROM_LOAD( "7.15h",      0x02000, 0x2000, CRC(988154fa) SHA1(981273ef70ae6a947c24559750a8e7dc3d032444) )
 	
-	// is this prom correct for this hardware? - check - track+field boards have 3 proms usually
-	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_REGION( 0x0220, "proms", 0 )
 	ROM_LOAD( "yiear.clr",    0x00000, 0x0020, CRC(c283d71f) SHA1(10cd39f4e951ba6ca5610081c8c1fcd9d68b34d2) )
+	ROM_LOAD( "prom1.b16",   0x0020, 0x0100, CRC(93dc32a0) SHA1(04e69d234e0ae93d90bbf2ef507f1cfd5cf3f87a) ) /* sprite lookup table */
+	ROM_LOAD( "prom2.e15",   0x0120, 0x0100,  CRC(e7e0f9e5) SHA1(008605db7a262fab8e569c1e19c707991027abfc) ) /* char lookup table */
 
 	ROM_REGION( 0x2000, "vlm", 0 )	/* 8k for the VLM5030 data */
 	ROM_LOAD( "01.snd",    0x00000, 0x2000, CRC(f75a1539) SHA1(f139f6cb41351eb81ee47d777db03012aa5fadb1) )
 ROM_END
+
 
 
 static DRIVER_INIT( trackfld )
