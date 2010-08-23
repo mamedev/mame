@@ -253,7 +253,7 @@ static WRITE8_DEVICE_HANDLER( ic48_1_74123_output_changed )
 }
 
 
-static const ttl74123_config ic48_1_config =
+static const ttl74123_interface ic48_1_config =
 {
 	TTL74123_GROUNDED,	/* the hook up type */
 	RES_K(22),			/* resistor connected to RCext */

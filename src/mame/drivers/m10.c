@@ -145,7 +145,7 @@ static WRITE8_DEVICE_HANDLER( ic8j2_output_changed )
 	ttl74123_a_w(state->ic8j1, 0, data);
 }
 
-static const ttl74123_config ic8j1_intf =
+static const ttl74123_interface ic8j1_intf =
 {
 	/* completely illegible */
 	TTL74123_NOT_GROUNDED_DIODE,	/* the hook up type */
@@ -157,7 +157,7 @@ static const ttl74123_config ic8j1_intf =
 	ic8j1_output_changed
 };
 
-static const ttl74123_config ic8j2_intf =
+static const ttl74123_interface ic8j2_intf =
 {
 	TTL74123_NOT_GROUNDED_DIODE,	/* the hook up type */
 	/* 10k + 20k variable resistor */

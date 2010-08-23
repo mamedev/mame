@@ -387,7 +387,7 @@ static WRITE8_DEVICE_HANDLER( ic60_74123_output_changed)
 }
 
 
-static const ttl74123_config ic60_intf =
+static const ttl74123_interface ic60_intf =
 {
 	TTL74123_GROUNDED,	/* the hook up type */
 	RES_K(22),			/* resistor connected to RCext */

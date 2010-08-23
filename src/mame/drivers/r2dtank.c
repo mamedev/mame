@@ -218,7 +218,7 @@ static CUSTOM_INPUT( get_ttl74123_output )
 }
 
 
-static const ttl74123_config ttl74123_intf =
+static const ttl74123_interface ttl74123_intf =
 {
 	TTL74123_GROUNDED,	/* the hook up type */
 	RES_K(22),			/* resistor connected to RCext */
