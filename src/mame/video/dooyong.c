@@ -1,10 +1,11 @@
 #include "emu.h"
 #include "includes/dooyong.h"
 
-
+UINT8 *paletteram_flytiger;
 UINT8 *dooyong_txvideoram;
 
 static UINT8 sprites_disabled;		/* Used by lastday/lastdaya */
+static UINT8 flytiger_palette_bank;		/* Used by flytiger */
 static UINT8 flytiger_pri;			/* Used by flytiger */
 static UINT8 tx_pri;				/* Used by sadari/gundl94/primella */
 static UINT16 rshark_pri;			/* Used by rshark/superx/popbingo */
@@ -176,18 +177,33 @@ WRITE8_HANDLER( primella_ctrl_w )
 //  logerror("%04x: bankswitch = %02x\n",cpu_get_pc(space->cpu),data&0xe0);
 }
 
+WRITE8_HANDLER( paletteram_flytiger_w )
+{
+	if (flytiger_palette_bank)
+	{
+		UINT16 value;
+		paletteram_flytiger[offset] = data;
+		value = paletteram_flytiger[offset & ~1] | (paletteram_flytiger[offset | 1] << 8);
+		palette_set_color_rgb(space->machine, offset/2, pal5bit(value >> 10), pal5bit(value >> 5), pal5bit(value >> 0));
+	}
+}
+
 WRITE8_HANDLER( flytiger_ctrl_w )
 {
 	/* bit 0 is flip screen */
 	flip_screen_set(space->machine, data & 0x01);
 
-	/* bits 1, 2, 3 used but unknown */
+	/* bits 1, 2 used but unknown */
+
+	/* bit 3 fg palette banking: trash protection? */	
+	flytiger_palette_bank = data & 0x08;
 
 	/* bit 4 changes tilemaps priority */
 	flytiger_pri = data & 0x10;
 }
 
 WRITE16_HANDLER( rshark_ctrl_w )
+
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -302,9 +318,7 @@ static TILE_GET_INFO( get_fg2_tile_info )
 		lastday_get_tile_info(machine, tileinfo, tile_index, fg2_tilerom, fg2scroll8, fg2_gfx);
 }
 
-/* flytiger uses some palette banking technique or something, but we
-   don't know what it is.  For now, this is the same as the code used
-   for the other layers (hence the really strange colour). */
+/* flytiger uses some palette banking technique or something maybe a trash protection */
 
 static TILE_GET_INFO( flytiger_get_fg_tile_info )
 {
@@ -313,7 +327,7 @@ static TILE_GET_INFO( flytiger_get_fg_tile_info )
 	int offs = (tile_index + (fgscroll8[1] << 6)) * 2;
 	int attr = tilerom[offs];
 	int code = tilerom[offs + 1] | ((attr & 0x01) << 8) | ((attr & 0x80) << 2);
-	int color = (attr & 0x78) >> 3; //TODO: missing 4th bit or palette bank
+	int color = (attr & 0x78) >> 3;
 	int flags = ((attr & 0x02) ? TILE_FLIPX : 0) | ((attr & 0x04) ? TILE_FLIPY : 0);
 
 	SET_TILE_INFO(fg_gfx, code, color, flags);

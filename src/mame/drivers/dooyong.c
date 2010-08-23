@@ -58,7 +58,6 @@ Flying Tiger
 #include "sound/okim6295.h"
 #include "includes/dooyong.h"
 
-
 static WRITE8_HANDLER( lastday_bankswitch_w )
 {
 	memory_set_bank(space->machine, "bank1", data & 0x07);
@@ -173,7 +172,7 @@ static ADDRESS_MAP_START( flytiger_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe020, 0xe020) AM_WRITE(soundlatch_w)
 	AM_RANGE(0xe030, 0xe037) AM_WRITE(dooyong_bgscroll8_w)
 	AM_RANGE(0xe040, 0xe047) AM_WRITE(dooyong_fgscroll8_w)
-	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(paletteram_xRRRRRGGGGGBBBBB_le_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(paletteram_flytiger_w) AM_BASE(&paletteram_flytiger)
 	AM_RANGE(0xf000, 0xffff) AM_RAM_WRITE(dooyong_txvideoram8_w) AM_BASE(&dooyong_txvideoram)
 ADDRESS_MAP_END
 
@@ -1849,7 +1848,7 @@ GAME( 1991, gulfstrmm,gulfstrm, gulfstrm, gulfstrm, 0, ROT270, "Dooyong (Media S
 GAME( 1991, pollux,   0,        pollux,   pollux,   0, ROT270, "Dooyong",  "Pollux (set 1)",       GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1991, polluxa,  pollux,   pollux,   pollux,   0, ROT270, "Dooyong",  "Pollux (set 2)",       GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1991, polluxa2, pollux,   pollux,   pollux,   0, ROT270, "Dooyong",  "Pollux (set 3)",       GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) /* Original Dooyong Board distributed by TCH */
-GAME( 1992, flytiger, 0,        flytiger, flytiger, 0, ROT270, "Dooyong",  "Flying Tiger",         GAME_IMPERFECT_GRAPHICS | GAME_WRONG_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1992, flytiger, 0,        flytiger, flytiger, 0, ROT270, "Dooyong",  "Flying Tiger",         GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1993, bluehawk, 0,        bluehawk, bluehawk, 0, ROT270, "Dooyong",  "Blue Hawk",            GAME_SUPPORTS_SAVE )
 GAME( 1993, bluehawkn,bluehawk, bluehawk, bluehawk, 0, ROT270, "Dooyong (NTC license)", "Blue Hawk (NTC)", GAME_SUPPORTS_SAVE )
 GAME( 1993, sadari,   0,        primella, sadari,   0, ROT0,   "Dooyong (NTC license)", "Sadari",  GAME_SUPPORTS_SAVE )

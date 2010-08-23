@@ -1,6 +1,7 @@
 /*----------- defined in video/dooyong.c -----------*/
 
 extern UINT8 *dooyong_txvideoram;
+extern UINT8 *paletteram_flytiger;
 
 WRITE8_HANDLER( dooyong_bgscroll8_w );
 WRITE8_HANDLER( dooyong_fgscroll8_w );
@@ -16,6 +17,7 @@ WRITE8_HANDLER( dooyong_txvideoram8_w );
 WRITE8_HANDLER( lastday_ctrl_w );
 WRITE8_HANDLER( pollux_ctrl_w );
 WRITE8_HANDLER( primella_ctrl_w );
+WRITE8_HANDLER( paletteram_flytiger_w );
 WRITE8_HANDLER( flytiger_ctrl_w );
 WRITE16_HANDLER( rshark_ctrl_w );
 
