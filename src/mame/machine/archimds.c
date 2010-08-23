@@ -376,9 +376,6 @@ static READ32_HANDLER( ioc_ctrl_r )
 	if(IOC_LOG)
 	logerror("IOC: R %s = %02x (PC=%x) %02x\n", ioc_regnames[offset&0x1f], ioc_regs[offset&0x1f], cpu_get_pc( space->cpu ),offset & 0x1f);
 
-	if((offset & 0x1f) >= 0x40/4)
-	printf("IOC: R %s = %02x (PC=%x) %02x\n", ioc_regnames[offset&0x1f], ioc_regs[offset&0x1f], cpu_get_pc( space->cpu ),offset & 0x1f);
-
 	switch (offset & 0x1f)
 	{
 		case CONTROL:
@@ -451,10 +448,6 @@ static WRITE32_HANDLER( ioc_ctrl_w )
 {
 	if(IOC_LOG)
 	logerror("IOC: W %02x @ reg %s (PC=%x)\n", data&0xff, ioc_regnames[offset&0x1f], cpu_get_pc( space->cpu ));
-
-	if((offset & 0x1f) >= 0x40/4)
-	printf("IOC: W %02x @ reg %s (PC=%x)\n", data&0xff, ioc_regnames[offset&0x1f], cpu_get_pc( space->cpu ));
-
 
 	switch (offset&0x1f)
 	{
