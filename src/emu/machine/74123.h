@@ -43,17 +43,22 @@
 
 *****************************************************************************/
 
-#ifndef TTL74123_H
-#define TTL74123_H
+#pragma once
 
-#include "devlegcy.h"
+#ifndef __TTL74123_H__
+#define __TTL74123_H__
 
-DECLARE_LEGACY_DEVICE(TTL74123, ttl74123);
+#include "emu.h"
+
+
+
+/***************************************************************************
+    DEVICE CONFIGURATION MACROS
+***************************************************************************/
 
 #define MDRV_TTL74123_ADD(_tag, _config) \
 	MDRV_DEVICE_ADD(_tag, TTL74123, 0) \
 	MDRV_DEVICE_CONFIG(_config)
-
 
 /* constants for the different ways the cap/res can be connected.
    This determines the formula for calculating the pulse width */
@@ -62,26 +67,104 @@ DECLARE_LEGACY_DEVICE(TTL74123, ttl74123);
 #define TTL74123_GROUNDED					(3)
 
 
-typedef struct _ttl74123_config ttl74123_config;
-struct _ttl74123_config
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+
+// ======================> ttl74123_interface
+
+struct ttl74123_interface
 {
-	int connection_type;	/* the hook up type - one of the constants above */
-	double res;				/* resistor connected to RCext */
-	double cap;				/* capacitor connected to Cext and RCext */
-	int a;					/* initial/constant value of the A pin */
-	int b;					/* initial/constant value of the B pin */
-	int clear;				/* initial/constant value of the Clear pin */
-	write8_device_func	output_changed_cb;
+    int m_connection_type;  /* the hook up type - one of the constants above */
+    double m_res;           /* resistor connected to RCext */
+    double m_cap;           /* capacitor connected to Cext and RCext */
+    int m_a;                /* initial/constant value of the A pin */
+    int m_b;                /* initial/constant value of the B pin */
+    int m_clear;            /* initial/constant value of the Clear pin */
+    write8_device_func  m_output_changed_cb;
 };
 
-/* write inputs */
+
+
+// ======================> ttl74123_device_config
+
+class ttl74123_device_config : public device_config,
+                              public ttl74123_interface
+{
+    friend class ttl74123_device;
+
+    // construction/destruction
+    ttl74123_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+
+public:
+    // allocators
+    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+    virtual device_t *alloc_device(running_machine &machine) const;
+
+protected:
+    // device_config overrides
+    virtual void device_config_complete();
+};
+
+
+
+// ======================> ttl74123_device
+
+class ttl74123_device :  public device_t
+{
+    friend class ttl74123_device_config;
+
+    // construction/destruction
+    ttl74123_device(running_machine &_machine, const ttl74123_device_config &_config);
+
+public:
+
+    void a_w(UINT8 data);
+    void b_w(UINT8 data);
+    void clear_w(UINT8 data);
+    void reset_w();
+
+protected:
+    // device-level overrides
+    virtual void device_start();
+    virtual void device_reset();
+    virtual void device_post_load() { }
+    virtual void device_clock_changed() { }
+
+    static TIMER_CALLBACK( output_callback );
+    static TIMER_CALLBACK( clear_callback );
+
+private:
+
+    int timer_running();
+    void start_pulse();
+    void output(INT32 param);
+    void set_output();
+    attotime compute_duration();
+    void clear();
+
+    UINT8 m_a;            /* pin 1/9 */
+    UINT8 m_b;            /* pin 2/10 */
+    UINT8 m_clear;        /* pin 3/11 */
+    emu_timer *m_timer;
+
+    const ttl74123_device_config &m_config;
+};
+
+
+// device type definition
+extern const device_type TTL74123;
+
+
+
+/***************************************************************************
+    PROTOTYPES
+***************************************************************************/
 
 WRITE8_DEVICE_HANDLER( ttl74123_a_w );
 WRITE8_DEVICE_HANDLER( ttl74123_b_w );
 WRITE8_DEVICE_HANDLER( ttl74123_clear_w );
-
-/* reset the latch */
-
-WRITE8_DEVICE_HANDLER( ttl74123_reset_w );
+WRITE8_DEVICE_HANDLER( ttl74123_reset_w ); /* reset the latch */
 
 #endif
