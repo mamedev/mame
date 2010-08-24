@@ -1174,7 +1174,7 @@ VIDEO_UPDATE( rallybik )
 	tilemap_draw(bitmap, cliprect, state->pf1_tilemap, TILEMAP_DRAW_OPAQUE | 0, 0);
 	tilemap_draw(bitmap, cliprect, state->pf1_tilemap, TILEMAP_DRAW_OPAQUE | 1, 0);
 
-	for (priority = 1; priority < 16; priority++)
+	for (priority = 0; priority < 16; priority++)
 	{
 		tilemap_draw(bitmap, cliprect, state->pf4_tilemap, priority, 0);
 		tilemap_draw(bitmap, cliprect, state->pf3_tilemap, priority, 0);
@@ -1199,7 +1199,7 @@ VIDEO_UPDATE( toaplan1 )
 	for (priority = 8; priority < 16; priority++)
 		tilemap_draw(bitmap, cliprect, state->pf1_tilemap, TILEMAP_DRAW_OPAQUE | priority, 0);
 
-	for (priority = 1; priority < 16; priority++)
+	for (priority = 0; priority < 16; priority++)
 	{
 		tilemap_draw_primask(bitmap, cliprect, state->pf4_tilemap, priority, priority, 0);
 		tilemap_draw_primask(bitmap, cliprect, state->pf3_tilemap, priority, priority, 0);
@@ -1224,7 +1224,7 @@ VIDEO_UPDATE( demonwld )
 	tilemap_draw(bitmap, cliprect, state->pf1_tilemap, TILEMAP_DRAW_OPAQUE | 0, 0);
 	tilemap_draw(bitmap, cliprect, state->pf1_tilemap, TILEMAP_DRAW_OPAQUE | 1, 0);
 
-	for (priority = 1; priority < 16; priority++)
+	for (priority = 0; priority < 16; priority++)
 	{
 		tilemap_draw_primask(bitmap, cliprect, state->pf4_tilemap, priority, priority, 0);
 		tilemap_draw_primask(bitmap, cliprect, state->pf3_tilemap, priority, priority, 0);
