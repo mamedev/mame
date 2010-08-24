@@ -639,8 +639,7 @@ UINT8 pia6821_device::control_b_r()
 
 READ8_DEVICE_HANDLER( pia6821_r )
 {
-    pia6821_device *dev = reinterpret_cast<pia6821_device *>(device);
-    return dev->reg_r(offset);
+    return downcast<pia6821_device *>(device)->reg_r(offset);
 }
 
 UINT8 pia6821_device::reg_r(UINT8 offset)
@@ -691,8 +690,7 @@ UINT8 pia6821_device::reg_r(UINT8 offset)
 
 READ8_DEVICE_HANDLER( pia6821_alt_r )
 {
-    pia6821_device *dev = reinterpret_cast<pia6821_device *>(device);
-    return dev->reg_r(((offset << 1) & 0x02) | ((offset >> 1) & 0x01));
+    return downcast<pia6821_device *>(device)->reg_r(((offset << 1) & 0x02) | ((offset >> 1) & 0x01));
 }
 
 
@@ -703,8 +701,7 @@ READ8_DEVICE_HANDLER( pia6821_alt_r )
 
 UINT8 pia6821_get_port_b_z_mask(running_device *device)
 {
-    pia6821_device *dev = reinterpret_cast<pia6821_device *>(device);
-    return dev->get_port_b_z_mask();
+    return downcast<pia6821_device *>(device)->get_port_b_z_mask();
 }
 
 UINT8 pia6821_device::get_port_b_z_mask()
@@ -942,8 +939,7 @@ void pia6821_device::control_b_w(UINT8 data)
 
 WRITE8_DEVICE_HANDLER( pia6821_w )
 {
-    pia6821_device *dev = reinterpret_cast<pia6821_device *>(device);
-    dev->reg_w(offset, data);
+    downcast<pia6821_device *>(device)->reg_w(offset, data);
 }
 
 void pia6821_device::reg_w(UINT8 offset, UINT8 data)
@@ -990,8 +986,7 @@ void pia6821_device::reg_w(UINT8 offset, UINT8 data)
 
 WRITE8_DEVICE_HANDLER( pia6821_alt_w )
 {
-    pia6821_device *dev = reinterpret_cast<pia6821_device *>(device);
-    dev->reg_w(((offset << 1) & 0x02) | ((offset >> 1) & 0x01), data);
+    downcast<pia6821_device *>(device)->reg_w(((offset << 1) & 0x02) | ((offset >> 1) & 0x01), data);
 }
 
 
@@ -1001,8 +996,7 @@ WRITE8_DEVICE_HANDLER( pia6821_alt_w )
 
 void pia6821_set_port_a_z_mask(running_device *device, UINT8 data)
 {
-    pia6821_device *dev = reinterpret_cast<pia6821_device *>(device);
-    dev->set_port_a_z_mask(data);
+    downcast<pia6821_device *>(device)->set_port_a_z_mask(data);
 }
 
 void pia6821_device::set_port_a_z_mask(UINT8 data)
@@ -1017,8 +1011,7 @@ void pia6821_device::set_port_a_z_mask(UINT8 data)
 
 READ8_DEVICE_HANDLER( pia6821_porta_r )
 {
-    pia6821_device *dev = reinterpret_cast<pia6821_device *>(device);
-    return dev->porta_r();
+    return downcast<pia6821_device *>(device)->porta_r();
 }
 
 UINT8 pia6821_device::porta_r()
@@ -1033,8 +1026,7 @@ UINT8 pia6821_device::porta_r()
 
 void pia6821_set_input_a(running_device *device, UINT8 data, UINT8 z_mask)
 {
-    pia6821_device *dev = reinterpret_cast<pia6821_device *>(device);
-    dev->set_input_a(data, z_mask);
+    downcast<pia6821_device *>(device)->set_input_a(data, z_mask);
 }
 
 void pia6821_device::set_input_a(UINT8 data, UINT8 z_mask)
@@ -1055,8 +1047,7 @@ void pia6821_device::set_input_a(UINT8 data, UINT8 z_mask)
 
 WRITE8_DEVICE_HANDLER( pia6821_porta_w )
 {
-    pia6821_device *dev = reinterpret_cast<pia6821_device *>(device);
-    dev->porta_w(data);
+    downcast<pia6821_device *>(device)->porta_w(data);
 }
 
 void pia6821_device::porta_w(UINT8 data)
@@ -1071,8 +1062,7 @@ void pia6821_device::porta_w(UINT8 data)
 
 UINT8 pia6821_get_output_a(running_device *device)
 {
-    pia6821_device *dev = reinterpret_cast<pia6821_device *>(device);
-    return dev->get_output_a();
+    return downcast<pia6821_device *>(device)->get_output_a();
 }
 
 UINT8 pia6821_device::get_output_a()
@@ -1089,8 +1079,7 @@ UINT8 pia6821_device::get_output_a()
 
 READ_LINE_DEVICE_HANDLER( pia6821_ca1_r )
 {
-    pia6821_device *dev = reinterpret_cast<pia6821_device *>(device);
-    return dev->ca1_r();
+    return downcast<pia6821_device *>(device)->ca1_r();
 }
 
 UINT8 pia6821_device::ca1_r()
@@ -1105,8 +1094,7 @@ UINT8 pia6821_device::ca1_r()
 
 WRITE_LINE_DEVICE_HANDLER( pia6821_ca1_w )
 {
-    pia6821_device *dev = reinterpret_cast<pia6821_device *>(device);
-    dev->ca1_w(state);
+    downcast<pia6821_device *>(device)->ca1_w(state);
 }
 
 void pia6821_device::ca1_w(UINT8 state)
@@ -1143,8 +1131,7 @@ void pia6821_device::ca1_w(UINT8 state)
 
 READ_LINE_DEVICE_HANDLER( pia6821_ca2_r )
 {
-    pia6821_device *dev = reinterpret_cast<pia6821_device *>(device);
-    return dev->ca2_r();
+    return downcast<pia6821_device *>(device)->ca2_r();
 }
 
 UINT8 pia6821_device::ca2_r()
@@ -1159,8 +1146,7 @@ UINT8 pia6821_device::ca2_r()
 
 WRITE_LINE_DEVICE_HANDLER( pia6821_ca2_w )
 {
-    pia6821_device *dev = reinterpret_cast<pia6821_device *>(device);
-    dev->ca2_w(state);
+    downcast<pia6821_device *>(device)->ca2_w(state);
 }
 
 void pia6821_device::ca2_w(UINT8 state)
@@ -1191,8 +1177,7 @@ void pia6821_device::ca2_w(UINT8 state)
 
 int pia6821_get_output_ca2(running_device *device)
 {
-    pia6821_device *dev = reinterpret_cast<pia6821_device *>(device);
-    return dev->get_output_ca2();
+    return downcast<pia6821_device *>(device)->get_output_ca2();
 }
 
 int pia6821_device::get_output_ca2()
@@ -1211,8 +1196,7 @@ int pia6821_device::get_output_ca2()
 
 int pia6821_get_output_ca2_z(running_device *device)
 {
-    pia6821_device *dev = reinterpret_cast<pia6821_device *>(device);
-    return dev->get_output_ca2_z();
+    return downcast<pia6821_device *>(device)->get_output_ca2_z();
 }
 
 int pia6821_device::get_output_ca2_z()
@@ -1231,8 +1215,7 @@ int pia6821_device::get_output_ca2_z()
 
 READ8_DEVICE_HANDLER( pia6821_portb_r )
 {
-    pia6821_device *dev = reinterpret_cast<pia6821_device *>(device);
-    return dev->portb_r();
+    return downcast<pia6821_device *>(device)->portb_r();
 }
 
 UINT8 pia6821_device::portb_r()
@@ -1247,8 +1230,7 @@ UINT8 pia6821_device::portb_r()
 
 WRITE8_DEVICE_HANDLER( pia6821_portb_w )
 {
-    pia6821_device *dev = reinterpret_cast<pia6821_device *>(device);
-    dev->portb_w(data);
+    downcast<pia6821_device *>(device)->portb_w(data);
 }
 
 void pia6821_device::portb_w(UINT8 data)
@@ -1268,8 +1250,7 @@ void pia6821_device::portb_w(UINT8 data)
 
 UINT8 pia6821_get_output_b(running_device *device)
 {
-    pia6821_device *dev = reinterpret_cast<pia6821_device *>(device);
-    return dev->get_output_b();
+    return downcast<pia6821_device *>(device)->get_output_b();
 }
 
 UINT8 pia6821_device::get_output_b()
@@ -1286,8 +1267,7 @@ UINT8 pia6821_device::get_output_b()
 
 READ_LINE_DEVICE_HANDLER( pia6821_cb1_r )
 {
-    pia6821_device *dev = reinterpret_cast<pia6821_device *>(device);
-    return dev->cb1_r();
+    return downcast<pia6821_device *>(device)->cb1_r();
 }
 
 UINT8 pia6821_device::cb1_r()
@@ -1302,8 +1282,7 @@ UINT8 pia6821_device::cb1_r()
 
 WRITE_LINE_DEVICE_HANDLER( pia6821_cb1_w )
 {
-    pia6821_device *dev = reinterpret_cast<pia6821_device *>(device);
-    dev->cb1_w(state);
+    downcast<pia6821_device *>(device)->cb1_w(state);
 }
 
 void pia6821_device::cb1_w(UINT8 state)
@@ -1339,8 +1318,7 @@ void pia6821_device::cb1_w(UINT8 state)
 
 READ_LINE_DEVICE_HANDLER( pia6821_cb2_r )
 {
-    pia6821_device *dev = reinterpret_cast<pia6821_device *>(device);
-    return dev->cb2_r();
+    return downcast<pia6821_device *>(device)->cb2_r();
 }
 
 UINT8 pia6821_device::cb2_r()
@@ -1355,8 +1333,7 @@ UINT8 pia6821_device::cb2_r()
 
 WRITE_LINE_DEVICE_HANDLER( pia6821_cb2_w )
 {
-    pia6821_device *dev = reinterpret_cast<pia6821_device *>(device);
-    dev->cb2_w(state);
+    downcast<pia6821_device *>(device)->cb2_w(state);
 }
 
 void pia6821_device::cb2_w(UINT8 state)
@@ -1389,8 +1366,7 @@ void pia6821_device::cb2_w(UINT8 state)
 
 int pia6821_get_output_cb2(running_device *device)
 {
-    pia6821_device *dev = reinterpret_cast<pia6821_device *>(device);
-    return dev->get_output_cb2();
+    return downcast<pia6821_device *>(device)->get_output_cb2();
 }
 
 int pia6821_device::get_output_cb2()
@@ -1407,8 +1383,7 @@ int pia6821_device::get_output_cb2()
 
 int pia6821_get_output_cb2_z(running_device *device)
 {
-    pia6821_device *dev = reinterpret_cast<pia6821_device *>(device);
-    return dev->get_output_cb2_z();
+    return downcast<pia6821_device *>(device)->get_output_cb2_z();
 }
 
 int pia6821_device::get_output_cb2_z()
@@ -1423,8 +1398,7 @@ int pia6821_device::get_output_cb2_z()
 
 int pia6821_get_irq_a(running_device *device)
 {
-    pia6821_device *dev = reinterpret_cast<pia6821_device *>(device);
-    return dev->get_irq_a();
+    return downcast<pia6821_device *>(device)->get_irq_a();
 }
 
 int pia6821_device::get_irq_a()
@@ -1439,8 +1413,7 @@ int pia6821_device::get_irq_a()
 
 int pia6821_get_irq_b(running_device *device)
 {
-    pia6821_device *dev = reinterpret_cast<pia6821_device *>(device);
-    return dev->get_irq_b();
+    return downcast<pia6821_device *>(device)->get_irq_b();
 }
 
 int pia6821_device::get_irq_b()
