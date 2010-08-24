@@ -42,7 +42,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
 
   - DSW1 bit 7 is called "No Die Mode" in the manual. It used to give invulnerability
     to shots (but not to falls), but it has no effect due to the "bra" instruction
-    at 0x001334 ('karnov') or 0x00131a ('karnov').
+    at 0x001334 ('karnov') or 0x00131a ('karnovj').
 
 2) 'wndrplnt'
 

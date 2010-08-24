@@ -134,7 +134,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
 1) 'firetrap' :
 
-  - US? version, licensed to Data East.
+  - US version, licensed to Data East.
   - MCU missing and simulated (init command = 0x13).
   - No warning screen.
   - Instructions in English

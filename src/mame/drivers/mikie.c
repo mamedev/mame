@@ -14,6 +14,26 @@
     6000-ffff ROM
 
 
+Stephh's notes (based on the games M6809 code and some tests) :
+
+  - To enter service mode, keep START1 and START2 pressed on reset.
+    Then press START1 to cycle through the different tests.
+  - According to code at 0x618f, you can start a game with 255 lives
+    if you set DSW1 and DSW2 to the following settings :
+      * "Coin A"      : "Free Play"
+      * "Coin B"      : "No Coin B"
+      * "Lives"       : "7"
+      * "Cabinet"     : "Upright"
+      * "Bonus Life"  : "20k 70k 50k+"
+      * "Difficulty"  : "Medium"
+      * "Demo Sounds" : "Off"
+    DSW3 is not tested here, so settings can be anything.
+  - I'm very surprised to notice that 'mikie' and 'mikiej' have the same
+    PRG ROMS but different GFX ROMS.
+    This is very rare (unique ?) for the Konami games.
+  - There might exist undumped Konami/Centuri version(s) of this game :
+    the manual I've found speaks about a "conversion kit".
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -81,9 +101,9 @@ static ADDRESS_MAP_START( mikie_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2400, 0x2400) AM_READ_PORT("SYSTEM") AM_WRITE(soundlatch_w)
 	AM_RANGE(0x2401, 0x2401) AM_READ_PORT("P1")
 	AM_RANGE(0x2402, 0x2402) AM_READ_PORT("P2")
-	AM_RANGE(0x2403, 0x2403) AM_READ_PORT("DSW2")
-	AM_RANGE(0x2500, 0x2500) AM_READ_PORT("DSW0")
-	AM_RANGE(0x2501, 0x2501) AM_READ_PORT("DSW1")
+	AM_RANGE(0x2403, 0x2403) AM_READ_PORT("DSW3")
+	AM_RANGE(0x2500, 0x2500) AM_READ_PORT("DSW1")
+	AM_RANGE(0x2501, 0x2501) AM_READ_PORT("DSW2")
 	AM_RANGE(0x2800, 0x288f) AM_RAM AM_BASE_SIZE_MEMBER(mikie_state, spriteram, spriteram_size)
 	AM_RANGE(0x2890, 0x37ff) AM_RAM
 	AM_RANGE(0x3800, 0x3bff) AM_RAM_WRITE(mikie_colorram_w) AM_BASE_MEMBER(mikie_state, colorram)
@@ -111,6 +131,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
+/* verified from M6809 code */
 static INPUT_PORTS_START( mikie )
 	PORT_START("SYSTEM")
 	KONAMI8_SYSTEM_UNK
@@ -121,20 +142,11 @@ static INPUT_PORTS_START( mikie )
 	PORT_START("P2")
 	KONAMI8_COCKTAIL_4WAY_B12_UNK
 
-	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Controls ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Single ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Dual ) )
-	PORT_BIT( 0xfc, IP_ACTIVE_HIGH, IPT_UNKNOWN )
-
-	PORT_START("DSW0")
+	PORT_START("DSW1")
 	KONAMI_COINAGE(DEF_STR( Free_Play ), "No Coin B")
 	/* "No Coin B" = coins produce sound, but no effect on coin counter */
 
-	PORT_START("DSW1")
+	PORT_START("DSW2")
 	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
 	PORT_DIPSETTING(    0x03, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
@@ -144,18 +156,29 @@ static INPUT_PORTS_START( mikie )
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( Cocktail ) )
 	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x18, "20K 50K+" )
-	PORT_DIPSETTING(    0x10, "30K 60K+" )
-	PORT_DIPSETTING(    0x08, "30K" )
-	PORT_DIPSETTING(    0x00, "40K" )
+	PORT_DIPSETTING(    0x18, "20k 70k 50k+" )
+	PORT_DIPSETTING(    0x10, "30K 90k 60k+" )
+	PORT_DIPSETTING(    0x08, "30k only" )
+	PORT_DIPSETTING(    0x00, "40K only" )
 	PORT_DIPNAME( 0x60, 0x60, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x60, "1 (Easy)" )
-	PORT_DIPSETTING(    0x40, "2" )
-	PORT_DIPSETTING(    0x20, "3" )
-	PORT_DIPSETTING(    0x00, "4 (Hard)" )
+	PORT_DIPSETTING(	0x60, DEF_STR( Easy ) )             /* 1 */
+	PORT_DIPSETTING(	0x40, DEF_STR( Medium ) )           /* 2 */
+	PORT_DIPSETTING(	0x20, DEF_STR( Hard ) )             /* 3 */
+	PORT_DIPSETTING(	0x00, DEF_STR( Hardest ) )          /* 4 */
 	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Demo_Sounds ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("DSW3")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "Upright Controls" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Single ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Dual ) )
+	PORT_DIPUNUSED( 0x04, 0x04 )
+	PORT_DIPUNUSED( 0x08, 0x08 )
+	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 
