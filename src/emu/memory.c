@@ -789,9 +789,9 @@ private:
 		m_live_lookup = m_table;
 		_UintType result;
 		if (sizeof(_UintType) == 1) result = m_space.read_byte(offset);
-		if (sizeof(_UintType) == 2) result = m_space.read_word(offset, mask);
-		if (sizeof(_UintType) == 4) result = m_space.read_dword(offset, mask);
-		if (sizeof(_UintType) == 8) result = m_space.read_qword(offset, mask);
+		if (sizeof(_UintType) == 2) result = m_space.read_word(offset << 1, mask);
+		if (sizeof(_UintType) == 4) result = m_space.read_dword(offset << 2, mask);
+		if (sizeof(_UintType) == 8) result = m_space.read_qword(offset << 3, mask);
 		m_live_lookup = oldtable;
 		return result;
 	}
@@ -841,9 +841,9 @@ private:
 		UINT8 *oldtable = m_live_lookup;
 		m_live_lookup = m_table;
 		if (sizeof(_UintType) == 1) m_space.write_byte(offset, data);
-		if (sizeof(_UintType) == 2) m_space.write_word(offset, data, mask);
-		if (sizeof(_UintType) == 4) m_space.write_dword(offset, data, mask);
-		if (sizeof(_UintType) == 8) m_space.write_qword(offset, data, mask);
+		if (sizeof(_UintType) == 2) m_space.write_word(offset << 1, data, mask);
+		if (sizeof(_UintType) == 4) m_space.write_dword(offset << 2, data, mask);
+		if (sizeof(_UintType) == 8) m_space.write_qword(offset << 3, data, mask);
 		m_live_lookup = oldtable;
 	}
 
