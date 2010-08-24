@@ -183,9 +183,9 @@ i2cmem_device::i2cmem_device( running_machine &_machine, const i2cmem_device_con
 	m_sdar( 1 ),
 	m_state( STATE_IDLE )
 {
-	if( m_page_size > 0 )
+	if( m_config.m_page_size > 0 )
 	{
-		m_page = auto_alloc_array( machine, UINT8, m_page_size );
+		m_page = auto_alloc_array( machine, UINT8, m_config.m_page_size );
 	}
 }
 
@@ -208,7 +208,7 @@ void i2cmem_device::device_start()
 	state_save_register_device_item( this, 0, m_shift );
 	state_save_register_device_item( this, 0, m_devsel );
 	state_save_register_device_item( this, 0, m_byteaddr );
-	state_save_register_device_item_pointer( this, 0, m_page, m_page_size );
+	state_save_register_device_item_pointer( this, 0, m_page, m_config.m_page_size );
 }
 
 
@@ -450,19 +450,19 @@ void i2cmem_device::set_scl_line( int state )
 							verboselog( this, 0, "write not enabled\n" );
 							m_state = STATE_IDLE;
 						}
-						else if( m_page_size > 0 )
+						else if( m_config.m_page_size > 0 )
 						{
 							m_page[ m_page_offset ] = m_shift;
 							verboselog( this, 1, "page[ %04x ] <- %02x\n", m_page_offset, m_page[ m_page_offset ] );
 
 							m_page_offset++;
-							if( m_page_offset == m_page_size )
+							if( m_page_offset == m_config.m_page_size )
 							{
-								int offset = data_offset() & ~( m_page_size - 1 );
+								int offset = data_offset() & ~( m_config.m_page_size - 1 );
 
-								verboselog( this, 1, "data[ %04x to %04x ] = page\n", offset, offset + m_page_size - 1 );
+								verboselog( this, 1, "data[ %04x to %04x ] = page\n", offset, offset + m_config.m_page_size - 1 );
 
-								for( int i = 0; i < m_page_size; i++ )
+								for( int i = 0; i < m_config.m_page_size; i++ )
 								{
 									m_addrspace[ 0 ]->write_byte( offset + i, m_page[ i ] );
 								}

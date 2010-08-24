@@ -135,7 +135,6 @@ protected:
 	int m_byteaddr;
 	UINT8 *m_page;
 	int m_page_offset;
-	int m_page_size;
 };
 
 
