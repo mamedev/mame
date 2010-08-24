@@ -76,6 +76,29 @@ device_t *ttl7474_device_config::alloc_device(running_machine &machine) const
 
 
 
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void ttl7474_device_config::device_config_complete()
+{
+	m_target_tag = reinterpret_cast<const char *>(m_inline_data[INLINE_TARGET_TAG]);
+	m_base_output_cb = reinterpret_cast<void (*)(device_t *device, INT32)>(m_inline_data[INLINE_OUTPUT_CB]);
+	m_base_comp_output_cb = reinterpret_cast<void (*)(device_t *device, INT32)>(m_inline_data[INLINE_COMP_OUTPUT_CB]);
+
+	m_output_cb.type = DEVCB_TYPE_DEVICE;
+	m_output_cb.tag = m_target_tag;
+	m_output_cb.writeline = m_base_output_cb;
+
+	m_comp_output_cb.type = DEVCB_TYPE_DEVICE;
+	m_comp_output_cb.tag = m_target_tag;
+	m_comp_output_cb.writeline = m_base_comp_output_cb;
+}
+
+
+
 //**************************************************************************
 //  LIVE DEVICE
 //**************************************************************************
@@ -97,7 +120,15 @@ ttl7474_device::ttl7474_device(running_machine &_machine, const ttl7474_device_c
 
 void ttl7474_device::device_start()
 {
-    register_globals();
+    state_save_register_device_item(this, 0, m_clear);
+    state_save_register_device_item(this, 0, m_preset);
+    state_save_register_device_item(this, 0, m_clk);
+    state_save_register_device_item(this, 0, m_d);
+    state_save_register_device_item(this, 0, m_output);
+    state_save_register_device_item(this, 0, m_output_comp);
+    state_save_register_device_item(this, 0, m_last_clock);
+    state_save_register_device_item(this, 0, m_last_output);
+    state_save_register_device_item(this, 0, m_last_output_comp);
 
     devcb_resolve_write_line(&m_output_cb, &m_config.m_output_cb, this);
     devcb_resolve_write_line(&m_comp_output_cb, &m_config.m_comp_output_cb, this);
@@ -112,9 +143,14 @@ void ttl7474_device::device_reset()
     init();
 }
 
+
+//-------------------------------------------------
+//  update - update internal state
+//-------------------------------------------------
+
 void ttl7474_device::update()
 {
-    if (!m_preset && m_clear)             /* line 1 in truth table */
+    if (!m_preset && m_clear)          	/* line 1 in truth table */
 	{
         m_output    = 1;
         m_output_comp = 0;
@@ -129,31 +165,33 @@ void ttl7474_device::update()
         m_output    = 1;
         m_output_comp = 1;
 	}
-    else if (!m_last_clock && m_clock)  /* line 4 in truth table */
+    else if (!m_last_clock && m_clk)  	/* line 4 in truth table */
 	{
         m_output    =  m_d;
         m_output_comp = !m_d;
 	}
 
-    m_last_clock = m_clock;
+    m_last_clock = m_clk;
 
 
 	/* call callback if any of the outputs changed */
     if (m_output != m_last_output)
 	{
         m_last_output = m_output;
-        if (m_output_cb.write != NULL)
-            devcb_call_write_line(&m_output_cb, m_output);
+		devcb_call_write_line(&m_output_cb, m_output);
 	}
 	/* call callback if any of the outputs changed */
     if (m_output_comp != m_last_output_comp)
 	{
         m_last_output_comp = m_output_comp;
-        if (m_comp_output_cb.write != NULL)
-            devcb_call_write_line(&m_comp_output_cb, m_output_comp);
+		devcb_call_write_line(&m_comp_output_cb, m_output_comp);
 	}
 }
 
+
+//-------------------------------------------------
+//  clear_w - set the clear line state
+//-------------------------------------------------
 
 WRITE_LINE_DEVICE_HANDLER( ttl7474_clear_w )
 {
@@ -166,6 +204,11 @@ void ttl7474_device::clear_w(UINT8 state)
 	update();
 }
 
+
+//-------------------------------------------------
+//  clear_w - set the clear line state
+//-------------------------------------------------
+
 WRITE_LINE_DEVICE_HANDLER( ttl7474_preset_w )
 {
     downcast<ttl7474_device *>(device)->preset_w(state);
@@ -177,6 +220,11 @@ void ttl7474_device::preset_w(UINT8 state)
 	update();
 }
 
+
+//-------------------------------------------------
+//  clock_w - set the clock line state
+//-------------------------------------------------
+
 WRITE_LINE_DEVICE_HANDLER( ttl7474_clock_w )
 {
     downcast<ttl7474_device *>(device)->clock_w(state);
@@ -184,9 +232,14 @@ WRITE_LINE_DEVICE_HANDLER( ttl7474_clock_w )
 
 void ttl7474_device::clock_w(UINT8 state)
 {
-    m_clock = state & 1;
+    m_clk = state & 1;
 	update();
 }
+
+
+//-------------------------------------------------
+//  d_w - set the d line state
+//-------------------------------------------------
 
 WRITE_LINE_DEVICE_HANDLER( ttl7474_d_w )
 {
@@ -200,6 +253,10 @@ void ttl7474_device::d_w(UINT8 state)
 }
 
 
+//-------------------------------------------------
+//  output_r - get the output line state
+//-------------------------------------------------
+
 READ_LINE_DEVICE_HANDLER( ttl7474_output_r )
 {
     return downcast<ttl7474_device *>(device)->output_r();
@@ -209,6 +266,11 @@ UINT8 ttl7474_device::output_r()
 {
     return m_output;
 }
+
+
+//-----------------------------------------------------
+//  output_comp_r - get the output-compare line state
+//-----------------------------------------------------
 
 READ_LINE_DEVICE_HANDLER( ttl7474_output_comp_r )
 {
@@ -224,25 +286,12 @@ void ttl7474_device::init()
 {
     m_clear = 1;
     m_preset = 1;
-    m_clock = 1;
+    m_clk = 1;
     m_d = 1;
 
     m_output = -1;
     m_last_clock = 1;
     m_last_output = -1;
-}
-
-void ttl7474_device::register_globals()
-{
-    state_save_register_device_item(this, 0, m_clear);
-    state_save_register_device_item(this, 0, m_preset);
-    state_save_register_device_item(this, 0, m_clock);
-    state_save_register_device_item(this, 0, m_d);
-    state_save_register_device_item(this, 0, m_output);
-    state_save_register_device_item(this, 0, m_output_comp);
-    state_save_register_device_item(this, 0, m_last_clock);
-    state_save_register_device_item(this, 0, m_last_output);
-    state_save_register_device_item(this, 0, m_last_output_comp);
 }
 
 const device_type MACHINE_TTL7474 = ttl7474_device_config::static_alloc_device_config;

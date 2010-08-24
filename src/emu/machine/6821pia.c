@@ -82,7 +82,27 @@ device_t *pia6821_device_config::alloc_device(running_machine &machine) const
 
 void pia6821_device_config::device_config_complete()
 {
+	// inherit a copy of the static data
+	const pia6821_interface *intf = reinterpret_cast<const pia6821_interface *>(static_config());
+	if (intf != NULL)
+		*static_cast<pia6821_interface *>(this) = *intf;
 
+	// or initialize to defaults if none provided
+	else
+	{
+    	memset(&m_in_a_func, 0, sizeof(m_in_a_func));
+    	memset(&m_in_b_func, 0, sizeof(m_in_b_func));
+    	memset(&m_in_ca1_func, 0, sizeof(m_in_ca1_func));
+    	memset(&m_in_cb1_func, 0, sizeof(m_in_cb1_func));
+    	memset(&m_in_ca2_func, 0, sizeof(m_in_ca2_func));
+    	memset(&m_in_cb2_func, 0, sizeof(m_in_cb2_func));
+    	memset(&m_out_a_func, 0, sizeof(m_out_a_func));
+    	memset(&m_out_b_func, 0, sizeof(m_out_b_func));
+    	memset(&m_out_ca2_func, 0, sizeof(m_out_ca2_func));
+    	memset(&m_out_cb2_func, 0, sizeof(m_out_cb2_func));
+    	memset(&m_irq_a_func, 0, sizeof(m_irq_a_func));
+    	memset(&m_irq_b_func, 0, sizeof(m_irq_b_func));
+	}
 }
 
 

@@ -52,13 +52,18 @@
 
 #define MDRV_7474_ADD(_tag, _target_tag, _output_cb, _comp_output_cb) \
     MDRV_DEVICE_ADD(_tag, MACHINE_TTL7474, 0) \
+    MDRV_7474_TARGET_TAG(_target_tag) \
     MDRV_7474_OUTPUT_CB(_output_cb) \
     MDRV_7474_COMP_OUTPUT_CB(_comp_output_cb)
 
 #define MDRV_7474_REPLACE(_tag, _target_tag, _output_cb, _comp_output_cb) \
     MDRV_DEVICE_REPLACE(_tag, TTL7474, 0) \
+    MDRV_7474_TARGET_TAG(_target_tag) \
     MDRV_7474_OUTPUT_CB(_output_cb) \
     MDRV_7474_COMP_OUTPUT_CB(_comp_output_cb)
+
+#define MDRV_7474_TARGET_TAG(_target_tag) \
+    MDRV_DEVICE_INLINE_DATAPTR(ttl7474_device_config::INLINE_TARGET_TAG, _target_tag)
 
 #define MDRV_7474_OUTPUT_CB(_cb) \
     MDRV_DEVICE_INLINE_DATAPTR(ttl7474_device_config::INLINE_OUTPUT_CB, _cb)
@@ -86,19 +91,23 @@ public:
     static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
     virtual device_t *alloc_device(running_machine &machine) const;
 
-    // inline configuration indexes go here (none yet)
-
-    // indexes to inline data
+    // inline configuration indexes go here
     enum
     {
+		INLINE_TARGET_TAG,
         INLINE_OUTPUT_CB,
         INLINE_COMP_OUTPUT_CB
     };
 
 protected:
-    // device_config overrides (none yet)
+    // device_config overrides
+    virtual void device_config_complete();
 
-    // internal state goes here (none yet)
+    // internal state goes here
+	const char *m_target_tag;
+	void (*m_base_output_cb)(device_t *device, INT32);
+	void (*m_base_comp_output_cb)(device_t *device, INT32);
+
     devcb_write_line m_output_cb;
     devcb_write_line m_comp_output_cb;
 };
@@ -140,7 +149,7 @@ private:
     /* inputs */
     UINT8 m_clear;              /* pin 1/13 */
     UINT8 m_preset;             /* pin 4/10 */
-    UINT8 m_clock;              /* pin 3/11 */
+    UINT8 m_clk;              	/* pin 3/11 */
     UINT8 m_d;                  /* pin 2/12 */
 
     /* outputs */
@@ -153,7 +162,6 @@ private:
     UINT8 m_last_output_comp;
 
     void update();
-    void register_globals();
     void init();
 };
 
