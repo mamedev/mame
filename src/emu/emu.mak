@@ -110,12 +110,8 @@ EMUOBJS = \
 	$(EMUOBJ)/debug/dvtext.o \
 	$(EMUOBJ)/debug/express.o \
 	$(EMUOBJ)/debug/textbuf.o \
-	$(EMUOBJ)/debugint/debugint.o
-
-ifdef PROFILER
-EMUOBJS += \
+	$(EMUOBJ)/debugint/debugint.o \
 	$(EMUOBJ)/profiler.o
-endif
 
 EMUSOUNDOBJS = \
 	$(EMUOBJ)/sound/filter.o \
