@@ -1188,4 +1188,34 @@ void via6522_device::cb2_w(UINT8 state)
     }
 }
 
+/*-------------------------------------------------
+    via_porta_w - interface writing VIA port A
+-------------------------------------------------*/
+
+WRITE8_DEVICE_HANDLER(via_porta_w)
+{
+    via6522_device *via = reinterpret_cast<via6522_device *>(device);
+    via->porta_w(data);
+}
+
+/*-------------------------------------------------
+    via_portb_w - interface writing VIA port B
+-------------------------------------------------*/
+
+WRITE8_DEVICE_HANDLER(via_portb_w)
+{
+    via6522_device *via = reinterpret_cast<via6522_device *>(device);
+    via->portb_w(data);
+}
+
+/*-------------------------------------------------
+    via_portb_r - interface reading VIA port B
+-------------------------------------------------*/
+
+READ8_DEVICE_HANDLER(via_portb_w)
+{
+    via6522_device *via = reinterpret_cast<via6522_device *>(device);
+    return via->portb_r();
+}
+
 const device_type VIA6522 = via6522_device_config::static_alloc_device_config;
