@@ -111,6 +111,8 @@ void pia6821_device_config::device_config_complete()
 //  LIVE DEVICE
 //**************************************************************************
 
+const device_type PIA6821 = pia6821_device_config::static_alloc_device_config;
+
 //-------------------------------------------------
 //  pia6821_device - constructor
 //-------------------------------------------------
@@ -1420,5 +1422,3 @@ int pia6821_device::get_irq_b()
 {
 	return m_irq_b_state;
 }
-
-const device_type PIA6821 = pia6821_device_config::static_alloc_device_config;

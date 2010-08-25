@@ -209,6 +209,8 @@ UINT16 via6522_device::get_counter1_value()
 //  LIVE DEVICE
 //**************************************************************************
 
+const device_type VIA6522 = via6522_device_config::static_alloc_device_config;
+
 //-------------------------------------------------
 //  via6522_device - constructor
 //-------------------------------------------------
@@ -245,9 +247,9 @@ void via6522_device::device_start()
     m_t2ll = 0xff; /* taken from vice */
     m_t2lh = 0xff;
     m_time2 = m_time1 = timer_get_time(&m_machine);
-    m_t1 = timer_alloc(&m_machine, t1_timeout_callback, 0);
-    m_t2 = timer_alloc(&m_machine, t2_timeout_callback, 0);
-    m_shift_timer = timer_alloc(&m_machine, shift_callback, 0);
+    m_t1 = timer_alloc(&m_machine, t1_timeout_callback, (void *)this);
+    m_t2 = timer_alloc(&m_machine, t2_timeout_callback, (void *)this);
+    m_shift_timer = timer_alloc(&m_machine, shift_callback, (void *)this);
 
 	/* Default clock is from CPU1 */
 	if (clock() == 0)
@@ -517,11 +519,6 @@ void via6522_device::t2_timeout()
     via_r - CPU interface for VIA read
 -------------------------------------------------*/
 
-READ8_DEVICE_HANDLER(via_r)
-{
-    return downcast<via6522_device *>(device)->reg_r(offset);
-}
-
 UINT8 via6522_device::reg_r(UINT8 offset)
 {
 	int val = 0;
@@ -711,11 +708,6 @@ UINT8 via6522_device::reg_r(UINT8 offset)
 /*-------------------------------------------------
     via_w - CPU interface for VIA write
 -------------------------------------------------*/
-
-WRITE8_DEVICE_HANDLER(via_w)
-{
-    downcast<via6522_device *>(device)->reg_w(offset, data);
-}
 
 void via6522_device::reg_w(UINT8 offset, UINT8 data)
 {
@@ -978,39 +970,10 @@ void via6522_device::reg_w(UINT8 offset, UINT8 data)
     }
 }
 
-/*-------------------------------------------------
-    via_ca1_r - interface returning VIA port
-    CA1 input
--------------------------------------------------*/
-
-READ_LINE_DEVICE_HANDLER(via_ca1_r)
-{
-    return downcast<via6522_device *>(device)->ca1_r();
-}
-
-
 
 /*-------------------------------------------------
-    via_ca2_r - interface returning VIA port
-    CA2 input
+    ca1_w - interface setting VIA port CA1 input
 -------------------------------------------------*/
-
-READ_LINE_DEVICE_HANDLER(via_ca2_r)
-{
-    return downcast<via6522_device *>(device)->ca2_r();
-}
-
-
-
-/*-------------------------------------------------
-    via_ca1_w - interface setting VIA port
-    CA1 input
--------------------------------------------------*/
-
-WRITE_LINE_DEVICE_HANDLER(via_ca1_w)
-{
-    downcast<via6522_device *>(device)->ca1_w(state);
-}
 
 void via6522_device::ca1_w(UINT8 state)
 {
@@ -1056,16 +1019,9 @@ void via6522_device::ca1_w(UINT8 state)
 }
 
 
-
 /*-------------------------------------------------
-    via_ca2_w - interface setting VIA port
-    CA2 input
+    ca2_w - interface setting VIA port CA2 input
 -------------------------------------------------*/
-
-WRITE_LINE_DEVICE_HANDLER(via_ca2_w)
-{
-    downcast<via6522_device *>(device)->ca2_w(state);
-}
 
 void via6522_device::ca2_w(UINT8 state)
 {
@@ -1088,40 +1044,9 @@ void via6522_device::ca2_w(UINT8 state)
 }
 
 
-
 /*-------------------------------------------------
-    via_cb1_r - interface returning VIA port
-    CB1 input
+    cb1_w - interface setting VIA port CB1 input
 -------------------------------------------------*/
-
-READ_LINE_DEVICE_HANDLER(via_cb1_r)
-{
-    return downcast<via6522_device *>(device)->cb1_r();
-}
-
-
-
-/*-------------------------------------------------
-    via_cb2_r - interface returning VIA port
-    CB2 input
--------------------------------------------------*/
-
-READ_LINE_DEVICE_HANDLER(via_cb2_r)
-{
-    return downcast<via6522_device *>(device)->cb2_r();
-}
-
-
-
-/*-------------------------------------------------
-    via_cb1_w - interface setting VIA port
-    CB1 input
--------------------------------------------------*/
-
-WRITE_LINE_DEVICE_HANDLER( via_cb1_w )
-{
-    downcast<via6522_device *>(device)->cb1_w(state);
-}
 
 void via6522_device::cb1_w(UINT8 state)
 {
@@ -1168,14 +1093,8 @@ void via6522_device::cb1_w(UINT8 state)
 
 
 /*-------------------------------------------------
-    via_cb2_w - interface setting VIA port
-    CB2 input
+    cb2_w - interface setting VIA port CB2 input
 -------------------------------------------------*/
-
-WRITE_LINE_DEVICE_HANDLER(via_cb2_w)
-{
-    downcast<via6522_device *>(device)->cb2_w(state);
-}
 
 void via6522_device::cb2_w(UINT8 state)
 {
@@ -1197,31 +1116,28 @@ void via6522_device::cb2_w(UINT8 state)
     }
 }
 
-/*-------------------------------------------------
-    via_porta_w - interface writing VIA port A
--------------------------------------------------*/
 
-WRITE8_DEVICE_HANDLER(via_porta_w)
-{
-    downcast<via6522_device *>(device)->porta_w(data);
-}
 
-/*-------------------------------------------------
-    via_portb_w - interface writing VIA port B
--------------------------------------------------*/
+/***************************************************************************
+    TRAMPOLINES
+***************************************************************************/
 
-WRITE8_DEVICE_HANDLER(via_portb_w)
-{
-    downcast<via6522_device *>(device)->portb_w(data);
-}
+READ8_DEVICE_HANDLER(via_r) { return downcast<via6522_device *>(device)->reg_r(offset); }
+WRITE8_DEVICE_HANDLER(via_w) { downcast<via6522_device *>(device)->reg_w(offset, data); }
 
-/*-------------------------------------------------
-    via_portb_r - interface reading VIA port B
--------------------------------------------------*/
+READ_LINE_DEVICE_HANDLER(via_ca1_r) { return downcast<via6522_device *>(device)->ca1_r(); }
+WRITE_LINE_DEVICE_HANDLER(via_ca1_w) { downcast<via6522_device *>(device)->ca1_w(state); }
 
-READ8_DEVICE_HANDLER(via_portb_w)
-{
-    return downcast<via6522_device *>(device)->portb_r();
-}
+READ_LINE_DEVICE_HANDLER(via_ca2_r) { return downcast<via6522_device *>(device)->ca2_r(); }
+WRITE_LINE_DEVICE_HANDLER(via_ca2_w) { downcast<via6522_device *>(device)->ca2_w(state); }
 
-const device_type VIA6522 = via6522_device_config::static_alloc_device_config;
+READ_LINE_DEVICE_HANDLER(via_cb1_r) { return downcast<via6522_device *>(device)->cb1_r(); }
+WRITE_LINE_DEVICE_HANDLER(via_cb1_w) { downcast<via6522_device *>(device)->cb1_w(state); }
+
+READ_LINE_DEVICE_HANDLER(via_cb2_r) { return downcast<via6522_device *>(device)->cb2_r(); }
+WRITE_LINE_DEVICE_HANDLER(via_cb2_w) { downcast<via6522_device *>(device)->cb2_w(state); }
+
+WRITE8_DEVICE_HANDLER(via_porta_w) { downcast<via6522_device *>(device)->porta_w(data); }
+
+READ8_DEVICE_HANDLER(via_portb_r) { return downcast<via6522_device *>(device)->portb_r(); }
+WRITE8_DEVICE_HANDLER(via_portb_w) { downcast<via6522_device *>(device)->portb_w(data); }
