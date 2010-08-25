@@ -130,8 +130,11 @@ void ttl7474_device::device_start()
     state_save_register_device_item(this, 0, m_last_output);
     state_save_register_device_item(this, 0, m_last_output_comp);
 
-    devcb_resolve_write_line(&m_output_cb, &m_config.m_output_cb, this);
-    devcb_resolve_write_line(&m_comp_output_cb, &m_config.m_comp_output_cb, this);
+	if(m_config.m_target_tag != NULL)
+	{
+    	devcb_resolve_write_line(&m_output_cb, &m_config.m_output_cb, this);
+    	devcb_resolve_write_line(&m_comp_output_cb, &m_config.m_comp_output_cb, this);
+	}
 }
 
 //-------------------------------------------------
