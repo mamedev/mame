@@ -449,6 +449,7 @@ const game_driver * const drivers[] =
 	DRIVER( jngolady )	/* (c) 1984 */
 	DRIVER( cntrygrl )	/* (c) 1984 Royal Denshi */
 	DRIVER( cntrygrla ) /* (c) 1984 */
+	DRIVER( roylcrdn )	/* (c) 1985 */
 	DRIVER( fruitbun )	/* (c) 1984 */
 	DRIVER( luckygrl )	/* (c) 1984 Wing? */
 	DRIVER( nightgal )	/* (c) 1984 */
