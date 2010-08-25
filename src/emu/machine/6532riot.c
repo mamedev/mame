@@ -40,7 +40,7 @@ enum
 //-------------------------------------------------
 
 riot6532_device_config::riot6532_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-    : device_config(mconfig, static_alloc_device_config, "RIOT6532", tag, owner, clock)
+	: device_config(mconfig, static_alloc_device_config, "RIOT6532", tag, owner, clock)
 {
 }
 
@@ -52,7 +52,7 @@ riot6532_device_config::riot6532_device_config(const machine_config &mconfig, co
 
 device_config *riot6532_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
 {
-    return global_alloc(riot6532_device_config(mconfig, tag, owner, clock));
+	return global_alloc(riot6532_device_config(mconfig, tag, owner, clock));
 }
 
 
@@ -62,7 +62,7 @@ device_config *riot6532_device_config::static_alloc_device_config(const machine_
 
 device_t *riot6532_device_config::alloc_device(running_machine &machine) const
 {
-    return auto_alloc(&machine, riot6532_device(machine, *this));
+	return auto_alloc(&machine, riot6532_device(machine, *this));
 }
 
 
@@ -74,22 +74,22 @@ device_t *riot6532_device_config::alloc_device(running_machine &machine) const
 
 void riot6532_device_config::device_config_complete()
 {
-    // inherit a copy of the static data
-    const riot6532_interface *intf = reinterpret_cast<const riot6532_interface *>(static_config());
-    if (intf != NULL)
-    {
-        *static_cast<riot6532_interface *>(this) = *intf;
-    }
+	// inherit a copy of the static data
+	const riot6532_interface *intf = reinterpret_cast<const riot6532_interface *>(static_config());
+	if (intf != NULL)
+	{
+		*static_cast<riot6532_interface *>(this) = *intf;
+	}
 
-    // or initialize to defaults if none provided
-    else
-    {
-        memset(&m_in_a_func, 0, sizeof(m_in_a_func));
-        memset(&m_in_b_func, 0, sizeof(m_in_b_func));
-        memset(&m_out_a_func, 0, sizeof(m_out_a_func));
-        memset(&m_out_b_func, 0, sizeof(m_out_b_func));
-        memset(&m_irq_func, 0, sizeof(m_irq_func));
-    }
+	// or initialize to defaults if none provided
+	else
+	{
+		memset(&m_in_a_func, 0, sizeof(m_in_a_func));
+		memset(&m_in_b_func, 0, sizeof(m_in_b_func));
+		memset(&m_out_a_func, 0, sizeof(m_out_a_func));
+		memset(&m_out_b_func, 0, sizeof(m_out_b_func));
+		memset(&m_irq_func, 0, sizeof(m_irq_func));
+	}
 }
 
 
@@ -108,13 +108,13 @@ void riot6532_device::update_irqstate()
 	int state = (m_irqstate & m_irqenable);
 
 	if (m_irq_func.write != NULL)
-    {
+	{
 		devcb_call_write_line(&m_irq_func, (state != 0) ? ASSERT_LINE : CLEAR_LINE);
-    }
+	}
 	else
-    {
+	{
 		logerror("%s:6532RIOT chip #%d: no irq callback function\n", cpuexec_describe_context(&m_machine), m_index);
-    }
+	}
 }
 
 
@@ -156,21 +156,21 @@ UINT8 riot6532_device::get_timer()
 {
 	/* if idle, return 0 */
 	if (m_timerstate == TIMER_IDLE)
-    {
+	{
 		return 0;
-    }
+	}
 
 	/* if counting, return the number of ticks remaining */
 	else if (m_timerstate == TIMER_COUNTING)
-    {
+	{
 		return attotime_to_ticks(timer_timeleft(m_timer), clock()) >> m_timershift;
-    }
+	}
 
 	/* if finishing, return the number of ticks without the shift */
 	else
-    {
+	{
 		return attotime_to_ticks(timer_timeleft(m_timer), clock());
-    }
+	}
 }
 
 
@@ -182,8 +182,8 @@ UINT8 riot6532_device::get_timer()
 
 TIMER_CALLBACK( riot6532_device::timer_end_callback )
 {
-    riot6532_device *via = reinterpret_cast<riot6532_device *>(ptr);
-    via->timer_end();
+	riot6532_device *via = reinterpret_cast<riot6532_device *>(ptr);
+	via->timer_end();
 }
 
 void riot6532_device::timer_end()
@@ -220,8 +220,8 @@ void riot6532_device::timer_end()
 
 WRITE8_DEVICE_HANDLER( riot6532_w )
 {
-    riot6532_device *via = reinterpret_cast<riot6532_device *>(device);
-    via->reg_w(offset, data);
+	riot6532_device *via = downcast<riot6532_device *>(device);
+	via->reg_w(offset, data);
 }
 
 void riot6532_device::reg_w(UINT8 offset, UINT8 data)
@@ -244,9 +244,9 @@ void riot6532_device::reg_w(UINT8 offset, UINT8 data)
 
 		/* writes here clear the timer flag */
 		if (m_timerstate != TIMER_FINISHING || get_timer() != 0xff)
-        {
+		{
 			m_irqstate &= ~TIMER_FLAG;
-        }
+		}
 		update_irqstate();
 
 		/* update the timer */
@@ -260,13 +260,13 @@ void riot6532_device::reg_w(UINT8 offset, UINT8 data)
 	{
 		/* A1 contains the A7 IRQ enable */
 		if (offset & 2)
-        {
+		{
 			m_irqenable |= PA7_FLAG;
-        }
+		}
 		else
-        {
+		{
 			m_irqenable &= ~PA7_FLAG;
-        }
+		}
 
 		/* A0 specifies the edge detect direction: 0=negative, 1=positive */
 		m_pa7dir = (offset & 1) << 7;
@@ -280,29 +280,29 @@ void riot6532_device::reg_w(UINT8 offset, UINT8 data)
 
 		/* if A0 == 1, we are writing to the port's DDR */
 		if (offset & 1)
-        {
+		{
 			port->m_ddr = data;
-        }
+		}
 
 		/* if A0 == 0, we are writing to the port's output */
 		else
 		{
 			port->m_out = data;
 			if (port->m_out_func.write != NULL)
-            {
+			{
 				devcb_call_write8(&port->m_out_func, 0, data);
-            }
+			}
 			else
-            {
+			{
 				logerror("%s:6532RIOT chip %s: Port %c is being written to but has no handler. %02X\n", cpuexec_describe_context(&m_machine), tag(), 'A' + (offset & 1), data);
-            }
+			}
 		}
 
 		/* writes to port A need to update the PA7 state */
 		if (port == &m_port[0])
-        {
+		{
 			update_pa7_state();
-        }
+		}
 	}
 }
 
@@ -313,8 +313,8 @@ void riot6532_device::reg_w(UINT8 offset, UINT8 data)
 
 READ8_DEVICE_HANDLER( riot6532_r )
 {
-    riot6532_device *via = reinterpret_cast<riot6532_device *>(device);
-    return via->reg_r(offset);
+	riot6532_device *via = downcast<riot6532_device *>(device);
+	return via->reg_r(offset);
 }
 
 UINT8 riot6532_device::reg_r(UINT8 offset)
@@ -338,19 +338,19 @@ UINT8 riot6532_device::reg_r(UINT8 offset)
 
 		/* A3 contains the timer IRQ enable */
 		if (offset & 8)
-        {
+		{
 			m_irqenable |= TIMER_FLAG;
-        }
+		}
 		else
-        {
+		{
 			m_irqenable &= ~TIMER_FLAG;
-        }
+		}
 
 		/* implicitly clears the timer flag */
 		if (m_timerstate != TIMER_FINISHING || val != 0xff)
-        {
+		{
 			m_irqstate &= ~TIMER_FLAG;
-        }
+		}
 		update_irqstate();
 	}
 
@@ -362,9 +362,9 @@ UINT8 riot6532_device::reg_r(UINT8 offset)
 
 		/* if A0 == 1, we are reading the port's DDR */
 		if (offset & 1)
-        {
+		{
 			val = port->m_ddr;
-        }
+		}
 
 		/* if A0 == 0, we are reading the port as an input */
 		else
@@ -376,14 +376,14 @@ UINT8 riot6532_device::reg_r(UINT8 offset)
 
 				/* changes to port A need to update the PA7 state */
 				if (port == &m_port[0])
-                {
+				{
 					update_pa7_state();
-                }
+				}
 			}
 			else
-            {
+			{
 				logerror("%s:6532RIOT chip %s: Port %c is being read but has no handler\n", cpuexec_describe_context(&m_machine), tag(), 'A' + (offset & 1));
-            }
+			}
 
 			/* apply the DDR to the result */
 			val = apply_ddr(port);
@@ -399,8 +399,8 @@ UINT8 riot6532_device::reg_r(UINT8 offset)
 
 void riot6532_porta_in_set(running_device *device, UINT8 data, UINT8 mask)
 {
-    riot6532_device *via = reinterpret_cast<riot6532_device *>(device);
-    via->porta_in_set(data, mask);
+	riot6532_device *via = downcast<riot6532_device *>(device);
+	via->porta_in_set(data, mask);
 }
 
 void riot6532_device::porta_in_set(UINT8 data, UINT8 mask)
@@ -416,8 +416,8 @@ void riot6532_device::porta_in_set(UINT8 data, UINT8 mask)
 
 void riot6532_portb_in_set(running_device *device, UINT8 data, UINT8 mask)
 {
-    riot6532_device *via = reinterpret_cast<riot6532_device *>(device);
-    via->portb_in_set(data, mask);
+	riot6532_device *via = downcast<riot6532_device *>(device);
+	via->portb_in_set(data, mask);
 }
 
 void riot6532_device::portb_in_set(UINT8 data, UINT8 mask)
@@ -432,8 +432,8 @@ void riot6532_device::portb_in_set(UINT8 data, UINT8 mask)
 
 UINT8 riot6532_porta_in_get(running_device *device)
 {
-    riot6532_device *via = reinterpret_cast<riot6532_device *>(device);
-    return via->porta_in_get();
+	riot6532_device *via = downcast<riot6532_device *>(device);
+	return via->porta_in_get();
 }
 
 UINT8 riot6532_device::porta_in_get()
@@ -448,8 +448,8 @@ UINT8 riot6532_device::porta_in_get()
 
 UINT8 riot6532_portb_in_get(running_device *device)
 {
-    riot6532_device *via = reinterpret_cast<riot6532_device *>(device);
-    return via->portb_in_get();
+	riot6532_device *via = downcast<riot6532_device *>(device);
+	return via->portb_in_get();
 }
 
 UINT8 riot6532_device::portb_in_get()
@@ -464,8 +464,8 @@ UINT8 riot6532_device::portb_in_get()
 
 UINT8 riot6532_porta_out_get(running_device *device)
 {
-    riot6532_device *via = reinterpret_cast<riot6532_device *>(device);
-    return via->porta_out_get();
+	riot6532_device *via = downcast<riot6532_device *>(device);
+	return via->porta_out_get();
 }
 
 UINT8 riot6532_device::porta_out_get()
@@ -480,8 +480,8 @@ UINT8 riot6532_device::porta_out_get()
 
 UINT8 riot6532_portb_out_get(running_device *device)
 {
-    riot6532_device *via = reinterpret_cast<riot6532_device *>(device);
-    return via->portb_out_get();
+	riot6532_device *via = downcast<riot6532_device *>(device);
+	return via->portb_out_get();
 }
 
 UINT8 riot6532_device::portb_out_get()
@@ -499,8 +499,8 @@ UINT8 riot6532_device::portb_out_get()
 //-------------------------------------------------
 
 riot6532_device::riot6532_device(running_machine &_machine, const riot6532_device_config &config)
-    : device_t(_machine, config),
-      m_config(config)
+	: device_t(_machine, config),
+	  m_config(config)
 {
 }
 
@@ -517,33 +517,33 @@ void riot6532_device::device_start()
 	m_index = m_machine.m_devicelist.index(RIOT6532, tag());
 
 	/* configure the ports */
-    devcb_resolve_read8(&m_port[0].m_in_func, &m_config.m_in_a_func, this);
-    devcb_resolve_write8(&m_port[0].m_out_func, &m_config.m_out_a_func, this);
-    devcb_resolve_read8(&m_port[1].m_in_func, &m_config.m_in_b_func, this);
-    devcb_resolve_write8(&m_port[1].m_out_func, &m_config.m_out_b_func, this);
+	devcb_resolve_read8(&m_port[0].m_in_func, &m_config.m_in_a_func, this);
+	devcb_resolve_write8(&m_port[0].m_out_func, &m_config.m_out_a_func, this);
+	devcb_resolve_read8(&m_port[1].m_in_func, &m_config.m_in_b_func, this);
+	devcb_resolve_write8(&m_port[1].m_out_func, &m_config.m_out_b_func, this);
 
 	/* resolve irq func */
-    devcb_resolve_write_line(&m_irq_func, &m_config.m_irq_func, this);
+	devcb_resolve_write_line(&m_irq_func, &m_config.m_irq_func, this);
 
 	/* allocate timers */
-    m_timer = timer_alloc(&m_machine, timer_end_callback, (void *)this);
+	m_timer = timer_alloc(&m_machine, timer_end_callback, (void *)this);
 
 	/* register for save states */
-    state_save_register_device_item(this, 0, m_port[0].m_in);
-    state_save_register_device_item(this, 0, m_port[0].m_out);
-    state_save_register_device_item(this, 0, m_port[0].m_ddr);
-    state_save_register_device_item(this, 0, m_port[1].m_in);
-    state_save_register_device_item(this, 0, m_port[1].m_out);
-    state_save_register_device_item(this, 0, m_port[1].m_ddr);
+	state_save_register_device_item(this, 0, m_port[0].m_in);
+	state_save_register_device_item(this, 0, m_port[0].m_out);
+	state_save_register_device_item(this, 0, m_port[0].m_ddr);
+	state_save_register_device_item(this, 0, m_port[1].m_in);
+	state_save_register_device_item(this, 0, m_port[1].m_out);
+	state_save_register_device_item(this, 0, m_port[1].m_ddr);
 
-    state_save_register_device_item(this, 0, m_irqstate);
-    state_save_register_device_item(this, 0, m_irqenable);
+	state_save_register_device_item(this, 0, m_irqstate);
+	state_save_register_device_item(this, 0, m_irqenable);
 
-    state_save_register_device_item(this, 0, m_pa7dir);
-    state_save_register_device_item(this, 0, m_pa7prev);
+	state_save_register_device_item(this, 0, m_pa7dir);
+	state_save_register_device_item(this, 0, m_pa7prev);
 
-    state_save_register_device_item(this, 0, m_timershift);
-    state_save_register_device_item(this, 0, m_timerstate);
+	state_save_register_device_item(this, 0, m_timershift);
+	state_save_register_device_item(this, 0, m_timerstate);
 }
 
 
