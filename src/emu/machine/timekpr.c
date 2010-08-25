@@ -68,6 +68,10 @@
 	TIMEKPR_DEVCFG_DERIVED_DEV_ALLOC(devtype)
 
 //**************************************************************************
+//  STATIC DATA
+//**************************************************************************
+
+//**************************************************************************
 //  DEVICE CONFIGURATION
 //**************************************************************************
 
@@ -244,6 +248,8 @@ void m48t02_device::device_start()
 	m_offset_century = -1;
 	m_offset_flags = -1;
 	m_size = 0x800;
+
+	timekeeper_device::device_start();
 }
 
 void m48t35_device::device_start()
@@ -259,6 +265,8 @@ void m48t35_device::device_start()
 	m_offset_century = -1;
 	m_offset_flags = -1;
 	m_size = 0x8000;
+
+	timekeeper_device::device_start();
 }
 
 void m48t58_device::device_start()
@@ -274,6 +282,8 @@ void m48t58_device::device_start()
 	m_offset_century = -1;
 	m_offset_flags = -1;
 	m_size = 0x2000;
+
+	timekeeper_device::device_start();
 }
 
 void mk48t08_device::device_start()
@@ -289,6 +299,8 @@ void mk48t08_device::device_start()
 	m_offset_century = 0x1ff1;
 	m_offset_flags = 0x1ff0;
 	m_size = 0x2000;
+
+	timekeeper_device::device_start();
 }
 
 //-------------------------------------------------
