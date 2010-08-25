@@ -352,7 +352,7 @@ public:
 
 	// compare a range against our range
 	bool matches_exactly(offs_t bytestart, offs_t byteend) const { return (m_bytestart == bytestart && m_byteend == byteend); }
-	bool fully_covers(offs_t bytestart, offs_t byteend) const { return (m_bytestart <= bytestart && m_byteend >= byteend); }
+	bool fully_covers(offs_t bytestart, offs_t byteend) const { return (m_bytestart >= bytestart && m_byteend <= byteend); }
 	bool partially_covers(offs_t bytestart, offs_t byteend) const { return (m_bytestart <= byteend && m_byteend >= bytestart); }
 
 	// track and verify address space references to this bank
