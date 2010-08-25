@@ -374,7 +374,7 @@ void via6522_device::clear_int(int data)
 
 void via6522_device::shift()
 {
-	if (SO_O2_CONTROL(m_acr))
+	if (SO_O2_CONTROL(m_acr) || SO_T2_CONTROL(m_acr))
 	{
 		m_out_cb2 = (m_sr >> 7) & 1;
 		m_sr =  (m_sr << 1) | m_out_cb2;
@@ -391,7 +391,11 @@ void via6522_device::shift()
 
 		if (m_shift_counter)
         {
-			timer_adjust_oneshot(m_shift_timer, cycles_to_time(2), 0);
+			if (SO_O2_CONTROL(m_acr)) {
+				timer_adjust_oneshot(m_shift_timer, cycles_to_time(2), 0);
+			} else {
+				timer_adjust_oneshot(m_shift_timer, cycles_to_time((m_t2ll + 2)*2), 0);
+			}
         }
 		else
 		{
@@ -683,6 +687,11 @@ UINT8 via6522_device::reg_r(UINT8 offset)
 			m_shift_counter=0;
 			timer_adjust_oneshot(m_shift_timer, cycles_to_time(2), 0);
 		}
+		if (SO_T2_CONTROL(m_acr))
+		{
+			m_shift_counter=0;
+			timer_adjust_oneshot(m_shift_timer, cycles_to_time((m_t2ll + 2)*2), 0);
+		}
 		break;
 
     case VIA_PCR:
@@ -879,6 +888,10 @@ void via6522_device::reg_w(UINT8 offset, UINT8 data)
 		if (SO_O2_CONTROL(m_acr))
 		{
 			timer_set(&m_machine, cycles_to_time(2), (void *)this, 0, shift_callback);
+		}
+		if (SO_T2_CONTROL(m_acr))
+		{
+			timer_set(&m_machine, cycles_to_time((m_t2ll + 2)*2), (void *)this, 0, shift_callback);
 		}
 		break;
 
