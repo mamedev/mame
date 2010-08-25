@@ -5996,6 +5996,7 @@ ROM_END
     Tough Turf, Sega System 16B
     CPU: 68000 + i8751 (317-0099)
     ROM Board: 171-5358
+    Sega ID# for ROM board: 834-6949
  */
 ROM_START( tturfu )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 code */
