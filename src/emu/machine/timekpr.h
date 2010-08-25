@@ -1,52 +1,280 @@
-/*
- * STmicroelectronics TIMEKEEPER SRAM
- *
- * Supports:
- *           M48T02
- *           M48T35
- *           M48T58
- *           MK48T08
- *
- */
+/***************************************************************************
 
-#if !defined( TIMEKPR_H )
-#define TIMEKPR_H ( 1 )
+    timekpr.h
 
-#include "devlegcy.h"
+    Various ST Microelectronics timekeeper SRAM implementations:
+    	- M48T02
+    	- M48T35
+    	- M48T58
+    	- MK48T08
 
-typedef struct _timekeeper_config timekeeper_config;
-struct _timekeeper_config
-{
-	const char *data;
-};
+***************************************************************************/
 
-DECLARE_LEGACY_NVRAM_DEVICE(M48T02, m48t02);
+#pragma once
+
+#ifndef __TIMEKPR_H__
+#define __TIMEKPR_H__
+
+#include "emu.h"
+
+
+
+//**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
 
 #define MDRV_M48T02_ADD(_tag) \
 	MDRV_DEVICE_ADD(_tag, M48T02, 0)
 
-
-DECLARE_LEGACY_NVRAM_DEVICE(M48T35, m48t35);
-
 #define MDRV_M48T35_ADD(_tag) \
 	MDRV_DEVICE_ADD(_tag, M48T35, 0)
 
-
-DECLARE_LEGACY_NVRAM_DEVICE(M48T58, m48t58);
-
 #define MDRV_M48T58_ADD(_tag) \
 	MDRV_DEVICE_ADD(_tag, M48T58, 0)
-
-
-DECLARE_LEGACY_NVRAM_DEVICE(MK48T08, mk48t08);
 
 #define MDRV_MK48T08_ADD(_tag) \
 	MDRV_DEVICE_ADD(_tag, MK48T08, 0)
 
 
-/* memory handlers */
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+
+// ======================> timekeeper_config
+
+struct timekeeper_config
+{
+	const UINT8 *m_data;
+};
+
+// ======================> timekeeper_device_config
+
+class timekeeper_device_config :	public device_config,
+									public device_config_nvram_interface,
+									public timekeeper_config
+{
+	friend class timekeeper_device;
+	friend class m48t02_device_config;
+	friend class m48t35_device_config;
+	friend class m48t58_device_config;
+	friend class mk48t08_device_config;
+
+protected:
+	// construction/destruction
+	timekeeper_device_config(const machine_config &mconfig, const char *type, const char *tag, const device_config *owner, UINT32 clock);
+
+public:
+	// allocators
+	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+	virtual device_t *alloc_device(running_machine &machine) const;
+};
+
+
+// ======================> timekeeper_device
+
+class timekeeper_device :	public device_t,
+							public device_nvram_interface
+{
+	friend class timekeeper_device_config;
+	friend class m48t02_device;
+	friend class m48t35_device;
+	friend class m48t58_device;
+	friend class mk48t08_device;
+
+	// construction/destruction
+	timekeeper_device(running_machine &_machine, const timekeeper_device_config &config);
+
+public:
+	void timekeeper_tick();
+
+	void write(UINT16 offset, UINT8 data);
+	UINT8 read(UINT16 offset);
+
+protected:
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
+
+	// device_nvram_interface overrides
+	virtual void nvram_default();
+	virtual void nvram_read(mame_file &file);
+	virtual void nvram_write(mame_file &file);
+
+	// internal state
+	const timekeeper_device_config &m_config;
+
+	static TIMER_CALLBACK( timekeeper_tick_callback );
+
+private:
+	void counters_to_ram();
+	void counters_from_ram();
+
+	UINT8 m_control;
+	UINT8 m_seconds;
+	UINT8 m_minutes;
+	UINT8 m_hours;
+	UINT8 m_day;
+	UINT8 m_date;
+	UINT8 m_month;
+	UINT8 m_year;
+	UINT8 m_century;
+
+	UINT8 *m_data;
+	UINT8 *m_default_data;
+
+	int m_size;
+	int m_offset_control;
+	int m_offset_seconds;
+	int m_offset_minutes;
+	int m_offset_hours;
+	int m_offset_day;
+	int m_offset_date;
+	int m_offset_month;
+	int m_offset_year;
+	int m_offset_century;
+	int m_offset_flags;
+};
+
+
+// ======================> m48t02_device_config
+
+class m48t02_device_config : public timekeeper_device_config
+{
+	friend class mt48t02_device;
+
+	m48t02_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+
+public:
+	// allocators
+	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+	virtual device_t *alloc_device(running_machine &machine) const;
+};
+
+
+// ======================> m48t02_device
+
+class m48t02_device : public timekeeper_device
+{
+	friend class timekeeper_device;
+	friend class m48t02_device_config;
+
+	// construction/destruction
+	m48t02_device(running_machine &_machine, const m48t02_device_config &config);
+
+protected:
+	// device-level overrides
+	virtual void device_start();
+};
+
+
+// ======================> m48t35_device_config
+
+class m48t35_device_config : public timekeeper_device_config
+{
+	friend class m48t35_device;
+	friend class timekeeper_device_config;
+
+	m48t35_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+
+public:
+	// allocators
+	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+	virtual device_t *alloc_device(running_machine &machine) const;
+};
+
+
+// ======================> m48t35_device
+
+class m48t35_device : public timekeeper_device
+{
+	friend class m48t35_device_config;
+
+	// construction/destruction
+	m48t35_device(running_machine &_machine, const m48t35_device_config &config);
+
+protected:
+	// device-level overrides
+	virtual void device_start();
+};
+
+
+// ======================> m48t58_device_config
+
+class m48t58_device_config : public timekeeper_device_config
+{
+	friend class m48t58_device;
+	friend class timekeeper_device_config;
+
+	m48t58_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+
+public:
+	// allocators
+	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+	virtual device_t *alloc_device(running_machine &machine) const;
+};
+
+
+// ======================> m48t58_device
+
+class m48t58_device : public timekeeper_device
+{
+	friend class m48t58_device_config;
+
+	// construction/destruction
+	m48t58_device(running_machine &_machine, const m48t58_device_config &config);
+
+protected:
+	// device-level overrides
+	virtual void device_start();
+};
+
+
+// ======================> mk48t08_device_config
+
+class mk48t08_device_config : public timekeeper_device_config
+{
+	friend class mk48t08_device;
+	friend class timekeeper_device_config;
+
+	mk48t08_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+
+public:
+	// allocators
+	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+	virtual device_t *alloc_device(running_machine &machine) const;
+};
+
+
+// ======================> mk48t08_device
+
+class mk48t08_device : public timekeeper_device
+{
+	friend class mk48t08_device_config;
+
+	// construction/destruction
+	mk48t08_device(running_machine &_machine, const mk48t08_device_config &config);
+
+protected:
+	// device-level overrides
+	virtual void device_start();
+};
+
+
+// device type definition
+extern const device_type M48T02;
+extern const device_type M48T35;
+extern const device_type M48T58;
+extern const device_type MK48T08;
+
+
+
+//**************************************************************************
+//  READ/WRITE HANDLERS
+//**************************************************************************
 
 WRITE8_DEVICE_HANDLER( timekeeper_w );
 READ8_DEVICE_HANDLER( timekeeper_r );
 
-#endif
+#endif // __TIMEKPR_H__

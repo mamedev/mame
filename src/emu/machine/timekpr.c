@@ -1,43 +1,22 @@
-/*
- * STmicroelectronics TIMEKEEPER SRAM
- *
- * Supports:
- *           M48T02
- *           M48T35
- *           M48T58
- *           MK48T08
- *
- */
+/***************************************************************************
+
+    timekpr.h
+
+    Various ST Microelectronics timekeeper SRAM implementations:
+    	- M48T02
+    	- M48T35
+    	- M48T58
+    	- MK48T08
+
+***************************************************************************/
 
 #include "emu.h"
 #include "machine/timekpr.h"
 
-typedef struct
-{
-	UINT8 control;
-	UINT8 seconds;
-	UINT8 minutes;
-	UINT8 hours;
-	UINT8 day;
-	UINT8 date;
-	UINT8 month;
-	UINT8 year;
-	UINT8 century;
-	UINT8 *data;
-	UINT8 *default_data;
-	running_device *device;
-	int size;
-	int offset_control;
-	int offset_seconds;
-	int offset_minutes;
-	int offset_hours;
-	int offset_day;
-	int offset_date;
-	int offset_month;
-	int offset_year;
-	int offset_century;
-	int offset_flags;
-} timekeeper_state;
+
+/***************************************************************************
+    MACROS
+***************************************************************************/
 
 #define MASK_SECONDS ( 0x7f )
 #define MASK_MINUTES ( 0x7f )
@@ -63,6 +42,70 @@ typedef struct
 #define DATE_BL ( 0x40 ) /* M48T58: not emulated */
 
 #define FLAGS_BL ( 0x10 ) /* MK48T08: not emulated */
+
+#define TIMEKPR_DEV_DERIVED_CTOR(devtype) \
+	devtype##_device::devtype##_device(running_machine &_machine, const devtype##_device_config &config) \
+		: timekeeper_device(_machine, config) \
+	{ }
+
+#define TIMEKPR_DEVCFG_DERIVED_CTOR(devtype, name) \
+	devtype##_device_config::devtype##_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock) \
+    : timekeeper_device_config(mconfig, name, tag, owner, clock) \
+	{ }
+
+#define TIMEKPR_DEVCFG_DERIVED_STATIC_ALLOC(devtype) \
+	device_config *devtype##_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock) \
+	{ return global_alloc(devtype##_device_config(mconfig, tag, owner, clock)); }
+
+#define TIMEKPR_DEVCFG_DERIVED_DEV_ALLOC(devtype) \
+	device_t *devtype##_device_config::alloc_device(running_machine &machine) const \
+	{ return auto_alloc(&machine, devtype##_device(machine, *this)); }
+
+#define TIMEKPR_DERIVE(devtype, name) \
+	TIMEKPR_DEV_DERIVED_CTOR(devtype) \
+	TIMEKPR_DEVCFG_DERIVED_CTOR(devtype, name) \
+	TIMEKPR_DEVCFG_DERIVED_STATIC_ALLOC(devtype) \
+	TIMEKPR_DEVCFG_DERIVED_DEV_ALLOC(devtype)
+
+//**************************************************************************
+//  DEVICE CONFIGURATION
+//**************************************************************************
+
+//-------------------------------------------------
+//  timekeeper_device_config - constructor
+//-------------------------------------------------
+
+timekeeper_device_config::timekeeper_device_config(const machine_config &mconfig, const char *type, const char *tag, const device_config *owner, UINT32 clock)
+    : device_config(mconfig, static_alloc_device_config, type, tag, owner, clock),
+	  device_config_nvram_interface(mconfig, *this)
+{
+
+}
+
+
+//-------------------------------------------------
+//  static_alloc_device_config - allocate a new
+//  configuration object
+//-------------------------------------------------
+
+device_config *timekeeper_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+{
+    return global_alloc(timekeeper_device_config(mconfig, "TIMEKEEPER", tag, owner, clock));
+}
+
+
+//-------------------------------------------------
+//  alloc_device - allocate a new device object
+//-------------------------------------------------
+
+device_t *timekeeper_device_config::alloc_device(running_machine &machine) const
+{
+    return auto_alloc(&machine, timekeeper_device(machine, *this));
+}
+
+/***************************************************************************
+    INLINE FUNCTIONS
+***************************************************************************/
 
 INLINE UINT8 make_bcd(UINT8 data)
 {
@@ -105,19 +148,6 @@ static void counter_to_ram( UINT8 *data, int offset, int counter )
 	}
 }
 
-static void counters_to_ram( timekeeper_state *c )
-{
-	counter_to_ram( c->data, c->offset_control, c->control );
-	counter_to_ram( c->data, c->offset_seconds, c->seconds );
-	counter_to_ram( c->data, c->offset_minutes, c->minutes );
-	counter_to_ram( c->data, c->offset_hours, c->hours );
-	counter_to_ram( c->data, c->offset_day, c->day );
-	counter_to_ram( c->data, c->offset_date, c->date );
-	counter_to_ram( c->data, c->offset_month, c->month );
-	counter_to_ram( c->data, c->offset_year, c->year );
-	counter_to_ram( c->data, c->offset_century, c->century );
-}
-
 static int counter_from_ram( UINT8 *data, int offset )
 {
 	if( offset >= 0 )
@@ -127,52 +157,208 @@ static int counter_from_ram( UINT8 *data, int offset )
 	return 0;
 }
 
-static void counters_from_ram( timekeeper_state *c )
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+const device_type M48T02 = m48t02_device_config::static_alloc_device_config;
+const device_type M48T35 = m48t35_device_config::static_alloc_device_config;
+const device_type M48T58 = m48t58_device_config::static_alloc_device_config;
+const device_type MK48T08 = mk48t08_device_config::static_alloc_device_config;
+
+TIMEKPR_DERIVE(m48t02, "M48T02")
+TIMEKPR_DERIVE(m48t35, "M48T35")
+TIMEKPR_DERIVE(m48t58, "M48T58")
+TIMEKPR_DERIVE(mk48t08, "MK48T08")
+
+//-------------------------------------------------
+//  timekeeper_device - constructor
+//-------------------------------------------------
+
+timekeeper_device::timekeeper_device(running_machine &_machine, const timekeeper_device_config &config)
+    : device_t(_machine, config),
+	  device_nvram_interface(_machine, config, *this),
+      m_config(config)
 {
-	c->control = counter_from_ram( c->data, c->offset_control );
-	c->seconds = counter_from_ram( c->data, c->offset_seconds );
-	c->minutes = counter_from_ram( c->data, c->offset_minutes );
-	c->hours = counter_from_ram( c->data, c->offset_hours );
-	c->day = counter_from_ram( c->data, c->offset_day );
-	c->date = counter_from_ram( c->data, c->offset_date );
-	c->month = counter_from_ram( c->data, c->offset_month );
-	c->year = counter_from_ram( c->data, c->offset_year );
-	c->century = counter_from_ram( c->data, c->offset_century );
+
 }
 
-static TIMER_CALLBACK( timekeeper_tick )
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void timekeeper_device::device_start()
 {
-	timekeeper_state *c = (timekeeper_state *) ptr;
+	emu_timer *timer;
+	attotime duration;
+	system_time systime;
 
-	int carry;
+	/* validate some basic stuff */
+	assert(this != NULL);
 
-	if( ( c->seconds & SECONDS_ST ) != 0 ||
-		( c->control & CONTROL_W ) != 0 )
+	m_machine.base_datetime(systime);
+
+	m_control = 0;
+	m_seconds = make_bcd( systime.local_time.second );
+	m_minutes = make_bcd( systime.local_time.minute );
+	m_hours = make_bcd( systime.local_time.hour );
+	m_day = make_bcd( systime.local_time.weekday + 1 );
+	m_date = make_bcd( systime.local_time.mday );
+	m_month = make_bcd( systime.local_time.month + 1 );
+	m_year = make_bcd( systime.local_time.year % 100 );
+	m_century = make_bcd( systime.local_time.year / 100 );
+	m_data = auto_alloc_array( &m_machine, UINT8, m_size );
+
+	m_default_data = *region();
+	if (m_default_data)
+	{
+		assert( region()->bytes() == m_size );
+	}
+
+	state_save_register_device_item( this, 0, m_control );
+	state_save_register_device_item( this, 0, m_seconds );
+	state_save_register_device_item( this, 0, m_minutes );
+	state_save_register_device_item( this, 0, m_hours );
+	state_save_register_device_item( this, 0, m_day );
+	state_save_register_device_item( this, 0, m_date );
+	state_save_register_device_item( this, 0, m_month );
+	state_save_register_device_item( this, 0, m_year );
+	state_save_register_device_item( this, 0, m_century );
+	state_save_register_device_item_pointer( this, 0, m_data, m_size );
+
+	timer = timer_alloc( &m_machine, timekeeper_tick_callback, (void *)this );
+	duration = ATTOTIME_IN_SEC(1);
+	timer_adjust_periodic( timer, duration, 0, duration );
+}
+
+void m48t02_device::device_start()
+{
+	m_offset_control = 0x7f8;
+	m_offset_seconds = 0x7f9;
+	m_offset_minutes = 0x7fa;
+	m_offset_hours = 0x7fb;
+	m_offset_day = 0x7fc;
+	m_offset_date = 0x7fd;
+	m_offset_month = 0x7fe;
+	m_offset_year = 0x7ff;
+	m_offset_century = -1;
+	m_offset_flags = -1;
+	m_size = 0x800;
+}
+
+void m48t35_device::device_start()
+{
+	m_offset_control = 0x7ff8;
+	m_offset_seconds = 0x7ff9;
+	m_offset_minutes = 0x7ffa;
+	m_offset_hours = 0x7ffb;
+	m_offset_day = 0x7ffc;
+	m_offset_date = 0x7ffd;
+	m_offset_month = 0x7ffe;
+	m_offset_year = 0x7fff;
+	m_offset_century = -1;
+	m_offset_flags = -1;
+	m_size = 0x8000;
+}
+
+void m48t58_device::device_start()
+{
+	m_offset_control = 0x1ff8;
+	m_offset_seconds = 0x1ff9;
+	m_offset_minutes = 0x1ffa;
+	m_offset_hours = 0x1ffb;
+	m_offset_day = 0x1ffc;
+	m_offset_date = 0x1ffd;
+	m_offset_month = 0x1ffe;
+	m_offset_year = 0x1fff;
+	m_offset_century = -1;
+	m_offset_flags = -1;
+	m_size = 0x2000;
+}
+
+void mk48t08_device::device_start()
+{
+	m_offset_control = 0x1ff8;
+	m_offset_seconds = 0x1ff9;
+	m_offset_minutes = 0x1ffa;
+	m_offset_hours = 0x1ffb;
+	m_offset_day = 0x1ffc;
+	m_offset_date = 0x1ffd;
+	m_offset_month = 0x1ffe;
+	m_offset_year = 0x1fff;
+	m_offset_century = 0x1ff1;
+	m_offset_flags = 0x1ff0;
+	m_size = 0x2000;
+}
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void timekeeper_device::device_reset()
+{
+
+}
+
+
+void timekeeper_device::counters_to_ram()
+{
+	counter_to_ram( m_data, m_offset_control, m_control );
+	counter_to_ram( m_data, m_offset_seconds, m_seconds );
+	counter_to_ram( m_data, m_offset_minutes, m_minutes );
+	counter_to_ram( m_data, m_offset_hours, m_hours );
+	counter_to_ram( m_data, m_offset_day, m_day );
+	counter_to_ram( m_data, m_offset_date, m_date );
+	counter_to_ram( m_data, m_offset_month, m_month );
+	counter_to_ram( m_data, m_offset_year, m_year );
+	counter_to_ram( m_data, m_offset_century, m_century );
+}
+
+void timekeeper_device::counters_from_ram()
+{
+	m_control = counter_from_ram( m_data, m_offset_control );
+	m_seconds = counter_from_ram( m_data, m_offset_seconds );
+	m_minutes = counter_from_ram( m_data, m_offset_minutes );
+	m_hours = counter_from_ram( m_data, m_offset_hours );
+	m_day = counter_from_ram( m_data, m_offset_day );
+	m_date = counter_from_ram( m_data, m_offset_date );
+	m_month = counter_from_ram( m_data, m_offset_month );
+	m_year = counter_from_ram( m_data, m_offset_year );
+	m_century = counter_from_ram( m_data, m_offset_century );
+}
+
+TIMER_CALLBACK( timekeeper_device::timekeeper_tick_callback )
+{
+    reinterpret_cast<timekeeper_device *>(ptr)->timekeeper_tick();
+}
+
+void timekeeper_device::timekeeper_tick()
+{
+	if( ( m_seconds & SECONDS_ST ) != 0 ||
+		( m_control & CONTROL_W ) != 0 )
 	{
 		return;
 	}
 
-	carry = inc_bcd( &c->seconds, MASK_SECONDS, 0x00, 0x59 );
+	int carry = inc_bcd( &m_seconds, MASK_SECONDS, 0x00, 0x59 );
 	if( carry )
 	{
-		carry = inc_bcd( &c->minutes, MASK_MINUTES, 0x00, 0x59 );
+		carry = inc_bcd( &m_minutes, MASK_MINUTES, 0x00, 0x59 );
 	}
 	if( carry )
 	{
-		carry = inc_bcd( &c->hours, MASK_HOURS, 0x00, 0x23 );
+		carry = inc_bcd( &m_hours, MASK_HOURS, 0x00, 0x23 );
 	}
 
 	if( carry )
 	{
-		UINT8 month;
-		UINT8 year;
 		UINT8 maxdays;
 		static const UINT8 daysinmonth[] = { 0x31, 0x28, 0x31, 0x30, 0x31, 0x30, 0x31, 0x31, 0x30, 0x31, 0x30, 0x31 };
 
-		inc_bcd( &c->day, MASK_DAY, 0x01, 0x07 );
+		inc_bcd( &m_day, MASK_DAY, 0x01, 0x07 );
 
-		month = from_bcd( c->month );
-		year = from_bcd( c->year );
+		UINT8 month = from_bcd( m_month );
+		UINT8 year = from_bcd( m_year );
 
 		if( month == 2 && ( year % 4 ) == 0 )
 		{
@@ -187,347 +373,119 @@ static TIMER_CALLBACK( timekeeper_tick )
 			maxdays = 0x31;
 		}
 
-		carry = inc_bcd( &c->date, MASK_DATE, 0x01, maxdays );
+		carry = inc_bcd( &m_date, MASK_DATE, 0x01, maxdays );
 	}
 	if( carry )
 	{
-		carry = inc_bcd( &c->month, MASK_MONTH, 0x01, 0x12 );
+		carry = inc_bcd( &m_month, MASK_MONTH, 0x01, 0x12 );
 	}
 	if( carry )
 	{
-		carry = inc_bcd( &c->year, MASK_YEAR, 0x00, 0x99 );
+		carry = inc_bcd( &m_year, MASK_YEAR, 0x00, 0x99 );
 	}
 	if( carry )
 	{
-		carry = inc_bcd( &c->century, MASK_CENTURY, 0x00, 0x99 );
+		carry = inc_bcd( &m_century, MASK_CENTURY, 0x00, 0x99 );
 
-		if( c->device->type() == M48T35 ||
-			c->device->type() == M48T58 )
+		if( type() == M48T35 ||
+			type() == M48T58 )
 		{
-			if( ( c->day & DAY_CEB ) != 0 )
+			if( ( m_day & DAY_CEB ) != 0 )
 			{
-				c->day ^= DAY_CB;
+				m_day ^= DAY_CB;
 			}
 		}
 	}
 
-	if( ( c->control & CONTROL_R ) == 0 )
+	if( ( m_control & CONTROL_R ) == 0 )
 	{
-		counters_to_ram( c );
+		counters_to_ram();
 	}
 }
 
-/*-------------------------------------------------
-    get_safe_token - makes sure that the passed
-    in device is the right type
--------------------------------------------------*/
-
-INLINE timekeeper_state *get_safe_token(running_device *device)
+void timekeeper_device::write(UINT16 offset, UINT8 data)
 {
-	assert(device != NULL);
-	assert((device->type() == M48T02) ||
-		   (device->type() == M48T35) ||
-		   (device->type() == M48T58) ||
-		   (device->type() == MK48T08));
-
-	return (timekeeper_state *)downcast<legacy_device_base *>(device)->token();
-}
-
-/* memory handlers */
-
-WRITE8_DEVICE_HANDLER( timekeeper_w )
-{
-	timekeeper_state *c = get_safe_token(device);
-
-	if( offset == c->offset_control )
+	if( offset == m_offset_control )
 	{
-		if( ( c->control & CONTROL_W ) != 0 &&
+		if( ( m_control & CONTROL_W ) != 0 &&
 			( data & CONTROL_W ) == 0 )
 		{
-			counters_from_ram( c );
+			counters_from_ram();
 		}
-		c->control = data;
+		m_control = data;
 	}
-	else if( offset == c->offset_day )
+	else if( offset == m_offset_day )
 	{
-		if( c->device->type() == M48T35 ||
-			c->device->type() == M48T58 )
+		if( type() == M48T35 ||
+			type() == M48T58 )
 		{
-			c->day = ( c->day & ~DAY_CEB ) | ( data & DAY_CEB );
+			m_day = ( m_day & ~DAY_CEB ) | ( data & DAY_CEB );
 		}
 	}
-	else if( offset == c->offset_date && c->device->type() == M48T58 )
+	else if( offset == m_offset_date && type() == M48T58 )
 	{
 		data &= ~DATE_BL;
 	}
-	else if( offset == c->offset_flags && c->device->type() == MK48T08 )
+	else if( offset == m_offset_flags && type() == MK48T08 )
 	{
 		data &= ~FLAGS_BL;
 	}
 
-//  logerror( "%s: timekeeper_write( %s, %04x, %02x )\n", cpuexec_describe_context(machine), c->device->tag, offset, data );
-	c->data[ offset ] = data;
+	m_data[ offset ] = data;
 }
 
-READ8_DEVICE_HANDLER( timekeeper_r )
+UINT8 timekeeper_device::read(UINT16 offset)
 {
-	timekeeper_state *c = get_safe_token(device);
-	UINT8 data = c->data[ offset ];
-//  logerror( "%s: timekeeper_read( %s, %04x ) %02x\n", cpuexec_describe_context(machine), c->device->tag, offset, data );
-	return data;
+	return m_data[ offset ];
 }
 
-/*-------------------------------------------------
-    device start callback
--------------------------------------------------*/
+//-------------------------------------------------
+//  nvram_default - called to initialize NVRAM to
+//  its default state
+//-------------------------------------------------
 
-static DEVICE_START(timekeeper)
+void timekeeper_device::nvram_default()
 {
-	timekeeper_state *c = get_safe_token(device);
-	emu_timer *timer;
-	attotime duration;
-	system_time systime;
-
-	/* validate some basic stuff */
-	assert(device != NULL);
-//  assert(device->baseconfig().static_config() != NULL);
-	assert(downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config() == NULL);
-	assert(device->machine != NULL);
-	assert(device->machine->config != NULL);
-
-	device->machine->base_datetime(systime);
-
-	c->device = device;
-	c->control = 0;
-	c->seconds = make_bcd( systime.local_time.second );
-	c->minutes = make_bcd( systime.local_time.minute );
-	c->hours = make_bcd( systime.local_time.hour );
-	c->day = make_bcd( systime.local_time.weekday + 1 );
-	c->date = make_bcd( systime.local_time.mday );
-	c->month = make_bcd( systime.local_time.month + 1 );
-	c->year = make_bcd( systime.local_time.year % 100 );
-	c->century = make_bcd( systime.local_time.year / 100 );
-	c->data = auto_alloc_array( device->machine, UINT8, c->size );
-
-	c->default_data = *device->region();
-	if (c->default_data)
-		assert( device->region()->bytes() == c->size );
-
-	state_save_register_device_item( device, 0, c->control );
-	state_save_register_device_item( device, 0, c->seconds );
-	state_save_register_device_item( device, 0, c->minutes );
-	state_save_register_device_item( device, 0, c->hours );
-	state_save_register_device_item( device, 0, c->day );
-	state_save_register_device_item( device, 0, c->date );
-	state_save_register_device_item( device, 0, c->month );
-	state_save_register_device_item( device, 0, c->year );
-	state_save_register_device_item( device, 0, c->century );
-	state_save_register_device_item_pointer( device, 0, c->data, c->size );
-
-	timer = timer_alloc( device->machine, timekeeper_tick, c );
-	duration = ATTOTIME_IN_SEC(1);
-	timer_adjust_periodic( timer, duration, 0, duration );
-}
-
-static DEVICE_START(m48t02)
-{
-	timekeeper_state *c = get_safe_token(device);
-
-	c->offset_control = 0x7f8;
-	c->offset_seconds = 0x7f9;
-	c->offset_minutes = 0x7fa;
-	c->offset_hours = 0x7fb;
-	c->offset_day = 0x7fc;
-	c->offset_date = 0x7fd;
-	c->offset_month = 0x7fe;
-	c->offset_year = 0x7ff;
-	c->offset_century = -1;
-	c->offset_flags = -1;
-	c->size = 0x800;
-
-	DEVICE_START_CALL( timekeeper );
-}
-
-static DEVICE_START(m48t35)
-{
-	timekeeper_state *c = get_safe_token(device);
-
-	c->offset_control = 0x7ff8;
-	c->offset_seconds = 0x7ff9;
-	c->offset_minutes = 0x7ffa;
-	c->offset_hours = 0x7ffb;
-	c->offset_day = 0x7ffc;
-	c->offset_date = 0x7ffd;
-	c->offset_month = 0x7ffe;
-	c->offset_year = 0x7fff;
-	c->offset_century = -1;
-	c->offset_flags = -1;
-	c->size = 0x8000;
-
-	DEVICE_START_CALL( timekeeper );
-}
-
-static DEVICE_START(m48t58)
-{
-	timekeeper_state *c = get_safe_token(device);
-
-	c->offset_control = 0x1ff8;
-	c->offset_seconds = 0x1ff9;
-	c->offset_minutes = 0x1ffa;
-	c->offset_hours = 0x1ffb;
-	c->offset_day = 0x1ffc;
-	c->offset_date = 0x1ffd;
-	c->offset_month = 0x1ffe;
-	c->offset_year = 0x1fff;
-	c->offset_century = -1;
-	c->offset_flags = -1;
-	c->size = 0x2000;
-
-	DEVICE_START_CALL( timekeeper );
-}
-
-static DEVICE_START(mk48t08)
-{
-	timekeeper_state *c = get_safe_token(device);
-
-	c->offset_control = 0x1ff8;
-	c->offset_seconds = 0x1ff9;
-	c->offset_minutes = 0x1ffa;
-	c->offset_hours = 0x1ffb;
-	c->offset_day = 0x1ffc;
-	c->offset_date = 0x1ffd;
-	c->offset_month = 0x1ffe;
-	c->offset_year = 0x1fff;
-	c->offset_century = 0x1ff1;
-	c->offset_flags = 0x1ff0;
-	c->size = 0x2000;
-
-	DEVICE_START_CALL( timekeeper );
-}
-
-/*-------------------------------------------------
-    device reset callback
--------------------------------------------------*/
-
-static DEVICE_RESET(timekeeper)
-{
-}
-
-static DEVICE_NVRAM(timekeeper)
-{
-	timekeeper_state *c = get_safe_token(device);
-
-	if( read_or_write )
+	if( m_default_data != NULL )
 	{
-		mame_fwrite( file, c->data, c->size );
+		memcpy( m_data, m_default_data, m_size );
 	}
 	else
 	{
-		if( file )
-		{
-			mame_fread( file, c->data, c->size );
-		}
-		else
-		{
-			if( c->default_data != NULL )
-			{
-				memcpy( c->data, c->default_data, c->size );
-			}
-			else
-			{
-				memset( c->data, 0xff, c->size );
-			}
-		}
-
-		counters_to_ram( c );
+		memset( m_data, 0xff, m_size );
 	}
 }
 
-/*-------------------------------------------------
-    device get info callback
--------------------------------------------------*/
 
-static DEVICE_GET_INFO(timekeeper)
+//-------------------------------------------------
+//  nvram_read - called to read NVRAM from the
+//  .nv file
+//-------------------------------------------------
+
+void timekeeper_device::nvram_read(mame_file &file)
 {
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:			info->i = sizeof(timekeeper_state); break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:	info->i = 0; break; // sizeof(timekeeper_config)
+	mame_fread( &file, m_data, m_size );
 
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:					info->start = DEVICE_START_NAME(timekeeper); break;
-		case DEVINFO_FCT_STOP:					/* nothing */ break;
-		case DEVINFO_FCT_RESET:					info->reset = DEVICE_RESET_NAME(timekeeper); break;
-		case DEVINFO_FCT_NVRAM:					info->nvram = DEVICE_NVRAM_NAME(timekeeper); break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:					strcpy(info->s, "Timekeeper"); break;
-		case DEVINFO_STR_FAMILY:				strcpy(info->s, "EEPROM"); break;
-		case DEVINFO_STR_VERSION:				strcpy(info->s, "1.0"); break;
-		case DEVINFO_STR_SOURCE_FILE:			strcpy(info->s, __FILE__); break;
-		case DEVINFO_STR_CREDITS:				strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
-	}
+	counters_to_ram();
 }
 
-DEVICE_GET_INFO( m48t02 )
+
+//-------------------------------------------------
+//  nvram_write - called to write NVRAM to the
+//  .nv file
+//-------------------------------------------------
+
+void timekeeper_device::nvram_write(mame_file &file)
 {
-	switch (state)
-	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "M48T02");					break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(m48t02);	break;
-
-		default:										DEVICE_GET_INFO_CALL(timekeeper);			break;
-	}
-}
-
-DEVICE_GET_INFO( m48t35 )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "M48T35");					break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(m48t35);	break;
-
-		default:										DEVICE_GET_INFO_CALL(timekeeper);			break;
-	}
-}
-
-DEVICE_GET_INFO( m48t58 )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "M48T58");					break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(m48t58);	break;
-
-		default:										DEVICE_GET_INFO_CALL(timekeeper);			break;
-	}
-}
-
-DEVICE_GET_INFO( mk48t08 )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "MK48T08");					break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(mk48t08);	break;
-
-		default:										DEVICE_GET_INFO_CALL(timekeeper);			break;
-	}
+	mame_fwrite( &file, m_data, m_size );
 }
 
 
-DEFINE_LEGACY_NVRAM_DEVICE(M48T02, m48t02);
-DEFINE_LEGACY_NVRAM_DEVICE(M48T35, m48t35);
-DEFINE_LEGACY_NVRAM_DEVICE(M48T58, m48t58);
-DEFINE_LEGACY_NVRAM_DEVICE(MK48T08, mk48t08);
+
+/***************************************************************************
+    TRAMPOLINES
+***************************************************************************/
+
+WRITE8_DEVICE_HANDLER( timekeeper_w ) { downcast<timekeeper_device *>(device)->write(offset, data); }
+READ8_DEVICE_HANDLER( timekeeper_r ) { return downcast<timekeeper_device*>(device)->read(offset); }
+
