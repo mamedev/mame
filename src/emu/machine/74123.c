@@ -57,7 +57,22 @@ device_t *ttl74123_device_config::alloc_device(running_machine &machine) const
 
 void ttl74123_device_config::device_config_complete()
 {
+	// inherit a copy of the static data
+	const ttl74123_interface *intf = reinterpret_cast<const ttl74123_interface *>(static_config());
+	if (intf != NULL)
+		*static_cast<ttl74123_interface *>(this) = *intf;
 
+	// or initialize to defaults if none provided
+	else
+	{
+		m_connection_type = TTL74123_NOT_GROUNDED_NO_DIODE;
+		m_res = 1.0;
+		m_cap = 1.0;
+		m_a = 0;
+		m_b = 0;
+		m_clear = 0;
+    	memset(&m_output_changed_cb, 0, sizeof(m_output_changed_cb));
+	}
 }
 
 
@@ -109,9 +124,9 @@ void ttl74123_device::device_reset()
 
 
 
-/*-------------------------------------------------
-    compute_duration
--------------------------------------------------*/
+//-------------------------------------------------
+//  compute_duration - compute timer duration
+//-------------------------------------------------
 
 attotime ttl74123_device::compute_duration()
 {
@@ -145,9 +160,9 @@ attotime ttl74123_device::compute_duration()
 }
 
 
-/*-------------------------------------------------
-    timer_running
--------------------------------------------------*/
+//-------------------------------------------------
+//  timer_running - is the timer running?
+//-------------------------------------------------
 
 int ttl74123_device::timer_running()
 {
@@ -172,6 +187,10 @@ void ttl74123_device::output(INT32 param)
 }
 
 
+//-------------------------------------------------
+//  set_output - set the output line state
+//-------------------------------------------------
+
 void ttl74123_device::set_output()
 {
 	int output = timer_running();
@@ -181,6 +200,10 @@ void ttl74123_device::set_output()
 	if (LOG) logerror("74123 %s:  Output: %d\n", tag(), output);
 }
 
+
+/*-------------------------------------------------
+    TIMER_CALLBACK( clear_callback )
+-------------------------------------------------*/
 
 TIMER_CALLBACK( ttl74123_device::clear_callback )
 {
@@ -195,6 +218,10 @@ void ttl74123_device::clear()
 	m_config.m_output_changed_cb(this, 0, output);
 }
 
+
+//-------------------------------------------------
+//  start_pulse - begin timing
+//-------------------------------------------------
 
 void ttl74123_device::start_pulse()
 {
@@ -228,6 +255,10 @@ void ttl74123_device::start_pulse()
 }
 
 
+//-------------------------------------------------
+//  a_w - write register a data
+//-------------------------------------------------
+
 WRITE8_DEVICE_HANDLER( ttl74123_a_w )
 {
 	ttl74123_device *dev = downcast<ttl74123_device *>(device);
@@ -246,6 +277,10 @@ void ttl74123_device::a_w(UINT8 data)
 }
 
 
+//-------------------------------------------------
+//  b_w - write register b data
+//-------------------------------------------------
+
 WRITE8_DEVICE_HANDLER( ttl74123_b_w )
 {
 	ttl74123_device *dev = downcast<ttl74123_device *>(device);
@@ -263,6 +298,10 @@ void ttl74123_device::b_w(UINT8 data)
 	m_b = data;
 }
 
+
+//-------------------------------------------------
+//  clear_w - write register clear data
+//-------------------------------------------------
 
 WRITE8_DEVICE_HANDLER( ttl74123_clear_w )
 {
@@ -285,6 +324,11 @@ void ttl74123_device::clear_w(UINT8 data)
 	}
 	m_clear = data;
 }
+
+
+//-------------------------------------------------
+//  reset_w - reset device
+//-------------------------------------------------
 
 WRITE8_DEVICE_HANDLER( ttl74123_reset_w )
 {
