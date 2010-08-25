@@ -135,12 +135,15 @@ static TIMER_CALLBACK( vidc_video_tick )
 static TIMER_CALLBACK( vidc_audio_tick )
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	INT16 res;
 
-	dac_signed_data_w(space->machine->device("dac"), (space->read_byte(vidc_sndstart+vidc_sndcur)));
+	res = (space->read_word(vidc_sndstart+vidc_sndcur));
+
+	dac_signed_data_w(space->machine->device("dac"), res);
 
 	vidc_sndcur++;
 
-	if (vidc_sndcur >= (vidc_sndend-vidc_sndstart)+0x10)
+	if (vidc_sndcur >= (vidc_sndend-vidc_sndstart)+0x40)
 	{
 		vidc_sndcur = 0;
 		archimedes_request_irq_b(machine, ARCHIMEDES_IRQB_SOUND_EMPTY);
@@ -148,7 +151,7 @@ static TIMER_CALLBACK( vidc_audio_tick )
 		if(!audio_dma_on)
 		{
 			timer_adjust_oneshot(snd_timer, attotime_never, 0);
-			dac_signed_data_w(space->machine->device("dac"), 0x80);
+			dac_signed_data_16_w(space->machine->device("dac"), 0x8000);
 		}
 	}
 }
@@ -860,6 +863,10 @@ WRITE32_HANDLER(archimedes_memc_w)
 			case 5: /* sound end */
 				//logerror("MEMC: SNDEND %08x\n",data);
 				vidc_sndend = 0x2000000 | ((data>>2)&0x7fff)*16;
+				break;
+
+			case 6:
+				vidc_sndcur = 0;
 				archimedes_request_irq_b(space->machine, ARCHIMEDES_IRQB_SOUND_EMPTY);
 				break;
 
@@ -882,13 +889,11 @@ WRITE32_HANDLER(archimedes_memc_w)
 					double sndhz;
 
 					/* FIXME: is the frequency correct? */
-					sndhz = (250000.0) / (double)((vidc_regs[0xc0]&0xff)+2);
+					sndhz = (250000.0 * 4) / (double)((vidc_regs[0xc0]&0xff)+2);
 
 					printf("MEMC: Starting audio DMA at %f Hz, buffer from %x to %x\n", sndhz, vidc_sndstart, vidc_sndend);
 
-					vidc_sndcur = 0;
-
-					timer_adjust_periodic(snd_timer, ATTOTIME_IN_HZ(sndhz), 0, ATTOTIME_IN_HZ(sndhz));
+					timer_adjust_periodic(snd_timer, attotime_zero, 0, ATTOTIME_IN_HZ(sndhz));
 				}
 
 				break;
