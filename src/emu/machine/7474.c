@@ -91,10 +91,14 @@ void ttl7474_device_config::device_config_complete()
 	m_output_cb.type = DEVCB_TYPE_DEVICE;
 	m_output_cb.tag = m_target_tag;
 	m_output_cb.writeline = m_base_output_cb;
+	m_output_cb.writedevice = NULL;
+	m_output_cb.writespace = NULL;
 
 	m_comp_output_cb.type = DEVCB_TYPE_DEVICE;
 	m_comp_output_cb.tag = m_target_tag;
 	m_comp_output_cb.writeline = m_base_comp_output_cb;
+	m_comp_output_cb.writedevice = NULL;
+	m_comp_output_cb.writespace = NULL;
 }
 
 
@@ -130,11 +134,8 @@ void ttl7474_device::device_start()
     state_save_register_device_item(this, 0, m_last_output);
     state_save_register_device_item(this, 0, m_last_output_comp);
 
-	if(m_config.m_target_tag != NULL)
-	{
-    	devcb_resolve_write_line(&m_output_cb, &m_config.m_output_cb, this);
-    	devcb_resolve_write_line(&m_comp_output_cb, &m_config.m_comp_output_cb, this);
-	}
+	devcb_resolve_write_line(&m_output_cb, &m_config.m_output_cb, this);
+	devcb_resolve_write_line(&m_comp_output_cb, &m_config.m_comp_output_cb, this);
 }
 
 //-------------------------------------------------
