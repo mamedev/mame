@@ -287,6 +287,41 @@ void via6522_device::device_start()
 }
 
 
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void via6522_device::device_reset()
+{
+    m_in_a = 0;
+    m_in_ca1 = 0;
+    m_in_ca2 = 0;
+    m_out_a = 0;
+    m_out_ca2 = 0;
+    m_ddr_a = 0;
+    m_in_b = 0;
+    m_in_cb1 = 0;
+    m_in_cb2 = 0;
+    m_out_b = 0;
+    m_out_cb2 = 0;
+    m_ddr_b = 0;
+
+    m_t1cl = 0;
+    m_t1ch = 0;
+    m_t2cl = 0;
+    m_t2ch = 0;
+
+    m_sr = 0;
+    m_pcr = 0;
+    m_acr = 0;
+    m_ier = 0;
+    m_ifr = 0;
+    m_t1_active = 0;
+    m_t2_active = 0;
+    m_shift_counter = 0;
+}
+
+
 /*-------------------------------------------------
     via_set_int - external interrupt check
 -------------------------------------------------*/
@@ -475,41 +510,6 @@ void via6522_device::t2_timeout()
     {
 		set_int(INT_T2);
     }
-}
-
-
-//-------------------------------------------------
-//  device_reset - device-specific reset
-//-------------------------------------------------
-
-void via6522_device::device_reset()
-{
-    m_in_a = 0;
-    m_in_ca1 = 0;
-    m_in_ca2 = 0;
-    m_out_a = 0;
-    m_out_ca2 = 0;
-    m_ddr_a = 0;
-    m_in_b = 0;
-    m_in_cb1 = 0;
-    m_in_cb2 = 0;
-    m_out_b = 0;
-    m_out_cb2 = 0;
-    m_ddr_b = 0;
-
-    m_t1cl = 0;
-    m_t1ch = 0;
-    m_t2cl = 0;
-    m_t2ch = 0;
-
-    m_sr = 0;
-    m_pcr = 0;
-    m_acr = 0;
-    m_ier = 0;
-    m_ifr = 0;
-    m_t1_active = 0;
-    m_t2_active = 0;
-    m_shift_counter = 0;
 }
 
 

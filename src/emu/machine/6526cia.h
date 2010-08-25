@@ -30,18 +30,18 @@
 
 **********************************************************************/
 
+#pragma once
+
 #ifndef __6526CIA_H__
 #define __6526CIA_H__
 
-#include "devcb.h"
+#include "emu.h"
 
-/***************************************************************************
-    MACROS
-***************************************************************************/
 
-DECLARE_LEGACY_DEVICE(MOS6526R1, cia6526r1);
-DECLARE_LEGACY_DEVICE(MOS6526R2, cia6526r2);
-DECLARE_LEGACY_DEVICE(MOS8520, cia8520);
+
+	//**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
 
 #define MDRV_MOS6526R1_ADD(_tag, _clock, _config) \
 	MDRV_DEVICE_ADD(_tag, MOS6526R1, _clock) \
@@ -65,22 +65,173 @@ DECLARE_LEGACY_DEVICE(MOS8520, cia8520);
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _mos6526_interface mos6526_interface;
-struct _mos6526_interface
+
+// ======================> mos6526_interface
+
+struct mos6526_interface
 {
-	int tod_clock;
+	int m_tod_clock;
 
-	devcb_write_line	out_irq_func;
-	devcb_write_line	out_pc_func;
-	devcb_write_line	out_cnt_func;
-	devcb_write_line	out_sp_func;
+	devcb_write_line	m_out_irq_func;
+	devcb_write_line	m_out_pc_func;
+	devcb_write_line	m_out_cnt_func;
+	devcb_write_line	m_out_sp_func;
 
-	devcb_read8			in_pa_func;
-	devcb_write8		out_pa_func;
+	devcb_read8			m_in_pa_func;
+	devcb_write8		m_out_pa_func;
 
-	devcb_read8			in_pb_func;
-	devcb_write8		out_pb_func;
+	devcb_read8			m_in_pb_func;
+	devcb_write8		m_out_pb_func;
 };
+
+
+
+// ======================> mos6526_device_config
+
+class mos6526_device_config :   public device_config,
+                                public mos6526_interface
+{
+    friend class mos6526_device;
+
+    // construction/destruction
+    mos6526_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+
+public:
+    // allocators
+    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+    virtual device_t *alloc_device(running_machine &machine) const;
+
+protected:
+    // device_config overrides
+    virtual void device_config_complete();
+};
+
+
+
+// ======================> mos6526_device
+
+class mos6526_device :  public device_t
+{
+    friend class mos6526_device_config;
+    friend class dart_channel;
+
+    // construction/destruction
+    mos6526_device(running_machine &_machine, const mos6526_device_config &_config);
+
+public:
+	UINT8 reg_r(UINT8 offset);
+	void reg_w(UINT8 offset, UINT8 data);
+
+	/* port access */
+	UINT8 pa_r(UINT8 offset) { return (m_port[0].m_latch | ~m_port[0].m_ddr); }
+	UINT8 pb_r(UINT8 offset) { return (m_port[1].m_latch | ~m_port[1].m_ddr); }
+
+	/* interrupt request */
+	UINT8 irq_r() { return m_irq; }
+
+	/* time of day clock */
+	void tod_w(UINT8 state) { if(state) clock_tod(); }
+
+	/* serial counter */
+	UINT8 cnt_r() { return m_cnt; }
+	void cnt_w(UINT8 state);
+
+	/* serial port */
+	UINT8 sp_r() { return m_sp; }
+	void sp_w(UINT8 state) { m_sp = state; }
+
+	/* flag */
+	void flag_w(UINT8 state);
+
+	/* port mask */
+	void set_port_mask_value(int port, int data);
+
+protected:
+    // device-level overrides
+    virtual void device_start();
+    virtual void device_reset();
+    virtual void device_post_load() { }
+    virtual void device_clock_changed() { }
+
+	static TIMER_CALLBACK( timer_proc );
+	static TIMER_CALLBACK( clock_tod_callback );
+
+private:
+
+	void update_pc();
+	void update_interrupts();
+	void timer_bump(int timer);
+	void timer_underflow(int timer);
+	void increment();
+	void clock_tod();
+
+	struct cia_timer
+	{
+	public:
+		cia_timer() { }
+
+		UINT16 get_count();
+		void update(int which, INT32 new_count);
+
+		UINT32			m_clock;
+		UINT16			m_latch;
+		UINT16			m_count;
+		UINT8			m_mode;
+		UINT8			m_irq;
+		emu_timer*		m_timer;
+		mos6526_device*	m_cia;
+	};
+
+	struct cia_port
+	{
+		UINT8		m_ddr;
+		UINT8		m_latch;
+		UINT8		m_in;
+		UINT8		m_out;
+		devcb_resolved_read8	m_read;
+		devcb_resolved_write8	m_write;
+		UINT8		m_mask_value; /* in READ operation the value can be forced by a extern electric circuit */
+	};
+
+	devcb_resolved_write_line m_out_irq_func;
+	devcb_resolved_write_line m_out_pc_func;
+	devcb_resolved_write_line m_out_cnt_func;
+	devcb_resolved_write_line m_out_sp_func;
+
+	cia_port		m_port[2];
+	cia_timer		m_timer[2];
+
+	/* Time Of the Day clock (TOD) */
+	UINT32			m_tod;
+	UINT32			m_tod_latch;
+	UINT8			m_tod_latched;
+	UINT8			m_tod_running;
+	UINT32			m_alarm;
+
+	/* Interrupts */
+	UINT8			m_icr;
+	UINT8			m_ics;
+	UINT8			m_irq;
+	int				m_flag;
+
+	/* Serial */
+	UINT8			m_loaded;
+	UINT8			m_sdr;
+	UINT8			m_sp;
+	UINT8			m_cnt;
+	UINT8			m_shift;
+	UINT8			m_serial;
+
+    const mos6526_device_config &m_config;
+};
+
+
+// device type definition
+extern const device_type MOS6526R1;
+extern const device_type MOS6526R2;
+extern const device_type MOS8520;
+
+
 
 /***************************************************************************
     FUNCTION PROTOTYPES

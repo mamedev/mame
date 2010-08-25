@@ -5,7 +5,7 @@
     This function emulates all the functionality of 6522
     versatile interface adapters.
 
-    This is based on the M6821 emulation in MAME.
+    This is based on the pre-existing 6821 emulation.
 
     Written by Mathis Rosenhauer
 
