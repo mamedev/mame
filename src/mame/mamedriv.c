@@ -10331,4 +10331,7 @@ Other Sun games
 	/* Olympic Video Gaming */
 	DRIVER( hotstuff )
 
+	/* Interactive Light */
+	DRIVER( savquest )
+
 #endif	/* DRIVER_RECURSIVE */

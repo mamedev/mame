@@ -2129,6 +2129,7 @@ src/mame/drivers/safarir.c svneol=native#text/plain
 src/mame/drivers/sandscrp.c svneol=native#text/plain
 src/mame/drivers/sangho.c svneol=native#text/plain
 src/mame/drivers/sauro.c svneol=native#text/plain
+src/mame/drivers/savquest.c svneol=native#text/plain
 src/mame/drivers/sbasketb.c svneol=native#text/plain
 src/mame/drivers/sbowling.c svneol=native#text/plain
 src/mame/drivers/sbrkout.c svneol=native#text/plain

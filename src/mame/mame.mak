@@ -57,6 +57,7 @@ CPUS += S2650
 CPUS += TMS340X0
 CPUS += TMS9900
 CPUS += Z8000
+#CPUS += Z8001
 CPUS += TMS32010
 CPUS += TMS32025
 CPUS += TMS32031
@@ -1622,6 +1623,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/re900.o \
 	$(DRIVERS)/rgum.o \
 	$(DRIVERS)/roul.o \
+	$(DRIVERS)/savquest.o \
 	$(DRIVERS)/sfbonus.o \
 	$(DRIVERS)/shangkid.o $(VIDEO)/shangkid.o \
 	$(DRIVERS)/skeetsht.o \
