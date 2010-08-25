@@ -111,27 +111,26 @@ static TIMER_CALLBACK( vidc_vblank )
 	timer_adjust_oneshot(vbl_timer, machine->primary_screen->time_until_pos(vidc_regs[0xb4]), 0);
 }
 
-/* at about every ~4/4 USEC do a DMA transfer byte */
+/* video DMA */
+/* TODO: what type of DMA this is, burst or cycle steal? Docs doesn't explain it (4 usec is the DRAM refresh). */
 static TIMER_CALLBACK( vidc_video_tick )
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 	static UINT8 *vram = memory_region(machine,"vram");
+	UINT32 size;
 
-	vram[vidc_vidcur] = (space->read_byte(vidc_vidstart+vidc_vidcur+vidc_vidinit));
+	size = vidc_vidend-vidc_vidstart;
 
-	vidc_vidcur++;
+	for(vidc_vidcur = 0;vidc_vidcur < size;vidc_vidcur++)
+		vram[vidc_vidcur] = (space->read_byte(vidc_vidstart+vidc_vidcur+vidc_vidinit));
 
 	if(video_dma_on)
-	{
-		if (vidc_vidcur >= vidc_vidend-vidc_vidstart)
-			vidc_vidcur = 0;
-
-		timer_adjust_oneshot(vid_timer, ATTOTIME_IN_USEC(1), 0);
-	}
+		timer_adjust_oneshot(vid_timer, space->machine->primary_screen->time_until_pos(vidc_regs[0xb4]), 0);
 	else
 		timer_adjust_oneshot(vid_timer, attotime_never, 0);
 }
 
+/* audio DMA */
 static TIMER_CALLBACK( vidc_audio_tick )
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
@@ -384,7 +383,7 @@ static READ32_HANDLER( ioc_ctrl_r )
 		case CONTROL:
 		{
 			UINT8 i2c_data;
-			static UINT8 flyback;
+			static UINT8 flyback; //internal name for vblank here
 			int vert_pos;
 
 			vert_pos = space->machine->primary_screen->vpos();
@@ -799,6 +798,7 @@ WRITE32_HANDLER(archimedes_vidc_w)
 			   (vidc_regs[VIDC_VBER] >= vidc_regs[VIDC_VBSR]))
 			{
 				rectangle visarea;
+				attoseconds_t refresh;
 
 				visarea.min_x = 0;
 				visarea.min_y = 0;
@@ -810,7 +810,10 @@ WRITE32_HANDLER(archimedes_vidc_w)
 					visarea.max_x, visarea.max_y,
 					vidc_regs[VIDC_HDER]-vidc_regs[VIDC_HDSR],vidc_regs[VIDC_VDER]-vidc_regs[VIDC_VDSR]+1);
 
-				space->machine->primary_screen->configure(vidc_regs[VIDC_HCR], vidc_regs[VIDC_VCR], visarea, space->machine->primary_screen->frame_period().attoseconds);
+				/* FIXME: pixel clock */
+				refresh = HZ_TO_ATTOSECONDS(16000000) * vidc_regs[VIDC_HCR] * vidc_regs[VIDC_VCR];
+
+				space->machine->primary_screen->configure(vidc_regs[VIDC_HCR], vidc_regs[VIDC_VCR], visarea, refresh);
 			}
 		}
 
@@ -881,7 +884,7 @@ WRITE32_HANDLER(archimedes_memc_w)
 				if ((data>>10)&1)
 				{
 					vidc_vidcur = 0;
-					timer_adjust_oneshot(vid_timer, ATTOTIME_IN_USEC(1), 0);
+					timer_adjust_oneshot(vid_timer, space->machine->primary_screen->time_until_pos(vidc_regs[0xb4]), 0);
 				}
 
 				if ((data>>11)&1)
