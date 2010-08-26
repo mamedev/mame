@@ -1046,6 +1046,19 @@ static INPUT_PORTS_START( dkongf )
     PORT_DIPSETTING(    0x60, DEF_STR( 1C_4C ) )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( dkongx )	/* Same Inputs as DKONG while all DIPS but Cabinet are controlled via service mode */
+    PORT_INCLUDE( dkong )
+
+    PORT_MODIFY("DSW0")
+    PORT_DIPUNUSED_DIPLOC( 0x01, 0x00, "SW1:!1" )
+    PORT_DIPUNUSED_DIPLOC( 0x02, 0x00, "SW1:!2" )
+    PORT_DIPUNUSED_DIPLOC( 0x04, 0x00, "SW1:!3" )
+    PORT_DIPUNUSED_DIPLOC( 0x08, 0x00, "SW1:!4" )
+    PORT_DIPUNUSED_DIPLOC( 0x10, 0x00, "SW1:!5" )
+    PORT_DIPUNUSED_DIPLOC( 0x20, 0x00, "SW1:!6" )
+    PORT_DIPUNUSED_DIPLOC( 0x40, 0x00, "SW1:!7" )
+INPUT_PORTS_END
+
 static INPUT_PORTS_START( radarscp )
     PORT_INCLUDE( radarscp_in0_2 )
     PORT_INCLUDE( radarscp_in1_2 )
@@ -3121,8 +3134,8 @@ GAME( 1981, dkongj,   dkong,    dkong2b,  dkong,          0,  ROT90, "Nintendo",
 GAME( 1981, dkongjo,  dkong,    dkong2b,  dkong,          0,  ROT90, "Nintendo", "Donkey Kong (Japan set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1981, dkongjo1, dkong,    dkong2b,  dkong,          0,  ROT90, "Nintendo", "Donkey Kong (Japan set 3)", GAME_SUPPORTS_SAVE )
 GAME( 2004, dkongf,   dkong,    dkong2b,  dkongf,         0,  ROT90, "hack", "Donkey Kong Foundry (hack)", GAME_SUPPORTS_SAVE ) /* from Jeff's Romhack */
-GAME( 2006, dkongx,   dkong,    braze,    dkong,     dkongx,  ROT90, "hack", "Donkey Kong II - Jumpman Returns (V1.2) (hack)", GAME_SUPPORTS_SAVE )
-GAME( 2006, dkongx11, dkong,    braze,    dkong,     dkongx,  ROT90, "hack", "Donkey Kong II - Jumpman Returns (V1.1) (hack)", GAME_SUPPORTS_SAVE )
+GAME( 2006, dkongx,   dkong,    braze,    dkongx,    dkongx,  ROT90, "hack", "Donkey Kong II - Jumpman Returns (V1.2) (hack)", GAME_SUPPORTS_SAVE )
+GAME( 2006, dkongx11, dkong,    braze,    dkongx,    dkongx,  ROT90, "hack", "Donkey Kong II - Jumpman Returns (V1.1) (hack)", GAME_SUPPORTS_SAVE )
 
 GAME( 1982, dkongjr,  0,        dkongjr,  dkongjr,        0,  ROT90, "Nintendo of America", "Donkey Kong Junior (US)", GAME_SUPPORTS_SAVE )
 GAME( 1982, dkongjrj, dkongjr,  dkongjr,  dkongjr,        0,  ROT90, "Nintendo", "Donkey Kong Jr. (Japan)", GAME_SUPPORTS_SAVE )
