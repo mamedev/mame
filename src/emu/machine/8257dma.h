@@ -30,17 +30,18 @@
 
 ***************************************************************************/
 
+#pragma once
+
 #ifndef __I8257__
 #define __I8257__
 
-#include "devlegcy.h"
+#include "emu.h"
+
 
 
 /***************************************************************************
-    MACROS / CONSTANTS
+    DEVICE CONFIGURATION MACROS
 ***************************************************************************/
-
-DECLARE_LEGACY_DEVICE(I8257, i8257);
 
 #define MDRV_I8257_ADD(_tag, _clock, _config) \
 	MDRV_DEVICE_ADD(_tag, I8257, _clock) \
@@ -51,25 +52,126 @@ DECLARE_LEGACY_DEVICE(I8257, i8257);
 
 #define I8257_NUM_CHANNELS		(4)
 
+
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _i8257_interface i8257_interface;
-struct _i8257_interface
+
+// ======================> i8257_interface
+
+struct i8257_interface
 {
-	devcb_write_line	out_hrq_func;
-	devcb_write_line	out_tc_func;
-	devcb_write_line	out_mark_func;
+	devcb_write_line	m_out_hrq_func;
+	devcb_write_line	m_out_tc_func;
+	devcb_write_line	m_out_mark_func;
 
 	/* accessors to main memory */
-	devcb_read8			in_memr_func;
-	devcb_write8		out_memw_func;
+	devcb_read8			m_in_memr_func;
+	devcb_write8		m_out_memw_func;
 
 	/* channel accesors */
-	devcb_read8			in_ior_func[I8257_NUM_CHANNELS];
-	devcb_write8		out_iow_func[I8257_NUM_CHANNELS];
+	devcb_read8			m_in_ior_func[I8257_NUM_CHANNELS];
+	devcb_write8		m_out_iow_func[I8257_NUM_CHANNELS];
 };
+
+
+
+// ======================> i8257_device_config
+
+class i8257_device_config : public device_config,
+                            public i8257_interface
+{
+    friend class i8257_device;
+
+    // construction/destruction
+    i8257_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+
+public:
+    // allocators
+    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+    virtual device_t *alloc_device(running_machine &machine) const;
+
+protected:
+    // device_config overrides
+    virtual void device_config_complete();
+};
+
+
+
+// ======================> i8257_device
+
+class i8257_device :  public device_t
+{
+    friend class i8257_device_config;
+
+    // construction/destruction
+    i8257_device(running_machine &_machine, const i8257_device_config &_config);
+
+public:
+
+	/* register access */
+	UINT8 i8257_r(UINT32 offset);
+	void i8257_w(UINT32 offset, UINT8 data);
+
+	/* data request */
+	void i8257_drq_w(int channel, int state);
+
+	void i8257_timerproc();
+	void i8257_msbflip_timerproc();
+	void i8257_drq_write_timerproc(INT32 param);
+
+protected:
+    // device-level overrides
+    virtual void device_start();
+    virtual void device_reset();
+    virtual void device_post_load() { }
+    virtual void device_clock_changed() { }
+
+	static TIMER_CALLBACK( i8257_timerproc_callback );
+	static TIMER_CALLBACK( i8257_msbflip_timerproc_callback );
+	static TIMER_CALLBACK( i8257_drq_write_callback );
+
+private:
+
+	int i8257_do_operation(int channel);
+	void i8257_update_status();
+	void i8257_prepare_msb_flip();
+
+	devcb_resolved_write_line	m_out_hrq_func;
+	devcb_resolved_write_line	m_out_tc_func;
+	devcb_resolved_write_line	m_out_mark_func;
+	devcb_resolved_read8		m_in_memr_func;
+	devcb_resolved_write8		m_out_memw_func;
+	devcb_resolved_read8		m_in_ior_func[I8257_NUM_CHANNELS];
+	devcb_resolved_write8		m_out_iow_func[I8257_NUM_CHANNELS];
+
+	emu_timer *m_timer;
+	emu_timer *m_msbflip_timer;
+
+	UINT16 m_registers[I8257_NUM_CHANNELS*2];
+
+	UINT16 m_address[I8257_NUM_CHANNELS];
+	UINT16 m_count[I8257_NUM_CHANNELS];
+	UINT8  m_rwmode[I8257_NUM_CHANNELS];
+
+	UINT8 m_mode;
+	UINT8 m_rr;
+
+	UINT8 m_msb;
+	UINT8 m_drq;
+
+	/* bits  0- 3 :  Terminal count for channels 0-3 */
+	UINT8 m_status;
+
+    const i8257_device_config &m_config;
+};
+
+
+// device type definition
+extern const device_type I8257;
+
+
 
 /***************************************************************************
     PROTOTYPES

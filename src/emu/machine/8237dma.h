@@ -135,7 +135,7 @@ private:
 	void i8237_do_read();
 	void i8237_do_write();
 	void i8237_advance();
-	void set_dack(int channel);
+	void i8327_set_dack(int channel);
 
 	/* States that the i8237 device can be in */
 	enum dma8237_state

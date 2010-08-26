@@ -245,7 +245,7 @@ void i8237_device::i8237_advance()
 }
 
 
-void i8237_device::set_dack(int channel)
+void i8237_device::i8327_set_dack(int channel)
 {
 	for (int i = 0; i < 4; i++)
 	{
@@ -342,7 +342,7 @@ void i8237_device::i8237_timerproc()
 
 	case DMA8237_S2:	/* Output A7-A0 */
 		/* set DACK */
-		set_dack(m_service_channel);
+		i8327_set_dack(m_service_channel);
 
 		/* Check for compressed timing */
 		if ( m_command & 0x08 )
@@ -436,7 +436,7 @@ void i8237_device::i8237_timerproc()
 		}
 
 		/* clear DACK */
-		set_dack(-1);
+		i8327_set_dack(-1);
 		break;
 
 	case DMA8237_S11:	/* Output A8-A15 */
