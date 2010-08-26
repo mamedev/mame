@@ -192,12 +192,12 @@ Notes:
       The other side of the cart PCB just has more locations for
       SOP44 MASKROMs... IC12S to IC21S (ROM12 to ROM21)
 
-  IC1-IC21S - MaskROM (SOP44), either 32Mb or 64Mb. Not all positions are populated.
+  IC1-IC21S - MaskROM (SOP44), either 32Mb or 64Mb. Not all positions are populated
       IC22  - EPROM (DIP42), either 27C160 or 27C322
       JP1   - JUMPER Sets the size of the EPROM. 1-2 = 32M, 2-3 = 16M
       IC37  - FLASHROM (SOIC8) Xicor X76F100 Secure SerialFlash
       IC41  - Sega 315-6213 Xilinx XC9536 (PLCC44)
-      IC42  - SEGA 315-5581 (QFP100). Probably some kind of FPGA or CPLD. Usually different per game.
+      IC42  - SEGA 315-5581 (QFP100). Probably some kind of FPGA or CPLD. Usually different per game
               On the end of the number, -JPN means it requires Japanese BIOS, -COM will run with any BIOS
  IC44-IC45  - SRAM (SOJ28) 32kx8, either IDT71256 or CY7C199
    CN1/2/3  - connectors joining to main board
@@ -277,20 +277,21 @@ Zombie Revenge                          840-0003C  21707        19 (64Mb)  315-6
 Notes:
 
       OSC1  - oscillator 50.0000MHz
-      IC1   - FPGA ACTEL A54SX32A (QFP208) SEGA part number 317-xxxx-yyy; -JPN means it requires Japanese BIOS, -COM will run with any BIOS
+      IC1   - FPGA ACTEL A54SX32A (QFP208) SEGA part number 317-xxxx-yyy
+              On the end of the number, -JPN means it requires Japanese BIOS, -COM will run with any BIOS
       IC11  - EPROM (DIP42), either 27C160 or 27C322
       JP1   - JUMPER Sets the size of the EPROM. 1-2 = 32M, 2-3 = 16M
       IC13S - EEPROM (SOIC8) 25LC040 serial EEPROM
       IC14  - 256 x 9 AsyncFIFO, 5.0V (SOP28)
       IC15  - SRAM (SOJ28) 32kx8, IDT71256
-IC17S-IC38S - MaskROM (SOP44), either 32Mb or 64Mb
+IC17S-IC38S - MaskROM (SOP44), either 32Mb or 64Mb. Not all positions are populated
    CN1/2/3  - connectors joining to main board
 
 Games known to use this PCB include....
                                         Sticker    EPROM   # of SOP44
 Game                                    on cart    IC11#   MASKROMs   IC1#      label IC1#    Notes
 ---------------------------------------------------------------------------------------------------------------------
-Giant Gram 2000                         840-0039C  23373   20 (64Mb)  A54SX32   317-0296-COM
+Giant Gram 2000                         840-0039C  23377   20 (64Mb)  A54SX32   317-0296-COM
 Kick '4' Cash                           840-0140C  24212   16 (64Mb)  A54SX32A  317-0397-COM
 Marvel Vs. Capcom 2                     841-0007C  23085A  14 (64Mb)  A54SX32   317-5058-COM  +2x 32Mb (full cart #:841-0007C-03)
 Quiz Ah Megamisama                      840-0030C  23227   16 (64Mb)  A54SX32   317-0280-JPN
@@ -320,12 +321,12 @@ Notes:
       The female side of the cart PCB only has traces
 
       OSC1  - oscillator 28.000MHz
-  IC1-IC11  - MaskROM (TSOP48), 128Mb
+  IC1-IC11  - MaskROM (TSOP48), 128Mb. Not all positions are populated
       IC22  - EPROM (DIP42), either 27C160 or 27C322
       JP1   - JUMPER Sets the size of the EPROM. 1-2 = 32M, 2-3 = 16M
       IC27  - PLD Sega 315-6319A ALTERA EPM7032 (PLCC44)
       IC41  - Sega 315-6213 Xilinx XC9536 (PLCC44)
-      IC42  - SEGA 315-5581 (QFP100). Probably some kind of FPGA or CPLD. Usually different per game.
+      IC42  - SEGA 315-5581 (QFP100). Probably some kind of FPGA or CPLD. Usually different per game
               On the end of the number, -JPN means it requires Japanese BIOS, -COM will run with any BIOS
  IC44-IC45  - SRAM (SOJ28) 32kx8, either IDT71256 or CY7C199
       JP2   - JUMPER unknown function
@@ -339,6 +340,7 @@ Capcom Vs. SNK Millennium Fight 2000    841-0011C  23511A   7 (128Mb)  315-6219 
 Capcom Vs. SNK Millennium Fight 2000    841-0011C  23511C   7 (128Mb)  315-6319   315-6213  317-5059-COM  (000904)
 Derby Owners Club 2                     840-0083C  22306B  11 (128Mb)  315-6319A  315-6213  not populated
 Derby Owners Club World Edition (Rev C) 840-0088C  22336C   7 (128Mb)  315-6319A  315-6213  not populated
+Derby Owners Club World Edition (Rev D) 840-0088C  22336D   7 (128Mb)  315-6319A  315-6213  not populated  2 MaskROM are different from Rev C
 Giga Wing 2                             841-0014C  22270    5 (128Mb)  315-6319A  315-6213  317-5064-COM
 Moero Justice Gakuen / Project Justice  841-0015C  23548A  11 (128Mb)  315-6319A  315-6213  317-5065-COM
 Samba de Amigo Ver.2000                 840-0047C  23600    ? (128Mb)  315-6319A  315-6213  317-0295-COM
@@ -368,13 +370,13 @@ Notes:
 
       IC1   - 74LVCH16245A (16bit transceiver with direction pin)
       IC2   - XC3S50 Xilinx Spartan FPGA (TQFP144)
-      IC3   - PIC16C621A EPROM-Based 8-Bit CMOS Microcontroller (PDIP18) with internal memory.
+      IC3   - PIC16C621A EPROM-Based 8-Bit CMOS Microcontroller (PDIP18) with internal memory
               On the end of the number, -JPN means it requires Japanese BIOS, -COM will run with any BIOS
       IC4   - XCF01SVG Xilinx Platform Flash In-System Programmable Configuration PROMS (TSSOP20)
       IC5   - 74LVC08A (Quad 2-input AND gate)
       IC6   - 74LVCH16245A (16bit transceiver with direction pin)
       IC7   - empty socket for EPROM (DIP42), either 27C160 or 27C322
-  IC8-IC15  - S29GL512N FlashROM (TSOP56), 512Mb.
+  IC8-IC15  - S29GL512N FlashROM (TSOP56), 512Mb. Not all positions are populated
       IC16  - R3112N431A Low voltage detector with output delay (SOT-23-5)
       JP1   - JUMPER Sets the size of the EPROM. 1-2 = 32M, 2-3 = 16M
       JP2   - JUMPER unknown function
@@ -386,6 +388,57 @@ Notes:
 Game                      on cart    IC7#         FLASHROMs   IC2#    IC3#          IC4#    Notes
 -----------------------------------------------------------------------------------------------------------------------
 Touch De Zunou (Rev A)    840-0166C  unpopulated   2 (512Mb)  XC3S50  317-0435-JPN  XCF01S  IC4# is marked "18"
+
+
+
+MASK B-F2X (C) Namco 2000
+|-------------------------------------------------------------------------------------|
+|                                                               ----CN2----            -|
+|                                                                                       |
+|7        LED1                                                                          |
+|                                                                                       |
+|6        MA23  MA22  MA21  MA20  MA19  MA18  MA17  MA16  MA15  MA14  MA13  MA12        |
+|                                                                                       |
+|5                                                                          ISSI        |
+|                                                                                       |
+|4        MA11  MA10  MA9   MA8   MA7   MA6   MA5   MA4   MA3   MA2   MA1   ISSI        | male side
+|                                                                                       |
+|3                                            OSC1                                      |
+|                                                                                       |
+|2       FLASH FLASH FLASH FLASH                    NAOD                                |
+|         FL3   FL2   FL1   FL0                     EC1B                                |
+|1 J J J                          X76F  NAOD                    SEGA                    |
+|  P P P                          100   EC2A                  315-5881                  |
+|  3 2 1                                                                                |
+|    A     B     C     D     E     F     H     J     K     L     M     N     P     R    |
+|             ----CN3----                                       ----CN1----             |
+|---------------------------------------------------------------------------------------|
+Notes:
+      The female side of the cart PCB only has traces
+
+        JP1 - JUMPER silkscreened   USE - NOT USE
+        JP2 - JUMPER silkscreened   64M - 128M
+        JP3 - JUMPER silkscreened BANK0 - BANK1
+         1F - FLASHROM (SOIC8) Xicor X76F100 Secure SerialFlash. Silkscreened X76F100
+         1H - NAODEC2A (QFP100) Altera MAX EPM7064S. Silkscreened NAODEC2A
+         1M - SEGA 315-5581 (QFP100). Probably some kind of FPGA or CPLD. Usually different per game
+              On the end of the number, -JPN means it requires Japanese BIOS, -COM will run with any BIOS
+2B,2C,2D,2F - DA28F640J5 FlashROM (SSOP56), 64Mb. Not all positions are populated. Silkscreened VOYAGER64
+              Looks like the equivalent of IC11/22 on Sega carts
+         2K - NAODEC1B (QFP100) Altera MAX EPM7064S. Silkscreened NAODEC1A
+         3J - oscillator 28.000MHz
+4B-4N,6B-6P - MASKROM (TSOP48), 128Mb. Not all positions are populated. Silkscreened MASK128MT
+      4P,5P - SRAM (SOJ28) 32kx8, ISSI IS61C256AH-15J
+   CN1/2/3  - connectors joining to main board
+
+   
+   Games known to use this PCB include....
+                                  Sticker   FL0-FL3    # of SOP48  IC @ 1F        IC @ 1M 
+ Game                              on cart   FLASHROM   FLASHROMs   X76F100        315-5581      Notes
+---------------------------------------------------------------------------------------------------------------------------------------
+/Shin Nihon Prowrestling                                                                         FL0 & FL1 have pin55 raised from PCB.  
+\Toukon Retsuden 4 Arcade Edition  25349801   2 (64Mb)  15 (128Mb)  not populated  317-5040-com  They are connected togheter and go to pin89 on 2K.
+
 
 
       Note! Generally, games that require a special I/O board or controller will not boot at all with a
