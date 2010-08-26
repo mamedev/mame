@@ -1046,7 +1046,9 @@ static INPUT_PORTS_START( dkongf )
     PORT_DIPSETTING(    0x60, DEF_STR( 1C_4C ) )
 INPUT_PORTS_END
 
-static INPUT_PORTS_START( dkongx )	/* Same Inputs as DKONG while all DIPS but Cabinet are controlled via service mode */
+static INPUT_PORTS_START( dkongx )	/* Supposedly the physical DIPS are read as defaults for the NVRAM when it's initially created.
+                                           The settings here match those from the default DSW0 settings.  Beyond the initial NVRAM
+                                           creation, DIPS (other than CABINET) can only be adjusted from the Service Mode */
     PORT_INCLUDE( dkong )
 
     PORT_MODIFY("DSW0")
