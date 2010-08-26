@@ -766,9 +766,9 @@ private:
 	_UintType unmap_r(address_space &space, offs_t offset, _UintType mask)
 	{
 		if (m_space.log_unmap() && !m_space.debugger_access())
-			logerror("%s: unmapped %s memory read from %s & %s\n", 
-						cpuexec_describe_context(&m_space.m_machine), m_space.name(), 
-						core_i64_hex_format(m_space.byte_to_address(offset), m_space.addrchars()),
+			logerror("%s: unmapped %s memory read from %s & %s\n",
+						cpuexec_describe_context(&m_space.m_machine), m_space.name(),
+						core_i64_hex_format(m_space.byte_to_address(offset * sizeof(_UintType)), m_space.addrchars()),
 						core_i64_hex_format(mask, 2 * sizeof(_UintType)));
 		return m_space.unmap();
 	}
@@ -822,9 +822,9 @@ private:
 	void unmap_w(address_space &space, offs_t offset, _UintType data, _UintType mask)
 	{
 		if (m_space.log_unmap() && !m_space.debugger_access())
-			logerror("%s: unmapped %s memory write to %s = %s & %s\n", 
-					cpuexec_describe_context(&m_space.m_machine), m_space.name(), 
-					core_i64_hex_format(m_space.byte_to_address(offset), m_space.addrchars()),
+			logerror("%s: unmapped %s memory write to %s = %s & %s\n",
+					cpuexec_describe_context(&m_space.m_machine), m_space.name(),
+					core_i64_hex_format(m_space.byte_to_address(offset * sizeof(_UintType)), m_space.addrchars()),
 					core_i64_hex_format(data, 2 * sizeof(_UintType)),
 					core_i64_hex_format(mask, 2 * sizeof(_UintType)));
 	}
@@ -860,7 +860,7 @@ template<typename _NativeType, endianness_t _Endian, bool _Large>
 class address_space_specific : public address_space
 {
 	typedef address_space_specific<_NativeType, _Endian, _Large> this_type;
-	
+
 	// constants describing the native size
 	static const UINT32 NATIVE_BYTES = sizeof(_NativeType);
 	static const UINT32 NATIVE_MASK = NATIVE_BYTES - 1;
@@ -880,7 +880,7 @@ public:
 #if (TEST_HANDLER)
 		// test code to verify the read/write handlers are touching the correct bits
 		// and returning the correct results
-		
+
 		// install some dummy RAM for the first 16 bytes with well-known values
 		UINT8 buffer[16];
 		for (int index = 0; index < 16; index++)
@@ -903,12 +903,12 @@ public:
 			UINT32 expected32 = (_Endian == ENDIANNESS_LITTLE) ? expected64 : (expected64 >> 32);
 			UINT16 expected16 = (_Endian == ENDIANNESS_LITTLE) ? expected32 : (expected32 >> 16);
 			UINT8 expected8 = (_Endian == ENDIANNESS_LITTLE) ? expected16 : (expected16 >> 8);
-			
+
 			UINT64 result64;
 			UINT32 result32;
 			UINT16 result16;
 			UINT8 result8;
-		
+
 			// validate byte accesses
 			printf("\nAddress %d\n", address);
 			printf("   read_byte = "); printf("%02X\n", result8 = read_byte(address)); assert(result8 == expected8);
@@ -935,7 +935,7 @@ public:
 			if (address % 4 == 0) { printf("              (0x00ffffff) = "); printf("%08X\n", result32 = read_dword(address, 0x00ffffff)); assert((result32 & 0x00ffffff) == (expected32 & 0x00ffffff)); }
 
 			// validate unaligned dword accesses
-			printf("   read_dword_unaligned = "); printf("%08X\n", result32 = read_dword_unaligned(address)); assert(result32 == expected32); 
+			printf("   read_dword_unaligned = "); printf("%08X\n", result32 = read_dword_unaligned(address)); assert(result32 == expected32);
 			printf("   read_dword_unaligned (0xff000000) = "); printf("%08X\n", result32 = read_dword_unaligned(address, 0xff000000)); assert((result32 & 0xff000000) == (expected32 & 0xff000000));
 			printf("                        (0x00ff0000) = "); printf("%08X\n", result32 = read_dword_unaligned(address, 0x00ff0000)); assert((result32 & 0x00ff0000) == (expected32 & 0x00ff0000));
 			printf("                        (0x0000ff00) = "); printf("%08X\n", result32 = read_dword_unaligned(address, 0x0000ff00)); assert((result32 & 0x0000ff00) == (expected32 & 0x0000ff00));
@@ -979,7 +979,7 @@ public:
 			if (address % 8 == 0) { printf("              (0x00ffffffffffffff) = "); printf("%s\n", core_i64_hex_format(result64 = read_qword(address, U64(0x00ffffffffffffff)), 16)); assert((result64 & U64(0x00ffffffffffffff)) == (expected64 & U64(0x00ffffffffffffff))); }
 
 			// validate unaligned qword accesses
-			printf("   read_qword_unaligned = "); printf("%s\n", core_i64_hex_format(result64 = read_qword_unaligned(address), 16)); assert(result64 == expected64); 
+			printf("   read_qword_unaligned = "); printf("%s\n", core_i64_hex_format(result64 = read_qword_unaligned(address), 16)); assert(result64 == expected64);
 			printf("   read_qword_unaligned (0xff00000000000000) = "); printf("%s\n", core_i64_hex_format(result64 = read_qword_unaligned(address, U64(0xff00000000000000)), 16)); assert((result64 & U64(0xff00000000000000)) == (expected64 & U64(0xff00000000000000)));
 			printf("                        (0x00ff000000000000) = "); printf("%s\n", core_i64_hex_format(result64 = read_qword_unaligned(address, U64(0x00ff000000000000)), 16)); assert((result64 & U64(0x00ff000000000000)) == (expected64 & U64(0x00ff000000000000)));
 			printf("                        (0x0000ff0000000000) = "); printf("%s\n", core_i64_hex_format(result64 = read_qword_unaligned(address, U64(0x0000ff0000000000)), 16)); assert((result64 & U64(0x0000ff0000000000)) == (expected64 & U64(0x0000ff0000000000)));
@@ -1187,7 +1187,7 @@ public:
 			}
 		}
 
-		// determine our alignment against the native boundaries, and mask the address		
+		// determine our alignment against the native boundaries, and mask the address
 		UINT32 offsbits = 8 * (address & (NATIVE_BYTES - 1));
 		address &= ~NATIVE_MASK;
 
@@ -1225,7 +1225,7 @@ public:
 				// read lower bits from upper address
 				curmask = ljmask << offsbits;
 				if (curmask != 0) result |= read_native(address + NATIVE_BYTES, curmask) >> offsbits;
-				
+
 				// return the un-justified result
 				return result >> LEFT_JUSTIFY_TARGET_TO_NATIVE_SHIFT;
 			}
@@ -1238,7 +1238,7 @@ public:
 			// a fixed number of loops for the compiler to unroll if it desires
 			const UINT32 MAX_SPLITS_MINUS_ONE = TARGET_BYTES / NATIVE_BYTES - 1;
 			_TargetType result = 0;
-			
+
 			// little-endian case
 			if (_Endian == ENDIANNESS_LITTLE)
 			{
@@ -1271,7 +1271,7 @@ public:
 				offsbits = TARGET_BITS - (NATIVE_BITS - offsbits);
 				_NativeType curmask = mask >> offsbits;
 				if (curmask != 0) result = (_TargetType)read_native(address, curmask) << offsbits;
-				
+
 				// read middle bits from subsequent addresses
 				for (UINT32 index = 0; index < MAX_SPLITS_MINUS_ONE; index++)
 				{
@@ -1280,7 +1280,7 @@ public:
 					curmask = mask >> offsbits;
 					if (curmask != 0) result |= (_TargetType)read_native(address, curmask) << offsbits;
 				}
-				
+
 				// if we're not aligned and we still have bits left, read lowermost bits from the last address
 				if (!_Aligned && offsbits != 0)
 				{
@@ -1292,7 +1292,7 @@ public:
 			return result;
 		}
 	}
-	
+
 	// generic direct write
 	template<typename _TargetType, bool _Aligned>
 	void write_direct(offs_t address, _TargetType data, _TargetType mask)
@@ -1315,7 +1315,7 @@ public:
 			}
 		}
 
-		// determine our alignment against the native boundaries, and mask the address		
+		// determine our alignment against the native boundaries, and mask the address
 		UINT32 offsbits = 8 * (address & (NATIVE_BYTES - 1));
 		address &= ~NATIVE_MASK;
 
@@ -1328,7 +1328,7 @@ public:
 				// write lower bits to lower address
 				_NativeType curmask = (_NativeType)mask << offsbits;
 				if (curmask != 0) write_native(address, (_NativeType)data << offsbits, curmask);
-				
+
 				// write upper bits to upper address
 				offsbits = NATIVE_BITS - offsbits;
 				curmask = mask >> offsbits;
@@ -1342,11 +1342,11 @@ public:
 				const UINT32 LEFT_JUSTIFY_TARGET_TO_NATIVE_SHIFT = ((NATIVE_BITS >= TARGET_BITS) ? (NATIVE_BITS - TARGET_BITS) : 0);
 				_NativeType ljdata = (_NativeType)data << LEFT_JUSTIFY_TARGET_TO_NATIVE_SHIFT;
 				_NativeType ljmask = (_NativeType)mask << LEFT_JUSTIFY_TARGET_TO_NATIVE_SHIFT;
-				
+
 				// write upper bits to lower address
 				_NativeType curmask = ljmask >> offsbits;
 				if (curmask != 0) write_native(address, ljdata >> offsbits, curmask);
-				
+
 				// write lower bits to upper address
 				offsbits = NATIVE_BITS - offsbits;
 				curmask = ljmask << offsbits;
@@ -1360,14 +1360,14 @@ public:
 			// compute the maximum number of loops; we do it this way so that there are
 			// a fixed number of loops for the compiler to unroll if it desires
 			const UINT32 MAX_SPLITS_MINUS_ONE = TARGET_BYTES / NATIVE_BYTES - 1;
-			
+
 			// little-endian case
 			if (_Endian == ENDIANNESS_LITTLE)
 			{
 				// write lowest bits to first address
 				_NativeType curmask = mask << offsbits;
 				if (curmask != 0) write_native(address, data << offsbits, curmask);
-				
+
 				// write middle bits to subsequent addresses
 				offsbits = NATIVE_BITS - offsbits;
 				for (UINT32 index = 0; index < MAX_SPLITS_MINUS_ONE; index++)
@@ -1377,7 +1377,7 @@ public:
 					if (curmask != 0) write_native(address, data >> offsbits, curmask);
 					offsbits += NATIVE_BITS;
 				}
-				
+
 				// if we're not aligned and we still have bits left, write uppermost bits to last address
 				if (!_Aligned && offsbits < TARGET_BITS)
 				{
@@ -1393,7 +1393,7 @@ public:
 				offsbits = TARGET_BITS - (NATIVE_BITS - offsbits);
 				_NativeType curmask = mask >> offsbits;
 				if (curmask != 0) write_native(address, data >> offsbits, curmask);
-				
+
 				// write middle bits to subsequent addresses
 				for (UINT32 index = 0; index < MAX_SPLITS_MINUS_ONE; index++)
 				{
@@ -1402,7 +1402,7 @@ public:
 					curmask = mask >> offsbits;
 					if (curmask != 0) write_native(address, data >> offsbits, curmask);
 				}
-				
+
 				// if we're not aligned and we still have bits left, write lowermost bits to the last address
 				if (!_Aligned && offsbits != 0)
 				{
@@ -2359,8 +2359,8 @@ void address_space::dump_map(FILE *file, read_or_write readorwrite)
 void address_space::unmap(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read_or_write readorwrite, bool quiet)
 {
 	VPRINTF(("address_space::unmap(%s-%s mask=%s mirror=%s, %s, %s)\n",
-			 core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars), 
-			 core_i64_hex_format(addrmask, m_addrchars), core_i64_hex_format(addrmirror, m_addrchars), 
+			 core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
+			 core_i64_hex_format(addrmask, m_addrchars), core_i64_hex_format(addrmirror, m_addrchars),
 			 (readorwrite == ROW_READ) ? "read" : (readorwrite == ROW_WRITE) ? "write" : (readorwrite == ROW_READWRITE) ? "read/write" : "??",
 			 quiet ? "quiet" : "normal"));
 
@@ -2382,8 +2382,8 @@ void address_space::unmap(offs_t addrstart, offs_t addrend, offs_t addrmask, off
 void address_space::install_port(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, const char *rtag, const char *wtag)
 {
 	VPRINTF(("address_space::install_port(%s-%s mask=%s mirror=%s, read=\"%s\" / write=\"%s\")\n",
-			 core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars), 
-			 core_i64_hex_format(addrmask, m_addrchars), core_i64_hex_format(addrmirror, m_addrchars), 
+			 core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
+			 core_i64_hex_format(addrmask, m_addrchars), core_i64_hex_format(addrmirror, m_addrchars),
 			 (rtag != NULL) ? rtag : "(none)", (wtag != NULL) ? wtag : "(none)"));
 
 	// read handler
@@ -2424,8 +2424,8 @@ void address_space::install_port(offs_t addrstart, offs_t addrend, offs_t addrma
 void address_space::install_bank(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, const char *rtag, const char *wtag)
 {
 	VPRINTF(("address_space::install_bank(%s-%s mask=%s mirror=%s, read=\"%s\" / write=\"%s\")\n",
-			 core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars), 
-			 core_i64_hex_format(addrmask, m_addrchars), core_i64_hex_format(addrmirror, m_addrchars), 
+			 core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
+			 core_i64_hex_format(addrmask, m_addrchars), core_i64_hex_format(addrmirror, m_addrchars),
 			 (rtag != NULL) ? rtag : "(none)", (wtag != NULL) ? wtag : "(none)"));
 
 	// map the read bank
@@ -2457,8 +2457,8 @@ void *address_space::install_ram(offs_t addrstart, offs_t addrend, offs_t addrma
 	memory_private *memdata = m_machine.memory_data;
 
 	VPRINTF(("address_space::install_ram(%s-%s mask=%s mirror=%s, %s, %p)\n",
-			 core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars), 
-			 core_i64_hex_format(addrmask, m_addrchars), core_i64_hex_format(addrmirror, m_addrchars), 
+			 core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
+			 core_i64_hex_format(addrmask, m_addrchars), core_i64_hex_format(addrmirror, m_addrchars),
 			 (readorwrite == ROW_READ) ? "read" : (readorwrite == ROW_WRITE) ? "write" : (readorwrite == ROW_READWRITE) ? "read/write" : "??",
 			 baseptr));
 
@@ -2532,8 +2532,8 @@ void *address_space::install_ram(offs_t addrstart, offs_t addrend, offs_t addrma
 UINT8 *address_space::install_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read8_delegate handler, UINT64 unitmask)
 {
 	VPRINTF(("address_space::install_handler(%s-%s mask=%s mirror=%s, %s, %s)\n",
-			 core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars), 
-			 core_i64_hex_format(addrmask, m_addrchars), core_i64_hex_format(addrmirror, m_addrchars), 
+			 core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
+			 core_i64_hex_format(addrmask, m_addrchars), core_i64_hex_format(addrmirror, m_addrchars),
 			 handler.name(), core_i64_hex_format(unitmask, data_width() / 4)));
 
 	UINT32 entry = read().map_range(addrstart, addrend, addrmask, addrmirror);
@@ -2545,8 +2545,8 @@ UINT8 *address_space::install_handler(offs_t addrstart, offs_t addrend, offs_t a
 UINT8 *address_space::install_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, write8_delegate handler, UINT64 unitmask)
 {
 	VPRINTF(("address_space::install_handler(%s-%s mask=%s mirror=%s, %s, %s)\n",
-			 core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars), 
-			 core_i64_hex_format(addrmask, m_addrchars), core_i64_hex_format(addrmirror, m_addrchars), 
+			 core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
+			 core_i64_hex_format(addrmask, m_addrchars), core_i64_hex_format(addrmirror, m_addrchars),
 			 handler.name(), core_i64_hex_format(unitmask, data_width() / 4)));
 
 	UINT32 entry = write().map_range(addrstart, addrend, addrmask, addrmirror);
@@ -2571,8 +2571,8 @@ UINT8 *address_space::install_handler(offs_t addrstart, offs_t addrend, offs_t a
 UINT8 *address_space::install_legacy_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read8_space_func rhandler, const char *rname, UINT64 unitmask)
 {
 	VPRINTF(("address_space::install_legacy_handler(%s-%s mask=%s mirror=%s, %s, %s) [read8]\n",
-			 core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars), 
-			 core_i64_hex_format(addrmask, m_addrchars), core_i64_hex_format(addrmirror, m_addrchars), 
+			 core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
+			 core_i64_hex_format(addrmask, m_addrchars), core_i64_hex_format(addrmirror, m_addrchars),
 			 rname, core_i64_hex_format(unitmask, data_width() / 4)));
 
 	UINT32 entry = read().map_range(addrstart, addrend, addrmask, addrmirror);
@@ -2584,8 +2584,8 @@ UINT8 *address_space::install_legacy_handler(offs_t addrstart, offs_t addrend, o
 UINT8 *address_space::install_legacy_handler(offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, write8_space_func whandler, const char *wname, UINT64 unitmask)
 {
 	VPRINTF(("address_space::install_legacy_handler(%s-%s mask=%s mirror=%s, %s, %s) [write8]\n",
-			 core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars), 
-			 core_i64_hex_format(addrmask, m_addrchars), core_i64_hex_format(addrmirror, m_addrchars), 
+			 core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
+			 core_i64_hex_format(addrmask, m_addrchars), core_i64_hex_format(addrmirror, m_addrchars),
 			 wname, core_i64_hex_format(unitmask, data_width() / 4)));
 
 	UINT32 entry = write().map_range(addrstart, addrend, addrmask, addrmirror);
@@ -2609,8 +2609,8 @@ UINT8 *address_space::install_legacy_handler(offs_t addrstart, offs_t addrend, o
 UINT8 *address_space::install_legacy_handler(device_t &device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, read8_device_func rhandler, const char *rname, UINT64 unitmask)
 {
 	VPRINTF(("address_space::install_legacy_handler(%s-%s mask=%s mirror=%s, %s, %s, \"%s\") [read8]\n",
-			 core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars), 
-			 core_i64_hex_format(addrmask, m_addrchars), core_i64_hex_format(addrmirror, m_addrchars), 
+			 core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
+			 core_i64_hex_format(addrmask, m_addrchars), core_i64_hex_format(addrmirror, m_addrchars),
 			 rname, core_i64_hex_format(unitmask, data_width() / 4), device.tag()));
 
 	UINT32 entry = read().map_range(addrstart, addrend, addrmask, addrmirror);
@@ -2622,8 +2622,8 @@ UINT8 *address_space::install_legacy_handler(device_t &device, offs_t addrstart,
 UINT8 *address_space::install_legacy_handler(device_t &device, offs_t addrstart, offs_t addrend, offs_t addrmask, offs_t addrmirror, write8_device_func whandler, const char *wname, UINT64 unitmask)
 {
 	VPRINTF(("address_space::install_legacy_handler(%s-%s mask=%s mirror=%s, %s, %s, \"%s\") [write8]\n",
-			 core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars), 
-			 core_i64_hex_format(addrmask, m_addrchars), core_i64_hex_format(addrmirror, m_addrchars), 
+			 core_i64_hex_format(addrstart, m_addrchars), core_i64_hex_format(addrend, m_addrchars),
+			 core_i64_hex_format(addrmask, m_addrchars), core_i64_hex_format(addrmirror, m_addrchars),
 			 wname, core_i64_hex_format(unitmask, data_width() / 4), device.tag()));
 
 	UINT32 entry = write().map_range(addrstart, addrend, addrmask, addrmirror);
