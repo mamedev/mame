@@ -2530,43 +2530,6 @@ ROM_START( soukobdx )
 	ROM_LOAD( "sb1_obj0.bin",       0x00000, 0x10000, CRC(ed810da4) SHA1(b3172b50b15d0e2fd40d38d32abf4de22b6f7a85) )
 ROM_END
 
-
-/*
-Puzzle Club
-Yunsung, 2000
-
-PCB Layout
-----------
-
-YS-2113
-|----------------------------------------------|
-|ROM1.128 ROM2.137 ROM3.7  62256  ROM5.97      |
-|  6116 Z80  6295  ROM4.2  62256  ROM6.95      |
-|  YMXXXX   16MHz     PAL         ROM7.105     |
-|  YM3014             PAL  PAL    ROM8.83      |
-|          62256    68000         ROM9.82      |
-|          62256           6116     14.38383MHz|
-|                          6116   PAL     PAL  |
-|J           6116   QL2003        PAL          |
-|A           6116                 PAL          |
-|M           6116   QL12X16B      PAL          |
-|M DIP1      6116                 PAL          |
-|A DIP2                                        |
-|            62256  QL2003                     |
-|            62256                             |
-|                                              |
-|  ROM11.166  ROM10.167                        |
-|                   QL2003        PAL          |
-|  ROM13.164  ROM12.165           PAL          |
-|----------------------------------------------|
-Notes:
-      68000 clock : 16.000MHz
-      Z80 clock   : 4.000MHz (16/4)
-      M6295 clock : 1.000MHz (16/16). Sample Rate = 1000000 / 132
-      YMXXXX clock: 4.000MHz (16/4). Chip is either YM2151 or YM3812
-      VSync       : 60Hz
-*/
-
 ROM_START( puzlclub )
 	ROM_REGION( 0x2c000, "audiocpu", 0 )       /* 176k for the sound cpu */
 	ROM_LOAD( "pc1_s0.bin",         0x0c000, 0x10000, CRC(44737c02) SHA1(bcacfed1c3522d6ecddd3ac79ded620e5334df35) )
