@@ -92,96 +92,163 @@
 
 #include "emu.h"
 #include "8255ppi.h"
+#include "devhelpr.h"
 
-typedef struct _ppi8255 ppi8255_t;
+//**************************************************************************
+//  DEVICE CONFIGURATION
+//**************************************************************************
 
-struct _ppi8255
+GENERIC_DEVICE_CONFIG_SETUP(ppi8255, "PPI8255")
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void ppi8255_device_config::device_config_complete()
 {
-	const ppi8255_interface	*intf;
+	// inherit a copy of the static data
+	const ppi8255_interface *intf = reinterpret_cast<const ppi8255_interface *>(static_config());
+	if (intf != NULL)
+	{
+		*static_cast<ppi8255_interface *>(this) = *intf;
+	}
 
-	devcb_resolved_read8 port_read[3];
-	devcb_resolved_write8 port_write[3];
-
-	/* mode flags */
-	UINT8 group_a_mode;
-	UINT8 group_b_mode;
-	UINT8 port_a_dir;
-	UINT8 port_b_dir;
-	UINT8 port_ch_dir;
-	UINT8 port_cl_dir;
-
-	/* handshake signals (1=asserted; 0=non-asserted) */
-	UINT8 obf_a;
-	UINT8 obf_b;
-	UINT8 ibf_a;
-	UINT8 ibf_b;
-	UINT8 inte_a;
-	UINT8 inte_b;
-	UINT8 inte_1;
-	UINT8 inte_2;
-
-	UINT8 in_mask[3];	/* input mask */
-	UINT8 out_mask[3];	/* output mask */
-	UINT8 read[3];		/* data read from ports */
-	UINT8 latch[3];		/* data written to ports */
-	UINT8 output[3];	/* actual output data */
-	UINT8 control;		/* mode control word */
-};
-
-
-static void set_mode(running_device *device, int data, int call_handlers);
-static void ppi8255_write_port(running_device *device, int port);
-
-
-INLINE ppi8255_t *get_safe_token(running_device *device) {
-	assert( device != NULL );
-	assert( device->type() == PPI8255 );
-	return ( ppi8255_t * ) downcast<legacy_device_base *>(device)->token();
+	// or initialize to defaults if none provided
+	else
+	{
+    	memset(&m_port_a_read, 0, sizeof(m_port_a_read));
+    	memset(&m_port_b_read, 0, sizeof(m_port_b_read));
+    	memset(&m_port_c_read, 0, sizeof(m_port_c_read));
+    	memset(&m_port_a_write, 0, sizeof(m_port_a_write));
+    	memset(&m_port_b_write, 0, sizeof(m_port_b_write));
+    	memset(&m_port_c_write, 0, sizeof(m_port_c_write));
+	}
 }
 
 
-INLINE void ppi8255_get_handshake_signals(ppi8255_t *ppi8255, int is_read, UINT8 *result)
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+const device_type PPI8255 = ppi8255_device_config::static_alloc_device_config;
+
+//-------------------------------------------------
+//  ppi8255_device - constructor
+//-------------------------------------------------
+
+ppi8255_device::ppi8255_device(running_machine &_machine, const ppi8255_device_config &config)
+    : device_t(_machine, config),
+      m_config(config)
+{
+
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void ppi8255_device::device_start()
+{
+	devcb_resolve_read8(&m_port_read[0], &m_config.m_port_a_read, this);
+	devcb_resolve_read8(&m_port_read[1], &m_config.m_port_b_read, this);
+	devcb_resolve_read8(&m_port_read[2], &m_config.m_port_c_read, this);
+
+	devcb_resolve_write8(&m_port_write[0], &m_config.m_port_a_write, this);
+	devcb_resolve_write8(&m_port_write[1], &m_config.m_port_b_write, this);
+	devcb_resolve_write8(&m_port_write[2], &m_config.m_port_c_write, this);
+
+	/* register for state saving */
+	state_save_register_device_item(this, 0, m_group_a_mode);
+	state_save_register_device_item(this, 0, m_group_b_mode);
+	state_save_register_device_item(this, 0, m_port_a_dir);
+	state_save_register_device_item(this, 0, m_port_b_dir);
+	state_save_register_device_item(this, 0, m_port_ch_dir);
+	state_save_register_device_item(this, 0, m_port_cl_dir);
+	state_save_register_device_item(this, 0, m_obf_a);
+	state_save_register_device_item(this, 0, m_obf_b);
+	state_save_register_device_item(this, 0, m_ibf_a);
+	state_save_register_device_item(this, 0, m_ibf_b);
+	state_save_register_device_item(this, 0, m_inte_a);
+	state_save_register_device_item(this, 0, m_inte_b);
+	state_save_register_device_item(this, 0, m_inte_1);
+	state_save_register_device_item(this, 0, m_inte_2);
+	state_save_register_device_item_array(this, 0, m_in_mask);
+	state_save_register_device_item_array(this, 0, m_out_mask);
+	state_save_register_device_item_array(this, 0, m_read);
+	state_save_register_device_item_array(this, 0, m_latch);
+}
+
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void ppi8255_device::device_reset()
+{
+	m_group_a_mode = 0;
+	m_group_b_mode = 0;
+	m_port_a_dir = 0;
+	m_port_b_dir = 0;
+	m_port_ch_dir = 0;
+	m_port_cl_dir = 0;
+	m_obf_a = m_ibf_a = 0;
+	m_obf_b = m_ibf_b = 0;
+	m_inte_a = m_inte_b = m_inte_1 = m_inte_2 = 0;
+
+	for (int i = 0; i < 3; i++)
+	{
+		m_in_mask[i] = m_out_mask[i] = m_read[i] = m_latch[i] = m_output[i] = 0;
+	}
+
+	set_mode(0x9b, 0);   /* Mode 0, all ports set to input */
+}
+
+
+void ppi8255_device::ppi8255_get_handshake_signals(int is_read, UINT8 *result)
 {
 	UINT8 handshake = 0x00;
 	UINT8 mask = 0x00;
 
 	/* group A */
-	if (ppi8255->group_a_mode == 1)
+	if (m_group_a_mode == 1)
 	{
-		if (ppi8255->port_a_dir)
+		if (m_port_a_dir)
 		{
-			handshake |= ppi8255->ibf_a ? 0x20 : 0x00;
-			handshake |= (ppi8255->ibf_a && ppi8255->inte_a) ? 0x08 : 0x00;
+			handshake |= m_ibf_a ? 0x20 : 0x00;
+			handshake |= (m_ibf_a && m_inte_a) ? 0x08 : 0x00;
 			mask |= 0x28;
 		}
 		else
 		{
-			handshake |= ppi8255->obf_a ? 0x00 : 0x80;
-			handshake |= (ppi8255->obf_a && ppi8255->inte_a) ? 0x08 : 0x00;
+			handshake |= m_obf_a ? 0x00 : 0x80;
+			handshake |= (m_obf_a && m_inte_a) ? 0x08 : 0x00;
 			mask |= 0x88;
 		}
 	}
-	else if (ppi8255->group_a_mode == 2)
+	else if (m_group_a_mode == 2)
 	{
-		handshake |= ppi8255->obf_a ? 0x00 : 0x80;
-		handshake |= ppi8255->ibf_a ? 0x20 : 0x00;
-		handshake |= ((ppi8255->obf_a && ppi8255->inte_1) || (ppi8255->ibf_a && ppi8255->inte_2)) ? 0x08 : 0x00;
+		handshake |= m_obf_a ? 0x00 : 0x80;
+		handshake |= m_ibf_a ? 0x20 : 0x00;
+		handshake |= ((m_obf_a && m_inte_1) || (m_ibf_a && m_inte_2)) ? 0x08 : 0x00;
 		mask |= 0xA8;
 	}
 
 	/* group B */
-	if (ppi8255->group_b_mode == 1)
+	if (m_group_b_mode == 1)
 	{
-		if (ppi8255->port_b_dir)
+		if (m_port_b_dir)
 		{
-			handshake |= ppi8255->ibf_b ? 0x02 : 0x00;
-			handshake |= (ppi8255->ibf_b && ppi8255->inte_b) ? 0x01 : 0x00;
+			handshake |= m_ibf_b ? 0x02 : 0x00;
+			handshake |= (m_ibf_b && m_inte_b) ? 0x01 : 0x00;
 			mask |= 0x03;
 		}
 		else
 		{
-			handshake |= ppi8255->obf_b ? 0x00 : 0x02;
-			handshake |= (ppi8255->obf_b && ppi8255->inte_b) ? 0x01 : 0x00;
+			handshake |= m_obf_b ? 0x00 : 0x02;
+			handshake |= (m_obf_b && m_inte_b) ? 0x01 : 0x00;
 			mask |= 0x03;
 		}
 	}
@@ -192,92 +259,90 @@ INLINE void ppi8255_get_handshake_signals(ppi8255_t *ppi8255, int is_read, UINT8
 
 
 
-static void ppi8255_input(running_device *device, int port, UINT8 data)
+void ppi8255_device::ppi8255_input(int port, UINT8 data)
 {
-	ppi8255_t	*ppi8255 = get_safe_token(device);
 	int changed = 0;
 
-	ppi8255->read[port] = data;
+	m_read[port] = data;
 
 	/* port C is special */
 	if (port == 2)
 	{
-		if (((ppi8255->group_a_mode == 1) && (ppi8255->port_a_dir == 0)) || (ppi8255->group_a_mode == 2))
+		if (((m_group_a_mode == 1) && (m_port_a_dir == 0)) || (m_group_a_mode == 2))
 		{
 			/* is !ACKA asserted? */
-			if (ppi8255->obf_a && !(data & 0x40))
+			if (m_obf_a && !(data & 0x40))
 			{
-				ppi8255->obf_a = 0;
+				m_obf_a = 0;
 				changed = 1;
 			}
 		}
 
-		if (((ppi8255->group_a_mode == 1) && (ppi8255->port_a_dir == 1)) || (ppi8255->group_a_mode == 2))
+		if (((m_group_a_mode == 1) && (m_port_a_dir == 1)) || (m_group_a_mode == 2))
 		{
 			/* is !STBA asserted? */
-			if (!ppi8255->ibf_a && !(data & 0x10))
+			if (!m_ibf_a && !(data & 0x10))
 			{
-				ppi8255->ibf_a = 1;
+				m_ibf_a = 1;
 				changed = 1;
 			}
 		}
 
-		if ((ppi8255->group_b_mode == 1) && (ppi8255->port_b_dir == 0))
+		if ((m_group_b_mode == 1) && (m_port_b_dir == 0))
 		{
 			/* is !ACKB asserted? */
-			if (ppi8255->obf_b && !(data & 0x04))
+			if (m_obf_b && !(data & 0x04))
 			{
-				ppi8255->obf_b = 0;
+				m_obf_b = 0;
 				changed = 1;
 			}
 		}
 
-		if ((ppi8255->group_b_mode == 1) && (ppi8255->port_b_dir == 1))
+		if ((m_group_b_mode == 1) && (m_port_b_dir == 1))
 		{
 			/* is !STBB asserted? */
-			if (!ppi8255->ibf_b && !(data & 0x04))
+			if (!m_ibf_b && !(data & 0x04))
 			{
-				ppi8255->ibf_b = 1;
+				m_ibf_b = 1;
 				changed = 1;
 			}
 		}
 
 		if (changed)
-			ppi8255_write_port(device, 2);
+		{
+			ppi8255_write_port(2);
+		}
 	}
 }
 
 
 
-static UINT8 ppi8255_read_port(running_device *device, int port)
+UINT8 ppi8255_device::ppi8255_read_port(int port)
 {
-	ppi8255_t	*ppi8255 = get_safe_token(device);
 	UINT8 result = 0x00;
 
-	if (ppi8255->in_mask[port])
+	if (m_in_mask[port])
 	{
-		if (ppi8255->port_read[port].read != NULL)
-			ppi8255_input(device, port, devcb_call_read8(&ppi8255->port_read[port], 0));
-
-		result |= ppi8255->read[port] & ppi8255->in_mask[port];
+		ppi8255_input(port, devcb_call_read8(&m_port_read[port], 0));
+		result |= m_read[port] & m_in_mask[port];
 	}
-	result |= ppi8255->latch[port] & ppi8255->out_mask[port];
+	result |= m_latch[port] & m_out_mask[port];
 
 	switch (port)
 	{
 	case 0:
 		/* clear input buffer full flag */
-		ppi8255->ibf_a = 0;
+		m_ibf_a = 0;
 		break;
 
 	case 1:
 		/* clear input buffer full flag */
-		ppi8255->ibf_b = 0;
+		m_ibf_b = 0;
 		break;
 
 	case 2:
 		/* read special port 2 signals */
-		ppi8255_get_handshake_signals(ppi8255, 1, &result);
+		ppi8255_get_handshake_signals(1, &result);
 		break;
 	}
 
@@ -286,9 +351,8 @@ static UINT8 ppi8255_read_port(running_device *device, int port)
 
 
 
-READ8_DEVICE_HANDLER( ppi8255_r )
+READ8_DEVICE_HANDLER_TRAMPOLINE(ppi8255, ppi8255_r)
 {
-	ppi8255_t	*ppi8255 = get_safe_token(device);
 	UINT8 result = 0;
 
 	offset %= 4;
@@ -298,11 +362,11 @@ READ8_DEVICE_HANDLER( ppi8255_r )
 		case 0: /* Port A read */
 		case 1: /* Port B read */
 		case 2: /* Port C read */
-			result = ppi8255_read_port(device, offset);
+			result = ppi8255_read_port(offset);
 			break;
 
 		case 3: /* Control word */
-			result = ppi8255->control;
+			result = m_control;
 			break;
 	}
 
@@ -311,29 +375,25 @@ READ8_DEVICE_HANDLER( ppi8255_r )
 
 
 
-static void ppi8255_write_port(running_device *device, int port)
+void ppi8255_device::ppi8255_write_port(int port)
 {
-	ppi8255_t	*ppi8255 = get_safe_token(device);
-	UINT8 write_data;
-
-	write_data = ppi8255->latch[port] & ppi8255->out_mask[port];
-	write_data |= 0xFF & ~ppi8255->out_mask[port];
+	UINT8 write_data = m_latch[port] & m_out_mask[port];
+	write_data |= 0xFF & ~m_out_mask[port];
 
 	/* write out special port 2 signals */
 	if (port == 2)
-		ppi8255_get_handshake_signals(ppi8255, 0, &write_data);
+	{
+		ppi8255_get_handshake_signals(0, &write_data);
+	}
 
-	ppi8255->output[port] = write_data;
-	if (ppi8255->port_write[port].write != NULL)
-		devcb_call_write8(&ppi8255->port_write[port], 0, write_data);
+	m_output[port] = write_data;
+	devcb_call_write8(&m_port_write[port], 0, write_data);
 }
 
 
 
-WRITE8_DEVICE_HANDLER( ppi8255_w )
+WRITE8_DEVICE_HANDLER_TRAMPOLINE(ppi8255, ppi8255_w)
 {
-	ppi8255_t	*ppi8255 = get_safe_token(device);
-
 	offset %= 4;
 
 	switch( offset )
@@ -341,24 +401,24 @@ WRITE8_DEVICE_HANDLER( ppi8255_w )
 		case 0: /* Port A write */
 		case 1: /* Port B write */
 		case 2: /* Port C write */
-			ppi8255->latch[offset] = data;
-			ppi8255_write_port(device, offset);
+			m_latch[offset] = data;
+			ppi8255_write_port(offset);
 
 			switch(offset)
 			{
 				case 0:
-					if (!ppi8255->port_a_dir && (ppi8255->group_a_mode != 0))
+					if (!m_port_a_dir && (m_group_a_mode != 0))
 					{
-						ppi8255->obf_a = 1;
-						ppi8255_write_port(device, 2);
+						m_obf_a = 1;
+						ppi8255_write_port(2);
 					}
 					break;
 
 				case 1:
-					if (!ppi8255->port_b_dir && (ppi8255->group_b_mode != 0))
+					if (!m_port_b_dir && (m_group_b_mode != 0))
 					{
-						ppi8255->obf_b = 1;
-						ppi8255_write_port(device, 2);
+						m_obf_b = 1;
+						ppi8255_write_port(2);
 					}
 					break;
 			}
@@ -367,129 +427,134 @@ WRITE8_DEVICE_HANDLER( ppi8255_w )
 		case 3: /* Control word */
 			if (data & 0x80)
 			{
-				set_mode(device, data & 0x7f, 1);
+				set_mode(data & 0x7f, 1);
 			}
 			else
 			{
 				/* bit set/reset */
-				int bit;
-
-				bit = (data >> 1) & 0x07;
+				int bit = (data >> 1) & 0x07;
 
 				if (data & 1)
-					ppi8255->latch[2] |= (1<<bit);	/* set bit */
+				{
+					m_latch[2] |= (1 << bit);	/* set bit */
+				}
 				else
-					ppi8255->latch[2] &= ~(1<<bit);	/* reset bit */
-
-				if (ppi8255->group_b_mode == 1)
 				{
-					if (bit == 2) ppi8255->inte_b = data & 1;
+					m_latch[2] &= ~(1 << bit);	/* reset bit */
 				}
 
-				if (ppi8255->group_a_mode == 1)
+				if (m_group_b_mode == 1)
 				{
-					if (bit == 4 && ppi8255->port_a_dir) ppi8255->inte_a = data & 1;
-					if (bit == 6 && !ppi8255->port_a_dir) ppi8255->inte_a = data & 1;
+					if (bit == 2)
+					{
+						m_inte_b = data & 1;
+					}
 				}
 
-				if (ppi8255->group_a_mode == 2)
+				if (m_group_a_mode == 1)
 				{
-					if (bit == 4) ppi8255->inte_2 = data & 1;
-					if (bit == 6) ppi8255->inte_1 = data & 1;
+					if (bit == 4 && m_port_a_dir)
+					{
+						m_inte_a = data & 1;
+					}
+					if (bit == 6 && !m_port_a_dir)
+					{
+						m_inte_a = data & 1;
+					}
 				}
 
-				ppi8255_write_port(device, 2);
+				if (m_group_a_mode == 2)
+				{
+					if (bit == 4)
+					{
+						m_inte_2 = data & 1;
+					}
+					if (bit == 6)
+					{
+						m_inte_1 = data & 1;
+					}
+				}
+
+				ppi8255_write_port(2);
 			}
 			break;
 	}
 }
 
 
-void ppi8255_set_port_a_read(running_device *device, const devcb_read8 *config)
+void ppi8255_device::set_mode(int data, int call_handlers)
 {
-	ppi8255_t	*ppi8255 = get_safe_token(device);
-	devcb_resolve_read8(&ppi8255->port_read[0], config, device);
-}
-
-void ppi8255_set_port_b_read(running_device *device, const devcb_read8 *config)
-{
-	ppi8255_t	*ppi8255 = get_safe_token(device);
-	devcb_resolve_read8(&ppi8255->port_read[1], config, device);
-}
-
-void ppi8255_set_port_c_read(running_device *device, const devcb_read8 *config)
-{
-	ppi8255_t	*ppi8255 = get_safe_token(device);
-	devcb_resolve_read8(&ppi8255->port_read[2], config, device);
-}
-
-
-void ppi8255_set_port_a_write(running_device *device, const devcb_write8 *config)
-{
-	ppi8255_t	*ppi8255 = get_safe_token(device);
-	devcb_resolve_write8(&ppi8255->port_write[0], config, device);
-}
-
-void ppi8255_set_port_b_write(running_device *device, const devcb_write8 *config)
-{
-	ppi8255_t	*ppi8255 = get_safe_token(device);
-	devcb_resolve_write8(&ppi8255->port_write[1], config, device);
-}
-
-void ppi8255_set_port_c_write(running_device *device, const devcb_write8 *config)
-{
-	ppi8255_t	*ppi8255 = get_safe_token(device);
-	devcb_resolve_write8(&ppi8255->port_write[2], config, device);
-}
-
-
-static void set_mode(running_device *device, int data, int call_handlers)
-{
-	ppi8255_t	*ppi8255 = get_safe_token(device);
-	int i;
-
 	/* parse out mode */
-	ppi8255->group_a_mode = (data >> 5) & 3;
-	ppi8255->group_b_mode = (data >> 2) & 1;
-	ppi8255->port_a_dir = (data >> 4) & 1;
-	ppi8255->port_b_dir = (data >> 1) & 1;
-	ppi8255->port_ch_dir = (data >> 3) & 1;
-	ppi8255->port_cl_dir = (data >> 0) & 1;
+	m_group_a_mode = (data >> 5) & 3;
+	m_group_b_mode = (data >> 2) & 1;
+	m_port_a_dir = (data >> 4) & 1;
+	m_port_b_dir = (data >> 1) & 1;
+	m_port_ch_dir = (data >> 3) & 1;
+	m_port_cl_dir = (data >> 0) & 1;
 
 	/* normalize group_a_mode */
-	if (ppi8255->group_a_mode == 3)
-		ppi8255->group_a_mode = 2;
+	if (m_group_a_mode == 3)
+	{
+		m_group_a_mode = 2;
+	}
 
 	/* Port A direction */
-	if (ppi8255->group_a_mode == 2)
-		ppi8255->in_mask[0] = 0xFF, ppi8255->out_mask[0] = 0xFF;	/* bidirectional */
+	if (m_group_a_mode == 2)
+	{
+		m_in_mask[0] = 0xFF;
+		m_out_mask[0] = 0xFF;	/* bidirectional */
+	}
 	else
-		if (ppi8255->port_a_dir)
-			ppi8255->in_mask[0] = 0xFF, ppi8255->out_mask[0] = 0x00;	/* input */
+	{
+		if (m_port_a_dir)
+		{
+			m_in_mask[0] = 0xFF;
+			m_out_mask[0] = 0x00;	/* input */
+		}
 		else
-			ppi8255->in_mask[0] = 0x00, ppi8255->out_mask[0] = 0xFF;	/* output */
+		{
+			m_in_mask[0] = 0x00;
+			m_out_mask[0] = 0xFF;	/* output */
+		}
+	}
 
 	/* Port B direction */
-	if (ppi8255->port_b_dir)
-		ppi8255->in_mask[1] = 0xFF, ppi8255->out_mask[1] = 0x00;	/* input */
+	if (m_port_b_dir)
+	{
+		m_in_mask[1] = 0xFF;
+		m_out_mask[1] = 0x00;	/* input */
+	}
 	else
-		ppi8255->in_mask[1] = 0x00, ppi8255->out_mask[1] = 0xFF;	/* output */
+	{
+		m_in_mask[1] = 0x00;
+		m_out_mask[1] = 0xFF;	/* output */
+	}
 
 	/* Port C upper direction */
-	if (ppi8255->port_ch_dir)
-		ppi8255->in_mask[2] = 0xF0, ppi8255->out_mask[2] = 0x00;	/* input */
+	if (m_port_ch_dir)
+	{
+		m_in_mask[2] = 0xF0;
+		m_out_mask[2] = 0x00;	/* input */
+	}
 	else
-		ppi8255->in_mask[2] = 0x00, ppi8255->out_mask[2] = 0xF0;	/* output */
+	{
+		m_in_mask[2] = 0x00;
+		m_out_mask[2] = 0xF0;	/* output */
+	}
 
 	/* Port C lower direction */
-	if (ppi8255->port_cl_dir)
-		ppi8255->in_mask[2] |= 0x0F;	/* input */
+	if (m_port_cl_dir)
+	{
+		m_in_mask[2] |= 0x0F;	/* input */
+	}
 	else
-		ppi8255->out_mask[2] |= 0x0F;	/* output */
+	{
+		m_out_mask[2] |= 0x0F;	/* output */
+	}
 
 	/* now depending on the group modes, certain Port C lines may be replaced
      * with varying control signals */
-	switch(ppi8255->group_a_mode)
+	switch(m_group_a_mode)
 	{
 		case 0:	/* Group A mode 0 */
 			/* no changes */
@@ -497,18 +562,18 @@ static void set_mode(running_device *device, int data, int call_handlers)
 
 		case 1:	/* Group A mode 1 */
 			/* bits 5-3 are reserved by Group A mode 1 */
-			ppi8255->in_mask[2] &= ~0x38;
-			ppi8255->out_mask[2] &= ~0x38;
+			m_in_mask[2] &= ~0x38;
+			m_out_mask[2] &= ~0x38;
 			break;
 
 		case 2: /* Group A mode 2 */
 			/* bits 7-3 are reserved by Group A mode 2 */
-			ppi8255->in_mask[2] &= ~0xF8;
-			ppi8255->out_mask[2] &= ~0xF8;
+			m_in_mask[2] &= ~0xF8;
+			m_out_mask[2] &= ~0xF8;
 			break;
 	}
 
-	switch(ppi8255->group_b_mode)
+	switch(m_group_b_mode)
 	{
 		case 0:	/* Group B mode 0 */
 			/* no changes */
@@ -516,129 +581,90 @@ static void set_mode(running_device *device, int data, int call_handlers)
 
 		case 1:	/* Group B mode 1 */
 			/* bits 2-0 are reserved by Group B mode 1 */
-			ppi8255->in_mask[2] &= ~0x07;
-			ppi8255->out_mask[2] &= ~0x07;
+			m_in_mask[2] &= ~0x07;
+			m_out_mask[2] &= ~0x07;
 			break;
 	}
 
 	/* KT: 25-Dec-99 - 8255 resets latches when mode set */
-	ppi8255->latch[0] = ppi8255->latch[1] = ppi8255->latch[2] = 0;
+	m_latch[0] = m_latch[1] = m_latch[2] = 0;
 
 	if (call_handlers)
 	{
-		for (i = 0; i < 3; i++)
-			ppi8255_write_port(device, i);
+		for (int i = 0; i < 3; i++)
+		{
+			ppi8255_write_port(i);
+		}
 	}
 
 	/* reset flip-flops */
-	ppi8255->obf_a = ppi8255->ibf_a = 0;
-	ppi8255->obf_b = ppi8255->ibf_b = 0;
-	ppi8255->inte_a = ppi8255->inte_b = ppi8255->inte_1 = ppi8255->inte_2 = 0;
+	m_obf_a = m_ibf_a = 0;
+	m_obf_b = m_ibf_b = 0;
+	m_inte_a = m_inte_b = m_inte_1 = m_inte_2 = 0;
 
 	/* store control word */
-	ppi8255->control = data;
+	m_control = data;
+}
+
+void ppi8255_set_port_a_read(running_device *device, const devcb_read8 *config)
+{
+	downcast<ppi8255_device*>(device)->ppi8255_set_port_read(0, config);
+}
+
+void ppi8255_set_port_b_read(running_device *device, const devcb_read8 *config)
+{
+	downcast<ppi8255_device*>(device)->ppi8255_set_port_read(1, config);
+}
+
+void ppi8255_set_port_c_read(running_device *device, const devcb_read8 *config)
+{
+	downcast<ppi8255_device*>(device)->ppi8255_set_port_read(2, config);
 }
 
 
-void ppi8255_set_port_a( running_device *device, UINT8 data ) { ppi8255_input(device, 0, data); }
-void ppi8255_set_port_b( running_device *device, UINT8 data ) { ppi8255_input(device, 1, data); }
-void ppi8255_set_port_c( running_device *device, UINT8 data ) { ppi8255_input(device, 2, data); }
-
-UINT8 ppi8255_get_port_a( running_device *device ) {
-	ppi8255_t	*ppi8255 = get_safe_token(device);
-
-	return ppi8255->output[0];
+void ppi8255_set_port_a_write(running_device *device, const devcb_write8 *config)
+{
+	downcast<ppi8255_device*>(device)->ppi8255_set_port_write(0, config);
 }
 
-UINT8 ppi8255_get_port_b( running_device *device ) {
-	ppi8255_t	*ppi8255 = get_safe_token(device);
-
-	return ppi8255->output[1];
+void ppi8255_set_port_b_write(running_device *device, const devcb_write8 *config)
+{
+	downcast<ppi8255_device*>(device)->ppi8255_set_port_write(1, config);
 }
 
-UINT8 ppi8255_get_port_c( running_device *device ) {
-	ppi8255_t	*ppi8255 = get_safe_token(device);
-
-	return ppi8255->output[2];
+void ppi8255_set_port_c_write(running_device *device, const devcb_write8 *config)
+{
+	downcast<ppi8255_device*>(device)->ppi8255_set_port_write(2, config);
 }
 
 
-static DEVICE_START( ppi8255 ) {
-	ppi8255_t	*ppi8255 = get_safe_token(device);
+void ppi8255_set_port_a( running_device *device, UINT8 data )
+{
+	downcast<ppi8255_device*>(device)->ppi8255_set_port(0, data);
+}
 
-	ppi8255->intf = (const ppi8255_interface *)device->baseconfig().static_config();
+void ppi8255_set_port_b( running_device *device, UINT8 data )
+{
+	downcast<ppi8255_device*>(device)->ppi8255_set_port(1, data);
+}
 
-	devcb_resolve_read8(&ppi8255->port_read[0], &ppi8255->intf->port_a_read, device);
-	devcb_resolve_read8(&ppi8255->port_read[1], &ppi8255->intf->port_b_read, device);
-	devcb_resolve_read8(&ppi8255->port_read[2], &ppi8255->intf->port_c_read, device);
-
-	devcb_resolve_write8(&ppi8255->port_write[0], &ppi8255->intf->port_a_write, device);
-	devcb_resolve_write8(&ppi8255->port_write[1], &ppi8255->intf->port_b_write, device);
-	devcb_resolve_write8(&ppi8255->port_write[2], &ppi8255->intf->port_c_write, device);
-
-	/* register for state saving */
-	state_save_register_device_item(device, 0, ppi8255->group_a_mode);
-	state_save_register_device_item(device, 0, ppi8255->group_b_mode);
-	state_save_register_device_item(device, 0, ppi8255->port_a_dir);
-	state_save_register_device_item(device, 0, ppi8255->port_b_dir);
-	state_save_register_device_item(device, 0, ppi8255->port_ch_dir);
-	state_save_register_device_item(device, 0, ppi8255->port_cl_dir);
-	state_save_register_device_item(device, 0, ppi8255->obf_a);
-	state_save_register_device_item(device, 0, ppi8255->obf_b);
-	state_save_register_device_item(device, 0, ppi8255->ibf_a);
-	state_save_register_device_item(device, 0, ppi8255->ibf_b);
-	state_save_register_device_item(device, 0, ppi8255->inte_a);
-	state_save_register_device_item(device, 0, ppi8255->inte_b);
-	state_save_register_device_item(device, 0, ppi8255->inte_1);
-	state_save_register_device_item(device, 0, ppi8255->inte_2);
-	state_save_register_device_item_array(device, 0, ppi8255->in_mask);
-	state_save_register_device_item_array(device, 0, ppi8255->out_mask);
-	state_save_register_device_item_array(device, 0, ppi8255->read);
-	state_save_register_device_item_array(device, 0, ppi8255->latch);
+void ppi8255_set_port_c( running_device *device, UINT8 data )
+{
+	downcast<ppi8255_device*>(device)->ppi8255_set_port(2, data);
 }
 
 
-static DEVICE_RESET( ppi8255 ) {
-	ppi8255_t	*ppi8255 = get_safe_token(device);
-	int			i;
-
-	ppi8255->group_a_mode = 0;
-	ppi8255->group_b_mode = 0;
-	ppi8255->port_a_dir = 0;
-	ppi8255->port_b_dir = 0;
-	ppi8255->port_ch_dir = 0;
-	ppi8255->port_cl_dir = 0;
-	ppi8255->obf_a = ppi8255->ibf_a = 0;
-	ppi8255->obf_b = ppi8255->ibf_b = 0;
-	ppi8255->inte_a = ppi8255->inte_b = ppi8255->inte_1 = ppi8255->inte_2 = 0;
-
-	for ( i = 0; i < 3; i++ ) {
-		ppi8255->in_mask[i] = ppi8255->out_mask[i] = ppi8255->read[i] = ppi8255->latch[i] = ppi8255->output[i] = 0;
-	}
-
-	set_mode(device, 0x9b, 0);   /* Mode 0, all ports set to input */
+UINT8 ppi8255_get_port_a( running_device *device )
+{
+	return downcast<ppi8255_device*>(device)->ppi8255_get_port(0);
 }
 
-
-DEVICE_GET_INFO(ppi8255) {
-	switch ( state ) {
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:				info->i = sizeof(ppi8255_t);				break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:		info->i = 0;								break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:						info->start = DEVICE_START_NAME(ppi8255);	break;
-		case DEVINFO_FCT_STOP:						/* nothing */								break;
-		case DEVINFO_FCT_RESET:						info->reset = DEVICE_RESET_NAME(ppi8255);	break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:						strcpy(info->s, "Intel PPI8255");			break;
-		case DEVINFO_STR_FAMILY:					strcpy(info->s, "PPI8255");					break;
-		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.00");					break;
-		case DEVINFO_STR_SOURCE_FILE:				strcpy(info->s, __FILE__);					break;
-		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright the MAME and MESS Teams"); break;
-	}
+UINT8 ppi8255_get_port_b( running_device *device )
+{
+	return downcast<ppi8255_device*>(device)->ppi8255_get_port(1);
 }
 
-
-DEFINE_LEGACY_DEVICE(PPI8255, ppi8255);
+UINT8 ppi8255_get_port_c( running_device *device )
+{
+	return downcast<ppi8255_device*>(device)->ppi8255_get_port(2);
+}
