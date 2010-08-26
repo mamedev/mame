@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "6850acia.h"
+#include "devhelpr.h"
 
 
 /***************************************************************************
@@ -20,95 +21,18 @@
 #define CR7		0x80
 
 #define TXD(_data) \
-	devcb_call_write_line(&acia_p->out_tx_func, _data)
+	devcb_call_write_line(&m_out_tx_func, _data)
 
 #define RTS(_data) \
-	devcb_call_write_line(&acia_p->out_rts_func, _data)
-
-static void acia6850_check_interrupts(running_device *device);
-
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
-
-enum serial_state
-{
-	START,
-	DATA,
-	PARITY,
-	STOP,
-	STOP2,
-};
-
-enum _parity_type
-{
-	NONE,
-	ODD,
-	EVEN
-};
-typedef enum _parity_type parity_type;
-
-typedef struct _acia6850_t acia6850_t;
-struct _acia6850_t
-{
-	devcb_resolved_read_line	in_rx_func;
-	devcb_resolved_write_line	out_tx_func;
-	devcb_resolved_read_line	in_cts_func;
-	devcb_resolved_write_line	out_rts_func;
-	devcb_resolved_read_line	in_dcd_func;
-	devcb_resolved_write_line	out_irq_func;
-
-	UINT8		ctrl;
-	UINT8		status;
-
-	UINT8		tdr;
-	UINT8		rdr;
-	UINT8		rx_shift;
-	UINT8		tx_shift;
-
-	UINT8		rx_counter;
-	UINT8		tx_counter;
-
-	int			rx_clock;
-	int			tx_clock;
-
-	int			divide;
-
-	/* Counters */
-	int			tx_bits;
-	int			rx_bits;
-	int			tx_parity;
-	int			rx_parity;
-
-	/* TX/RX state */
-	int			bits;
-	parity_type	parity;
-	int			stopbits;
-	int			tx_int;
-
-	/* Signals */
-	int			overrun;
-	int			reset;
-	int			rts;
-	int			brk;
-	int			first_reset;
-	int			status_read;
-	enum		serial_state rx_state;
-	enum		serial_state tx_state;
-	int			irq;
-
-	emu_timer	*rx_timer;
-	emu_timer	*tx_timer;
-};
-
+	devcb_call_write_line(&m_out_rts_func, _data)
 
 /***************************************************************************
     LOCAL VARIABLES
 ***************************************************************************/
 
-static const int ACIA6850_DIVIDE[3] = { 1, 16, 64 };
+const int acia6850_device::ACIA6850_DIVIDE[3] = { 1, 16, 64 };
 
-static const int ACIA6850_WORD[8][3] =
+const int acia6850_device::ACIA6850_WORD[8][3] =
 {
 	{ 7, EVEN, 2 },
 	{ 7, ODD,  2 },
@@ -121,153 +45,167 @@ static const int ACIA6850_WORD[8][3] =
 };
 
 
-/***************************************************************************
-    PROTOTYPES
-***************************************************************************/
-
-static TIMER_CALLBACK( receive_event );
-static TIMER_CALLBACK( transmit_event );
-
 
 /***************************************************************************
-    INLINE FUNCTIONS
+    LIVE DEVICE
 ***************************************************************************/
 
-INLINE acia6850_t *get_token(running_device *device)
+const device_type ACIA6850 = acia6850_device_config::static_alloc_device_config;
+
+GENERIC_DEVICE_CONFIG_SETUP(acia6850, "ACIA6850")
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void acia6850_device_config::device_config_complete()
 {
-	assert(device != NULL);
-	assert(device->type() == ACIA6850);
-	return (acia6850_t *) downcast<legacy_device_base *>(device)->token();
+	// inherit a copy of the static data
+	const acia6850_interface *intf = reinterpret_cast<const acia6850_interface *>(static_config());
+	if (intf != NULL)
+	{
+		*static_cast<acia6850_interface *>(this) = *intf;
+	}
+
+	// or initialize to defaults if none provided
+	else
+	{
+		m_tx_clock = 0;
+		m_rx_clock = 0;
+    	memset(&m_in_rx_func, 0, sizeof(m_in_rx_func));
+    	memset(&m_out_tx_func, 0, sizeof(m_out_tx_func));
+    	memset(&m_in_cts_func, 0, sizeof(m_in_cts_func));
+    	memset(&m_out_rts_func, 0, sizeof(m_out_rts_func));
+    	memset(&m_in_dcd_func, 0, sizeof(m_in_dcd_func));
+    	memset(&m_out_irq_func, 0, sizeof(m_out_irq_func));
+	}
 }
 
 
-INLINE acia6850_interface *get_interface(running_device *device)
+//-------------------------------------------------
+//  acia6850_device - constructor
+//-------------------------------------------------
+
+acia6850_device::acia6850_device(running_machine &_machine, const acia6850_device_config &config)
+    : device_t(_machine, config),
+      m_config(config)
 {
-	assert(device != NULL);
-	assert(device->type() == ACIA6850);
-	return (acia6850_interface *) device->baseconfig().static_config();
+
 }
 
 
-/***************************************************************************
-    IMPLEMENTATION
-***************************************************************************/
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void acia6850_device::device_start()
+{
+	/* resolve callbacks */
+	devcb_resolve_read_line(&m_in_rx_func, &m_config.m_in_rx_func, this);
+	devcb_resolve_write_line(&m_out_tx_func, &m_config.m_out_tx_func, this);
+	devcb_resolve_read_line(&m_in_cts_func, &m_config.m_in_cts_func, this);
+	devcb_resolve_write_line(&m_out_rts_func, &m_config.m_out_rts_func, this);
+	devcb_resolve_read_line(&m_in_dcd_func, &m_config.m_in_dcd_func, this);
+	devcb_resolve_write_line(&m_out_irq_func, &m_config.m_out_irq_func, this);
+
+	m_rx_clock = m_config.m_rx_clock;
+	m_tx_clock = m_config.m_tx_clock;
+	m_tx_counter = 0;
+	m_rx_counter = 0;
+	m_rx_timer = timer_alloc(&m_machine, receive_event_callback, (void *)this);
+	m_tx_timer = timer_alloc(&m_machine, transmit_event_callback, (void *)this);
+	m_first_reset = 1;
+	m_status_read = 0;
+	m_brk = 0;
+
+	timer_reset(m_rx_timer, attotime_never);
+	timer_reset(m_tx_timer, attotime_never);
+
+	state_save_register_device_item(this, 0, m_ctrl);
+	state_save_register_device_item(this, 0, m_status);
+	state_save_register_device_item(this, 0, m_rx_clock);
+	state_save_register_device_item(this, 0, m_tx_clock);
+	state_save_register_device_item(this, 0, m_rx_counter);
+	state_save_register_device_item(this, 0, m_tx_counter);
+	state_save_register_device_item(this, 0, m_rx_shift);
+	state_save_register_device_item(this, 0, m_tx_shift);
+	state_save_register_device_item(this, 0, m_rdr);
+	state_save_register_device_item(this, 0, m_tdr);
+	state_save_register_device_item(this, 0, m_rx_bits);
+	state_save_register_device_item(this, 0, m_tx_bits);
+	state_save_register_device_item(this, 0, m_rx_parity);
+	state_save_register_device_item(this, 0, m_tx_parity);
+	state_save_register_device_item(this, 0, m_tx_int);
+
+	state_save_register_device_item(this, 0, m_divide);
+	state_save_register_device_item(this, 0, m_overrun);
+	state_save_register_device_item(this, 0, m_reset);
+	state_save_register_device_item(this, 0, m_first_reset);
+	state_save_register_device_item(this, 0, m_rts);
+	state_save_register_device_item(this, 0, m_brk);
+	state_save_register_device_item(this, 0, m_status_read);
+}
+
 
 /*-------------------------------------------------
     DEVICE_RESET( acia6850 )
 -------------------------------------------------*/
 
-static DEVICE_RESET( acia6850 )
+void acia6850_device::device_reset()
 {
-	acia6850_t *acia_p = get_token(device);
+	int cts = devcb_call_read_line(&m_in_cts_func);
+	int dcd = devcb_call_read_line(&m_in_dcd_func);
 
-	int cts = devcb_call_read_line(&acia_p->in_cts_func);
-	int dcd = devcb_call_read_line(&acia_p->in_dcd_func);
-
-	acia_p->status = (cts << 3) | (dcd << 2) | ACIA6850_STATUS_TDRE;
-	acia_p->tdr = 0;
-	acia_p->rdr = 0;
-	acia_p->tx_shift = 0;
-	acia_p->rx_shift = 0;
-	acia_p->tx_counter = 0;
-	acia_p->rx_counter = 0;
+	m_status = (cts << 3) | (dcd << 2) | ACIA6850_STATUS_TDRE;
+	m_tdr = 0;
+	m_rdr = 0;
+	m_tx_shift = 0;
+	m_rx_shift = 0;
+	m_tx_counter = 0;
+	m_rx_counter = 0;
 
 	TXD(1);
-	acia_p->overrun = 0;
-	acia_p->status_read = 0;
-	acia_p->brk = 0;
+	m_overrun = 0;
+	m_status_read = 0;
+	m_brk = 0;
 
-	acia_p->rx_state = START;
-	acia_p->tx_state = START;
-	acia_p->irq = 0;
+	m_rx_state = START;
+	m_tx_state = START;
+	m_irq = 0;
 
-	devcb_call_write_line(&acia_p->out_irq_func, 1);
+	devcb_call_write_line(&m_out_irq_func, 1);
 
-	if (acia_p->first_reset)
+	if (m_first_reset)
 	{
-		acia_p->first_reset = 0;
+		m_first_reset = 0;
 
 		RTS(1);
 	}
 	else
 	{
-		RTS(acia_p->rts);
+		RTS(m_rts);
 	}
 }
 
-
-
-/*-------------------------------------------------
-    DEVICE_START( acia6850 )
--------------------------------------------------*/
-
-static DEVICE_START( acia6850 )
-{
-	acia6850_t *acia_p = get_token(device);
-	acia6850_interface *intf = get_interface(device);
-
-	/* resolve callbacks */
-	devcb_resolve_read_line(&acia_p->in_rx_func, &intf->in_rx_func, device);
-	devcb_resolve_write_line(&acia_p->out_tx_func, &intf->out_tx_func, device);
-	devcb_resolve_read_line(&acia_p->in_cts_func, &intf->in_cts_func, device);
-	devcb_resolve_write_line(&acia_p->out_rts_func, &intf->out_rts_func, device);
-	devcb_resolve_read_line(&acia_p->in_dcd_func, &intf->in_dcd_func, device);
-	devcb_resolve_write_line(&acia_p->out_irq_func, &intf->out_irq_func, device);
-
-	acia_p->rx_clock = intf->rx_clock;
-	acia_p->tx_clock = intf->tx_clock;
-	acia_p->tx_counter = 0;
-	acia_p->rx_counter = 0;
-	acia_p->rx_timer = timer_alloc(device->machine, receive_event, (void *) device);
-	acia_p->tx_timer = timer_alloc(device->machine, transmit_event, (void *) device);
-	acia_p->first_reset = 1;
-	acia_p->status_read = 0;
-	acia_p->brk = 0;
-
-	timer_reset(acia_p->rx_timer, attotime_never);
-	timer_reset(acia_p->tx_timer, attotime_never);
-
-	state_save_register_device_item(device, 0, acia_p->ctrl);
-	state_save_register_device_item(device, 0, acia_p->status);
-	state_save_register_device_item(device, 0, acia_p->rx_clock);
-	state_save_register_device_item(device, 0, acia_p->tx_clock);
-	state_save_register_device_item(device, 0, acia_p->rx_counter);
-	state_save_register_device_item(device, 0, acia_p->tx_counter);
-	state_save_register_device_item(device, 0, acia_p->rx_shift);
-	state_save_register_device_item(device, 0, acia_p->tx_shift);
-	state_save_register_device_item(device, 0, acia_p->rdr);
-	state_save_register_device_item(device, 0, acia_p->tdr);
-	state_save_register_device_item(device, 0, acia_p->rx_bits);
-	state_save_register_device_item(device, 0, acia_p->tx_bits);
-	state_save_register_device_item(device, 0, acia_p->rx_parity);
-	state_save_register_device_item(device, 0, acia_p->tx_parity);
-	state_save_register_device_item(device, 0, acia_p->tx_int);
-
-	state_save_register_device_item(device, 0, acia_p->divide);
-	state_save_register_device_item(device, 0, acia_p->overrun);
-	state_save_register_device_item(device, 0, acia_p->reset);
-	state_save_register_device_item(device, 0, acia_p->first_reset);
-	state_save_register_device_item(device, 0, acia_p->rts);
-	state_save_register_device_item(device, 0, acia_p->brk);
-	state_save_register_device_item(device, 0, acia_p->status_read);
-}
 
 
 /*-------------------------------------------------
     acia6850_stat_r - Read Status Register
 -------------------------------------------------*/
 
-READ8_DEVICE_HANDLER( acia6850_stat_r )
+READ8_DEVICE_HANDLER_TRAMPOLINE(acia6850, acia6850_stat_r)
 {
 	UINT8 status;
 
-	acia6850_t *acia_p = get_token(device);
-
-	acia_p->status_read = 1;
-	status = acia_p->status;
+	m_status_read = 1;
+	status = m_status;
 
 	if (status & ACIA6850_STATUS_CTS)
+	{
 		status &= ~ACIA6850_STATUS_TDRE;
+	}
 
 	return status;
 }
@@ -277,10 +215,8 @@ READ8_DEVICE_HANDLER( acia6850_stat_r )
     acia6850_ctrl_w - Write Control Register
 -------------------------------------------------*/
 
-WRITE8_DEVICE_HANDLER( acia6850_ctrl_w )
+WRITE8_DEVICE_HANDLER_TRAMPOLINE(acia6850, acia6850_ctrl_w )
 {
-	acia6850_t *acia_p = get_token(device);
-
 	int wordsel;
 	int divide;
 
@@ -290,109 +226,107 @@ WRITE8_DEVICE_HANDLER( acia6850_ctrl_w )
 
 	if (divide == 3)
 	{
-		acia_p->reset = 1;
-		device->reset();
+		m_reset = 1;
+		device_reset();
 	}
 	else
 	{
-		acia_p->reset = 0;
-		acia_p->divide = ACIA6850_DIVIDE[divide];
+		m_reset = 0;
+		m_divide = ACIA6850_DIVIDE[divide];
 	}
 
 	// Word Select Bits
 
 	wordsel = (data & CR4_2) >> 2;
 
-	acia_p->bits = ACIA6850_WORD[wordsel][0];
-	acia_p->parity = (parity_type)ACIA6850_WORD[wordsel][1];
-	acia_p->stopbits = ACIA6850_WORD[wordsel][2];
+	m_bits = ACIA6850_WORD[wordsel][0];
+	m_parity = (parity_type)ACIA6850_WORD[wordsel][1];
+	m_stopbits = ACIA6850_WORD[wordsel][2];
 
 	// Transmitter Control Bits
 
 	switch ((data & CR6_5) >> 5)
 	{
 	case 0:
-		acia_p->rts = 0;
-		RTS(acia_p->rts);
+		m_rts = 0;
+		RTS(m_rts);
 
-		acia_p->tx_int = 0;
-		acia_p->brk = 0;
+		m_tx_int = 0;
+		m_brk = 0;
 		break;
 
 	case 1:
-		acia_p->rts = 0;
-		RTS(acia_p->rts);
+		m_rts = 0;
+		RTS(m_rts);
 
-		acia_p->tx_int = 1;
-		acia_p->brk = 0;
+		m_tx_int = 1;
+		m_brk = 0;
 		break;
 
 	case 2:
-		acia_p->rts = 1;
-		RTS(acia_p->rts);
+		m_rts = 1;
+		RTS(m_rts);
 
-		acia_p->tx_int = 0;
-		acia_p->brk = 0;
+		m_tx_int = 0;
+		m_brk = 0;
 		break;
 
 	case 3:
-		acia_p->rts = 0;
-		RTS(acia_p->rts);
+		m_rts = 0;
+		RTS(m_rts);
 
-		acia_p->tx_int = 0;
-		acia_p->brk = 1;
+		m_tx_int = 0;
+		m_brk = 1;
 		break;
 	}
 
-	acia6850_check_interrupts(device);
+	check_interrupts();
 
 	// After writing the word type, set the rx/tx clocks (provided the divide values have changed)
 
-	if ((acia_p->ctrl ^ data) & CR1_0)
+	if ((m_ctrl ^ data) & CR1_0)
 	{
-		if (!acia_p->reset)
+		if (!m_reset)
 		{
-			if (acia_p->rx_clock)
+			if (m_rx_clock)
 			{
-				attotime rx_period = attotime_mul(ATTOTIME_IN_HZ(acia_p->rx_clock), acia_p->divide);
-				timer_adjust_periodic(acia_p->rx_timer, rx_period, 0, rx_period);
+				attotime rx_period = attotime_mul(ATTOTIME_IN_HZ(m_rx_clock), m_divide);
+				timer_adjust_periodic(m_rx_timer, rx_period, 0, rx_period);
 			}
 
-			if (acia_p->tx_clock)
+			if (m_tx_clock)
 			{
-				attotime tx_period = attotime_mul(ATTOTIME_IN_HZ(acia_p->tx_clock), acia_p->divide);
-				timer_adjust_periodic(acia_p->tx_timer, tx_period, 0, tx_period);
+				attotime tx_period = attotime_mul(ATTOTIME_IN_HZ(m_tx_clock), m_divide);
+				timer_adjust_periodic(m_tx_timer, tx_period, 0, tx_period);
 			}
 		}
 	}
-	acia_p->ctrl = data;
+	m_ctrl = data;
 }
 
 
 /*-------------------------------------------------
-    acia6850_check_interrupts
+    check_interrupts
 -------------------------------------------------*/
 
-static void acia6850_check_interrupts(running_device *device)
+void acia6850_device::check_interrupts()
 {
-	acia6850_t *acia_p = get_token(device);
+	int irq = (m_tx_int && (m_status & ACIA6850_STATUS_TDRE) && (~m_status & ACIA6850_STATUS_CTS)) ||
+		((m_ctrl & 0x80) && ((m_status & (ACIA6850_STATUS_RDRF|ACIA6850_STATUS_DCD)) || m_overrun));
 
-	int irq = (acia_p->tx_int && (acia_p->status & ACIA6850_STATUS_TDRE) && (~acia_p->status & ACIA6850_STATUS_CTS)) ||
-		((acia_p->ctrl & 0x80) && ((acia_p->status & (ACIA6850_STATUS_RDRF|ACIA6850_STATUS_DCD)) || acia_p->overrun));
-
-	if (irq != acia_p->irq)
+	if (irq != m_irq)
 	{
-		acia_p->irq = irq;
+		m_irq = irq;
 
 		if (irq)
 		{
-			acia_p->status |= ACIA6850_STATUS_IRQ;
-			devcb_call_write_line(&acia_p->out_irq_func, 0);
+			m_status |= ACIA6850_STATUS_IRQ;
+			devcb_call_write_line(&m_out_irq_func, 0);
 		}
 		else
 		{
-			acia_p->status &= ~ACIA6850_STATUS_IRQ;
-			devcb_call_write_line(&acia_p->out_irq_func, 1);
+			m_status &= ~ACIA6850_STATUS_IRQ;
+			devcb_call_write_line(&m_out_irq_func, 1);
 		}
 	}
 }
@@ -402,19 +336,17 @@ static void acia6850_check_interrupts(running_device *device)
     acia6850_data_w - Write transmit register
 -------------------------------------------------*/
 
-WRITE8_DEVICE_HANDLER( acia6850_data_w )
+WRITE8_DEVICE_HANDLER_TRAMPOLINE(acia6850, acia6850_data_w)
 {
-	acia6850_t *acia_p = get_token(device);
-
-	if (!acia_p->reset)
+	if (!m_reset)
 	{
-		acia_p->tdr = data;
-		acia_p->status &= ~ACIA6850_STATUS_TDRE;
-		acia6850_check_interrupts(device);
+		m_tdr = data;
+		m_status &= ~ACIA6850_STATUS_TDRE;
+		check_interrupts();
 	}
 	else
 	{
-		logerror("%s:ACIA %p: Data write while in reset!\n", cpuexec_describe_context(device->machine), device);
+		logerror("%s:ACIA %p: Data write while in reset!\n", cpuexec_describe_context(&m_machine), this);
 	}
 }
 
@@ -423,34 +355,32 @@ WRITE8_DEVICE_HANDLER( acia6850_data_w )
     acia6850_data_r - Read character
 -------------------------------------------------*/
 
-READ8_DEVICE_HANDLER( acia6850_data_r )
+READ8_DEVICE_HANDLER_TRAMPOLINE(acia6850, acia6850_data_r)
 {
-	acia6850_t *acia_p = get_token(device);
+	m_status &= ~(ACIA6850_STATUS_RDRF | ACIA6850_STATUS_IRQ | ACIA6850_STATUS_PE);
 
-	acia_p->status &= ~(ACIA6850_STATUS_RDRF | ACIA6850_STATUS_IRQ | ACIA6850_STATUS_PE);
-
-	if (acia_p->status_read)
+	if (m_status_read)
 	{
-		int dcd = devcb_call_read_line(&acia_p->in_dcd_func);
+		int dcd = devcb_call_read_line(&m_in_dcd_func);
 
-		acia_p->status_read = 0;
-		acia_p->status &= ~(ACIA6850_STATUS_OVRN | ACIA6850_STATUS_DCD);
+		m_status_read = 0;
+		m_status &= ~(ACIA6850_STATUS_OVRN | ACIA6850_STATUS_DCD);
 
 		if (dcd)
 		{
-			acia_p->status |= ACIA6850_STATUS_DCD;
+			m_status |= ACIA6850_STATUS_DCD;
 		}
 	}
 
-	if (acia_p->overrun == 1)
+	if (m_overrun == 1)
 	{
-		acia_p->status |= ACIA6850_STATUS_OVRN;
-		acia_p->overrun = 0;
+		m_status |= ACIA6850_STATUS_OVRN;
+		m_overrun = 0;
 	}
 
-	acia6850_check_interrupts(device);
+	check_interrupts();
 
-	return acia_p->rdr;
+	return m_rdr;
 }
 
 
@@ -458,15 +388,13 @@ READ8_DEVICE_HANDLER( acia6850_data_r )
     tx_tick - Transmit a bit
 -------------------------------------------------*/
 
-static void tx_tick(running_device *device)
+void acia6850_device::tx_tick()
 {
-	acia6850_t *acia_p = get_token(device);
-
-	switch (acia_p->tx_state)
+	switch (m_tx_state)
 	{
 		case START:
 		{
-			if (acia_p->brk)
+			if (m_brk)
 			{
 				// transmit break
 
@@ -474,16 +402,20 @@ static void tx_tick(running_device *device)
 			}
 			else
 			{
-				int _cts = devcb_call_read_line(&acia_p->in_cts_func);
+				int _cts = devcb_call_read_line(&m_in_cts_func);
 
 				if (_cts)
-					acia_p->status |= ACIA6850_STATUS_CTS;
+				{
+					m_status |= ACIA6850_STATUS_CTS;
+				}
 				else
-					acia_p->status &= ~ACIA6850_STATUS_CTS;
+				{
+					m_status &= ~ACIA6850_STATUS_CTS;
+				}
 
-				acia6850_check_interrupts(device);
+				check_interrupts();
 
-				if (acia_p->status & ACIA6850_STATUS_TDRE)
+				if (m_status & ACIA6850_STATUS_TDRE)
 				{
 					// transmitter idle
 					TXD(1);
@@ -492,42 +424,48 @@ static void tx_tick(running_device *device)
 				{
 					// transmit character
 
-					//logerror("ACIA6850 #%u: TX DATA %x\n", which, acia_p->tdr);
+					//logerror("ACIA6850 #%u: TX DATA %x\n", which, m_tdr);
 					//logerror("ACIA6850 #%u: TX START BIT\n", which);
 
 					TXD(0);
 
-					acia_p->tx_bits = acia_p->bits;
-					acia_p->tx_shift = acia_p->tdr;
-					acia_p->tx_parity = 0;
-					acia_p->tx_state = DATA;
+					m_tx_bits = m_bits;
+					m_tx_shift = m_tdr;
+					m_tx_parity = 0;
+					m_tx_state = DATA;
 				}
 			}
 			break;
 		}
 		case DATA:
 		{
-			int val = acia_p->tx_shift & 1;
+			int val = m_tx_shift & 1;
 			//logerror("ACIA6850 #%u: TX DATA BIT %x\n", which, val);
 
 			TXD(val);
-			acia_p->tx_parity ^= val;
-			acia_p->tx_shift >>= 1;
+			m_tx_parity ^= val;
+			m_tx_shift >>= 1;
 
-			if (--(acia_p->tx_bits) == 0)
-				acia_p->tx_state = (acia_p->parity == NONE) ? STOP : PARITY;
+			if (--(m_tx_bits) == 0)
+			{
+				m_tx_state = (m_parity == NONE) ? STOP : PARITY;
+			}
 
 			break;
 		}
 		case PARITY:
 		{
-			if (acia_p->parity == EVEN)
-				TXD((acia_p->tx_parity & 1) ? 1 : 0);
+			if (m_parity == EVEN)
+			{
+				TXD((m_tx_parity & 1) ? 1 : 0);
+			}
 			else
-				TXD((acia_p->tx_parity & 1) ? 0 : 1);
+			{
+				TXD((m_tx_parity & 1) ? 0 : 1);
+			}
 
-			//logerror("ACIA6850 #%u: TX PARITY BIT %x\n", which, *acia_p->tx_pin);
-			acia_p->tx_state = STOP;
+			//logerror("ACIA6850 #%u: TX PARITY BIT %x\n", which, *m_tx_pin);
+			m_tx_state = STOP;
 			break;
 		}
 		case STOP:
@@ -535,14 +473,14 @@ static void tx_tick(running_device *device)
 			//logerror("ACIA6850 #%u: TX STOP BIT\n", which);
 			TXD(1);
 
-			if (acia_p->stopbits == 1)
+			if (m_stopbits == 1)
 			{
-				acia_p->tx_state = START;
-				acia_p->status |= ACIA6850_STATUS_TDRE;
+				m_tx_state = START;
+				m_status |= ACIA6850_STATUS_TDRE;
 			}
 			else
 			{
-				acia_p->tx_state = STOP2;
+				m_tx_state = STOP2;
 			}
 			break;
 		}
@@ -550,8 +488,8 @@ static void tx_tick(running_device *device)
 		{
 			//logerror("ACIA6850 #%u: TX STOP BIT\n", which);
 			TXD(1);
-			acia_p->tx_state = START;
-			acia_p->status |= ACIA6850_STATUS_TDRE;
+			m_tx_state = START;
+			m_status |= ACIA6850_STATUS_TDRE;
 			break;
 		}
 	}
@@ -559,39 +497,43 @@ static void tx_tick(running_device *device)
 
 
 /*-------------------------------------------------
-    TIMER_CALLBACK( transmit_event )
+    transmit_event
 -------------------------------------------------*/
 
-static TIMER_CALLBACK( transmit_event )
+TIMER_CALLBACK( acia6850_device::transmit_event_callback ) { reinterpret_cast<acia6850_device *>(ptr)->transmit_event(); }
+
+void acia6850_device::transmit_event()
 {
-	running_device *device = (running_device *)ptr;
-	acia6850_t *acia_p = get_token(device);
-	tx_tick(device);
-	acia_p->tx_counter = 0;
+	tx_tick();
+	m_tx_counter = 0;
 }
 
 
 /*-------------------------------------------------
-    acia6850_tx_clock_in - As above, but using the tx pin
+    tx_clock_in - As above, but using the tx pin
 -------------------------------------------------*/
 
-void acia6850_tx_clock_in(running_device *device)
-{
-	acia6850_t *acia_p = get_token(device);
+void acia6850_tx_clock_in(running_device *device) { downcast<acia6850_device*>(device)->tx_clock_in(); }
 
-	int _cts = devcb_call_read_line(&acia_p->in_cts_func);
+void acia6850_device::tx_clock_in()
+{
+	int _cts = devcb_call_read_line(&m_in_cts_func);
 
 	if (_cts)
-		acia_p->status |= ACIA6850_STATUS_CTS;
-	else
-		acia_p->status &= ~ACIA6850_STATUS_CTS;
-
-	acia_p->tx_counter ++;
-
-	if ( acia_p->tx_counter > acia_p->divide-1)
 	{
-		tx_tick(device);
-		acia_p->tx_counter = 0;
+		m_status |= ACIA6850_STATUS_CTS;
+	}
+	else
+	{
+		m_status &= ~ACIA6850_STATUS_CTS;
+	}
+
+	m_tx_counter ++;
+
+	if ( m_tx_counter > m_divide - 1)
+	{
+		tx_tick();
+		m_tx_counter = 0;
 	}
 
 }
@@ -601,87 +543,85 @@ void acia6850_tx_clock_in(running_device *device)
     rx_tick - Receive a bit
 -------------------------------------------------*/
 
-static void rx_tick(running_device *device)
+void acia6850_device::rx_tick()
 {
-	acia6850_t *acia_p = get_token(device);
-
-	int dcd = devcb_call_read_line(&acia_p->in_dcd_func);
+	int dcd = devcb_call_read_line(&m_in_dcd_func);
 
 	if (dcd)
 	{
-		acia_p->status |= ACIA6850_STATUS_DCD;
-		acia6850_check_interrupts(device);
+		m_status |= ACIA6850_STATUS_DCD;
+		check_interrupts();
 	}
-	else if ((acia_p->status & (ACIA6850_STATUS_DCD|ACIA6850_STATUS_IRQ)) == ACIA6850_STATUS_DCD)
+	else if ((m_status & (ACIA6850_STATUS_DCD | ACIA6850_STATUS_IRQ)) == ACIA6850_STATUS_DCD)
 	{
-		acia_p->status &= ~ACIA6850_STATUS_DCD;
+		m_status &= ~ACIA6850_STATUS_DCD;
 	}
 
-	if (acia_p->status & ACIA6850_STATUS_DCD)
+	if (m_status & ACIA6850_STATUS_DCD)
 	{
-		acia_p->rx_state = START;
+		m_rx_state = START;
 	}
 	else
 	{
-		int rxd = devcb_call_read_line(&acia_p->in_rx_func);
+		int rxd = devcb_call_read_line(&m_in_rx_func);
 
-		switch (acia_p->rx_state)
+		switch (m_rx_state)
 		{
 			case START:
 			{
 				if (rxd == 0)
 				{
 					//logerror("ACIA6850 #%u: RX START BIT\n", which);
-					acia_p->rx_shift = 0;
-					acia_p->rx_parity = 0;
-					acia_p->rx_bits = acia_p->bits;
-					acia_p->rx_state = DATA;
+					m_rx_shift = 0;
+					m_rx_parity = 0;
+					m_rx_bits = m_bits;
+					m_rx_state = DATA;
 				}
 				break;
 			}
 			case DATA:
 			{
 				//logerror("ACIA6850 #%u: RX DATA BIT %x\n", which, rxd);
-				acia_p->rx_shift |= rxd ? 0x80 : 0;
-				acia_p->rx_parity ^= rxd;
+				m_rx_shift |= rxd ? 0x80 : 0;
+				m_rx_parity ^= rxd;
 
-				if (--acia_p->rx_bits == 0)
+				if (--m_rx_bits == 0)
 				{
-					if (acia_p->status & ACIA6850_STATUS_RDRF)
+					if (m_status & ACIA6850_STATUS_RDRF)
 					{
-						acia_p->overrun = 1;
-						acia6850_check_interrupts(device);
+						m_overrun = 1;
+						check_interrupts();
 					}
 
-					acia_p->rx_state = acia_p->parity == NONE ? STOP : PARITY;
+					m_rx_state = m_parity == NONE ? STOP : PARITY;
 				}
 				else
 				{
-					acia_p->rx_shift >>= 1;
+					m_rx_shift >>= 1;
 				}
 				break;
 			}
 			case PARITY:
 			{
 				//logerror("ACIA6850 #%u: RX PARITY BIT %x\n", which, rxd);
-				acia_p->rx_parity ^= rxd;
+				m_rx_parity ^= rxd;
 
-				if (acia_p->parity == EVEN)
+				if (m_parity == EVEN)
 				{
-					if (acia_p->rx_parity)
+					if (m_rx_parity)
 					{
-						acia_p->status |= ACIA6850_STATUS_PE;
+						m_status |= ACIA6850_STATUS_PE;
 					}
 				}
 				else
 				{
-					if (!acia_p->rx_parity)
+					if (!m_rx_parity)
 					{
-						acia_p->status |= ACIA6850_STATUS_PE;
+						m_status |= ACIA6850_STATUS_PE;
 					}
 				}
 
-				acia_p->rx_state = STOP;
+				m_rx_state = STOP;
 				break;
 			}
 			case STOP:
@@ -689,29 +629,29 @@ static void rx_tick(running_device *device)
 				if (rxd == 1)
 				{
 					//logerror("ACIA6850 #%u: RX STOP BIT\n", which);
-					if (acia_p->stopbits == 1)
+					if (m_stopbits == 1)
 					{
-						acia_p->status &= ~ACIA6850_STATUS_FE;
+						m_status &= ~ACIA6850_STATUS_FE;
 
-						if (!(acia_p->status & ACIA6850_STATUS_RDRF))
+						if (!(m_status & ACIA6850_STATUS_RDRF))
 						{
-							//logerror("ACIA6850 #%u: RX DATA %x\n", which, acia_p->rx_shift);
-							acia_p->rdr = acia_p->rx_shift;
-							acia_p->status |= ACIA6850_STATUS_RDRF;
-							acia6850_check_interrupts(device);
+							//logerror("ACIA6850 #%u: RX DATA %x\n", which, m_rx_shift);
+							m_rdr = m_rx_shift;
+							m_status |= ACIA6850_STATUS_RDRF;
+							check_interrupts();
 						}
 
-						acia_p->rx_state = START;
+						m_rx_state = START;
 					}
 					else
 					{
-						acia_p->rx_state = STOP2;
+						m_rx_state = STOP2;
 					}
 				}
 				else
 				{
-					acia_p->status |= ACIA6850_STATUS_FE;
-					acia_p->rx_state = START;
+					m_status |= ACIA6850_STATUS_FE;
+					m_rx_state = START;
 				}
 				break;
 			}
@@ -720,22 +660,22 @@ static void rx_tick(running_device *device)
 				if (rxd == 1)
 				{
 					//logerror("ACIA6850 #%u: RX STOP BIT\n", which);
-					acia_p->status &= ~ACIA6850_STATUS_FE;
+					m_status &= ~ACIA6850_STATUS_FE;
 
-					if (!(acia_p->status & ACIA6850_STATUS_RDRF))
+					if (!(m_status & ACIA6850_STATUS_RDRF))
 					{
-						//logerror("ACIA6850 #%u: RX DATA %x\n", which, acia_p->rx_shift);
-						acia_p->rdr = acia_p->rx_shift;
-						acia_p->status |= ACIA6850_STATUS_RDRF;
-						acia6850_check_interrupts(device);
+						//logerror("ACIA6850 #%u: RX DATA %x\n", which, m_rx_shift);
+						m_rdr = m_rx_shift;
+						m_status |= ACIA6850_STATUS_RDRF;
+						check_interrupts();
 					}
 
-					acia_p->rx_state = START;
+					m_rx_state = START;
 				}
 				else
 				{
-					acia_p->status |= ACIA6850_STATUS_FE;
-					acia_p->rx_state = START;
+					m_status |= ACIA6850_STATUS_FE;
+					m_rx_state = START;
 				}
 				break;
 			}
@@ -745,45 +685,45 @@ static void rx_tick(running_device *device)
 
 
 /*-------------------------------------------------
-    TIMER_CALLBACK( receive_event ) - Called on
-    receive timer event
+    TIMER_CALLBACK( receive_event_callback ) -
+    Called on receive timer event
 -------------------------------------------------*/
 
-static TIMER_CALLBACK( receive_event )
+TIMER_CALLBACK( acia6850_device::receive_event_callback ) { reinterpret_cast<acia6850_device *>(ptr)->receive_event(); }
+
+void acia6850_device::receive_event()
 {
-	running_device *device = (running_device *)ptr;
-	acia6850_t *acia_p = get_token(device);
-	rx_tick(device);
-	acia_p->rx_counter = 0;
+	rx_tick();
+	m_rx_counter = 0;
 }
 
 
 /*-------------------------------------------------
-    acia6850_rx_clock_in - As above, but using the rx pin
+    rx_clock_in - As above, but using the rx pin
 -------------------------------------------------*/
 
-void acia6850_rx_clock_in(running_device *device)
-{
-	acia6850_t *acia_p = get_token(device);
+void acia6850_rx_clock_in(running_device *device) { downcast<acia6850_device*>(device)->rx_clock_in(); }
 
-	int dcd = devcb_call_read_line(&acia_p->in_dcd_func);
+void acia6850_device::rx_clock_in()
+{
+	int dcd = devcb_call_read_line(&m_in_dcd_func);
 
 	if (dcd)
 	{
-		acia_p->status |= ACIA6850_STATUS_DCD;
-		acia6850_check_interrupts(device);
+		m_status |= ACIA6850_STATUS_DCD;
+		check_interrupts();
 	}
-	else if ((acia_p->status & (ACIA6850_STATUS_DCD|ACIA6850_STATUS_IRQ)) == ACIA6850_STATUS_DCD)
+	else if ((m_status & (ACIA6850_STATUS_DCD|ACIA6850_STATUS_IRQ)) == ACIA6850_STATUS_DCD)
 	{
-		acia_p->status &= ~ACIA6850_STATUS_DCD;
+		m_status &= ~ACIA6850_STATUS_DCD;
 	}
 
-	acia_p->rx_counter ++;
+	m_rx_counter ++;
 
-	if ( acia_p->rx_counter > acia_p->divide-1)
+	if ( m_rx_counter > m_divide - 1)
 	{
-		rx_tick(device);
-		acia_p->rx_counter = 0;
+		rx_tick();
+		m_rx_counter = 0;
 	}
 }
 
@@ -795,8 +735,7 @@ void acia6850_rx_clock_in(running_device *device)
 
 void acia6850_set_rx_clock(running_device *device, int clock)
 {
-	acia6850_t *acia_p = get_token(device);
-	acia_p->rx_clock = clock;
+	downcast<acia6850_device*>(device)->set_rx_clock(clock);
 }
 
 
@@ -807,35 +746,5 @@ void acia6850_set_rx_clock(running_device *device, int clock)
 
 void acia6850_set_tx_clock(running_device *device, int clock)
 {
-	acia6850_t *acia_p = get_token(device);
-	acia_p->tx_clock = clock;
+	downcast<acia6850_device*>(device)->set_tx_clock(clock);
 }
-
-
-/*-------------------------------------------------
-    DEVICE_GET_INFO( acia6850 )
--------------------------------------------------*/
-
-DEVICE_GET_INFO( acia6850 )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(acia6850_t);					break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = 0;									break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(acia6850);		break;
-		case DEVINFO_FCT_STOP:							/* Nothing */									break;
-		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(acia6850);		break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "6850 ACIA");					break;
-		case DEVINFO_STR_FAMILY:						strcpy(info->s, "6850 ACIA");					break;
-		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");							break;
-		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);						break;
-		case DEVINFO_STR_CREDITS:						/* Nothing */									break;
-	}
-}
-
-DEFINE_LEGACY_DEVICE(ACIA6850, acia6850);
