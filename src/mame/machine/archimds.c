@@ -119,7 +119,7 @@ static TIMER_CALLBACK( vidc_video_tick )
 	static UINT8 *vram = memory_region(machine,"vram");
 	UINT32 size;
 
-	size = vidc_vidend-vidc_vidstart;
+	size = vidc_vidend-vidc_vidstart+0x10;
 
 	for(vidc_vidcur = 0;vidc_vidcur < size;vidc_vidcur++)
 		vram[vidc_vidcur] = (space->read_byte(vidc_vidstart+vidc_vidcur+vidc_vidinit));
