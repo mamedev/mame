@@ -1069,6 +1069,8 @@ const game_driver * const drivers[] =
 	DRIVER( dkongjo )	/* (c) 1981 Nintendo */
 	DRIVER( dkongjo1 )	/* (c) 1981 Nintendo */
 	DRIVER( dkongf )	/* hack from Jeff's Romhack */
+	DRIVER( dkongx )	/* hack */
+	DRIVER( dkongx11 )	/* hack */
 	DRIVER( dkongjr )	/* (c) 1982 Nintendo of America */
 	DRIVER( dkongjrj )	/* (c) 1982 Nintendo */
 	DRIVER( dkongjnrj )	/* (c) 1982 Nintendo */
