@@ -7,7 +7,6 @@
 
 	original driver by Tomasz Slanina, Steve Ellenoff, Nicola Salmoria
 	rewrite to use AA functions by R.Belmont & Angelo Salese
-	special thanks to Tom Walker (author of the Acorn Archimedes Arculator emulator)
 
 	TODO (specific issues only):
 	- Sound is currently ugly in both games, recognizable but still nowhere near perfection
@@ -194,7 +193,7 @@ static MACHINE_START( ertictac )
 	archimedes_init(machine);
 
 	// reset the DAC to centerline
-	dac_signed_data_w(machine->device("dac"), 0x80);
+	//dac_signed_data_w(machine->device("dac"), 0x80);
 }
 
 static MACHINE_RESET( ertictac )
@@ -208,8 +207,8 @@ static INTERRUPT_GEN( ertictac_podule_irq )
 }
 
 /* TODO: Are we sure that this HW have I2C device? */
-#define	NVRAM_SIZE 1024
-#define	NVRAM_PAGE_SIZE	16	/* max size of one write request */
+#define	NVRAM_SIZE 256
+#define	NVRAM_PAGE_SIZE	0	/* max size of one write request */
 
 static const i2cmem_interface i2cmem_interface =
 {
@@ -240,8 +239,29 @@ static MACHINE_DRIVER_START( ertictac )
 	MDRV_VIDEO_UPDATE(archimds_vidc)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MDRV_SOUND_ADD("dac0", DAC, 0)
+	MDRV_SOUND_ROUTE(0, "mono", 0.10)
+
+	MDRV_SOUND_ADD("dac1", DAC, 0)
+	MDRV_SOUND_ROUTE(0, "mono", 0.10)
+
+	MDRV_SOUND_ADD("dac2", DAC, 0)
+	MDRV_SOUND_ROUTE(0, "mono", 0.10)
+
+	MDRV_SOUND_ADD("dac3", DAC, 0)
+	MDRV_SOUND_ROUTE(0, "mono", 0.10)
+
+	MDRV_SOUND_ADD("dac4", DAC, 0)
+	MDRV_SOUND_ROUTE(0, "mono", 0.10)
+
+	MDRV_SOUND_ADD("dac5", DAC, 0)
+	MDRV_SOUND_ROUTE(0, "mono", 0.10)
+
+	MDRV_SOUND_ADD("dac6", DAC, 0)
+	MDRV_SOUND_ROUTE(0, "mono", 0.10)
+
+	MDRV_SOUND_ADD("dac7", DAC, 0)
+	MDRV_SOUND_ROUTE(0, "mono", 0.10)
 MACHINE_DRIVER_END
 
 ROM_START( ertictac )

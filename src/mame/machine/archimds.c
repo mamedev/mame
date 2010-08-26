@@ -54,6 +54,9 @@ UINT32 vidc_regs[256];
 UINT8 ioc_regs[0x80/4];
 UINT8 vidc_bpp_mode;
 UINT8 vidc_interlace;
+static UINT8 vidc_pixel_clk;
+static const UINT32 pixel_rate[4] = { 8000000, 12000000, 16000000, 24000000};
+static UINT8 vidc_stereo_reg[8];
 
 static emu_timer *timer[4], *snd_timer, *vid_timer;
 emu_timer  *vbl_timer;
@@ -134,15 +137,25 @@ static TIMER_CALLBACK( vidc_video_tick )
 static TIMER_CALLBACK( vidc_audio_tick )
 {
 	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	UINT8 ulaw_comp;
 	INT16 res;
+	UINT8 ch;
+	static const char *const dac_port[8] = { "dac0", "dac1", "dac2", "dac3", "dac4", "dac5", "dac6", "dac7" };
 
-	res = (space->read_word(vidc_sndstart+vidc_sndcur));
+	for(ch=0;ch<8;ch++)
+	{
+		ulaw_comp = (space->read_byte(vidc_sndstart+vidc_sndcur + ch));
 
-	dac_signed_data_w(space->machine->device("dac"), res);
+		res=1<<((ulaw_comp>>5)+4);
+    	res+=(((ulaw_comp>>1)&0xF)<<(ulaw_comp>>5));
+    	if (ulaw_comp&1) res=-res;
 
-	vidc_sndcur++;
+		dac_signed_data_16_w(space->machine->device(dac_port[ch & 7]), res);
+	}
 
-	if (vidc_sndcur >= (vidc_sndend-vidc_sndstart)+0x40)
+	vidc_sndcur+=8;
+
+	if (vidc_sndcur >= (vidc_sndend-vidc_sndstart)+0x10)
 	{
 		vidc_sndcur = 0;
 		archimedes_request_irq_b(machine, ARCHIMEDES_IRQB_SOUND_EMPTY);
@@ -150,7 +163,8 @@ static TIMER_CALLBACK( vidc_audio_tick )
 		if(!audio_dma_on)
 		{
 			timer_adjust_oneshot(snd_timer, attotime_never, 0);
-			dac_signed_data_16_w(space->machine->device("dac"), 0x8000);
+			for(ch=0;ch<8;ch++)
+				dac_signed_data_16_w(space->machine->device(dac_port[ch & 7]), 0x8000);
 		}
 	}
 }
@@ -693,6 +707,45 @@ READ32_HANDLER(archimedes_vidc_r)
 	return 0;
 }
 
+static void vidc_dynamic_res_change(running_machine *machine)
+{
+	/* sanity checks - first pass */
+	/*
+		total cycles + border end
+	*/
+	if(vidc_regs[VIDC_HCR] && vidc_regs[VIDC_HBER] &&
+	   vidc_regs[VIDC_VCR] && vidc_regs[VIDC_VBER])
+	{
+		/* sanity checks - second pass */
+		/*
+		total cycles >= border end >= border start
+		*/
+		if((vidc_regs[VIDC_HCR] >= vidc_regs[VIDC_HBER]) &&
+		   (vidc_regs[VIDC_HBER] >= vidc_regs[VIDC_HBSR]) &&
+		   (vidc_regs[VIDC_VCR] >= vidc_regs[VIDC_VBER]) &&
+		   (vidc_regs[VIDC_VBER] >= vidc_regs[VIDC_VBSR]))
+		{
+			rectangle visarea;
+			attoseconds_t refresh;
+
+			visarea.min_x = 0;
+			visarea.min_y = 0;
+			visarea.max_x = vidc_regs[VIDC_HBER] - vidc_regs[VIDC_HBSR] - 1;
+			visarea.max_y = vidc_regs[VIDC_VBER] - vidc_regs[VIDC_VBSR];
+
+			logerror("Configuring: htotal %d vtotal %d border %d x %d display %d x %d\n",
+				vidc_regs[VIDC_HCR], vidc_regs[VIDC_VCR],
+				visarea.max_x, visarea.max_y,
+				vidc_regs[VIDC_HDER]-vidc_regs[VIDC_HDSR],vidc_regs[VIDC_VDER]-vidc_regs[VIDC_VDSR]+1);
+
+			/* FIXME: pixel clock */
+			refresh = HZ_TO_ATTOSECONDS(pixel_rate[vidc_pixel_clk]*2) * vidc_regs[VIDC_HCR] * vidc_regs[VIDC_VCR];
+
+			machine->primary_screen->configure(vidc_regs[VIDC_HCR], vidc_regs[VIDC_VCR], visarea, refresh);
+		}
+	}
+}
+
 WRITE32_HANDLER(archimedes_vidc_w)
 {
 	UINT32 reg = data>>24;
@@ -753,6 +806,13 @@ WRITE32_HANDLER(archimedes_vidc_w)
 		}
 
 	}
+	else if (reg >= 0x60 && reg <= 0x7c)
+	{
+		vidc_stereo_reg[(reg >> 2) & 7] = val & 0x07;
+
+//		popmessage("%02x %02x %02x %02x %02x %02x %02x %02x",vidc_stereo_reg[0],vidc_stereo_reg[1],vidc_stereo_reg[2],vidc_stereo_reg[3]
+//		,vidc_stereo_reg[4],vidc_stereo_reg[5],vidc_stereo_reg[6],vidc_stereo_reg[7]);
+	}
 	else if (reg >= 0x80 && reg <= 0xbc)
 	{
 		switch(reg)
@@ -781,47 +841,14 @@ WRITE32_HANDLER(archimedes_vidc_w)
 		logerror("VIDC: %s = %d\n", vrnames[(reg-0x80)/4], vidc_regs[reg]);
 		//#endif
 
-		/* sanity checks - first pass */
-		/*
-			total cycles + border end
-		*/
-		if(vidc_regs[VIDC_HCR] && vidc_regs[VIDC_HBER] &&
-		   vidc_regs[VIDC_VCR] && vidc_regs[VIDC_VBER])
-		{
-			/* sanity checks - second pass */
-			/*
-			total cycles >= border end >= border start
-			*/
-			if((vidc_regs[VIDC_HCR] >= vidc_regs[VIDC_HBER]) &&
-			   (vidc_regs[VIDC_HBER] >= vidc_regs[VIDC_HBSR]) &&
-			   (vidc_regs[VIDC_VCR] >= vidc_regs[VIDC_VBER]) &&
-			   (vidc_regs[VIDC_VBER] >= vidc_regs[VIDC_VBSR]))
-			{
-				rectangle visarea;
-				attoseconds_t refresh;
-
-				visarea.min_x = 0;
-				visarea.min_y = 0;
-				visarea.max_x = vidc_regs[VIDC_HBER] - vidc_regs[VIDC_HBSR] - 1;
-				visarea.max_y = vidc_regs[VIDC_VBER] - vidc_regs[VIDC_VBSR];
-
-				logerror("Configuring: htotal %d vtotal %d border %d x %d display %d x %d\n",
-					vidc_regs[VIDC_HCR], vidc_regs[VIDC_VCR],
-					visarea.max_x, visarea.max_y,
-					vidc_regs[VIDC_HDER]-vidc_regs[VIDC_HDSR],vidc_regs[VIDC_VDER]-vidc_regs[VIDC_VDSR]+1);
-
-				/* FIXME: pixel clock */
-				refresh = HZ_TO_ATTOSECONDS(16000000) * vidc_regs[VIDC_HCR] * vidc_regs[VIDC_VCR];
-
-				space->machine->primary_screen->configure(vidc_regs[VIDC_HCR], vidc_regs[VIDC_VCR], visarea, refresh);
-			}
-		}
-
+		vidc_dynamic_res_change(space->machine);
 	}
 	else if(reg == 0xe0)
 	{
-		vidc_bpp_mode = ((val & 0xc) >> 2);
+		vidc_bpp_mode = ((val & 0x0c) >> 2);
 		vidc_interlace = ((val & 0x40) >> 6);
+		vidc_pixel_clk = (val & 0x03);
+		vidc_dynamic_res_change(space->machine);
 	}
 	else
 	{
@@ -892,7 +919,7 @@ WRITE32_HANDLER(archimedes_memc_w)
 					double sndhz;
 
 					/* FIXME: is the frequency correct? */
-					sndhz = (250000.0 * 4) / (double)((vidc_regs[0xc0]&0xff)+2);
+					sndhz = (250000.0 / 2) / (double)((vidc_regs[0xc0]&0xff)+2);
 
 					printf("MEMC: Starting audio DMA at %f Hz, buffer from %x to %x\n", sndhz, vidc_sndstart, vidc_sndend);
 
