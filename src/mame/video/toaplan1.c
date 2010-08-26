@@ -149,8 +149,8 @@ static TILE_GET_INFO( get_pf1_tile_info )
 			tile_number,
 			color,
 			0);
-	if (state->pf1_tilevram16[2*tile_index+1] & 0x8000) tileinfo->category = 0;
-	else tileinfo->category = (attrib & 0xf000) >> 12;
+	if (state->pf1_tilevram16[2*tile_index+1] & 0x8000) tileinfo->pen_data = state->empty_tile;
+	tileinfo->category = (attrib & 0xf000) >> 12;
 }
 
 static TILE_GET_INFO( get_pf2_tile_info )
@@ -166,8 +166,8 @@ static TILE_GET_INFO( get_pf2_tile_info )
 			tile_number,
 			color,
 			0);
-	if (state->pf2_tilevram16[2*tile_index+1] & 0x8000) tileinfo->category = 0;
-	else tileinfo->category = (attrib & 0xf000) >> 12;
+	if (state->pf2_tilevram16[2*tile_index+1] & 0x8000) tileinfo->pen_data = state->empty_tile;
+	tileinfo->category = (attrib & 0xf000) >> 12;
 }
 
 static TILE_GET_INFO( get_pf3_tile_info )
@@ -183,8 +183,8 @@ static TILE_GET_INFO( get_pf3_tile_info )
 			tile_number,
 			color,
 			0);
-	if (state->pf3_tilevram16[2*tile_index+1] & 0x8000) tileinfo->category = 0;
-	else tileinfo->category = (attrib & 0xf000) >> 12;
+	if (state->pf3_tilevram16[2*tile_index+1] & 0x8000) tileinfo->pen_data = state->empty_tile;
+	tileinfo->category = (attrib & 0xf000) >> 12;
 }
 
 static TILE_GET_INFO( get_pf4_tile_info )
@@ -200,8 +200,8 @@ static TILE_GET_INFO( get_pf4_tile_info )
 			tile_number,
 			color,
 			0);
-	if (state->pf4_tilevram16[2*tile_index+1] & 0x8000) tileinfo->category = 0;
-	else tileinfo->category = (attrib & 0xf000) >> 12;
+	if (state->pf4_tilevram16[2*tile_index+1] & 0x8000) tileinfo->pen_data = state->empty_tile;
+	tileinfo->category = (attrib & 0xf000) >> 12;
 }
 
 /***************************************************************************
@@ -223,6 +223,9 @@ static void toaplan1_create_tilemaps(running_machine *machine)
 	tilemap_set_transparent_pen(state->pf2_tilemap, 0);
 	tilemap_set_transparent_pen(state->pf3_tilemap, 0);
 	tilemap_set_transparent_pen(state->pf4_tilemap, 0);
+	
+	
+	memset(state->empty_tile, 0x00, sizeof(state->empty_tile));
 }
 
 
