@@ -1,268 +1,56 @@
-/*********************************************************************
- Erotictac/Tactic [Sisteme 1992]
- (title depends on "Sexy Views" DIP)
+/*******************************************************************************************
 
- driver by
-  Tomasz Slanina
-  Steve Ellenoff
-    Nicola Salmoria
+	Erotictac/Tactic (c) 1990 Sisteme
+	Poizone (c) 1991 Eterna
 
-TODO:
- - sound
-    my guess:
-     - data (samples?) in mem range 0000-$0680 ($1f00000 - $1f00680)
-     - 4 chn?? ( masks $000000ff, $0000ff00, $00ff0000, $ff000000)
-     - INT7 (bit 1 in IRQRQB) = sound hw 'ready' flag (checked at $56c)
-     - writes to 3600000 - 3ffffff related to snd hardware
-   - additional notes (- AS):
-     Sound HW is mostly hooked up, but games seems to use some kind of
-     auto-repeat flag, plus data buffered is quite wrong, possibly something
-     to do with missing memory paging emulation (see machine/archimds.c).
+	Actually an Acorn Archimedes-based Arcade system
 
- - game doesn't work with 'demo sound' disabled
- - get rid of dirty hack in DRIVER_INIT (bug in the ARM core?)
- - is screen double buffered ?
- - flashing text in test mode
+	original driver by Tomasz Slanina, Steve Ellenoff, Nicola Salmoria
+	rewrite to use AA functions by R.Belmont & Angelo Salese
 
-  Poizone PCB appears to be a Jamam Acorn Archimedes based system,
-   Poizone was also released on the AA computer.
+	TODO (specific issues only):
+	- Sound is currently ugly in both games, recognizable but still nowhere near perfection
+	- ertictac: 'music' dip-sw makes the game to just hang, BGM doesn't play either for
+	            whatever reason (should be triggered as soon as it executes the POST)
+	- poizone: ARM core bugs causes it to crash at some point.
+	- Does this Arcade conversion have I2C device? It seems unused afaik.
+	- Need PCB for identify the exact model of AA, available RAM, what kind of i/o "podule"
+	  it has etc.
 
- - Poizone controls are checked exactly once at bootup, breaking them.
-
-**********************************************************************/
+*******************************************************************************************/
 #include "emu.h"
 #include "cpu/arm/arm.h"
 #include "sound/dac.h"
+#include "includes/archimds.h"
+#include "machine/i2cmem.h"
 
-#define NUM_PENS	(0x100)
-
-static UINT32 *ertictac_mainram;
-static UINT32 *ertictac_videoram;
-static UINT32 IRQSTA, IRQSTB, IRQMSKA, IRQMSKB, FIQMSK, T1low, T1high;
-static UINT32 vidFIFO[256];
-static pen_t pens[NUM_PENS];
-static emu_timer *snd_timer;
-static UINT32 vidc_sndstart, vidc_sndend, vidc_sndcur;
-
-static WRITE32_HANDLER(ertictac_vidc_w)
+static READ32_HANDLER( ertictac_podule_r )
 {
-	vidFIFO[data >> 24] = data & 0xffffff;
-}
+	ioc_regs[IRQ_STATUS_B] &= ~ARCHIMEDES_IRQB_PODULE_IRQ;
 
-static READ32_HANDLER(IOCR_r)
-{
-	return (input_port_read(space->machine, "dummy") & 0x80) | 0x34;
-}
-
-static WRITE32_HANDLER(IOCR_w)
-{
-	//ignored
-}
-
-
-static READ32_HANDLER(IRQSTA_r)
-{
-	return (IRQSTA & (~2)) | 0x80;
-}
-
-static READ32_HANDLER(IRQSTB_r)
-{
-	return (IRQSTB);
-}
-
-static READ32_HANDLER(IRQRQA_r)
-{
-	return (IRQSTA & IRQMSKA) | 0x80;
-}
-
-static WRITE32_HANDLER(IRQRQA_w)
-{
-	if(ACCESSING_BITS_0_7)
-		IRQSTA &= ~data;
-}
-
-static READ32_HANDLER(IRQMSKA_r)
-{
-	return IRQMSKA;
-}
-
-static WRITE32_HANDLER(IRQMSKA_w)
-{
-	if(ACCESSING_BITS_0_7)
-		IRQMSKA = (data & (~2)) | 0x80;
-}
-
-static READ32_HANDLER(IRQRQB_r)
-{
-	return (IRQSTB & IRQMSKB); /* 0x20 - controls,  0x02 - sound */
-}
-
-static READ32_HANDLER(IRQMSKB_r)
-{
-	return IRQMSKB;
-}
-
-static WRITE32_HANDLER(IRQMSKB_w)
-{
-	if(ACCESSING_BITS_0_7)
-		IRQMSKB = data;
-}
-
-static READ32_HANDLER(FIQMSK_r)
-{
-	return FIQMSK;
-}
-
-static WRITE32_HANDLER(FIQMSK_w)
-{
-	if(ACCESSING_BITS_0_7)
-		FIQMSK = (data & (~0x2c)) | 0x80;
-}
-
-static READ32_HANDLER(T1low_r)
-{
-	return T1low;
-}
-
-static WRITE32_HANDLER(T1low_w)
-{
-	if(ACCESSING_BITS_0_7)
-		T1low = data;
-}
-
-static READ32_HANDLER(T1high_r)
-{
-	return T1high;
-}
-
-static WRITE32_HANDLER(T1high_w)
-{
-	if(ACCESSING_BITS_0_7)
-		T1high = data;
-}
-
-static void startTimer(running_machine *machine);
-
-static TIMER_CALLBACK( ertictacTimer )
-{
-	IRQSTA |= 0x40;
-	if(IRQMSKA & 0x40)
+	switch(offset)
 	{
-		cputag_set_input_line(machine, "maincpu", ARM_IRQ_LINE, HOLD_LINE);
+		case 0x04/4: return input_port_read(space->machine, "DSW1") & 0xff;
+		case 0x08/4: return input_port_read(space->machine, "DSW2") & 0xff;
+		case 0x10/4: return input_port_read(space->machine, "SYSTEM") & 0xff;
+		case 0x14/4: return input_port_read(space->machine, "P2") & 0xff;
+		case 0x18/4: return input_port_read(space->machine, "P1") & 0xff;
 	}
-	startTimer(machine);
-}
 
-static void startTimer(running_machine *machine)
-{
-	timer_set(machine, ATTOTIME_IN_USEC(((T1low & 0xff) | ((T1high & 0xff) << 8)) >> 4), NULL, 0, ertictacTimer);
-}
-
-static WRITE32_HANDLER(T1GO_w)
-{
-	startTimer(space->machine);
-}
-
-/* porting code from machine/archimds.c, in the hope that someday that this driver uses that code ... */
-static TIMER_CALLBACK( ertictac_audio_tick )
-{
-	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-
-	dac_signed_data_w(space->machine->device("dac"), (0x80) | (space->read_byte(vidc_sndcur)));
-
-	vidc_sndcur++;
-
-	if (vidc_sndcur >= vidc_sndend)
-	{
-		IRQSTB |= 0x02;
-		if(IRQMSKB & 0x02)
-		{
-			cputag_set_input_line(machine, "maincpu", ARM_IRQ_LINE, HOLD_LINE);
-		}
-		timer_adjust_oneshot(snd_timer, attotime_never, 0);
-		dac_signed_data_w(space->machine->device("dac"), 0x80);
-	}
-}
-
-static WRITE32_HANDLER( ertictac_memc_w )
-{
-	if ((data & 0x0fe00000) == 0x03600000)
-	{
-//		printf("MEMC: %x to Unk reg %d\n", data&0x1ffff, (data >> 17) & 7);
-
-		switch ((data >> 17) & 7)
-		{
-			case 4:	/* sound start */
-				vidc_sndstart = ((data>>2)&0x7fff)*16;
-				IRQSTB &= ~0x02;
-				break;
-
-			case 5: /* sound end */
-				vidc_sndend = ((data>>2)&0x7fff)*16;
-				break;
-
-			case 7:	/* Control */
-				//memc_pagesize = ((data>>2) & 3);
-
-				//logerror("MEMC: %x to Control (page size %d, %s, %s)\n", data & 0x1ffc, page_sizes[memc_pagesize], ((data>>10)&1) ? "Video DMA on" : "Video DMA off", ((data>>11)&1) ? "Sound DMA on" : "Sound DMA off");
-				logerror("MEMC: %x to Control ( %s, %s)\n", data & 0x1ffc, ((data>>10)&1) ? "Video DMA on" : "Video DMA off", ((data>>11)&1) ? "Sound DMA on" : "Sound DMA off");
-
-				if ((data>>11)&1)
-				{
-					double sndhz;
-
-					/* FIXME: is the frequency correct? */
-					sndhz = (125000.0 / 2) / (double)((vidFIFO[0xc0]&0xff)+2);
-
-					logerror("MEMC: Starting audio DMA at %f Hz, buffer from %x to %x\n", sndhz, vidc_sndstart, vidc_sndend);
-
-					vidc_sndcur = vidc_sndstart;
-
-					timer_adjust_periodic(snd_timer, ATTOTIME_IN_HZ(sndhz), 0, ATTOTIME_IN_HZ(sndhz));
-				}
-				else
-				{
-					//timer_adjust_oneshot(snd_timer, attotime_never, 0);
-					//dac_signed_data_w(space->machine->device("dac"), 0x80);
-				}
-				break;
-
-			default:
-				break;
-		}
-	}
+	return 0;
 }
 
 static ADDRESS_MAP_START( ertictac_map, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x0007ffff) AM_RAM AM_BASE (&ertictac_mainram)
-	AM_RANGE(0x01f00000, 0x01ffffff) AM_RAM AM_BASE (&ertictac_videoram)
-	AM_RANGE(0x03200000, 0x03200003) AM_READWRITE(IOCR_r, IOCR_w)
-	AM_RANGE(0x03200010, 0x03200013) AM_READ(IRQSTA_r)
-	AM_RANGE(0x03200014, 0x03200017) AM_READWRITE(IRQRQA_r, IRQRQA_w)
-	AM_RANGE(0x03200018, 0x0320001b) AM_READWRITE(IRQMSKA_r, IRQMSKA_w)
-	AM_RANGE(0x03200010, 0x03200013) AM_READ(IRQSTB_r)
-	AM_RANGE(0x03200024, 0x03200027) AM_READ(IRQRQB_r)
-	AM_RANGE(0x03200028, 0x0320002b) AM_READWRITE(IRQMSKB_r, IRQMSKB_w)
-	AM_RANGE(0x03200038, 0x0320003b) AM_READWRITE(FIQMSK_r, FIQMSK_w)
+	AM_RANGE(0x00000000, 0x01ffffff) AM_READWRITE(archimedes_memc_logical_r, archimedes_memc_logical_w)
+	AM_RANGE(0x02000000, 0x02ffffff) AM_RAM AM_BASE(&archimedes_memc_physmem) /* physical RAM - 16 MB for now, should be 512k for the A310 */
 
-	AM_RANGE(0x03200050, 0x03200053) AM_READWRITE(T1low_r, T1low_w)
-	AM_RANGE(0x03200054, 0x03200057) AM_READWRITE(T1high_r, T1high_w)
-	AM_RANGE(0x03200058, 0x0320005b) AM_WRITE( T1GO_w )
+	AM_RANGE(0x03340000, 0x0334001f) AM_READ(ertictac_podule_r)
+	AM_RANGE(0x033c0000, 0x033c001f) AM_READ(ertictac_podule_r)
 
-	AM_RANGE(0x03340000, 0x03340003) AM_NOP
-	AM_RANGE(0x03340010, 0x03340013) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x03340014, 0x03340017) AM_READ_PORT("P2")
-	AM_RANGE(0x03340018, 0x0334001b) AM_READ_PORT("P1")
-
-	AM_RANGE(0x033c0004, 0x033c0007) AM_READ_PORT("DSW1")
-	AM_RANGE(0x033c0008, 0x033c000b) AM_READ_PORT("DSW2")
-	AM_RANGE(0x033c0010, 0x033c0013) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x033c0014, 0x033c0017) AM_READ_PORT("P2")
-	AM_RANGE(0x033c0018, 0x033c001b) AM_READ_PORT("P1")
-
-	AM_RANGE(0x03400000, 0x035fffff) AM_WRITE(ertictac_vidc_w)
-	AM_RANGE(0x03600000, 0x037fffff) AM_WRITE(ertictac_memc_w)
-	AM_RANGE(0x03800000, 0x03ffffff) AM_ROM AM_REGION("user1", 0) AM_WRITENOP
+	AM_RANGE(0x03000000, 0x033fffff) AM_READWRITE(archimedes_ioc_r, archimedes_ioc_w)
+	AM_RANGE(0x03400000, 0x035fffff) AM_READWRITE(archimedes_vidc_r, archimedes_vidc_w)
+	AM_RANGE(0x03600000, 0x037fffff) AM_READWRITE(archimedes_memc_r, archimedes_memc_w)
+	AM_RANGE(0x03800000, 0x03ffffff) AM_ROM AM_REGION("maincpu", 0) AM_WRITE(archimedes_memc_page_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( ertictac )
@@ -278,6 +66,7 @@ static INPUT_PORTS_START( ertictac )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x00c4, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("P2")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
@@ -285,6 +74,7 @@ static INPUT_PORTS_START( ertictac )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x00c4, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Language ) )
@@ -331,40 +121,18 @@ static INPUT_PORTS_START( ertictac )
 	PORT_DIPSETTING(    0x20, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
 
-	PORT_START("dummy")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
+	PORT_DIPNAME( 0x40, 0x40, "2-7" )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "2-8" )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static INPUT_CHANGED( podule_irq_ack )
-{
-	//if (newval)
-	//	IRQSTB &= ~0x20;
-}
-
 static INPUT_PORTS_START( poizone )
-	PORT_START("SYSTEM")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_START2 ) PORT_CHANGED(podule_irq_ack, 0)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_START1 ) PORT_CHANGED(podule_irq_ack, 0)
-	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(1) PORT_CHANGED(podule_irq_ack, 0)
-	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1) PORT_CHANGED(podule_irq_ack, 0)
+	PORT_INCLUDE( ertictac )
 
-	PORT_START("P1")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_CHANGED(podule_irq_ack, 0)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1) PORT_CHANGED(podule_irq_ack, 0)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1) PORT_CHANGED(podule_irq_ack, 0)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1) PORT_CHANGED(podule_irq_ack, 0)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1) PORT_CHANGED(podule_irq_ack, 0)
-	PORT_BIT( 0x00c4, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("P2")
-	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_CHANGED(podule_irq_ack, 0)
-	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2) PORT_CHANGED(podule_irq_ack, 0)
-	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2) PORT_CHANGED(podule_irq_ack, 0)
-	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2) PORT_CHANGED(podule_irq_ack, 0)
-	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2) PORT_CHANGED(podule_irq_ack, 0)
-	PORT_BIT( 0x00c4, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("DSW1")
+	PORT_MODIFY("DSW1")
 	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Language ) ) // 01
 	PORT_DIPSETTING(    0x00, DEF_STR( English ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( French ) )
@@ -388,7 +156,7 @@ static INPUT_PORTS_START( poizone )
 	PORT_DIPSETTING(	0x40, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(	0xC0, DEF_STR( 1C_4C ) )
 
-	PORT_START("DSW2") /* uses conditional dip-switches */
+	PORT_MODIFY("DSW2") /* TODO: uses conditional dip-switches */
 	PORT_DIPNAME( 0x01, 0x01, "2-1" )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
@@ -413,98 +181,62 @@ static INPUT_PORTS_START( poizone )
 	PORT_DIPNAME( 0x80, 0x80, "2-8" )
 	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-
-	PORT_START("dummy")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_VBLANK )
 INPUT_PORTS_END
+
+static DRIVER_INIT( ertictac)
+{
+	archimedes_driver_init(machine);
+}
 
 static MACHINE_START( ertictac )
 {
-	snd_timer = timer_alloc(machine, ertictac_audio_tick, NULL);
-	timer_adjust_oneshot(snd_timer, attotime_never, 0);
+	archimedes_init(machine);
+
+	// reset the DAC to centerline
+	dac_signed_data_w(machine->device("dac"), 0x80);
 }
 
 static MACHINE_RESET( ertictac )
 {
-	ertictac_mainram[0]=0xeae00007; //reset vector
+	archimedes_reset(machine);
 }
 
-static INTERRUPT_GEN( ertictac_interrupt )
-{
-	IRQSTA|=0x08;
-	if(IRQMSKA&0x08)
-	{
-		cpu_set_input_line(device, ARM_IRQ_LINE, HOLD_LINE);
-	}
-}
-
-/* hack */
 static INTERRUPT_GEN( ertictac_podule_irq )
 {
-	IRQSTB|=0x20;
-	if(IRQMSKB&0x20)
-	{
-		cpu_set_input_line(device, ARM_IRQ_LINE, HOLD_LINE);
-	}
+	archimedes_request_irq_b(device->machine, ARCHIMEDES_IRQB_PODULE_IRQ);
 }
 
+/* TODO: Are we sure that this HW have I2C device? */
+#define	NVRAM_SIZE 1024
+#define	NVRAM_PAGE_SIZE	16	/* max size of one write request */
 
-static VIDEO_START( ertictac )
+static const i2cmem_interface i2cmem_interface =
 {
-	int color;
-
-	for (color = 0; color < NUM_PENS; color++)
-	{
-		UINT8 i = color & 0x03;
-		UINT8 r = ((color & 0x04) >> 0) | ((color & 0x10) >> 1) | i;
-		UINT8 g = ((color & 0x20) >> 3) | ((color & 0x40) >> 3) | i;
-		UINT8 b = ((color & 0x08) >> 1) | ((color & 0x80) >> 4) | i;
-
-		pens[color] = MAKE_RGB(pal4bit(r), pal4bit(g), pal4bit(b));
-	}
-}
-
-
-static VIDEO_UPDATE( ertictac )
-{
-	int y, x;
-
-	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
-		for (x = 0; x < 0x140; x += 4)
-		{
-			offs_t offs = (y * 0x50) + (x >> 2) + (vidFIFO[0x88] >> 2);
-
-			*BITMAP_ADDR32(bitmap, y, x + 0) = pens[(ertictac_videoram[offs] >>  0) & 0xff];
-			*BITMAP_ADDR32(bitmap, y, x + 1) = pens[(ertictac_videoram[offs] >>  8) & 0xff];
-			*BITMAP_ADDR32(bitmap, y, x + 2) = pens[(ertictac_videoram[offs] >> 16) & 0xff];
-			*BITMAP_ADDR32(bitmap, y, x + 3) = pens[(ertictac_videoram[offs] >> 24) & 0xff];
-		}
-
-	return 0;
-}
-
+	I2CMEM_SLAVE_ADDRESS, NVRAM_PAGE_SIZE, NVRAM_SIZE
+};
 
 static MACHINE_DRIVER_START( ertictac )
 
-	MDRV_CPU_ADD("maincpu", ARM, 16000000) /* guess */
+	MDRV_CPU_ADD("maincpu", ARM, 8000000) /* guess */
 	MDRV_CPU_PROGRAM_MAP(ertictac_map)
-	MDRV_CPU_VBLANK_INT("screen", ertictac_interrupt)
-	MDRV_CPU_PERIODIC_INT(ertictac_podule_irq,60)
+	MDRV_CPU_PERIODIC_INT(ertictac_podule_irq,60) // FIXME: timing of this
 
 	MDRV_MACHINE_START(ertictac)
 	MDRV_MACHINE_RESET(ertictac)
 
+	MDRV_I2CMEM_ADD("i2cmem",i2cmem_interface)
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(320, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 255)
+	MDRV_SCREEN_SIZE(1280, 1024)
+	MDRV_SCREEN_VISIBLE_AREA(0, 1280-1, 0, 1024-1)
 
-	MDRV_VIDEO_START(ertictac)
-	MDRV_VIDEO_UPDATE(ertictac)
+	MDRV_PALETTE_LENGTH(0x200)
+
+	MDRV_VIDEO_START(archimds_vidc)
+	MDRV_VIDEO_UPDATE(archimds_vidc)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("dac", DAC, 0)
@@ -512,7 +244,7 @@ static MACHINE_DRIVER_START( ertictac )
 MACHINE_DRIVER_END
 
 ROM_START( ertictac )
-	ROM_REGION(0x800000, "user1", 0 )
+	ROM_REGION(0x800000, "maincpu", 0 )
 	ROM_LOAD32_BYTE( "01", 0x00000, 0x10000, CRC(8dce677c) SHA1(9f12b1febe796038caa1ecad1d17864dc546cfd8) )
 	ROM_LOAD32_BYTE( "02", 0x00001, 0x10000, CRC(7c5c916c) SHA1(d4ed5fc3a7b27253551e7d9176ed9e6513092e60) )
 	ROM_LOAD32_BYTE( "03", 0x00002, 0x10000, CRC(edca5ac6) SHA1(f6c4b8030f3c1c93922c5f7232f2159e0471b93a) )
@@ -529,10 +261,12 @@ ROM_START( ertictac )
 	ROM_LOAD32_BYTE( "14", 0xc0001, 0x10000, CRC(3029567c) SHA1(6d49bea3a3f6f11f4182a602d37b53f1f896c154) )
 	ROM_LOAD32_BYTE( "15", 0xc0002, 0x10000, CRC(500997ab) SHA1(028c7b3ca03141e5b596ab1e2ab98d0ccd9bf93a) )
 	ROM_LOAD32_BYTE( "16", 0xc0003, 0x10000, CRC(70a8d136) SHA1(50b11f5701ed5b79a5d59c9a3c7d5b7528e66a4d) )
+
+	ROM_REGION(0x200000, "vram", ROMREGION_ERASE00)
 ROM_END
 
 ROM_START( poizone )
-	ROM_REGION(0x800000, "user1", 0 )
+	ROM_REGION(0x800000, "maincpu", 0 )
 	ROM_LOAD32_BYTE( "p_son01.bin", 0x00000, 0x10000, CRC(28793c9f) SHA1(2d9f7d667203e745b47cd2cc97501ae961ae1a66) )
 	ROM_LOAD32_BYTE( "p_son02.bin", 0x00001, 0x10000, CRC(2d4b6f4b) SHA1(8df2680d6e5dc41787b3a72e594f01f5e732d0ec) )
 	ROM_LOAD32_BYTE( "p_son03.bin", 0x00002, 0x10000, CRC(0834d46e) SHA1(bf1cc9b47759ef39ed8fd8f334ed8f2902be3bf8) )
@@ -550,8 +284,10 @@ ROM_START( poizone )
 	ROM_LOAD32_BYTE( "p_son22.bin", 0x140001, 0x10000, CRC(16f0bb52) SHA1(893ab1e72b84de7a38f88f9d713769968ebd4553) )
 	ROM_LOAD32_BYTE( "p_son23.bin", 0x140002, 0x10000, CRC(e9c118b2) SHA1(110d9a204e701b9b54d89f027f8892c3f3a819c7) )
 	ROM_LOAD32_BYTE( "p_son24.bin", 0x140003, 0x10000, CRC(a09d7f55) SHA1(e0d562c655c16034b40db93de801b98b7948beb2) )
+
+	ROM_REGION(0x200000, "vram", ROMREGION_ERASE00)
 ROM_END
 
-GAME( 1990, ertictac, 0, ertictac, ertictac, 0, ROT0, "Sisteme", "Erotictac/Tactic" ,GAME_NO_SOUND)
-GAME( 1991, poizone,  0, ertictac, poizone, 0,  ROT0, "Eterna" ,"Poizone" ,GAME_NO_SOUND|GAME_NOT_WORKING)
+GAME( 1990, ertictac, 0, ertictac, ertictac, ertictac, ROT0, "Sisteme", "Erotictac/Tactic" ,GAME_IMPERFECT_SOUND)
+GAME( 1991, poizone,  0, ertictac, poizone, ertictac,  ROT0, "Eterna" ,"Poizone" ,GAME_IMPERFECT_SOUND|GAME_NOT_WORKING)
 
