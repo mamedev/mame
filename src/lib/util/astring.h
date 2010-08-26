@@ -333,6 +333,7 @@ public:
 	astring &reset() { return cpy(""); }
 	astring &expand(int length) { astring_expand(this, length); return *this; }
 
+	operator bool() { return this->text[0] != 0; }
 	operator bool() const { return this->text[0] != 0; }
 	operator const char *() const { return astring_c(this); }
 	const char *cstr() const { return astring_c(this); }
