@@ -225,7 +225,8 @@ legacy_cpu_device::legacy_cpu_device(running_machine &machine, const legacy_cpu_
 	  m_state_export(reinterpret_cast<cpu_state_io_func>(m_cpu_config.get_legacy_config_fct(CPUINFO_FCT_EXPORT_STATE))),
 	  m_string_export(reinterpret_cast<cpu_string_io_func>(m_cpu_config.get_legacy_config_fct(CPUINFO_FCT_EXPORT_STRING))),
 	  m_exit(reinterpret_cast<cpu_exit_func>(m_cpu_config.get_legacy_config_fct(CPUINFO_FCT_EXIT))),
-	  m_using_legacy_state(false)
+	  m_using_legacy_state(false),
+	  m_inited(false)
 {
 	memset(&m_partial_frame_period, 0, sizeof(m_partial_frame_period));
 
@@ -245,7 +246,7 @@ legacy_cpu_device::legacy_cpu_device(running_machine &machine, const legacy_cpu_
 legacy_cpu_device::~legacy_cpu_device()
 {
 	// call the CPU's exit function if present
-	if (m_exit != NULL)
+	if (m_inited && m_exit != NULL)
 		(*m_exit)(this);
 }
 
@@ -259,6 +260,7 @@ void legacy_cpu_device::device_start()
 	// standard init
 	cpu_init_func init = reinterpret_cast<cpu_init_func>(m_cpu_config.get_legacy_config_fct(CPUINFO_FCT_INIT));
 	(*init)(this, static_standard_irq_callback);
+	m_inited = true;
 
 	// fetch information about the CPU states
 	if (m_state_list == NULL)
