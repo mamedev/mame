@@ -81,8 +81,13 @@ struct _pci_bus_state
 	running_device *	busdevice;
 	const pci_bus_config *	config;
 	running_device *	device[32];
+	pci_bus_state *		siblings[8];
+	UINT8				siblings_busnum[8];
+	int					siblings_count;
 	offs_t					address;
-	INT8					devicenum;
+	INT8					devicenum; // device number we are addressing
+	INT8					busnum; // pci bus number we are addressing
+	pci_bus_state *		busnumaddr; // pci bus we are addressing
 };
 
 
@@ -93,7 +98,7 @@ struct _pci_bus_state
 
 /*-------------------------------------------------
     get_safe_token - makes sure that the passed
-    in device is, in fact, an IDE controller
+    in device is, in fact, a PCI bus
 -------------------------------------------------*/
 
 INLINE pci_bus_state *get_safe_token(running_device *device)
@@ -123,12 +128,12 @@ READ32_DEVICE_HANDLER( pci_32le_r )
 		case 1:
 			if (pcibus->devicenum != -1)
 			{
-				pci_read_func read = pcibus->config->device[pcibus->devicenum].read_callback;
+				pci_read_func read = pcibus->busnumaddr->config->device[pcibus->devicenum].read_callback;
 				if (read != NULL)
 				{
 					function = (pcibus->address >> 8) & 0x07;
 					reg = (pcibus->address >> 0) & 0xfc;
-					result = (*read)(device, pcibus->device[pcibus->devicenum], function, reg, mem_mask);
+					result = (*read)(pcibus->busnumaddr->busdevice, pcibus->busnumaddr->device[pcibus->devicenum], function, reg, mem_mask);
 				}
 			}
 			break;
@@ -138,6 +143,26 @@ READ32_DEVICE_HANDLER( pci_32le_r )
 		logerror("pci_32le_r('%s'): offset=%d result=0x%08X\n", device->tag(), offset, result);
 
 	return result;
+}
+
+
+
+static pci_bus_state *pci_search_bustree(int busnum, int devicenum, pci_bus_state *pcibus)
+{
+int a;
+pci_bus_state *ret;
+
+	if (pcibus->config->busnum == busnum)
+	{
+		return pcibus;
+	}
+	for (a = 0; a < pcibus->siblings_count; a++)
+	{
+		ret = pci_search_bustree(busnum, devicenum, pcibus->siblings[a]);
+		if (ret != NULL)
+			return ret;
+	}
+	return NULL;
 }
 
 
@@ -161,20 +186,31 @@ WRITE32_DEVICE_HANDLER( pci_32le_w )
 			{
 				int busnum = (pcibus->address >> 16) & 0xff;
 				int devicenum = (pcibus->address >> 11) & 0x1f;
-				pcibus->devicenum = (busnum == pcibus->config->busnum) ? devicenum : -1;
+				pcibus->busnumaddr = pci_search_bustree(busnum, devicenum, pcibus);
+				if (pcibus->busnumaddr != NULL)
+				{
+					pcibus->busnum = busnum;
+					pcibus->devicenum = devicenum;
+				}
+				else
+					pcibus->devicenum = -1;
+				if (LOG_PCI)
+					logerror("  bus:%d device:%d\n", busnum, devicenum);
 			}
 			break;
 
 		case 1:
 			if (pcibus->devicenum != -1)
 			{
-				pci_write_func write = pcibus->config->device[pcibus->devicenum].write_callback;
+				pci_write_func write = pcibus->busnumaddr->config->device[pcibus->devicenum].write_callback;
 				if (write != NULL)
 				{
 					int function = (pcibus->address >> 8) & 0x07;
 					int reg = (pcibus->address >> 0) & 0xfc;
-					(*write)(device, pcibus->device[pcibus->devicenum], function, reg, data, mem_mask);
+					(*write)(pcibus->busnumaddr->busdevice, pcibus->busnumaddr->device[pcibus->devicenum], function, reg, data, mem_mask);
 				}
+				if (LOG_PCI)
+					logerror("  function:%d register:%d\n", (pcibus->address >> 8) & 0x07, (pcibus->address >> 0) & 0xfc);
 			}
 			break;
 	}
@@ -186,12 +222,41 @@ READ64_DEVICE_HANDLER(pci_64be_r) { return read64be_with_32le_device_handler(pci
 WRITE64_DEVICE_HANDLER(pci_64be_w) { write64be_with_32le_device_handler(pci_32le_w, device, offset, data, mem_mask); }
 
 
+int pci_add_sibling( running_machine *machine, char *pcitag, char *sibling )
+{
+	running_device *device1 = machine->device(pcitag);
+	running_device *device2 = machine->device(sibling);
+	pci_bus_state *pcibus1 = get_safe_token(device1);
+	pci_bus_state *pcibus2 = get_safe_token(device2);
+	pci_bus_config *config2;
 
+	if ((device1 == NULL) || (device2 == NULL) || (pcibus1 == NULL) || (pcibus2 == NULL))
+		return 0;
+	if (pcibus1->siblings_count == 8)
+		return 0;
+	config2 = (pci_bus_config *)downcast<const legacy_device_config_base &>(device2->baseconfig()).inline_config();
+	pcibus1->siblings[pcibus1->siblings_count] = get_safe_token(device2);
+	pcibus1->siblings_busnum[pcibus1->siblings_count] = config2->busnum;
+	pcibus1->siblings_count++;
+	return 1;
+}
 
 
 /***************************************************************************
     DEVICE INTERFACE
 ***************************************************************************/
+
+
+static STATE_POSTLOAD( pci_bus_postload )
+{
+	pci_bus_state *pcibus = (pci_bus_state *)param;
+
+	if (pcibus->devicenum != -1)
+	{
+		pcibus->busnumaddr = pci_search_bustree(pcibus->busnum, pcibus->devicenum, pcibus);
+	}
+}
+
 
 /*-------------------------------------------------
     device start callback
@@ -219,9 +284,15 @@ static DEVICE_START( pci_bus )
 		if (pcibus->config->device[devicenum].devtag != NULL)
 			pcibus->device[devicenum] = device->machine->device(pcibus->config->device[devicenum].devtag);
 
+	if (pcibus->config->father != NULL)
+		pci_add_sibling(device->machine, (char *)pcibus->config->father, (char *)device->tag());
+
 	/* register pci states */
 	state_save_register_device_item(device, 0, pcibus->address);
 	state_save_register_device_item(device, 0, pcibus->devicenum);
+	state_save_register_device_item(device, 0, pcibus->busnum);
+
+	state_save_register_postload(device->machine, pci_bus_postload, pcibus);
 }
 
 
