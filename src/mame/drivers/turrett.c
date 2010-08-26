@@ -95,7 +95,7 @@ static INPUT_PORTS_START( turrett )
 INPUT_PORTS_END
 
 
-static const r3000_cpu_core config =
+static const r3000_cpu_core r3000_config =
 {
 	0,		/* 1 if we have an FPU, 0 otherwise */
 	2048,	/* code cache size */
@@ -107,7 +107,7 @@ static MACHINE_DRIVER_START( turrett )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", R3041BE, R3041_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(cpu_map)
-	MDRV_CPU_CONFIG(config)
+	MDRV_CPU_CONFIG(r3000_config)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

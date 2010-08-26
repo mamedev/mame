@@ -41,7 +41,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( system246 )
 INPUT_PORTS_END
 
-static const mips3_config config =
+static const mips3_config r5000_config =
 {
 	16384,				/* code cache size - probably wrong */
 	16384				/* data cache size */
@@ -50,7 +50,7 @@ static const mips3_config config =
 static MACHINE_DRIVER_START( system246 )
 	MDRV_CPU_ADD("maincpu", R5000LE, 294000000)	// actually R5900 @ 294 MHz
 	MDRV_CPU_PROGRAM_MAP(ps2_map)
-	MDRV_CPU_CONFIG(config)
+	MDRV_CPU_CONFIG(r5000_config)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

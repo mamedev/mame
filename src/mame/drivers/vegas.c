@@ -2213,7 +2213,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const mips3_config config =
+static const mips3_config r5000_config =
 {
 	16384,			/* code cache size */
 	16384,			/* data cache size */
@@ -2224,7 +2224,7 @@ static MACHINE_DRIVER_START( vegascore )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", R5000LE, SYSTEM_CLOCK*2)
-	MDRV_CPU_CONFIG(config)
+	MDRV_CPU_CONFIG(r5000_config)
 	MDRV_CPU_PROGRAM_MAP(vegas_map_8mb)
 
 	MDRV_MACHINE_START(vegas)
@@ -2294,7 +2294,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( vegasv3 )
 	MDRV_IMPORT_FROM(vegas32m)
 	MDRV_CPU_REPLACE("maincpu", RM7000LE, SYSTEM_CLOCK*2.5)
-	MDRV_CPU_CONFIG(config)
+	MDRV_CPU_CONFIG(r5000_config)
 	MDRV_CPU_PROGRAM_MAP(vegas_map_8mb)
 
 	MDRV_DEVICE_REMOVE("voodoo")
@@ -2309,7 +2309,7 @@ static MACHINE_DRIVER_START( denver )
 	MDRV_IMPORT_FROM(dcs2_audio_denver)
 
 	MDRV_CPU_REPLACE("maincpu", RM7000LE, SYSTEM_CLOCK*2.5)
-	MDRV_CPU_CONFIG(config)
+	MDRV_CPU_CONFIG(r5000_config)
 	MDRV_CPU_PROGRAM_MAP(vegas_map_32mb)
 
 	MDRV_DEVICE_REMOVE("voodoo")

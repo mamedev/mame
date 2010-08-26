@@ -555,7 +555,7 @@ static INPUT_PORTS_START( starsldr )
 INPUT_PORTS_END
 
 /* ?? */
-static const mips3_config config =
+static const mips3_config vr4300_config =
 {
 	16384,				/* code cache size */
 	8192,				/* data cache size */
@@ -573,7 +573,7 @@ static MACHINE_DRIVER_START( aleck64 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", VR4300BE, 93750000)
-	MDRV_CPU_CONFIG(config)
+	MDRV_CPU_CONFIG(vr4300_config)
 	MDRV_CPU_PROGRAM_MAP(n64_map)
 	MDRV_CPU_VBLANK_INT("screen", n64_vblank)
 

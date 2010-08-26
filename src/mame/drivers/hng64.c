@@ -1608,7 +1608,7 @@ static DRIVER_INIT(hng64_shoot)
 
 
 /* ?? */
-static const mips3_config config =
+static const mips3_config vr4300_config =
 {
 	16384,				/* code cache size */
 	16384				/* data cache size */
@@ -1695,7 +1695,7 @@ static MACHINE_RESET(hyperneo)
 static MACHINE_DRIVER_START( hng64 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", VR4300BE, MASTER_CLOCK) 	// actually R4300
-	MDRV_CPU_CONFIG(config)
+	MDRV_CPU_CONFIG(vr4300_config)
 	MDRV_CPU_PROGRAM_MAP(hng_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq_start,4)
 

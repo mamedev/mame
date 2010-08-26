@@ -2865,7 +2865,7 @@ static GFXDECODE_START( namcos23 )
 	GFXDECODE_ENTRY( NULL, 0, namcos23_cg_layout, 0x7f00, 0x80 )
 GFXDECODE_END
 
-static const mips3_config config =
+static const mips3_config r4650_config =
 {
 	8192,				/* code cache size - VERIFIED */
 	8192				/* data cache size - VERIFIED */
@@ -2875,7 +2875,7 @@ static MACHINE_DRIVER_START( gorgon )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", R4650BE, S23_BUSCLOCK*4)
-	MDRV_CPU_CONFIG(config)
+	MDRV_CPU_CONFIG(r4650_config)
 	MDRV_CPU_PROGRAM_MAP(gorgon_map)
 	MDRV_CPU_VBLANK_INT("screen", s23_interrupt)
 
@@ -2921,7 +2921,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( s23 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", R4650BE, S23_BUSCLOCK*4)
-	MDRV_CPU_CONFIG(config)
+	MDRV_CPU_CONFIG(r4650_config)
 	MDRV_CPU_PROGRAM_MAP(ss23_map)
 	MDRV_CPU_VBLANK_INT("screen", s23_interrupt)
 
@@ -2967,7 +2967,7 @@ MACHINE_DRIVER_END
 static MACHINE_DRIVER_START( ss23 )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", R4650BE, S23_BUSCLOCK*5)
-	MDRV_CPU_CONFIG(config)
+	MDRV_CPU_CONFIG(r4650_config)
 	MDRV_CPU_PROGRAM_MAP(ss23_map)
 	MDRV_CPU_VBLANK_INT("screen", s23_interrupt)
 

@@ -629,7 +629,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const mips3_config config =
+static const mips3_config r4600_config =
 {
 	16384,				/* code cache size */
 	16384				/* data cache size */
@@ -640,7 +640,7 @@ static MACHINE_DRIVER_START( kinst )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", R4600LE, MASTER_CLOCK*2)
-	MDRV_CPU_CONFIG(config)
+	MDRV_CPU_CONFIG(r4600_config)
 	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_start)
 

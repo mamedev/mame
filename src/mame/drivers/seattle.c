@@ -2450,7 +2450,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static const mips3_config config =
+static const mips3_config r5000_config =
 {
 	16384,		/* code cache size */
 	16384,		/* data cache size */
@@ -2461,7 +2461,7 @@ static MACHINE_DRIVER_START( seattle_common )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", R5000LE, SYSTEM_CLOCK*3)
-	MDRV_CPU_CONFIG(config)
+	MDRV_CPU_CONFIG(r5000_config)
 	MDRV_CPU_PROGRAM_MAP(seattle_map)
 
 	MDRV_MACHINE_START(seattle)
@@ -2495,7 +2495,7 @@ static MACHINE_DRIVER_START( phoenixsa )
 	MDRV_IMPORT_FROM(dcs2_audio_2115)
 
 	MDRV_CPU_REPLACE("maincpu", R4700LE, SYSTEM_CLOCK*2)
-	MDRV_CPU_CONFIG(config)
+	MDRV_CPU_CONFIG(r5000_config)
 	MDRV_CPU_PROGRAM_MAP(seattle_map)
 MACHINE_DRIVER_END
 
@@ -2505,7 +2505,7 @@ static MACHINE_DRIVER_START( seattle150 )
 	MDRV_IMPORT_FROM(dcs2_audio_2115)
 
 	MDRV_CPU_REPLACE("maincpu", R5000LE, SYSTEM_CLOCK*3)
-	MDRV_CPU_CONFIG(config)
+	MDRV_CPU_CONFIG(r5000_config)
 	MDRV_CPU_PROGRAM_MAP(seattle_map)
 MACHINE_DRIVER_END
 
@@ -2521,7 +2521,7 @@ static MACHINE_DRIVER_START( seattle200 )
 	MDRV_IMPORT_FROM(dcs2_audio_2115)
 
 	MDRV_CPU_REPLACE("maincpu", R5000LE, SYSTEM_CLOCK*4)
-	MDRV_CPU_CONFIG(config)
+	MDRV_CPU_CONFIG(r5000_config)
 	MDRV_CPU_PROGRAM_MAP(seattle_map)
 MACHINE_DRIVER_END
 
@@ -2537,7 +2537,7 @@ static MACHINE_DRIVER_START( flagstaff )
 	MDRV_IMPORT_FROM(cage_seattle)
 
 	MDRV_CPU_REPLACE("maincpu", R5000LE, SYSTEM_CLOCK*4)
-	MDRV_CPU_CONFIG(config)
+	MDRV_CPU_CONFIG(r5000_config)
 	MDRV_CPU_PROGRAM_MAP(seattle_map)
 
 	MDRV_SMC91C94_ADD("ethernet", ethernet_interrupt)

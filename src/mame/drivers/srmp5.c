@@ -521,7 +521,7 @@ static const st0016_interface st0016_config =
 	&st0016_charram
 };
 
-static const r3000_cpu_core config =
+static const r3000_cpu_core r3000_config =
 {
 	1,	/* 1 if we have an FPU, 0 otherwise */
 	4096,	/* code cache size */
@@ -568,7 +568,7 @@ static MACHINE_DRIVER_START( srmp5 )
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("sub", R3000LE, 25000000)
-	MDRV_CPU_CONFIG(config)
+	MDRV_CPU_CONFIG(r3000_config)
 	MDRV_CPU_PROGRAM_MAP(srmp5_mem)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_assert)
 
