@@ -179,7 +179,18 @@ VIDEO_START( trackfld )
 	trackfld_state *state = machine->driver_data<trackfld_state>();
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
 	tilemap_set_scroll_rows(state->bg_tilemap, 32);
+	state->sprites_gfx_banked = 0;
 }
+
+
+VIDEO_START( atlantol )
+{
+	trackfld_state *state = machine->driver_data<trackfld_state>();
+	VIDEO_START_CALL( trackfld );
+	state->sprites_gfx_banked = 1;
+}
+
+
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
@@ -193,7 +204,8 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 		int attr = spriteram_2[offs];
 		int code = spriteram[offs + 1];
 		int color = attr & 0x0f;
-		if (attr&1) code|=0x100; // extra tile# bit for the yiear conversion, trackfld doesn't have this many sprites so it will just get masked
+		if (!state->sprites_gfx_banked)
+			if (attr&1) code|=0x100; // extra tile# bit for the yiear conversion, trackfld doesn't have this many sprites so it will just get masked
 		int flipx = ~attr & 0x40;
 		int flipy = attr & 0x80;
 		int sx = spriteram[offs] - 1;
@@ -233,6 +245,8 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 			colortable_get_transpen_mask(machine->colortable, machine->gfx[0], color, 0));
 	}
 }
+
+
 
 VIDEO_UPDATE( trackfld )
 {
