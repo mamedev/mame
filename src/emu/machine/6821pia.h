@@ -3,18 +3,17 @@
     Motorola 6821 PIA interface and emulation
 
     Notes:
-        * pia6821_get_port_b_z_mask() gives the caller the bitmask
-          that show which bits are high-impendance when
-          reading port B, thus neither 0 or 1.
-          pia6821_get_output_cb2_z() returns the same
-          information for the CB2 pin
-        * pia6821_set_port_a_z_mask allows the input callback to
-          indicate which port A bits are disconnected.
-          For these bit, the read operation will return the
-          output buffer's contents
-        * the 'alt' interface functions are used when the A0 and A1
-          address bits are swapped
-        * all 'int' data or return values are Boolean
+        * get_port_b_z_mask() gives the caller the bitmask that shows
+          which bits are high-impendance when reading port B, and thus
+          neither 0 or 1. get_output_cb2_z() returns the same info
+          for the CB2 pin.
+        * set_port_a_z_mask allows the input callback to indicate
+          which port A bits are disconnected. For these bits, the
+          read operation will return the output buffer's contents.
+        * The 'alt' interface functions are used when the A0 and A1
+          address bits are swapped.
+        * All 'int' data or return values are bool, and should be
+          converted to bool at some point.
 
 **********************************************************************/
 
