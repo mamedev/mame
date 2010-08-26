@@ -2323,6 +2323,7 @@ static MACHINE_DRIVER_START( evilston )
 	MDRV_TC0140SYT_ADD("tc0140syt", taitol_tc0140syt_intf)
 MACHINE_DRIVER_END
 
+#ifdef UNUSED_CODE
 static MACHINE_DRIVER_START( lagirl )
 
 	/* basic machine hardware */
@@ -2336,6 +2337,7 @@ static MACHINE_DRIVER_START( lagirl )
 
 	MDRV_MACHINE_RESET(cachat)
 MACHINE_DRIVER_END
+#endif
 
 
 ROM_START( raimais )

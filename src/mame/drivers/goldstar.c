@@ -5855,6 +5855,7 @@ static MACHINE_DRIVER_START( cmasterc )
 
 MACHINE_DRIVER_END
 
+#ifdef UNUSED_CODE
 static MACHINE_DRIVER_START( cmnobmp )
 
 	MDRV_DRIVER_DATA(goldstar_state)
@@ -5891,6 +5892,7 @@ static MACHINE_DRIVER_START( cmnobmp )
 	MDRV_SOUND_CONFIG(cm_ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_DRIVER_END
+#endif
 
 static MACHINE_DRIVER_START( cmast91 )
 

@@ -40,7 +40,7 @@ enum
 	MDRV_OKIM6295_PIN7(_pin7)
 
 #define MDRV_OKIM6295_PIN7(_pin7) \
-	MDRV_DEVICE_INLINE_DATA16(okim6295_device_config::INLINE_PIN7, _pin7)
+	okim6295_device_config::static_set_pin7(device, _pin7); \
 
 
 
@@ -89,19 +89,17 @@ public:
 	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
 	virtual device_t *alloc_device(running_machine &machine) const;
 
-	// inline configuration indexes
-	enum
-	{
-		INLINE_PIN7
-	};
+	// inline configuration helpers
+	static void static_set_pin7(device_config *device, int pin7);
 
 protected:
 	// device_config overrides
-	virtual void device_config_complete();
 	virtual const address_space_config *memory_space_config(int spacenum = 0) const;
 
 	// internal state
 	const address_space_config  m_space_config;
+
+	// inline data
 	UINT8						m_pin7;
 };
 

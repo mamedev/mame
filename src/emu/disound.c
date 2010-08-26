@@ -68,41 +68,34 @@ device_config_sound_interface::~device_config_sound_interface()
 
 
 //-------------------------------------------------
-//  interface_process_token - token processing for
-//  the sound interface
+//  static_add_route - configuration helper to add 
+//  a new route to the device
 //-------------------------------------------------
 
-bool device_config_sound_interface::interface_process_token(UINT32 entrytype, const machine_config_token *&tokens)
+void device_config_sound_interface::static_add_route(device_config *device, UINT32 output, const char *target, double gain, UINT32 input)
 {
-	switch (entrytype)
-	{
-		// custom config 1 is a new route
-		case MCONFIG_TOKEN_DISOUND_ROUTE:
-		{
-			// put back the token that was originally fetched so we can grab a packed 64-bit token
-			TOKEN_UNGET_UINT32(tokens);
+	device_config_sound_interface *sound = dynamic_cast<device_config_sound_interface *>(device);
+	if (sound == NULL)
+		throw emu_fatalerror("MDRV_SOUND_ROUTE called on device '%s' with no sound interface", device->tag());
 
-			// extract data
-			int output, input;
-			UINT32 gain;
-			TOKEN_GET_UINT64_UNPACK4(tokens, entrytype, 8, output, 12, input, 12, gain, 32);
-			float fgain = (float)gain * (1.0f / (float)(1 << 24));
-			const char *target = TOKEN_GET_STRING(tokens);
+	sound_route **routeptr;
+	for (routeptr = &sound->m_route_list; *routeptr != NULL; routeptr = &(*routeptr)->m_next) ;
+	*routeptr = global_alloc(sound_route(output, input, gain, target));
+}
 
-			// allocate a new route
-			sound_route **routeptr;
-			for (routeptr = &m_route_list; *routeptr != NULL; routeptr = &(*routeptr)->m_next) ;
-			*routeptr = global_alloc(sound_route(output, input, fgain, target));
-			return true;
-		}
 
-		// custom config 2 resets the sound routes
-		case MCONFIG_TOKEN_DISOUND_RESET:
-			reset_routes();
-			return true;
-	}
+//-------------------------------------------------
+//  static_reset_routes - configuration helper to 
+//  reset all existing routes to the device
+//-------------------------------------------------
 
-	return false;
+void device_config_sound_interface::static_reset_routes(device_config *device)
+{
+	device_config_sound_interface *sound = dynamic_cast<device_config_sound_interface *>(device);
+	if (sound == NULL)
+		throw emu_fatalerror("MDRV_SOUND_ROUTES_RESET called on device '%s' with no sound interface", device->tag());
+
+	sound->reset_routes();
 }
 
 

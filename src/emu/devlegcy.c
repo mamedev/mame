@@ -128,6 +128,65 @@ const char *legacy_device_config_base::get_legacy_config_string(UINT32 state) co
 
 
 //-------------------------------------------------
+//  static_set_inline32 - configuration helper to
+//  set a 32-bit value in the inline configuration
+//-------------------------------------------------
+
+void legacy_device_config_base::static_set_inline32(device_config *device, UINT32 offset, UINT32 size, UINT32 value)
+{
+	legacy_device_config_base *legacy = downcast<legacy_device_config_base *>(device);
+	void *dest = reinterpret_cast<UINT8 *>(legacy->m_inline_config) + offset;
+	if (size == 1)
+		*reinterpret_cast<UINT8 *>(dest) = value;
+	else if (size == 2)
+		*reinterpret_cast<UINT16 *>(dest) = value;
+	else if (size == 4)
+		*reinterpret_cast<UINT32 *>(dest) = value;
+	else
+		throw emu_fatalerror("Unexpected size %d in legacy_device_config_base::static_set_inline32", size);
+}
+
+
+//-------------------------------------------------
+//  static_set_inline64 - configuration helper to
+//  set a 64-bit value in the inline configuration
+//-------------------------------------------------
+
+void legacy_device_config_base::static_set_inline64(device_config *device, UINT32 offset, UINT32 size, UINT64 value)
+{
+	legacy_device_config_base *legacy = downcast<legacy_device_config_base *>(device);
+	void *dest = reinterpret_cast<UINT8 *>(legacy->m_inline_config) + offset;
+	if (size == 1)
+		*reinterpret_cast<UINT8 *>(dest) = value;
+	else if (size == 2)
+		*reinterpret_cast<UINT16 *>(dest) = value;
+	else if (size == 4)
+		*reinterpret_cast<UINT32 *>(dest) = value;
+	else if (size == 8)
+		*reinterpret_cast<UINT64 *>(dest) = value;
+	else
+		throw emu_fatalerror("Unexpected size %d in legacy_device_config_base::static_set_inline64", size);
+}
+
+
+//-------------------------------------------------
+//  static_set_inline_float - configuration helper 
+//  to set a floating-point value in the inline
+//  configuration
+//-------------------------------------------------
+
+void legacy_device_config_base::static_set_inline_float(device_config *device, UINT32 offset, UINT32 size, float value)
+{
+	legacy_device_config_base *legacy = downcast<legacy_device_config_base *>(device);
+	void *dest = reinterpret_cast<UINT8 *>(legacy->m_inline_config) + offset;
+	if (size == 4)
+		*reinterpret_cast<float *>(dest) = value;
+	else
+		throw emu_fatalerror("Unexpected size %d in legacy_device_config_base::static_set_inline_float", size);
+}
+
+
+//-------------------------------------------------
 //  device_validity_check - perform validity
 //  checks on a device configuration
 //-------------------------------------------------

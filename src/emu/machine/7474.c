@@ -75,30 +75,52 @@ device_t *ttl7474_device_config::alloc_device(running_machine &machine) const
 }
 
 
-
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
+//  static_set_target_tag - configuration helper 
+//  to set the target tag
 //-------------------------------------------------
 
-void ttl7474_device_config::device_config_complete()
+void ttl7474_device_config::static_set_target_tag(device_config *device, const char *tag)
 {
-	m_target_tag = reinterpret_cast<const char *>(m_inline_data[INLINE_TARGET_TAG]);
-	m_base_output_cb = reinterpret_cast<void (*)(device_t *device, INT32)>(m_inline_data[INLINE_OUTPUT_CB]);
-	m_base_comp_output_cb = reinterpret_cast<void (*)(device_t *device, INT32)>(m_inline_data[INLINE_COMP_OUTPUT_CB]);
+	ttl7474_device_config *ttl7474 = downcast<ttl7474_device_config *>(device);
+	ttl7474->m_output_cb.tag = tag;
+	ttl7474->m_comp_output_cb.tag = tag;
+}
 
-	m_output_cb.type = DEVCB_TYPE_DEVICE;
-	m_output_cb.tag = m_target_tag;
-	m_output_cb.writeline = m_base_output_cb;
-	m_output_cb.writedevice = NULL;
-	m_output_cb.writespace = NULL;
 
-	m_comp_output_cb.type = DEVCB_TYPE_DEVICE;
-	m_comp_output_cb.tag = m_target_tag;
-	m_comp_output_cb.writeline = m_base_comp_output_cb;
-	m_comp_output_cb.writedevice = NULL;
-	m_comp_output_cb.writespace = NULL;
+//-------------------------------------------------
+//  static_set_output_cb - configuration helper
+//  to set the output callback
+//-------------------------------------------------
+
+void ttl7474_device_config::static_set_output_cb(device_config *device, write_line_device_func callback)
+{
+	ttl7474_device_config *ttl7474 = downcast<ttl7474_device_config *>(device);
+	if (callback != NULL)
+	{
+		ttl7474->m_output_cb.type = DEVCB_TYPE_DEVICE;
+		ttl7474->m_output_cb.writeline = callback;
+	}
+	else
+		ttl7474->m_output_cb.type = DEVCB_TYPE_NULL;
+}
+
+
+//-------------------------------------------------
+//  static_set_comp_output_cb - configuration 
+//  helper to set the comp. output callback
+//-------------------------------------------------
+
+void ttl7474_device_config::static_set_comp_output_cb(device_config *device, write_line_device_func callback)
+{
+	ttl7474_device_config *ttl7474 = downcast<ttl7474_device_config *>(device);
+	if (callback != NULL)
+	{
+		ttl7474->m_comp_output_cb.type = DEVCB_TYPE_DEVICE;
+		ttl7474->m_comp_output_cb.writeline = callback;
+	}
+	else
+		ttl7474->m_comp_output_cb.type = DEVCB_TYPE_NULL;
 }
 
 

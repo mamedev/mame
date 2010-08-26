@@ -118,15 +118,14 @@ device_t *okim6295_device_config::alloc_device(running_machine &machine) const
 
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
+//  static_set_pin7 - configuration helper to set
+//  the pin 7 state
 //-------------------------------------------------
 
-void okim6295_device_config::device_config_complete()
+void okim6295_device_config::static_set_pin7(device_config *device, int pin7)
 {
-	// copy the pin7 state from inline data
-	m_pin7 = m_inline_data[INLINE_PIN7];
+	okim6295_device_config *okim6295 = downcast<okim6295_device_config *>(device);
+	okim6295->m_pin7 = pin7;
 }
 
 

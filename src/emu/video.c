@@ -1721,29 +1721,114 @@ device_t *screen_device_config::alloc_device(running_machine &machine) const
 
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
+//  static_set_format - configuration helper
+//  to set the bitmap format
 //-------------------------------------------------
 
-void screen_device_config::device_config_complete()
+void screen_device_config::static_set_format(device_config *device, bitmap_format format)
 {
-	// move inline data into its final home
-	m_type = static_cast<screen_type_enum>(m_inline_data[INLINE_TYPE]);
-	m_width = static_cast<INT16>(m_inline_data[INLINE_WIDTH]);
-	m_height = static_cast<INT16>(m_inline_data[INLINE_HEIGHT]);
-	m_visarea.min_x = static_cast<INT16>(m_inline_data[INLINE_VIS_MINX]);
-	m_visarea.min_y = static_cast<INT16>(m_inline_data[INLINE_VIS_MINY]);
-	m_visarea.max_x = static_cast<INT16>(m_inline_data[INLINE_VIS_MAXX]);
-	m_visarea.max_y = static_cast<INT16>(m_inline_data[INLINE_VIS_MAXY]);
-	m_oldstyle_vblank_supplied = (m_inline_data[INLINE_OLDVBLANK] != 0);
-	m_refresh = m_inline_data[INLINE_REFRESH];
-	m_vblank = m_inline_data[INLINE_VBLANK];
-	m_format = static_cast<bitmap_format>(m_inline_data[INLINE_FORMAT]);
-	m_xoffset = static_cast<double>(static_cast<INT32>(m_inline_data[INLINE_XOFFSET])) / (double)(1 << 24);
-	m_yoffset = static_cast<double>(static_cast<INT32>(m_inline_data[INLINE_YOFFSET])) / (double)(1 << 24);
-	m_xscale = (m_inline_data[INLINE_XSCALE] == 0) ? 1.0 : (static_cast<double>(static_cast<INT32>(m_inline_data[INLINE_XSCALE])) / (double)(1 << 24));
-	m_yscale = (m_inline_data[INLINE_YSCALE] == 0) ? 1.0 : (static_cast<double>(static_cast<INT32>(m_inline_data[INLINE_YSCALE])) / (double)(1 << 24));
+	screen_device_config *screen = downcast<screen_device_config *>(device);
+	screen->m_format = format;
+}
+
+
+//-------------------------------------------------
+//  static_set_type - configuration helper
+//  to set the screen type
+//-------------------------------------------------
+
+void screen_device_config::static_set_type(device_config *device, screen_type_enum type)
+{
+	screen_device_config *screen = downcast<screen_device_config *>(device);
+	screen->m_type = type;
+}
+
+
+//-------------------------------------------------
+//  static_set_raw - configuration helper
+//  to set the raw screen parameters
+//-------------------------------------------------
+
+void screen_device_config::static_set_raw(device_config *device, UINT32 pixclock, UINT16 htotal, UINT16 hbend, UINT16 hbstart, UINT16 vtotal, UINT16 vbend, UINT16 vbstart)
+{
+	screen_device_config *screen = downcast<screen_device_config *>(device);
+	screen->m_refresh = HZ_TO_ATTOSECONDS(pixclock) * htotal * vtotal;
+	screen->m_vblank = screen->m_refresh / vtotal * (vtotal - (vbstart - vbend));
+	screen->m_width = htotal;
+	screen->m_height = vtotal;
+	screen->m_visarea.min_x = hbend;
+	screen->m_visarea.max_x = hbstart - 1;
+	screen->m_visarea.min_y = vbend;
+	screen->m_visarea.max_y = vbstart - 1;
+}
+
+
+//-------------------------------------------------
+//  static_set_refresh - configuration helper
+//  to set the refresh rate
+//-------------------------------------------------
+
+void screen_device_config::static_set_refresh(device_config *device, attoseconds_t rate)
+{
+	screen_device_config *screen = downcast<screen_device_config *>(device);
+	screen->m_refresh = rate;
+}
+
+
+//-------------------------------------------------
+//  static_set_vblank_time - configuration helper
+//  to set the VBLANK duration
+//-------------------------------------------------
+
+void screen_device_config::static_set_vblank_time(device_config *device, attoseconds_t time)
+{
+	screen_device_config *screen = downcast<screen_device_config *>(device);
+	screen->m_vblank = time;
+	screen->m_oldstyle_vblank_supplied = true;
+}
+
+
+//-------------------------------------------------
+//  static_set_size - configuration helper to set
+//  the width/height of the screen
+//-------------------------------------------------
+
+void screen_device_config::static_set_size(device_config *device, UINT16 width, UINT16 height)
+{
+	screen_device_config *screen = downcast<screen_device_config *>(device);
+	screen->m_width = width;
+	screen->m_height = height;
+}
+
+
+//-------------------------------------------------
+//  static_set_visarea - configuration helper to 
+//  set the visible area of the screen
+//-------------------------------------------------
+
+void screen_device_config::static_set_visarea(device_config *device, INT16 minx, INT16 maxx, INT16 miny, INT16 maxy)
+{
+	screen_device_config *screen = downcast<screen_device_config *>(device);
+	screen->m_visarea.min_x = minx;
+	screen->m_visarea.max_x = maxx;
+	screen->m_visarea.min_y = miny;
+	screen->m_visarea.max_y = maxy;
+}
+
+
+//-------------------------------------------------
+//  static_set_default_position - configuration 
+//  helper to set the default position and scale
+//  factors for the screen
+//-------------------------------------------------
+
+void screen_device_config::static_set_default_position(device_config *device, double xscale, double xoffs, double yscale, double yoffs)
+{
+	screen_device_config *screen = downcast<screen_device_config *>(device);
+	screen->m_xscale = xscale;
+	screen->m_xoffset = xoffs;
+	screen->m_yscale = yscale;
+	screen->m_yoffset = yoffs;
 }
 
 

@@ -736,6 +736,7 @@ static MACHINE_DRIVER_START( silkworm )
 	MDRV_CPU_PROGRAM_MAP(silkworm_map)
 MACHINE_DRIVER_END
 
+#ifdef UNUSED_CODE
 static MACHINE_DRIVER_START( backfirt )
 
 	/* basic machine hardware */
@@ -772,6 +773,7 @@ static MACHINE_DRIVER_START( backfirt )
 	/* no MSM on this PCB */
 
 MACHINE_DRIVER_END
+#endif
 
 /***************************************************************************
 

@@ -19,7 +19,7 @@
 
 #define MDRV_EEPROM_ADD(_tag, _interface) \
 	MDRV_DEVICE_ADD(_tag, EEPROM, 0) \
-	MDRV_DEVICE_INLINE_DATAPTR(eeprom_device_config::INLINE_INTERFACE, &_interface)
+	eeprom_device_config::static_set_interface(device, _interface); \
 
 #define MDRV_EEPROM_93C46_ADD(_tag) \
 	MDRV_EEPROM_ADD(_tag, eeprom_interface_93C46)
@@ -28,11 +28,10 @@
 	MDRV_EEPROM_ADD(_tag, eeprom_interface_93C66B)
 
 #define MDRV_EEPROM_DATA(_data, _size) \
-	MDRV_DEVICE_INLINE_DATAPTR(eeprom_device_config::INLINE_DATAPTR, &_data) \
-	MDRV_DEVICE_INLINE_DATA16(eeprom_device_config::INLINE_DATASIZE, _size)
+	eeprom_device_config::static_set_default_data(device, _data, _size); \
 
 #define MDRV_EEPROM_DEFAULT_VALUE(_value) \
-	MDRV_DEVICE_INLINE_DATA32(eeprom_device_config::INLINE_DEFVALUE, 0x10000 | ((_value) & 0xffff))
+	eeprom_device_config::static_set_default_value(device, _value); \
 
 
 
@@ -76,28 +75,26 @@ public:
 	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
 	virtual device_t *alloc_device(running_machine &machine) const;
 
-	// inline configuration indexes
-	enum
-	{
-		INLINE_INTERFACE,
-		INLINE_DATAPTR,
-		INLINE_DATASIZE,
-		INLINE_DEFVALUE
-	};
+	// inline configuration helpers
+	static void static_set_interface(device_config *deviec, const eeprom_interface &interface);
+	static void static_set_default_data(device_config *device, const UINT8 *data, UINT32 size);
+	static void static_set_default_data(device_config *device, const UINT16 *data, UINT32 size);
+	static void static_set_default_value(device_config *device, UINT16 value);
 
 protected:
 	// device_config overrides
-	virtual void device_config_complete();
 	virtual bool device_validity_check(const game_driver &driver) const;
 
 	// device_config_memory_interface overrides
 	virtual const address_space_config *memory_space_config(int spacenum = 0) const;
 
 	// device-specific configuration
+	address_space_config		m_space_config;
+
+	// internal state
 	const UINT8 *				m_default_data;
 	int 						m_default_data_size;
 	UINT32						m_default_value;
-	address_space_config		m_space_config;
 };
 
 

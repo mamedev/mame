@@ -879,7 +879,7 @@ static void stars_update_origin(running_machine *machine)
  *
  *************************************/
 
-TIMER_CALLBACK( galaxian_stars_blink_timer )
+TIMER_DEVICE_CALLBACK( galaxian_stars_blink_timer )
 {
 	stars_blink_state++;
 }

@@ -144,26 +144,18 @@ const address_space_config *device_config_memory_interface::memory_space_config(
 
 
 //-------------------------------------------------
-//  interface_process_token - token processing for
-//  the memory interface
+//  static_set_vblank_int - configuration helper 
+//  to set up VBLANK interrupts on the device
 //-------------------------------------------------
 
-bool device_config_memory_interface::interface_process_token(UINT32 entrytype, const machine_config_token *&tokens)
+void device_config_memory_interface::static_set_addrmap(device_config *device, int spacenum, address_map_constructor map)
 {
-	UINT32 data32;
-
-	switch (entrytype)
-	{
-		// specify device address map
-		case MCONFIG_TOKEN_DIMEMORY_MAP:
-			TOKEN_UNGET_UINT32(tokens);
-			TOKEN_GET_UINT32_UNPACK2(tokens, entrytype, 8, data32, 8);
-			assert(data32 < ARRAY_LENGTH(m_address_map));
-			m_address_map[data32] = TOKEN_GET_PTR(tokens, addrmap);
-			return true;
-	}
-
-	return false;
+	device_config_memory_interface *memory = dynamic_cast<device_config_memory_interface *>(device);
+	if (memory == NULL)
+		throw emu_fatalerror("MDRV_DEVICE_ADDRESS_MAP called on device '%s' with no memory interface", device->tag());
+	if (spacenum >= ARRAY_LENGTH(memory->m_address_map))
+		throw emu_fatalerror("MDRV_DEVICE_ADDRESS_MAP called with out-of-range space number %d", device->tag(), spacenum);
+	memory->m_address_map[spacenum] = map;
 }
 
 

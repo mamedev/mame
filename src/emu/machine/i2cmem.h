@@ -26,7 +26,7 @@
 
 #define MDRV_I2CMEM_ADD( _tag, _interface ) \
 	MDRV_DEVICE_ADD( _tag, I2CMEM, 0 ) \
-	MDRV_DEVICE_INLINE_DATAPTR( i2cmem_device_config::INLINE_INTERFACE, &_interface )
+	i2cmem_device_config::static_set_interface(device, _interface);
 
 
 //**************************************************************************
@@ -61,11 +61,8 @@ public:
 	static device_config *static_alloc_device_config( const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock );
 	virtual device_t *alloc_device( running_machine &machine ) const;
 
-	// inline configuration indexes
-	enum
-	{
-		INLINE_INTERFACE
-	};
+	// inline configuration
+	static void static_set_interface(device_config *device, const i2cmem_interface &interface);
 
 protected:
 	// device_config overrides

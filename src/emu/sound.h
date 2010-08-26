@@ -49,19 +49,11 @@ public:
 	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
 	virtual device_t *alloc_device(running_machine &machine) const;
 
-	// indexes to inline data
-	enum
-	{
-		INLINE_X,
-		INLINE_Y,
-		INLINE_Z
-	};
+	// inline configuration helpers
+	static void static_set_position(device_config *device, double x, double y, double z);
 
 protected:
-	// device_config overrides
-	virtual void device_config_complete();
-
-	// internal state
+	// inline configuration state
 	double		m_x;
 	double		m_y;
 	double		m_z;
@@ -133,9 +125,7 @@ extern const device_type SPEAKER;
 /* add/remove speakers */
 #define MDRV_SPEAKER_ADD(_tag, _x, _y, _z) \
 	MDRV_DEVICE_ADD(_tag, SPEAKER, 0) \
-	MDRV_DEVICE_INLINE_DATA32(speaker_device_config::INLINE_X, (INT32)((_x) * (double)(1 << 24))) \
-	MDRV_DEVICE_INLINE_DATA32(speaker_device_config::INLINE_Y, (INT32)((_y) * (double)(1 << 24))) \
-	MDRV_DEVICE_INLINE_DATA32(speaker_device_config::INLINE_Z, (INT32)((_z) * (double)(1 << 24)))
+	speaker_device_config::static_set_position(device, _x, _y, _z); \
 
 #define MDRV_SPEAKER_STANDARD_MONO(_tag) \
 	MDRV_SPEAKER_ADD(_tag, 0.0, 0.0, 1.0)

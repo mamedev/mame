@@ -517,10 +517,10 @@ void image_add_device_with_subdevices(device_t *owner, device_type type, const c
 	device_config *devconfig = type(*config, owner->subtag(tempstring,tag), &owner->baseconfig(), clock);
 	running_device *device = device_list->append(devconfig->tag(), devconfig->alloc_device(*owner->machine));
 
-	const machine_config_token *tokens = device->machine_config_tokens();
-	if (tokens != NULL)
+	machine_config_constructor machconfig = device->machine_config_additions();
+	if (machconfig != NULL)
     {
-		config->detokenize(tokens,devconfig);
+    	(*machconfig)(*config, devconfig);
         for (const device_config *config_dev = config->m_devicelist.first(); config_dev != NULL; config_dev = config_dev->next())
         {
 			if (config_dev->owner()==devconfig) {

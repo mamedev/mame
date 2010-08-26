@@ -848,10 +848,12 @@ static ADDRESS_MAP_START( norautx4_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6000, 0x67ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram) /* 6116 */
 ADDRESS_MAP_END
 
+#ifdef UNUSED_CODE
 static ADDRESS_MAP_START( norautx8_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM	/* need to be checked */
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram) /* 6116 */
 ADDRESS_MAP_END
+#endif
 
 static ADDRESS_MAP_START( kimble_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
@@ -1322,6 +1324,7 @@ static MACHINE_DRIVER_START( norautx4 )
 MACHINE_DRIVER_END
 
 
+#ifdef UNUSED_CODE
 static MACHINE_DRIVER_START( norautx8 )
 	MDRV_IMPORT_FROM(noraut_base)
 
@@ -1330,6 +1333,7 @@ static MACHINE_DRIVER_START( norautx8 )
 	MDRV_CPU_PROGRAM_MAP(norautx8_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 MACHINE_DRIVER_END
+#endif
 
 
 static MACHINE_DRIVER_START( kimble )

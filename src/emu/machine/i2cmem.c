@@ -110,6 +110,18 @@ device_t *i2cmem_device_config::alloc_device( running_machine &machine ) const
 
 
 //-------------------------------------------------
+//  static_set_interface - set the device 
+//  configuration
+//-------------------------------------------------
+
+void i2cmem_device_config::static_set_interface(device_config *device, const i2cmem_interface &interface)
+{
+	i2cmem_device_config *i2cmem = downcast<i2cmem_device_config *>(device);
+	*static_cast<i2cmem_interface *>(i2cmem) = interface;
+}
+
+
+//-------------------------------------------------
 //  device_config_complete - perform any
 //  operations now that the configuration is
 //  complete
@@ -117,15 +129,6 @@ device_t *i2cmem_device_config::alloc_device( running_machine &machine ) const
 
 void i2cmem_device_config::device_config_complete()
 {
-	// extract inline configuration from raw data
-	const i2cmem_interface *intf = reinterpret_cast<const i2cmem_interface *>( m_inline_data[ INLINE_INTERFACE ] );
-
-	// inherit a copy of the static data
-	if( intf != NULL )
-	{
-		*static_cast<i2cmem_interface *>(this) = *intf;
-	}
-
 	m_space_config = address_space_config( "i2cmem", ENDIANNESS_BIG, 8,  m_address_bits, 0, *ADDRESS_MAP_NAME( i2cmem_map8 ) );
 }
 
@@ -138,13 +141,6 @@ void i2cmem_device_config::device_config_complete()
 bool i2cmem_device_config::device_validity_check( const game_driver &driver ) const
 {
 	bool error = false;
-
-	if( m_inline_data[ INLINE_INTERFACE ] == 0 )
-	{
-		mame_printf_error( "%s: %s i2cmem device '%s' did not specify an interface\n", driver.source_file, driver.name, tag() );
-		error = true;
-	}
-
 	return error;
 }
 

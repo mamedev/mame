@@ -148,7 +148,7 @@ struct _ldplayer_interface
 	size_t					statesize;				/* size of the state */
 	const char *			name;					/* name of the player */
 	const rom_entry *		romregion;				/* pointer to ROM region information */
-	const machine_config_token *machine_config;		/* pointer to machine configuration */
+	machine_config_constructor machine_config;		/* pointer to machine configuration */
 	laserdisc_init_func		init;					/* initialization callback */
 	laserdisc_vsync_func	vsync;					/* vsync begin callback */
 	laserdisc_update_func	update;					/* update callback (line 16) */

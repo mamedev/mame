@@ -107,28 +107,55 @@ device_t *eeprom_device_config::alloc_device(running_machine &machine) const
 
 
 //-------------------------------------------------
-//  device_config_complete - perform any
-//  operations now that the configuration is
-//  complete
+//  static_set_interface - configuration helper 
+//  to set the interface
 //-------------------------------------------------
 
-void eeprom_device_config::device_config_complete()
+void eeprom_device_config::static_set_interface(device_config *device, const eeprom_interface &interface)
 {
-	// extract inline configuration from raw data
-	const eeprom_interface *intf = reinterpret_cast<const eeprom_interface *>(m_inline_data[INLINE_INTERFACE]);
-	m_default_data = reinterpret_cast<const UINT8 *>(m_inline_data[INLINE_DATAPTR]);
-	m_default_data_size = m_inline_data[INLINE_DATASIZE];
-	m_default_value = m_inline_data[INLINE_DEFVALUE];
+	eeprom_device_config *eeprom = downcast<eeprom_device_config *>(device);
+	*static_cast<eeprom_interface *>(eeprom) = interface;
 
-	// inherit a copy of the static data
-	if (intf != NULL)
-		*static_cast<eeprom_interface *>(this) = *intf;
-
-	// now describe our address space
-	if (m_data_bits == 8)
-		m_space_config = address_space_config("eeprom", ENDIANNESS_BIG, 8,  m_address_bits, 0, *ADDRESS_MAP_NAME(eeprom_map8));
+	// describe our address space
+	if (eeprom->m_data_bits == 8)
+		eeprom->m_space_config = address_space_config("eeprom", ENDIANNESS_BIG, 8,  eeprom->m_address_bits, 0, *ADDRESS_MAP_NAME(eeprom_map8));
 	else
-		m_space_config = address_space_config("eeprom", ENDIANNESS_BIG, 16, m_address_bits * 2, 0, *ADDRESS_MAP_NAME(eeprom_map16));
+		eeprom->m_space_config = address_space_config("eeprom", ENDIANNESS_BIG, 16, eeprom->m_address_bits * 2, 0, *ADDRESS_MAP_NAME(eeprom_map16));
+}
+
+
+//-------------------------------------------------
+//  static_set_default_data - configuration helpers
+//  to set the default data
+//-------------------------------------------------
+
+void eeprom_device_config::static_set_default_data(device_config *device, const UINT8 *data, UINT32 size)
+{
+	eeprom_device_config *eeprom = downcast<eeprom_device_config *>(device);
+if (eeprom->m_data_bits != 8) mame_printf_warning("16-bit EEPROM set with 8-bit data\n");
+//	assert(eeprom->m_data_bits == 8);
+	eeprom->m_default_data = data;
+	eeprom->m_default_data_size = size;
+}
+
+void eeprom_device_config::static_set_default_data(device_config *device, const UINT16 *data, UINT32 size)
+{
+	eeprom_device_config *eeprom = downcast<eeprom_device_config *>(device);
+if (eeprom->m_data_bits != 16) mame_printf_warning("8-bit EEPROM set with 16-bit data\n");
+//	assert(eeprom->m_data_bits == 16);
+	eeprom->m_default_data = reinterpret_cast<const UINT8 *>(data);
+	eeprom->m_default_data_size = size;
+}
+
+
+//-------------------------------------------------
+//  static_set_default_value - configuration helper
+//  to set the default value
+//-------------------------------------------------
+
+void eeprom_device_config::static_set_default_value(device_config *device, UINT16 value)
+{
+	downcast<eeprom_device_config *>(device)->m_default_value = 0x10000 | value;
 }
 
 
@@ -141,12 +168,7 @@ bool eeprom_device_config::device_validity_check(const game_driver &driver) cons
 {
 	bool error = false;
 
-	if (m_inline_data[INLINE_INTERFACE] == 0)
-	{
-		mame_printf_error("%s: %s eeprom device '%s' did not specify an interface\n", driver.source_file, driver.name, tag());
-		error = true;
-	}
-	else if (m_data_bits != 8 && m_data_bits != 16)
+	if (m_data_bits != 8 && m_data_bits != 16)
 	{
 		mame_printf_error("%s: %s eeprom device '%s' specified invalid data width %d\n", driver.source_file, driver.name, tag(), m_data_bits);
 		error = true;

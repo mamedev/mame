@@ -63,13 +63,13 @@
     MDRV_7474_COMP_OUTPUT_CB(_comp_output_cb)
 
 #define MDRV_7474_TARGET_TAG(_target_tag) \
-    MDRV_DEVICE_INLINE_DATAPTR(ttl7474_device_config::INLINE_TARGET_TAG, _target_tag)
+	ttl7474_device_config::static_set_target_tag(device, _target_tag); \
 
 #define MDRV_7474_OUTPUT_CB(_cb) \
-    MDRV_DEVICE_INLINE_DATAPTR(ttl7474_device_config::INLINE_OUTPUT_CB, _cb)
+	ttl7474_device_config::static_set_output_cb(device, _cb); \
 
 #define MDRV_7474_COMP_OUTPUT_CB(_cb) \
-    MDRV_DEVICE_INLINE_DATAPTR(ttl7474_device_config::INLINE_COMP_OUTPUT_CB, _cb)
+	ttl7474_device_config::static_set_comp_output_cb(device, _cb); \
 
 
 
@@ -91,23 +91,13 @@ public:
     static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
     virtual device_t *alloc_device(running_machine &machine) const;
 
-    // inline configuration indexes go here
-    enum
-    {
-		INLINE_TARGET_TAG,
-        INLINE_OUTPUT_CB,
-        INLINE_COMP_OUTPUT_CB
-    };
+	// inline configuration helpers
+	static void static_set_target_tag(device_config *device, const char *tag);
+	static void static_set_output_cb(device_config *device, write_line_device_func callback);
+	static void static_set_comp_output_cb(device_config *device, write_line_device_func callback);
 
 protected:
-    // device_config overrides
-    virtual void device_config_complete();
-
     // internal state goes here
-	const char *m_target_tag;
-	void (*m_base_output_cb)(device_t *device, INT32);
-	void (*m_base_comp_output_cb)(device_t *device, INT32);
-
     devcb_write_line m_output_cb;
     devcb_write_line m_comp_output_cb;
 };

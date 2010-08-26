@@ -205,9 +205,10 @@ device_t *gp9001vdp_device_config::alloc_device(running_machine &machine) const
 	return auto_alloc(&machine, gp9001vdp_device(machine, *this));
 }
 
-void gp9001vdp_device_config::device_config_complete()
+void gp9001vdp_device_config::static_set_gfx_region(device_config *device, int gfxregion)
 {
-	m_gfxregion = m_inline_data[0];
+	gp9001vdp_device_config *vdp = downcast<gp9001vdp_device_config *>(device);
+	vdp->m_gfxregion = gfxregion;
 }
 
 bool gp9001vdp_device_config::device_validity_check(const game_driver &driver) const

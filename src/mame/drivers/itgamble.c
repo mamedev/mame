@@ -217,6 +217,7 @@ static MACHINE_DRIVER_START( mnumber )
 MACHINE_DRIVER_END
 
 
+#ifdef UNUSED_CODE
 static MACHINE_DRIVER_START( ejollyx5 )
 
 	MDRV_IMPORT_FROM(itgamble)
@@ -227,6 +228,7 @@ static MACHINE_DRIVER_START( ejollyx5 )
 	MDRV_OKIM6295_REPLACE("oki", MNUMBER_SND_CLOCK/16, OKIM6295_PIN7_HIGH) /* clock frequency & pin 7 not verified */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_DRIVER_END
+#endif
 
 
 /*************************

@@ -80,37 +80,30 @@ struct timer_execution_state
 
 #define MDRV_TIMER_ADD(_tag, _callback) \
 	MDRV_DEVICE_ADD(_tag, TIMER, 0) \
-	MDRV_DEVICE_INLINE_DATA16(timer_device_config::INLINE_TYPE, timer_device_config::TIMER_TYPE_GENERIC) \
-	MDRV_DEVICE_INLINE_DATAPTR(timer_device_config::INLINE_CALLBACK, _callback)
+	timer_device_config::static_configure_generic(device, _callback); \
 
 #define MDRV_TIMER_ADD_PERIODIC(_tag, _callback, _period) \
 	MDRV_DEVICE_ADD(_tag, TIMER, 0) \
-	MDRV_DEVICE_INLINE_DATA16(timer_device_config::INLINE_TYPE, timer_device_config::TIMER_TYPE_PERIODIC) \
-	MDRV_DEVICE_INLINE_DATAPTR(timer_device_config::INLINE_CALLBACK, _callback) \
-	MDRV_DEVICE_INLINE_DATA64(timer_device_config::INLINE_PERIOD, UINT64_ATTOTIME_IN_##_period)
+	timer_device_config::static_configure_periodic(device, _callback, ATTOTIME_IN_##_period); \
 
 #define MDRV_TIMER_ADD_SCANLINE(_tag, _callback, _screen, _first_vpos, _increment) \
 	MDRV_DEVICE_ADD(_tag, TIMER, 0) \
-	MDRV_DEVICE_INLINE_DATA16(timer_device_config::INLINE_TYPE, timer_device_config::TIMER_TYPE_SCANLINE) \
-	MDRV_DEVICE_INLINE_DATAPTR(timer_device_config::INLINE_CALLBACK, _callback) \
-	MDRV_DEVICE_INLINE_DATAPTR(timer_device_config::INLINE_SCREEN, _screen) \
-	MDRV_DEVICE_INLINE_DATA16(timer_device_config::INLINE_FIRST_VPOS, _first_vpos) \
-	MDRV_DEVICE_INLINE_DATA16(timer_device_config::INLINE_INCREMENT, _increment)
+	timer_device_config::static_configure_scanline(device, _callback, _screen, _first_vpos, _increment); \
 
 #define MDRV_TIMER_MODIFY(_tag) \
 	MDRV_DEVICE_MODIFY(_tag)
 
 #define MDRV_TIMER_CALLBACK(_callback) \
-	MDRV_DEVICE_INLINE_DATA32(timer_device_config::INLINE_CALLBACK, _callback)
+	timer_device_config::static_set_callback(device, _callback); \
 
 #define MDRV_TIMER_START_DELAY(_start_delay) \
-	MDRV_DEVICE_INLINE_DATA64(timer_device_config::INLINE_DELAY, UINT64_ATTOTIME_IN_##_start_delay)
+	timer_device_config::static_set_start_delay(device, ATTOTIME_IN_##_start_delay); \
 
 #define MDRV_TIMER_PARAM(_param) \
-	MDRV_DEVICE_INLINE_DATA32(timer_device_config::INLINE_PARAM, _param)
+	timer_device_config::static_set_param(device, _param); \
 
 #define MDRV_TIMER_PTR(_ptr) \
-	MDRV_DEVICE_INLINE_DATAPTR(timer_device_config::INLINE_PTR, _ptr)
+	timer_device_config::static_set_ptr(device, (void *)(_ptr)); \
 
 
 
@@ -233,19 +226,18 @@ public:
 	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
 	virtual device_t *alloc_device(running_machine &machine) const;
 
-	// indexes to inline data
-	enum
-	{
-		INLINE_TYPE,
-		INLINE_CALLBACK,
-		INLINE_PERIOD,
-		INLINE_SCREEN,
-		INLINE_FIRST_VPOS,
-		INLINE_INCREMENT,
-		INLINE_DELAY,
-		INLINE_PARAM,
-		INLINE_PTR
-	};
+	// inline configuration helpers
+	static void static_configure_generic(device_config *device, timer_device_fired_func callback);
+	static void static_configure_periodic(device_config *device, timer_device_fired_func callback, attotime period);
+	static void static_configure_scanline(device_config *device, timer_device_fired_func callback, const char *screen, int first_vpos, int increment);
+	static void static_set_callback(device_config *device, timer_device_fired_func callback);
+	static void static_set_start_delay(device_config *device, attotime delay);
+	static void static_set_param(device_config *device, int param);
+	static void static_set_ptr(device_config *device, void *ptr);
+
+private:
+	// device_config overrides
+	virtual bool device_validity_check(const game_driver &driver) const;
 
 	// timer types
 	enum timer_type
@@ -255,19 +247,14 @@ public:
 		TIMER_TYPE_GENERIC
 	};
 
-private:
-	// device_config overrides
-	virtual void device_config_complete();
-	virtual bool device_validity_check(const game_driver &driver) const;
-
 	// configuration data
 	timer_type				m_type;				// type of timer
 	timer_device_fired_func	m_callback;			// the timer's callback function
 	void *					m_ptr;				// the pointer parameter passed to the timer callback
 
 	// periodic timers only
-	UINT64					m_start_delay;		// delay before the timer fires for the first time
-	UINT64					m_period;			// period of repeated timer firings
+	attotime				m_start_delay;		// delay before the timer fires for the first time
+	attotime				m_period;			// period of repeated timer firings
 	INT32					m_param;			// the integer parameter passed to the timer callback
 
 	// scanline timers only

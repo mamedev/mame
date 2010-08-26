@@ -66,32 +66,13 @@
 
 // configure devices
 #define MDRV_DEVICE_CONFIG(_config) \
-	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_DEVICE_CONFIG, 8), \
-	TOKEN_PTR(voidptr, &(_config)),
+	device_config::static_set_static_config(device, &(_config)); \
 
 #define MDRV_DEVICE_CONFIG_CLEAR() \
-	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_DEVICE_CONFIG, 8), \
-	TOKEN_PTR(voidptr, NULL),
+	device_config::static_set_static_config(device, NULL); \
 
 #define MDRV_DEVICE_CLOCK(_clock) \
-	TOKEN_UINT64_PACK2(MCONFIG_TOKEN_DEVICE_CLOCK, 8, _clock, 32),
-
-#define MDRV_DEVICE_INLINE_DATA16(_index, _data) \
-	TOKEN_UINT32_PACK3(MCONFIG_TOKEN_DEVICE_INLINE_DATA16, 8, _index, 8, (UINT16)(_data), 16), \
-
-#define MDRV_DEVICE_INLINE_DATA32(_index, _data) \
-	TOKEN_UINT32_PACK2(MCONFIG_TOKEN_DEVICE_INLINE_DATA32, 8, _index, 8), \
-	TOKEN_UINT32((UINT32)(_data)),
-
-#define MDRV_DEVICE_INLINE_DATA64(_index, _data) \
-	TOKEN_UINT32_PACK2(MCONFIG_TOKEN_DEVICE_INLINE_DATA64, 8, _index, 8), \
-	TOKEN_UINT64((UINT64)(_data)),
-
-#ifdef PTR64
-#define MDRV_DEVICE_INLINE_DATAPTR(_index, _data) MDRV_DEVICE_INLINE_DATA64(_index, (FPTR)(_data))
-#else
-#define MDRV_DEVICE_INLINE_DATAPTR(_index, _data) MDRV_DEVICE_INLINE_DATA32(_index, (FPTR)(_data))
-#endif
+	device_config::static_set_clock(device, _clock); \
 
 
 
@@ -110,7 +91,6 @@ class device_execute_interface;
 class device_memory_interface;
 class device_state_interface;
 struct rom_entry;
-union machine_config_token;
 class machine_config;
 
 
@@ -265,9 +245,12 @@ public:
 	const void *static_config() const { return m_static_config; }
 
 	// methods that wrap both interface-level and device-level behavior
-	void process_token(UINT32 entrytype, const machine_config_token *&tokens);
 	void config_complete();
 	bool validity_check(const game_driver &driver) const;
+	
+	// configuration helpers
+	static void static_set_clock(device_config *device, UINT32 clock) { device->m_clock = clock; }
+	static void static_set_static_config(device_config *device, const void *config) { device->m_static_config = config; }
 
 	//------------------- begin derived class overrides
 
@@ -276,14 +259,13 @@ public:
 
 	// optional operation overrides
 protected:
-	virtual bool device_process_token(UINT32 entrytype, const machine_config_token *&tokens);
 	virtual void device_config_complete();
 	virtual bool device_validity_check(const game_driver &driver) const;
 
 public:
 	// optional information overrides
 	virtual const rom_entry *rom_region() const;
-	virtual const machine_config_token *machine_config_tokens() const;
+	virtual machine_config_constructor machine_config_additions() const;
 
 	//------------------- end derived class overrides
 
@@ -298,7 +280,6 @@ protected:
 
 	const machine_config &	m_machine_config;		// reference to the machine's configuration
 	const void *			m_static_config;		// static device configuration
-	UINT64					m_inline_data[16];		// array of inline configuration values
 
 	astring					m_name;					// name of the device
 
@@ -333,7 +314,6 @@ public:
 
 	// optional operation overrides
 	virtual void interface_config_complete();
-	virtual bool interface_process_token(UINT32 entrytype, const machine_config_token *&tokens);
 	virtual bool interface_validity_check(const game_driver &driver) const;
 
 protected:
@@ -416,7 +396,7 @@ public:
 
 	// machine and ROM configuration getters ... pass through to underlying config
 	const rom_entry *rom_region() const { return m_baseconfig.rom_region(); }
-	const machine_config_token *machine_config_tokens() const { return m_baseconfig.machine_config_tokens(); }
+	machine_config_constructor machine_config_additions() const { return m_baseconfig.machine_config_additions(); }
 
 public:
 	running_machine *		machine;

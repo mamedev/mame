@@ -31,9 +31,7 @@
  *************************************/
 
 #define MDRV_CPU_VBLANK_INT_HACK(_func, _rate) \
-	TOKEN_UINT32_PACK2(MCONFIG_TOKEN_DIEXEC_VBLANK_INT, 8, _rate, 24), \
-	TOKEN_PTR(cpu_interrupt, _func), \
-	TOKEN_PTR(stringptr, NULL), \
+	device_config_execute_interface::static_set_vblank_int(device, _func, NULL, _rate); \
 
 
 

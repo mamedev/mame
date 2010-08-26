@@ -76,14 +76,13 @@ const int ALL_OUTPUTS		= MAX_OUTPUTS;	// special value indicating all outputs fo
 	MDRV_DEVICE_CONFIG(_config)
 
 #define MDRV_SOUND_ROUTE_EX(_output, _target, _gain, _input) \
-	TOKEN_UINT64_PACK4(MCONFIG_TOKEN_DISOUND_ROUTE, 8, _output, 12, _input, 12, ((float)(_gain) * (float)(1 << 24)), 32), \
-	TOKEN_PTR(stringptr, _target),
+	device_config_sound_interface::static_add_route(device, _output, _target, _gain, _input); \
 
 #define MDRV_SOUND_ROUTE(_output, _target, _gain) \
 	MDRV_SOUND_ROUTE_EX(_output, _target, _gain, 0)
 
 #define MDRV_SOUND_ROUTES_RESET() \
-	TOKEN_UINT32_PACK1(MCONFIG_TOKEN_DISOUND_RESET, 8),
+	device_config_sound_interface::static_reset_routes(device); \
 
 
 
@@ -118,9 +117,12 @@ public:
 
 	sound_route *		m_route_list;			// list of sound routes
 
+	// static inline helpers
+	static void static_add_route(device_config *device, UINT32 output, const char *target, double gain, UINT32 input = 0);
+	static void static_reset_routes(device_config *device);
+
 protected:
 	// optional operation overrides
-	virtual bool interface_process_token(UINT32 entrytype, const machine_config_token *&tokens);
 	virtual bool interface_validity_check(const game_driver &driver) const;
 
 	void reset_routes();

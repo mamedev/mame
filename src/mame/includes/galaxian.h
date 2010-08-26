@@ -56,7 +56,7 @@ WRITE8_HANDLER( scramble_background_blue_w );
 
 WRITE8_HANDLER( galaxian_gfxbank_w );
 
-TIMER_CALLBACK( galaxian_stars_blink_timer );
+TIMER_DEVICE_CALLBACK( galaxian_stars_blink_timer );
 
 /* video extension callbacks */
 typedef void (*galaxian_extend_tile_info_func)(UINT16 *code, UINT8 *color, UINT8 attrib, UINT8 x);

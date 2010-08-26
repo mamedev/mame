@@ -67,7 +67,7 @@ struct game_driver
 	const char *		description;				/* full name of the game */
 	const char *		year;						/* year the game was released */
 	const char *		manufacturer;				/* manufacturer of the game */
-	const machine_config_token *machine_config;		/* machine driver tokens */
+	machine_config_constructor machine_config;		/* machine driver tokens */
 	const input_port_token *ipt;					/* pointer to array of input port tokens */
 	void				(*driver_init)(running_machine *machine); /* DRIVER_INIT callback */
 	const rom_entry *	rom;						/* pointer to list of ROMs for the game */

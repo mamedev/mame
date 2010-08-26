@@ -8,13 +8,12 @@ class gp9001vdp_device_config : public device_config,
 public:
 	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
 	virtual device_t *alloc_device(running_machine &machine) const;
+	static void static_set_gfx_region(device_config *device, int gfxregion);
 protected:
-	virtual void device_config_complete();
 	virtual bool device_validity_check(const game_driver &driver) const;
 	virtual const address_space_config *memory_space_config(int spacenum = 0) const;
 	address_space_config		m_space_config;
 	UINT8						m_gfxregion;
-
 };
 
 class gp9001vdp_device : public device_t,
@@ -102,12 +101,12 @@ ADDRESS_MAP_EXTERN( gp9001vdp1_map, 16 );
 /* vdp map 0, gfx region 0 */
 #define MDRV_DEVICE_ADD_VDP0 \
 	MDRV_DEVICE_ADD("gp9001vdp0", gp9001vdp_, 0) \
-	MDRV_DEVICE_INLINE_DATA16(0, 0) \
+	gp9001vdp_device_config::static_set_gfx_region(device, 0); \
 
 /* vdp map 1, gfx region 2 */
 #define MDRV_DEVICE_ADD_VDP1 \
 	MDRV_DEVICE_ADD("gp9001vdp1", gp9001vdp_, 0) \
-	MDRV_DEVICE_INLINE_DATA16(0, 2) \
+	gp9001vdp_device_config::static_set_gfx_region(device, 2); \
 
 
 // access to VDP

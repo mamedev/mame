@@ -273,17 +273,6 @@ void device_config_interface::interface_config_complete()
 
 
 //-------------------------------------------------
-//  interface_process_token - default token
-//  processing for a given interface
-//-------------------------------------------------
-
-bool device_config_interface::interface_process_token(UINT32 entrytype, const machine_config_token *&tokens)
-{
-	return false;
-}
-
-
-//-------------------------------------------------
 //  interface_validity_check - default validation
 //  for a device after the configuration has been
 //  constructed
@@ -317,8 +306,6 @@ device_config::device_config(const machine_config &mconfig, device_type type, co
 	  m_tag(tag),
 	  m_config_complete(false)
 {
-	memset(m_inline_data, 0, sizeof(m_inline_data));
-
 	// derive the clock from our owner if requested
 	if ((m_clock & 0xff000000) == 0xff000000)
 	{
@@ -350,124 +337,6 @@ void device_config::config_complete()
 
 	// then notify the device itself
 	device_config_complete();
-}
-
-
-//-------------------------------------------------
-//  process_token - process tokens
-//-------------------------------------------------
-
-void device_config::process_token(UINT32 entrytype, const machine_config_token *&tokens)
-{
-	int size, offset, bits, index;
-	UINT32 data32;
-	UINT64 data64;
-	bool processed = false;
-
-	// first process stuff we know about
-	switch (entrytype)
-	{
-		// specify device clock
-		case MCONFIG_TOKEN_DEVICE_CLOCK:
-			TOKEN_UNGET_UINT32(tokens);
-			TOKEN_GET_UINT64_UNPACK2(tokens, entrytype, 8, m_clock, 32);
-			processed = true;
-			break;
-
-		// specify pointer to static device configuration
-		case MCONFIG_TOKEN_DEVICE_CONFIG:
-			m_static_config = TOKEN_GET_PTR(tokens, voidptr);
-			processed = true;
-			break;
-
-		// provide inline device data packed into a 16-bit space
-		case MCONFIG_TOKEN_DEVICE_INLINE_DATA16:
-			TOKEN_UNGET_UINT32(tokens);
-			TOKEN_GET_UINT32_UNPACK3(tokens, entrytype, 8, index, 8, data32, 16);
-			assert(index >= 0 && index < ARRAY_LENGTH(m_inline_data));
-			m_inline_data[index] = data32;
-			processed = true;
-			break;
-
-		// provide inline device data packed into a 32-bit space
-		case MCONFIG_TOKEN_DEVICE_INLINE_DATA32:
-			TOKEN_UNGET_UINT32(tokens);
-			TOKEN_GET_UINT32_UNPACK2(tokens, entrytype, 8, index, 8);
-			assert(index >= 0 && index < ARRAY_LENGTH(m_inline_data));
-			m_inline_data[index] = TOKEN_GET_UINT32(tokens);
-			processed = true;
-			break;
-
-		// provide inline device data packed into a 64-bit space
-		case MCONFIG_TOKEN_DEVICE_INLINE_DATA64:
-			TOKEN_UNGET_UINT32(tokens);
-			TOKEN_GET_UINT32_UNPACK2(tokens, entrytype, 8, index, 8);
-			assert(index >= 0 && index < ARRAY_LENGTH(m_inline_data));
-			TOKEN_EXTRACT_UINT64(tokens, m_inline_data[index]);
-			processed = true;
-			break;
-
-		// provide inline device data packed into a 32-bit word
-		case MCONFIG_TOKEN_DEVICE_CONFIG_DATA32:
-			TOKEN_UNGET_UINT32(tokens);
-			TOKEN_GET_UINT32_UNPACK3(tokens, entrytype, 8, size, 4, offset, 12);
-			data32 = TOKEN_GET_UINT32(tokens);
-			switch (size)
-			{
-				case 1: *(UINT8 *) ((UINT8 *)downcast<legacy_device_config_base *>(this)->inline_config() + offset) = data32; break;
-				case 2: *(UINT16 *)((UINT8 *)downcast<legacy_device_config_base *>(this)->inline_config() + offset) = data32; break;
-				case 4: *(UINT32 *)((UINT8 *)downcast<legacy_device_config_base *>(this)->inline_config() + offset) = data32; break;
-			}
-			processed = true;
-			break;
-
-		// provide inline device data packed into a 64-bit word
-		case MCONFIG_TOKEN_DEVICE_CONFIG_DATA64:
-			TOKEN_UNGET_UINT32(tokens);
-			TOKEN_GET_UINT32_UNPACK3(tokens, entrytype, 8, size, 4, offset, 12);
-			TOKEN_EXTRACT_UINT64(tokens, data64);
-			switch (size)
-			{
-				case 1: *(UINT8 *) ((UINT8 *)downcast<legacy_device_config_base *>(this)->inline_config() + offset) = data64; break;
-				case 2: *(UINT16 *)((UINT8 *)downcast<legacy_device_config_base *>(this)->inline_config() + offset) = data64; break;
-				case 4: *(UINT32 *)((UINT8 *)downcast<legacy_device_config_base *>(this)->inline_config() + offset) = data64; break;
-				case 8: *(UINT64 *)((UINT8 *)downcast<legacy_device_config_base *>(this)->inline_config() + offset) = data64; break;
-			}
-			processed = true;
-			break;
-
-		// provide inline floating-point device data packed into a fixed-point 32-bit word
-		case MCONFIG_TOKEN_DEVICE_CONFIG_DATAFP32:
-			TOKEN_UNGET_UINT32(tokens);
-			TOKEN_GET_UINT32_UNPACK4(tokens, entrytype, 8, size, 4, bits, 6, offset, 12);
-			data32 = TOKEN_GET_UINT32(tokens);
-			switch (size)
-			{
-				case 4: *(float *)((UINT8 *)downcast<legacy_device_config_base *>(this)->inline_config() + offset) = (float)(INT32)data32 / (float)(1 << bits); break;
-				case 8: *(double *)((UINT8 *)downcast<legacy_device_config_base *>(this)->inline_config() + offset) = (double)(INT32)data32 / (double)(1 << bits); break;
-			}
-			processed = true;
-			break;
-	}
-
-	// anything else might be handled by one of our interfaces
-	for (device_config_interface *intf = m_interface_list; intf != NULL; intf = intf->interface_next())
-		if (intf->interface_process_token(entrytype, tokens))
-		{
-			assert(!processed);
-			processed = true;
-		}
-
-	// or it might be processed by the device itself
-	if (device_process_token(entrytype, tokens))
-	{
-		assert(!processed);
-		processed = true;
-	}
-
-	// regardless, *somebody* must handle it
-	if (!processed)
-		throw emu_fatalerror("Unhandled token %d for device '%s'", entrytype, tag());
 }
 
 
@@ -506,18 +375,6 @@ void device_config::device_config_complete()
 
 
 //-------------------------------------------------
-//  device_process_token - process basic device
-//  tokens
-//-------------------------------------------------
-
-bool device_config::device_process_token(UINT32 entrytype, const machine_config_token *&tokens)
-{
-	// handle nothing by default
-	return false;
-}
-
-
-//-------------------------------------------------
 //  device_validity_check - validate a device after
 //  the configuration has been constructed
 //-------------------------------------------------
@@ -541,12 +398,12 @@ const rom_entry *device_config::rom_region() const
 
 
 //-------------------------------------------------
-//  machine_config_tokens - return a pointer to
-//  a set of machine configuration tokens
-//  describing sub-devices for this device
+//  machine_config - return a pointer to a machine
+//  config constructor describing sub-devices for 
+//  this device
 //-------------------------------------------------
 
-const machine_config_token *device_config::machine_config_tokens() const
+machine_config_constructor device_config::machine_config_additions() const
 {
 	return NULL;
 }
