@@ -30,17 +30,18 @@
 
 ***************************************************************************/
 
+#pragma once
+
 #ifndef __I8237__
 #define __I8237__
 
-#include "devlegcy.h"
+#include "emu.h"
+
 
 
 /***************************************************************************
-    MACROS / CONSTANTS
+    DEVICE CONFIGURATION MACROS
 ***************************************************************************/
-
-DECLARE_LEGACY_DEVICE(I8237, i8237);
 
 #define MDRV_I8237_ADD(_tag, _clock, _config) \
 	MDRV_DEVICE_ADD(_tag, I8237, _clock) \
@@ -49,25 +50,163 @@ DECLARE_LEGACY_DEVICE(I8237, i8237);
 #define I8237_INTERFACE(_name) \
 	const i8237_interface (_name) =
 
+
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _i8237_interface i8237_interface;
-struct _i8237_interface
+
+// ======================> i8237_interface
+
+struct i8237_interface
 {
-	devcb_write_line	out_hrq_func;
-	devcb_write_line	out_eop_func;
+	devcb_write_line	m_out_hrq_func;
+	devcb_write_line	m_out_eop_func;
 
 	/* accessors to main memory */
-	devcb_read8			in_memr_func;
-	devcb_write8		out_memw_func;
+	devcb_read8			m_in_memr_func;
+	devcb_write8		m_out_memw_func;
 
 	/* channel accessors */
-	devcb_read8			in_ior_func[4];
-	devcb_write8		out_iow_func[4];
-	devcb_write_line	out_dack_func[4];
+	devcb_read8			m_in_ior_func[4];
+	devcb_write8		m_out_iow_func[4];
+	devcb_write_line	m_out_dack_func[4];
 };
+
+
+
+// ======================> i8237_device_config
+
+class i8237_device_config : public device_config,
+                            public i8237_interface
+{
+    friend class i8237_device;
+
+    // construction/destruction
+    i8237_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+
+public:
+    // allocators
+    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+    virtual device_t *alloc_device(running_machine &machine) const;
+
+protected:
+    // device_config overrides
+    virtual void device_config_complete();
+};
+
+
+
+// ======================> i8237_device
+
+class i8237_device :  public device_t
+{
+    friend class i8237_device_config;
+
+    // construction/destruction
+    i8237_device(running_machine &_machine, const i8237_device_config &_config);
+
+public:
+
+	/* register access */
+	UINT8 i8237_r(UINT32 offset);
+	void i8237_w(UINT32 offset, UINT8 data);
+
+	/* hold acknowledge */
+	void i8237_hlda_w(UINT8 state) { m_hlda = state; }
+
+	/* data request */
+	void i8237_drq_write(int channel, int state);
+
+	void i8237_timerproc();
+
+protected:
+    // device-level overrides
+    virtual void device_start();
+    virtual void device_reset();
+    virtual void device_post_load() { }
+    virtual void device_clock_changed() { }
+
+	static TIMER_CALLBACK( i8237_timerproc_callback );
+	static TIMER_CALLBACK( receive_event_callback );
+
+private:
+
+	void i8237_do_read();
+	void i8237_do_write();
+	void i8237_advance();
+	void set_dack(int channel);
+
+	/* States that the i8237 device can be in */
+	enum dma8237_state
+	{
+		DMA8237_SI,			/* Idle state */
+		DMA8237_S0,			/* HRQ has been triggered, waiting to receive HLDA */
+	//  DMA8237_SW,         /* Wait state */
+
+		/* Normal transfer states */
+		DMA8237_S1,			/* Output A8-A15; only used when A8-A15 really needs to be output */
+		DMA8237_S2,			/* Output A0-A7 */
+		DMA8237_S3,			/* Initiate read; skipped in compressed timing. On the S2->S3 transition DACK is set. */
+		DMA8237_S4,			/* Perform read/write */
+
+		/* Memory to memory transfer states */
+		DMA8237_S11,		/* Output A8-A15 */
+	//  DMA8237_S12,        /* Output A0-A7 */
+	//  DMA8237_S13,        /* Initiate read */
+	//  DMA8237_S14,        /* Perform read/write */
+	//  DMA8237_S21,        /* Output A8-A15 */
+	//  DMA8237_S22,        /* Output A0-A7 */
+	//  DMA8237_S23,        /* Initiate read */
+	//  DMA8237_S24,        /* Perform read/write */
+	};
+
+	devcb_resolved_write_line	m_out_hrq_func;
+	devcb_resolved_write_line	m_out_eop_func;
+	devcb_resolved_read8		m_in_memr_func;
+	devcb_resolved_write8		m_out_memw_func;
+
+	emu_timer *m_timer;
+
+	struct
+	{
+		devcb_resolved_read8		m_in_ior_func;
+		devcb_resolved_write8		m_out_iow_func;
+		devcb_resolved_write_line	m_out_dack_func;
+		UINT16 m_base_address;
+		UINT16 m_base_count;
+		UINT16 m_address;
+		UINT16 m_count;
+		UINT8 m_mode;
+		int m_high_address_changed;
+	} m_chan[4];
+
+	UINT32 m_msb : 1;
+	UINT32 m_eop : 1;
+	UINT8 m_temp;
+	UINT8 m_temporary_data;
+	UINT8 m_command;
+	UINT8 m_drq;
+	UINT8 m_mask;
+	UINT8 m_hrq;
+	UINT8 m_hlda;
+
+	/* bits  0- 3 :  Terminal count for channels 0-3
+     * bits  4- 7 :  Transfer in progress for channels 0-3 */
+	UINT8 m_status;
+
+	dma8237_state m_state;		/* State the device is currently in */
+	int m_service_channel;		/* Channel we will be servicing */
+	int m_last_service_channel;	/* Previous channel we serviced; used to determine channel priority. */
+
+    const i8237_device_config &m_config;
+};
+
+
+// device type definition
+extern const device_type I8237;
+
+
 
 /***************************************************************************
     PROTOTYPES
