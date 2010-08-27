@@ -360,7 +360,6 @@ static const UINT8 cycles1[] =
   /*F*/  5, 5, 5, 7, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6
 };
 
-#if (BIG_SWITCH==0)
 static void (*const m6809_main[0x100])(m68_state_t *) = {
 /*          0xX0,   0xX1,     0xX2,    0xX3,    0xX4,    0xX5,    0xX6,    0xX7,
             0xX8,   0xX9,     0xXA,    0xXB,    0xXC,    0xXD,    0xXE,    0xXF   */
@@ -413,4 +412,3 @@ static void (*const m6809_main[0x100])(m68_state_t *) = {
 /* 0xFX */  subb_ex,cmpb_ex,sbcb_ex,addd_ex,andb_ex,bitb_ex,ldb_ex, stb_ex,
 	    eorb_ex,adcb_ex,orb_ex, addb_ex,ldd_ex, std_ex, ldu_ex, stu_ex
 };
-#endif
