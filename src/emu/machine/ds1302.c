@@ -22,34 +22,12 @@
 
 #include "emu.h"
 #include "ds1302.h"
+#include "devhelpr.h"
 
-
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
-
-typedef struct _ds1302_state ds1302_state;
-struct _ds1302_state
-{
-
-	UINT32 shift_in;
-	UINT8  shift_out;
-	UINT8  icount;
-	UINT8  last_clk;
-	UINT8  last_cmd;
-	UINT8  sram[0x20];
-};
 
 /***************************************************************************
     INLINE FUNCTIONS
 ***************************************************************************/
-
-INLINE ds1302_state *get_safe_token(running_device *device)
-{
-	assert(device != NULL);
-	assert(device->type() == DS1302);
-	return (ds1302_state *)downcast<legacy_device_base *>(device)->token();
-}
 
 INLINE UINT8 convert_to_bcd(int val)
 {
@@ -61,18 +39,101 @@ INLINE UINT8 convert_to_bcd(int val)
     IMPLEMENTATION
 ***************************************************************************/
 
+//**************************************************************************
+//  DEVICE CONFIGURATION
+//**************************************************************************
+
+//-------------------------------------------------
+//  ds1302_device_config - constructor
+//-------------------------------------------------
+
+ds1302_device_config::ds1302_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+    : device_config(mconfig, static_alloc_device_config, "DS1302", tag, owner, clock)
+{
+}
+
+
+//-------------------------------------------------
+//  static_alloc_device_config - allocate a new
+//  configuration object
+//-------------------------------------------------
+
+device_config *ds1302_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+{
+    return global_alloc(ds1302_device_config(mconfig, tag, owner, clock));
+}
+
+
+//-------------------------------------------------
+//  alloc_device - allocate a new device object
+//-------------------------------------------------
+
+device_t *ds1302_device_config::alloc_device(running_machine &machine) const
+{
+    return auto_alloc(&machine, ds1302_device(machine, *this));
+}
+
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+const device_type DS1302 = ds1302_device_config::static_alloc_device_config;
+
+//-------------------------------------------------
+//  ds1302_device - constructor
+//-------------------------------------------------
+
+ds1302_device::ds1302_device(running_machine &_machine, const ds1302_device_config &config)
+    : device_t(_machine, config),
+      m_config(config)
+{
+
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void ds1302_device::device_start()
+{
+	state_save_register_device_item(this, 0, m_shift_in);
+	state_save_register_device_item(this, 0, m_shift_out);
+	state_save_register_device_item(this, 0, m_icount);
+	state_save_register_device_item(this, 0, m_last_clk);
+	state_save_register_device_item(this, 0, m_last_cmd);
+	state_save_register_device_item_array(this, 0, m_sram);
+}
+
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void ds1302_device::device_reset()
+{
+	m_shift_in  = 0;
+	m_shift_out = 0;
+	m_icount    = 0;
+	m_last_clk  = 0;
+	m_last_cmd  = 0;
+}
+
+
 /*-------------------------------------------------
     ds1302_dat_w
 -------------------------------------------------*/
 
-WRITE8_DEVICE_HANDLER( ds1302_dat_w )
+WRITE8_DEVICE_HANDLER_TRAMPOLINE(ds1302, ds1302_dat_w)
 {
-	ds1302_state *ds1302 = get_safe_token(device);
-
 	if (data)
-		ds1302->shift_in |= (1 << ds1302->icount);
+	{
+		m_shift_in |= (1 << m_icount);
+	}
 	else
-		ds1302->shift_in &= ~(1 << ds1302->icount);
+	{
+		m_shift_in &= ~(1 << m_icount);
+	}
 }
 
 
@@ -80,86 +141,94 @@ WRITE8_DEVICE_HANDLER( ds1302_dat_w )
     ds1302_clk_w
 -------------------------------------------------*/
 
-WRITE8_DEVICE_HANDLER( ds1302_clk_w )
+WRITE8_DEVICE_HANDLER_TRAMPOLINE(ds1302, ds1302_clk_w)
 {
-	ds1302_state *ds1302 = get_safe_token(device);
-
-	if (data != ds1302->last_clk)
+	if (data != m_last_clk)
 	{
 		if (data)	//Rising, shift in command
 		{
-			ds1302->icount++;
-			if(ds1302->icount == 8)	//Command start
+			m_icount++;
+			if(m_icount == 8)	//Command start
 			{
 				system_time systime;
-				device->machine->base_datetime(systime);
+				m_machine.base_datetime(systime);
 
-				switch(ds1302->shift_in)
+				switch(m_shift_in)
 				{
 					case 0x81:	//Sec
-						ds1302->shift_out = convert_to_bcd(systime.local_time.second);
+						m_shift_out = convert_to_bcd(systime.local_time.second);
 						break;
+
 					case 0x83:	//Min
-						ds1302->shift_out = convert_to_bcd(systime.local_time.minute);
+						m_shift_out = convert_to_bcd(systime.local_time.minute);
 						break;
+
 					case 0x85:	//Hour
-						ds1302->shift_out = convert_to_bcd(systime.local_time.hour);
+						m_shift_out = convert_to_bcd(systime.local_time.hour);
 						break;
+
 					case 0x87:	//Day
-						ds1302->shift_out = convert_to_bcd(systime.local_time.mday);
+						m_shift_out = convert_to_bcd(systime.local_time.mday);
 						break;
+
 					case 0x89:	//Month
-						ds1302->shift_out = convert_to_bcd(systime.local_time.month + 1);
+						m_shift_out = convert_to_bcd(systime.local_time.month + 1);
 						break;
+
 					case 0x8b:	//weekday
-						ds1302->shift_out = convert_to_bcd(systime.local_time.weekday);
+						m_shift_out = convert_to_bcd(systime.local_time.weekday);
 						break;
+
 					case 0x8d:	//Year
-						ds1302->shift_out = convert_to_bcd(systime.local_time.year % 100);
+						m_shift_out = convert_to_bcd(systime.local_time.year % 100);
 						break;
+
 					default:
-						ds1302->shift_out = 0x0;
+						m_shift_out = 0x0;
 				}
 
-				if(ds1302->shift_in > 0xc0)
-					ds1302->shift_out = ds1302->sram[(ds1302->shift_in >> 1) & 0x1f];
-				ds1302->last_cmd = ds1302->shift_in & 0xff;
-				ds1302->icount++;
+				if(m_shift_in > 0xc0)
+				{
+					m_shift_out = m_sram[(m_shift_in >> 1) & 0x1f];
+				}
+				m_last_cmd = m_shift_in & 0xff;
+				m_icount++;
 			}
 
-			if(ds1302->icount == 17 && !(ds1302->last_cmd & 1))
+			if(m_icount == 17 && !(m_last_cmd & 1))
 			{
-				UINT8 val = (ds1302->shift_in >> 9) & 0xff;
+				UINT8 val = (m_shift_in >> 9) & 0xff;
 
-				switch(ds1302->last_cmd)
+				switch(m_last_cmd)
 				{
 					case 0x80:	//Sec
-
 						break;
+
 					case 0x82:	//Min
-
 						break;
+
 					case 0x84:	//Hour
-
 						break;
+
 					case 0x86:	//Day
-
 						break;
+
 					case 0x88:	//Month
-
 						break;
+
 					case 0x8a:	//weekday
-
 						break;
+
 					case 0x8c:	//Year
-
 						break;
+
 					default:
-						ds1302->shift_out = 0x0;
+						m_shift_out = 0x0;
 				}
-				if(ds1302->last_cmd > 0xc0)
+
+				if(m_last_cmd > 0xc0)
 				{
-					ds1302->sram[(ds1302->last_cmd >> 1) & 0x1f] = val;
+					m_sram[(m_last_cmd >> 1) & 0x1f] = val;
 				}
 
 
@@ -167,7 +236,7 @@ WRITE8_DEVICE_HANDLER( ds1302_clk_w )
 			}
 		}
 	}
-	ds1302->last_clk = data;
+	m_last_clk = data;
 }
 
 
@@ -175,56 +244,7 @@ WRITE8_DEVICE_HANDLER( ds1302_clk_w )
     ds1302_read
 -------------------------------------------------*/
 
-READ8_DEVICE_HANDLER( ds1302_read )
+READ8_DEVICE_HANDLER_TRAMPOLINE(ds1302, ds1302_read)
 {
-	ds1302_state *ds1302 = get_safe_token(device);
-	return (ds1302->shift_out & (1 << (ds1302->icount - 9))) ? 1 : 0;
+	return (m_shift_out & (1 << (m_icount - 9))) ? 1 : 0;
 }
-
-
-/*-------------------------------------------------
-    DEVICE_START( ds1302 )
--------------------------------------------------*/
-
-static DEVICE_START( ds1302 )
-{
-	ds1302_state *ds1302 = get_safe_token(device);
-
-	/* register for state saving */
-	state_save_register_device_item(device, 0, ds1302->shift_in);
-	state_save_register_device_item(device, 0, ds1302->shift_out);
-	state_save_register_device_item(device, 0, ds1302->icount);
-	state_save_register_device_item(device, 0, ds1302->last_clk);
-	state_save_register_device_item(device, 0, ds1302->last_cmd);
-	state_save_register_device_item_array(device, 0, ds1302->sram);
-}
-
-/*-------------------------------------------------
-    DEVICE_START( ds1302 )
--------------------------------------------------*/
-
-static DEVICE_RESET( ds1302 )
-{
-	ds1302_state *ds1302 = get_safe_token(device);
-
-	ds1302->shift_in  = 0;
-	ds1302->shift_out = 0;
-	ds1302->icount    = 0;
-	ds1302->last_clk  = 0;
-	ds1302->last_cmd  = 0;
-}
-
-/*-------------------------------------------------
-    DEVICE_GET_INFO( ds1302 )
--------------------------------------------------*/
-
-static const char DEVTEMPLATE_SOURCE[] = __FILE__;
-
-#define DEVTEMPLATE_ID(p,s)		p##ds1302##s
-#define DEVTEMPLATE_FEATURES	DT_HAS_START | DT_HAS_RESET
-#define DEVTEMPLATE_NAME		"Dallas DS1302 RTC"
-#define DEVTEMPLATE_FAMILY		"Dallas DS1302 RTC"
-#include "devtempl.h"
-
-
-DEFINE_LEGACY_DEVICE(DS1302, ds1302);
