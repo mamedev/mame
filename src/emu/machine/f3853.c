@@ -1,233 +1,288 @@
-/*
-  fairchild f3853 smi static ram interface
-  with integrated interrupt controller and timer
+/**********************************************************************
 
-  databook found at www.freetradezone.com
-*/
+	Fairchild F3853 SRAM interface with integrated interrupt
+	controller and timer (SMI)
+
+  	This chip is a timer shift register, basically the same as in the
+  	F3851.
+
+	Based on a datasheet obtained from www.freetradezone.com
+
+	The SMI does not have DC0 and DC1, only DC0; as a result, it does
+	not respond to the main CPU's DC0/DC1 swap instruction.  This may
+	lead to two devices responding to the same DC0 address and
+	attempting to place their bytes on the data bus simultaneously!
+
+	8-bit shift register:
+	Feedback in0 = !((out3 ^ out4) ^ (out5 ^ out7))
+	Interrupts are at 0xfe
+	0xff stops the register (0xfe is never reached)
+
+**********************************************************************/
 
 #include "emu.h"
 #include "f3853.h"
+#include "devhelpr.h"
 
-/*
-  the smi does not have DC0 and DC1, only DC0
-  it is not reacting to the cpus DC0/DC1 swap instruction
-  --> might lead to 2 devices having reacting to the same DC0 address
-  and placing their bytes to the databus!
-*/
+/***************************************************************************
+    MACROS
+***************************************************************************/
 
-
-typedef struct _f3853 f3853_t;
-struct _f3853 {
-    const f3853_config *config;
-
-    UINT8 high,low; // bit 7 set to 0 for timer interrupt, to 1 for external interrupt
-    int external_enable;
-    int timer_enable;
-
-    int request_flipflop;
-
-    int priority_line; /* inverted level*/
-    int external_interrupt_line;/* inverted level */
-
-    emu_timer *timer;
-};
-
-/*
-   8 bit shift register
-   feedback in0 = not ( (out3 xor out4) xor (out5 xor out7) )
-   interrupt at 0xfe
-   0xff stops register (0xfe never reached!)
-*/
-static UINT8 f3853_value_to_cycle[0x100];
+#define INTERRUPT_VECTOR(external) ( external ? m_low | ( m_high << 8 ) | 0x80 \
+: ( m_low | ( m_high << 8 ) ) & ~0x80 )
 
 
-static TIMER_CALLBACK( f3853_timer_callback );
-#define INTERRUPT_VECTOR(external) ( external ? f3853->low | ( f3853->high << 8 ) | 0x80 \
-					: ( f3853->low | ( f3853->high << 8 ) ) & ~0x80 )
 
+/***************************************************************************
+    IMPLEMENTATION
+***************************************************************************/
 
-INLINE f3853_t *get_safe_token(running_device *device)
+//**************************************************************************
+//  DEVICE CONFIGURATION
+//**************************************************************************
+
+//-------------------------------------------------
+//  f3853_device_config - constructor
+//-------------------------------------------------
+
+f3853_device_config::f3853_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+    : device_config(mconfig, static_alloc_device_config, "F3853", tag, owner, clock)
 {
-	assert( device != NULL );
-	assert( device->type() == F3853 );
-	return ( f3853_t * ) downcast<legacy_device_base *>(device)->token();
 }
 
 
-static void f3853_set_interrupt_request_line(running_device *device)
+//-------------------------------------------------
+//  static_alloc_device_config - allocate a new
+//  configuration object
+//-------------------------------------------------
+
+device_config *f3853_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
 {
-	f3853_t	*f3853 = get_safe_token( device );
-
-    if ( ! f3853->config->interrupt_request )
-		return;
-
-	if ( f3853->external_enable && ! f3853->priority_line )
-		f3853->config->interrupt_request(device, INTERRUPT_VECTOR(TRUE), TRUE);
-	else if ( f3853->timer_enable && ! f3853->priority_line && f3853->request_flipflop)
-		f3853->config->interrupt_request(device, INTERRUPT_VECTOR(FALSE), TRUE);
-	else
-		f3853->config->interrupt_request(device, 0, FALSE);
+    return global_alloc(f3853_device_config(mconfig, tag, owner, clock));
 }
 
 
-static void f3853_timer_start(running_device *device, UINT8 value)
+//-------------------------------------------------
+//  alloc_device - allocate a new device object
+//-------------------------------------------------
+
+device_t *f3853_device_config::alloc_device(running_machine &machine) const
 {
-	f3853_t	*f3853 = get_safe_token( device );
-
-	attotime period = (value != 0xff) ? attotime_mul(ATTOTIME_IN_HZ(device->clock()), f3853_value_to_cycle[value]*31) : attotime_never;
-
-	timer_adjust_oneshot(f3853->timer, period, 0);
+    return auto_alloc(&machine, f3853_device(machine, *this));
 }
 
 
-static TIMER_CALLBACK( f3853_timer_callback )
-{
-	running_device *device = (running_device *)ptr;
-	f3853_t	*f3853 = get_safe_token( device );
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
 
-    if (f3853->timer_enable)
+void f3853_device_config::device_config_complete()
+{
+	// inherit a copy of the static data
+	const f3853_interface *intf = reinterpret_cast<const f3853_interface *>(static_config());
+	if (intf != NULL)
 	{
-		f3853->request_flipflop = TRUE;
-		f3853_set_interrupt_request_line( device );
+		*static_cast<f3853_interface *>(this) = *intf;
+	}
+
+	// or initialize to defaults if none provided
+	else
+	{
+		memset(&m_interrupt_request, 0, sizeof(m_interrupt_request));
+	}
+}
+
+
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+const device_type F3853 = f3853_device_config::static_alloc_device_config;
+
+//-------------------------------------------------
+//  f3853_device - constructor
+//-------------------------------------------------
+
+f3853_device::f3853_device(running_machine &_machine, const f3853_device_config &config)
+    : device_t(_machine, config),
+      m_config(config)
+{
+
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void f3853_device::device_start()
+{
+	UINT8 reg = 0xfe;
+	for(INT32 i=254 /* Known to get 0xfe after 255 cycles */; i >= 0; i--)
+	{
+		INT32 o7 = (reg & 0x80) ? TRUE : FALSE;
+		INT32 o5 = (reg & 0x20) ? TRUE : FALSE;
+		INT32 o4 = (reg & 0x10) ? TRUE : FALSE;
+		INT32 o3 = (reg & 0x08) ? TRUE : FALSE;
+		m_value_to_cycle[reg] = i;
+		reg <<= 1;
+		if(!((o7 != o5) != (o4 != o3)))
+		{
+			reg |= 1;
+		}
+	}
+
+	m_timer = timer_alloc(&m_machine, f3853_timer_callback, (void *)this );
+
+	state_save_register_device_item(this, 0, m_high );
+	state_save_register_device_item(this, 0, m_low );
+	state_save_register_device_item(this, 0, m_external_enable );
+	state_save_register_device_item(this, 0, m_timer_enable );
+	state_save_register_device_item(this, 0, m_request_flipflop );
+	state_save_register_device_item(this, 0, m_priority_line );
+	state_save_register_device_item(this, 0, m_external_interrupt_line );
+}
+
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void f3853_device::device_reset()
+{
+	m_high = 0;
+	m_low = 0;
+	m_external_enable = 0;
+	m_timer_enable = 0;
+	m_request_flipflop = 0;
+	m_priority_line = FALSE;
+	m_external_interrupt_line = TRUE;
+
+	timer_enable(m_timer, 0);
+}
+
+
+void f3853_device::f3853_set_interrupt_request_line()
+{
+    if(!m_config.m_interrupt_request)
+    {
+		return;
+	}
+
+	if(m_external_enable && !m_priority_line)
+	{
+		m_config.m_interrupt_request(this, INTERRUPT_VECTOR(TRUE), TRUE);
+	}
+	else if( m_timer_enable && !m_priority_line && m_request_flipflop)
+	{
+		m_config.m_interrupt_request(this, INTERRUPT_VECTOR(FALSE), TRUE);
+	}
+	else
+	{
+		m_config.m_interrupt_request(this, 0, FALSE);
+	}
+}
+
+
+void f3853_device::f3853_timer_start(UINT8 value)
+{
+	attotime period = (value != 0xff) ? attotime_mul(ATTOTIME_IN_HZ(clock()), m_value_to_cycle[value]*31) : attotime_never;
+
+	timer_adjust_oneshot(m_timer, period, 0);
+}
+
+
+TIMER_CALLBACK( f3853_device::f3853_timer_callback )
+{
+	reinterpret_cast<f3853_device*>(ptr)->f3853_timer();
+}
+
+void f3853_device::f3853_timer()
+{
+    if(m_timer_enable)
+	{
+		m_request_flipflop = TRUE;
+		f3853_set_interrupt_request_line();
     }
-    f3853_timer_start( device, 0xfe);
+    f3853_timer_start(0xfe);
 }
 
 
 void f3853_set_external_interrupt_in_line(running_device *device, int level)
 {
-	f3853_t	*f3853 = get_safe_token( device );
+	downcast<f3853_device*>(device)->f3853_set_external_interrupt_in_line(level);
+}
 
-    if ( f3853->external_interrupt_line && ! level && f3853->external_enable)
-	f3853->request_flipflop = TRUE;
-    f3853->external_interrupt_line = level;
-    f3853_set_interrupt_request_line( device );
+void f3853_device::f3853_set_external_interrupt_in_line(int level)
+{
+    if(m_external_interrupt_line && !level && m_external_enable)
+    {
+		m_request_flipflop = TRUE;
+	}
+    m_external_interrupt_line = level;
+    f3853_set_interrupt_request_line();
 }
 
 
 void f3853_set_priority_in_line(running_device *device, int level)
 {
-	f3853_t	*f3853 = get_safe_token( device );
+	downcast<f3853_device*>(device)->f3853_set_priority_in_line(level);
+}
 
-    f3853->priority_line = level;
-    f3853_set_interrupt_request_line( device );
+void f3853_device::f3853_set_priority_in_line(int level)
+{
+    m_priority_line = level;
+    f3853_set_interrupt_request_line();
 }
 
 
-READ8_DEVICE_HANDLER(f3853_r)
+READ8_DEVICE_HANDLER_TRAMPOLINE(f3853, f3853_r)
 {
-	f3853_t	*f3853 = get_safe_token( device );
-    UINT8 data=0;
+    UINT8 data = 0;
 
     switch (offset)
 	{
     case 0:
-		data = f3853->high;
+		data = m_high;
 		break;
+
     case 1:
-		data = f3853->low;
+		data = m_low;
 		break;
-    case 2: // interrupt control; not readable
-    case 3: // timer; not readable
+
+    case 2: // Interrupt control; not readable
+    case 3: // Timer; not readable
 		break;
     }
+
     return data;
 }
 
 
-WRITE8_DEVICE_HANDLER(f3853_w)
+WRITE8_DEVICE_HANDLER_TRAMPOLINE(f3853, f3853_w)
 {
-	f3853_t	*f3853 = get_safe_token( device );
-	switch (offset)
+	switch(offset)
 	{
 	case 0:
-		f3853->high = data;
+		m_high = data;
 		break;
+
 	case 1:
-		f3853->low = data;
+		m_low = data;
 		break;
+
 	case 2: //interrupt control
-		f3853->external_enable = ((data&3)==1);
-		f3853->timer_enable = ((data&3)==3);
-		f3853_set_interrupt_request_line( device );
+		m_external_enable = ((data & 3) == 1);
+		m_timer_enable = ((data & 3) == 3);
+		f3853_set_interrupt_request_line();
 		break;
+
 	case 3: //timer
-		f3853->request_flipflop = FALSE;
-		f3853_set_interrupt_request_line( device );
-		f3853_timer_start( device, data );
+		m_request_flipflop = FALSE;
+		f3853_set_interrupt_request_line();
+		f3853_timer_start(data);
 		break;
 	}
 }
-
-
-static DEVICE_START( f3853 )
-{
-	f3853_t *f3853 = get_safe_token( device );
-	UINT8 reg=0xfe;
-	int i;
-
-	f3853->config = (const f3853_config *)device->baseconfig().static_config();
-
-	for (i=254/*known to get 0xfe after 255 cycles*/; i>=0; i--)
-	{
-		int o7 = ( reg & 0x80 ) ? TRUE : FALSE;
-		int o5 = ( reg & 0x20 ) ? TRUE : FALSE;
-		int o4 = ( reg & 0x10 ) ? TRUE : FALSE;
-		int o3 = ( reg & 8 ) ? TRUE : FALSE;
-		f3853_value_to_cycle[reg]=i;
-		reg<<=1;
-		if (!((o7!=o5)!=(o4!=o3))) reg|=1;
-	}
-
-	f3853->timer = timer_alloc( device->machine, f3853_timer_callback, (void *)device );
-
-	state_save_register_device_item( device, 0, f3853->high );
-	state_save_register_device_item( device, 0, f3853->low );
-	state_save_register_device_item( device, 0, f3853->external_enable );
-	state_save_register_device_item( device, 0, f3853->timer_enable );
-	state_save_register_device_item( device, 0, f3853->request_flipflop );
-	state_save_register_device_item( device, 0, f3853->priority_line );
-	state_save_register_device_item( device, 0, f3853->external_interrupt_line );
-}
-
-
-static DEVICE_RESET( f3853 )
-{
-	f3853_t	*f3853 = get_safe_token( device );
-
-	f3853->high = 0;
-	f3853->low = 0;
-	f3853->external_enable = 0;
-	f3853->timer_enable = 0;
-	f3853->request_flipflop = 0;
-	f3853->priority_line = FALSE;
-	f3853->external_interrupt_line = TRUE;
-
-	timer_enable( f3853->timer, 0 );
-}
-
-
-DEVICE_GET_INFO( f3853 )
-{
-	switch ( state )
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:				info->i = sizeof(f3853_t);						break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:		info->i = 0;									break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:						info->start = DEVICE_START_NAME(f3853);			break;
-		case DEVINFO_FCT_STOP:						/* nothing */									break;
-		case DEVINFO_FCT_RESET:						info->reset = DEVICE_RESET_NAME(f3853);			break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:						strcpy(info->s, "F3853");						break;
-		case DEVINFO_STR_FAMILY:					strcpy(info->s, "F8");							break;
-		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");							break;
-		case DEVINFO_STR_SOURCE_FILE:				strcpy(info->s, __FILE__);						break;
-		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright the MAME and MESS Teams"); break;
-	}
-}
-
-
-DEFINE_LEGACY_DEVICE(F3853, f3853);
