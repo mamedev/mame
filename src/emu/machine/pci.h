@@ -32,6 +32,7 @@ struct _pci_bus_config
 {
 	UINT8				busnum;
 	pci_device_entry	device[32];
+	const char *		father;
 };
 
 
@@ -49,6 +50,8 @@ struct _pci_bus_config
 	MDRV_DEVICE_CONFIG_DATAPTR_ARRAY_MEMBER(pci_bus_config, device, _devnum, pci_device_entry, read_callback, _configread) \
 	MDRV_DEVICE_CONFIG_DATAPTR_ARRAY_MEMBER(pci_bus_config, device, _devnum, pci_device_entry, write_callback, _configwrite)
 
+#define MDRV_PCI_BUS_SIBLING(_father_tag) \
+	MDRV_DEVICE_CONFIG_DATAPTR(pci_bus_config, father, _father_tag)
 
 
 /***************************************************************************
@@ -61,6 +64,7 @@ WRITE32_DEVICE_HANDLER( pci_32le_w );
 READ64_DEVICE_HANDLER( pci_64be_r );
 WRITE64_DEVICE_HANDLER( pci_64be_w );
 
+int pci_add_sibling( running_machine *machine, char *pcitag, char *sibling );
 
 /* ----- device interface ----- */
 

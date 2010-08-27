@@ -36,19 +36,134 @@ Thanks to Alex, Mr Mudkips, and Philip Burke for this info.
 
 #include "emu.h"
 #include "cpu/i386/i386.h"
+#include "machine/pci.h"
 #include "includes/naomibd.h"
+#include "debug/debugcon.h"
+#include "debug/debugcmd.h"
 
-static VIDEO_START(chihiro)
+/* jamtable instructions for Chihiro
+St.     Instr.		 Comment
+0x01 	POKEPCI 	 PCICONF[OP2] := OP1
+0x02 	OUTB 		 PORT[OP2] := OP1
+0x03 	POKE 		 MEM[OP2] := OP1
+0x04 	BNE 		 IF ACC <> OP2 THEN PC := PC + OP1
+0x05 	PEEKPCI 	 ACC := PCICONF[OP2]
+0x06 	AND/OR 		 ACC := (ACC & OP2) | OP1
+0x07 	BRA 		 PC := PC + OP1
+0x08 	INB 		 ACC := PORT[OP2]
+0x09 	PEEK 		 ACC := MEM[OP2]
+0xE1 	(prefix)	 execute the instruction code in OP2 with OP2 := OP1, OP1 := ACC
+0xEE 	END 
+*/
+
+/* jamtable disassembler */
+static void jamtable_disasm(running_machine *machine, address_space *space,UINT32 address,UINT32 size) // 0xff000080 == fff00080
 {
+	UINT32 base,addr;
+	UINT32 opcode,op1,op2;
+	char sop1[16];
+	char sop2[16];
+	char pcrel[16];
+	int prefix;
 
+	addr=address;
+	while (1)
+	{
+		base=addr;
+		opcode=space->read_byte(addr);
+		addr++;
+		op1=space->read_dword(addr);
+		addr+=4;
+		op2=space->read_dword(addr);
+		addr+=4;
+		if (opcode == 0xe1)
+		{
+			opcode=op2 & 255;
+			op2=op1;
+			//op1=edi;
+			sprintf(sop2,"%08X",op2);
+			sprintf(sop1,"ACC");
+			sprintf(pcrel,"PC+ACC");
+			prefix=1;
+		}
+		else
+		{
+			sprintf(sop2,"%08X",op2);
+			sprintf(sop1,"%08X",op1);
+			sprintf(pcrel,"%08X",base+9+op1);
+			prefix=0;
+		}
+		debug_console_printf(machine,"%08X ",base);
+		// dl=instr ebx=par1 eax=par2
+		switch (opcode)
+		{
+			case 0x01:
+				// if ((op2 & 0xff) == 0x880) op1=op1 & 0xfffffffd
+				// out cf8,op2
+				// out cfc,op1
+				// out cf8,0
+				// cf8 (CONFIG_ADDRESS) format:
+				// 31 30      24 23        16 15           11 10              8 7               2 1 0
+				// +-+----------+------------+---------------+-----------------+-----------------+-+-+
+				// | | Reserved | Bus Number | Device Number | Function Number | Register Number |0|0|
+				// +-+----------+------------+---------------+-----------------+-----------------+-+-+
+				// 31 - Enable bit
+				debug_console_printf(machine,"POKEPCI PCICONF[%s]=%s\n",sop2,sop1);
+				break;
+			case 0x02:
+				debug_console_printf(machine,"OUTB    PORT[%s]=%s\n",sop2,sop1);
+				break;
+			case 0x03:
+				debug_console_printf(machine,"POKE    MEM[%s]=%s\n",sop2,sop1);
+				break;
+			case 0x04:
+				debug_console_printf(machine,"BNE     IF ACC != %s THEN PC=%s\n",sop2,pcrel);
+				break;
+			case 0x05:
+				// out cf8,op2
+				// in acc,cfc
+				debug_console_printf(machine,"PEEKPCI ACC=PCICONF[%s]\n",sop2);
+				break;
+			case 0x06:
+				debug_console_printf(machine,"AND/OR  ACC=(ACC & %s) | %s\n",sop2,sop1);
+				break;
+			case 0x07:
+				debug_console_printf(machine,"BRA     PC=%s\n",pcrel);
+				break;
+			case 0x08:
+				debug_console_printf(machine,"INB     ACC=PORT[%s]\n",sop2);
+				break;
+			case 0x09:
+				debug_console_printf(machine,"PEEK    ACC=MEM[%s]\n",sop2);
+				break;
+			case 0xee:
+				debug_console_printf(machine,"END\n");
+				break;
+			default:
+				debug_console_printf(machine,"NOP     ????\n");
+				break;
+		}
+		if (opcode == 0xee)
+			break;
+		if (size <= 9)
+			break;
+		size-=9;
+	}
 }
 
-static VIDEO_UPDATE(chihiro)
+void jamtable_disasm_command(running_machine *machine, int ref, int params, const char **param)
 {
+	address_space *space=machine->firstcpu->space();
+	UINT64	addr,size;
 
-	return 0;
+	if (params < 2)
+		return;
+	if (!debug_command_parameter_number(machine, param[0], &addr))
+		return;
+	if (!debug_command_parameter_number(machine, param[1], &size))
+		return;
+	jamtable_disasm(machine, space, (UINT32)addr, (UINT32)size);
 }
-
 
 /*
 St.     Instr.       Comment
@@ -65,31 +180,138 @@ St.     Instr.       Comment
 0x12    INB          ACC := PORT(OP1)
 0xEE    END
 */
+#ifdef UNUSED_FUNCTION
 static READ32_HANDLER( chihiro_jamtable )
 {
 	return 0xEEEEEEEE;
 }
+#endif
+
+static UINT32 dummy_pci_r(running_device *busdevice, running_device *device, int function, int reg, UINT32 mem_mask)
+{
+	logerror("  bus:%d function:%d register:%d mask:%08X\n",((pci_bus_config *)downcast<const legacy_device_config_base &>(busdevice->baseconfig()).inline_config())->busnum,function,reg,mem_mask);
+	return 0;
+}
+
+static void dummy_pci_w(running_device *busdevice, running_device *device, int function, int reg, UINT32 data, UINT32 mem_mask)
+{
+	logerror("  bus:%d function:%d register:%d data:%08X mask:%08X\n",((pci_bus_config *)downcast<const legacy_device_config_base &>(busdevice->baseconfig()).inline_config())->busnum,function,reg,data,mem_mask);
+}
+
+static READ32_HANDLER( dummy_r )
+{
+	return 0;
+}
+
+static WRITE32_HANDLER( dummy_w )
+{
+}
+
+int smbus_cx25871(int command,int rw,int data)
+{
+	logerror("cx25871: %d %d %d\n",command,rw,data);
+	return 0;
+}
+
+typedef struct _smbus_state {
+	int status;
+	int control;
+	int address;
+	int data;
+	int command;
+	int rw;
+	int (*devices[128])(int command,int rw,int data);
+	UINT32 words[256/4];
+} smbus_state;
+smbus_state smbusst;
+
+void smbus_register_device(int address,int (*handler)(int command,int rw,int data))
+{
+	if (address < 128)
+		smbusst.devices[address]=handler;
+}
+
+static READ32_HANDLER( smbus_r )
+{
+	if ((offset == 0) && (mem_mask == 0xff)) // 0 smbus status
+		smbusst.words[offset] = (smbusst.words[offset] & ~mem_mask) | (smbusst.status << 0);
+	if ((offset == 1) && (mem_mask == 0xff0000)) // 6 smbus data
+		smbusst.words[offset] = (smbusst.words[offset] & ~mem_mask) | (smbusst.data << 16);
+	return smbusst.words[offset];
+}
+
+static WRITE32_HANDLER( smbus_w )
+{
+	COMBINE_DATA(smbusst.words);
+	if ((offset == 0) && (mem_mask == 0xff)) // 0 smbus status
+		smbusst.status &= ~data;
+	if ((offset == 0) && (mem_mask == 0xff0000)) // 2 smbus control
+	{
+		data=data>>16;
+		smbusst.control = data;
+		if ((smbusst.control & 6) == 2)
+		{
+			if (smbusst.devices[smbusst.address & 127])
+				if (smbusst.rw == 0)
+					smbusst.devices[smbusst.address & 127](smbusst.command,smbusst.rw,smbusst.data);
+				else
+					smbusst.data=smbusst.devices[smbusst.address & 127](smbusst.command,smbusst.rw,smbusst.data);
+			smbusst.status |= 0x10;
+		}
+	}
+	if ((offset == 1) && (mem_mask == 0xff)) // 4 smbus address
+	{
+		smbusst.address = data >> 1;
+		smbusst.rw = data & 1;
+	}
+	if ((offset == 1) && (mem_mask == 0xff0000)) // 6 smbus data
+	{
+		data=data>>16;
+		smbusst.data = data;
+	}
+	if ((offset == 2) && (mem_mask == 0xff)) // 8 smbus command
+		smbusst.command = data;
+}
 
 
 static ADDRESS_MAP_START( xbox_map, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x004fffff) AM_RAM
-	AM_RANGE(0x07fd0000, 0x07feffff) AM_RAM // a table of some sort?
+	AM_RANGE(0x00000000, 0x07ffffff) AM_RAM
+	AM_RANGE(0xff000000, 0xffffffff) AM_ROM AM_REGION("bios", 0) AM_MIRROR(0x00f80000)
+ADDRESS_MAP_END
 
-	AM_RANGE(0xff000080, 0xff000083) AM_READ( chihiro_jamtable )
-	AM_RANGE(0xfff00000, 0xfff7ffff) AM_ROM AM_SHARE("biosflash")
-	AM_RANGE(0xfff80000, 0xffffffff) AM_ROM AM_REGION("bios", 0) AM_SHARE("biosflash")
+static ADDRESS_MAP_START(xbox_map_io, ADDRESS_SPACE_IO, 32)
+	AM_RANGE(0x0cf8, 0x0cff) AM_DEVREADWRITE("pcibus", pci_32le_r, pci_32le_w)
+	AM_RANGE(0x8000, 0x80ff) AM_READWRITE(dummy_r, dummy_w)
+	AM_RANGE(0xc000, 0xc0ff) AM_READWRITE(smbus_r, smbus_w)
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( chihiro )
 INPUT_PORTS_END
+
+static MACHINE_START( chihiro )
+{
+	smbus_register_device(0x45,smbus_cx25871);
+	debug_console_register_command(machine,"jamdis",CMDFLAG_NONE,0,2,3,jamtable_disasm_command);
+}
 
 static MACHINE_DRIVER_START( chihiro_base )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", PENTIUM, 733333333) /* Wrong! */
 	MDRV_CPU_PROGRAM_MAP(xbox_map)
+	MDRV_CPU_IO_MAP(xbox_map_io)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
+
+	MDRV_PCI_BUS_ADD("pcibus", 0)
+	MDRV_PCI_BUS_DEVICE(0, "PCI Bridge Device - Host Bridge", dummy_pci_r, dummy_pci_w)
+	MDRV_PCI_BUS_DEVICE(1, "HUB Interface - ISA Bridge", dummy_pci_r, dummy_pci_w)
+	MDRV_PCI_BUS_DEVICE(2, "OHCI USB Controller 1", dummy_pci_r, dummy_pci_w)
+	MDRV_PCI_BUS_DEVICE(3, "OHCI USB Controller 2", dummy_pci_r, dummy_pci_w)
+	MDRV_PCI_BUS_DEVICE(30, "AGP Host to PCI Bridge", dummy_pci_r, dummy_pci_w)
+	MDRV_PCI_BUS_ADD("agpbus", 1)
+	MDRV_PCI_BUS_SIBLING("pcibus")
+	MDRV_PCI_BUS_DEVICE(0, "NV2A GeForce 3MX Integrated GPU/Northbridge", dummy_pci_r, dummy_pci_w)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -98,10 +320,9 @@ static MACHINE_DRIVER_START( chihiro_base )
 	MDRV_SCREEN_SIZE(640, 480)
 	MDRV_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 
-	MDRV_PALETTE_LENGTH(65536)
+	MDRV_MACHINE_START(chihiro)
 
-	MDRV_VIDEO_START(chihiro)
-	MDRV_VIDEO_UPDATE(chihiro)
+	MDRV_PALETTE_LENGTH(65536)
 MACHINE_DRIVER_END
 
 static MACHINE_DRIVER_START( chihirogd )
@@ -116,7 +337,7 @@ MACHINE_DRIVER_END
 		ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios+1)) /* Note '+1' */
 
 #define CHIHIRO_BIOS \
-	ROM_REGION( 0x200000, "bios", 0) \
+	ROM_REGION( 0x1000000, "bios", 0) \
 	ROM_SYSTEM_BIOS( 0, "bios0", "Chihiro Bios" ) \
 	ROM_LOAD_BIOS( 0,  "chihiro_xbox_bios.bin", 0x000000, 0x80000, CRC(66232714) SHA1(b700b0041af8f84835e45d1d1250247bf7077188) ) \
 	ROM_REGION( 0x200000, "others", 0) \
