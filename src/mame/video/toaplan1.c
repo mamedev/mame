@@ -1197,10 +1197,9 @@ VIDEO_UPDATE( toaplan1 )
 
 	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 	bitmap_fill(bitmap,cliprect,0x120);
-
-	tilemap_draw(bitmap, cliprect, state->pf4_tilemap, TILEMAP_DRAW_OPAQUE, 0);
-	for (priority = 8; priority < 16; priority++)
-		tilemap_draw(bitmap, cliprect, state->pf1_tilemap, TILEMAP_DRAW_OPAQUE | priority, 0);
+// it's really correct?
+	tilemap_draw(bitmap, cliprect, state->pf1_tilemap, TILEMAP_DRAW_OPAQUE | 0, 0);
+	tilemap_draw(bitmap, cliprect, state->pf1_tilemap, TILEMAP_DRAW_OPAQUE | 1, 0);
 
 	for (priority = 1; priority < 16; priority++)
 	{
