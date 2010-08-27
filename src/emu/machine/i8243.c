@@ -10,57 +10,106 @@
 
 #include "emu.h"
 #include "i8243.h"
+#include "devhelpr.h"
 
+//**************************************************************************
+//  DEVICE CONFIGURATION
+//**************************************************************************
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
+GENERIC_DEVICE_CONFIG_SETUP(i8243, "I8243")
 
-/* live processor state */
-typedef struct _i8243_state i8243_state;
-struct _i8243_state
+//-------------------------------------------------
+//  static_set_read_handler - configuration helper
+//  to set the read handler
+//-------------------------------------------------
+
+void i8243_device_config::static_set_read_handler(device_config *device, read8_device_func callback)
 {
-	UINT8		p[4];				/* 4 ports' worth of data */
-	UINT8		p2out;				/* port 2 bits that will be returned */
-	UINT8		p2;					/* most recent port 2 value */
-	UINT8		opcode;				/* latched opcode */
-	UINT8		prog;				/* previous PROG state */
-};
-
-
-/***************************************************************************
-    INLINE FUNCTIONS
-***************************************************************************/
-
-INLINE i8243_state *get_safe_token(running_device *device)
-{
-	assert(device != NULL);
-	assert(device->type() == I8243);
-	return (i8243_state *)downcast<legacy_device_base *>(device)->token();
+	i8243_device_config *i8243 = downcast<i8243_device_config *>(device);
+	if(callback != NULL)
+	{
+		i8243->m_readhandler.type = DEVCB_TYPE_SELF;
+		i8243->m_readhandler.readdevice = callback;
+	}
+	else
+	{
+		i8243->m_readhandler.type = DEVCB_TYPE_NULL;
+	}
 }
 
 
-INLINE i8243_config *get_safe_config(running_device *device)
+//-------------------------------------------------
+//  static_set_write_handler - configuration helper
+//  to set the write handler
+//-------------------------------------------------
+
+void i8243_device_config::static_set_write_handler(device_config *device, write8_device_func callback)
 {
-	assert(device != NULL);
-	assert(device->type() == I8243);
-	return (i8243_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
+	i8243_device_config *i8243 = downcast<i8243_device_config *>(device);
+	if(callback != NULL)
+	{
+		i8243->m_writehandler.type = DEVCB_TYPE_SELF;
+		i8243->m_writehandler.writedevice = callback;
+	}
+	else
+	{
+		i8243->m_writehandler.type = DEVCB_TYPE_NULL;
+	}
 }
 
 
 
 /***************************************************************************
-    DEVICE INTERFACE
+    LIVE DEVICE
 ***************************************************************************/
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+const device_type I8243 = i8243_device_config::static_alloc_device_config;
+
+//-------------------------------------------------
+//  i8243_device - constructor
+//-------------------------------------------------
+
+i8243_device::i8243_device(running_machine &_machine, const i8243_device_config &config)
+    : device_t(_machine, config),
+      m_config(config)
+{
+
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void i8243_device::device_start()
+{
+	devcb_resolve_read8(&m_readhandler, &m_config.m_readhandler, this);
+	devcb_resolve_write8(&m_writehandler, &m_config.m_writehandler, this);
+}
+
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void i8243_device::device_reset()
+{
+	m_p2 = 0x0f;
+	m_p2out = 0x0f;
+	m_prog = 1;
+}
+
 
 /*-------------------------------------------------
     i8243_p2_r - handle a read from port 2
 -------------------------------------------------*/
 
-READ8_DEVICE_HANDLER( i8243_p2_r )
+READ8_DEVICE_HANDLER_TRAMPOLINE(i8243, i8243_p2_r)
 {
-	i8243_state *i8243 = get_safe_token(device);
-	return i8243->p2out;
+	return m_p2out;
 }
 
 
@@ -68,10 +117,9 @@ READ8_DEVICE_HANDLER( i8243_p2_r )
     i8243_p2_r - handle a write to port 2
 -------------------------------------------------*/
 
-WRITE8_DEVICE_HANDLER( i8243_p2_w )
+WRITE8_DEVICE_HANDLER_TRAMPOLINE(i8243, i8243_p2_w)
 {
-	i8243_state *i8243 = get_safe_token(device);
-	i8243->p2 = data & 0x0f;
+	m_p2 = data & 0x0f;
 }
 
 
@@ -80,110 +128,46 @@ WRITE8_DEVICE_HANDLER( i8243_p2_w )
     line state
 -------------------------------------------------*/
 
-WRITE8_DEVICE_HANDLER( i8243_prog_w )
+WRITE8_DEVICE_HANDLER_TRAMPOLINE(i8243, i8243_prog_w)
 {
-	i8243_state *i8243 = get_safe_token(device);
-	i8243_config *config = get_safe_config(device);
-
 	/* only care about low bit */
 	data &= 1;
 
 	/* on high->low transition state, latch opcode/port */
-	if (i8243->prog && !data)
+	if(m_prog && !data)
 	{
-		i8243->opcode = i8243->p2;
+		m_opcode = m_p2;
 
 		/* if this is a read opcode, copy result to p2out */
-		if ((i8243->opcode >> 2) == MCS48_EXPANDER_OP_READ)
+		if((m_opcode >> 2) == MCS48_EXPANDER_OP_READ)
 		{
-			if (config->readhandler != NULL)
-				i8243->p[i8243->opcode & 3] = (*config->readhandler)(device, i8243->opcode & 3);
-			i8243->p2out = i8243->p[i8243->opcode & 3] & 0x0f;
+			m_p[m_opcode & 3] = devcb_call_read8(&m_readhandler, m_opcode & 3);
+			m_p2out = m_p[m_opcode & 3] & 0x0f;
 		}
 	}
 
 	/* on low->high transition state, act on opcode */
-	else if (!i8243->prog && data)
+	else if(!m_prog && data)
 	{
-		switch (i8243->opcode >> 2)
+		switch(m_opcode >> 2)
 		{
 			case MCS48_EXPANDER_OP_WRITE:
-				i8243->p[i8243->opcode & 3] = i8243->p2 & 0x0f;
-				if (config->writehandler != NULL)
-					(*config->writehandler)(device, i8243->opcode & 3, i8243->p[i8243->opcode & 3]);
+				m_p[m_opcode & 3] = m_p2 & 0x0f;
+				devcb_call_write8(&m_writehandler, m_opcode & 3, m_p[m_opcode & 3]);
 				break;
 
 			case MCS48_EXPANDER_OP_OR:
-				i8243->p[i8243->opcode & 3] |= i8243->p2 & 0x0f;
-				if (config->writehandler != NULL)
-					(*config->writehandler)(device, i8243->opcode & 3, i8243->p[i8243->opcode & 3]);
+				m_p[m_opcode & 3] |= m_p2 & 0x0f;
+				devcb_call_write8(&m_writehandler, m_opcode & 3, m_p[m_opcode & 3]);
 				break;
 
 			case MCS48_EXPANDER_OP_AND:
-				i8243->p[i8243->opcode & 3] &= i8243->p2 & 0x0f;
-				if (config->writehandler != NULL)
-					(*config->writehandler)(device, i8243->opcode & 3, i8243->p[i8243->opcode & 3]);
+				m_p[m_opcode & 3] &= m_p2 & 0x0f;
+				devcb_call_write8(&m_writehandler, m_opcode & 3, m_p[m_opcode & 3]);
 				break;
 		}
 	}
 
 	/* remember the state */
-	i8243->prog = data;
+	m_prog = data;
 }
-
-
-
-/***************************************************************************
-    DEVICE INTERFACE
-***************************************************************************/
-
-/*-------------------------------------------------
-    DEVICE_START( i8243 )
--------------------------------------------------*/
-
-static DEVICE_START( i8243 )
-{
-}
-
-
-/*-------------------------------------------------
-    DEVICE_RESET( i8243 )
--------------------------------------------------*/
-
-static DEVICE_RESET( i8243 )
-{
-	i8243_state *i8243 = get_safe_token(device);
-
-	i8243->p2 = 0x0f;
-	i8243->p2out = 0x0f;
-	i8243->prog = 1;
-}
-
-
-/*-------------------------------------------------
-    DEVICE_GET_INFO( i8243 )
--------------------------------------------------*/
-
-DEVICE_GET_INFO( i8243 )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(i8243_state);			break;
-		case DEVINFO_INT_INLINE_CONFIG_BYTES:			info->i = sizeof(i8243_config);			break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:			info->start = DEVICE_START_NAME(i8243);					break;
-		case DEVINFO_FCT_RESET:			info->reset = DEVICE_RESET_NAME(i8243);					break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "I8243");				break;
-		case DEVINFO_STR_FAMILY:						strcpy(info->s, "MCS-48");				break;
-		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");					break;
-		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);				break;
-		case DEVINFO_STR_CREDITS:						/* Nothing */							break;
-	}
-}
-
-
-DEFINE_LEGACY_DEVICE(I8243, i8243);
