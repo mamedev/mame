@@ -251,11 +251,14 @@ static WRITE32_HANDLER( smbus_w )
 		smbusst.control = data;
 		if ((smbusst.control & 6) == 2)
 		{
-			if (smbusst.devices[smbusst.address & 127])
-				if (smbusst.rw == 0)
+			if (smbusst.devices[smbusst.address & 127]) {
+				if (smbusst.rw == 0) {
 					smbusst.devices[smbusst.address & 127](smbusst.command,smbusst.rw,smbusst.data);
-				else
+				}
+				else {
 					smbusst.data=smbusst.devices[smbusst.address & 127](smbusst.command,smbusst.rw,smbusst.data);
+				}
+			}			
 			smbusst.status |= 0x10;
 		}
 	}
