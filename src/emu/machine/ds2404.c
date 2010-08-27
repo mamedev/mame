@@ -27,7 +27,6 @@ ds2404_device_config::ds2404_device_config(const machine_config &mconfig, const 
     : device_config(mconfig, static_alloc_device_config, "DS2404", tag, owner, clock),
       device_config_nvram_interface(mconfig, *this)
 {
-	printf("ds2404_device_config\n"); fflush(stdout);
 }
 
 
@@ -38,7 +37,6 @@ ds2404_device_config::ds2404_device_config(const machine_config &mconfig, const 
 
 device_config *ds2404_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
 {
-	printf("static_alloc_device_config\n"); fflush(stdout);
     return global_alloc(ds2404_device_config(mconfig, tag, owner, clock));
 }
 
@@ -49,7 +47,6 @@ device_config *ds2404_device_config::static_alloc_device_config(const machine_co
 
 device_t *ds2404_device_config::alloc_device(running_machine &machine) const
 {
-	printf("alloc_device\n"); fflush(stdout);
     return auto_alloc(&machine, ds2404_device(machine, *this));
 }
 
@@ -105,7 +102,6 @@ ds2404_device::ds2404_device(running_machine &_machine, const ds2404_device_conf
 	  device_nvram_interface(_machine, config, *this),
       m_config(config)
 {
-	printf("ds2404_device\n"); fflush(stdout);
 }
 
 //-------------------------------------------------
@@ -114,7 +110,6 @@ ds2404_device::ds2404_device(running_machine &_machine, const ds2404_device_conf
 
 void ds2404_device::device_start()
 {
-	printf("ds2404_device_start\n"); fflush(stdout);
 	struct tm ref_tm;
 
 	memset(&ref_tm, 0, sizeof(ref_tm));
@@ -141,7 +136,6 @@ void ds2404_device::device_start()
 
 void ds2404_device::ds2404_rom_cmd(UINT8 cmd)
 {
-	printf("ds2404_rom_cmd\n"); fflush(stdout);
 	switch(cmd)
 	{
 		case 0xcc:		/* Skip ROM */
@@ -157,7 +151,6 @@ void ds2404_device::ds2404_rom_cmd(UINT8 cmd)
 
 void ds2404_device::ds2404_cmd(UINT8 cmd)
 {
-	printf("ds2404_cmd\n"); fflush(stdout);
 	switch(cmd)
 	{
 		case 0x0f:		/* Write scratchpad */
@@ -193,7 +186,6 @@ void ds2404_device::ds2404_cmd(UINT8 cmd)
 
 UINT8 ds2404_device::ds2404_readmem()
 {
-	printf("ds2404_readmem\n"); fflush(stdout);
 	if( m_address < 0x200 )
 	{
 		return m_sram[ m_address ];
@@ -207,7 +199,6 @@ UINT8 ds2404_device::ds2404_readmem()
 
 void ds2404_device::ds2404_writemem(UINT8 value)
 {
-	printf("ds2404_writemem\n"); fflush(stdout);
 	if( m_address < 0x200 )
 	{
 		m_sram[ m_address ] = value;
@@ -220,21 +211,18 @@ void ds2404_device::ds2404_writemem(UINT8 value)
 
 WRITE8_DEVICE_HANDLER_TRAMPOLINE(ds2404, ds2404_1w_reset_w)
 {
-	printf("ds2404_1w_reset_w\n"); fflush(stdout);
 	m_state[0] = DS2404_STATE_IDLE;
 	m_state_ptr = 0;
 }
 
 WRITE8_DEVICE_HANDLER_TRAMPOLINE(ds2404, ds2404_3w_reset_w)
 {
-	printf("ds2404_3w_reset_w\n"); fflush(stdout);
 	m_state[0] = DS2404_STATE_COMMAND;
 	m_state_ptr = 0;
 }
 
 READ8_DEVICE_HANDLER_TRAMPOLINE(ds2404, ds2404_data_r)
 {
-	printf("ds2404_data_r\n"); fflush(stdout);
 	UINT8 value = 0;
 	switch(m_state[m_state_ptr])
 	{
@@ -269,7 +257,6 @@ READ8_DEVICE_HANDLER_TRAMPOLINE(ds2404, ds2404_data_r)
 
 WRITE8_DEVICE_HANDLER_TRAMPOLINE(ds2404, ds2404_data_w)
 {
-	printf("ds2404_data_w\n"); fflush(stdout);
 	switch( m_state[m_state_ptr] )
 	{
 		case DS2404_STATE_IDLE:
@@ -363,7 +350,6 @@ WRITE8_DEVICE_HANDLER_TRAMPOLINE(ds2404, ds2404_data_w)
 
 WRITE8_DEVICE_HANDLER_TRAMPOLINE(ds2404, ds2404_clk_w)
 {
-	printf("ds2404_clk_w\n"); fflush(stdout);
 	switch( m_state[m_state_ptr] )
 	{
 		case DS2404_STATE_IDLE:
@@ -391,13 +377,11 @@ WRITE8_DEVICE_HANDLER_TRAMPOLINE(ds2404, ds2404_clk_w)
 
 TIMER_CALLBACK( ds2404_device::ds2404_tick_callback )
 {
-	printf("ds2404_tick_callback\n"); fflush(stdout);
 	reinterpret_cast<ds2404_device*>(ptr)->ds2404_tick();
 }
 
 void ds2404_device::ds2404_tick()
 {
-	printf("ds2404_tick\n"); fflush(stdout);
 	for(int i = 0; i < 5; i++)
 	{
 		m_rtc[ i ]++;
@@ -416,7 +400,6 @@ void ds2404_device::ds2404_tick()
 
 void ds2404_device::nvram_default()
 {
-	printf("nvram_default\n"); fflush(stdout);
 	memset(m_sram, 0, sizeof(m_sram));
 }
 
@@ -428,7 +411,6 @@ void ds2404_device::nvram_default()
 
 void ds2404_device::nvram_read(mame_file &file)
 {
-	printf("nvram_read\n"); fflush(stdout);
 	mame_fread(&file, m_sram, sizeof(m_sram));
 }
 
@@ -440,6 +422,5 @@ void ds2404_device::nvram_read(mame_file &file)
 
 void ds2404_device::nvram_write(mame_file &file)
 {
-	printf("nvram_write\n"); fflush(stdout);
 	mame_fwrite(&file, m_sram, sizeof(m_sram));
 }
