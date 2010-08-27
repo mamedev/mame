@@ -85,7 +85,9 @@ void pia6821_device_config::device_config_complete()
 	// inherit a copy of the static data
 	const pia6821_interface *intf = reinterpret_cast<const pia6821_interface *>(static_config());
 	if (intf != NULL)
+	{
 		*static_cast<pia6821_interface *>(this) = *intf;
+	}
 
 	// or initialize to defaults if none provided
 	else

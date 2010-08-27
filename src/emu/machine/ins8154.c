@@ -11,6 +11,7 @@
 
 #include "emu.h"
 #include "ins8154.h"
+#include "devhelpr.h"
 
 
 /***************************************************************************
@@ -30,85 +31,135 @@ enum
 
 
 /***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
-
-typedef struct _ins8154_state ins8154_state;
-struct _ins8154_state
-{
-	/* i/o lines */
-	devcb_resolved_read8 in_a_func;
-	devcb_resolved_write8 out_a_func;
-	devcb_resolved_read8 in_b_func;
-	devcb_resolved_write8 out_b_func;
-	devcb_resolved_write_line out_irq_func;
-
-	/* registers */
-	UINT8 in_a;  /* Input Latch Port A */
-	UINT8 in_b;  /* Input Latch Port B */
-	UINT8 out_a; /* Output Latch Port A */
-	UINT8 out_b; /* Output Latch Port B */
-	UINT8 mdr;   /* Mode Definition Register */
-	UINT8 odra;  /* Output Definition Register Port A */
-	UINT8 odrb;  /* Output Definition Register Port B */
-};
-
-
-/*****************************************************************************
-    INLINE FUNCTIONS
-*****************************************************************************/
-
-INLINE ins8154_state *get_safe_token(running_device *device)
-{
-	assert(device != NULL);
-	assert(device->type() == INS8154);
-
-	return (ins8154_state *)downcast<legacy_device_base *>(device)->token();
-}
-
-
-/***************************************************************************
     IMPLEMENTATION
 ***************************************************************************/
 
-READ8_DEVICE_HANDLER( ins8154_r )
+//**************************************************************************
+//  DEVICE CONFIGURATION
+//**************************************************************************
+
+GENERIC_DEVICE_CONFIG_SETUP(ins8154, "INS8154")
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void ins8154_device_config::device_config_complete()
 {
-	ins8154_state *ins8154 = get_safe_token(device);
+	// inherit a copy of the static data
+	const ins8154_interface *intf = reinterpret_cast<const ins8154_interface *>(static_config());
+	if (intf != NULL)
+	{
+		*static_cast<ins8154_interface *>(this) = *intf;
+	}
+
+	// or initialize to defaults if none provided
+	else
+	{
+    	memset(&m_in_a_func, 0, sizeof(m_in_a_func));
+    	memset(&m_in_b_func, 0, sizeof(m_in_b_func));
+    	memset(&m_out_a_func, 0, sizeof(m_out_a_func));
+    	memset(&m_out_b_func, 0, sizeof(m_out_b_func));
+    	memset(&m_out_irq_func, 0, sizeof(m_out_irq_func));
+	}
+}
+
+
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+const device_type INS8154 = ins8154_device_config::static_alloc_device_config;
+
+//-------------------------------------------------
+//  ins8154_device - constructor
+//-------------------------------------------------
+
+ins8154_device::ins8154_device(running_machine &_machine, const ins8154_device_config &config)
+    : device_t(_machine, config),
+      m_config(config)
+{
+
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void ins8154_device::device_start()
+{
+	/* resolve callbacks */
+	devcb_resolve_read8(&m_in_a_func, &m_config.m_in_a_func, this);
+	devcb_resolve_write8(&m_out_a_func, &m_config.m_out_a_func, this);
+	devcb_resolve_read8(&m_in_b_func, &m_config.m_in_b_func, this);
+	devcb_resolve_write8(&m_out_b_func, &m_config.m_out_b_func, this);
+	devcb_resolve_write_line(&m_out_irq_func, &m_config.m_out_irq_func, this);
+
+	/* register for state saving */
+	state_save_register_device_item(this, 0, m_in_a);
+	state_save_register_device_item(this, 0, m_in_b);
+	state_save_register_device_item(this, 0, m_out_a);
+	state_save_register_device_item(this, 0, m_out_b);
+	state_save_register_device_item(this, 0, m_mdr);
+	state_save_register_device_item(this, 0, m_odra);
+	state_save_register_device_item(this, 0, m_odrb);
+}
+
+
+//-------------------------------------------------
+//  device_reset - device-specific reset
+//-------------------------------------------------
+
+void ins8154_device::device_reset()
+{
+	m_in_a = 0;
+	m_in_b = 0;
+	m_out_a = 0;
+	m_out_b = 0;
+	m_mdr = 0;
+	m_odra = 0;
+	m_odrb = 0;
+}
+
+
+READ8_DEVICE_HANDLER_TRAMPOLINE(ins8154, ins8154_r)
+{
 	UINT8 val = 0xff;
 
 	if (offset > 0x24)
 	{
 		if (VERBOSE)
-			logerror("%s: INS8154 '%s' Read from invalid offset %02x!\n", cpuexec_describe_context(device->machine), device->tag(), offset);
+		{
+			logerror("%s: INS8154 '%s' Read from invalid offset %02x!\n", cpuexec_describe_context(&m_machine), tag(), offset);
+		}
 		return 0xff;
 	}
 
 	switch (offset)
 	{
 	case 0x20:
-		if (ins8154->in_a_func.read != NULL)
-			val = devcb_call_read8(&ins8154->in_a_func, 0);
-		ins8154->in_a = val;
+		val = devcb_call_read8(&m_in_a_func, 0);
+		m_in_a = val;
 		break;
 
 	case 0x21:
-		if (ins8154->in_b_func.read != NULL)
-			val = devcb_call_read8(&ins8154->in_b_func, 0);
-		ins8154->in_b = val;
+		val = devcb_call_read8(&m_in_b_func, 0);
+		m_in_b = val;
 		break;
 
 	default:
 		if (offset < 0x08)
 		{
-			if (ins8154->in_a_func.read != NULL)
-				val = (devcb_call_read8(&ins8154->in_a_func, 0) << (8 - offset)) & 0x80;
-			ins8154->in_a = val;
+			val = (devcb_call_read8(&m_in_a_func, 0) << (8 - offset)) & 0x80;
+			m_in_a = val;
 		}
 		else
 		{
-			if (ins8154->in_b_func.read != NULL)
-				val = (devcb_call_read8(&ins8154->in_b_func, 0) << (8 - (offset >> 4))) & 0x80;
-			ins8154->in_b = val;
+			val = (devcb_call_read8(&m_in_b_func, 0) << (8 - (offset >> 4))) & 0x80;
+			m_in_b = val;
 		}
 		break;
 	}
@@ -116,68 +167,74 @@ READ8_DEVICE_HANDLER( ins8154_r )
 	return val;
 }
 
-WRITE8_DEVICE_HANDLER( ins8154_porta_w )
+WRITE8_DEVICE_HANDLER_TRAMPOLINE(ins8154, ins8154_porta_w)
 {
-	ins8154_state *ins8154 = get_safe_token(device);
-
-	ins8154->out_a = data;
+	m_out_a = data;
 
 	/* Test if any pins are set as outputs */
-	if (ins8154->odra)
-		devcb_call_write8(&ins8154->out_a_func, 0, (data & ins8154->odra) | (ins8154->odra ^ 0xff));
+	if (m_odra)
+	{
+		devcb_call_write8(&m_out_a_func, 0, (data & m_odra) | (m_odra ^ 0xff));
+	}
 }
 
-WRITE8_DEVICE_HANDLER( ins8154_portb_w )
+WRITE8_DEVICE_HANDLER_TRAMPOLINE(ins8154, ins8154_portb_w)
 {
-	ins8154_state *ins8154 = get_safe_token(device);
-
-	ins8154->out_b = data;
+	m_out_b = data;
 
 	/* Test if any pins are set as outputs */
-	if (ins8154->odrb)
-		devcb_call_write8(&ins8154->out_b_func, 0, (data & ins8154->odrb) | (ins8154->odrb ^ 0xff));
+	if (m_odrb)
+	{
+		devcb_call_write8(&m_out_b_func, 0, (data & m_odrb) | (m_odrb ^ 0xff));
+	}
 }
 
-WRITE8_DEVICE_HANDLER( ins8154_w )
+WRITE8_DEVICE_HANDLER_TRAMPOLINE(ins8154, ins8154_w)
 {
-	ins8154_state *ins8154 = get_safe_token(device);
-
 	if (offset > 0x24)
 	{
 		if (VERBOSE)
-			logerror("%s: INS8154 '%s' Write %02x to invalid offset %02x!\n", cpuexec_describe_context(device->machine), device->tag(), data, offset);
+		{
+			logerror("%s: INS8154 '%s' Write %02x to invalid offset %02x!\n", cpuexec_describe_context(&m_machine), tag(), data, offset);
+		}
 		return;
 	}
 
 	switch (offset)
 	{
 	case 0x20:
-		ins8154_porta_w(device, 0, data);
+		ins8154_porta_w(0, data);
 		break;
 
 	case 0x21:
-		ins8154_portb_w(device, 0, data);
+		ins8154_portb_w(0, data);
 		break;
 
 	case 0x22:
 		if (VERBOSE)
-			logerror("%s: INS8154 '%s' ODRA set to %02x\n", cpuexec_describe_context(device->machine), device->tag(), data);
+		{
+			logerror("%s: INS8154 '%s' ODRA set to %02x\n", cpuexec_describe_context(&m_machine), tag(), data);
+		}
 
-		ins8154->odra = data;
+		m_odra = data;
 		break;
 
 	case 0x23:
 		if (VERBOSE)
-			logerror("%s: INS8154 '%s' ODRB set to %02x\n", cpuexec_describe_context(device->machine), device->tag(), data);
+		{
+			logerror("%s: INS8154 '%s' ODRB set to %02x\n", cpuexec_describe_context(&m_machine), tag(), data);
+		}
 
-		ins8154->odrb = data;
+		m_odrb = data;
 		break;
 
 	case 0x24:
 		if (VERBOSE)
-			logerror("%s: INS8154 '%s' MDR set to %02x\n", cpuexec_describe_context(device->machine), device->tag(), data);
+		{
+			logerror("%s: INS8154 '%s' MDR set to %02x\n", cpuexec_describe_context(&m_machine), tag(), data);
+		}
 
-		ins8154->mdr = data;
+		m_mdr = data;
 		break;
 
 	default:
@@ -186,11 +243,11 @@ WRITE8_DEVICE_HANDLER( ins8154_w )
 			/* Set bit */
 			if (offset < 0x08)
 			{
-				ins8154_porta_w(device, 0, ins8154->out_a |= offset & 0x07);
+				ins8154_porta_w(0, m_out_a |= offset & 0x07);
 			}
 			else
 			{
-				ins8154_portb_w(device, 0, ins8154->out_b |= (offset >> 4) & 0x07);
+				ins8154_portb_w(0, m_out_b |= (offset >> 4) & 0x07);
 			}
 		}
 		else
@@ -198,75 +255,14 @@ WRITE8_DEVICE_HANDLER( ins8154_w )
 			/* Clear bit */
 			if (offset < 0x08)
 			{
-				ins8154_porta_w(device, 0, ins8154->out_a & ~(offset & 0x07));
+				ins8154_porta_w(0, m_out_a & ~(offset & 0x07));
 			}
 			else
 			{
-				ins8154_portb_w(device, 0, ins8154->out_b & ~((offset >> 4) & 0x07));
+				ins8154_portb_w(0, m_out_b & ~((offset >> 4) & 0x07));
 			}
 		}
 
 		break;
 	}
 }
-
-
-/*****************************************************************************
-    DEVICE INTERFACE
-*****************************************************************************/
-
-static DEVICE_START( ins8154 )
-{
-	ins8154_state *ins8154 = get_safe_token(device);
-	const ins8154_interface *intf = (const ins8154_interface *)device->baseconfig().static_config();
-
-	/* validate some basic stuff */
-	assert(intf != NULL);
-
-	/* resolve callbacks */
-	devcb_resolve_read8(&ins8154->in_a_func, &intf->in_a_func, device);
-	devcb_resolve_write8(&ins8154->out_a_func, &intf->out_a_func, device);
-	devcb_resolve_read8(&ins8154->in_b_func, &intf->in_b_func, device);
-	devcb_resolve_write8(&ins8154->out_b_func, &intf->out_b_func, device);
-	devcb_resolve_write_line(&ins8154->out_irq_func, &intf->out_irq_func, device);
-
-	/* register for state saving */
-	state_save_register_device_item(device, 0, ins8154->in_a);
-	state_save_register_device_item(device, 0, ins8154->in_b);
-	state_save_register_device_item(device, 0, ins8154->out_a);
-	state_save_register_device_item(device, 0, ins8154->out_b);
-	state_save_register_device_item(device, 0, ins8154->mdr);
-	state_save_register_device_item(device, 0, ins8154->odra);
-	state_save_register_device_item(device, 0, ins8154->odrb);
-}
-
-static DEVICE_RESET( ins8154 )
-{
-	ins8154_state *ins8154 = get_safe_token(device);
-
-	ins8154->in_a = 0;
-	ins8154->in_b = 0;
-	ins8154->out_a = 0;
-	ins8154->out_b = 0;
-	ins8154->mdr = 0;
-	ins8154->odra = 0;
-	ins8154->odrb = 0;
-}
-
-
-/***************************************************************************
-    DEVICE GETINFO
-***************************************************************************/
-
-static const char DEVTEMPLATE_SOURCE[] = __FILE__;
-
-#define DEVTEMPLATE_ID(p,s)				p##ins8154##s
-#define DEVTEMPLATE_FEATURES			DT_HAS_START | DT_HAS_RESET
-#define DEVTEMPLATE_NAME				"INS8154"
-#define DEVTEMPLATE_FAMILY				"INS8154"
-#define DEVTEMPLATE_VERSION				"1.1"
-#define DEVTEMPLATE_CREDITS				"Copyright MESS Team"
-#include "devtempl.h"
-
-
-DEFINE_LEGACY_DEVICE(INS8154, ins8154);

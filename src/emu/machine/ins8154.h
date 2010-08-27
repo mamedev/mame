@@ -28,39 +28,13 @@
 
 ***************************************************************************/
 
+#pragma once
+
 #ifndef __INS8154_H__
 #define __INS8154_H__
 
-#include "devlegcy.h"
-#include "devcb.h"
+#include "emu.h"
 
-
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
-
-typedef struct _ins8154_interface ins8154_interface;
-struct _ins8154_interface
-{
-	devcb_read8			in_a_func;
-	devcb_write8		out_a_func;
-	devcb_read8			in_b_func;
-	devcb_write8		out_b_func;
-	devcb_write_line	out_irq_func;
-};
-
-DECLARE_LEGACY_DEVICE(INS8154, ins8154);
-
-
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
-READ8_DEVICE_HANDLER( ins8154_r );
-WRITE8_DEVICE_HANDLER( ins8154_w );
-
-WRITE8_DEVICE_HANDLER( ins8154_porta_w );
-WRITE8_DEVICE_HANDLER( ins8154_portb_w );
 
 
 /***************************************************************************
@@ -70,6 +44,108 @@ WRITE8_DEVICE_HANDLER( ins8154_portb_w );
 #define MDRV_INS8154_ADD(_tag, _intrf) \
 	MDRV_DEVICE_ADD(_tag, INS8154, 0) \
 	MDRV_DEVICE_CONFIG(_intrf)
+
+
+/***************************************************************************
+    TYPE DEFINITIONS
+***************************************************************************/
+
+
+// ======================> ins8154_interface
+
+struct ins8154_interface
+{
+	devcb_read8			m_in_a_func;
+	devcb_write8		m_out_a_func;
+	devcb_read8			m_in_b_func;
+	devcb_write8		m_out_b_func;
+	devcb_write_line	m_out_irq_func;
+};
+
+
+
+// ======================> ins8154_device_config
+
+class ins8154_device_config : public device_config,
+                              public ins8154_interface
+{
+    friend class ins8154_device;
+
+    // construction/destruction
+    ins8154_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+
+public:
+    // allocators
+    static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+    virtual device_t *alloc_device(running_machine &machine) const;
+
+protected:
+    // device_config overrides
+    virtual void device_config_complete();
+};
+
+
+
+// ======================> ins8154_device
+
+class ins8154_device :  public device_t
+{
+    friend class ins8154_device_config;
+
+    // construction/destruction
+    ins8154_device(running_machine &_machine, const ins8154_device_config &_config);
+
+public:
+
+	UINT8 ins8154_r(UINT32 offset);
+	void ins8154_w(UINT32 offset, UINT8 data);
+
+	void ins8154_porta_w(UINT32 offset, UINT8 data);
+	void ins8154_portb_w(UINT32 offset, UINT8 data);
+
+protected:
+    // device-level overrides
+    virtual void device_start();
+    virtual void device_reset();
+    virtual void device_post_load() { }
+    virtual void device_clock_changed() { }
+
+private:
+
+	/* i/o lines */
+	devcb_resolved_read8 m_in_a_func;
+	devcb_resolved_write8 m_out_a_func;
+	devcb_resolved_read8 m_in_b_func;
+	devcb_resolved_write8 m_out_b_func;
+	devcb_resolved_write_line m_out_irq_func;
+
+	/* registers */
+	UINT8 m_in_a;  /* Input Latch Port A */
+	UINT8 m_in_b;  /* Input Latch Port B */
+	UINT8 m_out_a; /* Output Latch Port A */
+	UINT8 m_out_b; /* Output Latch Port B */
+	UINT8 m_mdr;   /* Mode Definition Register */
+	UINT8 m_odra;  /* Output Definition Register Port A */
+	UINT8 m_odrb;  /* Output Definition Register Port B */
+
+    const ins8154_device_config &m_config;
+};
+
+
+// device type definition
+extern const device_type INS8154;
+
+
+
+/***************************************************************************
+    PROTOTYPES
+***************************************************************************/
+
+READ8_DEVICE_HANDLER( ins8154_r );
+WRITE8_DEVICE_HANDLER( ins8154_w );
+
+WRITE8_DEVICE_HANDLER( ins8154_porta_w );
+WRITE8_DEVICE_HANDLER( ins8154_portb_w );
 
 
 #endif /* __INS8154_H__ */
