@@ -141,7 +141,10 @@ WRITE8_DEVICE_HANDLER_TRAMPOLINE(i8243, i8243_prog_w)
 		/* if this is a read opcode, copy result to p2out */
 		if((m_opcode >> 2) == MCS48_EXPANDER_OP_READ)
 		{
-			m_p[m_opcode & 3] = devcb_call_read8(&m_readhandler, m_opcode & 3);
+			if (m_readhandler.read != NULL)
+			{
+				m_p[m_opcode & 3] = devcb_call_read8(&m_readhandler, m_opcode & 3);
+			}
 			m_p2out = m_p[m_opcode & 3] & 0x0f;
 		}
 	}
