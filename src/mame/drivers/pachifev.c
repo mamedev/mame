@@ -310,10 +310,10 @@ static INTERRUPT_GEN( pachifev_vblank_irq )
 		/* I wish I had found a better way to handle cocktail inputs, but I can't find a way to access internal RAM */
 		/* (bit 5 of 0xf0aa : 0 = player 1 and 1 = player 2 - bit 6 of 0xf0aa : 0 = upright and 1 = cocktail). */
 		/* All I found is that in main RAM, 0xe00f.b determines the player : 0x00 = player 1 and 0x01 = player 2. */ 
-		const address_space *ramspace = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
+		address_space *ramspace = cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM);
 		UINT8 player = 0;
-		
-		if ((memory_read_byte(ramspace, 0xe00f) == 0x01) && ((input_port_read(device->machine, "DSW1") & 0x08) == 0x00))
+
+		if ((ramspace->read_byte(0xe00f) == 0x01) && ((input_port_read(device->machine, "DSW1") & 0x08) == 0x00))
 			player = 1;
 
         int current_power=input_port_read(device->machine, inname[player]) & 0x3f;
