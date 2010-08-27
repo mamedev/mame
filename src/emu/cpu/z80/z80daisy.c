@@ -175,7 +175,7 @@ void z80_daisy_chain::call_reti_device()
 			return;
 		}
 	}
-	logerror("z80daisy_call_reti_device: failed to find an device to reti!\n");
+	//logerror("z80daisy_call_reti_device: failed to find an device to reti!\n");
 }
 
 
