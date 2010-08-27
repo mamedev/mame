@@ -447,46 +447,7 @@ or Fatal Fury for example).
 #include "cpu/mips/mips3.h"
 #include "includes/hng64.h"
 
-int hng64_mcu_type = 0;
-static UINT32 fake_mcu_time;
-static UINT16 hng_mcu_en;
 
-static UINT32 *rombase;
-static UINT32 *hng_mainram;
-static UINT32 *hng_cart;
-static UINT32 *hng64_dualport;
-static UINT16 *hng64_soundram;
-static UINT32 *hng64_sysregs;
-
-// Stuff from over in video...
-extern WRITE32_HANDLER( hng64_videoram_w );
-extern UINT32 *hng64_spriteram, *hng64_videoregs, *hng64_spriteregs;
-extern UINT32 *hng64_videoram;
-extern UINT32 *hng64_tcram;
-extern UINT32 *hng64_3dregs;
-
-extern void hng64_command3d(running_machine* machine, const UINT16* packet);
-
-extern UINT8 hng64_screen_dis;
-
-VIDEO_START( hng64 );
-VIDEO_UPDATE( hng64 );
-
-static UINT32 activeBuffer;
-static UINT32 no_machine_error_code;
-static int hng64_interrupt_level_request;
-
-/* 3D stuff */
-static UINT32 *hng64_3d_1;
-static UINT32 *hng64_3d_2;
-static UINT32 *hng64_dl;
-//static UINT32 *hng64_q2;
-
-/* Communications stuff */
-static UINT32 *hng64_com_ram;
-static UINT8  *hng64_com_op_base;
-static UINT8  *hng64_com_mmu_mem;
-static UINT8  *hng64_com_virtual_mem;
 
 
 #ifdef UNUSED_FUNCTION
@@ -503,34 +464,36 @@ static READ32_HANDLER( hng64_random_read )
 
 static READ32_HANDLER( hng64_com_r )
 {
-	logerror("com read  (PC=%08x): %08x %08x = %08x\n", cpu_get_pc(space->cpu), (offset*4)+0xc0000000, mem_mask, hng64_com_ram[offset]);
-	return hng64_com_ram[offset];
+	hng64_state *state = space->machine->driver_data<hng64_state>();
+
+	logerror("com read  (PC=%08x): %08x %08x = %08x\n", cpu_get_pc(space->cpu), (offset*4)+0xc0000000, mem_mask, state->com_ram[offset]);
+	return state->com_ram[offset];
 }
 
 static WRITE32_HANDLER( hng64_com_w )
 {
+	hng64_state *state = space->machine->driver_data<hng64_state>();
+
 	logerror("com write (PC=%08x): %08x %08x = %08x\n", cpu_get_pc(space->cpu), (offset*4)+0xc0000000, mem_mask, data);
-	COMBINE_DATA(&hng64_com_ram[offset]);
+	COMBINE_DATA(&state->com_ram[offset]);
 }
-
-
-static UINT32 hng64_com_shared_a;
-static UINT32 hng64_com_shared_b;
 
 static WRITE32_HANDLER( hng64_com_share_w )
 {
+	hng64_state *state = space->machine->driver_data<hng64_state>();
+
 	logerror("commw  (PC=%08x): %08x %08x %08x\n", cpu_get_pc(space->cpu), data, (offset*4)+0xc0001000, mem_mask);
 
-	if (offset==0x0) COMBINE_DATA(&hng64_com_shared_a);
-	if (offset==0x1) COMBINE_DATA(&hng64_com_shared_b);
+	if (offset == 0x0) COMBINE_DATA(&state->com_shared_a);
+	if (offset == 0x1) COMBINE_DATA(&state->com_shared_b);
 }
 
 static READ32_HANDLER( hng64_com_share_r )
 {
 	logerror("commr  (PC=%08x): %08x %08x\n", cpu_get_pc(space->cpu), (offset*4)+0xc0001000, mem_mask);
 
-//  if(offset==0x0) return hng64_com_shared_a;
-//  if(offset==0x1) return hng64_com_shared_b;
+	//if(offset == 0x0) return state->com_shared_a;
+	//if(offset == 0x1) return state->com_shared_b;
 
 	if(offset==0x0) return 0x0000aaaa;
 	if(offset==0x1)	return 0x00030000;		// fatfurwa : at bfc06624 it wants a 01 : at bfc06650 it wants a 02
@@ -540,23 +503,29 @@ static READ32_HANDLER( hng64_com_share_r )
 
 static WRITE32_HANDLER( hng64_pal_w )
 {
+	UINT32 *paletteram = space->machine->generic.paletteram.u32;
 	int r, g, b/*, a*/;
-	COMBINE_DATA(&space->machine->generic.paletteram.u32[offset]);
 
-	b = ((space->machine->generic.paletteram.u32[offset] & 0x000000ff) >>0);
-	g = ((space->machine->generic.paletteram.u32[offset] & 0x0000ff00) >>8);
-	r = ((space->machine->generic.paletteram.u32[offset] & 0x00ff0000) >>16);
-	//a = ((space->machine->generic.paletteram.u32[offset] & 0xff000000) >>24);
+	COMBINE_DATA(&paletteram[offset]);
+
+	b = ((paletteram[offset] & 0x000000ff) >>0);
+	g = ((paletteram[offset] & 0x0000ff00) >>8);
+	r = ((paletteram[offset] & 0x00ff0000) >>16);
+	//a = ((paletteram[offset] & 0xff000000) >>24);
 	palette_set_color(space->machine,offset,MAKE_RGB(r,g,b));
 }
 
 static READ32_HANDLER( hng64_sysregs_r )
 {
+	hng64_state *state = space->machine->driver_data<hng64_state>();
 	system_time systime;
+
 	space->machine->base_datetime(systime);
 
-//  if((offset*4) != 0x1084)
-//      printf("HNG64 port read (PC=%08x) 0x%08x\n", cpu_get_pc(space->cpu),offset*4);
+#if 0
+	if((offset*4) != 0x1084)
+		printf("HNG64 port read (PC=%08x) 0x%08x\n", cpu_get_pc(space->cpu), offset*4);
+#endif
 
 	switch(offset*4)
 	{
@@ -565,7 +534,7 @@ static READ32_HANDLER( hng64_sysregs_r )
 		//case 0x107c:
 		case 0x1084: return 0x00000002; //MCU->MIPS latch port
 		//case 0x108c:
-		case 0x1104: return hng64_interrupt_level_request;
+		case 0x1104: return state->interrupt_level_request;
 		case 0x1254: return 0x00000000; //dma status, 0x800
 		/* 4-bit RTC */
 		case 0x2104: return (systime.local_time.second % 10);
@@ -590,25 +559,25 @@ static READ32_HANDLER( hng64_sysregs_r )
 //  printf("%08x\n",offset*4);
 
 //  return mame_rand(space->machine)&0xffffffff;
-	return hng64_sysregs[offset];
+	return state->sysregs[offset];
 }
 
 /* preliminary dma code, dma is used to copy program code -> ram */
-static INT32 hng_dma_start,hng_dma_dst,hng_dma_len;
-
 static void hng64_do_dma(address_space *space)
 {
-//  printf("Performing DMA Start %08x Len %08x Dst %08x\n",hng_dma_start, hng_dma_len, hng_dma_dst);
+	hng64_state *state = space->machine->driver_data<hng64_state>();
 
-	while (hng_dma_len>=0)
+	//printf("Performing DMA Start %08x Len %08x Dst %08x\n", state->dma_start, state->dma_len, state->dma_dst);
+
+	while (state->dma_len >= 0)
 	{
 		UINT32 dat;
 
-		dat = space->read_dword(hng_dma_start);
-		space->write_dword(hng_dma_dst,dat);
-		hng_dma_start+=4;
-		hng_dma_dst+=4;
-		hng_dma_len--;
+		dat = space->read_dword(state->dma_start);
+		space->write_dword(state->dma_dst, dat);
+		state->dma_start += 4;
+		state->dma_dst += 4;
+		state->dma_len--;
 	}
 }
 
@@ -626,28 +595,32 @@ static void hng64_do_dma(address_space *space)
 
 static WRITE32_HANDLER( hng64_sysregs_w )
 {
-	COMBINE_DATA (&hng64_sysregs[offset]);
+	hng64_state *state = space->machine->driver_data<hng64_state>();
 
-//  if(((offset*4) & 0x1200) == 0x1200)
-//      printf("HNG64 writing to SYSTEM Registers 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, hng64_sysregs[offset], cpu_get_pc(space->cpu));
+	COMBINE_DATA (&state->sysregs[offset]);
+
+#if 0
+	if(((offset*4) & 0x1200) == 0x1200)
+		printf("HNG64 writing to SYSTEM Registers 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, state->sysregs[offset], cpu_get_pc(space->cpu));
+#endif
 
 	switch(offset*4)
 	{
 		//case 0x100c: *DOCUMENT*
 
 		case 0x1084: //MIPS->MCU latch port
-			hng_mcu_en = (data & 0xff); //command-based, i.e. doesn't control halt line and such?
-			//printf("HNG64 writing to SYSTEM Registers 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, hng64_sysregs[offset], cpu_get_pc(space->cpu));
+			state->mcu_en = (data & 0xff); //command-based, i.e. doesn't control halt line and such?
+			//printf("HNG64 writing to SYSTEM Registers 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, state->sysregs[offset], cpu_get_pc(space->cpu));
 			break;
 		case 0x111c: /*irq ack */ break;
-		case 0x1204: hng_dma_start = hng64_sysregs[offset]; break;
-		case 0x1214: hng_dma_dst = hng64_sysregs[offset]; break;
+		case 0x1204: state->dma_start = state->sysregs[offset]; break;
+		case 0x1214: state->dma_dst = state->sysregs[offset]; break;
 		case 0x1224:
-			hng_dma_len = hng64_sysregs[offset];
+			state->dma_len = state->sysregs[offset];
 			hng64_do_dma(space);
 			break;
 		//default:
-			//printf("HNG64 writing to SYSTEM Registers 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, hng64_sysregs[offset], cpu_get_pc(space->cpu));
+			//printf("HNG64 writing to SYSTEM Registers 0x%08x == 0x%08x. (PC=%08x)\n", offset*4, state->sysregs[offset], cpu_get_pc(space->cpu));
 	}
 }
 
@@ -658,56 +631,62 @@ static WRITE32_HANDLER( hng64_sysregs_w )
 /* Fatal Fury Wild Ambition / Buriki One */
 static READ32_HANDLER( fight_io_r )
 {
+	hng64_state *state = space->machine->driver_data<hng64_state>();
+
 	switch (offset*4)
 	{
 		case 0x000: return 0x00000400;
 		case 0x004: return input_port_read(space->machine, "SYSTEM");
 		case 0x008: return input_port_read(space->machine, "P1_P2");
-		case 0x600: return no_machine_error_code;
+		case 0x600: return state->no_machine_error_code;
 	}
 
-	return hng64_dualport[offset];
+	return state->dualport[offset];
 }
 
 /* Samurai Shodown 64 / Samurai Shodown 64 2 */
 static READ32_HANDLER( samsho_io_r )
 {
+	hng64_state *state = space->machine->driver_data<hng64_state>();
+
 	switch (offset*4)
 	{
         case 0x000:
 		{
 			/* this is used on post by the io mcu to signal that a init task is complete, zeroed otherwise. */
-			//popmessage("%04x",fake_mcu_time);
+			//popmessage("%04x", state->mcu_fake_time);
 
-			if(fake_mcu_time < 0x100)
-				fake_mcu_time++;
+			if(state->mcu_fake_time < 0x100)
+				state->mcu_fake_time++;
 
-			if(fake_mcu_time < 0x80) //i/o init 1
+			if(state->mcu_fake_time < 0x80) //i/o init 1
 				return 0x300;
-			else if(fake_mcu_time < 0x100)//i/o init 2
+			else if(state->mcu_fake_time < 0x100)//i/o init 2
 				return 0x400;
 			else
 				return 0x000;
 		}
 		case 0x004: return input_port_read(space->machine, "SYSTEM");
 		case 0x008: return input_port_read(space->machine, "P1_P2");
-		case 0x600: return no_machine_error_code;
+		case 0x600: return state->no_machine_error_code;
 	}
 
-	return hng64_dualport[offset];
+	return state->dualport[offset];
 }
 
 /* Beast Busters 2 */
 /* FIXME: trigger input doesn't work? */
 static READ32_HANDLER( shoot_io_r )
 {
+	hng64_state *state = space->machine->driver_data<hng64_state>();
+
 	switch (offset*4)
 	{
         case 0x000:
         {
-			if(fake_mcu_time < 0x100)//i/o init
+			if(state->mcu_fake_time < 0x100)//i/o init
 			{
-				fake_mcu_time++;
+				state->mcu_fake_time++;
 				return 0x400;
 			}
 			else
@@ -715,13 +694,11 @@ static READ32_HANDLER( shoot_io_r )
 		}
 		case 0x010:
 		{
-			static UINT32 p1_trig;
-
 			/* Quick kludge for use the input test items */
 			if(input_port_read(space->machine, "D_IN") & 0x01000000)
-				p1_trig = mame_rand(space->machine) & 0x01000000;
+				state->p1_trig = mame_rand(space->machine) & 0x01000000;
 
-			return (input_port_read(space->machine, "D_IN") & ~0x01000000) | (p1_trig);
+			return (input_port_read(space->machine, "D_IN") & ~0x01000000) | (state->p1_trig);
 		}
 		case 0x018:
 		{
@@ -741,22 +718,24 @@ static READ32_HANDLER( shoot_io_r )
 
 			return p3_x<<24 | p3_y<<16 | p3_x<<8 | p3_y; //FIXME: see what's the right bank here when the trigger works
 		}
-		case 0x600: return no_machine_error_code;
+		case 0x600: return state->no_machine_error_code;
 	}
 
-	return hng64_dualport[offset];
+	return state->dualport[offset];
 }
 
 /* Roads Edge / Xtreme Rally */
 static READ32_HANDLER( racing_io_r )
 {
+	hng64_state *state = space->machine->driver_data<hng64_state>();
+
 	switch (offset*4)
 	{
         case 0x000:
         {
-			if(fake_mcu_time < 0x100)//i/o init
+			if(state->mcu_fake_time < 0x100)//i/o init
 			{
-				fake_mcu_time++;
+				state->mcu_fake_time++;
 				return 0x400;
 			}
 			else
@@ -764,15 +743,17 @@ static READ32_HANDLER( racing_io_r )
 		}
 		case 0x004: return input_port_read(space->machine, "SYSTEM");
 		case 0x008: return input_port_read(space->machine, "P1_P2");
-		case 0x600: return no_machine_error_code;
+		case 0x600: return state->no_machine_error_code;
 	}
 
-	return hng64_dualport[offset];
+	return state->dualport[offset];
 }
 
 static READ32_HANDLER( hng64_dualport_r )
 {
-//  printf("dualport R %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], cpu_get_pc(space->cpu));
+	hng64_state *state = space->machine->driver_data<hng64_state>();
+
+	//printf("dualport R %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], cpu_get_pc(space->cpu));
 
 	/*
     command table:
@@ -783,11 +764,10 @@ static READ32_HANDLER( hng64_dualport_r )
 
     (*) 0x11 is followed by 0x0b if the latter is used, JVS-esque indirect/direct mode?
     */
+	if (state->mcu_en == 0x0c)
+		return state->dualport[offset];
 
-	if(hng_mcu_en == 0x0c)
-		return hng64_dualport[offset];
-
-	switch(hng64_mcu_type)
+	switch (state->mcu_type)
 	{
 		case FIGHT_MCU:  return fight_io_r(space, offset,0xffffffff);
 		case SHOOT_MCU:  return shoot_io_r(space, offset,0xffffffff);
@@ -795,7 +775,7 @@ static READ32_HANDLER( hng64_dualport_r )
 		case SAMSHO_MCU: return samsho_io_r(space, offset,0xffffffff);
 	}
 
-	return hng64_dualport[offset];
+	return state->dualport[offset];
 }
 
 /*
@@ -810,8 +790,10 @@ Beast Busters 2 outputs (all at offset == 0x1c):
 
 static WRITE32_HANDLER( hng64_dualport_w )
 {
-//  printf("dualport WRITE %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], cpu_get_pc(space->cpu));
-	COMBINE_DATA (&hng64_dualport[offset]);
+	hng64_state *state = space->machine->driver_data<hng64_state>();
+
+	//printf("dualport WRITE %08x %08x (PC=%08x)\n", offset*4, hng64_dualport[offset], cpu_get_pc(space->cpu));
+	COMBINE_DATA (&state->dualport[offset]);
 }
 
 
@@ -823,7 +805,9 @@ static WRITE32_HANDLER( hng64_dualport_w )
 //   <ElSemi> 30140000-3015ffff is ZBuffer A
 static READ32_HANDLER( hng64_3d_1_r )
 {
-	return hng64_3d_1[offset];
+	hng64_state *state = space->machine->driver_data<hng64_state>();
+
+	return state->_3d_1[offset];
 }
 
 #ifdef UNUSED_FUNCTION
@@ -835,18 +819,24 @@ WRITE32_HANDLER( hng64_3d_1_w )
 
 static READ32_HANDLER( hng64_3d_2_r )
 {
-	return hng64_3d_2[offset];
+	hng64_state *state = space->machine->driver_data<hng64_state>();
+
+	return state->_3d_2[offset];
 }
 
 static WRITE32_HANDLER( hng64_3d_2_w )
 {
-	COMBINE_DATA (&hng64_3d_1[offset]);
-	COMBINE_DATA (&hng64_3d_2[offset]);
+	hng64_state *state = space->machine->driver_data<hng64_state>();
+
+	COMBINE_DATA (&state->_3d_1[offset]);
+	COMBINE_DATA (&state->_3d_2[offset]);
 }
 
 // The 3d 'display list'
 static WRITE32_HANDLER( dl_w )
 {
+	hng64_state *state = space->machine->driver_data<hng64_state>();
+	UINT32 *hng64_dl = state->dl;
 	int i;
 	UINT16 packet3d[16];
 
@@ -913,11 +903,14 @@ WRITE32_HANDLER( activate_3d_buffer )
 // Transition Control memory.
 static WRITE32_HANDLER( tcram_w )
 {
+	hng64_state *state = space->machine->driver_data<hng64_state>();
+	UINT32 *hng64_tcram = state->tcram;
+
 	COMBINE_DATA (&hng64_tcram[offset]);
 
 	if(offset == 0x02)
 	{
-		static UINT16 min_x,min_y,max_x,max_y;
+		UINT16 min_x, min_y, max_x, max_y;
 		rectangle visarea = space->machine->primary_screen->visible_area();
 
 		min_x = (hng64_tcram[1] & 0xffff0000) >> 16;
@@ -927,11 +920,11 @@ static WRITE32_HANDLER( tcram_w )
 
 		if(max_x == 0 || max_y == 0) // bail out if values are invalid, Fatal Fury WA sets this to disable the screen.
 		{
-			hng64_screen_dis = 1;
+			state->screen_dis = 1;
 			return;
 		}
 
-		hng64_screen_dis = 0;
+		state->screen_dis = 0;
 
 		visarea.min_x = min_x;
 		visarea.max_x = min_x + max_x - 1;
@@ -943,24 +936,28 @@ static WRITE32_HANDLER( tcram_w )
 
 static READ32_HANDLER( tcram_r )
 {
-//  printf("Q1 R : %.8x %.8x\n", offset, hng64_tcram[offset]);
+	hng64_state *state = space->machine->driver_data<hng64_state>();
+
+	//printf("Q1 R : %.8x %.8x\n", offset, hng64_tcram[offset]);
 	if(offset == 0x12)
 		return input_port_read(space->machine, "VBLANK");
 
-	return hng64_tcram[offset];
+	return state->tcram[offset];
 }
 
 /* Some games (namely sams64 after the title screen) tests bit 15 of this to be high,
    unknown purpose (vblank? related to the display list?). */
 static READ32_HANDLER( unk_vreg_r )
 {
-	static UINT32 toggle;
-	return ++toggle;
+	hng64_state *state = space->machine->driver_data<hng64_state>();
+
+	return ++state->unk_vreg_toggle;
 }
 
 
 static WRITE32_HANDLER( hng64_soundram_w )
 {
+	hng64_state *state = space->machine->driver_data<hng64_state>();
 	UINT32 mem_mask32 = mem_mask;
 	UINT32 data32 = data;
 
@@ -969,19 +966,20 @@ static WRITE32_HANDLER( hng64_soundram_w )
 	data = FLIPENDIAN_INT16(data);
 	mem_mask = mem_mask32 >> 16;
 	mem_mask = FLIPENDIAN_INT16(mem_mask);
-	COMBINE_DATA(&hng64_soundram[offset * 2 + 0]);
+	COMBINE_DATA(&state->soundram[offset * 2 + 0]);
 
 	data = data32 & 0xffff;
 	data = FLIPENDIAN_INT16(data);
 	mem_mask = mem_mask32 & 0xffff;
 	mem_mask = FLIPENDIAN_INT16(mem_mask);
-	COMBINE_DATA(&hng64_soundram[offset * 2 + 1]);
+	COMBINE_DATA(&state->soundram[offset * 2 + 1]);
 }
 
 static READ32_HANDLER( hng64_soundram_r )
 {
-	UINT16 datalo = hng64_soundram[offset * 2 + 0];
-	UINT16 datahi = hng64_soundram[offset * 2 + 1];
+	hng64_state *state = space->machine->driver_data<hng64_state>();
+	UINT16 datalo = state->soundram[offset * 2 + 0];
+	UINT16 datahi = state->soundram[offset * 2 + 1];
 
 	return FLIPENDIAN_INT16(datahi) | (FLIPENDIAN_INT16(datalo) << 16);
 }
@@ -989,7 +987,7 @@ static READ32_HANDLER( hng64_soundram_r )
 /* The following is guesswork, needs confirmation with a test on the real board. */
 static WRITE32_HANDLER( hng64_sprite_clear_even_w )
 {
-	static UINT32 spr_offs;
+	UINT32 spr_offs;
 
 	spr_offs = (offset) * 0x10 * 4;
 
@@ -1011,7 +1009,7 @@ static WRITE32_HANDLER( hng64_sprite_clear_even_w )
 
 static WRITE32_HANDLER( hng64_sprite_clear_odd_w )
 {
-	static UINT32 spr_offs;
+	UINT32 spr_offs;
 
 	spr_offs = (offset) * 0x10 * 4;
 
@@ -1044,39 +1042,39 @@ static WRITE32_HANDLER( hng64_sprite_clear_odd_w )
 */
 static ADDRESS_MAP_START( hng_map, ADDRESS_SPACE_PROGRAM, 32 )
 
-	AM_RANGE(0x00000000, 0x00ffffff) AM_RAM AM_BASE(&hng_mainram)
-	AM_RANGE(0x04000000, 0x05ffffff) AM_WRITENOP AM_ROM AM_REGION("user3",0) AM_BASE(&hng_cart)
+	AM_RANGE(0x00000000, 0x00ffffff) AM_RAM AM_BASE_MEMBER(hng64_state, mainram)
+	AM_RANGE(0x04000000, 0x05ffffff) AM_WRITENOP AM_ROM AM_REGION("user3", 0) AM_BASE_MEMBER(hng64_state, cart)
 
 	// Ports
-	AM_RANGE(0x1f700000, 0x1f702fff) AM_READWRITE(hng64_sysregs_r,hng64_sysregs_w) AM_BASE(&hng64_sysregs)
+	AM_RANGE(0x1f700000, 0x1f702fff) AM_READWRITE(hng64_sysregs_r, hng64_sysregs_w) AM_BASE_MEMBER(hng64_state, sysregs)
 
 	// SRAM.  Coin data, Player Statistics, etc.
 	AM_RANGE(0x1F800000, 0x1F803fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
 
 	// Dualport RAM
-	AM_RANGE(0x1F808000, 0x1F8087ff) AM_READWRITE(hng64_dualport_r, hng64_dualport_w) AM_BASE(&hng64_dualport)
+	AM_RANGE(0x1F808000, 0x1F8087ff) AM_READWRITE(hng64_dualport_r, hng64_dualport_w) AM_BASE_MEMBER(hng64_state, dualport)
 
 	// BIOS
-	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_WRITENOP AM_ROM AM_REGION("user1", 0) AM_BASE(&rombase)
+	AM_RANGE(0x1fc00000, 0x1fc7ffff) AM_WRITENOP AM_ROM AM_REGION("user1", 0) AM_BASE_MEMBER(hng64_state, rombase)
 
 	// Video
-	AM_RANGE(0x20000000, 0x2000bfff) AM_RAM AM_BASE(&hng64_spriteram)
+	AM_RANGE(0x20000000, 0x2000bfff) AM_RAM AM_BASE_MEMBER(hng64_state, spriteram)
 	AM_RANGE(0x2000d800, 0x2000e3ff) AM_WRITE(hng64_sprite_clear_even_w)
 	AM_RANGE(0x2000e400, 0x2000efff) AM_WRITE(hng64_sprite_clear_odd_w)
-	AM_RANGE(0x20010000, 0x20010013) AM_RAM AM_BASE(&hng64_spriteregs)
-	AM_RANGE(0x20100000, 0x2017ffff) AM_RAM_WRITE(hng64_videoram_w) AM_BASE(&hng64_videoram)	// Tilemap
-	AM_RANGE(0x20190000, 0x20190037) AM_RAM AM_BASE(&hng64_videoregs)
+	AM_RANGE(0x20010000, 0x20010013) AM_RAM AM_BASE_MEMBER(hng64_state, spriteregs)
+	AM_RANGE(0x20100000, 0x2017ffff) AM_RAM_WRITE(hng64_videoram_w) AM_BASE_MEMBER(hng64_state, videoram)	// Tilemap
+	AM_RANGE(0x20190000, 0x20190037) AM_RAM AM_BASE_MEMBER(hng64_state, videoregs)
 	AM_RANGE(0x20200000, 0x20203fff) AM_RAM_WRITE(hng64_pal_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x20208000, 0x2020805f) AM_READWRITE(tcram_r, tcram_w) AM_BASE(&hng64_tcram)	// Transition Control
-	AM_RANGE(0x20300000, 0x203001ff) AM_RAM_WRITE(dl_w) AM_BASE(&hng64_dl)	// 3d Display List
-//  AM_RANGE(0x20300200, 0x20300213) AM_RAM_WRITE(xxxx) AM_BASE(&xxxxxxxx)  // 3d Display List Upload?
+	AM_RANGE(0x20208000, 0x2020805f) AM_READWRITE(tcram_r, tcram_w) AM_BASE_MEMBER(hng64_state, tcram)	// Transition Control
+	AM_RANGE(0x20300000, 0x203001ff) AM_RAM_WRITE(dl_w) AM_BASE_MEMBER(hng64_state, dl)	// 3d Display List
+//  AM_RANGE(0x20300200, 0x20300213) AM_RAM_WRITE(xxxx) AM_BASE_MEMBER(hng64_state, xxxxxxxx)  // 3d Display List Upload?
 	AM_RANGE(0x20300214, 0x20300217) AM_WRITE(dl_control_w)
 	AM_RANGE(0x20300218, 0x2030021b) AM_READ(unk_vreg_r)
 
 	// 3d?
-	AM_RANGE(0x30000000, 0x3000002f) AM_RAM AM_BASE(&hng64_3dregs)
-	AM_RANGE(0x30100000, 0x3015ffff) AM_READWRITE(hng64_3d_1_r,hng64_3d_2_w) AM_BASE(&hng64_3d_1)	// 3D Display Buffer A
-	AM_RANGE(0x30200000, 0x3025ffff) AM_READWRITE(hng64_3d_2_r,hng64_3d_2_w) AM_BASE(&hng64_3d_2)	// 3D Display Buffer B
+	AM_RANGE(0x30000000, 0x3000002f) AM_RAM AM_BASE_MEMBER(hng64_state, _3dregs)
+	AM_RANGE(0x30100000, 0x3015ffff) AM_READWRITE(hng64_3d_1_r, hng64_3d_2_w) AM_BASE_MEMBER(hng64_state, _3d_1)	// 3D Display Buffer A
+	AM_RANGE(0x30200000, 0x3025ffff) AM_READWRITE(hng64_3d_2_r, hng64_3d_2_w) AM_BASE_MEMBER(hng64_state, _3d_2)	// 3D Display Buffer B
 
 	// Sound
 	AM_RANGE(0x60000000, 0x601fffff) AM_RAM												// Sound ??
@@ -1089,7 +1087,7 @@ static ADDRESS_MAP_START( hng_map, ADDRESS_SPACE_PROGRAM, 32 )
 //  AM_RANGE(0x6f000000, 0x6f000003) AM_WRITENOP    // halt / reset line for the sound CPU
 
 	// Communications
-	AM_RANGE(0xc0000000, 0xc0000fff) AM_READWRITE(hng64_com_r, hng64_com_w) AM_BASE(&hng64_com_ram)
+	AM_RANGE(0xc0000000, 0xc0000fff) AM_READWRITE(hng64_com_r, hng64_com_w) AM_BASE_MEMBER(hng64_state, com_ram)
 	AM_RANGE(0xc0001000, 0xc0001007) AM_READWRITE(hng64_com_share_r, hng64_com_share_w)
 
 	/* 6e000000-6fffffff */
@@ -1103,16 +1101,18 @@ ADDRESS_MAP_END
 /**************/
 /** COMM CPU **/
 /**************/
-#define KL5C_MMU_A(xxx) ( (xxx==0) ? 0x0000 : (hng64_com_mmu_mem[((xxx-1)*2)+1] << 2) | ((hng64_com_mmu_mem[(xxx-1)*2] & 0xc0) >> 6) )
-#define KL5C_MMU_B(xxx) ( (xxx==0) ? 0x0000 : (hng64_com_mmu_mem[(xxx-1)*2] & 0x3f) )
+#define KL5C_MMU_A(xxx) ( (xxx == 0) ? 0x0000 : (state->com_mmu_mem[((xxx-1)*2)+1] << 2) | ((state->com_mmu_mem[(xxx-1)*2] & 0xc0) >> 6) )
+#define KL5C_MMU_B(xxx) ( (xxx == 0) ? 0x0000 : (state->com_mmu_mem[(xxx-1)*2] & 0x3f) )
 
 DIRECT_UPDATE_HANDLER( KL5C80_direct_handler )
 {
-	direct.explicit_configure(0x0000, 0xffff, 0xffff, hng64_com_op_base);
+	hng64_state *state = machine->driver_data<hng64_state>();
+
+	direct.explicit_configure(0x0000, 0xffff, 0xffff, state->com_op_base);
 	return ~0;
 }
 
-static UINT32 KL5C80_translate_address(UINT16 vAddr)
+static UINT32 KL5C80_translate_address(hng64_state *state, UINT16 vAddr)
 {
 	int i;
 	UINT8 bNum = 4;
@@ -1138,7 +1138,7 @@ static UINT32 KL5C80_translate_address(UINT16 vAddr)
 	}
 }
 
-static void KL5C80_virtual_mem_sync(void)
+static void KL5C80_virtual_mem_sync(hng64_state *state)
 {
 	/* The KL5C80 maps each progressive chunk from the beginning of the
        virtual region until the beginning of the next virtual region.
@@ -1162,13 +1162,15 @@ static void KL5C80_virtual_mem_sync(void)
 		for (i = logical_offset; i <= 0xffff; i++)
 		{
 			if (physical_offset+i <= 0xfffff)
-				hng64_com_op_base[i] = hng64_com_virtual_mem[physical_offset+i];
+				state->com_op_base[i] = state->com_virtual_mem[physical_offset+i];
 		}
 	}
 }
 
-static void KL5C80_init(void)
+static void KL5C80_init(hng64_state *state)
 {
+	UINT8 *hng64_com_mmu_mem = state->com_mmu_mem;
+
 	/* init the MMU */
 	hng64_com_mmu_mem[0] =
 	hng64_com_mmu_mem[2] =
@@ -1183,8 +1185,9 @@ static void KL5C80_init(void)
 
 static READ8_HANDLER( hng64_comm_memory_r )
 {
-	UINT32 physical_address = KL5C80_translate_address(offset);
-	logerror("READING 0x%02x from 0x%04x (0x%05x)\n", hng64_com_virtual_mem[physical_address], offset, physical_address);
+	hng64_state *state = space->machine->driver_data<hng64_state>();
+	UINT32 physical_address = KL5C80_translate_address(state, offset);
+	logerror("READING 0x%02x from 0x%04x (0x%05x)\n", state->com_virtual_mem[physical_address], offset, physical_address);
 
 	/* Custom "virtual" memory map */
 	if (physical_address >= 0x26000 && physical_address <= 0x28000)
@@ -1193,7 +1196,7 @@ static READ8_HANDLER( hng64_comm_memory_r )
 	}
 
 
-	return hng64_com_virtual_mem[physical_address];
+	return state->com_virtual_mem[physical_address];
 }
 
 static WRITE8_HANDLER( hng64_comm_memory_w )
@@ -1206,16 +1209,18 @@ static WRITE8_HANDLER( hng64_comm_memory_w )
 /* KL5C80 I/O handlers */
 static WRITE8_HANDLER( hng64_comm_io_mmu )
 {
-	hng64_com_mmu_mem[offset] = data;
+	hng64_state *state = space->machine->driver_data<hng64_state>();
+
+	state->com_mmu_mem[offset] = data;
 
 	/* Debugging - you can't change A4 - the hardware doesn't let you */
-	if (hng64_com_mmu_mem[7] != 0xf0 || ((hng64_com_mmu_mem[6] & 0xc0) != 0x00))
+	if (state->com_mmu_mem[7] != 0xf0 || ((state->com_mmu_mem[6] & 0xc0) != 0x00))
 		logerror("KL5C MMU error !!! Code is trying to change A4!\n");
 
 	logerror("COMM CPU MMU WRITE : ");
 	logerror("B : %02x %02x %02x %02x  A : %03x %03x %03x %03x\n", KL5C_MMU_B(1), KL5C_MMU_B(2), KL5C_MMU_B(3), KL5C_MMU_B(4),
 																   KL5C_MMU_A(1), KL5C_MMU_A(2), KL5C_MMU_A(3), KL5C_MMU_A(4));
-	KL5C80_virtual_mem_sync();
+	KL5C80_virtual_mem_sync(state);
 }
 
 #ifdef UNUSED_FUNCTION
@@ -1254,7 +1259,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( hng_comm_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	/* Reserved for the KL5C80 internal hardware */
-	AM_RANGE(0x00,0x07) AM_WRITE( hng64_comm_io_mmu ) AM_BASE(&hng64_com_mmu_mem)
+	AM_RANGE(0x00, 0x07) AM_WRITE( hng64_comm_io_mmu ) AM_BASE_MEMBER(hng64_state, com_mmu_mem)
 //  AM_RANGE(0x08,0x1f) AM_NOP              /* Reserved */
 //  AM_RANGE(0x20,0x25) AM_READWRITE        /* Timer/Counter B */           /* hng64 writes here */
 //  AM_RANGE(0x27,0x27) AM_NOP              /* Reserved */
@@ -1555,6 +1560,8 @@ static void hng64_patch_bios_region(running_machine* machine, int region)
 
 static DRIVER_INIT( hng64 )
 {
+	hng64_state *state = machine->driver_data<hng64_state>();
+
 	// region hacking, english error messages are more useful to us, but no english bios is dumped...
 #ifdef HACK_REGION
 // versions according to fatal fury test mode
@@ -1566,43 +1573,53 @@ static DRIVER_INIT( hng64 )
 #endif
 
 	/* 1 meg of virtual address space for the com cpu */
-	hng64_com_virtual_mem = auto_alloc_array(machine, UINT8, 0x100000);
-	hng64_com_op_base     = auto_alloc_array(machine, UINT8, 0x10000);
+	state->com_virtual_mem = auto_alloc_array(machine, UINT8, 0x100000);
+	state->com_op_base     = auto_alloc_array(machine, UINT8, 0x10000);
 
-	hng64_soundram=auto_alloc_array(machine, UINT16, 0x200000/2);
+	state->soundram = auto_alloc_array(machine, UINT16, 0x200000/2);
 	DRIVER_INIT_CALL(hng64_reorder_gfx);
 }
 
 static DRIVER_INIT(hng64_fght)
 {
-	no_machine_error_code=0x01000000;
+	hng64_state *state = machine->driver_data<hng64_state>();
+
+	state->no_machine_error_code = 0x01000000;
 	DRIVER_INIT_CALL(hng64);
 }
 
 static DRIVER_INIT( fatfurwa )
 {
+	hng64_state *state = machine->driver_data<hng64_state>();
+
 	/* FILE* fp = fopen("/tmp/test.bin", "wb"); fwrite(memory_region(machine, "verts"), 1, 0x0c00000*2, fp); fclose(fp); */
 	DRIVER_INIT_CALL(hng64_fght);
-	hng64_mcu_type = FIGHT_MCU;
+	state->mcu_type = FIGHT_MCU;
 }
 
 static DRIVER_INIT( ss64 )
 {
+	hng64_state *state = machine->driver_data<hng64_state>();
+
 	DRIVER_INIT_CALL(hng64_fght);
-	hng64_mcu_type = SAMSHO_MCU;
+	state->mcu_type = SAMSHO_MCU;
 }
 
 static DRIVER_INIT(hng64_race)
 {
-	no_machine_error_code=0x02000000;
-	hng64_mcu_type = RACING_MCU;
+	hng64_state *state = machine->driver_data<hng64_state>();
+
+	state->no_machine_error_code = 0x02000000;
+	state->mcu_type = RACING_MCU;
 	DRIVER_INIT_CALL(hng64);
 }
 
 static DRIVER_INIT(hng64_shoot)
 {
-	hng64_mcu_type = SHOOT_MCU;
-	no_machine_error_code=0x03000000;
+	hng64_state *state = machine->driver_data<hng64_state>();
+
+	state->mcu_type = SHOOT_MCU;
+	state->no_machine_error_code = 0x03000000;
 	DRIVER_INIT_CALL(hng64);
 }
 
@@ -1621,20 +1638,22 @@ static TIMER_CALLBACK( irq_stop )
 
 static INTERRUPT_GEN( irq_start )
 {
+	hng64_state *state = device->machine->driver_data<hng64_state>();
+
 	logerror("HNG64 interrupt level %x\n", cpu_getiloops(device));
 
 	/* there are more, the sources are unknown at the moment */
 	switch (cpu_getiloops(device))
 	{
-		case 0x00: hng64_interrupt_level_request = 0;
+		case 0x00: state->interrupt_level_request = 0;
 		break;
-		case 0x01: hng64_interrupt_level_request = 1;
+		case 0x01: state->interrupt_level_request = 1;
 		break;
-		case 0x02: hng64_interrupt_level_request = 2;
+		case 0x02: state->interrupt_level_request = 2;
 		break;
 		case 0x03:
-		if(hng64_mcu_type == RACING_MCU)
-			hng64_interrupt_level_request = 11; //network irq
+		if (state->mcu_type == RACING_MCU)
+			state->interrupt_level_request = 11; //network irq
 		else
 			return;
 		break;
@@ -1647,36 +1666,39 @@ static INTERRUPT_GEN( irq_start )
 
 static MACHINE_START(hyperneo)
 {
+	hng64_state *state = machine->driver_data<hng64_state>();
+
 	/* set the fastest DRC options */
 	mips3drc_set_options(machine->device("maincpu"), MIPS3DRC_FASTEST_OPTIONS + MIPS3DRC_STRICT_VERIFY);
 
 	/* configure fast RAM regions for DRC */
-	mips3drc_add_fastram(machine->device("maincpu"), 0x00000000, 0x00ffffff, FALSE, hng_mainram);
-	mips3drc_add_fastram(machine->device("maincpu"), 0x04000000, 0x05ffffff, TRUE,  hng_cart);
-	mips3drc_add_fastram(machine->device("maincpu"), 0x1fc00000, 0x1fc7ffff, TRUE,  rombase);
+	mips3drc_add_fastram(machine->device("maincpu"), 0x00000000, 0x00ffffff, FALSE, state->mainram);
+	mips3drc_add_fastram(machine->device("maincpu"), 0x04000000, 0x05ffffff, TRUE,  state->cart);
+	mips3drc_add_fastram(machine->device("maincpu"), 0x1fc00000, 0x1fc7ffff, TRUE,  state->rombase);
 }
 
 
 static MACHINE_RESET(hyperneo)
 {
+	hng64_state *state = machine->driver_data<hng64_state>();
 	int i;
 	const UINT8 *rom = memory_region(machine, "user2");
 
 	/* Sound CPU */
-	UINT8 *RAM = (UINT8*)hng64_soundram;
+	UINT8 *RAM = (UINT8*)state->soundram;
 	memory_set_bankptr(machine, "bank1",&RAM[0x1e0000]);
 	memory_set_bankptr(machine, "bank2",&RAM[0x001000]); // where..
 	cputag_set_input_line(machine, "audiocpu", INPUT_LINE_HALT, ASSERT_LINE);
 	cputag_set_input_line(machine, "audiocpu", INPUT_LINE_RESET, ASSERT_LINE);
 
 	/* Comm CPU */
-	KL5C80_init();
+	KL5C80_init(state);
 
 	/* Fill up virtual memory with ROM */
 	for (i = 0x0; i < 0x100000; i++)
-		hng64_com_virtual_mem[i] = rom[i];
+		state->com_virtual_mem[i] = rom[i];
 
-	KL5C80_virtual_mem_sync();
+	KL5C80_virtual_mem_sync(state);
 
 	address_space *space = machine->device<z80_device>("comm")->space(AS_PROGRAM);
 	space->set_direct_update_handler(direct_update_delegate_create_static(KL5C80_direct_handler, *machine));
@@ -1685,14 +1707,17 @@ static MACHINE_RESET(hyperneo)
 //  cputag_set_input_line(machine, "comm", INPUT_LINE_HALT, ASSERT_LINE);     // hold on there pardner...
 
 	// "Display List" init - ugly
-	activeBuffer = 0;
+	state->activeBuffer = 0;
 
 	/* For simulate MCU stepping */
-	fake_mcu_time = 0;
-	hng_mcu_en = 0;
+	state->mcu_fake_time = 0;
+	state->mcu_en = 0;
 }
 
 static MACHINE_DRIVER_START( hng64 )
+
+	MDRV_DRIVER_DATA( hng64_state )
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", VR4300BE, MASTER_CLOCK) 	// actually R4300
 	MDRV_CPU_CONFIG(vr4300_config)

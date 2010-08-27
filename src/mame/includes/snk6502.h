@@ -10,6 +10,30 @@
 #include "sound/sn76477.h"
 
 
+class snk6502_state : public driver_data_t
+{
+public:
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, snk6502_state(machine)); }
+
+	snk6502_state(running_machine &machine)
+		: driver_data_t(machine) { }
+
+	UINT8 sasuke_counter;
+
+	UINT8 *videoram;
+	UINT8 *colorram;
+	UINT8 *videoram2;
+	UINT8 *charram;
+
+	int charbank;
+	int backcolor;
+	tilemap_t *bg_tilemap;
+	tilemap_t *fg_tilemap;
+
+	rgb_t palette[64];
+};
+
+
 /*----------- defined in audio/snk6502.c -----------*/
 
 extern const samples_interface sasuke_samples_interface;
@@ -32,19 +56,14 @@ extern WRITE8_HANDLER( fantasy_speech_w );
 
 DECLARE_LEGACY_SOUND_DEVICE(SNK6502, snk6502_sound);
 
-void snk6502_set_music_clock(double clock_time);
-void snk6502_set_music_freq(int freq);
-int snk6502_music0_playing(void);
+void snk6502_set_music_clock(running_machine *machine, double clock_time);
+void snk6502_set_music_freq(running_machine *machine, int freq);
+int snk6502_music0_playing(running_machine *machine);
 
 DISCRETE_SOUND_EXTERN( fantasy );
 
 
 /*----------- defined in video/snk6502.c -----------*/
-
-extern UINT8 *snk6502_videoram;
-extern UINT8 *snk6502_colorram;
-extern UINT8 *snk6502_videoram2;
-extern UINT8 *snk6502_charram;
 
 WRITE8_HANDLER( snk6502_videoram_w );
 WRITE8_HANDLER( snk6502_videoram2_w );

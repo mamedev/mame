@@ -4,6 +4,43 @@
 
 *************************************************************************/
 
+class snk_state : public driver_data_t
+{
+public:
+	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, snk_state(machine)); }
+
+	snk_state(running_machine &machine)
+		: driver_data_t(machine) { }
+
+	int countryc_trackball;
+	int last_value[2];
+	int cp_count[2];
+
+	int marvins_sound_busy_flag;
+	// FIXME this should be initialised on machine reset
+	int sound_status;
+
+	UINT8 *spriteram;
+	UINT8 *tx_videoram;
+	UINT8 *fg_videoram;
+	UINT8 *bg_videoram;
+
+	tilemap_t *tx_tilemap;
+	tilemap_t *fg_tilemap;
+	tilemap_t *bg_tilemap;
+	int fg_scrollx, fg_scrolly, bg_scrollx, bg_scrolly;
+	int sp16_scrollx, sp16_scrolly, sp32_scrollx, sp32_scrolly;
+	UINT8 sprite_split_point;
+	int num_sprites, yscroll_mask;
+	UINT32 bg_tile_offset;
+	UINT32 tx_tile_offset;
+	int is_psychos;
+
+	UINT8 drawmode_table[16];
+	UINT8 empty_tile[16*16];
+};
+
+
 /*----------- defined in video/snk.c -----------*/
 
 extern PALETTE_INIT( tnk3 );
@@ -55,9 +92,6 @@ extern WRITE8_HANDLER( gwara_sp_scroll_msb_w );
 extern WRITE8_HANDLER( tdfever_sp_scroll_msb_w );
 extern WRITE8_HANDLER( tdfever_spriteram_w );
 
-extern UINT8 *snk_tx_videoram;
-extern UINT8 *snk_fg_videoram;
-extern UINT8 *snk_bg_videoram;
 extern WRITE8_HANDLER( snk_tx_videoram_w );
 extern WRITE8_HANDLER( snk_bg_videoram_w );
 extern WRITE8_HANDLER( marvins_fg_videoram_w );

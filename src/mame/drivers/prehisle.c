@@ -13,16 +13,7 @@
 #include "cpu/m68000/m68000.h"
 #include "sound/upd7759.h"
 #include "sound/3812intf.h"
-
-extern WRITE16_HANDLER( prehisle_bg_videoram16_w );
-extern WRITE16_HANDLER( prehisle_fg_videoram16_w );
-extern WRITE16_HANDLER( prehisle_control16_w );
-extern READ16_HANDLER( prehisle_control16_r );
-
-extern VIDEO_START( prehisle );
-extern VIDEO_UPDATE( prehisle );
-
-extern UINT16 *prehisle_bg_videoram16;
+#include "includes/prehisle.h"
 
 /******************************************************************************/
 
@@ -37,9 +28,9 @@ static WRITE16_HANDLER( prehisle_sound16_w )
 static ADDRESS_MAP_START( prehisle_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x070000, 0x073fff) AM_RAM
-	AM_RANGE(0x090000, 0x0907ff) AM_RAM_WRITE(prehisle_fg_videoram16_w) AM_BASE_GENERIC(videoram)
-	AM_RANGE(0x0a0000, 0x0a07ff) AM_RAM AM_BASE_GENERIC(spriteram)
-	AM_RANGE(0x0b0000, 0x0b3fff) AM_RAM_WRITE(prehisle_bg_videoram16_w) AM_BASE(&prehisle_bg_videoram16)
+	AM_RANGE(0x090000, 0x0907ff) AM_RAM_WRITE(prehisle_fg_videoram16_w) AM_BASE_MEMBER(prehisle_state, videoram)
+	AM_RANGE(0x0a0000, 0x0a07ff) AM_RAM AM_BASE_MEMBER(prehisle_state, spriteram)
+	AM_RANGE(0x0b0000, 0x0b3fff) AM_RAM_WRITE(prehisle_bg_videoram16_w) AM_BASE_MEMBER(prehisle_state, bg_videoram16)
 	AM_RANGE(0x0d0000, 0x0d07ff) AM_RAM_WRITE(paletteram16_RRRRGGGGBBBBxxxx_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x0e0000, 0x0e00ff) AM_READ(prehisle_control16_r)
 	AM_RANGE(0x0f0070, 0x0ff071) AM_WRITE(prehisle_sound16_w)
@@ -213,6 +204,8 @@ static const ym3812_interface ym3812_config =
 /******************************************************************************/
 
 static MACHINE_DRIVER_START( prehisle )
+
+	MDRV_DRIVER_DATA( prehisle_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_18MHz/2)	/* verified on pcb */
