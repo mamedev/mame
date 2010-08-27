@@ -224,7 +224,6 @@ static void toaplan1_create_tilemaps(running_machine *machine)
 	tilemap_set_transparent_pen(state->pf3_tilemap, 0);
 	tilemap_set_transparent_pen(state->pf4_tilemap, 0);
 	
-	
 	memset(state->empty_tile, 0x00, sizeof(state->empty_tile));
 }
 
@@ -1172,7 +1171,7 @@ VIDEO_UPDATE( rallybik )
 
 	toaplan1_log_vram(screen->machine);
 
-	bitmap_fill(bitmap,cliprect,0);
+	bitmap_fill(bitmap,cliprect,0x120);
 
 	tilemap_draw(bitmap, cliprect, state->pf1_tilemap, TILEMAP_DRAW_OPAQUE | 0, 0);
 	tilemap_draw(bitmap, cliprect, state->pf1_tilemap, TILEMAP_DRAW_OPAQUE | 1, 0);
@@ -1185,6 +1184,7 @@ VIDEO_UPDATE( rallybik )
 		tilemap_draw(bitmap, cliprect, state->pf1_tilemap, priority, 0);
 		rallybik_draw_sprites(screen->machine, bitmap,cliprect,priority << 8);
 	}
+
 	return 0;
 }
 
@@ -1197,6 +1197,7 @@ VIDEO_UPDATE( toaplan1 )
 
 	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 	bitmap_fill(bitmap,cliprect,0x120);
+
 // it's really correct?
 	tilemap_draw(bitmap, cliprect, state->pf1_tilemap, TILEMAP_DRAW_OPAQUE | 0, 0);
 	tilemap_draw(bitmap, cliprect, state->pf1_tilemap, TILEMAP_DRAW_OPAQUE | 1, 0);
@@ -1209,35 +1210,9 @@ VIDEO_UPDATE( toaplan1 )
 		tilemap_draw_primask(bitmap, cliprect, state->pf1_tilemap, priority, priority, 0);
 	}
 
-	draw_sprites(screen->machine, bitmap,cliprect);
+	draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;
 }
-
-VIDEO_UPDATE( demonwld )
-{
-	toaplan1_state *state = screen->machine->driver_data<toaplan1_state>();
-	int priority;
-
-	toaplan1_log_vram(screen->machine);
-
-	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
-	bitmap_fill(bitmap,cliprect,0x120);
-
-	tilemap_draw(bitmap, cliprect, state->pf1_tilemap, TILEMAP_DRAW_OPAQUE | 0, 0);
-	tilemap_draw(bitmap, cliprect, state->pf1_tilemap, TILEMAP_DRAW_OPAQUE | 1, 0);
-
-	for (priority = 1; priority < 16; priority++)
-	{
-		tilemap_draw_primask(bitmap, cliprect, state->pf4_tilemap, priority, priority, 0);
-		tilemap_draw_primask(bitmap, cliprect, state->pf3_tilemap, priority, priority, 0);
-		tilemap_draw_primask(bitmap, cliprect, state->pf2_tilemap, priority, priority, 0);
-		tilemap_draw_primask(bitmap, cliprect, state->pf1_tilemap, priority, priority, 0);
-	}
-
-	draw_sprites(screen->machine, bitmap,cliprect);
-	return 0;
-}
-
 
 /****************************************************************************
     Spriteram is always 1 frame ahead, suggesting spriteram buffering.
