@@ -1537,6 +1537,12 @@ ROM_START( suprpokr )
 	ROM_LOAD( "10-19s-1.e2",  0x08000, 0x4000, BAD_DUMP CRC(22b45aeb) SHA1(006c3072cc44c6fde9b4d15163dc70707bbd5a9c) ) /* Self test reports this ROM bad */
 ROM_END
 
+ROM_START( suprpkr1 )
+	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD( "e1.bin",  0x00000, 0x4000, CRC(5cc7c1e0) SHA1(1cdca32c4df7227dab77574abe344b291741139e) )
+	ROM_LOAD( "e2.bin",  0x08000, 0x4000, BAD_DUMP CRC(e47d6e2a) SHA1(9cabc42275dad8be6cd5b167e381ddb5bf08276d) ) /* Self test reports this ROM bad */
+ROM_END
+
 ROM_START( reelfun ) /* v7.03 */
 	ROM_REGION( 0x38000, "maincpu", 0 )
 	ROM_LOAD( "reelfun.cnt",          0x00000, 0x4000, CRC(ce42e0ea) SHA1(87f703b14aa819c54e54b42e639448521c01f76b) )
@@ -1872,7 +1878,8 @@ GAME( 1986, reelfun,  0,        findout,  reelfun,  0,       ROT0, "Greyhound El
 GAME( 1986, reelfun1, reelfun,  findout,  reelfun,  0,       ROT0, "Greyhound Electronics", "Reel Fun (Version 7.01)",                 GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1987, findout,  0,        findout,  findout,  0,       ROT0, "Elettronolo",           "Find Out (Version 4.04)",                 GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 
-GAME( 1987, suprpokr, 0,        suprpokr, suprpokr, 0,       ROT0, "Greyhound Electronics", "Super Poker",                             GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1986, suprpokr, 0,        suprpokr, suprpokr, 0,       ROT0, "Grayhound Electronics", "Super Poker (Version 10.19S)",            GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1986, suprpkr1, suprpokr, suprpokr, suprpokr, 0,       ROT0, "Grayhound Electronics", "Super Poker (Version 10.15S)",            GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 
 GAME( 1991, quiz211,  0,        findout,  quiz,     0,       ROT0, "Elettronolo",           "Quiz (Revision 2.11)",                    GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 
