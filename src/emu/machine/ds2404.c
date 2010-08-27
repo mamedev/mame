@@ -1,51 +1,152 @@
-/* Dallas DS2404 RTC/NVRAM */
+/**********************************************************************
+
+    DALLAS DS2404
+
+    RTC + BACKUP RAM
+
+**********************************************************************/
 
 #include "emu.h"
 #include "ds2404.h"
 #include <time.h>
+#include "devhelpr.h"
 
-typedef enum {
-	DS2404_STATE_IDLE = 1,				/* waiting for ROM command, in 1-wire mode */
-	DS2404_STATE_COMMAND,				/* waiting for memory command */
-	DS2404_STATE_ADDRESS1,				/* waiting for address bits 0-7 */
-	DS2404_STATE_ADDRESS2,				/* waiting for address bits 8-15 */
-	DS2404_STATE_OFFSET,				/* waiting for ending offset */
-	DS2404_STATE_INIT_COMMAND,
-	DS2404_STATE_READ_MEMORY,			/* Read Memory command active */
-	DS2404_STATE_WRITE_SCRATCHPAD,		/* Write Scratchpad command active */
-	DS2404_STATE_READ_SCRATCHPAD,		/* Read Scratchpad command active */
-	DS2404_STATE_COPY_SCRATCHPAD		/* Copy Scratchpad command active */
-} DS2404_STATE;
+/***************************************************************************
+    IMPLEMENTATION
+***************************************************************************/
 
-typedef struct _ds2404_state ds2404_state;
-struct _ds2404_state {
-	UINT16 address;
-	UINT16 offset;
-	UINT16 end_offset;
-	UINT8 a1, a2;
-	UINT8 sram[512];	/* 4096 bits */
-	UINT8 ram[32];		/* scratchpad ram, 256 bits */
-	UINT8 rtc[5];		/* 40-bit RTC counter */
-	DS2404_STATE state[8];
-	int state_ptr;
-};
+//**************************************************************************
+//  DEVICE CONFIGURATION
+//**************************************************************************
 
-INLINE ds2404_state *get_safe_token(running_device *device)
+//-------------------------------------------------
+//  ds2404_device_config - constructor
+//-------------------------------------------------
+
+ds2404_device_config::ds2404_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+    : device_config(mconfig, static_alloc_device_config, "DS2404", tag, owner, clock),
+      device_config_nvram_interface(mconfig, *this)
 {
-	assert(device != NULL);
-	assert(device->type() == DS2404);
-
-	return (ds2404_state *)downcast<legacy_device_base *>(device)->token();
+	printf("ds2404_device_config\n"); fflush(stdout);
 }
 
 
-static void ds2404_rom_cmd(ds2404_state *state, UINT8 cmd)
+//-------------------------------------------------
+//  static_alloc_device_config - allocate a new
+//  configuration object
+//-------------------------------------------------
+
+device_config *ds2404_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
 {
+	printf("static_alloc_device_config\n"); fflush(stdout);
+    return global_alloc(ds2404_device_config(mconfig, tag, owner, clock));
+}
+
+
+//-------------------------------------------------
+//  alloc_device - allocate a new device object
+//-------------------------------------------------
+
+device_t *ds2404_device_config::alloc_device(running_machine &machine) const
+{
+	printf("alloc_device\n"); fflush(stdout);
+    return auto_alloc(&machine, ds2404_device(machine, *this));
+}
+
+
+//-------------------------------------------------
+//  static_set_ref_year - configuration helper
+//  to set the reference year
+//-------------------------------------------------
+
+void ds2404_device_config::static_set_ref_year(device_config *device, UINT32 year)
+{
+	ds2404_device_config *ds2404 = downcast<ds2404_device_config *>(device);
+	ds2404->m_ref_year = year;
+}
+
+
+//-------------------------------------------------
+//  static_set_ref_month - configuration helper
+//  to set the reference month
+//-------------------------------------------------
+
+void ds2404_device_config::static_set_ref_month(device_config *device, UINT8 month)
+{
+	ds2404_device_config *ds2404 = downcast<ds2404_device_config *>(device);
+	ds2404->m_ref_month = month;
+}
+
+
+//-------------------------------------------------
+//  static_set_ref_day - configuration helper
+//  to set the reference day
+//-------------------------------------------------
+
+void ds2404_device_config::static_set_ref_day(device_config *device, UINT8 day)
+{
+	ds2404_device_config *ds2404 = downcast<ds2404_device_config *>(device);
+	ds2404->m_ref_day = day;
+}
+
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+const device_type DS2404 = ds2404_device_config::static_alloc_device_config;
+
+//-------------------------------------------------
+//  ds2404_device - constructor
+//-------------------------------------------------
+
+ds2404_device::ds2404_device(running_machine &_machine, const ds2404_device_config &config)
+    : device_t(_machine, config),
+	  device_nvram_interface(_machine, config, *this),
+      m_config(config)
+{
+	printf("ds2404_device\n"); fflush(stdout);
+}
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void ds2404_device::device_start()
+{
+	printf("ds2404_device_start\n"); fflush(stdout);
+	struct tm ref_tm;
+
+	memset(&ref_tm, 0, sizeof(ref_tm));
+	ref_tm.tm_year = m_config.m_ref_year - 1900;
+	ref_tm.tm_mon = m_config.m_ref_month - 1;
+	ref_tm.tm_mday = m_config.m_ref_day;
+
+	time_t ref_time = mktime(&ref_tm);
+
+	time_t current_time;
+	time(&current_time);
+	current_time -= ref_time;
+
+	m_rtc[0] = 0x0;
+	m_rtc[1] = (current_time >> 0) & 0xff;
+	m_rtc[2] = (current_time >> 8) & 0xff;
+	m_rtc[3] = (current_time >> 16) & 0xff;
+	m_rtc[4] = (current_time >> 24) & 0xff;
+
+	emu_timer *timer = timer_alloc(&m_machine, ds2404_tick_callback, (void *)this);
+	timer_adjust_periodic(timer, ATTOTIME_IN_HZ(256), 0, ATTOTIME_IN_HZ(256));
+}
+
+
+void ds2404_device::ds2404_rom_cmd(UINT8 cmd)
+{
+	printf("ds2404_rom_cmd\n"); fflush(stdout);
 	switch(cmd)
 	{
 		case 0xcc:		/* Skip ROM */
-			state->state[0] = DS2404_STATE_COMMAND;
-			state->state_ptr = 0;
+			m_state[0] = DS2404_STATE_COMMAND;
+			m_state_ptr = 0;
 			break;
 
 		default:
@@ -54,33 +155,34 @@ static void ds2404_rom_cmd(ds2404_state *state, UINT8 cmd)
 	}
 }
 
-static void ds2404_cmd(ds2404_state *state, UINT8 cmd)
+void ds2404_device::ds2404_cmd(UINT8 cmd)
 {
+	printf("ds2404_cmd\n"); fflush(stdout);
 	switch(cmd)
 	{
 		case 0x0f:		/* Write scratchpad */
-			state->state[0] = DS2404_STATE_ADDRESS1;
-			state->state[1] = DS2404_STATE_ADDRESS2;
-			state->state[2] = DS2404_STATE_INIT_COMMAND;
-			state->state[3] = DS2404_STATE_WRITE_SCRATCHPAD;
-			state->state_ptr = 0;
+			m_state[0] = DS2404_STATE_ADDRESS1;
+			m_state[1] = DS2404_STATE_ADDRESS2;
+			m_state[2] = DS2404_STATE_INIT_COMMAND;
+			m_state[3] = DS2404_STATE_WRITE_SCRATCHPAD;
+			m_state_ptr = 0;
 			break;
 
 		case 0x55:		/* Copy scratchpad */
-			state->state[0] = DS2404_STATE_ADDRESS1;
-			state->state[1] = DS2404_STATE_ADDRESS2;
-			state->state[2] = DS2404_STATE_OFFSET;
-			state->state[3] = DS2404_STATE_INIT_COMMAND;
-			state->state[4] = DS2404_STATE_COPY_SCRATCHPAD;
-			state->state_ptr = 0;
+			m_state[0] = DS2404_STATE_ADDRESS1;
+			m_state[1] = DS2404_STATE_ADDRESS2;
+			m_state[2] = DS2404_STATE_OFFSET;
+			m_state[3] = DS2404_STATE_INIT_COMMAND;
+			m_state[4] = DS2404_STATE_COPY_SCRATCHPAD;
+			m_state_ptr = 0;
 			break;
 
 		case 0xf0:		/* Read memory */
-			state->state[0] = DS2404_STATE_ADDRESS1;
-			state->state[1] = DS2404_STATE_ADDRESS2;
-			state->state[2] = DS2404_STATE_INIT_COMMAND;
-			state->state[3] = DS2404_STATE_READ_MEMORY;
-			state->state_ptr = 0;
+			m_state[0] = DS2404_STATE_ADDRESS1;
+			m_state[1] = DS2404_STATE_ADDRESS2;
+			m_state[2] = DS2404_STATE_INIT_COMMAND;
+			m_state[3] = DS2404_STATE_READ_MEMORY;
+			m_state_ptr = 0;
 			break;
 
 		default:
@@ -89,50 +191,52 @@ static void ds2404_cmd(ds2404_state *state, UINT8 cmd)
 	}
 }
 
-static UINT8 ds2404_readmem(ds2404_state *state)
+UINT8 ds2404_device::ds2404_readmem()
 {
-	if( state->address < 0x200 )
+	printf("ds2404_readmem\n"); fflush(stdout);
+	if( m_address < 0x200 )
 	{
-		return state->sram[ state->address ];
+		return m_sram[ m_address ];
 	}
-	else if( state->address >= 0x202 && state->address <= 0x206 )
+	else if( m_address >= 0x202 && m_address <= 0x206 )
 	{
-		return state->rtc[ state->address - 0x202 ];
+		return m_rtc[ m_address - 0x202 ];
 	}
 	return 0;
 }
 
-static void ds2404_writemem(ds2404_state *state, UINT8 value)
+void ds2404_device::ds2404_writemem(UINT8 value)
 {
-	if( state->address < 0x200 )
+	printf("ds2404_writemem\n"); fflush(stdout);
+	if( m_address < 0x200 )
 	{
-		state->sram[ state->address ] = value;
+		m_sram[ m_address ] = value;
 	}
-	else if( state->address >= 0x202 && state->address <= 0x206 )
+	else if( m_address >= 0x202 && m_address <= 0x206 )
 	{
-		state->rtc[ state->address - 0x202 ] = value;
+		m_rtc[ m_address - 0x202 ] = value;
 	}
 }
 
-WRITE8_DEVICE_HANDLER( ds2404_1w_reset_w )
+WRITE8_DEVICE_HANDLER_TRAMPOLINE(ds2404, ds2404_1w_reset_w)
 {
-	ds2404_state *state = get_safe_token(device);
-	state->state[0] = DS2404_STATE_IDLE;
-	state->state_ptr = 0;
+	printf("ds2404_1w_reset_w\n"); fflush(stdout);
+	m_state[0] = DS2404_STATE_IDLE;
+	m_state_ptr = 0;
 }
 
-WRITE8_DEVICE_HANDLER( ds2404_3w_reset_w )
+WRITE8_DEVICE_HANDLER_TRAMPOLINE(ds2404, ds2404_3w_reset_w)
 {
-	ds2404_state *state = get_safe_token(device);
-	state->state[0] = DS2404_STATE_COMMAND;
-	state->state_ptr = 0;
+	printf("ds2404_3w_reset_w\n"); fflush(stdout);
+	m_state[0] = DS2404_STATE_COMMAND;
+	m_state_ptr = 0;
 }
 
-READ8_DEVICE_HANDLER( ds2404_data_r )
+READ8_DEVICE_HANDLER_TRAMPOLINE(ds2404, ds2404_data_r)
 {
-	ds2404_state *state = get_safe_token(device);
-	UINT8 value;
-	switch( state->state[state->state_ptr] )
+	printf("ds2404_data_r\n"); fflush(stdout);
+	UINT8 value = 0;
+	switch(m_state[m_state_ptr])
 	{
 		case DS2404_STATE_IDLE:
 		case DS2404_STATE_COMMAND:
@@ -143,14 +247,14 @@ READ8_DEVICE_HANDLER( ds2404_data_r )
 			break;
 
 		case DS2404_STATE_READ_MEMORY:
-			value = ds2404_readmem(state);
-			return value;
+			value = ds2404_readmem();
+			break;
 
 		case DS2404_STATE_READ_SCRATCHPAD:
-			if( state->offset < 0x20 ) {
-				value = state->ram[state->offset];
-				state->offset++;
-				return value;
+			if(m_offset < 0x20)
+			{
+				value = m_ram[m_offset];
+				m_offset++;
 			}
 			break;
 
@@ -160,37 +264,35 @@ READ8_DEVICE_HANDLER( ds2404_data_r )
 		case DS2404_STATE_COPY_SCRATCHPAD:
 			break;
 	}
-	return 0;
+	return value;
 }
 
-WRITE8_DEVICE_HANDLER( ds2404_data_w )
+WRITE8_DEVICE_HANDLER_TRAMPOLINE(ds2404, ds2404_data_w)
 {
-	ds2404_state *state = get_safe_token(device);
-	int i;
-
-	switch( state->state[state->state_ptr] )
+	printf("ds2404_data_w\n"); fflush(stdout);
+	switch( m_state[m_state_ptr] )
 	{
 		case DS2404_STATE_IDLE:
-			ds2404_rom_cmd(state, data & 0xff);
+			ds2404_rom_cmd(data & 0xff);
 			break;
 
 		case DS2404_STATE_COMMAND:
-			ds2404_cmd(state, data & 0xff);
+			ds2404_cmd(data & 0xff);
 			break;
 
 		case DS2404_STATE_ADDRESS1:
-			state->a1 = data & 0xff;
-			state->state_ptr++;
+			m_a1 = data & 0xff;
+			m_state_ptr++;
 			break;
 
 		case DS2404_STATE_ADDRESS2:
-			state->a2 = data & 0xff;
-			state->state_ptr++;
+			m_a2 = data & 0xff;
+			m_state_ptr++;
 			break;
 
 		case DS2404_STATE_OFFSET:
-			state->end_offset = data & 0xff;
-			state->state_ptr++;
+			m_end_offset = data & 0xff;
+			m_state_ptr++;
 			break;
 
 		case DS2404_STATE_INIT_COMMAND:
@@ -203,10 +305,13 @@ WRITE8_DEVICE_HANDLER( ds2404_data_w )
 			break;
 
 		case DS2404_STATE_WRITE_SCRATCHPAD:
-			if( state->offset < 0x20 ) {
-				state->ram[state->offset] = data & 0xff;
-				state->offset++;
-			} else {
+			if( m_offset < 0x20 )
+			{
+				m_ram[m_offset] = data & 0xff;
+				m_offset++;
+			}
+			else
+			{
 				/* Set OF flag */
 			}
 			break;
@@ -215,8 +320,9 @@ WRITE8_DEVICE_HANDLER( ds2404_data_w )
 			break;
 	}
 
-	if( state->state[state->state_ptr] == DS2404_STATE_INIT_COMMAND ) {
-		switch( state->state[state->state_ptr+1] )
+	if( m_state[m_state_ptr] == DS2404_STATE_INIT_COMMAND )
+	{
+		switch( m_state[m_state_ptr + 1] )
 		{
 			case DS2404_STATE_IDLE:
 			case DS2404_STATE_COMMAND:
@@ -227,37 +333,38 @@ WRITE8_DEVICE_HANDLER( ds2404_data_w )
 				break;
 
 			case DS2404_STATE_READ_MEMORY:
-				state->address = (state->a2 << 8) | state->a1;
-				state->address -= 1;
+				m_address = (m_a2 << 8) | m_a1;
+				m_address -= 1;
 				break;
 
 			case DS2404_STATE_WRITE_SCRATCHPAD:
-				state->address = (state->a2 << 8) | state->a1;
-				state->offset = state->address & 0x1f;
+				m_address = (m_a2 << 8) | m_a1;
+				m_offset = m_address & 0x1f;
 				break;
 
 			case DS2404_STATE_READ_SCRATCHPAD:
-				state->address = (state->a2 << 8) | state->a1;
-				state->offset = state->address & 0x1f;
+				m_address = (m_a2 << 8) | m_a1;
+				m_offset = m_address & 0x1f;
 				break;
 
 			case DS2404_STATE_COPY_SCRATCHPAD:
-				state->address = (state->a2 << 8) | state->a1;
+				m_address = (m_a2 << 8) | m_a1;
 
-				for( i=0; i <= state->end_offset; i++ ) {
-					ds2404_writemem( state, state->ram[i] );
-					state->address++;
+				for(int i = 0; i <= m_end_offset; i++)
+				{
+					ds2404_writemem(m_ram[i]);
+					m_address++;
 				}
 				break;
 		}
-		state->state_ptr++;
+		m_state_ptr++;
 	}
 }
 
-WRITE8_DEVICE_HANDLER( ds2404_clk_w )
+WRITE8_DEVICE_HANDLER_TRAMPOLINE(ds2404, ds2404_clk_w)
 {
-	ds2404_state *state = get_safe_token(device);
-	switch( state->state[state->state_ptr] )
+	printf("ds2404_clk_w\n"); fflush(stdout);
+	switch( m_state[m_state_ptr] )
 	{
 		case DS2404_STATE_IDLE:
 		case DS2404_STATE_COMMAND:
@@ -268,7 +375,7 @@ WRITE8_DEVICE_HANDLER( ds2404_clk_w )
 			break;
 
 		case DS2404_STATE_READ_MEMORY:
-			state->address++;
+			m_address++;
 			break;
 
 		case DS2404_STATE_READ_SCRATCHPAD:
@@ -282,14 +389,19 @@ WRITE8_DEVICE_HANDLER( ds2404_clk_w )
 	}
 }
 
-static TIMER_CALLBACK( ds2404_tick )
+TIMER_CALLBACK( ds2404_device::ds2404_tick_callback )
 {
-	ds2404_state *state = get_safe_token((running_device *)ptr);
-	int i;
-	for( i = 0; i < 5; i++ )
+	printf("ds2404_tick_callback\n"); fflush(stdout);
+	reinterpret_cast<ds2404_device*>(ptr)->ds2404_tick();
+}
+
+void ds2404_device::ds2404_tick()
+{
+	printf("ds2404_tick\n"); fflush(stdout);
+	for(int i = 0; i < 5; i++)
 	{
-		state->rtc[ i ]++;
-		if( state->rtc[ i ] != 0 )
+		m_rtc[ i ]++;
+		if(m_rtc[ i ] != 0)
 		{
 			break;
 		}
@@ -297,62 +409,37 @@ static TIMER_CALLBACK( ds2404_tick )
 }
 
 
-static DEVICE_START( ds2404 )
+//-------------------------------------------------
+//  nvram_default - called to initialize NVRAM to
+//  its default state
+//-------------------------------------------------
+
+void ds2404_device::nvram_default()
 {
-	ds2404_config *config = (ds2404_config *)downcast<const legacy_device_config_base &>(device->baseconfig()).inline_config();
-	ds2404_state *state = get_safe_token(device);
-
-	struct tm ref_tm;
-	time_t ref_time;
-	time_t current_time;
-	emu_timer *timer;
-
-	memset( &ref_tm, 0, sizeof( ref_tm ) );
-	ref_tm.tm_year = config->ref_year - 1900;
-	ref_tm.tm_mon = config->ref_month - 1;
-	ref_tm.tm_mday = config->ref_day;
-
-	ref_time = mktime( &ref_tm );
-
-	time( &current_time );
-	current_time -= ref_time;
-
-	state->rtc[ 0 ] = 0x0;
-	state->rtc[ 1 ] = ( current_time >> 0 ) & 0xff;
-	state->rtc[ 2 ] = ( current_time >> 8 ) & 0xff;
-	state->rtc[ 3 ] = ( current_time >> 16 ) & 0xff;
-	state->rtc[ 4 ] = ( current_time >> 24 ) & 0xff;
-
-	timer = timer_alloc( device->machine, ds2404_tick , (void *)device);
-	timer_adjust_periodic( timer, ATTOTIME_IN_HZ( 256 ), 0, ATTOTIME_IN_HZ( 256 ) );
+	printf("nvram_default\n"); fflush(stdout);
+	memset(m_sram, 0, sizeof(m_sram));
 }
 
 
-static DEVICE_RESET( ds2404 )
+//-------------------------------------------------
+//  nvram_read - called to read NVRAM from the
+//  .nv file
+//-------------------------------------------------
+
+void ds2404_device::nvram_read(mame_file &file)
 {
+	printf("nvram_read\n"); fflush(stdout);
+	mame_fread(&file, m_sram, sizeof(m_sram));
 }
 
 
-static DEVICE_NVRAM( ds2404 )
+//-------------------------------------------------
+//  nvram_write - called to write NVRAM to the
+//  .nv file
+//-------------------------------------------------
+
+void ds2404_device::nvram_write(mame_file &file)
 {
-	ds2404_state *state = get_safe_token(device);
-
-	if (read_or_write)
-		mame_fwrite(file, state->sram, sizeof(state->sram));
-	else if (file)
-		mame_fread(file, state->sram, sizeof(state->sram));
-	else
-		memset(state->sram, 0, sizeof(state->sram));
+	printf("nvram_write\n"); fflush(stdout);
+	mame_fwrite(&file, m_sram, sizeof(m_sram));
 }
-
-
-static const char DEVTEMPLATE_SOURCE[] = __FILE__;
-
-#define DEVTEMPLATE_ID(p,s)		p##ds2404##s
-#define DEVTEMPLATE_FEATURES	DT_HAS_START | DT_HAS_RESET | DT_HAS_NVRAM | DT_HAS_INLINE_CONFIG
-#define DEVTEMPLATE_NAME		"DS2404"
-#define DEVTEMPLATE_FAMILY		"NVRAM"
-#include "devtempl.h"
-
-
-DEFINE_LEGACY_NVRAM_DEVICE(DS2404, ds2404);
