@@ -141,24 +141,36 @@ READ8_DEVICE_HANDLER_TRAMPOLINE(ins8154, ins8154_r)
 	switch (offset)
 	{
 	case 0x20:
-		val = devcb_call_read8(&m_in_a_func, 0);
+		if(m_in_a_func.read != NULL)
+		{
+			val = devcb_call_read8(&m_in_a_func, 0);
+		}
 		m_in_a = val;
 		break;
 
 	case 0x21:
-		val = devcb_call_read8(&m_in_b_func, 0);
+		if(m_in_b_func.read != NULL)
+		{
+			val = devcb_call_read8(&m_in_b_func, 0);
+		}
 		m_in_b = val;
 		break;
 
 	default:
 		if (offset < 0x08)
 		{
-			val = (devcb_call_read8(&m_in_a_func, 0) << (8 - offset)) & 0x80;
+			if(m_in_a_func.read != NULL)
+			{
+				val = (devcb_call_read8(&m_in_a_func, 0) << (8 - offset)) & 0x80;
+			}
 			m_in_a = val;
 		}
 		else
 		{
-			val = (devcb_call_read8(&m_in_b_func, 0) << (8 - (offset >> 4))) & 0x80;
+			if(m_in_b_func.read != NULL)
+			{
+				val = (devcb_call_read8(&m_in_b_func, 0) << (8 - (offset >> 4))) & 0x80;
+			}
 			m_in_b = val;
 		}
 		break;
