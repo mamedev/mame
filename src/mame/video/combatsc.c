@@ -552,10 +552,10 @@ static void bootleg_draw_sprites( running_machine *machine, bitmap_t *bitmap, co
 //          if(state->vreg == 0x23 && (attributes & 0x02)) color += 1*16;
 //          if(state->vreg == 0x66 ) color += 2*16;
 
-			drawgfx_transpen( bitmap, cliprect, gfx,
-				number, color,
-				attributes & 0x10,0, /* flip */
-				x,y, 15 );
+			drawgfx_transpen(	bitmap, cliprect, gfx,
+							number, color,
+							attributes & 0x10,0, /* flip */
+							x, y, 15 );
 		}
 		source -= 8;
 	}
@@ -573,23 +573,21 @@ VIDEO_UPDATE( combatscb )
 		tilemap_set_scrollx(state->bg_tilemap[0], i, state->io_ram[0x040 + i] + 5);
 		tilemap_set_scrollx(state->bg_tilemap[1], i, state->io_ram[0x060 + i] + 3);
 	}
-	tilemap_set_scrolly(state->bg_tilemap[0], 0, state->io_ram[0x000]);
-	tilemap_set_scrolly(state->bg_tilemap[1], 0, state->io_ram[0x020]);
+	tilemap_set_scrolly(state->bg_tilemap[0], 0, state->io_ram[0x000] + 1);
+	tilemap_set_scrolly(state->bg_tilemap[1], 0, state->io_ram[0x020] + 1);
 
 	if (state->priority == 0)
 	{
-		tilemap_draw(bitmap, cliprect, state->bg_tilemap[1], TILEMAP_DRAW_OPAQUE,0);
-		bootleg_draw_sprites(screen->machine, bitmap,cliprect, state->page[1], 1);
-
+		tilemap_draw(bitmap, cliprect, state->bg_tilemap[1], TILEMAP_DRAW_OPAQUE, 0);
+		bootleg_draw_sprites(screen->machine, bitmap,cliprect, state->page[0], 0);
 		tilemap_draw(bitmap, cliprect, state->bg_tilemap[0], 0 ,0);
-		bootleg_draw_sprites(screen->machine, bitmap, cliprect, state->page[0], 0);
+		bootleg_draw_sprites(screen->machine, bitmap,cliprect, state->page[1], 1);
 	}
 	else
 	{
 		tilemap_draw(bitmap, cliprect, state->bg_tilemap[0], TILEMAP_DRAW_OPAQUE, 0);
 		bootleg_draw_sprites(screen->machine, bitmap,cliprect, state->page[0], 0);
-
-		tilemap_draw(bitmap,cliprect, state->bg_tilemap[1], 0, 0);
+		tilemap_draw(bitmap, cliprect, state->bg_tilemap[1], 0, 0);
 		bootleg_draw_sprites(screen->machine, bitmap,cliprect, state->page[1], 1);
 	}
 
