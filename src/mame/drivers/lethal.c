@@ -158,8 +158,6 @@ guns might be slightly off center
 
 'external' rowscroll not hooked up correctly (1st attract level, highscores)
 
-can't find the flip bits used for the tiles.. (p2 start screen, reload indicator)
-
 maybe some priority issues / sprite placement issues..
 
 ***************************************************************************/
