@@ -52,7 +52,7 @@ const int acia6850_device::ACIA6850_WORD[8][3] =
 
 const device_type ACIA6850 = acia6850_device_config::static_alloc_device_config;
 
-GENERIC_DEVICE_CONFIG_SETUP(acia6850, "ACIA6850")
+GENERIC_DEVICE_CONFIG_SETUP(acia6850, "6850 ACIA")
 
 //-------------------------------------------------
 //  device_config_complete - perform any

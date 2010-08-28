@@ -40,7 +40,7 @@ enum
 //-------------------------------------------------
 
 riot6532_device_config::riot6532_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-	: device_config(mconfig, static_alloc_device_config, "RIOT6532", tag, owner, clock)
+	: device_config(mconfig, static_alloc_device_config, "6532 (RIOT)", tag, owner, clock)
 {
 }
 

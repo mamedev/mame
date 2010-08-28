@@ -77,7 +77,6 @@ struct via6522_interface
 };
 
 
-
 // ======================> via6522_device_config
 
 class via6522_device_config :   public device_config,
@@ -99,7 +98,6 @@ protected:
 };
 
 
-
 // ======================> via6522_device
 
 class via6522_device :  public device_t
@@ -111,25 +109,25 @@ class via6522_device :  public device_t
     via6522_device(running_machine &_machine, const via6522_device_config &_config);
 
 public:
-    UINT8 reg_r(UINT8 offset);
-    void reg_w(UINT8 offset, UINT8 data);
+    UINT8 via_r(UINT32 offset);
+    void via_w(UINT32 offset, UINT8 data);
 
-    void porta_w(UINT8 data) { m_in_a = data; }
+    void via_porta_w(UINT8 data) { m_in_a = data; }
 
-    UINT8 portb_r() { return m_in_b; }
-    void portb_w(UINT8 data) { m_in_b = data; }
+    UINT8 via_portb_r() { return m_in_b; }
+    void via_portb_w(UINT8 data) { m_in_b = data; }
 
-    UINT8 ca1_r() { return m_in_ca1; }
-    void ca1_w(UINT8 data);
+    UINT8 via_ca1_r() { return m_in_ca1; }
+    void via_ca1_w(UINT8 data);
 
-    UINT8 ca2_r() { return m_in_ca2; }
-    void ca2_w(UINT8 data);
+    UINT8 via_ca2_r() { return m_in_ca2; }
+    void via_ca2_w(UINT8 data);
 
-    UINT8 cb1_r() { return m_in_cb1; }
-    void cb1_w(UINT8 data);
+    UINT8 via_cb1_r() { return m_in_cb1; }
+    void via_cb1_w(UINT8 data);
 
-    UINT8 cb2_r() { return m_in_cb2; }
-    void cb2_w(UINT8 data);
+    UINT8 via_cb2_r() { return m_in_cb2; }
+    void via_cb2_w(UINT8 data);
 
 protected:
     // device-level overrides

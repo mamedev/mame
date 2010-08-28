@@ -8,8 +8,8 @@
 
 #pragma once
 
-#ifndef __8255PPI_H_
-#define __8255PPI_H_
+#ifndef __8255PPI_H__
+#define __8255PPI_H__
 
 #include "emu.h"
 
@@ -46,7 +46,6 @@ struct ppi8255_interface
 };
 
 
-
 // ======================> ppi8255_device_config
 
 class ppi8255_device_config : public device_config,
@@ -66,7 +65,6 @@ protected:
     // device_config overrides
     virtual void device_config_complete();
 };
-
 
 
 // ======================> ppi8255_device

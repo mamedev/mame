@@ -48,7 +48,7 @@ INLINE UINT8 convert_to_bcd(int val)
 //-------------------------------------------------
 
 ds1302_device_config::ds1302_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-    : device_config(mconfig, static_alloc_device_config, "DS1302", tag, owner, clock)
+    : device_config(mconfig, static_alloc_device_config, "Dallas DS1302 RTC", tag, owner, clock)
 {
 }
 

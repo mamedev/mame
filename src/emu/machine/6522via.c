@@ -24,7 +24,7 @@
 
 #include "emu.h"
 #include "6522via.h"
-
+#include "devhelpr.h"
 
 /***************************************************************************
     PARAMETERS
@@ -109,36 +109,7 @@
 //  DEVICE CONFIGURATION
 //**************************************************************************
 
-//-------------------------------------------------
-//  via6522_device_config - constructor
-//-------------------------------------------------
-
-via6522_device_config::via6522_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-    : device_config(mconfig, static_alloc_device_config, "VIA6522", tag, owner, clock)
-{
-}
-
-
-//-------------------------------------------------
-//  static_alloc_device_config - allocate a new
-//  configuration object
-//-------------------------------------------------
-
-device_config *via6522_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-{
-    return global_alloc(via6522_device_config(mconfig, tag, owner, clock));
-}
-
-
-//-------------------------------------------------
-//  alloc_device - allocate a new device object
-//-------------------------------------------------
-
-device_t *via6522_device_config::alloc_device(running_machine &machine) const
-{
-    return auto_alloc(&machine, via6522_device(machine, *this));
-}
-
+GENERIC_DEVICE_CONFIG_SETUP(via6522, "6522 VIA")
 
 //-------------------------------------------------
 //  device_config_complete - perform any
@@ -523,7 +494,7 @@ void via6522_device::t2_timeout()
     via_r - CPU interface for VIA read
 -------------------------------------------------*/
 
-UINT8 via6522_device::reg_r(UINT8 offset)
+READ8_DEVICE_HANDLER_TRAMPOLINE(via6522, via_r)
 {
 	int val = 0;
 
@@ -718,7 +689,7 @@ UINT8 via6522_device::reg_r(UINT8 offset)
     via_w - CPU interface for VIA write
 -------------------------------------------------*/
 
-void via6522_device::reg_w(UINT8 offset, UINT8 data)
+WRITE8_DEVICE_HANDLER_TRAMPOLINE(via6522, via_w)
 {
 	offset &=0x0f;
 
@@ -988,7 +959,8 @@ void via6522_device::reg_w(UINT8 offset, UINT8 data)
     ca1_w - interface setting VIA port CA1 input
 -------------------------------------------------*/
 
-void via6522_device::ca1_w(UINT8 state)
+//void via6522_device::via_ca1_w(UINT8 state)
+WRITE_LINE_DEVICE_HANDLER_TRAMPOLINE(via6522, via_ca1_w)
 {
 	/* handle the active transition */
 	if (state != m_in_ca1)
@@ -1036,7 +1008,8 @@ void via6522_device::ca1_w(UINT8 state)
     ca2_w - interface setting VIA port CA2 input
 -------------------------------------------------*/
 
-void via6522_device::ca2_w(UINT8 state)
+//void via6522_device::via_ca2_w(UINT8 state)
+WRITE_LINE_DEVICE_HANDLER_TRAMPOLINE(via6522, via_ca2_w)
 {
 	/* CA2 is in input mode */
 	if (CA2_INPUT(m_pcr))
@@ -1061,7 +1034,8 @@ void via6522_device::ca2_w(UINT8 state)
     cb1_w - interface setting VIA port CB1 input
 -------------------------------------------------*/
 
-void via6522_device::cb1_w(UINT8 state)
+//void via6522_device::via_cb1_w(UINT8 state)
+WRITE_LINE_DEVICE_HANDLER_TRAMPOLINE(via6522, via_cb1_w)
 {
 	/* handle the active transition */
 	if (state != m_in_cb1)
@@ -1109,7 +1083,8 @@ void via6522_device::cb1_w(UINT8 state)
     cb2_w - interface setting VIA port CB2 input
 -------------------------------------------------*/
 
-void via6522_device::cb2_w(UINT8 state)
+//void via6522_device::via_cb2_w(UINT8 state)
+WRITE_LINE_DEVICE_HANDLER_TRAMPOLINE(via6522, via_cb2_w)
 {
 	/* CB2 is in input mode */
 	if (CB2_INPUT(m_pcr))
@@ -1135,22 +1110,10 @@ void via6522_device::cb2_w(UINT8 state)
     TRAMPOLINES
 ***************************************************************************/
 
-READ8_DEVICE_HANDLER(via_r) { return downcast<via6522_device *>(device)->reg_r(offset); }
-WRITE8_DEVICE_HANDLER(via_w) { downcast<via6522_device *>(device)->reg_w(offset, data); }
-
-READ_LINE_DEVICE_HANDLER(via_ca1_r) { return downcast<via6522_device *>(device)->ca1_r(); }
-WRITE_LINE_DEVICE_HANDLER(via_ca1_w) { downcast<via6522_device *>(device)->ca1_w(state); }
-
-READ_LINE_DEVICE_HANDLER(via_ca2_r) { return downcast<via6522_device *>(device)->ca2_r(); }
-WRITE_LINE_DEVICE_HANDLER(via_ca2_w) { downcast<via6522_device *>(device)->ca2_w(state); }
-
-READ_LINE_DEVICE_HANDLER(via_cb1_r) { return downcast<via6522_device *>(device)->cb1_r(); }
-WRITE_LINE_DEVICE_HANDLER(via_cb1_w) { downcast<via6522_device *>(device)->cb1_w(state); }
-
-READ_LINE_DEVICE_HANDLER(via_cb2_r) { return downcast<via6522_device *>(device)->cb2_r(); }
-WRITE_LINE_DEVICE_HANDLER(via_cb2_w) { downcast<via6522_device *>(device)->cb2_w(state); }
-
-WRITE8_DEVICE_HANDLER(via_porta_w) { downcast<via6522_device *>(device)->porta_w(data); }
-
-READ8_DEVICE_HANDLER(via_portb_r) { return downcast<via6522_device *>(device)->portb_r(); }
-WRITE8_DEVICE_HANDLER(via_portb_w) { downcast<via6522_device *>(device)->portb_w(data); }
+READ_LINE_DEVICE_HANDLER(via_ca1_r) { return downcast<via6522_device *>(device)->via_ca1_r(); }
+READ_LINE_DEVICE_HANDLER(via_ca2_r) { return downcast<via6522_device *>(device)->via_ca2_r(); }
+READ_LINE_DEVICE_HANDLER(via_cb1_r) { return downcast<via6522_device *>(device)->via_cb1_r(); }
+READ_LINE_DEVICE_HANDLER(via_cb2_r) { return downcast<via6522_device *>(device)->via_cb2_r(); }
+WRITE8_DEVICE_HANDLER(via_porta_w) { downcast<via6522_device *>(device)->via_porta_w(data); }
+READ8_DEVICE_HANDLER(via_portb_r) { return downcast<via6522_device *>(device)->via_portb_r(); }
+WRITE8_DEVICE_HANDLER(via_portb_w) { downcast<via6522_device *>(device)->via_portb_w(data); }

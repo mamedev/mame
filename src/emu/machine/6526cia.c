@@ -41,6 +41,30 @@
 #define	CIA_CRA_SPMODE	0x40
 #define	CIA_CRA_TODIN	0x80
 
+#define MOS6526_DEV_DERIVED_CTOR(devtype) \
+	devtype##_device::devtype##_device(running_machine &_machine, const devtype##_device_config &config) \
+		: timekeeper_device(_machine, config) \
+	{ }
+
+#define MOS6526_DEVCFG_DERIVED_CTOR(devtype, name) \
+	devtype##_device_config::devtype##_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock) \
+    : mos6526_device_config(mconfig, name, tag, owner, clock) \
+	{ }
+
+#define MOS6526_DEVCFG_DERIVED_STATIC_ALLOC(devtype) \
+	device_config *devtype##_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock) \
+	{ return global_alloc(devtype##_device_config(mconfig, tag, owner, clock)); }
+
+#define MOS6526_DEVCFG_DERIVED_DEV_ALLOC(devtype) \
+	device_t *devtype##_device_config::alloc_device(running_machine &machine) const \
+	{ return auto_alloc(&machine, devtype##_device(machine, *this)); }
+
+#define MOS6526_DERIVE(devtype, name) \
+	MOS6526_DEV_DERIVED_CTOR(devtype) \
+	MOS6526_DEVCFG_DERIVED_CTOR(devtype, name) \
+	MOS6526_DEVCFG_DERIVED_STATIC_ALLOC(devtype) \
+	MOS6526_DEVCFG_DERIVED_DEV_ALLOC(devtype)
+
 //**************************************************************************
 //  DEVICE CONFIGURATION
 //**************************************************************************
@@ -49,9 +73,10 @@
 //  mos6526_device_config - constructor
 //-------------------------------------------------
 
-mos6526_device_config::mos6526_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
-    : device_config(mconfig, static_alloc_device_config, "MOS6526", tag, owner, clock)
+mos6526_device_config::mos6526_device_config(const machine_config &mconfig, const char *type, const char *tag, const device_config *owner, UINT32 clock)
+    : device_config(mconfig, static_alloc_device_config, type, tag, owner, clock)
 {
+
 }
 
 
@@ -62,7 +87,7 @@ mos6526_device_config::mos6526_device_config(const machine_config &mconfig, cons
 
 device_config *mos6526_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
 {
-    return global_alloc(mos6526_device_config(mconfig, tag, owner, clock));
+    return global_alloc(mos6526_device_config(mconfig, "Base 6526", tag, owner, clock));
 }
 
 
@@ -110,9 +135,13 @@ void mos6526_device_config::device_config_complete()
 //  LIVE DEVICE
 //**************************************************************************
 
-const device_type MOS6526R1 = mos6526_device_config::static_alloc_device_config;
-const device_type MOS6526R2 = mos6526_device_config::static_alloc_device_config;
-const device_type MOS8520 = mos6526_device_config::static_alloc_device_config;
+const device_type MOS6526R1 = mos6526r1_device_config::static_alloc_device_config;
+const device_type MOS6526R2 = mos6526r2_device_config::static_alloc_device_config;
+const device_type MOS8520 = mos8520_device_config::static_alloc_device_config;
+
+MOS6526_DERIVE(mos6526r1, "MOS6526 rev1")
+MOS6526_DERIVE(mos6526r2, "MOS6526 rev2")
+MOS6526_DERIVE(mos8520, "MOS8520")
 
 //-------------------------------------------------
 //  mos6526_device - constructor

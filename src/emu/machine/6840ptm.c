@@ -61,7 +61,7 @@ const char *const ptm6840_device::opmode[] =
     IMPLEMENTATION
 ***************************************************************************/
 
-GENERIC_DEVICE_CONFIG_SETUP(ptm6840, "PTM6840")
+GENERIC_DEVICE_CONFIG_SETUP(ptm6840, "6840 PTM")
 
 const device_type PTM6840 = ptm6840_device_config::static_alloc_device_config;
 

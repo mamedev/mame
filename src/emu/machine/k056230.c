@@ -13,7 +13,7 @@
 //  DEVICE CONFIGURATION
 //**************************************************************************
 
-GENERIC_DEVICE_CONFIG_SETUP(k056230, "K056230")
+GENERIC_DEVICE_CONFIG_SETUP(k056230, "Konami 056230")
 
 //-------------------------------------------------
 //  device_config_complete - perform any

@@ -98,7 +98,7 @@
 //  DEVICE CONFIGURATION
 //**************************************************************************
 
-GENERIC_DEVICE_CONFIG_SETUP(ppi8255, "PPI8255")
+GENERIC_DEVICE_CONFIG_SETUP(ppi8255, "Intel PPI8255")
 
 //-------------------------------------------------
 //  device_config_complete - perform any
