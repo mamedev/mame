@@ -44,7 +44,7 @@ void k056230_device_config::device_config_complete()
 //  LIVE DEVICE
 //**************************************************************************
 
-const device_type K056230 = k056230_device_config::static_alloc_device_config;
+const device_type K0506230 = k056230_device_config::static_alloc_device_config;
 
 //-------------------------------------------------
 //  k056230_device - constructor

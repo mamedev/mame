@@ -99,7 +99,7 @@ private:
 
 
 // device type definition
-extern const device_type K056230;
+extern const device_type K0506230;
 
 
 
