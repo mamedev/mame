@@ -2125,7 +2125,7 @@ ROM_START( dkongx )
 	/* space for diagnostic ROM */
 
 	ROM_REGION( 0x10000, "braze", 0 )
-	ROM_LOAD( "27512.bin",  0x0000, 0x10000,  CRC(6e95ca0d) SHA1(c058add0f146d577e3df0ba60828fe1734e78d01) )
+	ROM_LOAD( "d2k12.bin",  0x0000, 0x10000,  CRC(6e95ca0d) SHA1(c058add0f146d577e3df0ba60828fe1734e78d01) ) /* Version 1.2 */
 
 	ROM_REGION( 0x1800, "soundcpu", 0 )	/* sound */
 	ROM_LOAD( "s_3i_b.bin",   0x0000, 0x0800, CRC(45a4ed06) SHA1(144d24464c1f9f01894eb12f846952290e6e32ef) )
@@ -2157,7 +2157,7 @@ ROM_START( dkongx11 )
 	/* space for diagnostic ROM */
 
 	ROM_REGION( 0x10000, "braze", 0 )
-	ROM_LOAD( "d2k11.bin",    0x00000, 0x10000, CRC(2048fc42) SHA1(e427a09ed8e792ee8ce01cd0b07c6a0d5a7c5536) )
+	ROM_LOAD( "d2k11.bin",    0x00000, 0x10000, CRC(2048fc42) SHA1(e427a09ed8e792ee8ce01cd0b07c6a0d5a7c5536) ) /* Version 1.1 */
 
 	ROM_REGION( 0x1800, "soundcpu", 0 )	/* sound */
 	ROM_LOAD( "s_3i_b.bin",   0x0000, 0x0800, CRC(45a4ed06) SHA1(144d24464c1f9f01894eb12f846952290e6e32ef) )
