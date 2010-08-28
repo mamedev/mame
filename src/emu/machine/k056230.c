@@ -6,44 +6,81 @@
 
 #include "emu.h"
 #include "k056230.h"
+#include "devhelpr.h"
 
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
 
-typedef struct _k056230_state k056230_state;
-struct _k056230_state
+//**************************************************************************
+//  DEVICE CONFIGURATION
+//**************************************************************************
+
+GENERIC_DEVICE_CONFIG_SETUP(k056230, "K056230")
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void k056230_device_config::device_config_complete()
 {
-	UINT32  *    ram;
-	int          is_thunderh;
+	// inherit a copy of the static data
+	const k056230_interface *intf = reinterpret_cast<const k056230_interface *>(static_config());
+	if (intf != NULL)
+	{
+		*static_cast<k056230_interface *>(this) = *intf;
+	}
 
-	running_device *cpu;
-};
-
-/*****************************************************************************
-    INLINE FUNCTIONS
-*****************************************************************************/
-
-INLINE k056230_state *k056230_get_safe_token( running_device *device )
-{
-	assert(device != NULL);
-	assert(device->type() == K056230);
-
-	return (k056230_state *)downcast<legacy_device_base *>(device)->token();
+	// or initialize to defaults if none provided
+	else
+	{
+		m_cpu = NULL;
+		m_is_thunderh = 0;
+	}
 }
 
-INLINE const k056230_interface *k056230_get_interface( running_device *device )
+
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+const device_type K056230 = k056230_device_config::static_alloc_device_config;
+
+//-------------------------------------------------
+//  k056230_device - constructor
+//-------------------------------------------------
+
+k056230_device::k056230_device(running_machine &_machine, const k056230_device_config &config)
+    : device_t(_machine, config),
+      m_config(config)
 {
-	assert(device != NULL);
-	assert((device->type() == K056230));
-	return (const k056230_interface *) device->baseconfig().static_config();
+
 }
 
-/*****************************************************************************
-    DEVICE HANDLERS
-*****************************************************************************/
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
 
-READ8_DEVICE_HANDLER( k056230_r )
+void k056230_device::device_start()
+{
+	if(m_config.m_cpu)
+	{
+		m_cpu = m_machine.device(m_config.m_cpu);
+	}
+	else
+	{
+		m_cpu = NULL;
+	}
+
+	m_is_thunderh = m_config.m_is_thunderh;
+
+	m_ram = auto_alloc_array(&m_machine, UINT32, 0x2000);
+
+	state_save_register_device_item_pointer(this, 0, m_ram, 0x2000);
+}
+
+
+READ8_DEVICE_HANDLER_TRAMPOLINE(k056230, k056230_r)
 {
 	switch (offset)
 	{
@@ -58,17 +95,23 @@ READ8_DEVICE_HANDLER( k056230_r )
 	return 0;
 }
 
-static TIMER_CALLBACK( network_irq_clear )
+TIMER_CALLBACK( k056230_device::network_irq_clear_callback )
 {
-	k056230_state *k056230 = (k056230_state *)ptr;
-	cpu_set_input_line(k056230->cpu, INPUT_LINE_IRQ2, CLEAR_LINE);
+	reinterpret_cast<k056230_device*>(ptr)->network_irq_clear();
 }
 
-WRITE8_DEVICE_HANDLER( k056230_w )
+void k056230_device::network_irq_clear()
 {
-	k056230_state *k056230 = k056230_get_safe_token(device);
+	if(m_cpu)
+	{
+		cpu_set_input_line(m_cpu, INPUT_LINE_IRQ2, CLEAR_LINE);
+	}
+}
 
-	switch (offset)
+
+WRITE8_DEVICE_HANDLER_TRAMPOLINE(k056230, k056230_w)
+{
+	switch(offset)
 	{
 		case 0:		// Mode register
 		{
@@ -76,13 +119,16 @@ WRITE8_DEVICE_HANDLER( k056230_w )
 		}
 		case 1:		// Control register
 		{
-			if (data & 0x20)
+			if(data & 0x20)
 			{
 				// Thunder Hurricane breaks otherwise...
-				if (!k056230->is_thunderh)
+				if(!m_is_thunderh)
 				{
-					cpu_set_input_line(k056230->cpu, INPUT_LINE_IRQ2, ASSERT_LINE);
-					timer_set(device->machine, ATTOTIME_IN_USEC(10), k056230, 0, network_irq_clear);
+					if(m_cpu)
+					{
+						cpu_set_input_line(m_cpu, INPUT_LINE_IRQ2, ASSERT_LINE);
+					}
+					timer_set(&m_machine, ATTOTIME_IN_USEC(10), (void*)this, 0, network_irq_clear_callback);
 				}
 			}
 //          else
@@ -97,50 +143,14 @@ WRITE8_DEVICE_HANDLER( k056230_w )
 //  mame_printf_debug("k056230_w: %d, %02X at %08X\n", offset, data, cpu_get_pc(space->cpu));
 }
 
-READ32_DEVICE_HANDLER( lanc_ram_r )
+READ32_DEVICE_HANDLER_TRAMPOLINE(k056230, lanc_ram_r)
 {
-	k056230_state *k056230 = k056230_get_safe_token(device);
-
 	//mame_printf_debug("LANC_RAM_r: %08X, %08X at %08X\n", offset, mem_mask, cpu_get_pc(space->cpu));
-	return k056230->ram[offset & 0x7ff];
+	return m_ram[offset & 0x7ff];
 }
 
-WRITE32_DEVICE_HANDLER( lanc_ram_w )
+WRITE32_DEVICE_HANDLER_TRAMPOLINE(k056230, lanc_ram_w)
 {
-	k056230_state *k056230 = k056230_get_safe_token(device);
-
 	//mame_printf_debug("LANC_RAM_w: %08X, %08X, %08X at %08X\n", data, offset, mem_mask, cpu_get_pc(space->cpu));
-	COMBINE_DATA(k056230->ram + (offset & 0x7ff));
+	COMBINE_DATA(m_ram + (offset & 0x7ff));
 }
-
-/*****************************************************************************
-    DEVICE INTERFACE
-*****************************************************************************/
-
-static DEVICE_START( k056230 )
-{
-	k056230_state *k056230 = k056230_get_safe_token(device);
-	const k056230_interface *intf = k056230_get_interface(device);
-
-	k056230->cpu = device->machine->device(intf->cpu);
-	k056230->is_thunderh = intf->is_thunderh;
-
-	k056230->ram = auto_alloc_array(device->machine, UINT32, 0x2000);
-
-	state_save_register_device_item_pointer(device, 0, k056230->ram, 0x2000);
-}
-
-/*-------------------------------------------------
-    device definition
--------------------------------------------------*/
-
-static const char DEVTEMPLATE_SOURCE[] = __FILE__;
-
-#define DEVTEMPLATE_ID( p, s )	p##k056230##s
-#define DEVTEMPLATE_FEATURES	      DT_HAS_START
-#define DEVTEMPLATE_NAME		"Konami 056230"
-#define DEVTEMPLATE_FAMILY		"Konami Network Board 056230"
-#include "devtempl.h"
-
-
-DEFINE_LEGACY_DEVICE(K056230, k056230);

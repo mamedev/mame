@@ -16,6 +16,7 @@
 #define __TIMEKPR_H__
 
 #include "emu.h"
+#include "devhelpr.h"
 
 
 
@@ -137,130 +138,10 @@ private:
 	int m_offset_flags;
 };
 
-
-// ======================> m48t02_device_config
-
-class m48t02_device_config : public timekeeper_device_config
-{
-	friend class mt48t02_device;
-
-	m48t02_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-	// allocators
-	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-	virtual device_t *alloc_device(running_machine &machine) const;
-};
-
-
-// ======================> m48t02_device
-
-class m48t02_device : public timekeeper_device
-{
-	friend class timekeeper_device;
-	friend class m48t02_device_config;
-
-	// construction/destruction
-	m48t02_device(running_machine &_machine, const m48t02_device_config &config);
-
-protected:
-	// device-level overrides
-	virtual void device_start();
-};
-
-
-// ======================> m48t35_device_config
-
-class m48t35_device_config : public timekeeper_device_config
-{
-	friend class m48t35_device;
-	friend class timekeeper_device_config;
-
-	m48t35_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-	// allocators
-	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-	virtual device_t *alloc_device(running_machine &machine) const;
-};
-
-
-// ======================> m48t35_device
-
-class m48t35_device : public timekeeper_device
-{
-	friend class m48t35_device_config;
-
-	// construction/destruction
-	m48t35_device(running_machine &_machine, const m48t35_device_config &config);
-
-protected:
-	// device-level overrides
-	virtual void device_start();
-};
-
-
-// ======================> m48t58_device_config
-
-class m48t58_device_config : public timekeeper_device_config
-{
-	friend class m48t58_device;
-	friend class timekeeper_device_config;
-
-	m48t58_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-	// allocators
-	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-	virtual device_t *alloc_device(running_machine &machine) const;
-};
-
-
-// ======================> m48t58_device
-
-class m48t58_device : public timekeeper_device
-{
-	friend class m48t58_device_config;
-
-	// construction/destruction
-	m48t58_device(running_machine &_machine, const m48t58_device_config &config);
-
-protected:
-	// device-level overrides
-	virtual void device_start();
-};
-
-
-// ======================> mk48t08_device_config
-
-class mk48t08_device_config : public timekeeper_device_config
-{
-	friend class mk48t08_device;
-	friend class timekeeper_device_config;
-
-	mk48t08_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-
-public:
-	// allocators
-	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
-	virtual device_t *alloc_device(running_machine &machine) const;
-};
-
-
-// ======================> mk48t08_device
-
-class mk48t08_device : public timekeeper_device
-{
-	friend class mk48t08_device_config;
-
-	// construction/destruction
-	mk48t08_device(running_machine &_machine, const mk48t08_device_config &config);
-
-protected:
-	// device-level overrides
-	virtual void device_start();
-};
-
+GENERIC_DEVICE_DERIVED_CONFIG(timekeeper, m48t02)
+GENERIC_DEVICE_DERIVED_CONFIG(timekeeper, m48t35)
+GENERIC_DEVICE_DERIVED_CONFIG(timekeeper, m48t58)
+GENERIC_DEVICE_DERIVED_CONFIG(timekeeper, mk48t08)
 
 // device type definition
 extern const device_type M48T02;

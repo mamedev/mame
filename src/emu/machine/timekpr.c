@@ -67,9 +67,6 @@
 	TIMEKPR_DEVCFG_DERIVED_STATIC_ALLOC(devtype) \
 	TIMEKPR_DEVCFG_DERIVED_DEV_ALLOC(devtype)
 
-//**************************************************************************
-//  STATIC DATA
-//**************************************************************************
 
 //**************************************************************************
 //  DEVICE CONFIGURATION
@@ -307,11 +304,11 @@ void mk48t08_device::device_start()
 //  device_reset - device-specific reset
 //-------------------------------------------------
 
-void timekeeper_device::device_reset()
-{
-
-}
-
+void timekeeper_device::device_reset() { }
+void m48t02_device::device_reset() { }
+void m48t35_device::device_reset() { }
+void m48t58_device::device_reset() { }
+void mk48t08_device::device_reset() { }
 
 void timekeeper_device::counters_to_ram()
 {

@@ -8,6 +8,16 @@
 #ifndef __DEVHELPR_H__
 #define __DEVHELPR_H__
 
+#define READ32_DEVICE_HANDLER_TRAMPOLINE(devname, funcname) \
+	READ32_DEVICE_HANDLER( funcname ) \
+	{ return downcast<devname##_device*>(device)->funcname(offset); } \
+	UINT32 devname##_device::funcname(UINT32 offset)
+
+#define WRITE32_DEVICE_HANDLER_TRAMPOLINE(devname, funcname) \
+	WRITE32_DEVICE_HANDLER( funcname ) \
+	{ downcast<devname##_device*>(device)->funcname(offset, data, mem_mask); } \
+	void devname##_device::funcname(UINT32 offset, UINT32 data, UINT32 mem_mask)
+
 #define READ8_DEVICE_HANDLER_TRAMPOLINE(devname, funcname) \
 	READ8_DEVICE_HANDLER( funcname ) \
 	{ return downcast<devname##_device*>(device)->funcname(offset); } \
@@ -39,5 +49,24 @@
 	device_t *devname##_device_config::alloc_device(running_machine &machine) const \
 	{ return auto_alloc(&machine, devname##_device(machine, *this)); }
 
+#define GENERIC_DEVICE_DERIVED_CONFIG(basename, devname) \
+	class devname##_device_config : public basename##_device_config \
+	{ \
+		friend class devname##_device; \
+		devname##_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock); \
+	public: \
+		static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock); \
+		virtual device_t *alloc_device(running_machine &machine) const; \
+	}; \
+	\
+	class devname##_device : public basename##_device \
+	{ \
+		friend class basename##_device; \
+		friend class devname##_device_config; \
+		devname##_device(running_machine &_machine, const devname##_device_config &config); \
+	protected: \
+		virtual void device_start(); \
+		virtual void device_reset(); \
+	};
 
 #endif // __DEVHELPR_H__
