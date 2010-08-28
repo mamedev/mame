@@ -190,6 +190,19 @@ static WRITE8_HANDLER( combatsc_bankselect_w )
 
 	state->priority = data & 0x20;
 
+	if (data & 0x40)
+	{
+		state->video_circuit = 1;
+		state->videoram = state->page[1];
+		state->scrollram = state->scrollram1;
+	}
+	else
+	{
+		state->video_circuit = 0;
+		state->videoram = state->page[0];
+		state->scrollram = state->scrollram0;
+	}
+
 	if (data & 0x10)
 		memory_set_bank(space->machine, "bank1", (data & 0x0e) >> 1);
 	else
@@ -217,13 +230,11 @@ static WRITE8_HANDLER( combatscb_bankselect_w )
 	{
 		state->video_circuit = 1;
 		state->videoram = state->page[1];
-		state->scrollram = state->scrollram1;
 	}
 	else
 	{
 		state->video_circuit = 0;
 		state->videoram = state->page[0];
-		state->scrollram = state->scrollram0;
 	}
 
 	data = data & 0x1f;
