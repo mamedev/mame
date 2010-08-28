@@ -43,7 +43,7 @@
 
 #define MOS6526_DEV_DERIVED_CTOR(devtype) \
 	devtype##_device::devtype##_device(running_machine &_machine, const devtype##_device_config &config) \
-		: timekeeper_device(_machine, config) \
+		: mos6526_device(_machine, config) \
 	{ }
 
 #define MOS6526_DEVCFG_DERIVED_CTOR(devtype, name) \

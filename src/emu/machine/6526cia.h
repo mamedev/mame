@@ -36,7 +36,7 @@
 #define __6526CIA_H__
 
 #include "emu.h"
-
+#include "devhelpr.h"
 
 
 	//**************************************************************************
@@ -93,8 +93,9 @@ class mos6526_device_config :   public device_config,
 {
     friend class mos6526_device;
 
+protected:
     // construction/destruction
-    mos6526_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+    mos6526_device_config(const machine_config &mconfig, const char *type, const char *tag, const device_config *owner, UINT32 clock);
 
 public:
     // allocators
@@ -115,6 +116,7 @@ class mos6526_device :  public device_t
     friend class mos6526_device_config;
     friend class dart_channel;
 
+protected:
     // construction/destruction
     mos6526_device(running_machine &_machine, const mos6526_device_config &_config);
 
@@ -225,6 +227,9 @@ private:
     const mos6526_device_config &m_config;
 };
 
+GENERIC_DEVICE_DERIVED_CONFIG(mos6526, mos6526r1)
+GENERIC_DEVICE_DERIVED_CONFIG(mos6526, mos6526r2)
+GENERIC_DEVICE_DERIVED_CONFIG(mos6526, mos8520)
 
 // device type definition
 extern const device_type MOS6526R1;
