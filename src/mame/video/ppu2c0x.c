@@ -76,7 +76,7 @@ static const pen_t default_colortable[] =
 typedef struct _ppu2c0x_state  ppu2c0x_state;
 struct _ppu2c0x_state
 {
-	address_space 		*space;					/* memory space */
+	address_space		*space;					/* memory space */
 	bitmap_t                    *bitmap;			/* target bitmap */
 	UINT8                       *spriteram;			/* sprite ram */
 	pen_t                       *colortable;			/* color table modified at run time */

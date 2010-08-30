@@ -26,7 +26,7 @@ public:
 	Instruction(const Opcode* oco) : m_valid(false),
 									 m_oco(oco),
 									 m_sizeIncrement(0),
-									 m_source(iINVALID), 
+									 m_source(iINVALID),
 									 m_destination(iINVALID) { }
 	virtual ~Instruction() {}
 
@@ -39,9 +39,9 @@ public:
 	virtual size_t accumulatorBitsModified() const = 0;   // Potentially make this always return ALL (like flags)
 	virtual size_t flags() const { return 0; }
 
-	static Instruction* decodeInstruction(const Opcode* opc, 
-										  const UINT16 word0, 
-										  const UINT16 word1, 
+	static Instruction* decodeInstruction(const Opcode* opc,
+										  const UINT16 word0,
+										  const UINT16 word1,
 										  bool shifted=false);
 
 	const bool valid() const { return m_valid; }
@@ -70,7 +70,7 @@ protected:
 class Abs: public Instruction
 {
 public:
-	Abs(const Opcode* oco, const UINT16 word0, const UINT16 word1) : Instruction(oco) 
+	Abs(const Opcode* oco, const UINT16 word0, const UINT16 word1) : Instruction(oco)
 	{
 		m_valid = decode(word0, word1);
 	}
@@ -98,7 +98,7 @@ public:
 	}
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
-		decode_JF_table(BITSn(word0,0x0001), BITSn(word0,0x0008), 
+		decode_JF_table(BITSn(word0,0x0001), BITSn(word0,0x0008),
 						m_source, m_destination);
 		return true;
 	}
@@ -121,7 +121,7 @@ public:
 	}
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
-		decode_JJJF_table(BITSn(word0,0x07), BITSn(word0,0x08), 
+		decode_JJJF_table(BITSn(word0,0x07), BITSn(word0,0x08),
 						  m_source, m_destination);
 		return true;
 	}
@@ -147,7 +147,7 @@ public:
 	}
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
-		decode_uuuuF_table(BITSn(word0,0x17), BITSn(word0,0x08), 
+		decode_uuuuF_table(BITSn(word0,0x17), BITSn(word0,0x08),
 						   m_opcode, m_source, m_destination);
 		// TODO: m_opcode = "add";
 		return true;
@@ -175,7 +175,7 @@ public:
 	}
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
-		decode_JJF_table(BITSn(word0,0x03),BITSn(word0,0x08), 
+		decode_JJF_table(BITSn(word0,0x03),BITSn(word0,0x08),
 						 m_source, m_destination);
 		return true;
 	}
@@ -213,7 +213,7 @@ public:
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
-	
+
 private:
 	UINT8 m_immediate;
 };
@@ -354,7 +354,7 @@ public:
 			case BBB_UPPER:  m_iVal <<= 8; break;
 			case BBB_MIDDLE: m_iVal <<= 4; break;
 			case BBB_LOWER:  m_iVal <<= 0; break;
-			
+
 			case BBB_INVALID: return false; break;
 		}
 
@@ -415,7 +415,7 @@ public:
 			case BBB_UPPER:  m_iVal <<= 8; break;
 			case BBB_MIDDLE: m_iVal <<= 4; break;
 			case BBB_LOWER:  m_iVal <<= 0; break;
-			
+
 			case BBB_INVALID: return false; break;
 		}
 
@@ -449,7 +449,7 @@ public:
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 2; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
-    
+
 private:
     reg_id m_r;
     UINT16 m_iVal;
@@ -481,7 +481,7 @@ public:
 			case BBB_UPPER:  m_iVal <<= 8; break;
 			case BBB_MIDDLE: m_iVal <<= 4; break;
 			case BBB_LOWER:  m_iVal <<= 0; break;
-			
+
 			case BBB_INVALID: return false; break;
 		}
 
@@ -538,7 +538,7 @@ public:
 	{
         std::string opcode = "b" + opMnemonicAsString(m_mnem);
 		// NEW // sprintf(opcode_str, "b.%s", M);
-        
+
 		char temp[32];
 		sprintf(temp, ">*+$%x", 2 + m_immediate);
 		// NEW // sprintf(temp, "$%04x (%d)", pc + 2 + (INT16)word1, (INT16)word1);
@@ -547,7 +547,7 @@ public:
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 2; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
-	
+
 private:
     op_mnem m_mnem;
 	INT16 m_immediate;
@@ -573,7 +573,7 @@ public:
 	{
         std::string opcode = "b" + opMnemonicAsString(m_mnem);
 		// NEW // sprintf(opcode_str, "b.%s", M);
-        
+
 		char temp[32];
 		if (m_immediate >= 0) sprintf(temp, "<*+$%x", m_immediate + 1);
 		else                  sprintf(temp, "<*-$%x", 1 - m_immediate - 2);
@@ -643,7 +643,7 @@ public:
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 2; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
-	
+
 private:
 	INT16 m_immediate;
 };
@@ -673,7 +673,7 @@ public:
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
-	
+
 private:
 	INT8 m_immediate;
 };
@@ -760,7 +760,7 @@ public:
 	size_t size() const { return 2; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 	size_t flags() { return DASMFLAG_STEP_OVER; }
-	
+
 private:
     op_mnem m_mnem;
 	INT16 m_immediate;
@@ -822,7 +822,7 @@ public:
 	size_t size() const { return 2; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 	size_t flags() { return DASMFLAG_STEP_OVER; }
-	
+
 private:
 	INT16 m_immediate;
 };
@@ -926,8 +926,8 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		/* Note: This is a JJJF limited in the docs, but other opcodes sneak
-				 in before cmp, so the same decode function can be used. */
-		decode_JJJF_table(BITSn(word0,0x07), BITSn(word0,0x08), 
+                 in before cmp, so the same decode function can be used. */
+		decode_JJJF_table(BITSn(word0,0x07), BITSn(word0,0x08),
 						  m_source, m_destination);
 		return true;
 	}
@@ -951,8 +951,8 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		/* Note: This is a JJJF limited in the docs, but other opcodes sneak
-				 in before cmp, so the same decode function can be used. */
-		decode_JJJF_table(BITSn(word0,0x07), BITSn(word0,0x08), 
+                 in before cmp, so the same decode function can be used. */
+		decode_JJJF_table(BITSn(word0,0x07), BITSn(word0,0x08),
 						  m_source, m_destination);
 		return true;
 	}
@@ -1068,7 +1068,7 @@ public:
 	}
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
-		decode_DDF_table(BITSn(word0,0x0003), BITSn(word0,0x0008), 
+		decode_DDF_table(BITSn(word0,0x0003), BITSn(word0,0x0008),
 						 m_source, m_destination);
 		return true;
 	}
@@ -1093,7 +1093,7 @@ public:
 	}
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
-		decode_QQF_special_table(BITSn(word0,0x0003), BITSn(word0,0x0008), 
+		decode_QQF_special_table(BITSn(word0,0x0003), BITSn(word0,0x0008),
 								 m_source, m_source2, m_destination);
 
 		decode_ss_table(BITSn(word0,0x0024), m_mnem);
@@ -1103,16 +1103,16 @@ public:
 	void disassemble(std::string& retString) const
 	{
         std::string opcode = "dmac" + opMnemonicAsString(m_mnem);
-        
-		retString = opcode + " " + 
-					regIdAsString(m_source) + "," + 
+
+		retString = opcode + " " +
+					regIdAsString(m_source) + "," +
 					regIdAsString(m_source2) + "," + regIdAsString(m_destination);
 		// NEW // sprintf(opcode_str, "dmac(%s)", A);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
-	
+
 private:
     op_mnem m_mnem;
 	reg_id m_source2;
@@ -1139,10 +1139,10 @@ public:
 		sprintf(temp, "*+$%x", 2 + m_immediate);
         std::string destination = temp;
 		// NEW // sprintf(temp, "X:(R%d),$%02x", Rnum, pc + 2 + word1);
-        
+
 		sprintf(temp, "X:(%s)", regIdAsString(m_source).c_str());
 		std::string source = temp;
-       
+
 		retString = "do " + source + "," + destination;
 	}
 	void evaluate(dsp56k_core* cpustate) {}
@@ -1179,7 +1179,7 @@ public:
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 2; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
-	
+
 private:
 	UINT8 m_immediate;
 	UINT16 m_displacement;
@@ -1197,7 +1197,7 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		m_displacement = word1;
-		
+
 		decode_DDDDD_table(BITSn(word0,0x001f), m_source);
 		if (m_source == iSSH) return false;
 		if (m_source == iINVALID) return false;
@@ -1213,7 +1213,7 @@ public:
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 2; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
-	
+
 private:
 	UINT16 m_displacement;
 };
@@ -1243,7 +1243,7 @@ public:
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 2; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
-	
+
 private:
 	UINT16 m_displacement;
 };
@@ -1279,7 +1279,7 @@ public:
 	}
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
-		decode_JJF_table(BITSn(word0,0x03),BITSn(word0,0x08), 
+		decode_JJF_table(BITSn(word0,0x03),BITSn(word0,0x08),
 						 m_source, m_destination);
 		return true;
 	}
@@ -1346,20 +1346,20 @@ public:
 	}
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
-		decode_QQQF_table(BITSn(word0,0x0007), BITSn(word0,0x0008), 
+		decode_QQQF_table(BITSn(word0,0x0007), BITSn(word0,0x0008),
 						  m_source, m_source2, m_destination);
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = "imac " + 
-					regIdAsString(m_source) + "," + 
+		retString = "imac " +
+					regIdAsString(m_source) + "," +
 					regIdAsString(m_source2) + "," + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
-	
+
 private:
 	reg_id m_source2;
 };
@@ -1375,13 +1375,13 @@ public:
 	}
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
-		decode_QQQF_table(BITSn(word0,0x0007), BITSn(word0,0x0008), 
+		decode_QQQF_table(BITSn(word0,0x0007), BITSn(word0,0x0008),
 						  m_source, m_source2, m_destination);
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = "impy " + 
+		retString = "impy " +
 					regIdAsString(m_source) + "," +
 					regIdAsString(m_source2) + "," + regIdAsString(m_destination);
 	}
@@ -1457,7 +1457,7 @@ public:
 	{
         std::string opcode = "j" + opMnemonicAsString(m_mnem);
 		// NEW // sprintf(opcode_str, "j.%s", M);
-        
+
 		char temp[32];
 		sprintf(temp, ">$%x", m_displacement);
 		// NEW // sprintf(temp, "$%04x", word1);
@@ -1590,7 +1590,7 @@ public:
 	{
         std::string opcode = "js" + opMnemonicAsString(m_mnem);
 		// NEW // sprintf(opcode_str, "js.%s", M);
-        
+
 		char temp[32];
 		sprintf(temp, ">$%x", m_displacement);
 		// NEW // sprintf(temp, "$%04x", word1);
@@ -1691,7 +1691,7 @@ public:
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
 	size_t flags() { return DASMFLAG_STEP_OVER; }
-	
+
 private:
 	UINT8 m_bAddr;
 };
@@ -1747,7 +1747,7 @@ public:
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
-    
+
 private:
     std::string m_ea;
 };
@@ -1840,7 +1840,7 @@ public:
 	}
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
-		decode_QQQF_table(BITSn(word0,0x07), BITSn(word0,0x08), 
+		decode_QQQF_table(BITSn(word0,0x07), BITSn(word0,0x08),
 						  m_source, m_source2, m_destination);
 
 		decode_kSign_table(BITSn(word0,0x40), m_sign);
@@ -1850,9 +1850,9 @@ public:
 	{
         std::string ts = m_sign;
         if (ts != "-") ts = "";
-		retString = "mac " + 
+		retString = "mac " +
                 	ts +
-					regIdAsString(m_source) + "," + 
+					regIdAsString(m_source) + "," +
 					regIdAsString(m_source2) + "," + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
@@ -1875,13 +1875,13 @@ public:
 	}
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
-		decode_QQF_table(BITSn(word0,0x03), BITSn(word0,0x08), 
+		decode_QQF_table(BITSn(word0,0x03), BITSn(word0,0x08),
 						 m_source, m_source2, m_destination);
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = "mac " + 
+		retString = "mac " +
 					regIdAsString(m_source) + "," +
 					regIdAsString(m_source2) + "," + regIdAsString(m_destination);
 	}
@@ -1904,13 +1904,13 @@ public:
 	}
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
-		decode_QQQF_table(BITSn(word0,0x0007), BITSn(word0,0x0008), 
+		decode_QQQF_table(BITSn(word0,0x0007), BITSn(word0,0x0008),
 						  m_source, m_source2, m_destination);
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = "mac " + 
+		retString = "mac " +
 					regIdAsString(m_source) + "," +
 					regIdAsString(m_source2) + "," + regIdAsString(m_destination);
 	}
@@ -1934,7 +1934,7 @@ public:
 	}
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
-		decode_QQQF_table(BITSn(word0,0x07), BITSn(word0,0x08), 
+		decode_QQQF_table(BITSn(word0,0x07), BITSn(word0,0x08),
 						  m_source, m_source2, m_destination);
 
 		decode_kSign_table(BITSn(word0,0x40), m_sign);
@@ -1944,9 +1944,9 @@ public:
 	{
         std::string ts = m_sign;
         if (ts != "-") ts = "";
-		retString = "macr " + 
+		retString = "macr " +
                 	ts +
-					regIdAsString(m_source) + "," + 
+					regIdAsString(m_source) + "," +
 					regIdAsString(m_source2) + "," + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
@@ -1969,14 +1969,14 @@ public:
 	}
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
-		decode_QQF_table(BITSn(word0,0x03), BITSn(word0,0x08), 
+		decode_QQF_table(BITSn(word0,0x03), BITSn(word0,0x08),
 						 m_source, m_source2, m_destination);
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = "macr " + 
-					regIdAsString(m_source) + "," + 
+		retString = "macr " +
+					regIdAsString(m_source) + "," +
 					regIdAsString(m_source2) + "," + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
@@ -2000,7 +2000,7 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		// Special QQF
-		decode_QQF_special_table(BITSn(word0,0x0003), BITSn(word0,0x0008), 
+		decode_QQF_special_table(BITSn(word0,0x0003), BITSn(word0,0x0008),
 								 m_source, m_source2, m_destination);
 
 		decode_s_table(BITSn(word0,0x0004), m_mnem);
@@ -2009,9 +2009,9 @@ public:
 	void disassemble(std::string& retString) const
 	{
         std::string opcode = "mac" + opMnemonicAsString(m_mnem);
-        
-		retString = opcode + " " + 
-					regIdAsString(m_source) + "," + 
+
+		retString = opcode + " " +
+					regIdAsString(m_source) + "," +
 					regIdAsString(m_source2) + "," + regIdAsString(m_destination);
 		// NEW // sprintf(opcode_str, "mac(%s)", A);
 	}
@@ -2122,7 +2122,7 @@ public:
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 2; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
-	
+
 private:
 	INT8 m_b;
     UINT8 m_W;
@@ -2161,7 +2161,7 @@ public:
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
-    
+
 private:
 	INT8 m_W;
 	reg_id m_SD;
@@ -2316,7 +2316,7 @@ public:
     }
 	size_t size() const { return 2; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
-	
+
 private:
     UINT8 m_t;
 	UINT8 m_W;
@@ -2381,7 +2381,7 @@ public:
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 2; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
-	
+
 private:
 	INT8 m_b;
     UINT8 m_W;
@@ -2411,14 +2411,14 @@ public:
 		else                  sprintf(temp, "#<-$%x", 1 - m_immediate - 1);
 		// NEW // sprintf(temp, "#$%02x,%s", BITSn(word0,0x00ff), D1);
 
-		retString = "move " + 
+		retString = "move " +
 					std::string(temp) + "," + regIdAsString(m_destination);
 		// NEW // sprintf(opcode_str, "move(i)");
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
-	
+
 private:
 	INT8 m_immediate;
 };
@@ -2498,7 +2498,7 @@ public:
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
-    
+
 private:
     UINT8 m_W;
     std::string m_ea;
@@ -2534,7 +2534,7 @@ public:
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 2; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
-    
+
 private:
     INT8 m_b;
     UINT8 m_W;
@@ -2677,8 +2677,8 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		/* There are inconsistencies with the S1 & S2 operand ordering in the docs,
-		   but since it's a multiply it doesn't matter */
-		decode_QQQF_table(BITSn(word0,0x07), BITSn(word0,0x08), 
+           but since it's a multiply it doesn't matter */
+		decode_QQQF_table(BITSn(word0,0x07), BITSn(word0,0x08),
 						  m_source, m_source2, m_destination);
 
 		decode_kSign_table(BITSn(word0,0x40), m_sign);
@@ -2688,7 +2688,7 @@ public:
 	{
         std::string ts = m_sign;
         if (ts != "-") ts = "";
-		retString = "mpy " + 
+		retString = "mpy " +
                 	ts +
 					regIdAsString(m_source) + "," +
 					regIdAsString(m_source2) + "," + regIdAsString(m_destination);
@@ -2696,7 +2696,7 @@ public:
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
-	
+
 private:
     std::string m_sign;
 	reg_id m_source2;
@@ -2713,20 +2713,20 @@ public:
 	}
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
-		decode_QQF_table(BITSn(word0,0x03), BITSn(word0,0x08), 
+		decode_QQF_table(BITSn(word0,0x03), BITSn(word0,0x08),
 						 m_source, m_source2, m_destination);
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = "mpy " + 
+		retString = "mpy " +
 					regIdAsString(m_source) + "," +
 					regIdAsString(m_source2) + "," + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
-	
+
 private:
 	reg_id m_source2;
 };
@@ -2742,20 +2742,20 @@ public:
 	}
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
-		decode_QQQF_table(BITSn(word0,0x0007), BITSn(word0,0x0008), 
+		decode_QQQF_table(BITSn(word0,0x0007), BITSn(word0,0x0008),
 						  m_source, m_source2, m_destination);
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = "mpy " + 
+		retString = "mpy " +
 					regIdAsString(m_source) + "," +
 					regIdAsString(m_source2) + "," + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
-	
+
 private:
 	reg_id m_source2;
 };
@@ -2773,8 +2773,8 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		/* There are inconsistencies with the S1 & S2 operand ordering in the docs,
-		   but since it's a multiply it doesn't matter */
-		decode_QQQF_table(BITSn(word0,0x07), BITSn(word0,0x08), 
+           but since it's a multiply it doesn't matter */
+		decode_QQQF_table(BITSn(word0,0x07), BITSn(word0,0x08),
 						  m_source, m_source2, m_destination);
 
 		decode_kSign_table(BITSn(word0,0x40), m_sign);
@@ -2784,7 +2784,7 @@ public:
 	{
         std::string ts = m_sign;
         if (ts != "-") ts = "";
-		retString = "mpyr " + 
+		retString = "mpyr " +
 					ts +
                 	regIdAsString(m_source) + "," +
 					regIdAsString(m_source2) + "," + regIdAsString(m_destination);
@@ -2792,7 +2792,7 @@ public:
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
-	
+
 private:
     std::string m_sign;
 	reg_id m_source2;
@@ -2809,20 +2809,20 @@ public:
 	}
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
-		decode_QQF_table(BITSn(word0,0x03), BITSn(word0,0x08), 
+		decode_QQF_table(BITSn(word0,0x03), BITSn(word0,0x08),
 						 m_source, m_source2, m_destination);
 		return true;
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = "mpyr " + 
+		retString = "mpyr " +
 					regIdAsString(m_source) + "," +
 					regIdAsString(m_source2) + "," + regIdAsString(m_destination);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
-	
+
 private:
 	reg_id m_source2;
 };
@@ -2839,7 +2839,7 @@ public:
 	}
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
-		decode_QQF_special_table(BITSn(word0,0x0003), BITSn(word0,0x0008), 
+		decode_QQF_special_table(BITSn(word0,0x0003), BITSn(word0,0x0008),
 								 m_source, m_source2, m_destination);
 
 		decode_s_table(BITSn(word0,0x0004), m_mnem);
@@ -2848,8 +2848,8 @@ public:
 	void disassemble(std::string& retString) const
 	{
         std::string opcode = "mpy" + opMnemonicAsString(m_mnem);
-        
-		retString = opcode + " " + 
+
+		retString = opcode + " " +
 					regIdAsString(m_source) + "," +
 					regIdAsString(m_source2) + "," + regIdAsString(m_destination);
 		// NEW // sprintf(opcode_str, "mpy(%s)", A);
@@ -2857,7 +2857,7 @@ public:
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
-	
+
 private:
     op_mnem m_mnem;
 	reg_id m_source2;
@@ -2984,7 +2984,7 @@ public:
 	}
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
-		decode_JJF_table(BITSn(word0,0x03),BITSn(word0,0x08), 
+		decode_JJF_table(BITSn(word0,0x03),BITSn(word0,0x08),
 						 m_source, m_destination);
 		return true;
 	}
@@ -3023,7 +3023,7 @@ public:
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
-	
+
 private:
 	UINT8 m_immediate;
 };
@@ -3273,7 +3273,7 @@ public:
 	}
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
-		decode_JF_table(BITSn(word0,0x01), BITSn(word0,0x08), 
+		decode_JF_table(BITSn(word0,0x01), BITSn(word0,0x08),
 						m_source, m_destination);
 		return true;
 	}
@@ -3317,7 +3317,7 @@ public:
 	}
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
-		decode_JJJF_table(BITSn(word0,0x07), BITSn(word0,0x08), 
+		decode_JJJF_table(BITSn(word0,0x07), BITSn(word0,0x08),
 						  m_source, m_destination);
 		return true;
 	}
@@ -3341,7 +3341,7 @@ public:
 	}
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
-		decode_uuuuF_table(BITSn(word0,0x17), BITSn(word0,0x08), 
+		decode_uuuuF_table(BITSn(word0,0x17), BITSn(word0,0x08),
 						   m_opcode, m_source, m_destination);
 
 		// TODO // m_opcode = "sub";
@@ -3354,7 +3354,7 @@ public:
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
-    
+
 private:
     std::string m_opcode;
 };
@@ -3446,9 +3446,9 @@ public:
 	}
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
-		decode_h0hF_table(BITSn(word0,0x0007),BITSn(word0,0x0008), 
+		decode_h0hF_table(BITSn(word0,0x0007),BITSn(word0,0x0008),
 						  m_source, m_destination);
-		
+
 		decode_RR_table(BITSn(word0,0x0030), m_destination2);
 
 		decode_cccc_table(BITSn(word0,0x03c0), m_mnem);
@@ -3456,25 +3456,25 @@ public:
 			return true;
 		if (m_destination2 != iR0)
 			return true;
-		
+
 		return false;
 	}
 	void disassemble(std::string& retString) const
 	{
         std::string opcode = "t" + opMnemonicAsString(m_mnem);
 		// NEW // sprintf(opcode_str, "t.%s", M);
-        
+
 		retString = opcode;
 		if (m_source != m_destination)
 			retString += std::string(" ") + regIdAsString(m_source) + "," + regIdAsString(m_destination);
-		
+
 		if (m_destination2 != iR0)
 			retString += std::string(" R0,") + regIdAsString(m_destination2);
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
-	
+
 private:
     op_mnem m_mnem;
 	reg_id m_destination2;
@@ -3490,7 +3490,7 @@ public:
 	}
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
-		decode_JJJF_table(BITSn(word0,0x07), BITSn(word0,0x08), 
+		decode_JJJF_table(BITSn(word0,0x07), BITSn(word0,0x08),
 						  m_source, m_destination);
 		return true;
 	}
@@ -3513,7 +3513,7 @@ public:
 	}
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
-		decode_DDF_table(BITSn(word0,0x03), BITSn(word0,0x08), 
+		decode_DDF_table(BITSn(word0,0x03), BITSn(word0,0x08),
 						 m_source, m_destination);
 		return true;
 	}
@@ -3536,7 +3536,7 @@ public:
 	}
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
-		decode_JF_table(BITSn(word0,0x0001),BITSn(word0,0x0008), 
+		decode_JF_table(BITSn(word0,0x0001),BITSn(word0,0x0008),
 						m_destination, m_source);
 		return true;
 	}
@@ -3564,9 +3564,9 @@ public:
 	}
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
-		decode_DDF_table(BITSn(word0,0x0030), BITSn(word0,0x0008), 
+		decode_DDF_table(BITSn(word0,0x0030), BITSn(word0,0x0008),
 						 m_destination, m_source);
-		
+
 		decode_HHH_table(BITSn(word0,0x0007), m_SD);
 		// If the destination of the second move is the same as the first, you're invalid
 		if (m_SD == m_destination && BITSn(word0,0x0100)) return false;
@@ -3582,14 +3582,14 @@ public:
         std::string source2;
         std::string destination2;
 		assemble_arguments_from_W_table(m_W, 'X', m_SD, m_ea, source2, destination2);
-		retString = "tfr3 " + 
-					regIdAsString(m_source) + "," + regIdAsString(m_destination) + " " + 
+		retString = "tfr3 " +
+					regIdAsString(m_source) + "," + regIdAsString(m_destination) + " " +
                     source2 + "," + destination2;
 	}
 	void evaluate(dsp56k_core* cpustate) {}
 	size_t size() const { return 1; }
 	size_t accumulatorBitsModified() const { return BM_HIGH | BM_MIDDLE | BM_LOW; }
-	
+
 private:
 	INT8 m_W;
 	reg_id m_SD;
@@ -3696,13 +3696,13 @@ public:
 	}
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
-		decode_QQQF_table(BITSn(word0,0x0007), BITSn(word0,0x0008), 
+		decode_QQQF_table(BITSn(word0,0x0007), BITSn(word0,0x0008),
 						  m_source, m_source2, m_destination);
-		
+
 		// This hackery amounts to a very strange QQQF table...
 		if (m_source == iX0 && m_source2 == iX0) return false;
 		if (m_source == iX1 && m_source2 == iX0) return false;
-		
+
 		if (m_source == iY0 && m_source2 == iX1)
 		{
 			m_source  = iX1;
@@ -3717,7 +3717,7 @@ public:
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = "shfl " + 
+		retString = "shfl " +
 					regIdAsString(m_source) + "," +
 					regIdAsString(m_source2) + "," + regIdAsString(m_destination);
 	}
@@ -3740,13 +3740,13 @@ public:
 	}
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
-		decode_QQQF_table(BITSn(word0,0x0007), BITSn(word0,0x0008), 
+		decode_QQQF_table(BITSn(word0,0x0007), BITSn(word0,0x0008),
 						  m_source, m_source2, m_destination);
-		
+
 		// This hackery amounts to a very strange QQQF table...
 		if (m_source == iX0 && m_source2 == iX0) return false;
 		if (m_source == iX1 && m_source2 == iX0) return false;
-		
+
 		if (m_source == iY0 && m_source2 == iX1)
 		{
 			m_source  = iX1;
@@ -3761,7 +3761,7 @@ public:
 	}
 	void disassemble(std::string& retString) const
 	{
-		retString = "shfr " + 
+		retString = "shfr " +
 					regIdAsString(m_source) + "," +
 					regIdAsString(m_source2) + "," + regIdAsString(m_destination);
 	}

@@ -6,7 +6,7 @@ The Hitachi hcd62121 is the custom cpu which was used in the Casio
 CFX-9850 (and maybe some other things too).
 
 This CPU core is based on the information provided by Martin Poupe.
-Martin Poupe's site can be found at http://prg.rkk.cz/~mpoupe/ 
+Martin Poupe's site can be found at http://prg.rkk.cz/~mpoupe/
 
 **********************************************************************/
 
@@ -141,7 +141,7 @@ INLINE void read_regreg( hcd62121_state *cpustate, int size, UINT8 op1, UINT8 op
 			cpustate->temp1[i] = cpustate->temp2[i];
 			cpustate->temp2[i] = v;
 		}
-	}   
+	}
 }
 
 
@@ -382,8 +382,8 @@ static CPU_SET_INFO( hcd62121 )
 
 	case CPUINFO_INT_REGISTER + HCD62121_IP:	cpustate->ip = info->i;							break;
 	case CPUINFO_INT_REGISTER + HCD62121_SP:	cpustate->sp = info->i;							break;
-//	case CPUINFO_INT_REGISTER + HCD62121_R00:	break;
-//	case CPUINFO_INT_REGISTER + HCD62121_R02:	break;
+//  case CPUINFO_INT_REGISTER + HCD62121_R00:   break;
+//  case CPUINFO_INT_REGISTER + HCD62121_R02:   break;
 	}
 }
 
@@ -432,7 +432,7 @@ CPU_GET_INFO( hcd62121 )
 	case CPUINFO_INT_REGISTER + HCD62121_SS:			info->i = cpustate->sseg;				break;
 	case CPUINFO_INT_REGISTER + HCD62121_DSIZE:			info->i = cpustate->dsize;				break;
 	case CPUINFO_INT_REGISTER + HCD62121_R00:			info->i = ( cpustate->reg[0x00] << 24 ) | ( cpustate->reg[0x01] << 16 ) | ( cpustate->reg[0x02] << 8 ) | cpustate->reg[0x03]; break;
-//	case CPUINFO_INT_REGISTER + HCD62121_R02:			info->i = cpustate->;					break;
+//  case CPUINFO_INT_REGISTER + HCD62121_R02:           info->i = cpustate->;                   break;
 
 	/* --- the following bits of info are returned as pointers to data or functions --- */
 	case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(hcd62121);		break;

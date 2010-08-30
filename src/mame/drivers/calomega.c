@@ -450,8 +450,8 @@
     - Promoted comg080 (Arcade Black Jack) to working state.
 
     - Added support for system 906III:
-	    - Accurate memory map, CRTC, and PIAs mapped.
-		- Preliminary PIAs support (no multiplexion yet).
+        - Accurate memory map, CRTC, and PIAs mapped.
+        - Preliminary PIAs support (no multiplexion yet).
         - Added proper machine driver, with correct R65C02 CPU.
         - Documented the hardware specs.
         - Added Game 51.08 (CEI Video Poker, Jacks or Better),
@@ -460,7 +460,7 @@
         - Mapped the AY8912.
         - Added AY8912 proper interfase. Tied SW2 to AY8912 port.
         - PIA0, portA is polled constantly. Tied some debug handlers
-	       to understand how the input system works.
+           to understand how the input system works.
         - Added notes about the PIAs R/W.
 
 
@@ -3973,9 +3973,9 @@ static DRIVER_INIT( comg080 )
 	}
 
 	/* Injecting missing Start and NMI vectors...
-	   Start = $2042;  NMI = $26f8;
-	   Also a fake vector at $3ff8-$3ff9. The code checks these values to continue.
-	*/
+       Start = $2042;  NMI = $26f8;
+       Also a fake vector at $3ff8-$3ff9. The code checks these values to continue.
+    */
 	UINT8 *PRGROM = memory_region( machine, "maincpu" );
 
 	PRGROM[0x3ff8] = 0x8e; /* checked by code */

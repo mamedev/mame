@@ -399,7 +399,7 @@ const rom_entry *device_config::rom_region() const
 
 //-------------------------------------------------
 //  machine_config - return a pointer to a machine
-//  config constructor describing sub-devices for 
+//  config constructor describing sub-devices for
 //  this device
 //-------------------------------------------------
 

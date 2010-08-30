@@ -1,6 +1,6 @@
 /***************************************************************************
 
-	Acorn Archimedes VIDC (VIDeo Controller) emulation
+    Acorn Archimedes VIDC (VIDeo Controller) emulation
 
 ***************************************************************************/
 

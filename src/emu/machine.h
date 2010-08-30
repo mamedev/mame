@@ -161,17 +161,17 @@ typedef tagged_list<region_info> region_list;
 class driver_data_t : public bindable_object
 {
 	friend class running_machine;
-	
+
 public:
 	driver_data_t(running_machine &machine);
 	virtual ~driver_data_t();
 
 	virtual void machine_start();
 	virtual void machine_reset();
-	
+
 	virtual void sound_start();
 	virtual void sound_reset();
-	
+
 	virtual void palette_init(const UINT8 *color_prom);
 	virtual void video_start();
 	virtual void video_reset();

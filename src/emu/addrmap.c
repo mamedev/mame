@@ -190,9 +190,9 @@ void address_map_entry::set_write_bank(const device_config &devconfig, const cha
 
 void address_map_entry::set_readwrite_bank(const device_config &devconfig, const char *tag)
 {
-	m_read.m_type = AMH_BANK; 
+	m_read.m_type = AMH_BANK;
 	m_read.set_tag(devconfig, tag);
-	m_write.m_type = AMH_BANK; 
+	m_write.m_type = AMH_BANK;
 	m_write.set_tag(devconfig, tag);
 }
 

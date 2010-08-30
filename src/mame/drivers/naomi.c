@@ -431,12 +431,12 @@ Notes:
       4P,5P - SRAM (SOJ28) 32kx8, ISSI IS61C256AH-15J
    CN1/2/3  - connectors joining to main board
 
-   
+
    Games known to use this PCB include....
-                                  Sticker   FL0-FL3    # of SOP48  IC @ 1F        IC @ 1M 
+                                  Sticker   FL0-FL3    # of SOP48  IC @ 1F        IC @ 1M
  Game                              on cart   FLASHROM   FLASHROMs   X76F100        315-5581      Notes
 ---------------------------------------------------------------------------------------------------------------------------------------
-/Shin Nihon Prowrestling                                                                         FL0 & FL1 have pin55 raised from PCB.  
+/Shin Nihon Prowrestling                                                                         FL0 & FL1 have pin55 raised from PCB.
 \Toukon Retsuden 4 Arcade Edition  25349801   2 (64Mb)  15 (128Mb)  not populated  317-5040-com  They are connected togheter and go to pin89 on 2K.
 
 
@@ -4783,13 +4783,13 @@ ROM_START( starseek )
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
 
 	/*
-	Note:
-	There was no sticker or silk screen markings on this PIC.
-	I have used the product number as a label instead.
+    Note:
+    There was no sticker or silk screen markings on this PIC.
+    I have used the product number as a label instead.
 
-	PIC16C621A-20 (317-0005-JPN)
-	Sticker: 253-5509-0005J
-	*/
+    PIC16C621A-20 (317-0005-JPN)
+    Sticker: 253-5509-0005J
+    */
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
 	ROM_LOAD("317-0005-jpn.pic", 0x00, 0x4000, CRC(19f8d4d0) SHA1(d256f26f757d7019cab7950d81992902cdb65e07) )
 ROM_END

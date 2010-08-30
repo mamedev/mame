@@ -165,8 +165,8 @@ static CPU_EXIT( sm8500 )
 INLINE void sm8500_do_interrupt(sm8500_state *cpustate, UINT16 vector) {
 	/* Get regs from ram */
 	sm8500_get_sp(cpustate);
-	cpustate->SYS = cpustate->program->read_byte(0x19);	
-	cpustate->PS1 = cpustate->program->read_byte(0x1f);	
+	cpustate->SYS = cpustate->program->read_byte(0x19);
+	cpustate->PS1 = cpustate->program->read_byte(0x1f);
 	/* Push PC */
 	PUSH_BYTE( cpustate->PC & 0xFF );
 	PUSH_BYTE( cpustate->PC >> 8 );

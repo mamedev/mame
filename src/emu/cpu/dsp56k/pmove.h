@@ -63,7 +63,7 @@ public:
 		std::string ea;
 		assemble_ea_from_m_table(BITSn(word0,0x4000), regIDAsNum(r), ea);
 
-		assemble_arguments_from_W_table(BITSn(word0,0x0100), 'X', SD, ea, 
+		assemble_arguments_from_W_table(BITSn(word0,0x0100), 'X', SD, ea,
 										m_source, m_destination);
 
 		// If the destination of the instruction overlaps with our destination, abort.
@@ -105,7 +105,7 @@ public:
 		reg_id SD;
 		decode_HHH_table(BITSn(word0,0x0e00), SD);
 
-		assemble_arguments_from_W_table(BITSn(word0,0x0100), 'X', SD, ea, 
+		assemble_arguments_from_W_table(BITSn(word0,0x0100), 'X', SD, ea,
 										m_source, m_destination);
 
 		// If the destination of the instruction overlaps with our destination, abort.
@@ -119,7 +119,7 @@ public:
 		retString = m_source + "," + m_destination;
 	}
 	void evaluate() {}
-	
+
 private:
 	std::string m_source;
 	std::string m_destination;
@@ -190,7 +190,7 @@ public:
 	}
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
-		decode_IIIIx_table(BITSn(word0,0x0f00), BITSn(word0,0x0008), 
+		decode_IIIIx_table(BITSn(word0,0x0f00), BITSn(word0,0x0008),
 						   m_source, m_destination);
 
 		if (m_source == iINVALID)
@@ -211,7 +211,7 @@ public:
 
 		// Don't return a failure, just let everything fall through (nop).
 		//if (m_source == "?" && m_destination == "?")
-		//	return false;
+		//  return false;
 
 		return true;
 	}
@@ -224,7 +224,7 @@ public:
 			retString = regIdAsString(m_source) + "," + regIdAsString(m_destination);
 	}
 	void evaluate() {}
-	
+
 private:
 	reg_id m_source;
 	reg_id m_destination;
@@ -267,7 +267,7 @@ public:
 		retString = pms + " " + pms2;
 	}
 	void evaluate() {}
-	
+
 private:
 	std::string pms;    // TODO
 	std::string pms2;
@@ -296,7 +296,7 @@ public:
 		retString = m_ea;
 	}
 	void evaluate() {}
-	
+
 private:
 	std::string m_ea;
 };
@@ -329,7 +329,7 @@ public:
 		retString = m_source + "," + m_destination;
 	}
 	void evaluate() {}
-	
+
 private:
 	std::string m_source;
 	std::string m_destination;

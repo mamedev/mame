@@ -985,7 +985,7 @@ void m68k_memory_interface::init16(address_space &space)
 	m_direct = &space.direct();
 	m_cpustate = get_safe_token(&space.device());
 	opcode_xor = 0;
-	
+
 	readimm16 = m68k_readimm16_delegate(m68k_readimm16_proto_delegate::create_member(m68k_memory_interface, simple_read_immediate_16), *this);
 	read8 = m68k_read8_delegate(m68k_read8_proto_delegate::create_member(address_space, read_byte), space);
 	read16 = m68k_read16_delegate(m68k_read16_proto_delegate::create_member(address_space, read_word), space);
@@ -1006,7 +1006,7 @@ void m68k_memory_interface::init32(address_space &space)
 	m_direct = &space.direct();
 	m_cpustate = get_safe_token(&space.device());
 	opcode_xor = WORD_XOR_BE(0);
-	
+
 	readimm16 = m68k_readimm16_delegate(m68k_readimm16_proto_delegate::create_member(m68k_memory_interface, read_immediate_16), *this);
 	read8 = m68k_read8_delegate(m68k_read8_proto_delegate::create_member(address_space, read_byte), space);
 	read16 = m68k_read16_delegate(m68k_read16_proto_delegate::create_member(address_space, read_word_unaligned), space);
@@ -1132,7 +1132,7 @@ void m68k_memory_interface::init32mmu(address_space &space)
 	m_direct = &space.direct();
 	m_cpustate = get_safe_token(&space.device());
 	opcode_xor = WORD_XOR_BE(0);
-	
+
 	readimm16 = m68k_readimm16_delegate(m68k_readimm16_proto_delegate::create_member(m68k_memory_interface, read_immediate_16_mmu), *this);
 	read8 = m68k_read8_delegate(m68k_read8_proto_delegate::create_member(m68k_memory_interface, read_byte_32_mmu), *this);
 	read16 = m68k_read16_delegate(m68k_read16_proto_delegate::create_member(m68k_memory_interface, readword_d32_mmu), *this);

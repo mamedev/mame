@@ -144,7 +144,7 @@ const address_space_config *device_config_memory_interface::memory_space_config(
 
 
 //-------------------------------------------------
-//  static_set_vblank_int - configuration helper 
+//  static_set_vblank_int - configuration helper
 //  to set up VBLANK interrupts on the device
 //-------------------------------------------------
 

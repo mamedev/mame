@@ -1,10 +1,10 @@
 /**********************************************************************
 
-	Fairchild F3853 SRAM interface with integrated interrupt
-	controller and timer
+    Fairchild F3853 SRAM interface with integrated interrupt
+    controller and timer
 
-  	This chip is a timer shift register, basically the same as in the
-  	F3851.
+    This chip is a timer shift register, basically the same as in the
+    F3851.
 
 **********************************************************************/
 

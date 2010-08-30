@@ -241,7 +241,7 @@ static DEVICE_START( k053260 )
 	/* register with the save state system */
 	state_save_register_device_item(device, 0, ic->mode);
 	state_save_register_device_item_array(device, 0, ic->regs);
-	
+
 	for ( i = 0; i < 4; i++ )
 	{
 		state_save_register_device_item(device, i, ic->channels[i].rate);

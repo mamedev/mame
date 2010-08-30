@@ -26,7 +26,7 @@ General notes:
     the microcontroller is able to write to anywhere within main memory.
 
     Gold Medalist (bootleg) has a 68705 in place of the Alpha controller.
-	 (Kyros bootleg also? we have decapped MCU dumps of different types for it)
+     (Kyros bootleg also? we have decapped MCU dumps of different types for it)
 
     V boards have more memory and double the amount of colours as II boards.
 
@@ -3230,11 +3230,11 @@ static DRIVER_INIT( sbasebal )
 	UINT16 *rom = (UINT16 *)memory_region(machine, "maincpu");
 
 	/* Patch protection check, it does a divide by zero because the MCU is trying to
-	   calculate the ball speed when a strike is scored, notice that current emulation
-	   just returns 49 mi/h every time that this event happens.
-	   68k reads at [0x4023e], then subtracts this value with [0x41838], presumably it's raw speed minus angle.
-	   main CPU then writes the result to RAM location [0x41866], probably just to signal the result to the MCU.
-	   */
+       calculate the ball speed when a strike is scored, notice that current emulation
+       just returns 49 mi/h every time that this event happens.
+       68k reads at [0x4023e], then subtracts this value with [0x41838], presumably it's raw speed minus angle.
+       main CPU then writes the result to RAM location [0x41866], probably just to signal the result to the MCU.
+       */
 	rom[0xb672/2] = 0x4e71;
 
 	/* And patch the ROM checksums */

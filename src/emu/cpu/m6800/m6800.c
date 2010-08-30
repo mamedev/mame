@@ -956,7 +956,7 @@ static CPU_RESET( m6800 )
 	cpustate->txstate = M6800_TX_STATE_INIT;
 	cpustate->txbits = cpustate->rxbits = 0;
 	cpustate->trcsr_read = 0;
-	
+
 	cpustate->cc = 0xc0;
 }
 

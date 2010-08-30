@@ -730,7 +730,7 @@ static INTERRUPT_GEN( karnov_interrupt )
 {
 	karnov_state *state = device->machine->driver_data<karnov_state>();
 	UINT8 port = input_port_read(device->machine, "FAKE");
-	
+
 	/* Coin input to the i8751 generates an interrupt to the main cpu */
 	if (port == state->coin_mask)
 		state->latch = 1;

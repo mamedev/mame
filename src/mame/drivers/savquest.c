@@ -6,11 +6,11 @@
     Skeleton by R. Belmont
 
     H/W is a white-box PC consisting of:
-	Pentium II 450 CPU
-	DFI P2XBL motherboard (i440BX chipset)
-	128 MB RAM
-	Guillemot Maxi Gamer 3D2 Voodoo II
-	Sound Blaster AWE64
+    Pentium II 450 CPU
+    DFI P2XBL motherboard (i440BX chipset)
+    128 MB RAM
+    Guillemot Maxi Gamer 3D2 Voodoo II
+    Sound Blaster AWE64
 
     Protected by a HASP brand parallel port dongle.
     I/O board has a PIC17C43 which is not readable.
@@ -74,7 +74,7 @@ MACHINE_DRIVER_END
 
 ROM_START( savquest )
 	ROM_REGION32_LE(0x40000, "user1", 0)
-	ROM_LOAD( "sq-aflash.bin", 0x000000, 0x040000, CRC(0b4f406f) SHA1(4003b0e6d46dcb47012acc118837f0f7cf529faf) ) 
+	ROM_LOAD( "sq-aflash.bin", 0x000000, 0x040000, CRC(0b4f406f) SHA1(4003b0e6d46dcb47012acc118837f0f7cf529faf) )
 
 	DISK_REGION( "disk" )
 	DISK_IMAGE( "savquest", 0, SHA1(b20cacf45e093b533c538bf4fc08f05f9475d640) )

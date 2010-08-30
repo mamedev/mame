@@ -92,6 +92,6 @@ delegate_generic_function delegate_convert_raw(delegate_generic_class *&object, 
 	// otherwise, it is the byte index into the vtable where the actual function lives
 	UINT8 *vtable_base = *reinterpret_cast<UINT8 **>(object);
 	return *reinterpret_cast<delegate_generic_function *>(vtable_base + mfp.u.vtable_index - 1);
-} 
+}
 
 #endif

@@ -5,11 +5,11 @@
     Copyright (c) 2008, The MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
 
-	The z80dart/z80sio itself is based on an older intel serial chip, the i8274 MPSC 
-	(see http://doc.chipfind.ru/pdf/intel/8274.pdf), which also has almost identical
-	behavior, except lacks the interrupt daisy chaining and has its own interrupt/dma
-	scheme which uses write register 2 on channel A, that register which is unused on
-	the z80dart and z80sio.
+    The z80dart/z80sio itself is based on an older intel serial chip, the i8274 MPSC
+    (see http://doc.chipfind.ru/pdf/intel/8274.pdf), which also has almost identical
+    behavior, except lacks the interrupt daisy chaining and has its own interrupt/dma
+    scheme which uses write register 2 on channel A, that register which is unused on
+    the z80dart and z80sio.
 
 ***************************************************************************/
 
@@ -21,8 +21,8 @@
     - wr0 reset tx interrupt pending
     - wait/ready
     - 1.5 stop bits
-	- synchronous mode (Z80-SIO/1,2)
-	- SDLC mode (Z80-SIO/1,2)
+    - synchronous mode (Z80-SIO/1,2)
+    - SDLC mode (Z80-SIO/1,2)
 
 */
 

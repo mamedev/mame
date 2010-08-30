@@ -297,15 +297,15 @@ Donkey Kong Junior Notes
     ------------------------------------------------
 
 
-	D2K Jumpman returns Notes
-	=========================
+    D2K Jumpman returns Notes
+    =========================
 
-	This is a DKong/Hack combo using a Braze Technologies High Score Save pcb.
-	This pcb will be placed in the cpu socket and the Z80 together with an
-	additional 64K rom, a 74LS245, an eeprom and a pal/gal. It looks like the
-	"encryption" was a conincidence resulting from an easy pcb layout.
-	The pal is also used to switch A15 on and off. This is done in locations
-	6800 and E800.
+    This is a DKong/Hack combo using a Braze Technologies High Score Save pcb.
+    This pcb will be placed in the cpu socket and the Z80 together with an
+    additional 64K rom, a 74LS245, an eeprom and a pal/gal. It looks like the
+    "encryption" was a conincidence resulting from an easy pcb layout.
+    The pal is also used to switch A15 on and off. This is done in locations
+    6800 and E800.
 
 ***************************************************************************/
 
@@ -1602,7 +1602,7 @@ GFXDECODE_END
  *  Braze Tech Addon boards
  *
  *************************************/
- 
+
 static const eeprom_interface braze_eeprom_intf =
 {
 	7,				/* address bits */

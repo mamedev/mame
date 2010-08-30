@@ -105,7 +105,7 @@ class address_map_entry
 public:
 	// construction/destruction
 	address_map_entry(address_map &map, offs_t start, offs_t end);
-	
+
 	// getters
 	address_map_entry *next() const { return m_next; }
 
@@ -670,7 +670,7 @@ void ADDRESS_MAP_NAME(_name)(address_map &map, const device_config &devconfig) \
 #define AM_RAM_READ(_read)					AM_READ(_read) AM_WRITEONLY
 #define AM_RAM_WRITE(_write)				AM_READONLY AM_WRITE(_write)
 #define AM_RAM_DEVREAD(_tag, _read) 		AM_DEVREAD(_tag, _read) AM_WRITEONLY
-#define AM_RAM_DEVWRITE(_tag, _write) 		AM_READONLY AM_DEVWRITE(_tag, _write)
+#define AM_RAM_DEVWRITE(_tag, _write)		AM_READONLY AM_DEVWRITE(_tag, _write)
 
 #define AM_BASE_SIZE_MEMBER(_struct, _base, _size)	AM_BASE_MEMBER(_struct, _base) AM_SIZE_MEMBER(_struct, _size)
 #define AM_BASE_SIZE_GENERIC(_member)		AM_BASE_GENERIC(_member) AM_SIZE_GENERIC(_member)

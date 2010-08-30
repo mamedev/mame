@@ -37,68 +37,68 @@
 
 ****************************************************************************
 
-	There are many implementations of delegate-like functionality for
-	C++ code, but none of them is a perfect drop-in fit for use in MAME.
-	In order to be useful in MAME, we need the following properties:
-	
-		* No significant overhead; we want to use these for memory
-		  accessors, and memory accessor overhead is already the dominant
-		  performance aspect for most drivers.
-		  
-		* Existing static functions need to be bound with an additional
-		  pointer parameter as the first argument. All existing 
-		  implementations that allow static function binding assume the
-		  same signature as the member functions.
-		
-		* We must be able to bind the function separately from the
-		  object. This is to allow configurations to bind functions
-		  before the objects are created.
-		  
-	Thus, the implementations below are based on existing works but are
-	really a new implementation that is specific to MAME.
-	
-	--------------------------------------------------------------------
-	
-	The "compatible" version of delegates is based on an implementation 
-	from Sergey Ryazanov, found here:
+    There are many implementations of delegate-like functionality for
+    C++ code, but none of them is a perfect drop-in fit for use in MAME.
+    In order to be useful in MAME, we need the following properties:
 
-		http://www.codeproject.com/KB/cpp/ImpossiblyFastCppDelegate.aspx
+        * No significant overhead; we want to use these for memory
+          accessors, and memory accessor overhead is already the dominant
+          performance aspect for most drivers.
 
-	These delegates essentially generate a templated static stub function
-	for each target function. The static function takes the first 
-	parameter, uses it as the object pointer, and calls through the 
-	member function. For static functions, the stub is compatible with
-	the signature of a static function, so we just set the stub directly.
-	
-	Pros:
-		* should work with any modern compiler
-		* static bindings are just as fast as direct calls
-	
-	Cons:
-		* lots of little stub functions generated
-		* double-hops on member function calls means more overhead
-		* calling through stub functions repackages parameters
-	
-	--------------------------------------------------------------------
-	
-	The "internal" version of delegates makes use of the internal 
-	structure of member function pointers in order to convert them at 
-	binding time into simple static function pointers. This only works 
-	on platforms where object->func(p1, p2) is equivalent in calling
-	convention to func(object, p1, p2).
-	
-	Most of the information on how this works comes from Don Clugston
-	in this article:
-	
-		http://www.codeproject.com/KB/cpp/FastDelegate.aspx
-	
-	Pros:
-		* as fast as a standard function call in static and member cases
-		* no stub functions or double-hops needed
-		
-	Cons:
-		* requires internal knowledge of the member function pointer
-		* only works for GCC (for now; MSVC info is also readily available)
+        * Existing static functions need to be bound with an additional
+          pointer parameter as the first argument. All existing
+          implementations that allow static function binding assume the
+          same signature as the member functions.
+
+        * We must be able to bind the function separately from the
+          object. This is to allow configurations to bind functions
+          before the objects are created.
+
+    Thus, the implementations below are based on existing works but are
+    really a new implementation that is specific to MAME.
+
+    --------------------------------------------------------------------
+
+    The "compatible" version of delegates is based on an implementation
+    from Sergey Ryazanov, found here:
+
+        http://www.codeproject.com/KB/cpp/ImpossiblyFastCppDelegate.aspx
+
+    These delegates essentially generate a templated static stub function
+    for each target function. The static function takes the first
+    parameter, uses it as the object pointer, and calls through the
+    member function. For static functions, the stub is compatible with
+    the signature of a static function, so we just set the stub directly.
+
+    Pros:
+        * should work with any modern compiler
+        * static bindings are just as fast as direct calls
+
+    Cons:
+        * lots of little stub functions generated
+        * double-hops on member function calls means more overhead
+        * calling through stub functions repackages parameters
+
+    --------------------------------------------------------------------
+
+    The "internal" version of delegates makes use of the internal
+    structure of member function pointers in order to convert them at
+    binding time into simple static function pointers. This only works
+    on platforms where object->func(p1, p2) is equivalent in calling
+    convention to func(object, p1, p2).
+
+    Most of the information on how this works comes from Don Clugston
+    in this article:
+
+        http://www.codeproject.com/KB/cpp/FastDelegate.aspx
+
+    Pros:
+        * as fast as a standard function call in static and member cases
+        * no stub functions or double-hops needed
+
+    Cons:
+        * requires internal knowledge of the member function pointer
+        * only works for GCC (for now; MSVC info is also readily available)
 
 ***************************************************************************/
 
@@ -125,8 +125,8 @@
 
 // nicer macros to hide the template gobblety-gook and to pass the names
 #define create_member_name(_class, _member, _name)	_create_member<_class, &_class::_member>(_name)
-#define create_member(_class, _member) 				_create_member<_class, &_class::_member>(#_class "::" #_member)
-#define create_static(_class, _func) 				_crate_static<_class, &_func>(#_func)
+#define create_member(_class, _member)				_create_member<_class, &_class::_member>(#_class "::" #_member)
+#define create_static(_class, _func)				_crate_static<_class, &_func>(#_func)
 
 
 
@@ -147,7 +147,7 @@ class delegate_generic_class;
 
 // ======================> bindable_object
 
-// define a bindable_object base class that must be at the root of any object 
+// define a bindable_object base class that must be at the root of any object
 // hierarchy which intends to do late binding
 class bindable_object
 {
@@ -157,8 +157,8 @@ public:
 	virtual ~bindable_object();
 };
 
-// define a deferred cast helper function that does a proper dynamic_cast 
-// from a bindable_object to the target class, and returns a delegate_generic_class 
+// define a deferred cast helper function that does a proper dynamic_cast
+// from a bindable_object to the target class, and returns a delegate_generic_class
 template<class _TargetClass>
 static delegate_generic_class *deferred_cast(bindable_object &object)
 {
@@ -190,7 +190,7 @@ public:
 	const char *name() const { return m_name; }
 
 protected:
-	deferred_cast_func 		m_caster;			// pointer to helper function that does the cast
+	deferred_cast_func		m_caster;			// pointer to helper function that does the cast
 	const char *			m_name;				// name string
 };
 
@@ -216,18 +216,18 @@ public:
 	proto_delegate_0param(static_func function = NULL, deferred_cast_func caster = NULL, const char *name = NULL)
 		: delegate_base(caster, name),
 		  m_function(function) { }
-	
+
 	proto_delegate_0param(const proto_delegate_0param &proto)
 		: delegate_base(proto.m_caster, proto.m_name),
 		  m_function(proto.m_function) { }
-	
+
 	// create a member function proto-delegate
 	template<class _FunctionClass, _ReturnType (_FunctionClass::*_FunctionPtr)()>
 	static proto_delegate_0param _create_member(const char *name = NULL)
 	{
 		return proto_delegate_0param(&method_stub<_FunctionClass, _FunctionPtr>, &deferred_cast<_FunctionClass>, name);
 	}
-	
+
 	// create a static function proto-delegate
 	template<class _FunctionClass, _ReturnType (*_FunctionPtr)(_FunctionClass *)>
 	static proto_delegate_0param _create_static(const char *name = NULL)
@@ -264,26 +264,26 @@ class delegate_0param : public proto_delegate_0param<_ReturnType>
 
 	using delegate_base::m_caster;
 	using proto_base::m_function;
-	
+
 public:
 	// constructors
 	delegate_0param()
 		: m_object(NULL) { }
-	
+
 	delegate_0param(proto_base proto)
 		: proto_delegate_0param<_ReturnType>(proto),
 		  m_object(NULL) { }
-	
+
 	delegate_0param(proto_base proto, bindable_object &object)
 		: proto_delegate_0param<_ReturnType>(proto),
 		  m_object((*m_caster)(object)) { }
-	
+
 	// bind the actual object
 	void bind(bindable_object &object) { m_object = (*m_caster)(object); }
 
 	// call the function
 	_ReturnType operator()() const { return (*m_function)(m_object); }
-	
+
 	// testing
 	bool has_object() const { return (m_object != NULL); }
 	bool operator==(const delegate_0param &rhs) const { return (m_object == rhs.m_object && proto_base::operator==(rhs)); }
@@ -308,18 +308,18 @@ public:
 	proto_delegate_1param(static_func function = NULL, deferred_cast_func caster = NULL, const char *name = NULL)
 		: delegate_base(caster, name),
 		  m_function(function) { }
-	
+
 	proto_delegate_1param(const proto_delegate_1param &proto)
 		: delegate_base(proto.m_caster, proto.m_name),
 		  m_function(proto.m_function) { }
-	
+
 	// create a member function proto-delegate
 	template<class _FunctionClass, _ReturnType (_FunctionClass::*_FunctionPtr)(_P1Type)>
 	static proto_delegate_1param _create_member(const char *name = NULL)
 	{
 		return proto_delegate_1param(&method_stub<_FunctionClass, _FunctionPtr>, &deferred_cast<_FunctionClass>, name);
 	}
-	
+
 	// create a static function proto-delegate
 	template<class _FunctionClass, _ReturnType (*_FunctionPtr)(_FunctionClass *, _P1Type)>
 	static proto_delegate_1param _create_static(const char *name = NULL)
@@ -353,7 +353,7 @@ template<typename _ReturnType, typename _P1Type>
 class delegate_1param : public proto_delegate_1param<_ReturnType, _P1Type>
 {
 	typedef proto_delegate_1param<_ReturnType, _P1Type> proto_base;
-	
+
 	using delegate_base::m_caster;
 	using proto_base::m_function;
 
@@ -361,21 +361,21 @@ public:
 	// constructors
 	delegate_1param()
 		: m_object(NULL) { }
-	
+
 	delegate_1param(proto_delegate_1param<_ReturnType, _P1Type> proto)
 		: proto_delegate_1param<_ReturnType, _P1Type>(proto),
 		  m_object(NULL) { }
-	
+
 	delegate_1param(proto_delegate_1param<_ReturnType, _P1Type> proto, bindable_object &object)
 		: proto_delegate_1param<_ReturnType, _P1Type>(proto),
 		  m_object((*m_caster)(object)) { }
-	
+
 	// bind the actual object
 	void bind(bindable_object &object) { m_object = (*m_caster)(object); }
 
 	// call the function
 	_ReturnType operator()(_P1Type p1) const { return (*m_function)(m_object, p1); }
-	
+
 	// testing
 	bool has_object() const { return (m_object != NULL); }
 	bool operator==(const delegate_1param &rhs) const { return (m_object == rhs.m_object && proto_base::operator==(rhs)); }
@@ -400,18 +400,18 @@ public:
 	proto_delegate_2param(static_func function = NULL, deferred_cast_func caster = NULL, const char *name = NULL)
 		: delegate_base(caster, name),
 		  m_function(function) { }
-	
+
 	proto_delegate_2param(const proto_delegate_2param &proto)
 		: delegate_base(proto.m_caster, proto.m_name),
 		  m_function(proto.m_function) { }
-	
+
 	// create a member function proto-delegate
 	template<class _FunctionClass, _ReturnType (_FunctionClass::*_FunctionPtr)(_P1Type, _P2Type)>
 	static proto_delegate_2param _create_member(const char *name = NULL)
 	{
 		return proto_delegate_2param(&method_stub<_FunctionClass, _FunctionPtr>, &deferred_cast<_FunctionClass>, name);
 	}
-	
+
 	// create a static function proto-delegate
 	template<class _FunctionClass, _ReturnType (*_FunctionPtr)(_FunctionClass *, _P1Type, _P2Type)>
 	static proto_delegate_2param _create_static(const char *name = NULL)
@@ -445,7 +445,7 @@ template<typename _ReturnType, typename _P1Type, typename _P2Type>
 class delegate_2param : public proto_delegate_2param<_ReturnType, _P1Type, _P2Type>
 {
 	typedef proto_delegate_2param<_ReturnType, _P1Type, _P2Type> proto_base;
-	
+
 	using delegate_base::m_caster;
 	using proto_base::m_function;
 
@@ -453,21 +453,21 @@ public:
 	// constructors
 	delegate_2param()
 		: m_object(NULL) { }
-	
+
 	delegate_2param(proto_delegate_2param<_ReturnType, _P1Type, _P2Type> proto)
 		: proto_delegate_2param<_ReturnType, _P1Type, _P2Type>(proto),
 		  m_object(NULL) { }
-	
+
 	delegate_2param(proto_delegate_2param<_ReturnType, _P1Type, _P2Type> proto, bindable_object &object)
 		: proto_delegate_2param<_ReturnType, _P1Type, _P2Type>(proto),
 		  m_object((*m_caster)(object)) { }
-	
+
 	// bind the actual object
 	void bind(bindable_object &object) { m_object = (*m_caster)(object); }
 
 	// call the function
 	_ReturnType operator()(_P1Type p1, _P2Type p2) const { return (*m_function)(m_object, p1, p2); }
-	
+
 	// testing
 	bool has_object() const { return (m_object != NULL); }
 	bool operator==(const delegate_2param &rhs) const { return (m_object == rhs.m_object && proto_base::operator==(rhs)); }
@@ -492,18 +492,18 @@ public:
 	proto_delegate_3param(static_func function = NULL, deferred_cast_func caster = NULL, const char *name = NULL)
 		: delegate_base(caster, name),
 		  m_function(function) { }
-	
+
 	proto_delegate_3param(const proto_delegate_3param &proto)
 		: delegate_base(proto.m_caster, proto.m_name),
 		  m_function(proto.m_function) { }
-	
+
 	// create a member function proto-delegate
 	template<class _FunctionClass, _ReturnType (_FunctionClass::*_FunctionPtr)(_P1Type, _P2Type, _P3Type)>
 	static proto_delegate_3param _create_member(const char *name = NULL)
 	{
 		return proto_delegate_3param(&method_stub<_FunctionClass, _FunctionPtr>, &deferred_cast<_FunctionClass>, name);
 	}
-	
+
 	// create a static function proto-delegate
 	template<class _FunctionClass, _ReturnType (*_FunctionPtr)(_FunctionClass *, _P1Type, _P2Type, _P3Type)>
 	static proto_delegate_3param _create_static(const char *name = NULL)
@@ -537,7 +537,7 @@ template<typename _ReturnType, typename _P1Type, typename _P2Type, typename _P3T
 class delegate_3param : public proto_delegate_3param<_ReturnType, _P1Type, _P2Type, _P3Type>
 {
 	typedef proto_delegate_3param<_ReturnType, _P1Type, _P2Type, _P3Type> proto_base;
-	
+
 	using delegate_base::m_caster;
 	using proto_base::m_function;
 
@@ -545,21 +545,21 @@ public:
 	// constructors
 	delegate_3param()
 		: m_object(NULL) { }
-	
+
 	delegate_3param(proto_delegate_3param<_ReturnType, _P1Type, _P2Type, _P3Type> proto)
 		: proto_delegate_3param<_ReturnType, _P1Type, _P2Type, _P3Type>(proto),
 		  m_object(NULL) { }
-	
+
 	delegate_3param(proto_delegate_3param<_ReturnType, _P1Type, _P2Type, _P3Type> proto, bindable_object &object)
 		: proto_delegate_3param<_ReturnType, _P1Type, _P2Type, _P3Type>(proto),
 		  m_object((*m_caster)(object)) { }
-	
+
 	// bind the actual object
 	void bind(bindable_object &object) { m_object = (*m_caster)(object); }
 
 	// call the function
 	_ReturnType operator()(_P1Type p1, _P2Type p2, _P3Type p3) const { return (*m_function)(m_object, p1, p2, p3); }
-	
+
 	// testing
 	bool has_object() const { return (m_object != NULL); }
 	bool operator==(const delegate_3param &rhs) const { return (m_object == rhs.m_object && proto_base::operator==(rhs)); }
@@ -584,18 +584,18 @@ public:
 	proto_delegate_4param(static_func function = NULL, deferred_cast_func caster = NULL, const char *name = NULL)
 		: delegate_base(caster, name),
 		  m_function(function) { }
-	
+
 	proto_delegate_4param(const proto_delegate_4param &proto)
 		: delegate_base(proto.m_caster, proto.m_name),
 		  m_function(proto.m_function) { }
-	
+
 	// create a member function proto-delegate
 	template<class _FunctionClass, _ReturnType (_FunctionClass::*_FunctionPtr)(_P1Type, _P2Type, _P3Type, _P4Type)>
 	static proto_delegate_4param _create_member(const char *name = NULL)
 	{
 		return proto_delegate_4param(&method_stub<_FunctionClass, _FunctionPtr>, &deferred_cast<_FunctionClass>, name);
 	}
-	
+
 	// create a static function proto-delegate
 	template<class _FunctionClass, _ReturnType (*_FunctionPtr)(_FunctionClass *, _P1Type, _P2Type, _P3Type, _P4Type)>
 	static proto_delegate_4param _create_static(const char *name = NULL)
@@ -629,7 +629,7 @@ template<typename _ReturnType, typename _P1Type, typename _P2Type, typename _P3T
 class delegate_4param : public proto_delegate_4param<_ReturnType, _P1Type, _P2Type, _P3Type, _P4Type>
 {
 	typedef proto_delegate_4param<_ReturnType, _P1Type, _P2Type, _P3Type, _P4Type> proto_base;
-	
+
 	using delegate_base::m_caster;
 	using proto_base::m_function;
 
@@ -637,21 +637,21 @@ public:
 	// constructors
 	delegate_4param()
 		: m_object(NULL) { }
-	
+
 	delegate_4param(proto_delegate_4param<_ReturnType, _P1Type, _P2Type, _P3Type, _P4Type> proto)
 		: proto_delegate_4param<_ReturnType, _P1Type, _P2Type, _P3Type, _P4Type>(proto),
 		  m_object(NULL) { }
-	
+
 	delegate_4param(proto_delegate_4param<_ReturnType, _P1Type, _P2Type, _P3Type, _P4Type> proto, bindable_object &object)
 		: proto_delegate_4param<_ReturnType, _P1Type, _P2Type, _P3Type, _P4Type>(proto),
 		  m_object((*m_caster)(object)) { }
-	
+
 	// bind the actual object
 	void bind(bindable_object &object) { m_object = (*m_caster)(object); }
 
 	// call the function
 	_ReturnType operator()(_P1Type p1, _P2Type p2, _P3Type p3, _P4Type p4) const { return (*m_function)(m_object, p1, p2, p3, p4); }
-	
+
 	// testing
 	bool has_object() const { return (m_object != NULL); }
 	bool operator==(const delegate_4param &rhs) const { return (m_object == rhs.m_object && proto_base::operator==(rhs)); }
@@ -680,7 +680,7 @@ struct delegate_gcc_mfp_internal
 	union										// first item can be one of two things:
 	{
 		delegate_generic_function funcptr;		// if even, it's a pointer to the function
-		FPTR 				vtable_index;		// if odd, it's the byte offset into the vtable
+		FPTR				vtable_index;		// if odd, it's the byte offset into the vtable
 	} u;
 	int 					this_delta;			// delta to apply to the 'this' pointer
 };
@@ -707,12 +707,12 @@ public:
 		: delegate_base(caster, name),
 		  m_function(function),
 		  m_rawfunction(mfp) { }
-	
+
 	proto_delegate_0param(const proto_delegate_0param &proto)
 		: delegate_base(proto.m_caster, proto.m_name),
 		  m_function(proto.m_function),
 		  m_rawfunction(proto.m_rawfunction) { }
-	
+
 	// create a member function proto-delegate
 	template<class _FunctionClass, _ReturnType (_FunctionClass::*_FunctionPtr)()>
 	static proto_delegate_0param _create_member(const char *name = NULL)
@@ -725,19 +725,19 @@ public:
 		tempunion.mfp = _FunctionPtr;
 		return proto_delegate_0param(tempunion.internal, NULL, &deferred_cast<_FunctionClass>, name);
 	}
-	
+
 	// create a static function proto-delegate
 	template<class _FunctionClass, _ReturnType (*_FunctionPtr)(_FunctionClass *)>
 	static proto_delegate_0param _create_static(const char *name = NULL)
 	{
 		return proto_delegate_0param(delegate_gcc_mfp_null, reinterpret_cast<static_func>(_FunctionPtr), &deferred_cast<_FunctionClass>, name);
 	}
-	
+
 	// equality testing
 	bool operator==(const proto_delegate_0param &rhs) const
 	{
-		return (m_function == rhs.m_function && m_caster == rhs.m_caster && 
-				m_rawfunction.u.funcptr == rhs.m_rawfunction.u.funcptr && 
+		return (m_function == rhs.m_function && m_caster == rhs.m_caster &&
+				m_rawfunction.u.funcptr == rhs.m_rawfunction.u.funcptr &&
 				m_rawfunction.this_delta == rhs.m_rawfunction.this_delta);
 	}
 
@@ -764,11 +764,11 @@ public:
 	// constructors
 	delegate_0param()
 		: m_object(NULL) { }
-	
+
 	delegate_0param(proto_base proto)
 		: proto_delegate_0param<_ReturnType>(proto),
 		  m_object(NULL) { }
-	
+
 	delegate_0param(proto_base proto, bindable_object &object)
 		: proto_delegate_0param<_ReturnType>(proto),
 		  m_object(NULL) { bind(object); }
@@ -780,10 +780,10 @@ public:
 		if (m_rawfunction.u.funcptr != NULL)
 			m_function = reinterpret_cast<static_func>(delegate_convert_raw(m_object, m_rawfunction));
 	}
-	
+
 	// call the function
 	_ReturnType operator()() const { return (*m_function)(m_object); }
-	
+
 	// testing
 	bool has_object() const { return (m_object != NULL); }
 	bool operator==(const delegate_0param &rhs) const { return (m_object == rhs.m_object && proto_base::operator==(rhs)); }
@@ -809,12 +809,12 @@ public:
 		: delegate_base(caster, name),
 		  m_function(function),
 		  m_rawfunction(mfp) { }
-	
+
 	proto_delegate_1param(const proto_delegate_1param &proto)
 		: delegate_base(proto.m_caster, proto.m_name),
 		  m_function(proto.m_function),
 		  m_rawfunction(proto.m_rawfunction) { }
-	
+
 	// create a member function proto-delegate
 	template<class _FunctionClass, _ReturnType (_FunctionClass::*_FunctionPtr)(_P1Type)>
 	static proto_delegate_1param _create_member(const char *name = NULL)
@@ -827,19 +827,19 @@ public:
 		tempunion.mfp = _FunctionPtr;
 		return proto_delegate_1param(tempunion.internal, NULL, &deferred_cast<_FunctionClass>, name);
 	}
-	
+
 	// create a static function proto-delegate
 	template<class _FunctionClass, _ReturnType (*_FunctionPtr)(_FunctionClass *, _P1Type)>
 	static proto_delegate_1param _create_static(const char *name = NULL)
 	{
 		return proto_delegate_1param(delegate_gcc_mfp_null, reinterpret_cast<static_func>(_FunctionPtr), &deferred_cast<_FunctionClass>, name);
 	}
-	
+
 	// equality testing
 	bool operator==(const proto_delegate_1param &rhs) const
 	{
-		return (m_function == rhs.m_function && m_caster == rhs.m_caster && 
-				m_rawfunction.u.funcptr == rhs.m_rawfunction.u.funcptr && 
+		return (m_function == rhs.m_function && m_caster == rhs.m_caster &&
+				m_rawfunction.u.funcptr == rhs.m_rawfunction.u.funcptr &&
 				m_rawfunction.this_delta == rhs.m_rawfunction.this_delta);
 	}
 
@@ -866,11 +866,11 @@ public:
 	// constructors
 	delegate_1param()
 		: m_object(NULL) { }
-	
+
 	delegate_1param(proto_base proto)
 		: proto_delegate_1param<_ReturnType, _P1Type>(proto),
 		  m_object(NULL) { }
-	
+
 	delegate_1param(proto_base proto, bindable_object &object)
 		: proto_delegate_1param<_ReturnType, _P1Type>(proto),
 		  m_object(NULL) { bind(object); }
@@ -882,10 +882,10 @@ public:
 		if (m_rawfunction.u.funcptr != NULL)
 			m_function = reinterpret_cast<static_func>(delegate_convert_raw(m_object, m_rawfunction));
 	}
-	
+
 	// call the function
 	_ReturnType operator()(_P1Type p1) const { return (*m_function)(m_object, p1); }
-	
+
 	// testing
 	bool has_object() const { return (m_object != NULL); }
 	bool operator==(const delegate_1param &rhs) const { return (m_object == rhs.m_object && proto_base::operator==(rhs)); }
@@ -911,12 +911,12 @@ public:
 		: delegate_base(caster, name),
 		  m_function(function),
 		  m_rawfunction(mfp) { }
-	
+
 	proto_delegate_2param(const proto_delegate_2param &proto)
 		: delegate_base(proto.m_caster, proto.m_name),
 		  m_function(proto.m_function),
 		  m_rawfunction(proto.m_rawfunction) { }
-	
+
 	// create a member function proto-delegate
 	template<class _FunctionClass, _ReturnType (_FunctionClass::*_FunctionPtr)(_P1Type, _P2Type)>
 	static proto_delegate_2param _create_member(const char *name = NULL)
@@ -929,19 +929,19 @@ public:
 		tempunion.mfp = _FunctionPtr;
 		return proto_delegate_2param(tempunion.internal, NULL, &deferred_cast<_FunctionClass>, name);
 	}
-	
+
 	// create a static function proto-delegate
 	template<class _FunctionClass, _ReturnType (*_FunctionPtr)(_FunctionClass *, _P1Type, _P2Type)>
 	static proto_delegate_2param _create_static(const char *name = NULL)
 	{
 		return proto_delegate_2param(delegate_gcc_mfp_null, reinterpret_cast<static_func>(_FunctionPtr), &deferred_cast<_FunctionClass>, name);
 	}
-	
+
 	// equality testing
 	bool operator==(const proto_delegate_2param &rhs) const
 	{
-		return (m_function == rhs.m_function && m_caster == rhs.m_caster && 
-				m_rawfunction.u.funcptr == rhs.m_rawfunction.u.funcptr && 
+		return (m_function == rhs.m_function && m_caster == rhs.m_caster &&
+				m_rawfunction.u.funcptr == rhs.m_rawfunction.u.funcptr &&
 				m_rawfunction.this_delta == rhs.m_rawfunction.this_delta);
 	}
 
@@ -968,11 +968,11 @@ public:
 	// constructors
 	delegate_2param()
 		: m_object(NULL) { }
-	
+
 	delegate_2param(proto_base proto)
 		: proto_delegate_2param<_ReturnType, _P1Type, _P2Type>(proto),
 		  m_object(NULL) { }
-	
+
 	delegate_2param(proto_base proto, bindable_object &object)
 		: proto_delegate_2param<_ReturnType, _P1Type, _P2Type>(proto),
 		  m_object(NULL) { bind(object); }
@@ -984,10 +984,10 @@ public:
 		if (m_rawfunction.u.funcptr != NULL)
 			m_function = reinterpret_cast<static_func>(delegate_convert_raw(m_object, m_rawfunction));
 	}
-	
+
 	// call the function
 	_ReturnType operator()(_P1Type p1, _P2Type p2) const { return (*m_function)(m_object, p1, p2); }
-	
+
 	// testing
 	bool has_object() const { return (m_object != NULL); }
 	bool operator==(const delegate_2param &rhs) const { return (m_object == rhs.m_object && proto_base::operator==(rhs)); }
@@ -1013,12 +1013,12 @@ public:
 		: delegate_base(caster, name),
 		  m_function(function),
 		  m_rawfunction(mfp) { }
-	
+
 	proto_delegate_3param(const proto_delegate_3param &proto)
 		: delegate_base(proto.m_caster, proto.m_name),
 		  m_function(proto.m_function),
 		  m_rawfunction(proto.m_rawfunction) { }
-	
+
 	// create a member function proto-delegate
 	template<class _FunctionClass, _ReturnType (_FunctionClass::*_FunctionPtr)(_P1Type, _P2Type, _P3Type)>
 	static proto_delegate_3param _create_member(const char *name = NULL)
@@ -1031,19 +1031,19 @@ public:
 		tempunion.mfp = _FunctionPtr;
 		return proto_delegate_3param(tempunion.internal, NULL, &deferred_cast<_FunctionClass>, name);
 	}
-	
+
 	// create a static function proto-delegate
 	template<class _FunctionClass, _ReturnType (*_FunctionPtr)(_FunctionClass *, _P1Type, _P2Type, _P3Type)>
 	static proto_delegate_3param _create_static(const char *name = NULL)
 	{
 		return proto_delegate_3param(delegate_gcc_mfp_null, reinterpret_cast<static_func>(_FunctionPtr), &deferred_cast<_FunctionClass>, name);
 	}
-	
+
 	// equality testing
 	bool operator==(const proto_delegate_3param &rhs) const
 	{
-		return (m_function == rhs.m_function && m_caster == rhs.m_caster && 
-				m_rawfunction.u.funcptr == rhs.m_rawfunction.u.funcptr && 
+		return (m_function == rhs.m_function && m_caster == rhs.m_caster &&
+				m_rawfunction.u.funcptr == rhs.m_rawfunction.u.funcptr &&
 				m_rawfunction.this_delta == rhs.m_rawfunction.this_delta);
 	}
 
@@ -1070,11 +1070,11 @@ public:
 	// constructors
 	delegate_3param()
 		: m_object(NULL) { }
-	
+
 	delegate_3param(proto_base proto)
 		: proto_delegate_3param<_ReturnType, _P1Type, _P2Type, _P3Type>(proto),
 		  m_object(NULL) { }
-	
+
 	delegate_3param(proto_base proto, bindable_object &object)
 		: proto_delegate_3param<_ReturnType, _P1Type, _P2Type, _P3Type>(proto),
 		  m_object(NULL) { bind(object); }
@@ -1086,10 +1086,10 @@ public:
 		if (m_rawfunction.u.funcptr != NULL)
 			m_function = reinterpret_cast<static_func>(delegate_convert_raw(m_object, m_rawfunction));
 	}
-	
+
 	// call the function
 	_ReturnType operator()(_P1Type p1, _P2Type p2, _P3Type p3) const { return (*m_function)(m_object, p1, p2, p3); }
-	
+
 	// testing
 	bool has_object() const { return (m_object != NULL); }
 	bool operator==(const delegate_3param &rhs) const { return (m_object == rhs.m_object && proto_base::operator==(rhs)); }
@@ -1115,12 +1115,12 @@ public:
 		: delegate_base(caster, name),
 		  m_function(function),
 		  m_rawfunction(mfp) { }
-	
+
 	proto_delegate_4param(const proto_delegate_4param &proto)
 		: delegate_base(proto.m_caster, proto.m_name),
 		  m_function(proto.m_function),
 		  m_rawfunction(proto.m_rawfunction) { }
-	
+
 	// create a member function proto-delegate
 	template<class _FunctionClass, _ReturnType (_FunctionClass::*_FunctionPtr)(_P1Type, _P2Type, _P3Type, _P4Type)>
 	static proto_delegate_4param _create_member(const char *name = NULL)
@@ -1133,19 +1133,19 @@ public:
 		tempunion.mfp = _FunctionPtr;
 		return proto_delegate_4param(tempunion.internal, NULL, &deferred_cast<_FunctionClass>, name);
 	}
-	
+
 	// create a static function proto-delegate
 	template<class _FunctionClass, _ReturnType (*_FunctionPtr)(_FunctionClass *, _P1Type, _P2Type, _P3Type, _P4Type)>
 	static proto_delegate_4param _create_static(const char *name = NULL)
 	{
 		return proto_delegate_4param(delegate_gcc_mfp_null, reinterpret_cast<static_func>(_FunctionPtr), &deferred_cast<_FunctionClass>, name);
 	}
-	
+
 	// equality testing
 	bool operator==(const proto_delegate_4param &rhs) const
 	{
-		return (m_function == rhs.m_function && m_caster == rhs.m_caster && 
-				m_rawfunction.u.funcptr == rhs.m_rawfunction.u.funcptr && 
+		return (m_function == rhs.m_function && m_caster == rhs.m_caster &&
+				m_rawfunction.u.funcptr == rhs.m_rawfunction.u.funcptr &&
 				m_rawfunction.this_delta == rhs.m_rawfunction.this_delta);
 	}
 
@@ -1172,11 +1172,11 @@ public:
 	// constructors
 	delegate_4param()
 		: m_object(NULL) { }
-	
+
 	delegate_4param(proto_base proto)
 		: proto_delegate_4param<_ReturnType, _P1Type, _P2Type, _P3Type, _P4Type>(proto),
 		  m_object(NULL) { }
-	
+
 	delegate_4param(proto_base proto, bindable_object &object)
 		: proto_delegate_4param<_ReturnType, _P1Type, _P2Type, _P3Type, _P4Type>(proto),
 		  m_object(NULL) { bind(object); }
@@ -1188,10 +1188,10 @@ public:
 		if (m_rawfunction.u.funcptr != NULL)
 			m_function = reinterpret_cast<static_func>(delegate_convert_raw(m_object, m_rawfunction));
 	}
-	
+
 	// call the function
 	_ReturnType operator()(_P1Type p1, _P2Type p2, _P3Type p3, _P4Type p4) const { return (*m_function)(m_object, p1, p2, p3, p4); }
-	
+
 	// testing
 	bool has_object() const { return (m_object != NULL); }
 	bool operator==(const delegate_4param &rhs) const { return (m_object == rhs.m_object && proto_base::operator==(rhs)); }

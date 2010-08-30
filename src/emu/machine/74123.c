@@ -172,7 +172,7 @@ int ttl74123_device::timer_running()
 
 
 /*-------------------------------------------------
-	TIMER_CALLBACK( output_callback )
+    TIMER_CALLBACK( output_callback )
 -------------------------------------------------*/
 
 TIMER_CALLBACK( ttl74123_device::output_callback )

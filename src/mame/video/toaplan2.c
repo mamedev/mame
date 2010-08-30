@@ -99,7 +99,7 @@ VIDEO_START( toaplan2 )
 
 	if (state->vdp1 != NULL)
 	{
- 		state->secondary_render_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
+		state->secondary_render_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
 		state->vdp1->custom_priority_bitmap = state->custom_priority_bitmap;
 		state->vdp1->displog = &state->displog;
 	}
@@ -345,7 +345,7 @@ VIDEO_UPDATE( toaplan2_dual )
 	{
 		gp9001_log_vram(state->vdp0, screen->machine);
 
-	//	bitmap_fill(bitmap,cliprect,0);
+	//  bitmap_fill(bitmap,cliprect,0);
 		bitmap_fill(state->custom_priority_bitmap, cliprect, 0);
 		state->vdp0->gp9001_render_vdp(screen->machine, bitmap, cliprect);
 	}
@@ -360,8 +360,8 @@ VIDEO_UPDATE( toaplan2_mixed )
 {
 	toaplan2_state *state = screen->machine->driver_data<toaplan2_state>();
 
-//	bitmap_fill(bitmap,cliprect,0);
-//	bitmap_fill(gp9001_custom_priority_bitmap, cliprect, 0);
+//  bitmap_fill(bitmap,cliprect,0);
+//  bitmap_fill(gp9001_custom_priority_bitmap, cliprect, 0);
 
 	if (state->vdp0)
 	{
@@ -379,7 +379,7 @@ VIDEO_UPDATE( toaplan2_mixed )
 		bitmap_fill(state->custom_priority_bitmap, cliprect, 0);
 		state->vdp1->gp9001_render_vdp(screen->machine, state->secondary_render_bitmap, cliprect);
 	}
-	
+
 
 	// key test places in batsugun
 	// level 2 - the two layers of clouds (will appear under background, or over ships if wrong)
@@ -390,7 +390,7 @@ VIDEO_UPDATE( toaplan2_mixed )
 	//
 	// when implemented based directly on the PAL equation it doesn't work, however, my own equations roughly based
 	// on that do.
-	// 
+	//
 
 	if (state->vdp0 && state->vdp1)
 	{
@@ -409,11 +409,11 @@ VIDEO_UPDATE( toaplan2_mixed )
 			{
 				UINT16 GPU0_LUTaddr = src_vdp0[x];
 				UINT16 GPU1_LUTaddr = src_vdp1[x];
-				
+
 				// these equations is derived from the PAL, but doesn't seem to work?
 
 				int COMPARISON = ((GPU0_LUTaddr & 0x0780) > (GPU1_LUTaddr & 0x0780));
-				
+
 				// note: GPU1_LUTaddr & 0x000f - transparency check for vdp1? (gfx are 4bpp, the low 4 bits of the lookup would be the pixel data value)
 #if 0
 				int result =

@@ -176,7 +176,7 @@ void ttl7474_device::device_reset()
 
 void ttl7474_device::update()
 {
-    if (!m_preset && m_clear)          	/* line 1 in truth table */
+    if (!m_preset && m_clear)       	/* line 1 in truth table */
 	{
         m_output    = 1;
         m_output_comp = 0;
@@ -191,7 +191,7 @@ void ttl7474_device::update()
         m_output    = 1;
         m_output_comp = 1;
 	}
-    else if (!m_last_clock && m_clk)  	/* line 4 in truth table */
+    else if (!m_last_clock && m_clk)	/* line 4 in truth table */
 	{
         m_output    =  m_d;
         m_output_comp = !m_d;

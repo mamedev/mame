@@ -359,7 +359,7 @@ static READ8_HANDLER( dip_switch_r )
 	{
 	case 0x01:
 		/* For the DIP switches to be read, protection_data must be
-		   0xff on reset. The AY8910 reset ensures this. */
+           0xff on reset. The AY8910 reset ensures this. */
 		if (state->protection_data != 0xff)
 			ret = state->protection_data ^ 0x88;
 		else

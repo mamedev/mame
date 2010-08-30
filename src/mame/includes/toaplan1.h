@@ -26,7 +26,7 @@ public:
 	/* Demon world */
 	int dsp_on;
 	int dsp_BIO;
-	int dsp_execute;                 
+	int dsp_execute;
 	UINT32 dsp_addr_w;
 	UINT32 main_ram_seg;
 
@@ -80,7 +80,7 @@ public:
 	int reset;		/* Hack! See toaplan1_bcu_control below */
 
 	tilemap_t *pf1_tilemap, *pf2_tilemap, *pf3_tilemap, *pf4_tilemap;
-	
+
 	// an empty tile, so that we can safely disable tiles
 	UINT8        empty_tile[8*8];
 };

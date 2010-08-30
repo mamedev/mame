@@ -11,7 +11,7 @@ public:
 	UINT8 *spriteram;
 	UINT8 *fgram;
 	UINT8 *bgram;
- 
+
 	int sound_cpu_busy;
 	UINT32 bg_tile_offset;
 };

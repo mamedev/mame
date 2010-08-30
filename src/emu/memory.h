@@ -212,7 +212,7 @@ typedef delegate_4param<void, address_space &, offs_t, UINT64, UINT64> write64_d
 class direct_read_data
 {
 	friend class address_table;
-	
+
 public:
 	// direct_range is an internal class that is part of a list of start/end ranges
 	class direct_range
@@ -226,7 +226,7 @@ public:
 
 		// getters
 		direct_range *next() const { return m_next; }
-		
+
 		// internal state
 		direct_range *			m_next;					// pointer to the next range in the list
 		offs_t					m_bytestart;			// starting byte offset of the range
@@ -281,8 +281,8 @@ private:
 	offs_t						m_bytestart;			// minimum valid byte address
 	offs_t						m_byteend;				// maximum valid byte address
 	UINT8						m_entry;				// live entry
-	simple_list<direct_range> 	m_rangelist[256];		// list of ranges for each entry
-	simple_list<direct_range> 	m_freerangelist;		// list of recycled range entries
+	simple_list<direct_range>	m_rangelist[256];		// list of ranges for each entry
+	simple_list<direct_range>	m_freerangelist;		// list of recycled range entries
 	direct_update_delegate		m_directupdate;			// fast direct-access update callback
 };
 
@@ -420,7 +420,7 @@ public:
 
 	// decryption
 	void set_decrypted_region(offs_t addrstart, offs_t addrend, void *base);
-	
+
 	// direct access
 	direct_update_delegate set_direct_update_handler(direct_update_delegate function) { return m_direct.set_direct_update(function); }
 	bool set_direct_region(offs_t &byteaddress);
@@ -551,7 +551,7 @@ protected:
 
 
 // space read/write handler function macros
-#define READ8_MEMBER(name) 				UINT8  name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT8 mem_mask)
+#define READ8_MEMBER(name)				UINT8  name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT8 mem_mask)
 #define WRITE8_MEMBER(name)				void   name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT8 data, ATTR_UNUSED UINT8 mem_mask)
 #define READ16_MEMBER(name)				UINT16 name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 mem_mask)
 #define WRITE16_MEMBER(name)			void   name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 data, ATTR_UNUSED UINT16 mem_mask)
@@ -560,7 +560,7 @@ protected:
 #define READ64_MEMBER(name)				UINT64 name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT64 mem_mask)
 #define WRITE64_MEMBER(name)			void   name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT64 data, ATTR_UNUSED UINT64 mem_mask)
 
-#define DECLARE_READ8_MEMBER(name) 		UINT8  name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT8 mem_mask = 0xff)
+#define DECLARE_READ8_MEMBER(name)		UINT8  name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT8 mem_mask = 0xff)
 #define DECLARE_WRITE8_MEMBER(name)		void   name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT8 data, ATTR_UNUSED UINT8 mem_mask = 0xff)
 #define DECLARE_READ16_MEMBER(name)		UINT16 name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 mem_mask = 0xffff)
 #define DECLARE_WRITE16_MEMBER(name)	void   name(ATTR_UNUSED address_space &space, ATTR_UNUSED offs_t offset, ATTR_UNUSED UINT16 data, ATTR_UNUSED UINT16 mem_mask = 0xffff)
@@ -781,14 +781,14 @@ inline UINT8 direct_read_data::read_raw_byte(offs_t byteaddress)
 		return m_raw[byteaddress & m_bytemask];
 	return m_space.read_byte(byteaddress);
 }
-		
+
 inline UINT8 direct_read_data::read_decrypted_byte(offs_t byteaddress)
 {
 	if (address_is_valid(byteaddress))
 		return m_decrypted[byteaddress & m_bytemask];
 	return m_space.read_byte(byteaddress);
 }
-		
+
 
 //-------------------------------------------------
 //  read_raw_word - read a word via the
@@ -801,14 +801,14 @@ inline UINT16 direct_read_data::read_raw_word(offs_t byteaddress)
 		return *reinterpret_cast<UINT16 *>(&m_raw[byteaddress & m_bytemask]);
 	return m_space.read_word(byteaddress);
 }
-		
+
 inline UINT16 direct_read_data::read_decrypted_word(offs_t byteaddress)
 {
 	if (address_is_valid(byteaddress))
 		return *reinterpret_cast<UINT16 *>(&m_decrypted[byteaddress & m_bytemask]);
 	return m_space.read_word(byteaddress);
 }
-		
+
 
 //-------------------------------------------------
 //  read_raw_dword - read a dword via the
@@ -821,14 +821,14 @@ inline UINT32 direct_read_data::read_raw_dword(offs_t byteaddress)
 		return *reinterpret_cast<UINT32 *>(&m_raw[byteaddress & m_bytemask]);
 	return m_space.read_dword(byteaddress);
 }
-		
+
 inline UINT32 direct_read_data::read_decrypted_dword(offs_t byteaddress)
 {
 	if (address_is_valid(byteaddress))
 		return *reinterpret_cast<UINT32 *>(&m_decrypted[byteaddress & m_bytemask]);
 	return m_space.read_dword(byteaddress);
 }
-		
+
 
 //-------------------------------------------------
 //  read_raw_qword - read a qword via the
@@ -841,13 +841,13 @@ inline UINT64 direct_read_data::read_raw_qword(offs_t byteaddress)
 		return *reinterpret_cast<UINT64 *>(&m_raw[byteaddress & m_bytemask]);
 	return m_space.read_qword(byteaddress);
 }
-		
+
 inline UINT64 direct_read_data::read_decrypted_qword(offs_t byteaddress)
 {
 	if (address_is_valid(byteaddress))
 		return *reinterpret_cast<UINT64 *>(&m_decrypted[byteaddress & m_bytemask]);
 	return m_space.read_qword(byteaddress);
 }
-		
+
 
 #endif	/* __MEMORY_H__ */

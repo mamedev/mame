@@ -14,9 +14,9 @@
 #define OpRead32(s, a)	((s)->direct->read_decrypted_dword(a))
 #else
 #define OpRead8(s, a)   ((s)->direct->read_decrypted_byte((a) ^ (s)->fetch_xor))
-#define OpRead16(s, a) 	(((s)->direct->read_decrypted_byte(((a)+0) ^ (s)->fetch_xor) << 0) | \
+#define OpRead16(s, a)	(((s)->direct->read_decrypted_byte(((a)+0) ^ (s)->fetch_xor) << 0) | \
 						 ((s)->direct->read_decrypted_byte(((a)+1) ^ (s)->fetch_xor) << 8))
-#define OpRead32(s, a) 	(((s)->direct->read_decrypted_byte(((a)+0) ^ (s)->fetch_xor) << 0) | \
+#define OpRead32(s, a)	(((s)->direct->read_decrypted_byte(((a)+0) ^ (s)->fetch_xor) << 0) | \
 						 ((s)->direct->read_decrypted_byte(((a)+1) ^ (s)->fetch_xor) << 8) | \
 						 ((s)->direct->read_decrypted_byte(((a)+2) ^ (s)->fetch_xor) << 16) | \
 						 ((s)->direct->read_decrypted_byte(((a)+3) ^ (s)->fetch_xor) << 24))

@@ -247,7 +247,7 @@ public:
 	// methods that wrap both interface-level and device-level behavior
 	void config_complete();
 	bool validity_check(const game_driver &driver) const;
-	
+
 	// configuration helpers
 	static void static_set_clock(device_config *device, UINT32 clock) { device->m_clock = clock; }
 	static void static_set_static_config(device_config *device, const void *config) { device->m_static_config = config; }

@@ -747,7 +747,7 @@ case 0xC3:		/* movw reg,i80 */
 		int i;
 		int size = datasize( cpustate, op );
 		UINT8 reg = read_op( cpustate );
-	
+
 		for( i = 0; i < size; i++ )
 		{
 			cpustate->reg[(reg + i) & 0x7f] = read_op( cpustate );

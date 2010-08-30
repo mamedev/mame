@@ -93,7 +93,7 @@ device_config_execute_interface::~device_config_execute_interface()
 
 
 //-------------------------------------------------
-//  static_set_disable - configuration helper to 
+//  static_set_disable - configuration helper to
 //  set the disabled state of a device
 //-------------------------------------------------
 
@@ -107,7 +107,7 @@ void device_config_execute_interface::static_set_disable(device_config *device)
 
 
 //-------------------------------------------------
-//  static_set_vblank_int - configuration helper 
+//  static_set_vblank_int - configuration helper
 //  to set up VBLANK interrupts on the device
 //-------------------------------------------------
 
@@ -123,7 +123,7 @@ void device_config_execute_interface::static_set_vblank_int(device_config *devic
 
 
 //-------------------------------------------------
-//  static_set_periodic_int - configuration helper 
+//  static_set_periodic_int - configuration helper
 //  to set up periodic interrupts on the device
 //-------------------------------------------------
 

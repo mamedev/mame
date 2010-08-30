@@ -266,8 +266,8 @@ static INPUT_PORTS_START( bestri )
 	PORT_DIPNAME( 0x00c0, 0x00c0, "Girls" )                 PORT_DIPLOCATION("SW1:7,8")   /* stored at 0x3a6faa.w */
 	PORT_DIPSETTING(      0x00c0, DEF_STR( No ) )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Yes ) )
-//	PORT_DIPSETTING(      0x0040, DEF_STR( No ) )
-//	PORT_DIPSETTING(      0x0000, DEF_STR( No ) )
+//  PORT_DIPSETTING(      0x0040, DEF_STR( No ) )
+//  PORT_DIPSETTING(      0x0000, DEF_STR( No ) )
 	PORT_DIPNAME( 0x0700, 0x0700, DEF_STR( Unknown ) )      PORT_DIPLOCATION("SW2:1,2,3") /* stored at 0x3a6fa6.w but not read back ? */
 	PORT_DIPSETTING(      0x0700, "0" )
 	PORT_DIPSETTING(      0x0300, "1" )

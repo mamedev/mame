@@ -10,7 +10,7 @@ public:
 	int sound_status;
 
 	UINT16* pow_fg_videoram;
- 
+
 	UINT16 *spriteram;
 	UINT16 *paletteram;
 	int sprite_flip_axis;

@@ -71,9 +71,9 @@ extern UINT8 vidc_interlace;
 #define CONTROL			0x00/4
 #define KART			0x04/4 // Keyboard Asynchronous Receiver Transmitter
 
-#define IRQ_STATUS_A 	0x10/4
+#define IRQ_STATUS_A	0x10/4
 #define IRQ_REQUEST_A   0x14/4
-#define IRQ_MASK_A 		0x18/4
+#define IRQ_MASK_A		0x18/4
 #define IRQ_STATUS_B	0x20/4
 #define IRQ_REQUEST_B   0x24/4
 #define IRQ_MASK_B		0x28/4

@@ -562,7 +562,7 @@ static bool validate_roms(int drivnum, const machine_config *config, region_arra
 					error = true;
 				}
 			}
-			
+
 			// count copies/fills as valid items
 			else if (ROMENTRY_ISCOPY(romp) || ROMENTRY_ISFILL(romp))
 				items_since_region++;

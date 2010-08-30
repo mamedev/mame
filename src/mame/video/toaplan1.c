@@ -223,7 +223,7 @@ static void toaplan1_create_tilemaps(running_machine *machine)
 	tilemap_set_transparent_pen(state->pf2_tilemap, 0);
 	tilemap_set_transparent_pen(state->pf3_tilemap, 0);
 	tilemap_set_transparent_pen(state->pf4_tilemap, 0);
-	
+
 	memset(state->empty_tile, 0x00, sizeof(state->empty_tile));
 }
 

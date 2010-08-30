@@ -170,7 +170,7 @@ void legacy_device_config_base::static_set_inline64(device_config *device, UINT3
 
 
 //-------------------------------------------------
-//  static_set_inline_float - configuration helper 
+//  static_set_inline_float - configuration helper
 //  to set a floating-point value in the inline
 //  configuration
 //-------------------------------------------------

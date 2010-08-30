@@ -17,7 +17,7 @@ public:
 	tilemap_t *pf2_tilemap;
 	const UINT8 *scale_table_ptr;
 	UINT8 scale_line_count;
- 
+
 	UINT16 *pf1_data;
 	UINT16 *pf2_data;
 	UINT16 *pf1_scroll_data;

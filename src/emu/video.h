@@ -280,7 +280,7 @@ extern const device_type SCREEN;
 	screen_device_config::static_set_type(device, SCREEN_TYPE_##_type); \
 
 #define MDRV_SCREEN_RAW_PARAMS(_pixclock, _htotal, _hbend, _hbstart, _vtotal, _vbend, _vbstart) \
-	screen_device_config::static_set_raw(device, _pixclock, _htotal, _hbend, _hbstart, _vtotal, _vbend, _vbstart); 
+	screen_device_config::static_set_raw(device, _pixclock, _htotal, _hbend, _hbstart, _vtotal, _vbend, _vbstart);
 
 #define MDRV_SCREEN_REFRESH_RATE(_rate) \
 	screen_device_config::static_set_refresh(device, HZ_TO_ATTOSECONDS(_rate)); \

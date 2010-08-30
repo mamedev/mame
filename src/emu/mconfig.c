@@ -117,7 +117,7 @@ device_config *machine_config::device_add(device_config *owner, const char *tag,
 
 
 //-------------------------------------------------
-//  device_replace - configuration helper to 
+//  device_replace - configuration helper to
 //  replace one device with a new device
 //-------------------------------------------------
 
@@ -130,7 +130,7 @@ device_config *machine_config::device_replace(device_config *owner, const char *
 
 
 //-------------------------------------------------
-//  device_remove - configuration helper to 
+//  device_remove - configuration helper to
 //  remove a device
 //-------------------------------------------------
 
@@ -144,7 +144,7 @@ device_config *machine_config::device_remove(device_config *owner, const char *t
 
 
 //-------------------------------------------------
-//  device_find - configuration helper to 
+//  device_find - configuration helper to
 //  locate a device
 //-------------------------------------------------
 

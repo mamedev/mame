@@ -3,10 +3,10 @@
     timekpr.h
 
     Various ST Microelectronics timekeeper SRAM implementations:
-    	- M48T02
-    	- M48T35
-    	- M48T58
-    	- MK48T08
+        - M48T02
+        - M48T35
+        - M48T58
+        - MK48T08
 
 ***************************************************************************/
 

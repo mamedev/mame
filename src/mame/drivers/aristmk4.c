@@ -54,10 +54,10 @@
         Now using mc146818 rtc driver instead of rtc_get_reg.
 
         19/8/10 - Roberto Fresca.
-		Added 3 Bags Full - 5VXFC790 (Victorian).
-		Set is now parent. Replaced the bad dumped GFX from NZ set with the new ones,
-		since they match 4 of 6 bitplanes. The PROM at U71 is also marked for Fantasy Fortune,
-		so maybe is the correct one for this game.
+        Added 3 Bags Full - 5VXFC790 (Victorian).
+        Set is now parent. Replaced the bad dumped GFX from NZ set with the new ones,
+        since they match 4 of 6 bitplanes. The PROM at U71 is also marked for Fantasy Fortune,
+        so maybe is the correct one for this game.
 
         The mc146818 driver is buggy - reported problem to Firewave and issues will be addressed.
         In this driver, the wrong day of the month is shown, wrong hours are shown.

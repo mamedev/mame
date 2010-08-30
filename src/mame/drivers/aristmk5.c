@@ -1,59 +1,59 @@
 /*
 
-	Aristocrat MK5 / MKV hardware
-	possibly 'Acorn Archimedes on a chip' hardware
+    Aristocrat MK5 / MKV hardware
+    possibly 'Acorn Archimedes on a chip' hardware
 
-	Note: ARM250 mapping is not identical to plain AA
+    Note: ARM250 mapping is not identical to plain AA
 
-	BIOS ROMs are actually nowhere to be found on a regular MK5 system. They can be used to change the system configurations on a PCB board
-	by swapping them with the game ROMs u7/u11 locations.
+    BIOS ROMs are actually nowhere to be found on a regular MK5 system. They can be used to change the system configurations on a PCB board
+    by swapping them with the game ROMs u7/u11 locations.
 
-	TODO (MK-5 specific):
-	- Fix remaining errors
-	- If all tests passes, this msg is printed on the keyboard serial port:
-	"System Startup Code Entered \n Gos_create could not allocate stack for the new process \n Unrecoverable error occured. System will now restart"
-	Apparently it looks like some sort of protection device ...
+    TODO (MK-5 specific):
+    - Fix remaining errors
+    - If all tests passes, this msg is printed on the keyboard serial port:
+    "System Startup Code Entered \n Gos_create could not allocate stack for the new process \n Unrecoverable error occured. System will now restart"
+    Apparently it looks like some sort of protection device ...
 
-	code DASMing of POST (adonis):
-	- bp 0x3400224:
-	  checks work RAM [0x87000], if bit 0 active high then all tests are skipped (presumably for debugging), otherwise check stuff;
-		- bp 0x3400230: EPROM checksum branch test
-		- bp 0x3400258: DRAM Check branch test
-		- bp 0x3400280: CPU Check branch test
-			bp 0x340027c: checks IRQ status A and FIQ status bit 7 (force IRQ flag)
-			- R0 == 0: CPU Check OK
-			- R0 == 1: IRQ status A force IRQ flag check failed
-			- R0 == 2: FIQ status force IRQ flag check failed
-			- R0 == 3: Internal Latch check 0x3250050 == 0xf5
-		- bp 0x34002a8: SRAM Check branch test (I2C)
-			- basically writes to the I2C clock/data then read-backs it
-		- bp 0x34002d0: 2KHz Timer branch test
-			bp 0x34002cc: it does various test with GO command reads (that are undefined on plain AA) and
-						  IRQA status bit 0, that's "printer busy" on original AA but here it have a completely
-						  different meaning.
-		- bp 0x34002f8: DRAM emulator branch tests
-			bp 0x34002f4:
-			- R0 == 0 "DRAM emulator found"
-			- R0 == 1 "DRAM emulator found"
-			- R0 == 3 "DRAM emulator not found - Error"
-			- R0 == 4 "DRAM emulator found instead of DRAM - Error"
-			- R0 == x "Undefined error in DRAM emulator area"
-			It r/w RAM location 0 and it expects to NOT read-back value written.
+    code DASMing of POST (adonis):
+    - bp 0x3400224:
+      checks work RAM [0x87000], if bit 0 active high then all tests are skipped (presumably for debugging), otherwise check stuff;
+        - bp 0x3400230: EPROM checksum branch test
+        - bp 0x3400258: DRAM Check branch test
+        - bp 0x3400280: CPU Check branch test
+            bp 0x340027c: checks IRQ status A and FIQ status bit 7 (force IRQ flag)
+            - R0 == 0: CPU Check OK
+            - R0 == 1: IRQ status A force IRQ flag check failed
+            - R0 == 2: FIQ status force IRQ flag check failed
+            - R0 == 3: Internal Latch check 0x3250050 == 0xf5
+        - bp 0x34002a8: SRAM Check branch test (I2C)
+            - basically writes to the I2C clock/data then read-backs it
+        - bp 0x34002d0: 2KHz Timer branch test
+            bp 0x34002cc: it does various test with GO command reads (that are undefined on plain AA) and
+                          IRQA status bit 0, that's "printer busy" on original AA but here it have a completely
+                          different meaning.
+        - bp 0x34002f8: DRAM emulator branch tests
+            bp 0x34002f4:
+            - R0 == 0 "DRAM emulator found"
+            - R0 == 1 "DRAM emulator found"
+            - R0 == 3 "DRAM emulator not found - Error"
+            - R0 == 4 "DRAM emulator found instead of DRAM - Error"
+            - R0 == x "Undefined error in DRAM emulator area"
+            It r/w RAM location 0 and it expects to NOT read-back value written.
 
-	goldprmd: checks if a "keyboard IRQ" fires (IRQ status B bit 6), it seems a serial port with data on it,
-	          returns an External Video Crystal Error (bp 3400278)
+    goldprmd: checks if a "keyboard IRQ" fires (IRQ status B bit 6), it seems a serial port with data on it,
+              returns an External Video Crystal Error (bp 3400278)
 
-	dmdtouch:
-		bp 3400640: checks 2MByte DRAM
-			- writes from 0x1000 to 0x100000, with 0x400 bytes index increment and 0xfb data increment
-			- writes from 0x100000 to 0x200000, with 0x400 bytes index increment and 0xfb data increment
-			- bp 3400720 checks if the aforementioned checks are ok (currently fails at the very first work RAM check at 0x1000, it returns the
-			  value that actually should be at 0x141000)
-		bp 340064c: if R0 == 0 2MB DRAM is ok, otherwise there's an error
+    dmdtouch:
+        bp 3400640: checks 2MByte DRAM
+            - writes from 0x1000 to 0x100000, with 0x400 bytes index increment and 0xfb data increment
+            - writes from 0x100000 to 0x200000, with 0x400 bytes index increment and 0xfb data increment
+            - bp 3400720 checks if the aforementioned checks are ok (currently fails at the very first work RAM check at 0x1000, it returns the
+              value that actually should be at 0x141000)
+        bp 340064c: if R0 == 0 2MB DRAM is ok, otherwise there's an error
 
-	set chip (BIOS):
-		same as goldprmd (serial + ext video crystal check)
-		bp 3400110: External Video Crystal test
+    set chip (BIOS):
+        same as goldprmd (serial + ext video crystal check)
+        bp 3400110: External Video Crystal test
 
 */
 
@@ -131,7 +131,7 @@ static ADDRESS_MAP_START( aristmk5_map, ADDRESS_SPACE_PROGRAM, 32 )
 	/* MK-5 overrides */
 	AM_RANGE(0x03010420, 0x03010423) AM_RAM_WRITE(mk5_i2c_w)
 	AM_RANGE(0x03010810, 0x03010813) AM_READNOP //MK-5 specific, watchdog
-//	System Startup Code Enabled protection appears to be located at 0x3010400 - 0x30104ff
+//  System Startup Code Enabled protection appears to be located at 0x3010400 - 0x30104ff
 	AM_RANGE(0x03220000, 0x03220003) AM_READWRITE(mk5_econet_r,mk5_econet_w)
 	AM_RANGE(0x03250048, 0x0325004b) AM_WRITE(mk5_ext_latch_w)
 	AM_RANGE(0x03250050, 0x03250053) AM_READ(mk5_unk_r)
@@ -150,7 +150,7 @@ static INPUT_PORTS_START( aristmk5 )
 	PORT_CONFNAME( 0x03, 0x00, "System Mode" )
 	PORT_CONFSETTING(    0x00, "Set Chip v4.04 Mode" )
 	PORT_CONFSETTING(    0x01, "Set Chip v4.4 Mode" )
-//	Clear Chip (missing?)
+//  Clear Chip (missing?)
 	PORT_CONFSETTING(    0x03, "Game Mode" )
 INPUT_PORTS_END
 

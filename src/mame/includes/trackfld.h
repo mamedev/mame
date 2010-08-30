@@ -27,7 +27,7 @@ public:
 	size_t   spriteram_size;
 	UINT8 *  palettebank;		// sbasketb
 	UINT8 *  spriteram_select;	// sbasketb
-	
+
 	/* video-related */
 	tilemap_t  *bg_tilemap;
 	int      bg_bank, sprite_bank1, sprite_bank2;	// trackfld

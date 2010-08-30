@@ -503,7 +503,7 @@ static CPU_EXECUTE( m6809 )	/* NS 970908 */
 
 			m68_state->ireg = ROP(PCD);
 			PC++;
-           	(*m6809_main[m68_state->ireg])(m68_state);
+        	(*m6809_main[m68_state->ireg])(m68_state);
 			m68_state->icount -= cycles1[m68_state->ireg];
 
 		} while( m68_state->icount > 0 );

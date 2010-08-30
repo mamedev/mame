@@ -143,7 +143,7 @@ Top Shooter PCB info
  Not Dumped
 
  Super Bubble Bobble (a bubble bobble rip-off from Sun Mixing, looks like it may be on this hardware)
- 
+
 TOP SHOOTER - Sun Mixing Co. Ltd. 1995
 
 To me it seems like an original cartridge-based arcade board

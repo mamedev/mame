@@ -570,9 +570,9 @@ void assemble_D_from_P_table(UINT16 P, UINT16 ppppp, std::string& D)
 
 	switch(P)
 	{
-		case 0x0: 
-			sprintf(temp, "X:<$%x", ppppp); 
-			// NEW // sprintf(temp, "X:$%02x", ppppp); 
+		case 0x0:
+			sprintf(temp, "X:<$%x", ppppp);
+			// NEW // sprintf(temp, "X:$%02x", ppppp);
 			break;
 		case 0x1:
 			assemble_address_from_IO_short_address(ppppp, fullAddy);
@@ -583,7 +583,7 @@ void assemble_D_from_P_table(UINT16 P, UINT16 ppppp, std::string& D)
 	D = temp;
 }
 
-void assemble_arguments_from_W_table(UINT16 W, char ma, const reg_id& SD, const std::string& ea, 
+void assemble_arguments_from_W_table(UINT16 W, char ma, const reg_id& SD, const std::string& ea,
 									 std::string& source, std::string& destination)
 {
 	char temp[32];
@@ -595,7 +595,7 @@ void assemble_arguments_from_W_table(UINT16 W, char ma, const reg_id& SD, const 
 	}
 }
 
-void assemble_arguments_from_W_table(UINT16 W, char ma, const std::string& SD, const std::string& ea, 
+void assemble_arguments_from_W_table(UINT16 W, char ma, const std::string& SD, const std::string& ea,
 									 std::string& source, std::string& destination)
 {
 	char temp[32];
@@ -679,7 +679,7 @@ bool registerOverlap(const reg_id& r0, const size_t bmd, const reg_id& r1)
 {
 	if (bmd == BM_NONE)
 		return false;
-	
+
 	if (r0 == r1)
 		return true;
 
@@ -720,7 +720,7 @@ UINT16 regValue16(dsp56k_core* cpustate, const reg_id& reg)
     if (reg == iM1) return M1;
     if (reg == iM2) return M2;
     if (reg == iM3) return M3;
-    
+
     mame_printf_debug("The dsp561xx core is requesting a 16 bit value from non-16 bit register!");
     return 0xdead;
 }
@@ -797,7 +797,7 @@ std::string regIdAsString(const reg_id& regId)
         case iINVALID: return "!!"; break;
         case iWEIRD: return "?"; break;
     }
-    
+
     return "INVALID_REG_ID";
 }
 
@@ -821,13 +821,13 @@ std::string opMnemonicAsString(const op_mnem& mnem)
         case oES: return "es"; break;
         case oLS: return "ls"; break;
         case oLE: return "le"; break;
-        
+
         case oSS: return "ss"; break;
         case oSU: return "su"; break;
         case oUU: return "uu"; break;
         case oINVALID: return "!!"; break;
     }
-    
+
     return "INVALID_OPCODE_MNEMONIC";
 }
 
@@ -872,7 +872,7 @@ reg_id stringAsRegID(const std::string& str)
     if (str == "^F") return iFHAT;
     if (str == "!!") return iINVALID;
     if (str == "?") return iWEIRD;
-    
+
     return iINVALID;
 }
 
@@ -892,7 +892,7 @@ UINT8 regIDAsNum(const reg_id& regId)
     if (regId == iM1) return 1;
     if (regId == iM2) return 2;
     if (regId == iM3) return 3;
-    
+
     return 255;
 }
 

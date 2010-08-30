@@ -67,7 +67,7 @@ struct _bsmt2000_chip
 	bsmt2000_voice voice[MAX_VOICES];	/* the voices */
 	UINT16 *	regmap[128];			/* mapping of registers to voice params */
 	UINT8		mode;					/* current mode */
-	
+
 	UINT32		clock;					/* original clock on the chip */
 	UINT8		stereo;					/* stereo output? */
 	UINT8		voices;					/* number of voices */

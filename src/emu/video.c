@@ -1802,7 +1802,7 @@ void screen_device_config::static_set_size(device_config *device, UINT16 width, 
 
 
 //-------------------------------------------------
-//  static_set_visarea - configuration helper to 
+//  static_set_visarea - configuration helper to
 //  set the visible area of the screen
 //-------------------------------------------------
 
@@ -1817,7 +1817,7 @@ void screen_device_config::static_set_visarea(device_config *device, INT16 minx,
 
 
 //-------------------------------------------------
-//  static_set_default_position - configuration 
+//  static_set_default_position - configuration
 //  helper to set the default position and scale
 //  factors for the screen
 //-------------------------------------------------

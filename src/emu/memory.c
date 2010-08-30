@@ -3289,7 +3289,7 @@ void address_table::populate_range_mirrored(offs_t bytestart, offs_t byteend, of
 
 //-------------------------------------------------
 //  depopulate_unused - scan the table and
-//	eliminate entries that are no longer used
+//  eliminate entries that are no longer used
 //-------------------------------------------------
 
 void address_table::depopulate_unused()

@@ -496,7 +496,7 @@ device_t *speaker_device_config::alloc_device(running_machine &machine) const
 
 
 //-------------------------------------------------
-//  static_set_position - configuration helper to 
+//  static_set_position - configuration helper to
 //  set the speaker position
 //-------------------------------------------------
 

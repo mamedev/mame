@@ -139,7 +139,7 @@ private:
     /* inputs */
     UINT8 m_clear;              /* pin 1/13 */
     UINT8 m_preset;             /* pin 4/10 */
-    UINT8 m_clk;              	/* pin 3/11 */
+    UINT8 m_clk;            	/* pin 3/11 */
     UINT8 m_d;                  /* pin 2/12 */
 
     /* outputs */

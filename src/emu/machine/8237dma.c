@@ -284,7 +284,7 @@ void i8237_device::i8237_timerproc()
 
 		/* Check if a new DMA request has been received. */
 		/* Bit 6 of the command register determines whether the DREQ signals are active
-		  high or active low. */
+          high or active low. */
 		UINT16 pending_request = ( ( m_command & 0x40 ) ? ~m_drq : m_drq ) & ~m_mask;
 
 		if ( pending_request & 0x0f )

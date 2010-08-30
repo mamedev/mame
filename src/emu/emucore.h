@@ -392,7 +392,7 @@ public:
 				num++;
 		return -1;
 	}
-	
+
 	T &prepend(T &object)
 	{
 		object.m_next = m_head;

@@ -267,7 +267,7 @@ READ32_HANDLER(archimedes_memc_logical_r)
 		page = (offset<<2) / page_sizes[memc_pagesize];
 		poffs = (offset<<2) % page_sizes[memc_pagesize];
 
-//		printf("Reading offset %x (addr %x): page %x (size %d %d) offset %x ==> %x %x\n", offset, offset<<2, page, memc_pagesize, page_sizes[memc_pagesize], poffs, memc_pages[page], memc_pages[page]*page_sizes[memc_pagesize]);
+//      printf("Reading offset %x (addr %x): page %x (size %d %d) offset %x ==> %x %x\n", offset, offset<<2, page, memc_pagesize, page_sizes[memc_pagesize], poffs, memc_pages[page], memc_pages[page]*page_sizes[memc_pagesize]);
 
 		if (memc_pages[page] != -1)
 		{
@@ -339,8 +339,8 @@ DIRECT_UPDATE_HANDLER( a310_setopbase )
 
 void archimedes_driver_init(running_machine *machine)
 {
-//	address_space *space = machine->device<arm_device>("maincpu")->space(AS_PROGRAM);
-//	space->set_direct_update_handler(direct_update_delegate_create_static(a310_setopbase, *machine));
+//  address_space *space = machine->device<arm_device>("maincpu")->space(AS_PROGRAM);
+//  space->set_direct_update_handler(direct_update_delegate_create_static(a310_setopbase, *machine));
 }
 
 static const char *const ioc_regnames[] =
@@ -711,15 +711,15 @@ static void vidc_dynamic_res_change(running_machine *machine)
 {
 	/* sanity checks - first pass */
 	/*
-		total cycles + border end
-	*/
+        total cycles + border end
+    */
 	if(vidc_regs[VIDC_HCR] && vidc_regs[VIDC_HBER] &&
 	   vidc_regs[VIDC_VCR] && vidc_regs[VIDC_VBER])
 	{
 		/* sanity checks - second pass */
 		/*
-		total cycles >= border end >= border start
-		*/
+        total cycles >= border end >= border start
+        */
 		if((vidc_regs[VIDC_HCR] >= vidc_regs[VIDC_HBER]) &&
 		   (vidc_regs[VIDC_HBER] >= vidc_regs[VIDC_HBSR]) &&
 		   (vidc_regs[VIDC_VCR] >= vidc_regs[VIDC_VBER]) &&
@@ -810,30 +810,30 @@ WRITE32_HANDLER(archimedes_vidc_w)
 	{
 		vidc_stereo_reg[(reg >> 2) & 7] = val & 0x07;
 
-//		popmessage("%02x %02x %02x %02x %02x %02x %02x %02x",vidc_stereo_reg[0],vidc_stereo_reg[1],vidc_stereo_reg[2],vidc_stereo_reg[3]
-//		,vidc_stereo_reg[4],vidc_stereo_reg[5],vidc_stereo_reg[6],vidc_stereo_reg[7]);
+//      popmessage("%02x %02x %02x %02x %02x %02x %02x %02x",vidc_stereo_reg[0],vidc_stereo_reg[1],vidc_stereo_reg[2],vidc_stereo_reg[3]
+//      ,vidc_stereo_reg[4],vidc_stereo_reg[5],vidc_stereo_reg[6],vidc_stereo_reg[7]);
 	}
 	else if (reg >= 0x80 && reg <= 0xbc)
 	{
 		switch(reg)
 		{
-			case VIDC_HCR:  vidc_regs[VIDC_HCR] =  ((val >> 14)<<1)+1; 	break;
-//			case VIDC_HSWR: vidc_regs[VIDC_HSWR] = (val >> 14)+1; 	break;
-			case VIDC_HBSR: vidc_regs[VIDC_HBSR] = ((val >> 14)<<1)+1; 	break;
+			case VIDC_HCR:  vidc_regs[VIDC_HCR] =  ((val >> 14)<<1)+1;	break;
+//          case VIDC_HSWR: vidc_regs[VIDC_HSWR] = (val >> 14)+1;   break;
+			case VIDC_HBSR: vidc_regs[VIDC_HBSR] = ((val >> 14)<<1)+1;	break;
 			case VIDC_HDSR: vidc_regs[VIDC_HDSR] = (val >> 14); 	break;
 			case VIDC_HDER: vidc_regs[VIDC_HDER] = (val >> 14); 	break;
-			case VIDC_HBER: vidc_regs[VIDC_HBER] = ((val >> 14)<<1)+1; 	break;
-//			#define VIDC_HCSR		0x98
-//			#define VIDC_HIR		0x9c
+			case VIDC_HBER: vidc_regs[VIDC_HBER] = ((val >> 14)<<1)+1;	break;
+//          #define VIDC_HCSR       0x98
+//          #define VIDC_HIR        0x9c
 
 			case VIDC_VCR:  vidc_regs[VIDC_VCR] = ((val >> 14)<<1)+1;	break;
-//			#define VIDC_VSWR		0xa4
-			case VIDC_VBSR: vidc_regs[VIDC_VBSR] = (val >> 14)+1; 	break;
+//          #define VIDC_VSWR       0xa4
+			case VIDC_VBSR: vidc_regs[VIDC_VBSR] = (val >> 14)+1;	break;
 			case VIDC_VDSR: vidc_regs[VIDC_VDSR] = (val >> 14)+1;	break;
 			case VIDC_VDER: vidc_regs[VIDC_VDER] = (val >> 14)+1;	break;
 			case VIDC_VBER: vidc_regs[VIDC_VBER] = (val >> 14)+1;	break;
-//			#define VIDC_VCSR		0xb8
-//			#define VIDC_VCER		0xbc
+//          #define VIDC_VCSR       0xb8
+//          #define VIDC_VCER       0xbc
 		}
 
 
@@ -1000,7 +1000,7 @@ WRITE32_HANDLER(archimedes_memc_page_w)
 			break;
 	}
 
-//	log >>= (12 + memc_pagesize);
+//  log >>= (12 + memc_pagesize);
 
 	// always make sure ROM mode is disconnected when this occurs
 	memc_latchrom = 0;

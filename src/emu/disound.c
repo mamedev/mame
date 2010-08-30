@@ -68,7 +68,7 @@ device_config_sound_interface::~device_config_sound_interface()
 
 
 //-------------------------------------------------
-//  static_add_route - configuration helper to add 
+//  static_add_route - configuration helper to add
 //  a new route to the device
 //-------------------------------------------------
 
@@ -85,7 +85,7 @@ void device_config_sound_interface::static_add_route(device_config *device, UINT
 
 
 //-------------------------------------------------
-//  static_reset_routes - configuration helper to 
+//  static_reset_routes - configuration helper to
 //  reset all existing routes to the device
 //-------------------------------------------------
 

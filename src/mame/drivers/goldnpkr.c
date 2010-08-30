@@ -3305,7 +3305,7 @@ ROM_END
          1x 2716 for char gen. (4.8a)
          3x 2716 for gfx bitplanes. (1.4a, 2.6a, 3.7a)
 
-  1x Reset switch. (R.SW) 
+  1x Reset switch. (R.SW)
   1x 8 DIP switches bank.
   1x 2x10 Edge connector. (GM1)
   1x 2x22 Edge connector. (GM2)

@@ -195,7 +195,7 @@ WRITE8_HANDLER( flytiger_ctrl_w )
 
 	/* bits 1, 2 used but unknown */
 
-	/* bit 3 fg palette banking: trash protection? */	
+	/* bit 3 fg palette banking: trash protection? */
 	flytiger_palette_bank = data & 0x08;
 
 	/* bit 4 changes tilemaps priority */

@@ -1,5 +1,5 @@
 /*
- 
+
 Chihiro is an Xbox based arcade motherboard from SEGA
 A Chihiro system consists of network board, media board, base board & Xbox board
 
@@ -42,18 +42,18 @@ Thanks to Alex, Mr Mudkips, and Philip Burke for this info.
 #include "debug/debugcmd.h"
 
 /* jamtable instructions for Chihiro
-St.     Instr.		 Comment
-0x01 	POKEPCI 	 PCICONF[OP2] := OP1
-0x02 	OUTB 		 PORT[OP2] := OP1
-0x03 	POKE 		 MEM[OP2] := OP1
-0x04 	BNE 		 IF ACC <> OP2 THEN PC := PC + OP1
-0x05 	PEEKPCI 	 ACC := PCICONF[OP2]
-0x06 	AND/OR 		 ACC := (ACC & OP2) | OP1
-0x07 	BRA 		 PC := PC + OP1
-0x08 	INB 		 ACC := PORT[OP2]
-0x09 	PEEK 		 ACC := MEM[OP2]
-0xE1 	(prefix)	 execute the instruction code in OP2 with OP2 := OP1, OP1 := ACC
-0xEE 	END 
+St.     Instr.       Comment
+0x01    POKEPCI      PCICONF[OP2] := OP1
+0x02    OUTB         PORT[OP2] := OP1
+0x03    POKE         MEM[OP2] := OP1
+0x04    BNE          IF ACC <> OP2 THEN PC := PC + OP1
+0x05    PEEKPCI      ACC := PCICONF[OP2]
+0x06    AND/OR       ACC := (ACC & OP2) | OP1
+0x07    BRA          PC := PC + OP1
+0x08    INB          ACC := PORT[OP2]
+0x09    PEEK         ACC := MEM[OP2]
+0xE1    (prefix)     execute the instruction code in OP2 with OP2 := OP1, OP1 := ACC
+0xEE    END
 */
 
 /* jamtable disassembler */
@@ -258,7 +258,7 @@ static WRITE32_HANDLER( smbus_w )
 				else {
 					smbusst.data=smbusst.devices[smbusst.address & 127](smbusst.command,smbusst.rw,smbusst.data);
 				}
-			}			
+			}
 			smbusst.status |= 0x10;
 		}
 	}

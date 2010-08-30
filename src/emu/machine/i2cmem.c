@@ -110,7 +110,7 @@ device_t *i2cmem_device_config::alloc_device( running_machine &machine ) const
 
 
 //-------------------------------------------------
-//  static_set_interface - set the device 
+//  static_set_interface - set the device
 //  configuration
 //-------------------------------------------------
 

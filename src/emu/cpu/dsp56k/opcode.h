@@ -33,7 +33,7 @@ public:
 	const reg_id& instSource() const;
 	const reg_id& instDestination() const;
 	const size_t instAccumulatorBitsModified() const;
-	
+
 private:
 	Instruction* m_instruction;
 	ParallelMove* m_parallelMove;

@@ -2879,7 +2879,7 @@ ROM_START( rdftadi ) // Dream Island license
 
 	ROM_REGION(0x400000, "user2", ROMREGION_ERASE00)	/* sound roms */
 	ROM_LOAD("raiden-f__pcm2.u0217", 0x000000, 0x400000, NO_DUMP )//the real rom used here is actually a 0x400000 long rom located at u0217 which contains the combined data of the two smaller roms on the older cart pcb at 217 and 216; pads are silkscreened SOUND0
-	//u0222 (unpopulated) is silkscreend SOUND1 and would expect a 27040 similar to the old gd_8 rom. 
+	//u0222 (unpopulated) is silkscreend SOUND1 and would expect a 27040 similar to the old gd_8 rom.
 	ROM_LOAD("gun_dogs__pcm.217", 0x000000, 0x200000, BAD_DUMP CRC(31253ad7) SHA1(c81c8d50f8f287f5cbfaec77b30d969b01ce11a9) )
 	ROM_LOAD("gd_8.216",   0x200000, 0x080000, BAD_DUMP CRC(f88cb6e4) SHA1(fb35b41307b490d5d08e4b8a70f8ff4ce2ca8105) )
 ROM_END
@@ -2909,7 +2909,7 @@ ROM_START( rdftam ) // Metrotainment license
 
 	ROM_REGION(0x400000, "user2", ROMREGION_ERASE00)	/* sound roms */
 	ROM_LOAD("raiden-f__pcm2.u0217", 0x000000, 0x400000, NO_DUMP )//the real rom used here is actually a 0x400000 long rom located at u0217 which contains the combined data of the two smaller roms on the older cart pcb at 217 and 216; pads are silkscreened SOUND0
-	//u0222 (unpopulated) is silkscreend SOUND1 and would expect a 27040 similar to the old gd_8 rom. 
+	//u0222 (unpopulated) is silkscreend SOUND1 and would expect a 27040 similar to the old gd_8 rom.
 	ROM_LOAD("gun_dogs__pcm.217", 0x000000, 0x200000, BAD_DUMP CRC(31253ad7) SHA1(c81c8d50f8f287f5cbfaec77b30d969b01ce11a9) )
 	ROM_LOAD("gd_8.216",   0x200000, 0x080000, BAD_DUMP CRC(f88cb6e4) SHA1(fb35b41307b490d5d08e4b8a70f8ff4ce2ca8105) )
 ROM_END

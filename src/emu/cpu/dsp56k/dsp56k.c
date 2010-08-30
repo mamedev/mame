@@ -21,7 +21,7 @@
     - 1-9 For fractional arithmetic, the 31-bit product is added to the 40-bit contents of A or B.  No pipeline!
     - 1-10 Two types of rounding: convergent rounding and two's complement rounding.  See status register bit R.
     - 1-10 Logic unit is 16-bits wide and works on MSP portion of accum register
-    - 1-10 The AGU can implement three types of arithmetic: linear, modulo, and reverse carry. 
+    - 1-10 The AGU can implement three types of arithmetic: linear, modulo, and reverse carry.
     - 1-12 "Two external interrupt pins!!!"
     - 1-12 Take care of all interrupt priority (IPR) stuff!
     - 1-19 Memory WAIT states
@@ -319,7 +319,7 @@ static size_t execute_one_new(dsp56k_core* cpustate)
 
 	UINT16 w0 = ROPCODE(ADDRESS(PC));
 	UINT16 w1 = ROPCODE(ADDRESS(PC) + ADDRESS(1));
-	
+
 	Opcode op(w0, w1);
 	op.evaluate(cpustate);
 	PC += op.evalSize();	// Special size function needed to handle jmps, etc.
@@ -505,8 +505,8 @@ CPU_GET_INFO( dsp56k )
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 2;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 2;							break;
 		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:			info->i = 4;							break;
-		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;	// ?					break;
-		case CPUINFO_INT_MAX_CYCLES:					info->i = 8;	// ?					break;
+		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;	// ?                    break;
+		case CPUINFO_INT_MAX_CYCLES:					info->i = 8;	// ?                    break;
 
 		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 16;					break;
 		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 16;					break;

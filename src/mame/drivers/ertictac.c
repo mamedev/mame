@@ -1,22 +1,22 @@
 /*******************************************************************************************
 
-	Erotictac/Tactic (c) 1990 Sisteme
-	Poizone (c) 1991 Eterna
+    Erotictac/Tactic (c) 1990 Sisteme
+    Poizone (c) 1991 Eterna
 
-	Actually an Acorn Archimedes-based Arcade system
+    Actually an Acorn Archimedes-based Arcade system
 
-	original driver by Tomasz Slanina, Steve Ellenoff, Nicola Salmoria
-	rewrite to use AA functions by R.Belmont & Angelo Salese
-	special thanks to Tom Walker (author of the Acorn Archimedes Arculator emulator)
+    original driver by Tomasz Slanina, Steve Ellenoff, Nicola Salmoria
+    rewrite to use AA functions by R.Belmont & Angelo Salese
+    special thanks to Tom Walker (author of the Acorn Archimedes Arculator emulator)
 
-	TODO (specific issues only):
-	- Sound is currently ugly in both games, recognizable but still nowhere near perfection
-	- ertictac: 'music' dip-sw makes the game to just hang, BGM doesn't play either for
-	            whatever reason (should be triggered as soon as it executes the POST)
-	- poizone: ARM core bugs causes it to crash at some point.
-	- Does this Arcade conversion have I2C device? It seems unused afaik.
-	- Need PCB for identify the exact model of AA, available RAM, what kind of i/o "podule"
-	  it has etc.
+    TODO (specific issues only):
+    - Sound is currently ugly in both games, recognizable but still nowhere near perfection
+    - ertictac: 'music' dip-sw makes the game to just hang, BGM doesn't play either for
+                whatever reason (should be triggered as soon as it executes the POST)
+    - poizone: ARM core bugs causes it to crash at some point.
+    - Does this Arcade conversion have I2C device? It seems unused afaik.
+    - Need PCB for identify the exact model of AA, available RAM, what kind of i/o "podule"
+      it has etc.
 
 *******************************************************************************************/
 #include "emu.h"

@@ -225,7 +225,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 		//
 		//if (offs < 0x26)
 		//{
-		//	sy++;	/* fix title screen & garbage at the bottom of the screen */
+		//  sy++;   /* fix title screen & garbage at the bottom of the screen */
 		//}
 
 

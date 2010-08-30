@@ -316,7 +316,7 @@ public:
 
 	astring &operator=(const char *string) { return cpy(string); }
 	astring &operator=(const astring &string) { return cpy(string); }
-	
+
 	bool operator==(const char *string) const { return (cmp(string) == 0); }
 	bool operator==(const astring &string) const { return (cmp(string) == 0); }
 	bool operator!=(const char *string) const { return (cmp(string) != 0); }

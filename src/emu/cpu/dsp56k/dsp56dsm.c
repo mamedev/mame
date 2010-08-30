@@ -1,8 +1,8 @@
 /***************************************************************************
 
-	dsp56dsm.c
-	Disassembler for the portable Motorola/Freescale dsp56k emulator.
-	Written by Andrew Gardner
+    dsp56dsm.c
+    Disassembler for the portable Motorola/Freescale dsp56k emulator.
+    Written by Andrew Gardner
 
 ***************************************************************************/
 

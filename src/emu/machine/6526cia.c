@@ -507,7 +507,7 @@ TIMER_CALLBACK( mos6526_device::clock_tod_callback )
 
 
 /*-------------------------------------------------
-	cnt_w
+    cnt_w
 -------------------------------------------------*/
 
 void mos6526_device::cnt_w(UINT8 state)

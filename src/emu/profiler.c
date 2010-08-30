@@ -37,14 +37,14 @@
 
 ****************************************************************************
 
-	Profiling is scope-based. To start profiling, put a profiler_scope
-	object on the stack. To end profiling, just end the scope:
+    Profiling is scope-based. To start profiling, put a profiler_scope
+    object on the stack. To end profiling, just end the scope:
 
-	{
-	    profiler_scope scope(PROFILER_VIDEO);
-	    
-	    your_work_here();
-	}
+    {
+        profiler_scope scope(PROFILER_VIDEO);
+
+        your_work_here();
+    }
 
     the profiler handles a FILO list so calls may be nested.
 
@@ -282,7 +282,7 @@ const char *real_profiler_state::text(running_machine &machine, astring &string)
 	// we are ready once we have wrapped around
 	if (m_dataindex == 0)
 		m_dataready = true;
-	
+
 	g_profiler.stop();
 	return string;
 }

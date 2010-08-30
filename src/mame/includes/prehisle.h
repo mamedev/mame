@@ -11,7 +11,7 @@ public:
 	UINT16 *videoram;
 	UINT16 *bg_videoram16;
 	UINT16 invert_controls;
- 
+
 	tilemap_t *bg2_tilemap;
 	tilemap_t *bg_tilemap;
 	tilemap_t *fg_tilemap;

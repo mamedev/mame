@@ -5502,8 +5502,8 @@ ROM_END
 
 ROM_START( mslug4 ) /* Original Version - Encrypted GFX */ /* MVS VERSION */
 	/* There also exist carts where p1 label is pg1; the PG1 revision has a Japanese cart label, SN 02Jxxxxx
-	The P1 revision has a US/EUR cart label, SN 02Txxxxx ; Rom data on both is identical.
-	These carts were manufactured by Mega Enterprise, not SNK. */
+    The P1 revision has a US/EUR cart label, SN 02Txxxxx ; Rom data on both is identical.
+    These carts were manufactured by Mega Enterprise, not SNK. */
 	ROM_REGION( 0x500000, "maincpu", 0 )
 	ROM_LOAD16_WORD_SWAP( "263-p1.bin", 0x000000, 0x100000, CRC(27e4def3) SHA1(a08785e8145981bb6b5332a3b2df7eb321253cca) )
 	ROM_LOAD16_WORD_SWAP( "263-p2.bin", 0x100000, 0x400000, CRC(fdb7aed8) SHA1(dbeaec38f44e58ffedba99e70fa1439c2bf0dfa3) )
