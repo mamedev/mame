@@ -294,7 +294,8 @@ INPUT_PORTS_END
 static MACHINE_START( chihiro )
 {
 	smbus_register_device(0x45,smbus_cx25871);
-	debug_console_register_command(machine,"jamdis",CMDFLAG_NONE,0,2,3,jamtable_disasm_command);
+	if (machine->debug_flags & DEBUG_FLAG_ENABLED)
+		debug_console_register_command(machine,"jamdis",CMDFLAG_NONE,0,2,3,jamtable_disasm_command);
 }
 
 static MACHINE_DRIVER_START( chihiro_base )
