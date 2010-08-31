@@ -359,7 +359,7 @@ static DEVICE_START( s2636 )
 	s2636->x_offset = intf->x_offset;
 	s2636->y_offset = intf->y_offset;
 
-	s2636->work_ram = auto_alloc_array(device->machine, UINT8, intf->work_ram_size);
+	s2636->work_ram = auto_alloc_array_clear(device->machine, UINT8, intf->work_ram_size);
 	s2636->bitmap = auto_bitmap_alloc(device->machine, width, height, BITMAP_FORMAT_INDEXED16);
 	s2636->collision_bitmap = auto_bitmap_alloc(device->machine, width, height, BITMAP_FORMAT_INDEXED16);
 
