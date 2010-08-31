@@ -101,41 +101,59 @@ struct _mc6845_t
 	UINT8	cursor_state;	/* 0 = off, 1 = on */
 	UINT8	cursor_blink_count;
 	UINT8	update_ready_bit;
+	/* output signals */
+	int		cur;
+	int		hsync;
+	int		vsync;
+	int		de;
+
+	/* internal counters */
+	UINT8	character_counter;		/* Not used yet */
+	UINT8	hsync_width_counter;	/* Not used yet */
+	UINT8	line_counter;
+	UINT8	raster_counter;
+	UINT8	adjust_counter;
+	UINT8	vsync_width_counter;
+
+	UINT8	line_enable_ff;		/* Internal flip flop which is set when the line_counter is reset and reset when vert_disp is reached */
+	UINT8	vsync_ff;
+	UINT8	adjust_active;
+	UINT16	line_address;
+	INT16	cursor_x;
 
 	/* timers */
-	emu_timer *de_changed_timer;
+	emu_timer *line_timer;
+	emu_timer *de_off_timer;
 	emu_timer *cur_on_timer;
 	emu_timer *cur_off_timer;
 	emu_timer *hsync_on_timer;
 	emu_timer *hsync_off_timer;
-	emu_timer *vsync_on_timer;
-	emu_timer *vsync_off_timer;
 	emu_timer *light_pen_latch_timer;
 	emu_timer *upd_adr_timer;
 
 	/* computed values - do NOT state save these! */
-	UINT16	 horiz_pix_total;
-	UINT16	 vert_pix_total;
-	UINT16	 max_visible_x;
-	UINT16	 max_visible_y;
-	UINT16	 hsync_on_pos;
-	UINT16	 hsync_off_pos;
-	UINT16	 vsync_on_pos;
-	UINT16	 vsync_off_pos;
-	UINT16   current_disp_addr;	/* the display address currently drawn */
+	/* These computed are used to define the screen parameters for a driver */
+	UINT16	horiz_pix_total;
+	UINT16	vert_pix_total;
+	UINT16	max_visible_x;
+	UINT16	max_visible_y;
+	UINT16	hsync_on_pos;
+	UINT16	hsync_off_pos;
+	UINT16	vsync_on_pos;
+	UINT16	vsync_off_pos;
+	int		has_valid_parameters;
+
+	UINT16   current_disp_addr;	/* the display address currently drawn (used only in mc6845_update) */
+
 	UINT8	 light_pen_latched;
 	attotime upd_time;
-	int		 has_valid_parameters;
 };
 
 
 static STATE_POSTLOAD( mc6845_state_save_postload );
 static void recompute_parameters(mc6845_t *mc6845, int postload);
 static void update_upd_adr_timer(mc6845_t *mc6845);
-static void update_de_changed_timer(mc6845_t *mc6845);
-static void update_cur_changed_timers(mc6845_t *mc6845);
-static void update_hsync_changed_timers(mc6845_t *mc6845);
-static void update_vsync_changed_timers(mc6845_t *mc6845);
+static void update_cursor_state(mc6845_t *mc6845);
 
 
 const mc6845_interface mc6845_null_interface = { 0 };
@@ -206,7 +224,7 @@ READ8_DEVICE_HANDLER( mc6845_status_r )
 	UINT8 ret = 0;
 
 	/* VBLANK bit */
-	if (supports_status_reg_d5[mc6845->device_type] && mc6845->screen->vblank())
+	if (supports_status_reg_d5[mc6845->device_type] && ( mc6845->line_enable_ff == 0 ))
 	   ret = ret | 0x20;
 
 	/* light pen latched */
@@ -402,7 +420,8 @@ static void recompute_parameters(mc6845_t *mc6845, int postload)
 				if (LOG) logerror("M6845 config screen: HTOTAL: 0x%x  VTOTAL: 0x%x  MAX_X: 0x%x  MAX_Y: 0x%x  HSYNC: 0x%x-0x%x  VSYNC: 0x%x-0x%x  Freq: %ffps\n",
 								  horiz_pix_total, vert_pix_total, max_visible_x, max_visible_y, hsync_on_pos, hsync_off_pos - 1, vsync_on_pos, vsync_off_pos - 1, 1 / ATTOSECONDS_TO_DOUBLE(refresh));
 
-				mc6845->screen->configure(horiz_pix_total, vert_pix_total, visarea, refresh);
+				if ( mc6845->screen != NULL )
+					mc6845->screen->configure(horiz_pix_total, vert_pix_total, visarea, refresh);
 
 				mc6845->has_valid_parameters = TRUE;
 			}
@@ -417,131 +436,86 @@ static void recompute_parameters(mc6845_t *mc6845, int postload)
 			mc6845->hsync_off_pos = hsync_off_pos;
 			mc6845->vsync_on_pos = vsync_on_pos;
 			mc6845->vsync_off_pos = vsync_off_pos;
-
-			update_de_changed_timer(mc6845);
-			update_cur_changed_timers(mc6845);
-			update_hsync_changed_timers(mc6845);
-			update_vsync_changed_timers(mc6845);
 		}
 	}
 }
 
 
-INLINE int is_display_enabled(mc6845_t *mc6845)
+INLINE void mc6845_update_counters(mc6845_t *mc6845)
 {
-	return !mc6845->screen->vblank() && !mc6845->screen->hblank();
-}
+	mc6845->character_counter = attotime_to_ticks( timer_timeelapsed( mc6845->line_timer ), mc6845->clock );
 
-
-static void update_upd_adr_timer(mc6845_t *mc6845)
-{
-	if (!is_display_enabled(mc6845) && supports_transparent[mc6845->device_type])
-		timer_adjust_oneshot(mc6845->upd_adr_timer,  mc6845->upd_time, 0);
-}
-
-static void update_de_changed_timer(mc6845_t *mc6845)
-{
-	if (mc6845->has_valid_parameters && (mc6845->de_changed_timer != NULL))
+	if ( timer_enabled( mc6845->hsync_off_timer ) )
 	{
-		INT16 next_y;
-		UINT16 next_x;
-		attotime duration;
+		mc6845->hsync_width_counter = attotime_to_ticks( timer_timeelapsed( mc6845->hsync_off_timer ), mc6845->clock );
+	}
+}
 
-		/* we are in a display region, get the location of the next blanking start */
-		if (is_display_enabled(mc6845))
+
+INLINE void mc6845_set_de(mc6845_t *mc6845, int state)
+{
+	if ( mc6845->de != state )
+	{
+		mc6845->de = state;
+
+		if ( mc6845->de )
 		{
-			/* normally, it's at end the current raster line */
-			next_y = mc6845->screen->vpos();
-			next_x = mc6845->max_visible_x + 1;
-
-			/* but if visible width = horiz_pix_total, then we need
-               to go to the beginning of VBLANK */
-			if (next_x == mc6845->horiz_pix_total)
-			{
-				next_y = mc6845->max_visible_y + 1;
-				next_x = 0;
-
-				/* abnormal case, no vertical blanking, either */
-				if (next_y == mc6845->vert_pix_total)
-					next_y = -1;
-			}
-			if (supports_transparent[mc6845->device_type]) timer_adjust_oneshot(mc6845->upd_adr_timer,  attotime_never, 0);
+			/* If the upd_adr_timer was running, cancel it */
+			timer_adjust_oneshot(mc6845->upd_adr_timer,  attotime_never, 0);
 		}
-
-		/* we are in a blanking region, get the location of the next display start */
 		else
 		{
-			next_x = 0;
-			next_y = (mc6845->screen->vpos() + 1) % mc6845->vert_pix_total;
-
-			/* if we would now fall in the vertical blanking, we need
-               to go to the top of the screen */
-			if (next_y > mc6845->max_visible_y)
-				next_y = 0;
-
 			/* if transparent update was requested fire the update timer */
 			if(!mc6845->update_ready_bit)
 				update_upd_adr_timer(mc6845);
 		}
 
-		if (next_y != -1)
-			duration = mc6845->screen->time_until_pos(next_y, next_x);
-		else
-			duration = attotime_never;
-
-		timer_adjust_oneshot(mc6845->de_changed_timer, duration, 0);
-	}
-}
-
-static void update_cur_changed_timers(mc6845_t *mc6845)
-{
-	if (mc6845->has_valid_parameters && (mc6845->cur_on_timer != NULL))
-	{
-		UINT16 cur_on_row = ((mc6845->cursor_addr - mc6845->disp_start_addr) / mc6845->horiz_disp) * (mc6845->max_ras_addr + 1);
-		UINT16 cur_on_y = cur_on_row + mc6845->cursor_start_ras;
-		UINT16 cur_off_y = cur_on_row + mc6845->cursor_end_ras;
-		UINT16 cur_on_pos = ((mc6845->cursor_addr - mc6845->disp_start_addr) % mc6845->horiz_disp) * mc6845->intf->hpixels_per_column;
-		UINT16 cur_off_pos = cur_on_pos + mc6845->intf->hpixels_per_column;
-		UINT16 next_y;
-		UINT16 y = mc6845->screen->vpos();
-
-		if ((y >= cur_on_y) && (y < cur_off_y))
-			next_y = y + 1;
-		else
-			next_y = cur_on_y;
-
-		timer_adjust_oneshot(mc6845->cur_on_timer,  mc6845->screen->time_until_pos(next_y, cur_on_pos) , 0);
-		timer_adjust_oneshot(mc6845->cur_off_timer, mc6845->screen->time_until_pos(next_y, cur_off_pos), 0);
-	}
-}
-
-static void update_hsync_changed_timers(mc6845_t *mc6845)
-{
-	if (mc6845->has_valid_parameters && (mc6845->hsync_on_timer != NULL))
-	{
-		UINT16 next_y;
-
-		/* we are before the HSYNC position, we trigger on the current line */
-		if (mc6845->screen->hpos() < mc6845->hsync_on_pos)
-			next_y = mc6845->screen->vpos();
-
-		/* trigger on the next line */
-		else
-			next_y = (mc6845->screen->vpos() + 1) % mc6845->vert_pix_total;
-
-		timer_adjust_oneshot(mc6845->hsync_on_timer,  mc6845->screen->time_until_pos(next_y, mc6845->hsync_on_pos) , 0);
-		timer_adjust_oneshot(mc6845->hsync_off_timer, mc6845->screen->time_until_pos(next_y, mc6845->hsync_off_pos), 0);
+		if ( mc6845->out_de_func.target != NULL )
+			devcb_call_write_line( &mc6845->out_de_func, mc6845->de );
 	}
 }
 
 
-static void update_vsync_changed_timers(mc6845_t *mc6845)
+INLINE void mc6845_set_hsync(mc6845_t *mc6845, int state)
 {
-	if (mc6845->has_valid_parameters && (mc6845->vsync_on_timer != NULL))
+	if ( mc6845->hsync != state )
 	{
-		timer_adjust_oneshot(mc6845->vsync_on_timer,  mc6845->screen->time_until_pos(mc6845->vsync_on_pos), 0);
-		timer_adjust_oneshot(mc6845->vsync_off_timer, mc6845->screen->time_until_pos(mc6845->vsync_off_pos), 0);
+		mc6845->hsync = state;
+
+		if ( mc6845->out_hsync_func.target != NULL )
+			devcb_call_write_line( &mc6845->out_hsync_func, mc6845->hsync );
 	}
+}
+
+
+INLINE void mc6845_set_vsync(mc6845_t *mc6845, int state)
+{
+	if ( mc6845->vsync != state )
+	{
+		mc6845->vsync = state;
+
+		if ( mc6845->out_vsync_func.target != NULL )
+			devcb_call_write_line( &mc6845->out_vsync_func, mc6845->vsync );
+	}
+}
+
+
+INLINE void mc6845_set_cur(mc6845_t *mc6845, int state)
+{
+	if ( mc6845->cur != state )
+	{
+		mc6845->cur = state;
+
+		if ( mc6845->out_cur_func.target != NULL )
+			devcb_call_write_line( &mc6845->out_cur_func, mc6845->cur );
+	}
+}
+
+
+static void update_upd_adr_timer(mc6845_t *mc6845)
+{
+	if (! mc6845->de && supports_transparent[mc6845->device_type])
+		timer_adjust_oneshot(mc6845->upd_adr_timer,  mc6845->upd_time, 0);
 }
 
 
@@ -554,15 +528,12 @@ static TIMER_CALLBACK( upd_adr_timer_cb )
 }
 
 
-static TIMER_CALLBACK( de_changed_timer_cb )
+static TIMER_CALLBACK( de_off_timer_cb )
 {
 	running_device *device = (running_device *)ptr;
 	mc6845_t *mc6845 = get_safe_token(device);
 
-	/* call the callback function -- we know it exists */
-	devcb_call_write_line(&mc6845->out_de_func, is_display_enabled(mc6845));
-
-	update_de_changed_timer(mc6845);
+	mc6845_set_de( mc6845, FALSE );
 }
 
 
@@ -571,8 +542,10 @@ static TIMER_CALLBACK( cur_on_timer_cb )
 	running_device *device = (running_device *)ptr;
 	mc6845_t *mc6845 = get_safe_token(device);
 
-	/* call the callback function -- we know it exists */
-	devcb_call_write_line(&mc6845->out_cur_func, TRUE);
+	mc6845_set_cur( mc6845, TRUE );
+
+	/* Schedule CURSOR off signal */
+	timer_adjust_oneshot( mc6845->cur_off_timer, ticks_to_attotime( 1, mc6845->clock ), 0 );
 }
 
 
@@ -581,32 +554,7 @@ static TIMER_CALLBACK( cur_off_timer_cb )
 	running_device *device = (running_device *)ptr;
 	mc6845_t *mc6845 = get_safe_token(device);
 
-	/* call the callback function -- we know it exists */
-	devcb_call_write_line(&mc6845->out_cur_func, FALSE);
-
-	update_cur_changed_timers(mc6845);
-}
-
-
-static TIMER_CALLBACK( vsync_on_timer_cb )
-{
-	running_device *device = (running_device *)ptr;
-	mc6845_t *mc6845 = get_safe_token(device);
-
-	/* call the callback function -- we know it exists */
-	devcb_call_write_line(&mc6845->out_vsync_func, TRUE);
-}
-
-
-static TIMER_CALLBACK( vsync_off_timer_cb )
-{
-	running_device *device = (running_device *)ptr;
-	mc6845_t *mc6845 = get_safe_token(device);
-
-	/* call the callback function -- we know it exists */
-	devcb_call_write_line(&mc6845->out_vsync_func, FALSE);
-
-	update_vsync_changed_timers(mc6845);
+	mc6845_set_cur( mc6845, FALSE );
 }
 
 
@@ -614,9 +562,13 @@ static TIMER_CALLBACK( hsync_on_timer_cb )
 {
 	running_device *device = (running_device *)ptr;
 	mc6845_t *mc6845 = get_safe_token(device);
+	UINT8 hsync_width = ( mc6845->sync_width & 0x0f ) ? ( mc6845->sync_width & 0x0f ) : 0x10;
 
-	/* call the callback function -- we know it exists */
-	devcb_call_write_line(&mc6845->out_hsync_func, TRUE);
+	mc6845->hsync_width_counter = 0;
+	mc6845_set_hsync( mc6845, TRUE );
+
+	/* Schedule HSYNC off signal */
+	timer_adjust_oneshot( mc6845->hsync_off_timer, ticks_to_attotime( hsync_width, mc6845->clock ), 0 );
 }
 
 
@@ -625,63 +577,133 @@ static TIMER_CALLBACK( hsync_off_timer_cb )
 	running_device *device = (running_device *)ptr;
 	mc6845_t *mc6845 = get_safe_token(device);
 
-	/* call the callback function -- we know it exists */
-	devcb_call_write_line(&mc6845->out_hsync_func, FALSE);
-
-	update_hsync_changed_timers(mc6845);
+	mc6845_set_hsync( mc6845, FALSE );
 }
 
+
+static TIMER_CALLBACK( line_timer_cb )
+{
+	running_device *device = (running_device *)ptr;
+	mc6845_t *mc6845 = get_safe_token(device);
+	int new_vsync = mc6845->vsync;
+
+	mc6845->character_counter = 0;
+	mc6845->cursor_x = -1;
+
+	/* Check if VSYNC is active */
+	if ( mc6845->vsync_ff )
+	{
+		UINT8 vsync_width = supports_vert_sync_width[mc6845->device_type] ? (mc6845->sync_width >> 4) & 0x0f : 0;
+
+		mc6845->vsync_width_counter = ( mc6845->vsync_width_counter + 1 ) & 0x0F;
+
+		/* Check if we've reached end of VSYNC */
+		if ( mc6845->vsync_width_counter == vsync_width )
+		{
+			mc6845->vsync_ff = 0;
+
+			new_vsync = FALSE;
+		}
+	}
+
+	if ( mc6845->raster_counter == mc6845->max_ras_addr )
+	{
+		/* Check if we have reached the end of the vertical area */
+		if ( mc6845->line_counter == mc6845->vert_char_total )
+		{
+			mc6845->adjust_counter = 0;
+			mc6845->adjust_active = 1;
+		}
+
+		mc6845->raster_counter = 0;
+		mc6845->line_counter = ( mc6845->line_counter + 1 ) & 0x7F;
+		mc6845->line_address = ( mc6845->line_address + mc6845->horiz_disp ) & 0x3fff;
+
+		/* Check if we've reached the end of active display */
+		if ( mc6845->line_counter == mc6845->vert_disp )
+		{
+			mc6845->line_enable_ff = 0;
+		}
+
+		/* Check if VSYNC should be enabled */
+		if ( mc6845->line_counter == mc6845->vert_sync_pos )
+		{
+			mc6845->vsync_width_counter = 0;
+			mc6845->vsync_ff = 1;
+
+			new_vsync = TRUE;
+		}
+	}
+	else
+	{
+		mc6845->raster_counter = ( mc6845->raster_counter + 1 ) & 0x1F;
+	}
+
+	if ( mc6845->adjust_active )
+	{
+		/* Check if we have reached the end of a full cycle */
+		if ( mc6845->adjust_counter == mc6845->vert_total_adj )
+		{
+			mc6845->adjust_active = 0;
+			mc6845->raster_counter = 0;
+			mc6845->line_counter = 0;
+			mc6845->line_address = mc6845->disp_start_addr;
+			mc6845->line_enable_ff = 1;
+			/* also update the cursor state now */
+			update_cursor_state(mc6845);
+		}
+		else
+		{
+			mc6845->adjust_counter = ( mc6845->adjust_counter + 1 ) & 0x1F;
+		}
+	}
+
+	if ( mc6845->line_enable_ff )
+	{
+		/* Schedule DE off signal change */
+		timer_adjust_oneshot(mc6845->de_off_timer, ticks_to_attotime( mc6845->horiz_disp, mc6845->clock ), 0);
+
+		/* Is cursor visible on this line? */
+		if ( mc6845->cursor_state &&
+			(mc6845->raster_counter >= (mc6845->cursor_start_ras & 0x1f)) &&
+			(mc6845->raster_counter <= mc6845->cursor_end_ras) &&
+			(mc6845->cursor_addr >= mc6845->line_address) &&
+			(mc6845->cursor_addr < (mc6845->line_address + mc6845->horiz_disp)) )
+		{
+			mc6845->cursor_x = mc6845->cursor_addr - mc6845->line_address;
+
+			/* Schedule CURSOR ON signal */
+			timer_adjust_oneshot( mc6845->cur_on_timer, ticks_to_attotime( mc6845->cursor_x, mc6845->clock ), 0 );
+		}
+	}
+
+	/* Schedule HSYNC on signal */
+	timer_adjust_oneshot( mc6845->hsync_on_timer, ticks_to_attotime( mc6845->horiz_sync_pos, mc6845->clock ), 0 );
+
+	/* Schedule our next callback */
+	timer_adjust_oneshot( mc6845->line_timer, ticks_to_attotime( mc6845->horiz_char_total + 1, mc6845->clock ), 0 );
+
+	/* Set VSYNC and DE signals */
+	mc6845_set_vsync( mc6845, new_vsync );
+	mc6845_set_de( mc6845, mc6845->line_enable_ff ? TRUE : FALSE );
+}
 
 
 UINT16 mc6845_get_ma(running_device *device)
 {
-	UINT16 ret;
 	mc6845_t *mc6845 = get_safe_token(device);
 
-	if (mc6845->has_valid_parameters)
-	{
-		/* clamp Y/X to the visible region */
-		int y = mc6845->screen->vpos();
-		int x = mc6845->screen->hpos();
-
-		/* since the MA counter stops in the blanking regions, if we are in a
-           VBLANK, both X and Y are at their max */
-		if ((y > mc6845->max_visible_y) || (x > mc6845->max_visible_x))
-			x = mc6845->max_visible_x;
-
-		if (y > mc6845->max_visible_y)
-			y = mc6845->max_visible_y;
-
-		ret = (mc6845->disp_start_addr +
-			  (y / (mc6845->max_ras_addr + 1)) * mc6845->horiz_disp +
-			  (x / mc6845->hpixels_per_column)) & 0x3fff;
-	}
-	else
-		ret = 0;
-
-	return ret;
+	mc6845_update_counters( mc6845 );
+	
+	return ( mc6845->line_address + mc6845->character_counter ) & 0x3fff;
 }
 
 
 UINT8 mc6845_get_ra(running_device *device)
 {
-	UINT8 ret;
 	mc6845_t *mc6845 = get_safe_token(device);
 
-	if (mc6845->has_valid_parameters)
-	{
-		/* get the current vertical raster position and clamp it to the visible region */
-		int y = mc6845->screen->vpos();
-
-		if (y > mc6845->max_visible_y)
-			y = mc6845->max_visible_y;
-
-		ret = y % (mc6845->max_ras_addr + 1);
-	}
-	else
-		ret = 0;
-
-	return ret;
+	return mc6845->raster_counter;
 }
 
 
@@ -697,34 +719,11 @@ static TIMER_CALLBACK( light_pen_latch_timer_cb )
 
 void mc6845_assert_light_pen_input(running_device *device)
 {
-	int y, x;
-	int char_x;
-
 	mc6845_t *mc6845 = get_safe_token(device);
 
-	if (mc6845->has_valid_parameters)
-	{
-		/* get the current pixel coordinates */
-		y = mc6845->screen->vpos();
-		x = mc6845->screen->hpos();
-
-		/* compute the pixel coordinate of the NEXT character -- this is when the light pen latches */
-		char_x = x / mc6845->hpixels_per_column;
-		x = (char_x + 1) * mc6845->hpixels_per_column;
-
-		/* adjust if we are passed the boundaries of the screen */
-		if (x == mc6845->horiz_pix_total)
-		{
-			y = y + 1;
-			x = 0;
-
-			if (y == mc6845->vert_pix_total)
-				y = 0;
-		}
-
-		/* set the timer that will latch the display address into the light pen registers */
-		timer_adjust_oneshot(mc6845->light_pen_latch_timer, mc6845->screen->time_until_pos(y, x), 0);
-	}
+	/* compute the pixel coordinate of the NEXT character -- this is when the light pen latches */
+	/* set the timer that will latch the display address into the light pen registers */
+	timer_adjust_oneshot(mc6845->light_pen_latch_timer, ticks_to_attotime( 1, mc6845->clock ), 0);
 }
 
 
@@ -812,9 +811,6 @@ void mc6845_update(running_device *device, bitmap_t *bitmap, const rectangle *cl
 		{
 			/* read the start address at the beginning of the frame */
 			mc6845->current_disp_addr = mc6845->disp_start_addr;
-
-			/* also update the cursor state now */
-			update_cursor_state(mc6845);
 		}
 
 		/* for each row in the visible region */
@@ -877,39 +873,33 @@ static void common_start(running_device *device, int device_type)
 		mc6845->hpixels_per_column = mc6845->intf->hpixels_per_column;
 
 		/* get the screen device */
-		mc6845->screen = downcast<screen_device *>(device->machine->device(mc6845->intf->screen_tag));
-		assert(mc6845->screen != NULL);
+		if ( mc6845->intf->screen_tag != NULL )
+		{
+			mc6845->screen = downcast<screen_device *>(device->machine->device(mc6845->intf->screen_tag));
+			assert(mc6845->screen != NULL);
+		}
+		else
+			mc6845->screen = NULL;
 
 		/* create the timers */
-		if (mc6845->out_de_func.target != NULL || supports_transparent[mc6845->device_type])
-		{
-			mc6845->de_changed_timer = timer_alloc(device->machine, de_changed_timer_cb, (void *)device);
-			if(supports_transparent[mc6845->device_type])
-			{
-				mc6845->upd_adr_timer = timer_alloc(device->machine, upd_adr_timer_cb, (void *)device);
-			}
-		}
+		mc6845->line_timer = timer_alloc(device->machine, line_timer_cb, (void *)device);
 
-		if (mc6845->out_cur_func.target != NULL)
-		{
-			mc6845->cur_on_timer = timer_alloc(device->machine, cur_on_timer_cb, (void *)device);
-			mc6845->cur_off_timer = timer_alloc(device->machine, cur_off_timer_cb, (void *)device);
-		}
+		mc6845->de_off_timer = timer_alloc(device->machine, de_off_timer_cb, (void *)device);
+		mc6845->upd_adr_timer = timer_alloc(device->machine, upd_adr_timer_cb, (void *)device);
 
-		if (mc6845->out_hsync_func.target != NULL)
-		{
-			mc6845->hsync_on_timer = timer_alloc(device->machine, hsync_on_timer_cb, (void *)device);
-			mc6845->hsync_off_timer = timer_alloc(device->machine, hsync_off_timer_cb, (void *)device);
-		}
+		mc6845->cur_on_timer = timer_alloc(device->machine, cur_on_timer_cb, (void *)device);
+		mc6845->cur_off_timer = timer_alloc(device->machine, cur_off_timer_cb, (void *)device);
 
-		if (mc6845->out_vsync_func.target != NULL)
-		{
-			mc6845->vsync_on_timer = timer_alloc(device->machine, vsync_on_timer_cb, (void *)device);
-			mc6845->vsync_off_timer = timer_alloc(device->machine, vsync_off_timer_cb, (void *)device);
-		}
+		mc6845->hsync_on_timer = timer_alloc(device->machine, hsync_on_timer_cb, (void *)device);
+		mc6845->hsync_off_timer = timer_alloc(device->machine, hsync_off_timer_cb, (void *)device);
 	}
 
 	mc6845->light_pen_latch_timer = timer_alloc(device->machine, light_pen_latch_timer_cb, (void *)device);
+
+	/* Use some large startup values */
+	mc6845->horiz_char_total = 0xff;
+	mc6845->max_ras_addr = 0x1f;
+	mc6845->vert_char_total = 0x7f;
 
 	/* register for state saving */
 	state_save_register_postload(device->machine, mc6845_state_save_postload, mc6845);
@@ -937,6 +927,21 @@ static void common_start(running_device *device, int device_type)
 	state_save_register_device_item(device, 0, mc6845->cursor_blink_count);
 	state_save_register_device_item(device, 0, mc6845->update_addr);
 	state_save_register_device_item(device, 0, mc6845->update_ready_bit);
+	state_save_register_device_item(device, 0, mc6845->cur);
+	state_save_register_device_item(device, 0, mc6845->hsync);
+	state_save_register_device_item(device, 0, mc6845->vsync);
+	state_save_register_device_item(device, 0, mc6845->de);
+	state_save_register_device_item(device, 0, mc6845->character_counter);
+	state_save_register_device_item(device, 0, mc6845->hsync_width_counter);
+	state_save_register_device_item(device, 0, mc6845->line_counter);
+	state_save_register_device_item(device, 0, mc6845->raster_counter);
+	state_save_register_device_item(device, 0, mc6845->adjust_counter);
+	state_save_register_device_item(device, 0, mc6845->vsync_width_counter);
+	state_save_register_device_item(device, 0, mc6845->line_enable_ff);
+	state_save_register_device_item(device, 0, mc6845->vsync_ff);
+	state_save_register_device_item(device, 0, mc6845->adjust_active);
+	state_save_register_device_item(device, 0, mc6845->line_address);
+	state_save_register_device_item(device, 0, mc6845->cursor_x);
 }
 
 static DEVICE_START( mc6845 )
@@ -990,6 +995,11 @@ static DEVICE_RESET( mc6845 )
 
 		if (mc6845->out_vsync_func.target != NULL)
 			devcb_call_write_line(&mc6845->out_vsync_func, FALSE);
+	}
+
+	if ( ! timer_enabled( mc6845->line_timer ) )
+	{
+		timer_adjust_oneshot( mc6845->line_timer, ticks_to_attotime( mc6845->horiz_char_total + 1, mc6845->clock ), 0 );
 	}
 
 	mc6845->light_pen_latched = FALSE;
