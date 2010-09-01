@@ -30,15 +30,11 @@ Standard dm01 memorymap
 -----------+---+-----------------+-----------------------------------------
 
   TODO: - find out clockspeed of CPU
-        - make a non-hacky Artwork representation of dot matrix
-  Layout notes: the dot matrix is set to screen 0.
-  Multiple matrices and matrix/VFD combos are not yet supported.
 
 ***************************************************************************/
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
-#include "video/awpvid.h"
 #include "bfm_dm01.h"
 // local prototypes ///////////////////////////////////////////////////////
 
@@ -64,8 +60,6 @@ static UINT8 comdata;
 
 //static int   read_index;
 //static int   write_index;
-
-static bitmap_t *dm_bitmap;
 
 #ifdef MAME_DEBUG
 #define VERBOSE 1
@@ -140,28 +134,39 @@ static WRITE8_HANDLER( mux_w )
 
 	if ( x == 8 )
 	{
-    	int off = ((0xFF^data) & 0x7C) >> 2;	// 7C = 000001111100
+    	int row = ((0xFF^data) & 0x7C) >> 2;	// 7C = 000001111100
 
 		scanline[x] &= 0x80;
-		if ( (off >= 0)  && (off < DM_MAXLINES) )
+		if ( (row >= 0)  && (row < DM_MAXLINES) )
 		{
-			int p;
+			int p,dots;
 
 			x = 0;
 			p = 0;
+			dots = 0;
 
-			while ( p < DM_BYTESPERROW )
+			while ( p < (DM_BYTESPERROW) )
 			{
-				UINT8 d = scanline[p++];
-				LOG(("%d",d));
-				*BITMAP_ADDR16(dm_bitmap, off, x++) = (d & 0x80) ? 0 : 1;
-				*BITMAP_ADDR16(dm_bitmap, off, x++) = (d & 0x40) ? 0 : 1;
-				*BITMAP_ADDR16(dm_bitmap, off, x++) = (d & 0x20) ? 0 : 1;
-				*BITMAP_ADDR16(dm_bitmap, off, x++) = (d & 0x10) ? 0 : 1;
-				*BITMAP_ADDR16(dm_bitmap, off, x++) = (d & 0x08) ? 0 : 1;
-				*BITMAP_ADDR16(dm_bitmap, off, x++) = (d & 0x04) ? 0 : 1;
-				*BITMAP_ADDR16(dm_bitmap, off, x++) = (d & 0x02) ? 0 : 1;
-				*BITMAP_ADDR16(dm_bitmap, off, x++) = (d & 0x01) ? 0 : 1;
+
+				UINT8 d = scanline[p];
+				if (d & 0x80) dots |= 0x01;
+				else          dots &=~0x01;
+				if (d & 0x40) dots |= 0x02;
+				else          dots &=~0x02;
+				if (d & 0x20) dots |= 0x04;
+				else          dots &=~0x04;
+				if (d & 0x10) dots |= 0x08;
+				else          dots &=~0x08;
+				if (d & 0x08) dots |= 0x10;
+				else          dots &=~0x10;
+				if (d & 0x04) dots |= 0x20;
+				else          dots &=~0x20;
+				if (d & 0x02) dots |= 0x40;
+				else          dots &=~0x40;
+				if (d & 0x01) dots |= 0x80;
+				else          dots &=~0x80;
+				output_set_indexed_value("matrix", p +(8*row), dots);
+				p++;
 			}
 		}
 	}
@@ -237,28 +242,6 @@ INTERRUPT_GEN( bfm_dm01_vbl )
 }
 
 ///////////////////////////////////////////////////////////////////////////
-
-VIDEO_START( bfm_dm01 )
-{
-	dm_bitmap = auto_bitmap_alloc(machine, DM_BYTESPERROW*8, DM_MAXLINES,machine->primary_screen->format());
-}
-
-///////////////////////////////////////////////////////////////////////////
-
-// Note that we assume square pixels, which isn't strictly true (the elements are round).
-
-VIDEO_UPDATE( bfm_dm01 )
-{
-	const rectangle &visarea = screen->visible_area();
-
-	copybitmap(bitmap, dm_bitmap, 0,0,0,0, &visarea);
-
-	LOG(("Busy=%X",data_avail));
-	LOG(("%X",Scorpion2_GetSwitchState(FEEDBACK_STROBE,FEEDBACK_DATA)));
-
-	return 0;
-}
-
 int BFM_dm01_busy(void)
 {
 	return data_avail;
@@ -273,11 +256,3 @@ void BFM_dm01_reset(void)
 
 	Scorpion2_SetSwitchState(FEEDBACK_STROBE,FEEDBACK_DATA, busy?0:1);
 }
-
-PALETTE_INIT( bfm_dm01 )
-{
-	palette_set_color(machine, 0, MAKE_RGB(0xFF,0x00,0x00));
-	palette_set_color(machine, 1, MAKE_RGB(0x40,0x00,0x00));
-}
-
-

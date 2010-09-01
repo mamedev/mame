@@ -14,6 +14,12 @@
 			<color red="0.0" green="1.0" blue="0.0" />
 		</rect>
 	</element>
+	<element name="matrix">
+	<dotmatrix>
+		<color red="1" green="0" blue="0" />
+	</dotmatrix>
+	</element>
+
 	<element name="Steppers" defstate="96">
 		<text string="00" state="0">
 			<color red="1.0" green="1.0" blue="1.0" />
@@ -403,9 +409,512 @@
 	</element>
 
 	<view name="AWP Simulated Video (Reels and Lamp Matrix)">
-		<screen index="0">
-			<bounds x="150" y="60" width="144" height="42" />
-		</screen>
+		<backdrop name="matrix0" element="matrix" state="0">
+			<bounds x="150" y="60" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix1" element="matrix" state="0">
+			<bounds x="158" y="60" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix2" element="matrix" state="0">
+			<bounds x="166" y="60" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix3" element="matrix" state="0">
+			<bounds x="174" y="60" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix4" element="matrix" state="0">
+			<bounds x="182" y="60" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix5" element="matrix" state="0">
+			<bounds x="190" y="60" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix6" element="matrix" state="0">
+			<bounds x="198" y="60" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix7" element="matrix" state="0">
+			<bounds x="206" y="60" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix8" element="matrix" state="0">
+			<bounds x="150" y="61" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix9" element="matrix" state="0">
+			<bounds x="158" y="61" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix10" element="matrix" state="0">
+			<bounds x="166" y="61" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix11" element="matrix" state="0">
+			<bounds x="174" y="61" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix12" element="matrix" state="0">
+			<bounds x="182" y="61" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix13" element="matrix" state="0">
+			<bounds x="190" y="61" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix14" element="matrix" state="0">
+			<bounds x="198" y="61" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix15" element="matrix" state="0">
+			<bounds x="206" y="61" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix16" element="matrix" state="0">
+			<bounds x="150" y="62" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix17" element="matrix" state="0">
+			<bounds x="158" y="62" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix18" element="matrix" state="0">
+			<bounds x="166" y="62" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix19" element="matrix" state="0">
+			<bounds x="174" y="62" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix20" element="matrix" state="0">
+			<bounds x="182" y="62" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix21" element="matrix" state="0">
+			<bounds x="190" y="62" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix22" element="matrix" state="0">
+			<bounds x="198" y="62" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix23" element="matrix" state="0">
+			<bounds x="206" y="62" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix24" element="matrix" state="0">
+			<bounds x="150" y="63" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix25" element="matrix" state="0">
+			<bounds x="158" y="63" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix26" element="matrix" state="0">
+			<bounds x="166" y="63" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix27" element="matrix" state="0">
+			<bounds x="174" y="63" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix28" element="matrix" state="0">
+			<bounds x="182" y="63" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix29" element="matrix" state="0">
+			<bounds x="190" y="63" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix30" element="matrix" state="0">
+			<bounds x="198" y="63" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix31" element="matrix" state="0">
+			<bounds x="206" y="63" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix32" element="matrix" state="0">
+			<bounds x="150" y="64" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix33" element="matrix" state="0">
+			<bounds x="158" y="64" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix34" element="matrix" state="0">
+			<bounds x="166" y="64" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix35" element="matrix" state="0">
+			<bounds x="174" y="64" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix36" element="matrix" state="0">
+			<bounds x="182" y="64" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix37" element="matrix" state="0">
+			<bounds x="190" y="64" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix38" element="matrix" state="0">
+			<bounds x="198" y="64" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix39" element="matrix" state="0">
+			<bounds x="206" y="64" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix40" element="matrix" state="0">
+			<bounds x="150" y="65" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix41" element="matrix" state="0">
+			<bounds x="158" y="65" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix42" element="matrix" state="0">
+			<bounds x="166" y="65" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix43" element="matrix" state="0">
+			<bounds x="174" y="65" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix44" element="matrix" state="0">
+			<bounds x="182" y="65" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix45" element="matrix" state="0">
+			<bounds x="190" y="65" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix46" element="matrix" state="0">
+			<bounds x="198" y="65" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix47" element="matrix" state="0">
+			<bounds x="206" y="65" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix48" element="matrix" state="0">
+			<bounds x="150" y="66" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix49" element="matrix" state="0">
+			<bounds x="158" y="66" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix50" element="matrix" state="0">
+			<bounds x="166" y="66" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix51" element="matrix" state="0">
+			<bounds x="174" y="66" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix52" element="matrix" state="0">
+			<bounds x="182" y="66" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix53" element="matrix" state="0">
+			<bounds x="190" y="66" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix54" element="matrix" state="0">
+			<bounds x="198" y="66" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix55" element="matrix" state="0">
+			<bounds x="206" y="66" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix56" element="matrix" state="0">
+			<bounds x="150" y="67" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix57" element="matrix" state="0">
+			<bounds x="158" y="67" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix58" element="matrix" state="0">
+			<bounds x="166" y="67" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix59" element="matrix" state="0">
+			<bounds x="174" y="67" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix60" element="matrix" state="0">
+			<bounds x="182" y="67" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix61" element="matrix" state="0">
+			<bounds x="190" y="67" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix62" element="matrix" state="0">
+			<bounds x="198" y="67" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix63" element="matrix" state="0">
+			<bounds x="206" y="67" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix64" element="matrix" state="0">
+			<bounds x="150" y="67" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix65" element="matrix" state="0">
+			<bounds x="158" y="67" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix66" element="matrix" state="0">
+			<bounds x="166" y="67" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix67" element="matrix" state="0">
+			<bounds x="174" y="67" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix68" element="matrix" state="0">
+			<bounds x="182" y="67" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix69" element="matrix" state="0">
+			<bounds x="190" y="67" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix70" element="matrix" state="0">
+			<bounds x="198" y="67" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix71" element="matrix" state="0">
+			<bounds x="206" y="67" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix72" element="matrix" state="0">
+			<bounds x="150" y="68" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix73" element="matrix" state="0">
+			<bounds x="158" y="68" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix74" element="matrix" state="0">
+			<bounds x="166" y="68" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix75" element="matrix" state="0">
+			<bounds x="174" y="68" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix76" element="matrix" state="0">
+			<bounds x="182" y="68" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix77" element="matrix" state="0">
+			<bounds x="190" y="68" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix78" element="matrix" state="0">
+			<bounds x="198" y="68" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix79" element="matrix" state="0">
+			<bounds x="206" y="68" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix80" element="matrix" state="0">
+			<bounds x="150" y="69" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix81" element="matrix" state="0">
+			<bounds x="158" y="69" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix82" element="matrix" state="0">
+			<bounds x="166" y="69" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix83" element="matrix" state="0">
+			<bounds x="174" y="69" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix84" element="matrix" state="0">
+			<bounds x="182" y="69" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix85" element="matrix" state="0">
+			<bounds x="190" y="69" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix86" element="matrix" state="0">
+			<bounds x="198" y="69" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix87" element="matrix" state="0">
+			<bounds x="206" y="69" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix88" element="matrix" state="0">
+			<bounds x="150" y="70" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix89" element="matrix" state="0">
+			<bounds x="158" y="70" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix90" element="matrix" state="0">
+			<bounds x="166" y="70" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix91" element="matrix" state="0">
+			<bounds x="174" y="70" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix92" element="matrix" state="0">
+			<bounds x="182" y="70" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix93" element="matrix" state="0">
+			<bounds x="190" y="70" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix94" element="matrix" state="0">
+			<bounds x="198" y="70" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix95" element="matrix" state="0">
+			<bounds x="206" y="70" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix96" element="matrix" state="0">
+			<bounds x="150" y="71" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix97" element="matrix" state="0">
+			<bounds x="158" y="71" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix98" element="matrix" state="0">
+			<bounds x="166" y="71" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix99" element="matrix" state="0">
+			<bounds x="174" y="71" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix100" element="matrix" state="0">
+			<bounds x="182" y="71" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix101" element="matrix" state="0">
+			<bounds x="190" y="71" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix102" element="matrix" state="0">
+			<bounds x="198" y="71" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix103" element="matrix" state="0">
+			<bounds x="206" y="71" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix104" element="matrix" state="0">
+			<bounds x="150" y="72" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix105" element="matrix" state="0">
+			<bounds x="158" y="72" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix106" element="matrix" state="0">
+			<bounds x="166" y="72" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix107" element="matrix" state="0">
+			<bounds x="174" y="72" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix108" element="matrix" state="0">
+			<bounds x="182" y="72" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix109" element="matrix" state="0">
+			<bounds x="190" y="72" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix110" element="matrix" state="0">
+			<bounds x="198" y="72" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix111" element="matrix" state="0">
+			<bounds x="206" y="72" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix112" element="matrix" state="0">
+			<bounds x="150" y="73" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix113" element="matrix" state="0">
+			<bounds x="158" y="73" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix114" element="matrix" state="0">
+			<bounds x="166" y="73" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix115" element="matrix" state="0">
+			<bounds x="174" y="73" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix116" element="matrix" state="0">
+			<bounds x="182" y="73" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix117" element="matrix" state="0">
+			<bounds x="190" y="73" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix118" element="matrix" state="0">
+			<bounds x="198" y="73" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix119" element="matrix" state="0">
+			<bounds x="206" y="73" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix120" element="matrix" state="0">
+			<bounds x="150" y="74" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix121" element="matrix" state="0">
+			<bounds x="158" y="74" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix122" element="matrix" state="0">
+			<bounds x="166" y="74" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix123" element="matrix" state="0">
+			<bounds x="174" y="74" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix124" element="matrix" state="0">
+			<bounds x="182" y="74" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix125" element="matrix" state="0">
+			<bounds x="190" y="74" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix126" element="matrix" state="0">
+			<bounds x="198" y="74" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix127" element="matrix" state="0">
+			<bounds x="206" y="74" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix128" element="matrix" state="0">
+			<bounds x="150" y="75" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix129" element="matrix" state="0">
+			<bounds x="158" y="75" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix130" element="matrix" state="0">
+			<bounds x="166" y="75" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix131" element="matrix" state="0">
+			<bounds x="174" y="75" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix132" element="matrix" state="0">
+			<bounds x="182" y="75" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix133" element="matrix" state="0">
+			<bounds x="190" y="75" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix134" element="matrix" state="0">
+			<bounds x="198" y="75" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix135" element="matrix" state="0">
+			<bounds x="206" y="75" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix136" element="matrix" state="0">
+			<bounds x="150" y="76" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix137" element="matrix" state="0">
+			<bounds x="158" y="76" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix138" element="matrix" state="0">
+			<bounds x="166" y="76" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix139" element="matrix" state="0">
+			<bounds x="174" y="76" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix140" element="matrix" state="0">
+			<bounds x="182" y="76" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix141" element="matrix" state="0">
+			<bounds x="190" y="76" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix142" element="matrix" state="0">
+			<bounds x="198" y="76" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix143" element="matrix" state="0">
+			<bounds x="206" y="76" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix144" element="matrix" state="0">
+			<bounds x="150" y="77" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix145" element="matrix" state="0">
+			<bounds x="158" y="77" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix146" element="matrix" state="0">
+			<bounds x="166" y="77" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix147" element="matrix" state="0">
+			<bounds x="174" y="77" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix148" element="matrix" state="0">
+			<bounds x="182" y="77" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix149" element="matrix" state="0">
+			<bounds x="190" y="77" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix150" element="matrix" state="0">
+			<bounds x="198" y="77" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix151" element="matrix" state="0">
+			<bounds x="206" y="77" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix152" element="matrix" state="0">
+			<bounds x="150" y="78" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix153" element="matrix" state="0">
+			<bounds x="158" y="78" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix154" element="matrix" state="0">
+			<bounds x="166" y="78" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix155" element="matrix" state="0">
+			<bounds x="174" y="78" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix156" element="matrix" state="0">
+			<bounds x="182" y="78" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix157" element="matrix" state="0">
+			<bounds x="190" y="78" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix158" element="matrix" state="0">
+			<bounds x="198" y="78" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix159" element="matrix" state="0">
+			<bounds x="206" y="78" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix160" element="matrix" state="0">
+			<bounds x="150" y="79" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix161" element="matrix" state="0">
+			<bounds x="158" y="79" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix162" element="matrix" state="0">
+			<bounds x="166" y="79" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix163" element="matrix" state="0">
+			<bounds x="174" y="79" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix164" element="matrix" state="0">
+			<bounds x="182" y="79" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix165" element="matrix" state="0">
+			<bounds x="190" y="79" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix166" element="matrix" state="0">
+			<bounds x="198" y="79" width="8" height="1"/>
+		</backdrop>
+		<backdrop name="matrix167" element="matrix" state="0">
+			<bounds x="206" y="79" width="8" height="1"/>
+		</backdrop>
+
+
 		<backdrop name="reel1" element="Steppers" state="0">
 			<bounds x="10" y="150" width="50" height="50"/>
 		</backdrop>
@@ -1193,9 +1702,511 @@
 			<bounds x="120" y="120" width="7" height="7"/>
 		</backdrop>
 	</view>
-	<view name="DMD Output Only">
-		<screen index="0">
-			<bounds x="0" y="0" width="72" height="21" />
-		</screen>
+
+	<view name="DMD Only">
+		<backdrop name="matrix0" element="matrix" state="0">
+			<bounds x="0" y="60" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix1" element="matrix" state="0">
+			<bounds x="64" y="60" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix2" element="matrix" state="0">
+			<bounds x="128" y="60" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix3" element="matrix" state="0">
+			<bounds x="192" y="60" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix4" element="matrix" state="0">
+			<bounds x="256" y="60" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix5" element="matrix" state="0">
+			<bounds x="320" y="60" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix6" element="matrix" state="0">
+			<bounds x="384" y="60" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix7" element="matrix" state="0">
+			<bounds x="448" y="60" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix8" element="matrix" state="0">
+			<bounds x="0" y="68" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix9" element="matrix" state="0">
+			<bounds x="64" y="68" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix10" element="matrix" state="0">
+			<bounds x="128" y="68" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix11" element="matrix" state="0">
+			<bounds x="192" y="68" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix12" element="matrix" state="0">
+			<bounds x="256" y="68" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix13" element="matrix" state="0">
+			<bounds x="320" y="68" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix14" element="matrix" state="0">
+			<bounds x="384" y="68" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix15" element="matrix" state="0">
+			<bounds x="448" y="68" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix16" element="matrix" state="0">
+			<bounds x="0" y="76" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix17" element="matrix" state="0">
+			<bounds x="64" y="76" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix18" element="matrix" state="0">
+			<bounds x="128" y="76" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix19" element="matrix" state="0">
+			<bounds x="192" y="76" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix20" element="matrix" state="0">
+			<bounds x="256" y="76" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix21" element="matrix" state="0">
+			<bounds x="320" y="76" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix22" element="matrix" state="0">
+			<bounds x="384" y="76" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix23" element="matrix" state="0">
+			<bounds x="448" y="76" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix24" element="matrix" state="0">
+			<bounds x="0" y="84" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix25" element="matrix" state="0">
+			<bounds x="64" y="84" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix26" element="matrix" state="0">
+			<bounds x="128" y="84" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix27" element="matrix" state="0">
+			<bounds x="192" y="84" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix28" element="matrix" state="0">
+			<bounds x="256" y="84" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix29" element="matrix" state="0">
+			<bounds x="320" y="84" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix30" element="matrix" state="0">
+			<bounds x="384" y="84" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix31" element="matrix" state="0">
+			<bounds x="448" y="84" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix32" element="matrix" state="0">
+			<bounds x="0" y="92" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix33" element="matrix" state="0">
+			<bounds x="64" y="92" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix34" element="matrix" state="0">
+			<bounds x="128" y="92" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix35" element="matrix" state="0">
+			<bounds x="192" y="92" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix36" element="matrix" state="0">
+			<bounds x="256" y="92" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix37" element="matrix" state="0">
+			<bounds x="320" y="92" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix38" element="matrix" state="0">
+			<bounds x="384" y="92" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix39" element="matrix" state="0">
+			<bounds x="448" y="92" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix40" element="matrix" state="0">
+			<bounds x="0" y="100" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix41" element="matrix" state="0">
+			<bounds x="64" y="100" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix42" element="matrix" state="0">
+			<bounds x="128" y="100" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix43" element="matrix" state="0">
+			<bounds x="192" y="100" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix44" element="matrix" state="0">
+			<bounds x="256" y="100" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix45" element="matrix" state="0">
+			<bounds x="320" y="100" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix46" element="matrix" state="0">
+			<bounds x="384" y="100" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix47" element="matrix" state="0">
+			<bounds x="448" y="100" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix48" element="matrix" state="0">
+			<bounds x="0" y="108" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix49" element="matrix" state="0">
+			<bounds x="64" y="108" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix50" element="matrix" state="0">
+			<bounds x="128" y="108" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix51" element="matrix" state="0">
+			<bounds x="192" y="108" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix52" element="matrix" state="0">
+			<bounds x="256" y="108" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix53" element="matrix" state="0">
+			<bounds x="320" y="108" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix54" element="matrix" state="0">
+			<bounds x="384" y="108" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix55" element="matrix" state="0">
+			<bounds x="448" y="108" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix56" element="matrix" state="0">
+			<bounds x="0" y="116" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix57" element="matrix" state="0">
+			<bounds x="64" y="116" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix58" element="matrix" state="0">
+			<bounds x="128" y="116" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix59" element="matrix" state="0">
+			<bounds x="192" y="116" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix60" element="matrix" state="0">
+			<bounds x="256" y="116" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix61" element="matrix" state="0">
+			<bounds x="320" y="116" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix62" element="matrix" state="0">
+			<bounds x="384" y="116" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix63" element="matrix" state="0">
+			<bounds x="448" y="116" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix64" element="matrix" state="0">
+			<bounds x="0" y="124" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix65" element="matrix" state="0">
+			<bounds x="64" y="124" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix66" element="matrix" state="0">
+			<bounds x="128" y="124" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix67" element="matrix" state="0">
+			<bounds x="192" y="124" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix68" element="matrix" state="0">
+			<bounds x="256" y="124" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix69" element="matrix" state="0">
+			<bounds x="320" y="124" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix70" element="matrix" state="0">
+			<bounds x="384" y="124" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix71" element="matrix" state="0">
+			<bounds x="448" y="124" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix72" element="matrix" state="0">
+			<bounds x="0" y="132" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix73" element="matrix" state="0">
+			<bounds x="64" y="132" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix74" element="matrix" state="0">
+			<bounds x="128" y="132" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix75" element="matrix" state="0">
+			<bounds x="192" y="132" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix76" element="matrix" state="0">
+			<bounds x="256" y="132" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix77" element="matrix" state="0">
+			<bounds x="320" y="132" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix78" element="matrix" state="0">
+			<bounds x="384" y="132" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix79" element="matrix" state="0">
+			<bounds x="448" y="132" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix80" element="matrix" state="0">
+			<bounds x="0" y="140" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix81" element="matrix" state="0">
+			<bounds x="64" y="140" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix82" element="matrix" state="0">
+			<bounds x="128" y="140" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix83" element="matrix" state="0">
+			<bounds x="192" y="140" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix84" element="matrix" state="0">
+			<bounds x="256" y="140" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix85" element="matrix" state="0">
+			<bounds x="320" y="140" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix86" element="matrix" state="0">
+			<bounds x="384" y="140" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix87" element="matrix" state="0">
+			<bounds x="448" y="140" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix88" element="matrix" state="0">
+			<bounds x="0" y="148" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix89" element="matrix" state="0">
+			<bounds x="64" y="148" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix90" element="matrix" state="0">
+			<bounds x="128" y="148" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix91" element="matrix" state="0">
+			<bounds x="192" y="148" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix92" element="matrix" state="0">
+			<bounds x="256" y="148" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix93" element="matrix" state="0">
+			<bounds x="320" y="148" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix94" element="matrix" state="0">
+			<bounds x="384" y="148" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix95" element="matrix" state="0">
+			<bounds x="448" y="148" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix96" element="matrix" state="0">
+			<bounds x="0" y="156" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix97" element="matrix" state="0">
+			<bounds x="64" y="156" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix98" element="matrix" state="0">
+			<bounds x="128" y="156" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix99" element="matrix" state="0">
+			<bounds x="192" y="156" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix100" element="matrix" state="0">
+			<bounds x="256" y="156" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix101" element="matrix" state="0">
+			<bounds x="320" y="156" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix102" element="matrix" state="0">
+			<bounds x="384" y="156" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix103" element="matrix" state="0">
+			<bounds x="448" y="156" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix104" element="matrix" state="0">
+			<bounds x="0" y="164" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix105" element="matrix" state="0">
+			<bounds x="64" y="164" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix106" element="matrix" state="0">
+			<bounds x="128" y="164" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix107" element="matrix" state="0">
+			<bounds x="192" y="164" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix108" element="matrix" state="0">
+			<bounds x="256" y="164" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix109" element="matrix" state="0">
+			<bounds x="320" y="164" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix110" element="matrix" state="0">
+			<bounds x="384" y="164" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix111" element="matrix" state="0">
+			<bounds x="448" y="164" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix112" element="matrix" state="0">
+			<bounds x="0" y="172" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix113" element="matrix" state="0">
+			<bounds x="64" y="172" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix114" element="matrix" state="0">
+			<bounds x="128" y="172" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix115" element="matrix" state="0">
+			<bounds x="192" y="172" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix116" element="matrix" state="0">
+			<bounds x="256" y="172" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix117" element="matrix" state="0">
+			<bounds x="320" y="172" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix118" element="matrix" state="0">
+			<bounds x="384" y="172" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix119" element="matrix" state="0">
+			<bounds x="448" y="172" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix120" element="matrix" state="0">
+			<bounds x="0" y="180" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix121" element="matrix" state="0">
+			<bounds x="64" y="180" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix122" element="matrix" state="0">
+			<bounds x="128" y="180" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix123" element="matrix" state="0">
+			<bounds x="192" y="180" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix124" element="matrix" state="0">
+			<bounds x="256" y="180" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix125" element="matrix" state="0">
+			<bounds x="320" y="180" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix126" element="matrix" state="0">
+			<bounds x="384" y="180" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix127" element="matrix" state="0">
+			<bounds x="448" y="180" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix128" element="matrix" state="0">
+			<bounds x="0" y="188" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix129" element="matrix" state="0">
+			<bounds x="64" y="188" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix130" element="matrix" state="0">
+			<bounds x="128" y="188" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix131" element="matrix" state="0">
+			<bounds x="192" y="188" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix132" element="matrix" state="0">
+			<bounds x="256" y="188" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix133" element="matrix" state="0">
+			<bounds x="320" y="188" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix134" element="matrix" state="0">
+			<bounds x="384" y="188" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix135" element="matrix" state="0">
+			<bounds x="448" y="188" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix136" element="matrix" state="0">
+			<bounds x="0" y="196" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix137" element="matrix" state="0">
+			<bounds x="64" y="196" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix138" element="matrix" state="0">
+			<bounds x="128" y="196" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix139" element="matrix" state="0">
+			<bounds x="192" y="196" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix140" element="matrix" state="0">
+			<bounds x="256" y="196" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix141" element="matrix" state="0">
+			<bounds x="320" y="196" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix142" element="matrix" state="0">
+			<bounds x="384" y="196" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix143" element="matrix" state="0">
+			<bounds x="448" y="196" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix144" element="matrix" state="0">
+			<bounds x="0" y="204" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix145" element="matrix" state="0">
+			<bounds x="64" y="204" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix146" element="matrix" state="0">
+			<bounds x="128" y="204" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix147" element="matrix" state="0">
+			<bounds x="192" y="204" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix148" element="matrix" state="0">
+			<bounds x="256" y="204" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix149" element="matrix" state="0">
+			<bounds x="320" y="204" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix150" element="matrix" state="0">
+			<bounds x="384" y="204" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix151" element="matrix" state="0">
+			<bounds x="448" y="204" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix152" element="matrix" state="0">
+			<bounds x="0" y="212" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix153" element="matrix" state="0">
+			<bounds x="64" y="212" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix154" element="matrix" state="0">
+			<bounds x="128" y="212" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix155" element="matrix" state="0">
+			<bounds x="192" y="212" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix156" element="matrix" state="0">
+			<bounds x="256" y="212" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix157" element="matrix" state="0">
+			<bounds x="320" y="212" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix158" element="matrix" state="0">
+			<bounds x="384" y="212" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix159" element="matrix" state="0">
+			<bounds x="448" y="212" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix160" element="matrix" state="0">
+			<bounds x="0" y="220" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix161" element="matrix" state="0">
+			<bounds x="64" y="220" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix162" element="matrix" state="0">
+			<bounds x="128" y="220" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix163" element="matrix" state="0">
+			<bounds x="192" y="220" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix164" element="matrix" state="0">
+			<bounds x="256" y="220" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix165" element="matrix" state="0">
+			<bounds x="320" y="220" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix166" element="matrix" state="0">
+			<bounds x="384" y="220" width="64" height="8"/>
+		</backdrop>
+		<backdrop name="matrix167" element="matrix" state="0">
+			<bounds x="448" y="220" width="64" height="8"/>
+		</backdrop>
 	</view>
 </mamelayout>

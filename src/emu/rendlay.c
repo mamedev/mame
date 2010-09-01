@@ -117,6 +117,7 @@ enum
 	COMPONENT_TYPE_LED16SEG,
 	COMPONENT_TYPE_LED14SEGSC,
 	COMPONENT_TYPE_LED16SEGSC,
+	COMPONENT_TYPE_DOTMATRIX,
 	COMPONENT_TYPE_MAX
 };
 
@@ -157,6 +158,7 @@ static void layout_element_draw_led14seg(bitmap_t *dest, const rectangle *bounds
 static void layout_element_draw_led16seg(bitmap_t *dest, const rectangle *bounds, const render_color *color, int state);
 static void layout_element_draw_led14segsc(bitmap_t *dest, const rectangle *bounds, const render_color *color, int state);
 static void layout_element_draw_led16segsc(bitmap_t *dest, const rectangle *bounds, const render_color *color, int state);
+static void layout_element_draw_dotmatrix(bitmap_t *dest, const rectangle *bounds, const render_color *color, int state);
 
 /* layout file parsing */
 static layout_element *load_layout_element(const machine_config *config, xml_data_node *elemnode, const char *dirname);
@@ -410,6 +412,10 @@ static void layout_element_scale(bitmap_t *dest, const bitmap_t *source, const r
 
 				case COMPONENT_TYPE_LED16SEGSC:
 					layout_element_draw_led16segsc(dest, &bounds, &component->color, elemtex->state);
+					break;
+
+				case COMPONENT_TYPE_DOTMATRIX:
+					layout_element_draw_dotmatrix(dest, &bounds, &component->color, elemtex->state);
 					break;
 			}
 		}
@@ -1322,6 +1328,37 @@ static void layout_element_draw_led16segsc(bitmap_t *dest, const rectangle *boun
 	global_free(tempbitmap);
 }
 
+/*-------------------------------------------------
+    layout_element_draw_dotmatrix - draw a
+    row of 8 dots for a dotmatrix
+-------------------------------------------------*/
+
+static void layout_element_draw_dotmatrix(bitmap_t *dest, const rectangle *bounds, const render_color *color, int pattern)
+{
+	const rgb_t onpen = MAKE_ARGB(0xff, 0xff, 0xff, 0xff);
+	const rgb_t offpen = MAKE_ARGB(0xff, 0x20, 0x20, 0x20);
+	int bmwidth, bmheight, dotwidth, i;
+	bitmap_t *tempbitmap;
+
+	/* sizes for computation */
+	bmwidth = 2000;
+	bmheight = 300;
+	dotwidth = 250;
+
+	/* allocate a temporary bitmap for drawing */
+	tempbitmap = global_alloc(bitmap_t(bmwidth, bmheight, BITMAP_FORMAT_ARGB32));
+	bitmap_fill(tempbitmap, NULL, MAKE_ARGB(0xff, 0x00, 0x00, 0x00));
+
+	for (i = 0; i < 8; i++)
+	{//                                                             height
+		draw_segment_decimal(tempbitmap, ((dotwidth/2 )+ (i * dotwidth)), bmheight/2, dotwidth, (pattern & (1 << i))?onpen:offpen);
+	}
+
+	/* resample to the target size */
+	render_resample_argb_bitmap_hq(dest->base, dest->rowpixels, dest->width, dest->height, tempbitmap, NULL, color);
+
+	global_free(tempbitmap);
+}
 
 
 /***************************************************************************
@@ -1620,8 +1657,9 @@ static layout_element *load_layout_element(const machine_config *config, xml_dat
 			element->maxstate = 65535;
 		if (new_component->type == COMPONENT_TYPE_LED16SEGSC)
 			element->maxstate = 262143;
+		if (new_component->type == COMPONENT_TYPE_DOTMATRIX)
+			element->maxstate = 255;
 	}
-
 	/* determine the scale/offset for normalization */
 	xoffs = bounds.x0;
 	yoffs = bounds.y0;
@@ -1698,6 +1736,10 @@ static element_component *load_element_component(const machine_config *config, x
 		strcpy(string, text);
 		component->string = string;
 	}
+
+	/* dotmatrix nodes */
+	else if (strcmp(compnode->name, "dotmatrix") == 0)
+		component->type = COMPONENT_TYPE_DOTMATRIX;
 
 	/* led7seg nodes */
 	else if (strcmp(compnode->name, "led7seg") == 0)

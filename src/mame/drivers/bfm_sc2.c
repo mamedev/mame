@@ -4013,17 +4013,6 @@ static MACHINE_CONFIG_START( scorpion2_dm01, driver_data_t )
 
 	/* video hardware */
 	MDRV_DEFAULT_LAYOUT(layout_awpdmd)
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE( 9*8, 21)
-	MDRV_SCREEN_VISIBLE_AREA(  0, 9*8-1, 0, 21-1)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_VIDEO_START( bfm_dm01)
-	MDRV_VIDEO_UPDATE(bfm_dm01)
-
-	MDRV_PALETTE_LENGTH(2)
-	MDRV_PALETTE_INIT(bfm_dm01)
-
 	MDRV_CPU_ADD("matrix", M6809, 2000000 )				/* matrix board 6809 CPU at 2 Mhz ?? I don't know the exact freq.*/
 	MDRV_CPU_PROGRAM_MAP(bfm_dm01_memmap)
 	MDRV_CPU_PERIODIC_INT(bfm_dm01_vbl, 1500 )			/* generate 1500 NMI's per second ?? what is the exact freq?? */
