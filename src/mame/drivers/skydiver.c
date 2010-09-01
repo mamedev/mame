@@ -371,7 +371,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( skydiver )
+static MACHINE_CONFIG_START( skydiver, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6800,MASTER_CLOCK/16)	   /* ???? */
@@ -402,7 +402,7 @@ static MACHINE_DRIVER_START( skydiver )
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(skydiver)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

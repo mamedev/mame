@@ -34,7 +34,7 @@ static MACHINE_START( empty )
  *
  *************************************/
 
-static MACHINE_DRIVER_START( empty )
+static MACHINE_CONFIG_START( empty, driver_data_t )
 
 	MDRV_MACHINE_START(empty)
 
@@ -44,7 +44,7 @@ static MACHINE_DRIVER_START( empty )
 	MDRV_SCREEN_SIZE(640,480)
 	MDRV_SCREEN_VISIBLE_AREA(0,639, 0,479)
 	MDRV_SCREEN_REFRESH_RATE(30)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

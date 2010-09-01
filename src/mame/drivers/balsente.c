@@ -1190,8 +1190,7 @@ static const cem3394_interface cem_interface =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( balsente )
-	MDRV_DRIVER_DATA(balsente_state)
+static MACHINE_CONFIG_START( balsente, balsente_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 5000000/4)
@@ -1250,19 +1249,18 @@ static MACHINE_DRIVER_START( balsente )
 	MDRV_SOUND_ADD("cem6", CEM3394, 0)
 	MDRV_SOUND_CONFIG(cem_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( shrike )
+static MACHINE_CONFIG_DERIVED( shrike, balsente )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(balsente)
 
 	MDRV_CPU_ADD("68k", M68000, 8000000)
 	MDRV_CPU_PROGRAM_MAP(shrike68k_map)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

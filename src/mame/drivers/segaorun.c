@@ -1113,10 +1113,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( outrun_base )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(segas1x_state)
+static MACHINE_CONFIG_START( outrun_base, segas1x_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, MASTER_CLOCK/4)
@@ -1157,23 +1154,20 @@ static MACHINE_DRIVER_START( outrun_base )
 	MDRV_SOUND_CONFIG(segapcm_interface)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( outrundx )
-	MDRV_IMPORT_FROM(outrun_base)
+static MACHINE_CONFIG_DERIVED( outrundx, outrun_base )
 	MDRV_SEGA16SP_ADD_OUTRUN("segaspr1")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( outrun )
-	MDRV_IMPORT_FROM(outrun_base)
+static MACHINE_CONFIG_DERIVED( outrun, outrun_base )
 	MDRV_NVRAM_HANDLER(outrun)
 
 	MDRV_SEGA16SP_ADD_OUTRUN("segaspr1")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( shangon )
-	MDRV_IMPORT_FROM(outrun_base)
+static MACHINE_CONFIG_DERIVED( shangon, outrun_base )
 	MDRV_NVRAM_HANDLER(outrun)
 
 	MDRV_SCREEN_MODIFY("screen")
@@ -1183,7 +1177,7 @@ static MACHINE_DRIVER_START( shangon )
 	MDRV_VIDEO_UPDATE(shangon)
 
 	MDRV_SEGA16SP_ADD_16B("segaspr1")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

@@ -842,10 +842,7 @@ static MACHINE_RESET( cninja )
 	state->irq_mask = 0;
 }
 
-static MACHINE_DRIVER_START( cninja )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(cninja_state)
+static MACHINE_CONFIG_START( cninja, cninja_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
@@ -892,12 +889,9 @@ static MACHINE_DRIVER_START( cninja )
 
 	MDRV_OKIM6295_ADD("oki2", 32220000/16, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( stoneage )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(cninja_state)
+static MACHINE_CONFIG_START( stoneage, cninja_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
@@ -942,13 +936,10 @@ static MACHINE_DRIVER_START( stoneage )
 
 	MDRV_OKIM6295_ADD("oki2", 32220000/16, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( cninjabl )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(cninja_state)
+static MACHINE_CONFIG_START( cninjabl, cninja_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
@@ -989,13 +980,10 @@ static MACHINE_DRIVER_START( cninjabl )
 
 	MDRV_OKIM6295_ADD("oki1", 32220000/32, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( edrandy )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(cninja_state)
+static MACHINE_CONFIG_START( edrandy, cninja_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
@@ -1042,12 +1030,9 @@ static MACHINE_DRIVER_START( edrandy )
 
 	MDRV_OKIM6295_ADD("oki2", 32220000/16, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( robocop2 )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(cninja_state)
+static MACHINE_CONFIG_START( robocop2, cninja_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 14000000)
@@ -1097,12 +1082,9 @@ static MACHINE_DRIVER_START( robocop2 )
 	MDRV_OKIM6295_ADD("oki2", 32220000/16, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( mutantf )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(cninja_state)
+static MACHINE_CONFIG_START( mutantf, cninja_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 14000000)
@@ -1146,7 +1128,7 @@ static MACHINE_DRIVER_START( mutantf )
 	MDRV_OKIM6295_ADD("oki2", 32220000/16, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /**********************************************************************************/
 

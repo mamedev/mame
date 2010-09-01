@@ -334,7 +334,7 @@ static MACHINE_START( astron )
 
 
 /* DRIVER */
-static MACHINE_DRIVER_START( astron )
+static MACHINE_CONFIG_START( astron, driver_data_t )
 
 	/* main cpu */
 	MDRV_CPU_ADD("maincpu", Z80, SCHEMATIC_CLOCK/4)
@@ -359,7 +359,7 @@ static MACHINE_DRIVER_START( astron )
 	MDRV_SOUND_ADD("ldsound", LASERDISC, 0)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( astron )

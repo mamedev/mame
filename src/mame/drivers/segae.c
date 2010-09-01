@@ -865,7 +865,7 @@ static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 
-static MACHINE_DRIVER_START( systeme )
+static MACHINE_CONFIG_START( systeme, driver_data_t )
 	MDRV_CPU_ADD("maincpu", Z80, 10738600/2) /* correct?  */
 	MDRV_CPU_PROGRAM_MAP(systeme_map)
 	MDRV_CPU_IO_MAP(io_map)
@@ -897,7 +897,7 @@ static MACHINE_DRIVER_START( systeme )
 
 	MDRV_SOUND_ADD("sn2", SN76496, 3579540)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*- Hang On Jr. Specific -*/

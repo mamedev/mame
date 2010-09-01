@@ -313,7 +313,7 @@ static GFXDECODE_START( tugboat )
 GFXDECODE_END
 
 
-static MACHINE_DRIVER_START( tugboat )
+static MACHINE_CONFIG_START( tugboat, driver_data_t )
 	MDRV_CPU_ADD("maincpu", M6502, 2000000)	/* 2 MHz ???? */
 	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
@@ -340,7 +340,7 @@ static MACHINE_DRIVER_START( tugboat )
 
 	MDRV_SOUND_ADD("aysnd", AY8910, 2000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( tugboat )

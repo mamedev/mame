@@ -610,7 +610,7 @@ GFXDECODE_END
 *          Machine Drivers          *
 ************************************/
 
-static MACHINE_DRIVER_START( amaticmg )
+static MACHINE_CONFIG_START( amaticmg, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)		/* WRONG! */
 	MDRV_CPU_PROGRAM_MAP(amaticmg_map)
@@ -651,7 +651,7 @@ static MACHINE_DRIVER_START( amaticmg )
 //  MDRV_SOUND_ADD("dac", DAC, 0)   /* Y3014B */
 //  MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /************************************

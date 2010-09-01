@@ -428,7 +428,7 @@ static const ay8910_interface miniboy7_ay8910_intf =
 *         Machine Drivers          *
 ***********************************/
 
-static MACHINE_DRIVER_START( miniboy7 )
+static MACHINE_CONFIG_START( miniboy7, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, MASTER_CLOCK/16)	/* guess */
@@ -461,7 +461,7 @@ static MACHINE_DRIVER_START( miniboy7 )
 	MDRV_SOUND_CONFIG(miniboy7_ay8910_intf)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***********************************

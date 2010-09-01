@@ -759,7 +759,7 @@ static INTERRUPT_GEN( bssoccer_interrupt )
 	}
 }
 
-static MACHINE_DRIVER_START( bssoccer )
+static MACHINE_CONFIG_START( bssoccer, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)	/* ? */
@@ -811,7 +811,7 @@ static MACHINE_DRIVER_START( bssoccer )
 
 	MDRV_SOUND_ADD("dac4", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -819,7 +819,7 @@ MACHINE_DRIVER_END
                                 Ultra Balloon
 ***************************************************************************/
 
-static MACHINE_DRIVER_START( uballoon )
+static MACHINE_CONFIG_START( uballoon, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)
@@ -865,13 +865,13 @@ static MACHINE_DRIVER_START( uballoon )
 
 	MDRV_SOUND_ADD("dac2", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
                             Suna Quiz 6000 Academy
 ***************************************************************************/
 
-static MACHINE_DRIVER_START( sunaq )
+static MACHINE_CONFIG_START( sunaq, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 24000000/4)
 	MDRV_CPU_PROGRAM_MAP(sunaq_map)
@@ -914,7 +914,7 @@ static MACHINE_DRIVER_START( sunaq )
 
 	MDRV_SOUND_ADD("dac2", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
                             Best Of Best
@@ -943,7 +943,7 @@ static const ay8910_interface bestbest_ay8910_interface =
 	DEVCB_HANDLER(bestbest_ay8910_port_a_w),	DEVCB_NULL
 };
 
-static MACHINE_DRIVER_START( bestbest )
+static MACHINE_CONFIG_START( bestbest, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 24000000/4)
 	MDRV_CPU_PROGRAM_MAP(bestbest_map)
@@ -998,7 +998,7 @@ static MACHINE_DRIVER_START( bestbest )
 
 	MDRV_SOUND_ADD("dac4", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

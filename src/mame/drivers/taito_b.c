@@ -2214,10 +2214,7 @@ static MACHINE_RESET( taitob )
 	state->coin_word = 0;
 }
 
-static MACHINE_DRIVER_START( rastsag2 )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(taitob_state)
+static MACHINE_CONFIG_START( rastsag2, taitob_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
@@ -2261,13 +2258,10 @@ static MACHINE_DRIVER_START( rastsag2 )
 	MDRV_SOUND_ROUTE(2, "mono", 1.0)
 
 	MDRV_TC0140SYT_ADD("tc0140syt", taitob_tc0140syt_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( ashura )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(taitob_state)
+static MACHINE_CONFIG_START( ashura, taitob_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
@@ -2311,13 +2305,10 @@ static MACHINE_DRIVER_START( ashura )
 	MDRV_SOUND_ROUTE(2, "mono", 1.0)
 
 	MDRV_TC0140SYT_ADD("tc0140syt", taitob_tc0140syt_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( crimec )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(taitob_state)
+static MACHINE_CONFIG_START( crimec, taitob_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
@@ -2361,13 +2352,10 @@ static MACHINE_DRIVER_START( crimec )
 	MDRV_SOUND_ROUTE(2, "mono", 1.0)
 
 	MDRV_TC0140SYT_ADD("tc0140syt", taitob_tc0140syt_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( tetrist )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(taitob_state)
+static MACHINE_CONFIG_START( tetrist, taitob_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz ???*/
@@ -2411,12 +2399,9 @@ static MACHINE_DRIVER_START( tetrist )
 	MDRV_SOUND_ROUTE(2, "mono", 1.0)
 
 	MDRV_TC0140SYT_ADD("tc0140syt", taitob_tc0140syt_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( tetrista )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(taitob_state)
+static MACHINE_CONFIG_START( tetrista, taitob_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
@@ -2461,12 +2446,9 @@ static MACHINE_DRIVER_START( tetrista )
 	MDRV_SOUND_ROUTE(3, "mono", 0.80)
 
 	MDRV_TC0140SYT_ADD("tc0140syt", taitob_tc0140syt_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( hitice )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(taitob_state)
+static MACHINE_CONFIG_START( hitice, taitob_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
@@ -2515,13 +2497,10 @@ static MACHINE_DRIVER_START( hitice )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MDRV_TC0140SYT_ADD("tc0140syt", taitob_tc0140syt_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( rambo3 )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(taitob_state)
+static MACHINE_CONFIG_START( rambo3, taitob_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)	/* verified on pcb */
@@ -2565,13 +2544,10 @@ static MACHINE_DRIVER_START( rambo3 )
 	MDRV_SOUND_ROUTE(2, "mono", 1.0)
 
 	MDRV_TC0140SYT_ADD("tc0140syt", taitob_tc0140syt_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( rambo3a )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(taitob_state)
+static MACHINE_CONFIG_START( rambo3a, taitob_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)	/* verified on pcb */
@@ -2615,12 +2591,9 @@ static MACHINE_DRIVER_START( rambo3a )
 	MDRV_SOUND_ROUTE(2, "mono", 1.0)
 
 	MDRV_TC0140SYT_ADD("tc0140syt", taitob_tc0140syt_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( pbobble )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(taitob_state)
+static MACHINE_CONFIG_START( pbobble, taitob_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
@@ -2668,13 +2641,10 @@ static MACHINE_DRIVER_START( pbobble )
 	MDRV_SOUND_ROUTE(2, "mono", 1.0)
 
 	MDRV_TC0140SYT_ADD("tc0140syt", taitob_tc0140syt_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( spacedx )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(taitob_state)
+static MACHINE_CONFIG_START( spacedx, taitob_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
@@ -2722,13 +2692,10 @@ static MACHINE_DRIVER_START( spacedx )
 	MDRV_SOUND_ROUTE(2, "mono", 1.0)
 
 	MDRV_TC0140SYT_ADD("tc0140syt", taitob_tc0140syt_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( spacedxo )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(taitob_state)
+static MACHINE_CONFIG_START( spacedxo, taitob_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
@@ -2772,13 +2739,10 @@ static MACHINE_DRIVER_START( spacedxo )
 	MDRV_SOUND_ROUTE(2, "mono", 1.0)
 
 	MDRV_TC0140SYT_ADD("tc0140syt", taitob_tc0140syt_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( qzshowby )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(taitob_state)
+static MACHINE_CONFIG_START( qzshowby, taitob_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz according to the readme*/
@@ -2826,13 +2790,10 @@ static MACHINE_DRIVER_START( qzshowby )
 	MDRV_SOUND_ROUTE(2, "mono", 1.0)
 
 	MDRV_TC0140SYT_ADD("tc0140syt", taitob_tc0140syt_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( viofight )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(taitob_state)
+static MACHINE_CONFIG_START( viofight, taitob_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
@@ -2880,12 +2841,9 @@ static MACHINE_DRIVER_START( viofight )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MDRV_TC0140SYT_ADD("tc0140syt", taitob_tc0140syt_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( masterw )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(taitob_state)
+static MACHINE_CONFIG_START( masterw, taitob_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
@@ -2930,13 +2888,10 @@ static MACHINE_DRIVER_START( masterw )
 	MDRV_SOUND_ROUTE(3, "mono", 0.80)
 
 	MDRV_TC0140SYT_ADD("tc0140syt", taitob_tc0140syt_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( silentd )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(taitob_state)
+static MACHINE_CONFIG_START( silentd, taitob_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz ??? */
@@ -2980,13 +2935,10 @@ static MACHINE_DRIVER_START( silentd )
 	MDRV_SOUND_ROUTE(2, "mono", 1.0)
 
 	MDRV_TC0140SYT_ADD("tc0140syt", taitob_tc0140syt_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( selfeena )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(taitob_state)
+static MACHINE_CONFIG_START( selfeena, taitob_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
@@ -3030,7 +2982,7 @@ static MACHINE_DRIVER_START( selfeena )
 	MDRV_SOUND_ROUTE(2, "mono", 1.0)
 
 	MDRV_TC0140SYT_ADD("tc0140syt", taitob_tc0140syt_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 #if 0
 static void ryujin_patch(void)
@@ -3042,10 +2994,7 @@ static void ryujin_patch(void)
 }
 #endif
 
-static MACHINE_DRIVER_START( ryujin )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(taitob_state)
+static MACHINE_CONFIG_START( ryujin, taitob_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
@@ -3089,7 +3038,7 @@ static MACHINE_DRIVER_START( ryujin )
 	MDRV_SOUND_ROUTE(2, "mono", 1.0)
 
 	MDRV_TC0140SYT_ADD("tc0140syt", taitob_tc0140syt_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 #if 0
 static void sbm_patch(void)
@@ -3099,10 +3048,7 @@ static void sbm_patch(void)
 }
 #endif
 
-static MACHINE_DRIVER_START( sbm )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(taitob_state)
+static MACHINE_CONFIG_START( sbm, taitob_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
@@ -3146,7 +3092,7 @@ static MACHINE_DRIVER_START( sbm )
 	MDRV_SOUND_ROUTE(2, "mono", 1.0)
 
 	MDRV_TC0140SYT_ADD("tc0140syt", taitob_tc0140syt_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

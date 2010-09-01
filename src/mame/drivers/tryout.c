@@ -196,7 +196,7 @@ static GFXDECODE_START( tryout )
 	GFXDECODE_ENTRY( NULL,	 0, vramlayout,   0, 4 )
 GFXDECODE_END
 
-static MACHINE_DRIVER_START( tryout )
+static MACHINE_CONFIG_START( tryout, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 2000000)		/* ? */
 	MDRV_CPU_PROGRAM_MAP(main_cpu)
@@ -225,7 +225,7 @@ static MACHINE_DRIVER_START( tryout )
 
 	MDRV_SOUND_ADD("ymsnd", YM2203, 1500000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( tryout )
 	ROM_REGION( 0x14000, "maincpu", 0 )

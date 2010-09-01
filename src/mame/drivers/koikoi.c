@@ -357,10 +357,7 @@ static MACHINE_RESET( koikoi )
 		state->ioram[i] = 0;
 }
 
-static MACHINE_DRIVER_START( koikoi )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(koikoi_state)
+static MACHINE_CONFIG_START( koikoi, koikoi_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,KOIKOI_CRYSTAL/4)	/* ?? */
@@ -392,7 +389,7 @@ static MACHINE_DRIVER_START( koikoi )
 	MDRV_SOUND_ADD("aysnd", AY8910, KOIKOI_CRYSTAL/8)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************************

@@ -661,10 +661,7 @@ static const k05324x_interface lethalej_k05324x_intf =
 	lethalen_sprite_callback
 };
 
-static MACHINE_DRIVER_START( lethalen )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(lethal_state)
+static MACHINE_CONFIG_START( lethalen, lethal_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", HD6309, MAIN_CLOCK/2)    /* verified on pcb */
@@ -708,17 +705,16 @@ static MACHINE_DRIVER_START( lethalen )
 	MDRV_SOUND_CONFIG(k054539_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( lethalej )
-	MDRV_IMPORT_FROM(lethalen)
+static MACHINE_CONFIG_DERIVED( lethalej, lethalen )
 
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(224, 512-1, 16, 240-1)
 
 	MDRV_DEVICE_REMOVE("k053244")
 	MDRV_K053244_ADD("k053244", lethalej_k05324x_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( lethalen )	// US version UAE
 	ROM_REGION( 0x50000, "maincpu", 0 )

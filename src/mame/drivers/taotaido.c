@@ -330,7 +330,7 @@ static const ym2610_interface ym2610_config =
 	irqhandler
 };
 
-static MACHINE_DRIVER_START( taotaido )
+static MACHINE_CONFIG_START( taotaido, driver_data_t )
 	MDRV_CPU_ADD("maincpu", M68000, 32000000/2)
 	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
@@ -364,7 +364,7 @@ static MACHINE_DRIVER_START( taotaido )
 	MDRV_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MDRV_SOUND_ROUTE(1, "lspeaker",  1.0)
 	MDRV_SOUND_ROUTE(2, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( taotaido )

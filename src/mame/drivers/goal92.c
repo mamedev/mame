@@ -313,10 +313,7 @@ static MACHINE_RESET( goal92 )
 	state->adpcm_toggle = 0;
 }
 
-static MACHINE_DRIVER_START( goal92 )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(goal92_state)
+static MACHINE_CONFIG_START( goal92, goal92_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,12000000)
@@ -358,7 +355,7 @@ static MACHINE_DRIVER_START( goal92 )
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*
 

@@ -313,7 +313,7 @@ static const mc6845_interface mc6845_intf =
 };
 
 
-static MACHINE_DRIVER_START( carrera )
+static MACHINE_CONFIG_START( carrera, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK / 6)
 	MDRV_CPU_PROGRAM_MAP(carrera_map)
@@ -342,7 +342,7 @@ static MACHINE_DRIVER_START( carrera )
 	MDRV_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK/12)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( carrera )

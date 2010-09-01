@@ -310,10 +310,7 @@ static MACHINE_RESET( hypersptb )
 	state->hyprolyb_vck_ready = 0;
 }
 
-static MACHINE_DRIVER_START( hyperspt )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(trackfld_state)
+static MACHINE_CONFIG_START( hyperspt, trackfld_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, XTAL_18_432MHz/12)	/* verified on pcb */
@@ -353,11 +350,10 @@ static MACHINE_DRIVER_START( hyperspt )
 
 	MDRV_SOUND_ADD("vlm", VLM5030, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( hypersptb )
-	MDRV_IMPORT_FROM(hyperspt)
+static MACHINE_CONFIG_DERIVED( hypersptb, hyperspt )
 	MDRV_DEVICE_REMOVE("vlm")
 
 	MDRV_CPU_MODIFY("audiocpu")
@@ -372,17 +368,16 @@ static MACHINE_DRIVER_START( hypersptb )
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(hyprolyb_msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( roadf )
-	MDRV_IMPORT_FROM(hyperspt)
+static MACHINE_CONFIG_DERIVED( roadf, hyperspt )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(roadf_map)
 	MDRV_GFXDECODE(roadf)
 	MDRV_VIDEO_START(roadf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

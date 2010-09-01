@@ -892,10 +892,7 @@ static const tc0140syt_interface asuka_tc0140syt_intf =
 	"maincpu", "audiocpu"
 };
 
-static MACHINE_DRIVER_START( bonzeadv )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(asuka_state)
+static MACHINE_CONFIG_START( bonzeadv, asuka_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)    /* checked on PCB */
@@ -937,12 +934,9 @@ static MACHINE_DRIVER_START( bonzeadv )
 	MDRV_SOUND_ROUTE(2, "mono", 1.0)
 
 	MDRV_TC0140SYT_ADD("tc0140syt", asuka_tc0140syt_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( asuka )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(asuka_state)
+static MACHINE_CONFIG_START( asuka, asuka_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)	/* verified on pcb */
@@ -989,12 +983,9 @@ static MACHINE_DRIVER_START( asuka )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_TC0140SYT_ADD("tc0140syt", asuka_tc0140syt_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( cadash )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(asuka_state)
+static MACHINE_CONFIG_START( cadash, asuka_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)	/* 68000p12 running at 16Mhz, verified on pcb  */
@@ -1041,12 +1032,9 @@ static MACHINE_DRIVER_START( cadash )
 	MDRV_SOUND_ROUTE(1, "mono", 0.50)
 
 	MDRV_TC0140SYT_ADD("tc0140syt", asuka_tc0140syt_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( mofflott )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(asuka_state)
+static MACHINE_CONFIG_START( mofflott, asuka_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)	/* 8 MHz ??? */
@@ -1093,12 +1081,9 @@ static MACHINE_DRIVER_START( mofflott )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_TC0140SYT_ADD("tc0140syt", asuka_tc0140syt_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( galmedes )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(asuka_state)
+static MACHINE_CONFIG_START( galmedes, asuka_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)	/* 8 MHz ??? */
@@ -1141,12 +1126,9 @@ static MACHINE_DRIVER_START( galmedes )
 	MDRV_SOUND_ROUTE(1, "mono", 0.50)
 
 	MDRV_TC0140SYT_ADD("tc0140syt", asuka_tc0140syt_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( eto )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(asuka_state)
+static MACHINE_CONFIG_START( eto, asuka_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)	/* 8 MHz ??? */
@@ -1189,7 +1171,7 @@ static MACHINE_DRIVER_START( eto )
 	MDRV_SOUND_ROUTE(1, "mono", 0.50)
 
 	MDRV_TC0140SYT_ADD("tc0140syt", asuka_tc0140syt_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

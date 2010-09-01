@@ -248,10 +248,7 @@ static MACHINE_RESET( compgolf )
 	state->scrolly_hi = 0;
 }
 
-static MACHINE_DRIVER_START( compgolf )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(compgolf_state)
+static MACHINE_CONFIG_START( compgolf, compgolf_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 2000000)
@@ -281,7 +278,7 @@ static MACHINE_DRIVER_START( compgolf )
 	MDRV_SOUND_ADD("ymsnd", YM2203, 1500000)
 	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************************

@@ -418,7 +418,7 @@ static INPUT_PORTS_START( steaser )
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_POKER_HOLD4 ) PORT_IMPULSE(1)
 INPUT_PORTS_END
 
-static MACHINE_DRIVER_START( ilpag )
+static MACHINE_CONFIG_START( ilpag, driver_data_t )
 	MDRV_CPU_ADD("maincpu", M68000, 11059200 )	// ?
 	MDRV_CPU_PROGRAM_MAP(ilpag_map)
 	MDRV_CPU_VBLANK_INT("screen",irq4_line_hold) //3 & 6 used, mcu comms?
@@ -439,7 +439,7 @@ static MACHINE_DRIVER_START( ilpag )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*
 20089f = 1 -> menu
@@ -486,14 +486,13 @@ static INTERRUPT_GEN( steaser_irq )
 	cpu_set_input_line(device, num, HOLD_LINE);
 }
 
-static MACHINE_DRIVER_START( steaser )
-	MDRV_IMPORT_FROM( ilpag )
+static MACHINE_CONFIG_DERIVED( steaser, ilpag )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(steaser_map)
 	MDRV_CPU_VBLANK_INT_HACK(steaser_irq,4)
 
 	MDRV_TIMER_ADD_PERIODIC("coinsim", steaser_mcu_sim, HZ(10000)) // not real, but for simulating the MCU
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( ilpag )

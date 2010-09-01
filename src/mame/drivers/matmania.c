@@ -308,10 +308,7 @@ static MACHINE_START( matmania )
 	state->mcu = machine->device("mcu");
 }
 
-static MACHINE_DRIVER_START( matmania )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(matmania_state)
+static MACHINE_CONFIG_START( matmania, matmania_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 1500000)	/* 1.5 MHz ???? */
@@ -352,7 +349,7 @@ static MACHINE_DRIVER_START( matmania )
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -409,10 +406,7 @@ static MACHINE_RESET( maniach )
 	state->from_mcu = 0;
 }
 
-static MACHINE_DRIVER_START( maniach )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(matmania_state)
+static MACHINE_CONFIG_START( maniach, matmania_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 1500000)	/* 1.5 MHz ???? */
@@ -455,7 +449,7 @@ static MACHINE_DRIVER_START( maniach )
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*************************************
  *

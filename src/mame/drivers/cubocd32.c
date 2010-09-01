@@ -1051,7 +1051,7 @@ static const i2cmem_interface i2cmem_interface =
 	I2CMEM_SLAVE_ADDRESS, NVRAM_PAGE_SIZE, NVRAM_SIZE
 };
 
-static MACHINE_DRIVER_START( cd32 )
+static MACHINE_CONFIG_START( cd32, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC020, AMIGA_68EC020_PAL_CLOCK) /* 14.3 Mhz */
@@ -1090,7 +1090,7 @@ static MACHINE_DRIVER_START( cd32 )
 	/* cia */
 	MDRV_MOS8520_ADD("cia_0", AMIGA_68EC020_PAL_CLOCK / 10, cia_0_intf)
 	MDRV_MOS8520_ADD("cia_1", AMIGA_68EC020_PAL_CLOCK / 10, cia_1_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 #define ROM_LOAD16_WORD_BIOS(bios,name,offset,length,hash)     ROMX_LOAD(name, offset, length, hash, ROM_BIOS(bios+1))
 

@@ -292,10 +292,7 @@ static MACHINE_RESET( funkybee )
 	state->gfx_bank = 0;
 }
 
-static MACHINE_DRIVER_START( funkybee )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(funkybee_state)
+static MACHINE_CONFIG_START( funkybee, funkybee_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3072000)	/* 3.072 MHz */
@@ -327,7 +324,7 @@ static MACHINE_DRIVER_START( funkybee )
 	MDRV_SOUND_ADD("aysnd", AY8910, 1500000)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

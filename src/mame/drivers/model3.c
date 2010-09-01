@@ -4992,7 +4992,7 @@ static const powerpc_config model3_2x =
 	66000000		/* Multiplier 2.5, Bus = 66MHz, Core = 166MHz */
 };
 
-static MACHINE_DRIVER_START( model3_10 )
+static MACHINE_CONFIG_START( model3_10, driver_data_t )
 	MDRV_CPU_ADD("maincpu", PPC603E, 66000000)
 	MDRV_CPU_CONFIG(model3_10)
 	MDRV_CPU_PROGRAM_MAP(model3_mem)
@@ -5032,9 +5032,9 @@ static MACHINE_DRIVER_START( model3_10 )
 	MDRV_SOUND_CONFIG(scsp2_interface)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 2.0)
 	MDRV_SOUND_ROUTE(0, "rspeaker", 2.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( model3_15 )
+static MACHINE_CONFIG_START( model3_15, driver_data_t )
 	MDRV_CPU_ADD("maincpu", PPC603E, 100000000)
 	MDRV_CPU_CONFIG(model3_15)
 	MDRV_CPU_PROGRAM_MAP(model3_mem)
@@ -5072,9 +5072,9 @@ static MACHINE_DRIVER_START( model3_15 )
 	MDRV_SOUND_CONFIG(scsp2_interface)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 2.0)
 	MDRV_SOUND_ROUTE(0, "rspeaker", 2.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( model3_20 )
+static MACHINE_CONFIG_START( model3_20, driver_data_t )
 	MDRV_CPU_ADD("maincpu", PPC603R, 166000000)
 	MDRV_CPU_CONFIG(model3_2x)
 	MDRV_CPU_PROGRAM_MAP(model3_mem)
@@ -5112,9 +5112,9 @@ static MACHINE_DRIVER_START( model3_20 )
 	MDRV_SOUND_CONFIG(scsp2_interface)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 2.0)
 	MDRV_SOUND_ROUTE(0, "rspeaker", 2.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( model3_21 )
+static MACHINE_CONFIG_START( model3_21, driver_data_t )
 	MDRV_CPU_ADD("maincpu", PPC603R, 166000000)
 	MDRV_CPU_CONFIG(model3_2x)
 	MDRV_CPU_PROGRAM_MAP(model3_mem)
@@ -5153,7 +5153,7 @@ static MACHINE_DRIVER_START( model3_21 )
 	MDRV_SOUND_CONFIG(scsp2_interface)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 2.0)
 	MDRV_SOUND_ROUTE(0, "rspeaker", 2.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static void interleave_vroms(running_machine *machine)
 {

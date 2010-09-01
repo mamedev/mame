@@ -148,7 +148,7 @@ static INPUT_PORTS_START( rotaryf )
 INPUT_PORTS_END
 
 
-static MACHINE_DRIVER_START( rotaryf )
+static MACHINE_CONFIG_START( rotaryf, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",I8085A,4000000) /* 8080? */ /* 2 MHz? */
@@ -165,7 +165,7 @@ static MACHINE_DRIVER_START( rotaryf )
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 30*8-1, 0*8, 32*8-1)
 	MDRV_SCREEN_REFRESH_RATE(60)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( rotaryf )

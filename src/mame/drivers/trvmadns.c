@@ -322,7 +322,7 @@ static MACHINE_RESET( trvmadns )
 	old_data = -1;
 }
 
-static MACHINE_DRIVER_START( trvmadns )
+static MACHINE_CONFIG_START( trvmadns, driver_data_t )
 	MDRV_CPU_ADD("maincpu", Z80,10000000/2) // ?
 	MDRV_CPU_PROGRAM_MAP(cpu_map)
 	MDRV_CPU_IO_MAP(io_map)
@@ -349,7 +349,7 @@ static MACHINE_DRIVER_START( trvmadns )
 
 	MDRV_SOUND_ADD("aysnd", AY8910, 10000000/2/4) //?
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( trvmadns )

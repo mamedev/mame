@@ -251,8 +251,7 @@ static MACHINE_START( diverboy )
 	state->audiocpu = machine->device("audiocpu");
 }
 
-static MACHINE_DRIVER_START( diverboy )
-	MDRV_DRIVER_DATA(diverboy_state)
+static MACHINE_CONFIG_START( diverboy, diverboy_state )
 
 	MDRV_CPU_ADD("maincpu", M68000, 12000000) /* guess */
 	MDRV_CPU_PROGRAM_MAP(diverboy_map)
@@ -281,7 +280,7 @@ static MACHINE_DRIVER_START( diverboy )
 
 	MDRV_OKIM6295_ADD("oki", 1320000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

@@ -409,10 +409,7 @@ static const tc0140syt_interface rastan_tc0140syt_intf =
 	"maincpu", "audiocpu"
 };
 
-static MACHINE_DRIVER_START( rastan )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(rastan_state)
+static MACHINE_CONFIG_START( rastan, rastan_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)	/* verified on pcb */
@@ -456,7 +453,7 @@ static MACHINE_DRIVER_START( rastan )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
 	MDRV_TC0140SYT_ADD("tc0140syt", rastan_tc0140syt_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

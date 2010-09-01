@@ -275,10 +275,7 @@ static MACHINE_RESET( crimfght )
 	konami_configure_set_lines(machine->device("maincpu"), crimfght_banking);
 }
 
-static MACHINE_DRIVER_START( crimfght )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(crimfght_state)
+static MACHINE_CONFIG_START( crimfght, crimfght_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", KONAMI, 3000000)		/* ? */
@@ -323,7 +320,7 @@ static MACHINE_DRIVER_START( crimfght )
 	MDRV_SOUND_ROUTE(0, "rspeaker", 0.20)
 	MDRV_SOUND_ROUTE(1, "lspeaker", 0.20)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.20)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

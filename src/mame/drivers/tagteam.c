@@ -226,7 +226,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_DRIVER_START( tagteam )
+static MACHINE_CONFIG_START( tagteam, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 1500000)	/* 1.5 MHz ?? */
@@ -263,7 +263,7 @@ static MACHINE_DRIVER_START( tagteam )
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

@@ -275,7 +275,7 @@ static const struct sp0250_interface sp0250_interface =
  *
  *************************************/
 
-MACHINE_DRIVER_START( sega_speech_board )
+MACHINE_CONFIG_FRAGMENT( sega_speech_board )
 
 	/* CPU for the speech board */
 	MDRV_CPU_ADD("audiocpu", I8035, SPEECH_MASTER_CLOCK)		/* divide by 15 in CPU */
@@ -286,7 +286,7 @@ MACHINE_DRIVER_START( sega_speech_board )
 	MDRV_SOUND_ADD("speech", SP0250, SPEECH_MASTER_CLOCK)
 	MDRV_SOUND_CONFIG(sp0250_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -915,7 +915,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-MACHINE_DRIVER_START( sega_universal_sound_board )
+MACHINE_CONFIG_FRAGMENT( sega_universal_sound_board )
 
 	/* CPU for the usb board */
 	MDRV_CPU_ADD("usbcpu", I8035, USB_MASTER_CLOCK)		/* divide by 15 in CPU */
@@ -927,13 +927,12 @@ MACHINE_DRIVER_START( sega_universal_sound_board )
 	/* sound hardware */
 	MDRV_SOUND_ADD("usbsnd", USB, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-MACHINE_DRIVER_START( sega_universal_sound_board_rom )
-	MDRV_IMPORT_FROM( sega_universal_sound_board )
+MACHINE_CONFIG_DERIVED( sega_universal_sound_board_rom, sega_universal_sound_board )
 
 	/* CPU for the usb board */
 	MDRV_CPU_MODIFY("usbcpu")
 	MDRV_CPU_PROGRAM_MAP(usb_map_rom)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END

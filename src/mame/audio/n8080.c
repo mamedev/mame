@@ -585,7 +585,7 @@ static ADDRESS_MAP_START( helifire_sound_io_map, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
-MACHINE_DRIVER_START( spacefev_sound )
+MACHINE_CONFIG_FRAGMENT( spacefev_sound )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("audiocpu", I8035, 6000000)
@@ -603,10 +603,10 @@ MACHINE_DRIVER_START( spacefev_sound )
 	MDRV_SOUND_ADD("snsnd", SN76477, 0)
 	MDRV_SOUND_CONFIG(spacefev_sn76477_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-MACHINE_DRIVER_START( sheriff_sound )
+MACHINE_CONFIG_FRAGMENT( sheriff_sound )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("audiocpu", I8035, 6000000)
@@ -622,10 +622,10 @@ MACHINE_DRIVER_START( sheriff_sound )
 	MDRV_SOUND_ADD("snsnd", SN76477, 0)
 	MDRV_SOUND_CONFIG(sheriff_sn76477_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-MACHINE_DRIVER_START( helifire_sound )
+MACHINE_CONFIG_FRAGMENT( helifire_sound )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("audiocpu", I8035, 6000000)
@@ -639,4 +639,4 @@ MACHINE_DRIVER_START( helifire_sound )
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END

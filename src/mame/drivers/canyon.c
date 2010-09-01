@@ -234,10 +234,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( canyon )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(canyon_state)
+static MACHINE_CONFIG_START( canyon, canyon_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, XTAL_12_096MHz / 16)
@@ -267,7 +264,7 @@ static MACHINE_DRIVER_START( canyon )
 	MDRV_SOUND_CONFIG_DISCRETE(canyon)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

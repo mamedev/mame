@@ -934,9 +934,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( root )
-
-	MDRV_DRIVER_DATA(zaxxon_state)
+static MACHINE_CONFIG_START( root, zaxxon_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/16)
@@ -958,32 +956,29 @@ static MACHINE_DRIVER_START( root )
 	MDRV_PALETTE_INIT(zaxxon)
 	MDRV_VIDEO_START(zaxxon)
 	MDRV_VIDEO_UPDATE(zaxxon)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( zaxxon )
-	MDRV_IMPORT_FROM(root)
+static MACHINE_CONFIG_DERIVED( zaxxon, root )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_IMPORT_FROM(zaxxon_samples)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(zaxxon_samples)
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( futspy )
-	MDRV_IMPORT_FROM(root)
+static MACHINE_CONFIG_DERIVED( futspy, root )
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(futspy)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_IMPORT_FROM(zaxxon_samples)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(zaxxon_samples)
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( razmataz )
-	MDRV_IMPORT_FROM(root)
+static MACHINE_CONFIG_DERIVED( razmataz, root )
 
 	MDRV_MACHINE_RESET(razmataz)
 
@@ -993,12 +988,11 @@ static MACHINE_DRIVER_START( razmataz )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_IMPORT_FROM(sega_universal_sound_board_rom)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(sega_universal_sound_board_rom)
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( congo )
-	MDRV_IMPORT_FROM(root)
+static MACHINE_CONFIG_DERIVED( congo, root )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(congo_map)
@@ -1023,8 +1017,8 @@ static MACHINE_DRIVER_START( congo )
 	MDRV_SOUND_ADD("sn2", SN76496, SOUND_CLOCK/4)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_IMPORT_FROM(congo_samples)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(congo_samples)
+MACHINE_CONFIG_END
 
 
 

@@ -652,7 +652,7 @@ static MACHINE_RESET( nwktr )
 	cputag_set_input_line(machine, "dsp", INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-static MACHINE_DRIVER_START( nwktr )
+static MACHINE_CONFIG_START( nwktr, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", PPC403GA, 64000000/2)	/* PowerPC 403GA 32MHz */
@@ -702,14 +702,13 @@ static MACHINE_DRIVER_START( nwktr )
 	MDRV_M48T58_ADD( "m48t58" )
 
 	MDRV_ADC12138_ADD( "adc12138", nwktr_adc_interface )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( thrilld )
-	MDRV_IMPORT_FROM(nwktr)
+static MACHINE_CONFIG_DERIVED( thrilld, nwktr )
 
 	MDRV_DEVICE_REMOVE("k001604")
 	MDRV_K001604_ADD("k001604", thrilld_k001604_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*****************************************************************************/

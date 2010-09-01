@@ -209,7 +209,7 @@ static GFXDECODE_START( rollrace )
 	GFXDECODE_ENTRY( "gfx5", 0x0000, spritelayout,	0,	32 )
 GFXDECODE_END
 
-static MACHINE_DRIVER_START( rollrace )
+static MACHINE_CONFIG_START( rollrace, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,XTAL_24MHz/8) /* verified on pcb */
@@ -245,16 +245,15 @@ static MACHINE_DRIVER_START( rollrace )
 
 	MDRV_SOUND_ADD("ay3", AY8910,XTAL_24MHz/16) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( rollace2 )
+static MACHINE_CONFIG_DERIVED( rollace2, rollrace )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(rollrace)
 
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0,255-24,16, 255-16)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

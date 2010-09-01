@@ -1142,8 +1142,7 @@ static const struct t11_setup t11_data =
 };
 
 
-static MACHINE_DRIVER_START( atarisy2 )
-	MDRV_DRIVER_DATA(atarisy2_state)
+static MACHINE_CONFIG_START( atarisy2, atarisy2_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", T11, MASTER_CLOCK/2)
@@ -1188,17 +1187,16 @@ static MACHINE_DRIVER_START( atarisy2 )
 	MDRV_SOUND_ADD("tms", TMS5220C, MASTER_CLOCK/4/4/2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( sprint )
+static MACHINE_CONFIG_DERIVED( sprint, atarisy2 )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(atarisy2)
 
 	/* sound hardware */
 	MDRV_DEVICE_REMOVE("tms")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

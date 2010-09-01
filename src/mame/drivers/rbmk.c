@@ -512,7 +512,7 @@ static INTERRUPT_GEN( mcu_irq )
 	cputag_set_input_line(device->machine, "mcu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_DRIVER_START( rbmk )
+static MACHINE_CONFIG_START( rbmk, driver_data_t )
 	MDRV_CPU_ADD("maincpu", M68000, 22000000 /2)
 	MDRV_CPU_PROGRAM_MAP(rbmk_mem)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
@@ -550,7 +550,7 @@ static MACHINE_DRIVER_START( rbmk )
 //  MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.60)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.60)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( rbmk )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */

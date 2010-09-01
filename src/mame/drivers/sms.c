@@ -532,7 +532,7 @@ static MACHINE_RESET( sms )
 	communication_port_status = 0;
 }
 
-static MACHINE_DRIVER_START( sms )
+static MACHINE_CONFIG_START( sms, driver_data_t )
 	MDRV_CPU_ADD("maincpu", I8088, XTAL_24MHz/8)
 	MDRV_CPU_PROGRAM_MAP(sms_map)
 
@@ -568,16 +568,15 @@ static MACHINE_DRIVER_START( sms )
 
 	MDRV_SOUND_ADD("aysnd", AY8910, XTAL_16MHz/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START(sureshot)
-	MDRV_IMPORT_FROM(sms)
+static MACHINE_CONFIG_DERIVED( sureshot, sms )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(sureshot_map)
 
 	MDRV_MACHINE_START(sureshot)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*************************************
  *

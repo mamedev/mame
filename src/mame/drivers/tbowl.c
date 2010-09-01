@@ -477,7 +477,7 @@ static MACHINE_RESET( tbowl )
 	adpcm_data[0] = adpcm_data[1] = -1;
 }
 
-static MACHINE_DRIVER_START( tbowl )
+static MACHINE_CONFIG_START( tbowl, driver_data_t )
 
 	/* CPU on Board '6206B' */
 	MDRV_CPU_ADD("maincpu", Z80, 8000000) /* NEC D70008AC-8 (Z80 Clone) */
@@ -537,7 +537,7 @@ static MACHINE_DRIVER_START( tbowl )
 	MDRV_SOUND_ADD("msm2", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* Board Layout from readme.txt

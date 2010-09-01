@@ -385,10 +385,7 @@ static MACHINE_RESET( chqflag )
 	state->wheel = 0;
 }
 
-static MACHINE_DRIVER_START( chqflag )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(chqflag_state)
+static MACHINE_CONFIG_START( chqflag, chqflag_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", KONAMI,XTAL_24MHz/8)	/* 052001 (verified on pcb) */
@@ -442,7 +439,7 @@ static MACHINE_DRIVER_START( chqflag )
 	MDRV_SOUND_CONFIG(k007232_interface_2)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.20)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.20)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( chqflag )
 	ROM_REGION( 0x58000, "maincpu", 0 )	/* 052001 code */

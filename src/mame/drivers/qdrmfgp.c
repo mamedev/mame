@@ -641,7 +641,7 @@ static MACHINE_RESET( qdrmfgp )
  *
  *************************************/
 
-static MACHINE_DRIVER_START( qdrmfgp )
+static MACHINE_CONFIG_START( qdrmfgp, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 32000000/2)	/*  16.000 MHz */
@@ -677,9 +677,9 @@ static MACHINE_DRIVER_START( qdrmfgp )
 	MDRV_SOUND_CONFIG(k054539_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( qdrmfgp2 )
+static MACHINE_CONFIG_START( qdrmfgp2, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 32000000/2)	/*  16.000 MHz */
@@ -714,7 +714,7 @@ static MACHINE_DRIVER_START( qdrmfgp2 )
 	MDRV_SOUND_ADD("konami", K054539, 18432000/384)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************************

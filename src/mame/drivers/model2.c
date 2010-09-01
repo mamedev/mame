@@ -2009,7 +2009,7 @@ static const mb86233_cpu_core tgp_config =
 
 
 /* original Model 2 */
-static MACHINE_DRIVER_START( model2o )
+static MACHINE_CONFIG_START( model2o, driver_data_t )
 	MDRV_CPU_ADD("maincpu", I960, 25000000)
 	MDRV_CPU_PROGRAM_MAP(model2o_mem)
 	MDRV_CPU_VBLANK_INT_HACK(model2_interrupt,2)
@@ -2062,10 +2062,10 @@ static MACHINE_DRIVER_START( model2o )
 	MDRV_SOUND_ADD("sega2", MULTIPCM, 8000000)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* 2A-CRX */
-static MACHINE_DRIVER_START( model2a )
+static MACHINE_CONFIG_START( model2a, driver_data_t )
 	MDRV_CPU_ADD("maincpu", I960, 25000000)
 	MDRV_CPU_PROGRAM_MAP(model2a_crx_mem)
 	MDRV_CPU_VBLANK_INT_HACK(model2_interrupt,2)
@@ -2111,7 +2111,7 @@ static MACHINE_DRIVER_START( model2a )
 	MDRV_SOUND_CONFIG(scsp_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 2.0)
 	MDRV_SOUND_ROUTE(0, "rspeaker", 2.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static READ8_HANDLER( driveio_port_r )
 {
@@ -2146,14 +2146,13 @@ static ADDRESS_MAP_START( drive_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x80, 0x83) AM_NOP //r/w it during irq
 ADDRESS_MAP_END
 
-static MACHINE_DRIVER_START( srallyc )
-	MDRV_IMPORT_FROM( model2a )
+static MACHINE_CONFIG_DERIVED( srallyc, model2a )
 
 	MDRV_CPU_ADD("drivecpu", Z80, 16000000/4) //???
 	MDRV_CPU_PROGRAM_MAP(drive_map)
 	MDRV_CPU_IO_MAP(drive_io_map)
 //  MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static const sharc_config sharc_cfg =
 {
@@ -2161,7 +2160,7 @@ static const sharc_config sharc_cfg =
 };
 
 /* 2B-CRX */
-static MACHINE_DRIVER_START( model2b )
+static MACHINE_CONFIG_START( model2b, driver_data_t )
 	MDRV_CPU_ADD("maincpu", I960, 25000000)
 	MDRV_CPU_PROGRAM_MAP(model2b_crx_mem)
 	MDRV_CPU_VBLANK_INT_HACK(model2_interrupt,2)
@@ -2213,10 +2212,10 @@ static MACHINE_DRIVER_START( model2b )
 	MDRV_SOUND_CONFIG(scsp_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 2.0)
 	MDRV_SOUND_ROUTE(0, "rspeaker", 2.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* 2C-CRX */
-static MACHINE_DRIVER_START( model2c )
+static MACHINE_CONFIG_START( model2c, driver_data_t )
 	MDRV_CPU_ADD("maincpu", I960, 25000000)
 	MDRV_CPU_PROGRAM_MAP(model2c_crx_mem)
 	MDRV_CPU_VBLANK_INT_HACK(model2c_interrupt,3)
@@ -2258,7 +2257,7 @@ static MACHINE_DRIVER_START( model2c )
 	MDRV_SOUND_CONFIG(scsp_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 2.0)
 	MDRV_SOUND_ROUTE(0, "rspeaker", 2.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM definitions */
 

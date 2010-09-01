@@ -358,7 +358,7 @@ static const ay8910_interface ay8910_interface_2 =
 
 
 
-static MACHINE_DRIVER_START( taxidrvr )
+static MACHINE_CONFIG_START( taxidrvr, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,4000000)	/* 4 MHz ??? */
@@ -406,7 +406,7 @@ static MACHINE_DRIVER_START( taxidrvr )
 	MDRV_SOUND_ADD("ay2", AY8910, 1250000)
 	MDRV_SOUND_CONFIG(ay8910_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

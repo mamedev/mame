@@ -399,7 +399,7 @@ static const ay8910_interface ay8910_config =
 };
 
 
-static MACHINE_DRIVER_START( nvram )
+static MACHINE_CONFIG_START( nvram, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3072000)	/* 3.072 MHz? */
@@ -439,18 +439,17 @@ static MACHINE_DRIVER_START( nvram )
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( no_nvram )
+static MACHINE_CONFIG_DERIVED( no_nvram, nvram )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(nvram)
 	MDRV_CPU_MODIFY("mcu")
 	MDRV_CPU_PROGRAM_MAP(mcu_no_nvram_map)
 
 	MDRV_NVRAM_HANDLER(0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

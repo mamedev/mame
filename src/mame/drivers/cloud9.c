@@ -456,10 +456,7 @@ static const pokey_interface pokey_config =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( cloud9 )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(cloud9_state)
+static MACHINE_CONFIG_START( cloud9, cloud9_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, MASTER_CLOCK/8)
@@ -493,7 +490,7 @@ static MACHINE_DRIVER_START( cloud9 )
 	MDRV_SOUND_ADD("pokey2", POKEY, MASTER_CLOCK/8)
 	MDRV_SOUND_CONFIG(pokey_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

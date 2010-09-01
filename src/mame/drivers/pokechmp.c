@@ -228,7 +228,7 @@ static GFXDECODE_START( pokechmp )
 GFXDECODE_END
 
 
-static MACHINE_DRIVER_START( pokechmp )
+static MACHINE_CONFIG_START( pokechmp, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 4000000)
@@ -265,7 +265,7 @@ static MACHINE_DRIVER_START( pokechmp )
 	MDRV_OKIM6295_ADD("oki", 4000000/4, OKIM6295_PIN7_HIGH) // ?? unknown frequency
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)	/* sound fx */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static DRIVER_INIT( pokechmp )
 {

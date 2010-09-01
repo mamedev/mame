@@ -640,7 +640,7 @@ static const kaneko_pandora_interface hvyunit_pandora_config =
 };
 
 
-static MACHINE_DRIVER_START( hvyunit )
+static MACHINE_CONFIG_START( hvyunit, driver_data_t )
 
 	MDRV_CPU_ADD("master", Z80,6000000)
 	MDRV_CPU_PROGRAM_MAP(master_memory)
@@ -681,7 +681,7 @@ static MACHINE_DRIVER_START( hvyunit )
 
 	MDRV_SOUND_ADD("ymsnd", YM2203, 3000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

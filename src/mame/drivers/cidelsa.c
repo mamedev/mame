@@ -509,8 +509,7 @@ static MACHINE_RESET( cidelsa )
 
 /* Machine Drivers */
 
-static MACHINE_DRIVER_START( destryer )
-	MDRV_DRIVER_DATA(cidelsa_state)
+static MACHINE_CONFIG_START( destryer, cidelsa_state )
 
 	/* basic system hardware */
 	MDRV_CPU_ADD(CDP1802_TAG, CDP1802, DESTRYER_CHR1)
@@ -523,11 +522,10 @@ static MACHINE_DRIVER_START( destryer )
 	MDRV_MACHINE_RESET(cidelsa)
 
 	/* sound and video hardware */
-	MDRV_IMPORT_FROM(destryer_video)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(destryer_video)
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( destryera )
-	MDRV_DRIVER_DATA(cidelsa_state)
+static MACHINE_CONFIG_START( destryera, cidelsa_state )
 
 	/* basic system hardware */
 	MDRV_CPU_ADD(CDP1802_TAG, CDP1802, DESTRYER_CHR1)
@@ -540,11 +538,10 @@ static MACHINE_DRIVER_START( destryera )
 	MDRV_MACHINE_RESET(cidelsa)
 
 	/* sound and video hardware */
-	MDRV_IMPORT_FROM(destryer_video)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(destryer_video)
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( altair )
-	MDRV_DRIVER_DATA(cidelsa_state)
+static MACHINE_CONFIG_START( altair, cidelsa_state )
 
 	/* basic system hardware */
 
@@ -563,11 +560,10 @@ static MACHINE_DRIVER_START( altair )
 	MDRV_CDP1852_ADD("ic26", ALTAIR_CHR1 / 8, altair_cdp1852_out1_intf)		/* clock is CDP1802 TPB */
 
 	/* sound and video hardware */
-	MDRV_IMPORT_FROM(altair_video)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(altair_video)
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( draco )
-	MDRV_DRIVER_DATA(cidelsa_state)
+static MACHINE_CONFIG_START( draco, cidelsa_state )
 
 	/* basic system hardware */
 	MDRV_CPU_ADD(CDP1802_TAG, CDP1802, DRACO_CHR1)
@@ -591,8 +587,8 @@ static MACHINE_DRIVER_START( draco )
 	MDRV_CDP1852_ADD("ic32", DRACO_CHR1 / 8, draco_cdp1852_out1_intf)		/* clock is CDP1802 TPB */
 
 	/* sound and video hardware */
-	MDRV_IMPORT_FROM(draco_video)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(draco_video)
+MACHINE_CONFIG_END
 
 /* ROMs */
 

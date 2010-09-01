@@ -3,4 +3,4 @@
 
 SOUND_RESET( taito_f3_soundsystem_reset );
 
-MACHINE_DRIVER_EXTERN( taito_f3_sound );
+MACHINE_CONFIG_EXTERN( taito_f3_sound );

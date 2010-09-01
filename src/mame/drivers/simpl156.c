@@ -415,10 +415,7 @@ static const deco16ic_interface simpl156_deco16ic_intf =
 	NULL
 };
 
-static MACHINE_DRIVER_START( chainrec )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(simpl156_state)
+static MACHINE_CONFIG_START( chainrec, simpl156_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", ARM, 28000000 /* /4 */)	/*DE156*/ /* 7.000 MHz */ /* measured at 7.. seems to need 28? */
@@ -451,39 +448,39 @@ static MACHINE_DRIVER_START( chainrec )
 	MDRV_OKIM6295_ADD("okimusic", 32220000/16, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.2)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( magdrop )
+static MACHINE_CONFIG_DERIVED( magdrop, chainrec )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(chainrec)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(magdrop_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( magdropp )
+static MACHINE_CONFIG_DERIVED( magdropp, chainrec )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(chainrec)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(magdropp_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( joemacr )
+static MACHINE_CONFIG_DERIVED( joemacr, chainrec )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(chainrec)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(joemacr_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( mitchell156 )
+static MACHINE_CONFIG_DERIVED( mitchell156, chainrec )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(chainrec)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(mitchell156_map)
 
 	MDRV_OKIM6295_REPLACE("okimusic", 32220000/32, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.2)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*

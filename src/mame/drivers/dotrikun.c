@@ -146,10 +146,7 @@ static MACHINE_RESET( dotrikun )
 }
 
 
-static MACHINE_DRIVER_START( dotrikun )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(dotrikun_state)
+static MACHINE_CONFIG_START( dotrikun, dotrikun_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)		 /* 4 MHz */
@@ -171,7 +168,7 @@ static MACHINE_DRIVER_START( dotrikun )
 	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 0, 192-1)
 
 	/* sound hardware */
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

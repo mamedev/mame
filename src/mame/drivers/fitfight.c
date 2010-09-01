@@ -731,8 +731,7 @@ static MACHINE_RESET( fitfight )
 	state->fof_700000_data = 0;
 }
 
-static MACHINE_DRIVER_START( fitfight )
-	MDRV_DRIVER_DATA(fitfight_state)
+static MACHINE_CONFIG_START( fitfight, fitfight_state )
 
 	MDRV_CPU_ADD("maincpu",M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(fitfight_main_map)
@@ -765,10 +764,9 @@ static MACHINE_DRIVER_START( fitfight )
 
 	MDRV_OKIM6295_ADD("oki", 1333333, OKIM6295_PIN7_LOW) // ~8080Hz ??? TODO: find out the real frequency
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( bbprot )
-	MDRV_DRIVER_DATA(fitfight_state)
+static MACHINE_CONFIG_START( bbprot, fitfight_state )
 
 	MDRV_CPU_ADD("maincpu",M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(bbprot_main_map)
@@ -795,7 +793,7 @@ static MACHINE_DRIVER_START( bbprot )
 
 	MDRV_OKIM6295_ADD("oki", 1333333, OKIM6295_PIN7_LOW) // ~8080Hz ??? TODO: find out the real frequency
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***
 

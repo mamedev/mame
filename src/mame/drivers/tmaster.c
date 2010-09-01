@@ -870,7 +870,7 @@ static const duart68681_config tmaster_duart68681_config =
 	NULL
 };
 
-static MACHINE_DRIVER_START( tm3k )
+static MACHINE_CONFIG_START( tm3k, driver_data_t )
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2) /* 12MHz */
 	MDRV_CPU_PROGRAM_MAP(tmaster_map)
 	MDRV_CPU_VBLANK_INT_HACK(tm3k_interrupt,2+20) // ??
@@ -898,15 +898,14 @@ static MACHINE_DRIVER_START( tm3k )
 
 	MDRV_OKIM6295_ADD("oki", XTAL_32MHz / 16, OKIM6295_PIN7_HIGH)  /* 2MHz; clock frequency & pin 7 not verified */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( tm )
-	MDRV_IMPORT_FROM(tm3k)
+static MACHINE_CONFIG_DERIVED( tm, tm3k )
 
 	MDRV_OKIM6295_REPLACE("oki", 1122000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 static INTERRUPT_GEN( galgames_interrupt )
@@ -937,7 +936,7 @@ static MACHINE_RESET( galgames )
 	machine->device("maincpu")->reset();
 }
 
-static MACHINE_DRIVER_START( galgames )
+static MACHINE_CONFIG_START( galgames, driver_data_t )
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2)
 	MDRV_CPU_PROGRAM_MAP(galgames_map)
 	MDRV_CPU_VBLANK_INT_HACK(galgames_interrupt, 1+20)	// ??
@@ -969,7 +968,7 @@ static MACHINE_DRIVER_START( galgames )
 
 	MDRV_OKIM6295_ADD("oki", XTAL_24MHz / 8, OKIM6295_PIN7_LOW) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*
     Each cartridge contains a PIC, that should provide, among other things, the following header:
@@ -977,10 +976,9 @@ MACHINE_DRIVER_END
     4345 5331 3939 3700 0c10 ffb3 3c00 0000       "CES1997"
     fffe f2f7 8557 c119 0000 0000 2340 188e
 */
-static MACHINE_DRIVER_START( galgame2 )
-	MDRV_IMPORT_FROM(galgames)
+static MACHINE_CONFIG_DERIVED( galgame2, galgames )
 //  MDRV_CPU_ADD("pic", PIC12C508, XTAL_24MHz / 2)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

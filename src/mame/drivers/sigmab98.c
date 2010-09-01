@@ -461,7 +461,7 @@ static INTERRUPT_GEN( gegege_vblank_interrupt )
 	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x5a);
 }
 
-static MACHINE_DRIVER_START( gegege )
+static MACHINE_CONFIG_START( gegege, driver_data_t )
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_27MHz / 4)	// ?
 	MDRV_CPU_PROGRAM_MAP(gegege_mem_map)
 	MDRV_CPU_IO_MAP(gegege_io_map)
@@ -490,7 +490,7 @@ static MACHINE_DRIVER_START( gegege )
 	MDRV_SOUND_ADD("ymz", YMZ280B, XTAL_27MHz / 2)	// ?
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

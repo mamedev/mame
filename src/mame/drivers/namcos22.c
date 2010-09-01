@@ -2868,7 +2868,7 @@ static INTERRUPT_GEN( mcu_interrupt )
 	}
 }
 
-static MACHINE_DRIVER_START( namcos22s )
+static MACHINE_CONFIG_START( namcos22s, driver_data_t )
 	MDRV_CPU_ADD("maincpu", M68EC020,SS22_MASTER_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(namcos22s_am)
 	MDRV_CPU_VBLANK_INT_HACK(namcos22s_interrupt,2)
@@ -2913,7 +2913,7 @@ static MACHINE_DRIVER_START( namcos22s )
 	MDRV_SOUND_ROUTE(1, "lspeaker", 1.00)
 	MDRV_SOUND_ROUTE(2, "rspeaker", 1.00)
 	MDRV_SOUND_ROUTE(3, "lspeaker", 1.00)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*********************************************************************************/
 
@@ -3284,7 +3284,7 @@ static MACHINE_RESET(namcos22)
 	InitDSP(machine, 0);
 }
 
-static MACHINE_DRIVER_START( namcos22 )
+static MACHINE_CONFIG_START( namcos22, driver_data_t )
 	MDRV_CPU_ADD("maincpu", M68020,SS22_MASTER_CLOCK/2) /* 25 MHz? */
 	MDRV_CPU_PROGRAM_MAP(namcos22_am)
 	MDRV_CPU_VBLANK_INT_HACK(namcos22_interrupt,2)
@@ -3326,7 +3326,7 @@ static MACHINE_DRIVER_START( namcos22 )
 	MDRV_SOUND_ROUTE(1, "lspeaker", 1.00)
 	MDRV_SOUND_ROUTE(2, "rspeaker", 1.00)
 	MDRV_SOUND_ROUTE(3, "lspeaker", 1.00)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*********************************************************************************/
 

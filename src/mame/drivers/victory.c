@@ -207,7 +207,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( victory )
+static MACHINE_CONFIG_START( victory, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, VICTORY_MAIN_CPU_CLOCK)
@@ -231,9 +231,9 @@ static MACHINE_DRIVER_START( victory )
 	MDRV_VIDEO_UPDATE(victory)
 
 	/* audio hardware */
-	MDRV_IMPORT_FROM(victory_audio)
+	MDRV_FRAGMENT_ADD(victory_audio)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

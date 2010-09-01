@@ -344,7 +344,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( wldarrow )
+static MACHINE_CONFIG_START( wldarrow, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8080, 2000000)
@@ -367,7 +367,7 @@ static MACHINE_DRIVER_START( wldarrow )
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

@@ -493,10 +493,7 @@ static MACHINE_RESET( exprraid )
 	state->bg_index[3] = 0;
 }
 
-static MACHINE_DRIVER_START( exprraid )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(exprraid_state)
+static MACHINE_CONFIG_START( exprraid, exprraid_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", DECO16, 4000000)        /* 4 MHz ??? */
@@ -533,14 +530,13 @@ static MACHINE_DRIVER_START( exprraid )
 	MDRV_SOUND_ADD("ym2", YM3526, 3600000)
 	MDRV_SOUND_CONFIG(ym3526_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( exprboot )
-	MDRV_IMPORT_FROM(exprraid)
+static MACHINE_CONFIG_DERIVED( exprboot, exprraid )
 
 	MDRV_CPU_REPLACE("maincpu", M6502, 4000000)        /* 4 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(master_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

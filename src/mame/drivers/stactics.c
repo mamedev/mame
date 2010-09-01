@@ -302,9 +302,7 @@ static MACHINE_START( stactics )
  *
  *************************************/
 
-static MACHINE_DRIVER_START( stactics )
-
-	MDRV_DRIVER_DATA(stactics_state)
+static MACHINE_CONFIG_START( stactics, stactics_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8080, 1933560)
@@ -314,10 +312,10 @@ static MACHINE_DRIVER_START( stactics )
 	MDRV_MACHINE_START(stactics)
 
 	/* video hardware */
-	MDRV_IMPORT_FROM(stactics_video)
+	MDRV_FRAGMENT_ADD(stactics_video)
 
 	/* audio hardware */
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

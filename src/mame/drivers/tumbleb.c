@@ -2012,10 +2012,7 @@ static MACHINE_RESET( tumbleb )
 	memset(state->control_0, 0, ARRAY_LENGTH(state->control_0));
 }
 
-static MACHINE_DRIVER_START( tumblepb )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(tumbleb_state)
+static MACHINE_CONFIG_START( tumblepb, tumbleb_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 14000000)
@@ -2044,13 +2041,10 @@ static MACHINE_DRIVER_START( tumblepb )
 
 	MDRV_OKIM6295_ADD("oki", 8000000/10, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( tumbleb2 )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(tumbleb_state)
+static MACHINE_CONFIG_START( tumbleb2, tumbleb_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 14000000)
@@ -2079,12 +2073,9 @@ static MACHINE_DRIVER_START( tumbleb2 )
 
 	MDRV_OKIM6295_ADD("oki", 8000000/10, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( jumpkids )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(tumbleb_state)
+static MACHINE_CONFIG_START( jumpkids, tumbleb_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
@@ -2117,12 +2108,9 @@ static MACHINE_DRIVER_START( jumpkids )
 
 	MDRV_OKIM6295_ADD("oki", 8000000/8, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( fncywld )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(tumbleb_state)
+static MACHINE_CONFIG_START( fncywld, tumbleb_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
@@ -2156,7 +2144,7 @@ static MACHINE_DRIVER_START( fncywld )
 	MDRV_OKIM6295_ADD("oki", 1023924, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -2186,10 +2174,7 @@ static MACHINE_RESET (htchctch)
 	MACHINE_RESET_CALL(tumbleb);
 }
 
-static MACHINE_DRIVER_START( htchctch )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(tumbleb_state)
+static MACHINE_CONFIG_START( htchctch, tumbleb_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 15000000) /* verified */
@@ -2227,48 +2212,40 @@ static MACHINE_DRIVER_START( htchctch )
 	MDRV_OKIM6295_ADD("oki", 1024000, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( cookbib )
-	MDRV_IMPORT_FROM(htchctch)
+static MACHINE_CONFIG_DERIVED( cookbib, htchctch )
 	MDRV_VIDEO_UPDATE( semicom_altoffsets )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( bcstory )
-	MDRV_IMPORT_FROM(htchctch)
+static MACHINE_CONFIG_DERIVED( bcstory, htchctch )
 	MDRV_VIDEO_UPDATE(bcstory)
 
 	MDRV_SOUND_REPLACE("ymsnd", YM2151, 3427190)
 	MDRV_SOUND_CONFIG(semicom_ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.10)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.10)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( semibase )
-	MDRV_IMPORT_FROM(bcstory)
+static MACHINE_CONFIG_DERIVED( semibase, bcstory )
 	MDRV_VIDEO_UPDATE(semibase )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( sdfight )
-	MDRV_IMPORT_FROM(bcstory)
+static MACHINE_CONFIG_DERIVED( sdfight, bcstory )
 	MDRV_VIDEO_START(sdfight)
 	MDRV_VIDEO_UPDATE(sdfight)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( metlsavr )
-	MDRV_IMPORT_FROM(cookbib)
+static MACHINE_CONFIG_DERIVED( metlsavr, cookbib )
 
 	MDRV_SOUND_REPLACE("ymsnd", YM2151, 3427190)
 	MDRV_SOUND_CONFIG(semicom_ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.10)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.10)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( jumppop )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(tumbleb_state)
+static MACHINE_CONFIG_START( jumppop, tumbleb_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
@@ -2306,12 +2283,9 @@ static MACHINE_DRIVER_START( jumppop )
 	MDRV_OKIM6295_ADD("oki", 875000, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( suprtrio )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(tumbleb_state)
+static MACHINE_CONFIG_START( suprtrio, tumbleb_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 14000000) /* 14mhz should be correct, but lots of sprite flicker later in game */
@@ -2344,12 +2318,9 @@ static MACHINE_DRIVER_START( suprtrio )
 	MDRV_OKIM6295_ADD("oki", 875000, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( pangpang )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(tumbleb_state)
+static MACHINE_CONFIG_START( pangpang, tumbleb_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 14000000)
@@ -2378,7 +2349,7 @@ static MACHINE_DRIVER_START( pangpang )
 
 	MDRV_OKIM6295_ADD("oki", 8000000/10, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /******************************************************************************/
 

@@ -1586,7 +1586,7 @@ static const pokey_interface warlords_pokey_interface =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( centiped )
+static MACHINE_CONFIG_START( centiped, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 12096000/8)	/* 1.512 MHz (slows down to 0.75MHz while accessing playfield RAM) */
@@ -1618,24 +1618,22 @@ static MACHINE_DRIVER_START( centiped )
 
 	MDRV_SOUND_ADD("pokey", POKEY, 12096000/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( caterplr )
+static MACHINE_CONFIG_DERIVED( caterplr, centiped )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(centiped)
 
 	/* sound hardware */
 	MDRV_SOUND_REPLACE("pokey", AY8910, 12096000/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( centipdb )
+static MACHINE_CONFIG_DERIVED( centipdb, centiped )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(centiped)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(centipdb_map)
 
@@ -1643,26 +1641,24 @@ static MACHINE_DRIVER_START( centipdb )
 	MDRV_SOUND_REPLACE("pokey", AY8910, 12096000/8)
 	MDRV_SOUND_CONFIG(centipdb_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( magworm )
+static MACHINE_CONFIG_DERIVED( magworm, centiped )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(centiped)
 	MDRV_MACHINE_RESET(magworm)
 
 	/* sound hardware */
 	MDRV_SOUND_REPLACE("pokey", AY8910, 12096000/8)
 	MDRV_SOUND_CONFIG(centipdb_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( milliped )
+static MACHINE_CONFIG_DERIVED( milliped, centiped )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(centiped)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(milliped_map)
 
@@ -1681,13 +1677,12 @@ static MACHINE_DRIVER_START( milliped )
 	MDRV_SOUND_ADD("pokey2", POKEY, 12096000/8)
 	MDRV_SOUND_CONFIG(milliped_pokey_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( warlords )
+static MACHINE_CONFIG_DERIVED( warlords, centiped )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(centiped)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(warlords_map)
 
@@ -1703,20 +1698,19 @@ static MACHINE_DRIVER_START( warlords )
 	MDRV_SOUND_REPLACE("pokey", POKEY, 12096000/8)
 	MDRV_SOUND_CONFIG(warlords_pokey_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( mazeinv )
+static MACHINE_CONFIG_DERIVED( mazeinv, milliped )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(milliped)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(mazeinv_map)
 	MDRV_VIDEO_UPDATE(centiped)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( bullsdrt )
+static MACHINE_CONFIG_START( bullsdrt, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", S2650, 12096000/8)
@@ -1743,7 +1737,7 @@ static MACHINE_DRIVER_START( bullsdrt )
 
 	MDRV_SOUND_ADD("snsnd", SN76496, 12096000/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

@@ -586,7 +586,7 @@ static const tms5220_interface tms5220_config =
 
 
 
-static MACHINE_DRIVER_START( zaccaria )
+static MACHINE_CONFIG_START( zaccaria, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,XTAL_18_432MHz/6)	/* verified on pcb */
@@ -640,7 +640,7 @@ static MACHINE_DRIVER_START( zaccaria )
 	MDRV_SOUND_ADD("tms", TMS5200, 649200) /* ROMCLK pin measured at 162.3Khz, OSC is exactly *4 of that) */
 	MDRV_SOUND_CONFIG(tms5220_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

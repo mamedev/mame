@@ -630,7 +630,7 @@ static INTERRUPT_GEN( jingbell_interrupt )
 		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_DRIVER_START( jingbell )
+static MACHINE_CONFIG_START( jingbell, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z180, XTAL_12MHz / 2)	/* HD64180RP8, 8 MHz? */
 	MDRV_CPU_PROGRAM_MAP(jingbell_map)
@@ -662,14 +662,13 @@ static MACHINE_DRIVER_START( jingbell )
 
 	MDRV_OKIM6295_ADD("oki", XTAL_12MHz / 12, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( gp98 )
-	MDRV_IMPORT_FROM(jingbell)
+static MACHINE_CONFIG_DERIVED( gp98, jingbell )
 	MDRV_GFXDECODE(gp98)
 
 	MDRV_VIDEO_START(gp98)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

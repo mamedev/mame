@@ -139,7 +139,7 @@ ADDRESS_MAP_END
 
 
 
-static MACHINE_DRIVER_START( magictg )
+static MACHINE_CONFIG_START( magictg, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", R4600BE, 10000000)  // ?? what cpu?
 	MDRV_CPU_CONFIG(r4600_config)
@@ -156,7 +156,7 @@ static MACHINE_DRIVER_START( magictg )
 
 	MDRV_VIDEO_START(magictg)
 	MDRV_VIDEO_UPDATE(magictg)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( magictg )
 	PORT_START("IPT_TEST")

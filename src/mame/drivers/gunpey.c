@@ -313,7 +313,7 @@ static INTERRUPT_GEN( gunpey_interrupt )
 }
 
 /***************************************************************************************/
-static MACHINE_DRIVER_START( gunpey )
+static MACHINE_CONFIG_START( gunpey, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V30, 57242400 / 4)
@@ -345,7 +345,7 @@ static MACHINE_DRIVER_START( gunpey )
 	MDRV_SOUND_CONFIG(ymz280b_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.25)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************************/

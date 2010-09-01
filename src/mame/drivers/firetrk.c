@@ -876,7 +876,7 @@ static GFXDECODE_START( montecar )
 GFXDECODE_END
 
 
-static MACHINE_DRIVER_START( firetrk )
+static MACHINE_CONFIG_START( firetrk, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6800, MASTER_CLOCK/12)	/* 750Khz during service mode */
@@ -907,13 +907,12 @@ static MACHINE_DRIVER_START( firetrk )
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(firetrk)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( superbug )
+static MACHINE_CONFIG_DERIVED( superbug, firetrk )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(firetrk)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(superbug_map)
 
@@ -927,13 +926,12 @@ static MACHINE_DRIVER_START( superbug )
 	MDRV_SOUND_REPLACE("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(superbug)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( montecar )
+static MACHINE_CONFIG_DERIVED( montecar, firetrk )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(firetrk)
 	MDRV_CPU_MODIFY("maincpu")	/* 750Khz during service mode */
 	MDRV_CPU_PROGRAM_MAP(montecar_map)
 
@@ -949,7 +947,7 @@ static MACHINE_DRIVER_START( montecar )
 	MDRV_SOUND_REPLACE("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(montecar)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( firetrk )

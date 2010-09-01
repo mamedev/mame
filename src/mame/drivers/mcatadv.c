@@ -441,10 +441,7 @@ static MACHINE_START( mcatadv )
 	state_save_register_global(machine, state->palette_bank2);
 }
 
-static MACHINE_DRIVER_START( mcatadv )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(mcatadv_state)
+static MACHINE_CONFIG_START( mcatadv, mcatadv_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz) /* verified on pcb */
@@ -483,15 +480,14 @@ static MACHINE_DRIVER_START( mcatadv )
 	MDRV_SOUND_ROUTE(0, "rspeaker", 0.32)
 	MDRV_SOUND_ROUTE(1, "lspeaker",  0.5)
 	MDRV_SOUND_ROUTE(2, "rspeaker", 0.5)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( nost )
-	MDRV_IMPORT_FROM( mcatadv )
+static MACHINE_CONFIG_DERIVED( nost, mcatadv )
 
 	MDRV_CPU_MODIFY("soundcpu")
 	MDRV_CPU_PROGRAM_MAP(nost_sound_map)
 	MDRV_CPU_IO_MAP(nost_sound_io_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( mcatadv )

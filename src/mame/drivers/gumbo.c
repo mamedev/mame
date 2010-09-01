@@ -227,8 +227,7 @@ static GFXDECODE_START( gumbo )
 GFXDECODE_END
 
 
-static MACHINE_DRIVER_START( gumbo )
-	MDRV_DRIVER_DATA(gumbo_state)
+static MACHINE_CONFIG_START( gumbo, gumbo_state )
 
 	MDRV_CPU_ADD("maincpu", M68000, 14318180 /2)	 // or 10mhz? ?
 	MDRV_CPU_PROGRAM_MAP(gumbo_map)
@@ -253,21 +252,19 @@ static MACHINE_DRIVER_START( gumbo )
 	MDRV_OKIM6295_ADD("oki", 1122000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.47)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( mspuzzle )
-	MDRV_IMPORT_FROM(gumbo)
+static MACHINE_CONFIG_DERIVED( mspuzzle, gumbo )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(mspuzzle_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( dblpoint )
-	MDRV_IMPORT_FROM(gumbo)
+static MACHINE_CONFIG_DERIVED( dblpoint, gumbo )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(dblpoint_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( gumbo )
 	ROM_REGION( 0x40000, "maincpu", 0 ) /* 68000 Code */

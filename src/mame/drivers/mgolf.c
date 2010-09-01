@@ -321,10 +321,7 @@ static MACHINE_RESET( mgolf )
 }
 
 
-static MACHINE_DRIVER_START( mgolf )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(mgolf_state)
+static MACHINE_CONFIG_START( mgolf, mgolf_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 12096000 / 16) /* ? */
@@ -348,7 +345,7 @@ static MACHINE_DRIVER_START( mgolf )
 	MDRV_VIDEO_UPDATE(mgolf)
 
 	/* sound hardware */
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( mgolf )

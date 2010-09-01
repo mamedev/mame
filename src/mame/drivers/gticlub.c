@@ -815,7 +815,7 @@ static MACHINE_RESET( gticlub )
 	cputag_set_input_line(machine, "dsp", INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-static MACHINE_DRIVER_START( gticlub )
+static MACHINE_CONFIG_START( gticlub, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", PPC403GA, 64000000/2)	/* PowerPC 403GA 32MHz */
@@ -861,29 +861,25 @@ static MACHINE_DRIVER_START( gticlub )
 	MDRV_SOUND_ADD("rfsnd", RF5C400, 64000000/4)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( thunderh )
-
-	MDRV_IMPORT_FROM(gticlub)
+static MACHINE_CONFIG_DERIVED( thunderh, gticlub )
 
 	MDRV_DEVICE_REMOVE("adc1038")
 	MDRV_ADC1038_ADD("adc1038", thunderh_adc1038_intf)
 
 	MDRV_DEVICE_REMOVE("k056230")
 	MDRV_K056230_ADD("k056230", thunderh_k056230_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( slrasslt )
-
-	MDRV_IMPORT_FROM(gticlub)
+static MACHINE_CONFIG_DERIVED( slrasslt, gticlub )
 
 	MDRV_DEVICE_REMOVE("adc1038")
 	MDRV_ADC1038_ADD("adc1038", thunderh_adc1038_intf)
 
 	MDRV_DEVICE_REMOVE("k001604_1")
 	MDRV_K001604_ADD("k001604_1", slrasslt_k001604_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 static const k033906_interface hangplt_k033906_intf_0 =
@@ -902,7 +898,7 @@ static MACHINE_RESET( hangplt )
 	cputag_set_input_line(machine, "dsp2", INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-static MACHINE_DRIVER_START( hangplt )
+static MACHINE_CONFIG_START( hangplt, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", PPC403GA, 64000000/2)	/* PowerPC 403GA 32MHz */
@@ -971,7 +967,7 @@ static MACHINE_DRIVER_START( hangplt )
 	MDRV_SOUND_ADD("rfsnd", RF5C400, 64000000/4)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*************************************************************************/
 

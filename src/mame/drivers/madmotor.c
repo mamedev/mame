@@ -240,10 +240,7 @@ static MACHINE_RESET( madmotor )
 	state->flipscreen = 0;
 }
 
-static MACHINE_DRIVER_START( madmotor )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(madmotor_state)
+static MACHINE_CONFIG_START( madmotor, madmotor_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000) /* Custom chip 59, 24 MHz crystal */
@@ -288,7 +285,7 @@ static MACHINE_DRIVER_START( madmotor )
 
 	MDRV_OKIM6295_ADD("oki2", 2047848, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /******************************************************************************/
 

@@ -215,9 +215,7 @@ static INTERRUPT_GEN( trvquest_interrupt )
 	via_ca1_w(state->via_2, 0);
 }
 
-static MACHINE_DRIVER_START( trvquest )
-
-	MDRV_DRIVER_DATA(gameplan_state)
+static MACHINE_CONFIG_START( trvquest, gameplan_state )
 
 	MDRV_CPU_ADD("maincpu", M6809,XTAL_6MHz/4)
 	MDRV_CPU_PROGRAM_MAP(cpu_map)
@@ -228,7 +226,7 @@ static MACHINE_DRIVER_START( trvquest )
 	MDRV_MACHINE_RESET(trvquest)
 
 	/* video hardware */
-	MDRV_IMPORT_FROM(trvquest_video)
+	MDRV_FRAGMENT_ADD(trvquest_video)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -243,7 +241,7 @@ static MACHINE_DRIVER_START( trvquest )
 	MDRV_VIA6522_ADD("via6522_0", 0, trvquest_via_0_interface)
 	MDRV_VIA6522_ADD("via6522_1", 0, via_1_interface)
 	MDRV_VIA6522_ADD("via6522_2", 0, via_2_interface)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( trvquest )
 	ROM_REGION( 0x10000, "maincpu", 0 )

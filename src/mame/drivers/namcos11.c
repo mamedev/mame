@@ -953,7 +953,7 @@ static MACHINE_RESET( namcos11 )
 	psx_machine_init(machine);
 }
 
-static MACHINE_DRIVER_START( coh100 )
+static MACHINE_CONFIG_START( coh100, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",  PSXCPU, XTAL_67_7376MHz )
 	MDRV_CPU_PROGRAM_MAP( namcos11_map)
@@ -988,15 +988,14 @@ static MACHINE_DRIVER_START( coh100 )
 	MDRV_SOUND_ROUTE(3, "lspeaker", 1.00)
 
 	MDRV_AT28C16_ADD( "at28c16", NULL )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( coh110 )
-	MDRV_IMPORT_FROM( coh100 )
+static MACHINE_CONFIG_DERIVED( coh110, coh100 )
 	MDRV_VIDEO_START( psx_type2 )
 
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE( 30 )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( namcos11 )
 	PORT_START( "SWITCH" )

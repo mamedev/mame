@@ -298,10 +298,7 @@ static MACHINE_RESET( orbit )
  *
  *************************************/
 
-static MACHINE_DRIVER_START( orbit )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(orbit_state)
+static MACHINE_CONFIG_START( orbit, orbit_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6800, MASTER_CLOCK / 16)
@@ -331,7 +328,7 @@ static MACHINE_DRIVER_START( orbit )
 	MDRV_SOUND_CONFIG_DISCRETE(orbit)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

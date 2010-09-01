@@ -945,10 +945,7 @@ static MACHINE_RESET( playmark )
 	state->old_oki_bank = 0;
 }
 
-static MACHINE_DRIVER_START( bigtwin )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(playmark_state)
+static MACHINE_CONFIG_START( bigtwin, playmark_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
@@ -981,13 +978,10 @@ static MACHINE_DRIVER_START( bigtwin )
 
 	MDRV_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( wbeachvl )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(playmark_state)
+static MACHINE_CONFIG_START( wbeachvl, playmark_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
@@ -1023,12 +1017,9 @@ static MACHINE_DRIVER_START( wbeachvl )
 
 	MDRV_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( excelsr )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(playmark_state)
+static MACHINE_CONFIG_START( excelsr, playmark_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
@@ -1061,12 +1052,9 @@ static MACHINE_DRIVER_START( excelsr )
 
 	MDRV_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( hotmind )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(playmark_state)
+static MACHINE_CONFIG_START( hotmind, playmark_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)	/* verified on pcb */
@@ -1102,12 +1090,9 @@ static MACHINE_DRIVER_START( hotmind )
 
 	MDRV_OKIM6295_ADD("oki", XTAL_1MHz, OKIM6295_PIN7_HIGH)  /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( hrdtimes )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(playmark_state)
+static MACHINE_CONFIG_START( hrdtimes, playmark_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)	/* verified on pcb */
@@ -1140,7 +1125,7 @@ static MACHINE_DRIVER_START( hrdtimes )
 
 	MDRV_OKIM6295_ADD("oki", XTAL_1MHz, OKIM6295_PIN7_HIGH) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

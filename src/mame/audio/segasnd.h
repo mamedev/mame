@@ -4,15 +4,15 @@
 
 *************************************************************************/
 
-MACHINE_DRIVER_EXTERN( sega_speech_board );
+MACHINE_CONFIG_EXTERN( sega_speech_board );
 
 WRITE8_HANDLER( sega_speech_data_w );
 WRITE8_HANDLER( sega_speech_control_w );
 
 
 
-MACHINE_DRIVER_EXTERN( sega_universal_sound_board );
-MACHINE_DRIVER_EXTERN( sega_universal_sound_board_rom );
+MACHINE_CONFIG_EXTERN( sega_universal_sound_board );
+MACHINE_CONFIG_EXTERN( sega_universal_sound_board_rom );
 
 void sega_usb_reset(running_machine *machine, UINT8 t1_clock_mask);
 

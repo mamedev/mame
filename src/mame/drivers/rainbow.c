@@ -674,10 +674,7 @@ static MACHINE_START( rainbow )
 	state->pc090oj = machine->device("pc090oj");
 }
 
-static MACHINE_DRIVER_START( rainbow )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(rainbow_state)
+static MACHINE_CONFIG_START( rainbow, rainbow_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz/2) /* verified on pcb */
@@ -716,14 +713,11 @@ static MACHINE_DRIVER_START( rainbow )
 	MDRV_SOUND_ROUTE(1, "mono", 0.50)
 
 	MDRV_TC0140SYT_ADD("tc0140syt", rainbow_tc0140syt_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* Jumping: The PCB has 2 Xtals, 24MHz and 18,432MHz */
-static MACHINE_DRIVER_START( jumping )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(rainbow_state)
+static MACHINE_CONFIG_START( jumping, rainbow_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_24MHz/3)	/* not verified but matches original */
@@ -761,7 +755,7 @@ static MACHINE_DRIVER_START( jumping )
 
 	MDRV_SOUND_ADD("ym2", YM2203, XTAL_18_432MHz/6)	/* not verified */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

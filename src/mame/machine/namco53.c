@@ -152,10 +152,10 @@ static ADDRESS_MAP_START( namco_53xx_map_io, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
-static MACHINE_DRIVER_START( namco_53xx )
+static MACHINE_CONFIG_FRAGMENT( namco_53xx )
 	MDRV_CPU_ADD("mcu", MB8843, DERIVED_CLOCK(1,1))		/* parent clock, internally divided by 6 */
 	MDRV_CPU_IO_MAP(namco_53xx_map_io)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( namco_53xx )

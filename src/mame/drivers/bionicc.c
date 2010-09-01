@@ -356,10 +356,7 @@ static MACHINE_RESET( bionicc )
 	state->soundcommand = 0;
 }
 
-static MACHINE_DRIVER_START( bionicc )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(bionicc_state)
+static MACHINE_CONFIG_START( bionicc, bionicc_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, MASTER_CLOCK / 2) /* 12 MHz - verified in schematics */
@@ -398,7 +395,7 @@ static MACHINE_DRIVER_START( bionicc )
 	MDRV_SOUND_ADD("ymsnd", YM2151, 3579545)
 	MDRV_SOUND_ROUTE(0, "mono", 0.60)
 	MDRV_SOUND_ROUTE(1, "mono", 0.60)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

@@ -191,8 +191,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( xybots )
-	MDRV_DRIVER_DATA(xybots_state)
+static MACHINE_CONFIG_START( xybots, xybots_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
@@ -218,8 +217,8 @@ static MACHINE_DRIVER_START( xybots )
 	MDRV_VIDEO_UPDATE(xybots)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(jsa_i_stereo_swapped)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(jsa_i_stereo_swapped)
+MACHINE_CONFIG_END
 
 
 

@@ -551,10 +551,7 @@ static const deco16ic_interface dassault_deco16ic_intf =
 	dassault_bank_callback
 };
 
-static MACHINE_DRIVER_START( dassault )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(dassault_state)
+static MACHINE_CONFIG_START( dassault, dassault_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 14000000) /* Accurate */
@@ -606,7 +603,7 @@ static MACHINE_DRIVER_START( dassault )
 	MDRV_OKIM6295_ADD("oki2", 2047848, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /**********************************************************************************/
 

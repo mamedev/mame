@@ -237,7 +237,7 @@ static const mc6845_interface mc6845_intf =
 };
 
 
-static MACHINE_DRIVER_START( usg32 )
+static MACHINE_CONFIG_START( usg32, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 2000000) /* ?? */
@@ -268,13 +268,12 @@ static MACHINE_DRIVER_START( usg32 )
 
 	MDRV_SOUND_ADD("aysnd", AY8910, 2000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( usg185 )
-	MDRV_IMPORT_FROM(usg32)
+static MACHINE_CONFIG_DERIVED( usg185, usg32 )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(usg185_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

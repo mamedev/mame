@@ -856,10 +856,7 @@ static MACHINE_RESET( ojankohs )
 	state->screen_refresh = 0;
 }
 
-static MACHINE_DRIVER_START( ojankohs )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(ojankohs_state)
+static MACHINE_CONFIG_START( ojankohs, ojankohs_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,12000000/2)		/* 6.00 MHz ? */
@@ -895,12 +892,9 @@ static MACHINE_DRIVER_START( ojankohs )
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( ojankoy )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(ojankohs_state)
+static MACHINE_CONFIG_START( ojankoy, ojankohs_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,12000000/2)		/* 6.00 MHz ? */
@@ -937,12 +931,9 @@ static MACHINE_DRIVER_START( ojankoy )
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( ccasino )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(ojankohs_state)
+static MACHINE_CONFIG_START( ccasino, ojankohs_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,12000000/2)		/* 6.00 MHz ? */
@@ -978,12 +969,9 @@ static MACHINE_DRIVER_START( ccasino )
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( ojankoc )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(ojankohs_state)
+static MACHINE_CONFIG_START( ojankoc, ojankohs_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,8000000/2)			/* 4.00 MHz */
@@ -1018,7 +1006,7 @@ static MACHINE_DRIVER_START( ojankoc )
 	MDRV_SOUND_ADD("msm", MSM5205, 8000000/22)
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( ojankohs )

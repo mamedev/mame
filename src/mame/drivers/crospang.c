@@ -346,10 +346,7 @@ static MACHINE_RESET( crospang )
 }
 
 
-static MACHINE_DRIVER_START( crospang )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(crospang_state)
+static MACHINE_CONFIG_START( crospang, crospang_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 14318180/2)
@@ -386,12 +383,9 @@ static MACHINE_DRIVER_START( crospang )
 
 	MDRV_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( bestri )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(crospang_state)
+static MACHINE_CONFIG_START( bestri, crospang_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 14318180/2)
@@ -428,7 +422,7 @@ static MACHINE_DRIVER_START( bestri )
 
 	MDRV_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( crospang )

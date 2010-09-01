@@ -675,7 +675,7 @@ static MACHINE_RESET( rygar )
 	adpcm_data = -1;
 }
 
-static MACHINE_DRIVER_START( rygar )
+static MACHINE_CONFIG_START( rygar, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_24MHz/4) /* verified on pcb */
@@ -711,33 +711,31 @@ static MACHINE_DRIVER_START( rygar )
 	MDRV_SOUND_ADD("msm", MSM5205, XTAL_400kHz) /* verified on pcb, even if schematics shows a 384khz resonator */
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( gemini )
+static MACHINE_CONFIG_DERIVED( gemini, rygar )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(rygar)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_CLOCK(6000000)
 	MDRV_CPU_PROGRAM_MAP(gemini_map)
 
 	MDRV_CPU_MODIFY("soundcpu")
 	MDRV_CPU_PROGRAM_MAP(tecmo_sound_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( silkworm )
+static MACHINE_CONFIG_DERIVED( silkworm, gemini )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(gemini)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_CLOCK(6000000)
 	MDRV_CPU_PROGRAM_MAP(silkworm_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 #ifdef UNUSED_CODE
-static MACHINE_DRIVER_START( backfirt )
+static MACHINE_CONFIG_START( backfirt, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_24MHz/4)
@@ -772,7 +770,7 @@ static MACHINE_DRIVER_START( backfirt )
 
 	/* no MSM on this PCB */
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 #endif
 
 /***************************************************************************

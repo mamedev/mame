@@ -267,10 +267,7 @@ static MACHINE_RESET( deniam )
 	machine->device<okim6295_device>("oki")->set_bank_base(0x00000);
 }
 
-static MACHINE_DRIVER_START( deniam16b )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(deniam_state)
+static MACHINE_CONFIG_START( deniam16b, deniam_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,XTAL_25MHz/2)	/* 12.5Mhz verified */
@@ -308,12 +305,9 @@ static MACHINE_DRIVER_START( deniam16b )
 
 	MDRV_OKIM6295_ADD("oki", XTAL_25MHz/24, OKIM6295_PIN7_HIGH) /* 1.041620 measured, = 1.0416666Mhz verified */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( deniam16c )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(deniam_state)
+static MACHINE_CONFIG_START( deniam16c, deniam_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,XTAL_25MHz/2)	/* 12.5Mhz verified */
@@ -347,7 +341,7 @@ static MACHINE_DRIVER_START( deniam16c )
 
 	MDRV_OKIM6295_ADD("oki", XTAL_25MHz/24, OKIM6295_PIN7_HIGH)  /* 1.041620 measured, = 1.0416666Mhz verified */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

@@ -1302,7 +1302,7 @@ static MACHINE_RESET ( jalmah )
 	}
 }
 
-static MACHINE_DRIVER_START( jalmah )
+static MACHINE_CONFIG_START( jalmah, driver_data_t )
 	MDRV_CPU_ADD("maincpu" , M68000, 12000000) /* 68000-8 */
 	MDRV_CPU_PROGRAM_MAP(jalmah)
 	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
@@ -1329,10 +1329,9 @@ static MACHINE_DRIVER_START( jalmah )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_OKIM6295_ADD("oki", 4000000, OKIM6295_PIN7_LOW)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( urashima )
-	MDRV_IMPORT_FROM(jalmah)
+static MACHINE_CONFIG_DERIVED( urashima, jalmah )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(urashima)
@@ -1341,7 +1340,7 @@ static MACHINE_DRIVER_START( urashima )
 
 	MDRV_VIDEO_START(urashima)
 	MDRV_VIDEO_UPDATE(urashima)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*
 

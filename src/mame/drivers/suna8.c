@@ -1465,7 +1465,7 @@ static const samples_interface suna8_samples_interface =
 	suna8_sh_start
 };
 
-static MACHINE_DRIVER_START( hardhead )
+static MACHINE_CONFIG_START( hardhead, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)	/* verified on pcb */
@@ -1508,7 +1508,7 @@ static MACHINE_DRIVER_START( hardhead )
 	MDRV_SOUND_CONFIG(suna8_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -1531,7 +1531,7 @@ static const ym2203_interface rranger_ym2203_interface =
 };
 
 /* 2203 + 8910 */
-static MACHINE_DRIVER_START( rranger )
+static MACHINE_CONFIG_START( rranger, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)					/* ? */
@@ -1573,7 +1573,7 @@ static MACHINE_DRIVER_START( rranger )
 	MDRV_SOUND_CONFIG(suna8_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
@@ -1593,7 +1593,7 @@ static INTERRUPT_GEN( brickzn_interrupt )
 	else				 cpu_set_input_line(device, 0, HOLD_LINE);
 }
 
-static MACHINE_DRIVER_START( brickzn )
+static MACHINE_CONFIG_START( brickzn, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)		/* SUNA PROTECTION BLOCK */
@@ -1645,7 +1645,7 @@ static MACHINE_DRIVER_START( brickzn )
 
 	MDRV_SOUND_ADD("dac4", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.17)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
@@ -1669,16 +1669,14 @@ static MACHINE_RESET( hardhea2 )
 	hardhea2_rambank_0_w(space,0,0);
 }
 
-static MACHINE_DRIVER_START( hardhea2 )
-
-	MDRV_IMPORT_FROM( brickzn )
+static MACHINE_CONFIG_DERIVED( hardhea2, brickzn )
 	MDRV_CPU_MODIFY("maincpu")			/* SUNA T568009 */
 	MDRV_CPU_PROGRAM_MAP(hardhea2_map)
 	MDRV_CPU_VBLANK_INT_HACK(hardhea2_interrupt,2)	/* IRQ & NMI */
 
 	MDRV_MACHINE_RESET(hardhea2)
 	MDRV_PALETTE_LENGTH(256)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
@@ -1695,7 +1693,7 @@ static const ay8910_interface starfigh_ay8910_interface =
 	DEVCB_DEVICE_HANDLER("samples", suna8_samples_number_w)
 };
 
-static MACHINE_DRIVER_START( starfigh )
+static MACHINE_CONFIG_START( starfigh, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)					/* ? */
@@ -1738,7 +1736,7 @@ static MACHINE_DRIVER_START( starfigh )
 	MDRV_SOUND_CONFIG(suna8_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
@@ -1754,7 +1752,7 @@ static INTERRUPT_GEN( sparkman_interrupt )
 	else cpu_set_input_line(device, 0, HOLD_LINE);
 }
 
-static MACHINE_DRIVER_START( sparkman )
+static MACHINE_CONFIG_START( sparkman, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)					/* ? */
@@ -1796,7 +1794,7 @@ static MACHINE_DRIVER_START( sparkman )
 	MDRV_SOUND_CONFIG(suna8_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

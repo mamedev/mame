@@ -80,10 +80,7 @@ static INPUT_PORTS_START( minivadr )
 INPUT_PORTS_END
 
 
-static MACHINE_DRIVER_START( minivadr )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(minivadr_state)
+static MACHINE_CONFIG_START( minivadr, minivadr_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,24000000 / 6)		 /* 4 MHz ? */
@@ -101,7 +98,7 @@ static MACHINE_DRIVER_START( minivadr )
 	MDRV_VIDEO_UPDATE(minivadr)
 
 	/* the board has no sound hardware */
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

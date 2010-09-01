@@ -735,10 +735,7 @@ static const tc0140syt_interface opwolf_tc0140syt_intf =
 	"maincpu", "audiocpu"
 };
 
-static MACHINE_DRIVER_START( opwolf )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(opwolf_state)
+static MACHINE_CONFIG_START( opwolf, opwolf_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, CPU_CLOCK )	/* 8 MHz */
@@ -788,13 +785,10 @@ static MACHINE_DRIVER_START( opwolf )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
 
 	MDRV_TC0140SYT_ADD("tc0140syt", opwolf_tc0140syt_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( opwolfb ) /* OSC clocks unknown for the bootleg, but changed to match original sets */
-
-	/* driver data */
-	MDRV_DRIVER_DATA(opwolf_state)
+static MACHINE_CONFIG_START( opwolfb, opwolf_state ) /* OSC clocks unknown for the bootleg, but changed to match original sets */
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, CPU_CLOCK )	/* 8 MHz ??? */
@@ -847,7 +841,7 @@ static MACHINE_DRIVER_START( opwolfb ) /* OSC clocks unknown for the bootleg, bu
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
 
 	MDRV_TC0140SYT_ADD("tc0140syt", opwolf_tc0140syt_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

@@ -319,7 +319,7 @@ static const ay8910_interface ay8910_config =
 	DEVCB_NULL
 };
 
-static MACHINE_DRIVER_START( speedatk )
+static MACHINE_CONFIG_START( speedatk, driver_data_t )
 	MDRV_CPU_ADD("maincpu", Z80,MASTER_CLOCK/2) //divider is unknown
 	MDRV_CPU_PROGRAM_MAP(speedatk_mem)
 	MDRV_CPU_IO_MAP(speedatk_io)
@@ -350,7 +350,7 @@ static MACHINE_DRIVER_START( speedatk )
 	MDRV_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK/4) //divider is unknown
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( speedatk )
 	ROM_REGION( 0x10000, "maincpu", 0 )

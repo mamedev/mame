@@ -2027,7 +2027,7 @@ static MACHINE_RESET( iqblocka )
 	input_select = 0;
 }
 
-static MACHINE_DRIVER_START( iqblocka )
+static MACHINE_CONFIG_START( iqblocka, driver_data_t )
 	MDRV_CPU_ADD("maincpu", Z180, XTAL_16MHz / 2)
 	MDRV_CPU_PROGRAM_MAP(iqblocka_map)
 	MDRV_CPU_IO_MAP(iqblocka_io)
@@ -2059,7 +2059,7 @@ static MACHINE_DRIVER_START( iqblocka )
 
 	MDRV_OKIM6295_ADD("oki", XTAL_16MHz / 16, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -2099,7 +2099,7 @@ static const ppi8255_interface mgcs_ppi8255_intf =
 	DEVCB_NULL					// Port C write
 };
 
-static MACHINE_DRIVER_START( mgcs )
+static MACHINE_CONFIG_START( mgcs, driver_data_t )
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_22MHz / 2)
 	MDRV_CPU_PROGRAM_MAP(mgcs)
 	MDRV_CPU_VBLANK_INT_HACK(mgcs_interrupt,2)
@@ -2127,7 +2127,7 @@ static MACHINE_DRIVER_START( mgcs )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_OKIM6295_ADD("oki", XTAL_8MHz / 8, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -2144,7 +2144,7 @@ static const ppi8255_interface sdmg2_ppi8255_intf =
 	DEVCB_NULL					// Port C write
 };
 
-static MACHINE_DRIVER_START( sdmg2 )
+static MACHINE_CONFIG_START( sdmg2, driver_data_t )
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_22MHz/2)
 	MDRV_CPU_PROGRAM_MAP(sdmg2)
 	MDRV_CPU_VBLANK_INT_HACK(mgcs_interrupt,2)
@@ -2172,7 +2172,7 @@ static MACHINE_DRIVER_START( sdmg2 )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_OKIM6295_ADD("oki", XTAL_22MHz / 22, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 //mgdh
@@ -2202,7 +2202,7 @@ static const ppi8255_interface mgdh_ppi8255_intf =
 	DEVCB_NULL					// Port C write
 };
 
-static MACHINE_DRIVER_START( mgdh )
+static MACHINE_CONFIG_START( mgdh, driver_data_t )
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_22MHz / 2)
 	MDRV_CPU_PROGRAM_MAP(mgdh_map)
 	MDRV_CPU_VBLANK_INT_HACK(mgdh_interrupt,2)
@@ -2230,7 +2230,7 @@ static MACHINE_DRIVER_START( mgdh )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_OKIM6295_ADD("oki", XTAL_22MHz / 22, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

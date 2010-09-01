@@ -480,10 +480,7 @@ static MACHINE_RESET( blockade )
 	state->just_been_reset = 0;
 }
 
-static MACHINE_DRIVER_START( blockade )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(blockade_state)
+static MACHINE_CONFIG_START( blockade, blockade_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8080, MASTER_CLOCK/10)
@@ -519,24 +516,21 @@ static MACHINE_DRIVER_START( blockade )
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(blockade)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( comotion )
-	MDRV_IMPORT_FROM(blockade)
+static MACHINE_CONFIG_DERIVED( comotion, blockade )
 	MDRV_PALETTE_INIT(bw)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( blasto )
-	MDRV_IMPORT_FROM(blockade)
+static MACHINE_CONFIG_DERIVED( blasto, blockade )
 	MDRV_GFXDECODE(blasto)
 	MDRV_PALETTE_INIT(bw)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( hustle )
-	MDRV_IMPORT_FROM(blockade)
+static MACHINE_CONFIG_DERIVED( hustle, blockade )
 	MDRV_GFXDECODE(blasto)
 	MDRV_PALETTE_INIT(yellow)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*************************************
  *

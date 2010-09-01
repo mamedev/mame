@@ -810,7 +810,7 @@ static const y8950_interface y8950_config = {
 	0 /* TODO */
 };
 
-static MACHINE_DRIVER_START( cybertnk )
+static MACHINE_CONFIG_START( cybertnk, driver_data_t )
 	MDRV_CPU_ADD("maincpu", M68000,20000000/2)
 	MDRV_CPU_PROGRAM_MAP(master_mem)
 //  MDRV_CPU_VBLANK_INT_HACK(master_irq,2)
@@ -852,7 +852,7 @@ static MACHINE_DRIVER_START( cybertnk )
 	MDRV_SOUND_CONFIG(y8950_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

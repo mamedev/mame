@@ -590,9 +590,7 @@ static const ym3812_interface ym3812_config =
 
 /******************************************************************************/
 
-static MACHINE_DRIVER_START( pow )
-
-	MDRV_DRIVER_DATA( snk68_state )
+static MACHINE_CONFIG_START( pow, snk68_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_18MHz/2) /* verified on pcb */
@@ -626,18 +624,16 @@ static MACHINE_DRIVER_START( pow )
 
 	MDRV_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( searchar )
-
-	MDRV_IMPORT_FROM(pow)
+static MACHINE_CONFIG_DERIVED( searchar, pow )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(searchar_map)
 
 	MDRV_VIDEO_START(searchar)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /******************************************************************************/

@@ -1327,10 +1327,7 @@ static MACHINE_RESET( aerofgt )
 	memory_set_bank(machine, "bank1", 0);	/* needed by spinlbrk */
 }
 
-static MACHINE_DRIVER_START( pspikes )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(aerofgt_state)
+static MACHINE_CONFIG_START( pspikes, aerofgt_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M68000,XTAL_20MHz/2)    /* verified on pcb */
@@ -1368,12 +1365,9 @@ static MACHINE_DRIVER_START( pspikes )
 	MDRV_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MDRV_SOUND_ROUTE(1, "lspeaker",  1.0)
 	MDRV_SOUND_ROUTE(2, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( spikes91 )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(aerofgt_state)
+static MACHINE_CONFIG_START( spikes91, aerofgt_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M68000,20000000/2)	/* 10 MHz (?) */
@@ -1404,13 +1398,10 @@ static MACHINE_DRIVER_START( spikes91 )
         1x OKI M5205 (sound)(ic145)
         2x LM324N (sound)(ic152, ic153)
     */
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( pspikesb )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(aerofgt_state)
+static MACHINE_CONFIG_START( pspikesb, aerofgt_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M68000,20000000/2)	/* 10 MHz (?) */
@@ -1438,12 +1429,9 @@ static MACHINE_DRIVER_START( pspikesb )
 
 	MDRV_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( pspikesc )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(aerofgt_state)
+static MACHINE_CONFIG_START( pspikesc, aerofgt_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M68000,20000000/2)	/* 10 MHz (?) */
@@ -1471,12 +1459,9 @@ static MACHINE_DRIVER_START( pspikesc )
 
 	MDRV_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( karatblz )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(aerofgt_state)
+static MACHINE_CONFIG_START( karatblz, aerofgt_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M68000,20000000/2)	/* 10 MHz (?) */
@@ -1513,12 +1498,9 @@ static MACHINE_DRIVER_START( karatblz )
 	MDRV_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MDRV_SOUND_ROUTE(1, "lspeaker",  1.0)
 	MDRV_SOUND_ROUTE(2, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( spinlbrk )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(aerofgt_state)
+static MACHINE_CONFIG_START( spinlbrk, aerofgt_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M68000,XTAL_20MHz/2)	/* verified on pcb */
@@ -1555,12 +1537,9 @@ static MACHINE_DRIVER_START( spinlbrk )
 	MDRV_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MDRV_SOUND_ROUTE(1, "lspeaker",  1.0)
 	MDRV_SOUND_ROUTE(2, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( turbofrc )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(aerofgt_state)
+static MACHINE_CONFIG_START( turbofrc, aerofgt_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M68000,XTAL_20MHz/2)	/* verified on pcb */
@@ -1597,12 +1576,9 @@ static MACHINE_DRIVER_START( turbofrc )
 	MDRV_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MDRV_SOUND_ROUTE(1, "lspeaker",  1.0)
 	MDRV_SOUND_ROUTE(2, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( aerofgtb )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(aerofgt_state)
+static MACHINE_CONFIG_START( aerofgtb, aerofgt_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M68000,20000000/2)	/* 10 MHz (?) */
@@ -1640,12 +1616,9 @@ static MACHINE_DRIVER_START( aerofgtb )
 	MDRV_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MDRV_SOUND_ROUTE(1, "lspeaker",  1.0)
 	MDRV_SOUND_ROUTE(2, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( aerofgt )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(aerofgt_state)
+static MACHINE_CONFIG_START( aerofgt, aerofgt_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M68000,XTAL_20MHz/2)	/* verified on pcb */
@@ -1683,12 +1656,9 @@ static MACHINE_DRIVER_START( aerofgt )
 	MDRV_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MDRV_SOUND_ROUTE(1, "lspeaker",  1.0)
 	MDRV_SOUND_ROUTE(2, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( aerfboot )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(aerofgt_state)
+static MACHINE_CONFIG_START( aerfboot, aerofgt_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M68000,20000000/2)	/* 10 MHz (?) */
@@ -1720,12 +1690,9 @@ static MACHINE_DRIVER_START( aerfboot )
 
 	MDRV_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( aerfboo2 )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(aerofgt_state)
+static MACHINE_CONFIG_START( aerfboo2, aerofgt_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M68000,20000000/2)	/* 10 MHz (?) */
@@ -1754,12 +1721,9 @@ static MACHINE_DRIVER_START( aerfboo2 )
 
 	MDRV_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( wbbc97 )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(aerofgt_state)
+static MACHINE_CONFIG_START( wbbc97, aerofgt_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M68000,20000000/2)	/* 10 MHz (?) */
@@ -1795,7 +1759,7 @@ static MACHINE_DRIVER_START( wbbc97 )
 
 	MDRV_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

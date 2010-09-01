@@ -76,7 +76,7 @@ static INPUT_PORTS_START( comebaby )
 INPUT_PORTS_END
 
 
-static MACHINE_DRIVER_START( comebaby )
+static MACHINE_CONFIG_START( comebaby, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", PENTIUM, 2000000000) /* Probably a Pentium .. ?? Mhz*/
 	MDRV_CPU_PROGRAM_MAP(comebaby_map)
@@ -93,7 +93,7 @@ static MACHINE_DRIVER_START( comebaby )
 
 	MDRV_VIDEO_START(comebaby)
 	MDRV_VIDEO_UPDATE(comebaby)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START(comebaby)

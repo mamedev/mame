@@ -9,14 +9,14 @@ void atarijsa_init(running_machine *machine, const char *testport, int testmask)
 void atarijsa_reset(void);
 
 
-MACHINE_DRIVER_EXTERN( jsa_i_stereo );
-MACHINE_DRIVER_EXTERN( jsa_i_stereo_swapped );
-MACHINE_DRIVER_EXTERN( jsa_i_stereo_pokey );
-MACHINE_DRIVER_EXTERN( jsa_i_mono_speech );
-MACHINE_DRIVER_EXTERN( jsa_ii_mono );
-MACHINE_DRIVER_EXTERN( jsa_iii_mono );
-MACHINE_DRIVER_EXTERN( jsa_iii_mono_noadpcm );
-MACHINE_DRIVER_EXTERN( jsa_iiis_stereo );
+MACHINE_CONFIG_EXTERN( jsa_i_stereo );
+MACHINE_CONFIG_EXTERN( jsa_i_stereo_swapped );
+MACHINE_CONFIG_EXTERN( jsa_i_stereo_pokey );
+MACHINE_CONFIG_EXTERN( jsa_i_mono_speech );
+MACHINE_CONFIG_EXTERN( jsa_ii_mono );
+MACHINE_CONFIG_EXTERN( jsa_iii_mono );
+MACHINE_CONFIG_EXTERN( jsa_iii_mono_noadpcm );
+MACHINE_CONFIG_EXTERN( jsa_iiis_stereo );
 
 
 /* Board-specific port definitions */

@@ -452,7 +452,7 @@ static GFXDECODE_START( sprint8 )
 GFXDECODE_END
 
 
-static MACHINE_DRIVER_START( sprint8 )
+static MACHINE_CONFIG_START( sprint8, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6800, 11055000 / 11) /* ? */
@@ -495,7 +495,7 @@ static MACHINE_DRIVER_START( sprint8 )
 	MDRV_SOUND_ROUTE(1, "speaker_3_7", 0.0)
 	MDRV_SOUND_ROUTE(2, "speaker_5_6", 0.0)
 	MDRV_SOUND_ROUTE(3, "speaker_4_8", 0.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( sprint8 )

@@ -259,9 +259,7 @@ static const ym3526_interface ym3526_config =
 
 
 
-static MACHINE_DRIVER_START( sidepckt )
-
-	MDRV_DRIVER_DATA(sidepckt_state)
+static MACHINE_CONFIG_START( sidepckt, sidepckt_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 2000000)        /* 2 MHz */
@@ -296,7 +294,7 @@ static MACHINE_DRIVER_START( sidepckt )
 	MDRV_SOUND_ADD("ym2", YM3526, 3000000)
 	MDRV_SOUND_CONFIG(ym3526_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

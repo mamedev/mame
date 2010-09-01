@@ -183,7 +183,7 @@ static INPUT_PORTS_START( quizo )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static MACHINE_DRIVER_START( quizo )
+static MACHINE_CONFIG_START( quizo, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,XTAL1/2)
 	MDRV_CPU_PROGRAM_MAP(memmap)
@@ -208,7 +208,7 @@ static MACHINE_DRIVER_START( quizo )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("aysnd", AY8910, XTAL2/16 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( quizo )

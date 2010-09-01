@@ -396,10 +396,7 @@ static MACHINE_RESET( toratora )
 	state->clear_tv = 0;
 }
 
-static MACHINE_DRIVER_START( toratora )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(toratora_state)
+static MACHINE_CONFIG_START( toratora, toratora_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6800,500000)	/* ?????? game speed is entirely controlled by this */
@@ -434,7 +431,7 @@ static MACHINE_DRIVER_START( toratora )
 	MDRV_SOUND_CONFIG(sn76477_intf)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

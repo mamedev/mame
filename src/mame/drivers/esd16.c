@@ -536,10 +536,7 @@ static MACHINE_RESET( esd16 )
 	state->tilemap0_color = 0;
 }
 
-static MACHINE_DRIVER_START( multchmp )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(esd16_state)
+static MACHINE_CONFIG_START( multchmp, esd16_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M68000, 16000000)
@@ -576,12 +573,11 @@ static MACHINE_DRIVER_START( multchmp )
 
 	MDRV_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( hedpanic )
+static MACHINE_CONFIG_DERIVED( hedpanic, multchmp )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(multchmp)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(hedpanic_map)
@@ -593,43 +589,39 @@ static MACHINE_DRIVER_START( hedpanic )
 	MDRV_GFXDECODE(hedpanic)
 	MDRV_VIDEO_UPDATE(hedpanic)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( mchampdx )
+static MACHINE_CONFIG_DERIVED( mchampdx, hedpanic )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(hedpanic)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(mchampdx_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( tangtang )
+static MACHINE_CONFIG_DERIVED( tangtang, hedpanic )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(hedpanic)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(tangtang_map)
 
 	MDRV_GFXDECODE(tangtang)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( swatpolc )
+static MACHINE_CONFIG_DERIVED( swatpolc, hedpanic )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(hedpanic)
 
 	MDRV_GFXDECODE(tangtang)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( hedpanio )
+static MACHINE_CONFIG_DERIVED( hedpanio, hedpanic )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(hedpanic)
 
 	MDRV_VIDEO_UPDATE(hedpanio)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

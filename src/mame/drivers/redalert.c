@@ -385,7 +385,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( redalert )
+static MACHINE_CONFIG_START( redalert, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, MAIN_CPU_CLOCK)
@@ -393,13 +393,13 @@ static MACHINE_DRIVER_START( redalert )
 	MDRV_CPU_VBLANK_INT("screen", redalert_vblank_interrupt)
 
 	/* video hardware */
-	MDRV_IMPORT_FROM(redalert_video)
+	MDRV_FRAGMENT_ADD(redalert_video)
 
 	/* audio hardware */
-	MDRV_IMPORT_FROM(redalert_audio)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(redalert_audio)
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( ww3 )
+static MACHINE_CONFIG_START( ww3, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, MAIN_CPU_CLOCK)
@@ -407,13 +407,13 @@ static MACHINE_DRIVER_START( ww3 )
 	MDRV_CPU_VBLANK_INT("screen", redalert_vblank_interrupt)
 
 	/* video hardware */
-	MDRV_IMPORT_FROM(ww3_video)
+	MDRV_FRAGMENT_ADD(ww3_video)
 
 	/* audio hardware */
-	MDRV_IMPORT_FROM(ww3_audio)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(ww3_audio)
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( panther )
+static MACHINE_CONFIG_START( panther, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, MAIN_CPU_CLOCK)
@@ -421,13 +421,13 @@ static MACHINE_DRIVER_START( panther )
 	MDRV_CPU_VBLANK_INT("screen", redalert_vblank_interrupt)
 
 	/* video hardware */
-	MDRV_IMPORT_FROM(panther_video)
+	MDRV_FRAGMENT_ADD(panther_video)
 
 	/* audio hardware */
-	MDRV_IMPORT_FROM(ww3_audio)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(ww3_audio)
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( demoneye )
+static MACHINE_CONFIG_START( demoneye, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, MAIN_CPU_CLOCK)
@@ -435,11 +435,11 @@ static MACHINE_DRIVER_START( demoneye )
 	MDRV_CPU_VBLANK_INT("screen", redalert_vblank_interrupt)
 
 	/* video hardware */
-	MDRV_IMPORT_FROM(demoneye_video)
+	MDRV_FRAGMENT_ADD(demoneye_video)
 
 	/* audio hardware */
-	MDRV_IMPORT_FROM(demoneye_audio)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(demoneye_audio)
+MACHINE_CONFIG_END
 
 
 

@@ -845,7 +845,7 @@ static const tms34010_config tms_config =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( jpmimpct )
+static MACHINE_CONFIG_START( jpmimpct, driver_data_t )
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)
 	MDRV_CPU_PROGRAM_MAP(m68k_program_map)
 
@@ -871,7 +871,7 @@ static MACHINE_DRIVER_START( jpmimpct )
 
 	MDRV_VIDEO_START(jpmimpct)
 	MDRV_VIDEO_UPDATE(tms340x0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************************
@@ -1321,7 +1321,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( impctawp )
+static MACHINE_CONFIG_START( impctawp, driver_data_t )
 	MDRV_CPU_ADD("maincpu",M68000, 8000000)
 	MDRV_CPU_PROGRAM_MAP(awp68k_program_map)
 
@@ -1339,7 +1339,7 @@ static MACHINE_DRIVER_START( impctawp )
 	MDRV_SOUND_ADD("upd",UPD7759, UPD7759_STANDARD_CLOCK)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 	MDRV_DEFAULT_LAYOUT(layout_awpvid16)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*************************************
  *

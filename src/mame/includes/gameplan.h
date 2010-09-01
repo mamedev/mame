@@ -58,6 +58,6 @@ extern const via6522_interface gameplan_via_0_interface;
 extern const via6522_interface leprechn_via_0_interface;
 extern const via6522_interface trvquest_via_0_interface;
 
-MACHINE_DRIVER_EXTERN( gameplan_video );
-MACHINE_DRIVER_EXTERN( leprechn_video );
-MACHINE_DRIVER_EXTERN( trvquest_video );
+MACHINE_CONFIG_EXTERN( gameplan_video );
+MACHINE_CONFIG_EXTERN( leprechn_video );
+MACHINE_CONFIG_EXTERN( trvquest_video );

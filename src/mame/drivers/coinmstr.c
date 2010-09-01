@@ -980,7 +980,7 @@ static const mc6845_interface h46505_intf =
 };
 
 
-static MACHINE_DRIVER_START( coinmstr )
+static MACHINE_CONFIG_START( coinmstr, driver_data_t )
 	MDRV_CPU_ADD("maincpu",Z80,8000000) // ?
 	MDRV_CPU_PROGRAM_MAP(coinmstr_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
@@ -1011,31 +1011,27 @@ static MACHINE_DRIVER_START( coinmstr )
 	MDRV_SOUND_ADD("aysnd", AY8910, 1500000)
 	MDRV_SOUND_CONFIG(ay8912_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( quizmstr )
-	MDRV_IMPORT_FROM(coinmstr)
+static MACHINE_CONFIG_DERIVED( quizmstr, coinmstr )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(quizmstr_io_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( trailblz )
-	MDRV_IMPORT_FROM(coinmstr)
+static MACHINE_CONFIG_DERIVED( trailblz, coinmstr )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(trailblz_io_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( supnudg2 )
-	MDRV_IMPORT_FROM(coinmstr)
+static MACHINE_CONFIG_DERIVED( supnudg2, coinmstr )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(supnudg2_io_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( pokeroul )
-	MDRV_IMPORT_FROM(coinmstr)
+static MACHINE_CONFIG_DERIVED( pokeroul, coinmstr )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(pokeroul_io_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*
 

@@ -407,8 +407,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( atarig1 )
-	MDRV_DRIVER_DATA(atarig1_state)
+static MACHINE_CONFIG_START( atarig1, atarig1_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz)
@@ -434,8 +433,8 @@ static MACHINE_DRIVER_START( atarig1 )
 	MDRV_VIDEO_UPDATE(atarig1)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(jsa_ii_mono)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(jsa_ii_mono)
+MACHINE_CONFIG_END
 
 
 

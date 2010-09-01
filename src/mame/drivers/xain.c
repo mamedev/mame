@@ -595,7 +595,7 @@ static MACHINE_START( xsleena )
 	memory_set_bank(machine, "bank2", 0);
 }
 
-static MACHINE_DRIVER_START( xsleena )
+static MACHINE_CONFIG_START( xsleena, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, CPU_CLOCK)
@@ -641,13 +641,12 @@ static MACHINE_DRIVER_START( xsleena )
 	MDRV_SOUND_ROUTE(1, "mono", 0.50)
 	MDRV_SOUND_ROUTE(2, "mono", 0.50)
 	MDRV_SOUND_ROUTE(3, "mono", 0.40)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( xsleenab )
-	MDRV_IMPORT_FROM(xsleena)
+static MACHINE_CONFIG_DERIVED( xsleenab, xsleena )
 	MDRV_DEVICE_REMOVE("mcu")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

@@ -1714,9 +1714,7 @@ static MACHINE_RESET(hyperneo)
 	state->mcu_en = 0;
 }
 
-static MACHINE_DRIVER_START( hng64 )
-
-	MDRV_DRIVER_DATA( hng64_state )
+static MACHINE_CONFIG_START( hng64, hng64_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", VR4300BE, MASTER_CLOCK) 	// actually R4300
@@ -1748,7 +1746,7 @@ static MACHINE_DRIVER_START( hng64 )
 
 	MDRV_VIDEO_START(hng64)
 	MDRV_VIDEO_UPDATE(hng64)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( hng64 )

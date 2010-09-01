@@ -492,7 +492,7 @@ static INTERRUPT_GEN( bmc_interrupt )
 		cpu_set_input_line(device, 2, HOLD_LINE);
 }
 
-static MACHINE_DRIVER_START( bmcbowl )
+static MACHINE_CONFIG_START( bmcbowl, driver_data_t )
 	MDRV_CPU_ADD("maincpu", M68000, 21477270/2 )
 	MDRV_CPU_PROGRAM_MAP(bmcbowl_mem)
 	MDRV_CPU_VBLANK_INT_HACK(bmc_interrupt,2)
@@ -526,7 +526,7 @@ static MACHINE_DRIVER_START( bmcbowl )
 
 	/* via */
 	MDRV_VIA6522_ADD("via6522_0", 1000000, via_interface)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( bmcbowl )
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* 68000 Code */

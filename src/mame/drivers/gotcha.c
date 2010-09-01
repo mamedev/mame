@@ -273,10 +273,7 @@ static MACHINE_RESET( gotcha )
 	state->banksel = 0;
 }
 
-static MACHINE_DRIVER_START( gotcha )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(gotcha_state)
+static MACHINE_CONFIG_START( gotcha, gotcha_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,14318180)	/* 14.31818 MHz */
@@ -314,7 +311,7 @@ static MACHINE_DRIVER_START( gotcha )
 
 	MDRV_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

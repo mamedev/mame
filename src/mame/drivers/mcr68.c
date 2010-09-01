@@ -945,7 +945,7 @@ GFXDECODE_END
 
 =================================================================*/
 
-static MACHINE_DRIVER_START( zwackery )
+static MACHINE_CONFIG_START( zwackery, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 7652400)	/* should be XTAL_16MHz/2 */
@@ -975,11 +975,11 @@ static MACHINE_DRIVER_START( zwackery )
 	MDRV_VIDEO_UPDATE(zwackery)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(chip_squeak_deluxe)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(chip_squeak_deluxe)
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( mcr68 )
+static MACHINE_CONFIG_START( mcr68, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 7723800)
@@ -1005,66 +1005,60 @@ static MACHINE_DRIVER_START( mcr68 )
 	MDRV_VIDEO_UPDATE(mcr68)
 
 	/* sound hardware -- determined by specific machine */
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( xenophob )
-
-	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mcr68)
-	MDRV_IMPORT_FROM(sounds_good)
-MACHINE_DRIVER_END
-
-static MACHINE_DRIVER_START( intlaser )
+static MACHINE_CONFIG_DERIVED( xenophob, mcr68 )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mcr68)
-	MDRV_IMPORT_FROM(sounds_good)
+	MDRV_FRAGMENT_ADD(sounds_good)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( intlaser, mcr68 )
+
+	/* basic machine hardware */
+	MDRV_FRAGMENT_ADD(sounds_good)
 
 	MDRV_WATCHDOG_VBLANK_INIT(800)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( spyhunt2 )
+static MACHINE_CONFIG_DERIVED( spyhunt2, mcr68 )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mcr68)
-	MDRV_IMPORT_FROM(sounds_good)
+	MDRV_FRAGMENT_ADD(sounds_good)
 	MDRV_DEVICE_REMOVE("mono")
-	MDRV_IMPORT_FROM(turbo_chip_squeak)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(turbo_chip_squeak)
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( archrivl )
-
-	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mcr68)
-	MDRV_IMPORT_FROM(williams_cvsd_sound)
-MACHINE_DRIVER_END
-
-
-static MACHINE_DRIVER_START( pigskin )
+static MACHINE_CONFIG_DERIVED( archrivl, mcr68 )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mcr68)
-	MDRV_IMPORT_FROM(williams_cvsd_sound)
+	MDRV_FRAGMENT_ADD(williams_cvsd_sound)
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( pigskin, mcr68 )
+
+	/* basic machine hardware */
+	MDRV_FRAGMENT_ADD(williams_cvsd_sound)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(pigskin_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( trisport )
+static MACHINE_CONFIG_DERIVED( trisport, mcr68 )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mcr68)
-	MDRV_IMPORT_FROM(williams_cvsd_sound)
+	MDRV_FRAGMENT_ADD(williams_cvsd_sound)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(trisport_map)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

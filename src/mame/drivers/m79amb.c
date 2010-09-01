@@ -205,10 +205,7 @@ static INTERRUPT_GEN( m79amb_interrupt )
 	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xcf);  /* RST 08h */
 }
 
-static MACHINE_DRIVER_START( m79amb )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(m79amb_state)
+static MACHINE_CONFIG_START( m79amb, m79amb_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8080, XTAL_19_6608MHz / 10)
@@ -232,7 +229,7 @@ static MACHINE_DRIVER_START( m79amb )
 	MDRV_SOUND_CONFIG_DISCRETE(m79amb)
 
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

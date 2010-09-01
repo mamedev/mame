@@ -193,7 +193,7 @@ static const samples_interface turbo_samples_interface =
 };
 
 
-MACHINE_DRIVER_START( turbo_samples )
+MACHINE_CONFIG_FRAGMENT( turbo_samples )
 
 	/* this is the cockpit speaker configuration */
 	MDRV_SPEAKER_ADD("fspeaker", 0.0, 0.0, 1.0)		/* front */
@@ -238,7 +238,7 @@ MACHINE_DRIVER_START( turbo_samples )
 
 	/* channel 9 = OSEL -> OCAR.W/WM */
 	MDRV_SOUND_ROUTE(9, "bspeaker",  0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*
     Cockpit: CN2 1+2 -> FRONT
@@ -451,7 +451,7 @@ static const samples_interface subroc3d_samples_interface =
 };
 
 
-MACHINE_DRIVER_START( subroc3d_samples )
+MACHINE_CONFIG_FRAGMENT( subroc3d_samples )
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
@@ -488,7 +488,7 @@ MACHINE_DRIVER_START( subroc3d_samples )
 	/* PROLOGUE sound in channel 11 */
 	MDRV_SOUND_ROUTE(11, "lspeaker",  0.25)
 	MDRV_SOUND_ROUTE(11, "rspeaker", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -606,12 +606,12 @@ static const samples_interface buckrog_samples_interface =
 };
 
 
-MACHINE_DRIVER_START( buckrog_samples )
+MACHINE_CONFIG_FRAGMENT( buckrog_samples )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(buckrog_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

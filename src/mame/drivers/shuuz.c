@@ -258,8 +258,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( shuuz )
-	MDRV_DRIVER_DATA(shuuz_state)
+static MACHINE_CONFIG_START( shuuz, shuuz_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
@@ -288,7 +287,7 @@ static MACHINE_DRIVER_START( shuuz )
 
 	MDRV_OKIM6295_ADD("oki", ATARI_CLOCK_14MHz/16, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

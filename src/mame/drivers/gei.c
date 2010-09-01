@@ -1046,7 +1046,7 @@ static const ppi8255_interface findout_ppi8255_intf[2] =
 	}
 };
 
-static MACHINE_DRIVER_START( getrivia )
+static MACHINE_CONFIG_START( getrivia, driver_data_t )
 	MDRV_CPU_ADD("maincpu",Z80,4000000) /* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(getrivia_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
@@ -1076,31 +1076,28 @@ static MACHINE_DRIVER_START( getrivia )
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( findout )
-	MDRV_IMPORT_FROM(getrivia)
+static MACHINE_CONFIG_DERIVED( findout, getrivia )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(findout_map)
 
 	MDRV_PPI8255_RECONFIG( "ppi8255_0", findout_ppi8255_intf[0] )
 	MDRV_PPI8255_RECONFIG( "ppi8255_1", findout_ppi8255_intf[1] )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( quizvid )
-	MDRV_IMPORT_FROM(findout)
+static MACHINE_CONFIG_DERIVED( quizvid, findout )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(quizvid_map)
 
 	MDRV_PALETTE_INIT(quizvid)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( gselect )
+static MACHINE_CONFIG_DERIVED( gselect, getrivia )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(getrivia)
 
 	MDRV_DEVICE_REMOVE("ticket")
 
@@ -1109,12 +1106,11 @@ static MACHINE_DRIVER_START( gselect )
 
 	MDRV_PPI8255_RECONFIG( "ppi8255_0", gselect_ppi8255_intf[0] )
 	MDRV_PPI8255_RECONFIG( "ppi8255_1", gselect_ppi8255_intf[1] )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( jokpokera )
+static MACHINE_CONFIG_DERIVED( jokpokera, getrivia )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(getrivia)
 
 	MDRV_DEVICE_REMOVE("ticket")
 
@@ -1122,57 +1118,47 @@ static MACHINE_DRIVER_START( jokpokera )
 	MDRV_CPU_PROGRAM_MAP(gselect_map)
 
 	MDRV_PPI8255_RECONFIG( "ppi8255_0", gselect_ppi8255_intf[0] )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( amuse )
+static MACHINE_CONFIG_DERIVED( amuse, getrivia )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(getrivia)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(amuse_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( gepoker )
+static MACHINE_CONFIG_DERIVED( gepoker, getrivia )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(getrivia)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(gepoker_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( amuse1 )
-
-	MDRV_IMPORT_FROM(getrivia)
+static MACHINE_CONFIG_DERIVED( amuse1, getrivia )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(amuse1_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( suprpokr )
-
-	MDRV_IMPORT_FROM(getrivia)
+static MACHINE_CONFIG_DERIVED( suprpokr, getrivia )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(suprpokr_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( geimulti )
-
-	MDRV_IMPORT_FROM(getrivia)
+static MACHINE_CONFIG_DERIVED( geimulti, getrivia )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(geimulti_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( sprtauth )
-
-	MDRV_IMPORT_FROM(getrivia)
+static MACHINE_CONFIG_DERIVED( sprtauth, getrivia )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(sprtauth_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************
 Rom board is UVM-1A

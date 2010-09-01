@@ -86,7 +86,7 @@ static const samples_interface spacefb_samples_interface =
 };
 
 
-MACHINE_DRIVER_START( spacefb_audio )
+MACHINE_CONFIG_FRAGMENT( spacefb_audio )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
@@ -95,4 +95,4 @@ MACHINE_DRIVER_START( spacefb_audio )
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(spacefb_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END

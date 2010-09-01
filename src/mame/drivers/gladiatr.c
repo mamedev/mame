@@ -674,7 +674,7 @@ static const msm5205_interface msm5205_config =
 
 
 
-static MACHINE_DRIVER_START( ppking )
+static MACHINE_CONFIG_START( ppking, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz/2) /* verified on pcb */
@@ -722,9 +722,9 @@ static MACHINE_DRIVER_START( ppking )
 	MDRV_SOUND_ADD("msm", MSM5205, XTAL_455kHz) /* verified on pcb */
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( gladiatr )
+static MACHINE_CONFIG_START( gladiatr, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz/2) /* verified on pcb */
@@ -771,7 +771,7 @@ static MACHINE_DRIVER_START( gladiatr )
 	MDRV_SOUND_ADD("msm", MSM5205, XTAL_455kHz) /* verified on pcb */
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

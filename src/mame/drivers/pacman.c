@@ -3170,7 +3170,7 @@ static const namco_interface namco_config =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( pacman )
+static MACHINE_CONFIG_START( pacman, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)
@@ -3197,65 +3197,59 @@ static MACHINE_DRIVER_START( pacman )
 	MDRV_SOUND_ADD("namco", NAMCO, MASTER_CLOCK/6/32)
 	MDRV_SOUND_CONFIG(namco_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( piranha )
+static MACHINE_CONFIG_DERIVED( piranha, pacman )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(pacman)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(piranha_portmap)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( nmouse )
+static MACHINE_CONFIG_DERIVED( nmouse, pacman )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(pacman)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(nmouse_portmap)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( mspacman )
+static MACHINE_CONFIG_DERIVED( mspacman, pacman )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(pacman)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(mspacman_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( woodpek )
+static MACHINE_CONFIG_DERIVED( woodpek, pacman )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(pacman)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(woodpek_map)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( alibaba )
+static MACHINE_CONFIG_DERIVED( alibaba, pacman )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(pacman)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(alibaba_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( dremshpr )
+static MACHINE_CONFIG_DERIVED( dremshpr, pacman )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(pacman)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(dremshpr_map)
@@ -3265,13 +3259,12 @@ static MACHINE_DRIVER_START( dremshpr )
 	/* sound hardware */
 	MDRV_SOUND_REPLACE("namco", AY8910, 14318000/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( theglobp )
+static MACHINE_CONFIG_DERIVED( theglobp, pacman )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(pacman)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(epos_map)
@@ -3279,13 +3272,12 @@ static MACHINE_DRIVER_START( theglobp )
 
 	MDRV_MACHINE_START(theglobp)
 	MDRV_MACHINE_RESET(theglobp)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( acitya )
+static MACHINE_CONFIG_DERIVED( acitya, pacman )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(pacman)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(epos_map)
@@ -3293,13 +3285,12 @@ static MACHINE_DRIVER_START( acitya )
 
 	MDRV_MACHINE_START(acitya)
 	MDRV_MACHINE_RESET(acitya)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( vanvan )
+static MACHINE_CONFIG_DERIVED( vanvan, pacman )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(pacman)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(vanvan_map)
@@ -3315,13 +3306,12 @@ static MACHINE_DRIVER_START( vanvan )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 	MDRV_SOUND_ADD("sn2", SN76496, 1789750)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( bigbucks )
+static MACHINE_CONFIG_DERIVED( bigbucks, pacman )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(pacman)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(bigbucks_map)
@@ -3330,13 +3320,12 @@ static MACHINE_DRIVER_START( bigbucks )
 
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( s2650games )
+static MACHINE_CONFIG_DERIVED( s2650games, pacman )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(pacman)
 
 	MDRV_DEVICE_REMOVE("maincpu")
 	MDRV_CPU_ADD("maincpu", S2650, MASTER_CLOCK/6/2)	/* 2H */
@@ -3356,43 +3345,39 @@ static MACHINE_DRIVER_START( s2650games )
 	/* sound hardware */
 	MDRV_SOUND_REPLACE("namco", SN76496, MASTER_CLOCK/6)	/* 1H */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( drivfrcp )
+static MACHINE_CONFIG_DERIVED( drivfrcp, s2650games )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(s2650games)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(drivfrcp_portmap)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( 8bpm )
+static MACHINE_CONFIG_DERIVED( 8bpm, s2650games )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(s2650games)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(_8bpm_portmap)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( porky )
+static MACHINE_CONFIG_DERIVED( porky, s2650games )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(s2650games)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(porky_portmap)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( rocktrv2 )
+static MACHINE_CONFIG_DERIVED( rocktrv2, pacman )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(pacman)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(rocktrv2_map)
@@ -3400,13 +3385,12 @@ static MACHINE_DRIVER_START( rocktrv2 )
 
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( mschamp )
+static MACHINE_CONFIG_DERIVED( mschamp, pacman )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(pacman)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(mschamp_map)
@@ -3414,16 +3398,15 @@ static MACHINE_DRIVER_START( mschamp )
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_MACHINE_RESET(mschamp)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( crush4 )
+static MACHINE_CONFIG_DERIVED( crush4, mschamp )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mschamp)
 
 	MDRV_GFXDECODE(crush4)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static const ay8910_interface crushs_ay8910_interface =
 {
@@ -3435,10 +3418,9 @@ static const ay8910_interface crushs_ay8910_interface =
 	DEVCB_NULL
 };
 
-static MACHINE_DRIVER_START( crushs )
+static MACHINE_CONFIG_DERIVED( crushs, pacman )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(pacman)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(crushs_map)
@@ -3448,7 +3430,7 @@ static MACHINE_DRIVER_START( crushs )
 	MDRV_SOUND_REPLACE("namco", AY8912, 1789750)
 	MDRV_SOUND_CONFIG(crushs_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

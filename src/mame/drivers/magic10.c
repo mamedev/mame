@@ -645,7 +645,7 @@ GFXDECODE_END
 *      Machine Drivers      *
 ****************************/
 
-static MACHINE_DRIVER_START( magic10 )
+static MACHINE_CONFIG_START( magic10, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000) // ?
 	MDRV_CPU_PROGRAM_MAP(magic10_map)
@@ -670,49 +670,49 @@ static MACHINE_DRIVER_START( magic10 )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH)	/* clock frequency & pin 7 not verified */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( magic10a )
+static MACHINE_CONFIG_DERIVED( magic10a, magic10 )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(magic10)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(magic10a_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( magic102 )
+static MACHINE_CONFIG_DERIVED( magic102, magic10 )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(magic10)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(magic102_map)
 
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 0*8, 30*8-1)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( hotslot )
+static MACHINE_CONFIG_DERIVED( hotslot, magic10 )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(magic10)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(hotslot_map)
 
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(8*8, 56*8-1, 2*8, 32*8-1)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( sgsafari )
+static MACHINE_CONFIG_DERIVED( sgsafari, magic10 )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(magic10)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(sgsafari_map)
 	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)	/* L1 interrupts */
 
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 44*8-1, 0*8, 30*8-1)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /****************************

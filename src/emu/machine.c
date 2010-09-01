@@ -1009,6 +1009,16 @@ driver_data_t::~driver_data_t()
 
 
 //-------------------------------------------------
+//  alloc - static allocator for this class
+//-------------------------------------------------
+
+driver_data_t *driver_data_t::alloc(running_machine &machine)
+{
+	return auto_alloc_clear(&machine, driver_data_t(machine));
+}
+
+
+//-------------------------------------------------
 //  machine_start - default implementation which
 //  calls to the legacy machine_start function
 //-------------------------------------------------

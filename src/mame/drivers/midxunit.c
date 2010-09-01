@@ -255,7 +255,7 @@ static const tms34010_config tms_config =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( midxunit )
+static MACHINE_CONFIG_START( midxunit, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", TMS34020, 40000000)
@@ -276,8 +276,8 @@ static MACHINE_DRIVER_START( midxunit )
 	MDRV_VIDEO_UPDATE(tms340x0)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(dcs_audio_2k_uart)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(dcs_audio_2k_uart)
+MACHINE_CONFIG_END
 
 
 

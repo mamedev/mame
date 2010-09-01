@@ -457,7 +457,7 @@ static const st0016_interface st0016_config =
 	&st0016_charram
 };
 
-static MACHINE_DRIVER_START( macs )
+static MACHINE_CONFIG_START( macs, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80,8000000) /* 8 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(macs_mem)
@@ -487,7 +487,7 @@ static MACHINE_DRIVER_START( macs )
 	MDRV_SOUND_CONFIG(st0016_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

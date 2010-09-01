@@ -172,10 +172,7 @@ static GFXDECODE_START( markham )
 GFXDECODE_END
 
 
-static MACHINE_DRIVER_START( markham )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(markham_state)
+static MACHINE_CONFIG_START( markham, markham_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,8000000/2) /* 4.000MHz */
@@ -211,7 +208,7 @@ static MACHINE_DRIVER_START( markham )
 
 	MDRV_SOUND_ADD("sn2", SN76496, 8000000/2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /****************************************************************************/
 

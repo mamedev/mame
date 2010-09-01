@@ -166,7 +166,7 @@ static const ay8910_interface ay8910_config =
 	DEVCB_INPUT_PORT("P2")
 };
 
-static MACHINE_DRIVER_START( twins )
+static MACHINE_CONFIG_START( twins, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V30, 8000000)
 	MDRV_CPU_PROGRAM_MAP(twins_map)
@@ -192,7 +192,7 @@ static MACHINE_DRIVER_START( twins )
 	MDRV_SOUND_ADD("aysnd", AY8910, 2000000)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* The second set has different palette hardware and a different port map */
 
@@ -254,7 +254,7 @@ static ADDRESS_MAP_START( twinsa_io, ADDRESS_SPACE_IO, 16 )
 ADDRESS_MAP_END
 
 
-static MACHINE_DRIVER_START( twinsa )
+static MACHINE_CONFIG_START( twinsa, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V30, XTAL_16MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(twins_map)
@@ -280,7 +280,7 @@ static MACHINE_DRIVER_START( twinsa )
 	MDRV_SOUND_ADD("aysnd", AY8910, XTAL_16MHz/8) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( twins )

@@ -228,7 +228,7 @@ static GFXDECODE_START( pitnrun )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,  0, 4 )
 GFXDECODE_END
 
-static MACHINE_DRIVER_START( pitnrun )
+static MACHINE_CONFIG_START( pitnrun, driver_data_t )
 	MDRV_CPU_ADD("maincpu", Z80,XTAL_18_432MHz/6)		 /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(pitnrun_map)
 	MDRV_CPU_VBLANK_INT("screen", pitnrun_nmi_source)
@@ -269,7 +269,7 @@ static MACHINE_DRIVER_START( pitnrun )
 	MDRV_SOUND_ADD("ay2", AY8910, XTAL_18_432MHz/12)		 /* verified on pcb */
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( pitnrun )

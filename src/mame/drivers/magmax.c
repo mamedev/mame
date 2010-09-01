@@ -355,7 +355,7 @@ static const ay8910_interface ay8910_config =
 };
 
 
-static MACHINE_DRIVER_START( magmax )
+static MACHINE_CONFIG_START( magmax, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)	/* verified on pcb */
@@ -397,7 +397,7 @@ static MACHINE_DRIVER_START( magmax )
 
 	MDRV_SOUND_ADD("ay3", AY8910, XTAL_20MHz/16) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( magmax )

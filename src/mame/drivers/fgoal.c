@@ -367,10 +367,7 @@ static MACHINE_RESET( fgoal )
 	state->prev_coin = 0;
 }
 
-static MACHINE_DRIVER_START( fgoal )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(fgoal_state)
+static MACHINE_CONFIG_START( fgoal, fgoal_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6800, 10065000 / 10) /* ? */
@@ -397,7 +394,7 @@ static MACHINE_DRIVER_START( fgoal )
 	MDRV_VIDEO_UPDATE(fgoal)
 
 	/* sound hardware */
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( fgoal )

@@ -14,9 +14,9 @@ WRITE8_HANDLER( redalert_voice_command_w );
 
 WRITE8_HANDLER( demoneye_audio_command_w );
 
-MACHINE_DRIVER_EXTERN( redalert_audio );
-MACHINE_DRIVER_EXTERN( ww3_audio );
-MACHINE_DRIVER_EXTERN( demoneye_audio );
+MACHINE_CONFIG_EXTERN( redalert_audio );
+MACHINE_CONFIG_EXTERN( ww3_audio );
+MACHINE_CONFIG_EXTERN( demoneye_audio );
 
 
 /*----------- defined in video/redalert.c -----------*/
@@ -27,7 +27,7 @@ extern UINT8 *redalert_charmap_videoram;
 extern UINT8 *redalert_video_control;
 WRITE8_HANDLER( redalert_bitmap_videoram_w );
 
-MACHINE_DRIVER_EXTERN( ww3_video );
-MACHINE_DRIVER_EXTERN( panther_video );
-MACHINE_DRIVER_EXTERN( redalert_video );
-MACHINE_DRIVER_EXTERN( demoneye_video );
+MACHINE_CONFIG_EXTERN( ww3_video );
+MACHINE_CONFIG_EXTERN( panther_video );
+MACHINE_CONFIG_EXTERN( redalert_video );
+MACHINE_CONFIG_EXTERN( demoneye_video );

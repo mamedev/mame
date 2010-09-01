@@ -201,7 +201,7 @@ static const k056800_interface ultrsprt_k056800_interface =
 };
 
 
-static MACHINE_DRIVER_START( ultrsprt )
+static MACHINE_CONFIG_START( ultrsprt, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", PPC403GA, 25000000)		/* PowerPC 403GA 25MHz */
 	MDRV_CPU_PROGRAM_MAP(ultrsprt_map)
@@ -236,7 +236,7 @@ static MACHINE_DRIVER_START( ultrsprt )
 	MDRV_SOUND_ADD("konami", K054539, 48000)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*****************************************************************************/

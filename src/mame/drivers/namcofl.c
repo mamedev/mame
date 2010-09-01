@@ -590,7 +590,7 @@ static MACHINE_RESET( namcofl )
 }
 
 
-static MACHINE_DRIVER_START( namcofl )
+static MACHINE_CONFIG_START( namcofl, driver_data_t )
 	MDRV_CPU_ADD("maincpu", I960, 20000000)	// i80960KA-20 == 20 MHz part
 	MDRV_CPU_PROGRAM_MAP(namcofl_mem)
 
@@ -622,7 +622,7 @@ static MACHINE_DRIVER_START( namcofl )
 	MDRV_SOUND_ROUTE(1, "lspeaker", 1.00)
 	MDRV_SOUND_ROUTE(2, "rspeaker", 1.00)
 	MDRV_SOUND_ROUTE(3, "lspeaker", 1.00)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( speedrcr )
 	ROM_REGION( 0x200000, "maincpu", 0 ) // i960 program

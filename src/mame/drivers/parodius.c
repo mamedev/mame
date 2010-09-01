@@ -297,10 +297,7 @@ static MACHINE_RESET( parodius )
 	state->videobank = 0;
 }
 
-static MACHINE_DRIVER_START( parodius )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(parodius_state)
+static MACHINE_CONFIG_START( parodius, parodius_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", KONAMI, 3000000)		/* 053248 */
@@ -341,7 +338,7 @@ static MACHINE_DRIVER_START( parodius )
 	MDRV_SOUND_ADD("k053260", K053260, 3579545)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.70)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.70)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

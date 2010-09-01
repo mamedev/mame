@@ -208,7 +208,7 @@ static const samples_interface astrob_samples_interface =
 };
 
 
-MACHINE_DRIVER_START( astrob_sound_board )
+MACHINE_CONFIG_FRAGMENT( astrob_sound_board )
 
 	MDRV_SOUND_START(astrob)
 
@@ -216,7 +216,7 @@ MACHINE_DRIVER_START( astrob_sound_board )
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(astrob_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -436,7 +436,7 @@ static const ppi8255_interface ppi8255_005_intf =
 };
 
 
-MACHINE_DRIVER_START( 005_sound_board )
+MACHINE_CONFIG_FRAGMENT( 005_sound_board )
 
 	MDRV_PPI8255_ADD( "ppi8255", ppi8255_005_intf )
 
@@ -449,7 +449,7 @@ MACHINE_DRIVER_START( 005_sound_board )
 
 	MDRV_SOUND_ADD("005", 005, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -673,7 +673,7 @@ static const samples_interface spaceod_samples_interface =
 };
 
 
-MACHINE_DRIVER_START( spaceod_sound_board )
+MACHINE_CONFIG_FRAGMENT( spaceod_sound_board )
 
 	/* sound hardware */
 	MDRV_SOUND_START(spaceod)
@@ -681,7 +681,7 @@ MACHINE_DRIVER_START( spaceod_sound_board )
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(spaceod_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -840,7 +840,7 @@ static const ppi8255_interface monsterb_ppi_intf =
 };
 
 
-MACHINE_DRIVER_START( monsterb_sound_board )
+MACHINE_CONFIG_FRAGMENT( monsterb_sound_board )
 
 	MDRV_PPI8255_ADD( "ppi8255", monsterb_ppi_intf )
 
@@ -863,7 +863,7 @@ MACHINE_DRIVER_START( monsterb_sound_board )
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

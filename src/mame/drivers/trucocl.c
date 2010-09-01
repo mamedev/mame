@@ -137,7 +137,7 @@ static INTERRUPT_GEN( trucocl_interrupt )
 	irq0_line_hold(device);
 }
 
-static MACHINE_DRIVER_START( trucocl )
+static MACHINE_CONFIG_START( trucocl, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 18432000/6)
 	MDRV_CPU_PROGRAM_MAP(main_map)
@@ -163,7 +163,7 @@ static MACHINE_DRIVER_START( trucocl )
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

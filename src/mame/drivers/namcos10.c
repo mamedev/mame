@@ -375,7 +375,7 @@ static MACHINE_RESET( namcos10 )
 	psx_machine_init(machine);
 }
 
-static MACHINE_DRIVER_START( namcos10 )
+static MACHINE_CONFIG_START( namcos10, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",  PSXCPU, XTAL_101_4912MHz )
 	MDRV_CPU_PROGRAM_MAP( namcos10_map)
@@ -399,7 +399,7 @@ static MACHINE_DRIVER_START( namcos10 )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( namcos10 )
 	/* IN 0 */

@@ -2216,7 +2216,7 @@ INPUT_PORTS_END
 // machine driver for scorpion2 board + adder2 expansion //////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-static MACHINE_DRIVER_START( scorpion2_vid )
+static MACHINE_CONFIG_START( scorpion2_vid, driver_data_t )
 	MDRV_MACHINE_RESET( init )							// main scorpion2 board initialisation
 	MDRV_QUANTUM_TIME(HZ(960))									// needed for serial communication !!
 	MDRV_CPU_ADD("maincpu", M6809, MASTER_CLOCK/4 )	// 6809 CPU at 2 Mhz
@@ -2250,7 +2250,7 @@ static MACHINE_DRIVER_START( scorpion2_vid )
 
 	MDRV_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static void sc2_common_init(running_machine *machine, int decrypt)
 {
@@ -3967,7 +3967,7 @@ INPUT_PORTS_END
 
 /* machine driver for scorpion2 board */
 
-static MACHINE_DRIVER_START( scorpion2 )
+static MACHINE_CONFIG_START( scorpion2, driver_data_t )
 	MDRV_MACHINE_RESET(awp_init)
 	MDRV_CPU_ADD("maincpu", M6809, MASTER_CLOCK/4 )
 	MDRV_CPU_PROGRAM_MAP(sc2_memmap)
@@ -3984,19 +3984,18 @@ static MACHINE_DRIVER_START( scorpion2 )
 
 	/* video hardware */
 	MDRV_DEFAULT_LAYOUT(layout_awpvid14)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* machine driver for scorpion3 board */
-static MACHINE_DRIVER_START( scorpion3 )
-	MDRV_IMPORT_FROM( scorpion2 )
+static MACHINE_CONFIG_DERIVED( scorpion3, scorpion2 )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(sc3_memmap)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* machine driver for scorpion2 board + matrix board */
-static MACHINE_DRIVER_START( scorpion2_dm01 )
+static MACHINE_CONFIG_START( scorpion2_dm01, driver_data_t )
 	MDRV_MACHINE_RESET(dm01_init)
 	MDRV_QUANTUM_TIME(HZ(960))									// needed for serial communication !!
 	MDRV_CPU_ADD("maincpu", M6809, MASTER_CLOCK/4 )
@@ -4028,7 +4027,7 @@ static MACHINE_DRIVER_START( scorpion2_dm01 )
 	MDRV_CPU_ADD("matrix", M6809, 2000000 )				/* matrix board 6809 CPU at 2 Mhz ?? I don't know the exact freq.*/
 	MDRV_CPU_PROGRAM_MAP(bfm_dm01_memmap)
 	MDRV_CPU_PERIODIC_INT(bfm_dm01_vbl, 1500 )			/* generate 1500 NMI's per second ?? what is the exact freq?? */
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static void sc2awp_common_init(running_machine *machine,int reels, int decrypt)
 {

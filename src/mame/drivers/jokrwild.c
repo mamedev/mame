@@ -454,7 +454,7 @@ static const mc6845_interface mc6845_intf =
 *    Machine Drivers     *
 *************************/
 
-static MACHINE_DRIVER_START( jokrwild )
+static MACHINE_CONFIG_START( jokrwild, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, MASTER_CLOCK/2)	/* guess */
@@ -482,7 +482,7 @@ static MACHINE_DRIVER_START( jokrwild )
 
 	MDRV_MC6845_ADD("crtc", MC6845, MASTER_CLOCK/16, mc6845_intf) /* guess */
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************

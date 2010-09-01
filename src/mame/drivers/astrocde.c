@@ -1270,7 +1270,7 @@ static const z80_daisy_config tenpin_daisy_chain[] =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( astrocade_base )
+static MACHINE_CONFIG_START( astrocade_base, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, ASTROCADE_CLOCK/4)
@@ -1289,11 +1289,10 @@ static MACHINE_DRIVER_START( astrocade_base )
 	MDRV_PALETTE_INIT(astrocde)
 	MDRV_VIDEO_START(astrocde)
 	MDRV_VIDEO_UPDATE(astrocde)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( astrocade_16color_base )
-	MDRV_IMPORT_FROM(astrocade_base)
+static MACHINE_CONFIG_DERIVED( astrocade_16color_base, astrocade_base )
 
 	/* basic machine hardware */
 	MDRV_NVRAM_HANDLER(generic_0fill)
@@ -1304,20 +1303,20 @@ static MACHINE_DRIVER_START( astrocade_16color_base )
 	MDRV_PALETTE_INIT(profpac)
 	MDRV_VIDEO_START(profpac)
 	MDRV_VIDEO_UPDATE(profpac)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( astrocade_mono_sound )
+static MACHINE_CONFIG_FRAGMENT( astrocade_mono_sound )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("astrocade1",  ASTROCADE, ASTROCADE_CLOCK/4)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( astrocade_stereo_sound )
+static MACHINE_CONFIG_FRAGMENT( astrocade_stereo_sound )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1327,7 +1326,7 @@ static MACHINE_DRIVER_START( astrocade_stereo_sound )
 
 	MDRV_SOUND_ADD("astrocade2",  ASTROCADE, ASTROCADE_CLOCK/4)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -1337,8 +1336,7 @@ MACHINE_DRIVER_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( seawolf2 )
-	MDRV_IMPORT_FROM(astrocade_base)
+static MACHINE_CONFIG_DERIVED( seawolf2, astrocade_base )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
@@ -1360,34 +1358,31 @@ static MACHINE_DRIVER_START( seawolf2 )
 	MDRV_SOUND_ROUTE(7, "rspeaker", 0.25)
 	MDRV_SOUND_ROUTE(8, "rspeaker", 0.25)
 	MDRV_SOUND_ROUTE(9, "rspeaker", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( ebases )
-	MDRV_IMPORT_FROM(astrocade_base)
-	MDRV_IMPORT_FROM(astrocade_mono_sound)
+static MACHINE_CONFIG_DERIVED( ebases, astrocade_base )
+	MDRV_FRAGMENT_ADD(astrocade_mono_sound)
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(ebases_map)
 	MDRV_CPU_IO_MAP(port_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( spacezap )
-	MDRV_IMPORT_FROM(astrocade_base)
-	MDRV_IMPORT_FROM(astrocade_mono_sound)
+static MACHINE_CONFIG_DERIVED( spacezap, astrocade_base )
+	MDRV_FRAGMENT_ADD(astrocade_mono_sound)
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(spacezap_map)
 	MDRV_CPU_IO_MAP(port_map_mono_pattern)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( wow )
-	MDRV_IMPORT_FROM(astrocade_base)
-	MDRV_IMPORT_FROM(astrocade_stereo_sound)
+static MACHINE_CONFIG_DERIVED( wow, astrocade_base )
+	MDRV_FRAGMENT_ADD(astrocade_stereo_sound)
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
@@ -1405,11 +1400,10 @@ static MACHINE_DRIVER_START( wow )
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(wow_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "center", 0.85)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( gorf )
-	MDRV_IMPORT_FROM(astrocade_base)
+static MACHINE_CONFIG_DERIVED( gorf, astrocade_base )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
@@ -1433,12 +1427,11 @@ static MACHINE_DRIVER_START( gorf )
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(gorf_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "upper", 0.85)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( robby )
-	MDRV_IMPORT_FROM(astrocade_base)
-	MDRV_IMPORT_FROM(astrocade_stereo_sound)
+static MACHINE_CONFIG_DERIVED( robby, astrocade_base )
+	MDRV_FRAGMENT_ADD(astrocade_stereo_sound)
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
@@ -1446,32 +1439,29 @@ static MACHINE_DRIVER_START( robby )
 	MDRV_CPU_IO_MAP(port_map_stereo_pattern)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( profpac )
-	MDRV_IMPORT_FROM(astrocade_16color_base)
-	MDRV_IMPORT_FROM(astrocade_stereo_sound)
+static MACHINE_CONFIG_DERIVED( profpac, astrocade_16color_base )
+	MDRV_FRAGMENT_ADD(astrocade_stereo_sound)
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(profpac_map)
 	MDRV_CPU_IO_MAP(port_map_16col_pattern)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( demndrgn )
-	MDRV_IMPORT_FROM(astrocade_16color_base)
+static MACHINE_CONFIG_DERIVED( demndrgn, astrocade_16color_base )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(demndrgn_map)
 	MDRV_CPU_IO_MAP(port_map_16col_pattern_nosound)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( tenpindx )
-	MDRV_IMPORT_FROM(astrocade_16color_base)
+static MACHINE_CONFIG_DERIVED( tenpindx, astrocade_16color_base )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
@@ -1490,7 +1480,7 @@ static MACHINE_DRIVER_START( tenpindx )
 	MDRV_SOUND_ADD("aysnd", AY8912, ASTROCADE_CLOCK/4)	/* real clock unknown */
 	MDRV_SOUND_CONFIG(ay8912_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

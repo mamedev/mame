@@ -1933,7 +1933,7 @@ static const ay8910_interface ay8910_config =
 };
 
 
-static MACHINE_DRIVER_START( halleys )
+static MACHINE_CONFIG_START( halleys, driver_data_t )
 	MDRV_CPU_ADD("maincpu", M6809, XTAL_19_968MHz/12) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(halleys_map)
 	MDRV_CPU_VBLANK_INT_HACK(halleys_interrupt, 4)
@@ -1974,16 +1974,15 @@ static MACHINE_DRIVER_START( halleys )
 	MDRV_SOUND_ADD("ay4", AY8910, XTAL_6MHz/4) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( benberob )
-	MDRV_IMPORT_FROM(halleys)
+static MACHINE_CONFIG_DERIVED( benberob, halleys )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_CLOCK(XTAL_19_968MHz/12) /* not verified but pcb identical to halley's comet */
 	MDRV_CPU_VBLANK_INT_HACK(benberob_interrupt, 4)
 	MDRV_VIDEO_UPDATE(benberob)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 //**************************************************************************

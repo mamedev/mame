@@ -295,10 +295,7 @@ static MACHINE_RESET( fcombat )
 	state->ty = 0;
 }
 
-static MACHINE_DRIVER_START( fcombat )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(fcombat_state)
+static MACHINE_CONFIG_START( fcombat, fcombat_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 10000000/3)
@@ -333,7 +330,7 @@ static MACHINE_DRIVER_START( fcombat )
 
 	MDRV_SOUND_ADD("ay3", AY8910, 1500000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.12)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*************************************
  *

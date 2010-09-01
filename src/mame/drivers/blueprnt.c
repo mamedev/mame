@@ -297,10 +297,7 @@ static MACHINE_RESET( blueprnt )
 }
 
 
-static MACHINE_DRIVER_START( blueprnt )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(blueprnt_state)
+static MACHINE_CONFIG_START( blueprnt, blueprnt_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 7000000/2)	// 3.5 MHz
@@ -340,7 +337,7 @@ static MACHINE_DRIVER_START( blueprnt )
 	MDRV_SOUND_ADD("ay2", AY8910, 10000000/2/2/2/2)
 	MDRV_SOUND_CONFIG(ay8910_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************************

@@ -636,7 +636,7 @@ static const mips3_config r4600_config =
 };
 
 
-static MACHINE_DRIVER_START( kinst )
+static MACHINE_CONFIG_START( kinst, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", R4600LE, MASTER_CLOCK*2)
@@ -665,8 +665,8 @@ static MACHINE_DRIVER_START( kinst )
 	MDRV_VIDEO_UPDATE(kinst)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(dcs_audio_2k)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(dcs_audio_2k)
+MACHINE_CONFIG_END
 
 
 

@@ -821,9 +821,7 @@ static MACHINE_RESET( pballoon )
  *
  *************************************/
 
-static MACHINE_DRIVER_START( sasuke )
-
-	MDRV_DRIVER_DATA( snk6502_state )
+static MACHINE_CONFIG_START( sasuke, snk6502_state )
 
 	// basic machine hardware
 	MDRV_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 16) // 700 kHz
@@ -873,11 +871,10 @@ static MACHINE_DRIVER_START( sasuke )
 	MDRV_SOUND_ADD("sn76477.3", SN76477, 0)
 	MDRV_SOUND_CONFIG(sasuke_sn76477_intf_3)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( satansat )
+static MACHINE_CONFIG_DERIVED( satansat, sasuke )
 	// basic machine hardware
-	MDRV_IMPORT_FROM(sasuke)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(satansat_map)
 
@@ -897,11 +894,9 @@ static MACHINE_DRIVER_START( satansat )
 
 	MDRV_DEVICE_REMOVE("sn76477.2")
 	MDRV_DEVICE_REMOVE("sn76477.3")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( vanguard )
-
-	MDRV_DRIVER_DATA( snk6502_state )
+static MACHINE_CONFIG_START( vanguard, snk6502_state )
 
 	// basic machine hardware
 	//MDRV_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 8)   // 1.4 MHz
@@ -946,11 +941,10 @@ static MACHINE_DRIVER_START( vanguard )
 	MDRV_SOUND_ADD("sn76477.2", SN76477, 0)
 	MDRV_SOUND_CONFIG(vanguard_sn76477_intf_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( fantasy )
+static MACHINE_CONFIG_DERIVED( fantasy, vanguard )
 	// basic machine hardware
-	MDRV_IMPORT_FROM(vanguard)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(fantasy_map)
 
@@ -968,26 +962,23 @@ static MACHINE_DRIVER_START( fantasy )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
 	MDRV_DEVICE_REMOVE("sn76477.2")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( nibbler )
-	// basic machine hardware
-	MDRV_IMPORT_FROM(fantasy)
+static MACHINE_CONFIG_DERIVED( nibbler, fantasy )
 
 	// sound hardware
 	MDRV_DEVICE_REMOVE("samples")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( pballoon )
+static MACHINE_CONFIG_DERIVED( pballoon, nibbler )
 	// basic machine hardware
-	MDRV_IMPORT_FROM(nibbler)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(pballoon_map)
 
 	MDRV_MACHINE_RESET(pballoon)
 
 	MDRV_VIDEO_START( pballoon )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************************

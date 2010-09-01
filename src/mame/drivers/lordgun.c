@@ -650,7 +650,7 @@ static const ym3812_interface lordgun_ym3812_interface =
 	soundirq
 };
 
-static MACHINE_DRIVER_START( lordgun )
+static MACHINE_CONFIG_START( lordgun, driver_data_t )
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2)
 	MDRV_CPU_PROGRAM_MAP(lordgun_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
@@ -686,7 +686,7 @@ static MACHINE_DRIVER_START( lordgun )
 
 	MDRV_OKIM6295_ADD("oki", XTAL_20MHz / 20, OKIM6295_PIN7_HIGH)	// ? 5MHz can't be right!
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 static const ymf278b_interface ymf278b_config =
@@ -694,7 +694,7 @@ static const ymf278b_interface ymf278b_config =
 	soundirq
 };
 
-static MACHINE_DRIVER_START( aliencha )
+static MACHINE_CONFIG_START( aliencha, driver_data_t )
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2)
 	MDRV_CPU_PROGRAM_MAP(aliencha_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
@@ -733,7 +733,7 @@ static MACHINE_DRIVER_START( aliencha )
 
 	MDRV_OKIM6295_ADD("oki2", XTAL_20MHz / 20, OKIM6295_PIN7_HIGH)	// ? 5MHz can't be right
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

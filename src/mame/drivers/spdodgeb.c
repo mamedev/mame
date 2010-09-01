@@ -431,7 +431,7 @@ static MACHINE_RESET( spdodgeb )
 	last_dash[0] = last_dash[1] = 0;
 }
 
-static MACHINE_DRIVER_START( spdodgeb )
+static MACHINE_CONFIG_START( spdodgeb, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502,12000000/6)	/* 2MHz ? */
@@ -475,7 +475,7 @@ static MACHINE_DRIVER_START( spdodgeb )
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

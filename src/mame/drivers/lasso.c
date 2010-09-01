@@ -499,10 +499,7 @@ static MACHINE_RESET( wwjgtin )
 	state->track_enable = 0;
 }
 
-static MACHINE_DRIVER_START( base )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(lasso_state)
+static MACHINE_CONFIG_START( base, lasso_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 11289000/16)	/* guess */
@@ -540,21 +537,19 @@ static MACHINE_DRIVER_START( base )
 
 	MDRV_SOUND_ADD("sn76489.2", SN76489, 2000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( lasso )
+static MACHINE_CONFIG_DERIVED( lasso, base )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(base)
 	MDRV_CPU_ADD("blitter", M6502, 11289000/16)	/* guess */
 	MDRV_CPU_PROGRAM_MAP(lasso_coprocessor_map)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( chameleo )
+static MACHINE_CONFIG_DERIVED( chameleo, base )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(base)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(chameleo_main_map)
 
@@ -563,12 +558,11 @@ static MACHINE_DRIVER_START( chameleo )
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(chameleo)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( wwjgtin )
+static MACHINE_CONFIG_DERIVED( wwjgtin, base )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(base)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(wwjgtin_main_map)
 
@@ -591,12 +585,11 @@ static MACHINE_DRIVER_START( wwjgtin )
 	/* sound hardware */
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( pinbo )
+static MACHINE_CONFIG_DERIVED( pinbo, base )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(base)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(pinbo_main_map)
 
@@ -621,7 +614,7 @@ static MACHINE_DRIVER_START( pinbo )
 
 	MDRV_SOUND_ADD("ay2", AY8910, 1250000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.55)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( lasso )

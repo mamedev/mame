@@ -1363,10 +1363,7 @@ static const ic_315_5250_interface segaxb_5250_2_intf =
 	NULL, NULL
 };
 
-static MACHINE_DRIVER_START( xboard )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(segas1x_state)
+static MACHINE_CONFIG_START( xboard, segas1x_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, MASTER_CLOCK/4)
@@ -1415,16 +1412,15 @@ static MACHINE_DRIVER_START( xboard )
 	MDRV_SOUND_CONFIG(segapcm_interface)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( smgp )
-	MDRV_IMPORT_FROM(xboard)
+static MACHINE_CONFIG_DERIVED( smgp, xboard )
 
 	MDRV_CPU_ADD("comm", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(smgp_comm_map)
 	MDRV_CPU_IO_MAP(smgp_comm_portmap)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

@@ -643,8 +643,7 @@ static MACHINE_RESET( oigas )
 	state->cnt = 0;
 }
 
-static MACHINE_DRIVER_START( base )
-	MDRV_DRIVER_DATA(freekick_state)
+static MACHINE_CONFIG_START( base, freekick_state )
 
 	MDRV_CPU_ADD("maincpu",Z80, 18432000/6)	//confirmed
 	MDRV_CPU_PROGRAM_MAP(pbillrd_map)
@@ -680,17 +679,15 @@ static MACHINE_DRIVER_START( base )
 
 	MDRV_SOUND_ADD("sn4", SN76496, 12000000/4)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( pbillrd )
-	MDRV_IMPORT_FROM(base)
+static MACHINE_CONFIG_DERIVED( pbillrd, base )
 
 	MDRV_MACHINE_START(pbillrd)
 	MDRV_MACHINE_RESET(freekick)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( freekickb )
-	MDRV_IMPORT_FROM(base)
+static MACHINE_CONFIG_DERIVED( freekickb, base )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(freekickb_map)
@@ -703,10 +700,9 @@ static MACHINE_DRIVER_START( freekickb )
 	MDRV_PPI8255_ADD( "ppi8255_1", ppi8255_intf[1] )
 
 	MDRV_VIDEO_UPDATE(freekick)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( gigas )
-	MDRV_IMPORT_FROM(base)
+static MACHINE_CONFIG_DERIVED( gigas, base )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(gigas_map)
@@ -716,16 +712,15 @@ static MACHINE_DRIVER_START( gigas )
 	MDRV_MACHINE_RESET(freekick)
 
 	MDRV_VIDEO_UPDATE(gigas)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( oigas )
-	MDRV_IMPORT_FROM(gigas)
+static MACHINE_CONFIG_DERIVED( oigas, gigas )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(oigas_io_map)
 
 	MDRV_MACHINE_START(oigas)
 	MDRV_MACHINE_RESET(oigas)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

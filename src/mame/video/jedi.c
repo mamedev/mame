@@ -354,7 +354,7 @@ static VIDEO_UPDATE( jedi )
  *
  *************************************/
 
-MACHINE_DRIVER_START( jedi_video )
+MACHINE_CONFIG_FRAGMENT( jedi_video )
 
 
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -365,4 +365,4 @@ MACHINE_DRIVER_START( jedi_video )
 
 	MDRV_VIDEO_START(jedi)
 	MDRV_VIDEO_UPDATE(jedi)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END

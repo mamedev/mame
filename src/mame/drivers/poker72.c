@@ -329,7 +329,7 @@ static MACHINE_RESET( poker72 )
 	memory_set_bankptr(machine, "bank1", &ROM[0]);
 }
 
-static MACHINE_DRIVER_START( poker72 )
+static MACHINE_CONFIG_START( poker72, driver_data_t )
 
 
 	/* basic machine hardware */
@@ -359,7 +359,7 @@ static MACHINE_DRIVER_START( poker72 )
 	MDRV_SOUND_ADD("ay", AY8910, 8000000/8) /* ? Mhz */
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

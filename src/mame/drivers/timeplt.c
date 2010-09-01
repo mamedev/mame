@@ -376,10 +376,7 @@ static MACHINE_RESET( timeplt )
 	state->nmi_enable = 0;
 }
 
-static MACHINE_DRIVER_START( timeplt )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(timeplt_state)
+static MACHINE_CONFIG_START( timeplt, timeplt_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/3/2)	/* not confirmed, but common for Konami games of the era */
@@ -406,12 +403,11 @@ static MACHINE_DRIVER_START( timeplt )
 	MDRV_VIDEO_UPDATE(timeplt)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(timeplt_sound)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(timeplt_sound)
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( psurge )
-	MDRV_IMPORT_FROM(timeplt)
+static MACHINE_CONFIG_DERIVED( psurge, timeplt )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
@@ -420,17 +416,16 @@ static MACHINE_DRIVER_START( psurge )
 
 	MDRV_MACHINE_START(common)
 	MDRV_MACHINE_RESET(0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( chkun )
-	MDRV_IMPORT_FROM(timeplt)
+static MACHINE_CONFIG_DERIVED( chkun, timeplt )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(chkun_main_map)
 
 	MDRV_VIDEO_START(chkun)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*************************************
  *

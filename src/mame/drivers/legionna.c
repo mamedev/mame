@@ -1039,7 +1039,7 @@ GFXDECODE_END
 
 /*****************************************************************************/
 
-static MACHINE_DRIVER_START( legionna )
+static MACHINE_CONFIG_START( legionna, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,20000000/2)	/* ??? */
@@ -1068,10 +1068,10 @@ static MACHINE_DRIVER_START( legionna )
 
 	/* sound hardware */
 	SEIBU_SOUND_SYSTEM_YM3812_INTERFACE(14318180/4,1320000)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( heatbrl )
+static MACHINE_CONFIG_START( heatbrl, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,20000000/2)	/* ??? */
@@ -1100,9 +1100,9 @@ static MACHINE_DRIVER_START( heatbrl )
 
 	/* sound hardware */
 	SEIBU_SOUND_SYSTEM_YM3812_INTERFACE(14318180/4,1320000)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( godzilla )
+static MACHINE_CONFIG_START( godzilla, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 20000000/2)
@@ -1131,9 +1131,9 @@ static MACHINE_DRIVER_START( godzilla )
 
 	/* sound hardware */
 	SEIBU_SOUND_SYSTEM_YM2151_INTERFACE(14318180/4,1320000)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( denjinmk )
+static MACHINE_CONFIG_START( denjinmk, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 20000000/2)
@@ -1162,9 +1162,9 @@ static MACHINE_DRIVER_START( denjinmk )
 
 	/* sound hardware */
 	SEIBU_SOUND_SYSTEM_YM2151_INTERFACE(14318180/4,1320000)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( grainbow )
+static MACHINE_CONFIG_START( grainbow, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 20000000/2)
@@ -1193,10 +1193,10 @@ static MACHINE_DRIVER_START( grainbow )
 
 	/* sound hardware */
 	SEIBU_SOUND_SYSTEM_YM2151_INTERFACE(14318180/4,1320000)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( cupsoc )
+static MACHINE_CONFIG_START( cupsoc, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,20000000/2)
@@ -1225,10 +1225,10 @@ static MACHINE_DRIVER_START( cupsoc )
 
 	/* sound hardware */
 	SEIBU_SOUND_SYSTEM_YM3812_INTERFACE(14318180/4,1320000)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( cupsocbl )
+static MACHINE_CONFIG_START( cupsocbl, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,12000000)
@@ -1264,7 +1264,7 @@ static MACHINE_DRIVER_START( cupsocbl )
 
 	MDRV_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

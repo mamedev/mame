@@ -17,7 +17,7 @@ void crbaloon_audio_set_breath_enable(running_device *sn, int enabled);
 void crbaloon_audio_set_appear_enable(running_device *sn, int enabled);
 WRITE8_DEVICE_HANDLER( crbaloon_audio_set_laugh_enable );
 
-MACHINE_DRIVER_EXTERN( crbaloon_audio );
+MACHINE_CONFIG_EXTERN( crbaloon_audio );
 
 
 /*----------- defined in video/crbaloon.c -----------*/

@@ -324,7 +324,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( starwars )
+static MACHINE_CONFIG_START( starwars, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, MASTER_CLOCK / 8)
@@ -369,7 +369,7 @@ static MACHINE_DRIVER_START( starwars )
 
 	MDRV_SOUND_ADD("tms", TMS5220, MASTER_CLOCK/2/9)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

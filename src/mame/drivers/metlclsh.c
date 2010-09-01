@@ -294,10 +294,7 @@ static MACHINE_RESET( metlclsh )
 	state->gfxbank = 0;
 }
 
-static MACHINE_DRIVER_START( metlclsh )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(metlclsh_state)
+static MACHINE_CONFIG_START( metlclsh, metlclsh_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 1500000)        // ?
@@ -338,7 +335,7 @@ static MACHINE_DRIVER_START( metlclsh )
 	MDRV_SOUND_ADD("ym2", YM3526, 3000000)
 	MDRV_SOUND_CONFIG(ym3526_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

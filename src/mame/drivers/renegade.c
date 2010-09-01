@@ -927,7 +927,7 @@ static MACHINE_RESET( renegade )
 }
 
 
-static MACHINE_DRIVER_START( renegade )
+static MACHINE_CONFIG_START( renegade, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 12000000/8)	/* 1.5 MHz (measured) */
@@ -966,13 +966,12 @@ static MACHINE_DRIVER_START( renegade )
 
 	MDRV_SOUND_ADD("adpcm", RENEGADE_ADPCM, 8000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( kuniokunb )
-	MDRV_IMPORT_FROM(renegade)
+static MACHINE_CONFIG_DERIVED( kuniokunb, renegade )
 	MDRV_DEVICE_REMOVE("mcu")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( renegade )

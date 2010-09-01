@@ -341,9 +341,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( jedi )
-
-	MDRV_DRIVER_DATA(jedi_state)
+static MACHINE_CONFIG_START( jedi, jedi_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, JEDI_MAIN_CPU_CLOCK)
@@ -356,11 +354,11 @@ static MACHINE_DRIVER_START( jedi )
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	/* video hardware */
-	MDRV_IMPORT_FROM(jedi_video)
+	MDRV_FRAGMENT_ADD(jedi_video)
 
 	/* audio hardware */
-	MDRV_IMPORT_FROM(jedi_audio)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(jedi_audio)
+MACHINE_CONFIG_END
 
 
 

@@ -630,10 +630,7 @@ static const kaneko_pandora_interface airbustr_pandora_config =
 	0, 0	/* x_offs, y_offs */
 };
 
-static MACHINE_DRIVER_START( airbustr )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(airbustr_state)
+static MACHINE_CONFIG_START( airbustr, airbustr_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("master", Z80, 6000000)	// ???
@@ -685,12 +682,11 @@ static MACHINE_DRIVER_START( airbustr )
 
 	MDRV_OKIM6295_ADD("oki", 12000000/4, OKIM6295_PIN7_LOW)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( airbustrb )
-	MDRV_IMPORT_FROM(airbustr)
+static MACHINE_CONFIG_DERIVED( airbustrb, airbustr )
 	MDRV_WATCHDOG_TIME_INIT(SEC(0)) // no protection device or watchdog
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* ROMs */

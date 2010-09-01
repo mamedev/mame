@@ -1007,9 +1007,7 @@ static GFXDECODE_START( srmp3 )
 GFXDECODE_END
 
 
-static MACHINE_DRIVER_START( srmp2 )
-
-	MDRV_DRIVER_DATA(srmp2_state)
+static MACHINE_CONFIG_START( srmp2, srmp2_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,16000000/2)				/* 8.00 MHz */
@@ -1043,12 +1041,10 @@ static MACHINE_DRIVER_START( srmp2 )
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( srmp3 )
-
-	MDRV_DRIVER_DATA(srmp2_state)
+static MACHINE_CONFIG_START( srmp3, srmp2_state )
 
 	/* basic machine hardware */
 
@@ -1085,12 +1081,10 @@ static MACHINE_DRIVER_START( srmp3 )
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( mjyuugi )
-
-	MDRV_DRIVER_DATA(srmp2_state)
+static MACHINE_CONFIG_START( mjyuugi, srmp2_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,16000000/2)				/* 8.00 MHz */
@@ -1123,7 +1117,7 @@ static MACHINE_DRIVER_START( mjyuugi )
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

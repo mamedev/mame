@@ -1119,10 +1119,7 @@ static MACHINE_RESET( undoukai )
 	}
 }
 
-static MACHINE_DRIVER_START( 40love )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(buggychl_state)
+static MACHINE_CONFIG_START( 40love, buggychl_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80,8000000/2) /* OK */
@@ -1177,12 +1174,9 @@ static MACHINE_DRIVER_START( 40love )
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( undoukai )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(buggychl_state)
+static MACHINE_CONFIG_START( undoukai, buggychl_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80,8000000/2)
@@ -1236,7 +1230,7 @@ static MACHINE_DRIVER_START( undoukai )
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*******************************************************************************/
 

@@ -684,7 +684,7 @@ static const nes_interface nes_config =
 };
 
 
-static MACHINE_DRIVER_START( playch10 )
+static MACHINE_CONFIG_START( playch10, driver_data_t )
 	// basic machine hardware
 	MDRV_CPU_ADD("maincpu", Z80, 8000000/2)	// 4 MHz
 	MDRV_CPU_PROGRAM_MAP(bios_map)
@@ -730,21 +730,19 @@ static MACHINE_DRIVER_START( playch10 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MDRV_RP5H01_ADD("rp5h01")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( playchnv )
-	MDRV_IMPORT_FROM(playch10)
+static MACHINE_CONFIG_DERIVED( playchnv, playch10 )
 	MDRV_NVRAM_HANDLER(playch10)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( playch10_hboard )
-	MDRV_IMPORT_FROM(playch10)
+static MACHINE_CONFIG_DERIVED( playch10_hboard, playch10 )
 	MDRV_VIDEO_START(playch10_hboard)
 	MDRV_MACHINE_START(playch10_hboard)
 
 	MDRV_DEVICE_REMOVE("ppu")
 	MDRV_PPU2C03B_ADD("ppu", playch10_ppu_interface)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

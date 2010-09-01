@@ -272,7 +272,7 @@ static MACHINE_RESET( pkscramble)
 	scanline_timer->adjust(machine->primary_screen->time_until_pos(interrupt_scanline), interrupt_scanline);
 }
 
-static MACHINE_DRIVER_START( pkscramble )
+static MACHINE_CONFIG_START( pkscramble, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000 )
 	MDRV_CPU_PROGRAM_MAP(pkscramble_map)
@@ -305,7 +305,7 @@ static MACHINE_DRIVER_START( pkscramble )
 	MDRV_SOUND_ADD("ymsnd", YM2203, 12000000/4)
 	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( pkscram )

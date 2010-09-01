@@ -1714,7 +1714,7 @@ static const ym3812_interface ym3812_config =
 
 /************* core pieces ******************/
 
-static MACHINE_DRIVER_START( itech8_core_lo )
+static MACHINE_CONFIG_START( itech8_core_lo, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, CLOCK_8MHz/4)
@@ -1742,19 +1742,18 @@ static MACHINE_DRIVER_START( itech8_core_lo )
 
 	/* via */
 	MDRV_VIA6522_ADD("via6522_0", CLOCK_8MHz/4, via_interface)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( itech8_core_hi )
+static MACHINE_CONFIG_DERIVED( itech8_core_hi, itech8_core_lo )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(itech8_core_lo)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(tmshi_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( itech8_sound_ym2203 )
+static MACHINE_CONFIG_FRAGMENT( itech8_sound_ym2203 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("soundcpu", M6809, CLOCK_8MHz/4)
@@ -1770,10 +1769,10 @@ static MACHINE_DRIVER_START( itech8_sound_ym2203 )
 
 	MDRV_OKIM6295_ADD("oki", CLOCK_8MHz/8, OKIM6295_PIN7_HIGH) // was /128, not /132, so unsure so pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( itech8_sound_ym2608b )
+static MACHINE_CONFIG_FRAGMENT( itech8_sound_ym2608b )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("soundcpu", M6809, CLOCK_8MHz/4)
@@ -1783,10 +1782,10 @@ static MACHINE_DRIVER_START( itech8_sound_ym2608b )
 	MDRV_SOUND_ADD("ymsnd", YM2608, CLOCK_8MHz)
 	MDRV_SOUND_CONFIG(ym2608b_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( itech8_sound_ym3812 )
+static MACHINE_CONFIG_FRAGMENT( itech8_sound_ym3812 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("soundcpu", M6809, CLOCK_8MHz/4)
@@ -1801,10 +1800,10 @@ static MACHINE_DRIVER_START( itech8_sound_ym3812 )
 
 	MDRV_OKIM6295_ADD("oki", CLOCK_8MHz/8, OKIM6295_PIN7_HIGH) // was /128, not /132, so unsure so pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( itech8_sound_ym3812_external )
+static MACHINE_CONFIG_FRAGMENT( itech8_sound_ym3812_external )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("soundcpu", M6809, CLOCK_8MHz/4)
@@ -1817,29 +1816,27 @@ static MACHINE_DRIVER_START( itech8_sound_ym3812_external )
 
 	MDRV_OKIM6295_ADD("oki", CLOCK_8MHz/8, OKIM6295_PIN7_HIGH) // was /128, not /132, so unsure so pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /************* full drivers ******************/
 
-static MACHINE_DRIVER_START( wfortune )
+static MACHINE_CONFIG_DERIVED( wfortune, itech8_core_hi )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(itech8_core_hi)
-	MDRV_IMPORT_FROM(itech8_sound_ym2203)
+	MDRV_FRAGMENT_ADD(itech8_sound_ym2203)
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
 	MDRV_VIDEO_UPDATE(itech8_2layer)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( grmatch )
+static MACHINE_CONFIG_DERIVED( grmatch, itech8_core_hi )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(itech8_core_hi)
-	MDRV_IMPORT_FROM(itech8_sound_ym2608b)
+	MDRV_FRAGMENT_ADD(itech8_sound_ym2608b)
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
@@ -1848,40 +1845,37 @@ static MACHINE_DRIVER_START( grmatch )
 
 	/* palette updater */
 	MDRV_TIMER_ADD_SCANLINE("palette", grmatch_palette_update, "screen", 0, 0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( stratab_hi )
+static MACHINE_CONFIG_DERIVED( stratab_hi, itech8_core_hi )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(itech8_core_hi)
-	MDRV_IMPORT_FROM(itech8_sound_ym2203)
+	MDRV_FRAGMENT_ADD(itech8_sound_ym2203)
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
 	MDRV_VIDEO_UPDATE(itech8_2layer)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( stratab_lo )
+static MACHINE_CONFIG_DERIVED( stratab_lo, itech8_core_lo )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(itech8_core_lo)
-	MDRV_IMPORT_FROM(itech8_sound_ym2203)
+	MDRV_FRAGMENT_ADD(itech8_sound_ym2203)
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
 	MDRV_VIDEO_UPDATE(itech8_2layer)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( slikshot_hi )
+static MACHINE_CONFIG_DERIVED( slikshot_hi, itech8_core_hi )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(itech8_core_hi)
-	MDRV_IMPORT_FROM(itech8_sound_ym2203)
+	MDRV_FRAGMENT_ADD(itech8_sound_ym2203)
 
 	MDRV_CPU_ADD("sub", Z80, CLOCK_8MHz/2)
 	MDRV_CPU_PROGRAM_MAP(slikz80_mem_map)
@@ -1892,14 +1886,13 @@ static MACHINE_DRIVER_START( slikshot_hi )
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
 	MDRV_VIDEO_START(slikshot)
 	MDRV_VIDEO_UPDATE(slikshot)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( slikshot_lo )
+static MACHINE_CONFIG_DERIVED( slikshot_lo, itech8_core_lo )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(itech8_core_lo)
-	MDRV_IMPORT_FROM(itech8_sound_ym2203)
+	MDRV_FRAGMENT_ADD(itech8_sound_ym2203)
 
 	MDRV_CPU_ADD("sub", Z80, CLOCK_8MHz/2)
 	MDRV_CPU_PROGRAM_MAP(slikz80_mem_map)
@@ -1910,62 +1903,57 @@ static MACHINE_DRIVER_START( slikshot_lo )
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
 	MDRV_VIDEO_START(slikshot)
 	MDRV_VIDEO_UPDATE(slikshot)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( slikshot_lo_noz80 )
+static MACHINE_CONFIG_DERIVED( slikshot_lo_noz80, itech8_core_lo )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(itech8_core_lo)
-	MDRV_IMPORT_FROM(itech8_sound_ym2203)
+	MDRV_FRAGMENT_ADD(itech8_sound_ym2203)
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
 	MDRV_VIDEO_UPDATE(itech8_2page)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( sstrike )
+static MACHINE_CONFIG_DERIVED( sstrike, slikshot_lo )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(slikshot_lo)
 	MDRV_MACHINE_START(sstrike)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( hstennis_hi )
+static MACHINE_CONFIG_DERIVED( hstennis_hi, itech8_core_hi )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(itech8_core_hi)
-	MDRV_IMPORT_FROM(itech8_sound_ym3812)
+	MDRV_FRAGMENT_ADD(itech8_sound_ym3812)
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 399, 0, 239)
 	MDRV_VIDEO_UPDATE(itech8_2page_large)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( hstennis_lo )
+static MACHINE_CONFIG_DERIVED( hstennis_lo, itech8_core_lo )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(itech8_core_lo)
-	MDRV_IMPORT_FROM(itech8_sound_ym3812)
+	MDRV_FRAGMENT_ADD(itech8_sound_ym3812)
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 399, 0, 239)
 	MDRV_VIDEO_UPDATE(itech8_2page_large)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( rimrockn )
+static MACHINE_CONFIG_DERIVED( rimrockn, itech8_core_hi )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(itech8_core_hi)
-	MDRV_IMPORT_FROM(itech8_sound_ym3812_external)
+	MDRV_FRAGMENT_ADD(itech8_sound_ym3812_external)
 
 	MDRV_CPU_REPLACE("maincpu", HD6309, CLOCK_12MHz)
 	MDRV_CPU_PROGRAM_MAP(tmshi_map)
@@ -1975,14 +1963,13 @@ static MACHINE_DRIVER_START( rimrockn )
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(24, 375, 0, 239)
 	MDRV_VIDEO_UPDATE(itech8_2page_large)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( ninclown )
+static MACHINE_CONFIG_DERIVED( ninclown, itech8_core_hi )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(itech8_core_hi)
-	MDRV_IMPORT_FROM(itech8_sound_ym3812_external)
+	MDRV_FRAGMENT_ADD(itech8_sound_ym3812_external)
 
 	MDRV_CPU_REPLACE("maincpu", M68000, CLOCK_12MHz)
 	MDRV_CPU_PROGRAM_MAP(ninclown_map)
@@ -1992,14 +1979,13 @@ static MACHINE_DRIVER_START( ninclown )
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(64, 423, 0, 239)
 	MDRV_VIDEO_UPDATE(itech8_2page_large)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( gtg2 )
+static MACHINE_CONFIG_DERIVED( gtg2, itech8_core_lo )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(itech8_core_lo)
-	MDRV_IMPORT_FROM(itech8_sound_ym3812_external)
+	MDRV_FRAGMENT_ADD(itech8_sound_ym3812_external)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(gtg2_map)
@@ -2008,7 +1994,7 @@ static MACHINE_DRIVER_START( gtg2 )
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
 	MDRV_VIDEO_UPDATE(itech8_2layer)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

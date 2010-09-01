@@ -2099,7 +2099,7 @@ static Z80PIO_INTERFACE( pio_interface )
  *************************************/
 
 /* original board with 64kbit ROMs and an 8255 PPI for outputs */
-static MACHINE_DRIVER_START( sys1ppi )
+static MACHINE_CONFIG_START( sys1ppi, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK)	/* not really, see notes above */
@@ -2137,43 +2137,40 @@ static MACHINE_DRIVER_START( sys1ppi )
 
 	MDRV_SOUND_ADD("sn2", SN76489A, SOUND_CLOCK/2)	/* selectable via jumper */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* reduced visible area for scrolling games */
-static MACHINE_DRIVER_START( sys1ppis )
-	MDRV_IMPORT_FROM( sys1ppi )
+static MACHINE_CONFIG_DERIVED( sys1ppis, sys1ppi )
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0*8+8, 32*8-1-8, 0*8, 28*8-1)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
 /* revised board with 128kbit ROMs and a Z80 PIO for outputs */
-static MACHINE_DRIVER_START( sys1pio )
-	MDRV_IMPORT_FROM( sys1ppi )
+static MACHINE_CONFIG_DERIVED( sys1pio, sys1ppi )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(system1_pio_io_map)
 
 	MDRV_DEVICE_REMOVE("ppi")
 	MDRV_Z80PIO_ADD("pio", MASTER_CLOCK, pio_interface)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* reduced visible area for scrolling games */
-static MACHINE_DRIVER_START( sys1pios )
-	MDRV_IMPORT_FROM( sys1pio )
+static MACHINE_CONFIG_DERIVED( sys1pios, sys1pio )
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0*8+8, 32*8-1-8, 0*8, 28*8-1)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
 /* this describes the additional 8751 MCU when present */
-static MACHINE_DRIVER_START( mcu )
+static MACHINE_CONFIG_FRAGMENT( mcu )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
@@ -2184,57 +2181,51 @@ static MACHINE_DRIVER_START( mcu )
 	MDRV_CPU_VBLANK_INT("screen", mcu_irq_assert)
 
 	MDRV_TIMER_ADD_PERIODIC("mcu_t0", mcu_t0_callback, MSEC(20))	/* ??? actual clock unknown */
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
 /* alternate program map with RAM/collision swapped */
-static MACHINE_DRIVER_START( nob )
-	MDRV_IMPORT_FROM( sys1ppi )
+static MACHINE_CONFIG_DERIVED( nob, sys1ppi )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(nobo_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( nobm )
-	MDRV_IMPORT_FROM( nob )
+static MACHINE_CONFIG_DERIVED( nobm, nob )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("mcu", I8751, SOUND_CLOCK)
 	MDRV_CPU_IO_MAP(nob_mcu_io_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
 /* system2 video */
-static MACHINE_DRIVER_START( sys2 )
-	MDRV_IMPORT_FROM( sys1ppi )
+static MACHINE_CONFIG_DERIVED( sys2, sys1ppi )
 
 	MDRV_MACHINE_START(system2)
 
 	/* video hardware */
 	MDRV_VIDEO_START(system2)
 	MDRV_VIDEO_UPDATE(system2)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( sys2m )
-	MDRV_IMPORT_FROM( sys2 )
-	MDRV_IMPORT_FROM( mcu )
-MACHINE_DRIVER_END
+static MACHINE_CONFIG_DERIVED( sys2m, sys2 )
+	MDRV_FRAGMENT_ADD( mcu )
+MACHINE_CONFIG_END
 
 /* system2 with rowscroll */
-static MACHINE_DRIVER_START( sys2row )
-	MDRV_IMPORT_FROM( sys2 )
+static MACHINE_CONFIG_DERIVED( sys2row, sys2 )
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(system2_rowscroll)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( sys2rowm )
-	MDRV_IMPORT_FROM( sys2row )
-	MDRV_IMPORT_FROM( mcu )
-MACHINE_DRIVER_END
+static MACHINE_CONFIG_DERIVED( sys2rowm, sys2row )
+	MDRV_FRAGMENT_ADD( mcu )
+MACHINE_CONFIG_END
 
 
 

@@ -815,7 +815,7 @@ static INTERRUPT_GEN( luckgrln_irq )
 		cputag_set_input_line(device->machine, "maincpu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_DRIVER_START( luckgrln )
+static MACHINE_CONFIG_START( luckgrln, driver_data_t )
 	MDRV_CPU_ADD("maincpu", Z180,8000000)
 	MDRV_CPU_PROGRAM_MAP(mainmap)
 	MDRV_CPU_IO_MAP(portmap)
@@ -838,7 +838,7 @@ static MACHINE_DRIVER_START( luckgrln )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static DRIVER_INIT( luckgrln )
 {

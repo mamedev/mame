@@ -725,10 +725,7 @@ static MACHINE_RESET( fcrash )
 	state->sample_select2 = 0;
 }
 
-static MACHINE_DRIVER_START( fcrash )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(cps_state)
+static MACHINE_CONFIG_START( fcrash, cps_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)
@@ -778,12 +775,9 @@ static MACHINE_DRIVER_START( fcrash )
 	MDRV_SOUND_ADD("msm2", MSM5205, 24000000/64)	/* ? */
 	MDRV_SOUND_CONFIG(msm5205_interface2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( kodb )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(cps_state)
+static MACHINE_CONFIG_START( kodb, cps_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)
@@ -820,7 +814,7 @@ static MACHINE_DRIVER_START( kodb )
 
 //  MDRV_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH) // pin 7 can be changed by the game code, see f006 on z80
 //  MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

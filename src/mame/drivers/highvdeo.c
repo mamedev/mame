@@ -865,7 +865,7 @@ static INTERRUPT_GEN( vblank_irq )
 	cpu_set_input_line_and_vector(device,0,HOLD_LINE,0x08/4);
 }
 
-static MACHINE_DRIVER_START( tv_vcf )
+static MACHINE_CONFIG_START( tv_vcf, driver_data_t )
 	MDRV_CPU_ADD("maincpu", V30, XTAL_12MHz/2 )	// ?
 	MDRV_CPU_PROGRAM_MAP(tv_vcf_map)
 	MDRV_CPU_IO_MAP(tv_vcf_io)
@@ -892,19 +892,17 @@ static MACHINE_DRIVER_START( tv_vcf )
 	MDRV_SOUND_ADD("oki", OKIM6376, XTAL_12MHz/2/2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( tv_ncf )
-	MDRV_IMPORT_FROM(tv_vcf)
+static MACHINE_CONFIG_DERIVED( tv_ncf, tv_vcf )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(tv_ncf_map)
 	MDRV_CPU_IO_MAP(tv_ncf_io)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( tv_tcf )
-	MDRV_IMPORT_FROM(tv_vcf)
+static MACHINE_CONFIG_DERIVED( tv_tcf, tv_vcf )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(tv_tcf_map)
@@ -912,10 +910,9 @@ static MACHINE_DRIVER_START( tv_tcf )
 
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 400-1, 0, 300-1)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( newmcard )
-	MDRV_IMPORT_FROM(tv_tcf)
+static MACHINE_CONFIG_DERIVED( newmcard, tv_tcf )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(newmcard_map)
@@ -923,10 +920,9 @@ static MACHINE_DRIVER_START( newmcard )
 
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 200-1)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( ciclone )
-	MDRV_IMPORT_FROM(tv_tcf)
+static MACHINE_CONFIG_DERIVED( ciclone, tv_tcf )
 
 	MDRV_DEVICE_REMOVE("maincpu")
 
@@ -934,9 +930,9 @@ static MACHINE_DRIVER_START( ciclone )
 	MDRV_CPU_PROGRAM_MAP(tv_tcf_map)
 	MDRV_CPU_IO_MAP(tv_tcf_io)
 	MDRV_CPU_VBLANK_INT("screen", vblank_irq)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( brasil )
+static MACHINE_CONFIG_START( brasil, driver_data_t )
 	MDRV_CPU_ADD("maincpu", I80186, 20000000 )	// fashion doesn't like 20/2 Mhz
 	MDRV_CPU_PROGRAM_MAP(brasil_map)
 	MDRV_CPU_IO_MAP(brasil_io)
@@ -961,7 +957,7 @@ static MACHINE_DRIVER_START( brasil )
 
 	MDRV_SOUND_ADD("oki", OKIM6376, XTAL_12MHz/2/2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( tour4000 )
 	ROM_REGION( 0x100000, "user1", 0 ) /* V30 Code */

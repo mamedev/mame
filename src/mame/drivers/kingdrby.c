@@ -965,7 +965,7 @@ static PALETTE_INIT(kingdrbb)
 	}
 }
 
-static MACHINE_DRIVER_START( kingdrby )
+static MACHINE_CONFIG_START( kingdrby, driver_data_t )
 	MDRV_CPU_ADD("master", Z80, CLK_2)
 	MDRV_CPU_PROGRAM_MAP(master_map)
 	MDRV_CPU_IO_MAP(master_io_map)
@@ -1009,10 +1009,9 @@ static MACHINE_DRIVER_START( kingdrby )
 	MDRV_SOUND_ADD("aysnd", AY8910, CLK_1/8)	/* guess */
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( kingdrbb )
-	MDRV_IMPORT_FROM( kingdrby )
+static MACHINE_CONFIG_DERIVED( kingdrbb, kingdrby )
 
 	MDRV_CPU_MODIFY("slave")
 	MDRV_CPU_PROGRAM_MAP(slave_1986_map)
@@ -1021,10 +1020,9 @@ static MACHINE_DRIVER_START( kingdrbb )
 
 	MDRV_PPI8255_RECONFIG( "ppi8255_0", ppi8255_1986_intf[0] )
 	MDRV_PPI8255_RECONFIG( "ppi8255_1", ppi8255_1986_intf[1] )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( cowrace )
-	MDRV_IMPORT_FROM( kingdrbb )
+static MACHINE_CONFIG_DERIVED( cowrace, kingdrbb )
 
 	MDRV_CPU_MODIFY("soundcpu")
 	MDRV_CPU_PROGRAM_MAP(cowrace_sound_map)
@@ -1039,7 +1037,7 @@ static MACHINE_DRIVER_START( cowrace )
 	MDRV_SOUND_REPLACE("aysnd", YM2203, 3000000)
 	MDRV_SOUND_CONFIG(cowrace_ym2203_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( kingdrby )
 	ROM_REGION( 0x3000, "master", 0 )

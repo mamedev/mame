@@ -305,10 +305,7 @@ static const eeprom_interface eeprom_intf =
 	"0100110000000" /* unlock command */
 };
 
-static MACHINE_DRIVER_START( simpsons )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(simpsons_state)
+static MACHINE_CONFIG_START( simpsons, simpsons_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/2/4) /* pin 18 of konami cpu is 12Mhz, while pin 17 is 3mhz. Clock probably divided internally by 4  */
@@ -354,7 +351,7 @@ static MACHINE_DRIVER_START( simpsons )
 	MDRV_SOUND_ADD("k053260", K053260, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.75)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

@@ -539,7 +539,7 @@ static GFXDECODE_START( terracre )
 	GFXDECODE_ENTRY( "gfx3", 0, sprite_layout, 1*16+16*16, 256 )
 GFXDECODE_END
 
-static MACHINE_DRIVER_START( amazon )
+static MACHINE_CONFIG_START( amazon, driver_data_t )
 	MDRV_CPU_ADD("maincpu", M68000, 8000000 )
 	MDRV_CPU_PROGRAM_MAP(amazon_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
@@ -576,9 +576,9 @@ static MACHINE_DRIVER_START( amazon )
 
 	MDRV_SOUND_ADD("dac2", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( ym3526 )
+static MACHINE_CONFIG_START( ym3526, driver_data_t )
 	MDRV_CPU_ADD("maincpu", M68000, 8000000 )
 	MDRV_CPU_PROGRAM_MAP(terracre_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
@@ -613,9 +613,9 @@ static MACHINE_DRIVER_START( ym3526 )
 
 	MDRV_SOUND_ADD("dac2", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( ym2203 )
+static MACHINE_CONFIG_START( ym2203, driver_data_t )
 	MDRV_CPU_ADD("maincpu", M68000, 8000000) /* 8 MHz?? */
 	MDRV_CPU_PROGRAM_MAP(terracre_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
@@ -659,7 +659,7 @@ static MACHINE_DRIVER_START( ym2203 )
 
 	MDRV_SOUND_ADD("dac2", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( terracre )
 	ROM_REGION( 0x20000, "maincpu", 0 )	/* 128K for 68000 code */

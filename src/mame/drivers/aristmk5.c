@@ -214,7 +214,7 @@ static const i2cmem_interface i2cmem_interface =
 };
 
 
-static MACHINE_DRIVER_START( aristmk5 )
+static MACHINE_CONFIG_START( aristmk5, driver_data_t )
 	MDRV_CPU_ADD("maincpu", ARM, 10000000) // ?
 	MDRV_CPU_PROGRAM_MAP(aristmk5_map)
 
@@ -259,7 +259,7 @@ static MACHINE_DRIVER_START( aristmk5 )
 
 	MDRV_SOUND_ADD("dac7", DAC, 0)
 	MDRV_SOUND_ROUTE(0, "mono", 0.10)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 #define ARISTOCRAT_MK5_BIOS \
 	ROM_REGION( 0x800000, "prg_code", 0 ) \

@@ -621,7 +621,7 @@ static INTERRUPT_GEN( darkhors )
 	}
 }
 
-static MACHINE_DRIVER_START( darkhors )
+static MACHINE_CONFIG_START( darkhors, driver_data_t )
 	MDRV_CPU_ADD("maincpu", M68EC020, 12000000) // 36MHz/3 ??
 	MDRV_CPU_PROGRAM_MAP(darkhors_map)
 	MDRV_CPU_VBLANK_INT_HACK(darkhors,3)
@@ -647,7 +647,7 @@ static MACHINE_DRIVER_START( darkhors )
 
 	MDRV_OKIM6295_ADD("oki", 528000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -671,7 +671,7 @@ static VIDEO_UPDATE(jclub2)
 	return 0;
 }
 
-static MACHINE_DRIVER_START( jclub2 )
+static MACHINE_CONFIG_START( jclub2, driver_data_t )
 	MDRV_CPU_ADD("maincpu", M68EC020, 12000000)
 	MDRV_CPU_PROGRAM_MAP(jclub2_map)
 	MDRV_CPU_VBLANK_INT_HACK(darkhors,3)
@@ -691,7 +691,7 @@ static MACHINE_DRIVER_START( jclub2 )
 
 	MDRV_VIDEO_START(jclub2)
 	MDRV_VIDEO_UPDATE(jclub2)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static ADDRESS_MAP_START( st0016_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
@@ -727,7 +727,7 @@ static VIDEO_UPDATE(jclub2o)
 	return 0;
 }
 
-static MACHINE_DRIVER_START( jclub2o )
+static MACHINE_CONFIG_START( jclub2o, driver_data_t )
 	MDRV_CPU_ADD("st0016",Z80,8000000)
 	MDRV_CPU_PROGRAM_MAP(st0016_mem)
 	MDRV_CPU_IO_MAP(st0016_io)
@@ -759,7 +759,7 @@ static MACHINE_DRIVER_START( jclub2o )
 	MDRV_SOUND_CONFIG(st0016_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

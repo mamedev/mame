@@ -352,7 +352,7 @@ static VIDEO_START( sangho )
 	v9938_init (machine, 0, *machine->primary_screen, machine->generic.tmpbitmap, MODEL_V9938, 0x20000, msx_vdp_interrupt);
 }
 
-static MACHINE_DRIVER_START(pzlestar)
+static MACHINE_CONFIG_START( pzlestar, driver_data_t )
 
 	MDRV_CPU_ADD("maincpu", Z80,8000000) // ?
 	MDRV_CPU_PROGRAM_MAP(sangho_map)
@@ -382,10 +382,10 @@ static MACHINE_DRIVER_START(pzlestar)
 	MDRV_SOUND_ADD("ymsnd", YM2413, 3580000)
 
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START(sexyboom )
+static MACHINE_CONFIG_START( sexyboom, driver_data_t )
 
 	MDRV_CPU_ADD("maincpu", Z80,8000000) // ?
 	MDRV_CPU_PROGRAM_MAP(sangho_map)
@@ -414,7 +414,7 @@ static MACHINE_DRIVER_START(sexyboom )
 	MDRV_SOUND_ADD("ymsnd", YM2413, 3580000)
 
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( pzlestar )
 	ROM_REGION( 0x20000*16, "user1", 0 ) // 15 sockets, 13 used

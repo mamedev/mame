@@ -608,8 +608,7 @@ static COP400_INTERFACE( looping_cop_intf )
  *
  *************************************/
 
-static MACHINE_DRIVER_START( looping )
-	MDRV_DRIVER_DATA(looping_state)
+static MACHINE_CONFIG_START( looping, looping_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", TMS9995, MAIN_CPU_CLOCK)
@@ -654,7 +653,7 @@ static MACHINE_DRIVER_START( looping )
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

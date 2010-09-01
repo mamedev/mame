@@ -242,7 +242,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_DRIVER_START( srumbler )
+static MACHINE_CONFIG_START( srumbler, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 1500000)        /* 1.5 MHz (?) */
@@ -286,7 +286,7 @@ static MACHINE_DRIVER_START( srumbler )
 	MDRV_SOUND_ROUTE(1, "mono", 0.10)
 	MDRV_SOUND_ROUTE(2, "mono", 0.10)
 	MDRV_SOUND_ROUTE(3, "mono", 0.30)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

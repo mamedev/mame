@@ -791,7 +791,7 @@ static const ay8910_interface cb2001_ay8910_config =
 };
 
 static const nec_config cb2001_config = { cb2001_decryption_table, };
-static MACHINE_DRIVER_START( cb2001 )
+static MACHINE_CONFIG_START( cb2001, driver_data_t )
 	MDRV_CPU_ADD("maincpu", V30, 20000000) // CPU91A-011-0016JK004; encrypted cpu like nec v25/35 used in some irem game
 	MDRV_CPU_CONFIG(cb2001_config)
 	MDRV_CPU_PROGRAM_MAP(cb2001_map)
@@ -822,7 +822,7 @@ static MACHINE_DRIVER_START( cb2001 )
 	MDRV_SOUND_ADD("aysnd", AY8910, 1500000) // wrong
 	MDRV_SOUND_CONFIG(cb2001_ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( cb2001 )

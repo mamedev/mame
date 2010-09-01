@@ -447,10 +447,7 @@ static MACHINE_RESET( fuuki16 )
 }
 
 
-static MACHINE_DRIVER_START( fuuki16 )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(fuuki16_state)
+static MACHINE_CONFIG_START( fuuki16, fuuki16_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
@@ -491,7 +488,7 @@ static MACHINE_DRIVER_START( fuuki16 )
 	MDRV_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.85)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.85)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

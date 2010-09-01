@@ -468,7 +468,7 @@ static const tms5110_interface bagman_tms5110_interface =
 	DEVCB_NULL										/* rom clock - Only used to drive the data lines */
 };
 
-static MACHINE_DRIVER_START( bagman )
+static MACHINE_CONFIG_START( bagman, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, BAGMAN_H0)
@@ -502,9 +502,9 @@ static MACHINE_DRIVER_START( bagman )
 	MDRV_SOUND_ADD("tms", TMS5110A, 640000)
 	MDRV_SOUND_CONFIG(bagman_tms5110_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( pickin )
+static MACHINE_CONFIG_START( pickin, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, BAGMAN_H0)
@@ -536,7 +536,7 @@ static MACHINE_DRIVER_START( pickin )
 	MDRV_SOUND_ADD("ay2", AY8910, 1500000)
 	MDRV_SOUND_CONFIG(ay8910_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*
 
@@ -556,7 +556,7 @@ z80
 */
 
 
-static MACHINE_DRIVER_START( botanic )
+static MACHINE_CONFIG_START( botanic, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, BAGMAN_H0)
@@ -588,14 +588,13 @@ static MACHINE_DRIVER_START( botanic )
 	MDRV_SOUND_ADD("ay2", AY8910, 1500000)
 	MDRV_SOUND_CONFIG(ay8910_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( squaitsa )
-	MDRV_IMPORT_FROM( botanic )
+static MACHINE_CONFIG_DERIVED( squaitsa, botanic )
 	MDRV_SOUND_MODIFY("aysnd")
 	MDRV_SOUND_CONFIG(ay8910_dial_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

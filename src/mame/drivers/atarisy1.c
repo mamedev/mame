@@ -740,8 +740,7 @@ static const ym2151_interface ym2151_config =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( atarisy1 )
-	MDRV_DRIVER_DATA(atarisy1_state)
+static MACHINE_CONFIG_START( atarisy1, atarisy1_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68010, ATARI_CLOCK_14MHz/2)
@@ -792,7 +791,7 @@ static MACHINE_DRIVER_START( atarisy1 )
 
 	/* via */
 	MDRV_VIA6522_ADD("via6522_0", 0, via_interface)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

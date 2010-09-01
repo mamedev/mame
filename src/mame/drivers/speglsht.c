@@ -319,7 +319,7 @@ static MACHINE_RESET(speglsht)
 	memset(shared,0,0x1000);
 }
 
-static MACHINE_DRIVER_START( speglsht )
+static MACHINE_CONFIG_START( speglsht, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80, 8000000) /* 8 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(st0016_mem)
@@ -355,7 +355,7 @@ static MACHINE_DRIVER_START( speglsht )
 	MDRV_SOUND_CONFIG(st0016_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( speglsht )
 	ROM_REGION( 0x210000, "maincpu", 0 )

@@ -862,9 +862,7 @@ static const tms34010_config tms_config_coolpool =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( amerdart )
-
-	MDRV_DRIVER_DATA( coolpool_state )
+static MACHINE_CONFIG_START( amerdart, coolpool_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", TMS34010, XTAL_40MHz)
@@ -894,12 +892,10 @@ static MACHINE_DRIVER_START( amerdart )
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( coolpool )
-
-	MDRV_DRIVER_DATA( coolpool_state )
+static MACHINE_CONFIG_START( coolpool, coolpool_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", TMS34010, XTAL_40MHz)
@@ -929,15 +925,14 @@ static MACHINE_DRIVER_START( coolpool )
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( 9ballsht )
-	MDRV_IMPORT_FROM(coolpool)
+static MACHINE_CONFIG_DERIVED( 9ballsht, coolpool )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(nballsht_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

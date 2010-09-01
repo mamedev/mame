@@ -106,7 +106,7 @@ static VIDEO_UPDATE( rcorsair )
 	return 0;
 }
 
-static MACHINE_DRIVER_START( rcorsair )
+static MACHINE_CONFIG_START( rcorsair, driver_data_t )
 
 	/* Main CPU is probably inside Custom Block with
        program code, unknown type */
@@ -127,7 +127,7 @@ static MACHINE_DRIVER_START( rcorsair )
 
 	MDRV_VIDEO_START(rcorsair)
 	MDRV_VIDEO_UPDATE(rcorsair)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( rcorsair )
 	ROM_REGION( 0x2000, "maincpu", 0 )

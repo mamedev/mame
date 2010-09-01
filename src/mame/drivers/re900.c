@@ -387,7 +387,7 @@ static const ay8910_interface ay8910_bs94 =
 *      Machine Driver      *
 ***************************/
 
-static MACHINE_DRIVER_START( re900 )
+static MACHINE_CONFIG_START( re900, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8051, MAIN_CLOCK)
@@ -396,7 +396,7 @@ static MACHINE_DRIVER_START( re900 )
 	MDRV_CPU_VBLANK_INT("screen", re900_video_interrupt)
 
 	/* video hardware */
-	MDRV_IMPORT_FROM(tms9928a)
+	MDRV_FRAGMENT_ADD(tms9928a)
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(60)
 
@@ -407,17 +407,15 @@ static MACHINE_DRIVER_START( re900 )
 	MDRV_SOUND_ADD("ay_re900", AY8910, TMS_CLOCK) /* From TMS9128NL - Pin 37 (GROMCLK) */
 	MDRV_SOUND_CONFIG(ay8910_re900)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( bs94 )
-
-	MDRV_IMPORT_FROM(re900)
+static MACHINE_CONFIG_DERIVED( bs94, re900 )
 
 	/* sound hardware   */
 	MDRV_SOUND_MODIFY("ay_re900")
 	MDRV_SOUND_CONFIG(ay8910_bs94)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************

@@ -274,7 +274,7 @@ static PALETTE_INIT( caswin )
 }
 
 
-static MACHINE_DRIVER_START( vvillage )
+static MACHINE_CONFIG_START( vvillage, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,4000000)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(vvillage_mem)
@@ -303,7 +303,7 @@ static MACHINE_DRIVER_START( vvillage )
 	MDRV_SOUND_ADD("aysnd", AY8910, 4000000 / 4)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( caswin )
 	ROM_REGION( 0x8000, "maincpu", 0 )

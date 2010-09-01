@@ -624,10 +624,7 @@ static MACHINE_RESET( lazercmd )
 }
 
 
-static MACHINE_DRIVER_START( lazercmd )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(lazercmd_state)
+static MACHINE_CONFIG_START( lazercmd, lazercmd_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", S2650,MASTER_CLOCK/12)				/* 672 kHz? */
@@ -662,13 +659,10 @@ static MACHINE_DRIVER_START( lazercmd )
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( medlanes )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(lazercmd_state)
+static MACHINE_CONFIG_START( medlanes, lazercmd_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", S2650,MASTER_CLOCK/12)				/* 666 kHz */
@@ -703,13 +697,10 @@ static MACHINE_DRIVER_START( medlanes )
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( bbonk )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(lazercmd_state)
+static MACHINE_CONFIG_START( bbonk, lazercmd_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", S2650,MASTER_CLOCK/12)				/* 666 kHz */
@@ -744,7 +735,7 @@ static MACHINE_DRIVER_START( bbonk )
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

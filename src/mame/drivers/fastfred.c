@@ -616,7 +616,7 @@ GFXDECODE_END
 #define CLOCK 18432000  /* The crystal is 18.432MHz */
 
 
-static MACHINE_DRIVER_START( fastfred )
+static MACHINE_CONFIG_START( fastfred, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CLOCK/6)     /* 3.072 MHz */
@@ -650,12 +650,11 @@ static MACHINE_DRIVER_START( fastfred )
 
 	MDRV_SOUND_ADD("ay8910.2", AY8910, CLOCK/12)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( jumpcoas )
+static MACHINE_CONFIG_DERIVED( jumpcoas, fastfred )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(fastfred)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(jumpcoas_map)
 
@@ -666,12 +665,11 @@ static MACHINE_DRIVER_START( jumpcoas )
 
 	/* sound hardware */
 	MDRV_DEVICE_REMOVE("ay8910.2")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( imago )
+static MACHINE_CONFIG_DERIVED( imago, fastfred )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(fastfred)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(imago_map)
 
@@ -683,7 +681,7 @@ static MACHINE_DRIVER_START( imago )
 
 	MDRV_VIDEO_START(imago)
 	MDRV_VIDEO_UPDATE(imago)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 #undef CLOCK
 

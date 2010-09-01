@@ -2841,7 +2841,7 @@ static const adc083x_interface konami573_adc_interface = {
 	analogue_inputs_callback
 };
 
-static MACHINE_DRIVER_START( konami573 )
+static MACHINE_CONFIG_START( konami573, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",  PSXCPU, XTAL_67_7376MHz )
 	MDRV_CPU_PROGRAM_MAP( konami573_map)
@@ -2879,15 +2879,14 @@ static MACHINE_DRIVER_START( konami573 )
 	MDRV_M48T58_ADD( "m48t58" )
 
 	MDRV_ADC0834_ADD( "adc0834", konami573_adc_interface )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( k573bait )
-	MDRV_IMPORT_FROM(konami573)
+static MACHINE_CONFIG_DERIVED( k573bait, konami573 )
 
 	/* Additional NEC Encoder */
 	MDRV_UPD4701_ADD( "upd4701" )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( konami573 )
 	PORT_START("IN0")

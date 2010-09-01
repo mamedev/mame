@@ -361,10 +361,7 @@ static MACHINE_RESET( bottom9 )
 	state->nmienable = 0;
 }
 
-static MACHINE_DRIVER_START( bottom9 )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(bottom9_state)
+static MACHINE_CONFIG_START( bottom9, bottom9_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 2000000) /* ? */
@@ -409,7 +406,7 @@ static MACHINE_DRIVER_START( bottom9 )
 	MDRV_SOUND_CONFIG(k007232_interface_2)
 	MDRV_SOUND_ROUTE(0, "mono", 0.40)
 	MDRV_SOUND_ROUTE(1, "mono", 0.40)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

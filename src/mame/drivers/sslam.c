@@ -710,9 +710,7 @@ GFXDECODE_END
 
 /* Machine Driver */
 
-static MACHINE_DRIVER_START( sslam )
-
-	MDRV_DRIVER_DATA( sslam_state )
+static MACHINE_CONFIG_START( sslam, sslam_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
@@ -741,11 +739,9 @@ static MACHINE_DRIVER_START( sslam )
 
 	MDRV_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( powerbls )
-
-	MDRV_DRIVER_DATA( sslam_state )
+static MACHINE_CONFIG_START( powerbls, sslam_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
@@ -774,7 +770,7 @@ static MACHINE_DRIVER_START( powerbls )
 
 	MDRV_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)	/* verified on original PCB */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* maybe one dump is bad .. which? -> 2nd set was verified good from 2 pcbs */
 

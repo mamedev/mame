@@ -547,10 +547,7 @@ static const ymf278b_interface fuuki32_ymf278b_interface =
 	irqhandler		/* irq */
 };
 
-static MACHINE_DRIVER_START( fuuki32 )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(fuuki32_state)
+static MACHINE_CONFIG_START( fuuki32, fuuki32_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC020, CPU_CLOCK) /* 20MHz verified */
@@ -586,7 +583,7 @@ static MACHINE_DRIVER_START( fuuki32 )
 	MDRV_SOUND_CONFIG(fuuki32_ymf278b_interface)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

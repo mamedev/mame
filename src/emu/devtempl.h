@@ -170,7 +170,7 @@ DEVICE_GET_INFO( DEVTEMPLATE_ID(,) )
 		case DEVINFO_PTR_ROM_REGION:			info->romregion = DEVTEMPLATE_ID1(ROM_NAME());						break;
 #endif
 #if ((DEVTEMPLATE_FEATURES) & DT_HAS_MACHINE_CONFIG)
-		case DEVINFO_PTR_MACHINE_CONFIG:		info->machine_config = DEVTEMPLATE_ID1(MACHINE_DRIVER_NAME());		break;
+		case DEVINFO_PTR_MACHINE_CONFIG:		info->machine_config = DEVTEMPLATE_ID1(MACHINE_CONFIG_NAME());		break;
 #endif
 #if ((DEVTEMPLATE_FEATURES) & DT_HAS_PROGRAM_SPACE)
 #ifdef DEVTEMPLATE_PGM_INTMAP
@@ -277,7 +277,7 @@ DEVICE_GET_INFO( DEVTEMPLATE_DERIVED_ID(,) )
 		case DEVINFO_PTR_ROM_REGION:			info->romregion = DEVTEMPLATE_DERIVED_ID1(ROM_NAME());						break;
 #endif
 #if ((DEVTEMPLATE_DERIVED_FEATURES) & DT_HAS_MACHINE_CONFIG)
-		case DEVINFO_PTR_MACHINE_CONFIG:		info->machine_config = DEVTEMPLATE_DERIVED_ID1(MACHINE_DRIVER_NAME());		break;
+		case DEVINFO_PTR_MACHINE_CONFIG:		info->machine_config = DEVTEMPLATE_DERIVED_ID1(MACHINE_CONFIG_NAME());		break;
 #endif
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */

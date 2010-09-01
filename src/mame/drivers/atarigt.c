@@ -790,8 +790,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( atarigt )
-	MDRV_DRIVER_DATA(atarigt_state)
+static MACHINE_CONFIG_START( atarigt, atarigt_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC020, ATARI_CLOCK_50MHz/2)
@@ -819,8 +818,8 @@ static MACHINE_DRIVER_START( atarigt )
 	MDRV_VIDEO_UPDATE(atarigt)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(cage)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(cage)
+MACHINE_CONFIG_END
 
 
 

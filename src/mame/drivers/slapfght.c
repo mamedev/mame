@@ -743,7 +743,7 @@ static VIDEO_EOF( perfrman )
 	buffer_spriteram_w(space, 0, 0);
 }
 
-static MACHINE_DRIVER_START( perfrman )
+static MACHINE_CONFIG_START( perfrman, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,16000000/4)			/* 4MHz ???, 16MHz Oscillator */
@@ -787,10 +787,10 @@ static MACHINE_DRIVER_START( perfrman )
 	MDRV_SOUND_ADD("ay2", AY8910, 16000000/8)
 	MDRV_SOUND_CONFIG(ay8910_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( tigerhb )
+static MACHINE_CONFIG_START( tigerhb, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 6000000)
@@ -834,9 +834,9 @@ static MACHINE_DRIVER_START( tigerhb )
 	MDRV_SOUND_ADD("ay2", AY8910, 1500000)
 	MDRV_SOUND_CONFIG(ay8910_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( tigerh )
+static MACHINE_CONFIG_START( tigerh, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_36MHz/6) /* verified on pcb */
@@ -883,10 +883,10 @@ static MACHINE_DRIVER_START( tigerh )
 	MDRV_SOUND_ADD("ay2", AY8910, XTAL_36MHz/24) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ay8910_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( slapfigh )
+static MACHINE_CONFIG_START( slapfigh, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80, XTAL_36MHz/6) /* verified on pcb */
@@ -933,27 +933,25 @@ static MACHINE_DRIVER_START( slapfigh )
 	MDRV_SOUND_ADD("ay2", AY8910, XTAL_36MHz/24) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ay8910_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( slapfighb1 )
+static MACHINE_CONFIG_DERIVED( slapfighb1, slapfigh )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(slapfigh)
 
 	MDRV_DEVICE_REMOVE("mcu")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* identical to slapfigh_ but the scroll registers are located elsewhere in memory */
-static MACHINE_DRIVER_START( slapfighb2 )
+static MACHINE_CONFIG_DERIVED( slapfighb2, slapfigh )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(slapfigh)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(slapfighb2_map)
 
 	MDRV_DEVICE_REMOVE("mcu")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( perfrman )

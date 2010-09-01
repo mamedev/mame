@@ -475,7 +475,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( galsnew )
+static MACHINE_CONFIG_START( galsnew, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
@@ -509,19 +509,18 @@ static MACHINE_DRIVER_START( galsnew )
 	MDRV_OKIM6295_ADD("oki", 12000000/6, OKIM6295_PIN7_LOW)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( fantasia )
+static MACHINE_CONFIG_DERIVED( fantasia, galsnew )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM( galsnew )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(fantasia_map)
 
 	MDRV_WATCHDOG_TIME_INIT(SEC(0))	/* a guess, and certainly wrong */
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*************************************
  *

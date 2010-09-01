@@ -102,7 +102,7 @@ static const powerpc_config ppc603e_config =
 };
 
 
-static MACHINE_DRIVER_START( taitotz )
+static MACHINE_CONFIG_START( taitotz, driver_data_t )
 	MDRV_CPU_ADD("maincpu", PPC603E, 100000000)
 	MDRV_CPU_CONFIG(ppc603e_config)
 	MDRV_CPU_PROGRAM_MAP(ppc603e_mem)
@@ -119,7 +119,7 @@ static MACHINE_DRIVER_START( taitotz )
 
 	MDRV_VIDEO_START(taitotz)
 	MDRV_VIDEO_UPDATE(taitotz)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 #define TAITOTZ_BIOS	\
 	ROM_LOAD32_WORD_SWAP( "e68-05-1.ic6", 0x000000, 0x080000, CRC(6ad9b006) SHA1(f05a0ae26b6abaeda9c7944aee96c72b08fff7a5) )	\

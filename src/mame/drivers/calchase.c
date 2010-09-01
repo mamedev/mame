@@ -648,7 +648,7 @@ static void calchase_set_keyb_int(running_machine *machine, int state) {
 }
 
 
-static MACHINE_DRIVER_START( calchase )
+static MACHINE_CONFIG_START( calchase, driver_data_t )
 	MDRV_CPU_ADD("maincpu", PENTIUM, 200000000) // Cyrix 686MX-PR200 CPU
 	MDRV_CPU_PROGRAM_MAP(calchase_map)
 	MDRV_CPU_IO_MAP(calchase_io)
@@ -679,7 +679,7 @@ static MACHINE_DRIVER_START( calchase )
 
 	MDRV_VIDEO_START(calchase)
 	MDRV_VIDEO_UPDATE(calchase)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static DRIVER_INIT( calchase )
 {

@@ -133,11 +133,11 @@ static ADDRESS_MAP_START( vp931_portmap, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
-static MACHINE_DRIVER_START( vp931 )
+static MACHINE_CONFIG_FRAGMENT( vp931 )
 	MDRV_CPU_ADD("vp931", I8049, XTAL_11MHz)
 	MDRV_CPU_IO_MAP(vp931_portmap)
 	MDRV_TIMER_ADD("tracktimer", track_timer)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( vp931 )
@@ -157,7 +157,7 @@ const ldplayer_interface vp931_interface =
 	sizeof(ldplayer_data),						/* size of the state */
 	"Phillips 22VP931",							/* name of the player */
 	ROM_NAME(vp931),							/* pointer to ROM region information */
-	MACHINE_DRIVER_NAME(vp931),					/* pointer to machine configuration */
+	MACHINE_CONFIG_NAME(vp931),					/* pointer to machine configuration */
 	vp931_init,									/* initialization callback */
 	vp931_vsync,								/* vsync callback */
 	vp931_update,								/* update callback */

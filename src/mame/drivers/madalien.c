@@ -172,7 +172,7 @@ static const ay8910_interface ay8910_config =
 };
 
 
-static MACHINE_DRIVER_START( madalien )
+static MACHINE_CONFIG_START( madalien, driver_data_t )
 
 	/* main CPU */
 	MDRV_CPU_ADD("maincpu", M6502, MADALIEN_MAIN_CLOCK / 8)    /* 1324kHz */
@@ -183,7 +183,7 @@ static MACHINE_DRIVER_START( madalien )
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	/* video hardware */
-	MDRV_IMPORT_FROM(madalien_video)
+	MDRV_FRAGMENT_ADD(madalien_video)
 
 	/* audio hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -198,7 +198,7 @@ static MACHINE_DRIVER_START( madalien )
 	MDRV_SOUND_CONFIG_DISCRETE(madalien)
 
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( madalien )

@@ -390,7 +390,7 @@ static const namco_interface namco_config =
 
 
 
-static MACHINE_DRIVER_START( baraduke )
+static MACHINE_CONFIG_START( baraduke, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809,49152000/32)
@@ -425,7 +425,7 @@ static MACHINE_DRIVER_START( baraduke )
 	MDRV_SOUND_ADD("namco", NAMCO_CUS30, 49152000/2048)
 	MDRV_SOUND_CONFIG(namco_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

@@ -700,7 +700,7 @@ static const ay8910_interface buggybjr_ym2149_interface_2 =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( tx1 )
+static MACHINE_CONFIG_START( tx1, driver_data_t )
 	MDRV_CPU_ADD("main_cpu", I8086, CPU_MASTER_CLOCK / 3)
 	MDRV_CPU_PROGRAM_MAP(tx1_main)
 //  MDRV_WATCHDOG_TIME_INIT(5)
@@ -750,10 +750,10 @@ static MACHINE_DRIVER_START( tx1 )
 	MDRV_SOUND_ADD("tx1", TX1, 0)
 	MDRV_SOUND_ROUTE(0, "frontleft", 0.2)
 	MDRV_SOUND_ROUTE(1, "frontright", 0.2)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( buggyboy )
+static MACHINE_CONFIG_START( buggyboy, driver_data_t )
 	MDRV_CPU_ADD("main_cpu", I8086, CPU_MASTER_CLOCK / 3)
 	MDRV_CPU_PROGRAM_MAP(buggyboy_main)
 //  MDRV_WATCHDOG_TIME_INIT(5)
@@ -805,10 +805,10 @@ static MACHINE_DRIVER_START( buggyboy )
 	MDRV_SOUND_ADD("buggyboy", BUGGYBOY, 0)
 	MDRV_SOUND_ROUTE(0, "frontleft", 0.2)
 	MDRV_SOUND_ROUTE(1, "frontright", 0.2)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( buggybjr )
+static MACHINE_CONFIG_START( buggybjr, driver_data_t )
 	MDRV_CPU_ADD("main_cpu", I8086, CPU_MASTER_CLOCK / 3)
 	MDRV_CPU_PROGRAM_MAP(buggybjr_main)
 //  MDRV_WATCHDOG_TIME_INIT(5)
@@ -849,7 +849,7 @@ static MACHINE_DRIVER_START( buggybjr )
 	MDRV_SOUND_ADD("buggyboy", BUGGYBOY, 0)
 	MDRV_SOUND_ROUTE(0, "frontleft", 0.2)
 	MDRV_SOUND_ROUTE(1, "frontright", 0.2)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************************

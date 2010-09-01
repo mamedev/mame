@@ -503,7 +503,7 @@ static MACHINE_RESET( skimaxx )
  *
  *************************************/
 
-static MACHINE_DRIVER_START( skimaxx )
+static MACHINE_CONFIG_START( skimaxx, driver_data_t )
 	MDRV_CPU_ADD("maincpu", M68EC030, XTAL_40MHz)
 	MDRV_CPU_PROGRAM_MAP(68030_1_map)
 	MDRV_CPU_VBLANK_INT("screen", irq3_line_hold)	// 1,3,7 are identical, rest is RTE
@@ -549,7 +549,7 @@ static MACHINE_DRIVER_START( skimaxx )
 
 	MDRV_OKIM6295_ADD("oki4", XTAL_4MHz/2, OKIM6295_PIN7_HIGH)	// ?
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************************

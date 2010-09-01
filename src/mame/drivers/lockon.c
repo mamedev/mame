@@ -517,10 +517,7 @@ static MACHINE_RESET( lockon )
 	state->main_inten = 0;
 }
 
-static MACHINE_DRIVER_START( lockon )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(lockon_state)
+static MACHINE_CONFIG_START( lockon, lockon_state )
 
 	MDRV_CPU_ADD("maincpu", V30, XTAL_16MHz / 2)
 	MDRV_CPU_PROGRAM_MAP(main_v30)
@@ -580,7 +577,7 @@ static MACHINE_DRIVER_START( lockon )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ADD("f2203.3r", FILTER_VOLUME, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************************

@@ -117,7 +117,7 @@ static GFXDECODE_START( gomoku )
 GFXDECODE_END
 
 
-static MACHINE_DRIVER_START( gomoku )
+static MACHINE_CONFIG_START( gomoku, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/12)		 /* 1.536 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(gomoku_map)
@@ -143,7 +143,7 @@ static MACHINE_DRIVER_START( gomoku )
 
 	MDRV_SOUND_ADD("gomoku", GOMOKU, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( gomoku )

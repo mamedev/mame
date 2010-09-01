@@ -597,10 +597,7 @@ static MACHINE_RESET( champbas )
 }
 
 
-static MACHINE_DRIVER_START( talbot )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(champbas_state)
+static MACHINE_CONFIG_START( talbot, champbas_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)
@@ -633,13 +630,10 @@ static MACHINE_DRIVER_START( talbot )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("aysnd", AY8910, XTAL_18_432MHz/12)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( champbas )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(champbas_state)
+static MACHINE_CONFIG_START( champbas, champbas_state )
 
 	/* basic machine hardware */
 	/* main cpu */
@@ -676,12 +670,12 @@ static MACHINE_DRIVER_START( champbas )
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( champmcu )
+static MACHINE_CONFIG_DERIVED( champmcu, champbas )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(champbas)
 
 	/* MCU */
 	MDRV_CPU_ADD(CPUTAG_MCU, ALPHA8201, XTAL_18_432MHz/6/8)
@@ -689,13 +683,10 @@ static MACHINE_DRIVER_START( champmcu )
 
 	/* to MCU timeout champbbj */
 	MDRV_QUANTUM_TIME(HZ(3000))
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( exctsccr )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(champbas_state)
+static MACHINE_CONFIG_START( exctsccr, champbas_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6 )
@@ -750,13 +741,10 @@ static MACHINE_DRIVER_START( exctsccr )
 
 	MDRV_SOUND_ADD("dac2", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* Bootleg running on a modified Champion Baseball board */
-static MACHINE_DRIVER_START( exctsccrb )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(champbas_state)
+static MACHINE_CONFIG_START( exctsccrb, champbas_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)
@@ -792,7 +780,7 @@ static MACHINE_DRIVER_START( exctsccrb )
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

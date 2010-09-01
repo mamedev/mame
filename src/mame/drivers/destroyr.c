@@ -448,10 +448,7 @@ static MACHINE_START( destroyr )
 	state_save_register_global_array(machine, state->potsense);
 }
 
-static MACHINE_DRIVER_START( destroyr )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(destroyr_state)
+static MACHINE_CONFIG_START( destroyr, destroyr_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6800, XTAL_12_096MHz / 16)
@@ -474,7 +471,7 @@ static MACHINE_DRIVER_START( destroyr )
 	MDRV_VIDEO_UPDATE(destroyr)
 
 	/* sound hardware */
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( destroyr )

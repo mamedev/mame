@@ -909,9 +909,7 @@ static const tc0140syt_interface taitox_tc0140syt_intf =
 
 /**************************************************************************/
 
-static MACHINE_DRIVER_START( superman )
-
-	MDRV_DRIVER_DATA( seta_state )
+static MACHINE_CONFIG_START( superman, seta_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)	/* verified on pcb */
@@ -951,11 +949,9 @@ static MACHINE_DRIVER_START( superman )
 	MDRV_SOUND_ROUTE(2, "rspeaker", 1.0)
 
 	MDRV_TC0140SYT_ADD("tc0140syt", taitox_tc0140syt_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( daisenpu )
-
-	MDRV_DRIVER_DATA( seta_state )
+static MACHINE_CONFIG_START( daisenpu, seta_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)	/* verified on pcb */
@@ -992,11 +988,9 @@ static MACHINE_DRIVER_START( daisenpu )
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.45)
 
 	MDRV_TC0140SYT_ADD("tc0140syt", taitox_tc0140syt_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( gigandes )
-
-	MDRV_DRIVER_DATA( seta_state )
+static MACHINE_CONFIG_START( gigandes, seta_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)	/* 8 MHz? */
@@ -1035,11 +1029,9 @@ static MACHINE_DRIVER_START( gigandes )
 	MDRV_SOUND_ROUTE(2, "rspeaker", 1.0)
 
 	MDRV_TC0140SYT_ADD("tc0140syt", taitox_tc0140syt_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( ballbros )
-
-	MDRV_DRIVER_DATA( seta_state )
+static MACHINE_CONFIG_START( ballbros, seta_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)	/* 8 MHz? */
@@ -1078,7 +1070,7 @@ static MACHINE_DRIVER_START( ballbros )
 	MDRV_SOUND_ROUTE(2, "rspeaker", 1.0)
 
 	MDRV_TC0140SYT_ADD("tc0140syt", taitox_tc0140syt_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

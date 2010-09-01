@@ -271,7 +271,7 @@ static const es5505_interface es5505_taito_f3_config =
 	NULL /* irq */
 };
 
-MACHINE_DRIVER_START( taito_f3_sound )
+MACHINE_CONFIG_FRAGMENT( taito_f3_sound )
 	MDRV_TIMER_ADD("timer_68681", taito_en_timer_callback)
 
 	MDRV_SOUND_RESET( taito_f3_soundsystem_reset )
@@ -284,4 +284,4 @@ MACHINE_DRIVER_START( taito_f3_sound )
 	MDRV_SOUND_CONFIG(es5505_taito_f3_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END

@@ -163,9 +163,7 @@ static MACHINE_RESET( 4enraya )
 	state->last_snd_ctrl = 0;
 }
 
-static MACHINE_DRIVER_START( 4enraya )
-
-	MDRV_DRIVER_DATA(_4enraya_state)
+static MACHINE_CONFIG_START( 4enraya, _4enraya_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80,8000000/2)
@@ -193,7 +191,7 @@ static MACHINE_DRIVER_START( 4enraya )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("aysnd", AY8910, 8000000/4 /* guess */)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

@@ -826,9 +826,7 @@ static MACHINE_RESET( liberate )
 	state->bank = 0;
 }
 
-static MACHINE_DRIVER_START( liberate )
-
-	MDRV_DRIVER_DATA(liberate_state)
+static MACHINE_CONFIG_START( liberate, liberate_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",DECO16, 2000000)
@@ -868,27 +866,23 @@ static MACHINE_DRIVER_START( liberate )
 
 	MDRV_SOUND_ADD("ay2", AY8910, 1500000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( liberatb )
-	MDRV_IMPORT_FROM(liberate)
+static MACHINE_CONFIG_DERIVED( liberatb, liberate )
 
 	/* basic machine hardware */
 	MDRV_CPU_REPLACE("maincpu", M6502, 2000000)
 	MDRV_CPU_PROGRAM_MAP(liberatb_map)
 	MDRV_CPU_VBLANK_INT("screen", deco16_interrupt)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( boomrang )
-	MDRV_IMPORT_FROM(liberate)
+static MACHINE_CONFIG_DERIVED( boomrang, liberate )
 
 	MDRV_VIDEO_START(boomrang)
 	MDRV_VIDEO_UPDATE(boomrang)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( prosoccr )
-
-	MDRV_IMPORT_FROM(liberate)
+static MACHINE_CONFIG_DERIVED( prosoccr, liberate )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
@@ -909,11 +903,9 @@ static MACHINE_DRIVER_START( prosoccr )
 
 	MDRV_VIDEO_START(prosoccr)
 	MDRV_VIDEO_UPDATE(prosoccr)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( prosport )
-
-	MDRV_DRIVER_DATA(liberate_state)
+static MACHINE_CONFIG_START( prosport, liberate_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", DECO16, 2000000)
@@ -952,7 +944,7 @@ static MACHINE_DRIVER_START( prosport )
 
 	MDRV_SOUND_ADD("ay2", AY8910, 1500000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************************

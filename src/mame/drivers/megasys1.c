@@ -1454,7 +1454,7 @@ static const ym2151_interface ym2151_config =
 	megasys1_sound_irq
 };
 
-static MACHINE_DRIVER_START( system_A )
+static MACHINE_CONFIG_START( system_A, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, SYS_A_CPU_CLOCK) /* 6MHz verified */
@@ -1499,17 +1499,15 @@ static MACHINE_DRIVER_START( system_A )
 	MDRV_OKIM6295_ADD("oki2", OKI4_SOUND_CLOCK, OKIM6295_PIN7_HIGH) /* 4MHz verified */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( system_A_hachoo )
-	MDRV_IMPORT_FROM(system_A)
+static MACHINE_CONFIG_DERIVED( system_A_hachoo, system_A )
 	MDRV_MACHINE_RESET(megasys1_hachoo)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( system_B )
+static MACHINE_CONFIG_DERIVED( system_B, system_A )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(system_A)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_CLOCK(SYS_B_CPU_CLOCK) /* 8MHz */
@@ -1518,10 +1516,10 @@ static MACHINE_DRIVER_START( system_B )
 
 	MDRV_CPU_MODIFY("soundcpu")
 	MDRV_CPU_PROGRAM_MAP(megasys1B_sound_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( system_Bbl )
+static MACHINE_CONFIG_START( system_Bbl, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, SYS_B_CPU_CLOCK)
@@ -1553,12 +1551,11 @@ static MACHINE_DRIVER_START( system_Bbl )
 	MDRV_OKIM6295_ADD("oki1", OKI4_SOUND_CLOCK, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( system_B_hayaosi1 )
+static MACHINE_CONFIG_DERIVED( system_B_hayaosi1, system_B )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(system_B)
 
 	MDRV_OKIM6295_REPLACE("oki1", 2000000, OKIM6295_PIN7_HIGH) /* correct speed, but unknown OSC + divider combo */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
@@ -1567,13 +1564,12 @@ static MACHINE_DRIVER_START( system_B_hayaosi1 )
 	MDRV_OKIM6295_REPLACE("oki2", 2000000, OKIM6295_PIN7_HIGH) /* correct speed, but unknown OSC + divider combo */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( system_C )
+static MACHINE_CONFIG_DERIVED( system_C, system_A )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(system_A)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_CLOCK(SYS_C_CPU_CLOCK) /* 12MHz */
 	MDRV_CPU_PROGRAM_MAP(megasys1C_map)
@@ -1581,7 +1577,7 @@ static MACHINE_DRIVER_START( system_C )
 
 	MDRV_CPU_MODIFY("soundcpu")
 	MDRV_CPU_PROGRAM_MAP(megasys1B_sound_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
@@ -1595,7 +1591,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 
-static MACHINE_DRIVER_START( system_D )
+static MACHINE_CONFIG_START( system_D, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, SYS_D_CPU_CLOCK)	/* 8MHz */
@@ -1625,7 +1621,7 @@ static MACHINE_DRIVER_START( system_D )
 
 	MDRV_OKIM6295_ADD("oki1", SYS_D_CPU_CLOCK/4, OKIM6295_PIN7_HIGH)	/* 2MHz (8MHz / 4) */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -1657,7 +1653,7 @@ static const ym2203_interface ym2203_config =
 	irq_handler
 };
 
-static MACHINE_DRIVER_START( system_Z )
+static MACHINE_CONFIG_START( system_Z, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, SYS_A_CPU_CLOCK) /* 6MHz (12MHz / 2) */
@@ -1688,7 +1684,7 @@ static MACHINE_DRIVER_START( system_Z )
 	MDRV_SOUND_ADD("ymsnd", YM2203, 1500000)
 	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************************

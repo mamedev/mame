@@ -493,7 +493,7 @@ static const cubeqst_lin_config lin_config =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( cubeqst )
+static MACHINE_CONFIG_START( cubeqst, driver_data_t )
 	MDRV_CPU_ADD("main_cpu", M68000, XTAL_16MHz / 2)
 	MDRV_CPU_PROGRAM_MAP(m68k_program_map)
 	MDRV_CPU_VBLANK_INT("screen", vblank)
@@ -565,7 +565,7 @@ static MACHINE_DRIVER_START( cubeqst )
 	MDRV_SOUND_ROUTE(0, "rspeaker", 0.125)
 	MDRV_SOUND_ADD("ldac7", DAC, 0)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.125)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************************

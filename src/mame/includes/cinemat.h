@@ -14,22 +14,22 @@ MACHINE_RESET( cinemat );
 
 WRITE8_HANDLER( cinemat_sound_control_w );
 
-MACHINE_DRIVER_EXTERN( spacewar_sound );
-MACHINE_DRIVER_EXTERN( barrier_sound );
-MACHINE_DRIVER_EXTERN( speedfrk_sound );
-MACHINE_DRIVER_EXTERN( starhawk_sound );
-MACHINE_DRIVER_EXTERN( sundance_sound );
-MACHINE_DRIVER_EXTERN( tailg_sound );
-MACHINE_DRIVER_EXTERN( warrior_sound );
-MACHINE_DRIVER_EXTERN( armora_sound );
-MACHINE_DRIVER_EXTERN( ripoff_sound );
-MACHINE_DRIVER_EXTERN( starcas_sound );
-MACHINE_DRIVER_EXTERN( solarq_sound );
-MACHINE_DRIVER_EXTERN( boxingb_sound );
-MACHINE_DRIVER_EXTERN( wotw_sound );
-MACHINE_DRIVER_EXTERN( wotwc_sound );
-MACHINE_DRIVER_EXTERN( demon_sound );
-MACHINE_DRIVER_EXTERN( qb3_sound );
+MACHINE_CONFIG_EXTERN( spacewar_sound );
+MACHINE_CONFIG_EXTERN( barrier_sound );
+MACHINE_CONFIG_EXTERN( speedfrk_sound );
+MACHINE_CONFIG_EXTERN( starhawk_sound );
+MACHINE_CONFIG_EXTERN( sundance_sound );
+MACHINE_CONFIG_EXTERN( tailg_sound );
+MACHINE_CONFIG_EXTERN( warrior_sound );
+MACHINE_CONFIG_EXTERN( armora_sound );
+MACHINE_CONFIG_EXTERN( ripoff_sound );
+MACHINE_CONFIG_EXTERN( starcas_sound );
+MACHINE_CONFIG_EXTERN( solarq_sound );
+MACHINE_CONFIG_EXTERN( boxingb_sound );
+MACHINE_CONFIG_EXTERN( wotw_sound );
+MACHINE_CONFIG_EXTERN( wotwc_sound );
+MACHINE_CONFIG_EXTERN( demon_sound );
+MACHINE_CONFIG_EXTERN( qb3_sound );
 
 
 /*----------- defined in video/cinemat.c -----------*/

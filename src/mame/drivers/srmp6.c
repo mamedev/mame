@@ -665,9 +665,7 @@ static INTERRUPT_GEN(srmp6_interrupt)
 		cpu_set_input_line(device,4,HOLD_LINE);
 }
 
-static MACHINE_DRIVER_START( srmp6 )
-
-	MDRV_DRIVER_DATA( srmp6_state )
+static MACHINE_CONFIG_START( srmp6, srmp6_state )
 
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(srmp6)
@@ -692,7 +690,7 @@ static MACHINE_DRIVER_START( srmp6 )
 	MDRV_SOUND_ADD("nile", NILE, 0)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

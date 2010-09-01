@@ -252,10 +252,7 @@ static MACHINE_RESET( formatz )
 	state->sy = 0;
 }
 
-static MACHINE_DRIVER_START( formatz )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(aeroboto_state)
+static MACHINE_CONFIG_START( formatz, aeroboto_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, XTAL_10MHz/8) /* verified on pcb */
@@ -294,7 +291,7 @@ static MACHINE_DRIVER_START( formatz )
 
 	MDRV_SOUND_ADD("ay2", AY8910, XTAL_10MHz/16) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

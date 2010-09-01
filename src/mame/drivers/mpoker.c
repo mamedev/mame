@@ -559,7 +559,7 @@ static GFXDECODE_START( mpoker )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles16x16_layout, 0, 0x100 )
 GFXDECODE_END
 
-static MACHINE_DRIVER_START( mpoker )
+static MACHINE_CONFIG_START( mpoker, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,MASTER_CLOCK/6)		 /* 3 MHz? */
 	MDRV_CPU_PROGRAM_MAP(main_map)
@@ -586,7 +586,7 @@ static MACHINE_DRIVER_START( mpoker )
 //  MDRV_SPEAKER_STANDARD_MONO("mono")
 //  MDRV_SOUND_ADD("dac", DAC, 0)
 //  MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( mpoker )
 	ROM_REGION( 0x3000, "maincpu", 0 )

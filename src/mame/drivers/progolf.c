@@ -425,7 +425,7 @@ static PALETTE_INIT( progolf )
 	}
 }
 
-static MACHINE_DRIVER_START( progolf )
+static MACHINE_CONFIG_START( progolf, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 3000000/2) /* guess, 3 Mhz makes the game to behave worse? */
 	MDRV_CPU_PROGRAM_MAP(main_cpu)
@@ -460,7 +460,7 @@ static MACHINE_DRIVER_START( progolf )
 
 	MDRV_SOUND_ADD("ay2", AY8910, 12000000/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( progolf )

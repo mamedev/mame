@@ -1240,7 +1240,7 @@ INPUT_PORTS_END
 // machine driver for scorpion1 board ///////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 
-static MACHINE_DRIVER_START( scorpion1 )
+static MACHINE_CONFIG_START( scorpion1, driver_data_t )
 	MDRV_MACHINE_RESET(bfm_sc1)							// main scorpion1 board initialisation
 	MDRV_CPU_ADD("maincpu", M6809, MASTER_CLOCK/4)			// 6809 CPU at 1 Mhz
 	MDRV_CPU_PROGRAM_MAP(memmap)						// setup read and write memorymap
@@ -1252,14 +1252,13 @@ static MACHINE_DRIVER_START( scorpion1 )
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 	MDRV_DEFAULT_LAYOUT(layout_awpvid14)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /////////////////////////////////////////////////////////////////////////////////////
 // machine driver for scorpion1 board + adder2 extension ////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 
-static MACHINE_DRIVER_START( scorpion1_adder2 )
-	MDRV_IMPORT_FROM( scorpion1 )
+static MACHINE_CONFIG_DERIVED( scorpion1_adder2, scorpion1 )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(memmap_adder2)				// setup read and write memorymap
@@ -1283,20 +1282,19 @@ static MACHINE_DRIVER_START( scorpion1_adder2 )
 	MDRV_CPU_ADD("adder2", M6809, ADDER_CLOCK/4 )		// adder2 board 6809 CPU at 2 Mhz
 	MDRV_CPU_PROGRAM_MAP(adder2_memmap)				// setup adder2 board memorymap
 	MDRV_CPU_VBLANK_INT("adder",adder2_vbl)				// board has a VBL IRQ
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /////////////////////////////////////////////////////////////////////////////////////
 // machine driver for scorpion1 board ///////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 
-static MACHINE_DRIVER_START( scorpion1_nec_uk )
-	MDRV_IMPORT_FROM( scorpion1 )
+static MACHINE_CONFIG_DERIVED( scorpion1_nec_uk, scorpion1 )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(sc1_nec_uk)					// setup read and write memorymap
 
 	MDRV_SOUND_ADD("upd",UPD7759, UPD7759_STANDARD_CLOCK)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 // ROM definition ///////////////////////////////////////////////////////////////////
 

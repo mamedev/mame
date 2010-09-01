@@ -274,8 +274,7 @@ static GFXDECODE_START( good )
 GFXDECODE_END
 
 
-static MACHINE_DRIVER_START( good )
-	MDRV_DRIVER_DATA(good_state)
+static MACHINE_CONFIG_START( good, good_state )
 
 	MDRV_CPU_ADD("maincpu", M68000, 16000000 /2)
 	MDRV_CPU_PROGRAM_MAP(good_map)
@@ -300,7 +299,7 @@ static MACHINE_DRIVER_START( good )
 	MDRV_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.47)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( good )

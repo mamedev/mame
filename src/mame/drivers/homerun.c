@@ -218,10 +218,7 @@ static MACHINE_RESET( homerun )
 	state->xpc = 0;
 }
 
-static MACHINE_DRIVER_START( homerun )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(homerun_state)
+static MACHINE_CONFIG_START( homerun, homerun_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 5000000)
@@ -254,7 +251,7 @@ static MACHINE_DRIVER_START( homerun )
 	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*

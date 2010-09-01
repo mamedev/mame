@@ -157,7 +157,7 @@ static PALETTE_INIT( eolith16 )
 
 
 
-static MACHINE_DRIVER_START( eolith16 )
+static MACHINE_CONFIG_START( eolith16, driver_data_t )
 	MDRV_CPU_ADD("maincpu", E116T, 60000000)		/* no internal multiplier */
 	MDRV_CPU_PROGRAM_MAP(eolith16_map)
 	MDRV_CPU_VBLANK_INT_HACK(eolith_speedup,262)
@@ -183,7 +183,7 @@ static MACHINE_DRIVER_START( eolith16 )
 	MDRV_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*
 

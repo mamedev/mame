@@ -235,10 +235,7 @@ static MACHINE_RESET( dynadice )
 	state->ay_data = 0;
 }
 
-static MACHINE_DRIVER_START( dynadice )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(dynadice_state)
+static MACHINE_CONFIG_START( dynadice, dynadice_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8080,18432000/8)
@@ -273,7 +270,7 @@ static MACHINE_DRIVER_START( dynadice )
 
 	MDRV_SOUND_ADD("aysnd", AY8910, 2000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( dynadice )
 	ROM_REGION( 0x10000, "maincpu", 0 )

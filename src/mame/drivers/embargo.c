@@ -254,10 +254,7 @@ static MACHINE_RESET( embargo )
  *
  *************************************/
 
-static MACHINE_DRIVER_START( embargo )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(embargo_state)
+static MACHINE_CONFIG_START( embargo, embargo_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", S2650, 625000)
@@ -276,7 +273,7 @@ static MACHINE_DRIVER_START( embargo )
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 0, 239)
 	MDRV_SCREEN_REFRESH_RATE(60)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

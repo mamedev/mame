@@ -2852,7 +2852,7 @@ static MACHINE_RESET( stv )
 }
 
 
-static MACHINE_DRIVER_START( stv )
+static MACHINE_CONFIG_START( stv, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz
@@ -2896,7 +2896,7 @@ static MACHINE_DRIVER_START( stv )
 	MDRV_SOUND_CONFIG(scsp_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
 		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(bios+1)) /* Note '+1' */

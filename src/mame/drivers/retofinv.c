@@ -336,7 +336,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_DRIVER_START( retofinv )
+static MACHINE_CONFIG_START( retofinv, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 18432000/6)	/* 3.072 MHz? */
@@ -379,16 +379,14 @@ static MACHINE_DRIVER_START( retofinv )
 
 	MDRV_SOUND_ADD("sn2", SN76496, 18432000/6)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* bootleg has no mcu */
-static MACHINE_DRIVER_START( retofinb )
-
-	MDRV_IMPORT_FROM(retofinv)
+static MACHINE_CONFIG_DERIVED( retofinb, retofinv )
 	MDRV_DEVICE_REMOVE("68705")
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

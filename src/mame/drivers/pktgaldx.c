@@ -318,10 +318,7 @@ static MACHINE_START( pktgaldx )
 	state->deco16ic = machine->device("deco_custom");
 }
 
-static MACHINE_DRIVER_START( pktgaldx )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(pktgaldx_state)
+static MACHINE_CONFIG_START( pktgaldx, pktgaldx_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 14000000)
@@ -355,13 +352,10 @@ static MACHINE_DRIVER_START( pktgaldx )
 	MDRV_OKIM6295_ADD("oki2", 32220000/16, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( pktgaldb )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(pktgaldx_state)
+static MACHINE_CONFIG_START( pktgaldb, pktgaldx_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
@@ -393,7 +387,7 @@ static MACHINE_DRIVER_START( pktgaldb )
 	MDRV_OKIM6295_ADD("oki2", 32220000/16, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( pktgaldx )

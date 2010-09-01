@@ -3444,7 +3444,7 @@ static GFXDECODE_START( igs011_hi )
 GFXDECODE_END
 #endif
 
-static MACHINE_DRIVER_START( igs011_base )
+static MACHINE_CONFIG_START( igs011_base, driver_data_t )
 	MDRV_CPU_ADD("maincpu",M68000, XTAL_22MHz/3)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
@@ -3467,7 +3467,7 @@ static MACHINE_DRIVER_START( igs011_base )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_OKIM6295_ADD("oki", XTAL_22MHz/21, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static INTERRUPT_GEN( drgnwrld_interrupt )
 {
@@ -3479,21 +3479,19 @@ static INTERRUPT_GEN( drgnwrld_interrupt )
 	}
 }
 
-static MACHINE_DRIVER_START( drgnwrld )
-	MDRV_IMPORT_FROM(igs011_base)
+static MACHINE_CONFIG_DERIVED( drgnwrld, igs011_base )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(drgnwrld)
 	MDRV_CPU_VBLANK_INT_HACK(drgnwrld_interrupt,1+4)	// lev5 frequency drives the music tempo
 
 	MDRV_SOUND_ADD("ymsnd", YM3812, 3579545)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( drgnwrld_igs012 )
-	MDRV_IMPORT_FROM(drgnwrld)
+static MACHINE_CONFIG_DERIVED( drgnwrld_igs012, drgnwrld )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(drgnwrld_igs012)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -3512,12 +3510,11 @@ static INTERRUPT_GEN( lhb_interrupt )
 	}
 }
 
-static MACHINE_DRIVER_START( lhb )
-	MDRV_IMPORT_FROM(igs011_base)
+static MACHINE_CONFIG_DERIVED( lhb, igs011_base )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(lhb)
 	MDRV_CPU_VBLANK_INT_HACK(lhb_interrupt,3+1)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -3530,26 +3527,23 @@ static INTERRUPT_GEN( wlcc_interrupt )
 	}
 }
 
-static MACHINE_DRIVER_START( wlcc )
-	MDRV_IMPORT_FROM(igs011_base)
+static MACHINE_CONFIG_DERIVED( wlcc, igs011_base )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(wlcc)
 	MDRV_CPU_VBLANK_INT_HACK(wlcc_interrupt,2)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
-static MACHINE_DRIVER_START( xymg )
-	MDRV_IMPORT_FROM(igs011_base)
+static MACHINE_CONFIG_DERIVED( xymg, igs011_base )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(xymg)
 	MDRV_CPU_VBLANK_INT_HACK(wlcc_interrupt,2)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
-static MACHINE_DRIVER_START( lhb2 )
-	MDRV_IMPORT_FROM(igs011_base)
+static MACHINE_CONFIG_DERIVED( lhb2, igs011_base )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(lhb2)
 	MDRV_CPU_VBLANK_INT_HACK(drgnwrld_interrupt,1+4)	// lev5 frequency drives the music tempo
@@ -3558,7 +3552,7 @@ static MACHINE_DRIVER_START( lhb2 )
 
 	MDRV_SOUND_ADD("ymsnd", YM2413, 3579545)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -3583,8 +3577,7 @@ static INTERRUPT_GEN( vbowl_interrupt )
 	}
 }
 
-static MACHINE_DRIVER_START( vbowl )
-	MDRV_IMPORT_FROM(igs011_base)
+static MACHINE_CONFIG_DERIVED( vbowl, igs011_base )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(vbowl)
 	MDRV_CPU_VBLANK_INT_HACK(vbowl_interrupt,3+4)
@@ -3596,7 +3589,7 @@ static MACHINE_DRIVER_START( vbowl )
 	MDRV_SOUND_ADD("ics", ICS2115, 0)
 	MDRV_SOUND_CONFIG(vbowl_ics2115_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 5.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

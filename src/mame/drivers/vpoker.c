@@ -394,7 +394,7 @@ static const ptm6840_interface ptm_intf =
 	DEVCB_LINE(ptm_irq)
 };
 
-static MACHINE_DRIVER_START( vpoker )
+static MACHINE_CONFIG_START( vpoker, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M6809,XTAL_4MHz)
@@ -422,7 +422,7 @@ static MACHINE_DRIVER_START( vpoker )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 //  MDRV_SOUND_ADD("aysnd", AY8910, 8000000/4 /* guess */)
 //  MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

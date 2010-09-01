@@ -1658,10 +1658,7 @@ static void braze_decrypt_rom(running_machine *machine, UINT8 *dest)
  *
  *************************************/
 
-static MACHINE_DRIVER_START( dkong_base )
-
-    /* driver data */
-    MDRV_DRIVER_DATA(dkong_state)
+static MACHINE_CONFIG_START( dkong_base, dkong_state )
 
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", Z80, CLOCK_1H)
@@ -1685,57 +1682,47 @@ static MACHINE_DRIVER_START( dkong_base )
     MDRV_VIDEO_START(dkong)
     MDRV_VIDEO_UPDATE(dkong)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( radarscp )
-
-    MDRV_IMPORT_FROM(dkong_base)
+static MACHINE_CONFIG_DERIVED( radarscp, dkong_base )
 
     MDRV_MACHINE_START(radarscp)
     MDRV_PALETTE_LENGTH(RS_PALETTE_LENGTH)
     MDRV_PALETTE_INIT(radarscp)
 
     /* sound hardware */
-    MDRV_IMPORT_FROM(radarscp_audio)
+    MDRV_FRAGMENT_ADD(radarscp_audio)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( radarscp1 )
-
-    MDRV_IMPORT_FROM(dkong_base)
+static MACHINE_CONFIG_DERIVED( radarscp1, dkong_base )
 
     MDRV_MACHINE_START(radarscp1)
     MDRV_PALETTE_LENGTH(RS_PALETTE_LENGTH)
     MDRV_PALETTE_INIT(radarscp1)
 
     /* sound hardware */
-    MDRV_IMPORT_FROM(radarscp1_audio)
+    MDRV_FRAGMENT_ADD(radarscp1_audio)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( dkong2b )
-
-    MDRV_IMPORT_FROM(dkong_base)
+static MACHINE_CONFIG_DERIVED( dkong2b, dkong_base )
 
     MDRV_MACHINE_START(dkong2b)
     MDRV_PALETTE_LENGTH(DK2B_PALETTE_LENGTH)
 
     /* sound hardware */
-    MDRV_IMPORT_FROM(dkong2b_audio)
+    MDRV_FRAGMENT_ADD(dkong2b_audio)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( braze )
-	MDRV_IMPORT_FROM(dkong2b)
+static MACHINE_CONFIG_DERIVED( braze, dkong2b )
 
 	MDRV_EEPROM_ADD("eeprom", braze_eeprom_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( dkong3 )
-
-    /* driver data */
-    MDRV_DRIVER_DATA(dkong_state)
+static MACHINE_CONFIG_START( dkong3, dkong_state )
 
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", Z80, XTAL_8MHz / 2) /* verified in schematics */
@@ -1760,38 +1747,33 @@ static MACHINE_DRIVER_START( dkong3 )
     MDRV_VIDEO_UPDATE(dkong)
 
     /* sound hardware */
-    MDRV_IMPORT_FROM(dkong3_audio)
-MACHINE_DRIVER_END
+    MDRV_FRAGMENT_ADD(dkong3_audio)
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( dkongjr )
-
-    MDRV_IMPORT_FROM(dkong_base)
+static MACHINE_CONFIG_DERIVED( dkongjr, dkong_base )
 
     MDRV_CPU_MODIFY("maincpu")
     MDRV_CPU_PROGRAM_MAP(dkongjr_map)
 
     /* sound hardware */
-    MDRV_IMPORT_FROM(dkongjr_audio)
+    MDRV_FRAGMENT_ADD(dkongjr_audio)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( pestplce )
-
-    MDRV_IMPORT_FROM(dkongjr)
+static MACHINE_CONFIG_DERIVED( pestplce, dkongjr )
 
     MDRV_GFXDECODE(pestplce)
     MDRV_PALETTE_LENGTH(DK2B_PALETTE_LENGTH)
     MDRV_PALETTE_INIT(dkong2b)  /* wrong! */
     MDRV_VIDEO_UPDATE(pestplce)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( dkong3b )
+static MACHINE_CONFIG_DERIVED( dkong3b, dkongjr )
 
-    /* basic machine hardware */
-    MDRV_IMPORT_FROM(dkongjr)
+	/* basic machine hardware */
     MDRV_PALETTE_INIT(dkong3)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*************************************
  *
@@ -1799,9 +1781,7 @@ MACHINE_DRIVER_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( s2650 )
-
-    MDRV_IMPORT_FROM(dkong2b)
+static MACHINE_CONFIG_DERIVED( s2650, dkong2b )
 
     /* basic machine hardware */
     MDRV_CPU_REPLACE("maincpu", S2650, CLOCK_1H / 2)    /* ??? */
@@ -1814,18 +1794,17 @@ static MACHINE_DRIVER_START( s2650 )
 
     MDRV_MACHINE_START(s2650)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( spclforc )
+static MACHINE_CONFIG_DERIVED( spclforc, s2650 )
 
-    /* basic machine hardware */
-    MDRV_IMPORT_FROM(s2650)
+	/* basic machine hardware */
     MDRV_DEVICE_REMOVE("soundcpu")
 
     /* video hardware */
     MDRV_VIDEO_UPDATE(spclforc)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*************************************
  *
@@ -1833,35 +1812,35 @@ MACHINE_DRIVER_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( strtheat )
-    /* basic machine hardware */
-    MDRV_IMPORT_FROM(dkong2b)
+static MACHINE_CONFIG_DERIVED( strtheat, dkong2b )
+
+	/* basic machine hardware */
 
     MDRV_CPU_MODIFY("maincpu")
     MDRV_CPU_IO_MAP(epos_readport)
 
     MDRV_MACHINE_RESET(strtheat)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( drakton )
-    /* basic machine hardware */
-    MDRV_IMPORT_FROM(dkong2b)
+static MACHINE_CONFIG_DERIVED( drakton, dkong2b )
 
-    MDRV_CPU_MODIFY("maincpu")
-    MDRV_CPU_IO_MAP(epos_readport)
-
-    MDRV_MACHINE_RESET(drakton)
-MACHINE_DRIVER_END
-
-static MACHINE_DRIVER_START( drktnjr )
-    /* basic machine hardware */
-    MDRV_IMPORT_FROM(dkongjr)
+	/* basic machine hardware */
 
     MDRV_CPU_MODIFY("maincpu")
     MDRV_CPU_IO_MAP(epos_readport)
 
     MDRV_MACHINE_RESET(drakton)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( drktnjr, dkongjr )
+
+	/* basic machine hardware */
+
+    MDRV_CPU_MODIFY("maincpu")
+    MDRV_CPU_IO_MAP(epos_readport)
+
+    MDRV_MACHINE_RESET(drakton)
+MACHINE_CONFIG_END
 
 /*************************************
  *

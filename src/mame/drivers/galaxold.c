@@ -2118,7 +2118,7 @@ static const ay8910_interface bongo_ay8910_interface =
 };
 
 
-static MACHINE_DRIVER_START( galaxold_base )
+static MACHINE_CONFIG_START( galaxold_base, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, PIXEL_CLOCK/2)	/* 3.072 MHz */
@@ -2145,45 +2145,41 @@ static MACHINE_DRIVER_START( galaxold_base )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( galaxian )
+static MACHINE_CONFIG_DERIVED( galaxian, galaxold_base )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(galaxold_base)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(galaxian_audio)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(galaxian_audio)
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( batman2 )
+static MACHINE_CONFIG_DERIVED( batman2, galaxian )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(galaxian)
 
 	/* video hardware */
 	MDRV_VIDEO_START(batman2)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( mooncrst )
+static MACHINE_CONFIG_DERIVED( mooncrst, galaxian )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(galaxian)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(mooncrst_map)
 
 	/* video hardware */
 	MDRV_VIDEO_START(mooncrst)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( scramblb )
+static MACHINE_CONFIG_DERIVED( scramblb, galaxian )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(galaxian)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(scramblb_map)
 
@@ -2192,12 +2188,11 @@ static MACHINE_DRIVER_START( scramblb )
 
 	MDRV_PALETTE_INIT(scrambold)
 	MDRV_VIDEO_START(scrambold)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( scramb2 )
+static MACHINE_CONFIG_DERIVED( scramb2, galaxian )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(galaxian)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(scramb2_map)
 
@@ -2206,14 +2201,13 @@ static MACHINE_DRIVER_START( scramb2 )
 
 	MDRV_PALETTE_INIT(scrambold)
 	MDRV_VIDEO_START(scrambold)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
-static MACHINE_DRIVER_START( 4in1 )
+static MACHINE_CONFIG_DERIVED( 4in1, galaxian )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(galaxian)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(_4in1_map)
 
@@ -2221,13 +2215,12 @@ static MACHINE_DRIVER_START( 4in1 )
 	MDRV_GFXDECODE(_4in1)
 
 	MDRV_VIDEO_START(pisces)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( bagmanmc )
+static MACHINE_CONFIG_DERIVED( bagmanmc, galaxian )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(galaxian)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(bagmanmc_map)
 
@@ -2237,23 +2230,22 @@ static MACHINE_DRIVER_START( bagmanmc )
 	MDRV_GFXDECODE(bagmanmc)
 
 	MDRV_VIDEO_START(pisces)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( dkongjrm )
+static MACHINE_CONFIG_DERIVED( dkongjrm, galaxian )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(galaxian)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(dkongjrm_map)
 
 	/* video hardware */
 	MDRV_VIDEO_START(dkongjrm)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( rockclim )
+static MACHINE_CONFIG_DERIVED( rockclim, galaxian )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(galaxian)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(rockclim_map)
 	MDRV_GFXDECODE(rockclim)
@@ -2265,11 +2257,11 @@ static MACHINE_DRIVER_START( rockclim )
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_SIZE(64*8, 32*8)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( ozon1 )
+static MACHINE_CONFIG_DERIVED( ozon1, galaxold_base )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(galaxold_base)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(ozon1_map)
 	MDRV_CPU_IO_MAP(ozon1_io_map)
@@ -2283,9 +2275,9 @@ static MACHINE_DRIVER_START( ozon1 )
 	MDRV_VIDEO_START(galaxold_plain)
 	MDRV_SOUND_ADD("aysnd", AY8910, PIXEL_CLOCK/4)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( drivfrcg )
+static MACHINE_CONFIG_START( drivfrcg, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", S2650, MASTER_CLOCK/6)
@@ -2312,12 +2304,12 @@ static MACHINE_DRIVER_START( drivfrcg )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_IMPORT_FROM(galaxian_audio)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(galaxian_audio)
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( bongo )
+static MACHINE_CONFIG_DERIVED( bongo, galaxold_base )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(galaxold_base)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(bongo)
 	MDRV_CPU_IO_MAP(bongo_io)
@@ -2328,12 +2320,11 @@ static MACHINE_DRIVER_START( bongo )
 	MDRV_SOUND_ADD("aysnd", AY8910, PIXEL_CLOCK/4)
 	MDRV_SOUND_CONFIG(bongo_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( hunchbkg )
+static MACHINE_CONFIG_DERIVED( hunchbkg, galaxold_base )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(galaxold_base)
 	MDRV_CPU_REPLACE("maincpu", S2650, PIXEL_CLOCK / 4)
 
 	MDRV_CPU_PROGRAM_MAP(hunchbkg)
@@ -2341,12 +2332,12 @@ static MACHINE_DRIVER_START( hunchbkg )
 
 	MDRV_MACHINE_RESET(hunchbkg)
 
-	MDRV_IMPORT_FROM(galaxian_audio)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(galaxian_audio)
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( harem )
+static MACHINE_CONFIG_DERIVED( harem, galaxold_base )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(galaxold_base)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(harem_cpu1)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
@@ -2370,16 +2361,16 @@ static MACHINE_DRIVER_START( harem )
 
 	MDRV_SOUND_ADD("ay3", AY8910, 2000000) //?
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33/3)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( tazzmang )
+static MACHINE_CONFIG_DERIVED( tazzmang, galaxian )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(galaxian)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(tazzmang)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( racknrol )
+static MACHINE_CONFIG_START( racknrol, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", S2650, PIXEL_CLOCK/2)
@@ -2408,12 +2399,11 @@ static MACHINE_DRIVER_START( racknrol )
 
 	MDRV_SOUND_ADD("sn3", SN76496, PIXEL_CLOCK/2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( ckongg )
+static MACHINE_CONFIG_DERIVED( ckongg, galaxian )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(galaxian)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(ckongg_map)
 
@@ -2421,12 +2411,11 @@ static MACHINE_DRIVER_START( ckongg )
 
 	MDRV_VIDEO_START(ckongs)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( ckongmc )
+static MACHINE_CONFIG_DERIVED( ckongmc, galaxian )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(galaxian)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(ckongmc_map)
 
@@ -2434,10 +2423,10 @@ static MACHINE_DRIVER_START( ckongmc )
 
 	MDRV_VIDEO_START(ckongs)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( hexpoola )
+static MACHINE_CONFIG_START( hexpoola, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", S2650, PIXEL_CLOCK/2)
@@ -2460,7 +2449,7 @@ static MACHINE_DRIVER_START( hexpoola )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("snsnd", SN76496, PIXEL_CLOCK/2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

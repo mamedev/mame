@@ -898,7 +898,7 @@ static const ymz280b_interface ymz280b_intf =
 	0	// irq ?
 };
 
-static MACHINE_DRIVER_START( galpani3 )
+static MACHINE_CONFIG_START( galpani3, driver_data_t )
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)	 // ? (from which clock?)
 	MDRV_CPU_PROGRAM_MAP(galpani3_map)
 	MDRV_CPU_VBLANK_INT_HACK(galpani3_vblank, 3)
@@ -924,7 +924,7 @@ static MACHINE_DRIVER_START( galpani3 )
 	MDRV_SOUND_CONFIG(ymz280b_intf)
 	MDRV_SOUND_ROUTE(0, "mono", 1.0)
 	MDRV_SOUND_ROUTE(1, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( galpani3 )

@@ -295,10 +295,7 @@ static MACHINE_RESET( gunsmoke )
 	state->sprite3bank = 0;
 }
 
-static MACHINE_DRIVER_START( gunsmoke )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(gunsmoke_state)
+static MACHINE_CONFIG_START( gunsmoke, gunsmoke_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)	// 4 MHz
@@ -341,7 +338,7 @@ static MACHINE_DRIVER_START( gunsmoke )
 	MDRV_SOUND_ROUTE(1, "mono", 0.22)
 	MDRV_SOUND_ROUTE(2, "mono", 0.22)
 	MDRV_SOUND_ROUTE(3, "mono", 0.14)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROMs */
 

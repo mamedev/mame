@@ -226,10 +226,7 @@ static MACHINE_RESET( scregg )
 	state->btime_tilemap[3] = 0;
 }
 
-static MACHINE_DRIVER_START( dommy )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(btime_state)
+static MACHINE_CONFIG_START( dommy, btime_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 1500000)
@@ -262,13 +259,10 @@ static MACHINE_DRIVER_START( dommy )
 
 	MDRV_SOUND_ADD("ay2", AY8910, 1500000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( scregg )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(btime_state)
+static MACHINE_CONFIG_START( scregg, btime_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 1500000)
@@ -301,7 +295,7 @@ static MACHINE_DRIVER_START( scregg )
 
 	MDRV_SOUND_ADD("ay2", AY8910, 1500000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.23)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( dommy )

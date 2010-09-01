@@ -117,10 +117,7 @@ static MACHINE_START( cheekyms )
 	state->dac = machine->device("dac");
 }
 
-static MACHINE_DRIVER_START( cheekyms )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(cheekyms_state)
+static MACHINE_CONFIG_START( cheekyms, cheekyms_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,5000000/2)  /* 2.5 MHz */
@@ -150,7 +147,7 @@ static MACHINE_DRIVER_START( cheekyms )
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

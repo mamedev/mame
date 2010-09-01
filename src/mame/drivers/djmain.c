@@ -1485,7 +1485,7 @@ static const k056832_interface djmain_k056832_intf =
 	djmain_tile_callback, "none"
 };
 
-static MACHINE_DRIVER_START( djmain )
+static MACHINE_CONFIG_START( djmain, driver_data_t )
 
 	/* basic machine hardware */
 	// popn3 works 9.6 MHz or slower in some songs */
@@ -1527,7 +1527,7 @@ static MACHINE_DRIVER_START( djmain )
 	MDRV_SOUND_CONFIG(k054539_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

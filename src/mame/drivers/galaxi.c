@@ -392,10 +392,7 @@ static MACHINE_RESET( galaxi )
 	state->out[2] = 0;
 }
 
-static MACHINE_DRIVER_START( galaxi )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(galaxi_state)
+static MACHINE_CONFIG_START( galaxi, galaxi_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_10MHz)	// ?
@@ -425,19 +422,19 @@ static MACHINE_DRIVER_START( galaxi )
 
 	MDRV_OKIM6295_ADD("oki", XTAL_16MHz/16, OKIM6295_PIN7_LOW)	// ?
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( magjoker )
+static MACHINE_CONFIG_DERIVED( magjoker, galaxi )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(galaxi)
 
 	/* sound hardware */
 	MDRV_SOUND_MODIFY("oki")
 
 	/* ADPCM samples are recorded with extremely low volume */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 4.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

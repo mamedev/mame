@@ -166,7 +166,7 @@ static GFXDECODE_START( murogmbl )
 	GFXDECODE_ENTRY( "gfx1", 0, layout8x8x2,  0x0, 1 )
 GFXDECODE_END
 
-static MACHINE_DRIVER_START( murogmbl )
+static MACHINE_CONFIG_START( murogmbl, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 1000000) /* Z80? */
 	MDRV_CPU_PROGRAM_MAP(murogmbl_map)
@@ -191,7 +191,7 @@ static MACHINE_DRIVER_START( murogmbl )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("dac1", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

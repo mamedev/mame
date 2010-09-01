@@ -606,7 +606,7 @@ static const ay8910_interface ay8910_config =
 };
 
 
-static MACHINE_DRIVER_START( multfish )
+static MACHINE_CONFIG_START( multfish, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,6000000) /* 6 MHz? */
 	MDRV_CPU_PROGRAM_MAP(multfish_map)
@@ -633,7 +633,7 @@ static MACHINE_DRIVER_START( multfish )
 	MDRV_SOUND_ADD("aysnd", AY8910, 6000000/4)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static MACHINE_RESET( island2a )
 {
@@ -644,11 +644,11 @@ static MACHINE_RESET( island2a )
 	multfish_bram[0x2003] = 0x01;
 	multfish_bram[0x4003] = 0x02;
 }
-static MACHINE_DRIVER_START( island2a )
+static MACHINE_CONFIG_DERIVED( island2a, multfish )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(multfish)
 	MDRV_MACHINE_RESET( island2a )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

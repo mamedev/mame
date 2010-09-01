@@ -327,10 +327,7 @@ static MACHINE_RESET( gradius3 )
 
 }
 
-static MACHINE_DRIVER_START( gradius3 )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(gradius3_state)
+static MACHINE_CONFIG_START( gradius3, gradius3_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)	/* 10 MHz */
@@ -381,7 +378,7 @@ static MACHINE_DRIVER_START( gradius3 )
 	MDRV_SOUND_ROUTE(0, "rspeaker", 0.20)
 	MDRV_SOUND_ROUTE(1, "lspeaker", 0.20)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.20)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

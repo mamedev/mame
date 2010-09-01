@@ -1565,7 +1565,7 @@ static INTERRUPT_GEN( cischeat_interrupt )
 
 
 
-static MACHINE_DRIVER_START( bigrun )
+static MACHINE_CONFIG_START( bigrun, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("cpu1", M68000, 10000000)
@@ -1614,13 +1614,12 @@ static MACHINE_DRIVER_START( bigrun )
 
 	MDRV_OKIM6295_ADD("oki2", STD_OKI_CLOCK, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( cischeat )
+static MACHINE_CONFIG_DERIVED( cischeat, bigrun )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(bigrun)
 	MDRV_CPU_MODIFY("cpu1")
 	MDRV_CPU_PROGRAM_MAP(cischeat_map)
 
@@ -1642,13 +1641,12 @@ static MACHINE_DRIVER_START( cischeat )
 
 	MDRV_VIDEO_START(cischeat)
 	MDRV_VIDEO_UPDATE(cischeat)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( f1gpstar )
+static MACHINE_CONFIG_DERIVED( f1gpstar, bigrun )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(bigrun)
 	MDRV_CPU_MODIFY("cpu1")
 	MDRV_CPU_CLOCK(12000000)
 	MDRV_CPU_PROGRAM_MAP(f1gpstar_map)
@@ -1670,13 +1668,12 @@ static MACHINE_DRIVER_START( f1gpstar )
 
 	MDRV_VIDEO_START(f1gpstar)
 	MDRV_VIDEO_UPDATE(f1gpstar)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( f1gpstr2 )
+static MACHINE_CONFIG_DERIVED( f1gpstr2, f1gpstar )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(f1gpstar)
 
 	MDRV_CPU_MODIFY("cpu1")
 	MDRV_CPU_PROGRAM_MAP(f1gpstr2_map)
@@ -1687,7 +1684,7 @@ static MACHINE_DRIVER_START( f1gpstr2 )
 	MDRV_CPU_ADD("cpu5", M68000, 12000000/* was 10000000 */)
 	MDRV_CPU_PROGRAM_MAP(f1gpstr2_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /**************************************************************************
@@ -1713,7 +1710,7 @@ static INTERRUPT_GEN( interrupt_scudhamm )
 }
 
 
-static MACHINE_DRIVER_START( scudhamm )
+static MACHINE_CONFIG_START( scudhamm, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M68000, 12000000)
@@ -1746,7 +1743,7 @@ static MACHINE_DRIVER_START( scudhamm )
 	MDRV_OKIM6295_ADD("oki2", 2112000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /**************************************************************************
@@ -1764,15 +1761,14 @@ static INTERRUPT_GEN( interrupt_armchmp2)
 	}
 }
 
-static MACHINE_DRIVER_START( armchmp2 )
+static MACHINE_CONFIG_DERIVED( armchmp2, scudhamm )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(scudhamm)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(armchmp2_map)
 	MDRV_CPU_VBLANK_INT_HACK(interrupt_armchmp2,INTERRUPT_NUM_SCUDHAMM)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

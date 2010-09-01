@@ -433,10 +433,7 @@ static MACHINE_RESET( buggychl )
 	state->ddr_c = 0;
 }
 
-static MACHINE_DRIVER_START( buggychl )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(buggychl_state)
+static MACHINE_CONFIG_START( buggychl, buggychl_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000) /* 4 MHz??? */
@@ -493,7 +490,7 @@ static MACHINE_DRIVER_START( buggychl )
 	// pin 1 SOLO  8'       not mapped
 	// pin 2 SOLO 16'       not mapped
 	// pin 22 Noise Output  not mapped
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

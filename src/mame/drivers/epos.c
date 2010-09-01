@@ -392,10 +392,7 @@ static MACHINE_START( dealer )
 	MACHINE_START_CALL(epos);
 }
 
-static MACHINE_DRIVER_START( epos )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(epos_state)
+static MACHINE_CONFIG_START( epos, epos_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 11000000/4)	/* 2.75 MHz (see notes) */
@@ -420,13 +417,10 @@ static MACHINE_DRIVER_START( epos )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("aysnd", AY8910, 11000000/4)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( dealer )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(epos_state)
+static MACHINE_CONFIG_START( dealer, epos_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 11000000/4)	/* 2.75 MHz (see notes) */
@@ -453,7 +447,7 @@ static MACHINE_DRIVER_START( dealer )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("aysnd", AY8910, 11000000/4)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************************

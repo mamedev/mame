@@ -1073,7 +1073,7 @@ GFXDECODE_END
  *************************************/
 
 /* Core MCR3 system with no sound */
-static MACHINE_DRIVER_START( mcr3_base )
+static MACHINE_CONFIG_START( mcr3_base, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
@@ -1102,17 +1102,16 @@ static MACHINE_DRIVER_START( mcr3_base )
 
 	MDRV_VIDEO_START(mcr)
 	MDRV_VIDEO_UPDATE(mcr)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************************/
 
 
 /* Core MCR monoboard system with no sound */
-static MACHINE_DRIVER_START( mcrmono )
+static MACHINE_CONFIG_DERIVED( mcrmono, mcr3_base )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mcr3_base)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(mcrmono_map)
@@ -1121,36 +1120,33 @@ static MACHINE_DRIVER_START( mcrmono )
 	/* video hardware */
 	MDRV_VIDEO_START(mcrmono)
 	MDRV_VIDEO_UPDATE(mcr3)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* Sarge/Demolition Derby Mono/Max RPM = MCR monoboard with Turbo Chip Squeak */
-static MACHINE_DRIVER_START( mono_tcs )
+static MACHINE_CONFIG_DERIVED( mono_tcs, mcrmono )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mcrmono)
-	MDRV_IMPORT_FROM(turbo_chip_squeak)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(turbo_chip_squeak)
+MACHINE_CONFIG_END
 
 
 /* Rampage/Power Drive/Star Guards = MCR monoboard with Sounds Good */
-static MACHINE_DRIVER_START( mono_sg )
+static MACHINE_CONFIG_DERIVED( mono_sg, mcrmono )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mcrmono)
-	MDRV_IMPORT_FROM(sounds_good)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(sounds_good)
+MACHINE_CONFIG_END
 
 
 /*************************************/
 
 
 /* Core scrolling system with SSIO sound */
-static MACHINE_DRIVER_START( mcrscroll )
+static MACHINE_CONFIG_DERIVED( mcrscroll, mcr3_base )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mcr3_base)
-	MDRV_IMPORT_FROM(mcr_ssio)
+	MDRV_FRAGMENT_ADD(mcr_ssio)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(spyhunt_map)
@@ -1166,16 +1162,15 @@ static MACHINE_DRIVER_START( mcrscroll )
 	MDRV_PALETTE_INIT(spyhunt)
 	MDRV_VIDEO_START(spyhunt)
 	MDRV_VIDEO_UPDATE(spyhunt)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* Spy Hunter = scrolling system with an SSIO and a chip squeak deluxe */
-static MACHINE_DRIVER_START( mcrsc_csd )
+static MACHINE_CONFIG_DERIVED( mcrsc_csd, mcrscroll )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mcrscroll)
-	MDRV_IMPORT_FROM(chip_squeak_deluxe_stereo)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(chip_squeak_deluxe_stereo)
+MACHINE_CONFIG_END
 
 
 

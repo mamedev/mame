@@ -487,7 +487,7 @@ static INTERRUPT_GEN( bballoon_interrupt )
 //  irq_en = 0;
 }
 
-static MACHINE_DRIVER_START( bballoon )
+static MACHINE_CONFIG_START( bballoon, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", ARM7, 24000000)
@@ -510,7 +510,7 @@ static MACHINE_DRIVER_START( bballoon )
 	MDRV_VIDEO_UPDATE(bballoon)
 
 	/* sound hardware */
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*
 Balloon & Balloon

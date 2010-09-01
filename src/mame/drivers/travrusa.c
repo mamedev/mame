@@ -296,10 +296,7 @@ static MACHINE_RESET( travrusa )
 	state->scrollx[1] = 0;
 }
 
-static MACHINE_DRIVER_START( travrusa )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(irem_z80_state)
+static MACHINE_CONFIG_START( travrusa, irem_z80_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz (?) */
@@ -327,17 +324,15 @@ static MACHINE_DRIVER_START( travrusa )
 	MDRV_VIDEO_UPDATE(travrusa)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(m52_sound_c_audio)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(m52_sound_c_audio)
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( shtrider )
-
-	MDRV_IMPORT_FROM(travrusa)
+static MACHINE_CONFIG_DERIVED( shtrider, travrusa )
 
 	/* video hardware */
 	MDRV_GFXDECODE(shtrider)
 	MDRV_PALETTE_INIT(shtrider)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

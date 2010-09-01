@@ -3093,7 +3093,7 @@ static const ay8910_interface ay8910_config =
 	DEVCB_HANDLER(royalmah_player_2_port_r)
 };
 
-static MACHINE_DRIVER_START( royalmah )
+static MACHINE_CONFIG_START( royalmah, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 18432000/6)        /* 3.072 MHz */
@@ -3121,12 +3121,10 @@ static MACHINE_DRIVER_START( royalmah )
 	MDRV_SOUND_ADD("aysnd", AY8910, 18432000/12)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( janoh )
-
-	MDRV_IMPORT_FROM(royalmah)
+static MACHINE_CONFIG_DERIVED( janoh, royalmah )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_CLOCK(8000000/2)	/* 4 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(janho_map)
@@ -3135,10 +3133,9 @@ static MACHINE_DRIVER_START( janoh )
 	MDRV_CPU_PROGRAM_MAP(janoh_sub_map)
 	MDRV_CPU_IO_MAP(janoh_sub_iomap)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( jansou )
-	MDRV_IMPORT_FROM(royalmah)
+static MACHINE_CONFIG_DERIVED( jansou, royalmah )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(jansou_map)
@@ -3150,41 +3147,36 @@ static MACHINE_DRIVER_START( jansou )
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( dondenmj )
-	MDRV_IMPORT_FROM(royalmah)
+static MACHINE_CONFIG_DERIVED( dondenmj, royalmah )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_CLOCK(8000000/2)	/* 4 MHz ? */
 	MDRV_CPU_IO_MAP(dondenmj_iomap)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( makaijan )
-	MDRV_IMPORT_FROM(royalmah)
+static MACHINE_CONFIG_DERIVED( makaijan, royalmah )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_CLOCK(8000000/2)	/* 4 MHz ? */
 	MDRV_CPU_IO_MAP(makaijan_iomap)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( daisyari )
-	MDRV_IMPORT_FROM(royalmah)
+static MACHINE_CONFIG_DERIVED( daisyari, royalmah )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_CLOCK(8000000/2)	/* 4 MHz ? */
 	MDRV_CPU_IO_MAP(daisyari_iomap)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( mjclub )
-	MDRV_IMPORT_FROM(royalmah)
+static MACHINE_CONFIG_DERIVED( mjclub, royalmah )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_CLOCK(8000000/2)	/* 4 MHz ? */
 	MDRV_CPU_IO_MAP(mjclub_iomap)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( ippatsu )
-	MDRV_IMPORT_FROM(dondenmj)
+static MACHINE_CONFIG_DERIVED( ippatsu, dondenmj )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(ippatsu_iomap)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static INTERRUPT_GEN( suzume_irq )
 {
@@ -3192,47 +3184,41 @@ static INTERRUPT_GEN( suzume_irq )
 		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_DRIVER_START( suzume )
-	MDRV_IMPORT_FROM(dondenmj)
+static MACHINE_CONFIG_DERIVED( suzume, dondenmj )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(suzume_iomap)
 	MDRV_CPU_VBLANK_INT("screen", suzume_irq)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( tontonb )
-	MDRV_IMPORT_FROM(dondenmj)
+static MACHINE_CONFIG_DERIVED( tontonb, dondenmj )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(tontonb_iomap)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( mjdiplob )
-	MDRV_IMPORT_FROM(dondenmj)
+static MACHINE_CONFIG_DERIVED( mjdiplob, dondenmj )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(mjdiplob_iomap)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( majs101b )
-	MDRV_IMPORT_FROM(dondenmj)
+static MACHINE_CONFIG_DERIVED( majs101b, dondenmj )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(majs101b_iomap)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( mjapinky )
-	MDRV_IMPORT_FROM(dondenmj)
+static MACHINE_CONFIG_DERIVED( mjapinky, dondenmj )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(mjapinky_map)
 	MDRV_CPU_IO_MAP(mjapinky_iomap)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( mjderngr )
-	MDRV_IMPORT_FROM(dondenmj)
+static MACHINE_CONFIG_DERIVED( mjderngr, dondenmj )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(mjderngr_iomap)
 
 	/* video hardware */
 	MDRV_PALETTE_LENGTH(16*32)
 	MDRV_PALETTE_INIT(mjderngr)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* It runs in IM 2, thus needs a vector on the data bus */
 static INTERRUPT_GEN( janptr96_interrupt )
@@ -3245,8 +3231,7 @@ static INTERRUPT_GEN( janptr96_interrupt )
 	}
 }
 
-static MACHINE_DRIVER_START( janptr96 )
-	MDRV_IMPORT_FROM(mjderngr)
+static MACHINE_CONFIG_DERIVED( janptr96, mjderngr )
 	MDRV_CPU_REPLACE("maincpu",Z80,24000000/4)	/* 6 MHz? */
 	MDRV_CPU_PROGRAM_MAP(janptr96_map)
 	MDRV_CPU_IO_MAP(janptr96_iomap)
@@ -3257,11 +3242,10 @@ static MACHINE_DRIVER_START( janptr96 )
 
 	/* devices */
 	MDRV_MSM6242_ADD("rtc")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( mjifb )
-	MDRV_IMPORT_FROM(mjderngr)
+static MACHINE_CONFIG_DERIVED( mjifb, mjderngr )
 	MDRV_CPU_REPLACE("maincpu",TMP90841, 8000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(mjifb_map)
 	MDRV_CPU_IO_MAP(mjifb_iomap)
@@ -3269,11 +3253,10 @@ static MACHINE_DRIVER_START( mjifb )
 
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( mjdejavu )
-	MDRV_IMPORT_FROM(mjderngr)
+static MACHINE_CONFIG_DERIVED( mjdejavu, mjderngr )
 	MDRV_CPU_REPLACE("maincpu",TMP90841, 8000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(mjdejavu_map)
 	MDRV_CPU_IO_MAP(mjifb_iomap)
@@ -3281,7 +3264,7 @@ static MACHINE_DRIVER_START( mjdejavu )
 
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 8, 255-8)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 static INTERRUPT_GEN( mjtensin_interrupt )
@@ -3293,8 +3276,7 @@ static INTERRUPT_GEN( mjtensin_interrupt )
 	}
 }
 
-static MACHINE_DRIVER_START( mjtensin )
-	MDRV_IMPORT_FROM(mjderngr)
+static MACHINE_CONFIG_DERIVED( mjtensin, mjderngr )
 	MDRV_CPU_REPLACE("maincpu",TMP90841, 12000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(mjtensin_map)
 	MDRV_CPU_IO_MAP(mjtensin_iomap)
@@ -3305,10 +3287,9 @@ static MACHINE_DRIVER_START( mjtensin )
 
 	/* devices */
 	MDRV_MSM6242_ADD("rtc")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( cafetime )
-	MDRV_IMPORT_FROM(mjderngr)
+static MACHINE_CONFIG_DERIVED( cafetime, mjderngr )
 	MDRV_CPU_REPLACE("maincpu",TMP90841, 12000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(cafetime_map)
 	MDRV_CPU_IO_MAP(cafetime_iomap)
@@ -3319,10 +3300,9 @@ static MACHINE_DRIVER_START( cafetime )
 
 	/* devices */
 	MDRV_MSM6242_ADD("rtc")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( mjvegasa )
-	MDRV_IMPORT_FROM(mjderngr)
+static MACHINE_CONFIG_DERIVED( mjvegasa, mjderngr )
 	MDRV_CPU_REPLACE("maincpu",TMP90841, XTAL_8MHz)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(mjvegasa_map)
 	MDRV_CPU_IO_MAP(mjvegasa_iomap)
@@ -3333,7 +3313,7 @@ static MACHINE_DRIVER_START( mjvegasa )
 
 	/* devices */
 	MDRV_MSM6242_ADD("rtc")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

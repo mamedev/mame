@@ -1074,8 +1074,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( turbo )
-	MDRV_DRIVER_DATA(turbo_state)
+static MACHINE_CONFIG_START( turbo, turbo_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
@@ -1101,12 +1100,11 @@ static MACHINE_DRIVER_START( turbo )
 	MDRV_VIDEO_UPDATE(turbo)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(turbo_samples)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(turbo_samples)
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( subroc3d )
-	MDRV_DRIVER_DATA(turbo_state)
+static MACHINE_CONFIG_START( subroc3d, turbo_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
@@ -1130,12 +1128,11 @@ static MACHINE_DRIVER_START( subroc3d )
 	MDRV_VIDEO_UPDATE(subroc3d)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(subroc3d_samples)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(subroc3d_samples)
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( buckrog )
-	MDRV_DRIVER_DATA(turbo_state)
+static MACHINE_CONFIG_START( buckrog, turbo_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
@@ -1166,8 +1163,8 @@ static MACHINE_DRIVER_START( buckrog )
 	MDRV_VIDEO_UPDATE(buckrog)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(buckrog_samples)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(buckrog_samples)
+MACHINE_CONFIG_END
 
 
 

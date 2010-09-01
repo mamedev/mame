@@ -791,7 +791,7 @@ static const duart68681_config maygaym1_duart68681_config =
 
 // machine driver for maygay m1 board /////////////////////////////////
 
-static MACHINE_DRIVER_START( m1 )
+static MACHINE_CONFIG_START( m1, driver_data_t )
 
 	MDRV_MACHINE_START(m1)
 	MDRV_MACHINE_RESET(m1)
@@ -814,7 +814,7 @@ static MACHINE_DRIVER_START( m1 )
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	MDRV_DEFAULT_LAYOUT(layout_awpvid16)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( m_sptlgt )
 	ROM_REGION( 0x10000, "maincpu", ROMREGION_ERASE00  )

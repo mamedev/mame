@@ -80,7 +80,7 @@ static VIDEO_UPDATE(intrscti)
 	return 0;
 }
 
-static MACHINE_DRIVER_START( intrscti )
+static MACHINE_CONFIG_START( intrscti, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,4000000)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(intrscti_map)
@@ -100,7 +100,7 @@ static MACHINE_DRIVER_START( intrscti )
 
 	MDRV_VIDEO_START(intrscti)
 	MDRV_VIDEO_UPDATE(intrscti)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( intrscti )

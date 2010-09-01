@@ -909,7 +909,7 @@ static const samples_interface zektor_samples_interface =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( g80v_base )
+static MACHINE_CONFIG_START( g80v_base, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK/2)
@@ -931,21 +931,19 @@ static MACHINE_DRIVER_START( g80v_base )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( elim2 )
-	MDRV_IMPORT_FROM(g80v_base)
+static MACHINE_CONFIG_DERIVED( elim2, g80v_base )
 
 	/* custom sound board */
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(elim2_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( spacfury )
-	MDRV_IMPORT_FROM(g80v_base)
+static MACHINE_CONFIG_DERIVED( spacfury, g80v_base )
 
 	/* custom sound board */
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
@@ -953,12 +951,11 @@ static MACHINE_DRIVER_START( spacfury )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	/* speech board */
-	MDRV_IMPORT_FROM(sega_speech_board)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(sega_speech_board)
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( zektor )
-	MDRV_IMPORT_FROM(g80v_base)
+static MACHINE_CONFIG_DERIVED( zektor, g80v_base )
 
 	/* custom sound board */
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
@@ -969,27 +966,25 @@ static MACHINE_DRIVER_START( zektor )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 
 	/* speech board */
-	MDRV_IMPORT_FROM(sega_speech_board)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(sega_speech_board)
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( tacscan )
-	MDRV_IMPORT_FROM(g80v_base)
+static MACHINE_CONFIG_DERIVED( tacscan, g80v_base )
 
 	/* universal sound board */
-	MDRV_IMPORT_FROM(sega_universal_sound_board)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(sega_universal_sound_board)
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( startrek )
-	MDRV_IMPORT_FROM(g80v_base)
+static MACHINE_CONFIG_DERIVED( startrek, g80v_base )
 
 	/* speech board */
-	MDRV_IMPORT_FROM(sega_speech_board)
+	MDRV_FRAGMENT_ADD(sega_speech_board)
 
 	/* universal sound board */
-	MDRV_IMPORT_FROM(sega_universal_sound_board)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(sega_universal_sound_board)
+MACHINE_CONFIG_END
 
 
 

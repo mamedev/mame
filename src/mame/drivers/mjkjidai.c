@@ -372,9 +372,7 @@ static GFXDECODE_START( mjkjidai )
 GFXDECODE_END
 
 
-static MACHINE_DRIVER_START( mjkjidai )
-
-	MDRV_DRIVER_DATA(mjkjidai_state)
+static MACHINE_CONFIG_START( mjkjidai, mjkjidai_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,10000000/2)	/* 5 MHz ??? */
@@ -410,7 +408,7 @@ static MACHINE_DRIVER_START( mjkjidai )
 
 	MDRV_SOUND_ADD("adpcm", MJKJIDAI, 6000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

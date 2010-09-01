@@ -850,7 +850,7 @@ static const ay8910_interface scobra_ay8910_interface_2 =
 };
 
 
-static MACHINE_DRIVER_START( type1 )
+static MACHINE_CONFIG_START( type1, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 18432000/6)	/* 3.072 MHz */
@@ -895,16 +895,15 @@ static MACHINE_DRIVER_START( type1 )
 	MDRV_SOUND_ADD("ay2", AY8910, 14318000/8)
 	MDRV_SOUND_CONFIG(scobra_ay8910_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.16)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
 /* Rescue, Minefield and Strategy X have extra colors, and custom video initialise */
 /* routines to set up the graduated color backgound they use */
-static MACHINE_DRIVER_START( rescue )
+static MACHINE_CONFIG_DERIVED( rescue, type1 )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(type1)
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
@@ -913,13 +912,12 @@ static MACHINE_DRIVER_START( rescue )
 
 	MDRV_PALETTE_INIT(rescue)
 	MDRV_VIDEO_START(rescue)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( minefld )
+static MACHINE_CONFIG_DERIVED( minefld, type1 )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(type1)
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
@@ -928,34 +926,31 @@ static MACHINE_DRIVER_START( minefld )
 
 	MDRV_PALETTE_INIT(minefld)
 	MDRV_VIDEO_START(minefld)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( mimonkey )
+static MACHINE_CONFIG_DERIVED( mimonkey, type1 )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(type1)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(mimonkey_map)
 
 	/* video hardware */
 	MDRV_VIDEO_START(mimonkey)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( type2 )
+static MACHINE_CONFIG_DERIVED( type2, type1 )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(type1)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(type2_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( stratgyx )
+static MACHINE_CONFIG_DERIVED( stratgyx, type2 )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(type2)
 
 	/* device config overrides */
 	MDRV_PPI8255_RECONFIG( "ppi8255_1", stratgyx_ppi_1_intf )
@@ -965,23 +960,22 @@ static MACHINE_DRIVER_START( stratgyx )
 
 	MDRV_PALETTE_INIT(stratgyx)
 	MDRV_VIDEO_START(stratgyx)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( darkplnt )
+static MACHINE_CONFIG_DERIVED( darkplnt, type2 )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(type2)
 
 	/* video hardware */
 	MDRV_PALETTE_LENGTH(32+64+2) /* 32 for characters, 64 (buffer) for stars, 2 for bullets */
 
 	MDRV_PALETTE_INIT(darkplnt)
 	MDRV_VIDEO_START(darkplnt)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( hustler )
+static MACHINE_CONFIG_START( hustler, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 18432000/6)	/* 3.072 MHz */
@@ -1024,39 +1018,36 @@ static MACHINE_DRIVER_START( hustler )
 	MDRV_SOUND_ADD("aysnd", AY8910, 14318000/8)
 	MDRV_SOUND_CONFIG(hustler_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( hustlerb )
+static MACHINE_CONFIG_DERIVED( hustlerb, hustler )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(hustler)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(hustlerb_map)
 
 	MDRV_CPU_MODIFY("audiocpu")
 	MDRV_CPU_PROGRAM_MAP(hustlerb_sound_map)
 	MDRV_CPU_IO_MAP(hustlerb_sound_io_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* same as type1 but with a strange memory map, maybe a kind of protection */
-static MACHINE_DRIVER_START( anteatg )
+static MACHINE_CONFIG_DERIVED( anteatg, type1 )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(type1)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(anteatg_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* same as type1 but with a strange memory map, maybe a kind of protection */
-static MACHINE_DRIVER_START( anteatgb )
+static MACHINE_CONFIG_DERIVED( anteatgb, type1 )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(type1)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(anteatgb_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

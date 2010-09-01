@@ -175,7 +175,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( subs )
+static MACHINE_CONFIG_START( subs, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502,12096000/16)		/* clock input is the "4H" signal */
@@ -213,7 +213,7 @@ static MACHINE_DRIVER_START( subs )
 	MDRV_SOUND_CONFIG_DISCRETE(subs)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

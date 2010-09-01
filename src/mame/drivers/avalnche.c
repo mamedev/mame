@@ -230,10 +230,7 @@ static MACHINE_RESET( avalnche )
 	state->avalance_video_inverted = 0;
 }
 
-static MACHINE_DRIVER_START( avalnche )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(avalnche_state)
+static MACHINE_CONFIG_START( avalnche, avalnche_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502,MASTER_CLOCK/16)	   /* clock input is the "2H" signal divided by two */
@@ -259,7 +256,7 @@ static MACHINE_DRIVER_START( avalnche )
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(avalnche)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

@@ -680,7 +680,7 @@ static const ay8910_interface pkunwar_ay8910_interface_2 =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( nova2001 )
+static MACHINE_CONFIG_START( nova2001, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MAIN_CLOCK/4)	// 3 MHz verified on schematics
@@ -711,9 +711,9 @@ static MACHINE_DRIVER_START( nova2001 )
 	MDRV_SOUND_ADD("ay2", AY8910, MAIN_CLOCK/6)
 	MDRV_SOUND_CONFIG(nova2001_ay8910_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( ninjakun )
+static MACHINE_CONFIG_START( ninjakun, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MAIN_CLOCK/4)	// 3 MHz
@@ -752,9 +752,9 @@ static MACHINE_DRIVER_START( ninjakun )
 	MDRV_SOUND_ADD("ay2", AY8910, MAIN_CLOCK/4)	// 3 MHz
 	MDRV_SOUND_CONFIG(nova2001_ay8910_interface_1)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( pkunwar )
+static MACHINE_CONFIG_START( pkunwar, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MAIN_CLOCK/4)	// 3 MHz
@@ -786,9 +786,9 @@ static MACHINE_DRIVER_START( pkunwar )
 	MDRV_SOUND_ADD("ay2", AY8910, MAIN_CLOCK/8)
 	MDRV_SOUND_CONFIG(pkunwar_ay8910_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( raiders5 )
+static MACHINE_CONFIG_START( raiders5, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MAIN_CLOCK/4)	// 3 MHz
@@ -825,7 +825,7 @@ static MACHINE_DRIVER_START( raiders5 )
 	MDRV_SOUND_ADD("ay2", AY8910, MAIN_CLOCK/8)
 	MDRV_SOUND_CONFIG(pkunwar_ay8910_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

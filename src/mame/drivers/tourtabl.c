@@ -165,7 +165,7 @@ static INPUT_PORTS_START( tourtabl )
 INPUT_PORTS_END
 
 
-static MACHINE_DRIVER_START( tourtabl )
+static MACHINE_CONFIG_START( tourtabl, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 3)	/* actually M6507 */
 	MDRV_CPU_PROGRAM_MAP(main_map)
@@ -191,7 +191,7 @@ static MACHINE_DRIVER_START( tourtabl )
 
 	MDRV_SOUND_ADD("tia", TIA, MASTER_CLOCK/114)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( tourtabl )

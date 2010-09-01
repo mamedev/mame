@@ -406,8 +406,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( eprom )
-	MDRV_DRIVER_DATA(eprom_state)
+static MACHINE_CONFIG_START( eprom, eprom_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
@@ -438,12 +437,11 @@ static MACHINE_DRIVER_START( eprom )
 	MDRV_VIDEO_UPDATE(eprom)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(jsa_i_mono_speech)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(jsa_i_mono_speech)
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( klaxp )
-	MDRV_DRIVER_DATA(eprom_state)
+static MACHINE_CONFIG_START( klaxp, eprom_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
@@ -471,12 +469,11 @@ static MACHINE_DRIVER_START( klaxp )
 	MDRV_VIDEO_UPDATE(eprom)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(jsa_ii_mono)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(jsa_ii_mono)
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( guts )
-	MDRV_DRIVER_DATA(eprom_state)
+static MACHINE_CONFIG_START( guts, eprom_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
@@ -504,8 +501,8 @@ static MACHINE_DRIVER_START( guts )
 	MDRV_VIDEO_UPDATE(guts)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(jsa_ii_mono)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(jsa_ii_mono)
+MACHINE_CONFIG_END
 
 
 

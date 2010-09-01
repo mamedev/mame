@@ -391,7 +391,7 @@ static MACHINE_RESET( splash )
 	ret = 0x100;
 }
 
-static MACHINE_DRIVER_START( splash )
+static MACHINE_CONFIG_START( splash, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,24000000/2)			/* 12 MHz (24/2) */
@@ -427,7 +427,7 @@ static MACHINE_DRIVER_START( splash )
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(splash_msm5205_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static void ym_irq(running_device *device, int state)
 {
@@ -444,7 +444,7 @@ static const ym2203_interface ym2203_config =
 	ym_irq
 };
 
-static MACHINE_DRIVER_START( roldfrog )
+static MACHINE_CONFIG_START( roldfrog, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,24000000/2)			/* 12 MHz - verified */
@@ -481,10 +481,10 @@ static MACHINE_DRIVER_START( roldfrog )
 	MDRV_SOUND_ROUTE(1, "mono", 0.60)
 	MDRV_SOUND_ROUTE(2, "mono", 0.60)
 	MDRV_SOUND_ROUTE(3, "mono", 0.40)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( funystrp )
+static MACHINE_CONFIG_START( funystrp, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,24000000/2)			/* 12 MHz (24/2) */
@@ -520,7 +520,7 @@ static MACHINE_DRIVER_START( funystrp )
 //  MDRV_SOUND_ADD("msm", MSM5205, 384000)
 //  MDRV_SOUND_CONFIG(msm5205_config)
 //  MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

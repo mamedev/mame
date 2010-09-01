@@ -930,10 +930,7 @@ static MACHINE_RESET( darius )
 }
 
 
-static MACHINE_DRIVER_START( darius )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(darius_state)
+static MACHINE_CONFIG_START( darius, darius_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,16000000/2)	/* 8 MHz ? */
@@ -1057,7 +1054,7 @@ static MACHINE_DRIVER_START( darius )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	MDRV_TC0140SYT_ADD("tc0140syt", darius_tc0140syt_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

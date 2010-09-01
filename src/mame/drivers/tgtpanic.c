@@ -117,7 +117,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( tgtpanic )
+static MACHINE_CONFIG_START( tgtpanic, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_4MHz)
@@ -134,7 +134,7 @@ static MACHINE_DRIVER_START( tgtpanic )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 192 - 1, 0, 192 - 1)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
  /*************************************

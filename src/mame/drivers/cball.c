@@ -225,10 +225,7 @@ static GFXDECODE_START( cball )
 GFXDECODE_END
 
 
-static MACHINE_DRIVER_START( cball )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(cball_state)
+static MACHINE_CONFIG_START( cball, cball_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6800, XTAL_12_096MHz / 16) /* ? */
@@ -252,7 +249,7 @@ static MACHINE_DRIVER_START( cball )
 	MDRV_VIDEO_UPDATE(cball)
 
 	/* sound hardware */
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( cball )

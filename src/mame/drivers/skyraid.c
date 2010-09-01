@@ -223,7 +223,7 @@ static GFXDECODE_START( skyraid )
 GFXDECODE_END
 
 
-static MACHINE_DRIVER_START( skyraid )
+static MACHINE_CONFIG_START( skyraid, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 12096000 / 12)
@@ -253,7 +253,7 @@ static MACHINE_DRIVER_START( skyraid )
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(skyraid)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( skyraid )

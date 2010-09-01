@@ -390,9 +390,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_DRIVER_START( mainsnk )
-
-	MDRV_DRIVER_DATA( mainsnk_state )
+static MACHINE_CONFIG_START( mainsnk, mainsnk_state )
 
 	MDRV_CPU_ADD("maincpu", Z80, 3360000)
 	MDRV_CPU_PROGRAM_MAP(main_map)
@@ -426,7 +424,7 @@ static MACHINE_DRIVER_START( mainsnk )
 
 	MDRV_SOUND_ADD("ay2", AY8910, 2000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( mainsnk)

@@ -379,10 +379,7 @@ static MACHINE_RESET( missb2 )
 	state->sound_status = 0;
 }
 
-static MACHINE_DRIVER_START( missb2 )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(bublbobl_state)
+static MACHINE_CONFIG_START( missb2, bublbobl_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MAIN_XTAL/4)	// 6 MHz
@@ -425,7 +422,7 @@ static MACHINE_DRIVER_START( missb2 )
 
 	MDRV_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.4)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROMs */
 

@@ -626,7 +626,7 @@ static VIDEO_UPDATE(ltcasino)
 }
 
 
-static MACHINE_DRIVER_START( ltcasino )
+static MACHINE_CONFIG_START( ltcasino, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502,2000000)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(ltcasino_map)
@@ -651,7 +651,7 @@ static MACHINE_DRIVER_START( ltcasino )
 
 	MDRV_SOUND_ADD("aysnd", AY8910, 1000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.4)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( ltcasino )

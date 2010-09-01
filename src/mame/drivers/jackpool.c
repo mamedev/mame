@@ -239,7 +239,7 @@ static INTERRUPT_GEN( jackpool_interrupt )
 }
 
 
-static MACHINE_DRIVER_START( jackpool )
+static MACHINE_CONFIG_START( jackpool, driver_data_t )
 	MDRV_CPU_ADD("maincpu", M68000, 12000000) // ?
 	MDRV_CPU_PROGRAM_MAP(jackpool_mem)
 	MDRV_CPU_VBLANK_INT("screen",jackpool_interrupt)  // ?
@@ -264,7 +264,7 @@ static MACHINE_DRIVER_START( jackpool )
 
 	MDRV_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( jackpool )

@@ -714,7 +714,7 @@ static MACHINE_START( twin16 )
 	state_save_register_global_array(machine, cuebrickj_nvram);
 }
 
-static MACHINE_DRIVER_START( twin16 )
+static MACHINE_CONFIG_START( twin16, driver_data_t )
 	// basic machine hardware
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_18_432MHz/2)
 	MDRV_CPU_PROGRAM_MAP(main_map)
@@ -766,14 +766,13 @@ static MACHINE_DRIVER_START( twin16 )
 	MDRV_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.20)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.20)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( devilw )
-	MDRV_IMPORT_FROM(twin16)
+static MACHINE_CONFIG_DERIVED( devilw, twin16 )
 	MDRV_QUANTUM_TIME(HZ(60000)) // watchdog reset otherwise
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( fround )
+static MACHINE_CONFIG_START( fround, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(fround_map)
@@ -821,20 +820,18 @@ static MACHINE_DRIVER_START( fround )
 	MDRV_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.20)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.20)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( miaj )
-	MDRV_IMPORT_FROM(twin16)
+static MACHINE_CONFIG_DERIVED( miaj, twin16 )
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 39*8-1, 2*8, 30*8-1)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( cuebrickj )
-	MDRV_IMPORT_FROM(twin16)
+static MACHINE_CONFIG_DERIVED( cuebrickj, twin16 )
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 39*8-1, 2*8, 30*8-1)
 	MDRV_NVRAM_HANDLER(generic_0fill)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROMs */
 

@@ -54,7 +54,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( savquest )
 INPUT_PORTS_END
 
-static MACHINE_DRIVER_START( savquest )
+static MACHINE_CONFIG_START( savquest, driver_data_t )
 	MDRV_CPU_ADD("maincpu", PENTIUM, 450000000)	// actually Pentium II 450
 	MDRV_CPU_PROGRAM_MAP(savquest_map)
 	MDRV_CPU_IO_MAP(savquest_io)
@@ -70,7 +70,7 @@ static MACHINE_DRIVER_START( savquest )
 
 	MDRV_VIDEO_START(savquest)
 	MDRV_VIDEO_UPDATE(savquest)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( savquest )
 	ROM_REGION32_LE(0x40000, "user1", 0)

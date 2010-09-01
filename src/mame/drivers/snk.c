@@ -3625,9 +3625,7 @@ GFXDECODE_END
 
 /**********************************************************************/
 
-static MACHINE_DRIVER_START( marvins )
-
-	MDRV_DRIVER_DATA( snk_state )
+static MACHINE_CONFIG_START( marvins, snk_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3360000)	/* 3.36 MHz */
@@ -3672,12 +3670,10 @@ static MACHINE_DRIVER_START( marvins )
 
 	MDRV_SOUND_ADD("wave", SNKWAVE, 8000000)	/* verified on schematics */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( vangrd2 )
-
-	MDRV_IMPORT_FROM(marvins)
+static MACHINE_CONFIG_DERIVED( vangrd2, marvins )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
@@ -3685,12 +3681,10 @@ static MACHINE_DRIVER_START( vangrd2 )
 
 	MDRV_CPU_MODIFY("sub")
 	MDRV_CPU_PROGRAM_MAP(madcrash_cpuB_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( madcrush )
-
-	MDRV_IMPORT_FROM(marvins)
+static MACHINE_CONFIG_DERIVED( madcrush, marvins )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
@@ -3698,12 +3692,10 @@ static MACHINE_DRIVER_START( madcrush )
 
 	MDRV_CPU_MODIFY("sub")
 	MDRV_CPU_PROGRAM_MAP(madcrush_cpuB_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( jcross )
-
-	MDRV_DRIVER_DATA( snk_state )
+static MACHINE_CONFIG_START( jcross, snk_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3350000) /* NOT verified */
@@ -3745,12 +3737,10 @@ static MACHINE_DRIVER_START( jcross )
 
 	MDRV_SOUND_ADD("ay2", AY8910, 2000000)	/* NOT verified */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( sgladiat )
-
-	MDRV_IMPORT_FROM(jcross)
+static MACHINE_CONFIG_DERIVED( sgladiat, jcross )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
@@ -3764,12 +3754,10 @@ static MACHINE_DRIVER_START( sgladiat )
        of the screen when the Debug dip switch is on */
 
 	MDRV_VIDEO_START(sgladiat)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( hal21 )
-
-	MDRV_IMPORT_FROM(jcross)
+static MACHINE_CONFIG_DERIVED( hal21, jcross )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
@@ -3785,12 +3773,10 @@ static MACHINE_DRIVER_START( hal21 )
 
 	/* video hardware */
 	MDRV_VIDEO_START(hal21)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( tnk3 )
-
-	MDRV_DRIVER_DATA( snk_state )
+static MACHINE_CONFIG_START( tnk3, snk_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_13_4MHz/4) /* verified on pcb */
@@ -3828,12 +3814,10 @@ static MACHINE_DRIVER_START( tnk3 )
 	MDRV_SOUND_ADD("ym1", YM3526, XTAL_8MHz/2) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ym3526_config_1)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( aso )
-
-	MDRV_IMPORT_FROM(tnk3)
+static MACHINE_CONFIG_DERIVED( aso, tnk3 )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
@@ -3847,12 +3831,10 @@ static MACHINE_DRIVER_START( aso )
 
 	/* video hardware */
 	MDRV_VIDEO_START(aso)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( athena )
-
-	MDRV_IMPORT_FROM(tnk3)
+static MACHINE_CONFIG_DERIVED( athena, tnk3 )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("audiocpu")
@@ -3862,12 +3844,10 @@ static MACHINE_DRIVER_START( athena )
 	MDRV_SOUND_ADD("ym2", YM3526, XTAL_8MHz/2) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ym3526_config_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( fitegolf )
-
-	MDRV_IMPORT_FROM(tnk3)
+static MACHINE_CONFIG_DERIVED( fitegolf, tnk3 )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("audiocpu")
@@ -3878,12 +3858,10 @@ static MACHINE_DRIVER_START( fitegolf )
 	MDRV_SOUND_REPLACE("ym1", YM3812, XTAL_4MHz) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ym3812_config_1)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( ikari )
-
-	MDRV_DRIVER_DATA( snk_state )
+static MACHINE_CONFIG_START( ikari, snk_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_13_4MHz/4) /* verified on pcb */
@@ -3925,12 +3903,10 @@ static MACHINE_DRIVER_START( ikari )
 	MDRV_SOUND_ADD("ym2", YM3526, XTAL_8MHz/2) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ym3526_config_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( victroad )
-
-	MDRV_IMPORT_FROM(ikari)
+static MACHINE_CONFIG_DERIVED( victroad, ikari )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("audiocpu")
@@ -3940,12 +3916,10 @@ static MACHINE_DRIVER_START( victroad )
 	MDRV_SOUND_REPLACE("ym2", Y8950, XTAL_8MHz/2) /* verified on pcb */
 	MDRV_SOUND_CONFIG(y8950_config_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( bermudat )
-
-	MDRV_DRIVER_DATA( snk_state )
+static MACHINE_CONFIG_START( bermudat, snk_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_8MHz/2) /* verified on pcb */
@@ -3986,21 +3960,17 @@ static MACHINE_DRIVER_START( bermudat )
 	MDRV_SOUND_ADD("ym2", Y8950, XTAL_8MHz/2) /* verified on pcb */
 	MDRV_SOUND_CONFIG(y8950_config_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( psychos )
-
-	MDRV_IMPORT_FROM(bermudat)
+static MACHINE_CONFIG_DERIVED( psychos, bermudat )
 
 	/* video hardware */
 	MDRV_VIDEO_START(psychos)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( gwar )
-
-	MDRV_IMPORT_FROM(bermudat)
+static MACHINE_CONFIG_DERIVED( gwar, bermudat )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
@@ -4009,12 +3979,10 @@ static MACHINE_DRIVER_START( gwar )
 	MDRV_CPU_MODIFY("sub")
 	MDRV_CPU_PROGRAM_MAP(gwar_cpuB_map)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( gwara )
-
-	MDRV_IMPORT_FROM(bermudat)
+static MACHINE_CONFIG_DERIVED( gwara, bermudat )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
@@ -4022,12 +3990,10 @@ static MACHINE_DRIVER_START( gwara )
 
 	MDRV_CPU_MODIFY("sub")
 	MDRV_CPU_PROGRAM_MAP(gwara_cpuB_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( chopper1 )
-
-	MDRV_IMPORT_FROM(bermudat)
+static MACHINE_CONFIG_DERIVED( chopper1, bermudat )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("sub")
@@ -4046,22 +4012,18 @@ static MACHINE_DRIVER_START( chopper1 )
 	MDRV_SOUND_REPLACE("ym1", YM3812, 4000000)
 	MDRV_SOUND_CONFIG(ym3812_config_1)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( choppera )
-
-	MDRV_IMPORT_FROM(chopper1)
+static MACHINE_CONFIG_DERIVED( choppera, chopper1 )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(gwar_cpuA_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( tdfever )
-
-	MDRV_DRIVER_DATA( snk_state )
+static MACHINE_CONFIG_START( tdfever, snk_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)
@@ -4103,12 +4065,10 @@ static MACHINE_DRIVER_START( tdfever )
 	MDRV_SOUND_ADD("ym2", Y8950, 4000000)
 	MDRV_SOUND_CONFIG(y8950_config_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( tdfever2 )
-
-	MDRV_IMPORT_FROM(tdfever)
+static MACHINE_CONFIG_DERIVED( tdfever2, tdfever )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("audiocpu")
@@ -4119,7 +4079,7 @@ static MACHINE_DRIVER_START( tdfever2 )
 	// apparently, no "ym1" in tdfever2
 	// (registers are written to but they cause sound not to work)
 	MDRV_DEVICE_REMOVE("ym1")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***********************************************************************/

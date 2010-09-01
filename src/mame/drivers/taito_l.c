@@ -2020,10 +2020,7 @@ static const tc0140syt_interface taitol_tc0140syt_intf =
 };
 
 
-static MACHINE_DRIVER_START( fhawk )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(taitol_state)
+static MACHINE_CONFIG_START( fhawk, taitol_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_13_33056MHz/2)	/* verified freq on pin122 of TC0090LVC cpu */
@@ -2068,13 +2065,12 @@ static MACHINE_DRIVER_START( fhawk )
 	MDRV_SOUND_ROUTE(3, "mono", 0.80)
 
 	MDRV_TC0140SYT_ADD("tc0140syt", taitol_tc0140syt_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( champwr )
+static MACHINE_CONFIG_DERIVED( champwr, fhawk )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(fhawk)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(champwr_map)
 
@@ -2097,14 +2093,13 @@ static MACHINE_DRIVER_START( champwr )
 	MDRV_SOUND_ADD("msm", MSM5205, XTAL_384kHz)
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
-static MACHINE_DRIVER_START( raimais )
+static MACHINE_CONFIG_DERIVED( raimais, fhawk )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(fhawk)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(raimais_map)
 
@@ -2122,13 +2117,10 @@ static MACHINE_DRIVER_START( raimais )
 	MDRV_SOUND_ROUTE(0, "mono", 0.25)
 	MDRV_SOUND_ROUTE(1, "mono", 1.0)
 	MDRV_SOUND_ROUTE(2, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( kurikint )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(taitol_state)
+static MACHINE_CONFIG_START( kurikint, taitol_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_13_33056MHz/2)	/* verified freq on pin122 of TC0090LVC cpu */
@@ -2169,23 +2161,19 @@ static MACHINE_DRIVER_START( kurikint )
 	MDRV_SOUND_ROUTE(3, "mono", 0.80)
 
 	MDRV_TC0140SYT_ADD("tc0140syt", taitol_tc0140syt_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( kurikinta )
+static MACHINE_CONFIG_DERIVED( kurikinta, kurikint )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(kurikint)
 
 	/* video hardware */
 	MDRV_GFXDECODE(1)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( plotting )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(taitol_state)
+static MACHINE_CONFIG_START( plotting, taitol_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_13_33056MHz/2)	/* verified freq on pin122 of TC0090LVC cpu */
@@ -2221,66 +2209,58 @@ static MACHINE_DRIVER_START( plotting )
 	MDRV_SOUND_ROUTE(3, "mono", 0.80)
 
 	MDRV_TC0140SYT_ADD("tc0140syt", taitol_tc0140syt_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( puzznic )
+static MACHINE_CONFIG_DERIVED( puzznic, plotting )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(plotting)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(puzznic_map)
 
 	MDRV_MACHINE_RESET(puzznic)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( puzznici )
+static MACHINE_CONFIG_DERIVED( puzznici, plotting )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(plotting)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(puzznici_map)
 
 	MDRV_MACHINE_RESET(puzznic)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( horshoes )
+static MACHINE_CONFIG_DERIVED( horshoes, plotting )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(plotting)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(horshoes_map)
 
 	MDRV_MACHINE_RESET(horshoes)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( palamed )
+static MACHINE_CONFIG_DERIVED( palamed, plotting )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(plotting)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(palamed_map)
 
 	MDRV_MACHINE_RESET(palamed)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( cachat )
+static MACHINE_CONFIG_DERIVED( cachat, plotting )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(plotting)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(cachat_map)
 
 	MDRV_MACHINE_RESET(cachat)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( evilston )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(taitol_state)
+static MACHINE_CONFIG_START( evilston, taitol_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_13_33056MHz/2)	/* not verified */
@@ -2321,13 +2301,12 @@ static MACHINE_DRIVER_START( evilston )
 	MDRV_SOUND_ROUTE(3, "mono", 0.80)
 
 	MDRV_TC0140SYT_ADD("tc0140syt", taitol_tc0140syt_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 #ifdef UNUSED_CODE
-static MACHINE_DRIVER_START( lagirl )
+static MACHINE_CONFIG_DERIVED( lagirl, plotting )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(plotting)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_CLOCK(XTAL_27_2109MHz/4)
 	MDRV_CPU_PROGRAM_MAP(cachat_map)
@@ -2336,7 +2315,7 @@ static MACHINE_DRIVER_START( lagirl )
 	MDRV_SOUND_REPLACE("ymsnd", YM2203, XTAL_27_2109MHz/8)
 
 	MDRV_MACHINE_RESET(cachat)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 #endif
 
 

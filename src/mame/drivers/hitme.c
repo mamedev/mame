@@ -316,10 +316,7 @@ static MACHINE_RESET( hitme )
 	state->timeout_time = attotime_zero;
 }
 
-static MACHINE_DRIVER_START( hitme )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(hitme_state)
+static MACHINE_CONFIG_START( hitme, hitme_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8080, MASTER_CLOCK/16)
@@ -349,7 +346,7 @@ static MACHINE_DRIVER_START( hitme )
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(hitme)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -360,8 +357,7 @@ MACHINE_DRIVER_END
     Barricade or is the resolution set by a dip switch?
 */
 
-static MACHINE_DRIVER_START( barricad )
-	MDRV_IMPORT_FROM(hitme)
+static MACHINE_CONFIG_DERIVED( barricad, hitme )
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
@@ -372,7 +368,7 @@ static MACHINE_DRIVER_START( barricad )
 
 	MDRV_VIDEO_START(barricad)
 	MDRV_VIDEO_UPDATE(barricad)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

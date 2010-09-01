@@ -522,7 +522,7 @@ static const namcoio_interface intf1 =
 /* TODO: chip #2: test/cocktail, optional buttons */
 
 
-static MACHINE_DRIVER_START( gaplus )
+static MACHINE_CONFIG_START( gaplus, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809,	24576000/16)	/* 1.536 MHz */
@@ -569,12 +569,11 @@ static MACHINE_DRIVER_START( gaplus )
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(gaplus_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( gaplusa )
+static MACHINE_CONFIG_DERIVED( gaplusa, gaplus )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(gaplus)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(gaplusa_cpu1_map)
 
@@ -582,18 +581,17 @@ static MACHINE_DRIVER_START( gaplusa )
 	MDRV_DEVICE_REMOVE("58xx")
 	MDRV_NAMCO56XX_ADD("56xx", intf1)
 	MDRV_NAMCO58XX_ADD("58xx", intf0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( gapluso )
+static MACHINE_CONFIG_DERIVED( gapluso, gaplus )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(gaplus)
 
 	MDRV_DEVICE_REMOVE("56xx")
 	MDRV_DEVICE_REMOVE("58xx")
 	MDRV_NAMCO58XX_ADD("56xx", intf0)
 	MDRV_NAMCO56XX_ADD("58xx", intf1)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

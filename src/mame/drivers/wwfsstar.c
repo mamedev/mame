@@ -427,9 +427,7 @@ static const ym2151_interface ym2151_config =
  Machine Driver(s)
 *******************************************************************************/
 
-static MACHINE_DRIVER_START( wwfsstar )
-
-	MDRV_DRIVER_DATA( wwfsstar_state )
+static MACHINE_CONFIG_START( wwfsstar, wwfsstar_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, CPU_CLOCK)
@@ -461,7 +459,7 @@ static MACHINE_DRIVER_START( wwfsstar )
 	MDRV_OKIM6295_ADD("oki", XTAL_1_056MHz, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.47)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*******************************************************************************
  Rom Loaders / Game Drivers

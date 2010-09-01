@@ -1013,7 +1013,7 @@ static const namco_interface namco_config =
 };
 
 
-static MACHINE_DRIVER_START( hopmappy )
+static MACHINE_CONFIG_START( hopmappy, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("cpu1", M6809, 49152000/32)
@@ -1059,37 +1059,34 @@ static MACHINE_DRIVER_START( hopmappy )
 	MDRV_SOUND_ADD("namco", NAMCO_CUS30, 49152000/2048)
 	MDRV_SOUND_CONFIG(namco_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( skykiddx )
+static MACHINE_CONFIG_DERIVED( skykiddx, hopmappy )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(hopmappy)
 	MDRV_CPU_MODIFY("cpu2")
 	MDRV_CPU_PROGRAM_MAP(skykiddx_cpu2_map)
 
 	MDRV_CPU_MODIFY("mcu")
 	MDRV_CPU_PROGRAM_MAP(skykiddx_mcu_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( roishtar )
+static MACHINE_CONFIG_DERIVED( roishtar, hopmappy )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(hopmappy)
 	MDRV_CPU_MODIFY("cpu2")
 	MDRV_CPU_PROGRAM_MAP(roishtar_cpu2_map)
 
 	MDRV_CPU_MODIFY("mcu")
 	MDRV_CPU_PROGRAM_MAP(roishtar_mcu_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( genpeitd )
+static MACHINE_CONFIG_DERIVED( genpeitd, hopmappy )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(hopmappy)
 	MDRV_CPU_MODIFY("cpu2")
 	MDRV_CPU_PROGRAM_MAP(genpeitd_cpu2_map)
 
@@ -1099,13 +1096,12 @@ static MACHINE_DRIVER_START( genpeitd )
 	/* sound hardware */
 	MDRV_SOUND_ADD("namco2", NAMCO_63701X, 6000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( rthunder )
+static MACHINE_CONFIG_DERIVED( rthunder, hopmappy )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(hopmappy)
 	MDRV_CPU_MODIFY("cpu2")
 	MDRV_CPU_PROGRAM_MAP(rthunder_cpu2_map)
 
@@ -1115,13 +1111,12 @@ static MACHINE_DRIVER_START( rthunder )
 	/* sound hardware */
 	MDRV_SOUND_ADD("namco2", NAMCO_63701X, 6000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( wndrmomo )
+static MACHINE_CONFIG_DERIVED( wndrmomo, hopmappy )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(hopmappy)
 	MDRV_CPU_MODIFY("cpu2")
 	MDRV_CPU_PROGRAM_MAP(wndrmomo_cpu2_map)
 
@@ -1131,7 +1126,7 @@ static MACHINE_DRIVER_START( wndrmomo )
 	/* sound hardware */
 	MDRV_SOUND_ADD("namco2", NAMCO_63701X, 6000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

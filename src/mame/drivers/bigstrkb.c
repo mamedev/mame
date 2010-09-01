@@ -194,9 +194,7 @@ GFXDECODE_END
 
 /* Machine Driver */
 
-static MACHINE_DRIVER_START( bigstrkb )
-
-	MDRV_DRIVER_DATA( bigstrkb_state )
+static MACHINE_CONFIG_START( bigstrkb, bigstrkb_state )
 
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(bigstrkb_map)
@@ -227,7 +225,7 @@ static MACHINE_DRIVER_START( bigstrkb )
 	MDRV_OKIM6295_ADD("oki2", 4000000, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* Rom Loading */
 

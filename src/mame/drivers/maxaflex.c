@@ -427,7 +427,7 @@ static const pokey_interface pokey_config = {
 	atari_interrupt_cb
 };
 
-static MACHINE_DRIVER_START( a600xl )
+static MACHINE_CONFIG_START( a600xl, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, FREQ_17_EXACT)
 	MDRV_CPU_PROGRAM_MAP(a600xl_mem)
@@ -465,12 +465,11 @@ static MACHINE_DRIVER_START( a600xl )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MDRV_MACHINE_START( atarixl )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( maxaflex )
-	MDRV_IMPORT_FROM( a600xl )
+static MACHINE_CONFIG_DERIVED( maxaflex, a600xl )
 	MDRV_MACHINE_RESET( supervisor_board )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START(maxaflex)
 	ROM_REGION(0x10000,"maincpu",0) /* 64K for the CPU */

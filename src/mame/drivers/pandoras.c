@@ -349,10 +349,7 @@ static const ay8910_interface ay8910_config =
 	DEVCB_NULL
 };
 
-static MACHINE_DRIVER_START( pandoras )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(pandoras_state)
+static MACHINE_CONFIG_START( pandoras, pandoras_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, MASTER_CLOCK/6)	/* CPU A */
@@ -399,7 +396,7 @@ static MACHINE_DRIVER_START( pandoras )
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

@@ -160,11 +160,11 @@ typedef tagged_list<region_info> region_list;
 // base class for all driver data structures
 class driver_data_t : public bindable_object
 {
-	friend class running_machine;
-
 public:
 	driver_data_t(running_machine &machine);
 	virtual ~driver_data_t();
+	
+	static driver_data_t *alloc(running_machine &machine);
 
 	virtual void machine_start();
 	virtual void machine_reset();

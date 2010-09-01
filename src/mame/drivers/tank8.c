@@ -324,7 +324,7 @@ static GFXDECODE_START( tank8 )
 GFXDECODE_END
 
 
-static MACHINE_DRIVER_START( tank8 )
+static MACHINE_CONFIG_START( tank8, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6800, 11055000 / 10) /* ? */
@@ -356,7 +356,7 @@ static MACHINE_DRIVER_START( tank8 )
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(tank8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( tank8a )

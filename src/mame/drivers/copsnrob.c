@@ -271,10 +271,7 @@ static MACHINE_RESET( copsnrob )
 }
 
 
-static MACHINE_DRIVER_START( copsnrob )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(copsnrob_state)
+static MACHINE_CONFIG_START( copsnrob, copsnrob_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502,14318180/16)		/* 894886.25 kHz */
@@ -296,7 +293,7 @@ static MACHINE_DRIVER_START( copsnrob )
 
 	MDRV_PALETTE_INIT(copsnrob)
 	MDRV_VIDEO_UPDATE(copsnrob)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

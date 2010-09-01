@@ -349,7 +349,7 @@ static INTERRUPT_GEN( thedeep_interrupt )
 	}
 }
 
-static MACHINE_DRIVER_START( thedeep )
+static MACHINE_CONFIG_START( thedeep, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)		/* verified on pcb */
@@ -385,7 +385,7 @@ static MACHINE_DRIVER_START( thedeep )
 	MDRV_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/4)  /* verified on pcb */
 	MDRV_SOUND_CONFIG(thedeep_ym2203_intf)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

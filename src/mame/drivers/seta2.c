@@ -2275,9 +2275,7 @@ static const x1_010_interface x1_010_sound_intf =
 };
 
 
-static MACHINE_DRIVER_START( mj4simai )
-
-	MDRV_DRIVER_DATA( seta2_state )
+static MACHINE_CONFIG_START( mj4simai, seta2_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M68000,50000000/3)			/* !! TMP68301 @ 16.666666MHz !! */
@@ -2309,12 +2307,11 @@ static MACHINE_DRIVER_START( mj4simai )
 	MDRV_SOUND_CONFIG(x1_010_sound_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( gundamex )
+static MACHINE_CONFIG_DERIVED( gundamex, mj4simai )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mj4simai)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(gundamex_map)
 
@@ -2323,24 +2320,21 @@ static MACHINE_DRIVER_START( gundamex )
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0x00, 0x180-1, 0x100, 0x1e0-1)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( grdians )
-
-	MDRV_IMPORT_FROM(mj4simai)
+static MACHINE_CONFIG_DERIVED( grdians, mj4simai )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(grdians_map)
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0x80, 0x80 + 0x130 -1, 0x80, 0x80 + 0xe8 -1)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( myangel )
+static MACHINE_CONFIG_DERIVED( myangel, mj4simai )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mj4simai)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(myangel_map)
 
@@ -2349,13 +2343,12 @@ static MACHINE_DRIVER_START( myangel )
 	MDRV_SCREEN_VISIBLE_AREA(0, 0x178-1, 0x00, 0xf0-1)
 
 	MDRV_VIDEO_START(seta2_offset)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( myangel2 )
+static MACHINE_CONFIG_DERIVED( myangel2, mj4simai )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mj4simai)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(myangel2_map)
 
@@ -2364,38 +2357,35 @@ static MACHINE_DRIVER_START( myangel2 )
 	MDRV_SCREEN_VISIBLE_AREA(0, 0x178-1, 0x00, 0xf0-1)
 
 	MDRV_VIDEO_START(seta2_offset)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( pzlbowl )
+static MACHINE_CONFIG_DERIVED( pzlbowl, mj4simai )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mj4simai)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(pzlbowl_map)
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0x10, 0x190-1, 0x100, 0x1f0-1)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( penbros )
+static MACHINE_CONFIG_DERIVED( penbros, mj4simai )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mj4simai)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(penbros_map)
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 0x140-1, 0x80, 0x160-1)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( samshoot )
+static MACHINE_CONFIG_DERIVED( samshoot, mj4simai )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mj4simai)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(samshoot_map)
 	MDRV_CPU_VBLANK_INT_HACK(samshoot_interrupt,2)
@@ -2405,7 +2395,7 @@ static MACHINE_DRIVER_START( samshoot )
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0x40, 0x180-1, 0x40, 0x130-1)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
@@ -2458,9 +2448,7 @@ static MACHINE_RESET( funcube )
 	state->funcube_hopper_motor = 0;
 }
 
-static MACHINE_DRIVER_START( funcube )
-
-	MDRV_DRIVER_DATA( seta2_state )
+static MACHINE_CONFIG_START( funcube, seta2_state )
 
 	MDRV_CPU_ADD("maincpu", M68040, XTAL_25_447MHz) // !! XCF5206 actually !!
 	MDRV_CPU_PROGRAM_MAP(funcube_map)
@@ -2494,7 +2482,7 @@ static MACHINE_DRIVER_START( funcube )
 
 	// MSM9810B
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

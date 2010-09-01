@@ -267,10 +267,7 @@ static MACHINE_RESET( finalizr )
 	state->irq_enable = 0;
 }
 
-static MACHINE_DRIVER_START( finalizr )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(finalizr_state)
+static MACHINE_CONFIG_START( finalizr, finalizr_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809,XTAL_18_432MHz/6)	/* ??? */
@@ -307,7 +304,7 @@ static MACHINE_DRIVER_START( finalizr )
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.65)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

@@ -202,10 +202,7 @@ static MACHINE_RESET( cchance )
 
 }
 
-static MACHINE_DRIVER_START( cchance )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(tnzs_state)
+static MACHINE_CONFIG_START( cchance, tnzs_state )
 
 	MDRV_CPU_ADD("maincpu", Z80,4000000)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(main_map)
@@ -235,7 +232,7 @@ static MACHINE_DRIVER_START( cchance )
 	MDRV_SOUND_ADD("aysnd", AY8910, 1500000/2)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( cchance )
 	ROM_REGION( 0x10000, "maincpu", 0 )

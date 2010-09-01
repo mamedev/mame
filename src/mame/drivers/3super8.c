@@ -64,7 +64,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_DRIVER_START( 3super8 )
+static MACHINE_CONFIG_START( 3super8, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,24000000/4)		 /* 6 MHz */
 	MDRV_CPU_PROGRAM_MAP(map)
@@ -89,7 +89,7 @@ static MACHINE_DRIVER_START( 3super8 )
 
 	MDRV_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

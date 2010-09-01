@@ -366,10 +366,7 @@ static const k053247_interface xmen_k053246_intf =
 	xmen_sprite_callback
 };
 
-static MACHINE_DRIVER_START( xmen )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(xmen_state)
+static MACHINE_CONFIG_START( xmen, xmen_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz)	/* verified on pcb */
@@ -411,7 +408,7 @@ static MACHINE_DRIVER_START( xmen )
 	MDRV_SOUND_ADD("k054539", K054539, 48000)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.80)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 static MACHINE_START( xmen6p )
@@ -458,10 +455,7 @@ static const k053247_interface xmen6p_k053246_intf =
 	xmen_sprite_callback
 };
 
-static MACHINE_DRIVER_START( xmen6p )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(xmen_state)
+static MACHINE_CONFIG_START( xmen6p, xmen_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* ? */
@@ -513,7 +507,7 @@ static MACHINE_DRIVER_START( xmen6p )
 	MDRV_SOUND_ADD("k054539", K054539, 48000)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.80)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.80)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

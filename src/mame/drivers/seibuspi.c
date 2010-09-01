@@ -1858,7 +1858,7 @@ static MACHINE_RESET( spi )
 	}
 }
 
-static MACHINE_DRIVER_START( spi )
+static MACHINE_CONFIG_START( spi, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I386, 50000000/2)	/* Intel 386DX, 25MHz */
@@ -1898,7 +1898,7 @@ static MACHINE_DRIVER_START( spi )
 	MDRV_SOUND_CONFIG(ymf271_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static MACHINE_START( sxx2f )
 {
@@ -1922,20 +1922,16 @@ static MACHINE_RESET( sxx2f )
 	sb_coin_latch = 0;
 }
 
-static MACHINE_DRIVER_START( sxx2f ) /* Intel i386DX @ 25MHz, YMF271 @ 16.9344MHz, Z80 @ 7.159MHz(?) */
-
-	MDRV_IMPORT_FROM(spi)
+static MACHINE_CONFIG_DERIVED( sxx2f, spi ) /* Intel i386DX @ 25MHz, YMF271 @ 16.9344MHz, Z80 @ 7.159MHz(?) */
 
 	MDRV_MACHINE_START(sxx2f)
 	MDRV_MACHINE_RESET(sxx2f)
 
 	MDRV_NVRAM_HANDLER(0)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( sxx2g ) /* single board version using measured clocks */
-
-	MDRV_IMPORT_FROM(spi)
+static MACHINE_CONFIG_DERIVED( sxx2g, spi ) /* single board version using measured clocks */
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_CLOCK(28636360) /* AMD AM386DX/DX-40, 28.63636MHz */
@@ -1954,7 +1950,7 @@ static MACHINE_DRIVER_START( sxx2g ) /* single board version using measured cloc
 
 	MDRV_NVRAM_HANDLER(0)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static READ32_HANDLER ( senkyu_speedup_r )
 {
@@ -2202,7 +2198,7 @@ static MACHINE_RESET( seibu386 )
 	cpu_set_irq_callback(machine->device("maincpu"), spi_irq_callback);
 }
 
-static MACHINE_DRIVER_START( seibu386 )
+static MACHINE_CONFIG_START( seibu386, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I386, 40000000)	/* AMD 386DX, 40MHz */
@@ -2234,7 +2230,7 @@ static MACHINE_DRIVER_START( seibu386 )
 
 	MDRV_OKIM6295_ADD("oki2", 1431815, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* SYS386-F V2.0 */
 static DRIVER_INIT( sys386f2 )
@@ -2256,7 +2252,7 @@ static DRIVER_INIT( sys386f2 )
 	}
 }
 
-static MACHINE_DRIVER_START( sys386f2 )
+static MACHINE_CONFIG_START( sys386f2, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I386, 25000000)	/* 25mhz */
@@ -2288,7 +2284,7 @@ static MACHINE_DRIVER_START( sys386f2 )
 	MDRV_SOUND_ADD("ymz", YMZ280B, 16934400)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*******************************************************************/

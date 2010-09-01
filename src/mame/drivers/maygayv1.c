@@ -989,7 +989,7 @@ static INTERRUPT_GEN( vsync_interrupt )
 }
 
 
-static MACHINE_DRIVER_START( maygayv1 )
+static MACHINE_CONFIG_START( maygayv1, driver_data_t )
 	MDRV_CPU_ADD("maincpu", M68000, MASTER_CLOCK / 2)
 	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", vsync_interrupt)
@@ -1029,7 +1029,7 @@ static MACHINE_DRIVER_START( maygayv1 )
 
 	MDRV_SOUND_ADD("upd",UPD7759, UPD7759_STANDARD_CLOCK)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************************

@@ -597,7 +597,7 @@ static const struct pit8253_config taitowlf_pit8254_config =
 	}
 };
 
-static MACHINE_DRIVER_START(taitowlf)
+static MACHINE_CONFIG_START( taitowlf, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", PENTIUM, 200000000)
@@ -639,7 +639,7 @@ static MACHINE_DRIVER_START(taitowlf)
 	MDRV_VIDEO_START(taitowlf)
 	MDRV_VIDEO_UPDATE(taitowlf)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static void set_gate_a20(running_machine *machine, int a20)
 {

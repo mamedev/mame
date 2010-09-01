@@ -149,8 +149,7 @@ static ADDRESS_MAP_START( puckpkmn_map, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 
-static MACHINE_DRIVER_START( puckpkmn )
-	MDRV_IMPORT_FROM( megadriv )
+static MACHINE_CONFIG_DERIVED( puckpkmn, megadriv )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(puckpkmn_map)
@@ -160,7 +159,7 @@ static MACHINE_DRIVER_START( puckpkmn )
 	MDRV_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* Genie's Hardware (contains no real sega parts) */
 

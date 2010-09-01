@@ -71,9 +71,9 @@ public:
 
 /*----------- defined in audio/turbo.c -----------*/
 
-MACHINE_DRIVER_EXTERN( turbo_samples );
-MACHINE_DRIVER_EXTERN( subroc3d_samples );
-MACHINE_DRIVER_EXTERN( buckrog_samples );
+MACHINE_CONFIG_EXTERN( turbo_samples );
+MACHINE_CONFIG_EXTERN( subroc3d_samples );
+MACHINE_CONFIG_EXTERN( buckrog_samples );
 
 WRITE8_DEVICE_HANDLER( turbo_sound_a_w );
 WRITE8_DEVICE_HANDLER( turbo_sound_b_w );

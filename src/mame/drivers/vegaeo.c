@@ -162,7 +162,7 @@ static VIDEO_UPDATE( vega )
 }
 
 
-static MACHINE_DRIVER_START( vega )
+static MACHINE_CONFIG_START( vega, driver_data_t )
 	MDRV_CPU_ADD("maincpu", GMS30C2132, 55000000)	/* 55 MHz */
 	MDRV_CPU_PROGRAM_MAP(vega_map)
 	MDRV_CPU_VBLANK_INT_HACK(eolith_speedup,262)
@@ -184,7 +184,7 @@ static MACHINE_DRIVER_START( vega )
 
 	/* sound hardware */
 	MDRV_AT28C16_ADD( "at28c16", NULL )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*
 Crazy Wars

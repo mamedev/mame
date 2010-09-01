@@ -323,10 +323,7 @@ static MACHINE_RESET( gng )
 	state->scrolly[1] = 0;
 }
 
-static MACHINE_DRIVER_START( gng )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(gng_state)
+static MACHINE_CONFIG_START( gng, gng_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, XTAL_12MHz/8)		/* verified on pcb */
@@ -371,7 +368,7 @@ static MACHINE_DRIVER_START( gng )
 	MDRV_SOUND_ROUTE(1, "mono", 0.40)
 	MDRV_SOUND_ROUTE(2, "mono", 0.40)
 	MDRV_SOUND_ROUTE(3, "mono", 0.20)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

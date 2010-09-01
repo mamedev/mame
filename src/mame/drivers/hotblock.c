@@ -208,10 +208,7 @@ static const ay8910_interface ay8910_config =
 };
 
 
-static MACHINE_DRIVER_START( hotblock )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(hotblock_state)
+static MACHINE_CONFIG_START( hotblock, hotblock_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8088, 10000000)
@@ -238,7 +235,7 @@ static MACHINE_DRIVER_START( hotblock )
 	MDRV_SOUND_ADD("aysnd", AY8910, 1000000)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( hotblock )
 	ROM_REGION( 0x100000, "maincpu", 0 )

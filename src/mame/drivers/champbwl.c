@@ -354,10 +354,7 @@ static MACHINE_RESET( champbwl )
 
 }
 
-static MACHINE_DRIVER_START( champbwl )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(tnzs_state)
+static MACHINE_CONFIG_START( champbwl, tnzs_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 16000000/4) /* 4MHz */
@@ -391,7 +388,7 @@ static MACHINE_DRIVER_START( champbwl )
 	MDRV_SOUND_CONFIG(champbwl_sound_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( champbwl )
 	ROM_REGION( 0x20000, "maincpu", 0 )		/* Z80 Code */

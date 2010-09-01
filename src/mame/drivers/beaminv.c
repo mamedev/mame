@@ -329,10 +329,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( beaminv )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(beaminv_state)
+static MACHINE_CONFIG_START( beaminv, beaminv_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 2000000)	/* 2 MHz ? */
@@ -351,7 +348,7 @@ static MACHINE_DRIVER_START( beaminv )
 	MDRV_SCREEN_VISIBLE_AREA(0, 247, 16, 231)
 	MDRV_SCREEN_REFRESH_RATE(60)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

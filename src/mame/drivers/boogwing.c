@@ -322,10 +322,7 @@ static const deco16ic_interface boogwing_deco16ic_intf =
 };
 
 
-static MACHINE_DRIVER_START( boogwing )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(boogwing_state)
+static MACHINE_CONFIG_START( boogwing, boogwing_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 14000000)	/* DE102 */
@@ -367,7 +364,7 @@ static MACHINE_DRIVER_START( boogwing )
 	MDRV_OKIM6295_ADD("oki2", 32220000/16, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /**********************************************************************************/
 

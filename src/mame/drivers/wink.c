@@ -311,7 +311,7 @@ static MACHINE_RESET( wink )
 	sound_flag = 0;
 }
 
-static MACHINE_DRIVER_START( wink )
+static MACHINE_CONFIG_START( wink, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 12000000 / 4)
 	MDRV_CPU_PROGRAM_MAP(wink_map)
@@ -345,7 +345,7 @@ static MACHINE_DRIVER_START( wink )
 	MDRV_SOUND_ADD("aysnd", AY8912, 12000000 / 8)
 	MDRV_SOUND_CONFIG(ay8912_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

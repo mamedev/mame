@@ -1100,9 +1100,7 @@ static const struct pit8253_config mediagx_pit8254_config =
 };
 
 
-static MACHINE_DRIVER_START(mediagx)
-
-	MDRV_DRIVER_DATA(mediagx_state)
+static MACHINE_CONFIG_START( mediagx, mediagx_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", MEDIAGX, 166000000)
@@ -1152,7 +1150,7 @@ static MACHINE_DRIVER_START(mediagx)
 
 	MDRV_SOUND_ADD("dac2", DMADAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static void set_gate_a20(running_machine *machine, int a20)
 {

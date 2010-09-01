@@ -625,10 +625,7 @@ static MACHINE_RESET( macrossp )
 	state->old_fade = 0;
 }
 
-static MACHINE_DRIVER_START( macrossp )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(macrossp_state)
+static MACHINE_CONFIG_START( macrossp, macrossp_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC020, 50000000/2)	/* 25 MHz */
@@ -663,14 +660,13 @@ static MACHINE_DRIVER_START( macrossp )
 	MDRV_SOUND_CONFIG(es5506_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( quizmoon )
-	MDRV_IMPORT_FROM(macrossp)
+static MACHINE_CONFIG_DERIVED( quizmoon, macrossp )
 
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 24*16-1, 0*8, 14*16-1)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

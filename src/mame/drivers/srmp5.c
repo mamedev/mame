@@ -557,9 +557,7 @@ static GFXDECODE_START( srmp5 )
 	//GFXDECODE_ENTRY( "gfx1", 0, tile_16x16x8_layout, 0x0, 0x800  )
 GFXDECODE_END
 
-static MACHINE_DRIVER_START( srmp5 )
-
-	MDRV_DRIVER_DATA( srmp5_state )
+static MACHINE_CONFIG_START( srmp5, srmp5_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80,8000000)
@@ -594,7 +592,7 @@ static MACHINE_DRIVER_START( srmp5 )
 	MDRV_SOUND_CONFIG(st0016_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( srmp5 )
 	ROM_REGION( 0x410000, "maincpu", 0 )

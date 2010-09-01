@@ -207,7 +207,7 @@ static const mc6845_interface mc6845_intf =
 };
 
 
-static MACHINE_DRIVER_START( murogem )
+static MACHINE_CONFIG_START( murogem, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6802,8000000)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(murogem_map)
@@ -228,7 +228,7 @@ static MACHINE_DRIVER_START( murogem )
 	MDRV_VIDEO_UPDATE(murogem)
 
 	MDRV_MC6845_ADD("crtc", MC6845, 750000, mc6845_intf) /* ? MHz */
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( murogem )

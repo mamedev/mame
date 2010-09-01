@@ -1052,7 +1052,7 @@ static MACHINE_RESET( wecleman )
 	k007232_set_bank( machine->device("konami"), 0, 1 );
 }
 
-static MACHINE_DRIVER_START( wecleman )
+static MACHINE_CONFIG_START( wecleman, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)	/* Schems show 10MHz */
@@ -1095,7 +1095,7 @@ static MACHINE_DRIVER_START( wecleman )
 	MDRV_SOUND_ADD("konami", K007232, 3579545)
 	MDRV_SOUND_ROUTE(0, "mono", 0.20)
 	MDRV_SOUND_ROUTE(1, "mono", 0.20)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
@@ -1123,7 +1123,7 @@ static const k051316_interface hotchase_k051316_intf_1 =
 	hotchase_zoom_callback_1
 };
 
-static MACHINE_DRIVER_START( hotchase )
+static MACHINE_CONFIG_START( hotchase, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)	/* 10 MHz - PCB is drawn in one set's readme */
@@ -1172,7 +1172,7 @@ static MACHINE_DRIVER_START( hotchase )
 	MDRV_SOUND_ADD("konami3", K007232, 3579545)
 	MDRV_SOUND_ROUTE(0, "mono", 0.20)
 	MDRV_SOUND_ROUTE(1, "mono", 0.20)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

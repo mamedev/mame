@@ -195,7 +195,7 @@ static INTERRUPT_GEN( assert_irq )
        */
 }
 
-static MACHINE_DRIVER_START( mustache )
+static MACHINE_CONFIG_START( mustache, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -228,7 +228,7 @@ static MACHINE_DRIVER_START( mustache )
 	MDRV_SOUND_CONFIG(t5182_ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 1.0)
 	MDRV_SOUND_ROUTE(1, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( mustache )
 	ROM_REGION( 0x20000, "maincpu", 0 )

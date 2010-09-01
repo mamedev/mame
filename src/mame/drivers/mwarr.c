@@ -534,10 +534,7 @@ static MACHINE_RESET( mwarr )
 	state->which = 0;
 }
 
-static MACHINE_DRIVER_START( mwarr )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(mwarr_state)
+static MACHINE_CONFIG_START( mwarr, mwarr_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, MASTER_CLOCK)
@@ -569,7 +566,7 @@ static MACHINE_DRIVER_START( mwarr )
 
 	MDRV_OKIM6295_ADD("oki2", SOUND_CLOCK/48 , OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************************

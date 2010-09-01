@@ -209,7 +209,7 @@ static MACHINE_RESET( spacewar )
 	generic_init(machine, spacewar_sound_w);
 }
 
-MACHINE_DRIVER_START( spacewar_sound )
+MACHINE_CONFIG_FRAGMENT( spacewar_sound )
 	MDRV_MACHINE_START(generic)
 	MDRV_MACHINE_RESET(spacewar)
 
@@ -218,7 +218,7 @@ MACHINE_DRIVER_START( spacewar_sound )
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(spacewar_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -265,7 +265,7 @@ static MACHINE_RESET( barrier )
 	generic_init(machine, barrier_sound_w);
 }
 
-MACHINE_DRIVER_START( barrier_sound )
+MACHINE_CONFIG_FRAGMENT( barrier_sound )
 	MDRV_MACHINE_START(generic)
 	MDRV_MACHINE_RESET(barrier)
 
@@ -274,7 +274,7 @@ MACHINE_DRIVER_START( barrier_sound )
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(barrier_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -326,7 +326,7 @@ static MACHINE_RESET( speedfrk )
 	generic_init(machine, speedfrk_sound_w);
 }
 
-MACHINE_DRIVER_START( speedfrk_sound )
+MACHINE_CONFIG_FRAGMENT( speedfrk_sound )
 	MDRV_MACHINE_START(generic)
 	MDRV_MACHINE_RESET(speedfrk)
 
@@ -335,7 +335,7 @@ MACHINE_DRIVER_START( speedfrk_sound )
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(speedfrk_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -403,7 +403,7 @@ static MACHINE_RESET( starhawk )
 	generic_init(machine, starhawk_sound_w);
 }
 
-MACHINE_DRIVER_START( starhawk_sound )
+MACHINE_CONFIG_FRAGMENT( starhawk_sound )
 	MDRV_MACHINE_START(generic)
 	MDRV_MACHINE_RESET(starhawk)
 
@@ -412,7 +412,7 @@ MACHINE_DRIVER_START( starhawk_sound )
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(starhawk_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -474,7 +474,7 @@ static MACHINE_RESET( sundance )
 	generic_init(machine, sundance_sound_w);
 }
 
-MACHINE_DRIVER_START( sundance_sound )
+MACHINE_CONFIG_FRAGMENT( sundance_sound )
 	MDRV_MACHINE_START(generic)
 	MDRV_MACHINE_RESET(sundance)
 
@@ -483,7 +483,7 @@ MACHINE_DRIVER_START( sundance_sound )
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(sundance_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -564,7 +564,7 @@ static MACHINE_RESET( tailg )
 	generic_init(machine, tailg_sound_w);
 }
 
-MACHINE_DRIVER_START( tailg_sound )
+MACHINE_CONFIG_FRAGMENT( tailg_sound )
 	MDRV_MACHINE_START(generic)
 	MDRV_MACHINE_RESET(tailg)
 
@@ -573,7 +573,7 @@ MACHINE_DRIVER_START( tailg_sound )
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(tailg_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -634,7 +634,7 @@ static MACHINE_RESET( warrior )
 	generic_init(machine, warrior_sound_w);
 }
 
-MACHINE_DRIVER_START( warrior_sound )
+MACHINE_CONFIG_FRAGMENT( warrior_sound )
 	MDRV_MACHINE_START(generic)
 	MDRV_MACHINE_RESET(warrior)
 
@@ -643,7 +643,7 @@ MACHINE_DRIVER_START( warrior_sound )
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(warrior_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -730,7 +730,7 @@ static MACHINE_RESET( armora )
 	generic_init(machine, armora_sound_w);
 }
 
-MACHINE_DRIVER_START( armora_sound )
+MACHINE_CONFIG_FRAGMENT( armora_sound )
 	MDRV_MACHINE_START(generic)
 	MDRV_MACHINE_RESET(armora)
 
@@ -739,7 +739,7 @@ MACHINE_DRIVER_START( armora_sound )
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(armora_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -823,7 +823,7 @@ static MACHINE_RESET( ripoff )
 	generic_init(machine, ripoff_sound_w);
 }
 
-MACHINE_DRIVER_START( ripoff_sound )
+MACHINE_CONFIG_FRAGMENT( ripoff_sound )
 	MDRV_MACHINE_START(generic)
 	MDRV_MACHINE_RESET(ripoff)
 
@@ -832,7 +832,7 @@ MACHINE_DRIVER_START( ripoff_sound )
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(ripoff_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -937,7 +937,7 @@ static MACHINE_RESET( starcas )
 	generic_init(machine, starcas_sound_w);
 }
 
-MACHINE_DRIVER_START( starcas_sound )
+MACHINE_CONFIG_FRAGMENT( starcas_sound )
 	MDRV_MACHINE_START(generic)
 	MDRV_MACHINE_RESET(starcas)
 
@@ -946,7 +946,7 @@ MACHINE_DRIVER_START( starcas_sound )
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(starcas_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -1074,7 +1074,7 @@ static MACHINE_RESET( solarq )
 	generic_init(machine, solarq_sound_w);
 }
 
-MACHINE_DRIVER_START( solarq_sound )
+MACHINE_CONFIG_FRAGMENT( solarq_sound )
 	MDRV_MACHINE_START(generic)
 	MDRV_MACHINE_RESET(solarq)
 
@@ -1083,7 +1083,7 @@ MACHINE_DRIVER_START( solarq_sound )
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(solarq_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -1210,7 +1210,7 @@ static MACHINE_RESET( boxingb )
 	generic_init(machine, boxingb_sound_w);
 }
 
-MACHINE_DRIVER_START( boxingb_sound )
+MACHINE_CONFIG_FRAGMENT( boxingb_sound )
 	MDRV_MACHINE_START(generic)
 	MDRV_MACHINE_RESET(boxingb)
 
@@ -1219,7 +1219,7 @@ MACHINE_DRIVER_START( boxingb_sound )
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(boxingb_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -1324,7 +1324,7 @@ static MACHINE_RESET( wotw )
 	generic_init(machine, wotw_sound_w);
 }
 
-MACHINE_DRIVER_START( wotw_sound )
+MACHINE_CONFIG_FRAGMENT( wotw_sound )
 	MDRV_MACHINE_START(generic)
 	MDRV_MACHINE_RESET(wotw)
 
@@ -1333,7 +1333,7 @@ MACHINE_DRIVER_START( wotw_sound )
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(wotw_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -1438,7 +1438,7 @@ static MACHINE_RESET( wotwc )
 	generic_init(machine, wotwc_sound_w);
 }
 
-MACHINE_DRIVER_START( wotwc_sound )
+MACHINE_CONFIG_FRAGMENT( wotwc_sound )
 	MDRV_MACHINE_START(generic)
 	MDRV_MACHINE_RESET(wotwc)
 
@@ -1447,7 +1447,7 @@ MACHINE_DRIVER_START( wotwc_sound )
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(wotwc_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -1585,7 +1585,7 @@ static const z80_daisy_config daisy_chain[] =
 };
 
 
-MACHINE_DRIVER_START( demon_sound )
+MACHINE_CONFIG_FRAGMENT( demon_sound )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("audiocpu", Z80, 3579545)
@@ -1611,7 +1611,7 @@ MACHINE_DRIVER_START( demon_sound )
 	MDRV_SOUND_ADD("ay3", AY8910, 3579545)
 	MDRV_SOUND_CONFIG(demon_ay8910_interface_3)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -1639,7 +1639,6 @@ static MACHINE_RESET( qb3_sound )
 }
 
 
-MACHINE_DRIVER_START( qb3_sound )
-	MDRV_IMPORT_FROM(demon_sound)
+MACHINE_CONFIG_DERIVED( qb3_sound, demon_sound )
 	MDRV_MACHINE_RESET(qb3_sound)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END

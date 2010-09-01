@@ -269,10 +269,7 @@ static MACHINE_RESET( blockout )
 	state->color = 0;
 }
 
-static MACHINE_DRIVER_START( blockout )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(blockout_state)
+static MACHINE_CONFIG_START( blockout, blockout_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)       /* MRH - 8.76 makes gfx/adpcm samples sync better -- but 10 is correct speed*/
@@ -309,7 +306,7 @@ static MACHINE_DRIVER_START( blockout )
 	MDRV_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

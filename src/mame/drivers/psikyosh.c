@@ -811,10 +811,7 @@ static MACHINE_START( psikyosh )
 }
 
 
-static MACHINE_DRIVER_START( psikyo3v1 )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(psikyosh_state)
+static MACHINE_CONFIG_START( psikyo3v1, psikyosh_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", SH2, MASTER_CLOCK/2)
@@ -850,19 +847,19 @@ static MACHINE_DRIVER_START( psikyo3v1 )
 	MDRV_SOUND_CONFIG(ymf278b_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( psikyo5 )
+static MACHINE_CONFIG_DERIVED( psikyo5, psikyo3v1 )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(psikyo3v1)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(ps5_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( psikyo5_240 )
+static MACHINE_CONFIG_DERIVED( psikyo5_240, psikyo3v1 )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(psikyo3v1)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(ps5_map)
@@ -870,7 +867,7 @@ static MACHINE_DRIVER_START( psikyo5_240 )
 	/* Ideally this would be driven off the video register. However, it doesn't changeat runtime and MAME will pick a better screen resolution if it knows upfront */
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 40*8-1, 0, 30*8-1)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* PS3 */

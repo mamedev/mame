@@ -5510,9 +5510,7 @@ static const ay8910_interface ladylinr_ay8910_config =
 	DEVCB_NULL
 };
 
-static MACHINE_DRIVER_START( goldstar )
-
-	MDRV_DRIVER_DATA(goldstar_state)
+static MACHINE_CONFIG_START( goldstar, goldstar_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -5544,12 +5542,10 @@ static MACHINE_DRIVER_START( goldstar )
 	MDRV_OKIM6295_ADD("oki", OKI_CLOCK, OKIM6295_PIN7_HIGH)	/* clock frequency & pin 7 not verified */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( goldstbl )
-
-	MDRV_DRIVER_DATA(goldstar_state)
+static MACHINE_CONFIG_START( goldstbl, goldstar_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -5580,12 +5576,10 @@ static MACHINE_DRIVER_START( goldstbl )
 
 	MDRV_OKIM6295_ADD("oki", OKI_CLOCK, OKIM6295_PIN7_HIGH)	/* clock frequency & pin 7 not verified */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( moonlght )
-
-	MDRV_DRIVER_DATA(goldstar_state)
+static MACHINE_CONFIG_START( moonlght, goldstar_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -5616,7 +5610,7 @@ static MACHINE_DRIVER_START( moonlght )
 
 	MDRV_OKIM6295_ADD("oki", OKI_CLOCK, OKIM6295_PIN7_HIGH)	/* clock frequency & pin 7 not verified */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 static PALETTE_INIT(cm)
@@ -5680,9 +5674,7 @@ static PALETTE_INIT(lucky8)
 }
 
 
-static MACHINE_DRIVER_START( chrygld )
-
-	MDRV_DRIVER_DATA(goldstar_state)
+static MACHINE_CONFIG_START( chrygld, goldstar_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -5720,13 +5712,11 @@ static MACHINE_DRIVER_START( chrygld )
 	MDRV_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
-static MACHINE_DRIVER_START( cb3c )
-
-	MDRV_DRIVER_DATA(goldstar_state)
+static MACHINE_CONFIG_START( cb3c, goldstar_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -5764,12 +5754,10 @@ static MACHINE_DRIVER_START( cb3c )
 	MDRV_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( ncb3 )
-
-	MDRV_DRIVER_DATA(goldstar_state)
+static MACHINE_CONFIG_START( ncb3, goldstar_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -5808,12 +5796,10 @@ static MACHINE_DRIVER_START( ncb3 )
 	MDRV_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( cm )
-
-	MDRV_DRIVER_DATA(goldstar_state)
+static MACHINE_CONFIG_START( cm, goldstar_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -5846,19 +5832,15 @@ static MACHINE_DRIVER_START( cm )
 	MDRV_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
 	MDRV_SOUND_CONFIG(cm_ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( cmasterc )
-
-	MDRV_IMPORT_FROM(cm)
+static MACHINE_CONFIG_DERIVED( cmasterc, cm )
 	MDRV_GFXDECODE(cmasterc)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 #ifdef UNUSED_CODE
-static MACHINE_DRIVER_START( cmnobmp )
-
-	MDRV_DRIVER_DATA(goldstar_state)
+static MACHINE_CONFIG_START( cmnobmp, goldstar_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -5891,12 +5873,10 @@ static MACHINE_DRIVER_START( cmnobmp )
 	MDRV_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
 	MDRV_SOUND_CONFIG(cm_ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 #endif
 
-static MACHINE_DRIVER_START( cmast91 )
-
-	MDRV_DRIVER_DATA(goldstar_state)
+static MACHINE_CONFIG_START( cmast91, goldstar_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -5929,7 +5909,7 @@ static MACHINE_DRIVER_START( cmast91 )
 	MDRV_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
 	MDRV_SOUND_CONFIG(cm_ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static INTERRUPT_GEN( lucky8_irq )
 {
@@ -5939,9 +5919,7 @@ static INTERRUPT_GEN( lucky8_irq )
 		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_DRIVER_START( lucky8 )
-
-	MDRV_DRIVER_DATA(goldstar_state)
+static MACHINE_CONFIG_START( lucky8, goldstar_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -5980,7 +5958,7 @@ static MACHINE_DRIVER_START( lucky8 )
 	MDRV_SOUND_CONFIG(lucky8_ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static PALETTE_INIT(magical)
 {
@@ -5999,9 +5977,7 @@ static PALETTE_INIT(magical)
 	}
 }
 
-static MACHINE_DRIVER_START( magical )
-
-	MDRV_DRIVER_DATA(goldstar_state)
+static MACHINE_CONFIG_START( magical, goldstar_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -6039,12 +6015,10 @@ static MACHINE_DRIVER_START( magical )
 	MDRV_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
 	MDRV_SOUND_CONFIG(lucky8_ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( kkojnoli )
-
-	MDRV_DRIVER_DATA(goldstar_state)
+static MACHINE_CONFIG_START( kkojnoli, goldstar_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -6079,12 +6053,10 @@ static MACHINE_DRIVER_START( kkojnoli )
 	MDRV_SOUND_ADD("snsnd", SN76489, PSG_CLOCK)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( ladylinr )
-
-	MDRV_DRIVER_DATA(goldstar_state)
+static MACHINE_CONFIG_START( ladylinr, goldstar_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -6121,12 +6093,10 @@ static MACHINE_DRIVER_START( ladylinr )
 	MDRV_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
 	MDRV_SOUND_CONFIG(ladylinr_ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( wcat3 )
-
-	MDRV_DRIVER_DATA(goldstar_state)
+static MACHINE_CONFIG_START( wcat3, goldstar_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -6165,13 +6135,11 @@ static MACHINE_DRIVER_START( wcat3 )
 	MDRV_SOUND_CONFIG(lucky8_ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* diff with cm machine driver: gfxdecode, OKI & portmap */
-static MACHINE_DRIVER_START( amcoe1 )
-
-	MDRV_DRIVER_DATA(goldstar_state)
+static MACHINE_CONFIG_START( amcoe1, goldstar_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -6207,13 +6175,11 @@ static MACHINE_DRIVER_START( amcoe1 )
 
 	MDRV_OKIM6295_ADD("oki", OKI_CLOCK, OKIM6295_PIN7_HIGH)	/* clock frequency & pin 7 not verified */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* diff with cm machine driver: gfxdecode, OKI, portmap & tilemaps rect size/position */
-static MACHINE_DRIVER_START( amcoe1a )
-
-	MDRV_DRIVER_DATA(goldstar_state)
+static MACHINE_CONFIG_START( amcoe1a, goldstar_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -6249,13 +6215,11 @@ static MACHINE_DRIVER_START( amcoe1a )
 
 	MDRV_OKIM6295_ADD("oki", OKI_CLOCK, OKIM6295_PIN7_HIGH)	/* clock frequency & pin 7 not verified */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* diff with cm machine driver: gfxdecode, AY8910 volume & portmap */
-static MACHINE_DRIVER_START( amcoe2 )
-
-	MDRV_DRIVER_DATA(goldstar_state)
+static MACHINE_CONFIG_START( amcoe2, goldstar_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -6288,11 +6252,9 @@ static MACHINE_DRIVER_START( amcoe2 )
 	MDRV_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
 	MDRV_SOUND_CONFIG(cm_ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.00)	/* analyzed for clips */
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( nfm )
-
-	MDRV_DRIVER_DATA(goldstar_state)
+static MACHINE_CONFIG_START( nfm, goldstar_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -6325,11 +6287,9 @@ static MACHINE_DRIVER_START( nfm )
 	MDRV_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
 	MDRV_SOUND_CONFIG(cm_ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.00)	/* analyzed for clips */
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( unkch )
-
-	MDRV_DRIVER_DATA(goldstar_state)
+static MACHINE_CONFIG_START( unkch, goldstar_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -6360,19 +6320,15 @@ static MACHINE_DRIVER_START( unkch )
 //  MDRV_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
 //  MDRV_SOUND_CONFIG(ay8910_config)
 //  MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( cherrys )
-
-	MDRV_IMPORT_FROM(ncb3)
+static MACHINE_CONFIG_DERIVED( cherrys, ncb3 )
 	MDRV_GFXDECODE(cherrys)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 // hw unknown
-static MACHINE_DRIVER_START( pkrmast )
-
-	MDRV_DRIVER_DATA(goldstar_state)
+static MACHINE_CONFIG_START( pkrmast, goldstar_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -6405,7 +6361,7 @@ static MACHINE_DRIVER_START( pkrmast )
 	MDRV_SOUND_ADD("aysnd", AY8910, AY_CLOCK)
 	MDRV_SOUND_CONFIG(cm_ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

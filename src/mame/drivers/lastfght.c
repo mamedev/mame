@@ -570,10 +570,7 @@ static MACHINE_RESET( lastfght )
 	state->c00006 = 0;
 }
 
-static MACHINE_DRIVER_START( lastfght )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(lastfght_state)
+static MACHINE_CONFIG_START( lastfght, lastfght_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", H83044, 32000000/2)
@@ -596,7 +593,7 @@ static MACHINE_DRIVER_START( lastfght )
 
 	MDRV_VIDEO_START( lastfght )
 	MDRV_VIDEO_UPDATE( lastfght )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

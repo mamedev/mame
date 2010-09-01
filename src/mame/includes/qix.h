@@ -82,9 +82,9 @@ WRITE_LINE_DEVICE_HANDLER( qix_vsync_changed );
 
 /*----------- defined in video/qix.c -----------*/
 
-MACHINE_DRIVER_EXTERN( qix_video );
-MACHINE_DRIVER_EXTERN( zookeep_video );
-MACHINE_DRIVER_EXTERN( slither_video );
+MACHINE_CONFIG_EXTERN( qix_video );
+MACHINE_CONFIG_EXTERN( zookeep_video );
+MACHINE_CONFIG_EXTERN( slither_video );
 
 WRITE8_DEVICE_HANDLER( qix_flip_screen_w );
 WRITE8_HANDLER( qix_palettebank_w );
@@ -92,5 +92,5 @@ WRITE8_HANDLER( qix_palettebank_w );
 
 /*----------- defined in audio/qix.c -----------*/
 
-MACHINE_DRIVER_EXTERN( qix_audio );
-MACHINE_DRIVER_EXTERN( slither_audio );
+MACHINE_CONFIG_EXTERN( qix_audio );
+MACHINE_CONFIG_EXTERN( slither_audio );

@@ -390,10 +390,7 @@ static MACHINE_RESET( m52 )
 	state->bgcontrol = 0;
 }
 
-static MACHINE_DRIVER_START( m52 )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(irem_z80_state)
+static MACHINE_CONFIG_START( m52, irem_z80_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)
@@ -416,17 +413,16 @@ static MACHINE_DRIVER_START( m52 )
 	MDRV_VIDEO_UPDATE(m52)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(m52_sound_c_audio)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(m52_sound_c_audio)
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( alpha1v )
-	MDRV_IMPORT_FROM(m52)
+static MACHINE_CONFIG_DERIVED( alpha1v, m52 )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(alpha1v_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

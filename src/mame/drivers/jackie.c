@@ -519,7 +519,7 @@ static DRIVER_INIT( jackie )
 }
 
 
-static MACHINE_DRIVER_START( jackie )
+static MACHINE_CONFIG_START( jackie, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz / 2)
@@ -548,7 +548,7 @@ static MACHINE_DRIVER_START( jackie )
 	MDRV_SOUND_ADD("ymsnd", YM2413, 3579545)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( jackie )

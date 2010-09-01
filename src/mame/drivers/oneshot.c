@@ -370,10 +370,7 @@ static MACHINE_RESET( oneshot )
 	state->p2_wobble = 0;
 }
 
-static MACHINE_DRIVER_START( oneshot )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(oneshot_state)
+static MACHINE_CONFIG_START( oneshot, oneshot_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
@@ -408,16 +405,15 @@ static MACHINE_DRIVER_START( oneshot )
 
 	MDRV_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( maddonna )
+static MACHINE_CONFIG_DERIVED( maddonna, oneshot )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(oneshot)
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(maddonna) // no crosshair
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( oneshot )

@@ -344,7 +344,7 @@ static const ym2203_interface ym2203_config =
     irqhandler
 };
 
-static MACHINE_DRIVER_START( sothello )
+static MACHINE_CONFIG_START( sothello, driver_data_t )
 
     /* basic machine hardware */
 
@@ -390,7 +390,7 @@ static MACHINE_DRIVER_START( sothello )
     MDRV_SOUND_CONFIG(msm_interface)
     MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

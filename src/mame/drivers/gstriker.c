@@ -546,7 +546,7 @@ INPUT_PORTS_END
 
 /*** MACHINE DRIVER **********************************************************/
 
-static MACHINE_DRIVER_START( gstriker )
+static MACHINE_CONFIG_START( gstriker, driver_data_t )
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(gstriker_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
@@ -578,15 +578,14 @@ static MACHINE_DRIVER_START( gstriker )
 	MDRV_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MDRV_SOUND_ROUTE(1, "lspeaker",  1.0)
 	MDRV_SOUND_ROUTE(2, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( twrldc94 )
-	MDRV_IMPORT_FROM( gstriker )
+static MACHINE_CONFIG_DERIVED( twrldc94, gstriker )
 	MDRV_VIDEO_START( twrldc94 )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( vgoal )
+static MACHINE_CONFIG_START( vgoal, driver_data_t )
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(vgoal_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
@@ -618,7 +617,7 @@ static MACHINE_DRIVER_START( vgoal )
 	MDRV_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MDRV_SOUND_ROUTE(1, "lspeaker",  1.0)
 	MDRV_SOUND_ROUTE(2, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

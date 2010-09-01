@@ -376,7 +376,7 @@ static const msm5205_interface msm5205_config =
 	MSM5205_S96_4B	/* 4KHz 4-bit */
 };
 
-static MACHINE_DRIVER_START( wc90b )
+static MACHINE_CONFIG_START( wc90b, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK)
@@ -415,7 +415,7 @@ static MACHINE_DRIVER_START( wc90b )
 	MDRV_SOUND_ADD("msm", MSM5205, MSM5205_CLOCK)
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( wc90b1 )
 	ROM_REGION( 0x20000, "maincpu", 0 )

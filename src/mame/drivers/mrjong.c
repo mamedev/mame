@@ -178,10 +178,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( mrjong )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(mrjong_state)
+static MACHINE_CONFIG_START( mrjong, mrjong_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,15468000/6)	/* 2.578 MHz?? */
@@ -212,7 +209,7 @@ static MACHINE_DRIVER_START( mrjong )
 
 	MDRV_SOUND_ADD("sn2", SN76489, 15468000/6)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************************

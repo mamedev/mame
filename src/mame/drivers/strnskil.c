@@ -321,7 +321,7 @@ static GFXDECODE_START( strnskil )
 GFXDECODE_END
 
 
-static MACHINE_DRIVER_START( strnskil )
+static MACHINE_CONFIG_START( strnskil, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,8000000/2) /* 4.000MHz */
@@ -357,7 +357,7 @@ static MACHINE_DRIVER_START( strnskil )
 
 	MDRV_SOUND_ADD("sn2", SN76496, 8000000/2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /****************************************************************************/
 

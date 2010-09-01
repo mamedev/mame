@@ -3272,10 +3272,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( system16b )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(segas1x_state)
+static MACHINE_CONFIG_START( system16b, segas1x_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, MASTER_CLOCK_10MHz)
@@ -3311,18 +3308,17 @@ static MACHINE_DRIVER_START( system16b )
 	MDRV_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
 	MDRV_SOUND_CONFIG(upd7759_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.48)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( system16b_8751 )
-	MDRV_IMPORT_FROM(system16b)
+static MACHINE_CONFIG_DERIVED( system16b_8751, system16b )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_VBLANK_INT("screen", i8751_main_cpu_vblank)
 
 	MDRV_CPU_ADD("mcu", I8751, MASTER_CLOCK_8MHz)
 	MDRV_CPU_IO_MAP(mcu_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_pulse)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* same as the above, but with custom Sega ICs */
 
@@ -3331,21 +3327,19 @@ static const ic_315_5250_interface sys16b_5250_intf =
 	NULL, NULL
 };
 
-static MACHINE_DRIVER_START( system16b_5248 )
-	MDRV_IMPORT_FROM(system16b)
+static MACHINE_CONFIG_DERIVED( system16b_5248, system16b )
 
 	MDRV_315_5248_ADD("315_5248")
 	MDRV_315_5250_ADD("315_5250_1", sys16b_5250_intf)
 	MDRV_315_5250_ADD("315_5250_2", sys16b_5250_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( system16b_8751_5248 )
-	MDRV_IMPORT_FROM(system16b_8751)
+static MACHINE_CONFIG_DERIVED( system16b_8751_5248, system16b_8751 )
 
 	MDRV_315_5248_ADD("315_5248")
 	MDRV_315_5250_ADD("315_5250_1", sys16b_5250_intf)
 	MDRV_315_5250_ADD("315_5250_2", sys16b_5250_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -3355,8 +3349,7 @@ MACHINE_DRIVER_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( atomicp ) /* 10MHz CPU Clock verified */
-	MDRV_IMPORT_FROM(system16b)
+static MACHINE_CONFIG_DERIVED( atomicp, system16b ) /* 10MHz CPU Clock verified */
 
 	/* basic machine hardware */
 	MDRV_DEVICE_REMOVE("soundcpu")
@@ -3369,13 +3362,12 @@ static MACHINE_DRIVER_START( atomicp ) /* 10MHz CPU Clock verified */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_DEVICE_REMOVE("upd")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( timescan )
-	MDRV_IMPORT_FROM(system16b)
+static MACHINE_CONFIG_DERIVED( timescan, system16b )
 	MDRV_VIDEO_START(timscanr)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

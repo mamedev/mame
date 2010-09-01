@@ -125,7 +125,7 @@ static INPUT_PORTS_START( bingoc )
 INPUT_PORTS_END
 
 
-static MACHINE_DRIVER_START( bingoc )
+static MACHINE_CONFIG_START( bingoc, driver_data_t )
 
 	MDRV_CPU_ADD("maincpu", M68000,8000000)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(main_map)
@@ -160,7 +160,7 @@ static MACHINE_DRIVER_START( bingoc )
 	MDRV_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( bingoc )
 	ROM_REGION( 0x40000, "maincpu", 0 )

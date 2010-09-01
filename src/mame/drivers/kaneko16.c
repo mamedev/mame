@@ -1799,7 +1799,7 @@ static const ay8910_interface ay8910_intf_eeprom =
     6-7]    rte
 */
 
-static MACHINE_DRIVER_START( berlwall )
+static MACHINE_CONFIG_START( berlwall, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* MC68000P12 */
@@ -1838,14 +1838,14 @@ static MACHINE_DRIVER_START( berlwall )
 	MDRV_OKIM6295_ADD("oki", 12000000/6, OKIM6295_PIN7_LOW)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
                             Bakuretsu Breaker
 ***************************************************************************/
 
-static MACHINE_DRIVER_START( bakubrkr )
+static MACHINE_CONFIG_START( bakubrkr, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_12MHz) /* verified on pcb */
@@ -1883,7 +1883,7 @@ static MACHINE_DRIVER_START( bakubrkr )
 
 	MDRV_OKIM6295_ADD("oki", XTAL_12MHz/6, OKIM6295_PIN7_HIGH) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
@@ -1900,7 +1900,7 @@ MACHINE_DRIVER_END
         6-7]    busy loop
 */
 
-static MACHINE_DRIVER_START( blazeon )
+static MACHINE_CONFIG_START( blazeon, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,12000000)	/* TMP68HC000-12 */
@@ -1935,7 +1935,7 @@ static MACHINE_DRIVER_START( blazeon )
 	MDRV_SOUND_ADD("ymsnd", YM2151, 4000000)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -1953,7 +1953,7 @@ MACHINE_DRIVER_END
     VIDEO_UPDATE_AFTER_VBLANK fixes the mangled/wrong colored sprites
 */
 
-static MACHINE_DRIVER_START( gtmr )
+static MACHINE_CONFIG_START( gtmr, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("gtmr", M68000, XTAL_16MHz)	/* verified on pcb */
@@ -1986,33 +1986,31 @@ static MACHINE_DRIVER_START( gtmr )
 
 	MDRV_OKIM6295_ADD("oki2", XTAL_16MHz/8, OKIM6295_PIN7_LOW)	/* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
                                 Blood Warrior
 ***************************************************************************/
 
-static MACHINE_DRIVER_START( bloodwar )
+static MACHINE_CONFIG_DERIVED( bloodwar, gtmr )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(gtmr)
 	MDRV_CPU_MODIFY("gtmr")
 	MDRV_CPU_PROGRAM_MAP(bloodwar)
 
 	MDRV_MACHINE_RESET( bloodwar )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
                             Great 1000 Miles Rally 2
 ***************************************************************************/
 
-static MACHINE_DRIVER_START( gtmr2 )
+static MACHINE_CONFIG_DERIVED( gtmr2, gtmr )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(gtmr)
 	MDRV_CPU_MODIFY("gtmr")
 	MDRV_CPU_PROGRAM_MAP(gtmr2_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
                             Bonk's Adventure
@@ -2028,22 +2026,21 @@ MACHINE_DRIVER_END
     So now test mode is fully working and visible.
     SebV
 */
-static MACHINE_DRIVER_START( bonkadv )
+static MACHINE_CONFIG_DERIVED( bonkadv, gtmr )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(gtmr)
 	MDRV_CPU_MODIFY("gtmr")
 	MDRV_CPU_PROGRAM_MAP(bonkadv)
 	MDRV_CPU_VBLANK_INT_HACK(kaneko16_interrupt,KANEKO16_INTERRUPTS_NUM + 1 ) // comment above
 
 	MDRV_MACHINE_RESET( bonkadv )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
                                 Magical Crystal
 ***************************************************************************/
 
-static MACHINE_DRIVER_START( mgcrystl )
+static MACHINE_CONFIG_START( mgcrystl, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_12MHz) /* verified on pcb */
@@ -2081,7 +2078,7 @@ static MACHINE_DRIVER_START( mgcrystl )
 
 	MDRV_OKIM6295_ADD("oki", XTAL_12MHz/6, OKIM6295_PIN7_HIGH) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -2161,7 +2158,7 @@ static ADDRESS_MAP_START( shogwarr_oki2_map, 0, 8 )
 	AM_RANGE(0x00000, 0x3ffff) AM_ROMBANK("bank11")
 ADDRESS_MAP_END
 
-static MACHINE_DRIVER_START( shogwarr )
+static MACHINE_CONFIG_START( shogwarr, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_12MHz)
@@ -2196,7 +2193,7 @@ static MACHINE_DRIVER_START( shogwarr )
 	MDRV_OKIM6295_ADD("oki2", XTAL_16MHz/8, OKIM6295_PIN7_LOW)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MDRV_DEVICE_ADDRESS_MAP(0, shogwarr_oki2_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 static const UINT8 brapboys_default_eeprom[128] = {
@@ -2215,15 +2212,14 @@ static ADDRESS_MAP_START( brapboys_oki2_map, 0, 8 )
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("bank11")
 ADDRESS_MAP_END
 
-static MACHINE_DRIVER_START( brapboys )
-	MDRV_IMPORT_FROM(shogwarr)
+static MACHINE_CONFIG_DERIVED( brapboys, shogwarr )
 	MDRV_SOUND_MODIFY("oki2")
 	MDRV_DEVICE_ADDRESS_MAP(0, brapboys_oki2_map)
 
 	MDRV_DEVICE_REMOVE("eeprom")
 	MDRV_EEPROM_93C46_ADD("eeprom")
 	MDRV_EEPROM_DATA(brapboys_default_eeprom, 128)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

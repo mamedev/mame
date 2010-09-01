@@ -959,10 +959,7 @@ static MACHINE_RESET( dwarfd )
 	state->i8275HorizontalRetrace = 0;
 }
 
-static MACHINE_DRIVER_START( dwarfd )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(dwarfd_state)
+static MACHINE_CONFIG_START( dwarfd, dwarfd_state )
 
 	/* basic machine hardware */
 	/* FIXME: The 8085A had a max clock of 6MHz, internally divided by 2! */
@@ -995,15 +992,14 @@ static MACHINE_DRIVER_START( dwarfd )
 	MDRV_SOUND_ADD("aysnd", AY8910, 1500000)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( qc )
-	MDRV_IMPORT_FROM( dwarfd )
+static MACHINE_CONFIG_DERIVED( qc, dwarfd )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(qc_map)
 	MDRV_CPU_IO_MAP(qc_io_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( dwarfd )
 	ROM_REGION( 0x10000, "maincpu", 0 )

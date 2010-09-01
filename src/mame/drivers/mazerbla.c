@@ -1475,10 +1475,7 @@ static MACHINE_RESET( mazerbla )
 }
 
 
-static MACHINE_DRIVER_START( mazerbla )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(mazerbla_state)
+static MACHINE_CONFIG_START( mazerbla, mazerbla_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK)	/* 4 MHz, no NMI, IM2 - vectors at 0xf8, 0xfa, 0xfc */
@@ -1518,13 +1515,10 @@ static MACHINE_DRIVER_START( mazerbla )
 	MDRV_VIDEO_UPDATE(mazerbla)
 
 	/* sound hardware */
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( greatgun )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(mazerbla_state)
+static MACHINE_CONFIG_START( greatgun, mazerbla_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK)	/* 4 MHz, no NMI, IM2 - vectors at 0xf8, 0xfa, 0xfc */
@@ -1571,7 +1565,7 @@ static MACHINE_DRIVER_START( greatgun )
 	MDRV_SOUND_ADD("ay2", AY8910, SOUND_CLOCK / 8)
 	MDRV_SOUND_CONFIG(ay8912_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*************************************
  *

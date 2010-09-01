@@ -814,10 +814,7 @@ static MACHINE_RESET( dunhuang )
 }
 
 
-static MACHINE_DRIVER_START( dunhuang )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(dunhuang_state)
+static MACHINE_CONFIG_START( dunhuang, dunhuang_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,12000000/2)
@@ -856,7 +853,7 @@ static MACHINE_DRIVER_START( dunhuang )
 
 	MDRV_OKIM6295_ADD("oki", 12000000/8, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

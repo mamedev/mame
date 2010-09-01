@@ -225,7 +225,7 @@ static INTERRUPT_GEN( deadang_interrupt )
 
 /* Machine Drivers */
 
-static MACHINE_DRIVER_START( deadang )
+static MACHINE_CONFIG_START( deadang, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V30,XTAL_16MHz/2) /* Sony 8623h9 CXQ70116D-8 (V30 compatible) */
@@ -259,7 +259,7 @@ static MACHINE_DRIVER_START( deadang )
 	/* sound hardware */
 	SEIBU_SOUND_SYSTEM_YM2203_INTERFACE(XTAL_14_31818MHz/4)
 	SEIBU_SOUND_SYSTEM_ADPCM_INTERFACE
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROMs */
 

@@ -705,7 +705,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( spiders )
+static MACHINE_CONFIG_START( spiders, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 2800000)
@@ -737,9 +737,9 @@ static MACHINE_DRIVER_START( spiders )
 	MDRV_TTL74123_ADD("ic60", ic60_intf)
 
 	/* audio hardware */
-	MDRV_IMPORT_FROM(spiders_audio)
+	MDRV_FRAGMENT_ADD(spiders_audio)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

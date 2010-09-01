@@ -270,7 +270,7 @@ static MACHINE_RESET( cmmb )
 {
 }
 
-static MACHINE_DRIVER_START( cmmb )
+static MACHINE_CONFIG_START( cmmb, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M65C02,8000000/2) // unknown clock
@@ -296,7 +296,7 @@ static MACHINE_DRIVER_START( cmmb )
 //  MDRV_SPEAKER_STANDARD_MONO("mono")
 //  MDRV_SOUND_ADD("aysnd", AY8910, 8000000/4)
 //  MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

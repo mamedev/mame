@@ -755,7 +755,7 @@ static const mc6845_interface mc6845_intf =
 *    Machine Drivers     *
 *************************/
 
-static MACHINE_DRIVER_START( magicfly )
+static MACHINE_CONFIG_START( magicfly, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, MASTER_CLOCK/12)	/* guess */
@@ -785,17 +785,16 @@ static MACHINE_DRIVER_START( magicfly )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( 7mezzo )
+static MACHINE_CONFIG_DERIVED( 7mezzo, magicfly )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(magicfly)
 
 	/* video hardware */
 	MDRV_VIDEO_START(7mezzo)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************

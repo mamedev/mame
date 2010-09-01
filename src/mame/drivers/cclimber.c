@@ -981,7 +981,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_DRIVER_START( root )
+static MACHINE_CONFIG_START( root, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/3/2)	/* 3.072 MHz */
@@ -1005,12 +1005,10 @@ static MACHINE_DRIVER_START( root )
 	MDRV_PALETTE_INIT(cclimber)
 	MDRV_VIDEO_START(cclimber)
 	MDRV_VIDEO_UPDATE(cclimber)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( cclimber )
-
-	MDRV_IMPORT_FROM(root)
+static MACHINE_CONFIG_DERIVED( cclimber, root )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -1022,12 +1020,10 @@ static MACHINE_DRIVER_START( cclimber )
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(cclimber_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( cannonb )
-
-	MDRV_IMPORT_FROM(cclimber)
+static MACHINE_CONFIG_DERIVED( cannonb, cclimber )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
@@ -1035,12 +1031,10 @@ static MACHINE_DRIVER_START( cannonb )
 
 	/* video hardware */
 	MDRV_GFXDECODE(cannonb)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( yamato )
-
-	MDRV_IMPORT_FROM(root)
+static MACHINE_CONFIG_DERIVED( yamato, root )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
@@ -1064,12 +1058,10 @@ static MACHINE_DRIVER_START( yamato )
 
 	MDRV_SOUND_ADD("ay2", AY8910, 1536000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( toprollr )
-
-	MDRV_IMPORT_FROM(cclimber)
+static MACHINE_CONFIG_DERIVED( toprollr, cclimber )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
@@ -1082,10 +1074,10 @@ static MACHINE_DRIVER_START( toprollr )
 
 	MDRV_VIDEO_START(toprollr)
 	MDRV_VIDEO_UPDATE(toprollr)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( swimmer )
+static MACHINE_CONFIG_START( swimmer, driver_data_t )
 
 	/* basic machine hardware */
     MDRV_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)    /* verified on pcb */
@@ -1119,7 +1111,7 @@ static MACHINE_DRIVER_START( swimmer )
 
     MDRV_SOUND_ADD("ay2", AY8910, XTAL_4MHz/2)  /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

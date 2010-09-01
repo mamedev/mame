@@ -600,7 +600,7 @@ static const tms34010_config tms_config =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( tunit_core )
+static MACHINE_CONFIG_START( tunit_core, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", TMS34010, CPU_CLOCK)
@@ -619,23 +619,21 @@ static MACHINE_DRIVER_START( tunit_core )
 
 	MDRV_VIDEO_START(midtunit)
 	MDRV_VIDEO_UPDATE(tms340x0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( tunit_adpcm )
-
-	/* basic machine hardware */
-	MDRV_IMPORT_FROM(tunit_core)
-	MDRV_IMPORT_FROM(williams_adpcm_sound)
-MACHINE_DRIVER_END
-
-
-static MACHINE_DRIVER_START( tunit_dcs )
+static MACHINE_CONFIG_DERIVED( tunit_adpcm, tunit_core )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(tunit_core)
-	MDRV_IMPORT_FROM(dcs_audio_2k)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(williams_adpcm_sound)
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( tunit_dcs, tunit_core )
+
+	/* basic machine hardware */
+	MDRV_FRAGMENT_ADD(dcs_audio_2k)
+MACHINE_CONFIG_END
 
 
 

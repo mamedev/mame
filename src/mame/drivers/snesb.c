@@ -497,10 +497,7 @@ static INPUT_PORTS_START( denseib )
 INPUT_PORTS_END
 
 
-static MACHINE_DRIVER_START( kinstb )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(snes_state)
+static MACHINE_CONFIG_START( kinstb, snes_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", _5A22, 3580000*6)	/* 2.68Mhz, also 3.58Mhz */
@@ -528,7 +525,7 @@ static MACHINE_DRIVER_START( kinstb )
 	MDRV_SOUND_ADD("spc700", SNES, 0)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.00)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static DRIVER_INIT(kinstb)
 {

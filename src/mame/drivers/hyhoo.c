@@ -252,7 +252,7 @@ static const ay8910_interface ay8910_config =
 };
 
 
-static MACHINE_DRIVER_START( hyhoo )
+static MACHINE_CONFIG_START( hyhoo, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 5000000)	/* 5.00 MHz ?? */
@@ -283,7 +283,7 @@ static MACHINE_DRIVER_START( hyhoo )
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( hyhoo )

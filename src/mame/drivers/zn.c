@@ -466,7 +466,7 @@ static void zn_machine_init( running_machine *machine )
 	psx_machine_init(machine);
 }
 
-static MACHINE_DRIVER_START( zn1_1mb_vram )
+static MACHINE_CONFIG_START( zn1_1mb_vram, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD( "maincpu", PSXCPU, XTAL_67_7376MHz )
 	MDRV_CPU_PROGRAM_MAP( zn_map)
@@ -495,16 +495,15 @@ static MACHINE_DRIVER_START( zn1_1mb_vram )
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.35)
 
 	MDRV_AT28C16_ADD( "at28c16", NULL )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( zn1_2mb_vram )
-	MDRV_IMPORT_FROM( zn1_1mb_vram )
+static MACHINE_CONFIG_DERIVED( zn1_2mb_vram, zn1_1mb_vram )
 
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_SIZE( 1024, 1024 )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( zn2 )
+static MACHINE_CONFIG_START( zn2, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD( "maincpu", PSXCPU, XTAL_100MHz )
 	MDRV_CPU_PROGRAM_MAP( zn_map)
@@ -533,7 +532,7 @@ static MACHINE_DRIVER_START( zn2 )
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.35)
 
 	MDRV_AT28C16_ADD( "at28c16", NULL )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*
 Capcom ZN1 generic PCB Layout
@@ -720,8 +719,7 @@ static ADDRESS_MAP_START( qsound_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_READ(soundlatch_r)
 ADDRESS_MAP_END
 
-static MACHINE_DRIVER_START( coh1000c )
-	MDRV_IMPORT_FROM( zn1_1mb_vram )
+static MACHINE_CONFIG_DERIVED( coh1000c, zn1_1mb_vram )
 
 	MDRV_CPU_ADD("audiocpu",  Z80, 8000000 )  /* 8MHz ?? */
 	MDRV_CPU_PROGRAM_MAP( qsound_map)
@@ -733,10 +731,9 @@ static MACHINE_DRIVER_START( coh1000c )
 	MDRV_SOUND_ADD( "qsound", QSOUND, QSOUND_CLOCK )
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( coh1002c )
-	MDRV_IMPORT_FROM( zn1_2mb_vram )
+static MACHINE_CONFIG_DERIVED( coh1002c, zn1_2mb_vram )
 
 	MDRV_CPU_ADD("audiocpu",  Z80, 8000000 )  /* 8MHz ?? */
 	MDRV_CPU_PROGRAM_MAP( qsound_map)
@@ -748,7 +745,7 @@ static MACHINE_DRIVER_START( coh1002c )
 	MDRV_SOUND_ADD( "qsound", QSOUND, QSOUND_CLOCK )
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*
 
@@ -916,8 +913,7 @@ static MACHINE_RESET( coh3002c )
 	zn_machine_init(machine);
 }
 
-static MACHINE_DRIVER_START( coh3002c )
-	MDRV_IMPORT_FROM( zn2 )
+static MACHINE_CONFIG_DERIVED( coh3002c, zn2 )
 
 	MDRV_CPU_ADD("audiocpu", Z80, 8000000 )	/* 8MHz ?? */
 	MDRV_CPU_PROGRAM_MAP( qsound_map)
@@ -929,7 +925,7 @@ static MACHINE_DRIVER_START( coh3002c )
 	MDRV_SOUND_ADD( "qsound", QSOUND, QSOUND_CLOCK )
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*
 
@@ -1251,8 +1247,7 @@ static const tc0140syt_interface coh1000ta_tc0140syt_intf =
 	"maincpu", "audiocpu"
 };
 
-static MACHINE_DRIVER_START( coh1000ta )
-	MDRV_IMPORT_FROM( zn1_1mb_vram )
+static MACHINE_CONFIG_DERIVED( coh1000ta, zn1_1mb_vram )
 
 	MDRV_CPU_ADD("audiocpu", Z80, 16000000 / 4 )	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP( fx1a_sound_map)
@@ -1269,7 +1264,7 @@ static MACHINE_DRIVER_START( coh1000ta )
 	MDRV_MB3773_ADD("mb3773")
 
 	MDRV_TC0140SYT_ADD("tc0140syt", coh1000ta_tc0140syt_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static WRITE32_HANDLER( taitofx1b_volume_w )
 {
@@ -1332,16 +1327,15 @@ static NVRAM_HANDLER( coh1000tb )
 }
 
 
-static MACHINE_DRIVER_START( coh1000tb )
-	MDRV_IMPORT_FROM( zn1_2mb_vram )
+static MACHINE_CONFIG_DERIVED( coh1000tb, zn1_2mb_vram )
 
 	MDRV_MACHINE_RESET( coh1000tb )
 	MDRV_NVRAM_HANDLER( coh1000tb )
 
 	MDRV_MB3773_ADD("mb3773")
 
-	MDRV_IMPORT_FROM( taito_zoom_sound )
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD( taito_zoom_sound )
+MACHINE_CONFIG_END
 
 /*
 
@@ -1518,13 +1512,12 @@ static MACHINE_RESET( coh1000w )
 	psx_dma_install_write_handler(5, atpsx_dma_write);
 }
 
-static MACHINE_DRIVER_START( coh1000w )
-	MDRV_IMPORT_FROM( zn1_2mb_vram )
+static MACHINE_CONFIG_DERIVED( coh1000w, zn1_2mb_vram )
 
 	MDRV_MACHINE_RESET( coh1000w )
 
 	MDRV_IDE_CONTROLLER_ADD("ide", atpsx_interrupt)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*
 
@@ -1712,8 +1705,7 @@ static ADDRESS_MAP_START( psarc_snd_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100020, 0xffffff) AM_WRITENOP
 ADDRESS_MAP_END
 
-static MACHINE_DRIVER_START( coh1002e )
-	MDRV_IMPORT_FROM( zn1_2mb_vram )
+static MACHINE_CONFIG_DERIVED( coh1002e, zn1_2mb_vram )
 
 	MDRV_CPU_ADD("audiocpu", M68000, 12000000 )
 	MDRV_CPU_PROGRAM_MAP( psarc_snd_map)
@@ -1723,7 +1715,7 @@ static MACHINE_DRIVER_START( coh1002e )
 	MDRV_SOUND_ADD( "ymf", YMF271, 16934400 )
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*
@@ -1850,11 +1842,10 @@ static MACHINE_RESET( bam2 )
 	zn_machine_init(machine);
 }
 
-static MACHINE_DRIVER_START( bam2 )
-	MDRV_IMPORT_FROM( zn1_2mb_vram )
+static MACHINE_CONFIG_DERIVED( bam2, zn1_2mb_vram )
 
 	MDRV_MACHINE_RESET( bam2 )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*
 
@@ -2191,14 +2182,12 @@ static MACHINE_RESET( coh1000a )
 	}
 }
 
-static MACHINE_DRIVER_START( coh1000a )
-	MDRV_IMPORT_FROM( zn1_2mb_vram )
+static MACHINE_CONFIG_DERIVED( coh1000a, zn1_2mb_vram )
 
 	MDRV_MACHINE_RESET( coh1000a )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( coh1000a_ide )
-	MDRV_IMPORT_FROM( zn1_2mb_vram )
+static MACHINE_CONFIG_DERIVED( coh1000a_ide, zn1_2mb_vram )
 
 	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_VBLANK_INT("screen", jdredd_vblank)
@@ -2206,7 +2195,7 @@ static MACHINE_DRIVER_START( coh1000a_ide )
 	MDRV_MACHINE_RESET( coh1000a )
 
 	MDRV_IDE_CONTROLLER_ADD("ide", jdredd_ide_interrupt)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*
 
@@ -2343,8 +2332,7 @@ static MACHINE_RESET( coh1001l )
 	zn_machine_init(machine);
 }
 
-static MACHINE_DRIVER_START( coh1001l )
-	MDRV_IMPORT_FROM( zn1_2mb_vram )
+static MACHINE_CONFIG_DERIVED( coh1001l, zn1_2mb_vram )
 
 //  MDRV_CPU_ADD("audiocpu", M68000, 10000000 )
 //  MDRV_CPU_PROGRAM_MAP( atlus_snd_map)
@@ -2352,7 +2340,7 @@ static MACHINE_DRIVER_START( coh1001l )
 	MDRV_MACHINE_RESET( coh1001l )
 
 //  MDRV_SOUND_ADD( "ymz", wYMZ280B, ymz280b_intf )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*
 
@@ -2388,11 +2376,10 @@ static MACHINE_RESET( coh1002v )
 	zn_machine_init(machine);
 }
 
-static MACHINE_DRIVER_START( coh1002v )
-	MDRV_IMPORT_FROM( zn1_2mb_vram )
+static MACHINE_CONFIG_DERIVED( coh1002v, zn1_2mb_vram )
 
 	MDRV_MACHINE_RESET( coh1002v )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*
 
@@ -2624,14 +2611,12 @@ static ADDRESS_MAP_START( cbaj_z80_port_map, ADDRESS_SPACE_IO, 8)
 ADDRESS_MAP_END
 
 
-static MACHINE_DRIVER_START( coh1002m )
-	MDRV_IMPORT_FROM( zn1_2mb_vram )
+static MACHINE_CONFIG_DERIVED( coh1002m, zn1_2mb_vram )
 
 	MDRV_MACHINE_RESET( coh1002m )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( coh1002msnd )
-	MDRV_IMPORT_FROM( zn1_2mb_vram )
+static MACHINE_CONFIG_DERIVED( coh1002msnd, zn1_2mb_vram )
 
 	MDRV_CPU_ADD("audiocpu", Z80, 32000000/8 )
 	MDRV_CPU_PROGRAM_MAP( cbaj_z80_map)
@@ -2642,16 +2627,15 @@ static MACHINE_DRIVER_START( coh1002msnd )
 	MDRV_SOUND_ADD("ymz", YMZ280B, 16934400)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( coh1002ml )
-	MDRV_IMPORT_FROM( zn1_2mb_vram )
+static MACHINE_CONFIG_DERIVED( coh1002ml, zn1_2mb_vram )
 
 	MDRV_CPU_ADD("link", Z80, 8000000 )
 	MDRV_CPU_PROGRAM_MAP( link_map)
 
 	MDRV_MACHINE_RESET( coh1002m )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( zn )
 	PORT_START("P1")

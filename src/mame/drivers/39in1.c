@@ -1584,9 +1584,7 @@ static MACHINE_START(39in1)
 	pxa255_start(machine);
 }
 
-static MACHINE_DRIVER_START( 39in1 )
-
-	MDRV_DRIVER_DATA( _39in1_state )
+static MACHINE_CONFIG_START( 39in1, _39in1_state )
 
 	MDRV_CPU_ADD("maincpu", PXA255, 200000000)
 	MDRV_CPU_PROGRAM_MAP(39in1_map)
@@ -1613,7 +1611,7 @@ static MACHINE_DRIVER_START( 39in1 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ADD("dac2", DMADAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( 39in1 )
 	// main program, encrypted

@@ -466,7 +466,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( omegrace )
+static MACHINE_CONFIG_START( omegrace, driver_data_t )
 
 	/* basic machine hardware */
 
@@ -509,7 +509,7 @@ static MACHINE_DRIVER_START( omegrace )
 
 	MDRV_SOUND_ADD("ay2", AY8912, 12000000/12)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

@@ -1426,7 +1426,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( defender )
+static MACHINE_CONFIG_START( defender, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, MASTER_CLOCK/3/4)
@@ -1462,21 +1462,19 @@ static MACHINE_DRIVER_START( defender )
 	MDRV_PIA6821_ADD("pia_0", williams_pia_0_intf)
 	MDRV_PIA6821_ADD("pia_1", williams_pia_1_intf)
 	MDRV_PIA6821_ADD("pia_2", williams_snd_pia_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( jin ) // needs a different screen size or the credit text is clipped
+static MACHINE_CONFIG_DERIVED( jin, defender ) // needs a different screen size or the credit text is clipped
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(defender)
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 315, 7, 245)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( williams )
+static MACHINE_CONFIG_DERIVED( williams, defender )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(defender)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(williams_map)
@@ -1488,54 +1486,49 @@ static MACHINE_DRIVER_START( williams )
 	MDRV_MACHINE_RESET(williams)
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(6, 298-1, 7, 247-1)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( williams_muxed )
+static MACHINE_CONFIG_DERIVED( williams_muxed, williams )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(williams)
 
 	/* pia */
 	MDRV_PIA6821_MODIFY("pia_0", williams_muxed_pia_0_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( williams_extra_ram )
+static MACHINE_CONFIG_DERIVED( williams_extra_ram, williams )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(williams)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(williams_extra_ram_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( spdball )
+static MACHINE_CONFIG_DERIVED( spdball, williams )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(williams)
 
 	/* pia */
 	MDRV_PIA6821_ADD("pia_3", spdball_pia_3_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( lottofun )
+static MACHINE_CONFIG_DERIVED( lottofun, williams )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(williams)
 
 	/* pia */
 	MDRV_PIA6821_MODIFY("pia_0", lottofun_pia_0_intf)
 	MDRV_TICKET_DISPENSER_ADD("ticket", 70, TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_HIGH)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( alienar )
+static MACHINE_CONFIG_DERIVED( alienar, defender )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(defender)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(williams_map)
@@ -1547,13 +1540,12 @@ static MACHINE_DRIVER_START( alienar )
 
 	/* pia */
 	MDRV_PIA6821_MODIFY("pia_0", williams_muxed_pia_0_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( sinistar )
+static MACHINE_CONFIG_DERIVED( sinistar, williams_extra_ram )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(williams_extra_ram)
 
 	/* sound hardware */
 	MDRV_SOUND_ADD("cvsd", HC55516, 0)
@@ -1562,13 +1554,12 @@ static MACHINE_DRIVER_START( sinistar )
 	/* pia */
 	MDRV_PIA6821_MODIFY("pia_0", williams_49way_pia_0_intf)
 	MDRV_PIA6821_MODIFY("pia_2", sinistar_snd_pia_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( playball )
+static MACHINE_CONFIG_DERIVED( playball, williams )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(williams)
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
@@ -1581,13 +1572,12 @@ static MACHINE_DRIVER_START( playball )
 	/* pia */
 	MDRV_PIA6821_MODIFY("pia_1", playball_pia_1_intf)
 	MDRV_PIA6821_MODIFY("pia_2", sinistar_snd_pia_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( blaster )
+static MACHINE_CONFIG_DERIVED( blaster, williams )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(williams)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(blaster_map)
@@ -1601,20 +1591,19 @@ static MACHINE_DRIVER_START( blaster )
 
 	/* pia */
 	MDRV_PIA6821_MODIFY("pia_0", williams_49way_pia_0_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( blastkit )
+static MACHINE_CONFIG_DERIVED( blastkit, blaster )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(blaster)
 
 	/* pia */
 	MDRV_PIA6821_MODIFY("pia_0", williams_49way_muxed_pia_0_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( williams2 )
+static MACHINE_CONFIG_START( williams2, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, MASTER_CLOCK/3/4)
@@ -1652,55 +1641,51 @@ static MACHINE_DRIVER_START( williams2 )
 	MDRV_PIA6821_ADD("pia_0", williams2_muxed_pia_0_intf)
 	MDRV_PIA6821_ADD("pia_1", williams2_pia_1_intf)
 	MDRV_PIA6821_ADD("pia_2", williams2_snd_pia_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( williams2_extra_ram )
+static MACHINE_CONFIG_DERIVED( williams2_extra_ram, williams2 )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(williams2)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(williams2_extra_ram_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( mysticm )
+static MACHINE_CONFIG_DERIVED( mysticm, williams2_extra_ram )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(williams2_extra_ram)
 
 	/* pia */
 	MDRV_PIA6821_MODIFY("pia_0", mysticm_pia_0_intf)
 	MDRV_PIA6821_MODIFY("pia_1", mysticm_pia_1_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( tshoot )
+static MACHINE_CONFIG_DERIVED( tshoot, williams2 )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(williams2)
 
 	/* pia */
 	MDRV_PIA6821_MODIFY("pia_0", tshoot_pia_0_intf)
 	MDRV_PIA6821_MODIFY("pia_1", tshoot_pia_1_intf)
 	MDRV_PIA6821_MODIFY("pia_2", tshoot_snd_pia_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( joust2 )
+static MACHINE_CONFIG_DERIVED( joust2, williams2 )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(williams2)
 	MDRV_DEVICE_REMOVE("mono")
-	MDRV_IMPORT_FROM(williams_cvsd_sound)
+	MDRV_FRAGMENT_ADD(williams_cvsd_sound)
 
 	MDRV_MACHINE_START(joust2)
 	MDRV_MACHINE_RESET(joust2)
 
 	/* pia */
 	MDRV_PIA6821_MODIFY("pia_1", joust2_pia_1_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

@@ -567,9 +567,7 @@ static INTERRUPT_GEN( n64_vblank )
 	signal_rcp_interrupt(device->machine, VI_INTERRUPT);
 }
 
-static MACHINE_DRIVER_START( aleck64 )
-
-	MDRV_DRIVER_DATA(_n64_state)
+static MACHINE_CONFIG_START( aleck64, _n64_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", VR4300BE, 93750000)
@@ -601,7 +599,7 @@ static MACHINE_DRIVER_START( aleck64 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ADD("dac2", DMADAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static DRIVER_INIT( aleck64 )
 {

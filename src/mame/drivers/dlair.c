@@ -669,7 +669,7 @@ static const ay8910_interface ay8910_config =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( dlair_base )
+static MACHINE_CONFIG_START( dlair_base, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK_US/4)
@@ -693,22 +693,20 @@ static MACHINE_DRIVER_START( dlair_base )
 	MDRV_SOUND_ADD("ldsound", LASERDISC, 0)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( dlair_pr7820 )
-	MDRV_IMPORT_FROM(dlair_base)
+static MACHINE_CONFIG_DERIVED( dlair_pr7820, dlair_base )
 	MDRV_LASERDISC_ADD("laserdisc", PIONEER_PR7820, "screen", "ldsound")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( dlair_ldv1000 )
-	MDRV_IMPORT_FROM(dlair_base)
+static MACHINE_CONFIG_DERIVED( dlair_ldv1000, dlair_base )
 	MDRV_LASERDISC_ADD("laserdisc", PIONEER_LDV1000, "screen", "ldsound")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( dleuro )
+static MACHINE_CONFIG_START( dleuro, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK_EURO/4)
@@ -746,7 +744,7 @@ static MACHINE_DRIVER_START( dleuro )
 	MDRV_SOUND_ADD("ldsound", LASERDISC, 0)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

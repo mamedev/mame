@@ -826,10 +826,7 @@ static MACHINE_RESET( sf )
 	state->fgscroll = 0;
 }
 
-static MACHINE_DRIVER_START( sf )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(sf_state)
+static MACHINE_CONFIG_START( sf, sf_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)	/* 8 MHz ? (xtal is 16MHz) */
@@ -879,34 +876,31 @@ static MACHINE_DRIVER_START( sf )
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( sfus )
+static MACHINE_CONFIG_DERIVED( sfus, sf )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(sf)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(sfus_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( sfjp )
+static MACHINE_CONFIG_DERIVED( sfjp, sf )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(sf)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(sfjp_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( sfp )
+static MACHINE_CONFIG_DERIVED( sfp, sf )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(sf)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( sf )

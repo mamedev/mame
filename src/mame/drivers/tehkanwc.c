@@ -657,7 +657,7 @@ static const msm5205_interface msm5205_config =
 	MSM5205_S48_4B		/* 8KHz               */
 };
 
-static MACHINE_DRIVER_START( tehkanwc )
+static MACHINE_CONFIG_START( tehkanwc, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 18432000/4)	/* 18.432000 / 4 */
@@ -703,7 +703,7 @@ static MACHINE_DRIVER_START( tehkanwc )
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 static DRIVER_INIT( teedoff )

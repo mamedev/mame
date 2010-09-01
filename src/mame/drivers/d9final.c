@@ -255,7 +255,7 @@ static MACHINE_RESET( d9final )
 	memory_set_bankptr(machine, "bank1", &ROM[0x10000]);
 }
 
-static MACHINE_DRIVER_START( d9final )
+static MACHINE_CONFIG_START( d9final, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 24000000/4)/* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(d9final_map)
@@ -283,7 +283,7 @@ static MACHINE_DRIVER_START( d9final )
 
 	MDRV_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( d9final )

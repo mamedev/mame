@@ -265,7 +265,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_DRIVER_START( iqblock )
+static MACHINE_CONFIG_START( iqblock, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,12000000/2)	/* 6 MHz */
@@ -294,7 +294,7 @@ static MACHINE_DRIVER_START( iqblock )
 
 	MDRV_SOUND_ADD("ymsnd", YM2413, 3579545)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

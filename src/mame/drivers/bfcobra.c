@@ -1729,7 +1729,7 @@ static INTERRUPT_GEN( vblank_gen )
 	update_irqs(device->machine);
 }
 
-static MACHINE_DRIVER_START( bfcobra )
+static MACHINE_CONFIG_START( bfcobra, driver_data_t )
 	MDRV_CPU_ADD("maincpu", Z80, Z80_XTAL)
 	MDRV_CPU_PROGRAM_MAP(z80_prog_map)
 	MDRV_CPU_IO_MAP(z80_io_map)
@@ -1767,7 +1767,7 @@ static MACHINE_DRIVER_START( bfcobra )
 	MDRV_ACIA6850_ADD("acia6850_0", z80_acia_if)
 	MDRV_ACIA6850_ADD("acia6850_1", m6809_acia_if)
 	MDRV_ACIA6850_ADD("acia6850_2", data_acia_if)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

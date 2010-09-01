@@ -40,4 +40,4 @@ public:
 WRITE8_HANDLER( crgolf_videoram_w );
 READ8_HANDLER( crgolf_videoram_r );
 
-MACHINE_DRIVER_EXTERN( crgolf_video );
+MACHINE_CONFIG_EXTERN( crgolf_video );

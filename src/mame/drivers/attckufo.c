@@ -191,10 +191,7 @@ static const mos6560_interface attckufo_6560_intf =
 };
 
 
-static MACHINE_DRIVER_START( attckufo )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(attckufo_state)
+static MACHINE_CONFIG_START( attckufo, attckufo_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 14318181/14)
@@ -218,7 +215,7 @@ static MACHINE_DRIVER_START( attckufo )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_MOS656X_ADD("mos6560", attckufo_6560_intf)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( attckufo )
 	ROM_REGION( 0x4000, "maincpu", 0 )

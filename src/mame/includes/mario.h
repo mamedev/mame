@@ -84,7 +84,7 @@ WRITE8_HANDLER( mario_sh3_w );
 WRITE8_HANDLER( mario_sh_tuneselect_w );
 WRITE8_HANDLER( masao_sh_irqtrigger_w );
 
-MACHINE_DRIVER_EXTERN( mario_audio );
-MACHINE_DRIVER_EXTERN( masao_audio );
+MACHINE_CONFIG_EXTERN( mario_audio );
+MACHINE_CONFIG_EXTERN( masao_audio );
 
 #endif /*MARIO_H_*/

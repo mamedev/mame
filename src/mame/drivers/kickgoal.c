@@ -683,10 +683,7 @@ static MACHINE_RESET( kickgoal )
 	state->m6295_key_delay = 0;
 }
 
-static MACHINE_DRIVER_START( kickgoal )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(kickgoal_state)
+static MACHINE_CONFIG_START( kickgoal, kickgoal_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
@@ -723,12 +720,9 @@ static MACHINE_DRIVER_START( kickgoal )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_OKIM6295_ADD("oki", 12000000/8, OKIM6295_PIN7_LOW)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( actionhw )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(kickgoal_state)
+static MACHINE_CONFIG_START( actionhw, kickgoal_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_12MHz)	/* verified on pcb */
@@ -764,7 +758,7 @@ static MACHINE_DRIVER_START( actionhw )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_OKIM6295_ADD("oki", XTAL_12MHz/12, OKIM6295_PIN7_HIGH) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

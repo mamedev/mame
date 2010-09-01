@@ -461,7 +461,7 @@ static INTERRUPT_GEN( hitpoker_irq )
 	cpu_set_input_line(device, MC68HC11_IRQ_LINE, HOLD_LINE);
 }
 
-static MACHINE_DRIVER_START( hitpoker )
+static MACHINE_CONFIG_START( hitpoker, driver_data_t )
 	MDRV_CPU_ADD("maincpu", MC68HC11,1000000)
 	MDRV_CPU_PROGRAM_MAP(hitpoker_map)
 	MDRV_CPU_IO_MAP(hitpoker_io)
@@ -489,7 +489,7 @@ static MACHINE_DRIVER_START( hitpoker )
 	MDRV_SOUND_ADD("aysnd", AY8910, 1500000)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static DRIVER_INIT(hitpoker)
 {

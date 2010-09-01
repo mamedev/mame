@@ -390,7 +390,7 @@ static VIDEO_EOF( wwfwfest )
  Machine Driver(s)
 *******************************************************************************/
 
-static MACHINE_DRIVER_START( wwfwfest )
+static MACHINE_CONFIG_START( wwfwfest, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, CPU_CLOCK)	/* 24 crystal, 12 rated chip */
@@ -424,12 +424,11 @@ static MACHINE_DRIVER_START( wwfwfest )
 
 	MDRV_OKIM6295_ADD("oki", 1024188, OKIM6295_PIN7_HIGH) /* Verified - Pin 7 tied to +5VDC */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( wwfwfstb )
-	MDRV_IMPORT_FROM(wwfwfest)
+static MACHINE_CONFIG_DERIVED( wwfwfstb, wwfwfest )
 	MDRV_VIDEO_START(wwfwfstb)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*******************************************************************************
  Rom Loaders / Game Drivers

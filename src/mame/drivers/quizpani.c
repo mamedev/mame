@@ -240,7 +240,7 @@ static const nmk112_interface quizpani_nmk112_intf =
 };
 
 
-static MACHINE_DRIVER_START( quizpani )
+static MACHINE_CONFIG_START( quizpani, driver_data_t )
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(quizpani_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
@@ -265,7 +265,7 @@ static MACHINE_DRIVER_START( quizpani )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_NMK112_ADD("nmk112", quizpani_nmk112_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( quizpani )
 	ROM_REGION( 0x340000, "maincpu", 0 ) /* 68000 Code */

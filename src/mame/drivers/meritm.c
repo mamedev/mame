@@ -1047,7 +1047,7 @@ static TIMER_DEVICE_CALLBACK( vblank_end_tick )
 	z80pio_pa_w(meritm_z80pio[0], 0, meritm_vint);
 }
 
-static MACHINE_DRIVER_START(meritm_crt250)
+static MACHINE_CONFIG_START( meritm_crt250, driver_data_t )
 	MDRV_CPU_ADD("maincpu", Z80, SYSTEM_CLK/6)
 	MDRV_CPU_PROGRAM_MAP(meritm_crt250_map)
 	MDRV_CPU_IO_MAP(meritm_crt250_io_map)
@@ -1087,24 +1087,21 @@ static MACHINE_DRIVER_START(meritm_crt250)
 	MDRV_SOUND_ADD("aysnd", AY8910, SYSTEM_CLK/12)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START(meritm_crt250_questions)
-	MDRV_IMPORT_FROM(meritm_crt250)
+static MACHINE_CONFIG_DERIVED( meritm_crt250_questions, meritm_crt250 )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(meritm_crt250_questions_map)
 	MDRV_MACHINE_START(meritm_crt250_questions)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START(meritm_crt250_crt252_crt258)
-	MDRV_IMPORT_FROM(meritm_crt250_questions)
+static MACHINE_CONFIG_DERIVED( meritm_crt250_crt252_crt258, meritm_crt250_questions )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(meritm_crt250_crt258_io_map)
 	MDRV_MACHINE_START(meritm_crt250_crt252_crt258)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START(meritm_crt260)
-	MDRV_IMPORT_FROM(meritm_crt250)
+static MACHINE_CONFIG_DERIVED( meritm_crt260, meritm_crt250 )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(meritm_map)
 	MDRV_CPU_IO_MAP(meritm_io_map)
@@ -1116,7 +1113,7 @@ static MACHINE_DRIVER_START(meritm_crt260)
 
 	MDRV_NVRAM_HANDLER(meritm_crt260)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*

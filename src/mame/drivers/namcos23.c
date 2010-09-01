@@ -2871,7 +2871,7 @@ static const mips3_config r4650_config =
 	8192				/* data cache size - VERIFIED */
 };
 
-static MACHINE_DRIVER_START( gorgon )
+static MACHINE_CONFIG_START( gorgon, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", R4650BE, S23_BUSCLOCK*4)
@@ -2916,9 +2916,9 @@ static MACHINE_DRIVER_START( gorgon )
 	MDRV_SOUND_ROUTE(1, "lspeaker", 1.00)
 	MDRV_SOUND_ROUTE(2, "rspeaker", 1.00)
 	MDRV_SOUND_ROUTE(3, "lspeaker", 1.00)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( s23 )
+static MACHINE_CONFIG_START( s23, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", R4650BE, S23_BUSCLOCK*4)
 	MDRV_CPU_CONFIG(r4650_config)
@@ -2962,9 +2962,9 @@ static MACHINE_DRIVER_START( s23 )
 	MDRV_SOUND_ROUTE(1, "lspeaker", 1.00)
 	MDRV_SOUND_ROUTE(2, "rspeaker", 1.00)
 	MDRV_SOUND_ROUTE(3, "lspeaker", 1.00)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( ss23 )
+static MACHINE_CONFIG_START( ss23, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", R4650BE, S23_BUSCLOCK*5)
 	MDRV_CPU_CONFIG(r4650_config)
@@ -3004,10 +3004,9 @@ static MACHINE_DRIVER_START( ss23 )
 	MDRV_SOUND_ROUTE(1, "lspeaker", 1.00)
 	MDRV_SOUND_ROUTE(2, "rspeaker", 1.00)
 	MDRV_SOUND_ROUTE(3, "lspeaker", 1.00)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( ss23io )
-	MDRV_IMPORT_FROM( ss23 )
+static MACHINE_CONFIG_DERIVED( ss23io, ss23 )
 
 	MDRV_CPU_MODIFY("audiocpu")
 	MDRV_CPU_IO_MAP( s23h8iomap )
@@ -3015,10 +3014,9 @@ static MACHINE_DRIVER_START( ss23io )
 	MDRV_CPU_ADD("ioboard", H83334, 14745600 )
 	MDRV_CPU_PROGRAM_MAP( s23iobrdmap )
 	MDRV_CPU_IO_MAP( s23iobrdiomap )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( ss23e2 )
-	MDRV_IMPORT_FROM( ss23 )
+static MACHINE_CONFIG_DERIVED( ss23e2, ss23 )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_CLOCK(S23_BUSCLOCK*6)
@@ -3029,10 +3027,9 @@ static MACHINE_DRIVER_START( ss23e2 )
 	MDRV_CPU_ADD("ioboard", H83334, 14745600 )
 	MDRV_CPU_PROGRAM_MAP( s23iobrdmap )
 	MDRV_CPU_IO_MAP( s23iobrdiomap )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( gmen )
-	MDRV_IMPORT_FROM( s23 )
+static MACHINE_CONFIG_DERIVED( gmen, s23 )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_CLOCK(S23_BUSCLOCK*5)
@@ -3042,7 +3039,7 @@ static MACHINE_DRIVER_START( gmen )
 	MDRV_CPU_PROGRAM_MAP(gmen_sh2_map)
 
 	MDRV_MACHINE_RESET(gmen)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( rapidrvr )
 	ROM_REGION32_BE( 0x400000, "user1", 0 ) /* 4 megs for main R4650 code */

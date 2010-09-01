@@ -321,7 +321,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( videopin )
+static MACHINE_CONFIG_START( videopin, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 12096000 / 16)
@@ -349,7 +349,7 @@ static MACHINE_DRIVER_START( videopin )
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(videopin)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

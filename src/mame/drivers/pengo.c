@@ -344,7 +344,7 @@ static const namco_interface namco_config =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( pengo )
+static MACHINE_CONFIG_START( pengo, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)
@@ -369,20 +369,19 @@ static MACHINE_DRIVER_START( pengo )
 	MDRV_SOUND_ADD("namco", NAMCO, MASTER_CLOCK/6/32)
 	MDRV_SOUND_CONFIG(namco_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( jrpacmbl )
+static MACHINE_CONFIG_DERIVED( jrpacmbl, pengo )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(pengo)
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(jrpacmbl_map)
 
 	MDRV_VIDEO_START(jrpacman)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

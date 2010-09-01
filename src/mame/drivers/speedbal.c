@@ -225,7 +225,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_DRIVER_START( speedbal )
+static MACHINE_CONFIG_START( speedbal, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz ??? */
@@ -259,7 +259,7 @@ static MACHINE_DRIVER_START( speedbal )
 
 	MDRV_SOUND_ADD("ymsnd", YM3812, 3600000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

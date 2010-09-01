@@ -392,9 +392,7 @@ INPUT_PORTS_END
 
 
 
-static MACHINE_DRIVER_START( shougi )
-
-	MDRV_DRIVER_DATA( shougi_state )
+static MACHINE_CONFIG_START( shougi, shougi_state )
 
 	MDRV_CPU_ADD("maincpu", Z80,10000000/4)
 	MDRV_CPU_PROGRAM_MAP(main_map)
@@ -430,7 +428,7 @@ static MACHINE_DRIVER_START( shougi )
 
 	MDRV_SOUND_ADD("aysnd", AY8910, 10000000/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

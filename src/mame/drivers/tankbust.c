@@ -339,7 +339,7 @@ static MACHINE_RESET( tankbust )
 }
 
 
-static MACHINE_DRIVER_START( tankbust )
+static MACHINE_CONFIG_START( tankbust, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)		/* 4 MHz ? */
@@ -380,7 +380,7 @@ static MACHINE_DRIVER_START( tankbust )
 
 	MDRV_SOUND_ADD("ay2", AY8910, 2000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

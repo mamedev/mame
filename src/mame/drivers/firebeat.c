@@ -1912,7 +1912,7 @@ static MACHINE_RESET( firebeat )
 	cdda_set_cdrom(machine->device("cdda"), cd);
 }
 
-static MACHINE_DRIVER_START(firebeat)
+static MACHINE_CONFIG_START( firebeat, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", PPC403GCX, 66000000)
@@ -1951,9 +1951,9 @@ static MACHINE_DRIVER_START(firebeat)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START(firebeat2)
+static MACHINE_CONFIG_START( firebeat2, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", PPC403GCX, 66000000)
@@ -1997,16 +1997,14 @@ static MACHINE_DRIVER_START(firebeat2)
 	MDRV_SOUND_ADD("cdda", CDDA, 0)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START(firebeat_spu)
-
-	MDRV_IMPORT_FROM(firebeat)
+static MACHINE_CONFIG_DERIVED( firebeat_spu, firebeat )
 
 	MDRV_CPU_ADD("audiocpu", M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(spu_map)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*****************************************************************************/
 /* Security dongle is a Dallas DS1411 RS232 Adapter with a DS1991 Multikey iButton */

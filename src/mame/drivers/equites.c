@@ -1139,7 +1139,7 @@ static const samples_interface alphamc07_samples_interface =
 #define MSM5232_BASE_VOLUME 1.0
 
 // the sound board is the same in all games
-static MACHINE_DRIVER_START( common_sound )
+static MACHINE_CONFIG_FRAGMENT( common_sound )
 
 	MDRV_CPU_ADD("audiocpu", I8085A, XTAL_6_144MHz)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sound_map)
@@ -1177,7 +1177,7 @@ static MACHINE_DRIVER_START( common_sound )
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(alphamc07_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /******************************************************************************/
 
@@ -1241,17 +1241,14 @@ static MACHINE_RESET( equites )
 }
 
 
-static MACHINE_DRIVER_START( equites )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(equites_state)
+static MACHINE_CONFIG_START( equites, equites_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_12MHz/4) /* 68000P8 running at 3mhz! verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(equites_map)
 	MDRV_CPU_VBLANK_INT_HACK(equites_interrupt, 2)
 
-	MDRV_IMPORT_FROM(common_sound)
+	MDRV_FRAGMENT_ADD(common_sound)
 
 	MDRV_CPU_ADD("mcu", ALPHA8301, 4000000/8)
 	MDRV_CPU_PROGRAM_MAP(mcu_map)
@@ -1271,29 +1268,25 @@ static MACHINE_DRIVER_START( equites )
 
 	MDRV_MACHINE_START(equites)
 	MDRV_MACHINE_RESET(equites)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( gekisou )
-	MDRV_IMPORT_FROM(equites)
+static MACHINE_CONFIG_DERIVED( gekisou, equites )
 
 	// gekisou has battery-backed RAM to store settings
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( splndrbt )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(equites_state)
+static MACHINE_CONFIG_START( splndrbt, equites_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_24MHz/4) /* 68000P8 running at 6mhz, verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(splndrbt_map)
 	MDRV_CPU_VBLANK_INT_HACK(equites_interrupt, 2)
 
-	MDRV_IMPORT_FROM(common_sound)
+	MDRV_FRAGMENT_ADD(common_sound)
 
 	MDRV_CPU_ADD("mcu", ALPHA8301, 4000000/8)
 	MDRV_CPU_PROGRAM_MAP(mcu_map)
@@ -1313,7 +1306,7 @@ static MACHINE_DRIVER_START( splndrbt )
 
 	MDRV_MACHINE_START(equites)
 	MDRV_MACHINE_RESET(equites)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /******************************************************************************/

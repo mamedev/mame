@@ -717,7 +717,7 @@ static MACHINE_RESET( mlanding )
 	dsp_HOLD_signal = 0;
 }
 
-static MACHINE_DRIVER_START( mlanding )
+static MACHINE_CONFIG_START( mlanding, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000 )		/* 12 MHz ??? (guess) */
@@ -770,7 +770,7 @@ static MACHINE_DRIVER_START( mlanding )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.4)
 
 	MDRV_TC0140SYT_ADD("tc0140syt", mlanding_tc0140syt_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( mlanding )
 	ROM_REGION( 0x60000, "maincpu", 0 )	/* 68000 */

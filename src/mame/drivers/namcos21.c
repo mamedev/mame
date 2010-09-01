@@ -1522,7 +1522,7 @@ static const c140_interface C140_interface_typeB =
 	C140_TYPE_SYSTEM21_B
 };
 
-static MACHINE_DRIVER_START( s21base )
+static MACHINE_CONFIG_START( s21base, driver_data_t )
 	MDRV_CPU_ADD("maincpu", M68000,12288000) /* Master */
 	MDRV_CPU_PROGRAM_MAP(namcos21_68k_master)
 	MDRV_CPU_VBLANK_INT("screen", namcos2_68k_master_vblank)
@@ -1569,10 +1569,9 @@ static MACHINE_DRIVER_START( s21base )
 
 	MDRV_VIDEO_START(namcos21)
 	MDRV_VIDEO_UPDATE(namcos21)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( poly_c140_typeA )
-	MDRV_IMPORT_FROM(s21base)
+static MACHINE_CONFIG_DERIVED( poly_c140_typeA, s21base )
 
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -1584,10 +1583,9 @@ static MACHINE_DRIVER_START( poly_c140_typeA )
 	MDRV_SOUND_ADD("ymsnd", YM2151, 3579580)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.30)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.30)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( poly_c140_typeB )
-	MDRV_IMPORT_FROM(s21base)
+static MACHINE_CONFIG_DERIVED( poly_c140_typeB, s21base )
 
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
@@ -1599,9 +1597,9 @@ static MACHINE_DRIVER_START( poly_c140_typeB )
 	MDRV_SOUND_ADD("ymsnd", YM2151, 3579580)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.30)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.30)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( driveyes )
+static MACHINE_CONFIG_START( driveyes, driver_data_t )
 	MDRV_CPU_ADD("maincpu", M68000,12288000) /* Master */
 	MDRV_CPU_PROGRAM_MAP(driveyes_68k_master)
 	MDRV_CPU_VBLANK_INT("screen", namcos2_68k_master_vblank)
@@ -1654,9 +1652,9 @@ static MACHINE_DRIVER_START( driveyes )
 	MDRV_SOUND_ADD("ymsnd", YM2151, 3579580)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.30)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.30)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( winrun_c140_typeB )
+static MACHINE_CONFIG_START( winrun_c140_typeB, driver_data_t )
 	MDRV_CPU_ADD("maincpu", M68000,12288000) /* Master */
 	MDRV_CPU_PROGRAM_MAP(am_master_winrun)
 	MDRV_CPU_VBLANK_INT("screen", namcos2_68k_master_vblank)
@@ -1712,7 +1710,7 @@ static MACHINE_DRIVER_START( winrun_c140_typeB )
 	MDRV_SOUND_ADD("ymsnd", YM2151, 3579580)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.30)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.30)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( aircomb )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* Master */

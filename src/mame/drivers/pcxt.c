@@ -917,7 +917,7 @@ static MACHINE_RESET( filetto )
 	filetto_devices.dma8237_2 = machine->device( "dma8237_2" );
 }
 
-static MACHINE_DRIVER_START( filetto )
+static MACHINE_CONFIG_START( filetto, driver_data_t )
 	MDRV_CPU_ADD("maincpu", I8088, 8000000) //or regular PC-XT 14318180/3 clock?
 	MDRV_CPU_PROGRAM_MAP(filetto_map)
 	MDRV_CPU_IO_MAP(filetto_io)
@@ -960,9 +960,9 @@ static MACHINE_DRIVER_START( filetto )
 //  PC "buzzer" sound
 	MDRV_SOUND_ADD("beep", BEEP, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( tetriskr )
+static MACHINE_CONFIG_START( tetriskr, driver_data_t )
 	MDRV_CPU_ADD("maincpu", I8088, 14318180/3)
 	MDRV_CPU_PROGRAM_MAP(filetto_map)
 	MDRV_CPU_IO_MAP(tetriskr_io)
@@ -1002,7 +1002,7 @@ static MACHINE_DRIVER_START( tetriskr )
 //  PC "buzzer" sound
 	MDRV_SOUND_ADD("beep", BEEP, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( filetto )
 	ROM_REGION( 0x100000, "maincpu", 0 )

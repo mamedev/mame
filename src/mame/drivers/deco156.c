@@ -409,10 +409,7 @@ static MACHINE_START( deco156 )
 	state->deco16ic = machine->device<deco16ic_device>("deco_custom");
 }
 
-static MACHINE_DRIVER_START( hvysmsh )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(deco156_state)
+static MACHINE_CONFIG_START( hvysmsh, deco156_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", ARM, 28000000) /* Unconfirmed */
@@ -451,12 +448,9 @@ static MACHINE_DRIVER_START( hvysmsh )
 	MDRV_OKIM6295_ADD("oki2", 28000000/14, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.35)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.35)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( wcvol95 )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(deco156_state)
+static MACHINE_CONFIG_START( wcvol95, deco156_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", ARM, 28000000) /* Unconfirmed */
@@ -492,7 +486,7 @@ static MACHINE_DRIVER_START( wcvol95 )
 	MDRV_SOUND_CONFIG(ymz280b_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /**********************************************************************************/

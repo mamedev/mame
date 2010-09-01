@@ -212,9 +212,9 @@ VIDEO_UPDATE( spclforc );
 
 WRITE8_HANDLER( dkong_audio_irq_w );
 
-MACHINE_DRIVER_EXTERN( radarscp_audio );
-MACHINE_DRIVER_EXTERN( dkong2b_audio );
-MACHINE_DRIVER_EXTERN( dkongjr_audio );
-MACHINE_DRIVER_EXTERN( dkong3_audio );
-MACHINE_DRIVER_EXTERN( radarscp1_audio );
+MACHINE_CONFIG_EXTERN( radarscp_audio );
+MACHINE_CONFIG_EXTERN( dkong2b_audio );
+MACHINE_CONFIG_EXTERN( dkongjr_audio );
+MACHINE_CONFIG_EXTERN( dkong3_audio );
+MACHINE_CONFIG_EXTERN( radarscp1_audio );
 

@@ -150,7 +150,7 @@ static const samples_interface starcrus_samples_interface =
 };
 
 
-static MACHINE_DRIVER_START( starcrus )
+static MACHINE_CONFIG_START( starcrus, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8080,9750000/9)  /* 8224 chip is a divide by 9 */
@@ -179,7 +179,7 @@ static MACHINE_DRIVER_START( starcrus )
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(starcrus_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

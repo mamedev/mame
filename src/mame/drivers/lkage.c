@@ -414,10 +414,7 @@ static MACHINE_RESET( lkage )
 }
 
 
-static MACHINE_DRIVER_START( lkage )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(lkage_state)
+static MACHINE_CONFIG_START( lkage, lkage_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,6000000)
@@ -464,13 +461,10 @@ static MACHINE_DRIVER_START( lkage )
 	MDRV_SOUND_ROUTE(1, "mono", 0.15)
 	MDRV_SOUND_ROUTE(2, "mono", 0.15)
 	MDRV_SOUND_ROUTE(3, "mono", 0.40)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( lkageb )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(lkage_state)
+static MACHINE_CONFIG_START( lkageb, lkage_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,6000000)
@@ -514,7 +508,7 @@ static MACHINE_DRIVER_START( lkageb )
 	MDRV_SOUND_ROUTE(1, "mono", 0.15)
 	MDRV_SOUND_ROUTE(2, "mono", 0.15)
 	MDRV_SOUND_ROUTE(3, "mono", 0.40)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( lkage )

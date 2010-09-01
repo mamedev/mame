@@ -110,7 +110,7 @@ static INPUT_PORTS_START( pangofun )
 INPUT_PORTS_END
 
 
-static MACHINE_DRIVER_START( pangofun )
+static MACHINE_CONFIG_START( pangofun, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I486, 14318180*2)	/* I486 ?? Mhz */
 	MDRV_CPU_PROGRAM_MAP(pangofun_map)
@@ -127,7 +127,7 @@ static MACHINE_DRIVER_START( pangofun )
 
 	MDRV_VIDEO_START(pangofun)
 	MDRV_VIDEO_UPDATE(pangofun)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START(pangofun)

@@ -515,7 +515,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( r2dtank )
+static MACHINE_CONFIG_START( r2dtank, driver_data_t )
 	MDRV_CPU_ADD("maincpu", M6809,3000000)		 /* ?? too fast ? */
 	MDRV_CPU_PROGRAM_MAP(r2dtank_main_map)
 
@@ -552,7 +552,7 @@ static MACHINE_DRIVER_START( r2dtank )
 	MDRV_SOUND_CONFIG(ay8910_2_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

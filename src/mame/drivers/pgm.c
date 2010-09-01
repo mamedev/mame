@@ -1366,10 +1366,7 @@ static MACHINE_RESET( pgm )
 	state->cal_cnt = 0;
 }
 
-static MACHINE_DRIVER_START( pgm )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(pgm_state)
+static MACHINE_CONFIG_START( pgm, pgm_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 20000000) /* 20 mhz! verified on real board */
@@ -1404,31 +1401,28 @@ static MACHINE_DRIVER_START( pgm )
 	MDRV_SOUND_ADD("ics", ICS2115, 0)
 	MDRV_SOUND_CONFIG(pgm_ics2115_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 5.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( drgw2 )
-	MDRV_IMPORT_FROM(pgm)
+static MACHINE_CONFIG_DERIVED( drgw2, pgm )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_VBLANK_INT_HACK(drgw_interrupt,2) // needs an extra IRQ, puzzli2 doesn't want this irq!
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static MACHINE_RESET( killbld );
 
-static MACHINE_DRIVER_START( killbld )
-	MDRV_IMPORT_FROM(pgm)
+static MACHINE_CONFIG_DERIVED( killbld, pgm )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(killbld_mem)
 
 	MDRV_MACHINE_RESET(killbld)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static MACHINE_RESET( dw3 );
 
-static MACHINE_DRIVER_START( dw3 )
-	MDRV_IMPORT_FROM(pgm)
+static MACHINE_CONFIG_DERIVED( dw3, pgm )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(killbld_mem)
@@ -1436,22 +1430,20 @@ static MACHINE_DRIVER_START( dw3 )
 
 	MDRV_MACHINE_RESET(dw3)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static MACHINE_RESET( olds );
 
-static MACHINE_DRIVER_START( olds )
-	MDRV_IMPORT_FROM(pgm)
+static MACHINE_CONFIG_DERIVED( olds, pgm )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(olds_mem)
 
 	MDRV_MACHINE_RESET(olds)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( kov )
-	MDRV_IMPORT_FROM(pgm)
+static MACHINE_CONFIG_DERIVED( kov, pgm )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(kovsh_mem)
@@ -1459,10 +1451,9 @@ static MACHINE_DRIVER_START( kov )
 	/* protection CPU */
 	MDRV_CPU_ADD("prot", ARM7, 20000000)	// 55857E/F/G
 	MDRV_CPU_PROGRAM_MAP(kovsh_arm7_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( kov_disabled_arm )
-	MDRV_IMPORT_FROM(pgm)
+static MACHINE_CONFIG_DERIVED( kov_disabled_arm, pgm )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(kovsh_mem)
@@ -1472,11 +1463,10 @@ static MACHINE_DRIVER_START( kov_disabled_arm )
 	MDRV_CPU_ADD("prot", ARM7, 20000000)	// 55857E/F/G
 	MDRV_CPU_PROGRAM_MAP(kovsh_arm7_map)
 	MDRV_DEVICE_DISABLE()
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( kov2 )
-	MDRV_IMPORT_FROM(pgm)
+static MACHINE_CONFIG_DERIVED( kov2, pgm )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(kov2_mem)
@@ -1484,10 +1474,9 @@ static MACHINE_DRIVER_START( kov2 )
 	/* protection CPU */
 	MDRV_CPU_ADD("prot", ARM7, 20000000)	// 55857F
 	MDRV_CPU_PROGRAM_MAP(arm7_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( svg )
-	MDRV_IMPORT_FROM(pgm)
+static MACHINE_CONFIG_DERIVED( svg, pgm )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(svg_68k_mem)
@@ -1496,11 +1485,10 @@ static MACHINE_DRIVER_START( svg )
 	/* protection CPU */
 	MDRV_CPU_ADD("prot", ARM7, 20000000)	// 55857G
 	MDRV_CPU_PROGRAM_MAP(svg_arm7_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 #if 0
-static MACHINE_DRIVER_START( cavepgm )
-	MDRV_IMPORT_FROM(pgm)
+static MACHINE_CONFIG_DERIVED( cavepgm, pgm )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(cavepgm_mem)
@@ -1508,7 +1496,7 @@ static MACHINE_DRIVER_START( cavepgm )
 	/* protection CPU */
 //  MDRV_CPU_ADD("prot", ARM7, 20000000)    // ???
 //  MDRV_CPU_PROGRAM_MAP(arm7_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 #endif
 
 

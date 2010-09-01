@@ -230,7 +230,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( carpolo )
+static MACHINE_CONFIG_START( carpolo, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, XTAL_11_289MHz/12)		/* 940.75 kHz */
@@ -275,7 +275,7 @@ static MACHINE_DRIVER_START( carpolo )
 	MDRV_VIDEO_START(carpolo)
 	MDRV_VIDEO_UPDATE(carpolo)
 	MDRV_VIDEO_EOF(carpolo)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

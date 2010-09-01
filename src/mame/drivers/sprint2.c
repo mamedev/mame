@@ -492,7 +492,7 @@ static GFXDECODE_START( sprint2 )
 GFXDECODE_END
 
 
-static MACHINE_DRIVER_START( sprint2 )
+static MACHINE_CONFIG_START( sprint2, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 12096000 / 16)
@@ -522,12 +522,10 @@ static MACHINE_DRIVER_START( sprint2 )
 	MDRV_SOUND_CONFIG_DISCRETE(sprint2)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( sprint1 )
-
-	MDRV_IMPORT_FROM(sprint2)
+static MACHINE_CONFIG_DERIVED( sprint1, sprint2 )
 
 	/* sound hardware */
 	MDRV_DEVICE_REMOVE("lspeaker")
@@ -539,12 +537,10 @@ static MACHINE_DRIVER_START( sprint1 )
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(sprint1)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( dominos )
-
-	MDRV_IMPORT_FROM(sprint2)
+static MACHINE_CONFIG_DERIVED( dominos, sprint2 )
 
 	/* sound hardware */
 	MDRV_DEVICE_REMOVE("lspeaker")
@@ -556,7 +552,7 @@ static MACHINE_DRIVER_START( dominos )
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(dominos)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( sprint1 )

@@ -309,7 +309,7 @@ static PALETTE_INIT( triplhnt )
 }
 
 
-static MACHINE_DRIVER_START( triplhnt )
+static MACHINE_CONFIG_START( triplhnt, driver_data_t )
 
 /* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6800, 800000)
@@ -341,7 +341,7 @@ static MACHINE_DRIVER_START( triplhnt )
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(triplhnt)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( triplhnt )

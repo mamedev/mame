@@ -992,7 +992,7 @@ static const ccpu_config config_jmi =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( cinemat_nojmi_4k )
+static MACHINE_CONFIG_START( cinemat_nojmi_4k, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", CCPU, MASTER_CLOCK/4)
@@ -1014,42 +1014,37 @@ static MACHINE_DRIVER_START( cinemat_nojmi_4k )
 
 	MDRV_VIDEO_START(cinemat_bilevel)
 	MDRV_VIDEO_UPDATE(cinemat)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( cinemat_jmi_4k )
-	MDRV_IMPORT_FROM(cinemat_nojmi_4k)
+static MACHINE_CONFIG_DERIVED( cinemat_jmi_4k, cinemat_nojmi_4k )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_CONFIG(config_jmi)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( cinemat_nojmi_8k )
-	MDRV_IMPORT_FROM(cinemat_nojmi_4k)
+static MACHINE_CONFIG_DERIVED( cinemat_nojmi_8k, cinemat_nojmi_4k )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(program_map_8k)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( cinemat_jmi_8k )
-	MDRV_IMPORT_FROM(cinemat_jmi_4k)
+static MACHINE_CONFIG_DERIVED( cinemat_jmi_8k, cinemat_jmi_4k )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(program_map_8k)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( cinemat_jmi_16k )
-	MDRV_IMPORT_FROM(cinemat_jmi_4k)
+static MACHINE_CONFIG_DERIVED( cinemat_jmi_16k, cinemat_jmi_4k )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(program_map_16k)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( cinemat_jmi_32k )
-	MDRV_IMPORT_FROM(cinemat_jmi_4k)
+static MACHINE_CONFIG_DERIVED( cinemat_jmi_32k, cinemat_jmi_4k )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(program_map_32k)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -1060,116 +1055,100 @@ MACHINE_DRIVER_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( spacewar )
-	MDRV_IMPORT_FROM(cinemat_nojmi_4k)
-	MDRV_IMPORT_FROM(spacewar_sound)
+static MACHINE_CONFIG_DERIVED( spacewar, cinemat_nojmi_4k )
+	MDRV_FRAGMENT_ADD(spacewar_sound)
 	MDRV_VIDEO_UPDATE(spacewar)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( barrier )
-	MDRV_IMPORT_FROM(cinemat_jmi_4k)
-	MDRV_IMPORT_FROM(barrier_sound)
-MACHINE_DRIVER_END
+static MACHINE_CONFIG_DERIVED( barrier, cinemat_jmi_4k )
+	MDRV_FRAGMENT_ADD(barrier_sound)
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( speedfrk )
-	MDRV_IMPORT_FROM(cinemat_nojmi_8k)
-	MDRV_IMPORT_FROM(speedfrk_sound)
-MACHINE_DRIVER_END
+static MACHINE_CONFIG_DERIVED( speedfrk, cinemat_nojmi_8k )
+	MDRV_FRAGMENT_ADD(speedfrk_sound)
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( starhawk )
-	MDRV_IMPORT_FROM(cinemat_jmi_4k)
-	MDRV_IMPORT_FROM(starhawk_sound)
-MACHINE_DRIVER_END
+static MACHINE_CONFIG_DERIVED( starhawk, cinemat_jmi_4k )
+	MDRV_FRAGMENT_ADD(starhawk_sound)
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( sundance )
-	MDRV_IMPORT_FROM(cinemat_jmi_8k)
-	MDRV_IMPORT_FROM(sundance_sound)
+static MACHINE_CONFIG_DERIVED( sundance, cinemat_jmi_8k )
+	MDRV_FRAGMENT_ADD(sundance_sound)
 	MDRV_VIDEO_START(cinemat_16level)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( tailg )
-	MDRV_IMPORT_FROM(cinemat_nojmi_8k)
-	MDRV_IMPORT_FROM(tailg_sound)
-MACHINE_DRIVER_END
+static MACHINE_CONFIG_DERIVED( tailg, cinemat_nojmi_8k )
+	MDRV_FRAGMENT_ADD(tailg_sound)
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( warrior )
-	MDRV_IMPORT_FROM(cinemat_jmi_8k)
-	MDRV_IMPORT_FROM(warrior_sound)
-MACHINE_DRIVER_END
+static MACHINE_CONFIG_DERIVED( warrior, cinemat_jmi_8k )
+	MDRV_FRAGMENT_ADD(warrior_sound)
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( armora )
-	MDRV_IMPORT_FROM(cinemat_jmi_16k)
-	MDRV_IMPORT_FROM(armora_sound)
-MACHINE_DRIVER_END
+static MACHINE_CONFIG_DERIVED( armora, cinemat_jmi_16k )
+	MDRV_FRAGMENT_ADD(armora_sound)
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( ripoff )
-	MDRV_IMPORT_FROM(cinemat_jmi_8k)
-	MDRV_IMPORT_FROM(ripoff_sound)
-MACHINE_DRIVER_END
+static MACHINE_CONFIG_DERIVED( ripoff, cinemat_jmi_8k )
+	MDRV_FRAGMENT_ADD(ripoff_sound)
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( starcas )
-	MDRV_IMPORT_FROM(cinemat_jmi_8k)
-	MDRV_IMPORT_FROM(starcas_sound)
-MACHINE_DRIVER_END
+static MACHINE_CONFIG_DERIVED( starcas, cinemat_jmi_8k )
+	MDRV_FRAGMENT_ADD(starcas_sound)
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( solarq )
-	MDRV_IMPORT_FROM(cinemat_jmi_16k)
-	MDRV_IMPORT_FROM(solarq_sound)
+static MACHINE_CONFIG_DERIVED( solarq, cinemat_jmi_16k )
+	MDRV_FRAGMENT_ADD(solarq_sound)
 	MDRV_VIDEO_START(cinemat_64level)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( boxingb )
-	MDRV_IMPORT_FROM(cinemat_jmi_32k)
-	MDRV_IMPORT_FROM(boxingb_sound)
+static MACHINE_CONFIG_DERIVED( boxingb, cinemat_jmi_32k )
+	MDRV_FRAGMENT_ADD(boxingb_sound)
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 1024, 0, 788)
 	MDRV_VIDEO_START(cinemat_color)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( wotw )
-	MDRV_IMPORT_FROM(cinemat_jmi_16k)
+static MACHINE_CONFIG_DERIVED( wotw, cinemat_jmi_16k )
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 1120, 0, 767)
-	MDRV_IMPORT_FROM(wotw_sound)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(wotw_sound)
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( wotwc )
-	MDRV_IMPORT_FROM(cinemat_jmi_16k)
-	MDRV_IMPORT_FROM(wotwc_sound)
+static MACHINE_CONFIG_DERIVED( wotwc, cinemat_jmi_16k )
+	MDRV_FRAGMENT_ADD(wotwc_sound)
 	MDRV_VIDEO_START(cinemat_color)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( demon )
-	MDRV_IMPORT_FROM(cinemat_jmi_16k)
-	MDRV_IMPORT_FROM(demon_sound)
+static MACHINE_CONFIG_DERIVED( demon, cinemat_jmi_16k )
+	MDRV_FRAGMENT_ADD(demon_sound)
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 1024, 0, 805)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( qb3 )
-	MDRV_IMPORT_FROM(cinemat_jmi_32k)
-	MDRV_IMPORT_FROM(qb3_sound)
+static MACHINE_CONFIG_DERIVED( qb3, cinemat_jmi_32k )
+	MDRV_FRAGMENT_ADD(qb3_sound)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_DATA_MAP(data_map_qb3)
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 1120, 0, 780)
 	MDRV_VIDEO_START(cinemat_qb3color)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

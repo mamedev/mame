@@ -310,10 +310,7 @@ static MACHINE_RESET( junofrst )
 	state->blitterdata[3] = 0;
 }
 
-static MACHINE_DRIVER_START( junofrst )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(timeplt_state)
+static MACHINE_CONFIG_START( junofrst, timeplt_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 1500000)			/* 1.5 MHz ??? */
@@ -358,7 +355,7 @@ static MACHINE_DRIVER_START( junofrst )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MDRV_SOUND_ADD("filter.0.2", FILTER_RC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( junofrst )

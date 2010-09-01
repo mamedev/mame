@@ -337,10 +337,7 @@ static MACHINE_RESET( ginganin )
 }
 
 
-static MACHINE_DRIVER_START( ginganin )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(ginganin_state)
+static MACHINE_CONFIG_START( ginganin, ginganin_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 6000000)	/* ? */
@@ -376,7 +373,7 @@ static MACHINE_DRIVER_START( ginganin )
 
 	MDRV_SOUND_ADD("ymsnd", Y8950, 3579545)	/* The Y8950 is basically a YM3526 with ADPCM built in */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

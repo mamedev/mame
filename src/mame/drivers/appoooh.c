@@ -421,10 +421,7 @@ static MACHINE_RESET( appoooh )
 	state->priority = 0;
 }
 
-static MACHINE_DRIVER_START( appoooh_common )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(appoooh_state)
+static MACHINE_CONFIG_START( appoooh_common, appoooh_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,18432000/6)	/* ??? the main xtal is 18.432 MHz */
@@ -450,13 +447,10 @@ static MACHINE_DRIVER_START( appoooh_common )
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( appoooh )
-
-	/* common machine hardware */
-	MDRV_IMPORT_FROM(appoooh_common)
+static MACHINE_CONFIG_DERIVED( appoooh, appoooh_common )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -471,13 +465,10 @@ static MACHINE_DRIVER_START( appoooh )
 	MDRV_PALETTE_INIT(appoooh)
 	MDRV_VIDEO_START(appoooh)
 	MDRV_VIDEO_UPDATE(appoooh)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( robowres )
-
-	/* common machine hardware */
-	MDRV_IMPORT_FROM(appoooh_common)
+static MACHINE_CONFIG_DERIVED( robowres, appoooh_common )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -492,7 +483,7 @@ static MACHINE_DRIVER_START( robowres )
 	MDRV_PALETTE_INIT(robowres)
 	MDRV_VIDEO_START(appoooh)
 	MDRV_VIDEO_UPDATE(robowres)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*************************************
  *

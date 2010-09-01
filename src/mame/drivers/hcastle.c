@@ -205,10 +205,7 @@ static MACHINE_RESET( hcastle )
 	state->old_pf2 = -1;
 }
 
-static MACHINE_DRIVER_START( hcastle )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(hcastle_state)
+static MACHINE_CONFIG_START( hcastle, hcastle_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", KONAMI, 3000000)	/* Derived from 24 MHz clock */
@@ -255,7 +252,7 @@ static MACHINE_DRIVER_START( hcastle )
 
 	MDRV_SOUND_ADD("konami2", K051649, 3579545/2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************/
 

@@ -409,7 +409,7 @@ static VIDEO_UPDATE( stactics )
  *
  *************************************/
 
-MACHINE_DRIVER_START( stactics_video )
+MACHINE_CONFIG_FRAGMENT( stactics_video )
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
 
@@ -425,4 +425,4 @@ MACHINE_DRIVER_START( stactics_video )
 	MDRV_PALETTE_INIT(stactics)
 	MDRV_VIDEO_START(stactics)
 	MDRV_VIDEO_UPDATE(stactics)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END

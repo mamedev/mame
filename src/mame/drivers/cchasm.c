@@ -153,7 +153,7 @@ static const z80_daisy_config daisy_chain[] =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( cchasm )
+static MACHINE_CONFIG_START( cchasm, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,CCHASM_68K_CLOCK)	/* 8 MHz (from schematics) */
@@ -194,7 +194,7 @@ static MACHINE_DRIVER_START( cchasm )
 
 	/* 6840 PTM */
 	MDRV_PTM6840_ADD("6840ptm", cchasm_6840_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

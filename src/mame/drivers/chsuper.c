@@ -189,7 +189,7 @@ static GFXDECODE_START( chsuper )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, charlayout,   0, 1 )
 GFXDECODE_END
 
-static MACHINE_DRIVER_START( chsuper )
+static MACHINE_CONFIG_START( chsuper, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z180, XTAL_12MHz / 2)	/* HD64180RP8, 8 MHz? */
@@ -218,7 +218,7 @@ static MACHINE_DRIVER_START( chsuper )
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*  ROM Regions definition

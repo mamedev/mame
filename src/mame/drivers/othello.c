@@ -410,10 +410,7 @@ static MACHINE_RESET( othello )
 	state->n7751_busy = 0;
 }
 
-static MACHINE_DRIVER_START( othello )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(othello_state)
+static MACHINE_CONFIG_START( othello, othello_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80,XTAL_8MHz/2)
@@ -459,7 +456,7 @@ static MACHINE_DRIVER_START( othello )
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( othello )
 	ROM_REGION( 0x10000, "maincpu", 0 )

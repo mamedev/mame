@@ -260,10 +260,7 @@ static MACHINE_RESET( momoko )
 	state->flipscreen = 0;
 }
 
-static MACHINE_DRIVER_START( momoko )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(momoko_state)
+static MACHINE_CONFIG_START( momoko, momoko_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 5000000)	/* 5.0MHz */
@@ -304,7 +301,7 @@ static MACHINE_DRIVER_START( momoko )
 	MDRV_SOUND_ROUTE(1, "mono", 0.15)
 	MDRV_SOUND_ROUTE(2, "mono", 0.15)
 	MDRV_SOUND_ROUTE(3, "mono", 0.40)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /****************************************************************************/
 

@@ -556,9 +556,7 @@ static const ym2151_interface ym2151_config =
 	irq_handler
 };
 
-static MACHINE_DRIVER_START( shadfrce )
-
-	MDRV_DRIVER_DATA( shadfrce_state )
+static MACHINE_CONFIG_START( shadfrce, shadfrce_state )
 
 	MDRV_CPU_ADD("maincpu", M68000, CPU_CLOCK)			/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(shadfrce_map)
@@ -589,7 +587,7 @@ static MACHINE_DRIVER_START( shadfrce )
 	MDRV_OKIM6295_ADD("oki", XTAL_13_4952MHz/8, OKIM6295_PIN7_HIGH)	/* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* Rom Defs. */
 

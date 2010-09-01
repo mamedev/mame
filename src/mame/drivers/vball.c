@@ -415,7 +415,7 @@ static const ym2151_interface ym2151_config =
 };
 
 
-static MACHINE_DRIVER_START( vball )
+static MACHINE_CONFIG_START( vball, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, CPU_CLOCK)	/* 2 MHz - measured by guru but it makes the game far far too slow ?! */
@@ -448,7 +448,7 @@ static MACHINE_DRIVER_START( vball )
 	MDRV_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

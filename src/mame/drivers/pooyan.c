@@ -222,10 +222,7 @@ static MACHINE_RESET( pooyan )
 }
 
 
-static MACHINE_DRIVER_START( pooyan )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(timeplt_state)
+static MACHINE_CONFIG_START( pooyan, timeplt_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/3/2)
@@ -250,8 +247,8 @@ static MACHINE_DRIVER_START( pooyan )
 	MDRV_VIDEO_UPDATE(pooyan)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(timeplt_sound)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(timeplt_sound)
+MACHINE_CONFIG_END
 
 
 /*************************************

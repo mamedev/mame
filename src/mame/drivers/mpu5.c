@@ -33,7 +33,7 @@ static VIDEO_UPDATE(mpu5)
 	return 0;
 }
 
-static MACHINE_DRIVER_START( mpu5 )
+static MACHINE_CONFIG_START( mpu5, driver_data_t )
 	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)	 // ?
 	MDRV_CPU_PROGRAM_MAP(mpu5_map)
 
@@ -52,7 +52,7 @@ static MACHINE_DRIVER_START( mpu5 )
 
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	/* unknown sound */
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( m_honmon )
 	ROM_REGION( 0x300000, "maincpu", 0 ) /* Code */

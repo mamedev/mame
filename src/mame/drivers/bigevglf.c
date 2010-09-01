@@ -503,10 +503,7 @@ static MACHINE_RESET( bigevglf )
 }
 
 
-static MACHINE_DRIVER_START( bigevglf )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(bigevglf_state)
+static MACHINE_CONFIG_START( bigevglf, bigevglf_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,10000000/2)		/* 5 MHz ? */
@@ -564,7 +561,7 @@ static MACHINE_DRIVER_START( bigevglf )
 	// pin 1 SOLO  8'       not mapped
 	// pin 2 SOLO 16'       not mapped
 	// pin 22 Noise Output  not mapped
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

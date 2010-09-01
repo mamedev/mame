@@ -1102,7 +1102,7 @@ static const jaguar_cpu_config dsp_config =
 };
 
 
-static MACHINE_DRIVER_START( cojagr3k )
+static MACHINE_CONFIG_START( cojagr3k, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", R3041BE, R3000_CLOCK)
@@ -1142,16 +1142,15 @@ static MACHINE_DRIVER_START( cojagr3k )
 
 	MDRV_SOUND_ADD("dac2", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( cojag68k )
-	MDRV_IMPORT_FROM(cojagr3k)
+static MACHINE_CONFIG_DERIVED( cojag68k, cojagr3k )
 
 	/* basic machine hardware */
 	MDRV_CPU_REPLACE("maincpu", M68EC020, M68K_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(m68020_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

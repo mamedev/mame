@@ -131,10 +131,7 @@ static INPUT_PORTS_START( mosaicf2 )
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_OUTPUT ) PORT_WRITE_LINE_DEVICE("eeprom", eeprom_set_cs_line)
 INPUT_PORTS_END
 
-static MACHINE_DRIVER_START( mosaicf2 )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(mosaicf2_state)
+static MACHINE_CONFIG_START( mosaicf2, mosaicf2_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", E132XN, 20000000*4)	/* 4x internal multiplier */
@@ -167,7 +164,7 @@ static MACHINE_DRIVER_START( mosaicf2 )
 	MDRV_OKIM6295_ADD("oki", 1789772.5, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*
 

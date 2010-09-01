@@ -183,9 +183,7 @@ static GFXDECODE_START( stlforce )
 GFXDECODE_END
 
 
-static MACHINE_DRIVER_START( stlforce )
-
-	MDRV_DRIVER_DATA( stlforce_state )
+static MACHINE_CONFIG_START( stlforce, stlforce_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 15000000)
@@ -213,17 +211,17 @@ static MACHINE_DRIVER_START( stlforce )
 
 	MDRV_OKIM6295_ADD("oki", 937500 , OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( twinbrat )
+static MACHINE_CONFIG_DERIVED( twinbrat, stlforce )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(stlforce)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_CLOCK(14745600)
 
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(3*8, 45*8-1, 0*8, 30*8-1)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( stlforce )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */

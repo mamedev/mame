@@ -863,7 +863,7 @@ static const namco_interface namco_config =
  * Machine driver
  *********************************************************************/
 
-static MACHINE_DRIVER_START( polepos )
+static MACHINE_CONFIG_START( polepos, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/8)	/* 3.072 MHz */
@@ -930,7 +930,7 @@ static MACHINE_DRIVER_START( polepos )
 	MDRV_SOUND_ADD("polepos", POLEPOS, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90 * 0.77)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90 * 0.77)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* doesn't exist on the bootleg, but required for now or the game only boots in test mode!
    - they probably simulate some of the logic */
@@ -949,7 +949,7 @@ static const namco_51xx_interface namco_51xx_bl_intf =
 };
 
 
-static MACHINE_DRIVER_START( topracern )
+static MACHINE_CONFIG_START( topracern, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/8)	/* 3.072 MHz */
@@ -1004,7 +1004,7 @@ static MACHINE_DRIVER_START( topracern )
 	MDRV_SOUND_ADD("polepos", POLEPOS, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90 * 0.77)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90 * 0.77)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 static ADDRESS_MAP_START( sound_z80_bootleg_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -1016,8 +1016,7 @@ static ADDRESS_MAP_START( sound_z80_bootleg_iomap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 
-static MACHINE_DRIVER_START( polepos2bi )
-	MDRV_IMPORT_FROM(topracern)
+static MACHINE_CONFIG_DERIVED( polepos2bi, topracern )
 
 	MDRV_CPU_ADD("soundz80bl", Z80, MASTER_CLOCK/8)	/*? MHz */
 	MDRV_CPU_PROGRAM_MAP(sound_z80_bootleg_map)
@@ -1026,7 +1025,7 @@ static MACHINE_DRIVER_START( polepos2bi )
 	MDRV_SOUND_ADD("tms", TMS5220, 600000)	/* ? Mhz */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

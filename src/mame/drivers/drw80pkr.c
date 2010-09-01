@@ -444,7 +444,7 @@ INPUT_PORTS_END
 *     Machine Driver     *
 *************************/
 
-static MACHINE_DRIVER_START( drw80pkr )
+static MACHINE_CONFIG_START( drw80pkr, driver_data_t )
 	// basic machine hardware
 	MDRV_CPU_ADD("maincpu", I8039, CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(drw80pkr_map)
@@ -473,7 +473,7 @@ static MACHINE_DRIVER_START( drw80pkr )
 
 	MDRV_SOUND_ADD("aysnd", AY8912, 20000000/12)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*************************
 *        Rom Load        *

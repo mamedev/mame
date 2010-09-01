@@ -1915,7 +1915,7 @@ static const samples_interface reactor_samples_interface =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( gottlieb_core )
+static MACHINE_CONFIG_START( gottlieb_core, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8088, CPU_CLOCK/3)
@@ -1940,24 +1940,21 @@ static MACHINE_DRIVER_START( gottlieb_core )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( gottlieb1 )
-	MDRV_IMPORT_FROM(gottlieb_core)
-	MDRV_IMPORT_FROM(gottlieb_soundrev1)
-MACHINE_DRIVER_END
+static MACHINE_CONFIG_DERIVED( gottlieb1, gottlieb_core )
+	MDRV_FRAGMENT_ADD(gottlieb_soundrev1)
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( gottlieb2 )
-	MDRV_IMPORT_FROM(gottlieb_core)
-	MDRV_IMPORT_FROM(gottlieb_soundrev2)
-MACHINE_DRIVER_END
+static MACHINE_CONFIG_DERIVED( gottlieb2, gottlieb_core )
+	MDRV_FRAGMENT_ADD(gottlieb_soundrev2)
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( g2laser )
-	MDRV_IMPORT_FROM(gottlieb_core)
-	MDRV_IMPORT_FROM(gottlieb_soundrev2)
+static MACHINE_CONFIG_DERIVED( g2laser, gottlieb_core )
+	MDRV_FRAGMENT_ADD(gottlieb_soundrev2)
 
 	MDRV_LASERDISC_ADD("laserdisc", PIONEER_PR8210, "screen", "ldsound")
 	MDRV_LASERDISC_AUDIO(laserdisc_audio_process)
@@ -1970,7 +1967,7 @@ static MACHINE_DRIVER_START( g2laser )
 	MDRV_SOUND_ADD("ldsound", LASERDISC, 0)
 	MDRV_SOUND_ROUTE(0, "mono", 1.0)
 	/* right channel is processed as data */
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -1980,8 +1977,7 @@ MACHINE_DRIVER_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( reactor )
-	MDRV_IMPORT_FROM(gottlieb1)
+static MACHINE_CONFIG_DERIVED( reactor, gottlieb1 )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
@@ -1993,34 +1989,31 @@ static MACHINE_DRIVER_START( reactor )
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(reactor_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( qbert )
-	MDRV_IMPORT_FROM(gottlieb1)
+static MACHINE_CONFIG_DERIVED( qbert, gottlieb1 )
 
 	/* video hardware */
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(qbert_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( screwloo )
-	MDRV_IMPORT_FROM(gottlieb2)
+static MACHINE_CONFIG_DERIVED( screwloo, gottlieb2 )
 
 	MDRV_VIDEO_START(screwloo)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( cobram3 )
-	MDRV_IMPORT_FROM(g2laser)
+static MACHINE_CONFIG_DERIVED( cobram3, g2laser )
 
 	/* sound hardware */
 	MDRV_SOUND_MODIFY("dac1")
 	MDRV_SOUND_ROUTES_RESET()
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

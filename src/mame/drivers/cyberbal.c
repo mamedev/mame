@@ -429,8 +429,7 @@ static const ym2151_interface ym2151_config =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( cyberbal )
-	MDRV_DRIVER_DATA(cyberbal_state)
+static MACHINE_CONFIG_START( cyberbal, cyberbal_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
@@ -487,11 +486,10 @@ static MACHINE_DRIVER_START( cyberbal )
 
 	MDRV_SOUND_ADD("dac2", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( cyberbal2p )
-	MDRV_DRIVER_DATA(cyberbal_state)
+static MACHINE_CONFIG_START( cyberbal2p, cyberbal_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
@@ -517,8 +515,8 @@ static MACHINE_DRIVER_START( cyberbal2p )
 	MDRV_VIDEO_UPDATE(cyberbal)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(jsa_ii_mono)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(jsa_ii_mono)
+MACHINE_CONFIG_END
 
 
 

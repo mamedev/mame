@@ -187,5 +187,5 @@ WRITE8_DEVICE_HANDLER( scramble_sh_irqtrigger_w );
 WRITE8_DEVICE_HANDLER( mrkougar_sh_irqtrigger_w );
 WRITE8_HANDLER( hotshock_sh_irqtrigger_w );
 
-MACHINE_DRIVER_EXTERN( ad2083_audio );
+MACHINE_CONFIG_EXTERN( ad2083_audio );
 

@@ -165,10 +165,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_DRIVER_START( mrdo )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(mrdo_state)
+static MACHINE_CONFIG_START( mrdo, mrdo_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MAIN_CLOCK/2)	/* Verified */
@@ -195,7 +192,7 @@ static MACHINE_DRIVER_START( mrdo )
 
 	MDRV_SOUND_ADD("sn2", SN76489, MAIN_CLOCK/2)	/* Verified */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

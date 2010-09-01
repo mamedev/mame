@@ -226,7 +226,7 @@ UINT8 vicdual_characterram_r(offs_t offset)
  *
  *************************************/
 
-static MACHINE_DRIVER_START( vicdual_root )
+static MACHINE_CONFIG_START( vicdual_root, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, VICDUAL_MAIN_CPU_CLOCK)
@@ -236,7 +236,7 @@ static MACHINE_DRIVER_START( vicdual_root )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_RAW_PARAMS(VICDUAL_PIXEL_CLOCK, VICDUAL_HTOTAL, VICDUAL_HBEND, VICDUAL_HBSTART, VICDUAL_VTOTAL, VICDUAL_VBEND, VICDUAL_VBSTART)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -303,10 +303,9 @@ static INPUT_PORTS_START( depthch )
 INPUT_PORTS_END
 
 
-static MACHINE_DRIVER_START( depthch )
+static MACHINE_CONFIG_DERIVED( depthch, vicdual_root )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(vicdual_root)
 	MDRV_CPU_REPLACE("maincpu", I8080, VICDUAL_MAIN_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(depthch_map)
 	MDRV_CPU_IO_MAP(depthch_io_map)
@@ -316,9 +315,9 @@ static MACHINE_DRIVER_START( depthch )
 
 	/* audio hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_IMPORT_FROM(depthch_audio)
+	MDRV_FRAGMENT_ADD(depthch_audio)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -391,10 +390,9 @@ static INPUT_PORTS_START( safari )
 INPUT_PORTS_END
 
 
-static MACHINE_DRIVER_START( safari )
+static MACHINE_CONFIG_DERIVED( safari, vicdual_root )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(vicdual_root)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(safari_map)
 	MDRV_CPU_IO_MAP(safari_io_map)
@@ -402,7 +400,7 @@ static MACHINE_DRIVER_START( safari )
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(vicdual_bw)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -493,10 +491,9 @@ static INPUT_PORTS_START( frogs )
 INPUT_PORTS_END
 
 
-static MACHINE_DRIVER_START( frogs )
+static MACHINE_CONFIG_DERIVED( frogs, vicdual_root )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(vicdual_root)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(frogs_map)
 	MDRV_CPU_IO_MAP(frogs_io_map)
@@ -507,9 +504,9 @@ static MACHINE_DRIVER_START( frogs )
 
 	/* audio hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_IMPORT_FROM(frogs_audio)
+	MDRV_FRAGMENT_ADD(frogs_audio)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -682,10 +679,9 @@ static INPUT_PORTS_START( sspaceat )
 INPUT_PORTS_END
 
 
-static MACHINE_DRIVER_START( headon )
+static MACHINE_CONFIG_DERIVED( headon, vicdual_root )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(vicdual_root)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(headon_map)
 	MDRV_CPU_IO_MAP(headon_io_map)
@@ -695,23 +691,21 @@ static MACHINE_DRIVER_START( headon )
 
 	/* audio hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_IMPORT_FROM(headon_audio)
+	MDRV_FRAGMENT_ADD(headon_audio)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( headons )
-	MDRV_IMPORT_FROM(headon)
+static MACHINE_CONFIG_DERIVED( headons, headon )
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(vicdual_bw) // no colour prom on PCB, must be bw?
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
-static MACHINE_DRIVER_START( sspaceat )
+static MACHINE_CONFIG_DERIVED( sspaceat, vicdual_root )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(vicdual_root)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(headon_map)
 	MDRV_CPU_IO_MAP(sspaceat_io_map)
@@ -719,7 +713,7 @@ static MACHINE_DRIVER_START( sspaceat )
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(vicdual_bw_or_color)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -902,10 +896,9 @@ static INPUT_PORTS_START( digger )
 INPUT_PORTS_END
 
 
-static MACHINE_DRIVER_START( headon2 )
+static MACHINE_CONFIG_DERIVED( headon2, vicdual_root )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(vicdual_root)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(headon2_map)
 	MDRV_CPU_IO_MAP(headon2_io_map)
@@ -915,22 +908,21 @@ static MACHINE_DRIVER_START( headon2 )
 
 	/* audio hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_IMPORT_FROM(headon_audio)
+	MDRV_FRAGMENT_ADD(headon_audio)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( headon2bw )
+static MACHINE_CONFIG_DERIVED( headon2bw, headon2 )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(headon2)
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(vicdual_bw)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( digger )
+static MACHINE_CONFIG_DERIVED( digger, vicdual_root )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(vicdual_root)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(headon2_map)
 	MDRV_CPU_IO_MAP(digger_io_map)
@@ -938,7 +930,7 @@ static MACHINE_DRIVER_START( digger )
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(vicdual_color)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -1848,151 +1840,139 @@ static INPUT_PORTS_START( alphaho )
 INPUT_PORTS_END
 
 
-static MACHINE_DRIVER_START( vicdual_dualgame_root )
+static MACHINE_CONFIG_DERIVED( vicdual_dualgame_root, vicdual_root )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(vicdual_root)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(vicdual_dualgame_map)
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(vicdual_color)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( invho2 )
+static MACHINE_CONFIG_DERIVED( invho2, vicdual_dualgame_root )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(vicdual_dualgame_root)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(invho2_io_map)
 
 	/* audio hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_IMPORT_FROM(invinco_audio)
-	MDRV_IMPORT_FROM(headon_audio)
+	MDRV_FRAGMENT_ADD(invinco_audio)
+	MDRV_FRAGMENT_ADD(headon_audio)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( invds )
+static MACHINE_CONFIG_DERIVED( invds, vicdual_dualgame_root )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(vicdual_dualgame_root)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(invds_io_map)
 
 	/* audio hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_IMPORT_FROM(invinco_audio)
+	MDRV_FRAGMENT_ADD(invinco_audio)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( sspacaho )
+static MACHINE_CONFIG_DERIVED( sspacaho, vicdual_dualgame_root )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(vicdual_dualgame_root)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(sspacaho_io_map)
 
 	/* audio hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_IMPORT_FROM(headon_audio)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(headon_audio)
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( spacetrk )
+static MACHINE_CONFIG_DERIVED( spacetrk, vicdual_dualgame_root )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(vicdual_dualgame_root)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(spacetrk_io_map)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( carnival )
+static MACHINE_CONFIG_DERIVED( carnival, vicdual_dualgame_root )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(vicdual_dualgame_root)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(carnival_io_map)
 
 	/* audio hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_IMPORT_FROM(carnival_audio)
+	MDRV_FRAGMENT_ADD(carnival_audio)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( carnivalh )
+static MACHINE_CONFIG_DERIVED( carnivalh, vicdual_dualgame_root )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(vicdual_dualgame_root)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(headon_io_map)
 
 	/* audio hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_IMPORT_FROM(carnival_audio)
+	MDRV_FRAGMENT_ADD(carnival_audio)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
-static MACHINE_DRIVER_START( tranqgun )
+static MACHINE_CONFIG_DERIVED( tranqgun, vicdual_dualgame_root )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(vicdual_dualgame_root)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(tranqgun_io_map)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( brdrline )
+static MACHINE_CONFIG_DERIVED( brdrline, vicdual_dualgame_root )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(vicdual_dualgame_root)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(brdrline_io_map)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( pulsar )
+static MACHINE_CONFIG_DERIVED( pulsar, vicdual_dualgame_root )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(vicdual_dualgame_root)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(pulsar_io_map)
 
 	/* audio hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_IMPORT_FROM(pulsar_audio)
+	MDRV_FRAGMENT_ADD(pulsar_audio)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( heiankyo )
+static MACHINE_CONFIG_DERIVED( heiankyo, vicdual_dualgame_root )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(vicdual_dualgame_root)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(heiankyo_io_map)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( alphaho )
+static MACHINE_CONFIG_DERIVED( alphaho, vicdual_dualgame_root )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(vicdual_dualgame_root)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(alphaho_io_map)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -2107,10 +2087,9 @@ static INPUT_PORTS_START( samurai )
 INPUT_PORTS_END
 
 
-static MACHINE_DRIVER_START( samurai )
+static MACHINE_CONFIG_DERIVED( samurai, vicdual_root )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(vicdual_root)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(samurai_map)
 	MDRV_CPU_IO_MAP(samurai_io_map)
@@ -2118,7 +2097,7 @@ static MACHINE_DRIVER_START( samurai )
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(vicdual_color)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -2206,10 +2185,9 @@ static INPUT_PORTS_START( nsub )
 INPUT_PORTS_END
 
 
-static MACHINE_DRIVER_START( nsub )
+static MACHINE_CONFIG_DERIVED( nsub, vicdual_root )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(vicdual_root)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(nsub_map)
 	MDRV_CPU_IO_MAP(nsub_io_map)
@@ -2217,7 +2195,7 @@ static MACHINE_DRIVER_START( nsub )
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(vicdual_color)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -2305,10 +2283,9 @@ static INPUT_PORTS_START( invinco )
 INPUT_PORTS_END
 
 
-static MACHINE_DRIVER_START( invinco )
+static MACHINE_CONFIG_DERIVED( invinco, vicdual_root )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(vicdual_root)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(invinco_map)
 	MDRV_CPU_IO_MAP(invinco_io_map)
@@ -2318,9 +2295,9 @@ static MACHINE_DRIVER_START( invinco )
 
 	/* audio hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_IMPORT_FROM(invinco_audio)
+	MDRV_FRAGMENT_ADD(invinco_audio)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

@@ -277,7 +277,7 @@ static const mc6845_interface mc6845_intf =
 };
 
 //51f
-static MACHINE_DRIVER_START( fortecar )
+static MACHINE_CONFIG_START( fortecar, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,6000000)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(fortecar_map)
@@ -313,7 +313,7 @@ static MACHINE_DRIVER_START( fortecar )
 	MDRV_SOUND_ADD("aysnd", AY8910, 1500000)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( fortecar )
 	ROM_REGION( 0x10000, "maincpu", 0 )

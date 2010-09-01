@@ -558,7 +558,7 @@ static INTERRUPT_GEN( acommand_irq )
 	}
 }
 
-static MACHINE_DRIVER_START( acommand )
+static MACHINE_CONFIG_START( acommand, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M68000,12000000)
@@ -588,7 +588,7 @@ static MACHINE_DRIVER_START( acommand )
 	MDRV_OKIM6295_ADD("oki2", 2112000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

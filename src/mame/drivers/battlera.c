@@ -241,7 +241,7 @@ static const c6280_interface c6280_config =
 	"audiocpu"
 };
 
-static MACHINE_DRIVER_START( battlera )
+static MACHINE_CONFIG_START( battlera, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", H6280,21477200/3)
@@ -281,7 +281,7 @@ static MACHINE_DRIVER_START( battlera )
 	MDRV_SOUND_CONFIG(c6280_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /******************************************************************************/
 

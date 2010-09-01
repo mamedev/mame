@@ -278,9 +278,7 @@ static GFXDECODE_START( silkroad )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles16x16x6_layout,  0x0000, 256 )
 GFXDECODE_END
 
-static MACHINE_DRIVER_START( silkroad )
-
-	MDRV_DRIVER_DATA( silkroad_state )
+static MACHINE_CONFIG_START( silkroad, silkroad_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)
@@ -315,7 +313,7 @@ static MACHINE_DRIVER_START( silkroad )
 	MDRV_OKIM6295_ADD("oki2", 2112000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.45)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.45)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

@@ -312,8 +312,7 @@ static const duart68681_config micro3d_duart68681_config =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( micro3d )
-	MDRV_DRIVER_DATA(micro3d_state)
+static MACHINE_CONFIG_START( micro3d, micro3d_state )
 
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_32MHz / 2)
 	MDRV_CPU_PROGRAM_MAP(hostmem)
@@ -364,7 +363,7 @@ static MACHINE_DRIVER_START( micro3d )
 	MDRV_SOUND_ADD("noise_2", MICRO3D, 0)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************************

@@ -916,7 +916,7 @@ static const psx_spu_interface psxspu_interface =
 	psx_dma_install_write_handler
 };
 
-static MACHINE_DRIVER_START( coh3002t )
+static MACHINE_CONFIG_START( coh3002t, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD( "maincpu", PSXCPU, XTAL_100MHz )
 	MDRV_CPU_PROGRAM_MAP( zn_map)
@@ -952,8 +952,8 @@ static MACHINE_DRIVER_START( coh3002t )
 
 	MDRV_MB3773_ADD("mb3773")
 
-	MDRV_IMPORT_FROM( taito_zoom_sound )
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD( taito_zoom_sound )
+MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( coh3002t )
 	PORT_START("P1")

@@ -147,7 +147,7 @@ static MACHINE_START(quakeat)
 }
 /*************************************************************/
 
-static MACHINE_DRIVER_START( quake )
+static MACHINE_CONFIG_START( quake, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", PENTIUM, 233000000) /* Pentium II, 233MHz */
 	MDRV_CPU_PROGRAM_MAP(quake_map)
@@ -170,7 +170,7 @@ static MACHINE_DRIVER_START( quake )
 
 	MDRV_VIDEO_START(quake)
 	MDRV_VIDEO_UPDATE(quake)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START(quake)

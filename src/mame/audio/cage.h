@@ -7,8 +7,8 @@
 #define CAGE_IRQ_REASON_DATA_READY		(1)
 #define CAGE_IRQ_REASON_BUFFER_EMPTY	(2)
 
-MACHINE_DRIVER_EXTERN( cage );
-MACHINE_DRIVER_EXTERN( cage_seattle );
+MACHINE_CONFIG_EXTERN( cage );
+MACHINE_CONFIG_EXTERN( cage_seattle );
 
 void cage_init(running_machine *machine, offs_t speedup);
 void cage_set_irq_handler(void (*irqhandler)(running_machine *, int));

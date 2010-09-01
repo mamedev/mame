@@ -503,8 +503,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( badlands )
-	MDRV_DRIVER_DATA(badlands_state)
+static MACHINE_CONFIG_START( badlands, badlands_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
@@ -538,7 +537,7 @@ static MACHINE_DRIVER_START( badlands )
 	MDRV_SOUND_ADD("ymsnd", YM2151, ATARI_CLOCK_14MHz/4)
 	MDRV_SOUND_ROUTE(0, "mono", 0.30)
 	MDRV_SOUND_ROUTE(1, "mono", 0.30)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -713,8 +712,7 @@ static MACHINE_RESET( badlandsb )
 //  memcpy(state->bank_base, &state->bank_source_data[0x0000], 0x1000);
 }
 
-static MACHINE_DRIVER_START( badlandsb )
-	MDRV_DRIVER_DATA(badlands_state)
+static MACHINE_CONFIG_START( badlandsb, badlands_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 2800000/2)
@@ -748,7 +746,7 @@ static MACHINE_DRIVER_START( badlandsb )
 	MDRV_SOUND_ADD("ymsnd", YM2151, 2800000/4)
 	MDRV_SOUND_ROUTE(0, "mono", 0.30)
 	MDRV_SOUND_ROUTE(1, "mono", 0.30)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

@@ -193,9 +193,7 @@ static INPUT_PORTS_START( sstrangr )
 INPUT_PORTS_END
 
 
-static MACHINE_DRIVER_START( sstrangr )
-
-	MDRV_DRIVER_DATA( sstrangr_state )
+static MACHINE_CONFIG_START( sstrangr, sstrangr_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",I8080,1996800)	/* clock is a guess, taken from mw8080bw */
@@ -214,7 +212,7 @@ static MACHINE_DRIVER_START( sstrangr )
 
 	/* sound hardware */
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -267,15 +265,14 @@ static INPUT_PORTS_START( sstrngr2 )
 INPUT_PORTS_END
 
 
-static MACHINE_DRIVER_START( sstrngr2 )
+static MACHINE_CONFIG_DERIVED( sstrngr2, sstrangr )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(sstrangr)
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(sstrngr2)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

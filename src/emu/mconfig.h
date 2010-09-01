@@ -228,34 +228,54 @@ private:
 //**************************************************************************
 
 // start/end tags for the machine driver
-#define MACHINE_DRIVER_NAME(_name) construct_machine_config_##_name
+#define MACHINE_CONFIG_NAME(_name) construct_machine_config_##_name
 
-#define MACHINE_DRIVER_START(_name) \
-void MACHINE_DRIVER_NAME(_name)(machine_config &config, device_config *owner) \
+#define MACHINE_CONFIG_START(_name, _class) \
+void MACHINE_CONFIG_NAME(_name)(machine_config &config, device_config *owner) \
 { \
 	device_config *device = NULL; \
 	const char *tag; \
 	astring tempstring; \
 	(void)device; \
 	(void)tag; \
+	assert(config.m_driver_data_alloc == NULL); \
+	config.m_driver_data_alloc = &_class::alloc; \
 
-#define MACHINE_DRIVER_END \
+#define MACHINE_CONFIG_FRAGMENT(_name) \
+void MACHINE_CONFIG_NAME(_name)(machine_config &config, device_config *owner) \
+{ \
+	device_config *device = NULL; \
+	const char *tag; \
+	astring tempstring; \
+	(void)device; \
+	(void)tag; \
+	assert(config.m_driver_data_alloc != NULL); \
+
+#define MACHINE_CONFIG_DERIVED(_name, _base) \
+void MACHINE_CONFIG_NAME(_name)(machine_config &config, device_config *owner) \
+{ \
+	device_config *device = NULL; \
+	const char *tag; \
+	astring tempstring; \
+	(void)device; \
+	(void)tag; \
+	MACHINE_CONFIG_NAME(_base)(config, owner); \
+	assert(config.m_driver_data_alloc != NULL); \
+
+#define MACHINE_CONFIG_END \
 }
 
 // use this to declare external references to a machine driver
-#define MACHINE_DRIVER_EXTERN(_name) \
-	extern void MACHINE_DRIVER_NAME(_name)(machine_config &config, device_config *owner)
+#define MACHINE_CONFIG_EXTERN(_name) \
+	extern void MACHINE_CONFIG_NAME(_name)(machine_config &config, device_config *owner)
 
 
 // importing data from other machine drivers
-#define MDRV_IMPORT_FROM(_name) \
-	MACHINE_DRIVER_NAME(_name)(config, owner);
+#define MDRV_FRAGMENT_ADD(_name) \
+	MACHINE_CONFIG_NAME(_name)(config, owner);
 
 
 // core parameters
-#define MDRV_DRIVER_DATA(_class) \
-	config.m_driver_data_alloc = &_class::alloc; \
-
 #define MDRV_QUANTUM_TIME(_time) \
 	config.m_minimum_quantum = ATTOTIME_IN_##_time; \
 

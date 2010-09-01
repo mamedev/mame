@@ -816,9 +816,7 @@ static const vr0video_interface vr0video_config =
 	"maincpu"
 };
 
-static MACHINE_DRIVER_START( crystal )
-
-	MDRV_DRIVER_DATA(crystal_state)
+static MACHINE_CONFIG_START( crystal, crystal_state )
 
 	MDRV_CPU_ADD("maincpu", SE3208, 43000000)
 	MDRV_CPU_PROGRAM_MAP(crystal_mem)
@@ -852,19 +850,18 @@ static MACHINE_DRIVER_START( crystal )
 	MDRV_SOUND_CONFIG(vr0_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*
     Top blade screen is 32 pixels wider
 */
-static MACHINE_DRIVER_START( topbladv )
-	MDRV_IMPORT_FROM(crystal)
+static MACHINE_CONFIG_DERIVED( topbladv, crystal )
 
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_SIZE(320+32, 240)
 	MDRV_SCREEN_VISIBLE_AREA(0, 319+32, 0, 239)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( crysbios )
 	ROM_REGION( 0x20000, "maincpu", 0 ) // bios

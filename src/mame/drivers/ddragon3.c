@@ -590,10 +590,7 @@ static MACHINE_RESET( ddragon3 )
 		state->io_reg[i] = 0;
 }
 
-static MACHINE_DRIVER_START( ddragon3 )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(ddragon3_state)
+static MACHINE_CONFIG_START( ddragon3, ddragon3_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2)
@@ -628,17 +625,15 @@ static MACHINE_DRIVER_START( ddragon3 )
 	MDRV_OKIM6295_ADD("oki", XTAL_1_056MHz, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.50)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( ddragon3b )
-	MDRV_IMPORT_FROM(ddragon3)
+static MACHINE_CONFIG_DERIVED( ddragon3b, ddragon3 )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(dd3b_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( ctribe )
-	MDRV_IMPORT_FROM(ddragon3)
+static MACHINE_CONFIG_DERIVED( ctribe, ddragon3 )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(ctribe_map)
@@ -655,7 +650,7 @@ static MACHINE_DRIVER_START( ctribe )
 	MDRV_SOUND_MODIFY("oki")
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*************************************
  *

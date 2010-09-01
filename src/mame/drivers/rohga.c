@@ -772,10 +772,7 @@ static const deco16ic_interface nitrobal_deco16ic_intf =
 	rohga_bank_callback
 };
 
-static MACHINE_DRIVER_START( rohga )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(rohga_state)
+static MACHINE_CONFIG_START( rohga, rohga_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 14000000)
@@ -818,12 +815,9 @@ static MACHINE_DRIVER_START( rohga )
 	MDRV_OKIM6295_ADD("oki2", 32220000/16, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( wizdfire )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(rohga_state)
+static MACHINE_CONFIG_START( wizdfire, rohga_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 14000000)
@@ -865,12 +859,9 @@ static MACHINE_DRIVER_START( wizdfire )
 	MDRV_OKIM6295_ADD("oki2", 32220000/16, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( nitrobal )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(rohga_state)
+static MACHINE_CONFIG_START( nitrobal, rohga_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 14000000)
@@ -912,12 +903,9 @@ static MACHINE_DRIVER_START( nitrobal )
 	MDRV_OKIM6295_ADD("oki2", 32220000/16, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( schmeisr )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(rohga_state)
+static MACHINE_CONFIG_START( schmeisr, rohga_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 14000000)
@@ -960,7 +948,7 @@ static MACHINE_DRIVER_START( schmeisr )
 	MDRV_OKIM6295_ADD("oki2", 32220000/16, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /**********************************************************************************/
 

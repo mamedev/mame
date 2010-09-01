@@ -1011,7 +1011,7 @@ ADDRESS_MAP_END
 
 #define MASTER_CLOCK_HZ 48384000
 
-static MACHINE_DRIVER_START( namconb1 )
+static MACHINE_CONFIG_START( namconb1, driver_data_t )
 	MDRV_CPU_ADD("maincpu", M68EC020,MASTER_CLOCK_HZ/2)
 	MDRV_CPU_PROGRAM_MAP(namconb1_am)
 	MDRV_CPU_VBLANK_INT("screen", namconb1_interrupt)
@@ -1042,9 +1042,9 @@ static MACHINE_DRIVER_START( namconb1 )
 	MDRV_SOUND_ROUTE(1, "lspeaker", 1.00)
 	MDRV_SOUND_ROUTE(2, "rspeaker", 1.00)
 	MDRV_SOUND_ROUTE(3, "lspeaker", 1.00)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( namconb2 )
+static MACHINE_CONFIG_START( namconb2, driver_data_t )
 	MDRV_CPU_ADD("maincpu", M68EC020,MASTER_CLOCK_HZ/2)
 	MDRV_CPU_PROGRAM_MAP(namconb2_am)
 	MDRV_CPU_VBLANK_INT("screen", namconb2_interrupt)
@@ -1075,7 +1075,7 @@ static MACHINE_DRIVER_START( namconb2 )
 	MDRV_SOUND_ROUTE(1, "lspeaker", 1.00)
 	MDRV_SOUND_ROUTE(2, "rspeaker", 1.00)
 	MDRV_SOUND_ROUTE(3, "lspeaker", 1.00)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************/
 

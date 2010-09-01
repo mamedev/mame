@@ -57,7 +57,7 @@ READ8_HANDLER (megatech_sms_ioport_dd_r);
 READ8_HANDLER( smsgg_backupram_r );
 WRITE8_HANDLER( smsgg_backupram_w );
 extern void megatech_set_genz80_as_sms_standard_map(running_machine *machine, const char* tag, int mapper);
-MACHINE_DRIVER_EXTERN(sms);
+MACHINE_CONFIG_EXTERN(sms);
 extern DRIVER_INIT(sms);
 extern DRIVER_INIT(smspal);
 extern DRIVER_INIT(smscm);

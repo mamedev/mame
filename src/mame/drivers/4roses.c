@@ -379,7 +379,7 @@ static const mc6845_interface mc6845_intf =
 *     Machine Drivers     *
 **************************/
 
-static MACHINE_DRIVER_START( 4roses )
+static MACHINE_CONFIG_START( 4roses, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M65C02, MASTER_CLOCK/8)	/* 2MHz, guess */
 	MDRV_CPU_PROGRAM_MAP(4roses_map)
@@ -411,7 +411,7 @@ static MACHINE_DRIVER_START( 4roses )
 	MDRV_SOUND_ADD("ay8910", AY8910, MASTER_CLOCK/8)	/* 2MHz, guess */
 	MDRV_SOUND_CONFIG(ay8910_intf)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.5)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************

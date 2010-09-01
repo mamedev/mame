@@ -497,10 +497,7 @@ static MACHINE_START( gaelco )
 	state->audiocpu = machine->device("audiocpu");
 }
 
-static MACHINE_DRIVER_START( bigkarnk )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(gaelco_state)
+static MACHINE_CONFIG_START( bigkarnk, gaelco_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)	/* MC68000P10, 10 MHz */
@@ -536,12 +533,9 @@ static MACHINE_DRIVER_START( bigkarnk )
 
 	MDRV_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( maniacsq )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(gaelco_state)
+static MACHINE_CONFIG_START( maniacsq, gaelco_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,24000000/2)			/* 12 MHz */
@@ -569,12 +563,9 @@ static MACHINE_DRIVER_START( maniacsq )
 
 	MDRV_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( squash )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(gaelco_state)
+static MACHINE_CONFIG_START( squash, gaelco_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* MC68000P12, 12 MHz */
@@ -604,12 +595,9 @@ static MACHINE_DRIVER_START( squash )
 
 	MDRV_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( thoop )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(gaelco_state)
+static MACHINE_CONFIG_START( thoop, gaelco_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* MC68000P12, 12 MHz */
@@ -639,7 +627,7 @@ static MACHINE_DRIVER_START( thoop )
 
 	MDRV_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************************

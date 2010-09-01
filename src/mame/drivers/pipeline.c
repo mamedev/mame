@@ -358,7 +358,7 @@ static PALETTE_INIT(pipeline)
 	}
 }
 
-static MACHINE_DRIVER_START( pipeline )
+static MACHINE_CONFIG_START( pipeline, driver_data_t )
 	/* basic machine hardware */
 
 	MDRV_CPU_ADD("maincpu", Z80, 7372800/2)
@@ -401,7 +401,7 @@ static MACHINE_DRIVER_START( pipeline )
 	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( pipeline )
 	ROM_REGION( 0x10000, "maincpu", 0 )

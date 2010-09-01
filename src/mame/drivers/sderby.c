@@ -453,9 +453,7 @@ GFXDECODE_END
 *      Machine Drivers      *
 ****************************/
 
-static MACHINE_DRIVER_START( sderby )
-
-	MDRV_DRIVER_DATA( sderby_state )
+static MACHINE_CONFIG_START( sderby, sderby_state )
 
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(sderby_map)
@@ -478,11 +476,9 @@ static MACHINE_DRIVER_START( sderby )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) /* clock frequency & pin 7 not verified */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( spacewin )
-
-	MDRV_DRIVER_DATA( sderby_state )
+static MACHINE_CONFIG_START( spacewin, sderby_state )
 
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(spacewin_map)
@@ -505,11 +501,9 @@ static MACHINE_DRIVER_START( spacewin )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) /* clock frequency & pin 7 not verified */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( pmroulet )
-
-	MDRV_DRIVER_DATA( sderby_state )
+static MACHINE_CONFIG_START( pmroulet, sderby_state )
 
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(roulette_map)
@@ -532,7 +526,7 @@ static MACHINE_DRIVER_START( pmroulet )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) /* clock frequency & pin 7 not verified */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /****************************

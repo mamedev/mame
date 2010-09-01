@@ -570,7 +570,7 @@ static const pokey_interface pokey_interface_2 =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( tempest )
+static MACHINE_CONFIG_START( tempest, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 8)
@@ -604,7 +604,7 @@ static MACHINE_DRIVER_START( tempest )
 	MDRV_SOUND_ADD("pokey2", POKEY, MASTER_CLOCK / 8)
 	MDRV_SOUND_CONFIG(pokey_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

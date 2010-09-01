@@ -212,9 +212,7 @@ INPUT_PORTS_END
 
 /* machine driver */
 
-static MACHINE_DRIVER_START( sbugger )
-
-	MDRV_DRIVER_DATA( sbugger_state )
+static MACHINE_CONFIG_START( sbugger, sbugger_state )
 
 	MDRV_CPU_ADD("maincpu", I8085A, 6000000)        /* 3.00 MHz??? */
 	MDRV_CPU_PROGRAM_MAP(sbugger_map)
@@ -246,7 +244,7 @@ static MACHINE_DRIVER_START( sbugger )
 	MDRV_SOUND_ADD("sn76489.2", SN76489, 3000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* rom loading */
 

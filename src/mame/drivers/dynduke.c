@@ -281,7 +281,7 @@ static INTERRUPT_GEN( dynduke_interrupt )
 
 /* Machine Driver */
 
-static MACHINE_DRIVER_START( dynduke )
+static MACHINE_CONFIG_START( dynduke, driver_data_t )
 	// basic machine hardware
 	MDRV_CPU_ADD("maincpu", V30, 16000000/2) // NEC V30-8 CPU
 	MDRV_CPU_PROGRAM_MAP(master_map)
@@ -316,14 +316,13 @@ static MACHINE_DRIVER_START( dynduke )
 
 	// sound hardware
 	SEIBU_SOUND_SYSTEM_YM3812_INTERFACE(14318180/4,1320000)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( dbldyn )
-	MDRV_IMPORT_FROM(dynduke)
+static MACHINE_CONFIG_DERIVED( dbldyn, dynduke )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(masterj_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROMs */
 

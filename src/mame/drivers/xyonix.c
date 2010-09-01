@@ -214,9 +214,7 @@ GFXDECODE_END
 
 /* MACHINE driver *************************************************************/
 
-static MACHINE_DRIVER_START( xyonix )
-
-	MDRV_DRIVER_DATA( xyonix_state )
+static MACHINE_CONFIG_START( xyonix, xyonix_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,16000000 / 4)		 /* 4 MHz ? */
@@ -248,7 +246,7 @@ static MACHINE_DRIVER_START( xyonix )
 
 	MDRV_SOUND_ADD("sn2", SN76496, 16000000/4)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM Loading ***************************************************************/
 

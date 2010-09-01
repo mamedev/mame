@@ -614,7 +614,7 @@ static MACHINE_RESET(viper)
 	devtag_reset(machine, "ide");
 }
 
-static MACHINE_DRIVER_START(viper)
+static MACHINE_CONFIG_START( viper, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", MPC8240, 200000000)
@@ -647,7 +647,7 @@ static MACHINE_DRIVER_START(viper)
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 	MDRV_M48T58_ADD( "m48t58" )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*****************************************************************************/
 

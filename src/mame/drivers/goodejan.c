@@ -325,7 +325,7 @@ static INTERRUPT_GEN( goodejan_irq )
 /* vector 0x00c is just a reti */
 }
 
-static MACHINE_DRIVER_START( goodejan )
+static MACHINE_CONFIG_START( goodejan, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V30, GOODEJAN_MHZ2/2)
@@ -353,13 +353,12 @@ static MACHINE_DRIVER_START( goodejan )
 
 	/* sound hardware */
 	SEIBU_SOUND_SYSTEM_YM3812_INTERFACE(GOODEJAN_MHZ1/2,GOODEJAN_MHZ2/16)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( totmejan )
-	MDRV_IMPORT_FROM( goodejan )
+static MACHINE_CONFIG_DERIVED( totmejan, goodejan )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(totmejan_io_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( totmejan )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* V30 code */

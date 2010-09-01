@@ -852,10 +852,7 @@ static INTERRUPT_GEN( fantland_sound_irq )
 	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x80 / 4);
 }
 
-static MACHINE_DRIVER_START( fantland )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(fantland_state)
+static MACHINE_CONFIG_START( fantland, fantland_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8086, 8000000)        // ?
@@ -895,7 +892,7 @@ static MACHINE_DRIVER_START( fantland )
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 static void galaxygn_sound_irq( running_device *device, int line )
@@ -909,10 +906,7 @@ static const ym2151_interface galaxygn_ym2151_interface =
 	galaxygn_sound_irq
 };
 
-static MACHINE_DRIVER_START( galaxygn )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(fantland_state)
+static MACHINE_CONFIG_START( galaxygn, fantland_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8088, 8000000)        // ?
@@ -947,7 +941,7 @@ static MACHINE_DRIVER_START( galaxygn )
 	MDRV_SOUND_CONFIG(galaxygn_ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 1.0)
 	MDRV_SOUND_ROUTE(1, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 // OKI M5205 running at 384kHz [18.432/48]. Sample rate = 384000 / 48
@@ -1022,10 +1016,7 @@ static MACHINE_RESET( borntofi )
 	borntofi_adpcm_stop(machine->device("msm4"), 3);
 }
 
-static MACHINE_DRIVER_START( borntofi )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(fantland_state)
+static MACHINE_CONFIG_START( borntofi, fantland_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V20, 16000000/2)        // D701080C-8 - NEC D70108C-8 V20 CPU, running at 8.000MHz [16/2]
@@ -1058,7 +1049,7 @@ static MACHINE_DRIVER_START( borntofi )
 	MDRV_SOUND_ADD("msm2", MSM5205, 384000) MDRV_SOUND_CONFIG(msm5205_config_1) MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MDRV_SOUND_ADD("msm3", MSM5205, 384000) MDRV_SOUND_CONFIG(msm5205_config_2) MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MDRV_SOUND_ADD("msm4", MSM5205, 384000) MDRV_SOUND_CONFIG(msm5205_config_3) MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -1073,10 +1064,7 @@ static const ym3526_interface wheelrun_ym3526_interface =
 	wheelrun_ym3526_irqhandler
 };
 
-static MACHINE_DRIVER_START( wheelrun )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(fantland_state)
+static MACHINE_CONFIG_START( wheelrun, fantland_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V20, XTAL_18MHz/2)		// D701080C-8 (V20)
@@ -1109,7 +1097,7 @@ static MACHINE_DRIVER_START( wheelrun )
 	MDRV_SOUND_ADD("ymsnd", YM3526, XTAL_14MHz/4)
 	MDRV_SOUND_CONFIG(wheelrun_ym3526_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

@@ -636,9 +636,7 @@ static const k053936_interface polygonet_k053936_intf =
 	0, 0, 0	/* wrap, xoff, yoff */
 };
 
-static MACHINE_DRIVER_START( plygonet )
-
-	MDRV_DRIVER_DATA( polygonet_state )
+static MACHINE_CONFIG_START( plygonet, polygonet_state )
 
 	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)	/* 16 MHz (xtal is 32.0 MHz) */
 	MDRV_CPU_PROGRAM_MAP(main_map)
@@ -688,7 +686,7 @@ static MACHINE_DRIVER_START( plygonet )
 	MDRV_SOUND_CONFIG(k054539_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.75)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /**********************************************************************************/

@@ -953,7 +953,7 @@ static const tms32031_config tms_config =
 };
 
 
-static MACHINE_DRIVER_START( gaelco3d )
+static MACHINE_CONFIG_START( gaelco3d, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 15000000)
@@ -1006,11 +1006,10 @@ static MACHINE_DRIVER_START( gaelco3d )
 
 	MDRV_SOUND_ADD("dac4", DMADAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)	/* speedup: seat speaker */
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( gaelco3d2 )
-	MDRV_IMPORT_FROM(gaelco3d)
+static MACHINE_CONFIG_DERIVED( gaelco3d2, gaelco3d )
 
 	/* basic machine hardware */
 	MDRV_CPU_REPLACE("maincpu", M68EC020, 25000000)
@@ -1021,7 +1020,7 @@ static MACHINE_DRIVER_START( gaelco3d2 )
 	MDRV_CPU_CLOCK(50000000)
 
 	MDRV_MACHINE_RESET(gaelco3d2)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

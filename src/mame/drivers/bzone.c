@@ -549,7 +549,7 @@ static const pokey_interface redbaron_pokey_interface =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( bzone_base )
+static MACHINE_CONFIG_START( bzone_base, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, BZONE_MASTER_CLOCK / 8)
@@ -570,23 +570,20 @@ static MACHINE_DRIVER_START( bzone_base )
 	/* Drivers */
 	MDRV_MATHBOX_ADD("mathbox")
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( bzone )
-
-	MDRV_IMPORT_FROM(bzone_base)
+static MACHINE_CONFIG_DERIVED( bzone, bzone_base )
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(bzone_audio)
+	MDRV_FRAGMENT_ADD(bzone_audio)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
-static MACHINE_DRIVER_START( redbaron )
+static MACHINE_CONFIG_DERIVED( redbaron, bzone_base )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(bzone_base)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(redbaron_map)
 	MDRV_CPU_PERIODIC_INT(bzone_interrupt, (double)BZONE_MASTER_CLOCK / 4096 / 12)
@@ -612,7 +609,7 @@ static MACHINE_DRIVER_START( redbaron )
 	MDRV_SOUND_ADD("custom", REDBARON, 0)
 
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

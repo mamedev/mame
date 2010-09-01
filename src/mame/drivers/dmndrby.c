@@ -486,7 +486,7 @@ static INTERRUPT_GEN( dderby_timer_irq )
 	cputag_set_input_line_and_vector(device->machine, "maincpu", 0, HOLD_LINE, 0xcf); /* RST 08h */
 }
 
-static MACHINE_DRIVER_START( dderby )
+static MACHINE_CONFIG_START( dderby, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,4000000)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(memmap)
@@ -518,7 +518,7 @@ static MACHINE_DRIVER_START( dderby )
 
 	MDRV_SOUND_ADD("ay1", AY8910, 1789750) // frequency guessed
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( dmndrby )

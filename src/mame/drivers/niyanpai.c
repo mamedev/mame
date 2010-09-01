@@ -771,7 +771,7 @@ static const z80_daisy_config daisy_chain_sound[] =
 };
 
 
-static MACHINE_DRIVER_START( niyanpai )
+static MACHINE_CONFIG_START( niyanpai, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12288000/2)	/* TMP68301, 6.144 MHz */
@@ -812,23 +812,21 @@ static MACHINE_DRIVER_START( niyanpai )
 
 	MDRV_SOUND_ADD("dac2", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( musobana )
+static MACHINE_CONFIG_DERIVED( musobana, niyanpai )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(niyanpai)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(musobana_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( mhhonban )
+static MACHINE_CONFIG_DERIVED( mhhonban, niyanpai )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(niyanpai)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(mhhonban_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( niyanpai )

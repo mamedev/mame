@@ -2457,7 +2457,7 @@ static const mips3_config r5000_config =
 	SYSTEM_CLOCK	/* system clock rate */
 };
 
-static MACHINE_DRIVER_START( seattle_common )
+static MACHINE_CONFIG_START( seattle_common, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", R5000LE, SYSTEM_CLOCK*3)
@@ -2487,54 +2487,48 @@ static MACHINE_DRIVER_START( seattle_common )
 	MDRV_VIDEO_UPDATE(seattle)
 
 	/* sound hardware */
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( phoenixsa )
-	MDRV_IMPORT_FROM(seattle_common)
-	MDRV_IMPORT_FROM(dcs2_audio_2115)
+static MACHINE_CONFIG_DERIVED( phoenixsa, seattle_common )
+	MDRV_FRAGMENT_ADD(dcs2_audio_2115)
 
 	MDRV_CPU_REPLACE("maincpu", R4700LE, SYSTEM_CLOCK*2)
 	MDRV_CPU_CONFIG(r5000_config)
 	MDRV_CPU_PROGRAM_MAP(seattle_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( seattle150 )
-	MDRV_IMPORT_FROM(seattle_common)
-	MDRV_IMPORT_FROM(dcs2_audio_2115)
+static MACHINE_CONFIG_DERIVED( seattle150, seattle_common )
+	MDRV_FRAGMENT_ADD(dcs2_audio_2115)
 
 	MDRV_CPU_REPLACE("maincpu", R5000LE, SYSTEM_CLOCK*3)
 	MDRV_CPU_CONFIG(r5000_config)
 	MDRV_CPU_PROGRAM_MAP(seattle_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( seattle150_widget )
-	MDRV_IMPORT_FROM(seattle150)
+static MACHINE_CONFIG_DERIVED( seattle150_widget, seattle150 )
 	MDRV_SMC91C94_ADD("ethernet", ethernet_interrupt)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( seattle200 )
-	MDRV_IMPORT_FROM(seattle_common)
-	MDRV_IMPORT_FROM(dcs2_audio_2115)
+static MACHINE_CONFIG_DERIVED( seattle200, seattle_common )
+	MDRV_FRAGMENT_ADD(dcs2_audio_2115)
 
 	MDRV_CPU_REPLACE("maincpu", R5000LE, SYSTEM_CLOCK*4)
 	MDRV_CPU_CONFIG(r5000_config)
 	MDRV_CPU_PROGRAM_MAP(seattle_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( seattle200_widget )
-	MDRV_IMPORT_FROM(seattle200)
+static MACHINE_CONFIG_DERIVED( seattle200_widget, seattle200 )
 	MDRV_SMC91C94_ADD("ethernet", ethernet_interrupt)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( flagstaff )
-	MDRV_IMPORT_FROM(seattle_common)
-	MDRV_IMPORT_FROM(cage_seattle)
+static MACHINE_CONFIG_DERIVED( flagstaff, seattle_common )
+	MDRV_FRAGMENT_ADD(cage_seattle)
 
 	MDRV_CPU_REPLACE("maincpu", R5000LE, SYSTEM_CLOCK*4)
 	MDRV_CPU_CONFIG(r5000_config)
@@ -2544,7 +2538,7 @@ static MACHINE_DRIVER_START( flagstaff )
 
 	MDRV_3DFX_VOODOO_MODIFY("voodoo")
 	MDRV_3DFX_VOODOO_TMU_MEMORY(1, 4)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

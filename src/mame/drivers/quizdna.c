@@ -452,7 +452,7 @@ static const ym2203_interface ym2203_config =
 };
 
 
-static MACHINE_DRIVER_START( quizdna )
+static MACHINE_CONFIG_START( quizdna, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MCLK/2) /* 8.000 MHz */
@@ -486,28 +486,26 @@ static MACHINE_DRIVER_START( quizdna )
 
 	MDRV_OKIM6295_ADD("oki", (MCLK/1024)*132, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( gakupara )
+static MACHINE_CONFIG_DERIVED( gakupara, quizdna )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(quizdna)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(gakupara_io_map)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( gekiretu )
+static MACHINE_CONFIG_DERIVED( gekiretu, quizdna )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(quizdna)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(gekiretu_map)
 	MDRV_CPU_IO_MAP(gekiretu_io_map)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /****************************************************************************/

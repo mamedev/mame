@@ -201,10 +201,7 @@ static MACHINE_START( mogura )
 	state->dac2 = machine->device("dac2");
 }
 
-static MACHINE_DRIVER_START( mogura )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(mogura_state)
+static MACHINE_CONFIG_START( mogura, mogura_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,3000000)		 /* 3 MHz */
@@ -238,7 +235,7 @@ static MACHINE_DRIVER_START( mogura )
 
 	MDRV_SOUND_ADD("dac2", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( mogura )
 	ROM_REGION( 0x10000, "maincpu", 0 )

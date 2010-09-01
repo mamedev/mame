@@ -718,10 +718,7 @@ static MACHINE_RESET( othunder )
 	state->banknum = 0;
 }
 
-static MACHINE_DRIVER_START( othunder )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(othunder_state)
+static MACHINE_CONFIG_START( othunder, othunder_state )
 
 	/* basic machine hardware */
 //  MDRV_CPU_ADD("maincpu", M68000, 24000000/2 )   /* 12 MHz */
@@ -782,7 +779,7 @@ static MACHINE_DRIVER_START( othunder )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	MDRV_TC0140SYT_ADD("tc0140syt", othunder_tc0140syt_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

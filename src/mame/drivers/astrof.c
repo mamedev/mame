@@ -955,10 +955,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( base )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(astrof_state)
+static MACHINE_CONFIG_START( base, astrof_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, MAIN_CPU_CLOCK)
@@ -970,13 +967,12 @@ static MACHINE_DRIVER_START( base )
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( astrof )
+static MACHINE_CONFIG_DERIVED( astrof, base )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(base)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(astrof_map)
 
@@ -986,24 +982,22 @@ static MACHINE_DRIVER_START( astrof )
 	MDRV_VIDEO_UPDATE(astrof)
 
 	/* audio hardware */
-	MDRV_IMPORT_FROM(astrof_audio)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(astrof_audio)
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( abattle )
+static MACHINE_CONFIG_DERIVED( abattle, astrof )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(astrof)
 
 	MDRV_MACHINE_START(abattle)
 	MDRV_MACHINE_RESET(abattle)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( spfghmk2 )
+static MACHINE_CONFIG_DERIVED( spfghmk2, base )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(base)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(spfghmk2_map)
 
@@ -1013,14 +1007,13 @@ static MACHINE_DRIVER_START( spfghmk2 )
 	MDRV_VIDEO_UPDATE(astrof)
 
 	/* audio hardware */
-	MDRV_IMPORT_FROM(spfghmk2_audio)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(spfghmk2_audio)
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( tomahawk )
+static MACHINE_CONFIG_DERIVED( tomahawk, base )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(base)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(tomahawk_map)
 
@@ -1030,8 +1023,8 @@ static MACHINE_DRIVER_START( tomahawk )
 	MDRV_VIDEO_UPDATE(tomahawk)
 
 	/* audio hardware */
-	MDRV_IMPORT_FROM(tomahawk_audio)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(tomahawk_audio)
+MACHINE_CONFIG_END
 
 
 

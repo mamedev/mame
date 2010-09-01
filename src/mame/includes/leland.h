@@ -141,5 +141,5 @@ WRITE8_HANDLER( ataxx_svram_port_w );
 READ8_HANDLER( ataxx_mvram_port_r );
 READ8_HANDLER( ataxx_svram_port_r );
 
-MACHINE_DRIVER_EXTERN( leland_video );
-MACHINE_DRIVER_EXTERN( ataxx_video );
+MACHINE_CONFIG_EXTERN( leland_video );
+MACHINE_CONFIG_EXTERN( ataxx_video );

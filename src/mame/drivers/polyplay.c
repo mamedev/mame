@@ -276,7 +276,7 @@ GFXDECODE_END
 
 /* the machine driver */
 
-static MACHINE_DRIVER_START( polyplay )
+static MACHINE_CONFIG_START( polyplay, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 9830400/4)
@@ -310,7 +310,7 @@ static MACHINE_DRIVER_START( polyplay )
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(polyplay_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* ROM loading and mapping */

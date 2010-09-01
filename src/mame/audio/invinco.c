@@ -42,11 +42,11 @@ static const samples_interface invinco_samples_interface =
 };
 
 
-MACHINE_DRIVER_START( invinco_audio )
+MACHINE_CONFIG_FRAGMENT( invinco_audio )
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(invinco_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* sample IDs - must match sample file name table above */

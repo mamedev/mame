@@ -295,10 +295,7 @@ static MACHINE_RESET( rockrage )
 	state->layer_colorbase[1] = 0x10;
 }
 
-static MACHINE_DRIVER_START( rockrage )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(rockrage_state)
+static MACHINE_CONFIG_START( rockrage, rockrage_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", HD6309, 3000000*4)		/* 24MHz/8 */
@@ -337,7 +334,7 @@ static MACHINE_DRIVER_START( rockrage )
 
 	MDRV_SOUND_ADD("vlm", VLM5030, 3579545)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

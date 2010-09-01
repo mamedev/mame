@@ -433,7 +433,7 @@ static const samples_interface gridlee_samples_interface =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( gridlee )
+static MACHINE_CONFIG_START( gridlee, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, BALSENTE_CPU_CLOCK)
@@ -463,7 +463,7 @@ static MACHINE_DRIVER_START( gridlee )
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(gridlee_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

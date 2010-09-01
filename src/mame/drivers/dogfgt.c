@@ -246,10 +246,7 @@ static MACHINE_RESET( dogfgt )
 }
 
 
-static MACHINE_DRIVER_START( dogfgt )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(dogfgt_state)
+static MACHINE_CONFIG_START( dogfgt, dogfgt_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 1500000)	/* 1.5 MHz ???? */
@@ -287,7 +284,7 @@ static MACHINE_DRIVER_START( dogfgt )
 
 	MDRV_SOUND_ADD("ay2", AY8910, 1500000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

@@ -312,10 +312,7 @@ static MACHINE_RESET( dribling )
 }
 
 
-static MACHINE_DRIVER_START( dribling )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(dribling_state)
+static MACHINE_CONFIG_START( dribling, dribling_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 5000000)
@@ -345,7 +342,7 @@ static MACHINE_DRIVER_START( dribling )
 	MDRV_VIDEO_UPDATE(dribling)
 
 	/* sound hardware */
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

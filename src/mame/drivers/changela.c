@@ -520,10 +520,7 @@ static MACHINE_RESET (changela)
 	state->dir_31 = 0;
 }
 
-static MACHINE_DRIVER_START( changela )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(changela_state)
+static MACHINE_CONFIG_START( changela, changela_state )
 
 	MDRV_CPU_ADD("maincpu", Z80,5000000)
 	MDRV_CPU_PROGRAM_MAP(changela_map)
@@ -555,7 +552,7 @@ static MACHINE_DRIVER_START( changela )
 	MDRV_SOUND_ADD("ay2", AY8910, 1250000)
 	MDRV_SOUND_CONFIG(ay8910_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( changela )

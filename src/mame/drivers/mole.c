@@ -316,10 +316,7 @@ static MACHINE_RESET( mole )
 	state->tile_bank = 0;
 }
 
-static MACHINE_DRIVER_START( mole )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(mole_state)
+static MACHINE_CONFIG_START( mole, mole_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 4000000) // ???
@@ -349,7 +346,7 @@ static MACHINE_DRIVER_START( mole )
 
 	MDRV_SOUND_ADD("aysnd", AY8910, 2000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************************

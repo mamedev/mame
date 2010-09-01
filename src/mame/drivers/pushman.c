@@ -444,10 +444,7 @@ static MACHINE_RESET( pushman )
 	memset(state->shared_ram, 0, ARRAY_LENGTH(state->shared_ram));
 }
 
-static MACHINE_DRIVER_START( pushman )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(pushman_state)
+static MACHINE_CONFIG_START( pushman, pushman_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)
@@ -490,7 +487,7 @@ static MACHINE_DRIVER_START( pushman )
 
 	MDRV_SOUND_ADD("ym2", YM2203, 2000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static MACHINE_RESET( bballs )
 {
@@ -501,10 +498,7 @@ static MACHINE_RESET( bballs )
 	state->latch = 0x400;
 }
 
-static MACHINE_DRIVER_START( bballs )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(pushman_state)
+static MACHINE_CONFIG_START( bballs, pushman_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)
@@ -543,7 +537,7 @@ static MACHINE_DRIVER_START( bballs )
 
 	MDRV_SOUND_ADD("ym2", YM2203, 2000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************/

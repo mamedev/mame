@@ -1956,10 +1956,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( system16a )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(segas1x_state)
+static MACHINE_CONFIG_START( system16a, segas1x_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)
@@ -2005,28 +2002,26 @@ static MACHINE_DRIVER_START( system16a )
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( system16a_no7751 )
-	MDRV_IMPORT_FROM(system16a)
+static MACHINE_CONFIG_DERIVED( system16a_no7751, system16a )
 	MDRV_DEVICE_REMOVE("n7751")
 	MDRV_DEVICE_REMOVE("dac")
 
 	MDRV_SOUND_REPLACE("ymsnd", YM2151, 4000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( system16a_8751 )
-	MDRV_IMPORT_FROM(system16a)
+static MACHINE_CONFIG_DERIVED( system16a_8751, system16a )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_VBLANK_INT("screen", i8751_main_cpu_vblank)
 
 	MDRV_CPU_ADD("mcu", I8751, 8000000)
 	MDRV_CPU_IO_MAP(mcu_io_map)
 	MDRV_CPU_VBLANK_INT("screen", mcu_irq_assert)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

@@ -353,7 +353,7 @@ static PALETTE_INIT( lions )
 	}
 }
 
-static MACHINE_DRIVER_START( lions )
+static MACHINE_CONFIG_START( lions, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, MAIN_CLOCK/4)		 /* 3 MHz.(guess) */
 	MDRV_CPU_PROGRAM_MAP(lions_map)
@@ -383,7 +383,7 @@ static MACHINE_DRIVER_START( lions )
 	MDRV_SOUND_ADD("aysnd", AY8910, MAIN_CLOCK/8)	/* 1.5 MHz.(guess) */
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( 86lions )

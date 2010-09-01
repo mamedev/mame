@@ -389,7 +389,7 @@ static MACHINE_START(f3)
 	state_save_register_global_array(machine, coin_word);
 }
 
-static MACHINE_DRIVER_START( f3 )
+static MACHINE_CONFIG_START( f3, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC020, XTAL_16MHz)
@@ -416,49 +416,44 @@ static MACHINE_DRIVER_START( f3 )
 	MDRV_VIDEO_UPDATE(f3)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(taito_f3_sound)
+	MDRV_FRAGMENT_ADD(taito_f3_sound)
 	MDRV_SOUND_RESET(f3)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* These games reprogram the video output registers to display different scanlines,
  we can't change our screen display at runtime, so we do it here instead.  None
  of the games change the registers during the game (to do so would probably require
  monitor recalibration.)
 */
-static MACHINE_DRIVER_START( f3_224a )
-	MDRV_IMPORT_FROM(f3)
+static MACHINE_CONFIG_DERIVED( f3_224a, f3 )
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(46, 40*8-1 + 46, 31, 31+224-1)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( f3_224b )
-	MDRV_IMPORT_FROM(f3)
+static MACHINE_CONFIG_DERIVED( f3_224b, f3 )
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(46, 40*8-1 + 46, 32, 32+224-1)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( f3_224c )
-	MDRV_IMPORT_FROM(f3)
+static MACHINE_CONFIG_DERIVED( f3_224c, f3 )
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(46, 40*8-1 + 46, 24, 24+224-1)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* recalh and gseeker need a default EEPROM to work */
-static MACHINE_DRIVER_START( f3_eeprom )
-	MDRV_IMPORT_FROM(f3)
+static MACHINE_CONFIG_DERIVED( f3_eeprom, f3 )
 
 	MDRV_DEVICE_REMOVE("eeprom")
 	MDRV_EEPROM_93C46_ADD("eeprom")
 	MDRV_EEPROM_DATA(recalh_eeprom, 128)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( f3_224b_eeprom )
-	MDRV_IMPORT_FROM(f3)
+static MACHINE_CONFIG_DERIVED( f3_224b_eeprom, f3 )
 
 	MDRV_DEVICE_REMOVE("eeprom")
 	MDRV_EEPROM_93C46_ADD("eeprom")
 	MDRV_EEPROM_DATA(recalh_eeprom, 128)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static const gfx_layout bubsympb_sprite_layout =
 {
@@ -490,7 +485,7 @@ static GFXDECODE_START( bubsympb )
 	GFXDECODE_ENTRY( NULL,           0x000000, pivotlayout,         0,  64 ) /* Dynamically modified */
 GFXDECODE_END
 
-static MACHINE_DRIVER_START( bubsympb )
+static MACHINE_CONFIG_START( bubsympb, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC020, XTAL_16MHz)
 	MDRV_CPU_PROGRAM_MAP(f3_map)
@@ -520,7 +515,7 @@ static MACHINE_DRIVER_START( bubsympb )
 
 	MDRV_OKIM6295_ADD("oki", 1000000 , OKIM6295_PIN7_HIGH) // not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /******************************************************************************/
 

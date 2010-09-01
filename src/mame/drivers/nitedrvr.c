@@ -134,10 +134,7 @@ GFXDECODE_END
 
 /* Machine Driver */
 
-static MACHINE_DRIVER_START( nitedrvr )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(nitedrvr_state)
+static MACHINE_CONFIG_START( nitedrvr, nitedrvr_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, XTAL_12_096MHz/12) // 1 MHz
@@ -171,7 +168,7 @@ static MACHINE_DRIVER_START( nitedrvr )
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(nitedrvr)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROMs */
 

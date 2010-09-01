@@ -149,12 +149,12 @@ static const samples_interface astrof_samples_interface =
 
 
 
-MACHINE_DRIVER_START( astrof_audio )
+MACHINE_CONFIG_FRAGMENT( astrof_audio )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(astrof_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -170,9 +170,9 @@ WRITE8_HANDLER( spfghmk2_audio_w )
 }
 
 
-MACHINE_DRIVER_START( spfghmk2_audio )
+MACHINE_CONFIG_FRAGMENT( spfghmk2_audio )
 	/* nothing yet */
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -234,9 +234,9 @@ static const sn76477_interface tomahawk_sn76477_interface =
 };
 
 
-MACHINE_DRIVER_START( tomahawk_audio )
+MACHINE_CONFIG_FRAGMENT( tomahawk_audio )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("snsnd", SN76477, 0)
 	MDRV_SOUND_CONFIG(tomahawk_sn76477_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END

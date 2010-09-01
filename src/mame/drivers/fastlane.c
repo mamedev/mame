@@ -210,10 +210,7 @@ static MACHINE_START( fastlane )
 	state->k007121 = machine->device("k007121");
 }
 
-static MACHINE_DRIVER_START( fastlane )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(fastlane_state)
+static MACHINE_CONFIG_START( fastlane, fastlane_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", HD6309, 3000000*4)		/* 24MHz/8? */
@@ -252,7 +249,7 @@ static MACHINE_DRIVER_START( fastlane )
 	MDRV_SOUND_CONFIG(k007232_interface_2)
 	MDRV_SOUND_ROUTE(0, "mono", 0.50)
 	MDRV_SOUND_ROUTE(1, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

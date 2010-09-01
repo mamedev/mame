@@ -386,10 +386,7 @@ static MACHINE_RESET( cultures )
 	state->bg2_bank = 0;
 }
 
-static MACHINE_DRIVER_START( cultures )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(cultures_state)
+static MACHINE_CONFIG_START( cultures, cultures_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MCLK/2) /* 8.000 MHz */
@@ -419,7 +416,7 @@ static MACHINE_DRIVER_START( cultures )
 
 	MDRV_OKIM6295_ADD("oki", (MCLK/1024)*132, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*
 

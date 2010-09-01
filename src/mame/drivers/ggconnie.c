@@ -143,7 +143,7 @@ static const c6280_interface c6280_config =
 	"maincpu"
 };
 
-static MACHINE_DRIVER_START( ggconnie )
+static MACHINE_CONFIG_START( ggconnie, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", H6280, PCE_MAIN_CLOCK/3)
 	MDRV_CPU_PROGRAM_MAP(sgx_mem)
@@ -171,7 +171,7 @@ static MACHINE_DRIVER_START( ggconnie )
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.00)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START(ggconnie)
 	ROM_REGION( 0x100000, "maincpu", 0 )

@@ -375,7 +375,7 @@ static INTERRUPT_GEN( mirax_vblank_irq )
 		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_DRIVER_START( mirax )
+static MACHINE_CONFIG_START( mirax, driver_data_t )
 	MDRV_CPU_ADD("maincpu", Z80, 12000000/4) // ceramic potted module, encrypted z80
 	MDRV_CPU_PROGRAM_MAP(mirax_main_map)
 	MDRV_CPU_VBLANK_INT("screen",mirax_vblank_irq)
@@ -405,7 +405,7 @@ static MACHINE_DRIVER_START( mirax )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 	MDRV_SOUND_ADD("ay2", AY8910, 12000000/4)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( mirax )

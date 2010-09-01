@@ -341,8 +341,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( rampart )
-	MDRV_DRIVER_DATA(rampart_state)
+static MACHINE_CONFIG_START( rampart, rampart_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, MASTER_CLOCK/2)
@@ -376,7 +375,7 @@ static MACHINE_DRIVER_START( rampart )
 
 	MDRV_SOUND_ADD("ymsnd", YM2413, MASTER_CLOCK/4)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

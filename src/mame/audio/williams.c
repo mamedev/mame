@@ -193,7 +193,7 @@ static const ym2151_interface adpcm_ym2151_interface =
     MACHINE DRIVERS
 ****************************************************************************/
 
-MACHINE_DRIVER_START( williams_cvsd_sound )
+MACHINE_CONFIG_FRAGMENT( williams_cvsd_sound )
 	MDRV_CPU_ADD("cvsdcpu", M6809E, CVSD_MASTER_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(williams_cvsd_map)
 
@@ -210,10 +210,10 @@ MACHINE_DRIVER_START( williams_cvsd_sound )
 
 	MDRV_SOUND_ADD("cvsd", HC55516, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-MACHINE_DRIVER_START( williams_narc_sound )
+MACHINE_CONFIG_FRAGMENT( williams_narc_sound )
 	MDRV_CPU_ADD("narc1cpu", M6809E, NARC_MASTER_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(williams_narc_master_map)
 
@@ -238,10 +238,10 @@ MACHINE_DRIVER_START( williams_narc_sound )
 	MDRV_SOUND_ADD("cvsd", HC55516, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-MACHINE_DRIVER_START( williams_adpcm_sound )
+MACHINE_CONFIG_FRAGMENT( williams_adpcm_sound )
 	MDRV_CPU_ADD("adpcm", M6809E, ADPCM_MASTER_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(williams_adpcm_map)
 
@@ -256,7 +256,7 @@ MACHINE_DRIVER_START( williams_adpcm_sound )
 
 	MDRV_OKIM6295_ADD("oki", ADPCM_MASTER_CLOCK/8, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

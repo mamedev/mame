@@ -309,7 +309,7 @@ static GFXDECODE_START( cham24 )
 	/* none, the ppu generates one */
 GFXDECODE_END
 
-static MACHINE_DRIVER_START( cham24 )
+static MACHINE_CONFIG_START( cham24, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", N2A03, N2A03_DEFAULTCLOCK)
 	MDRV_CPU_PROGRAM_MAP(cham24_map)
@@ -342,7 +342,7 @@ static MACHINE_DRIVER_START( cham24 )
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( cham24 )
 	ROM_REGION(0x10000, "maincpu", ROMREGION_ERASE00)

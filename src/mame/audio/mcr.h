@@ -63,9 +63,9 @@ void squawkntalk_reset_w(running_machine *machine, int state);
 
 /************ External definitions ***************/
 
-MACHINE_DRIVER_EXTERN( mcr_ssio );
-MACHINE_DRIVER_EXTERN( chip_squeak_deluxe );
-MACHINE_DRIVER_EXTERN( chip_squeak_deluxe_stereo );
-MACHINE_DRIVER_EXTERN( sounds_good );
-MACHINE_DRIVER_EXTERN( turbo_chip_squeak );
-MACHINE_DRIVER_EXTERN( squawk_n_talk );
+MACHINE_CONFIG_EXTERN( mcr_ssio );
+MACHINE_CONFIG_EXTERN( chip_squeak_deluxe );
+MACHINE_CONFIG_EXTERN( chip_squeak_deluxe_stereo );
+MACHINE_CONFIG_EXTERN( sounds_good );
+MACHINE_CONFIG_EXTERN( turbo_chip_squeak );
+MACHINE_CONFIG_EXTERN( squawk_n_talk );

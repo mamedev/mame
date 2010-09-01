@@ -3766,10 +3766,7 @@ static const ymz280b_interface ymz280b_config =
 };
 
 
-static MACHINE_DRIVER_START( tekipaki )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(toaplan2_state)
+static MACHINE_CONFIG_START( tekipaki, toaplan2_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_10MHz)			/* 10MHz Oscillator */
@@ -3809,13 +3806,10 @@ static MACHINE_DRIVER_START( tekipaki )
 	MDRV_SOUND_ADD("ymsnd", YM3812, XTAL_27MHz/8)
 	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( ghox )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(toaplan2_state)
+static MACHINE_CONFIG_START( ghox, toaplan2_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_10MHz)			/* verified on pcb */
@@ -3852,7 +3846,7 @@ static MACHINE_DRIVER_START( ghox )
 
 	MDRV_SOUND_ADD("ymsnd", YM2151, XTAL_27MHz/8) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* x = modified to match batsugun 'unencrypted' code */
 
@@ -3880,10 +3874,7 @@ static const UINT8 ts002mach_decryption_table[256] = {
 
 static const nec_config ts002mach_config ={ ts002mach_decryption_table, };
 
-static MACHINE_DRIVER_START( dogyuun )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(toaplan2_state)
+static MACHINE_CONFIG_START( dogyuun, toaplan2_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_25MHz/2)			/* verified on pcb */
@@ -3933,7 +3924,7 @@ static MACHINE_DRIVER_START( dogyuun )
 
 	MDRV_OKIM6295_ADD("oki", XTAL_25MHz/24, OKIM6295_PIN7_HIGH) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* x = modified to match batsugun 'unencrypted' code - '?' likewise, but not so sure about them
   '!' = code stops being the same as batsugun at this point, might be wrong
@@ -3984,10 +3975,7 @@ static MACHINE_RESET(kbash)
 
 
 
-static MACHINE_DRIVER_START( kbash )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(toaplan2_state)
+static MACHINE_CONFIG_START( kbash, toaplan2_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz)			/* 16MHz Oscillator */
@@ -4029,13 +4017,10 @@ static MACHINE_DRIVER_START( kbash )
 
 	MDRV_OKIM6295_ADD("oki", XTAL_32MHz/32, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( kbash2 )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(toaplan2_state)
+static MACHINE_CONFIG_START( kbash2, toaplan2_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz)			/* 16MHz Oscillator */
@@ -4070,13 +4055,10 @@ static MACHINE_DRIVER_START( kbash2 )
 
 	MDRV_OKIM6295_ADD("oki2", XTAL_16MHz/16, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( truxton2 )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(toaplan2_state)
+static MACHINE_CONFIG_START( truxton2, toaplan2_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz)			/* verified on pcb */
@@ -4111,13 +4093,10 @@ static MACHINE_DRIVER_START( truxton2 )
 
 	MDRV_OKIM6295_ADD("oki", XTAL_16MHz/4, OKIM6295_PIN7_LOW) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( pipibibs )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(toaplan2_state)
+static MACHINE_CONFIG_START( pipibibs, toaplan2_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_10MHz)			/* verified on pcb */
@@ -4155,13 +4134,10 @@ static MACHINE_DRIVER_START( pipibibs )
 	MDRV_SOUND_ADD("ymsnd", YM3812, XTAL_27MHz/8)			/* verified on pcb */
 	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( whoopee )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(toaplan2_state)
+static MACHINE_CONFIG_START( whoopee, toaplan2_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_10MHz)			/* 10MHz Oscillator */
@@ -4199,13 +4175,10 @@ static MACHINE_DRIVER_START( whoopee )
 	MDRV_SOUND_ADD("ymsnd", YM3812, XTAL_27MHz/8)
 	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( pipibibi_bootleg )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(toaplan2_state)
+static MACHINE_CONFIG_START( pipibibi_bootleg, toaplan2_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_10MHz)			/* 10MHz Oscillator */
@@ -4243,7 +4216,7 @@ static MACHINE_DRIVER_START( pipibibi_bootleg )
 	MDRV_SOUND_ADD("ymsnd", YM3812, XTAL_27MHz/8)
 	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* x = modified to match batsugun 'unencrypted' code - '?' likewise, but not so sure about them */
 /* this one seems more different to the other tables */
@@ -4272,10 +4245,7 @@ static const UINT8 ts001turbo_decryption_table[256] = {
 static const nec_config ts001turbo_config ={ ts001turbo_decryption_table, };
 
 
-static MACHINE_DRIVER_START( fixeight )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(toaplan2_state)
+static MACHINE_CONFIG_START( fixeight, toaplan2_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz)			/* verified on pcb */
@@ -4318,13 +4288,10 @@ static MACHINE_DRIVER_START( fixeight )
 
 	MDRV_OKIM6295_ADD("oki", XTAL_16MHz/16, OKIM6295_PIN7_HIGH) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( fixeighb )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(toaplan2_state)
+static MACHINE_CONFIG_START( fixeighb, toaplan2_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_10MHz)			/* 10MHz Oscillator */
@@ -4356,7 +4323,7 @@ static MACHINE_DRIVER_START( fixeighb )
 
 	MDRV_OKIM6295_ADD("oki", XTAL_14MHz/16, OKIM6295_PIN7_LOW)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* according to the comments this chip has the same markings as the Batsugun chip,
    maybe they double map some opcodes on it and recycled the chips using unencrypted ones
@@ -4390,10 +4357,7 @@ static const UINT8 ts007spy_vfive_decryption_table[256] = {
 static const nec_config ts007spy_vfive_config ={ ts007spy_vfive_decryption_table, };
 
 
-static MACHINE_DRIVER_START( vfive )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(toaplan2_state)
+static MACHINE_CONFIG_START( vfive, toaplan2_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_20MHz/2)	/* verified on pcb */
@@ -4429,7 +4393,7 @@ static MACHINE_DRIVER_START( vfive )
 
 	MDRV_SOUND_ADD("ymsnd", YM2151, XTAL_27MHz/8) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static MACHINE_RESET(batsugun)
 {
@@ -4485,10 +4449,7 @@ static const nmk112_interface batrider_nmk112_intf =
 	"oki1", "oki2", 0
 };
 
-static MACHINE_DRIVER_START( batsugun )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(toaplan2_state)
+static MACHINE_CONFIG_START( batsugun, toaplan2_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)			/* 16MHz , 32MHz Oscillator */
@@ -4541,13 +4502,10 @@ static MACHINE_DRIVER_START( batsugun )
 
 	MDRV_OKIM6295_ADD("oki", XTAL_32MHz/8, OKIM6295_PIN7_LOW)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( snowbro2 )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(toaplan2_state)
+static MACHINE_CONFIG_START( snowbro2, toaplan2_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz)
@@ -4582,13 +4540,10 @@ static MACHINE_DRIVER_START( snowbro2 )
 
 	MDRV_OKIM6295_ADD("oki", XTAL_27MHz/10, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( mahoudai )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(toaplan2_state)
+static MACHINE_CONFIG_START( mahoudai, toaplan2_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)		/* 16MHz , 32MHz Oscillator */
@@ -4628,13 +4583,10 @@ static MACHINE_DRIVER_START( mahoudai )
 
 	MDRV_OKIM6295_ADD("oki", XTAL_32MHz/32, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( shippumd )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(toaplan2_state)
+static MACHINE_CONFIG_START( shippumd, toaplan2_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)		/* 16MHz , 32MHz Oscillator */
@@ -4674,13 +4626,10 @@ static MACHINE_DRIVER_START( shippumd )
 
 	MDRV_OKIM6295_ADD("oki", XTAL_32MHz/32, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( bgaregga )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(toaplan2_state)
+static MACHINE_CONFIG_START( bgaregga, toaplan2_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)		/* 16MHz , 32MHz Oscillator */
@@ -4722,13 +4671,10 @@ static MACHINE_DRIVER_START( bgaregga )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_NMK112_ADD("nmk112", bgaregga_nmk112_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( batrider )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(toaplan2_state)
+static MACHINE_CONFIG_START( batrider, toaplan2_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)		/* 16MHz , 32MHz Oscillator */
@@ -4773,12 +4719,9 @@ static MACHINE_DRIVER_START( batrider )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_NMK112_ADD("nmk112", batrider_nmk112_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( bbakraid )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(toaplan2_state)
+static MACHINE_CONFIG_START( bbakraid, toaplan2_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)		/* 16MHz , 32MHz Oscillator */
@@ -4819,15 +4762,14 @@ static MACHINE_DRIVER_START( bbakraid )
 	MDRV_SOUND_CONFIG(ymz280b_config)
 	MDRV_SOUND_ROUTE(0, "mono", 1.0)
 	MDRV_SOUND_ROUTE(1, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( bbakradu )
-	MDRV_IMPORT_FROM(bbakraid)
+static MACHINE_CONFIG_DERIVED( bbakradu, bbakraid )
 
 	MDRV_DEVICE_REMOVE("eeprom")
 	MDRV_EEPROM_ADD("eeprom", bbakraid_93C66_intf)
 	MDRV_EEPROM_DATA(bbakraid_unlim_default, 512)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

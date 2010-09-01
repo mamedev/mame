@@ -418,10 +418,7 @@ static MACHINE_RESET( bishi )
 	state->cur_control2 = 0;
 }
 
-static MACHINE_DRIVER_START( bishi )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(bishi_state)
+static MACHINE_CONFIG_START( bishi, bishi_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, CPU_CLOCK) /* 12MHz (24MHz OSC / 2 ) */
@@ -457,7 +454,7 @@ static MACHINE_DRIVER_START( bishi )
 	MDRV_SOUND_CONFIG(ymz280b_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 // ROM definitions
 

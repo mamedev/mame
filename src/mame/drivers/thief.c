@@ -448,7 +448,7 @@ static const tms9927_interface tms9927_intf =
 };
 
 
-static MACHINE_DRIVER_START( sharkatt )
+static MACHINE_CONFIG_START( sharkatt, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)        /* 4 MHz? */
@@ -483,10 +483,10 @@ static MACHINE_DRIVER_START( sharkatt )
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(sharkatt_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( thief )
+static MACHINE_CONFIG_START( thief, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000) /* 4 MHz? */
@@ -521,10 +521,10 @@ static MACHINE_DRIVER_START( thief )
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(thief_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( natodef )
+static MACHINE_CONFIG_START( natodef, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000) /* 4 MHz? */
@@ -559,7 +559,7 @@ static MACHINE_DRIVER_START( natodef )
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(natodef_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /**********************************************************/
 

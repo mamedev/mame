@@ -26,7 +26,7 @@
 
 /*----------- defined in audio/spacefb.c -----------*/
 
-MACHINE_DRIVER_EXTERN( spacefb_audio );
+MACHINE_CONFIG_EXTERN( spacefb_audio );
 
 READ8_HANDLER( spacefb_audio_p2_r );
 READ8_HANDLER( spacefb_audio_t0_r );

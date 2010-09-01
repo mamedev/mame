@@ -724,7 +724,7 @@ static const tms34010_config rapidfir_tms_config =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( tickee )
+static MACHINE_CONFIG_START( tickee, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", TMS34010, XTAL_40MHz)
@@ -757,19 +757,18 @@ static MACHINE_DRIVER_START( tickee )
 	MDRV_SOUND_ADD("ym2", YM2149, VIDEO_CLOCK/8)
 	MDRV_SOUND_CONFIG(ay8910_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( ghoshunt )
-	MDRV_IMPORT_FROM(tickee)
+static MACHINE_CONFIG_DERIVED( ghoshunt, tickee )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(ghoshunt_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( rapidfir )
+static MACHINE_CONFIG_START( rapidfir, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", TMS34010, XTAL_50MHz)
@@ -794,10 +793,10 @@ static MACHINE_DRIVER_START( rapidfir )
 
 	MDRV_OKIM6295_ADD("oki", OKI_CLOCK, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( mouseatk )
+static MACHINE_CONFIG_START( mouseatk, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", TMS34010, XTAL_40MHz)
@@ -828,7 +827,7 @@ static MACHINE_DRIVER_START( mouseatk )
 
 	MDRV_OKIM6295_ADD("oki", OKI_CLOCK, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************************

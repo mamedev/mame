@@ -1252,10 +1252,7 @@ static MACHINE_RESET( reikaids )
 	state->gfx_bank[1] = 0;	// this is not used by reikaids
 }
 
-static MACHINE_DRIVER_START( mrokumei )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(homedata_state)
+static MACHINE_CONFIG_START( mrokumei, homedata_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 16000000/4)	/* 4MHz ? */
@@ -1294,7 +1291,7 @@ static MACHINE_DRIVER_START( mrokumei )
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /**************************************************************************/
@@ -1321,10 +1318,7 @@ static const UPD7810_CONFIG upd_config =
 };
 
 
-static MACHINE_DRIVER_START( reikaids )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(homedata_state)
+static MACHINE_CONFIG_START( reikaids, homedata_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 16000000/4)	/* 4MHz ? */
@@ -1370,15 +1364,12 @@ static MACHINE_DRIVER_START( reikaids )
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /**************************************************************************/
 
-static MACHINE_DRIVER_START( pteacher )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(homedata_state)
+static MACHINE_CONFIG_START( pteacher, homedata_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 16000000/4)	/* 4MHz ? */
@@ -1421,25 +1412,21 @@ static MACHINE_DRIVER_START( pteacher )
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( mjkinjas )
-
-	MDRV_IMPORT_FROM(pteacher)
+static MACHINE_CONFIG_DERIVED( mjkinjas, pteacher )
 
 	MDRV_CPU_MODIFY("audiocpu")
 	MDRV_CPU_CLOCK(11000000)	/* 11MHz ? */
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( lemnangl )
-
-	MDRV_IMPORT_FROM(pteacher)
+static MACHINE_CONFIG_DERIVED( lemnangl, pteacher )
 
 	/* video hardware */
 	MDRV_GFXDECODE(lemnangl)
 
 	MDRV_VIDEO_START(lemnangl)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( mirderby )
 INPUT_PORTS_END
@@ -1547,10 +1534,7 @@ GFXDECODE_END
 
 /* clocks are 16mhz and 9mhz */
 
-static MACHINE_DRIVER_START( mirderby )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(homedata_state)
+static MACHINE_CONFIG_START( mirderby, homedata_state )
 
 	MDRV_CPU_ADD("maincpu", M6809, 16000000/8)	/* 2 Mhz */
 	MDRV_CPU_PROGRAM_MAP(cpu2_map)
@@ -1592,7 +1576,7 @@ static MACHINE_DRIVER_START( mirderby )
 	MDRV_SOUND_ROUTE(1, "mono", 0.25)
 	MDRV_SOUND_ROUTE(2, "mono", 0.25)
 	MDRV_SOUND_ROUTE(3, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /**************************************************************************/
 

@@ -764,10 +764,7 @@ static MACHINE_RESET( tokio )
 	state->tokio_prot_count = 0;
 }
 
-static MACHINE_DRIVER_START( tokio )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(bublbobl_state)
+static MACHINE_CONFIG_START( tokio, bublbobl_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MAIN_XTAL/4)	// 6 MHz
@@ -805,7 +802,7 @@ static MACHINE_DRIVER_START( tokio )
 	MDRV_SOUND_ROUTE(1, "mono", 0.08)
 	MDRV_SOUND_ROUTE(2, "mono", 0.08)
 	MDRV_SOUND_ROUTE(3, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 static MACHINE_START( bublbobl )
@@ -848,10 +845,7 @@ static MACHINE_RESET( bublbobl )
 	state->port4_out = 0;
 }
 
-static MACHINE_DRIVER_START( bublbobl )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(bublbobl_state)
+static MACHINE_CONFIG_START( bublbobl, bublbobl_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MAIN_XTAL/4)	// 6 MHz
@@ -893,7 +887,7 @@ static MACHINE_DRIVER_START( bublbobl )
 
 	MDRV_SOUND_ADD("ym2", YM3526, MAIN_XTAL/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 static MACHINE_START( boblbobl )
@@ -916,8 +910,7 @@ static MACHINE_RESET( boblbobl )
 	state->ic43_b = 0;
 }
 
-static MACHINE_DRIVER_START( boblbobl )
-	MDRV_IMPORT_FROM(bublbobl)
+static MACHINE_CONFIG_DERIVED( boblbobl, bublbobl )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(bootleg_map)
@@ -927,7 +920,7 @@ static MACHINE_DRIVER_START( boblbobl )
 	MDRV_MACHINE_RESET(boblbobl)
 
 	MDRV_DEVICE_REMOVE("mcu")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 static MACHINE_START( bub68705 )
@@ -962,8 +955,7 @@ static MACHINE_RESET( bub68705 )
 	state->latch = 0;
 }
 
-static MACHINE_DRIVER_START( bub68705 )
-	MDRV_IMPORT_FROM(bublbobl)
+static MACHINE_CONFIG_DERIVED( bub68705, bublbobl )
 	MDRV_DEVICE_REMOVE("mcu")
 
 	MDRV_CPU_ADD("mcu", M68705, 4000000)	// xtal is 4MHz, divided by 4 internally
@@ -972,7 +964,7 @@ static MACHINE_DRIVER_START( bub68705 )
 
 	MDRV_MACHINE_START(bub68705)
 	MDRV_MACHINE_RESET(bub68705)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

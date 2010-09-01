@@ -437,7 +437,7 @@ static const msm5205_interface msm5205_config =
 
 
 
-static MACHINE_DRIVER_START( rmhaihai )
+static MACHINE_CONFIG_START( rmhaihai, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80,20000000/4)	/* 5 MHz ??? */
@@ -470,22 +470,20 @@ static MACHINE_DRIVER_START( rmhaihai )
 	MDRV_SOUND_ADD("msm", MSM5205, 500000)
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( rmhaisei )
+static MACHINE_CONFIG_DERIVED( rmhaisei, rmhaihai )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(rmhaihai)
 
 	/* video hardware */
 	MDRV_GFXDECODE(themj)
 	MDRV_PALETTE_LENGTH(0x200)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( themj )
+static MACHINE_CONFIG_DERIVED( themj, rmhaihai )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(rmhaihai)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(themj_map)
@@ -496,7 +494,7 @@ static MACHINE_DRIVER_START( themj )
 	/* video hardware */
 	MDRV_GFXDECODE(themj)
 	MDRV_PALETTE_LENGTH(0x200)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

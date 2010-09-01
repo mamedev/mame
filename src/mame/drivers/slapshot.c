@@ -551,10 +551,7 @@ static MACHINE_START( slapshot )
 }
 
 
-static MACHINE_DRIVER_START( slapshot )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(slapshot_state)
+static MACHINE_CONFIG_START( slapshot, slapshot_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 14346000)	/* 28.6860 MHz / 2 ??? */
@@ -601,12 +598,9 @@ static MACHINE_DRIVER_START( slapshot )
 	MDRV_MK48T08_ADD( "mk48t08" )
 
 	MDRV_TC0140SYT_ADD("tc0140syt", slapshot_tc0140syt_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( opwolf3 )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(slapshot_state)
+static MACHINE_CONFIG_START( opwolf3, slapshot_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 14346000)	/* 28.6860 MHz / 2 ??? */
@@ -653,7 +647,7 @@ static MACHINE_DRIVER_START( opwolf3 )
 	MDRV_MK48T08_ADD( "mk48t08" )
 
 	MDRV_TC0140SYT_ADD("tc0140syt", slapshot_tc0140syt_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
                     DRIVERS

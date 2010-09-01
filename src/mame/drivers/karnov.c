@@ -810,10 +810,7 @@ static MACHINE_RESET( karnov )
 }
 
 
-static MACHINE_DRIVER_START( karnov )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(karnov_state)
+static MACHINE_CONFIG_START( karnov, karnov_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)	/* 10 MHz */
@@ -852,13 +849,10 @@ static MACHINE_DRIVER_START( karnov )
 	MDRV_SOUND_ADD("ym2", YM3526, 3000000)
 	MDRV_SOUND_CONFIG(ym3526_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( wndrplnt )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(karnov_state)
+static MACHINE_CONFIG_START( wndrplnt, karnov_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)	/* 10 MHz */
@@ -897,7 +891,7 @@ static MACHINE_DRIVER_START( wndrplnt )
 	MDRV_SOUND_ADD("ym2", YM3526, 3000000)
 	MDRV_SOUND_CONFIG(ym3526_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************************

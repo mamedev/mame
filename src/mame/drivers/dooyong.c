@@ -773,7 +773,7 @@ static const ym2151_interface ym2151_config =
 ***************************************************************************/
 
 
-static MACHINE_DRIVER_START( sound_2203 )
+static MACHINE_CONFIG_FRAGMENT( sound_2203 )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ym1", YM2203, 4000000)
@@ -783,9 +783,9 @@ static MACHINE_DRIVER_START( sound_2203 )
 	MDRV_SOUND_ADD("ym2", YM2203, 4000000)
 	MDRV_SOUND_CONFIG(ym2203_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( sound_2151 )
+static MACHINE_CONFIG_FRAGMENT( sound_2151 )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ymsnd", YM2151, 3579545)
@@ -795,9 +795,9 @@ static MACHINE_DRIVER_START( sound_2151 )
 
 	MDRV_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( sound_2151_m68k )
+static MACHINE_CONFIG_FRAGMENT( sound_2151_m68k )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ymsnd", YM2151, 4000000)
@@ -807,9 +807,9 @@ static MACHINE_DRIVER_START( sound_2151_m68k )
 
 	MDRV_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( lastday )
+static MACHINE_CONFIG_START( lastday, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 8000000)	/* ??? */
@@ -839,10 +839,10 @@ static MACHINE_DRIVER_START( lastday )
 	MDRV_VIDEO_UPDATE(lastday)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM( sound_2203 )
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD( sound_2203 )
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( gulfstrm )
+static MACHINE_CONFIG_START( gulfstrm, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 8000000)	/* ??? */
@@ -872,10 +872,10 @@ static MACHINE_DRIVER_START( gulfstrm )
 	MDRV_VIDEO_UPDATE(gulfstrm)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM( sound_2203 )
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD( sound_2203 )
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( pollux )
+static MACHINE_CONFIG_START( pollux, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 8000000)	/* ??? */
@@ -905,10 +905,10 @@ static MACHINE_DRIVER_START( pollux )
 	MDRV_VIDEO_UPDATE(pollux)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM( sound_2203 )
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD( sound_2203 )
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( bluehawk )
+static MACHINE_CONFIG_START( bluehawk, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 8000000)	/* ??? */
@@ -938,10 +938,10 @@ static MACHINE_DRIVER_START( bluehawk )
 	MDRV_VIDEO_UPDATE(bluehawk)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM( sound_2151 )
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD( sound_2151 )
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( flytiger )
+static MACHINE_CONFIG_START( flytiger, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 8000000)	/* ??? */
@@ -971,10 +971,10 @@ static MACHINE_DRIVER_START( flytiger )
 	MDRV_VIDEO_UPDATE(flytiger)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM( sound_2151 )
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD( sound_2151 )
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( primella )
+static MACHINE_CONFIG_START( primella, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 8000000)	/* ??? */
@@ -1002,8 +1002,8 @@ static MACHINE_DRIVER_START( primella )
 	MDRV_VIDEO_UPDATE(primella)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM( sound_2151 )
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD( sound_2151 )
+MACHINE_CONFIG_END
 
 static INTERRUPT_GEN( rshark_interrupt )
 {
@@ -1013,7 +1013,7 @@ static INTERRUPT_GEN( rshark_interrupt )
 		cpu_set_input_line(device, 6, HOLD_LINE);
 }
 
-static MACHINE_DRIVER_START( rshark )
+static MACHINE_CONFIG_START( rshark, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)	/* measured on super-x */
@@ -1041,10 +1041,10 @@ static MACHINE_DRIVER_START( rshark )
 	MDRV_VIDEO_UPDATE(rshark)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM( sound_2151_m68k )
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD( sound_2151_m68k )
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( superx ) // dif mem map
+static MACHINE_CONFIG_START( superx, driver_data_t ) // dif mem map
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)	/* measured on super-x */
@@ -1072,10 +1072,10 @@ static MACHINE_DRIVER_START( superx ) // dif mem map
 	MDRV_VIDEO_UPDATE(rshark)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM( sound_2151_m68k )
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD( sound_2151_m68k )
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( popbingo )
+static MACHINE_CONFIG_START( popbingo, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)
@@ -1103,8 +1103,8 @@ static MACHINE_DRIVER_START( popbingo )
 	MDRV_VIDEO_UPDATE(popbingo)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM( sound_2151_m68k )
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD( sound_2151_m68k )
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

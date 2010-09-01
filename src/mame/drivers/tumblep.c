@@ -302,10 +302,7 @@ static MACHINE_START( tumblep )
 	state->deco16ic = machine->device("deco_custom");
 }
 
-static MACHINE_DRIVER_START( tumblep )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(tumblep_state)
+static MACHINE_CONFIG_START( tumblep, tumblep_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 14000000)
@@ -343,7 +340,7 @@ static MACHINE_DRIVER_START( tumblep )
 	MDRV_OKIM6295_ADD("oki", 1023924, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /******************************************************************************/
 

@@ -630,7 +630,7 @@ static const c140_interface C140_interface_typeB =
 	C140_TYPE_SYSTEM21_B
 };
 
-static MACHINE_DRIVER_START( gal3 )
+static MACHINE_CONFIG_START( gal3, driver_data_t )
 	MDRV_CPU_ADD("cpumst", M68020, 49152000/2)
 	MDRV_CPU_PROGRAM_MAP(cpu_mst_map)
 	MDRV_CPU_VBLANK_INT("lscreen", irq1_line_hold)
@@ -690,7 +690,7 @@ static MACHINE_DRIVER_START( gal3 )
 	MDRV_SOUND_CONFIG(C140_interface_typeA)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*
 

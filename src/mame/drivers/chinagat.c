@@ -568,10 +568,7 @@ static MACHINE_RESET( chinagat )
 }
 
 
-static MACHINE_DRIVER_START( chinagat )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(ddragon_state)
+static MACHINE_CONFIG_START( chinagat, ddragon_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", HD6309, MAIN_CLOCK / 2)		/* 1.5 MHz (12MHz oscillator / 4 internally) */
@@ -610,12 +607,9 @@ static MACHINE_DRIVER_START( chinagat )
 
 	MDRV_OKIM6295_ADD("oki", 1065000, OKIM6295_PIN7_HIGH) // pin 7 not verified, clock frequency estimated with recording
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( saiyugoub1 )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(ddragon_state)
+static MACHINE_CONFIG_START( saiyugoub1, ddragon_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, MAIN_CLOCK / 8)		/* 68B09EP 1.5 MHz (12MHz oscillator) */
@@ -659,12 +653,9 @@ static MACHINE_DRIVER_START( saiyugoub1 )
 	MDRV_SOUND_ADD("adpcm", MSM5205, 9263750 / 24)
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( saiyugoub2 )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(ddragon_state)
+static MACHINE_CONFIG_START( saiyugoub2, ddragon_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, MAIN_CLOCK / 8)		/* 1.5 MHz (12MHz oscillator) */
@@ -708,7 +699,7 @@ static MACHINE_DRIVER_START( saiyugoub2 )
 	MDRV_SOUND_ROUTE(1, "mono", 0.50)
 	MDRV_SOUND_ROUTE(2, "mono", 0.50)
 	MDRV_SOUND_ROUTE(3, "mono", 0.80)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

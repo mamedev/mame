@@ -241,7 +241,7 @@ static INTERRUPT_GEN( timelimt_irq ) {
 
 /***************************************************************************/
 
-static MACHINE_DRIVER_START( timelimt )
+static MACHINE_CONFIG_START( timelimt, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 5000000)	/* 5.000 MHz */
@@ -283,16 +283,16 @@ static MACHINE_DRIVER_START( timelimt )
 	MDRV_SOUND_ADD("ay2", AY8910, 18432000/12)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( progress )
+static MACHINE_CONFIG_DERIVED( progress, timelimt )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(timelimt)
 
 	MDRV_GFXDECODE(progress)
 	MDRV_PALETTE_LENGTH(96)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

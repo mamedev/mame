@@ -1107,7 +1107,7 @@ static GFXDECODE_START( pinkiri8 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 0x100 )
 GFXDECODE_END
 
-static MACHINE_DRIVER_START( pinkiri8 )
+static MACHINE_CONFIG_START( pinkiri8, driver_data_t )
 	MDRV_CPU_ADD("maincpu",Z180,16000000)
 	MDRV_CPU_PROGRAM_MAP(pinkiri8_map)
 	MDRV_CPU_IO_MAP(pinkiri8_io)
@@ -1132,7 +1132,7 @@ static MACHINE_DRIVER_START( pinkiri8 )
 
 	MDRV_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

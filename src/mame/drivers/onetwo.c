@@ -353,10 +353,7 @@ static MACHINE_START( onetwo )
 	state->audiocpu = machine->device("audiocpu");
 }
 
-static MACHINE_DRIVER_START( onetwo )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(onetwo_state)
+static MACHINE_CONFIG_START( onetwo, onetwo_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,MASTER_CLOCK)	/* 4 MHz */
@@ -393,7 +390,7 @@ static MACHINE_DRIVER_START( onetwo )
 
 	MDRV_OKIM6295_ADD("oki", 1056000*2, OKIM6295_PIN7_LOW) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*************************************
  *

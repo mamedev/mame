@@ -896,7 +896,7 @@ static const i2cmem_interface i2cmem_interface =
 	I2CMEM_SLAVE_ADDRESS, 0, 0x100
 };
 
-static MACHINE_DRIVER_START( twinkle )
+static MACHINE_CONFIG_START( twinkle, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",  PSXCPU, XTAL_67_7376MHz )
 	MDRV_CPU_PROGRAM_MAP( main_map )
@@ -942,7 +942,7 @@ static MACHINE_DRIVER_START( twinkle )
 	MDRV_SOUND_ADD( "cdda", CDDA, 0 )
 	MDRV_SOUND_ROUTE( 0, "speakerleft", 1.0 )
 	MDRV_SOUND_ROUTE( 1, "speakerright", 1.0 )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( twinkle )
 

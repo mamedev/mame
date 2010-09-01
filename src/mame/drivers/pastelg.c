@@ -401,7 +401,7 @@ static const ay8910_interface ay8910_config =
 };
 
 
-static MACHINE_DRIVER_START( pastelg )
+static MACHINE_CONFIG_START( pastelg, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 19968000/8)	/* 2.496 MHz ? */
@@ -436,7 +436,7 @@ static MACHINE_DRIVER_START( pastelg )
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*
 
@@ -461,7 +461,7 @@ Note
 
 */
 
-static MACHINE_DRIVER_START( threeds )
+static MACHINE_CONFIG_START( threeds, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 19968000/8)	/* 2.496 MHz ? */
@@ -495,7 +495,7 @@ static MACHINE_DRIVER_START( threeds )
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( pastelg )

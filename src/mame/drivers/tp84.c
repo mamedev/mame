@@ -291,7 +291,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_DRIVER_START( tp84 )
+static MACHINE_CONFIG_START( tp84, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("cpu1",M6809, XTAL_18_432MHz/12) /* verified on pcb */
@@ -343,13 +343,12 @@ static MACHINE_DRIVER_START( tp84 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MDRV_SOUND_ADD("filter3", FILTER_RC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( tp84b )
-	MDRV_IMPORT_FROM(tp84)
+static MACHINE_CONFIG_DERIVED( tp84b, tp84 )
 	MDRV_CPU_MODIFY("cpu1")
 	MDRV_CPU_PROGRAM_MAP(tp84b_cpu1_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

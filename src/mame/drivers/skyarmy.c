@@ -273,9 +273,7 @@ static GFXDECODE_START( skyarmy )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 0, 8 )
 GFXDECODE_END
 
-static MACHINE_DRIVER_START( skyarmy )
-
-	MDRV_DRIVER_DATA( skyarmy_state )
+static MACHINE_CONFIG_START( skyarmy, skyarmy_state )
 
 	MDRV_CPU_ADD("maincpu", Z80,4000000)
 	MDRV_CPU_PROGRAM_MAP(skyarmy_map)
@@ -302,7 +300,7 @@ static MACHINE_DRIVER_START( skyarmy )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("aysnd", AY8910, 2500000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( skyarmy )

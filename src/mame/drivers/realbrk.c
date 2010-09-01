@@ -673,7 +673,7 @@ static INTERRUPT_GEN( realbrk_interrupt )
 	}
 }
 
-static MACHINE_DRIVER_START( realbrk )
+static MACHINE_CONFIG_START( realbrk, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M68000, XTAL_32MHz / 2)			/* !! TMP68301 !! */
@@ -707,28 +707,25 @@ static MACHINE_DRIVER_START( realbrk )
 	MDRV_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( pkgnsh )
-	MDRV_IMPORT_FROM( realbrk )
+static MACHINE_CONFIG_DERIVED( pkgnsh, realbrk )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(pkgnsh_mem)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( pkgnshdx )
-	MDRV_IMPORT_FROM( realbrk )
+static MACHINE_CONFIG_DERIVED( pkgnshdx, realbrk )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(pkgnshdx_mem)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( dai2kaku )
-	MDRV_IMPORT_FROM( realbrk )
+static MACHINE_CONFIG_DERIVED( dai2kaku, realbrk )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(dai2kaku_mem)
 
 	MDRV_GFXDECODE(dai2kaku)
 	MDRV_VIDEO_UPDATE(dai2kaku)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

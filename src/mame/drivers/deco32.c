@@ -1655,7 +1655,7 @@ static INTERRUPT_GEN( tattass_snd_interrupt )
 	cpu_set_input_line(device, M6809_FIRQ_LINE, HOLD_LINE);
 }
 
-static MACHINE_DRIVER_START( captaven )
+static MACHINE_CONFIG_START( captaven, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", ARM, XTAL_28MHz/4) /* verified on pcb (Data East 101 custom)*/
@@ -1700,9 +1700,9 @@ static MACHINE_DRIVER_START( captaven )
 	MDRV_OKIM6295_ADD("oki2", XTAL_32_22MHz/16, OKIM6295_PIN7_HIGH) /* verified on pcb; pin 7 is floating to 2.5V (left unconnected), so I presume High */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.35)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.35)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( fghthist )
+static MACHINE_CONFIG_START( fghthist, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", ARM, 28000000/4)
@@ -1744,9 +1744,9 @@ static MACHINE_DRIVER_START( fghthist )
 	MDRV_OKIM6295_ADD("oki2", 32220000/16, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.35)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.35)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( fghthsta )
+static MACHINE_CONFIG_START( fghthsta, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", ARM, 28000000/4)
@@ -1788,9 +1788,9 @@ static MACHINE_DRIVER_START( fghthsta )
 	MDRV_OKIM6295_ADD("oki2", 32220000/16, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.35)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.35)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( dragngun )
+static MACHINE_CONFIG_START( dragngun, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", ARM, 28000000/4)
@@ -1840,9 +1840,9 @@ static MACHINE_DRIVER_START( dragngun )
 	MDRV_OKIM6295_ADD("oki3", 32220000/32, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( lockload )
+static MACHINE_CONFIG_START( lockload, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", ARM, 28000000/4)
@@ -1892,9 +1892,9 @@ static MACHINE_DRIVER_START( lockload )
 	MDRV_OKIM6295_ADD("oki3", 32220000/32, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( tattass )
+static MACHINE_CONFIG_START( tattass, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", ARM, 28000000/4) /* Unconfirmed */
@@ -1928,9 +1928,9 @@ static MACHINE_DRIVER_START( tattass )
 	MDRV_SOUND_ADD("bsmt", BSMT2000, 24000000)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( nslasher )
+static MACHINE_CONFIG_START( nslasher, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", ARM, 28322000/4)
@@ -1975,7 +1975,7 @@ static MACHINE_DRIVER_START( nslasher )
 	MDRV_OKIM6295_ADD("oki2", 32220000/16, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /**********************************************************************************/
 

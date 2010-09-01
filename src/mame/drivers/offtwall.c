@@ -403,8 +403,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( offtwall )
-	MDRV_DRIVER_DATA(offtwall_state)
+static MACHINE_CONFIG_START( offtwall, offtwall_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
@@ -429,8 +428,8 @@ static MACHINE_DRIVER_START( offtwall )
 	MDRV_VIDEO_UPDATE(offtwall)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(jsa_iii_mono_noadpcm)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(jsa_iii_mono_noadpcm)
+MACHINE_CONFIG_END
 
 
 

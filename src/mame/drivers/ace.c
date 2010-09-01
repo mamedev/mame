@@ -343,10 +343,7 @@ static MACHINE_RESET( ace )
 		state->objpos[i] = 0;
 }
 
-static MACHINE_DRIVER_START( ace )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(ace_state)
+static MACHINE_CONFIG_START( ace, ace_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8080, MASTER_CLOCK/9)	/* 2 MHz ? */
@@ -372,7 +369,7 @@ static MACHINE_DRIVER_START( ace )
 	/* sound hardware */
 	/* ???? */
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

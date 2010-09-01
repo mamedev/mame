@@ -155,10 +155,7 @@ static GFXDECODE_START( higemaru )
 GFXDECODE_END
 
 
-static MACHINE_DRIVER_START( higemaru )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(higemaru_state)
+static MACHINE_CONFIG_START( higemaru, higemaru_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz/4)	/* 3 MHz Sharp LH0080A Z80A-CPU-D */
@@ -188,7 +185,7 @@ static MACHINE_DRIVER_START( higemaru )
 
 	MDRV_SOUND_ADD("ay2", AY8910, XTAL_12MHz/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

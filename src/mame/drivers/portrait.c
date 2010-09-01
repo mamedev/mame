@@ -250,7 +250,7 @@ static GFXDECODE_START( portrait )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, tile_layout, 0, 0x800/8 )
 GFXDECODE_END
 
-static MACHINE_DRIVER_START( portrait )
+static MACHINE_CONFIG_START( portrait, driver_data_t )
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)     /* 4 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(portrait_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
@@ -280,7 +280,7 @@ static MACHINE_DRIVER_START( portrait )
 
 	MDRV_SOUND_ADD("tms", TMS5200, 640000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( portrait )

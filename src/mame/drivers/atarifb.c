@@ -553,10 +553,7 @@ static MACHINE_RESET( atarifb )
 	state->counter_y_in2b = 0;
 }
 
-static MACHINE_DRIVER_START( atarifb )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(atarifb_state)
+static MACHINE_CONFIG_START( atarifb, atarifb_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 750000)
@@ -586,22 +583,20 @@ static MACHINE_DRIVER_START( atarifb )
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(atarifb)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.18)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( atarifb4 )
+static MACHINE_CONFIG_DERIVED( atarifb4, atarifb )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(atarifb)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(atarifb4_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( abaseb )
+static MACHINE_CONFIG_DERIVED( abaseb, atarifb )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(atarifb)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(abaseb_map)
 
@@ -612,13 +607,12 @@ static MACHINE_DRIVER_START( abaseb )
 	MDRV_SOUND_REPLACE("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(abaseb)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.24)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( soccer )
+static MACHINE_CONFIG_DERIVED( soccer, atarifb )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(atarifb)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(soccer_map)
 
@@ -627,7 +621,7 @@ static MACHINE_DRIVER_START( soccer )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 38*8-1, 2*8, 32*8-1)
 	MDRV_GFXDECODE(soccer)
 	MDRV_VIDEO_UPDATE(soccer)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

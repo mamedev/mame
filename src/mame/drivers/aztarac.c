@@ -143,7 +143,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( aztarac )
+static MACHINE_CONFIG_START( aztarac, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)
@@ -180,7 +180,7 @@ static MACHINE_DRIVER_START( aztarac )
 
 	MDRV_SOUND_ADD("ay4", AY8910, 2000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

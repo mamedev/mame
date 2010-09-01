@@ -1288,10 +1288,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( system18 )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(segas1x_state)
+static MACHINE_CONFIG_START( system18, segas1x_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)
@@ -1331,18 +1328,17 @@ static MACHINE_DRIVER_START( system18 )
 
 	MDRV_SOUND_ADD("rfsnd", RF5C68, 10000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( system18_8751 )
-	MDRV_IMPORT_FROM(system18)
+static MACHINE_CONFIG_DERIVED( system18_8751, system18 )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_VBLANK_INT_HACK(NULL,0)
 
 	MDRV_CPU_ADD("mcu", I8751, 8000000)
 	MDRV_CPU_IO_MAP(mcu_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

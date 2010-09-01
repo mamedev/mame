@@ -718,7 +718,7 @@ static const tc0480scp_interface undrfire_tc0480scp_intf =
 	0		/* col_base */
 };
 
-static MACHINE_DRIVER_START( undrfire )
+static MACHINE_CONFIG_START( undrfire, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)	/* 16 MHz */
@@ -745,11 +745,11 @@ static MACHINE_DRIVER_START( undrfire )
 	MDRV_TC0480SCP_ADD("tc0480scp", undrfire_tc0480scp_intf)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(taito_f3_sound)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(taito_f3_sound)
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( cbombers )
+static MACHINE_CONFIG_START( cbombers, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)	/* 16 MHz */
@@ -782,8 +782,8 @@ static MACHINE_DRIVER_START( cbombers )
 	MDRV_TC0480SCP_ADD("tc0480scp", undrfire_tc0480scp_intf)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(taito_f3_sound)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(taito_f3_sound)
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

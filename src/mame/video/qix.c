@@ -446,7 +446,7 @@ static const m6809_config encryption_config =
 };
 
 
-MACHINE_DRIVER_START( qix_video )
+MACHINE_CONFIG_FRAGMENT( qix_video )
 	MDRV_CPU_ADD("videocpu", M6809, MAIN_CLOCK_OSC/4/4)	/* 1.25 MHz */
 	MDRV_CPU_PROGRAM_MAP(qix_video_map)
 	MDRV_CPU_CONFIG(encryption_config)	// for kram3
@@ -459,17 +459,17 @@ MACHINE_DRIVER_START( qix_video )
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_RAW_PARAMS(QIX_CHARACTER_CLOCK*8, 256, 0, 256, 256, 0, 256)	/* temporary, CRTC will configure screen */
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-MACHINE_DRIVER_START( zookeep_video )
+MACHINE_CONFIG_FRAGMENT( zookeep_video )
 	MDRV_CPU_MODIFY("videocpu")
 	MDRV_CPU_PROGRAM_MAP(zookeep_video_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-MACHINE_DRIVER_START( slither_video )
+MACHINE_CONFIG_FRAGMENT( slither_video )
 	MDRV_CPU_MODIFY("videocpu")
 	MDRV_CPU_CLOCK(SLITHER_CLOCK_OSC/4/4)	/* 1.34 MHz */
 	MDRV_CPU_PROGRAM_MAP(slither_video_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END

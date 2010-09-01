@@ -328,7 +328,7 @@ static GFXDECODE_START( bestleag )
 	GFXDECODE_ENTRY( "gfx2", 0, bestleag_char16layout,   0x300, 16 )
 GFXDECODE_END
 
-static MACHINE_DRIVER_START( bestleag )
+static MACHINE_CONFIG_START( bestleag, driver_data_t )
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(bestleag_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
@@ -351,13 +351,12 @@ static MACHINE_DRIVER_START( bestleag )
 	MDRV_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH) /* Hand-tuned */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.00)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( bestleaw )
-	MDRV_IMPORT_FROM(bestleag)
+static MACHINE_CONFIG_DERIVED( bestleaw, bestleag )
 
 	MDRV_VIDEO_UPDATE(bestleaw)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* Rom Loading */

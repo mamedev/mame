@@ -393,10 +393,7 @@ static MACHINE_RESET( rng )
 	state->sound_status = 0;
 }
 
-static MACHINE_DRIVER_START( rng )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(rungun_state)
+static MACHINE_CONFIG_START( rng, rungun_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
@@ -447,7 +444,7 @@ static MACHINE_DRIVER_START( rng )
 	MDRV_SOUND_CONFIG(k054539_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( rungun )

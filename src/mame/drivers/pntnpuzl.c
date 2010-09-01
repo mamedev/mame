@@ -436,7 +436,7 @@ INPUT_PORTS_END
 
 
 
-static MACHINE_DRIVER_START( pntnpuzl )
+static MACHINE_CONFIG_START( pntnpuzl, driver_data_t )
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)//??
 	MDRV_CPU_PROGRAM_MAP(pntnpuzl_map)
 	MDRV_CPU_VBLANK_INT("screen", pntnpuzl_irq)	// irq1 = coin irq2 = service irq4 = coin
@@ -455,7 +455,7 @@ static MACHINE_DRIVER_START( pntnpuzl )
 
 	MDRV_VIDEO_START(pntnpuzl)
 	MDRV_VIDEO_UPDATE(pntnpuzl)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( pntnpuzl )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */

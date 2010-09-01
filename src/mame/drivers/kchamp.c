@@ -418,10 +418,7 @@ static MACHINE_RESET( kchamp )
 	state->sound_nmi_enable = 0;
 }
 
-static MACHINE_DRIVER_START( kchampvs )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(kchamp_state)
+static MACHINE_CONFIG_START( kchampvs, kchamp_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz/4)    /* verified on pcb */
@@ -464,16 +461,13 @@ static MACHINE_DRIVER_START( kchampvs )
 	MDRV_SOUND_ADD("msm", MSM5205, 375000)  /* verified on pcb, discrete circuit clock */
 	MDRV_SOUND_CONFIG(msm_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /********************
 * 1 Player Version  *
 ********************/
 
-static MACHINE_DRIVER_START( kchamp )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(kchamp_state)
+static MACHINE_CONFIG_START( kchamp, kchamp_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3000000)	/* 12MHz / 4 = 3.0 MHz */
@@ -517,7 +511,7 @@ static MACHINE_DRIVER_START( kchamp )
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15) /* guess: using volume 0.50 makes the sound to clip a lot */
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

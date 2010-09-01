@@ -433,7 +433,7 @@ static const tms36xx_interface tms3615_interface =
 
 
 
-static MACHINE_DRIVER_START( naughtyb )
+static MACHINE_CONFIG_START( naughtyb, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CLOCK_XTAL / 4) /* 12 MHz clock, divided by 4. CPU is a Z80A */
@@ -465,11 +465,11 @@ static MACHINE_DRIVER_START( naughtyb )
 
 	MDRV_SOUND_ADD("naughtyb", NAUGHTYB, 0)
 	MDRV_SOUND_ROUTE(0, "mono", 0.40)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* Exactly the same but for certain address writes */
-static MACHINE_DRIVER_START( popflame )
+static MACHINE_CONFIG_START( popflame, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CLOCK_XTAL / 4) /* 12 MHz clock, divided by 4. CPU is a Z80A */
@@ -500,7 +500,7 @@ static MACHINE_DRIVER_START( popflame )
 
 	MDRV_SOUND_ADD("popflame", POPFLAME, 0)
 	MDRV_SOUND_ROUTE(0, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

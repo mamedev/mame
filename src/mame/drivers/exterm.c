@@ -446,7 +446,7 @@ static const tms34010_config slave_config =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( exterm )
+static MACHINE_CONFIG_START( exterm, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", TMS34010, 40000000)
@@ -487,7 +487,7 @@ static MACHINE_DRIVER_START( exterm )
 
 	MDRV_SOUND_ADD("ymsnd", YM2151, 4000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

@@ -2468,12 +2468,11 @@ static ADDRESS_MAP_START( md_bootleg_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xe00000, 0xe0ffff) AM_RAM AM_MIRROR(0x1f0000) AM_BASE(&megadrive_ram)
 ADDRESS_MAP_END
 
-MACHINE_DRIVER_START( md_bootleg )
-	MDRV_IMPORT_FROM(megadriv)
+MACHINE_CONFIG_DERIVED( md_bootleg, megadriv )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(md_bootleg_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /****************************************** 32X related ******************************************/
@@ -3879,23 +3878,21 @@ INPUT_PORTS_START( megdsvp )
 	PORT_DIPSETTING( 0x01, DEF_STR( On ) )
 INPUT_PORTS_END
 
-MACHINE_DRIVER_START( megdsvp )
-	MDRV_IMPORT_FROM(megadriv)
+MACHINE_CONFIG_DERIVED( megdsvp, megadriv )
 
 	MDRV_CPU_ADD("svp", SSP1601, MASTER_CLOCK_NTSC / 7 * 3) /* ~23 MHz (guessed) */
 	MDRV_CPU_PROGRAM_MAP(svp_ssp_map)
 	MDRV_CPU_IO_MAP(svp_ext_map)
 	/* IRQs are not used by this CPU */
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-MACHINE_DRIVER_START( megdsvppal )
-	MDRV_IMPORT_FROM(megadpal)
+MACHINE_CONFIG_DERIVED( megdsvppal, megadpal )
 
 	MDRV_CPU_ADD("svp", SSP1601, MASTER_CLOCK_PAL / 7 * 3) /* ~23 MHz (guessed) */
 	MDRV_CPU_PROGRAM_MAP(svp_ssp_map)
 	MDRV_CPU_IO_MAP(svp_ext_map)
 	/* IRQs are not used by this CPU */
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /****************************************** END SVP related *************************************/
 
@@ -6184,16 +6181,16 @@ static NVRAM_HANDLER( megadriv )
 #endif
 
 
-MACHINE_DRIVER_START( megadriv_timers )
+MACHINE_CONFIG_FRAGMENT( megadriv_timers )
 	MDRV_TIMER_ADD("frame_timer", frame_timer_callback)
 	MDRV_TIMER_ADD("scanline_timer", scanline_timer_callback)
 	MDRV_TIMER_ADD("render_timer", render_timer_callback)
 	MDRV_TIMER_ADD("irq6_timer", irq6_on_callback)
 	MDRV_TIMER_ADD("irq4_timer", irq4_on_callback)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-MACHINE_DRIVER_START( megadriv )
+MACHINE_CONFIG_START( megadriv, driver_data_t )
 	MDRV_CPU_ADD("maincpu", M68000, MASTER_CLOCK_NTSC / 7) /* 7.67 MHz */
 	MDRV_CPU_PROGRAM_MAP(megadriv_map)
 	/* IRQs are handled via the timers */
@@ -6206,7 +6203,7 @@ MACHINE_DRIVER_START( megadriv )
 	MDRV_MACHINE_START(megadriv)
 	MDRV_MACHINE_RESET(megadriv)
 
-	MDRV_IMPORT_FROM(megadriv_timers)
+	MDRV_FRAGMENT_ADD(megadriv_timers)
 
 	MDRV_SCREEN_ADD("megadriv", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
@@ -6236,11 +6233,11 @@ MACHINE_DRIVER_START( megadriv )
 	MDRV_SOUND_ADD("snsnd", SMSIII, MASTER_CLOCK_NTSC/15)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) /* 3.58 MHz */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25) /* 3.58 MHz */
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /************ PAL hardware has a different master clock *************/
 
-MACHINE_DRIVER_START( megadpal )
+MACHINE_CONFIG_START( megadpal, driver_data_t )
 	MDRV_CPU_ADD("maincpu", M68000, MASTER_CLOCK_PAL / 7) /* 7.67 MHz */
 	MDRV_CPU_PROGRAM_MAP(megadriv_map)
 	/* IRQs are handled via the timers */
@@ -6253,7 +6250,7 @@ MACHINE_DRIVER_START( megadpal )
 	MDRV_MACHINE_START(megadriv)
 	MDRV_MACHINE_RESET(megadriv)
 
-	MDRV_IMPORT_FROM(megadriv_timers)
+	MDRV_FRAGMENT_ADD(megadriv_timers)
 
 	MDRV_SCREEN_ADD("megadriv", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
@@ -6283,15 +6280,14 @@ MACHINE_DRIVER_START( megadpal )
 	MDRV_SOUND_ADD("snsnd", SMSIII, MASTER_CLOCK_PAL/15)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) /* 3.58 MHz */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25) /* 3.58 MHz */
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
 static const sh2_cpu_core sh2_conf_master = { 0, NULL };
 static const sh2_cpu_core sh2_conf_slave  = { 1, NULL };
 
-MACHINE_DRIVER_START( genesis_32x )
-	MDRV_IMPORT_FROM(megadriv)
+MACHINE_CONFIG_DERIVED( genesis_32x, megadriv )
 
 	MDRV_CPU_ADD("32x_master_sh2", SH2, (MASTER_CLOCK_NTSC*3)/7 )
 	MDRV_CPU_PROGRAM_MAP(sh2_main_map)
@@ -6307,11 +6303,10 @@ MACHINE_DRIVER_START( genesis_32x )
 	// boosting the interleave here actually makes Kolibri run incorrectly however, that
 	// one works best just boosting the interleave on communications?!
 	MDRV_QUANTUM_TIME(HZ(1800000))
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-MACHINE_DRIVER_START( genesis_32x_pal )
-	MDRV_IMPORT_FROM(megadpal)
+MACHINE_CONFIG_DERIVED( genesis_32x_pal, megadpal )
 
 	MDRV_CPU_ADD("32x_master_sh2", SH2, (MASTER_CLOCK_PAL*3)/7 )
 	MDRV_CPU_PROGRAM_MAP(sh2_main_map)
@@ -6321,21 +6316,19 @@ MACHINE_DRIVER_START( genesis_32x_pal )
 	MDRV_CPU_PROGRAM_MAP(sh2_slave_map)
 	MDRV_CPU_CONFIG(sh2_conf_slave)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-MACHINE_DRIVER_START( genesis_scd )
-	MDRV_IMPORT_FROM(megadriv)
-
-	MDRV_CPU_ADD("segacd_68k", M68000, SEGACD_CLOCK ) /* 12.5 MHz */
-	MDRV_CPU_PROGRAM_MAP(segacd_map)
-MACHINE_DRIVER_END
-
-MACHINE_DRIVER_START( genesis_32x_scd )
-	MDRV_IMPORT_FROM(genesis_32x)
+MACHINE_CONFIG_DERIVED( genesis_scd, megadriv )
 
 	MDRV_CPU_ADD("segacd_68k", M68000, SEGACD_CLOCK ) /* 12.5 MHz */
 	MDRV_CPU_PROGRAM_MAP(segacd_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
+
+MACHINE_CONFIG_DERIVED( genesis_32x_scd, genesis_32x )
+
+	MDRV_CPU_ADD("segacd_68k", M68000, SEGACD_CLOCK ) /* 12.5 MHz */
+	MDRV_CPU_PROGRAM_MAP(segacd_map)
+MACHINE_CONFIG_END
 
 
 /* Callback when the genesis enters interrupt code */

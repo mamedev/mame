@@ -512,8 +512,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( atarig42 )
-	MDRV_DRIVER_DATA(atarig42_state)
+static MACHINE_CONFIG_START( atarig42, atarig42_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz)
@@ -521,7 +520,7 @@ static MACHINE_DRIVER_START( atarig42 )
 	MDRV_CPU_VBLANK_INT("screen", atarigen_video_int_gen)
 
 	/* ASIC65 */
-	MDRV_IMPORT_FROM(asic65)
+	MDRV_FRAGMENT_ADD(asic65)
 
 	MDRV_MACHINE_START(atarig42)
 	MDRV_MACHINE_RESET(atarig42)
@@ -543,8 +542,8 @@ static MACHINE_DRIVER_START( atarig42 )
 	MDRV_VIDEO_UPDATE(atarig42)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(jsa_iii_mono)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(jsa_iii_mono)
+MACHINE_CONFIG_END
 
 
 

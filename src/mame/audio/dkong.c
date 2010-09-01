@@ -1312,7 +1312,7 @@ const tms5110_interface tms_interface = {
  *
  *************************************/
 
-MACHINE_DRIVER_START( dkong2b_audio )
+MACHINE_CONFIG_FRAGMENT( dkong2b_audio )
 
 	MDRV_SOUND_START( dkong )
 
@@ -1350,21 +1350,17 @@ MACHINE_DRIVER_START( dkong2b_audio )
 	MDRV_SOUND_CONFIG_DISCRETE(dkong2b)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-MACHINE_DRIVER_START( radarscp_audio )
-
-	MDRV_IMPORT_FROM( dkong2b_audio )
+MACHINE_CONFIG_DERIVED( radarscp_audio, dkong2b_audio )
 	MDRV_SOUND_MODIFY("discrete")
 	MDRV_SOUND_CONFIG_DISCRETE(radarscp)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.7)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-MACHINE_DRIVER_START( radarscp1_audio )
-
-	MDRV_IMPORT_FROM( radarscp_audio )
+MACHINE_CONFIG_DERIVED( radarscp1_audio, radarscp_audio )
 	MDRV_CPU_MODIFY("soundcpu")
 	MDRV_CPU_IO_MAP(radarscp1_sound_io_map)
 
@@ -1381,9 +1377,9 @@ MACHINE_DRIVER_START( radarscp1_audio )
 	MDRV_DEVICE_CONFIG(tms_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-MACHINE_DRIVER_START( dkongjr_audio )
+MACHINE_CONFIG_FRAGMENT( dkongjr_audio )
 
 	/* sound latches */
 
@@ -1418,9 +1414,9 @@ MACHINE_DRIVER_START( dkongjr_audio )
 	MDRV_SOUND_CONFIG_DISCRETE(dkongjr)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-MACHINE_DRIVER_START( dkong3_audio )
+MACHINE_CONFIG_FRAGMENT( dkong3_audio )
 
 	MDRV_CPU_ADD("n2a03a", N2A03,N2A03_DEFAULTCLOCK)
 	MDRV_CPU_PROGRAM_MAP(dkong3_sound1_map)
@@ -1444,6 +1440,6 @@ MACHINE_DRIVER_START( dkong3_audio )
 	MDRV_SOUND_CONFIG(nes_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 

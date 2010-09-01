@@ -217,10 +217,7 @@ static MACHINE_RESET( blockhl )
 	state->rombank = 0;
 }
 
-static MACHINE_DRIVER_START( blockhl )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(blockhl_state)
+static MACHINE_CONFIG_START( blockhl, blockhl_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", KONAMI,3000000)		/* Konami custom 052526 */
@@ -257,7 +254,7 @@ static MACHINE_DRIVER_START( blockhl )
 	MDRV_SOUND_ADD("ymsnd", YM2151, 3579545)
 	MDRV_SOUND_ROUTE(0, "mono", 0.60)
 	MDRV_SOUND_ROUTE(1, "mono", 0.60)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

@@ -277,7 +277,7 @@ static MACHINE_START( esh )
 
 
 /* DRIVER */
-static MACHINE_DRIVER_START( esh )
+static MACHINE_CONFIG_START( esh, driver_data_t )
 
 	/* main cpu */
 	MDRV_CPU_ADD("maincpu", Z80, PCB_CLOCK/6)						/* The denominator is a Daphne guess based on PacMan's hardware */
@@ -306,7 +306,7 @@ static MACHINE_DRIVER_START( esh )
 	MDRV_SOUND_ADD("ldsound", LASERDISC, 0)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( esh )

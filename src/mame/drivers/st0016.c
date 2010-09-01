@@ -432,7 +432,7 @@ static const st0016_interface st0016_config =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( st0016 )
+static MACHINE_CONFIG_START( st0016, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80,8000000) /* 8 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(st0016_mem)
@@ -460,16 +460,15 @@ static MACHINE_DRIVER_START( st0016 )
 	MDRV_SOUND_CONFIG(st0016_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( mayjinsn )
-	MDRV_IMPORT_FROM(st0016)
+static MACHINE_CONFIG_DERIVED( mayjinsn, st0016 )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(st0016_m2_io)
 	MDRV_CPU_ADD("sub", V810, 10000000)//25 Mhz ?
 	MDRV_CPU_PROGRAM_MAP(v810_mem)
 	MDRV_QUANTUM_TIME(HZ(60))
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*************************************
  *

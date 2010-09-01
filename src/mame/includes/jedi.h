@@ -49,7 +49,7 @@ public:
 
 /*----------- defined in audio/jedi.c -----------*/
 
-MACHINE_DRIVER_EXTERN( jedi_audio );
+MACHINE_CONFIG_EXTERN( jedi_audio );
 
 WRITE8_HANDLER( jedi_audio_reset_w );
 WRITE8_HANDLER( jedi_audio_latch_w );
@@ -59,7 +59,7 @@ CUSTOM_INPUT( jedi_audio_comm_stat_r );
 
 /*----------- defined in video/jedi.c -----------*/
 
-MACHINE_DRIVER_EXTERN( jedi_video );
+MACHINE_CONFIG_EXTERN( jedi_video );
 
 WRITE8_HANDLER( jedi_vscroll_w );
 WRITE8_HANDLER( jedi_hscroll_w );

@@ -247,10 +247,7 @@ static MACHINE_RESET( drmicro )
 }
 
 
-static MACHINE_DRIVER_START( drmicro )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(drmicro_state)
+static MACHINE_CONFIG_START( drmicro, drmicro_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,MCLK/6)	/* 3.072MHz? */
@@ -293,7 +290,7 @@ static MACHINE_DRIVER_START( drmicro )
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*************************************
  *

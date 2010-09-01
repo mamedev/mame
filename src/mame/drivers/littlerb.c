@@ -494,7 +494,7 @@ static INTERRUPT_GEN( littlerb )
 	cpu_set_input_line(device, 4, HOLD_LINE);
 }
 
-static MACHINE_DRIVER_START( littlerb )
+static MACHINE_CONFIG_START( littlerb, driver_data_t )
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(littlerb_main)
 	MDRV_CPU_VBLANK_INT("screen", littlerb)
@@ -513,7 +513,7 @@ static MACHINE_DRIVER_START( littlerb )
 
 //  MDRV_PALETTE_INIT(littlerb)
 	MDRV_VIDEO_UPDATE(littlerb)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( littlerb )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */

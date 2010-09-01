@@ -363,10 +363,7 @@ static MACHINE_RESET( jackal )
 	state->irq_enable = 0;
 }
 
-static MACHINE_DRIVER_START( jackal )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(jackal_state)
+static MACHINE_CONFIG_START( jackal, jackal_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("master", M6809, MASTER_CLOCK/12) // verified on pcb
@@ -402,7 +399,7 @@ static MACHINE_DRIVER_START( jackal )
 	MDRV_SOUND_ADD("ymsnd", YM2151, SOUND_CLOCK) // verified on pcb
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*************************************
  *

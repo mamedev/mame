@@ -242,10 +242,7 @@ static MACHINE_RESET( dday )
 }
 
 
-static MACHINE_DRIVER_START( dday )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(dday_state)
+static MACHINE_CONFIG_START( dday, dday_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 2000000)     /* 2 MHz ? */
@@ -278,7 +275,7 @@ static MACHINE_DRIVER_START( dday )
 
 	MDRV_SOUND_ADD("ay2", AY8910, 1000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

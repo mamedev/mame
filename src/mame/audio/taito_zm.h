@@ -1,1 +1,1 @@
-MACHINE_DRIVER_EXTERN( taito_zoom_sound );
+MACHINE_CONFIG_EXTERN( taito_zoom_sound );

@@ -1602,9 +1602,7 @@ static const namcoio_interface intf1_interleave =
 };
 
 
-static MACHINE_DRIVER_START( superpac )
-
-	MDRV_DRIVER_DATA(mappy_state)
+static MACHINE_CONFIG_START( superpac, mappy_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, PIXEL_CLOCK/4)	/* 1.536 MHz */
@@ -1641,12 +1639,11 @@ static MACHINE_DRIVER_START( superpac )
 	MDRV_SOUND_ADD("namco", NAMCO_15XX, 18432000/768)
 	MDRV_SOUND_CONFIG(namco_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( pacnpal )
+static MACHINE_CONFIG_DERIVED( pacnpal, superpac )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM( superpac )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_VBLANK_INT("screen", pacnpal_interrupt_1)	// also update the custom I/O chips
 
@@ -1654,13 +1651,12 @@ static MACHINE_DRIVER_START( pacnpal )
 	MDRV_DEVICE_REMOVE("namcoio_2")
 	MDRV_NAMCO56XX_ADD("namcoio_1", intf0_lamps)
 	MDRV_NAMCO59XX_ADD("namcoio_2", intf1)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( grobda )
+static MACHINE_CONFIG_DERIVED( grobda, superpac )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM( superpac )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_VBLANK_INT("screen", phozon_interrupt_1)	// also update the custom I/O chips
 
@@ -1672,12 +1668,10 @@ static MACHINE_DRIVER_START( grobda )
 	/* sound hardware */
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.55)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( phozon )
-
-	MDRV_DRIVER_DATA(mappy_state)
+static MACHINE_CONFIG_START( phozon, mappy_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809,	PIXEL_CLOCK/4)	/* MAIN CPU */
@@ -1718,12 +1712,10 @@ static MACHINE_DRIVER_START( phozon )
 	MDRV_SOUND_ADD("namco", NAMCO_15XX, 18432000/768)
 	MDRV_SOUND_CONFIG(namco_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( mappy )
-
-	MDRV_DRIVER_DATA(mappy_state)
+static MACHINE_CONFIG_START( mappy, mappy_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, PIXEL_CLOCK/4)	/* 1.536 MHz */
@@ -1760,12 +1752,11 @@ static MACHINE_DRIVER_START( mappy )
 	MDRV_SOUND_ADD("namco", NAMCO_15XX, 18432000/768)
 	MDRV_SOUND_CONFIG(namco_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( digdug2 )
+static MACHINE_CONFIG_DERIVED( digdug2, mappy )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM( mappy )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_VBLANK_INT("screen", phozon_interrupt_1)	// also update the custom I/O chips
 
@@ -1775,12 +1766,11 @@ static MACHINE_DRIVER_START( digdug2 )
 	MDRV_DEVICE_REMOVE("namcoio_2")
 	MDRV_NAMCO58XX_ADD("namcoio_1", intf0)
 	MDRV_NAMCO56XX_ADD("namcoio_2", intf1)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( todruaga )
+static MACHINE_CONFIG_DERIVED( todruaga, mappy )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM( mappy )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_VBLANK_INT("screen", phozon_interrupt_1)	// also update the custom I/O chips
 
@@ -1792,12 +1782,11 @@ static MACHINE_DRIVER_START( todruaga )
 	/* video hardware */
 	MDRV_GFXDECODE(todruaga)
 	MDRV_PALETTE_LENGTH(64*4+64*16)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( motos )
+static MACHINE_CONFIG_DERIVED( motos, mappy )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM( mappy )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_VBLANK_INT("screen", superpac_interrupt_1)	// also update the custom I/O chips
 
@@ -1805,7 +1794,7 @@ static MACHINE_DRIVER_START( motos )
 	MDRV_DEVICE_REMOVE("namcoio_2")
 	MDRV_NAMCO56XX_ADD("namcoio_1", intf0_lamps)
 	MDRV_NAMCO56XX_ADD("namcoio_2", intf1)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

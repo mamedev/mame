@@ -105,7 +105,7 @@ extern const game_driver GAME_NAME(NAME) =	\
 	FULLNAME,								\
 	#YEAR,									\
 	COMPANY,								\
-	MACHINE_DRIVER_NAME(MACHINE),			\
+	MACHINE_CONFIG_NAME(MACHINE),			\
 	INPUT_PORTS_NAME(INPUT),				\
 	DRIVER_INIT_NAME(INIT),					\
 	ROM_NAME(NAME),							\

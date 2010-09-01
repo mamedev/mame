@@ -693,10 +693,7 @@ static const tc0140syt_interface topspeed_tc0140syt_intf =
 	"maincpu", "audiocpu"
 };
 
-static MACHINE_DRIVER_START( topspeed )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(topspeed_state)
+static MACHINE_CONFIG_START( topspeed, topspeed_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz ??? */
@@ -744,7 +741,7 @@ static MACHINE_DRIVER_START( topspeed )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
 	MDRV_TC0140SYT_ADD("tc0140syt", topspeed_tc0140syt_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

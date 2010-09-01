@@ -119,7 +119,7 @@ static const samples_interface frogs_samples_interface =
 };
 
 
-MACHINE_DRIVER_START( frogs_audio )
+MACHINE_CONFIG_FRAGMENT( frogs_audio )
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(frogs_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
@@ -127,7 +127,7 @@ MACHINE_DRIVER_START( frogs_audio )
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(frogs)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 static TIMER_CALLBACK( frogs_croak_callback )
@@ -453,12 +453,12 @@ static DISCRETE_SOUND_START(headon)
 
 DISCRETE_SOUND_END
 
-MACHINE_DRIVER_START( headon_audio )
+MACHINE_CONFIG_FRAGMENT( headon_audio )
 
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(headon)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 WRITE8_HANDLER( headon_audio_w )
 {

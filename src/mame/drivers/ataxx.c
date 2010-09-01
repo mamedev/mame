@@ -310,7 +310,7 @@ static const eeprom_interface eeprom_intf =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( ataxx )
+static MACHINE_CONFIG_START( ataxx, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("master", Z80, 6000000)
@@ -332,26 +332,25 @@ static MACHINE_DRIVER_START( ataxx )
 	MDRV_NVRAM_HANDLER(leland)
 
 	/* video hardware */
-	MDRV_IMPORT_FROM(ataxx_video)
+	MDRV_FRAGMENT_ADD(ataxx_video)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("leland", LELAND_80186, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( wsf )
+static MACHINE_CONFIG_DERIVED( wsf, ataxx )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(ataxx)
 
 	/* sound hardware */
 	MDRV_SOUND_ADD("ymsnd", YM2151, 4000000)
 	MDRV_SOUND_ROUTE(0, "mono", 0.40)
 	MDRV_SOUND_ROUTE(1, "mono", 0.40)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

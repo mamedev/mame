@@ -457,7 +457,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_DRIVER_START( pingpong )
+static MACHINE_CONFIG_START( pingpong, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80,18432000/6)		/* 3.072 MHz (probably) */
@@ -484,17 +484,16 @@ static MACHINE_DRIVER_START( pingpong )
 
 	MDRV_SOUND_ADD("snsnd", SN76496, 18432000/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* too fast! */
-static MACHINE_DRIVER_START( merlinmm )
-	MDRV_IMPORT_FROM( pingpong )
+static MACHINE_CONFIG_DERIVED( merlinmm, pingpong )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(merlinmm_map)
 	MDRV_CPU_VBLANK_INT_HACK(pingpong_interrupt,2)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

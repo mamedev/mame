@@ -593,7 +593,7 @@ static INPUT_PORTS_START( ppcar )
 INPUT_PORTS_END
 
 
-static MACHINE_DRIVER_START( ssfindo )
+static MACHINE_CONFIG_START( ssfindo, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", ARM7, 54000000) // guess...
@@ -614,9 +614,9 @@ static MACHINE_DRIVER_START( ssfindo )
 
 	MDRV_VIDEO_UPDATE(ssfindo)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( ppcar )
+static MACHINE_CONFIG_START( ppcar, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", ARM7, 54000000) // guess...
@@ -636,7 +636,7 @@ static MACHINE_DRIVER_START( ppcar )
 	MDRV_PALETTE_LENGTH(256)
 
 	MDRV_VIDEO_UPDATE(ssfindo)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( ssfindo )

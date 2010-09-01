@@ -671,10 +671,7 @@ static MACHINE_START( magerror )
 	timer_adjust_periodic(state->magerror_irq_timer, attotime_zero, 0, ATTOTIME_IN_HZ(968));		/* tempo? */
 }
 
-static MACHINE_DRIVER_START( hyprduel )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(hyprduel_state)
+static MACHINE_CONFIG_START( hyprduel, hyprduel_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,20000000/2)		/* 10MHz */
@@ -714,13 +711,10 @@ static MACHINE_DRIVER_START( hyprduel )
 	MDRV_OKIM6295_ADD("oki", 4000000/16/16*132, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.57)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.57)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( magerror )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(hyprduel_state)
+static MACHINE_CONFIG_START( magerror, hyprduel_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,20000000/2)		/* 10MHz */
@@ -759,7 +753,7 @@ static MACHINE_DRIVER_START( magerror )
 	MDRV_OKIM6295_ADD("oki", 4000000/16/16*132, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.57)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.57)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
                                 ROMs Loading

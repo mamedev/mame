@@ -1028,7 +1028,7 @@ static INTERRUPT_GEN( bootleg_interrupt )
 
 
 
-static MACHINE_DRIVER_START( pbillian )
+static MACHINE_CONFIG_START( pbillian, driver_data_t )
 	MDRV_CPU_ADD("maincpu", Z80,12000000/2)		 /* 6 MHz */
 	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_IO_MAP(pbillian_port_map)
@@ -1059,9 +1059,9 @@ static MACHINE_DRIVER_START( pbillian )
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(pbillian_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( hotsmash )
+static MACHINE_CONFIG_START( hotsmash, driver_data_t )
 	MDRV_CPU_ADD("maincpu", Z80,12000000/2)		 /* 6 MHz */
 	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_IO_MAP(hotsmash_port_map)
@@ -1095,9 +1095,9 @@ static MACHINE_DRIVER_START( hotsmash )
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(pbillian_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( sqix )
+static MACHINE_CONFIG_START( sqix, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 12000000/2)	/* 6 MHz */
@@ -1136,18 +1136,17 @@ static MACHINE_DRIVER_START( sqix )
 	MDRV_SOUND_ADD("ay2", AY8910, 12000000/8)
 	MDRV_SOUND_CONFIG(sqix_ay8910_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( sqixu )
-	MDRV_IMPORT_FROM( sqix )
+static MACHINE_CONFIG_DERIVED( sqixu, sqix )
 
 	MDRV_CPU_MODIFY("mcu")
 	MDRV_CPU_IO_MAP(sqixu_mcu_io_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( sqixbl )
+static MACHINE_CONFIG_START( sqixbl, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 12000000/2)	/* 6 MHz */
@@ -1181,7 +1180,7 @@ static MACHINE_DRIVER_START( sqixbl )
 	MDRV_SOUND_ADD("ay2", AY8910, 12000000/8)
 	MDRV_SOUND_CONFIG(bootleg_ay8910_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

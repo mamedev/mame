@@ -1790,7 +1790,7 @@ static const ay8910_interface ay8910_interface_4 =
 
 
 
-static MACHINE_DRIVER_START( nomcu )
+static MACHINE_CONFIG_START( nomcu, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80,8000000/2)      /* 4 MHz */
@@ -1843,14 +1843,13 @@ static MACHINE_DRIVER_START( nomcu )
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* same as above, but with additional 68705 MCU */
-static MACHINE_DRIVER_START( mcu )
+static MACHINE_CONFIG_DERIVED( mcu, nomcu )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(nomcu)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(taitosj_main_mcu_map)
 
@@ -1858,18 +1857,17 @@ static MACHINE_DRIVER_START( mcu )
 	MDRV_CPU_PROGRAM_MAP(taitosj_mcu_map)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( kikstart )
+static MACHINE_CONFIG_DERIVED( kikstart, mcu )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mcu)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(kikstart_main_map)
 
 	MDRV_VIDEO_UPDATE(kikstart)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

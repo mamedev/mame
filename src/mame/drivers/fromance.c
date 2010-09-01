@@ -1008,10 +1008,7 @@ static MACHINE_RESET( fromance )
 		state->crtc_data[i] = 0;
 }
 
-static MACHINE_DRIVER_START( nekkyoku )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(fromance_state)
+static MACHINE_CONFIG_START( nekkyoku, fromance_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,12000000/2)		/* 6.00 Mhz ? */
@@ -1047,13 +1044,10 @@ static MACHINE_DRIVER_START( nekkyoku )
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( idolmj )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(fromance_state)
+static MACHINE_CONFIG_START( idolmj, fromance_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,12000000/2)		/* 6.00 Mhz ? */
@@ -1089,13 +1083,10 @@ static MACHINE_DRIVER_START( idolmj )
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( fromance )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(fromance_state)
+static MACHINE_CONFIG_START( fromance, fromance_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,12000000/2)		/* 6.00 Mhz ? */
@@ -1131,7 +1122,7 @@ static MACHINE_DRIVER_START( fromance )
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

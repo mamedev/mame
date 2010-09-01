@@ -239,7 +239,7 @@ static const pia6821_interface slithersnd_pia_0_intf =
  *
  *************************************/
 
-MACHINE_DRIVER_START( qix_audio )
+MACHINE_CONFIG_FRAGMENT( qix_audio )
 	MDRV_CPU_ADD("audiocpu", M6802, SOUND_CLOCK_OSC/2)		/* 0.92 MHz */
 	MDRV_CPU_PROGRAM_MAP(audio_map)
 
@@ -253,10 +253,10 @@ MACHINE_DRIVER_START( qix_audio )
 	MDRV_SOUND_CONFIG_DISCRETE(qix)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-MACHINE_DRIVER_START( slither_audio )
+MACHINE_CONFIG_FRAGMENT( slither_audio )
 	MDRV_PIA6821_ADD("sndpia0", slithersnd_pia_0_intf)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -266,4 +266,4 @@ MACHINE_DRIVER_START( slither_audio )
 
 	MDRV_SOUND_ADD("sn2", SN76489, SLITHER_CLOCK_OSC/4/4)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END

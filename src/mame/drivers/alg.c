@@ -403,7 +403,7 @@ static const mos6526_interface cia_1_intf =
 	DEVCB_NULL								/* port B */
 };
 
-static MACHINE_DRIVER_START( alg_r1 )
+static MACHINE_CONFIG_START( alg_r1, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, AMIGA_68000_NTSC_CLOCK)
@@ -444,19 +444,17 @@ static MACHINE_DRIVER_START( alg_r1 )
 	/* cia */
 	MDRV_MOS8520_ADD("cia_0", AMIGA_68000_NTSC_CLOCK / 10, cia_0_intf)
 	MDRV_MOS8520_ADD("cia_1", AMIGA_68000_NTSC_CLOCK / 10, cia_1_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( alg_r2 )
-	MDRV_IMPORT_FROM(alg_r1)
+static MACHINE_CONFIG_DERIVED( alg_r2, alg_r1 )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(main_map_r2)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( picmatic )
-	MDRV_IMPORT_FROM(alg_r1)
+static MACHINE_CONFIG_DERIVED( picmatic, alg_r1 )
 
 	/* adjust for PAL specs */
 	MDRV_CPU_REPLACE("maincpu", M68000, AMIGA_68000_PAL_CLOCK)
@@ -466,7 +464,7 @@ static MACHINE_DRIVER_START( picmatic )
 	MDRV_SCREEN_REFRESH_RATE(50)
 	MDRV_SCREEN_SIZE(512*2, 312)
 	MDRV_SCREEN_VISIBLE_AREA((129-8)*2, (449+8-1)*2, 44-8, 300+8-1)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

@@ -648,7 +648,7 @@ static const samples_interface bowl3d_samples_interface =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( meadows )
+static MACHINE_CONFIG_START( meadows, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", S2650, MASTER_CLOCK/8)	/* 5MHz / 8 = 625 kHz */
@@ -684,10 +684,10 @@ static MACHINE_DRIVER_START( meadows )
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(meadows_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( minferno )
+static MACHINE_CONFIG_START( minferno, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", S2650, MASTER_CLOCK/24) 	/* 5MHz / 8 / 3 = 208.33 kHz */
@@ -710,10 +710,10 @@ static MACHINE_DRIVER_START( minferno )
 	MDRV_VIDEO_UPDATE(meadows)
 
 	/* audio hardware */
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( bowl3d )
+static MACHINE_CONFIG_START( bowl3d, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", S2650, MASTER_CLOCK/8)	/* 5MHz / 8 = 625 kHz */
 	MDRV_CPU_PROGRAM_MAP(bowl3d_main_map)
@@ -753,7 +753,7 @@ static MACHINE_DRIVER_START( bowl3d )
 	MDRV_SOUND_ADD("samples2", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(bowl3d_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

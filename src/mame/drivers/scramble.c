@@ -1233,7 +1233,7 @@ static ADDRESS_MAP_START( scramble_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("8910.2", ay8910_r, ay8910_data_w)
 ADDRESS_MAP_END
 
-static MACHINE_DRIVER_START( scramble )
+static MACHINE_CONFIG_START( scramble, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 18432000/6)	/* 3.072 MHz */
@@ -1278,24 +1278,22 @@ static MACHINE_DRIVER_START( scramble )
 	MDRV_SOUND_ADD("8910.2", AY8910, 14318000/8)
 	MDRV_SOUND_CONFIG(scramble_ay8910_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.16)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( mars )
+static MACHINE_CONFIG_DERIVED( mars, scramble )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(scramble)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(mars_map)
 
 	/* video hardware */
 	MDRV_PALETTE_LENGTH(32+64+2+0)	/* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
 	MDRV_PALETTE_INIT(galaxold)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( devilfsh )
+static MACHINE_CONFIG_DERIVED( devilfsh, scramble )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(scramble)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(mars_map)
 
@@ -1303,12 +1301,11 @@ static MACHINE_DRIVER_START( devilfsh )
 	MDRV_GFXDECODE(devilfsh)
 	MDRV_PALETTE_LENGTH(32+64+2+0)	/* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
 	MDRV_PALETTE_INIT(galaxold)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( newsin7 )
+static MACHINE_CONFIG_DERIVED( newsin7, scramble )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(scramble)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(newsin7_map)
 
@@ -1317,12 +1314,11 @@ static MACHINE_DRIVER_START( newsin7 )
 	MDRV_PALETTE_LENGTH(32+64+2+0)	/* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
 	MDRV_PALETTE_INIT(galaxold)
 	MDRV_VIDEO_START(newsin7)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( mrkougar )
+static MACHINE_CONFIG_DERIVED( mrkougar, scramble )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(scramble)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(mrkougar_map)
 
@@ -1332,12 +1328,11 @@ static MACHINE_DRIVER_START( mrkougar )
 	MDRV_GFXDECODE(mrkougar)
 	MDRV_PALETTE_LENGTH(32+64+2+0)	/* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
 	MDRV_PALETTE_INIT(galaxold)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( mrkougb )
+static MACHINE_CONFIG_DERIVED( mrkougb, scramble )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(scramble)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(mrkougar_map)
 
@@ -1346,12 +1341,11 @@ static MACHINE_DRIVER_START( mrkougb )
 	/* video hardware */
 	MDRV_PALETTE_LENGTH(32+64+2+0)	/* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
 	MDRV_PALETTE_INIT(galaxold)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( ckongs )
+static MACHINE_CONFIG_DERIVED( ckongs, scramble )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(scramble)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(ckongs_map)
 
@@ -1359,12 +1353,11 @@ static MACHINE_DRIVER_START( ckongs )
 	MDRV_PALETTE_LENGTH(32+64+2+0)	/* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
 	MDRV_PALETTE_INIT(galaxold)
 	MDRV_VIDEO_START(ckongs)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( hotshock )
+static MACHINE_CONFIG_DERIVED( hotshock, scramble )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(scramble)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(hotshock_map)
 
@@ -1387,35 +1380,32 @@ static MACHINE_DRIVER_START( hotshock )
 	MDRV_SOUND_MODIFY("8910.2")
 	MDRV_SOUND_CONFIG(hotshock_ay8910_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( cavelon )
+static MACHINE_CONFIG_DERIVED( cavelon, scramble )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(scramble)
 
 	/* video hardware */
 	MDRV_PALETTE_LENGTH(32+64+2+0)	/* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
 	MDRV_PALETTE_INIT(galaxold)
 	MDRV_VIDEO_START(ckongs)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( mimonscr )
+static MACHINE_CONFIG_DERIVED( mimonscr, scramble )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(scramble)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(mimonscr_map)
 
 	/* video hardware */
 	MDRV_VIDEO_START(mimonkey)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* Triple Punch and Mariner are different - only one CPU, one 8910 */
-static MACHINE_DRIVER_START( triplep )
+static MACHINE_CONFIG_DERIVED( triplep, scramble )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(scramble)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(triplep_io_map)
 
@@ -1432,25 +1422,23 @@ static MACHINE_DRIVER_START( triplep )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	MDRV_DEVICE_REMOVE("8910.2")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( mariner )
+static MACHINE_CONFIG_DERIVED( mariner, triplep )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(triplep)
 
 	/* video hardware */
 	MDRV_PALETTE_LENGTH(32+64+2+16)	/* 32 for characters, 64 for stars, 2 for bullets, 16 for background */
 
 	MDRV_PALETTE_INIT(mariner)
 	MDRV_VIDEO_START(mariner)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* Hunchback replaces the Z80 with a S2650 CPU */
-static MACHINE_DRIVER_START( hunchbks )
+static MACHINE_CONFIG_DERIVED( hunchbks, scramble )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(scramble)
 	MDRV_CPU_REPLACE("maincpu", S2650, 18432000/6)
 	MDRV_CPU_PROGRAM_MAP(hunchbks_map)
 	MDRV_CPU_IO_MAP(hunchbks_readport)
@@ -1463,19 +1451,18 @@ static MACHINE_DRIVER_START( hunchbks )
 	MDRV_PALETTE_LENGTH(32+64+2+0)	/* 32 for characters, 64 for stars, 2 for bullets */
 
 	MDRV_PALETTE_INIT(galaxold)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( hncholms )
+static MACHINE_CONFIG_DERIVED( hncholms, hunchbks )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(hunchbks)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_CLOCK(18432000/6/2/2)
 
 	MDRV_VIDEO_START(scorpion)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( ad2083 )
+static MACHINE_CONFIG_START( ad2083, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 18432000/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(ad2083_map)
@@ -1505,18 +1492,17 @@ static MACHINE_DRIVER_START( ad2083 )
 
 	/* sound hardware */
 
-	MDRV_IMPORT_FROM(ad2083_audio)
+	MDRV_FRAGMENT_ADD(ad2083_audio)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( turpins )
+static MACHINE_CONFIG_DERIVED( turpins, scramble )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(scramble)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(turpins_map)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

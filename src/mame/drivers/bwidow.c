@@ -709,7 +709,7 @@ static const pokey_interface pokey_interface_2 =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( bwidow )
+static MACHINE_CONFIG_START( bwidow, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 8)
@@ -737,24 +737,22 @@ static MACHINE_DRIVER_START( bwidow )
 	MDRV_SOUND_ADD("pokey2", POKEY, MASTER_CLOCK / 8)
 	MDRV_SOUND_CONFIG(pokey_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( gravitar )
+static MACHINE_CONFIG_DERIVED( gravitar, bwidow )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(bwidow)
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 420, 0, 400)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( lunarbat )
+static MACHINE_CONFIG_DERIVED( lunarbat, gravitar )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(gravitar)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(spacduel_map)
 
@@ -762,13 +760,12 @@ static MACHINE_DRIVER_START( lunarbat )
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(45)
 	MDRV_SCREEN_VISIBLE_AREA(0, 500, 0, 440)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( spacduel )
+static MACHINE_CONFIG_DERIVED( spacduel, gravitar )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(gravitar)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(spacduel_map)
 
@@ -776,7 +773,7 @@ static MACHINE_DRIVER_START( spacduel )
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(45)
 	MDRV_SCREEN_VISIBLE_AREA(0, 540, 0, 400)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

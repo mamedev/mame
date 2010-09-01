@@ -108,7 +108,7 @@ static VIDEO_UPDATE(stepstag)
 	return 0;
 }
 
-static MACHINE_DRIVER_START( stepstag )
+static MACHINE_CONFIG_START( stepstag, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000 ) //??
 	MDRV_CPU_PROGRAM_MAP(stepstag_map)
@@ -145,7 +145,7 @@ static MACHINE_DRIVER_START( stepstag )
 
 	MDRV_VIDEO_START(stepstag)
 	MDRV_VIDEO_UPDATE(stepstag)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( stepstag )

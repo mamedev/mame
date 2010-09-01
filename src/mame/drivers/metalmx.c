@@ -740,8 +740,7 @@ static const dsp32_config dsp32c_config =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( metalmx )
-	MDRV_DRIVER_DATA(metalmx_state)
+static MACHINE_CONFIG_START( metalmx, metalmx_state )
 
 	MDRV_CPU_ADD("maincpu", M68EC020, XTAL_14_31818MHz)
 	MDRV_CPU_PROGRAM_MAP(main_map)
@@ -778,8 +777,8 @@ static MACHINE_DRIVER_START( metalmx )
 	MDRV_VIDEO_START(metalmx)
 	MDRV_VIDEO_UPDATE(metalmx)
 
-	MDRV_IMPORT_FROM(cage)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(cage)
+MACHINE_CONFIG_END
 
 
 static DRIVER_INIT( metalmx )

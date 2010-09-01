@@ -444,8 +444,7 @@ static MACHINE_RESET( drill )
 	state->shutter_sensor = 0;
 }
 
-static MACHINE_DRIVER_START( drill )
-	MDRV_DRIVER_DATA(_2mindril_state)
+static MACHINE_CONFIG_START( drill, _2mindril_state )
 
 	MDRV_CPU_ADD("maincpu", M68000, 16000000 )
 	MDRV_CPU_PROGRAM_MAP(drill_map)
@@ -474,7 +473,7 @@ static MACHINE_DRIVER_START( drill )
 	MDRV_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MDRV_SOUND_ROUTE(1, "lspeaker",  1.0)
 	MDRV_SOUND_ROUTE(2, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( 2mindril )

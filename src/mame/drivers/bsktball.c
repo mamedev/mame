@@ -247,10 +247,7 @@ static MACHINE_RESET( bsktball )
 }
 
 
-static MACHINE_DRIVER_START( bsktball )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(bsktball_state)
+static MACHINE_CONFIG_START( bsktball, bsktball_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502,750000)
@@ -281,7 +278,7 @@ static MACHINE_DRIVER_START( bsktball )
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(bsktball)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

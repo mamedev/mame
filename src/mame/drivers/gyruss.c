@@ -505,10 +505,7 @@ static MACHINE_START( gyruss )
 	state->audiocpu_2 = machine->device<cpu_device>("audio2");
 }
 
-static MACHINE_DRIVER_START( gyruss )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(gyruss_state)
+static MACHINE_CONFIG_START( gyruss, gyruss_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3072000)	/* 3.072 MHz (?) */
@@ -583,7 +580,7 @@ static MACHINE_DRIVER_START( gyruss )
 	MDRV_SOUND_CONFIG_DISCRETE(gyruss_sound)
 	MDRV_SOUND_ROUTE(0, "rspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "lspeaker",  1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

@@ -892,7 +892,7 @@ static const msm5205_interface msm5205_config =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( tubep )
+static MACHINE_CONFIG_START( tubep, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80,16000000 / 4)	/* 4 MHz */
@@ -943,19 +943,18 @@ static MACHINE_DRIVER_START( tubep )
 	MDRV_SOUND_ADD("ay3", AY8910, 19968000 / 8 / 2)
 	MDRV_SOUND_CONFIG(ay8910_interface_3)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( tubepb )
-	MDRV_IMPORT_FROM( tubep )
+static MACHINE_CONFIG_DERIVED( tubepb, tubep )
 
 	MDRV_CPU_REPLACE("mcu", M6802,6000000) /* ? MHz Xtal */
 	MDRV_CPU_PROGRAM_MAP(nsc_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( rjammer )
+static MACHINE_CONFIG_START( rjammer, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80,16000000 / 4)	/* 4 MHz */
@@ -1009,7 +1008,7 @@ static MACHINE_DRIVER_START( rjammer )
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

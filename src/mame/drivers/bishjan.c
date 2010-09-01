@@ -825,7 +825,7 @@ static INTERRUPT_GEN( bishjan_interrupt )
 	}
 }
 
-static MACHINE_DRIVER_START( bishjan )
+static MACHINE_CONFIG_START( bishjan, driver_data_t )
 	MDRV_CPU_ADD("maincpu", H83044, XTAL_44_1MHz / 3)
 	MDRV_CPU_PROGRAM_MAP( bishjan_map)
 	MDRV_CPU_VBLANK_INT_HACK(bishjan_interrupt,2)
@@ -844,7 +844,7 @@ static MACHINE_DRIVER_START( bishjan )
 
 	MDRV_VIDEO_START( bishjan )
 	MDRV_VIDEO_UPDATE( bishjan )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
                           Sakura Love - Ying Hua Lian
@@ -856,7 +856,7 @@ static INTERRUPT_GEN( saklove_interrupt )
 		cpu_set_input_line_and_vector(device,0,HOLD_LINE,0x4c/4);
 }
 
-static MACHINE_DRIVER_START( saklove )
+static MACHINE_CONFIG_START( saklove, driver_data_t )
 	MDRV_CPU_ADD("maincpu", I80188, XTAL_20MHz )	// !! AMD AM188-EM !!
 	MDRV_CPU_PROGRAM_MAP( saklove_map)
 	MDRV_CPU_IO_MAP( saklove_io)
@@ -886,7 +886,7 @@ static MACHINE_DRIVER_START( saklove )
 
 	MDRV_SOUND_ADD("ymsnd", YM3812, XTAL_12MHz / 4)	// ? chip and clock unknown
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

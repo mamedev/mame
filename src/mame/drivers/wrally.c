@@ -245,7 +245,7 @@ static GFXDECODE_START( wrally )
 GFXDECODE_END
 
 
-static MACHINE_DRIVER_START( wrally )
+static MACHINE_CONFIG_START( wrally, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,XTAL_24MHz/2)		/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(wrally_map)
@@ -277,7 +277,7 @@ static MACHINE_DRIVER_START( wrally )
 
 	MDRV_OKIM6295_ADD("oki", XTAL_1MHz, OKIM6295_PIN7_HIGH)					/* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( wrally )

@@ -506,10 +506,7 @@ static MACHINE_RESET( helifire )
 }
 
 
-static MACHINE_DRIVER_START( spacefev )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(n8080_state)
+static MACHINE_CONFIG_START( spacefev, n8080_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8080, MASTER_CLOCK / 10)
@@ -536,14 +533,11 @@ static MACHINE_DRIVER_START( spacefev )
 	MDRV_TIMER_ADD_SCANLINE("rst2", rst2_tick, "screen", 240, 256)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM( spacefev_sound )
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD( spacefev_sound )
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( sheriff )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(n8080_state)
+static MACHINE_CONFIG_START( sheriff, n8080_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8080, MASTER_CLOCK / 10)
@@ -570,14 +564,11 @@ static MACHINE_DRIVER_START( sheriff )
 	MDRV_TIMER_ADD_SCANLINE("rst2", rst2_tick, "screen", 240, 256)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM( sheriff_sound )
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD( sheriff_sound )
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( helifire )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(n8080_state)
+static MACHINE_CONFIG_START( helifire, n8080_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8080, MASTER_CLOCK / 10)
@@ -605,8 +596,8 @@ static MACHINE_DRIVER_START( helifire )
 	MDRV_TIMER_ADD_SCANLINE("rst2", rst2_tick, "screen", 240, 256)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM( helifire_sound )
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD( helifire_sound )
+MACHINE_CONFIG_END
 
 
 /*

@@ -246,9 +246,7 @@ static MACHINE_START( taitoo )
 	state->tc0080vco = machine->device("tc0080vco");
 }
 
-static MACHINE_DRIVER_START( parentj )
-
-	MDRV_DRIVER_DATA(taitoo_state)
+static MACHINE_CONFIG_START( parentj, taitoo_state )
 
 	MDRV_CPU_ADD("maincpu", M68000,12000000 )		/*?? MHz */
 	MDRV_CPU_PROGRAM_MAP(parentj_map)
@@ -278,7 +276,7 @@ static MACHINE_DRIVER_START( parentj )
 	MDRV_SOUND_ROUTE(0, "mono", 0.25)
 	MDRV_SOUND_ROUTE(1, "mono",  1.0)
 	MDRV_SOUND_ROUTE(2, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( parentj )
 	ROM_REGION( 0x20000, "maincpu", 0 ) /* 68000 Code */

@@ -343,7 +343,7 @@ static GFXDECODE_START( mil4000 )
 GFXDECODE_END
 
 
-static MACHINE_DRIVER_START( mil4000 )
+static MACHINE_CONFIG_START( mil4000, driver_data_t )
 	MDRV_CPU_ADD("maincpu", M68000, 12000000 )	// ?
 	MDRV_CPU_PROGRAM_MAP(mil4000_map)
 	// irq 2/4/5 point to the same place, others invalid
@@ -366,7 +366,7 @@ static MACHINE_DRIVER_START( mil4000 )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH) // frequency from 1000 kHz resonator. pin 7 high not verified.
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

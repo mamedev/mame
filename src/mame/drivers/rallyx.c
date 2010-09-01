@@ -891,10 +891,7 @@ static MACHINE_RESET( rallyx )
 	state->stars_enable = 0;
 }
 
-static MACHINE_DRIVER_START( rallyx )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(timeplt_state)
+static MACHINE_CONFIG_START( rallyx, timeplt_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
@@ -932,13 +929,10 @@ static MACHINE_DRIVER_START( rallyx )
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(rallyx_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( jungler )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(timeplt_state)
+static MACHINE_CONFIG_START( jungler, timeplt_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
@@ -966,45 +960,42 @@ static MACHINE_DRIVER_START( jungler )
 	MDRV_VIDEO_UPDATE(jungler)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(locomotn_sound)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(locomotn_sound)
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( tactcian )
+static MACHINE_CONFIG_DERIVED( tactcian, jungler )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(jungler)
 
 	/* video hardware */
 	MDRV_VIDEO_START(locomotn)
 	MDRV_VIDEO_UPDATE(locomotn)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( locomotn )
+static MACHINE_CONFIG_DERIVED( locomotn, jungler )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(jungler)
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MDRV_VIDEO_START(locomotn)
 	MDRV_VIDEO_UPDATE(locomotn)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( commsega )
+static MACHINE_CONFIG_DERIVED( commsega, jungler )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(jungler)
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MDRV_VIDEO_START(commsega)
 	MDRV_VIDEO_UPDATE(locomotn)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************************

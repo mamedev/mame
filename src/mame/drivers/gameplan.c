@@ -1010,9 +1010,7 @@ static MACHINE_RESET( gameplan )
 	state->video_data = 0;
 }
 
-static MACHINE_DRIVER_START( gameplan )
-
-	MDRV_DRIVER_DATA(gameplan_state)
+static MACHINE_CONFIG_START( gameplan, gameplan_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, GAMEPLAN_MAIN_CPU_CLOCK)
@@ -1027,7 +1025,7 @@ static MACHINE_DRIVER_START( gameplan )
 	MDRV_MACHINE_RESET(gameplan)
 
 	/* video hardware */
-	MDRV_IMPORT_FROM(gameplan_video)
+	MDRV_FRAGMENT_ADD(gameplan_video)
 
 	/* audio hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -1040,12 +1038,10 @@ static MACHINE_DRIVER_START( gameplan )
 	MDRV_VIA6522_ADD("via6522_0", 0, gameplan_via_0_interface)
 	MDRV_VIA6522_ADD("via6522_1", 0, via_1_interface)
 	MDRV_VIA6522_ADD("via6522_2", 0, via_2_interface)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( leprechn )
-
-	MDRV_IMPORT_FROM(gameplan)
+static MACHINE_CONFIG_DERIVED( leprechn, gameplan )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_CLOCK(LEPRECHAUN_MAIN_CPU_CLOCK)
 
@@ -1054,12 +1050,12 @@ static MACHINE_DRIVER_START( leprechn )
 	MDRV_CPU_PROGRAM_MAP(leprechn_audio_map)
 
 	/* video hardware */
-	MDRV_IMPORT_FROM(leprechn_video)
+	MDRV_FRAGMENT_ADD(leprechn_video)
 
 	/* via */
 	MDRV_DEVICE_REMOVE("via6522_0")
 	MDRV_VIA6522_ADD("via6522_0", 0, leprechn_via_0_interface)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

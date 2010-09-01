@@ -2962,10 +2962,7 @@ static MACHINE_START( qsound )
 	memory_configure_bank(machine, "bank1", 0, 6, memory_region(machine, "audiocpu") + 0x10000, 0x4000);
 }
 
-static MACHINE_DRIVER_START( cps1_10MHz )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(cps_state)
+static MACHINE_CONFIG_START( cps1_10MHz, cps_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_10MHz )	/* verified on pcb */
@@ -3003,30 +3000,27 @@ static MACHINE_DRIVER_START( cps1_10MHz )
 	/* CPS PPU is fed by a 16mhz clock,pin 117 outputs a 4mhz clock which is divided by 4 using 2 74ls74 */
 	MDRV_OKIM6295_ADD("oki", XTAL_16MHz/4/4, OKIM6295_PIN7_HIGH) // pin 7 can be changed by the game code, see f006 on z80
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 #ifndef MESS
-static MACHINE_DRIVER_START( cps1_12MHz )
+static MACHINE_CONFIG_DERIVED( cps1_12MHz, cps1_10MHz )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(cps1_10MHz)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_CLOCK( XTAL_12MHz )	/* verified on pcb */
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( pang3 )
+static MACHINE_CONFIG_DERIVED( pang3, cps1_12MHz )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(cps1_12MHz)
 
 	MDRV_EEPROM_ADD("eeprom", pang3_eeprom_interface)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( qsound )
+static MACHINE_CONFIG_DERIVED( qsound, cps1_12MHz )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(cps1_12MHz)
 
 	MDRV_CPU_REPLACE("maincpu", M68000, XTAL_12MHz )	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(qsound_main_map)
@@ -3050,14 +3044,11 @@ static MACHINE_DRIVER_START( qsound )
 	MDRV_SOUND_ADD("qsound", QSOUND, QSOUND_CLOCK)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* bootlegs with PIC */
 
-static MACHINE_DRIVER_START( cpspicb )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(cps_state)
+static MACHINE_CONFIG_START( cpspicb, cps_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
@@ -3089,15 +3080,14 @@ static MACHINE_DRIVER_START( cpspicb )
 
 	MDRV_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( wofhfh )
+static MACHINE_CONFIG_DERIVED( wofhfh, cps1_12MHz )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(cps1_12MHz)
 
 	MDRV_EEPROM_ADD("eeprom", qsound_eeprom_interface)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* incomplete */
 static ADDRESS_MAP_START( sf2mdt_z80map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -3133,10 +3123,7 @@ static const msm5205_interface msm5205_interface2 =
 	MSM5205_S96_4B		/* 4KHz 4-bit */
 };
 
-static MACHINE_DRIVER_START( sf2mdt )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(cps_state)
+static MACHINE_CONFIG_START( sf2mdt, cps_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
@@ -3179,7 +3166,7 @@ static MACHINE_DRIVER_START( sf2mdt )
 	MDRV_SOUND_ADD("msm2", MSM5205, 24000000/64)	/* ? */
 	MDRV_SOUND_CONFIG(msm5205_interface2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*
 
@@ -3221,10 +3208,7 @@ Note:
 
 */
 
-static MACHINE_DRIVER_START( knightsb )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(cps_state)
+static MACHINE_CONFIG_START( knightsb, cps_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 24000000 / 2)
@@ -3267,7 +3251,7 @@ static MACHINE_DRIVER_START( knightsb )
 	MDRV_SOUND_ADD("msm2", MSM5205, 24000000/64)	/* ? */
 	MDRV_SOUND_CONFIG(msm5205_interface2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 #endif

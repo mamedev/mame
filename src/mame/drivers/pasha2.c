@@ -413,10 +413,7 @@ static MACHINE_RESET( pasha2 )
 	state->vbuffer = 0;
 }
 
-static MACHINE_DRIVER_START( pasha2 )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(pasha2_state)
+static MACHINE_CONFIG_START( pasha2, pasha2_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", E116XT, 20000000*4)		/* 4x internal multiplier */
@@ -451,7 +448,7 @@ static MACHINE_DRIVER_START( pasha2 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	//and ATMEL DREAM SAM9773
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( pasha2 )
 	ROM_REGION16_BE( 0x80000, "user1", 0 ) /* Hyperstone CPU Code */

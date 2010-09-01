@@ -176,7 +176,7 @@ static INPUT_PORTS_START( targeth )
 INPUT_PORTS_END
 
 
-static MACHINE_DRIVER_START( targeth )
+static MACHINE_CONFIG_START( targeth, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,24000000/2)			/* 12 MHz */
@@ -202,7 +202,7 @@ static MACHINE_DRIVER_START( targeth )
 
 	MDRV_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( targeth )
 	ROM_REGION( 0x100000, "maincpu", 0 )	/* 68000 code */

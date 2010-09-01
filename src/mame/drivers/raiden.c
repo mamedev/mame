@@ -258,7 +258,7 @@ static VIDEO_EOF( raiden )
 	buffer_spriteram16_w(space,0,0,0xffff); /* Could be a memory location instead */
 }
 
-static MACHINE_DRIVER_START( raiden )
+static MACHINE_CONFIG_START( raiden, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V30,XTAL_20MHz/2) /* NEC V30 CPU, 20MHz verified on pcb */
@@ -294,19 +294,16 @@ static MACHINE_DRIVER_START( raiden )
 
 	/* sound hardware */
 	SEIBU_SOUND_SYSTEM_YM3812_RAIDEN_INTERFACE(XTAL_14_31818MHz/4,XTAL_12MHz/12) // frequency and pin 7 verified (pin set in audio\seibu.h)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( raidena )
-
-	MDRV_IMPORT_FROM( raiden )
+static MACHINE_CONFIG_DERIVED( raidena, raiden )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(alt_main_map)
 
 	MDRV_VIDEO_START(raidena)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( raidenu )
-	MDRV_IMPORT_FROM( raiden )
+static MACHINE_CONFIG_DERIVED( raidenu, raiden )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(raidenu_main_map)
@@ -315,7 +312,7 @@ static MACHINE_DRIVER_START( raidenu )
 	MDRV_CPU_PROGRAM_MAP(raidenu_sub_map)
 
 	MDRV_VIDEO_START(raidena)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************/

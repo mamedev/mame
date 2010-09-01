@@ -2744,7 +2744,7 @@ static const mc6845_interface mc6845_intf =
 *                Machine Drivers                 *
 *************************************************/
 
-static MACHINE_DRIVER_START( sys903 )
+static MACHINE_CONFIG_START( sys903, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, CPU_CLOCK)	/* confirmed */
 	MDRV_CPU_PROGRAM_MAP(sys903_map)
@@ -2780,12 +2780,12 @@ static MACHINE_DRIVER_START( sys903 )
 
 	/* acia */
 	MDRV_ACIA6850_ADD("acia6850_0", acia6850_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( s903mod )
+static MACHINE_CONFIG_DERIVED( s903mod, sys903 )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM( sys903 )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(s903mod_map)
@@ -2796,12 +2796,12 @@ static MACHINE_DRIVER_START( s903mod )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	MDRV_DEVICE_REMOVE("acia6850_0")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( sys905 )
+static MACHINE_CONFIG_DERIVED( sys905, sys903 )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM( sys903 )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(sys905_map)
@@ -2815,12 +2815,12 @@ static MACHINE_DRIVER_START( sys905 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	MDRV_DEVICE_REMOVE("acia6850_0")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( sys906 )
+static MACHINE_CONFIG_DERIVED( sys906, sys903 )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM( sys903 )
 
 	MDRV_CPU_REPLACE("maincpu", M65C02, CPU_CLOCK)	/* guess */
 	MDRV_CPU_PROGRAM_MAP(sys906_map)
@@ -2836,7 +2836,7 @@ static MACHINE_DRIVER_START( sys906 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	MDRV_DEVICE_REMOVE("acia6850_0")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************************************

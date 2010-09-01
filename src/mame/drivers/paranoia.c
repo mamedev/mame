@@ -135,7 +135,7 @@ static const c6280_interface c6280_config =
 	"maincpu"
 };
 
-static MACHINE_DRIVER_START( paranoia )
+static MACHINE_CONFIG_START( paranoia, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", H6280, PCE_MAIN_CLOCK/3)
 	MDRV_CPU_PROGRAM_MAP(pce_mem)
@@ -171,7 +171,7 @@ static MACHINE_DRIVER_START( paranoia )
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.00)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.00)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START(paranoia)
 	ROM_REGION( 0x40000, "maincpu", 0 )

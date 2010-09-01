@@ -327,7 +327,7 @@ static const psx_spu_interface konamigv_psxspu_interface =
 	psx_dma_install_write_handler
 };
 
-static MACHINE_DRIVER_START( konamigv )
+static MACHINE_CONFIG_START( konamigv, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",  PSXCPU, XTAL_67_7376MHz )
 	MDRV_CPU_PROGRAM_MAP( konamigv_map)
@@ -363,7 +363,7 @@ static MACHINE_DRIVER_START( konamigv )
 	MDRV_SOUND_ADD( "cdda", CDDA, 0 )
 	MDRV_SOUND_ROUTE( 0, "lspeaker", 1.0 )
 	MDRV_SOUND_ROUTE( 1, "rspeaker", 1.0 )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( konamigv )
 	PORT_START("P1")
@@ -537,10 +537,9 @@ static DRIVER_INIT( simpbowl )
 	DRIVER_INIT_CALL(konamigv);
 }
 
-static MACHINE_DRIVER_START( simpbowl )
-	MDRV_IMPORT_FROM( konamigv )
+static MACHINE_CONFIG_DERIVED( simpbowl, konamigv )
 	MDRV_NVRAM_HANDLER( simpbowl )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( simpbowl )
 	PORT_INCLUDE( konamigv )
@@ -624,10 +623,9 @@ static DRIVER_INIT( btchamp )
 	DRIVER_INIT_CALL(konamigv);
 }
 
-static MACHINE_DRIVER_START( btchamp )
-	MDRV_IMPORT_FROM( konamigv )
+static MACHINE_CONFIG_DERIVED( btchamp, konamigv )
 	MDRV_NVRAM_HANDLER( btchamp )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( btchamp )
 	PORT_INCLUDE( konamigv )
@@ -715,10 +713,9 @@ static DRIVER_INIT( kdeadeye )
 	DRIVER_INIT_CALL(konamigv);
 }
 
-static MACHINE_DRIVER_START( kdeadeye )
-	MDRV_IMPORT_FROM( konamigv )
+static MACHINE_CONFIG_DERIVED( kdeadeye, konamigv )
 	MDRV_NVRAM_HANDLER( btchamp )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( kdeadeye )
 	PORT_INCLUDE( konamigv )

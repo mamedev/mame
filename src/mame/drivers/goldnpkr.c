@@ -2287,7 +2287,7 @@ DISCRETE_SOUND_END
 *              Machine Drivers               *
 *********************************************/
 
-static MACHINE_DRIVER_START( goldnpkr_base )
+static MACHINE_CONFIG_START( goldnpkr_base, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, CPU_CLOCK)
@@ -2314,24 +2314,20 @@ static MACHINE_DRIVER_START( goldnpkr_base )
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_VIDEO_START(goldnpkr)
 	MDRV_VIDEO_UPDATE(goldnpkr)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( goldnpkr )
-
-	MDRV_IMPORT_FROM(goldnpkr_base)
+static MACHINE_CONFIG_DERIVED( goldnpkr, goldnpkr_base )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(goldnpkr)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( pottnpkr )
-
-	MDRV_IMPORT_FROM(goldnpkr_base)
+static MACHINE_CONFIG_DERIVED( pottnpkr, goldnpkr_base )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
@@ -2344,12 +2340,10 @@ static MACHINE_DRIVER_START( pottnpkr )
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(pottnpkr)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( witchcrd )
-
-	MDRV_IMPORT_FROM(goldnpkr_base)
+static MACHINE_CONFIG_DERIVED( witchcrd, goldnpkr_base )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
@@ -2365,12 +2359,10 @@ static MACHINE_DRIVER_START( witchcrd )
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(goldnpkr)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( genie )
-
-	MDRV_IMPORT_FROM(goldnpkr_base)
+static MACHINE_CONFIG_DERIVED( genie, goldnpkr_base )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
@@ -2386,7 +2378,7 @@ static MACHINE_DRIVER_START( genie )
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(goldnpkr)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*********************************************

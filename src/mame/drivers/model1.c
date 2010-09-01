@@ -1496,7 +1496,7 @@ ROM_START( wingwarj )
 ROM_END
 
 
-static MACHINE_DRIVER_START( model1 )
+static MACHINE_CONFIG_START( model1, driver_data_t )
 	MDRV_CPU_ADD("maincpu", V60, 16000000)
 	MDRV_CPU_PROGRAM_MAP(model1_mem)
 	MDRV_CPU_IO_MAP(model1_io)
@@ -1534,9 +1534,9 @@ static MACHINE_DRIVER_START( model1 )
 	MDRV_SOUND_ADD("sega2", MULTIPCM, 8000000)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( model1_vr )
+static MACHINE_CONFIG_START( model1_vr, driver_data_t )
 	MDRV_CPU_ADD("maincpu", V60, 16000000)
 	MDRV_CPU_PROGRAM_MAP(model1_vr_mem)
 	MDRV_CPU_IO_MAP(model1_vr_io)
@@ -1578,7 +1578,7 @@ static MACHINE_DRIVER_START( model1_vr )
 	MDRV_SOUND_ADD("sega2", MULTIPCM, 8000000)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 GAME( 1993, vf,       0,       model1,    vf,       0, ROT0, "Sega", "Virtua Fighter", GAME_IMPERFECT_GRAPHICS )
 GAME( 1992, vr,       0,       model1_vr, vr,       0, ROT0, "Sega", "Virtua Racing", GAME_IMPERFECT_GRAPHICS )

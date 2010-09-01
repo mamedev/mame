@@ -333,10 +333,7 @@ static MACHINE_RESET( bladestl )
 		state->last_track[i] = 0;
 }
 
-static MACHINE_DRIVER_START( bladestl )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(bladestl_state)
+static MACHINE_CONFIG_START( bladestl, bladestl_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", HD6309, 24000000/2)		/* 24MHz/2 (?) */
@@ -380,7 +377,7 @@ static MACHINE_DRIVER_START( bladestl )
 	MDRV_SOUND_ADD("ymsnd", YM2203, 3579545)
 	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************************

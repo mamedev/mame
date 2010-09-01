@@ -242,10 +242,7 @@ static MACHINE_RESET( battlnts )
 	state->spritebank = 0;
 }
 
-static MACHINE_DRIVER_START( battlnts )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(battlnts_state)
+static MACHINE_CONFIG_START( battlnts, battlnts_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", HD6309, XTAL_24MHz / 2 /* 3000000*4? */)
@@ -281,7 +278,7 @@ static MACHINE_DRIVER_START( battlnts )
 
 	MDRV_SOUND_ADD("ym2", YM3812, XTAL_24MHz / 8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************************

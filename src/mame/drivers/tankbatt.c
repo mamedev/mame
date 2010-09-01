@@ -297,7 +297,7 @@ static const samples_interface tankbatt_samples_interface =
 
 
 
-static MACHINE_DRIVER_START( tankbatt )
+static MACHINE_CONFIG_START( tankbatt, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 1000000)	/* 1 MHz ???? */
@@ -325,7 +325,7 @@ static MACHINE_DRIVER_START( tankbatt )
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(tankbatt_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

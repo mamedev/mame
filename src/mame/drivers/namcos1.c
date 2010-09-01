@@ -1077,7 +1077,7 @@ static const namco_interface namco_config =
     LPF info : Fco = 3.3KHz , g = -12dB/oct
 */
 
-static MACHINE_DRIVER_START( ns1 )
+static MACHINE_CONFIG_START( ns1, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809,49152000/32)
@@ -1136,7 +1136,7 @@ static MACHINE_DRIVER_START( ns1 )
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

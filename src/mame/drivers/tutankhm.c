@@ -218,10 +218,7 @@ static MACHINE_RESET( tutankhm )
 	state->flip_y = 0;
 }
 
-static MACHINE_DRIVER_START( tutankhm )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(timeplt_state)
+static MACHINE_CONFIG_START( tutankhm, timeplt_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, XTAL_18_432MHz/12)	/* 1.5 MHz ??? */
@@ -242,8 +239,8 @@ static MACHINE_DRIVER_START( tutankhm )
 	MDRV_VIDEO_UPDATE(tutankhm)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(timeplt_sound)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(timeplt_sound)
+MACHINE_CONFIG_END
 
 
 /*************************************

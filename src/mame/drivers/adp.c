@@ -632,10 +632,7 @@ static const ay8910_interface ay8910_config =
 static const hd63484_interface adp_hd63484_intf = { 0 };
 static const hd63484_interface skattva_hd63484_intf = { 1 };	// skattva hd63484 hack. to be removed once the video controller emulation is complete!
 
-static MACHINE_DRIVER_START( quickjac )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(adp_state)
+static MACHINE_CONFIG_START( quickjac, adp_state )
 
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)
 	MDRV_CPU_PROGRAM_MAP(quickjac_mem)
@@ -665,12 +662,9 @@ static MACHINE_DRIVER_START( quickjac )
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( skattv )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(adp_state)
+static MACHINE_CONFIG_START( skattv, adp_state )
 
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)
 	MDRV_CPU_PROGRAM_MAP(skattv_mem)
@@ -700,19 +694,15 @@ static MACHINE_DRIVER_START( skattv )
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( skattva )
-	MDRV_IMPORT_FROM( skattv )
+static MACHINE_CONFIG_DERIVED( skattva, skattv )
 
 	MDRV_DEVICE_REMOVE("hd63484")
 	MDRV_HD63484_ADD("hd63484", skattva_hd63484_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( backgamn )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(adp_state)
+static MACHINE_CONFIG_START( backgamn, adp_state )
 
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)
 	MDRV_CPU_PROGRAM_MAP(backgamn_mem)
@@ -741,22 +731,20 @@ static MACHINE_DRIVER_START( backgamn )
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( funland )
-	MDRV_IMPORT_FROM( skattv )
+static MACHINE_CONFIG_DERIVED( funland, skattv )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(funland_mem)
 
 	MDRV_PALETTE_LENGTH(0x100)
 	MDRV_PALETTE_INIT(all_black)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( fstation )
-	MDRV_IMPORT_FROM( skattv )
+static MACHINE_CONFIG_DERIVED( fstation, skattv )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(fstation_mem)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( quickjac )

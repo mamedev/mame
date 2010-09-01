@@ -424,7 +424,7 @@ static const ym2203_interface kothello_ym2203_interface =
 
 static const hd63484_interface shanghai_hd63484_intf = { 0 };
 
-static MACHINE_DRIVER_START( shanghai )
+static MACHINE_CONFIG_START( shanghai, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V30,16000000/2)	/* ? */
@@ -456,10 +456,10 @@ static MACHINE_DRIVER_START( shanghai )
 	MDRV_SOUND_ROUTE(1, "mono", 0.15)
 	MDRV_SOUND_ROUTE(2, "mono", 0.15)
 	MDRV_SOUND_ROUTE(3, "mono", 0.80)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( shangha2 )
+static MACHINE_CONFIG_START( shangha2, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V30,16000000/2)	/* ? */
@@ -490,10 +490,10 @@ static MACHINE_DRIVER_START( shangha2 )
 	MDRV_SOUND_ROUTE(1, "mono", 0.15)
 	MDRV_SOUND_ROUTE(2, "mono", 0.15)
 	MDRV_SOUND_ROUTE(3, "mono", 0.80)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( kothello )
+static MACHINE_CONFIG_START( kothello, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V30,16000000/2)	/* ? */
@@ -532,7 +532,7 @@ static MACHINE_DRIVER_START( kothello )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
 	SEIBU_SOUND_SYSTEM_ADPCM_INTERFACE
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

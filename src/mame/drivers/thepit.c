@@ -648,7 +648,7 @@ static const ay8910_interface ay8910_config =
 };
 
 
-static MACHINE_DRIVER_START( thepit )
+static MACHINE_CONFIG_START( thepit, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, PIXEL_CLOCK/2)     /* 3.072 MHz */
@@ -681,30 +681,28 @@ static MACHINE_DRIVER_START( thepit )
 
 	MDRV_SOUND_ADD("ay2", AY8910, PIXEL_CLOCK/4)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( intrepid )
+static MACHINE_CONFIG_DERIVED( intrepid, thepit )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(thepit)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(intrepid_main_map)
 
 	/* video hardware */
 	MDRV_GFXDECODE(intrepid)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( suprmous )
+static MACHINE_CONFIG_DERIVED( suprmous, intrepid )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(intrepid)
 
 	/* video hardware */
 	MDRV_PALETTE_INIT(suprmous)
 	MDRV_GFXDECODE(suprmous)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

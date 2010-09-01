@@ -303,7 +303,7 @@ static INTERRUPT_GEN( cabaret_interrupt )
 		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_DRIVER_START( cabaret )
+static MACHINE_CONFIG_START( cabaret, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z180, XTAL_12MHz / 2)
 	MDRV_CPU_PROGRAM_MAP(cabaret_map)
@@ -330,7 +330,7 @@ static MACHINE_DRIVER_START( cabaret )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 static DRIVER_INIT( cabaret )

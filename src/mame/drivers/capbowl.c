@@ -369,10 +369,7 @@ static MACHINE_RESET( capbowl )
 }
 
 
-static MACHINE_DRIVER_START( capbowl )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(capbowl_state)
+static MACHINE_CONFIG_START( capbowl, capbowl_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809E, MASTER_CLOCK)
@@ -410,13 +407,12 @@ static MACHINE_DRIVER_START( capbowl )
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( bowlrama )
+static MACHINE_CONFIG_DERIVED( bowlrama, capbowl )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(capbowl)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(bowlrama_map)
@@ -424,7 +420,7 @@ static MACHINE_DRIVER_START( bowlrama )
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 359, 0, 239)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

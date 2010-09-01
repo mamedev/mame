@@ -307,10 +307,7 @@ static MACHINE_RESET( gbusters )
 	state->priority = 0;
 }
 
-static MACHINE_DRIVER_START( gbusters )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(gbusters_state)
+static MACHINE_CONFIG_START( gbusters, gbusters_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", KONAMI, 3000000)	/* Konami custom 052526 */
@@ -352,7 +349,7 @@ static MACHINE_DRIVER_START( gbusters )
 	MDRV_SOUND_CONFIG(k007232_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.30)
 	MDRV_SOUND_ROUTE(1, "mono", 0.30)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

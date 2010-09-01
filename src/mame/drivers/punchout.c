@@ -946,7 +946,7 @@ static MACHINE_RESET( punchout )
 }
 
 
-static MACHINE_DRIVER_START( punchout )
+static MACHINE_CONFIG_START( punchout, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 8000000/2)	/* 4 MHz */
@@ -992,13 +992,12 @@ static MACHINE_DRIVER_START( punchout )
 
 	MDRV_SOUND_ADD("vlm", VLM5030, 3580000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( armwrest )
+static MACHINE_CONFIG_DERIVED( armwrest, punchout )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(punchout)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(armwrest_map)
@@ -1008,7 +1007,7 @@ static MACHINE_DRIVER_START( armwrest )
 
 	MDRV_VIDEO_START(armwrest)
 	MDRV_VIDEO_UPDATE(armwrest)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

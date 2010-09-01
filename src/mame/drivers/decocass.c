@@ -626,10 +626,7 @@ static PALETTE_INIT( decocass )
 }
 
 
-static MACHINE_DRIVER_START( decocass )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(decocass_state)
+static MACHINE_CONFIG_START( decocass, decocass_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, HCLK4)
@@ -669,241 +666,212 @@ static MACHINE_DRIVER_START( decocass )
 
 	MDRV_SOUND_ADD("ay2", AY8910, HCLK2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( ctsttape )
+static MACHINE_CONFIG_DERIVED( ctsttape, decocass )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(decocass)
 	MDRV_MACHINE_RESET(ctsttape)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( chwy )
+static MACHINE_CONFIG_DERIVED( chwy, decocass )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(decocass)
 	MDRV_MACHINE_RESET(chwy)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( clocknch )
+static MACHINE_CONFIG_DERIVED( clocknch, decocass )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(decocass)
 	MDRV_MACHINE_RESET(clocknch)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( ctisland )
+static MACHINE_CONFIG_DERIVED( ctisland, decocass )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(decocass)
 	MDRV_MACHINE_RESET(ctisland)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( csuperas )
+static MACHINE_CONFIG_DERIVED( csuperas, decocass )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(decocass)
 	MDRV_MACHINE_RESET(csuperas)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( castfant )
+static MACHINE_CONFIG_DERIVED( castfant, decocass )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(decocass)
 	MDRV_MACHINE_RESET(castfant)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( cluckypo )
+static MACHINE_CONFIG_DERIVED( cluckypo, decocass )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(decocass)
 	MDRV_MACHINE_RESET(cluckypo)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( cterrani )
+static MACHINE_CONFIG_DERIVED( cterrani, decocass )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(decocass)
 	MDRV_MACHINE_RESET(cterrani)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( cexplore )
+static MACHINE_CONFIG_DERIVED( cexplore, decocass )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(decocass)
 	MDRV_MACHINE_RESET(cexplore)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( cprogolf )
+static MACHINE_CONFIG_DERIVED( cprogolf, decocass )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(decocass)
 	MDRV_MACHINE_RESET(cprogolf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( cmissnx )
+static MACHINE_CONFIG_DERIVED( cmissnx, decocass )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(decocass)
 	MDRV_MACHINE_RESET(cmissnx)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( cdiscon1 )
+static MACHINE_CONFIG_DERIVED( cdiscon1, decocass )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(decocass)
 	MDRV_MACHINE_RESET(cdiscon1)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( cptennis )
+static MACHINE_CONFIG_DERIVED( cptennis, decocass )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(decocass)
 	MDRV_MACHINE_RESET(cptennis)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( ctornado )
+static MACHINE_CONFIG_DERIVED( ctornado, decocass )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(decocass)
 	MDRV_MACHINE_RESET(ctornado)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( cbnj )
+static MACHINE_CONFIG_DERIVED( cbnj, decocass )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(decocass)
 	MDRV_MACHINE_RESET(cbnj)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( cburnrub )
+static MACHINE_CONFIG_DERIVED( cburnrub, decocass )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(decocass)
 	MDRV_MACHINE_RESET(cburnrub)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( cbtime )
+static MACHINE_CONFIG_DERIVED( cbtime, decocass )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(decocass)
 	MDRV_MACHINE_RESET(cbtime)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( cgraplop )
+static MACHINE_CONFIG_DERIVED( cgraplop, decocass )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(decocass)
 	MDRV_MACHINE_RESET(cgraplop)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( cgraplop2 )
+static MACHINE_CONFIG_DERIVED( cgraplop2, decocass )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(decocass)
 	MDRV_MACHINE_RESET(cgraplop2)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( clapapa )
+static MACHINE_CONFIG_DERIVED( clapapa, decocass )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(decocass)
 	MDRV_MACHINE_RESET(clapapa)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( cfghtice )
+static MACHINE_CONFIG_DERIVED( cfghtice, decocass )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(decocass)
 	MDRV_MACHINE_RESET(cfghtice)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( cprobowl )
+static MACHINE_CONFIG_DERIVED( cprobowl, decocass )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(decocass)
 	MDRV_MACHINE_RESET(cprobowl)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( cnightst )
+static MACHINE_CONFIG_DERIVED( cnightst, decocass )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(decocass)
 	MDRV_MACHINE_RESET(cnightst)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( cprosocc )
+static MACHINE_CONFIG_DERIVED( cprosocc, decocass )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(decocass)
 	MDRV_MACHINE_RESET(cprosocc)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( cppicf )
+static MACHINE_CONFIG_DERIVED( cppicf, decocass )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(decocass)
 	MDRV_MACHINE_RESET(cppicf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( cbdash )
+static MACHINE_CONFIG_DERIVED( cbdash, decocass )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(decocass)
 	MDRV_MACHINE_RESET(cbdash)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( cscrtry )
+static MACHINE_CONFIG_DERIVED( cscrtry, decocass )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(decocass)
 	MDRV_MACHINE_RESET(cscrtry)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( cflyball )
+static MACHINE_CONFIG_DERIVED( cflyball, decocass )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(decocass)
 	MDRV_MACHINE_RESET(cflyball)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( czeroize )
+static MACHINE_CONFIG_DERIVED( czeroize, decocass )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(decocass)
 	MDRV_MACHINE_RESET(czeroize)
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 32*8-1, 1*8, 31*8-1)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 #define ROM_LOAD_BIOS(bios,name,offset,length,hash) \

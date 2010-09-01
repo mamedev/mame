@@ -439,10 +439,7 @@ static MACHINE_RESET( mainevt )
 	state->nmi_enable = 0;
 }
 
-static MACHINE_DRIVER_START( mainevt )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(mainevt_state)
+static MACHINE_CONFIG_START( mainevt, mainevt_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", HD6309, 3000000*4)	/* ?? */
@@ -484,7 +481,7 @@ static MACHINE_DRIVER_START( mainevt )
 
 	MDRV_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 static const k052109_interface dv_k052109_intf =
@@ -503,10 +500,7 @@ static const k051960_interface dv_k051960_intf =
 	dv_sprite_callback
 };
 
-static MACHINE_DRIVER_START( devstors )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(mainevt_state)
+static MACHINE_CONFIG_START( devstors, mainevt_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", HD6309, 3000000*4)	/* ?? */
@@ -550,7 +544,7 @@ static MACHINE_DRIVER_START( devstors )
 	MDRV_SOUND_CONFIG(k007232_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.20)
 	MDRV_SOUND_ROUTE(1, "mono", 0.20)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

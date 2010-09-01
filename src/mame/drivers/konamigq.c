@@ -357,7 +357,7 @@ static MACHINE_RESET( konamigq )
 	psx_machine_init(machine);
 }
 
-static MACHINE_DRIVER_START( konamigq )
+static MACHINE_CONFIG_START( konamigq, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",  PSXCPU, XTAL_67_7376MHz )
 	MDRV_CPU_PROGRAM_MAP( konamigq_map)
@@ -398,7 +398,7 @@ static MACHINE_DRIVER_START( konamigq )
 	MDRV_SOUND_CONFIG(k054539_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( konamigq )
 	PORT_START("GUNX1")

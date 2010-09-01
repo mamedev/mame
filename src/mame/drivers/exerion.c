@@ -413,10 +413,7 @@ static MACHINE_RESET( exerion )
 		state->background_latches[i] = 0;
 }
 
-static MACHINE_DRIVER_START( exerion )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(exerion_state)
+static MACHINE_CONFIG_START( exerion, exerion_state )
 
 	MDRV_CPU_ADD("maincpu", Z80, EXERION_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(main_map)
@@ -448,7 +445,7 @@ static MACHINE_DRIVER_START( exerion )
 	MDRV_SOUND_ADD("ay2", AY8910, EXERION_AY8910_CLOCK)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

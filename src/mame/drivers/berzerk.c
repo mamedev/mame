@@ -1043,7 +1043,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( berzerk )
+static MACHINE_CONFIG_START( berzerk, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MAIN_CPU_CLOCK)
@@ -1073,16 +1073,15 @@ static MACHINE_DRIVER_START( berzerk )
 
 	MDRV_SOUND_ADD("exidy", EXIDY, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( frenzy )
+static MACHINE_CONFIG_DERIVED( frenzy, berzerk )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(berzerk)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(frenzy_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

@@ -278,7 +278,7 @@ static INTERRUPT_GEN( sengokmj_interrupt )
 	cpu_set_input_line_and_vector(device,0,HOLD_LINE,0xc8/4);
 }
 
-static MACHINE_DRIVER_START( sengokmj )
+static MACHINE_CONFIG_START( sengokmj, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V30, 16000000/2) /* V30-8 */
@@ -307,7 +307,7 @@ static MACHINE_DRIVER_START( sengokmj )
 
 	/* sound hardware */
 	SEIBU_SOUND_SYSTEM_YM3812_INTERFACE(14318180/4,1320000)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( sengokmj )

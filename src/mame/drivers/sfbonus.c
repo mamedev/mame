@@ -1246,7 +1246,7 @@ static NVRAM_HANDLER( sfbonus )
 }
 
 
-static MACHINE_DRIVER_START( sfbonus )
+static MACHINE_CONFIG_START( sfbonus, driver_data_t )
 	MDRV_CPU_ADD("maincpu", Z80, 6000000) // custom packaged z80 CPU ?? Mhz
 	MDRV_CPU_PROGRAM_MAP(sfbonus_map)
 	MDRV_CPU_IO_MAP(sfbonus_io)
@@ -1276,7 +1276,7 @@ static MACHINE_DRIVER_START( sfbonus )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* Skill Fruit Bonus */

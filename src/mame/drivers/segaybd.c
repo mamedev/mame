@@ -1003,10 +1003,7 @@ static const sega_pcm_interface segapcm_interface =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( yboard )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(segas1x_state)
+static MACHINE_CONFIG_START( yboard, segas1x_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, MASTER_CLOCK/4)
@@ -1063,7 +1060,7 @@ static MACHINE_DRIVER_START( yboard )
 	MDRV_SOUND_CONFIG(segapcm_interface)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

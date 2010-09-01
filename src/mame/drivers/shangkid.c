@@ -373,7 +373,7 @@ static const ay8910_interface shangkid_ay8910_interface =
 };
 
 
-static MACHINE_DRIVER_START( chinhero )
+static MACHINE_CONFIG_START( chinhero, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6) /* verified on pcb */
@@ -417,13 +417,12 @@ static MACHINE_DRIVER_START( chinhero )
 	MDRV_SOUND_ADD("aysnd", AY8910, XTAL_18_432MHz/12) /* verified on pcb */
 	MDRV_SOUND_CONFIG(chinhero_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( shangkid )
+static MACHINE_CONFIG_DERIVED( shangkid, chinhero )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(chinhero)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(shangkid_main_map)
 
@@ -441,7 +440,7 @@ static MACHINE_DRIVER_START( shangkid )
 
 	MDRV_SOUND_MODIFY("aysnd")
 	MDRV_SOUND_CONFIG(shangkid_ay8910_interface)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -466,7 +465,7 @@ static ADDRESS_MAP_START( dynamski_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_data_address_w)
 ADDRESS_MAP_END
 
-static MACHINE_DRIVER_START( dynamski )
+static MACHINE_CONFIG_START( dynamski, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3000000) /* ? */
@@ -493,7 +492,7 @@ static MACHINE_DRIVER_START( dynamski )
 
 	MDRV_SOUND_ADD("aysnd", AY8910, 2000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************************/
 

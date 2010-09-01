@@ -187,10 +187,7 @@ static MACHINE_RESET( kopunch )
 	state->gfxbank = 0;
 }
 
-static MACHINE_DRIVER_START( kopunch )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(kopunch_state)
+static MACHINE_CONFIG_START( kopunch, kopunch_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8085A, 4000000)	/* 4 MHz ???? Uses SIM, must be 8085 */
@@ -217,7 +214,7 @@ static MACHINE_DRIVER_START( kopunch )
 	MDRV_VIDEO_UPDATE(kopunch)
 
 	/* sound hardware */
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

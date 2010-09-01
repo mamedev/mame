@@ -436,10 +436,7 @@ static MACHINE_RESET( cop01 )
 }
 
 
-static MACHINE_DRIVER_START( cop01 )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(cop01_state)
+static MACHINE_CONFIG_START( cop01, cop01_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)	/* ???? */
@@ -480,12 +477,9 @@ static MACHINE_DRIVER_START( cop01 )
 
 	MDRV_SOUND_ADD("ay3", AY8910, 1500000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( mightguy )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(cop01_state)
+static MACHINE_CONFIG_START( mightguy, cop01_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)	/* ???? */
@@ -520,7 +514,7 @@ static MACHINE_DRIVER_START( mightguy )
 
 	MDRV_SOUND_ADD("ymsnd", YM3526, 4000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

@@ -684,7 +684,7 @@ DISCRETE_SOUND_EXTERN( cliffhgr );
  *
  *************************************/
 
-static MACHINE_DRIVER_START( cliffhgr )
+static MACHINE_CONFIG_START( cliffhgr, driver_data_t )
 
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)       /* 4MHz */
 	MDRV_CPU_PROGRAM_MAP(mainmem)
@@ -701,7 +701,7 @@ static MACHINE_DRIVER_START( cliffhgr )
 	MDRV_LASERDISC_OVERLAY_CLIP(15-12, 15+32*8+12-1, 27-9, 27+24*8+9-1)
 
 	/* start with the TMS9928a video configuration */
-	MDRV_IMPORT_FROM(tms9928a)
+	MDRV_FRAGMENT_ADD(tms9928a)
 
 	/* override video rendering and raw screen info */
 	MDRV_DEVICE_REMOVE("screen")
@@ -717,7 +717,7 @@ static MACHINE_DRIVER_START( cliffhgr )
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(cliffhgr)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

@@ -418,7 +418,7 @@ static VIDEO_UPDATE(triforce)
 static INPUT_PORTS_START( triforce )
 INPUT_PORTS_END
 
-static MACHINE_DRIVER_START( triforce_base )
+static MACHINE_CONFIG_START( triforce_base, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", PPC403GA, 64000000) /* Wrong! */
@@ -437,12 +437,11 @@ static MACHINE_DRIVER_START( triforce_base )
 
 	MDRV_VIDEO_START(triforce)
 	MDRV_VIDEO_UPDATE(triforce)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( triforcegd )
-	MDRV_IMPORT_FROM(triforce_base)
+static MACHINE_CONFIG_DERIVED( triforcegd, triforce_base )
 	MDRV_NAOMI_DIMM_BOARD_ADD("rom_board", "gdrom", "user1", "picreturn")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
 		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_BIOS(bios+1)) /* Note '+1' */

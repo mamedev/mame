@@ -591,7 +591,7 @@ static const tms34010_config tms_config_lethalj =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( gameroom )
+static MACHINE_CONFIG_START( gameroom, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", TMS34010, MASTER_CLOCK)
@@ -622,18 +622,17 @@ static MACHINE_DRIVER_START( gameroom )
 
 	MDRV_OKIM6295_ADD("oki3", SOUND_CLOCK, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.26)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( lethalj )
-	MDRV_IMPORT_FROM( gameroom )
+static MACHINE_CONFIG_DERIVED( lethalj, gameroom )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_CONFIG(tms_config_lethalj)
 
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_RAW_PARAMS(VIDEO_CLOCK_LETHALJ, 689, 0, 512, 259, 0, 236)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

@@ -1772,7 +1772,7 @@ static const ym2151_interface ym2151_config =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( system24 )
+static MACHINE_CONFIG_START( system24, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, MASTER_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(system24_cpu1_map)
@@ -1810,12 +1810,11 @@ static MACHINE_DRIVER_START( system24 )
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( system24_floppy )
-	MDRV_IMPORT_FROM(system24)
+static MACHINE_CONFIG_DERIVED( system24_floppy, system24 )
 	MDRV_NVRAM_HANDLER(system24)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************************

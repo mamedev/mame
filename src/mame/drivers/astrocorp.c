@@ -460,10 +460,7 @@ GFXDECODE_END
 
 static const UINT16 showhand_default_eeprom[15] =	{0x0001,0x0007,0x000a,0x0003,0x0000,0x0009,0x0003,0x0000,0x0002,0x0001,0x0000,0x0000,0x0000,0x0000,0x0000};
 
-static MACHINE_DRIVER_START( showhand )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(astrocorp_state)
+static MACHINE_CONFIG_START( showhand, astrocorp_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2)
@@ -493,14 +490,13 @@ static MACHINE_DRIVER_START( showhand )
 
 	MDRV_OKIM6295_ADD("oki", XTAL_20MHz/20, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( showhanc )
-	MDRV_IMPORT_FROM( showhand )
+static MACHINE_CONFIG_DERIVED( showhanc, showhand )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(showhanc_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 static INTERRUPT_GEN( skilldrp_irq )
@@ -512,10 +508,7 @@ static INTERRUPT_GEN( skilldrp_irq )
 	}
 }
 
-static MACHINE_DRIVER_START( skilldrp )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(astrocorp_state)
+static MACHINE_CONFIG_START( skilldrp, astrocorp_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2)	// JX-1689F1028N GRX586.V5
@@ -547,14 +540,13 @@ static MACHINE_DRIVER_START( skilldrp )
 
 	MDRV_OKIM6295_ADD("oki", XTAL_24MHz/24, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( speeddrp )
-	MDRV_IMPORT_FROM( skilldrp )
+static MACHINE_CONFIG_DERIVED( speeddrp, skilldrp )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(speeddrp_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

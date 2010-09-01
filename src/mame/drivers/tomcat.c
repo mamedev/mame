@@ -374,7 +374,7 @@ static const riot6532_interface tomcat_riot6532_intf =
 	DEVCB_NULL	// connected to IRQ line of 6502
 };
 
-static MACHINE_DRIVER_START(tomcat)
+static MACHINE_CONFIG_START( tomcat, driver_data_t )
 	MDRV_CPU_ADD("maincpu", M68010, XTAL_12MHz / 2)
 	MDRV_CPU_PROGRAM_MAP(tomcat_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq1_line_assert, 5)
@@ -421,6 +421,6 @@ static MACHINE_DRIVER_START(tomcat)
 	MDRV_SOUND_ADD("ymsnd", YM2151, XTAL_14_31818MHz / 4)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.60)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.60)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 GAME( 1985, tomcat, 0,        tomcat, tomcat, 0, ROT0, "Atari", "TomCat (prototype)", GAME_SUPPORTS_SAVE )

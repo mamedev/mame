@@ -308,10 +308,7 @@ static MACHINE_RESET( pzletime )
 	state->ticket = 0;
 }
 
-static MACHINE_DRIVER_START( pzletime )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(pzletime_state)
+static MACHINE_CONFIG_START( pzletime, pzletime_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M68000,10000000)
@@ -340,7 +337,7 @@ static MACHINE_DRIVER_START( pzletime )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_OKIM6295_ADD("oki", 937500, OKIM6295_PIN7_HIGH) //freq & pin7 taken from stlforce
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

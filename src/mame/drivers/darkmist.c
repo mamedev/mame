@@ -246,7 +246,7 @@ static INTERRUPT_GEN( darkmist_interrupt )
 
 
 
-static MACHINE_DRIVER_START( darkmist )
+static MACHINE_CONFIG_START( darkmist, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,4000000)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(memmap)
@@ -278,7 +278,7 @@ static MACHINE_DRIVER_START( darkmist )
 	MDRV_SOUND_ROUTE(0, "mono", 1.0)
 	MDRV_SOUND_ROUTE(1, "mono", 1.0)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( darkmist )
 	ROM_REGION( 0x18000, "maincpu", 0 )

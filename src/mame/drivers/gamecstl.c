@@ -656,7 +656,7 @@ static const struct pit8253_config gamecstl_pit8254_config =
 	}
 };
 
-static MACHINE_DRIVER_START(gamecstl)
+static MACHINE_CONFIG_START( gamecstl, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", PENTIUM, 200000000)
@@ -698,7 +698,7 @@ static MACHINE_DRIVER_START(gamecstl)
 	MDRV_VIDEO_START(gamecstl)
 	MDRV_VIDEO_UPDATE(gamecstl)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static void set_gate_a20(running_machine *machine, int a20)
 {

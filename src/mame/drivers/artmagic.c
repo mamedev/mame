@@ -705,7 +705,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( artmagic )
+static MACHINE_CONFIG_START( artmagic, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, MASTER_CLOCK_25MHz/2)
@@ -735,19 +735,17 @@ static MACHINE_DRIVER_START( artmagic )
 
 	MDRV_OKIM6295_ADD("oki", MASTER_CLOCK_40MHz/3/10, OKIM6295_PIN7_LOW)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.65)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( cheesech )
-	MDRV_IMPORT_FROM(artmagic)
+static MACHINE_CONFIG_DERIVED( cheesech, artmagic )
 
 	MDRV_SOUND_MODIFY("oki")
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( stonebal )
-	MDRV_IMPORT_FROM(artmagic)
+static MACHINE_CONFIG_DERIVED( stonebal, artmagic )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(stonebal_map)
@@ -757,7 +755,7 @@ static MACHINE_DRIVER_START( stonebal )
 
 	MDRV_SOUND_MODIFY("oki")
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

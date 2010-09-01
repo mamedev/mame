@@ -508,10 +508,7 @@ static PALETTE_INIT( ddayjlc )
 	}
 }
 
-static MACHINE_DRIVER_START( ddayjlc )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(ddayjlc_state)
+static MACHINE_CONFIG_START( ddayjlc, ddayjlc_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,12000000/3)
@@ -550,7 +547,7 @@ static MACHINE_DRIVER_START( ddayjlc )
 
 	MDRV_SOUND_ADD("ay2", AY8910, 12000000/6)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( ddayjlc )

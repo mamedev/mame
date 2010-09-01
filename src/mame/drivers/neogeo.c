@@ -1337,10 +1337,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( neogeo )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(neogeo_state)
+static MACHINE_CONFIG_START( neogeo, neogeo_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, NEOGEO_MAIN_CPU_CLOCK)
@@ -1379,7 +1376,7 @@ static MACHINE_DRIVER_START( neogeo )
 
 	/* NEC uPD4990A RTC */
 	MDRV_UPD4990A_ADD("upd4990a")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*************************************
  *

@@ -217,7 +217,7 @@ static SOUND_START( redalert )
  *
  *************************************/
 
-static MACHINE_DRIVER_START( redalert_audio_m37b )
+static MACHINE_CONFIG_FRAGMENT( redalert_audio_m37b )
 
 	MDRV_CPU_ADD("audiocpu", M6502, REDALERT_AUDIO_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(redalert_audio_map)
@@ -229,7 +229,7 @@ static MACHINE_DRIVER_START( redalert_audio_m37b )
 	MDRV_SOUND_ROUTE(1, "mono", 0.50)
 	/* channel C is used a noise source and is not connected to a speaker */
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*************************************
  *
@@ -237,7 +237,7 @@ MACHINE_DRIVER_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( redalert_audio_voice )
+static MACHINE_CONFIG_FRAGMENT( redalert_audio_voice )
 
 	MDRV_CPU_ADD("voice", I8085A, REDALERT_VOICE_CPU_CLOCK)
 	MDRV_CPU_CONFIG(redalert_voice_i8085_config)
@@ -245,7 +245,7 @@ static MACHINE_DRIVER_START( redalert_audio_voice )
 
 	MDRV_SOUND_ADD("cvsd", HC55516, REDALERT_HC55516_CLOCK)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*************************************
  *
@@ -253,16 +253,16 @@ MACHINE_DRIVER_END
  *
  *************************************/
 
-MACHINE_DRIVER_START( redalert_audio )
+MACHINE_CONFIG_FRAGMENT( redalert_audio )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_IMPORT_FROM( redalert_audio_m37b )
-	MDRV_IMPORT_FROM( redalert_audio_voice )
+	MDRV_FRAGMENT_ADD( redalert_audio_m37b )
+	MDRV_FRAGMENT_ADD( redalert_audio_voice )
 
 	MDRV_SOUND_START( redalert )
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*************************************
  *
@@ -270,15 +270,15 @@ MACHINE_DRIVER_END
  *
  *************************************/
 
-MACHINE_DRIVER_START( ww3_audio )
+MACHINE_CONFIG_FRAGMENT( ww3_audio )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_IMPORT_FROM( redalert_audio_m37b )
+	MDRV_FRAGMENT_ADD( redalert_audio_m37b )
 
 	MDRV_SOUND_START( redalert_audio )
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*************************************
  *
@@ -405,7 +405,7 @@ static SOUND_START( demoneye )
  *
  *************************************/
 
-MACHINE_DRIVER_START( demoneye_audio )
+MACHINE_CONFIG_FRAGMENT( demoneye_audio )
 
 	MDRV_CPU_ADD("audiocpu", M6802, DEMONEYE_AUDIO_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(demoneye_audio_map)
@@ -423,4 +423,4 @@ MACHINE_DRIVER_START( demoneye_audio )
 	MDRV_SOUND_ADD("ay2", AY8910, DEMONEYE_AY8910_CLOCK)
 	MDRV_SOUND_CONFIG(demoneye_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END

@@ -766,7 +766,7 @@ static const mc6845_interface mc6845_intf =
 *              Machine Drivers               *
 *********************************************/
 
-static MACHINE_DRIVER_START( megadpkr )
+static MACHINE_CONFIG_START( megadpkr, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, CPU_CLOCK)
@@ -797,7 +797,7 @@ static MACHINE_DRIVER_START( megadpkr )
 	MDRV_VIDEO_START(megadpkr)
 	MDRV_VIDEO_UPDATE(megadpkr)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*********************************************

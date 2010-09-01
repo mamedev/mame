@@ -390,7 +390,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( irem_audio_base )
+static MACHINE_CONFIG_FRAGMENT( irem_audio_base )
 
 	MDRV_SOUND_START(irem_audio)
 
@@ -416,9 +416,9 @@ static MACHINE_DRIVER_START( irem_audio_base )
 	MDRV_SOUND_ADD("msm2", MSM5205, XTAL_384kHz) /* verified on pcb */
 	MDRV_SOUND_CONFIG(irem_msm5205_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-MACHINE_DRIVER_START( m52_sound_c_audio )
+MACHINE_CONFIG_FRAGMENT( m52_sound_c_audio )
 
 	MDRV_SOUND_START(irem_audio)
 
@@ -446,21 +446,19 @@ MACHINE_DRIVER_START( m52_sound_c_audio )
 	MDRV_SOUND_CONFIG_DISCRETE(m52_sound_c)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-MACHINE_DRIVER_START( m52_large_audio )	/* 10 yard fight */
-	MDRV_IMPORT_FROM(irem_audio_base)
+MACHINE_CONFIG_DERIVED( m52_large_audio, irem_audio_base )	/* 10 yard fight */
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("iremsound")
 	MDRV_CPU_PROGRAM_MAP(m52_large_sound_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-MACHINE_DRIVER_START( m62_audio )
-	MDRV_IMPORT_FROM(irem_audio_base)
+MACHINE_CONFIG_DERIVED( m62_audio, irem_audio_base )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("iremsound")
 	MDRV_CPU_PROGRAM_MAP(m62_sound_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END

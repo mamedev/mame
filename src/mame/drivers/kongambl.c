@@ -126,7 +126,7 @@ static const k053247_interface k053247_intf =
 	kongambl_sprite_callback
 };
 
-static MACHINE_DRIVER_START( kongambl )
+static MACHINE_CONFIG_START( kongambl, driver_data_t )
 	MDRV_CPU_ADD("maincpu", M68EC020, 25000000)
 	MDRV_CPU_PROGRAM_MAP(kongambl_map)
 
@@ -151,7 +151,7 @@ static MACHINE_DRIVER_START( kongambl )
 	MDRV_K056832_ADD("k056832", k056832_intf)
 
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( kingtut )

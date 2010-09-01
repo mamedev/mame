@@ -166,7 +166,7 @@ static const z80_daisy_config daisy_chain[] =
 };
 
 
-static MACHINE_DRIVER_START( ldv1000 )
+static MACHINE_CONFIG_FRAGMENT( ldv1000 )
 	MDRV_CPU_ADD("ldv1000", Z80, XTAL_5MHz/2)
 	MDRV_CPU_CONFIG(daisy_chain)
 	MDRV_CPU_PROGRAM_MAP(ldv1000_map)
@@ -176,7 +176,7 @@ static MACHINE_DRIVER_START( ldv1000 )
 	MDRV_PPI8255_ADD("ldvppi0", ppi0intf)
 	MDRV_PPI8255_ADD("ldvppi1", ppi1intf)
 	MDRV_TIMER_ADD("multitimer", multijump_timer)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( ldv1000 )
@@ -196,7 +196,7 @@ const ldplayer_interface ldv1000_interface =
 	sizeof(ldplayer_data),						/* size of the state */
 	"Pioneer LD-V1000",							/* name of the player */
 	ROM_NAME(ldv1000),							/* pointer to ROM region information */
-	MACHINE_DRIVER_NAME(ldv1000),				/* pointer to machine configuration */
+	MACHINE_CONFIG_NAME(ldv1000),				/* pointer to machine configuration */
 	ldv1000_init,								/* initialization callback */
 	ldv1000_vsync,								/* vsync callback */
 	ldv1000_update,								/* update callback */

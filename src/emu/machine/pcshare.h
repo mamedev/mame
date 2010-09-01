@@ -11,4 +11,4 @@ void pc_keyb_clear(void);
 
 extern IRQ_CALLBACK(pcat_irq_callback);
 ADDRESS_MAP_EXTERN(pcat32_io_common, 32);
-MACHINE_DRIVER_EXTERN(pcat_common);
+MACHINE_CONFIG_EXTERN(pcat_common);

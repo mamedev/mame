@@ -115,7 +115,7 @@ static INTERRUPT_GEN( pesadelo_interrupt )
 }
 
 
-static MACHINE_DRIVER_START( pesadelo )
+static MACHINE_CONFIG_START( pesadelo, driver_data_t )
 
 	MDRV_CPU_ADD("maincpu", Z80, 3579545)		  /* 3.579545 Mhz */
 	MDRV_CPU_PROGRAM_MAP(program_mem)
@@ -126,7 +126,7 @@ static MACHINE_DRIVER_START( pesadelo )
 	MDRV_MACHINE_RESET( forte2 )
 
 	/* video hardware */
-	MDRV_IMPORT_FROM(tms9928a)
+	MDRV_FRAGMENT_ADD(tms9928a)
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE((float)XTAL_10_738635MHz/2/342/262)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -137,7 +137,7 @@ static MACHINE_DRIVER_START( pesadelo )
 	MDRV_SOUND_ADD("aysnd", AY8910, (float)XTAL_3_579545MHz/2)
 	MDRV_SOUND_CONFIG(forte2_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static DRIVER_INIT(pesadelo)
 {

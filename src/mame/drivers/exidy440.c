@@ -997,7 +997,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( exidy440 )
+static MACHINE_CONFIG_START( exidy440, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, MAIN_CPU_CLOCK)
@@ -1008,21 +1008,20 @@ static MACHINE_DRIVER_START( exidy440 )
 	MDRV_NVRAM_HANDLER(exidy440)
 
 	/* video hardware */
-	MDRV_IMPORT_FROM(exidy440_video)
+	MDRV_FRAGMENT_ADD(exidy440_video)
 
 	/* audio hardware */
-	MDRV_IMPORT_FROM(exidy440_audio)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(exidy440_audio)
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( topsecex )
+static MACHINE_CONFIG_DERIVED( topsecex, exidy440 )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(exidy440)
 
 	/* video hardware */
-	MDRV_IMPORT_FROM(topsecex_video)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(topsecex_video)
+MACHINE_CONFIG_END
 
 
 

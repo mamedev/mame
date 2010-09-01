@@ -1766,10 +1766,7 @@ static const ym2203_interface ym2203_config =
                                 Dangun Feveron
 ***************************************************************************/
 
-static MACHINE_DRIVER_START( dfeveron )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(cave_state)
+static MACHINE_CONFIG_START( dfeveron, cave_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz)
@@ -1802,7 +1799,7 @@ static MACHINE_DRIVER_START( dfeveron )
 	MDRV_SOUND_CONFIG(ymz280b_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
@@ -1810,10 +1807,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 
-static MACHINE_DRIVER_START( ddonpach )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(cave_state)
+static MACHINE_CONFIG_START( ddonpach, cave_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz)
@@ -1846,7 +1840,7 @@ static MACHINE_DRIVER_START( ddonpach )
 	MDRV_SOUND_CONFIG(ymz280b_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
@@ -1858,10 +1852,7 @@ static const nmk112_interface donpachi_nmk112_intf =
 	"oki1", "oki2", 1 << 0	// chip #0 (music) is not paged
 };
 
-static MACHINE_DRIVER_START( donpachi )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(cave_state)
+static MACHINE_CONFIG_START( donpachi, cave_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz)
@@ -1899,17 +1890,14 @@ static MACHINE_DRIVER_START( donpachi )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	MDRV_NMK112_ADD("nmk112", donpachi_nmk112_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
                                 Esprade
 ***************************************************************************/
 
-static MACHINE_DRIVER_START( esprade )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(cave_state)
+static MACHINE_CONFIG_START( esprade, cave_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz)
@@ -1942,17 +1930,14 @@ static MACHINE_DRIVER_START( esprade )
 	MDRV_SOUND_CONFIG(ymz280b_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
                                     Gaia Crusaders
 ***************************************************************************/
 
-static MACHINE_DRIVER_START( gaia )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(cave_state)
+static MACHINE_CONFIG_START( gaia, cave_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz)
@@ -1984,17 +1969,14 @@ static MACHINE_DRIVER_START( gaia )
 	MDRV_SOUND_CONFIG(ymz280b_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
                                     Guwange
 ***************************************************************************/
 
-static MACHINE_DRIVER_START( guwange )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(cave_state)
+static MACHINE_CONFIG_START( guwange, cave_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz)
@@ -2027,16 +2009,13 @@ static MACHINE_DRIVER_START( guwange )
 	MDRV_SOUND_CONFIG(ymz280b_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
                                 Hotdog Storm
 ***************************************************************************/
 
-static MACHINE_DRIVER_START( hotdogst )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(cave_state)
+static MACHINE_CONFIG_START( hotdogst, cave_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz)
@@ -2083,17 +2062,14 @@ static MACHINE_DRIVER_START( hotdogst )
 	MDRV_OKIM6295_ADD("oki", XTAL_1_056MHz, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
                                Koro Koro Quest
 ***************************************************************************/
 
-static MACHINE_DRIVER_START( korokoro )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(cave_state)
+static MACHINE_CONFIG_START( korokoro, cave_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz)
@@ -2126,27 +2102,21 @@ static MACHINE_DRIVER_START( korokoro )
 	MDRV_SOUND_CONFIG(ymz280b_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( crusherm )
-
-	/* driver data */
-	MDRV_IMPORT_FROM( korokoro )
+static MACHINE_CONFIG_DERIVED( crusherm, korokoro )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(crusherm_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
                                 Mazinger Z
 ***************************************************************************/
 
-static MACHINE_DRIVER_START( mazinger )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(cave_state)
+static MACHINE_CONFIG_START( mazinger, cave_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz)
@@ -2195,17 +2165,14 @@ static MACHINE_DRIVER_START( mazinger )
 	MDRV_OKIM6295_ADD("oki", XTAL_1_056MHz, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 2.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 2.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
                                 Metamoqester
 ***************************************************************************/
 
-static MACHINE_DRIVER_START( metmqstr )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(cave_state)
+static MACHINE_CONFIG_START( metmqstr, cave_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_32MHz / 2)
@@ -2252,7 +2219,7 @@ static MACHINE_DRIVER_START( metmqstr )
 	MDRV_OKIM6295_ADD("oki2", XTAL_32MHz / 16 , OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
@@ -2266,10 +2233,7 @@ static const nmk112_interface pwrinst2_nmk112_intf =
 	"oki1", "oki2", 0
 };
 
-static MACHINE_DRIVER_START( pwrinst2 )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(cave_state)
+static MACHINE_CONFIG_START( pwrinst2, cave_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz)	/* 16 MHz */
@@ -2322,17 +2286,14 @@ static MACHINE_DRIVER_START( pwrinst2 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.00)
 
 	MDRV_NMK112_ADD("nmk112", pwrinst2_nmk112_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
                         Sailor Moon / Air Gallet
 ***************************************************************************/
 
-static MACHINE_DRIVER_START( sailormn )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(cave_state)
+static MACHINE_CONFIG_START( sailormn, cave_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz)
@@ -2378,17 +2339,14 @@ static MACHINE_DRIVER_START( sailormn )
 	MDRV_OKIM6295_ADD("oki2", 2112000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
                             Tobikose! Jumpman
 ***************************************************************************/
 
-static MACHINE_DRIVER_START( tjumpman )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(cave_state)
+static MACHINE_CONFIG_START( tjumpman, cave_state )
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
@@ -2426,17 +2384,14 @@ static MACHINE_DRIVER_START( tjumpman )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	// oki2 spot is unpopulated
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
                                 Uo Poko
 ***************************************************************************/
 
-static MACHINE_DRIVER_START( uopoko )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(cave_state)
+static MACHINE_CONFIG_START( uopoko, cave_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz)
@@ -2468,7 +2423,7 @@ static MACHINE_DRIVER_START( uopoko )
 	MDRV_SOUND_CONFIG(ymz280b_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

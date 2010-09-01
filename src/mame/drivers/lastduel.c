@@ -502,10 +502,7 @@ static MACHINE_RESET( lastduel )
 		state->scroll[i] = 0;
 }
 
-static MACHINE_DRIVER_START( lastduel )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(lastduel_state)
+static MACHINE_CONFIG_START( lastduel, lastduel_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000) /* Could be 8 MHz */
@@ -544,13 +541,10 @@ static MACHINE_DRIVER_START( lastduel )
 
 	MDRV_SOUND_ADD("ym2", YM2203, 3579545)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( madgear )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(lastduel_state)
+static MACHINE_CONFIG_START( madgear, lastduel_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000) /* Accurate */
@@ -592,7 +586,7 @@ static MACHINE_DRIVER_START( madgear )
 
 	MDRV_OKIM6295_ADD("oki", XTAL_10MHz/10, OKIM6295_PIN7_HIGH) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.98)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /******************************************************************************/
 

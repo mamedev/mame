@@ -55,8 +55,8 @@ public:
 
 /*----------- defined in video/cidelsa.c -----------*/
 
-MACHINE_DRIVER_EXTERN( destryer_video );
-MACHINE_DRIVER_EXTERN( altair_video );
-MACHINE_DRIVER_EXTERN( draco_video );
+MACHINE_CONFIG_EXTERN( destryer_video );
+MACHINE_CONFIG_EXTERN( altair_video );
+MACHINE_CONFIG_EXTERN( draco_video );
 
 #endif

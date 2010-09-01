@@ -19,7 +19,7 @@ extern UINT8 rb_input_select;
 
 WRITE8_DEVICE_HANDLER( bzone_sounds_w );
 
-MACHINE_DRIVER_EXTERN( bzone_audio );
+MACHINE_CONFIG_EXTERN( bzone_audio );
 
 /*----------- defined in audio/redbaron.c -----------*/
 

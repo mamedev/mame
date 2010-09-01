@@ -1312,7 +1312,7 @@ static MACHINE_RESET( ms32 )
 
 /********** MACHINE DRIVER **********/
 
-static MACHINE_DRIVER_START( ms32 )
+static MACHINE_CONFIG_START( ms32, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V70, 20000000) // 20MHz
@@ -1346,10 +1346,9 @@ static MACHINE_DRIVER_START( ms32 )
 	MDRV_SOUND_ADD("ymf", YMF271, 16934400)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( f1superb )
-	MDRV_IMPORT_FROM(ms32)
+static MACHINE_CONFIG_DERIVED( f1superb, ms32 )
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(f1superb_map)
@@ -1357,7 +1356,7 @@ static MACHINE_DRIVER_START( f1superb )
 	MDRV_GFXDECODE(f1superb)
 
 	MDRV_VIDEO_START(f1superb)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

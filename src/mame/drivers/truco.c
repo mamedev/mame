@@ -135,7 +135,7 @@ static INTERRUPT_GEN( truco_interrupt )
 }
 
 
-static MACHINE_DRIVER_START( truco )
+static MACHINE_CONFIG_START( truco, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 750000)        /* ?? guess */
@@ -163,7 +163,7 @@ static MACHINE_DRIVER_START( truco )
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

@@ -525,10 +525,7 @@ static GFXDECODE_START( hopprobo )
 GFXDECODE_END
 
 
-static MACHINE_DRIVER_START( marineb )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(espial_state)
+static MACHINE_CONFIG_START( marineb, espial_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3072000)	/* 3.072 MHz */
@@ -558,46 +555,42 @@ static MACHINE_DRIVER_START( marineb )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("ay1", AY8910, 1500000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( changes )
+static MACHINE_CONFIG_DERIVED( changes, marineb )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(marineb)
 
 	/* video hardware */
 	MDRV_GFXDECODE(changes)
 	MDRV_VIDEO_UPDATE(changes)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( springer )
+static MACHINE_CONFIG_DERIVED( springer, marineb )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(marineb)
 	MDRV_MACHINE_RESET(springer)
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(springer)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( hoccer )
+static MACHINE_CONFIG_DERIVED( hoccer, marineb )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(marineb)
 
 	/* video hardware */
 	MDRV_GFXDECODE(hoccer)
 	MDRV_VIDEO_UPDATE(hoccer)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( wanted )
+static MACHINE_CONFIG_DERIVED( wanted, marineb )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(marineb)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(wanted_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
@@ -612,26 +605,24 @@ static MACHINE_DRIVER_START( wanted )
 
 	MDRV_SOUND_ADD("ay2", AY8910, 1500000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( hopprobo )
+static MACHINE_CONFIG_DERIVED( hopprobo, marineb )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(marineb)
 
 	/* video hardware */
 	MDRV_GFXDECODE(hopprobo)
 	MDRV_VIDEO_UPDATE(hopprobo)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( bcruzm12 )
+static MACHINE_CONFIG_DERIVED( bcruzm12, wanted )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(wanted)
 	MDRV_MACHINE_RESET(springer)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

@@ -293,8 +293,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( relief )
-	MDRV_DRIVER_DATA(relief_state)
+static MACHINE_CONFIG_START( relief, relief_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
@@ -326,7 +325,7 @@ static MACHINE_DRIVER_START( relief )
 
 	MDRV_SOUND_ADD("ymsnd", YM2413, ATARI_CLOCK_14MHz/4)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

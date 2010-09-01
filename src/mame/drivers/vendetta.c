@@ -497,10 +497,7 @@ static MACHINE_RESET( vendetta )
 	vendetta_video_banking(machine, 0);
 }
 
-static MACHINE_DRIVER_START( vendetta )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(vendetta_state)
+static MACHINE_CONFIG_START( vendetta, vendetta_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", KONAMI, 6000000)	/* this is strange, seems an overclock but */
@@ -546,13 +543,12 @@ static MACHINE_DRIVER_START( vendetta )
 	MDRV_SOUND_ADD("k053260", K053260, 3579545)	/* verified with PCB */
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.75)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( esckids )
+static MACHINE_CONFIG_DERIVED( esckids, vendetta )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(vendetta)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(esckids_map)
 
@@ -565,7 +561,7 @@ static MACHINE_DRIVER_START( esckids )
 	MDRV_K052109_ADD("k052109", esckids_k052109_intf)
 	MDRV_DEVICE_REMOVE("k053246")
 	MDRV_K053246_ADD("k053246", esckids_k053246_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

@@ -361,9 +361,7 @@ static const struct tms9995reset_param pachifev_processor_config =
     1,0,0
 };
 
-static MACHINE_DRIVER_START( pachifev )
-
-    MDRV_DRIVER_DATA(pachifev_state)
+static MACHINE_CONFIG_START( pachifev, pachifev_state )
 
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu", TMS9995, XTAL_12MHz)
@@ -377,7 +375,7 @@ static MACHINE_DRIVER_START( pachifev )
 
     /* video hardware */
 
-    MDRV_IMPORT_FROM(tms9928a)
+    MDRV_FRAGMENT_ADD(tms9928a)
     MDRV_SCREEN_MODIFY("screen")
     MDRV_SCREEN_REFRESH_RATE((float)XTAL_10_738635MHz/2/342/262)
     MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
@@ -393,7 +391,7 @@ static MACHINE_DRIVER_START( pachifev )
     MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
     MDRV_SOUND_ADD("sn76_2", SN76489A, XTAL_10_738635MHz/3) /* guess */
     MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( pachifev )
     ROM_REGION( 0x10000, "maincpu", 0 )

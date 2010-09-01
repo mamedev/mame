@@ -218,7 +218,7 @@ static GFXDECODE_START( tiamc1 )
 GFXDECODE_END
 
 
-static MACHINE_DRIVER_START( tiamc1 )
+static MACHINE_CONFIG_START( tiamc1, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8080,16000000/9)		 /* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(tiamc1_map)
@@ -248,7 +248,7 @@ static MACHINE_DRIVER_START( tiamc1 )
 
 	MDRV_SOUND_ADD("2x8253", TIAMC1, 16000000/9)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( konek )

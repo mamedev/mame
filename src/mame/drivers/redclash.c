@@ -354,10 +354,7 @@ static MACHINE_RESET( redclash )
 	state->stars_count = 0;
 }
 
-static MACHINE_DRIVER_START( zerohour )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(ladybug_state)
+static MACHINE_CONFIG_START( zerohour, ladybug_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)  /* 4 MHz */
@@ -383,13 +380,10 @@ static MACHINE_DRIVER_START( zerohour )
 	MDRV_VIDEO_EOF(redclash)
 
 	/* sound hardware */
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( redclash )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(ladybug_state)
+static MACHINE_CONFIG_START( redclash, ladybug_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)  /* 4 MHz */
@@ -415,7 +409,7 @@ static MACHINE_DRIVER_START( redclash )
 	MDRV_VIDEO_EOF(redclash)
 
 	/* sound hardware */
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

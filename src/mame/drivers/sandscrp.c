@@ -438,7 +438,7 @@ static const kaneko_pandora_interface sandscrp_pandora_config =
 	0, 0	/* x_offs, y_offs */
 };
 
-static MACHINE_DRIVER_START( sandscrp )
+static MACHINE_CONFIG_START( sandscrp, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,12000000)	/* TMP68HC000N-12 */
@@ -481,7 +481,7 @@ static MACHINE_DRIVER_START( sandscrp )
 	MDRV_SOUND_CONFIG(ym2203_intf_sandscrp)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

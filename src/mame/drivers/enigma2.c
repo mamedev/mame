@@ -603,10 +603,7 @@ static INPUT_PORTS_START( enigma2a )
 INPUT_PORTS_END
 
 
-static MACHINE_DRIVER_START( enigma2 )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(enigma2_state)
+static MACHINE_CONFIG_START( enigma2, enigma2_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)
@@ -632,13 +629,10 @@ static MACHINE_DRIVER_START( enigma2 )
 	MDRV_SOUND_ADD("aysnd", AY8910, AY8910_CLOCK)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( enigma2a )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(enigma2_state)
+static MACHINE_CONFIG_START( enigma2a, enigma2_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8080, CPU_CLOCK)
@@ -665,7 +659,7 @@ static MACHINE_DRIVER_START( enigma2a )
 	MDRV_SOUND_ADD("aysnd", AY8910, AY8910_CLOCK)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

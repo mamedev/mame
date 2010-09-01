@@ -462,7 +462,7 @@ ADDRESS_MAP_END
 
 
 /********* machine driver ***********/
-MACHINE_DRIVER_START(mcr_ssio)
+MACHINE_CONFIG_FRAGMENT(mcr_ssio)
 	MDRV_CPU_ADD("ssiocpu", Z80, SSIO_CLOCK/2/4)
 	MDRV_CPU_PROGRAM_MAP(ssio_map)
 	MDRV_CPU_PERIODIC_INT(ssio_14024_clock, SSIO_CLOCK/2/16/10)
@@ -475,7 +475,7 @@ MACHINE_DRIVER_START(mcr_ssio)
 	MDRV_SOUND_ADD("ssio.2", AY8910, SSIO_CLOCK/2/4)
 	MDRV_SOUND_CONFIG(ssio_ay8910_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.33)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -593,7 +593,7 @@ static const pia6821_interface csdeluxe_pia_intf =
 
 
 /********* machine driver ***********/
-MACHINE_DRIVER_START(chip_squeak_deluxe)
+MACHINE_CONFIG_FRAGMENT(chip_squeak_deluxe)
 	MDRV_CPU_ADD("csdcpu", M68000, CSDELUXE_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(csdeluxe_map)
 
@@ -602,9 +602,9 @@ MACHINE_DRIVER_START(chip_squeak_deluxe)
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("csddac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-MACHINE_DRIVER_START(chip_squeak_deluxe_stereo)
+MACHINE_CONFIG_FRAGMENT(chip_squeak_deluxe_stereo)
 	MDRV_CPU_ADD("csdcpu", M68000, CSDELUXE_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(csdeluxe_map)
 
@@ -613,7 +613,7 @@ MACHINE_DRIVER_START(chip_squeak_deluxe_stereo)
 	MDRV_SOUND_ADD("csddac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -712,7 +712,7 @@ static const pia6821_interface soundsgood_pia_intf =
 
 
 /********* machine driver ***********/
-MACHINE_DRIVER_START(sounds_good)
+MACHINE_CONFIG_FRAGMENT(sounds_good)
 	MDRV_CPU_ADD("sgcpu", M68000, SOUNDSGOOD_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(soundsgood_map)
 
@@ -721,7 +721,7 @@ MACHINE_DRIVER_START(sounds_good)
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("sgdac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -814,7 +814,7 @@ static const pia6821_interface turbocs_pia_intf =
 
 
 /********* machine driver ***********/
-MACHINE_DRIVER_START(turbo_chip_squeak)
+MACHINE_CONFIG_FRAGMENT(turbo_chip_squeak)
 	MDRV_CPU_ADD("tcscpu", M6809E, TURBOCS_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(turbocs_map)
 
@@ -823,7 +823,7 @@ MACHINE_DRIVER_START(turbo_chip_squeak)
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("tcsdac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -975,7 +975,7 @@ static const pia6821_interface squawkntalk_pia1_intf =
 
 
 /********* machine driver ***********/
-MACHINE_DRIVER_START(squawk_n_talk)
+MACHINE_CONFIG_FRAGMENT(squawk_n_talk)
 	MDRV_CPU_ADD("sntcpu", M6802, SQUAWKTALK_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(squawkntalk_map)
 
@@ -989,4 +989,4 @@ MACHINE_DRIVER_START(squawk_n_talk)
 
 	/* the board also supports an AY-8912 and/or an 8-bit DAC, neither of */
 	/* which are populated on the Discs of Tron board */
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END

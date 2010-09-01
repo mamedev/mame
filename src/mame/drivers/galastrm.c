@@ -316,7 +316,7 @@ static const tc0480scp_interface galastrm_tc0480scp_intf =
 	0		/* col_base */
 };
 
-static MACHINE_DRIVER_START( galastrm )
+static MACHINE_CONFIG_START( galastrm, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)	/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(galastrm_map)
@@ -342,8 +342,8 @@ static MACHINE_DRIVER_START( galastrm )
 	MDRV_TC0480SCP_ADD("tc0480scp", galastrm_tc0480scp_intf)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(taito_f3_sound)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(taito_f3_sound)
+MACHINE_CONFIG_END
 
 /***************************************************************************/
 

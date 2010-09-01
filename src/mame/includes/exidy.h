@@ -29,11 +29,11 @@ READ8_HANDLER( exidy_sh6840_r );
 WRITE8_HANDLER( exidy_sh6840_w );
 WRITE8_HANDLER( exidy_sfxctrl_w );
 
-MACHINE_DRIVER_EXTERN( venture_audio );
+MACHINE_CONFIG_EXTERN( venture_audio );
 
-MACHINE_DRIVER_EXTERN( mtrap_cvsd_audio );
+MACHINE_CONFIG_EXTERN( mtrap_cvsd_audio );
 
-MACHINE_DRIVER_EXTERN( victory_audio );
+MACHINE_CONFIG_EXTERN( victory_audio );
 READ8_HANDLER( victory_sound_response_r );
 READ8_HANDLER( victory_sound_status_r );
 WRITE8_HANDLER( victory_sound_command_w );

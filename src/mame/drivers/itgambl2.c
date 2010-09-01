@@ -247,7 +247,7 @@ static PALETTE_INIT( itgambl2 )
 *     Machine Drivers     *
 **************************/
 
-static MACHINE_DRIVER_START( itgambl2 )
+static MACHINE_CONFIG_START( itgambl2, driver_data_t )
 
     /* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", H83044, MAIN_CLOCK)	/* wrong CPU, but we have not a H8/3337 core ATM */
@@ -272,7 +272,7 @@ static MACHINE_DRIVER_START( itgambl2 )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************

@@ -591,7 +591,7 @@ static const ay8910_interface scarn_ay8910_config =
 *          Machine Driver          *
 ***********************************/
 
-static MACHINE_DRIVER_START( slotcarn )
+static MACHINE_CONFIG_START( slotcarn, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK) // 2.5 Mhz?
@@ -622,7 +622,7 @@ static MACHINE_DRIVER_START( slotcarn )
 	MDRV_SOUND_ADD("aysnd",AY8910, SND_CLOCK)
 	MDRV_SOUND_CONFIG(scarn_ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /******************************

@@ -42,5 +42,5 @@ void mystston_on_scanline_interrupt(running_machine *machine);
 
 /*----------- defined in video/mystston.c -----------*/
 
-MACHINE_DRIVER_EXTERN( mystston_video );
+MACHINE_CONFIG_EXTERN( mystston_video );
 WRITE8_HANDLER( mystston_video_control_w );

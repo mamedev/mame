@@ -270,7 +270,7 @@ GFXDECODE_END
 
 /* Machine Driver + Related bits */
 
-static MACHINE_DRIVER_START( pirates )
+static MACHINE_CONFIG_START( pirates, driver_data_t )
 	MDRV_CPU_ADD("maincpu", M68000, 16000000) /* 16mhz */
 	MDRV_CPU_PROGRAM_MAP(pirates_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
@@ -296,7 +296,7 @@ static MACHINE_DRIVER_START( pirates )
 
 	MDRV_OKIM6295_ADD("oki", 1333333, OKIM6295_PIN7_LOW)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

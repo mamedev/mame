@@ -184,10 +184,7 @@ static MACHINE_RESET( zerozone )
 	state->tilebank = 0;
 }
 
-static MACHINE_DRIVER_START( zerozone )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(zerozone_state)
+static MACHINE_CONFIG_START( zerozone, zerozone_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)	/* 10 MHz */
@@ -221,7 +218,7 @@ static MACHINE_DRIVER_START( zerozone )
 
 	MDRV_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

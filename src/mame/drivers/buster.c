@@ -69,7 +69,7 @@ static GFXDECODE_START( buster )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
-static MACHINE_DRIVER_START( buster )
+static MACHINE_CONFIG_START( buster, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,8000000)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(mainmap)
@@ -94,7 +94,7 @@ static MACHINE_DRIVER_START( buster )
 	MDRV_SOUND_ADD("aysnd", AY8910, 1500000/2)
 //  MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( buster )

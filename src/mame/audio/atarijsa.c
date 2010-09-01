@@ -803,7 +803,7 @@ static const ym2151_interface ym2151_config =
  *************************************/
 
 /* Used by Blasteroids */
-MACHINE_DRIVER_START( jsa_i_stereo )
+MACHINE_CONFIG_FRAGMENT( jsa_i_stereo )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("jsa", M6502, JSA_MASTER_CLOCK/2)
@@ -817,38 +817,36 @@ MACHINE_DRIVER_START( jsa_i_stereo )
 	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.60)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.60)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* Used by Xybots */
-MACHINE_DRIVER_START( jsa_i_stereo_swapped )
+MACHINE_CONFIG_DERIVED( jsa_i_stereo_swapped, jsa_i_stereo )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(jsa_i_stereo)
 
 	/* sound hardware */
 	MDRV_SOUND_REPLACE("ymsnd", YM2151, JSA_MASTER_CLOCK)
 	MDRV_SOUND_CONFIG(ym2151_config)
 	MDRV_SOUND_ROUTE(0, "rspeaker", 0.60)
 	MDRV_SOUND_ROUTE(1, "lspeaker", 0.60)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* Used by Toobin', Vindicators */
-MACHINE_DRIVER_START( jsa_i_stereo_pokey )
+MACHINE_CONFIG_DERIVED( jsa_i_stereo_pokey, jsa_i_stereo )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(jsa_i_stereo)
 
 	/* sound hardware */
 	MDRV_SOUND_ADD("pokey", POKEY, JSA_MASTER_CLOCK/2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* Used by Escape from the Planet of the Robot Monsters */
-MACHINE_DRIVER_START( jsa_i_mono_speech )
+MACHINE_CONFIG_FRAGMENT( jsa_i_mono_speech )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("jsa", M6502, JSA_MASTER_CLOCK/2)
@@ -865,11 +863,11 @@ MACHINE_DRIVER_START( jsa_i_mono_speech )
 
 	MDRV_SOUND_ADD("tms", TMS5220C, JSA_MASTER_CLOCK*2/11) /* potentially JSA_MASTER_CLOCK/9 as well */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* Used by Cyberball 2072, STUN Runner, Skull & Crossbones, ThunderJaws, Hydra, Pit Fighter */
-MACHINE_DRIVER_START( jsa_ii_mono )
+MACHINE_CONFIG_FRAGMENT( jsa_ii_mono )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("jsa", M6502, JSA_MASTER_CLOCK/2)
@@ -886,35 +884,33 @@ MACHINE_DRIVER_START( jsa_ii_mono )
 
 	MDRV_OKIM6295_ADD("adpcm", JSA_MASTER_CLOCK/3, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* Used by Batman, Guardians of the 'Hood, Road Riot 4WD, Steel Talons */
-MACHINE_DRIVER_START( jsa_iii_mono )
+MACHINE_CONFIG_DERIVED( jsa_iii_mono, jsa_ii_mono )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(jsa_ii_mono)
 	MDRV_CPU_MODIFY("jsa")
 	MDRV_CPU_PROGRAM_MAP(atarijsa3_map)
 
 	MDRV_DEVICE_MODIFY("adpcm")
 	MDRV_DEVICE_ADDRESS_MAP(0, jsa3_oki_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* Used by Off the Wall */
-MACHINE_DRIVER_START( jsa_iii_mono_noadpcm )
+MACHINE_CONFIG_DERIVED( jsa_iii_mono_noadpcm, jsa_iii_mono )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(jsa_iii_mono)
 
 	/* sound hardware */
 	MDRV_DEVICE_REMOVE("adpcm")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* Used by Space Lords, Moto Frenzy, Road Riot's Revenge Rally */
-MACHINE_DRIVER_START( jsa_iiis_stereo )
+MACHINE_CONFIG_FRAGMENT( jsa_iiis_stereo )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("jsa", M6502, JSA_MASTER_CLOCK/2)
@@ -936,7 +932,7 @@ MACHINE_DRIVER_START( jsa_iiis_stereo )
 	MDRV_OKIM6295_ADD("adpcmr", JSA_MASTER_CLOCK/3, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
 	MDRV_DEVICE_ADDRESS_MAP(0, jsa3_oki2_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************************

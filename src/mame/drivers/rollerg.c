@@ -261,10 +261,7 @@ static MACHINE_RESET( rollerg )
 	state->readzoomroms = 0;
 }
 
-static MACHINE_DRIVER_START( rollerg )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(rollerg_state)
+static MACHINE_CONFIG_START( rollerg, rollerg_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", KONAMI, 3000000)		/* ? */
@@ -303,7 +300,7 @@ static MACHINE_DRIVER_START( rollerg )
 
 	MDRV_SOUND_ADD("k053260", K053260, 3579545)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

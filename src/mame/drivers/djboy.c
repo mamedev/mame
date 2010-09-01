@@ -582,8 +582,7 @@ static MACHINE_RESET( djboy )
 	state->z80_to_beast_full = 0;
 }
 
-static MACHINE_DRIVER_START( djboy )
-	MDRV_DRIVER_DATA(djboy_state)
+static MACHINE_CONFIG_START( djboy, djboy_state )
 
 	MDRV_CPU_ADD("maincpu", Z80, 6000000)
 	MDRV_CPU_PROGRAM_MAP(cpu0_am)
@@ -634,7 +633,7 @@ static MACHINE_DRIVER_START( djboy )
 
 	MDRV_OKIM6295_ADD("oki2", 12000000 / 8, OKIM6295_PIN7_LOW)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( djboy )

@@ -386,9 +386,7 @@ static INTERRUPT_GEN( spoker_interrupt )
 		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_DRIVER_START( spoker )
-
-	MDRV_DRIVER_DATA( spoker_state )
+static MACHINE_CONFIG_START( spoker, spoker_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z180, XTAL_12MHz / 2)	/* HD64180RP8, 8 MHz? */
@@ -421,7 +419,7 @@ static MACHINE_DRIVER_START( spoker )
 
 	MDRV_OKIM6295_ADD("oki", XTAL_12MHz / 12, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 static DRIVER_INIT( spk116it )

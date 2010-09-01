@@ -1360,7 +1360,7 @@ static VIDEO_UPDATE(segac2_new)
 }
 
 
-static MACHINE_DRIVER_START( segac )
+static MACHINE_CONFIG_START( segac, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XL2_CLOCK/6)
@@ -1370,7 +1370,7 @@ static MACHINE_DRIVER_START( segac )
 	MDRV_MACHINE_RESET(segac2)
 	MDRV_NVRAM_HANDLER(generic_randfill)
 
-	MDRV_IMPORT_FROM(megadriv_timers)
+	MDRV_FRAGMENT_ADD(megadriv_timers)
 
 	/* video hardware */
 	//MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS | VIDEO_HAS_HIGHLIGHTS)
@@ -1398,18 +1398,17 @@ static MACHINE_DRIVER_START( segac )
 
 	MDRV_SOUND_ADD("snsnd", SN76496, XL2_CLOCK/15)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( segac2 )
+static MACHINE_CONFIG_DERIVED( segac2, segac )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM( segac )
 
 	/* sound hardware */
 	MDRV_SOUND_ADD("upd", UPD7759, XL1_CLOCK)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

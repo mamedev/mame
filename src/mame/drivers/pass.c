@@ -231,9 +231,7 @@ static GFXDECODE_START( pass )
 GFXDECODE_END
 
 /* todo : is this correct? */
-static MACHINE_DRIVER_START( pass )
-
-	MDRV_DRIVER_DATA( pass_state )
+static MACHINE_CONFIG_START( pass, pass_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 14318180/2 )
@@ -267,7 +265,7 @@ static MACHINE_DRIVER_START( pass )
 
 	MDRV_OKIM6295_ADD("oki", 792000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( pass )

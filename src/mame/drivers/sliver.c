@@ -570,9 +570,7 @@ static INTERRUPT_GEN( sliver_int )
 	cpu_set_input_line(device, 2+cpu_getiloops(device), HOLD_LINE);
 }
 
-static MACHINE_DRIVER_START( sliver )
-
-	MDRV_DRIVER_DATA( sliver_state )
+static MACHINE_CONFIG_START( sliver, sliver_state )
 
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(sliver_map)
@@ -598,7 +596,7 @@ static MACHINE_DRIVER_START( sliver )
 	MDRV_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.6)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.6)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( sliver )
 	ROM_REGION( 0x100000, "maincpu", 0 ) /* 68000 Code */

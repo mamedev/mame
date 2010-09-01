@@ -705,9 +705,7 @@ static DRIVER_INIT( quiz18k )
 
 
 
-static MACHINE_DRIVER_START( welltris )
-
-	MDRV_DRIVER_DATA( welltris_state )
+static MACHINE_CONFIG_START( welltris, welltris_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,20000000/2)	/* 10 MHz */
@@ -740,16 +738,15 @@ static MACHINE_DRIVER_START( welltris )
 	MDRV_SOUND_ROUTE(0, "mono", 0.25)
 	MDRV_SOUND_ROUTE(1, "mono", 0.75)
 	MDRV_SOUND_ROUTE(2, "mono", 0.75)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( quiz18k )
+static MACHINE_CONFIG_DERIVED( quiz18k, welltris )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM( welltris )
 
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(15, 335-1, 0, 224-1)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

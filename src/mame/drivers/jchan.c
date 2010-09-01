@@ -655,7 +655,7 @@ static const ymz280b_interface ymz280b_intf =
 
 /* machine driver */
 
-static MACHINE_DRIVER_START( jchan )
+static MACHINE_CONFIG_START( jchan, driver_data_t )
 
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(jchan_main)
@@ -686,7 +686,7 @@ static MACHINE_DRIVER_START( jchan )
 	MDRV_SOUND_CONFIG(ymz280b_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* rom loading */
 

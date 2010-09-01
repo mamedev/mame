@@ -954,10 +954,7 @@ static MACHINE_RESET( m62 )
 	state->bankcontrol[1] = 0;
 }
 
-static MACHINE_DRIVER_START( ldrun )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(irem_z80_state)
+static MACHINE_CONFIG_START( ldrun, irem_z80_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 24000000/6)
@@ -984,14 +981,13 @@ static MACHINE_DRIVER_START( ldrun )
 	MDRV_VIDEO_UPDATE(ldrun)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(m62_audio)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(m62_audio)
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( kungfum )
+static MACHINE_CONFIG_DERIVED( kungfum, ldrun )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(ldrun)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_CLOCK(18432000/6)
 	MDRV_CPU_PROGRAM_MAP(kungfum_map)
@@ -1003,13 +999,12 @@ static MACHINE_DRIVER_START( kungfum )
 
 	MDRV_VIDEO_START(kungfum)
 	MDRV_VIDEO_UPDATE(kungfum)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( battroad )
+static MACHINE_CONFIG_DERIVED( battroad, ldrun )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(ldrun)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_CLOCK(18432000/6)
 	MDRV_CPU_PROGRAM_MAP(battroad_map)
@@ -1024,26 +1019,24 @@ static MACHINE_DRIVER_START( battroad )
 	MDRV_PALETTE_INIT(battroad)
 	MDRV_VIDEO_START(battroad)
 	MDRV_VIDEO_UPDATE(battroad)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( ldrun2 )
+static MACHINE_CONFIG_DERIVED( ldrun2, ldrun )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(ldrun)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(ldrun2_map)
 	MDRV_CPU_IO_MAP(ldrun2_io_map)
 
 	MDRV_VIDEO_START(ldrun2)
 	MDRV_VIDEO_UPDATE(ldrun)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( ldrun3 )
+static MACHINE_CONFIG_DERIVED( ldrun3, ldrun )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(ldrun)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(ldrun3_map)
 	MDRV_CPU_IO_MAP(ldrun3_io_map)
@@ -1052,13 +1045,12 @@ static MACHINE_DRIVER_START( ldrun3 )
 	MDRV_GFXDECODE(ldrun3)
 	MDRV_VIDEO_START(ldrun2)
 	MDRV_VIDEO_UPDATE(ldrun3)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( ldrun4 )
+static MACHINE_CONFIG_DERIVED( ldrun4, ldrun )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(ldrun)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(ldrun4_map)
 	MDRV_CPU_IO_MAP(ldrun4_io_map)
@@ -1067,13 +1059,12 @@ static MACHINE_DRIVER_START( ldrun4 )
 	MDRV_GFXDECODE(ldrun3)
 	MDRV_VIDEO_START(ldrun4)
 	MDRV_VIDEO_UPDATE(ldrun4)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( lotlot )
+static MACHINE_CONFIG_DERIVED( lotlot, ldrun )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(ldrun)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(lotlot_map)
 
@@ -1084,13 +1075,12 @@ static MACHINE_DRIVER_START( lotlot )
 	MDRV_PALETTE_INIT(lotlot)
 	MDRV_VIDEO_START(lotlot)
 	MDRV_VIDEO_UPDATE(lotlot)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( kidniki )
+static MACHINE_CONFIG_DERIVED( kidniki, ldrun )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(ldrun)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(kidniki_map)
 	MDRV_CPU_IO_MAP(kidniki_io_map)
@@ -1100,13 +1090,12 @@ static MACHINE_DRIVER_START( kidniki )
 
 	MDRV_VIDEO_START(kidniki)
 	MDRV_VIDEO_UPDATE(kidniki)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( spelunkr )
+static MACHINE_CONFIG_DERIVED( spelunkr, ldrun )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(ldrun)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(spelunkr_map)
 
@@ -1115,13 +1104,12 @@ static MACHINE_DRIVER_START( spelunkr )
 
 	MDRV_VIDEO_START(spelunkr)
 	MDRV_VIDEO_UPDATE(spelunkr)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( spelunk2 )
+static MACHINE_CONFIG_DERIVED( spelunk2, ldrun )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(ldrun)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(spelunk2_map)
 
@@ -1132,13 +1120,12 @@ static MACHINE_DRIVER_START( spelunk2 )
 	MDRV_PALETTE_INIT(spelunk2)
 	MDRV_VIDEO_START(spelunk2)
 	MDRV_VIDEO_UPDATE(spelunk2)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( youjyudn )
+static MACHINE_CONFIG_DERIVED( youjyudn, ldrun )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(ldrun)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_CLOCK(18432000/6)
 	MDRV_CPU_PROGRAM_MAP(youjyudn_map)
@@ -1151,13 +1138,12 @@ static MACHINE_DRIVER_START( youjyudn )
 
 	MDRV_VIDEO_START(youjyudn)
 	MDRV_VIDEO_UPDATE(youjyudn)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( horizon )
+static MACHINE_CONFIG_DERIVED( horizon, ldrun )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(ldrun)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(horizon_map)
 
@@ -1167,7 +1153,7 @@ static MACHINE_DRIVER_START( horizon )
 
 	MDRV_VIDEO_START(horizon)
 	MDRV_VIDEO_UPDATE(horizon)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

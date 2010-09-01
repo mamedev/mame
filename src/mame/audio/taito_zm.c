@@ -50,7 +50,7 @@ static const zsg2_interface zsg2_taito_config =
 	"zsg2"	/* sample region */
 };
 
-MACHINE_DRIVER_START( taito_zoom_sound )
+MACHINE_CONFIG_FRAGMENT( taito_zoom_sound )
 	MDRV_CPU_ADD("mn10200", MN10200, 25000000/2)
 	MDRV_CPU_PROGRAM_MAP(taitozoom_map)
 	MDRV_CPU_IO_MAP(taitozoom_io_map)
@@ -61,4 +61,4 @@ MACHINE_DRIVER_START( taito_zoom_sound )
 	MDRV_SOUND_CONFIG(zsg2_taito_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END

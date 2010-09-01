@@ -1856,7 +1856,7 @@ static const ay8910_interface ay8910_config =
 
 
 /* machine driver for MOD 2 board */
-static MACHINE_DRIVER_START( mpu4mod2 )
+static MACHINE_CONFIG_START( mpu4mod2, driver_data_t )
 
 	MDRV_MACHINE_START(mpu4mod2)
 	MDRV_MACHINE_RESET(mpu4)
@@ -1883,10 +1883,9 @@ static MACHINE_DRIVER_START( mpu4mod2 )
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
 	MDRV_DEFAULT_LAYOUT(layout_mpu4)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( mod4yam )
-	MDRV_IMPORT_FROM( mpu4mod2 )
+static MACHINE_CONFIG_DERIVED( mod4yam, mpu4mod2 )
 	MDRV_MACHINE_START(mpu4mod4)
 
 	MDRV_CPU_MODIFY("maincpu")
@@ -1895,10 +1894,9 @@ static MACHINE_DRIVER_START( mod4yam )
 	MDRV_DEVICE_REMOVE("ay8913")
 	MDRV_SOUND_ADD("ym2413", YM2413, MPU4_MASTER_CLOCK/4)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( mod4oki )
-	MDRV_IMPORT_FROM( mpu4mod2 )
+static MACHINE_CONFIG_DERIVED( mod4oki, mpu4mod2 )
 	MDRV_MACHINE_START(mpu4mod4)
 
 	MDRV_PIA6821_ADD("pia_gamebd", pia_gameboard_intf)
@@ -1909,14 +1907,13 @@ static MACHINE_DRIVER_START( mod4oki )
 	MDRV_DEVICE_REMOVE("ay8913")
 	MDRV_SOUND_ADD("msm6376", OKIM6376, 4000000) //?
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( mpu4dutch )
-	MDRV_IMPORT_FROM( mod4oki )
+static MACHINE_CONFIG_DERIVED( mpu4dutch, mod4oki )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(dutch_memmap)				// setup read and write memorymap
 	MDRV_MACHINE_START(mpu4dutch)						// main mpu4 board initialisation
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static DRIVER_INIT (connect4)
 {

@@ -198,10 +198,7 @@ static MACHINE_RESET( hanaawas )
 	state->mux = 0;
 }
 
-static MACHINE_DRIVER_START( hanaawas )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(hanaawas_state)
+static MACHINE_CONFIG_START( hanaawas, hanaawas_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,18432000/6)	/* 3.072 MHz ??? */
@@ -233,7 +230,7 @@ static MACHINE_DRIVER_START( hanaawas )
 	MDRV_SOUND_ADD("aysnd", AY8910, 18432000/12)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

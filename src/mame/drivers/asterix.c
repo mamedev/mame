@@ -294,10 +294,7 @@ static MACHINE_RESET( asterix )
 	}
 }
 
-static MACHINE_DRIVER_START( asterix )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(asterix_state)
+static MACHINE_CONFIG_START( asterix, asterix_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
@@ -339,7 +336,7 @@ static MACHINE_DRIVER_START( asterix )
 	MDRV_SOUND_ADD("k053260", K053260, 4000000)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.75)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( asterix )

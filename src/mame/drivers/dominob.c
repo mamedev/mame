@@ -290,10 +290,7 @@ static const ay8910_interface ay8910_config =
 };
 
 
-static MACHINE_DRIVER_START( dominob )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(dominob_state)
+static MACHINE_CONFIG_START( dominob, dominob_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,XTAL_12MHz/2)
@@ -320,7 +317,7 @@ static MACHINE_DRIVER_START( dominob )
 	MDRV_SOUND_ADD("aysnd", AY8910, XTAL_12MHz/4)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

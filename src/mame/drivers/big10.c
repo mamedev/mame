@@ -237,7 +237,7 @@ static const ay8910_interface ay8910_config =
 *           Machine Driver            *
 **************************************/
 
-static MACHINE_DRIVER_START( big10 )
+static MACHINE_CONFIG_START( big10, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)	/* guess */
@@ -268,7 +268,7 @@ static MACHINE_DRIVER_START( big10 )
 	MDRV_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK/12)	/* guess */
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /**************************************

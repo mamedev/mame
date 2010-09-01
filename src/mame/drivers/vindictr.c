@@ -193,8 +193,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( vindictr )
-	MDRV_DRIVER_DATA(vindictr_state)
+static MACHINE_CONFIG_START( vindictr, vindictr_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68010, ATARI_CLOCK_14MHz/2)
@@ -219,8 +218,8 @@ static MACHINE_DRIVER_START( vindictr )
 	MDRV_VIDEO_UPDATE(vindictr)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(jsa_i_stereo_pokey)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(jsa_i_stereo_pokey)
+MACHINE_CONFIG_END
 
 
 

@@ -421,10 +421,7 @@ static VIDEO_UPDATE(varia)
 }
 
 
-static MACHINE_DRIVER_START( varia )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(metro_state)
+static MACHINE_CONFIG_START( varia, metro_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
@@ -455,7 +452,7 @@ static MACHINE_DRIVER_START( varia )
 	MDRV_SOUND_ADD("essnd", ES8712, 12000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( vmetal )

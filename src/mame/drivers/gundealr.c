@@ -466,10 +466,7 @@ static MACHINE_RESET( gundealr )
 	state->scroll[3] = 0;
 }
 
-static MACHINE_DRIVER_START( gundealr )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(gundealr_state)
+static MACHINE_CONFIG_START( gundealr, gundealr_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 8000000)	/* 8 MHz ??? */
@@ -499,7 +496,7 @@ static MACHINE_DRIVER_START( gundealr )
 
 	MDRV_SOUND_ADD("ymsnd", YM2203, 1500000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

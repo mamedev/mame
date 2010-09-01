@@ -354,7 +354,7 @@ static const ay8910_interface ay8910_config =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( suprridr )
+static MACHINE_CONFIG_START( suprridr, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_49_152MHz/16)		/* 3 MHz */
@@ -390,7 +390,7 @@ static MACHINE_DRIVER_START( suprridr )
 	MDRV_SOUND_ADD("ay2", AY8910, XTAL_49_152MHz/32)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

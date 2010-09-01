@@ -453,10 +453,7 @@ static MACHINE_RESET( ninjemak )
 	state->ninjemak_dispdisable = 0;
 }
 
-static MACHINE_DRIVER_START( galivan )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(galivan_state)
+static MACHINE_CONFIG_START( galivan, galivan_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,12000000/2)		/* 6 MHz? */
@@ -498,12 +495,9 @@ static MACHINE_DRIVER_START( galivan )
 
 	MDRV_SOUND_ADD("dac2", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( ninjemak )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(galivan_state)
+static MACHINE_CONFIG_START( ninjemak, galivan_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,12000000/2)		/* 6 MHz? */
@@ -544,7 +538,7 @@ static MACHINE_DRIVER_START( ninjemak )
 
 	MDRV_SOUND_ADD("dac2", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

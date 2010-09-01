@@ -638,10 +638,7 @@ static MACHINE_RESET( jollyjgr )
 	state->tilemap_bank = 0;
 }
 
-static MACHINE_DRIVER_START( jollyjgr )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(jollyjgr_state)
+static MACHINE_CONFIG_START( jollyjgr, jollyjgr_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3579545)		 /* 3,579545 MHz */
@@ -671,17 +668,16 @@ static MACHINE_DRIVER_START( jollyjgr )
 
 	MDRV_SOUND_ADD("aysnd", AY8910, 3579545)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( fspider )
-	MDRV_IMPORT_FROM( jollyjgr )
+static MACHINE_CONFIG_DERIVED( fspider, jollyjgr )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(fspider_map)
 
 	MDRV_VIDEO_UPDATE(fspider)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*************************************
  *

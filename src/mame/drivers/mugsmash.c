@@ -408,9 +408,7 @@ static MACHINE_START( mugsmash )
 	state->audiocpu = machine->device("audiocpu");
 }
 
-static MACHINE_DRIVER_START( mugsmash )
-
-	MDRV_DRIVER_DATA( mugsmash_state )
+static MACHINE_CONFIG_START( mugsmash, mugsmash_state )
 
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(mugsmash_map)
@@ -444,7 +442,7 @@ static MACHINE_DRIVER_START( mugsmash )
 	MDRV_OKIM6295_ADD("oki", 1122000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)	/* sound fx */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( mugsmash )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */

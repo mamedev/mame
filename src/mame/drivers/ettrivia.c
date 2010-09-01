@@ -237,7 +237,7 @@ static INTERRUPT_GEN( ettrivia_interrupt )
 		cpu_set_input_line(device, 0, HOLD_LINE);
 }
 
-static MACHINE_DRIVER_START( ettrivia )
+static MACHINE_CONFIG_START( ettrivia, driver_data_t )
 	MDRV_CPU_ADD("maincpu", Z80,12000000/4-48000) //should be ok, it gives the 300 interrupts expected
 	MDRV_CPU_PROGRAM_MAP(cpu_map)
 	MDRV_CPU_IO_MAP(io_map)
@@ -273,7 +273,7 @@ static MACHINE_DRIVER_START( ettrivia )
 	MDRV_SOUND_ADD("ay3", AY8910, 1500000)
 	MDRV_SOUND_CONFIG(ay8912_interface_3)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( promutrv )
 	ROM_REGION( 0x10000, "maincpu", 0 )

@@ -358,7 +358,7 @@ static MACHINE_RESET( crballoon )
  *
  *************************************/
 
-static MACHINE_DRIVER_START( crbaloon )
+static MACHINE_CONFIG_START( crbaloon, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CRBALOON_MASTER_XTAL / 3)
@@ -385,9 +385,9 @@ static MACHINE_DRIVER_START( crbaloon )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
 
 	/* audio hardware */
-	MDRV_IMPORT_FROM(crbaloon_audio)
+	MDRV_FRAGMENT_ADD(crbaloon_audio)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

@@ -13,10 +13,10 @@ void sega_security(int chip);
 
 /*----------- defined in audio/segag80r.c -----------*/
 
-MACHINE_DRIVER_EXTERN( astrob_sound_board );
-MACHINE_DRIVER_EXTERN( 005_sound_board );
-MACHINE_DRIVER_EXTERN( spaceod_sound_board );
-MACHINE_DRIVER_EXTERN( monsterb_sound_board );
+MACHINE_CONFIG_EXTERN( astrob_sound_board );
+MACHINE_CONFIG_EXTERN( 005_sound_board );
+MACHINE_CONFIG_EXTERN( spaceod_sound_board );
+MACHINE_CONFIG_EXTERN( monsterb_sound_board );
 
 WRITE8_HANDLER( astrob_sound_w );
 

@@ -353,8 +353,7 @@ static const pokey_interface pokey_config =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( foodf )
-	MDRV_DRIVER_DATA(foodf_state)
+static MACHINE_CONFIG_START( foodf, foodf_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, MASTER_CLOCK/2)
@@ -391,7 +390,7 @@ static MACHINE_DRIVER_START( foodf )
 
 	MDRV_SOUND_ADD("pokey3", POKEY, MASTER_CLOCK/2/10)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

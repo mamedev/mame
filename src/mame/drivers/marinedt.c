@@ -645,10 +645,7 @@ static MACHINE_RESET( marinedt )
 	state->cyqh = 0;
 }
 
-static MACHINE_DRIVER_START( marinedt )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(marinedt_state)
+static MACHINE_CONFIG_START( marinedt, marinedt_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,10000000/4)
@@ -676,7 +673,7 @@ static MACHINE_DRIVER_START( marinedt )
 
 	/* sound hardware */
 	//discrete sound
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

@@ -339,7 +339,7 @@ static VIDEO_UPDATE( ppmast93 )
 	return 0;
 }
 
-static MACHINE_DRIVER_START( ppmast93 )
+static MACHINE_CONFIG_START( ppmast93, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,5000000)		 /* 5 MHz */
 	MDRV_CPU_PROGRAM_MAP(ppmast93_cpu1_map)
@@ -375,7 +375,7 @@ static MACHINE_DRIVER_START( ppmast93 )
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( ppmast93 )
 	ROM_REGION( 0x30000, "maincpu", 0 )

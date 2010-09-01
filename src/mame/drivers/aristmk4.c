@@ -1169,7 +1169,7 @@ static MACHINE_RESET( aristmk4 )
 }
 
 
-static MACHINE_DRIVER_START( aristmk4 )
+static MACHINE_CONFIG_START( aristmk4, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, MAIN_CLOCK/8) // 1.5mhz (goldenc needs a bit faster for some reason)
@@ -1216,7 +1216,7 @@ static MACHINE_DRIVER_START( aristmk4 )
     MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
 
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( 3bagflvt )
 

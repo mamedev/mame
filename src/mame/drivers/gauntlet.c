@@ -513,8 +513,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( gauntlet )
-	MDRV_DRIVER_DATA(gauntlet_state)
+static MACHINE_CONFIG_START( gauntlet, gauntlet_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68010, ATARI_CLOCK_14MHz/2)
@@ -556,7 +555,7 @@ static MACHINE_DRIVER_START( gauntlet )
 	MDRV_SOUND_ADD("tms", TMS5220C, ATARI_CLOCK_14MHz/2/11)	/* potentially ATARI_CLOCK_14MHz/2/9 as well */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

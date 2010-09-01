@@ -437,10 +437,7 @@ static MACHINE_RESET( boxer )
 }
 
 
-static MACHINE_DRIVER_START(boxer)
-
-	/* driver data */
-	MDRV_DRIVER_DATA(boxer_state)
+static MACHINE_CONFIG_START( boxer, boxer_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 16)
@@ -462,7 +459,7 @@ static MACHINE_DRIVER_START(boxer)
 	MDRV_VIDEO_UPDATE(boxer)
 
 	/* sound hardware */
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************************

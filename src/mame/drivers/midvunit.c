@@ -1018,7 +1018,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( midvcommon )
+static MACHINE_CONFIG_START( midvcommon, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", TMS32031, CPU_CLOCK)
@@ -1040,19 +1040,17 @@ static MACHINE_DRIVER_START( midvcommon )
 
 	MDRV_VIDEO_START(midvunit)
 	MDRV_VIDEO_UPDATE(midvunit)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( midvunit )
-	MDRV_IMPORT_FROM(midvcommon)
+static MACHINE_CONFIG_DERIVED( midvunit, midvcommon )
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(dcs_audio_2k)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(dcs_audio_2k)
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( midvplus )
-	MDRV_IMPORT_FROM(midvcommon)
+static MACHINE_CONFIG_DERIVED( midvplus, midvcommon )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
@@ -1065,8 +1063,8 @@ static MACHINE_DRIVER_START( midvplus )
 	MDRV_IDE_CONTROLLER_ADD("ide", NULL)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(dcs2_audio_2115)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(dcs2_audio_2115)
+MACHINE_CONFIG_END
 
 
 

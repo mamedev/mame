@@ -153,14 +153,14 @@ static const samples_interface seawolf_samples_interface =
 };
 
 
-MACHINE_DRIVER_START( seawolf_audio )
+MACHINE_CONFIG_FRAGMENT( seawolf_audio )
 	MDRV_SOUND_START(samples)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(seawolf_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.6)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 WRITE8_HANDLER( seawolf_audio_w )
@@ -214,7 +214,7 @@ static const samples_interface gunfight_samples_interface =
 };
 
 
-MACHINE_DRIVER_START( gunfight_audio )
+MACHINE_CONFIG_FRAGMENT( gunfight_audio )
 	MDRV_SOUND_START(samples)
 
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -226,7 +226,7 @@ MACHINE_DRIVER_START( gunfight_audio )
 	MDRV_SOUND_ADD("samples2", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(gunfight_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 WRITE8_HANDLER( gunfight_audio_w )
@@ -323,12 +323,12 @@ static DISCRETE_SOUND_START(tornbase)
 DISCRETE_SOUND_END
 
 
-MACHINE_DRIVER_START( tornbase_audio )
+MACHINE_CONFIG_FRAGMENT( tornbase_audio )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(tornbase)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 WRITE8_DEVICE_HANDLER( tornbase_audio_w )
@@ -367,9 +367,9 @@ WRITE8_DEVICE_HANDLER( tornbase_audio_w )
  *
  *************************************/
 
-MACHINE_DRIVER_START( zzzap_audio )
+MACHINE_CONFIG_FRAGMENT( zzzap_audio )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 WRITE8_HANDLER( zzzap_audio_1_w )
@@ -569,12 +569,12 @@ static DISCRETE_SOUND_START(maze)
 DISCRETE_SOUND_END
 
 
-MACHINE_DRIVER_START( maze_audio )
+MACHINE_CONFIG_FRAGMENT( maze_audio )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(maze)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 void maze_write_discrete(running_device *device, UINT8 maze_tone_timing_state)
@@ -815,13 +815,13 @@ static DISCRETE_SOUND_START(boothill)
 DISCRETE_SOUND_END
 
 
-MACHINE_DRIVER_START( boothill_audio )
+MACHINE_CONFIG_FRAGMENT( boothill_audio )
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(boothill)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 WRITE8_DEVICE_HANDLER( boothill_audio_w )
@@ -1045,12 +1045,12 @@ static DISCRETE_SOUND_START(checkmat)
 DISCRETE_SOUND_END
 
 
-MACHINE_DRIVER_START( checkmat_audio )
+MACHINE_CONFIG_FRAGMENT( checkmat_audio )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(checkmat)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.4)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 WRITE8_DEVICE_HANDLER( checkmat_audio_w )
@@ -1256,12 +1256,12 @@ static DISCRETE_SOUND_START(desertgu)
 DISCRETE_SOUND_END
 
 
-MACHINE_DRIVER_START( desertgu_audio )
+MACHINE_CONFIG_FRAGMENT( desertgu_audio )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(desertgu)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 WRITE8_DEVICE_HANDLER( desertgu_audio_1_w )
@@ -1523,12 +1523,12 @@ static DISCRETE_SOUND_START(dplay)
 DISCRETE_SOUND_END
 
 
-MACHINE_DRIVER_START( dplay_audio )
+MACHINE_CONFIG_FRAGMENT( dplay_audio )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(dplay)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 WRITE8_DEVICE_HANDLER( dplay_audio_w )
@@ -1572,7 +1572,7 @@ static const samples_interface gmissile_samples_interface =
 };
 
 
-MACHINE_DRIVER_START( gmissile_audio )
+MACHINE_CONFIG_FRAGMENT( gmissile_audio )
 	MDRV_SOUND_START(samples)
 
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1584,7 +1584,7 @@ MACHINE_DRIVER_START( gmissile_audio )
 	MDRV_SOUND_ADD("samples2", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(gmissile_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.9)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 WRITE8_HANDLER( gmissile_audio_1_w )
@@ -1671,7 +1671,7 @@ static const samples_interface m4_samples_interface =
 };
 
 
-MACHINE_DRIVER_START( m4_audio )
+MACHINE_CONFIG_FRAGMENT( m4_audio )
 	MDRV_SOUND_START(samples)
 
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -1683,7 +1683,7 @@ MACHINE_DRIVER_START( m4_audio )
 	MDRV_SOUND_ADD("samples2", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(m4_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 WRITE8_HANDLER( m4_audio_1_w )
@@ -1933,7 +1933,7 @@ static const samples_interface clowns_samples_interface =
 };
 
 
-MACHINE_DRIVER_START( clowns_audio )
+MACHINE_CONFIG_FRAGMENT( clowns_audio )
 	MDRV_SOUND_START(samples)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -1945,7 +1945,7 @@ MACHINE_DRIVER_START( clowns_audio )
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(clowns)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 WRITE8_HANDLER( clowns_audio_1_w )
@@ -2307,13 +2307,13 @@ DISCRETE_GAIN(NODE_RELATIVE(SPACWALK_SPRINGBOARD_HIT1_SND, _num - 1),           
 	DISCRETE_OUTPUT(NODE_90, 11000)
 DISCRETE_SOUND_END
 
-MACHINE_DRIVER_START( spacwalk_audio )
+MACHINE_CONFIG_FRAGMENT( spacwalk_audio )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(spacwalk)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 WRITE8_DEVICE_HANDLER( spacwalk_audio_1_w )
 {
@@ -2538,13 +2538,13 @@ static DISCRETE_SOUND_START(shuffle)
 DISCRETE_SOUND_END
 
 
-MACHINE_DRIVER_START( shuffle_audio )
+MACHINE_CONFIG_FRAGMENT( shuffle_audio )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(shuffle)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 WRITE8_DEVICE_HANDLER( shuffle_audio_1_w )
@@ -2603,12 +2603,12 @@ static DISCRETE_SOUND_START(dogpatch)
 DISCRETE_SOUND_END
 
 
-MACHINE_DRIVER_START( dogpatch_audio )
+MACHINE_CONFIG_FRAGMENT( dogpatch_audio )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(dogpatch)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.3)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 WRITE8_HANDLER( dogpatch_audio_w )
@@ -3136,7 +3136,7 @@ static DISCRETE_SOUND_START(spcenctr)
 DISCRETE_SOUND_END
 
 
-MACHINE_DRIVER_START( spcenctr_audio )
+MACHINE_CONFIG_FRAGMENT( spcenctr_audio )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("snsnd", SN76477, 0)
@@ -3146,7 +3146,7 @@ MACHINE_DRIVER_START( spcenctr_audio )
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(spcenctr)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -3222,14 +3222,14 @@ static const samples_interface phantom2_samples_interface =
 };
 
 
-MACHINE_DRIVER_START( phantom2_audio )
+MACHINE_CONFIG_FRAGMENT( phantom2_audio )
 	MDRV_SOUND_START(samples)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(phantom2_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 WRITE8_HANDLER( phantom2_audio_1_w )
@@ -3352,13 +3352,13 @@ static DISCRETE_SOUND_START(bowler)
 DISCRETE_SOUND_END
 
 
-MACHINE_DRIVER_START( bowler_audio )
+MACHINE_CONFIG_FRAGMENT( bowler_audio )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(bowler)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 WRITE8_DEVICE_HANDLER( bowler_audio_1_w )
@@ -3503,7 +3503,7 @@ static const samples_interface invaders_samples_interface =
 
 
 /* left in for all games that hack into invaders samples for audio */
-MACHINE_DRIVER_START( invaders_samples_audio )
+MACHINE_CONFIG_FRAGMENT( invaders_samples_audio )
 	MDRV_SOUND_START(samples)
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -3515,7 +3515,7 @@ MACHINE_DRIVER_START( invaders_samples_audio )
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(invaders_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* nodes - inputs */
@@ -4072,7 +4072,7 @@ static DISCRETE_SOUND_START(invaders)
 DISCRETE_SOUND_END
 
 
-MACHINE_DRIVER_START( invaders_audio )
+MACHINE_CONFIG_FRAGMENT( invaders_audio )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("snsnd", SN76477, 0)
@@ -4082,7 +4082,7 @@ MACHINE_DRIVER_START( invaders_audio )
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(invaders)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 WRITE8_DEVICE_HANDLER( invaders_audio_1_w )
@@ -4482,12 +4482,12 @@ static DISCRETE_SOUND_START(blueshrk)
 DISCRETE_SOUND_END
 
 
-MACHINE_DRIVER_START( blueshrk_audio )
+MACHINE_CONFIG_FRAGMENT( blueshrk_audio )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(blueshrk)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 WRITE8_DEVICE_HANDLER( blueshrk_audio_w )
@@ -4700,7 +4700,7 @@ static DISCRETE_SOUND_START(invad2ct)
 DISCRETE_SOUND_END
 
 
-MACHINE_DRIVER_START( invad2ct_audio )
+MACHINE_CONFIG_FRAGMENT( invad2ct_audio )
 	MDRV_SPEAKER_STANDARD_STEREO("spk1", "spk2")
 
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
@@ -4715,7 +4715,7 @@ MACHINE_DRIVER_START( invad2ct_audio )
 	MDRV_SOUND_ADD("sn2", SN76477, 0)
 	MDRV_SOUND_CONFIG(invad2ct_p2_sn76477_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "spk2", 0.3)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 WRITE8_DEVICE_HANDLER( invad2ct_audio_1_w )

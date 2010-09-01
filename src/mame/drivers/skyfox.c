@@ -238,10 +238,7 @@ static MACHINE_RESET( skyfox )
 	state->bg_ctrl = 0;
 }
 
-static MACHINE_DRIVER_START( skyfox )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(skyfox_state)
+static MACHINE_CONFIG_START( skyfox, skyfox_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_8MHz/2) /* Verified at 4MHz */
@@ -276,7 +273,7 @@ static MACHINE_DRIVER_START( skyfox )
 
 	MDRV_SOUND_ADD("ym2", YM2203, XTAL_14_31818MHz/8) /* Verified at 1.789772MHz */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

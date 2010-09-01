@@ -1205,10 +1205,7 @@ static MACHINE_START( cps2 )
 }
 
 
-static MACHINE_DRIVER_START( cps2 )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(cps_state)
+static MACHINE_CONFIG_START( cps2, cps_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz)
@@ -1253,18 +1250,16 @@ static MACHINE_DRIVER_START( cps2 )
 	MDRV_SOUND_ADD("qsound", QSOUND, QSOUND_CLOCK)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( dead_cps2 )
-	MDRV_IMPORT_FROM(cps2)
+static MACHINE_CONFIG_DERIVED( dead_cps2, cps2 )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(dead_cps2_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( gigamn2 )
-	MDRV_IMPORT_FROM(cps2)
+static MACHINE_CONFIG_DERIVED( gigamn2, cps2 )
 
 	MDRV_DEVICE_REMOVE("audiocpu")
 
@@ -1273,7 +1268,7 @@ static MACHINE_DRIVER_START( gigamn2 )
 	MDRV_OKIM6295_ADD("oki", XTAL_32MHz/32, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.47)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*************************************
  *

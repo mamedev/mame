@@ -17,7 +17,7 @@ void exidy440_bank_select(running_machine *machine, UINT8 bank);
 extern UINT8 exidy440_sound_command;
 extern UINT8 exidy440_sound_command_ack;
 
-MACHINE_DRIVER_EXTERN( exidy440_audio );
+MACHINE_CONFIG_EXTERN( exidy440_audio );
 
 
 /*----------- defined in video/exidy440.c -----------*/
@@ -40,5 +40,5 @@ READ8_HANDLER( exidy440_vertical_pos_r );
 READ8_HANDLER( exidy440_horizontal_pos_r );
 WRITE8_HANDLER( exidy440_interrupt_clear_w );
 
-MACHINE_DRIVER_EXTERN( exidy440_video );
-MACHINE_DRIVER_EXTERN( topsecex_video );
+MACHINE_CONFIG_EXTERN( exidy440_video );
+MACHINE_CONFIG_EXTERN( topsecex_video );

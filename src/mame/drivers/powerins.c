@@ -357,7 +357,7 @@ static const nmk112_interface powerins_nmk112_intf =
 };
 
 
-static MACHINE_DRIVER_START( powerins )
+static MACHINE_CONFIG_START( powerins, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12MHz */
@@ -398,12 +398,11 @@ static MACHINE_DRIVER_START( powerins )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 
 	MDRV_NMK112_ADD("nmk112", powerins_nmk112_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( powerina )
+static MACHINE_CONFIG_DERIVED( powerina, powerins )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(powerins)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(powerina_map)
@@ -418,12 +417,11 @@ static MACHINE_DRIVER_START( powerina )
 
 	MDRV_DEVICE_REMOVE("oki2")
 	MDRV_DEVICE_REMOVE("ym2203")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( powerinb )
+static MACHINE_CONFIG_DERIVED( powerinb, powerins )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(powerins)
 
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -433,7 +431,7 @@ static MACHINE_DRIVER_START( powerinb )
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, 120)	// YM2203 rate is at 150??
 
 	MDRV_DEVICE_REMOVE("ym2203")	// Sound code talks to one, but it's not fitted on the board
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

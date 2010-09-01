@@ -479,10 +479,7 @@ static MACHINE_RESET( kyugo )
 }
 
 
-static MACHINE_DRIVER_START( gyrodine )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(kyugo_state)
+static MACHINE_CONFIG_START( gyrodine, kyugo_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)	/* verified on pcb */
@@ -524,57 +521,52 @@ static MACHINE_DRIVER_START( gyrodine )
 
 	MDRV_SOUND_ADD("ay2", AY8910, XTAL_18_432MHz/12)  /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( repulse )
+static MACHINE_CONFIG_DERIVED( repulse, gyrodine )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(gyrodine)
 	MDRV_CPU_MODIFY("sub")
 	MDRV_CPU_PROGRAM_MAP(repulse_sub_map)
 	MDRV_CPU_IO_MAP(repulse_sub_portmap)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( srdmissn )
+static MACHINE_CONFIG_DERIVED( srdmissn, gyrodine )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(gyrodine)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(srdmissn_portmap)
 
 	MDRV_CPU_MODIFY("sub")
 	MDRV_CPU_PROGRAM_MAP(srdmissn_sub_map)
 	MDRV_CPU_IO_MAP(srdmissn_sub_portmap)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( flashgal )
+static MACHINE_CONFIG_DERIVED( flashgal, repulse )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(repulse)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(flashgal_portmap)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( flashgala )
+static MACHINE_CONFIG_DERIVED( flashgala, gyrodine )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(gyrodine)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(flashgala_portmap)
 
 	MDRV_CPU_MODIFY("sub")
 	MDRV_CPU_PROGRAM_MAP(flashgala_sub_map)
 	MDRV_CPU_IO_MAP(flashgala_sub_portmap)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( legend )
+static MACHINE_CONFIG_DERIVED( legend, gyrodine )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(gyrodine)
 	MDRV_CPU_MODIFY("sub")
 	MDRV_CPU_PROGRAM_MAP(legend_sub_map)
 	MDRV_CPU_IO_MAP(srdmissn_sub_portmap)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************************

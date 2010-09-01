@@ -222,10 +222,7 @@ static MACHINE_RESET( flkatck )
 	state->flipscreen = 0;
 }
 
-static MACHINE_DRIVER_START( flkatck )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(flkatck_state)
+static MACHINE_CONFIG_START( flkatck, flkatck_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", HD6309,3000000*4) /* HD63C09EP, 24/8 MHz */
@@ -269,7 +266,7 @@ static MACHINE_DRIVER_START( flkatck )
 	MDRV_SOUND_ROUTE(0, "rspeaker", 0.50)
 	MDRV_SOUND_ROUTE(1, "lspeaker", 0.50)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

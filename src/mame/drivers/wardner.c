@@ -392,7 +392,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_DRIVER_START( wardner )
+static MACHINE_CONFIG_START( wardner, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_24MHz/4)		/* 6MHz */
@@ -438,7 +438,7 @@ static MACHINE_DRIVER_START( wardner )
 	MDRV_SOUND_ADD("ymsnd", YM3812, XTAL_14MHz/4)
 	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

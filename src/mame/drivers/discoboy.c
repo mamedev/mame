@@ -464,10 +464,7 @@ static MACHINE_RESET( discoboy )
 	state->adpcm_data = 0x80;
 }
 
-static MACHINE_DRIVER_START( discoboy )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(discoboy_state)
+static MACHINE_CONFIG_START( discoboy, discoboy_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,12000000/2)		 /* 6 MHz? */
@@ -508,7 +505,7 @@ static MACHINE_DRIVER_START( discoboy )
 	MDRV_SOUND_ADD("msm", MSM5205, 384000) // ???? unknown
 	MDRV_SOUND_CONFIG(discoboy_msm5205_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( discoboy )

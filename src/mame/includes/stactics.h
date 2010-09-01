@@ -43,7 +43,7 @@ public:
 
 /*----------- defined in video/stactics.c -----------*/
 
-MACHINE_DRIVER_EXTERN( stactics_video );
+MACHINE_CONFIG_EXTERN( stactics_video );
 
 WRITE8_HANDLER( stactics_scroll_ram_w );
 WRITE8_HANDLER( stactics_speed_latch_w );

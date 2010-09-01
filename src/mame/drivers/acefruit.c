@@ -547,7 +547,7 @@ static GFXDECODE_START( acefruit )
 	GFXDECODE_ENTRY( "gfx1", 0x1800, charlayout, 8, 4 )
 GFXDECODE_END
 
-static MACHINE_DRIVER_START( acefruit )
+static MACHINE_CONFIG_START( acefruit, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 2500000) /* 2.5MHz */
@@ -572,7 +572,7 @@ static MACHINE_DRIVER_START( acefruit )
 	MDRV_VIDEO_UPDATE(acefruit)
 
 	/* sound hardware */
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static DRIVER_INIT( sidewndr )
 {

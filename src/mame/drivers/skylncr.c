@@ -656,7 +656,7 @@ static INTERRUPT_GEN( skylncr_vblank_interrupt )
 *           Machine Driver           *
 *************************************/
 
-static MACHINE_DRIVER_START( skylncr )
+static MACHINE_CONFIG_START( skylncr, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
@@ -689,7 +689,7 @@ static MACHINE_DRIVER_START( skylncr )
 	MDRV_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK/8)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /**********************************

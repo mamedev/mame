@@ -518,10 +518,7 @@ static MACHINE_RESET( bking3 )
 	state->ddr_c = 0;
 }
 
-static MACHINE_DRIVER_START( bking )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(buggychl_state)
+static MACHINE_CONFIG_START( bking, buggychl_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("main_cpu", Z80, XTAL_12MHz/4)	/* 3 MHz */
@@ -567,10 +564,9 @@ static MACHINE_DRIVER_START( bking )
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( bking3 )
-	MDRV_IMPORT_FROM(bking)
+static MACHINE_CONFIG_DERIVED( bking3, bking )
 
 	MDRV_CPU_MODIFY("main_cpu")
 	MDRV_CPU_IO_MAP(bking3_io_map)
@@ -582,7 +578,7 @@ static MACHINE_DRIVER_START( bking3 )
 	MDRV_MACHINE_RESET(bking3)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

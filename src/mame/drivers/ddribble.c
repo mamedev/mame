@@ -282,10 +282,7 @@ static MACHINE_RESET( ddribble )
 	state->charbank[1] = 0;
 }
 
-static MACHINE_DRIVER_START( ddribble )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(ddribble_state)
+static MACHINE_CONFIG_START( ddribble, ddribble_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809,	XTAL_18_432MHz/12)	/* verified on pcb */
@@ -341,7 +338,7 @@ static MACHINE_DRIVER_START( ddribble )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MDRV_SOUND_ADD("filter3", FILTER_RC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( ddribble )

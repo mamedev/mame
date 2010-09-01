@@ -427,7 +427,7 @@ static const msm5205_interface msm5205_config =
 };
 
 
-static MACHINE_DRIVER_START( toki ) /* KOYO 20.000MHz near the cpu */
+static MACHINE_CONFIG_START( toki, driver_data_t ) /* KOYO 20.000MHz near the cpu */
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,XTAL_20MHz /2)	/* verified on pcb */
@@ -456,10 +456,10 @@ static MACHINE_DRIVER_START( toki ) /* KOYO 20.000MHz near the cpu */
 
 	/* sound hardware */
 	SEIBU_SOUND_SYSTEM_YM3812_RAIDEN_INTERFACE(XTAL_14_31818MHz/4,XTAL_12MHz/12) /* verifed on pcb */
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( tokib )
+static MACHINE_CONFIG_START( tokib, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 10MHz causes bad slowdowns with monkey machine rd1 */
@@ -494,7 +494,7 @@ static MACHINE_DRIVER_START( tokib )
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

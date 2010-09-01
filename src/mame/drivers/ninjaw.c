@@ -797,10 +797,7 @@ static MACHINE_RESET( ninjaw )
 	sound_global_enable(machine, 1);	/* mixer enabled */
 }
 
-static MACHINE_DRIVER_START( ninjaw )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(ninjaw_state)
+static MACHINE_CONFIG_START( ninjaw, ninjaw_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,16000000/2)	/* 8 MHz ? */
@@ -881,13 +878,10 @@ static MACHINE_DRIVER_START( ninjaw )
 //  MDRV_SOUND_ADD("subwoofer", SUBWOOFER, 0)
 
 	MDRV_TC0140SYT_ADD("tc0140syt", ninjaw_tc0140syt_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( darius2 )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(ninjaw_state)
+static MACHINE_CONFIG_START( darius2, ninjaw_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,16000000/2)	/* 8 MHz ? */
@@ -968,7 +962,7 @@ static MACHINE_DRIVER_START( darius2 )
 //  MDRV_SOUND_ADD("subwoofer", SUBWOOFER, 0)
 
 	MDRV_TC0140SYT_ADD("tc0140syt", ninjaw_tc0140syt_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

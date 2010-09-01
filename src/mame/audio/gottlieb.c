@@ -326,7 +326,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-MACHINE_DRIVER_START( gottlieb_soundrev1 )
+MACHINE_CONFIG_FRAGMENT( gottlieb_soundrev1 )
 	MDRV_SOUND_START(gottlieb1)
 
 	MDRV_RIOT6532_ADD("riot", SOUND1_CLOCK/4, gottlieb_riot6532_intf)
@@ -337,7 +337,7 @@ MACHINE_DRIVER_START( gottlieb_soundrev1 )
 	/* sound hardware */
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -575,7 +575,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-MACHINE_DRIVER_START( gottlieb_soundrev2 )
+MACHINE_CONFIG_FRAGMENT( gottlieb_soundrev2 )
 	/* audio CPUs */
 	MDRV_CPU_ADD("audiocpu", M6502, SOUND2_CLOCK/4)
 	MDRV_CPU_PROGRAM_MAP(gottlieb_audio2_map)
@@ -600,7 +600,7 @@ MACHINE_DRIVER_START( gottlieb_soundrev2 )
 
 	MDRV_SOUND_ADD("spsnd", SP0250, SOUND2_SPEECH_CLOCK)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

@@ -471,7 +471,7 @@ static const pokey_interface pokey_config =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( mhavoc )
+static MACHINE_CONFIG_START( mhavoc, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("alpha", M6502, MHAVOC_CLOCK_2_5M)		/* 2.5 MHz */
@@ -510,21 +510,19 @@ static MACHINE_DRIVER_START( mhavoc )
 
 	MDRV_SOUND_ADD("pokey4", POKEY, MHAVOC_CLOCK_1_25M)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( mhavocrv )
-	MDRV_IMPORT_FROM( mhavoc )
+static MACHINE_CONFIG_DERIVED( mhavocrv, mhavoc )
 
 	MDRV_SOUND_ADD("tms", TMS5220, MHAVOC_CLOCK/2/9)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( alphaone )
+static MACHINE_CONFIG_DERIVED( alphaone, mhavoc )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mhavoc)
 	MDRV_CPU_MODIFY("alpha")
 	MDRV_CPU_PROGRAM_MAP(alphaone_map)
 	MDRV_DEVICE_REMOVE("gamma")
@@ -541,7 +539,7 @@ static MACHINE_DRIVER_START( alphaone )
 
 	MDRV_DEVICE_REMOVE("pokey3")
 	MDRV_DEVICE_REMOVE("pokey4")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

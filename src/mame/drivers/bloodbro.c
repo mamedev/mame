@@ -433,7 +433,7 @@ GFXDECODE_END
 
 /* Machine Drivers */
 
-static MACHINE_DRIVER_START( bloodbro )
+static MACHINE_CONFIG_START( bloodbro, driver_data_t )
 	// basic machine hardware
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_20MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(bloodbro_map)
@@ -460,10 +460,9 @@ static MACHINE_DRIVER_START( bloodbro )
 
 	// sound hardware
 	SEIBU_SOUND_SYSTEM_YM3812_RAIDEN_INTERFACE(XTAL_7_15909MHz/2, XTAL_12MHz/12)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( weststry )
-	MDRV_IMPORT_FROM(bloodbro)
+static MACHINE_CONFIG_DERIVED( weststry, bloodbro )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(weststry_map)
@@ -473,16 +472,15 @@ static MACHINE_DRIVER_START( weststry )
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_UPDATE(weststry)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( skysmash )
-	MDRV_IMPORT_FROM(bloodbro)
+static MACHINE_CONFIG_DERIVED( skysmash, bloodbro )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
 
 	MDRV_VIDEO_UPDATE(skysmash)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROMs */
 

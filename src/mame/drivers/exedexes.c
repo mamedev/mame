@@ -212,10 +212,7 @@ static MACHINE_RESET( exedexes )
 	state->sc2on = 0;
 }
 
-static MACHINE_DRIVER_START( exedexes )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(exedexes_state)
+static MACHINE_CONFIG_START( exedexes, exedexes_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz (?) */
@@ -258,7 +255,7 @@ static MACHINE_DRIVER_START( exedexes )
 
 	MDRV_SOUND_ADD("sn2", SN76489, 3000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.36)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

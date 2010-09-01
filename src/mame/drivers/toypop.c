@@ -543,9 +543,7 @@ static const namcoio_interface intf2 =
 };
 
 
-static MACHINE_DRIVER_START( liblrabl )
-
-	MDRV_DRIVER_DATA(toypop_state)
+static MACHINE_CONFIG_START( liblrabl, toypop_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 1536000)	/* 1.536 MHz (measured on Libble Rabble board) */
@@ -589,18 +587,17 @@ static MACHINE_DRIVER_START( liblrabl )
 	MDRV_SOUND_ADD("namco", NAMCO_15XX, 24000)
 	MDRV_SOUND_CONFIG(namco_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( toypop )
+static MACHINE_CONFIG_DERIVED( toypop, liblrabl )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(liblrabl)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(toypop_map)
 
 	MDRV_DEVICE_REMOVE("58xx")
 	MDRV_NAMCO58XX_ADD("58xx", intf0_coin)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

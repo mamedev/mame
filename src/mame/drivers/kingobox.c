@@ -474,10 +474,7 @@ static MACHINE_RESET( kingofb )
 	state->palette_bank = 0;
 }
 
-static MACHINE_DRIVER_START( kingofb )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(kingofb_state)
+static MACHINE_CONFIG_START( kingofb, kingofb_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)        /* 4.0 MHz */
@@ -526,14 +523,11 @@ static MACHINE_DRIVER_START( kingofb )
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* Ring King */
-static MACHINE_DRIVER_START( ringking )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(kingofb_state)
+static MACHINE_CONFIG_START( ringking, kingofb_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)        /* 4.0 MHz */
@@ -582,7 +576,7 @@ static MACHINE_DRIVER_START( ringking )
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

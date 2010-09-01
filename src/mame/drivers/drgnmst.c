@@ -403,8 +403,7 @@ static MACHINE_RESET( drgnmst )
 	state->oki0_bank = 0;
 }
 
-static MACHINE_DRIVER_START( drgnmst )
-	MDRV_DRIVER_DATA(drgnmst_state)
+static MACHINE_CONFIG_START( drgnmst, drgnmst_state )
 
 	MDRV_CPU_ADD("maincpu", M68000, 12000000) /* Confirmed */
 	MDRV_CPU_PROGRAM_MAP(drgnmst_main_map)
@@ -441,7 +440,7 @@ static MACHINE_DRIVER_START( drgnmst )
 	MDRV_OKIM6295_ADD("oki2", 32000000/32, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( drgnmst )

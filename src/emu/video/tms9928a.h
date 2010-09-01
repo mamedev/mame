@@ -85,4 +85,4 @@ void TMS9928A_post_load (running_machine *machine);
 /*
 ** MachineDriver video declarations for the TMS9928A chip
 */
-MACHINE_DRIVER_EXTERN( tms9928a );
+MACHINE_CONFIG_EXTERN( tms9928a );

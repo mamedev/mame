@@ -321,7 +321,7 @@ static INTERRUPT_GEN( vblank_callback_istellar )
 
 
 /* DRIVER */
-static MACHINE_DRIVER_START( istellar )
+static MACHINE_CONFIG_START( istellar, driver_data_t )
 	/* main cpu */
 	MDRV_CPU_ADD("maincpu", Z80, GUESSED_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(z80_0_mem)
@@ -357,7 +357,7 @@ static MACHINE_DRIVER_START( istellar )
 	MDRV_SOUND_ADD("ldsound", LASERDISC, 0)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* There is a photo of the PCB with blurry IC locations and labels.  Comments reflect what I can (barely) see. */

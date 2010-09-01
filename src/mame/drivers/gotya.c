@@ -192,10 +192,7 @@ static MACHINE_RESET( gotya )
 	state->theme_playing = 0;
 }
 
-static MACHINE_DRIVER_START( gotya )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(gotya_state)
+static MACHINE_CONFIG_START( gotya, gotya_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,18432000/6)	/* 3.072 MHz ??? */
@@ -226,7 +223,7 @@ static MACHINE_DRIVER_START( gotya )
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(gotya_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

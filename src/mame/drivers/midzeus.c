@@ -1107,7 +1107,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( midzeus )
+static MACHINE_CONFIG_START( midzeus, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", TMS32032, CPU_CLOCK)
@@ -1129,8 +1129,8 @@ static MACHINE_DRIVER_START( midzeus )
 	MDRV_VIDEO_UPDATE(midzeus)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(dcs2_audio_2104)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(dcs2_audio_2104)
+MACHINE_CONFIG_END
 
 static READ8_HANDLER( PIC16C5X_T0_clk_r )
 {
@@ -1142,15 +1142,13 @@ static ADDRESS_MAP_START( pic_io_map, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
-static MACHINE_DRIVER_START( invasn )
-
-	MDRV_IMPORT_FROM(midzeus)
+static MACHINE_CONFIG_DERIVED( invasn, midzeus )
 
 	MDRV_CPU_ADD("pic", PIC16C57, 8000000)	/* ? */
 	MDRV_CPU_IO_MAP(pic_io_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( midzeus2 )
+static MACHINE_CONFIG_START( midzeus2, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", TMS32032, CPU_CLOCK)
@@ -1170,10 +1168,10 @@ static MACHINE_DRIVER_START( midzeus2 )
 	MDRV_VIDEO_UPDATE(midzeus2)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(dcs2_audio_2104)
+	MDRV_FRAGMENT_ADD(dcs2_audio_2104)
 
 	MDRV_M48T35_ADD( "m48t35" )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

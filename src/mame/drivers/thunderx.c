@@ -679,10 +679,7 @@ static MACHINE_RESET( thunderx )
 	MACHINE_RESET_CALL(scontra);
 }
 
-static MACHINE_DRIVER_START( scontra )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(thunderx_state)
+static MACHINE_CONFIG_START( scontra, thunderx_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", KONAMI, XTAL_24MHz/8)		/* Verified on pcb, CPU is 052001 */
@@ -724,13 +721,10 @@ static MACHINE_DRIVER_START( scontra )
 	MDRV_SOUND_CONFIG(k007232_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.20)
 	MDRV_SOUND_ROUTE(1, "mono", 0.20)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( thunderx )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(thunderx_state)
+static MACHINE_CONFIG_START( thunderx, thunderx_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", KONAMI, 3000000)		/* ? */
@@ -767,7 +761,7 @@ static MACHINE_DRIVER_START( thunderx )
 	MDRV_SOUND_ADD("ymsnd", YM2151, 3579545)
 	MDRV_SOUND_ROUTE(0, "mono", 1.0)
 	MDRV_SOUND_ROUTE(1, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

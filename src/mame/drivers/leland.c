@@ -731,7 +731,7 @@ static const eeprom_interface eeprom_intf =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( leland )
+static MACHINE_CONFIG_START( leland, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("master", Z80, MASTER_CLOCK/2)
@@ -750,7 +750,7 @@ static MACHINE_DRIVER_START( leland )
 	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
 
 	/* video hardware */
-	MDRV_IMPORT_FROM(leland_video)
+	MDRV_FRAGMENT_ADD(leland_video)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -765,13 +765,12 @@ static MACHINE_DRIVER_START( leland )
 
 	MDRV_SOUND_ADD("custom", LELAND, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( redline )
+static MACHINE_CONFIG_DERIVED( redline, leland )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(leland)
 
 	MDRV_CPU_ADD("audiocpu", I80186, MCU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(leland_80186_map_program)
@@ -780,13 +779,12 @@ static MACHINE_DRIVER_START( redline )
 	/* sound hardware */
 	MDRV_SOUND_REPLACE("custom", REDLINE_80186, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( quarterb )
+static MACHINE_CONFIG_DERIVED( quarterb, redline )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(redline)
 
 	MDRV_CPU_MODIFY("audiocpu")
 	MDRV_CPU_IO_MAP(leland_80186_map_io)
@@ -794,17 +792,16 @@ static MACHINE_DRIVER_START( quarterb )
 	/* sound hardware */
 	MDRV_SOUND_REPLACE("custom", LELAND_80186, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( lelandi )
+static MACHINE_CONFIG_DERIVED( lelandi, quarterb )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(quarterb)
 
 	MDRV_CPU_MODIFY("slave")
 	MDRV_CPU_PROGRAM_MAP(slave_large_map_program)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

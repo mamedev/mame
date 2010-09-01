@@ -4332,10 +4332,7 @@ static const msm5205_interface hanamai_msm5205_interface =
 
 
 
-static MACHINE_DRIVER_START( hanamai )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(dynax_state)
+static MACHINE_CONFIG_START( hanamai, dynax_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80,22000000 / 4)	/* 5.5MHz */
@@ -4378,7 +4375,7 @@ static MACHINE_DRIVER_START( hanamai )
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(hanamai_msm5205_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -4393,10 +4390,7 @@ static const ay8910_interface hnoridur_ay8910_interface =
 	DEVCB_INPUT_PORT("DSW0")		/* Port A Read: DSW */
 };
 
-static MACHINE_DRIVER_START( hnoridur )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(dynax_state)
+static MACHINE_CONFIG_START( hnoridur, dynax_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80,22000000 / 4)	/* 5.5MHz */
@@ -4435,17 +4429,14 @@ static MACHINE_DRIVER_START( hnoridur )
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(hanamai_msm5205_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
                                 Hana Jingi
 ***************************************************************************/
 
-static MACHINE_DRIVER_START( hjingi )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(dynax_state)
+static MACHINE_CONFIG_START( hjingi, dynax_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80, XTAL_22MHz / 4)
@@ -4484,7 +4475,7 @@ static MACHINE_DRIVER_START( hjingi )
 	MDRV_SOUND_ADD("msm", MSM5205, XTAL_384kHz )
 	MDRV_SOUND_CONFIG(hanamai_msm5205_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
@@ -4504,10 +4495,7 @@ static const ym2203_interface sprtmtch_ym2203_interface =
 	sprtmtch_sound_callback,	/* IRQ handler */
 };
 
-static MACHINE_DRIVER_START( sprtmtch )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(dynax_state)
+static MACHINE_CONFIG_START( sprtmtch, dynax_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,22000000 / 4)	/* 5.5MHz */
@@ -4543,17 +4531,14 @@ static MACHINE_DRIVER_START( sprtmtch )
 	MDRV_SOUND_ROUTE(1, "mono", 0.20)
 	MDRV_SOUND_ROUTE(2, "mono", 0.20)
 	MDRV_SOUND_ROUTE(3, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
                             Mahjong Friday
 ***************************************************************************/
 
-static MACHINE_DRIVER_START( mjfriday )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(dynax_state)
+static MACHINE_CONFIG_START( mjfriday, dynax_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80,24000000/4)	/* 6 MHz? */
@@ -4585,20 +4570,19 @@ static MACHINE_DRIVER_START( mjfriday )
 
 	MDRV_SOUND_ADD("ymsnd", YM2413, 24000000/6)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
                             Mahjong Dial Q2
 ***************************************************************************/
 
-static MACHINE_DRIVER_START( mjdialq2 )
+static MACHINE_CONFIG_DERIVED( mjdialq2, mjfriday )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM( mjfriday )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(mjdialq2_mem_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
@@ -4622,10 +4606,9 @@ static INTERRUPT_GEN( yarunara_clock_interrupt )
 	sprtmtch_update_irq(device->machine);
 }
 
-static MACHINE_DRIVER_START( yarunara )
+static MACHINE_CONFIG_DERIVED( yarunara, hnoridur )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM( hnoridur )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(yarunara_mem_map)
 	MDRV_CPU_IO_MAP(yarunara_io_map)
@@ -4639,35 +4622,31 @@ static MACHINE_DRIVER_START( yarunara )
 
 	/* devices */
 	MDRV_MSM6242_ADD("rtc")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
                             Mahjong Campus Hunting
 ***************************************************************************/
 
-static MACHINE_DRIVER_START( mcnpshnt )
-
-	MDRV_IMPORT_FROM( hnoridur )
+static MACHINE_CONFIG_DERIVED( mcnpshnt, hnoridur )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(mcnpshnt_mem_map)
 	MDRV_CPU_IO_MAP(mcnpshnt_io_map)
 
 	MDRV_VIDEO_START(mcnpshnt)	// different priorities
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
                             7jigen
 ***************************************************************************/
 
-static MACHINE_DRIVER_START( nanajign )
-
-	MDRV_IMPORT_FROM( hnoridur )
+static MACHINE_CONFIG_DERIVED( nanajign, hnoridur )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(nanajign_mem_map)
 	MDRV_CPU_IO_MAP(nanajign_io_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
@@ -4707,10 +4686,7 @@ static MACHINE_START( jantouki )
 	MACHINE_START_CALL(dynax);
 }
 
-static MACHINE_DRIVER_START( jantouki )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(dynax_state)
+static MACHINE_CONFIG_START( jantouki, dynax_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80,22000000 / 4)	/* 5.5MHz */
@@ -4769,7 +4745,7 @@ static MACHINE_DRIVER_START( jantouki )
 
 	/* devices */
 	MDRV_MSM6242_ADD("rtc")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
@@ -4796,16 +4772,14 @@ static INTERRUPT_GEN( mjelctrn_vblank_interrupt )
 		cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xf8);
 }
 
-static MACHINE_DRIVER_START( mjelctrn )
-
-	MDRV_IMPORT_FROM( hnoridur )
+static MACHINE_CONFIG_DERIVED( mjelctrn, hnoridur )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(nanajign_mem_map)
 	MDRV_CPU_IO_MAP(mjelctrn_io_map)
 	MDRV_CPU_VBLANK_INT("screen", mjelctrn_vblank_interrupt)	/* IM 2 needs a vector on the data bus */
 
 	MDRV_VIDEO_START(mjelctrn)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
@@ -4838,14 +4812,12 @@ static INTERRUPT_GEN( neruton_vblank_interrupt )
 	}
 }
 
-static MACHINE_DRIVER_START( neruton )
-
-	MDRV_IMPORT_FROM( mjelctrn )
+static MACHINE_CONFIG_DERIVED( neruton, mjelctrn )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_VBLANK_INT_HACK(neruton_vblank_interrupt,1+10)	/* IM 2 needs a vector on the data bus */
 
 	MDRV_VIDEO_START(neruton)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
                                     Mahjong X-Tal 7
@@ -4865,13 +4837,11 @@ static INTERRUPT_GEN( majxtal7_vblank_interrupt )
 	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0x40);
 }
 
-static MACHINE_DRIVER_START( majxtal7 )
-
-	MDRV_IMPORT_FROM( neruton )
+static MACHINE_CONFIG_DERIVED( majxtal7, neruton )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_VBLANK_INT("screen", majxtal7_vblank_interrupt)	/* IM 2 needs a vector on the data bus */
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
@@ -4887,10 +4857,7 @@ static const ay8910_interface htengoku_ay8910_interface =
 	DEVCB_NULL,						DEVCB_HANDLER(htengoku_dsw_w)		// W
 };
 
-static MACHINE_DRIVER_START( htengoku )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(dynax_state)
+static MACHINE_CONFIG_START( htengoku, dynax_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80,20000000 / 4)
@@ -4930,7 +4897,7 @@ static MACHINE_DRIVER_START( htengoku )
 
 	/* devices */
 	MDRV_MSM6242_ADD("rtc")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
@@ -4968,10 +4935,7 @@ static MACHINE_START( tenkai )
 	state_save_register_postload(machine, tenkai_bank_postload, NULL);
 }
 
-static MACHINE_DRIVER_START( tenkai )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(dynax_state)
+static MACHINE_CONFIG_START( tenkai, dynax_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",TMP91640, 21472700 / 2)
@@ -5009,13 +4973,12 @@ static MACHINE_DRIVER_START( tenkai )
 
 	/* devices */
 	MDRV_MSM6242_ADD("rtc")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( majrjhdx )
-	MDRV_IMPORT_FROM( tenkai )
+static MACHINE_CONFIG_DERIVED( majrjhdx, tenkai )
 	MDRV_PALETTE_LENGTH(512)
 	MDRV_PALETTE_INIT(sprtmtch)			// static palette
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
                                 Mahjong Gekisha
@@ -5042,10 +5005,7 @@ static MACHINE_RESET( gekisha )
 	gekisha_set_rombank(machine, 0);
 }
 
-static MACHINE_DRIVER_START( gekisha )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(dynax_state)
+static MACHINE_CONFIG_START( gekisha, dynax_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",TMP90841, XTAL_10MHz )	// ?
@@ -5080,7 +5040,7 @@ static MACHINE_DRIVER_START( gekisha )
 
 	MDRV_SOUND_ADD("ymsnd", YM2413, XTAL_24MHz / 8)	// ?
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

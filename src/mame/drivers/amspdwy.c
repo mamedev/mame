@@ -271,10 +271,7 @@ static MACHINE_RESET( amspdwy )
 	state->wheel_return[1] = 0;
 }
 
-static MACHINE_DRIVER_START( amspdwy )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(amspdwy_state)
+static MACHINE_CONFIG_START( amspdwy, amspdwy_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,3000000)
@@ -308,7 +305,7 @@ static MACHINE_DRIVER_START( amspdwy )
 	MDRV_SOUND_CONFIG(amspdwy_ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

@@ -1993,10 +1993,7 @@ GFXDECODE_END
  *************************************/
 
 /* System 16A/B Bootlegs */
-static MACHINE_DRIVER_START( system16 )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(segas1x_bootleg_state)
+static MACHINE_CONFIG_START( system16, segas1x_bootleg_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)
@@ -2026,7 +2023,7 @@ static MACHINE_DRIVER_START( system16 )
 	MDRV_SOUND_ADD("ymsnd", YM2151, 4000000)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.32)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.32)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 static void sound_cause_nmi( running_device *device, int chip )
@@ -2044,10 +2041,9 @@ const upd7759_interface sys16_upd7759_interface  =
 };
 
 
-static MACHINE_DRIVER_START( system16_7759 )
+static MACHINE_CONFIG_DERIVED( system16_7759, system16 )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(system16)
 
 	MDRV_CPU_MODIFY("soundcpu")
 	MDRV_CPU_PROGRAM_MAP(sound_7759_map)
@@ -2058,10 +2054,10 @@ static MACHINE_DRIVER_START( system16_7759 )
 	MDRV_SOUND_CONFIG(sys16_upd7759_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.48)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.48)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( system16_datsu_sound )
+static MACHINE_CONFIG_FRAGMENT( system16_datsu_sound )
 	/* TODO:
     - other games might use this sound configuration
     - speaker is likely to be mono for the bootlegs, not stereo.
@@ -2081,7 +2077,7 @@ static MACHINE_DRIVER_START( system16_datsu_sound )
 	MDRV_SOUND_CONFIG(tturfbl_msm5205_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 static const sega16sp_interface shinobld_sega16sp_intf =
@@ -2094,10 +2090,9 @@ static const sega16sp_interface shinobld_sega16sp_intf =
 	0, // use buffer
 };
 
-static MACHINE_DRIVER_START( shinobib )
+static MACHINE_CONFIG_DERIVED( shinobib, system16 )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(system16)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(shinobib_map)
 
@@ -2105,7 +2100,7 @@ static MACHINE_DRIVER_START( shinobib )
 
 	MDRV_VIDEO_START( s16a_bootleg_shinobi )
 	MDRV_VIDEO_UPDATE( s16a_bootleg )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static const sega16sp_interface passshtb_sega16sp_intf =
 {
@@ -2117,10 +2112,9 @@ static const sega16sp_interface passshtb_sega16sp_intf =
 	0, // use buffer
 };
 
-static MACHINE_DRIVER_START( passshtb )
+static MACHINE_CONFIG_DERIVED( passshtb, system16_7759 )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(system16_7759)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(passshtb_map)
 
@@ -2128,13 +2122,12 @@ static MACHINE_DRIVER_START( passshtb )
 
 	MDRV_VIDEO_START( s16a_bootleg_passsht )
 	MDRV_VIDEO_UPDATE( s16a_bootleg )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( passsht4b )
+static MACHINE_CONFIG_DERIVED( passsht4b, system16_7759 )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(system16_7759)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(passht4b_map)
 
@@ -2143,7 +2136,7 @@ static MACHINE_DRIVER_START( passsht4b )
 
 	MDRV_VIDEO_START( s16a_bootleg_passsht )
 	MDRV_VIDEO_UPDATE( s16a_bootleg_passht4b )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static const sega16sp_interface wb3bbl_sega16sp_intf =
 {
@@ -2155,10 +2148,9 @@ static const sega16sp_interface wb3bbl_sega16sp_intf =
 	0, // use buffer
 };
 
-static MACHINE_DRIVER_START( wb3bb )
+static MACHINE_CONFIG_DERIVED( wb3bb, system16 )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(system16)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(wb3bbl_map)
 
@@ -2166,7 +2158,7 @@ static MACHINE_DRIVER_START( wb3bb )
 
 	MDRV_VIDEO_START( s16a_bootleg_wb3bl )
 	MDRV_VIDEO_UPDATE( s16a_bootleg )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 static const sega16sp_interface s16bbl_x121_sega16sp_intf =
@@ -2179,10 +2171,7 @@ static const sega16sp_interface s16bbl_x121_sega16sp_intf =
 	0, // use buffer
 };
 
-static MACHINE_DRIVER_START( goldnaxeb1 )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(segas1x_bootleg_state)
+static MACHINE_CONFIG_START( goldnaxeb1, segas1x_bootleg_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)
@@ -2206,23 +2195,23 @@ static MACHINE_DRIVER_START( goldnaxeb1 )
 	MDRV_PALETTE_INIT( all_black )
 	MDRV_VIDEO_START(system16)
 	MDRV_VIDEO_UPDATE(system16)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( goldnaxeb2 )
+static MACHINE_CONFIG_DERIVED( goldnaxeb2, goldnaxeb1 )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(goldnaxeb1)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(goldnaxeb2_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( bayrouteb1 )
+static MACHINE_CONFIG_DERIVED( bayrouteb1, goldnaxeb1 )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(goldnaxeb1)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(bayrouteb1_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static const sega16sp_interface s16bbl_x107_sega16sp_intf =
 {
@@ -2234,22 +2223,21 @@ static const sega16sp_interface s16bbl_x107_sega16sp_intf =
 	0, // use buffer
 };
 
-static MACHINE_DRIVER_START( bayrouteb2 )
+static MACHINE_CONFIG_DERIVED( bayrouteb2, goldnaxeb1 )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(goldnaxeb1)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(bayrouteb2_map)
 
-	MDRV_IMPORT_FROM(system16_datsu_sound)
+	MDRV_FRAGMENT_ADD(system16_datsu_sound)
 
 	MDRV_DEVICE_REMOVE("segaspr1")
 	MDRV_SEGA16SP_ADD("segaspr1", s16bbl_x107_sega16sp_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( tturfbl )
+static MACHINE_CONFIG_DERIVED( tturfbl, system16_7759 )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(system16_7759)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(tturfbl_map)
 
@@ -2264,7 +2252,7 @@ static MACHINE_DRIVER_START( tturfbl )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 
 	MDRV_SEGA16SP_ADD("segaspr1", s16bbl_x107_sega16sp_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static const sega16sp_interface s16bbl_x112_sega16sp_intf =
 {
@@ -2276,15 +2264,14 @@ static const sega16sp_interface s16bbl_x112_sega16sp_intf =
 	0, // use buffer
 };
 
-static MACHINE_DRIVER_START( dduxbl )
+static MACHINE_CONFIG_DERIVED( dduxbl, system16 )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(system16)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(dduxbl_map)
 
 	MDRV_SEGA16SP_ADD("segaspr1", s16bbl_x112_sega16sp_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static const sega16sp_interface s16bbl_x124_sega16sp_intf =
 {
@@ -2296,20 +2283,18 @@ static const sega16sp_interface s16bbl_x124_sega16sp_intf =
 	0, // use buffer
 };
 
-static MACHINE_DRIVER_START( eswatbl )
+static MACHINE_CONFIG_DERIVED( eswatbl, system16_7759 )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(system16_7759)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(eswatbl_map)
 
 	MDRV_SEGA16SP_ADD("segaspr1", s16bbl_x124_sega16sp_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( fpointbl )
+static MACHINE_CONFIG_DERIVED( fpointbl, system16 )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(system16)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(fpointbl_map)
 
@@ -2317,35 +2302,30 @@ static MACHINE_DRIVER_START( fpointbl )
 	MDRV_CPU_PROGRAM_MAP(fpointbl_sound_map)
 
 	MDRV_SEGA16SP_ADD("segaspr1", s16bbl_x107_sega16sp_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( tetrisbl )
+static MACHINE_CONFIG_DERIVED( tetrisbl, system16 )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(system16)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(tetrisbl_map)
 
 	MDRV_SEGA16SP_ADD("segaspr1", s16bbl_x112_sega16sp_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( beautyb )
+static MACHINE_CONFIG_DERIVED( beautyb, system16 )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(system16)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(beautyb_map)
 
 	MDRV_SEGA16SP_ADD("segaspr1", s16bbl_x112_sega16sp_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* System 18 Bootlegs */
-static MACHINE_DRIVER_START( system18 )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(segas1x_bootleg_state)
+static MACHINE_CONFIG_START( system18, segas1x_bootleg_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)
@@ -2389,31 +2369,28 @@ static MACHINE_DRIVER_START( system18 )
 	MDRV_SOUND_ADD("5c68", RF5C68, 8000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( astormbl )
+static MACHINE_CONFIG_DERIVED( astormbl, system18 )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(system18)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(astormbl_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( mwalkbl )
+static MACHINE_CONFIG_DERIVED( mwalkbl, system18 )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(system18)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(mwalkbl_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( shdancbl )
+static MACHINE_CONFIG_DERIVED( shdancbl, system18 )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(system18)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(shdancbl_map)
 
@@ -2426,7 +2403,7 @@ static MACHINE_DRIVER_START( shdancbl )
 	MDRV_SOUND_CONFIG(shdancbl_msm5205_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************************

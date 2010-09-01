@@ -1208,7 +1208,7 @@ static const ay8910_interface ay8910_config =
 *    Machine Drivers    *
 ************************/
 
-static MACHINE_DRIVER_START( videopkr )
+static MACHINE_CONFIG_START( videopkr, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8039, CPU_CLOCK)
@@ -1244,25 +1244,23 @@ static MACHINE_DRIVER_START( videopkr )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.55)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( blckjack )
+static MACHINE_CONFIG_DERIVED( blckjack, videopkr )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(videopkr)
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(4*8, 31*8-1, 2*8, 30*8-1)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( videodad )
+static MACHINE_CONFIG_DERIVED( videodad, videopkr )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(videopkr)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_CLOCK(CPU_CLOCK_ALT)
 
@@ -1273,13 +1271,12 @@ static MACHINE_DRIVER_START( videodad )
 
 	MDRV_GFXDECODE(videodad)
 	MDRV_VIDEO_START(vidadcba)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( babypkr )
+static MACHINE_CONFIG_DERIVED( babypkr, videopkr )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(videopkr)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_CLOCK(CPU_CLOCK_ALT)
 	/* most likely romless or eprom */
@@ -1299,17 +1296,16 @@ static MACHINE_DRIVER_START( babypkr )
 	MDRV_SOUND_ADD("aysnd", AY8910, CPU_CLOCK / 6)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( fortune1 )
+static MACHINE_CONFIG_DERIVED( fortune1, videopkr )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(videopkr)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_CLOCK(CPU_CLOCK_ALT)
 
 	MDRV_PALETTE_INIT(fortune1)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*************************
 *        Rom Load        *

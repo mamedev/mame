@@ -435,7 +435,7 @@ static const ym2151_interface ym2151_config =
 
 static const nec_config firebarr_config ={ rtypeleo_decryption_table, };
 
-static MACHINE_DRIVER_START( firebarr )
+static MACHINE_CONFIG_START( firebarr, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V33, 28000000/2)	/* NEC V33, 28MHz clock */
@@ -474,11 +474,10 @@ static MACHINE_DRIVER_START( firebarr )
 	MDRV_SOUND_ADD("irem", IREMGA20, 14318180/4)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static const nec_config dsoccr94_config ={ dsoccr94_decryption_table, };
-static MACHINE_DRIVER_START( dsoccr94 )
-	MDRV_IMPORT_FROM(firebarr)
+static MACHINE_CONFIG_DERIVED( dsoccr94, firebarr )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
@@ -489,15 +488,14 @@ static MACHINE_DRIVER_START( dsoccr94 )
 
 	/* video hardware */
 	MDRV_GFXDECODE(m107)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 static const nec_config wpksoc_config ={ leagueman_decryption_table, };
-static MACHINE_DRIVER_START( wpksoc )
-	MDRV_IMPORT_FROM(firebarr)
+static MACHINE_CONFIG_DERIVED( wpksoc, firebarr )
 	MDRV_CPU_MODIFY("soundcpu")
 	MDRV_CPU_CONFIG(wpksoc_config)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************/
 

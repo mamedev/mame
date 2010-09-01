@@ -1027,7 +1027,7 @@ static const ay8910_interface ay8910_config =
 *    Machine Drivers     *
 *************************/
 
-static MACHINE_DRIVER_START( fclown )
+static MACHINE_CONFIG_START( fclown, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, MASTER_CLOCK/8)	/* guess, seems ok */
@@ -1069,7 +1069,7 @@ static MACHINE_DRIVER_START( fclown )
 	MDRV_OKIM6295_ADD("oki6295", MASTER_CLOCK/12, OKIM6295_PIN7_LOW)	/* guess, seems ok; pin7 guessed, seems ok */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.20)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************

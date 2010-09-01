@@ -192,7 +192,7 @@ static VIDEO_UPDATE( crgolf )
  *
  *************************************/
 
-MACHINE_DRIVER_START( crgolf_video )
+MACHINE_CONFIG_FRAGMENT( crgolf_video )
 
 	MDRV_VIDEO_START(crgolf)
 	MDRV_VIDEO_UPDATE(crgolf)
@@ -203,4 +203,4 @@ MACHINE_DRIVER_START( crgolf_video )
 	MDRV_SCREEN_VISIBLE_AREA(0, 255, 8, 247)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END

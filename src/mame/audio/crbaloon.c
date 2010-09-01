@@ -167,7 +167,7 @@ static const sn76477_interface crbaloon_sn76477_interface =
 
 
 
-MACHINE_DRIVER_START( crbaloon_audio )
+MACHINE_CONFIG_FRAGMENT( crbaloon_audio )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
@@ -178,4 +178,4 @@ MACHINE_DRIVER_START( crbaloon_audio )
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(crbaloon)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END

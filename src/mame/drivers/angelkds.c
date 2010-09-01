@@ -604,10 +604,7 @@ static MACHINE_RESET( angelkds )
 	state->bgtopbank = 0;
 }
 
-static MACHINE_DRIVER_START( angelkds )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(angelkds_state)
+static MACHINE_CONFIG_START( angelkds, angelkds_state )
 
 	MDRV_CPU_ADD("maincpu", Z80, 8000000) /* 8MHz? 6 seems too slow? */
 	MDRV_CPU_PROGRAM_MAP(main_map)
@@ -650,7 +647,7 @@ static MACHINE_DRIVER_START( angelkds )
 	MDRV_SOUND_ROUTE(1, "mono", 0.65)
 	MDRV_SOUND_ROUTE(2, "mono", 0.65)
 	MDRV_SOUND_ROUTE(3, "mono", 0.45)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*** Rom Loading
 

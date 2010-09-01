@@ -51,7 +51,7 @@ static const vr0_interface vr0_config =
 };
 
 
-static MACHINE_DRIVER_START( ddz )
+static MACHINE_CONFIG_START( ddz, driver_data_t )
 	MDRV_CPU_ADD("maincpu", SE3208, 43000000)
 	MDRV_CPU_PROGRAM_MAP(ddz_mem)
 	MDRV_CPU_VBLANK_INT("screen", ddz_interrupt)
@@ -79,7 +79,7 @@ static MACHINE_DRIVER_START( ddz )
 	MDRV_SOUND_CONFIG(vr0_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

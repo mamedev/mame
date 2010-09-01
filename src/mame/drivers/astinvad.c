@@ -586,10 +586,7 @@ static const samples_interface astinvad_samples_interface =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( kamikaze )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(astinvad_state)
+static MACHINE_CONFIG_START( kamikaze, astinvad_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK)
@@ -615,22 +612,18 @@ static MACHINE_DRIVER_START( kamikaze )
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(astinvad_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( spcking2 )
+static MACHINE_CONFIG_DERIVED( spcking2, kamikaze )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(kamikaze)
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_RAW_PARAMS(VIDEO_CLOCK, 320, 0, 256, 256, 16, 240)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( spaceint )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(astinvad_state)
+static MACHINE_CONFIG_START( spaceint, astinvad_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK)        /* a guess */
@@ -657,7 +650,7 @@ static MACHINE_DRIVER_START( spaceint )
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(astinvad_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

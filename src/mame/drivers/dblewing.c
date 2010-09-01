@@ -732,10 +732,7 @@ static MACHINE_RESET( dblewing )
 	state->sound_irq = 0;
 }
 
-static MACHINE_DRIVER_START( dblewing )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(dblewing_state)
+static MACHINE_CONFIG_START( dblewing, dblewing_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 14000000)	/* DE102 */
@@ -775,7 +772,7 @@ static MACHINE_DRIVER_START( dblewing )
 
 	MDRV_OKIM6295_ADD("oki", 32220000/32, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*

@@ -187,10 +187,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( yard )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(irem_z80_state)
+static MACHINE_CONFIG_START( yard, irem_z80_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/3/2)
@@ -210,8 +207,8 @@ static MACHINE_DRIVER_START( yard )
 	MDRV_VIDEO_UPDATE(yard)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(m52_large_audio)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(m52_large_audio)
+MACHINE_CONFIG_END
 
 
 

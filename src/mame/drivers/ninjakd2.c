@@ -905,7 +905,7 @@ static const samples_interface ninjakd2_samples_interface =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( ninjakd2 )
+static MACHINE_CONFIG_START( ninjakd2, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MAIN_CLOCK_12/2)		/* verified */
@@ -951,12 +951,11 @@ static MACHINE_DRIVER_START( ninjakd2 )
 	MDRV_SOUND_ADD("pcm", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(ninjakd2_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( mnight )
+static MACHINE_CONFIG_DERIVED( mnight, ninjakd2 )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(ninjakd2)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(mnight_main_cpu)
@@ -966,12 +965,11 @@ static MACHINE_DRIVER_START( mnight )
 
 	/* sound hardware */
 	MDRV_DEVICE_REMOVE("pcm")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( arkarea )
+static MACHINE_CONFIG_DERIVED( arkarea, ninjakd2 )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(ninjakd2)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(mnight_main_cpu)
@@ -981,12 +979,11 @@ static MACHINE_DRIVER_START( arkarea )
 
 	/* sound hardware */
 	MDRV_DEVICE_REMOVE("pcm")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( robokid )
+static MACHINE_CONFIG_DERIVED( robokid, mnight )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mnight)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(robokid_main_cpu)
@@ -999,12 +996,11 @@ static MACHINE_DRIVER_START( robokid )
 
 	MDRV_VIDEO_START(robokid)
 	MDRV_VIDEO_UPDATE(robokid)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( omegaf )
+static MACHINE_CONFIG_DERIVED( omegaf, robokid )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(robokid)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(omegaf_main_cpu)
@@ -1014,7 +1010,7 @@ static MACHINE_DRIVER_START( omegaf )
 	/* video hardware */
 	MDRV_VIDEO_START(omegaf)
 	MDRV_VIDEO_UPDATE(omegaf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

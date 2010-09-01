@@ -881,7 +881,7 @@ static const kaneko_pandora_interface galpanic_pandora_config =
 };
 
 
-static MACHINE_DRIVER_START( galpanic )
+static MACHINE_CONFIG_START( galpanic, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_12MHz) /* verified on pcb */
@@ -911,22 +911,20 @@ static MACHINE_DRIVER_START( galpanic )
 
 	MDRV_OKIM6295_ADD("oki", XTAL_12MHz/6, OKIM6295_PIN7_LOW) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( galpanica )
+static MACHINE_CONFIG_DERIVED( galpanica, galpanic )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(galpanic)
 
 	/* arm watchdog */
 	MDRV_WATCHDOG_TIME_INIT(SEC(3))	/* a guess, and certainly wrong */
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( comad )
+static MACHINE_CONFIG_DERIVED( comad, galpanic )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(galpanic)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_CLOCK(10000000)
 	MDRV_CPU_PROGRAM_MAP(comad_map)
@@ -936,12 +934,11 @@ static MACHINE_DRIVER_START( comad )
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(comad)
 	MDRV_VIDEO_EOF(0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( supmodel )
+static MACHINE_CONFIG_DERIVED( supmodel, comad )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(comad)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_CLOCK(12000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(supmodel_map)
@@ -954,13 +951,12 @@ static MACHINE_DRIVER_START( supmodel )
 	/* sound hardware */
 	MDRV_OKIM6295_REPLACE("oki", 1584000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( fantsia2 )
+static MACHINE_CONFIG_DERIVED( fantsia2, comad )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(comad)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_CLOCK(12000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(fantsia2_map)
@@ -968,12 +964,11 @@ static MACHINE_DRIVER_START( fantsia2 )
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(comad)
 	MDRV_VIDEO_EOF(0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( galhustl )
+static MACHINE_CONFIG_DERIVED( galhustl, comad )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(comad)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_CLOCK(12000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(galhustl_map)
@@ -986,12 +981,11 @@ static MACHINE_DRIVER_START( galhustl )
 	/* sound hardware */
 	MDRV_OKIM6295_REPLACE("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( zipzap )
+static MACHINE_CONFIG_DERIVED( zipzap, comad )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(comad)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_CLOCK(12000000)	/* ? */
 	MDRV_CPU_PROGRAM_MAP(zipzap_map)
@@ -1003,7 +997,7 @@ static MACHINE_DRIVER_START( zipzap )
 	/* sound hardware */
 	MDRV_OKIM6295_REPLACE("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

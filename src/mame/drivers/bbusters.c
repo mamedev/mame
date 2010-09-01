@@ -716,9 +716,7 @@ static VIDEO_EOF( mechatt )
 	buffer_spriteram16_w(space,0,0,0xffff);
 }
 
-static MACHINE_DRIVER_START( bbusters )
-
-	MDRV_DRIVER_DATA( bbusters_state )
+static MACHINE_CONFIG_START( bbusters, bbusters_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
@@ -755,11 +753,9 @@ static MACHINE_DRIVER_START( bbusters )
 	MDRV_SOUND_ROUTE(0, "rspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "lspeaker",  1.0)
 	MDRV_SOUND_ROUTE(2, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( mechatt )
-
-	MDRV_DRIVER_DATA( bbusters_state )
+static MACHINE_CONFIG_START( mechatt, bbusters_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
@@ -794,7 +790,7 @@ static MACHINE_DRIVER_START( mechatt )
 	MDRV_SOUND_ROUTE(0, "rspeaker", 0.50)
 	MDRV_SOUND_ROUTE(1, "lspeaker",  1.0)
 	MDRV_SOUND_ROUTE(2, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /******************************************************************************/
 

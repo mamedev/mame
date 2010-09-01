@@ -431,7 +431,7 @@ static const msm5205_interface msm5205_config =
 	MSM5205_S48_4B		/* 8KHz               */
 };
 
-static MACHINE_DRIVER_START( stfight )
+static MACHINE_CONFIG_START( stfight, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3000000)	/* 3 MHz */
@@ -479,7 +479,7 @@ static MACHINE_DRIVER_START( stfight )
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

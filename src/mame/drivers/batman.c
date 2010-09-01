@@ -232,8 +232,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( batman )
-	MDRV_DRIVER_DATA(batman_state)
+static MACHINE_CONFIG_START( batman, batman_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz)
@@ -258,8 +257,8 @@ static MACHINE_DRIVER_START( batman )
 	MDRV_VIDEO_UPDATE(batman)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(jsa_iii_mono)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(jsa_iii_mono)
+MACHINE_CONFIG_END
 
 
 

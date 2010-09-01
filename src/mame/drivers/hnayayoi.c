@@ -553,10 +553,7 @@ static MACHINE_RESET( hnayayoi )
 }
 
 
-static MACHINE_DRIVER_START( hnayayoi )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(hnayayoi_state)
+static MACHINE_CONFIG_START( hnayayoi, hnayayoi_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 20000000/4 )        /* 5 MHz ???? */
@@ -597,22 +594,20 @@ static MACHINE_DRIVER_START( hnayayoi )
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( hnfubuki )
-	MDRV_IMPORT_FROM(hnayayoi)
+static MACHINE_CONFIG_DERIVED( hnfubuki, hnayayoi )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(hnfubuki_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( untoucha )
-	MDRV_IMPORT_FROM(hnayayoi)
+static MACHINE_CONFIG_DERIVED( untoucha, hnayayoi )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(untoucha_map)
 	MDRV_CPU_IO_MAP(untoucha_io_map)
 
 	MDRV_VIDEO_START(untoucha)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

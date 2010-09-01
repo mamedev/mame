@@ -253,9 +253,7 @@ static MACHINE_RESET( 1942 )
 	state->scroll[1] = 0;
 }
 
-static MACHINE_DRIVER_START( 1942 )
-
-	MDRV_DRIVER_DATA(_1942_state)
+static MACHINE_CONFIG_START( 1942, _1942_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MAIN_CPU_CLOCK)	/* 4 MHz ??? */
@@ -291,7 +289,7 @@ static MACHINE_DRIVER_START( 1942 )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 	MDRV_SOUND_ADD("ay2", AY8910, AUDIO_CLOCK)	/* 1.5 MHz */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

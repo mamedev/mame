@@ -1728,7 +1728,7 @@ static const es5506_interface es5506_config =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( timekill )
+static MACHINE_CONFIG_START( timekill, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, CPU_CLOCK)
@@ -1763,26 +1763,24 @@ static MACHINE_DRIVER_START( timekill )
 
 	/* via */
 	MDRV_VIA6522_ADD("via6522_0", SOUND_CLOCK/8, via_interface)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( bloodstm )
+static MACHINE_CONFIG_DERIVED( bloodstm, timekill )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(timekill)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(bloodstm_map)
 
 	/* video hardware */
 	MDRV_PALETTE_LENGTH(32768)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( drivedge )
+static MACHINE_CONFIG_DERIVED( drivedge, bloodstm )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(bloodstm)
 
 	MDRV_CPU_REPLACE("maincpu", M68EC020, CPU020_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(drivedge_map)
@@ -1797,13 +1795,12 @@ static MACHINE_DRIVER_START( drivedge )
 
 	MDRV_MACHINE_RESET(drivedge)
 	MDRV_QUANTUM_TIME(HZ(6000))
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( sftm )
+static MACHINE_CONFIG_DERIVED( sftm, bloodstm )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(bloodstm)
 
 	MDRV_CPU_REPLACE("maincpu", M68EC020, CPU020_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(itech020_map)
@@ -1817,16 +1814,15 @@ static MACHINE_DRIVER_START( sftm )
 
 	/* via */
 	MDRV_DEVICE_REMOVE("via6522_0")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( tourny )
+static MACHINE_CONFIG_DERIVED( tourny, sftm )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(sftm)
 
 	MDRV_M48T02_ADD( "m48t02"  )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

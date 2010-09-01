@@ -876,7 +876,7 @@ static const ymf262_interface tecmosys_ymf262_interface =
 };
 
 
-static MACHINE_DRIVER_START( deroon )
+static MACHINE_CONFIG_START( deroon, driver_data_t )
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
@@ -921,7 +921,7 @@ static MACHINE_DRIVER_START( deroon )
 	MDRV_SOUND_ADD("ymz", YMZ280B, 16900000)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.30)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.30)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( deroon )

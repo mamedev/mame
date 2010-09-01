@@ -479,7 +479,7 @@ static const ym2151_interface ym2151_config =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( rpunch )
+static MACHINE_CONFIG_START( rpunch, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, MASTER_CLOCK/2)
@@ -513,7 +513,7 @@ static MACHINE_DRIVER_START( rpunch )
 
 	MDRV_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

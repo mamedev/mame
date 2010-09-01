@@ -369,7 +369,7 @@ static const tc0480scp_interface superchs_tc0480scp_intf =
 	0		/* col_base */
 };
 
-static MACHINE_DRIVER_START( superchs )
+static MACHINE_CONFIG_START( superchs, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)	/* 16 MHz */
@@ -401,8 +401,8 @@ static MACHINE_DRIVER_START( superchs )
 	MDRV_TC0480SCP_ADD("tc0480scp", superchs_tc0480scp_intf)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(taito_f3_sound)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(taito_f3_sound)
+MACHINE_CONFIG_END
 
 /***************************************************************************/
 

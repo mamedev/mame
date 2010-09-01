@@ -556,7 +556,7 @@ static const ym3812_interface ym3812_config =
 
 
 
-static MACHINE_DRIVER_START( twincobr )
+static MACHINE_CONFIG_START( twincobr, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_28MHz/4)		/* 7MHz - Main board Crystal is 28MHz */
@@ -601,11 +601,10 @@ static MACHINE_DRIVER_START( twincobr )
 	MDRV_SOUND_ADD("ymsnd", YM3812, XTAL_28MHz/8)
 	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( fsharkbt )
-	MDRV_IMPORT_FROM( twincobr )
+static MACHINE_CONFIG_DERIVED( fsharkbt, twincobr )
 
 	MDRV_CPU_ADD("mcu", I8741, XTAL_28MHz/16)
 	/* Program Map is internal to the CPU */
@@ -613,7 +612,7 @@ static MACHINE_DRIVER_START( fsharkbt )
 	MDRV_DEVICE_DISABLE()		/* Internal program code is not dumped */
 
 	MDRV_MACHINE_RESET(fsharkbt)	/* Reset fshark bootleg 8741 MCU data */
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

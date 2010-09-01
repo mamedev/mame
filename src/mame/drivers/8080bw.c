@@ -379,10 +379,9 @@ INPUT_PORTS_END
 
 /* same as regular invaders, but with a color board added */
 
-static MACHINE_DRIVER_START( invadpt2 )
+static MACHINE_CONFIG_DERIVED( invadpt2, mw8080bw_root )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(invadpt2_io_map)
 	MDRV_MACHINE_START(extra_8080bw)
@@ -398,9 +397,9 @@ static MACHINE_DRIVER_START( invadpt2 )
 	MDRV_VIDEO_UPDATE(invadpt2)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(invaders_samples_audio)
+	MDRV_FRAGMENT_ADD(invaders_samples_audio)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*******************************************************/
 /*                                                     */
@@ -438,10 +437,9 @@ static INPUT_PORTS_START( spcewars )
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-static MACHINE_DRIVER_START( spcewars )
+static MACHINE_CONFIG_DERIVED( spcewars, mw8080bw_root )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(spcewars_io_map)
 	MDRV_MACHINE_START(extra_8080bw)
@@ -450,13 +448,13 @@ static MACHINE_DRIVER_START( spcewars )
 	MDRV_MB14241_ADD("mb14241")
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(invaders_samples_audio)
+	MDRV_FRAGMENT_ADD(invaders_samples_audio)
 
 	/* extra audio channel */
 	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*******************************************************/
 /*                                                     */
@@ -513,14 +511,13 @@ static INPUT_PORTS_START( astropal )
 
 INPUT_PORTS_END
 
-static MACHINE_DRIVER_START( astropal )
+static MACHINE_CONFIG_DERIVED( astropal, invaders )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(invaders)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(astropal_io_map)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*******************************************************/
 /*                                                     */
@@ -563,10 +560,9 @@ static INPUT_PORTS_START( cosmo )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x80, "SW1:8" ) /* must be HIGH normally or the joystick won't work */
 INPUT_PORTS_END
 
-static MACHINE_DRIVER_START( cosmo )
+static MACHINE_CONFIG_DERIVED( cosmo, mw8080bw_root )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(cosmo_map)
 	MDRV_CPU_IO_MAP(cosmo_io_map)
@@ -576,9 +572,9 @@ static MACHINE_DRIVER_START( cosmo )
 	MDRV_VIDEO_UPDATE(cosmo)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(invaders_samples_audio)
+	MDRV_FRAGMENT_ADD(invaders_samples_audio)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*******************************************************/
 /*                                                     */
@@ -686,10 +682,9 @@ static INPUT_PORTS_START( invrvnge )
 INPUT_PORTS_END
 
 
-static MACHINE_DRIVER_START( invrvnge )
+static MACHINE_CONFIG_DERIVED( invrvnge, mw8080bw_root )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(invrvnge_io_map)
 
@@ -697,9 +692,9 @@ static MACHINE_DRIVER_START( invrvnge )
 	MDRV_MB14241_ADD("mb14241")
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(invaders_samples_audio)
+	MDRV_FRAGMENT_ADD(invaders_samples_audio)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*******************************************************/
@@ -792,10 +787,9 @@ static INPUT_PORTS_START( lrescue )
 	PORT_DIPUNUSED_DIPLOC( 0x80, 0x00, "SW1:8" )
 INPUT_PORTS_END
 
-static MACHINE_DRIVER_START( lrescue )
+static MACHINE_CONFIG_DERIVED( lrescue, mw8080bw_root )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(lrescue_io_map)
 	MDRV_MACHINE_START(extra_8080bw)
@@ -817,7 +811,7 @@ static MACHINE_DRIVER_START( lrescue )
 	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*******************************************************/
@@ -940,10 +934,9 @@ static INPUT_PORTS_START( rollingc )
 	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNKNOWN )
 INPUT_PORTS_END
 
-static MACHINE_DRIVER_START( rollingc )
+static MACHINE_CONFIG_DERIVED( rollingc, mw8080bw_root )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(rollingc_map)
 	MDRV_CPU_IO_MAP(rollingc_io_map)
@@ -955,9 +948,9 @@ static MACHINE_DRIVER_START( rollingc )
 	MDRV_VIDEO_UPDATE(rollingc)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(invaders_samples_audio)
+	MDRV_FRAGMENT_ADD(invaders_samples_audio)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -1055,10 +1048,9 @@ static MACHINE_RESET( schaser )
 	MACHINE_RESET_CALL(mw8080bw);
 }
 
-static MACHINE_DRIVER_START( schaser )
+static MACHINE_CONFIG_DERIVED( schaser, mw8080bw_root )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_REPLACE("maincpu",I8080,1996800)   	/* 19.968MHz / 10 */
 	MDRV_CPU_PROGRAM_MAP(schaser_map)
 	MDRV_CPU_IO_MAP(schaser_io_map)
@@ -1083,7 +1075,7 @@ static MACHINE_DRIVER_START( schaser )
 	MDRV_SOUND_CONFIG_DISCRETE(schaser)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*******************************************************/
@@ -1126,10 +1118,9 @@ static INPUT_PORTS_START( schasercv )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x00, "SW1:8" )
 INPUT_PORTS_END
 
-static MACHINE_DRIVER_START( schasercv )
+static MACHINE_CONFIG_DERIVED( schasercv, mw8080bw_root )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(schaser_map)
 	MDRV_CPU_IO_MAP(schasercv_io_map)
@@ -1142,12 +1133,12 @@ static MACHINE_DRIVER_START( schasercv )
 	MDRV_VIDEO_UPDATE(schasercv)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(invaders_samples_audio)
+	MDRV_FRAGMENT_ADD(invaders_samples_audio)
 
 	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*******************************************************/
@@ -1218,10 +1209,9 @@ static INPUT_PORTS_START( sflush )
 INPUT_PORTS_END
 
 
-static MACHINE_DRIVER_START( sflush )
+static MACHINE_CONFIG_DERIVED( sflush, mw8080bw_root )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_REPLACE("maincpu",M6800,2000000)   	/* ?? */
 	MDRV_CPU_PROGRAM_MAP(sflush_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_pulse,2)
@@ -1233,7 +1223,7 @@ static MACHINE_DRIVER_START( sflush )
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(sflush)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*******************************************************/
@@ -1326,10 +1316,9 @@ static INPUT_PORTS_START( lupin3a )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static MACHINE_DRIVER_START( lupin3 )
+static MACHINE_CONFIG_DERIVED( lupin3, mw8080bw_root )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(lupin3_io_map)
 	MDRV_MACHINE_START(extra_8080bw)
@@ -1341,14 +1330,13 @@ static MACHINE_DRIVER_START( lupin3 )
 	MDRV_VIDEO_UPDATE(indianbt)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(invaders_samples_audio)
+	MDRV_FRAGMENT_ADD(invaders_samples_audio)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( lupin3a )
+static MACHINE_CONFIG_DERIVED( lupin3a, mw8080bw_root )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(schaser_map)
 	MDRV_CPU_IO_MAP(lupin3_io_map)
@@ -1361,9 +1349,9 @@ static MACHINE_DRIVER_START( lupin3a )
 	MDRV_VIDEO_UPDATE(lupin3)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(invaders_samples_audio)
+	MDRV_FRAGMENT_ADD(invaders_samples_audio)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*******************************************************/
@@ -1464,10 +1452,9 @@ static INPUT_PORTS_START( polaris )
 	PORT_ADJUSTER( 90, "Sub Volume VR3" )
 INPUT_PORTS_END
 
-static MACHINE_DRIVER_START( polaris )
+static MACHINE_CONFIG_DERIVED( polaris, mw8080bw_root )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_REPLACE("maincpu",I8080,1996800)   	/* 19.968MHz / 10 */
 	MDRV_CPU_PROGRAM_MAP(schaser_map)
 	MDRV_CPU_IO_MAP(polaris_io_map)
@@ -1488,7 +1475,7 @@ static MACHINE_DRIVER_START( polaris )
 	MDRV_SOUND_CONFIG_DISCRETE(polaris)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*******************************************************/
@@ -1593,10 +1580,9 @@ static INPUT_PORTS_START( ballbomb )
 	PORT_DIPUNKNOWN_DIPLOC( 0x80, 0x00, "SW1:8" )
 INPUT_PORTS_END
 
-static MACHINE_DRIVER_START( ballbomb )
+static MACHINE_CONFIG_DERIVED( ballbomb, mw8080bw_root )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(ballbomb_io_map)
 	MDRV_MACHINE_START(extra_8080bw)
@@ -1608,9 +1594,9 @@ static MACHINE_DRIVER_START( ballbomb )
 	MDRV_VIDEO_UPDATE(ballbomb)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(invaders_samples_audio)
+	MDRV_FRAGMENT_ADD(invaders_samples_audio)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*******************************************************/
@@ -1670,19 +1656,18 @@ static INPUT_PORTS_START( yosakdon )
 INPUT_PORTS_END
 
 
-static MACHINE_DRIVER_START( yosakdon )
+static MACHINE_CONFIG_DERIVED( yosakdon, mw8080bw_root )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(yosakdon_map)
 	MDRV_CPU_IO_MAP(yosakdon_io_map)
 	MDRV_MACHINE_START(extra_8080bw)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(invaders_samples_audio)
+	MDRV_FRAGMENT_ADD(invaders_samples_audio)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*******************************************************/
@@ -1768,10 +1753,9 @@ static ADDRESS_MAP_START( indianbt_io_map, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
-static MACHINE_DRIVER_START( indianbt )
+static MACHINE_CONFIG_DERIVED( indianbt, mw8080bw_root )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(indianbt_io_map)
 	MDRV_MACHINE_START(extra_8080bw)
@@ -1783,13 +1767,13 @@ static MACHINE_DRIVER_START( indianbt )
 	MDRV_VIDEO_UPDATE(indianbt)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(invaders_samples_audio)
+	MDRV_FRAGMENT_ADD(invaders_samples_audio)
 
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(indianbt)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*******************************************************/
 /*                                                     */
@@ -1842,10 +1826,9 @@ static INPUT_PORTS_START( steelwkr )
 INPUT_PORTS_END
 
 
-static MACHINE_DRIVER_START( steelwkr )
+static MACHINE_CONFIG_DERIVED( steelwkr, mw8080bw_root )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(steelwkr_io_map)
 	MDRV_MACHINE_START(extra_8080bw)
@@ -1857,9 +1840,9 @@ static MACHINE_DRIVER_START( steelwkr )
 	MDRV_VIDEO_UPDATE(invadpt2)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(invaders_samples_audio)
+	MDRV_FRAGMENT_ADD(invaders_samples_audio)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*****************************************************
 
@@ -1978,10 +1961,9 @@ static ADDRESS_MAP_START( shuttlei_io_map, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
-static MACHINE_DRIVER_START( shuttlei )
+static MACHINE_CONFIG_DERIVED( shuttlei, mw8080bw_root )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(shuttlei_map)
 	MDRV_CPU_IO_MAP(shuttlei_io_map)
@@ -1993,9 +1975,9 @@ static MACHINE_DRIVER_START( shuttlei )
 	MDRV_VIDEO_UPDATE(shuttlei)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(invaders_samples_audio)
+	MDRV_FRAGMENT_ADD(invaders_samples_audio)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -2088,10 +2070,9 @@ static INPUT_PORTS_START( darthvdr )
 	INVADERS_CAB_TYPE_PORT
 INPUT_PORTS_END
 
-static MACHINE_DRIVER_START( darthvdr )
+static MACHINE_CONFIG_DERIVED( darthvdr, mw8080bw_root )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(darthvdr_map)
 	MDRV_CPU_IO_MAP(darthvdr_io_map)
@@ -2100,7 +2081,7 @@ static MACHINE_DRIVER_START( darthvdr )
 	MDRV_MACHINE_START(darthvdr)
 	MDRV_MACHINE_RESET(darthvdr)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*************************************
  *
@@ -2161,10 +2142,9 @@ static INPUT_PORTS_START( vortex )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_1C ) )
 INPUT_PORTS_END
 
-MACHINE_DRIVER_START( vortex )
+MACHINE_CONFIG_DERIVED( vortex, mw8080bw_root )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(vortex_io_map)
 	MDRV_MACHINE_START(extra_8080bw)
@@ -2178,9 +2158,9 @@ MACHINE_DRIVER_START( vortex )
 	MDRV_MB14241_ADD("mb14241")
 
 	/* audio hardware */
-	MDRV_IMPORT_FROM(invaders_audio)
+	MDRV_FRAGMENT_ADD(invaders_audio)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* decrypt function for vortex */
 static DRIVER_INIT( vortex )
@@ -2368,14 +2348,13 @@ static ADDRESS_MAP_START( modelr_io_map, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
-MACHINE_DRIVER_START( modelr )
+MACHINE_CONFIG_DERIVED( modelr, invaders )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(invaders)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(modelr_io_map)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( searthin )

@@ -1324,7 +1324,7 @@ static MACHINE_RESET( ms32 )
 }
 
 
-static MACHINE_DRIVER_START( bnstars )
+static MACHINE_CONFIG_START( bnstars, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V70, 20000000) // 20MHz
@@ -1371,7 +1371,7 @@ static MACHINE_DRIVER_START( bnstars )
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( bnstars1 )

@@ -444,7 +444,7 @@ static MACHINE_RESET( pturn )
 	soundlatch_clear_w(space,0,0);
 }
 
-static MACHINE_DRIVER_START( pturn )
+static MACHINE_CONFIG_START( pturn, driver_data_t )
 	MDRV_CPU_ADD("maincpu", Z80, 12000000/3)
 	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", pturn_main_intgen)
@@ -478,7 +478,7 @@ static MACHINE_DRIVER_START( pturn )
 
 	MDRV_SOUND_ADD("ay2", AY8910, 2000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( pturn )

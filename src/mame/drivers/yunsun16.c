@@ -588,10 +588,7 @@ static const ym3812_interface magicbub_ym3812_intf =
 	soundirq	/* IRQ Line */
 };
 
-static MACHINE_DRIVER_START( magicbub )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(yunsun16_state)
+static MACHINE_CONFIG_START( magicbub, yunsun16_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
@@ -630,17 +627,14 @@ static MACHINE_DRIVER_START( magicbub )
 	MDRV_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
                                 Shocking
 ***************************************************************************/
 
-static MACHINE_DRIVER_START( shocking )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(yunsun16_state)
+static MACHINE_CONFIG_START( shocking, yunsun16_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
@@ -670,7 +664,7 @@ static MACHINE_DRIVER_START( shocking )
 	MDRV_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

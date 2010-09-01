@@ -324,9 +324,7 @@ static MACHINE_START( superdq )
 }
 
 
-static MACHINE_DRIVER_START( superdq )
-
-	MDRV_DRIVER_DATA( superdq_state )
+static MACHINE_CONFIG_START( superdq, superdq_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/8)
@@ -358,7 +356,7 @@ static MACHINE_DRIVER_START( superdq )
 	MDRV_SOUND_ADD("ldsound", LASERDISC, 0)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

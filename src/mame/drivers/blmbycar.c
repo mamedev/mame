@@ -356,10 +356,7 @@ static MACHINE_RESET( blmbycar )
 }
 
 
-static MACHINE_DRIVER_START( blmbycar )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(blmbycar_state)
+static MACHINE_CONFIG_START( blmbycar, blmbycar_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)	/* ? */
@@ -389,7 +386,7 @@ static MACHINE_DRIVER_START( blmbycar )
 	MDRV_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 static MACHINE_START( watrball )
@@ -406,10 +403,7 @@ static MACHINE_RESET( watrball )
 	state->retvalue = 0;
 }
 
-static MACHINE_DRIVER_START( watrball )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(blmbycar_state)
+static MACHINE_CONFIG_START( watrball, blmbycar_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)	/* ? */
@@ -439,7 +433,7 @@ static MACHINE_DRIVER_START( watrball )
 	MDRV_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

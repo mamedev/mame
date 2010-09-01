@@ -855,7 +855,7 @@ static MACHINE_RESET( apache3 )
 }
 
 
-static MACHINE_DRIVER_START( apache3 )
+static MACHINE_CONFIG_START( apache3, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V30, CLOCK_1 / 2)
@@ -899,9 +899,9 @@ static MACHINE_DRIVER_START( apache3 )
 	MDRV_OKIM6295_ADD("oki", CLOCK_1 / 4 / 2, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( roundup5 )
+static MACHINE_CONFIG_START( roundup5, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V30, CLOCK_1 / 2)
@@ -941,9 +941,9 @@ static MACHINE_DRIVER_START( roundup5 )
 	MDRV_OKIM6295_ADD("oki", CLOCK_1 / 4 / 2, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( cyclwarr )
+static MACHINE_CONFIG_START( cyclwarr, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, CLOCK_2 / 4)
@@ -984,9 +984,9 @@ static MACHINE_DRIVER_START( cyclwarr )
 	MDRV_OKIM6295_ADD("oki", CLOCK_1 / 8, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( bigfight )
+static MACHINE_CONFIG_START( bigfight, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, CLOCK_2 / 4)
@@ -1027,7 +1027,7 @@ static MACHINE_DRIVER_START( bigfight )
 	MDRV_OKIM6295_ADD("oki", CLOCK_1 / 8 / 2, OKIM6295_PIN7_HIGH) /* 2MHz was too fast. Can the clock be software controlled? */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************/
 

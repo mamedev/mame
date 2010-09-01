@@ -692,7 +692,7 @@ static const msm5205_interface msm5205_config =
 	MSM5205_SEX_4B	/* vclk input mode    */
 };
 
-static MACHINE_DRIVER_START( gsword )
+static MACHINE_CONFIG_START( gsword, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_18MHz/6) /* verified on pcb */
@@ -745,9 +745,9 @@ static MACHINE_DRIVER_START( gsword )
 	MDRV_SOUND_ADD("msm", MSM5205, XTAL_400kHz) /* verified on pcb */
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( josvolly )
+static MACHINE_CONFIG_START( josvolly, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 18000000/6) /* ? */
@@ -793,7 +793,7 @@ static MACHINE_DRIVER_START( josvolly )
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 #endif
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

@@ -331,7 +331,7 @@ static const tms34010_config tms_config =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( btoads )
+static MACHINE_CONFIG_START( btoads, driver_data_t )
 
 	MDRV_CPU_ADD("maincpu", TMS34020, CPU_CLOCK/2)
 	MDRV_CPU_CONFIG(tms_config)
@@ -361,7 +361,7 @@ static MACHINE_DRIVER_START( btoads )
 	MDRV_SOUND_ADD("bsmt", BSMT2000, SOUND_CLOCK)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

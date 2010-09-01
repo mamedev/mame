@@ -376,10 +376,7 @@ static MACHINE_RESET( ironhors )
 	state->spriterambank = 0;
 }
 
-static MACHINE_DRIVER_START( ironhors )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(ironhors_state)
+static MACHINE_CONFIG_START( ironhors, ironhors_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809,18432000/6)        /* 3.072 MHz??? mod by Shingo Suzuki 1999/10/15 */
@@ -423,7 +420,7 @@ static MACHINE_DRIVER_START( ironhors )
 	MDRV_SOUND_CONFIG_DISCRETE(ironhors)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static INTERRUPT_GEN( farwest_interrupt )
 {
@@ -463,8 +460,7 @@ static const ym2203_interface farwest_ym2203_config =
 
 
 
-static MACHINE_DRIVER_START( farwest )
-	MDRV_IMPORT_FROM(ironhors)
+static MACHINE_CONFIG_DERIVED( farwest, ironhors )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(farwest_master_map)
@@ -480,7 +476,7 @@ static MACHINE_DRIVER_START( farwest )
 
 	MDRV_SOUND_MODIFY("ym2203")
 	MDRV_SOUND_CONFIG(farwest_ym2203_config)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

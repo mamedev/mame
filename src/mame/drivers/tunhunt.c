@@ -301,9 +301,7 @@ static const pokey_interface pokey_interface_2 =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( tunhunt )
-
-	MDRV_DRIVER_DATA( tunhunt_state )
+static MACHINE_CONFIG_START( tunhunt, tunhunt_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502,2000000)		/* ??? */
@@ -335,7 +333,7 @@ static MACHINE_DRIVER_START( tunhunt )
 	MDRV_SOUND_ADD("pokey2", POKEY, 1209600)
 	MDRV_SOUND_CONFIG(pokey_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

@@ -405,10 +405,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( dcheese )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(dcheese_state)
+static MACHINE_CONFIG_START( dcheese, dcheese_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, MAIN_OSC)
@@ -443,14 +440,13 @@ static MACHINE_DRIVER_START( dcheese )
 	MDRV_SOUND_ADD("bsmt", BSMT2000, SOUND_OSC)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.2)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.2)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( fredmem )
-	MDRV_IMPORT_FROM(dcheese)
+static MACHINE_CONFIG_DERIVED( fredmem, dcheese )
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 359, 0, 239)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

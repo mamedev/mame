@@ -259,10 +259,7 @@ static const ay8910_interface ay8910_config =
 };
 
 
-static MACHINE_DRIVER_START( hanaroku )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(albazc_state)
+static MACHINE_CONFIG_START( hanaroku, albazc_state )
 
 	MDRV_CPU_ADD("maincpu", Z80,6000000)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(hanaroku_map)
@@ -289,7 +286,7 @@ static MACHINE_DRIVER_START( hanaroku )
 	MDRV_SOUND_ADD("aysnd", AY8910, 1500000) /* ? MHz */
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( hanaroku )

@@ -372,7 +372,7 @@ static ADDRESS_MAP_START( hikaru_map_slave, ADDRESS_SPACE_PROGRAM, 64 )
 ADDRESS_MAP_END
 
 
-static MACHINE_DRIVER_START( hikaru )
+static MACHINE_CONFIG_START( hikaru, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", SH4, CPU_CLOCK)
 //  MDRV_CPU_CONFIG(sh4cpu_config)
@@ -405,7 +405,7 @@ static MACHINE_DRIVER_START( hikaru )
 //  MDRV_SOUND_CONFIG(aica_config)
 //  MDRV_SOUND_ROUTE(0, "lspeaker", 2.0)
 //  MDRV_SOUND_ROUTE(0, "rspeaker", 2.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \

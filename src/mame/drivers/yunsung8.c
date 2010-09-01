@@ -500,10 +500,7 @@ static MACHINE_RESET( yunsung8 )
 }
 
 
-static MACHINE_DRIVER_START( yunsung8 )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(yunsung8_state)
+static MACHINE_CONFIG_START( yunsung8, yunsung8_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 8000000)			/* Z80B */
@@ -543,7 +540,7 @@ static MACHINE_DRIVER_START( yunsung8 )
 	MDRV_SOUND_CONFIG(yunsung8_msm5205_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

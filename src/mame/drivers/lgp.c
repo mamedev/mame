@@ -338,7 +338,7 @@ static MACHINE_START( lgp )
 
 
 /* DRIVER */
-static MACHINE_DRIVER_START( lgp )
+static MACHINE_CONFIG_START( lgp, driver_data_t )
 	/* main cpu */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_PCB_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(main_program_map)
@@ -369,7 +369,7 @@ static MACHINE_DRIVER_START( lgp )
 	MDRV_SOUND_ADD("ldsound", LASERDISC, 0)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( lgp )

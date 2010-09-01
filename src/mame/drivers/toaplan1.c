@@ -1510,9 +1510,7 @@ static const ym3812_interface ym3812_config =
 
 
 
-static MACHINE_DRIVER_START( rallybik )
-
-	MDRV_DRIVER_DATA( toaplan1_state )
+static MACHINE_CONFIG_START( rallybik, toaplan1_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_10MHz)
@@ -1549,12 +1547,10 @@ static MACHINE_DRIVER_START( rallybik )
 	MDRV_SOUND_ADD("ymsnd", YM3812, XTAL_28MHz/8)
 	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( truxton )
-
-	MDRV_DRIVER_DATA( toaplan1_state )
+static MACHINE_CONFIG_START( truxton, toaplan1_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_10MHz)
@@ -1591,12 +1587,10 @@ static MACHINE_DRIVER_START( truxton )
 	MDRV_SOUND_ADD("ymsnd", YM3812, XTAL_28MHz/8)
 	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( hellfire )
-
-	MDRV_DRIVER_DATA( toaplan1_state )
+static MACHINE_CONFIG_START( hellfire, toaplan1_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_10MHz)
@@ -1633,12 +1627,10 @@ static MACHINE_DRIVER_START( hellfire )
 	MDRV_SOUND_ADD("ymsnd", YM3812, XTAL_28MHz/8)
 	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( zerowing )
-
-	MDRV_DRIVER_DATA( toaplan1_state )
+static MACHINE_CONFIG_START( zerowing, toaplan1_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_10MHz)
@@ -1675,12 +1667,10 @@ static MACHINE_DRIVER_START( zerowing )
 	MDRV_SOUND_ADD("ymsnd", YM3812, XTAL_28MHz/8)
 	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( demonwld )
-
-	MDRV_DRIVER_DATA( toaplan1_state )
+static MACHINE_CONFIG_START( demonwld, toaplan1_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_10MHz)
@@ -1721,12 +1711,10 @@ static MACHINE_DRIVER_START( demonwld )
 	MDRV_SOUND_ADD("ymsnd", YM3812, XTAL_28MHz/8)
 	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( samesame )
-
-	MDRV_DRIVER_DATA( toaplan1_state )
+static MACHINE_CONFIG_START( samesame, toaplan1_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_10MHz)
@@ -1761,12 +1749,10 @@ static MACHINE_DRIVER_START( samesame )
 	MDRV_SOUND_ADD("ymsnd", YM3812, XTAL_28MHz/8)
 	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( outzone )
-
-	MDRV_DRIVER_DATA( toaplan1_state )
+static MACHINE_CONFIG_START( outzone, toaplan1_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_10MHz)
@@ -1803,12 +1789,10 @@ static MACHINE_DRIVER_START( outzone )
 	MDRV_SOUND_ADD("ymsnd", YM3812, XTAL_28MHz/8)
 	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( vimana )
-
-	MDRV_DRIVER_DATA( toaplan1_state )
+static MACHINE_CONFIG_START( vimana, toaplan1_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_10MHz)	/* verified on pcb */
@@ -1843,7 +1827,7 @@ static MACHINE_DRIVER_START( vimana )
 	MDRV_SOUND_ADD("ymsnd", YM3812, XTAL_28MHz/8)	/* verified on pcb */
 	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

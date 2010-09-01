@@ -306,7 +306,7 @@ static const ym2608_interface ym2608_config =
 	irqhandler
 };
 
-static MACHINE_DRIVER_START( wc90 )
+static MACHINE_CONFIG_START( wc90, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_8MHz)		/* verified on pcb */
@@ -343,13 +343,11 @@ static MACHINE_DRIVER_START( wc90 )
 	MDRV_SOUND_ROUTE(0, "mono", 0.50)
 	MDRV_SOUND_ROUTE(1, "mono", 1.0)
 	MDRV_SOUND_ROUTE(2, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( wc90t )
-
-	MDRV_IMPORT_FROM( wc90 )
+static MACHINE_CONFIG_DERIVED( wc90t, wc90 )
 	MDRV_VIDEO_START( wc90t )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( wc90 )
 	ROM_REGION( 0x20000, "maincpu", 0 )

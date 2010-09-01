@@ -216,10 +216,7 @@ static MACHINE_RESET( ultraman )
 	state->bank2 = -1;
 }
 
-static MACHINE_DRIVER_START( ultraman )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(ultraman_state)
+static MACHINE_CONFIG_START( ultraman, ultraman_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,24000000/2)		/* 12 MHz? */
@@ -265,7 +262,7 @@ static MACHINE_DRIVER_START( ultraman )
 	MDRV_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

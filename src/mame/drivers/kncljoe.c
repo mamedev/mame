@@ -272,10 +272,7 @@ static MACHINE_RESET( kncljoe )
 	state->flipscreen = 0;
 }
 
-static MACHINE_DRIVER_START( kncljoe )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(kncljoe_state)
+static MACHINE_CONFIG_START( kncljoe, kncljoe_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_6MHz)  /* verified on pcb */
@@ -319,7 +316,7 @@ static MACHINE_DRIVER_START( kncljoe )
 
 	MDRV_SOUND_ADD("sn2", SN76489, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

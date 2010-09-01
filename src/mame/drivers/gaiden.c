@@ -764,10 +764,7 @@ static const ym2203_interface ym2203_config =
 	irqhandler
 };
 
-static MACHINE_DRIVER_START( shadoww )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(gaiden_state)
+static MACHINE_CONFIG_START( shadoww, gaiden_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 18432000/2)	/* 9.216 MHz */
@@ -813,10 +810,9 @@ static MACHINE_DRIVER_START( shadoww )
 
 	MDRV_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( raiga )
-	MDRV_IMPORT_FROM(shadoww)
+static MACHINE_CONFIG_DERIVED( raiga, shadoww )
 
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
@@ -824,12 +820,9 @@ static MACHINE_DRIVER_START( raiga )
 	MDRV_VIDEO_START(raiga)
 	MDRV_VIDEO_UPDATE(raiga)
 	MDRV_GFXDECODE(raiga)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( drgnbowl )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(gaiden_state)
+static MACHINE_CONFIG_START( drgnbowl, gaiden_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 20000000/2)	/* 10 MHz */
@@ -865,7 +858,7 @@ static MACHINE_DRIVER_START( drgnbowl )
 
 	MDRV_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*
 Master Ninja
@@ -946,10 +939,7 @@ static ADDRESS_MAP_START( mastninj_map, ADDRESS_SPACE_PROGRAM, 16 )
 //  AM_RANGE(0x07a808, 0x07a809) AM_WRITE(gaiden_flip_w)
 ADDRESS_MAP_END
 
-static MACHINE_DRIVER_START( mastninj )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(gaiden_state)
+static MACHINE_CONFIG_START( mastninj, gaiden_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)	/* 10 MHz? */
@@ -996,7 +986,7 @@ static MACHINE_DRIVER_START( mastninj )
 	/* no OKI on the bootleg */
 //  MDRV_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)
 //  MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

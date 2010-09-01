@@ -2274,10 +2274,7 @@ static MACHINE_RESET( common )
 }
 
 
-static MACHINE_DRIVER_START( cuebrick )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(tmnt_state)
+static MACHINE_CONFIG_START( cuebrick, tmnt_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)	/* 8 MHz */
@@ -2313,13 +2310,10 @@ static MACHINE_DRIVER_START( cuebrick )
 	MDRV_SOUND_CONFIG(ym2151_interface_cbj)
 	MDRV_SOUND_ROUTE(0, "mono", 1.0)
 	MDRV_SOUND_ROUTE(1, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( mia )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(tmnt_state)
+static MACHINE_CONFIG_START( mia, tmnt_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_24MHz/3)
@@ -2361,7 +2355,7 @@ static MACHINE_DRIVER_START( mia )
 	MDRV_SOUND_CONFIG(k007232_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.20)
 	MDRV_SOUND_ROUTE(1, "mono", 0.20)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 static MACHINE_RESET( tmnt )
@@ -2373,10 +2367,7 @@ static MACHINE_RESET( tmnt )
 	upd7759_reset_w(state->upd, 1);
 }
 
-static MACHINE_DRIVER_START( tmnt )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(tmnt_state)
+static MACHINE_CONFIG_START( tmnt, tmnt_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_24MHz/3)
@@ -2425,13 +2416,10 @@ static MACHINE_DRIVER_START( tmnt )
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(tmnt_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( punkshot )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(tmnt_state)
+static MACHINE_CONFIG_START( punkshot, tmnt_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
@@ -2472,13 +2460,10 @@ static MACHINE_DRIVER_START( punkshot )
 
 	MDRV_SOUND_ADD("k053260", K053260, XTAL_3_579545MHz)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( lgtnfght )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(tmnt_state)
+static MACHINE_CONFIG_START( lgtnfght, tmnt_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_24MHz/2)
@@ -2520,13 +2505,10 @@ static MACHINE_DRIVER_START( lgtnfght )
 	MDRV_SOUND_ADD("k053260", K053260, XTAL_3_579545MHz)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.70)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.70)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( blswhstl )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(tmnt_state)
+static MACHINE_CONFIG_START( blswhstl, tmnt_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
@@ -2573,7 +2555,7 @@ static MACHINE_DRIVER_START( blswhstl )
 	MDRV_SOUND_ADD("k053260", K053260, XTAL_3_579545MHz)
 	MDRV_SOUND_ROUTE(0, "rspeaker", 0.50)	/* fixed inverted stereo channels */
 	MDRV_SOUND_ROUTE(1, "lspeaker", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -2593,10 +2575,7 @@ static GFXDECODE_START( glfgreat )
 	GFXDECODE_ENTRY( "gfx3", 0, zoomlayout, 0x400, 16 )
 GFXDECODE_END
 
-static MACHINE_DRIVER_START( glfgreat )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(tmnt_state)
+static MACHINE_CONFIG_START( glfgreat, tmnt_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)		/* Confirmed */
@@ -2637,7 +2616,7 @@ static MACHINE_DRIVER_START( glfgreat )
 	MDRV_SOUND_ADD("k053260", K053260, XTAL_3_579545MHz)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 static void sound_nmi( running_device *device )
@@ -2660,10 +2639,7 @@ static MACHINE_START( prmrsocr )
 	memory_configure_bank(machine, "bank1", 0, 8, &ROM[0x10000], 0x4000);
 }
 
-static MACHINE_DRIVER_START( prmrsocr )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(tmnt_state)
+static MACHINE_CONFIG_START( prmrsocr, tmnt_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)		/* Confirmed */
@@ -2707,13 +2683,10 @@ static MACHINE_DRIVER_START( prmrsocr )
 	MDRV_SOUND_CONFIG(k054539_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( tmnt2 )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(tmnt_state)
+static MACHINE_CONFIG_START( tmnt2, tmnt_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)
@@ -2762,13 +2735,10 @@ static MACHINE_DRIVER_START( tmnt2 )
 	MDRV_SOUND_ADD("k053260", K053260, XTAL_3_579545MHz)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.75)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( ssriders )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(tmnt_state)
+static MACHINE_CONFIG_START( ssriders, tmnt_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)
@@ -2813,13 +2783,10 @@ static MACHINE_DRIVER_START( ssriders )
 	MDRV_SOUND_ADD("k053260", K053260, XTAL_3_579545MHz)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.70)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.70)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( sunsetbl )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(tmnt_state)
+static MACHINE_CONFIG_START( sunsetbl, tmnt_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
@@ -2855,12 +2822,9 @@ static MACHINE_DRIVER_START( sunsetbl )
 	MDRV_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( thndrx2 )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(tmnt_state)
+static MACHINE_CONFIG_START( thndrx2, tmnt_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
@@ -2905,7 +2869,7 @@ static MACHINE_DRIVER_START( thndrx2 )
 	MDRV_SOUND_ADD("k053260", K053260, XTAL_3_579545MHz)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.75)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

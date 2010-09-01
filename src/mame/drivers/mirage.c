@@ -376,10 +376,7 @@ static MACHINE_RESET( mirage )
 	state->mux_data = 0;
 }
 
-static MACHINE_DRIVER_START( mirage )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(mirage_state)
+static MACHINE_CONFIG_START( mirage, mirage_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 28000000/2)
@@ -412,7 +409,7 @@ static MACHINE_DRIVER_START( mirage )
 
 	MDRV_OKIM6295_ADD("oki_sfx", 1000000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( mirage )

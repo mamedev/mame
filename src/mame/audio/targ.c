@@ -197,7 +197,7 @@ static const samples_interface targ_samples_interface =
 };
 
 
-MACHINE_DRIVER_START( spectar_audio )
+MACHINE_CONFIG_FRAGMENT( spectar_audio )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
@@ -207,10 +207,10 @@ MACHINE_DRIVER_START( spectar_audio )
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-MACHINE_DRIVER_START( targ_audio )
+MACHINE_CONFIG_FRAGMENT( targ_audio )
 
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
@@ -220,4 +220,4 @@ MACHINE_DRIVER_START( targ_audio )
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END

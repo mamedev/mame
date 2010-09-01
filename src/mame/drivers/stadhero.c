@@ -219,7 +219,7 @@ static const ym3812_interface ym3812_config =
 
 /******************************************************************************/
 
-static MACHINE_DRIVER_START( stadhero )
+static MACHINE_CONFIG_START( stadhero, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)
@@ -258,7 +258,7 @@ static MACHINE_DRIVER_START( stadhero )
 
 	MDRV_OKIM6295_ADD("oki", 1023924, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /******************************************************************************/
 

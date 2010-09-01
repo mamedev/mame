@@ -320,7 +320,7 @@ static const tms34010_config tms_config =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( xtheball )
+static MACHINE_CONFIG_START( xtheball, driver_data_t )
 
 	MDRV_CPU_ADD("maincpu", TMS34010, 40000000)
 	MDRV_CPU_CONFIG(tms_config)
@@ -345,7 +345,7 @@ static MACHINE_DRIVER_START( xtheball )
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

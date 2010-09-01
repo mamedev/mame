@@ -1511,7 +1511,7 @@ static DRIVER_INIT( ghlpanic )
 	system11gun_install(machine);
 }
 
-static MACHINE_DRIVER_START( coh700 )
+static MACHINE_CONFIG_START( coh700, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",  CXD8661R, XTAL_100MHz )
 	MDRV_CPU_PROGRAM_MAP( namcos12_map)
@@ -1548,7 +1548,7 @@ static MACHINE_DRIVER_START( coh700 )
 	MDRV_SOUND_ROUTE(3, "lspeaker", 1.00)
 
 	MDRV_AT28C16_ADD( "at28c16", NULL )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( namcos12 )
 	PORT_START("DSW")

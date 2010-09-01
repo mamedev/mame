@@ -7710,10 +7710,7 @@ static MACHINE_START( sryudens )
                             Don Den Lover Vol.1
 ***************************************************************************/
 
-static MACHINE_DRIVER_START( ddenlovr )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(dynax_state)
+static MACHINE_CONFIG_START( ddenlovr, dynax_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M68000, XTAL_24MHz / 2)
@@ -7751,29 +7748,26 @@ static MACHINE_DRIVER_START( ddenlovr )
 
 	/* devices */
 	MDRV_MSM6242_ADD("rtc")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( ddenlovj )
+static MACHINE_CONFIG_DERIVED( ddenlovj, ddenlovr )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(ddenlovr)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(ddenlovj_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( ddenlovrk )
-	MDRV_IMPORT_FROM(ddenlovr)
+static MACHINE_CONFIG_DERIVED( ddenlovrk, ddenlovr )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(ddenlovrk_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( akamaru )
+static MACHINE_CONFIG_DERIVED( akamaru, ddenlovr )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(ddenlovr)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(akamaru_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 static const ay8910_interface quiz365_ay8910_interface =
@@ -7786,25 +7780,23 @@ static const ay8910_interface quiz365_ay8910_interface =
 	DEVCB_HANDLER(ddenlovr_select_w)
 };
 
-static MACHINE_DRIVER_START( quiz365 )
+static MACHINE_CONFIG_DERIVED( quiz365, ddenlovr )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(ddenlovr)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(quiz365_map)
 
 	MDRV_SOUND_MODIFY("aysnd")
 	MDRV_SOUND_CONFIG(quiz365_ay8910_interface)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( nettoqc )
+static MACHINE_CONFIG_DERIVED( nettoqc, ddenlovr )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(ddenlovr)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(nettoqc_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
                                 Rong Rong
@@ -7840,10 +7832,7 @@ static INTERRUPT_GEN( rtc_irq )
 }
 #endif
 
-static MACHINE_DRIVER_START( quizchq )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(dynax_state)
+static MACHINE_CONFIG_START( quizchq, dynax_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 8000000)	/* ? */
@@ -7879,16 +7868,15 @@ static MACHINE_DRIVER_START( quizchq )
 
 	/* devices */
 	MDRV_MSM6242_ADD("rtc")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( rongrong )
+static MACHINE_CONFIG_DERIVED( rongrong, quizchq )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(quizchq)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(rongrong_map)
 	MDRV_CPU_IO_MAP(rongrong_portmap)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 
@@ -7918,10 +7906,7 @@ static INTERRUPT_GEN( mmpanic_irq )
 		cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xcf);	// RST 08, vblank
 }
 
-static MACHINE_DRIVER_START( mmpanic )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(dynax_state)
+static MACHINE_CONFIG_START( mmpanic, dynax_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 8000000)
@@ -7965,7 +7950,7 @@ static MACHINE_DRIVER_START( mmpanic )
 
 	/* devices */
 	MDRV_MSM6242_ADD("rtc")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
@@ -7995,10 +7980,7 @@ static INTERRUPT_GEN( hanakanz_irq )
 		cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xe0);
 }
 
-static MACHINE_DRIVER_START( hanakanz )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(dynax_state)
+static MACHINE_CONFIG_START( hanakanz, dynax_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80,8000000)	// TMPZ84C015BF-8
@@ -8034,21 +8016,21 @@ static MACHINE_DRIVER_START( hanakanz )
 
 	/* devices */
 	MDRV_MSM6242_ADD("rtc")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( hkagerou )
+static MACHINE_CONFIG_DERIVED( hkagerou, hanakanz )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM( hanakanz )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(hkagerou_portmap)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( mjreach1 )
+static MACHINE_CONFIG_DERIVED( mjreach1, hanakanz )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM( hanakanz )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(mjreach1_portmap)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
@@ -8077,21 +8059,19 @@ static INTERRUPT_GEN( mjchuuka_irq )
 }
 
 
-static MACHINE_DRIVER_START( mjchuuka )
+static MACHINE_CONFIG_DERIVED( mjchuuka, hanakanz )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM( hanakanz )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(mjchuuka_portmap)
 	MDRV_CPU_VBLANK_INT("screen", mjchuuka_irq)
 
 	MDRV_SOUND_ADD("aysnd", AY8910, 1789772)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( funkyfig )
-
-	MDRV_IMPORT_FROM(mmpanic)
+static MACHINE_CONFIG_DERIVED( funkyfig, mmpanic )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(funkyfig_map)
 	MDRV_CPU_IO_MAP(funkyfig_portmap)
@@ -8103,7 +8083,7 @@ static MACHINE_DRIVER_START( funkyfig )
 	MDRV_CPU_IO_MAP(funkyfig_sound_portmap)
 
 	MDRV_VIDEO_START(ddenlovr)	// no extra layers?
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
@@ -8152,9 +8132,9 @@ static const ay8910_interface mjmyster_ay8910_interface =
 	DEVCB_HANDLER(ddenlovr_select_w)
 };
 
-static MACHINE_DRIVER_START( mjmyster )
+static MACHINE_CONFIG_DERIVED( mjmyster, quizchq )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM( quizchq )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(mjmyster_map)
 	MDRV_CPU_IO_MAP(mjmyster_portmap)
@@ -8166,7 +8146,7 @@ static MACHINE_DRIVER_START( mjmyster )
 	MDRV_SOUND_ADD("aysnd", AY8910, 3579545)
 	MDRV_SOUND_CONFIG(mjmyster_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
                             Hanafuda Hana Ginga
@@ -8203,9 +8183,9 @@ static const ay8910_interface hginga_ay8910_interface =
 	DEVCB_NULL,						DEVCB_HANDLER(ddenlovr_select_w)		// W
 };
 
-static MACHINE_DRIVER_START( hginga )
+static MACHINE_CONFIG_DERIVED( hginga, quizchq )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM( quizchq )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(hginga_map)
 	MDRV_CPU_IO_MAP(hginga_portmap)
@@ -8216,11 +8196,11 @@ static MACHINE_DRIVER_START( hginga )
 	MDRV_SOUND_ADD("aysnd", AY8910, 3579545)
 	MDRV_SOUND_CONFIG(hginga_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( hgokou )
+static MACHINE_CONFIG_DERIVED( hgokou, quizchq )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM( quizchq )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(hgokou_map)
 	MDRV_CPU_IO_MAP(hgokou_portmap)
@@ -8231,19 +8211,19 @@ static MACHINE_DRIVER_START( hgokou )
 	MDRV_SOUND_ADD("aysnd", AY8910, 3579545)
 	MDRV_SOUND_CONFIG(hginga_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( mjmywrld )
+static MACHINE_CONFIG_DERIVED( mjmywrld, mjmyster )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM( mjmyster )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(hginga_map)
 	MDRV_CPU_IO_MAP(mjmywrld_portmap)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( mjmyuniv )
+static MACHINE_CONFIG_DERIVED( mjmyuniv, quizchq )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM( quizchq )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(mjmyster_map)
 	MDRV_CPU_IO_MAP(mjmyster_portmap)
@@ -8255,11 +8235,11 @@ static MACHINE_DRIVER_START( mjmyuniv )
 	MDRV_SOUND_ADD("aysnd", AY8910, 1789772)
 	MDRV_SOUND_CONFIG(mjmyster_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( mjmyornt )
+static MACHINE_CONFIG_DERIVED( mjmyornt, quizchq )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM( quizchq )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(mjmyster_portmap)
 	MDRV_CPU_VBLANK_INT_HACK(mjmyster_irq, 2)
@@ -8270,7 +8250,7 @@ static MACHINE_DRIVER_START( mjmyornt )
 	MDRV_SOUND_ADD("aysnd", AY8910, 1789772)
 	MDRV_SOUND_CONFIG(mjmyster_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static INTERRUPT_GEN( mjflove_irq )
 {
@@ -8291,9 +8271,9 @@ static INTERRUPT_GEN( mjflove_irq )
 	}
 }
 
-static MACHINE_DRIVER_START( mjflove )
+static MACHINE_CONFIG_DERIVED( mjflove, quizchq )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM( quizchq )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(rongrong_map)
 	MDRV_CPU_IO_MAP(mjflove_portmap)
@@ -8305,7 +8285,7 @@ static MACHINE_DRIVER_START( mjflove )
 
 	MDRV_SOUND_ADD("aysnd", AY8910, 28636363/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*  It runs in IM 2, thus needs a vector on the data bus:
     0xee is vblank  */
@@ -8314,21 +8294,18 @@ static INTERRUPT_GEN( hparadis_irq )
 	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xee);
 }
 
-static MACHINE_DRIVER_START( hparadis )
+static MACHINE_CONFIG_DERIVED( hparadis, quizchq )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM( quizchq )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(hparadis_map)
 	MDRV_CPU_IO_MAP(hparadis_portmap)
 	MDRV_CPU_VBLANK_INT("screen", hparadis_irq)
 
 	MDRV_MACHINE_START(hparadis)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( jongtei )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(dynax_state)
+static MACHINE_CONFIG_START( jongtei, dynax_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80, XTAL_20MHz / 2)	// ?
@@ -8364,16 +8341,13 @@ static MACHINE_DRIVER_START( jongtei )
 
 	/* devices */
 	MDRV_MSM6242_ADD("rtc")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
                             Mahjong Seiryu Densetsu
 ***************************************************************************/
 
-static MACHINE_DRIVER_START( sryudens )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(dynax_state)
+static MACHINE_CONFIG_START( sryudens, dynax_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80, XTAL_16MHz / 2)	// ?
@@ -8412,16 +8386,13 @@ static MACHINE_DRIVER_START( sryudens )
 
 	/* devices */
 	MDRV_MSM6242_ADD("rtc")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
                             Mahjong Daimyojin
 ***************************************************************************/
 
-static MACHINE_DRIVER_START( daimyojn )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(dynax_state)
+static MACHINE_CONFIG_START( daimyojn, dynax_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80, XTAL_20MHz / 2)
@@ -8457,7 +8428,7 @@ static MACHINE_DRIVER_START( daimyojn )
 
 	/* devices */
 	MDRV_MSM6242_ADD("rtc")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

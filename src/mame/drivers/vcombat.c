@@ -546,7 +546,7 @@ static const mc6845_interface mc6845_intf =
 };
 
 
-static MACHINE_DRIVER_START( vcombat )
+static MACHINE_CONFIG_START( vcombat, driver_data_t )
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_12MHz)
 	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_assert)
@@ -593,10 +593,10 @@ static MACHINE_DRIVER_START( vcombat )
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( shadfgtr )
+static MACHINE_CONFIG_START( shadfgtr, driver_data_t )
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_12MHz)
 	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_assert)
@@ -626,7 +626,7 @@ static MACHINE_DRIVER_START( shadfgtr )
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( vcombat )

@@ -437,7 +437,7 @@ static VIDEO_UPDATE( panther )
  *
  *************************************/
 
-static MACHINE_DRIVER_START( redalert_video_common )
+static MACHINE_CONFIG_FRAGMENT( redalert_video_common )
 
 	MDRV_VIDEO_UPDATE(redalert)
 
@@ -448,21 +448,21 @@ static MACHINE_DRIVER_START( redalert_video_common )
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-MACHINE_DRIVER_START( redalert_video )
+MACHINE_CONFIG_FRAGMENT( redalert_video )
 
 	MDRV_VIDEO_START(redalert)
-	MDRV_IMPORT_FROM( redalert_video_common )
+	MDRV_FRAGMENT_ADD( redalert_video_common )
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-MACHINE_DRIVER_START( ww3_video )
+MACHINE_CONFIG_FRAGMENT( ww3_video )
 
 	MDRV_VIDEO_START( ww3 )
-	MDRV_IMPORT_FROM( redalert_video_common )
+	MDRV_FRAGMENT_ADD( redalert_video_common )
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************************
@@ -471,7 +471,7 @@ MACHINE_DRIVER_END
  *
  *************************************/
 
-MACHINE_DRIVER_START( demoneye_video )
+MACHINE_CONFIG_FRAGMENT( demoneye_video )
 
 	MDRV_VIDEO_START(redalert)
 	MDRV_VIDEO_UPDATE(demoneye)
@@ -483,10 +483,10 @@ MACHINE_DRIVER_START( demoneye_video )
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-MACHINE_DRIVER_START( panther_video )
+MACHINE_CONFIG_FRAGMENT( panther_video )
 
 	MDRV_VIDEO_START(ww3)
 	MDRV_VIDEO_UPDATE(panther)
@@ -498,5 +498,5 @@ MACHINE_DRIVER_START( panther_video )
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 

@@ -24,7 +24,7 @@ extern UINT8 *madalien_edge1_pos;
 extern UINT8 *madalien_edge2_pos;
 extern UINT8 *madalien_headlight_pos;
 
-MACHINE_DRIVER_EXTERN( madalien_video );
+MACHINE_CONFIG_EXTERN( madalien_video );
 
 WRITE8_HANDLER( madalien_videoram_w );
 WRITE8_HANDLER( madalien_charram_w );

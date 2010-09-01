@@ -242,10 +242,7 @@ static const ay8910_interface ay8910_config =
 	DEVCB_NULL
 };
 
-static MACHINE_DRIVER_START( bogeyman )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(bogeyman_state)
+static MACHINE_CONFIG_START( bogeyman, bogeyman_state )
 
 	// basic machine hardware
 	MDRV_CPU_ADD("maincpu", M6502, 1500000)	/* Verified */
@@ -281,7 +278,7 @@ static MACHINE_DRIVER_START( bogeyman )
 
 	MDRV_SOUND_ADD("ay2", AY8910, 1500000)	/* Verified */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROMs */
 

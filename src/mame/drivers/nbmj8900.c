@@ -328,7 +328,7 @@ INPUT_PORTS_END
 
 
 
-static MACHINE_DRIVER_START( ohpaipee )
+static MACHINE_CONFIG_START( ohpaipee, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 20000000/4)	/* 5.00 MHz ? */
@@ -358,16 +358,15 @@ static MACHINE_DRIVER_START( ohpaipee )
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( togenkyo )
+static MACHINE_CONFIG_DERIVED( togenkyo, ohpaipee )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(ohpaipee)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(togenkyo_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

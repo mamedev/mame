@@ -273,10 +273,7 @@ static const ay8910_interface ay8910_interface_2 =
 
 
 
-static MACHINE_DRIVER_START( holeland )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(holeland_state)
+static MACHINE_CONFIG_START( holeland, holeland_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)        /* 4 MHz ? */
@@ -309,7 +306,7 @@ static MACHINE_DRIVER_START( holeland )
 	MDRV_SOUND_ADD("ay2", AY8910, 1818182)
 	MDRV_SOUND_CONFIG(ay8910_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*
 
@@ -345,10 +342,7 @@ Notes:
 
 */
 
-static MACHINE_DRIVER_START( crzrally )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(holeland_state)
+static MACHINE_CONFIG_START( crzrally, holeland_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 20000000/4)        /* 5 MHz */
@@ -383,7 +377,7 @@ static MACHINE_DRIVER_START( crzrally )
 	MDRV_SOUND_ADD("ay2", AY8910, 20000000/16)
 	MDRV_SOUND_CONFIG(ay8910_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

@@ -367,7 +367,7 @@ static INTERRUPT_GEN( groundfx_interrupt )
 	cpu_set_input_line(device, 4, HOLD_LINE);
 }
 
-static MACHINE_DRIVER_START( groundfx )
+static MACHINE_CONFIG_START( groundfx, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)	/* 16 MHz */
@@ -394,8 +394,8 @@ static MACHINE_DRIVER_START( groundfx )
 	MDRV_TC0480SCP_ADD("tc0480scp", groundfx_tc0480scp_intf)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(taito_f3_sound)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(taito_f3_sound)
+MACHINE_CONFIG_END
 
 /***************************************************************************
                     DRIVERS

@@ -328,10 +328,7 @@ static MACHINE_RESET( munchmo )
 	state->which = 0;
 }
 
-static MACHINE_DRIVER_START( mnchmobl )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(munchmo_state)
+static MACHINE_CONFIG_START( mnchmobl, munchmo_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_15MHz/4) /* ? */
@@ -369,7 +366,7 @@ static MACHINE_DRIVER_START( mnchmobl )
 
 	MDRV_SOUND_ADD("ay2", AY8910, XTAL_15MHz/4/2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************************

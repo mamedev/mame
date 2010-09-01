@@ -648,10 +648,7 @@ static MACHINE_RESET( taitoair )
 	}
 }
 
-static MACHINE_DRIVER_START( airsys )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(taitoair_state)
+static MACHINE_CONFIG_START( airsys, taitoair_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,24000000 / 2)		/* 12 MHz ??? */
@@ -698,7 +695,7 @@ static MACHINE_DRIVER_START( airsys )
 	MDRV_SOUND_ROUTE(2, "mono", 0.60)
 
 	MDRV_TC0140SYT_ADD("tc0140syt", airsys_tc0140syt_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************************************************

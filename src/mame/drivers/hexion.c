@@ -227,7 +227,7 @@ static INTERRUPT_GEN( hexion_interrupt )
 		cpu_set_input_line(device, 0, HOLD_LINE);
 }
 
-static MACHINE_DRIVER_START( hexion )
+static MACHINE_CONFIG_START( hexion, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,24000000/4)	/* Z80B 6 MHz */
@@ -257,7 +257,7 @@ static MACHINE_DRIVER_START( hexion )
 
 	MDRV_SOUND_ADD("konami", K051649, 24000000/16)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

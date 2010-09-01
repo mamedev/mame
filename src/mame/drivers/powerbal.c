@@ -483,10 +483,7 @@ static MACHINE_RESET( powerbal )
 	state->tilebank = 0;
 }
 
-static MACHINE_DRIVER_START( powerbal )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(playmark_state)
+static MACHINE_CONFIG_START( powerbal, playmark_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
@@ -515,12 +512,9 @@ static MACHINE_DRIVER_START( powerbal )
 
 	MDRV_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( magicstk )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(playmark_state)
+static MACHINE_CONFIG_START( magicstk, playmark_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
@@ -552,7 +546,7 @@ static MACHINE_DRIVER_START( magicstk )
 
 	MDRV_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*

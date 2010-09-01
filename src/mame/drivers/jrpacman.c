@@ -263,7 +263,7 @@ static const namco_interface namco_config =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( jrpacman )
+static MACHINE_CONFIG_START( jrpacman, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 18432000/6)	/* 3.072 MHz */
@@ -292,7 +292,7 @@ static MACHINE_DRIVER_START( jrpacman )
 	MDRV_SOUND_ADD("namco", NAMCO, 3072000/32)
 	MDRV_SOUND_CONFIG(namco_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

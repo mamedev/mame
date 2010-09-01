@@ -648,10 +648,9 @@ static VIDEO_EOF( mpnew )
 	VIDEO_EOF_CALL(megatech_bios);
 }
 
-static MACHINE_DRIVER_START( mpnew )
+static MACHINE_CONFIG_DERIVED( mpnew, megadriv )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(megadriv)
 
 	/* The Megaplay has an extra BIOS cpu which drives an SMS VDP
        which includes an SN76496 for sound */
@@ -672,7 +671,7 @@ static MACHINE_DRIVER_START( mpnew )
 	/* New update functions to handle the extra layer */
 	MDRV_VIDEO_START(megplay)
 	MDRV_VIDEO_UPDATE(megplay)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* MegaPlay Games - Modified Genesis games */

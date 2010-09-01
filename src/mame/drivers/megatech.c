@@ -521,10 +521,9 @@ static MACHINE_RESET(mtnew)
 	megatech_select_game(machine, 0);
 }
 
-static MACHINE_DRIVER_START( megatech )
+static MACHINE_CONFIG_DERIVED( megatech, megadriv )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(megadriv)
 
 	/* Megatech has an extra SMS based bios *and* an additional screen */
 	MDRV_CPU_ADD("mtbios", Z80, MASTER_CLOCK / 15) /* ?? */
@@ -549,7 +548,7 @@ static MACHINE_DRIVER_START( megatech )
 	MDRV_SOUND_ADD("sn2", SN76496, MASTER_CLOCK/15)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* MegaTech Games - Genesis & sms! Games with a timer */

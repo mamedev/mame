@@ -339,10 +339,7 @@ static MACHINE_RESET( meijinsn )
 }
 
 
-static MACHINE_DRIVER_START( meijinsn )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(meijinsn_state)
+static MACHINE_CONFIG_START( meijinsn, meijinsn_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 9000000 )
@@ -378,7 +375,7 @@ static MACHINE_DRIVER_START( meijinsn )
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( meijinsn )

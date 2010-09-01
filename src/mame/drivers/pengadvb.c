@@ -259,7 +259,7 @@ static INTERRUPT_GEN( pengadvb_interrupt )
 }
 
 
-static MACHINE_DRIVER_START( pengadvb )
+static MACHINE_CONFIG_START( pengadvb, driver_data_t )
 
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_10_738635MHz/3)		  /* 3.579545 Mhz */
 	MDRV_CPU_PROGRAM_MAP(program_mem)
@@ -272,7 +272,7 @@ static MACHINE_DRIVER_START( pengadvb )
     MDRV_I8255A_ADD( "ppi8255", pengadvb_ppi8255_interface)
 
 	/* video hardware */
-	MDRV_IMPORT_FROM(tms9928a)
+	MDRV_FRAGMENT_ADD(tms9928a)
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE((float)XTAL_10_738635MHz/2/342/262)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -283,7 +283,7 @@ static MACHINE_DRIVER_START( pengadvb )
 	MDRV_SOUND_ADD("aysnd", AY8910, (float)XTAL_10_738635MHz/6)
 	MDRV_SOUND_CONFIG(pengadvb_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static void pengadvb_decrypt(running_machine *machine, const char* region)
 {

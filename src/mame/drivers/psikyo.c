@@ -1057,10 +1057,7 @@ static const ym2610_interface sngkace_ym2610_interface =
 	sound_irq
 };
 
-static MACHINE_DRIVER_START( sngkace )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(psikyo_state)
+static MACHINE_CONFIG_START( sngkace, psikyo_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC020, XTAL_32MHz/2) /* verified on pcb */
@@ -1098,7 +1095,7 @@ static MACHINE_DRIVER_START( sngkace )
 	MDRV_SOUND_ROUTE(0, "rspeaker", 1.2)
 	MDRV_SOUND_ROUTE(1, "lspeaker",  1.0)
 	MDRV_SOUND_ROUTE(2, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -1112,10 +1109,7 @@ static const ym2610_interface gunbird_ym2610_interface =
 	sound_irq	/* irq */
 };
 
-static MACHINE_DRIVER_START( gunbird )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(psikyo_state)
+static MACHINE_CONFIG_START( gunbird, psikyo_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)
@@ -1153,12 +1147,9 @@ static MACHINE_DRIVER_START( gunbird )
 	MDRV_SOUND_ROUTE(0, "rspeaker", 1.2)
 	MDRV_SOUND_ROUTE(1, "lspeaker",  1.0)
 	MDRV_SOUND_ROUTE(2, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( s1945bl ) /* Bootleg hardware based on the unprotected Japanese Strikers 1945 set */
-
-	/* driver data */
-	MDRV_DRIVER_DATA(psikyo_state)
+static MACHINE_CONFIG_START( s1945bl, psikyo_state ) /* Bootleg hardware based on the unprotected Japanese Strikers 1945 set */
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)
@@ -1189,7 +1180,7 @@ static MACHINE_DRIVER_START( s1945bl ) /* Bootleg hardware based on the unprotec
 	MDRV_OKIM6295_ADD("oki", XTAL_16MHz/16, OKIM6295_PIN7_LOW) // ?? clock
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MDRV_DEVICE_ADDRESS_MAP(0, s1945bl_oki_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -1209,10 +1200,7 @@ static const ymf278b_interface ymf278b_config =
 	irqhandler
 };
 
-static MACHINE_DRIVER_START( s1945 )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(psikyo_state)
+static MACHINE_CONFIG_START( s1945, psikyo_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)
@@ -1250,7 +1238,7 @@ static MACHINE_DRIVER_START( s1945 )
 	MDRV_SOUND_CONFIG(ymf278b_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

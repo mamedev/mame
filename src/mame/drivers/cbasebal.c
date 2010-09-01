@@ -276,10 +276,7 @@ static MACHINE_RESET( cbasebal )
 	state->scroll_y[1] = 0;
 }
 
-static MACHINE_DRIVER_START( cbasebal )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(cbasebal_state)
+static MACHINE_CONFIG_START( cbasebal, cbasebal_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 6000000)	/* ??? */
@@ -316,7 +313,7 @@ static MACHINE_DRIVER_START( cbasebal )
 
 	MDRV_SOUND_ADD("ymsnd", YM2413, 3579545)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

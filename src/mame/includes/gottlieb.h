@@ -17,8 +17,8 @@
 
 WRITE8_HANDLER( gottlieb_sh_w );
 
-MACHINE_DRIVER_EXTERN( gottlieb_soundrev1 );
-MACHINE_DRIVER_EXTERN( gottlieb_soundrev2 );
+MACHINE_CONFIG_EXTERN( gottlieb_soundrev1 );
+MACHINE_CONFIG_EXTERN( gottlieb_soundrev2 );
 
 INPUT_PORTS_EXTERN( gottlieb1_sound );
 INPUT_PORTS_EXTERN( gottlieb2_sound );

@@ -756,7 +756,7 @@ static INTERRUPT_GEN( witch_sub_interrupt )
 	cpu_set_input_line(device,0,ASSERT_LINE);
 }
 
-static MACHINE_DRIVER_START( witch )
+static MACHINE_CONFIG_START( witch, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,8000000)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(map_main)
@@ -797,7 +797,7 @@ static MACHINE_DRIVER_START( witch )
 	MDRV_SOUND_CONFIG(ym2203_interface_1)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* this set has (c)1992 Sega / Vic Tokai in the roms? */
 ROM_START( witch )

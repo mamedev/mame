@@ -256,7 +256,7 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-static MACHINE_DRIVER_START( dcon )
+static MACHINE_CONFIG_START( dcon, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)
@@ -283,9 +283,9 @@ static MACHINE_DRIVER_START( dcon )
 
 	/* sound hardware */
 	SEIBU_SOUND_SYSTEM_YM3812_INTERFACE(4000000,1320000)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( sdgndmps )
+static MACHINE_CONFIG_START( sdgndmps, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)
@@ -312,7 +312,7 @@ static MACHINE_DRIVER_START( sdgndmps )
 
 	/* sound hardware */
 	SEIBU_SOUND_SYSTEM_YM2151_INTERFACE(14318180/4,1320000)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************/
 

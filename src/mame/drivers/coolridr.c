@@ -1056,7 +1056,7 @@ static MACHINE_RESET ( coolridr )
 	cputag_set_input_line(machine, "soundcpu", INPUT_LINE_HALT, ASSERT_LINE);
 }
 
-static MACHINE_DRIVER_START( coolridr )
+static MACHINE_CONFIG_START( coolridr, driver_data_t )
 	MDRV_CPU_ADD("maincpu", SH2, 28000000)	// 28 mhz
 	MDRV_CPU_PROGRAM_MAP(system_h1_map)
 	MDRV_CPU_VBLANK_INT("screen",system_h1)
@@ -1082,7 +1082,7 @@ static MACHINE_DRIVER_START( coolridr )
 
 	MDRV_VIDEO_START(coolridr)
 	MDRV_VIDEO_UPDATE(coolridr)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( coolridr )
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* SH2 code */

@@ -12,4 +12,4 @@ WRITE8_DEVICE_HANDLER( spiders_audio_a_w );
 WRITE8_DEVICE_HANDLER( spiders_audio_b_w );
 WRITE8_DEVICE_HANDLER( spiders_audio_ctrl_w );
 
-MACHINE_DRIVER_EXTERN( spiders_audio );
+MACHINE_CONFIG_EXTERN( spiders_audio );

@@ -223,8 +223,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( toobin )
-	MDRV_DRIVER_DATA(toobin_state)
+static MACHINE_CONFIG_START( toobin, toobin_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68010, MASTER_CLOCK/4)
@@ -249,8 +248,8 @@ static MACHINE_DRIVER_START( toobin )
 	MDRV_VIDEO_UPDATE(toobin)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(jsa_i_stereo_pokey)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(jsa_i_stereo_pokey)
+MACHINE_CONFIG_END
 
 
 

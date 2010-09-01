@@ -993,10 +993,7 @@ static MACHINE_RESET( hyprolyb )
 	state->hyprolyb_vck_ready = 0;
 }
 
-static MACHINE_DRIVER_START( trackfld )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(trackfld_state)
+static MACHINE_CONFIG_START( trackfld, trackfld_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, MASTER_CLOCK/6/2)	/* a guess for now */
@@ -1036,13 +1033,10 @@ static MACHINE_DRIVER_START( trackfld )
 
 	MDRV_SOUND_ADD("vlm", VLM5030, VLM_CLOCK)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( yieartf )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(trackfld_state)
+static MACHINE_CONFIG_START( yieartf, trackfld_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, MASTER_CLOCK/6/2)	/* a guess for now */
@@ -1083,12 +1077,11 @@ static MACHINE_DRIVER_START( yieartf )
 
 	MDRV_SOUND_ADD("vlm", VLM5030, VLM_CLOCK)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* same as the original, but uses ADPCM instead of VLM5030 */
 /* also different memory handlers do handle that */
-static MACHINE_DRIVER_START( hyprolyb )
-	MDRV_IMPORT_FROM(trackfld)
+static MACHINE_CONFIG_DERIVED( hyprolyb, trackfld )
 
 	MDRV_CPU_MODIFY("audiocpu")
 	MDRV_CPU_PROGRAM_MAP(hyprolyb_sound_map)
@@ -1105,42 +1098,38 @@ static MACHINE_DRIVER_START( hyprolyb )
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(hyprolyb_msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( atlantol )
-	MDRV_IMPORT_FROM(hyprolyb)
+static MACHINE_CONFIG_DERIVED( atlantol, hyprolyb )
 
 	MDRV_VIDEO_START(atlantol)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( mastkin )
+static MACHINE_CONFIG_DERIVED( mastkin, trackfld )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(trackfld)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(mastkin_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( wizzquiz )
+static MACHINE_CONFIG_DERIVED( wizzquiz, trackfld )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(trackfld)
 	// right cpu?
 	MDRV_CPU_REPLACE("maincpu",M6800,2048000)		/* 1.400 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(wizzquiz_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( reaktor )
+static MACHINE_CONFIG_DERIVED( reaktor, trackfld )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(trackfld)
 	MDRV_CPU_REPLACE("maincpu",Z80,MASTER_CLOCK/6)
 	MDRV_CPU_PROGRAM_MAP(reaktor_map)
 	MDRV_CPU_IO_MAP(reaktor_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

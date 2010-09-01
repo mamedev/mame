@@ -192,7 +192,7 @@ static PALETTE_INIT(cardline)
 	}
 }
 
-static MACHINE_DRIVER_START( cardline )
+static MACHINE_CONFIG_START( cardline, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I80C32,12000000)
@@ -223,7 +223,7 @@ static MACHINE_DRIVER_START( cardline )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

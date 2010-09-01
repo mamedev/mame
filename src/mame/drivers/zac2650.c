@@ -238,7 +238,7 @@ static GFXDECODE_START( tinvader )
 	GFXDECODE_SCALE( NULL,   0x1F00, s2636_character, 0, 2, 8, 6 )	/* dynamic */
 GFXDECODE_END
 
-static MACHINE_DRIVER_START( tinvader )
+static MACHINE_CONFIG_START( tinvader, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", S2650, 3800000/4)
@@ -265,7 +265,7 @@ static MACHINE_DRIVER_START( tinvader )
 
 	MDRV_SOUND_ADD("s2636snd", S2636, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static WRITE8_HANDLER( tinvader_sound_w )
 {

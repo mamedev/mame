@@ -1184,7 +1184,7 @@ GFXDECODE_END
 
 /* MACHINE DRIVERS */
 
-static MACHINE_DRIVER_START( raiden2 )
+static MACHINE_CONFIG_START( raiden2, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V30,XTAL_32MHz/2) /* verified on pcb */
@@ -1223,19 +1223,17 @@ static MACHINE_DRIVER_START( raiden2 )
 /* Sound hardware infos: Z80 and YM2151 are clocked at XTAL_28_63636MHz/8 */
 /* The 2 Oki M6295 are clocked at XTAL_28_63636MHz/28 and pin 7 is high for both */
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
-static MACHINE_DRIVER_START( nzerotea )
-
-	MDRV_IMPORT_FROM(raiden2)
+static MACHINE_CONFIG_DERIVED( nzerotea, raiden2 )
 
 	/* basic machine hardware */
 	MDRV_DEVICE_MODIFY("maincpu") // also change it to a v33!
 	MDRV_CPU_PROGRAM_MAP(nzerotea_mem)
 	MDRV_CPU_VBLANK_INT("screen", raiden2_interrupt)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROM LOADING */
 
@@ -2275,7 +2273,7 @@ static MACHINE_RESET( rdx_v33 )
 	common_reset();
 }
 
-static MACHINE_DRIVER_START( rdx_v33 )
+static MACHINE_CONFIG_START( rdx_v33, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V33, 32000000/2 ) // ?
@@ -2305,7 +2303,7 @@ static MACHINE_DRIVER_START( rdx_v33 )
 
 	MDRV_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

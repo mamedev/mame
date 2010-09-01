@@ -212,7 +212,7 @@ static PALETTE_INIT( poolshrk )
 }
 
 
-static MACHINE_DRIVER_START( poolshrk )
+static MACHINE_CONFIG_START( poolshrk, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6800, 11055000 / 8) /* ? */
@@ -238,7 +238,7 @@ static MACHINE_DRIVER_START( poolshrk )
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(poolshrk)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( poolshrk )

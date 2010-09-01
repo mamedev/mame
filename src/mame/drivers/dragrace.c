@@ -333,10 +333,7 @@ static MACHINE_RESET( dragrace )
 	state->gear[1] = 0;
 }
 
-static MACHINE_DRIVER_START( dragrace )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(dragrace_state)
+static MACHINE_CONFIG_START( dragrace, dragrace_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6800, 12096000 / 12)
@@ -369,7 +366,7 @@ static MACHINE_DRIVER_START( dragrace )
 	MDRV_SOUND_CONFIG_DISCRETE(dragrace)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( dragrace )

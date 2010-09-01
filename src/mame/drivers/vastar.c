@@ -292,9 +292,7 @@ static const ay8910_interface ay8910_config =
 
 
 
-static MACHINE_DRIVER_START( vastar )
-
-	MDRV_DRIVER_DATA(vastar_state)
+static MACHINE_CONFIG_START( vastar, vastar_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3072000)	/* 3.072 MHz ???? */
@@ -332,7 +330,7 @@ static MACHINE_DRIVER_START( vastar )
 	MDRV_SOUND_ADD("aysnd", AY8910, 1500000)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

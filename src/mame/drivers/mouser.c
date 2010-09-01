@@ -190,10 +190,7 @@ static MACHINE_RESET( mouser )
 	state->nmi_enable = 0;
 }
 
-static MACHINE_DRIVER_START( mouser )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(mouser_state)
+static MACHINE_CONFIG_START( mouser, mouser_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz ? */
@@ -230,7 +227,7 @@ static MACHINE_DRIVER_START( mouser )
 
 	MDRV_SOUND_ADD("ay2", AY8910, 4000000/2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( mouser )

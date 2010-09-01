@@ -242,7 +242,7 @@ static PALETTE_INIT( spcforce )
 }
 
 
-static MACHINE_DRIVER_START( spcforce )
+static MACHINE_CONFIG_START( spcforce, driver_data_t )
 
 	/* basic machine hardware */
 	/* FIXME: The 8085A had a max clock of 6MHz, internally divided by 2! */
@@ -279,7 +279,7 @@ static MACHINE_DRIVER_START( spcforce )
 
 	MDRV_SOUND_ADD("sn3", SN76496, 2000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

@@ -384,10 +384,7 @@ static MACHINE_RESET( brkthru )
 	state->flipscreen = 0;
 }
 
-static MACHINE_DRIVER_START( brkthru )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(brkthru_state)
+static MACHINE_CONFIG_START( brkthru, brkthru_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, MASTER_CLOCK/8)        /* 1.5 MHz ? */
@@ -425,13 +422,10 @@ static MACHINE_DRIVER_START( brkthru )
 	MDRV_SOUND_ADD("ym2", YM3526, MASTER_CLOCK/4)
 	MDRV_SOUND_CONFIG(ym3526_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( darwin )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(brkthru_state)
+static MACHINE_CONFIG_START( darwin, brkthru_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, MASTER_CLOCK/8)        /* 1.5 MHz ? */
@@ -480,7 +474,7 @@ static MACHINE_DRIVER_START( darwin )
 	MDRV_SOUND_ADD("ym2", YM3526, MASTER_CLOCK/4)
 	MDRV_SOUND_CONFIG(ym3526_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

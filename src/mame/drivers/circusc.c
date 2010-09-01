@@ -331,10 +331,7 @@ static DISCRETE_SOUND_START( circusc )
 
 DISCRETE_SOUND_END
 
-static MACHINE_DRIVER_START( circusc )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(circusc_state)
+static MACHINE_CONFIG_START( circusc, circusc_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 2048000)        /* 2 MHz */
@@ -380,7 +377,7 @@ static MACHINE_DRIVER_START( circusc )
 	MDRV_SOUND_CONFIG_DISCRETE(circusc)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

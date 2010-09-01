@@ -351,10 +351,7 @@ static MACHINE_RESET( ashnojoe )
 }
 
 
-static MACHINE_DRIVER_START( ashnojoe )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(ashnojoe_state)
+static MACHINE_CONFIG_START( ashnojoe, ashnojoe_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)
@@ -392,7 +389,7 @@ static MACHINE_DRIVER_START( ashnojoe )
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( scessjoe )
 	ROM_REGION( 0xc0000, "maincpu", 0 )     /* 68000 code */

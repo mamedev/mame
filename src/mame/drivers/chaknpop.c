@@ -271,10 +271,7 @@ static MACHINE_RESET( chaknpop )
 	state->mcu_select = 0;
 }
 
-static MACHINE_DRIVER_START( chaknpop )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(chaknpop_state)
+static MACHINE_CONFIG_START( chaknpop, chaknpop_state )
 
 	/* basic machine hardware */
 	/* the real board is 3.072MHz, but it is faster for MAME */
@@ -312,7 +309,7 @@ static MACHINE_DRIVER_START( chaknpop )
 	MDRV_SOUND_ADD("ay2", AY8910, 18432000 / 12)
 	MDRV_SOUND_CONFIG(ay8910_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

@@ -734,7 +734,7 @@ static const esrip_config rip_config =
 	"proms"
 };
 
-static MACHINE_DRIVER_START( esripsys )
+static MACHINE_CONFIG_START( esripsys, driver_data_t )
 	MDRV_CPU_ADD("game_cpu", M6809E, XTAL_8MHz)
 	MDRV_CPU_PROGRAM_MAP(game_cpu_map)
 	MDRV_CPU_VBLANK_INT("screen", esripsys_vblank_irq)
@@ -771,7 +771,7 @@ static MACHINE_DRIVER_START( esripsys )
 
 	/* 6840 PTM */
 	MDRV_PTM6840_ADD("6840ptm", ptm_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************************

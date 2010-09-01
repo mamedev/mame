@@ -298,7 +298,7 @@ static const tc0140syt_interface exzisus_tc0140syt_intf =
 };
 
 /* All clocks are unconfirmed */
-static MACHINE_DRIVER_START( exzisus )
+static MACHINE_CONFIG_START( exzisus, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("cpua", Z80, 6000000)
@@ -341,7 +341,7 @@ static MACHINE_DRIVER_START( exzisus )
 	MDRV_SOUND_ROUTE(1, "mono", 0.50)
 
 	MDRV_TC0140SYT_ADD("tc0140syt", exzisus_tc0140syt_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

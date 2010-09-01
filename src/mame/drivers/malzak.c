@@ -394,10 +394,7 @@ static MACHINE_RESET( malzak )
 	state->malzak_y = 0;
 }
 
-static MACHINE_DRIVER_START( malzak )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(malzak_state)
+static MACHINE_CONFIG_START( malzak, malzak_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", S2650, 3800000/4)
@@ -441,16 +438,15 @@ static MACHINE_DRIVER_START( malzak )
 
 	MDRV_SOUND_ADD("s2636snd_1", S2636, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( malzak2 )
-	MDRV_IMPORT_FROM( malzak )
+static MACHINE_CONFIG_DERIVED( malzak2, malzak )
 
 	MDRV_CPU_MODIFY( "maincpu" )
 	MDRV_CPU_PROGRAM_MAP(malzak2_map)
 
 	MDRV_NVRAM_HANDLER( generic_0fill )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( malzak )
 	ROM_REGION( 0x8000, "maincpu", 0 )

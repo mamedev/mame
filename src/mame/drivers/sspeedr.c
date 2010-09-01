@@ -186,7 +186,7 @@ static GFXDECODE_START( sspeedr )
 GFXDECODE_END
 
 
-static MACHINE_DRIVER_START( sspeedr )
+static MACHINE_CONFIG_START( sspeedr, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_19_968MHz/8)
@@ -211,7 +211,7 @@ static MACHINE_DRIVER_START( sspeedr )
 	MDRV_VIDEO_EOF(sspeedr)
 
 	/* sound hardware */
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( sspeedr )

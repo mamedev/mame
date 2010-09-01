@@ -694,7 +694,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( atarisy4 )
+static MACHINE_CONFIG_START( atarisy4, driver_data_t )
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)
 	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", vblank_int)
@@ -714,17 +714,16 @@ static MACHINE_DRIVER_START( atarisy4 )
 
 	MDRV_VIDEO_START(atarisy4)
 	MDRV_VIDEO_UPDATE(atarisy4)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( airrace )
-	MDRV_IMPORT_FROM(atarisy4)
+static MACHINE_CONFIG_DERIVED( airrace, atarisy4 )
 
 	MDRV_CPU_ADD("dsp1", TMS32010, 16000000)
 	MDRV_CPU_PROGRAM_MAP(dsp1_map)
 	MDRV_CPU_IO_MAP(dsp1_io_map)
 
 	MDRV_MACHINE_RESET(airrace)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************************

@@ -359,10 +359,7 @@ static MACHINE_RESET( quasar )
 	state->io_page = 8;
 }
 
-static MACHINE_DRIVER_START( quasar )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(cvs_state)
+static MACHINE_CONFIG_START( quasar, cvs_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", S2650, 14318000/4)	/* 14 mhz crystal divide by 4 on board */
@@ -403,7 +400,7 @@ static MACHINE_DRIVER_START( quasar )
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( quasar )
 	ROM_REGION( 0x8000, "maincpu", 0 )

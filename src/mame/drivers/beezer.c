@@ -72,7 +72,7 @@ static INPUT_PORTS_START( beezer )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 INPUT_PORTS_END
 
-static MACHINE_DRIVER_START( beezer )
+static MACHINE_CONFIG_START( beezer, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 1000000)        /* 1 MHz */
@@ -102,7 +102,7 @@ static MACHINE_DRIVER_START( beezer )
 	/* via */
 	MDRV_VIA6522_ADD("via6522_0", 0, b_via_0_interface)
 	MDRV_VIA6522_ADD("via6522_1", 0, b_via_1_interface)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

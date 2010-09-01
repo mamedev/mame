@@ -470,7 +470,7 @@ static const ay8910_interface lcay8910_interface =
 };
 
 
-static MACHINE_DRIVER_START( lvcards )
+static MACHINE_CONFIG_START( lvcards, driver_data_t )
 	// basic machine hardware
 	MDRV_CPU_ADD("maincpu",Z80, 18432000/6)	// 3.072 MHz ?
 
@@ -500,10 +500,9 @@ static MACHINE_DRIVER_START( lvcards )
 	MDRV_SOUND_ADD("aysnd", AY8910, 18432000/12)
 	MDRV_SOUND_CONFIG(lcay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( lvpoker )
-	MDRV_IMPORT_FROM( lvcards )
+static MACHINE_CONFIG_DERIVED( lvpoker, lvcards )
 
 	// basic machine hardware
 	MDRV_NVRAM_HANDLER(generic_1fill)
@@ -511,10 +510,9 @@ static MACHINE_DRIVER_START( lvpoker )
 	MDRV_CPU_PROGRAM_MAP(lvpoker_map)
 	MDRV_MACHINE_START(lvpoker)
 	MDRV_MACHINE_RESET(lvpoker)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( ponttehk )
-	MDRV_IMPORT_FROM( lvcards )
+static MACHINE_CONFIG_DERIVED( ponttehk, lvcards )
 
 	// basic machine hardware
 	MDRV_NVRAM_HANDLER(generic_1fill)
@@ -524,7 +522,7 @@ static MACHINE_DRIVER_START( ponttehk )
 
 	// video hardware
 	MDRV_PALETTE_INIT(ponttehk)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( lvpoker )
 	ROM_REGION( 0x10000, "maincpu", 0 )

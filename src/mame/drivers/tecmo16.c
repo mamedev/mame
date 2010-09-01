@@ -398,7 +398,7 @@ static const ym2151_interface ym2151_config =
 
 /******************************************************************************/
 
-static MACHINE_DRIVER_START( fstarfrc )
+static MACHINE_CONFIG_START( fstarfrc, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,24000000/2)			/* 12MHz */
@@ -435,22 +435,21 @@ static MACHINE_DRIVER_START( fstarfrc )
 	MDRV_OKIM6295_ADD("oki", 999900, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( ginkun )
-	MDRV_IMPORT_FROM(fstarfrc)
+static MACHINE_CONFIG_DERIVED( ginkun, fstarfrc )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(ginkun_map)
 
 	MDRV_VIDEO_START(ginkun)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( riot )
+static MACHINE_CONFIG_DERIVED( riot, ginkun )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(ginkun)
 	MDRV_VIDEO_START(riot)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /******************************************************************************/
 

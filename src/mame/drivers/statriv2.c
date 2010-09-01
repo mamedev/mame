@@ -567,7 +567,7 @@ static const tms9927_interface tms9927_intf =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( statriv2 )
+static MACHINE_CONFIG_START( statriv2, driver_data_t )
 	/* basic machine hardware */
 	/* FIXME: The 8085A had a max clock of 6MHz, internally divided by 2! */
     MDRV_CPU_ADD("maincpu", I8085A, MASTER_CLOCK)
@@ -599,26 +599,26 @@ static MACHINE_DRIVER_START( statriv2 )
 
 	MDRV_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( statriv2v )
+static MACHINE_CONFIG_DERIVED( statriv2v, statriv2 )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(statriv2)
 
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 392, 0, 256, 262, 0, 256)
 
 	MDRV_VIDEO_START(vertical)
 	MDRV_GFXDECODE(vertical)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( funcsino )
+static MACHINE_CONFIG_DERIVED( funcsino, statriv2 )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(statriv2)
 
     MDRV_CPU_MODIFY("maincpu")
     MDRV_CPU_CLOCK(MASTER_CLOCK/2)	/* 3 MHz?? seems accurate */
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

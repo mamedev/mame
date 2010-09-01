@@ -2183,7 +2183,7 @@ static READ16_HANDLER( dual_pcb_masterslave )
  *
  *************************************/
 
-static MACHINE_DRIVER_START( system32 )
+static MACHINE_CONFIG_START( system32, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V60, MASTER_CLOCK/2)
@@ -2229,19 +2229,18 @@ static MACHINE_DRIVER_START( system32 )
 	MDRV_SOUND_ADD("rfsnd", RF5C68, RFC_CLOCK/4)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.55)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.55)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( system32_v25 )
-	MDRV_IMPORT_FROM(system32)
+static MACHINE_CONFIG_DERIVED( system32_v25, system32 )
 
 	/* add a V25 for protection */
 	MDRV_CPU_ADD("mcu", V25, 10000000)
 	MDRV_CPU_PROGRAM_MAP(ga2_v25_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( multi32 )
+static MACHINE_CONFIG_START( multi32, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V70, MULTI32_CLOCK/2)
@@ -2290,7 +2289,7 @@ static MACHINE_DRIVER_START( multi32 )
 	MDRV_SOUND_ADD("sega", MULTIPCM, MASTER_CLOCK/4)
 	MDRV_SOUND_ROUTE(1, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(0, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

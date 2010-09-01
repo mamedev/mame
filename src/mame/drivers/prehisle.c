@@ -203,9 +203,7 @@ static const ym3812_interface ym3812_config =
 
 /******************************************************************************/
 
-static MACHINE_DRIVER_START( prehisle )
-
-	MDRV_DRIVER_DATA( prehisle_state )
+static MACHINE_CONFIG_START( prehisle, prehisle_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_18MHz/2)	/* verified on pcb */
@@ -239,7 +237,7 @@ static MACHINE_DRIVER_START( prehisle )
 
 	MDRV_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /******************************************************************************/
 

@@ -339,10 +339,7 @@ static MACHINE_START( supbtime )
 	state->deco16ic = machine->device("deco_custom");
 }
 
-static MACHINE_DRIVER_START( supbtime )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(supbtime_state)
+static MACHINE_CONFIG_START( supbtime, supbtime_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 14000000)
@@ -381,13 +378,10 @@ static MACHINE_DRIVER_START( supbtime )
 
 	MDRV_OKIM6295_ADD("oki", 1023924, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( chinatwn )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(supbtime_state)
+static MACHINE_CONFIG_START( chinatwn, supbtime_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 14000000)
@@ -426,7 +420,7 @@ static MACHINE_DRIVER_START( chinatwn )
 
 	MDRV_OKIM6295_ADD("oki", 1023924, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /******************************************************************************/
 

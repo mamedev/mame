@@ -521,7 +521,7 @@ static const msm5205_interface msm5205_config =
 };
 
 
-static MACHINE_DRIVER_START( tigeroad )
+static MACHINE_CONFIG_START( tigeroad, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_10MHz) /* verified on pcb */
@@ -560,14 +560,13 @@ static MACHINE_DRIVER_START( tigeroad )
 
 	MDRV_SOUND_ADD("ym2", YM2203, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* same as above but with additional Z80 for samples playback */
-static MACHINE_DRIVER_START( toramich )
+static MACHINE_CONFIG_DERIVED( toramich, tigeroad )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(tigeroad)
 
 	MDRV_CPU_ADD("sample", Z80, 3579545) /* ? */
 	MDRV_CPU_PROGRAM_MAP(sample_map)
@@ -578,7 +577,7 @@ static MACHINE_DRIVER_START( toramich )
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

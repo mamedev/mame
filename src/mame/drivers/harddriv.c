@@ -1119,8 +1119,7 @@ INPUT_PORTS_END
  *************************************/
 
 /* Driver board without MSP (used by Race Drivin' cockpit) */
-static MACHINE_DRIVER_START( driver_nomsp )
-	MDRV_DRIVER_DATA(harddriv_state)
+static MACHINE_CONFIG_START( driver_nomsp, harddriv_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68010, 32000000/4)
@@ -1150,23 +1149,21 @@ static MACHINE_DRIVER_START( driver_nomsp )
 
 	MDRV_VIDEO_START(harddriv)
 	MDRV_VIDEO_UPDATE(tms340x0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* Driver board with MSP (used by Hard Drivin' cockpit) */
-static MACHINE_DRIVER_START( driver_msp )
-	MDRV_IMPORT_FROM(driver_nomsp)
+static MACHINE_CONFIG_DERIVED( driver_msp, driver_nomsp )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("msp", TMS34010, 50000000)
 	MDRV_CPU_PROGRAM_MAP(driver_msp_map)
 	MDRV_CPU_CONFIG(msp_config)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* Multisync board without MSP (used by STUN Runner, Steel Talons, Race Drivin' compact) */
-static MACHINE_DRIVER_START( multisync_nomsp )
-	MDRV_IMPORT_FROM(driver_nomsp)
+static MACHINE_CONFIG_DERIVED( multisync_nomsp, driver_nomsp )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
@@ -1179,23 +1176,21 @@ static MACHINE_DRIVER_START( multisync_nomsp )
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_RAW_PARAMS(6000000*2, 323*2, 0, 256*2, 308, 0, 288)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* Multisync board with MSP (used by Hard Drivin' compact) */
-static MACHINE_DRIVER_START( multisync_msp )
-	MDRV_IMPORT_FROM(multisync_nomsp)
+static MACHINE_CONFIG_DERIVED( multisync_msp, multisync_nomsp )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("msp", TMS34010, 50000000)
 	MDRV_CPU_PROGRAM_MAP(driver_msp_map)
 	MDRV_CPU_CONFIG(msp_config)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* Multisync II board (used by Hard Drivin's Airborne) */
-static MACHINE_DRIVER_START( multisync2 )
-	MDRV_IMPORT_FROM(multisync_nomsp)
+static MACHINE_CONFIG_DERIVED( multisync2, multisync_nomsp )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
@@ -1203,7 +1198,7 @@ static MACHINE_DRIVER_START( multisync2 )
 
 	MDRV_CPU_MODIFY("gsp")
 	MDRV_CPU_PROGRAM_MAP(multisync2_gsp_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -1214,17 +1209,17 @@ MACHINE_DRIVER_END
  *************************************/
 
 /* ADSP/ADSP II boards (used by Hard/Race Drivin', STUN Runner) */
-static MACHINE_DRIVER_START( adsp )
+static MACHINE_CONFIG_FRAGMENT( adsp )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("adsp", ADSP2100, 8000000)
 	MDRV_CPU_PROGRAM_MAP(adsp_program_map)
 	MDRV_CPU_DATA_MAP(adsp_data_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* DS III board (used by Steel Talons) */
-static MACHINE_DRIVER_START( ds3 )
+static MACHINE_CONFIG_FRAGMENT( ds3 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("adsp", ADSP2101, 12000000)
@@ -1232,11 +1227,11 @@ static MACHINE_DRIVER_START( ds3 )
 	MDRV_CPU_DATA_MAP(ds3_data_map)
 
 	MDRV_QUANTUM_TIME(HZ(60000))
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* DS IV board (used by Hard Drivin's Airborne) */
-static MACHINE_DRIVER_START( ds4 )
+static MACHINE_CONFIG_FRAGMENT( ds4 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("adsp", ADSP2101, 12000000)
@@ -1256,7 +1251,7 @@ static MACHINE_DRIVER_START( ds4 )
 
 	MDRV_SOUND_ADD("dac2", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -1267,7 +1262,7 @@ MACHINE_DRIVER_END
  *************************************/
 
 /* DSK board (used by Race Drivin') */
-static MACHINE_DRIVER_START( dsk )
+static MACHINE_CONFIG_FRAGMENT( dsk )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("dsp32", DSP32C, 40000000)
@@ -1275,12 +1270,12 @@ static MACHINE_DRIVER_START( dsk )
 	MDRV_CPU_PROGRAM_MAP(dsk_dsp32_map)
 
 	/* ASIC65 */
-	MDRV_IMPORT_FROM( asic65 )
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD( asic65 )
+MACHINE_CONFIG_END
 
 
 /* DSK II board (used by Hard Drivin's Airborne) */
-static MACHINE_DRIVER_START( dsk2 )
+static MACHINE_CONFIG_FRAGMENT( dsk2 )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("dsp32", DSP32C, 40000000)
@@ -1288,8 +1283,8 @@ static MACHINE_DRIVER_START( dsk2 )
 	MDRV_CPU_PROGRAM_MAP(dsk2_dsp32_map)
 
 	/* ASIC65 */
-	MDRV_IMPORT_FROM( asic65 )
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD( asic65 )
+MACHINE_CONFIG_END
 
 
 
@@ -1299,7 +1294,7 @@ MACHINE_DRIVER_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( driversnd )
+static MACHINE_CONFIG_FRAGMENT( driversnd )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("soundcpu", M68000, 16000000/2)
@@ -1315,7 +1310,7 @@ static MACHINE_DRIVER_START( driversnd )
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -1325,85 +1320,77 @@ MACHINE_DRIVER_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( harddriv )
+static MACHINE_CONFIG_DERIVED( harddriv, driver_msp )
 
-	/* basic machine hardware */
-	MDRV_IMPORT_FROM( driver_msp )		/* original driver board with MSP */
-	MDRV_IMPORT_FROM( adsp )			/* ADSP board */
-	MDRV_IMPORT_FROM( driversnd )		/* driver sound board */
-MACHINE_DRIVER_END
-
-
-static MACHINE_DRIVER_START( harddrivc )
-
-	/* basic machine hardware */
-	MDRV_IMPORT_FROM( multisync_msp )	/* multisync board with MSP */
-	MDRV_IMPORT_FROM( adsp )			/* ADSP board */
-	MDRV_IMPORT_FROM( driversnd )		/* driver sound board */
-MACHINE_DRIVER_END
+	/* basic machine hardware */		/* original driver board with MSP */
+	MDRV_FRAGMENT_ADD( adsp )			/* ADSP board */
+	MDRV_FRAGMENT_ADD( driversnd )		/* driver sound board */
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( racedriv )
+static MACHINE_CONFIG_DERIVED( harddrivc, multisync_msp )
 
-	/* basic machine hardware */
-	MDRV_IMPORT_FROM( driver_nomsp )	/* original driver board without MSP */
-	MDRV_IMPORT_FROM( adsp )			/* ADSP board */
-	MDRV_IMPORT_FROM( dsk )				/* DSK board */
-	MDRV_IMPORT_FROM( driversnd )		/* driver sound board */
-MACHINE_DRIVER_END
+	/* basic machine hardware */	/* multisync board with MSP */
+	MDRV_FRAGMENT_ADD( adsp )			/* ADSP board */
+	MDRV_FRAGMENT_ADD( driversnd )		/* driver sound board */
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( racedrivc )
+static MACHINE_CONFIG_DERIVED( racedriv, driver_nomsp )
 
-	/* basic machine hardware */
-	MDRV_IMPORT_FROM( multisync_nomsp )	/* multisync board without MSP */
-	MDRV_IMPORT_FROM( adsp )			/* ADSP board */
-	MDRV_IMPORT_FROM( dsk )				/* DSK board */
-	MDRV_IMPORT_FROM( driversnd )		/* driver sound board */
-MACHINE_DRIVER_END
+	/* basic machine hardware */	/* original driver board without MSP */
+	MDRV_FRAGMENT_ADD( adsp )			/* ADSP board */
+	MDRV_FRAGMENT_ADD( dsk )				/* DSK board */
+	MDRV_FRAGMENT_ADD( driversnd )		/* driver sound board */
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( stunrun )
+static MACHINE_CONFIG_DERIVED( racedrivc, multisync_nomsp )
 
-	/* basic machine hardware */
-	MDRV_IMPORT_FROM( multisync_nomsp )	/* multisync board without MSP */
+	/* basic machine hardware */	/* multisync board without MSP */
+	MDRV_FRAGMENT_ADD( adsp )			/* ADSP board */
+	MDRV_FRAGMENT_ADD( dsk )				/* DSK board */
+	MDRV_FRAGMENT_ADD( driversnd )		/* driver sound board */
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( stunrun, multisync_nomsp )
+
+	/* basic machine hardware */	/* multisync board without MSP */
 	MDRV_CPU_MODIFY("gsp")
 	MDRV_CPU_CONFIG(gsp_config_multisync_stunrun)
-	MDRV_IMPORT_FROM( adsp )			/* ADSP board */
-	MDRV_IMPORT_FROM( jsa_ii_mono )		/* JSA II sound board */
+	MDRV_FRAGMENT_ADD( adsp )			/* ADSP board */
+	MDRV_FRAGMENT_ADD( jsa_ii_mono )		/* JSA II sound board */
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_RAW_PARAMS(5000000*2, 317*2, 0, 256*2, 262, 0, 228)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( strtdriv )
+static MACHINE_CONFIG_DERIVED( strtdriv, multisync_nomsp )
 
-	/* basic machine hardware */
-	MDRV_IMPORT_FROM( multisync_nomsp )	/* multisync board */
-	MDRV_IMPORT_FROM( ds3 )				/* DS III board */
-	MDRV_IMPORT_FROM( dsk )				/* DSK board */
-MACHINE_DRIVER_END
-
-
-static MACHINE_DRIVER_START( steeltal )
-
-	/* basic machine hardware */
-	MDRV_IMPORT_FROM( multisync_msp )	/* multisync board with MSP */
-	MDRV_IMPORT_FROM( ds3 )				/* DS III board */
-	MDRV_IMPORT_FROM( jsa_iii_mono )	/* JSA III sound board */
-	MDRV_IMPORT_FROM( asic65 )			/* ASIC65 on DSPCOM board */
-MACHINE_DRIVER_END
+	/* basic machine hardware */	/* multisync board */
+	MDRV_FRAGMENT_ADD( ds3 )				/* DS III board */
+	MDRV_FRAGMENT_ADD( dsk )				/* DSK board */
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( hdrivair )
+static MACHINE_CONFIG_DERIVED( steeltal, multisync_msp )
 
-	/* basic machine hardware */
-	MDRV_IMPORT_FROM( multisync2 )		/* multisync II board */
-	MDRV_IMPORT_FROM( ds4 )				/* DS IV board */
-	MDRV_IMPORT_FROM( dsk2 )			/* DSK II board */
-MACHINE_DRIVER_END
+	/* basic machine hardware */	/* multisync board with MSP */
+	MDRV_FRAGMENT_ADD( ds3 )				/* DS III board */
+	MDRV_FRAGMENT_ADD( jsa_iii_mono )	/* JSA III sound board */
+	MDRV_FRAGMENT_ADD( asic65 )			/* ASIC65 on DSPCOM board */
+MACHINE_CONFIG_END
+
+
+static MACHINE_CONFIG_DERIVED( hdrivair, multisync2 )
+
+	/* basic machine hardware */		/* multisync II board */
+	MDRV_FRAGMENT_ADD( ds4 )				/* DS IV board */
+	MDRV_FRAGMENT_ADD( dsk2 )			/* DSK II board */
+MACHINE_CONFIG_END
 
 
 

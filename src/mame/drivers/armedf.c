@@ -791,10 +791,7 @@ static MACHINE_RESET( armedf )
 }
 
 
-static MACHINE_DRIVER_START( terraf )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(armedf_state)
+static MACHINE_CONFIG_START( terraf, armedf_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000) /* 8 MHz?? */
@@ -836,12 +833,9 @@ static MACHINE_DRIVER_START( terraf )
 
 	MDRV_SOUND_ADD("dac2", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( terrafb )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(armedf_state)
+static MACHINE_CONFIG_START( terrafb, armedf_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000) /* 8 MHz?? */
@@ -888,12 +882,9 @@ static MACHINE_DRIVER_START( terrafb )
 
 	MDRV_SOUND_ADD("dac2", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( kodure )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(armedf_state)
+static MACHINE_CONFIG_START( kodure, armedf_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000) /* 8 MHz?? */
@@ -935,12 +926,9 @@ static MACHINE_DRIVER_START( kodure )
 
 	MDRV_SOUND_ADD("dac2", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( armedf )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(armedf_state)
+static MACHINE_CONFIG_START( armedf, armedf_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000) /* 8 MHz?? */
@@ -982,12 +970,9 @@ static MACHINE_DRIVER_START( armedf )
 
 	MDRV_SOUND_ADD("dac2", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( cclimbr2 )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(armedf_state)
+static MACHINE_CONFIG_START( cclimbr2, armedf_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000) /* 8 MHz?? */
@@ -1029,12 +1014,9 @@ static MACHINE_DRIVER_START( cclimbr2 )
 
 	MDRV_SOUND_ADD("dac2", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( legion )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(armedf_state)
+static MACHINE_CONFIG_START( legion, armedf_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000) /* 8 MHz?? */
@@ -1076,12 +1058,9 @@ static MACHINE_DRIVER_START( legion )
 
 	MDRV_SOUND_ADD("dac2", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( legiono )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(armedf_state)
+static MACHINE_CONFIG_START( legiono, armedf_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000) /* 8 MHz?? */
@@ -1123,7 +1102,7 @@ static MACHINE_DRIVER_START( legiono )
 
 	MDRV_SOUND_ADD("dac2", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************************

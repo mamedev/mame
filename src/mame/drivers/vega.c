@@ -35,7 +35,7 @@ static VIDEO_UPDATE(vega)
 	return 0;
 }
 
-static MACHINE_DRIVER_START( vega )
+static MACHINE_CONFIG_START( vega, driver_data_t )
 	MDRV_CPU_ADD("maincpu", I8035, 6000000) // what CPU? what speed?
 	MDRV_CPU_PROGRAM_MAP(vega_map)
 
@@ -51,7 +51,7 @@ static MACHINE_DRIVER_START( vega )
 
 	MDRV_PALETTE_INIT(vega)
 	MDRV_VIDEO_UPDATE(vega)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( vega )
 	ROM_REGION( 0x10000, "maincpu", 0 )

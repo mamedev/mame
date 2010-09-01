@@ -320,10 +320,7 @@ static MACHINE_RESET( blktiger )
 	state->i8751_latch = 0;
 }
 
-static MACHINE_DRIVER_START( blktiger )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(blktiger_state)
+static MACHINE_CONFIG_START( blktiger, blktiger_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_24MHz/4)	/* verified on pcb */
@@ -368,15 +365,14 @@ static MACHINE_DRIVER_START( blktiger )
 
 	MDRV_SOUND_ADD("ym2", YM2203, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( blktigerbl )
-	MDRV_IMPORT_FROM(blktiger)
+static MACHINE_CONFIG_DERIVED( blktigerbl, blktiger )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(blktigerbl_io_map)
 
 	MDRV_DEVICE_REMOVE("mcu")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

@@ -723,10 +723,7 @@ static MACHINE_RESET( psikyo4 )
 	state->oldbrt2 = -1;
 }
 
-static MACHINE_DRIVER_START( ps4big )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(psikyo4_state)
+static MACHINE_CONFIG_START( ps4big, psikyo4_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", SH2, MASTER_CLOCK/2)
@@ -768,18 +765,18 @@ static MACHINE_DRIVER_START( ps4big )
 	MDRV_SOUND_CONFIG(ymf278b_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( ps4small )
+static MACHINE_CONFIG_DERIVED( ps4small, ps4big )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(ps4big)
 
 	MDRV_SCREEN_MODIFY("lscreen")
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
 
 	MDRV_SCREEN_MODIFY("rscreen")
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

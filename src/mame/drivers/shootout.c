@@ -260,9 +260,7 @@ static const ym2203_interface ym2203_interface2 =
 	shootout_snd2_irq
 };
 
-static MACHINE_DRIVER_START( shootout )
-
-	MDRV_DRIVER_DATA( shootout_state )
+static MACHINE_CONFIG_START( shootout, shootout_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 2000000)	/* 2 MHz? */
@@ -292,12 +290,10 @@ static MACHINE_DRIVER_START( shootout )
 	MDRV_SOUND_ADD("ymsnd", YM2203, 1500000)
 	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( shootouj )
-
-	MDRV_DRIVER_DATA( shootout_state )
+static MACHINE_CONFIG_START( shootouj, shootout_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 2000000)	/* 2 MHz? */
@@ -324,7 +320,7 @@ static MACHINE_DRIVER_START( shootouj )
 	MDRV_SOUND_ADD("ymsnd", YM2203, 1500000)
 	MDRV_SOUND_CONFIG(ym2203_interface2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( shootout )

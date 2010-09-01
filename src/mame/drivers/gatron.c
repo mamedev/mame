@@ -437,7 +437,7 @@ GFXDECODE_END
 *    Machine Drivers     *
 *************************/
 
-static MACHINE_DRIVER_START( gat )
+static MACHINE_CONFIG_START( gat, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/24)	/* 666.66 kHz, guess */
@@ -467,7 +467,7 @@ static MACHINE_DRIVER_START( gat )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("snsnd", SN76496, MASTER_CLOCK/8 )	/* 2 MHz, guess */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.00)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************

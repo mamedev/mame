@@ -427,10 +427,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( nomcu )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(kangaroo_state)
+static MACHINE_CONFIG_START( nomcu, kangaroo_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
@@ -459,17 +456,16 @@ static MACHINE_DRIVER_START( nomcu )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( mcu )
-	MDRV_IMPORT_FROM(nomcu)
+static MACHINE_CONFIG_DERIVED( mcu, nomcu )
 
 	MDRV_MACHINE_START(kangaroo_mcu)
 
 	MDRV_CPU_ADD("mcu", MB8841, MASTER_CLOCK/4/2)
 	MDRV_DEVICE_DISABLE()
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

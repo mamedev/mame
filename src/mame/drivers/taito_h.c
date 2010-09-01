@@ -563,10 +563,7 @@ static const tc0140syt_interface taitoh_tc0140syt_intf =
 	"maincpu", "audiocpu"
 };
 
-static MACHINE_DRIVER_START( syvalion )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(taitoh_state)
+static MACHINE_CONFIG_START( syvalion, taitoh_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,24000000 / 2)		/* 12 MHz */
@@ -608,13 +605,10 @@ static MACHINE_DRIVER_START( syvalion )
 	MDRV_SOUND_ROUTE(2, "mono", 1.0)
 
 	MDRV_TC0140SYT_ADD("tc0140syt", taitoh_tc0140syt_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( recordbr )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(taitoh_state)
+static MACHINE_CONFIG_START( recordbr, taitoh_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,24000000 / 2)		/* 12 MHz */
@@ -656,13 +650,10 @@ static MACHINE_DRIVER_START( recordbr )
 	MDRV_SOUND_ROUTE(2, "mono", 1.0)
 
 	MDRV_TC0140SYT_ADD("tc0140syt", taitoh_tc0140syt_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( dleague )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(taitoh_state)
+static MACHINE_CONFIG_START( dleague, taitoh_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,24000000 / 2)		/* 12 MHz */
@@ -704,7 +695,7 @@ static MACHINE_DRIVER_START( dleague )
 	MDRV_SOUND_ROUTE(2, "mono", 1.0)
 
 	MDRV_TC0140SYT_ADD("tc0140syt", taitoh_tc0140syt_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

@@ -207,10 +207,7 @@ static MACHINE_START( galspnbl )
 	state->audiocpu = machine->device("audiocpu");
 }
 
-static MACHINE_DRIVER_START( galspnbl )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(galspnbl_state)
+static MACHINE_CONFIG_START( galspnbl, galspnbl_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)	/* 10 MHz ??? */
@@ -246,7 +243,7 @@ static MACHINE_DRIVER_START( galspnbl )
 
 	MDRV_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

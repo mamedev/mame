@@ -240,7 +240,7 @@ static INPUT_PORTS_START( roul )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static MACHINE_DRIVER_START( roul )
+static MACHINE_CONFIG_START( roul, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(roul_map)
@@ -271,7 +271,7 @@ static MACHINE_DRIVER_START( roul )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("aysnd", AY8910, 1000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START(roul)
 	ROM_REGION( 0x10000, "maincpu", 0 )

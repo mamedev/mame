@@ -640,7 +640,7 @@ GFXDECODE_END
 *****************************************************************************************************/
 
 
-static MACHINE_DRIVER_START( limenko )
+static MACHINE_CONFIG_START( limenko, driver_data_t )
 	MDRV_CPU_ADD("maincpu", E132XN, 20000000*4)	/* 4x internal multiplier */
 	MDRV_CPU_PROGRAM_MAP(limenko_map)
 	MDRV_CPU_IO_MAP(limenko_io_map)
@@ -663,9 +663,9 @@ static MACHINE_DRIVER_START( limenko )
 	MDRV_VIDEO_UPDATE(limenko)
 
 	/* sound hardware */
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( spotty )
+static MACHINE_CONFIG_START( spotty, driver_data_t )
 	MDRV_CPU_ADD("maincpu", GMS30C2232, 20000000)	/* 20 MHz, no internal multiplier */
 	MDRV_CPU_PROGRAM_MAP(spotty_map)
 	MDRV_CPU_IO_MAP(spotty_io_map)
@@ -695,7 +695,7 @@ static MACHINE_DRIVER_START( spotty )
 
 	MDRV_OKIM6295_ADD("oki", 4000000 / 4 , OKIM6295_PIN7_HIGH) //?
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*****************************************************************************************************

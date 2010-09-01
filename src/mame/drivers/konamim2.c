@@ -1130,7 +1130,7 @@ static INTERRUPT_GEN(m2)
 	cpu_set_input_line(device, INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
-static MACHINE_DRIVER_START( m2 )
+static MACHINE_CONFIG_START( m2, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", PPC602, 33000000)	/* actually PPC602, 66MHz */
@@ -1156,7 +1156,7 @@ static MACHINE_DRIVER_START( m2 )
 	MDRV_VIDEO_START(m2)
 	MDRV_VIDEO_UPDATE(m2)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( polystar )

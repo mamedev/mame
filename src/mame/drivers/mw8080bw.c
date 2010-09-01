@@ -222,10 +222,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-MACHINE_DRIVER_START( mw8080bw_root )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(mw8080bw_state)
+MACHINE_CONFIG_START( mw8080bw_root, mw8080bw_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",I8080,MW8080BW_CPU_CLOCK)
@@ -240,7 +237,7 @@ MACHINE_DRIVER_START( mw8080bw_root )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_RAW_PARAMS(MW8080BW_PIXEL_CLOCK, MW8080BW_HTOTAL, MW8080BW_HBEND, MW8080BW_HPIXCOUNT, MW8080BW_VTOTAL, MW8080BW_VBEND, MW8080BW_VBSTART)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -404,10 +401,9 @@ static INPUT_PORTS_START( seawolf )
 INPUT_PORTS_END
 
 
-static MACHINE_DRIVER_START( seawolf )
+static MACHINE_CONFIG_DERIVED( seawolf, mw8080bw_root )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(seawolf_io_map)
 	/* there is no watchdog */
@@ -416,9 +412,9 @@ static MACHINE_DRIVER_START( seawolf )
 	MDRV_MB14241_ADD("mb14241")
 
 	/* audio hardware */
-	MDRV_IMPORT_FROM(seawolf_audio)
+	MDRV_FRAGMENT_ADD(seawolf_audio)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -506,10 +502,9 @@ static INPUT_PORTS_START( gunfight )
 INPUT_PORTS_END
 
 
-static MACHINE_DRIVER_START( gunfight )
+static MACHINE_CONFIG_DERIVED( gunfight, mw8080bw_root )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(gunfight_io_map)
 	/* there is no watchdog */
@@ -518,9 +513,9 @@ static MACHINE_DRIVER_START( gunfight )
 	MDRV_MB14241_ADD("mb14241")
 
 	/* audio hardware */
-	MDRV_IMPORT_FROM(gunfight_audio)
+	MDRV_FRAGMENT_ADD(gunfight_audio)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -737,10 +732,9 @@ static INPUT_PORTS_START( tornbase )
 INPUT_PORTS_END
 
 
-static MACHINE_DRIVER_START( tornbase)
+static MACHINE_CONFIG_DERIVED( tornbase, mw8080bw_root )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(tornbase_io_map)
 	/* there is no watchdog */
@@ -749,9 +743,9 @@ static MACHINE_DRIVER_START( tornbase)
 	MDRV_MB14241_ADD("mb14241")
 
 	/* audio hardware */
-	MDRV_IMPORT_FROM(tornbase_audio)
+	MDRV_FRAGMENT_ADD(tornbase_audio)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -853,10 +847,9 @@ static INPUT_PORTS_START( lagunar )
 INPUT_PORTS_END
 
 
-static MACHINE_DRIVER_START( zzzap )
+static MACHINE_CONFIG_DERIVED( zzzap, mw8080bw_root )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(zzzap_io_map)
 	MDRV_WATCHDOG_TIME_INIT(NSEC(PERIOD_OF_555_MONOSTABLE_NSEC(RES_M(1), CAP_U(1)))) /* 1.1s */
@@ -865,9 +858,9 @@ static MACHINE_DRIVER_START( zzzap )
 	MDRV_MB14241_ADD("mb14241")
 
 	/* audio hardware */
-	/* MDRV_IMPORT_FROM(zzzap_audio) */
+	/* MDRV_FRAGMENT_ADD(zzzap_audio) */
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -967,19 +960,18 @@ static INPUT_PORTS_START( maze )
 INPUT_PORTS_END
 
 
-static MACHINE_DRIVER_START( maze )
+static MACHINE_CONFIG_DERIVED( maze, mw8080bw_root )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(maze_io_map)
 	MDRV_MACHINE_START(maze)
 	MDRV_WATCHDOG_TIME_INIT(NSEC(PERIOD_OF_555_MONOSTABLE_NSEC(RES_K(270), CAP_U(10)))) /* 2.97s */
 
 	/* audio hardware */
-	MDRV_IMPORT_FROM(maze_audio)
+	MDRV_FRAGMENT_ADD(maze_audio)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -1060,10 +1052,9 @@ static INPUT_PORTS_START( boothill )
 INPUT_PORTS_END
 
 
-static MACHINE_DRIVER_START( boothill )
+static MACHINE_CONFIG_DERIVED( boothill, mw8080bw_root )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(boothill_io_map)
 	MDRV_MACHINE_START(boothill)
@@ -1073,9 +1064,9 @@ static MACHINE_DRIVER_START( boothill )
 	MDRV_MB14241_ADD("mb14241")
 
 	/* audio hardware */
-	MDRV_IMPORT_FROM(boothill_audio)
+	MDRV_FRAGMENT_ADD(boothill_audio)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -1168,18 +1159,17 @@ static INPUT_PORTS_START( checkmat )
 INPUT_PORTS_END
 
 
-static MACHINE_DRIVER_START( checkmat )
+static MACHINE_CONFIG_DERIVED( checkmat, mw8080bw_root )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(checkmat_io_map)
 	MDRV_WATCHDOG_TIME_INIT(NSEC(PERIOD_OF_555_MONOSTABLE_NSEC(RES_K(270), CAP_U(10)))) /* 2.97s */
 
 	/* audio hardware */
-	MDRV_IMPORT_FROM(checkmat_audio)
+	MDRV_FRAGMENT_ADD(checkmat_audio)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -1298,10 +1288,9 @@ static INPUT_PORTS_START( desertgu )
 INPUT_PORTS_END
 
 
-static MACHINE_DRIVER_START( desertgu )
+static MACHINE_CONFIG_DERIVED( desertgu, mw8080bw_root )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(desertgu_io_map)
 	MDRV_MACHINE_START(desertgu)
@@ -1311,9 +1300,9 @@ static MACHINE_DRIVER_START( desertgu )
 	MDRV_MB14241_ADD("mb14241")
 
 	/* audio hardware */
-	MDRV_IMPORT_FROM(desertgu_audio)
+	MDRV_FRAGMENT_ADD(desertgu_audio)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -1499,10 +1488,9 @@ static INPUT_PORTS_START( einning )
 INPUT_PORTS_END
 
 
-static MACHINE_DRIVER_START( dplay )
+static MACHINE_CONFIG_DERIVED( dplay, mw8080bw_root )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(dplay_io_map)
 	MDRV_WATCHDOG_TIME_INIT(USEC(255000000 / (MW8080BW_PIXEL_CLOCK / MW8080BW_HTOTAL / MW8080BW_VTOTAL)))
@@ -1511,9 +1499,9 @@ static MACHINE_DRIVER_START( dplay )
 	MDRV_MB14241_ADD("mb14241")
 
 	/* audio hardware */
-	MDRV_IMPORT_FROM(dplay_audio)
+	MDRV_FRAGMENT_ADD(dplay_audio)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -1595,10 +1583,9 @@ static INPUT_PORTS_START( gmissile )
 INPUT_PORTS_END
 
 
-static MACHINE_DRIVER_START( gmissile )
+static MACHINE_CONFIG_DERIVED( gmissile, mw8080bw_root )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(gmissile_io_map)
 	MDRV_MACHINE_START(gmissile)
@@ -1608,9 +1595,9 @@ static MACHINE_DRIVER_START( gmissile )
 	MDRV_MB14241_ADD("mb14241")
 
 	/* audio hardware */
-	MDRV_IMPORT_FROM(gmissile_audio)
+	MDRV_FRAGMENT_ADD(gmissile_audio)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -1690,10 +1677,9 @@ static INPUT_PORTS_START( m4 )
 INPUT_PORTS_END
 
 
-static MACHINE_DRIVER_START( m4 )
+static MACHINE_CONFIG_DERIVED( m4, mw8080bw_root )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(m4_io_map)
 	MDRV_MACHINE_START(m4)
@@ -1703,9 +1689,9 @@ static MACHINE_DRIVER_START( m4 )
 	MDRV_MB14241_ADD("mb14241")
 
 	/* audio hardware */
-	MDRV_IMPORT_FROM(m4_audio)
+	MDRV_FRAGMENT_ADD(m4_audio)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -1861,10 +1847,9 @@ static INPUT_PORTS_START( clowns1 )
 INPUT_PORTS_END
 
 
-static MACHINE_DRIVER_START( clowns )
+static MACHINE_CONFIG_DERIVED( clowns, mw8080bw_root )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(clowns_io_map)
 	MDRV_MACHINE_START(clowns)
@@ -1874,9 +1859,9 @@ static MACHINE_DRIVER_START( clowns )
 	MDRV_MB14241_ADD("mb14241")
 
 	/* audio hardware */
-	MDRV_IMPORT_FROM(clowns_audio)
+	MDRV_FRAGMENT_ADD(clowns_audio)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -1956,10 +1941,9 @@ static INPUT_PORTS_START( spacwalk )
 	PORT_ADJUSTER( 40, "R507 - Music Volume" )
 INPUT_PORTS_END
 
-static MACHINE_DRIVER_START( spacwalk )
+static MACHINE_CONFIG_DERIVED( spacwalk, mw8080bw_root )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(spacwalk_io_map)
 	MDRV_MACHINE_START(clowns)
@@ -1969,9 +1953,9 @@ static MACHINE_DRIVER_START( spacwalk )
 	MDRV_MB14241_ADD("mb14241")
 
 	/* audio hardware */
-	MDRV_IMPORT_FROM(spacwalk_audio)
+	MDRV_FRAGMENT_ADD(spacwalk_audio)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -2038,10 +2022,9 @@ static INPUT_PORTS_START( shuffle )
 INPUT_PORTS_END
 
 
-static MACHINE_DRIVER_START( shuffle )
+static MACHINE_CONFIG_DERIVED( shuffle, mw8080bw_root )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(shuffle_io_map)
 	MDRV_WATCHDOG_TIME_INIT(USEC(255000000 / (MW8080BW_PIXEL_CLOCK / MW8080BW_HTOTAL / MW8080BW_VTOTAL)))
@@ -2050,9 +2033,9 @@ static MACHINE_DRIVER_START( shuffle )
 	MDRV_MB14241_ADD("mb14241")
 
 	/* audio hardware */
-	MDRV_IMPORT_FROM(shuffle_audio)
+	MDRV_FRAGMENT_ADD(shuffle_audio)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -2124,10 +2107,9 @@ static INPUT_PORTS_START( dogpatch )
 INPUT_PORTS_END
 
 
-static MACHINE_DRIVER_START( dogpatch )
+static MACHINE_CONFIG_DERIVED( dogpatch, mw8080bw_root )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(dogpatch_io_map)
 	/* the watch dog time is unknown, but all other */
@@ -2138,9 +2120,9 @@ static MACHINE_DRIVER_START( dogpatch )
 	MDRV_MB14241_ADD("mb14241")
 
 	/* audio hardware */
-	MDRV_IMPORT_FROM(dogpatch_audio)
+	MDRV_FRAGMENT_ADD(dogpatch_audio)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -2290,10 +2272,9 @@ static INPUT_PORTS_START( spcenctr )
 INPUT_PORTS_END
 
 
-static MACHINE_DRIVER_START( spcenctr )
+static MACHINE_CONFIG_DERIVED( spcenctr, mw8080bw_root )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(spcenctr_io_map)
 	MDRV_MACHINE_START(spcenctr)
@@ -2311,9 +2292,9 @@ static MACHINE_DRIVER_START( spcenctr )
 	MDRV_VIDEO_UPDATE(spcenctr)
 
 	/* audio hardware */
-	MDRV_IMPORT_FROM(spcenctr_audio)
+	MDRV_FRAGMENT_ADD(spcenctr_audio)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -2386,10 +2367,9 @@ static INPUT_PORTS_START( phantom2 )
 INPUT_PORTS_END
 
 
-static MACHINE_DRIVER_START( phantom2 )
+static MACHINE_CONFIG_DERIVED( phantom2, mw8080bw_root )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(phantom2_io_map)
 	MDRV_MACHINE_START(phantom2)
@@ -2403,9 +2383,9 @@ static MACHINE_DRIVER_START( phantom2 )
 	MDRV_MB14241_ADD("mb14241")
 
 	/* audio hardware */
-	MDRV_IMPORT_FROM(phantom2_audio)
+	MDRV_FRAGMENT_ADD(phantom2_audio)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -2526,10 +2506,9 @@ static INPUT_PORTS_START( bowler )
 INPUT_PORTS_END
 
 
-static MACHINE_DRIVER_START( bowler )
+static MACHINE_CONFIG_DERIVED( bowler, mw8080bw_root )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(bowler_io_map)
 	MDRV_WATCHDOG_TIME_INIT(USEC(255000000 / (MW8080BW_PIXEL_CLOCK / MW8080BW_HTOTAL / MW8080BW_VTOTAL)))
@@ -2538,9 +2517,9 @@ static MACHINE_DRIVER_START( bowler )
 	MDRV_MB14241_ADD("mb14241")
 
 	/* audio hardware */
-	MDRV_IMPORT_FROM(bowler_audio)
+	MDRV_FRAGMENT_ADD(bowler_audio)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -2743,10 +2722,9 @@ static INPUT_PORTS_START( invaders )
 INPUT_PORTS_END
 
 
-MACHINE_DRIVER_START( invaders )
+MACHINE_CONFIG_DERIVED( invaders, mw8080bw_root )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(invaders_io_map)
 	MDRV_MACHINE_START(invaders)
@@ -2759,9 +2737,9 @@ MACHINE_DRIVER_START( invaders )
 	MDRV_MB14241_ADD("mb14241")
 
 	/* audio hardware */
-	MDRV_IMPORT_FROM(invaders_audio)
+	MDRV_FRAGMENT_ADD(invaders_audio)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -2826,10 +2804,9 @@ static INPUT_PORTS_START( blueshrk )
 INPUT_PORTS_END
 
 
-static MACHINE_DRIVER_START( blueshrk )
+static MACHINE_CONFIG_DERIVED( blueshrk, mw8080bw_root )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(blueshrk_io_map)
 	MDRV_WATCHDOG_TIME_INIT(USEC(255000000 / (MW8080BW_PIXEL_CLOCK / MW8080BW_HTOTAL / MW8080BW_VTOTAL)))
@@ -2838,9 +2815,9 @@ static MACHINE_DRIVER_START( blueshrk )
 	MDRV_MB14241_ADD("mb14241")
 
 	/* audio hardware */
-	MDRV_IMPORT_FROM(blueshrk_audio)
+	MDRV_FRAGMENT_ADD(blueshrk_audio)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -2927,10 +2904,9 @@ static INPUT_PORTS_START( invad2ct )
 INPUT_PORTS_END
 
 
-static MACHINE_DRIVER_START( invad2ct )
+static MACHINE_CONFIG_DERIVED( invad2ct, mw8080bw_root )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mw8080bw_root)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(invad2ct_io_map)
 	MDRV_WATCHDOG_TIME_INIT(USEC(255000000 / (MW8080BW_PIXEL_CLOCK / MW8080BW_HTOTAL / MW8080BW_VTOTAL)))
@@ -2939,9 +2915,9 @@ static MACHINE_DRIVER_START( invad2ct )
 	MDRV_MB14241_ADD("mb14241")
 
 	/* audio hardware */
-	MDRV_IMPORT_FROM(invad2ct_audio)
+	MDRV_FRAGMENT_ADD(invad2ct_audio)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

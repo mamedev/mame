@@ -202,7 +202,7 @@ static GFXDECODE_START( koftball )
 GFXDECODE_END
 
 
-static MACHINE_DRIVER_START( koftball )
+static MACHINE_CONFIG_START( koftball, driver_data_t )
 	MDRV_CPU_ADD("maincpu", M68000, 21477270/2 )
 	MDRV_CPU_PROGRAM_MAP(koftball_mem)
 	MDRV_CPU_VBLANK_INT_HACK(bmc_interrupt,3)
@@ -226,7 +226,7 @@ static MACHINE_DRIVER_START( koftball )
 	MDRV_OKIM6295_ADD("oki", 1122000, OKIM6295_PIN7_LOW) /* clock frequency & pin 7 not verified */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( koftball )
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* 68000 Code */

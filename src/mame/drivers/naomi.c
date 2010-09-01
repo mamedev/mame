@@ -1915,7 +1915,7 @@ static MACHINE_RESET( naomi )
  * Common for Naomi 1, Naomi GD-Rom, Naomi 2, Atomiswave ...
  */
 
-static MACHINE_DRIVER_START( naomi_base )
+static MACHINE_CONFIG_START( naomi_base, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", SH4, CPU_CLOCK) // SH4!!!
 	MDRV_CPU_CONFIG(sh4cpu_config)
@@ -1951,25 +1951,23 @@ static MACHINE_DRIVER_START( naomi_base )
 	MDRV_SOUND_CONFIG(aica_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 2.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 2.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*
  * Naomi 1
  */
 
-static MACHINE_DRIVER_START( naomi )
-	MDRV_IMPORT_FROM(naomi_base)
+static MACHINE_CONFIG_DERIVED( naomi, naomi_base )
 	MDRV_NAOMI_ROM_BOARD_ADD("rom_board", "user1")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*
  * Naomi 1 GD-Rom
  */
 
-static MACHINE_DRIVER_START( naomigd )
-	MDRV_IMPORT_FROM(naomi_base)
+static MACHINE_CONFIG_DERIVED( naomigd, naomi_base )
 	MDRV_NAOMI_DIMM_BOARD_ADD("rom_board", "gdrom", "user1", "picreturn")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*
  * Naomi 2
@@ -1987,14 +1985,13 @@ MACHINE_DRIVER_END
  * Atomiswave
  */
 
-static MACHINE_DRIVER_START( aw )
-	MDRV_IMPORT_FROM(naomi_base)
+static MACHINE_CONFIG_DERIVED( aw, naomi_base )
 //  MDRV_DEVICE_REMOVE("main_eeprom")
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(aw_map)
 	MDRV_NVRAM_HANDLER(aw_nvram)
 	MDRV_AW_ROM_BOARD_ADD("rom_board", "user1")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \
 		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_BIOS(bios+1)) /* Note '+1' */

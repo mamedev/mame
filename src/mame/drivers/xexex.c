@@ -519,10 +519,7 @@ static MACHINE_RESET( xexex )
 	k054539_init_flags(machine->device("k054539"), K054539_REVERSE_STEREO);
 }
 
-static MACHINE_DRIVER_START( xexex )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(xexex_state)
+static MACHINE_CONFIG_START( xexex, xexex_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)	// 16MHz (32MHz xtal)
@@ -588,7 +585,7 @@ static MACHINE_DRIVER_START( xexex )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ADD("filter2r", FILTER_VOLUME, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( xexex ) /* Europe, Version AA */

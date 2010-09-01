@@ -356,7 +356,7 @@ static const pokey_interface pokey_interface_2 =
 };
 
 
-static MACHINE_DRIVER_START( runaway )
+static MACHINE_CONFIG_START( runaway, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 12096000 / 8) /* ? */
@@ -390,13 +390,12 @@ static MACHINE_DRIVER_START( runaway )
 	MDRV_SOUND_ADD("pokey2", POKEY, 12096000 / 8)
 	MDRV_SOUND_CONFIG(pokey_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( qwak )
+static MACHINE_CONFIG_DERIVED( qwak, runaway )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(runaway)
 
 	/* video hardware */
 	MDRV_GFXDECODE(qwak)
@@ -404,7 +403,7 @@ static MACHINE_DRIVER_START( qwak )
 	MDRV_VIDEO_START(qwak)
 	MDRV_VIDEO_UPDATE(qwak)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( runaway )

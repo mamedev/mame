@@ -375,10 +375,7 @@ static const k051316_interface _88games_k051316_intf =
 	_88games_zoom_callback
 };
 
-static MACHINE_DRIVER_START( 88games )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(_88games_state)
+static MACHINE_CONFIG_START( 88games, _88games_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", KONAMI, 3000000) /* ? */
@@ -422,7 +419,7 @@ static MACHINE_DRIVER_START( 88games )
 
 	MDRV_SOUND_ADD("upd2", UPD7759, UPD7759_STANDARD_CLOCK)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

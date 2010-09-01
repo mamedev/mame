@@ -1566,7 +1566,7 @@ static const samples_interface journey_samples_interface =
  *************************************/
 
 /* 90009 CPU board plus 90908/90913/91483 sound board */
-static MACHINE_DRIVER_START( mcr_90009 )
+static MACHINE_CONFIG_START( mcr_90009, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MAIN_OSC_MCR_I/8)
@@ -1599,13 +1599,12 @@ static MACHINE_DRIVER_START( mcr_90009 )
 	MDRV_VIDEO_UPDATE(mcr)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(mcr_ssio)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(mcr_ssio)
+MACHINE_CONFIG_END
 
 
 /* 90010 CPU board plus 90908/90913/91483 sound board */
-static MACHINE_DRIVER_START( mcr_90010 )
-	MDRV_IMPORT_FROM(mcr_90009)
+static MACHINE_CONFIG_DERIVED( mcr_90010, mcr_90009 )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
@@ -1614,12 +1613,11 @@ static MACHINE_DRIVER_START( mcr_90010 )
 
 	/* video hardware */
 	MDRV_PALETTE_LENGTH(64)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* 91475 CPU board plus 90908/90913/91483 sound board plus cassette interface */
-static MACHINE_DRIVER_START( mcr_91475 )
-	MDRV_IMPORT_FROM(mcr_90010)
+static MACHINE_CONFIG_DERIVED( mcr_91475, mcr_90010 )
 
 	/* video hardware */
 	MDRV_PALETTE_LENGTH(128)
@@ -1629,12 +1627,11 @@ static MACHINE_DRIVER_START( mcr_91475 )
 	MDRV_SOUND_CONFIG(journey_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* 91490 CPU board plus 90908/90913/91483 sound board */
-static MACHINE_DRIVER_START( mcr_91490 )
-	MDRV_IMPORT_FROM(mcr_90010)
+static MACHINE_CONFIG_DERIVED( mcr_91490, mcr_90010 )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("maincpu")
@@ -1644,23 +1641,21 @@ static MACHINE_DRIVER_START( mcr_91490 )
 
 	MDRV_DEVICE_MODIFY("ctc")
 	MDRV_DEVICE_CLOCK(5000000 /* same as "maincpu" */)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* 91490 CPU board plus 90908/90913/91483 sound board plus Squawk n' Talk sound board */
-static MACHINE_DRIVER_START( mcr_91490_snt )
+static MACHINE_CONFIG_DERIVED( mcr_91490_snt, mcr_91490 )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mcr_91490)
-	MDRV_IMPORT_FROM(squawk_n_talk)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(squawk_n_talk)
+MACHINE_CONFIG_END
 
 
 /* 91490 CPU board plus 90908/90913/91483 sound board plus Squawk n' Talk sound board plus IPU */
-static MACHINE_DRIVER_START( mcr_91490_ipu )
+static MACHINE_CONFIG_DERIVED( mcr_91490_ipu, mcr_91490_snt )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mcr_91490_snt)
 	MDRV_MACHINE_START(nflfoot)
 
 	MDRV_CPU_ADD("ipu", Z80, 7372800/2)
@@ -1673,16 +1668,15 @@ static MACHINE_DRIVER_START( mcr_91490_ipu )
 	MDRV_Z80PIO_ADD("ipu_pio0", 7372800/2, nflfoot_pio_intf)
 	MDRV_Z80PIO_ADD("ipu_pio1", 7372800/2, nflfoot_pio_intf)
 	MDRV_Z80SIO_ADD("ipu_sio", 7372800/2 /* same as "ipu" */, nflfoot_sio_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* 91490 CPU board plus 90908/90913/91483 sound board plus Turbo Chip Squeak sound board */
-static MACHINE_DRIVER_START( mcr_91490_tcs )
+static MACHINE_CONFIG_DERIVED( mcr_91490_tcs, mcr_91490 )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mcr_91490)
-	MDRV_IMPORT_FROM(turbo_chip_squeak)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(turbo_chip_squeak)
+MACHINE_CONFIG_END
 
 
 

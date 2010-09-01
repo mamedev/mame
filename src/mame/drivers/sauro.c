@@ -388,7 +388,7 @@ static INTERRUPT_GEN( sauro_interrupt )
 	cpu_set_input_line(device, 0, HOLD_LINE);
 }
 
-static MACHINE_DRIVER_START( tecfri )
+static MACHINE_CONFIG_START( tecfri, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_20MHz/4)       /* verified on pcb */
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
@@ -412,10 +412,9 @@ static MACHINE_DRIVER_START( tecfri )
 	MDRV_SOUND_ADD("ymsnd", YM3812, XTAL_20MHz/8)       /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( trckydoc )
-	MDRV_IMPORT_FROM(tecfri)
+static MACHINE_CONFIG_DERIVED( trckydoc, tecfri )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(trckydoc_map)
@@ -425,10 +424,9 @@ static MACHINE_DRIVER_START( trckydoc )
 	MDRV_VIDEO_START(trckydoc)
 	MDRV_VIDEO_UPDATE(trckydoc)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( sauro )
-	MDRV_IMPORT_FROM(tecfri)
+static MACHINE_CONFIG_DERIVED( sauro, tecfri )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(sauro_map)
@@ -446,7 +444,7 @@ static MACHINE_DRIVER_START( sauro )
 	MDRV_SOUND_ADD("speech", SP0256, 3120000)
 	MDRV_SOUND_CONFIG(sauro_sp256)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

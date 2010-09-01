@@ -592,10 +592,7 @@ static MACHINE_START( docastle )
 	state_save_register_global_array(machine, state->buffer1);
 }
 
-static MACHINE_DRIVER_START( docastle )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(docastle_state)
+static MACHINE_CONFIG_START( docastle, docastle_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_4MHz)
@@ -643,11 +640,11 @@ static MACHINE_DRIVER_START( docastle )
 
 	MDRV_SOUND_ADD("sn4", SN76489A, XTAL_4MHz)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( dorunrun )
+static MACHINE_CONFIG_DERIVED( dorunrun, docastle )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(docastle)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(dorunrun_map)
@@ -657,11 +654,11 @@ static MACHINE_DRIVER_START( dorunrun )
 
 	/* video hardware */
 	MDRV_VIDEO_START(dorunrun)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( idsoccer )
+static MACHINE_CONFIG_DERIVED( idsoccer, docastle )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(docastle)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(idsoccer_map)
@@ -676,7 +673,7 @@ static MACHINE_DRIVER_START( idsoccer )
 	MDRV_SOUND_ADD("msm", MSM5205, XTAL_384kHz) /* Crystal verified on American Soccer board. */
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* ROMs */
 

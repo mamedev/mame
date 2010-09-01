@@ -267,7 +267,7 @@ static MACHINE_START( sprcros2 )
 	state_save_register_global(machine, sprcros2_s_port3);
 }
 
-static MACHINE_DRIVER_START( sprcros2 )
+static MACHINE_CONFIG_START( sprcros2, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("master", Z80,10000000/2)
@@ -308,7 +308,7 @@ static MACHINE_DRIVER_START( sprcros2 )
 
 	MDRV_SOUND_ADD("sn3", SN76489, 10000000/4)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( sprcros2 )
 	ROM_REGION( 0x14000, "master", 0 )

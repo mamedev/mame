@@ -234,7 +234,7 @@ static INTERRUPT_GEN( feversoc_irq )
 	cputag_set_input_line(device->machine, "maincpu", 8, HOLD_LINE );
 }
 
-static MACHINE_DRIVER_START( feversoc )
+static MACHINE_CONFIG_START( feversoc, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",SH2,MASTER_CLOCK)
@@ -258,7 +258,7 @@ static MACHINE_DRIVER_START( feversoc )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_OKIM6295_ADD("oki", MASTER_CLOCK/16, OKIM6295_PIN7_LOW) //pin 7 & frequency not verified (clock should be 28,6363 / n)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.6)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

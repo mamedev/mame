@@ -467,10 +467,7 @@ static MACHINE_RESET( crshrace )
 	state->pending_command = 0;
 }
 
-static MACHINE_DRIVER_START( crshrace )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(crshrace_state)
+static MACHINE_CONFIG_START( crshrace, crshrace_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,16000000)	/* 16 MHz ??? */
@@ -511,7 +508,7 @@ static MACHINE_DRIVER_START( crshrace )
 	MDRV_SOUND_ROUTE(0, "rspeaker", 0.25)
 	MDRV_SOUND_ROUTE(1, "lspeaker",  1.0)
 	MDRV_SOUND_ROUTE(2, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( crshrace )

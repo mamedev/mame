@@ -1054,7 +1054,7 @@ static const ay8910_interface ay8910_config =
 *     Machine Driver     *
 *************************/
 
-static MACHINE_DRIVER_START( ampoker2 )
+static MACHINE_CONFIG_START( ampoker2, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/2)		/* 3 MHz */
@@ -1087,16 +1087,16 @@ static MACHINE_DRIVER_START( ampoker2 )
 	MDRV_SOUND_ADD("aysnd", AY8910,MASTER_CLOCK/4)	/* 1.5 MHz, measured */
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( sigma2k )
+static MACHINE_CONFIG_DERIVED( sigma2k, ampoker2 )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(ampoker2)
 
 	/* video hardware */
 	MDRV_GFXDECODE(sigma2k)
 	MDRV_VIDEO_START(sigma2k)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************

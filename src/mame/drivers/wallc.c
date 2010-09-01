@@ -275,7 +275,7 @@ static DRIVER_INIT( wallca )
 
 
 
-static MACHINE_DRIVER_START( wallc )
+static MACHINE_CONFIG_START( wallc, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 12288000 / 4)	/* 3.072 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(wallc_map)
@@ -300,7 +300,7 @@ static MACHINE_DRIVER_START( wallc )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("aysnd", AY8910, 12288000 / 8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

@@ -609,7 +609,7 @@ static const pokey_interface pokey_config =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( asteroid )
+static MACHINE_CONFIG_START( asteroid, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, MASTER_CLOCK/8)
@@ -633,21 +633,19 @@ static MACHINE_DRIVER_START( asteroid )
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(asteroid)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.4)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( asterock )
+static MACHINE_CONFIG_DERIVED( asterock, asteroid )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(asteroid)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PERIODIC_INT(asterock_interrupt, (double)MASTER_CLOCK/4096/12)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( astdelux )
+static MACHINE_CONFIG_DERIVED( astdelux, asteroid )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(asteroid)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(astdelux_map)
 
@@ -661,13 +659,12 @@ static MACHINE_DRIVER_START( astdelux )
 	MDRV_SOUND_ADD("pokey", POKEY, MASTER_CLOCK/8)
 	MDRV_SOUND_CONFIG(pokey_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( llander )
+static MACHINE_CONFIG_DERIVED( llander, asteroid )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(asteroid)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(llander_map)
 	MDRV_CPU_PERIODIC_INT(llander_interrupt, (double)MASTER_CLOCK/4096/12)
@@ -684,7 +681,7 @@ static MACHINE_DRIVER_START( llander )
 	MDRV_SOUND_REPLACE("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(llander)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

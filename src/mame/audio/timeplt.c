@@ -187,7 +187,7 @@ static const ay8910_interface timeplt_ay8910_interface =
  *
  *************************************/
 
-MACHINE_DRIVER_START( timeplt_sound )
+MACHINE_CONFIG_FRAGMENT( timeplt_sound )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("tpsound",Z80,MASTER_CLOCK/8)
@@ -222,13 +222,12 @@ MACHINE_DRIVER_START( timeplt_sound )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 	MDRV_SOUND_ADD("filter.1.2", FILTER_RC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-MACHINE_DRIVER_START( locomotn_sound )
-	MDRV_IMPORT_FROM(timeplt_sound)
+MACHINE_CONFIG_DERIVED( locomotn_sound, timeplt_sound )
 
 	/* basic machine hardware */
 	MDRV_CPU_MODIFY("tpsound")
 	MDRV_CPU_PROGRAM_MAP(locomotn_sound_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END

@@ -607,7 +607,7 @@ static const sn76477_interface sn76477_intf =
 };
 
 
-static MACHINE_DRIVER_START( route16 )
+static MACHINE_CONFIG_START( route16, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("cpu1", Z80, 2500000)	/* 10MHz / 4 = 2.5MHz */
@@ -632,22 +632,20 @@ static MACHINE_DRIVER_START( route16 )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("ay8910", AY8910, 10000000/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( routex )
+static MACHINE_CONFIG_DERIVED( routex, route16 )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(route16)
 	MDRV_CPU_MODIFY("cpu1")
 	MDRV_CPU_PROGRAM_MAP(routex_cpu1_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( stratvox )
+static MACHINE_CONFIG_DERIVED( stratvox, route16 )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(route16)
 	MDRV_CPU_MODIFY("cpu1")
 	MDRV_CPU_PROGRAM_MAP(stratvox_cpu1_map)
 
@@ -668,37 +666,33 @@ static MACHINE_DRIVER_START( stratvox )
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( speakres )
+static MACHINE_CONFIG_DERIVED( speakres, stratvox )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(stratvox)
 	MDRV_CPU_MODIFY("cpu1")
 	MDRV_CPU_PROGRAM_MAP(speakres_cpu1_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( spacecho )
+static MACHINE_CONFIG_DERIVED( spacecho, speakres )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(speakres)
 	MDRV_CPU_MODIFY("cpu2")
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,48)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( ttmahjng )
-
-	MDRV_IMPORT_FROM(route16)
+static MACHINE_CONFIG_DERIVED( ttmahjng, route16 )
 	MDRV_CPU_MODIFY("cpu1")
 	MDRV_CPU_PROGRAM_MAP(ttmahjng_cpu1_map)
 	MDRV_CPU_IO_MAP(0)
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(ttmahjng)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

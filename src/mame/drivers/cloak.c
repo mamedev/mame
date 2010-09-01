@@ -330,7 +330,7 @@ static const pokey_interface pokey_interface_2 =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( cloak )
+static MACHINE_CONFIG_START( cloak, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 1000000)		/* 1 MHz ???? */
@@ -369,7 +369,7 @@ static MACHINE_DRIVER_START( cloak )
 	MDRV_SOUND_ADD("pokey2", POKEY, XTAL_10MHz/8)		/* Accurate to recording */
 	MDRV_SOUND_CONFIG(pokey_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

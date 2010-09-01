@@ -395,10 +395,7 @@ static MACHINE_RESET( yumefuda )
 	state->prot_lock = 0;
 }
 
-static MACHINE_DRIVER_START( yumefuda )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(albazg_state)
+static MACHINE_CONFIG_START( yumefuda, albazg_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80 , MASTER_CLOCK/2) /* xtal is 12 Mhz, unknown divider*/
@@ -437,7 +434,7 @@ static MACHINE_DRIVER_START( yumefuda )
 	MDRV_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK/16) /* guessed to use the same xtal as the crtc */
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************************/
 

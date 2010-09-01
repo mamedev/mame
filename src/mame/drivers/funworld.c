@@ -2116,7 +2116,7 @@ static const mc6845_interface mc6845_intf =
 *     Machine Drivers     *
 **************************/
 
-static MACHINE_DRIVER_START( fw1stpal )
+static MACHINE_CONFIG_START( fw1stpal, driver_data_t )
     /* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M65SC02, MASTER_CLOCK/8)	/* 2MHz */
 	MDRV_CPU_PROGRAM_MAP(funworld_map)
@@ -2151,23 +2151,21 @@ static MACHINE_DRIVER_START( fw1stpal )
 	MDRV_SOUND_ADD("ay8910", AY8910, MASTER_CLOCK/8)	/* 2MHz */
 	MDRV_SOUND_CONFIG(ay8910_intf)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.5)	/* analyzed to avoid clips */
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( fw2ndpal )
-	MDRV_IMPORT_FROM(fw1stpal)
+static MACHINE_CONFIG_DERIVED( fw2ndpal, fw1stpal )
 
 	MDRV_CPU_REPLACE("maincpu", M65C02, MASTER_CLOCK/8)	/* 2MHz */
 	MDRV_CPU_PROGRAM_MAP(funworld_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	MDRV_GFXDECODE(fw2ndpal)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
-static MACHINE_DRIVER_START( funquiz )
-	MDRV_IMPORT_FROM(fw1stpal)
-//  MDRV_IMPORT_FROM(fw2ndpal)
+static MACHINE_CONFIG_DERIVED( funquiz, fw1stpal )
+//  MDRV_FRAGMENT_ADD(fw2ndpal)
 
 	MDRV_CPU_REPLACE("maincpu", M65C02, MASTER_CLOCK/8)	/* 2MHz */
 	MDRV_CPU_PROGRAM_MAP(funquiz_map)
@@ -2176,11 +2174,10 @@ static MACHINE_DRIVER_START( funquiz )
 	MDRV_SOUND_REPLACE("ay8910", AY8910, MASTER_CLOCK/8)	/* 2MHz */
 	MDRV_SOUND_CONFIG(funquiz_ay8910_intf)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.5)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( magicrd2 )
-	MDRV_IMPORT_FROM(fw1stpal)
+static MACHINE_CONFIG_DERIVED( magicrd2, fw1stpal )
 
 	MDRV_CPU_REPLACE("maincpu", M65C02, MASTER_CLOCK/8)	/* 2MHz */
 	MDRV_CPU_PROGRAM_MAP(magicrd2_map)
@@ -2191,39 +2188,35 @@ static MACHINE_DRIVER_START( magicrd2 )
 	MDRV_SOUND_REPLACE("ay8910", AY8910, MASTER_CLOCK/8)	/* 2MHz */
 	MDRV_SOUND_CONFIG(ay8910_intf)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.5)	/* analyzed to avoid clips */
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( royalcd1 )
-	MDRV_IMPORT_FROM(fw1stpal)
+static MACHINE_CONFIG_DERIVED( royalcd1, fw1stpal )
 
 	MDRV_CPU_REPLACE("maincpu", M65C02, MASTER_CLOCK/8)	/* (G65SC02P in pro version) 2MHz */
 	MDRV_CPU_PROGRAM_MAP(magicrd2_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( royalcd2 )
-	MDRV_IMPORT_FROM(fw2ndpal)
+static MACHINE_CONFIG_DERIVED( royalcd2, fw2ndpal )
 
 	MDRV_CPU_REPLACE("maincpu", M65C02, MASTER_CLOCK/8)	/* 2MHz */
 	MDRV_CPU_PROGRAM_MAP(magicrd2_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( cuoreuno )
-	MDRV_IMPORT_FROM(fw1stpal)
+static MACHINE_CONFIG_DERIVED( cuoreuno, fw1stpal )
 
 	MDRV_CPU_REPLACE("maincpu", M65C02, MASTER_CLOCK/8)	/* 2MHz */
 	MDRV_CPU_PROGRAM_MAP(cuoreuno_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( saloon )
-	MDRV_IMPORT_FROM(fw1stpal)
+static MACHINE_CONFIG_DERIVED( saloon, fw1stpal )
 
 	MDRV_CPU_REPLACE("maincpu", M65C02, MASTER_CLOCK/8)	/* 2MHz */
 	MDRV_CPU_PROGRAM_MAP(saloon_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

@@ -734,10 +734,7 @@ static MACHINE_RESET( combatsc )
 }
 
 /* combat school (original) */
-static MACHINE_DRIVER_START( combatsc )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(combatsc_state)
+static MACHINE_CONFIG_START( combatsc, combatsc_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", HD6309, 3000000*4)	/* 3 MHz? */
@@ -779,13 +776,10 @@ static MACHINE_DRIVER_START( combatsc )
 
 	MDRV_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* combat school (bootleg on different hardware) */
-static MACHINE_DRIVER_START( combatscb )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(combatsc_state)
+static MACHINE_CONFIG_START( combatscb, combatsc_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", HD6309, 3000000*4)	/* 3 MHz? */
@@ -824,7 +818,7 @@ static MACHINE_DRIVER_START( combatscb )
 
 	MDRV_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

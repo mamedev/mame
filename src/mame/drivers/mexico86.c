@@ -471,10 +471,7 @@ static MACHINE_RESET( mexico86 )
 	state->charbank = 0;
 }
 
-static MACHINE_DRIVER_START( mexico86 )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(mexico86_state)
+static MACHINE_CONFIG_START( mexico86, mexico86_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80, 24000000/4)      /* 6 MHz, Uses clock divided 24MHz OSC */
@@ -520,25 +517,23 @@ static MACHINE_DRIVER_START( mexico86 )
 	MDRV_SOUND_ROUTE(1, "mono", 0.30)
 	MDRV_SOUND_ROUTE(2, "mono", 0.30)
 	MDRV_SOUND_ROUTE(3, "mono", 1.00)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( knightb )
+static MACHINE_CONFIG_DERIVED( knightb, mexico86 )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(mexico86)
 
 	MDRV_DEVICE_REMOVE("sub")
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(kikikai)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( kikikai )
+static MACHINE_CONFIG_DERIVED( kikikai, knightb )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(knightb)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_VBLANK_INT("screen", kikikai_interrupt) // IRQs should be triggered by the MCU, but we don't have it
@@ -547,7 +542,7 @@ static MACHINE_DRIVER_START( kikikai )
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(kikikai)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************************

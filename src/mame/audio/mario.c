@@ -683,7 +683,7 @@ static const ay8910_interface ay8910_config =
  *
  *************************************/
 
-MACHINE_DRIVER_START( mario_audio )
+MACHINE_CONFIG_FRAGMENT( mario_audio )
 
 #if USE_8039
 	MDRV_CPU_ADD("audiocpu", I8039, I8035_CLOCK)         /* 730 kHz */
@@ -701,9 +701,9 @@ MACHINE_DRIVER_START( mario_audio )
 	MDRV_SOUND_CONFIG_DISCRETE(mario)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.5)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-MACHINE_DRIVER_START( masao_audio )
+MACHINE_CONFIG_FRAGMENT( masao_audio )
 
 	MDRV_CPU_ADD("audiocpu", Z80,24576000/16)	/* ???? */
 	MDRV_CPU_PROGRAM_MAP(masao_sound_map)
@@ -717,5 +717,5 @@ MACHINE_DRIVER_START( masao_audio )
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 

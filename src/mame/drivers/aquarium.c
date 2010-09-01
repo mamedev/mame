@@ -357,10 +357,7 @@ static MACHINE_RESET( aquarium )
 #endif
 }
 
-static MACHINE_DRIVER_START( aquarium )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(aquarium_state)
+static MACHINE_CONFIG_START( aquarium, aquarium_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 32000000/2)
@@ -398,7 +395,7 @@ static MACHINE_DRIVER_START( aquarium )
 	MDRV_OKIM6295_ADD("oki", 1122000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.47)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.47)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( aquarium )
 	ROM_REGION( 0x080000, "maincpu", 0 )     /* 68000 code */

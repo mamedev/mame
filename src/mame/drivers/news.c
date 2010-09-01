@@ -127,10 +127,7 @@ static MACHINE_RESET( news )
 	state->bgpic = 0;
 }
 
-static MACHINE_DRIVER_START( news )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(news_state)
+static MACHINE_CONFIG_START( news, news_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,8000000)		 /* ? MHz */
@@ -159,7 +156,7 @@ static MACHINE_DRIVER_START( news )
 
 	MDRV_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

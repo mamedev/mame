@@ -313,10 +313,7 @@ static MACHINE_RESET( cbuster )
 	state->pri = 0;
 }
 
-static MACHINE_DRIVER_START( twocrude )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(cbuster_state)
+static MACHINE_CONFIG_START( twocrude, cbuster_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000) /* Custom chip 59 */
@@ -362,7 +359,7 @@ static MACHINE_DRIVER_START( twocrude )
 
 	MDRV_OKIM6295_ADD("oki2", 32220000/16, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /******************************************************************************/
 

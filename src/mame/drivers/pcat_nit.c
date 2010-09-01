@@ -224,14 +224,14 @@ static MACHINE_START( streetg2 )
 	microtouch_init(machine, pcat_nit_microtouch_tx_callback, NULL);
 }
 
-static MACHINE_DRIVER_START( pcat_nit )
+static MACHINE_CONFIG_START( pcat_nit, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I386, 14318180*2)	/* I386 ?? Mhz */
 	MDRV_CPU_PROGRAM_MAP(pcat_map)
 	MDRV_CPU_IO_MAP(pcat_nit_io)
 
 	/* video hardware */
-	MDRV_IMPORT_FROM( pcvideo_vga )
+	MDRV_FRAGMENT_ADD( pcvideo_vga )
 
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -240,11 +240,11 @@ static MACHINE_DRIVER_START( pcat_nit )
 	MDRV_MACHINE_START(streetg2)
 	MDRV_NVRAM_HANDLER( mc146818 )
 
-//  MDRV_IMPORT_FROM( at_kbdc8042 )
-	MDRV_IMPORT_FROM( pcat_common )
+//  MDRV_FRAGMENT_ADD( at_kbdc8042 )
+	MDRV_FRAGMENT_ADD( pcat_common )
 	MDRV_NS16450_ADD( "ns16450_0", pcat_nit_com0_interface )
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************
 *

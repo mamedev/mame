@@ -841,10 +841,7 @@ static MACHINE_RESET( nycaptor )
 	memset(state->vol_ctrl, 0, ARRAY_LENGTH(state->vol_ctrl));
 }
 
-static MACHINE_DRIVER_START( nycaptor )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(nycaptor_state)
+static MACHINE_CONFIG_START( nycaptor, nycaptor_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,8000000/2)		/* ??? */
@@ -905,12 +902,9 @@ static MACHINE_DRIVER_START( nycaptor )
 	// pin 1 SOLO  8'       not mapped
 	// pin 2 SOLO 16'       not mapped
 	// pin 22 Noise Output  not mapped
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( cyclshtg )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(nycaptor_state)
+static MACHINE_CONFIG_START( cyclshtg, nycaptor_state )
 
 	MDRV_CPU_ADD("maincpu", Z80,8000000/2)
 	MDRV_CPU_PROGRAM_MAP(cyclshtg_master_map)
@@ -969,13 +963,10 @@ static MACHINE_DRIVER_START( cyclshtg )
 	// pin 1 SOLO  8'       not mapped
 	// pin 2 SOLO 16'       not mapped
 	// pin 22 Noise Output  not mapped
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( bronx )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(nycaptor_state)
+static MACHINE_CONFIG_START( bronx, nycaptor_state )
 
 	MDRV_CPU_ADD("maincpu", Z80,8000000/2)
 	MDRV_CPU_PROGRAM_MAP(bronx_master_map)
@@ -1030,7 +1021,7 @@ static MACHINE_DRIVER_START( bronx )
 	// pin 1 SOLO  8'       not mapped
 	// pin 2 SOLO 16'       not mapped
 	// pin 22 Noise Output  not mapped
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

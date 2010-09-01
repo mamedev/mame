@@ -1973,10 +1973,7 @@ static MACHINE_RESET( dec8 )
 }
 
 
-static MACHINE_DRIVER_START( cobracom )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(dec8_state)
+static MACHINE_CONFIG_START( cobracom, dec8_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 2000000)
@@ -2018,12 +2015,9 @@ static MACHINE_DRIVER_START( cobracom )
 	MDRV_SOUND_ADD("ym2", YM3812, 3000000)
 	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( ghostb )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(dec8_state)
+static MACHINE_CONFIG_START( ghostb, dec8_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", HD6309, 3000000*4)
@@ -2070,13 +2064,10 @@ static MACHINE_DRIVER_START( ghostb )
 	MDRV_SOUND_ADD("ym2", YM3812, 3000000)
 	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( srdarwin )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(dec8_state)
+static MACHINE_CONFIG_START( srdarwin, dec8_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809,2000000)  /* MC68A09EP */
@@ -2118,12 +2109,9 @@ static MACHINE_DRIVER_START( srdarwin )
 	MDRV_SOUND_ADD("ym2", YM3812, 3000000)
 	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( gondo )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(dec8_state)
+static MACHINE_CONFIG_START( gondo, dec8_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", HD6309,3000000*4) /* HD63C09EP */
@@ -2169,12 +2157,9 @@ static MACHINE_DRIVER_START( gondo )
 	MDRV_SOUND_ADD("ym2", YM3526, 3000000)
 	MDRV_SOUND_CONFIG(ym3526_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( oscar )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(dec8_state)
+static MACHINE_CONFIG_START( oscar, dec8_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", HD6309, XTAL_12MHz/2) /* verified on pcb */
@@ -2220,12 +2205,9 @@ static MACHINE_DRIVER_START( oscar )
 	MDRV_SOUND_ADD("ym2", YM3526, XTAL_12MHz/4) /* verified on pcb */
 	MDRV_SOUND_CONFIG(ym3526_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( lastmisn )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(dec8_state)
+static MACHINE_CONFIG_START( lastmisn, dec8_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 2000000)
@@ -2270,12 +2252,9 @@ static MACHINE_DRIVER_START( lastmisn )
 	MDRV_SOUND_ADD("ym2", YM3526, 3000000)
 	MDRV_SOUND_CONFIG(ym3526_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( shackled )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(dec8_state)
+static MACHINE_CONFIG_START( shackled, dec8_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 2000000)
@@ -2320,12 +2299,9 @@ static MACHINE_DRIVER_START( shackled )
 	MDRV_SOUND_ADD("ym2", YM3526, 3000000)
 	MDRV_SOUND_CONFIG(ym3526_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( csilver )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(dec8_state)
+static MACHINE_CONFIG_START( csilver, dec8_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, XTAL_12MHz/8) /* verified on pcb */
@@ -2375,12 +2351,9 @@ static MACHINE_DRIVER_START( csilver )
 	MDRV_SOUND_ADD("msm", MSM5205, XTAL_384kHz) /* verified on pcb */
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.88)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( garyoret )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(dec8_state)
+static MACHINE_CONFIG_START( garyoret, dec8_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", HD6309,3000000*4) /* HD63C09EP */
@@ -2423,7 +2396,7 @@ static MACHINE_DRIVER_START( garyoret )
 	MDRV_SOUND_ADD("ym2", YM3526, 3000000)
 	MDRV_SOUND_CONFIG(ym3526_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /******************************************************************************/
 

@@ -594,7 +594,7 @@ static MACHINE_RESET( jpmsys5v )
  *
  *************************************/
 
-static MACHINE_DRIVER_START( jpmsys5v )
+static MACHINE_CONFIG_START( jpmsys5v, driver_data_t )
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)
 	MDRV_CPU_PROGRAM_MAP(68000_map)
 
@@ -627,7 +627,7 @@ static MACHINE_DRIVER_START( jpmsys5v )
 
 	/* 6840 PTM */
 	MDRV_PTM6840_ADD("6840ptm", ptm_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************************

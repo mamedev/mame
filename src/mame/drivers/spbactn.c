@@ -333,9 +333,7 @@ static const ym3812_interface ym3812_config =
 	irqhandler
 };
 
-static MACHINE_DRIVER_START( spbactn )
-
-	MDRV_DRIVER_DATA( spbactn_state )
+static MACHINE_CONFIG_START( spbactn, spbactn_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
@@ -368,7 +366,7 @@ static MACHINE_DRIVER_START( spbactn )
 
 	MDRV_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( spbactn )
 	/* Board 9002-A (CPU Board) */

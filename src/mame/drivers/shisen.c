@@ -215,7 +215,7 @@ static const ym2151_interface ym2151_config =
 
 
 
-static MACHINE_DRIVER_START( shisen )
+static MACHINE_CONFIG_START( shisen, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 6000000)	/* 6 MHz ? */
@@ -257,7 +257,7 @@ static MACHINE_DRIVER_START( shisen )
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

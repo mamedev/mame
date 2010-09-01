@@ -858,10 +858,7 @@ static MACHINE_RESET( nightgal )
 	memset(state->pen_raw_data, 0, ARRAY_LENGTH(state->pen_raw_data));
 }
 
-static MACHINE_DRIVER_START( royalqn )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(nightgal_state)
+static MACHINE_CONFIG_START( royalqn, nightgal_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,MASTER_CLOCK / 8)		 /* ? MHz */
@@ -898,11 +895,11 @@ static MACHINE_DRIVER_START( royalqn )
 	MDRV_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK / 8)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( sexygal )
+static MACHINE_CONFIG_DERIVED( sexygal, royalqn )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM( royalqn )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(sexygal_map)
 	MDRV_CPU_IO_MAP(sexygal_io)
@@ -917,15 +914,14 @@ static MACHINE_DRIVER_START( sexygal )
 	MDRV_SOUND_ADD("ymsnd", YM2203, MASTER_CLOCK / 8)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( ngalsumr )
-	MDRV_IMPORT_FROM( royalqn )
+static MACHINE_CONFIG_DERIVED( ngalsumr, royalqn )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(royalqn_map)
 	MDRV_CPU_IO_MAP(royalqn_io)
 	MDRV_CPU_PERIODIC_INT(nmi_line_pulse,244)//???
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*
 Night Gal

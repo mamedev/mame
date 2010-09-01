@@ -243,10 +243,7 @@ static MACHINE_RESET( goindol )
 	state->prot_toggle = 0;
 }
 
-static MACHINE_DRIVER_START( goindol )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(goindol_state)
+static MACHINE_CONFIG_START( goindol, goindol_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 6000000)        /* 6 MHz (?) */
@@ -280,7 +277,7 @@ static MACHINE_DRIVER_START( goindol )
 
 	MDRV_SOUND_ADD("ymsnd", YM2203, 2000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

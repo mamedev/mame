@@ -431,9 +431,7 @@ static const ay8910_interface ay8910_config =
                            Machine Driver
 **********************************************************************/
 
-static MACHINE_DRIVER_START( supdrapo )
-
-	MDRV_DRIVER_DATA( supdrapo_state )
+static MACHINE_CONFIG_START( supdrapo, supdrapo_state )
 
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)	/* guess */
 	MDRV_CPU_PROGRAM_MAP(sdpoker_mem)
@@ -464,7 +462,7 @@ static MACHINE_DRIVER_START( supdrapo )
 	MDRV_SOUND_ADD("aysnd", AY8910, SND_CLOCK)	/* guess */
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*********************************************************************

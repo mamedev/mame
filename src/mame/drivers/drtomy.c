@@ -292,10 +292,7 @@ static MACHINE_RESET( drtomy )
 	state->oki_bank = 0;
 }
 
-static MACHINE_DRIVER_START( drtomy )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(drtomy_state)
+static MACHINE_CONFIG_START( drtomy, drtomy_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,24000000/2)			/* ? MHz */
@@ -324,7 +321,7 @@ static MACHINE_DRIVER_START( drtomy )
 
 	MDRV_OKIM6295_ADD("oki", 26000000/16, OKIM6295_PIN7_LOW)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.8)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( drtomy )

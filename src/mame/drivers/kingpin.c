@@ -138,7 +138,7 @@ static const TMS9928a_interface tms9928a_interface =
 	vdp_interrupt
 };
 
-static MACHINE_DRIVER_START( kingpin )
+static MACHINE_CONFIG_START( kingpin, driver_data_t )
 /*  MAIN CPU */
 	MDRV_CPU_ADD("maincpu", Z80, 3579545)
 	MDRV_CPU_PROGRAM_MAP(kingpin_program_map)
@@ -151,7 +151,7 @@ static MACHINE_DRIVER_START( kingpin )
 	/*MDRV_CPU_IO_MAP(sound_io_map)*/
 
 /*  VIDEO */
-	MDRV_IMPORT_FROM(tms9928a)
+	MDRV_FRAGMENT_ADD(tms9928a)
 
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -168,7 +168,7 @@ static MACHINE_DRIVER_START( kingpin )
     MDRV_SOUND_CONFIG(ay8912_interface)
     MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 */
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 static DRIVER_INIT( kingpin )
 {

@@ -475,7 +475,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( sbrkout )
+static MACHINE_CONFIG_START( sbrkout, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502,MAIN_CLOCK/16)	   /* 375 KHz? Should be 750KHz? */
@@ -501,7 +501,7 @@ static MACHINE_DRIVER_START( sbrkout )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

@@ -487,7 +487,7 @@ static MACHINE_START( rblaster )
 	laserdisc = machine->device("laserdisc");
 }
 
-static MACHINE_DRIVER_START( rblaster )
+static MACHINE_CONFIG_START( rblaster, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M6502,8000000/2)
@@ -520,21 +520,19 @@ static MACHINE_DRIVER_START( rblaster )
 	MDRV_SOUND_ADD("ldsound", LASERDISC, 0)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( begas )
-	MDRV_IMPORT_FROM( rblaster )
+static MACHINE_CONFIG_DERIVED( begas, rblaster )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(begas_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( cobra )
-	MDRV_IMPORT_FROM( rblaster )
+static MACHINE_CONFIG_DERIVED( cobra, rblaster )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(cobra_map)
 
 	MDRV_DEVICE_REMOVE("audiocpu")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

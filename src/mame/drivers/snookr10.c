@@ -698,7 +698,7 @@ GFXDECODE_END
 *     Machine Drivers     *
 **************************/
 
-static MACHINE_DRIVER_START( snookr10 )
+static MACHINE_CONFIG_START( snookr10, driver_data_t )
 
     /* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M65SC02, MASTER_CLOCK/8)	/* 2 MHz (1.999 MHz measured) */
@@ -728,28 +728,26 @@ static MACHINE_DRIVER_START( snookr10 )
 	MDRV_OKIM6295_ADD("oki", MASTER_CLOCK/16, OKIM6295_PIN7_HIGH)	/* 1 MHz (995.5 kHz measured); pin7 checked HIGH on PCB */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.8)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( apple10 )
+static MACHINE_CONFIG_DERIVED( apple10, snookr10 )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(snookr10)
 	MDRV_CPU_MODIFY("maincpu")
 
     /* video hardware */
 	MDRV_PALETTE_INIT(apple10)
 	MDRV_VIDEO_START(apple10)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( tenballs )
+static MACHINE_CONFIG_DERIVED( tenballs, snookr10 )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(snookr10)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(tenballs_map)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************

@@ -104,14 +104,14 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( vertigo )
+static MACHINE_CONFIG_START( vertigo, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)
 	MDRV_CPU_PROGRAM_MAP(vertigo_map)
 	MDRV_CPU_PERIODIC_INT(vertigo_interrupt,60)
 
-	MDRV_IMPORT_FROM(exidy440_audio)
+	MDRV_FRAGMENT_ADD(exidy440_audio)
 
 	MDRV_PIT8254_ADD( "pit8254", vertigo_pit8254_config )
 
@@ -134,7 +134,7 @@ static MACHINE_DRIVER_START( vertigo )
 
 	MDRV_VIDEO_START(vector)
 	MDRV_VIDEO_UPDATE(vector)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

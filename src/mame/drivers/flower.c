@@ -238,7 +238,7 @@ static INTERRUPT_GEN( flower_cpu0_interrupt )
 	cpu_set_input_line(device, 0, ASSERT_LINE);
 }
 
-static MACHINE_DRIVER_START( flower )
+static MACHINE_CONFIG_START( flower, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,8000000)
@@ -276,7 +276,7 @@ static MACHINE_DRIVER_START( flower )
 
 	MDRV_SOUND_ADD("flower", FLOWER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( flower ) /* Komax version */

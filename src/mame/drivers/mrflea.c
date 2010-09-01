@@ -357,10 +357,7 @@ static MACHINE_RESET( mrflea )
 	state->select1 = 0;
 }
 
-static MACHINE_DRIVER_START( mrflea )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(mrflea_state)
+static MACHINE_CONFIG_START( mrflea, mrflea_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000) /* 4 MHz? */
@@ -404,7 +401,7 @@ static MACHINE_DRIVER_START( mrflea )
 
 	MDRV_SOUND_ADD("ay3", AY8910, 2000000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*************************************
  *

@@ -571,10 +571,7 @@ static MACHINE_RESET( taito_dualscreen )
 	sound_global_enable(machine, 1);	/* mixer enabled */
 }
 
-static MACHINE_DRIVER_START( darius2d )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(warriorb_state)
+static MACHINE_CONFIG_START( darius2d, warriorb_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz ??? (Might well be 16!) */
@@ -638,13 +635,10 @@ static MACHINE_DRIVER_START( darius2d )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	MDRV_TC0140SYT_ADD("tc0140syt", warriorb_tc0140syt_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( warriorb )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(warriorb_state)
+static MACHINE_CONFIG_START( warriorb, warriorb_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz ? */
@@ -708,7 +702,7 @@ static MACHINE_DRIVER_START( warriorb )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
 	MDRV_TC0140SYT_ADD("tc0140syt", warriorb_tc0140syt_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

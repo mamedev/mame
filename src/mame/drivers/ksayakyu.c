@@ -271,10 +271,7 @@ static MACHINE_RESET( ksayakyu )
 	state->flipscreen = 0;
 }
 
-static MACHINE_DRIVER_START( ksayakyu )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(ksayakyu_state)
+static MACHINE_CONFIG_START( ksayakyu, ksayakyu_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,MAIN_CLOCK/8) //divider is guessed
@@ -318,7 +315,7 @@ static MACHINE_DRIVER_START( ksayakyu )
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( ksayakyu )
 	ROM_REGION( 0x20000, "maincpu", 0 )

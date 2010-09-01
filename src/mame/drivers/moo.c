@@ -505,10 +505,7 @@ static const k054338_interface moo_k054338_intf =
 };
 
 
-static MACHINE_DRIVER_START( moo )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(moo_state)
+static MACHINE_CONFIG_START( moo, moo_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
@@ -553,12 +550,9 @@ static MACHINE_DRIVER_START( moo )
 	MDRV_SOUND_ADD("k054539", K054539, 48000)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.75)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.75)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( moobl )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(moo_state)
+static MACHINE_CONFIG_START( moobl, moo_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16100000)
@@ -596,10 +590,9 @@ static MACHINE_DRIVER_START( moobl )
 	MDRV_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( bucky )
-	MDRV_IMPORT_FROM(moo)
+static MACHINE_CONFIG_DERIVED( bucky, moo )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(bucky_map)
@@ -611,7 +604,7 @@ static MACHINE_DRIVER_START( bucky )
 
 	/* video hardware */
 	MDRV_PALETTE_LENGTH(4096)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

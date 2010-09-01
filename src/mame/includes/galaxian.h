@@ -128,8 +128,8 @@ void tenspot_set_game_bank(running_machine *machine, int bank, int from_game);
 
 /*----------- defined in audio/galaxian.c -----------*/
 
-MACHINE_DRIVER_EXTERN( mooncrst_audio );
-MACHINE_DRIVER_EXTERN( galaxian_audio );
+MACHINE_CONFIG_EXTERN( mooncrst_audio );
+MACHINE_CONFIG_EXTERN( galaxian_audio );
 
 WRITE8_DEVICE_HANDLER( galaxian_sound_w );
 WRITE8_DEVICE_HANDLER( galaxian_pitch_w );

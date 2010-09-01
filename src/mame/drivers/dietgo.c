@@ -199,10 +199,7 @@ static MACHINE_START( dietgo )
 	state->deco16ic = machine->device("deco_custom");
 }
 
-static MACHINE_DRIVER_START( dietgo )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(dietgo_state)
+static MACHINE_CONFIG_START( dietgo, dietgo_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_28MHz/2) /* DE102 (verified on pcb) */
@@ -238,7 +235,7 @@ static MACHINE_DRIVER_START( dietgo )
 
 	MDRV_OKIM6295_ADD("oki", XTAL_32_22MHz/32, OKIM6295_PIN7_HIGH) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* Diet Go Go */
 

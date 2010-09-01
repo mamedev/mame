@@ -200,8 +200,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( blstroid )
-	MDRV_DRIVER_DATA(blstroid_state)
+static MACHINE_CONFIG_START( blstroid, blstroid_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
@@ -227,8 +226,8 @@ static MACHINE_DRIVER_START( blstroid )
 	MDRV_VIDEO_UPDATE(blstroid)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(jsa_i_stereo)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(jsa_i_stereo)
+MACHINE_CONFIG_END
 
 
 

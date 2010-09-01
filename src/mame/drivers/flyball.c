@@ -401,10 +401,7 @@ static MACHINE_RESET( flyball )
 }
 
 
-static MACHINE_DRIVER_START( flyball )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(flyball_state)
+static MACHINE_CONFIG_START( flyball, flyball_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, MASTER_CLOCK/16)
@@ -429,7 +426,7 @@ static MACHINE_DRIVER_START( flyball )
 	MDRV_VIDEO_START(flyball)
 
 	/* sound hardware */
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************************

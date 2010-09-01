@@ -330,10 +330,7 @@ static MACHINE_RESET( m14 )
 }
 
 
-static MACHINE_DRIVER_START( m14 )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(m14_state)
+static MACHINE_CONFIG_START( m14, m14_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",I8085A,6000000/2) //guess: 6 Mhz internally divided by 2
@@ -364,7 +361,7 @@ static MACHINE_DRIVER_START( m14 )
 //  MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 //  MDRV_SOUND_CONFIG_DISCRETE(m14)
 //  MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

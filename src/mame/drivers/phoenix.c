@@ -449,7 +449,7 @@ static MACHINE_RESET( phoenix )
 }
 
 
-static MACHINE_DRIVER_START( phoenix )
+static MACHINE_CONFIG_START( phoenix, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8085A, CPU_CLOCK)	/* 2.75 MHz */
@@ -484,13 +484,12 @@ static MACHINE_DRIVER_START( phoenix )
 	MDRV_SOUND_ADD("discrete", DISCRETE, 120000)
 	MDRV_SOUND_CONFIG_DISCRETE(phoenix)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.6)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( pleiads )
+static MACHINE_CONFIG_DERIVED( pleiads, phoenix )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(phoenix)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(pleiads_memory_map)
 
@@ -508,7 +507,7 @@ static MACHINE_DRIVER_START( pleiads )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
 	MDRV_DEVICE_REMOVE("discrete")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* Same as Phoenix, but uses an AY8910 and an extra visible line (column) */
@@ -521,7 +520,7 @@ static I8085_CONFIG( survival_i8085_config )
 	DEVCB_NULL							/* SOD changed callback (8085A only) */
 };
 
-static MACHINE_DRIVER_START( survival )
+static MACHINE_CONFIG_START( survival, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8085A, CPU_CLOCK)	/* 5.50 MHz */
@@ -553,18 +552,17 @@ static MACHINE_DRIVER_START( survival )
 	MDRV_SOUND_ADD("aysnd", AY8910, 11000000/4)
 	MDRV_SOUND_CONFIG(survival_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* Uses a Z80 */
-static MACHINE_DRIVER_START( condor )
+static MACHINE_CONFIG_DERIVED( condor, phoenix )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(phoenix)
 	/* FIXME: Verify clock. This is most likely 11MHz/2 */
 	MDRV_CPU_REPLACE("maincpu", Z80, 11000000/4)	/* 2.75 MHz??? */
 	MDRV_CPU_PROGRAM_MAP(phoenix_memory_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

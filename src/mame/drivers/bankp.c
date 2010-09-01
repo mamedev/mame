@@ -267,10 +267,7 @@ static MACHINE_RESET( bankp )
 	state->priority = 0;
 }
 
-static MACHINE_DRIVER_START( bankp )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(bankp_state)
+static MACHINE_CONFIG_START( bankp, bankp_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, BANKP_CPU_CLOCK)
@@ -305,7 +302,7 @@ static MACHINE_DRIVER_START( bankp )
 
 	MDRV_SOUND_ADD("sn3", SN76489, BANKP_SN76496_CLOCK)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

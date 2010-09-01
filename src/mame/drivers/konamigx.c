@@ -1785,7 +1785,7 @@ static GFXDECODE_START( type4 )
 	GFXDECODE_ENTRY( "gfx3", 0, bglayout_8bpp, 0x1800, 8 )
 GFXDECODE_END
 
-static MACHINE_DRIVER_START( konamigx )
+static MACHINE_CONFIG_START( konamigx, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC020, 24000000)
 	MDRV_CPU_PROGRAM_MAP(gx_type2_map)
@@ -1836,34 +1836,29 @@ static MACHINE_DRIVER_START( konamigx )
 	MDRV_SOUND_CONFIG(k054539_config)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( dragoonj )
-	MDRV_IMPORT_FROM(konamigx)
+static MACHINE_CONFIG_DERIVED( dragoonj, konamigx )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_CLOCK(26400000) // needs higher clock to stop sprite flickerings
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(40, 40+384-1, 16, 16+224-1)
 	MDRV_VIDEO_START(dragoonj)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( le2 )
-	MDRV_IMPORT_FROM(konamigx)
+static MACHINE_CONFIG_DERIVED( le2, konamigx )
 	MDRV_VIDEO_START(le2)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( konamigx_6bpp )
-	MDRV_IMPORT_FROM(konamigx)
+static MACHINE_CONFIG_DERIVED( konamigx_6bpp, konamigx )
 	MDRV_VIDEO_START(konamigx_6bpp)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( konamigx_6bpp_2 )
-	MDRV_IMPORT_FROM(konamigx)
+static MACHINE_CONFIG_DERIVED( konamigx_6bpp_2, konamigx )
 	MDRV_VIDEO_START(konamigx_6bpp_2)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( opengolf )
-	MDRV_IMPORT_FROM(konamigx)
+static MACHINE_CONFIG_DERIVED( opengolf, konamigx )
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_RAW_PARAMS(8000000, 384+24+64+40, 0, 383, 224+16+8+16, 0, 223)
 	MDRV_SCREEN_VISIBLE_AREA(40, 40+384-1, 16, 16+224-1)
@@ -1874,10 +1869,9 @@ static MACHINE_DRIVER_START( opengolf )
 	MDRV_CPU_PROGRAM_MAP(gx_type1_map)
 
 	MDRV_ADC0834_ADD( "adc0834", konamigx_adc_interface )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( racinfrc )
-	MDRV_IMPORT_FROM(konamigx)
+static MACHINE_CONFIG_DERIVED( racinfrc, konamigx )
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_RAW_PARAMS(8000000, 384+24+64+40, 0, 383, 224+16+8+16, 0, 223)
 	MDRV_SCREEN_VISIBLE_AREA(32, 32+384-1, 16, 16+224-1)
@@ -1888,10 +1882,9 @@ static MACHINE_DRIVER_START( racinfrc )
 	MDRV_CPU_PROGRAM_MAP(gx_type1_map)
 
 	MDRV_ADC0834_ADD( "adc0834", konamigx_adc_interface )
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( gxtype3 )
-	MDRV_IMPORT_FROM(konamigx)
+static MACHINE_CONFIG_DERIVED( gxtype3, konamigx )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(gx_type3_map)
@@ -1914,10 +1907,9 @@ static MACHINE_DRIVER_START( gxtype3 )
 
 
 	MDRV_GFXDECODE(type34)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( gxtype4 )
-	MDRV_IMPORT_FROM(konamigx)
+static MACHINE_CONFIG_DERIVED( gxtype4, konamigx )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(gx_type4_map)
@@ -1940,10 +1932,9 @@ static MACHINE_DRIVER_START( gxtype4 )
 	MDRV_PALETTE_LENGTH(8192)
 	MDRV_GFXDECODE(type4)
 	MDRV_VIDEO_START(konamigx_type4)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( gxtype4_vsn )
-	MDRV_IMPORT_FROM(gxtype4)
+static MACHINE_CONFIG_DERIVED( gxtype4_vsn, gxtype4 )
 
 	MDRV_DEFAULT_LAYOUT(layout_dualhsxs)
 
@@ -1956,23 +1947,21 @@ static MACHINE_DRIVER_START( gxtype4_vsn )
 	MDRV_SCREEN_VISIBLE_AREA(0, 576-1, 16, 32*8-1-16)
 
 	MDRV_VIDEO_START(konamigx_type4_vsn)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( gxtype4sd2 )
-	MDRV_IMPORT_FROM(gxtype4)
+static MACHINE_CONFIG_DERIVED( gxtype4sd2, gxtype4 )
 
 	MDRV_VIDEO_START(konamigx_type4_sd2)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
-static MACHINE_DRIVER_START( winspike )
-	MDRV_IMPORT_FROM(konamigx)
+static MACHINE_CONFIG_DERIVED( winspike, konamigx )
 
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(38, 38+384-1, 16, 16+224-1)
 	MDRV_VIDEO_START(winspike)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /**********************************************************************************/

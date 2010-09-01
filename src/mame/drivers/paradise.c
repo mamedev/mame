@@ -562,10 +562,7 @@ static MACHINE_RESET( paradise )
 	state->priority = 0;
 }
 
-static MACHINE_DRIVER_START( paradise )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(paradise_state)
+static MACHINE_CONFIG_START( paradise, paradise_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)			/* Z8400B - 6mhz Verified */
@@ -598,18 +595,18 @@ static MACHINE_DRIVER_START( paradise )
 
 	MDRV_OKIM6295_ADD("oki2", XTAL_12MHz/12, OKIM6295_PIN7_HIGH) /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( tgtball )
+static MACHINE_CONFIG_DERIVED( tgtball, paradise )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(paradise)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(tgtball_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( torus )
+static MACHINE_CONFIG_DERIVED( torus, paradise )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(paradise)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(torus_map)
 	MDRV_CPU_IO_MAP(torus_io_map)
@@ -619,11 +616,11 @@ static MACHINE_DRIVER_START( torus )
 	MDRV_VIDEO_UPDATE(torus)
 
 	MDRV_DEVICE_REMOVE("oki2")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( madball )
+static MACHINE_CONFIG_DERIVED( madball, paradise )
+
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(paradise)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(torus_map)
 	MDRV_CPU_IO_MAP(torus_io_map)
@@ -633,7 +630,7 @@ static MACHINE_DRIVER_START( madball )
 	MDRV_VIDEO_UPDATE(madball)
 
 	MDRV_DEVICE_REMOVE("oki2")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

@@ -253,8 +253,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( skullxbo )
-	MDRV_DRIVER_DATA(skullxbo_state)
+static MACHINE_CONFIG_START( skullxbo, skullxbo_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
@@ -280,8 +279,8 @@ static MACHINE_DRIVER_START( skullxbo )
 	MDRV_VIDEO_UPDATE(skullxbo)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(jsa_ii_mono)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(jsa_ii_mono)
+MACHINE_CONFIG_END
 
 
 

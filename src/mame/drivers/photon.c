@@ -192,7 +192,7 @@ static VIDEO_UPDATE( photon )
 	return pk8000_video_update(screen, bitmap, cliprect, memory_region(screen->machine, "maincpu"));
 }
 
-static MACHINE_DRIVER_START( photon )
+static MACHINE_CONFIG_START( photon, driver_data_t )
 
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",I8080, 1780000)
@@ -222,7 +222,7 @@ static MACHINE_DRIVER_START( photon )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*
     Dump was made using custom adaptor, hence it is marked as bad dump.

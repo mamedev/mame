@@ -486,10 +486,7 @@ static MACHINE_RESET( jongkyo )
 }
 
 
-static MACHINE_DRIVER_START( jongkyo )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(jongkyo_state)
+static MACHINE_CONFIG_START( jongkyo, jongkyo_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,JONGKYO_CLOCK/4)
@@ -518,7 +515,7 @@ static MACHINE_DRIVER_START( jongkyo )
 	MDRV_SOUND_ADD("aysnd", AY8910, JONGKYO_CLOCK/8)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************************

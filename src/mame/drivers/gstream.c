@@ -548,10 +548,7 @@ static MACHINE_RESET( gstream )
 	state->oki_bank_1 = 0;
 }
 
-static MACHINE_DRIVER_START( gstream )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(gstream_state)
+static MACHINE_CONFIG_START( gstream, gstream_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", E132XT, 16000000*4)	/* 4x internal multiplier */
@@ -585,7 +582,7 @@ static MACHINE_DRIVER_START( gstream )
 
 	MDRV_OKIM6295_ADD("oki2", 1000000, OKIM6295_PIN7_HIGH) /* 1 Mhz? */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( gstream )
 	ROM_REGION32_BE( 0x080000, "user1", 0 ) /* Hyperstone CPU Code */

@@ -263,7 +263,7 @@ static I8255A_INTERFACE( ppi8255_intf )
  *
  *************************************/
 
-static MACHINE_DRIVER_START( sg1000a )
+static MACHINE_CONFIG_START( sg1000a, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_3_579545MHz)
 	MDRV_CPU_PROGRAM_MAP(program_map)
@@ -273,7 +273,7 @@ static MACHINE_DRIVER_START( sg1000a )
 	MDRV_I8255A_ADD( "ppi8255", ppi8255_intf )
 
 	/* video hardware */
-	MDRV_IMPORT_FROM(tms9928a)
+	MDRV_FRAGMENT_ADD(tms9928a)
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE((float)XTAL_10_738635MHz/2/342/262)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
@@ -284,7 +284,7 @@ static MACHINE_DRIVER_START( sg1000a )
 
 	MDRV_SOUND_ADD("snsnd", SN76489, XTAL_3_579545MHz)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*************************************
  *

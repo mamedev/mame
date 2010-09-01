@@ -194,10 +194,7 @@ static MACHINE_RESET( glass )
 		state->blitter_serial_buffer[i] = 0;
 }
 
-static MACHINE_DRIVER_START( glass )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(glass_state)
+static MACHINE_CONFIG_START( glass, glass_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,24000000/2)		/* 12 MHz (M680000 P12) */
@@ -226,7 +223,7 @@ static MACHINE_DRIVER_START( glass )
 
 	MDRV_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 ROM_START( glass ) /* Version 1.1 */
 	ROM_REGION( 0x080000, "maincpu", 0 )	/* 68000 code */

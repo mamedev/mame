@@ -855,7 +855,7 @@ static MACHINE_RESET( mastboy )
 
 
 
-static MACHINE_DRIVER_START( mastboy )
+static MACHINE_CONFIG_START( mastboy, driver_data_t )
 	MDRV_CPU_ADD("maincpu", Z180, 12000000/2)	/* HD647180X0CP6-1M1R */
 	MDRV_CPU_PROGRAM_MAP(mastboy_map)
 	MDRV_CPU_IO_MAP(mastboy_io_map)
@@ -887,7 +887,7 @@ static MACHINE_DRIVER_START( mastboy )
 	MDRV_SOUND_ADD("msm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /* Romsets */
 

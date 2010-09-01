@@ -245,10 +245,7 @@ static MACHINE_RESET( commando )
 }
 
 
-static MACHINE_DRIVER_START( commando )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(commando_state)
+static MACHINE_CONFIG_START( commando, commando_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, PHI_MAIN)	// ???
@@ -288,7 +285,7 @@ static MACHINE_DRIVER_START( commando )
 
 	MDRV_SOUND_ADD("ym2", YM2203, PHI_B/2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* ROMs */

@@ -6850,9 +6850,7 @@ static INTERRUPT_GEN( tndrcade_sub_interrupt )
 		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_DRIVER_START( tndrcade )
-
-	MDRV_DRIVER_DATA( seta_state )
+static MACHINE_CONFIG_START( tndrcade, seta_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000/2)	/* 8 MHz */
@@ -6888,7 +6886,7 @@ static MACHINE_DRIVER_START( tndrcade )
 	MDRV_SOUND_ADD("ym2", YM3812, 16000000/4)	/* 4 MHz */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
@@ -6901,9 +6899,7 @@ MACHINE_DRIVER_END
 
 /* twineagl lev 3 = lev 2 + lev 1 ! */
 
-static MACHINE_DRIVER_START( twineagl )
-
-	MDRV_DRIVER_DATA( seta_state )
+static MACHINE_CONFIG_START( twineagl, seta_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000/2)	/* 8 MHz */
@@ -6935,7 +6931,7 @@ static MACHINE_DRIVER_START( twineagl )
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
@@ -6944,9 +6940,7 @@ MACHINE_DRIVER_END
 
 /* downtown lev 3 = lev 2 + lev 1 ! */
 
-static MACHINE_DRIVER_START( downtown )
-
-	MDRV_DRIVER_DATA( seta_state )
+static MACHINE_CONFIG_START( downtown, seta_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz/2) /* verified on pcb */
@@ -6976,7 +6970,7 @@ static MACHINE_DRIVER_START( downtown )
 	MDRV_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
@@ -7003,9 +6997,7 @@ static INTERRUPT_GEN( calibr50_interrupt )
 }
 
 
-static MACHINE_DRIVER_START( usclssic )
-
-	MDRV_DRIVER_DATA( seta_state )
+static MACHINE_CONFIG_START( usclssic, seta_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000/2)	/* 8 MHz */
@@ -7040,7 +7032,7 @@ static MACHINE_DRIVER_START( usclssic )
 	MDRV_SOUND_CONFIG(seta_sound_intf2)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
@@ -7052,9 +7044,7 @@ MACHINE_DRIVER_END
     Test mode shows a 16ms and 4ms counters. I wonder if every game has
     5 ints per frame */
 
-static MACHINE_DRIVER_START( calibr50 )
-
-	MDRV_DRIVER_DATA( seta_state )
+static MACHINE_CONFIG_START( calibr50, seta_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz/2) /* verified on pcb */
@@ -7087,7 +7077,7 @@ static MACHINE_DRIVER_START( calibr50 )
 	MDRV_SOUND_ADD("x1snd", X1_010, 16000000)	/* 16 MHz */
 	MDRV_SOUND_CONFIG(seta_sound_intf2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
@@ -7096,9 +7086,7 @@ MACHINE_DRIVER_END
 
 /* metafox lev 3 = lev 2 + lev 1 ! */
 
-static MACHINE_DRIVER_START( metafox )
-
-	MDRV_DRIVER_DATA( seta_state )
+static MACHINE_CONFIG_START( metafox, seta_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000/2)	/* 8 MHz */
@@ -7130,16 +7118,14 @@ static MACHINE_DRIVER_START( metafox )
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
                                 Athena no Hatena?
 ***************************************************************************/
 
-static MACHINE_DRIVER_START( atehate )
-
-	MDRV_DRIVER_DATA( seta_state )
+static MACHINE_CONFIG_START( atehate, seta_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
@@ -7167,7 +7153,7 @@ static MACHINE_DRIVER_START( atehate )
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
@@ -7180,9 +7166,7 @@ MACHINE_DRIVER_END
     samples are bankswitched
 */
 
-static MACHINE_DRIVER_START( blandia )
-
-	MDRV_DRIVER_DATA( seta_state )
+static MACHINE_CONFIG_START( blandia, seta_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
@@ -7212,11 +7196,9 @@ static MACHINE_DRIVER_START( blandia )
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( blandiap )
-
-	MDRV_DRIVER_DATA( seta_state )
+static MACHINE_CONFIG_START( blandiap, seta_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
@@ -7246,16 +7228,14 @@ static MACHINE_DRIVER_START( blandiap )
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
                                 Block Carnival
 ***************************************************************************/
 
-static MACHINE_DRIVER_START( blockcar )
-
-	MDRV_DRIVER_DATA( seta_state )
+static MACHINE_CONFIG_START( blockcar, seta_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000/2)	/* 8 MHz */
@@ -7283,16 +7263,14 @@ static MACHINE_DRIVER_START( blockcar )
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
                                 Daioh
 ***************************************************************************/
 
-static MACHINE_DRIVER_START( daioh )
-
-	MDRV_DRIVER_DATA( seta_state )
+static MACHINE_CONFIG_START( daioh, seta_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
@@ -7320,7 +7298,7 @@ static MACHINE_DRIVER_START( daioh )
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
                 Dragon Unit, Quiz Kokology, Strike Gunner
@@ -7332,9 +7310,7 @@ MACHINE_DRIVER_END
     lev 2 drives the game
 */
 
-static MACHINE_DRIVER_START( drgnunit )
-
-	MDRV_DRIVER_DATA( seta_state )
+static MACHINE_CONFIG_START( drgnunit, seta_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000/2)	/* 8 MHz */
@@ -7363,14 +7339,12 @@ static MACHINE_DRIVER_START( drgnunit )
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*  Same as qzkklogy, but with a 16MHz CPU and different
     layout for the layer's tiles    */
 
-static MACHINE_DRIVER_START( qzkklgy2 )
-
-	MDRV_DRIVER_DATA( seta_state )
+static MACHINE_CONFIG_START( qzkklgy2, seta_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
@@ -7399,7 +7373,7 @@ static MACHINE_DRIVER_START( qzkklgy2 )
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
                                 Seta Roulette
@@ -7416,9 +7390,7 @@ static INTERRUPT_GEN( setaroul_interrupt )
 }
 
 
-static MACHINE_DRIVER_START( setaroul )
-
-	MDRV_DRIVER_DATA( seta_state )
+static MACHINE_CONFIG_START( setaroul, seta_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000/2)	/* 8 MHz */
@@ -7448,16 +7420,14 @@ static MACHINE_DRIVER_START( setaroul )
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
                                 Eight Force
 ***************************************************************************/
 
-static MACHINE_DRIVER_START( eightfrc )
-
-	MDRV_DRIVER_DATA( seta_state )
+static MACHINE_CONFIG_START( eightfrc, seta_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
@@ -7485,7 +7455,7 @@ static MACHINE_DRIVER_START( eightfrc )
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
@@ -7497,9 +7467,7 @@ MACHINE_DRIVER_END
     lev 1 == lev 3 (writes to $500000, bit 4 -> 1 then 0)
     lev 2 drives the game
 */
-static MACHINE_DRIVER_START( extdwnhl )
-
-	MDRV_DRIVER_DATA( seta_state )
+static MACHINE_CONFIG_START( extdwnhl, seta_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
@@ -7528,7 +7496,7 @@ static MACHINE_DRIVER_START( extdwnhl )
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
@@ -7551,9 +7519,7 @@ static MACHINE_START( wrofaero ) { uPD71054_timer_init(machine); }
     lev 2: VBlank
     lev 4: Sound (generated by a timer mapped at $d00000-6 ?)
 */
-static MACHINE_DRIVER_START( gundhara )
-
-	MDRV_DRIVER_DATA( seta_state )
+static MACHINE_CONFIG_START( gundhara, seta_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
@@ -7591,7 +7557,7 @@ static MACHINE_DRIVER_START( gundhara )
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
@@ -7602,9 +7568,7 @@ MACHINE_DRIVER_END
     lev 1 == lev 3 (writes to $500000, bit 4 -> 1 then 0)
     lev 2 drives the game
 */
-static MACHINE_DRIVER_START( jjsquawk )
-
-	MDRV_DRIVER_DATA( seta_state )
+static MACHINE_CONFIG_START( jjsquawk, seta_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
@@ -7633,11 +7597,9 @@ static MACHINE_DRIVER_START( jjsquawk )
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( jjsquawb )
-
-	MDRV_DRIVER_DATA( seta_state )
+static MACHINE_CONFIG_START( jjsquawb, seta_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
@@ -7666,16 +7628,14 @@ static MACHINE_DRIVER_START( jjsquawb )
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
                 (Kamen) Masked Riders Club Battle Race
 ***************************************************************************/
 
 /*  kamenrid: lev 2 by vblank, lev 4 by timer */
-static MACHINE_DRIVER_START( kamenrid )
-
-	MDRV_DRIVER_DATA( seta_state )
+static MACHINE_CONFIG_START( kamenrid, seta_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
@@ -7707,7 +7667,7 @@ static MACHINE_DRIVER_START( kamenrid )
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
                                 Orbs
@@ -7715,9 +7675,7 @@ MACHINE_DRIVER_END
 
 /* The CPU clock has been verified/measured, PCB only has one OSC and it's 14.318180 MHz */
 
-static MACHINE_DRIVER_START( orbs )
-
-	MDRV_DRIVER_DATA( seta_state )
+static MACHINE_CONFIG_START( orbs, seta_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 14318180/2)	/* 7.143 MHz */
@@ -7745,16 +7703,14 @@ static MACHINE_DRIVER_START( orbs )
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
                   Kero Kero Keroppi no Issyoni Asobou
 ***************************************************************************/
 
-static MACHINE_DRIVER_START( keroppi )
-
-	MDRV_DRIVER_DATA( seta_state )
+static MACHINE_CONFIG_START( keroppi, seta_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 14318180/2)	/* 7.143 MHz */
@@ -7784,16 +7740,14 @@ static MACHINE_DRIVER_START( keroppi )
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
                                 Krazy Bowl
 ***************************************************************************/
 
-static MACHINE_DRIVER_START( krzybowl )
-
-	MDRV_DRIVER_DATA( seta_state )
+static MACHINE_CONFIG_START( krzybowl, seta_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
@@ -7821,7 +7775,7 @@ static MACHINE_DRIVER_START( krzybowl )
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
@@ -7829,9 +7783,7 @@ MACHINE_DRIVER_END
 ***************************************************************************/
 
 /*  madshark: lev 2 by vblank, lev 4 by timer */
-static MACHINE_DRIVER_START( madshark )
-
-	MDRV_DRIVER_DATA( seta_state )
+static MACHINE_CONFIG_START( madshark, seta_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
@@ -7865,7 +7817,7 @@ static MACHINE_DRIVER_START( madshark )
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
                             Mobile Suit Gundam
@@ -7873,9 +7825,7 @@ MACHINE_DRIVER_END
 
 /* msgundam lev 2 == lev 6 ! */
 
-static MACHINE_DRIVER_START( msgundam )
-
-	MDRV_DRIVER_DATA( seta_state )
+static MACHINE_CONFIG_START( msgundam, seta_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
@@ -7912,7 +7862,7 @@ static MACHINE_DRIVER_START( msgundam )
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -7920,9 +7870,7 @@ MACHINE_DRIVER_END
                             Oishii Puzzle
 ***************************************************************************/
 
-static MACHINE_DRIVER_START( oisipuzl )
-
-	MDRV_DRIVER_DATA( seta_state )
+static MACHINE_CONFIG_START( oisipuzl, seta_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
@@ -7950,7 +7898,7 @@ static MACHINE_DRIVER_START( oisipuzl )
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
                             Triple Fun
@@ -7958,9 +7906,7 @@ MACHINE_DRIVER_END
 
 /* same as oisipuzl but with different interrupts and sound */
 
-static MACHINE_DRIVER_START( triplfun )
-
-	MDRV_DRIVER_DATA( seta_state )
+static MACHINE_CONFIG_START( triplfun, seta_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
@@ -7987,15 +7933,13 @@ static MACHINE_DRIVER_START( triplfun )
 	MDRV_OKIM6295_ADD("oki", 792000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
                             Pro Mahjong Kiwame
 ***************************************************************************/
 
-static MACHINE_DRIVER_START( kiwame )
-
-	MDRV_DRIVER_DATA( seta_state )
+static MACHINE_CONFIG_START( kiwame, seta_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
@@ -8024,7 +7968,7 @@ static MACHINE_DRIVER_START( kiwame )
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -8034,9 +7978,7 @@ MACHINE_DRIVER_END
 
 /* pretty much like wrofaero, but ints are 1&2, not 2&4 */
 
-static MACHINE_DRIVER_START( rezon )
-
-	MDRV_DRIVER_DATA( seta_state )
+static MACHINE_CONFIG_START( rezon, seta_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
@@ -8064,7 +8006,7 @@ static MACHINE_DRIVER_START( rezon )
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -8074,9 +8016,7 @@ MACHINE_DRIVER_END
 
 /*  thunderl lev 2 = lev 3 - other levels lead to an error */
 
-static MACHINE_DRIVER_START( thunderl )
-
-	MDRV_DRIVER_DATA( seta_state )
+static MACHINE_CONFIG_START( thunderl, seta_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000/2)	/* 8 MHz */
@@ -8104,12 +8044,10 @@ static MACHINE_DRIVER_START( thunderl )
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( wiggie )
-
-	MDRV_DRIVER_DATA( seta_state )
+static MACHINE_CONFIG_START( wiggie, seta_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000/2)	/* 8 MHz */
@@ -8138,17 +8076,14 @@ static MACHINE_DRIVER_START( wiggie )
 
 	MDRV_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( superbar )
-	MDRV_IMPORT_FROM( wiggie )
+static MACHINE_CONFIG_DERIVED( superbar, wiggie )
 
 	MDRV_GFXDECODE(superbar)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( wits )
-
-	MDRV_DRIVER_DATA( seta_state )
+static MACHINE_CONFIG_START( wits, seta_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000/2)	/* 8 MHz */
@@ -8176,16 +8111,14 @@ static MACHINE_DRIVER_START( wits )
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
                     Ultraman Club / SD Gundam Neo Battling
 ***************************************************************************/
 
-static MACHINE_DRIVER_START( umanclub )
-
-	MDRV_DRIVER_DATA( seta_state )
+static MACHINE_CONFIG_START( umanclub, seta_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
@@ -8213,16 +8146,14 @@ static MACHINE_DRIVER_START( umanclub )
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
                             Ultra Toukond Densetsu
 ***************************************************************************/
 
-static MACHINE_DRIVER_START( utoukond )
-
-	MDRV_DRIVER_DATA( seta_state )
+static MACHINE_CONFIG_START( utoukond, seta_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
@@ -8259,16 +8190,14 @@ static MACHINE_DRIVER_START( utoukond )
 	MDRV_SOUND_CONFIG(utoukond_ym3438_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.30)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.30)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
                                 War of Aero
 ***************************************************************************/
 
-static MACHINE_DRIVER_START( wrofaero )
-
-	MDRV_DRIVER_DATA( seta_state )
+static MACHINE_CONFIG_START( wrofaero, seta_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
@@ -8304,7 +8233,7 @@ static MACHINE_DRIVER_START( wrofaero )
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 
@@ -8318,9 +8247,7 @@ MACHINE_DRIVER_END
    at int 1 is necessary: it plays the background music.
 */
 
-static MACHINE_DRIVER_START( zingzip )
-
-	MDRV_DRIVER_DATA( seta_state )
+static MACHINE_CONFIG_START( zingzip, seta_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
@@ -8349,15 +8276,13 @@ static MACHINE_DRIVER_START( zingzip )
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
                                 Pairs Love
 ***************************************************************************/
 
-static MACHINE_DRIVER_START( pairlove )
-
-	MDRV_DRIVER_DATA( seta_state )
+static MACHINE_CONFIG_START( pairlove, seta_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000/2)	/* 8 MHz */
@@ -8385,7 +8310,7 @@ static MACHINE_DRIVER_START( pairlove )
 	MDRV_SOUND_CONFIG(seta_sound_intf)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
@@ -8401,9 +8326,7 @@ static INTERRUPT_GEN( crazyfgt_interrupt )
 	}
 }
 
-static MACHINE_DRIVER_START( crazyfgt )
-
-	MDRV_DRIVER_DATA( seta_state )
+static MACHINE_CONFIG_START( crazyfgt, seta_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz */
@@ -8433,7 +8356,7 @@ static MACHINE_DRIVER_START( crazyfgt )
 
 	MDRV_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)	// clock?
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
                              International Toote
@@ -8493,9 +8416,7 @@ static const pia6821_interface inttoote_pia1_intf =
 	DEVCB_NULL		/* IRQB */
 };
 
-static MACHINE_DRIVER_START( inttoote )
-
-	MDRV_DRIVER_DATA( seta_state )
+static MACHINE_CONFIG_START( inttoote, seta_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
@@ -8530,13 +8451,12 @@ static MACHINE_DRIVER_START( inttoote )
 
 	/* devices */
 	MDRV_MSM6242_ADD("rtc")
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( jockeyc )
-	MDRV_IMPORT_FROM( inttoote )
+static MACHINE_CONFIG_DERIVED( jockeyc, inttoote )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(jockeyc_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

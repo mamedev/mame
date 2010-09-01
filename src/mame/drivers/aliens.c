@@ -261,10 +261,7 @@ static MACHINE_RESET( aliens )
 	state->palette_selected = 0;
 }
 
-static MACHINE_DRIVER_START( aliens )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(aliens_state)
+static MACHINE_CONFIG_START( aliens, aliens_state )
 
 	/* basic machine hardware */
 
@@ -310,7 +307,7 @@ static MACHINE_DRIVER_START( aliens )
 	MDRV_SOUND_CONFIG(k007232_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.20)
 	MDRV_SOUND_ROUTE(1, "mono", 0.20)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

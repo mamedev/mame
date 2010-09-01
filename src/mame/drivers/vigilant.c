@@ -523,7 +523,7 @@ static const ym2203_interface ym2203_config =
 };
 
 
-static MACHINE_DRIVER_START( vigilant )
+static MACHINE_CONFIG_START( vigilant, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3579645)		   /* 3.579645 MHz */
@@ -565,9 +565,9 @@ static MACHINE_DRIVER_START( vigilant )
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( buccanrs )
+static MACHINE_CONFIG_START( buccanrs, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 5688800)		   /* 5.688800 MHz */
@@ -625,9 +625,9 @@ static MACHINE_DRIVER_START( buccanrs )
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.35)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.35)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( kikcubic )
+static MACHINE_CONFIG_START( kikcubic, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3579645)		   /* 3.579645 MHz */
@@ -669,7 +669,7 @@ static MACHINE_DRIVER_START( kikcubic )
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

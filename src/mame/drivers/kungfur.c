@@ -333,7 +333,7 @@ static INTERRUPT_GEN( kungfur_irq )
 	cputag_set_input_line(device->machine, "maincpu", M6809_IRQ_LINE, HOLD_LINE);
 }
 
-static MACHINE_DRIVER_START( kungfur )
+static MACHINE_CONFIG_START( kungfur, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M6809,8000000/2)
@@ -366,7 +366,7 @@ static MACHINE_DRIVER_START( kungfur )
 	MDRV_SOUND_ADD("adpcm2", MSM5205, 400000)
 	MDRV_SOUND_CONFIG(msm5205_config_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************************************************
 

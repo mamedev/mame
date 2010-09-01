@@ -402,7 +402,7 @@ static GFXDECODE_START( sprint4 )
 GFXDECODE_END
 
 
-static MACHINE_DRIVER_START( sprint4 )
+static MACHINE_CONFIG_START( sprint4, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, PIXEL_CLOCK / 8)
@@ -431,7 +431,7 @@ static MACHINE_DRIVER_START( sprint4 )
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( sprint4 )

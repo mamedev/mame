@@ -510,7 +510,7 @@ static GFXDECODE_START( pcat_dyn )
 	// there's a 8x16 charset just after the 8x8 one
 GFXDECODE_END
 
-static MACHINE_DRIVER_START( pcat_dyn )
+static MACHINE_CONFIG_START( pcat_dyn, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I486, 40000000)	/* Am486 DX-40 */
 	MDRV_CPU_PROGRAM_MAP(pcat_map)
@@ -528,7 +528,7 @@ static MACHINE_DRIVER_START( pcat_dyn )
 	MDRV_MACHINE_START(pcat_dyn)
 	MDRV_NVRAM_HANDLER( mc146818 )
 
-//  MDRV_IMPORT_FROM( at_kbdc8042 )
+//  MDRV_FRAGMENT_ADD( at_kbdc8042 )
 	MDRV_PIC8259_ADD( "pic8259_1", pic8259_1_config )
 	MDRV_PIC8259_ADD( "pic8259_2", pic8259_2_config )
 	MDRV_I8237_ADD( "dma8237_1", XTAL_14_31818MHz/3, dma8237_1_config )
@@ -541,7 +541,7 @@ static MACHINE_DRIVER_START( pcat_dyn )
 
 	MDRV_VIDEO_START(pcat_dyn)
 	MDRV_VIDEO_UPDATE(pcat_dyn)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /***************************************
 *

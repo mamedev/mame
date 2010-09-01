@@ -194,10 +194,7 @@ static MACHINE_RESET( sbasketb )
 	state->last_irq = 0;
 }
 
-static MACHINE_DRIVER_START( sbasketb )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(trackfld_state)
+static MACHINE_CONFIG_START( sbasketb, trackfld_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 1400000)        /* 1.400 MHz ??? */
@@ -236,7 +233,7 @@ static MACHINE_DRIVER_START( sbasketb )
 
 	MDRV_SOUND_ADD("vlm", VLM5030, XTAL_3_579545MHz) /* Schematics say 3.58MHz, but board uses 3.579545MHz xtal */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

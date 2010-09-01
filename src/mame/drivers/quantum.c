@@ -225,7 +225,7 @@ static const pokey_interface pokey_interface_2 =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( quantum )
+static MACHINE_CONFIG_START( quantum, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, MASTER_CLOCK / 2)
@@ -253,7 +253,7 @@ static MACHINE_DRIVER_START( quantum )
 	MDRV_SOUND_ADD("pokey2", POKEY, 600000)
 	MDRV_SOUND_CONFIG(pokey_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

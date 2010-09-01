@@ -633,10 +633,7 @@ static MACHINE_RESET( pipedrm )
 		state->crtc_data[i] = 0;
 }
 
-static MACHINE_DRIVER_START( pipedrm )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(fromance_state)
+static MACHINE_CONFIG_START( pipedrm, fromance_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,12000000/2)
@@ -673,13 +670,10 @@ static MACHINE_DRIVER_START( pipedrm )
 	MDRV_SOUND_ROUTE(0, "mono", 0.50)
 	MDRV_SOUND_ROUTE(1, "mono", 1.0)
 	MDRV_SOUND_ROUTE(2, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( hatris )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(fromance_state)
+static MACHINE_CONFIG_START( hatris, fromance_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,12000000/2)
@@ -716,7 +710,7 @@ static MACHINE_DRIVER_START( hatris )
 	MDRV_SOUND_ROUTE(0, "mono", 0.50)
 	MDRV_SOUND_ROUTE(1, "mono", 1.0)
 	MDRV_SOUND_ROUTE(2, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

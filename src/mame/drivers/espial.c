@@ -324,10 +324,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_DRIVER_START( espial )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(espial_state)
+static MACHINE_CONFIG_START( espial, espial_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3072000)	/* 3.072 MHz */
@@ -361,12 +358,11 @@ static MACHINE_DRIVER_START( espial )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("aysnd", AY8910, 1500000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( netwars )
+static MACHINE_CONFIG_DERIVED( netwars, espial )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(espial)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(netwars_map)
@@ -376,7 +372,7 @@ static MACHINE_DRIVER_START( netwars )
 	MDRV_SCREEN_SIZE(32*8, 64*8)
 
 	MDRV_VIDEO_START(netwars)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

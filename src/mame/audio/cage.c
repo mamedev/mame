@@ -647,7 +647,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-MACHINE_DRIVER_START( cage )
+MACHINE_CONFIG_FRAGMENT( cage )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("cage", TMS32031, 33868800)
@@ -680,12 +680,11 @@ MACHINE_DRIVER_START( cage )
 	MDRV_SOUND_ADD("dac2", DMADAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 #endif
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-MACHINE_DRIVER_START( cage_seattle )
-	MDRV_IMPORT_FROM(cage)
+MACHINE_CONFIG_DERIVED( cage_seattle, cage )
 
 	MDRV_CPU_MODIFY("cage")
 	MDRV_CPU_PROGRAM_MAP(cage_map_seattle)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END

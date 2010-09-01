@@ -1937,10 +1937,7 @@ static MACHINE_START( alpha68k_II )
 
 }
 
-static MACHINE_DRIVER_START( sstingry )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(alpha68k_state)
+static MACHINE_CONFIG_START( sstingry, alpha68k_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 6000000) /* 24MHz/4? */
@@ -1988,12 +1985,9 @@ static MACHINE_DRIVER_START( sstingry )
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 //ZT
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( kyros )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(alpha68k_state)
+static MACHINE_CONFIG_START( kyros, alpha68k_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 6000000) /* 24MHz/4? */
@@ -2040,12 +2034,9 @@ static MACHINE_DRIVER_START( kyros )
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 //ZT
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( jongbou )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(alpha68k_state)
+static MACHINE_CONFIG_START( jongbou, alpha68k_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)
@@ -2079,12 +2070,9 @@ static MACHINE_DRIVER_START( jongbou )
 	MDRV_SOUND_ADD("aysnd", AY8910, 2000000)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.65)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( alpha68k_I )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(alpha68k_state)
+static MACHINE_CONFIG_START( alpha68k_I, alpha68k_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 6000000) /* 24MHz/4? */
@@ -2117,12 +2105,9 @@ static MACHINE_DRIVER_START( alpha68k_I )
 	MDRV_SOUND_ADD("ymsnd", YM3812, 4000000)
 	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( alpha68k_II )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(alpha68k_state)
+static MACHINE_CONFIG_START( alpha68k_II, alpha68k_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000) /* Correct */
@@ -2162,19 +2147,15 @@ static MACHINE_DRIVER_START( alpha68k_II )
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( btlfieldb )
-	MDRV_IMPORT_FROM(alpha68k_II)
+static MACHINE_CONFIG_DERIVED( btlfieldb, alpha68k_II )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_VBLANK_INT_HACK(alpha68k_interrupt,2)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 //AT
-static MACHINE_DRIVER_START( alpha68k_II_gm )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(alpha68k_state)
+static MACHINE_CONFIG_START( alpha68k_II_gm, alpha68k_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)
@@ -2214,13 +2195,10 @@ static MACHINE_DRIVER_START( alpha68k_II_gm )
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 //ZT
 
-static MACHINE_DRIVER_START( alpha68k_V )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(alpha68k_state)
+static MACHINE_CONFIG_START( alpha68k_V, alpha68k_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000) /* ? */
@@ -2260,12 +2238,9 @@ static MACHINE_DRIVER_START( alpha68k_V )
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( alpha68k_V_sb )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(alpha68k_state)
+static MACHINE_CONFIG_START( alpha68k_V_sb, alpha68k_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000) /* ? */
@@ -2305,12 +2280,9 @@ static MACHINE_DRIVER_START( alpha68k_V_sb )
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( tnextspc )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(alpha68k_state)
+static MACHINE_CONFIG_START( tnextspc, alpha68k_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 9000000) /* Confirmed 18 MHz/2 */
@@ -2343,7 +2315,7 @@ static MACHINE_DRIVER_START( tnextspc )
 	MDRV_SOUND_ADD("ymsnd", YM3812, 4000000)
 	MDRV_SOUND_CONFIG(ym3812_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /******************************************************************************/

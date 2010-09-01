@@ -722,7 +722,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_DRIVER_START( geebee )
+static MACHINE_CONFIG_START( geebee, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8080, MASTER_CLOCK/9) /* verified on pcb */
@@ -747,12 +747,11 @@ static MACHINE_DRIVER_START( geebee )
 
 	MDRV_SOUND_ADD("geebee", GEEBEE, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( navarone )
+static MACHINE_CONFIG_DERIVED( navarone, geebee )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(geebee)
 
 	MDRV_GFXDECODE(2k)
 	MDRV_PALETTE_LENGTH(2*2+1)
@@ -760,9 +759,9 @@ static MACHINE_DRIVER_START( navarone )
 	MDRV_PALETTE_INIT(navarone)
 	MDRV_VIDEO_START(navarone)
 	MDRV_VIDEO_UPDATE(navarone)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( bombbee )
+static MACHINE_CONFIG_START( bombbee, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8080, MASTER_CLOCK/9)		/* 18.432 MHz / 9 */
@@ -786,15 +785,14 @@ static MACHINE_DRIVER_START( bombbee )
 
 	MDRV_SOUND_ADD("warpwarp", WARPWARP, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( warpwarp )
+static MACHINE_CONFIG_DERIVED( warpwarp, bombbee )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(bombbee)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(warpwarp_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

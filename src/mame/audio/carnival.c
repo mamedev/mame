@@ -296,7 +296,7 @@ static ADDRESS_MAP_START( carnival_audio_io_map, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
-MACHINE_DRIVER_START( carnival_audio )
+MACHINE_CONFIG_FRAGMENT( carnival_audio )
 	MDRV_CPU_ADD("audiocpu", I8039, 3579545)
 	MDRV_CPU_PROGRAM_MAP(carnival_audio_map)
 	MDRV_CPU_IO_MAP(carnival_audio_io_map)
@@ -309,4 +309,4 @@ MACHINE_DRIVER_START( carnival_audio )
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(carnival_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END

@@ -380,7 +380,7 @@ static const pokey_interface pokey_interface_2 =
  *
  *************************************/
 
-static MACHINE_DRIVER_START( liberatr )
+static MACHINE_CONFIG_START( liberatr, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, MASTER_CLOCK/16) /* 1.25Mhz divided from 20Mhz master clock */
@@ -410,16 +410,15 @@ static MACHINE_DRIVER_START( liberatr )
 	MDRV_SOUND_ADD("pokey2", POKEY, MASTER_CLOCK/16) /* 1.25Mhz from Phi2 signal from 6502 */
 	MDRV_SOUND_CONFIG(pokey_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( liberat2 )
+static MACHINE_CONFIG_DERIVED( liberat2, liberatr )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(liberatr)
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(liberat2_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

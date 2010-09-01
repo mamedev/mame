@@ -564,7 +564,7 @@ static const hd63484_interface jwildb52_hd63484_intf = { 1 };
 *    Machine Drivers     *
 *************************/
 
-static MACHINE_DRIVER_START( jwildb52 )
+static MACHINE_CONFIG_START( jwildb52, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, MAIN_CLOCK/9)	/* 2 MHz */
@@ -595,7 +595,7 @@ static MACHINE_DRIVER_START( jwildb52 )
 	MDRV_VIDEO_START(jwildb52)
 	MDRV_VIDEO_UPDATE(jwildb52)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************

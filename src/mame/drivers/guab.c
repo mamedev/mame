@@ -760,7 +760,7 @@ static MACHINE_RESET( guab )
 	memset(&fdc, 0, sizeof(fdc));
 }
 
-static MACHINE_DRIVER_START( guab )
+static MACHINE_CONFIG_START( guab, driver_data_t )
 	/* TODO: Verify clock */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)
 	MDRV_CPU_PROGRAM_MAP(guab_map)
@@ -789,7 +789,7 @@ static MACHINE_DRIVER_START( guab )
 
 	/* 6840 PTM */
 	MDRV_PTM6840_ADD("6840ptm", ptm_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************************

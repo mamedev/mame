@@ -287,7 +287,7 @@ static GFXDECODE_START( ultratnk )
 GFXDECODE_END
 
 
-static MACHINE_DRIVER_START( ultratnk )
+static MACHINE_CONFIG_START( ultratnk, driver_data_t )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, PIXEL_CLOCK / 8)
@@ -316,7 +316,7 @@ static MACHINE_DRIVER_START( ultratnk )
 	MDRV_SOUND_CONFIG_DISCRETE(ultratnk)
 	MDRV_SOUND_ROUTE(0, "mono", 1.0)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 ROM_START( ultratnk )

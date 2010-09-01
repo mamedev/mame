@@ -493,10 +493,7 @@ static MACHINE_RESET( mjsister )
 }
 
 
-static MACHINE_DRIVER_START( mjsister )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(mjsister_state)
+static MACHINE_CONFIG_START( mjsister, mjsister_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MCLK/2) /* 6.000 MHz */
@@ -530,7 +527,7 @@ static MACHINE_DRIVER_START( mjsister )
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*************************************
  *

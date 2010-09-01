@@ -222,10 +222,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( m57 )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(irem_z80_state)
+static MACHINE_CONFIG_START( m57, irem_z80_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)	/* verified on pcb */
@@ -250,8 +247,8 @@ static MACHINE_DRIVER_START( m57 )
 	MDRV_VIDEO_UPDATE(m57)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(m52_sound_c_audio)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(m52_sound_c_audio)
+MACHINE_CONFIG_END
 
 
 

@@ -47,7 +47,7 @@ static const mips3_config r5000_config =
 	16384				/* data cache size */
 };
 
-static MACHINE_DRIVER_START( system246 )
+static MACHINE_CONFIG_START( system246, driver_data_t )
 	MDRV_CPU_ADD("maincpu", R5000LE, 294000000)	// actually R5900 @ 294 MHz
 	MDRV_CPU_PROGRAM_MAP(ps2_map)
 	MDRV_CPU_CONFIG(r5000_config)
@@ -63,11 +63,10 @@ static MACHINE_DRIVER_START( system246 )
 
 	MDRV_VIDEO_START(system246)
 	MDRV_VIDEO_UPDATE(system246)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( system256 )
-	MDRV_IMPORT_FROM( system246 )
-MACHINE_DRIVER_END
+static MACHINE_CONFIG_DERIVED( system256, system246 )
+MACHINE_CONFIG_END
 
 #define SYSTEM246_BIOS	\
         ROM_LOAD( "r27v1602f.7d", 0x000000, 0x200000, CRC(2b2e41a2) SHA1(f0a74bbcaf801f3fd0b7002ebd0118564aae3528) )

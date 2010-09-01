@@ -182,10 +182,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( rocnrope )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(timeplt_state)
+static MACHINE_CONFIG_START( rocnrope, timeplt_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, MASTER_CLOCK / 3 / 4)        /* Verified in schematics */
@@ -208,8 +205,8 @@ static MACHINE_DRIVER_START( rocnrope )
 	MDRV_VIDEO_UPDATE(rocnrope)
 
 	/* sound hardware */
-	MDRV_IMPORT_FROM(timeplt_sound)
-MACHINE_DRIVER_END
+	MDRV_FRAGMENT_ADD(timeplt_sound)
+MACHINE_CONFIG_END
 
 /*************************************
  *

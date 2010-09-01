@@ -1004,7 +1004,7 @@ static const c140_interface C140_interface_typeA =
 };
 
 /* cropped at sides */
-static MACHINE_DRIVER_START( namcona1 )
+static MACHINE_CONFIG_START( namcona1, driver_data_t )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 50113000/4)
 	MDRV_CPU_PROGRAM_MAP(namcona1_main_map)
@@ -1042,29 +1042,27 @@ static MACHINE_DRIVER_START( namcona1 )
 	MDRV_SOUND_CONFIG(C140_interface_typeA)
 	MDRV_SOUND_ROUTE(0, "rspeaker", 1.00)
 	MDRV_SOUND_ROUTE(1, "lspeaker", 1.00)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /* full-width */
-static MACHINE_DRIVER_START( namcona1w )
+static MACHINE_CONFIG_DERIVED( namcona1w, namcona1 )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(namcona1)
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 38*8-1-0, 4*8, 32*8-1)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( namcona2 )
+static MACHINE_CONFIG_DERIVED( namcona2, namcona1 )
 
 	/* basic machine hardware */
-	MDRV_IMPORT_FROM(namcona1)
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(namcona2_main_map)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 static void init_namcona1( running_machine *machine, int gametype )

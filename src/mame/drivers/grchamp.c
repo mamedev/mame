@@ -671,8 +671,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_DRIVER_START( grchamp )
-	MDRV_DRIVER_DATA(grchamp_state)
+static MACHINE_CONFIG_START( grchamp, grchamp_state )
 
 	/* basic machine hardware */
 	/* CPU BOARD */
@@ -725,7 +724,7 @@ static MACHINE_DRIVER_START( grchamp )
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(grchamp)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

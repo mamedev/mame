@@ -63,9 +63,9 @@ void spacefev_start_red_cannon(running_machine *machine);
 
 /*----------- defined in audio/n8080.c -----------*/
 
-MACHINE_DRIVER_EXTERN( spacefev_sound );
-MACHINE_DRIVER_EXTERN( sheriff_sound );
-MACHINE_DRIVER_EXTERN( helifire_sound );
+MACHINE_CONFIG_EXTERN( spacefev_sound );
+MACHINE_CONFIG_EXTERN( sheriff_sound );
+MACHINE_CONFIG_EXTERN( helifire_sound );
 
 MACHINE_START( spacefev_sound );
 MACHINE_START( sheriff_sound );

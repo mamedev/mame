@@ -998,10 +998,7 @@ static const tc0140syt_interface wgp_tc0140syt_intf =
 	"sub", "audiocpu"
 };
 
-static MACHINE_DRIVER_START( wgp )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(wgp_state)
+static MACHINE_CONFIG_START( wgp, wgp_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz ??? */
@@ -1049,11 +1046,10 @@ static MACHINE_DRIVER_START( wgp )
 	MDRV_SOUND_ROUTE(2, "rspeaker", 1.0)
 
 	MDRV_TC0140SYT_ADD("tc0140syt", wgp_tc0140syt_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( wgp2 )
-	MDRV_IMPORT_FROM(wgp)
+static MACHINE_CONFIG_DERIVED( wgp2, wgp )
 
 	MDRV_QUANTUM_TIME(HZ(12000))
 	/* video hardware */
@@ -1061,7 +1057,7 @@ static MACHINE_DRIVER_START( wgp2 )
 
 	MDRV_DEVICE_REMOVE("tc0100scn")
 	MDRV_TC0100SCN_ADD("tc0100scn", wgp2_tc0100scn_intf)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

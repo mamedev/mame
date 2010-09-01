@@ -325,10 +325,7 @@ static MACHINE_RESET( popper )
 	state->gfx_bank = 0;
 }
 
-static MACHINE_DRIVER_START( popper )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(popper_state)
+static MACHINE_CONFIG_START( popper, popper_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,18432000/6)
@@ -367,7 +364,7 @@ static MACHINE_DRIVER_START( popper )
 
 	MDRV_SOUND_ADD("ay2", AY8910, 18432000/12)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*************************************

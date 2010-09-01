@@ -652,9 +652,7 @@ static const ym2151_interface whizz_ym2151_interface =
 	irqhandler
 };
 
-static MACHINE_DRIVER_START( sidearms )
-
-	MDRV_DRIVER_DATA(sidearms_state)
+static MACHINE_CONFIG_START( sidearms, sidearms_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000) /* 4 MHz (?) */
@@ -696,12 +694,10 @@ static MACHINE_DRIVER_START( sidearms )
 	MDRV_SOUND_ROUTE(1, "mono", 0.15)
 	MDRV_SOUND_ROUTE(2, "mono", 0.15)
 	MDRV_SOUND_ROUTE(3, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
-static MACHINE_DRIVER_START( turtship )
-
-	MDRV_DRIVER_DATA(sidearms_state)
+static MACHINE_CONFIG_START( turtship, sidearms_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000) /* 4 MHz (?) */
@@ -743,11 +739,9 @@ static MACHINE_DRIVER_START( turtship )
 	MDRV_SOUND_ROUTE(1, "mono", 0.15)
 	MDRV_SOUND_ROUTE(2, "mono", 0.15)
 	MDRV_SOUND_ROUTE(3, "mono", 0.25)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( whizz )
-
-	MDRV_DRIVER_DATA(sidearms_state)
+static MACHINE_CONFIG_START( whizz, sidearms_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)        /* 4 MHz (?) */
@@ -785,7 +779,7 @@ static MACHINE_DRIVER_START( whizz )
 	MDRV_SOUND_CONFIG(whizz_ym2151_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 1.0)
 	MDRV_SOUND_ROUTE(1, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

@@ -293,7 +293,7 @@ static GFXDECODE_START( starshp1 )
 GFXDECODE_END
 
 
-static MACHINE_DRIVER_START( starshp1 )
+static MACHINE_CONFIG_START( starshp1, driver_data_t )
 
 	/* basic machine hardware */
 
@@ -322,7 +322,7 @@ static MACHINE_DRIVER_START( starshp1 )
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(starshp1)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************

@@ -1021,7 +1021,7 @@ static MACHINE_RESET( peplus )
 *     Machine Driver     *
 *************************/
 
-static MACHINE_DRIVER_START( peplus )
+static MACHINE_CONFIG_START( peplus, driver_data_t )
 	// basic machine hardware
 	MDRV_CPU_ADD("maincpu", I80C32, CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(peplus_map)
@@ -1052,7 +1052,7 @@ static MACHINE_DRIVER_START( peplus )
 
 	MDRV_SOUND_ADD("aysnd", AY8912, SOUND_CLOCK)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /*****************

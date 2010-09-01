@@ -368,10 +368,7 @@ static MACHINE_RESET( mayumi )
 	state->input_sel = 0;
 }
 
-static MACHINE_DRIVER_START( mayumi )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(mayumi_state)
+static MACHINE_CONFIG_START( mayumi, mayumi_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MCLK/2) /* 5.000 MHz ? */
@@ -409,7 +406,7 @@ static MACHINE_DRIVER_START( mayumi )
 
 	MDRV_NVRAM_HANDLER(generic_0fill)
 
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 /*************************************
  *

@@ -672,10 +672,7 @@ static MACHINE_RESET( firetrap )
 	state->coin_command_pending = 0;
 }
 
-static MACHINE_DRIVER_START( firetrap )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(firetrap_state)
+static MACHINE_CONFIG_START( firetrap, firetrap_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, FIRETRAP_XTAL/2)		// 6 MHz
@@ -714,12 +711,9 @@ static MACHINE_DRIVER_START( firetrap )
 	MDRV_SOUND_ADD("msm", MSM5205, FIRETRAP_XTAL/32)	// 375 kHz
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
-static MACHINE_DRIVER_START( firetrapbl )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(firetrap_state)
+static MACHINE_CONFIG_START( firetrapbl, firetrap_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, FIRETRAP_XTAL/2)		// 6 MHz
@@ -758,7 +752,7 @@ static MACHINE_DRIVER_START( firetrapbl )
 	MDRV_SOUND_ADD("msm", MSM5205, FIRETRAP_XTAL/32)	// 375 kHz
 	MDRV_SOUND_CONFIG(msm5205_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 

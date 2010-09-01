@@ -251,10 +251,7 @@ static MACHINE_RESET( jailbrek )
 	state->nmi_enable = 0;
 }
 
-static MACHINE_DRIVER_START( jailbrek )
-
-	/* driver data */
-	MDRV_DRIVER_DATA(jailbrek_state)
+static MACHINE_CONFIG_START( jailbrek, jailbrek_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, MASTER_CLOCK/12)
@@ -285,7 +282,7 @@ static MACHINE_DRIVER_START( jailbrek )
 
 	MDRV_SOUND_ADD("vlm", VLM5030, VOICE_CLOCK)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-MACHINE_DRIVER_END
+MACHINE_CONFIG_END
 
 
 /***************************************************************************
