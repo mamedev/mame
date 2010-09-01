@@ -759,15 +759,18 @@ void timer_reset(emu_timer *which, attotime duration)
 
 int timer_enable(emu_timer *which, int enable)
 {
-	int old;
+	int old = which->enabled;
 
-	/* set the enable flag */
-	old = which->enabled;
-	which->enabled = enable;
+	/* reschedule only if the state has changed */
+	if (old != enable)
+	{
+		/* set the enable flag */
+		which->enabled = enable;
 
-	/* remove the timer and insert back into the list */
-	timer_list_remove(which);
-	timer_list_insert(which);
+		/* remove the timer and insert back into the list */
+		timer_list_remove(which);
+		timer_list_insert(which);
+	}
 
 	return old;
 }
