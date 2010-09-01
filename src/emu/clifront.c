@@ -240,6 +240,7 @@ static int execute_simple_commands(core_options *options, const char *exename)
 	/* validate? */
 	if (options_get_bool(options, CLIOPTION_VALIDATE))
 	{
+		set_mame_options(options);
 		return mame_validitychecks(NULL);
 	}
 
