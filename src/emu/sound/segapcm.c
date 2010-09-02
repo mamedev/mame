@@ -21,7 +21,7 @@ struct _segapcm_state
 INLINE segapcm_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SOUND_SEGAPCM);
+	assert(device->type() == SEGAPCM);
 	return (segapcm_state *)downcast<legacy_device_base *>(device)->token();
 }
 

@@ -19,7 +19,7 @@ struct _ym2203_state
 INLINE ym2203_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SOUND_YM2203);
+	assert(device->type() == YM2203);
 	return (ym2203_state *)downcast<legacy_device_base *>(device)->token();
 }
 
@@ -131,7 +131,7 @@ static DEVICE_START( ym2203 )
 
 	info->intf = intf;
 	info->device = device;
-	info->psg = ay8910_start_ym(NULL, SOUND_YM2203, device, device->clock(), &intf->ay8910_intf);
+	info->psg = ay8910_start_ym(NULL, YM2203, device, device->clock(), &intf->ay8910_intf);
 	assert_always(info->psg != NULL, "Error creating YM2203/AY8910 chip");
 
 	/* Timer Handler set */

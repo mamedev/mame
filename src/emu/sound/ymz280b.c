@@ -133,7 +133,7 @@ static const timer_fired_func update_irq_state_cb[] =
 INLINE ymz280b_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SOUND_YMZ280B);
+	assert(device->type() == YMZ280B);
 	return (ymz280b_state *)downcast<legacy_device_base *>(device)->token();
 }
 

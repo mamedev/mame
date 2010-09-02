@@ -276,7 +276,7 @@ static int env_volume_table[256];
 INLINE YMF271Chip *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SOUND_YMF271);
+	assert(device->type() == YMF271);
 	return (YMF271Chip *)downcast<legacy_device_base *>(device)->token();
 }
 

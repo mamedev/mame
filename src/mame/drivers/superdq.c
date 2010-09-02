@@ -351,7 +351,7 @@ static MACHINE_CONFIG_START( superdq, superdq_state )
 	MDRV_SOUND_ADD("snsnd", SN76496, MASTER_CLOCK/8)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.8)
 
-	MDRV_SOUND_ADD("ldsound", LASERDISC, 0)
+	MDRV_SOUND_ADD("ldsound", LASERDISC_SOUND, 0)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

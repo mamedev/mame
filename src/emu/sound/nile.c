@@ -65,7 +65,7 @@ struct _nile_state
 INLINE nile_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SOUND_NILE);
+	assert(device->type() == NILE);
 	return (nile_state *)downcast<legacy_device_base *>(device)->token();
 }
 

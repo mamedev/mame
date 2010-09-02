@@ -89,14 +89,13 @@ struct _mos6560_interface
 ***************************************************************************/
 
 DECLARE_LEGACY_SOUND_DEVICE(MOS656X, mos6560);
-#define MOS656X SOUND_MOS656X
 
 /***************************************************************************
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
 #define MDRV_MOS656X_ADD(_tag, _interface) \
-	MDRV_DEVICE_ADD(_tag, SOUND_MOS656X, 0) \
+	MDRV_SOUND_ADD(_tag, MOS656X, 0) \
 	MDRV_DEVICE_CONFIG(_interface)
 
 

@@ -354,7 +354,7 @@ static MACHINE_CONFIG_START( istellar, driver_device )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ldsound", LASERDISC, 0)
+	MDRV_SOUND_ADD("ldsound", LASERDISC_SOUND, 0)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

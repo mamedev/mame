@@ -26,7 +26,7 @@ struct _vr0_state
 INLINE vr0_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SOUND_VRENDER0);
+	assert(device->type() == VRENDER0);
 	return (vr0_state *)downcast<legacy_device_base *>(device)->token();
 }
 

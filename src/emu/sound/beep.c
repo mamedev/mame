@@ -32,7 +32,7 @@ struct _beep_state
 INLINE beep_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SOUND_BEEP);
+	assert(device->type() == BEEP);
 	return (beep_state *)downcast<legacy_device_base *>(device)->token();
 }
 

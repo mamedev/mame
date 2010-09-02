@@ -15,7 +15,7 @@ struct _filter_rc_state
 INLINE filter_rc_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SOUND_FILTER_RC);
+	assert(device->type() == FILTER_RC);
 	return (filter_rc_state *)downcast<legacy_device_base *>(device)->token();
 }
 

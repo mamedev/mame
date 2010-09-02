@@ -50,7 +50,7 @@ static const int vol_table[4] = { 26, 84, 200, 258 };
 INLINE namco_63701x *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SOUND_NAMCO_63701X);
+	assert(device->type() == NAMCO_63701X);
 	return (namco_63701x *)downcast<legacy_device_base *>(device)->token();
 }
 

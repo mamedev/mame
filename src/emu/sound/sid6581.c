@@ -15,7 +15,7 @@
 static SID6581 *get_sid(running_device *device)
 {
 	assert(device != NULL);
-	assert((device->type() == SOUND_SID6581) || (device->type() == SOUND_SID8580));
+	assert((device->type() == SID6581) || (device->type() == SID8580));
 	return (SID6581 *) downcast<legacy_device_base *>(device)->token();
 }
 

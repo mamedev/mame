@@ -24,7 +24,7 @@ struct _tms_state {
 INLINE tms_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SOUND_TMS3615);
+	assert(device->type() == TMS3615);
 	return (tms_state *)downcast<legacy_device_base *>(device)->token();
 }
 

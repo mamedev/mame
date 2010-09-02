@@ -209,7 +209,7 @@ static MACHINE_RESET( dlair )
 static INTERRUPT_GEN( vblank_callback )
 {
 	/* also update the speaker on the European version */
-	beep_sound_device *beep = device->machine->device<beep_sound_device>("beep");
+	beep_device *beep = device->machine->device<beep_device>("beep");
 	if (beep != NULL)
 	{
 		z80ctc_device *ctc = device->machine->device<z80ctc_device>("ctc");
@@ -690,7 +690,7 @@ static MACHINE_CONFIG_START( dlair_base, driver_device )
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.33)
 
-	MDRV_SOUND_ADD("ldsound", LASERDISC, 0)
+	MDRV_SOUND_ADD("ldsound", LASERDISC_SOUND, 0)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
@@ -741,7 +741,7 @@ static MACHINE_CONFIG_START( dleuro, driver_device )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.33)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.33)
 
-	MDRV_SOUND_ADD("ldsound", LASERDISC, 0)
+	MDRV_SOUND_ADD("ldsound", LASERDISC_SOUND, 0)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

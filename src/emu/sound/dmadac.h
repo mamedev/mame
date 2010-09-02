@@ -12,7 +12,7 @@
 
 #include "devlegcy.h"
 
-DECLARE_LEGACY_SOUND_DEVICE(DMADAC, dmadac);
+DECLARE_LEGACY_SOUND_DEVICE(DMADAC, dmadac_sound);
 
 void dmadac_transfer(dmadac_sound_device **devlist, UINT8 num_channels, offs_t channel_spacing, offs_t frame_spacing, offs_t total_frames, INT16 *data);
 void dmadac_enable(dmadac_sound_device **devlist, UINT8 num_channels, UINT8 enable);

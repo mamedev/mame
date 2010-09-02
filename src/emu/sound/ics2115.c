@@ -68,7 +68,7 @@ struct _ics2115_state
 INLINE ics2115_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SOUND_ICS2115);
+	assert(device->type() == ICS2115);
 	return (ics2115_state *)downcast<legacy_device_base *>(device)->token();
 }
 

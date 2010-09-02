@@ -268,7 +268,7 @@ typedef struct
 INLINE S14001AChip *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SOUND_S14001A);
+	assert(device->type() == S14001A);
 	return (S14001AChip *)downcast<legacy_device_base *>(device)->token();
 }
 

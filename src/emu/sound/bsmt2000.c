@@ -99,7 +99,7 @@ static void set_regmap(bsmt2000_chip *chip, UINT8 posbase, UINT8 ratebase, UINT8
 INLINE bsmt2000_chip *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SOUND_BSMT2000);
+	assert(device->type() == BSMT2000);
 	return (bsmt2000_chip *)downcast<legacy_device_base *>(device)->token();
 }
 

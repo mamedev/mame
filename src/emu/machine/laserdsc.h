@@ -216,7 +216,7 @@ void laserdisc_set_config(running_device *device, const laserdisc_config *config
 DECLARE_LEGACY_DEVICE(LASERDISC, laserdisc);
 
 /* audio get info callback */
-DECLARE_LEGACY_SOUND_DEVICE(LASERDISC, laserdisc_sound);
+DECLARE_LEGACY_SOUND_DEVICE(LASERDISC_SOUND, laserdisc_sound);
 
 /* type setter */
 int laserdisc_get_type(running_device *device);

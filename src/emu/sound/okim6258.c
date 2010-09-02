@@ -52,7 +52,7 @@ static int tables_computed = 0;
 INLINE okim6258_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SOUND_OKIM6258);
+	assert(device->type() == OKIM6258);
 	return (okim6258_state *)downcast<legacy_device_base *>(device)->token();
 }
 

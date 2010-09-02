@@ -572,7 +572,7 @@ static void gp9001_scroll_reg_data_w(gp9001vdp_device *vdp, offs_t offset, UINT1
 						/* HACK! When tilted, sound CPU needs to be reset. */
 						running_device *ym = vdp->machine->device("ymsnd");
 
-						if (ym && ym->type() == SOUND_YM3812)
+						if (ym && ym->type() == YM3812)
 						{
 							cputag_set_input_line(vdp->machine, "audiocpu", INPUT_LINE_RESET, PULSE_LINE);
 							devtag_reset(vdp->machine, "ymsnd");

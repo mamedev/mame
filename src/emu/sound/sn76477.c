@@ -264,7 +264,7 @@ struct _sn76477_state
 INLINE sn76477_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SOUND_SN76477);
+	assert(device->type() == SN76477);
 	return (sn76477_state *)downcast<legacy_device_base *>(device)->token();
 }
 

@@ -213,7 +213,7 @@ void micro3d_noise_sh_w(running_machine *machine, UINT8 data)
 INLINE noise_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SOUND_MICRO3D);
+	assert(device->type() == MICRO3D);
 
 	return (noise_state *)downcast<legacy_device_base *>(device)->token();
 }

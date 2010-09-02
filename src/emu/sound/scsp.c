@@ -175,8 +175,8 @@ struct _SLOT
 
 #define USEDSP
 
-typedef struct _SCSP SCSP;
-struct _SCSP
+typedef struct _scsp_state scsp_state;
+struct _scsp_state
 {
 	union
 	{
@@ -227,7 +227,7 @@ struct _SCSP
 	running_device *device;
 };
 
-static void dma_scsp(address_space *space, struct _SCSP *SCSP);		/*SCSP DMA transfer function*/
+static void dma_scsp(address_space *space, scsp_state *scsp);		/*state DMA transfer function*/
 #define	scsp_dgate		scsp_regs[0x16/2] & 0x4000
 #define	scsp_ddir		scsp_regs[0x16/2] & 0x2000
 #define scsp_dexe		scsp_regs[0x16/2] & 0x1000
@@ -244,34 +244,34 @@ static int length;
 static signed short *RBUFDST;	//this points to where the sample will be stored in the RingBuf
 
 
-INLINE SCSP *get_safe_token(running_device *device)
+INLINE scsp_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SOUND_SCSP);
-	return (SCSP *)downcast<legacy_device_base *>(device)->token();
+	assert(device->type() == SCSP);
+	return (scsp_state *)downcast<legacy_device_base *>(device)->token();
 }
 
-static unsigned char DecodeSCI(struct _SCSP *SCSP,unsigned char irq)
+static unsigned char DecodeSCI(scsp_state *scsp,unsigned char irq)
 {
 	unsigned char SCI=0;
 	unsigned char v;
-	v=(SCILV0((SCSP))&(1<<irq))?1:0;
+	v=(SCILV0((scsp))&(1<<irq))?1:0;
 	SCI|=v;
-	v=(SCILV1((SCSP))&(1<<irq))?1:0;
+	v=(SCILV1((scsp))&(1<<irq))?1:0;
 	SCI|=v<<1;
-	v=(SCILV2((SCSP))&(1<<irq))?1:0;
+	v=(SCILV2((scsp))&(1<<irq))?1:0;
 	SCI|=v<<2;
 	return SCI;
 }
 
-static void CheckPendingIRQ(struct _SCSP *SCSP)
+static void CheckPendingIRQ(scsp_state *scsp)
 {
-	UINT32 pend=SCSP->udata.data[0x20/2];
-	UINT32 en=SCSP->udata.data[0x1e/2];
+	UINT32 pend=scsp->udata.data[0x20/2];
+	UINT32 en=scsp->udata.data[0x1e/2];
 
-	if(SCSP->MidiW!=SCSP->MidiR)
+	if(scsp->MidiW!=scsp->MidiR)
 	{
-		SCSP->udata.data[0x20/2] |= 8;
+		scsp->udata.data[0x20/2] |= 8;
 		pend |= 8;
 	}
 	if(!pend)
@@ -279,113 +279,113 @@ static void CheckPendingIRQ(struct _SCSP *SCSP)
 	if(pend&0x40)
 		if(en&0x40)
 		{
-			SCSP->Int68kCB(SCSP->device, SCSP->IrqTimA);
+			scsp->Int68kCB(scsp->device, scsp->IrqTimA);
 			return;
 		}
 	if(pend&0x80)
 		if(en&0x80)
 		{
-			SCSP->Int68kCB(SCSP->device, SCSP->IrqTimBC);
+			scsp->Int68kCB(scsp->device, scsp->IrqTimBC);
 			return;
 		}
 	if(pend&0x100)
 		if(en&0x100)
 		{
-			SCSP->Int68kCB(SCSP->device, SCSP->IrqTimBC);
+			scsp->Int68kCB(scsp->device, scsp->IrqTimBC);
 			return;
 		}
 	if(pend&8)
 		if (en&8)
 		{
-			SCSP->Int68kCB(SCSP->device, SCSP->IrqMidi);
-			SCSP->udata.data[0x20/2] &= ~8;
+			scsp->Int68kCB(scsp->device, scsp->IrqMidi);
+			scsp->udata.data[0x20/2] &= ~8;
 			return;
 		}
 
-	SCSP->Int68kCB(SCSP->device, 0);
+	scsp->Int68kCB(scsp->device, 0);
 }
 
-static void ResetInterrupts(struct _SCSP *SCSP)
+static void ResetInterrupts(scsp_state *scsp)
 {
-	UINT32 reset = SCSP->udata.data[0x22/2];
+	UINT32 reset = scsp->udata.data[0x22/2];
 
 	if (reset & 0x40)
 	{
-		SCSP->Int68kCB(SCSP->device, -SCSP->IrqTimA);
+		scsp->Int68kCB(scsp->device, -scsp->IrqTimA);
 	}
 	if (reset & 0x180)
 	{
-		SCSP->Int68kCB(SCSP->device, -SCSP->IrqTimBC);
+		scsp->Int68kCB(scsp->device, -scsp->IrqTimBC);
 	}
 	if (reset & 0x8)
 	{
-		SCSP->Int68kCB(SCSP->device, -SCSP->IrqMidi);
+		scsp->Int68kCB(scsp->device, -scsp->IrqMidi);
 	}
 
-	CheckPendingIRQ(SCSP);
+	CheckPendingIRQ(scsp);
 }
 
 static TIMER_CALLBACK( timerA_cb )
 {
-	struct _SCSP *SCSP = (struct _SCSP *)ptr;
+	scsp_state *scsp = (scsp_state *)ptr;
 
-	SCSP->TimCnt[0] = 0xFFFF;
-	SCSP->udata.data[0x20/2]|=0x40;
-	SCSP->udata.data[0x18/2]&=0xff00;
-	SCSP->udata.data[0x18/2]|=SCSP->TimCnt[0]>>8;
+	scsp->TimCnt[0] = 0xFFFF;
+	scsp->udata.data[0x20/2]|=0x40;
+	scsp->udata.data[0x18/2]&=0xff00;
+	scsp->udata.data[0x18/2]|=scsp->TimCnt[0]>>8;
 
-	CheckPendingIRQ(SCSP);
+	CheckPendingIRQ(scsp);
 }
 
 static TIMER_CALLBACK( timerB_cb )
 {
-	struct _SCSP *SCSP = (struct _SCSP *)ptr;
+	scsp_state *scsp = (scsp_state *)ptr;
 
-	SCSP->TimCnt[1] = 0xFFFF;
-	SCSP->udata.data[0x20/2]|=0x80;
-	SCSP->udata.data[0x1a/2]&=0xff00;
-	SCSP->udata.data[0x1a/2]|=SCSP->TimCnt[1]>>8;
+	scsp->TimCnt[1] = 0xFFFF;
+	scsp->udata.data[0x20/2]|=0x80;
+	scsp->udata.data[0x1a/2]&=0xff00;
+	scsp->udata.data[0x1a/2]|=scsp->TimCnt[1]>>8;
 
-	CheckPendingIRQ(SCSP);
+	CheckPendingIRQ(scsp);
 }
 
 static TIMER_CALLBACK( timerC_cb )
 {
-	struct _SCSP *SCSP = (struct _SCSP *)ptr;
+	scsp_state *scsp = (scsp_state *)ptr;
 
-	SCSP->TimCnt[2] = 0xFFFF;
-	SCSP->udata.data[0x20/2]|=0x100;
-	SCSP->udata.data[0x1c/2]&=0xff00;
-	SCSP->udata.data[0x1c/2]|=SCSP->TimCnt[2]>>8;
+	scsp->TimCnt[2] = 0xFFFF;
+	scsp->udata.data[0x20/2]|=0x100;
+	scsp->udata.data[0x1c/2]&=0xff00;
+	scsp->udata.data[0x1c/2]|=scsp->TimCnt[2]>>8;
 
-	CheckPendingIRQ(SCSP);
+	CheckPendingIRQ(scsp);
 }
 
-static int Get_AR(struct _SCSP *SCSP,int base,int R)
+static int Get_AR(scsp_state *scsp,int base,int R)
 {
 	int Rate=base+(R<<1);
 	if(Rate>63)	Rate=63;
 	if(Rate<0) Rate=0;
-	return SCSP->ARTABLE[Rate];
+	return scsp->ARTABLE[Rate];
 }
 
-static int Get_DR(struct _SCSP *SCSP,int base,int R)
+static int Get_DR(scsp_state *scsp,int base,int R)
 {
 	int Rate=base+(R<<1);
 	if(Rate>63)	Rate=63;
 	if(Rate<0) Rate=0;
-	return SCSP->DRTABLE[Rate];
+	return scsp->DRTABLE[Rate];
 }
 
-static int Get_RR(struct _SCSP *SCSP,int base,int R)
+static int Get_RR(scsp_state *scsp,int base,int R)
 {
 	int Rate=base+(R<<1);
 	if(Rate>63)	Rate=63;
 	if(Rate<0) Rate=0;
-	return SCSP->DRTABLE[Rate];
+	return scsp->DRTABLE[Rate];
 }
 
-static void Compute_EG(struct _SCSP *SCSP,struct _SLOT *slot)
+static void Compute_EG(scsp_state *scsp,struct _SLOT *slot)
 {
 	int octave=(OCT(slot)^8)-8;
 	int rate;
@@ -395,10 +395,10 @@ static void Compute_EG(struct _SCSP *SCSP,struct _SLOT *slot)
 		rate=0; //rate=((FNS(slot)>>9)&1);
 
 	slot->EG.volume=0x17F<<EG_SHIFT;
-	slot->EG.AR=Get_AR(SCSP,rate,AR(slot));
-	slot->EG.D1R=Get_DR(SCSP,rate,D1R(slot));
-	slot->EG.D2R=Get_DR(SCSP,rate,D2R(slot));
-	slot->EG.RR=Get_RR(SCSP,rate,RR(slot));
+	slot->EG.AR=Get_AR(scsp,rate,AR(slot));
+	slot->EG.D1R=Get_DR(scsp,rate,D1R(slot));
+	slot->EG.D2R=Get_DR(scsp,rate,D2R(slot));
+	slot->EG.RR=Get_RR(scsp,rate,RR(slot));
 	slot->EG.DL=0x1f-DL(slot);
 	slot->EG.EGHOLD=EGHOLD(slot);
 }
@@ -480,17 +480,17 @@ static void Compute_LFO(struct _SLOT *slot)
 		LFO_ComputeStep(&(slot->ALFO),LFOF(slot),ALFOWS(slot),ALFOS(slot),1);
 }
 
-static void SCSP_StartSlot(struct _SCSP *SCSP, struct _SLOT *slot)
+static void SCSP_StartSlot(scsp_state *scsp, struct _SLOT *slot)
 {
 	UINT32 start_offset;
 
 	slot->active=1;
 	start_offset = PCM8B(slot) ? SA(slot) : SA(slot) & 0x7FFFE;
-	slot->base=SCSP->SCSPRAM + start_offset;
+	slot->base=scsp->SCSPRAM + start_offset;
 	slot->cur_addr=0;
 	slot->nxt_addr=1<<SHIFT;
 	slot->step=SCSP_Step(slot);
-	Compute_EG(SCSP,slot);
+	Compute_EG(scsp,slot);
 	slot->EG.state=ATTACK;
 	slot->EG.volume=0x17F<<EG_SHIFT;
 	slot->Prev=0;
@@ -516,41 +516,41 @@ static void SCSP_StopSlot(struct _SLOT *slot,int keyoff)
 
 #define log_base_2(n) (log((double)(n))/log(2.0))
 
-static void SCSP_Init(running_device *device, struct _SCSP *SCSP, const scsp_interface *intf)
+static void SCSP_Init(running_device *device, scsp_state *scsp, const scsp_interface *intf)
 {
 	int i;
 
-	memset(SCSP,0,sizeof(*SCSP));
+	memset(scsp,0,sizeof(*scsp));
 
-	SCSPDSP_Init(&SCSP->DSP);
+	SCSPDSP_Init(&scsp->DSP);
 
-	SCSP->device = device;
-	SCSP->IrqTimA = SCSP->IrqTimBC = SCSP->IrqMidi = 0;
-	SCSP->MidiR=SCSP->MidiW=0;
-	SCSP->MidiOutR=SCSP->MidiOutW=0;
+	scsp->device = device;
+	scsp->IrqTimA = scsp->IrqTimBC = scsp->IrqMidi = 0;
+	scsp->MidiR=scsp->MidiW=0;
+	scsp->MidiOutR=scsp->MidiOutW=0;
 
 	// get SCSP RAM
 	if (strcmp(device->tag(), "scsp") == 0 || strcmp(device->tag(), "scsp1") == 0)
 	{
-		SCSP->Master=1;
+		scsp->Master=1;
 	}
 	else
 	{
-		SCSP->Master=0;
+		scsp->Master=0;
 	}
 
-	SCSP->SCSPRAM = *device->region();
-	if (SCSP->SCSPRAM)
+	scsp->SCSPRAM = *device->region();
+	if (scsp->SCSPRAM)
 	{
-		SCSP->SCSPRAM_LENGTH = device->region()->bytes();
-		SCSP->DSP.SCSPRAM = (UINT16 *)SCSP->SCSPRAM;
-		SCSP->DSP.SCSPRAM_LENGTH = SCSP->SCSPRAM_LENGTH/2;
-		SCSP->SCSPRAM += intf->roffset;
+		scsp->SCSPRAM_LENGTH = device->region()->bytes();
+		scsp->DSP.SCSPRAM = (UINT16 *)scsp->SCSPRAM;
+		scsp->DSP.SCSPRAM_LENGTH = scsp->SCSPRAM_LENGTH/2;
+		scsp->SCSPRAM += intf->roffset;
 	}
 
-	SCSP->timerA = timer_alloc(device->machine, timerA_cb, SCSP);
-	SCSP->timerB = timer_alloc(device->machine, timerB_cb, SCSP);
-	SCSP->timerC = timer_alloc(device->machine, timerC_cb, SCSP);
+	scsp->timerA = timer_alloc(device->machine, timerA_cb, scsp);
+	scsp->timerB = timer_alloc(device->machine, timerB_cb, scsp);
+	scsp->timerC = timer_alloc(device->machine, timerC_cb, scsp);
 
 	for(i=0;i<0x400;++i)
 	{
@@ -606,12 +606,12 @@ static void SCSP_Init(running_device *device, struct _SCSP *SCSP, const scsp_int
 		else
 			fSDL=0.0;
 
-		SCSP->LPANTABLE[i]=FIX((4.0*LPAN*TL*fSDL));
-		SCSP->RPANTABLE[i]=FIX((4.0*RPAN*TL*fSDL));
+		scsp->LPANTABLE[i]=FIX((4.0*LPAN*TL*fSDL));
+		scsp->RPANTABLE[i]=FIX((4.0*RPAN*TL*fSDL));
 	}
 
-	SCSP->ARTABLE[0]=SCSP->DRTABLE[0]=0;	//Infinite time
-	SCSP->ARTABLE[1]=SCSP->DRTABLE[1]=0;	//Infinite time
+	scsp->ARTABLE[0]=scsp->DRTABLE[0]=0;	//Infinite time
+	scsp->ARTABLE[1]=scsp->DRTABLE[1]=0;	//Infinite time
 	for(i=2;i<64;++i)
 	{
 		double t,step,scale;
@@ -620,41 +620,40 @@ static void SCSP_Init(running_device *device, struct _SCSP *SCSP, const scsp_int
 		{
 			step=(1023*1000.0)/((float) 44100.0f*t);
 			scale=(double) (1<<EG_SHIFT);
-			SCSP->ARTABLE[i]=(int) (step*scale);
+			scsp->ARTABLE[i]=(int) (step*scale);
 		}
 		else
-			SCSP->ARTABLE[i]=1024<<EG_SHIFT;
+			scsp->ARTABLE[i]=1024<<EG_SHIFT;
 
 		t=DRTimes[i];	//In ms
 		step=(1023*1000.0)/((float) 44100.0f*t);
 		scale=(double) (1<<EG_SHIFT);
-		SCSP->DRTABLE[i]=(int) (step*scale);
+		scsp->DRTABLE[i]=(int) (step*scale);
 	}
 
 	// make sure all the slots are off
 	for(i=0;i<32;++i)
 	{
-		SCSP->Slots[i].slot=i;
-		SCSP->Slots[i].active=0;
-		SCSP->Slots[i].base=NULL;
-		SCSP->Slots[i].EG.state=RELEASE;
+		scsp->Slots[i].slot=i;
+		scsp->Slots[i].active=0;
+		scsp->Slots[i].base=NULL;
+		scsp->Slots[i].EG.state=RELEASE;
 	}
 
 	LFO_Init(device->machine);
-	SCSP->buffertmpl=auto_alloc_array_clear(device->machine, signed int, 44100);
-	SCSP->buffertmpr=auto_alloc_array_clear(device->machine, signed int, 44100);
+	scsp->buffertmpl=auto_alloc_array_clear(device->machine, signed int, 44100);
+	scsp->buffertmpr=auto_alloc_array_clear(device->machine, signed int, 44100);
 
 	// no "pend"
-	SCSP[0].udata.data[0x20/2] = 0;
-	//SCSP[1].udata.data[0x20/2] = 0;
-	SCSP->TimCnt[0] = 0xffff;
-	SCSP->TimCnt[1] = 0xffff;
-	SCSP->TimCnt[2] = 0xffff;
+	scsp->udata.data[0x20/2] = 0;
+	scsp->TimCnt[0] = 0xffff;
+	scsp->TimCnt[1] = 0xffff;
+	scsp->TimCnt[2] = 0xffff;
 }
 
-static void SCSP_UpdateSlotReg(struct _SCSP *SCSP,int s,int r)
+static void SCSP_UpdateSlotReg(scsp_state *scsp,int s,int r)
 {
-	struct _SLOT *slot=SCSP->Slots+s;
+	struct _SLOT *slot=scsp->Slots+s;
 	int sl;
 	switch(r&0x3f)
 	{
@@ -664,11 +663,11 @@ static void SCSP_UpdateSlotReg(struct _SCSP *SCSP,int s,int r)
 			{
 				for(sl=0;sl<32;++sl)
 				{
-					struct _SLOT *s2=SCSP->Slots+sl;
+					struct _SLOT *s2=scsp->Slots+sl;
 					{
 						if(KEYONB(s2) && s2->EG.state==RELEASE/*&& !s2->active*/)
 						{
-							SCSP_StartSlot(SCSP, s2);
+							SCSP_StartSlot(scsp, s2);
 						}
 						if(!KEYONB(s2) /*&& s2->active*/)
 						{
@@ -685,7 +684,7 @@ static void SCSP_UpdateSlotReg(struct _SCSP *SCSP,int s,int r)
 			break;
 		case 0xA:
 		case 0xB:
-			slot->EG.RR=Get_RR(SCSP,0,RR(slot));
+			slot->EG.RR=Get_RR(scsp,0,RR(slot));
 			slot->EG.DL=0x1f-DL(slot);
 			break;
 		case 0x12:
@@ -695,30 +694,30 @@ static void SCSP_UpdateSlotReg(struct _SCSP *SCSP,int s,int r)
 	}
 }
 
-static void SCSP_UpdateReg(struct _SCSP *SCSP, int reg)
+static void SCSP_UpdateReg(scsp_state *scsp, int reg)
 {
 	/* temporary hack until this is converted to a device */
-	address_space *space = device_get_space(SCSP->device->machine->firstcpu, AS_PROGRAM);
+	address_space *space = device_get_space(scsp->device->machine->firstcpu, AS_PROGRAM);
 	switch(reg&0x3f)
 	{
 		case 0x2:
 		case 0x3:
 			{
-				unsigned int v=RBL(SCSP);
-				SCSP->DSP.RBP=RBP(SCSP);
+				unsigned int v=RBL(scsp);
+				scsp->DSP.RBP=RBP(scsp);
 				if(v==0)
-					SCSP->DSP.RBL=8*1024;
+					scsp->DSP.RBL=8*1024;
 				else if(v==1)
-					SCSP->DSP.RBL=16*1024;
+					scsp->DSP.RBL=16*1024;
 				if(v==2)
-					SCSP->DSP.RBL=32*1024;
+					scsp->DSP.RBL=32*1024;
 				if(v==3)
-					SCSP->DSP.RBL=64*1024;
+					scsp->DSP.RBL=64*1024;
 			}
 			break;
 		case 0x6:
 		case 0x7:
-			scsp_midi_in(space->machine->device("scsp"), 0, SCSP->udata.data[0x6/2]&0xff, 0);
+			scsp_midi_in(space->machine->device("scsp"), 0, scsp->udata.data[0x6/2]&0xff, 0);
 			break;
 		case 0x12:
 		case 0x13:
@@ -729,57 +728,57 @@ static void SCSP_UpdateReg(struct _SCSP *SCSP, int reg)
 			break;
 		case 0x18:
 		case 0x19:
-			if(SCSP->Master)
+			if(scsp->Master)
 			{
 				UINT32 time;
 
-				SCSP->TimPris[0]=1<<((SCSP->udata.data[0x18/2]>>8)&0x7);
-				SCSP->TimCnt[0]=(SCSP->udata.data[0x18/2]&0xff)<<8;
+				scsp->TimPris[0]=1<<((scsp->udata.data[0x18/2]>>8)&0x7);
+				scsp->TimCnt[0]=(scsp->udata.data[0x18/2]&0xff)<<8;
 
-				if ((SCSP->udata.data[0x18/2]&0xff) != 255)
+				if ((scsp->udata.data[0x18/2]&0xff) != 255)
 				{
-					time = (44100 / SCSP->TimPris[0]) / (255-(SCSP->udata.data[0x18/2]&0xff));
+					time = (44100 / scsp->TimPris[0]) / (255-(scsp->udata.data[0x18/2]&0xff));
 					if (time)
 					{
-						timer_adjust_oneshot(SCSP->timerA, ATTOTIME_IN_HZ(time), 0);
+						timer_adjust_oneshot(scsp->timerA, ATTOTIME_IN_HZ(time), 0);
 					}
 				}
 			}
 			break;
 		case 0x1a:
 		case 0x1b:
-			if(SCSP->Master)
+			if(scsp->Master)
 			{
 				UINT32 time;
 
-				SCSP->TimPris[1]=1<<((SCSP->udata.data[0x1A/2]>>8)&0x7);
-				SCSP->TimCnt[1]=(SCSP->udata.data[0x1A/2]&0xff)<<8;
+				scsp->TimPris[1]=1<<((scsp->udata.data[0x1A/2]>>8)&0x7);
+				scsp->TimCnt[1]=(scsp->udata.data[0x1A/2]&0xff)<<8;
 
-				if ((SCSP->udata.data[0x1A/2]&0xff) != 255)
+				if ((scsp->udata.data[0x1A/2]&0xff) != 255)
 				{
-					time = (44100 / SCSP->TimPris[1]) / (255-(SCSP->udata.data[0x1A/2]&0xff));
+					time = (44100 / scsp->TimPris[1]) / (255-(scsp->udata.data[0x1A/2]&0xff));
 					if (time)
 					{
-						timer_adjust_oneshot(SCSP->timerB, ATTOTIME_IN_HZ(time), 0);
+						timer_adjust_oneshot(scsp->timerB, ATTOTIME_IN_HZ(time), 0);
 					}
 				}
 			}
 			break;
 		case 0x1C:
 		case 0x1D:
-			if(SCSP->Master)
+			if(scsp->Master)
 			{
 				UINT32 time;
 
-				SCSP->TimPris[2]=1<<((SCSP->udata.data[0x1C/2]>>8)&0x7);
-				SCSP->TimCnt[2]=(SCSP->udata.data[0x1C/2]&0xff)<<8;
+				scsp->TimPris[2]=1<<((scsp->udata.data[0x1C/2]>>8)&0x7);
+				scsp->TimCnt[2]=(scsp->udata.data[0x1C/2]&0xff)<<8;
 
-				if ((SCSP->udata.data[0x1C/2]&0xff) != 255)
+				if ((scsp->udata.data[0x1C/2]&0xff) != 255)
 				{
-					time = (44100 / SCSP->TimPris[2]) / (255-(SCSP->udata.data[0x1C/2]&0xff));
+					time = (44100 / scsp->TimPris[2]) / (255-(scsp->udata.data[0x1C/2]&0xff));
 					if (time)
 					{
-						timer_adjust_oneshot(SCSP->timerC, ATTOTIME_IN_HZ(time), 0);
+						timer_adjust_oneshot(scsp->timerC, ATTOTIME_IN_HZ(time), 0);
 					}
 				}
 			}
@@ -787,24 +786,24 @@ static void SCSP_UpdateReg(struct _SCSP *SCSP, int reg)
 		case 0x22:	//SCIRE
 		case 0x23:
 
-			if(SCSP->Master)
+			if(scsp->Master)
 			{
-				SCSP->udata.data[0x20/2]&=~SCSP->udata.data[0x22/2];
-				ResetInterrupts(SCSP);
+				scsp->udata.data[0x20/2]&=~scsp->udata.data[0x22/2];
+				ResetInterrupts(scsp);
 
 				// behavior from real hardware: if you SCIRE a timer that's expired,
 				// it'll immediately pop up again in SCIPD.  ask Sakura Taisen on the Saturn...
-				if (SCSP->TimCnt[0] == 0xffff)
+				if (scsp->TimCnt[0] == 0xffff)
 				{
-					SCSP->udata.data[0x20/2] |= 0x40;
+					scsp->udata.data[0x20/2] |= 0x40;
 				}
-				if (SCSP->TimCnt[1] == 0xffff)
+				if (scsp->TimCnt[1] == 0xffff)
 				{
-					SCSP->udata.data[0x20/2] |= 0x80;
+					scsp->udata.data[0x20/2] |= 0x80;
 				}
-				if (SCSP->TimCnt[2] == 0xffff)
+				if (scsp->TimCnt[2] == 0xffff)
 				{
-					SCSP->udata.data[0x20/2] |= 0x100;
+					scsp->udata.data[0x20/2] |= 0x100;
 				}
 			}
 			break;
@@ -814,38 +813,38 @@ static void SCSP_UpdateReg(struct _SCSP *SCSP, int reg)
 		case 0x27:
 		case 0x28:
 		case 0x29:
-			if(SCSP->Master)
+			if(scsp->Master)
 			{
-				SCSP->IrqTimA=DecodeSCI(SCSP,SCITMA);
-				SCSP->IrqTimBC=DecodeSCI(SCSP,SCITMB);
-				SCSP->IrqMidi=DecodeSCI(SCSP,SCIMID);
+				scsp->IrqTimA=DecodeSCI(scsp,SCITMA);
+				scsp->IrqTimBC=DecodeSCI(scsp,SCITMB);
+				scsp->IrqMidi=DecodeSCI(scsp,SCIMID);
 			}
 			break;
 	}
 }
 
-static void SCSP_UpdateSlotRegR(struct _SCSP *SCSP, int slot,int reg)
+static void SCSP_UpdateSlotRegR(scsp_state *scsp, int slot,int reg)
 {
 
 }
 
-static void SCSP_UpdateRegR(struct _SCSP *SCSP, int reg)
+static void SCSP_UpdateRegR(scsp_state *scsp, int reg)
 {
 	switch(reg&0x3f)
 	{
 		case 4:
 		case 5:
 			{
-				unsigned short v=SCSP->udata.data[0x5/2];
+				unsigned short v=scsp->udata.data[0x5/2];
 				v&=0xff00;
-				v|=SCSP->MidiStack[SCSP->MidiR];
-				SCSP[0].Int68kCB(SCSP->device, -SCSP->IrqMidi);	// cancel the IRQ
-				if(SCSP->MidiR!=SCSP->MidiW)
+				v|=scsp->MidiStack[scsp->MidiR];
+				scsp->Int68kCB(scsp->device, -scsp->IrqMidi);	// cancel the IRQ
+				if(scsp->MidiR!=scsp->MidiW)
 				{
-					++SCSP->MidiR;
-					SCSP->MidiR&=31;
+					++scsp->MidiR;
+					scsp->MidiR&=31;
 				}
-				SCSP->udata.data[0x5/2]=v;
+				scsp->udata.data[0x5/2]=v;
 			}
 			break;
 		case 8:
@@ -853,12 +852,12 @@ static void SCSP_UpdateRegR(struct _SCSP *SCSP, int reg)
 			{
 				// MSLC     |  CA   |SGC|EG
 				// f e d c b a 9 8 7 6 5 4 3 2 1 0
-				unsigned char MSLC=(SCSP->udata.data[0x8/2]>>11)&0x1f;
-				struct _SLOT *slot=SCSP->Slots + MSLC;
+				unsigned char MSLC=(scsp->udata.data[0x8/2]>>11)&0x1f;
+				struct _SLOT *slot=scsp->Slots + MSLC;
 				unsigned int SGC = (slot->EG.state) & 3;
 				unsigned int CA = (slot->cur_addr>>(SHIFT+12)) & 0xf;
 				unsigned int EG = (0x1f - (slot->EG.volume>>(EG_SHIFT+5))) & 0x1f;
-				SCSP->udata.data[0x8/2] =  (MSLC << 11) | (CA << 7) | (SGC << 5) | EG;
+				scsp->udata.data[0x8/2] =  (MSLC << 11) | (CA << 7) | (SGC << 5) | EG;
 			}
 			break;
 
@@ -876,46 +875,46 @@ static void SCSP_UpdateRegR(struct _SCSP *SCSP, int reg)
 	}
 }
 
-static void SCSP_w16(struct _SCSP *SCSP,unsigned int addr,unsigned short val)
+static void SCSP_w16(scsp_state *scsp,unsigned int addr,unsigned short val)
 {
 	addr&=0xffff;
 	if(addr<0x400)
 	{
 		int slot=addr/0x20;
 		addr&=0x1f;
-		*((unsigned short *) (SCSP->Slots[slot].udata.datab+(addr))) = val;
-		SCSP_UpdateSlotReg(SCSP,slot,addr&0x1f);
+		*((unsigned short *) (scsp->Slots[slot].udata.datab+(addr))) = val;
+		SCSP_UpdateSlotReg(scsp,slot,addr&0x1f);
 	}
 	else if(addr<0x600)
 	{
 		if (addr < 0x430)
 		{
-			*((unsigned short *) (SCSP->udata.datab+((addr&0x3f)))) = val;
-			SCSP_UpdateReg(SCSP, addr&0x3f);
+			*((unsigned short *) (scsp->udata.datab+((addr&0x3f)))) = val;
+			SCSP_UpdateReg(scsp, addr&0x3f);
 		}
 	}
 	else if(addr<0x700)
-		SCSP->RINGBUF[(addr-0x600)/2]=val;
+		scsp->RINGBUF[(addr-0x600)/2]=val;
 	else
 	{
 		//DSP
 		if(addr<0x780)	//COEF
-			*((unsigned short *) (SCSP->DSP.COEF+(addr-0x700)/2))=val;
+			*((unsigned short *) (scsp->DSP.COEF+(addr-0x700)/2))=val;
 		else if(addr<0x800)
-			*((unsigned short *) (SCSP->DSP.MADRS+(addr-0x780)/2))=val;
+			*((unsigned short *) (scsp->DSP.MADRS+(addr-0x780)/2))=val;
 		else if(addr<0xC00)
 		{
-			*((unsigned short *) (SCSP->DSP.MPRO+(addr-0x800)/2))=val;
+			*((unsigned short *) (scsp->DSP.MPRO+(addr-0x800)/2))=val;
 
 			if(addr==0xBF0)
 			{
-				SCSPDSP_Start(&SCSP->DSP);
+				SCSPDSP_Start(&scsp->DSP);
 	    		}
 		}
 	}
 }
 
-static unsigned short SCSP_r16(struct _SCSP *SCSP, unsigned int addr)
+static unsigned short SCSP_r16(scsp_state *scsp, unsigned int addr)
 {
 	unsigned short v=0;
 	addr&=0xffff;
@@ -923,26 +922,26 @@ static unsigned short SCSP_r16(struct _SCSP *SCSP, unsigned int addr)
 	{
 		int slot=addr/0x20;
 		addr&=0x1f;
-		SCSP_UpdateSlotRegR(SCSP, slot,addr&0x1f);
-		v=*((unsigned short *) (SCSP->Slots[slot].udata.datab+(addr)));
+		SCSP_UpdateSlotRegR(scsp, slot,addr&0x1f);
+		v=*((unsigned short *) (scsp->Slots[slot].udata.datab+(addr)));
 	}
 	else if(addr<0x600)
 	{
 		if (addr < 0x430)
 		{
-			SCSP_UpdateRegR(SCSP, addr&0x3f);
-			v= *((unsigned short *) (SCSP->udata.datab+((addr&0x3f))));
+			SCSP_UpdateRegR(scsp, addr&0x3f);
+			v= *((unsigned short *) (scsp->udata.datab+((addr&0x3f))));
 		}
 	}
 	else if(addr<0x700)
-		v=SCSP->RINGBUF[(addr-0x600)/2];
+		v=scsp->RINGBUF[(addr-0x600)/2];
 	return v;
 }
 
 
 #define REVSIGN(v) ((~v)+1)
 
-INLINE INT32 SCSP_UpdateSlot(struct _SCSP *SCSP, struct _SLOT *slot)
+INLINE INT32 SCSP_UpdateSlot(scsp_state *scsp, struct _SLOT *slot)
 {
 	INT32 sample;
 	int step=slot->step;
@@ -972,7 +971,7 @@ INLINE INT32 SCSP_UpdateSlot(struct _SCSP *SCSP, struct _SLOT *slot)
 
 	if(MDL(slot)!=0 || MDXSL(slot)!=0 || MDYSL(slot)!=0)
 	{
-		INT32 smp=(SCSP->RINGBUF[(SCSP->BUFPTR+MDXSL(slot))&63]+SCSP->RINGBUF[(SCSP->BUFPTR+MDYSL(slot))&63])/2;
+		INT32 smp=(scsp->RINGBUF[(scsp->BUFPTR+MDXSL(slot))&63]+scsp->RINGBUF[(scsp->BUFPTR+MDYSL(slot))&63])/2;
 
 		smp<<=0xA; // associate cycle with 1024
 		smp>>=0x1A-MDL(slot); // ex. for MDL=0xF, sample range corresponds to +/- 64 pi (32=2^5 cycles) so shift by 11 (16-5 == 0x1A-0xF)
@@ -983,8 +982,8 @@ INLINE INT32 SCSP_UpdateSlot(struct _SCSP *SCSP, struct _SLOT *slot)
 
 	if(PCM8B(slot))	//8 bit signed
 	{
-		INT8 *p1=(signed char *) (SCSP->SCSPRAM+BYTE_XOR_BE(((SA(slot)+addr1))&0x7FFFF));
-		INT8 *p2=(signed char *) (SCSP->SCSPRAM+BYTE_XOR_BE(((SA(slot)+addr2))&0x7FFFF));
+		INT8 *p1=(signed char *) (scsp->SCSPRAM+BYTE_XOR_BE(((SA(slot)+addr1))&0x7FFFF));
+		INT8 *p2=(signed char *) (scsp->SCSPRAM+BYTE_XOR_BE(((SA(slot)+addr2))&0x7FFFF));
 		//sample=(p[0])<<8;
 		INT32 s;
 		INT32 fpart=slot->cur_addr&((1<<SHIFT)-1);
@@ -993,8 +992,8 @@ INLINE INT32 SCSP_UpdateSlot(struct _SCSP *SCSP, struct _SLOT *slot)
 	}
 	else	//16 bit signed (endianness?)
 	{
-		INT16 *p1=(signed short *) (SCSP->SCSPRAM+((SA(slot)+addr1)&0x7FFFE));
-		INT16 *p2=(signed short *) (SCSP->SCSPRAM+((SA(slot)+addr2)&0x7FFFE));
+		INT16 *p1=(signed short *) (scsp->SCSPRAM+((SA(slot)+addr1)&0x7FFFE));
+		INT16 *p2=(signed short *) (scsp->SCSPRAM+((SA(slot)+addr2)&0x7FFFE));
 		INT32 s;
 		INT32 fpart=slot->cur_addr&((1<<SHIFT)-1);
 		s=(int)(p1[0])*((1<<SHIFT)-fpart)+(int)(p2[0])*fpart;
@@ -1089,19 +1088,19 @@ INLINE INT32 SCSP_UpdateSlot(struct _SCSP *SCSP, struct _SLOT *slot)
 		if(!SDIR(slot))
 		{
 			unsigned short Enc=((TL(slot))<<0x0)|(0x7<<0xd);
-			*RBUFDST=(sample*SCSP->LPANTABLE[Enc])>>(SHIFT+1);
+			*RBUFDST=(sample*scsp->LPANTABLE[Enc])>>(SHIFT+1);
 		}
 		else
 		{
 			unsigned short Enc=(0<<0x0)|(0x7<<0xd);
-			*RBUFDST=(sample*SCSP->LPANTABLE[Enc])>>(SHIFT+1);
+			*RBUFDST=(sample*scsp->LPANTABLE[Enc])>>(SHIFT+1);
 		}
 	}
 
 	return sample;
 }
 
-static void SCSP_DoMasterSamples(struct _SCSP *SCSP, int nsamples)
+static void SCSP_DoMasterSamples(scsp_state *scsp, int nsamples)
 {
 	stream_sample_t *bufr,*bufl;
 	int sl, s, i;
@@ -1118,48 +1117,48 @@ static void SCSP_DoMasterSamples(struct _SCSP *SCSP, int nsamples)
 		for(sl=0;sl<32;++sl)
 		{
 #if FM_DELAY
-			RBUFDST=SCSP->DELAYBUF+SCSP->DELAYPTR;
+			RBUFDST=scsp->DELAYBUF+scsp->DELAYPTR;
 #else
-			RBUFDST=SCSP->RINGBUF+SCSP->BUFPTR;
+			RBUFDST=scsp->RINGBUF+scsp->BUFPTR;
 #endif
-			if(SCSP->Slots[sl].active)
+			if(scsp->Slots[sl].active)
 			{
-				struct _SLOT *slot=SCSP->Slots+sl;
+				struct _SLOT *slot=scsp->Slots+sl;
 				unsigned short Enc;
 				signed int sample;
 
-				sample=SCSP_UpdateSlot(SCSP, slot);
+				sample=SCSP_UpdateSlot(scsp, slot);
 
 				Enc=((TL(slot))<<0x0)|((IMXL(slot))<<0xd);
-				SCSPDSP_SetSample(&SCSP->DSP,(sample*SCSP->LPANTABLE[Enc])>>(SHIFT-2),ISEL(slot),IMXL(slot));
+				SCSPDSP_SetSample(&scsp->DSP,(sample*scsp->LPANTABLE[Enc])>>(SHIFT-2),ISEL(slot),IMXL(slot));
 				Enc=((TL(slot))<<0x0)|((DIPAN(slot))<<0x8)|((DISDL(slot))<<0xd);
 				{
-					smpl+=(sample*SCSP->LPANTABLE[Enc])>>SHIFT;
-					smpr+=(sample*SCSP->RPANTABLE[Enc])>>SHIFT;
+					smpl+=(sample*scsp->LPANTABLE[Enc])>>SHIFT;
+					smpr+=(sample*scsp->RPANTABLE[Enc])>>SHIFT;
 				}
 			}
 
 #if FM_DELAY
-			SCSP->RINGBUF[(SCSP->BUFPTR+64-(FM_DELAY-1))&63] = SCSP->DELAYBUF[(SCSP->DELAYPTR+FM_DELAY-(FM_DELAY-1))%FM_DELAY];
+			scsp->RINGBUF[(scsp->BUFPTR+64-(FM_DELAY-1))&63] = scsp->DELAYBUF[(scsp->DELAYPTR+FM_DELAY-(FM_DELAY-1))%FM_DELAY];
 #endif
-			++SCSP->BUFPTR;
-			SCSP->BUFPTR&=63;
+			++scsp->BUFPTR;
+			scsp->BUFPTR&=63;
 #if FM_DELAY
-			++SCSP->DELAYPTR;
-			if(SCSP->DELAYPTR>FM_DELAY-1) SCSP->DELAYPTR=0;
+			++scsp->DELAYPTR;
+			if(scsp->DELAYPTR>FM_DELAY-1) scsp->DELAYPTR=0;
 #endif
 		}
 
-		SCSPDSP_Step(&SCSP->DSP);
+		SCSPDSP_Step(&scsp->DSP);
 
 		for(i=0;i<16;++i)
 		{
-			struct _SLOT *slot=SCSP->Slots+i;
+			struct _SLOT *slot=scsp->Slots+i;
 			if(EFSDL(slot))
 			{
 				unsigned short Enc=((EFPAN(slot))<<0x8)|((EFSDL(slot))<<0xd);
-				smpl+=(SCSP->DSP.EFREG[i]*SCSP->LPANTABLE[Enc])>>SHIFT;
-				smpr+=(SCSP->DSP.EFREG[i]*SCSP->RPANTABLE[Enc])>>SHIFT;
+				smpl+=(scsp->DSP.EFREG[i]*scsp->LPANTABLE[Enc])>>SHIFT;
+				smpr+=(scsp->DSP.EFREG[i]*scsp->RPANTABLE[Enc])>>SHIFT;
 			}
 		}
 
@@ -1168,15 +1167,15 @@ static void SCSP_DoMasterSamples(struct _SCSP *SCSP, int nsamples)
 	}
 }
 
-static void dma_scsp(address_space *space, struct _SCSP *SCSP)
+static void dma_scsp(address_space *space, scsp_state *scsp)
 {
 	static UINT16 tmp_dma[3], *scsp_regs;
 
-	scsp_regs = (UINT16 *)SCSP->udata.datab;
+	scsp_regs = (UINT16 *)scsp->udata.datab;
 
 	logerror("SCSP: DMA transfer START\n"
 			 "DMEA: %04x DRGA: %04x DTLG: %04x\n"
-			 "DGATE: %d  DDIR: %d\n",SCSP->scsp_dmea,SCSP->scsp_drga,SCSP->scsp_dtlg,scsp_dgate ? 1 : 0,scsp_ddir ? 1 : 0);
+			 "DGATE: %d  DDIR: %d\n",scsp->scsp_dmea,scsp->scsp_drga,scsp->scsp_dtlg,scsp_dgate ? 1 : 0,scsp_ddir ? 1 : 0);
 
 	/* Copy the dma values in a temp storage for resuming later */
     	/* (DMA *can't* overwrite his parameters).                  */
@@ -1189,20 +1188,20 @@ static void dma_scsp(address_space *space, struct _SCSP *SCSP)
 
 	if(scsp_ddir)
 	{
-		for(;SCSP->scsp_dtlg > 0;SCSP->scsp_dtlg-=2)
+		for(;scsp->scsp_dtlg > 0;scsp->scsp_dtlg-=2)
 		{
-			space->write_word(SCSP->scsp_dmea, space->read_word(0x100000|SCSP->scsp_drga));
-			SCSP->scsp_dmea+=2;
-			SCSP->scsp_drga+=2;
+			space->write_word(scsp->scsp_dmea, space->read_word(0x100000|scsp->scsp_drga));
+			scsp->scsp_dmea+=2;
+			scsp->scsp_drga+=2;
 		}
 	}
 	else
 	{
-		for(;SCSP->scsp_dtlg > 0;SCSP->scsp_dtlg-=2)
+		for(;scsp->scsp_dtlg > 0;scsp->scsp_dtlg-=2)
 		{
-			space->write_word(0x100000|SCSP->scsp_drga,space->read_word(SCSP->scsp_dmea));
-			SCSP->scsp_dmea+=2;
-			SCSP->scsp_drga+=2;
+			space->write_word(0x100000|scsp->scsp_drga,space->read_word(scsp->scsp_dmea));
+			scsp->scsp_dmea+=2;
+			scsp->scsp_drga+=2;
 		}
 	}
 
@@ -1229,69 +1228,69 @@ int SCSP_IRQCB(void *param)
 
 static STREAM_UPDATE( SCSP_Update )
 {
-	struct _SCSP *SCSP = (struct _SCSP *)param;
+	scsp_state *scsp = (scsp_state *)param;
 	bufferl = outputs[0];
 	bufferr = outputs[1];
 	length = samples;
-	SCSP_DoMasterSamples(SCSP, samples);
+	SCSP_DoMasterSamples(scsp, samples);
 }
 
 static DEVICE_START( scsp )
 {
 	const scsp_interface *intf;
 
-	struct _SCSP *SCSP = get_safe_token(device);
+	scsp_state *scsp = get_safe_token(device);
 
 	intf = (const scsp_interface *)device->baseconfig().static_config();
 
 	// init the emulation
-	SCSP_Init(device, SCSP, intf);
+	SCSP_Init(device, scsp, intf);
 
 	// set up the IRQ callbacks
 	{
-		SCSP->Int68kCB = intf->irq_callback;
+		scsp->Int68kCB = intf->irq_callback;
 
-		SCSP->stream = stream_create(device, 0, 2, 44100, SCSP, SCSP_Update);
+		scsp->stream = stream_create(device, 0, 2, 44100, scsp, SCSP_Update);
 	}
 }
 
 
 void scsp_set_ram_base(running_device *device, void *base)
 {
-	struct _SCSP *SCSP = get_safe_token(device);
-	if (SCSP)
+	scsp_state *scsp = get_safe_token(device);
+	if (scsp)
 	{
-		SCSP->SCSPRAM = (unsigned char *)base;
-		SCSP->DSP.SCSPRAM = (UINT16 *)base;
-		SCSP->SCSPRAM_LENGTH = 0x80000;
-		SCSP->DSP.SCSPRAM_LENGTH = 0x80000/2;
+		scsp->SCSPRAM = (unsigned char *)base;
+		scsp->DSP.SCSPRAM = (UINT16 *)base;
+		scsp->SCSPRAM_LENGTH = 0x80000;
+		scsp->DSP.SCSPRAM_LENGTH = 0x80000/2;
 	}
 }
 
 
 READ16_DEVICE_HANDLER( scsp_r )
 {
-	struct _SCSP *SCSP = get_safe_token(device);
+	scsp_state *scsp = get_safe_token(device);
 
-	stream_update(SCSP->stream);
+	stream_update(scsp->stream);
 
-	return SCSP_r16(SCSP, offset*2);
+	return SCSP_r16(scsp, offset*2);
 }
 
 UINT32* stv_scu;
 
 WRITE16_DEVICE_HANDLER( scsp_w )
 {
-	struct _SCSP *SCSP = get_safe_token(device);
+	scsp_state *scsp = get_safe_token(device);
 	UINT16 tmp, *scsp_regs;
 
-	stream_update(SCSP->stream);
+	stream_update(scsp->stream);
 
-	tmp = SCSP_r16(SCSP, offset*2);
+	tmp = SCSP_r16(scsp, offset*2);
 	COMBINE_DATA(&tmp);
-	SCSP_w16(SCSP,offset*2, tmp);
+	SCSP_w16(scsp,offset*2, tmp);
 
-	scsp_regs = (UINT16 *)SCSP->udata.datab;
+	scsp_regs = (UINT16 *)scsp->udata.datab;
 
 	switch(offset*2)
 	{
@@ -1299,14 +1298,14 @@ WRITE16_DEVICE_HANDLER( scsp_w )
 		case 0x412:
 		/*DMEA [15:1]*/
 		/*Sound memory address*/
-		SCSP->scsp_dmea = (((scsp_regs[0x414/2] & 0xf000)>>12)*0x10000) | (scsp_regs[0x412/2] & 0xfffe);
+		scsp->scsp_dmea = (((scsp_regs[0x414/2] & 0xf000)>>12)*0x10000) | (scsp_regs[0x412/2] & 0xfffe);
 		break;
 		case 0x414:
 		/*DMEA [19:16]*/
-		SCSP->scsp_dmea = (((scsp_regs[0x414/2] & 0xf000)>>12)*0x10000) | (scsp_regs[0x412/2] & 0xfffe);
+		scsp->scsp_dmea = (((scsp_regs[0x414/2] & 0xf000)>>12)*0x10000) | (scsp_regs[0x412/2] & 0xfffe);
 		/*DRGA [11:1]*/
 		/*Register memory address*/
-		SCSP->scsp_drga = scsp_regs[0x414/2] & 0x0ffe;
+		scsp->scsp_drga = scsp_regs[0x414/2] & 0x0ffe;
 		break;
 		case 0x416:
 		/*DGATE[14]*/
@@ -1317,10 +1316,10 @@ WRITE16_DEVICE_HANDLER( scsp_w )
 		/*starting bit*/
 		/*DTLG[11:1]*/
 		/*size of transfer*/
-		SCSP->scsp_dtlg = scsp_regs[0x416/2] & 0x0ffe;
+		scsp->scsp_dtlg = scsp_regs[0x416/2] & 0x0ffe;
 		if(scsp_dexe)
 		{
-			dma_scsp(cpu_get_address_space(device->machine->firstcpu, ADDRESS_SPACE_PROGRAM), SCSP);
+			dma_scsp(cpu_get_address_space(device->machine->firstcpu, ADDRESS_SPACE_PROGRAM), scsp);
 			scsp_regs[0x416/2]^=0x1000;//disable starting bit
 		}
 		break;
@@ -1341,21 +1340,21 @@ WRITE16_DEVICE_HANDLER( scsp_w )
 
 WRITE16_DEVICE_HANDLER( scsp_midi_in )
 {
-	struct _SCSP *SCSP = get_safe_token(device);
+	scsp_state *scsp = get_safe_token(device);
 
-	SCSP->MidiStack[SCSP->MidiW++]=data;
-	SCSP->MidiW &= 31;
+	scsp->MidiStack[scsp->MidiW++]=data;
+	scsp->MidiW &= 31;
 
-	CheckPendingIRQ(SCSP);
+	CheckPendingIRQ(scsp);
 }
 
 READ16_DEVICE_HANDLER( scsp_midi_out_r )
 {
-	struct _SCSP *SCSP = get_safe_token(device);
+	scsp_state *scsp = get_safe_token(device);
 	unsigned char val;
 
-	val=SCSP->MidiStack[SCSP->MidiR++];
-	SCSP->MidiR&=31;
+	val=scsp->MidiStack[scsp->MidiR++];
+	scsp->MidiR&=31;
 	return val;
 }
 
@@ -1370,7 +1369,7 @@ DEVICE_GET_INFO( scsp )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(struct _SCSP);				break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(scsp_state);				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( scsp );		break;

@@ -30,8 +30,8 @@
 
 DEVICE_GET_INFO( sega005_sound );
 
-DECLARE_LEGACY_SOUND_DEVICE(005, sega005_sound);
-DEFINE_LEGACY_SOUND_DEVICE(005, sega005_sound);
+DECLARE_LEGACY_SOUND_DEVICE(SEGA005, sega005_sound);
+DEFINE_LEGACY_SOUND_DEVICE(SEGA005, sega005_sound);
 
 
 
@@ -343,7 +343,7 @@ WRITE8_HANDLER( astrob_sound_w )
  *
  *************************************/
 
-static SOUND_START( 005 );
+static SOUND_START( sega005 );
 static STREAM_UPDATE( sega005_stream_update );
 static TIMER_CALLBACK( sega005_auto_timer );
 static WRITE8_DEVICE_HANDLER( sega005_sound_a_w );
@@ -441,13 +441,13 @@ MACHINE_CONFIG_FRAGMENT( 005_sound_board )
 	MDRV_PPI8255_ADD( "ppi8255", ppi8255_005_intf )
 
 	/* sound hardware */
-	MDRV_SOUND_START(005)
+	MDRV_SOUND_START(sega005)
 
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
 	MDRV_SOUND_CONFIG(sega005_samples_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD("005", 005, 0)
+	MDRV_SOUND_ADD("005", SEGA005, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -459,7 +459,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-static SOUND_START( 005 )
+static SOUND_START( sega005 )
 {
 	state_save_register_global_array(machine, sound_state);
 	state_save_register_global(machine, sound_addr);

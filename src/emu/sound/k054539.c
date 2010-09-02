@@ -94,7 +94,7 @@ struct _k054539_state {
 INLINE k054539_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SOUND_K054539);
+	assert(device->type() == K054539);
 	return (k054539_state *)downcast<legacy_device_base *>(device)->token();
 }
 

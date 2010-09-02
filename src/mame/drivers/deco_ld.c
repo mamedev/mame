@@ -517,7 +517,7 @@ static MACHINE_CONFIG_START( rblaster, driver_device )
 	MDRV_SOUND_ADD("ay2", AY8910, 1500000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
-	MDRV_SOUND_ADD("ldsound", LASERDISC, 0)
+	MDRV_SOUND_ADD("ldsound", LASERDISC_SOUND, 0)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

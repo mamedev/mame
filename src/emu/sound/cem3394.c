@@ -141,7 +141,7 @@ struct _cem3394_state
 INLINE cem3394_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SOUND_CEM3394);
+	assert(device->type() == CEM3394);
 	return (cem3394_state *)downcast<legacy_device_base *>(device)->token();
 }
 

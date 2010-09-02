@@ -61,7 +61,7 @@ const int ALL_OUTPUTS		= MAX_OUTPUTS;	// special value indicating all outputs fo
 //**************************************************************************
 
 #define MDRV_SOUND_ADD(_tag, _type, _clock) \
-	MDRV_DEVICE_ADD(_tag, SOUND_##_type, _clock) \
+	MDRV_DEVICE_ADD(_tag, _type, _clock) \
 
 #define MDRV_SOUND_MODIFY(_tag) \
 	MDRV_DEVICE_MODIFY(_tag)
@@ -70,7 +70,7 @@ const int ALL_OUTPUTS		= MAX_OUTPUTS;	// special value indicating all outputs fo
 	MDRV_DEVICE_CLOCK(_clock)
 
 #define MDRV_SOUND_REPLACE(_tag, _type, _clock) \
-	MDRV_DEVICE_REPLACE(_tag, SOUND_##_type, _clock)
+	MDRV_DEVICE_REPLACE(_tag, _type, _clock)
 
 #define MDRV_SOUND_CONFIG(_config) \
 	MDRV_DEVICE_CONFIG(_config)

@@ -86,7 +86,7 @@ typedef struct {
 INLINE c6280_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SOUND_C6280);
+	assert(device->type() == C6280);
 	return (c6280_t *)downcast<legacy_device_base *>(device)->token();
 }
 

@@ -33,7 +33,7 @@ struct _samples_info
 INLINE samples_info *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SOUND_SAMPLES);
+	assert(device->type() == SAMPLES);
 	return (samples_info *)downcast<legacy_device_base *>(device)->token();
 }
 

@@ -60,7 +60,7 @@ struct _sp0250_state
 INLINE sp0250_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SOUND_SP0250);
+	assert(device->type() == SP0250);
 	return (sp0250_state *)downcast<legacy_device_base *>(device)->token();
 }
 

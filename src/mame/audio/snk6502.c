@@ -385,7 +385,7 @@ DISCRETE_SOUND_END
 INLINE snk6502_sound_state *get_safe_token( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->type() == SOUND_SNK6502);
+	assert(device->type() == SNK6502);
 
 	return (snk6502_sound_state *)downcast<legacy_device_base *>(device)->token();
 }

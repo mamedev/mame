@@ -213,7 +213,7 @@ static signed short *RBUFDST;	//this points to where the sample will be stored i
 INLINE aica_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SOUND_AICA);
+	assert(device->type() == AICA);
 	return (aica_state *)downcast<legacy_device_base *>(device)->token();
 }
 

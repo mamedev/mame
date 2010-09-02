@@ -85,7 +85,7 @@ struct _c352_state
 INLINE c352_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SOUND_C352);
+	assert(device->type() == C352);
 	return (c352_state *)downcast<legacy_device_base *>(device)->token();
 }
 

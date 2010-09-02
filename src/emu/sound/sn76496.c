@@ -138,14 +138,14 @@ struct _sn76496_state
 INLINE sn76496_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SOUND_SN76496 ||
-		   device->type() == SOUND_SN76489 ||
-		   device->type() == SOUND_SN76489A ||
-		   device->type() == SOUND_SN76494 ||
-		   device->type() == SOUND_SN94624 ||
-		   device->type() == SOUND_NCR7496 ||
-		   device->type() == SOUND_GAMEGEAR ||
-		   device->type() == SOUND_SMSIII);
+	assert(device->type() == SN76496 ||
+		   device->type() == SN76489 ||
+		   device->type() == SN76489A ||
+		   device->type() == SN76494 ||
+		   device->type() == SN94624 ||
+		   device->type() == NCR7496 ||
+		   device->type() == GAMEGEAR ||
+		   device->type() == SMSIII);
 	return (sn76496_state *)downcast<legacy_device_base *>(device)->token();
 }
 

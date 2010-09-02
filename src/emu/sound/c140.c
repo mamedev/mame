@@ -109,7 +109,7 @@ struct _c140_state
 INLINE c140_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SOUND_C140);
+	assert(device->type() == C140);
 	return (c140_state *)downcast<legacy_device_base *>(device)->token();
 }
 

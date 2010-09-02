@@ -256,7 +256,7 @@ static const INT16 K5_table[] = {
 INLINE vlm5030_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SOUND_VLM5030);
+	assert(device->type() == VLM5030);
 	return (vlm5030_state *)downcast<legacy_device_base *>(device)->token();
 }
 

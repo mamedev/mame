@@ -51,7 +51,7 @@ static int diff_lookup[49*16];
 INLINE es8712_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SOUND_ES8712);
+	assert(device->type() == ES8712);
 	return (es8712_state *)downcast<legacy_device_base *>(device)->token();
 }
 

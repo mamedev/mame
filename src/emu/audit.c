@@ -154,7 +154,7 @@ int audit_samples(core_options *options, const game_driver *gamedrv, audit_recor
 	/* count the number of sample records attached to this driver */
 	const device_config_sound_interface *sound = NULL;
 	for (bool gotone = config->m_devicelist.first(sound); gotone; gotone = sound->next(sound))
-		if (sound->devconfig().type() == SOUND_SAMPLES)
+		if (sound->devconfig().type() == SAMPLES)
 		{
 			const samples_interface *intf = (const samples_interface *)sound->devconfig().static_config();
 
@@ -177,7 +177,7 @@ int audit_samples(core_options *options, const game_driver *gamedrv, audit_recor
 
 	/* now iterate over sample entries */
 	for (bool gotone = config->m_devicelist.first(sound); gotone; gotone = sound->next(sound))
-		if (sound->devconfig().type() == SOUND_SAMPLES)
+		if (sound->devconfig().type() == SAMPLES)
 		{
 			const samples_interface *intf = (const samples_interface *)sound->devconfig().static_config();
 			const char *sharedname = NULL;

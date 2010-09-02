@@ -235,7 +235,7 @@ struct _snes_sound_state
 INLINE snes_sound_state *get_safe_token( running_device *device )
 {
 	assert(device != NULL);
-	assert(device->type() == SNES_SPC);
+	assert(device->type() == SNES);
 
 	return (snes_sound_state *)downcast<legacy_device_base *>(device)->token();
 }

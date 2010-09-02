@@ -25,7 +25,7 @@ struct _cdda_info
 INLINE cdda_info *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SOUND_CDDA);
+	assert(device->type() == CDDA);
 	return (cdda_info *)downcast<legacy_device_base *>(device)->token();
 }
 
@@ -94,7 +94,7 @@ running_device *cdda_from_cdrom(running_machine *machine, void *file)
 	device_sound_interface *sound = NULL;
 
 	for (bool gotone = machine->m_devicelist.first(sound); gotone; gotone = sound->next(sound))
-		if (sound->device().type() == SOUND_CDDA)
+		if (sound->device().type() == CDDA)
 		{
 			cdda_info *info = get_safe_token(*sound);
 			if (info->disc == file)

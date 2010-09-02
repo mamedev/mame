@@ -79,7 +79,7 @@ typedef struct
 INLINE ES5503Chip *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SOUND_ES5503);
+	assert(device->type() == ES5503);
 	return (ES5503Chip *)downcast<legacy_device_base *>(device)->token();
 }
 

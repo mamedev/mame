@@ -88,7 +88,7 @@
 DECLARE_LEGACY_SOUND_DEVICE(CDP1869, cdp1869);
 
 #define MDRV_CDP1869_ADD(_tag, _pixclock, _config) \
-	MDRV_DEVICE_ADD(_tag, SOUND_CDP1869, _pixclock) \
+	MDRV_DEVICE_ADD(_tag, CDP1869, _pixclock) \
 	MDRV_DEVICE_CONFIG(_config)
 
 #define MDRV_CDP1869_SCREEN_PAL_ADD(_tag, _clock) \

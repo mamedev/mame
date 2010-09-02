@@ -198,13 +198,13 @@ struct _tmsprom_state
 INLINE tms5110_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SOUND_TMS5110 ||
-		   device->type() == SOUND_TMS5100 ||
-		   device->type() == SOUND_TMS5110A ||
-		   device->type() == SOUND_CD2801 ||
-		   device->type() == SOUND_TMC0281 ||
-		   device->type() == SOUND_CD2802 ||
-		   device->type() == SOUND_M58817);
+	assert(device->type() == TMS5110 ||
+		   device->type() == TMS5100 ||
+		   device->type() == TMS5110A ||
+		   device->type() == CD2801 ||
+		   device->type() == TMC0281 ||
+		   device->type() == CD2802 ||
+		   device->type() == M58817);
 	return (tms5110_state *)downcast<legacy_device_base *>(device)->token();
 }
 

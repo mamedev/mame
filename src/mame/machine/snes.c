@@ -1696,7 +1696,7 @@ MACHINE_START( snes )
 
 	state->maincpu = machine->device<_5a22_device>("maincpu");
 	state->soundcpu = machine->device<spc700_device>("soundcpu");
-	state->spc700 = machine->device<snes_sound_sound_device>("spc700");
+	state->spc700 = machine->device<snes_sound_device>("spc700");
 	state->superfx = machine->device<cpu_device>("superfx");
 
 	state->maincpu->space(AS_PROGRAM)->set_direct_update_handler(direct_update_delegate_create_static(snes_direct, *machine));

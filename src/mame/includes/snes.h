@@ -461,7 +461,7 @@ public:
 	/* devices */
 	_5a22_device *maincpu;
 	spc700_device *soundcpu;
-	snes_sound_sound_device *spc700;
+	snes_sound_device *spc700;
 	cpu_device *superfx;
 };
 

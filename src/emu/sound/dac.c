@@ -20,7 +20,7 @@ struct _dac_state
 INLINE dac_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SOUND_DAC);
+	assert(device->type() == DAC);
 	return (dac_state *)downcast<legacy_device_base *>(device)->token();
 }
 

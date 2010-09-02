@@ -9,7 +9,7 @@
 
 
 
-DECLARE_LEGACY_SOUND_DEVICE(S2636, s2636_sound);
+DECLARE_LEGACY_SOUND_DEVICE(S2636_SOUND, s2636_sound);
 void s2636_soundport_w (running_device *device, int mode, int data);
 
 

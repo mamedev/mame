@@ -59,7 +59,7 @@ struct _dmadac_state
 INLINE dmadac_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SOUND_DMADAC);
+	assert(device->type() == DMADAC);
 	return (dmadac_state *)downcast<legacy_device_base *>(device)->token();
 }
 
@@ -241,7 +241,7 @@ void dmadac_set_volume(dmadac_sound_device **devlist, UINT8 num_channels, UINT16
  * Generic get_info
  **************************************************************************/
 
-DEVICE_GET_INFO( dmadac )
+DEVICE_GET_INFO( dmadac_sound )
 {
 	switch (state)
 	{
@@ -263,4 +263,4 @@ DEVICE_GET_INFO( dmadac )
 }
 
 
-DEFINE_LEGACY_SOUND_DEVICE(DMADAC, dmadac);
+DEFINE_LEGACY_SOUND_DEVICE(DMADAC, dmadac_sound);

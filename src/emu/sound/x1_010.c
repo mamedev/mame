@@ -101,7 +101,7 @@ struct _x1_010_state
 INLINE x1_010_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SOUND_X1_010);
+	assert(device->type() == X1_010);
 	return (x1_010_state *)downcast<legacy_device_base *>(device)->token();
 }
 

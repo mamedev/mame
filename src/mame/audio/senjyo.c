@@ -51,7 +51,7 @@ Z80CTC_INTERFACE( senjyo_ctc_intf )
 
 WRITE8_HANDLER( senjyo_volume_w )
 {
-	samples_sound_device *samples = space->machine->device<samples_sound_device>("samples");
+	samples_device *samples = space->machine->device<samples_device>("samples");
 	single_volume = data & 0x0f;
 	sample_set_volume(samples,0,single_volume / 15.0);
 }

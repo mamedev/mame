@@ -451,7 +451,7 @@ static MACHINE_CONFIG_DERIVED( spcewars, mw8080bw_root )
 	MDRV_FRAGMENT_ADD(invaders_samples_audio)
 
 	/* extra audio channel */
-	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 MACHINE_CONFIG_END
@@ -808,7 +808,7 @@ static MACHINE_CONFIG_DERIVED( lrescue, mw8080bw_root )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	/* extra audio channel */
-	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 MACHINE_CONFIG_END
@@ -1135,7 +1135,7 @@ static MACHINE_CONFIG_DERIVED( schasercv, mw8080bw_root )
 	/* sound hardware */
 	MDRV_FRAGMENT_ADD(invaders_samples_audio)
 
-	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 MACHINE_CONFIG_END

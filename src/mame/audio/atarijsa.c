@@ -57,8 +57,8 @@ static cpu_device *jsacpu;
 static const char *test_port;
 static UINT16 test_mask;
 
-static pokey_sound_device *pokey;
-static ym2151_sound_device *ym2151;
+static pokey_device *pokey;
+static ym2151_device *ym2151;
 static device_t *tms5220;
 static okim6295_device *oki6295;
 static okim6295_device *oki6295_l, *oki6295_r;
@@ -139,8 +139,8 @@ void atarijsa_init(running_machine *machine, const char *testport, int testmask)
 
 	/* determine which sound hardware is installed */
 	tms5220 = machine->device("tms");
-	ym2151 = machine->device<ym2151_sound_device>("ymsnd");
-	pokey = machine->device<pokey_sound_device>("pokey");
+	ym2151 = machine->device<ym2151_device>("ymsnd");
+	pokey = machine->device<pokey_device>("pokey");
 	oki6295 = machine->device<okim6295_device>("adpcm");
 	oki6295_l = machine->device<okim6295_device>("adpcml");
 	oki6295_r = machine->device<okim6295_device>("adpcmr");

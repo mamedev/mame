@@ -36,7 +36,7 @@ struct _snkwave_state
 INLINE snkwave_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SOUND_SNKWAVE);
+	assert(device->type() == SNKWAVE);
 	return (snkwave_state *)downcast<legacy_device_base *>(device)->token();
 }
 

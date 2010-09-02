@@ -891,22 +891,22 @@ void atarigen_set_vol(running_machine *machine, int volume, device_type type)
 
 void atarigen_set_ym2151_vol(running_machine *machine, int volume)
 {
-	atarigen_set_vol(machine, volume, SOUND_YM2151);
+	atarigen_set_vol(machine, volume, YM2151);
 }
 
 void atarigen_set_ym2413_vol(running_machine *machine, int volume)
 {
-	atarigen_set_vol(machine, volume, SOUND_YM2413);
+	atarigen_set_vol(machine, volume, YM2413);
 }
 
 void atarigen_set_pokey_vol(running_machine *machine, int volume)
 {
-	atarigen_set_vol(machine, volume, SOUND_POKEY);
+	atarigen_set_vol(machine, volume, POKEY);
 }
 
 void atarigen_set_tms5220_vol(running_machine *machine, int volume)
 {
-	atarigen_set_vol(machine, volume, SOUND_TMS5220);
+	atarigen_set_vol(machine, volume, TMS5220);
 }
 
 void atarigen_set_oki6295_vol(running_machine *machine, int volume)

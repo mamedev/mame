@@ -25,7 +25,7 @@ struct _ymf262_state
 INLINE ymf262_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SOUND_YMF262);
+	assert(device->type() == YMF262);
 	return (ymf262_state *)downcast<legacy_device_base *>(device)->token();
 }
 

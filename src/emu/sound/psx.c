@@ -87,7 +87,7 @@ struct psxinfo
 INLINE struct psxinfo *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SOUND_PSXSPU);
+	assert(device->type() == PSXSPU);
 	return (struct psxinfo *)downcast<legacy_device_base *>(device)->token();
 }
 

@@ -69,7 +69,7 @@ struct _zsg2_state
 INLINE zsg2_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SOUND_ZSG2);
+	assert(device->type() == ZSG2);
 	return (zsg2_state *)downcast<legacy_device_base *>(device)->token();
 }
 

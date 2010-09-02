@@ -78,7 +78,7 @@ static wav_file *	wavraw;					/* raw waveform */
 INLINE gaelco_sound_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SOUND_GAELCO_GAE1 || device->type() == SOUND_GAELCO_CG1V);
+	assert(device->type() == GAELCO_GAE1 || device->type() == GAELCO_CG1V);
 	return (gaelco_sound_state *)downcast<legacy_device_base *>(device)->token();
 }
 

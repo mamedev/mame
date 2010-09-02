@@ -55,9 +55,9 @@ static STREAM_UPDATE( hc55516_update );
 INLINE hc55516_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SOUND_HC55516 ||
-		   device->type() == SOUND_MC3417 ||
-		   device->type() == SOUND_MC3418);
+	assert(device->type() == HC55516 ||
+		   device->type() == MC3417 ||
+		   device->type() == MC3418);
 	return (hc55516_state *)downcast<legacy_device_base *>(device)->token();
 }
 

@@ -132,7 +132,7 @@ typedef struct
 INLINE YMF278BChip *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SOUND_YMF278B);
+	assert(device->type() == YMF278B);
 	return (YMF278BChip *)downcast<legacy_device_base *>(device)->token();
 }
 

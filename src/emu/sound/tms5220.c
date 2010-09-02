@@ -441,10 +441,10 @@ struct _tms5220_state
 INLINE tms5220_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SOUND_TMS5220 ||
-		   device->type() == SOUND_TMS5220C ||
-		   device->type() == SOUND_TMC0285 ||
-		   device->type() == SOUND_TMS5200);
+	assert(device->type() == TMS5220 ||
+		   device->type() == TMS5220C ||
+		   device->type() == TMC0285 ||
+		   device->type() == TMS5200);
 	return (tms5220_state *)downcast<legacy_device_base *>(device)->token();
 }
 

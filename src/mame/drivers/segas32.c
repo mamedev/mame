@@ -4150,7 +4150,7 @@ static DRIVER_INIT( radr )
 
 static DRIVER_INIT( scross )
 {
-	multipcm_sound_device *multipcm = machine->device<multipcm_sound_device>("sega");
+	multipcm_device *multipcm = machine->device<multipcm_device>("sega");
 	segas32_common_init(analog_custom_io_r, analog_custom_io_w);
 	memory_install_write8_device_handler(cputag_get_address_space(machine, "soundcpu", ADDRESS_SPACE_PROGRAM), multipcm, 0xb0, 0xbf, 0, 0, scross_bank_w);
 

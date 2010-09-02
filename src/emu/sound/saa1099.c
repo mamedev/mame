@@ -171,7 +171,7 @@ static const UINT8 envelope[8][64] = {
 INLINE saa1099_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SOUND_SAA1099);
+	assert(device->type() == SAA1099);
 	return (saa1099_state *)downcast<legacy_device_base *>(device)->token();
 }
 

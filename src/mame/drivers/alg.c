@@ -437,7 +437,7 @@ static MACHINE_CONFIG_START( alg_r1, driver_device )
 	MDRV_SOUND_ROUTE(2, "rspeaker", 0.25)
 	MDRV_SOUND_ROUTE(3, "lspeaker", 0.25)
 
-	MDRV_SOUND_ADD("ldsound", LASERDISC, 0)
+	MDRV_SOUND_ADD("ldsound", LASERDISC_SOUND, 0)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 

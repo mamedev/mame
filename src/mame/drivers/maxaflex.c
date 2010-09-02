@@ -461,7 +461,7 @@ static MACHINE_CONFIG_START( a600xl, driver_device )
 	MDRV_SOUND_CONFIG(pokey_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("speaker", SPEAKER, 0)
+	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	MDRV_MACHINE_START( atarixl )

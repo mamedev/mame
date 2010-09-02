@@ -696,7 +696,7 @@ static MACHINE_CONFIG_START( firefox, driver_device )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
 
-	MDRV_SOUND_ADD("ldsound", LASERDISC, 0)
+	MDRV_SOUND_ADD("ldsound", LASERDISC_SOUND, 0)
 	MDRV_SOUND_ROUTE(0, "lspeaker", 0.50)
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.50)
 MACHINE_CONFIG_END

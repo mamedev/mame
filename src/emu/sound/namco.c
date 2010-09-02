@@ -78,9 +78,9 @@ struct _namco_sound
 INLINE namco_sound *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SOUND_NAMCO ||
-		   device->type() == SOUND_NAMCO_15XX ||
-		   device->type() == SOUND_NAMCO_CUS30);
+	assert(device->type() == NAMCO ||
+		   device->type() == NAMCO_15XX ||
+		   device->type() == NAMCO_CUS30);
 	return (namco_sound *)downcast<legacy_device_base *>(device)->token();
 }
 

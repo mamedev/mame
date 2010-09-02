@@ -129,7 +129,7 @@ static double get_filtered_volume(speaker_state *sp);
 INLINE speaker_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SOUND_SPEAKER);
+	assert(device->type() == SPEAKER_SOUND);
 	return (speaker_state *)downcast<legacy_device_base *>(device)->token();
 }
 
@@ -424,7 +424,7 @@ static double get_filtered_volume(speaker_state *sp)
  * Generic get_info
  **************************************************************************/
 
-DEVICE_GET_INFO( speaker )
+DEVICE_GET_INFO( speaker_sound )
 {
 	switch (state)
 	{
@@ -446,4 +446,4 @@ DEVICE_GET_INFO( speaker )
 }
 
 
-DEFINE_LEGACY_SOUND_DEVICE(SPEAKER, speaker);
+DEFINE_LEGACY_SOUND_DEVICE(SPEAKER_SOUND, speaker_sound);

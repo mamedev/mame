@@ -288,7 +288,7 @@ static const int pitch_vals[32] = {
 INLINE digitalker *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SOUND_DIGITALKER);
+	assert(device->type() == DIGITALKER);
 	return (digitalker *)downcast<legacy_device_base *>(device)->token();
 }
 

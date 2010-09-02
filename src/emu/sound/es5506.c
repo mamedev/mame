@@ -130,7 +130,7 @@ struct _es5506_state
 INLINE es5506_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SOUND_ES5505 || device->type() == SOUND_ES5506);
+	assert(device->type() == ES5505 || device->type() == ES5506);
 	return (es5506_state *)downcast<legacy_device_base *>(device)->token();
 }
 
@@ -854,7 +854,7 @@ static void es5506_start_common(running_device *device, const void *config, devi
 	compute_tables(chip);
 
 	/* init the voices */
-	accum_mask = (sndtype == SOUND_ES5506) ? 0xffffffff : 0x7fffffff;
+	accum_mask = (sndtype == ES5506) ? 0xffffffff : 0x7fffffff;
 	for (j = 0; j < 32; j++)
 	{
 		chip->voice[j].index = j;
@@ -915,7 +915,7 @@ static void es5506_start_common(running_device *device, const void *config, devi
 
 static DEVICE_START( es5506 )
 {
-	es5506_start_common(device, device->baseconfig().static_config(), SOUND_ES5506);
+	es5506_start_common(device, device->baseconfig().static_config(), ES5506);
 }
 
 
@@ -1490,7 +1490,7 @@ static DEVICE_START( es5505 )
 	es5506intf.irq_callback = intf->irq_callback;
 	es5506intf.read_port = intf->read_port;
 
-	es5506_start_common(device, &es5506intf, SOUND_ES5505);
+	es5506_start_common(device, &es5506intf, ES5505);
 }
 
 

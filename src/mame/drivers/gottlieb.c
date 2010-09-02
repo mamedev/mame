@@ -1964,7 +1964,7 @@ static MACHINE_CONFIG_DERIVED( g2laser, gottlieb_core )
 	MDRV_DEVICE_REMOVE("screen")
 	MDRV_LASERDISC_SCREEN_ADD_NTSC("screen", BITMAP_FORMAT_INDEXED16)
 
-	MDRV_SOUND_ADD("ldsound", LASERDISC, 0)
+	MDRV_SOUND_ADD("ldsound", LASERDISC_SOUND, 0)
 	MDRV_SOUND_ROUTE(0, "mono", 1.0)
 	/* right channel is processed as data */
 MACHINE_CONFIG_END

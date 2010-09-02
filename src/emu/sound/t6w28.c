@@ -61,7 +61,7 @@ struct _t6w28_state
 INLINE t6w28_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SOUND_T6W28);
+	assert(device->type() == T6W28);
 	return (t6w28_state *)downcast<legacy_device_base *>(device)->token();
 }
 

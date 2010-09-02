@@ -616,7 +616,7 @@ static void print_game_sampleof(FILE *out, const game_driver *game, const machin
 	const device_config_sound_interface *sound = NULL;
 
 	for (bool gotone = config->m_devicelist.first(sound); gotone; gotone = sound->next(sound))
-		if (sound->devconfig().type() == SOUND_SAMPLES)
+		if (sound->devconfig().type() == SAMPLES)
 		{
 			const char *const *samplenames = ((const samples_interface *)sound->devconfig().static_config())->samplenames;
 			if (samplenames != NULL)
@@ -648,7 +648,7 @@ static void print_game_sample(FILE *out, const game_driver *game, const machine_
 
 	/* iterate over sound chips looking for samples */
 	for (bool gotone = config->m_devicelist.first(sound); gotone; gotone = sound->next(sound))
-		if (sound->devconfig().type() == SOUND_SAMPLES)
+		if (sound->devconfig().type() == SAMPLES)
 		{
 			const char *const *samplenames = ((const samples_interface *)sound->devconfig().static_config())->samplenames;
 			if (samplenames != NULL)

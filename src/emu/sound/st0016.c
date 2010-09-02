@@ -22,7 +22,7 @@ struct _st0016_state
 INLINE st0016_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SOUND_ST0016);
+	assert(device->type() == ST0016);
 	return (st0016_state *)downcast<legacy_device_base *>(device)->token();
 }
 

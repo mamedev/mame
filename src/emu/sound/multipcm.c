@@ -129,7 +129,7 @@ static const int val2chan[] =
 INLINE MultiPCM *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SOUND_MULTIPCM);
+	assert(device->type() == MULTIPCM);
 	return (MultiPCM *)downcast<legacy_device_base *>(device)->token();
 }
 

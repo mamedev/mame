@@ -22,7 +22,7 @@ struct _s2636_sound
 static s2636_sound *get_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SOUND_S2636);
+	assert(device->type() == S2636_SOUND);
 	return (s2636_sound *) downcast<legacy_device_base *>(device)->token();
 }
 
@@ -100,4 +100,4 @@ DEVICE_GET_INFO( s2636_sound )
 	}
 }
 
-DEFINE_LEGACY_SOUND_DEVICE(S2636, s2636_sound);
+DEFINE_LEGACY_SOUND_DEVICE(S2636_SOUND, s2636_sound);

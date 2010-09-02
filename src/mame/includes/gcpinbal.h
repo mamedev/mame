@@ -9,7 +9,7 @@ public:
 		: driver_device(machine, config),
 		  maincpu(machine.device<cpu_device>("maincpu")),
 		  oki(machine.device<okim6295_device>("oki")),
-		  msm(machine.device<msm5205_sound_device>("msm")) { }
+		  msm(machine.device<msm5205_device>("msm")) { }
 
 	/* memory pointers */
 	UINT16 *    tilemapram;
@@ -34,7 +34,7 @@ public:
 	/* devices */
 	cpu_device *maincpu;
 	okim6295_device *oki;
-	msm5205_sound_device *msm;
+	msm5205_device *msm;
 };
 
 

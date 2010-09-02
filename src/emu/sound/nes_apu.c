@@ -75,7 +75,7 @@ struct _nesapu_state
 INLINE nesapu_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SOUND_NES);
+	assert(device->type() == NES);
 	return (nesapu_state *)downcast<legacy_device_base *>(device)->token();
 }
 

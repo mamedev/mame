@@ -622,7 +622,7 @@ int cli_info_listsamples(core_options *options, const char *gamename)
 
 			/* find samples interfaces */
 			for (bool gotone = config->m_devicelist.first(sound); gotone; gotone = sound->next(sound))
-				if (sound->devconfig().type() == SOUND_SAMPLES)
+				if (sound->devconfig().type() == SAMPLES)
 				{
 					const char *const *samplenames = ((const samples_interface *)sound->devconfig().static_config())->samplenames;
 					int sampnum;

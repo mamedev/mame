@@ -41,7 +41,7 @@ struct _votrax_state
 INLINE votrax_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SOUND_VOTRAX);
+	assert(device->type() == VOTRAX);
 	return (votrax_state *)downcast<legacy_device_base *>(device)->token();
 }
 

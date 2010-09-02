@@ -224,7 +224,7 @@ static const int upd7759_state_table[16] = { -1, -1, 0, 0, 1, 2, 2, 3, -1, -1, 0
 INLINE upd7759_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SOUND_UPD7759);
+	assert(device->type() == UPD7759);
 	return (upd7759_state *)downcast<legacy_device_base *>(device)->token();
 }
 

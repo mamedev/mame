@@ -344,7 +344,7 @@ static const int *const tunes[] = {NULL,tune1,tune2,tune3,tune4};
 INLINE tms_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SOUND_TMS36XX);
+	assert(device->type() == TMS36XX);
 	return (tms_state *)downcast<legacy_device_base *>(device)->token();
 }
 

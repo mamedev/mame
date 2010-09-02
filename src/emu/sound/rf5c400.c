@@ -97,7 +97,7 @@ enum {
 INLINE rf5c400_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SOUND_RF5C400);
+	assert(device->type() == RF5C400);
 	return (rf5c400_state *)downcast<legacy_device_base *>(device)->token();
 }
 

@@ -37,7 +37,7 @@ public:
 		astring temp;
 		for (int i = 0; i < ARRAY_LENGTH(cem_device); i++)
 		{
-			cem_device[i] = machine.device<cem3394_sound_device>(temp.format("cem%d", i+1));
+			cem_device[i] = machine.device<cem3394_device>(temp.format("cem%d", i+1));
 			assert(cem_device[i] != NULL);
 		}
 	}
@@ -100,7 +100,7 @@ public:
 
 	/* noise generator states */
 	UINT32 noise_position[6];
-	cem3394_sound_device *cem_device[6];
+	cem3394_device *cem_device[6];
 
 	/* game-specific states */
 	UINT8 nstocker_bits;

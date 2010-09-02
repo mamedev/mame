@@ -40,7 +40,7 @@ struct _rf5c68_state
 INLINE rf5c68_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SOUND_RF5C68);
+	assert(device->type() == RF5C68);
 	return (rf5c68_state *)downcast<legacy_device_base *>(device)->token();
 }
 

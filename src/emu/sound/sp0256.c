@@ -135,7 +135,7 @@ static const INT16 qtbl[128] =
 INLINE sp0256_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SOUND_SP0256);
+	assert(device->type() == SP0256);
 	return (sp0256_state *)downcast<legacy_device_base *>(device)->token();
 }
 

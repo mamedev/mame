@@ -37,7 +37,7 @@ struct _ym3526_state
 INLINE ym3526_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SOUND_YM3526);
+	assert(device->type() == YM3526);
 	return (ym3526_state *)downcast<legacy_device_base *>(device)->token();
 }
 

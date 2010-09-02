@@ -13,7 +13,7 @@ struct _tia_state
 INLINE tia_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SOUND_TIA);
+	assert(device->type() == TIA);
 	return (tia_state *)downcast<legacy_device_base *>(device)->token();
 }
 

@@ -263,7 +263,7 @@ static MACHINE_CONFIG_START( tinvader, driver_device )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("s2636snd", S2636, 0)
+	MDRV_SOUND_ADD("s2636snd", S2636_SOUND, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 

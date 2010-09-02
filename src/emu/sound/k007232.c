@@ -58,7 +58,7 @@ typedef struct kdacApcm
 INLINE KDAC_A_PCM *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == SOUND_K007232);
+	assert(device->type() == K007232);
 	return (KDAC_A_PCM *)downcast<legacy_device_base *>(device)->token();
 }
 
