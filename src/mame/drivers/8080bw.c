@@ -920,6 +920,7 @@ static INPUT_PORTS_START( rollingc )
 	PORT_INCLUDE( sicv )
 
 	PORT_MODIFY("IN0")
+        /* Duplicate control required (both must be mapped to same key for input to work for game select and in-game) */
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) /* Game Select */
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) /* Game Select */
 
@@ -1544,9 +1545,6 @@ INPUT_PORTS_END
 
 static INPUT_PORTS_START( jspecter )
 	PORT_INCLUDE( sicv )
-
-	PORT_MODIFY("IN1")
-	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_2WAY //typo? declared twice
 
 	PORT_MODIFY("IN2")
 	PORT_DIPUNKNOWN_DIPLOC( 0x04, 0x00, "SW1:3" )
