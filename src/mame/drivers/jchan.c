@@ -655,7 +655,7 @@ static const ymz280b_interface ymz280b_intf =
 
 /* machine driver */
 
-static MACHINE_CONFIG_START( jchan, driver_data_t )
+static MACHINE_CONFIG_START( jchan, driver_device )
 
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(jchan_main)

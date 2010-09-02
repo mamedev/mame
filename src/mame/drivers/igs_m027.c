@@ -364,7 +364,7 @@ static INTERRUPT_GEN( igs_majhong_interrupt )
 }
 
 
-static MACHINE_CONFIG_START( igs_majhong, driver_data_t )
+static MACHINE_CONFIG_START( igs_majhong, driver_device )
 	MDRV_CPU_ADD("maincpu",ARM7, 20000000)
 
 	MDRV_CPU_PROGRAM_MAP(igs_majhong_map)

@@ -640,7 +640,7 @@ static const kaneko_pandora_interface hvyunit_pandora_config =
 };
 
 
-static MACHINE_CONFIG_START( hvyunit, driver_data_t )
+static MACHINE_CONFIG_START( hvyunit, driver_device )
 
 	MDRV_CPU_ADD("master", Z80,6000000)
 	MDRV_CPU_PROGRAM_MAP(master_memory)

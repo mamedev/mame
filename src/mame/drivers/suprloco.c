@@ -164,7 +164,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_CONFIG_START( suprloco, driver_data_t )
+static MACHINE_CONFIG_START( suprloco, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz (?) */

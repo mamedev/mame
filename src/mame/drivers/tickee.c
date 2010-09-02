@@ -724,7 +724,7 @@ static const tms34010_config rapidfir_tms_config =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( tickee, driver_data_t )
+static MACHINE_CONFIG_START( tickee, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", TMS34010, XTAL_40MHz)
@@ -768,7 +768,7 @@ static MACHINE_CONFIG_DERIVED( ghoshunt, tickee )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( rapidfir, driver_data_t )
+static MACHINE_CONFIG_START( rapidfir, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", TMS34010, XTAL_50MHz)
@@ -796,7 +796,7 @@ static MACHINE_CONFIG_START( rapidfir, driver_data_t )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( mouseatk, driver_data_t )
+static MACHINE_CONFIG_START( mouseatk, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", TMS34010, XTAL_40MHz)

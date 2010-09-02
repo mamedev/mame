@@ -45,13 +45,11 @@ PROMs : NEC B406 (1kx4) x2
 #include "sound/ay8910.h"
 
 
-class sbowling_state : public driver_data_t
+class sbowling_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, sbowling_state(machine)); }
-
-	sbowling_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	sbowling_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	int bgmap;
 	UINT8 *videoram;

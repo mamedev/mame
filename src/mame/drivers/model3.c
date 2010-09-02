@@ -4992,7 +4992,7 @@ static const powerpc_config model3_2x =
 	66000000		/* Multiplier 2.5, Bus = 66MHz, Core = 166MHz */
 };
 
-static MACHINE_CONFIG_START( model3_10, driver_data_t )
+static MACHINE_CONFIG_START( model3_10, driver_device )
 	MDRV_CPU_ADD("maincpu", PPC603E, 66000000)
 	MDRV_CPU_CONFIG(model3_10)
 	MDRV_CPU_PROGRAM_MAP(model3_mem)
@@ -5034,7 +5034,7 @@ static MACHINE_CONFIG_START( model3_10, driver_data_t )
 	MDRV_SOUND_ROUTE(0, "rspeaker", 2.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( model3_15, driver_data_t )
+static MACHINE_CONFIG_START( model3_15, driver_device )
 	MDRV_CPU_ADD("maincpu", PPC603E, 100000000)
 	MDRV_CPU_CONFIG(model3_15)
 	MDRV_CPU_PROGRAM_MAP(model3_mem)
@@ -5074,7 +5074,7 @@ static MACHINE_CONFIG_START( model3_15, driver_data_t )
 	MDRV_SOUND_ROUTE(0, "rspeaker", 2.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( model3_20, driver_data_t )
+static MACHINE_CONFIG_START( model3_20, driver_device )
 	MDRV_CPU_ADD("maincpu", PPC603R, 166000000)
 	MDRV_CPU_CONFIG(model3_2x)
 	MDRV_CPU_PROGRAM_MAP(model3_mem)
@@ -5114,7 +5114,7 @@ static MACHINE_CONFIG_START( model3_20, driver_data_t )
 	MDRV_SOUND_ROUTE(0, "rspeaker", 2.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( model3_21, driver_data_t )
+static MACHINE_CONFIG_START( model3_21, driver_device )
 	MDRV_CPU_ADD("maincpu", PPC603R, 166000000)
 	MDRV_CPU_CONFIG(model3_2x)
 	MDRV_CPU_PROGRAM_MAP(model3_mem)

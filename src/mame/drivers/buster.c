@@ -69,7 +69,7 @@ static GFXDECODE_START( buster )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles8x8_layout, 0, 16 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( buster, driver_data_t )
+static MACHINE_CONFIG_START( buster, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,8000000)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(mainmap)

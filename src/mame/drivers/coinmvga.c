@@ -652,7 +652,7 @@ static INTERRUPT_GEN( vblank_irq )
 *    Machine Drivers     *
 *************************/
 
-static MACHINE_CONFIG_START( coinmvga, driver_data_t )
+static MACHINE_CONFIG_START( coinmvga, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", H83007, CPU_CLOCK)	/* xtal */

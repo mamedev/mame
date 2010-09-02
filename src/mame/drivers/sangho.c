@@ -352,7 +352,7 @@ static VIDEO_START( sangho )
 	v9938_init (machine, 0, *machine->primary_screen, machine->generic.tmpbitmap, MODEL_V9938, 0x20000, msx_vdp_interrupt);
 }
 
-static MACHINE_CONFIG_START( pzlestar, driver_data_t )
+static MACHINE_CONFIG_START( pzlestar, driver_device )
 
 	MDRV_CPU_ADD("maincpu", Z80,8000000) // ?
 	MDRV_CPU_PROGRAM_MAP(sangho_map)
@@ -385,7 +385,7 @@ static MACHINE_CONFIG_START( pzlestar, driver_data_t )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( sexyboom, driver_data_t )
+static MACHINE_CONFIG_START( sexyboom, driver_device )
 
 	MDRV_CPU_ADD("maincpu", Z80,8000000) // ?
 	MDRV_CPU_PROGRAM_MAP(sangho_map)

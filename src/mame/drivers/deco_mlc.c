@@ -382,7 +382,7 @@ static MACHINE_RESET( mlc )
 	raster_irq_timer = machine->device<timer_device>("int_timer");
 }
 
-static MACHINE_CONFIG_START( avengrgs, driver_data_t )
+static MACHINE_CONFIG_START( avengrgs, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", SH2,42000000/2) /* 21 MHz clock confirmed on real board */
@@ -415,7 +415,7 @@ static MACHINE_CONFIG_START( avengrgs, driver_data_t )
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( mlc, driver_data_t )
+static MACHINE_CONFIG_START( mlc, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", ARM,42000000/6) /* 42 MHz -> 7MHz clock confirmed on real board */

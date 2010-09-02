@@ -593,7 +593,7 @@ static INPUT_PORTS_START( ppcar )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( ssfindo, driver_data_t )
+static MACHINE_CONFIG_START( ssfindo, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", ARM7, 54000000) // guess...
@@ -616,7 +616,7 @@ static MACHINE_CONFIG_START( ssfindo, driver_data_t )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ppcar, driver_data_t )
+static MACHINE_CONFIG_START( ppcar, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", ARM7, 54000000) // guess...

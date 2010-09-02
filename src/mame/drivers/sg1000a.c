@@ -263,7 +263,7 @@ static I8255A_INTERFACE( ppi8255_intf )
  *
  *************************************/
 
-static MACHINE_CONFIG_START( sg1000a, driver_data_t )
+static MACHINE_CONFIG_START( sg1000a, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_3_579545MHz)
 	MDRV_CPU_PROGRAM_MAP(program_map)

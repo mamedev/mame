@@ -915,7 +915,7 @@ static const k037122_interface hornet_k037122_intf_r =
 	"rscreen", 1
 };
 
-static MACHINE_CONFIG_START( hornet, driver_data_t )
+static MACHINE_CONFIG_START( hornet, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", PPC403GA, 64000000/2)	/* PowerPC 403GA 32MHz */

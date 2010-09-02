@@ -300,7 +300,7 @@ static const mos6526_interface cia_1_intf =
 	DEVCB_NULL
 };
 
-static MACHINE_CONFIG_START( upscope, driver_data_t )
+static MACHINE_CONFIG_START( upscope, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, AMIGA_68000_NTSC_CLOCK)

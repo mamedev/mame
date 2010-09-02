@@ -435,7 +435,7 @@ static const ym2151_interface ym2151_config =
 
 static const nec_config firebarr_config ={ rtypeleo_decryption_table, };
 
-static MACHINE_CONFIG_START( firebarr, driver_data_t )
+static MACHINE_CONFIG_START( firebarr, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V33, 28000000/2)	/* NEC V33, 28MHz clock */

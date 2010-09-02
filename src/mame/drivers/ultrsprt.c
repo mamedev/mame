@@ -201,7 +201,7 @@ static const k056800_interface ultrsprt_k056800_interface =
 };
 
 
-static MACHINE_CONFIG_START( ultrsprt, driver_data_t )
+static MACHINE_CONFIG_START( ultrsprt, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", PPC403GA, 25000000)		/* PowerPC 403GA 25MHz */
 	MDRV_CPU_PROGRAM_MAP(ultrsprt_map)

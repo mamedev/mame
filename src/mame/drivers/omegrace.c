@@ -466,7 +466,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( omegrace, driver_data_t )
+static MACHINE_CONFIG_START( omegrace, driver_device )
 
 	/* basic machine hardware */
 

@@ -222,7 +222,7 @@ static INTERRUPT_GEN( ttchamp_irq ) /* right? */
 	cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( ttchamp, driver_data_t )
+static MACHINE_CONFIG_START( ttchamp, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V30, 8000000)
 	MDRV_CPU_PROGRAM_MAP(ttchamp_map)

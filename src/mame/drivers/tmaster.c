@@ -870,7 +870,7 @@ static const duart68681_config tmaster_duart68681_config =
 	NULL
 };
 
-static MACHINE_CONFIG_START( tm3k, driver_data_t )
+static MACHINE_CONFIG_START( tm3k, driver_device )
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2) /* 12MHz */
 	MDRV_CPU_PROGRAM_MAP(tmaster_map)
 	MDRV_CPU_VBLANK_INT_HACK(tm3k_interrupt,2+20) // ??
@@ -936,7 +936,7 @@ static MACHINE_RESET( galgames )
 	machine->device("maincpu")->reset();
 }
 
-static MACHINE_CONFIG_START( galgames, driver_data_t )
+static MACHINE_CONFIG_START( galgames, driver_device )
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2)
 	MDRV_CPU_PROGRAM_MAP(galgames_map)
 	MDRV_CPU_VBLANK_INT_HACK(galgames_interrupt, 1+20)	// ??

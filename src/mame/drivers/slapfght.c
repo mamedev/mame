@@ -743,7 +743,7 @@ static VIDEO_EOF( perfrman )
 	buffer_spriteram_w(space, 0, 0);
 }
 
-static MACHINE_CONFIG_START( perfrman, driver_data_t )
+static MACHINE_CONFIG_START( perfrman, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,16000000/4)			/* 4MHz ???, 16MHz Oscillator */
@@ -790,7 +790,7 @@ static MACHINE_CONFIG_START( perfrman, driver_data_t )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( tigerhb, driver_data_t )
+static MACHINE_CONFIG_START( tigerhb, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 6000000)
@@ -836,7 +836,7 @@ static MACHINE_CONFIG_START( tigerhb, driver_data_t )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( tigerh, driver_data_t )
+static MACHINE_CONFIG_START( tigerh, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_36MHz/6) /* verified on pcb */
@@ -886,7 +886,7 @@ static MACHINE_CONFIG_START( tigerh, driver_data_t )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( slapfigh, driver_data_t )
+static MACHINE_CONFIG_START( slapfigh, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80, XTAL_36MHz/6) /* verified on pcb */

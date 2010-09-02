@@ -684,7 +684,7 @@ static const nes_interface nes_config =
 };
 
 
-static MACHINE_CONFIG_START( playch10, driver_data_t )
+static MACHINE_CONFIG_START( playch10, driver_device )
 	// basic machine hardware
 	MDRV_CPU_ADD("maincpu", Z80, 8000000/2)	// 4 MHz
 	MDRV_CPU_PROGRAM_MAP(bios_map)

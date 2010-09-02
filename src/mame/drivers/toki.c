@@ -427,7 +427,7 @@ static const msm5205_interface msm5205_config =
 };
 
 
-static MACHINE_CONFIG_START( toki, driver_data_t ) /* KOYO 20.000MHz near the cpu */
+static MACHINE_CONFIG_START( toki, driver_device ) /* KOYO 20.000MHz near the cpu */
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,XTAL_20MHz /2)	/* verified on pcb */
@@ -459,7 +459,7 @@ static MACHINE_CONFIG_START( toki, driver_data_t ) /* KOYO 20.000MHz near the cp
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( tokib, driver_data_t )
+static MACHINE_CONFIG_START( tokib, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 10MHz causes bad slowdowns with monkey machine rd1 */

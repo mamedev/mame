@@ -477,7 +477,7 @@ static MACHINE_RESET( tbowl )
 	adpcm_data[0] = adpcm_data[1] = -1;
 }
 
-static MACHINE_CONFIG_START( tbowl, driver_data_t )
+static MACHINE_CONFIG_START( tbowl, driver_device )
 
 	/* CPU on Board '6206B' */
 	MDRV_CPU_ADD("maincpu", Z80, 8000000) /* NEC D70008AC-8 (Z80 Clone) */

@@ -503,7 +503,7 @@ static MACHINE_RESET( skimaxx )
  *
  *************************************/
 
-static MACHINE_CONFIG_START( skimaxx, driver_data_t )
+static MACHINE_CONFIG_START( skimaxx, driver_device )
 	MDRV_CPU_ADD("maincpu", M68EC030, XTAL_40MHz)
 	MDRV_CPU_PROGRAM_MAP(68030_1_map)
 	MDRV_CPU_VBLANK_INT("screen", irq3_line_hold)	// 1,3,7 are identical, rest is RTE

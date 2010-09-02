@@ -11,13 +11,11 @@ similar hardware.
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
 
-class drtomy_state : public driver_data_t
+class drtomy_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, drtomy_state(machine)); }
-
-	drtomy_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	drtomy_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	/* memory pointers */
 	UINT16 *  spriteram;

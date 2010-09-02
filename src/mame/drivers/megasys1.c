@@ -1454,7 +1454,7 @@ static const ym2151_interface ym2151_config =
 	megasys1_sound_irq
 };
 
-static MACHINE_CONFIG_START( system_A, driver_data_t )
+static MACHINE_CONFIG_START( system_A, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, SYS_A_CPU_CLOCK) /* 6MHz verified */
@@ -1519,7 +1519,7 @@ static MACHINE_CONFIG_DERIVED( system_B, system_A )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( system_Bbl, driver_data_t )
+static MACHINE_CONFIG_START( system_Bbl, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, SYS_B_CPU_CLOCK)
@@ -1591,7 +1591,7 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 
-static MACHINE_CONFIG_START( system_D, driver_data_t )
+static MACHINE_CONFIG_START( system_D, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, SYS_D_CPU_CLOCK)	/* 8MHz */
@@ -1653,7 +1653,7 @@ static const ym2203_interface ym2203_config =
 	irq_handler
 };
 
-static MACHINE_CONFIG_START( system_Z, driver_data_t )
+static MACHINE_CONFIG_START( system_Z, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, SYS_A_CPU_CLOCK) /* 6MHz (12MHz / 2) */

@@ -532,7 +532,7 @@ static MACHINE_RESET( sms )
 	communication_port_status = 0;
 }
 
-static MACHINE_CONFIG_START( sms, driver_data_t )
+static MACHINE_CONFIG_START( sms, driver_device )
 	MDRV_CPU_ADD("maincpu", I8088, XTAL_24MHz/8)
 	MDRV_CPU_PROGRAM_MAP(sms_map)
 

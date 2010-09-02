@@ -1933,7 +1933,7 @@ static const ay8910_interface ay8910_config =
 };
 
 
-static MACHINE_CONFIG_START( halleys, driver_data_t )
+static MACHINE_CONFIG_START( halleys, driver_device )
 	MDRV_CPU_ADD("maincpu", M6809, XTAL_19_968MHz/12) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(halleys_map)
 	MDRV_CPU_VBLANK_INT_HACK(halleys_interrupt, 4)

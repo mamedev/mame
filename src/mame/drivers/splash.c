@@ -391,7 +391,7 @@ static MACHINE_RESET( splash )
 	ret = 0x100;
 }
 
-static MACHINE_CONFIG_START( splash, driver_data_t )
+static MACHINE_CONFIG_START( splash, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,24000000/2)			/* 12 MHz (24/2) */
@@ -444,7 +444,7 @@ static const ym2203_interface ym2203_config =
 	ym_irq
 };
 
-static MACHINE_CONFIG_START( roldfrog, driver_data_t )
+static MACHINE_CONFIG_START( roldfrog, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,24000000/2)			/* 12 MHz - verified */
@@ -484,7 +484,7 @@ static MACHINE_CONFIG_START( roldfrog, driver_data_t )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( funystrp, driver_data_t )
+static MACHINE_CONFIG_START( funystrp, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,24000000/2)			/* 12 MHz (24/2) */

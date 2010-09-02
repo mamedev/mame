@@ -556,7 +556,7 @@ static const ym3812_interface ym3812_config =
 
 
 
-static MACHINE_CONFIG_START( twincobr, driver_data_t )
+static MACHINE_CONFIG_START( twincobr, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_28MHz/4)		/* 7MHz - Main board Crystal is 28MHz */

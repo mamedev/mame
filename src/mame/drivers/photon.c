@@ -192,7 +192,7 @@ static VIDEO_UPDATE( photon )
 	return pk8000_video_update(screen, bitmap, cliprect, memory_region(screen->machine, "maincpu"));
 }
 
-static MACHINE_CONFIG_START( photon, driver_data_t )
+static MACHINE_CONFIG_START( photon, driver_device )
 
     /* basic machine hardware */
     MDRV_CPU_ADD("maincpu",I8080, 1780000)

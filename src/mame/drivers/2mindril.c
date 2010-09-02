@@ -49,13 +49,11 @@ DAC               -26.6860Mhz
 #include "sound/2610intf.h"
 
 
-class _2mindril_state : public driver_data_t
+class _2mindril_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, _2mindril_state(machine)); }
-
-	_2mindril_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	_2mindril_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	/* memory pointers */
 	UINT16 *      map1ram;

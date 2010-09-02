@@ -512,7 +512,7 @@ static GFXDECODE_START( cyclemb )
 	GFXDECODE_ENTRY( "sprite_data_2", 0, spritelayout_32x32,    0x00, 0x40 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( cyclemb, driver_data_t )
+static MACHINE_CONFIG_START( cyclemb, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80,18000000/4)
 	MDRV_CPU_PROGRAM_MAP(cyclemb_map)

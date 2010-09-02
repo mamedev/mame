@@ -76,13 +76,11 @@ Notes:
 #define x_offset 0x45
 #define y_offset 0x0d
 
-class sliver_state : public driver_data_t
+class sliver_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, sliver_state(machine)); }
-
-	sliver_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	sliver_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	UINT16 io_offset;
 	UINT16 io_reg[IO_SIZE];

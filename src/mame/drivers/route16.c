@@ -607,7 +607,7 @@ static const sn76477_interface sn76477_intf =
 };
 
 
-static MACHINE_CONFIG_START( route16, driver_data_t )
+static MACHINE_CONFIG_START( route16, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("cpu1", Z80, 2500000)	/* 10MHz / 4 = 2.5MHz */

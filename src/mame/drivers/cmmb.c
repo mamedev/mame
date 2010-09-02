@@ -270,7 +270,7 @@ static MACHINE_RESET( cmmb )
 {
 }
 
-static MACHINE_CONFIG_START( cmmb, driver_data_t )
+static MACHINE_CONFIG_START( cmmb, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M65C02,8000000/2) // unknown clock

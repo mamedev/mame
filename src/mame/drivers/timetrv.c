@@ -125,7 +125,7 @@ static INTERRUPT_GEN( ld_irq )
 	cpu_set_input_line_and_vector(device,0,HOLD_LINE,0x48/4); //ld irq
 }
 
-static MACHINE_CONFIG_START( timetrv, driver_data_t )
+static MACHINE_CONFIG_START( timetrv, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",I80188,20000000) //???

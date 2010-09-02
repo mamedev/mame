@@ -641,7 +641,7 @@ static MACHINE_RESET( qdrmfgp )
  *
  *************************************/
 
-static MACHINE_CONFIG_START( qdrmfgp, driver_data_t )
+static MACHINE_CONFIG_START( qdrmfgp, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 32000000/2)	/*  16.000 MHz */
@@ -679,7 +679,7 @@ static MACHINE_CONFIG_START( qdrmfgp, driver_data_t )
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( qdrmfgp2, driver_data_t )
+static MACHINE_CONFIG_START( qdrmfgp2, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 32000000/2)	/*  16.000 MHz */

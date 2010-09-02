@@ -1465,7 +1465,7 @@ static const samples_interface suna8_samples_interface =
 	suna8_sh_start
 };
 
-static MACHINE_CONFIG_START( hardhead, driver_data_t )
+static MACHINE_CONFIG_START( hardhead, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)	/* verified on pcb */
@@ -1531,7 +1531,7 @@ static const ym2203_interface rranger_ym2203_interface =
 };
 
 /* 2203 + 8910 */
-static MACHINE_CONFIG_START( rranger, driver_data_t )
+static MACHINE_CONFIG_START( rranger, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)					/* ? */
@@ -1593,7 +1593,7 @@ static INTERRUPT_GEN( brickzn_interrupt )
 	else				 cpu_set_input_line(device, 0, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( brickzn, driver_data_t )
+static MACHINE_CONFIG_START( brickzn, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)		/* SUNA PROTECTION BLOCK */
@@ -1693,7 +1693,7 @@ static const ay8910_interface starfigh_ay8910_interface =
 	DEVCB_DEVICE_HANDLER("samples", suna8_samples_number_w)
 };
 
-static MACHINE_CONFIG_START( starfigh, driver_data_t )
+static MACHINE_CONFIG_START( starfigh, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)					/* ? */
@@ -1752,7 +1752,7 @@ static INTERRUPT_GEN( sparkman_interrupt )
 	else cpu_set_input_line(device, 0, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( sparkman, driver_data_t )
+static MACHINE_CONFIG_START( sparkman, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)					/* ? */

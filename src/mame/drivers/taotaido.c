@@ -330,7 +330,7 @@ static const ym2610_interface ym2610_config =
 	irqhandler
 };
 
-static MACHINE_CONFIG_START( taotaido, driver_data_t )
+static MACHINE_CONFIG_START( taotaido, driver_device )
 	MDRV_CPU_ADD("maincpu", M68000, 32000000/2)
 	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)

@@ -1711,7 +1711,7 @@ static NVRAM_HANDLER( sms )
 	}
 }
 
-MACHINE_CONFIG_START( sms, driver_data_t )
+MACHINE_CONFIG_START( sms, driver_device )
 	MDRV_CPU_ADD("maincpu", Z80, 3579540)
 	//MDRV_CPU_PROGRAM_MAP(sms_map)
 	MDRV_CPU_IO_MAP(sms_io_map)

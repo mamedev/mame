@@ -461,7 +461,7 @@ static INTERRUPT_GEN( hitpoker_irq )
 	cpu_set_input_line(device, MC68HC11_IRQ_LINE, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( hitpoker, driver_data_t )
+static MACHINE_CONFIG_START( hitpoker, driver_device )
 	MDRV_CPU_ADD("maincpu", MC68HC11,1000000)
 	MDRV_CPU_PROGRAM_MAP(hitpoker_map)
 	MDRV_CPU_IO_MAP(hitpoker_io)

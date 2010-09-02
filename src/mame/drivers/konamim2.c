@@ -1130,7 +1130,7 @@ static INTERRUPT_GEN(m2)
 	cpu_set_input_line(device, INPUT_LINE_IRQ0, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( m2, driver_data_t )
+static MACHINE_CONFIG_START( m2, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", PPC602, 33000000)	/* actually PPC602, 66MHz */

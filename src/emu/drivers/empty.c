@@ -34,7 +34,7 @@ static MACHINE_START( empty )
  *
  *************************************/
 
-static MACHINE_CONFIG_START( empty, driver_data_t )
+static MACHINE_CONFIG_START( empty, driver_device )
 
 	MDRV_MACHINE_START(empty)
 

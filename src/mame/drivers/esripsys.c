@@ -734,7 +734,7 @@ static const esrip_config rip_config =
 	"proms"
 };
 
-static MACHINE_CONFIG_START( esripsys, driver_data_t )
+static MACHINE_CONFIG_START( esripsys, driver_device )
 	MDRV_CPU_ADD("game_cpu", M6809E, XTAL_8MHz)
 	MDRV_CPU_PROGRAM_MAP(game_cpu_map)
 	MDRV_CPU_VBLANK_INT("screen", esripsys_vblank_irq)

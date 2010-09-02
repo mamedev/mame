@@ -236,7 +236,7 @@ static PALETTE_INIT( itgambl3 )
 *     Machine Drivers     *
 **************************/
 
-static MACHINE_CONFIG_START( itgambl3, driver_data_t )
+static MACHINE_CONFIG_START( itgambl3, driver_device )
 
     /* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", H83044, MAIN_CLOCK)	/* wrong CPU, but we have not a M16C core ATM */

@@ -1858,7 +1858,7 @@ static MACHINE_RESET( spi )
 	}
 }
 
-static MACHINE_CONFIG_START( spi, driver_data_t )
+static MACHINE_CONFIG_START( spi, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I386, 50000000/2)	/* Intel 386DX, 25MHz */
@@ -2198,7 +2198,7 @@ static MACHINE_RESET( seibu386 )
 	cpu_set_irq_callback(machine->device("maincpu"), spi_irq_callback);
 }
 
-static MACHINE_CONFIG_START( seibu386, driver_data_t )
+static MACHINE_CONFIG_START( seibu386, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I386, 40000000)	/* AMD 386DX, 40MHz */
@@ -2252,7 +2252,7 @@ static DRIVER_INIT( sys386f2 )
 	}
 }
 
-static MACHINE_CONFIG_START( sys386f2, driver_data_t )
+static MACHINE_CONFIG_START( sys386f2, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I386, 25000000)	/* 25mhz */

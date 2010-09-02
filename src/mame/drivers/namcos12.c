@@ -1511,7 +1511,7 @@ static DRIVER_INIT( ghlpanic )
 	system11gun_install(machine);
 }
 
-static MACHINE_CONFIG_START( coh700, driver_data_t )
+static MACHINE_CONFIG_START( coh700, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",  CXD8661R, XTAL_100MHz )
 	MDRV_CPU_PROGRAM_MAP( namcos12_map)

@@ -9,10 +9,8 @@
 class relief_state : public atarigen_state
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, relief_state(machine)); }
-
-	relief_state(running_machine &machine)
-		: atarigen_state(machine) { }
+	relief_state(running_machine &machine, const driver_device_config_base &config)
+		: atarigen_state(machine, config) { }
 
 	UINT8			ym2413_volume;
 	UINT8			overall_volume;

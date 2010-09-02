@@ -191,7 +191,7 @@ static GFXDECODE_START( scotrsht )
 	GFXDECODE_ENTRY( "gfx2", 0, spritelayout, 16*16*8, 16*8 ) /* sprites */
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( scotrsht, driver_data_t )
+static MACHINE_CONFIG_START( scotrsht, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 18432000/6)        /* 3.072 MHz */

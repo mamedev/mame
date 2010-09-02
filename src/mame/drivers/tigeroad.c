@@ -521,7 +521,7 @@ static const msm5205_interface msm5205_config =
 };
 
 
-static MACHINE_CONFIG_START( tigeroad, driver_data_t )
+static MACHINE_CONFIG_START( tigeroad, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_10MHz) /* verified on pcb */

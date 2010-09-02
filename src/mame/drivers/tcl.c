@@ -112,7 +112,7 @@ static const ppi8255_interface ppi8255_intf[2] =
 };
 
 
-static MACHINE_CONFIG_START( tcl, driver_data_t )
+static MACHINE_CONFIG_START( tcl, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,12000000/4)

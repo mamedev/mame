@@ -850,7 +850,7 @@ static const ay8910_interface scobra_ay8910_interface_2 =
 };
 
 
-static MACHINE_CONFIG_START( type1, driver_data_t )
+static MACHINE_CONFIG_START( type1, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 18432000/6)	/* 3.072 MHz */
@@ -975,7 +975,7 @@ static MACHINE_CONFIG_DERIVED( darkplnt, type2 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( hustler, driver_data_t )
+static MACHINE_CONFIG_START( hustler, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 18432000/6)	/* 3.072 MHz */

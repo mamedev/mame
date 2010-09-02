@@ -558,7 +558,7 @@ static INTERRUPT_GEN( acommand_irq )
 	}
 }
 
-static MACHINE_CONFIG_START( acommand, driver_data_t )
+static MACHINE_CONFIG_START( acommand, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M68000,12000000)

@@ -343,7 +343,7 @@ static GFXDECODE_START( mil4000 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( mil4000, driver_data_t )
+static MACHINE_CONFIG_START( mil4000, driver_device )
 	MDRV_CPU_ADD("maincpu", M68000, 12000000 )	// ?
 	MDRV_CPU_PROGRAM_MAP(mil4000_map)
 	// irq 2/4/5 point to the same place, others invalid

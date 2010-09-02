@@ -11,11 +11,13 @@
 class beathead_state : public atarigen_state
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, beathead_state(machine)); }
+	beathead_state(running_machine &machine, const driver_device_config_base &config)
+		: atarigen_state(machine, config) { }
 
-	beathead_state(running_machine &machine)
-		: atarigen_state(machine),
-		  m_maincpu(*machine.device<asap_device>("maincpu")) { }
+	virtual void find_devices()
+	{
+		required_device(m_maincpu, "maincpu");
+	}
 
 	virtual void machine_start();
 	virtual void machine_reset();
@@ -23,7 +25,7 @@ public:
 	virtual void video_start();
 	virtual bool video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 
-	asap_device &	m_maincpu;
+	asap_device *	m_maincpu;
 
 	UINT32 *		m_videoram;
 	UINT32 *		m_paletteram;

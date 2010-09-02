@@ -830,7 +830,7 @@ static const ymz280b_interface ymz280b_intf =
 	0	// irq ?
 };
 
-static MACHINE_CONFIG_START( skns, driver_data_t )
+static MACHINE_CONFIG_START( skns, driver_device )
 	MDRV_CPU_ADD("maincpu", SH2,28638000)
 	MDRV_CPU_PROGRAM_MAP(skns_map)
 	MDRV_CPU_VBLANK_INT_HACK(skns_interrupt,2)

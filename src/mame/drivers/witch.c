@@ -756,7 +756,7 @@ static INTERRUPT_GEN( witch_sub_interrupt )
 	cpu_set_input_line(device,0,ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( witch, driver_data_t )
+static MACHINE_CONFIG_START( witch, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,8000000)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(map_main)

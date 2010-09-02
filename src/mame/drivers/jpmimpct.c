@@ -845,7 +845,7 @@ static const tms34010_config tms_config =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( jpmimpct, driver_data_t )
+static MACHINE_CONFIG_START( jpmimpct, driver_device )
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)
 	MDRV_CPU_PROGRAM_MAP(m68k_program_map)
 
@@ -1321,7 +1321,7 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( impctawp, driver_data_t )
+static MACHINE_CONFIG_START( impctawp, driver_device )
 	MDRV_CPU_ADD("maincpu",M68000, 8000000)
 	MDRV_CPU_PROGRAM_MAP(awp68k_program_map)
 

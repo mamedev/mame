@@ -427,7 +427,7 @@ static const pokey_interface pokey_config = {
 	atari_interrupt_cb
 };
 
-static MACHINE_CONFIG_START( a600xl, driver_data_t )
+static MACHINE_CONFIG_START( a600xl, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, FREQ_17_EXACT)
 	MDRV_CPU_PROGRAM_MAP(a600xl_mem)

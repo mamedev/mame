@@ -1714,7 +1714,7 @@ static const ym3812_interface ym3812_config =
 
 /************* core pieces ******************/
 
-static MACHINE_CONFIG_START( itech8_core_lo, driver_data_t )
+static MACHINE_CONFIG_START( itech8_core_lo, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, CLOCK_8MHz/4)

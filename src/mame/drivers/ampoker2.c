@@ -1054,7 +1054,7 @@ static const ay8910_interface ay8910_config =
 *     Machine Driver     *
 *************************/
 
-static MACHINE_CONFIG_START( ampoker2, driver_data_t )
+static MACHINE_CONFIG_START( ampoker2, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/2)		/* 3 MHz */

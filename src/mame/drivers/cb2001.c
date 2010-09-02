@@ -791,7 +791,7 @@ static const ay8910_interface cb2001_ay8910_config =
 };
 
 static const nec_config cb2001_config = { cb2001_decryption_table, };
-static MACHINE_CONFIG_START( cb2001, driver_data_t )
+static MACHINE_CONFIG_START( cb2001, driver_device )
 	MDRV_CPU_ADD("maincpu", V30, 20000000) // CPU91A-011-0016JK004; encrypted cpu like nec v25/35 used in some irem game
 	MDRV_CPU_CONFIG(cb2001_config)
 	MDRV_CPU_PROGRAM_MAP(cb2001_map)

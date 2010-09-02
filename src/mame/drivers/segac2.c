@@ -1360,7 +1360,7 @@ static VIDEO_UPDATE(segac2_new)
 }
 
 
-static MACHINE_CONFIG_START( segac, driver_data_t )
+static MACHINE_CONFIG_START( segac, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XL2_CLOCK/6)

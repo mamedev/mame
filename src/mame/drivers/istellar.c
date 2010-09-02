@@ -321,7 +321,7 @@ static INTERRUPT_GEN( vblank_callback_istellar )
 
 
 /* DRIVER */
-static MACHINE_CONFIG_START( istellar, driver_data_t )
+static MACHINE_CONFIG_START( istellar, driver_device )
 	/* main cpu */
 	MDRV_CPU_ADD("maincpu", Z80, GUESSED_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(z80_0_mem)

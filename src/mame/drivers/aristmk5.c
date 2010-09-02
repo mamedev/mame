@@ -214,7 +214,7 @@ static const i2cmem_interface i2cmem_interface =
 };
 
 
-static MACHINE_CONFIG_START( aristmk5, driver_data_t )
+static MACHINE_CONFIG_START( aristmk5, driver_device )
 	MDRV_CPU_ADD("maincpu", ARM, 10000000) // ?
 	MDRV_CPU_PROGRAM_MAP(aristmk5_map)
 

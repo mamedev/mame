@@ -433,7 +433,7 @@ static const samples_interface gridlee_samples_interface =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( gridlee, driver_data_t )
+static MACHINE_CONFIG_START( gridlee, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, BALSENTE_CPU_CLOCK)

@@ -287,7 +287,7 @@ static const pokey_interface pokey_config =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( irobot, driver_data_t )
+static MACHINE_CONFIG_START( irobot, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, MAIN_CLOCK/8)

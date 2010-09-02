@@ -154,7 +154,7 @@ static MACHINE_RESET( deshoros )
 	bank = -1;
 }
 
-static MACHINE_CONFIG_START( deshoros, driver_data_t )
+static MACHINE_CONFIG_START( deshoros, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M6809,2000000)

@@ -755,7 +755,7 @@ static COP400_INTERFACE( thayers_cop_intf )
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( thayers, driver_data_t )
+static MACHINE_CONFIG_START( thayers, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_4MHz)
 	MDRV_CPU_PROGRAM_MAP(thayers_map)

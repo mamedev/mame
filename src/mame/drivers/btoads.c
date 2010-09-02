@@ -331,7 +331,7 @@ static const tms34010_config tms_config =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( btoads, driver_data_t )
+static MACHINE_CONFIG_START( btoads, driver_device )
 
 	MDRV_CPU_ADD("maincpu", TMS34020, CPU_CLOCK/2)
 	MDRV_CPU_CONFIG(tms_config)

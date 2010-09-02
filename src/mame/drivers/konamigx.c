@@ -1785,7 +1785,7 @@ static GFXDECODE_START( type4 )
 	GFXDECODE_ENTRY( "gfx3", 0, bglayout_8bpp, 0x1800, 8 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( konamigx, driver_data_t )
+static MACHINE_CONFIG_START( konamigx, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC020, 24000000)
 	MDRV_CPU_PROGRAM_MAP(gx_type2_map)

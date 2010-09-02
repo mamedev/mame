@@ -189,7 +189,7 @@ static GFXDECODE_START( ssozumo )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( ssozumo, driver_data_t )
+static MACHINE_CONFIG_START( ssozumo, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 1200000)	/* 1.2 MHz ???? */

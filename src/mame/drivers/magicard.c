@@ -623,7 +623,7 @@ static INTERRUPT_GEN( magicard_irq )
 		cpu_set_input_line_and_vector(device, 1, HOLD_LINE,0xf0/4);
 }
 
-static MACHINE_CONFIG_START( magicard, driver_data_t )
+static MACHINE_CONFIG_START( magicard, driver_device )
 	MDRV_CPU_ADD("maincpu", SCC68070, CLOCK_A/2)	/* SCC-68070 CCA84 datasheet */
 	MDRV_CPU_PROGRAM_MAP(magicard_mem)
 	MDRV_CPU_VBLANK_INT("screen", magicard_irq) /* no interrupts? (it erases the vectors..) */

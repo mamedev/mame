@@ -373,7 +373,7 @@ static const ay8910_interface shangkid_ay8910_interface =
 };
 
 
-static MACHINE_CONFIG_START( chinhero, driver_data_t )
+static MACHINE_CONFIG_START( chinhero, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6) /* verified on pcb */
@@ -465,7 +465,7 @@ static ADDRESS_MAP_START( dynamski_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_data_address_w)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( dynamski, driver_data_t )
+static MACHINE_CONFIG_START( dynamski, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3000000) /* ? */

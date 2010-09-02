@@ -3444,7 +3444,7 @@ static GFXDECODE_START( igs011_hi )
 GFXDECODE_END
 #endif
 
-static MACHINE_CONFIG_START( igs011_base, driver_data_t )
+static MACHINE_CONFIG_START( igs011_base, driver_device )
 	MDRV_CPU_ADD("maincpu",M68000, XTAL_22MHz/3)
 
 	MDRV_NVRAM_HANDLER(generic_0fill)

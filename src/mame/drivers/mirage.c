@@ -39,13 +39,11 @@ MR_01-.3A    [a0b758aa]
 #include "video/deco16ic.h"
 #include "sound/okim6295.h"
 
-class mirage_state : public driver_data_t
+class mirage_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, mirage_state(machine)); }
-
-	mirage_state(running_machine &machine)
-		: driver_data_t(machine),
+	mirage_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config),
 		  maincpu(machine.device<cpu_device>("maincpu")),
 		  deco16ic(machine.device<deco16ic_device>("deco_custom")),
 		  oki_sfx(machine.device<okim6295_device>("oki_sfx")),

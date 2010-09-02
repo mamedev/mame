@@ -437,7 +437,7 @@ static const msm5205_interface msm5205_config =
 
 
 
-static MACHINE_CONFIG_START( rmhaihai, driver_data_t )
+static MACHINE_CONFIG_START( rmhaihai, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80,20000000/4)	/* 5 MHz ??? */

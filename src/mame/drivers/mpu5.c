@@ -33,7 +33,7 @@ static VIDEO_UPDATE(mpu5)
 	return 0;
 }
 
-static MACHINE_CONFIG_START( mpu5, driver_data_t )
+static MACHINE_CONFIG_START( mpu5, driver_device )
 	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)	 // ?
 	MDRV_CPU_PROGRAM_MAP(mpu5_map)
 

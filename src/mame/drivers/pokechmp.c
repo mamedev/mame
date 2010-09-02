@@ -228,7 +228,7 @@ static GFXDECODE_START( pokechmp )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( pokechmp, driver_data_t )
+static MACHINE_CONFIG_START( pokechmp, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 4000000)

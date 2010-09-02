@@ -441,7 +441,7 @@ static GFXDECODE_START( gpworld )
 GFXDECODE_END
 
 /* DRIVER */
-static MACHINE_CONFIG_START( gpworld, driver_data_t )
+static MACHINE_CONFIG_START( gpworld, driver_device )
 
 	/* main cpu */
 	MDRV_CPU_ADD("maincpu", Z80, GUESSED_CLOCK)

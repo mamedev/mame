@@ -353,7 +353,7 @@ static const ym2203_interface ym2203_config =
 	irqhandler
 };
 
-static MACHINE_CONFIG_START( sshangha, driver_data_t )
+static MACHINE_CONFIG_START( sshangha, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 28000000/2)

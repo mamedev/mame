@@ -759,7 +759,7 @@ static INTERRUPT_GEN( bssoccer_interrupt )
 	}
 }
 
-static MACHINE_CONFIG_START( bssoccer, driver_data_t )
+static MACHINE_CONFIG_START( bssoccer, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)	/* ? */
@@ -819,7 +819,7 @@ MACHINE_CONFIG_END
                                 Ultra Balloon
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( uballoon, driver_data_t )
+static MACHINE_CONFIG_START( uballoon, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)
@@ -871,7 +871,7 @@ MACHINE_CONFIG_END
                             Suna Quiz 6000 Academy
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( sunaq, driver_data_t )
+static MACHINE_CONFIG_START( sunaq, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 24000000/4)
 	MDRV_CPU_PROGRAM_MAP(sunaq_map)
@@ -943,7 +943,7 @@ static const ay8910_interface bestbest_ay8910_interface =
 	DEVCB_HANDLER(bestbest_ay8910_port_a_w),	DEVCB_NULL
 };
 
-static MACHINE_CONFIG_START( bestbest, driver_data_t )
+static MACHINE_CONFIG_START( bestbest, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 24000000/4)
 	MDRV_CPU_PROGRAM_MAP(bestbest_map)

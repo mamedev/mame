@@ -256,7 +256,7 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-static MACHINE_CONFIG_START( dcon, driver_data_t )
+static MACHINE_CONFIG_START( dcon, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)
@@ -285,7 +285,7 @@ static MACHINE_CONFIG_START( dcon, driver_data_t )
 	SEIBU_SOUND_SYSTEM_YM3812_INTERFACE(4000000,1320000)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sdgndmps, driver_data_t )
+static MACHINE_CONFIG_START( sdgndmps, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)

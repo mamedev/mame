@@ -73,7 +73,7 @@
 // between devices and the machine config
 class machine_config;
 class device_config;
-typedef void (*machine_config_constructor)(machine_config &config, device_config *owner);
+typedef device_config * (*machine_config_constructor)(machine_config &config, device_config *owner);
 
 // devices and callbacks
 #include "devintrf.h"

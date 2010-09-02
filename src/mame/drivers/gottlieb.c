@@ -1915,7 +1915,7 @@ static const samples_interface reactor_samples_interface =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( gottlieb_core, driver_data_t )
+static MACHINE_CONFIG_START( gottlieb_core, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8088, CPU_CLOCK/3)

@@ -4,13 +4,11 @@
 
 *************************************************************************/
 
-class ashnojoe_state : public driver_data_t
+class ashnojoe_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, ashnojoe_state(machine)); }
-
-	ashnojoe_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	ashnojoe_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	/* memory pointers */
 	UINT16 *    tileram;

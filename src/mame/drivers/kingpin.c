@@ -138,7 +138,7 @@ static const TMS9928a_interface tms9928a_interface =
 	vdp_interrupt
 };
 
-static MACHINE_CONFIG_START( kingpin, driver_data_t )
+static MACHINE_CONFIG_START( kingpin, driver_device )
 /*  MAIN CPU */
 	MDRV_CPU_ADD("maincpu", Z80, 3579545)
 	MDRV_CPU_PROGRAM_MAP(kingpin_program_map)

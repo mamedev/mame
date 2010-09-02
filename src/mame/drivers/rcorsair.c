@@ -106,7 +106,7 @@ static VIDEO_UPDATE( rcorsair )
 	return 0;
 }
 
-static MACHINE_CONFIG_START( rcorsair, driver_data_t )
+static MACHINE_CONFIG_START( rcorsair, driver_device )
 
 	/* Main CPU is probably inside Custom Block with
        program code, unknown type */

@@ -546,7 +546,7 @@ INPUT_PORTS_END
 
 /*** MACHINE DRIVER **********************************************************/
 
-static MACHINE_CONFIG_START( gstriker, driver_data_t )
+static MACHINE_CONFIG_START( gstriker, driver_device )
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(gstriker_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
@@ -585,7 +585,7 @@ static MACHINE_CONFIG_DERIVED( twrldc94, gstriker )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( vgoal, driver_data_t )
+static MACHINE_CONFIG_START( vgoal, driver_device )
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(vgoal_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)

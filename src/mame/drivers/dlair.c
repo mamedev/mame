@@ -669,7 +669,7 @@ static const ay8910_interface ay8910_config =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( dlair_base, driver_data_t )
+static MACHINE_CONFIG_START( dlair_base, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK_US/4)
@@ -706,7 +706,7 @@ static MACHINE_CONFIG_DERIVED( dlair_ldv1000, dlair_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( dleuro, driver_data_t )
+static MACHINE_CONFIG_START( dleuro, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK_EURO/4)

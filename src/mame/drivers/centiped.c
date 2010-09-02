@@ -1586,7 +1586,7 @@ static const pokey_interface warlords_pokey_interface =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( centiped, driver_data_t )
+static MACHINE_CONFIG_START( centiped, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 12096000/8)	/* 1.512 MHz (slows down to 0.75MHz while accessing playfield RAM) */
@@ -1710,7 +1710,7 @@ static MACHINE_CONFIG_DERIVED( mazeinv, milliped )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( bullsdrt, driver_data_t )
+static MACHINE_CONFIG_START( bullsdrt, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", S2650, 12096000/8)

@@ -6190,7 +6190,7 @@ MACHINE_CONFIG_FRAGMENT( megadriv_timers )
 MACHINE_CONFIG_END
 
 
-MACHINE_CONFIG_START( megadriv, driver_data_t )
+MACHINE_CONFIG_START( megadriv, driver_device )
 	MDRV_CPU_ADD("maincpu", M68000, MASTER_CLOCK_NTSC / 7) /* 7.67 MHz */
 	MDRV_CPU_PROGRAM_MAP(megadriv_map)
 	/* IRQs are handled via the timers */
@@ -6237,7 +6237,7 @@ MACHINE_CONFIG_END
 
 /************ PAL hardware has a different master clock *************/
 
-MACHINE_CONFIG_START( megadpal, driver_data_t )
+MACHINE_CONFIG_START( megadpal, driver_device )
 	MDRV_CPU_ADD("maincpu", M68000, MASTER_CLOCK_PAL / 7) /* 7.67 MHz */
 	MDRV_CPU_PROGRAM_MAP(megadriv_map)
 	/* IRQs are handled via the timers */

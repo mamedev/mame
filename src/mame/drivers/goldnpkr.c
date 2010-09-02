@@ -2287,7 +2287,7 @@ DISCRETE_SOUND_END
 *              Machine Drivers               *
 *********************************************/
 
-static MACHINE_CONFIG_START( goldnpkr_base, driver_data_t )
+static MACHINE_CONFIG_START( goldnpkr_base, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, CPU_CLOCK)

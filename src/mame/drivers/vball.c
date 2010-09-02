@@ -415,7 +415,7 @@ static const ym2151_interface ym2151_config =
 };
 
 
-static MACHINE_CONFIG_START( vball, driver_data_t )
+static MACHINE_CONFIG_START( vball, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, CPU_CLOCK)	/* 2 MHz - measured by guru but it makes the game far far too slow ?! */

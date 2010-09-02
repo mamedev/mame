@@ -771,7 +771,7 @@ static const z80_daisy_config daisy_chain_sound[] =
 };
 
 
-static MACHINE_CONFIG_START( niyanpai, driver_data_t )
+static MACHINE_CONFIG_START( niyanpai, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12288000/2)	/* TMP68301, 6.144 MHz */

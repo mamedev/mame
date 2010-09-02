@@ -379,7 +379,7 @@ static const mc6845_interface mc6845_intf =
 *     Machine Drivers     *
 **************************/
 
-static MACHINE_CONFIG_START( 4roses, driver_data_t )
+static MACHINE_CONFIG_START( 4roses, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M65C02, MASTER_CLOCK/8)	/* 2MHz, guess */
 	MDRV_CPU_PROGRAM_MAP(4roses_map)

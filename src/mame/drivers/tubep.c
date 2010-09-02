@@ -892,7 +892,7 @@ static const msm5205_interface msm5205_config =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( tubep, driver_data_t )
+static MACHINE_CONFIG_START( tubep, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80,16000000 / 4)	/* 4 MHz */
@@ -954,7 +954,7 @@ static MACHINE_CONFIG_DERIVED( tubepb, tubep )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( rjammer, driver_data_t )
+static MACHINE_CONFIG_START( rjammer, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80,16000000 / 4)	/* 4 MHz */

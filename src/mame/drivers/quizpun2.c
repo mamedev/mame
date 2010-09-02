@@ -415,7 +415,7 @@ GFXDECODE_END
                                 Machine Drivers
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( quizpun2, driver_data_t )
+static MACHINE_CONFIG_START( quizpun2, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_8MHz / 2)	// 4 MHz?
 	MDRV_CPU_PROGRAM_MAP(quizpun2_map)

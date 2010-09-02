@@ -671,7 +671,7 @@ static const ymz280b_interface ymz280b_config =
 	livequiz_irqhandler
 };
 
-static MACHINE_CONFIG_START( livequiz, driver_data_t )
+static MACHINE_CONFIG_START( livequiz, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_24MHz / 2)
@@ -702,7 +702,7 @@ static MACHINE_CONFIG_START( livequiz, driver_data_t )
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.80)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( hammer, driver_data_t )
+static MACHINE_CONFIG_START( hammer, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_28MHz / 2)

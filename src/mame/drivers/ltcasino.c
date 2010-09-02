@@ -626,7 +626,7 @@ static VIDEO_UPDATE(ltcasino)
 }
 
 
-static MACHINE_CONFIG_START( ltcasino, driver_data_t )
+static MACHINE_CONFIG_START( ltcasino, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502,2000000)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(ltcasino_map)

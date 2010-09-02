@@ -277,7 +277,7 @@ GFXDECODE_END
 /*** MACHINE DRIVER **********************************************************/
 
 
-static MACHINE_CONFIG_START( speedspn, driver_data_t )
+static MACHINE_CONFIG_START( speedspn, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80,6000000)		 /* 6 MHz */

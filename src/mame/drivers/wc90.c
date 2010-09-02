@@ -306,7 +306,7 @@ static const ym2608_interface ym2608_config =
 	irqhandler
 };
 
-static MACHINE_CONFIG_START( wc90, driver_data_t )
+static MACHINE_CONFIG_START( wc90, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_8MHz)		/* verified on pcb */

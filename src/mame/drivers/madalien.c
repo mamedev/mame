@@ -172,7 +172,7 @@ static const ay8910_interface ay8910_config =
 };
 
 
-static MACHINE_CONFIG_START( madalien, driver_data_t )
+static MACHINE_CONFIG_START( madalien, driver_device )
 
 	/* main CPU */
 	MDRV_CPU_ADD("maincpu", M6502, MADALIEN_MAIN_CLOCK / 8)    /* 1324kHz */

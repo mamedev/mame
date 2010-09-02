@@ -457,7 +457,7 @@ static const st0016_interface st0016_config =
 	&st0016_charram
 };
 
-static MACHINE_CONFIG_START( macs, driver_data_t )
+static MACHINE_CONFIG_START( macs, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80,8000000) /* 8 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(macs_mem)

@@ -661,7 +661,7 @@ GFXDECODE_END
 
 /*******************************************************************************/
 
-static MACHINE_CONFIG_START( tsamurai, driver_data_t )
+static MACHINE_CONFIG_START( tsamurai, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)
@@ -704,7 +704,7 @@ static MACHINE_CONFIG_START( tsamurai, driver_data_t )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( m660, driver_data_t )
+static MACHINE_CONFIG_START( m660, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)
@@ -752,7 +752,7 @@ static MACHINE_CONFIG_START( m660, driver_data_t )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( vsgongf, driver_data_t )
+static MACHINE_CONFIG_START( vsgongf, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)

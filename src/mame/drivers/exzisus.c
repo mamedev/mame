@@ -298,7 +298,7 @@ static const tc0140syt_interface exzisus_tc0140syt_intf =
 };
 
 /* All clocks are unconfirmed */
-static MACHINE_CONFIG_START( exzisus, driver_data_t )
+static MACHINE_CONFIG_START( exzisus, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("cpua", Z80, 6000000)

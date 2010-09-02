@@ -246,7 +246,7 @@ static INTERRUPT_GEN( darkmist_interrupt )
 
 
 
-static MACHINE_CONFIG_START( darkmist, driver_data_t )
+static MACHINE_CONFIG_START( darkmist, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,4000000)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(memmap)

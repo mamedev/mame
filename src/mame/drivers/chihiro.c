@@ -298,7 +298,7 @@ static MACHINE_START( chihiro )
 		debug_console_register_command(machine,"jamdis",CMDFLAG_NONE,0,2,3,jamtable_disasm_command);
 }
 
-static MACHINE_CONFIG_START( chihiro_base, driver_data_t )
+static MACHINE_CONFIG_START( chihiro_base, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", PENTIUM, 733333333) /* Wrong! */

@@ -192,7 +192,7 @@ static PALETTE_INIT(cardline)
 	}
 }
 
-static MACHINE_CONFIG_START( cardline, driver_data_t )
+static MACHINE_CONFIG_START( cardline, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I80C32,12000000)

@@ -705,7 +705,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( spiders, driver_data_t )
+static MACHINE_CONFIG_START( spiders, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 2800000)

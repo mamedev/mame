@@ -700,7 +700,7 @@ static const ay8910_interface buggybjr_ym2149_interface_2 =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( tx1, driver_data_t )
+static MACHINE_CONFIG_START( tx1, driver_device )
 	MDRV_CPU_ADD("main_cpu", I8086, CPU_MASTER_CLOCK / 3)
 	MDRV_CPU_PROGRAM_MAP(tx1_main)
 //  MDRV_WATCHDOG_TIME_INIT(5)
@@ -753,7 +753,7 @@ static MACHINE_CONFIG_START( tx1, driver_data_t )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( buggyboy, driver_data_t )
+static MACHINE_CONFIG_START( buggyboy, driver_device )
 	MDRV_CPU_ADD("main_cpu", I8086, CPU_MASTER_CLOCK / 3)
 	MDRV_CPU_PROGRAM_MAP(buggyboy_main)
 //  MDRV_WATCHDOG_TIME_INIT(5)
@@ -808,7 +808,7 @@ static MACHINE_CONFIG_START( buggyboy, driver_data_t )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( buggybjr, driver_data_t )
+static MACHINE_CONFIG_START( buggybjr, driver_device )
 	MDRV_CPU_ADD("main_cpu", I8086, CPU_MASTER_CLOCK / 3)
 	MDRV_CPU_PROGRAM_MAP(buggybjr_main)
 //  MDRV_WATCHDOG_TIME_INIT(5)

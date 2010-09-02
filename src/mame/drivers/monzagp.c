@@ -238,7 +238,7 @@ static GFXDECODE_START( monzagp )
 	GFXDECODE_ENTRY( "gfx1", 0x0000, tile_layout2,   0, 8 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( monzagp, driver_data_t )
+static MACHINE_CONFIG_START( monzagp, driver_device )
 	MDRV_CPU_ADD("maincpu", I8035, 12000000/32)	/* 400KHz ??? - Main board Crystal is 12MHz */
 	MDRV_CPU_PROGRAM_MAP(monzagp_map)
 	MDRV_CPU_IO_MAP(monzagp_io)

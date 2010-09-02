@@ -1013,7 +1013,7 @@ static const namco_interface namco_config =
 };
 
 
-static MACHINE_CONFIG_START( hopmappy, driver_data_t )
+static MACHINE_CONFIG_START( hopmappy, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("cpu1", M6809, 49152000/32)

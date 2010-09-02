@@ -281,7 +281,7 @@ static INTERRUPT_GEN( mcu_interrupt )
   - The level 1 interrupt to the 68k has been measured at 60Hz.
 *******************************************/
 
-static MACHINE_CONFIG_START( namcond1, driver_data_t )
+static MACHINE_CONFIG_START( namcond1, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12288000)

@@ -448,7 +448,7 @@ static const tms9927_interface tms9927_intf =
 };
 
 
-static MACHINE_CONFIG_START( sharkatt, driver_data_t )
+static MACHINE_CONFIG_START( sharkatt, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)        /* 4 MHz? */
@@ -486,7 +486,7 @@ static MACHINE_CONFIG_START( sharkatt, driver_data_t )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( thief, driver_data_t )
+static MACHINE_CONFIG_START( thief, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000) /* 4 MHz? */
@@ -524,7 +524,7 @@ static MACHINE_CONFIG_START( thief, driver_data_t )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( natodef, driver_data_t )
+static MACHINE_CONFIG_START( natodef, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000) /* 4 MHz? */

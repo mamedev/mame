@@ -876,7 +876,7 @@ static const ymf262_interface tecmosys_ymf262_interface =
 };
 
 
-static MACHINE_CONFIG_START( deroon, driver_data_t )
+static MACHINE_CONFIG_START( deroon, driver_device )
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)

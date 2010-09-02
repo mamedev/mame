@@ -375,7 +375,7 @@ static INTERRUPT_GEN( mirax_vblank_irq )
 		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( mirax, driver_data_t )
+static MACHINE_CONFIG_START( mirax, driver_device )
 	MDRV_CPU_ADD("maincpu", Z80, 12000000/4) // ceramic potted module, encrypted z80
 	MDRV_CPU_PROGRAM_MAP(mirax_main_map)
 	MDRV_CPU_VBLANK_INT("screen",mirax_vblank_irq)

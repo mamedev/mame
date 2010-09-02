@@ -432,7 +432,7 @@ static const st0016_interface st0016_config =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( st0016, driver_data_t )
+static MACHINE_CONFIG_START( st0016, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80,8000000) /* 8 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(st0016_mem)

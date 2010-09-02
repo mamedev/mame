@@ -313,7 +313,7 @@ static GFXDECODE_START( tugboat )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( tugboat, driver_data_t )
+static MACHINE_CONFIG_START( tugboat, driver_device )
 	MDRV_CPU_ADD("maincpu", M6502, 2000000)	/* 2 MHz ???? */
 	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)

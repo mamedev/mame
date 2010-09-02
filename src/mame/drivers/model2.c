@@ -2009,7 +2009,7 @@ static const mb86233_cpu_core tgp_config =
 
 
 /* original Model 2 */
-static MACHINE_CONFIG_START( model2o, driver_data_t )
+static MACHINE_CONFIG_START( model2o, driver_device )
 	MDRV_CPU_ADD("maincpu", I960, 25000000)
 	MDRV_CPU_PROGRAM_MAP(model2o_mem)
 	MDRV_CPU_VBLANK_INT_HACK(model2_interrupt,2)
@@ -2065,7 +2065,7 @@ static MACHINE_CONFIG_START( model2o, driver_data_t )
 MACHINE_CONFIG_END
 
 /* 2A-CRX */
-static MACHINE_CONFIG_START( model2a, driver_data_t )
+static MACHINE_CONFIG_START( model2a, driver_device )
 	MDRV_CPU_ADD("maincpu", I960, 25000000)
 	MDRV_CPU_PROGRAM_MAP(model2a_crx_mem)
 	MDRV_CPU_VBLANK_INT_HACK(model2_interrupt,2)
@@ -2160,7 +2160,7 @@ static const sharc_config sharc_cfg =
 };
 
 /* 2B-CRX */
-static MACHINE_CONFIG_START( model2b, driver_data_t )
+static MACHINE_CONFIG_START( model2b, driver_device )
 	MDRV_CPU_ADD("maincpu", I960, 25000000)
 	MDRV_CPU_PROGRAM_MAP(model2b_crx_mem)
 	MDRV_CPU_VBLANK_INT_HACK(model2_interrupt,2)
@@ -2215,7 +2215,7 @@ static MACHINE_CONFIG_START( model2b, driver_data_t )
 MACHINE_CONFIG_END
 
 /* 2C-CRX */
-static MACHINE_CONFIG_START( model2c, driver_data_t )
+static MACHINE_CONFIG_START( model2c, driver_device )
 	MDRV_CPU_ADD("maincpu", I960, 25000000)
 	MDRV_CPU_PROGRAM_MAP(model2c_crx_mem)
 	MDRV_CPU_VBLANK_INT_HACK(model2c_interrupt,3)

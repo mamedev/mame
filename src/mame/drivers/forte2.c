@@ -115,7 +115,7 @@ static INTERRUPT_GEN( pesadelo_interrupt )
 }
 
 
-static MACHINE_CONFIG_START( pesadelo, driver_data_t )
+static MACHINE_CONFIG_START( pesadelo, driver_device )
 
 	MDRV_CPU_ADD("maincpu", Z80, 3579545)		  /* 3.579545 Mhz */
 	MDRV_CPU_PROGRAM_MAP(program_mem)

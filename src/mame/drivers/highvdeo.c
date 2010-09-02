@@ -865,7 +865,7 @@ static INTERRUPT_GEN( vblank_irq )
 	cpu_set_input_line_and_vector(device,0,HOLD_LINE,0x08/4);
 }
 
-static MACHINE_CONFIG_START( tv_vcf, driver_data_t )
+static MACHINE_CONFIG_START( tv_vcf, driver_device )
 	MDRV_CPU_ADD("maincpu", V30, XTAL_12MHz/2 )	// ?
 	MDRV_CPU_PROGRAM_MAP(tv_vcf_map)
 	MDRV_CPU_IO_MAP(tv_vcf_io)
@@ -932,7 +932,7 @@ static MACHINE_CONFIG_DERIVED( ciclone, tv_tcf )
 	MDRV_CPU_VBLANK_INT("screen", vblank_irq)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( brasil, driver_data_t )
+static MACHINE_CONFIG_START( brasil, driver_device )
 	MDRV_CPU_ADD("maincpu", I80186, 20000000 )	// fashion doesn't like 20/2 Mhz
 	MDRV_CPU_PROGRAM_MAP(brasil_map)
 	MDRV_CPU_IO_MAP(brasil_io)

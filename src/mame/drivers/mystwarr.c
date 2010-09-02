@@ -957,7 +957,7 @@ static MACHINE_RESET(gaiapols)
 	for (i=5; i<=7; i++) k054539_set_gain(k054539_1, i, 2.0);
 }
 
-static MACHINE_CONFIG_START( mystwarr, driver_data_t )
+static MACHINE_CONFIG_START( mystwarr, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)	/* 16 MHz (confirmed) */

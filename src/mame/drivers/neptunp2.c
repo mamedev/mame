@@ -66,7 +66,7 @@ static GFXDECODE_START( neptunp2 )
 //  GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 8 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( neptunp2, driver_data_t )
+static MACHINE_CONFIG_START( neptunp2, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",I80188,20000000) // N80C188-20 AMD

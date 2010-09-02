@@ -76,7 +76,7 @@ static INPUT_PORTS_START( comebaby )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( comebaby, driver_data_t )
+static MACHINE_CONFIG_START( comebaby, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", PENTIUM, 2000000000) /* Probably a Pentium .. ?? Mhz*/
 	MDRV_CPU_PROGRAM_MAP(comebaby_map)

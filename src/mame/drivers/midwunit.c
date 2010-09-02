@@ -631,7 +631,7 @@ static const tms34010_config tms_config =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( wunit, driver_data_t )
+static MACHINE_CONFIG_START( wunit, driver_device )
 
 	MDRV_CPU_ADD("maincpu", TMS34010, 50000000)
 	MDRV_CPU_CONFIG(tms_config)

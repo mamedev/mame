@@ -989,7 +989,7 @@ static INTERRUPT_GEN( vsync_interrupt )
 }
 
 
-static MACHINE_CONFIG_START( maygayv1, driver_data_t )
+static MACHINE_CONFIG_START( maygayv1, driver_device )
 	MDRV_CPU_ADD("maincpu", M68000, MASTER_CLOCK / 2)
 	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", vsync_interrupt)

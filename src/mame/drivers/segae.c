@@ -865,7 +865,7 @@ static ADDRESS_MAP_START( io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( systeme, driver_data_t )
+static MACHINE_CONFIG_START( systeme, driver_device )
 	MDRV_CPU_ADD("maincpu", Z80, 10738600/2) /* correct?  */
 	MDRV_CPU_PROGRAM_MAP(systeme_map)
 	MDRV_CPU_IO_MAP(io_map)

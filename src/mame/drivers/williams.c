@@ -1426,7 +1426,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( defender, driver_data_t )
+static MACHINE_CONFIG_START( defender, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, MASTER_CLOCK/3/4)
@@ -1603,7 +1603,7 @@ static MACHINE_CONFIG_DERIVED( blastkit, blaster )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( williams2, driver_data_t )
+static MACHINE_CONFIG_START( williams2, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, MASTER_CLOCK/3/4)

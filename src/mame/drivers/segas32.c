@@ -2183,7 +2183,7 @@ static READ16_HANDLER( dual_pcb_masterslave )
  *
  *************************************/
 
-static MACHINE_CONFIG_START( system32, driver_data_t )
+static MACHINE_CONFIG_START( system32, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V60, MASTER_CLOCK/2)
@@ -2240,7 +2240,7 @@ static MACHINE_CONFIG_DERIVED( system32_v25, system32 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( multi32, driver_data_t )
+static MACHINE_CONFIG_START( multi32, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V70, MULTI32_CLOCK/2)

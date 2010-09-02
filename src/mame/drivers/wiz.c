@@ -695,7 +695,7 @@ static MACHINE_RESET( wiz )
 	dsc0 = dsc1 = 1;
 }
 
-static MACHINE_CONFIG_START( wiz, driver_data_t )
+static MACHINE_CONFIG_START( wiz, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 18432000/6)	/* 3.072 MHz ??? */

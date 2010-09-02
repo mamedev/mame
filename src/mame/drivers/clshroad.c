@@ -248,7 +248,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_CONFIG_START( firebatl, driver_data_t )
+static MACHINE_CONFIG_START( firebatl, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3000000)	/* ? */
@@ -283,7 +283,7 @@ static MACHINE_CONFIG_START( firebatl, driver_data_t )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( clshroad, driver_data_t )
+static MACHINE_CONFIG_START( clshroad, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/4)	/* ? real speed unknown. 3MHz is too low and causes problems */

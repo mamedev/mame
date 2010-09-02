@@ -293,7 +293,7 @@ static GFXDECODE_START( starshp1 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( starshp1, driver_data_t )
+static MACHINE_CONFIG_START( starshp1, driver_device )
 
 	/* basic machine hardware */
 

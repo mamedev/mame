@@ -717,7 +717,7 @@ static MACHINE_RESET( mlanding )
 	dsp_HOLD_signal = 0;
 }
 
-static MACHINE_CONFIG_START( mlanding, driver_data_t )
+static MACHINE_CONFIG_START( mlanding, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000 )		/* 12 MHz ??? (guess) */

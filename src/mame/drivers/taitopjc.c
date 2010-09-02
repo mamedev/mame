@@ -86,7 +86,7 @@ static const powerpc_config ppc603e_config =
 	XTAL_66_6667MHz		/* Multiplier 1.5, Bus = 66MHz, Core = 100MHz */
 };
 
-static MACHINE_CONFIG_START( taitopjc, driver_data_t )
+static MACHINE_CONFIG_START( taitopjc, driver_device )
 	MDRV_CPU_ADD("maincpu", PPC603E, 100000000)
 	MDRV_CPU_CONFIG(ppc603e_config)
 	MDRV_CPU_PROGRAM_MAP(ppc603e_mem)

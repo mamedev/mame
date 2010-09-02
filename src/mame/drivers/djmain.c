@@ -1485,7 +1485,7 @@ static const k056832_interface djmain_k056832_intf =
 	djmain_tile_callback, "none"
 };
 
-static MACHINE_CONFIG_START( djmain, driver_data_t )
+static MACHINE_CONFIG_START( djmain, driver_device )
 
 	/* basic machine hardware */
 	// popn3 works 9.6 MHz or slower in some songs */

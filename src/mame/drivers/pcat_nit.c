@@ -224,7 +224,7 @@ static MACHINE_START( streetg2 )
 	microtouch_init(machine, pcat_nit_microtouch_tx_callback, NULL);
 }
 
-static MACHINE_CONFIG_START( pcat_nit, driver_data_t )
+static MACHINE_CONFIG_START( pcat_nit, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I386, 14318180*2)	/* I386 ?? Mhz */
 	MDRV_CPU_PROGRAM_MAP(pcat_map)

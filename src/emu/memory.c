@@ -2021,7 +2021,7 @@ void address_space::populate_map_entry(const address_map_entry &entry, read_or_w
 		case AMH_DEVICE_DELEGATE:
 			if (data.m_type == AMH_DRIVER_DELEGATE)
 			{
-				object = m_machine.driver_data<driver_data_t>();
+				object = m_machine.driver_data<driver_device>();
 				if (object == NULL)
 					throw emu_fatalerror("Attempted to map a driver delegate in space %s of device '%s' when there is no driver data\n", m_name, m_device.tag());
 			}

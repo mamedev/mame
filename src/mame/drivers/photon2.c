@@ -296,7 +296,7 @@ static MACHINE_RESET( photon2 )
 	memory_set_bankptr(machine, "bank1", memory_region(machine, "maincpu"));
 }
 
-static MACHINE_CONFIG_START( photon2, driver_data_t )
+static MACHINE_CONFIG_START( photon2, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3500000)        /* 3.5 MHz */
 	MDRV_CPU_PROGRAM_MAP(spectrum_mem)

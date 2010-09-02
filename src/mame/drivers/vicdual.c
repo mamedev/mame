@@ -226,7 +226,7 @@ UINT8 vicdual_characterram_r(offs_t offset)
  *
  *************************************/
 
-static MACHINE_CONFIG_START( vicdual_root, driver_data_t )
+static MACHINE_CONFIG_START( vicdual_root, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, VICDUAL_MAIN_CPU_CLOCK)

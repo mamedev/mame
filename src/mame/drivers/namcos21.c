@@ -1522,7 +1522,7 @@ static const c140_interface C140_interface_typeB =
 	C140_TYPE_SYSTEM21_B
 };
 
-static MACHINE_CONFIG_START( s21base, driver_data_t )
+static MACHINE_CONFIG_START( s21base, driver_device )
 	MDRV_CPU_ADD("maincpu", M68000,12288000) /* Master */
 	MDRV_CPU_PROGRAM_MAP(namcos21_68k_master)
 	MDRV_CPU_VBLANK_INT("screen", namcos2_68k_master_vblank)
@@ -1599,7 +1599,7 @@ static MACHINE_CONFIG_DERIVED( poly_c140_typeB, s21base )
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.30)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( driveyes, driver_data_t )
+static MACHINE_CONFIG_START( driveyes, driver_device )
 	MDRV_CPU_ADD("maincpu", M68000,12288000) /* Master */
 	MDRV_CPU_PROGRAM_MAP(driveyes_68k_master)
 	MDRV_CPU_VBLANK_INT("screen", namcos2_68k_master_vblank)
@@ -1654,7 +1654,7 @@ static MACHINE_CONFIG_START( driveyes, driver_data_t )
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.30)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( winrun_c140_typeB, driver_data_t )
+static MACHINE_CONFIG_START( winrun_c140_typeB, driver_device )
 	MDRV_CPU_ADD("maincpu", M68000,12288000) /* Master */
 	MDRV_CPU_PROGRAM_MAP(am_master_winrun)
 	MDRV_CPU_VBLANK_INT("screen", namcos2_68k_master_vblank)

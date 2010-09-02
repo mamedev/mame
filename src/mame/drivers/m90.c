@@ -697,7 +697,7 @@ static INTERRUPT_GEN( bomblord_interrupt )
 
 
 /* Basic hardware -- no decryption table is setup for CPU */
-static MACHINE_CONFIG_START( m90, driver_data_t )
+static MACHINE_CONFIG_START( m90, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V30,XTAL_32MHz/2/2) /* verified clock on cpu is 16Mhz but probably divided internally by 2 */
 	MDRV_CPU_PROGRAM_MAP(m90_main_cpu_map)
@@ -773,7 +773,7 @@ MACHINE_CONFIG_END
 
 
 static const nec_config bomberman_config ={ 	bomberman_decryption_table, };
-static MACHINE_CONFIG_START( bombrman, driver_data_t )
+static MACHINE_CONFIG_START( bombrman, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V30,XTAL_32MHz/2/2) /* verified clock on cpu is 16Mhz but probably divided internally by 2 */
@@ -818,7 +818,7 @@ MACHINE_CONFIG_END
 
 static const nec_config dynablaster_config ={	dynablaster_decryption_table, };
 
-static MACHINE_CONFIG_START( bbmanw, driver_data_t )
+static MACHINE_CONFIG_START( bbmanw, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V30,XTAL_32MHz/2/2) /* verified clock on cpu is 16Mhz but probably divided internally by 2 */
@@ -885,7 +885,7 @@ static MACHINE_CONFIG_DERIVED( bomblord, bbmanw )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( dynablsb, driver_data_t )
+static MACHINE_CONFIG_START( dynablsb, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V30,32000000/4)

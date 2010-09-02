@@ -1799,7 +1799,7 @@ static const ay8910_interface ay8910_intf_eeprom =
     6-7]    rte
 */
 
-static MACHINE_CONFIG_START( berlwall, driver_data_t )
+static MACHINE_CONFIG_START( berlwall, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* MC68000P12 */
@@ -1845,7 +1845,7 @@ MACHINE_CONFIG_END
                             Bakuretsu Breaker
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( bakubrkr, driver_data_t )
+static MACHINE_CONFIG_START( bakubrkr, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_12MHz) /* verified on pcb */
@@ -1900,7 +1900,7 @@ MACHINE_CONFIG_END
         6-7]    busy loop
 */
 
-static MACHINE_CONFIG_START( blazeon, driver_data_t )
+static MACHINE_CONFIG_START( blazeon, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,12000000)	/* TMP68HC000-12 */
@@ -1953,7 +1953,7 @@ MACHINE_CONFIG_END
     VIDEO_UPDATE_AFTER_VBLANK fixes the mangled/wrong colored sprites
 */
 
-static MACHINE_CONFIG_START( gtmr, driver_data_t )
+static MACHINE_CONFIG_START( gtmr, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("gtmr", M68000, XTAL_16MHz)	/* verified on pcb */
@@ -2040,7 +2040,7 @@ MACHINE_CONFIG_END
                                 Magical Crystal
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( mgcrystl, driver_data_t )
+static MACHINE_CONFIG_START( mgcrystl, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_12MHz) /* verified on pcb */
@@ -2158,7 +2158,7 @@ static ADDRESS_MAP_START( shogwarr_oki2_map, 0, 8 )
 	AM_RANGE(0x00000, 0x3ffff) AM_ROMBANK("bank11")
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( shogwarr, driver_data_t )
+static MACHINE_CONFIG_START( shogwarr, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_12MHz)

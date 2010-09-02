@@ -34,13 +34,11 @@ Notes:
 #include "cpu/z80/z80.h"
 #include "sound/dac.h"
 
-class go2000_state : public driver_data_t
+class go2000_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, go2000_state(machine)); }
-
-	go2000_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	go2000_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	/* memory pointers */
 	UINT16 *  videoram;

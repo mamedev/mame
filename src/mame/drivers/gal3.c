@@ -630,7 +630,7 @@ static const c140_interface C140_interface_typeB =
 	C140_TYPE_SYSTEM21_B
 };
 
-static MACHINE_CONFIG_START( gal3, driver_data_t )
+static MACHINE_CONFIG_START( gal3, driver_device )
 	MDRV_CPU_ADD("cpumst", M68020, 49152000/2)
 	MDRV_CPU_PROGRAM_MAP(cpu_mst_map)
 	MDRV_CPU_VBLANK_INT("lscreen", irq1_line_hold)

@@ -228,7 +228,7 @@ static GFXDECODE_START( pitnrun )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,  0, 4 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( pitnrun, driver_data_t )
+static MACHINE_CONFIG_START( pitnrun, driver_device )
 	MDRV_CPU_ADD("maincpu", Z80,XTAL_18_432MHz/6)		 /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(pitnrun_map)
 	MDRV_CPU_VBLANK_INT("screen", pitnrun_nmi_source)

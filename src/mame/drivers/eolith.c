@@ -337,7 +337,7 @@ INPUT_PORTS_END
 
 
 
-static MACHINE_CONFIG_START( eolith45, driver_data_t )
+static MACHINE_CONFIG_START( eolith45, driver_device )
 	MDRV_CPU_ADD("maincpu", E132N, 45000000)		 /* 45 MHz */
 	MDRV_CPU_PROGRAM_MAP(eolith_map)
 	MDRV_CPU_VBLANK_INT_HACK(eolith_speedup,262)

@@ -3093,7 +3093,7 @@ static const ay8910_interface ay8910_config =
 	DEVCB_HANDLER(royalmah_player_2_port_r)
 };
 
-static MACHINE_CONFIG_START( royalmah, driver_data_t )
+static MACHINE_CONFIG_START( royalmah, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 18432000/6)        /* 3.072 MHz */

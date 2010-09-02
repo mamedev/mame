@@ -1729,7 +1729,7 @@ static INTERRUPT_GEN( vblank_gen )
 	update_irqs(device->machine);
 }
 
-static MACHINE_CONFIG_START( bfcobra, driver_data_t )
+static MACHINE_CONFIG_START( bfcobra, driver_device )
 	MDRV_CPU_ADD("maincpu", Z80, Z80_XTAL)
 	MDRV_CPU_PROGRAM_MAP(z80_prog_map)
 	MDRV_CPU_IO_MAP(z80_io_map)

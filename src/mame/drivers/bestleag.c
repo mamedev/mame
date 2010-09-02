@@ -328,7 +328,7 @@ static GFXDECODE_START( bestleag )
 	GFXDECODE_ENTRY( "gfx2", 0, bestleag_char16layout,   0x300, 16 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( bestleag, driver_data_t )
+static MACHINE_CONFIG_START( bestleag, driver_device )
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(bestleag_map)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)

@@ -238,7 +238,7 @@ static GFXDECODE_START( tinvader )
 	GFXDECODE_SCALE( NULL,   0x1F00, s2636_character, 0, 2, 8, 6 )	/* dynamic */
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( tinvader, driver_data_t )
+static MACHINE_CONFIG_START( tinvader, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", S2650, 3800000/4)

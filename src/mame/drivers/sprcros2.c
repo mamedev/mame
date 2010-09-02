@@ -267,7 +267,7 @@ static MACHINE_START( sprcros2 )
 	state_save_register_global(machine, sprcros2_s_port3);
 }
 
-static MACHINE_CONFIG_START( sprcros2, driver_data_t )
+static MACHINE_CONFIG_START( sprcros2, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("master", Z80,10000000/2)

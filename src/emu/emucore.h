@@ -535,7 +535,7 @@ public:
 		return object;
 	}
 
-	void remove(T *object)
+	void detach(T *object)
 	{
 		for (T **objectptr = &m_head; *objectptr != NULL; objectptr = &(*objectptr)->m_next)
 			if (*objectptr == object)
@@ -544,9 +544,14 @@ public:
 				if (m_tailptr == &object->m_next)
 					m_tailptr = objectptr;
 				m_map.remove(object);
-				pool_free(m_pool, object);
 				return;
 			}
+	}
+
+	void remove(T *object)
+	{
+		detach(object);
+		pool_free(m_pool, object);
 	}
 
 	void remove(const char *tag)

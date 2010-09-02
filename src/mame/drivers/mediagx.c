@@ -86,13 +86,11 @@ struct _speedup_entry
 	UINT32			pc;
 };
 
-class mediagx_state : public driver_data_t
+class mediagx_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, mediagx_state(machine)); }
-
-	mediagx_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	mediagx_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	UINT32 *cga_ram;
 	UINT32 *bios_ram;

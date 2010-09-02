@@ -358,7 +358,7 @@ static MACHINE_RESET( crballoon )
  *
  *************************************/
 
-static MACHINE_CONFIG_START( crbaloon, driver_data_t )
+static MACHINE_CONFIG_START( crbaloon, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CRBALOON_MASTER_XTAL / 3)

@@ -486,7 +486,7 @@ static INTERRUPT_GEN( dderby_timer_irq )
 	cputag_set_input_line_and_vector(device->machine, "maincpu", 0, HOLD_LINE, 0xcf); /* RST 08h */
 }
 
-static MACHINE_CONFIG_START( dderby, driver_data_t )
+static MACHINE_CONFIG_START( dderby, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,4000000)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(memmap)

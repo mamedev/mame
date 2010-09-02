@@ -610,7 +610,7 @@ GFXDECODE_END
 *          Machine Drivers          *
 ************************************/
 
-static MACHINE_CONFIG_START( amaticmg, driver_data_t )
+static MACHINE_CONFIG_START( amaticmg, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)		/* WRONG! */
 	MDRV_CPU_PROGRAM_MAP(amaticmg_map)

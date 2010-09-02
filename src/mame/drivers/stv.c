@@ -2852,7 +2852,7 @@ static MACHINE_RESET( stv )
 }
 
 
-static MACHINE_CONFIG_START( stv, driver_data_t )
+static MACHINE_CONFIG_START( stv, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", SH2, MASTER_CLOCK_352/2) // 28.6364 MHz

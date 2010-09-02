@@ -709,7 +709,7 @@ static MACHINE_RESET( zr107 )
 	cputag_set_input_line(machine, "dsp", INPUT_LINE_RESET, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( zr107, driver_data_t )
+static MACHINE_CONFIG_START( zr107, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", PPC403GA, 64000000/2)	/* PowerPC 403GA 32MHz */
@@ -770,7 +770,7 @@ static const k001604_interface jetwave_k001604_intf =
 	0		/* slrasslt hack */
 };
 
-static MACHINE_CONFIG_START( jetwave, driver_data_t )
+static MACHINE_CONFIG_START( jetwave, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", PPC403GA, 64000000/2)	/* PowerPC 403GA 32MHz */

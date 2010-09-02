@@ -65,13 +65,11 @@ SOFT  PSG & VOICE  BY M.C & S.H
 #include "video/resnet.h"
 #include "sound/ay8910.h"
 
-class meijinsn_state : public driver_data_t
+class meijinsn_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, meijinsn_state(machine)); }
-
-	meijinsn_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	meijinsn_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	/* memory pointers */
 	UINT16 *   shared_ram;

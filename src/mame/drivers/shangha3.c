@@ -476,7 +476,7 @@ static const ym3438_interface ym3438_config =
 };
 
 
-static MACHINE_CONFIG_START( shangha3, driver_data_t )
+static MACHINE_CONFIG_START( shangha3, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)
@@ -511,7 +511,7 @@ static MACHINE_CONFIG_START( shangha3, driver_data_t )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( heberpop, driver_data_t )
+static MACHINE_CONFIG_START( heberpop, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)
@@ -551,7 +551,7 @@ static MACHINE_CONFIG_START( heberpop, driver_data_t )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( blocken, driver_data_t )
+static MACHINE_CONFIG_START( blocken, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)

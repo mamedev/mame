@@ -265,7 +265,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_CONFIG_START( iqblock, driver_data_t )
+static MACHINE_CONFIG_START( iqblock, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,12000000/2)	/* 6 MHz */

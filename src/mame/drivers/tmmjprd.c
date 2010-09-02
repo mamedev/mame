@@ -714,7 +714,7 @@ static INTERRUPT_GEN( tmmjprd_interrupt )
 	cpu_set_input_line(device, intlevel, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( tmmjprd, driver_data_t )
+static MACHINE_CONFIG_START( tmmjprd, driver_device )
 	MDRV_CPU_ADD("maincpu",M68EC020,24000000) /* 24 MHz */
 	MDRV_CPU_PROGRAM_MAP(tmmjprd_map)
 	MDRV_CPU_VBLANK_INT_HACK(tmmjprd_interrupt,2)

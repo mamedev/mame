@@ -1233,7 +1233,7 @@ static ADDRESS_MAP_START( scramble_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("8910.2", ay8910_r, ay8910_data_w)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( scramble, driver_data_t )
+static MACHINE_CONFIG_START( scramble, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 18432000/6)	/* 3.072 MHz */
@@ -1462,7 +1462,7 @@ static MACHINE_CONFIG_DERIVED( hncholms, hunchbks )
 	MDRV_VIDEO_START(scorpion)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ad2083, driver_data_t )
+static MACHINE_CONFIG_START( ad2083, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 18432000/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(ad2083_map)

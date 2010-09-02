@@ -71,7 +71,7 @@ static INPUT_PORTS_START( queen )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( queen, driver_data_t )
+static MACHINE_CONFIG_START( queen, driver_device )
 	MDRV_CPU_ADD("maincpu", PENTIUM, 533000000) // Celeron or Pentium 3, 533 Mhz
 	MDRV_CPU_PROGRAM_MAP(queen_map)
 	MDRV_CPU_IO_MAP(queen_io)

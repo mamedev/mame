@@ -791,7 +791,7 @@ static const duart68681_config maygaym1_duart68681_config =
 
 // machine driver for maygay m1 board /////////////////////////////////
 
-static MACHINE_CONFIG_START( m1, driver_data_t )
+static MACHINE_CONFIG_START( m1, driver_device )
 
 	MDRV_MACHINE_START(m1)
 	MDRV_MACHINE_RESET(m1)

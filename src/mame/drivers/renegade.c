@@ -927,7 +927,7 @@ static MACHINE_RESET( renegade )
 }
 
 
-static MACHINE_CONFIG_START( renegade, driver_data_t )
+static MACHINE_CONFIG_START( renegade, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 12000000/8)	/* 1.5 MHz (measured) */

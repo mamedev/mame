@@ -574,7 +574,7 @@ static INTERRUPT_GEN( galpani2_interrupt2 )
 	}
 }
 
-static MACHINE_CONFIG_START( galpani2, driver_data_t )
+static MACHINE_CONFIG_START( galpani2, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz)

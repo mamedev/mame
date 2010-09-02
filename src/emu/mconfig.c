@@ -50,26 +50,16 @@
 //-------------------------------------------------
 
 machine_config::machine_config(machine_config_constructor constructor)
-	: m_driver_data_alloc(NULL),
-	  m_minimum_quantum(attotime_zero),
+	: m_minimum_quantum(attotime_zero),
 	  m_perfect_cpu_quantum(NULL),
 	  m_watchdog_vblank_count(0),
 	  m_watchdog_time(attotime_zero),
-	  m_machine_start(NULL),
-	  m_machine_reset(NULL),
 	  m_nvram_handler(NULL),
 	  m_memcard_handler(NULL),
 	  m_video_attributes(0),
 	  m_gfxdecodeinfo(NULL),
 	  m_total_colors(0),
 	  m_default_layout(NULL),
-	  m_init_palette(NULL),
-	  m_video_start(NULL),
-	  m_video_reset(NULL),
-	  m_video_eof(NULL),
-	  m_video_update(NULL),
-	  m_sound_start(NULL),
-	  m_sound_reset(NULL),
 	  m_parse_level(0)
 {
 	// construct the config

@@ -313,7 +313,7 @@ static INTERRUPT_GEN( gunpey_interrupt )
 }
 
 /***************************************************************************************/
-static MACHINE_CONFIG_START( gunpey, driver_data_t )
+static MACHINE_CONFIG_START( gunpey, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V30, 57242400 / 4)

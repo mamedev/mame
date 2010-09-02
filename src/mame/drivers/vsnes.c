@@ -1645,7 +1645,7 @@ static const nes_interface nes_interface_2 =
 	"sub"
 };
 
-static MACHINE_CONFIG_START( vsnes, driver_data_t )
+static MACHINE_CONFIG_START( vsnes, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", N2A03,N2A03_DEFAULTCLOCK)
@@ -1704,7 +1704,7 @@ static MACHINE_CONFIG_DERIVED( topgun, vsnes )
 	MDRV_PPU2C05_04_ADD("ppu1", vsnes_ppu_interface_1)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( vsdual, driver_data_t )
+static MACHINE_CONFIG_START( vsdual, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", N2A03,N2A03_DEFAULTCLOCK)

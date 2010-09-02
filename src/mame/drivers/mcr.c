@@ -1566,7 +1566,7 @@ static const samples_interface journey_samples_interface =
  *************************************/
 
 /* 90009 CPU board plus 90908/90913/91483 sound board */
-static MACHINE_CONFIG_START( mcr_90009, driver_data_t )
+static MACHINE_CONFIG_START( mcr_90009, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MAIN_OSC_MCR_I/8)

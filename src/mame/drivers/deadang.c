@@ -225,7 +225,7 @@ static INTERRUPT_GEN( deadang_interrupt )
 
 /* Machine Drivers */
 
-static MACHINE_CONFIG_START( deadang, driver_data_t )
+static MACHINE_CONFIG_START( deadang, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V30,XTAL_16MHz/2) /* Sony 8623h9 CXQ70116D-8 (V30 compatible) */

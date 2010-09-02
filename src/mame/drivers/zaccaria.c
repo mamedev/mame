@@ -586,7 +586,7 @@ static const tms5220_interface tms5220_config =
 
 
 
-static MACHINE_CONFIG_START( zaccaria, driver_data_t )
+static MACHINE_CONFIG_START( zaccaria, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,XTAL_18_432MHz/6)	/* verified on pcb */

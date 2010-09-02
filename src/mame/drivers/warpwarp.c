@@ -722,7 +722,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_CONFIG_START( geebee, driver_data_t )
+static MACHINE_CONFIG_START( geebee, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8080, MASTER_CLOCK/9) /* verified on pcb */
@@ -761,7 +761,7 @@ static MACHINE_CONFIG_DERIVED( navarone, geebee )
 	MDRV_VIDEO_UPDATE(navarone)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( bombbee, driver_data_t )
+static MACHINE_CONFIG_START( bombbee, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8080, MASTER_CLOCK/9)		/* 18.432 MHz / 9 */

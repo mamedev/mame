@@ -9,10 +9,8 @@
 class foodf_state : public atarigen_state
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, foodf_state(machine)); }
-
-	foodf_state(running_machine &machine)
-		: atarigen_state(machine) { }
+	foodf_state(running_machine &machine, const driver_device_config_base &config)
+		: atarigen_state(machine, config) { }
 
 	double			rweights[3];
 	double			gweights[3];

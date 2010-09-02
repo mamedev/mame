@@ -810,7 +810,7 @@ static const y8950_interface y8950_config = {
 	0 /* TODO */
 };
 
-static MACHINE_CONFIG_START( cybertnk, driver_data_t )
+static MACHINE_CONFIG_START( cybertnk, driver_device )
 	MDRV_CPU_ADD("maincpu", M68000,20000000/2)
 	MDRV_CPU_PROGRAM_MAP(master_mem)
 //  MDRV_CPU_VBLANK_INT_HACK(master_irq,2)

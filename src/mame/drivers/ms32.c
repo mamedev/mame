@@ -1312,7 +1312,7 @@ static MACHINE_RESET( ms32 )
 
 /********** MACHINE DRIVER **********/
 
-static MACHINE_CONFIG_START( ms32, driver_data_t )
+static MACHINE_CONFIG_START( ms32, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V70, 20000000) // 20MHz

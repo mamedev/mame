@@ -1004,7 +1004,7 @@ static const c140_interface C140_interface_typeA =
 };
 
 /* cropped at sides */
-static MACHINE_CONFIG_START( namcona1, driver_data_t )
+static MACHINE_CONFIG_START( namcona1, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 50113000/4)
 	MDRV_CPU_PROGRAM_MAP(namcona1_main_map)

@@ -394,7 +394,7 @@ static const ptm6840_interface ptm_intf =
 	DEVCB_LINE(ptm_irq)
 };
 
-static MACHINE_CONFIG_START( vpoker, driver_data_t )
+static MACHINE_CONFIG_START( vpoker, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M6809,XTAL_4MHz)

@@ -1,10 +1,8 @@
-class stlforce_state : public driver_data_t
+class stlforce_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, stlforce_state(machine)); }
-
-	stlforce_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	stlforce_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	tilemap_t *bg_tilemap;
 	tilemap_t *mlow_tilemap;

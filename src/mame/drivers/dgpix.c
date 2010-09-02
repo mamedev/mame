@@ -303,7 +303,7 @@ static MACHINE_RESET( dgpix )
 }
 
 
-static MACHINE_CONFIG_START( dgpix, driver_data_t )
+static MACHINE_CONFIG_START( dgpix, driver_device )
 	MDRV_CPU_ADD("maincpu", E132XT, 20000000*4)	/* 4x internal multiplier */
 	MDRV_CPU_PROGRAM_MAP(cpu_map)
 	MDRV_CPU_IO_MAP(io_map)

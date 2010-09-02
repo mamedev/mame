@@ -219,7 +219,7 @@ static const ym3812_interface ym3812_config =
 
 /******************************************************************************/
 
-static MACHINE_CONFIG_START( stadhero, driver_data_t )
+static MACHINE_CONFIG_START( stadhero, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)

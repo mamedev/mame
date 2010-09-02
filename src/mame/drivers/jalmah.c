@@ -1302,7 +1302,7 @@ static MACHINE_RESET ( jalmah )
 	}
 }
 
-static MACHINE_CONFIG_START( jalmah, driver_data_t )
+static MACHINE_CONFIG_START( jalmah, driver_device )
 	MDRV_CPU_ADD("maincpu" , M68000, 12000000) /* 68000-8 */
 	MDRV_CPU_PROGRAM_MAP(jalmah)
 	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)

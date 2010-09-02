@@ -1133,7 +1133,7 @@ static MACHINE_START( supergm3 )
 	multigmc_mmc3_6000_ram = auto_alloc_array(machine, UINT8, 0x2000);
 }
 
-static MACHINE_CONFIG_START( multigam, driver_data_t )
+static MACHINE_CONFIG_START( multigam, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", N2A03, N2A03_DEFAULTCLOCK)
 	MDRV_CPU_PROGRAM_MAP(multigam_map)

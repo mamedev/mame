@@ -94,13 +94,11 @@ Note
 #include "sound/okim6295.h"
 #include "machine/eeprom.h"
 
-class spool99_state : public driver_data_t
+class spool99_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, spool99_state(machine)); }
-
-	spool99_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	spool99_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	UINT8 *main;
 	tilemap_t *sc0_tilemap;

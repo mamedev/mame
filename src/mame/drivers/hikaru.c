@@ -372,7 +372,7 @@ static ADDRESS_MAP_START( hikaru_map_slave, ADDRESS_SPACE_PROGRAM, 64 )
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_START( hikaru, driver_data_t )
+static MACHINE_CONFIG_START( hikaru, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", SH4, CPU_CLOCK)
 //  MDRV_CPU_CONFIG(sh4cpu_config)

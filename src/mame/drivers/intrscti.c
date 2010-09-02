@@ -80,7 +80,7 @@ static VIDEO_UPDATE(intrscti)
 	return 0;
 }
 
-static MACHINE_CONFIG_START( intrscti, driver_data_t )
+static MACHINE_CONFIG_START( intrscti, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,4000000)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(intrscti_map)

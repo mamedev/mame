@@ -166,7 +166,7 @@ static const ay8910_interface ay8910_config =
 	DEVCB_INPUT_PORT("P2")
 };
 
-static MACHINE_CONFIG_START( twins, driver_data_t )
+static MACHINE_CONFIG_START( twins, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V30, 8000000)
 	MDRV_CPU_PROGRAM_MAP(twins_map)
@@ -254,7 +254,7 @@ static ADDRESS_MAP_START( twinsa_io, ADDRESS_SPACE_IO, 16 )
 ADDRESS_MAP_END
 
 
-static MACHINE_CONFIG_START( twinsa, driver_data_t )
+static MACHINE_CONFIG_START( twinsa, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V30, XTAL_16MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(twins_map)

@@ -237,7 +237,7 @@ static INTERRUPT_GEN( ettrivia_interrupt )
 		cpu_set_input_line(device, 0, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( ettrivia, driver_data_t )
+static MACHINE_CONFIG_START( ettrivia, driver_device )
 	MDRV_CPU_ADD("maincpu", Z80,12000000/4-48000) //should be ok, it gives the 300 interrupts expected
 	MDRV_CPU_PROGRAM_MAP(cpu_map)
 	MDRV_CPU_IO_MAP(io_map)

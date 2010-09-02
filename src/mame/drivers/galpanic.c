@@ -881,7 +881,7 @@ static const kaneko_pandora_interface galpanic_pandora_config =
 };
 
 
-static MACHINE_CONFIG_START( galpanic, driver_data_t )
+static MACHINE_CONFIG_START( galpanic, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_12MHz) /* verified on pcb */

@@ -272,7 +272,7 @@ static MACHINE_RESET( pkscramble)
 	scanline_timer->adjust(machine->primary_screen->time_until_pos(interrupt_scanline), interrupt_scanline);
 }
 
-static MACHINE_CONFIG_START( pkscramble, driver_data_t )
+static MACHINE_CONFIG_START( pkscramble, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000 )
 	MDRV_CPU_PROGRAM_MAP(pkscramble_map)

@@ -7,13 +7,11 @@
 #include "sound/okim6295.h"
 #include "video/deco16ic.h"
 
-class rohga_state : public driver_data_t
+class rohga_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, rohga_state(machine)); }
-
-	rohga_state(running_machine &machine)
-		: driver_data_t(machine),
+	rohga_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config),
 		  maincpu(machine.device<cpu_device>("maincpu")),
 		  audiocpu(machine.device<cpu_device>("audiocpu")),
 		  deco16ic(machine.device<deco16ic_device>("deco_custom")),

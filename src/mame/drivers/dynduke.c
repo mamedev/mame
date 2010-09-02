@@ -281,7 +281,7 @@ static INTERRUPT_GEN( dynduke_interrupt )
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( dynduke, driver_data_t )
+static MACHINE_CONFIG_START( dynduke, driver_device )
 	// basic machine hardware
 	MDRV_CPU_ADD("maincpu", V30, 16000000/2) // NEC V30-8 CPU
 	MDRV_CPU_PROGRAM_MAP(master_map)

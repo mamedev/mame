@@ -277,7 +277,7 @@ static const mc6845_interface mc6845_intf =
 };
 
 //51f
-static MACHINE_CONFIG_START( fortecar, driver_data_t )
+static MACHINE_CONFIG_START( fortecar, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,6000000)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(fortecar_map)

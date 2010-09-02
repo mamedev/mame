@@ -195,7 +195,7 @@ static INTERRUPT_GEN( assert_irq )
        */
 }
 
-static MACHINE_CONFIG_START( mustache, driver_data_t )
+static MACHINE_CONFIG_START( mustache, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)

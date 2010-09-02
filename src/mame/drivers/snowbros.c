@@ -1445,7 +1445,7 @@ static const kaneko_pandora_interface snowbros_pandora_config =
 	0, 0	/* x_offs, y_offs */
 };
 
-static MACHINE_CONFIG_START( snowbros, driver_data_t )
+static MACHINE_CONFIG_START( snowbros, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000) /* 8 Mhz - confirmed */
@@ -1556,7 +1556,7 @@ CPU : 1 X MC68000P12
 See included pics
 */
 
-static MACHINE_CONFIG_START( honeydol, driver_data_t )
+static MACHINE_CONFIG_START( honeydol, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
@@ -1594,7 +1594,7 @@ static MACHINE_CONFIG_START( honeydol, driver_data_t )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( twinadv, driver_data_t )
+static MACHINE_CONFIG_START( twinadv, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000) // or 12
@@ -1673,7 +1673,7 @@ static MACHINE_CONFIG_DERIVED( _4in1, semicom )
 	MDRV_GFXDECODE(snowbros)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( snowbro3, driver_data_t )
+static MACHINE_CONFIG_START( snowbro3, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000) /* 16mhz or 12mhz ? */

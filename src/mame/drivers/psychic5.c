@@ -677,7 +677,7 @@ static const ym2203_interface ym2203_config =
 	irqhandler
 };
 
-static MACHINE_CONFIG_START( psychic5, driver_data_t )
+static MACHINE_CONFIG_START( psychic5, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)
@@ -724,7 +724,7 @@ static MACHINE_CONFIG_START( psychic5, driver_data_t )
 	MDRV_SOUND_ROUTE(3, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( bombsa, driver_data_t )
+static MACHINE_CONFIG_START( bombsa, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz/2 ) /* 6 MHz */

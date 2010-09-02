@@ -1175,7 +1175,7 @@ static MACHINE_START(casino5)
 	memory_set_bank(machine, "bank2", 0);
 }
 
-static MACHINE_CONFIG_START( pitboss, driver_data_t )
+static MACHINE_CONFIG_START( pitboss, driver_device )
 	MDRV_CPU_ADD("maincpu",Z80, CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(pitboss_map)
 	MDRV_CPU_IO_MAP(trvwhiz_io_map)

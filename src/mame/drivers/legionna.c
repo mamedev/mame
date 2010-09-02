@@ -1039,7 +1039,7 @@ GFXDECODE_END
 
 /*****************************************************************************/
 
-static MACHINE_CONFIG_START( legionna, driver_data_t )
+static MACHINE_CONFIG_START( legionna, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,20000000/2)	/* ??? */
@@ -1071,7 +1071,7 @@ static MACHINE_CONFIG_START( legionna, driver_data_t )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( heatbrl, driver_data_t )
+static MACHINE_CONFIG_START( heatbrl, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,20000000/2)	/* ??? */
@@ -1102,7 +1102,7 @@ static MACHINE_CONFIG_START( heatbrl, driver_data_t )
 	SEIBU_SOUND_SYSTEM_YM3812_INTERFACE(14318180/4,1320000)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( godzilla, driver_data_t )
+static MACHINE_CONFIG_START( godzilla, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 20000000/2)
@@ -1133,7 +1133,7 @@ static MACHINE_CONFIG_START( godzilla, driver_data_t )
 	SEIBU_SOUND_SYSTEM_YM2151_INTERFACE(14318180/4,1320000)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( denjinmk, driver_data_t )
+static MACHINE_CONFIG_START( denjinmk, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 20000000/2)
@@ -1164,7 +1164,7 @@ static MACHINE_CONFIG_START( denjinmk, driver_data_t )
 	SEIBU_SOUND_SYSTEM_YM2151_INTERFACE(14318180/4,1320000)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( grainbow, driver_data_t )
+static MACHINE_CONFIG_START( grainbow, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 20000000/2)
@@ -1196,7 +1196,7 @@ static MACHINE_CONFIG_START( grainbow, driver_data_t )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( cupsoc, driver_data_t )
+static MACHINE_CONFIG_START( cupsoc, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,20000000/2)
@@ -1228,7 +1228,7 @@ static MACHINE_CONFIG_START( cupsoc, driver_data_t )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( cupsocbl, driver_data_t )
+static MACHINE_CONFIG_START( cupsocbl, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,12000000)

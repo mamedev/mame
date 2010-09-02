@@ -436,7 +436,7 @@ INPUT_PORTS_END
 
 
 
-static MACHINE_CONFIG_START( pntnpuzl, driver_data_t )
+static MACHINE_CONFIG_START( pntnpuzl, driver_device )
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)//??
 	MDRV_CPU_PROGRAM_MAP(pntnpuzl_map)
 	MDRV_CPU_VBLANK_INT("screen", pntnpuzl_irq)	// irq1 = coin irq2 = service irq4 = coin

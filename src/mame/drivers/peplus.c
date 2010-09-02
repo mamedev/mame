@@ -1021,7 +1021,7 @@ static MACHINE_RESET( peplus )
 *     Machine Driver     *
 *************************/
 
-static MACHINE_CONFIG_START( peplus, driver_data_t )
+static MACHINE_CONFIG_START( peplus, driver_device )
 	// basic machine hardware
 	MDRV_CPU_ADD("maincpu", I80C32, CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(peplus_map)

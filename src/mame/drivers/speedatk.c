@@ -319,7 +319,7 @@ static const ay8910_interface ay8910_config =
 	DEVCB_NULL
 };
 
-static MACHINE_CONFIG_START( speedatk, driver_data_t )
+static MACHINE_CONFIG_START( speedatk, driver_device )
 	MDRV_CPU_ADD("maincpu", Z80,MASTER_CLOCK/2) //divider is unknown
 	MDRV_CPU_PROGRAM_MAP(speedatk_mem)
 	MDRV_CPU_IO_MAP(speedatk_io)

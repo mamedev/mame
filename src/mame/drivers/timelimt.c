@@ -241,7 +241,7 @@ static INTERRUPT_GEN( timelimt_irq ) {
 
 /***************************************************************************/
 
-static MACHINE_CONFIG_START( timelimt, driver_data_t )
+static MACHINE_CONFIG_START( timelimt, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 5000000)	/* 5.000 MHz */

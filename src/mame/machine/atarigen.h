@@ -60,11 +60,11 @@ struct _atarigen_screen_timer
 };
 
 
-class atarigen_state : public driver_data_t
+class atarigen_state : public driver_device
 {
 public:
-	atarigen_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	atarigen_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	UINT8				scanline_int_state;
 	UINT8				sound_int_state;

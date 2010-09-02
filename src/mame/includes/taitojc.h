@@ -1,12 +1,10 @@
 #include "video/poly.h"
 
-class taitojc_state : public driver_data_t
+class taitojc_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, taitojc_state(machine)); }
-
-	taitojc_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	taitojc_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	int texture_x;
 	int texture_y;

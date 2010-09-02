@@ -152,13 +152,11 @@ Video board has additional chips:
 #include "machine/microtch.h"
 #include "machine/68681.h"
 
-class adp_state : public driver_data_t
+class adp_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, adp_state(machine)); }
-
-	adp_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	adp_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	/* misc */
 	UINT8 mux_data;

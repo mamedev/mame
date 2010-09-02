@@ -137,7 +137,7 @@ static INTERRUPT_GEN( trucocl_interrupt )
 	irq0_line_hold(device);
 }
 
-static MACHINE_CONFIG_START( trucocl, driver_data_t )
+static MACHINE_CONFIG_START( trucocl, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 18432000/6)
 	MDRV_CPU_PROGRAM_MAP(main_map)

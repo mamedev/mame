@@ -110,6 +110,57 @@ const int DEBUG_FLAG_OSD_ENABLED	= 0x00001000;		// The OSD debugger is enabled
 //  MACROS
 //**************************************************************************
 
+// macros to wrap legacy callbacks
+#define MACHINE_START_NAME(name)	machine_start_##name
+#define MACHINE_START(name)			void MACHINE_START_NAME(name)(running_machine *machine)
+#define MACHINE_START_CALL(name)	MACHINE_START_NAME(name)(machine)
+
+#define MACHINE_RESET_NAME(name)	machine_reset_##name
+#define MACHINE_RESET(name)			void MACHINE_RESET_NAME(name)(running_machine *machine)
+#define MACHINE_RESET_CALL(name)	MACHINE_RESET_NAME(name)(machine)
+
+#define SOUND_START_NAME(name)		sound_start_##name
+#define SOUND_START(name)			void SOUND_START_NAME(name)(running_machine *machine)
+#define SOUND_START_CALL(name)		SOUND_START_NAME(name)(machine)
+
+#define SOUND_RESET_NAME(name)		sound_reset_##name
+#define SOUND_RESET(name)			void SOUND_RESET_NAME(name)(running_machine *machine)
+#define SOUND_RESET_CALL(name)		SOUND_RESET_NAME(name)(machine)
+
+#define VIDEO_START_NAME(name)		video_start_##name
+#define VIDEO_START(name)			void VIDEO_START_NAME(name)(running_machine *machine)
+#define VIDEO_START_CALL(name)		VIDEO_START_NAME(name)(machine)
+
+#define VIDEO_RESET_NAME(name)		video_reset_##name
+#define VIDEO_RESET(name)			void VIDEO_RESET_NAME(name)(running_machine *machine)
+#define VIDEO_RESET_CALL(name)		VIDEO_RESET_NAME(name)(machine)
+
+#define PALETTE_INIT_NAME(name)		palette_init_##name
+#define PALETTE_INIT(name)			void PALETTE_INIT_NAME(name)(running_machine *machine, const UINT8 *color_prom)
+#define PALETTE_INIT_CALL(name)		PALETTE_INIT_NAME(name)(machine, color_prom)
+
+#define VIDEO_EOF_NAME(name)		video_eof_##name
+#define VIDEO_EOF(name)				void VIDEO_EOF_NAME(name)(running_machine *machine)
+#define VIDEO_EOF_CALL(name)		VIDEO_EOF_NAME(name)(machine)
+
+#define VIDEO_UPDATE_NAME(name)		video_update_##name
+#define VIDEO_UPDATE(name)			UINT32 VIDEO_UPDATE_NAME(name)(screen_device *screen, bitmap_t *bitmap, const rectangle *cliprect)
+#define VIDEO_UPDATE_CALL(name)		VIDEO_UPDATE_NAME(name)(screen, bitmap, cliprect)
+
+
+// NULL versions
+#define machine_start_0 			NULL
+#define machine_reset_0 			NULL
+#define sound_start_0				NULL
+#define sound_reset_0				NULL
+#define video_start_0				NULL
+#define video_reset_0				NULL
+#define palette_init_0				NULL
+#define video_eof_0 				NULL
+#define video_update_0				NULL
+
+
+
 // global allocation helpers
 #define auto_alloc(m, t)				pool_alloc(static_cast<running_machine *>(m)->m_respool, t)
 #define auto_alloc_clear(m, t)			pool_alloc_clear(static_cast<running_machine *>(m)->m_respool, t)
@@ -157,35 +208,16 @@ typedef struct _generic_audio_private generic_audio_private;
 typedef tagged_list<region_info> region_list;
 
 
-// base class for all driver data structures
-class driver_data_t : public bindable_object
-{
-public:
-	driver_data_t(running_machine &machine);
-	virtual ~driver_data_t();
-	
-	static driver_data_t *alloc(running_machine &machine);
-
-	virtual void machine_start();
-	virtual void machine_reset();
-
-	virtual void sound_start();
-	virtual void sound_reset();
-
-	virtual void palette_init(const UINT8 *color_prom);
-	virtual void video_start();
-	virtual void video_reset();
-	virtual bool video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
-	virtual void video_eof();
-
-	virtual void pre_save();
-	virtual void post_load();
-
-	running_machine &	m_machine;
-};
+// legacy callback functions
+typedef void   (*legacy_callback_func)(running_machine *machine);
+typedef void   (*palette_init_func)(running_machine *machine, const UINT8 *color_prom);
+typedef UINT32 (*video_update_func)(screen_device *screen, bitmap_t *bitmap, const rectangle *cliprect);
 
 
-// memory region
+
+// ======================> region_info
+
+// memory region object; should eventually be renamed memory_region
 class region_info
 {
 	DISABLE_COPYING(region_info);
@@ -240,7 +272,10 @@ private:
 };
 
 
-// this structure holds generic pointers that are commonly used
+
+// ======================> generic_pointers
+
+// holds generic pointers that are commonly used
 struct generic_pointers
 {
 	generic_ptr				nvram;				// generic NVRAM
@@ -258,6 +293,9 @@ struct generic_pointers
 	bitmap_t *				tmpbitmap;			// temporary bitmap
 };
 
+
+
+// ======================> system_time
 
 // system time description, both local and UTC
 class system_time
@@ -286,6 +324,9 @@ public:
 	full_time		utc_time;	// UTC coordinated time
 };
 
+
+
+// ======================> running_machine
 
 // description of the currently-running machine
 class running_machine : public bindable_object
@@ -423,8 +464,6 @@ private:
 	void set_saveload_filename(const char *filename);
 	void fill_systime(system_time &systime, time_t t);
 	void handle_saveload();
-	static STATE_PRESAVE( pre_save_static );
-	static STATE_POSTLOAD( post_load_static );
 
 	static TIMER_CALLBACK( static_soft_reset );
 	void soft_reset();
@@ -482,7 +521,130 @@ private:
 	// base time
 	time_t					m_base_time;
 
-	driver_data_t *			m_driver_data;		// drivers can hang data off of here instead of using globals
+	driver_device *			m_driver_data;		// drivers can hang data off of here instead of using globals
+};
+
+
+
+// ======================> driver_device_config_base
+
+// a base class with common functionality for the (mostly stub) driver_device_configs
+class driver_device_config_base : public device_config
+{
+	friend class driver_device;
+
+protected:
+	// construction/destruction
+	driver_device_config_base(const machine_config &mconfig, device_type type, const char *tag, const device_config *owner);
+
+public:
+	// indexes into our generic callbacks
+	enum callback_type
+	{
+		CB_MACHINE_START,
+		CB_MACHINE_RESET,
+		CB_SOUND_START,
+		CB_SOUND_RESET,
+		CB_VIDEO_START,
+		CB_VIDEO_RESET,
+		CB_VIDEO_EOF,
+		CB_COUNT
+	};
+
+	// inline configuration helpers
+	static void static_set_game(device_config *device, const game_driver *game);
+	static void static_set_callback(device_config *device, callback_type type, legacy_callback_func callback);
+	static void static_set_palette_init(device_config *device, palette_init_func callback);
+	static void static_set_video_update(device_config *device, video_update_func callback);
+
+protected:
+	// internal state
+	const game_driver *		m_game;						// pointer to the game driver
+
+	legacy_callback_func	m_callbacks[CB_COUNT];		// generic legacy callbacks
+	palette_init_func		m_palette_init;				// one-time palette init callback
+	video_update_func		m_video_update;				// video update callback
+};
+
+
+
+// ======================> driver_device_config
+
+// this provides a minimal config class for driver devices, which don't
+// explicitly declare their own
+template<class _DeviceClass>
+class driver_device_config : public driver_device_config_base
+{
+	// construction/destruction
+	driver_device_config(const machine_config &mconfig, const char *tag, const device_config *owner)
+		: driver_device_config_base(mconfig, static_alloc_device_config, tag, owner) { }
+
+public:
+	// allocators
+	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+	{
+		return global_alloc(driver_device_config(mconfig, tag, owner));
+	}
+	
+	virtual device_t *alloc_device(running_machine &machine) const
+	{
+		// we clear here for historical reasons, as many existing driver states
+		// assume everything is NULL before starting
+		return auto_alloc_clear(&machine, _DeviceClass(machine, *this));
+	}
+};
+
+
+
+// ======================> driver_device
+
+// base class for machine driver-specific devices
+class driver_device : public device_t
+{
+public:
+	// construction/destruction
+	driver_device(running_machine &machine, const driver_device_config_base &config);
+	virtual ~driver_device();
+
+	// additional video helpers
+	virtual bool video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
+	virtual void video_eof();
+
+protected:
+	// helpers called at startup
+	virtual void find_devices();
+	virtual void driver_start();
+	virtual void machine_start();
+	virtual void sound_start();
+	virtual void video_start();
+
+	// helpers called at reset
+	virtual void driver_reset();
+	virtual void machine_reset();
+	virtual void sound_reset();
+	virtual void video_reset();
+
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_reset();
+	
+	// device locators
+	template<class T>
+	bool optional_device(T *&device, const char *tag)
+	{
+		device = downcast<T *>(m_machine.device<T>(tag));
+		return (device != NULL);
+	}
+
+	template<class T>
+	void required_device(T *&device, const char *tag)
+	{
+		if (!optional_device(device, tag))
+			throw emu_fatalerror("Unable to find device '%s'", tag);
+	}
+
+	// internal state
+	const driver_device_config_base &m_config;
 };
 
 

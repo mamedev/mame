@@ -306,7 +306,7 @@ static GFXDECODE_START( wolfpack )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( wolfpack, driver_data_t )
+static MACHINE_CONFIG_START( wolfpack, driver_device )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	/* basic machine hardware */

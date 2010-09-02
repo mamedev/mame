@@ -166,7 +166,7 @@ static GFXDECODE_START( murogmbl )
 	GFXDECODE_ENTRY( "gfx1", 0, layout8x8x2,  0x0, 1 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( murogmbl, driver_data_t )
+static MACHINE_CONFIG_START( murogmbl, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 1000000) /* Z80? */
 	MDRV_CPU_PROGRAM_MAP(murogmbl_map)

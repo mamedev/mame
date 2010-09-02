@@ -1605,7 +1605,7 @@ via software as INT1
 /*                                                           */
 /*************************************************************/
 
-static MACHINE_CONFIG_START( default, driver_data_t )
+static MACHINE_CONFIG_START( default, driver_device )
 	MDRV_CPU_ADD("maincpu", M68000, M68K_CPU_CLOCK) /* 12.288MHz (49.152MHz OSC/4) */
 	MDRV_CPU_PROGRAM_MAP(master_default_am)
 	MDRV_CPU_VBLANK_INT("screen", namcos2_68k_master_vblank)
@@ -1682,7 +1682,7 @@ static MACHINE_CONFIG_DERIVED( default3, default )
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( gollygho, driver_data_t )
+static MACHINE_CONFIG_START( gollygho, driver_device )
 	MDRV_CPU_ADD("maincpu", M68000, M68K_CPU_CLOCK) /* 12.288MHz (49.152MHz OSC/4) */
 	MDRV_CPU_PROGRAM_MAP(master_default_am)
 	MDRV_CPU_VBLANK_INT("screen", namcos2_68k_master_vblank)
@@ -1732,7 +1732,7 @@ static MACHINE_CONFIG_START( gollygho, driver_data_t )
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.80)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( finallap, driver_data_t )
+static MACHINE_CONFIG_START( finallap, driver_device )
 	MDRV_CPU_ADD("maincpu", M68000, M68K_CPU_CLOCK) /* 12.288MHz (49.152MHz OSC/4) */
 	MDRV_CPU_PROGRAM_MAP(master_finallap_am)
 	MDRV_CPU_VBLANK_INT("screen", namcos2_68k_master_vblank)
@@ -1782,7 +1782,7 @@ static MACHINE_CONFIG_START( finallap, driver_data_t )
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.80)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sgunner, driver_data_t )
+static MACHINE_CONFIG_START( sgunner, driver_device )
 	MDRV_CPU_ADD("maincpu", M68000, M68K_CPU_CLOCK) /* 12.288MHz (49.152MHz OSC/4) */
 	MDRV_CPU_PROGRAM_MAP(master_sgunner_am)
 	MDRV_CPU_VBLANK_INT("screen", namcos2_68k_master_vblank)
@@ -1832,7 +1832,7 @@ static MACHINE_CONFIG_START( sgunner, driver_data_t )
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.80)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( luckywld, driver_data_t )
+static MACHINE_CONFIG_START( luckywld, driver_device )
 	MDRV_CPU_ADD("maincpu", M68000, M68K_CPU_CLOCK) /* 12.288MHz (49.152MHz OSC/4) */
 	MDRV_CPU_PROGRAM_MAP(master_luckywld_am)
 	MDRV_CPU_VBLANK_INT("screen", namcos2_68k_master_vblank)
@@ -1882,7 +1882,7 @@ static MACHINE_CONFIG_START( luckywld, driver_data_t )
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.80)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( metlhawk, driver_data_t )
+static MACHINE_CONFIG_START( metlhawk, driver_device )
 	MDRV_CPU_ADD("maincpu", M68000, M68K_CPU_CLOCK) /* 12.288MHz (49.152MHz OSC/4) */
 	MDRV_CPU_PROGRAM_MAP(master_metlhawk_am)
 	MDRV_CPU_VBLANK_INT("screen", namcos2_68k_master_vblank)

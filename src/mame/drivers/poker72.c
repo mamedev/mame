@@ -329,7 +329,7 @@ static MACHINE_RESET( poker72 )
 	memory_set_bankptr(machine, "bank1", &ROM[0]);
 }
 
-static MACHINE_CONFIG_START( poker72, driver_data_t )
+static MACHINE_CONFIG_START( poker72, driver_device )
 
 
 	/* basic machine hardware */

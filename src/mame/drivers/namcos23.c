@@ -2871,7 +2871,7 @@ static const mips3_config r4650_config =
 	8192				/* data cache size - VERIFIED */
 };
 
-static MACHINE_CONFIG_START( gorgon, driver_data_t )
+static MACHINE_CONFIG_START( gorgon, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", R4650BE, S23_BUSCLOCK*4)
@@ -2918,7 +2918,7 @@ static MACHINE_CONFIG_START( gorgon, driver_data_t )
 	MDRV_SOUND_ROUTE(3, "lspeaker", 1.00)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( s23, driver_data_t )
+static MACHINE_CONFIG_START( s23, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", R4650BE, S23_BUSCLOCK*4)
 	MDRV_CPU_CONFIG(r4650_config)
@@ -2964,7 +2964,7 @@ static MACHINE_CONFIG_START( s23, driver_data_t )
 	MDRV_SOUND_ROUTE(3, "lspeaker", 1.00)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ss23, driver_data_t )
+static MACHINE_CONFIG_START( ss23, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", R4650BE, S23_BUSCLOCK*5)
 	MDRV_CPU_CONFIG(r4650_config)

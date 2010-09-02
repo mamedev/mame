@@ -992,7 +992,7 @@ static const ccpu_config config_jmi =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( cinemat_nojmi_4k, driver_data_t )
+static MACHINE_CONFIG_START( cinemat_nojmi_4k, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", CCPU, MASTER_CLOCK/4)

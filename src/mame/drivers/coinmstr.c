@@ -980,7 +980,7 @@ static const mc6845_interface h46505_intf =
 };
 
 
-static MACHINE_CONFIG_START( coinmstr, driver_data_t )
+static MACHINE_CONFIG_START( coinmstr, driver_device )
 	MDRV_CPU_ADD("maincpu",Z80,8000000) // ?
 	MDRV_CPU_PROGRAM_MAP(coinmstr_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)

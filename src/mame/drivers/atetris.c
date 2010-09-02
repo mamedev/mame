@@ -338,7 +338,7 @@ static const pokey_interface pokey_interface_2 =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( atetris, driver_data_t )
+static MACHINE_CONFIG_START( atetris, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502,MASTER_CLOCK/8)
@@ -374,7 +374,7 @@ static MACHINE_CONFIG_START( atetris, driver_data_t )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( atetrisb2, driver_data_t )
+static MACHINE_CONFIG_START( atetrisb2, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502,BOOTLEG_CLOCK/8)

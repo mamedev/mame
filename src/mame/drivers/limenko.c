@@ -640,7 +640,7 @@ GFXDECODE_END
 *****************************************************************************************************/
 
 
-static MACHINE_CONFIG_START( limenko, driver_data_t )
+static MACHINE_CONFIG_START( limenko, driver_device )
 	MDRV_CPU_ADD("maincpu", E132XN, 20000000*4)	/* 4x internal multiplier */
 	MDRV_CPU_PROGRAM_MAP(limenko_map)
 	MDRV_CPU_IO_MAP(limenko_io_map)
@@ -665,7 +665,7 @@ static MACHINE_CONFIG_START( limenko, driver_data_t )
 	/* sound hardware */
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( spotty, driver_data_t )
+static MACHINE_CONFIG_START( spotty, driver_device )
 	MDRV_CPU_ADD("maincpu", GMS30C2232, 20000000)	/* 20 MHz, no internal multiplier */
 	MDRV_CPU_PROGRAM_MAP(spotty_map)
 	MDRV_CPU_IO_MAP(spotty_io_map)

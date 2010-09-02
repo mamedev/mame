@@ -241,7 +241,7 @@ static const c6280_interface c6280_config =
 	"audiocpu"
 };
 
-static MACHINE_CONFIG_START( battlera, driver_data_t )
+static MACHINE_CONFIG_START( battlera, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", H6280,21477200/3)

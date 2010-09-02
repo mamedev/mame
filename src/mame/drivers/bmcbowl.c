@@ -492,7 +492,7 @@ static INTERRUPT_GEN( bmc_interrupt )
 		cpu_set_input_line(device, 2, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( bmcbowl, driver_data_t )
+static MACHINE_CONFIG_START( bmcbowl, driver_device )
 	MDRV_CPU_ADD("maincpu", M68000, 21477270/2 )
 	MDRV_CPU_PROGRAM_MAP(bmcbowl_mem)
 	MDRV_CPU_VBLANK_INT_HACK(bmc_interrupt,2)

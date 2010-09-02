@@ -591,7 +591,7 @@ static const tms34010_config tms_config_lethalj =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( gameroom, driver_data_t )
+static MACHINE_CONFIG_START( gameroom, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", TMS34010, MASTER_CLOCK)

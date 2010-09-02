@@ -240,7 +240,7 @@ static const nmk112_interface quizpani_nmk112_intf =
 };
 
 
-static MACHINE_CONFIG_START( quizpani, driver_data_t )
+static MACHINE_CONFIG_START( quizpani, driver_device )
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(quizpani_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)

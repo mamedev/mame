@@ -238,7 +238,7 @@ static INTERRUPT_GEN( flower_cpu0_interrupt )
 	cpu_set_input_line(device, 0, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( flower, driver_data_t )
+static MACHINE_CONFIG_START( flower, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,8000000)

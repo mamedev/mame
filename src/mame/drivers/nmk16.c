@@ -3528,7 +3528,7 @@ static const nmk112_interface nmk16_nmk112_intf =
 	"oki1", "oki2", 0
 };
 
-static MACHINE_CONFIG_START( tharrier, driver_data_t )
+static MACHINE_CONFIG_START( tharrier, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz */
@@ -3574,7 +3574,7 @@ static MACHINE_CONFIG_START( tharrier, driver_data_t )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( manybloc, driver_data_t )
+static MACHINE_CONFIG_START( manybloc, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000) /* 10? MHz - check */
@@ -3618,7 +3618,7 @@ static MACHINE_CONFIG_START( manybloc, driver_data_t )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( mustang, driver_data_t )
+static MACHINE_CONFIG_START( mustang, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz ? */
@@ -3661,7 +3661,7 @@ static MACHINE_CONFIG_START( mustang, driver_data_t )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( mustangb, driver_data_t )
+static MACHINE_CONFIG_START( mustangb, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz ? */
@@ -3696,7 +3696,7 @@ MACHINE_CONFIG_END
 #define BIOSHIP_CRYSTAL1 10000000
 #define BIOSHIP_CRYSTAL2 12000000
 
-static MACHINE_CONFIG_START( bioship, driver_data_t )
+static MACHINE_CONFIG_START( bioship, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, BIOSHIP_CRYSTAL1 ) /* 10.0 MHz (verified) */
@@ -3738,7 +3738,7 @@ static MACHINE_CONFIG_START( bioship, driver_data_t )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( vandyke, driver_data_t )
+static MACHINE_CONFIG_START( vandyke, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_10MHz) /* 68000p12 running at 10Mhz, verified on pcb */
@@ -3780,7 +3780,7 @@ static MACHINE_CONFIG_START( vandyke, driver_data_t )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( vandykeb, driver_data_t )
+static MACHINE_CONFIG_START( vandykeb, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz ? */
@@ -3815,7 +3815,7 @@ static MACHINE_CONFIG_START( vandykeb, driver_data_t )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( acrobatm, driver_data_t )
+static MACHINE_CONFIG_START( acrobatm, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz (verified on pcb) */
@@ -3858,7 +3858,7 @@ static MACHINE_CONFIG_START( acrobatm, driver_data_t )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( tdragonb, driver_data_t )	/* bootleg using Raiden sound hardware */
+static MACHINE_CONFIG_START( tdragonb, driver_device )	/* bootleg using Raiden sound hardware */
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)
@@ -3890,7 +3890,7 @@ static MACHINE_CONFIG_START( tdragonb, driver_data_t )	/* bootleg using Raiden s
 	SEIBU_SOUND_SYSTEM_YM3812_INTERFACE(14318180/4, 1320000)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( tdragon, driver_data_t )
+static MACHINE_CONFIG_START( tdragon, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_8MHz) /* verified on pcb */
@@ -3934,7 +3934,7 @@ static MACHINE_CONFIG_START( tdragon, driver_data_t )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ssmissin, driver_data_t )
+static MACHINE_CONFIG_START( ssmissin, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000) /* 8 Mhz */
@@ -3969,7 +3969,7 @@ static MACHINE_CONFIG_START( ssmissin, driver_data_t )
 	MDRV_NMK112_ADD("nmk112", nmk16_nmk112_intf)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( strahl, driver_data_t )
+static MACHINE_CONFIG_START( strahl, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000) /* 12 MHz ? */
@@ -4011,7 +4011,7 @@ static MACHINE_CONFIG_START( strahl, driver_data_t )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( hachamf, driver_data_t )
+static MACHINE_CONFIG_START( hachamf, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz ? */
@@ -4054,7 +4054,7 @@ static MACHINE_CONFIG_START( hachamf, driver_data_t )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( macross, driver_data_t )
+static MACHINE_CONFIG_START( macross, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz ? */
@@ -4096,7 +4096,7 @@ static MACHINE_CONFIG_START( macross, driver_data_t )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( blkheart, driver_data_t )
+static MACHINE_CONFIG_START( blkheart, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_8MHz) /* verified on pcb */
@@ -4138,7 +4138,7 @@ static MACHINE_CONFIG_START( blkheart, driver_data_t )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( gunnail, driver_data_t )
+static MACHINE_CONFIG_START( gunnail, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000) /* 12 MHz? */
@@ -4180,7 +4180,7 @@ static MACHINE_CONFIG_START( gunnail, driver_data_t )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( macross2, driver_data_t )
+static MACHINE_CONFIG_START( macross2, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz ? */
@@ -4223,7 +4223,7 @@ static MACHINE_CONFIG_START( macross2, driver_data_t )
 	MDRV_NMK112_ADD("nmk112", nmk16_nmk112_intf)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( tdragon2, driver_data_t )
+static MACHINE_CONFIG_START( tdragon2, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000) /* 10 MHz  */
@@ -4266,7 +4266,7 @@ static MACHINE_CONFIG_START( tdragon2, driver_data_t )
 	MDRV_NMK112_ADD("nmk112", nmk16_nmk112_intf)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( raphero, driver_data_t )
+static MACHINE_CONFIG_START( raphero, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 14000000) /* 14 MHz measured */
@@ -4308,7 +4308,7 @@ static MACHINE_CONFIG_START( raphero, driver_data_t )
 	MDRV_NMK112_ADD("nmk112", nmk16_nmk112_intf)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( bjtwin, driver_data_t )
+static MACHINE_CONFIG_START( bjtwin, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000) /* verified on pcb */
@@ -4814,7 +4814,7 @@ static const ym2151_interface afega_ym2151_intf =
 };
 
 
-static MACHINE_CONFIG_START( stagger1, driver_data_t )
+static MACHINE_CONFIG_START( stagger1, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,XTAL_12MHz) /* 68000p10 running at 12mhz, verified on pcb */
@@ -4895,7 +4895,7 @@ static MACHINE_CONFIG_DERIVED( popspops, grdnstrm )
 	MDRV_VIDEO_UPDATE(bubl2000)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( firehawk, driver_data_t )
+static MACHINE_CONFIG_START( firehawk, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,12000000)
@@ -4930,7 +4930,7 @@ static MACHINE_CONFIG_START( firehawk, driver_data_t )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( twinactn, driver_data_t )
+static MACHINE_CONFIG_START( twinactn, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,12000000)

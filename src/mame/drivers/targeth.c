@@ -176,7 +176,7 @@ static INPUT_PORTS_START( targeth )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( targeth, driver_data_t )
+static MACHINE_CONFIG_START( targeth, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,24000000/2)			/* 12 MHz */

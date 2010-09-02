@@ -789,7 +789,7 @@ static MACHINE_START( teetert )
  *
  *************************************/
 
-static MACHINE_CONFIG_START( base, driver_data_t )
+static MACHINE_CONFIG_START( base, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, EXIDY_CPU_CLOCK)

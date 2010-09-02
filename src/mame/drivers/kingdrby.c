@@ -965,7 +965,7 @@ static PALETTE_INIT(kingdrbb)
 	}
 }
 
-static MACHINE_CONFIG_START( kingdrby, driver_data_t )
+static MACHINE_CONFIG_START( kingdrby, driver_device )
 	MDRV_CPU_ADD("master", Z80, CLK_2)
 	MDRV_CPU_PROGRAM_MAP(master_map)
 	MDRV_CPU_IO_MAP(master_io_map)

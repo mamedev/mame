@@ -981,7 +981,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_CONFIG_START( root, driver_data_t )
+static MACHINE_CONFIG_START( root, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/3/2)	/* 3.072 MHz */
@@ -1077,7 +1077,7 @@ static MACHINE_CONFIG_DERIVED( toprollr, cclimber )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( swimmer, driver_data_t )
+static MACHINE_CONFIG_START( swimmer, driver_device )
 
 	/* basic machine hardware */
     MDRV_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)    /* verified on pcb */

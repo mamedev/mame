@@ -1,11 +1,9 @@
 
-class lsasquad_state : public driver_data_t
+class lsasquad_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, lsasquad_state(machine)); }
-
-	lsasquad_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	lsasquad_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	/* memory pointers */
 	UINT8 *      scrollram;

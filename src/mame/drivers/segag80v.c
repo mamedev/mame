@@ -909,7 +909,7 @@ static const samples_interface zektor_samples_interface =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( g80v_base, driver_data_t )
+static MACHINE_CONFIG_START( g80v_base, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK/2)

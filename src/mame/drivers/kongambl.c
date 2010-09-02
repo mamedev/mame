@@ -126,7 +126,7 @@ static const k053247_interface k053247_intf =
 	kongambl_sprite_callback
 };
 
-static MACHINE_CONFIG_START( kongambl, driver_data_t )
+static MACHINE_CONFIG_START( kongambl, driver_device )
 	MDRV_CPU_ADD("maincpu", M68EC020, 25000000)
 	MDRV_CPU_PROGRAM_MAP(kongambl_map)
 

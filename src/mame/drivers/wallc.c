@@ -275,7 +275,7 @@ static DRIVER_INIT( wallca )
 
 
 
-static MACHINE_CONFIG_START( wallc, driver_data_t )
+static MACHINE_CONFIG_START( wallc, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 12288000 / 4)	/* 3.072 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(wallc_map)

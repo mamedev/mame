@@ -673,7 +673,7 @@ static ADDRESS_MAP_START( qs1000_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x0000, 0x007f) AM_RAM	// RAM?  wavetable registers?  not sure.
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( common, driver_data_t )
+static MACHINE_CONFIG_START( common, driver_device )
 	MDRV_CPU_ADD("maincpu", E116T, 50000000)	/* 50 MHz */
 	MDRV_CPU_PROGRAM_MAP(common_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
@@ -803,7 +803,7 @@ static MACHINE_CONFIG_DERIVED( mrkicker, common )
 	MDRV_FRAGMENT_ADD(sound_ym_oki)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( aoh, driver_data_t )
+static MACHINE_CONFIG_START( aoh, driver_device )
 	MDRV_CPU_ADD("maincpu", E132XN, 20000000*4)	/* 4x internal multiplier */
 	MDRV_CPU_PROGRAM_MAP(aoh_map)
 	MDRV_CPU_IO_MAP(aoh_io)

@@ -718,7 +718,7 @@ static const tc0480scp_interface undrfire_tc0480scp_intf =
 	0		/* col_base */
 };
 
-static MACHINE_CONFIG_START( undrfire, driver_data_t )
+static MACHINE_CONFIG_START( undrfire, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)	/* 16 MHz */
@@ -749,7 +749,7 @@ static MACHINE_CONFIG_START( undrfire, driver_data_t )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( cbombers, driver_data_t )
+static MACHINE_CONFIG_START( cbombers, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)	/* 16 MHz */

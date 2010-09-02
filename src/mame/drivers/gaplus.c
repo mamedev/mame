@@ -522,7 +522,7 @@ static const namcoio_interface intf1 =
 /* TODO: chip #2: test/cocktail, optional buttons */
 
 
-static MACHINE_CONFIG_START( gaplus, driver_data_t )
+static MACHINE_CONFIG_START( gaplus, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809,	24576000/16)	/* 1.536 MHz */

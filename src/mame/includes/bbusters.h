@@ -1,10 +1,8 @@
-class bbusters_state : public driver_data_t
+class bbusters_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, bbusters_state(machine)); }
-
-	bbusters_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	bbusters_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	UINT16 *videoram;
 	UINT16 *ram;

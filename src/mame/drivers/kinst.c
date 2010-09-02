@@ -636,7 +636,7 @@ static const mips3_config r4600_config =
 };
 
 
-static MACHINE_CONFIG_START( kinst, driver_data_t )
+static MACHINE_CONFIG_START( kinst, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", R4600LE, MASTER_CLOCK*2)

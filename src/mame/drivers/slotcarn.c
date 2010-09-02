@@ -591,7 +591,7 @@ static const ay8910_interface scarn_ay8910_config =
 *          Machine Driver          *
 ***********************************/
 
-static MACHINE_CONFIG_START( slotcarn, driver_data_t )
+static MACHINE_CONFIG_START( slotcarn, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK) // 2.5 Mhz?

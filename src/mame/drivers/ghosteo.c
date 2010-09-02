@@ -487,7 +487,7 @@ static INTERRUPT_GEN( bballoon_interrupt )
 //  irq_en = 0;
 }
 
-static MACHINE_CONFIG_START( bballoon, driver_data_t )
+static MACHINE_CONFIG_START( bballoon, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", ARM7, 24000000)

@@ -418,7 +418,7 @@ static INPUT_PORTS_START( steaser )
 	PORT_BIT( 0x8000, IP_ACTIVE_HIGH, IPT_POKER_HOLD4 ) PORT_IMPULSE(1)
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( ilpag, driver_data_t )
+static MACHINE_CONFIG_START( ilpag, driver_device )
 	MDRV_CPU_ADD("maincpu", M68000, 11059200 )	// ?
 	MDRV_CPU_PROGRAM_MAP(ilpag_map)
 	MDRV_CPU_VBLANK_INT("screen",irq4_line_hold) //3 & 6 used, mcu comms?

@@ -91,55 +91,10 @@
 #define MEMCARD_HANDLER(name)		void MEMCARD_HANDLER_NAME(name)(running_machine *machine, mame_file *file, int action)
 #define MEMCARD_HANDLER_CALL(name)	MEMCARD_HANDLER_NAME(name)(machine, file, action)
 
-#define MACHINE_START_NAME(name)	machine_start_##name
-#define MACHINE_START(name)			void MACHINE_START_NAME(name)(running_machine *machine)
-#define MACHINE_START_CALL(name)	MACHINE_START_NAME(name)(machine)
-
-#define MACHINE_RESET_NAME(name)	machine_reset_##name
-#define MACHINE_RESET(name)			void MACHINE_RESET_NAME(name)(running_machine *machine)
-#define MACHINE_RESET_CALL(name)	MACHINE_RESET_NAME(name)(machine)
-
-#define SOUND_START_NAME(name)		sound_start_##name
-#define SOUND_START(name)			void SOUND_START_NAME(name)(running_machine *machine)
-#define SOUND_START_CALL(name)		SOUND_START_NAME(name)(machine)
-
-#define SOUND_RESET_NAME(name)		sound_reset_##name
-#define SOUND_RESET(name)			void SOUND_RESET_NAME(name)(running_machine *machine)
-#define SOUND_RESET_CALL(name)		SOUND_RESET_NAME(name)(machine)
-
-#define VIDEO_START_NAME(name)		video_start_##name
-#define VIDEO_START(name)			void VIDEO_START_NAME(name)(running_machine *machine)
-#define VIDEO_START_CALL(name)		VIDEO_START_NAME(name)(machine)
-
-#define VIDEO_RESET_NAME(name)		video_reset_##name
-#define VIDEO_RESET(name)			void VIDEO_RESET_NAME(name)(running_machine *machine)
-#define VIDEO_RESET_CALL(name)		VIDEO_RESET_NAME(name)(machine)
-
-#define PALETTE_INIT_NAME(name)		palette_init_##name
-#define PALETTE_INIT(name)			void PALETTE_INIT_NAME(name)(running_machine *machine, const UINT8 *color_prom)
-#define PALETTE_INIT_CALL(name)		PALETTE_INIT_NAME(name)(machine, color_prom)
-
-#define VIDEO_EOF_NAME(name)		video_eof_##name
-#define VIDEO_EOF(name)				void VIDEO_EOF_NAME(name)(running_machine *machine)
-#define VIDEO_EOF_CALL(name)		VIDEO_EOF_NAME(name)(machine)
-
-#define VIDEO_UPDATE_NAME(name)		video_update_##name
-#define VIDEO_UPDATE(name)			UINT32 VIDEO_UPDATE_NAME(name)(screen_device *screen, bitmap_t *bitmap, const rectangle *cliprect)
-#define VIDEO_UPDATE_CALL(name)		VIDEO_UPDATE_NAME(name)(screen, bitmap, cliprect)
-
 
 // NULL versions
 #define nvram_handler_0 			NULL
 #define memcard_handler_0			NULL
-#define machine_start_0 			NULL
-#define machine_reset_0 			NULL
-#define sound_start_0				NULL
-#define sound_reset_0				NULL
-#define video_start_0				NULL
-#define video_reset_0				NULL
-#define palette_init_0				NULL
-#define video_eof_0 				NULL
-#define video_update_0				NULL
 
 
 
@@ -149,23 +104,13 @@
 
 // forward references
 struct gfx_decode_entry;
-class driver_data_t;
+class driver_device;
 
 
 
 // various callback functions
 typedef void   (*nvram_handler_func)(running_machine *machine, mame_file *file, int read_or_write);
 typedef void   (*memcard_handler_func)(running_machine *machine, mame_file *file, int action);
-typedef void   (*machine_start_func)(running_machine *machine);
-typedef void   (*machine_reset_func)(running_machine *machine);
-typedef void   (*sound_start_func)(running_machine *machine);
-typedef void   (*sound_reset_func)(running_machine *machine);
-typedef void   (*video_start_func)(running_machine *machine);
-typedef void   (*video_reset_func)(running_machine *machine);
-typedef void   (*palette_init_func)(running_machine *machine, const UINT8 *color_prom);
-typedef void   (*video_eof_func)(running_machine *machine);
-typedef UINT32 (*video_update_func)(screen_device *screen, bitmap_t *bitmap, const rectangle *cliprect);
-typedef driver_data_t *(*driver_data_alloc_func)(running_machine &machine);
 
 
 
@@ -182,15 +127,10 @@ public:
 	machine_config(machine_config_constructor constructor);
 	~machine_config();
 
-	driver_data_alloc_func	m_driver_data_alloc;		// allocator for driver data
-
 	attotime				m_minimum_quantum;			// minimum scheduling quantum
 	const char *			m_perfect_cpu_quantum;		// tag of CPU to use for "perfect" scheduling
 	INT32					m_watchdog_vblank_count;	// number of VBLANKs until the watchdog kills us
 	attotime				m_watchdog_time;			// length of time until the watchdog kills us
-
-	machine_start_func		m_machine_start;			// one-time machine start callback
-	machine_reset_func		m_machine_reset;			// machine reset callback
 
 	nvram_handler_func		m_nvram_handler;			// NVRAM save/load callback
 	memcard_handler_func	m_memcard_handler;			// memory card save/load callback
@@ -199,15 +139,6 @@ public:
 	const gfx_decode_entry *m_gfxdecodeinfo;			// pointer to array of graphics decoding information
 	UINT32					m_total_colors;				// total number of colors in the palette
 	const char *			m_default_layout;			// default layout for this machine
-
-	palette_init_func		m_init_palette;				// one-time palette init callback
-	video_start_func		m_video_start;				// one-time video start callback
-	video_reset_func		m_video_reset;				// video reset callback
-	video_eof_func			m_video_eof;				// end-of-frame video callback
-	video_update_func		m_video_update;				// video update callback
-
-	sound_start_func		m_sound_start;				// one-time sound start callback
-	sound_reset_func		m_sound_reset;				// sound reset callback
 
 	device_config_list		m_devicelist;				// list of device configs
 
@@ -231,43 +162,44 @@ private:
 #define MACHINE_CONFIG_NAME(_name) construct_machine_config_##_name
 
 #define MACHINE_CONFIG_START(_name, _class) \
-void MACHINE_CONFIG_NAME(_name)(machine_config &config, device_config *owner) \
+device_config *MACHINE_CONFIG_NAME(_name)(machine_config &config, device_config *owner) \
 { \
 	device_config *device = NULL; \
 	const char *tag; \
 	astring tempstring; \
 	(void)device; \
 	(void)tag; \
-	assert(config.m_driver_data_alloc == NULL); \
-	config.m_driver_data_alloc = &_class::alloc; \
+	assert(owner == NULL); \
+	owner = config.device_add(NULL, "root", &driver_device_config<_class>::static_alloc_device_config, 0); \
 
 #define MACHINE_CONFIG_FRAGMENT(_name) \
-void MACHINE_CONFIG_NAME(_name)(machine_config &config, device_config *owner) \
+device_config *MACHINE_CONFIG_NAME(_name)(machine_config &config, device_config *owner) \
 { \
 	device_config *device = NULL; \
 	const char *tag; \
 	astring tempstring; \
 	(void)device; \
 	(void)tag; \
-	assert(config.m_driver_data_alloc != NULL); \
+	assert(owner != NULL); \
 
 #define MACHINE_CONFIG_DERIVED(_name, _base) \
-void MACHINE_CONFIG_NAME(_name)(machine_config &config, device_config *owner) \
+device_config *MACHINE_CONFIG_NAME(_name)(machine_config &config, device_config *owner) \
 { \
 	device_config *device = NULL; \
 	const char *tag; \
 	astring tempstring; \
 	(void)device; \
 	(void)tag; \
-	MACHINE_CONFIG_NAME(_base)(config, owner); \
-	assert(config.m_driver_data_alloc != NULL); \
+	owner = MACHINE_CONFIG_NAME(_base)(config, owner); \
+	assert(owner != NULL); \
 
 #define MACHINE_CONFIG_END \
+	return owner; \
 }
 
 // use this to declare external references to a machine driver
 #define MACHINE_CONFIG_EXTERN(_name) \
-	extern void MACHINE_CONFIG_NAME(_name)(machine_config &config, device_config *owner)
+	extern device_config *MACHINE_CONFIG_NAME(_name)(machine_config &config, device_config *owner)
 
 
 // importing data from other machine drivers
@@ -290,12 +222,6 @@ void MACHINE_CONFIG_NAME(_name)(machine_config &config, device_config *owner) \
 
 
 // core functions
-#define MDRV_MACHINE_START(_func) \
-	config.m_machine_start = MACHINE_START_NAME(_func); \
-
-#define MDRV_MACHINE_RESET(_func) \
-	config.m_machine_reset = MACHINE_RESET_NAME(_func); \
-
 #define MDRV_NVRAM_HANDLER(_func) \
 	config.m_nvram_handler = NVRAM_HANDLER_NAME(_func); \
 
@@ -317,29 +243,37 @@ void MACHINE_CONFIG_NAME(_name)(machine_config &config, device_config *owner) \
 	config.m_default_layout = &(_layout)[0]; \
 
 
-// core video functions
-#define MDRV_PALETTE_INIT(_func) \
-	config.m_init_palette = PALETTE_INIT_NAME(_func); \
+// core machine functions
+#define MDRV_MACHINE_START(_func) \
+	driver_device_config_base::static_set_callback(owner, driver_device_config_base::CB_MACHINE_START, MACHINE_START_NAME(_func)); \
 
-#define MDRV_VIDEO_START(_func) \
-	config.m_video_start = VIDEO_START_NAME(_func); \
-
-#define MDRV_VIDEO_RESET(_func) \
-	config.m_video_reset = VIDEO_RESET_NAME(_func); \
-
-#define MDRV_VIDEO_EOF(_func) \
-	config.m_video_eof = VIDEO_EOF_NAME(_func); \
-
-#define MDRV_VIDEO_UPDATE(_func) \
-	config.m_video_update = VIDEO_UPDATE_NAME(_func); \
+#define MDRV_MACHINE_RESET(_func) \
+	driver_device_config_base::static_set_callback(owner, driver_device_config_base::CB_MACHINE_RESET, MACHINE_RESET_NAME(_func)); \
 
 
 // core sound functions
 #define MDRV_SOUND_START(_func) \
-	config.m_sound_start = SOUND_START_NAME(_func); \
+	driver_device_config_base::static_set_callback(owner, driver_device_config_base::CB_SOUND_START, SOUND_START_NAME(_func)); \
 
 #define MDRV_SOUND_RESET(_func) \
-	config.m_sound_reset = SOUND_RESET_NAME(_func); \
+	driver_device_config_base::static_set_callback(owner, driver_device_config_base::CB_SOUND_RESET, SOUND_RESET_NAME(_func)); \
+
+
+// core video functions
+#define MDRV_PALETTE_INIT(_func) \
+	driver_device_config_base::static_set_palette_init(owner, PALETTE_INIT_NAME(_func)); \
+
+#define MDRV_VIDEO_START(_func) \
+	driver_device_config_base::static_set_callback(owner, driver_device_config_base::CB_VIDEO_START, VIDEO_START_NAME(_func)); \
+
+#define MDRV_VIDEO_RESET(_func) \
+	driver_device_config_base::static_set_callback(owner, driver_device_config_base::CB_VIDEO_RESET, VIDEO_RESET_NAME(_func)); \
+
+#define MDRV_VIDEO_EOF(_func) \
+	driver_device_config_base::static_set_callback(owner, driver_device_config_base::CB_VIDEO_EOF, VIDEO_EOF_NAME(_func)); \
+
+#define MDRV_VIDEO_UPDATE(_func) \
+	driver_device_config_base::static_set_video_update(owner, VIDEO_UPDATE_NAME(_func)); \
 
 
 // add/remove devices

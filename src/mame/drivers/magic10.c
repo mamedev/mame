@@ -645,7 +645,7 @@ GFXDECODE_END
 *      Machine Drivers      *
 ****************************/
 
-static MACHINE_CONFIG_START( magic10, driver_data_t )
+static MACHINE_CONFIG_START( magic10, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000) // ?
 	MDRV_CPU_PROGRAM_MAP(magic10_map)

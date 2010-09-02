@@ -376,7 +376,7 @@ static const msm5205_interface msm5205_config =
 	MSM5205_S96_4B	/* 4KHz 4-bit */
 };
 
-static MACHINE_CONFIG_START( wc90b, driver_data_t )
+static MACHINE_CONFIG_START( wc90b, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK)

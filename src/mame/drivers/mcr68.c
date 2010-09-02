@@ -945,7 +945,7 @@ GFXDECODE_END
 
 =================================================================*/
 
-static MACHINE_CONFIG_START( zwackery, driver_data_t )
+static MACHINE_CONFIG_START( zwackery, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 7652400)	/* should be XTAL_16MHz/2 */
@@ -979,7 +979,7 @@ static MACHINE_CONFIG_START( zwackery, driver_data_t )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( mcr68, driver_data_t )
+static MACHINE_CONFIG_START( mcr68, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 7723800)

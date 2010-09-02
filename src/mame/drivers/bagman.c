@@ -468,7 +468,7 @@ static const tms5110_interface bagman_tms5110_interface =
 	DEVCB_NULL										/* rom clock - Only used to drive the data lines */
 };
 
-static MACHINE_CONFIG_START( bagman, driver_data_t )
+static MACHINE_CONFIG_START( bagman, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, BAGMAN_H0)
@@ -504,7 +504,7 @@ static MACHINE_CONFIG_START( bagman, driver_data_t )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pickin, driver_data_t )
+static MACHINE_CONFIG_START( pickin, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, BAGMAN_H0)
@@ -556,7 +556,7 @@ z80
 */
 
 
-static MACHINE_CONFIG_START( botanic, driver_data_t )
+static MACHINE_CONFIG_START( botanic, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, BAGMAN_H0)

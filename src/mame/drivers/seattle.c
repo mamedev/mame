@@ -2457,7 +2457,7 @@ static const mips3_config r5000_config =
 	SYSTEM_CLOCK	/* system clock rate */
 };
 
-static MACHINE_CONFIG_START( seattle_common, driver_data_t )
+static MACHINE_CONFIG_START( seattle_common, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", R5000LE, SYSTEM_CLOCK*3)

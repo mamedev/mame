@@ -385,7 +385,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( redalert, driver_data_t )
+static MACHINE_CONFIG_START( redalert, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, MAIN_CPU_CLOCK)
@@ -399,7 +399,7 @@ static MACHINE_CONFIG_START( redalert, driver_data_t )
 	MDRV_FRAGMENT_ADD(redalert_audio)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ww3, driver_data_t )
+static MACHINE_CONFIG_START( ww3, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, MAIN_CPU_CLOCK)
@@ -413,7 +413,7 @@ static MACHINE_CONFIG_START( ww3, driver_data_t )
 	MDRV_FRAGMENT_ADD(ww3_audio)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( panther, driver_data_t )
+static MACHINE_CONFIG_START( panther, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, MAIN_CPU_CLOCK)
@@ -427,7 +427,7 @@ static MACHINE_CONFIG_START( panther, driver_data_t )
 	MDRV_FRAGMENT_ADD(ww3_audio)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( demoneye, driver_data_t )
+static MACHINE_CONFIG_START( demoneye, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, MAIN_CPU_CLOCK)

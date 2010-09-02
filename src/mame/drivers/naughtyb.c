@@ -433,7 +433,7 @@ static const tms36xx_interface tms3615_interface =
 
 
 
-static MACHINE_CONFIG_START( naughtyb, driver_data_t )
+static MACHINE_CONFIG_START( naughtyb, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CLOCK_XTAL / 4) /* 12 MHz clock, divided by 4. CPU is a Z80A */
@@ -469,7 +469,7 @@ MACHINE_CONFIG_END
 
 
 /* Exactly the same but for certain address writes */
-static MACHINE_CONFIG_START( popflame, driver_data_t )
+static MACHINE_CONFIG_START( popflame, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CLOCK_XTAL / 4) /* 12 MHz clock, divided by 4. CPU is a Z80A */

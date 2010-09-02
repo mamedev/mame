@@ -2868,7 +2868,7 @@ static INTERRUPT_GEN( mcu_interrupt )
 	}
 }
 
-static MACHINE_CONFIG_START( namcos22s, driver_data_t )
+static MACHINE_CONFIG_START( namcos22s, driver_device )
 	MDRV_CPU_ADD("maincpu", M68EC020,SS22_MASTER_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(namcos22s_am)
 	MDRV_CPU_VBLANK_INT_HACK(namcos22s_interrupt,2)
@@ -3284,7 +3284,7 @@ static MACHINE_RESET(namcos22)
 	InitDSP(machine, 0);
 }
 
-static MACHINE_CONFIG_START( namcos22, driver_data_t )
+static MACHINE_CONFIG_START( namcos22, driver_device )
 	MDRV_CPU_ADD("maincpu", M68020,SS22_MASTER_CLOCK/2) /* 25 MHz? */
 	MDRV_CPU_PROGRAM_MAP(namcos22_am)
 	MDRV_CPU_VBLANK_INT_HACK(namcos22_interrupt,2)

@@ -309,7 +309,7 @@ static PALETTE_INIT( triplhnt )
 }
 
 
-static MACHINE_CONFIG_START( triplhnt, driver_data_t )
+static MACHINE_CONFIG_START( triplhnt, driver_device )
 
 /* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6800, 800000)

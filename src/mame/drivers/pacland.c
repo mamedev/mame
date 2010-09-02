@@ -411,7 +411,7 @@ static const namco_interface namco_config =
 
 
 
-static MACHINE_CONFIG_START( pacland, driver_data_t )
+static MACHINE_CONFIG_START( pacland, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 49152000/32)	/* 1.536 MHz */

@@ -64,7 +64,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_CONFIG_START( 3super8, driver_data_t )
+static MACHINE_CONFIG_START( 3super8, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,24000000/4)		 /* 6 MHz */
 	MDRV_CPU_PROGRAM_MAP(map)

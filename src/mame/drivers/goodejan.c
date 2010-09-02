@@ -325,7 +325,7 @@ static INTERRUPT_GEN( goodejan_irq )
 /* vector 0x00c is just a reti */
 }
 
-static MACHINE_CONFIG_START( goodejan, driver_data_t )
+static MACHINE_CONFIG_START( goodejan, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V30, GOODEJAN_MHZ2/2)

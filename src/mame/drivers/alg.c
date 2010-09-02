@@ -403,7 +403,7 @@ static const mos6526_interface cia_1_intf =
 	DEVCB_NULL								/* port B */
 };
 
-static MACHINE_CONFIG_START( alg_r1, driver_data_t )
+static MACHINE_CONFIG_START( alg_r1, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, AMIGA_68000_NTSC_CLOCK)

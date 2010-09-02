@@ -515,7 +515,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( r2dtank, driver_data_t )
+static MACHINE_CONFIG_START( r2dtank, driver_device )
 	MDRV_CPU_ADD("maincpu", M6809,3000000)		 /* ?? too fast ? */
 	MDRV_CPU_PROGRAM_MAP(r2dtank_main_map)
 

@@ -567,7 +567,7 @@ static const tms9927_interface tms9927_intf =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( statriv2, driver_data_t )
+static MACHINE_CONFIG_START( statriv2, driver_device )
 	/* basic machine hardware */
 	/* FIXME: The 8085A had a max clock of 6MHz, internally divided by 2! */
     MDRV_CPU_ADD("maincpu", I8085A, MASTER_CLOCK)

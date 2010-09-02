@@ -537,7 +537,7 @@ static const samples_interface senjyo_samples_interface =
 };
 
 
-static MACHINE_CONFIG_START( senjyo, driver_data_t )
+static MACHINE_CONFIG_START( senjyo, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz? */

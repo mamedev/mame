@@ -494,7 +494,7 @@ static INTERRUPT_GEN( littlerb )
 	cpu_set_input_line(device, 4, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( littlerb, driver_data_t )
+static MACHINE_CONFIG_START( littlerb, driver_device )
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(littlerb_main)
 	MDRV_CPU_VBLANK_INT("screen", littlerb)

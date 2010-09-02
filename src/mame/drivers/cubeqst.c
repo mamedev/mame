@@ -493,7 +493,7 @@ static const cubeqst_lin_config lin_config =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( cubeqst, driver_data_t )
+static MACHINE_CONFIG_START( cubeqst, driver_device )
 	MDRV_CPU_ADD("main_cpu", M68000, XTAL_16MHz / 2)
 	MDRV_CPU_PROGRAM_MAP(m68k_program_map)
 	MDRV_CPU_VBLANK_INT("screen", vblank)

@@ -2539,7 +2539,7 @@ static const sh2_cpu_core sh2_conf_cps3 = {
 	cps3_dma_callback
 };
 
-static MACHINE_CONFIG_START( cps3, driver_data_t )
+static MACHINE_CONFIG_START( cps3, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", SH2, 6250000*4) // external clock is 6.25 Mhz, it sets the intenral multiplier to 4x (this should probably be handled in the core..)
 	MDRV_CPU_PROGRAM_MAP(cps3_map)

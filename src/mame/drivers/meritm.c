@@ -1047,7 +1047,7 @@ static TIMER_DEVICE_CALLBACK( vblank_end_tick )
 	z80pio_pa_w(meritm_z80pio[0], 0, meritm_vint);
 }
 
-static MACHINE_CONFIG_START( meritm_crt250, driver_data_t )
+static MACHINE_CONFIG_START( meritm_crt250, driver_device )
 	MDRV_CPU_ADD("maincpu", Z80, SYSTEM_CLK/6)
 	MDRV_CPU_PROGRAM_MAP(meritm_crt250_map)
 	MDRV_CPU_IO_MAP(meritm_crt250_io_map)

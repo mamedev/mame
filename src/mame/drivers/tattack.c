@@ -180,7 +180,7 @@ static PALETTE_INIT( tattack  )
 }
 
 
-static MACHINE_CONFIG_START( tattack, driver_data_t )
+static MACHINE_CONFIG_START( tattack, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 8000000 / 2)	/* 4 MHz ? */

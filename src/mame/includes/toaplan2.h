@@ -16,13 +16,11 @@
 #include "video/gp9001.h"
 
 // cache the vdps for faster access
-class toaplan2_state : public driver_data_t
+class toaplan2_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, toaplan2_state(machine)); }
-
-	toaplan2_state(running_machine &machine)
-		: driver_data_t(machine)
+	toaplan2_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config)
 	{
 		vdp0 = NULL;
 		vdp1 = NULL;

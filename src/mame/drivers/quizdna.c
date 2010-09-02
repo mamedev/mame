@@ -452,7 +452,7 @@ static const ym2203_interface ym2203_config =
 };
 
 
-static MACHINE_CONFIG_START( quizdna, driver_data_t )
+static MACHINE_CONFIG_START( quizdna, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MCLK/2) /* 8.000 MHz */

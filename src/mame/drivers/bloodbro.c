@@ -433,7 +433,7 @@ GFXDECODE_END
 
 /* Machine Drivers */
 
-static MACHINE_CONFIG_START( bloodbro, driver_data_t )
+static MACHINE_CONFIG_START( bloodbro, driver_device )
 	// basic machine hardware
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_20MHz/2) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(bloodbro_map)

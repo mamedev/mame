@@ -239,7 +239,7 @@ static INTERRUPT_GEN( jackpool_interrupt )
 }
 
 
-static MACHINE_CONFIG_START( jackpool, driver_data_t )
+static MACHINE_CONFIG_START( jackpool, driver_device )
 	MDRV_CPU_ADD("maincpu", M68000, 12000000) // ?
 	MDRV_CPU_PROGRAM_MAP(jackpool_mem)
 	MDRV_CPU_VBLANK_INT("screen",jackpool_interrupt)  // ?

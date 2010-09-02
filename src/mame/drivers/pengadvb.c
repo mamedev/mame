@@ -259,7 +259,7 @@ static INTERRUPT_GEN( pengadvb_interrupt )
 }
 
 
-static MACHINE_CONFIG_START( pengadvb, driver_data_t )
+static MACHINE_CONFIG_START( pengadvb, driver_device )
 
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_10_738635MHz/3)		  /* 3.579545 Mhz */
 	MDRV_CPU_PROGRAM_MAP(program_mem)

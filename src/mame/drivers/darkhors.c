@@ -621,7 +621,7 @@ static INTERRUPT_GEN( darkhors )
 	}
 }
 
-static MACHINE_CONFIG_START( darkhors, driver_data_t )
+static MACHINE_CONFIG_START( darkhors, driver_device )
 	MDRV_CPU_ADD("maincpu", M68EC020, 12000000) // 36MHz/3 ??
 	MDRV_CPU_PROGRAM_MAP(darkhors_map)
 	MDRV_CPU_VBLANK_INT_HACK(darkhors,3)
@@ -671,7 +671,7 @@ static VIDEO_UPDATE(jclub2)
 	return 0;
 }
 
-static MACHINE_CONFIG_START( jclub2, driver_data_t )
+static MACHINE_CONFIG_START( jclub2, driver_device )
 	MDRV_CPU_ADD("maincpu", M68EC020, 12000000)
 	MDRV_CPU_PROGRAM_MAP(jclub2_map)
 	MDRV_CPU_VBLANK_INT_HACK(darkhors,3)
@@ -727,7 +727,7 @@ static VIDEO_UPDATE(jclub2o)
 	return 0;
 }
 
-static MACHINE_CONFIG_START( jclub2o, driver_data_t )
+static MACHINE_CONFIG_START( jclub2o, driver_device )
 	MDRV_CPU_ADD("st0016",Z80,8000000)
 	MDRV_CPU_PROGRAM_MAP(st0016_mem)
 	MDRV_CPU_IO_MAP(st0016_io)

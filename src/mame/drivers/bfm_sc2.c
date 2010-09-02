@@ -2216,7 +2216,7 @@ INPUT_PORTS_END
 // machine driver for scorpion2 board + adder2 expansion //////////////////
 ///////////////////////////////////////////////////////////////////////////
 
-static MACHINE_CONFIG_START( scorpion2_vid, driver_data_t )
+static MACHINE_CONFIG_START( scorpion2_vid, driver_device )
 	MDRV_MACHINE_RESET( init )							// main scorpion2 board initialisation
 	MDRV_QUANTUM_TIME(HZ(960))									// needed for serial communication !!
 	MDRV_CPU_ADD("maincpu", M6809, MASTER_CLOCK/4 )	// 6809 CPU at 2 Mhz
@@ -3967,7 +3967,7 @@ INPUT_PORTS_END
 
 /* machine driver for scorpion2 board */
 
-static MACHINE_CONFIG_START( scorpion2, driver_data_t )
+static MACHINE_CONFIG_START( scorpion2, driver_device )
 	MDRV_MACHINE_RESET(awp_init)
 	MDRV_CPU_ADD("maincpu", M6809, MASTER_CLOCK/4 )
 	MDRV_CPU_PROGRAM_MAP(sc2_memmap)
@@ -3995,7 +3995,7 @@ MACHINE_CONFIG_END
 
 
 /* machine driver for scorpion2 board + matrix board */
-static MACHINE_CONFIG_START( scorpion2_dm01, driver_data_t )
+static MACHINE_CONFIG_START( scorpion2_dm01, driver_device )
 	MDRV_MACHINE_RESET(dm01_init)
 	MDRV_QUANTUM_TIME(HZ(960))									// needed for serial communication !!
 	MDRV_CPU_ADD("maincpu", M6809, MASTER_CLOCK/4 )

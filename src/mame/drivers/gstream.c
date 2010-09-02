@@ -124,13 +124,11 @@ RAM4 is HMC HM6264LP-70
 #include "cpu/e132xs/e132xs.h"
 #include "sound/okim6295.h"
 
-class gstream_state : public driver_data_t
+class gstream_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, gstream_state(machine)); }
-
-	gstream_state(running_machine &machine)
-		: driver_data_t(machine),
+	gstream_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config),
 		  maincpu(machine.device<cpu_device>("maincpu")),
 		  oki_1(machine.device<okim6295_device>("oki1")),
 		  oki_2(machine.device<okim6295_device>("oki2")) { }

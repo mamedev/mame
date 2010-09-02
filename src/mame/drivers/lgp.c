@@ -338,7 +338,7 @@ static MACHINE_START( lgp )
 
 
 /* DRIVER */
-static MACHINE_CONFIG_START( lgp, driver_data_t )
+static MACHINE_CONFIG_START( lgp, driver_device )
 	/* main cpu */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_PCB_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(main_program_map)

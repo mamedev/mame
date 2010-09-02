@@ -258,7 +258,7 @@ static VIDEO_EOF( raiden )
 	buffer_spriteram16_w(space,0,0,0xffff); /* Could be a memory location instead */
 }
 
-static MACHINE_CONFIG_START( raiden, driver_data_t )
+static MACHINE_CONFIG_START( raiden, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V30,XTAL_20MHz/2) /* NEC V30 CPU, 20MHz verified on pcb */

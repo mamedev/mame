@@ -1014,7 +1014,7 @@ static const tms34010_config yunit_tms_config =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( zunit, driver_data_t )
+static MACHINE_CONFIG_START( zunit, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", TMS34010, FAST_MASTER_CLOCK)
@@ -1047,7 +1047,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( yunit_core, driver_data_t )
+static MACHINE_CONFIG_START( yunit_core, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", TMS34010, SLOW_MASTER_CLOCK)

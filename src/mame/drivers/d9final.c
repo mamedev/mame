@@ -255,7 +255,7 @@ static MACHINE_RESET( d9final )
 	memory_set_bankptr(machine, "bank1", &ROM[0x10000]);
 }
 
-static MACHINE_CONFIG_START( d9final, driver_data_t )
+static MACHINE_CONFIG_START( d9final, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 24000000/4)/* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(d9final_map)

@@ -361,7 +361,7 @@ static GFXDECODE_START( panicr )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 0x200, 16 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( panicr, driver_data_t )
+static MACHINE_CONFIG_START( panicr, driver_device )
 	MDRV_CPU_ADD("maincpu", V20,MASTER_CLOCK/2) /* Sony 8623h9 CXQ70116D-8 (V20 compatible) */
 	MDRV_CPU_PROGRAM_MAP(panicr_map)
 	MDRV_CPU_VBLANK_INT_HACK(panicr_interrupt,2)

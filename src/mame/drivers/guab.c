@@ -760,7 +760,7 @@ static MACHINE_RESET( guab )
 	memset(&fdc, 0, sizeof(fdc));
 }
 
-static MACHINE_CONFIG_START( guab, driver_data_t )
+static MACHINE_CONFIG_START( guab, driver_device )
 	/* TODO: Verify clock */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)
 	MDRV_CPU_PROGRAM_MAP(guab_map)

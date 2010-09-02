@@ -2217,7 +2217,7 @@ GFXDECODE_END
 *                             Machine Drivers                              *
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( victor21, driver_data_t )
+static MACHINE_CONFIG_START( victor21, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z180, XTAL_12MHz / 8)	/* Unknown clock */
 	MDRV_CPU_PROGRAM_MAP(victor21_map)
@@ -2258,7 +2258,7 @@ static MACHINE_CONFIG_DERIVED( victor5, victor21 )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( crsbingo, driver_data_t )
+static MACHINE_CONFIG_START( crsbingo, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z180, XTAL_12MHz / 8)	/* Unknown CPU and clock */
 	MDRV_CPU_PROGRAM_MAP(crsbingo_map)
@@ -2288,7 +2288,7 @@ static MACHINE_CONFIG_START( crsbingo, driver_data_t )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( srider, driver_data_t )
+static MACHINE_CONFIG_START( srider, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z180, XTAL_12MHz / 8)	/* Unknown clock */
 	MDRV_CPU_PROGRAM_MAP(srider_map)
@@ -2328,7 +2328,7 @@ static MACHINE_CONFIG_DERIVED( sharkpy, srider )
 	MDRV_CPU_PROGRAM_MAP(sharkpy_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( tisub, driver_data_t )
+static MACHINE_CONFIG_START( tisub, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z180, XTAL_12MHz / 8)	/* Unknown CPU and clock */
 	MDRV_CPU_PROGRAM_MAP(tisub_map)
@@ -2357,7 +2357,7 @@ static MACHINE_CONFIG_START( tisub, driver_data_t )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( stisub, driver_data_t )
+static MACHINE_CONFIG_START( stisub, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z180, XTAL_12MHz / 8)	/* Unknown clock */
 	MDRV_CPU_PROGRAM_MAP(stisub_map)

@@ -1107,7 +1107,7 @@ static GFXDECODE_START( pinkiri8 )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 0x100 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( pinkiri8, driver_data_t )
+static MACHINE_CONFIG_START( pinkiri8, driver_device )
 	MDRV_CPU_ADD("maincpu",Z180,16000000)
 	MDRV_CPU_PROGRAM_MAP(pinkiri8_map)
 	MDRV_CPU_IO_MAP(pinkiri8_io)

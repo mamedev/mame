@@ -444,7 +444,7 @@ INPUT_PORTS_END
 *     Machine Driver     *
 *************************/
 
-static MACHINE_CONFIG_START( drw80pkr, driver_data_t )
+static MACHINE_CONFIG_START( drw80pkr, driver_device )
 	// basic machine hardware
 	MDRV_CPU_ADD("maincpu", I8039, CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(drw80pkr_map)

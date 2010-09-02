@@ -1912,7 +1912,7 @@ static MACHINE_RESET( firebeat )
 	cdda_set_cdrom(machine->device("cdda"), cd);
 }
 
-static MACHINE_CONFIG_START( firebeat, driver_data_t )
+static MACHINE_CONFIG_START( firebeat, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", PPC403GCX, 66000000)
@@ -1953,7 +1953,7 @@ static MACHINE_CONFIG_START( firebeat, driver_data_t )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( firebeat2, driver_data_t )
+static MACHINE_CONFIG_START( firebeat2, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", PPC403GCX, 66000000)

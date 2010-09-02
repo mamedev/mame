@@ -809,7 +809,7 @@ static MACHINE_CONFIG_FRAGMENT( sound_2151_m68k )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( lastday, driver_data_t )
+static MACHINE_CONFIG_START( lastday, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 8000000)	/* ??? */
@@ -842,7 +842,7 @@ static MACHINE_CONFIG_START( lastday, driver_data_t )
 	MDRV_FRAGMENT_ADD( sound_2203 )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( gulfstrm, driver_data_t )
+static MACHINE_CONFIG_START( gulfstrm, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 8000000)	/* ??? */
@@ -875,7 +875,7 @@ static MACHINE_CONFIG_START( gulfstrm, driver_data_t )
 	MDRV_FRAGMENT_ADD( sound_2203 )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( pollux, driver_data_t )
+static MACHINE_CONFIG_START( pollux, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 8000000)	/* ??? */
@@ -908,7 +908,7 @@ static MACHINE_CONFIG_START( pollux, driver_data_t )
 	MDRV_FRAGMENT_ADD( sound_2203 )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( bluehawk, driver_data_t )
+static MACHINE_CONFIG_START( bluehawk, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 8000000)	/* ??? */
@@ -941,7 +941,7 @@ static MACHINE_CONFIG_START( bluehawk, driver_data_t )
 	MDRV_FRAGMENT_ADD( sound_2151 )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( flytiger, driver_data_t )
+static MACHINE_CONFIG_START( flytiger, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 8000000)	/* ??? */
@@ -974,7 +974,7 @@ static MACHINE_CONFIG_START( flytiger, driver_data_t )
 	MDRV_FRAGMENT_ADD( sound_2151 )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( primella, driver_data_t )
+static MACHINE_CONFIG_START( primella, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 8000000)	/* ??? */
@@ -1013,7 +1013,7 @@ static INTERRUPT_GEN( rshark_interrupt )
 		cpu_set_input_line(device, 6, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( rshark, driver_data_t )
+static MACHINE_CONFIG_START( rshark, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)	/* measured on super-x */
@@ -1044,7 +1044,7 @@ static MACHINE_CONFIG_START( rshark, driver_data_t )
 	MDRV_FRAGMENT_ADD( sound_2151_m68k )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( superx, driver_data_t ) // dif mem map
+static MACHINE_CONFIG_START( superx, driver_device ) // dif mem map
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)	/* measured on super-x */
@@ -1075,7 +1075,7 @@ static MACHINE_CONFIG_START( superx, driver_data_t ) // dif mem map
 	MDRV_FRAGMENT_ADD( sound_2151_m68k )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( popbingo, driver_data_t )
+static MACHINE_CONFIG_START( popbingo, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)

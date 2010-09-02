@@ -479,7 +479,7 @@ static const ym2151_interface ym2151_config =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( rpunch, driver_data_t )
+static MACHINE_CONFIG_START( rpunch, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, MASTER_CLOCK/2)

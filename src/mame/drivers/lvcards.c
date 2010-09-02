@@ -470,7 +470,7 @@ static const ay8910_interface lcay8910_interface =
 };
 
 
-static MACHINE_CONFIG_START( lvcards, driver_data_t )
+static MACHINE_CONFIG_START( lvcards, driver_device )
 	// basic machine hardware
 	MDRV_CPU_ADD("maincpu",Z80, 18432000/6)	// 3.072 MHz ?
 

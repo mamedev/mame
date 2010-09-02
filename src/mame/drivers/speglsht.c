@@ -319,7 +319,7 @@ static MACHINE_RESET(speglsht)
 	memset(shared,0,0x1000);
 }
 
-static MACHINE_CONFIG_START( speglsht, driver_data_t )
+static MACHINE_CONFIG_START( speglsht, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80, 8000000) /* 8 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(st0016_mem)

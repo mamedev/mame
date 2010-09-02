@@ -547,7 +547,7 @@ static GFXDECODE_START( acefruit )
 	GFXDECODE_ENTRY( "gfx1", 0x1800, charlayout, 8, 4 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( acefruit, driver_data_t )
+static MACHINE_CONFIG_START( acefruit, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 2500000) /* 2.5MHz */

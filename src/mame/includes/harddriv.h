@@ -10,22 +10,23 @@
 class harddriv_state : public atarigen_state
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, harddriv_state(machine)); }
+	harddriv_state(running_machine &machine, const driver_device_config_base &config)
+		: atarigen_state(machine, config) { }
 
-	harddriv_state(running_machine &machine)
-		: atarigen_state(machine),
-		  maincpu(machine.device<cpu_device>("maincpu")),
-		  gsp(machine.device<cpu_device>("gsp")),
-		  msp(machine.device<cpu_device>("msp")),
-		  adsp(machine.device<cpu_device>("adsp")),
-		  soundcpu(machine.device<cpu_device>("soundcpu")),
-		  sounddsp(machine.device<cpu_device>("sounddsp")),
-		  jsacpu(machine.device<cpu_device>("jsa")),
-		  dsp32(machine.device<cpu_device>("dsp32")),
-		  duart_timer(machine.device<timer_device>("duart_timer")) { }
+	virtual void find_devices()
+	{
+		required_device(maincpu, "maincpu");
+		required_device(gsp, "gsp");
+		optional_device(msp, "msp");
+		required_device(adsp, "adsp");
+		optional_device(soundcpu, "soundcpu");
+		optional_device(sounddsp, "sounddsp");
+		optional_device(jsacpu, "jsacpu");
+		optional_device(dsp32, "dsp32");
+	}
 
 	cpu_device *			maincpu;
-	cpu_device *			gsp;
+	tms34010_device *		gsp;
 	cpu_device *			msp;
 	cpu_device *			adsp;
 	cpu_device *			soundcpu;

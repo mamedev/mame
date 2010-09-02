@@ -24,13 +24,11 @@
 #define DRACO_PAGERAM_MASK		0x7ff
 #define CIDELSA_CHARRAM_MASK	0x7ff
 
-class cidelsa_state : public driver_data_t
+class cidelsa_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, cidelsa_state(machine)); }
-
-	cidelsa_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	cidelsa_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	/* cpu state */
 	cdp1802_control_mode cdp1802_mode;

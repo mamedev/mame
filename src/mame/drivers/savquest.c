@@ -54,7 +54,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( savquest )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( savquest, driver_data_t )
+static MACHINE_CONFIG_START( savquest, driver_device )
 	MDRV_CPU_ADD("maincpu", PENTIUM, 450000000)	// actually Pentium II 450
 	MDRV_CPU_PROGRAM_MAP(savquest_map)
 	MDRV_CPU_IO_MAP(savquest_io)

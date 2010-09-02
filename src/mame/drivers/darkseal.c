@@ -239,7 +239,7 @@ static const ym2151_interface ym2151_config =
 	sound_irq
 };
 
-static MACHINE_CONFIG_START( darkseal, driver_data_t )
+static MACHINE_CONFIG_START( darkseal, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,12000000) /* Custom chip 59 */

@@ -1772,7 +1772,7 @@ static const ym2151_interface ym2151_config =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( system24, driver_data_t )
+static MACHINE_CONFIG_START( system24, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, MASTER_CLOCK/2)
 	MDRV_CPU_PROGRAM_MAP(system24_cpu1_map)

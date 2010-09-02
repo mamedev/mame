@@ -207,7 +207,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( victory, driver_data_t )
+static MACHINE_CONFIG_START( victory, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, VICTORY_MAIN_CPU_CLOCK)

@@ -1791,7 +1791,7 @@ static const ym2151_interface ym2151_config =
 
 
 
-static MACHINE_CONFIG_START( m72_base, driver_data_t )
+static MACHINE_CONFIG_START( m72_base, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",V30,MASTER_CLOCK/2/2)	/* 16 MHz external freq (8MHz internal) */
@@ -1847,7 +1847,7 @@ static MACHINE_CONFIG_DERIVED( m72_8751, m72_base )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( rtype, driver_data_t )
+static MACHINE_CONFIG_START( rtype, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",V30,MASTER_CLOCK/2/2)	/* 16 MHz external freq (8MHz internal) */
@@ -1885,7 +1885,7 @@ static MACHINE_CONFIG_START( rtype, driver_data_t )
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( xmultipl, driver_data_t )
+static MACHINE_CONFIG_START( xmultipl, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",V30,MASTER_CLOCK/2/2)	/* 16 MHz external freq (8MHz internal) */
@@ -1928,7 +1928,7 @@ static MACHINE_CONFIG_START( xmultipl, driver_data_t )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( xmultiplm72, driver_data_t )
+static MACHINE_CONFIG_START( xmultiplm72, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",V30,MASTER_CLOCK/2/2)	/* 16 MHz external freq (8MHz internal) */
@@ -1971,7 +1971,7 @@ static MACHINE_CONFIG_START( xmultiplm72, driver_data_t )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( dbreed, driver_data_t )
+static MACHINE_CONFIG_START( dbreed, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",V30,MASTER_CLOCK/2/2)	/* 16 MHz external freq (8MHz internal) */
@@ -2014,7 +2014,7 @@ static MACHINE_CONFIG_START( dbreed, driver_data_t )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( dbreedm72, driver_data_t )
+static MACHINE_CONFIG_START( dbreedm72, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V30,MASTER_CLOCK/2/2)	/* 16 MHz external freq (8MHz internal) */
@@ -2057,7 +2057,7 @@ static MACHINE_CONFIG_START( dbreedm72, driver_data_t )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( rtype2, driver_data_t )
+static MACHINE_CONFIG_START( rtype2, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V30,MASTER_CLOCK/2/2)	/* 16 MHz external freq (8MHz internal) */
@@ -2100,7 +2100,7 @@ static MACHINE_CONFIG_START( rtype2, driver_data_t )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( majtitle, driver_data_t )
+static MACHINE_CONFIG_START( majtitle, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V30,MASTER_CLOCK/2/2)	/* 16 MHz external freq (8MHz internal) */
@@ -2143,7 +2143,7 @@ static MACHINE_CONFIG_START( majtitle, driver_data_t )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( hharry, driver_data_t )
+static MACHINE_CONFIG_START( hharry, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V30,MASTER_CLOCK/2/2)	/* 16 MHz external freq (8MHz internal) */
@@ -2186,7 +2186,7 @@ static MACHINE_CONFIG_START( hharry, driver_data_t )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( hharryu, driver_data_t )
+static MACHINE_CONFIG_START( hharryu, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V30,MASTER_CLOCK/2/2)	/* 16 MHz external freq (8MHz internal) */
@@ -2229,7 +2229,7 @@ static MACHINE_CONFIG_START( hharryu, driver_data_t )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( dkgenm72, driver_data_t )
+static MACHINE_CONFIG_START( dkgenm72, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",V30,MASTER_CLOCK/2/2)	/* 16 MHz external freq (8MHz internal) */
@@ -2272,7 +2272,7 @@ static MACHINE_CONFIG_START( dkgenm72, driver_data_t )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( poundfor, driver_data_t )
+static MACHINE_CONFIG_START( poundfor, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V30,MASTER_CLOCK/2/2)	/* 16 MHz external freq (8MHz internal) */
@@ -2315,7 +2315,7 @@ static MACHINE_CONFIG_START( poundfor, driver_data_t )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( cosmccop, driver_data_t )
+static MACHINE_CONFIG_START( cosmccop, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V30,MASTER_CLOCK/2/2)

@@ -291,7 +291,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_CONFIG_START( tp84, driver_data_t )
+static MACHINE_CONFIG_START( tp84, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("cpu1",M6809, XTAL_18_432MHz/12) /* verified on pcb */

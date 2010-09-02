@@ -438,7 +438,7 @@ static const kaneko_pandora_interface sandscrp_pandora_config =
 	0, 0	/* x_offs, y_offs */
 };
 
-static MACHINE_CONFIG_START( sandscrp, driver_data_t )
+static MACHINE_CONFIG_START( sandscrp, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,12000000)	/* TMP68HC000N-12 */

@@ -549,7 +549,7 @@ static const pokey_interface redbaron_pokey_interface =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( bzone_base, driver_data_t )
+static MACHINE_CONFIG_START( bzone_base, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, BZONE_MASTER_CLOCK / 8)

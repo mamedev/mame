@@ -303,7 +303,7 @@ static INTERRUPT_GEN( cabaret_interrupt )
 		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( cabaret, driver_data_t )
+static MACHINE_CONFIG_START( cabaret, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z180, XTAL_12MHz / 2)
 	MDRV_CPU_PROGRAM_MAP(cabaret_map)

@@ -425,7 +425,7 @@ static const r3000_cpu_core r3000_config =
 };
 
 
-static MACHINE_CONFIG_START( policetr, driver_data_t )
+static MACHINE_CONFIG_START( policetr, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", R3000BE, MASTER_CLOCK/2)

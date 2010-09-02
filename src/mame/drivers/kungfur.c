@@ -333,7 +333,7 @@ static INTERRUPT_GEN( kungfur_irq )
 	cputag_set_input_line(device->machine, "maincpu", M6809_IRQ_LINE, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( kungfur, driver_data_t )
+static MACHINE_CONFIG_START( kungfur, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M6809,8000000/2)

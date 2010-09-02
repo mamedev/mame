@@ -418,7 +418,7 @@ static VIDEO_UPDATE(triforce)
 static INPUT_PORTS_START( triforce )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( triforce_base, driver_data_t )
+static MACHINE_CONFIG_START( triforce_base, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", PPC403GA, 64000000) /* Wrong! */

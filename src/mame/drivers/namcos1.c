@@ -1077,7 +1077,7 @@ static const namco_interface namco_config =
     LPF info : Fco = 3.3KHz , g = -12dB/oct
 */
 
-static MACHINE_CONFIG_START( ns1, driver_data_t )
+static MACHINE_CONFIG_START( ns1, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809,49152000/32)

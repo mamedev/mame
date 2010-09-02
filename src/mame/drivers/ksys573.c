@@ -2841,7 +2841,7 @@ static const adc083x_interface konami573_adc_interface = {
 	analogue_inputs_callback
 };
 
-static MACHINE_CONFIG_START( konami573, driver_data_t )
+static MACHINE_CONFIG_START( konami573, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",  PSXCPU, XTAL_67_7376MHz )
 	MDRV_CPU_PROGRAM_MAP( konami573_map)

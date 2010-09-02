@@ -905,7 +905,7 @@ static const samples_interface ninjakd2_samples_interface =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( ninjakd2, driver_data_t )
+static MACHINE_CONFIG_START( ninjakd2, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MAIN_CLOCK_12/2)		/* verified */

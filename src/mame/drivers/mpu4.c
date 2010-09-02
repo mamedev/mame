@@ -1856,7 +1856,7 @@ static const ay8910_interface ay8910_config =
 
 
 /* machine driver for MOD 2 board */
-static MACHINE_CONFIG_START( mpu4mod2, driver_data_t )
+static MACHINE_CONFIG_START( mpu4mod2, driver_device )
 
 	MDRV_MACHINE_START(mpu4mod2)
 	MDRV_MACHINE_RESET(mpu4)

@@ -601,7 +601,7 @@ static const eeprom_interface zeropnt2_eeprom_interface =
                                 Burglar X
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( burglarx, driver_data_t )
+static MACHINE_CONFIG_START( burglarx, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
@@ -647,7 +647,7 @@ static MACHINE_RESET( zeropt )
 	MACHINE_RESET_CALL(unico);
 }
 
-static MACHINE_CONFIG_START( zeropnt, driver_data_t )
+static MACHINE_CONFIG_START( zeropnt, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
@@ -688,7 +688,7 @@ MACHINE_CONFIG_END
                                 Zero Point 2
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( zeropnt2, driver_data_t )
+static MACHINE_CONFIG_START( zeropnt2, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)

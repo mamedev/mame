@@ -444,7 +444,7 @@ static MACHINE_RESET( pturn )
 	soundlatch_clear_w(space,0,0);
 }
 
-static MACHINE_CONFIG_START( pturn, driver_data_t )
+static MACHINE_CONFIG_START( pturn, driver_device )
 	MDRV_CPU_ADD("maincpu", Z80, 12000000/3)
 	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", pturn_main_intgen)

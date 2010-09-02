@@ -259,7 +259,7 @@ static const ppi8255_interface ppi8255_intf[2] =
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( vroulet, driver_data_t )
+static MACHINE_CONFIG_START( vroulet, driver_device )
 	// basic machine hardware
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)	//???
 	MDRV_CPU_PROGRAM_MAP(vroulet_map)

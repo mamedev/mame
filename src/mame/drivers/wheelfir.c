@@ -225,16 +225,11 @@ struct scroll_info
 };
 
 
-class wheelfir_state : public driver_data_t
+class wheelfir_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine)
-	{
-		return auto_alloc_clear(&machine, wheelfir_state(machine));
-	}
-
-	wheelfir_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	wheelfir_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	running_device *maincpu;
 	running_device *subcpu;

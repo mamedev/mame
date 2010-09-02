@@ -431,7 +431,7 @@ static MACHINE_RESET( spdodgeb )
 	last_dash[0] = last_dash[1] = 0;
 }
 
-static MACHINE_CONFIG_START( spdodgeb, driver_data_t )
+static MACHINE_CONFIG_START( spdodgeb, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502,12000000/6)	/* 2MHz ? */

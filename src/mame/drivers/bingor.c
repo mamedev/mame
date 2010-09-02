@@ -602,7 +602,7 @@ static GFXDECODE_START( bingor )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( bingor, driver_data_t )
+static MACHINE_CONFIG_START( bingor, driver_device )
 	MDRV_CPU_ADD("maincpu", I80186, 14000000 ) //?? Mhz
 	MDRV_CPU_PROGRAM_MAP(bingor_map)
 	MDRV_CPU_IO_MAP(bingor_io)

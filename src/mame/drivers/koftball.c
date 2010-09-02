@@ -202,7 +202,7 @@ static GFXDECODE_START( koftball )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( koftball, driver_data_t )
+static MACHINE_CONFIG_START( koftball, driver_device )
 	MDRV_CPU_ADD("maincpu", M68000, 21477270/2 )
 	MDRV_CPU_PROGRAM_MAP(koftball_mem)
 	MDRV_CPU_VBLANK_INT_HACK(bmc_interrupt,3)

@@ -1056,7 +1056,7 @@ static MACHINE_RESET ( coolridr )
 	cputag_set_input_line(machine, "soundcpu", INPUT_LINE_HALT, ASSERT_LINE);
 }
 
-static MACHINE_CONFIG_START( coolridr, driver_data_t )
+static MACHINE_CONFIG_START( coolridr, driver_device )
 	MDRV_CPU_ADD("maincpu", SH2, 28000000)	// 28 mhz
 	MDRV_CPU_PROGRAM_MAP(system_h1_map)
 	MDRV_CPU_VBLANK_INT("screen",system_h1)

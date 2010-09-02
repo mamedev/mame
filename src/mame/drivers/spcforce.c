@@ -242,7 +242,7 @@ static PALETTE_INIT( spcforce )
 }
 
 
-static MACHINE_CONFIG_START( spcforce, driver_data_t )
+static MACHINE_CONFIG_START( spcforce, driver_device )
 
 	/* basic machine hardware */
 	/* FIXME: The 8085A had a max clock of 6MHz, internally divided by 2! */

@@ -1073,7 +1073,7 @@ GFXDECODE_END
  *************************************/
 
 /* Core MCR3 system with no sound */
-static MACHINE_CONFIG_START( mcr3_base, driver_data_t )
+static MACHINE_CONFIG_START( mcr3_base, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)

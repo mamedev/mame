@@ -122,7 +122,7 @@ bool device_config_sound_interface::interface_validity_check(const game_driver &
 
 		// if it's not a speaker or a sound device, error
 		const device_config_sound_interface *sound;
-		if (target->type() != SPEAKER && !target->interface(sound))
+		if (target != NULL && target->type() != SPEAKER && !target->interface(sound))
 		{
 			mame_printf_error("%s: %s attempting to route sound to a non-sound device '%s' (%s)\n", driver.source_file, driver.name, route->m_target, target->name());
 			error = true;

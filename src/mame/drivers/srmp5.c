@@ -62,13 +62,11 @@ This is not a bug (real machine behaves the same).
 
 #define SPRITE_DATA_GRANULARITY 0x80
 
-class srmp5_state : public driver_data_t
+class srmp5_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, srmp5_state(machine)); }
-
-	srmp5_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	srmp5_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	UINT32 databank;
 	UINT16 *tileram;

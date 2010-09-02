@@ -641,7 +641,7 @@ static const riot6532_interface riot_intf =
 };
 
 
-static MACHINE_CONFIG_START( firefox, driver_data_t )
+static MACHINE_CONFIG_START( firefox, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809E, MASTER_XTAL/2)

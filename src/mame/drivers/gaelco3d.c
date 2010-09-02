@@ -953,7 +953,7 @@ static const tms32031_config tms_config =
 };
 
 
-static MACHINE_CONFIG_START( gaelco3d, driver_data_t )
+static MACHINE_CONFIG_START( gaelco3d, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 15000000)

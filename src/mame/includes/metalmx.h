@@ -1,10 +1,8 @@
-class metalmx_state : public driver_data_t
+class metalmx_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, metalmx_state(machine)); }
-
-	metalmx_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	metalmx_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	running_device *maincpu;
 	running_device *gsp;

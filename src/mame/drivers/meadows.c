@@ -648,7 +648,7 @@ static const samples_interface bowl3d_samples_interface =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( meadows, driver_data_t )
+static MACHINE_CONFIG_START( meadows, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", S2650, MASTER_CLOCK/8)	/* 5MHz / 8 = 625 kHz */
@@ -687,7 +687,7 @@ static MACHINE_CONFIG_START( meadows, driver_data_t )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( minferno, driver_data_t )
+static MACHINE_CONFIG_START( minferno, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", S2650, MASTER_CLOCK/24) 	/* 5MHz / 8 / 3 = 208.33 kHz */
@@ -713,7 +713,7 @@ static MACHINE_CONFIG_START( minferno, driver_data_t )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( bowl3d, driver_data_t )
+static MACHINE_CONFIG_START( bowl3d, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", S2650, MASTER_CLOCK/8)	/* 5MHz / 8 = 625 kHz */
 	MDRV_CPU_PROGRAM_MAP(bowl3d_main_map)

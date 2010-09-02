@@ -367,7 +367,7 @@ static INTERRUPT_GEN( groundfx_interrupt )
 	cpu_set_input_line(device, 4, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( groundfx, driver_data_t )
+static MACHINE_CONFIG_START( groundfx, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)	/* 16 MHz */

@@ -1184,7 +1184,7 @@ GFXDECODE_END
 
 /* MACHINE DRIVERS */
 
-static MACHINE_CONFIG_START( raiden2, driver_data_t )
+static MACHINE_CONFIG_START( raiden2, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V30,XTAL_32MHz/2) /* verified on pcb */
@@ -2273,7 +2273,7 @@ static MACHINE_RESET( rdx_v33 )
 	common_reset();
 }
 
-static MACHINE_CONFIG_START( rdx_v33, driver_data_t )
+static MACHINE_CONFIG_START( rdx_v33, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V33, 32000000/2 ) // ?

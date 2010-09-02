@@ -349,7 +349,7 @@ static INTERRUPT_GEN( thedeep_interrupt )
 	}
 }
 
-static MACHINE_CONFIG_START( thedeep, driver_data_t )
+static MACHINE_CONFIG_START( thedeep, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)		/* verified on pcb */

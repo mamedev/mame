@@ -179,7 +179,7 @@ static INTERRUPT_GEN( xorworld_interrupt )
 }
 
 
-static MACHINE_CONFIG_START( xorworld, driver_data_t )
+static MACHINE_CONFIG_START( xorworld, driver_device )
 	// basic machine hardware
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)	// 10 MHz
 	MDRV_CPU_PROGRAM_MAP(xorworld_map)

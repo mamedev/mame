@@ -143,7 +143,7 @@ static const c6280_interface c6280_config =
 	"maincpu"
 };
 
-static MACHINE_CONFIG_START( ggconnie, driver_data_t )
+static MACHINE_CONFIG_START( ggconnie, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", H6280, PCE_MAIN_CLOCK/3)
 	MDRV_CPU_PROGRAM_MAP(sgx_mem)

@@ -863,7 +863,7 @@ static const namco_interface namco_config =
  * Machine driver
  *********************************************************************/
 
-static MACHINE_CONFIG_START( polepos, driver_data_t )
+static MACHINE_CONFIG_START( polepos, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/8)	/* 3.072 MHz */
@@ -949,7 +949,7 @@ static const namco_51xx_interface namco_51xx_bl_intf =
 };
 
 
-static MACHINE_CONFIG_START( topracern, driver_data_t )
+static MACHINE_CONFIG_START( topracern, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/8)	/* 3.072 MHz */

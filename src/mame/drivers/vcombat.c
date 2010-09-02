@@ -546,7 +546,7 @@ static const mc6845_interface mc6845_intf =
 };
 
 
-static MACHINE_CONFIG_START( vcombat, driver_data_t )
+static MACHINE_CONFIG_START( vcombat, driver_device )
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_12MHz)
 	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_assert)
@@ -596,7 +596,7 @@ static MACHINE_CONFIG_START( vcombat, driver_data_t )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( shadfgtr, driver_data_t )
+static MACHINE_CONFIG_START( shadfgtr, driver_device )
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_12MHz)
 	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_assert)

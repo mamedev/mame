@@ -237,7 +237,7 @@ static const mc6845_interface mc6845_intf =
 };
 
 
-static MACHINE_CONFIG_START( usg32, driver_data_t )
+static MACHINE_CONFIG_START( usg32, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 2000000) /* ?? */

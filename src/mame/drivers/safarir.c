@@ -50,13 +50,11 @@ modified by Hau
 #include "cpu/i8085/i8085.h"
 #include "sound/samples.h"
 
-class safarir_state : public driver_data_t
+class safarir_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, safarir_state(machine)); }
-
-	safarir_state(running_machine &machine)
-		: driver_data_t(machine) { }
+	safarir_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
 	UINT8 *ram_1, *ram_2;
 	size_t ram_size;

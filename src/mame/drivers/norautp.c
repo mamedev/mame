@@ -1235,7 +1235,7 @@ static I8255A_INTERFACE (ppi8255_intf_1)
 *    Machine Drivers     *
 *************************/
 
-static MACHINE_CONFIG_START( noraut_base, driver_data_t )
+static MACHINE_CONFIG_START( noraut_base, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, NORAUT_CPU_CLOCK)

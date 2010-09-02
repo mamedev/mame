@@ -673,7 +673,7 @@ static INTERRUPT_GEN( realbrk_interrupt )
 	}
 }
 
-static MACHINE_CONFIG_START( realbrk, driver_data_t )
+static MACHINE_CONFIG_START( realbrk, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M68000, XTAL_32MHz / 2)			/* !! TMP68301 !! */

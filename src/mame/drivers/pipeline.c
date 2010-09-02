@@ -358,7 +358,7 @@ static PALETTE_INIT(pipeline)
 	}
 }
 
-static MACHINE_CONFIG_START( pipeline, driver_data_t )
+static MACHINE_CONFIG_START( pipeline, driver_device )
 	/* basic machine hardware */
 
 	MDRV_CPU_ADD("maincpu", Z80, 7372800/2)

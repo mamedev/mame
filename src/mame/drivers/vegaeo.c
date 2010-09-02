@@ -162,7 +162,7 @@ static VIDEO_UPDATE( vega )
 }
 
 
-static MACHINE_CONFIG_START( vega, driver_data_t )
+static MACHINE_CONFIG_START( vega, driver_device )
 	MDRV_CPU_ADD("maincpu", GMS30C2132, 55000000)	/* 55 MHz */
 	MDRV_CPU_PROGRAM_MAP(vega_map)
 	MDRV_CPU_VBLANK_INT_HACK(eolith_speedup,262)

@@ -2118,7 +2118,7 @@ static const ay8910_interface bongo_ay8910_interface =
 };
 
 
-static MACHINE_CONFIG_START( galaxold_base, driver_data_t )
+static MACHINE_CONFIG_START( galaxold_base, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, PIXEL_CLOCK/2)	/* 3.072 MHz */
@@ -2277,7 +2277,7 @@ static MACHINE_CONFIG_DERIVED( ozon1, galaxold_base )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( drivfrcg, driver_data_t )
+static MACHINE_CONFIG_START( drivfrcg, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", S2650, MASTER_CLOCK/6)
@@ -2370,7 +2370,7 @@ static MACHINE_CONFIG_DERIVED( tazzmang, galaxian )
 	MDRV_CPU_PROGRAM_MAP(tazzmang)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( racknrol, driver_data_t )
+static MACHINE_CONFIG_START( racknrol, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", S2650, PIXEL_CLOCK/2)
@@ -2426,7 +2426,7 @@ static MACHINE_CONFIG_DERIVED( ckongmc, galaxian )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( hexpoola, driver_data_t )
+static MACHINE_CONFIG_START( hexpoola, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", S2650, PIXEL_CLOCK/2)

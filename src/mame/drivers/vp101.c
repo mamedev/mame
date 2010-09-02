@@ -55,7 +55,7 @@ static const mips3_config r5000_config =
 	100000000			/* system (bus) clock */
 };
 
-static MACHINE_CONFIG_START( vp101, driver_data_t )
+static MACHINE_CONFIG_START( vp101, driver_device )
 	MDRV_CPU_ADD("maincpu", R5000LE, 300000000)	/* actually VR5500 with added NEC VR-series custom instructions */
 	MDRV_CPU_CONFIG(r5000_config)
 	MDRV_CPU_PROGRAM_MAP(main_map)

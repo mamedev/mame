@@ -148,7 +148,7 @@ static INPUT_PORTS_START( rotaryf )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( rotaryf, driver_data_t )
+static MACHINE_CONFIG_START( rotaryf, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",I8085A,4000000) /* 8080? */ /* 2 MHz? */

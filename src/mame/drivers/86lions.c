@@ -353,7 +353,7 @@ static PALETTE_INIT( lions )
 	}
 }
 
-static MACHINE_CONFIG_START( lions, driver_data_t )
+static MACHINE_CONFIG_START( lions, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, MAIN_CLOCK/4)		 /* 3 MHz.(guess) */
 	MDRV_CPU_PROGRAM_MAP(lions_map)

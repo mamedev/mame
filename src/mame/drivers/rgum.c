@@ -249,7 +249,7 @@ static const ay8910_interface ay8910_config =
 	DEVCB_NULL
 };
 
-static MACHINE_CONFIG_START( rgum, driver_data_t )
+static MACHINE_CONFIG_START( rgum, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M65C02,24000000/16)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(rgum_map)

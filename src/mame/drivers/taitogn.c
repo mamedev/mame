@@ -916,7 +916,7 @@ static const psx_spu_interface psxspu_interface =
 	psx_dma_install_write_handler
 };
 
-static MACHINE_CONFIG_START( coh3002t, driver_data_t )
+static MACHINE_CONFIG_START( coh3002t, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD( "maincpu", PSXCPU, XTAL_100MHz )
 	MDRV_CPU_PROGRAM_MAP( zn_map)

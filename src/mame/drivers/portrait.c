@@ -250,7 +250,7 @@ static GFXDECODE_START( portrait )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, tile_layout, 0, 0x800/8 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( portrait, driver_data_t )
+static MACHINE_CONFIG_START( portrait, driver_device )
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)     /* 4 MHz ? */
 	MDRV_CPU_PROGRAM_MAP(portrait_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)

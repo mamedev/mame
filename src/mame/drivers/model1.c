@@ -1496,7 +1496,7 @@ ROM_START( wingwarj )
 ROM_END
 
 
-static MACHINE_CONFIG_START( model1, driver_data_t )
+static MACHINE_CONFIG_START( model1, driver_device )
 	MDRV_CPU_ADD("maincpu", V60, 16000000)
 	MDRV_CPU_PROGRAM_MAP(model1_mem)
 	MDRV_CPU_IO_MAP(model1_io)
@@ -1536,7 +1536,7 @@ static MACHINE_CONFIG_START( model1, driver_data_t )
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( model1_vr, driver_data_t )
+static MACHINE_CONFIG_START( model1_vr, driver_device )
 	MDRV_CPU_ADD("maincpu", V60, 16000000)
 	MDRV_CPU_PROGRAM_MAP(model1_vr_mem)
 	MDRV_CPU_IO_MAP(model1_vr_io)

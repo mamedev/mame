@@ -457,7 +457,7 @@ static const ym2203_interface ym2203_config =
 	irqhandler
 };
 
-static MACHINE_CONFIG_START( sfkick, driver_data_t )
+static MACHINE_CONFIG_START( sfkick, driver_device )
 
 	MDRV_CPU_ADD("maincpu",Z80,MASTER_CLOCK/6)
 	MDRV_CPU_PROGRAM_MAP(sfkick_map)

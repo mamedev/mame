@@ -231,7 +231,7 @@ static DRIVER_INIT(dambustr)
 
 
 
-static MACHINE_CONFIG_START( dambustr, driver_data_t )
+static MACHINE_CONFIG_START( dambustr, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 18432000/6)	/* 3.072 MHz */
 	MDRV_CPU_PROGRAM_MAP(dambustr_map)

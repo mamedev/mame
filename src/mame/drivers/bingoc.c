@@ -125,7 +125,7 @@ static INPUT_PORTS_START( bingoc )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( bingoc, driver_data_t )
+static MACHINE_CONFIG_START( bingoc, driver_device )
 
 	MDRV_CPU_ADD("maincpu", M68000,8000000)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(main_map)

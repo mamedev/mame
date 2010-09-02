@@ -831,7 +831,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( g80r_base, driver_data_t )
+static MACHINE_CONFIG_START( g80r_base, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, VIDEO_CLOCK/4)

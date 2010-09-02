@@ -684,7 +684,7 @@ DISCRETE_SOUND_EXTERN( cliffhgr );
  *
  *************************************/
 
-static MACHINE_CONFIG_START( cliffhgr, driver_data_t )
+static MACHINE_CONFIG_START( cliffhgr, driver_device )
 
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)       /* 4MHz */
 	MDRV_CPU_PROGRAM_MAP(mainmem)

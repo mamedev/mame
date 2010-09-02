@@ -64,7 +64,7 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( hotstuff )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( hotstuff, driver_data_t )
+static MACHINE_CONFIG_START( hotstuff, driver_device )
 
 	MDRV_CPU_ADD("maincpu", M68000, 16000000)
 	MDRV_CPU_PROGRAM_MAP(hotstuff_map)

@@ -155,7 +155,7 @@ static const gaelcosnd_interface maniacsq_snd_interface =
 	{ 0*0x0080000, 1*0x0080000, 0, 0 },		/* start of each ROM bank */
 };
 
-static MACHINE_CONFIG_START( maniacsq, driver_data_t )
+static MACHINE_CONFIG_START( maniacsq, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 26000000/2)		/* 13 MHz? */
 	MDRV_CPU_PROGRAM_MAP(maniacsq_map)
@@ -287,7 +287,7 @@ static const eeprom_interface gaelco2_eeprom_interface =
 //  "*10010xxxxxx", /* erase all */
 };
 
-static MACHINE_CONFIG_START( bang, driver_data_t )
+static MACHINE_CONFIG_START( bang, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 30000000/2)			/* 15 MHz */
 	MDRV_CPU_PROGRAM_MAP(bang_map)
@@ -531,7 +531,7 @@ static const gaelcosnd_interface alighunt_snd_interface =
 	{ 0*0x0400000, 1*0x0400000, 2*0x0400000, 3*0x0400000 }	/* start of each ROM bank */
 };
 
-static MACHINE_CONFIG_START( alighunt, driver_data_t )
+static MACHINE_CONFIG_START( alighunt, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 24000000/2)			/* 12 MHz */
 	MDRV_CPU_PROGRAM_MAP(alighunt_map)
@@ -774,7 +774,7 @@ static const gaelcosnd_interface touchgo_snd_interface =
 	{ 0*0x0400000, 1*0x0400000, 0, 0 }		/* start of each ROM bank */
 };
 
-static MACHINE_CONFIG_START( touchgo, driver_data_t )
+static MACHINE_CONFIG_START( touchgo, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 32000000/2)			/* 16 MHz */
 	MDRV_CPU_PROGRAM_MAP(touchgo_map)
@@ -967,7 +967,7 @@ static const gaelcosnd_interface snowboar_snd_interface =
 	{ 0*0x0400000, 1*0x0400000, 0, 0 }		/* start of each ROM bank */
 };
 
-static MACHINE_CONFIG_START( snowboar, driver_data_t )
+static MACHINE_CONFIG_START( snowboar, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 30000000/2)			/* 15 MHz */
 	MDRV_CPU_PROGRAM_MAP(snowboar_map)
@@ -1209,7 +1209,7 @@ static const gaelcosnd_interface wrally2_snd_interface =
 	{ 0*0x0200000, 1*0x0200000, 0, 0 }	/* start of each ROM bank */
 };
 
-static MACHINE_CONFIG_START( wrally2, driver_data_t )
+static MACHINE_CONFIG_START( wrally2, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 26000000/2)			/* 13 MHz */
 	MDRV_CPU_PROGRAM_MAP(wrally2_map)

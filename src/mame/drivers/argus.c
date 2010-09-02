@@ -529,7 +529,7 @@ static GFXDECODE_START( butasan )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( argus, driver_data_t )
+static MACHINE_CONFIG_START( argus, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 5000000)			/* 4 MHz */
@@ -587,7 +587,7 @@ static MACHINE_CONFIG_START( argus, driver_data_t )
 #endif
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( valtric, driver_data_t )
+static MACHINE_CONFIG_START( valtric, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 5000000)			/* 5 MHz */
@@ -632,7 +632,7 @@ static MACHINE_CONFIG_START( valtric, driver_data_t )
 	MDRV_SOUND_ROUTE(3, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( butasan, driver_data_t )
+static MACHINE_CONFIG_START( butasan, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 5000000)			/* 5 MHz */

@@ -466,7 +466,7 @@ static void zn_machine_init( running_machine *machine )
 	psx_machine_init(machine);
 }
 
-static MACHINE_CONFIG_START( zn1_1mb_vram, driver_data_t )
+static MACHINE_CONFIG_START( zn1_1mb_vram, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD( "maincpu", PSXCPU, XTAL_67_7376MHz )
 	MDRV_CPU_PROGRAM_MAP( zn_map)
@@ -503,7 +503,7 @@ static MACHINE_CONFIG_DERIVED( zn1_2mb_vram, zn1_1mb_vram )
 	MDRV_SCREEN_SIZE( 1024, 1024 )
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( zn2, driver_data_t )
+static MACHINE_CONFIG_START( zn2, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD( "maincpu", PSXCPU, XTAL_100MHz )
 	MDRV_CPU_PROGRAM_MAP( zn_map)

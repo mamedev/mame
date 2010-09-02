@@ -519,7 +519,7 @@ static DRIVER_INIT( jackie )
 }
 
 
-static MACHINE_CONFIG_START( jackie, driver_data_t )
+static MACHINE_CONFIG_START( jackie, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz / 2)

@@ -433,7 +433,7 @@ ADDRESS_MAP_END
 
 // machine driver for system85 board //////////////////////////////////////
 
-static MACHINE_CONFIG_START( bfmsys85, driver_data_t )
+static MACHINE_CONFIG_START( bfmsys85, driver_device )
 	MDRV_MACHINE_START(bfm_sys85)						// main system85 board initialisation
 	MDRV_MACHINE_RESET(bfm_sys85)
 	MDRV_CPU_ADD("maincpu", M6809, MASTER_CLOCK/4)			// 6809 CPU at 1 Mhz

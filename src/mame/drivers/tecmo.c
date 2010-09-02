@@ -675,7 +675,7 @@ static MACHINE_RESET( rygar )
 	adpcm_data = -1;
 }
 
-static MACHINE_CONFIG_START( rygar, driver_data_t )
+static MACHINE_CONFIG_START( rygar, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_24MHz/4) /* verified on pcb */
@@ -735,7 +735,7 @@ static MACHINE_CONFIG_DERIVED( silkworm, gemini )
 MACHINE_CONFIG_END
 
 #ifdef UNUSED_CODE
-static MACHINE_CONFIG_START( backfirt, driver_data_t )
+static MACHINE_CONFIG_START( backfirt, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_24MHz/4)

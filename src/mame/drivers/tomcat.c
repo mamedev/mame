@@ -374,7 +374,7 @@ static const riot6532_interface tomcat_riot6532_intf =
 	DEVCB_NULL	// connected to IRQ line of 6502
 };
 
-static MACHINE_CONFIG_START( tomcat, driver_data_t )
+static MACHINE_CONFIG_START( tomcat, driver_device )
 	MDRV_CPU_ADD("maincpu", M68010, XTAL_12MHz / 2)
 	MDRV_CPU_PROGRAM_MAP(tomcat_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq1_line_assert, 5)

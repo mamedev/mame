@@ -1106,7 +1106,7 @@ static DRIVER_INIT( rockn3 )
 }
 
 
-static MACHINE_CONFIG_START( tetrisp2, driver_data_t )
+static MACHINE_CONFIG_START( tetrisp2, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
@@ -1139,7 +1139,7 @@ static MACHINE_CONFIG_START( tetrisp2, driver_data_t )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( nndmseal, driver_data_t )
+static MACHINE_CONFIG_START( nndmseal, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_12MHz)
@@ -1170,7 +1170,7 @@ static MACHINE_CONFIG_START( nndmseal, driver_data_t )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( rockn, driver_data_t )
+static MACHINE_CONFIG_START( rockn, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
@@ -1202,7 +1202,7 @@ static MACHINE_CONFIG_START( rockn, driver_data_t )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( rockn2, driver_data_t )
+static MACHINE_CONFIG_START( rockn2, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
@@ -1234,7 +1234,7 @@ static MACHINE_CONFIG_START( rockn2, driver_data_t )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( rocknms, driver_data_t )
+static MACHINE_CONFIG_START( rocknms, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)

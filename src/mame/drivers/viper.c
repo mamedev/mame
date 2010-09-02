@@ -614,7 +614,7 @@ static MACHINE_RESET(viper)
 	devtag_reset(machine, "ide");
 }
 
-static MACHINE_CONFIG_START( viper, driver_data_t )
+static MACHINE_CONFIG_START( viper, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", MPC8240, 200000000)

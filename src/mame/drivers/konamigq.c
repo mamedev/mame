@@ -357,7 +357,7 @@ static MACHINE_RESET( konamigq )
 	psx_machine_init(machine);
 }
 
-static MACHINE_CONFIG_START( konamigq, driver_data_t )
+static MACHINE_CONFIG_START( konamigq, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",  PSXCPU, XTAL_67_7376MHz )
 	MDRV_CPU_PROGRAM_MAP( konamigq_map)

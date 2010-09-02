@@ -357,7 +357,7 @@ static const nmk112_interface powerins_nmk112_intf =
 };
 
 
-static MACHINE_CONFIG_START( powerins, driver_data_t )
+static MACHINE_CONFIG_START( powerins, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12MHz */

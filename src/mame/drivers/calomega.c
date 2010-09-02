@@ -2744,7 +2744,7 @@ static const mc6845_interface mc6845_intf =
 *                Machine Drivers                 *
 *************************************************/
 
-static MACHINE_CONFIG_START( sys903, driver_data_t )
+static MACHINE_CONFIG_START( sys903, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, CPU_CLOCK)	/* confirmed */
 	MDRV_CPU_PROGRAM_MAP(sys903_map)

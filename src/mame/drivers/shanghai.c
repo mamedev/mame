@@ -424,7 +424,7 @@ static const ym2203_interface kothello_ym2203_interface =
 
 static const hd63484_interface shanghai_hd63484_intf = { 0 };
 
-static MACHINE_CONFIG_START( shanghai, driver_data_t )
+static MACHINE_CONFIG_START( shanghai, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V30,16000000/2)	/* ? */
@@ -459,7 +459,7 @@ static MACHINE_CONFIG_START( shanghai, driver_data_t )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( shangha2, driver_data_t )
+static MACHINE_CONFIG_START( shangha2, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V30,16000000/2)	/* ? */
@@ -493,7 +493,7 @@ static MACHINE_CONFIG_START( shangha2, driver_data_t )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( kothello, driver_data_t )
+static MACHINE_CONFIG_START( kothello, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V30,16000000/2)	/* ? */

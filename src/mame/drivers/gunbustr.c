@@ -345,7 +345,7 @@ static const tc0480scp_interface gunbustr_tc0480scp_intf =
 	0		/* col_base */
 };
 
-static MACHINE_CONFIG_START( gunbustr, driver_data_t )
+static MACHINE_CONFIG_START( gunbustr, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)	/* 16 MHz */

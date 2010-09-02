@@ -103,7 +103,7 @@ static const r3000_cpu_core r3000_config =
 };
 
 
-static MACHINE_CONFIG_START( turrett, driver_data_t )
+static MACHINE_CONFIG_START( turrett, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", R3041BE, R3041_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(cpu_map)

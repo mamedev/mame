@@ -1728,7 +1728,7 @@ static const es5506_interface es5506_config =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( timekill, driver_data_t )
+static MACHINE_CONFIG_START( timekill, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, CPU_CLOCK)

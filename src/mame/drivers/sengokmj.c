@@ -278,7 +278,7 @@ static INTERRUPT_GEN( sengokmj_interrupt )
 	cpu_set_input_line_and_vector(device,0,HOLD_LINE,0xc8/4);
 }
 
-static MACHINE_CONFIG_START( sengokmj, driver_data_t )
+static MACHINE_CONFIG_START( sengokmj, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V30, 16000000/2) /* V30-8 */

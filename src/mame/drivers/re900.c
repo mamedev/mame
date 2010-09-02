@@ -387,7 +387,7 @@ static const ay8910_interface ay8910_bs94 =
 *      Machine Driver      *
 ***************************/
 
-static MACHINE_CONFIG_START( re900, driver_data_t )
+static MACHINE_CONFIG_START( re900, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8051, MAIN_CLOCK)

@@ -1052,7 +1052,7 @@ static MACHINE_RESET( wecleman )
 	k007232_set_bank( machine->device("konami"), 0, 1 );
 }
 
-static MACHINE_CONFIG_START( wecleman, driver_data_t )
+static MACHINE_CONFIG_START( wecleman, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)	/* Schems show 10MHz */
@@ -1123,7 +1123,7 @@ static const k051316_interface hotchase_k051316_intf_1 =
 	hotchase_zoom_callback_1
 };
 
-static MACHINE_CONFIG_START( hotchase, driver_data_t )
+static MACHINE_CONFIG_START( hotchase, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)	/* 10 MHz - PCB is drawn in one set's readme */

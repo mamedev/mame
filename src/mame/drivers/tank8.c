@@ -324,7 +324,7 @@ static GFXDECODE_START( tank8 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( tank8, driver_data_t )
+static MACHINE_CONFIG_START( tank8, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6800, 11055000 / 10) /* ? */

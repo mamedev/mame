@@ -330,7 +330,7 @@ static const pokey_interface pokey_interface_2 =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( cloak, driver_data_t )
+static MACHINE_CONFIG_START( cloak, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 1000000)		/* 1 MHz ???? */

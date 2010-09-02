@@ -416,7 +416,7 @@ static GFXDECODE_START( cshooter )
 	GFXDECODE_ENTRY( "gfx1", 128/8, cshooter_charlayout,   0, 64  )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( cshooter, driver_data_t )
+static MACHINE_CONFIG_START( cshooter, driver_device )
 	MDRV_CPU_ADD("maincpu", Z80,XTAL_12MHz/2)		 /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(cshooter_map)
 	MDRV_CPU_VBLANK_INT_HACK(cshooter_interrupt,2)
@@ -445,7 +445,7 @@ static MACHINE_CONFIG_START( cshooter, driver_data_t )
 
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( airraid, driver_data_t )
+static MACHINE_CONFIG_START( airraid, driver_device )
 	MDRV_CPU_ADD("maincpu", Z80,XTAL_12MHz/2)		 /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(airraid_map)
 	MDRV_CPU_VBLANK_INT_HACK(cshooter_interrupt,2)

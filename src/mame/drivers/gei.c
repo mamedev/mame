@@ -1046,7 +1046,7 @@ static const ppi8255_interface findout_ppi8255_intf[2] =
 	}
 };
 
-static MACHINE_CONFIG_START( getrivia, driver_data_t )
+static MACHINE_CONFIG_START( getrivia, driver_device )
 	MDRV_CPU_ADD("maincpu",Z80,4000000) /* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP(getrivia_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)

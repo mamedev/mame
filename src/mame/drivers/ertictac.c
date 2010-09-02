@@ -216,7 +216,7 @@ static const i2cmem_interface i2cmem_interface =
 	I2CMEM_SLAVE_ADDRESS, NVRAM_PAGE_SIZE, NVRAM_SIZE
 };
 
-static MACHINE_CONFIG_START( ertictac, driver_data_t )
+static MACHINE_CONFIG_START( ertictac, driver_device )
 
 	MDRV_CPU_ADD("maincpu", ARM, 8000000) /* guess */
 	MDRV_CPU_PROGRAM_MAP(ertictac_map)

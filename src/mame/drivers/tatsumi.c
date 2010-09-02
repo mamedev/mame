@@ -855,7 +855,7 @@ static MACHINE_RESET( apache3 )
 }
 
 
-static MACHINE_CONFIG_START( apache3, driver_data_t )
+static MACHINE_CONFIG_START( apache3, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V30, CLOCK_1 / 2)
@@ -901,7 +901,7 @@ static MACHINE_CONFIG_START( apache3, driver_data_t )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( roundup5, driver_data_t )
+static MACHINE_CONFIG_START( roundup5, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V30, CLOCK_1 / 2)
@@ -943,7 +943,7 @@ static MACHINE_CONFIG_START( roundup5, driver_data_t )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( cyclwarr, driver_data_t )
+static MACHINE_CONFIG_START( cyclwarr, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, CLOCK_2 / 4)
@@ -986,7 +986,7 @@ static MACHINE_CONFIG_START( cyclwarr, driver_data_t )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( bigfight, driver_data_t )
+static MACHINE_CONFIG_START( bigfight, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, CLOCK_2 / 4)

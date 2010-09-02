@@ -179,7 +179,7 @@ static MACHINE_RESET( itgamble )
 *     Machine Drivers     *
 **************************/
 
-static MACHINE_CONFIG_START( itgamble, driver_data_t )
+static MACHINE_CONFIG_START( itgamble, driver_device )
 
     /* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", H83044, MAIN_CLOCK/2)	/* probably the wrong CPU */

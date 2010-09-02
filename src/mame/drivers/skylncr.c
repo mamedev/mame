@@ -656,7 +656,7 @@ static INTERRUPT_GEN( skylncr_vblank_interrupt )
 *           Machine Driver           *
 *************************************/
 
-static MACHINE_CONFIG_START( skylncr, driver_data_t )
+static MACHINE_CONFIG_START( skylncr, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)

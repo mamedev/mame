@@ -196,7 +196,7 @@ static GFXDECODE_START( tryout )
 	GFXDECODE_ENTRY( NULL,	 0, vramlayout,   0, 4 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( tryout, driver_data_t )
+static MACHINE_CONFIG_START( tryout, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 2000000)		/* ? */
 	MDRV_CPU_PROGRAM_MAP(main_cpu)

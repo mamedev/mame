@@ -1565,7 +1565,7 @@ static INTERRUPT_GEN( cischeat_interrupt )
 
 
 
-static MACHINE_CONFIG_START( bigrun, driver_data_t )
+static MACHINE_CONFIG_START( bigrun, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("cpu1", M68000, 10000000)
@@ -1710,7 +1710,7 @@ static INTERRUPT_GEN( interrupt_scudhamm )
 }
 
 
-static MACHINE_CONFIG_START( scudhamm, driver_data_t )
+static MACHINE_CONFIG_START( scudhamm, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M68000, 12000000)

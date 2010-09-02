@@ -731,7 +731,7 @@ static const eeprom_interface eeprom_intf =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( leland, driver_data_t )
+static MACHINE_CONFIG_START( leland, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("master", Z80, MASTER_CLOCK/2)

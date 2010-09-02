@@ -1028,7 +1028,7 @@ static INTERRUPT_GEN( bootleg_interrupt )
 
 
 
-static MACHINE_CONFIG_START( pbillian, driver_data_t )
+static MACHINE_CONFIG_START( pbillian, driver_device )
 	MDRV_CPU_ADD("maincpu", Z80,12000000/2)		 /* 6 MHz */
 	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_IO_MAP(pbillian_port_map)
@@ -1061,7 +1061,7 @@ static MACHINE_CONFIG_START( pbillian, driver_data_t )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( hotsmash, driver_data_t )
+static MACHINE_CONFIG_START( hotsmash, driver_device )
 	MDRV_CPU_ADD("maincpu", Z80,12000000/2)		 /* 6 MHz */
 	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_IO_MAP(hotsmash_port_map)
@@ -1097,7 +1097,7 @@ static MACHINE_CONFIG_START( hotsmash, driver_data_t )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( sqix, driver_data_t )
+static MACHINE_CONFIG_START( sqix, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 12000000/2)	/* 6 MHz */
@@ -1146,7 +1146,7 @@ static MACHINE_CONFIG_DERIVED( sqixu, sqix )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( sqixbl, driver_data_t )
+static MACHINE_CONFIG_START( sqixbl, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 12000000/2)	/* 6 MHz */

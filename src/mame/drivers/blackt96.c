@@ -471,7 +471,7 @@ ADDRESS_MAP_END
 
 
 
-static MACHINE_CONFIG_START( blackt96, driver_data_t )
+static MACHINE_CONFIG_START( blackt96, driver_device )
 	MDRV_CPU_ADD("maincpu", M68000, 18000000 /2)
 	MDRV_CPU_PROGRAM_MAP(blackt96_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)

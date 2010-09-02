@@ -165,7 +165,7 @@ static INPUT_PORTS_START( tourtabl )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( tourtabl, driver_data_t )
+static MACHINE_CONFIG_START( tourtabl, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 3)	/* actually M6507 */
 	MDRV_CPU_PROGRAM_MAP(main_map)

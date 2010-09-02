@@ -201,7 +201,7 @@ static GFXDECODE_START( solomon )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,   0, 8 )	/* colors   0-127 */
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( solomon, driver_data_t )
+static MACHINE_CONFIG_START( solomon, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)	/* 4.0 MHz (?????) */

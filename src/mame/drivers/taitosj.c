@@ -1790,7 +1790,7 @@ static const ay8910_interface ay8910_interface_4 =
 
 
 
-static MACHINE_CONFIG_START( nomcu, driver_data_t )
+static MACHINE_CONFIG_START( nomcu, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80,8000000/2)      /* 4 MHz */

@@ -234,7 +234,7 @@ static INTERRUPT_GEN( feversoc_irq )
 	cputag_set_input_line(device->machine, "maincpu", 8, HOLD_LINE );
 }
 
-static MACHINE_CONFIG_START( feversoc, driver_data_t )
+static MACHINE_CONFIG_START( feversoc, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",SH2,MASTER_CLOCK)

@@ -375,7 +375,7 @@ static MACHINE_RESET( namcos10 )
 	psx_machine_init(machine);
 }
 
-static MACHINE_CONFIG_START( namcos10, driver_data_t )
+static MACHINE_CONFIG_START( namcos10, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",  PSXCPU, XTAL_101_4912MHz )
 	MDRV_CPU_PROGRAM_MAP( namcos10_map)

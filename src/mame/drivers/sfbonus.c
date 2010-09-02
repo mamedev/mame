@@ -1246,7 +1246,7 @@ static NVRAM_HANDLER( sfbonus )
 }
 
 
-static MACHINE_CONFIG_START( sfbonus, driver_data_t )
+static MACHINE_CONFIG_START( sfbonus, driver_device )
 	MDRV_CPU_ADD("maincpu", Z80, 6000000) // custom packaged z80 CPU ?? Mhz
 	MDRV_CPU_PROGRAM_MAP(sfbonus_map)
 	MDRV_CPU_IO_MAP(sfbonus_io)

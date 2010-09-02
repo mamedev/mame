@@ -559,7 +559,7 @@ static GFXDECODE_START( mpoker )
 	GFXDECODE_ENTRY( "gfx1", 0, tiles16x16_layout, 0, 0x100 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( mpoker, driver_data_t )
+static MACHINE_CONFIG_START( mpoker, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,MASTER_CLOCK/6)		 /* 3 MHz? */
 	MDRV_CPU_PROGRAM_MAP(main_map)

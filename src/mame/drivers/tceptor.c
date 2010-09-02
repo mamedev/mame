@@ -377,7 +377,7 @@ static MACHINE_RESET( tceptor )
 
 /*******************************************************************/
 
-static MACHINE_CONFIG_START( tceptor, driver_data_t )
+static MACHINE_CONFIG_START( tceptor, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 49152000/32)

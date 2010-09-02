@@ -392,7 +392,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_CONFIG_START( wardner, driver_data_t )
+static MACHINE_CONFIG_START( wardner, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_24MHz/4)		/* 6MHz */

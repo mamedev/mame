@@ -328,7 +328,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( spacefb, driver_data_t )
+static MACHINE_CONFIG_START( spacefb, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, SPACEFB_MAIN_CPU_CLOCK)

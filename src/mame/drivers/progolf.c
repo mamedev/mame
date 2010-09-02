@@ -425,7 +425,7 @@ static PALETTE_INIT( progolf )
 	}
 }
 
-static MACHINE_CONFIG_START( progolf, driver_data_t )
+static MACHINE_CONFIG_START( progolf, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 3000000/2) /* guess, 3 Mhz makes the game to behave worse? */
 	MDRV_CPU_PROGRAM_MAP(main_cpu)

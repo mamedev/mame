@@ -200,7 +200,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_CONFIG_START( shaolins, driver_data_t )
+static MACHINE_CONFIG_START( shaolins, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, MASTER_CLOCK/12)        /* verified on pcb */

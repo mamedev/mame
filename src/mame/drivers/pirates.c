@@ -270,7 +270,7 @@ GFXDECODE_END
 
 /* Machine Driver + Related bits */
 
-static MACHINE_CONFIG_START( pirates, driver_data_t )
+static MACHINE_CONFIG_START( pirates, driver_device )
 	MDRV_CPU_ADD("maincpu", M68000, 16000000) /* 16mhz */
 	MDRV_CPU_PROGRAM_MAP(pirates_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)

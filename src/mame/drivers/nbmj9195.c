@@ -2911,7 +2911,7 @@ static const z80_daisy_config daisy_chain_sound[] =
 };
 
 
-static MACHINE_CONFIG_START( NBMJDRV1, driver_data_t )
+static MACHINE_CONFIG_START( NBMJDRV1, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 12000000/2)		/* TMPZ84C011, 6.00 MHz */

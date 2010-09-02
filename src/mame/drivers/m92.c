@@ -917,7 +917,7 @@ void m92_sprite_interrupt(running_machine *machine)
 	cputag_set_input_line_and_vector(machine, "maincpu", 0, HOLD_LINE, M92_IRQ_1);
 }
 
-static MACHINE_CONFIG_START( m92, driver_data_t )
+static MACHINE_CONFIG_START( m92, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",V33,18000000/2)	/* NEC V33, 18 MHz clock */
@@ -1003,7 +1003,7 @@ static MACHINE_CONFIG_DERIVED( hook, m92 )
 	MDRV_CPU_CONFIG(hook_config)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ppan, driver_data_t )
+static MACHINE_CONFIG_START( ppan, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",V33,18000000/2)

@@ -997,7 +997,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( exidy440, driver_data_t )
+static MACHINE_CONFIG_START( exidy440, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, MAIN_CPU_CLOCK)

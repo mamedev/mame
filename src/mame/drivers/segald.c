@@ -334,7 +334,7 @@ static MACHINE_START( astron )
 
 
 /* DRIVER */
-static MACHINE_CONFIG_START( astron, driver_data_t )
+static MACHINE_CONFIG_START( astron, driver_device )
 
 	/* main cpu */
 	MDRV_CPU_ADD("maincpu", Z80, SCHEMATIC_CLOCK/4)

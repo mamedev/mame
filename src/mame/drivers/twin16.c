@@ -714,7 +714,7 @@ static MACHINE_START( twin16 )
 	state_save_register_global_array(machine, cuebrickj_nvram);
 }
 
-static MACHINE_CONFIG_START( twin16, driver_data_t )
+static MACHINE_CONFIG_START( twin16, driver_device )
 	// basic machine hardware
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_18_432MHz/2)
 	MDRV_CPU_PROGRAM_MAP(main_map)
@@ -772,7 +772,7 @@ static MACHINE_CONFIG_DERIVED( devilw, twin16 )
 	MDRV_QUANTUM_TIME(HZ(60000)) // watchdog reset otherwise
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( fround, driver_data_t )
+static MACHINE_CONFIG_START( fround, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(fround_map)

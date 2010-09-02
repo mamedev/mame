@@ -2027,7 +2027,7 @@ static MACHINE_RESET( iqblocka )
 	input_select = 0;
 }
 
-static MACHINE_CONFIG_START( iqblocka, driver_data_t )
+static MACHINE_CONFIG_START( iqblocka, driver_device )
 	MDRV_CPU_ADD("maincpu", Z180, XTAL_16MHz / 2)
 	MDRV_CPU_PROGRAM_MAP(iqblocka_map)
 	MDRV_CPU_IO_MAP(iqblocka_io)
@@ -2099,7 +2099,7 @@ static const ppi8255_interface mgcs_ppi8255_intf =
 	DEVCB_NULL					// Port C write
 };
 
-static MACHINE_CONFIG_START( mgcs, driver_data_t )
+static MACHINE_CONFIG_START( mgcs, driver_device )
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_22MHz / 2)
 	MDRV_CPU_PROGRAM_MAP(mgcs)
 	MDRV_CPU_VBLANK_INT_HACK(mgcs_interrupt,2)
@@ -2144,7 +2144,7 @@ static const ppi8255_interface sdmg2_ppi8255_intf =
 	DEVCB_NULL					// Port C write
 };
 
-static MACHINE_CONFIG_START( sdmg2, driver_data_t )
+static MACHINE_CONFIG_START( sdmg2, driver_device )
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_22MHz/2)
 	MDRV_CPU_PROGRAM_MAP(sdmg2)
 	MDRV_CPU_VBLANK_INT_HACK(mgcs_interrupt,2)
@@ -2202,7 +2202,7 @@ static const ppi8255_interface mgdh_ppi8255_intf =
 	DEVCB_NULL					// Port C write
 };
 
-static MACHINE_CONFIG_START( mgdh, driver_data_t )
+static MACHINE_CONFIG_START( mgdh, driver_device )
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_22MHz / 2)
 	MDRV_CPU_PROGRAM_MAP(mgdh_map)
 	MDRV_CPU_VBLANK_INT_HACK(mgdh_interrupt,2)

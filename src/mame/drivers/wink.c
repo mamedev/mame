@@ -311,7 +311,7 @@ static MACHINE_RESET( wink )
 	sound_flag = 0;
 }
 
-static MACHINE_CONFIG_START( wink, driver_data_t )
+static MACHINE_CONFIG_START( wink, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 12000000 / 4)
 	MDRV_CPU_PROGRAM_MAP(wink_map)

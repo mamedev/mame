@@ -1240,7 +1240,7 @@ INPUT_PORTS_END
 // machine driver for scorpion1 board ///////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////
 
-static MACHINE_CONFIG_START( scorpion1, driver_data_t )
+static MACHINE_CONFIG_START( scorpion1, driver_device )
 	MDRV_MACHINE_RESET(bfm_sc1)							// main scorpion1 board initialisation
 	MDRV_CPU_ADD("maincpu", M6809, MASTER_CLOCK/4)			// 6809 CPU at 1 Mhz
 	MDRV_CPU_PROGRAM_MAP(memmap)						// setup read and write memorymap

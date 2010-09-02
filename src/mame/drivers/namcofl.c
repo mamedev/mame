@@ -590,7 +590,7 @@ static MACHINE_RESET( namcofl )
 }
 
 
-static MACHINE_CONFIG_START( namcofl, driver_data_t )
+static MACHINE_CONFIG_START( namcofl, driver_device )
 	MDRV_CPU_ADD("maincpu", I960, 20000000)	// i80960KA-20 == 20 MHz part
 	MDRV_CPU_PROGRAM_MAP(namcofl_mem)
 

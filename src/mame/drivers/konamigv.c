@@ -327,7 +327,7 @@ static const psx_spu_interface konamigv_psxspu_interface =
 	psx_dma_install_write_handler
 };
 
-static MACHINE_CONFIG_START( konamigv, driver_data_t )
+static MACHINE_CONFIG_START( konamigv, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",  PSXCPU, XTAL_67_7376MHz )
 	MDRV_CPU_PROGRAM_MAP( konamigv_map)

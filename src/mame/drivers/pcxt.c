@@ -917,7 +917,7 @@ static MACHINE_RESET( filetto )
 	filetto_devices.dma8237_2 = machine->device( "dma8237_2" );
 }
 
-static MACHINE_CONFIG_START( filetto, driver_data_t )
+static MACHINE_CONFIG_START( filetto, driver_device )
 	MDRV_CPU_ADD("maincpu", I8088, 8000000) //or regular PC-XT 14318180/3 clock?
 	MDRV_CPU_PROGRAM_MAP(filetto_map)
 	MDRV_CPU_IO_MAP(filetto_io)
@@ -962,7 +962,7 @@ static MACHINE_CONFIG_START( filetto, driver_data_t )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( tetriskr, driver_data_t )
+static MACHINE_CONFIG_START( tetriskr, driver_device )
 	MDRV_CPU_ADD("maincpu", I8088, 14318180/3)
 	MDRV_CPU_PROGRAM_MAP(filetto_map)
 	MDRV_CPU_IO_MAP(tetriskr_io)

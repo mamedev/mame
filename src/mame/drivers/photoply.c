@@ -495,7 +495,7 @@ static GFXDECODE_START( photoply )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( photoply, driver_data_t )
+static MACHINE_CONFIG_START( photoply, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I486, 75000000)	/* I486DX4, 75 or 100 Mhz */
 	MDRV_CPU_PROGRAM_MAP(photoply_map)

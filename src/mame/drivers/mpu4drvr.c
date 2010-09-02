@@ -2224,7 +2224,7 @@ static TIMER_DEVICE_CALLBACK( scanline_timer_callback )
 }
 
 
-static MACHINE_CONFIG_START( mpu4_vid, driver_data_t )
+static MACHINE_CONFIG_START( mpu4_vid, driver_device )
 	MDRV_CPU_ADD("maincpu", M6809, MPU4_MASTER_CLOCK/4 )
 	MDRV_CPU_PROGRAM_MAP(mpu4_6809_map)
 	MDRV_TIMER_ADD_PERIODIC("50hz",gen_50hz, HZ(100))
@@ -2298,7 +2298,7 @@ MACHINE_CONFIG_END
 
 
 /* machine driver for Zenitone Deal 'Em board */
-static MACHINE_CONFIG_START( dealem, driver_data_t )
+static MACHINE_CONFIG_START( dealem, driver_device )
 	MDRV_MACHINE_START(mpu4mod2)							/* main mpu4 board initialisation */
 	MDRV_MACHINE_RESET(mpu4_vid)
 	MDRV_CPU_ADD("maincpu", M6809, MPU4_MASTER_CLOCK/4)

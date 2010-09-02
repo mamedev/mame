@@ -509,7 +509,8 @@ inline device_config *device_config::typenext() const
 // create a tag for an object that is owned by this device
 inline astring &device_config::subtag(astring &dest, const char *_tag) const
 {
-	return (this != NULL) ? dest.cpy(m_tag).cat(":").cat(_tag) : dest.cpy(_tag);
+	// temp. for now: don't include the root tag in the full tag name
+	return (this != NULL && m_owner != NULL) ? dest.cpy(m_tag).cat(":").cat(_tag) : dest.cpy(_tag);
 }
 
 // create a tag for an object that a sibling to this device

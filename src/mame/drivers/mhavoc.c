@@ -471,7 +471,7 @@ static const pokey_interface pokey_config =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( mhavoc, driver_data_t )
+static MACHINE_CONFIG_START( mhavoc, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("alpha", M6502, MHAVOC_CLOCK_2_5M)		/* 2.5 MHz */

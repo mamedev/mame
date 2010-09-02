@@ -9,10 +9,8 @@
 class klax_state : public atarigen_state
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, klax_state(machine)); }
-
-	klax_state(running_machine &machine)
-		: atarigen_state(machine) { }
+	klax_state(running_machine &machine, const driver_device_config_base &config)
+		: atarigen_state(machine, config) { }
 };
 
 

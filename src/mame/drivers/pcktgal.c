@@ -221,7 +221,7 @@ static const msm5205_interface msm5205_config =
 
 /***************************************************************************/
 
-static MACHINE_CONFIG_START( pcktgal, driver_data_t )
+static MACHINE_CONFIG_START( pcktgal, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 2000000)

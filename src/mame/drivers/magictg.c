@@ -139,7 +139,7 @@ ADDRESS_MAP_END
 
 
 
-static MACHINE_CONFIG_START( magictg, driver_data_t )
+static MACHINE_CONFIG_START( magictg, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", R4600BE, 10000000)  // ?? what cpu?
 	MDRV_CPU_CONFIG(r4600_config)

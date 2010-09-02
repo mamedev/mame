@@ -650,7 +650,7 @@ static const ym3812_interface lordgun_ym3812_interface =
 	soundirq
 };
 
-static MACHINE_CONFIG_START( lordgun, driver_data_t )
+static MACHINE_CONFIG_START( lordgun, driver_device )
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2)
 	MDRV_CPU_PROGRAM_MAP(lordgun_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
@@ -694,7 +694,7 @@ static const ymf278b_interface ymf278b_config =
 	soundirq
 };
 
-static MACHINE_CONFIG_START( aliencha, driver_data_t )
+static MACHINE_CONFIG_START( aliencha, driver_device )
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2)
 	MDRV_CPU_PROGRAM_MAP(aliencha_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)

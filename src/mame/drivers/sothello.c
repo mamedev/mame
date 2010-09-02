@@ -344,7 +344,7 @@ static const ym2203_interface ym2203_config =
     irqhandler
 };
 
-static MACHINE_CONFIG_START( sothello, driver_data_t )
+static MACHINE_CONFIG_START( sothello, driver_device )
 
     /* basic machine hardware */
 

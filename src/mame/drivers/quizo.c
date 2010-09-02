@@ -183,7 +183,7 @@ static INPUT_PORTS_START( quizo )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( quizo, driver_data_t )
+static MACHINE_CONFIG_START( quizo, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,XTAL1/2)
 	MDRV_CPU_PROGRAM_MAP(memmap)

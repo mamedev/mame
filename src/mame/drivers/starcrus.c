@@ -150,7 +150,7 @@ static const samples_interface starcrus_samples_interface =
 };
 
 
-static MACHINE_CONFIG_START( starcrus, driver_data_t )
+static MACHINE_CONFIG_START( starcrus, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8080,9750000/9)  /* 8224 chip is a divide by 9 */

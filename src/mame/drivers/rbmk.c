@@ -512,7 +512,7 @@ static INTERRUPT_GEN( mcu_irq )
 	cputag_set_input_line(device->machine, "mcu", INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( rbmk, driver_data_t )
+static MACHINE_CONFIG_START( rbmk, driver_device )
 	MDRV_CPU_ADD("maincpu", M68000, 22000000 /2)
 	MDRV_CPU_PROGRAM_MAP(rbmk_mem)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)

@@ -277,7 +277,7 @@ static MACHINE_START( esh )
 
 
 /* DRIVER */
-static MACHINE_CONFIG_START( esh, driver_data_t )
+static MACHINE_CONFIG_START( esh, driver_device )
 
 	/* main cpu */
 	MDRV_CPU_ADD("maincpu", Z80, PCB_CLOCK/6)						/* The denominator is a Daphne guess based on PacMan's hardware */

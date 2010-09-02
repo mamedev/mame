@@ -1655,7 +1655,7 @@ static INTERRUPT_GEN( tattass_snd_interrupt )
 	cpu_set_input_line(device, M6809_FIRQ_LINE, HOLD_LINE);
 }
 
-static MACHINE_CONFIG_START( captaven, driver_data_t )
+static MACHINE_CONFIG_START( captaven, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", ARM, XTAL_28MHz/4) /* verified on pcb (Data East 101 custom)*/
@@ -1702,7 +1702,7 @@ static MACHINE_CONFIG_START( captaven, driver_data_t )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.35)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( fghthist, driver_data_t )
+static MACHINE_CONFIG_START( fghthist, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", ARM, 28000000/4)
@@ -1746,7 +1746,7 @@ static MACHINE_CONFIG_START( fghthist, driver_data_t )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.35)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( fghthsta, driver_data_t )
+static MACHINE_CONFIG_START( fghthsta, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", ARM, 28000000/4)
@@ -1790,7 +1790,7 @@ static MACHINE_CONFIG_START( fghthsta, driver_data_t )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.35)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( dragngun, driver_data_t )
+static MACHINE_CONFIG_START( dragngun, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", ARM, 28000000/4)
@@ -1842,7 +1842,7 @@ static MACHINE_CONFIG_START( dragngun, driver_data_t )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( lockload, driver_data_t )
+static MACHINE_CONFIG_START( lockload, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", ARM, 28000000/4)
@@ -1894,7 +1894,7 @@ static MACHINE_CONFIG_START( lockload, driver_data_t )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( tattass, driver_data_t )
+static MACHINE_CONFIG_START( tattass, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", ARM, 28000000/4) /* Unconfirmed */
@@ -1930,7 +1930,7 @@ static MACHINE_CONFIG_START( tattass, driver_data_t )
 	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( nslasher, driver_data_t )
+static MACHINE_CONFIG_START( nslasher, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", ARM, 28322000/4)

@@ -389,7 +389,7 @@ static MACHINE_START(f3)
 	state_save_register_global_array(machine, coin_word);
 }
 
-static MACHINE_CONFIG_START( f3, driver_data_t )
+static MACHINE_CONFIG_START( f3, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC020, XTAL_16MHz)
@@ -485,7 +485,7 @@ static GFXDECODE_START( bubsympb )
 	GFXDECODE_ENTRY( NULL,           0x000000, pivotlayout,         0,  64 ) /* Dynamically modified */
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( bubsympb, driver_data_t )
+static MACHINE_CONFIG_START( bubsympb, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC020, XTAL_16MHz)
 	MDRV_CPU_PROGRAM_MAP(f3_map)

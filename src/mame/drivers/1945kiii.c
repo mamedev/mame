@@ -47,13 +47,11 @@ Notes:
 #define MASTER_CLOCK	XTAL_16MHz
 
 
-class k3_state : public driver_data_t
+class k3_state : public driver_device
 {
 public:
-	static driver_data_t *alloc(running_machine &machine) { return auto_alloc_clear(&machine, k3_state(machine)); }
-
-	k3_state(running_machine &machine)
-		: driver_data_t(machine),
+	k3_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config),
 		  oki1(machine.device<okim6295_device>("oki1")),
 		  oki2(machine.device<okim6295_device>("oki2")) { }
 

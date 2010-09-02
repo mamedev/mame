@@ -510,7 +510,7 @@ static GFXDECODE_START( pcat_dyn )
 	// there's a 8x16 charset just after the 8x8 one
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( pcat_dyn, driver_data_t )
+static MACHINE_CONFIG_START( pcat_dyn, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I486, 40000000)	/* Am486 DX-40 */
 	MDRV_CPU_PROGRAM_MAP(pcat_map)

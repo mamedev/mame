@@ -195,7 +195,7 @@ static INPUT_PORTS_START( thoop2 )
 INPUT_PORTS_END
 
 
-static MACHINE_CONFIG_START( thoop2, driver_data_t )
+static MACHINE_CONFIG_START( thoop2, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,24000000/2)			/* 12 MHz */

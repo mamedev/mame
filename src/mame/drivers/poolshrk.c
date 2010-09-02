@@ -212,7 +212,7 @@ static PALETTE_INIT( poolshrk )
 }
 
 
-static MACHINE_CONFIG_START( poolshrk, driver_data_t )
+static MACHINE_CONFIG_START( poolshrk, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6800, 11055000 / 8) /* ? */

@@ -630,7 +630,7 @@ static INTERRUPT_GEN( jingbell_interrupt )
 		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
-static MACHINE_CONFIG_START( jingbell, driver_data_t )
+static MACHINE_CONFIG_START( jingbell, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z180, XTAL_12MHz / 2)	/* HD64180RP8, 8 MHz? */
 	MDRV_CPU_PROGRAM_MAP(jingbell_map)

@@ -136,30 +136,28 @@ void device_list::start_all()
 	state_save_register_presave(m_machine, static_pre_save, this);
 	state_save_register_postload(m_machine, static_post_load, this);
 
-	// iterate until we've started everything
-	int devcount = count();
-	int numstarted = 0;
-	while (numstarted < devcount)
+	// iterate over devices to start them
+	device_t *nextdevice;
+	for (device_t *device = first(); device != NULL; device = nextdevice)
 	{
-		// iterate over devices and start them
-		int prevstarted = numstarted;
-		for (device_t *device = first(); device != NULL; device = device->next())
-			if (!device->started())
-			{
-				// attempt to start the device, catching any expected exceptions
-				try
-				{
-					device->start();
-					numstarted++;
-				}
-				catch (device_missing_dependencies &)
-				{
-				}
-			}
-
-		// if we didn't start anything new, we're in trouble
-		if (numstarted == prevstarted)
-			fatalerror("Circular dependency in device startup; unable to start %d/%d devices\n", devcount - numstarted, devcount);
+		// attempt to start the device, catching any expected exceptions
+		nextdevice = device->next();
+		try
+		{
+			mame_printf_verbose("Starting %s '%s'\n", device->name(), device->tag());
+			device->start();
+		}
+		
+		// handle missing dependencies by moving the device to the end
+		catch (device_missing_dependencies &)
+		{
+			// if we're the end, fail
+			mame_printf_verbose("  (missing dependencies; rescheduling)\n");
+			if (nextdevice == NULL)
+				throw emu_fatalerror("Circular dependency in device startup; unable to start %s '%s'\n", device->name(), device->tag());
+			detach(device);
+			append(device->tag(), device);
+		}
 	}
 }
 

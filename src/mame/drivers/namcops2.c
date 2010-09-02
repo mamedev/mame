@@ -47,7 +47,7 @@ static const mips3_config r5000_config =
 	16384				/* data cache size */
 };
 
-static MACHINE_CONFIG_START( system246, driver_data_t )
+static MACHINE_CONFIG_START( system246, driver_device )
 	MDRV_CPU_ADD("maincpu", R5000LE, 294000000)	// actually R5900 @ 294 MHz
 	MDRV_CPU_PROGRAM_MAP(ps2_map)
 	MDRV_CPU_CONFIG(r5000_config)

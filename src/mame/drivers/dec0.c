@@ -1142,7 +1142,7 @@ static const msm5205_interface msm5205_config =
 };
 
 
-static MACHINE_CONFIG_START( automat, driver_data_t )
+static MACHINE_CONFIG_START( automat, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)
@@ -1186,7 +1186,7 @@ static MACHINE_CONFIG_START( automat, driver_data_t )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( hbarrel, driver_data_t )
+static MACHINE_CONFIG_START( hbarrel, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2)
@@ -1230,7 +1230,7 @@ static MACHINE_CONFIG_START( hbarrel, driver_data_t )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( baddudes, driver_data_t )
+static MACHINE_CONFIG_START( baddudes, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2)
@@ -1271,7 +1271,7 @@ static MACHINE_CONFIG_START( baddudes, driver_data_t )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( birdtry, driver_data_t )
+static MACHINE_CONFIG_START( birdtry, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2)
@@ -1312,7 +1312,7 @@ static MACHINE_CONFIG_START( birdtry, driver_data_t )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( robocop, driver_data_t )
+static MACHINE_CONFIG_START( robocop, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2)
@@ -1358,7 +1358,7 @@ static MACHINE_CONFIG_START( robocop, driver_data_t )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( robocopb, driver_data_t )
+static MACHINE_CONFIG_START( robocopb, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)
@@ -1399,7 +1399,7 @@ static MACHINE_CONFIG_START( robocopb, driver_data_t )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( hippodrm, driver_data_t )
+static MACHINE_CONFIG_START( hippodrm, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2)
@@ -1445,7 +1445,7 @@ static MACHINE_CONFIG_START( hippodrm, driver_data_t )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( slyspy, driver_data_t )
+static MACHINE_CONFIG_START( slyspy, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_20MHz/2) /* verified on pcb (20MHZ OSC) 68000P12 running at 10Mhz */
@@ -1486,7 +1486,7 @@ static MACHINE_CONFIG_START( slyspy, driver_data_t )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( secretab, driver_data_t )
+static MACHINE_CONFIG_START( secretab, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_20MHz/2) /* verified on pcb (20MHZ OSC) 68000P12 running at 10Mhz */
@@ -1528,7 +1528,7 @@ static MACHINE_CONFIG_START( secretab, driver_data_t )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( midres, driver_data_t )
+static MACHINE_CONFIG_START( midres, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_20MHz/2) /* verified on pcb (20MHZ OSC) 68000P12 running at 10Mhz */

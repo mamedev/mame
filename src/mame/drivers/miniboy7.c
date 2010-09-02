@@ -428,7 +428,7 @@ static const ay8910_interface miniboy7_ay8910_intf =
 *         Machine Drivers          *
 ***********************************/
 
-static MACHINE_CONFIG_START( miniboy7, driver_data_t )
+static MACHINE_CONFIG_START( miniboy7, driver_device )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, MASTER_CLOCK/16)	/* guess */
