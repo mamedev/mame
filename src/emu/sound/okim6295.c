@@ -533,4 +533,4 @@ void adpcm_state::compute_tables()
 	}
 }
 
-const device_type SOUND_OKIM6295 = okim6295_device_config::static_alloc_device_config;
+const device_type OKIM6295 = okim6295_device_config::static_alloc_device_config;

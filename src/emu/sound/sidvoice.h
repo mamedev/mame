@@ -21,11 +21,11 @@ struct sw_storage
 #endif
 };
 
-struct _SID6581;
+struct __SID6581;
 
 typedef struct _sidOperator
 {
-	struct _SID6581 *sid;
+	struct __SID6581 *sid;
 	UINT8 reg[7];
 	UINT32 SIDfreq;
 	UINT16 SIDpulseWidth;

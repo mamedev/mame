@@ -13,7 +13,7 @@
 #include "streams.h"
 
 /* private area */
-typedef struct _SID6581
+typedef struct __SID6581
 {
     running_device *device;
     sound_stream *mixer_channel; // mame stream/ mixer channel
@@ -53,15 +53,15 @@ typedef struct _SID6581
 
 	sidOperator optr1, optr2, optr3;
     int optr3_outputmask;
-} SID6581;
+} _SID6581;
 
-void sid6581_init (SID6581 *This);
+void sid6581_init (_SID6581 *This);
 
-int sidEmuReset(SID6581 *This);
+int sidEmuReset(_SID6581 *This);
 
-int sid6581_port_r (running_machine *machine, SID6581 *This, int offset);
-void sid6581_port_w (SID6581 *This, int offset, int data);
+int sid6581_port_r (running_machine *machine, _SID6581 *This, int offset);
+void sid6581_port_w (_SID6581 *This, int offset, int data);
 
-void sidEmuFillBuffer(SID6581 *This, stream_sample_t *buffer, UINT32 bufferLen );
+void sidEmuFillBuffer(_SID6581 *This, stream_sample_t *buffer, UINT32 bufferLen );
 
 #endif /* __SID_H__ */

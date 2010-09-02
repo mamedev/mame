@@ -32,11 +32,11 @@ enum
 //**************************************************************************
 
 #define MDRV_OKIM6295_ADD(_tag, _clock, _pin7) \
-	MDRV_DEVICE_ADD(_tag, SOUND_OKIM6295, _clock) \
+	MDRV_DEVICE_ADD(_tag, OKIM6295, _clock) \
 	MDRV_OKIM6295_PIN7(_pin7)
 
 #define MDRV_OKIM6295_REPLACE(_tag, _clock, _pin7) \
-	MDRV_DEVICE_REPLACE(_tag, SOUND_OKIM6295, _clock) \
+	MDRV_DEVICE_REPLACE(_tag, OKIM6295, _clock) \
 	MDRV_OKIM6295_PIN7(_pin7)
 
 #define MDRV_OKIM6295_PIN7(_pin7) \
@@ -167,7 +167,7 @@ protected:
 
 
 // device type definition
-extern const device_type SOUND_OKIM6295;
+extern const device_type OKIM6295;
 
 
 

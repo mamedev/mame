@@ -12,18 +12,18 @@
 
 
 
-static SID6581 *get_sid(running_device *device)
+static _SID6581 *get_sid(running_device *device)
 {
 	assert(device != NULL);
 	assert((device->type() == SID6581) || (device->type() == SID8580));
-	return (SID6581 *) downcast<legacy_device_base *>(device)->token();
+	return (_SID6581 *) downcast<legacy_device_base *>(device)->token();
 }
 
 
 
 static STREAM_UPDATE( sid_update )
 {
-	SID6581 *sid = (SID6581 *) param;
+	_SID6581 *sid = (_SID6581 *) param;
 	sidEmuFillBuffer(sid, outputs[0], samples);
 }
 
@@ -31,7 +31,7 @@ static STREAM_UPDATE( sid_update )
 
 static void sid_start(running_device *device, SIDTYPE sidtype)
 {
-	SID6581 *sid = get_sid(device);
+	_SID6581 *sid = get_sid(device);
 	const sid6581_interface *iface = (const sid6581_interface*) device->baseconfig().static_config();
 
 	sid->device = device;
@@ -49,7 +49,7 @@ static void sid_start(running_device *device, SIDTYPE sidtype)
 
 static DEVICE_RESET( sid )
 {
-	SID6581 *sid = get_sid(device);
+	_SID6581 *sid = get_sid(device);
 	sidEmuReset(sid);
 }
 
@@ -91,7 +91,7 @@ DEVICE_GET_INFO( sid6581 )
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(SID6581);						break;
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(_SID6581);						break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME( sid6581 );		break;
