@@ -1,4 +1,5 @@
 #include "emu.h"
+#include "includes/baraduke.h"
 
 UINT8 *baraduke_textram, *baraduke_videoram, *baraduke_spriteram;
 

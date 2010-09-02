@@ -94,9 +94,6 @@ const device_type gp9001vdp_ = gp9001vdp_device_config::static_alloc_device_conf
 #define GP9001_SPRITE_FLIPY 0x2000
 
 
-ADDRESS_MAP_EXTERN( gp9001vdp0_map, 16 );
-ADDRESS_MAP_EXTERN( gp9001vdp1_map, 16 );
-
 
 /* vdp map 0, gfx region 0 */
 #define MDRV_DEVICE_ADD_VDP0 \

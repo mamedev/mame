@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/targeth.h"
 
 UINT16 *targeth_spriteram;
 UINT16 *targeth_vregs;

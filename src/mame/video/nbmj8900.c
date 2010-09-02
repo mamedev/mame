@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "includes/nb1413m3.h"
+#include "includes/nbmj8900.h"
 
 
 static int nbmj8900_scrolly;

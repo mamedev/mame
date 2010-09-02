@@ -1,5 +1,6 @@
 #include "emu.h"
 #include "video/taitoic.h"
+#include "includes/superchs.h"
 
 struct tempsprite
 {

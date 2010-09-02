@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/wiz.h"
 
 
 static const rectangle spritevisiblearea =

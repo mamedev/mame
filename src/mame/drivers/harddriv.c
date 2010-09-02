@@ -328,12 +328,9 @@ Notes:
 #include "machine/atarigen.h"
 #include "machine/asic65.h"
 #include "audio/atarijsa.h"
-#include "includes/harddriv.h"
 #include "sound/dac.h"
-
-/* from slapstic.c */
-void slapstic_init(running_machine *machine, int chip);
-
+#include "includes/slapstic.h"
+#include "includes/harddriv.h"
 
 
 /*************************************

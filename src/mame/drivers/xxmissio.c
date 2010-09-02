@@ -12,25 +12,9 @@ XX Mission (c) 1986 UPL
 #include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "sound/2203intf.h"
-
-VIDEO_START( xxmissio );
-VIDEO_UPDATE( xxmissio );
-
-extern UINT8 *xxmissio_bgram;
-extern UINT8 *xxmissio_fgram;
-extern UINT8 *xxmissio_spriteram;
+#include "includes/xxmissio.h"
 
 static UINT8 xxmissio_status;
-
-
-WRITE8_DEVICE_HANDLER( xxmissio_scroll_x_w );
-WRITE8_DEVICE_HANDLER( xxmissio_scroll_y_w );
-WRITE8_HANDLER( xxmissio_flipscreen_w );
-
-READ8_HANDLER( xxmissio_bgram_r );
-WRITE8_HANDLER( xxmissio_bgram_w );
-
-WRITE8_HANDLER( xxmissio_paletteram_w );
 
 static WRITE8_HANDLER( xxmissio_bank_sel_w )
 {

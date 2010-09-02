@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/terracre.h"
 
 static UINT16 xscroll;
 static UINT16 yscroll;

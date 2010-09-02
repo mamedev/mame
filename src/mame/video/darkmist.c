@@ -1,7 +1,5 @@
 #include "emu.h"
-
-/*defined in drivers/darkmist.c */
-extern int darkmist_hw;
+#include "includes/darkmist.h"
 
 
 UINT8 *darkmist_scroll;

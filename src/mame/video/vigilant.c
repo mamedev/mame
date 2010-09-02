@@ -15,6 +15,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/vigilant.h"
 
 
 static const rectangle bottomvisiblearea =

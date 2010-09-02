@@ -1,4 +1,5 @@
 #include "emu.h"
+#include "includes/tigeroad.h"
 
 static int bgcharbank;
 static tilemap_t *bg_tilemap, *fg_tilemap;

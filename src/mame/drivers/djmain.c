@@ -69,14 +69,7 @@ hard drive  3.5 adapter     long 3.5 IDE cable      3.5 adapter   PCB
 #include "machine/idectrl.h"
 #include "sound/k054539.h"
 #include "video/konicdev.h"
-
-
-extern UINT32 *djmain_obj_ram;
-
-VIDEO_UPDATE( djmain );
-VIDEO_START( djmain );
-extern void djmain_tile_callback(running_machine* machine, int layer, int *code, int *color, int *flags);
-
+#include "includes/djmain.h"
 
 static int sndram_bank;
 static UINT8 *sndram;

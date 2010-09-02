@@ -19,6 +19,10 @@
 WRITE8_DEVICE_HANDLER( mcr_ipu_sio_transmit );
 
 
+/*----------- defined in drivers/mcr68.c -----------*/
+
+READ8_DEVICE_HANDLER( zwackery_port_2_r );
+
 
 /*----------- defined in machine/mcr.c -----------*/
 

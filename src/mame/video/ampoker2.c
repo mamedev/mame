@@ -68,6 +68,7 @@
 
 #include "emu.h"
 #include "video/resnet.h"
+#include "includes/ampoker2.h"
 
 static tilemap_t *bg_tilemap;
 

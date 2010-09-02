@@ -7,6 +7,7 @@ Atari Sprint 4 driver
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "audio/sprint4.h"
+#include "includes/sprint4.h"
 
 #define MASTER_CLOCK    12096000
 
@@ -16,15 +17,6 @@ Atari Sprint 4 driver
 #define PIXEL_CLOCK    (MASTER_CLOCK / 2)
 
 
-PALETTE_INIT( sprint4 );
-
-VIDEO_EOF( sprint4 );
-VIDEO_START( sprint4 );
-VIDEO_UPDATE( sprint4 );
-
-extern int sprint4_collision[4];
-
-WRITE8_HANDLER( sprint4_video_ram_w );
 
 static int da_latch;
 

@@ -1,4 +1,5 @@
 #include "emu.h"
+#include "includes/skykid.h"
 
 UINT8 *skykid_textram, *skykid_videoram, *skykid_spriteram;
 

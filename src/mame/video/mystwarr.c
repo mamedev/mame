@@ -8,6 +8,7 @@
 #include "emu.h"
 #include "video/konamiic.h"
 #include "includes/konamigx.h"
+#include "includes/mystwarr.h"
 
 static int layer_colorbase[6];
 static int oinprion, cbparam;

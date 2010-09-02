@@ -277,8 +277,8 @@ TODO:
 #include "cpu/m6809/m6809.h"
 #include "sound/2151intf.h"
 #include "sound/k007232.h"
-
 #include "wecleman.lh"
+#include "includes/wecleman.h"
 
 /* Variables only used here: */
 static UINT16 *blitter_regs;
@@ -288,25 +288,6 @@ static int spr_color_offs;
 
 /* Variables that video has acces to: */
 int wecleman_selected_ip, wecleman_irqctrl;
-
-/* Variables defined in video: */
-extern UINT16 *wecleman_videostatus;
-extern UINT16 *wecleman_pageram, *wecleman_txtram, *wecleman_roadram;
-extern size_t wecleman_roadram_size;
-
-/* Functions defined in video: */
-WRITE16_HANDLER( hotchase_paletteram16_SBGRBBBBGGGGRRRR_word_w );
-WRITE16_HANDLER( wecleman_paletteram16_SSSSBBBBGGGGRRRR_word_w );
-WRITE16_HANDLER( wecleman_videostatus_w );
-WRITE16_HANDLER( wecleman_pageram_w );
-WRITE16_HANDLER( wecleman_txtram_w );
-VIDEO_UPDATE( wecleman );
-VIDEO_START( wecleman );
-VIDEO_UPDATE( hotchase );
-VIDEO_START( hotchase );
-
-extern void hotchase_zoom_callback_0(running_machine *machine, int *code,int *color,int *flags);
-extern void hotchase_zoom_callback_1(running_machine *machine, int *code,int *color,int *flags);
 
 /***************************************************************************
                             Common Routines

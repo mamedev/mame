@@ -1,4 +1,5 @@
 #include "emu.h"
+#include "includes/timelimt.h"
 
 /* globals */
 UINT8 *timelimt_bg_videoram;

@@ -27,16 +27,7 @@ Sound: AY-3-8912
 #include "cpu/m6809/m6809.h"
 #include "video/mc6845.h"
 #include "sound/ay8910.h"
-
-/* video */
-WRITE8_HANDLER( usgames_videoram_w );
-WRITE8_HANDLER( usgames_charram_w );
-VIDEO_START(usgames);
-PALETTE_INIT(usgames);
-VIDEO_UPDATE(usgames);
-
-
-extern UINT8 *usgames_videoram,*usgames_charram;
+#include "includes/usgames.h"
 
 
 static WRITE8_HANDLER( usgames_rombank_w )

@@ -110,31 +110,16 @@
 #include "cpu/m6809/m6809.h"
 #include "sound/2151intf.h"
 #include "sound/upd7759.h"
-
+#include "includes/rpunch.h"
 
 
 #define MASTER_CLOCK		16000000
 
 
-/* video driver data & functions */
-VIDEO_START( rpunch );
-VIDEO_UPDATE( rpunch );
-
-extern UINT16 *rpunch_bitmapram;
-extern size_t rpunch_bitmapram_size;
-extern int rpunch_sprite_palette;
-
 static UINT8 sound_data;
 static UINT8 sound_busy;
 static UINT8 ym2151_irq;
 static UINT8 upd_rom_bank;
-
-WRITE16_HANDLER( rpunch_videoram_w );
-WRITE16_HANDLER( rpunch_videoreg_w );
-WRITE16_HANDLER( rpunch_scrollreg_w );
-WRITE16_HANDLER( rpunch_ins_w );
-WRITE16_HANDLER( rpunch_crtc_data_w );
-WRITE16_HANDLER( rpunch_crtc_register_w );
 
 
 

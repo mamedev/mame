@@ -145,8 +145,6 @@
  *
  *************************************/
 
-extern UINT8 (*sega_decrypt)(offs_t, UINT8);
-
 static UINT8 *mainram;
 
 

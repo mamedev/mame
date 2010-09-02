@@ -19,25 +19,7 @@ Notes:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-
-
-extern UINT8 *popeye_videoram;
-extern UINT8 *popeye_colorram;
-extern UINT8 *popeye_background_pos;
-extern UINT8 *popeye_palettebank;
-
-extern WRITE8_HANDLER( popeye_videoram_w );
-extern WRITE8_HANDLER( popeye_colorram_w );
-extern WRITE8_HANDLER( popeye_bitmap_w );
-extern WRITE8_HANDLER( skyskipr_bitmap_w );
-
-extern PALETTE_INIT( popeye );
-extern PALETTE_INIT( popeyebl );
-extern VIDEO_START( skyskipr );
-extern VIDEO_START( popeye );
-extern VIDEO_UPDATE( popeye );
-
-
+#include "includes/popeye.h"
 
 static INTERRUPT_GEN( popeye_interrupt )
 {

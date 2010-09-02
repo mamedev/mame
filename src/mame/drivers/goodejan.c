@@ -60,9 +60,6 @@ Notes:
 #define GOODEJAN_MHZ2 16000000
 #define GOODEJAN_MHZ3 12000000
 
-extern UINT16 *seibucrtc_sc0vram,*seibucrtc_sc1vram,*seibucrtc_sc2vram,*seibucrtc_sc3vram;
-extern UINT16 *seibucrtc_vregs;
-extern UINT16 seibucrtc_sc0bank;
 static UINT16 goodejan_mux_data;
 
 static WRITE16_HANDLER( goodejan_gfxbank_w )

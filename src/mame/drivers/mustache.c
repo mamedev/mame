@@ -31,6 +31,7 @@ YM2151:
 #include "cpu/z80/z80.h"
 #include "audio/seibu.h"	// for seibu_sound_decrypt on the MAIN cpu (not sound)
 #include "audio/t5182.h"
+#include "includes/mustache.h"
 
 #define XTAL1  14318180
 #define XTAL2  18432000
@@ -39,14 +40,6 @@ YM2151:
 #define CPU_CLOCK   (XTAL3/2)
 #define T5182_CLOCK (XTAL1/4)
 #define YM_CLOCK    (XTAL1/4)
-
-
-WRITE8_HANDLER( mustache_videoram_w );
-WRITE8_HANDLER( mustache_scroll_w );
-WRITE8_HANDLER ( mustache_video_control_w);
-VIDEO_START( mustache );
-VIDEO_UPDATE( mustache );
-PALETTE_INIT( mustache );
 
 
 static READ8_HANDLER(t5182shared_r)

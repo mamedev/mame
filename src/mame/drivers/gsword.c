@@ -147,23 +147,7 @@ reg: 0->1 (main->2nd) /     : (1->0) 2nd->main :
 #include "machine/tait8741.h"
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
-
-
-extern WRITE8_HANDLER( gsword_charbank_w );
-extern WRITE8_HANDLER( gsword_videoctrl_w );
-extern WRITE8_HANDLER( gsword_videoram_w );
-extern WRITE8_HANDLER( gsword_scroll_w );
-
-extern PALETTE_INIT( josvolly );
-extern PALETTE_INIT( gsword );
-extern VIDEO_START( gsword );
-extern VIDEO_UPDATE( gsword );
-
-extern size_t gsword_spritexy_size;
-
-extern UINT8 *gsword_spritexy_ram;
-extern UINT8 *gsword_spritetile_ram;
-extern UINT8 *gsword_spriteattrib_ram;
+#include "includes/gsword.h"
 
 static int coins;
 static int fake8910_0,fake8910_1;

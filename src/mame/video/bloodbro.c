@@ -5,6 +5,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/bloodbro.h"
 
 UINT16 *bloodbro_txvideoram;
 UINT16 *bloodbro_bgvideoram,*bloodbro_fgvideoram;

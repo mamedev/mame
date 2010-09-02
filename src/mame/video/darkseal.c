@@ -86,6 +86,7 @@ Sprites - Data East custom chip 52
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/darkseal.h"
 
 UINT16 *darkseal_pf12_row,*darkseal_pf34_row;
 UINT16 *darkseal_pf1_data,*darkseal_pf2_data,*darkseal_pf3_data;

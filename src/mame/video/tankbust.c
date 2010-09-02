@@ -3,6 +3,7 @@
 */
 
 #include "emu.h"
+#include "includes/tankbust.h"
 
 /*
 *   variables

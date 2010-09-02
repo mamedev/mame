@@ -55,13 +55,7 @@
 #include "cpu/e132xs/e132xs.h"
 #include "deprecat.h"
 #include "machine/eeprom.h"
-
-READ32_HANDLER(eolith_vram_r);
-WRITE32_HANDLER(eolith_vram_w);
-VIDEO_START(eolith);
-VIDEO_UPDATE(eolith);
-
-extern int eolith_buffer;
+#include "includes/eolith.h"
 
 static int coin_counter_bit = 0;
 

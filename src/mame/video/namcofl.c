@@ -4,6 +4,7 @@
 #include "includes/namconb1.h"
 #include "includes/namcoic.h"
 #include "includes/namcos2.h"
+#include "includes/namcofl.h"
 
 //UINT32 *namcofl_spritebank32;
 //UINT32 *namcofl_tilebank32;

@@ -1,5 +1,6 @@
 #include "emu.h"
 #include "video/taitoic.h"
+#include "includes/groundfx.h"
 
 UINT16 groundfx_rotate_ctrl[8];
 

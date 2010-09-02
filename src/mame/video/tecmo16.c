@@ -9,6 +9,7 @@
 ******************************************************************************/
 
 #include "emu.h"
+#include "includes/tecmo16.h"
 
 UINT16 *tecmo16_videoram;
 UINT16 *tecmo16_colorram;

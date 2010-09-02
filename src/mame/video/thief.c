@@ -4,6 +4,8 @@
 
 #include "emu.h"
 #include "video/tms9927.h"
+#include "includes/thief.h"
+
 
 static UINT8 thief_read_mask, thief_write_mask;
 static UINT8 thief_video_control;

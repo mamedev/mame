@@ -18,19 +18,9 @@ Notes:
 #include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "sound/sn76496.h"
+#include "includes/strnskil.h"
 
 /****************************************************************************/
-
-WRITE8_HANDLER( strnskil_videoram_w );
-WRITE8_HANDLER( strnskil_scrl_ctrl_w );
-
-PALETTE_INIT( strnskil );
-VIDEO_START( strnskil );
-VIDEO_UPDATE( strnskil );
-
-extern UINT8 *strnskil_xscroll;
-
-
 
 static READ8_HANDLER( strnskil_d800_r )
 {

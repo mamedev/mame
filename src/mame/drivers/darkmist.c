@@ -27,14 +27,8 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "audio/t5182.h"
+#include "includes/darkmist.h"
 
-
-VIDEO_START(darkmist);
-VIDEO_UPDATE(darkmist);
-PALETTE_INIT(darkmist);
-
-extern UINT8 *darkmist_scroll;
-extern UINT8 *darkmist_spritebank;
 static UINT8 * darkmist_workram;
 
 int darkmist_hw;

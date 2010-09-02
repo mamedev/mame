@@ -17,21 +17,7 @@ Notes:
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6800/m6800.h"
 #include "sound/namco.h"
-
-extern UINT8 *skykid_textram, *skykid_videoram, *skykid_spriteram;
-
-/* from video/skykid.c */
-VIDEO_START( skykid );
-READ8_HANDLER( skykid_videoram_r );
-WRITE8_HANDLER( skykid_videoram_w );
-READ8_HANDLER( skykid_textram_r );
-WRITE8_HANDLER( skykid_textram_w );
-WRITE8_HANDLER( skykid_scroll_x_w );
-WRITE8_HANDLER( skykid_scroll_y_w );
-WRITE8_HANDLER( skykid_flipscreen_priority_w );
-VIDEO_UPDATE( skykid );
-PALETTE_INIT( skykid );
-
+#include "includes/skykid.h"
 
 static UINT8 inputport_selected;
 

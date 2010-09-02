@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/toki.h"
 
 static tilemap_t *background_layer,*foreground_layer,*text_layer;
 

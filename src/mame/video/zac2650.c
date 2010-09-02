@@ -6,6 +6,7 @@
 
 #include "emu.h"
 #include "sound/s2636.h"
+#include "includes/zac2650.h"
 
 UINT8 *zac2650_s2636_0_ram;
 static bitmap_t *spritebitmap;

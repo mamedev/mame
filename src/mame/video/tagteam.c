@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/tagteam.h"
 
 static int palettebank;
 

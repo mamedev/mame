@@ -54,15 +54,7 @@ c1  ??
 #include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "sound/3812intf.h"
-
-
-extern UINT8 *speedbal_background_videoram;
-extern UINT8 *speedbal_foreground_videoram;
-
-VIDEO_START( speedbal );
-VIDEO_UPDATE( speedbal );
-WRITE8_HANDLER( speedbal_foreground_videoram_w );
-WRITE8_HANDLER( speedbal_background_videoram_w );
+#include "includes/speedbal.h"
 
 static WRITE8_HANDLER( speedbal_coincounter_w )
 {

@@ -1,6 +1,7 @@
 #include "emu.h"
 #include "video/taitoic.h"
 #include "video/poly.h"
+#include "includes/galastrm.h"
 
 #define X_OFFSET 96
 #define Y_OFFSET 60

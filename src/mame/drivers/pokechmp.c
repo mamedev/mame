@@ -49,13 +49,7 @@ ClawGrip, Jul 2006
 #include "sound/2203intf.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
-
-extern WRITE8_HANDLER( pokechmp_videoram_w );
-extern WRITE8_HANDLER( pokechmp_flipscreen_w );
-
-extern VIDEO_START( pokechmp );
-extern VIDEO_UPDATE( pokechmp );
-
+#include "includes/pokechmp.h"
 
 static WRITE8_HANDLER( pokechmp_bank_w )
 {

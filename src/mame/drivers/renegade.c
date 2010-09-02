@@ -108,16 +108,7 @@ $8000 - $ffff   ROM
 #include "cpu/m6805/m6805.h"
 #include "sound/3526intf.h"
 #include "sound/okim6295.h"
-
-extern VIDEO_UPDATE( renegade );
-extern VIDEO_START( renegade );
-WRITE8_HANDLER( renegade_scroll0_w );
-WRITE8_HANDLER( renegade_scroll1_w );
-WRITE8_HANDLER( renegade_videoram_w );
-WRITE8_HANDLER( renegade_videoram2_w );
-WRITE8_HANDLER( renegade_flipscreen_w );
-
-extern UINT8 *renegade_videoram2;
+#include "includes/renegade.h"
 
 static UINT8 bank;
 static int mcu_sim;

@@ -26,19 +26,7 @@
 #include "sound/2203intf.h"
 #include "sound/msm5205.h"
 #include "sound/c6280.h"
-
-VIDEO_UPDATE( battlera );
-VIDEO_START( battlera );
-INTERRUPT_GEN( battlera_interrupt );
-
-READ8_HANDLER( HuC6270_register_r );
-WRITE8_HANDLER( HuC6270_register_w );
-//READ8_HANDLER( HuC6270_data_r );
-WRITE8_HANDLER( HuC6270_data_w );
-WRITE8_HANDLER( battlera_palette_w );
-
-READ8_HANDLER( HuC6270_debug_r );
-WRITE8_HANDLER( HuC6270_debug_w );
+#include "includes/battlera.h"
 
 static int control_port_select;
 

@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/vulgus.h"
 
 UINT8 *vulgus_fgvideoram,*vulgus_bgvideoram;
 UINT8 *vulgus_scroll_low,*vulgus_scroll_high;

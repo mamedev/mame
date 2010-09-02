@@ -12,20 +12,9 @@ Quiz Gekiretsu Scramble (Gakuen Paradise 2) (c) 1993 Face
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
 #include "sound/okim6295.h"
+#include "includes/quizdna.h"
 
 #define MCLK 16000000
-
-VIDEO_START( quizdna );
-VIDEO_UPDATE( quizdna );
-
-WRITE8_HANDLER( quizdna_fg_ram_w );
-WRITE8_HANDLER( quizdna_bg_ram_w );
-WRITE8_HANDLER( quizdna_bg_yscroll_w );
-WRITE8_HANDLER( quizdna_bg_xscroll_w );
-WRITE8_HANDLER( quizdna_screen_ctrl_w );
-
-WRITE8_HANDLER( paletteram_xBGR_RRRR_GGGG_BBBB_w );
-
 
 static WRITE8_HANDLER( quizdna_rombank_w )
 {

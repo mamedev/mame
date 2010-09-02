@@ -1,5 +1,6 @@
 #include "emu.h"
 #include "video/taitoic.h"
+#include "includes/undrfire.h"
 
 UINT16 undrfire_rotate_ctrl[8];
 

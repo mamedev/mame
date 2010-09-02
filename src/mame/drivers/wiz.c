@@ -162,23 +162,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
 #include "deprecat.h"
 #include "sound/ay8910.h"
 #include "sound/discrete.h"
-
-extern UINT8 *wiz_videoram2;
-extern UINT8 *wiz_colorram2;
-extern UINT8 *wiz_attributesram;
-extern UINT8 *wiz_attributesram2;
-extern UINT8 *wiz_sprite_bank;
-
-WRITE8_HANDLER( wiz_char_bank_select_w );
-WRITE8_HANDLER( wiz_palettebank_w );
-WRITE8_HANDLER( wiz_bgcolor_w );
-WRITE8_HANDLER( wiz_flipx_w );
-WRITE8_HANDLER( wiz_flipy_w );
-VIDEO_START( wiz );
-PALETTE_INIT( wiz );
-VIDEO_UPDATE( wiz );
-VIDEO_UPDATE( stinger );
-VIDEO_UPDATE( kungfut );
+#include "includes/wiz.h"
 
 #define STINGER_SHOT_EN1	NODE_01
 #define STINGER_SHOT_EN2	NODE_02

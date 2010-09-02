@@ -7,6 +7,7 @@
 
 
 #include "emu.h"
+#include "includes/mustache.h"
 
 static tilemap_t *bg_tilemap;
 static int control_byte;

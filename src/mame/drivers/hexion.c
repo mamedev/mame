@@ -84,16 +84,7 @@ Notes:
 #include "sound/okim6295.h"
 #include "sound/k051649.h"
 #include "includes/konamipt.h"
-
-VIDEO_START( hexion );
-VIDEO_UPDATE( hexion );
-
-WRITE8_HANDLER( hexion_bankswitch_w );
-READ8_HANDLER( hexion_bankedram_r );
-WRITE8_HANDLER( hexion_bankedram_w );
-WRITE8_HANDLER( hexion_bankctrl_w );
-WRITE8_HANDLER( hexion_gfxrom_select_w );
-
+#include "includes/hexion.h"
 
 
 static WRITE8_HANDLER( coincntr_w )

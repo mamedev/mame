@@ -5,6 +5,7 @@
 ************************************************************************/
 
 #include "emu.h"
+#include "includes/quizpani.h"
 
 UINT16 *quizpani_bg_videoram, *quizpani_txt_videoram;
 UINT16 *quizpani_scrollreg;

@@ -5,6 +5,7 @@
 ****************************************************************************/
 
 #include "emu.h"
+#include "includes/runaway.h"
 
 
 static tilemap_t *bg_tilemap;

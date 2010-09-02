@@ -176,17 +176,7 @@
 #include "cpu/m6502/m6502.h"
 #include "video/mc6845.h"
 #include "sound/ay8910.h"
-
-/* from video */
-extern UINT8 *funworld_videoram;
-extern UINT8 *funworld_colorram;
-
-WRITE8_HANDLER( funworld_videoram_w );
-WRITE8_HANDLER( funworld_colorram_w );
-PALETTE_INIT( funworld );
-VIDEO_START( funworld );
-VIDEO_UPDATE( funworld );
-
+#include "includes/funworld.h"
 
 /**********************
 * Read/Write Handlers *

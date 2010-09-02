@@ -10,10 +10,9 @@
 
 #include "emu.h"
 #include "video/taitoic.h"
-
+#include "includes/rainbow.h"
 #include "includes/opwolf.h"
 #include "includes/rastan.h"
-#include "includes/rainbow.h"
 
 /***************************************************************************/
 

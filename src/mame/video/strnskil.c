@@ -9,6 +9,7 @@ Video hardware driver by Uki
 ******************************************************************************/
 
 #include "emu.h"
+#include "includes/strnskil.h"
 
 
 UINT8 *strnskil_xscroll;

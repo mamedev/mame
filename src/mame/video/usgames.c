@@ -1,4 +1,5 @@
 #include "emu.h"
+#include "includes/usgames.h"
 
 UINT8 *usgames_videoram,*usgames_charram;
 

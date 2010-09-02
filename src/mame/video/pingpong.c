@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/pingpong.h"
 
 static tilemap_t *bg_tilemap;
 UINT8 *pingpong_videoram;

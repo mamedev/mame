@@ -1,6 +1,7 @@
 #include "emu.h"
 #include "deprecat.h"
 #include "cpu/m6502/m6502.h"
+#include "includes/spdodgeb.h"
 
 
 UINT8 *spdodgeb_videoram;

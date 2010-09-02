@@ -116,11 +116,9 @@ typedef struct _micro3d_vtx_
 	INT32 x, y, z;
 } micro3d_vtx;
 
-/*----------- defined in drivers/micro3d.c -----------*/
-extern UINT16 *micro3d_sprite_vram;
-void m68901_int_gen(running_machine *machine, int source);
 
 /*----------- defined in machine/micro3d.c -----------*/
+
 READ16_HANDLER( micro3d_mc68901_r );
 WRITE16_HANDLER( micro3d_mc68901_w );
 
@@ -165,7 +163,9 @@ MACHINE_RESET( micro3d );
 DRIVER_INIT( micro3d );
 DRIVER_INIT( botssa );
 
+
 /*----------- defined in audio/micro3d.c -----------*/
+
 WRITE8_DEVICE_HANDLER( micro3d_upd7759_w );
 WRITE8_HANDLER( micro3d_snd_dac_a );
 WRITE8_HANDLER( micro3d_snd_dac_b );
@@ -176,9 +176,10 @@ void micro3d_noise_sh_w(running_machine *machine, UINT8 data);
 
 DECLARE_LEGACY_SOUND_DEVICE(MICRO3D, micro3d_sound);
 
+
 /*----------- defined in video/micro3d.c -----------*/
+
 VIDEO_START( micro3d );
-VIDEO_UPDATE( micro3d );
 VIDEO_RESET( micro3d );
 
 void micro3d_tms_interrupt(running_device *device, int state);

@@ -17,13 +17,7 @@
 #include "sound/2203intf.h"
 #include "sound/3812intf.h"
 #include "sound/msm5205.h"
-
-extern WRITE8_HANDLER( pcktgal_videoram_w );
-extern WRITE8_HANDLER( pcktgal_flipscreen_w );
-
-extern PALETTE_INIT( pcktgal );
-extern VIDEO_START( pcktgal );
-extern VIDEO_UPDATE( pcktgal );
+#include "includes/pcktgal.h"
 
 /***************************************************************************/
 

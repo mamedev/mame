@@ -6,6 +6,7 @@
 ****************************************************************/
 
 #include "emu.h"
+#include "includes/tryout.h"
 
 static tilemap_t *fg_tilemap, *bg_tilemap;
 static UINT8 vram_bank;

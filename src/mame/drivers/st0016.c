@@ -73,8 +73,6 @@ WRITE8_HANDLER(st0016_rom_bank_w)
 	st0016_rom_bank=data;
 }
 
-READ8_HANDLER(st0016_dma_r);
-
 static ADDRESS_MAP_START( st0016_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x00, 0xbf) AM_READ(st0016_vregs_r) AM_WRITE(st0016_vregs_w) /* video/crt regs ? */

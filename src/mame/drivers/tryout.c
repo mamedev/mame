@@ -23,18 +23,7 @@ $208 strikes count
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/2203intf.h"
-
-extern UINT8 *tryout_gfx_control;
-
-extern READ8_HANDLER( tryout_vram_r );
-extern WRITE8_HANDLER( tryout_videoram_w );
-extern WRITE8_HANDLER( tryout_vram_w );
-extern WRITE8_HANDLER( tryout_vram_bankswitch_w );
-extern WRITE8_HANDLER( tryout_flipscreen_w );
-
-extern PALETTE_INIT( tryout );
-extern VIDEO_START( tryout );
-extern VIDEO_UPDATE( tryout );
+#include "includes/tryout.h"
 
 static WRITE8_HANDLER( tryout_nmi_ack_w )
 {

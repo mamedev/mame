@@ -1,4 +1,5 @@
 #include "emu.h"
+#include "includes/pcktgal.h"
 
 static tilemap_t *bg_tilemap;
 

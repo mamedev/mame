@@ -649,21 +649,12 @@
 #include "machine/6821pia.h"
 #include "machine/6850acia.h"
 #include "sound/ay8910.h"
+#include "includes/calomega.h"
 
 
 /* UART */
 static UINT8 tx_line;
 static UINT8 rx_line;
-
-
-/* from video */
-extern UINT8 *calomega_videoram;
-extern UINT8 *calomega_colorram;
-WRITE8_HANDLER( calomega_videoram_w );
-WRITE8_HANDLER( calomega_colorram_w );
-PALETTE_INIT( calomega );
-VIDEO_START( calomega );
-VIDEO_UPDATE( calomega );
 
 
 /**************************************************

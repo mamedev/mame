@@ -39,6 +39,7 @@
 
 #include "emu.h"
 #include "video/resnet.h"
+#include "includes/snookr10.h"
 
 UINT8 *snookr10_videoram;
 UINT8 *snookr10_colorram;

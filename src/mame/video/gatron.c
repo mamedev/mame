@@ -18,6 +18,7 @@
 
 
 #include "emu.h"
+#include "includes/gatron.h"
 
 static tilemap_t *bg_tilemap;
 

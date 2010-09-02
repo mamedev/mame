@@ -6,6 +6,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/gsword.h"
 
 size_t gsword_spritexy_size;
 

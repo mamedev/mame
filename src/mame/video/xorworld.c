@@ -1,4 +1,5 @@
 #include "emu.h"
+#include "includes/xorworld.h"
 
 static tilemap_t *bg_tilemap;
 

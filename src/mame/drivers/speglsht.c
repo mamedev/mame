@@ -109,7 +109,6 @@ Notes:
 #include "sound/st0016.h"
 #include "includes/st0016.h"
 
-READ8_HANDLER(st0016_dma_r);
 static UINT8 *shared;
 
 UINT32 *speglsht_framebuffer;

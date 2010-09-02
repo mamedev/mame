@@ -10,7 +10,6 @@ WRITE16_HANDLER( gaelco2_coin_w );
 WRITE16_HANDLER( gaelco2_coin2_w );
 WRITE16_HANDLER( wrally2_coin_w );
 WRITE16_HANDLER( touchgo_coin_w );
-NVRAM_HANDLER( gaelco2 );
 WRITE16_HANDLER( bang_clr_gun_int_w );
 INTERRUPT_GEN( bang_interrupt );
 CUSTOM_INPUT( wrally2_analog_bit_r );

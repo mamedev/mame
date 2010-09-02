@@ -141,6 +141,7 @@ Updates by Bryan McPhail, 12/12/2004:
 #include "cpu/m6809/m6809.h"
 #include "cpu/m6805/m6805.h"
 #include "sound/2203intf.h"
+#include "includes/xain.h"
 
 #define MASTER_CLOCK		XTAL_12MHz
 #define CPU_CLOCK			MASTER_CLOCK / 8
@@ -148,19 +149,6 @@ Updates by Bryan McPhail, 12/12/2004:
 #define PIXEL_CLOCK			MASTER_CLOCK / 2
 
 static int vblank;
-
-VIDEO_UPDATE( xain );
-VIDEO_START( xain );
-WRITE8_HANDLER( xain_scrollxP0_w );
-WRITE8_HANDLER( xain_scrollyP0_w );
-WRITE8_HANDLER( xain_scrollxP1_w );
-WRITE8_HANDLER( xain_scrollyP1_w );
-WRITE8_HANDLER( xain_charram_w );
-WRITE8_HANDLER( xain_bgram0_w );
-WRITE8_HANDLER( xain_bgram1_w );
-WRITE8_HANDLER( xain_flipscreen_w );
-
-extern UINT8 *xain_charram, *xain_bgram0, *xain_bgram1, xain_pri;
 
 /* MCU */
 static int from_main;

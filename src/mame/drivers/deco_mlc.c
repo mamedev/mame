@@ -102,12 +102,8 @@
 #include "includes/decoprot.h"
 #include "cpu/arm/arm.h"
 #include "cpu/sh2/sh2.h"
+#include "includes/deco_mlc.h"
 
-VIDEO_START( mlc );
-VIDEO_UPDATE( mlc );
-VIDEO_EOF( mlc );
-
-extern UINT32 *mlc_vram, *mlc_clip_ram;
 static UINT32 *mlc_ram, *irq_ram;
 static timer_device *raster_irq_timer;
 static int mainCpuIsArm;

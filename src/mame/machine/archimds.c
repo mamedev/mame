@@ -59,7 +59,7 @@ static const UINT32 pixel_rate[4] = { 8000000, 12000000, 16000000, 24000000};
 static UINT8 vidc_stereo_reg[8];
 
 static emu_timer *timer[4], *snd_timer, *vid_timer;
-emu_timer  *vbl_timer;
+static emu_timer *vbl_timer;
 
 void archimedes_request_irq_a(running_machine *machine, int mask)
 {

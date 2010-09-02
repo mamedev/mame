@@ -56,20 +56,9 @@ Stephh's notes (based on the games M68000 code and some tests) :
 #include "cpu/m68000/m68000.h"
 #include "sound/2203intf.h"
 #include "sound/okim6295.h"
+#include "includes/sshangha.h"
 
 #define SSHANGHA_HACK	0
-
-VIDEO_START( sshangha );
-VIDEO_UPDATE( sshangha );
-
-WRITE16_HANDLER( sshangha_pf2_data_w );
-WRITE16_HANDLER( sshangha_pf1_data_w );
-WRITE16_HANDLER( sshangha_control_0_w );
-WRITE16_HANDLER( sshangha_video_w );
-
-extern UINT16 *sshangha_pf1_data;
-extern UINT16 *sshangha_pf2_data;
-extern UINT16 *sshangha_pf1_rowscroll, *sshangha_pf2_rowscroll;
 
 static UINT16 *sshangha_prot_data;
 

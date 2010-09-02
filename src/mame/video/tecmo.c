@@ -5,6 +5,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/tecmo.h"
 
 UINT8 *tecmo_txvideoram,*tecmo_fgvideoram,*tecmo_bgvideoram;
 

@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "video/resnet.h"
+#include "includes/tp84.h"
 
 
 UINT8 *tp84_bg_videoram;

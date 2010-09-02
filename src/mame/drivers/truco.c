@@ -18,12 +18,9 @@
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/dac.h"
+#include "includes/truco.h"
 
 static UINT8 *battery_ram;
-
-/* from video */
-VIDEO_UPDATE( truco );
-PALETTE_INIT( truco );
 
 
 /***************************************************************************/

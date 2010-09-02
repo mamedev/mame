@@ -26,7 +26,7 @@ Memo:
 #include "includes/nb1413m3.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-
+#include "includes/hyhoo.h"
 
 #define	SIGNED_DAC	0		// 0:unsigned DAC, 1:signed DAC
 #if SIGNED_DAC
@@ -34,14 +34,6 @@ Memo:
 #else
 #define DAC_WRITE	dac_w
 #endif
-
-
-VIDEO_UPDATE( hyhoo );
-VIDEO_START( hyhoo );
-
-extern UINT8 *hyhoo_clut;
-WRITE8_HANDLER( hyhoo_blitter_w );
-WRITE8_HANDLER( hyhoo_romsel_w );
 
 
 static DRIVER_INIT( hyhoo )

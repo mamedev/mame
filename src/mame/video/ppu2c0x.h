@@ -125,8 +125,6 @@ extern void (*ppu_latch)( running_device *device, offs_t offset );
 WRITE8_DEVICE_HANDLER( ppu2c0x_w );
 READ8_DEVICE_HANDLER( ppu2c0x_r );
 
-int ppu2c0x_get_scanlines_per_frame( running_device *device );
-
 
 /***************************************************************************
     DEVICE CONFIGURATION MACROS

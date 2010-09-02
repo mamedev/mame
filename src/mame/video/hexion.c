@@ -1,5 +1,5 @@
 #include "emu.h"
-
+#include "includes/hexion.h"
 
 static UINT8 *vram[2],*unkram;
 static int bankctrl,rambank,pmcbank,gfxrom_select;

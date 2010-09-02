@@ -17,26 +17,11 @@ Might be some priority glitches
 #include "sound/3812intf.h"
 #include "sound/msm5205.h"
 #include "rendlay.h"
+#include "includes/tbowl.h"
 
 static int adpcm_pos[2],adpcm_end[2];
 static int adpcm_data[2];
 static UINT8 *shared_ram;
-
-/* in video/tbowl.c */
-extern UINT8 *tbowl_txvideoram, *tbowl_bgvideoram, *tbowl_bg2videoram;
-extern UINT8 *tbowl_spriteram;
-
-WRITE8_HANDLER (tbowl_bg2videoram_w);
-WRITE8_HANDLER (tbowl_bgvideoram_w);
-WRITE8_HANDLER (tbowl_txvideoram_w);
-
-WRITE8_HANDLER (tbowl_bg2xscroll_lo); WRITE8_HANDLER (tbowl_bg2xscroll_hi);
-WRITE8_HANDLER (tbowl_bg2yscroll_lo); WRITE8_HANDLER (tbowl_bg2yscroll_hi);
-WRITE8_HANDLER (tbowl_bgxscroll_lo);  WRITE8_HANDLER (tbowl_bgxscroll_hi);
-WRITE8_HANDLER (tbowl_bgyscroll_lo);  WRITE8_HANDLER (tbowl_bgyscroll_hi);
-
-VIDEO_START( tbowl );
-VIDEO_UPDATE( tbowl );
 
 static WRITE8_HANDLER( tbowl_coin_counter_w )
 {

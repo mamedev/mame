@@ -27,6 +27,7 @@
 *****************************************************************************/
 
 #include "emu.h"
+#include "includes/m90.h"
 
 static UINT16 *m90_spriteram;
 UINT16 *m90_video_data;

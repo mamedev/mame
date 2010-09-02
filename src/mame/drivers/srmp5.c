@@ -384,8 +384,6 @@ static ADDRESS_MAP_START( st0016_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
-READ8_HANDLER(st0016_dma_r);
-
 static READ8_HANDLER(cmd1_r)
 {
 	srmp5_state *state = space->machine->driver_data<srmp5_state>();

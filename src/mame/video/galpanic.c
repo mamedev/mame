@@ -1,5 +1,6 @@
 #include "emu.h"
 #include "kan_pand.h"
+#include "includes/galpanic.h"
 
 UINT16 *galpanic_bgvideoram,*galpanic_fgvideoram;
 size_t galpanic_fgvideoram_size;

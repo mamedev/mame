@@ -135,9 +135,6 @@ const gfx_layout mcr_sprite_layout =
  *
  *************************************/
 
-READ8_DEVICE_HANDLER( zwackery_port_2_r );
-
-
 static READ8_DEVICE_HANDLER( zwackery_port_1_r )
 {
 	UINT8 ret = input_port_read(device->machine, "IN1");

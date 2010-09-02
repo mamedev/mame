@@ -35,17 +35,7 @@ Daughterboard: Custom made, plugged in the 2 roms and Z80 mainboard sockets.
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/dac.h"
-
-/* from video */
-extern UINT8 *trucocl_videoram;
-extern UINT8 *trucocl_colorram;
-
-WRITE8_HANDLER( trucocl_videoram_w );
-WRITE8_HANDLER( trucocl_colorram_w );
-PALETTE_INIT( trucocl );
-VIDEO_START( trucocl );
-VIDEO_UPDATE( trucocl );
-
+#include "includes/trucocl.h"
 
 static WRITE8_HANDLER( irq_enable_w )
 {

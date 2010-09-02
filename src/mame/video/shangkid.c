@@ -2,6 +2,7 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "includes/shangkid.h"
 
 static tilemap_t *background;
 UINT8 *shangkid_videoreg;

@@ -63,7 +63,6 @@
 #include "includes/archimds.h"
 #include "machine/i2cmem.h"
 
-extern void archimedes_request_irq_a(running_machine *machine, int mask);
 static emu_timer *mk5_2KHz_timer;
 static UINT8 ext_latch;
 

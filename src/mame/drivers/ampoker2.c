@@ -369,14 +369,7 @@
 #include "sound/ay8910.h"
 #include "ampoker2.lh"
 #include "sigmapkr.lh"
-
-/* from video */
-extern WRITE8_HANDLER( ampoker2_videoram_w );
-extern PALETTE_INIT( ampoker2 );
-extern VIDEO_START( ampoker2 );
-extern VIDEO_START( sigma2k );
-extern VIDEO_UPDATE( ampoker2 );
-
+#include "includes/ampoker2.h"
 
 /**********************
 * Read/Write Handlers *

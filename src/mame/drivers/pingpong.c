@@ -8,16 +8,7 @@ Ping Pong (c) 1985 Konami
 #include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "sound/sn76496.h"
-
-extern UINT8 *pingpong_videoram;
-extern UINT8 *pingpong_colorram;
-
-extern WRITE8_HANDLER( pingpong_videoram_w );
-extern WRITE8_HANDLER( pingpong_colorram_w );
-
-extern PALETTE_INIT( pingpong );
-extern VIDEO_START( pingpong );
-extern VIDEO_UPDATE( pingpong );
+#include "includes/pingpong.h"
 
 static int intenable;
 

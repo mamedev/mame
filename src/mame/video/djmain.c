@@ -5,6 +5,7 @@
 
 #include "emu.h"
 #include "video/konicdev.h"
+#include "includes/djmain.h"
 
 #define NUM_SPRITES	(0x800 / 16)
 #define NUM_LAYERS	2

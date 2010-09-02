@@ -5,6 +5,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/gladiatr.h"
 
 UINT8 *gladiatr_videoram, *gladiatr_colorram, *gladiatr_textram;
 

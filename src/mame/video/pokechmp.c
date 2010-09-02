@@ -1,6 +1,7 @@
 /* Poke Champ */
 
 #include "emu.h"
+#include "includes/pokechmp.h"
 
 static tilemap_t *bg_tilemap;
 

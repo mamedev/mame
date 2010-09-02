@@ -359,8 +359,6 @@ Notes:
 #include "audio/taito_en.h"
 #include "includes/taitojc.h"
 
-extern UINT32 *f3_shared_ram;
-
 #define POLYGON_FIFO_SIZE		100000
 
 static READ32_HANDLER( taitojc_palette_r )

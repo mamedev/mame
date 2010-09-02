@@ -9,6 +9,7 @@
 
 #include "emu.h"
 #include "video/konicdev.h"
+#include "includes/wecleman.h"
 
 #define BMP_PAD		8
 #define BLEND_STEPS	16
@@ -35,9 +36,6 @@ struct sprite
 	int x, y;
 	int shadow_mode, flags;
 };
-
-/* Variables defined in driver: */
-extern int wecleman_selected_ip, wecleman_irqctrl;
 
 /* Variables that driver has acces to: */
 UINT16 *wecleman_videostatus;

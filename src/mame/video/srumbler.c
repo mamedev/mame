@@ -7,7 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-
+#include "includes/srumbler.h"
 
 UINT8 *srumbler_backgroundram,*srumbler_foregroundram;
 static tilemap_t *bg_tilemap,*fg_tilemap;

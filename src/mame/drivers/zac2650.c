@@ -13,16 +13,9 @@
 #include "sound/s2636.h"
 
 #include "tinv2650.lh"
+#include "includes/zac2650.h"
 
-extern UINT8 *zac2650_s2636_0_ram;
-WRITE8_HANDLER( tinvader_videoram_w );
 static WRITE8_HANDLER( tinvader_sound_w );
-READ8_HANDLER( zac_s2636_r );
-WRITE8_HANDLER( zac_s2636_w );
-READ8_HANDLER( tinvader_port_0_r );
-
-VIDEO_START( tinvader );
-VIDEO_UPDATE( tinvader );
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x17ff) AM_ROM

@@ -46,27 +46,7 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-
-extern UINT8 *tsamurai_videoram;
-extern UINT8 *tsamurai_colorram;
-extern UINT8 *tsamurai_bg_videoram;
-
-WRITE8_HANDLER( vsgongf_color_w );
-
-WRITE8_HANDLER( tsamurai_bgcolor_w );
-WRITE8_HANDLER( tsamurai_textbank1_w );
-WRITE8_HANDLER( tsamurai_textbank2_w );
-
-WRITE8_HANDLER( tsamurai_scrolly_w );
-WRITE8_HANDLER( tsamurai_scrollx_w );
-VIDEO_UPDATE( tsamurai );
-WRITE8_HANDLER( tsamurai_bg_videoram_w );
-WRITE8_HANDLER( tsamurai_fg_videoram_w );
-WRITE8_HANDLER( tsamurai_fg_colorram_w );
-extern VIDEO_START( tsamurai );
-
-extern VIDEO_START( vsgongf );
-extern VIDEO_UPDATE( vsgongf );
+#include "includes/tsamurai.h"
 
 static int nmi_enabled;
 static int sound_command1, sound_command2, sound_command3;

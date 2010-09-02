@@ -42,15 +42,7 @@ Dip locations and factory settings verified with US manual
 #include "audio/seibu.h"
 #include "sound/2203intf.h"
 #include "sound/msm5205.h"
-
-extern UINT16 *deadang_video_data, *deadang_scroll_ram;
-
-extern WRITE16_HANDLER( deadang_foreground_w );
-extern WRITE16_HANDLER( deadang_text_w );
-extern WRITE16_HANDLER( deadang_bank_w );
-
-extern VIDEO_START( deadang );
-extern VIDEO_UPDATE( deadang );
+#include "includes/deadang.h"
 
 /* Read/Write Handlers */
 

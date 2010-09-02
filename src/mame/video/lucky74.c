@@ -95,6 +95,7 @@
 
 #include "emu.h"
 #include "video/resnet.h"
+#include "includes/lucky74.h"
 
 
 UINT8 *lucky74_fg_videoram, *lucky74_fg_colorram, *lucky74_bg_videoram, *lucky74_bg_colorram;

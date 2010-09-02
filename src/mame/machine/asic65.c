@@ -42,11 +42,6 @@ static struct _asic65_t
 	FILE * log;
 } asic65;
 
-WRITE16_HANDLER( asic65_data_w );
-
-READ16_HANDLER( asic65_r );
-READ16_HANDLER( asic65_io_r );
-
 
 #define PARAM_WRITE		0
 #define COMMAND_WRITE	1

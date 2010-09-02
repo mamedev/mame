@@ -392,12 +392,12 @@ void gp9001vdp_device::device_reset()
 }
 
 
-void gp9001_voffs_w(gp9001vdp_device *vdp, offs_t offset, UINT16 data, UINT16 mem_mask)
+static void gp9001_voffs_w(gp9001vdp_device *vdp, offs_t offset, UINT16 data, UINT16 mem_mask)
 {
 	COMBINE_DATA(&vdp->gp9001_voffs);
 }
 
-int gp9001_videoram16_r(gp9001vdp_device *vdp, offs_t offset)
+static int gp9001_videoram16_r(gp9001vdp_device *vdp, offs_t offset)
 {
 	int offs = vdp->gp9001_voffs;
 	vdp->gp9001_voffs++;
@@ -405,14 +405,14 @@ int gp9001_videoram16_r(gp9001vdp_device *vdp, offs_t offset)
 }
 
 
-void gp9001_videoram16_w(gp9001vdp_device *vdp, offs_t offset, UINT16 data, UINT16 mem_mask)
+static void gp9001_videoram16_w(gp9001vdp_device *vdp, offs_t offset, UINT16 data, UINT16 mem_mask)
 {
 	int offs = vdp->gp9001_voffs;
 	vdp->gp9001_voffs++;
 	vdp->space()->write_word(offs*2, data, mem_mask);
 }
 
-WRITE16_DEVICE_HANDLER( gp9001_devvoffs_w )
+static WRITE16_DEVICE_HANDLER( gp9001_devvoffs_w )
 {
 	gp9001vdp_device *vdp = (gp9001vdp_device *)device;
 
@@ -420,25 +420,25 @@ WRITE16_DEVICE_HANDLER( gp9001_devvoffs_w )
 }
 
 
-READ16_DEVICE_HANDLER( gp9001_devvideoram16_r )
+static READ16_DEVICE_HANDLER( gp9001_devvideoram16_r )
 {
 	gp9001vdp_device *vdp = (gp9001vdp_device *)device;
 	return gp9001_videoram16_r(vdp, offset);
 }
 
-WRITE16_DEVICE_HANDLER( gp9001_devvideoram16_w )
+static WRITE16_DEVICE_HANDLER( gp9001_devvideoram16_w )
 {
 	gp9001vdp_device *vdp = (gp9001vdp_device *)device;
 	gp9001_videoram16_w(vdp, offset, data, mem_mask);
 }
 
 
-READ16_DEVICE_HANDLER( gp9001_vdpstatus_r )
+static READ16_DEVICE_HANDLER( gp9001_vdpstatus_r )
 {
 	return ((device->machine->primary_screen->vpos() + 15) % 262) >= 245;
 }
 
-WRITE16_DEVICE_HANDLER( gp9001_scroll_reg_select_w )
+static WRITE16_DEVICE_HANDLER( gp9001_scroll_reg_select_w )
 {
 	gp9001vdp_device *vdp = (gp9001vdp_device *)device;
 
@@ -654,7 +654,7 @@ static void gp9001_scroll_reg_data_w(gp9001vdp_device *vdp, offs_t offset, UINT1
 #endif
 }
 
-WRITE16_DEVICE_HANDLER( gp9001_scroll_reg_devvdata_w )
+static WRITE16_DEVICE_HANDLER( gp9001_scroll_reg_devvdata_w )
 {
 	gp9001vdp_device *vdp = (gp9001vdp_device*)device;
 	gp9001_scroll_reg_data_w(vdp, offset, data, mem_mask);

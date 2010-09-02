@@ -313,28 +313,7 @@ The first sprite data is located at f20b,then f21b and so on.
 #include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "sound/2203intf.h"
-
-
-WRITE8_HANDLER( psychic5_paged_ram_w );
-WRITE8_HANDLER( psychic5_vram_page_select_w );
-WRITE8_HANDLER( psychic5_title_screen_w );
-
-READ8_HANDLER( psychic5_paged_ram_r );
-READ8_HANDLER( psychic5_vram_page_select_r );
-
-VIDEO_START( psychic5 );
-VIDEO_RESET( psychic5 );
-VIDEO_UPDATE( psychic5 );
-
-
-extern UINT8 *bombsa_paletteram;
-WRITE8_HANDLER( bombsa_paged_ram_w );
-WRITE8_HANDLER( bombsa_unknown_w );
-
-VIDEO_START( bombsa );
-VIDEO_RESET( bombsa );
-VIDEO_UPDATE( bombsa );
-
+#include "includes/psychic5.h"
 
 static UINT8 psychic5_bank_latch;
 

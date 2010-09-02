@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "sound/sn76477.h"
+#include "includes/route16.h"
 
 
 UINT8 *route16_videoram1;

@@ -100,6 +100,7 @@
 
 #include "emu.h"
 #include "video/resnet.h"
+#include "includes/funworld.h"
 
 static tilemap_t *bg_tilemap;
 UINT8 *funworld_colorram;

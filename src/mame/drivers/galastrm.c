@@ -44,14 +44,10 @@ $305.b invincibility
 #include "sound/es5506.h"
 #include "includes/taito_f3.h"
 #include "audio/taito_en.h"
-
-
-VIDEO_START( galastrm );
-VIDEO_UPDATE( galastrm );
+#include "includes/galastrm.h"
 
 static UINT16 coin_word, frame_counter=0;
 static UINT32 *galastrm_ram;
-extern INT16  galastrm_tc0610_ctrl_reg[2][8];
 
 /*********************************************************************/
 

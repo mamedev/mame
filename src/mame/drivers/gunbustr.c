@@ -51,10 +51,7 @@
 #include "sound/es5506.h"
 #include "includes/taito_f3.h"
 #include "audio/taito_en.h"
-
-
-VIDEO_START( gunbustr );
-VIDEO_UPDATE( gunbustr );
+#include "includes/gunbustr.h"
 
 static UINT16 coin_word;
 static UINT32 *gunbustr_ram;

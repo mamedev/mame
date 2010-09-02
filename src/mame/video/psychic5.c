@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "jalblend.h"
+#include "includes/psychic5.h"
 
 #define	BG_SCROLLX_LSB		0x308
 #define	BG_SCROLLX_MSB		0x309

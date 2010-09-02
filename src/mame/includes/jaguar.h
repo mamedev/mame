@@ -26,8 +26,6 @@ extern UINT32 *jaguar_gpu_clut;
 extern UINT32 *jaguar_dsp_ram;
 extern UINT32 *jaguar_wave_rom;
 
-extern UINT8 blitter_status;
-
 /*----------- defined in audio/jaguar.c -----------*/
 
 TIMER_DEVICE_CALLBACK( jaguar_serial_callback );
@@ -49,6 +47,8 @@ WRITE32_HANDLER( jaguar_serial_w );
 
 
 /*----------- defined in video/jaguar.c -----------*/
+
+extern UINT8 blitter_status;
 
 void jaguar_gpu_suspend(running_machine *machine);
 void jaguar_gpu_resume(running_machine *machine);

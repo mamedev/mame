@@ -57,10 +57,3 @@ READ16_HANDLER( opwolf_cchip_data_r );
 WRITE16_HANDLER( opwolf_cchip_status_w );
 WRITE16_HANDLER( opwolf_cchip_data_w );
 WRITE16_HANDLER( opwolf_cchip_bank_w );
-
-
-/*----------- defined in video/rastan.c -----------*/
-
-WRITE16_HANDLER( opwolf_spritectrl_w );
-
-VIDEO_UPDATE( opwolf );

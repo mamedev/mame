@@ -1,4 +1,5 @@
 #include "emu.h"
+#include "includes/pirates.h"
 
 
 UINT16 *pirates_tx_tileram, *pirates_spriteram;

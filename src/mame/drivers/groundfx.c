@@ -69,13 +69,10 @@
 #include "sound/es5506.h"
 #include "includes/taito_f3.h"
 #include "audio/taito_en.h"
-
-VIDEO_START( groundfx );
-VIDEO_UPDATE( groundfx );
+#include "includes/groundfx.h"
 
 static UINT16 coin_word, frame_counter=0;
 static UINT16 port_sel = 0;
-extern UINT16 groundfx_rotate_ctrl[8];
 static UINT32 *groundfx_ram;
 
 /***********************************************************

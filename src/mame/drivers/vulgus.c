@@ -43,20 +43,7 @@ c001      YM2203 #2 write
 #include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "sound/ay8910.h"
-
-
-extern UINT8 *vulgus_fgvideoram;
-extern UINT8 *vulgus_bgvideoram;
-extern UINT8 *vulgus_scroll_low,*vulgus_scroll_high;
-
-WRITE8_HANDLER( vulgus_fgvideoram_w );
-WRITE8_HANDLER( vulgus_bgvideoram_w );
-WRITE8_HANDLER( vulgus_c804_w );
-WRITE8_HANDLER( vulgus_palette_bank_w );
-VIDEO_START( vulgus );
-PALETTE_INIT( vulgus );
-VIDEO_UPDATE( vulgus );
-
+#include "includes/vulgus.h"
 
 
 static INTERRUPT_GEN( vulgus_interrupt )

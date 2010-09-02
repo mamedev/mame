@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/thepit.h"
 
 
 UINT8 *thepit_videoram;

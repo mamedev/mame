@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/suprloco.h"
 
 UINT8 *suprloco_videoram;
 UINT8 *suprloco_scrollram;

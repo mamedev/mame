@@ -14,6 +14,7 @@
 
 
 #include "emu.h"
+#include "includes/calomega.h"
 
 UINT8 *calomega_videoram;
 UINT8 *calomega_colorram;

@@ -25,6 +25,7 @@ Memo:
 #include "includes/nb1413m3.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
+#include "includes/pastelg.h"
 
 
 #define SIGNED_DAC	0		// 0:unsigned DAC, 1:signed DAC
@@ -34,18 +35,6 @@ Memo:
 #define DAC_WRITE	dac_w
 #endif
 
-
-extern PALETTE_INIT( pastelg );
-extern VIDEO_UPDATE( pastelg );
-extern VIDEO_START( pastelg );
-
-extern WRITE8_HANDLER( pastelg_clut_w );
-extern WRITE8_HANDLER( pastelg_romsel_w );
-extern WRITE8_HANDLER( threeds_romsel_w );
-extern WRITE8_HANDLER( threeds_output_w );
-extern WRITE8_HANDLER( pastelg_blitter_w );
-extern READ8_HANDLER( threeds_rom_readback_r );
-extern int pastelg_blitter_src_addr_r(void);
 
 
 static DRIVER_INIT( pastelg )

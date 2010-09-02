@@ -34,25 +34,7 @@ TODO:
 #include "machine/nmk112.h"
 #include "sound/okim6295.h"
 #include "sound/2203intf.h"
-
-/* Variables that video has access to */
-
-/* Variables defined in video */
-extern UINT16 *powerins_vram_0, *powerins_vctrl_0;
-extern UINT16 *powerins_vram_1, *powerins_vctrl_1;
-
-/* Functions defined in video */
-
-WRITE16_HANDLER( powerins_flipscreen_w );
-WRITE16_HANDLER( powerins_tilebank_w );
-
-WRITE16_HANDLER( powerins_paletteram16_w );
-
-WRITE16_HANDLER( powerins_vram_0_w );
-WRITE16_HANDLER( powerins_vram_1_w );
-
-VIDEO_START( powerins );
-VIDEO_UPDATE( powerins );
+#include "includes/powerins.h"
 
 
 /***************************************************************************

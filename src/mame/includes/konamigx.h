@@ -1,3 +1,8 @@
+/*----------- defined in drivers/konamigx.c -----------*/
+
+extern UINT32 *gx_psacram, *gx_subpaletteram32;
+
+
 /*----------- defined in video/konamigx.c -----------*/
 
 // 2nd-Tier GX/MW Hardware Functions
@@ -106,6 +111,3 @@ WRITE16_HANDLER( K053990_martchmp_word_w );
 void konamigx_esc_alert(UINT32 *srcbase, int srcoffs, int count, int mode);
 
 void fantjour_dma_install(running_machine *machine);
-
-
-

@@ -35,13 +35,7 @@ EEPROM chip: 93C46
 #include "machine/eeprom.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/saa1099.h"
-
-
-extern WRITE16_HANDLER(xorworld_videoram16_w);
-
-extern PALETTE_INIT( xorworld );
-extern VIDEO_START( xorworld );
-extern VIDEO_UPDATE( xorworld );
+#include "includes/xorworld.h"
 
 
 /****************************************************************

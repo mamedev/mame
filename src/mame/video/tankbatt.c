@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/tankbatt.h"
 
 UINT8 *tankbatt_bulletsram;
 size_t tankbatt_bulletsram_size;

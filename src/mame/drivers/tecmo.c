@@ -49,20 +49,7 @@ f80b      ????
 #include "cpu/z80/z80.h"
 #include "sound/3812intf.h"
 #include "sound/msm5205.h"
-
-
-extern int tecmo_video_type;
-extern UINT8 *tecmo_txvideoram,*tecmo_fgvideoram,*tecmo_bgvideoram;
-
-WRITE8_HANDLER( tecmo_txvideoram_w );
-WRITE8_HANDLER( tecmo_fgvideoram_w );
-WRITE8_HANDLER( tecmo_bgvideoram_w );
-WRITE8_HANDLER( tecmo_fgscroll_w );
-WRITE8_HANDLER( tecmo_bgscroll_w );
-WRITE8_HANDLER( tecmo_flipscreen_w );
-
-VIDEO_START( tecmo );
-VIDEO_UPDATE( tecmo );
+#include "includes/tecmo.h"
 
 static int adpcm_pos,adpcm_end;
 static int adpcm_data;

@@ -14,18 +14,7 @@
 #include "cpu/m6502/m6502.h"
 #include "machine/atari_vg.h"
 #include "sound/pokey.h"
-
-extern VIDEO_START( runaway );
-extern VIDEO_START( qwak );
-extern VIDEO_UPDATE( runaway );
-extern VIDEO_UPDATE( qwak );
-
-extern UINT8* runaway_video_ram;
-extern UINT8* runaway_sprite_ram;
-
-extern WRITE8_HANDLER( runaway_paletteram_w );
-extern WRITE8_HANDLER( runaway_video_ram_w );
-extern WRITE8_HANDLER( runaway_tile_bank_w );
+#include "includes/runaway.h"
 
 static emu_timer *interrupt_timer;
 

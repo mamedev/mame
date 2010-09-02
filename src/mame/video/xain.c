@@ -31,6 +31,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/xain.h"
 
 UINT8 *xain_charram, *xain_bgram0, *xain_bgram1, xain_pri;
 

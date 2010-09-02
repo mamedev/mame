@@ -10,7 +10,6 @@
 #define CPS3_VOICES		16
 
 static sound_stream *cps3_stream;
-extern UINT8* cps3_user5region;
 
 typedef struct _cps3_voice_
 {

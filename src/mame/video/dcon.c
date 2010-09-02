@@ -5,6 +5,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/dcon.h"
 
 UINT16 *dcon_back_data,*dcon_fore_data,*dcon_mid_data,*dcon_scroll_ram,*dcon_textram;
 

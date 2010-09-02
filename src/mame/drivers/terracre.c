@@ -87,21 +87,11 @@ AT-2
 #include "sound/dac.h"
 #include "sound/2203intf.h"
 #include "sound/3526intf.h"
+#include "includes/terracre.h"
 
 static const UINT16 *mpProtData;
 static UINT8 mAmazonProtCmd;
 static UINT8 mAmazonProtReg[6];
-
-extern UINT16 *amazon_videoram;
-
-PALETTE_INIT( amazon );
-WRITE16_HANDLER( amazon_background_w );
-WRITE16_HANDLER( amazon_foreground_w );
-WRITE16_HANDLER( amazon_scrolly_w );
-WRITE16_HANDLER( amazon_scrollx_w );
-WRITE16_HANDLER( amazon_flipscreen_w );
-VIDEO_START( amazon );
-VIDEO_UPDATE( amazon );
 
 static const UINT16 mAmazonProtData[] =
 {

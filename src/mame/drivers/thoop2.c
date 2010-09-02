@@ -16,16 +16,7 @@ pf: but some gameplay bugs - sprite positioning is incorrect, no enemies, jump a
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
-
-extern UINT16 *thoop2_vregs;
-extern UINT16 *thoop2_videoram;
-extern UINT16 *thoop2_spriteram;
-
-/* from video/thoop2.c */
-WRITE16_HANDLER( thoop2_vram_w );
-VIDEO_START( thoop2 );
-VIDEO_UPDATE( thoop2 );
-
+#include "includes/thoop2.h"
 
 static const gfx_layout thoop2_tilelayout =
 {

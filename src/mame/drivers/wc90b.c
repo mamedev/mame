@@ -86,7 +86,7 @@ Noted added by ClawGrip 28-Mar-2008:
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
 #include "sound/msm5205.h"
-
+#include "includes/wc90b.h"
 
 #define TEST_DIPS false /* enable to test unmapped dip switches */
 
@@ -94,22 +94,6 @@ Noted added by ClawGrip 28-Mar-2008:
 #define SOUND_CLOCK XTAL_20MHz/4
 #define YM2203_CLOCK XTAL_20MHz/16
 #define MSM5205_CLOCK XTAL_384kHz
-
-extern UINT8 *wc90b_fgvideoram,*wc90b_bgvideoram,*wc90b_txvideoram;
-
-extern UINT8 *wc90b_scroll1x;
-extern UINT8 *wc90b_scroll2x;
-
-extern UINT8 *wc90b_scroll1y;
-extern UINT8 *wc90b_scroll2y;
-
-extern UINT8 *wc90b_scroll_x_lo;
-
-VIDEO_START( wc90b );
-WRITE8_HANDLER( wc90b_bgvideoram_w );
-WRITE8_HANDLER( wc90b_fgvideoram_w );
-WRITE8_HANDLER( wc90b_txvideoram_w );
-VIDEO_UPDATE( wc90b );
 
 static int msm5205next;
 

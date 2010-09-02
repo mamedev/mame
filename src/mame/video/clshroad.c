@@ -31,6 +31,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/clshroad.h"
 
 /* Variables only used here: */
 
@@ -40,11 +41,6 @@ static tilemap_t *tilemap_0a, *tilemap_0b, *tilemap_1;
 
 UINT8 *clshroad_vram_0, *clshroad_vram_1;
 UINT8 *clshroad_vregs;
-
-WRITE8_HANDLER( clshroad_vram_0_w );
-WRITE8_HANDLER( clshroad_vram_1_w );
-WRITE8_HANDLER( clshroad_flipscreen_w );
-
 
 WRITE8_HANDLER( clshroad_flipscreen_w )
 {

@@ -8,7 +8,7 @@
 
 #include "emu.h"
 #include "includes/nb1413m3.h"
-
+#include "includes/hyhoo.h"
 
 UINT8 *hyhoo_clut;
 

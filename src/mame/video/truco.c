@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/truco.h"
 
 PALETTE_INIT( truco )
 {

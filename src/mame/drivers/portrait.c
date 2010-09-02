@@ -87,18 +87,7 @@ DM81LS95 = TriState buffer
 #include "cpu/z80/z80.h"
 #include "cpu/mcs48/mcs48.h"
 #include "sound/tms5220.h"
-
-extern PALETTE_INIT(portrait);
-
-extern UINT8 *portrait_bgvideoram,*portrait_fgvideoram;
-
-extern int portrait_scroll;
-
-//PALETTE_INIT( portrait );
-VIDEO_START( portrait );
-VIDEO_UPDATE( portrait );
-WRITE8_HANDLER( portrait_bgvideo_write );
-WRITE8_HANDLER( portrait_fgvideo_write );
+#include "includes/portrait.h"
 
 static WRITE8_HANDLER( portrait_ctrl_w )
 {

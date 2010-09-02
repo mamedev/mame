@@ -10,6 +10,7 @@
 #include "emu.h"
 #include "deprecat.h"
 #include "cpu/h6280/h6280.h"
+#include "includes/battlera.h"
 
 static int HuC6270_registers[20];
 static int VDC_register,vram_ptr;

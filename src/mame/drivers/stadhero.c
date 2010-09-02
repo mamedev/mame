@@ -12,18 +12,7 @@
 #include "sound/2203intf.h"
 #include "sound/3812intf.h"
 #include "sound/okim6295.h"
-
-/* Video emulation definitions */
-VIDEO_START( stadhero );
-VIDEO_UPDATE( stadhero );
-
-extern UINT16 *stadhero_pf1_data;
-extern UINT16 *stadhero_pf2_control_0;
-extern UINT16 *stadhero_pf2_control_1;
-
-WRITE16_HANDLER( stadhero_pf1_data_w );
-READ16_HANDLER( stadhero_pf2_data_r );
-WRITE16_HANDLER( stadhero_pf2_data_w );
+#include "includes/stadhero.h"
 
 /******************************************************************************/
 

@@ -1,6 +1,7 @@
 /* Speed Spin video, see driver file for notes */
 
 #include "emu.h"
+#include "includes/speedspn.h"
 
 UINT8 *speedspn_attram;
 

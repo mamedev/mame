@@ -21,17 +21,7 @@ Buccaneers has a 5.6888 Mhz and a 18.432 Mhz OSC
 #include "sound/dac.h"
 #include "sound/2203intf.h"
 #include "sound/2151intf.h"
-
-/* video/vigilant.c */
-VIDEO_START( vigilant );
-VIDEO_RESET( vigilant );
-WRITE8_HANDLER( vigilant_paletteram_w );
-WRITE8_HANDLER( vigilant_horiz_scroll_w );
-WRITE8_HANDLER( vigilant_rear_horiz_scroll_w );
-WRITE8_HANDLER( vigilant_rear_color_w );
-VIDEO_UPDATE( vigilant );
-VIDEO_UPDATE( kikcubic );
-
+#include "includes/vigilant.h"
 
 static WRITE8_HANDLER( vigilant_bank_select_w )
 {

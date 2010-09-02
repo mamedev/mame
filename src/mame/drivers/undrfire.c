@@ -193,16 +193,12 @@ Board contains only 29 ROMs and not much else.
 #include "sound/es5506.h"
 #include "includes/taito_f3.h"
 #include "audio/taito_en.h"
+#include "includes/undrfire.h"
 
 #include "cbombers.lh"
 
-VIDEO_START( undrfire );
-VIDEO_UPDATE( undrfire );
-VIDEO_UPDATE( cbombers );
-
 static UINT16 coin_word;
 static UINT16 port_sel = 0;
-extern UINT16 undrfire_rotate_ctrl[8];
 static int frame_counter=0;
 
 static UINT32 *undrfire_ram;	/* will be read in video for gun target calcs */

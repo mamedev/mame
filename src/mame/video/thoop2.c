@@ -10,6 +10,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/thoop2.h"
 
 UINT16 *thoop2_vregs;
 UINT16 *thoop2_videoram;

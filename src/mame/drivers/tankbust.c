@@ -19,24 +19,7 @@ To do:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-
-
-VIDEO_START( tankbust );
-VIDEO_UPDATE( tankbust );
-
-extern UINT8 *tankbust_txtram;
-extern UINT8 *tankbust_videoram;
-extern UINT8 *tankbust_colorram;
-
-WRITE8_HANDLER( tankbust_background_videoram_w );
-READ8_HANDLER ( tankbust_background_videoram_r );
-WRITE8_HANDLER( tankbust_background_colorram_w );
-READ8_HANDLER ( tankbust_background_colorram_r );
-WRITE8_HANDLER( tankbust_txtram_w );
-READ8_HANDLER ( tankbust_txtram_r );
-
-WRITE8_HANDLER( tankbust_xscroll_w );
-WRITE8_HANDLER( tankbust_yscroll_w );
+#include "includes/tankbust.h"
 
 
 //port A of ay8910#0

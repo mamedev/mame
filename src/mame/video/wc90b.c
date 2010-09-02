@@ -1,4 +1,5 @@
 #include "emu.h"
+#include "includes/wc90b.h"
 
 
 UINT8 *wc90b_fgvideoram,*wc90b_bgvideoram,*wc90b_txvideoram;

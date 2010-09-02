@@ -6,6 +6,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/portrait.h"
 
 int portrait_scroll;
 UINT8 *portrait_bgvideoram, *portrait_fgvideoram;

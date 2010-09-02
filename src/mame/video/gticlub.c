@@ -187,8 +187,6 @@ static int prev_poly_type;
 static UINT8 *gfxrom;
 
 
-void K001005_swap_buffers(running_machine *machine);
-
 static void K001005_exit(running_machine &machine)
 {
 	poly_free(poly);

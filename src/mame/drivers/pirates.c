@@ -91,17 +91,7 @@ Notes:
 #include "cpu/m68000/m68000.h"
 #include "machine/eeprom.h"
 #include "sound/okim6295.h"
-
-extern UINT16 *pirates_tx_tileram, *pirates_spriteram;
-extern UINT16 *pirates_fg_tileram,  *pirates_bg_tileram;
-extern UINT16 *pirates_scroll;
-
-VIDEO_START(pirates);
-WRITE16_HANDLER( pirates_tx_tileram_w );
-WRITE16_HANDLER( pirates_fg_tileram_w );
-WRITE16_HANDLER( pirates_bg_tileram_w );
-VIDEO_UPDATE(pirates);
-
+#include "includes/pirates.h"
 
 
 static const eeprom_interface eeprom_intf =

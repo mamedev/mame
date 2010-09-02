@@ -9,6 +9,9 @@
 
 /*----------- defined in machine/dc.c -----------*/
 
+READ64_HANDLER( pvr_ctrl_r );
+WRITE64_HANDLER( pvr_ctrl_w );
+
 READ64_HANDLER( dc_sysctrl_r );
 WRITE64_HANDLER( dc_sysctrl_w );
 READ64_HANDLER( dc_maple_r );
@@ -209,10 +212,6 @@ extern UINT32 pvrctrl_regs[0x100/4];
 extern UINT64 *dc_texture_ram;
 extern UINT64 *dc_framebuffer_ram;
 
-void dc_vblank( running_machine *machine );
-
-READ64_HANDLER( pvr_ctrl_r );
-WRITE64_HANDLER( pvr_ctrl_w );
 READ64_HANDLER( pvr_ta_r );
 WRITE64_HANDLER( pvr_ta_w );
 WRITE64_HANDLER( ta_fifo_poly_w );

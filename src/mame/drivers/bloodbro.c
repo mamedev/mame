@@ -110,20 +110,7 @@ DIP locations verified for:
 #include "audio/seibu.h"
 #include "cpu/z80/z80.h"
 #include "sound/3812intf.h"
-
-
-extern UINT16 *bloodbro_bgvideoram, *bloodbro_fgvideoram;
-extern UINT16 *bloodbro_txvideoram;
-extern UINT16 *bloodbro_scroll;
-
-WRITE16_HANDLER( bloodbro_bgvideoram_w );
-WRITE16_HANDLER( bloodbro_fgvideoram_w );
-WRITE16_HANDLER( bloodbro_txvideoram_w );
-
-extern VIDEO_UPDATE( bloodbro );
-extern VIDEO_UPDATE( weststry );
-extern VIDEO_UPDATE( skysmash );
-extern VIDEO_START( bloodbro );
+#include "includes/bloodbro.h"
 
 
 /* Memory Maps */

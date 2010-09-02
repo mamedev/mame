@@ -41,7 +41,6 @@ static int gx_specialrozenable; // type 1 roz, with voxel height-map, rendered f
 static int gx_rushingheroes_hack;
 static int gx_le2_textcolour_hack;
 static tilemap_t *gx_psac_tilemap, *gx_psac_tilemap2;
-extern UINT32 *gx_psacram, *gx_subpaletteram32;
 static bitmap_t* type3_roz_temp_bitmap;
 static tilemap_t* gx_psac_tilemap_alt;
 

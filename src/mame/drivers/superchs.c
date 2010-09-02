@@ -42,10 +42,7 @@
 #include "audio/taito_en.h"
 
 #include "superchs.lh"
-
-
-VIDEO_START( superchs );
-VIDEO_UPDATE( superchs );
+#include "includes/superchs.h"
 
 static UINT16 coin_word;
 static UINT32 *superchs_ram;

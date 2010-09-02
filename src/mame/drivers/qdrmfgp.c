@@ -25,14 +25,7 @@ GP1 HDD data contents:
 #include "machine/idectrl.h"
 #include "sound/k054539.h"
 #include "video/konicdev.h"
-
-VIDEO_START( qdrmfgp );
-VIDEO_START( qdrmfgp2 );
-VIDEO_UPDATE( qdrmfgp );
-
-extern void qdrmfgp_tile_callback(running_machine *machine, int layer, int *code, int *color, int *flags);
-extern void qdrmfgp2_tile_callback(running_machine *machine, int layer, int *code, int *color, int *flags);
-
+#include "includes/qdrmfgp.h"
 
 static UINT8 *sndram;
 static UINT16 *workram;

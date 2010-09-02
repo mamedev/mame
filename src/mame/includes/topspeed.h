@@ -38,5 +38,4 @@ public:
 
 /*----------- defined in video/topspeed.c -----------*/
 
-VIDEO_START( topspeed );
 VIDEO_UPDATE( topspeed );

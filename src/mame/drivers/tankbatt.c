@@ -59,18 +59,10 @@ Known issues:
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "sound/samples.h"
-
-extern UINT8 *tankbatt_bulletsram;
-extern size_t tankbatt_bulletsram_size;
+#include "includes/tankbatt.h"
 
 static int tankbatt_nmi_enable; /* No need to init this - the game will set it on reset */
 static int tankbatt_sound_enable;
-
-extern WRITE8_HANDLER( tankbatt_videoram_w );
-
-extern PALETTE_INIT( tankbatt );
-extern VIDEO_START( tankbatt );
-extern VIDEO_UPDATE( tankbatt );
 
 static WRITE8_HANDLER( tankbatt_led_w )
 {

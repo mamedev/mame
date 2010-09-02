@@ -38,6 +38,7 @@ Note:   if MAME_DEBUG is defined, pressing Z with:
 **************************************************************************/
 
 #include "emu.h"
+#include "includes/powerins.h"
 
 /* Variables that driver has access to: */
 UINT16 *powerins_vram_0, *powerins_vctrl_0;

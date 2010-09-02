@@ -13,20 +13,7 @@ Notes:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-
-/* from video */
-extern VIDEO_START( timelimt );
-extern PALETTE_INIT( timelimt );
-extern VIDEO_UPDATE( timelimt );
-
-extern WRITE8_HANDLER( timelimt_videoram_w );
-extern WRITE8_HANDLER( timelimt_bg_videoram_w );
-extern WRITE8_HANDLER( timelimt_scroll_y_w );
-extern WRITE8_HANDLER( timelimt_scroll_x_msb_w );
-extern WRITE8_HANDLER( timelimt_scroll_x_lsb_w );
-
-extern UINT8 *timelimt_bg_videoram;
-extern size_t timelimt_bg_videoram_size;
+#include "includes/timelimt.h"
 
 /***************************************************************************/
 

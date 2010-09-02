@@ -27,27 +27,12 @@ Credits:
 #include "sound/ay8910.h"
 #include "sound/samples.h"
 #include "video/tms9927.h"
+#include "includes/thief.h"
 
 #define MASTER_CLOCK	XTAL_20MHz
 
 
 static UINT8 thief_input_select;
-
-READ8_HANDLER( thief_context_ram_r );
-WRITE8_HANDLER( thief_context_ram_w );
-WRITE8_HANDLER( thief_context_bank_w );
-WRITE8_HANDLER( thief_video_control_w );
-WRITE8_HANDLER( thief_color_map_w );
-WRITE8_HANDLER( thief_color_plane_w );
-READ8_HANDLER( thief_videoram_r );
-WRITE8_HANDLER( thief_videoram_w );
-WRITE8_HANDLER( thief_blit_w );
-READ8_HANDLER( thief_coprocessor_r );
-WRITE8_HANDLER( thief_coprocessor_w );
-
-VIDEO_START( thief );
-VIDEO_UPDATE( thief );
-
 
 static INTERRUPT_GEN( thief_interrupt )
 {

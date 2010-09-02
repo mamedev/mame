@@ -76,16 +76,7 @@ TODO:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-
-extern UINT8 *lvcards_videoram;
-extern UINT8 *lvcards_colorram;
-extern WRITE8_HANDLER( lvcards_videoram_w );
-extern WRITE8_HANDLER( lvcards_colorram_w );
-
-extern PALETTE_INIT( lvcards );
-extern PALETTE_INIT( ponttehk );
-extern VIDEO_START( lvcards );
-extern VIDEO_UPDATE( lvcards );
+#include "includes/lvcards.h"
 
 static UINT8 payout;
 static UINT8 pulse;

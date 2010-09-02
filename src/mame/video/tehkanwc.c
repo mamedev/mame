@@ -12,6 +12,7 @@ robbiex@rocketmail.com
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/tehkanwc.h"
 
 UINT8 *tehkanwc_videoram;
 UINT8 *tehkanwc_colorram;

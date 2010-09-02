@@ -9,6 +9,7 @@ Video hardware driver by Uki
 *******************************************************************************/
 
 #include "emu.h"
+#include "includes/xxmissio.h"
 
 UINT8 *xxmissio_bgram;
 UINT8 *xxmissio_fgram;

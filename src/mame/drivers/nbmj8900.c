@@ -29,6 +29,7 @@ TODO:
 #include "sound/dac.h"
 #include "sound/ay8910.h"
 #include "sound/3812intf.h"
+#include "includes/nbmj8900.h"
 
 
 #define SIGNED_DAC	0		// 0:unsigned DAC, 1:signed DAC
@@ -39,19 +40,6 @@ TODO:
 #endif
 
 
-
-extern VIDEO_UPDATE( nbmj8900 );
-extern VIDEO_START( nbmj8900_2layer );
-
-extern READ8_HANDLER( nbmj8900_palette_type1_r );
-extern WRITE8_HANDLER( nbmj8900_palette_type1_w );
-extern WRITE8_HANDLER( nbmj8900_blitter_w );
-extern WRITE8_HANDLER( nbmj8900_scrolly_w );
-extern WRITE8_HANDLER( nbmj8900_vramsel_w );
-extern WRITE8_HANDLER( nbmj8900_romsel_w );
-extern WRITE8_HANDLER( nbmj8900_clutsel_w );
-extern READ8_HANDLER( nbmj8900_clut_r );
-extern WRITE8_HANDLER( nbmj8900_clut_w );
 
 
 static DRIVER_INIT( ohpaipee )

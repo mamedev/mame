@@ -6,6 +6,7 @@ Atari Sprint 4 video emulation
 
 #include "emu.h"
 #include "audio/sprint4.h"
+#include "includes/sprint4.h"
 
 static tilemap_t* playfield;
 

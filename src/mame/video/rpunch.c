@@ -7,6 +7,7 @@
 ****************************************************************************/
 
 #include "emu.h"
+#include "includes/rpunch.h"
 
 
 #define BITMAP_WIDTH	304

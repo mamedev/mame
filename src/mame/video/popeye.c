@@ -7,6 +7,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/popeye.h"
 
 UINT8 *popeye_videoram;
 UINT8 *popeye_colorram;

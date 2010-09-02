@@ -23,6 +23,7 @@ TODO:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/okim6295.h"
+#include "includes/speedspn.h"
 
 /*** README INFO **************************************************************
 
@@ -53,17 +54,6 @@ TCH-SS9.u34     "     /               AB2Bh
 
 
 ******************************************************************************/
-
-/* in video */
-extern UINT8 *speedspn_attram;
-
-WRITE8_HANDLER( speedspn_vidram_w );
-WRITE8_HANDLER( speedspn_attram_w );
-READ8_HANDLER( speedspn_vidram_r );
-VIDEO_START(speedspn);
-VIDEO_UPDATE(speedspn);
-WRITE8_HANDLER(speedspn_banked_vidram_change);
-WRITE8_HANDLER(speedspn_global_display_w);
 
 static READ8_HANDLER(speedspn_irq_ack_r)
 {

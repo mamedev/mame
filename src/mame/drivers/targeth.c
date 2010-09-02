@@ -12,16 +12,7 @@ The DS5002FP has 32KB undumped gameplay code making the game unplayable :_(
 #include "deprecat.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
-
-extern UINT16 *targeth_vregs;
-extern UINT16 *targeth_videoram;
-extern UINT16 *targeth_spriteram;
-
-/* from video/targeth.c */
-WRITE16_HANDLER( targeth_vram_w );
-VIDEO_START( targeth );
-VIDEO_UPDATE( targeth );
-
+#include "includes/targeth.h"
 
 static const gfx_layout tilelayout16_0x080000 =
 {

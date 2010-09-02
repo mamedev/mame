@@ -27,17 +27,7 @@ Notes:
 #include "cpu/m6809/m6809.h"
 #include "sound/3812intf.h"
 #include "sound/msm5205.h"
-
-extern UINT8 *spdodgeb_videoram;
-
-PALETTE_INIT( spdodgeb );
-VIDEO_START( spdodgeb );
-VIDEO_UPDATE( spdodgeb );
-INTERRUPT_GEN( spdodgeb_interrupt );
-WRITE8_HANDLER( spdodgeb_scrollx_lo_w );
-WRITE8_HANDLER( spdodgeb_ctrl_w );
-WRITE8_HANDLER( spdodgeb_videoram_w );
-
+#include "includes/spdodgeb.h"
 
 /* private globals */
 static int toggle=0;//, soundcode = 0;

@@ -365,19 +365,7 @@
 #include "cpu/m6502/m6502.h"
 #include "sound/okim6295.h"
 #include "snookr10.lh"
-
-
-/* from video */
-extern UINT8 *snookr10_videoram;
-extern UINT8 *snookr10_colorram;
-
-WRITE8_HANDLER( snookr10_videoram_w );
-WRITE8_HANDLER( snookr10_colorram_w );
-PALETTE_INIT( snookr10 );
-PALETTE_INIT( apple10 );
-VIDEO_START( snookr10 );
-VIDEO_START( apple10 );
-VIDEO_UPDATE( snookr10 );
+#include "includes/snookr10.h"
 
 static int outportl, outporth;
 static int bit0, bit1, bit2, bit3, bit4, bit5;

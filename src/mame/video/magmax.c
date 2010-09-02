@@ -8,6 +8,7 @@ Additional tweaking by Jarek Burczynski
 ***************************************************************************/
 
 #include "emu.h"
+#include "includes/magmax.h"
 
 UINT16 *magmax_scroll_x;
 UINT16 *magmax_scroll_y;

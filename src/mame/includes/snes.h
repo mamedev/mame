@@ -545,8 +545,6 @@ extern WRITE8_HANDLER( superfx_w_bank3 );
 WRITE_LINE_DEVICE_HANDLER( snes_extern_irq_w );
 
 
-extern void snes_latch_counters(running_machine *machine);
-
 extern UINT8  *snes_ram;			/* Main memory */
 
 
@@ -662,6 +660,8 @@ extern struct snes_cart_info snes_cart;
 /*----------- defined in video/snes.c -----------*/
 
 extern struct SNES_PPU_STRUCT snes_ppu;
+
+extern void snes_latch_counters(running_machine *machine);
 
 extern VIDEO_START( snes );
 extern VIDEO_UPDATE( snes );

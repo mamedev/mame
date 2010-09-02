@@ -24,14 +24,7 @@ Memory Overview:
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
 #include "sound/msm5205.h"
-
-
-extern WRITE16_HANDLER( tigeroad_videoram_w );
-extern WRITE16_HANDLER( tigeroad_videoctrl_w );
-extern WRITE16_HANDLER( tigeroad_scroll_w );
-extern VIDEO_START( tigeroad );
-extern VIDEO_UPDATE( tigeroad );
-extern VIDEO_EOF( tigeroad );
+#include "includes/tigeroad.h"
 
 
 static UINT16 *ram16;

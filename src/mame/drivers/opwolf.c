@@ -282,6 +282,7 @@ register. So what is controlling priority.
 #include "audio/taitosnd.h"
 #include "sound/2151intf.h"
 #include "sound/msm5205.h"
+#include "includes/rastan.h"
 #include "includes/opwolf.h"
 
 static READ16_HANDLER( cchip_r )

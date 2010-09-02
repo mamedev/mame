@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "includes/nb1413m3.h"
+#include "includes/pastelg.h"
 
 
 static int blitter_destx, blitter_desty;
