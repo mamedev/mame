@@ -911,7 +911,7 @@ void atarigen_set_tms5220_vol(running_machine *machine, int volume)
 
 void atarigen_set_oki6295_vol(running_machine *machine, int volume)
 {
-	atarigen_set_vol(machine, volume, SOUND_OKIM6295);
+	atarigen_set_vol(machine, volume, OKIM6295);
 }
 
 
