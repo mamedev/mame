@@ -72,38 +72,29 @@
 #include "emu.h"
 #include "includes/suna8.h"
 
-#define TILEMAPS 0
-
-static int suna8_text_dim; /* specifies format of text layer */
-
-UINT8 suna8_rombank, suna8_spritebank, suna8_palettebank;
-UINT8 suna8_unknown;
-
-
 /***************************************************************************
     For Debug: there's no tilemap, just sprites.
 ***************************************************************************/
 #if TILEMAPS
-static tilemap_t *bg_tilemap;
-static int tiles, rombank, page;
-
 static TILE_GET_INFO( get_tile_info )
 {
+	suna8_state *state = machine->driver_data<suna8_state>();
 	UINT8 code, attr;
-	if (input_code_pressed(screen->machine, KEYCODE_X))
+
+	if (input_code_pressed(machine, KEYCODE_X))
 	{
-		UINT8 *rom = memory_region(machine, REGION_CPU1) + 0x10000 + 0x4000*rombank;
+		UINT8 *rom = memory_region(machine, "maincpu") + 0x10000 + 0x4000 * state->trombank;
 		code = rom[ 2 * tile_index + 0 ];
 		attr = rom[ 2 * tile_index + 1 ];
 	}
 	else
 	{
-		code = machine->generic.spriteram.u8[ 2 * tile_index + 0 ];
-		attr = machine->generic.spriteram.u8[ 2 * tile_index + 1 ];
+		code = state->spriteram[ 2 * tile_index + 0 ];
+		attr = state->spriteram[ 2 * tile_index + 1 ];
 	}
 	SET_TILE_INFO(
 			0,
-			( (attr & 0x03) << 8 ) + code + tiles*0x400,
+			( (attr & 0x03) << 8 ) + code + state->tiles*0x400,
 			(attr >> 2) & 0xf,
 			TILE_FLIPYX( (attr >> 6) & 3 ));
 }
@@ -112,30 +103,38 @@ static TILE_GET_INFO( get_tile_info )
 
 READ8_HANDLER( suna8_banked_paletteram_r )
 {
-	offset += suna8_palettebank * 0x200;
+	suna8_state *state = space->machine->driver_data<suna8_state>();
+
+	offset += state->palettebank * 0x200;
 	return space->machine->generic.paletteram.u8[offset];
 }
 
 READ8_HANDLER( suna8_banked_spriteram_r )
 {
-	offset += suna8_spritebank * 0x2000;
-	return space->machine->generic.spriteram.u8[offset];
+	suna8_state *state = space->machine->driver_data<suna8_state>();
+
+	offset += state->spritebank * 0x2000;
+	return state->spriteram[offset];
 }
 
 WRITE8_HANDLER( suna8_spriteram_w )
 {
-	space->machine->generic.spriteram.u8[offset] = data;
+	suna8_state *state = space->machine->driver_data<suna8_state>();
+
+	state->spriteram[offset] = data;
 #if TILEMAPS
-	tilemap_mark_tile_dirty(bg_tilemap,offset/2);
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset/2);
 #endif
 }
 
 WRITE8_HANDLER( suna8_banked_spriteram_w )
 {
-	offset += suna8_spritebank * 0x2000;
-	space->machine->generic.spriteram.u8[offset] = data;
+	suna8_state *state = space->machine->driver_data<suna8_state>();
+
+	offset += state->spritebank * 0x2000;
+	state->spriteram[offset] = data;
 #if TILEMAPS
-	tilemap_mark_tile_dirty(bg_tilemap,offset/2);
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset/2);
 #endif
 }
 
@@ -144,9 +143,11 @@ WRITE8_HANDLER( suna8_banked_spriteram_w )
 */
 WRITE8_HANDLER( brickzn_banked_paletteram_w )
 {
+	suna8_state *state = space->machine->driver_data<suna8_state>();
 	int r,g,b;
 	UINT16 rgb;
-	offset += suna8_palettebank * 0x200;
+
+	offset += state->palettebank * 0x200;
 	space->machine->generic.paletteram.u8[offset] = data;
 	rgb = (space->machine->generic.paletteram.u8[offset&~1] << 8) + space->machine->generic.paletteram.u8[offset|1];
 	r	=	(((rgb & (1<<0xc))?1:0)<<0) |
@@ -169,21 +170,23 @@ WRITE8_HANDLER( brickzn_banked_paletteram_w )
 
 static void suna8_vh_start_common(running_machine *machine, int dim)
 {
-	suna8_text_dim = dim;
-	if (!(suna8_text_dim > 0))
+	suna8_state *state = machine->driver_data<suna8_state>();
+
+	state->text_dim = dim;
+	if (!(state->text_dim > 0))
 	{
-		machine->generic.paletteram.u8	=	auto_alloc_array(machine, UINT8, 0x200 * 2);
-		machine->generic.spriteram.u8	=	auto_alloc_array(machine, UINT8, 0x2000 * 2);
-		suna8_spritebank  = 0;
-		suna8_palettebank = 0;
+		machine->generic.paletteram.u8 = auto_alloc_array(machine, UINT8, 0x200 * 2);
+		state->spriteram = auto_alloc_array(machine, UINT8, 0x2000 * 2);
+		state->spritebank  = 0;
+		state->palettebank = 0;
 	}
 
 #if TILEMAPS
-	bg_tilemap = tilemap_create(	machine, get_tile_info, tilemap_scan_cols,
+	state->bg_tilemap = tilemap_create(	machine, get_tile_info, tilemap_scan_cols,
 
-								8,8,0x20*((suna8_text_dim > 0)?4:8),0x20);
+								8, 8, 0x20*((state->text_dim > 0)?4:8), 0x20);
 
-	tilemap_set_transparent_pen(bg_tilemap,15);
+	tilemap_set_transparent_pen(state->bg_tilemap, 15);
 #endif
 }
 
@@ -201,7 +204,8 @@ VIDEO_START( suna8_textdim12 )	{ suna8_vh_start_common(machine, 12); }
 
 static void draw_normal_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
-	UINT8 *spriteram = machine->generic.spriteram.u8;
+	suna8_state *state = machine->driver_data<suna8_state>();
+	UINT8 *spriteram = state->spriteram;
 	int i;
 	int mx = 0;	// multisprite x counter
 
@@ -218,7 +222,7 @@ static void draw_normal_sprites(running_machine *machine, bitmap_t *bitmap,const
 		int x		=	spriteram[i + 2];
 		int bank	=	spriteram[i + 3];
 
-		if (suna8_text_dim > 0)
+		if (state->text_dim > 0)
 		{
 			/* Older, simpler hardware */
 			flipx = 0;
@@ -334,14 +338,15 @@ static void draw_normal_sprites(running_machine *machine, bitmap_t *bitmap,const
 
 static void draw_text_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
-	UINT8 *spriteram = machine->generic.spriteram.u8;
+	suna8_state *state = machine->driver_data<suna8_state>();
+	UINT8 *spriteram = state->spriteram;
 	int i;
 
 	int max_x = machine->primary_screen->width() - 8;
 	int max_y = machine->primary_screen->height() - 8;
 
 	/* Earlier games only */
-	if (!(suna8_text_dim > 0))	return;
+	if (!(state->text_dim > 0))	return;
 
 	for (i = 0x1900; i < 0x19ff; i += 4)
 	{
@@ -354,7 +359,7 @@ static void draw_text_sprites(running_machine *machine, bitmap_t *bitmap,const r
 
 		if (~code & 0x80)	continue;
 
-		dimx = 2;					dimy = suna8_text_dim;
+		dimx = 2;					dimy = state->text_dim;
 		srcx  = (code & 0xf) * 2;	srcy = (y & 0xf0) / 8;
 		srcpg = (code >> 4) & 3;
 
@@ -416,27 +421,28 @@ VIDEO_UPDATE( suna8 )
 #if TILEMAPS
 	if (input_code_pressed(screen->machine, KEYCODE_Z) || input_code_pressed(screen->machine, KEYCODE_X))
 	{
-		int max_tiles = memory_region_length(machine, "gfx1") / (0x400 * 0x20);
+		suna8_state *state = screen->machine->driver_data<suna8_state>();
+		int max_tiles = memory_region_length(screen->machine, "gfx1") / (0x400 * 0x20);
 
-		if (input_code_pressed_once(screen->machine, KEYCODE_Q))	{ page--;	tilemap_mark_all_tiles_dirty_all(screen->machine);	}
-		if (input_code_pressed_once(screen->machine, KEYCODE_W))	{ page++;	tilemap_mark_all_tiles_dirty_all(screen->machine);	}
-		if (input_code_pressed_once(screen->machine, KEYCODE_E))	{ tiles--;	tilemap_mark_all_tiles_dirty_all(screen->machine);	}
-		if (input_code_pressed_once(screen->machine, KEYCODE_R))	{ tiles++;	tilemap_mark_all_tiles_dirty_all(screen->machine);	}
-		if (input_code_pressed_once(screen->machine, KEYCODE_A))	{ rombank--;	tilemap_mark_all_tiles_dirty_all(screen->machine);	}
-		if (input_code_pressed_once(screen->machine, KEYCODE_S))	{ rombank++;	tilemap_mark_all_tiles_dirty_all(screen->machine);	}
+		if (input_code_pressed_once(screen->machine, KEYCODE_Q))	{ state->page--;	tilemap_mark_all_tiles_dirty_all(screen->machine);	}
+		if (input_code_pressed_once(screen->machine, KEYCODE_W))	{ state->page++;	tilemap_mark_all_tiles_dirty_all(screen->machine);	}
+		if (input_code_pressed_once(screen->machine, KEYCODE_E))	{ state->tiles--;	tilemap_mark_all_tiles_dirty_all(screen->machine);	}
+		if (input_code_pressed_once(screen->machine, KEYCODE_R))	{ state->tiles++;	tilemap_mark_all_tiles_dirty_all(screen->machine);	}
+		if (input_code_pressed_once(screen->machine, KEYCODE_A))	{ state->trombank--;	tilemap_mark_all_tiles_dirty_all(screen->machine);	}
+		if (input_code_pressed_once(screen->machine, KEYCODE_S))	{ state->trombank++;	tilemap_mark_all_tiles_dirty_all(screen->machine);	}
 
-		rombank  &= 0xf;
-		page  &= (suna8_text_dim > 0)?3:7;
-		tiles %= max_tiles;
-		if (tiles < 0)	tiles += max_tiles;
+		state->rombank  &= 0xf;
+		state->page  &= (state->text_dim > 0)?3:7;
+		state->tiles %= max_tiles;
+		if (state->tiles < 0) state->tiles += max_tiles;
 
-		tilemap_set_scrollx( bg_tilemap, 0, 0x100 * page);
-		tilemap_set_scrolly( bg_tilemap, 0, 0);
-		tilemap_draw(bitmap,cliprect, bg_tilemap, 0, 0);
+		tilemap_set_scrollx(state->bg_tilemap, 0, 0x100 * state->page);
+		tilemap_set_scrolly(state->bg_tilemap, 0, 0);
+		tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 #if 1
 	popmessage("%02X %02X %02X %02X - p%2X g%02X r%02X",
-						suna8_rombank, suna8_palettebank, suna8_spritebank, suna8_unknown,
-						page,tiles,rombank	);
+						state->rombank, state->palettebank, state->spritebank, state->unknown,
+						state->page, state->tiles, state->trombank);
 #endif
 	}
 	else

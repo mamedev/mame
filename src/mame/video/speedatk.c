@@ -4,10 +4,8 @@
 
 *****************************************************************************************/
 #include "emu.h"
+#include "includes/speedatk.h"
 
-UINT8 *speedatk_videoram;
-UINT8 *speedatk_colorram;
-static tilemap_t *bg_tilemap;
 
 /*
 
@@ -77,34 +75,43 @@ PALETTE_INIT( speedatk )
 
 WRITE8_HANDLER( speedatk_videoram_w )
 {
-	speedatk_videoram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
+	speedatk_state *state = space->machine->driver_data<speedatk_state>();
+
+	state->videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( speedatk_colorram_w )
 {
-	speedatk_colorram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
+	speedatk_state *state = space->machine->driver_data<speedatk_state>();
+
+	state->colorram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 static TILE_GET_INFO( get_tile_info )
 {
+	speedatk_state *state = machine->driver_data<speedatk_state>();
 	int code, color, region;
 
-	code = speedatk_videoram[tile_index] + ((speedatk_colorram[tile_index] & 0xe0) << 3);
-	color = speedatk_colorram[tile_index] & 0x1f;
-	region = (speedatk_colorram[tile_index] & 0x10) >> 4;
+	code = state->videoram[tile_index] + ((state->colorram[tile_index] & 0xe0) << 3);
+	color = state->colorram[tile_index] & 0x1f;
+	region = (state->colorram[tile_index] & 0x10) >> 4;
 
 	SET_TILE_INFO(region, code, color, 0);
 }
 
 VIDEO_START( speedatk )
 {
-	bg_tilemap = tilemap_create(machine, get_tile_info,tilemap_scan_rows,8,8,34,30);
+	speedatk_state *state = machine->driver_data<speedatk_state>();
+
+	state->bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 8, 34, 30);
 }
 
 VIDEO_UPDATE( speedatk )
 {
-	tilemap_draw(bitmap,cliprect,bg_tilemap,0,0);
+	speedatk_state *state = screen->machine->driver_data<speedatk_state>();
+
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	return 0;
 }

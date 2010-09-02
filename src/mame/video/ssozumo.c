@@ -8,13 +8,7 @@ Driver by Takahiro Nogi (nogi@kt.rim.or.jp) 1999/10/04
 ***************************************************************************/
 
 #include "emu.h"
-
-UINT8 *ssozumo_videoram;
-UINT8 *ssozumo_colorram;
-UINT8 *ssozumo_videoram2;
-UINT8 *ssozumo_colorram2;
-
-static tilemap_t *bg_tilemap, *fg_tilemap;
+#include "includes/ssozumo.h"
 
 /**************************************************************************/
 
@@ -48,52 +42,61 @@ PALETTE_INIT( ssozumo )
 
 WRITE8_HANDLER( ssozumo_videoram_w )
 {
-	ssozumo_videoram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
+	ssozumo_state *state = space->machine->driver_data<ssozumo_state>();
+
+	state->videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( ssozumo_colorram_w )
 {
-	ssozumo_colorram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
+	ssozumo_state *state = space->machine->driver_data<ssozumo_state>();
+
+	state->colorram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( ssozumo_videoram2_w )
 {
-	ssozumo_videoram2[offset] = data;
-	tilemap_mark_tile_dirty(fg_tilemap, offset);
+	ssozumo_state *state = space->machine->driver_data<ssozumo_state>();
+
+	state->videoram2[offset] = data;
+	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
 }
 
 WRITE8_HANDLER( ssozumo_colorram2_w )
 {
-	ssozumo_colorram2[offset] = data;
-	tilemap_mark_tile_dirty(fg_tilemap, offset);
+	ssozumo_state *state = space->machine->driver_data<ssozumo_state>();
+
+	state->colorram2[offset] = data;
+	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
 }
 
 WRITE8_HANDLER( ssozumo_paletteram_w )
 {
+	ssozumo_state *state = space->machine->driver_data<ssozumo_state>();
 	int	bit0, bit1, bit2, bit3, val;
 	int	r, g, b;
 	int	offs2;
 
-	space->machine->generic.paletteram.u8[offset] = data;
+	state->paletteram[offset] = data;
 	offs2 = offset & 0x0f;
 
-	val = space->machine->generic.paletteram.u8[offs2];
+	val = state->paletteram[offs2];
 	bit0 = (val >> 0) & 0x01;
 	bit1 = (val >> 1) & 0x01;
 	bit2 = (val >> 2) & 0x01;
 	bit3 = (val >> 3) & 0x01;
 	r = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-	val = space->machine->generic.paletteram.u8[offs2 | 0x10];
+	val = state->paletteram[offs2 | 0x10];
 	bit0 = (val >> 0) & 0x01;
 	bit1 = (val >> 1) & 0x01;
 	bit2 = (val >> 2) & 0x01;
 	bit3 = (val >> 3) & 0x01;
 	g = 0x0e * bit0 + 0x1f * bit1 + 0x43 * bit2 + 0x8f * bit3;
 
-	val = space->machine->generic.paletteram.u8[offs2 | 0x20];
+	val = state->paletteram[offs2 | 0x20];
 	bit0 = (val >> 0) & 0x01;
 	bit1 = (val >> 1) & 0x01;
 	bit2 = (val >> 2) & 0x01;
@@ -105,7 +108,9 @@ WRITE8_HANDLER( ssozumo_paletteram_w )
 
 WRITE8_HANDLER( ssozumo_scroll_w )
 {
-	tilemap_set_scrolly(bg_tilemap, 0, data);
+	ssozumo_state *state = space->machine->driver_data<ssozumo_state>();
+
+	tilemap_set_scrolly(state->bg_tilemap, 0, data);
 }
 
 WRITE8_HANDLER( ssozumo_flipscreen_w )
@@ -115,8 +120,9 @@ WRITE8_HANDLER( ssozumo_flipscreen_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int code = ssozumo_videoram[tile_index] + ((ssozumo_colorram[tile_index] & 0x08) << 5);
-	int color = (ssozumo_colorram[tile_index] & 0x30) >> 4;
+	ssozumo_state *state = machine->driver_data<ssozumo_state>();
+	int code = state->videoram[tile_index] + ((state->colorram[tile_index] & 0x08) << 5);
+	int color = (state->colorram[tile_index] & 0x30) >> 4;
 	int flags = ((tile_index % 32) >= 16) ? TILE_FLIPY : 0;
 
 	SET_TILE_INFO(1, code, color, flags);
@@ -124,29 +130,33 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	int code = ssozumo_videoram2[tile_index] + 256 * (ssozumo_colorram2[tile_index] & 0x07);
-	int color = (ssozumo_colorram2[tile_index] & 0x30) >> 4;
+	ssozumo_state *state = machine->driver_data<ssozumo_state>();
+	int code = state->videoram2[tile_index] + 256 * (state->colorram2[tile_index] & 0x07);
+	int color = (state->colorram2[tile_index] & 0x30) >> 4;
 
 	SET_TILE_INFO(0, code, color, 0);
 }
 
 VIDEO_START( ssozumo )
 {
-	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols_flip_x,
+	ssozumo_state *state = machine->driver_data<ssozumo_state>();
+
+	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_cols_flip_x,
 		 16, 16, 16, 32);
 
-	fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_cols_flip_x,
+	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_cols_flip_x,
 		 8, 8, 32, 32);
 
-	tilemap_set_transparent_pen(fg_tilemap, 0);
+	tilemap_set_transparent_pen(state->fg_tilemap, 0);
 }
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	UINT8 *spriteram = machine->generic.spriteram.u8;
+	ssozumo_state *state = machine->driver_data<ssozumo_state>();
+	UINT8 *spriteram = state->spriteram;
 	int offs;
 
-	for (offs = 0; offs < machine->generic.spriteram_size; offs += 4)
+	for (offs = 0; offs < state->spriteram_size; offs += 4)
 	{
 		if (spriteram[offs] & 0x01)
 		{
@@ -176,8 +186,10 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( ssozumo )
 {
-	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
-	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
+	ssozumo_state *state = screen->machine->driver_data<ssozumo_state>();
+
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, 0);
 	draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;
 }

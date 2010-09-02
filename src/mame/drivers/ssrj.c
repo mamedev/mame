@@ -32,42 +32,35 @@ HW info :
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-
-extern UINT8 *ssrj_vram1,*ssrj_vram2,*ssrj_vram3,*ssrj_vram4,*ssrj_scrollram;
-
-WRITE8_HANDLER(ssrj_vram1_w);
-WRITE8_HANDLER(ssrj_vram2_w);
-WRITE8_HANDLER(ssrj_vram4_w);
-
-VIDEO_START( ssrj );
-VIDEO_UPDATE( ssrj );
-PALETTE_INIT( ssrj );
-
-static int oldport;
+#include "includes/ssrj.h"
 
 static MACHINE_RESET(ssrj)
 {
+	ssrj_state *state = machine->driver_data<ssrj_state>();
 	UINT8 *rom = memory_region(machine, "maincpu");
+
 	memset(&rom[0xc000], 0 ,0x3fff); /* req for some control types */
-	oldport = 0x80;
+	state->oldport = 0x80;
 }
 
 static READ8_HANDLER(ssrj_wheel_r)
 {
+	ssrj_state *state = space->machine->driver_data<ssrj_state>();
 	int port = input_port_read(space->machine, "IN1") - 0x80;
-	int retval = port-oldport;
-	oldport = port;
+	int retval = port - state->oldport;
+
+	state->oldport = port;
 	return retval;
 }
 
 static ADDRESS_MAP_START( ssrj_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(ssrj_vram1_w) AM_BASE(&ssrj_vram1)
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(ssrj_vram2_w) AM_BASE(&ssrj_vram2)
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE(&ssrj_vram3)
-	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(ssrj_vram4_w) AM_BASE(&ssrj_vram4)
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(ssrj_vram1_w) AM_BASE_MEMBER(ssrj_state, vram1)
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(ssrj_vram2_w) AM_BASE_MEMBER(ssrj_state, vram2)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE_MEMBER(ssrj_state, vram3)
+	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(ssrj_vram4_w) AM_BASE_MEMBER(ssrj_state, vram4)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM
-	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE(&ssrj_scrollram)
+	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE_MEMBER(ssrj_state, scrollram)
 	AM_RANGE(0xf000, 0xf000) AM_READ_PORT("IN0")
 	AM_RANGE(0xf001, 0xf001) AM_READ(ssrj_wheel_r)
 	AM_RANGE(0xf002, 0xf002) AM_READ_PORT("IN2")
@@ -148,7 +141,7 @@ static const ay8910_interface ay8910_config =
 };
 
 
-static MACHINE_CONFIG_START( ssrj, driver_device )
+static MACHINE_CONFIG_START( ssrj, ssrj_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,8000000/2)

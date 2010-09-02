@@ -1,20 +1,21 @@
 #include "emu.h"
-
-static tilemap_t *tilemap1,*tilemap2,*tilemap4;
-UINT8 *ssrj_vram1,*ssrj_vram2,*ssrj_vram3,*ssrj_vram4,*ssrj_scrollram;
+#include "includes/ssrj.h"
 
 /* tilemap 1 */
 
 WRITE8_HANDLER(ssrj_vram1_w)
 {
-	ssrj_vram1[offset]=data;
-	tilemap_mark_tile_dirty(tilemap1,offset>>1);
+	ssrj_state *state = space->machine->driver_data<ssrj_state>();
+
+	state->vram1[offset] = data;
+	tilemap_mark_tile_dirty(state->tilemap1, offset>>1);
 }
 
 static TILE_GET_INFO( get_tile_info1 )
 {
+	ssrj_state *state = machine->driver_data<ssrj_state>();
 	int code;
-	code=ssrj_vram1[tile_index<<1]+(ssrj_vram1[(tile_index<<1)+1]<<8);
+	code = state->vram1[tile_index<<1] + (state->vram1[(tile_index<<1)+1]<<8);
 	SET_TILE_INFO(
 		0,
 		code&0x3ff,
@@ -26,14 +27,17 @@ static TILE_GET_INFO( get_tile_info1 )
 
 WRITE8_HANDLER(ssrj_vram2_w)
 {
-	ssrj_vram2[offset]=data;
-	tilemap_mark_tile_dirty(tilemap2,offset>>1);
+	ssrj_state *state = space->machine->driver_data<ssrj_state>();
+
+	state->vram2[offset] = data;
+	tilemap_mark_tile_dirty(state->tilemap2, offset>>1);
 }
 
 static TILE_GET_INFO( get_tile_info2 )
 {
+	ssrj_state *state = machine->driver_data<ssrj_state>();
 	int code;
-	code=ssrj_vram2[tile_index<<1]+(ssrj_vram2[(tile_index<<1)+1]<<8);
+	code = state->vram2[tile_index<<1] + (state->vram2[(tile_index<<1)+1]<<8);
 	SET_TILE_INFO(
 		0,
 		code&0x3ff,
@@ -45,14 +49,17 @@ static TILE_GET_INFO( get_tile_info2 )
 
 WRITE8_HANDLER(ssrj_vram4_w)
 {
-	ssrj_vram4[offset]=data;
-	tilemap_mark_tile_dirty(tilemap4,offset>>1);
+	ssrj_state *state = space->machine->driver_data<ssrj_state>();
+
+	state->vram4[offset] = data;
+	tilemap_mark_tile_dirty(state->tilemap4, offset>>1);
 }
 
 static TILE_GET_INFO( get_tile_info4 )
 {
+	ssrj_state *state = machine->driver_data<ssrj_state>();
 	int code;
-	code=ssrj_vram4[tile_index<<1]+(ssrj_vram4[(tile_index<<1)+1]<<8);
+	code = state->vram4[tile_index<<1] + (state->vram4[(tile_index<<1)+1]<<8);
 	SET_TILE_INFO(
 		0,
 		code&0x3ff,
@@ -62,7 +69,7 @@ static TILE_GET_INFO( get_tile_info4 )
 
 
 
-static const int fakecols[4*4][8][3]=
+static const UINT8 fakecols[4*4][8][3]=
 {
 
 {{0x00,0x00,0x00},
@@ -217,59 +224,66 @@ static const int fakecols[4*4][8][3]=
 
 VIDEO_START( ssrj )
 {
-	tilemap1 = tilemap_create( machine, get_tile_info1,tilemap_scan_rows,8,8,32,32 );
-	tilemap2 = tilemap_create( machine, get_tile_info2,tilemap_scan_rows,8,8,32,32 );
-	tilemap4 = tilemap_create( machine, get_tile_info4,tilemap_scan_rows,8,8,32,32 );
-	tilemap_set_transparent_pen(tilemap2,0);
-	tilemap_set_transparent_pen(tilemap4,0);
+	ssrj_state *state = machine->driver_data<ssrj_state>();
+
+	state->tilemap1 = tilemap_create(machine, get_tile_info1, tilemap_scan_rows, 8, 8, 32, 32);
+	state->tilemap2 = tilemap_create(machine, get_tile_info2, tilemap_scan_rows, 8, 8, 32, 32);
+	state->tilemap4 = tilemap_create(machine, get_tile_info4, tilemap_scan_rows, 8, 8, 32, 32);
+	tilemap_set_transparent_pen(state->tilemap2, 0);
+	tilemap_set_transparent_pen(state->tilemap4, 0);
 }
 
 
 static void draw_objects(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
+	ssrj_state *state = machine->driver_data<ssrj_state>();
 	int i,j,k,x,y;
 
 	for(i=0;i<6;i++)
 	{
-	  x=ssrj_scrollram[0x80+20*i];
-	  y=ssrj_scrollram[0x80+20*i+2];
-	  if(!ssrj_scrollram[0x80+20*i+3])
-	    for(k=0;k<5;k++,y+=8)
-	     for(j=0;j<0x20;j++)
-	     {
-		int code;
-		code=ssrj_vram3[(i*5+k)*64+(31-j)*2]+256*ssrj_vram3[(i*5+k)*64+(31-j)*2+1];
-		drawgfx_transpen(bitmap,
-			cliprect,machine->gfx[0],
-			code&1023,
-			((code>>12)&0x3)+8,
-			code&0x8000,
-			code&0x4000,
-			(247-(x+(j<<3)))&0xff,
-			y,
-			0);
-	     }
+		x = state->scrollram[0x80+20*i];
+		y = state->scrollram[0x80+20*i+2];
+		if (!state->scrollram[0x80+20*i+3])
+			for(k=0;k<5;k++,y+=8)
+				for(j=0;j<0x20;j++)
+				{
+					int code;
+					int offs = (i * 5 + k) * 64 + (31 - j) * 2;
+
+					code = state->vram3[offs] + 256 * state->vram3[offs + 1];
+					drawgfx_transpen(bitmap,
+						cliprect,machine->gfx[0],
+						code&1023,
+						((code>>12)&0x3)+8,
+						code&0x8000,
+						code&0x4000,
+						(247-(x+(j<<3)))&0xff,
+						y,
+						0);
+				}
 	}
 }
 
 
 PALETTE_INIT( ssrj )
 {
-	int i,j;
-	for(i=0;i<4*4;i++)
-	 for(j=0;j<8;j++)
-	  palette_set_color_rgb(machine,i*8+j,fakecols[i][j][0],fakecols[i][j][1],fakecols[i][j][2]);
+	int i, j;
+	for(i=0; i<4*4; i++)
+		for(j=0; j<8; j++)
+			palette_set_color_rgb(machine, i*8+j, fakecols[i][j][0], fakecols[i][j][1], fakecols[i][j][2]);
 }
 
 VIDEO_UPDATE( ssrj )
 {
-	tilemap_set_scrolly(tilemap1 , 0, 0xff-ssrj_scrollram[2] );
-	tilemap_set_scrollx(tilemap1 , 0, ssrj_scrollram[0] );
-	tilemap_draw(bitmap,cliprect,tilemap1, 0,0);
-	draw_objects(screen->machine, bitmap,cliprect);
-	tilemap_draw(bitmap,cliprect,tilemap2, 0,0);
+	ssrj_state *state = screen->machine->driver_data<ssrj_state>();
 
-	if(ssrj_scrollram[0x101]==0xb)tilemap_draw(bitmap,cliprect,tilemap4, 0,0);/* hack to display 4th tilemap */
+	tilemap_set_scrolly(state->tilemap1, 0, 0xff-state->scrollram[2] );
+	tilemap_set_scrollx(state->tilemap1, 0, state->scrollram[0] );
+	tilemap_draw(bitmap, cliprect, state->tilemap1, 0, 0);
+	draw_objects(screen->machine, bitmap, cliprect);
+	tilemap_draw(bitmap, cliprect, state->tilemap2, 0, 0);
+
+	if (state->scrollram[0x101] == 0xb) tilemap_draw(bitmap, cliprect, state->tilemap4, 0, 0);/* hack to display 4th tilemap */
 	return 0;
 }
 

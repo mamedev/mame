@@ -58,25 +58,14 @@ Notes:
 #include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "sound/sn76496.h"
+#include "includes/sprcros2.h"
 
-extern UINT8 *sprcros2_fgvideoram, *sprcros2_spriteram, *sprcros2_bgvideoram;
-extern size_t sprcros2_spriteram_size;
-
-WRITE8_HANDLER( sprcros2_fgvideoram_w );
-WRITE8_HANDLER( sprcros2_bgvideoram_w );
-WRITE8_HANDLER( sprcros2_bgscrollx_w );
-WRITE8_HANDLER( sprcros2_bgscrolly_w );
-
-PALETTE_INIT( sprcros2 );
-VIDEO_START( sprcros2 );
-VIDEO_UPDATE( sprcros2 );
-UINT8 sprcros2_m_port7 = 0;
-static UINT8 sprcros2_s_port3 = 0;
 
 
 
 static WRITE8_HANDLER( sprcros2_m_port7_w )
 {
+	sprcros2_state *state = space->machine->driver_data<sprcros2_state>();
 	UINT8 *RAM = memory_region(space->machine, "master");
 
 	//76543210
@@ -88,16 +77,17 @@ static WRITE8_HANDLER( sprcros2_m_port7_w )
 	//------x- flip screen
 	//-------x nmi enable
 
-	if((sprcros2_m_port7^data)&0x40)
+	if((state->m_port7^data)&0x40)
 		memory_set_bankptr(space->machine, "bank1",&RAM[0x10000+((data&0x40)<<7)]);
 
 	tilemap_set_flip_all( space->machine,data&0x02?(TILEMAP_FLIPX|TILEMAP_FLIPY):0 );
 
-	sprcros2_m_port7 = data;
+	state->m_port7 = data;
 }
 
 static WRITE8_HANDLER( sprcros2_s_port3_w )
 {
+	sprcros2_state *state = space->machine->driver_data<sprcros2_state>();
 	UINT8 *RAM = memory_region(space->machine, "slave");
 
 	//76543210
@@ -106,18 +96,18 @@ static WRITE8_HANDLER( sprcros2_s_port3_w )
 	//-----xx- unused
 	//-------x nmi enable
 
-	if((sprcros2_s_port3^data)&0x08)
+	if((state->s_port3^data)&0x08)
 		memory_set_bankptr(space->machine, "bank2",&RAM[0x10000+((data&0x08)<<10)]);
 
-	sprcros2_s_port3 = data;
+	state->s_port3 = data;
 }
 
 static ADDRESS_MAP_START( sprcros2_master_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(sprcros2_fgvideoram_w) AM_BASE(&sprcros2_fgvideoram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(sprcros2_fgvideoram_w) AM_BASE_MEMBER(sprcros2_state, fgvideoram)
 	AM_RANGE(0xe800, 0xe817) AM_RAM						//always zero
-	AM_RANGE(0xe818, 0xe83f) AM_RAM AM_BASE(&sprcros2_spriteram) AM_SIZE(&sprcros2_spriteram_size)
+	AM_RANGE(0xe818, 0xe83f) AM_RAM AM_BASE_SIZE_MEMBER(sprcros2_state, spriteram, spriteram_size)
 	AM_RANGE(0xe840, 0xefff) AM_RAM						//always zero
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("share1")			//shared with slave cpu
@@ -136,7 +126,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sprcros2_slave_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK("bank2")
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(sprcros2_bgvideoram_w) AM_BASE(&sprcros2_bgvideoram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(sprcros2_bgvideoram_w) AM_BASE_MEMBER(sprcros2_state, bgvideoram)
 	AM_RANGE(0xe800, 0xefff) AM_RAM						//always zero
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM
 	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("share1")
@@ -243,31 +233,37 @@ GFXDECODE_END
 
 static INTERRUPT_GEN( sprcros2_m_interrupt )
 {
+	sprcros2_state *state = device->machine->driver_data<sprcros2_state>();
+
 	if (cpu_getiloops(device) == 0)
 	{
-		if(sprcros2_m_port7&0x01)
+		if(state->m_port7&0x01)
 			cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 	}
 	else
 	{
-		if(sprcros2_m_port7&0x08)
+		if(state->m_port7&0x08)
 			cpu_set_input_line(device, 0, HOLD_LINE);
 	}
 }
 
 static INTERRUPT_GEN( sprcros2_s_interrupt )
 {
-	if(sprcros2_s_port3&0x01)
+	sprcros2_state *state = device->machine->driver_data<sprcros2_state>();
+
+	if(state->s_port3&0x01)
 		cpu_set_input_line(device, INPUT_LINE_NMI, PULSE_LINE);
 }
 
 static MACHINE_START( sprcros2 )
 {
-	state_save_register_global(machine, sprcros2_m_port7);
-	state_save_register_global(machine, sprcros2_s_port3);
+	sprcros2_state *state = machine->driver_data<sprcros2_state>();
+
+	state_save_register_global(machine, state->m_port7);
+	state_save_register_global(machine, state->s_port3);
 }
 
-static MACHINE_CONFIG_START( sprcros2, driver_device )
+static MACHINE_CONFIG_START( sprcros2, sprcros2_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("master", Z80,10000000/2)

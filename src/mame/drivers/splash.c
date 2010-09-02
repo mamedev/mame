@@ -47,24 +47,7 @@ TS 2006.12.22:
 #include "sound/2203intf.h"
 #include "sound/3812intf.h"
 #include "sound/msm5205.h"
-
-
-extern UINT16 *splash_vregs;
-extern UINT16 *splash_videoram;
-extern UINT16 *splash_spriteram;
-extern UINT16 *splash_pixelram;
-extern UINT16 *roldfrog_bitmap_mode;
-static UINT16 *roldfrog_protdata;
-static int adpcm_data;
-static int ret;
-
-extern int splash_bitmap_type;
-extern int splash_sprite_attr2_shift;
-
-WRITE16_HANDLER( splash_vram_w );
-VIDEO_START( splash );
-VIDEO_UPDATE( splash );
-VIDEO_UPDATE( funystrp );
+#include "includes/splash.h"
 
 static WRITE16_HANDLER( splash_sh_irqtrigger_w )
 {
@@ -107,30 +90,34 @@ static WRITE16_HANDLER( splash_coin_w )
 
 static ADDRESS_MAP_START( splash_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM													/* ROM */
-	AM_RANGE(0x800000, 0x83ffff) AM_RAM AM_BASE(&splash_pixelram)						/* Pixel Layer */
+	AM_RANGE(0x800000, 0x83ffff) AM_RAM AM_BASE_MEMBER(splash_state, pixelram)						/* Pixel Layer */
 	AM_RANGE(0x840000, 0x840001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x840002, 0x840003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x840004, 0x840005) AM_READ_PORT("P1")
 	AM_RANGE(0x840006, 0x840007) AM_READ_PORT("P2")
 	AM_RANGE(0x84000e, 0x84000f) AM_WRITE(splash_sh_irqtrigger_w)						/* Sound command */
 	AM_RANGE(0x84000a, 0x84003b) AM_WRITE(splash_coin_w)								/* Coin Counters + Coin Lockout */
-	AM_RANGE(0x880000, 0x8817ff) AM_RAM_WRITE(splash_vram_w) AM_BASE(&splash_videoram)	/* Video RAM */
-	AM_RANGE(0x881800, 0x881803) AM_RAM AM_BASE(&splash_vregs)							/* Scroll registers */
+	AM_RANGE(0x880000, 0x8817ff) AM_RAM_WRITE(splash_vram_w) AM_BASE_MEMBER(splash_state, videoram)	/* Video RAM */
+	AM_RANGE(0x881800, 0x881803) AM_RAM AM_BASE_MEMBER(splash_state, vregs)							/* Scroll registers */
 	AM_RANGE(0x881804, 0x881fff) AM_RAM													/* Work RAM */
 	AM_RANGE(0x8c0000, 0x8c0fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)/* Palette is xRRRRxGGGGxBBBBx */
-	AM_RANGE(0x900000, 0x900fff) AM_RAM AM_BASE(&splash_spriteram)						/* Sprite RAM */
+	AM_RANGE(0x900000, 0x900fff) AM_RAM AM_BASE_MEMBER(splash_state, spriteram)						/* Sprite RAM */
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM													/* Work RAM */
 ADDRESS_MAP_END
 
 static WRITE8_HANDLER( splash_adpcm_data_w )
 {
-	adpcm_data = data;
+	splash_state *state = space->machine->driver_data<splash_state>();
+
+	state->adpcm_data = data;
 }
 
 static void splash_msm5205_int(running_device *device)
 {
-	msm5205_data_w(device,adpcm_data >> 4);
-	adpcm_data = (adpcm_data << 4) & 0xf0;
+	splash_state *state = device->machine->driver_data<splash_state>();
+
+	msm5205_data_w(device, state->adpcm_data >> 4);
+	state->adpcm_data = (state->adpcm_data << 4) & 0xf0;
 }
 
 static ADDRESS_MAP_START( splash_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -148,28 +135,30 @@ ADDRESS_MAP_END
 
 static READ16_HANDLER( roldfrog_bombs_r )
 {
-	ret ^= 0x100;
-	return ret;
+	splash_state *state = space->machine->driver_data<splash_state>();
+
+	state->ret ^= 0x100;
+	return state->ret;
 }
 
 static ADDRESS_MAP_START( roldfrog_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM													/* ROM */
-	AM_RANGE(0x400000, 0x407fff) AM_ROM	AM_BASE(&roldfrog_protdata)						/* Protection Data */
+	AM_RANGE(0x400000, 0x407fff) AM_ROM AM_BASE_MEMBER(splash_state, protdata)						/* Protection Data */
 	AM_RANGE(0x408000, 0x4087ff) AM_RAM 												/* Extra Ram */
-	AM_RANGE(0x800000, 0x83ffff) AM_RAM AM_BASE(&splash_pixelram)						/* Pixel Layer */
+	AM_RANGE(0x800000, 0x83ffff) AM_RAM AM_BASE_MEMBER(splash_state, pixelram)						/* Pixel Layer */
 	AM_RANGE(0x840000, 0x840001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x840002, 0x840003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x840004, 0x840005) AM_READ_PORT("P1")
 	AM_RANGE(0x840006, 0x840007) AM_READ_PORT("P2")
 	AM_RANGE(0x84000e, 0x84000f) AM_WRITE(roldf_sh_irqtrigger_w)						/* Sound command */
 	AM_RANGE(0x84000a, 0x84003b) AM_WRITE(splash_coin_w)								/* Coin Counters + Coin Lockout */
-	AM_RANGE(0x880000, 0x8817ff) AM_RAM_WRITE(splash_vram_w) AM_BASE(&splash_videoram)	/* Video RAM */
-	AM_RANGE(0x881800, 0x881803) AM_RAM AM_BASE(&splash_vregs)							/* Scroll registers */
+	AM_RANGE(0x880000, 0x8817ff) AM_RAM_WRITE(splash_vram_w) AM_BASE_MEMBER(splash_state, videoram)	/* Video RAM */
+	AM_RANGE(0x881800, 0x881803) AM_RAM AM_BASE_MEMBER(splash_state, vregs)							/* Scroll registers */
 	AM_RANGE(0x881804, 0x881fff) AM_RAM													/* Work RAM */
 	AM_RANGE(0x8c0000, 0x8c0fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)/* Palette is xRRRRxGGGGxBBBBx */
 	AM_RANGE(0xa00000, 0xa00001) AM_READ(roldfrog_bombs_r)
-	AM_RANGE(0xd00000, 0xd00fff) AM_RAM AM_BASE(&splash_spriteram)						/* Sprite RAM */
-	AM_RANGE(0xe00000, 0xe00001) AM_WRITEONLY AM_BASE(&roldfrog_bitmap_mode)			/* Bitmap Mode? */
+	AM_RANGE(0xd00000, 0xd00fff) AM_RAM AM_BASE_MEMBER(splash_state, spriteram)						/* Sprite RAM */
+	AM_RANGE(0xe00000, 0xe00001) AM_WRITEONLY AM_BASE_MEMBER(splash_state, bitmap_mode)			/* Bitmap Mode? */
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM													/* Work RAM */
 ADDRESS_MAP_END
 
@@ -190,18 +179,18 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( funystrp_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM													/* ROM */
 	AM_RANGE(0x100000, 0x100fff) AM_RAM													/* protection? RAM */
-	AM_RANGE(0x800000, 0x83ffff) AM_RAM AM_BASE(&splash_pixelram)						/* Pixel Layer */
+	AM_RANGE(0x800000, 0x83ffff) AM_RAM AM_BASE_MEMBER(splash_state, pixelram)						/* Pixel Layer */
 //  AM_RANGE(0x84000e, 0x84000f) AM_WRITE(splash_sh_irqtrigger_w)                       /* Sound command */
 	AM_RANGE(0x84000a, 0x84003b) AM_WRITE(splash_coin_w)								/* Coin Counters + Coin Lockout */
 	AM_RANGE(0x840000, 0x840001) AM_READ_PORT("DSW1")
 	AM_RANGE(0x840002, 0x840003) AM_READ_PORT("DSW2")
 	AM_RANGE(0x840004, 0x840005) AM_READ_PORT("P1")
 	AM_RANGE(0x840006, 0x840007) AM_READ_PORT("P2")
-	AM_RANGE(0x880000, 0x8817ff) AM_RAM_WRITE(splash_vram_w) AM_BASE(&splash_videoram)	/* Video RAM */
-	AM_RANGE(0x881800, 0x881803) AM_RAM AM_BASE(&splash_vregs)							/* Scroll registers */
+	AM_RANGE(0x880000, 0x8817ff) AM_RAM_WRITE(splash_vram_w) AM_BASE_MEMBER(splash_state, videoram)	/* Video RAM */
+	AM_RANGE(0x881800, 0x881803) AM_RAM AM_BASE_MEMBER(splash_state, vregs)							/* Scroll registers */
 	AM_RANGE(0x881804, 0x881fff) AM_RAM													/* Work RAM */
 	AM_RANGE(0x8c0000, 0x8c0fff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)/* Palette is xRRRRxGGGGxBBBBx */
-	AM_RANGE(0xd00000, 0xd01fff) AM_RAM AM_BASE(&splash_spriteram)						/* Sprite RAM */
+	AM_RANGE(0xd00000, 0xd01fff) AM_RAM AM_BASE_MEMBER(splash_state, spriteram)						/* Sprite RAM */
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM													/* Work RAM */
 ADDRESS_MAP_END
 
@@ -387,11 +376,13 @@ static const msm5205_interface splash_msm5205_interface =
 
 static MACHINE_RESET( splash )
 {
-	adpcm_data = 0;
-	ret = 0x100;
+	splash_state *state = machine->driver_data<splash_state>();
+
+	state->adpcm_data = 0;
+	state->ret = 0x100;
 }
 
-static MACHINE_CONFIG_START( splash, driver_device )
+static MACHINE_CONFIG_START( splash, splash_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,24000000/2)			/* 12 MHz (24/2) */
@@ -849,27 +840,35 @@ ROM_END
 
 static DRIVER_INIT( splash )
 {
-	splash_bitmap_type = 0;
-	splash_sprite_attr2_shift = 8;
+	splash_state *state = machine->driver_data<splash_state>();
+
+	state->bitmap_type = 0;
+	state->sprite_attr2_shift = 8;
 }
 
 static DRIVER_INIT( splash10 )
 {
-	splash_bitmap_type = 0;
-	splash_sprite_attr2_shift = 0;
+	splash_state *state = machine->driver_data<splash_state>();
+
+	state->bitmap_type = 0;
+	state->sprite_attr2_shift = 0;
 }
 
 static DRIVER_INIT( roldfrog )
 {
-	splash_bitmap_type = 1;
-	splash_sprite_attr2_shift = 8;
+	splash_state *state = machine->driver_data<splash_state>();
+
+	state->bitmap_type = 1;
+	state->sprite_attr2_shift = 8;
 }
 
 static DRIVER_INIT( rebus )
 {
+	splash_state *state = machine->driver_data<splash_state>();
 	UINT16 *ROM = (UINT16 *)memory_region(machine, "maincpu");
-	splash_bitmap_type = 1;
-	splash_sprite_attr2_shift = 0;
+
+	state->bitmap_type = 1;
+	state->sprite_attr2_shift = 0;
 
 	//d1 clear , regs restore and rte - end of trap $b
 	ROM[0x196c0/2] = 0x7200;
@@ -895,10 +894,11 @@ static DRIVER_INIT( rebus )
 
 static DRIVER_INIT( funystrp )
 {
+	splash_state *state = machine->driver_data<splash_state>();
 	UINT16 *ROM = (UINT16 *)memory_region(machine, "maincpu");
 
-	splash_bitmap_type = 0;
-	splash_sprite_attr2_shift = 0;
+	state->bitmap_type = 0;
+	state->sprite_attr2_shift = 0;
 
 	/* part of the protection? */
 	ROM[0x04770/2] = 0x4e71;

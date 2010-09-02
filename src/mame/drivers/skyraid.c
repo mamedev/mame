@@ -8,17 +8,6 @@ Atari Sky Raider driver
 #include "cpu/m6502/m6502.h"
 #include "includes/skyraid.h"
 
-extern UINT8* skyraid_alpha_num_ram;
-extern UINT8* skyraid_pos_ram;
-extern UINT8* skyraid_obj_ram;
-
-extern int skyraid_scroll;
-
-extern VIDEO_START(skyraid);
-extern VIDEO_UPDATE(skyraid);
-
-static int analog_range;
-static int analog_offset;
 
 
 static PALETTE_INIT( skyraid )
@@ -47,11 +36,12 @@ static PALETTE_INIT( skyraid )
 
 static READ8_HANDLER( skyraid_port_0_r )
 {
+	skyraid_state *state = space->machine->driver_data<skyraid_state>();
 	UINT8 val = input_port_read(space->machine, "LANGUAGE");
 
-	if (input_port_read(space->machine, "STICKY") > analog_range)
+	if (input_port_read(space->machine, "STICKY") > state->analog_range)
 		val |= 0x40;
-	if (input_port_read(space->machine, "STICKX") > analog_range)
+	if (input_port_read(space->machine, "STICKX") > state->analog_range)
 		val |= 0x80;
 
 	return val;
@@ -60,31 +50,37 @@ static READ8_HANDLER( skyraid_port_0_r )
 
 static WRITE8_HANDLER( skyraid_range_w )
 {
-	analog_range = data & 0x3f;
+	skyraid_state *state = space->machine->driver_data<skyraid_state>();
+
+	state->analog_range = data & 0x3f;
 }
 
 
 static WRITE8_HANDLER( skyraid_offset_w )
 {
-	analog_offset = data & 0x3f;
+	skyraid_state *state = space->machine->driver_data<skyraid_state>();
+
+	state->analog_offset = data & 0x3f;
 }
 
 
 static WRITE8_HANDLER( skyraid_scroll_w )
 {
-	skyraid_scroll = data;
+	skyraid_state *state = space->machine->driver_data<skyraid_state>();
+
+	state->scroll = data;
 }
 
 
 static ADDRESS_MAP_START( skyraid_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM AM_MIRROR(0x300)
-	AM_RANGE(0x0400, 0x040f) AM_WRITEONLY AM_BASE(&skyraid_pos_ram)
-	AM_RANGE(0x0800, 0x087f) AM_RAM AM_MIRROR(0x480) AM_BASE(&skyraid_alpha_num_ram)
+	AM_RANGE(0x0400, 0x040f) AM_WRITEONLY AM_BASE_MEMBER(skyraid_state, pos_ram)
+	AM_RANGE(0x0800, 0x087f) AM_RAM AM_MIRROR(0x480) AM_BASE_MEMBER(skyraid_state, alpha_num_ram)
 	AM_RANGE(0x1000, 0x1000) AM_READ(skyraid_port_0_r)
 	AM_RANGE(0x1001, 0x1001) AM_READ_PORT("DSW")
 	AM_RANGE(0x1400, 0x1400) AM_READ_PORT("COIN")
 	AM_RANGE(0x1400, 0x1401) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x1c00, 0x1c0f) AM_WRITEONLY AM_BASE(&skyraid_obj_ram)
+	AM_RANGE(0x1c00, 0x1c0f) AM_WRITEONLY AM_BASE_MEMBER(skyraid_state, obj_ram)
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(skyraid_scroll_w)
 	AM_RANGE(0x4400, 0x4400) AM_DEVWRITE("discrete", skyraid_sound_w)
 	AM_RANGE(0x4800, 0x4800) AM_WRITE(skyraid_range_w)
@@ -223,7 +219,7 @@ static GFXDECODE_START( skyraid )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( skyraid, driver_device )
+static MACHINE_CONFIG_START( skyraid, skyraid_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 12096000 / 12)

@@ -58,15 +58,15 @@
 ***************************************************************************/
 
 #include "emu.h"
-
-static int color_bank;
+#include "includes/suna16.h"
 
 WRITE16_HANDLER( suna16_flipscreen_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
+		suna16_state *state = space->machine->driver_data<suna16_state>();
 		flip_screen_set(space->machine,  data & 1 );
-		color_bank =   ( data & 4 ) >> 2;
+		state->color_bank = ( data & 4 ) >> 2;
 	}
 	if (data & ~(1|4))	logerror("CPU#0 PC %06X - Flip screen unknown bits: %04X\n", cpu_get_pc(space->cpu), data);
 }
@@ -76,7 +76,7 @@ WRITE16_HANDLER( bestbest_flipscreen_w )
 	if (ACCESSING_BITS_0_7)
 	{
 		flip_screen_set(space->machine,  data & 0x10 );
-//      color_bank =   ( data & 0x07 );
+		//state->color_bank = ( data & 0x07 );
 	}
 	if (data & ~(0x10))	logerror("CPU#0 PC %06X - Flip screen unknown bits: %04X\n", cpu_get_pc(space->cpu), data);
 }
@@ -92,18 +92,24 @@ WRITE16_HANDLER( bestbest_flipscreen_w )
 
 VIDEO_START( suna16 )
 {
-	machine->generic.paletteram.u16 = auto_alloc_array(machine, UINT16, machine->total_colors());
+	suna16_state *state = machine->driver_data<suna16_state>();
+
+	state->paletteram = auto_alloc_array(machine, UINT16, machine->total_colors());
 }
 
 READ16_HANDLER( suna16_paletteram16_r )
 {
-	return space->machine->generic.paletteram.u16[offset + color_bank * 256];
+	suna16_state *state = space->machine->driver_data<suna16_state>();
+
+	return state->paletteram[offset + state->color_bank * 256];
 }
 
 WRITE16_HANDLER( suna16_paletteram16_w )
 {
-	offset += color_bank * 256;
-	data = COMBINE_DATA(&space->machine->generic.paletteram.u16[offset]);
+	suna16_state *state = space->machine->driver_data<suna16_state>();
+
+	offset += state->color_bank * 256;
+	data = COMBINE_DATA(&state->paletteram[offset]);
 	palette_set_color_rgb( space->machine, offset, pal5bit(data >> 0),pal5bit(data >> 5),pal5bit(data >> 10));
 }
 
@@ -118,8 +124,8 @@ WRITE16_HANDLER( suna16_paletteram16_w )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, UINT16 *sprites, int gfx)
 {
+	suna16_state *state = machine->driver_data<suna16_state>();
 	int offs;
-
 	int max_x = machine->primary_screen->width() - 8;
 	int max_y = machine->primary_screen->height() - 8;
 
@@ -192,7 +198,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 				drawgfx_transpen(	bitmap, cliprect,machine->gfx[gfx],
 							(tile & 0x3fff) + bank*0x4000,
-							attr + (color_bank << 4),
+							attr + (state->color_bank << 4),
 							tile_flipx, tile_flipy,
 							sx, sy,15	);
 
@@ -217,14 +223,17 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( suna16 )
 {
+	suna16_state *state = screen->machine->driver_data<suna16_state>();
+
 	/* Suna Quiz indicates the background is the last pen */
 	bitmap_fill(bitmap,cliprect,0xff);
-	draw_sprites(screen->machine, bitmap, cliprect, screen->machine->generic.spriteram.u16, 0);
+	draw_sprites(screen->machine, bitmap, cliprect, state->spriteram, 0);
 	return 0;
 }
 
 VIDEO_UPDATE( bestbest )
 {
+	suna16_state *state = screen->machine->driver_data<suna16_state>();
 	int layers_ctrl = -1;
 
 #ifdef MAME_DEBUG
@@ -238,7 +247,7 @@ if (input_code_pressed(screen->machine, KEYCODE_Z))
 
 	/* Suna Quiz indicates the background is the last pen */
 	bitmap_fill(bitmap,cliprect,0xff);
-	if (layers_ctrl & 1)	draw_sprites(screen->machine, bitmap, cliprect, screen->machine->generic.spriteram.u16,   0);
-	if (layers_ctrl & 2)	draw_sprites(screen->machine, bitmap, cliprect, screen->machine->generic.spriteram2.u16, 1);
+	if (layers_ctrl & 1)	draw_sprites(screen->machine, bitmap, cliprect, state->spriteram,  0);
+	if (layers_ctrl & 2)	draw_sprites(screen->machine, bitmap, cliprect, state->spriteram2, 1);
 	return 0;
 }

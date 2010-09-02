@@ -12,23 +12,7 @@ palazzol@home.com
 #include "emu.h"
 #include "cpu/i8085/i8085.h"
 #include "sound/samples.h"
-
-/* included from video/starcrus.c */
-WRITE8_HANDLER( starcrus_s1_x_w );
-WRITE8_HANDLER( starcrus_s1_y_w );
-WRITE8_HANDLER( starcrus_s2_x_w );
-WRITE8_HANDLER( starcrus_s2_y_w );
-WRITE8_HANDLER( starcrus_p1_x_w );
-WRITE8_HANDLER( starcrus_p1_y_w );
-WRITE8_HANDLER( starcrus_p2_x_w );
-WRITE8_HANDLER( starcrus_p2_y_w );
-WRITE8_HANDLER( starcrus_ship_parm_1_w );
-WRITE8_HANDLER( starcrus_ship_parm_2_w );
-WRITE8_HANDLER( starcrus_proj_parm_1_w );
-WRITE8_HANDLER( starcrus_proj_parm_2_w );
-READ8_HANDLER( starcrus_coll_det_r );
-extern VIDEO_START( starcrus );
-extern VIDEO_UPDATE( starcrus );
+#include "includes/starcrus.h"
 
 static ADDRESS_MAP_START( starcrus_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
@@ -150,7 +134,7 @@ static const samples_interface starcrus_samples_interface =
 };
 
 
-static MACHINE_CONFIG_START( starcrus, driver_device )
+static MACHINE_CONFIG_START( starcrus, starcrus_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", I8080,9750000/9)  /* 8224 chip is a divide by 9 */
@@ -173,7 +157,7 @@ static MACHINE_CONFIG_START( starcrus, driver_device )
 	MDRV_VIDEO_START(starcrus)
 	MDRV_VIDEO_UPDATE(starcrus)
 
-    /* sound hardware */
+	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)

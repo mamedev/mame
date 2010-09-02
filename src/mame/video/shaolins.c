@@ -8,13 +8,8 @@
 
 #include "emu.h"
 #include "video/resnet.h"
+#include "includes/shaolins.h"
 
-extern UINT8 shaolins_nmi_enable;
-
-static int palettebank;
-UINT8 *shaolins_videoram;
-UINT8 *shaolins_colorram;
-static tilemap_t *bg_tilemap;
 
 /***************************************************************************
 
@@ -95,36 +90,45 @@ PALETTE_INIT( shaolins )
 
 WRITE8_HANDLER( shaolins_videoram_w )
 {
-	shaolins_videoram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
+	shaolins_state *state = space->machine->driver_data<shaolins_state>();
+
+	state->videoram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( shaolins_colorram_w )
 {
-	shaolins_colorram[offset] = data;
-	tilemap_mark_tile_dirty(bg_tilemap, offset);
+	shaolins_state *state = space->machine->driver_data<shaolins_state>();
+
+	state->colorram[offset] = data;
+	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( shaolins_palettebank_w )
 {
-	if (palettebank != (data & 0x07))
+	shaolins_state *state = space->machine->driver_data<shaolins_state>();
+
+	if (state->palettebank != (data & 0x07))
 	{
-		palettebank = data & 0x07;
+		state->palettebank = data & 0x07;
 		tilemap_mark_all_tiles_dirty_all(space->machine);
 	}
 }
 
 WRITE8_HANDLER( shaolins_scroll_w )
 {
+	shaolins_state *state = space->machine->driver_data<shaolins_state>();
 	int col;
 
 	for (col = 4; col < 32; col++)
-		tilemap_set_scrolly(bg_tilemap, col, data + 1);
+		tilemap_set_scrolly(state->bg_tilemap, col, data + 1);
 }
 
 WRITE8_HANDLER( shaolins_nmi_w )
 {
-	shaolins_nmi_enable = data;
+	shaolins_state *state = space->machine->driver_data<shaolins_state>();
+
+	state->nmi_enable = data;
 
 	if (flip_screen_get(space->machine) != (data & 0x01))
 	{
@@ -135,9 +139,10 @@ WRITE8_HANDLER( shaolins_nmi_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int attr = shaolins_colorram[tile_index];
-	int code = shaolins_videoram[tile_index] + ((attr & 0x40) << 2);
-	int color = (attr & 0x0f) + 16 * palettebank;
+	shaolins_state *state = machine->driver_data<shaolins_state>();
+	int attr = state->colorram[tile_index];
+	int code = state->videoram[tile_index] + ((attr & 0x40) << 2);
+	int color = (attr & 0x0f) + 16 * state->palettebank;
 	int flags = (attr & 0x20) ? TILE_FLIPY : 0;
 
 	SET_TILE_INFO(0, code, color, flags);
@@ -145,23 +150,26 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( shaolins )
 {
-	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,
+	shaolins_state *state = machine->driver_data<shaolins_state>();
+
+	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,
 		 8, 8, 32, 32);
 
-	tilemap_set_scroll_cols(bg_tilemap, 32);
+	tilemap_set_scroll_cols(state->bg_tilemap, 32);
 }
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	UINT8 *spriteram = machine->generic.spriteram.u8;
+	shaolins_state *state = machine->driver_data<shaolins_state>();
+	UINT8 *spriteram = state->spriteram;
 	int offs;
 
-	for (offs = machine->generic.spriteram_size-32; offs >= 0; offs-=32 ) /* max 24 sprites */
+	for (offs = state->spriteram_size - 32; offs >= 0; offs -= 32 ) /* max 24 sprites */
 	{
 		if (spriteram[offs] && spriteram[offs + 6]) /* stop rogue sprites on high score screen */
 		{
 			int code = spriteram[offs + 8];
-			int color = (spriteram[offs + 9] & 0x0f) | (palettebank << 4);
+			int color = (spriteram[offs + 9] & 0x0f) | (state->palettebank << 4);
 			int flipx = !(spriteram[offs + 9] & 0x40);
 			int flipy = spriteram[offs + 9] & 0x80;
 			int sx = 240 - spriteram[offs + 6];
@@ -179,14 +187,16 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 				code, color,
 				flipx, flipy,
 				sx, sy,
-				colortable_get_transpen_mask(machine->colortable, machine->gfx[1], color, palettebank << 5));
+				colortable_get_transpen_mask(machine->colortable, machine->gfx[1], color, state->palettebank << 5));
 		}
 	}
 }
 
 VIDEO_UPDATE( shaolins )
 {
-	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	shaolins_state *state = screen->machine->driver_data<shaolins_state>();
+
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	draw_sprites(screen->machine, bitmap, cliprect);
 	return 0;
 }

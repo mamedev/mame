@@ -5,25 +5,21 @@ Atari Sky Raider video emulation
 ***************************************************************************/
 
 #include "emu.h"
-
-int skyraid_scroll;
-
-UINT8* skyraid_alpha_num_ram;
-UINT8* skyraid_pos_ram;
-UINT8* skyraid_obj_ram;
-
-static bitmap_t *helper;
+#include "includes/skyraid.h"
 
 
 VIDEO_START( skyraid )
 {
-	helper = auto_bitmap_alloc(machine, 128, 240, machine->primary_screen->format());
+	skyraid_state *state = machine->driver_data<skyraid_state>();
+
+	state->helper = auto_bitmap_alloc(machine, 128, 240, machine->primary_screen->format());
 }
 
 
 static void draw_text(running_machine *machine, bitmap_t* bitmap, const rectangle* cliprect)
 {
-	const UINT8* p = skyraid_alpha_num_ram;
+	skyraid_state *state = machine->driver_data<skyraid_state>();
+	const UINT8* p = state->alpha_num_ram;
 
 	int i;
 
@@ -42,6 +38,7 @@ static void draw_text(running_machine *machine, bitmap_t* bitmap, const rectangl
 
 static void draw_terrain(running_machine *machine, bitmap_t* bitmap, const rectangle *cliprect)
 {
+	skyraid_state *state = machine->driver_data<skyraid_state>();
 	const UINT8* p = memory_region(machine, "user1");
 
 	int x;
@@ -49,7 +46,7 @@ static void draw_terrain(running_machine *machine, bitmap_t* bitmap, const recta
 
 	for (y = 0; y < bitmap->height; y++)
 	{
-		int offset = (16 * skyraid_scroll + 16 * ((y + 1) / 2)) & 0x7FF;
+		int offset = (16 * state->scroll + 16 * ((y + 1) / 2)) & 0x7FF;
 
 		x = 0;
 
@@ -77,14 +74,15 @@ static void draw_terrain(running_machine *machine, bitmap_t* bitmap, const recta
 
 static void draw_sprites(running_machine *machine, bitmap_t* bitmap, const rectangle* cliprect)
 {
+	skyraid_state *state = machine->driver_data<skyraid_state>();
 	int i;
 
 	for (i = 0; i < 4; i++)
 	{
-		int code = skyraid_obj_ram[8 + 2 * i + 0] & 15;
-		int flag = skyraid_obj_ram[8 + 2 * i + 1] & 15;
-		int vert = skyraid_pos_ram[8 + 2 * i + 0];
-		int horz = skyraid_pos_ram[8 + 2 * i + 1];
+		int code = state->obj_ram[8 + 2 * i + 0] & 15;
+		int flag = state->obj_ram[8 + 2 * i + 1] & 15;
+		int vert = state->pos_ram[8 + 2 * i + 0];
+		int horz = state->pos_ram[8 + 2 * i + 1];
 
 		vert -= 31;
 
@@ -98,15 +96,16 @@ static void draw_sprites(running_machine *machine, bitmap_t* bitmap, const recta
 
 static void draw_missiles(running_machine *machine, bitmap_t* bitmap, const rectangle* cliprect)
 {
+	skyraid_state *state = machine->driver_data<skyraid_state>();
 	int i;
 
 	/* hardware is restricted to one sprite per scanline */
 
 	for (i = 0; i < 4; i++)
 	{
-		int code = skyraid_obj_ram[2 * i + 0] & 15;
-		int vert = skyraid_pos_ram[2 * i + 0];
-		int horz = skyraid_pos_ram[2 * i + 1];
+		int code = state->obj_ram[2 * i + 0] & 15;
+		int vert = state->pos_ram[2 * i + 0];
+		int horz = state->pos_ram[2 * i + 1];
 
 		vert -= 15;
 		horz -= 31;
@@ -141,12 +140,14 @@ static void draw_trapezoid(running_machine *machine, bitmap_t* dst, bitmap_t* sr
 
 VIDEO_UPDATE( skyraid )
 {
+	skyraid_state *state = screen->machine->driver_data<skyraid_state>();
+
 	bitmap_fill(bitmap, cliprect, 0);
 
-	draw_terrain(screen->machine, helper, NULL);
-	draw_sprites(screen->machine, helper, NULL);
-	draw_missiles(screen->machine, helper, NULL);
-	draw_trapezoid(screen->machine, bitmap, helper);
+	draw_terrain(screen->machine, state->helper, NULL);
+	draw_sprites(screen->machine, state->helper, NULL);
+	draw_missiles(screen->machine, state->helper, NULL);
+	draw_trapezoid(screen->machine, bitmap, state->helper);
 	draw_text(screen->machine, bitmap, cliprect);
 	return 0;
 }

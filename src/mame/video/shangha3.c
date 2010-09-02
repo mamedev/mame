@@ -60,31 +60,23 @@ Word | Bit(s)           | Use
 
 #include "emu.h"
 #include "profiler.h"
+#include "includes/shangha3.h"
 
-
-UINT16 *shangha3_ram;
-size_t shangha3_ram_size;
-
-int shangha3_do_shadows;
-
-static UINT16 gfxlist_addr;
-static bitmap_t *rawbitmap;
-
-static UINT8 drawmode_table[16];
 
 
 VIDEO_START( shangha3 )
 {
+	shangha3_state *state = machine->driver_data<shangha3_state>();
 	int i;
 
-	rawbitmap = machine->primary_screen->alloc_compatible_bitmap();
+	state->rawbitmap = machine->primary_screen->alloc_compatible_bitmap();
 
 	for (i = 0;i < 14;i++)
-		drawmode_table[i] = DRAWMODE_SOURCE;
-	drawmode_table[14] = shangha3_do_shadows ? DRAWMODE_SHADOW : DRAWMODE_SOURCE;
-	drawmode_table[15] = DRAWMODE_NONE;
+		state->drawmode_table[i] = DRAWMODE_SOURCE;
+	state->drawmode_table[14] = state->do_shadows ? DRAWMODE_SHADOW : DRAWMODE_SOURCE;
+	state->drawmode_table[15] = DRAWMODE_NONE;
 
-	if (shangha3_do_shadows)
+	if (state->do_shadows)
 	{
 		/* Prepare the shadow table */
 		for (i = 0;i < 128;i++)
@@ -107,18 +99,24 @@ WRITE16_HANDLER( shangha3_flipscreen_w )
 
 WRITE16_HANDLER( shangha3_gfxlist_addr_w )
 {
-	COMBINE_DATA(&gfxlist_addr);
+	shangha3_state *state = space->machine->driver_data<shangha3_state>();
+
+	COMBINE_DATA(&state->gfxlist_addr);
 }
 
 
 WRITE16_HANDLER( shangha3_blitter_go_w )
 {
+	shangha3_state *state = space->machine->driver_data<shangha3_state>();
+	UINT16 *shangha3_ram = state->ram;
+	bitmap_t *rawbitmap = state->rawbitmap;
+	UINT8 *drawmode_table = state->drawmode_table;
 	int offs;
 
 
 	g_profiler.start(PROFILER_VIDEO);
 
-	for (offs = gfxlist_addr << 3;offs < shangha3_ram_size/2;offs += 16)
+	for (offs = state->gfxlist_addr << 3; offs < state->ram_size/2; offs += 16)
 	{
 		int sx,sy,x,y,code,color,flipx,flipy,sizex,sizey,zoomx,zoomy;
 
@@ -265,6 +263,8 @@ else
 
 VIDEO_UPDATE( shangha3 )
 {
-	copybitmap(bitmap,rawbitmap,0,0,0,0,cliprect);
+	shangha3_state *state = screen->machine->driver_data<shangha3_state>();
+
+	copybitmap(bitmap, state->rawbitmap, 0, 0, 0, 0, cliprect);
 	return 0;
 }

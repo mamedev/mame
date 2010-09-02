@@ -11,13 +11,7 @@ driver by Nicola Salmoria
 #include "audio/m72.h"
 #include "sound/dac.h"
 #include "sound/2151intf.h"
-
-extern WRITE8_HANDLER( sichuan2_videoram_w );
-extern WRITE8_HANDLER( sichuan2_bankswitch_w );
-extern WRITE8_HANDLER( sichuan2_paletteram_w );
-
-extern VIDEO_START( sichuan2 );
-extern VIDEO_UPDATE( sichuan2 );
+#include "includes/shisen.h"
 
 static READ8_HANDLER( sichuan2_dsw1_r )
 {
@@ -51,8 +45,8 @@ static WRITE8_HANDLER( sichuan2_coin_w )
 static ADDRESS_MAP_START( shisen_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc800, 0xcaff) AM_RAM_WRITE(sichuan2_paletteram_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(sichuan2_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0xc800, 0xcaff) AM_RAM_WRITE(sichuan2_paletteram_w) AM_BASE_MEMBER(shisen_state, paletteram)
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(sichuan2_videoram_w) AM_BASE_MEMBER(shisen_state, videoram)
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -215,7 +209,7 @@ static const ym2151_interface ym2151_config =
 
 
 
-static MACHINE_CONFIG_START( shisen, driver_device )
+static MACHINE_CONFIG_START( shisen, shisen_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 6000000)	/* 6 MHz ? */

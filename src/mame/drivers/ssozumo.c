@@ -12,23 +12,7 @@ Driver by Takahiro Nogi (nogi@kt.rim.or.jp) 1999/10/04
 #include "cpu/m6809/m6809.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
-
-extern UINT8 *ssozumo_videoram;
-extern UINT8 *ssozumo_colorram;
-extern UINT8 *ssozumo_videoram2;
-extern UINT8 *ssozumo_colorram2;
-
-extern WRITE8_HANDLER( ssozumo_videoram_w );
-extern WRITE8_HANDLER( ssozumo_colorram_w );
-extern WRITE8_HANDLER( ssozumo_videoram2_w );
-extern WRITE8_HANDLER( ssozumo_colorram2_w );
-extern WRITE8_HANDLER( ssozumo_paletteram_w );
-extern WRITE8_HANDLER( ssozumo_scroll_w );
-extern WRITE8_HANDLER( ssozumo_flipscreen_w );
-
-extern PALETTE_INIT( ssozumo );
-extern VIDEO_START( ssozumo );
-extern VIDEO_UPDATE( ssozumo );
+#include "includes/ssozumo.h"
 
 static WRITE8_HANDLER( ssozumo_sh_command_w )
 {
@@ -39,11 +23,11 @@ static WRITE8_HANDLER( ssozumo_sh_command_w )
 
 static ADDRESS_MAP_START( ssozumo_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x077f) AM_RAM
-	AM_RANGE(0x0780, 0x07ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(ssozumo_videoram2_w) AM_BASE(&ssozumo_videoram2)
-	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE(ssozumo_colorram2_w) AM_BASE(&ssozumo_colorram2)
-	AM_RANGE(0x3000, 0x31ff) AM_RAM_WRITE(ssozumo_videoram_w) AM_BASE(&ssozumo_videoram)
-	AM_RANGE(0x3200, 0x33ff) AM_RAM_WRITE(ssozumo_colorram_w) AM_BASE(&ssozumo_colorram)
+	AM_RANGE(0x0780, 0x07ff) AM_RAM AM_BASE_SIZE_MEMBER(ssozumo_state, spriteram, spriteram_size)
+	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(ssozumo_videoram2_w) AM_BASE_MEMBER(ssozumo_state, videoram2)
+	AM_RANGE(0x2400, 0x27ff) AM_RAM_WRITE(ssozumo_colorram2_w) AM_BASE_MEMBER(ssozumo_state, colorram2)
+	AM_RANGE(0x3000, 0x31ff) AM_RAM_WRITE(ssozumo_videoram_w) AM_BASE_MEMBER(ssozumo_state, videoram)
+	AM_RANGE(0x3200, 0x33ff) AM_RAM_WRITE(ssozumo_colorram_w) AM_BASE_MEMBER(ssozumo_state, colorram)
 	AM_RANGE(0x3400, 0x35ff) AM_RAM
 	AM_RANGE(0x3600, 0x37ff) AM_RAM
 	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("P1") AM_WRITE(ssozumo_flipscreen_w)
@@ -51,7 +35,7 @@ static ADDRESS_MAP_START( ssozumo_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4020, 0x4020) AM_READ_PORT("DSW2") AM_WRITE(ssozumo_scroll_w)
 	AM_RANGE(0x4030, 0x4030) AM_READ_PORT("DSW1")
 //  AM_RANGE(0x4030, 0x4030) AM_WRITEONLY
-	AM_RANGE(0x4050, 0x407f) AM_RAM_WRITE(ssozumo_paletteram_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x4050, 0x407f) AM_RAM_WRITE(ssozumo_paletteram_w) AM_BASE_MEMBER(ssozumo_state, paletteram)
 	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -189,7 +173,7 @@ static GFXDECODE_START( ssozumo )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( ssozumo, driver_device )
+static MACHINE_CONFIG_START( ssozumo, ssozumo_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 1200000)	/* 1.2 MHz ???? */

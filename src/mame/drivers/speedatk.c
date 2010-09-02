@@ -78,19 +78,9 @@ PS / PD :  key matrix
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
-
-extern UINT8 *speedatk_videoram;
-extern UINT8 *speedatk_colorram;
-static UINT8 mux_data;
-static UINT8 km_status,coin_settings;
+#include "includes/speedatk.h"
 
 #define MASTER_CLOCK XTAL_12MHz
-
-extern WRITE8_HANDLER( speedatk_videoram_w );
-extern WRITE8_HANDLER( speedatk_colorram_w );
-extern PALETTE_INIT( speedatk );
-extern VIDEO_START( speedatk );
-extern VIDEO_UPDATE( speedatk );
 
 /* This "key matrix" device maps some buttons with multiple bit activations,for        *
  * example pressing button A + button B it causes an output of button C.               *
@@ -98,22 +88,22 @@ extern VIDEO_UPDATE( speedatk );
  * it handles the multiplexer device between player one and two.                       */
 static READ8_HANDLER( key_matrix_r )
 {
-	static UINT8 coin_impulse;
+	speedatk_state *state = space->machine->driver_data<speedatk_state>();
 
-	if(coin_impulse > 0)
+	if(state->coin_impulse > 0)
 	{
-		coin_impulse--;
+		state->coin_impulse--;
 		return 0x80;
 	}
 
 	if((input_port_read(space->machine,"COINS") & 1) || (input_port_read(space->machine,"COINS") & 2))
 	{
-		coin_impulse = coin_settings;
-		coin_impulse--;
+		state->coin_impulse = state->coin_settings;
+		state->coin_impulse--;
 		return 0x80;
 	}
 
-	switch(mux_data)
+	switch(state->mux_data)
 	{
 		case 0x02:
 		{
@@ -151,7 +141,7 @@ static READ8_HANDLER( key_matrix_r )
 				default:	return 0x00;
 			}
 		}
-		default: logerror("Input reads with mux_data = %x\n",mux_data);
+		default: logerror("Input reads with mux_data = %x\n", state->mux_data);
 	}
 
 	return 0x00;
@@ -159,14 +149,18 @@ static READ8_HANDLER( key_matrix_r )
 
 static WRITE8_HANDLER( key_matrix_w )
 {
-	mux_data = data;
+	speedatk_state *state = space->machine->driver_data<speedatk_state>();
+
+	state->mux_data = data;
 }
 
 /*Key matrix status,used for coin settings and I don't know what else...*/
 static READ8_HANDLER( key_matrix_status_r )
 {
+	speedatk_state *state = space->machine->driver_data<speedatk_state>();
+
 	/*bit 0: busy flag,active low*/
-	return (km_status & 0xfe) | 1;
+	return (state->km_status & 0xfe) | 1;
 }
 
 /*
@@ -181,9 +175,11 @@ a1
 */
 static WRITE8_HANDLER( key_matrix_status_w )
 {
-	km_status = data;
-	if((km_status & 0xf0) == 0x80) //coinage setting command
-		coin_settings = km_status & 0xf;
+	speedatk_state *state = space->machine->driver_data<speedatk_state>();
+
+	state->km_status = data;
+	if((state->km_status & 0xf0) == 0x80) //coinage setting command
+		state->coin_settings = state->km_status & 0xf;
 }
 
 static ADDRESS_MAP_START( speedatk_mem, ADDRESS_SPACE_PROGRAM, 8 )
@@ -191,8 +187,8 @@ static ADDRESS_MAP_START( speedatk_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0x8000) AM_READWRITE(key_matrix_r,key_matrix_w)
 	AM_RANGE(0x8001, 0x8001) AM_READWRITE(key_matrix_status_r,key_matrix_status_w)
 	AM_RANGE(0x8800, 0x8fff) AM_RAM
-	AM_RANGE(0xa000, 0xa3ff) AM_RAM_WRITE(speedatk_videoram_w) AM_BASE(&speedatk_videoram)
-	AM_RANGE(0xb000, 0xb3ff) AM_RAM_WRITE(speedatk_colorram_w) AM_BASE(&speedatk_colorram)
+	AM_RANGE(0xa000, 0xa3ff) AM_RAM_WRITE(speedatk_videoram_w) AM_BASE_MEMBER(speedatk_state, videoram)
+	AM_RANGE(0xb000, 0xb3ff) AM_RAM_WRITE(speedatk_colorram_w) AM_BASE_MEMBER(speedatk_state, colorram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( speedatk_io, ADDRESS_SPACE_IO, 8 )
@@ -319,7 +315,8 @@ static const ay8910_interface ay8910_config =
 	DEVCB_NULL
 };
 
-static MACHINE_CONFIG_START( speedatk, driver_device )
+static MACHINE_CONFIG_START( speedatk, speedatk_state )
+
 	MDRV_CPU_ADD("maincpu", Z80,MASTER_CLOCK/2) //divider is unknown
 	MDRV_CPU_PROGRAM_MAP(speedatk_mem)
 	MDRV_CPU_IO_MAP(speedatk_io)

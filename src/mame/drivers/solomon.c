@@ -9,20 +9,7 @@ driver by Mirko Buffoni
 #include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-
-extern UINT8 *solomon_videoram;
-extern UINT8 *solomon_colorram;
-extern UINT8 *solomon_videoram2;
-extern UINT8 *solomon_colorram2;
-
-extern WRITE8_HANDLER( solomon_videoram_w );
-extern WRITE8_HANDLER( solomon_colorram_w );
-extern WRITE8_HANDLER( solomon_videoram2_w );
-extern WRITE8_HANDLER( solomon_colorram2_w );
-extern WRITE8_HANDLER( solomon_flipscreen_w );
-
-extern VIDEO_START( solomon );
-extern VIDEO_UPDATE( solomon );
+#include "includes/solomon.h"
 
 static WRITE8_HANDLER( solomon_sh_command_w )
 {
@@ -55,11 +42,11 @@ static READ8_HANDLER( solomon_0xe603_r )
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
-	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(solomon_colorram_w) AM_BASE(&solomon_colorram)
-	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(solomon_videoram_w) AM_BASE(&solomon_videoram)
-	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(solomon_colorram2_w) AM_BASE(&solomon_colorram2)
-	AM_RANGE(0xdc00, 0xdfff) AM_RAM_WRITE(solomon_videoram2_w) AM_BASE(&solomon_videoram2)
-	AM_RANGE(0xe000, 0xe07f) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0xd000, 0xd3ff) AM_RAM_WRITE(solomon_colorram_w) AM_BASE_MEMBER(solomon_state, colorram)
+	AM_RANGE(0xd400, 0xd7ff) AM_RAM_WRITE(solomon_videoram_w) AM_BASE_MEMBER(solomon_state, videoram)
+	AM_RANGE(0xd800, 0xdbff) AM_RAM_WRITE(solomon_colorram2_w) AM_BASE_MEMBER(solomon_state, colorram2)
+	AM_RANGE(0xdc00, 0xdfff) AM_RAM_WRITE(solomon_videoram2_w) AM_BASE_MEMBER(solomon_state, videoram2)
+	AM_RANGE(0xe000, 0xe07f) AM_RAM AM_BASE_SIZE_MEMBER(solomon_state, spriteram, spriteram_size)
 	AM_RANGE(0xe400, 0xe5ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xe600, 0xe600) AM_READ_PORT("P1")
 	AM_RANGE(0xe601, 0xe601) AM_READ_PORT("P2")
@@ -201,7 +188,7 @@ static GFXDECODE_START( solomon )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout,   0, 8 )	/* colors   0-127 */
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( solomon, driver_device )
+static MACHINE_CONFIG_START( solomon, solomon_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)	/* 4.0 MHz (?????) */

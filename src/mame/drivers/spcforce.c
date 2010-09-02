@@ -35,40 +35,36 @@ a000-a3ff   R/W X/Y scroll position of each character (can be scrolled up
 #include "cpu/i8085/i8085.h"
 #include "cpu/mcs48/mcs48.h"
 #include "sound/sn76496.h"
+#include "includes/spcforce.h"
 
-
-extern UINT8 *spcforce_videoram;
-extern UINT8 *spcforce_colorram;
-extern UINT8 *spcforce_scrollram;
-
-WRITE8_HANDLER( spcforce_flip_screen_w );
-VIDEO_UPDATE( spcforce );
-
-
-static int spcforce_SN76496_latch;
-static int spcforce_SN76496_select;
 
 static WRITE8_HANDLER( spcforce_SN76496_latch_w )
 {
-	spcforce_SN76496_latch = data;
+	spcforce_state *state = space->machine->driver_data<spcforce_state>();
+
+	state->sn76496_latch = data;
 }
 
 static READ8_HANDLER( spcforce_SN76496_select_r )
 {
-	if (~spcforce_SN76496_select & 0x40) return sn76496_ready_r(space->machine->device("sn1"));
-	if (~spcforce_SN76496_select & 0x20) return sn76496_ready_r(space->machine->device("sn2"));
-	if (~spcforce_SN76496_select & 0x10) return sn76496_ready_r(space->machine->device("sn3"));
+	spcforce_state *state = space->machine->driver_data<spcforce_state>();
+
+	if (~state->sn76496_select & 0x40) return sn76496_ready_r(space->machine->device("sn1"));
+	if (~state->sn76496_select & 0x20) return sn76496_ready_r(space->machine->device("sn2"));
+	if (~state->sn76496_select & 0x10) return sn76496_ready_r(space->machine->device("sn3"));
 
 	return 0;
 }
 
 static WRITE8_HANDLER( spcforce_SN76496_select_w )
 {
-    spcforce_SN76496_select = data;
+	spcforce_state *state = space->machine->driver_data<spcforce_state>();
 
-	if (~data & 0x40)  sn76496_w(space->machine->device("sn1"), 0, spcforce_SN76496_latch);
-	if (~data & 0x20)  sn76496_w(space->machine->device("sn2"), 0, spcforce_SN76496_latch);
-	if (~data & 0x10)  sn76496_w(space->machine->device("sn3"), 0, spcforce_SN76496_latch);
+	state->sn76496_select = data;
+
+	if (~data & 0x40) sn76496_w(space->machine->device("sn1"), 0, state->sn76496_latch);
+	if (~data & 0x20) sn76496_w(space->machine->device("sn2"), 0, state->sn76496_latch);
+	if (~data & 0x10) sn76496_w(space->machine->device("sn3"), 0, state->sn76496_latch);
 }
 
 static READ8_HANDLER( spcforce_t0_r )
@@ -93,9 +89,9 @@ static ADDRESS_MAP_START( spcforce_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x700b, 0x700b) AM_WRITE(spcforce_flip_screen_w)
 	AM_RANGE(0x700e, 0x700e) AM_WRITE(interrupt_enable_w)
 	AM_RANGE(0x700f, 0x700f) AM_WRITENOP
-	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_BASE(&spcforce_videoram)
-	AM_RANGE(0x9000, 0x93ff) AM_RAM AM_BASE(&spcforce_colorram)
-	AM_RANGE(0xa000, 0xa3ff) AM_RAM AM_BASE(&spcforce_scrollram)
+	AM_RANGE(0x8000, 0x83ff) AM_RAM AM_BASE_MEMBER(spcforce_state, videoram)
+	AM_RANGE(0x9000, 0x93ff) AM_RAM AM_BASE_MEMBER(spcforce_state, colorram)
+	AM_RANGE(0xa000, 0xa3ff) AM_RAM AM_BASE_MEMBER(spcforce_state, scrollram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( spcforce_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -242,7 +238,7 @@ static PALETTE_INIT( spcforce )
 }
 
 
-static MACHINE_CONFIG_START( spcforce, driver_device )
+static MACHINE_CONFIG_START( spcforce, spcforce_state )
 
 	/* basic machine hardware */
 	/* FIXME: The 8085A had a max clock of 6MHz, internally divided by 2! */

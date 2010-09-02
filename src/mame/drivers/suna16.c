@@ -29,19 +29,7 @@ Year + Game                 By      Board      Hardware
 #include "sound/2151intf.h"
 #include "sound/ay8910.h"
 #include "sound/3526intf.h"
-
-/* Variables and functions defined in video: */
-
-WRITE16_HANDLER( suna16_flipscreen_w );
-WRITE16_HANDLER( bestbest_flipscreen_w );
-
-READ16_HANDLER ( suna16_paletteram16_r );
-WRITE16_HANDLER( suna16_paletteram16_w );
-
-VIDEO_START( suna16 );
-VIDEO_UPDATE( suna16 );
-VIDEO_UPDATE( bestbest );
-
+#include "includes/suna16.h"
 
 /***************************************************************************
 
@@ -106,7 +94,7 @@ static ADDRESS_MAP_START( bssoccer_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x200000, 0x203fff) AM_RAM	// RAM
 	AM_RANGE(0x400000, 0x4001ff) AM_READWRITE(suna16_paletteram16_r, suna16_paletteram16_w)  // Banked Palette
 	AM_RANGE(0x400200, 0x400fff) AM_RAM	//
-	AM_RANGE(0x600000, 0x61ffff) AM_RAM AM_BASE_GENERIC(spriteram)	// Sprites
+	AM_RANGE(0x600000, 0x61ffff) AM_RAM AM_BASE_MEMBER(suna16_state, spriteram)	// Sprites
 	AM_RANGE(0xa00000, 0xa00001) AM_READ_PORT("P1") AM_WRITE(suna16_soundlatch_w)	// To Sound CPU
 	AM_RANGE(0xa00002, 0xa00003) AM_READ_PORT("P2") AM_WRITE(suna16_flipscreen_w)	// Flip Screen
 	AM_RANGE(0xa00004, 0xa00005) AM_READ_PORT("P3") AM_WRITE(bssoccer_leds_w)	// Leds
@@ -125,7 +113,7 @@ static ADDRESS_MAP_START( uballoon_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800000, 0x803fff) AM_RAM	// RAM
 	AM_RANGE(0x200000, 0x2001ff) AM_READWRITE(suna16_paletteram16_r, suna16_paletteram16_w)	// Banked Palette
 	AM_RANGE(0x200200, 0x200fff) AM_RAM	//
-	AM_RANGE(0x400000, 0x41ffff) AM_MIRROR(0x1e0000) AM_RAM AM_BASE_GENERIC(spriteram)	// Sprites
+	AM_RANGE(0x400000, 0x41ffff) AM_MIRROR(0x1e0000) AM_RAM AM_BASE_MEMBER(suna16_state, spriteram)	// Sprites
 	AM_RANGE(0x600000, 0x600001) AM_READ_PORT("P1") AM_WRITE(suna16_soundlatch_w)	// To Sound CPU
 	AM_RANGE(0x600002, 0x600003) AM_READ_PORT("P2")
 	AM_RANGE(0x600004, 0x600005) AM_READ_PORT("DSW1") AM_WRITE(suna16_flipscreen_w)	// Flip Screen
@@ -150,7 +138,7 @@ static ADDRESS_MAP_START( sunaq_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x540000, 0x5401ff) AM_READWRITE(suna16_paletteram16_r, suna16_paletteram16_w)
 	AM_RANGE(0x540200, 0x540fff) AM_RAM   // RAM
 	AM_RANGE(0x580000, 0x583fff) AM_RAM	// RAM
-	AM_RANGE(0x5c0000, 0x5dffff) AM_RAM AM_BASE_GENERIC(spriteram)	// Sprites
+	AM_RANGE(0x5c0000, 0x5dffff) AM_RAM AM_BASE_MEMBER(suna16_state, spriteram)	// Sprites
 ADDRESS_MAP_END
 
 
@@ -158,23 +146,25 @@ ADDRESS_MAP_END
                             Best Of Best
 ***************************************************************************/
 
-static UINT16 prot;
-
 static READ16_HANDLER( bestbest_prot_r )
 {
-	return prot;
+	suna16_state *state = space->machine->driver_data<suna16_state>();
+
+	return state->prot;
 }
 
 static WRITE16_HANDLER( bestbest_prot_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
+		suna16_state *state = space->machine->driver_data<suna16_state>();
+
 		switch (data & 0xff)
 		{
-			case 0x00:	prot = prot ^ 0x0009;	break;
-			case 0x08:	prot = prot ^ 0x0002;	break;
-			case 0x0c:	prot = prot ^ 0x0003;	break;
-//          default:    logerror("CPU#0 PC %06X - Unknown protection value: %04X\n", cpu_get_pc(space->cpu), data);
+			case 0x00:	state->prot = state->prot ^ 0x0009;	break;
+			case 0x08:	state->prot = state->prot ^ 0x0002;	break;
+			case 0x0c:	state->prot = state->prot ^ 0x0003;	break;
+			//default:    logerror("CPU#0 PC %06X - Unknown protection value: %04X\n", cpu_get_pc(space->cpu), data);
 		}
 	}
 }
@@ -191,8 +181,8 @@ static ADDRESS_MAP_START( bestbest_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x540000, 0x540fff ) AM_READWRITE( suna16_paletteram16_r, suna16_paletteram16_w )	// Banked(?) Palette
 	AM_RANGE( 0x541000, 0x54ffff ) AM_RAM														//
 	AM_RANGE( 0x580000, 0x58ffff ) AM_RAM							// RAM
-	AM_RANGE( 0x5c0000, 0x5dffff ) AM_RAM AM_BASE_GENERIC( spriteram  )	// Sprites (Chip 1)
-	AM_RANGE( 0x5e0000, 0x5fffff ) AM_RAM AM_BASE_GENERIC( spriteram2 )	// Sprites (Chip 2)
+	AM_RANGE( 0x5c0000, 0x5dffff ) AM_RAM AM_BASE_MEMBER(suna16_state, spriteram)	// Sprites (Chip 1)
+	AM_RANGE( 0x5e0000, 0x5fffff ) AM_RAM AM_BASE_MEMBER(suna16_state, spriteram2)	// Sprites (Chip 2)
 ADDRESS_MAP_END
 
 
@@ -759,7 +749,7 @@ static INTERRUPT_GEN( bssoccer_interrupt )
 	}
 }
 
-static MACHINE_CONFIG_START( bssoccer, driver_device )
+static MACHINE_CONFIG_START( bssoccer, suna16_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)	/* ? */
@@ -819,7 +809,7 @@ MACHINE_CONFIG_END
                                 Ultra Balloon
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( uballoon, driver_device )
+static MACHINE_CONFIG_START( uballoon, suna16_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)
@@ -871,7 +861,8 @@ MACHINE_CONFIG_END
                             Suna Quiz 6000 Academy
 ***************************************************************************/
 
-static MACHINE_CONFIG_START( sunaq, driver_device )
+static MACHINE_CONFIG_START( sunaq, suna16_state )
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 24000000/4)
 	MDRV_CPU_PROGRAM_MAP(sunaq_map)
@@ -943,7 +934,8 @@ static const ay8910_interface bestbest_ay8910_interface =
 	DEVCB_HANDLER(bestbest_ay8910_port_a_w),	DEVCB_NULL
 };
 
-static MACHINE_CONFIG_START( bestbest, driver_device )
+static MACHINE_CONFIG_START( bestbest, suna16_state )
+
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 24000000/4)
 	MDRV_CPU_PROGRAM_MAP(bestbest_map)

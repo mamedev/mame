@@ -25,16 +25,7 @@ blocken:
 #include "sound/ay8910.h"
 #include "sound/okim6295.h"
 #include "sound/2612intf.h"
-
-extern UINT16 *shangha3_ram;
-extern size_t shangha3_ram_size;
-extern int shangha3_do_shadows;
-
-WRITE16_HANDLER( shangha3_flipscreen_w );
-WRITE16_HANDLER( shangha3_gfxlist_addr_w );
-WRITE16_HANDLER( shangha3_blitter_go_w );
-VIDEO_START( shangha3 );
-VIDEO_UPDATE( shangha3 );
+#include "includes/shangha3.h"
 
 
 
@@ -53,12 +44,12 @@ write    read
 */
 static READ16_HANDLER( shangha3_prot_r )
 {
-	static int count;
+	shangha3_state *state = space->machine->driver_data<shangha3_state>();
 	static const int result[] = { 0x0,0x1,0x3,0x7,0xf,0xe,0xc,0x8,0x0};
 
 	logerror("PC %04x: read 20004e\n",cpu_get_pc(space->cpu));
 
-	return result[count++ % 9];
+	return result[state->prot_count++ % 9];
 }
 static WRITE16_HANDLER( shangha3_prot_w )
 {
@@ -139,7 +130,7 @@ static ADDRESS_MAP_START( shangha3_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x20003e, 0x20003f) AM_DEVWRITE8("aysnd", ay8910_address_w, 0x00ff)
 	AM_RANGE(0x20004e, 0x20004f) AM_READWRITE(shangha3_prot_r,shangha3_prot_w)
 	AM_RANGE(0x20006e, 0x20006f) AM_DEVREADWRITE8("oki", okim6295_r,okim6295_w, 0x00ff)
-	AM_RANGE(0x300000, 0x30ffff) AM_RAM AM_BASE(&shangha3_ram) AM_SIZE(&shangha3_ram_size)	/* gfx & work ram */
+	AM_RANGE(0x300000, 0x30ffff) AM_RAM AM_BASE_SIZE_MEMBER(shangha3_state, ram, ram_size)	/* gfx & work ram */
 	AM_RANGE(0x340000, 0x340001) AM_WRITE(shangha3_flipscreen_w)
 	AM_RANGE(0x360000, 0x360001) AM_WRITE(shangha3_gfxlist_addr_w)
 ADDRESS_MAP_END
@@ -154,7 +145,7 @@ static ADDRESS_MAP_START( heberpop_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x20000a, 0x20000b) AM_WRITENOP	/* irq ack? */
 	AM_RANGE(0x20000c, 0x20000d) AM_WRITE(heberpop_coinctrl_w)
 	AM_RANGE(0x20000e, 0x20000f) AM_WRITE(heberpop_sound_command_w)
-	AM_RANGE(0x300000, 0x30ffff) AM_RAM AM_BASE(&shangha3_ram) AM_SIZE(&shangha3_ram_size)	/* gfx & work ram */
+	AM_RANGE(0x300000, 0x30ffff) AM_RAM AM_BASE_SIZE_MEMBER(shangha3_state, ram, ram_size)	/* gfx & work ram */
 	AM_RANGE(0x340000, 0x340001) AM_WRITE(shangha3_flipscreen_w)
 	AM_RANGE(0x360000, 0x360001) AM_WRITE(shangha3_gfxlist_addr_w)
 	AM_RANGE(0x800000, 0xb7ffff) AM_READ(heberpop_gfxrom_r)
@@ -170,7 +161,7 @@ static ADDRESS_MAP_START( blocken_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x10000c, 0x10000d) AM_WRITE(blocken_coinctrl_w)
 	AM_RANGE(0x10000e, 0x10000f) AM_WRITE(heberpop_sound_command_w)
 	AM_RANGE(0x200000, 0x200fff) AM_RAM_WRITE(paletteram16_RRRRRGGGGGBBBBBx_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x300000, 0x30ffff) AM_RAM AM_BASE(&shangha3_ram) AM_SIZE(&shangha3_ram_size)	/* gfx & work ram */
+	AM_RANGE(0x300000, 0x30ffff) AM_RAM AM_BASE_SIZE_MEMBER(shangha3_state, ram, ram_size)	/* gfx & work ram */
 	AM_RANGE(0x340000, 0x340001) AM_WRITE(shangha3_flipscreen_w)
 	AM_RANGE(0x360000, 0x360001) AM_WRITE(shangha3_gfxlist_addr_w)
 	AM_RANGE(0x800000, 0xb7ffff) AM_READ(heberpop_gfxrom_r)
@@ -476,7 +467,7 @@ static const ym3438_interface ym3438_config =
 };
 
 
-static MACHINE_CONFIG_START( shangha3, driver_device )
+static MACHINE_CONFIG_START( shangha3, shangha3_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)
@@ -511,7 +502,7 @@ static MACHINE_CONFIG_START( shangha3, driver_device )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( heberpop, driver_device )
+static MACHINE_CONFIG_START( heberpop, shangha3_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)
@@ -551,7 +542,7 @@ static MACHINE_CONFIG_START( heberpop, driver_device )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( blocken, driver_device )
+static MACHINE_CONFIG_START( blocken, shangha3_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)
@@ -666,15 +657,18 @@ ROM_END
 
 static DRIVER_INIT( shangha3 )
 {
-	shangha3_do_shadows = 1;
+	shangha3_state *state = machine->driver_data<shangha3_state>();
+
+	state->do_shadows = 1;
 }
 
 static DRIVER_INIT( heberpop )
 {
-	shangha3_do_shadows = 0;
+	shangha3_state *state = machine->driver_data<shangha3_state>();
+
+	state->do_shadows = 0;
 }
 
 GAME( 1993, shangha3, 0, shangha3, shangha3, shangha3, ROT0, "Sunsoft", "Shanghai III (Japan)", 0 )
 GAME( 1994, heberpop, 0, heberpop, heberpop, heberpop, ROT0, "Sunsoft / Atlus", "Hebereke no Popoon (Japan)", 0 )
 GAME( 1994, blocken,  0, blocken,  blocken,  heberpop, ROT0, "KID / Visco", "Blocken (Japan)", 0 )
-
