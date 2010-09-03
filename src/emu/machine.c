@@ -138,14 +138,14 @@ static char giant_string_buffer[65536] = { 0 };
 //  running_machine - constructor
 //-------------------------------------------------
 
-running_machine::running_machine(const game_driver &driver, const machine_config &_config, core_options &options, bool exit_to_game_select)
+running_machine::running_machine(const machine_config &_config, core_options &options, bool exit_to_game_select)
 	: m_regionlist(m_respool),
 	  m_devicelist(m_respool),
 	  config(&_config),
 	  m_config(_config),
 	  firstcpu(NULL),
-	  gamedrv(&driver),
-	  m_game(driver),
+	  gamedrv(&_config.gamedrv()),
+	  m_game(_config.gamedrv()),
 	  primary_screen(NULL),
 	  palette(NULL),
 	  pens(NULL),
@@ -177,7 +177,7 @@ running_machine::running_machine(const game_driver &driver, const machine_config
 	  m_logerror_list(NULL),
 	  m_scheduler(*this),
 	  m_options(options),
-	  m_basename(driver.name),
+	  m_basename(_config.gamedrv().name),
 	  m_current_phase(MACHINE_PHASE_PREINIT),
 	  m_paused(false),
 	  m_hard_reset_pending(false),
@@ -190,7 +190,7 @@ running_machine::running_machine(const game_driver &driver, const machine_config
 	  m_saveload_schedule_time(attotime_zero),
 	  m_saveload_searchpath(NULL),
 	  m_rand_seed(0x9d14abd7),
-	  m_driver_data(NULL)
+	  m_driver_device(NULL)
 {
 	memset(gfx, 0, sizeof(gfx));
 	memset(&generic, 0, sizeof(generic));
@@ -201,12 +201,11 @@ running_machine::running_machine(const game_driver &driver, const machine_config
 	device_config *config = m_config.m_devicelist.find("root");
 	if (config == NULL)
 		throw emu_fatalerror("Machine configuration missing driver_device");
-	driver_device_config_base::static_set_game(config, &driver);
 
 	// attach this machine to all the devices in the configuration
 	m_devicelist.import_config_list(m_config.m_devicelist, *this);
-	m_driver_data = device<driver_device>("root");
-	assert(m_driver_data != NULL);
+	m_driver_device = device<driver_device>("root");
+	assert(m_driver_device != NULL);
 
 	// find devices
 	primary_screen = screen_first(*this);
@@ -1010,6 +1009,17 @@ void driver_device_config_base::static_set_palette_init(device_config *device, p
 void driver_device_config_base::static_set_video_update(device_config *device, video_update_func callback)
 {
 	downcast<driver_device_config_base *>(device)->m_video_update = callback;
+}
+
+
+//-------------------------------------------------
+//  rom_region - return a pointer to the ROM 
+//  regions specified for the current game
+//-------------------------------------------------
+
+const rom_entry *driver_device_config_base::rom_region() const
+{
+	return m_game->rom;
 }
 
 

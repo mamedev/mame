@@ -123,7 +123,7 @@ enum
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _rom_source rom_source;
+typedef device_config rom_source;
 
 
 struct rom_entry
@@ -282,13 +282,13 @@ int rom_load_warnings(running_machine *machine);
 /* ----- ROM iteration ----- */
 
 /* return pointer to first ROM source */
-const rom_source *rom_first_source(const game_driver *drv, const machine_config *config);
+const rom_source *rom_first_source(const machine_config &config);
 
 /* return pointer to next ROM source */
-const rom_source *rom_next_source(const game_driver *drv, const machine_config *config, const rom_source *previous);
+const rom_source *rom_next_source(const rom_source &previous);
 
 /* return pointer to the first ROM region within a source */
-const rom_entry *rom_first_region(const game_driver *drv, const rom_source *romp);
+const rom_entry *rom_first_region(const rom_source &romp);
 
 /* return pointer to the next ROM region within a source */
 const rom_entry *rom_next_region(const rom_entry *romp);

@@ -232,15 +232,14 @@ const char *image_get_device_option(device_image_interface *image)
 void image_add_device_options(core_options *opts, const game_driver *driver)
 {
 	int index = 0;
-	machine_config *config;
 	const device_config_image_interface *image = NULL;
 
 	/* create the configuration */
-	config = global_alloc(machine_config(driver->machine_config));
+	machine_config config(*driver);
 
 	/* enumerate our callback for every device */
 	/* loop on each device instance */
-	for (bool gotone = config->m_devicelist.first(image); gotone; gotone = image->next(image))
+	for (bool gotone = config.m_devicelist.first(image); gotone; gotone = image->next(image))
 	{
 		options_entry entry[2];
 		astring dev_full_name;
@@ -267,9 +266,6 @@ void image_add_device_options(core_options *opts, const game_driver *driver)
 
 	/* record that we've added device options */
 	options_set_bool(opts, OPTION_ADDED_DEVICE_OPTIONS, TRUE, OPTION_PRIORITY_CMDLINE);
-
-	/* free the configuration */
-	global_free(config);
 }
 
 /*-------------------------------------------------

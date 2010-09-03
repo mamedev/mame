@@ -338,7 +338,7 @@ class running_machine : public bindable_object
 
 public:
 	// construction/destruction
-	running_machine(const game_driver &driver, const machine_config &config, core_options &options, bool exit_to_game_select = false);
+	running_machine(const machine_config &config, core_options &options, bool exit_to_game_select = false);
 	~running_machine();
 
 	// fetch items by name
@@ -456,8 +456,10 @@ public:
 	debug_view_manager *	m_debug_view;		// internal data from debugvw.c
 
 	// driver-specific information
+	driver_device *driver_data() const { return m_driver_device; }
+
 	template<class T>
-	T *driver_data() const { return downcast<T *>(m_driver_data); }
+	T *driver_data() const { return downcast<T *>(m_driver_device); }
 
 private:
 	void start();
@@ -521,7 +523,7 @@ private:
 	// base time
 	time_t					m_base_time;
 
-	driver_device *			m_driver_data;		// drivers can hang data off of here instead of using globals
+	driver_device *			m_driver_device;
 };
 
 
@@ -558,6 +560,9 @@ public:
 	static void static_set_video_update(device_config *device, video_update_func callback);
 
 protected:
+	// optional information overrides
+	virtual const rom_entry *rom_region() const;
+
 	// internal state
 	const game_driver *		m_game;						// pointer to the game driver
 

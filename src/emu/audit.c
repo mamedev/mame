@@ -56,7 +56,7 @@ INLINE void set_status(audit_record *record, UINT8 status, UINT8 substatus)
 
 int audit_images(core_options *options, const game_driver *gamedrv, UINT32 validation, audit_record **audit)
 {
-	machine_config *config = global_alloc(machine_config(gamedrv->machine_config));
+	machine_config config(*gamedrv);
 	const rom_entry *region, *rom;
 	const rom_source *source;
 	audit_record *record;
@@ -67,10 +67,10 @@ int audit_images(core_options *options, const game_driver *gamedrv, UINT32 valid
 
 	/* determine the number of records we will generate */
 	records = 0;
-	for (source = rom_first_source(gamedrv, config); source != NULL; source = rom_next_source(gamedrv, config, source))
+	bool source_is_gamedrv = true;
+	for (source = rom_first_source(config); source != NULL; source = rom_next_source(*source))
 	{
-		int source_is_gamedrv = rom_source_is_gamedrv(gamedrv, source);
-		for (region = rom_first_region(gamedrv, source); region != NULL; region = rom_next_region(region))
+		for (region = rom_first_region(*source); region != NULL; region = rom_next_region(region))
 			for (rom = rom_first_file(region); rom != NULL; rom = rom_next_file(rom))
 				if (ROMREGION_ISROMDATA(region) || ROMREGION_ISDISKDATA(region))
 				{
@@ -83,6 +83,8 @@ int audit_images(core_options *options, const game_driver *gamedrv, UINT32 valid
 					}
 					records++;
 				}
+
+		source_is_gamedrv = false;
 	}
 
 	if (records > 0)
@@ -92,10 +94,10 @@ int audit_images(core_options *options, const game_driver *gamedrv, UINT32 valid
 		record = *audit;
 
 		/* iterate over ROM sources and regions */
-		for (source = rom_first_source(gamedrv, config); source != NULL; source = rom_next_source(gamedrv, config, source))
+		bool source_is_gamedrv = true;
+		for (source = rom_first_source(config); source != NULL; source = rom_next_source(*source))
 		{
-			int source_is_gamedrv = rom_source_is_gamedrv(gamedrv, source);
-			for (region = rom_first_region(gamedrv, source); region != NULL; region = rom_next_region(region))
+			for (region = rom_first_region(*source); region != NULL; region = rom_next_region(region))
 			{
 				const char *regiontag = ROMREGION_ISLOADBYNAME(region) ? ROM_GETNAME(region) : NULL;
 				for (rom = rom_first_file(region); rom; rom = rom_next_file(rom))
@@ -123,6 +125,7 @@ int audit_images(core_options *options, const game_driver *gamedrv, UINT32 valid
 					record++;
 				}
 			}
+			source_is_gamedrv = false;
 		}
 	}
 
@@ -134,7 +137,6 @@ int audit_images(core_options *options, const game_driver *gamedrv, UINT32 valid
 		records = 0;
 	}
 
-	global_free(config);
 	return records;
 }
 
@@ -146,14 +148,14 @@ int audit_images(core_options *options, const game_driver *gamedrv, UINT32 valid
 
 int audit_samples(core_options *options, const game_driver *gamedrv, audit_record **audit)
 {
-	machine_config *config = global_alloc(machine_config(gamedrv->machine_config));
+	machine_config config(*gamedrv);
 	audit_record *record;
 	int records = 0;
 	int sampnum;
 
 	/* count the number of sample records attached to this driver */
 	const device_config_sound_interface *sound = NULL;
-	for (bool gotone = config->m_devicelist.first(sound); gotone; gotone = sound->next(sound))
+	for (bool gotone = config.m_devicelist.first(sound); gotone; gotone = sound->next(sound))
 		if (sound->devconfig().type() == SAMPLES)
 		{
 			const samples_interface *intf = (const samples_interface *)sound->devconfig().static_config();
@@ -176,7 +178,7 @@ int audit_samples(core_options *options, const game_driver *gamedrv, audit_recor
 	record = *audit;
 
 	/* now iterate over sample entries */
-	for (bool gotone = config->m_devicelist.first(sound); gotone; gotone = sound->next(sound))
+	for (bool gotone = config.m_devicelist.first(sound); gotone; gotone = sound->next(sound))
 		if (sound->devconfig().type() == SAMPLES)
 		{
 			const samples_interface *intf = (const samples_interface *)sound->devconfig().static_config();
@@ -219,7 +221,6 @@ int audit_samples(core_options *options, const game_driver *gamedrv, audit_recor
 		}
 
 skip:
-	global_free(config);
 	return records;
 }
 
@@ -524,18 +525,20 @@ static int rom_used_by_parent(const game_driver *gamedrv, const rom_entry *romen
 	/* iterate up the parent chain */
 	for (drv = driver_get_clone(gamedrv); drv != NULL; drv = driver_get_clone(drv))
 	{
+		machine_config config(*drv);
 		const rom_entry *region;
 		const rom_entry *rom;
 
 		/* see if the parent has the same ROM or not */
-		for (region = rom_first_region(drv, NULL); region; region = rom_next_region(region))
-			for (rom = rom_first_file(region); rom; rom = rom_next_file(rom))
-				if (hash_data_is_equal(ROM_GETHASHDATA(rom), hash, 0))
-				{
-					if (parent != NULL)
-						*parent = drv;
-					return TRUE;
-				}
+		for (const rom_source *source = rom_first_source(config); source != NULL; source = rom_next_source(*source))
+			for (region = rom_first_region(*source); region; region = rom_next_region(region))
+				for (rom = rom_first_file(region); rom; rom = rom_next_file(rom))
+					if (hash_data_is_equal(ROM_GETHASHDATA(rom), hash, 0))
+					{
+						if (parent != NULL)
+							*parent = drv;
+						return TRUE;
+					}
 	}
 
 	return FALSE;

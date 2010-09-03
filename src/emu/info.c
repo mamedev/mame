@@ -39,7 +39,7 @@ public:
 	const game_driver *drv;
 	machine_config mconfig;
 
-	parent_info(const game_driver *drv) : mconfig(drv->machine_config)
+	parent_info(const game_driver *drv) : mconfig(*drv)
 	{
 		this->drv = drv;
 	}
@@ -458,14 +458,13 @@ static const char *get_merge_name(const rom_entry *rom, int parents, const paren
 
 	for (parent = 0; parent < parents; ++parent)
 	{
-		const game_driver *clone_of = pinfoarray[parent]->drv;
 		const machine_config *pconfig = &pinfoarray[parent]->mconfig;
 		const rom_source *psource;
 		const rom_entry *pregion, *prom;
 
 		/* scan the clone_of ROM for a matching ROM entry */
-		for (psource = rom_first_source(clone_of, pconfig); psource != NULL; psource = rom_next_source(clone_of, pconfig, psource))
-			for (pregion = rom_first_region(clone_of, psource); pregion != NULL; pregion = rom_next_region(pregion))
+		for (psource = rom_first_source(*pconfig); psource != NULL; psource = rom_next_source(*psource))
+			for (pregion = rom_first_region(*psource); pregion != NULL; pregion = rom_next_region(pregion))
 				for (prom = rom_first_file(pregion); prom != NULL; prom = rom_next_file(prom))
 					if (hash_data_is_equal(ROM_GETHASHDATA(rom), ROM_GETHASHDATA(prom), 0))
 					{
@@ -484,7 +483,7 @@ static const char *get_merge_name(const rom_entry *rom, int parents, const paren
     the XML output
 -------------------------------------------------*/
 
-static void print_game_rom(FILE *out, const game_driver *game, const machine_config *config)
+static void print_game_rom(FILE *out, const game_driver *game, const machine_config &config)
 {
 	const game_driver *clone_of = driver_get_clone(game);
 	int rom_type;
@@ -504,8 +503,8 @@ static void print_game_rom(FILE *out, const game_driver *game, const machine_con
 		const rom_entry *region;
 
 		/* iterate over ROM sources: first the game, then any devices */
-		for (source = rom_first_source(game, config); source != NULL; source = rom_next_source(game, config, source))
-			for (region = rom_first_region(game, source); region != NULL; region = rom_next_region(region))
+		for (source = rom_first_source(config); source != NULL; source = rom_next_source(*source))
+			for (region = rom_first_region(*source); region != NULL; region = rom_next_region(region))
 			{
 				int is_disk = ROMREGION_ISDISKDATA(region);
 				const rom_entry *rom;
@@ -611,11 +610,11 @@ static void print_game_rom(FILE *out, const game_driver *game, const machine_con
     attribute, if appropriate
 -------------------------------------------------*/
 
-static void print_game_sampleof(FILE *out, const game_driver *game, const machine_config *config)
+static void print_game_sampleof(FILE *out, const game_driver *game, const machine_config &config)
 {
 	const device_config_sound_interface *sound = NULL;
 
-	for (bool gotone = config->m_devicelist.first(sound); gotone; gotone = sound->next(sound))
+	for (bool gotone = config.m_devicelist.first(sound); gotone; gotone = sound->next(sound))
 		if (sound->devconfig().type() == SAMPLES)
 		{
 			const char *const *samplenames = ((const samples_interface *)sound->devconfig().static_config())->samplenames;
@@ -642,12 +641,12 @@ static void print_game_sampleof(FILE *out, const game_driver *game, const machin
     samples referenced by a game_driver
 -------------------------------------------------*/
 
-static void print_game_sample(FILE *out, const game_driver *game, const machine_config *config)
+static void print_game_sample(FILE *out, const game_driver *game, const machine_config &config)
 {
 	const device_config_sound_interface *sound = NULL;
 
 	/* iterate over sound chips looking for samples */
-	for (bool gotone = config->m_devicelist.first(sound); gotone; gotone = sound->next(sound))
+	for (bool gotone = config.m_devicelist.first(sound); gotone; gotone = sound->next(sound))
 		if (sound->devconfig().type() == SAMPLES)
 		{
 			const char *const *samplenames = ((const samples_interface *)sound->devconfig().static_config())->samplenames;
@@ -685,11 +684,11 @@ static void print_game_sample(FILE *out, const game_driver *game, const machine_
     sound chips used by a game
 -------------------------------------------------*/
 
-static void print_game_chips(FILE *out, const game_driver *game, const machine_config *config)
+static void print_game_chips(FILE *out, const game_driver *game, const machine_config &config)
 {
 	/* iterate over CPUs */
 	const device_config_execute_interface *exec = NULL;
-	for (bool gotone = config->m_devicelist.first(exec); gotone; gotone = exec->next(exec))
+	for (bool gotone = config.m_devicelist.first(exec); gotone; gotone = exec->next(exec))
 	{
 		fprintf(out, "\t\t<chip");
 		fprintf(out, " type=\"cpu\"");
@@ -701,7 +700,7 @@ static void print_game_chips(FILE *out, const game_driver *game, const machine_c
 
 	/* iterate over sound chips */
 	const device_config_sound_interface *sound = NULL;
-	for (bool gotone = config->m_devicelist.first(sound); gotone; gotone = sound->next(sound))
+	for (bool gotone = config.m_devicelist.first(sound); gotone; gotone = sound->next(sound))
 	{
 		fprintf(out, "\t\t<chip");
 		fprintf(out, " type=\"audio\"");
@@ -719,12 +718,12 @@ static void print_game_chips(FILE *out, const game_driver *game, const machine_c
     displays
 -------------------------------------------------*/
 
-static void print_game_display(FILE *out, const game_driver *game, const machine_config *config)
+static void print_game_display(FILE *out, const game_driver *game, const machine_config &config)
 {
 	const screen_device_config *devconfig;
 
 	/* iterate over screens */
-	for (devconfig = screen_first(*config); devconfig != NULL; devconfig = screen_next(devconfig))
+	for (devconfig = screen_first(config); devconfig != NULL; devconfig = screen_next(devconfig))
 	{
 		fprintf(out, "\t\t<display");
 
@@ -803,13 +802,13 @@ static void print_game_display(FILE *out, const game_driver *game, const machine
     displays
 -------------------------------------------------*/
 
-static void print_game_sound(FILE *out, const game_driver *game, const machine_config *config)
+static void print_game_sound(FILE *out, const game_driver *game, const machine_config &config)
 {
-	int speakers = speaker_output_count(config);
+	int speakers = speaker_output_count(&config);
 
 	/* if we have no sound, zero out the speaker count */
 	const device_config_sound_interface *sound = NULL;
-	if (!config->m_devicelist.first(sound))
+	if (!config.m_devicelist.first(sound))
 		speakers = 0;
 
 	fprintf(out, "\t\t<sound channels=\"%d\"/>\n", speakers);
@@ -820,7 +819,7 @@ static void print_game_sound(FILE *out, const game_driver *game, const machine_c
     print_game_driver - print driver status
 -------------------------------------------------*/
 
-static void print_game_driver(FILE *out, const game_driver *game, const machine_config *config)
+static void print_game_driver(FILE *out, const game_driver *game, const machine_config &config)
 {
 	fprintf(out, "\t\t<driver");
 
@@ -874,7 +873,7 @@ static void print_game_driver(FILE *out, const game_driver *game, const machine_
 	else
 		fprintf(out, " savestate=\"unsupported\"");
 
-	fprintf(out, " palettesize=\"%d\"", config->m_total_colors);
+	fprintf(out, " palettesize=\"%d\"", config.m_total_colors);
 
 	fprintf(out, "/>\n");
 }
@@ -918,13 +917,13 @@ static void print_game_categories(FILE *out, const game_driver *game, const iopo
     image devices
 -------------------------------------------------*/
 
-static void print_game_images(FILE *out, const game_driver *game, const machine_config *config)
+static void print_game_images(FILE *out, const game_driver *game, const machine_config &config)
 {
 	const device_config_image_interface *dev = NULL;
 	const char *name;
 	const char *shortname;
 
-	for (bool gotone = config->m_devicelist.first(dev); gotone; gotone = dev->next(dev))
+	for (bool gotone = config.m_devicelist.first(dev); gotone; gotone = dev->next(dev))
 	{
 		/* print out device type */
 		fprintf(out, "\t\t<device type=\"%s\"", xml_normalize_string(dev->image_type_name()));
@@ -971,9 +970,9 @@ static void print_game_images(FILE *out, const game_driver *game, const machine_
     for all known software lists for this system
 -------------------------------------------------*/
 
-static void print_game_software_list(FILE *out, const game_driver *game, const machine_config *config)
+static void print_game_software_list(FILE *out, const game_driver *game, const machine_config &config)
 {
-	for (const device_config *dev = config->m_devicelist.first(SOFTWARE_LIST); dev != NULL; dev = dev->typenext())
+	for (const device_config *dev = config.m_devicelist.first(SOFTWARE_LIST); dev != NULL; dev = dev->typenext())
 	{
 		software_list_config *swlist = (software_list_config *)downcast<const legacy_device_config_base *>(dev)->inline_config();
 
@@ -996,7 +995,7 @@ static void print_game_software_list(FILE *out, const game_driver *game, const m
 static void print_game_info(FILE *out, const game_driver *game)
 {
 	const game_driver *clone_of;
-	machine_config *config;
+	machine_config config(*game);
 	ioport_list portlist;
 	const char *start;
 
@@ -1005,7 +1004,6 @@ static void print_game_info(FILE *out, const game_driver *game)
 		return;
 
 	/* start tracking resources and allocate the machine and input configs */
-	config = global_alloc(machine_config(game->machine_config));
 	input_port_list_init(portlist, game->ipt, NULL, 0, FALSE);
 
 	/* print the header and the game name */
@@ -1070,8 +1068,6 @@ static void print_game_info(FILE *out, const game_driver *game)
 
 	/* close the topmost tag */
 	fprintf(out, "\t</" XML_TOP ">\n");
-
-	global_free(config);
 }
 
 

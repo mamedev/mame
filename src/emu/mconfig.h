@@ -124,8 +124,10 @@ class machine_config
 	friend class running_machine;
 
 public:
-	machine_config(machine_config_constructor constructor);
+	machine_config(const game_driver &gamedrv);
 	~machine_config();
+	
+	const game_driver &gamedrv() const { return m_gamedrv; }
 
 	attotime				m_minimum_quantum;			// minimum scheduling quantum
 	const char *			m_perfect_cpu_quantum;		// tag of CPU to use for "perfect" scheduling
@@ -149,6 +151,7 @@ public:
 	device_config *device_find(device_config *owner, const char *tag);
 
 private:
+	const game_driver &		m_gamedrv;
 	int						m_parse_level;				// nested parsing level
 };
 

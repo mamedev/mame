@@ -189,10 +189,10 @@ int mame_execute(core_options *options)
 		}
 
 		// create the machine configuration
-		const machine_config *config = global_alloc(machine_config(driver->machine_config));
+		const machine_config *config = global_alloc(machine_config(*driver));
 
 		// create the machine structure and driver
-		running_machine *machine = global_alloc(running_machine(*driver, *config, *options, started_empty));
+		running_machine *machine = global_alloc(running_machine(*config, *options, started_empty));
 
 		// looooong term: remove this
 		global_machine = machine;
@@ -519,7 +519,6 @@ void mame_parse_ini_files(core_options *options, const game_driver *driver)
 #ifndef MESS
 		const game_driver *parent = driver_get_clone(driver);
 		const game_driver *gparent = (parent != NULL) ? driver_get_clone(parent) : NULL;
-		machine_config *config;
 
 		/* parse "vertical.ini" or "horizont.ini" */
 		if (driver->flags & ORIENTATION_SWAP_XY)
@@ -528,14 +527,15 @@ void mame_parse_ini_files(core_options *options, const game_driver *driver)
 			parse_ini_file(options, "horizont", OPTION_PRIORITY_ORIENTATION_INI);
 
 		/* parse "vector.ini" for vector games */
-		config = global_alloc(machine_config(driver->machine_config));
-		for (const screen_device_config *devconfig = screen_first(*config); devconfig != NULL; devconfig = screen_next(devconfig))
-			if (devconfig->screen_type() == SCREEN_TYPE_VECTOR)
-			{
-				parse_ini_file(options, "vector", OPTION_PRIORITY_VECTOR_INI);
-				break;
-			}
-		global_free(config);
+		{
+			machine_config config(*driver);
+			for (const screen_device_config *devconfig = screen_first(config); devconfig != NULL; devconfig = screen_next(devconfig))
+				if (devconfig->screen_type() == SCREEN_TYPE_VECTOR)
+				{
+					parse_ini_file(options, "vector", OPTION_PRIORITY_VECTOR_INI);
+					break;
+				}
+		}
 
 		/* next parse "source/<sourcefile>.ini"; if that doesn't exist, try <sourcefile>.ini */
 		astring sourcename;

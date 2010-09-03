@@ -248,8 +248,8 @@ bool device_config_memory_interface::interface_validity_check(const game_driver 
 				{
 					// look for the region
 					bool found = false;
-					for (const rom_source *source = rom_first_source(&driver, &m_machine_config); source != NULL && !found; source = rom_next_source(&driver, &m_machine_config, source))
-						for (const rom_entry *romp = rom_first_region(&driver, source); !ROMENTRY_ISEND(romp) && !found; romp++)
+					for (const rom_source *source = rom_first_source(m_machine_config); source != NULL && !found; source = rom_next_source(*source))
+						for (const rom_entry *romp = rom_first_region(*source); !ROMENTRY_ISEND(romp) && !found; romp++)
 						{
 							const char *regiontag = ROMREGION_GETTAG(romp);
 							if (regiontag != NULL)
@@ -295,11 +295,11 @@ bool device_config_memory_interface::interface_validity_check(const game_driver 
 //              }
 
 				// validate bank and share tags
-				if (entry->m_read.m_type == AMH_BANK && !validate_tag(&driver, "bank", entry->m_read.m_tag))
+				if (entry->m_read.m_type == AMH_BANK && !validate_tag(driver, "bank", entry->m_read.m_tag))
 					error = true ;
-				if (entry->m_write.m_type == AMH_BANK && !validate_tag(&driver, "bank", entry->m_write.m_tag))
+				if (entry->m_write.m_type == AMH_BANK && !validate_tag(driver, "bank", entry->m_write.m_tag))
 					error = true;
-				if (entry->m_share != NULL && !validate_tag(&driver, "share", entry->m_share))
+				if (entry->m_share != NULL && !validate_tag(driver, "share", entry->m_share))
 					error = true;
 			}
 
