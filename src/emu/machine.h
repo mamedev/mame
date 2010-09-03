@@ -617,7 +617,6 @@ public:
 
 protected:
 	// helpers called at startup
-	virtual void find_devices();
 	virtual void driver_start();
 	virtual void machine_start();
 	virtual void sound_start();
@@ -633,23 +632,70 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 	
-	// device locators
-	template<class T>
-	bool optional_device(T *&device, const char *tag)
+	// helper class to request auto-device discovery in the constructor of a derived class
+	class auto_device_base
 	{
-		device = downcast<T *>(m_machine.device<T>(tag));
-		return (device != NULL);
-	}
+	public:
+		// construction/destruction
+		auto_device_base(driver_device &base, const char *tag);
+		virtual ~auto_device_base();
 
-	template<class T>
-	void required_device(T *&device, const char *tag)
+		// getters
+		virtual void findit(driver_device &base) = 0;
+	
+		// internal state
+		auto_device_base *m_next;
+		const char *m_tag;
+	};
+
+	// optional device finder
+	template<class _DeviceClass>
+	class optional_device : public auto_device_base
 	{
-		if (!optional_device(device, tag))
-			throw emu_fatalerror("Unable to find device '%s'", tag);
-	}
+	public:
+		// construction/destruction
+		optional_device(driver_device &base, const char *tag) 
+			: auto_device_base(base, tag), 
+			  m_device(NULL) { }
+
+		// operators to make use transparent
+		operator _DeviceClass *() { return m_device; }
+		operator _DeviceClass *() const { return m_device; }
+		_DeviceClass *operator->() { return m_device; }
+
+		// finder
+		virtual void findit(driver_device &base)
+		{
+			m_device = base.m_machine.device<_DeviceClass>(m_tag);
+		}
+	
+		// internal state
+		_DeviceClass *m_device;
+	};
+	
+	// required devices are similar but throw an error if they are not found
+	template<class _DeviceClass>
+	class required_device : public optional_device<_DeviceClass>
+	{
+	public:
+		// construction/destruction
+		required_device(driver_device &base, const char *tag) 
+			: optional_device<_DeviceClass>(base, tag) { }
+
+		// finder
+		virtual void findit(driver_device &base)
+		{
+			this->m_device = base.m_machine.device<_DeviceClass>(this->m_tag);
+			if (this->m_device == NULL) throw emu_fatalerror("Unabled to find required device '%s'", this->m_tag);
+		}
+	};
+	
+	// internal helpers
+	void register_auto_device(auto_device_base &autodev);
 
 	// internal state
 	const driver_device_config_base &m_config;
+	auto_device_base *m_auto_device_list;
 };
 
 

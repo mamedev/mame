@@ -11,8 +11,8 @@ class mitchell_state : public driver_device
 public:
 	mitchell_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config),
-		  audiocpu(machine.device<cpu_device>("audiocpu")),
-		  oki(machine.device<okim6295_device>("oki")) { }
+		  audiocpu(*this, "audiocpu"),
+		  oki(*this, "oki") { }
 
 	/* memory pointers */
 	UINT8 *    videoram;
@@ -37,8 +37,8 @@ public:
 	int        keymatrix;
 
 	/* devices */
-	cpu_device *audiocpu;
-	okim6295_device *oki;
+	required_device<cpu_device> audiocpu;
+	required_device<okim6295_device> oki;
 };
 
 

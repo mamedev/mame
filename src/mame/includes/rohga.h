@@ -12,11 +12,11 @@ class rohga_state : public driver_device
 public:
 	rohga_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config),
-		  maincpu(machine.device<cpu_device>("maincpu")),
-		  audiocpu(machine.device<cpu_device>("audiocpu")),
-		  deco16ic(machine.device<deco16ic_device>("deco_custom")),
-		  oki1(machine.device<okim6295_device>("oki1")),
-		  oki2(machine.device<okim6295_device>("oki2")) { }
+		  maincpu(*this, "maincpu"),
+		  audiocpu(*this, "audiocpu"),
+		  deco16ic(*this, "deco_custom"),
+		  oki1(*this, "oki1"),
+		  oki2(*this, "oki2") { }
 
 	/* memory pointers */
 	UINT16 *  pf1_rowscroll;
@@ -26,11 +26,11 @@ public:
 	UINT16 *  spriteram;
 
 	/* devices */
-	cpu_device *maincpu;
-	cpu_device *audiocpu;
-	deco16ic_device *deco16ic;
-	okim6295_device *oki1;
-	okim6295_device *oki2;
+	required_device<cpu_device> maincpu;
+	required_device<cpu_device> audiocpu;
+	required_device<deco16ic_device> deco16ic;
+	required_device<okim6295_device> oki1;
+	required_device<okim6295_device> oki2;
 };
 
 

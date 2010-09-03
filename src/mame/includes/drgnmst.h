@@ -6,8 +6,8 @@ class drgnmst_state : public driver_device
 public:
 	drgnmst_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config),
-		  oki_1(machine.device<okim6295_device>("oki1")),
-		  oki_2(machine.device<okim6295_device>("oki2")) { }
+		  oki_1(*this, "oki1"),
+		  oki_2(*this, "oki2") { }
 
 	/* memory pointers */
 	UINT16 *    vidregs;
@@ -33,8 +33,8 @@ public:
 	UINT8       oki1_bank;
 
 	/* devices */
-	okim6295_device *oki_1;
-	okim6295_device *oki_2;
+	required_device<okim6295_device> oki_1;
+	required_device<okim6295_device> oki_2;
 };
 
 

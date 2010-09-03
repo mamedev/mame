@@ -11,28 +11,24 @@ class harddriv_state : public atarigen_state
 {
 public:
 	harddriv_state(running_machine &machine, const driver_device_config_base &config)
-		: atarigen_state(machine, config) { }
+		: atarigen_state(machine, config),
+		  maincpu(*this, "maincpu"),
+		  gsp(*this, "gsp"),
+		  msp(*this, "msp"),
+		  adsp(*this, "adsp"),
+		  soundcpu(*this, "soundcpu"),
+		  sounddsp(*this, "sounddsp"),
+		  jsacpu(*this, "jsacpu"),
+		  dsp32(*this, "dsp32") { }
 
-	virtual void find_devices()
-	{
-		required_device(maincpu, "maincpu");
-		required_device(gsp, "gsp");
-		optional_device(msp, "msp");
-		required_device(adsp, "adsp");
-		optional_device(soundcpu, "soundcpu");
-		optional_device(sounddsp, "sounddsp");
-		optional_device(jsacpu, "jsacpu");
-		optional_device(dsp32, "dsp32");
-	}
-
-	cpu_device *			maincpu;
-	tms34010_device *		gsp;
-	cpu_device *			msp;
-	cpu_device *			adsp;
-	cpu_device *			soundcpu;
-	cpu_device *			sounddsp;
-	cpu_device *			jsacpu;
-	cpu_device *			dsp32;
+	required_device<cpu_device> maincpu;
+	required_device<tms34010_device> gsp;
+	optional_device<cpu_device> msp;
+	required_device<cpu_device> adsp;
+	optional_device<cpu_device> soundcpu;
+	optional_device<cpu_device> sounddsp;
+	optional_device<cpu_device> jsacpu;
+	optional_device<cpu_device> dsp32;
 
 	UINT8					hd34010_host_access;
 	UINT8					dsk_pio_access;

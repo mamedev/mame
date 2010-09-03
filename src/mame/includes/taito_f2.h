@@ -15,7 +15,7 @@ class taitof2_state : public driver_device
 public:
 	taitof2_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config),
-		  oki(machine.device<okim6295_device>("oki")) { }
+		  oki(*this, "oki") { }
 
 	/* memory pointers */
 	UINT16 *        sprite_extension;
@@ -68,7 +68,7 @@ public:
 	/* devices */
 	running_device *maincpu;
 	running_device *audiocpu;
-	okim6295_device *oki;
+	required_device<okim6295_device> oki;
 	running_device *tc0100scn;
 	running_device *tc0100scn_1;
 	running_device *tc0100scn_2;

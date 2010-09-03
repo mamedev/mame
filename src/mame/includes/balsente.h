@@ -31,8 +31,8 @@ class balsente_state : public driver_device
 public:
 	balsente_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config),
-		  scanline_timer(machine.device<timer_device>("scan_timer")),
-		  counter_0_timer(machine.device<timer_device>("8253_0_timer"))
+		  scanline_timer(*this, "scan_timer"),
+		  counter_0_timer(*this, "8253_0_timer")
 	{
 		astring temp;
 		for (int i = 0; i < ARRAY_LENGTH(cem_device); i++)
@@ -64,12 +64,12 @@ public:
 		UINT8 writebyte;
 	} counter[3];
 
-	timer_device *scanline_timer;
+	required_device<timer_device> scanline_timer;
 
 	/* manually clocked counter 0 states */
 	UINT8 counter_control;
 	UINT8 counter_0_ff;
-	timer_device *counter_0_timer;
+	required_device<timer_device> counter_0_timer;
 	UINT8 counter_0_timer_active;
 
 	/* random number generator states */

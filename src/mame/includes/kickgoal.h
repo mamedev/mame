@@ -12,8 +12,8 @@ class kickgoal_state : public driver_device
 public:
 	kickgoal_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config),
-		  adpcm(machine.device<okim6295_device>("oki")),
-		  eeprom(machine.device<eeprom_device>("eeprom")) { }
+		  adpcm(*this, "oki"),
+		  eeprom(*this, "eeprom") { }
 
 	/* memory pointers */
 	UINT16 *    fgram;
@@ -34,8 +34,8 @@ public:
 	UINT16      m6295_key_delay;
 
 	/* devices */
-	okim6295_device *adpcm;
-	eeprom_device *eeprom;
+	required_device<okim6295_device> adpcm;
+	required_device<eeprom_device> eeprom;
 };
 
 

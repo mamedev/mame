@@ -12,11 +12,11 @@ class dassault_state : public driver_device
 public:
 	dassault_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config),
-		  maincpu(machine.device<cpu_device>("maincpu")),
-		  audiocpu(machine.device<cpu_device>("audiocpu")),
-		  subcpu(machine.device<cpu_device>("sub")),
-		  deco16ic(machine.device<deco16ic_device>("deco_custom")),
-		  oki2(machine.device<okim6295_device>("oki2")) { }
+		  maincpu(*this, "maincpu"),
+		  audiocpu(*this, "audiocpu"),
+		  subcpu(*this, "sub"),
+		  deco16ic(*this, "deco_custom"),
+		  oki2(*this, "oki2") { }
 
 	/* memory pointers */
 	UINT16 *  pf2_rowscroll;
@@ -26,11 +26,11 @@ public:
 	UINT16 *  shared_ram;
 
 	/* devices */
-	cpu_device *maincpu;
-	cpu_device *audiocpu;
-	cpu_device *subcpu;
-	deco16ic_device *deco16ic;
-	okim6295_device *oki2;
+	required_device<cpu_device> maincpu;
+	required_device<cpu_device> audiocpu;
+	required_device<cpu_device> subcpu;
+	required_device<deco16ic_device> deco16ic;
+	required_device<okim6295_device> oki2;
 };
 
 
