@@ -434,7 +434,7 @@ void z80dma_device::do_read()
 				else
 					m_latch = devcb_call_read8(&m_in_iorq_func, m_addressA);
 
-				if (LOG) logerror("A src: %04x data: %02x\n",m_addressA, m_latch);
+				if (LOG) logerror("A src: %04x %s -> data: %02x\n",m_addressA, PORTA_MEMORY ? "mem" : "i/o", m_latch);
 				m_addressA += PORTA_FIXED ? 0 : PORTA_INC ? PORTA_STEP : -PORTA_STEP;
 			}
 			else
@@ -444,7 +444,7 @@ void z80dma_device::do_read()
 				else
 					m_latch = devcb_call_read8(&m_in_iorq_func, m_addressB);
 
-				if (LOG) logerror("B src: %04x data: %02x\n",m_addressB, m_latch);
+				if (LOG) logerror("B src: %04x %s -> data: %02x\n",m_addressB, PORTB_MEMORY ? "mem" : "i/o", m_latch);
 				m_addressB += PORTB_FIXED ? 0 : PORTB_INC ? PORTB_STEP : -PORTB_STEP;
 			}
 			break;
@@ -481,7 +481,7 @@ int z80dma_device::do_write()
 				else
 					devcb_call_write8(&m_out_iorq_func, m_addressB, m_latch);
 
-				if (LOG) logerror("B dst: %04x \n",m_addressB);
+				if (LOG) logerror("B dst: %04x %s\n",m_addressB, PORTB_MEMORY ? "mem" : "i/o");
 				m_addressB += PORTB_FIXED ? 0 : PORTB_INC ? PORTB_STEP : -PORTB_STEP;
 			}
 			else
@@ -491,7 +491,7 @@ int z80dma_device::do_write()
 				else
 					devcb_call_write8(&m_out_iorq_func, m_addressA, m_latch);
 
-				if (LOG) logerror("A dst: %04x \n",m_addressA);
+				if (LOG) logerror("A dst: %04x %s\n",m_addressA, PORTA_MEMORY ? "mem" : "i/o");
 				m_addressA += PORTA_FIXED ? 0 : PORTA_INC ? PORTA_STEP : -PORTA_STEP;
 			}
 			m_count--;
