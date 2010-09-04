@@ -90,6 +90,14 @@ VIDEO_START( gaiden )
 	tilemap_set_transparent_pen(state->foreground, 0);
 	tilemap_set_transparent_pen(state->text_layer, 0);
 
+	tilemap_set_scrolldy(state->background, 0, 33);
+	tilemap_set_scrolldy(state->foreground, 0, 33);
+	tilemap_set_scrolldy(state->text_layer, 0, 31);
+
+	tilemap_set_scrolldx(state->background, 0, -1);
+	tilemap_set_scrolldx(state->foreground, 0, -1);
+	tilemap_set_scrolldx(state->text_layer, 0, -1);
+
 	/* set up sprites */
 	state->sprite_bitmap = auto_bitmap_alloc(machine, width, height, BITMAP_FORMAT_INDEXED16);
 }
