@@ -52,8 +52,8 @@ class k3_state : public driver_device
 public:
 	k3_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config),
-		  oki1(machine.device<okim6295_device>("oki1")),
-		  oki2(machine.device<okim6295_device>("oki2")) { }
+		  oki1(*this, "oki1"),
+		  oki2(*this, "oki2") { }
 
 	/* memory pointers */
 	UINT16 *  spriteram_1;
@@ -65,8 +65,8 @@ public:
 	tilemap_t  *bg_tilemap;
 
 	/* devices */
-	okim6295_device *oki1;
-	okim6295_device *oki2;
+	required_device<okim6295_device> oki1;
+	required_device<okim6295_device> oki2;
 };
 
 

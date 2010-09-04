@@ -32,15 +32,13 @@ public:
 	balsente_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config),
 		  scanline_timer(*this, "scan_timer"),
-		  counter_0_timer(*this, "8253_0_timer")
-	{
-		astring temp;
-		for (int i = 0; i < ARRAY_LENGTH(cem_device); i++)
-		{
-			cem_device[i] = machine.device<cem3394_device>(temp.format("cem%d", i+1));
-			assert(cem_device[i] != NULL);
-		}
-	}
+		  counter_0_timer(*this, "8253_0_timer"),
+		  m_cem1(*this, "cem1"),
+		  m_cem2(*this, "cem2"),
+		  m_cem3(*this, "cem3"),
+		  m_cem4(*this, "cem4"),
+		  m_cem5(*this, "cem5"),
+		  m_cem6(*this, "cem6") { }
 
 	/* global data */
 	UINT8 shooter;
@@ -100,6 +98,12 @@ public:
 
 	/* noise generator states */
 	UINT32 noise_position[6];
+	required_device<cem3394_device> m_cem1;
+	required_device<cem3394_device> m_cem2;
+	required_device<cem3394_device> m_cem3;
+	required_device<cem3394_device> m_cem4;
+	required_device<cem3394_device> m_cem5;
+	required_device<cem3394_device> m_cem6;
 	cem3394_device *cem_device[6];
 
 	/* game-specific states */

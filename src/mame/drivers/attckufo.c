@@ -51,16 +51,16 @@ class attckufo_state : public driver_device
 public:
 	attckufo_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config),
-		  maincpu(machine.device<cpu_device>("maincpu")),
-		  mos6560(machine.device("mos6560")) { }
+		  maincpu(*this, "maincpu"),
+		  mos6560(*this, "mos6560") { }
 
 	/* memory pointers */
 	UINT8 *      mainram;
 	UINT8 *      tileram;
 
 	/* devices */
-	cpu_device *maincpu;
-	running_device *mos6560;
+	required_device<cpu_device> maincpu;
+	required_device<mos6560_device> mos6560;
 };
 
 

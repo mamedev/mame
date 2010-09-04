@@ -44,10 +44,10 @@ class mirage_state : public driver_device
 public:
 	mirage_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config),
-		  maincpu(machine.device<cpu_device>("maincpu")),
-		  deco16ic(machine.device<deco16ic_device>("deco_custom")),
-		  oki_sfx(machine.device<okim6295_device>("oki_sfx")),
-		  oki_bgm(machine.device<okim6295_device>("oki_bgm")) { }
+		  maincpu(*this, "maincpu"),
+		  deco16ic(*this, "deco_custom"),
+		  oki_sfx(*this, "oki_sfx"),
+		  oki_bgm(*this, "oki_bgm") { }
 
 	/* memory pointers */
 	UINT16 *  pf1_rowscroll;
@@ -60,10 +60,10 @@ public:
 	UINT32 mux_data;
 
 	/* devices */
-	cpu_device *maincpu;
-	deco16ic_device *deco16ic;
-	okim6295_device *oki_sfx;
-	okim6295_device *oki_bgm;
+	required_device<m68000_device> maincpu;
+	required_device<deco16ic_device> deco16ic;
+	required_device<okim6295_device> oki_sfx;
+	required_device<okim6295_device> oki_bgm;
 };
 
 

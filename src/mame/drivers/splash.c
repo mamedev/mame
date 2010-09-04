@@ -435,7 +435,7 @@ static const ym2203_interface ym2203_config =
 	ym_irq
 };
 
-static MACHINE_CONFIG_START( roldfrog, driver_device )
+static MACHINE_CONFIG_START( roldfrog, splash_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,24000000/2)			/* 12 MHz - verified */
@@ -475,7 +475,7 @@ static MACHINE_CONFIG_START( roldfrog, driver_device )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( funystrp, driver_device )
+static MACHINE_CONFIG_START( funystrp, splash_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000,24000000/2)			/* 12 MHz (24/2) */

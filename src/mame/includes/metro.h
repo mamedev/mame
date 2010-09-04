@@ -82,9 +82,9 @@ public:
 	/* devices */
 	required_device<cpu_device> maincpu;
 	required_device<cpu_device> audiocpu;
-	required_device<okim6295_device> oki;
+	optional_device<okim6295_device> oki;
 	required_device<device_t> ymsnd;
-	required_device<k053936_device> k053936;
+	optional_device<k053936_device> k053936;
 };
 
 

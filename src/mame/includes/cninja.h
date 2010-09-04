@@ -32,8 +32,8 @@ public:
 	required_device<cpu_device> maincpu;
 	required_device<cpu_device> audiocpu;
 	required_device<deco16ic_device> deco16ic;
-	required_device<timer_device> raster_irq_timer;
-	required_device<okim6295_device> oki2;
+	optional_device<timer_device> raster_irq_timer;
+	optional_device<okim6295_device> oki2;
 };
 
 /*----------- defined in video/cninja.c -----------*/

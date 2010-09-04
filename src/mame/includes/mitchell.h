@@ -37,7 +37,7 @@ public:
 	int        keymatrix;
 
 	/* devices */
-	required_device<cpu_device> audiocpu;
+	optional_device<cpu_device> audiocpu;
 	required_device<okim6295_device> oki;
 };
 

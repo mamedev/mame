@@ -68,7 +68,7 @@ public:
 	/* devices */
 	running_device *maincpu;
 	running_device *audiocpu;
-	required_device<okim6295_device> oki;
+	optional_device<okim6295_device> oki;
 	running_device *tc0100scn;
 	running_device *tc0100scn_1;
 	running_device *tc0100scn_2;
