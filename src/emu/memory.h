@@ -740,6 +740,10 @@ int memory_get_bank(running_machine *machine, const char *tag) ATTR_NONNULL(1);
 // set the absolute address of a bank base
 void memory_set_bankptr(running_machine *machine, const char *tag, void *base) ATTR_NONNULL(1, 3);
 
+// get a pointer to a shared memory region by tag
+void *memory_get_shared(running_machine &machine, const char *tag);
+void *memory_get_shared(running_machine &machine, const char *tag, size_t &length);
+
 // dump the internal memory tables to the given file
 void memory_dump(running_machine *machine, FILE *file);
 

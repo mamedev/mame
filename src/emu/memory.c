@@ -224,9 +224,6 @@
 // banking constants
 const int BANK_ENTRY_UNSPECIFIED = -1;
 
-// shares are initially mapped to this invalid pointer
-static void *UNMAPPED_SHARE_PTR = ((void *)-1);
-
 // other address map constants
 const int MEMORY_BLOCK_CHUNK = 65536;					// minimum chunk size of allocated memory blocks
 
@@ -389,6 +386,31 @@ private:
 	astring					m_name;					// friendly name for this bank
 	astring					m_tag;					// tag for this bank
 	simple_list<bank_reference> m_reflist;			// linked list of address spaces referencing this bank
+};
+
+
+// ======================> memory_share
+
+// a memory share contains information about shared memory region
+class memory_share
+{
+public:
+	// construction/destruction
+	memory_share(size_t size, void *ptr = NULL)
+		: m_ptr(ptr),
+		  m_size(size) { }
+	
+	// getters
+	void *ptr() const { return m_ptr; }
+	size_t size() const { return m_size; }
+	
+	// setters
+	void set_ptr(void *ptr) { m_ptr = ptr; }
+	
+private:
+	// internal state
+	void *					m_ptr;					// pointer to the memory backing the region
+	size_t					m_size;					// size of the shared region
 };
 
 
@@ -1499,7 +1521,7 @@ struct _memory_private
 	tagmap_t<memory_bank *>	bankmap;						// map for fast bank lookups
 	UINT8					banknext;						// next bank to allocate
 
-	tagmap_t<void *>		sharemap;						// map for share lookups
+	tagmap_t<memory_share *> sharemap;						// map for share lookups
 };
 
 
@@ -1672,6 +1694,27 @@ void memory_set_bankptr(running_machine *machine, const char *tag, void *base)
 
 	// set the base
 	bank->set_base(base);
+}
+
+
+//-------------------------------------------------
+//  memory_get_shared - get a pointer to a shared 
+//  memory region by tag
+//-------------------------------------------------
+
+void *memory_get_shared(running_machine &machine, const char *tag)
+{
+	size_t size;
+	return memory_get_shared(machine, tag, size);
+}
+
+void *memory_get_shared(running_machine &machine, const char *tag, size_t &length)
+{
+	memory_share *share = machine.memory_data->sharemap.find(tag);
+	if (share == NULL)
+		return NULL;
+	length = share->size();
+	return share->ptr();
 }
 
 
@@ -1908,16 +1951,19 @@ void address_space::prepare_map()
 	// make a pass over the address map, adjusting for the device and getting memory pointers
 	for (address_map_entry *entry = m_map->m_entrylist.first(); entry != NULL; entry = entry->next())
 	{
-		// if we have a share entry, add it to our map
-		if (entry->m_share != NULL)
-			m_machine.memory_data->sharemap.add(entry->m_share, UNMAPPED_SHARE_PTR, false);
-
 		// computed adjusted addresses first
 		entry->m_bytestart = entry->m_addrstart;
 		entry->m_byteend = entry->m_addrend;
 		entry->m_bytemirror = entry->m_addrmirror;
 		entry->m_bytemask = entry->m_addrmask;
 		adjust_addresses(entry->m_bytestart, entry->m_byteend, entry->m_bytemask, entry->m_bytemirror);
+
+		// if we have a share entry, add it to our map
+		if (entry->m_share != NULL && m_machine.memory_data->sharemap.find(entry->m_share) == NULL)
+		{
+			memory_share *share = auto_alloc(&m_machine, memory_share(entry->m_byteend + 1 - entry->m_bytestart));
+			m_machine.memory_data->sharemap.add(entry->m_share, share, false);
+		}
 
 		// if this is a ROM handler without a specified region, attach it to the implicit region
 		if (m_spacenum == ADDRESS_SPACE_0 && entry->m_read.m_type == AMH_ROM && entry->m_region == NULL)
@@ -2274,10 +2320,10 @@ address_map_entry *address_space::block_assign_intersecting(offs_t bytestart, of
 		// if we haven't assigned this block yet, see if we have a mapped shared pointer for it
 		if (entry->m_memory == NULL && entry->m_share != NULL)
 		{
-			void *shareptr = memdata->sharemap.find(entry->m_share);
-			if (shareptr != UNMAPPED_SHARE_PTR)
+			memory_share *share = memdata->sharemap.find(entry->m_share);
+			if (share != NULL && share->ptr() != NULL)
 			{
-				entry->m_memory = shareptr;
+				entry->m_memory = share->ptr();
 				VPRINTF(("memory range %08X-%08X -> shared_ptr '%s' [%p]\n", entry->m_addrstart, entry->m_addrend, entry->m_share, entry->m_memory));
 			}
 		}
@@ -2292,9 +2338,9 @@ address_map_entry *address_space::block_assign_intersecting(offs_t bytestart, of
 		// if we're the first match on a shared pointer, assign it now
 		if (entry->m_memory != NULL && entry->m_share != NULL)
 		{
-			void *shareptr = memdata->sharemap.find(entry->m_share);
-			if (shareptr == UNMAPPED_SHARE_PTR)
-				memdata->sharemap.add(entry->m_share, entry->m_memory, TRUE);
+			memory_share *share = memdata->sharemap.find(entry->m_share);
+			if (share != NULL && share->ptr() == NULL)
+				share->set_ptr(entry->m_memory);
 		}
 
 		// keep track of the first unassigned entry
