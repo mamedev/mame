@@ -857,7 +857,7 @@ void z80dma_device::rdy_write_callback(int state)
 void z80dma_device::rdy_w(int state)
 {
 	if (LOG) logerror("RDY: %d Active High: %d\n", state, READY_ACTIVE_HIGH);
-	timer_call_after_resynch(&m_machine, (void *)this, state == READY_ACTIVE_HIGH, static_rdy_write_callback);
+	timer_call_after_resynch(&m_machine, (void *)this, state, static_rdy_write_callback);
 }
 
 
