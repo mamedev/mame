@@ -1567,6 +1567,7 @@ const game_driver * const drivers[] =
 	DRIVER( youjyudn )	/* (c) 1986 (Japan) */
 
 	DRIVER( vigilant )	/* (c) 1988 (World) */
+	DRIVER( vigilant1 )	/* (c) 1988 (World) */
 	DRIVER( vigilantu )	/* (c) 1988 (US) */
 	DRIVER( vigilantj )	/* (c) 1988 (Japan) */
 	DRIVER( kikcubic )	/* (c) 1988 (Japan) */
@@ -4003,7 +4004,6 @@ DokiDoki Penguin Land *not confirmed
 	DRIVER( atomicp )	/* (c) 1990 Philko - korean clone board */
 	DRIVER( snapper )	/* (c) 1990 Philko - korean clone board */
 
-
 	/* S16 Bootlegs */
 	DRIVER( bayrouteb1 )/* (c) 1989 (protected) (bootleg) */
 	DRIVER( bayrouteb2 )/* (c) 1989 (protected) (bootleg) */
@@ -4022,6 +4022,10 @@ DokiDoki Penguin Land *not confirmed
 	DRIVER( iqpipe )	/* (c) 1991 AMT */
 	DRIVER( tturfbl )	/* (c) 1989 (Datsu bootleg) */
 	DRIVER( wb3bbl )	/* BOOTLEG */
+
+	/* ISG S16 bootleg system */
+	DRIVER( isgsm )
+	DRIVER( shinfz )
 
 	/* System 18 */
 	DRIVER( shdancer )	/* 1989.05 Shadow Dancer (US) */

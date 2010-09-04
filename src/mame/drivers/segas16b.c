@@ -1032,26 +1032,12 @@ static void sound_w(running_machine *machine, UINT8 data)
 	}
 }
 
-
-static void system16b_generic_init(running_machine *machine, int _rom_board)
+static void system16b_common_init(running_machine* machine, int _rom_board)
 {
 	segas1x_state *state = machine->driver_data<segas1x_state>();
 
 	/* set the ROM board */
 	state->rom_board = _rom_board;
-
-	/* allocate memory for regions not autmatically assigned */
-	segaic16_spriteram_0 = auto_alloc_array(machine, UINT16, 0x00800 / 2);
-	segaic16_paletteram  = auto_alloc_array(machine, UINT16, 0x01000 / 2);
-	segaic16_tileram_0   = auto_alloc_array(machine, UINT16, 0x10000 / 2);
-	segaic16_textram_0   = auto_alloc_array(machine, UINT16, 0x01000 / 2);
-	workram              = auto_alloc_array(machine, UINT16, 0x04000 / 2);
-
-	/* init the memory mapper */
-	segaic16_memory_mapper_init(machine->device("maincpu"), region_info_list[state->rom_board], sound_w, NULL);
-
-	/* init the FD1094 */
-	fd1094_driver_init(machine, "maincpu", segaic16_memory_mapper_set_decrypted);
 
 	/* reset the custom handlers and other pointers */
 	state->custom_io_r = NULL;
@@ -1073,6 +1059,29 @@ static void system16b_generic_init(running_machine *machine, int _rom_board)
 	state_save_register_global(machine, state->mj_last_val);
 	state_save_register_global(machine, state->hwc_input_value);
 	state_save_register_global(machine, state->atomicp_sound_divisor);
+
+}
+
+
+static void system16b_generic_init(running_machine *machine, int _rom_board)
+{
+	segas1x_state *state = machine->driver_data<segas1x_state>();
+
+	system16b_common_init(machine, _rom_board);
+
+	/* allocate memory for regions not autmatically assigned */
+	segaic16_spriteram_0 = auto_alloc_array(machine, UINT16, 0x00800 / 2);
+	segaic16_paletteram  = auto_alloc_array(machine, UINT16, 0x01000 / 2);
+	segaic16_tileram_0   = auto_alloc_array(machine, UINT16, 0x10000 / 2);
+	segaic16_textram_0   = auto_alloc_array(machine, UINT16, 0x01000 / 2);
+	workram              = auto_alloc_array(machine, UINT16, 0x04000 / 2);
+
+	/* init the memory mapper */
+	segaic16_memory_mapper_init(machine->device("maincpu"), region_info_list[state->rom_board], sound_w, NULL);
+
+	/* init the FD1094 */
+	fd1094_driver_init(machine, "maincpu", segaic16_memory_mapper_set_decrypted);
+
 	state_save_register_global_pointer(machine, segaic16_spriteram_0, 0x00800/2);
 	state_save_register_global_pointer(machine, segaic16_paletteram,  0x01000/2);
 	state_save_register_global_pointer(machine, segaic16_tileram_0,   0x10000/2);
@@ -6675,3 +6684,457 @@ GAME( 1989, wrestwar1,  wrestwar, system16b,      wrestwar, generic_5704,       
 /* Custom Korean Board - these probably belong with the bootlegs... */
 GAME( 1990, atomicp,    0,        atomicp,        atomicp,  atomicp,            ROT0,   "Philko",         "Atomic Point (Korea)" , 0) // korean clone board..
 GAME( 1990, snapper,    0,        atomicp,        snapper,  snapper,            ROT0,   "Philko",         "Snapper (Korea)" , 0) // korean clone board..
+
+
+
+
+/* ISG 'Selection Master' Type 2006 hardware
+
+This is a 'multi-game' cart system (only the operator can select the game, via a dipswitch exposed from the cartridge)
+
+The system is designed to look like a PGM system (the ISG logo and fonts are ripped straight from original IGS material,
+and the external casing of the unit is near identical)  The system does NOT however run PGM games, the cartridges won't
+fit, and the hardware is basically a bootleg of Sega System 16 instead of PGM!  So far only one cartridge has been seen.
+
+There are various levels of 'protection' on the system
+ - Address XOR + 16-bit bitswap on the BIOS rom and Cartridge ROMs
+ - A device which performs a 32-bit bitswap, used to produce decryption keys for the data compressed on the cartridges
+ - An alternate way of reading the cartridge data through a port, which causes an additional 8-bit data xor to be applied
+ - A simple hardware RLE decompression device used to decrypt data for the BIOS (the games use a stronger software
+   implementation instead)
+
+The PCB is entirely custom SMT components, as you'd expect from a modern bootleg, all chips have had their surface details
+removed.
+
+*/
+
+
+
+/* these should probably go in a driver state derived from the Sega one */
+static UINT16 isgsm_cart_addrlatch;
+static UINT32 isgsm_cart_addr;
+static int isgsm_type = 0;
+static UINT32 isgsm_addr;
+static UINT8  isgsm_mode;
+static UINT16 isgsm_addrlatch;
+static UINT32 isgsm_security;
+static UINT16 isgsm_securitylatch;
+static UINT8 isgsm_rle_control_position = 8;
+static UINT8 isgsm_rle_control_byte;
+static int isgsm_rle_latched;
+static UINT8 isgsm_rle_byte;
+
+#define ISGSM_CART_BANK "gamecart"
+#define ISGSM_MAIN_BANK "mainbank"
+
+static WRITE16_HANDLER( isgsm_sound_w16 )
+{
+	sound_w(space->machine, data);
+}
+
+static WRITE16_HANDLER( isgsm_cart_addr_high_w )
+{
+	isgsm_cart_addrlatch = data;
+}
+
+static WRITE16_HANDLER( isgsm_cart_addr_low_w )
+{
+	isgsm_cart_addr = data | isgsm_cart_addrlatch<<16;
+}
+
+// the cart can be read here 8-bits at a time.
+// when reading from this port the data is xored by a fixed value (maybe other carts differ?)
+static READ16_HANDLER( isgsm_cart_data_r )
+{
+	int size = memory_region_length(space->machine,"gamecart_rgn");
+	UINT8* rgn = memory_region(space->machine,"gamecart_rgn");
+
+	isgsm_cart_addr++;
+
+	UINT8 data = rgn[(isgsm_cart_addr&(size-1))^1]^0x66;
+
+	return data;
+}
+
+static WRITE16_HANDLER( isgsm_data_w )
+{
+	UINT8* dest = 0;
+
+	switch (isgsm_type)
+	{
+		case 0x20: dest = memory_region(space->machine,"gfx2");
+			break;
+
+		case 0x21: dest = memory_region(space->machine,"gfx1");
+			break;
+
+		case 0x22: dest = memory_region(space->machine,"soundcpu");
+			break;
+
+		case 0x23: dest = memory_region(space->machine,"maincpu");
+			break;
+
+		default: // no other cases?
+			break;
+	}
+
+	if (dest)
+	{
+		int bytes_to_write;
+		// mode register
+		//  droo
+		//  d = direction
+		//  r = hardware rle (used by the bios only, games are using some kind of software compression/encryption
+		//  oo = operator mode (0 = plain, 1 = xor, 2 = OR, 3 = AND)
+
+		// address can auto-increment or decrement, happens *before* data is written
+		bytes_to_write = 1;
+
+		if (isgsm_mode&0x4)
+		{
+			if (!isgsm_rle_latched)
+			{
+				if (isgsm_rle_control_position==8)
+				{
+					isgsm_rle_control_byte = data;
+					isgsm_rle_control_position = 0;
+					bytes_to_write = 0;
+				}
+				else
+				{
+					if (((isgsm_rle_control_byte<<isgsm_rle_control_position)&0x80) == 0) // RLE
+					{
+						isgsm_rle_byte = data;
+						isgsm_rle_latched = 1;
+					}
+					else
+					{
+						bytes_to_write = 1;
+					}
+					
+					isgsm_rle_control_position++;
+				}
+			}
+			else
+			{
+				isgsm_rle_latched = 0;
+				bytes_to_write = data+2;
+				data = isgsm_rle_byte;
+			}
+		}
+		
+		for (int i=0;i<bytes_to_write;i++)
+		{
+			if (isgsm_mode&0x8)
+			{
+				isgsm_addr++;
+				isgsm_addr&=0xfffffff;
+			}
+			else
+			{
+				isgsm_addr--;
+				isgsm_addr&=0xfffffff;
+			}
+
+			switch (isgsm_mode&0x3)
+			{
+				case 0: dest[isgsm_addr]  = data; break;
+				case 1: dest[isgsm_addr] ^= data; break;
+				case 2: dest[isgsm_addr] |= data; break; // not used, based on real hw test
+				case 3: dest[isgsm_addr] &= data; break; // ^^
+			}
+
+			if (dest == memory_region(space->machine,"gfx1"))
+			{
+
+				// we need to re-decode the tiles if writing to this area to keep MAME happy
+				gfx_element_mark_dirty(space->machine->gfx[0], (isgsm_addr&0x1ffff)/8);
+			}
+		}
+	}
+}
+
+static WRITE16_HANDLER( isgsm_type_w )
+{
+	//printf("type set to %04x %04x\n", data, mem_mask);
+	isgsm_type = data;
+}
+
+static WRITE16_HANDLER( isgsm_addr_high_w )
+{
+	// this is latched, doesn't get applied until low part is written.
+	isgsm_addrlatch = data;
+}
+
+static WRITE16_HANDLER( isgsm_addr_low_w )
+{
+	// update the address and mode
+	isgsm_mode = (isgsm_addrlatch & 0xf000)>>12;
+	isgsm_addr = data | ((isgsm_addrlatch&0x0fff)<<16);
+
+	// also resets the RLE
+	isgsm_rle_control_position = 8;
+	isgsm_rle_control_byte = 0;
+	isgsm_rle_latched = 0;
+}
+
+static WRITE16_HANDLER( isgsm_cart_security_high_w )
+{
+	// this is latched, doesn't get applied until low part is written.
+	isgsm_securitylatch = data;
+}
+
+static WRITE16_HANDLER( isgsm_cart_security_low_w )
+{
+	isgsm_security = data | isgsm_securitylatch << 16;
+	// come up with security answer
+	// -- this probably depends on the cart.
+	isgsm_security = BITSWAP32(isgsm_security, 19, 20, 25, 26, 15, 0, 16, 2, 8, 9, 13, 14, 31, 21, 7, 18, 11, 30, 22, 17, 3, 4, 12, 28, 29, 5, 27, 10, 23, 24, 1, 6);
+}
+
+static READ16_HANDLER( isgsm_cart_security_low_r )
+{
+	return isgsm_security & 0xffff;
+}
+
+static READ16_HANDLER( isgsm_cart_security_high_r )
+{
+	return (isgsm_security>>16) & 0xffff;
+}
+
+WRITE16_HANDLER( isgsm_sound_reset_w )
+{
+	if (data==0)
+	{
+		devtag_reset( space->machine, "soundcpu" );
+		space->machine->device<cpu_device>( "soundcpu" )->resume(SUSPEND_REASON_HALT );
+	}
+	else if (data==1)
+	{
+		devtag_reset( space->machine, "soundcpu" );
+		space->machine->device<cpu_device>( "soundcpu" )->suspend(SUSPEND_REASON_HALT, 1 );
+	}
+}
+
+static WRITE16_HANDLER( isgsm_main_bank_change_w )
+{
+	// other values on real hw have strange results, change memory mapping etc??
+	if (data==1)
+	{
+		memory_set_bankptr(space->machine,ISGSM_MAIN_BANK, memory_region(space->machine, "maincpu"));
+	}
+}
+
+static MACHINE_START( isgsm )
+{
+	memory_set_bankptr(machine,ISGSM_CART_BANK, memory_region(machine, "gamecart_rgn"));
+	memory_set_bankptr(machine,ISGSM_MAIN_BANK, memory_region(machine, "bios"));
+}
+
+static ADDRESS_MAP_START( isgsm_map, ADDRESS_SPACE_PROGRAM, 16 )
+
+	AM_RANGE(0x000000, 0x0fffff) AM_ROMBANK(ISGSM_MAIN_BANK) // this area is ALWAYS read-only, even when the game is banked in
+	AM_RANGE(0x200000, 0x23ffff) AM_RAM // used during startup for decompression
+	AM_RANGE(0x3f0000, 0x3fffff) AM_WRITE( rom_5704_bank_w )
+	AM_RANGE(0x400000, 0x40ffff) AM_RAM_WRITE(segaic16_tileram_0_w) AM_BASE(&segaic16_tileram_0)
+	AM_RANGE(0x410000, 0x410fff) AM_RAM_WRITE(segaic16_textram_0_w) AM_BASE(&segaic16_textram_0)
+	AM_RANGE(0x440000, 0x4407ff) AM_RAM AM_BASE(&segaic16_spriteram_0)
+	AM_RANGE(0x840000, 0x840fff) AM_RAM_WRITE(segaic16_paletteram_w) AM_BASE(&segaic16_paletteram)
+	AM_RANGE(0xC40000, 0xC43fff) AM_READWRITE(misc_io_r, misc_io_w)
+
+	AM_RANGE(0xe00000, 0xe00001) AM_WRITE( isgsm_data_w ) // writes decompressed data here (copied from RAM..)
+	AM_RANGE(0xe00002, 0xe00003) AM_WRITE( isgsm_type_w ) // selects which 'type' of data we're writing
+	AM_RANGE(0xe00004, 0xe00005) AM_WRITE( isgsm_addr_high_w ) // high address, and some mode bits
+	AM_RANGE(0xe00006, 0xe00007) AM_WRITE( isgsm_addr_low_w )  // low address
+
+	AM_RANGE(0xe80000, 0xe80001) AM_READ( isgsm_cart_data_r ) // 8-bit port that the entire cart can be read from
+	AM_RANGE(0xe80002, 0xe80003) AM_READ_PORT("CARDDSW")
+	AM_RANGE(0xe80004, 0xe80005) AM_WRITE( isgsm_cart_addr_high_w )
+	AM_RANGE(0xe80006, 0xe80007) AM_WRITE( isgsm_cart_addr_low_w )
+	AM_RANGE(0xe80008, 0xe80009) AM_READWRITE( isgsm_cart_security_high_r, isgsm_cart_security_high_w ) // 32-bit bitswap device..
+	AM_RANGE(0xe8000a, 0xe8000b) AM_READWRITE( isgsm_cart_security_low_r,  isgsm_cart_security_low_w )
+
+	AM_RANGE(0xee0000, 0xefffff) AM_ROMBANK(ISGSM_CART_BANK) // only the first 0x20000 bytes of the cart are visible here..
+
+	AM_RANGE(0xfe0006, 0xfe0007) AM_WRITE( isgsm_sound_w16 )
+	AM_RANGE(0xfe0008, 0xfe0009) AM_WRITE( isgsm_sound_reset_w )
+	AM_RANGE(0xfe000a, 0xfe000b) AM_WRITE( isgsm_main_bank_change_w )
+	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_BASE(&workram)
+ADDRESS_MAP_END
+
+
+
+static INPUT_PORTS_START( isgsm )
+	PORT_INCLUDE( system16b_generic )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPUNUSED_DIPLOC( 0x0001, 0x0001, "SW2:1" )
+	PORT_DIPUNUSED_DIPLOC( 0x0002, 0x0002, "SW2:2" )
+	PORT_DIPUNUSED_DIPLOC( 0x0004, 0x0004, "SW2:3" )
+	PORT_DIPUNUSED_DIPLOC( 0x0008, 0x0008, "SW2:4" )
+	PORT_DIPUNUSED_DIPLOC( 0x0010, 0x0010, "SW2:5" )
+	PORT_DIPUNUSED_DIPLOC( 0x0020, 0x0020, "SW2:6" )
+	PORT_DIPUNUSED_DIPLOC( 0x0040, 0x0040, "SW2:7" )
+	PORT_DIPUNUSED_DIPLOC( 0x0080, 0x0080, "SW2:8" )
+
+	PORT_MODIFY("UNUSED")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPUNUSED_DIPLOC( 0x0001, 0x0001, "SW1:1" )
+	PORT_DIPUNUSED_DIPLOC( 0x0002, 0x0002, "SW1:2" )
+	PORT_DIPUNUSED_DIPLOC( 0x0004, 0x0004, "SW1:3" )
+	PORT_DIPUNUSED_DIPLOC( 0x0008, 0x0008, "SW1:4" )
+	PORT_DIPUNUSED_DIPLOC( 0x0010, 0x0010, "SW1:5" )
+	PORT_DIPUNUSED_DIPLOC( 0x0020, 0x0020, "SW1:6" )
+	PORT_DIPUNUSED_DIPLOC( 0x0040, 0x0040, "SW1:7" )
+	PORT_DIPUNUSED_DIPLOC( 0x0080, 0x0080, "SW1:8" )
+
+	PORT_START("CARDDSW") // on the gamecard..
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( shinfz )
+	PORT_INCLUDE( system16b_generic )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("SW2:1")
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Cocktail ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unused ) ) PORT_DIPLOCATION("SW2:2")
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ) ) PORT_DIPLOCATION("SW2:3,4")
+	PORT_DIPSETTING(    0x08, "2" )
+	PORT_DIPSETTING(    0x0c, "3" )
+	PORT_DIPSETTING(    0x04, "4" )
+	PORT_DIPSETTING(    0x00, "240 (Cheat)")
+	PORT_DIPNAME( 0x30, 0x30, "Extra Ship Cost" ) PORT_DIPLOCATION("SW2:5,6")
+	PORT_DIPSETTING(    0x30, "5000" )
+	PORT_DIPSETTING(    0x20, "10000" )
+	PORT_DIPSETTING(    0x10, "15000" )
+	PORT_DIPSETTING(    0x00, "20000" )
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Difficulty ) ) PORT_DIPLOCATION("SW2:7,8")
+	PORT_DIPSETTING(    0x80, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( Normal ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+
+	PORT_MODIFY("UNUSED")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPUNUSED_DIPLOC( 0x0001, 0x0001, "SW1:1" )
+	PORT_DIPUNUSED_DIPLOC( 0x0002, 0x0002, "SW1:2" )
+	PORT_DIPUNUSED_DIPLOC( 0x0004, 0x0004, "SW1:3" )
+	PORT_DIPUNUSED_DIPLOC( 0x0008, 0x0008, "SW1:4" )
+	PORT_DIPUNUSED_DIPLOC( 0x0010, 0x0010, "SW1:5" )
+	PORT_DIPUNUSED_DIPLOC( 0x0020, 0x0020, "SW1:6" )
+	PORT_DIPUNUSED_DIPLOC( 0x0040, 0x0040, "SW1:7" )
+	PORT_DIPUNUSED_DIPLOC( 0x0080, 0x0080, "SW1:8" )
+
+	PORT_START("CARDDSW") // on the gamecard..
+	PORT_DIPNAME( 0x0003, 0x0000, "Game Type" )
+	PORT_DIPSETTING(      0x0000, "Shinobi Ninja Game" )
+	PORT_DIPSETTING(      0x0001, "FZ-2006 Game I" )
+	PORT_DIPSETTING(      0x0002, "FZ-2006 Game II" )
+	PORT_DIPSETTING(      0x0003, "Invalid" ) // this (or higher) gives 'BAD SELECT - Check Switch' message.
+	PORT_BIT( 0xfffc, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
+
+
+
+static MACHINE_RESET( isgsm )
+{
+	segaic16_tilemap_reset(machine, 0);
+
+	/* configure sprite banks */
+	for (int i = 0; i < 16; i++)
+		segaic16_sprites_set_bank(machine, 0, i, i);
+
+	memory_set_bankptr(machine,ISGSM_CART_BANK, memory_region(machine, "gamecart_rgn"));
+	memory_set_bankptr(machine,ISGSM_MAIN_BANK, memory_region(machine, "bios"));
+	devtag_reset( machine, "maincpu" );
+}
+
+
+static MACHINE_CONFIG_DERIVED( isgsm, system16b )
+	/* basic machine hardware */
+
+	MDRV_DEVICE_REMOVE("maincpu")
+
+	MDRV_CPU_ADD("maincpu", M68000, 16000000) // no obvious CPU, but seems to be clocked faster than an original system16 based on the boot times
+	MDRV_CPU_PROGRAM_MAP(isgsm_map)
+	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
+
+	MDRV_MACHINE_START(isgsm)
+	MDRV_MACHINE_RESET(isgsm)
+
+MACHINE_CONFIG_END
+
+
+DRIVER_INIT( isgsm )
+{
+	system16b_common_init(machine, ROM_BOARD_171_5521);
+
+	// decrypt the bios...
+	UINT16* temp = (UINT16*)malloc(0x20000);
+	UINT16* rom = (UINT16*)memory_region(machine, "bios");
+	int i;
+
+	for (i=0;i<0x10000;i++)
+	{
+		temp[i^0x4127] = BITSWAP16(rom[i], 6, 14, 4, 2, 12, 10, 8, 0, 1, 9, 11, 13, 3, 5, 7, 15);
+	}
+
+	memcpy(rom, temp, 0x20000);
+	free(temp);
+}
+
+DRIVER_INIT( shinfz )
+{
+	DRIVER_INIT_CALL( isgsm );
+
+	UINT16* temp = (UINT16*)malloc(0x200000);
+	UINT16* rom = (UINT16*)memory_region(machine, "gamecart_rgn");
+	int i;
+
+	for (i=0;i<0x100000;i++)
+	{
+		temp[i^0x68956] = BITSWAP16(rom[i], 8, 4, 12, 3, 6, 7, 1, 0, 15, 11, 5, 14, 10, 2, 9, 13);
+	}
+
+	memcpy(rom, temp, 0x200000);
+	free(temp);
+}
+
+
+
+/* other regions are filled with data from the game cartridge at run-time via port accesses */
+#define ISGSM_BIOS \
+	ROM_REGION16_BE( 0x100000, "bios", 0 ) \
+	ROM_LOAD16_WORD_SWAP("ism2006v00.u1",0x00000,0x20000, CRC(2292585c) SHA1(97ba0e0f0be832a5114d95151e519bc027f6675b) ) \
+	ROM_REGION( 0x100000, "maincpu", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x60000, "gfx1", ROMREGION_ERASE00 ) \
+	ROM_REGION16_BE( 0x200000, "gfx2", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x40000, "soundcpu", ROMREGION_ERASE00 ) \
+
+
+ROM_START( isgsm )
+	ISGSM_BIOS
+	ROM_REGION16_BE( 0x200000, "gamecart_rgn", ROMREGION_ERASE00 )
+ROM_END
+
+
+ROM_START( shinfz )
+	ISGSM_BIOS
+	
+	ROM_REGION16_BE( 0x200000, "gamecart_rgn", 0 )
+	ROM_LOAD16_WORD_SWAP("shin06.u13",0x00000,0x200000, CRC(39d773e9) SHA1(5284f90cb5190128a17ebee8b539a39c8914c364) )
+ROM_END
+
+GAME( 2006, isgsm,  0,      isgsm, isgsm,  isgsm,         ROT0,  "ISG", "ISG Selection Master Type 2006 BIOS", GAME_IS_BIOS_ROOT )
+GAME( 2006, shinfz, isgsm,  isgsm, shinfz, shinfz,        ROT0,  "ISG", "Shinobi / FZ-2006 (Korean System 16 bootleg) (ISG Selection Master Type 2006)", 0 )
+
+
