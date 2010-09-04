@@ -45,6 +45,22 @@ Notes:
       HSync             - 15.40kHz
 
 
+Stephh's notes (based on the games Z80 code and some tests) :
+
+  - The "Continue" Dip Switch acts as follows :
+      * when set to "Normal", you can continue a game from where you just lost (table at 0x2edd)
+      * when set to "Checkpoints", your continue round is determined from where you just lost (table at 0x2f01) :
+          . if you lose from round 01 to 05, you'll continue from round 01
+          . if you lose from round 06 to 10, you'll continue from round 06
+          . if you lose from round 11 to 15, you'll continue from round 11
+          . if you lose from round 16 to 20, you'll continue from round 16
+          . if you lose from round 21 to 25, you'll continue from round 21
+          . if you lose from round 26 to 30, you'll continue from round 26
+          . if you lose from round 31 to 35, you'll continue from round 31
+          . if you lose from round 36, the game will become bogus because table is only 35 bytes wide
+            and [0x2f01 + 0x23] = 0x6c which is not a valid round
+    Round is stored at 0x800c (range 0x00-0x23).
+
 */
 
 #include "emu.h"
@@ -96,78 +112,13 @@ static VIDEO_START ( pipeline )
 	tilemap_set_transparent_pen(tilemap2,0);
 }
 
-static VIDEO_UPDATE ( pipeline)
+static VIDEO_UPDATE ( pipeline )
 {
 	tilemap_draw(bitmap,cliprect,tilemap1, 0,0);
 	tilemap_draw(bitmap,cliprect,tilemap2, 0,0);
 	return 0;
 }
 
-
-static INPUT_PORTS_START( pipeline )
-	PORT_START("P1")
-	PORT_BIT(  0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
-	PORT_BIT(  0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
-	PORT_BIT(  0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
-	PORT_BIT(  0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
-	PORT_BIT(  0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT(  0x20, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT(  0x40, IP_ACTIVE_LOW, IPT_COIN1   )
-	PORT_BIT(  0x80, IP_ACTIVE_LOW, IPT_START1  )
-
-	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x00, "DIPSW 1-1" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "DIPSW 1-2" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, "DIPSW 1-3" )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "DIPSW 1-4" )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, "DIPSW 1-5" )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, "DIPSW 1-6" )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, "DIPSW 1-7" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "DIPSW 1-8" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("DSW2")
-	PORT_DIPNAME( 0x01, 0x00, "DIPSW 2-1" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x00, "DIPSW 2-2" )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x00, "DIPSW 2-3" )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "DIPSW 2-4" )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x00, "DIPSW 2-5" )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x00, "DIPSW 2-6" )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x00, "DIPSW 2-7" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x00, "DIPSW 2-8" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-INPUT_PORTS_END
 
 static WRITE8_DEVICE_HANDLER(vidctrl_w)
 {
@@ -259,6 +210,57 @@ static ADDRESS_MAP_START( mcu_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0080, 0x0fff) AM_ROM
 ADDRESS_MAP_END
 
+
+/* verified from Z80 code */
+static INPUT_PORTS_START( pipeline )
+	PORT_START("P1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_START1 )
+
+	PORT_START("DSW1")
+	/* bits 0 to 6 are tested from less to most significant - code at 0x00dd */
+	PORT_DIPNAME( 0x7f, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(	0x07, "10 Coins/1 Credit" )
+	PORT_DIPSETTING(	0x03, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(	0x01, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(	0x00, DEF_STR( 1C_1C ) )
+//	PORT_DIPSETTING(	0x7f, DEF_STR( 1C_1C ) )            /* duplicated setting */
+	PORT_DIPSETTING(	0x0f, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(	0x1f, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(	0x3f, DEF_STR( 1C_4C ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Lives ) )
+	PORT_DIPSETTING(	0x80, "1" )
+	PORT_DIPSETTING(	0x00, "2" )
+
+	PORT_START("DSW2")
+	/* bits 0 to 2 are tested from less to most significant - code at 0x0181 */
+	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )             /* table at 0x35eb */
+	PORT_DIPSETTING(    0x01, DEF_STR( Medium ) )           /* table at 0x35c5 */
+//	PORT_DIPSETTING(    0x07, DEF_STR( Medium ) )           /* duplicated setting */
+	PORT_DIPSETTING(    0x03, DEF_STR( Hard ) )             /* table at 0x35a0 */
+	PORT_DIPNAME( 0x18, 0x18, "Water Speed" )               /* check code at 0x2619 - table at 0x5685 */
+	PORT_DIPSETTING(    0x18, "Slowest" )                   /* 0x12 */
+	PORT_DIPSETTING(    0x10, "Slow" )                      /* 0x0f */
+	PORT_DIPSETTING(    0x08, "Fast" )                      /* 0x0d */
+	PORT_DIPSETTING(    0x00, "Fastest" )                   /* 0x08 */
+	PORT_DIPNAME( 0x20, 0x20, "Continue" )                  /* check code at 0x0ffd - see notes */
+	PORT_DIPSETTING(	0x20, DEF_STR( Normal ) )
+	PORT_DIPSETTING(	0x00, "Checkpoints" )
+	PORT_DIPNAME( 0xc0, 0x00, "Sounds/Music" )              /* check code at 0x1c0a - determine if it really affects music once it is supported */
+	PORT_DIPSETTING(	0xc0, DEF_STR( Off ) )
+	PORT_DIPSETTING(	0x40, "Attract Mode" )
+	PORT_DIPSETTING(	0x80, "Normal Game" )
+	PORT_DIPSETTING(	0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+
 static const gfx_layout layout_8x8x8 =
 {
 	8,8,
@@ -308,7 +310,7 @@ static const ppi8255_interface ppi8255_intf[3] =
 		DEVCB_NULL,						/* Port B read */
 		DEVCB_NULL,						/* Port C read */
 		DEVCB_NULL,						/* Port A write */
-		DEVCB_NULL,						/* Port B write */
+		DEVCB_NULL,						/* Port B write */  /* related to sound/music : check code at 0x1c0a */
 		DEVCB_HANDLER(vidctrl_w)		/* Port C write */
 	},
 	{
@@ -435,4 +437,3 @@ ROM_START( pipeline )
 ROM_END
 
 GAME( 1990, pipeline, 0, pipeline, pipeline, 0, ROT0, "Daehyun Electronics", "Pipeline",GAME_NO_SOUND )
-
