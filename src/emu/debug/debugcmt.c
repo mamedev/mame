@@ -52,10 +52,10 @@
     TYPE DEFINITIONS
 ***************************************************************************/
 
-typedef struct _debug_comment debug_comment;
-struct _debug_comment
+class debug_comment
 {
-	UINT8			is_valid;
+public:
+	bool			is_valid;
 	UINT32			address;
 	char			text[DEBUG_COMMENT_MAX_LINE_LENGTH];
 	rgb_t			color;
@@ -78,7 +78,6 @@ public:
 ***************************************************************************/
 
 static int debug_comment_load_xml(running_machine *machine, mame_file *file);
-static void debug_comment_exit(running_machine &machine);
 
 
 
