@@ -526,8 +526,16 @@ VIDEO_UPDATE( batrider )
 	/* used for 'for use in' and '8ing' screen on bbakraid, raizing on batrider */
 	for (line = 0; line < 256;line++)
 	{
-		clip.min_y = clip.max_y = line;
-		tilemap_set_scrolly(state->tx_tilemap, 0, state->txvideoram16_offs[line&0xff] - line);
+		if (state->tx_flip)
+		{
+			clip.min_y = clip.max_y = 256 - line;
+			tilemap_set_scrolly(state->tx_tilemap, 0, 256 - line + state->txvideoram16_offs[256 - line]);
+		}
+		else
+		{
+			clip.min_y = clip.max_y = line;
+			tilemap_set_scrolly(state->tx_tilemap, 0,     - line + state->txvideoram16_offs[      line]);
+		}
 		tilemap_draw(bitmap, &clip, state->tx_tilemap, 0, 0);
 	}
 	return 0;
