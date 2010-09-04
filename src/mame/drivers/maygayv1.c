@@ -132,6 +132,7 @@ Find lamps/reels after UPD changes.
 #include "machine/68681.h"
 #include "sound/2413intf.h"
 #include "sound/upd7759.h"
+#include "machine/nvram.h"
 
 
 /*************************************
@@ -641,7 +642,7 @@ static WRITE16_HANDLER( vsync_int_ctrl )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x083fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x080000, 0x083fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x100000, 0x17ffff) AM_ROM AM_REGION("maincpu", 0x80000)
 	AM_RANGE(0x820000, 0x820003) AM_READWRITE(maygay_8279_r, maygay_8279_w)
 	AM_RANGE(0x800000, 0x800003) AM_DEVWRITE8( "ymsnd", ym2413_w, 0xff00 )
@@ -1004,7 +1005,7 @@ static MACHINE_CONFIG_START( maygayv1, driver_device )
 	MDRV_MACHINE_START(maygayv1)
 	MDRV_MACHINE_RESET(maygayv1)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* TODO: Use real video timings */
 	MDRV_SCREEN_ADD("screen", RASTER)

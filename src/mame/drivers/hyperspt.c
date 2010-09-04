@@ -14,6 +14,7 @@ Based on drivers from Juno First emulator by Chris Hardy (chrish@kcbbs.gen.nz)
 #include "sound/sn76496.h"
 #include "sound/vlm5030.h"
 #include "machine/konami1.h"
+#include "machine/nvram.h"
 #include "includes/konamipt.h"
 #include "includes/trackfld.h"
 
@@ -41,7 +42,7 @@ static ADDRESS_MAP_START( hyperspt_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(hyperspt_videoram_w) AM_BASE_MEMBER(trackfld_state, videoram)
 	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(hyperspt_colorram_w) AM_BASE_MEMBER(trackfld_state, colorram)
 	AM_RANGE(0x3000, 0x37ff) AM_RAM
-	AM_RANGE(0x3800, 0x3fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x3800, 0x3fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -62,7 +63,7 @@ static ADDRESS_MAP_START( roadf_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(hyperspt_videoram_w) AM_BASE_MEMBER(trackfld_state, videoram)
 	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(hyperspt_colorram_w) AM_BASE_MEMBER(trackfld_state, colorram)
 	AM_RANGE(0x3000, 0x37ff) AM_RAM
-	AM_RANGE(0x3800, 0x3fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x3800, 0x3fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -322,7 +323,7 @@ static MACHINE_CONFIG_START( hyperspt, trackfld_state )
 
 	MDRV_MACHINE_START(hyperspt)
 	MDRV_MACHINE_RESET(hyperspt)
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

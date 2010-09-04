@@ -27,7 +27,17 @@
 #include "cpu/m68000/m68000.h"
 #include "includes/amiga.h"
 #include "machine/6526cia.h"
+#include "machine/nvram.h"
 
+
+class upscope_state : public driver_device
+{
+public:
+	upscope_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8	m_nvram[0x100];
+};
 
 
 /*************************************
@@ -193,8 +203,9 @@ static WRITE8_DEVICE_HANDLER( upscope_cia_1_porta_w )
 		/* if SEL == 0 && BUSY == 1, we write data to NVRAM */
 		else if ((data & 5) == 1)
 		{
+			upscope_state *state = device->machine->driver_data<upscope_state>();
 			if (LOG_IO) logerror("NVRAM data write @ %02X = %02X\n", nvram_address_latch, parallel_data);
-			device->machine->generic.nvram.u8[nvram_address_latch] = parallel_data;
+			state->m_nvram[nvram_address_latch] = parallel_data;
 		}
 
 		/* if SEL == 0 && BUSY == 0, who knows? */
@@ -217,7 +228,8 @@ static WRITE8_DEVICE_HANDLER( upscope_cia_1_porta_w )
 		/* if SEL == 0, we read NVRAM */
 		else
 		{
-			nvram_data_latch = device->machine->generic.nvram.u8[nvram_address_latch];
+			upscope_state *state = device->machine->driver_data<upscope_state>();
+			nvram_data_latch = state->m_nvram[nvram_address_latch];
 			if (LOG_IO) logerror("NVRAM data read @ %02X = %02X\n", nvram_address_latch, nvram_data_latch);
 		}
 	}
@@ -300,14 +312,14 @@ static const mos6526_interface cia_1_intf =
 	DEVCB_NULL
 };
 
-static MACHINE_CONFIG_START( upscope, driver_device )
+static MACHINE_CONFIG_START( upscope, upscope_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, AMIGA_68000_NTSC_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(main_map)
 
 	MDRV_MACHINE_RESET(amiga)
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
     /* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -391,8 +403,8 @@ static DRIVER_INIT( upscope )
 	amiga_machine_config(machine, &upscope_intf);
 
 	/* allocate NVRAM */
-	machine->generic.nvram_size = 0x100;
-	machine->generic.nvram.u8 = auto_alloc_array(machine, UINT8, machine->generic.nvram_size);
+	upscope_state *state = machine->driver_data<upscope_state>();
+	machine->device<nvram_device>("nvram")->set_base(state->m_nvram, sizeof(state->m_nvram));
 
 	/* set up memory */
 	memory_configure_bank(machine, "bank1", 0, 1, amiga_chip_ram, 0);

@@ -641,14 +641,16 @@ READ8_DEVICE_HANDLER( williams_input_port_49way_0_5_r )
 WRITE8_HANDLER( williams_cmos_w )
 {
 	/* only 4 bits are valid */
-	space->machine->generic.nvram.u8[offset] = data | 0xf0;
+	williams_state *state = space->machine->driver_data<williams_state>();
+	state->m_nvram[offset] = data | 0xf0;
 }
 
 
 WRITE8_HANDLER( bubbles_cmos_w )
 {
 	/* bubbles has additional CMOS for a full 8 bits */
-	space->machine->generic.nvram.u8[offset] = data;
+	williams_state *state = space->machine->driver_data<williams_state>();
+	state->m_nvram[offset] = data;
 }
 
 

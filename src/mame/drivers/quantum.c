@@ -48,6 +48,7 @@
 #include "video/vector.h"
 #include "video/avgdvg.h"
 #include "sound/pokey.h"
+#include "machine/nvram.h"
 
 #define MASTER_CLOCK (12096000)
 #define CLOCK_3KHZ  (MASTER_CLOCK / 4096)
@@ -118,7 +119,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800000, 0x801fff) AM_RAM AM_BASE((UINT16 **)&avgdvg_vectorram) AM_SIZE(&avgdvg_vectorram_size)
 	AM_RANGE(0x840000, 0x84001f) AM_DEVREADWRITE8("pokey1", pokey_r, pokey_w, 0x00ff)
 	AM_RANGE(0x840020, 0x84003f) AM_DEVREADWRITE8("pokey2", pokey_r, pokey_w, 0x00ff)
-	AM_RANGE(0x900000, 0x9001ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x900000, 0x9001ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x940000, 0x940001) AM_READ(trackball_r) /* trackball */
 	AM_RANGE(0x948000, 0x948001) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x950000, 0x95001f) AM_WRITEONLY AM_BASE((UINT16**)&avgdvg_colorram)
@@ -232,7 +233,7 @@ static MACHINE_CONFIG_START( quantum, driver_device )
 	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold, (double)MASTER_CLOCK / 4096 / 12)
 
-	MDRV_NVRAM_HANDLER(generic_1fill)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", VECTOR)

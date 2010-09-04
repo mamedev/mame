@@ -108,6 +108,7 @@ Not all regional versions are available for each Megatouch series
 #include "machine/z80pio.h"
 #include "machine/pc16552d.h"
 #include "machine/microtch.h"
+#include "machine/nvram.h"
 
 /*************************************
  *
@@ -547,7 +548,7 @@ static READ8_HANDLER(meritm_ds1644_r)
 
 static ADDRESS_MAP_START( meritm_crt250_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xdfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xe000, 0xffff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( meritm_crt250_questions_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -555,7 +556,7 @@ static ADDRESS_MAP_START( meritm_crt250_questions_map, ADDRESS_SPACE_PROGRAM, 8 
 	AM_RANGE(0x0000, 0x0000) AM_WRITE(meritm_crt250_questions_lo_w)
 	AM_RANGE(0x0001, 0x0001) AM_WRITE(meritm_crt250_questions_hi_w)
 	AM_RANGE(0x0002, 0x0002) AM_WRITE(meritm_crt250_questions_bank_w)
-	AM_RANGE(0xe000, 0xffff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( meritm_crt250_io_map, ADDRESS_SPACE_IO, 8 )
@@ -1064,7 +1065,7 @@ static MACHINE_CONFIG_START( meritm_crt250, driver_device )
 	MDRV_TIMER_ADD_SCANLINE("vblank_start", vblank_start_tick, "screen", 259, 262)
 	MDRV_TIMER_ADD_SCANLINE("vblank_end",   vblank_end_tick,   "screen", 262, 262)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 

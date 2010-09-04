@@ -344,6 +344,7 @@ C - uses sub board with support for player 3 and 4 controls
 #include "sound/2151intf.h"
 #include "sound/namco.h"
 #include "sound/dac.h"
+#include "machine/nvram.h"
 #include "includes/namcos1.h"
 
 static int dac0_value, dac1_value, dac0_gain, dac1_gain;
@@ -485,7 +486,7 @@ static ADDRESS_MAP_START( mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0xbfff) AM_ROMBANK("bank20") /* banked ROM */
 	AM_RANGE(0xc000, 0xc000) AM_WRITE(namcos1_mcu_patch_w)	/* kludge! see notes */
 	AM_RANGE(0xc000, 0xc7ff) AM_RAMBANK("bank19")	/* TRIRAM (shared) */
-	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_BASE_SIZE_GENERIC(nvram) /* EEPROM */
+	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE("nvram") /* EEPROM */
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(namcos1_dac0_w)
 	AM_RANGE(0xd400, 0xd400) AM_WRITE(namcos1_dac1_w)
 	AM_RANGE(0xd800, 0xd800) AM_WRITE(namcos1_mcu_bankswitch_w) /* ROM bank selector */
@@ -1101,7 +1102,7 @@ static MACHINE_CONFIG_START( ns1, driver_device )
 	MDRV_QUANTUM_TIME(HZ(38400))
 
 	MDRV_MACHINE_RESET(namcos1)
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)

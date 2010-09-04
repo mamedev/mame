@@ -372,6 +372,7 @@ D                                                                               
 #include "sound/msm5232.h"
 #include "sound/dac.h"
 #include "sound/samples.h"
+#include "machine/nvram.h"
 #include "includes/equites.h"
 
 #define HVOLTAGE_DEBUG	0
@@ -696,7 +697,7 @@ static WRITE16_HANDLER( mcu_halt_clear_w )
 
 static ADDRESS_MAP_START( equites_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x00ffff) AM_ROM	// ROM area is written several times (dev system?)
-	AM_RANGE(0x040000, 0x040fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)	// nvram is for gekisou only
+	AM_RANGE(0x040000, 0x040fff) AM_RAM AM_SHARE("nvram")	// nvram is for gekisou only
 	AM_RANGE(0x080000, 0x080fff) AM_READWRITE(equites_fg_videoram_r, equites_fg_videoram_w)	// 8-bit
 	AM_RANGE(0x0c0000, 0x0c01ff) AM_RAM_WRITE(equites_bg_videoram_w) AM_BASE_MEMBER(equites_state, bg_videoram)
 	AM_RANGE(0x0c0200, 0x0c0fff) AM_RAM
@@ -1274,7 +1275,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( gekisou, equites )
 
 	// gekisou has battery-backed RAM to store settings
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 MACHINE_CONFIG_END
 

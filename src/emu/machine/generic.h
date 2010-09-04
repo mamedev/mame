@@ -82,15 +82,6 @@ void nvram_load(running_machine *machine);
 /* save NVRAM to a file */
 void nvram_save(running_machine *machine);
 
-/* generic NVRAM handler that defaults to a 0 fill */
-NVRAM_HANDLER( generic_0fill );
-
-/* generic NVRAM handler that defaults to a 1 fill */
-NVRAM_HANDLER( generic_1fill );
-
-/* generic NVRAM handler that defaults to a random fill */
-NVRAM_HANDLER( generic_randfill );
-
 
 
 /* ----- memory card management ----- */

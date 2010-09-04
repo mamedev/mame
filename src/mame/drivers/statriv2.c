@@ -73,6 +73,7 @@ quaquiz2 - no inputs, needs NVRAM
 #include "sound/ay8910.h"
 #include "machine/8255ppi.h"
 #include "video/tms9927.h"
+#include "machine/nvram.h"
 
 #define MASTER_CLOCK		12440000
 
@@ -271,7 +272,7 @@ static const ppi8255_interface ppi8255_intf =
 static ADDRESS_MAP_START( statriv2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
-	AM_RANGE(0x4800, 0x48ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x4800, 0x48ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(statriv2_videoram_w) AM_BASE_GENERIC(videoram)
 ADDRESS_MAP_END
 
@@ -575,7 +576,7 @@ static MACHINE_CONFIG_START( statriv2, driver_device )
 	MDRV_CPU_IO_MAP(statriv2_io_map)
 	MDRV_CPU_VBLANK_INT("screen", statriv2_interrupt)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* 1x 8255 */
 	MDRV_PPI8255_ADD("ppi", ppi8255_intf)

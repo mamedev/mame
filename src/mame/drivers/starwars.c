@@ -29,6 +29,7 @@
 #include "sound/tms5220.h"
 #include "sound/pokey.h"
 #include "machine/x2212.h"
+#include "machine/nvram.h"
 #include "includes/starwars.h"
 #include "includes/slapstic.h"
 
@@ -336,7 +337,7 @@ static MACHINE_CONFIG_START( starwars, driver_device )
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 
 	MDRV_MACHINE_RESET(starwars)
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_RIOT6532_ADD("riot", MASTER_CLOCK / 8, starwars_riot6532_intf)
 

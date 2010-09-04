@@ -114,6 +114,7 @@ DIP locations verified for:
 #include "cpu/m6502/m6502.h"
 #include "sound/vlm5030.h"
 #include "sound/nes_apu.h"
+#include "machine/nvram.h"
 #include "rendlay.h"
 #include "includes/punchout.h"
 
@@ -314,7 +315,7 @@ static WRITE8_HANDLER( spunchout_exp_w )
 
 static ADDRESS_MAP_START( punchout_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
 	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(punchout_bg_top_videoram_w) AM_BASE(&punchout_bg_top_videoram)
 	AM_RANGE(0xdff0, 0xdff7) AM_BASE(&punchout_spr1_ctrlram)
@@ -328,7 +329,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( armwrest_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0xc000, 0xc3ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
 	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(armwrest_fg_videoram_w) AM_BASE(&armwrest_fg_videoram)
 	AM_RANGE(0xdff0, 0xdff7) AM_BASE(&punchout_spr1_ctrlram)
@@ -935,7 +936,7 @@ static MACHINE_CONFIG_START( punchout, driver_device )
 	MDRV_CPU_VBLANK_INT("top", nmi_line_pulse)
 
 	MDRV_MACHINE_RESET(punchout)
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_GFXDECODE(punchout)

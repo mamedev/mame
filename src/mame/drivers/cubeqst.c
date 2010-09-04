@@ -23,6 +23,7 @@
 #include "sound/dac.h"
 #include "streams.h"
 #include "machine/laserdsc.h"
+#include "machine/nvram.h"
 
 
 /*************************************
@@ -404,7 +405,7 @@ static ADDRESS_MAP_START( m68k_program_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x03800e, 0x03800f) AM_READWRITE(laserdisc_r, laserdisc_w)
 	AM_RANGE(0x03c800, 0x03c9ff) AM_RAM_WRITE(palette_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x03cc00, 0x03cc01) AM_WRITE(control_w)
-	AM_RANGE(0x03e000, 0x03efff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x03e000, 0x03efff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x03f000, 0x03ffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -514,7 +515,7 @@ static MACHINE_CONFIG_START( cubeqst, driver_device )
 
 	MDRV_MACHINE_START(cubeqst)
 	MDRV_MACHINE_RESET(cubeqst)
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_LASERDISC_SCREEN_ADD_NTSC("screen", BITMAP_FORMAT_RGB32)
 	MDRV_VIDEO_START(cubeqst)

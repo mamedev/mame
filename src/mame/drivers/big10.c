@@ -60,6 +60,7 @@
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "video/v9938.h"
+#include "machine/nvram.h"
 #include "deprecat.h"
 
 #define VDP_MEM             0x40000
@@ -128,7 +129,7 @@ static READ8_HANDLER( mux_r )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xf000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -247,7 +248,7 @@ static MACHINE_CONFIG_START( big10, driver_device )
 
 	MDRV_MACHINE_RESET(big10)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

@@ -28,6 +28,7 @@ Sound: AY-3-8912
 #include "video/mc6845.h"
 #include "sound/ay8910.h"
 #include "includes/usgames.h"
+#include "machine/nvram.h"
 
 
 static WRITE8_HANDLER( usgames_rombank_w )
@@ -60,7 +61,7 @@ static WRITE8_HANDLER( lamps2_w )
 
 
 static ADDRESS_MAP_START( usgames_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("DSW")
 	AM_RANGE(0x2010, 0x2010) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x2020, 0x2020) AM_WRITE(lamps1_w)
@@ -79,7 +80,7 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( usg185_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x2000, 0x2001) AM_DEVWRITE("aysnd", ay8910_address_data_w)
 	AM_RANGE(0x2400, 0x2400) AM_READ_PORT("DSW")
 	AM_RANGE(0x2410, 0x2410) AM_READ_PORT("INPUTS")
@@ -235,7 +236,7 @@ static MACHINE_CONFIG_START( usg32, driver_device )
 	MDRV_CPU_PROGRAM_MAP(usgames_map)
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold,5*60) /* ?? */
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

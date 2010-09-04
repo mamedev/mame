@@ -437,6 +437,7 @@
 #include "cpu/z180/z180.h"
 #include "sound/saa1099.h"
 #include "sound/msm5205.h"
+#include "machine/nvram.h"
 
 /* RAM areas */
 static UINT8* mastboy_tileram;
@@ -455,6 +456,17 @@ static int mastboy_backupram_enabled;
 static int mastboy_m5205_next;
 static int mastboy_m5205_part;
 static int mastboy_m5205_sambit0, mastboy_m5205_sambit1;
+
+class mastboy_state : public driver_device
+{
+public:
+	mastboy_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config),
+		  m_nvram(*this, "nvram") { }
+
+	required_shared_ptr<UINT8>	m_nvram;
+};
+
 
 /* VIDEO EMULATION */
 
@@ -583,14 +595,16 @@ static WRITE8_HANDLER( mastboy_bank_w )
 
 static READ8_HANDLER( mastboy_backupram_r )
 {
-	return space->machine->generic.nvram.u8[offset];
+	mastboy_state *state = space->machine->driver_data<mastboy_state>();
+	return state->m_nvram[offset];
 }
 
 static WRITE8_HANDLER( mastboy_backupram_w )
 {
+	mastboy_state *state = space->machine->driver_data<mastboy_state>();
 //  if (mastboy_backupram_enabled)
 //  {
-		space->machine->generic.nvram.u8[offset] = data;
+		state->m_nvram[offset] = data;
 //  }
 //  else
 //  {
@@ -685,7 +699,7 @@ static ADDRESS_MAP_START( mastboy_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0xc000, 0xffff) AM_READWRITE(banked_ram_r,banked_ram_w) // mastboy bank area read / write
 
-	AM_RANGE(0xff000, 0xff7ff) AM_READWRITE(mastboy_backupram_r,mastboy_backupram_w) AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0xff000, 0xff7ff) AM_READWRITE(mastboy_backupram_r,mastboy_backupram_w) AM_SHARE("nvram")
 
 	AM_RANGE(0xff800, 0xff807) AM_READ_PORT("P1")
 	AM_RANGE(0xff808, 0xff80f) AM_READ_PORT("P2")
@@ -855,13 +869,13 @@ static MACHINE_RESET( mastboy )
 
 
 
-static MACHINE_CONFIG_START( mastboy, driver_device )
+static MACHINE_CONFIG_START( mastboy, mastboy_state )
 	MDRV_CPU_ADD("maincpu", Z180, 12000000/2)	/* HD647180X0CP6-1M1R */
 	MDRV_CPU_PROGRAM_MAP(mastboy_map)
 	MDRV_CPU_IO_MAP(mastboy_io_map)
 	MDRV_CPU_VBLANK_INT("screen", mastboy_interrupt)
 
-	MDRV_NVRAM_HANDLER(generic_1fill)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	MDRV_MACHINE_RESET( mastboy )
 

@@ -52,6 +52,7 @@ DD10 DD14  DD18     H5            DD21
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
+#include "machine/nvram.h"
 #include "video/resnet.h"
 
 static UINT8* dderby_vidchars;
@@ -105,7 +106,7 @@ static WRITE8_HANDLER( output_w )
 
 static ADDRESS_MAP_START( memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xc000, 0xc007) AM_READ(input_r)
 	AM_RANGE(0xc000, 0xc007) AM_WRITE(output_w)
 	AM_RANGE(0xc802, 0xc802) AM_READ_PORT("DSW1")
@@ -497,7 +498,7 @@ static MACHINE_CONFIG_START( dderby, driver_device )
 	MDRV_CPU_PROGRAM_MAP(dderby_sound_map)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

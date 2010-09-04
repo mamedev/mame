@@ -419,7 +419,7 @@ static PALETTE_INIT( amaticmg )
 
 static ADDRESS_MAP_START( amaticmg_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x00000, 0x3ffff) AM_ROM
-//  AM_RANGE(0x0000, 0x0000) AM_RAM // AM_BASE_SIZE_GENERIC(nvram)
+//  AM_RANGE(0x0000, 0x0000) AM_RAM // AM_SHARE("nvram")
 //  AM_RANGE(0x0000, 0x0000) AM_DEVWRITE("crtc", mc6845_address_w)
 //  AM_RANGE(0x0000, 0x0000) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
 //  AM_RANGE(0x0000, 0x0000) AM_RAM_WRITE(amaticmg_videoram_w) AM_BASE(&amaticmg_videoram)
@@ -617,7 +617,7 @@ static MACHINE_CONFIG_START( amaticmg, driver_device )
 	MDRV_CPU_IO_MAP(amaticmg_portmap)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-//  MDRV_NVRAM_HANDLER(generic_0fill)
+//  MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* 3x 8255 */
 //  MDRV_PPI8255_ADD( "ppi8255_0", ppi8255_intf[0] )

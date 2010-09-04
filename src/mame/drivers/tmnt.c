@@ -77,10 +77,9 @@ Updates:
 #include "sound/k054539.h"
 #include "sound/k007232.h"
 #include "sound/upd7759.h"
+#include "machine/nvram.h"
 #include "includes/tmnt.h"
 #include "includes/konamipt.h"
-
-static UINT16 cuebrick_nvram[0x400 * 0x20];	// 32k paged in a 1k window
 
 static READ16_HANDLER( k052109_word_noA12_r )
 {
@@ -573,13 +572,13 @@ static WRITE16_HANDLER( prmrsocr_eeprom_w )
 static READ16_HANDLER( cuebrick_nv_r )
 {
 	tmnt_state *state = space->machine->driver_data<tmnt_state>();
-	return cuebrick_nvram[offset + (state->cuebrick_nvram_bank * 0x400 / 2)];
+	return state->m_cuebrick_nvram[offset + (state->cuebrick_nvram_bank * 0x400 / 2)];
 }
 
 static WRITE16_HANDLER( cuebrick_nv_w )
 {
 	tmnt_state *state = space->machine->driver_data<tmnt_state>();
-       COMBINE_DATA(&cuebrick_nvram[offset + (state->cuebrick_nvram_bank * 0x400 / 2)]);
+       COMBINE_DATA(&state->m_cuebrick_nvram[offset + (state->cuebrick_nvram_bank * 0x400 / 2)]);
 }
 
 static WRITE16_HANDLER( cuebrick_nvbank_w )
@@ -600,7 +599,7 @@ static ADDRESS_MAP_START( cuebrick_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0a0010, 0x0a0011) AM_READ_PORT("DSW1") AM_WRITE(watchdog_reset16_w)
 	AM_RANGE(0x0a0012, 0x0a0013) AM_READ_PORT("DSW2")
 	AM_RANGE(0x0a0018, 0x0a0019) AM_READ_PORT("DSW3")
-	AM_RANGE(0x0b0000, 0x0b03ff) AM_READWRITE(cuebrick_nv_r, cuebrick_nv_w)
+	AM_RANGE(0x0b0000, 0x0b03ff) AM_READWRITE(cuebrick_nv_r, cuebrick_nv_w) AM_SHARE("nvram")
 	AM_RANGE(0x0b0400, 0x0b0401) AM_WRITE(cuebrick_nvbank_w)
 	AM_RANGE(0x0c0000, 0x0c0003) AM_DEVREADWRITE8("ymsnd", ym2151_r, ym2151_w, 0xff00)
 	AM_RANGE(0x100000, 0x107fff) AM_READWRITE(k052109_word_noA12_r, k052109_word_noA12_w)
@@ -2295,7 +2294,7 @@ static MACHINE_CONFIG_START( cuebrick, tmnt_state )
 	MDRV_SCREEN_VISIBLE_AREA(13*8, (64-13)*8-1, 2*8, 30*8-1 )
 
 	MDRV_PALETTE_LENGTH(1024)
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_VIDEO_START(cuebrick)
 	MDRV_VIDEO_UPDATE(mia)
@@ -4285,8 +4284,8 @@ static DRIVER_INIT( tmnt )
 
 static DRIVER_INIT( cuebrick )
 {
-	machine->generic.nvram.u8 = (UINT8 *)cuebrick_nvram;
-	machine->generic.nvram_size = 0x400 * 0x20;
+	tmnt_state *state = machine->driver_data<tmnt_state>();
+	machine->device<nvram_device>("nvram")->set_base(state->m_cuebrick_nvram, sizeof(state->m_cuebrick_nvram));
 }
 
 GAME( 1989, cuebrick,    0,        cuebrick, cuebrick, cuebrick, ROT0,  "Konami", "Cue Brick (World version D)", GAME_SUPPORTS_SAVE )

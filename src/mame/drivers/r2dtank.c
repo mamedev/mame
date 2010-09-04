@@ -38,6 +38,7 @@ RAM = 4116 (x11)
 #include "cpu/m6800/m6800.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/ay8910.h"
+#include "machine/nvram.h"
 
 
 #define LOG_AUDIO_COMM	(0)
@@ -412,7 +413,7 @@ static ADDRESS_MAP_START( r2dtank_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8004, 0x8004) AM_READWRITE(audio_answer_r, audio_command_w)
 	AM_RANGE(0xb000, 0xb000) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0xb001, 0xb001) AM_DEVWRITE("crtc", mc6845_register_w)
-	AM_RANGE(0xc000, 0xc007) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0xc000, 0xc007) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xc800, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -523,7 +524,7 @@ static MACHINE_CONFIG_START( r2dtank, driver_device )
 	MDRV_CPU_PROGRAM_MAP(r2dtank_audio_map)
 
 	MDRV_MACHINE_START(r2dtank)
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(r2dtank)

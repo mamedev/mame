@@ -201,6 +201,7 @@ VBlank duration: 1/VSYNC * (16/256) = 1017.6 us
 #include "sound/dac.h"
 #include "sound/samples.h"
 #include "sound/sp0250.h"
+#include "machine/nvram.h"
 #include "streams.h"
 #include "includes/gottlieb.h"
 
@@ -735,7 +736,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( gottlieb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xffff)
-	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x1000, 0x1fff) AM_RAM AM_REGION("maincpu", 0x1000)	/* or ROM */
 	AM_RANGE(0x2000, 0x2fff) AM_RAM AM_REGION("maincpu", 0x2000)	/* or ROM */
 	AM_RANGE(0x3000, 0x30ff) AM_MIRROR(0x0700) AM_WRITEONLY AM_BASE_GENERIC(spriteram)							/* FRSEL */
@@ -1924,7 +1925,7 @@ static MACHINE_CONFIG_START( gottlieb_core, driver_device )
 
 	MDRV_MACHINE_START(gottlieb)
 	MDRV_MACHINE_RESET(gottlieb)
-	MDRV_NVRAM_HANDLER(generic_1fill)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 	MDRV_WATCHDOG_VBLANK_INIT(16)
 
 	/* video hardware */

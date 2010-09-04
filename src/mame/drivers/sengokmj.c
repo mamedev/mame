@@ -56,6 +56,7 @@ RSSENGO2.72   chr.
 #include "audio/seibu.h"
 #include "sound/3812intf.h"
 #include "includes/sei_crtc.h"
+#include "machine/nvram.h"
 
 static UINT16 sengokumj_mux_data;
 static UINT8 hopper_io;
@@ -101,7 +102,7 @@ static READ16_HANDLER( sengokmj_system_r )
 
 static ADDRESS_MAP_START( sengokmj_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x07fff) AM_RAM
-	AM_RANGE(0x08000, 0x09fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x08000, 0x09fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM_WRITE(seibucrtc_sc0vram_w) AM_BASE(&seibucrtc_sc0vram)
 	AM_RANGE(0x0c800, 0x0cfff) AM_RAM_WRITE(seibucrtc_sc1vram_w) AM_BASE(&seibucrtc_sc1vram)
 	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM_WRITE(seibucrtc_sc2vram_w) AM_BASE(&seibucrtc_sc2vram)
@@ -286,7 +287,7 @@ static MACHINE_CONFIG_START( sengokmj, driver_device )
 	SEIBU_SOUND_SYSTEM_CPU(14318180/4)
 
 	MDRV_MACHINE_RESET(seibu_sound)
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

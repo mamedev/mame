@@ -50,6 +50,7 @@ not handled commands with reg[3] & 0xc0 == 0x00
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "roul.lh"
+#include "machine/nvram.h"
 
 #define VIDEOBUF_SIZE 256*256
 
@@ -153,7 +154,7 @@ static WRITE8_HANDLER( ball_w )
 
 static ADDRESS_MAP_START( roul_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( roul_cpu_io_map, ADDRESS_SPACE_IO, 8 )
@@ -251,7 +252,7 @@ static MACHINE_CONFIG_START( roul, driver_device )
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 	MDRV_CPU_IO_MAP(sound_cpu_io_map)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_PALETTE_INIT(roul)
 

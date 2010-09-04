@@ -94,6 +94,7 @@
 #include "cpu/m6809/m6809.h"
 #include "video/mc6845.h"
 #include "machine/6821pia.h"
+#include "machine/nvram.h"
 
 
 /*************************
@@ -461,7 +462,7 @@ static MACHINE_CONFIG_START( jokrwild, driver_device )
 	MDRV_CPU_PROGRAM_MAP(jokrwild_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-//  MDRV_NVRAM_HANDLER(generic_0fill)
+//  MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_PIA6821_ADD("pia0", pia0_intf)
 	MDRV_PIA6821_ADD("pia1", pia1_intf)

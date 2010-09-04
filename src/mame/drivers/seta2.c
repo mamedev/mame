@@ -536,6 +536,7 @@ The same H8/3007 code "FC21 IOPR-0" at U49 is used for FUNCUBE 2,3,4 & 5
 #include "machine/eeprom.h"
 #include "sound/x1_010.h"
 #include "includes/seta2.h"
+#include "machine/nvram.h"
 
 /***************************************************************************
 
@@ -835,7 +836,7 @@ static WRITE16_HANDLER( samshoot_coin_w )
 static ADDRESS_MAP_START( samshoot_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x000000, 0x1fffff ) AM_ROM
 	AM_RANGE( 0x200000, 0x20ffff ) AM_RAM
-	AM_RANGE( 0x300000, 0x30ffff ) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE( 0x300000, 0x30ffff ) AM_RAM AM_SHARE("nvram")
 
 	AM_RANGE( 0x400000, 0x400001 ) AM_READ_PORT("DSW1")				// DSW 1
 	AM_RANGE( 0x400002, 0x400003 ) AM_READ_PORT("BUTTONS")			// Buttons
@@ -870,19 +871,21 @@ ADDRESS_MAP_END
 // RAM shared with the sub CPU
 static READ32_HANDLER( funcube_nvram_dword_r )
 {
-	UINT16 val = space->machine->generic.nvram.u16[offset];
+	seta2_state *state = space->machine->driver_data<seta2_state>();
+	UINT16 val = state->m_nvram[offset];
 	return ((val & 0xff00) << 8) | (val & 0x00ff);
 }
 
 static WRITE32_HANDLER( funcube_nvram_dword_w )
 {
+	seta2_state *state = space->machine->driver_data<seta2_state>();
 	if (ACCESSING_BITS_0_7)
 	{
-		space->machine->generic.nvram.u16[offset] = (space->machine->generic.nvram.u16[offset] & 0xff00) | (data & 0x000000ff);
+		state->m_nvram[offset] = (state->m_nvram[offset] & 0xff00) | (data & 0x000000ff);
 	}
 	if (ACCESSING_BITS_16_23)
 	{
-		space->machine->generic.nvram.u16[offset] = (space->machine->generic.nvram.u16[offset] & 0x00ff) | ((data & 0x00ff0000) >> 8);
+		state->m_nvram[offset] = (state->m_nvram[offset] & 0x00ff) | ((data & 0x00ff0000) >> 8);
 	}
 }
 
@@ -980,7 +983,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( funcube_sub_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x000000, 0x01ffff ) AM_ROM
-	AM_RANGE( 0x200000, 0x20017f ) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE( 0x200000, 0x20017f ) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
 
@@ -2390,7 +2393,7 @@ static MACHINE_CONFIG_DERIVED( samshoot, mj4simai )
 	MDRV_CPU_PROGRAM_MAP(samshoot_map)
 	MDRV_CPU_VBLANK_INT_HACK(samshoot_interrupt,2)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
@@ -2459,7 +2462,7 @@ static MACHINE_CONFIG_START( funcube, seta2_state )
 	MDRV_CPU_IO_MAP(funcube_sub_io)
 	MDRV_CPU_PERIODIC_INT(funcube_sub_timer_irq, 60*10 )
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_MACHINE_RESET( funcube )
 

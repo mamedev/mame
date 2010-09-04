@@ -129,6 +129,7 @@ below are simply made to the banking address to run on other boards.
 #include "emu.h"
 #include "sound/ay8910.h"
 #include "cpu/z80/z80.h"
+#include "machine/nvram.h"
 
 #define multfish_VIDRAM_SIZE (0x2000*0x10)
 #define multfish_BRAM_SIZE (0x2000*0x10)
@@ -355,7 +356,7 @@ static WRITE8_HANDLER(multfish_rtc_w)
 static ADDRESS_MAP_START( multfish_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM AM_WRITE(multfish_vid_w)
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
-	AM_RANGE(0xc000, 0xdff7) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0xc000, 0xdff7) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xdff8, 0xdfff) AM_READWRITE(multfish_rtc_r, multfish_rtc_w)
 	AM_RANGE(0xe000, 0xffff) AM_READWRITE(bankedram_r, bankedram_w)
 ADDRESS_MAP_END
@@ -624,7 +625,7 @@ static MACHINE_CONFIG_START( multfish, driver_device )
 	MDRV_GFXDECODE(multfish)
 	MDRV_PALETTE_LENGTH(0x1000)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_VIDEO_START(multfish)
 	MDRV_VIDEO_UPDATE(multfish)

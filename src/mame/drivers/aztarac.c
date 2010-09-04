@@ -19,6 +19,7 @@
 #include "video/vector.h"
 #include "includes/aztarac.h"
 #include "sound/ay8910.h"
+#include "machine/nvram.h"
 
 
 
@@ -49,7 +50,8 @@ static MACHINE_RESET( aztarac )
 
 static READ16_HANDLER( nvram_r )
 {
-	return space->machine->generic.nvram.u16[offset] | 0xfff0;
+	aztarac_state *state = space->machine->driver_data<aztarac_state>();
+	return state->m_nvram[offset] | 0xfff0;
 }
 
 
@@ -76,7 +78,7 @@ static READ16_HANDLER( joystick_r )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x00bfff) AM_ROM
-	AM_RANGE(0x022000, 0x0220ff) AM_READ(nvram_r) AM_WRITEONLY AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x022000, 0x0220ff) AM_READ(nvram_r) AM_WRITEONLY AM_SHARE("nvram")
 	AM_RANGE(0x027000, 0x027001) AM_READ(joystick_r)
 	AM_RANGE(0x027004, 0x027005) AM_READ_PORT("INPUTS")
 	AM_RANGE(0x027008, 0x027009) AM_READWRITE(aztarac_sound_r, aztarac_sound_w)
@@ -143,7 +145,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( aztarac, driver_device )
+static MACHINE_CONFIG_START( aztarac, aztarac_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 8000000)
@@ -155,7 +157,7 @@ static MACHINE_CONFIG_START( aztarac, driver_device )
 	MDRV_CPU_PERIODIC_INT(aztarac_snd_timed_irq, 100)
 
 	MDRV_MACHINE_RESET(aztarac)
-	MDRV_NVRAM_HANDLER(generic_1fill)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", VECTOR)

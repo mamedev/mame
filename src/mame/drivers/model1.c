@@ -633,6 +633,7 @@ Notes:
 #include "cpu/mb86233/mb86233.h"
 #include "sound/multipcm.h"
 #include "sound/2612intf.h"
+#include "machine/nvram.h"
 #include "includes/model1.h"
 
 static int model1_sound_irq;
@@ -887,7 +888,7 @@ static ADDRESS_MAP_START( model1_mem, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0xc00040, 0xc00043) AM_READWRITE(network_ctl_r, network_ctl_w)
 
-	AM_RANGE(0xc00200, 0xc002ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0xc00200, 0xc002ff) AM_RAM AM_SHARE("nvram")
 
 	AM_RANGE(0xc40000, 0xc40001) AM_WRITE(snd_latch_to_68k_w)
 	AM_RANGE(0xc40002, 0xc40003) AM_READ(snd_68k_ready_r)
@@ -935,7 +936,7 @@ static ADDRESS_MAP_START( model1_vr_mem, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0xc00040, 0xc00043) AM_READWRITE(network_ctl_r, network_ctl_w)
 
-	AM_RANGE(0xc00200, 0xc002ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0xc00200, 0xc002ff) AM_RAM AM_SHARE("nvram")
 
 	AM_RANGE(0xc40000, 0xc40001) AM_WRITE(snd_latch_to_68k_w)
 	AM_RANGE(0xc40002, 0xc40003) AM_READ(snd_68k_ready_r)
@@ -1507,7 +1508,7 @@ static MACHINE_CONFIG_START( model1, driver_device )
 
 	MDRV_MACHINE_START(model1)
 	MDRV_MACHINE_RESET(model1)
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK )
 
@@ -1551,7 +1552,7 @@ static MACHINE_CONFIG_START( model1_vr, driver_device )
 
 	MDRV_MACHINE_START(model1)
 	MDRV_MACHINE_RESET(model1_vr)
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK )
 

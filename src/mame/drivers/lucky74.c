@@ -672,6 +672,7 @@
 #include "sound/sn76496.h"
 #include "sound/msm5205.h"
 #include "machine/8255ppi.h"
+#include "machine/nvram.h"
 #include "lucky74.lh"
 #include "includes/lucky74.h"
 
@@ -811,7 +812,7 @@ static INTERRUPT_GEN( nmi_interrupt )
 
 static ADDRESS_MAP_START( lucky74_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)	/* NVRAM */
+	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_SHARE("nvram")	/* NVRAM */
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(lucky74_fg_videoram_w) AM_BASE(&lucky74_fg_videoram)				/* VRAM1-1 */
 	AM_RANGE(0xd800, 0xdfff) AM_RAM_WRITE(lucky74_fg_colorram_w) AM_BASE(&lucky74_fg_colorram)				/* VRAM1-2 */
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(lucky74_bg_videoram_w) AM_BASE(&lucky74_bg_videoram)				/* VRAM2-1 */
@@ -1237,7 +1238,7 @@ static MACHINE_CONFIG_START( lucky74, driver_device )
 	MDRV_CPU_IO_MAP(lucky74_portmap)
 	MDRV_CPU_VBLANK_INT("screen", nmi_interrupt)	/* 60 Hz. measured */
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_SOUND_START(lucky74)
 

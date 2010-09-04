@@ -293,6 +293,7 @@ Notes:
 #include "cpu/mips/r3000.h"
 #include "cpu/jaguar/jaguar.h"
 #include "machine/idectrl.h"
+#include "machine/nvram.h"
 #include "sound/dac.h"
 #include "includes/jaguar.h"
 
@@ -300,6 +301,17 @@ Notes:
 #define JAGUAR_CLOCK		XTAL_52MHz
 #define R3000_CLOCK			XTAL_40MHz
 #define M68K_CLOCK			XTAL_50MHz
+
+
+class cojag_state : public driver_device
+{
+public:
+	cojag_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config),
+		  m_nvram(*this, "nvram") { }
+
+	required_shared_ptr<UINT32>	m_nvram;
+};
 
 
 
@@ -507,10 +519,11 @@ static WRITE32_HANDLER( latch_w )
 
 static READ32_HANDLER( eeprom_data_r )
 {
+	cojag_state *state = space->machine->driver_data<cojag_state>();
 	if (cojag_is_r3000)
-		return space->machine->generic.nvram.u32[offset] | 0xffffff00;
+		return state->m_nvram[offset] | 0xffffff00;
 	else
-		return space->machine->generic.nvram.u32[offset] | 0x00ffffff;
+		return state->m_nvram[offset] | 0x00ffffff;
 }
 
 
@@ -524,10 +537,11 @@ static WRITE32_HANDLER( eeprom_data_w )
 {
 //  if (eeprom_enable)
 	{
+		cojag_state *state = space->machine->driver_data<cojag_state>();
 		if (cojag_is_r3000)
-			space->machine->generic.nvram.u32[offset] = data & 0x000000ff;
+			state->m_nvram[offset] = data & 0x000000ff;
 		else
-			space->machine->generic.nvram.u32[offset] = data & 0xff000000;
+			state->m_nvram[offset] = data & 0xff000000;
 	}
 //  else
 //      logerror("%08X:error writing to disabled EEPROM\n", cpu_get_previouspc(space->cpu));
@@ -804,7 +818,7 @@ static ADDRESS_MAP_START( r3000_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x12000000, 0x120fffff) AM_RAM		// tested in self-test only?
 	AM_RANGE(0x14000004, 0x14000007) AM_WRITE(watchdog_reset32_w)
 	AM_RANGE(0x16000000, 0x16000003) AM_WRITE(eeprom_enable_w)
-	AM_RANGE(0x18000000, 0x18001fff) AM_READWRITE(eeprom_data_r, eeprom_data_w) AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x18000000, 0x18001fff) AM_READWRITE(eeprom_data_r, eeprom_data_w) AM_SHARE("nvram")
 	AM_RANGE(0x1fc00000, 0x1fdfffff) AM_ROM AM_REGION("user1", 0) AM_BASE(&rom_base)
 ADDRESS_MAP_END
 
@@ -813,7 +827,7 @@ static ADDRESS_MAP_START( m68020_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x7fffff) AM_RAM AM_BASE(&jaguar_shared_ram) AM_SHARE("share1")
 	AM_RANGE(0x800000, 0x9fffff) AM_ROM AM_REGION("user1", 0) AM_BASE(&rom_base)
 	AM_RANGE(0xa00000, 0xa1ffff) AM_RAM
-	AM_RANGE(0xa20000, 0xa21fff) AM_READWRITE(eeprom_data_r, eeprom_data_w) AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0xa20000, 0xa21fff) AM_READWRITE(eeprom_data_r, eeprom_data_w) AM_SHARE("nvram")
 	AM_RANGE(0xa30000, 0xa30003) AM_WRITE(watchdog_reset32_w)
 	AM_RANGE(0xa40000, 0xa40003) AM_WRITE(eeprom_enable_w)
 	AM_RANGE(0xb70000, 0xb70003) AM_READWRITE(misc_control_r, misc_control_w)
@@ -1102,7 +1116,7 @@ static const jaguar_cpu_config dsp_config =
 };
 
 
-static MACHINE_CONFIG_START( cojagr3k, driver_device )
+static MACHINE_CONFIG_START( cojagr3k, cojag_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", R3041BE, R3000_CLOCK)
@@ -1118,7 +1132,7 @@ static MACHINE_CONFIG_START( cojagr3k, driver_device )
 	MDRV_CPU_PROGRAM_MAP(dsp_map)
 
 	MDRV_MACHINE_RESET(cojag)
-	MDRV_NVRAM_HANDLER(generic_1fill)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	MDRV_IDE_CONTROLLER_ADD("ide", jaguar_external_int)
 

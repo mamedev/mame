@@ -17,6 +17,7 @@
 #include "includes/exidy440.h"
 #include "machine/74148.h"
 #include "machine/pit8253.h"
+#include "machine/nvram.h"
 
 
 
@@ -42,7 +43,7 @@ static ADDRESS_MAP_START( vertigo_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x004060, 0x00406f) AM_WRITE(vertigo_motor_w) AM_MIRROR(0x001000)
 	AM_RANGE(0x004070, 0x00407f) AM_WRITE(vertigo_wsot_w) AM_MIRROR(0x001000)
 	AM_RANGE(0x006000, 0x006007) AM_DEVREADWRITE("pit8254", vertigo_pit8254_lsb_r, vertigo_pit8254_lsb_w)
-	AM_RANGE(0x007000, 0x0073ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x007000, 0x0073ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x800000, 0x81ffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -124,7 +125,7 @@ static MACHINE_CONFIG_START( vertigo, driver_device )
     */
 	MDRV_MACHINE_START(vertigo)
 	MDRV_MACHINE_RESET(vertigo)
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", VECTOR)

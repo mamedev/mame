@@ -65,6 +65,7 @@ Notes:
 #include "emu.h"
 #include "deprecat.h"
 #include "cpu/h83002/h8.h"
+#include "machine/nvram.h"
 
 class lastfght_state : public driver_device
 {
@@ -413,7 +414,7 @@ static ADDRESS_MAP_START( lastfght_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE( 0x080000, 0x0fffff ) AM_ROM AM_REGION("maincpu", 0)
 
-	AM_RANGE( 0x200000, 0x20ffff ) AM_RAM AM_BASE_SIZE_GENERIC(nvram)	// battery
+	AM_RANGE( 0x200000, 0x20ffff ) AM_RAM AM_SHARE("nvram")	// battery
 
 	AM_RANGE( 0x600000, 0x600001 ) AM_WRITE( lastfght_hi_w )
 	AM_RANGE( 0x600002, 0x600003 ) AM_READWRITE( lastfght_sound_r, lastfght_sound_w )
@@ -575,7 +576,7 @@ static MACHINE_CONFIG_START( lastfght, lastfght_state )
 	MDRV_CPU_PROGRAM_MAP( lastfght_map)
 	MDRV_CPU_VBLANK_INT_HACK(unknown_interrupt,2)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_MACHINE_START(lastfght)
 	MDRV_MACHINE_RESET(lastfght)

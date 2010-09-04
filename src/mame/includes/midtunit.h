@@ -6,6 +6,16 @@
 
 #include "midyunit.h"
 
+class midtunit_state : public driver_device
+{
+public:
+	midtunit_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config),
+		  m_nvram(*this, "nvram") { }
+
+	required_shared_ptr<UINT16>	m_nvram;
+};
+
 /*----------- defined in machine/midtunit.c -----------*/
 
 WRITE16_HANDLER( midtunit_cmos_enable_w );

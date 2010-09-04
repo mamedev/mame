@@ -12,6 +12,7 @@
 #include "cpu/se3208/se3208.h"
 #include "video/vrender0.h"
 #include "machine/ds1302.h"
+#include "machine/nvram.h"
 #include "sound/vrender0.h"
 
 
@@ -58,7 +59,7 @@ static MACHINE_CONFIG_START( ddz, driver_device )
 
 	//MDRV_MACHINE_RESET(ddz)
 
-	//MDRV_NVRAM_HANDLER(generic_0fill)
+	//MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)

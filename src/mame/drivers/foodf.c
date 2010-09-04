@@ -77,6 +77,7 @@
 #include "cpu/m68000/m68000.h"
 #include "machine/atarigen.h"
 #include "sound/pokey.h"
+#include "machine/nvram.h"
 #include "includes/foodf.h"
 
 
@@ -91,7 +92,8 @@
 
 static READ16_HANDLER( nvram_r )
 {
-	return space->machine->generic.nvram.u16[offset] | 0xfff0;
+	foodf_state *state = space->machine->driver_data<foodf_state>();
+	return state->m_nvram[offset] | 0xfff0;
 }
 
 
@@ -216,7 +218,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x018000, 0x018fff) AM_MIRROR(0x3e3000) AM_RAM
 	AM_RANGE(0x01c000, 0x01c0ff) AM_MIRROR(0x3e3f00) AM_RAM AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0x800000, 0x8007ff) AM_MIRROR(0x03f800) AM_RAM_WRITE(atarigen_playfield_w) AM_BASE_MEMBER(foodf_state, playfield)
-	AM_RANGE(0x900000, 0x9001ff) AM_MIRROR(0x03fe00) AM_RAM_READ(nvram_r) AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x900000, 0x9001ff) AM_MIRROR(0x03fe00) AM_RAM_READ(nvram_r) AM_SHARE("nvram")
 	AM_RANGE(0x940000, 0x940007) AM_MIRROR(0x023ff8) AM_READ(analog_r)
 	AM_RANGE(0x944000, 0x944007) AM_MIRROR(0x023ff8) AM_WRITE(analog_w)
 	AM_RANGE(0x948000, 0x948001) AM_MIRROR(0x023ffe) AM_READ_PORT("SYSTEM") AM_WRITE(digital_w)
@@ -362,7 +364,7 @@ static MACHINE_CONFIG_START( foodf, foodf_state )
 
 	MDRV_MACHINE_START(foodf)
 	MDRV_MACHINE_RESET(foodf)
-	MDRV_NVRAM_HANDLER(generic_1fill)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 	MDRV_WATCHDOG_VBLANK_INIT(8)
 
 	MDRV_TIMER_ADD("scan_timer", scanline_update)

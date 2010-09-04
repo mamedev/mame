@@ -278,8 +278,6 @@ private:
 // holds generic pointers that are commonly used
 struct generic_pointers
 {
-	generic_ptr				nvram;				// generic NVRAM
-	UINT32					nvram_size;
 	generic_ptr				videoram;			// videoram
 	UINT32					videoram_size;
 	generic_ptr				spriteram;			// spriteram
@@ -632,70 +630,107 @@ protected:
 	virtual void device_start();
 	virtual void device_reset();
 	
-	// helper class to request auto-device discovery in the constructor of a derived class
-	class auto_device_base
+	// helper class to request auto-object discovery in the constructor of a derived class
+	class auto_finder_base
 	{
 	public:
 		// construction/destruction
-		auto_device_base(driver_device &base, const char *tag);
-		virtual ~auto_device_base();
+		auto_finder_base(driver_device &base, const char *tag);
+		virtual ~auto_finder_base();
 
 		// getters
 		virtual void findit(driver_device &base) = 0;
 	
 		// internal state
-		auto_device_base *m_next;
+		auto_finder_base *m_next;
 		const char *m_tag;
 	};
 
-	// optional device finder
-	template<class _DeviceClass>
-	class optional_device : public auto_device_base
+	// templated version bound to a specific type
+	template<typename _TargetType, bool _Required>
+	class auto_finder_type : public auto_finder_base
 	{
 	public:
 		// construction/destruction
-		optional_device(driver_device &base, const char *tag) 
-			: auto_device_base(base, tag), 
-			  m_device(NULL) { }
+		auto_finder_type(driver_device &base, const char *tag) 
+			: auto_finder_base(base, tag), 
+			  m_target(NULL) { }
 
 		// operators to make use transparent
-		operator _DeviceClass *() { return m_device; }
-		operator _DeviceClass *() const { return m_device; }
-		_DeviceClass *operator->() { return m_device; }
+		operator _TargetType() { return m_target; }
+		operator _TargetType() const { return m_target; }
+		_TargetType operator->() { return m_target; }
 
-		// finder
-		virtual void findit(driver_device &base)
+		// setter for setting the object
+		void set_target(_TargetType target)
 		{
-			m_device = base.m_machine.device<_DeviceClass>(m_tag);
+			m_target = target;
+			if (target == 0 && _Required)
+				throw emu_fatalerror("Unable to find required object '%s'", this->m_tag);
 		}
-	
+
 		// internal state
-		_DeviceClass *m_device;
+		_TargetType m_target;
+	};
+	
+	// optional device finder
+	template<class _DeviceClass>
+	class optional_device : public auto_finder_type<_DeviceClass *, false>
+	{
+	public:
+		optional_device(driver_device &base, const char *tag) : auto_finder_type<_DeviceClass *, false>(base, tag) { }
+		virtual void findit(driver_device &base) { set_target(base.m_machine.device<_DeviceClass>(this->m_tag)); }
 	};
 	
 	// required devices are similar but throw an error if they are not found
 	template<class _DeviceClass>
-	class required_device : public optional_device<_DeviceClass>
+	class required_device : public auto_finder_type<_DeviceClass *, true>
 	{
 	public:
-		// construction/destruction
-		required_device(driver_device &base, const char *tag) 
-			: optional_device<_DeviceClass>(base, tag) { }
-
-		// finder
-		virtual void findit(driver_device &base)
-		{
-			this->m_device = base.m_machine.device<_DeviceClass>(this->m_tag);
-			if (this->m_device == NULL) throw emu_fatalerror("Unabled to find required device '%s'", this->m_tag);
-		}
+		required_device(driver_device &base, const char *tag) : auto_finder_type<_DeviceClass *, true>(base, tag) { }
+		virtual void findit(driver_device &base) { set_target(base.m_machine.device<_DeviceClass>(this->m_tag)); }
+	};
+	
+	// optional shared pointer finder
+	template<typename _PointerType>
+	class optional_shared_ptr : public auto_finder_type<_PointerType *, false>
+	{
+	public:
+		optional_shared_ptr(driver_device &base, const char *tag) : auto_finder_type<_PointerType *, false>(base, tag) { }
+		virtual void findit(driver_device &base) { set_target(reinterpret_cast<_PointerType *>(memory_get_shared(base.m_machine, this->m_tag))); }
+	};
+	
+	// required shared pointer finder
+	template<typename _PointerType>
+	class required_shared_ptr : public auto_finder_type<_PointerType *, true>
+	{
+	public:
+		required_shared_ptr(driver_device &base, const char *tag) : auto_finder_type<_PointerType *, true>(base, tag) { }
+		virtual void findit(driver_device &base) { set_target(reinterpret_cast<_PointerType *>(memory_get_shared(base.m_machine, this->m_tag))); }
+	};
+	
+	// optional shared pointer size finder
+	class optional_shared_size : public auto_finder_type<size_t, false>
+	{
+	public:
+		optional_shared_size(driver_device &base, const char *tag) : auto_finder_type<size_t, false>(base, tag) { }
+		virtual void findit(driver_device &base) { size_t size; memory_get_shared(base.m_machine, this->m_tag, size); set_target(size); }
+	};
+	
+	// required shared pointer size finder
+	class required_shared_size : public auto_finder_type<size_t, true>
+	{
+	public:
+		required_shared_size(driver_device &base, const char *tag) : auto_finder_type<size_t, true>(base, tag) { }
+		virtual void findit(driver_device &base) { size_t size; memory_get_shared(base.m_machine, this->m_tag, size); set_target(size); }
 	};
 	
 	// internal helpers
-	void register_auto_device(auto_device_base &autodev);
+	void register_auto_finder(auto_finder_base &autodev);
 
 	// internal state
 	const driver_device_config_base &m_config;
-	auto_device_base *m_auto_device_list;
+	auto_finder_base *m_auto_finder_list;
 };
 
 

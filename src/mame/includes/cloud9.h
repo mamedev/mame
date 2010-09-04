@@ -8,14 +8,15 @@ class cloud9_state : public driver_device
 {
 public:
 	cloud9_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: driver_device(machine, config),
+		  nvram_stage(*this, "nvram") { }
 
 	/* memory pointers */
 	UINT8 *     videoram;
 	UINT8 *     spriteram;
 	UINT8 *     paletteram;
-//  UINT8 *     nvram_stage;    // currently this uses generic nvram handlers
-//  UINT8 *     nvram;      // currently this uses generic nvram handlers
+	required_shared_ptr<UINT8> nvram_stage;    // currently this uses generic nvram handlers
+	UINT8		nvram[0x100];      // currently this uses generic nvram handlers
 
 	/* video-related */
 	const UINT8 *syncprom;

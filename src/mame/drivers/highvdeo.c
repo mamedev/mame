@@ -86,6 +86,7 @@ Game is V30 based, with rom banking (2Mb)
 #include "cpu/nec/nec.h"
 #include "cpu/i86/i86.h"
 #include "sound/okim6376.h"
+#include "machine/nvram.h"
 #include "fashion.lh"
 
 static UINT16 *blit_ram;
@@ -255,7 +256,7 @@ static WRITE16_HANDLER( write1_w )
 
 static ADDRESS_MAP_START( tv_vcf_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM /*irq vector area*/
-	AM_RANGE(0x00400, 0x03fff) AM_RAM AM_BASE_SIZE_GENERIC( nvram )
+	AM_RANGE(0x00400, 0x03fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x40000, 0x4ffff) AM_RAM AM_BASE(&blit_ram) /*blitter ram*/
 	AM_RANGE(0x80000, 0xbffff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
@@ -294,7 +295,7 @@ static WRITE16_DEVICE_HANDLER( tv_ncf_oki6395_w )
 }
 static ADDRESS_MAP_START( tv_ncf_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM /*irq vector area*/
-	AM_RANGE(0x00400, 0x03fff) AM_RAM AM_BASE_SIZE_GENERIC( nvram )
+	AM_RANGE(0x00400, 0x03fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x20000, 0x2ffff) AM_RAM AM_BASE(&blit_ram) /*blitter ram*/
 	AM_RANGE(0x40000, 0xbffff) AM_ROM AM_REGION("user1",0x40000)
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
@@ -337,7 +338,7 @@ static WRITE16_HANDLER( tv_tcf_bankselect_w )
 
 static ADDRESS_MAP_START( tv_tcf_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM /*irq vector area*/
-	AM_RANGE(0x00400, 0x03fff) AM_RAM AM_BASE_SIZE_GENERIC( nvram )
+	AM_RANGE(0x00400, 0x03fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x40000, 0x5d4bf) AM_RAM AM_BASE(&blit_ram) /*blitter ram*/
 	AM_RANGE(0x7fe00, 0x7ffff) AM_RAM_WRITE( tv_tcf_paletteram_w ) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x80000, 0xbffff) AM_ROMBANK("bank1")
@@ -395,7 +396,7 @@ static WRITE16_HANDLER( write2_w )
 
 static ADDRESS_MAP_START( newmcard_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM /*irq vector area*/
-	AM_RANGE(0x00400, 0x0ffff) AM_RAM AM_BASE_SIZE_GENERIC( nvram )
+	AM_RANGE(0x00400, 0x0ffff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x40000, 0x7ffff) AM_RAM AM_BASE(&blit_ram) /*blitter ram*/
 	AM_RANGE(0x80000, 0xbffff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
@@ -463,7 +464,7 @@ static WRITE16_HANDLER( brasil_status_w )
 
 static ADDRESS_MAP_START( brasil_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM /*irq vector area*/
-	AM_RANGE(0x00400, 0x0ffff) AM_RAM AM_BASE_SIZE_GENERIC( nvram )
+	AM_RANGE(0x00400, 0x0ffff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x40000, 0x7ffff) AM_RAM AM_BASE(&blit_ram) /*blitter ram*/
 	AM_RANGE(0x80000, 0xbffff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc0000, 0xfffff) AM_ROM AM_REGION("boot_prg",0)
@@ -871,7 +872,7 @@ static MACHINE_CONFIG_START( tv_vcf, driver_device )
 	MDRV_CPU_IO_MAP(tv_vcf_io)
 	MDRV_CPU_VBLANK_INT("screen", vblank_irq)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -938,7 +939,7 @@ static MACHINE_CONFIG_START( brasil, driver_device )
 	MDRV_CPU_IO_MAP(brasil_io)
 	MDRV_CPU_VBLANK_INT("screen", vblank_irq)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)

@@ -8,6 +8,16 @@
 
 #define MIDVUNIT_VIDEO_CLOCK	33000000
 
+class midvunit_state : public driver_device
+{
+public:
+	midvunit_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config),
+		  m_nvram(*this, "nvram") { }
+
+	required_shared_ptr<UINT32>	m_nvram;
+};
+
 
 
 /*----------- defined in video/midvunit.c -----------*/

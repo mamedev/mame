@@ -144,6 +144,7 @@
 #include "includes/tatsumi.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
+#include "machine/nvram.h"
 
 #include "roundup5.lh"
 
@@ -194,7 +195,7 @@ static WRITE16_HANDLER(cyclwarr_sound_w)
 
 static ADDRESS_MAP_START( apache3_v30_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x03fff) AM_RAM
-	AM_RANGE(0x04000, 0x07fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x04000, 0x07fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x08000, 0x08fff) AM_RAM_WRITE(apache3_palette_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x0c000, 0x0dfff) AM_RAM_WRITE(roundup5_text_w) AM_BASE_GENERIC(videoram)
 	AM_RANGE(0x0e800, 0x0e803) AM_WRITENOP // CRT
@@ -874,7 +875,7 @@ static MACHINE_CONFIG_START( apache3, driver_device )
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_QUANTUM_TIME(HZ(6000))
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 	MDRV_MACHINE_RESET(apache3)
 
 	/* video hardware */

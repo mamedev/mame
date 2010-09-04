@@ -39,6 +39,7 @@ Notes:
 #include "machine/6522via.h"
 #include "sound/ay8910.h"
 #include "includes/gameplan.h"
+#include "machine/nvram.h"
 
 static READ8_HANDLER( trvquest_question_r )
 {
@@ -58,7 +59,7 @@ static WRITE8_DEVICE_HANDLER( trvquest_misc_w )
 }
 
 static ADDRESS_MAP_START( cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram) // cmos ram
+	AM_RANGE(0x0000, 0x1fff) AM_RAM AM_SHARE("nvram") // cmos ram
 	AM_RANGE(0x2000, 0x27ff) AM_RAM // main ram
 	AM_RANGE(0x3800, 0x380f) AM_DEVREADWRITE("via6522_1", via_r, via_w)
 	AM_RANGE(0x3810, 0x381f) AM_DEVREADWRITE("via6522_2", via_r, via_w)
@@ -221,7 +222,7 @@ static MACHINE_CONFIG_START( trvquest, gameplan_state )
 	MDRV_CPU_PROGRAM_MAP(cpu_map)
 	MDRV_CPU_VBLANK_INT("screen", trvquest_interrupt)
 
-	MDRV_NVRAM_HANDLER(generic_1fill)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 	MDRV_MACHINE_START(trvquest)
 	MDRV_MACHINE_RESET(trvquest)
 

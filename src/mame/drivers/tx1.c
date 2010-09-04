@@ -45,6 +45,7 @@
 #include "sound/ay8910.h"
 #include "rendlay.h"
 #include "includes/tx1.h"
+#include "machine/nvram.h"
 
 #include "tx1.lh"
 #include "buggyboy.lh"
@@ -508,7 +509,7 @@ static const ppi8255_interface tx1_ppi8255_intf =
 static ADDRESS_MAP_START( tx1_main, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x00fff) AM_MIRROR(0x1000) AM_RAM
 	AM_RANGE(0x02000, 0x02fff) AM_MIRROR(0x1000) AM_RAM
-	AM_RANGE(0x04000, 0x04fff) AM_MIRROR(0x1000) AM_RAM	AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x04000, 0x04fff) AM_MIRROR(0x1000) AM_RAM	AM_SHARE("nvram")
 	AM_RANGE(0x06000, 0x06fff) AM_READWRITE(tx1_crtc_r, tx1_crtc_w)
 	AM_RANGE(0x08000, 0x09fff) AM_RAM AM_BASE(&tx1_vram)
 	AM_RANGE(0x0a000, 0x0afff) AM_RAM AM_SHARE("share1") AM_BASE(&tx1_rcram)
@@ -559,7 +560,7 @@ ADDRESS_MAP_END
  *************************************/
 
 static ADDRESS_MAP_START( buggyboy_main, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x00000, 0x03fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x00000, 0x03fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x04000, 0x04fff) AM_READWRITE(tx1_crtc_r, tx1_crtc_w)
 	AM_RANGE(0x08000, 0x09fff) AM_RAM AM_BASE(&buggyboy_vram)
 	AM_RANGE(0x0a000, 0x0afff) AM_RAM AM_SHARE("share1") AM_BASE(&buggyboy_rcram) AM_SIZE(&buggyboy_rcram_size)
@@ -574,7 +575,7 @@ static ADDRESS_MAP_START( buggyboy_main, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( buggybjr_main, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x00000, 0x03fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x00000, 0x03fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x04000, 0x04fff) AM_READWRITE(tx1_crtc_r, tx1_crtc_w)
 	AM_RANGE(0x08000, 0x08fff) AM_RAM AM_BASE(&buggyboy_vram)
 	AM_RANGE(0x0a000, 0x0afff) AM_RAM AM_SHARE("share1") AM_BASE(&buggyboy_rcram) AM_SIZE(&buggyboy_rcram_size)
@@ -714,7 +715,7 @@ static MACHINE_CONFIG_START( tx1, driver_device )
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold, TX1_PIXEL_CLOCK / 4 / 2048 / 2)
 
 	MDRV_MACHINE_RESET(tx1)
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_PPI8255_ADD("ppi8255", tx1_ppi8255_intf)
 
@@ -767,7 +768,7 @@ static MACHINE_CONFIG_START( buggyboy, driver_device )
 	MDRV_CPU_IO_MAP(buggyboy_sound_io)
 
 	MDRV_MACHINE_RESET(buggyboy)
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_PPI8255_ADD("ppi8255", buggyboy_ppi8255_intf)
 
@@ -822,7 +823,7 @@ static MACHINE_CONFIG_START( buggybjr, driver_device )
 	MDRV_CPU_PERIODIC_INT(z80_irq, BUGGYBOY_ZCLK / 2 / 4 / 2048)
 
 	MDRV_MACHINE_RESET(buggybjr)
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)

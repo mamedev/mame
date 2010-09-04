@@ -24,6 +24,7 @@
 #include "audio/dcs.h"
 #include "machine/idectrl.h"
 #include "machine/midwayic.h"
+#include "machine/nvram.h"
 #include "includes/midvunit.h"
 
 
@@ -182,14 +183,16 @@ static WRITE32_HANDLER( midvunit_cmos_protect_w )
 
 static WRITE32_HANDLER( midvunit_cmos_w )
 {
+	midvunit_state *state = space->machine->driver_data<midvunit_state>();
 	if (!cmos_protected)
-		COMBINE_DATA(space->machine->generic.nvram.u32 + offset);
+		COMBINE_DATA(state->m_nvram + offset);
 }
 
 
 static READ32_HANDLER( midvunit_cmos_r )
 {
-	return space->machine->generic.nvram.u32[offset];
+	midvunit_state *state = space->machine->driver_data<midvunit_state>();
+	return state->m_nvram[offset];
 }
 
 
@@ -354,9 +357,10 @@ static const UINT32 bit_data[0x10] =
 
 static READ32_HANDLER( bit_data_r )
 {
+	midvunit_state *state = space->machine->driver_data<midvunit_state>();
 	int bit = (bit_data[bit_index / 32] >> (31 - (bit_index % 32))) & 1;
 	bit_index = (bit_index + 1) % 512;
-	return bit ? space->machine->generic.nvram.u32[offset] : ~space->machine->generic.nvram.u32[offset];
+	return bit ? state->m_nvram[offset] : ~state->m_nvram[offset];
 }
 
 
@@ -502,7 +506,7 @@ static ADDRESS_MAP_START( midvunit_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x995020, 0x995020) AM_WRITE(midvunit_cmos_protect_w)
 	AM_RANGE(0x997000, 0x997000) AM_NOP	// communications
 	AM_RANGE(0x9a0000, 0x9a0000) AM_WRITE(midvunit_sound_w)
-	AM_RANGE(0x9c0000, 0x9c1fff) AM_READWRITE(midvunit_cmos_r, midvunit_cmos_w) AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x9c0000, 0x9c1fff) AM_READWRITE(midvunit_cmos_r, midvunit_cmos_w) AM_SHARE("nvram")
 	AM_RANGE(0x9e0000, 0x9e7fff) AM_RAM_WRITE(midvunit_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xa00000, 0xbfffff) AM_READWRITE(midvunit_textureram_r, midvunit_textureram_w) AM_BASE(&midvunit_textureram)
 	AM_RANGE(0xc00000, 0xffffff) AM_ROM AM_REGION("user1", 0)
@@ -1018,7 +1022,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( midvcommon, driver_device )
+static MACHINE_CONFIG_START( midvcommon, midvunit_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", TMS32031, CPU_CLOCK)
@@ -1026,7 +1030,7 @@ static MACHINE_CONFIG_START( midvcommon, driver_device )
 
 	MDRV_MACHINE_START(midvunit)
 	MDRV_MACHINE_RESET(midvunit)
-	MDRV_NVRAM_HANDLER(generic_1fill)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	MDRV_TIMER_ADD("timer0", NULL)
 	MDRV_TIMER_ADD("timer1", NULL)
@@ -1058,6 +1062,7 @@ static MACHINE_CONFIG_DERIVED( midvplus, midvcommon )
 	MDRV_CPU_PROGRAM_MAP(midvplus_map)
 
 	MDRV_MACHINE_RESET(midvplus)
+	MDRV_DEVICE_REMOVE("nvram")
 	MDRV_NVRAM_HANDLER(midway_serial_pic2)
 
 	MDRV_IDE_CONTROLLER_ADD("ide", NULL)

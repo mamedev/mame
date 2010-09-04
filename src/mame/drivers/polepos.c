@@ -228,6 +228,7 @@ Todo:
 #include "audio/namco54.h"
 #include "includes/polepos.h"
 #include "sound/tms5220.h"
+#include "machine/nvram.h"
 
 #include "polepos.lh"
 #include "topracer.lh"
@@ -478,7 +479,7 @@ static MACHINE_RESET( polepos )
 
 static ADDRESS_MAP_START( z80_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x3000, 0x37ff) AM_MIRROR(0x0800) AM_RAM AM_BASE_SIZE_GENERIC(nvram)	/* Battery Backup */
+	AM_RANGE(0x3000, 0x37ff) AM_MIRROR(0x0800) AM_RAM AM_SHARE("nvram")	/* Battery Backup */
 	AM_RANGE(0x4000, 0x47ff) AM_READWRITE(polepos_sprite_r, polepos_sprite_w)				/* Motion Object */
 	AM_RANGE(0x4800, 0x4bff) AM_READWRITE(polepos_road_r, polepos_road_w)				/* Road Memory */
 	AM_RANGE(0x4c00, 0x4fff) AM_READWRITE(polepos_alpha_r, polepos_alpha_w)				/* Alphanumeric (char ram) */
@@ -891,7 +892,7 @@ static MACHINE_CONFIG_START( polepos, driver_device )
 	MDRV_QUANTUM_TIME(HZ(6000))	/* some interleaving */
 
 	MDRV_MACHINE_RESET(polepos)
-	MDRV_NVRAM_HANDLER(generic_1fill)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -974,7 +975,7 @@ static MACHINE_CONFIG_START( topracern, driver_device )
 	MDRV_QUANTUM_TIME(HZ(6000))	/* some interleaving */
 
 	MDRV_MACHINE_RESET(polepos)
-	MDRV_NVRAM_HANDLER(generic_1fill)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

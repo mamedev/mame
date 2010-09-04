@@ -12,6 +12,7 @@ To Do:
 
 #include "emu.h"
 #include "cpu/m6800/m6800.h"
+#include "machine/nvram.h"
 #include "includes/triplhnt.h"
 
 static UINT8 triplhnt_cmos[16];
@@ -23,8 +24,7 @@ static UINT8 triplhnt_hit_code;
 
 static DRIVER_INIT( triplhnt )
 {
-	machine->generic.nvram.u8 = triplhnt_cmos;
-	machine->generic.nvram_size = sizeof triplhnt_cmos;
+	machine->device<nvram_device>("nvram")->set_base(triplhnt_cmos, sizeof(triplhnt_cmos));
 }
 
 
@@ -148,7 +148,7 @@ static ADDRESS_MAP_START( triplhnt_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0c0a, 0x0c0a) AM_READ_PORT("0C0A")
 	AM_RANGE(0x0c0b, 0x0c0b) AM_READ(triplhnt_input_port_4_r)
 	AM_RANGE(0x0c10, 0x0c1f) AM_READ(triplhnt_da_latch_r)
-	AM_RANGE(0x0c20, 0x0c2f) AM_READ(triplhnt_cmos_r)
+	AM_RANGE(0x0c20, 0x0c2f) AM_READ(triplhnt_cmos_r) AM_SHARE("nvram")
 	AM_RANGE(0x0c30, 0x0c3f) AM_READWRITE(triplhnt_misc_r, triplhnt_misc_w)
 	AM_RANGE(0x0c40, 0x0c40) AM_READ_PORT("0C40")
 	AM_RANGE(0x0c48, 0x0c48) AM_READ_PORT("0C48")
@@ -316,7 +316,7 @@ static MACHINE_CONFIG_START( triplhnt, driver_device )
 	MDRV_CPU_PROGRAM_MAP(triplhnt_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

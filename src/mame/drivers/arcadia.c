@@ -51,6 +51,7 @@
 #include "cpu/m68000/m68000.h"
 #include "includes/amiga.h"
 #include "machine/6526cia.h"
+#include "machine/nvram.h"
 
 
 
@@ -191,7 +192,7 @@ static ADDRESS_MAP_START( amiga_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x800000, 0x97ffff) AM_ROMBANK("bank2") AM_REGION("user3", 0)
 	AM_RANGE(0x980000, 0x9fbfff) AM_ROM AM_REGION("user2", 0)
-	AM_RANGE(0x9fc000, 0x9ffffd) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x9fc000, 0x9ffffd) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x9ffffe, 0x9fffff) AM_WRITE(arcadia_multibios_change_game)
 	AM_RANGE(0xf00000, 0xf7ffff) AM_ROM AM_REGION("user2", 0)
 ADDRESS_MAP_END
@@ -293,7 +294,7 @@ static MACHINE_CONFIG_START( arcadia, driver_device )
 	MDRV_CPU_PROGRAM_MAP(amiga_map)
 
 	MDRV_MACHINE_RESET(amiga)
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)

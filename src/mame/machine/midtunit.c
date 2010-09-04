@@ -79,7 +79,8 @@ WRITE16_HANDLER( midtunit_cmos_w )
 {
 	if (1)/*cmos_write_enable)*/
 	{
-		COMBINE_DATA(space->machine->generic.nvram.u16+offset);
+		midtunit_state *state = space->machine->driver_data<midtunit_state>();
+		COMBINE_DATA(state->m_nvram+offset);
 		cmos_write_enable = 0;
 	}
 	else
@@ -92,7 +93,8 @@ WRITE16_HANDLER( midtunit_cmos_w )
 
 READ16_HANDLER( midtunit_cmos_r )
 {
-	return space->machine->generic.nvram.u16[offset];
+	midtunit_state *state = space->machine->driver_data<midtunit_state>();
+	return state->m_nvram[offset];
 }
 
 

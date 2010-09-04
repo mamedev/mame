@@ -73,6 +73,7 @@ Versions known to exist but not dumped:
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/eeprom.h"
+#include "machine/nvram.h"
 #include "machine/nmk112.h"
 #include "cpu/z80/z80.h"
 #include "includes/cave.h"
@@ -930,7 +931,7 @@ static CUSTOM_INPUT( tjumpman_hopper_r )
 
 static ADDRESS_MAP_START( tjumpman_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM																	// ROM
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_BASE_SIZE_GENERIC( nvram )									// RAM
+	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_SHARE("nvram")									// RAM
 	AM_RANGE(0x200000, 0x207fff) AM_RAM AM_BASE_SIZE_MEMBER(cave_state, spriteram, spriteram_size)		// Sprites
 	AM_RANGE(0x208000, 0x20ffff) AM_RAM AM_BASE_MEMBER(cave_state, spriteram_2)							// Sprite bank 2
 	AM_RANGE(0x304000, 0x307fff) AM_WRITE(cave_vram_0_w)												// Layer 0 - 16x16 tiles mapped here
@@ -2348,7 +2349,7 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( tjumpman, cave_state )
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_28MHz / 2)

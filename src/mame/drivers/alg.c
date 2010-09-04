@@ -26,6 +26,7 @@
 #include "includes/amiga.h"
 #include "machine/laserdsc.h"
 #include "machine/6526cia.h"
+#include "machine/nvram.h"
 
 
 static running_device *laserdisc;
@@ -263,7 +264,7 @@ static ADDRESS_MAP_START( main_map_r1, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfc0000, 0xffffff) AM_ROM AM_REGION("user1", 0)			/* System ROM */
 
 	AM_RANGE(0xf00000, 0xf1ffff) AM_ROM AM_REGION("user2", 0)			/* Custom ROM */
-	AM_RANGE(0xf54000, 0xf55fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0xf54000, 0xf55fff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
 
@@ -276,7 +277,7 @@ static ADDRESS_MAP_START( main_map_r2, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfc0000, 0xffffff) AM_ROM AM_REGION("user1", 0)			/* System ROM */
 
 	AM_RANGE(0xf00000, 0xf3ffff) AM_ROM AM_REGION("user2", 0)			/* Custom ROM */
-	AM_RANGE(0xf7c000, 0xf7dfff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0xf7c000, 0xf7dfff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
 
@@ -289,7 +290,7 @@ static ADDRESS_MAP_START( main_map_picmatic, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfc0000, 0xffffff) AM_ROM AM_REGION("user1", 0)			/* System ROM */
 
 	AM_RANGE(0xf00000, 0xf1ffff) AM_ROM AM_REGION("user2", 0)			/* Custom ROM */
-	AM_RANGE(0xf40000, 0xf41fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0xf40000, 0xf41fff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
 
@@ -411,7 +412,7 @@ static MACHINE_CONFIG_START( alg_r1, driver_device )
 
 	MDRV_MACHINE_START(alg)
 	MDRV_MACHINE_RESET(alg)
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_LASERDISC_ADD("laserdisc", SONY_LDP1450, "screen", "ldsound")
 	MDRV_LASERDISC_OVERLAY(amiga, 512*2, 262, BITMAP_FORMAT_INDEXED16)

@@ -100,6 +100,7 @@
 
 #include "emu.h"
 #include "includes/beathead.h"
+#include "machine/nvram.h"
 
 
 
@@ -235,7 +236,7 @@ WRITE32_MEMBER( beathead_state::eeprom_data_w )
 	if (m_eeprom_enabled)
 	{
 		mem_mask &= 0x000000ff;
-		COMBINE_DATA(m_machine.generic.nvram.u32 + offset);
+		COMBINE_DATA(m_nvram + offset);
 		m_eeprom_enabled = 0;
 	}
 }
@@ -313,7 +314,7 @@ WRITE32_MEMBER( beathead_state::coin_count_w )
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 32, beathead_state)
 	AM_RANGE(0x00000000, 0x0001ffff) AM_RAM AM_BASE(m_ram_base)
 	AM_RANGE(0x01800000, 0x01bfffff) AM_ROM AM_REGION("user1", 0) AM_BASE(m_rom_base)
-	AM_RANGE(0x40000000, 0x400007ff) AM_RAM_WRITE(eeprom_data_w) AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x40000000, 0x400007ff) AM_RAM_WRITE(eeprom_data_w) AM_SHARE("nvram")
 	AM_RANGE(0x41000000, 0x41000003) AM_READWRITE(sound_data_r, sound_data_w)
 	AM_RANGE(0x41000100, 0x41000103) AM_READ(interrupt_control_r)
 	AM_RANGE(0x41000100, 0x4100011f) AM_WRITE(interrupt_control_w)
@@ -399,7 +400,7 @@ static MACHINE_CONFIG_START( beathead, beathead_state )
 	MDRV_CPU_ADD("maincpu", ASAP, ATARI_CLOCK_14MHz)
 	MDRV_CPU_PROGRAM_MAP(main_map)
 
-	MDRV_NVRAM_HANDLER(generic_1fill)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	MDRV_TIMER_ADD("scan_timer", scanline_callback)
 

@@ -230,6 +230,7 @@ DIP locations verified for:
 #include "cpu/m68000/m68000.h"
 #include "includes/balsente.h"
 #include "sound/cem3394.h"
+#include "machine/nvram.h"
 
 #include "stocker.lh"
 
@@ -258,7 +259,7 @@ static ADDRESS_MAP_START( cpu1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9903, 0x9903) AM_READ_PORT("IN1") AM_WRITENOP
 	AM_RANGE(0x9a00, 0x9a03) AM_READ(balsente_random_num_r)
 	AM_RANGE(0x9a04, 0x9a05) AM_READWRITE(balsente_m6850_r, balsente_m6850_w)
-	AM_RANGE(0x9b00, 0x9cff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)	/* system+cart NOVRAM */
+	AM_RANGE(0x9b00, 0x9cff) AM_RAM AM_SHARE("nvram")	/* system+cart NOVRAM */
 	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xffff) AM_ROMBANK("bank2")
 ADDRESS_MAP_END
@@ -1205,7 +1206,7 @@ static MACHINE_CONFIG_START( balsente, balsente_state )
 
 	MDRV_MACHINE_START(balsente)
 	MDRV_MACHINE_RESET(balsente)
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_TIMER_ADD("scan_timer", balsente_interrupt_timer)
 	MDRV_TIMER_ADD("8253_0_timer", balsente_clock_counter_0_ff)

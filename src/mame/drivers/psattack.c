@@ -76,6 +76,7 @@ GUN_xP are 6 pin gun connectors (pins 1-4 match the UNICO sytle guns):
 #include "video/vrender0.h"
 #include "machine/ds1302.h"
 #include "sound/vrender0.h"
+#include "machine/nvram.h"
 
 static READ32_HANDLER( psattack_unk_r )
 {
@@ -165,7 +166,7 @@ static MACHINE_CONFIG_START( psattack, driver_device )
 	MDRV_MACHINE_START(psattack)
 	MDRV_MACHINE_RESET(psattack)
 
-	//MDRV_NVRAM_HANDLER(generic_0fill)
+	//MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)

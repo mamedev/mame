@@ -33,6 +33,7 @@ To do:
 #include "cpu/m68000/m68000.h"
 #include "machine/eeprom.h"
 #include "machine/ticket.h"
+#include "machine/nvram.h"
 #include "sound/okim6295.h"
 
 class astrocorp_state : public driver_device
@@ -290,7 +291,7 @@ static ADDRESS_MAP_START( showhand_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x05a000, 0x05a001 ) AM_WRITE(showhand_outputs_w)
 	AM_RANGE( 0x05e000, 0x05e001 ) AM_READ_PORT("EEPROMIN")
 	AM_RANGE( 0x060000, 0x0601ff ) AM_RAM_WRITE(astrocorp_palette_w) AM_BASE_MEMBER(astrocorp_state, paletteram)
-	AM_RANGE( 0x070000, 0x073fff ) AM_RAM AM_BASE_SIZE_GENERIC(nvram)	// battery
+	AM_RANGE( 0x070000, 0x073fff ) AM_RAM AM_SHARE("nvram")	// battery
 	AM_RANGE( 0x080000, 0x080001 ) AM_DEVWRITE("oki", astrocorp_sound_bank_w)
 	AM_RANGE( 0x0a0000, 0x0a0001 ) AM_WRITE(astrocorp_screen_enable_w)
 	AM_RANGE( 0x0d0000, 0x0d0001 ) AM_READ(astrocorp_unk_r) AM_DEVWRITE8("oki", okim6295_w, 0xff00)
@@ -306,7 +307,7 @@ static ADDRESS_MAP_START( showhanc_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x088000, 0x088001 ) AM_WRITE(astrocorp_eeprom_w)
 	AM_RANGE( 0x08a000, 0x08a001 ) AM_WRITE(showhand_outputs_w)
 	AM_RANGE( 0x08e000, 0x08e001 ) AM_READ_PORT("EEPROMIN")
-	AM_RANGE( 0x090000, 0x093fff ) AM_RAM AM_BASE_SIZE_GENERIC(nvram)	// battery
+	AM_RANGE( 0x090000, 0x093fff ) AM_RAM AM_SHARE("nvram")	// battery
 	AM_RANGE( 0x0a0000, 0x0a0001 ) AM_WRITE(astrocorp_screen_enable_w)
 	AM_RANGE( 0x0e0000, 0x0e0001 ) AM_READ(astrocorp_unk_r) AM_DEVWRITE8("oki", okim6295_w, 0xff00)
 ADDRESS_MAP_END
@@ -321,14 +322,14 @@ static ADDRESS_MAP_START( skilldrp_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x20e000, 0x20e001 ) AM_READ_PORT("EEPROMIN")
 	AM_RANGE( 0x380000, 0x3801ff ) AM_RAM_WRITE(astrocorp_palette_w) AM_BASE_MEMBER(astrocorp_state, paletteram)
 	AM_RANGE( 0x400000, 0x400001 ) AM_WRITE(astrocorp_screen_enable_w)
-	AM_RANGE( 0x500000, 0x507fff ) AM_RAM AM_BASE_SIZE_GENERIC(nvram)	// battery
+	AM_RANGE( 0x500000, 0x507fff ) AM_RAM AM_SHARE("nvram")	// battery
 	AM_RANGE( 0x580000, 0x580001 ) AM_DEVWRITE("oki", skilldrp_sound_bank_w)
 	AM_RANGE( 0x600000, 0x600001 ) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( speeddrp_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x000000, 0x01ffff ) AM_ROM
-	AM_RANGE( 0x280000, 0x283fff ) AM_RAM AM_BASE_SIZE_GENERIC(nvram)	// battery
+	AM_RANGE( 0x280000, 0x283fff ) AM_RAM AM_SHARE("nvram")	// battery
 	AM_RANGE( 0x380000, 0x380fff ) AM_RAM AM_BASE_SIZE_MEMBER(astrocorp_state, spriteram, spriteram_size)
 	AM_RANGE( 0x382000, 0x382001 ) AM_WRITE(astrocorp_draw_sprites_w)
 	AM_RANGE( 0x384000, 0x384001 ) AM_READ_PORT("INPUTS")
@@ -465,7 +466,7 @@ static MACHINE_CONFIG_START( showhand, astrocorp_state )
 	MDRV_CPU_PROGRAM_MAP(showhand_map)
 	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 	MDRV_EEPROM_93C46_ADD("eeprom")
 	MDRV_EEPROM_DATA(showhand_default_eeprom, sizeof(showhand_default_eeprom))
 
@@ -513,7 +514,7 @@ static MACHINE_CONFIG_START( skilldrp, astrocorp_state )
 	MDRV_CPU_PROGRAM_MAP(skilldrp_map)
 	MDRV_CPU_VBLANK_INT_HACK(skilldrp_irq, 2)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 	MDRV_EEPROM_93C46_ADD("eeprom")
 
 	MDRV_TICKET_DISPENSER_ADD("ticket", 200, TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW )

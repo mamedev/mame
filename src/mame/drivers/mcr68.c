@@ -57,6 +57,7 @@
 #include "cpu/m68000/m68000.h"
 #include "audio/mcr.h"
 #include "audio/williams.h"
+#include "machine/nvram.h"
 #include "includes/mcr.h"
 
 
@@ -386,7 +387,7 @@ static ADDRESS_MAP_START( trisport_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x080000, 0x08ffff) AM_READ(trisport_port_1_r)
 	AM_RANGE(0x0a0000, 0x0affff) AM_READ_PORT("DSW")
-	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x120000, 0x12007f) AM_WRITE(mcr68_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x140000, 0x1407ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x160000, 0x160fff) AM_RAM_WRITE(mcr68_videoram_w) AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)
@@ -1057,7 +1058,7 @@ static MACHINE_CONFIG_DERIVED( trisport, mcr68 )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(trisport_map)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
 

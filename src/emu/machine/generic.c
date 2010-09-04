@@ -104,10 +104,6 @@ void generic_machine_init(running_machine *machine)
 	state_save_register_item_array(machine, "coin", NULL, 0, state->coinlockedout);
 	state_save_register_item_array(machine, "coin", NULL, 0, state->lastcoin);
 
-	/* reset NVRAM size and pointers */
-	machine->generic.nvram.v = NULL;
-	machine->generic.nvram_size = 0;
-
 	/* reset memory card info */
 	state->memcard_inserted = -1;
 
@@ -397,68 +393,6 @@ void nvram_save(running_machine *machine)
 
 		// close the file
 		mame_fclose(nvram_file);
-	}
-}
-
-
-/*-------------------------------------------------
-    NVRAM_HANDLER( generic_0fill ) - generic NVRAM
-    with a 0 fill
--------------------------------------------------*/
-
-NVRAM_HANDLER( generic_0fill )
-{
-	const region_info *region = machine->region("nvram");
-	if (read_or_write)
-		mame_fwrite(file, machine->generic.nvram.v, machine->generic.nvram_size);
-	else if (file != NULL)
-		mame_fread(file, machine->generic.nvram.v, machine->generic.nvram_size);
-	else if (region != NULL && region->bytes() == machine->generic.nvram_size)
-		memcpy(machine->generic.nvram.v, region->base(), machine->generic.nvram_size);
-	else
-		memset(machine->generic.nvram.v, 0, machine->generic.nvram_size);
-}
-
-
-/*-------------------------------------------------
-    NVRAM_HANDLER( generic_1fill ) - generic NVRAM
-    with a 1 fill
--------------------------------------------------*/
-
-NVRAM_HANDLER( generic_1fill )
-{
-	const region_info *region = machine->region("nvram");
-	if (read_or_write)
-		mame_fwrite(file, machine->generic.nvram.v, machine->generic.nvram_size);
-	else if (file != NULL)
-		mame_fread(file, machine->generic.nvram.v, machine->generic.nvram_size);
-	else if (region != NULL && region->bytes() == machine->generic.nvram_size)
-		memcpy(machine->generic.nvram.v, region->base(), machine->generic.nvram_size);
-	else
-		memset(machine->generic.nvram.v, 0xff, machine->generic.nvram_size);
-}
-
-
-/*-------------------------------------------------
-    NVRAM_HANDLER( generic_randfill ) - generic NVRAM
-    with a random fill
--------------------------------------------------*/
-
-NVRAM_HANDLER( generic_randfill )
-{
-	const region_info *region = machine->region("nvram");
-	if (read_or_write)
-		mame_fwrite(file, machine->generic.nvram.v, machine->generic.nvram_size);
-	else if (file != NULL)
-		mame_fread(file, machine->generic.nvram.v, machine->generic.nvram_size);
-	else if (region != NULL && region->bytes() == machine->generic.nvram_size)
-		memcpy(machine->generic.nvram.v, region->base(), machine->generic.nvram_size);
-	else
-	{
-		UINT8 *nvram = (UINT8 *)machine->generic.nvram.v;
-		int i;
-		for (i = 0; i < machine->generic.nvram_size; i++)
-			nvram[i] = mame_rand(machine);
 	}
 }
 

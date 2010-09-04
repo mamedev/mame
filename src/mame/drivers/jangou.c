@@ -30,6 +30,7 @@ $c088-$c095 player tiles
 #include "sound/hc55516.h"
 #include "sound/msm5205.h"
 #include "video/resnet.h"
+#include "machine/nvram.h"
 
 #define MASTER_CLOCK	XTAL_19_968MHz
 
@@ -481,7 +482,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( roylcrdn_cpu0_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x7000, 0x77ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)	/* MK48Z02B-15 ZEROPOWER RAM */
+	AM_RANGE(0x7000, 0x77ff) AM_RAM AM_SHARE("nvram")	/* MK48Z02B-15 ZEROPOWER RAM */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( roylcrdn_cpu0_io, ADDRESS_SPACE_IO, 8 )
@@ -1074,7 +1075,7 @@ static MACHINE_CONFIG_DERIVED( roylcrdn, jangou )
 
 	MDRV_DEVICE_REMOVE("cpu1")
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_MACHINE_START(common)
 	MDRV_MACHINE_RESET(common)

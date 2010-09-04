@@ -78,6 +78,7 @@
 #include "cpu/mcs51/mcs51.h"
 #include "video/tms9928a.h"
 #include "sound/ay8910.h"
+#include "machine/nvram.h"
 #include "re900.lh"
 
 static UINT8 *re900_rom;
@@ -209,7 +210,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mem_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_READ (rom_r)
-	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0xc000, 0xdfff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(TMS9928A_vram_w)
 	AM_RANGE(0xe001, 0xe001) AM_WRITE(TMS9928A_register_w)
 	AM_RANGE(0xe800, 0xe801) AM_DEVWRITE("ay_re900", ay8910_address_data_w)
@@ -400,7 +401,7 @@ static MACHINE_CONFIG_START( re900, driver_device )
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_REFRESH_RATE(60)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* sound hardware   */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

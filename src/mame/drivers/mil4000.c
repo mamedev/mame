@@ -87,6 +87,7 @@ Changes (2008-12-10, Roberto Fresca):
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
+#include "machine/nvram.h"
 #include "mil4000.lh"
 
 
@@ -266,7 +267,7 @@ static ADDRESS_MAP_START( mil4000_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x70801e, 0x70801f) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)
 
 	AM_RANGE(0x780000, 0x780fff) AM_RAM_WRITE(paletteram16_RRRRRGGGGGBBBBBx_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_BASE_SIZE_GENERIC(nvram) // 2x CY62256L-70 (U7 & U8).
+	AM_RANGE(0xff0000, 0xffffff) AM_RAM AM_SHARE("nvram") // 2x CY62256L-70 (U7 & U8).
 
 ADDRESS_MAP_END
 
@@ -349,7 +350,7 @@ static MACHINE_CONFIG_START( mil4000, driver_device )
 	// irq 2/4/5 point to the same place, others invalid
 	MDRV_CPU_VBLANK_INT("screen", irq5_line_hold)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)

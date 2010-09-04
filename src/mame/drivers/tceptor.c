@@ -18,6 +18,7 @@
 #include "rendlay.h"
 #include "tceptor2.lh"
 #include "includes/tceptor.h"
+#include "machine/nvram.h"
 
 /*******************************************************************/
 
@@ -228,7 +229,7 @@ static ADDRESS_MAP_START( mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8800, 0x8800) AM_WRITE(mcu_irq_enable_w)
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
-	AM_RANGE(0xc800, 0xdfff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)	// Battery Backup
+	AM_RANGE(0xc800, 0xdfff) AM_RAM AM_SHARE("nvram")	// Battery Backup
 	AM_RANGE(0xf000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -386,7 +387,7 @@ static MACHINE_CONFIG_START( tceptor, driver_device )
 
 	MDRV_QUANTUM_TIME(HZ(6000))
 
-	MDRV_NVRAM_HANDLER(generic_1fill)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	MDRV_MACHINE_START(tceptor)
 	MDRV_MACHINE_RESET(tceptor)

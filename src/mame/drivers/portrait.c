@@ -87,6 +87,7 @@ DM81LS95 = TriState buffer
 #include "cpu/z80/z80.h"
 #include "cpu/mcs48/mcs48.h"
 #include "sound/tms5220.h"
+#include "machine/nvram.h"
 #include "includes/portrait.h"
 
 static WRITE8_HANDLER( portrait_ctrl_w )
@@ -129,7 +130,7 @@ static ADDRESS_MAP_START( portrait_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa010, 0xa010) AM_READ_PORT("INPUTS")
 	AM_RANGE(0xa018, 0xa018) AM_READNOP AM_WRITE(portrait_positive_scroll_w)
 	AM_RANGE(0xa019, 0xa019) AM_WRITE(portrait_negative_scroll_w)
-	AM_RANGE(0xa800, 0xa83f) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0xa800, 0xa83f) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xffff, 0xffff) AM_READNOP
 ADDRESS_MAP_END
 
@@ -248,7 +249,7 @@ static MACHINE_CONFIG_START( portrait, driver_device )
 	MDRV_CPU_PROGRAM_MAP(portrait_sound_map)
 
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(50)

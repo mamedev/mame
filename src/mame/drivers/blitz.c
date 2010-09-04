@@ -455,7 +455,7 @@ static WRITE8_DEVICE_HANDLER( sound_w )
 static ADDRESS_MAP_START( megadpkr_map, ADDRESS_SPACE_PROGRAM, 8 )
 //  ADDRESS_MAP_GLOBAL_MASK(0x7fff) // seems that hardware is playing with A14 & A15 CPU lines...
 
-	AM_RANGE(0x0000, 0x07ff) AM_RAM //AM_BASE_SIZE_GENERIC(nvram)   /* battery backed RAM */
+	AM_RANGE(0x0000, 0x07ff) AM_RAM //AM_SHARE("nvram")   /* battery backed RAM */
 //  AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("crtc", mc6845_address_w)
 //  AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0x0844, 0x0847) AM_DEVREADWRITE("pia0", pia6821_r, pia6821_w)
@@ -776,7 +776,7 @@ static MACHINE_CONFIG_START( megadpkr, driver_device )
 //  MDRV_CPU_ADD("mcu", M68705, CPU_CLOCK) /* unknown */
 //  MDRV_CPU_PROGRAM_MAP(mcu_map)
 
-//  MDRV_NVRAM_HANDLER(generic_0fill)
+//  MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_PIA6821_ADD("pia0", megadpkr_pia0_intf)
 	MDRV_PIA6821_ADD("pia1", megadpkr_pia1_intf)

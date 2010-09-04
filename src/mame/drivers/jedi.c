@@ -112,6 +112,7 @@
 
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
+#include "machine/nvram.h"
 #include "includes/jedi.h"
 
 
@@ -248,7 +249,7 @@ static WRITE8_HANDLER( nvram_data_w )
 	jedi_state *state = space->machine->driver_data<jedi_state>();
 
 	if (state->nvram_enabled)
-		space->machine->generic.nvram.u8[offset] = data;
+		state->m_nvram[offset] = data;
 }
 
 
@@ -269,7 +270,7 @@ static WRITE8_HANDLER( nvram_enable_w )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM
-	AM_RANGE(0x0800, 0x08ff) AM_MIRROR(0x0300) AM_RAM_WRITE(nvram_data_w) AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x0800, 0x08ff) AM_MIRROR(0x0300) AM_RAM_WRITE(nvram_data_w) AM_SHARE("nvram")
 	AM_RANGE(0x0c00, 0x0c00) AM_MIRROR(0x03fe) AM_READ_PORT("0c00") AM_WRITENOP
 	AM_RANGE(0x0c01, 0x0c01) AM_MIRROR(0x03fe) AM_READ_PORT("0c01") AM_WRITENOP
 	AM_RANGE(0x1000, 0x13ff) AM_NOP
@@ -351,7 +352,7 @@ static MACHINE_CONFIG_START( jedi, jedi_state )
 
 	MDRV_MACHINE_START(jedi)
 	MDRV_MACHINE_RESET(jedi)
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_FRAGMENT_ADD(jedi_video)

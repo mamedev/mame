@@ -24,6 +24,7 @@
 #include "sound/2413intf.h"
 #include "sound/upd7759.h"
 #include "video/tms34061.h"
+#include "machine/nvram.h"
 
 
 /*************************************
@@ -282,7 +283,7 @@ static ADDRESS_MAP_START( 68000_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x01fffe, 0x01ffff) AM_WRITE(rombank_w)
 	AM_RANGE(0x020000, 0x03ffff) AM_ROMBANK("bank1")
-	AM_RANGE(0x040000, 0x043fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x040000, 0x043fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x046000, 0x046001) AM_WRITENOP
 	AM_RANGE(0x046020, 0x046021) AM_DEVREADWRITE8("acia6850_0", acia6850_stat_r, acia6850_ctrl_w, 0xff)
 	AM_RANGE(0x046022, 0x046023) AM_DEVREADWRITE8("acia6850_0", acia6850_data_r, acia6850_data_w, 0xff)
@@ -602,7 +603,7 @@ static MACHINE_CONFIG_START( jpmsys5v, driver_device )
 	MDRV_ACIA6850_ADD("acia6850_1", acia1_if)
 	MDRV_ACIA6850_ADD("acia6850_2", acia2_if)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_MACHINE_START(jpmsys5v)
 	MDRV_MACHINE_RESET(jpmsys5v)

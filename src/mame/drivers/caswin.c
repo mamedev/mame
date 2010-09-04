@@ -44,6 +44,7 @@ TODO:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
+#include "machine/nvram.h"
 
 static UINT8 *sc0_vram,*sc0_attr;
 static tilemap_t *sc0_tilemap;
@@ -135,7 +136,7 @@ static WRITE8_HANDLER( vvillage_lamps_w )
 static ADDRESS_MAP_START( vvillage_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xa000, 0xa000) AM_READ(vvillage_rng_r) //accessed by caswin only
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xf000, 0xf3ff) AM_RAM_WRITE(sc0_vram_w) AM_BASE(&sc0_vram)
 	AM_RANGE(0xf800, 0xfbff) AM_RAM_WRITE(sc0_attr_w) AM_BASE(&sc0_attr)
 ADDRESS_MAP_END
@@ -289,7 +290,7 @@ static MACHINE_CONFIG_START( vvillage, driver_device )
 	MDRV_SCREEN_SIZE(256, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-16-1)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_GFXDECODE(vvillage)
 	MDRV_PALETTE_LENGTH(0x40)

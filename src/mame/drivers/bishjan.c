@@ -37,6 +37,7 @@ To do:
 #include "cpu/i86/i86.h"
 #include "sound/okim6295.h"
 #include "sound/3812intf.h"
+#include "machine/nvram.h"
 
 /***************************************************************************
                               Tilemaps Access
@@ -368,7 +369,7 @@ static ADDRESS_MAP_START( bishjan_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x000000, 0x07ffff ) AM_ROM AM_REGION("maincpu", 0)
 	AM_RANGE( 0x080000, 0x0fffff ) AM_ROM AM_REGION("maincpu", 0)
 
-	AM_RANGE( 0x200000, 0x207fff ) AM_RAM AM_BASE_SIZE_GENERIC(nvram)	// battery
+	AM_RANGE( 0x200000, 0x207fff ) AM_RAM AM_SHARE("nvram")	// battery
 
 
 	// read lo (2)   (only half tilemap?)
@@ -492,7 +493,7 @@ static MACHINE_RESET( saklove )
 }
 
 static ADDRESS_MAP_START( saklove_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x00000, 0x07fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)	// battery
+	AM_RANGE(0x00000, 0x07fff) AM_RAM AM_SHARE("nvram")	// battery
 
 	// read lo (2)   (only half tilemap?)
 	AM_RANGE(0x12000, 0x12fff) AM_READWRITE( bishjan_videoram_2_lo_r, bishjan_videoram_2_lo_w )
@@ -830,7 +831,7 @@ static MACHINE_CONFIG_START( bishjan, driver_device )
 	MDRV_CPU_PROGRAM_MAP( bishjan_map)
 	MDRV_CPU_VBLANK_INT_HACK(bishjan_interrupt,2)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -863,7 +864,7 @@ static MACHINE_CONFIG_START( saklove, driver_device )
 	MDRV_CPU_VBLANK_INT( "screen", saklove_interrupt )
 
 	MDRV_MACHINE_RESET(saklove)
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

@@ -121,6 +121,7 @@ Notes:
 #include "video/vrender0.h"
 #include "machine/ds1302.h"
 #include "sound/vrender0.h"
+#include "machine/nvram.h"
 
 #define IDLE_LOOP_SPEEDUP
 
@@ -468,7 +469,7 @@ static ADDRESS_MAP_START( crystal_mem, ADDRESS_SPACE_PROGRAM, 32 )
 
 	AM_RANGE(0x01200000, 0x0120000f) AM_READ(Input_r)
 	AM_RANGE(0x01280000, 0x01280003) AM_WRITE(Banksw_w)
-	AM_RANGE(0x01400000, 0x0140ffff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x01400000, 0x0140ffff) AM_RAM AM_SHARE("nvram")
 
 	AM_RANGE(0x01801400, 0x01801403) AM_READWRITE(Timer0_r, Timer0_w)
 	AM_RANGE(0x01801408, 0x0180140b) AM_READWRITE(Timer1_r, Timer1_w)
@@ -823,7 +824,7 @@ static MACHINE_CONFIG_START( crystal, crystal_state )
 	MDRV_MACHINE_START(crystal)
 	MDRV_MACHINE_RESET(crystal)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)

@@ -83,6 +83,7 @@
 #include "sound/upd7759.h"
 #include "includes/jpmimpct.h"
 #include "machine/meters.h"
+#include "machine/nvram.h"
 
 /*************************************
  *
@@ -623,7 +624,7 @@ static WRITE16_HANDLER( jpmio_w )
 static ADDRESS_MAP_START( m68k_program_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000000, 0x000fffff) AM_ROM
 	AM_RANGE(0x00100000, 0x001fffff) AM_ROM
-	AM_RANGE(0x00400000, 0x00403fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x00400000, 0x00403fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x00480000, 0x0048001f) AM_READWRITE(duart_1_r, duart_1_w)
 	AM_RANGE(0x00480020, 0x00480033) AM_READ(inputs1_r)
 	AM_RANGE(0x00480034, 0x00480035) AM_READ(unk_r)
@@ -856,7 +857,7 @@ static MACHINE_CONFIG_START( jpmimpct, driver_device )
 	MDRV_QUANTUM_TIME(HZ(30000))
 	MDRV_MACHINE_START(jpmimpct)
 	MDRV_MACHINE_RESET(jpmimpct)
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_TIMER_ADD( "duart_1_timer", duart_1_timer_event)
 
@@ -1294,7 +1295,7 @@ static READ16_HANDLER( ump_r )
 static ADDRESS_MAP_START( awp68k_program_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000000, 0x000fffff) AM_ROM
 	AM_RANGE(0x00100000, 0x001fffff) AM_ROM
-	AM_RANGE(0x00400000, 0x00403fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x00400000, 0x00403fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x00480000, 0x0048001f) AM_READWRITE(duart_1_r, duart_1_w)
 	AM_RANGE(0x00480020, 0x00480033) AM_READ(inputs1_r)
 	AM_RANGE(0x00480034, 0x00480035) AM_READ(ump_r)
@@ -1329,7 +1330,7 @@ static MACHINE_CONFIG_START( impctawp, driver_device )
 
 	MDRV_MACHINE_START(impctawp)
 	MDRV_MACHINE_RESET(impctawp)
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_PPI8255_ADD( "ppi8255_0", ppi8255_intf[0] )
 

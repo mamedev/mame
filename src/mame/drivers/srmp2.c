@@ -58,6 +58,7 @@ Note:
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
 #include "includes/srmp2.h"
+#include "machine/nvram.h"
 
 
 /***************************************************************************
@@ -365,7 +366,7 @@ static WRITE8_HANDLER( srmp3_rombank_w )
 
 static ADDRESS_MAP_START( srmp2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x0c0000, 0x0c3fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x0c0000, 0x0c3fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x140000, 0x143fff) AM_RAM AM_BASE_MEMBER(srmp2_state,spriteram2.u16)		/* Sprites Code + X + Attr */
 	AM_RANGE(0x180000, 0x180609) AM_RAM AM_BASE_MEMBER(srmp2_state,spriteram1.u16)		/* Sprites Y */
 	AM_RANGE(0x1c0000, 0x1c0001) AM_WRITENOP						/* ??? */
@@ -408,7 +409,7 @@ static ADDRESS_MAP_START( mjyuugi_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xd00000, 0xd00609) AM_RAM AM_BASE_MEMBER(srmp2_state,spriteram1.u16)	/* Sprites Y */
 	AM_RANGE(0xd02000, 0xd023ff) AM_RAM							/* ??? only writes $00fa */
 	AM_RANGE(0xe00000, 0xe03fff) AM_RAM AM_BASE_MEMBER(srmp2_state,spriteram2.u16)	/* Sprites Code + X + Attr */
-	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0xffc000, 0xffffff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
 
@@ -526,7 +527,7 @@ static WRITE8_HANDLER( srmp3_flags_w )
 static ADDRESS_MAP_START( srmp3_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")							/* rom bank */
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)	/* work ram */
+	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_SHARE("nvram")	/* work ram */
 	AM_RANGE(0xa800, 0xa800) AM_WRITENOP							/* flag ? */
 	AM_RANGE(0xb000, 0xb303) AM_RAM AM_BASE_MEMBER(srmp2_state,spriteram1.u8)				/* Sprites Y */
 	AM_RANGE(0xb800, 0xb800) AM_WRITENOP							/* flag ? */
@@ -1015,7 +1016,7 @@ static MACHINE_CONFIG_START( srmp2, srmp2_state )
 	MDRV_CPU_VBLANK_INT_HACK(srmp2_interrupt,16)		/* Interrupt times is not understood */
 
 	MDRV_MACHINE_RESET(srmp2)
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1055,7 +1056,7 @@ static MACHINE_CONFIG_START( srmp3, srmp2_state )
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_MACHINE_RESET(srmp3)
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1092,7 +1093,7 @@ static MACHINE_CONFIG_START( mjyuugi, srmp2_state )
 	MDRV_CPU_VBLANK_INT_HACK(srmp2_interrupt,16)		/* Interrupt times is not understood */
 
 	MDRV_MACHINE_RESET(srmp2)
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

@@ -366,6 +366,7 @@
 #include "sound/okim6295.h"
 #include "snookr10.lh"
 #include "includes/snookr10.h"
+#include "machine/nvram.h"
 
 static int outportl, outporth;
 static int bit0, bit1, bit2, bit3, bit4, bit5;
@@ -496,7 +497,7 @@ static WRITE8_HANDLER( output_port_1_w )
 *************************/
 
 static ADDRESS_MAP_START( snookr10_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x1000, 0x1000) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
 	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("IN0")		/* IN0 */
 	AM_RANGE(0x3001, 0x3001) AM_READ_PORT("IN1")		/* IN1 */
@@ -511,7 +512,7 @@ static ADDRESS_MAP_START( snookr10_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tenballs_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x0000, 0x0fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x1000, 0x1000) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
 	AM_RANGE(0x4000, 0x4000) AM_READ_PORT("IN0")		/* IN0 */
 	AM_RANGE(0x4001, 0x4001) AM_READ_PORT("IN1")		/* IN1 */
@@ -693,7 +694,7 @@ static MACHINE_CONFIG_START( snookr10, driver_device )
 	MDRV_CPU_PROGRAM_MAP(snookr10_map)
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
     /* video hardware */
 

@@ -63,6 +63,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
+#include "machine/nvram.h"
 
 class supdrapo_state : public driver_device
 {
@@ -257,7 +258,7 @@ static ADDRESS_MAP_START( sdpoker_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8004, 0x8004) AM_READ_PORT("IN3") AM_WRITE(debug8004_w)
 	AM_RANGE(0x8005, 0x8005) AM_READ_PORT("SW2")
 	AM_RANGE(0x8006, 0x8006) AM_READ_PORT("SW1")
-	AM_RANGE(0x9000, 0x90ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x9000, 0x90ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x9400, 0x9400) AM_READ(sdpoker_rng_r)
 	AM_RANGE(0x9800, 0x9801) AM_DEVWRITE("aysnd", ay8910_data_address_w)
 ADDRESS_MAP_END
@@ -438,7 +439,7 @@ static MACHINE_CONFIG_START( supdrapo, supdrapo_state )
 	MDRV_MACHINE_START(supdrapo)
 	MDRV_MACHINE_RESET(supdrapo)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

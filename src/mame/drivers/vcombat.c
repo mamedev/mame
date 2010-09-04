@@ -87,6 +87,7 @@ TODO :  This is a partially working driver.  Most of the memory maps for
 #include "video/tlc34076.h"
 #include "video/mc6845.h"
 #include "sound/dac.h"
+#include "machine/nvram.h"
 
 
 static UINT16* m68k_framebuffer[2];
@@ -327,7 +328,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x60000c, 0x60000d) AM_WRITE(crtc_w)
 	AM_RANGE(0x600010, 0x600011) AM_RAM AM_BASE(&framebuffer_ctrl)
-	AM_RANGE(0x700000, 0x7007ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x700000, 0x7007ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x701000, 0x701001) AM_READ(main_irqiack_r)
 	AM_RANGE(0x702000, 0x702001) AM_READ(control_3_r)
 	AM_RANGE(0x705000, 0x705001) AM_RAM AM_SHARE("share4")		/* M1->M0 */
@@ -564,7 +565,7 @@ static MACHINE_CONFIG_START( vcombat, driver_device )
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold, 15000)	/* Remove this if MC6845 is enabled */
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 	MDRV_MACHINE_RESET(vcombat)
 
 /* Temporary hack for experimenting with timing. */
@@ -609,7 +610,7 @@ static MACHINE_CONFIG_START( shadfgtr, driver_device )
 	MDRV_CPU_ADD("soundcpu", M68000, XTAL_12MHz)
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 	MDRV_MACHINE_RESET(shadfgtr)
 
 	MDRV_TLC34076_ADD("tlc34076", TLC34076_6_BIT)

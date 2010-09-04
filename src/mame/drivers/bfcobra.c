@@ -79,6 +79,7 @@
 #include "cpu/m6809/m6809.h"
 #include "sound/upd7759.h"
 #include "sound/ay8910.h"
+#include "machine/nvram.h"
 
 /*
     Defines
@@ -1432,7 +1433,7 @@ static WRITE8_DEVICE_HANDLER( upd_w )
 }
 
 static ADDRESS_MAP_START( m6809_prog_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_RAM	AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x0000, 0x1fff) AM_RAM	AM_SHARE("nvram")
 	AM_RANGE(0x2000, 0x2000) AM_RAM		// W 'B', 6F
 	AM_RANGE(0x2200, 0x2200) AM_RAM		// W 'F'
 	AM_RANGE(0x2600, 0x2600) AM_READWRITE(meter_r, meter_w)
@@ -1739,7 +1740,7 @@ static MACHINE_CONFIG_START( bfcobra, driver_device )
 	MDRV_CPU_PROGRAM_MAP(m6809_prog_map)
 	MDRV_CPU_PERIODIC_INT(timer_irq, 1000)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_MACHINE_RESET(bfcobra)
 

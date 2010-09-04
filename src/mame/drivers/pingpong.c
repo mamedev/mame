@@ -8,6 +8,7 @@ Ping Pong (c) 1985 Konami
 #include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "sound/sn76496.h"
+#include "machine/nvram.h"
 #include "includes/pingpong.h"
 
 static int intenable;
@@ -105,7 +106,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( merlinmm_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x5000, 0x53ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x5400, 0x57ff) AM_RAM
 	AM_RANGE(0x6000, 0x6007) AM_WRITENOP /* solenoid writes */
 	AM_RANGE(0x7000, 0x7000) AM_READ_PORT("IN4")
@@ -483,7 +484,7 @@ static MACHINE_CONFIG_DERIVED( merlinmm, pingpong )
 	MDRV_CPU_PROGRAM_MAP(merlinmm_map)
 	MDRV_CPU_VBLANK_INT_HACK(pingpong_interrupt,2)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
 

@@ -445,6 +445,7 @@ or Fatal Fury for example).
 #include "cpu/nec/nec.h"
 #include "deprecat.h"
 #include "cpu/mips/mips3.h"
+#include "machine/nvram.h"
 #include "includes/hng64.h"
 
 
@@ -1049,7 +1050,7 @@ static ADDRESS_MAP_START( hng_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x1f700000, 0x1f702fff) AM_READWRITE(hng64_sysregs_r, hng64_sysregs_w) AM_BASE_MEMBER(hng64_state, sysregs)
 
 	// SRAM.  Coin data, Player Statistics, etc.
-	AM_RANGE(0x1F800000, 0x1F803fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x1F800000, 0x1F803fff) AM_RAM AM_SHARE("nvram")
 
 	// Dualport RAM
 	AM_RANGE(0x1F808000, 0x1F8087ff) AM_READWRITE(hng64_dualport_r, hng64_dualport_w) AM_BASE_MEMBER(hng64_state, dualport)
@@ -1729,7 +1730,7 @@ static MACHINE_CONFIG_START( hng64, hng64_state )
 	MDRV_CPU_PROGRAM_MAP(hng_comm_map)
 	MDRV_CPU_IO_MAP(hng_comm_io_map)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_GFXDECODE(hng64)
 	MDRV_MACHINE_START(hyperneo)

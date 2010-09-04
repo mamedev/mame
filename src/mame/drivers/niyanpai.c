@@ -41,6 +41,7 @@ Memo:
 #include "sound/dac.h"
 #include "sound/3812intf.h"
 #include "cpu/z80/z80daisy.h"
+#include "machine/nvram.h"
 #include "includes/niyanpai.h"
 
 
@@ -273,7 +274,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( niyanpai_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x040000, 0x040fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x040000, 0x040fff) AM_RAM AM_SHARE("nvram")
 
 	AM_RANGE(0x0a0000, 0x0a08ff) AM_READWRITE(niyanpai_palette_r,niyanpai_palette_w)
 	AM_RANGE(0x0a0900, 0x0a11ff) AM_RAM	// palette work ram?
@@ -313,7 +314,7 @@ static ADDRESS_MAP_START( musobana_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0a0000, 0x0a08ff) AM_READWRITE(niyanpai_palette_r,niyanpai_palette_w)
 	AM_RANGE(0x0a0900, 0x0a11ff) AM_RAM				// palette work ram?
 
-	AM_RANGE(0x0a8000, 0x0a87ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x0a8000, 0x0a87ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x0bf800, 0x0bffff) AM_RAM
 
 	AM_RANGE(0x200000, 0x200001) AM_WRITE(niyanpai_sound_w)
@@ -352,7 +353,7 @@ static ADDRESS_MAP_START( mhhonban_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x060900, 0x0611ff) AM_RAM				// palette work ram?
 	AM_RANGE(0x07f800, 0x07ffff) AM_RAM
 
-	AM_RANGE(0x0a8000, 0x0a87ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x0a8000, 0x0a87ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x0bf000, 0x0bffff) AM_RAM
 
 	AM_RANGE(0x200000, 0x200001) AM_WRITE(niyanpai_sound_w)
@@ -786,7 +787,7 @@ static MACHINE_CONFIG_START( niyanpai, driver_device )
 	MDRV_Z80CTC_ADD("ctc", 8000000 /* same as "audiocpu" */, ctc_intf)
 
 	MDRV_MACHINE_RESET(niyanpai)
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

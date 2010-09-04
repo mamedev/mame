@@ -28,6 +28,7 @@ To Do:
 #include "sound/ymz280b.h"
 #include "machine/eeprom.h"
 #include "machine/ticket.h"
+#include "machine/nvram.h"
 
 /***************************************************************************
 
@@ -332,7 +333,7 @@ static ADDRESS_MAP_START( gegege_mem_map, ADDRESS_SPACE_PROGRAM, 8 )
 //  AM_RANGE( 0xd001, 0xd021 ) AM_RAM
 	AM_RANGE( 0xd800, 0xdfff ) AM_RAMBANK("rambank")
 
-	AM_RANGE( 0xe000, 0xefff ) AM_RAM AM_BASE_SIZE_GENERIC(nvram)	// battery
+	AM_RANGE( 0xe000, 0xefff ) AM_RAM AM_SHARE("nvram")	// battery
 
 	AM_RANGE( 0xf000, 0xffff ) AM_RAM
 ADDRESS_MAP_END
@@ -467,7 +468,7 @@ static MACHINE_CONFIG_START( gegege, driver_device )
 	MDRV_CPU_IO_MAP(gegege_io_map)
 	MDRV_CPU_VBLANK_INT("screen", gegege_vblank_interrupt)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
 
 	MDRV_TICKET_DISPENSER_ADD("hopper", 200, TICKET_MOTOR_ACTIVE_LOW, TICKET_STATUS_ACTIVE_LOW )

@@ -31,6 +31,7 @@ public:
 	int        tmnt_soundlatch;
 	int        cuebrick_snd_irqlatch, cuebrick_nvram_bank;
 	int        toggle, last;
+	UINT16	   m_cuebrick_nvram[0x400 * 0x20];	// 32k paged in a 1k window
 
 	/* devices */
 	running_device *maincpu;

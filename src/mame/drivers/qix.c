@@ -226,6 +226,7 @@ Interrupts:
 #include "rendlay.h"
 #include "includes/qix.h"
 #include "cpu/m6809/m6809.h"
+#include "machine/nvram.h"
 
 #include "elecyoyo.lh"
 
@@ -560,7 +561,7 @@ static MACHINE_CONFIG_START( qix_base, qix_state )
 	MDRV_QUANTUM_PERFECT_CPU("maincpu")
 
 	MDRV_MACHINE_RESET(qix)
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_PIA6821_ADD("pia0", qix_pia_0_intf)
 	MDRV_PIA6821_ADD("pia1", qix_pia_1_intf)

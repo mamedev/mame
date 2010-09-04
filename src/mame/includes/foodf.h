@@ -10,7 +10,10 @@ class foodf_state : public atarigen_state
 {
 public:
 	foodf_state(running_machine &machine, const driver_device_config_base &config)
-		: atarigen_state(machine, config) { }
+		: atarigen_state(machine, config),
+		  m_nvram(*this, "nvram") { }
+
+	required_shared_ptr<UINT16> m_nvram;
 
 	double			rweights[3];
 	double			gweights[3];

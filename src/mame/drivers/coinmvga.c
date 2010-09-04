@@ -216,6 +216,7 @@
 #include "emu.h"
 #include "cpu/h83002/h8.h"
 #include "sound/ymz280b.h"
+#include "machine/nvram.h"
 
 static UINT16 *vram;
 
@@ -660,7 +661,7 @@ static MACHINE_CONFIG_START( coinmvga, driver_device )
 	MDRV_CPU_IO_MAP(coinmvga_io_map)
 	MDRV_CPU_VBLANK_INT("screen", vblank_irq)	/* wrong, fix me */
 
-//  MDRV_NVRAM_HANDLER(generic_0fill)
+//  MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

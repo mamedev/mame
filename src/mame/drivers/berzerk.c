@@ -12,6 +12,7 @@
 #include "cpu/z80/z80.h"
 #include "includes/exidy.h"
 #include "machine/74181.h"
+#include "machine/nvram.h"
 #include "sound/s14001a.h"
 #include "video/resnet.h"
 
@@ -559,7 +560,7 @@ static SOUND_RESET(berzerk)
 
 static ADDRESS_MAP_START( berzerk_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_ROM
-	AM_RANGE(0x0800, 0x0bff) AM_MIRROR(0x0400) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x0800, 0x0bff) AM_MIRROR(0x0400) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x1000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x5fff) AM_RAM AM_BASE(&berzerk_videoram) AM_SIZE(&berzerk_videoram_size) AM_SHARE("share1")
 	AM_RANGE(0x6000, 0x7fff) AM_RAM_WRITE(magicram_w) AM_SHARE("share1")
@@ -574,7 +575,7 @@ static ADDRESS_MAP_START( frenzy_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6000, 0x7fff) AM_RAM_WRITE(magicram_w) AM_SHARE("share1")
 	AM_RANGE(0x8000, 0x87ff) AM_MIRROR(0x3800) AM_RAM AM_BASE(&berzerk_colorram)
 	AM_RANGE(0xc000, 0xcfff) AM_ROM
-	AM_RANGE(0xf800, 0xfbff) AM_MIRROR(0x0400) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0xf800, 0xfbff) AM_MIRROR(0x0400) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
 
@@ -1053,7 +1054,7 @@ static MACHINE_CONFIG_START( berzerk, driver_device )
 	MDRV_MACHINE_START(berzerk)
 	MDRV_MACHINE_RESET(berzerk)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_VIDEO_START(berzerk)

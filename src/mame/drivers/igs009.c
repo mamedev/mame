@@ -20,6 +20,7 @@ NVRAM   :   Battery for main RAM
 #include "machine/8255ppi.h"
 #include "sound/2413intf.h"
 #include "sound/okim6295.h"
+#include "machine/nvram.h"
 
 /***************************************************************************
                                 Video Hardware
@@ -409,7 +410,7 @@ static READ8_HANDLER( jingbell_magic_r )
 
 static ADDRESS_MAP_START( jingbell_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x00000, 0x0f3ff ) AM_ROM
-	AM_RANGE( 0x0f400, 0x0ffff ) AM_RAM AM_BASE_SIZE_GENERIC( nvram )
+	AM_RANGE( 0x0f400, 0x0ffff ) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( jingbell_portmap, ADDRESS_SPACE_IO, 8 )
@@ -639,7 +640,7 @@ static MACHINE_CONFIG_START( jingbell, driver_device )
 
 	MDRV_MACHINE_RESET(jingbell)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

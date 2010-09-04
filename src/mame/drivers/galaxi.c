@@ -42,6 +42,7 @@ Notes:
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/okim6295.h"
+#include "machine/nvram.h"
 #include "galaxi.lh"
 
 class galaxi_state : public driver_device
@@ -286,7 +287,7 @@ static ADDRESS_MAP_START( galaxi_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x700000, 0x700001) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)
 
-	AM_RANGE(0x600000, 0x607fff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)	// 2x DS1230Y (non volatile SRAM)
+	AM_RANGE(0x600000, 0x607fff) AM_RAM AM_SHARE("nvram")	// 2x DS1230Y (non volatile SRAM)
 ADDRESS_MAP_END
 
 /***************************************************************************
@@ -399,7 +400,7 @@ static MACHINE_CONFIG_START( galaxi, galaxi_state )
 
 	MDRV_MACHINE_START(galaxi)
 	MDRV_MACHINE_RESET(galaxi)
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

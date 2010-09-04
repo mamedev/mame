@@ -4,15 +4,18 @@
 
 *************************************************************************/
 
+#include "machine/nvram.h"
+
 class capbowl_state : public driver_device
 {
 public:
 	capbowl_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
+	void init_nvram(nvram_device &nvram, void *base, size_t size);
+
 	/* memory pointers */
 	UINT8 *  rowaddress;
-//  UINT8 *  nvram; // currently this uses generic_nvram
 
 	/* video-related */
 	offs_t blitter_addr;

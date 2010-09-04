@@ -500,6 +500,7 @@
 #include "machine/ticket.h"
 #include "audio/williams.h"
 #include "includes/williams.h"
+#include "machine/nvram.h"
 
 
 #define MASTER_CLOCK		(12000000)
@@ -517,7 +518,7 @@ static ADDRESS_MAP_START( defender_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_RAM AM_BASE(&williams_videoram)
 	/* range from 0xc000-0xcfff is mapped programmatically below */
 	AM_RANGE(0xc000, 0xc00f) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xc400, 0xc4ff) AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0xc400, 0xc4ff) AM_SHARE("nvram")
 	AM_RANGE(0xc000, 0xcfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xd000, 0xdfff) AM_WRITE(defender_bank_select_w)
 	AM_RANGE(0xd000, 0xffff) AM_ROM
@@ -538,7 +539,7 @@ void defender_install_io_space(address_space *space)
 	memory_install_read8_handler     (space, 0xc800, 0xcbff, 0, 0x03e0, williams_video_counter_r);
 	memory_install_readwrite8_device_handler(space, pia_1, 0xcc00, 0xcc03, 0, 0x03e0, pia6821_r, pia6821_w);
 	memory_install_readwrite8_device_handler(space, pia_0, 0xcc04, 0xcc07, 0, 0x03e0, pia6821_r, pia6821_w);
-	memory_set_bankptr(space->machine, "bank3", space->machine->generic.nvram.v);
+	memory_set_bankptr(space->machine, "bank3", space->machine->driver_data<williams_state>()->m_nvram);
 	memory_set_bankptr(space->machine, "bank4", space->machine->generic.paletteram.v);
 }
 
@@ -560,7 +561,7 @@ static ADDRESS_MAP_START( williams_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xca00, 0xca07) AM_MIRROR(0x00f8) AM_WRITE(williams_blitter_w)
 	AM_RANGE(0xcb00, 0xcbff) AM_READ(williams_video_counter_r)
 	AM_RANGE(0xcbff, 0xcbff) AM_WRITE(williams_watchdog_reset_w)
-	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE(williams_cmos_w) AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE(williams_cmos_w) AM_SHARE("nvram")
 	AM_RANGE(0xd000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -575,7 +576,7 @@ static ADDRESS_MAP_START( williams_extra_ram_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xca00, 0xca07) AM_MIRROR(0x00f8) AM_WRITE(williams_blitter_w)
 	AM_RANGE(0xcb00, 0xcbff) AM_READ(williams_video_counter_r)
 	AM_RANGE(0xcbff, 0xcbff) AM_WRITE(williams_watchdog_reset_w)
-	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE(williams_cmos_w) AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE(williams_cmos_w) AM_SHARE("nvram")
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -604,7 +605,7 @@ static ADDRESS_MAP_START( blaster_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xca00, 0xca07) AM_MIRROR(0x00f8) AM_WRITE(williams_blitter_w)
 	AM_RANGE(0xcb00, 0xcbff) AM_READ(williams_video_counter_r)
 	AM_RANGE(0xcbff, 0xcbff) AM_WRITE(williams_watchdog_reset_w)
-	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE(williams_cmos_w) AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE(williams_cmos_w) AM_SHARE("nvram")
 	AM_RANGE(0xd000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -633,7 +634,7 @@ static ADDRESS_MAP_START( williams2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xcb80, 0xcb9f) AM_WRITE(defender_video_control_w)
 	AM_RANGE(0xcba0, 0xcbbf) AM_WRITE(williams2_blit_window_enable_w)
 	AM_RANGE(0xcbe0, 0xcbef) AM_READ(williams2_video_counter_r)
-	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE(williams_cmos_w) AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE(williams_cmos_w) AM_SHARE("nvram")
 	AM_RANGE(0xd000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -655,7 +656,7 @@ static ADDRESS_MAP_START( williams2_extra_ram_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xcb80, 0xcb9f) AM_WRITE(defender_video_control_w)
 	AM_RANGE(0xcba0, 0xcbbf) AM_WRITE(williams2_blit_window_enable_w)
 	AM_RANGE(0xcbe0, 0xcbef) AM_READ(williams2_video_counter_r)
-	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE(williams_cmos_w) AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0xcc00, 0xcfff) AM_RAM_WRITE(williams_cmos_w) AM_SHARE("nvram")
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
 	AM_RANGE(0xe000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -1426,7 +1427,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( defender, driver_device )
+static MACHINE_CONFIG_START( defender, williams_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, MASTER_CLOCK/3/4)
@@ -1437,7 +1438,7 @@ static MACHINE_CONFIG_START( defender, driver_device )
 
 	MDRV_MACHINE_START(defender)
 	MDRV_MACHINE_RESET(defender)
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_TIMER_ADD("scan_timer", williams_va11_callback)
 	MDRV_TIMER_ADD("240_timer", williams_count240_callback)
@@ -1603,7 +1604,7 @@ static MACHINE_CONFIG_DERIVED( blastkit, blaster )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( williams2, driver_device )
+static MACHINE_CONFIG_START( williams2, williams_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, MASTER_CLOCK/3/4)
@@ -1614,7 +1615,7 @@ static MACHINE_CONFIG_START( williams2, driver_device )
 
 	MDRV_MACHINE_START(williams2)
 	MDRV_MACHINE_RESET(williams2)
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_TIMER_ADD("scan_timer", williams2_va11_callback)
 	MDRV_TIMER_ADD("254_timer", williams2_endscreen_callback)

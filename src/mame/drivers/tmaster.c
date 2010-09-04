@@ -108,6 +108,7 @@ To Do:
 #include "machine/eeprom.h"
 #include "machine/microtch.h"
 #include "machine/68681.h"
+#include "machine/nvram.h"
 
 /***************************************************************************
 
@@ -475,7 +476,7 @@ static READ16_HANDLER( tmaster_coins_r )
 static ADDRESS_MAP_START( tmaster_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE( 0x000000, 0x1fffff ) AM_ROM
 	AM_RANGE( 0x200000, 0x27ffff ) AM_RAM
-	AM_RANGE( 0x280000, 0x28ffef ) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE( 0x280000, 0x28ffef ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE( 0x28fff0, 0x28ffff ) AM_READWRITE( rtc_r, rtc_w )
 
 	AM_RANGE( 0x300010, 0x300011 ) AM_READ( tmaster_coins_r )
@@ -880,7 +881,7 @@ static MACHINE_CONFIG_START( tm3k, driver_device )
 
 	MDRV_DUART68681_ADD( "duart68681", XTAL_8_664MHz / 2 /*??*/, tmaster_duart68681_config )
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)

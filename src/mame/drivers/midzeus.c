@@ -36,6 +36,7 @@ The Grid         v1.2   10/18/2000
 #include "machine/midwayic.h"
 #include "machine/timekpr.h"
 #include "audio/dcs.h"
+#include "machine/nvram.h"
 
 #include "crusnexo.lh"
 
@@ -132,8 +133,9 @@ static INTERRUPT_GEN( display_irq )
 
 static WRITE32_HANDLER( cmos_w )
 {
+	midzeus_state *state = space->machine->driver_data<midzeus_state>();
 	if (bitlatch[2] && !cmos_protected)
-		COMBINE_DATA(&space->machine->generic.nvram.u32[offset]);
+		COMBINE_DATA(&state->m_nvram[offset]);
 	else
 		logerror("%06X:timekeeper_w with bitlatch[2] = %d, cmos_protected = %d\n", cpu_get_pc(space->cpu), bitlatch[2], cmos_protected);
 	cmos_protected = TRUE;
@@ -142,7 +144,8 @@ static WRITE32_HANDLER( cmos_w )
 
 static READ32_HANDLER( cmos_r )
 {
-	return space->machine->generic.nvram.u32[offset] | 0xffffff00;
+	midzeus_state *state = space->machine->driver_data<midzeus_state>();
+	return state->m_nvram[offset] | 0xffffff00;
 }
 
 
@@ -591,7 +594,7 @@ static ADDRESS_MAP_START( zeus_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x8d0000, 0x8d0004) AM_READWRITE(bitlatches_r, bitlatches_w)
 	AM_RANGE(0x990000, 0x99000f) AM_READWRITE(midway_ioasic_r, midway_ioasic_w)
 	AM_RANGE(0x9e0000, 0x9e0000) AM_WRITENOP		// watchdog?
-	AM_RANGE(0x9f0000, 0x9f7fff) AM_READWRITE(cmos_r, cmos_w) AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x9f0000, 0x9f7fff) AM_READWRITE(cmos_r, cmos_w) AM_SHARE("nvram")
 	AM_RANGE(0x9f8000, 0x9f8000) AM_WRITE(cmos_protect_w)
 	AM_RANGE(0xa00000, 0xffffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
@@ -1107,7 +1110,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( midzeus, driver_device )
+static MACHINE_CONFIG_START( midzeus, midzeus_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", TMS32032, CPU_CLOCK)
@@ -1116,7 +1119,7 @@ static MACHINE_CONFIG_START( midzeus, driver_device )
 
 	MDRV_MACHINE_START(midzeus)
 	MDRV_MACHINE_RESET(midzeus)
-	MDRV_NVRAM_HANDLER(generic_1fill)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	/* video hardware */
 	MDRV_PALETTE_LENGTH(32768)

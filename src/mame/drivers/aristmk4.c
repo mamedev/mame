@@ -104,6 +104,7 @@
 #include "state.h"
 #include "sound/samples.h"
 #include "machine/mc146818.h" // DALLAS1287 is functionally compatible.
+#include "machine/nvram.h"
 
 
 int rtc_address_strobe = 0;
@@ -677,7 +678,7 @@ static ADDRESS_MAP_START( aristmk4_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1c00, 0x1cff) AM_WRITE(mk4_printer_w)
 	AM_RANGE(0x1900, 0x19ff) AM_READ(mk4_printer_r)
 	AM_RANGE(0x2000, 0x3fff) AM_ROM  // graphics rom map
-	AM_RANGE(0x4000, 0x4fff) AM_RAMBANK("bank1") AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x4000, 0x4fff) AM_RAMBANK("bank1") AM_SHARE("nvram")
 
 	AM_RANGE(0x5000, 0x5000) AM_WRITE(u3_p0)
 	AM_RANGE(0x5002, 0x5002) AM_READ(u3_p2)
@@ -1203,7 +1204,7 @@ static MACHINE_CONFIG_START( aristmk4, driver_device )
 	MDRV_MACHINE_START(aristmk4)
 	MDRV_NVRAM_HANDLER( mc146818 )
     MDRV_MACHINE_RESET(aristmk4 )
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
     /* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

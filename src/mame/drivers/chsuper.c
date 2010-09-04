@@ -13,6 +13,7 @@ TODO:
 #include "emu.h"
 #include "cpu/z180/z180.h"
 #include "sound/dac.h"
+#include "machine/nvram.h"
 
 static int chsuper_tilexor;
 
@@ -94,7 +95,7 @@ static ADDRESS_MAP_START( chsuper_prg_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x00000, 0x0efff) AM_ROM
 	AM_RANGE(0x00000, 0x01fff) AM_WRITE( chsuper_vram_w )
 	AM_RANGE(0x0f000, 0x0ffff) AM_RAM AM_REGION("maincpu", 0xf000)
-	AM_RANGE(0xfb000, 0xfbfff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0xfb000, 0xfbfff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
 //  AM_RANGE(0xaff8, 0xaff8) AM_DEVWRITE("oki", okim6295_w)
@@ -205,7 +206,7 @@ static MACHINE_CONFIG_START( chsuper, driver_device )
 	MDRV_SCREEN_SIZE(64*8, 64*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 0, 30*8-1)
 
-	MDRV_NVRAM_HANDLER( generic_0fill )
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_GFXDECODE(chsuper)
 	MDRV_PALETTE_LENGTH(0x100)

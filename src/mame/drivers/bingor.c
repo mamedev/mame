@@ -615,7 +615,7 @@ static MACHINE_CONFIG_START( bingor, driver_device )
 
 
 	MDRV_GFXDECODE(bingor)
-	//MDRV_NVRAM_HANDLER(generic_0fill)
+	//MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)

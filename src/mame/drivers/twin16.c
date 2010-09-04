@@ -49,6 +49,7 @@ Known Issues:
 #include "sound/2151intf.h"
 #include "sound/k007232.h"
 #include "sound/upd7759.h"
+#include "machine/nvram.h"
 #include "includes/twin16.h"
 #include "includes/konamipt.h"
 
@@ -248,7 +249,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0a0000, 0x0a0001) AM_WRITE(twin16_CPUA_register_w)
 	AM_RANGE(0x0a0008, 0x0a0009) AM_WRITE(sound_command_w)
 	AM_RANGE(0x0a0010, 0x0a0011) AM_WRITE(watchdog_reset16_w)
-	AM_RANGE(0x0b0000, 0x0b03ff) AM_READWRITE(cuebrickj_nvram_r, cuebrickj_nvram_w)
+	AM_RANGE(0x0b0000, 0x0b03ff) AM_READWRITE(cuebrickj_nvram_r, cuebrickj_nvram_w) AM_SHARE("nvram")
 	AM_RANGE(0x0b0400, 0x0b0401) AM_WRITE(cuebrickj_nvram_bank_w)
 	AM_RANGE(0x0c0000, 0x0c000f) AM_WRITE(twin16_video_register_w)
 	AM_RANGE(0x0c000e, 0x0c000f) AM_READ(twin16_sprite_status_r)
@@ -830,7 +831,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( cuebrickj, twin16 )
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(1*8, 39*8-1, 2*8, 30*8-1)
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
 /* ROMs */
@@ -1329,8 +1330,7 @@ static DRIVER_INIT( cuebrickj )
 {
 	gfx_untangle(machine);
 
-	machine->generic.nvram.u8 = (UINT8 *)cuebrickj_nvram;
-	machine->generic.nvram_size = 0x400*0x20;
+	machine->device<nvram_device>("nvram")->set_base(cuebrickj_nvram, 0x400*0x20);
 }
 
 /* Game Drivers */

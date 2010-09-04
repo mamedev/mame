@@ -123,6 +123,7 @@ RAM4 is HMC HM6264LP-70
 #include "emu.h"
 #include "cpu/e132xs/e132xs.h"
 #include "sound/okim6295.h"
+#include "machine/nvram.h"
 
 class gstream_state : public driver_device
 {
@@ -269,7 +270,7 @@ static ADDRESS_MAP_START( gstream_32bit_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x4FA00000, 0x4FA00003) AM_WRITE(gstream_tilemap1_scrolly_w)
 	AM_RANGE(0x4FC00000, 0x4FC00003) AM_WRITE(gstream_tilemap2_scrollx_w)
 	AM_RANGE(0x4FE00000, 0x4FE00003) AM_WRITE(gstream_tilemap2_scrolly_w)
-	AM_RANGE(0xFFC00000, 0xFFC01FFF) AM_RAM AM_BASE_SIZE_GENERIC(nvram) // Backup RAM
+	AM_RANGE(0xFFC00000, 0xFFC01FFF) AM_RAM AM_SHARE("nvram") // Backup RAM
 	AM_RANGE(0xFFF80000, 0xFFFFFFFF) AM_ROM AM_REGION("user1",0) // boot rom
 ADDRESS_MAP_END
 
@@ -557,7 +558,7 @@ static MACHINE_CONFIG_START( gstream, gstream_state )
 	MDRV_MACHINE_START(gstream)
 	MDRV_MACHINE_RESET(gstream)
 
-	MDRV_NVRAM_HANDLER(generic_1fill)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

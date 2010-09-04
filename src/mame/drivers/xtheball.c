@@ -10,6 +10,7 @@
 #include "cpu/tms34010/tms34010.h"
 #include "video/tlc34076.h"
 #include "machine/ticket.h"
+#include "machine/nvram.h"
 #include "sound/dac.h"
 
 
@@ -199,7 +200,7 @@ static READ16_HANDLER( analogy_watchdog_r )
  *************************************/
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x00000000, 0x0001ffff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x00000000, 0x0001ffff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x01000000, 0x010fffff) AM_RAM AM_BASE(&vram_bg)
 	AM_RANGE(0x02000000, 0x020fffff) AM_RAM AM_BASE(&vram_fg)
 	AM_RANGE(0x03000000, 0x030000ff) AM_DEVREADWRITE8("tlc34076", tlc34076_r, tlc34076_w, 0x00ff)
@@ -327,7 +328,7 @@ static MACHINE_CONFIG_START( xtheball, driver_device )
 	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_PERIODIC_INT(irq1_line_hold, 15000)
 
-	MDRV_NVRAM_HANDLER(generic_1fill)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	MDRV_TICKET_DISPENSER_ADD("ticket", 100, TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_HIGH)
 

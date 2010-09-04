@@ -14,6 +14,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
+#include "machine/nvram.h"
 
 static tilemap_t *bg_tilemap;
 static UINT8 sound_flag;
@@ -88,7 +89,7 @@ static WRITE8_HANDLER( sound_irq_w )
 static ADDRESS_MAP_START( wink_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x9000, 0x97ff) AM_RAM	AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x9000, 0x97ff) AM_RAM	AM_SHARE("nvram")
 	AM_RANGE(0xa000, 0xa3ff) AM_RAM_WRITE(bgram_w) AM_BASE_GENERIC(videoram)
 ADDRESS_MAP_END
 
@@ -323,7 +324,7 @@ static MACHINE_CONFIG_START( wink, driver_device )
 	MDRV_CPU_IO_MAP(wink_sound_io)
 	MDRV_CPU_PERIODIC_INT(wink_sound, 15625)
 
-	MDRV_NVRAM_HANDLER(generic_1fill)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 	MDRV_MACHINE_RESET(wink)
 
 	/* video hardware */

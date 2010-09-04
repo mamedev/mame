@@ -91,6 +91,8 @@ Smitdogg
 #include "video/pc_vga.h"
 #include "video/pc_video.h"
 
+static UINT8 *banked_nvram;
+
 static void pcat_nit_microtouch_tx_callback(running_machine *machine, UINT8 data)
 {
 	ins8250_receive(machine->device("ns16450_0"), data);
@@ -143,13 +145,11 @@ static WRITE8_HANDLER(pcat_nit_rombank_w)
 	else
 	{
 		// nvram bank
-		memory_unmap_read(space, 0x000d8000, 0x000dffff, 0, 0);
-		memory_unmap_write(space, 0x000d8000, 0x000dffff, 0, 0);
+		memory_unmap_readwrite(space, 0x000d8000, 0x000dffff, 0, 0);
 
-		memory_install_read_bank(space, 0x000d8000, 0x000d9fff, 0, 0, "nvrambank" );
-		memory_install_write_bank(space, 0x000d8000, 0x000d9fff, 0, 0, "nvrambank" );
+		memory_install_readwrite_bank(space, 0x000d8000, 0x000d9fff, 0, 0, "nvrambank" );
 
-		memory_set_bankptr(space->machine, "nvrambank", space->machine->generic.nvram.u8);
+		memory_set_bankptr(space->machine, "nvrambank", banked_nvram);
 
 	}
 }
@@ -380,8 +380,7 @@ ROM_END
 
 static DRIVER_INIT(pcat_nit)
 {
-	machine->generic.nvram_size = 0x2000;
-	machine->generic.nvram.u8 = auto_alloc_array(machine, UINT8, machine->generic.nvram_size);
+	banked_nvram = auto_alloc_array(machine, UINT8, 0x2000);
 
 	pc_vga_init(machine, &vga_interface, NULL);
 }

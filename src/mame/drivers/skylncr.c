@@ -36,6 +36,7 @@
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "machine/8255ppi.h"
+#include "machine/nvram.h"
 
 static tilemap_t *tmap;
 
@@ -313,7 +314,7 @@ static WRITE8_HANDLER( skylncr_nmi_enable_w )
 
 static ADDRESS_MAP_START( mem_map_skylncr, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")
 
 	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE( skylncr_videoram_w ) AM_BASE( &skylncr_videoram )
 	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE( skylncr_colorram_w ) AM_BASE( &skylncr_colorram )
@@ -664,7 +665,7 @@ static MACHINE_CONFIG_START( skylncr, driver_device )
 	MDRV_CPU_IO_MAP(io_map_skylncr)
 	MDRV_CPU_VBLANK_INT("screen", skylncr_vblank_interrupt)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* 1x M5M82C255, or 2x PPI8255 */
 	MDRV_PPI8255_ADD( "ppi8255_0", ppi8255_intf[0] )

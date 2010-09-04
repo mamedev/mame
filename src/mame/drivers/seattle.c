@@ -191,7 +191,19 @@
 #include "machine/midwayic.h"
 #include "machine/smc91c9x.h"
 #include "video/voodoo.h"
+#include "machine/nvram.h"
 
+
+
+class seattle_state : public driver_device
+{
+public:
+	seattle_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config),
+		  m_nvram(*this, "nvram") { }
+
+	required_shared_ptr<UINT32>	m_nvram;
+};
 
 
 /*************************************
@@ -1574,15 +1586,17 @@ static WRITE32_DEVICE_HANDLER( widget_w )
 
 static WRITE32_HANDLER( cmos_w )
 {
+	seattle_state *state = space->machine->driver_data<seattle_state>();
 	if (cmos_write_enabled)
-		COMBINE_DATA(space->machine->generic.nvram.u32 + offset);
+		COMBINE_DATA(state->m_nvram + offset);
 	cmos_write_enabled = FALSE;
 }
 
 
 static READ32_HANDLER( cmos_r )
 {
-	return space->machine->generic.nvram.u32[offset];
+	seattle_state *state = space->machine->driver_data<seattle_state>();
+	return state->m_nvram[offset];
 }
 
 
@@ -1734,7 +1748,7 @@ static ADDRESS_MAP_START( seattle_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x0c000000, 0x0c000fff) AM_READWRITE(galileo_r, galileo_w)
 	AM_RANGE(0x13000000, 0x13000003) AM_WRITE(asic_fifo_w)
 	AM_RANGE(0x16000000, 0x1600003f) AM_READWRITE(midway_ioasic_r, midway_ioasic_w)
-	AM_RANGE(0x16100000, 0x1611ffff) AM_READWRITE(cmos_r, cmos_w) AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x16100000, 0x1611ffff) AM_READWRITE(cmos_r, cmos_w) AM_SHARE("nvram")
 	AM_RANGE(0x17000000, 0x17000003) AM_READWRITE(cmos_protect_r, cmos_protect_w)
 	AM_RANGE(0x17100000, 0x17100003) AM_WRITE(seattle_watchdog_w)
 	AM_RANGE(0x17300000, 0x17300003) AM_RAM_WRITE(seattle_interrupt_enable_w) AM_BASE(&interrupt_enable)
@@ -2457,7 +2471,7 @@ static const mips3_config r5000_config =
 	SYSTEM_CLOCK	/* system clock rate */
 };
 
-static MACHINE_CONFIG_START( seattle_common, driver_device )
+static MACHINE_CONFIG_START( seattle_common, seattle_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", R5000LE, SYSTEM_CLOCK*3)
@@ -2466,7 +2480,7 @@ static MACHINE_CONFIG_START( seattle_common, driver_device )
 
 	MDRV_MACHINE_START(seattle)
 	MDRV_MACHINE_RESET(seattle)
-	MDRV_NVRAM_HANDLER(generic_1fill)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	MDRV_IDE_CONTROLLER_ADD("ide", ide_interrupt)
 	MDRV_IDE_BUS_MASTER_SPACE("maincpu", PROGRAM)

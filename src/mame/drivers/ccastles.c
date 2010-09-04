@@ -133,15 +133,6 @@
 
 
 
-/*************************************
- *
- *  Globals
- *
- *************************************/
-
-static UINT8 *nvram_stage;
-
-
 /************************************* *
  *  VBLANK and IRQ generation
  *
@@ -234,13 +225,10 @@ static MACHINE_START( ccastles )
 	state->irq_state = 0;
 	schedule_next_irq(machine, 0);
 
-	/* allocate backing memory for the NVRAM */
-	machine->generic.nvram.u8 = auto_alloc_array(machine, UINT8, machine->generic.nvram_size);
-
 	/* setup for save states */
 	state_save_register_global(machine, state->irq_state);
 	state_save_register_global_array(machine, state->nvram_store);
-	state_save_register_global_pointer(machine, machine->generic.nvram.u8, machine->generic.nvram_size);
+	state_save_register_global_array(machine, state->nvram);
 }
 
 
@@ -305,22 +293,24 @@ static READ8_HANDLER( leta_r )
 
 static NVRAM_HANDLER( ccastles )
 {
+	ccastles_state *state = machine->driver_data<ccastles_state>();
 	if (read_or_write)
 	{
 		/* on power down, the EAROM is implicitly stored */
-		memcpy(machine->generic.nvram.v, nvram_stage, machine->generic.nvram_size);
-		mame_fwrite(file, machine->generic.nvram.v, machine->generic.nvram_size);
+		memcpy(state->nvram, state->nvram_stage, sizeof(state->nvram));
+		mame_fwrite(file, state->nvram, sizeof(state->nvram));
 	}
 	else if (file)
-		mame_fread(file, machine->generic.nvram.v, machine->generic.nvram_size);
+		mame_fread(file, state->nvram, sizeof(state->nvram));
 	else
-		memset(machine->generic.nvram.v, 0, machine->generic.nvram_size);
+		memset(state->nvram, 0, sizeof(state->nvram));
 }
 
 
 static WRITE8_HANDLER( nvram_recall_w )
 {
-	memcpy(nvram_stage, space->machine->generic.nvram.v, space->machine->generic.nvram_size);
+	ccastles_state *state = space->machine->driver_data<ccastles_state>();
+	memcpy(state->nvram_stage, state->nvram, sizeof(state->nvram));
 }
 
 
@@ -330,7 +320,7 @@ static WRITE8_HANDLER( nvram_store_w )
 
 	state->nvram_store[offset] = data & 1;
 	if (!state->nvram_store[0] && state->nvram_store[1])
-		memcpy(space->machine->generic.nvram.v, nvram_stage, space->machine->generic.nvram_size);
+		memcpy(state->nvram, state->nvram_stage, sizeof(state->nvram));
 }
 
 
@@ -348,7 +338,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_RAM_WRITE(ccastles_videoram_w) AM_BASE_MEMBER(ccastles_state, videoram)
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x8e00, 0x8fff) AM_BASE_MEMBER(ccastles_state, spriteram)
-	AM_RANGE(0x9000, 0x90ff) AM_MIRROR(0x0300) AM_RAM AM_BASE(&nvram_stage) AM_SIZE_GENERIC(nvram)
+	AM_RANGE(0x9000, 0x90ff) AM_MIRROR(0x0300) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x9400, 0x9403) AM_MIRROR(0x01fc) AM_READ(leta_r)
 	AM_RANGE(0x9600, 0x97ff) AM_READ_PORT("IN0")
 	AM_RANGE(0x9800, 0x980f) AM_MIRROR(0x01f0) AM_DEVREADWRITE("pokey1", pokey_r, pokey_w)

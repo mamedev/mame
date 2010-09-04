@@ -4,6 +4,16 @@
 
 *************************************************************************/
 
+class aztarac_state : public driver_device
+{
+public:
+	aztarac_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config),
+		  m_nvram(*this, "nvram") { }
+
+	required_shared_ptr<UINT16>	m_nvram;
+};
+
 /*----------- defined in audio/aztarac.c -----------*/
 
 READ16_HANDLER( aztarac_sound_r );

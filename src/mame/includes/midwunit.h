@@ -6,6 +6,16 @@
 
 #include "midtunit.h"
 
+class midwxunit_state : public driver_device
+{
+public:
+	midwxunit_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config),
+		  m_nvram(*this, "nvram") { }
+
+	required_shared_ptr<UINT16>	m_nvram;
+};
+
 /*----------- defined in machine/midwunit.c -----------*/
 
 extern UINT8 *midwunit_decode_memory;

@@ -367,6 +367,7 @@
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
+#include "machine/nvram.h"
 #include "ampoker2.lh"
 #include "sigmapkr.lh"
 #include "includes/ampoker2.h"
@@ -576,7 +577,7 @@ static WRITE8_HANDLER( ampoker2_watchdog_reset_w )
 
 static ADDRESS_MAP_START( ampoker2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(ampoker2_videoram_w) AM_BASE_GENERIC(videoram)
 ADDRESS_MAP_END
 
@@ -1056,7 +1057,7 @@ static MACHINE_CONFIG_START( ampoker2, driver_device )
 	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 1536)
 	MDRV_WATCHDOG_TIME_INIT(MSEC(200))	/* 200 ms, measured */
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

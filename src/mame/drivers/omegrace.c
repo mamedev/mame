@@ -218,6 +218,7 @@
 #include "video/vector.h"
 #include "video/avgdvg.h"
 #include "sound/ay8910.h"
+#include "machine/nvram.h"
 
 #include "rendlay.h"
 
@@ -328,7 +329,7 @@ static WRITE8_HANDLER( omegrace_soundlatch_w )
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x4bff) AM_RAM
-	AM_RANGE(0x5c00, 0x5cff) AM_RAM AM_BASE_SIZE_GENERIC(nvram) /* NVRAM */
+	AM_RANGE(0x5c00, 0x5cff) AM_RAM AM_SHARE("nvram") /* NVRAM */
 	AM_RANGE(0x8000, 0x8fff) AM_RAM AM_BASE(&avgdvg_vectorram) AM_SIZE(&avgdvg_vectorram_size) AM_REGION("maincpu", 0x8000) /* vector ram */
 	AM_RANGE(0x9000, 0x9fff) AM_ROM /* vector rom */
 ADDRESS_MAP_END
@@ -488,7 +489,7 @@ static MACHINE_CONFIG_START( omegrace, driver_device )
 	MDRV_CPU_PERIODIC_INT(nmi_line_pulse,250)
 
 	MDRV_MACHINE_RESET(omegrace)
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", VECTOR)

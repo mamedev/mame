@@ -80,6 +80,7 @@
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "sound/pokey.h"
+#include "machine/nvram.h"
 #include "includes/irobot.h"
 
 #define MAIN_CLOCK		XTAL_12_096MHz
@@ -93,7 +94,8 @@
 
 static WRITE8_HANDLER( irobot_nvram_w )
 {
-	space->machine->generic.nvram.u8[offset] = data & 0x0f;
+	irobot_state *state = space->machine->driver_data<irobot_state>();
+	state->m_nvram[offset] = data & 0x0f;
 }
 
 
@@ -134,7 +136,7 @@ static ADDRESS_MAP_START( irobot_map, ADDRESS_SPACE_PROGRAM, 8 )
     AM_RANGE(0x1140, 0x1140) AM_WRITE(irobot_statwr_w)
     AM_RANGE(0x1180, 0x1180) AM_WRITE(irobot_out0_w)
     AM_RANGE(0x11c0, 0x11c0) AM_WRITE(irobot_rom_banksel_w)
-    AM_RANGE(0x1200, 0x12ff) AM_RAM_WRITE(irobot_nvram_w) AM_BASE_SIZE_GENERIC(nvram)
+    AM_RANGE(0x1200, 0x12ff) AM_RAM_WRITE(irobot_nvram_w) AM_SHARE("nvram")
     AM_RANGE(0x1300, 0x13ff) AM_READ(irobot_control_r)
     AM_RANGE(0x1400, 0x143f) AM_READWRITE(quad_pokey_r, quad_pokey_w)
     AM_RANGE(0x1800, 0x18ff) AM_WRITE(irobot_paletteram_w)
@@ -287,14 +289,14 @@ static const pokey_interface pokey_config =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( irobot, driver_device )
+static MACHINE_CONFIG_START( irobot, irobot_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, MAIN_CLOCK/8)
 	MDRV_CPU_PROGRAM_MAP(irobot_map)
 
 	MDRV_MACHINE_RESET(irobot)
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

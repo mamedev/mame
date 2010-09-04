@@ -35,6 +35,7 @@ dy_6.bin (near Z80)
 #include "cpu/z80/z80.h"
 #include "cpu/i8085/i8085.h"
 #include "sound/ay8910.h"
+#include "machine/nvram.h"
 
 
 class dynadice_state : public driver_device
@@ -93,7 +94,7 @@ static WRITE8_DEVICE_HANDLER( sound_control_w )
 static ADDRESS_MAP_START( dynadice_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM_WRITE(dynadice_videoram_w) AM_BASE_MEMBER(dynadice_state, videoram)
-	AM_RANGE(0x4000, 0x40ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x4000, 0x40ff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dynadice_io_map, ADDRESS_SPACE_IO, 8 )
@@ -247,7 +248,7 @@ static MACHINE_CONFIG_START( dynadice, dynadice_state )
 	MDRV_MACHINE_START(dynadice)
 	MDRV_MACHINE_RESET(dynadice)
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

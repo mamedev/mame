@@ -118,6 +118,7 @@
 #include "cpu/m6502/m6502.h"
 #include "deprecat.h"
 #include "sound/pokey.h"
+#include "machine/nvram.h"
 #include "includes/cloak.h"
 
 static int cloak_nvram_enabled;
@@ -175,7 +176,7 @@ static ADDRESS_MAP_START( master_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2200, 0x2200) AM_READ_PORT("P2")
 	AM_RANGE(0x2400, 0x2400) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x2600, 0x2600) AM_WRITE(cloak_custom_w)
-	AM_RANGE(0x2800, 0x29ff) AM_RAM AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x2800, 0x29ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x2f00, 0x2fff) AM_NOP
 	AM_RANGE(0x3000, 0x30ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x3200, 0x327f) AM_WRITE(cloak_paletteram_w)
@@ -343,7 +344,7 @@ static MACHINE_CONFIG_START( cloak, driver_device )
 
 	MDRV_QUANTUM_TIME(HZ(1000))
 
-	MDRV_NVRAM_HANDLER(generic_0fill)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
