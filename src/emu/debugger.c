@@ -114,6 +114,9 @@ static void debugger_exit(running_machine &machine)
 {
 	machine_entry **entryptr;
 
+	// save any comments
+	debug_comment_save(&machine);
+
 	/* remove this machine from the list; it came down cleanly */
 	for (entryptr = &machine_list; *entryptr != NULL; entryptr = &(*entryptr)->next)
 		if ((*entryptr)->machine == &machine)

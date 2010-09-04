@@ -506,13 +506,3 @@ error:
 		xml_file_free(root);
 	return 0;
 }
-
-
-/*-------------------------------------------------------------------------
-    debug_comment_exit - saves the comments and frees memory
--------------------------------------------------------------------------*/
-
-static void debug_comment_exit(running_machine &machine)
-{
-	debug_comment_save(&machine);
-}
