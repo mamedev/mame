@@ -154,7 +154,7 @@ static WRITE8_HANDLER( key_matrix_w )
 	state->mux_data = data;
 }
 
-/*Key matrix status,used for coin settings and I don't know what else...*/
+/* Key matrix status,used for coin settings and I don't know what else... */
 static READ8_HANDLER( key_matrix_status_r )
 {
 	speedatk_state *state = space->machine->driver_data<speedatk_state>();
@@ -164,7 +164,8 @@ static READ8_HANDLER( key_matrix_status_r )
 }
 
 /*
-high four bits are for command, low four are for param
+xxxx ---- command
+---- xxxx param
 My guess is that the other commands configs the key matrix, it probably needs some tests on the real thing.
 1f
 3f
