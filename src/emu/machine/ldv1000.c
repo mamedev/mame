@@ -423,7 +423,8 @@ static TIMER_DEVICE_CALLBACK( multijump_timer )
 static WRITE_LINE_DEVICE_HANDLER( ctc_interrupt )
 {
 	laserdisc_state *ld = ldcore_get_safe_token(device->owner());
-	cpu_set_input_line(ld->player->cpu, 0, state ? ASSERT_LINE : CLEAR_LINE);
+	if (ld->player->cpu != NULL)
+		cpu_set_input_line(ld->player->cpu, 0, state ? ASSERT_LINE : CLEAR_LINE);
 }
 
 

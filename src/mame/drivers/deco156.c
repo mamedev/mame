@@ -27,16 +27,18 @@ class deco156_state : public driver_device
 public:
 	deco156_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config),
-		  oki2(machine.device<okim6295_device>("oki2")) { }
+		  maincpu(*this, "maincpu"),
+		  deco16ic(*this, "deco_custom"),
+		  oki2(*this, "oki2") { }
 
 	/* memory pointers */
 	UINT16 *  pf1_rowscroll;
 	UINT16 *  pf2_rowscroll;
 
 	/* devices */
-	cpu_device *maincpu;
-	deco16ic_device *deco16ic;
-	okim6295_device *oki2;
+	required_device<arm_device> maincpu;
+	required_device<deco16ic_device> deco16ic;
+	optional_device<okim6295_device> oki2;
 };
 
 
@@ -399,14 +401,6 @@ static const deco16ic_interface deco156_deco16ic_intf =
 	NULL
 };
 
-static MACHINE_START( deco156 )
-{
-	deco156_state *state = machine->driver_data<deco156_state>();
-
-	state->maincpu = machine->device<cpu_device>("maincpu");
-	state->deco16ic = machine->device<deco16ic_device>("deco_custom");
-}
-
 static MACHINE_CONFIG_START( hvysmsh, deco156_state )
 
 	/* basic machine hardware */
@@ -415,8 +409,6 @@ static MACHINE_CONFIG_START( hvysmsh, deco156_state )
 	MDRV_CPU_VBLANK_INT("screen", deco32_vbl_interrupt)
 
 	MDRV_EEPROM_93C46_ADD("eeprom")
-
-	MDRV_MACHINE_START(deco156)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM )
@@ -456,8 +448,6 @@ static MACHINE_CONFIG_START( wcvol95, deco156_state )
 	MDRV_CPU_VBLANK_INT("screen", deco32_vbl_interrupt)
 
 	MDRV_EEPROM_93C46_ADD("eeprom")
-
-	MDRV_MACHINE_START(deco156)
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM )

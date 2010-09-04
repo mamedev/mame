@@ -22,10 +22,10 @@ class mosaicf2_state : public driver_device
 public:
 	mosaicf2_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config),
-		  maincpu(machine.device<cpu_device>("maincpu")) { }
+		  maincpu(*this, "maincpu") { }
 
 	/* memory pointers */
-	cpu_device *	maincpu;
+	required_device<e132xn_device>	maincpu;
 	UINT32 *  videoram;
 };
 

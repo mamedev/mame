@@ -130,9 +130,9 @@ class gstream_state : public driver_device
 public:
 	gstream_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config),
-		  maincpu(machine.device<cpu_device>("maincpu")),
-		  oki_1(machine.device<okim6295_device>("oki1")),
-		  oki_2(machine.device<okim6295_device>("oki2")) { }
+		  maincpu(*this, "maincpu"),
+		  oki_1(*this, "oki1"),
+		  oki_2(*this, "oki2") { }
 
 	/* memory pointers */
 	UINT32 *  vram;
@@ -149,9 +149,9 @@ public:
 	int       oki_bank_0, oki_bank_1;
 
 	/* devices */
-	cpu_device *maincpu;
-	okim6295_device *oki_1;
-	okim6295_device *oki_2;
+	required_device<e132xt_device> maincpu;
+	required_device<okim6295_device> oki_1;
+	required_device<okim6295_device> oki_2;
 };
 
 
