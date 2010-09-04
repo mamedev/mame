@@ -132,7 +132,7 @@ void eeprom_device_config::static_set_interface(device_config *device, const eep
 void eeprom_device_config::static_set_default_data(device_config *device, const UINT8 *data, UINT32 size)
 {
 	eeprom_device_config *eeprom = downcast<eeprom_device_config *>(device);
-if (eeprom->m_data_bits != 8) mame_printf_warning("16-bit EEPROM set with 8-bit data\n");
+if (eeprom->m_data_bits != 8) mame_printf_debug("16-bit EEPROM set with 8-bit data\n");
 //  assert(eeprom->m_data_bits == 8);
 	eeprom->m_default_data = data;
 	eeprom->m_default_data_size = size;
@@ -141,7 +141,7 @@ if (eeprom->m_data_bits != 8) mame_printf_warning("16-bit EEPROM set with 8-bit 
 void eeprom_device_config::static_set_default_data(device_config *device, const UINT16 *data, UINT32 size)
 {
 	eeprom_device_config *eeprom = downcast<eeprom_device_config *>(device);
-if (eeprom->m_data_bits != 16) mame_printf_warning("8-bit EEPROM set with 16-bit data\n");
+if (eeprom->m_data_bits != 16) mame_printf_debug("8-bit EEPROM set with 16-bit data\n");
 //  assert(eeprom->m_data_bits == 16);
 	eeprom->m_default_data = reinterpret_cast<const UINT8 *>(data);
 	eeprom->m_default_data_size = size;
