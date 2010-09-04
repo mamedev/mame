@@ -91,17 +91,10 @@ static void debug_comment_exit(running_machine &machine);
                          loads any existing comment file
 -------------------------------------------------------------------------*/
 
-int debug_comment_init(running_machine *machine)
+int debug_comment_init(device_t &device, device_debug &devdebug)
 {
 	/* allocate memory for the comments */
-	device_disasm_interface *disasm;
-	for (device_t *device = machine->m_devicelist.first(); device != NULL; device = device->next())
-		if (device->interface(disasm))
-			device->debug()->m_comments = auto_alloc_clear(machine, debug_cpu_comment_group);
-
-	/* automatically load em up */
-	debug_comment_load(machine);
-	machine->add_notifier(MACHINE_NOTIFY_EXIT, debug_comment_exit);
+	devdebug.m_comments = auto_alloc_clear(device.machine, debug_cpu_comment_group);
 	return 1;
 }
 

@@ -72,7 +72,6 @@ void debugger_init(running_machine *machine)
 		debug_cpu_init(machine);
 		debug_command_init(machine);
 		debug_console_init(machine);
-		debug_comment_init(machine);
 
 		/* always initialize the internal render debugger */
 		debugint_init(machine);

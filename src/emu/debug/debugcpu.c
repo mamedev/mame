@@ -96,6 +96,8 @@ struct _debugcpu_private
 	UINT64			tempvar[NUM_TEMP_VARIABLES];
 
 	osd_ticks_t 	last_periodic_update_time;
+
+	bool			comments_loaded;
 };
 
 
@@ -183,10 +185,6 @@ void debug_cpu_init(running_machine *machine)
 		sprintf(symname, "temp%d", regnum);
 		symtable_add_register(global->symtable, symname, &global->tempvar[regnum], get_tempvar, set_tempvar);
 	}
-
-	/* loop over devices and build up their info */
-	for (device_t *device = machine->m_devicelist.first(); device != NULL; device = device->next())
-		device->set_debug(*auto_alloc(machine, device_debug(*device, global->symtable)));
 
 	/* first CPU is visible by default */
 	global->visiblecpu = machine->firstcpu;
@@ -1562,14 +1560,14 @@ static UINT64 get_cpunum(void *globalref, void *ref)
 //  device_debug - constructor
 //-------------------------------------------------
 
-device_debug::device_debug(device_t &device, symbol_table *globalsyms)
+device_debug::device_debug(device_t &device)
 	: m_device(device),
 	  m_exec(NULL),
 	  m_memory(NULL),
 	  m_state(NULL),
 	  m_disasm(NULL),
 	  m_flags(0),
-	  m_symtable(symtable_alloc(globalsyms, (void *)&device)),
+	  m_symtable(symtable_alloc(debug_cpu_get_global_symtable(device.machine), (void *)&device)),
 	  m_instrhook(NULL),
 	  m_dasm_override(NULL),
 	  m_opwidth(0),
@@ -1631,6 +1629,10 @@ device_debug::device_debug(device_t &device, symbol_table *globalsyms)
 		if (m_state != NULL && symtable_find(m_symtable, "curpc") == NULL)
 			symtable_add_register(m_symtable, "curpc", NULL, get_current_pc, 0);
 	}
+	
+	// initialize coments
+	if (m_disasm != NULL)
+		debug_comment_init(device, *this);
 }
 
 
@@ -1843,6 +1845,13 @@ void device_debug::instruction_hook(offs_t curpc)
 	if (global->execution_state == EXECUTION_STATE_STOPPED)
 	{
 		int firststop = true;
+		
+		// load comments if we haven't yet
+		if (!global->comments_loaded)
+		{
+			debug_comment_load(m_device.machine);
+			global->comments_loaded = true;
+		}
 
 		// reset any transient state
 		reset_transient_flags(*m_device.machine);

@@ -38,6 +38,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "debug/debugcpu.h"
 
 
 
@@ -726,6 +727,10 @@ void device_t::start()
 
 	// force an update of the clock
 	notify_clock_changed();
+	
+	// if we're debugging, create a device_debug object
+	if ((m_machine.debug_flags & DEBUG_FLAG_ENABLED) != 0)
+		m_debug = auto_alloc(&m_machine, device_debug(*this));
 
 	// register our save states
 	state_save_register_device_item(this, 0, m_clock);

@@ -138,7 +138,7 @@ public:
 
 public:
 	// construction/destruction
-	device_debug(device_t &device, symbol_table *globalsyms);
+	device_debug(device_t &device);
 	~device_debug();
 
 	// getters

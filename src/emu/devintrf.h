@@ -387,7 +387,6 @@ public:
 
 	// debugging
 	device_debug *debug() const { return m_debug; }
-	void set_debug(device_debug &debug) { m_debug = &debug; }
 
 	// basic information getters ... pass through to underlying config
 	device_type type() const { return m_baseconfig.type(); }
