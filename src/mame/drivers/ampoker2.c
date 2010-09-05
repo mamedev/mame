@@ -4,8 +4,8 @@
     AMERICAN POKER 2
     ----------------
 
-    Company:    Novomatic.
-    Year:       1990.
+    Company:  Novomatic.
+    Year:     1990.
 
     Driver by Roberto Fresca, with a lot of help of Grull Osgo.
     Based on a preliminary work of Curt Coder.
@@ -19,6 +19,7 @@
     ampkr2b1 |  clone   |  American Poker II (bootleg, set 1).
     ampkr2b2 |  clone   |  American Poker II (bootleg, set 2).
     ampkr2b3 |  clone   |  American Poker II (bootleg, set 3).
+    ampkr2b4 |  clone   |  American Poker II (bootleg, set 4).
     ampkr228 |  clone   |  American Poker II (iamp2 v28).
     pkrdewin |  clone   |  Poker De Win.
     ampkr95  |  clone   |  American Poker 95.
@@ -26,6 +27,7 @@
     rabbitpk |  clone   |  Rabbit Poker / Arizona Poker 1.1? (with PIC)
     sigmapkr |  parent  |  Sigma Poker.
     sigma2k  |  parent  |  Sigma Poker 2000.
+    piccolop |  parent  |  Piccolo Poker.
 
 
 *********************************************************************************
@@ -562,11 +564,11 @@ static WRITE8_HANDLER( ampoker2_watchdog_reset_w )
 	if (((data >> 3) & 0x01) == 0)		/* check for refresh value (0x08) */
 	{
 		watchdog_reset(space->machine);
-//      popmessage("%02x", data);
+//		popmessage("%02x", data);
 	}
 	else
 	{
-//      popmessage("%02x", data);
+//		popmessage("%02x", data);
 	}
 }
 
@@ -1259,6 +1261,31 @@ ROM_START( rabbitpk )
 	ROM_LOAD( "82s147an.u48", 0x0000, 0x0200, CRC(9bc8e543) SHA1(e4882868a43e21a509a180b9731600d1dd63b5cc) )
 ROM_END
 
+/*
+
+Piccolo Poker (Admiral, licenced by Novomatic). 
+Seems a interesting American Poker II variant.
+
+Roms have swapped halves.
+Rechecked on PCB.
+
+*/
+
+ROM_START( piccolop )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "v4.1.bin", 0x4000, 0x4000, CRC(ae092c43) SHA1(191e233310d59d3b4eb71c7081799835efcae069) )
+	ROM_CONTINUE(         0x0000, 0x4000)
+	ROM_LOAD( "v4.2.bin", 0xc000, 0x4000, CRC(69fb6fd5) SHA1(e95c2793aaa11b9501ca544dd0a045e8e7bc52bf) )
+	ROM_CONTINUE(         0x8000, 0x4000)
+
+	ROM_REGION( 0x8000, "gfx1", 0 )
+	ROM_LOAD( "zei_8.11.bin", 0x4000, 0x4000, CRC(1b003672) SHA1(e58bd58023f332c30851204491b7e0bd7c5d9631) )
+	ROM_CONTINUE(             0x0000, 0x4000)
+
+	ROM_REGION( 0x200, "proms", 0 )  /* not dumped. using the ampoker2 one instead */
+	ROM_LOAD( "82s147an.u48", 0x0000, 0x0200, CRC(9bc8e543) SHA1(e4882868a43e21a509a180b9731600d1dd63b5cc) )
+ROM_END
+
 
 /*************************
 *      Driver Init       *
@@ -1286,21 +1313,49 @@ static DRIVER_INIT( rabbitpk )
 	}
 }
 
+static DRIVER_INIT( piccolop )
+{
+/*
+
+  1382: 41            ld   b,c
+  1383: 80            add  a,b
+  1384: 00            nop  ------\
+  1385: 00            nop         |  Obvious patch...
+  1386: 00            nop         |  Dunno if was made originarily.
+  1387: 00            nop  ------/
+  1388: 3E 08         ld   a,$08
+  138A: D3 37         out  ($37),a   ; Sets bit3 to keep happy the watchdog reset.
+  138C: 32 01 C0      ld   ($C001),a
+  138F: 18 FE         jr   $138F     ; INFINITE LOOP --- WTF???
+
+  The following patch will break the infinite loop,
+  but reset the game constantly.
+
+*/
+
+//	UINT8 *rom = memory_region(machine, "maincpu");
+
+//	rom[0x138f] = 0x00;
+//	rom[0x1390] = 0x00;
+
+}
+
 
 /*************************
 *      Game Drivers      *
 *************************/
 
-/*     YEAR  NAME      PARENT    MACHINE   INPUT     INIT      ROT    COMPANY       FULLNAME                             FLAGS  LAYOUT      */
-GAMEL( 1990, ampoker2, 0,        ampoker2, ampoker2, 0,        ROT0, "Novomatic",  "American Poker II",                  GAME_SUPPORTS_SAVE,     layout_ampoker2 )
-GAMEL( 1990, ampkr2b1, ampoker2, ampoker2, ampoker2, 0,        ROT0, "bootleg",    "American Poker II (bootleg, set 1)", GAME_SUPPORTS_SAVE,     layout_ampoker2 )
-GAMEL( 1990, ampkr2b2, ampoker2, ampoker2, ampoker2, 0,        ROT0, "bootleg",    "American Poker II (bootleg, set 2)", GAME_SUPPORTS_SAVE,     layout_ampoker2 )
-GAMEL( 1994, ampkr2b3, ampoker2, ampoker2, ampoker2, 0,        ROT0, "bootleg",    "American Poker II (bootleg, set 3)", GAME_SUPPORTS_SAVE,     layout_ampoker2 )
-GAMEL( 1994, ampkr2b4, ampoker2, ampoker2, ampoker2, 0,        ROT0, "bootleg",    "American Poker II (bootleg, set 4)", GAME_SUPPORTS_SAVE,     layout_ampoker2 )
-GAMEL( 1994, ampkr228, ampoker2, ampoker2, ampoker2, 0,        ROT0, "bootleg?",   "American Poker II (iamp2 v28)",      GAME_SUPPORTS_SAVE,     layout_ampoker2 )
-GAMEL( 1995, ampkr95,  ampoker2, ampoker2, ampkr95,  0,        ROT0, "bootleg",    "American Poker 95",                  GAME_SUPPORTS_SAVE,     layout_ampoker2 )
-GAMEL( 1990, pkrdewin, ampoker2, ampoker2, ampoker2, 0,        ROT0, "bootleg",    "Poker De Win",                       GAME_SUPPORTS_SAVE,     layout_ampoker2 )
-GAMEL( 1990, videomat, ampoker2, ampoker2, ampoker2, 0,        ROT0, "bootleg",    "Videomat (Polish bootleg)",          GAME_SUPPORTS_SAVE,     layout_ampoker2 )
-GAMEL( 1990, rabbitpk, ampoker2, ampoker2, ampoker2, rabbitpk, ROT0, "bootleg",    "Rabbit Poker (Arizona Poker v1.1?)", GAME_SUPPORTS_SAVE,     layout_ampoker2 )
-GAMEL( 1995, sigmapkr, 0,        ampoker2, sigmapkr, 0,        ROT0, "Sigma Inc.", "Sigma Poker",                        GAME_SUPPORTS_SAVE,     layout_sigmapkr )
-GAMEL( 1998, sigma2k,  0,        sigma2k,  sigma2k,  0,        ROT0, "Sigma Inc.", "Sigma Poker 2000",                   GAME_SUPPORTS_SAVE,     layout_sigmapkr )
+/*     YEAR  NAME      PARENT    MACHINE   INPUT     INIT      ROT    COMPANY                FULLNAME                             FLAGS  LAYOUT      */
+GAMEL( 1990, ampoker2, 0,        ampoker2, ampoker2, 0,        ROT0, "Novomatic",           "American Poker II",                  GAME_SUPPORTS_SAVE,     layout_ampoker2 )
+GAMEL( 1990, ampkr2b1, ampoker2, ampoker2, ampoker2, 0,        ROT0, "bootleg",             "American Poker II (bootleg, set 1)", GAME_SUPPORTS_SAVE,     layout_ampoker2 )
+GAMEL( 1990, ampkr2b2, ampoker2, ampoker2, ampoker2, 0,        ROT0, "bootleg",             "American Poker II (bootleg, set 2)", GAME_SUPPORTS_SAVE,     layout_ampoker2 )
+GAMEL( 1994, ampkr2b3, ampoker2, ampoker2, ampoker2, 0,        ROT0, "bootleg",             "American Poker II (bootleg, set 3)", GAME_SUPPORTS_SAVE,     layout_ampoker2 )
+GAMEL( 1994, ampkr2b4, ampoker2, ampoker2, ampoker2, 0,        ROT0, "bootleg",             "American Poker II (bootleg, set 4)", GAME_SUPPORTS_SAVE,     layout_ampoker2 )
+GAMEL( 1994, ampkr228, ampoker2, ampoker2, ampoker2, 0,        ROT0, "bootleg?",            "American Poker II (iamp2 v28)",      GAME_SUPPORTS_SAVE,     layout_ampoker2 )
+GAMEL( 1995, ampkr95,  ampoker2, ampoker2, ampkr95,  0,        ROT0, "bootleg",             "American Poker 95",                  GAME_SUPPORTS_SAVE,     layout_ampoker2 )
+GAMEL( 1990, pkrdewin, ampoker2, ampoker2, ampoker2, 0,        ROT0, "bootleg",             "Poker De Win",                       GAME_SUPPORTS_SAVE,     layout_ampoker2 )
+GAMEL( 1990, videomat, ampoker2, ampoker2, ampoker2, 0,        ROT0, "bootleg",             "Videomat (Polish bootleg)",          GAME_SUPPORTS_SAVE,     layout_ampoker2 )
+GAMEL( 1990, rabbitpk, ampoker2, ampoker2, ampoker2, rabbitpk, ROT0, "bootleg",             "Rabbit Poker (Arizona Poker v1.1?)", GAME_SUPPORTS_SAVE,     layout_ampoker2 )
+GAMEL( 1995, sigmapkr, 0,        ampoker2, sigmapkr, 0,        ROT0, "Sigma Inc.",          "Sigma Poker",                        GAME_SUPPORTS_SAVE,     layout_sigmapkr )
+GAMEL( 1998, sigma2k,  0,        sigma2k,  sigma2k,  0,        ROT0, "Sigma Inc.",          "Sigma Poker 2000",                   GAME_SUPPORTS_SAVE,     layout_sigmapkr )
+GAME(  1990, piccolop, ampoker2, ampoker2, ampoker2, piccolop, ROT0, "Admiral - Novomatic", "Piccolo Poker",                      GAME_NOT_WORKING )

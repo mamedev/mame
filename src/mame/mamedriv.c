@@ -9342,6 +9342,7 @@ Other Sun games
 	DRIVER( vroulet )	/* (c) 1989 World Game */
 	DRIVER( rcasino )	/* (c) 1984 Dyna Electronics */
 	DRIVER( ampoker2 )	/* (c) 1990 Novomatic */
+	DRIVER( piccolop )	/* (c) 1990 Admiral - Novomatic */
 	DRIVER( ampkr2b1 )	/* 1990 bootleg */
 	DRIVER( ampkr2b2 )	/* 1990 bootleg */
 	DRIVER( ampkr2b3 )	/* 1994 bootleg */
