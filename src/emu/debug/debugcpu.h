@@ -53,6 +53,8 @@ const UINT8 WATCHPOINT_READ				= 1;
 const UINT8 WATCHPOINT_WRITE			= 2;
 const UINT8 WATCHPOINT_READWRITE		= WATCHPOINT_READ | WATCHPOINT_WRITE;
 
+const int COMMENT_VERSION 				= 1;
+
 
 
 //**************************************************************************
@@ -62,7 +64,7 @@ const UINT8 WATCHPOINT_READWRITE		= WATCHPOINT_READ | WATCHPOINT_WRITE;
 typedef int (*debug_instruction_hook_func)(device_t &device, offs_t curpc);
 
 
-class debug_cpu_comment_group;
+typedef struct _xml_data_node xml_data_node;
 
 
 class device_debug
@@ -126,7 +128,7 @@ public:
 		bool hit(int type, offs_t address, int size);
 
 		watchpoint *		m_next;						// next in the list
-		address_space &m_space;					// address space
+		address_space &		m_space;					// address space
 		int					m_index;					// user reported index
 		bool				m_enabled;					// enabled?
 		UINT8				m_type;						// type (read/write)
@@ -164,7 +166,7 @@ public:
 	void set_dasm_override(dasm_override_func dasm_override) { m_dasm_override = dasm_override; }
 
 	// disassembly
-	offs_t disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
+	offs_t disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram) const;
 
 	// debugger focus
 	void ignore(bool ignore = true);
@@ -203,6 +205,17 @@ public:
 	// hotspots
 	bool hotspot_tracking_enabled() const { return (m_hotspots != NULL); }
 	void hotspot_track(int numspots, int threshhold);
+	
+	// comments
+	void comment_add(offs_t address, const char *comment, rgb_t color);
+	bool comment_remove(offs_t addr);
+	const char *comment_text(offs_t addr) const;
+	UINT32 comment_count() const { return m_comment_list.count(); }
+	UINT32 comment_change_count() const { return m_comment_change; }
+	bool comment_export(xml_data_node &node);
+	bool comment_import(xml_data_node &node);
+	void comment_dump(offs_t addr = ~0);
+	UINT32 compute_opcode_crc32(offs_t address) const;
 
 	// history
 	offs_t history_pc(int index) const;
@@ -304,12 +317,29 @@ private:
 	{
 		offs_t				m_access;					// access address
 		offs_t				m_pc;						// PC of the access
-		address_space *m_space;					// space where the access occurred
+		address_space *		m_space;					// space where the access occurred
 		UINT32				m_count;					// number of hits
 	};
 	hotspot_entry *			m_hotspots;					// hotspot list
 	int						m_hotspot_count;			// number of hotspots
 	int						m_hotspot_threshhold;		// threshhold for the number of hits to print
+
+	// comments
+	class dasm_comment
+	{
+	public:
+		dasm_comment(const char *text, offs_t address, rgb_t color, UINT32 crc);
+		
+		dasm_comment *next() const { return m_next; }
+	
+		dasm_comment *		m_next;						// next comment in the list
+		offs_t				m_address;					// address in question
+		rgb_t				m_color;					// color to use
+		UINT32				m_crc;						// CRC of code
+		astring				m_text;						// text
+	};
+	simple_list<dasm_comment> m_comment_list;			// list of comments
+	UINT32					m_comment_change;			// change counter for comments
 
 	// internal flag values
 	static const UINT32 DEBUG_FLAG_OBSERVING		= 0x00000001;		// observing this CPU
@@ -332,9 +362,6 @@ private:
 	static const UINT32 DEBUG_FLAG_TRACING_ANY		= DEBUG_FLAG_TRACING | DEBUG_FLAG_TRACING_OVER;
 	static const UINT32 DEBUG_FLAG_TRANSIENT		= DEBUG_FLAG_STEPPING_ANY | DEBUG_FLAG_STOP_PC | DEBUG_FLAG_STOP_CONTEXT |
 			DEBUG_FLAG_STOP_INTERRUPT | DEBUG_FLAG_STOP_EXCEPTION | DEBUG_FLAG_STOP_VBLANK | DEBUG_FLAG_STOP_TIME;
-
-public: // until comments get folded in
-	debug_cpu_comment_group *m_comments;				// disassembly comments
 };
 
 
@@ -388,6 +415,16 @@ symbol_table *debug_cpu_get_visible_symtable(running_machine *machine);
 
 /* specifies a debug command script to execute */
 void debug_cpu_source_script(running_machine *machine, const char *file);
+
+
+
+/* ----- debugger comment helpers ----- */
+
+// save all comments for a given machine
+bool debug_comment_save(running_machine *machine);
+
+// load all comments for a given machine
+bool debug_comment_load(running_machine *machine);
 
 
 

@@ -13,7 +13,6 @@
 #include "debugger.h"
 #include "debug/debugcpu.h"
 #include "debug/debugcmd.h"
-#include "debug/debugcmt.h"
 #include "debug/debugcon.h"
 #include "debug/express.h"
 #include "debug/debugvw.h"
@@ -113,9 +112,6 @@ void debugger_refresh_display(running_machine *machine)
 static void debugger_exit(running_machine &machine)
 {
 	machine_entry **entryptr;
-
-	// save any comments
-	debug_comment_save(&machine);
 
 	/* remove this machine from the list; it came down cleanly */
 	for (entryptr = &machine_list; *entryptr != NULL; entryptr = &(*entryptr)->next)

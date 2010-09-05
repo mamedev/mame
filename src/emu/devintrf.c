@@ -200,6 +200,11 @@ void device_list::static_reset(running_machine &machine)
 
 void device_list::static_exit(running_machine &machine)
 {
+	// first let the debugger save comments
+	if ((machine.debug_flags & DEBUG_FLAG_ENABLED) != 0)
+		debug_comment_save(&machine);
+	
+	// then nuke the devices
 	machine.m_devicelist.reset();
 }
 

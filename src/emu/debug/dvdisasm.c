@@ -40,7 +40,6 @@
 #include "emu.h"
 #include "debugvw.h"
 #include "dvdisasm.h"
-#include "debugcmt.h"
 #include "debugcpu.h"
 
 
@@ -98,7 +97,7 @@ debug_view_disasm::debug_view_disasm(running_machine &machine, debug_view_osd_up
 	for (const debug_view_source *source = m_source_list.head(); source != NULL; source = source->next())
 	{
 		const debug_view_disasm_source &dasmsource = downcast<const debug_view_disasm_source &>(*source);
-		total_comments += debug_comment_get_count(&dasmsource.m_device);
+		total_comments += dasmsource.m_device.debug()->comment_count();
 	}
 
 	// initialize
@@ -438,7 +437,7 @@ bool debug_view_disasm::recompute(offs_t pc, int startline, int lines)
 		{
 			// get and add the comment, if present
 			offs_t comment_address = source.m_space->byte_to_address(m_byteaddress[instr]);
-			const char *text = debug_comment_get_text(&source.m_device, comment_address, debug_comment_get_opcode_crc32(&source.m_device, comment_address));
+			const char *text = source.m_device.debug()->comment_text(comment_address);
 			if (text != NULL)
 				sprintf(&destbuf[m_divider2], "// %.*s", m_allocated.x - m_divider2 - 1, text);
 		}
@@ -451,7 +450,7 @@ bool debug_view_disasm::recompute(offs_t pc, int startline, int lines)
 	// update opcode base information
 	m_last_direct_decrypted = source.m_space->direct().decrypted();
 	m_last_direct_raw = source.m_space->direct().raw();
-	m_last_change_count = debug_comment_all_change_count(&m_machine);
+	m_last_change_count = source.m_device.debug()->comment_change_count();
 
 	// now longer need to recompute
 	m_recompute = false;
@@ -502,7 +501,7 @@ void debug_view_disasm::view_update()
 		m_recompute = true;
 
 	// if the comments have changed, redo it
-	if (m_last_change_count != debug_comment_all_change_count(&m_machine))
+	if (m_last_change_count != source.m_device.debug()->comment_change_count())
 		m_recompute = true;
 
 	// if we need to recompute, do it
@@ -511,7 +510,7 @@ recompute:
 	if (m_recompute)
 	{
 		// recompute the view
-		if (m_byteaddress != NULL && m_last_change_count != debug_comment_all_change_count(&m_machine))
+		if (m_byteaddress != NULL && m_last_change_count != source.m_device.debug()->comment_change_count())
 		{
 			// smoosh us against the left column, but not the top row
 			m_topleft.x = 0;

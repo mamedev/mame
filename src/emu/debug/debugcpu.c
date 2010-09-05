@@ -38,17 +38,19 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "emuopts.h"
 #include "osdepend.h"
 #include "debugcpu.h"
 #include "debugcmd.h"
-#include "debugcmt.h"
 #include "debugcon.h"
 #include "express.h"
 #include "debugvw.h"
 #include "debugger.h"
 #include "debugint/debugint.h"
 #include "uiinput.h"
+#include "xmlfile.h"
 #include <ctype.h>
+#include <zlib.h>
 
 
 
@@ -307,6 +309,146 @@ void debug_cpu_source_script(running_machine *machine, const char *file)
 				fatalerror("Cannot open command file '%s'", file);
 		}
 	}
+}
+
+
+
+//**************************************************************************
+//  MEMORY AND DISASSEMBLY HELPERS
+//**************************************************************************
+
+//-------------------------------------------------
+//  debug_comment_save - save all comments for
+//  the given machine
+//-------------------------------------------------
+
+bool debug_comment_save(running_machine *machine)
+{
+	// if we don't have a root, bail
+	xml_data_node *root = xml_file_create();
+	if (root == NULL)
+		return false;
+
+	// wrap in a try/catch to handle errors
+	try
+	{
+		// create a comment node
+		xml_data_node *commentnode = xml_add_child(root, "mamecommentfile", NULL);
+		if (commentnode == NULL)
+			throw emu_exception();
+		xml_set_attribute_int(commentnode, "version", COMMENT_VERSION);
+
+		// create a system node
+		xml_data_node *systemnode = xml_add_child(commentnode, "system", NULL);
+		if (systemnode == NULL)
+			throw emu_exception();
+		xml_set_attribute(systemnode, "name", machine->gamedrv->name);
+
+		// for each device
+		bool found_comments = false;
+		for (device_t *device = machine->m_devicelist.first(); device != NULL; device = device->next())
+			if (device->debug()->comment_count() > 0)
+			{
+				// create a node for this device
+				xml_data_node *curnode = xml_add_child(systemnode, "cpu", NULL);
+				if (curnode == NULL)
+					throw emu_exception();
+				xml_set_attribute(curnode, "tag", device->tag());
+				
+				// export the comments
+				if (!device->debug()->comment_export(*curnode))
+					throw emu_exception();
+				found_comments = true;
+			}
+
+		// flush the file
+		if (found_comments)
+		{
+			astring fname(machine->basename(), ".cmt");
+			mame_file *fp;
+			file_error filerr = mame_fopen(SEARCHPATH_COMMENT, fname, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &fp);
+
+			if (filerr == FILERR_NONE)
+			{
+				xml_file_write(root, mame_core_file(fp));
+				mame_fclose(fp);
+			}
+		}
+	}
+	catch (emu_exception &)
+	{
+		xml_file_free(root);
+		return false;
+	}
+
+	// free and get out of here
+	xml_file_free(root);
+	return true;
+}
+
+
+//-------------------------------------------------
+//  debug_comment_load - load all comments for
+//  the given machine
+//-------------------------------------------------
+
+bool debug_comment_load(running_machine *machine)
+{
+	// open the file
+	astring fname(machine->basename(), ".cmt");
+	mame_file *fp;
+	file_error filerr = mame_fopen(SEARCHPATH_COMMENT, fname, OPEN_FLAG_READ, &fp);
+
+	// if an error, just return false
+	if (filerr != FILERR_NONE)
+		return false;
+
+	// wrap in a try/catch to handle errors
+	xml_data_node *root = xml_file_read(mame_core_file(fp), NULL);
+	try
+	{
+		// read the file
+		if (root == NULL)
+			throw emu_exception();
+
+		// find the config node
+		xml_data_node *commentnode = xml_get_sibling(root->child, "mamecommentfile");
+		if (commentnode == NULL)
+			throw emu_exception();
+
+		// validate the config data version
+		int version = xml_get_attribute_int(commentnode, "version", 0);
+		if (version != COMMENT_VERSION)
+			throw emu_exception();
+
+		// check to make sure the file is applicable
+		xml_data_node *systemnode = xml_get_sibling(commentnode->child, "system");
+		const char *name = xml_get_attribute_string(systemnode, "name", "");
+		if (strcmp(name, machine->gamedrv->name) != 0)
+			throw emu_exception();
+
+		// iterate over devices
+		for (xml_data_node *cpunode = xml_get_sibling(systemnode->child, "cpu"); cpunode; cpunode = xml_get_sibling(cpunode->next, "cpu"))
+		{
+			device_t *device = machine->device(xml_get_attribute_string(cpunode, "tag", ""));
+			if (device != NULL)
+				if (!device->debug()->comment_import(*cpunode))
+					throw emu_exception();
+		}
+	}
+	catch (emu_exception &)
+	{
+		// clean up in case of error
+		if (root != NULL)
+			xml_file_free(root);
+		mame_fclose(fp);
+		return false;
+	}
+
+	// free the parser
+	xml_file_free(root);
+	mame_fclose(fp);
+	return true;
 }
 
 
@@ -1583,8 +1725,7 @@ device_debug::device_debug(device_t &device)
 	  m_trace(NULL),
 	  m_hotspots(NULL),
 	  m_hotspot_count(0),
-	  m_hotspot_threshhold(0),
-	  m_comments(NULL)
+	  m_hotspot_threshhold(0)
 {
 	memset(m_pc_history, 0, sizeof(m_pc_history));
 	memset(m_wplist, 0, sizeof(m_wplist));
@@ -1629,10 +1770,6 @@ device_debug::device_debug(device_t &device)
 		if (m_state != NULL && symtable_find(m_symtable, "curpc") == NULL)
 			symtable_add_register(m_symtable, "curpc", NULL, get_current_pc, 0);
 	}
-	
-	// initialize coments
-	if (m_disasm != NULL)
-		debug_comment_init(device, *this);
 }
 
 
@@ -1958,7 +2095,7 @@ void device_debug::set_instruction_hook(debug_instruction_hook_func hook)
 //  PC on a given device
 //-------------------------------------------------
 
-offs_t device_debug::disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
+offs_t device_debug::disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram) const
 {
 	offs_t result = 0;
 
@@ -2420,6 +2557,212 @@ offs_t device_debug::history_pc(int index) const
 	if (index <= -HISTORY_SIZE)
 		index = -HISTORY_SIZE + 1;
 	return m_pc_history[(m_pc_history_index + ARRAY_LENGTH(m_pc_history) - 1 + index) % ARRAY_LENGTH(m_pc_history)];
+}
+
+
+//-------------------------------------------------
+//  comment_add - adds a comment to the list at 
+//  the given address
+//-------------------------------------------------
+
+void device_debug::comment_add(offs_t addr, const char *comment, rgb_t color)
+{
+	// create a new item for the list
+	UINT32 crc = compute_opcode_crc32(addr);
+	dasm_comment *newcomment = auto_alloc(m_device.machine, dasm_comment(comment, addr, color, crc));
+	
+	// figure out where to insert it
+	dasm_comment *prev = NULL;
+	dasm_comment *curr;
+	for (curr = m_comment_list.first(); curr != NULL; prev = curr, curr = curr->next())
+		if (curr->m_address >= addr)
+			break;
+
+	// we could be the new head
+	if (prev == NULL)
+		m_comment_list.prepend(*newcomment);
+	
+	// or else we just insert ourselves here 
+	else
+	{
+		newcomment->m_next = prev->m_next;
+		prev->m_next = newcomment;
+	}
+	
+	// scan forward from here to delete any exact matches
+	for ( ; curr != NULL && curr->m_address == addr; curr = curr->next())
+		if (curr->m_crc == crc)
+		{
+			m_comment_list.remove(*curr);
+			break;
+		}
+
+	// force an update
+	m_comment_change++;
+}
+
+
+//-------------------------------------------------
+//  comment_remove - removes a comment at the 
+//  given address with a matching CRC
+//-------------------------------------------------
+
+bool device_debug::comment_remove(offs_t addr)
+{
+	// scan the list for a match
+	UINT32 crc = compute_opcode_crc32(addr);
+	for (dasm_comment *curr = m_comment_list.first(); curr != NULL; curr = curr->next())
+	{
+		// if we're past the address, we failed
+		if (curr->m_address > addr)
+			break;
+		
+		// find an exact match
+		if (curr->m_address == addr && curr->m_crc == crc)
+		{
+			// remove it and force an update
+			m_comment_list.remove(*curr);
+			m_comment_change++;
+			return true;
+		}
+	}
+	
+	// failure is an option
+	return false;
+}
+
+
+//-------------------------------------------------
+//  comment_text - return the text of a comment
+//-------------------------------------------------
+
+const char *device_debug::comment_text(offs_t addr) const
+{
+	// scan the list for a match
+	UINT32 crc = compute_opcode_crc32(addr);
+	for (dasm_comment *curr = m_comment_list.first(); curr != NULL; curr = curr->next())
+	{
+		// if we're past the address, we failed
+		if (curr->m_address > addr)
+			break;
+		
+		// find an exact match
+		if (curr->m_address == addr && curr->m_crc == crc)
+			return curr->m_text;
+	}
+	
+	// failure is an option
+	return NULL;
+}
+
+
+//-------------------------------------------------
+//  comment_export - export the comments to the
+//  given XML data node
+//-------------------------------------------------
+
+bool device_debug::comment_export(xml_data_node &curnode)
+{
+	// iterate through the comments
+	astring crc_buf;
+	for (dasm_comment *curr = m_comment_list.first(); curr != NULL; curr = curr->next())
+	{
+		xml_data_node *datanode = xml_add_child(&curnode, "comment", xml_normalize_string(curr->m_text));
+		if (datanode == NULL)
+			return false;
+		xml_set_attribute_int(datanode, "address", curr->m_address);
+		xml_set_attribute_int(datanode, "color", curr->m_color);
+		crc_buf.printf("%08X", curr->m_crc);
+		xml_set_attribute(datanode, "crc", crc_buf);
+	}
+	return true;
+}
+
+
+//-------------------------------------------------
+//  comment_import - import the comments from the
+//  given XML data node
+//-------------------------------------------------
+
+bool device_debug::comment_import(xml_data_node &cpunode)
+{
+	// iterate through nodes
+	for (xml_data_node *datanode = xml_get_sibling(cpunode.child, "comment"); datanode; datanode = xml_get_sibling(datanode->next, "comment"))
+	{
+		// extract attributes
+		offs_t address = xml_get_attribute_int(datanode, "address", 0);
+		rgb_t color = xml_get_attribute_int(datanode, "color", 0);
+		UINT32 crc;
+		sscanf(xml_get_attribute_string(datanode, "crc", 0), "%08X", &crc);
+		
+		// add the new comment; we assume they were saved ordered
+		m_comment_list.append(*auto_alloc(m_device.machine, dasm_comment(datanode->value, address, color, crc)));
+	}
+	return true;
+}
+
+
+//-------------------------------------------------
+//  comment_dump - logs comments to the error.log
+//  at a given address
+//-------------------------------------------------
+
+void device_debug::comment_dump(offs_t addr)
+{
+	// determine the CRC at the given address (if valid)
+	UINT32 crc = (addr == ~0) ? 0 : compute_opcode_crc32(addr);
+
+	// dump everything that matches
+	bool found = false;
+	for (dasm_comment *curr = m_comment_list.first(); curr != NULL; curr = curr->next())
+		if (addr == ~0 || (curr->m_address == addr && curr->m_crc == crc))
+		{
+			found = true;
+			logerror("%08X %08X - %s\n", curr->m_address, curr->m_crc, curr->m_text.cstr());
+		}
+
+	// if nothing found, indicate as much
+	if (!found)
+		logerror("No comment exists for address : 0x%x\n", addr);
+}
+
+
+//-------------------------------------------------
+//  compute_opcode_crc32 - determine the CRC of
+//  the opcode bytes at the given address
+//-------------------------------------------------
+
+UINT32 device_debug::compute_opcode_crc32(offs_t address) const
+{
+	// no memory interface, just fail
+	if (m_memory == NULL)
+		return 0;
+
+	// no program interface, just fail
+	address_space *space = m_memory->space(AS_PROGRAM);
+	if (space == NULL)
+		return 0;
+		
+	// zero out the buffers
+	UINT8 opbuf[64], argbuf[64];
+	memset(opbuf, 0x00, sizeof(opbuf));
+	memset(argbuf, 0x00, sizeof(argbuf));
+
+	// fetch the bytes up to the maximum
+	int maxbytes = m_disasm->max_opcode_bytes();
+	for (int index = 0; index < maxbytes; index++)
+	{
+		opbuf[index] = debug_read_opcode(space, address + index, 1, false);
+		argbuf[index] = debug_read_opcode(space, address + index, 1, true);
+	}
+
+	// disassemble and then convert to bytes
+	char buff[256];
+	int numbytes = disassemble(buff, address & space->logaddrmask(), opbuf, argbuf) & DASMFLAG_LENGTHMASK;
+	numbytes = space->address_to_byte(numbytes);
+
+	// return a CRC of the resulting bytes
+	return crc32(0, argbuf, numbytes);
 }
 
 
@@ -3076,3 +3419,16 @@ void device_debug::tracer::flush()
 	fflush(&m_file);
 }
 
+
+//-------------------------------------------------
+//  dasm_comment - constructor
+//-------------------------------------------------
+
+device_debug::dasm_comment::dasm_comment(const char *text, offs_t address, rgb_t color, UINT32 crc)
+	: m_next(NULL),
+	  m_address(address),
+	  m_color(color),
+	  m_crc(crc),
+	  m_text(text)
+{
+}
