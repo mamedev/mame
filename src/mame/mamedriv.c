@@ -10427,4 +10427,7 @@ Other Sun games
 	/* Interactive Light */
 	DRIVER( savquest )
 
+	/* Jubilee */
+	DRIVER( jubileep )
+
 #endif	/* DRIVER_RECURSIVE */

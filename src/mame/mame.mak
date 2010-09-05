@@ -1560,6 +1560,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/jackpool.o \
 	$(DRIVERS)/jokrwild.o \
 	$(DRIVERS)/jongkyo.o \
+	$(DRIVERS)/jubilee.o \
 	$(DRIVERS)/kingpin.o \
 	$(DRIVERS)/koikoi.o \
 	$(DRIVERS)/kyugo.o $(VIDEO)/kyugo.o \
