@@ -10113,122 +10113,207 @@ Other Sun games
 	DRIVER( cmkenosp )	/* (c) 2000 Coinmaster-Gaming, Ltd. */
 	DRIVER( cmkenospa )	/* (c) 2000 Coinmaster-Gaming, Ltd. */
 
-	/* Igrosoft */
+	/* Igrosoft Original sets */
 	/* Multifish */
-	//DRIVER( mfish )   /* (c) 2002 */
-	//DRIVER( mfish_2 ) /* (c) 2002 */
-	DRIVER( mfish_3 )	/* (c) 2002 */
-	DRIVER( mfish_3a )	/* (c) 2002 */
-	//DRIVER( mfish_4 ) /* (c) 2002 */
-	//DRIVER( mfish_5 ) /* (c) 2002 */
-	DRIVER( mfish_6 ) /* (c) 2002 */
-	//DRIVER( mfish_7 ) /* (c) 2002 */
-	//DRIVER( mfish_8 ) /* (c) 2002 */
-	//DRIVER( mfish_9 ) /* (c) 2002 */
+	//DRIVER( mfish )	/* (c) 2002 */
+	//DRIVER( mfish_2 )	/* (c) 2002 */
+	//DRIVER( mfish_4 )	/* (c) 2002 */
+	//DRIVER( mfish_5 )	/* (c) 2002 */
+	//DRIVER( mfish_7 )	/* (c) 2002 */
+	//DRIVER( mfish_8 )	/* (c) 2002 */
+	//DRIVER( mfish_9 )	/* (c) 2002 */
 	//DRIVER( mfish_10 )    /* (c) 2002 */
+	//DRIVER( mfish_13 )    /* (c) 2002 */
+	DRIVER( mfish_3 )	/* (c) 2002 */
+	DRIVER( mfish_6 )	/* (c) 2002 */
 	DRIVER( mfish_11 )	/* (c) 2002 */
 	DRIVER( mfish_12 )	/* (c) 2002 */
-	DRIVER( mfish_12a )	/* (c) 2002 */
-	//DRIVER( mfish_13 )    /* (c) 2002 */
+	DRIVER( mfish_13 )	/* (c) 2002 */
 
 	/* Crazy Monkey */
-	//DRIVER( crzmon )  /* (c) 2003 */
-	//DRIVER( crzmon_2 )    /* (c) 2003 */
-	//DRIVER( crzmon_3 )    /* (c) 2003 */
-	//DRIVER( crzmon_4 )    /* (c) 2003 */
-	//DRIVER( crzmon_5 )    /* (c) 2003 */
-	//DRIVER( crzmon_6 )
+	//DRIVER( crzmon )	/* (c) 2003 */
+	//DRIVER( crzmon_2 )	/* (c) 2003 */
+	//DRIVER( crzmon_3 )	/* (c) 2003 */
+	//DRIVER( crzmon_4 )	/* (c) 2003 */
+	//DRIVER( crzmon_5 )	/* (c) 2003 */
+	//DRIVER( crzmon_6 )	/* (c) 2003 */
+	DRIVER( crzmon_5 )	/* (c) 2003 */
 	DRIVER( crzmon_7 )	/* (c) 2003 */
-	DRIVER( crzmon_7a )	/* (c) 2003 */
-	DRIVER( crzmon_7b )	/* (c) 2003 */
 	DRIVER( crzmon_8 )	/* (c) 2003 */
-	DRIVER( crzmon_8a )	/* (c) 2003 */
+	DRIVER( crzmon_9 )	/* (c) 2003 */
 
 	/* Fruit Cocktail */
-	//DRIVER( fcockt )  /* (c) 2003 */
-	//DRIVER( fcockt_2 )    /* (c) 2003 */
-	//DRIVER( fcockt_3 )    /* (c) 2003 */
-	//DRIVER( fcockt_4 )    /* (c) 2003 */
-	//DRIVER( fcockt_5 )    /* (c) 2003 */
+	//DRIVER( fcockt )	/* (c) 2003 */
+	//DRIVER( fcockt_2 )	/* (c) 2003 */
+	//DRIVER( fcockt_3 )	/* (c) 2003 */
+	//DRIVER( fcockt_4 )	/* (c) 2003 */
+	DRIVER( fcockt_5 )	/* (c) 2003 */
 	DRIVER( fcockt_6 )	/* (c) 2003 */
-	DRIVER( fcockt_6a )	/* (c) 2003 */
-	DRIVER( fcockt_6b )	/* (c) 2003 */
 	DRIVER( fcockt_7 )	/* (c) 2003 */
-	DRIVER( fcockt_7a )	/* (c) 2003 */
 	DRIVER( fcockt_8 )	/* (c) 2003 */
+	DRIVER( fcockt_9 )	/* (c) 2003 */
+	DRIVER( fcockt_10 )	/* (c) 2003 */
+	DRIVER( fcockt_11 )	/* (c) 2003 */
+	DRIVER( fcockt_12 )	/* (c) 2003 */
 
 	/* Lucky Haunter */
-	//DRIVER( lhaunt )  /* (c) 2003 */
-	//DRIVER( lhaunt_2 )    /* (c) 2003 */
-	//DRIVER( lhaunt_3 )    /* (c) 2003 */
+	//DRIVER( lhaunt )	/* (c) 2003 */
+	//DRIVER( lhaunt_2 )	/* (c) 2003 */
+	//DRIVER( lhaunt_3 )	/* (c) 2003 */
 	DRIVER( lhaunt_4 )	/* (c) 2003 */
-	DRIVER( lhaunt_4a )	/* (c) 2003 */
 	DRIVER( lhaunt_5 )	/* (c) 2003 */
-	DRIVER( lhaunt_5a )	/* (c) 2003 */
 	DRIVER( lhaunt_6 )	/* (c) 2003 */
-	DRIVER( lhaunt_6a )	/* (c) 2003 */
+	DRIVER( lhaunt_7 )	/* (c) 2003 */
+	DRIVER( lhaunt_8 )	/* (c) 2003 */
 
 	/* Rollfruit */
-	//DRIVER( rollfr )  /* (c) 2003 */
+	//DRIVER( rollfr )	/* (c) 2003 */
 	DRIVER( rollfr_2 )	/* (c) 2003 */
 
 	/* Garage */
-	//DRIVER( garage )  /* (c) 2004 */
-	//DRIVER( garage_2 )    /* (c) 2004 */
-	//DRIVER( garage_3 )    /* (c) 2004 */
+	//DRIVER( garage )	/* (c) 2004 */
+	//DRIVER( garage_2 )	/* (c) 2004 */
+	//DRIVER( garage_3 )	/* (c) 2004 */
 	DRIVER( garage_4 )	/* (c) 2004 */
-	DRIVER( garage_4a )	/* (c) 2004 */
-	DRIVER( garage_4b )	/* (c) 2004 */
 	DRIVER( garage_5 )	/* (c) 2004 */
-	DRIVER( garage_5a )	/* (c) 2004 */
+	DRIVER( garage_6 )	/* (c) 2004 */
+	DRIVER( garage_7 )	/* (c) 2004 */
 
 	/* Rock Climber */
-	//DRIVER( rclimb )  /* (c) 2004 */
-	//DRIVER( rclimb_2 )    /* (c) 2004 */
+	//DRIVER( rclimb_2 )	/* (c) 2004 */
+	DRIVER( rclimb )	/* (c) 2004 */
 	DRIVER( rclimb_3 )	/* (c) 2004 */
-	DRIVER( rclimb_3a )	/* (c) 2004 */
-	DRIVER( rclimb_3b )	/* (c) 2004 */
+	DRIVER( rclimb_4 )	/* (c) 2004 */
+	DRIVER( rclimb_5 )	/* (c) 2004 */
 
 	/* Sweet Life */
 	DRIVER( sweetl )	/* (c) 2004 */
-	DRIVER( sweetla )	/* (c) 2004 */
-	DRIVER( sweetlb )	/* (c) 2004 */
+	DRIVER( sweetl_2 )	/* (c) 2004 */
 
 	/* Resident */
-	//DRIVER( resdnt )  /* (c) 2004 */
+	//DRIVER( resdnt )	/* (c) 2004 */
 	DRIVER( resdnt_2 )	/* (c) 2004 */
-	DRIVER( resdnt_2a )	/* (c) 2004 */
+	DRIVER( resdnt_3 )	/* (c) 2004 */
 
 	/* Island */
 	DRIVER( island )	/* (c) 2005 */
-	DRIVER( islanda )	/* (c) 2005 */
 
 	/* Pirate */
-	//DRIVER( pirate )  /* (c) 2005 */
+	//DRIVER( pirate )	/* (c) 2005 */
 	DRIVER( pirate_2 )	/* (c) 2005 */
-	DRIVER( pirate_3 )	/* (c) 2005 */
-
-	/* Pirate 2 */
-	DRIVER( pirate2 )	/* (c) 2006 */
-	DRIVER( pirate2a )	/* (c) 2006 */
-	DRIVER( pirate2b )	/* (c) 2006 */
-	DRIVER( pirate2c )	/* (c) 2006 */
-	DRIVER( pirate2d )	/* (c) 2006 */
-	DRIVER( pirate2e )	/* (c) 2006 */
+ 	DRIVER( pirate_3 )	/* (c) 2005 */
+	DRIVER( pirate_4 )	/* (c) 2005 */
 
 	/* Island 2 */
 	DRIVER( island2 )	/* (c) 2006 */
-	DRIVER( island2a )	/* (c) 2006 */
+	DRIVER( island2_3 )	/* (c) 2006 */
+	DRIVER( island2_4 )	/* (c) 2006 */
+
+	/* Pirate 2 */
+	DRIVER( pirate2 )	/* (c) 2006 */
+	DRIVER( pirate2_2 )	/* (c) 2006 */
 
 	/* Keks */
 	DRIVER( keks )		/* (c) 2006 */
-	DRIVER( keksa )		/* (c) 2006 */
-	DRIVER( keksb )		/* (c) 2006 */
-	DRIVER( keksc )		/* (c) 2006 */
 	DRIVER( keks_2 )	/* (c) 2006 */
-	DRIVER( keks_2a )	/* (c) 2006 */
-	DRIVER( keks_2b )	/* (c) 2006 */
+	DRIVER( keks_3 )	/* (c) 2006 */
 
+	/* Gnome */
+	DRIVER( gnome )		/* (c) 2007 */
+
+	/* Igrosoft bootleg sets */
+
+	DRIVER( mfish_3a )	/* bootleg - Multifish */
+	DRIVER( mfish_12a )	/* bootleg */
+	DRIVER( crzmon_7a )	/* bootleg - Crazy Monkey */
+	DRIVER( crzmon_7b )	/* bootleg */
+	DRIVER( crzmon_8a )	/* bootleg */
+	DRIVER( crzmon_8b )	/* bootleg */
+	DRIVER( crzmon_8c )	/* bootleg */
+	DRIVER( crzmon_8d )	/* bootleg */
+	DRIVER( crzmon_8e )	/* bootleg */
+	DRIVER( crzmon_8f )	/* bootleg */
+	DRIVER( crzmon_9a )	/* bootleg */
+	DRIVER( crzmon_9b )	/* bootleg */
+	DRIVER( crzmon_9c )	/* bootleg */
+	DRIVER( fcockt_6a )	/* bootleg - Fruit Cocktail */
+	DRIVER( fcockt_6b )	/* bootleg */
+	DRIVER( fcockt_6c )	/* bootleg */
+	DRIVER( fcockt_6d )	/* bootleg */
+	DRIVER( fcockt_7a )	/* bootleg */
+	DRIVER( fcockt_7b )	/* bootleg */
+	DRIVER( fcockt_7c )	/* bootleg */
+	DRIVER( fcockt_7d )	/* bootleg */
+	DRIVER( fcockt_7e )	/* bootleg */
+	DRIVER( fcockt_7f )	/* bootleg */
+	DRIVER( fcockt_7g )	/* bootleg */
+	DRIVER( fcockt_7h )	/* bootleg */
+	DRIVER( fcockt_8a )	/* bootleg */
+	DRIVER( fcockt_8b )	/* bootleg */
+	DRIVER( lhaunt_4a )	/* bootleg - Lucky Haunter */
+	DRIVER( lhaunt_5a )	/* bootleg */
+	DRIVER( lhaunt_6a )	/* bootleg */
+	DRIVER( lhaunt_6b )	/* bootleg */
+	DRIVER( lhaunt_6c )	/* bootleg */
+	DRIVER( lhaunt_6d )	/* bootleg */
+	DRIVER( lhaunt_6e )	/* bootleg */
+	DRIVER( lhaunt_6f )	/* bootleg */
+	DRIVER( garage_4a )	/* bootleg - Garage */
+	DRIVER( garage_4b )	/* bootleg */
+	DRIVER( garage_4c )	/* bootleg */
+	DRIVER( garage_5a )	/* bootleg */
+	DRIVER( garage_5b )	/* bootleg */
+	DRIVER( garage_5c )	/* bootleg */
+	DRIVER( garage_5d )	/* bootleg */
+	DRIVER( garage_5e )	/* bootleg */
+	DRIVER( rclimb_3a )	/* bootleg - Rock Climber */
+	DRIVER( rclimb_3b )	/* bootleg */
+	DRIVER( rclimb_3c )	/* bootleg */
+	DRIVER( rclimb_3d )	/* bootleg */
+	DRIVER( rclimb_3e )	/* bootleg */
+	DRIVER( sweetla )	/* bootleg - Sweet Life */
+	DRIVER( sweetlb )	/* bootleg */
+	DRIVER( resdnt_2a )	/* bootleg - Resident */
+	DRIVER( resdnt_2b )	/* bootleg */
+	DRIVER( resdnt_2c )	/* bootleg */
+	DRIVER( resdnt_2d )	/* bootleg */
+	DRIVER( resdnt_2e )	/* bootleg */
+	DRIVER( resdnt_2f )	/* bootleg */
+	DRIVER( resdnt_2g )	/* bootleg */
+	DRIVER( islanda )	/* bootleg - Island */
+	DRIVER( islandb )	/* bootleg */
+ 	DRIVER( islandc )	/* bootleg */
+	DRIVER( island2a )	/* bootleg - Island 2 */
+	DRIVER( island2b )	/* bootleg */
+	DRIVER( island2c )	/* bootleg */
+	DRIVER( island2_3a )	/* bootleg */
+	DRIVER( island2_4a )	/* bootleg */
+	DRIVER( pirate2a )	/* bootleg - Pirate 2 */
+	DRIVER( pirate2b )	/* bootleg */
+	DRIVER( pirate2c )	/* bootleg */
+	DRIVER( pirate2d )	/* bootleg */
+	DRIVER( pirate2e )	/* bootleg */
+	DRIVER( pirate2f )	/* bootleg */
+	DRIVER( pirate2g )	/* bootleg */
+	DRIVER( pirate2h )	/* bootleg */
+	DRIVER( pirate2_2a )	/* bootleg */
+	DRIVER( keksa )		/* bootleg - Keks */
+	DRIVER( keksb )		/* bootleg */
+	DRIVER( keksc )		/* bootleg */
+	DRIVER( keks_2a )	/* bootleg */
+	DRIVER( keks_2b )	/* bootleg */
+	DRIVER( keks_2c )	/* bootleg */
+	DRIVER( keks_2d )	/* bootleg */
+ 	DRIVER( keks_2e )	/* bootleg */
+	DRIVER( keks_2f )	/* bootleg */
+	DRIVER( keks_2g )	/* bootleg */
+	DRIVER( keks_3a )	/* bootleg */
+	DRIVER( keks_3b )	/* bootleg */
+	DRIVER( gnomea )	/* bootleg - Gnome */
+	DRIVER( gnomeb )	/* bootleg */
+	DRIVER( gnomec )	/* bootleg */
+	DRIVER( gnomed )	/* bootleg */
+	DRIVER( gnomee )	/* bootleg */
 	/* Disney */
 	DRIVER( cdi )		/* Base unit */
 	DRIVER( quizard )	/* (c) Disney 1996 */
