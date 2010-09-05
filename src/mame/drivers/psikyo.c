@@ -330,30 +330,33 @@ static ADDRESS_MAP_START( psikyo_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xfe0000, 0xffffff) AM_RAM														// RAM
 ADDRESS_MAP_END
 
-static READ32_DEVICE_HANDLER( s1945bl_oki_r )
+static READ32_HANDLER( s1945bl_oki_r )
 {
-	UINT8 dat = okim6295_r(device, 0);
+	UINT8 dat = space->machine->device<okim6295_device>("oki")->read(*space, 0);
 	return dat << 24;
 }
 
-static WRITE32_DEVICE_HANDLER( s1945bl_oki_w )
+static WRITE32_HANDLER( s1945bl_oki_w )
 {
 	if (ACCESSING_BITS_24_31)
-		okim6295_w(device, 0, data >> 24);
+	{
+		okim6295_device *oki = space->machine->device<okim6295_device>("oki");
+		oki->write(*space, 0, data >> 24);
+	}
 
 	if (ACCESSING_BITS_16_23)
 	{
 		// not at all sure about this, it seems to write 0 too often
 		UINT8 bank = (data & 0x00ff0000) >> 16;
 		if (bank < 4)
-			memory_set_bank(device->machine, "okibank", bank);
+			memory_set_bank(space->machine, "okibank", bank);
 	}
 
 	if (ACCESSING_BITS_8_15)
-		printf("ACCESSING_BITS_8_15 ?? %08x %08x\n", data & 0x00ff0000, mem_mask);
+		printf("ACCESSING_BITS_8_15 ?? %08x %08x\n", data & 0x0000ff00, mem_mask);
 
 	if (ACCESSING_BITS_0_7)
-		printf("ACCESSING_BITS_0_7 ?? %08x %08x\n", data & 0x00ff0000, mem_mask);
+		printf("ACCESSING_BITS_0_7 ?? %08x %08x\n", data & 0x000000ff, mem_mask);
 }
 
 static ADDRESS_MAP_START( s1945bl_oki_map, 0, 8 )
@@ -374,7 +377,7 @@ static ADDRESS_MAP_START( psikyo_bootleg_map, ADDRESS_SPACE_PROGRAM, 32 )
 //  AM_RANGE(0xc00004, 0xc0000b) AM_WRITE(s1945_mcu_w)                                      // MCU on sh404, see DRIVER_INIT
 //  AM_RANGE(0xc00010, 0xc00013) AM_WRITE(psikyo_soundlatch_w)                              // Depends on board, see DRIVER_INIT
 
-	AM_RANGE(0xC00018, 0xC0001b) AM_DEVREADWRITE("oki", s1945bl_oki_r, s1945bl_oki_w)
+	AM_RANGE(0xC00018, 0xC0001b) AM_READWRITE(s1945bl_oki_r, s1945bl_oki_w)
 
 	AM_RANGE(0xfe0000, 0xffffff) AM_RAM														// RAM
 

@@ -61,6 +61,22 @@
     MACROS
 ***************************************************************************/
 
+// static template for a read8 stub function that calls through a given READ8_MEMBER
+template<class _Class, UINT8 (_Class::*_Function)(address_space &, offs_t, UINT8)>
+UINT8 devcb_stub(device_t *device, offs_t offset)
+{
+	_Class *target = downcast<_Class *>(device);
+	return (target->*_Function)(*device->machine->m_nonspecific_space, offset, 0xff);
+}
+
+// static template for a write8 stub function that calls through a given WRITE8_MEMBER
+template<class _Class, void (_Class::*_Function)(address_space &, offs_t, UINT8, UINT8)>
+void devcb_stub(device_t *device, offs_t offset, UINT8 data)
+{
+	_Class *target = downcast<_Class *>(device);
+	(target->*_Function)(*device->machine->m_nonspecific_space, offset, data, 0xff);
+}
+
 #define DEVCB_NULL							{ DEVCB_TYPE_NULL }
 
 /* standard line or read/write handlers with the calling device passed */
@@ -72,6 +88,7 @@
 /* line or read/write handlers for another device */
 #define DEVCB_DEVICE_LINE(tag,func)			{ DEVCB_TYPE_DEVICE, tag, (func), NULL, NULL }
 #define DEVCB_DEVICE_HANDLER(tag,func)		{ DEVCB_TYPE_DEVICE, tag, NULL, (func), NULL }
+#define DEVCB_DEVICE_MEMBER(tag,cls,memb)	{ DEVCB_TYPE_DEVICE, tag, NULL, &devcb_stub<cls, &cls::memb>, NULL }
 
 /* read/write handlers for a given CPU's address space */
 #define DEVCB_MEMORY_HANDLER(cpu,space,func) { DEVCB_TYPE_MEMORY(ADDRESS_SPACE_##space), (cpu), NULL, NULL, (func) }
@@ -102,17 +119,14 @@
 #define MDRV_DEVICE_CONFIG_READ_HANDLER(_struct, _entry, _tag, _func) MDRV_DEVICE_CONFIG_DEVCB_GENERIC(read, _struct, _entry, _tag, DEVCB_TYPE_DEVICE, NULL, _func, NULL)
 #define MDRV_DEVICE_CONFIG_WRITE_HANDLER(_struct, _entry, _tag, _func) MDRV_DEVICE_CONFIG_DEVCB_GENERIC(write, _struct, _entry, _tag, DEVCB_TYPE_DEVICE, NULL, _func, NULL)
 
+
+
 /***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
 
 /* forward declarations */
 class device_config;
-
-
-/* read/write types for I/O lines (similar to read/write handlers but no offset) */
-typedef int (*read_line_device_func)(device_t *device);
-typedef void (*write_line_device_func)(device_t *device, int state);
 
 
 /* static structure used for device configuration when the desired callback type is a read_line_device_func */

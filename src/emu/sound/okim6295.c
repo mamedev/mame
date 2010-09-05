@@ -287,15 +287,10 @@ void okim6295_device::set_pin7(int pin7)
 
 
 //-------------------------------------------------
-//  status_read - read the status register
+//  read_status - read the status register
 //-------------------------------------------------
 
-READ8_DEVICE_HANDLER( okim6295_r )
-{
-	return downcast<okim6295_device *>(device)->read(*device->machine->m_nonspecific_space, offset);
-}
-
-READ8_MEMBER( okim6295_device::read )
+UINT8 okim6295_device::read_status()
 {
 	UINT8 result = 0xf0;	// naname expects bits 4-7 to be 1
 
@@ -308,23 +303,28 @@ READ8_MEMBER( okim6295_device::read )
 	return result;
 }
 
-
+	
 //-------------------------------------------------
-//  data_write - write to the command/data register
+//  read - memory interface for read
 //-------------------------------------------------
 
-WRITE8_DEVICE_HANDLER( okim6295_w )
+READ8_MEMBER( okim6295_device::read )
 {
-	downcast<okim6295_device *>(device)->write(*device->machine->m_nonspecific_space, offset, data);
+	return read_status();
 }
 
-WRITE8_MEMBER( okim6295_device::write )
+
+//-------------------------------------------------
+//  write_command - write to the command register
+//-------------------------------------------------
+
+void okim6295_device::write_command(UINT8 command)
 {
 	// if a command is pending, process the second half
 	if (m_command != -1)
 	{
 		// the manual explicitly says that it's not possible to start multiple voices at the same time
-		int voicemask = data >> 4;
+		int voicemask = command >> 4;
 		if (voicemask != 0 && voicemask != 1 && voicemask != 2 && voicemask != 4 && voicemask != 8)
 			popmessage("OKI6295 start %x contact MAMEDEV", voicemask);
 
@@ -362,7 +362,7 @@ WRITE8_MEMBER( okim6295_device::write )
 
 						// also reset the ADPCM parameters
 						voice.m_adpcm.reset();
-						voice.m_volume = s_volume_table[data & 0x0f];
+						voice.m_volume = s_volume_table[command & 0x0f];
 					}
 					else
 						logerror("OKIM6295:'%s' requested to play sample %02x on non-stopped voice\n",tag(),m_command);
@@ -381,8 +381,8 @@ WRITE8_MEMBER( okim6295_device::write )
 	}
 
 	// if this is the start of a command, remember the sample number for next time
-	else if (data & 0x80)
-		m_command = data & 0x7f;
+	else if (command & 0x80)
+		m_command = command & 0x7f;
 
 	// otherwise, see if this is a silence command
 	else
@@ -391,11 +391,21 @@ WRITE8_MEMBER( okim6295_device::write )
 		stream_update(m_stream);
 
 		// determine which voice(s) (voice is set by a 1 bit in bits 3-6 of the command
-		int voicemask = data >> 3;
+		int voicemask = command >> 3;
 		for (int voicenum = 0; voicenum < OKIM6295_VOICES; voicenum++, voicemask >>= 1)
 			if (voicemask & 1)
 				m_voice[voicenum].m_playing = false;
 	}
+}
+
+
+//-------------------------------------------------
+//  write - memory interface for write
+//-------------------------------------------------
+
+WRITE8_MEMBER( okim6295_device::write )
+{
+	write_command(data);
 }
 
 

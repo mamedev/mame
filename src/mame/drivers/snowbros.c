@@ -124,8 +124,8 @@ static INTERRUPT_GEN( snowbros_interrupt )
 
 static INTERRUPT_GEN( snowbro3_interrupt )
 {
-	running_device *adpcm = device->machine->device("oki");
-	int status = okim6295_r(adpcm,0);
+	okim6295_device *adpcm = device->machine->device<okim6295_device>("oki");
+	int status = adpcm->read_status();
 
 	cpu_set_input_line(device, cpu_getiloops(device) + 2, ASSERT_LINE);	/* IRQs 4, 3, and 2 */
 
@@ -133,8 +133,8 @@ static INTERRUPT_GEN( snowbro3_interrupt )
 	{
 		if ((status&0x08)==0x00)
 		{
-			okim6295_w(adpcm,0,0x80|sb3_music);
-			okim6295_w(adpcm,0,0x00|0x82);
+			adpcm->write_command(0x80|sb3_music);
+			adpcm->write_command(0x00|0x82);
 		}
 
 	}
@@ -142,7 +142,7 @@ static INTERRUPT_GEN( snowbro3_interrupt )
 	{
 		if ((status&0x08)==0x08)
 		{
-			okim6295_w(adpcm,0,0x40);		/* Stop playing music */
+			adpcm->write_command(0x40);		/* Stop playing music */
 		}
 	}
 
@@ -426,24 +426,24 @@ static void sb3_play_music(running_machine *machine, int data)
 	}
 }
 
-static void sb3_play_sound (running_device *device, int data)
+static void sb3_play_sound (okim6295_device *oki, int data)
 {
-	int status = okim6295_r(device,0);
+	int status = oki->read_status();
 
 	if ((status&0x01)==0x00)
 	{
-		okim6295_w(device,0,0x80|data);
-		okim6295_w(device,0,0x00|0x12);
+		oki->write_command(0x80|data);
+		oki->write_command(0x00|0x12);
 	}
 	else if ((status&0x02)==0x00)
 	{
-		okim6295_w(device,0,0x80|data);
-		okim6295_w(device,0,0x00|0x22);
+		oki->write_command(0x80|data);
+		oki->write_command(0x00|0x22);
 	}
 	else if ((status&0x04)==0x00)
 	{
-		okim6295_w(device,0,0x80|data);
-		okim6295_w(device,0,0x00|0x42);
+		oki->write_command(0x80|data);
+		oki->write_command(0x00|0x42);
 	}
 
 
@@ -451,10 +451,11 @@ static void sb3_play_sound (running_device *device, int data)
 
 static WRITE16_DEVICE_HANDLER( sb3_sound_w )
 {
+	okim6295_device *oki = downcast<okim6295_device *>(device);
 	if (data == 0x00fe)
 	{
 		sb3_music_is_playing = 0;
-		okim6295_w(device,0,0x78);		/* Stop sounds */
+		oki->write_command(0x78);		/* Stop sounds */
 	}
 	else /* the alternating 0x00-0x2f or 0x30-0x5f might be something to do with the channels */
 	{
@@ -462,7 +463,7 @@ static WRITE16_DEVICE_HANDLER( sb3_sound_w )
 
 		if (data <= 0x21)
 		{
-			sb3_play_sound(device, data);
+			sb3_play_sound(oki, data);
 		}
 
 		if (data>=0x22 && data<=0x31)
@@ -472,7 +473,7 @@ static WRITE16_DEVICE_HANDLER( sb3_sound_w )
 
 		if ((data>=0x30) && (data<=0x51))
 		{
-			sb3_play_sound(device, data-0x30);
+			sb3_play_sound(oki, data-0x30);
 		}
 
 		if (data>=0x52 && data<=0x5f)

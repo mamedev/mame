@@ -102,6 +102,11 @@ class device_missing_dependencies : public emu_exception { };
 typedef device_config *(*device_type)(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
 
 
+// read/write types for I/O lines (similar to read/write handlers but no offset)
+typedef int (*read_line_device_func)(device_t *device);
+typedef void (*write_line_device_func)(device_t *device, int state);
+
+
 
 // ======================> tagged_device_list
 

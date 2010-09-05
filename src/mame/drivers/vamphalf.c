@@ -67,20 +67,6 @@ static UINT16 semicom_prot_data[2];
 static UINT16 finalgdr_backupram_bank;
 static UINT8 *finalgdr_backupram;
 
-static READ16_DEVICE_HANDLER( oki_r )
-{
-	if(offset)
-		return okim6295_r(device, 0);
-	else
-		return 0;
-}
-
-static WRITE16_DEVICE_HANDLER( oki_w )
-{
-	if(offset)
-		okim6295_w(device, 0, data);
-}
-
 static READ16_DEVICE_HANDLER( eeprom_r )
 {
 	if(offset)
@@ -244,7 +230,7 @@ static ADDRESS_MAP_START( common_32bit_map, ADDRESS_SPACE_PROGRAM, 32 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( vamphalf_io, ADDRESS_SPACE_IO, 16 )
-	AM_RANGE(0x0c0, 0x0c3) AM_DEVREADWRITE("oki", oki_r, oki_w)
+	AM_RANGE(0x0c2, 0x0c3) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x140, 0x143) AM_DEVWRITE8("ymsnd", ym2151_register_port_w, 0x00ff)
 	AM_RANGE(0x146, 0x147) AM_DEVREADWRITE8("ymsnd", ym2151_status_port_r, ym2151_data_port_w, 0x00ff)
 	AM_RANGE(0x1c0, 0x1c3) AM_DEVREAD("eeprom", eeprom_r)
@@ -267,7 +253,7 @@ static ADDRESS_MAP_START( coolmini_io, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x300, 0x303) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x304, 0x307) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x308, 0x30b) AM_DEVWRITE("eeprom", eeprom_w)
-	AM_RANGE(0x4c0, 0x4c3) AM_DEVREADWRITE("oki", oki_r, oki_w)
+	AM_RANGE(0x4c2, 0x4c3) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x540, 0x543) AM_DEVWRITE8("ymsnd", ym2151_register_port_w, 0x00ff)
 	AM_RANGE(0x546, 0x547) AM_DEVREADWRITE8("ymsnd", ym2151_status_port_r, ym2151_data_port_w, 0x00ff)
 	AM_RANGE(0x7c0, 0x7c3) AM_DEVREAD("eeprom", eeprom_r)
@@ -277,7 +263,7 @@ static ADDRESS_MAP_START( suplup_io, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x020, 0x023) AM_DEVWRITE("eeprom", eeprom_w)
 	AM_RANGE(0x040, 0x043) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x060, 0x063) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x080, 0x083) AM_DEVREADWRITE("oki", oki_r, oki_w)
+	AM_RANGE(0x082, 0x083) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x0c0, 0x0c3) AM_DEVWRITE8("ymsnd", ym2151_register_port_w, 0x00ff)
 	AM_RANGE(0x0c4, 0x0c7) AM_DEVREADWRITE8("ymsnd", ym2151_status_port_r, ym2151_data_port_w, 0x00ff)
 	AM_RANGE(0x100, 0x103) AM_DEVREAD("eeprom", eeprom_r)
@@ -335,7 +321,7 @@ static ADDRESS_MAP_START( jmpbreak_io, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x240, 0x243) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x280, 0x283) AM_DEVWRITE("eeprom", eeprom_w)
 	AM_RANGE(0x2c0, 0x2c3) AM_DEVREAD("eeprom", eeprom_r)
-	AM_RANGE(0x440, 0x443) AM_DEVREADWRITE("oki", oki_r, oki_w)
+	AM_RANGE(0x442, 0x443) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x540, 0x543) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x680, 0x683) AM_DEVWRITE8("ymsnd", ym2151_register_port_w, 0x00ff)
 	AM_RANGE(0x684, 0x687) AM_DEVREADWRITE8("ymsnd", ym2151_status_port_r, ym2151_data_port_w, 0x00ff)
@@ -346,7 +332,7 @@ static ADDRESS_MAP_START( mrdig_io, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0x500, 0x503) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x3c0, 0x3c3) AM_DEVWRITE("eeprom", eeprom_w)
 	AM_RANGE(0x180, 0x183) AM_DEVREAD("eeprom", eeprom_r)
-	AM_RANGE(0x080, 0x083) AM_DEVREADWRITE("oki", oki_r, oki_w)
+	AM_RANGE(0x082, 0x083) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x280, 0x283) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x0c0, 0x0c3) AM_DEVWRITE8("ymsnd", ym2151_register_port_w, 0x00ff)
 	AM_RANGE(0x0c4, 0x0c7) AM_DEVREADWRITE8("ymsnd", ym2151_status_port_r, ym2151_data_port_w, 0x00ff)

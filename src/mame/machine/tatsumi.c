@@ -360,7 +360,7 @@ READ8_DEVICE_HANDLER(tatsumi_hack_ym2151_r)
 READ8_DEVICE_HANDLER(tatsumi_hack_oki_r)
 {
 	address_space *space = cputag_get_address_space(device->machine, "audiocpu", ADDRESS_SPACE_PROGRAM);
-	int r=okim6295_r(device,0);
+	int r=downcast<okim6295_device *>(device)->read(*space,0);
 
 	if (cpu_get_pc(space->cpu)==0x2b70 || cpu_get_pc(space->cpu)==0x2bb5
 		|| cpu_get_pc(space->cpu)==0x2acc

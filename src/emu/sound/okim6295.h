@@ -120,6 +120,9 @@ public:
 	void set_bank_base(offs_t base);
 	void set_pin7(int pin7);
 
+	UINT8 read_status();
+	void write_command(UINT8 command);
+	
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 
@@ -168,15 +171,6 @@ protected:
 
 // device type definition
 extern const device_type OKIM6295;
-
-
-
-//**************************************************************************
-//  READ/WRITE HANDLERS
-//**************************************************************************
-
-READ8_DEVICE_HANDLER( okim6295_r );
-WRITE8_DEVICE_HANDLER( okim6295_w );
 
 
 #endif /* __OKIM6295_H__ */

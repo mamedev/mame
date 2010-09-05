@@ -463,7 +463,7 @@ static WRITE8_HANDLER( metro_portb_w )
 	{
 		/* write */
 		if (!BIT(data, 4))
-			okim6295_w(state->oki, 0, state->porta);
+			state->oki->write(*space, 0, state->porta);
 	}
 
 	state->portb = data;
@@ -513,14 +513,14 @@ static WRITE8_HANDLER( daitorid_portb_w )
 	{
 		/* write */
 		if (!BIT(data, 4))
-			okim6295_w(state->oki, 0, state->porta);
+			state->oki->write(*space, 0, state->porta);
 	}
 
 	if (BIT(state->portb, 3) && !BIT(data, 3))	/* clock 1->0 */
 	{
 		/* read */
 		if (!BIT(data, 4))
-			state->porta = okim6295_r(state->oki, 0);
+			state->porta = state->oki->read(*space, 0);
 	}
 
 	state->portb = data;

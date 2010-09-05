@@ -116,9 +116,9 @@ Hollywood Action
 //static int state->melody;
 //static int kickgoal_snd_bank;
 
-static void kickgoal_play(running_device *device, int melody, int data)
+static void kickgoal_play(okim6295_device *oki, int melody, int data)
 {
-	int status = okim6295_r(device,0);
+	int status = oki->read(0);
 
 	logerror("Playing sample %01x:%02x from command %02x\n",kickgoal_snd_bank,kickgoal_sound,data);
 	if (kickgoal_sound == 0) popmessage("Unknown sound command %02x",kickgoal_sound);
@@ -128,35 +128,36 @@ static void kickgoal_play(running_device *device, int melody, int data)
 			state->melody      = kickgoal_sound;
 			state->melody_loop = kickgoal_sound;
 			if (status & 0x08)
-				okim6295_w(device,0,0x40);
-			okim6295_w(device,0,(0x80 | state->melody));
-			okim6295_w(device,0,0x81);
+				oki->write(0,0x40);
+			oki->write(0,(0x80 | state->melody));
+			oki->write(0,0x81);
 		}
 	}
 	else {
 		if ((status & 0x01) == 0) {
-		okim6295_w(device,0,(0x80 | kickgoal_sound));
-			okim6295_w(device,0,0x11);
+		oki->write(0,(0x80 | kickgoal_sound));
+			oki->write(0,0x11);
 		}
 		else if ((status & 0x02) == 0) {
-		okim6295_w(device,0,(0x80 | kickgoal_sound));
-			okim6295_w(device,0,0x21);
+		oki->write(0,(0x80 | kickgoal_sound));
+			oki->write(0,0x21);
 		}
 		else if ((status & 0x04) == 0) {
-		okim6295_w(device,0,(0x80 | kickgoal_sound));
-			okim6295_w(device,0,0x41);
+		oki->write(0,(0x80 | kickgoal_sound));
+			oki->write(0,0x41);
 		}
 	}
 }
 
 WRITE16_DEVICE_HANDLER( kickgoal_snd_w )
 {
+	okim6295_device *oki = downcast<okim6295_device *>(device);
 	if (ACCESSING_BITS_0_7)
 	{
 		logerror("PC:%06x Writing %04x to Sound CPU\n",cpu_get_previouspc(space->cpu),data);
 		if (data >= 0x40) {
 			if (data == 0xfe) {
-				okim6295_w(device,0,0x40);	/* Stop playing the melody */
+				oki->write(0,0x40);	/* Stop playing the melody */
 				state->melody      = 0x00;
 				state->melody_loop = 0x00;
 			}
@@ -165,49 +166,37 @@ WRITE16_DEVICE_HANDLER( kickgoal_snd_w )
 			}
 		}
 		else if (data == 0) {
-			okim6295_w(device,0,0x38);		/* Stop playing effects */
+			oki->write(0,0x38);		/* Stop playing effects */
 		}
 		else {
 			kickgoal_sound = kickgoal_cmd_snd[data];
 
 			if (kickgoal_sound >= 0x70) {
 				if (kickgoal_snd_bank != 1)
-				{
-					okim6295_device *oki = downcast<okim6295_device *>(device);
 					oki->set_bank_base((1 * 0x40000));
-				}
 				kickgoal_snd_bank = 1;
-				kickgoal_play(device, 0, data);
+				kickgoal_play(oki, 0, data);
 			}
 			else if (kickgoal_sound >= 0x69) {
 				if (kickgoal_snd_bank != 2)
-				{
-					okim6295_device *oki = downcast<okim6295_device *>(device);
 					oki->set_bank_base((2 * 0x40000));
-				}
 				kickgoal_snd_bank = 2;
-				kickgoal_play(device, 4, data);
+				kickgoal_play(oki, 4, data);
 			}
 			else if (kickgoal_sound >= 0x65) {
 				if (kickgoal_snd_bank != 1)
-				{
-					okim6295_device *oki = downcast<okim6295_device *>(device);
 					oki->set_bank_base((1 * 0x40000));
-				}
 				kickgoal_snd_bank = 1;
-				kickgoal_play(device, 4, data);
+				kickgoal_play(oki, 4, data);
 			}
 			else if (kickgoal_sound >= 0x60) {
 				kickgoal_snd_bank = 0;
-				{
-					okim6295_device *oki = downcast<okim6295_device *>(device);
 					oki->set_bank_base(device, (0 * 0x40000));
-				}
 				kickgoal_snd_bank = 0;
-				kickgoal_play(device, 4, data);
+				kickgoal_play(oki, 4, data);
 			}
 			else {
-				kickgoal_play(device, 0, data);
+				kickgoal_play(oki, 0, data);
 			}
 		}
 	}
@@ -230,7 +219,7 @@ static WRITE16_DEVICE_HANDLER( actionhw_snd_w )
 		case 0xfe:	oki->set_bank_base((1 * 0x40000)); break;
 		case 0xff:	oki->set_bank_base((3 * 0x40000)); break;
 		case 0x78:
-				okim6295_w(device, 0, data);
+				oki->write_command(data);
 				state->snd_sam[0] = 00; state->snd_sam[1]= 00; state->snd_sam[2] = 00; state->snd_sam[3] = 00;
 				break;
 		default:
@@ -239,44 +228,44 @@ static WRITE16_DEVICE_HANDLER( actionhw_snd_w )
 					if ((data & 0x80) && (state->snd_sam[3] != state->snd_new))
 					{
 						logerror("About to play sample %02x at vol %02x\n", state->snd_new, data);
-						if ((okim6295_r(device, 0) & 0x08) != 0x08)
+						if ((oki->read_status() & 0x08) != 0x08)
 						{
 							logerror("Playing sample %02x at vol %02x\n", state->snd_new, data);
-							okim6295_w(device, 0, state->snd_new);
-							okim6295_w(device, 0, data);
+							oki->write_command(state->snd_new);
+							oki->write_command(data);
 						}
 						state->snd_new = 00;
 					}
 					if ((data & 0x40) && (state->snd_sam[2] != state->snd_new))
 					{
 						logerror("About to play sample %02x at vol %02x\n", state->snd_new, data);
-						if ((okim6295_r(device, 0) & 0x04) != 0x04)
+						if ((oki->read_status() & 0x04) != 0x04)
 						{
 							logerror("Playing sample %02x at vol %02x\n", state->snd_new, data);
-							okim6295_w(device, 0, state->snd_new);
-							okim6295_w(device, 0, data);
+							oki->write_command(state->snd_new);
+							oki->write_command(data);
 						}
 						state->snd_new = 00;
 					}
 					if ((data & 0x20) && (state->snd_sam[1] != state->snd_new))
 					{
 						logerror("About to play sample %02x at vol %02x\n", state->snd_new, data);
-						if ((okim6295_r(device, 0) & 0x02) != 0x02)
+						if ((oki->read_status() & 0x02) != 0x02)
 						{
 							logerror("Playing sample %02x at vol %02x\n", state->snd_new, data);
-							okim6295_w(device, 0, state->snd_new);
-							okim6295_w(device, 0, data);
+							oki->write_command(state->snd_new);
+							oki->write_command(data);
 						}
 						state->snd_new = 00;
 					}
 					if ((data & 0x10) && (state->snd_sam[0] != state->snd_new))
 					{
 						logerror("About to play sample %02x at vol %02x\n", state->snd_new, data);
-						if ((okim6295_r(device, 0) & 0x01) != 0x01)
+						if ((oki->read_status() & 0x01) != 0x01)
 						{
 							logerror("Playing sample %02x at vol %02x\n", state->snd_new, data);
-							okim6295_w(device, 0, state->snd_new);
-							okim6295_w(device, 0, data);
+							oki->write_command(state->snd_new);
+							oki->write_command(data);
 						}
 						state->snd_new = 00;
 					}
@@ -291,7 +280,7 @@ static WRITE16_DEVICE_HANDLER( actionhw_snd_w )
 				else /* Turn a channel off */
 				{
 					logerror("Turning channel %02x off\n", data);
-					okim6295_w(device, 0, data);
+					oki->write_command(data);
 					if (data & 0x40) state->snd_sam[3] = 00;
 					if (data & 0x20) state->snd_sam[2] = 00;
 					if (data & 0x10) state->snd_sam[1] = 00;
@@ -307,7 +296,7 @@ static INTERRUPT_GEN( kickgoal_interrupt )
 {
 	kickgoal_state *state = device->machine->driver_data<kickgoal_state>();
 
-	if ((okim6295_r(state->adpcm, 0) & 0x08) == 0)
+	if ((state->adpcm->read_status() & 0x08) == 0)
 	{
 		switch(state->melody_loop)
 		{
@@ -336,8 +325,8 @@ static INTERRUPT_GEN( kickgoal_interrupt )
 		if (state->melody_loop)
 		{
 //          logerror("Changing to sample %02x\n", state->melody_loop);
-			okim6295_w(state->adpcm, 0, ((0x80 | state->melody_loop) & 0xff));
-			okim6295_w(state->adpcm, 0, 0x81);
+			state->adpcm->write_command((0x80 | state->melody_loop) & 0xff);
+			state->adpcm->write_command(0x81);
 		}
 	}
 	if (input_code_pressed_once(device->machine, KEYCODE_PGUP))
@@ -424,9 +413,9 @@ static INTERRUPT_GEN( kickgoal_interrupt )
 	{
 		if (state->m6295_key_delay >= (0x80 * oki_time_base))
 		{
-			okim6295_w(state->adpcm, 0, 0x78);
-			okim6295_w(state->adpcm, 0, (0x80 | state->m6295_comm));
-			okim6295_w(state->adpcm, 0, 0x11);
+			state->adpcm->write_command(0x78);
+			state->adpcm->write_command(0x80 | state->m6295_comm);
+			state->adpcm->write_command(0x11);
 
 			popmessage("Playing sound %02x on Bank %02x", state->m6295_comm, state->m6295_bank);
 

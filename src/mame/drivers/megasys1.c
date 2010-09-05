@@ -382,7 +382,7 @@ static READ8_DEVICE_HANDLER( oki_status_r )
 	if (megasys1_ignore_oki_status == 1)
 		return 0;
 	else
-		return okim6295_r(device,offset);
+		return downcast<okim6295_device *>(device)->read_status();
 }
 
 /***************************************************************************
@@ -3843,8 +3843,9 @@ static DRIVER_INIT( iganinju )
 
 static WRITE16_DEVICE_HANDLER( okim6295_both_w )
 {
-	if (ACCESSING_BITS_0_7)	okim6295_w(device, 0, (data >> 0) & 0xff );
-	else				okim6295_w(device, 0, (data >> 8) & 0xff );
+	okim6295_device *oki = downcast<okim6295_device *>(device);
+	if (ACCESSING_BITS_0_7)	oki->write_command((data >> 0) & 0xff );
+	else				oki->write_command((data >> 8) & 0xff );
 }
 
 static DRIVER_INIT( jitsupro )

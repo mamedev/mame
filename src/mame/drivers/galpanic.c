@@ -262,8 +262,8 @@ static ADDRESS_MAP_START( comad_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x900000, 0x900001) AM_WRITE(galpanica_6295_bankswitch_w)	/* not sure */
 	AM_RANGE(0xc00000, 0xc0ffff) AM_RAM				/* missw96 */
 	AM_RANGE(0xc80000, 0xc8ffff) AM_RAM				/* fantasia, newfant */
-	AM_RANGE(0xf00000, 0xf00001) AM_DEVREADWRITE8("oki", comad_okim6295_r, okim6295_w, 0xff00)	/* fantasia, missw96 */
-	AM_RANGE(0xf80000, 0xf80001) AM_DEVREADWRITE8("oki", comad_okim6295_r, okim6295_w, 0xff00)	/* newfant */
+	AM_RANGE(0xf00000, 0xf00001) AM_DEVREAD8("oki", comad_okim6295_r, 0xff00) AM_DEVWRITE8_MODERN("oki", okim6295_device, write, 0xff00)	/* fantasia, missw96 */
+	AM_RANGE(0xf80000, 0xf80001) AM_DEVREAD8("oki", comad_okim6295_r, 0xff00) AM_DEVWRITE8_MODERN("oki", okim6295_device, write, 0xff00)	/* newfant */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( fantsia2_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -279,7 +279,7 @@ static ADDRESS_MAP_START( fantsia2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800008, 0x800009) AM_READ(kludge)	/* bits 8-a = timer? palette update code waits for them to be 111 */
 	AM_RANGE(0x900000, 0x900001) AM_WRITE(galpanica_6295_bankswitch_w)	/* not sure */
 	AM_RANGE(0xa00000, 0xa00001) AM_WRITENOP	/* coin counters, + ? */
-	AM_RANGE(0xc80000, 0xc80001) AM_DEVREADWRITE8("oki", comad_okim6295_r, okim6295_w, 0xff00)
+	AM_RANGE(0xc80000, 0xc80001) AM_DEVREAD8("oki", comad_okim6295_r, 0xff00) AM_DEVWRITE8_MODERN("oki", okim6295_device, write, 0xff00)
 	AM_RANGE(0xf80000, 0xf8ffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -326,7 +326,7 @@ static ADDRESS_MAP_START( zipzap_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x900000, 0x900001) AM_WRITE(galpanica_6295_bankswitch_w)
 
-	AM_RANGE(0xc00000, 0xc00001) AM_DEVREADWRITE8("oki", comad_okim6295_r, okim6295_w, 0xff00)
+	AM_RANGE(0xc00000, 0xc00001) AM_DEVREAD8("oki", comad_okim6295_r, 0xff00) AM_DEVWRITE8_MODERN("oki", okim6295_device, write, 0xff00)	/* fantasia, missw96 */
 
 	AM_RANGE(0xc80000, 0xc8ffff) AM_RAM		// main ram
 ADDRESS_MAP_END
@@ -351,7 +351,7 @@ static ADDRESS_MAP_START( supmodel_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xd80000, 0xd80001) AM_WRITENOP
 	AM_RANGE(0xe00012, 0xe00013) AM_WRITENOP
 	AM_RANGE(0xe80000, 0xe80001) AM_WRITENOP
-	AM_RANGE(0xf80000, 0xf80001) AM_DEVREADWRITE8("oki", comad_okim6295_r, okim6295_w, 0xff00)
+	AM_RANGE(0xf80000, 0xf80001) AM_DEVREAD8("oki", comad_okim6295_r, 0xff00) AM_DEVWRITE8_MODERN("oki", okim6295_device, write, 0xff00)	/* fantasia, missw96 */
 ADDRESS_MAP_END
 
 #define COMMON_COIN0\

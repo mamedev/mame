@@ -93,7 +93,7 @@ static READ16_HANDLER( ioc_r )
 
 		case 0x50:
 		case 0x51:
-			return okim6295_r(state->oki, 0) << 8;
+			return state->oki->read(*space, 0) << 8;
 
 	}
 
@@ -146,7 +146,7 @@ static WRITE16_HANDLER( ioc_w )
 		// OKIM6295
 		case 0x50:
 		case 0x51:
-			okim6295_w(state->oki, 0, data >> 8);
+			state->oki->write(*space, 0, data >> 8);
 			break;
 
 		// MSM6585 ADPCM - mini emulation

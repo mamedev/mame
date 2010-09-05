@@ -3643,18 +3643,18 @@ static DRIVER_INIT( bubsymph )
 }
 
 
-static READ32_DEVICE_HANDLER( bubsympb_oki_r )
+static READ32_HANDLER( bubsympb_oki_r )
 {
-	return okim6295_r(device,0);
+	return space->machine->device<okim6295_device>("oki")->read(*space,0);
 }
-static WRITE32_DEVICE_HANDLER( bubsympb_oki_w )
+static WRITE32_HANDLER( bubsympb_oki_w )
 {
 	//printf("write %08x %08x\n",data,mem_mask);
-	if (ACCESSING_BITS_0_7) okim6295_w(device,0,data&0xff);
-	//if (mem_mask==0x000000ff) okim6295_w(device,0,data&0xff);
+	if (ACCESSING_BITS_0_7) space->machine->device<okim6295_device>("oki")->write(*space, 0,data&0xff);
+	//if (mem_mask==0x000000ff) downcast<okim6295_device *>(device)->write(0,data&0xff);
 	if (ACCESSING_BITS_16_23)
 	{
-		UINT8 *snd = memory_region(device->machine, "oki");
+		UINT8 *snd = memory_region(space->machine, "oki");
 		int bank = (data & 0x000f0000) >> 16;
 		// almost certainly wrong
 		memcpy(snd+0x30000, snd+0x80000+0x30000+bank*0x10000, 0x10000);
@@ -3668,7 +3668,6 @@ static WRITE32_DEVICE_HANDLER( bubsympb_oki_w )
 
 static DRIVER_INIT( bubsympb )
 {
-	running_device *oki = machine->device("oki");
 	f3_game=BUBSYMPH;
 	//tile_decode(machine);
 
@@ -3691,8 +3690,8 @@ static DRIVER_INIT( bubsympb )
 		}
 	}
 
-	memory_install_read32_device_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), oki, 0x4a001c, 0x4a001f, 0, 0, bubsympb_oki_r );
-	memory_install_write32_device_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), oki, 0x4a001c, 0x4a001f, 0, 0, bubsympb_oki_w );
+	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4a001c, 0x4a001f, 0, 0, bubsympb_oki_r );
+	memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4a001c, 0x4a001f, 0, 0, bubsympb_oki_w );
 }
 
 

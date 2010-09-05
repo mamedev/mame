@@ -97,8 +97,8 @@ static struct
 
 	running_machine *machine;
 	running_device *ymdevice;
-	running_device *oki1device;
-	running_device *oki2device;
+	okim6295_device *oki1device;
+	okim6295_device *oki2device;
 
 	/* C001      */	UINT8 last_command;		// last command received
 	/* C016      */	UINT8 oki_playing;		// bitmap of active Oki channels
@@ -144,12 +144,12 @@ static void oki_play_sample(int sample_no)
 	UINT8 byte1 = read8(table_start + 2 * (sample_no & 0x7f) + 0);
 	UINT8 byte2 = read8(table_start + 2 * (sample_no & 0x7f) + 1);
 	int chip = (byte1 & 0x80) >> 7;
-	running_device *okidevice = (chip) ? NMK004_state.oki2device : NMK004_state.oki1device;
+	okim6295_device *okidevice = (chip) ? NMK004_state.oki2device : NMK004_state.oki1device;
 
 	if ((byte1 & 0x7f) == 0)
 	{
 		// stop all channels
-		okim6295_w(okidevice, 0, 0x78 );
+		okidevice->write_command( 0x78 );
 	}
 	else
 	{
@@ -163,7 +163,7 @@ static void oki_play_sample(int sample_no)
 		NMK004_state.oki_playing |= 1 << (ch + 4*chip);
 
 		// stop channel
-		okim6295_w(okidevice, 0, (0x08 << ch) );
+		okidevice->write_command( 0x08 << ch );
 
 		if (sample != 0)
 		{
@@ -174,15 +174,15 @@ static void oki_play_sample(int sample_no)
 			if (bank != 3)
 				memcpy(rom + 0x20000,rom + 0x40000 + bank * 0x20000,0x20000);
 
-			okim6295_w(okidevice, 0, 0x80 | sample );
-			okim6295_w(okidevice, 0, (0x10 << ch) | vol );
+			okidevice->write_command( 0x80 | sample );
+			okidevice->write_command( (0x10 << ch) | vol );
 		}
 	}
 }
 
 static void oki_update_state(void)
 {
-	NMK004_state.oki_playing = ((okim6295_r(NMK004_state.oki2device, 0) & 0x0f) << 4) | (okim6295_r(NMK004_state.oki1device, 0) & 0x0f);
+	NMK004_state.oki_playing = ((NMK004_state.oki2device->read_status() & 0x0f) << 4) | (NMK004_state.oki1device->read_status() & 0x0f);
 }
 
 
@@ -1022,8 +1022,8 @@ static TIMER_CALLBACK( real_nmk004_init )
 
 	NMK004_state.machine = machine;
 	NMK004_state.ymdevice = machine->device("ymsnd");
-	NMK004_state.oki1device = machine->device("oki1");
-	NMK004_state.oki2device = machine->device("oki2");
+	NMK004_state.oki1device = machine->device<okim6295_device>("oki1");
+	NMK004_state.oki2device = machine->device<okim6295_device>("oki2");
 
 	NMK004_state.rom = memory_region(machine, "audiocpu");
 

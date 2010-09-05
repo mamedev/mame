@@ -902,9 +902,9 @@ static const ym2203_interface cowrace_ym2203_interface =
 		AY8910_LEGACY_OUTPUT,
 		AY8910_DEFAULT_LOADS,
 		DEVCB_HANDLER(sound_cmd_r),									// read A
-		DEVCB_DEVICE_HANDLER("oki", okim6295_r),					// read B
+		DEVCB_DEVICE_MEMBER("oki", okim6295_device, read),			// read B
 		DEVCB_NULL,													// write A
-		DEVCB_DEVICE_HANDLER("oki", okim6295_w)						// write B
+		DEVCB_DEVICE_MEMBER("oki", okim6295_device, write)			// write B
 	},
 	NULL
 };

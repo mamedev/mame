@@ -176,7 +176,7 @@ static READ8_HANDLER( spool99_io_r )
 //          case 0xafe5: return 1;
 //          case 0xafe6: return 1;
 			case 0xafe7: return eeprom_read_bit(space->machine->device("eeprom"));
-			case 0xaff8: return okim6295_r(space->machine->device("oki"),0);
+			case 0xaff8: return space->machine->device<okim6295_device>("oki")->read(*space,0);
 		}
 	}
 //  printf("%04x %d\n",offset+0xaf00,io_switch);
@@ -234,7 +234,7 @@ static READ8_HANDLER( vcarn_io_r )
 			case 0xa725: return input_port_read(space->machine,"HOLD3");
 			case 0xa726: return input_port_read(space->machine,"HOLD4");
 			case 0xa727: return input_port_read(space->machine,"HOLD2");
-			case 0xa780: return okim6295_r(space->machine->device("oki"),0);
+			case 0xa780: return space->machine->device<okim6295_device>("oki")->read(*space,0);
 			case 0xa7a0: return input_port_read(space->machine,"HOLD1");
 			case 0xa7a1: return input_port_read(space->machine,"HOLD5");
 			case 0xa7a2: return input_port_read(space->machine,"START");

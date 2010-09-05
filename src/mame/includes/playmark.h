@@ -1,3 +1,4 @@
+#include "sound/okim6295.h"
 
 class playmark_state : public driver_device
 {
@@ -38,7 +39,7 @@ public:
 	int         old_oki_bank;
 
 	/* devices */
-	running_device *oki;
+	okim6295_device *oki;
 	running_device *eeprom;
 };
 

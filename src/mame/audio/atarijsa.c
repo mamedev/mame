@@ -340,7 +340,7 @@ static READ8_HANDLER( jsa2_io_r )
 	{
 		case 0x000:		/* /RDV */
 			if (oki6295 != NULL)
-				result = okim6295_r(oki6295, offset);
+				result = oki6295->read(*space, offset);
 			else
 				logerror("atarijsa: Unknown read at %04X\n", offset & 0x206);
 			break;
@@ -398,7 +398,7 @@ static WRITE8_HANDLER( jsa2_io_w )
 
 		case 0x200:		/* /WRV */
 			if (oki6295 != NULL)
-				okim6295_w(oki6295, offset, data);
+				oki6295->write(*space, offset, data);
 			else
 				logerror("atarijsa: Unknown write (%02X) at %04X\n", data & 0xff, offset & 0x206);
 			break;
@@ -465,7 +465,7 @@ static READ8_HANDLER( jsa3_io_r )
 	{
 		case 0x000:		/* /RDV */
 			if (oki6295 != NULL)
-				result = okim6295_r(oki6295, offset);
+				result = oki6295->read(*space, offset);
 			break;
 
 		case 0x002:		/* /RDP */
@@ -525,7 +525,7 @@ static WRITE8_HANDLER( jsa3_io_w )
 
 		case 0x200:		/* /WRV */
 			if (oki6295 != NULL)
-				okim6295_w(oki6295, offset, data);
+				oki6295->write(*space, offset, data);
 			break;
 
 		case 0x202:		/* /WRP */
@@ -599,7 +599,7 @@ static READ8_HANDLER( jsa3s_io_r )
 	{
 		case 0x000:		/* /RDV */
 			if (oki6295_l != NULL)
-				result = okim6295_r((offset & 1) ? oki6295_r : oki6295_l, offset);
+				result = ((offset & 1) ? oki6295_r : oki6295_l)->read(*space, offset);
 			break;
 
 		case 0x002:		/* /RDP */
@@ -659,7 +659,7 @@ static WRITE8_HANDLER( jsa3s_io_w )
 
 		case 0x200:		/* /WRV */
 			if (oki6295_l != NULL)
-				okim6295_w((offset & 1) ? oki6295_r : oki6295_l, 0, data);
+				((offset & 1) ? oki6295_r : oki6295_l)->write(*space, 0, data);
 			break;
 
 		case 0x202:		/* /WRP */

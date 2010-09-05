@@ -71,29 +71,29 @@ static const UINT8 fixeight_cmd_snd[128] =
 /*78*/  0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
-static void play_oki_sound(running_device *device, int game_sound, int data)
+static void play_oki_sound(okim6295_device *oki, int game_sound, int data)
 {
-	int status = okim6295_r(device,0);
+	int status = oki->read_status();
 
 	logerror("Playing sample %02x from command %02x\n",game_sound,data);
 
 	if (game_sound != 0)
 	{
 		if ((status & 0x01) == 0) {
-			okim6295_w(device,0,(0x80 | game_sound));
-			okim6295_w(device,0,0x11);
+			oki->write_command(0x80 | game_sound);
+			oki->write_command(0x11);
 		}
 		else if ((status & 0x02) == 0) {
-			okim6295_w(device,0,(0x80 | game_sound));
-			okim6295_w(device,0,0x21);
+			oki->write_command(0x80 | game_sound);
+			oki->write_command(0x21);
 		}
 		else if ((status & 0x04) == 0) {
-			okim6295_w(device,0,(0x80 | game_sound));
-			okim6295_w(device,0,0x41);
+			oki->write_command(0x80 | game_sound);
+			oki->write_command(0x41);
 		}
 		else if ((status & 0x08) == 0) {
-			okim6295_w(device,0,(0x80 | game_sound));
-			okim6295_w(device,0,0x81);
+			oki->write_command(0x80 | game_sound);
+			oki->write_command(0x81);
 		}
 	}
 }
@@ -108,13 +108,14 @@ void kbash_okisnd_w(running_device *device, int data)
 {
 //  popmessage("Writing %04x to Sound CPU",data);
 
+	okim6295_device *oki = downcast<okim6295_device *>(device);
 	if (data == 0)
 	{
-		okim6295_w(device,0,0x78);		/* Stop playing effects */
+		oki->write_command(0x78);		/* Stop playing effects */
 	}
 	else if ((data > 0) && (data < 128))
 	{
-		play_oki_sound(device, kbash_cmd_snd[data], data);
+		play_oki_sound(oki, kbash_cmd_snd[data], data);
 	}
 }
 
@@ -122,13 +123,14 @@ void fixeight_okisnd_w(running_device *device, int data)
 {
 //  popmessage("Writing %04x to Sound CPU",data);
 
+	okim6295_device *oki = downcast<okim6295_device *>(device);
 	if (data == 0)
 	{
-		okim6295_w(device,0,0x78);		/* Stop playing effects */
+		oki->write_command(0x78);		/* Stop playing effects */
 	}
 	else if ((data > 0) && (data < 128))
 	{
-		play_oki_sound(device, fixeight_cmd_snd[data], data);
+		play_oki_sound(oki, fixeight_cmd_snd[data], data);
 	}
 }
 
@@ -136,12 +138,13 @@ void batsugun_okisnd_w(running_device *device, int data)
 {
 //  popmessage("Writing %04x to Sound CPU",data);
 
+	okim6295_device *oki = downcast<okim6295_device *>(device);
 	if (data == 0)
 	{
-		okim6295_w(device,0,0x78);		/* Stop playing effects */
+		oki->write_command(0x78);		/* Stop playing effects */
 	}
 	else if ((data > 0) && (data < 64))
 	{
-		play_oki_sound(device, batsugun_cmd_snd[data], data);
+		play_oki_sound(oki, batsugun_cmd_snd[data], data);
 	}
 }

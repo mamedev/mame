@@ -141,7 +141,7 @@ static READ8_HANDLER( playmark_snd_command_r )
 	}
 	else if ((state->oki_control & 0x38) == 0x28)
 	{
-		data = (okim6295_r(state->oki, 0) & 0x0f);
+		data = (state->oki->read(*space, 0) & 0x0f);
 		// logerror("PC$%03x PortB reading %02x from the OKI status port\n", cpu_get_previouspc(space->cpu), data);
 	}
 
@@ -183,9 +183,9 @@ static WRITE8_HANDLER( playmark_oki_w )
 	state->oki_command = data;
 }
 
-static WRITE8_DEVICE_HANDLER( playmark_snd_control_w )
+static WRITE8_HANDLER( playmark_snd_control_w )
 {
-	playmark_state *state = device->machine->driver_data<playmark_state>();
+	playmark_state *state = space->machine->driver_data<playmark_state>();
 //  address_space *space = cputag_get_address_space(device->machine, "audiocpu", ADDRESS_SPACE_PROGRAM);
 
     /*  This port controls communications to and from the 68K, and the OKI
@@ -206,7 +206,8 @@ static WRITE8_DEVICE_HANDLER( playmark_snd_control_w )
 	if ((data & 0x38) == 0x18)
 	{
 		// logerror("PC$%03x Writing %02x to OKI1, PortC=%02x, Code=%02x\n",cpu_get_previouspc(space->cpu),playmark_oki_command,playmark_oki_control,playmark_snd_command);
-		okim6295_w(device, 0, state->oki_command);
+		okim6295_device *oki = space->machine->device<okim6295_device>("oki");
+		oki->write(*space, 0, state->oki_command);
 	}
 }
 
@@ -333,7 +334,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( playmark_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x00) AM_DEVWRITE("oki", playmark_oki_banking_w)
 	AM_RANGE(0x01, 0x01) AM_READWRITE(playmark_snd_command_r, playmark_oki_w)
-	AM_RANGE(0x02, 0x02) AM_READ(playmark_snd_flag_r) AM_DEVWRITE("oki", playmark_snd_control_w)
+	AM_RANGE(0x02, 0x02) AM_READWRITE(playmark_snd_flag_r, playmark_snd_control_w)
 	AM_RANGE(PIC16C5x_T0, PIC16C5x_T0) AM_READ(PIC16C5X_T0_clk_r)
 ADDRESS_MAP_END
 
@@ -909,7 +910,7 @@ static MACHINE_START( playmark )
 {
 	playmark_state *state = machine->driver_data<playmark_state>();
 
-	state->oki = machine->device("oki");
+	state->oki = machine->device<okim6295_device>("oki");
 	state->eeprom = machine->device("eeprom");
 
 	state_save_register_global(machine, state->bgscrollx);

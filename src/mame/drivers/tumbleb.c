@@ -325,16 +325,17 @@ static WRITE16_HANDLER( semicom_soundcmd_w );
 
 /******************************************************************************/
 
-static WRITE16_DEVICE_HANDLER( tumblepb_oki_w )
+static WRITE16_HANDLER( tumblepb_oki_w )
 {
+	okim6295_device *oki = space->machine->device<okim6295_device>("oki");
 	if (mem_mask == 0xffff)
 	{
-		okim6295_w(device, 0, data & 0xff);
+		oki->write(*space, 0, data & 0xff);
 		//printf("tumbleb_oki_w %04x %04x\n", data, mem_mask);
 	}
 	else
 	{
-		okim6295_w(device, 0, (data >> 8) & 0xff);
+		oki->write(*space, 0, (data >> 8) & 0xff);
 		//printf("tumbleb_oki_w %04x %04x\n", data, mem_mask);
 	}
     /* STUFF IN OTHER BYTE TOO..*/
@@ -453,14 +454,15 @@ command 1 - stop?
 static void tumbleb2_playmusic( running_device *device )
 {
 	tumbleb_state *state = device->machine->driver_data<tumbleb_state>();
-	int status = okim6295_r(device, 0);
+	okim6295_device *oki = downcast<okim6295_device *>(device);
+	int status = oki->read_status();
 
 	if (state->music_is_playing)
 	{
 		if (!BIT(status, 3))
 		{
-			okim6295_w(device, 0, 0x80 | state->music_command);
-			okim6295_w(device, 0, 0x00 | 0x82);
+			oki->write_command(0x80 | state->music_command);
+			oki->write_command(0x00 | 0x82);
 		}
 	}
 }
@@ -500,24 +502,24 @@ static void tumbleb2_set_music_bank( running_machine *machine, int bank )
 	memcpy(&oki[0x38000], &oki[0x80000 + 0x38000 + 0x8000 * bank], 0x8000);
 }
 
-static void tumbleb2_play_sound( running_device *device, int data )
+static void tumbleb2_play_sound( okim6295_device *oki, int data )
 {
-	int status = okim6295_r(device, 0);
+	int status = oki->read_status();
 
 	if (!BIT(status, 0))
 	{
-		okim6295_w(device, 0, 0x80 | data);
-		okim6295_w(device, 0, 0x00 | 0x12);
+		oki->write_command(0x80 | data);
+		oki->write_command(0x00 | 0x12);
 	}
 	else if (!BIT(status, 1))
 	{
-		okim6295_w(device, 0, 0x80 | data);
-		okim6295_w(device, 0, 0x00 | 0x22);
+		oki->write_command(0x80 | data);
+		oki->write_command(0x00 | 0x22);
 	}
 	else if (!BIT(status, 2))
 	{
-		okim6295_w(device, 0, 0x80 | data);
-		okim6295_w(device, 0, 0x00 | 0x42);
+		oki->write_command(0x80 | data);
+		oki->write_command(0x00 | 0x42);
 	}
 }
 
@@ -533,16 +535,16 @@ static void tumbleb2_play_sound( running_device *device, int data )
 // bank 7 = how to play?
 // bank 8 = boss???
 
-static void process_tumbleb2_music_command( running_device *device, int data )
+static void process_tumbleb2_music_command( okim6295_device *oki, int data )
 {
-	tumbleb_state *state = device->machine->driver_data<tumbleb_state>();
-	int status = okim6295_r(device, 0);
+	tumbleb_state *state = oki->machine->driver_data<tumbleb_state>();
+	int status = oki->read_status();
 
 	if (data == 1) // stop?
 	{
 		if (BIT(status, 3))
 		{
-			okim6295_w(device, 0, 0x40);		/* Stop playing music */
+			oki->write_command(0x40);		/* Stop playing music */
 			state->music_is_playing = 0;
 		}
 	}
@@ -551,7 +553,7 @@ static void process_tumbleb2_music_command( running_device *device, int data )
 		if (state->music_is_playing != data)
 		{
 			state->music_is_playing = data;
-			okim6295_w(device, 0, 0x40); // stop the current music
+			oki->write_command(0x40); // stop the current music
 			switch (data)
 			{
 				case 0x04: // map screen
@@ -625,8 +627,8 @@ static void process_tumbleb2_music_command( running_device *device, int data )
 					break;
 			}
 
-			tumbleb2_set_music_bank(device->machine, state->music_bank);
-			tumbleb2_playmusic(device);
+			tumbleb2_set_music_bank(oki->machine, state->music_bank);
+			tumbleb2_playmusic(oki);
 		}
 	}
 }
@@ -643,11 +645,11 @@ static WRITE16_DEVICE_HANDLER( tumbleb2_soundmcu_w )
 	}
 	else if (sound == -2)
 	{
-		process_tumbleb2_music_command(device, data);
+		process_tumbleb2_music_command(downcast<okim6295_device *>(device), data);
 	}
 	else
 	{
-		tumbleb2_play_sound(device, sound);
+		tumbleb2_play_sound(downcast<okim6295_device *>(device), sound);
 	}
 }
 
@@ -658,7 +660,7 @@ static ADDRESS_MAP_START( tumblepopb_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 #if TUMBLEP_HACK
 	AM_RANGE(0x000000, 0x07ffff) AM_WRITEONLY	/* To write levels modifications */
 #endif
-	AM_RANGE(0x100000, 0x100001) AM_READ(tumblepb_prot_r) AM_DEVWRITE("oki", tumblepb_oki_w)
+	AM_RANGE(0x100000, 0x100001) AM_READWRITE(tumblepb_prot_r, tumblepb_oki_w)
 	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_BASE_MEMBER(tumbleb_state, mainram)
 	AM_RANGE(0x140000, 0x1407ff) AM_RAM_WRITE(paletteram16_xxxxBBBBGGGGRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_BASE_SIZE_MEMBER(tumbleb_state, spriteram, spriteram_size) /* Bootleg sprite buffer */

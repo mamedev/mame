@@ -77,7 +77,6 @@ typedef device_config * (*machine_config_constructor)(machine_config &config, de
 
 // devices and callbacks
 #include "devintrf.h"
-#include "devcb.h"
 #include "distate.h"
 #include "dimemory.h"
 #include "diexec.h"
@@ -129,6 +128,7 @@ typedef device_config * (*machine_config_constructor)(machine_config &config, de
 #include "sound.h"
 
 // generic helpers
+#include "devcb.h"
 #include "drivers/xtal.h"
 #include "audio/generic.h"
 #include "machine/generic.h"
