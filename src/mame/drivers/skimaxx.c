@@ -309,10 +309,10 @@ static ADDRESS_MAP_START( 68030_1_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x10180000, 0x1018ffff) AM_RAM AM_SHARE("share1")	// above 10188000 accessed at level end (game bug?)
 	AM_RANGE(0x20000000, 0x20000003) AM_READNOP	// watchdog_r?
 
-	AM_RANGE(0x20000010, 0x20000013) AM_DEVREADWRITE8("oki1", okim6295_r, okim6295_w, 0x00ff)	// left
-	AM_RANGE(0x20000014, 0x20000017) AM_DEVREADWRITE8("oki2", okim6295_r, okim6295_w, 0x00ff)	// left
-	AM_RANGE(0x20000018, 0x2000001b) AM_DEVREADWRITE8("oki3", okim6295_r, okim6295_w, 0x00ff)	// right
-	AM_RANGE(0x2000001c, 0x2000001f) AM_DEVREADWRITE8("oki4", okim6295_r, okim6295_w, 0x00ff)	// right
+	AM_RANGE(0x20000010, 0x20000013) AM_DEVREADWRITE8_MODERN("oki1", okim6295_device, read, write, 0x00ff)	// left
+	AM_RANGE(0x20000014, 0x20000017) AM_DEVREADWRITE8_MODERN("oki2", okim6295_device, read, write, 0x00ff)	// left
+	AM_RANGE(0x20000018, 0x2000001b) AM_DEVREADWRITE8_MODERN("oki3", okim6295_device, read, write, 0x00ff)	// right
+	AM_RANGE(0x2000001c, 0x2000001f) AM_DEVREADWRITE8_MODERN("oki4", okim6295_device, read, write, 0x00ff)	// right
 
 	AM_RANGE(0x20000020, 0x20000023) AM_READ ( skimaxx_unk1_r )	// units linking?
 	AM_RANGE(0x20000024, 0x20000027) AM_WRITE( skimaxx_unk1_w )	// ""

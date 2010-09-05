@@ -185,7 +185,7 @@ static ADDRESS_MAP_START( madgear_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM
 	AM_RANGE(0xf000, 0xf001) AM_DEVREADWRITE("ym1", ym2203_r,ym2203_w)
 	AM_RANGE(0xf002, 0xf003) AM_DEVREADWRITE("ym2", ym2203_r,ym2203_w)
-	AM_RANGE(0xf004, 0xf004) AM_DEVWRITE("oki", okim6295_w)
+	AM_RANGE(0xf004, 0xf004) AM_DEVWRITE_MODERN("oki", okim6295_device, write)
 	AM_RANGE(0xf006, 0xf006) AM_READ(soundlatch_r)
 	AM_RANGE(0xf00a, 0xf00a) AM_WRITE(mg_bankswitch_w)
 ADDRESS_MAP_END

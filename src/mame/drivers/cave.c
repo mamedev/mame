@@ -509,8 +509,8 @@ static ADDRESS_MAP_START( donpachi_map, ADDRESS_SPACE_PROGRAM, 16 )
 /**/AM_RANGE(0x800000, 0x800005) AM_RAM AM_BASE_MEMBER(cave_state, vctrl_2)									// Layer 2 Control
 	AM_RANGE(0x900000, 0x90007f) AM_RAM_READ(donpachi_videoregs_r) AM_BASE_MEMBER(cave_state, videoregs)	// Video Regs
 /**/AM_RANGE(0xa08000, 0xa08fff) AM_RAM AM_BASE_SIZE_MEMBER(cave_state, paletteram, paletteram_size)		// Palette
-	AM_RANGE(0xb00000, 0xb00003) AM_DEVREADWRITE8("oki1", okim6295_r, okim6295_w, 0x00ff)					// M6295
-	AM_RANGE(0xb00010, 0xb00013) AM_DEVREADWRITE8("oki2", okim6295_r, okim6295_w, 0x00ff)					//
+	AM_RANGE(0xb00000, 0xb00003) AM_DEVREADWRITE8_MODERN("oki1", okim6295_device, read, write, 0x00ff)					// M6295
+	AM_RANGE(0xb00010, 0xb00013) AM_DEVREADWRITE8_MODERN("oki2", okim6295_device, read, write, 0x00ff)					//
 	AM_RANGE(0xb00020, 0xb0002f) AM_DEVWRITE("nmk112", nmk112_okibank_lsb_w)								//
 	AM_RANGE(0xc00000, 0xc00001) AM_READ_PORT("IN0")														// Inputs
 	AM_RANGE(0xc00002, 0xc00003) AM_READ_PORT("IN1")														// Inputs + EEPROM
@@ -943,7 +943,7 @@ static ADDRESS_MAP_START( tjumpman_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x700000, 0x700007) AM_READ(cave_irq_cause_r)												// IRQ Cause
 	AM_RANGE(0x700068, 0x700069) AM_WRITE(watchdog_reset16_w)											// Watchdog
 	AM_RANGE(0x700000, 0x70007f) AM_WRITEONLY AM_BASE_MEMBER(cave_state, videoregs)						// Video Regs
-	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE8("oki1", okim6295_r, okim6295_w, 0x00ff)				// M6295
+	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE8_MODERN("oki1", okim6295_device, read, write, 0x00ff)				// M6295
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(tjumpman_leds_w)												// Leds + Hopper
 	AM_RANGE(0xe00000, 0xe00001) AM_DEVWRITE("eeprom", tjumpman_eeprom_lsb_w)							// EEPROM
 ADDRESS_MAP_END
@@ -1012,7 +1012,7 @@ static ADDRESS_MAP_START( hotdogst_sound_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x30, 0x30) AM_READ(soundlatch_lo_r)						// From Main CPU
 	AM_RANGE(0x40, 0x40) AM_READ(soundlatch_hi_r)						//
 	AM_RANGE(0x50, 0x51) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)	//
-	AM_RANGE(0x60, 0x60) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)	// M6295
+	AM_RANGE(0x60, 0x60) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)	// M6295
 	AM_RANGE(0x70, 0x70) AM_WRITE(hotdogst_okibank_w)					// Samples bank
 ADDRESS_MAP_END
 
@@ -1043,7 +1043,7 @@ static ADDRESS_MAP_START( mazinger_sound_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x30, 0x30) AM_READ(soundlatch_lo_r)		// From Main CPU
 	AM_RANGE(0x50, 0x51) AM_DEVWRITE("ymsnd", ym2203_w)	// YM2203
 	AM_RANGE(0x52, 0x53) AM_DEVREAD("ymsnd", ym2203_r)	// YM2203
-	AM_RANGE(0x70, 0x70) AM_DEVWRITE("oki", okim6295_w)	// M6295
+	AM_RANGE(0x70, 0x70) AM_DEVWRITE_MODERN("oki", okim6295_device, write)	// M6295
 	AM_RANGE(0x74, 0x74) AM_WRITE(hotdogst_okibank_w)	// Samples bank
 ADDRESS_MAP_END
 
@@ -1091,9 +1091,9 @@ static ADDRESS_MAP_START( metmqstr_sound_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x30, 0x30) AM_READ(soundlatch_lo_r)						// From Main CPU
 	AM_RANGE(0x40, 0x40) AM_READ(soundlatch_hi_r)						//
 	AM_RANGE(0x50, 0x51) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)	// YM2151
-	AM_RANGE(0x60, 0x60) AM_DEVWRITE("oki1", okim6295_w)				// M6295 #0
+	AM_RANGE(0x60, 0x60) AM_DEVWRITE_MODERN("oki1", okim6295_device, write)				// M6295 #0
 	AM_RANGE(0x70, 0x70) AM_WRITE(metmqstr_okibank0_w)					// Samples Bank #0
-	AM_RANGE(0x80, 0x80) AM_DEVWRITE("oki2", okim6295_w)				// M6295 #1
+	AM_RANGE(0x80, 0x80) AM_DEVWRITE_MODERN("oki2", okim6295_device, write)				// M6295 #1
 	AM_RANGE(0x90, 0x90) AM_WRITE(metmqstr_okibank1_w)					// Samples Bank #1
 ADDRESS_MAP_END
 
@@ -1118,8 +1118,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pwrinst2_sound_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("oki1", okim6295_r, okim6295_w)	// M6295
-	AM_RANGE(0x08, 0x08) AM_DEVREADWRITE("oki2", okim6295_r, okim6295_w)	//
+	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE_MODERN("oki1", okim6295_device, read, write)	// M6295
+	AM_RANGE(0x08, 0x08) AM_DEVREADWRITE_MODERN("oki2", okim6295_device, read, write)	//
 	AM_RANGE(0x10, 0x17) AM_DEVWRITE("nmk112", nmk112_okibank_w)			// Samples bank
 	AM_RANGE(0x40, 0x41) AM_DEVREADWRITE("ymsnd", ym2203_r, ym2203_w)		//
 	AM_RANGE(0x50, 0x50) AM_WRITE(soundlatch_ack_w)							// To Main CPU
@@ -1187,9 +1187,9 @@ static ADDRESS_MAP_START( sailormn_sound_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x30, 0x30) AM_READ(soundlatch_lo_r)							// From Main CPU
 	AM_RANGE(0x40, 0x40) AM_READ(soundlatch_hi_r)							//
 	AM_RANGE(0x50, 0x51) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)		// YM2151
-	AM_RANGE(0x60, 0x60) AM_DEVREADWRITE("oki1", okim6295_r, okim6295_w)	// M6295 #0
+	AM_RANGE(0x60, 0x60) AM_DEVREADWRITE_MODERN("oki1", okim6295_device, read, write)	// M6295 #0
 	AM_RANGE(0x70, 0x70) AM_WRITE(sailormn_okibank0_w)						// Samples Bank #0
-	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE("oki2", okim6295_r, okim6295_w)	// M6295 #1
+	AM_RANGE(0x80, 0x80) AM_DEVREADWRITE_MODERN("oki2", okim6295_device, read, write)	// M6295 #1
 	AM_RANGE(0xc0, 0xc0) AM_WRITE(sailormn_okibank1_w)						// Samples Bank #1
 ADDRESS_MAP_END
 

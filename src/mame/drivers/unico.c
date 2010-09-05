@@ -71,7 +71,7 @@ static ADDRESS_MAP_START( burglarx_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800114, 0x800115) AM_WRITEONLY AM_BASE(&unico_scrollx_2)				//
 	AM_RANGE(0x800116, 0x800117) AM_WRITEONLY AM_BASE(&unico_scrollx_1)				//
 	AM_RANGE(0x800120, 0x800121) AM_WRITEONLY AM_BASE(&unico_scrolly_1)				//
-	AM_RANGE(0x800188, 0x800189) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)	// Sound
+	AM_RANGE(0x800188, 0x800189) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)	// Sound
 	AM_RANGE(0x80018a, 0x80018b) AM_DEVWRITE8("ymsnd", ym3812_write_port_w, 0xff00			)	//
 	AM_RANGE(0x80018c, 0x80018d) AM_DEVREADWRITE8("ymsnd", ym3812_status_port_r, ym3812_control_port_w, 0xff00		)	//
 	AM_RANGE(0x80018e, 0x80018f) AM_DEVWRITE("oki", burglarx_sound_bank_w)					//
@@ -166,7 +166,7 @@ static ADDRESS_MAP_START( zeropnt_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800174, 0x800175) AM_READ(unico_gunx_0_msb_r			)	//
 	AM_RANGE(0x800178, 0x800179) AM_READ(unico_guny_1_msb_r			)	//
 	AM_RANGE(0x80017c, 0x80017d) AM_READ(unico_gunx_1_msb_r			)	//
-	AM_RANGE(0x800188, 0x800189) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff				)	// Sound
+	AM_RANGE(0x800188, 0x800189) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff				)	// Sound
 	AM_RANGE(0x80018a, 0x80018b) AM_DEVWRITE8("ymsnd", ym3812_write_port_w, 0xff00			)	//
 	AM_RANGE(0x80018c, 0x80018d) AM_DEVREADWRITE8("ymsnd", ym3812_status_port_r, ym3812_control_port_w, 0xff00		)	//
 	AM_RANGE(0x80018e, 0x80018f) AM_WRITE(zeropnt_sound_bank_w				)	//
@@ -231,9 +231,9 @@ static WRITE32_DEVICE_HANDLER( zeropnt2_eeprom_w )
 static ADDRESS_MAP_START( zeropnt2_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM												// ROM
 	AM_RANGE(0x800018, 0x80001b) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x800024, 0x800027) AM_DEVREADWRITE8("oki1", okim6295_r, okim6295_w, 0x00ff0000	)	// Sound
+	AM_RANGE(0x800024, 0x800027) AM_DEVREADWRITE8_MODERN("oki1", okim6295_device, read, write, 0x00ff0000	)	// Sound
 	AM_RANGE(0x800028, 0x80002f) AM_DEVREADWRITE8("ymsnd", ym2151_r, ym2151_w, 0x00ff0000)	//
-	AM_RANGE(0x800030, 0x800033) AM_DEVREADWRITE8("oki2", okim6295_r, okim6295_w, 0x00ff0000	)	//
+	AM_RANGE(0x800030, 0x800033) AM_DEVREADWRITE8_MODERN("oki2", okim6295_device, read, write, 0x00ff0000	)	//
 	AM_RANGE(0x800034, 0x800037) AM_WRITE(zeropnt2_sound_bank_w				)	//
 	AM_RANGE(0x800038, 0x80003b) AM_WRITE(zeropnt2_leds_w					)	// ?
 	AM_RANGE(0x80010c, 0x800123) AM_WRITEONLY AM_BASE(&unico_scroll32		)	// Scroll

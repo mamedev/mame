@@ -179,7 +179,7 @@ static ADDRESS_MAP_START( pirates_map, ADDRESS_SPACE_PROGRAM, 16 )
 //  AM_RANGE(0x902580, 0x902a7f) AM_RAM  // more of tilemaps ?
 	AM_RANGE(0x902a80, 0x904187) AM_RAM_WRITE(pirates_bg_tileram_w) AM_BASE(&pirates_bg_tileram)
 //  AM_RANGE(0x903c80, 0x904187) AM_RAM  // more of tilemaps ?
-	AM_RANGE(0xa00000, 0xa00001) AM_DEVREADWRITE8("oki", okim6295_r,okim6295_w, 0x00ff)
+	AM_RANGE(0xa00000, 0xa00001) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
 ADDRESS_MAP_END
 
 

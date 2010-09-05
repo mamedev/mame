@@ -484,7 +484,7 @@ static ADDRESS_MAP_START( pinkiri8_io, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x60, 0x60) AM_WRITE(output_regs_w)
 	AM_RANGE(0x80, 0x83) AM_WRITE(pinkiri8_vram_w)
 
-	AM_RANGE(0xa0, 0xa0) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w ) //correct?
+	AM_RANGE(0xa0, 0xa0) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write) //correct?
 	AM_RANGE(0xb0, 0xb0) AM_WRITE(mux_w) //mux
 	AM_RANGE(0xb0, 0xb0) AM_READ(mux_p2_r) // mux inputs
 	AM_RANGE(0xb1, 0xb1) AM_READ(mux_p1_r) // mux inputs

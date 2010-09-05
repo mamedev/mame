@@ -760,7 +760,7 @@ static ADDRESS_MAP_START( srider_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE( 0x0d016, 0x0d017 ) AM_DEVWRITE( "ymsnd", ym3812_w )
 
-	AM_RANGE( 0x0d018, 0x0d018 ) AM_DEVWRITE( "oki", okim6295_w )
+	AM_RANGE( 0x0d018, 0x0d018 ) AM_DEVWRITE_MODERN("oki", okim6295_device, write)
 
 	AM_RANGE( 0x0d01b, 0x0d01b ) AM_WRITE( subsino_tiles_offset_w )
 
@@ -787,7 +787,7 @@ static ADDRESS_MAP_START( sharkpy_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE( 0x09016, 0x09017 ) AM_DEVWRITE( "ymsnd", ym3812_w )
 
-	AM_RANGE( 0x09018, 0x09018 ) AM_DEVWRITE( "oki", okim6295_w )
+	AM_RANGE( 0x09018, 0x09018 ) AM_DEVWRITE_MODERN("oki", okim6295_device, write)
 
 	AM_RANGE( 0x0901b, 0x0901b ) AM_WRITE( subsino_tiles_offset_w )
 
@@ -819,7 +819,7 @@ static ADDRESS_MAP_START( victor21_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE( 0x0900b, 0x0900b ) AM_RAM //protection
 
-//  AM_RANGE( 0x0900c, 0x0900c ) AM_DEVWRITE( "oki", okim6295_w )
+//  AM_RANGE( 0x0900c, 0x0900c ) AM_DEVWRITE_MODERN("oki", okim6295_device, write)
 
 	AM_RANGE( 0x0900e, 0x0900f ) AM_DEVWRITE( "ymsnd", ym2413_w )
 
@@ -918,7 +918,7 @@ static ADDRESS_MAP_START( crsbingo_map, ADDRESS_SPACE_PROGRAM, 8 )
 //  AM_RANGE( 0x0900c, 0x0900c ) AM_READ_PORT( "INC" )
 	AM_RANGE( 0x0900c, 0x0900d ) AM_DEVWRITE( "ymsnd", ym2413_w )
 
-//  AM_RANGE( 0x09018, 0x09018 ) AM_DEVWRITE( "oki", okim6295_w )
+//  AM_RANGE( 0x09018, 0x09018 ) AM_DEVWRITE_MODERN("oki", okim6295_device, write)
 
 //  AM_RANGE( 0x0900d, 0x0900d ) AM_WRITE( subsino_tiles_offset_w )
 
@@ -967,7 +967,7 @@ static ADDRESS_MAP_START( tisub_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE( 0x09016, 0x09017 ) AM_DEVWRITE( "ymsnd", ym3812_w )
 
-//  AM_RANGE( 0x0900c, 0x0900c ) AM_DEVWRITE( "oki", okim6295_w )
+//  AM_RANGE( 0x0900c, 0x0900c ) AM_DEVWRITE_MODERN("oki", okim6295_device, write)
 
 	AM_RANGE( 0x0901b, 0x0901b ) AM_WRITE( subsino_tiles_offset_w )
 

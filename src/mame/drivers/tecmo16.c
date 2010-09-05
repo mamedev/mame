@@ -94,7 +94,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xfbff) AM_RAM	/* Sound RAM */
-	AM_RANGE(0xfc00, 0xfc00) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)
+	AM_RANGE(0xfc00, 0xfc00) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 	AM_RANGE(0xfc04, 0xfc05) AM_DEVREADWRITE("ymsnd", ym2151_r, ym2151_w)
 	AM_RANGE(0xfc08, 0xfc08) AM_READ(soundlatch_r)
 	AM_RANGE(0xfc0c, 0xfc0c) AM_NOP

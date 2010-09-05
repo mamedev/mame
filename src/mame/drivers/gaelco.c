@@ -131,7 +131,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bigkarnk_snd_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM											/* RAM */
-	AM_RANGE(0x0800, 0x0801) AM_DEVREADWRITE("oki", okim6295_r, okim6295_w)	/* OKI6295 */
+	AM_RANGE(0x0800, 0x0801) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)	/* OKI6295 */
 //  AM_RANGE(0x0900, 0x0900) AM_WRITENOP                                    /* enable sound output? */
 	AM_RANGE(0x0a00, 0x0a01) AM_DEVREADWRITE("ymsnd", ym3812_r, ym3812_w)		/* YM3812 */
 	AM_RANGE(0x0b00, 0x0b00) AM_READ(soundlatch_r)							/* Sound latch */
@@ -151,7 +151,7 @@ static ADDRESS_MAP_START( maniacsq_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("P1")
 	AM_RANGE(0x700006, 0x700007) AM_READ_PORT("P2")
 	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(OKIM6295_bankswitch_w)										/* OKI6295 bankswitch */
-	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)						/* OKI6295 status register */
+	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)						/* OKI6295 status register */
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM															/* Work RAM */
 ADDRESS_MAP_END
 
@@ -168,7 +168,7 @@ static ADDRESS_MAP_START( squash_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("P1")
 	AM_RANGE(0x700006, 0x700007) AM_READ_PORT("P2")
 	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(OKIM6295_bankswitch_w)										/* OKI6295 bankswitch */
-	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)						/* OKI6295 status register */
+	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)						/* OKI6295 status register */
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM															/* Work RAM */
 ADDRESS_MAP_END
 
@@ -185,7 +185,7 @@ static ADDRESS_MAP_START( thoop_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x700004, 0x700005) AM_READ_PORT("P1")
 	AM_RANGE(0x700006, 0x700007) AM_READ_PORT("P2")
 	AM_RANGE(0x70000c, 0x70000d) AM_WRITE(OKIM6295_bankswitch_w)										/* OKI6295 bankswitch */
-	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x00ff)						/* OKI6295 status register */
+	AM_RANGE(0x70000e, 0x70000f) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)						/* OKI6295 status register */
 	AM_RANGE(0xff0000, 0xffffff) AM_RAM															/* Work RAM */
 ADDRESS_MAP_END
 

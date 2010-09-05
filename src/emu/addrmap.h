@@ -586,6 +586,48 @@ void ADDRESS_MAP_NAME(_name)(address_map &map, const device_config &devconfig) \
 	curentry->set_handler(devconfig, _tag, _rhandler, #_rhandler, _whandler, #_whandler, _unitmask); \
 
 
+// device reads
+#define AM_DEVREAD_MODERN(_tag, _class, _handler) \
+	curentry->set_handler(devconfig, _tag, read_proto_delegate::_create_member<_class, &_class::_handler>(#_class "::" #_handler)); \
+
+#define AM_DEVREAD8_MODERN(_tag, _class, _handler, _unitmask) \
+	curentry->set_handler(devconfig, _tag, read8_proto_delegate::_create_member<_class, &_class::_handler>(#_class "::" #_handler), _unitmask); \
+
+#define AM_DEVREAD16_MODERN(_tag, _class, _handler, _unitmask) \
+	curentry->set_handler(devconfig, _tag, read16_proto_delegate::_create_member<_class, &_class::_handler>(#_class "::" #_handler), _unitmask); \
+
+#define AM_DEVREAD32_MODERN(_tag, _class, _handler, _unitmask) \
+	curentry->set_handler(devconfig, _tag, read32_proto_delegate::_create_member<_class, &_class::_handler>(#_class "::" #_handler), _unitmask); \
+
+
+// device writes
+#define AM_DEVWRITE_MODERN(_tag, _class, _handler) \
+	curentry->set_handler(devconfig, _tag, write_proto_delegate::_create_member<_class, &_class::_handler>(#_class "::" #_handler)); \
+
+#define AM_DEVWRITE8_MODERN(_tag, _class, _handler, _unitmask) \
+	curentry->set_handler(devconfig, _tag, write8_proto_delegate::_create_member<_class, &_class::_handler>(#_class "::" #_handler), _unitmask); \
+
+#define AM_DEVWRITE16_MODERN(_tag, _class, _handler, _unitmask) \
+	curentry->set_handler(devconfig, _tag, write16_proto_delegate::_create_member<_class, &_class::_handler>(#_class "::" #_handler), _unitmask); \
+
+#define AM_DEVWRITE32_MODERN(_tag, _class, _handler, _unitmask) \
+	curentry->set_handler(devconfig, _tag, write32_proto_delegate::_create_member<_class, &_class::_handler>(#_class "::" #_handler), _unitmask); \
+
+
+// device reads/writes
+#define AM_DEVREADWRITE_MODERN(_tag, _class, _rhandler, _whandler) \
+	curentry->set_handler(devconfig, _tag, read_proto_delegate::_create_member<_class, &_class::_rhandler>(#_class "::" #_rhandler), write_proto_delegate::_create_member<_class, &_class::_whandler>(#_class "::" #_whandler)); \
+
+#define AM_DEVREADWRITE8_MODERN(_tag, _class, _rhandler, _whandler, _unitmask) \
+	curentry->set_handler(devconfig, _tag, read8_proto_delegate::_create_member<_class, &_class::_rhandler>(#_class "::" #_rhandler), write8_proto_delegate::_create_member<_class, &_class::_whandler>(#_class "::" #_whandler), _unitmask); \
+
+#define AM_DEVREADWRITE16_MODERN(_tag, _class, _rhandler, _whandler, _unitmask) \
+	curentry->set_handler(devconfig, _tag, read16_proto_delegate::_create_member<_class, &_class::_rhandler>(#_class "::" #_rhandler), write16_proto_delegate::_create_member<_class, &_class::_whandler>(#_class "::" #_whandler), _unitmask); \
+
+#define AM_DEVREADWRITE32_MODERN(_tag, _class, _rhandler, _whandler, _unitmask) \
+	curentry->set_handler(devconfig, _tag, read32_proto_delegate::_create_member<_class, &_class::_rhandler>(#_class "::" #_rhandler), write32_proto_delegate::_create_member<_class, &_class::_whandler>(#_class "::" #_whandler), _unitmask); \
+
+
 // special-case accesses
 #define AM_ROM \
 	curentry->set_read_type(AMH_ROM); \

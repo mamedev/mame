@@ -200,7 +200,7 @@ static WRITE8_HANDLER(sshangha_sound_shared_w)
 static ADDRESS_MAP_START( sshangha_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc001) AM_DEVREADWRITE("ymsnd", ym2203_r,ym2203_w)
-	AM_RANGE(0xc200, 0xc201) AM_DEVREADWRITE("oki",okim6295_r,okim6295_w)
+	AM_RANGE(0xc200, 0xc201) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 	AM_RANGE(0xf800, 0xf807) AM_READWRITE(sshangha_sound_shared_r,sshangha_sound_shared_w)
 	AM_RANGE(0xf808, 0xffff) AM_RAM
 ADDRESS_MAP_END

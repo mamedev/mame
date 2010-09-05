@@ -136,8 +136,8 @@ static ADDRESS_MAP_START( fuuki16_sound_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x30, 0x30) AM_WRITENOP	// ? In the NMI routine
 	AM_RANGE(0x40, 0x41) AM_DEVWRITE("ym1", ym2203_w)
 	AM_RANGE(0x50, 0x51) AM_DEVREADWRITE("ym2", ym3812_r, ym3812_w)
-	AM_RANGE(0x60, 0x60) AM_DEVREAD("oki", okim6295_r)	// M6295
-	AM_RANGE(0x61, 0x61) AM_DEVWRITE("oki", okim6295_w)	// M6295
+	AM_RANGE(0x60, 0x60) AM_DEVREAD_MODERN("oki", okim6295_device, read)	// M6295
+	AM_RANGE(0x61, 0x61) AM_DEVWRITE_MODERN("oki", okim6295_device, write)	// M6295
 ADDRESS_MAP_END
 
 

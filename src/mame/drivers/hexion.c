@@ -115,7 +115,7 @@ static ADDRESS_MAP_START( hexion_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe88a, 0xe88e) AM_DEVWRITE("konami", k051649_volume_w)
 	AM_RANGE(0xe88f, 0xe88f) AM_DEVWRITE("konami", k051649_keyonoff_w)
 	AM_RANGE(0xf000, 0xf00f) AM_WRITENOP	/* 053252? f00e = IRQ ack, f00f = NMI ack */
-	AM_RANGE(0xf200, 0xf200) AM_DEVWRITE("oki", okim6295_w)
+	AM_RANGE(0xf200, 0xf200) AM_DEVWRITE_MODERN("oki", okim6295_device, write)
 	AM_RANGE(0xf400, 0xf400) AM_READ_PORT("DSW1")
 	AM_RANGE(0xf401, 0xf401) AM_READ_PORT("DSW2")
 	AM_RANGE(0xf402, 0xf402) AM_READ_PORT("P1")

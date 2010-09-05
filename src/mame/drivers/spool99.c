@@ -210,7 +210,7 @@ static ADDRESS_MAP_START( spool99_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xafed, 0xafed) AM_DEVWRITE("eeprom", eeprom_resetline_w )
 	AM_RANGE(0xafee, 0xafee) AM_DEVWRITE("eeprom", eeprom_clockline_w )
 	AM_RANGE(0xafef, 0xafef) AM_DEVWRITE("eeprom", eeprom_dataline_w )
-	AM_RANGE(0xaff8, 0xaff8) AM_DEVWRITE("oki", okim6295_w)
+	AM_RANGE(0xaff8, 0xaff8) AM_DEVWRITE_MODERN("oki", okim6295_device, write)
 
 	AM_RANGE(0xb000, 0xb3ff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE_GENERIC(paletteram)
 
@@ -256,7 +256,7 @@ static ADDRESS_MAP_START( vcarn_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa745, 0xa745) AM_DEVWRITE("eeprom", eeprom_resetline_w )
 	AM_RANGE(0xa746, 0xa746) AM_DEVWRITE("eeprom", eeprom_clockline_w )
 	AM_RANGE(0xa747, 0xa747) AM_DEVWRITE("eeprom", eeprom_dataline_w )
-	AM_RANGE(0xa780, 0xa780) AM_DEVWRITE("oki", okim6295_w)
+	AM_RANGE(0xa780, 0xa780) AM_DEVWRITE_MODERN("oki", okim6295_device, write)
 
 	AM_RANGE(0xa800, 0xabff) AM_RAM_WRITE(paletteram_xxxxBBBBGGGGRRRR_le_w) AM_BASE_GENERIC(paletteram)
 

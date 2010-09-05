@@ -98,7 +98,7 @@ static ADDRESS_MAP_START( chsuper_prg_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xfb000, 0xfbfff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
-//  AM_RANGE(0xaff8, 0xaff8) AM_DEVWRITE("oki", okim6295_w)
+//  AM_RANGE(0xaff8, 0xaff8) AM_DEVWRITE_MODERN("oki", okim6295_device, write)
 
 static ADDRESS_MAP_START( chsuper_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE( 0x0000, 0x003f ) AM_RAM // Z180 internal regs

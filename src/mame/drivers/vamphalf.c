@@ -299,7 +299,7 @@ static ADDRESS_MAP_START( finalgdr_io, ADDRESS_SPACE_IO, 32 )
 	AM_RANGE(0x2c00, 0x2dff) AM_READWRITE(finalgdr_backupram_r, finalgdr_backupram_w)
 	AM_RANGE(0x3000, 0x3007) AM_DEVREADWRITE8("ymsnd", ym2151_r, ym2151_w, 0x0000ff00)
 	AM_RANGE(0x3800, 0x3803) AM_READ_PORT("P1_P2")
-	AM_RANGE(0x3400, 0x3403) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x0000ff00)
+	AM_RANGE(0x3400, 0x3403) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x0000ff00)
 	AM_RANGE(0x3c00, 0x3c03) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x4400, 0x4403) AM_DEVREAD("eeprom", eeprom32_r)
 	AM_RANGE(0x6000, 0x6003) AM_READNOP //?
@@ -316,7 +316,7 @@ static ADDRESS_MAP_START( mrkicker_io, ADDRESS_SPACE_IO, 32 )
 	AM_RANGE(0x4040, 0x4043) AM_WRITE(finalgdr_prot_w)
 	AM_RANGE(0x6400, 0x6403) AM_READ(finalgdr_prot_r)
 	AM_RANGE(0x7000, 0x7007) AM_DEVREADWRITE8("ymsnd", ym2151_r, ym2151_w, 0x0000ff00)
-//  AM_RANGE(0x7400, 0x7403) AM_DEVREADWRITE8("oki", okim6295_r, okim6295_w, 0x0000ff00)
+//  AM_RANGE(0x7400, 0x7403) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x0000ff00)
 
 //  AM_RANGE(0xxxxx, 0xxxxx) AM_WRITE(finalgdr_backupram_bank_w)
 //  AM_RANGE(0xxxxx, 0xxxxx) AM_READWRITE(finalgdr_backupram_r, finalgdr_backupram_w)
@@ -363,8 +363,8 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( aoh_io, ADDRESS_SPACE_IO, 32 )
 	AM_RANGE(0x0480, 0x0483) AM_DEVWRITE("eeprom", eeprom32_w)
-	AM_RANGE(0x0620, 0x0623) AM_DEVREADWRITE8("oki_2", okim6295_r, okim6295_w, 0x0000ff00)
-	AM_RANGE(0x0660, 0x0663) AM_DEVREADWRITE8("oki_1", okim6295_r, okim6295_w, 0x0000ff00)
+	AM_RANGE(0x0620, 0x0623) AM_DEVREADWRITE8_MODERN("oki_2", okim6295_device, read, write, 0x0000ff00)
+	AM_RANGE(0x0660, 0x0663) AM_DEVREADWRITE8_MODERN("oki_1", okim6295_device, read, write, 0x0000ff00)
 	AM_RANGE(0x0640, 0x0647) AM_DEVREADWRITE8("ymsnd", ym2151_r, ym2151_w, 0x0000ff00)
 	AM_RANGE(0x0680, 0x0683) AM_DEVWRITE("oki_2", aoh_oki_bank_w)
 ADDRESS_MAP_END
