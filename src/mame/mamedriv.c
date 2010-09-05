@@ -959,6 +959,7 @@ const game_driver * const drivers[] =
 	DRIVER( finfurl2j )	/* March 1999 */
 				/* Guitar Jam - July 1999 */
 	DRIVER( crszone )	/* Crisis Zone - December 1999 */
+	DRIVER( crszonea )	/* Crisis Zone - December 1999 */
 
 	/* Namco System 246 */
 	DRIVER( sys246 )
