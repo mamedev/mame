@@ -4324,7 +4324,8 @@ DokiDoki Penguin Land *not confirmed
 	DRIVER( vf2o )		/* 1994.11 Virtua Fighter 2 */
 	DRIVER( vf2a )		/* 1995.?? */
 	DRIVER( vf2b )		/* 1995.?? */
-	DRIVER( srallyc )	/* 1995.02 Sega Rally Championship */
+	DRIVER( srallyc )	/* 1995.02 Sega Rally Championship - Rev C */
+	DRIVER( srallycb )	/* 1995.02 Sega Rally Championship - Rev B */
 	DRIVER( vcop2 )		/* 1995.09 Virtua Cop 2 */
 	DRIVER( vf2 )		/* 1995.09 Virtua Fighter 2.1*/
 						/* 1995.10 Sky Target */
