@@ -967,6 +967,7 @@ const game_driver * const drivers[] =
 	DRIVER( netchu02 )
 	DRIVER( soulclb2 )
 	DRIVER( soulcl2a )
+	DRIVER( soulcl2b )
 	DRIVER( tekken4 )
 	DRIVER( tekken4a )
 	DRIVER( tekken4b )

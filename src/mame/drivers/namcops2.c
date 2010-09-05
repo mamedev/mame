@@ -143,12 +143,23 @@ ROM_START( soulclb2 )
 	ROM_REGION(0x840000, "key", ROMREGION_ERASE00)
         ROM_LOAD( "sc23vera.ic002", 0x000000, 0x800000, CRC(5c537182) SHA1(ff4213db24b1200b494e6c3bd3eb7b75789e4032) )
         ROM_LOAD( "sc23vera_spr.ic002", 0x800000, 0x040000, CRC(8f548cbc) SHA1(81b844dc5873bb397cd4cd5aca101d7486d60385) )
-
 	DISK_REGION("dvd")
 	DISK_IMAGE_READONLY( "sc21-dvd0d", 0, SHA1(9a7b1ea836adc9d78481928a3067530e0f8d74a6) )
 ROM_END
 
 ROM_START( soulcl2a )
+	ROM_REGION(0x200000, "bios", 0)
+	SYSTEM246_BIOS
+
+	ROM_REGION(0x840000, "key", ROMREGION_ERASE00)
+        ROM_LOAD( "sc22vera.ic002", 0x000000, 0x800000, CRC(2a1031b4) SHA1(81ad0b9273734758da917c62910906f06e774bd6) ) 
+        ROM_LOAD( "sc22vera_spr.ic002", 0x800000, 0x040000, CRC(6dd152e4) SHA1(1eb23b2c65f12b39fecf34d6b21916165441ebe4) ) 
+
+	DISK_REGION("dvd")
+	DISK_IMAGE_READONLY( "sc21-dvd0d", 0, SHA1(9a7b1ea836adc9d78481928a3067530e0f8d74a6) )
+ROM_END
+
+ROM_START( soulcl2b )
 	ROM_REGION(0x200000, "bios", 0)
 	SYSTEM246_BIOS
 
@@ -297,8 +308,8 @@ ROM_START( gundzaft )
 	SYSTEM246_BIOS
 
 	ROM_REGION(0x840000, "key", ROMREGION_ERASE00)
-        ROM_LOAD( "sed1vera.ic002", 0x000000, 0x800000, NO_DUMP )
-        ROM_LOAD( "sed1vera_spr.ic002", 0x800000, 0x040000, NO_DUMP )
+	ROM_LOAD( "sed1vera.ic002", 0x000000, 0x800000, CRC(db52309d) SHA1(3e325dfa68dadcc2f9abd9d338e47ffa511e73f8) ) 
+	ROM_LOAD( "sed1vera_spr.ic002", 0x800000, 0x040000, CRC(12641e0e) SHA1(64b7655f95a2e5e41b5a89998f2b858dab05ae75) ) 
 
 	DISK_REGION("dvd")
 	DISK_IMAGE_READONLY( "sed1dvd0", 0, SHA1(0e6db61d94f66a4ddd7d4a3013983a838d256c5d) )
@@ -308,7 +319,8 @@ GAME(2001, sys246,          0, system246, system246, 0, ROT0, "Namco", "System 2
 GAME(2002, dragchrn,   sys246, system246, system246, 0, ROT0, "Namco", "Dragon Chronicles (DC001 Ver. A)", GAME_NO_SOUND|GAME_NOT_WORKING)
 GAME(2002, netchu02,   sys246, system246, system246, 0, ROT0, "Namco", "Netchuu Pro Yakyuu 2002 (NPY1 Ver. A)", GAME_NO_SOUND|GAME_NOT_WORKING)
 GAME(2002, soulclb2,   sys246, system246, system246, 0, ROT0, "Namco", "Soul Calibur II (SC23 Ver. A)", GAME_NO_SOUND|GAME_NOT_WORKING)
-GAME(2002, soulcl2a, soulclb2, system246, system246, 0, ROT0, "Namco", "Soul Calibur II (SC21 Ver. A)", GAME_NO_SOUND|GAME_NOT_WORKING)
+GAME(2002, soulcl2a, soulclb2, system246, system246, 0, ROT0, "Namco", "Soul Calibur II (SC22 Ver. A)", GAME_NO_SOUND|GAME_NOT_WORKING)
+GAME(2002, soulcl2b, soulclb2, system246, system246, 0, ROT0, "Namco", "Soul Calibur II (SC21 Ver. A)", GAME_NO_SOUND|GAME_NOT_WORKING)
 GAME(2002, tekken4,    sys246, system246, system246, 0, ROT0, "Namco", "Tekken 4 (TEF3 Ver. C)", GAME_NO_SOUND|GAME_NOT_WORKING)
 GAME(2002, tekken4a,  tekken4, system246, system246, 0, ROT0, "Namco", "Tekken 4 (TEF2 Ver. A)", GAME_NO_SOUND|GAME_NOT_WORKING)
 GAME(2002, tekken4b,  tekken4, system246, system246, 0, ROT0, "Namco", "Tekken 4 (TEF1 Ver. A)", GAME_NO_SOUND|GAME_NOT_WORKING)
