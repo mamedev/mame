@@ -770,7 +770,7 @@ static INPUT_PORTS_START( saklove )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN  )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1   ) PORT_NAME("Play")
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON5  ) PORT_NAME("Big? / Small?")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON5  ) PORT_NAME("Big or Small 1")
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON4  ) PORT_NAME("Bet Amount")	// 1-5-10
 
 	PORT_START("IN B")
@@ -778,7 +778,7 @@ static INPUT_PORTS_START( saklove )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_MAHJONG_DOUBLE_UP )	// top 10? / double up?
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN  )	// used?
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN  )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON6  ) PORT_NAME("Big? / Small?")	// plays sample or advances music in system test / big or small?
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON6  ) PORT_NAME("Big or Small 2")	// plays sample or advances music in system test / big or small?
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN  )	// used?
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1    )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN  )	// used?

@@ -1543,8 +1543,8 @@ static INPUT_PORTS_START( tnextspc )
 	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_DIPUNUSED_DIPLOC( 0x02, 0x02, "SW1:2" )			 /* Listed as "Unused" */
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Bonus_Life ) )		PORT_DIPLOCATION("SW1:3")
-	PORT_DIPSETTING(    0x04, "2nd Extend" )
+	PORT_DIPNAME( 0x04, 0x04, "Additional Bonus Life" )		PORT_DIPLOCATION("SW1:3")
+	PORT_DIPSETTING(    0x04, "2nd Extend ONLY" )
 	PORT_DIPSETTING(    0x00, "Every Extend" )
 	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "SW1:4" )			 /* Listed as "Unused" */
 	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coinage ) )			PORT_DIPLOCATION("SW1:5,6")
