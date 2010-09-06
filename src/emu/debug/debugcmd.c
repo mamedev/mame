@@ -364,9 +364,6 @@ void debug_command_init(running_machine *machine)
 	debug_console_register_command(machine, "softreset",	CMDFLAG_NONE, 0, 0, 1, execute_softreset);
 	debug_console_register_command(machine, "hardreset",	CMDFLAG_NONE, 0, 0, 1, execute_hardreset);
 
-	/* ask all the devices if they would like to register functions or symbols */
-	machine->m_devicelist.debug_setup_all();
-
 	machine->add_notifier(MACHINE_NOTIFY_EXIT, debug_command_exit);
 
 	/* set up the initial debugscript if specified */

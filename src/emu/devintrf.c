@@ -164,19 +164,6 @@ void device_list::start_all()
 
 
 //-------------------------------------------------
-//  debug_setup_all - tell all the devices to set
-//  up any debugging they need
-//-------------------------------------------------
-
-void device_list::debug_setup_all()
-{
-	// iterate over devices and stop them
-	for (device_t *device = first(); device != NULL; device = device->next())
-		device->debug_setup();
-}
-
-
-//-------------------------------------------------
 //  reset_all - reset all devices in the list
 //-------------------------------------------------
 
@@ -735,7 +722,10 @@ void device_t::start()
 	
 	// if we're debugging, create a device_debug object
 	if ((m_machine.debug_flags & DEBUG_FLAG_ENABLED) != 0)
+	{
 		m_debug = auto_alloc(&m_machine, device_debug(*this));
+		debug_setup();
+	}
 
 	// register our save states
 	state_save_register_device_item(this, 0, m_clock);

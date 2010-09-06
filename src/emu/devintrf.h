@@ -199,7 +199,6 @@ public:
 	void import_config_list(const device_config_list &list, running_machine &machine);
 
 	void start_all();
-	void debug_setup_all();
 	void reset_all();
 };
 
