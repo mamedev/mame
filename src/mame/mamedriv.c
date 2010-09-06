@@ -9729,6 +9729,7 @@ Other Sun games
 	DRIVER( cmast91 )	/* (c) 1991 Dyna Electronics */
 	DRIVER( cmast92 )	/* (c) 1992 Dyna Electronics */
 
+	DRIVER( tonypok )	/* (c) 1991 Corsica */
 	DRIVER( jkrmast )	/* (c) 199? unknown */
 	DRIVER( pkrmast )	/* (c) 199? unknown */
 	DRIVER( pkrmasta )	/* (c) 199? unknown */

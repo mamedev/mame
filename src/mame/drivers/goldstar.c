@@ -312,11 +312,12 @@ static ADDRESS_MAP_START( nfm_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 
+
 static ADDRESS_MAP_START( cm_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 	AM_RANGE(0x01, 0x01) AM_DEVREAD("aysnd", ay8910_r)
 	AM_RANGE(0x02, 0x03) AM_DEVWRITE("aysnd", ay8910_data_address_w)
-	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)	/* Input Ports */
+	AM_RANGE(0x04, 0x07) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)	/* Inputs */
 	AM_RANGE(0x08, 0x0b) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)	/* DIP switches */
 	AM_RANGE(0x10, 0x10) AM_WRITE (cm_outport0_w)	/* output port */
 	AM_RANGE(0x11, 0x11) AM_WRITENOP
@@ -7028,6 +7029,7 @@ ROM_START( cmezspin )
 	ROM_LOAD( "82s129.u46", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
 ROM_END
 
+
 ROM_START( cmasterc )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "msii841.u81",  0x3000,  0x1000, CRC(977db602) SHA1(0fd3d6781b654ac6befdc9278f84ca708d5d448c) )
@@ -7234,6 +7236,42 @@ ROM_START( cmasterf )
 	ROM_LOAD( "u53.8",  0x0000, 0x10000, CRC(e92443d3) SHA1(4b6ca4521841610054165f085ae05510e77af191) )
 
 	/* proms taken from cmv4, probably wrong  */
+	ROM_REGION( 0x200, "proms", 0 )
+	ROM_LOAD( "82s129.u84", 0x0000, 0x0100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) )
+	ROM_LOAD( "82s129.u70", 0x0100, 0x0100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) )
+
+	ROM_REGION( 0x100, "proms2", 0 )
+	ROM_LOAD( "82s129.u46", 0x0000, 0x0100, CRC(50ec383b) SHA1(ae95b92bd3946b40134bcdc22708d5c6b0f4c23e) )
+ROM_END
+
+
+
+ROM_START( tonypok )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "tonypok.rom",  0x0000,  0x1000, CRC(c7047fcb) SHA1(a224e5a3c0fcd1d588ab264c4d0c624159834488) )
+	ROM_CONTINUE(0x4000,0x1000)
+	ROM_CONTINUE(0x3000,0x1000)
+	ROM_CONTINUE(0x7000,0x1000)
+	ROM_CONTINUE(0x1000,0x1000)
+	ROM_CONTINUE(0x6000,0x1000)
+	ROM_CONTINUE(0x2000,0x1000)
+	ROM_CONTINUE(0x5000,0x1000)
+
+	ROM_REGION( 0x18000, "gfx1", 0 )
+	ROM_LOAD( "pok_u16.7", 0x00000,  0x8000, CRC(d7511644) SHA1(2aedd80b279f6e1231bacfce913e06070c74fff7) )
+	ROM_LOAD( "pok_u11.6", 0x08000,  0x8000, CRC(6ff4d0f9) SHA1(3faccac9562c9269f392655d045a10569f335ccc) )
+	ROM_LOAD( "pok_u4.5",  0x10000,  0x8000, CRC(7c641db2) SHA1(b90d4c5efc388fe8938ed3180b3c36a20ecdc15b) )
+
+	// the remainder of the roms are from Cherry Master - this was a conversion kit
+	ROM_REGION( 0x8000, "gfx2", 0 )
+	ROM_LOAD( "u15.4",  0x0000,  0x2000, CRC(8607ffd9) SHA1(9bc94715554aa2473ae2ed249a47f29c7886b3dc) )
+	ROM_LOAD( "u10.3",  0x2000,  0x2000, CRC(c32367be) SHA1(ff217021b9c58e23b2226f8b0a7f5da966225715) )
+	ROM_LOAD( "u14.2",  0x4000,  0x2000, CRC(6dfcb188) SHA1(22430429c798954d9d979e62699b58feae7fdbf4) )
+	ROM_LOAD( "u9.1",   0x6000,  0x2000, CRC(9678ead2) SHA1(e80aefa98b2363fe9e6b2415762695ace272e4d3) )
+
+	ROM_REGION( 0x10000, "user1", 0 )
+	ROM_LOAD( "u53.8",  0x0000, 0x10000, CRC(e92443d3) SHA1(4b6ca4521841610054165f085ae05510e77af191) )
+
 	ROM_REGION( 0x200, "proms", 0 )
 	ROM_LOAD( "82s129.u84", 0x0000, 0x0100, CRC(0489b760) SHA1(78f8632b17a76335183c5c204cdec856988368b0) )
 	ROM_LOAD( "82s129.u70", 0x0100, 0x0100, CRC(21eb5b19) SHA1(9b8425bdb97f11f4855c998c7792c3291fd07470) )
@@ -9878,6 +9916,15 @@ static DRIVER_INIT( unkch4 )
 	ROM[0x9a6f] = 0x00;
 }
 
+static DRIVER_INIT( tonypok )
+{
+	// the ppi doesn't seem to work properly, so just install the inputs directly
+	address_space *io = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_IO);
+	memory_install_read_port(io, 0x04, 0x04, 0, 0, "IN0" );
+	memory_install_read_port(io, 0x05, 0x05, 0, 0, "IN1" );
+	memory_install_read_port(io, 0x06, 0x06, 0, 0, "IN2" );
+
+}
 
 
 /*********************************************
@@ -9917,6 +9964,8 @@ GAME(  1991, cmasterd,  cmaster,  cm,       cmasterb, cmv4,      ROT0, "Dyna",  
 GAME(  1991, cmastere,  cmaster,  cm,       cmasterb, cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 6)",           0 )
 GAME(  1991, cmasterf,  cmaster,  cm,       cmasterb, cmv4,      ROT0, "Dyna",              "Cherry Master I (ver.1.01, set 7)",           0 )
 
+
+GAME(  1991, tonypok,   0,        cm,       cmv801,   tonypok,   ROT0, "Corsica",           "Poker Master (Tony-Poker V3.A, hack?)",   0 )
 GAME(  199?, jkrmast,   0,        pkrmast,  cmasterb, cmv4,      ROT0, "<unknown>",         "Joker Master",                                GAME_NOT_WORKING ) // incomplete dump + encrypted?
 GAME(  199?, pkrmast,   jkrmast,  pkrmast,  cmasterb, cmv4,      ROT0, "<unknown>",         "Poker Master (set 1)",                        GAME_NOT_WORKING ) // incomplete dump + encrypted?
 GAME(  199?, pkrmasta,  jkrmast,  pkrmast,  cmasterb, cmv4,      ROT0, "<unknown>",         "Poker Master (set 2)",                        GAME_NOT_WORKING ) // incomplete dump + encrypted?
