@@ -876,9 +876,12 @@ static void pce_refresh_sprites(running_machine *machine, int which, int line, U
 			sprites_drawn++;
 			if(sprites_drawn > 16)
 			{
-				vdc[which].status |= VDC_OR;
 				if(vdc[which].vdc_data[CR].w & CR_OV)
+				{
+					/* note: flag is set only if irq is taken, Mizubaku Daibouken relies on this behaviour */
+					vdc[which].status |= VDC_OR;
 					cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
+				}
 				continue;  /* Should cause an interrupt */
 			}
 
@@ -991,9 +994,12 @@ static void pce_refresh_sprites(running_machine *machine, int which, int line, U
 				sprites_drawn++;
 				if( sprites_drawn > 16 )
 				{
-					vdc[which].status |= VDC_OR;
 					if(vdc[which].vdc_data[CR].w&CR_OV)
+					{
+						/* note: flag is set only if irq is taken, Mizubaku Daibouken relies on this behaviour */
+						vdc[which].status |= VDC_OR;
 						cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
+					}
 				}
 				else
 				{
