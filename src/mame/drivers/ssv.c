@@ -2674,21 +2674,22 @@ static DRIVER_INIT( hypreact )		{	init_ssv(machine, +0, +0xf0, +0, -0xf7, 0);	}
 static DRIVER_INIT( hypreac2 )		{	init_ssv(machine, +0, +0xf0, +0, -0xf8, 0); init_hypreac2(machine);	}
 static DRIVER_INIT( janjans1 )		{	init_ssv(machine, +0, +0xe8, +0, -0xf0, 0);	}
 static DRIVER_INIT( keithlcy )		{	init_ssv(machine, -8, +0xf1, +0, -0xf0, 0);	}
-static DRIVER_INIT( meosism )		{	init_ssv(machine, +0, +0xe8, +0, -0xef, 0);	}
-static DRIVER_INIT( mslider )		{	init_ssv(machine, -16,+0xf0, +8, -0xf1, 0);	}
-static DRIVER_INIT( ryorioh )		{	init_ssv(machine, +0, +0xe8, +0, -0xf0, 0);	}
+static DRIVER_INIT( meosism )			{	init_ssv(machine, +0, +0xe8, +0, -0xef, 0);	}
+static DRIVER_INIT( mslider )			{	init_ssv(machine, -8, +0xf0, +0, -0xf1, 0);	}
+static DRIVER_INIT( ryorioh )			{	init_ssv(machine, +0, +0xe8, +0, -0xf0, 0);	}
 static DRIVER_INIT( srmp4 )			{	init_ssv(machine, -8, +0xf0, +0, -0xf0, 0);
 //  ((UINT16 *)memory_region(machine, "user1"))[0x2b38/2] = 0x037a;   /* patch to see gal test mode */
 }
-static DRIVER_INIT( srmp7 )		{	init_ssv(machine, +0, -0x0f, +0, -0xf0, 0);	}
+static DRIVER_INIT( srmp7 )			{	init_ssv(machine, +0, -0x0f, +0, -0xf0, 0);	}
 static DRIVER_INIT( stmblade )		{	init_ssv(machine, -8, +0xef, +0, -0xf0, 0);	}
 static DRIVER_INIT( survarts )		{	init_ssv(machine, +0, +0xe8, +0, -0xef, 0);	}
 static DRIVER_INIT( dynagear )		{	init_ssv(machine, -8, +0xec, +0, -0xef, 0);	}
 static DRIVER_INIT( sxyreact )		{	init_ssv(machine, +0, +0xe8, +0, -0xef, 0); init_hypreac2(machine);	}	// different
+static DRIVER_INIT( cairblad )		{	init_ssv(machine, +0, +0xe8, +0, -0xef, 0); init_hypreac2(machine);	}	// different
 static DRIVER_INIT( sxyreac2 )		{	init_ssv(machine, +0, +0xe8, +0, -0xef, 0); init_hypreac2(machine);	}
 static DRIVER_INIT( twineag2 )		{	init_ssv(machine, -6, +0x01, -2, +0x00, 1);	}
-static DRIVER_INIT( ultrax )		{	init_ssv(machine, -8, +0x01, +0, +0x00, 1);	}
-static DRIVER_INIT( vasara )		{	init_ssv(machine, +0, +0xf0, +0, -0xf8, 0);	}
+static DRIVER_INIT( ultrax )			{	init_ssv(machine, -8, +0x01, +0, +0x00, 1);	}
+static DRIVER_INIT( vasara )			{	init_ssv(machine, +0, +0xf0, +0, -0xf8, 0);	}
 static DRIVER_INIT( jsk )			{	init_ssv(machine, -8, +0xf5, +0, -0xf4, 0);	}
 
 
@@ -2704,7 +2705,7 @@ static MACHINE_CONFIG_START( ssv, ssv_state )
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(0x180, 0x100)
+	MDRV_SCREEN_SIZE(0x1c6, 0x106)
 	MDRV_SCREEN_VISIBLE_AREA(0, 0x150-1, 0, 0xf0-1)
 
 	MDRV_GFXDECODE(ssv)
@@ -2732,7 +2733,7 @@ static MACHINE_CONFIG_DERIVED( drifto94, ssv )
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0, 0x150-1, 4, 0xf0-1)
+	MDRV_SCREEN_VISIBLE_AREA(0, 0x150-1, 1, 0xf0-1-1)
 MACHINE_CONFIG_END
 
 
@@ -2747,7 +2748,7 @@ static MACHINE_CONFIG_DERIVED( gdfs, ssv )
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0, 0x150-1, 0, 0xf0-1)
+	MDRV_SCREEN_VISIBLE_AREA(0, 0x152-1, 0, 0xf0-1)
 
 	MDRV_GFXDECODE(gdfs)
 	MDRV_VIDEO_START(gdfs)
@@ -2763,7 +2764,7 @@ static MACHINE_CONFIG_DERIVED( hypreact, ssv )
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(8, 0x148-1, 16, 0xf0-1)
+	MDRV_SCREEN_VISIBLE_AREA(0, 0x152-1, 8, 0xf8-1)
 MACHINE_CONFIG_END
 
 
@@ -2775,7 +2776,7 @@ static MACHINE_CONFIG_DERIVED( hypreac2, ssv )
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0, 0x150-1, 8, 0xf8-1)
+	MDRV_SCREEN_VISIBLE_AREA(0, 0x152-1, 8, 0xf8-1)
 MACHINE_CONFIG_END
 
 
@@ -2787,7 +2788,7 @@ static MACHINE_CONFIG_DERIVED( janjans1, ssv )
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0, 0x150-1, 0, 0xf0-1)
+	MDRV_SCREEN_VISIBLE_AREA(0, 0x150-1, 0, 0xf0-1-1)
 MACHINE_CONFIG_END
 
 
@@ -2799,7 +2800,7 @@ static MACHINE_CONFIG_DERIVED( keithlcy, ssv )
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0, 0x150-1, 4, 0xf0-1)
+	MDRV_SCREEN_VISIBLE_AREA(0, 0x150-1, 1, 0xf0-1-1)
 MACHINE_CONFIG_END
 
 
@@ -2813,7 +2814,7 @@ static MACHINE_CONFIG_DERIVED( meosism, ssv )
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0, 0x150-1, 0, 0xf0-1)
+	MDRV_SCREEN_VISIBLE_AREA(0, 0x150-1+2, 2, 0xf0-1-2)
 MACHINE_CONFIG_END
 
 
@@ -2825,7 +2826,7 @@ static MACHINE_CONFIG_DERIVED( mslider, ssv )
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0, 0x150-1, 0, 0xf0-1)
+	MDRV_SCREEN_VISIBLE_AREA(0, 0x160-1, 0, 0xf0-1)
 MACHINE_CONFIG_END
 
 
@@ -2837,9 +2838,19 @@ static MACHINE_CONFIG_DERIVED( ryorioh, ssv )
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0, 0x150-1, 0, 0xf0-1)
+	MDRV_SCREEN_VISIBLE_AREA(0, 0x150-1, 0, 0xf0-1-1)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( vasara, ssv )
+
+	/* basic machine hardware */
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_PROGRAM_MAP(ryorioh_map)
+
+	/* video hardware */
+	MDRV_SCREEN_MODIFY("screen")
+	MDRV_SCREEN_VISIBLE_AREA(0, 0x150-1, 0, 0xf0-1)
+MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( srmp4, ssv )
 
@@ -2861,7 +2872,7 @@ static MACHINE_CONFIG_DERIVED( srmp7, ssv )
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0, 0x150-1, 0, 0xf0-1)
+	MDRV_SCREEN_VISIBLE_AREA(0, 0x150-1, 0, 0xf0-1-1)
 MACHINE_CONFIG_END
 
 
@@ -2874,7 +2885,7 @@ static MACHINE_CONFIG_DERIVED( stmblade, ssv )
 	MDRV_NVRAM_HANDLER(ssv)
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0, 0x158-1, 0, 0xf0-1)
+	MDRV_SCREEN_VISIBLE_AREA(0, 0x160-1, 0, 0xf0-1)
 MACHINE_CONFIG_END
 
 
@@ -2894,7 +2905,7 @@ static MACHINE_CONFIG_DERIVED( dynagear, survarts )
 	/* basic machine hardware */
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(8, 0x158-16-1, 0, 0xf0-1)
+	MDRV_SCREEN_VISIBLE_AREA(0, 336-1, 0, 0xf0-1)
 MACHINE_CONFIG_END
 
 
@@ -2926,9 +2937,34 @@ static MACHINE_CONFIG_DERIVED( sxyreact, ssv )
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
+	MDRV_SCREEN_VISIBLE_AREA(0, 0x150-1+2, 0, 0xf0-1)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( sxyreac2, ssv )
+
+	/* basic machine hardware */
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_PROGRAM_MAP(sxyreact_map)
+
+	MDRV_NVRAM_HANDLER(ssv)
+
+	/* video hardware */
+	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, 0x150-1, 0, 0xf0-1)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( cairblad, ssv )
+
+	/* basic machine hardware */
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_PROGRAM_MAP(sxyreact_map)
+
+	MDRV_NVRAM_HANDLER(ssv)
+
+	/* video hardware */
+	MDRV_SCREEN_MODIFY("screen")
+	MDRV_SCREEN_VISIBLE_AREA(0, 0x150-1+2, 0, 0xf0-1)
+MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( twineag2, ssv )
 
@@ -4625,9 +4661,9 @@ GAME( 1997,  mslider,  0,        mslider,  mslider,  mslider,  ROT0,   "Visco / 
 GAME( 1997,  srmp7,    0,        srmp7,    srmp7,    srmp7,    ROT0,   "Seta",               "Super Real Mahjong P7 (Japan)",                    GAME_NO_COCKTAIL | GAME_IMPERFECT_SOUND )
 GAME( 1998,  ryorioh,  0,        ryorioh,  ryorioh,  ryorioh,  ROT0,   "Visco",              "Gourmet Battle Quiz Ryohrioh CooKing (Japan)",     GAME_NO_COCKTAIL )
 GAME( 1998,  sxyreact, 0,        sxyreact, sxyreact, sxyreact, ROT0,   "Sammy",              "Pachinko Sexy Reaction (Japan)",                   GAME_NO_COCKTAIL )
-GAME( 1999,  sxyreac2, 0,        sxyreact, sxyreact, sxyreac2, ROT0,   "Sammy",              "Pachinko Sexy Reaction 2 (Japan)",                 GAME_NO_COCKTAIL )
-GAME( 1999,  cairblad, 0,        sxyreact, cairblad, sxyreact, ROT270, "Sammy",              "Change Air Blade (Japan)",                         GAME_NO_COCKTAIL )
+GAME( 1999,  sxyreac2, 0,        sxyreac2, sxyreact, sxyreac2, ROT0,   "Sammy",              "Pachinko Sexy Reaction 2 (Japan)",                 GAME_NO_COCKTAIL )
+GAME( 1999,  cairblad, 0,        cairblad, cairblad, cairblad, ROT270, "Sammy",              "Change Air Blade (Japan)",                         GAME_NO_COCKTAIL )
 GAME( 2000,  janjans2, 0,        janjans1, janjans2, janjans1, ROT0,   "Visco",              "Lovely Pop Mahjong JangJang Shimasho 2 (Japan)",   GAME_NO_COCKTAIL | GAME_IMPERFECT_GRAPHICS )
-GAME( 2000,  vasara,   0,        ryorioh,  vasara,   vasara,   ROT270, "Visco",              "Vasara",                                           GAME_NO_COCKTAIL )
-GAME( 2001,  vasara2,  0,        ryorioh,  vasara2,  vasara,   ROT270, "Visco",              "Vasara 2 (set 1)",                                 GAME_NO_COCKTAIL )
-GAME( 2001,  vasara2a, vasara2,  ryorioh,  vasara2,  vasara,   ROT270, "Visco",              "Vasara 2 (set 2)",                                 GAME_NO_COCKTAIL )
+GAME( 2000,  vasara,   0,        vasara,   vasara,   vasara,   ROT270, "Visco",              "Vasara",                                           GAME_NO_COCKTAIL )
+GAME( 2001,  vasara2,  0,        vasara,   vasara2,  vasara,   ROT270, "Visco",              "Vasara 2 (set 1)",                                 GAME_NO_COCKTAIL )
+GAME( 2001,  vasara2a, vasara2,  vasara,   vasara2,  vasara,   ROT270, "Visco",              "Vasara 2 (set 2)",                                 GAME_NO_COCKTAIL )

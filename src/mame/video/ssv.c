@@ -1120,6 +1120,8 @@ void ssv_enable_video(running_machine *machine, int enable)
 
 VIDEO_UPDATE( ssv )
 {
+	rectangle clip = { 0, 0, 0, 0 };
+
 	ssv_state *state = screen->machine->driver_data<ssv_state>();
 
 	if (state->scroll[0x76/2] & 0x0080)
@@ -1138,10 +1140,31 @@ VIDEO_UPDATE( ssv )
 	/* The background color is the first one in the palette */
 	bitmap_fill(bitmap,cliprect, 0);
 
-	if (!state->enable_video)	return 0;
+	// used by twineag2 and ultrax
+	clip.min_x = (cliprect->max_x / 2 + state->scroll[0x62/2]) * 2 - state->scroll[0x64/2] * 2 + 2;
+	clip.max_x = (cliprect->max_x / 2 + state->scroll[0x62/2]) * 2 - state->scroll[0x62/2] * 2 + 1;
+	clip.min_y = (cliprect->max_y     + state->scroll[0x6a/2])     - state->scroll[0x6c/2]     + 1;
+	clip.max_y = (cliprect->max_y     + state->scroll[0x6a/2])     - state->scroll[0x6a/2]        ;
 
-	draw_layer(screen->machine, bitmap, cliprect, 0);	// "background layer"
+//	printf("%04x %04x %04x %04x\n",clip.min_x, clip.max_x, clip.min_y, clip.max_y);
 
-	draw_sprites(screen->machine, bitmap, cliprect);	// sprites list
+	if (clip.min_x < 0) clip.min_x = 0;
+	if (clip.min_y < 0) clip.min_y = 0;
+	if (clip.max_x > cliprect->max_x) clip.max_x = cliprect->max_x;
+	if (clip.max_y > cliprect->max_y) clip.max_y = cliprect->max_y;
+
+	if (clip.min_x > clip.max_x)
+		clip.min_x = clip.max_x;
+	if (clip.min_y > clip.max_y)
+		clip.min_y = clip.max_y;
+
+	if (!state->enable_video)
+		return 0;
+
+	draw_layer(screen->machine, bitmap, &clip, 0);	// "background layer"
+
+	draw_sprites(screen->machine, bitmap, &clip);	// sprites list
+
+
 	return 0;
 }
