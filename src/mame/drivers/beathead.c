@@ -384,6 +384,10 @@ static INPUT_PORTS_START( beathead )
 	PORT_BIT( 0xfff0, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_INCLUDE( atarijsa_iii )		/* audio board port */
+        PORT_MODIFY("JSAIII")
+// coin 1+2 import from JSAIII not used - set to unused
+	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_UNUSED )
+
 INPUT_PORTS_END
 
 
