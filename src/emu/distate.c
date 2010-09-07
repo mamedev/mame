@@ -410,8 +410,7 @@ device_config_state_interface::~device_config_state_interface()
 device_state_interface::device_state_interface(running_machine &machine, const device_config &config, device_t &device)
 	: device_interface(machine, config, device),
 	  m_machine(machine),
-	  m_state_config(dynamic_cast<const device_config_state_interface &>(config)),
-	  m_state_list(NULL)
+	  m_state_config(dynamic_cast<const device_config_state_interface &>(config))
 {
 	memset(m_fast_state, 0, sizeof(m_fast_state));
 }
@@ -584,9 +583,7 @@ device_state_entry &device_state_interface::state_add(int index, const char *sym
 	device_state_entry *entry = auto_alloc(&m_machine, device_state_entry(index, symbol, data, size));
 
 	// append to the end of the list
-	device_state_entry **tailptr;
-	for (tailptr = &m_state_list; *tailptr != NULL; tailptr = &(*tailptr)->m_next) ;
-	*tailptr = entry;
+	m_state_list.append(*entry);
 
 	// set the fast entry if applicable
 	if (index >= k_fast_state_min && index <= k_fast_state_max)
@@ -608,7 +605,7 @@ const device_state_entry *device_state_interface::state_find_entry(int index)
 		return m_fast_state[index - k_fast_state_min];
 
 	// otherwise, scan the first
-	for (const device_state_entry *entry = m_state_list; entry != NULL; entry = entry->m_next)
+	for (const device_state_entry *entry = m_state_list.first(); entry != NULL; entry = entry->m_next)
 		if (entry->m_index == index)
 			return entry;
 
@@ -625,6 +622,6 @@ const device_state_entry *device_state_interface::state_find_entry(int index)
 void device_state_interface::interface_post_start()
 {
 	// make sure we got something during startup
-	if (m_state_list == NULL)
+	if (m_state_list.count() == 0)
 		throw emu_fatalerror("No state registered for device '%s' that supports it!", m_device.tag());
 }

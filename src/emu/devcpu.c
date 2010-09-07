@@ -263,7 +263,7 @@ void legacy_cpu_device::device_start()
 	m_inited = true;
 
 	// fetch information about the CPU states
-	if (m_state_list == NULL)
+	if (m_state_list.count() == 0)
 	{
 		m_using_legacy_state = true;
 		for (int index = 0; index < MAX_REGS; index++)

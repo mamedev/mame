@@ -73,6 +73,7 @@ enum
 class device_state_entry
 {
 	friend class device_state_interface;
+	friend class simple_list<device_state_entry>;
 
 private:
 	// construction/destruction
@@ -161,7 +162,7 @@ public:
 
 	// configuration access
 	const device_config_state_interface &state_config() const { return m_state_config; }
-	const device_state_entry *state_first() const { return m_state_list; }
+	const device_state_entry *state_first() const { return m_state_list.first(); }
 
 	// state getters
 	UINT64 state(int index);
@@ -205,7 +206,7 @@ protected:
 	// state
 	running_machine &						m_machine;				// reference to owning machine
 	const device_config_state_interface &	m_state_config;			// reference to configuration data
-	device_state_entry *					m_state_list;			// head of state list
+	simple_list<device_state_entry>			m_state_list;			// head of state list
 	device_state_entry *					m_fast_state[k_fast_state_max  + 1 - k_fast_state_min];
 																	// fast access to common entries
 };
