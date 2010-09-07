@@ -332,9 +332,6 @@ void running_machine::start()
 	// start up the devices
 	m_devicelist.start_all();
 
-	// finish image devices init process
-	image_postdevice_init(this);
-
 	// if we're coming in with a savegame request, process it now
 	const char *savegame = options_get_string(&m_options, OPTION_STATE);
 	if (savegame[0] != 0)
@@ -977,8 +974,8 @@ void driver_device_config_base::static_set_game(device_config *device, const gam
 
 
 //-------------------------------------------------
-//  static_set_machine_start - set the legacy 
-//  machine start callback in the device 
+//  static_set_machine_start - set the legacy
+//  machine start callback in the device
 //  configuration
 //-------------------------------------------------
 
@@ -989,8 +986,8 @@ void driver_device_config_base::static_set_callback(device_config *device, callb
 
 
 //-------------------------------------------------
-//  static_set_palette_init - set the legacy 
-//  palette init callback in the device 
+//  static_set_palette_init - set the legacy
+//  palette init callback in the device
 //  configuration
 //-------------------------------------------------
 
@@ -1001,8 +998,8 @@ void driver_device_config_base::static_set_palette_init(device_config *device, p
 
 
 //-------------------------------------------------
-//  static_set_video_update - set the legacy 
-//  video update callback in the device 
+//  static_set_video_update - set the legacy
+//  video update callback in the device
 //  configuration
 //-------------------------------------------------
 
@@ -1013,7 +1010,7 @@ void driver_device_config_base::static_set_video_update(device_config *device, v
 
 
 //-------------------------------------------------
-//  rom_region - return a pointer to the ROM 
+//  rom_region - return a pointer to the ROM
 //  regions specified for the current game
 //-------------------------------------------------
 
@@ -1175,7 +1172,7 @@ void driver_device::device_start()
 	// reschedule ourselves to be last
 	if (next() != NULL)
 		throw device_missing_dependencies();
-	
+
 	// find all the registered devices
 	for (auto_finder_base *autodev = m_auto_finder_list; autodev != NULL; autodev = autodev->m_next)
 		autodev->findit(*this);
@@ -1183,7 +1180,10 @@ void driver_device::device_start()
 	// call the game-specific init
 	if (m_config.m_game->driver_init != NULL)
 		(*m_config.m_game->driver_init)(&m_machine);
-	
+
+	// finish image devices init process
+	image_postdevice_init(&m_machine);
+
 	// call palette_init if present
 	if (m_config.m_palette_init != NULL)
 		(*m_config.m_palette_init)(&m_machine, memory_region(machine, "proms"));
