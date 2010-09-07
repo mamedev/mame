@@ -43,7 +43,7 @@ INLINE char *src2(UINT32 op, int scale)
 	return temp;
 }
 
-CPU_DISASSEMBLE( asap )
+offs_t asap_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram)
 {
 	UINT32 op = oprom[0] | (oprom[1] << 8) | (oprom[2] << 16) | (oprom[3] << 24);
 	int opcode = op >> 27;

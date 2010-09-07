@@ -280,7 +280,7 @@ device_execute_interface::device_execute_interface(running_machine &machine, con
 	  m_iloops(0),
 	  m_partial_frame_timer(NULL),
 	  m_profiler(PROFILER_IDLE),
-	  m_icount(NULL),
+	  m_icountptr(NULL),
 	  m_cycles_running(0),
 	  m_cycles_stolen(0),
 	  m_suspend(0),
@@ -326,7 +326,7 @@ bool device_execute_interface::executing() const
 
 INT32 device_execute_interface::cycles_remaining() const
 {
-	return executing() ? *m_icount : 0;
+	return executing() ? *m_icountptr : 0;
 }
 
 
@@ -342,9 +342,9 @@ void device_execute_interface::eat_cycles(int cycles)
 		return;
 
 	// clamp cycles to the icount and update
-	if (cycles > *m_icount)
-		cycles = *m_icount;
-	*m_icount -= cycles;
+	if (cycles > *m_icountptr)
+		cycles = *m_icountptr;
+	*m_icountptr -= cycles;
 }
 
 
@@ -360,7 +360,7 @@ void device_execute_interface::adjust_icount(int delta)
 		return;
 
 	// aply the delta directly
-	*m_icount += delta;
+	*m_icountptr += delta;
 }
 
 
@@ -377,12 +377,12 @@ void device_execute_interface::abort_timeslice()
 		return;
 
 	// swallow the remaining cycles
-	if (m_icount != NULL)
+	if (m_icountptr != NULL)
 	{
-		int delta = *m_icount;
+		int delta = *m_icountptr;
 		m_cycles_stolen += delta;
 		m_cycles_running -= delta;
-		*m_icount -= delta;
+		*m_icountptr -= delta;
 	}
 }
 
@@ -492,8 +492,8 @@ attotime device_execute_interface::local_time() const
 	attotime result = m_localtime;
 	if (executing())
 	{
-		assert(m_cycles_running >= *m_icount);
-		int cycles = m_cycles_running - *m_icount;
+		assert(m_cycles_running >= *m_icountptr);
+		int cycles = m_cycles_running - *m_icountptr;
 		result = attotime_add(result, cycles_to_attotime(cycles));
 	}
 	return result;
@@ -509,8 +509,8 @@ UINT64 device_execute_interface::total_cycles() const
 {
 	if (executing())
 	{
-		assert(m_cycles_running >= *m_icount);
-		return m_totalcycles + m_cycles_running - *m_icount;
+		assert(m_cycles_running >= *m_icountptr);
+		return m_totalcycles + m_cycles_running - *m_icountptr;
 	}
 	else
 		return m_totalcycles;
@@ -584,7 +584,7 @@ void device_execute_interface::interface_pre_start()
 void device_execute_interface::interface_post_start()
 {
 	// make sure somebody set us up the icount
-	assert_always(m_icount != NULL, "m_icount never initialized!");
+	assert_always(m_icountptr != NULL, "m_icountptr never initialized!");
 }
 
 

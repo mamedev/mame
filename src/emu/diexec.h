@@ -323,7 +323,7 @@ protected:
 
 	// cycle counting and executing
 	profile_type			m_profiler;					// profiler tag
-	int *					m_icount;					// pointer to the icount
+	int *					m_icountptr;				// pointer to the icount
 	int 					m_cycles_running;			// number of cycles we are executing
 	int						m_cycles_stolen;			// number of cycles we artificially stole
 
