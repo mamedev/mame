@@ -603,7 +603,7 @@ static UINT8 vdc_r( running_machine *machine, int which, offs_t offset )
 	{
 		case 0x00:
 			temp = vdc[which].status;
-			vdc[which].status &= ~(VDC_VD | VDC_RR | VDC_CR | VDC_OR | VDC_DS);
+			vdc[which].status &= ~(VDC_VD | VDC_DV | VDC_DS | VDC_RR | VDC_OR | VDC_CR);
 			cputag_set_input_line(machine, "maincpu", 0, CLEAR_LINE);
 			break;
 
