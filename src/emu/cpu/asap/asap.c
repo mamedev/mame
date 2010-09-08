@@ -422,8 +422,8 @@ void asap_device::state_string_export(const device_state_entry &entry, astring &
 
 offs_t asap_device::disasm_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram, UINT32 options)
 {
-	extern offs_t asap_disassemble(char *buffer, offs_t pc, const UINT8 *oprom, const UINT8 *opram);
-	return asap_disassemble(buffer, pc, oprom, opram);
+	extern CPU_DISASSEMBLE( asap );
+	return CPU_DISASSEMBLE_NAME(asap)(NULL, buffer, pc, oprom, opram, 0);
 }
 
 
