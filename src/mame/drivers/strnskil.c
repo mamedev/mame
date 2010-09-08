@@ -7,15 +7,15 @@ Strength & Skill (c) 1984 Sun Electronics
     19/Jun/2001 -
 
 Notes:
- Banbam has a Fujitsu MB8841 4-Bit MCU for protection labeled SUN 8212
- It's not known if it has internal ROM code or if rom 12 is the only
- program code for it. Pettan Pyuu is a clone of Banbam although with
- different levels / play fields.
+ Banbam has a Fujitsu MB8841 4-Bit MCU for protection labeled SUN 8212.
+ Its internal ROM has been imaged, manually typed, and decoded as sun-8212.ic3.
+ Pettan Pyuu is a clone of Banbam although with different levels / play fields.
 
 *****************************************************************************/
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "cpu/mb88xx/mb88xx.h"
 #include "deprecat.h"
 #include "sound/sn76496.h"
 #include "includes/strnskil.h"
@@ -24,8 +24,7 @@ Notes:
 
 static READ8_HANDLER( strnskil_d800_r )
 {
-/* bit0: interrupt type?, bit1: CPU2 busack? */
-
+    /* bit0: interrupt type?, bit1: CPU2 busack? */
 	if (cpu_getiloops(space->cpu) == 0)
 		return 0;
 	return 1;
@@ -106,6 +105,11 @@ static ADDRESS_MAP_START( strnskil_map2, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd802, 0xd802) AM_DEVWRITE("sn2", sn76496_w)
 ADDRESS_MAP_END
 
+
+static ADDRESS_MAP_START( mcu_io_map, ADDRESS_SPACE_IO, 8 )
+//	AM_RANGE(MB88_PORTK,  MB88_PORTK)  AM_READ(mcu_portk_r)
+//	AM_RANGE(MB88_PORTR0, MB88_PORTR0) AM_READWRITE(mcu_portr0_r, mcu_portr0_w)
+ADDRESS_MAP_END
 
 /****************************************************************************/
 
@@ -349,6 +353,12 @@ static MACHINE_CONFIG_START( strnskil, driver_device )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
+
+static MACHINE_CONFIG_DERIVED( banbam, strnskil )
+    MDRV_CPU_ADD("mcu", MB8841, 8000000/2)
+    MDRV_CPU_IO_MAP(mcu_io_map)
+MACHINE_CONFIG_END
+
 /****************************************************************************/
 
 ROM_START( strnskil )
@@ -448,7 +458,7 @@ ROM_START( pettanp )
 	ROM_REGION( 0x0100, "user1", 0 ) /* scroll control PROM */
 	ROM_LOAD( "16-6.59",  0x0000,  0x0100, CRC(ec4faf5b) SHA1(7ebbf50807d04105ebadec91bded069408e399ba) ) /* Prom type 24s10 */
 
-	ROM_REGION( 0x1000, "user2", 0 ) /* protection, program code used with Fujitsu MB8841 4-Bit MCU */
+	ROM_REGION( 0x1000, "user2", 0 ) /* protection data used with Fujitsu MB8841 4-Bit MCU */
 	ROM_LOAD( "tvg12-16.2", 0x0000,  0x1000, CRC(3abc6ba8) SHA1(15e0b0f9d068f6094e2be4f4f1dea0ff6e85686b) )
 ROM_END
 
@@ -483,8 +493,11 @@ ROM_START( banbam )
 	ROM_REGION( 0x0100, "user1", 0 ) /* scroll control PROM */
 	ROM_LOAD( "16-6.59",  0x0000,  0x0100, CRC(ec4faf5b) SHA1(7ebbf50807d04105ebadec91bded069408e399ba) ) /* Prom type 24s10 */
 
-	ROM_REGION( 0x2000, "user2", 0 ) /* protection, program code used with Fujitsu MB8841 4-Bit MCU */
+	ROM_REGION( 0x2000, "user2", 0 ) /* protection, data used with Fujitsu MB8841 4-Bit MCU */
 	ROM_LOAD( "ban-rom12.ic2", 0x0000,  0x2000, CRC(044bb2f6) SHA1(829b2152740061e0506c7504885d8404fb8fe360) )
+
+	ROM_REGION( 0x800, "mcu", 0 ) /* Fujitsu MB8841 4-Bit MCU internal ROM */
+	ROM_LOAD( "sun-8212.ic3", 0x000,  0x800, BAD_DUMP CRC(8869611e) SHA1(c6443f3bcb0cdb4d7b1b19afcbfe339c300f36aa) )
 ROM_END
 
 static DRIVER_INIT( pettanp )
@@ -508,5 +521,5 @@ static DRIVER_INIT( banbam )
 
 GAME( 1984, strnskil, 0,        strnskil, strnskil, 0,       ROT0, "Sun Electronics", "Strength & Skill", 0 )
 GAME( 1984, guiness,  strnskil, strnskil, strnskil, 0,       ROT0, "Sun Electronics", "The Guiness (Japan)", 0 )
-GAME( 1984, banbam,   0,        strnskil, banbam,   banbam,  ROT0, "Sun Electronics", "BanBam", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
+GAME( 1984, banbam,   0,        banbam,   banbam,   banbam,  ROT0, "Sun Electronics", "BanBam", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
 GAME( 1984, pettanp,  banbam,   strnskil, banbam,   pettanp, ROT0, "Sun Electronics", "Pettan Pyuu (Japan)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
