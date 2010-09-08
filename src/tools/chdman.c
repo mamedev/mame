@@ -776,7 +776,7 @@ static int do_createcd(int argc, char *argv[], int param)
 			goto cleanup;
 		}
 
-		printf("Track %d/%d (%s:%d,%d frames,%d hunks,swap %d,pregap %d,postgap %d)\n", i+1, toc.numtrks, track_info.fname[i], track_info.offset[i], toc.tracks[i].frames, trackhunks, track_info.swap[i], toc.tracks[i].pregap, toc.tracks[i].postgap);
+		printf("Track %02d/%02d (%s:%d,%d frames,%d hunks,swap %d,pregap %d,postgap %d)\n", i+1, toc.numtrks, track_info.fname[i], track_info.offset[i], toc.tracks[i].frames, trackhunks, track_info.swap[i], toc.tracks[i].pregap, toc.tracks[i].postgap);
 
 		/* loop over hunks */
 		for (curhunk = 0; curhunk < trackhunks; curhunk++, totalhunks++)

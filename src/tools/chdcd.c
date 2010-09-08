@@ -232,23 +232,210 @@ static chd_error chdcd_parse_gdi(const char *tocfname, cdrom_toc *outtoc, chdcd_
 }
 
 /*-------------------------------------------------
-    chdcd_tracksize_helper - fixes up track sizes
-                             for bin/cue images
+    chdcd_parse_toc - parse a CDRWin format CUE file
 -------------------------------------------------*/
 
-static void chdcd_tracksize_helper(int trknum, cdrom_toc *outtoc, chdcd_track_input_info *outinfo)
+chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc *outtoc, chdcd_track_input_info *outinfo)
 {
-	if (outtoc->tracks[trknum].frames == 0)
+	FILE *infile;
+	int i, trknum;
+	static char token[128];
+	static char lastfname[128];
+
+	infile = fopen(tocfname, "rt");
+
+	if (infile == (FILE *)NULL)
+	{
+		return CHDERR_FILE_NOT_FOUND;
+	}
+
+	/* clear structures */
+	memset(outtoc, 0, sizeof(cdrom_toc));
+	memset(outinfo, 0, sizeof(chdcd_track_input_info));
+
+	trknum = -1;
+
+	while (!feof(infile))
+	{
+		/* get the next line */
+		fgets(linebuffer, 511, infile);
+
+		/* if EOF didn't hit, keep going */
+		if (!feof(infile))
+		{
+			i = 0;
+
+			TOKENIZE
+
+			if (!strcmp(token, "FILE"))
+			{
+				/* found the data file for a track */
+				TOKENIZE
+
+				/* keep the filename */
+				strncpy(&outinfo->fname[trknum][0], token, strlen(token));
+				strncpy(lastfname, token, 128);
+
+				/* get the file type */
+				TOKENIZE
+
+				if (!strcmp(token, "BINARY"))
+				{
+					outinfo->swap[trknum] = 0;
+				}
+				else if (!strcmp(token, "MOTOROLA"))
+				{
+					outinfo->swap[trknum] = 1;
+				}
+				else
+				{
+					printf("ERROR: Unhandled track type %s\n", token);
+					return CHDERR_FILE_NOT_FOUND;
+				}
+			}
+			else if (!strcmp(token, "TRACK"))
+			{
+				/* get the track number */
+				TOKENIZE
+				trknum = strtoul(token, NULL, 10) - 1;
+
+				/* next token on the line is the track type */
+				TOKENIZE
+
+				outtoc->tracks[trknum].trktype = CD_TRACK_MODE1;
+				outtoc->tracks[trknum].datasize = 0;
+				outtoc->tracks[trknum].subtype = CD_SUB_NONE;
+				outtoc->tracks[trknum].subsize = 0;
+				outtoc->tracks[trknum].pregap = 0;
+				outinfo->idx0offs[trknum] = 0;
+				outinfo->idx1offs[trknum] = 0;
+				strcpy(&outinfo->fname[trknum][0], lastfname);	// default filename to the last one
+//				printf("trk %d: fname %s\n", trknum+1, &outinfo->fname[trknum][0]);
+
+				cdrom_convert_type_string_to_track_info(token, &outtoc->tracks[trknum]);
+				if (outtoc->tracks[trknum].datasize == 0)
+				{
+					printf("ERROR: Unknown track type [%s].  Contact MAMEDEV.\n", token);
+					return CHDERR_FILE_NOT_FOUND;
+				}
+				else if (outtoc->tracks[trknum].trktype != CD_TRACK_MODE1_RAW &&
+					outtoc->tracks[trknum].trktype != CD_TRACK_MODE2_RAW &&
+					outtoc->tracks[trknum].trktype != CD_TRACK_AUDIO)
+				{
+					printf("Note: MAME prefers and can accept RAW format images.\n");
+					printf("At least one track of this rip is not either RAW or AUDIO.\n");
+				}
+
+				/* next (optional) token on the line is the subcode type */
+				TOKENIZE
+
+				cdrom_convert_subtype_string_to_track_info(token, &outtoc->tracks[trknum]);
+			}
+			else if (!strcmp(token, "INDEX"))	/* only in bin/cue files */
+			{
+				int idx, frames;
+
+				/* get index number */
+				TOKENIZE
+				idx = strtoul(token, NULL, 10);
+
+				/* get index */
+				TOKENIZE
+				frames = msf_to_frames( token );
+
+				if (idx == 0)
+				{
+					outinfo->idx0offs[trknum] = frames;
+				}
+				else if (idx == 1)
+				{
+					outinfo->idx1offs[trknum] = frames;
+					if (!outtoc->tracks[trknum].pregap)
+					{
+						outtoc->tracks[trknum].pregap = frames - outinfo->idx0offs[trknum];
+					}
+				}
+			}
+			else if (!strcmp(token, "PREGAP"))
+			{
+				int frames;
+
+				/* get index */
+				TOKENIZE
+				frames = msf_to_frames( token );
+
+				outtoc->tracks[trknum].pregap = frames;
+			}
+			else if (!strcmp(token, "POSTGAP"))
+			{
+				int frames;
+
+				/* get index */
+				TOKENIZE
+				frames = msf_to_frames( token );
+
+				outtoc->tracks[trknum].postgap = frames;
+			}
+		}
+	}
+
+	/* close the input CUE */
+	fclose(infile);
+
+	/* store the number of tracks found */
+	outtoc->numtrks = trknum + 1;
+
+	/* now go over the files again and set the lengths */
+	for (trknum = 0; trknum < outtoc->numtrks; trknum++)
 	{
 		UINT64 tlen;
 
-		tlen = get_file_size(outinfo->fname[trknum]) - outinfo->offset[trknum];
-		tlen /= (outtoc->tracks[trknum].datasize + outtoc->tracks[trknum].subsize);
+		// is this the last track?
+		if (trknum == (outtoc->numtrks-1))
+		{
+			/* if we have the same filename as the last track, do it that way */
+			if (!strcmp(&outinfo->fname[trknum][0], &outinfo->fname[trknum-1][0]))
+			{
+				tlen = get_file_size(outinfo->fname[trknum]);
+				tlen /= (outtoc->tracks[trknum].datasize + outtoc->tracks[trknum].subsize);
+				outinfo->offset[trknum] = outinfo->idx1offs[trknum];
+				outtoc->tracks[trknum].frames = tlen - outinfo->offset[trknum];
+			}
+			else	/* data files are different */
+			{
+				tlen = get_file_size(outinfo->fname[trknum]);
+				tlen /= (outtoc->tracks[trknum].datasize + outtoc->tracks[trknum].subsize);
+				outtoc->tracks[trknum].frames = tlen;
+				outinfo->offset[trknum] = 0;
+			}
+		}
+		else
+		{
+			/* if we have the same filename as the next track, do it that way */
+			if (!strcmp(&outinfo->fname[trknum][0], &outinfo->fname[trknum+1][0]))
+			{
+				// datasize = the difference between the start of the next track and our start
+				outtoc->tracks[trknum].frames = outinfo->idx1offs[trknum+1] - outinfo->idx1offs[trknum];
+				outinfo->offset[trknum] = outinfo->idx1offs[trknum];
 
-		outtoc->tracks[trknum].frames = tlen;
+				if (!outtoc->tracks[trknum].frames)
+				{
+					printf("ERROR: unable to determine size of track %d, missing INDEX 01 markers?\n", trknum+1);
+					return CHDERR_FILE_NOT_FOUND;
+				}
+			}
+			else	/* data files are different */
+			{
+				tlen = get_file_size(outinfo->fname[trknum]);
+				tlen /= (outtoc->tracks[trknum].datasize + outtoc->tracks[trknum].subsize);
+				outtoc->tracks[trknum].frames = tlen;
+				outinfo->offset[trknum] = 0;
+			}
+		}
+//		printf("trk %d: %d frames @ offset %d\n", trknum+1, outtoc->tracks[trknum].frames, outinfo->offset[trknum]);
 	}
 
-//  printf("track %d: %d frames\n", trknum, outtoc->tracks[trknum].frames);
+	return CHDERR_NONE;
 }
 
 /*-------------------------------------------------
@@ -258,7 +445,7 @@ static void chdcd_tracksize_helper(int trknum, cdrom_toc *outtoc, chdcd_track_in
 chd_error chdcd_parse_toc(const char *tocfname, cdrom_toc *outtoc, chdcd_track_input_info *outinfo)
 {
 	FILE *infile;
-	int i, trknum, cuemode = 0;
+	int i, trknum;
 	static char token[128];
 
 	if (strstr(tocfname,".gdi"))
@@ -268,7 +455,7 @@ chd_error chdcd_parse_toc(const char *tocfname, cdrom_toc *outtoc, chdcd_track_i
 
 	if (strstr(tocfname,".cue"))
 	{
-		cuemode = 1;
+		return chdcd_parse_cue(tocfname, outtoc, outinfo);
 	}
 
 	infile = fopen(tocfname, "rt");
@@ -299,17 +486,6 @@ chd_error chdcd_parse_toc(const char *tocfname, cdrom_toc *outtoc, chdcd_track_i
 			if ((!strcmp(token, "DATAFILE")) || (!strcmp(token, "AUDIOFILE")) || (!strcmp(token, "FILE")))
 			{
 				int f;
-
-				/* for bin/cue, this is where you increment the track # */
-				if (cuemode)
-				{
-					/* make sure we have a size for the current track before moving on */
-					if (trknum > -1)
-					{
-						chdcd_tracksize_helper(trknum, outtoc, outinfo);
-					}
-					trknum++;
-				}
 
 				/* found the data file for a track */
 				TOKENIZE
@@ -386,20 +562,10 @@ chd_error chdcd_parse_toc(const char *tocfname, cdrom_toc *outtoc, chdcd_track_i
 			}
 			else if (!strcmp(token, "TRACK"))
 			{
-				/* found a new track if CDRDAO .toc, not if .cue */
-				if (!cuemode)
-				{
-					trknum++;
-				}
+				trknum++;
 
 				/* next token on the line is the track type */
 				TOKENIZE
-
-				/* for bin/cue skip the track number */
-				if (cuemode)
-				{
-					TOKENIZE
-				}
 
 				outtoc->tracks[trknum].trktype = CD_TRACK_MODE1;
 				outtoc->tracks[trknum].datasize = 0;
@@ -410,6 +576,7 @@ chd_error chdcd_parse_toc(const char *tocfname, cdrom_toc *outtoc, chdcd_track_i
 				if (outtoc->tracks[trknum].datasize == 0)
 				{
 					printf("ERROR: Unknown track type [%s].  Contact MAMEDEV.\n", token);
+					return CHDERR_FILE_NOT_FOUND;
 				}
 				else if (outtoc->tracks[trknum].trktype != CD_TRACK_MODE1_RAW &&
 					outtoc->tracks[trknum].trktype != CD_TRACK_MODE2_RAW &&
@@ -424,24 +591,7 @@ chd_error chdcd_parse_toc(const char *tocfname, cdrom_toc *outtoc, chdcd_track_i
 
 				cdrom_convert_subtype_string_to_track_info(token, &outtoc->tracks[trknum]);
 			}
-			else if (!strcmp(token, "INDEX"))	/* only in bin/cue files */
-			{
-				int idx, frames;
-
-				/* get index number */
-				TOKENIZE
-				idx = strtoul(token, NULL, 10);
-
-				/* get index */
-				TOKENIZE
-				frames = msf_to_frames( token );
-
-				if (idx == 1)
-				{
-					outtoc->tracks[trknum].pregap = frames;
-				}
-			}
-			else if ((!strcmp(token, "START")) || (!strcmp(token, "PREGAP")))	/* START for CDRDAO, PREGAP for CDRWIN */
+			else if (!strcmp(token, "START"))
 			{
 				int frames;
 
@@ -451,23 +601,7 @@ chd_error chdcd_parse_toc(const char *tocfname, cdrom_toc *outtoc, chdcd_track_i
 
 				outtoc->tracks[trknum].pregap = frames;
 			}
-			else if (!strcmp(token, "POSTGAP"))	/* only in CDRWIN files */
-			{
-				int frames;
-
-				/* get index */
-				TOKENIZE
-				frames = msf_to_frames( token );
-
-				outtoc->tracks[trknum].postgap = frames;
-			}
 		}
-	}
-
-	if (cuemode)
-	{
-		/* make sure we have a size for the last track before moving on */
-		chdcd_tracksize_helper(trknum, outtoc, outinfo);
 	}
 
 	/* close the input TOC */

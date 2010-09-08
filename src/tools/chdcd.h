@@ -20,6 +20,8 @@ struct _chdcd_track_input_info	/* used only at compression time */
 	char fname[CD_MAX_TRACKS][256];	/* filename for each track */
 	UINT32 offset[CD_MAX_TRACKS];	/* offset in the data file for each track */
 	int swap[CD_MAX_TRACKS];	/* data needs to be byte swapped */
+	UINT32 idx0offs[CD_MAX_TRACKS];
+	UINT32 idx1offs[CD_MAX_TRACKS];
 };
 
 
