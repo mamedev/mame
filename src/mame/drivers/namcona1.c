@@ -751,7 +751,7 @@ static ADDRESS_MAP_START( namcona1_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xefff00, 0xefffff) AM_READWRITE(namcona1_vreg_r, namcona1_vreg_w) AM_BASE(&namcona1_vreg)
 	AM_RANGE(0xf00000, 0xf01fff) AM_READWRITE(namcona1_paletteram_r, namcona1_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xf40000, 0xf7ffff) AM_READWRITE(namcona1_gfxram_r, namcona1_gfxram_w)
-	AM_RANGE(0xff0000, 0xffbfff) AM_READWRITE(namcona1_videoram_r,    namcona1_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0xff0000, 0xffbfff) AM_READWRITE(namcona1_videoram_r,    namcona1_videoram_w) AM_BASE_MEMBER(namcona1_state, videoram)
 	AM_RANGE(0xffd000, 0xffdfff) AM_RAM /* unknown */
 	AM_RANGE(0xffe000, 0xffefff) AM_RAM	AM_BASE(&namcona1_scroll)		/* scroll registers */
 	AM_RANGE(0xfff000, 0xffffff) AM_RAM	AM_BASE_GENERIC(spriteram)			/* spriteram */
@@ -773,7 +773,7 @@ static ADDRESS_MAP_START( namcona2_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xefff00, 0xefffff) AM_READWRITE(namcona1_vreg_r, namcona1_vreg_w) AM_BASE(&namcona1_vreg)
 	AM_RANGE(0xf00000, 0xf01fff) AM_READWRITE(namcona1_paletteram_r, namcona1_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xf40000, 0xf7ffff) AM_READWRITE(namcona1_gfxram_r, namcona1_gfxram_w)
-	AM_RANGE(0xff0000, 0xffbfff) AM_READWRITE(namcona1_videoram_r,    namcona1_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0xff0000, 0xffbfff) AM_READWRITE(namcona1_videoram_r,    namcona1_videoram_w) AM_BASE_MEMBER(namcona1_state, videoram)
 	AM_RANGE(0xffd000, 0xffdfff) AM_RAM /* unknown */
 	AM_RANGE(0xffe000, 0xffefff) AM_RAM	AM_BASE(&namcona1_scroll)		/* scroll registers */
 	AM_RANGE(0xfff000, 0xffffff) AM_RAM	AM_BASE_GENERIC(spriteram)			/* spriteram */
@@ -1004,7 +1004,7 @@ static const c140_interface C140_interface_typeA =
 };
 
 /* cropped at sides */
-static MACHINE_CONFIG_START( namcona1, driver_device )
+static MACHINE_CONFIG_START( namcona1, namcona1_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 50113000/4)
 	MDRV_CPU_PROGRAM_MAP(namcona1_main_map)

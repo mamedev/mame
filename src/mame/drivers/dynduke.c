@@ -81,7 +81,7 @@ static ADDRESS_MAP_START( master_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0b002, 0x0b003) AM_READ_PORT("DSW")
 	AM_RANGE(0x0b004, 0x0b005) AM_WRITENOP
 	AM_RANGE(0x0b006, 0x0b007) AM_WRITE(dynduke_control_w)
-	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM_WRITE(dynduke_text_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM_WRITE(dynduke_text_w) AM_BASE_MEMBER(dynduke_state, videoram)
 	AM_RANGE(0x0d000, 0x0d00d) AM_READWRITE(seibu_main_word_r, seibu_main_word_w)
 	AM_RANGE(0xa0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
@@ -101,7 +101,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( masterj_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x06fff) AM_RAM
 	AM_RANGE(0x07000, 0x07fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0x08000, 0x087ff) AM_RAM_WRITE(dynduke_text_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x08000, 0x087ff) AM_RAM_WRITE(dynduke_text_w) AM_BASE_MEMBER(dynduke_state, videoram)
 	AM_RANGE(0x09000, 0x0900d) AM_READWRITE(seibu_main_word_r, seibu_main_word_w)
 	AM_RANGE(0x0c000, 0x0c0ff) AM_RAM AM_BASE(&dynduke_scroll_ram)
 	AM_RANGE(0x0e000, 0x0efff) AM_RAM AM_SHARE("share1")
@@ -270,7 +270,7 @@ static INTERRUPT_GEN( dynduke_interrupt )
 
 /* Machine Driver */
 
-static MACHINE_CONFIG_START( dynduke, driver_device )
+static MACHINE_CONFIG_START( dynduke, dynduke_state )
 	// basic machine hardware
 	MDRV_CPU_ADD("maincpu", V30, 16000000/2) // NEC V30-8 CPU
 	MDRV_CPU_PROGRAM_MAP(master_map)

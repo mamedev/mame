@@ -174,7 +174,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfe4002, 0xfe4003) AM_READ_PORT("SYSTEM")
 /*  AM_RANGE(0xfe4002, 0xfe4003) AM_WRITE(tigeroad_soundcmd_w) added by init_tigeroad() */
 	AM_RANGE(0xfe4004, 0xfe4005) AM_READ_PORT("DSW")
-	AM_RANGE(0xfec000, 0xfec7ff) AM_RAM_WRITE(tigeroad_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0xfec000, 0xfec7ff) AM_RAM_WRITE(tigeroad_videoram_w) AM_BASE_MEMBER(tigeroad_state, videoram)
 	AM_RANGE(0xfe8000, 0xfe8003) AM_WRITE(tigeroad_scroll_w)
 	AM_RANGE(0xfe800e, 0xfe800f) AM_WRITEONLY    /* fe800e = watchdog or IRQ acknowledge */
 	AM_RANGE(0xff8200, 0xff867f) AM_RAM_WRITE(paletteram16_xxxxRRRRGGGGBBBB_word_w) AM_BASE_GENERIC(paletteram)
@@ -514,7 +514,7 @@ static const msm5205_interface msm5205_config =
 };
 
 
-static MACHINE_CONFIG_START( tigeroad, driver_device )
+static MACHINE_CONFIG_START( tigeroad, tigeroad_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_10MHz) /* verified on pcb */

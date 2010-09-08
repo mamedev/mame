@@ -43,10 +43,12 @@ PALETTE_INIT( tryout )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
+	tryout_state *state = machine->driver_data<tryout_state>();
+	UINT8 *videoram = state->videoram;
 	int code, attr, color;
 
-	code = machine->generic.videoram.u8[tile_index];
-	attr = machine->generic.videoram.u8[tile_index + 0x400];
+	code = videoram[tile_index];
+	attr = videoram[tile_index + 0x400];
 	code |= ((attr & 0x03) << 8);
 	color = ((attr & 0x4)>>2)+6;
 
@@ -65,7 +67,9 @@ READ8_HANDLER( tryout_vram_r )
 
 WRITE8_HANDLER( tryout_videoram_w )
 {
-	space->machine->generic.videoram.u8[offset] = data;
+	tryout_state *state = space->machine->driver_data<tryout_state>();
+	UINT8 *videoram = state->videoram;
+	videoram[offset] = data;
 	tilemap_mark_tile_dirty(fg_tilemap, offset & 0x3ff);
 }
 

@@ -348,6 +348,8 @@ void irobot_run_video(void)
 
 VIDEO_UPDATE( irobot )
 {
+	irobot_state *state = screen->machine->driver_data<irobot_state>();
+	UINT8 *videoram = state->videoram;
 	UINT8 *bitmap_base = irobot_bufsel ? polybitmap1 : polybitmap2;
 	int x, y, offs;
 
@@ -359,8 +361,8 @@ VIDEO_UPDATE( irobot )
 	for (y = offs = 0; y < 32; y++)
 		for (x = 0; x < 32; x++, offs++)
 		{
-			int code = screen->machine->generic.videoram.u8[offs] & 0x3f;
-			int color = ((screen->machine->generic.videoram.u8[offs] & 0xc0) >> 6) | (irobot_alphamap >> 3);
+			int code = videoram[offs] & 0x3f;
+			int color = ((videoram[offs] & 0xc0) >> 6) | (irobot_alphamap >> 3);
 
 			drawgfx_transpen(bitmap,cliprect,screen->machine->gfx[0],
 					code, color,

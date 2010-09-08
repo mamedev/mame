@@ -43,7 +43,9 @@ PALETTE_INIT( sprint4 )
 
 static TILE_GET_INFO( sprint4_tile_info )
 {
-	UINT8 code = machine->generic.videoram.u8[tile_index];
+	sprint4_state *state = machine->driver_data<sprint4_state>();
+	UINT8 *videoram = state->videoram;
+	UINT8 code = videoram[tile_index];
 
 	if ((code & 0x30) == 0x30)
 		SET_TILE_INFO(0, code & ~0x40, (code >> 6) ^ 3, 0);
@@ -62,6 +64,8 @@ VIDEO_START( sprint4 )
 
 VIDEO_UPDATE( sprint4 )
 {
+	sprint4_state *state = screen->machine->driver_data<sprint4_state>();
+	UINT8 *videoram = state->videoram;
 	int i;
 
 	tilemap_draw(bitmap, cliprect, playfield, 0, 0);
@@ -70,10 +74,10 @@ VIDEO_UPDATE( sprint4 )
 	{
 		int bank = 0;
 
-		UINT8 horz = screen->machine->generic.videoram.u8[0x390 + 2 * i + 0];
-		UINT8 attr = screen->machine->generic.videoram.u8[0x390 + 2 * i + 1];
-		UINT8 vert = screen->machine->generic.videoram.u8[0x398 + 2 * i + 0];
-		UINT8 code = screen->machine->generic.videoram.u8[0x398 + 2 * i + 1];
+		UINT8 horz = videoram[0x390 + 2 * i + 0];
+		UINT8 attr = videoram[0x390 + 2 * i + 1];
+		UINT8 vert = videoram[0x398 + 2 * i + 0];
+		UINT8 code = videoram[0x398 + 2 * i + 1];
 
 		if (i & 1)
 			bank = 32;
@@ -91,6 +95,8 @@ VIDEO_UPDATE( sprint4 )
 
 VIDEO_EOF( sprint4 )
 {
+	sprint4_state *state = machine->driver_data<sprint4_state>();
+	UINT8 *videoram = state->videoram;
 	int i;
 
 	/* check for sprite-playfield collisions */
@@ -106,9 +112,9 @@ VIDEO_EOF( sprint4 )
 
 		int bank = 0;
 
-		UINT8 horz = machine->generic.videoram.u8[0x390 + 2 * i + 0];
-		UINT8 vert = machine->generic.videoram.u8[0x398 + 2 * i + 0];
-		UINT8 code = machine->generic.videoram.u8[0x398 + 2 * i + 1];
+		UINT8 horz = videoram[0x390 + 2 * i + 0];
+		UINT8 vert = videoram[0x398 + 2 * i + 0];
+		UINT8 code = videoram[0x398 + 2 * i + 1];
 
 		rect.min_x = horz - 15;
 		rect.min_y = vert - 15;
@@ -137,15 +143,17 @@ VIDEO_EOF( sprint4 )
 
 	/* update sound status */
 
-	discrete_sound_w(discrete, SPRINT4_MOTOR_DATA_1, machine->generic.videoram.u8[0x391] & 15);
-	discrete_sound_w(discrete, SPRINT4_MOTOR_DATA_2, machine->generic.videoram.u8[0x393] & 15);
-	discrete_sound_w(discrete, SPRINT4_MOTOR_DATA_3, machine->generic.videoram.u8[0x395] & 15);
-	discrete_sound_w(discrete, SPRINT4_MOTOR_DATA_4, machine->generic.videoram.u8[0x397] & 15);
+	discrete_sound_w(discrete, SPRINT4_MOTOR_DATA_1, videoram[0x391] & 15);
+	discrete_sound_w(discrete, SPRINT4_MOTOR_DATA_2, videoram[0x393] & 15);
+	discrete_sound_w(discrete, SPRINT4_MOTOR_DATA_3, videoram[0x395] & 15);
+	discrete_sound_w(discrete, SPRINT4_MOTOR_DATA_4, videoram[0x397] & 15);
 }
 
 
 WRITE8_HANDLER( sprint4_video_ram_w )
 {
-	space->machine->generic.videoram.u8[offset] = data;
+	sprint4_state *state = space->machine->driver_data<sprint4_state>();
+	UINT8 *videoram = state->videoram;
+	videoram[offset] = data;
 	tilemap_mark_tile_dirty(playfield, offset);
 }

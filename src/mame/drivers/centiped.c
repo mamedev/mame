@@ -674,7 +674,7 @@ static READ8_DEVICE_HANDLER( caterplr_AY8910_r )
 static ADDRESS_MAP_START( centiped_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM AM_BASE(&rambase)
-	AM_RANGE(0x0400, 0x07bf) AM_RAM_WRITE(centiped_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x0400, 0x07bf) AM_RAM_WRITE(centiped_videoram_w) AM_BASE_MEMBER(centiped_state, videoram)
 	AM_RANGE(0x07c0, 0x07ff) AM_RAM AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0x0800, 0x0800) AM_READ_PORT("DSW1")		/* DSW1 */
 	AM_RANGE(0x0801, 0x0801) AM_READ_PORT("DSW2")		/* DSW2 */
@@ -699,7 +699,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( centipdb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x4000) AM_RAM
-	AM_RANGE(0x0400, 0x07bf) AM_MIRROR(0x4000) AM_RAM_WRITE(centiped_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x0400, 0x07bf) AM_MIRROR(0x4000) AM_RAM_WRITE(centiped_videoram_w) AM_BASE_MEMBER(centiped_state, videoram)
 	AM_RANGE(0x07c0, 0x07ff) AM_MIRROR(0x4000) AM_RAM AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0x0800, 0x0800) AM_MIRROR(0x4000) AM_READ_PORT("DSW1")		/* DSW1 */
 	AM_RANGE(0x0801, 0x0801) AM_MIRROR(0x4000) AM_READ_PORT("DSW2")		/* DSW2 */
@@ -735,7 +735,7 @@ static ADDRESS_MAP_START( milliped_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x0400, 0x040f) AM_DEVREADWRITE("pokey", pokey_r, pokey_w)
 	AM_RANGE(0x0800, 0x080f) AM_DEVREADWRITE("pokey2", pokey_r, pokey_w)
-	AM_RANGE(0x1000, 0x13bf) AM_RAM_WRITE(centiped_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x1000, 0x13bf) AM_RAM_WRITE(centiped_videoram_w) AM_BASE_MEMBER(centiped_state, videoram)
 	AM_RANGE(0x13c0, 0x13ff) AM_RAM AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0x2000, 0x2000) AM_READ(centiped_IN0_r)
 	AM_RANGE(0x2001, 0x2001) AM_READ(milliped_IN1_r)
@@ -766,7 +766,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( warlords_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x07bf) AM_RAM_WRITE(centiped_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x0400, 0x07bf) AM_RAM_WRITE(centiped_videoram_w) AM_BASE_MEMBER(centiped_state, videoram)
 	AM_RANGE(0x07c0, 0x07ff) AM_RAM AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0x0800, 0x0800) AM_READ_PORT("DSW1")	/* DSW1 */
 	AM_RANGE(0x0801, 0x0801) AM_READ_PORT("DSW2")	/* DSW2 */
@@ -793,7 +793,7 @@ static ADDRESS_MAP_START( mazeinv_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
 	AM_RANGE(0x0400, 0x040f) AM_DEVREADWRITE("pokey", pokey_r, pokey_w)
 	AM_RANGE(0x0800, 0x080f) AM_DEVREADWRITE("pokey2", pokey_r, pokey_w)
-	AM_RANGE(0x1000, 0x13bf) AM_RAM_WRITE(centiped_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x1000, 0x13bf) AM_RAM_WRITE(centiped_videoram_w) AM_BASE_MEMBER(centiped_state, videoram)
 	AM_RANGE(0x13c0, 0x13ff) AM_RAM AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0x2000, 0x2000) AM_READ_PORT("IN0")
 	AM_RANGE(0x2001, 0x2001) AM_READ_PORT("IN1")
@@ -837,7 +837,7 @@ static ADDRESS_MAP_START( bullsdrt_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1487, 0x1487) AM_MIRROR(0x6000) AM_WRITE(centiped_flip_screen_w)
 	AM_RANGE(0x1500, 0x1500) AM_MIRROR(0x6000) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x1580, 0x1580) AM_MIRROR(0x6000) AM_NOP
-	AM_RANGE(0x1800, 0x1bbf) AM_MIRROR(0x6000) AM_WRITE(centiped_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x1800, 0x1bbf) AM_MIRROR(0x6000) AM_WRITE(centiped_videoram_w) AM_BASE_MEMBER(centiped_state, videoram)
 	AM_RANGE(0x1bc0, 0x1bff) AM_MIRROR(0x6000) AM_RAM AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0x1c00, 0x1fff) AM_MIRROR(0x6000) AM_RAM
 	AM_RANGE(0x2000, 0x2fff) AM_ROM
@@ -1586,7 +1586,7 @@ static const pokey_interface warlords_pokey_interface =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( centiped, driver_device )
+static MACHINE_CONFIG_START( centiped, centiped_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 12096000/8)	/* 1.512 MHz (slows down to 0.75MHz while accessing playfield RAM) */
@@ -1710,7 +1710,7 @@ static MACHINE_CONFIG_DERIVED( mazeinv, milliped )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( bullsdrt, driver_device )
+static MACHINE_CONFIG_START( bullsdrt, centiped_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", S2650, 12096000/8)

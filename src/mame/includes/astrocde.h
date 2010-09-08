@@ -11,6 +11,16 @@
 #define AC_STARS			(0x04)
 
 
+class astrocde_state : public driver_device
+{
+public:
+	astrocde_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *videoram;
+};
+
+
 /*----------- defined in video/astrocde.c -----------*/
 
 extern UINT8 astrocade_video_config;

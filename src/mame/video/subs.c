@@ -39,6 +39,8 @@ WRITE8_HANDLER( subs_invert2_w )
 
 VIDEO_UPDATE( subs )
 {
+	subs_state *state = screen->machine->driver_data<subs_state>();
+	UINT8 *videoram = state->videoram;
 	UINT8 *spriteram = screen->machine->generic.spriteram.u8;
 	int offs;
 
@@ -48,7 +50,7 @@ VIDEO_UPDATE( subs )
 
 	/* for every character in the Video RAM, check if it has been modified */
 	/* since last time and update it accordingly. */
-	for (offs = screen->machine->generic.videoram_size - 1;offs >= 0;offs--)
+	for (offs = 0x400 - 1; offs >= 0; offs--)
 	{
 		int charcode;
 		int sx,sy;
@@ -58,7 +60,7 @@ VIDEO_UPDATE( subs )
 		left_sonar_window = 0;
 		right_sonar_window = 0;
 
-		charcode = screen->machine->generic.videoram.u8[offs];
+		charcode = videoram[offs];
 
 		/* Which monitor is this for? */
 		right_enable = charcode & 0x40;

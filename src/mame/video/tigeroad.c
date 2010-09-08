@@ -6,7 +6,9 @@ static tilemap_t *bg_tilemap, *fg_tilemap;
 
 WRITE16_HANDLER( tigeroad_videoram_w )
 {
-	COMBINE_DATA(&space->machine->generic.videoram.u16[offset]);
+	tigeroad_state *state = space->machine->driver_data<tigeroad_state>();
+	UINT16 *videoram = state->videoram;
+	COMBINE_DATA(&videoram[offset]);
 	tilemap_mark_tile_dirty(fg_tilemap, offset);
 }
 
@@ -125,7 +127,9 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	int data = machine->generic.videoram.u16[tile_index];
+	tigeroad_state *state = machine->driver_data<tigeroad_state>();
+	UINT16 *videoram = state->videoram;
+	int data = videoram[tile_index];
 	int attr = data >> 8;
 	int code = (data & 0xff) + ((attr & 0xc0) << 2) + ((attr & 0x20) << 5);
 	int color = attr & 0x0f;

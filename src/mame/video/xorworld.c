@@ -51,7 +51,9 @@ PALETTE_INIT( xorworld )
 
 WRITE16_HANDLER( xorworld_videoram16_w )
 {
-	COMBINE_DATA(&space->machine->generic.videoram.u16[offset]);
+	xorworld_state *state = space->machine->driver_data<xorworld_state>();
+	UINT16 *videoram = state->videoram;
+	COMBINE_DATA(&videoram[offset]);
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
@@ -67,7 +69,9 @@ WRITE16_HANDLER( xorworld_videoram16_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int data = machine->generic.videoram.u16[tile_index];
+	xorworld_state *state = machine->driver_data<xorworld_state>();
+	UINT16 *videoram = state->videoram;
+	int data = videoram[tile_index];
 	int code = data & 0x0fff;
 
 	SET_TILE_INFO(0, code, data >> 12, 0);

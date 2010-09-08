@@ -68,7 +68,9 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	SET_TILE_INFO(0, machine->generic.videoram.u8[tile_index], 0, 0);
+	timelimt_state *state = machine->driver_data<timelimt_state>();
+	UINT8 *videoram = state->videoram;
+	SET_TILE_INFO(0, videoram[tile_index], 0, 0);
 }
 
 VIDEO_START( timelimt )
@@ -86,7 +88,9 @@ VIDEO_START( timelimt )
 
 WRITE8_HANDLER( timelimt_videoram_w )
 {
-	space->machine->generic.videoram.u8[offset] = data;
+	timelimt_state *state = space->machine->driver_data<timelimt_state>();
+	UINT8 *videoram = state->videoram;
+	videoram[offset] = data;
 	tilemap_mark_tile_dirty(fg_tilemap, offset);
 }
 

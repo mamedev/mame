@@ -1,3 +1,13 @@
+class raiden_state : public driver_device
+{
+public:
+	raiden_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT16 *videoram;
+};
+
+
 /*----------- defined in video/raiden.c -----------*/
 
 extern UINT16 *raiden_back_data,*raiden_fore_data,*raiden_scroll_ram;

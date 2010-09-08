@@ -1,3 +1,13 @@
+class deadang_state : public driver_device
+{
+public:
+	deadang_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT16 *videoram;
+};
+
+
 /*----------- defined in video/deadang.c -----------*/
 
 extern UINT16 *deadang_video_data, *deadang_scroll_ram;

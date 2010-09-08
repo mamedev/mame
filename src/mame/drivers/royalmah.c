@@ -98,6 +98,17 @@ Stephh's notes (based on the games Z80 code and some tests) :
 #include "machine/nvram.h"
 
 
+class royalmah_state : public driver_device
+{
+public:
+	royalmah_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *videoram;
+};
+
+
+
 static UINT8 input_port_select, dsw_select, rombank;
 static int palette_base;
 static UINT8 *janptr96_nvram;
@@ -186,6 +197,8 @@ static WRITE8_HANDLER( mjderngr_palbank_w )
 
 static VIDEO_UPDATE( royalmah )
 {
+	royalmah_state *state = screen->machine->driver_data<royalmah_state>();
+	UINT8 *videoram = state->videoram;
 
 	offs_t offs;
 
@@ -193,8 +206,8 @@ static VIDEO_UPDATE( royalmah )
 	{
 		int i;
 
-		UINT8 data1 = screen->machine->generic.videoram.u8[offs + 0x0000];
-		UINT8 data2 = screen->machine->generic.videoram.u8[offs + 0x4000];
+		UINT8 data1 = videoram[offs + 0x0000];
+		UINT8 data2 = videoram[offs + 0x4000];
 
 		UINT8 y = 255 - (offs >> 6);
 		UINT8 x = 255 - (offs << 2);
@@ -424,7 +437,7 @@ static ADDRESS_MAP_START( royalmah_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x6fff ) AM_ROM AM_WRITE( royalmah_rom_w )
 	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE( 0x8000, 0xffff ) AM_ROMBANK( "bank1" )	// banked ROMs not present in royalmah
-	AM_RANGE( 0x8000, 0xffff ) AM_WRITEONLY AM_BASE_GENERIC(videoram)
+	AM_RANGE( 0x8000, 0xffff ) AM_WRITEONLY AM_BASE_MEMBER(royalmah_state, videoram)
 ADDRESS_MAP_END
 
 
@@ -434,7 +447,7 @@ static ADDRESS_MAP_START( mjapinky_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x7800, 0x7fff ) AM_RAM
 	AM_RANGE( 0x8000, 0x8000 ) AM_READ( mjapinky_dsw_r )
 	AM_RANGE( 0x8000, 0xffff ) AM_ROMBANK( "bank1" )
-	AM_RANGE( 0x8000, 0xffff ) AM_WRITEONLY AM_BASE_GENERIC(videoram)
+	AM_RANGE( 0x8000, 0xffff ) AM_WRITEONLY AM_BASE_MEMBER(royalmah_state, videoram)
 ADDRESS_MAP_END
 
 
@@ -566,7 +579,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( janho_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x6fff ) AM_ROM AM_WRITE( royalmah_rom_w )
 	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_SHARE("share1") AM_SHARE("nvram")
-	AM_RANGE( 0x8000, 0xffff ) AM_WRITEONLY AM_BASE_GENERIC(videoram)
+	AM_RANGE( 0x8000, 0xffff ) AM_WRITEONLY AM_BASE_MEMBER(royalmah_state, videoram)
 ADDRESS_MAP_END
 
 
@@ -688,7 +701,7 @@ static ADDRESS_MAP_START( jansou_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x6800, 0x6800 ) AM_WRITE(jansou_sound_w)
 
 	AM_RANGE( 0x7000, 0x77ff ) AM_RAM AM_SHARE("nvram")
-	AM_RANGE( 0x8000, 0xffff ) AM_WRITEONLY AM_BASE_GENERIC(videoram)
+	AM_RANGE( 0x8000, 0xffff ) AM_WRITEONLY AM_BASE_MEMBER(royalmah_state, videoram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( jansou_sub_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -711,7 +724,7 @@ static ADDRESS_MAP_START( janptr96_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x6000, 0x6fff ) AM_RAMBANK("bank3") AM_SHARE("nvram")	// nvram
 	AM_RANGE( 0x7000, 0x7fff ) AM_RAMBANK("bank2")	// banked nvram
 	AM_RANGE( 0x8000, 0xffff ) AM_ROMBANK("bank1")
-	AM_RANGE( 0x8000, 0xffff ) AM_WRITEONLY AM_BASE_GENERIC(videoram)
+	AM_RANGE( 0x8000, 0xffff ) AM_WRITEONLY AM_BASE_MEMBER(royalmah_state, videoram)
 ADDRESS_MAP_END
 
 static WRITE8_HANDLER( janptr96_dswsel_w )
@@ -809,9 +822,11 @@ static READ8_HANDLER( mjifb_rom_io_r )
 
 static WRITE8_HANDLER( mjifb_rom_io_w )
 {
+	royalmah_state *state = space->machine->driver_data<royalmah_state>();
+	UINT8 *videoram = state->videoram;
 	if (mjifb_rom_enable)
 	{
-		space->machine->generic.videoram.u8[offset] = data;
+		videoram[offset] = data;
 		return;
 	}
 
@@ -836,13 +851,15 @@ static WRITE8_HANDLER( mjifb_rom_io_w )
 
 static WRITE8_HANDLER( mjifb_videoram_w )
 {
-	space->machine->generic.videoram.u8[offset + 0x4000] = data;
+	royalmah_state *state = space->machine->driver_data<royalmah_state>();
+	UINT8 *videoram = state->videoram;
+	videoram[offset + 0x4000] = data;
 }
 
 static ADDRESS_MAP_START( mjifb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x6fff ) AM_ROM
 	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_SHARE("nvram")
-	AM_RANGE( 0x8000, 0xbfff ) AM_READWRITE(mjifb_rom_io_r, mjifb_rom_io_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE( 0x8000, 0xbfff ) AM_READWRITE(mjifb_rom_io_r, mjifb_rom_io_w) AM_BASE_MEMBER(royalmah_state, videoram)
 	AM_RANGE( 0xc000, 0xffff ) AM_ROM AM_WRITE(mjifb_videoram_w)
 //  AM_RANGE( 0xc000, 0xffff ) AM_ROM AM_WRITEONLY  This should, but doesn't work
 ADDRESS_MAP_END
@@ -916,9 +933,11 @@ static READ8_HANDLER( mjdejavu_rom_io_r )
 
 static WRITE8_HANDLER( mjdejavu_rom_io_w )
 {
+	royalmah_state *state = space->machine->driver_data<royalmah_state>();
+	UINT8 *videoram = state->videoram;
 	if (mjifb_rom_enable)
 	{
-		space->machine->generic.videoram.u8[offset] = data;
+		videoram[offset] = data;
 		return;
 	}
 
@@ -941,7 +960,7 @@ static WRITE8_HANDLER( mjdejavu_rom_io_w )
 static ADDRESS_MAP_START( mjdejavu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0x6fff ) AM_ROM
 	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_SHARE("nvram")
-	AM_RANGE( 0x8000, 0xbfff ) AM_READWRITE(mjdejavu_rom_io_r, mjdejavu_rom_io_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE( 0x8000, 0xbfff ) AM_READWRITE(mjdejavu_rom_io_r, mjdejavu_rom_io_w) AM_BASE_MEMBER(royalmah_state, videoram)
 	AM_RANGE( 0xc000, 0xffff ) AM_ROM AM_WRITE(mjifb_videoram_w)
 ADDRESS_MAP_END
 
@@ -983,7 +1002,7 @@ static ADDRESS_MAP_START( mjtensin_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x6ff3, 0x6ff3 ) AM_WRITE( mjtensin_6ff3_w )
 	AM_RANGE( 0x7000, 0x7fff ) AM_RAM AM_SHARE("nvram")
 	AM_RANGE( 0x8000, 0xffff ) AM_ROMBANK( "bank1" )
-	AM_RANGE( 0x8000, 0xffff ) AM_WRITEONLY AM_BASE_GENERIC(videoram)
+	AM_RANGE( 0x8000, 0xffff ) AM_WRITEONLY AM_BASE_MEMBER(royalmah_state, videoram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( mjtensin_iomap, ADDRESS_SPACE_IO, 8 )
@@ -1053,7 +1072,7 @@ static ADDRESS_MAP_START( cafetime_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x7fe4, 0x7fe4 ) AM_READ( cafetime_7fe4_r )
 	AM_RANGE( 0x7ff0, 0x7fff ) AM_DEVREADWRITE("rtc", msm6242_r, msm6242_w)
 	AM_RANGE( 0x8000, 0xffff ) AM_ROMBANK( "bank1" )
-	AM_RANGE( 0x8000, 0xffff ) AM_WRITEONLY AM_BASE_GENERIC(videoram)
+	AM_RANGE( 0x8000, 0xffff ) AM_WRITEONLY AM_BASE_MEMBER(royalmah_state, videoram)
 ADDRESS_MAP_END
 
 
@@ -1116,9 +1135,11 @@ static READ8_HANDLER( mjvegasa_rom_io_r )
 
 static WRITE8_HANDLER( mjvegasa_rom_io_w )
 {
+	royalmah_state *state = space->machine->driver_data<royalmah_state>();
+	UINT8 *videoram = state->videoram;
 	if ((rombank & 0x70) != 0x70)
 	{
-		space->machine->generic.videoram.u8[offset] = data;
+		videoram[offset] = data;
 		return;
 	}
 
@@ -1174,7 +1195,7 @@ static ADDRESS_MAP_START( mjvegasa_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE( 0x00000, 0x05fff ) AM_ROM
 	AM_RANGE( 0x06000, 0x07fff ) AM_RAM AM_SHARE("nvram")
-	AM_RANGE( 0x08000, 0x0ffff ) AM_READWRITE(mjvegasa_rom_io_r, mjvegasa_rom_io_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE( 0x08000, 0x0ffff ) AM_READWRITE(mjvegasa_rom_io_r, mjvegasa_rom_io_w) AM_BASE_MEMBER(royalmah_state, videoram)
 
 	AM_RANGE( 0x10001, 0x10001 ) AM_DEVREAD( "aysnd", ay8910_r )
 	AM_RANGE( 0x10002, 0x10003 ) AM_DEVWRITE( "aysnd", ay8910_data_address_w )
@@ -3094,7 +3115,7 @@ static const ay8910_interface ay8910_config =
 	DEVCB_HANDLER(royalmah_player_2_port_r)
 };
 
-static MACHINE_CONFIG_START( royalmah, driver_device )
+static MACHINE_CONFIG_START( royalmah, royalmah_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 18432000/6)        /* 3.072 MHz */

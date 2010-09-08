@@ -1,3 +1,13 @@
+class pitnrun_state : public driver_device
+{
+public:
+	pitnrun_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *videoram;
+};
+
+
 /*----------- defined in machine/pitnrun.c -----------*/
 
 WRITE8_HANDLER (pitnrun_68705_portA_w);

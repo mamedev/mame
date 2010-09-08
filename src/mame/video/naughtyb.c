@@ -8,7 +8,8 @@
 
 #include "emu.h"
 #include "video/resnet.h"
-#include "includes/phoenix.h"
+#include "audio/pleiads.h"
+#include "includes/naughtyb.h"
 
 UINT8 *naughtyb_videoram2;
 
@@ -211,11 +212,13 @@ WRITE8_HANDLER( popflame_videoreg_w )
 ***************************************************************************/
 VIDEO_UPDATE( naughtyb )
 {
+	naughtyb_state *state = screen->machine->driver_data<naughtyb_state>();
+	UINT8 *videoram = state->videoram;
 	int offs;
 
 	// for every character in the Video RAM
 
-	for (offs = screen->machine->generic.videoram_size - 1;offs >= 0;offs--)
+	for (offs = 0x800 - 1; offs >= 0; offs--)
 	{
 		int sx,sy;
 
@@ -253,8 +256,8 @@ VIDEO_UPDATE( naughtyb )
 				8*sx,8*sy);
 
 		drawgfx_transpen(screen->machine->generic.tmpbitmap,0,screen->machine->gfx[1],
-				screen->machine->generic.videoram.u8[offs] + 256*bankreg,
-				(screen->machine->generic.videoram.u8[offs] >> 5) + 8 * palreg,
+				videoram[offs] + 256*bankreg,
+				(videoram[offs] >> 5) + 8 * palreg,
 				naughtyb_cocktail,naughtyb_cocktail,
 				8*sx,8*sy,0);
 	}

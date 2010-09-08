@@ -383,7 +383,7 @@ static ADDRESS_MAP_START( bios_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM	// 8V
 	AM_RANGE(0x8800, 0x8fff) AM_READWRITE(ram_8w_r, ram_8w_w) AM_BASE(&ram_8w)	// 8W
-	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(playch10_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(playch10_videoram_w) AM_BASE_MEMBER(playch10_state, videoram)
 	AM_RANGE(0xc000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xffff) AM_READWRITE(pc10_prot_r, pc10_prot_w)
 ADDRESS_MAP_END
@@ -684,7 +684,7 @@ static const nes_interface nes_config =
 };
 
 
-static MACHINE_CONFIG_START( playch10, driver_device )
+static MACHINE_CONFIG_START( playch10, playch10_state )
 	// basic machine hardware
 	MDRV_CPU_ADD("maincpu", Z80, 8000000/2)	// 4 MHz
 	MDRV_CPU_PROGRAM_MAP(bios_map)

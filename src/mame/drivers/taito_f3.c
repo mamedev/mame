@@ -158,7 +158,7 @@ static ADDRESS_MAP_START( f3_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x4a0000, 0x4a001f) AM_READWRITE(f3_control_r,  f3_control_w)
 	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x610000, 0x61bfff) AM_RAM_WRITE(f3_pf_data_w) AM_BASE(&f3_pf_data)
-	AM_RANGE(0x61c000, 0x61dfff) AM_RAM_WRITE(f3_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x61c000, 0x61dfff) AM_RAM_WRITE(f3_videoram_w) AM_BASE_MEMBER(taito_f3_state, videoram)
 	AM_RANGE(0x61e000, 0x61ffff) AM_RAM_WRITE(f3_vram_w) AM_BASE(&f3_vram)
 	AM_RANGE(0x620000, 0x62ffff) AM_RAM_WRITE(f3_lineram_w) AM_BASE(&f3_line_ram)
 	AM_RANGE(0x630000, 0x63ffff) AM_RAM_WRITE(f3_pivot_w) AM_BASE(&f3_pivot_ram)
@@ -389,7 +389,7 @@ static MACHINE_START(f3)
 	state_save_register_global_array(machine, coin_word);
 }
 
-static MACHINE_CONFIG_START( f3, driver_device )
+static MACHINE_CONFIG_START( f3, taito_f3_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC020, XTAL_16MHz)
@@ -485,7 +485,7 @@ static GFXDECODE_START( bubsympb )
 	GFXDECODE_ENTRY( NULL,           0x000000, pivotlayout,         0,  64 ) /* Dynamically modified */
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( bubsympb, driver_device )
+static MACHINE_CONFIG_START( bubsympb, taito_f3_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68EC020, XTAL_16MHz)
 	MDRV_CPU_PROGRAM_MAP(f3_map)

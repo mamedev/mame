@@ -17,8 +17,4 @@ void pc_video_start(running_machine *machine,
 
 VIDEO_UPDATE( pc_video );
 
-WRITE8_HANDLER( pc_video_videoram_w );
-WRITE16_HANDLER( pc_video_videoram16le_w );
-WRITE32_HANDLER( pc_video_videoram32_w );
-
 #endif /* PC_VIDEO_H */

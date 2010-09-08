@@ -1,3 +1,13 @@
+class namcona1_state : public driver_device
+{
+public:
+	namcona1_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT16 *videoram;
+};
+
+
 /*----------- defined in video/namcona1.c -----------*/
 
 enum

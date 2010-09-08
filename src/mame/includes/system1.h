@@ -1,6 +1,14 @@
-#ifndef _system1_H_
-#define _system1_H_
+class system1_state : public driver_device
+{
+public:
+	system1_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
 
+	UINT8 *videoram;
+};
+
+
+/*----------- defined in video/system1.c -----------*/
 
 VIDEO_START( system1 );
 VIDEO_START( system2 );
@@ -23,5 +31,3 @@ WRITE8_HANDLER( system1_sprite_collision_reset_w );
 VIDEO_UPDATE( system1 );
 VIDEO_UPDATE( system2 );
 VIDEO_UPDATE( system2_rowscroll );
-
-#endif

@@ -92,6 +92,8 @@ VIDEO_START( magmax )
 
 VIDEO_UPDATE( magmax )
 {
+	magmax_state *state = screen->machine->driver_data<magmax_state>();
+	UINT16 *videoram = state->videoram;
 	UINT16 *spriteram16 = screen->machine->generic.spriteram.u16;
 	int offs;
 
@@ -223,7 +225,7 @@ VIDEO_UPDATE( magmax )
 		//int page = (*magmax_vreg>>3) & 0x1;
 		int code;
 
-		code = screen->machine->generic.videoram.u16[offs /*+ page*/] & 0xff;
+		code = videoram[offs /*+ page*/] & 0xff;
 		if (code)
 		{
 			int sx = (offs % 32);

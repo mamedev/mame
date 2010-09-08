@@ -168,7 +168,7 @@ static WRITE8_HANDLER( cloak_nvram_enable_w )
 
 static ADDRESS_MAP_START( master_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_RAM
-	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(cloak_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(cloak_videoram_w) AM_BASE_MEMBER(cloak_state, videoram)
 	AM_RANGE(0x0800, 0x0fff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x1000, 0x100f) AM_DEVREADWRITE("pokey1", pokey_r, pokey_w)		/* DSW0 also */
 	AM_RANGE(0x1800, 0x180f) AM_DEVREADWRITE("pokey2", pokey_r, pokey_w)		/* DSW1 also */
@@ -331,7 +331,7 @@ static const pokey_interface pokey_interface_2 =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( cloak, driver_device )
+static MACHINE_CONFIG_START( cloak, cloak_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 1000000)		/* 1 MHz ???? */

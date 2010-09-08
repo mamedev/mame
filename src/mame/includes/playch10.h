@@ -1,3 +1,13 @@
+class playch10_state : public driver_device
+{
+public:
+	playch10_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *videoram;
+};
+
+
 /*----------- defined in machine/playch10.c -----------*/
 
 MACHINE_RESET( pc10 );

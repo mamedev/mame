@@ -84,12 +84,16 @@ int twin16_spriteram_process_enable( void )
 
 static READ16_HANDLER( videoram16_r )
 {
-	return space->machine->generic.videoram.u16[offset];
+	twin16_state *state = space->machine->driver_data<twin16_state>();
+	UINT16 *videoram = state->videoram;
+	return videoram[offset];
 }
 
 static WRITE16_HANDLER( videoram16_w )
 {
-	COMBINE_DATA(space->machine->generic.videoram.u16 + offset);
+	twin16_state *state = space->machine->driver_data<twin16_state>();
+	UINT16 *videoram = state->videoram;
+	COMBINE_DATA(videoram + offset);
 }
 
 static READ16_HANDLER( extra_rom_r )
@@ -255,7 +259,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0c000e, 0x0c000f) AM_READ(twin16_sprite_status_r)
 	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(twin16_text_ram_w) AM_BASE(&twin16_text_ram)
 //  AM_RANGE(0x104000, 0x105fff) AM_NOP             // miaj
-	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_BASE_MEMBER(twin16_state, videoram)
 	AM_RANGE(0x140000, 0x143fff) AM_RAM AM_SHARE("share1") AM_BASE_SIZE_GENERIC(spriteram)
 ADDRESS_MAP_END
 
@@ -287,7 +291,7 @@ static ADDRESS_MAP_START( fround_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0c000e, 0x0c000f) AM_READ(twin16_sprite_status_r)
 	AM_RANGE(0x0e0000, 0x0e0001) AM_WRITE(fround_gfx_bank_w)
 	AM_RANGE(0x100000, 0x103fff) AM_RAM_WRITE(twin16_text_ram_w) AM_BASE(&twin16_text_ram)
-	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x120000, 0x123fff) AM_RAM AM_BASE_MEMBER(twin16_state, videoram)
 	AM_RANGE(0x140000, 0x143fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x500000, 0x6fffff) AM_READ(twin16_gfx_rom1_r)
 ADDRESS_MAP_END
@@ -715,7 +719,7 @@ static MACHINE_START( twin16 )
 	state_save_register_global_array(machine, cuebrickj_nvram);
 }
 
-static MACHINE_CONFIG_START( twin16, driver_device )
+static MACHINE_CONFIG_START( twin16, twin16_state )
 	// basic machine hardware
 	MDRV_CPU_ADD("maincpu", M68000, XTAL_18_432MHz/2)
 	MDRV_CPU_PROGRAM_MAP(main_map)
@@ -773,7 +777,7 @@ static MACHINE_CONFIG_DERIVED( devilw, twin16 )
 	MDRV_QUANTUM_TIME(HZ(60000)) // watchdog reset otherwise
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( fround, driver_device )
+static MACHINE_CONFIG_START( fround, twin16_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 10000000)
 	MDRV_CPU_PROGRAM_MAP(fround_map)

@@ -19,7 +19,7 @@ static WRITE8_HANDLER( tinvader_sound_w );
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x17ff) AM_ROM
-	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(tinvader_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(tinvader_videoram_w) AM_BASE_MEMBER(zac2650_state, videoram)
 	AM_RANGE(0x1c00, 0x1cff) AM_RAM
 	AM_RANGE(0x1d00, 0x1dff) AM_RAM
 	AM_RANGE(0x1e80, 0x1e80) AM_READWRITE(tinvader_port_0_r, tinvader_sound_w)
@@ -231,7 +231,7 @@ static GFXDECODE_START( tinvader )
 	GFXDECODE_SCALE( NULL,   0x1F00, s2636_character, 0, 2, 8, 6 )	/* dynamic */
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( tinvader, driver_device )
+static MACHINE_CONFIG_START( tinvader, zac2650_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", S2650, 3800000/4)

@@ -14,7 +14,9 @@ static tilemap_t *fg_tilemap;
 
 WRITE8_HANDLER( renegade_videoram_w )
 {
-	space->machine->generic.videoram.u8[offset] = data;
+	renegade_state *state = space->machine->driver_data<renegade_state>();
+	UINT8 *videoram = state->videoram;
+	videoram[offset] = data;
 	offset = offset % (64 * 16);
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
@@ -43,7 +45,9 @@ WRITE8_HANDLER( renegade_scroll1_w )
 
 static TILE_GET_INFO( get_bg_tilemap_info )
 {
-	const UINT8 *source = &machine->generic.videoram.u8[tile_index];
+	renegade_state *state = machine->driver_data<renegade_state>();
+	UINT8 *videoram = state->videoram;
+	const UINT8 *source = &videoram[tile_index];
 	UINT8 attributes = source[0x400]; /* CCC??BBB */
 	SET_TILE_INFO(
 		1 + (attributes & 0x7),

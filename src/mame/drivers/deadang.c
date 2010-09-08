@@ -64,7 +64,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x05000, 0x05fff) AM_WRITEONLY
 	AM_RANGE(0x06000, 0x0600f) AM_READWRITE(seibu_main_word_r, seibu_main_word_w)
 	AM_RANGE(0x06010, 0x07fff) AM_WRITEONLY
-	AM_RANGE(0x08000, 0x087ff) AM_WRITE(deadang_text_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x08000, 0x087ff) AM_WRITE(deadang_text_w) AM_BASE_MEMBER(deadang_state, videoram)
 	AM_RANGE(0x08800, 0x0bfff) AM_WRITEONLY
 	AM_RANGE(0x0a000, 0x0a001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x0a002, 0x0a003) AM_READ_PORT("DSW")
@@ -217,7 +217,7 @@ static INTERRUPT_GEN( deadang_interrupt )
 
 /* Machine Drivers */
 
-static MACHINE_CONFIG_START( deadang, driver_device )
+static MACHINE_CONFIG_START( deadang, deadang_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V30,XTAL_16MHz/2) /* Sony 8623h9 CXQ70116D-8 (V30 compatible) */

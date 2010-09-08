@@ -62,12 +62,14 @@ PALETTE_INIT( gridlee )
 
 static STATE_POSTLOAD( expand_pixels )
 {
+	gridlee_state *state = machine->driver_data<gridlee_state>();
+	UINT8 *videoram = state->videoram;
     int offset = 0;
 
     for(offset = 0; offset < 0x77ff; offset++)
     {
-        local_videoram[offset * 2 + 0] = machine->generic.videoram.u8[offset] >> 4;
-        local_videoram[offset * 2 + 1] = machine->generic.videoram.u8[offset] & 15;
+        local_videoram[offset * 2 + 0] = videoram[offset] >> 4;
+        local_videoram[offset * 2 + 1] = videoram[offset] & 15;
     }
 }
 
@@ -115,7 +117,9 @@ WRITE8_HANDLER( gridlee_cocktail_flip_w )
 
 WRITE8_HANDLER( gridlee_videoram_w )
 {
-	space->machine->generic.videoram.u8[offset] = data;
+	gridlee_state *state = space->machine->driver_data<gridlee_state>();
+	UINT8 *videoram = state->videoram;
+	videoram[offset] = data;
 
 	/* expand the two pixel values into two bytes */
 	local_videoram[offset * 2 + 0] = data >> 4;

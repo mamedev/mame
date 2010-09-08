@@ -58,7 +58,7 @@
 #include "audio/mcr.h"
 #include "audio/williams.h"
 #include "machine/nvram.h"
-#include "includes/mcr.h"
+#include "includes/mcr68.h"
 
 
 
@@ -315,7 +315,7 @@ static ADDRESS_MAP_START( mcr68_map, ADDRESS_SPACE_PROGRAM, 16 )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fffff)
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0x060000, 0x063fff) AM_RAM
-	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE(mcr68_videoram_w) AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)
+	AM_RANGE(0x070000, 0x070fff) AM_RAM_WRITE(mcr68_videoram_w) AM_BASE_MEMBER(mcr68_state, videoram)
 	AM_RANGE(0x071000, 0x071fff) AM_RAM
 	AM_RANGE(0x080000, 0x080fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x090000, 0x09007f) AM_WRITE(mcr68_paletteram_w) AM_BASE_GENERIC(paletteram)
@@ -343,7 +343,7 @@ static ADDRESS_MAP_START( zwackery_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x104000, 0x104007) AM_DEVREADWRITE8("pia0", pia6821_r, pia6821_w, 0xff00)
 	AM_RANGE(0x108000, 0x108007) AM_DEVREADWRITE8("pia1", pia6821_r, pia6821_w, 0x00ff)
 	AM_RANGE(0x10c000, 0x10c007) AM_DEVREADWRITE8("pia2", pia6821_r, pia6821_w, 0x00ff)
-	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(zwackery_videoram_w) AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)
+	AM_RANGE(0x800000, 0x800fff) AM_RAM_WRITE(zwackery_videoram_w) AM_BASE_MEMBER(mcr68_state, videoram)
 	AM_RANGE(0x802000, 0x803fff) AM_RAM_WRITE(zwackery_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xc00000, 0xc00fff) AM_RAM_WRITE(zwackery_spriteram_w) AM_BASE_SIZE_GENERIC(spriteram)
 ADDRESS_MAP_END
@@ -364,7 +364,7 @@ static ADDRESS_MAP_START( pigskin_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0a0000, 0x0affff) AM_READ(pigskin_port_2_r)
 	AM_RANGE(0x0c0000, 0x0c007f) AM_WRITE(mcr68_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x0e0000, 0x0effff) AM_WRITE(watchdog_reset16_w)
-	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(mcr68_videoram_w) AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)
+	AM_RANGE(0x100000, 0x100fff) AM_RAM_WRITE(mcr68_videoram_w) AM_BASE_MEMBER(mcr68_state, videoram)
 	AM_RANGE(0x120000, 0x120001) AM_READWRITE(pigskin_protection_r, pigskin_protection_w)
 	AM_RANGE(0x140000, 0x143fff) AM_RAM
 	AM_RANGE(0x160000, 0x1607ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
@@ -390,7 +390,7 @@ static ADDRESS_MAP_START( trisport_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x100000, 0x103fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x120000, 0x12007f) AM_WRITE(mcr68_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x140000, 0x1407ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0x160000, 0x160fff) AM_RAM_WRITE(mcr68_videoram_w) AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)
+	AM_RANGE(0x160000, 0x160fff) AM_RAM_WRITE(mcr68_videoram_w) AM_BASE_MEMBER(mcr68_state, videoram)
 	AM_RANGE(0x180000, 0x18000f) AM_READWRITE(mcr68_6840_upper_r, mcr68_6840_upper_w)
 	AM_RANGE(0x1a0000, 0x1affff) AM_WRITE(archrivl_control_w)
 	AM_RANGE(0x1c0000, 0x1cffff) AM_WRITE(watchdog_reset16_w)
@@ -887,6 +887,32 @@ INPUT_PORTS_END
  *
  *************************************/
 
+static const gfx_layout mcr68_bg_layout =
+{
+	8,8,
+	RGN_FRAC(1,2),
+	4,
+	{ STEP2(RGN_FRAC(1,2),1), STEP2(RGN_FRAC(0,2),1) },
+	{ STEP8(0,2) },
+	{ STEP8(0,16) },
+	16*8
+};
+
+
+static const gfx_layout mcr68_sprite_layout =
+{
+	32,32,
+	RGN_FRAC(1,4),
+	4,
+	{ STEP4(0,1) },
+	{ STEP2(RGN_FRAC(0,4)+0,4), STEP2(RGN_FRAC(1,4)+0,4), STEP2(RGN_FRAC(2,4)+0,4), STEP2(RGN_FRAC(3,4)+0,4),
+	  STEP2(RGN_FRAC(0,4)+8,4), STEP2(RGN_FRAC(1,4)+8,4), STEP2(RGN_FRAC(2,4)+8,4), STEP2(RGN_FRAC(3,4)+8,4),
+	  STEP2(RGN_FRAC(0,4)+16,4), STEP2(RGN_FRAC(1,4)+16,4), STEP2(RGN_FRAC(2,4)+16,4), STEP2(RGN_FRAC(3,4)+16,4),
+	  STEP2(RGN_FRAC(0,4)+24,4), STEP2(RGN_FRAC(1,4)+24,4), STEP2(RGN_FRAC(2,4)+24,4), STEP2(RGN_FRAC(3,4)+24,4) },
+	{ STEP32(0,32) },
+	32*32
+};
+
 static const gfx_layout zwackery_layout =
 {
 	16,16,
@@ -900,13 +926,13 @@ static const gfx_layout zwackery_layout =
 };
 
 static GFXDECODE_START( mcr68 )
-	GFXDECODE_SCALE( "gfx1", 0, mcr_bg_layout,     0, 4, 2, 2 )
-	GFXDECODE_ENTRY( "gfx2", 0, mcr_sprite_layout, 0, 4 )
+	GFXDECODE_SCALE( "gfx1", 0, mcr68_bg_layout,     0, 4, 2, 2 )
+	GFXDECODE_ENTRY( "gfx2", 0, mcr68_sprite_layout, 0, 4 )
 GFXDECODE_END
 
 static GFXDECODE_START( zwackery )
 	GFXDECODE_ENTRY( "gfx1", 0, zwackery_layout,       0, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, mcr_sprite_layout, 0x800, 32 )
+	GFXDECODE_ENTRY( "gfx2", 0, mcr68_sprite_layout, 0x800, 32 )
 	GFXDECODE_ENTRY( "gfx1", 0, zwackery_layout,       0, 16 )	/* yes, an extra copy */
 GFXDECODE_END
 
@@ -946,7 +972,7 @@ GFXDECODE_END
 
 =================================================================*/
 
-static MACHINE_CONFIG_START( zwackery, driver_device )
+static MACHINE_CONFIG_START( zwackery, mcr68_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 7652400)	/* should be XTAL_16MHz/2 */
@@ -980,7 +1006,7 @@ static MACHINE_CONFIG_START( zwackery, driver_device )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( mcr68, driver_device )
+static MACHINE_CONFIG_START( mcr68, mcr68_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 7723800)

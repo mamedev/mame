@@ -30,6 +30,17 @@ CYC1399
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 
+
+class cmmb_state : public driver_device
+{
+public:
+	cmmb_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *videoram;
+};
+
+
 static VIDEO_START( cmmb )
 {
 
@@ -37,6 +48,8 @@ static VIDEO_START( cmmb )
 
 static VIDEO_UPDATE( cmmb )
 {
+	cmmb_state *state = screen->machine->driver_data<cmmb_state>();
+	UINT8 *videoram = state->videoram;
 	const gfx_element *gfx = screen->machine->gfx[0];
 	int count = 0x00000;
 
@@ -47,8 +60,8 @@ static VIDEO_UPDATE( cmmb )
 	{
 		for (x=0;x<32;x++)
 		{
-			int tile = screen->machine->generic.videoram.u8[count] & 0x3f;
-			int colour = (screen->machine->generic.videoram.u8[count] & 0xc0)>>6;
+			int tile = videoram[count] & 0x3f;
+			int colour = (videoram[count] & 0xc0)>>6;
 			drawgfx_opaque(bitmap,cliprect,gfx,tile,colour,0,0,x*8,y*8);
 
 			count++;
@@ -142,7 +155,7 @@ static READ8_HANDLER( kludge_r )
 static ADDRESS_MAP_START( cmmb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x01ff) AM_RAM /* zero page address */
 //  AM_RANGE(0x13c0, 0x13ff) AM_RAM //spriteram
-	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x1000, 0x13ff) AM_RAM AM_BASE_MEMBER(cmmb_state, videoram)
 	AM_RANGE(0x2480, 0x249f) AM_RAM_WRITE(cmmb_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x4000, 0x400f) AM_READWRITE(cmmb_input_r,cmmb_output_w) //i/o
 	AM_RANGE(0x4900, 0x4900) AM_READ(kludge_r)
@@ -270,7 +283,7 @@ static MACHINE_RESET( cmmb )
 {
 }
 
-static MACHINE_CONFIG_START( cmmb, driver_device )
+static MACHINE_CONFIG_START( cmmb, cmmb_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M65C02,8000000/2) // unknown clock

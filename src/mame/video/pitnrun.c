@@ -32,8 +32,10 @@ UINT8* pitnrun_videoram2;
 
 static TILE_GET_INFO( get_tile_info1 )
 {
+	pitnrun_state *state = machine->driver_data<pitnrun_state>();
+	UINT8 *videoram = state->videoram;
 	int code;
-	code = machine->generic.videoram.u8[tile_index];
+	code = videoram[tile_index];
 	SET_TILE_INFO(
 		0,
 		code,
@@ -54,7 +56,9 @@ static TILE_GET_INFO( get_tile_info2 )
 
 WRITE8_HANDLER( pitnrun_videoram_w )
 {
-	space->machine->generic.videoram.u8[offset] = data;
+	pitnrun_state *state = space->machine->driver_data<pitnrun_state>();
+	UINT8 *videoram = state->videoram;
+	videoram[offset] = data;
 	tilemap_mark_all_tiles_dirty( fg );
 }
 

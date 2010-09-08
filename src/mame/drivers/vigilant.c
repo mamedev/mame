@@ -66,7 +66,7 @@ static ADDRESS_MAP_START( vigilant_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc020, 0xc0df) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(vigilant_paletteram_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)
+	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_BASE_MEMBER(vigilant_state, videoram)
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 ADDRESS_MAP_END
 
@@ -87,7 +87,7 @@ static ADDRESS_MAP_START( kikcubic_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0xc000, 0xc0ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0xc800, 0xcaff) AM_RAM_WRITE(vigilant_paletteram_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)
+	AM_RANGE(0xd000, 0xdfff) AM_RAM AM_BASE_MEMBER(vigilant_state, videoram)
 	AM_RANGE(0xe000, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -513,7 +513,7 @@ static const ym2203_interface ym2203_config =
 };
 
 
-static MACHINE_CONFIG_START( vigilant, driver_device )
+static MACHINE_CONFIG_START( vigilant, vigilant_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3579645)		   /* 3.579645 MHz */
@@ -557,7 +557,7 @@ static MACHINE_CONFIG_START( vigilant, driver_device )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( buccanrs, driver_device )
+static MACHINE_CONFIG_START( buccanrs, vigilant_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 5688800)		   /* 5.688800 MHz */
@@ -617,7 +617,7 @@ static MACHINE_CONFIG_START( buccanrs, driver_device )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.35)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( kikcubic, driver_device )
+static MACHINE_CONFIG_START( kikcubic, vigilant_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3579645)		   /* 3.579645 MHz */

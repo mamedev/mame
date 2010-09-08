@@ -48,9 +48,7 @@ void pc_video_start(running_machine *machine,
 	pc_current_width = -1;
 	machine->generic.tmpbitmap = NULL;
 
-	machine->generic.videoram_size = vramsize;
-
-	if (machine->generic.videoram_size)
+	if (vramsize)
 	{
 		video_start_generic_bitmapped(machine);
 	}
@@ -101,24 +99,4 @@ VIDEO_UPDATE( pc_video )
 		}
 	}
 	return rc;
-}
-
-
-
-WRITE8_HANDLER ( pc_video_videoram_w )
-{
-	if (space->machine->generic.videoram.u8 && space->machine->generic.videoram.u8[offset] != data)
-	{
-		space->machine->generic.videoram.u8[offset] = data;
-		pc_anythingdirty = 1;
-	}
-}
-
-
-WRITE16_HANDLER( pc_video_videoram16le_w ) { write16le_with_write8_handler(pc_video_videoram_w, space, offset, data, mem_mask); }
-
-WRITE32_HANDLER( pc_video_videoram32_w )
-{
-	COMBINE_DATA(space->machine->generic.videoram.u32 + offset);
-	pc_anythingdirty = 1;
 }

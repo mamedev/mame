@@ -78,19 +78,44 @@ static void tilemap_get_info(
 	}
 } /* tilemap_get_info */
 
-static TILE_GET_INFO( tilemap_get_info0 ){ tilemap_get_info(machine,tileinfo,tile_index,0*0x1000+machine->generic.videoram.u16,tilemap_palette_bank[0],namcona1_vreg[0xbc/2]&1); }
-static TILE_GET_INFO( tilemap_get_info1 ){ tilemap_get_info(machine,tileinfo,tile_index,1*0x1000+machine->generic.videoram.u16,tilemap_palette_bank[1],namcona1_vreg[0xbc/2]&2); }
-static TILE_GET_INFO( tilemap_get_info2 ){ tilemap_get_info(machine,tileinfo,tile_index,2*0x1000+machine->generic.videoram.u16,tilemap_palette_bank[2],namcona1_vreg[0xbc/2]&4); }
-static TILE_GET_INFO( tilemap_get_info3 ){ tilemap_get_info(machine,tileinfo,tile_index,3*0x1000+machine->generic.videoram.u16,tilemap_palette_bank[3],namcona1_vreg[0xbc/2]&8); }
+static TILE_GET_INFO( tilemap_get_info0 )
+{
+	namcona1_state *state = machine->driver_data<namcona1_state>();
+	UINT16 *videoram = state->videoram;
+	tilemap_get_info(machine,tileinfo,tile_index,0*0x1000+videoram,tilemap_palette_bank[0],namcona1_vreg[0xbc/2]&1);
+}
+
+static TILE_GET_INFO( tilemap_get_info1 )
+{
+	namcona1_state *state = machine->driver_data<namcona1_state>();
+	UINT16 *videoram = state->videoram;
+	tilemap_get_info(machine,tileinfo,tile_index,1*0x1000+videoram,tilemap_palette_bank[1],namcona1_vreg[0xbc/2]&2);
+}
+
+static TILE_GET_INFO( tilemap_get_info2 )
+{
+	namcona1_state *state = machine->driver_data<namcona1_state>();
+	UINT16 *videoram = state->videoram;
+	tilemap_get_info(machine,tileinfo,tile_index,2*0x1000+videoram,tilemap_palette_bank[2],namcona1_vreg[0xbc/2]&4);
+}
+
+static TILE_GET_INFO( tilemap_get_info3 )
+{
+	namcona1_state *state = machine->driver_data<namcona1_state>();
+	UINT16 *videoram = state->videoram;
+	tilemap_get_info(machine,tileinfo,tile_index,3*0x1000+videoram,tilemap_palette_bank[3],namcona1_vreg[0xbc/2]&8);
+}
 
 static TILE_GET_INFO( roz_get_info )
 {
+	namcona1_state *state = machine->driver_data<namcona1_state>();
+	UINT16 *videoram = state->videoram;
 	/* each logical tile is constructed from 4*4 normal tiles */
 	int tilemap_color = roz_palette;
 	int use_4bpp_gfx = namcona1_vreg[0xbc/2]&16; /* ? */
 	int c = tile_index%0x40;
 	int r = tile_index/0x40;
-	int data = machine->generic.videoram.u16[0x8000/2+(r/4)*0x40+c/4]&0xfbf; /* mask out bit 0x40 - patch for Emeraldia Japan */
+	int data = videoram[0x8000/2+(r/4)*0x40+c/4]&0xfbf; /* mask out bit 0x40 - patch for Emeraldia Japan */
 	int tile = (data+(c%4)+(r%4)*0x40)&0xfff;
 	int gfx = use_4bpp_gfx;
 	if( use_4bpp_gfx )
@@ -129,7 +154,9 @@ static TILE_GET_INFO( roz_get_info )
 
 WRITE16_HANDLER( namcona1_videoram_w )
 {
-	COMBINE_DATA( &space->machine->generic.videoram.u16[offset] );
+	namcona1_state *state = space->machine->driver_data<namcona1_state>();
+	UINT16 *videoram = state->videoram;
+	COMBINE_DATA( &videoram[offset] );
 	if( offset<0x8000/2 )
 	{
 		tilemap_mark_tile_dirty( bg_tilemap[offset/0x1000], offset&0xfff );
@@ -142,7 +169,9 @@ WRITE16_HANDLER( namcona1_videoram_w )
 
 READ16_HANDLER( namcona1_videoram_r )
 {
-	return space->machine->generic.videoram.u16[offset];
+	namcona1_state *state = space->machine->driver_data<namcona1_state>();
+	UINT16 *videoram = state->videoram;
+	return videoram[offset];
 } /* namcona1_videoram_r */
 
 /*************************************************************************/
@@ -537,6 +566,8 @@ static void draw_pixel_line( UINT16 *pDest, UINT8 *pPri, UINT16 *pSource, const 
 
 static void draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int which, int primask )
 {
+	namcona1_state *state = machine->driver_data<namcona1_state>();
+	UINT16 *videoram = state->videoram;
 	/*          scrollx lineselect
      *  tmap0   ffe000  ffe200
      *  tmap1   ffe400  ffe600
@@ -587,7 +618,7 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, const re
 				draw_pixel_line(
 					BITMAP_ADDR16(bitmap, line, 0),
 					BITMAP_ADDR8(machine->priority_bitmap, line, 0),
-					machine->generic.videoram.u16 + ydata + 25,
+					videoram + ydata + 25,
 					paldata );
 			}
 			else

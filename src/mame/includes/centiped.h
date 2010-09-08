@@ -4,6 +4,16 @@
 
 *************************************************************************/
 
+class centiped_state : public driver_device
+{
+public:
+	centiped_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *videoram;
+};
+
+
 /*----------- defined in video/centiped.c -----------*/
 
 extern UINT8 centiped_flipscreen, *bullsdrt_tiles_bankram;

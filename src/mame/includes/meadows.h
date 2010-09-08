@@ -6,6 +6,16 @@
 
 #include "sound/samples.h"
 
+class meadows_state : public driver_device
+{
+public:
+	meadows_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *videoram;
+};
+
+
 /*----------- defined in audio/meadows.c -----------*/
 
 SAMPLES_START( meadows_sh_start );

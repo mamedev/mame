@@ -156,7 +156,7 @@ static ADDRESS_MAP_START( polyplay_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1000, 0x8fff) AM_ROM
 	AM_RANGE(0xe800, 0xebff) AM_ROM AM_REGION("gfx1", 0)
 	AM_RANGE(0xec00, 0xf7ff) AM_RAM_WRITE(polyplay_characterram_w) AM_BASE(&polyplay_characterram)
-	AM_RANGE(0xf800, 0xffff) AM_RAM AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)
+	AM_RANGE(0xf800, 0xffff) AM_RAM AM_BASE_MEMBER(polyplay_state, videoram)
 ADDRESS_MAP_END
 
 
@@ -276,7 +276,7 @@ GFXDECODE_END
 
 /* the machine driver */
 
-static MACHINE_CONFIG_START( polyplay, driver_device )
+static MACHINE_CONFIG_START( polyplay, polyplay_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 9830400/4)

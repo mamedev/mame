@@ -42,7 +42,9 @@ static UINT8 bins, gins;
 
 static TILE_GET_INFO( get_bg0_tile_info )
 {
-	int data = machine->generic.videoram.u16[tile_index];
+	rpunch_state *state = machine->driver_data<rpunch_state>();
+	UINT16 *videoram = state->videoram;
+	int data = videoram[tile_index];
 	int code;
 	if (videoflags & 0x0400)	code = (data & 0x0fff) | 0x2000;
 	else						code = (data & 0x1fff);
@@ -56,7 +58,9 @@ static TILE_GET_INFO( get_bg0_tile_info )
 
 static TILE_GET_INFO( get_bg1_tile_info )
 {
-	int data = machine->generic.videoram.u16[machine->generic.videoram_size / 4 + tile_index];
+	rpunch_state *state = machine->driver_data<rpunch_state>();
+	UINT16 *videoram = state->videoram;
+	int data = videoram[0x4000 / 2 + tile_index];
 	int code;
 	if (videoflags & 0x0800)	code = (data & 0x0fff) | 0x2000;
 	else						code = (data & 0x1fff);
@@ -109,9 +113,11 @@ VIDEO_START( rpunch )
 
 WRITE16_HANDLER( rpunch_videoram_w )
 {
+	rpunch_state *state = space->machine->driver_data<rpunch_state>();
+	UINT16 *videoram = state->videoram;
 	int tmap = offset >> 12;
 	int tile_index = offset & 0xfff;
-	COMBINE_DATA(&space->machine->generic.videoram.u16[offset]);
+	COMBINE_DATA(&videoram[offset]);
 	tilemap_mark_tile_dirty(background[tmap],tile_index);
 }
 

@@ -23,14 +23,18 @@ static UINT8 penmask[64];
 
 static TILE_GET_INFO( centiped_get_tile_info )
 {
-	int data = machine->generic.videoram.u8[tile_index];
+	centiped_state *state = machine->driver_data<centiped_state>();
+	UINT8 *videoram = state->videoram;
+	int data = videoram[tile_index];
 	SET_TILE_INFO(0, (data & 0x3f) + 0x40, 0, TILE_FLIPYX(data >> 6));
 }
 
 
 static TILE_GET_INFO( warlords_get_tile_info )
 {
-	int data = machine->generic.videoram.u8[tile_index];
+	centiped_state *state = machine->driver_data<centiped_state>();
+	UINT8 *videoram = state->videoram;
+	int data = videoram[tile_index];
 	int color = ((tile_index & 0x10) >> 4) | ((tile_index & 0x200) >> 8) | (centiped_flipscreen >> 5);
 	SET_TILE_INFO(0, data & 0x3f, color, TILE_FLIPYX(data >> 6));
 }
@@ -38,7 +42,9 @@ static TILE_GET_INFO( warlords_get_tile_info )
 
 static TILE_GET_INFO( milliped_get_tile_info )
 {
-	int data = machine->generic.videoram.u8[tile_index];
+	centiped_state *state = machine->driver_data<centiped_state>();
+	UINT8 *videoram = state->videoram;
+	int data = videoram[tile_index];
 	int bank = (data >> 6) & 1;
 	int color = (data >> 6) & 3;
 	/* Flip both x and y if flipscreen is non-zero */
@@ -49,7 +55,9 @@ static TILE_GET_INFO( milliped_get_tile_info )
 
 static TILE_GET_INFO( bullsdrt_get_tile_info )
 {
-	int data = machine->generic.videoram.u8[tile_index];
+	centiped_state *state = machine->driver_data<centiped_state>();
+	UINT8 *videoram = state->videoram;
+	int data = videoram[tile_index];
 	int bank = bullsdrt_tiles_bankram[tile_index & 0x1f] & 0x0f;
 	SET_TILE_INFO(0, (data & 0x3f) + 0x40 * bank, 0, TILE_FLIPYX(data >> 6));
 }
@@ -136,7 +144,9 @@ VIDEO_START( bullsdrt )
 
 WRITE8_HANDLER( centiped_videoram_w )
 {
-	space->machine->generic.videoram.u8[offset] = data;
+	centiped_state *state = space->machine->driver_data<centiped_state>();
+	UINT8 *videoram = state->videoram;
+	videoram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 

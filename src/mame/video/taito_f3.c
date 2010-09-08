@@ -525,13 +525,15 @@ static TILE_GET_INFO( get_tile_info4 )
 
 static TILE_GET_INFO( get_tile_info_vram )
 {
+	taito_f3_state *state = machine->driver_data<taito_f3_state>();
+	UINT32 *videoram = state->videoram;
 	int vram_tile;
 	int flags=0;
 
 	if (tile_index&1)
-		vram_tile = (machine->generic.videoram.u32[tile_index>>1]&0xffff);
+		vram_tile = (videoram[tile_index>>1]&0xffff);
 	else
-		vram_tile = (machine->generic.videoram.u32[tile_index>>1]>>16);
+		vram_tile = (videoram[tile_index>>1]>>16);
 
 	if (vram_tile&0x0100) flags|=TILE_FLIPX;
 	if (vram_tile&0x8000) flags|=TILE_FLIPY;
@@ -545,6 +547,8 @@ static TILE_GET_INFO( get_tile_info_vram )
 
 static TILE_GET_INFO( get_tile_info_pixel )
 {
+	taito_f3_state *state = machine->driver_data<taito_f3_state>();
+	UINT32 *videoram = state->videoram;
 	int vram_tile,col_off;
 	int flags=0;
 	int y_offs=(f3_control_1[2]&0x1ff);
@@ -557,9 +561,9 @@ static TILE_GET_INFO( get_tile_info_pixel )
 		col_off=((tile_index%32)*0x40)+((tile_index&0xfe0)>>5);
 
 	if (col_off&1)
-		vram_tile = (machine->generic.videoram.u32[col_off>>1]&0xffff);
+		vram_tile = (videoram[col_off>>1]&0xffff);
 	else
-		vram_tile = (machine->generic.videoram.u32[col_off>>1]>>16);
+		vram_tile = (videoram[col_off>>1]>>16);
 
 	if (vram_tile&0x0100) flags|=TILE_FLIPX;
 	if (vram_tile&0x8000) flags|=TILE_FLIPY;
@@ -793,8 +797,10 @@ WRITE32_HANDLER( f3_control_1_w )
 
 WRITE32_HANDLER( f3_videoram_w )
 {
+	taito_f3_state *state = space->machine->driver_data<taito_f3_state>();
+	UINT32 *videoram = state->videoram;
 	int tile,col_off;
-	COMBINE_DATA(&space->machine->generic.videoram.u32[offset]);
+	COMBINE_DATA(&videoram[offset]);
 
 	tilemap_mark_tile_dirty(vram_layer,offset<<1);
 	tilemap_mark_tile_dirty(vram_layer,(offset<<1)+1);

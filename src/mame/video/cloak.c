@@ -149,7 +149,9 @@ WRITE8_HANDLER( graph_processor_w )
 
 WRITE8_HANDLER( cloak_videoram_w )
 {
-	space->machine->generic.videoram.u8[offset] = data;
+	cloak_state *state = space->machine->driver_data<cloak_state>();
+	UINT8 *videoram = state->videoram;
+	videoram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
@@ -160,7 +162,9 @@ WRITE8_HANDLER( cloak_flipscreen_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int code = machine->generic.videoram.u8[tile_index];
+	cloak_state *state = machine->driver_data<cloak_state>();
+	UINT8 *videoram = state->videoram;
+	int code = videoram[tile_index];
 
 	SET_TILE_INFO(0, code, 0, 0);
 }

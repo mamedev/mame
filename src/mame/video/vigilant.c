@@ -182,17 +182,19 @@ WRITE8_HANDLER( vigilant_rear_color_w )
 
 static void draw_foreground(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int priority, int opaque )
 {
+	vigilant_state *state = machine->driver_data<vigilant_state>();
+	UINT8 *videoram = state->videoram;
 	int offs;
 	int scroll = -(horiz_scroll_low + horiz_scroll_high);
 
 
-	for (offs = 0; offs<machine->generic.videoram_size; offs+=2 )
+	for (offs = 0; offs < 0x1000; offs += 2)
 	{
 		int sy = 8 * ((offs/2) / 64);
 		int sx = 8 * ((offs/2) % 64);
-		int attributes = machine->generic.videoram.u8[offs+1];
+		int attributes = videoram[offs+1];
 		int color = attributes & 0x0F;
-		int tile_number = machine->generic.videoram.u8[offs] | ((attributes & 0xF0) << 4);
+		int tile_number = videoram[offs] | ((attributes & 0xF0) << 4);
 
 		if (priority)	 /* foreground */
 		{
@@ -280,15 +282,17 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 VIDEO_UPDATE( kikcubic )
 {
+	vigilant_state *state = screen->machine->driver_data<vigilant_state>();
+	UINT8 *videoram = state->videoram;
 	int offs;
 
-	for (offs = 0; offs<screen->machine->generic.videoram_size; offs+=2 )
+	for (offs = 0; offs < 0x1000; offs += 2)
 	{
 		int sy = 8 * ((offs/2) / 64);
 		int sx = 8 * ((offs/2) % 64);
-		int attributes = screen->machine->generic.videoram.u8[offs+1];
+		int attributes = videoram[offs+1];
 		int color = (attributes & 0xF0) >> 4;
-		int tile_number = screen->machine->generic.videoram.u8[offs] | ((attributes & 0x0F) << 8);
+		int tile_number = videoram[offs] | ((attributes & 0x0F) << 8);
 
 		drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],
 				tile_number,

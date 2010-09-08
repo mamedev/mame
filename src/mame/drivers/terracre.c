@@ -211,7 +211,7 @@ static ADDRESS_MAP_START( terracre_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x026002, 0x026003) AM_WRITE(amazon_scrollx_w)
 	AM_RANGE(0x026004, 0x026005) AM_WRITE(amazon_scrolly_w)
 	AM_RANGE(0x02600c, 0x02600d) AM_WRITE(amazon_sound_w)
-	AM_RANGE(0x028000, 0x0287ff) AM_WRITE(amazon_foreground_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x028000, 0x0287ff) AM_WRITE(amazon_foreground_w) AM_BASE_MEMBER(terracre_state, videoram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( amazon_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -227,7 +227,7 @@ static ADDRESS_MAP_START( amazon_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x046002, 0x046003) AM_WRITE(amazon_scrollx_w)
 	AM_RANGE(0x046004, 0x046005) AM_WRITE(amazon_scrolly_w)
 	AM_RANGE(0x04600c, 0x04600d) AM_WRITE(amazon_sound_w)
-	AM_RANGE(0x050000, 0x050fff) AM_WRITE(amazon_foreground_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x050000, 0x050fff) AM_WRITE(amazon_foreground_w) AM_BASE_MEMBER(terracre_state, videoram)
 	AM_RANGE(0x070000, 0x070003) AM_READWRITE(amazon_protection_r, amazon_protection_w)
 ADDRESS_MAP_END
 
@@ -529,7 +529,7 @@ static GFXDECODE_START( terracre )
 	GFXDECODE_ENTRY( "gfx3", 0, sprite_layout, 1*16+16*16, 256 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( amazon, driver_device )
+static MACHINE_CONFIG_START( amazon, terracre_state )
 	MDRV_CPU_ADD("maincpu", M68000, 8000000 )
 	MDRV_CPU_PROGRAM_MAP(amazon_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
@@ -568,7 +568,7 @@ static MACHINE_CONFIG_START( amazon, driver_device )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ym3526, driver_device )
+static MACHINE_CONFIG_START( ym3526, terracre_state )
 	MDRV_CPU_ADD("maincpu", M68000, 8000000 )
 	MDRV_CPU_PROGRAM_MAP(terracre_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
@@ -605,7 +605,7 @@ static MACHINE_CONFIG_START( ym3526, driver_device )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( ym2203, driver_device )
+static MACHINE_CONFIG_START( ym2203, terracre_state )
 	MDRV_CPU_ADD("maincpu", M68000, 8000000) /* 8 MHz?? */
 	MDRV_CPU_PROGRAM_MAP(terracre_map)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)

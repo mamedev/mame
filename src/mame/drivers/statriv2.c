@@ -75,6 +75,17 @@ quaquiz2 - no inputs, needs NVRAM
 #include "video/tms9927.h"
 #include "machine/nvram.h"
 
+
+class statriv2_state : public driver_device
+{
+public:
+	statriv2_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *videoram;
+};
+
+
 #define MASTER_CLOCK		12440000
 
 
@@ -98,16 +109,20 @@ static UINT8 last_coin;
 
 static TILE_GET_INFO( horizontal_tile_info )
 {
-	int code = machine->generic.videoram.u8[0x400+tile_index];
-	int attr = machine->generic.videoram.u8[tile_index] & 0x3f;
+	statriv2_state *state = machine->driver_data<statriv2_state>();
+	UINT8 *videoram = state->videoram;
+	int code = videoram[0x400+tile_index];
+	int attr = videoram[tile_index] & 0x3f;
 
 	SET_TILE_INFO(0, code, attr, 0);
 }
 
 static TILE_GET_INFO( vertical_tile_info )
 {
-	int code = machine->generic.videoram.u8[0x400+tile_index];
-	int attr = machine->generic.videoram.u8[tile_index] & 0x3f;
+	statriv2_state *state = machine->driver_data<statriv2_state>();
+	UINT8 *videoram = state->videoram;
+	int code = videoram[0x400+tile_index];
+	int attr = videoram[tile_index] & 0x3f;
 
 	SET_TILE_INFO(0, ((code & 0x7f) << 1) | ((code & 0x80) >> 7), attr, 0);
 }
@@ -151,7 +166,9 @@ static VIDEO_START( vertical )
 
 static WRITE8_HANDLER( statriv2_videoram_w )
 {
-	space->machine->generic.videoram.u8[offset] = data;
+	statriv2_state *state = space->machine->driver_data<statriv2_state>();
+	UINT8 *videoram = state->videoram;
+	videoram[offset] = data;
 	tilemap_mark_tile_dirty(statriv2_tilemap, offset & 0x3ff);
 }
 
@@ -273,7 +290,7 @@ static ADDRESS_MAP_START( statriv2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x43ff) AM_RAM
 	AM_RANGE(0x4800, 0x48ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(statriv2_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(statriv2_videoram_w) AM_BASE_MEMBER(statriv2_state, videoram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( statriv2_io_map, ADDRESS_SPACE_IO, 8 )
@@ -568,7 +585,7 @@ static const tms9927_interface tms9927_intf =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( statriv2, driver_device )
+static MACHINE_CONFIG_START( statriv2, statriv2_state )
 	/* basic machine hardware */
 	/* FIXME: The 8085A had a max clock of 6MHz, internally divided by 2! */
     MDRV_CPU_ADD("maincpu", I8085A, MASTER_CLOCK)

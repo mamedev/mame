@@ -528,9 +528,11 @@ VIDEO_UPDATE( galaxian )
 
 static TILE_GET_INFO( bg_get_tile_info )
 {
+	galaxian_state *state = machine->driver_data<galaxian_state>();
+	UINT8 *videoram = state->videoram;
 	UINT8 x = tile_index & 0x1f;
 
-	UINT16 code = machine->generic.videoram.u8[tile_index];
+	UINT16 code = videoram[tile_index];
 	UINT8 attrib = machine->generic.spriteram.u8[x*2+1];
 	UINT8 color = attrib & 7;
 
@@ -543,11 +545,13 @@ static TILE_GET_INFO( bg_get_tile_info )
 
 WRITE8_HANDLER( galaxian_videoram_w )
 {
+	galaxian_state *state = space->machine->driver_data<galaxian_state>();
+	UINT8 *videoram = state->videoram;
 	/* update any video up to the current scanline */
 	space->machine->primary_screen->update_now();
 
 	/* store the data and mark the corresponding tile dirty */
-	space->machine->generic.videoram.u8[offset] = data;
+	videoram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 

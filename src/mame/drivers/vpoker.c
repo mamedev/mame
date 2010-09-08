@@ -82,13 +82,27 @@ mm74c920J/mmc6551j-9    x2
 #include "cpu/m6809/m6809.h"
 #include "machine/6840ptm.h"
 
+
+class vpoker_state : public driver_device
+{
+public:
+	vpoker_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *videoram;
+};
+
+
 static VIDEO_START( vpoker )
 {
-	machine->generic.videoram.u8 = auto_alloc_array(machine, UINT8, 0x200);
+	vpoker_state *state = machine->driver_data<vpoker_state>();
+	state->videoram = auto_alloc_array(machine, UINT8, 0x200);
 }
 
 static VIDEO_UPDATE( vpoker )
 {
+	vpoker_state *state = screen->machine->driver_data<vpoker_state>();
+	UINT8 *videoram = state->videoram;
 	const gfx_element *gfx = screen->machine->gfx[0];
 	int count = 0x0000;
 
@@ -98,7 +112,7 @@ static VIDEO_UPDATE( vpoker )
 	{
 		for (x=0;x<0x20;x++)
 		{
-			int tile = screen->machine->generic.videoram.u8[count];
+			int tile = videoram[count];
 			//int colour = tile>>12;
 			drawgfx_opaque(bitmap,cliprect,gfx,tile,0,0,0,x*16,y*16);
 
@@ -119,6 +133,8 @@ static READ8_HANDLER( blitter_r )
 
 static WRITE8_HANDLER( blitter_w )
 {
+	vpoker_state *state = space->machine->driver_data<vpoker_state>();
+	UINT8 *videoram = state->videoram;
 	static UINT8 blit_ram[8];
 
 	blit_ram[offset] = data;
@@ -129,7 +145,7 @@ static WRITE8_HANDLER( blitter_w )
 
 		blit_offs = (blit_ram[1] & 0x01)<<8|(blit_ram[2] & 0xff);
 
-		space->machine->generic.videoram.u8[blit_offs] = blit_ram[0];
+		videoram[blit_offs] = blit_ram[0];
 //      printf("%02x %02x %02x %02x %02x %02x %02x %02x\n",blit_ram[0],blit_ram[1],blit_ram[2],blit_ram[3],blit_ram[4],blit_ram[5],blit_ram[6],blit_ram[7]);
 	}
 }
@@ -394,7 +410,7 @@ static const ptm6840_interface ptm_intf =
 	DEVCB_LINE(ptm_irq)
 };
 
-static MACHINE_CONFIG_START( vpoker, driver_device )
+static MACHINE_CONFIG_START( vpoker, vpoker_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M6809,XTAL_4MHz)

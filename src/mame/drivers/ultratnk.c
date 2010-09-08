@@ -70,7 +70,9 @@ static MACHINE_RESET( ultratnk )
 
 static READ8_HANDLER( ultratnk_wram_r )
 {
-	return space->machine->generic.videoram.u8[0x380 + offset];
+	ultratnk_state *state = space->machine->driver_data<ultratnk_state>();
+	UINT8 *videoram = state->videoram;
+	return videoram[0x380 + offset];
 }
 
 
@@ -96,7 +98,9 @@ static READ8_HANDLER( ultratnk_options_r )
 
 static WRITE8_HANDLER( ultratnk_wram_w )
 {
-	space->machine->generic.videoram.u8[0x380 + offset] = data;
+	ultratnk_state *state = space->machine->driver_data<ultratnk_state>();
+	UINT8 *videoram = state->videoram;
+	videoram[0x380 + offset] = data;
 }
 
 
@@ -152,7 +156,7 @@ static ADDRESS_MAP_START( ultratnk_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x700) AM_RAM
 	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x700) AM_READWRITE(ultratnk_wram_r, ultratnk_wram_w)
-	AM_RANGE(0x0800, 0x0bff) AM_MIRROR(0x400) AM_RAM_WRITE(ultratnk_video_ram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x0800, 0x0bff) AM_MIRROR(0x400) AM_RAM_WRITE(ultratnk_video_ram_w) AM_BASE_MEMBER(ultratnk_state, videoram)
 
 	AM_RANGE(0x1000, 0x17ff) AM_READ_PORT("IN0")
 	AM_RANGE(0x1800, 0x1fff) AM_READ_PORT("IN1")
@@ -287,7 +291,7 @@ static GFXDECODE_START( ultratnk )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( ultratnk, driver_device )
+static MACHINE_CONFIG_START( ultratnk, ultratnk_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, PIXEL_CLOCK / 8)

@@ -37,6 +37,17 @@
 #include "sbrkout.lh"
 
 
+class sbrkout_state : public driver_device
+{
+public:
+	sbrkout_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *videoram;
+};
+
+
+
 
 /*************************************
  *
@@ -85,7 +96,9 @@ static TIMER_CALLBACK( pot_trigger_callback );
 
 static MACHINE_START( sbrkout )
 {
-	memory_set_bankptr(machine, "bank1", &machine->generic.videoram.u8[0x380]);
+	sbrkout_state *state = machine->driver_data<sbrkout_state>();
+	UINT8 *videoram = state->videoram;
+	memory_set_bankptr(machine, "bank1", &videoram[0x380]);
 	scanline_timer = timer_alloc(machine, scanline_callback, NULL);
 	pot_timer = timer_alloc(machine, pot_trigger_callback, NULL);
 
@@ -110,6 +123,8 @@ static MACHINE_RESET( sbrkout )
 
 static TIMER_CALLBACK( scanline_callback )
 {
+	sbrkout_state *state = machine->driver_data<sbrkout_state>();
+	UINT8 *videoram = state->videoram;
 	int scanline = param;
 
 	/* force a partial update before anything happens */
@@ -120,7 +135,7 @@ static TIMER_CALLBACK( scanline_callback )
 		cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
 
 	/* update the DAC state */
-	dac_data_w(machine->device("dac"), (machine->generic.videoram.u8[0x380 + 0x11] & (scanline >> 2)) ? 255 : 0);
+	dac_data_w(machine->device("dac"), (videoram[0x380 + 0x11] & (scanline >> 2)) ? 255 : 0);
 
 	/* on the VBLANK, read the pot and schedule an interrupt time for it */
 	if (scanline == machine->primary_screen->visible_area().max_y + 1)
@@ -279,7 +294,9 @@ static READ8_HANDLER( sync2_r )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int code = (machine->generic.videoram.u8[tile_index] & 0x80) ? machine->generic.videoram.u8[tile_index] : 0;
+	sbrkout_state *state = machine->driver_data<sbrkout_state>();
+	UINT8 *videoram = state->videoram;
+	int code = (videoram[tile_index] & 0x80) ? videoram[tile_index] : 0;
 	SET_TILE_INFO(0, code, 0, 0);
 }
 
@@ -292,7 +309,9 @@ static VIDEO_START( sbrkout )
 
 static WRITE8_HANDLER( sbrkout_videoram_w )
 {
-	space->machine->generic.videoram.u8[offset] = data;
+	sbrkout_state *state = space->machine->driver_data<sbrkout_state>();
+	UINT8 *videoram = state->videoram;
+	videoram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
@@ -306,15 +325,17 @@ static WRITE8_HANDLER( sbrkout_videoram_w )
 
 static VIDEO_UPDATE( sbrkout )
 {
+	sbrkout_state *state = screen->machine->driver_data<sbrkout_state>();
+	UINT8 *videoram = state->videoram;
 	int ball;
 
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 
 	for (ball = 2; ball >= 0; ball--)
 	{
-		int code = ((screen->machine->generic.videoram.u8[0x380 + 0x18 + ball * 2 + 1] & 0x80) >> 7);
-		int sx = 31 * 8 - screen->machine->generic.videoram.u8[0x380 + 0x10 + ball * 2];
-		int sy = 30 * 8 - screen->machine->generic.videoram.u8[0x380 + 0x18 + ball * 2];
+		int code = ((videoram[0x380 + 0x18 + ball * 2 + 1] & 0x80) >> 7);
+		int sx = 31 * 8 - videoram[0x380 + 0x10 + ball * 2];
+		int sy = 30 * 8 - videoram[0x380 + 0x18 + ball * 2];
 
 		drawgfx_transpen(bitmap, cliprect, screen->machine->gfx[1], code, 0, 0, 0, sx, sy, 0);
 	}
@@ -333,7 +354,7 @@ static VIDEO_UPDATE( sbrkout )
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x007f) AM_MIRROR(0x380) AM_RAMBANK("bank1")
-	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(sbrkout_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x0400, 0x07ff) AM_RAM_WRITE(sbrkout_videoram_w) AM_BASE_MEMBER(sbrkout_state, videoram)
 	AM_RANGE(0x0800, 0x083f) AM_READ(switches_r)
 	AM_RANGE(0x0840, 0x0840) AM_MIRROR(0x003f) AM_READ_PORT("COIN")
 	AM_RANGE(0x0880, 0x0880) AM_MIRROR(0x003f) AM_READ_PORT("START")
@@ -475,7 +496,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( sbrkout, driver_device )
+static MACHINE_CONFIG_START( sbrkout, sbrkout_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502,MAIN_CLOCK/16)	   /* 375 KHz? Should be 750KHz? */

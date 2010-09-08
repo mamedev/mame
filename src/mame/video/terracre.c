@@ -29,7 +29,9 @@ TILE_GET_INFO( get_bg_tile_info )
 static
 TILE_GET_INFO( get_fg_tile_info )
 {
-	int data = machine->generic.videoram.u16[tile_index];
+	terracre_state *state = machine->driver_data<terracre_state>();
+	UINT16 *videoram = state->videoram;
+	int data = videoram[tile_index];
 	SET_TILE_INFO( 0,data&0xff,0,0 );
 }
 
@@ -160,7 +162,9 @@ WRITE16_HANDLER( amazon_background_w )
 
 WRITE16_HANDLER( amazon_foreground_w )
 {
-	COMBINE_DATA( &space->machine->generic.videoram.u16[offset] );
+	terracre_state *state = space->machine->driver_data<terracre_state>();
+	UINT16 *videoram = state->videoram;
+	COMBINE_DATA( &videoram[offset] );
 	tilemap_mark_tile_dirty( foreground, offset );
 }
 

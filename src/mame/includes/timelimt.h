@@ -1,3 +1,13 @@
+class timelimt_state : public driver_device
+{
+public:
+	timelimt_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *videoram;
+};
+
+
 /*----------- defined in video/timelimt.c -----------*/
 
 extern UINT8 *timelimt_bg_videoram;

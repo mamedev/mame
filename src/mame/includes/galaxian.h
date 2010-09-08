@@ -28,6 +28,16 @@
 
 #define GAL_AUDIO	"discrete"
 
+class galaxian_state : public driver_device
+{
+public:
+	galaxian_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *videoram;
+};
+
+
 /*----------- defined in video/galaxian.c -----------*/
 
 extern UINT8 galaxian_frogger_adjust;

@@ -135,7 +135,9 @@ static MACHINE_RESET( sprint4 )
 
 static READ8_HANDLER( sprint4_wram_r )
 {
-	return space->machine->generic.videoram.u8[0x380 + offset];
+	sprint4_state *state = space->machine->driver_data<sprint4_state>();
+	UINT8 *videoram = state->videoram;
+	return videoram[0x380 + offset];
 }
 
 
@@ -161,7 +163,9 @@ static READ8_HANDLER( sprint4_options_r )
 
 static WRITE8_HANDLER( sprint4_wram_w )
 {
-	space->machine->generic.videoram.u8[0x380 + offset] = data;
+	sprint4_state *state = space->machine->driver_data<sprint4_state>();
+	UINT8 *videoram = state->videoram;
+	videoram[0x380 + offset] = data;
 }
 
 
@@ -234,7 +238,7 @@ static ADDRESS_MAP_START( sprint4_cpu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 
 	AM_RANGE(0x0080, 0x00ff) AM_MIRROR(0x700) AM_READWRITE(sprint4_wram_r, sprint4_wram_w)
-	AM_RANGE(0x0800, 0x0bff) AM_MIRROR(0x400) AM_RAM_WRITE(sprint4_video_ram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x0800, 0x0bff) AM_MIRROR(0x400) AM_RAM_WRITE(sprint4_video_ram_w) AM_BASE_MEMBER(sprint4_state, videoram)
 
 	AM_RANGE(0x0000, 0x0007) AM_MIRROR(0x718) AM_READ(sprint4_analog_r)
 	AM_RANGE(0x0020, 0x0027) AM_MIRROR(0x718) AM_READ(sprint4_coin_r)
@@ -394,7 +398,7 @@ static GFXDECODE_START( sprint4 )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( sprint4, driver_device )
+static MACHINE_CONFIG_START( sprint4, sprint4_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, PIXEL_CLOCK / 8)

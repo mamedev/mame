@@ -82,7 +82,7 @@ static ADDRESS_MAP_START( strnskil_map1, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 	AM_RANGE(0xc800, 0xcfff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(strnskil_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(strnskil_videoram_w) AM_BASE_MEMBER(strnskil_state, videoram)
 
 	AM_RANGE(0xd800, 0xd800) AM_READ(strnskil_d800_r)
 	AM_RANGE(0xd801, 0xd801) AM_READ_PORT("DSW1")
@@ -315,7 +315,7 @@ static GFXDECODE_START( strnskil )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( strnskil, driver_device )
+static MACHINE_CONFIG_START( strnskil, strnskil_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,8000000/2) /* 4.000MHz */

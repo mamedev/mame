@@ -15,7 +15,7 @@
 
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0xbfff) AM_RAM AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)
+	AM_RANGE(0x0000, 0xbfff) AM_RAM AM_BASE_MEMBER(beezer_state, videoram)
 	AM_RANGE(0xc000, 0xcfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xd000, 0xffff) AM_ROM AM_WRITE(beezer_bankswitch_w)
 ADDRESS_MAP_END
@@ -72,7 +72,7 @@ static INPUT_PORTS_START( beezer )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( beezer, driver_device )
+static MACHINE_CONFIG_START( beezer, beezer_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 1000000)        /* 1 MHz */

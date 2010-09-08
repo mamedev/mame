@@ -22,7 +22,9 @@ WRITE16_HANDLER( raiden_foreground_w )
 
 WRITE16_HANDLER( raiden_text_w )
 {
-	COMBINE_DATA(&space->machine->generic.videoram.u16[offset]);
+	raiden_state *state = space->machine->driver_data<raiden_state>();
+	UINT16 *videoram = state->videoram;
+	COMBINE_DATA(&videoram[offset]);
 	tilemap_mark_tile_dirty(tx_layer, offset);
 }
 
@@ -56,7 +58,9 @@ static TILE_GET_INFO( get_fore_tile_info )
 
 static TILE_GET_INFO( get_text_tile_info )
 {
-	int tiledata = machine->generic.videoram.u16[tile_index];
+	raiden_state *state = machine->driver_data<raiden_state>();
+	UINT16 *videoram = state->videoram;
+	int tiledata = videoram[tile_index];
 	int tile = (tiledata & 0xff) | ((tiledata >> 6) & 0x300);
 	int color = (tiledata >> 8) & 0x0f;
 

@@ -247,7 +247,7 @@ static ADDRESS_MAP_START( chinhero_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xb802, 0xb802) AM_READ_PORT("P2")
 	AM_RANGE(0xb803, 0xb803) AM_READ_PORT("P1")
 	AM_RANGE(0xc000, 0xc002) AM_WRITEONLY AM_BASE(&shangkid_videoreg)
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(shangkid_videoram_w) AM_BASE_GENERIC(videoram) AM_SHARE("share1")
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(shangkid_videoram_w) AM_BASE_MEMBER(shangkid_state, videoram) AM_SHARE("share1")
 	AM_RANGE(0xe000, 0xfdff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_BASE_GENERIC(spriteram) AM_SHARE("share3")
 ADDRESS_MAP_END
@@ -268,7 +268,7 @@ static ADDRESS_MAP_START( shangkid_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xb802, 0xb802) AM_READ_PORT("P2")
 	AM_RANGE(0xb803, 0xb803) AM_READ_PORT("P1")
 	AM_RANGE(0xc000, 0xc002) AM_WRITEONLY AM_BASE(&shangkid_videoreg)
-	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(shangkid_videoram_w) AM_BASE_GENERIC(videoram) AM_SHARE("share1")
+	AM_RANGE(0xd000, 0xdfff) AM_RAM_WRITE(shangkid_videoram_w) AM_BASE_MEMBER(shangkid_state, videoram) AM_SHARE("share1")
 	AM_RANGE(0xe000, 0xfdff) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0xfe00, 0xffff) AM_RAM AM_BASE_GENERIC(spriteram) AM_SHARE("share3")
 ADDRESS_MAP_END
@@ -363,7 +363,7 @@ static const ay8910_interface shangkid_ay8910_interface =
 };
 
 
-static MACHINE_CONFIG_START( chinhero, driver_device )
+static MACHINE_CONFIG_START( chinhero, shangkid_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6) /* verified on pcb */
@@ -436,7 +436,7 @@ MACHINE_CONFIG_END
 
 static ADDRESS_MAP_START( dynamski_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_BASE_GENERIC(videoram) /* tilemap */
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM AM_BASE_MEMBER(shangkid_state, videoram) /* tilemap */
 	AM_RANGE(0xc800, 0xcbff) AM_RAM
 	AM_RANGE(0xd000, 0xd3ff) AM_RAM
 	AM_RANGE(0xd800, 0xdbff) AM_RAM
@@ -455,7 +455,7 @@ static ADDRESS_MAP_START( dynamski_portmap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x00, 0x01) AM_DEVWRITE("aysnd", ay8910_data_address_w)
 ADDRESS_MAP_END
 
-static MACHINE_CONFIG_START( dynamski, driver_device )
+static MACHINE_CONFIG_START( dynamski, shangkid_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3000000) /* ? */

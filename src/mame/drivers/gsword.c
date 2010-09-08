@@ -358,7 +358,7 @@ static ADDRESS_MAP_START( cpu1_map, ADDRESS_SPACE_PROGRAM , 8 )
 	AM_RANGE(0xaa80, 0xaa80) AM_WRITE(gsword_videoctrl_w)	/* flip screen, char palette bank */
 	AM_RANGE(0xab00, 0xab00) AM_WRITE(gsword_scroll_w)
 	AM_RANGE(0xab80, 0xabff) AM_WRITEONLY AM_BASE(&gsword_spriteattrib_ram)
-	AM_RANGE(0xb000, 0xb7ff) AM_RAM_WRITE(gsword_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0xb000, 0xb7ff) AM_RAM_WRITE(gsword_videoram_w) AM_BASE_MEMBER(gsword_state, videoram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cpu1_io_map, ADDRESS_SPACE_IO, 8 )
@@ -676,7 +676,7 @@ static const msm5205_interface msm5205_config =
 	MSM5205_SEX_4B	/* vclk input mode    */
 };
 
-static MACHINE_CONFIG_START( gsword, driver_device )
+static MACHINE_CONFIG_START( gsword, gsword_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_18MHz/6) /* verified on pcb */
@@ -731,7 +731,7 @@ static MACHINE_CONFIG_START( gsword, driver_device )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( josvolly, driver_device )
+static MACHINE_CONFIG_START( josvolly, gsword_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 18000000/6) /* ? */

@@ -49,7 +49,9 @@ PALETTE_INIT( strnskil )
 
 WRITE8_HANDLER( strnskil_videoram_w )
 {
-	space->machine->generic.videoram.u8[offset] = data;
+	strnskil_state *state = space->machine->driver_data<strnskil_state>();
+	UINT8 *videoram = state->videoram;
+	videoram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset / 2);
 }
 
@@ -66,8 +68,10 @@ WRITE8_HANDLER( strnskil_scrl_ctrl_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int attr = machine->generic.videoram.u8[tile_index * 2];
-	int code = machine->generic.videoram.u8[(tile_index * 2) + 1] + ((attr & 0x60) << 3);
+	strnskil_state *state = machine->driver_data<strnskil_state>();
+	UINT8 *videoram = state->videoram;
+	int attr = videoram[tile_index * 2];
+	int code = videoram[(tile_index * 2) + 1] + ((attr & 0x60) << 3);
 	int color = (attr & 0x1f) | ((attr & 0x80) >> 2);
 
 	SET_TILE_INFO(0, code, color, 0);

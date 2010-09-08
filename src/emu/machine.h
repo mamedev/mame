@@ -278,8 +278,6 @@ private:
 // holds generic pointers that are commonly used
 struct generic_pointers
 {
-	generic_ptr				videoram;			// videoram
-	UINT32					videoram_size;
 	generic_ptr				spriteram;			// spriteram
 	UINT32					spriteram_size;
 	generic_ptr				spriteram2;			// secondary spriteram

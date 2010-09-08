@@ -130,7 +130,9 @@ bit 0:  3.9kOhm resistor
 
 WRITE16_HANDLER( roundup5_text_w )
 {
-	COMBINE_DATA(&space->machine->generic.videoram.u16[offset]);
+	tatsumi_state *state = space->machine->driver_data<tatsumi_state>();
+	UINT16 *videoram = state->videoram;
+	COMBINE_DATA(&videoram[offset]);
 	tilemap_mark_tile_dirty( tx_layer,offset);
 }
 
@@ -179,7 +181,9 @@ WRITE16_HANDLER( roundup5_crt_w )
 
 static TILE_GET_INFO( get_text_tile_info )
 {
-	int tile = machine->generic.videoram.u16[tile_index];
+	tatsumi_state *state = machine->driver_data<tatsumi_state>();
+	UINT16 *videoram = state->videoram;
+	int tile = videoram[tile_index];
 	SET_TILE_INFO(
 			1,
 			tile & 0xfff,

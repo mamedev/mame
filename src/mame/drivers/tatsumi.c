@@ -197,7 +197,7 @@ static ADDRESS_MAP_START( apache3_v30_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x03fff) AM_RAM
 	AM_RANGE(0x04000, 0x07fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x08000, 0x08fff) AM_RAM_WRITE(apache3_palette_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x0c000, 0x0dfff) AM_RAM_WRITE(roundup5_text_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x0c000, 0x0dfff) AM_RAM_WRITE(roundup5_text_w) AM_BASE_MEMBER(tatsumi_state, videoram)
 	AM_RANGE(0x0e800, 0x0e803) AM_WRITENOP // CRT
 	AM_RANGE(0x0f000, 0x0f001) AM_READ_PORT("DSW")
 	AM_RANGE(0x0f000, 0x0f001) AM_WRITENOP // todo
@@ -238,7 +238,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( roundup5_v30_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x07fff) AM_RAM
-	AM_RANGE(0x08000, 0x0bfff) AM_RAM_WRITE(roundup5_text_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x08000, 0x0bfff) AM_RAM_WRITE(roundup5_text_w) AM_BASE_MEMBER(tatsumi_state, videoram)
 	AM_RANGE(0x0c000, 0x0c003) AM_WRITE(roundup5_crt_w)
 	AM_RANGE(0x0d000, 0x0d001) AM_READ_PORT("DSW")
 	AM_RANGE(0x0d400, 0x0d40f) AM_WRITEONLY AM_BASE(&roundup5_unknown0)
@@ -856,7 +856,7 @@ static MACHINE_RESET( apache3 )
 }
 
 
-static MACHINE_CONFIG_START( apache3, driver_device )
+static MACHINE_CONFIG_START( apache3, tatsumi_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V30, CLOCK_1 / 2)
@@ -902,7 +902,7 @@ static MACHINE_CONFIG_START( apache3, driver_device )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( roundup5, driver_device )
+static MACHINE_CONFIG_START( roundup5, tatsumi_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V30, CLOCK_1 / 2)
@@ -944,7 +944,7 @@ static MACHINE_CONFIG_START( roundup5, driver_device )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( cyclwarr, driver_device )
+static MACHINE_CONFIG_START( cyclwarr, tatsumi_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, CLOCK_2 / 4)
@@ -987,7 +987,7 @@ static MACHINE_CONFIG_START( cyclwarr, driver_device )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( bigfight, driver_device )
+static MACHINE_CONFIG_START( bigfight, tatsumi_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, CLOCK_2 / 4)

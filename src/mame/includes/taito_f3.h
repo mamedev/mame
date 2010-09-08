@@ -39,6 +39,16 @@ enum {
 	COMMANDW	/* prototype */
 };
 
+class taito_f3_state : public driver_device
+{
+public:
+	taito_f3_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT32 *videoram;
+};
+
+
 /*----------- defined in drivers/taito_f3.c -----------*/
 
 extern UINT32 *f3_shared_ram;

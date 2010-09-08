@@ -4,6 +4,16 @@
 
 *************************************************************************/
 
+class segag80r_state : public driver_device
+{
+public:
+	segag80r_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *videoram;
+};
+
+
 /*----------- defined in machine/segag80.c -----------*/
 
 extern UINT8 (*sega_decrypt)(offs_t, UINT8);

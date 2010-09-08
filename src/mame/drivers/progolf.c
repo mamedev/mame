@@ -55,6 +55,17 @@ Twenty four 8116 rams.
 #include "sound/ay8910.h"
 #include "video/mc6845.h"
 
+
+class progolf_state : public driver_device
+{
+public:
+	progolf_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *videoram;
+};
+
+
 static UINT8 char_pen,char_pen_vreg;
 static UINT8 *progolf_fg_fb;
 static UINT8 *progolf_fbram;
@@ -66,16 +77,19 @@ static UINT8 sound_cmd;
 
 static VIDEO_START( progolf )
 {
+	progolf_state *state = machine->driver_data<progolf_state>();
 	scrollx_hi = 0;
 	scrollx_lo = 0;
 
 	progolf_fg_fb = auto_alloc_array(machine, UINT8, 0x2000*8);
-	machine->generic.videoram.u8 = auto_alloc_array(machine, UINT8, 0x1000);
+	state->videoram = auto_alloc_array(machine, UINT8, 0x1000);
 }
 
 
 static VIDEO_UPDATE( progolf )
 {
+	progolf_state *state = screen->machine->driver_data<progolf_state>();
+	UINT8 *videoram = state->videoram;
 	int count,color,x,y,xi,yi;
 
 	{
@@ -87,7 +101,7 @@ static VIDEO_UPDATE( progolf )
 		{
 			for(y=0;y<32;y++)
 			{
-				int tile = screen->machine->generic.videoram.u8[count];
+				int tile = videoram[count];
 
 				drawgfx_opaque(bitmap,cliprect,screen->machine->gfx[0],tile,1,0,0,(256-x*8)+scroll,y*8);
 				/* wrap-around */
@@ -185,6 +199,8 @@ static READ8_HANDLER( audio_command_r )
 
 static READ8_HANDLER( progolf_videoram_r )
 {
+	progolf_state *state = space->machine->driver_data<progolf_state>();
+	UINT8 *videoram = state->videoram;
 	UINT8 *gfx_rom = memory_region(space->machine, "gfx1");
 
 	if (offset >= 0x0800)
@@ -196,7 +212,7 @@ static READ8_HANDLER( progolf_videoram_r )
 		else if (progolf_gfx_switch == 0x70)
 			return gfx_rom[offset + 0x2000];
 		else
-			return space->machine->generic.videoram.u8[offset];
+			return videoram[offset];
 	} else {
 		if      (progolf_gfx_switch == 0x10)
 			return gfx_rom[offset];
@@ -205,14 +221,16 @@ static READ8_HANDLER( progolf_videoram_r )
 		else if (progolf_gfx_switch == 0x30)
 			return gfx_rom[offset + 0x2000];
 		else
-			return space->machine->generic.videoram.u8[offset];
+			return videoram[offset];
 	}
 }
 
 static WRITE8_HANDLER( progolf_videoram_w )
 {
+	progolf_state *state = space->machine->driver_data<progolf_state>();
+	UINT8 *videoram = state->videoram;
 	//if(progolf_gfx_switch & 0x40)
-	space->machine->generic.videoram.u8[offset] = data;
+	videoram[offset] = data;
 }
 
 static ADDRESS_MAP_START( main_cpu, ADDRESS_SPACE_PROGRAM, 8 )
@@ -425,7 +443,7 @@ static PALETTE_INIT( progolf )
 	}
 }
 
-static MACHINE_CONFIG_START( progolf, driver_device )
+static MACHINE_CONFIG_START( progolf, progolf_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, 3000000/2) /* guess, 3 Mhz makes the game to behave worse? */
 	MDRV_CPU_PROGRAM_MAP(main_cpu)

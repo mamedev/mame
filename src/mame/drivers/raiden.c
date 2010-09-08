@@ -54,7 +54,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0b000, 0x0b001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x0b002, 0x0b003) AM_READ_PORT("DSW")
 	AM_RANGE(0x0b000, 0x0b007) AM_WRITE(raiden_control_w)
-	AM_RANGE(0x0c000, 0x0c7ff) AM_WRITE(raiden_text_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x0c000, 0x0c7ff) AM_WRITE(raiden_text_w) AM_BASE_MEMBER(raiden_state, videoram)
 	AM_RANGE(0x0d000, 0x0d00d) AM_READWRITE(seibu_main_word_r, seibu_main_word_w)
 	AM_RANGE(0x0d060, 0x0d067) AM_WRITEONLY AM_BASE(&raiden_scroll_ram)
 	AM_RANGE(0xa0000, 0xfffff) AM_ROM
@@ -77,7 +77,7 @@ static ADDRESS_MAP_START( alt_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x07000, 0x07fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x08000, 0x08fff) AM_RAM AM_SHARE("share1") AM_BASE(&raiden_shared_ram)
 	AM_RANGE(0x0a000, 0x0a00d) AM_READWRITE(seibu_main_word_r, seibu_main_word_w)
-	AM_RANGE(0x0c000, 0x0c7ff) AM_WRITE(raiden_text_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x0c000, 0x0c7ff) AM_WRITE(raiden_text_w) AM_BASE_MEMBER(raiden_state, videoram)
 	AM_RANGE(0x0e000, 0x0e001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x0e000, 0x0e007) AM_WRITE(raidena_control_w)
 	AM_RANGE(0x0e002, 0x0e003) AM_READ_PORT("DSW")
@@ -95,7 +95,7 @@ static ADDRESS_MAP_START( raidenu_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0b000, 0x0b001) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x0b002, 0x0b003) AM_READ_PORT("DSW")
 	AM_RANGE(0x0b000, 0x0b007) AM_WRITE(raidena_control_w)
-	AM_RANGE(0x0c000, 0x0c7ff) AM_WRITE(raiden_text_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x0c000, 0x0c7ff) AM_WRITE(raiden_text_w) AM_BASE_MEMBER(raiden_state, videoram)
 	AM_RANGE(0x0d000, 0x0d00d) AM_READWRITE(seibu_main_word_r, seibu_main_word_w)
 	AM_RANGE(0xa0000, 0xfffff) AM_ROM
 ADDRESS_MAP_END
@@ -249,7 +249,7 @@ static VIDEO_EOF( raiden )
 	buffer_spriteram16_w(space,0,0,0xffff); /* Could be a memory location instead */
 }
 
-static MACHINE_CONFIG_START( raiden, driver_device )
+static MACHINE_CONFIG_START( raiden, raiden_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", V30,XTAL_20MHz/2) /* NEC V30 CPU, 20MHz verified on pcb */

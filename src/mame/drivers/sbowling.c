@@ -177,7 +177,7 @@ static WRITE8_HANDLER (system_w)
 	{
 		int offs;
 		for (offs = 0;offs < 0x4000; offs++)
-			sbw_videoram_w(space, offs, space->machine->generic.videoram.u8[offs]);
+			sbw_videoram_w(space, offs, state->videoram[offs]);
 	}
 	state->sbw_system = data;
 }

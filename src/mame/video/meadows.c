@@ -23,7 +23,9 @@ static tilemap_t *bg_tilemap;
 
 static TILE_GET_INFO( get_tile_info )
 {
-	SET_TILE_INFO(0, machine->generic.videoram.u8[tile_index] & 0x7f, 0, 0);
+	meadows_state *state = machine->driver_data<meadows_state>();
+	UINT8 *videoram = state->videoram;
+	SET_TILE_INFO(0, videoram[tile_index] & 0x7f, 0, 0);
 }
 
 
@@ -49,7 +51,9 @@ VIDEO_START( meadows )
 
 WRITE8_HANDLER( meadows_videoram_w )
 {
-	space->machine->generic.videoram.u8[offset] = data;
+	meadows_state *state = space->machine->driver_data<meadows_state>();
+	UINT8 *videoram = state->videoram;
+	videoram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 

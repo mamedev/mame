@@ -12,6 +12,7 @@ public:
 		  m_nvram(*this, "nvram") { }
 
 	required_shared_ptr<UINT8>	m_nvram;
+	UINT8 *videoram;
 };
 
 /*----------- defined in video/atetris.c -----------*/

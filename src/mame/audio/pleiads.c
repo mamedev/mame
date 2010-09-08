@@ -9,7 +9,7 @@
 #include "emu.h"
 #include "streams.h"
 #include "sound/tms36xx.h"
-#include "includes/phoenix.h"
+#include "audio/pleiads.h"
 
 #define VMIN	0
 #define VMAX	32767

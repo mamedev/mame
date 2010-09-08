@@ -53,10 +53,12 @@ static TILE_GET_INFO( get_fgtile_info )
 
 static TILE_GET_INFO( get_txttile_info )
 {
+	darkmist_state *state = machine->driver_data<darkmist_state>();
+	UINT8 *videoram = state->videoram;
 	int code,attr,pal;
 
-	code=machine->generic.videoram.u8[tile_index];
-	attr=machine->generic.videoram.u8[tile_index+0x400];
+	code=videoram[tile_index];
+	attr=videoram[tile_index+0x400];
 	pal=(attr>>1);
 
 	code+=(attr&1)<<8;

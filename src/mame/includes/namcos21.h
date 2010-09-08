@@ -5,6 +5,16 @@
 #define NAMCOS21_POLY_FRAME_WIDTH 496
 #define NAMCOS21_POLY_FRAME_HEIGHT 480
 
+class namcos21_state : public driver_device
+{
+public:
+	namcos21_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *videoram;
+};
+
+
 /*----------- defined in drivers/namcos21.c -----------*/
 
 extern void namcos21_kickstart(running_machine *, int);

@@ -354,7 +354,7 @@ static ADDRESS_MAP_START( meadows_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0d00, 0x0d0f) AM_WRITE(meadows_spriteram_w) AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0x0e00, 0x0eff) AM_RAM
 	AM_RANGE(0x1000, 0x1bff) AM_ROM
-	AM_RANGE(0x1c00, 0x1fff) AM_RAM_WRITE(meadows_videoram_w) AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)
+	AM_RANGE(0x1c00, 0x1fff) AM_RAM_WRITE(meadows_videoram_w) AM_BASE_MEMBER(meadows_state, videoram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( bowl3d_main_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -367,12 +367,12 @@ static ADDRESS_MAP_START( bowl3d_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0d00, 0x0d0f) AM_WRITE(meadows_spriteram_w) AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0x0e00, 0x0eff) AM_RAM
 	AM_RANGE(0x1000, 0x1bff) AM_ROM
-	AM_RANGE(0x1c00, 0x1fff) AM_RAM_WRITE(meadows_videoram_w) AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)
+	AM_RANGE(0x1c00, 0x1fff) AM_RAM_WRITE(meadows_videoram_w) AM_BASE_MEMBER(meadows_state, videoram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( minferno_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0bff) AM_ROM
-	AM_RANGE(0x1c00, 0x1eff) AM_RAM_WRITE(meadows_videoram_w) AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)
+	AM_RANGE(0x1c00, 0x1eff) AM_RAM_WRITE(meadows_videoram_w) AM_BASE_MEMBER(meadows_state, videoram)
 	AM_RANGE(0x1f00, 0x1f00) AM_READ_PORT("JOY1")
 	AM_RANGE(0x1f01, 0x1f01) AM_READ_PORT("JOY2")
 	AM_RANGE(0x1f02, 0x1f02) AM_READ_PORT("BUTTONS")
@@ -648,7 +648,7 @@ static const samples_interface bowl3d_samples_interface =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( meadows, driver_device )
+static MACHINE_CONFIG_START( meadows, meadows_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", S2650, MASTER_CLOCK/8)	/* 5MHz / 8 = 625 kHz */
@@ -687,7 +687,7 @@ static MACHINE_CONFIG_START( meadows, driver_device )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( minferno, driver_device )
+static MACHINE_CONFIG_START( minferno, meadows_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", S2650, MASTER_CLOCK/24) 	/* 5MHz / 8 / 3 = 208.33 kHz */
@@ -713,7 +713,7 @@ static MACHINE_CONFIG_START( minferno, driver_device )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( bowl3d, driver_device )
+static MACHINE_CONFIG_START( bowl3d, meadows_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", S2650, MASTER_CLOCK/8)	/* 5MHz / 8 = 625 kHz */
 	MDRV_CPU_PROGRAM_MAP(bowl3d_main_map)

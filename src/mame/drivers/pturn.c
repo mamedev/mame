@@ -79,6 +79,17 @@ ROMS: All ROM labels say only "PROM" and a number.
 #include "deprecat.h"
 #include "sound/ay8910.h"
 
+
+class pturn_state : public driver_device
+{
+public:
+	pturn_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *videoram;
+};
+
+
 static tilemap_t *pturn_fgmap,*pturn_bgmap;
 static int bgbank=0;
 static int fgbank=0;
@@ -97,8 +108,10 @@ static const UINT8 tile_lookup[0x10]=
 
 static TILE_GET_INFO( get_pturn_tile_info )
 {
+	pturn_state *state = machine->driver_data<pturn_state>();
+	UINT8 *videoram = state->videoram;
 	int tileno;
-	tileno = machine->generic.videoram.u8[tile_index];
+	tileno = videoram[tile_index];
 
 	tileno=tile_lookup[tileno>>4]|(tileno&0xf)|(fgbank<<8);
 
@@ -184,7 +197,9 @@ READ8_HANDLER (pturn_protection2_r)
 
 static WRITE8_HANDLER( pturn_videoram_w )
 {
-	space->machine->generic.videoram.u8[offset]=data;
+	pturn_state *state = space->machine->driver_data<pturn_state>();
+	UINT8 *videoram = state->videoram;
+	videoram[offset]=data;
 	tilemap_mark_tile_dirty(pturn_fgmap,offset);
 }
 
@@ -280,7 +295,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 
 	AM_RANGE(0xdfe0, 0xdfe0) AM_NOP
 
-	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(pturn_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0xe000, 0xe3ff) AM_RAM_WRITE(pturn_videoram_w) AM_BASE_MEMBER(pturn_state, videoram)
 	AM_RANGE(0xe400, 0xe400) AM_WRITE(fgpalette_w)
 	AM_RANGE(0xe800, 0xe800) AM_WRITE(sound_w)
 
@@ -444,7 +459,7 @@ static MACHINE_RESET( pturn )
 	soundlatch_clear_w(space,0,0);
 }
 
-static MACHINE_CONFIG_START( pturn, driver_device )
+static MACHINE_CONFIG_START( pturn, pturn_state )
 	MDRV_CPU_ADD("maincpu", Z80, 12000000/3)
 	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", pturn_main_intgen)

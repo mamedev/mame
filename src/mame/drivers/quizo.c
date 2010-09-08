@@ -27,6 +27,17 @@ Xtals 8MHz, 21.47727MHz
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 
+
+class quizo_state : public driver_device
+{
+public:
+	quizo_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *videoram;
+};
+
+
 #define XTAL1	 8000000
 #define XTAL2	21477270
 
@@ -65,13 +76,15 @@ static PALETTE_INIT(quizo)
 
 static VIDEO_UPDATE( quizo )
 {
+	quizo_state *state = screen->machine->driver_data<quizo_state>();
+	UINT8 *videoram = state->videoram;
 	int x,y;
 	for(y=0;y<200;y++)
 	{
 		for(x=0;x<80;x++)
 		{
-			int data=screen->machine->generic.videoram.u8[y*80+x];
-			int data1=screen->machine->generic.videoram.u8[y*80+x+0x4000];
+			int data=videoram[y*80+x];
+			int data1=videoram[y*80+x+0x4000];
 			int pix;
 
 			pix=(data&1)|(((data>>4)&1)<<1)|((data1&1)<<2)|(((data1>>4)&1)<<3);
@@ -95,8 +108,10 @@ static VIDEO_UPDATE( quizo )
 
 static WRITE8_HANDLER(vram_w)
 {
+	quizo_state *state = space->machine->driver_data<quizo_state>();
+	UINT8 *videoram = state->videoram;
 	int bank=(port70&8)?1:0;
-	space->machine->generic.videoram.u8[offset+bank*0x4000]=data;
+	videoram[offset+bank*0x4000]=data;
 }
 
 static WRITE8_HANDLER(port70_w)
@@ -183,7 +198,7 @@ static INPUT_PORTS_START( quizo )
 	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static MACHINE_CONFIG_START( quizo, driver_device )
+static MACHINE_CONFIG_START( quizo, quizo_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,XTAL1/2)
 	MDRV_CPU_PROGRAM_MAP(memmap)
@@ -244,7 +259,9 @@ ROM_END
 
 static DRIVER_INIT(quizo)
 {
-	machine->generic.videoram.u8=auto_alloc_array(machine, UINT8, 0x4000*2);
+	quizo_state *state = machine->driver_data<quizo_state>();
+	UINT8 *videoram = state->videoram;
+	videoram=auto_alloc_array(machine, UINT8, 0x4000*2);
 }
 
 GAME( 1985, quizo,  0,       quizo,  quizo,  quizo, ROT0, "Seoul Coin Corp.", "Quiz Olympic (set 1)", 0 )

@@ -27,29 +27,6 @@ WRITE8_DEVICE_HANDLER( phoenix_sound_control_b_w );
 
 DECLARE_LEGACY_SOUND_DEVICE(PHOENIX, phoenix_sound);
 
-/*----------- defined in audio/pleiads.c -----------*/
-
-WRITE8_HANDLER( pleiads_sound_control_a_w );
-WRITE8_HANDLER( pleiads_sound_control_b_w );
-WRITE8_HANDLER( pleiads_sound_control_c_w );
-
-DECLARE_LEGACY_SOUND_DEVICE(PLEIADS, pleiads_sound);
-DECLARE_LEGACY_SOUND_DEVICE(NAUGHTYB, naughtyb_sound);
-DECLARE_LEGACY_SOUND_DEVICE(POPFLAME, popflame_sound);
-
-/*----------- defined in video/naughtyb.c -----------*/
-
-extern UINT8 *naughtyb_videoram2;
-extern UINT8 *naughtyb_scrollreg;
-extern int naughtyb_cocktail;
-
-WRITE8_HANDLER( naughtyb_videoreg_w );
-WRITE8_HANDLER( popflame_videoreg_w );
-
-VIDEO_START( naughtyb );
-PALETTE_INIT( naughtyb );
-VIDEO_UPDATE( naughtyb );
-
 
 /*----------- defined in video/phoenix.c -----------*/
 

@@ -12,6 +12,16 @@
 #define TMS_CLOCK		XTAL_40MHz			/* TMS320C31 clocks on drivedge */
 
 
+class itech32_state : public driver_device
+{
+public:
+	itech32_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT16 *videoram;
+};
+
+
 /*----------- defined in drivers/itech32.c -----------*/
 
 void itech32_update_interrupts(running_machine *machine, int vint, int xint, int qint);

@@ -199,6 +199,8 @@ static TILE_GET_INFO( bg_get_tile_info )
 
 VIDEO_START( segag80r )
 {
+	segag80r_state *state = machine->driver_data<segag80r_state>();
+	UINT8 *videoram = state->videoram;
 	static const int rg_resistances[3] = { 4700, 2400, 1200 };
 	static const int b_resistances[2] = { 2000, 1000 };
 
@@ -208,7 +210,7 @@ VIDEO_START( segag80r )
 			3,	rg_resistances, gweights, 220, 0,
 			2,	b_resistances,  bweights, 220, 0);
 
-	gfx_element_set_source(machine->gfx[0], &machine->generic.videoram.u8[0x800]);
+	gfx_element_set_source(machine->gfx[0], &videoram[0x800]);
 
 	/* allocate paletteram */
 	machine->generic.paletteram.u8 = auto_alloc_array(machine, UINT8, 0x80);
@@ -271,6 +273,8 @@ VIDEO_START( segag80r )
 
 WRITE8_HANDLER( segag80r_videoram_w )
 {
+	segag80r_state *state = space->machine->driver_data<segag80r_state>();
+	UINT8 *videoram = state->videoram;
 	/* accesses to the upper half of VRAM go to paletteram if selected */
 	if ((offset & 0x1000) && (video_control & 0x02))
 	{
@@ -281,7 +285,7 @@ WRITE8_HANDLER( segag80r_videoram_w )
 	}
 
 	/* all other accesses go to videoram */
-	space->machine->generic.videoram.u8[offset] = data;
+	videoram[offset] = data;
 
 	/* track which characters are dirty */
 	if (offset & 0x800)
@@ -643,6 +647,8 @@ WRITE8_HANDLER( sindbadm_back_port_w )
 
 static void draw_videoram(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, const UINT8 *transparent_pens)
 {
+	segag80r_state *state = machine->driver_data<segag80r_state>();
+	UINT8 *videoram = state->videoram;
 	int flipmask = video_flip ? 0x1f : 0x00;
 	int x, y;
 
@@ -653,7 +659,7 @@ static void draw_videoram(running_machine *machine, bitmap_t *bitmap, const rect
 		for (x = cliprect->min_x / 8; x <= cliprect->max_x / 8; x++)
 		{
 			int offs = effy * 32 + (x ^ flipmask);
-			UINT8 tile = machine->generic.videoram.u8[offs];
+			UINT8 tile = videoram[offs];
 
 			/* draw the tile */
 			drawgfx_transmask(bitmap, cliprect, machine->gfx[0], tile, tile >> 4, video_flip, video_flip, x*8, y*8, transparent_pens[tile >> 4]);

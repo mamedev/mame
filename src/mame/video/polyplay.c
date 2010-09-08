@@ -51,14 +51,16 @@ VIDEO_START( polyplay )
 
 VIDEO_UPDATE( polyplay )
 {
+	polyplay_state *state = screen->machine->driver_data<polyplay_state>();
+	UINT8 *videoram = state->videoram;
 	offs_t offs;
 
 
-	for (offs = 0; offs < screen->machine->generic.videoram_size; offs++)
+	for (offs = 0; offs < 0x800; offs++)
 	{
 		int sx = (offs & 0x3f) << 3;
 		int sy = offs >> 6 << 3;
-		UINT8 code = screen->machine->generic.videoram.u8[offs];
+		UINT8 code = videoram[offs];
 
 		drawgfx_opaque(bitmap,cliprect, screen->machine->gfx[(code >> 7) & 0x01],
 				code, 0, 0, 0, sx, sy);

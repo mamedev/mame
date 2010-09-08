@@ -32,7 +32,9 @@ WRITE16_HANDLER( dynduke_foreground_w )
 
 WRITE16_HANDLER( dynduke_text_w )
 {
-	COMBINE_DATA(&space->machine->generic.videoram.u16[offset]);
+	dynduke_state *state = space->machine->driver_data<dynduke_state>();
+	UINT16 *videoram = state->videoram;
+	COMBINE_DATA(&videoram[offset]);
 	tilemap_mark_tile_dirty(tx_layer,offset);
 }
 
@@ -66,7 +68,9 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 static TILE_GET_INFO( get_tx_tile_info )
 {
-	int tile=machine->generic.videoram.u16[tile_index];
+	dynduke_state *state = machine->driver_data<dynduke_state>();
+	UINT16 *videoram = state->videoram;
+	int tile=videoram[tile_index];
 	int color=(tile >> 8) & 0x0f;
 
 	tile = (tile & 0xff) | ((tile & 0xc000) >> 6);

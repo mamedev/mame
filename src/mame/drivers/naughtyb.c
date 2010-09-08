@@ -105,7 +105,8 @@ TODO:
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/tms36xx.h"
-#include "includes/phoenix.h"
+#include "audio/pleiads.h"
+#include "includes/naughtyb.h"
 
 #define CLOCK_XTAL 12000000
 
@@ -249,7 +250,7 @@ static WRITE8_HANDLER( popflame_protection_w )
 static ADDRESS_MAP_START( naughtyb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE_MEMBER(naughtyb_state, videoram)
 	AM_RANGE(0x8800, 0x8fff) AM_RAM AM_BASE(&naughtyb_videoram2)
 	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(naughtyb_videoreg_w)
 	AM_RANGE(0x9800, 0x9fff) AM_RAM AM_BASE(&naughtyb_scrollreg)
@@ -262,7 +263,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( popflame_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
 	AM_RANGE(0x4000, 0x7fff) AM_RAM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE_MEMBER(naughtyb_state, videoram)
 	AM_RANGE(0x8800, 0x8fff) AM_RAM AM_BASE(&naughtyb_videoram2)
 	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(popflame_videoreg_w)
 	AM_RANGE(0x9800, 0x9fff) AM_RAM AM_BASE(&naughtyb_scrollreg)
@@ -433,7 +434,7 @@ static const tms36xx_interface tms3615_interface =
 
 
 
-static MACHINE_CONFIG_START( naughtyb, driver_device )
+static MACHINE_CONFIG_START( naughtyb, naughtyb_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CLOCK_XTAL / 4) /* 12 MHz clock, divided by 4. CPU is a Z80A */
@@ -469,7 +470,7 @@ MACHINE_CONFIG_END
 
 
 /* Exactly the same but for certain address writes */
-static MACHINE_CONFIG_START( popflame, driver_device )
+static MACHINE_CONFIG_START( popflame, naughtyb_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CLOCK_XTAL / 4) /* 12 MHz clock, divided by 4. CPU is a Z80A */

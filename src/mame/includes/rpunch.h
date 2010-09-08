@@ -1,3 +1,13 @@
+class rpunch_state : public driver_device
+{
+public:
+	rpunch_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT16 *videoram;
+};
+
+
 /*----------- defined in video/rpunch.c -----------*/
 
 extern UINT16 *rpunch_bitmapram;

@@ -580,7 +580,7 @@ static WRITE8_HANDLER( ampoker2_watchdog_reset_w )
 static ADDRESS_MAP_START( ampoker2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(ampoker2_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0xe000, 0xefff) AM_RAM_WRITE(ampoker2_videoram_w) AM_BASE_MEMBER(ampoker2_state, videoram)
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ampoker2_io_map, ADDRESS_SPACE_IO, 8 )
@@ -1050,7 +1050,7 @@ static const ay8910_interface ay8910_config =
 *     Machine Driver     *
 *************************/
 
-static MACHINE_CONFIG_START( ampoker2, driver_device )
+static MACHINE_CONFIG_START( ampoker2, ampoker2_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/2)		/* 3 MHz */

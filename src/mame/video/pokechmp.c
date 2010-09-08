@@ -7,7 +7,9 @@ static tilemap_t *bg_tilemap;
 
 WRITE8_HANDLER( pokechmp_videoram_w )
 {
-	space->machine->generic.videoram.u8[offset] = data;
+	pokechmp_state *state = space->machine->driver_data<pokechmp_state>();
+	UINT8 *videoram = state->videoram;
+	videoram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset / 2);
 }
 
@@ -22,8 +24,10 @@ WRITE8_HANDLER( pokechmp_flipscreen_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int code = machine->generic.videoram.u8[tile_index*2+1] + ((machine->generic.videoram.u8[tile_index*2] & 0x3f) << 8);
-	int color = machine->generic.videoram.u8[tile_index*2] >> 6;
+	pokechmp_state *state = machine->driver_data<pokechmp_state>();
+	UINT8 *videoram = state->videoram;
+	int code = videoram[tile_index*2+1] + ((videoram[tile_index*2] & 0x3f) << 8);
+	int color = videoram[tile_index*2] >> 6;
 
 	SET_TILE_INFO(0, code, color, 0);
 }

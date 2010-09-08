@@ -347,7 +347,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0800, 0x7fff) AM_ROM		/* PROM board ROM area */
 	AM_RANGE(0x8000, 0xbfff) AM_ROM		/* PROM board ROM area */
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(mainram_w) AM_BASE(&mainram)
-	AM_RANGE(0xe000, 0xffff) AM_RAM_WRITE(vidram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0xe000, 0xffff) AM_RAM_WRITE(vidram_w) AM_BASE_MEMBER(segag80r_state, videoram)
 ADDRESS_MAP_END
 
 
@@ -829,7 +829,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( g80r_base, driver_device )
+static MACHINE_CONFIG_START( g80r_base, segag80r_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, VIDEO_CLOCK/4)

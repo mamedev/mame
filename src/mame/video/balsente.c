@@ -46,8 +46,6 @@ WRITE8_HANDLER( balsente_videoram_w )
 {
 	balsente_state *state = space->machine->driver_data<balsente_state>();
 
-	space->machine->generic.videoram.u8[offset] = data;
-
 	/* expand the two pixel values into two bytes */
 	state->videoram[offset * 2 + 0] = data >> 4;
 	state->videoram[offset * 2 + 1] = data & 15;

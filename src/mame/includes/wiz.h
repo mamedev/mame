@@ -1,3 +1,13 @@
+class wiz_state : public driver_device
+{
+public:
+	wiz_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *videoram;
+};
+
+
 /*----------- defined in video/wiz.c -----------*/
 
 extern UINT8 *wiz_videoram2;

@@ -64,14 +64,18 @@ PALETTE_INIT( tankbatt )
 
 WRITE8_HANDLER( tankbatt_videoram_w )
 {
-	space->machine->generic.videoram.u8[offset] = data;
+	tankbatt_state *state = space->machine->driver_data<tankbatt_state>();
+	UINT8 *videoram = state->videoram;
+	videoram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int code = machine->generic.videoram.u8[tile_index];
-	int color = machine->generic.videoram.u8[tile_index] | 0x01;
+	tankbatt_state *state = machine->driver_data<tankbatt_state>();
+	UINT8 *videoram = state->videoram;
+	int code = videoram[tile_index];
+	int color = videoram[tile_index] | 0x01;
 
 	SET_TILE_INFO(0, code, color, 0);
 }

@@ -112,7 +112,9 @@ WRITE8_HANDLER( gottlieb_laserdisc_video_control_w )
 
 WRITE8_HANDLER( gottlieb_videoram_w )
 {
-	space->machine->generic.videoram.u8[offset] = data;
+	gottlieb_state *state = space->machine->driver_data<gottlieb_state>();
+	UINT8 *videoram = state->videoram;
+	videoram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 
@@ -136,7 +138,9 @@ WRITE8_HANDLER( gottlieb_charram_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int code = machine->generic.videoram.u8[tile_index];
+	gottlieb_state *state = machine->driver_data<gottlieb_state>();
+	UINT8 *videoram = state->videoram;
+	int code = videoram[tile_index];
 	if ((code & 0x80) == 0)
 		SET_TILE_INFO(gottlieb_gfxcharlo, code, 0, 0);
 	else
@@ -145,7 +149,9 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_screwloo_bg_tile_info )
 {
-	int code = machine->generic.videoram.u8[tile_index];
+	gottlieb_state *state = machine->driver_data<gottlieb_state>();
+	UINT8 *videoram = state->videoram;
+	int code = videoram[tile_index];
 	if ((code & 0xc0) == 0)
 		SET_TILE_INFO(gottlieb_gfxcharlo, code, 0, 0);
 	else

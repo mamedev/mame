@@ -70,7 +70,7 @@ static ADDRESS_MAP_START( memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd681, 0xd681) AM_READ(t5182_sharedram_semaphore_snd_r)
 	AM_RANGE(0xd682, 0xd682) AM_WRITE(t5182_sharedram_semaphore_main_acquire_w)
 	AM_RANGE(0xd683, 0xd683) AM_WRITE(t5182_sharedram_semaphore_main_release_w)
-	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_BASE_GENERIC(videoram)
+	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_BASE_MEMBER(darkmist_state, videoram)
 	AM_RANGE(0xe000, 0xefff) AM_RAM AM_BASE(&darkmist_workram)
 	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 ADDRESS_MAP_END
@@ -240,7 +240,7 @@ static INTERRUPT_GEN( darkmist_interrupt )
 
 
 
-static MACHINE_CONFIG_START( darkmist, driver_device )
+static MACHINE_CONFIG_START( darkmist, darkmist_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80,4000000)		 /* ? MHz */
 	MDRV_CPU_PROGRAM_MAP(memmap)

@@ -201,15 +201,16 @@ INLINE void enable_clipping(void)
 
 VIDEO_START( itech32 )
 {
+	itech32_state *state = machine->driver_data<itech32_state>();
 	int i;
 
 	/* allocate memory */
-	machine->generic.videoram.u16 = auto_alloc_array(machine, UINT16, VRAM_WIDTH * (itech32_vram_height + 16) * 2);
-	memset(machine->generic.videoram.u16, 0xff, VRAM_WIDTH * (itech32_vram_height + 16) * 2 * 2);
+	state->videoram = auto_alloc_array(machine, UINT16, VRAM_WIDTH * (itech32_vram_height + 16) * 2);
+	memset(state->videoram, 0xff, VRAM_WIDTH * (itech32_vram_height + 16) * 2 * 2);
 
 	/* videoplane[0] is the foreground; videoplane[1] is the background */
-	videoplane[0] = &machine->generic.videoram.u16[0 * VRAM_WIDTH * (itech32_vram_height + 16) + 8 * VRAM_WIDTH];
-	videoplane[1] = &machine->generic.videoram.u16[1 * VRAM_WIDTH * (itech32_vram_height + 16) + 8 * VRAM_WIDTH];
+	videoplane[0] = &state->videoram[0 * VRAM_WIDTH * (itech32_vram_height + 16) + 8 * VRAM_WIDTH];
+	videoplane[1] = &state->videoram[1 * VRAM_WIDTH * (itech32_vram_height + 16) + 8 * VRAM_WIDTH];
 
 	/* set the masks */
 	vram_mask = VRAM_WIDTH * itech32_vram_height - 1;

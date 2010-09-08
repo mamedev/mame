@@ -339,7 +339,7 @@ static const ppi8255_interface ppi8255_intf =
 
 static ADDRESS_MAP_START( gat_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x5fff) AM_ROM
-	AM_RANGE(0x6000, 0x63ff) AM_RAM_WRITE(gat_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x6000, 0x63ff) AM_RAM_WRITE(gat_videoram_w) AM_BASE_MEMBER(gatron_state, videoram)
 	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")	/* battery backed RAM */
 	AM_RANGE(0xa000, 0xa000) AM_DEVWRITE("snsnd", sn76496_w)							/* PSG */
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(output_port_0_w)										/* lamps */
@@ -432,7 +432,7 @@ GFXDECODE_END
 *    Machine Drivers     *
 *************************/
 
-static MACHINE_CONFIG_START( gat, driver_device )
+static MACHINE_CONFIG_START( gat, gatron_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/24)	/* 666.66 kHz, guess */

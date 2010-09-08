@@ -65,6 +65,17 @@ D.9B         [f99cac4b] /
 #include "deprecat.h"
 #include "audio/t5182.h"
 
+
+class panicr_state : public driver_device
+{
+public:
+	panicr_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *videoram;
+};
+
+
 #define MASTER_CLOCK	XTAL_16MHz
 #define SOUND_CLOCK		XTAL_14_31818MHz
 #define TC15_CLOCK		XTAL_12MHz
@@ -144,8 +155,10 @@ static TILE_GET_INFO( get_bgtile_info )
 
 static TILE_GET_INFO( get_txttile_info )
 {
-	int code=machine->generic.videoram.u8[tile_index*4];
-	int attr=machine->generic.videoram.u8[tile_index*4+2];
+	panicr_state *state = machine->driver_data<panicr_state>();
+	UINT8 *videoram = state->videoram;
+	int code=videoram[tile_index*4];
+	int attr=videoram[tile_index*4+2];
 	int color = attr & 0x07;
 
 	tileinfo->group = color;
@@ -177,7 +190,7 @@ static ADDRESS_MAP_START( panicr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x02000, 0x02fff) AM_RAM AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0x03000, 0x03fff) AM_RAM
 	AM_RANGE(0x08000, 0x0bfff) AM_RAM AM_REGION("user3", 0) //attribue map ?
-	AM_RANGE(0x0c000, 0x0cfff) AM_RAM AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x0c000, 0x0cfff) AM_RAM AM_BASE_MEMBER(panicr_state, videoram)
 	AM_RANGE(0x0d000, 0x0d000) AM_WRITE(t5182_sound_irq_w)
 	AM_RANGE(0x0d002, 0x0d002) AM_READ(t5182_sharedram_semaphore_snd_r)
 	AM_RANGE(0x0d004, 0x0d004) AM_WRITE(t5182_sharedram_semaphore_main_acquire_w)
@@ -361,7 +374,7 @@ static GFXDECODE_START( panicr )
 	GFXDECODE_ENTRY( "gfx3", 0, spritelayout, 0x200, 16 )
 GFXDECODE_END
 
-static MACHINE_CONFIG_START( panicr, driver_device )
+static MACHINE_CONFIG_START( panicr, panicr_state )
 	MDRV_CPU_ADD("maincpu", V20,MASTER_CLOCK/2) /* Sony 8623h9 CXQ70116D-8 (V20 compatible) */
 	MDRV_CPU_PROGRAM_MAP(panicr_map)
 	MDRV_CPU_VBLANK_INT_HACK(panicr_interrupt,2)

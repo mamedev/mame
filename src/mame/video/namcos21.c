@@ -46,6 +46,8 @@ WRITE16_HANDLER(winrun_gpu_register_w)
 
 WRITE16_HANDLER( winrun_gpu_videoram_w)
 {
+	namcos21_state *state = space->machine->driver_data<namcos21_state>();
+	UINT8 *videoram = state->videoram;
 	int color = data>>8;
 	int mask  = data&0xff;
 	int i;
@@ -53,14 +55,16 @@ WRITE16_HANDLER( winrun_gpu_videoram_w)
 	{
 		if( mask&(0x01<<i) )
 		{
-			space->machine->generic.videoram.u8[(offset+i)&0x7ffff] = color;
+			videoram[(offset+i)&0x7ffff] = color;
 		}
 	}
 } /* winrun_gpu_videoram_w */
 
 READ16_HANDLER( winrun_gpu_videoram_r )
 {
-	return space->machine->generic.videoram.u8[offset]<<8;
+	namcos21_state *state = space->machine->driver_data<namcos21_state>();
+	UINT8 *videoram = state->videoram;
+	return videoram[offset]<<8;
 } /* winrun_gpu_videoram_r */
 
 static void
@@ -127,9 +131,10 @@ static int objcode2tile( int code )
 
 VIDEO_START( namcos21 )
 {
+	namcos21_state *state = machine->driver_data<namcos21_state>();
 	if( namcos2_gametype == NAMCOS21_WINRUN91 )
 	{
-		machine->generic.videoram.u8 = auto_alloc_array(machine, UINT8, 0x80000);
+		state->videoram = auto_alloc_array(machine, UINT8, 0x80000);
 	}
 	AllocatePolyFrameBuffer(machine);
 	namco_obj_init(machine,
@@ -178,6 +183,8 @@ update_palette( running_machine *machine )
 
 VIDEO_UPDATE( namcos21 )
 {
+	namcos21_state *state = screen->machine->driver_data<namcos21_state>();
+	UINT8 *videoram = state->videoram;
 	int pivot = 3;
 	int pri;
 	update_palette(screen->machine);
@@ -215,7 +222,7 @@ VIDEO_UPDATE( namcos21 )
 		int sx,sy;
 		for( sy=cliprect->min_y; sy<=cliprect->max_y; sy++ )
 		{
-			const UINT8 *pSource = &screen->machine->generic.videoram.u8[((yscroll+sy)&0x3ff)*0x200];
+			const UINT8 *pSource = &videoram[((yscroll+sy)&0x3ff)*0x200];
 			UINT16 *pDest = BITMAP_ADDR16(bitmap, sy, 0);
 			for( sx=cliprect->min_x; sx<=cliprect->max_x; sx++ )
 			{

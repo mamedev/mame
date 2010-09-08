@@ -222,7 +222,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd800, 0xd83f) AM_BASE(&wiz_attributesram2)
 	AM_RANGE(0xd840, 0xd85f) AM_BASE_GENERIC(spriteram2) AM_SIZE_GENERIC(spriteram)
 	AM_RANGE(0xd000, 0xd85f) AM_RAM
-	AM_RANGE(0xe000, 0xe3ff) AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)	/* Fallthrough */
+	AM_RANGE(0xe000, 0xe3ff) AM_BASE_MEMBER(wiz_state, videoram)	/* Fallthrough */
 	AM_RANGE(0xe400, 0xe7ff) AM_RAM
 	AM_RANGE(0xe800, 0xe83f) AM_BASE(&wiz_attributesram)
 	AM_RANGE(0xe840, 0xe85f) AM_BASE_GENERIC(spriteram)
@@ -679,7 +679,7 @@ static MACHINE_RESET( wiz )
 	dsc0 = dsc1 = 1;
 }
 
-static MACHINE_CONFIG_START( wiz, driver_device )
+static MACHINE_CONFIG_START( wiz, wiz_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 18432000/6)	/* 3.072 MHz ??? */

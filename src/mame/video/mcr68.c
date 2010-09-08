@@ -5,7 +5,7 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/mcr.h"
+#include "includes/mcr68.h"
 
 
 #define LOW_BYTE(x) ((x) & 0xff)
@@ -27,7 +27,9 @@ static tilemap_t *fg_tilemap;
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int data = LOW_BYTE(machine->generic.videoram.u16[tile_index * 2]) | (LOW_BYTE(machine->generic.videoram.u16[tile_index * 2 + 1]) << 8);
+	mcr68_state *state = machine->driver_data<mcr68_state>();
+	UINT16 *videoram = state->videoram;
+	int data = LOW_BYTE(videoram[tile_index * 2]) | (LOW_BYTE(videoram[tile_index * 2 + 1]) << 8);
 	int code = (data & 0x3ff) | ((data >> 4) & 0xc00);
 	int color = (~data >> 12) & 3;
 	SET_TILE_INFO(0, code, color, TILE_FLIPYX((data >> 10) & 3));
@@ -38,7 +40,9 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( zwackery_get_bg_tile_info )
 {
-	int data = machine->generic.videoram.u16[tile_index];
+	mcr68_state *state = machine->driver_data<mcr68_state>();
+	UINT16 *videoram = state->videoram;
+	int data = videoram[tile_index];
 	int color = (data >> 13) & 7;
 	SET_TILE_INFO(0, data & 0x3ff, color, TILE_FLIPYX((data >> 11) & 3));
 }
@@ -46,7 +50,9 @@ static TILE_GET_INFO( zwackery_get_bg_tile_info )
 
 static TILE_GET_INFO( zwackery_get_fg_tile_info )
 {
-	int data = machine->generic.videoram.u16[tile_index];
+	mcr68_state *state = machine->driver_data<mcr68_state>();
+	UINT16 *videoram = state->videoram;
+	int data = videoram[tile_index];
 	int color = (data >> 13) & 7;
 	SET_TILE_INFO(2, data & 0x3ff, color, TILE_FLIPYX((data >> 11) & 3));
 	tileinfo->category = (color != 0);
@@ -178,14 +184,18 @@ WRITE16_HANDLER( zwackery_paletteram_w )
 
 WRITE16_HANDLER( mcr68_videoram_w )
 {
-	COMBINE_DATA(&space->machine->generic.videoram.u16[offset]);
+	mcr68_state *state = space->machine->driver_data<mcr68_state>();
+	UINT16 *videoram = state->videoram;
+	COMBINE_DATA(&videoram[offset]);
 	tilemap_mark_tile_dirty(bg_tilemap, offset / 2);
 }
 
 
 WRITE16_HANDLER( zwackery_videoram_w )
 {
-	COMBINE_DATA(&space->machine->generic.videoram.u16[offset]);
+	mcr68_state *state = space->machine->driver_data<mcr68_state>();
+	UINT16 *videoram = state->videoram;
+	COMBINE_DATA(&videoram[offset]);
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 	tilemap_mark_tile_dirty(fg_tilemap, offset);
 }

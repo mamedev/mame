@@ -482,7 +482,7 @@ static ADDRESS_MAP_START( mcrmono_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe800, 0xe9ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0xea00, 0xebff) AM_RAM
 	AM_RANGE(0xec00, 0xec7f) AM_MIRROR(0x0380) AM_WRITE(mcr3_paletteram_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(mcr3_videoram_w) AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM_WRITE(mcr3_videoram_w) AM_BASE_MEMBER(mcr_state, videoram)
 	AM_RANGE(0xf800, 0xffff) AM_ROM		/* schematics show a 2716 @ 2B here, but nobody used it */
 ADDRESS_MAP_END
 
@@ -512,7 +512,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( spyhunt_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_UNMAP_HIGH
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(spyhunt_videoram_w) AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(spyhunt_videoram_w) AM_BASE_MEMBER(mcr_state, videoram)
 	AM_RANGE(0xe800, 0xebff) AM_MIRROR(0x0400) AM_RAM_WRITE(spyhunt_alpharam_w) AM_BASE(&spyhunt_alpharam)
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xf800, 0xf9ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
@@ -1074,7 +1074,7 @@ GFXDECODE_END
  *************************************/
 
 /* Core MCR3 system with no sound */
-static MACHINE_CONFIG_START( mcr3_base, driver_device )
+static MACHINE_CONFIG_START( mcr3_base, mcr_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)

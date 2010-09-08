@@ -45,7 +45,9 @@ static tilemap_t *alpha_tilemap;
 #ifdef UNUSED_FUNCTION
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	int data = machine->generic.videoram.u8[tile_index * 2] | (machine->generic.videoram.u8[tile_index * 2 + 1] << 8);
+	mcr_state *state = machine->driver_data<mcr_state>();
+	UINT8 *videoram = state->videoram;
+	int data = videoram[tile_index * 2] | (videoram[tile_index * 2 + 1] << 8);
 	int code = (data & 0x3ff) | ((data >> 4) & 0x400);
 	int color = (data >> 12) & 3;
 	SET_TILE_INFO(0, code, color, TILE_FLIPYX((data >> 10) & 3));
@@ -55,7 +57,9 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( mcrmono_get_bg_tile_info )
 {
-	int data = machine->generic.videoram.u8[tile_index * 2] | (machine->generic.videoram.u8[tile_index * 2 + 1] << 8);
+	mcr_state *state = machine->driver_data<mcr_state>();
+	UINT8 *videoram = state->videoram;
+	int data = videoram[tile_index * 2] | (videoram[tile_index * 2 + 1] << 8);
 	int code = (data & 0x3ff) | ((data >> 4) & 0x400);
 	int color = ((data >> 12) & 3) ^ 3;
 	SET_TILE_INFO(0, code, color, TILE_FLIPYX((data >> 10) & 3));
@@ -71,7 +75,9 @@ static TILEMAP_MAPPER( spyhunt_bg_scan )
 
 static TILE_GET_INFO( spyhunt_get_bg_tile_info )
 {
-	int data = machine->generic.videoram.u8[tile_index];
+	mcr_state *state = machine->driver_data<mcr_state>();
+	UINT8 *videoram = state->videoram;
+	int data = videoram[tile_index];
 	int code = (data & 0x3f) | ((data >> 1) & 0x40);
 	SET_TILE_INFO(0, code, 0, (data & 0x40) ? TILE_FLIPY : 0);
 }
@@ -166,14 +172,18 @@ WRITE8_HANDLER( mcr3_paletteram_w )
 
 WRITE8_HANDLER( mcr3_videoram_w )
 {
-	space->machine->generic.videoram.u8[offset] = data;
+	mcr_state *state = space->machine->driver_data<mcr_state>();
+	UINT8 *videoram = state->videoram;
+	videoram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset / 2);
 }
 
 
 WRITE8_HANDLER( spyhunt_videoram_w )
 {
-	space->machine->generic.videoram.u8[offset] = data;
+	mcr_state *state = space->machine->driver_data<mcr_state>();
+	UINT8 *videoram = state->videoram;
+	videoram[offset] = data;
 	tilemap_mark_tile_dirty(bg_tilemap, offset);
 }
 

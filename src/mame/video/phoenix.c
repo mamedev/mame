@@ -8,6 +8,7 @@
 
 #include "emu.h"
 #include "video/resnet.h"
+#include "audio/pleiads.h"
 #include "includes/phoenix.h"
 
 static UINT8 *videoram_pg[2];

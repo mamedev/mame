@@ -33,7 +33,9 @@ PALETTE_INIT( truco )
 
 VIDEO_UPDATE( truco )
 {
-	UINT8		*vid = screen->machine->generic.videoram.u8;
+	truco_state *state = screen->machine->driver_data<truco_state>();
+	UINT8 *videoram = state->videoram;
+	UINT8		*vid = videoram;
 	int x, y;
 
 	for( y = 0; y < 192; y++ )

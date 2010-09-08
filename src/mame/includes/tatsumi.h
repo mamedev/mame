@@ -1,3 +1,13 @@
+class tatsumi_state : public driver_device
+{
+public:
+	tatsumi_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT16 *videoram;
+};
+
+
 /*----------- defined in drivers/tatsumi.c -----------*/
 
 extern UINT16 *apache3_g_ram;

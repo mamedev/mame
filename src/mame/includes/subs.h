@@ -16,6 +16,16 @@
 #define SUBS_NOISE_RESET		NODE_07
 
 
+class subs_state : public driver_device
+{
+public:
+	subs_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *videoram;
+};
+
+
 /*----------- defined in machine/subs.c -----------*/
 
 MACHINE_RESET( subs );

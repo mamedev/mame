@@ -173,6 +173,17 @@ Stephh's log (2007.11.28) :
 #include "pe_keno.lh"
 #include "pe_slots.lh"
 
+
+class peplus_state : public driver_device
+{
+public:
+	peplus_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *videoram;
+};
+
+
 #define MASTER_CLOCK		XTAL_20MHz
 #define CPU_CLOCK			((MASTER_CLOCK)/2)		/* divided by 2 - 7474 */
 #define MC6845_CLOCK		((MASTER_CLOCK)/8/3)
@@ -357,7 +368,9 @@ static WRITE_LINE_DEVICE_HANDLER(crtc_vsync)
 
 static WRITE8_DEVICE_HANDLER( peplus_crtc_display_w )
 {
-	device->machine->generic.videoram.u8[vid_address] = data;
+	peplus_state *state = device->machine->driver_data<peplus_state>();
+	UINT8 *videoram = state->videoram;
+	videoram[vid_address] = data;
 	palette_ram[vid_address] = io_port[1];
 	palette_ram2[vid_address] = io_port[3];
 
@@ -644,9 +657,11 @@ static READ8_DEVICE_HANDLER( peplus_input_bank_a_r )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
+	peplus_state *state = machine->driver_data<peplus_state>();
+	UINT8 *videoram = state->videoram;
 	int pr = palette_ram[tile_index];
 	int pr2 = palette_ram2[tile_index];
-	int vr = machine->generic.videoram.u8[tile_index];
+	int vr = videoram[tile_index];
 
 	int code = ((pr & 0x0f)*256) | vr;
 	int color = (pr>>4) & 0x0f;
@@ -755,7 +770,7 @@ static ADDRESS_MAP_START( peplus_iomap, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0x6000, 0x6000) AM_READ(peplus_bgcolor_r) AM_WRITE(peplus_bgcolor_w)
 
     // Bogus Location for Video RAM
-	AM_RANGE(0x06001, 0x06400) AM_RAM AM_BASE_GENERIC(videoram)
+	AM_RANGE(0x06001, 0x06400) AM_RAM AM_BASE_MEMBER(peplus_state, videoram)
 
     // Superboard Data
 	AM_RANGE(0x7000, 0x7fff) AM_READWRITE(peplus_s7000_r, peplus_s7000_w) AM_BASE(&s7000_ram)
@@ -1021,7 +1036,7 @@ static MACHINE_RESET( peplus )
 *     Machine Driver     *
 *************************/
 
-static MACHINE_CONFIG_START( peplus, driver_device )
+static MACHINE_CONFIG_START( peplus, peplus_state )
 	// basic machine hardware
 	MDRV_CPU_ADD("maincpu", I80C32, CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(peplus_map)

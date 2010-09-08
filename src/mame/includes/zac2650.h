@@ -1,3 +1,13 @@
+class zac2650_state : public driver_device
+{
+public:
+	zac2650_state(running_machine &machine, const driver_device_config_base &config)
+		: driver_device(machine, config) { }
+
+	UINT8 *videoram;
+};
+
+
 /*----------- defined in video/zac2650.c -----------*/
 
 extern UINT8 *zac2650_s2636_0_ram;

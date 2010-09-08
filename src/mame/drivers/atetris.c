@@ -207,7 +207,7 @@ static WRITE8_HANDLER( nvram_enable_w )
 /* full address map derived from schematics */
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(atetris_videoram_w) AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(atetris_videoram_w) AM_BASE_MEMBER(atetris_state, videoram)
 	AM_RANGE(0x2000, 0x20ff) AM_MIRROR(0x0300) AM_RAM_WRITE(paletteram_RRRGGGBB_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x2400, 0x25ff) AM_MIRROR(0x0200) AM_RAM_WRITE(nvram_w) AM_SHARE("nvram")
 	AM_RANGE(0x2800, 0x280f) AM_MIRROR(0x03e0) AM_DEVREADWRITE("pokey1", pokey_r, pokey_w)
@@ -224,7 +224,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( atetrisb2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
-	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(atetris_videoram_w) AM_BASE_GENERIC(videoram) AM_SIZE_GENERIC(videoram)
+	AM_RANGE(0x1000, 0x1fff) AM_RAM_WRITE(atetris_videoram_w) AM_BASE_MEMBER(atetris_state, videoram)
 	AM_RANGE(0x2000, 0x20ff) AM_RAM_WRITE(paletteram_RRRGGGBB_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x2400, 0x25ff) AM_RAM_WRITE(nvram_w) AM_SHARE("nvram")
 	AM_RANGE(0x2802, 0x2802) AM_DEVWRITE("sn1", sn76496_w)
@@ -376,7 +376,7 @@ static MACHINE_CONFIG_START( atetris, atetris_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( atetrisb2, driver_device )
+static MACHINE_CONFIG_START( atetrisb2, atetris_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502,BOOTLEG_CLOCK/8)

@@ -188,7 +188,6 @@ Notes:
 ******************************************************************************/
 
 #include "emu.h"
-#include "video/system1.h"
 #include "cpu/z80/z80.h"
 #include "cpu/mcs51/mcs51.h"
 #include "machine/z80pio.h"
@@ -197,6 +196,7 @@ Notes:
 #include "machine/segacrp2.h"
 #include "machine/mc8123.h"
 #include "sound/sn76496.h"
+#include "includes/system1.h"
 
 
 #define MASTER_CLOCK	XTAL_20MHz

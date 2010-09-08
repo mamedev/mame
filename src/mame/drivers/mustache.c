@@ -56,7 +56,7 @@ static WRITE8_HANDLER(t5182shared_w)
 static ADDRESS_MAP_START( memmap, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0xbfff) AM_ROM
-	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(mustache_videoram_w) AM_BASE_GENERIC(videoram)
+	AM_RANGE(0xc000, 0xcfff) AM_RAM_WRITE(mustache_videoram_w) AM_BASE_MEMBER(mustache_state, videoram)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(t5182_sound_irq_w)
 	AM_RANGE(0xd001, 0xd001) AM_READ(t5182_sharedram_semaphore_snd_r)
 	AM_RANGE(0xd002, 0xd002) AM_WRITE(t5182_sharedram_semaphore_main_acquire_w)
@@ -188,7 +188,7 @@ static INTERRUPT_GEN( assert_irq )
        */
 }
 
-static MACHINE_CONFIG_START( mustache, driver_device )
+static MACHINE_CONFIG_START( mustache, mustache_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)

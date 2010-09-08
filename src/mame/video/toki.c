@@ -49,7 +49,9 @@ VIDEO_EOF( tokib )
 
 static TILE_GET_INFO( get_text_tile_info )
 {
-	int tile = machine->generic.videoram.u16[tile_index];
+	toki_state *state = machine->driver_data<toki_state>();
+	UINT16 *videoram = state->videoram;
+	int tile = videoram[tile_index];
 	int color = (tile >> 12) & 0xf;
 
 	tile &= 0xfff;
@@ -111,7 +113,9 @@ VIDEO_START( toki )
 
 WRITE16_HANDLER( toki_foreground_videoram16_w )
 {
-	COMBINE_DATA(&space->machine->generic.videoram.u16[offset]);
+	toki_state *state = space->machine->driver_data<toki_state>();
+	UINT16 *videoram = state->videoram;
+	COMBINE_DATA(&videoram[offset]);
 	tilemap_mark_tile_dirty(text_layer,offset);
 }
 
