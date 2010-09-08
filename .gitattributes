@@ -1316,6 +1316,7 @@ src/mame/audio/norautp.c svneol=native#text/plain
 src/mame/audio/orbit.c svneol=native#text/plain
 src/mame/audio/phoenix.c svneol=native#text/plain
 src/mame/audio/pleiads.c svneol=native#text/plain
+src/mame/audio/pleiads.h svneol=native#text/plain
 src/mame/audio/polepos.c svneol=native#text/plain
 src/mame/audio/polyplay.c svneol=native#text/plain
 src/mame/audio/poolshrk.c svneol=native#text/plain
