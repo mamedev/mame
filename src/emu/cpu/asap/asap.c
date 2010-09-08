@@ -189,6 +189,7 @@ device_t *asap_device_config::alloc_device(running_machine &machine) const
 	return auto_alloc(&machine, asap_device(machine, *this));
 }
 
+
 //-------------------------------------------------
 //  execute_min_cycles - return minimum number of
 //  cycles it takes for one instruction to execute

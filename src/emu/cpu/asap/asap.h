@@ -63,9 +63,6 @@ public:
 	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
 	virtual device_t *alloc_device(running_machine &machine) const;
 
-	// inline configuration helpers
-	static void static_set_pin7(device_config *device, int pin7);
-
 protected:
 	// device_config_execute_interface overrides
 	virtual UINT32 execute_min_cycles() const;
