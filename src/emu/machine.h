@@ -652,7 +652,7 @@ protected:
 		// construction/destruction
 		auto_finder_type(driver_device &base, const char *tag) 
 			: auto_finder_base(base, tag), 
-			  m_target(NULL) { }
+			  m_target(0) { }
 
 		// operators to make use transparent
 		operator _TargetType() { return m_target; }
