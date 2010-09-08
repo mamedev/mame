@@ -144,6 +144,7 @@ public:
 
 protected:
 	// optional operation overrides
+	virtual void interface_pre_start();
 	virtual void interface_post_start();
 
 	struct sound_output

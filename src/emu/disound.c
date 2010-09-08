@@ -190,6 +190,29 @@ device_sound_interface::~device_sound_interface()
 
 
 //-------------------------------------------------
+//  interface_pre_start - make sure all our input
+//  devices are started
+//-------------------------------------------------
+
+void device_sound_interface::interface_pre_start()
+{
+	// scan all the sound devices
+	device_sound_interface *sound = NULL;
+	for (bool gotone = m_device.machine->m_devicelist.first(sound); gotone; gotone = sound->next(sound))
+	{
+		// scan each route on the device
+		for (const device_config_sound_interface::sound_route *route = sound->sound_config().m_route_list; route != NULL; route = route->m_next)
+		{
+			// if we are the target of this route but the source hasn't yet started, defer our start for later
+			device_t *target_device = m_device.machine->device(route->m_target);
+			if (target_device == &m_device && !sound->device().started())
+				throw device_missing_dependencies();
+		}
+	}
+}
+
+
+//-------------------------------------------------
 //  interface_post_start - verify that state was
 //  properly set up
 //-------------------------------------------------
@@ -214,6 +237,35 @@ void device_sound_interface::interface_post_start()
 			sound_output *output = &m_output[m_outputs++];
 			output->stream = stream;
 			output->output = curoutput;
+		}
+	}
+
+	// iterate over all the sound devices
+	device_sound_interface *sound = NULL;
+	for (bool gotone = m_device.machine->m_devicelist.first(sound); gotone; gotone = sound->next(sound))
+	{
+		// scan each route on the device
+		for (const device_config_sound_interface::sound_route *route = sound->sound_config().m_route_list; route != NULL; route = route->m_next)
+		{
+			// if we are the target of this route, hook it up
+			device_t *target_device = m_device.machine->device(route->m_target);
+			if (target_device == &m_device)
+			{
+				// iterate over all outputs, matching any that apply
+				int inputnum = route->m_input;
+				int numoutputs = stream_get_device_outputs(*sound);
+				for (int outputnum = 0; outputnum < numoutputs; outputnum++)
+					if (route->m_output == outputnum || route->m_output == ALL_OUTPUTS)
+					{
+						sound_stream *inputstream, *stream;
+						int streaminput, streamoutput;
+
+						// get the input and output streams and wire them together
+						if (stream_device_input_to_stream_input(target_device, inputnum++, &inputstream, &streaminput))
+							if (stream_device_output_to_stream_output(*sound, outputnum, &stream, &streamoutput))
+								stream_set_input(inputstream, streaminput, stream, streamoutput, route->m_gain);
+					}
+			}
 		}
 	}
 }

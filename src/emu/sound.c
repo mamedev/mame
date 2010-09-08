@@ -73,7 +73,6 @@ static void sound_resume(running_machine &machine);
 static void sound_load(running_machine *machine, int config_type, xml_data_node *parentnode);
 static void sound_save(running_machine *machine, int config_type, xml_data_node *parentnode);
 static TIMER_CALLBACK( sound_update );
-static void route_sound(running_machine *machine);
 
 
 
@@ -137,10 +136,6 @@ void sound_init(running_machine *machine)
 	global->update_timer = timer_alloc(machine, sound_update, NULL);
 	timer_adjust_periodic(global->update_timer, STREAMS_UPDATE_ATTOTIME, 0, STREAMS_UPDATE_ATTOTIME);
 
-	/* finally, do all the routing */
-	VPRINTF(("route_sound\n"));
-	route_sound(machine);
-
 	/* open the output WAV file if specified */
 	filename = options_get_string(machine->options(), OPTION_WAVWRITE);
 	if (filename[0] != 0)
@@ -175,49 +170,6 @@ static void sound_exit(running_machine &machine)
 
 	/* reset variables */
 	global->totalsnd = 0;
-}
-
-
-
-/***************************************************************************
-    INITIALIZATION HELPERS
-***************************************************************************/
-
-/*-------------------------------------------------
-    route_sound - route sound outputs to target
-    inputs
--------------------------------------------------*/
-
-static void route_sound(running_machine *machine)
-{
-	/* iterate again over all the sound chips */
-	device_sound_interface *sound = NULL;
-	for (bool gotone = machine->m_devicelist.first(sound); gotone; gotone = sound->next(sound))
-	{
-		int numoutputs = stream_get_device_outputs(*sound);
-
-		/* iterate over all routes */
-		for (const device_config_sound_interface::sound_route *route = sound->sound_config().m_route_list; route != NULL; route = route->m_next)
-		{
-			device_t *target_device = machine->device(route->m_target);
-			if (target_device->type() == SPEAKER)
-				continue;
-
-			int inputnum = route->m_input;
-
-			/* iterate over all outputs, matching any that apply */
-			for (int outputnum = 0; outputnum < numoutputs; outputnum++)
-				if (route->m_output == outputnum || route->m_output == ALL_OUTPUTS)
-				{
-					sound_stream *inputstream, *stream;
-					int streaminput, streamoutput;
-
-					if (stream_device_input_to_stream_input(target_device, inputnum++, &inputstream, &streaminput))
-						if (stream_device_output_to_stream_output(*sound, outputnum, &stream, &streamoutput))
-							stream_set_input(inputstream, streaminput, stream, streamoutput, route->m_gain);
-				}
-		}
-	}
 }
 
 
