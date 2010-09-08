@@ -61,18 +61,10 @@
 #include "cpu/arm/arm.h"
 #include "sound/dac.h"
 #include "includes/archimds.h"
-#include "machine/i2cmem.h"
+//#include "machine/i2cmem.h"
 
 static emu_timer *mk5_2KHz_timer;
 static UINT8 ext_latch;
-
-/* bit mirrors of I2C */
-static WRITE32_HANDLER( mk5_i2c_w )
-{
-	i2cmem_sda_write(space->machine->device("i2cmem"), (data & 0x40) >> 6);
-	i2cmem_scl_write(space->machine->device("i2cmem"), (data & 0x80) >> 7);
-	i2c_clk = (data & 0x80) >> 7;
-}
 
 static WRITE32_HANDLER( mk5_ext_latch_w )
 {
@@ -89,15 +81,49 @@ static READ32_HANDLER( ext_timer_latch_r )
 	return 0xffffffff; //value doesn't matter apparently
 }
 
+/* same as plain AA but with the I2C unconnected */
 static READ32_HANDLER( mk5_ioc_r )
 {
+	static UINT32 ioc_addr;
+
+	ioc_addr = offset*4;
+	ioc_addr >>= 16;
+	ioc_addr &= 0x37;
+
+	if(((ioc_addr == 0x20) || (ioc_addr == 0x30)) && (offset & 0x1f) == 0)
+	{
+		static UINT8 flyback; //internal name for vblank here
+		int vert_pos;
+
+		vert_pos = space->machine->primary_screen->vpos();
+		flyback = (vert_pos <= vidc_regs[VIDC_VDSR] || vert_pos >= vidc_regs[VIDC_VDER]) ? 0x80 : 0x00;
+
+		//i2c_data = (i2cmem_sda_read(space->machine->device("i2cmem")) & 1);
+
+		return (flyback) | (ioc_regs[CONTROL] & 0x7c) | (1<<1) | 1;
+	}
+
 	return archimedes_ioc_r(space,offset,mem_mask);
 }
 
 static WRITE32_HANDLER( mk5_ioc_w )
 {
+	static UINT32 ioc_addr;
+
+	ioc_addr = offset*4;
+	ioc_addr >>= 16;
+	ioc_addr &= 0x37;
+
 	if(!ext_latch)
-		archimedes_ioc_w(space,offset,data,mem_mask);
+	{
+		if(((ioc_addr == 0x20) || (ioc_addr == 0x30)) && (offset & 0x1f) == 0)
+		{
+			ioc_regs[CONTROL] = data & 0x7c;
+			return;
+		}
+		else
+			archimedes_ioc_w(space,offset,data,mem_mask);
+	}
 }
 
 static READ32_HANDLER( mk5_unk_r )
@@ -105,22 +131,48 @@ static READ32_HANDLER( mk5_unk_r )
 	return 0xf5; // checked inside the CPU check, unknown meaning
 }
 
-/* I'm not really optimistic that this thing really uses I2C ... */
-static READ32_HANDLER( mk5_econet_r )
+static WRITE32_HANDLER( sram_banksel_w )
 {
-	UINT8 i2c_data;
+    /*
 
-	i2c_data = (i2cmem_sda_read(space->machine->device("i2cmem")) & 1);
+    The Main Board provides 32 kbytes of Static Random Access Memory (SRAM) with
+    battery back-up for the electronic meters.
+    The SRAM contains machine metering information, recording money in/out and
+    game history etc. It is critical that this data is preserved reliably, and various
+    jurisdictions require multiple backups of the data.
+    Three standard low power SRAMs are fitted to the board. The data is usually
+    replicated three times, so that each chip contains identical data. Each memory is
+    checked against the other to verify that the stored data is correct.
+    Each chip is mapped to the same address, and the chip selected depends on the bank
+    select register. Access is mutually exclusive, increasing security with only one chip
+    visible in the CPU address space at a time. If the CPU crashes and overwrites
+    memory only one of the three devices can be corrupted. On reset the bank select
+    register selects bank 0, which does not exist. The SRAMs are at banks 1,2,3.
+    Each of the SRAM chips may be powered from a separate battery, further reducing
+    the possibility of losing data. For the US Gaming Machine, a single battery provides
+    power for all three SRAMs. This battery also powers the Real Time Clock
 
-	return (ioc_regs[CONTROL] & 0xfc) | (i2c_clk<<1) | i2c_data;
-}
 
-static WRITE32_HANDLER( mk5_econet_w )
-{
-	//logerror("IOC I2C: CLK %d DAT %d\n", (data>>1)&1, data&1);
-	i2cmem_sda_write(space->machine->device("i2cmem"), data & 0x01);
-	i2cmem_scl_write(space->machine->device("i2cmem"), (data & 0x02) >> 1);
-	i2c_clk = (data & 2) >> 1;
+    CHIP SELECT & SRAM BANKING
+
+    write: 03010420 40  select bank 1
+    write: 3220000 01   store 0x01 @ 3220000
+    write: 03010420 80  select bank 2
+    write: 3220000 02   store 0x02 @ 3220000
+    write: 03010420 C0  ...
+    write: 3220000 03   ...
+    write: 03010420 00  ...
+    write: 3220000 00   ...
+    write: 03010420 40  select the first SRAM chip
+    read:  3220000 01   read the value 0x1 back hopefully
+    write: 03010420 80  ...
+    read:  3220000 02   ...
+    write: 03010420 C0  ...
+    read:  3220000 03   ...
+    write: 03010420 00  select bank 0
+    */
+
+    memory_set_bank(space->machine,"sram_bank", (data & 0xc0) >> 6);
 }
 
 static ADDRESS_MAP_START( aristmk5_map, ADDRESS_SPACE_PROGRAM, 32 )
@@ -128,10 +180,14 @@ static ADDRESS_MAP_START( aristmk5_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x02000000, 0x02ffffff) AM_RAM AM_BASE(&archimedes_memc_physmem) /* physical RAM - 16 MB for now, should be 512k for the A310 */
 
 	/* MK-5 overrides */
-	AM_RANGE(0x03010420, 0x03010423) AM_RAM_WRITE(mk5_i2c_w)
+	AM_RANGE(0x03010420, 0x03010423) AM_WRITE(sram_banksel_w) // SRAM bank select write
+
+//	AM_RANGE(0x0301049c, 0x0301051f) AM_DEVREADWRITE("eeprom", eeprom_r, eeprom_w) // eeprom ???
+
 	AM_RANGE(0x03010810, 0x03010813) AM_READNOP //MK-5 specific, watchdog
 //  System Startup Code Enabled protection appears to be located at 0x3010400 - 0x30104ff
-	AM_RANGE(0x03220000, 0x03220003) AM_READWRITE(mk5_econet_r,mk5_econet_w)
+    AM_RANGE(0x03220000, 0x03227fff) AM_RAMBANK("sram_bank") //AM_BASE_SIZE_GENERIC(nvram) // nvram 32kbytes x 3
+
 	AM_RANGE(0x03250048, 0x0325004b) AM_WRITE(mk5_ext_latch_w)
 	AM_RANGE(0x03250050, 0x03250053) AM_READ(mk5_unk_r)
 	AM_RANGE(0x03250058, 0x0325005b) AM_READ(ext_timer_latch_r)
@@ -155,7 +211,10 @@ INPUT_PORTS_END
 
 static DRIVER_INIT( aristmk5 )
 {
+	UINT8 *SRAM = memory_region(machine, "sram");
 	archimedes_driver_init(machine);
+
+	memory_configure_bank(machine, "sram_bank", 0, 4, &SRAM[0], 0x8000);
 }
 
 static TIMER_CALLBACK( mk5_2KHz_callback )
@@ -204,6 +263,7 @@ static MACHINE_RESET( aristmk5 )
 	}
 }
 
+#if 0
 #define	NVRAM_SIZE 256
 #define	NVRAM_PAGE_SIZE	0	/* max size of one write request */
 
@@ -211,7 +271,7 @@ static const i2cmem_interface i2cmem_interface =
 {
 	I2CMEM_SLAVE_ADDRESS, NVRAM_PAGE_SIZE, NVRAM_SIZE
 };
-
+#endif
 
 static MACHINE_CONFIG_START( aristmk5, driver_device )
 	MDRV_CPU_ADD("maincpu", ARM, 10000000) // ?
@@ -220,7 +280,7 @@ static MACHINE_CONFIG_START( aristmk5, driver_device )
 	MDRV_MACHINE_START( aristmk5 )
 	MDRV_MACHINE_RESET( aristmk5 )
 
-	MDRV_I2CMEM_ADD("i2cmem",i2cmem_interface)
+//	MDRV_I2CMEM_ADD("i2cmem",i2cmem_interface)
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
@@ -275,6 +335,8 @@ ROM_START( aristmk5 )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 )
 
 	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x8000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( reelrock )
@@ -287,6 +349,8 @@ ROM_START( reelrock )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
 
 	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x8000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( indiandr )
@@ -299,6 +363,8 @@ ROM_START( indiandr )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
 
 	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x8000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( dolphntr )
@@ -311,6 +377,8 @@ ROM_START( dolphntr )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
 
 	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x8000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( dolphtra )
@@ -321,6 +389,8 @@ ROM_START( dolphtra )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
 
 	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x8000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( goldprmd )
@@ -333,6 +403,8 @@ ROM_START( goldprmd )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
 
 	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x8000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( qotn )
@@ -345,6 +417,8 @@ ROM_START( qotn )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
 
 	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x8000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( swthrt2v )
@@ -355,6 +429,8 @@ ROM_START( swthrt2v )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
 
 	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x8000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( enchfrst )
@@ -365,6 +441,8 @@ ROM_START( enchfrst )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
 
 	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x8000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( margmgc )
@@ -379,6 +457,8 @@ ROM_START( margmgc )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
 
 	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x8000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( adonis )
@@ -391,6 +471,8 @@ ROM_START( adonis )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
 
 	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x8000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( dmdtouch )
@@ -403,6 +485,8 @@ ROM_START( dmdtouch )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
 
 	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x8000*4, "sram", ROMREGION_ERASEFF )
 ROM_END
 
 ROM_START( magicmsk )
@@ -415,6 +499,8 @@ ROM_START( magicmsk )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
 
 	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x8000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
 ROM_START( geishanz )
@@ -429,20 +515,35 @@ ROM_START( geishanz )
 	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
 
 	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x8000*4, "sram", ROMREGION_ERASE00 )
+ROM_END
+
+ROM_START( wtiger )
+	ARISTOCRAT_MK5_BIOS
+	ROM_LOAD32_WORD( "u7.bin",  0x200000, 0x80000, CRC(752e54c5) SHA1(9317544a7cf2d9bf29347d31fe72331fc3d018ef) )
+	ROM_LOAD32_WORD( "u11.bin", 0x200002, 0x80000, CRC(38e888b1) SHA1(acc857eb2be19140bbb58d70583e08f24807b9f2) )
+
+	ROM_REGION( 0x800000, "maincpu", ROMREGION_ERASE00 ) /* ARM Code */
+
+	ROM_REGION( 0x200000, "vram", ROMREGION_ERASE00 )
+
+	ROM_REGION( 0x8000*4, "sram", ROMREGION_ERASE00 )
 ROM_END
 
 GAME( 1995, aristmk5, 0,        aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "MK-V System", GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
 
-GAME( 1995, swthrt2v, aristmk5, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Sweet Hearts II (C - 07/09/95, Venezuela version)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1995, enchfrst, aristmk5, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Enchanted Forest (E - 23/06/95, Local)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1996, dolphntr, aristmk5, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Dolphin Treasure (B - 06/12/96, NSW/ACT, Rev 1.24.4.0)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1996, dolphtra, dolphntr, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Dolphin Treasure (B - 06/12/96, NSW/ACT, Rev 3)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1997, goldprmd, aristmk5, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Golden Pyramids (B - 13-05-97, USA)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1997, qotn,     aristmk5, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Queen of the Nile (B - 13-05-97, NSW/ACT)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1997, dmdtouch, aristmk5, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Diamond Touch (E - 30-06-97, Local)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1998, adonis,   aristmk5, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Adonis (A - 25-05-98, NSW/ACT)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1998, reelrock, aristmk5, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Reelin-n-Rockin (A - 13/07/98, Local)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 1998, indiandr, aristmk5, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Indian Dreaming (B - 15/12/98, Local)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, magicmsk, aristmk5, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Magic Mask (A - 09/05/2000, Export))", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2000, margmgc,  aristmk5, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Margarita Magic (A - 07/07/2000, NSW/ACT)", GAME_NOT_WORKING|GAME_NO_SOUND )
-GAME( 2001, geishanz, aristmk5, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Geisha (A - 05/03/01, New Zealand)", GAME_NOT_WORKING|GAME_NO_SOUND )
+GAME( 1995, swthrt2v, aristmk5, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Sweet Hearts II (C - 07/09/95, Venezuela version)", GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )
+GAME( 1995, enchfrst, aristmk5, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Enchanted Forest (E - 23/06/95, Local)", GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )
+GAME( 1996, dolphntr, aristmk5, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Dolphin Treasure (B - 06/12/96, NSW/ACT, Rev 1.24.4.0)", GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )
+GAME( 1996, dolphtra, dolphntr, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Dolphin Treasure (B - 06/12/96, NSW/ACT, Rev 3)", GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )
+GAME( 1997, goldprmd, aristmk5, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Golden Pyramids (B - 13-05-97, USA)", GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )
+GAME( 1997, qotn,     aristmk5, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Queen of the Nile (B - 13-05-97, NSW/ACT)", GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )
+GAME( 1997, dmdtouch, aristmk5, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Diamond Touch (E - 30-06-97, Local)", GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )
+GAME( 1998, adonis,   aristmk5, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Adonis (A - 25-05-98, NSW/ACT)", GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )
+GAME( 1998, reelrock, aristmk5, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Reelin-n-Rockin (A - 13/07/98, Local)", GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )
+GAME( 1998, indiandr, aristmk5, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Indian Dreaming (B - 15/12/98, Local)", GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )
+GAME( 2000, magicmsk, aristmk5, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Magic Mask (A - 09/05/2000, Export))", GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )
+GAME( 2000, margmgc,  aristmk5, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Margarita Magic (A - 07/07/2000, NSW/ACT)", GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )
+GAME( 2001, geishanz, aristmk5, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "Geisha (A - 05/03/01, New Zealand)", GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )
+GAME( 2001, wtiger,   aristmk5, aristmk5, aristmk5, aristmk5, ROT0,  "Aristocrat", "White Tiger", GAME_NOT_WORKING|GAME_IMPERFECT_SOUND )

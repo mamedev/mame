@@ -9778,6 +9778,7 @@ Other Sun games
 	DRIVER( magicmsk )	/* (c) 2000 */
 	DRIVER( margmgc )	/* (c) 2000 */
 	DRIVER( geishanz )	/* (c) 2001 */
+	DRIVER( wtiger )	/* (c) 2001 */
 
 	/* Eagle */
 	DRIVER( janshi )
