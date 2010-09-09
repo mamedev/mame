@@ -390,6 +390,11 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc *outtoc, chdcd_track_i
 	{
 		UINT64 tlen;
 
+		if (outtoc->tracks[trknum].trktype == CD_TRACK_AUDIO)
+		{
+			outinfo->swap[trknum] = 1;
+		}
+
 		// is this the last track?
 		if (trknum == (outtoc->numtrks-1))
 		{
