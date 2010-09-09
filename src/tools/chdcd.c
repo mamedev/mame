@@ -307,7 +307,7 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc *outtoc, chdcd_track_i
 				outtoc->tracks[trknum].subtype = CD_SUB_NONE;
 				outtoc->tracks[trknum].subsize = 0;
 				outtoc->tracks[trknum].pregap = 0;
-				outinfo->idx0offs[trknum] = 0;
+				outinfo->idx0offs[trknum] = -1;
 				outinfo->idx1offs[trknum] = 0;
 				strcpy(&outinfo->fname[trknum][0], lastfname);	// default filename to the last one
 //				printf("trk %d: fname %s\n", trknum+1, &outinfo->fname[trknum][0]);
@@ -350,7 +350,7 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc *outtoc, chdcd_track_i
 				else if (idx == 1)
 				{
 					outinfo->idx1offs[trknum] = frames;
-					if (!outtoc->tracks[trknum].pregap)
+					if ((outtoc->tracks[trknum].pregap == 0) && (outinfo->idx0offs[trknum] != -1))
 					{
 						outtoc->tracks[trknum].pregap = frames - outinfo->idx0offs[trknum];
 					}
@@ -397,9 +397,8 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc *outtoc, chdcd_track_i
 			if (!strcmp(&outinfo->fname[trknum][0], &outinfo->fname[trknum-1][0]))
 			{
 				tlen = get_file_size(outinfo->fname[trknum]);
-				tlen /= (outtoc->tracks[trknum].datasize + outtoc->tracks[trknum].subsize);
-				outinfo->offset[trknum] = outinfo->idx1offs[trknum];
-				outtoc->tracks[trknum].frames = tlen - outinfo->offset[trknum];
+				outinfo->offset[trknum] = outinfo->offset[trknum-1] + outtoc->tracks[trknum-1].frames * (outtoc->tracks[trknum-1].datasize + outtoc->tracks[trknum-1].subsize);
+				outtoc->tracks[trknum].frames = (tlen - outinfo->offset[trknum]) / (outtoc->tracks[trknum].datasize + outtoc->tracks[trknum].subsize);
 			}
 			else	/* data files are different */
 			{
@@ -414,9 +413,16 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc *outtoc, chdcd_track_i
 			/* if we have the same filename as the next track, do it that way */
 			if (!strcmp(&outinfo->fname[trknum][0], &outinfo->fname[trknum+1][0]))
 			{
-				// datasize = the difference between the start of the next track and our start
 				outtoc->tracks[trknum].frames = outinfo->idx1offs[trknum+1] - outinfo->idx1offs[trknum];
-				outinfo->offset[trknum] = outinfo->idx1offs[trknum];
+
+				if (trknum == 0)	// track 0 offset is 0
+				{
+					outinfo->offset[trknum] = 0;
+				}
+				else
+				{
+					outinfo->offset[trknum] = outinfo->offset[trknum-1] + outtoc->tracks[trknum-1].frames * (outtoc->tracks[trknum-1].datasize + outtoc->tracks[trknum-1].subsize); 
+				}
 
 				if (!outtoc->tracks[trknum].frames)
 				{
