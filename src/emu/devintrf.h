@@ -58,6 +58,40 @@
 // shorthand for accessing devices by machine/type/tag
 #define devtag_reset(mach,tag)								(mach)->device(tag)->reset()
 
+// often derived devices need only a different name and a simple parameter to differentiate them
+// these are provided as macros because you can't pass string literals to templates, annoyingly enough
+// use this to declare the existence of a derived device in the header file
+#define DECLARE_TRIVIAL_DERIVED_DEVICE(_ConfigClass, _ConfigBase, _DeviceClass, _DeviceBase) \
+typedef _DeviceBase _DeviceClass;														\
+class _ConfigClass;																		\
+																						\
+class _ConfigClass : public _ConfigBase 												\
+{ 																						\
+protected: 																				\
+	_ConfigClass(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock, UINT32 param = 0); \
+																						\
+public: 																				\
+	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock); \
+	virtual device_t *alloc_device(running_machine &machine) const;						\
+};																						\
+
+// use this macro to define the actual implementation in the source file
+#define DEFINE_TRIVIAL_DERIVED_DEVICE(_ConfigClass, _ConfigBase, _DeviceClass, _DeviceBase, _Name, _Param) \
+_ConfigClass::_ConfigClass(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock, UINT32 param) \
+	: _ConfigBase(mconfig, static_alloc_device_config, _Name, tag, owner, clock, param)	\
+{																						\
+} 																						\
+																						\
+device_config *_ConfigClass::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock) \
+{	 																					\
+	return global_alloc(_ConfigClass(mconfig, tag, owner, clock, _Param)); 				\
+} 																						\
+																						\
+device_t *_ConfigClass::alloc_device(running_machine &machine) const 					\
+{ 																						\
+	return auto_alloc(&machine, _DeviceClass(machine, *this)); 							\
+} 																						\
+
 
 
 //**************************************************************************
@@ -218,7 +252,7 @@ class device_config
 
 protected:
 	// construction/destruction
-	device_config(const machine_config &mconfig, device_type type, const char *name, const char *tag, const device_config *owner, UINT32 clock);
+	device_config(const machine_config &mconfig, device_type type, const char *name, const char *tag, const device_config *owner, UINT32 clock, UINT32 param = 0);
 	virtual ~device_config();
 
 public:

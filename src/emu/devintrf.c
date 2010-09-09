@@ -285,7 +285,7 @@ bool device_config_interface::interface_validity_check(const game_driver &driver
 //  device configuration
 //-------------------------------------------------
 
-device_config::device_config(const machine_config &mconfig, device_type type, const char *name, const char *tag, const device_config *owner, UINT32 clock)
+device_config::device_config(const machine_config &mconfig, device_type type, const char *name, const char *tag, const device_config *owner, UINT32 clock, UINT32 param)
 	: m_next(NULL),
 	  m_owner(const_cast<device_config *>(owner)),
 	  m_interface_list(NULL),
