@@ -304,6 +304,7 @@ const options_entry mame_win_options[] =
 	{ "multithreading;mt",        "0",        OPTION_BOOLEAN,    "enable multithreading; this enables rendering and blitting on a separate thread" },
 	{ "numprocessors;np",         "auto",     0,				 "number of processors; this overrides the number the system reports" },
 	{ "profile",                  "0",        0,                 "enable profiling, specifying the stack depth to track" },
+	{ "bench",                    "0",        0,                 "benchmark for the given number of emulated seconds; implies -video none -nosound -nothrottle" },
 
 	// video options
 	{ NULL,                       NULL,       OPTION_HEADER,     "WINDOWS VIDEO OPTIONS" },
@@ -450,6 +451,16 @@ static void output_oslog(running_machine &machine, const char *buffer)
 void osd_init(running_machine *machine)
 {
 	const char *stemp;
+	
+	// determine if we are benchmarking, and adjust options appropriately
+	int bench = options_get_int(machine->options(), WINOPTION_BENCH);
+	if (bench > 0)
+	{
+		options_set_bool(machine->options(), OPTION_THROTTLE, false, OPTION_PRIORITY_MAXIMUM);
+		options_set_bool(machine->options(), OPTION_SOUND, false, OPTION_PRIORITY_MAXIMUM);
+		options_set_string(machine->options(), WINOPTION_VIDEO, "none", OPTION_PRIORITY_MAXIMUM);
+		options_set_int(machine->options(), OPTION_SECONDS_TO_RUN, bench, OPTION_PRIORITY_MAXIMUM);
+	}
 
 	// determine if we are profiling, and adjust options appropriately
 	int profile = options_get_int(machine->options(), WINOPTION_PROFILE);
@@ -457,7 +468,7 @@ void osd_init(running_machine *machine)
 	{
 		options_set_bool(machine->options(), OPTION_THROTTLE, false, OPTION_PRIORITY_MAXIMUM);
 		options_set_bool(machine->options(), WINOPTION_MULTITHREADING, false, OPTION_PRIORITY_MAXIMUM);
-		options_set_bool(machine->options(), WINOPTION_NUMPROCESSORS, 1, OPTION_PRIORITY_MAXIMUM);
+		options_set_int(machine->options(), WINOPTION_NUMPROCESSORS, 1, OPTION_PRIORITY_MAXIMUM);
 	}
 
 	// thread priority

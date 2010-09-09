@@ -57,6 +57,7 @@
 #define WINOPTION_MULTITHREADING		"multithreading"
 #define WINOPTION_NUMPROCESSORS			"numprocessors"
 #define WINOPTION_PROFILE				"profile"
+#define WINOPTION_BENCH					"bench"
 
 // video options
 #define WINOPTION_VIDEO					"video"
