@@ -284,7 +284,7 @@ struct _dsio_denver_state
 typedef struct _dcs_state dcs_state;
 struct _dcs_state
 {
-	cpu_device *cpu;
+	adsp21xx_device *cpu;
 	address_space *program;
 	address_space *data;
 	UINT8		rev;
@@ -409,12 +409,12 @@ static WRITE16_HANDLER( output_latch_w );
 static READ16_HANDLER( output_control_r );
 static WRITE16_HANDLER( output_control_w );
 
-static void timer_enable_callback(cpu_device &device, int enable);
+static void timer_enable_callback(adsp21xx_device &device, int enable);
 static TIMER_DEVICE_CALLBACK( internal_timer_callback );
 static TIMER_DEVICE_CALLBACK( dcs_irq );
 static TIMER_DEVICE_CALLBACK( sport0_irq );
 static void recompute_sample_rate(running_machine *machine);
-static void sound_tx_callback(cpu_device &device, int port, INT32 data);
+static void sound_tx_callback(adsp21xx_device &device, int port, INT32 data);
 
 static READ16_HANDLER( dcs_polling_r );
 static WRITE16_HANDLER( dcs_polling_w );
@@ -610,7 +610,7 @@ static const adsp21xx_config adsp_config =
 /* Basic DCS system with ADSP-2105 and 2k of SRAM (T-unit, V-unit, Killer Instinct) */
 MACHINE_CONFIG_FRAGMENT( dcs_audio_2k )
 	MDRV_CPU_ADD("dcs", ADSP2105, XTAL_10MHz)
-	MDRV_CPU_CONFIG(adsp_config)
+	MDRV_ADSP21XX_CONFIG(adsp_config)
 	MDRV_CPU_PROGRAM_MAP(dcs_2k_program_map)
 	MDRV_CPU_DATA_MAP(dcs_2k_data_map)
 
@@ -650,7 +650,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_FRAGMENT( dcs2_audio_2115 )
 	MDRV_CPU_ADD("dcs2", ADSP2115, XTAL_16MHz)
-	MDRV_CPU_CONFIG(adsp_config)
+	MDRV_ADSP21XX_CONFIG(adsp_config)
 	MDRV_CPU_PROGRAM_MAP(dcs2_2115_program_map)
 	MDRV_CPU_DATA_MAP(dcs2_2115_data_map)
 
@@ -671,7 +671,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED( dcs2_audio_2104, dcs2_audio_2115 )
 	MDRV_CPU_REPLACE("dcs2", ADSP2104, XTAL_16MHz)
-	MDRV_CPU_CONFIG(adsp_config)
+	MDRV_ADSP21XX_CONFIG(adsp_config)
 	MDRV_CPU_PROGRAM_MAP(dcs2_2104_program_map)
 	MDRV_CPU_DATA_MAP(dcs2_2104_data_map)
 MACHINE_CONFIG_END
@@ -686,7 +686,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_FRAGMENT( dcs2_audio_dsio )
 	MDRV_CPU_ADD("dsio", ADSP2181, XTAL_32MHz)
-	MDRV_CPU_CONFIG(adsp_config)
+	MDRV_ADSP21XX_CONFIG(adsp_config)
 	MDRV_CPU_PROGRAM_MAP(dsio_program_map)
 	MDRV_CPU_DATA_MAP(dsio_data_map)
 	MDRV_CPU_IO_MAP(dsio_io_map)
@@ -710,7 +710,7 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_FRAGMENT( dcs2_audio_denver )
 	MDRV_CPU_ADD("denver", ADSP2181, XTAL_33_333MHz)
-	MDRV_CPU_CONFIG(adsp_config)
+	MDRV_ADSP21XX_CONFIG(adsp_config)
 	MDRV_CPU_PROGRAM_MAP(denver_program_map)
 	MDRV_CPU_DATA_MAP(denver_data_map)
 	MDRV_CPU_IO_MAP(denver_io_map)
@@ -763,7 +763,7 @@ static void dcs_boot(void)
 			/* convert from 16-bit data to 8-bit data and boot */
 			for (i = 0; i < 0x1000; i++)
 				buffer[i] = base[i];
-			adsp2105_load_boot_data(buffer, dcs_internal_program_ram);
+			dcs.cpu->load_boot_data(buffer, dcs_internal_program_ram);
 			break;
 
 		/* rev 2: use the ROM page in the SDRC to boot from */
@@ -784,7 +784,7 @@ static void dcs_boot(void)
 			/* convert from 16-bit data to 8-bit data and boot */
 			for (i = 0; i < 0x1000; i++)
 				buffer[i] = base[i];
-			adsp2115_load_boot_data(buffer, dcs_internal_program_ram);
+			dcs.cpu->load_boot_data(buffer, dcs_internal_program_ram);
 			break;
 
 		/* rev 3/4: HALT the ADSP-2181 until program is downloaded via IDMA */
@@ -938,9 +938,9 @@ void dcs_init(running_machine *machine)
 	dcs_sram = NULL;
 
 	/* find the DCS CPU and the sound ROMs */
-	dcs.cpu = machine->device<cpu_device>("dcs");
-	dcs.program = cpu_get_address_space(dcs.cpu, ADDRESS_SPACE_PROGRAM);
-	dcs.data = cpu_get_address_space(dcs.cpu, ADDRESS_SPACE_DATA);
+	dcs.cpu = machine->device<adsp21xx_device>("dcs");
+	dcs.program = dcs.cpu->space(AS_PROGRAM);
+	dcs.data = dcs.cpu->space(AS_DATA);
 	dcs.rev = 1;
 	dcs.channels = 1;
 	dcs.dmadac[0] = machine->device<dmadac_sound_device>("dac");
@@ -975,23 +975,23 @@ void dcs2_init(running_machine *machine, int dram_in_mb, offs_t polling_offset)
 	memset(&dcs, 0, sizeof(dcs));
 
 	/* find the DCS CPU and the sound ROMs */
-	dcs.cpu = machine->device<cpu_device>("dcs2");
+	dcs.cpu = machine->device<adsp21xx_device>("dcs2");
 	dcs.rev = 2;
 	soundbank_words = 0x1000;
 	if (dcs.cpu == NULL)
 	{
-		dcs.cpu = machine->device<cpu_device>("dsio");
+		dcs.cpu = machine->device<adsp21xx_device>("dsio");
 		dcs.rev = 3;
 		soundbank_words = 0x400;
 	}
 	if (dcs.cpu == NULL)
 	{
-		dcs.cpu = machine->device<cpu_device>("denver");
+		dcs.cpu = machine->device<adsp21xx_device>("denver");
 		dcs.rev = 4;
 		soundbank_words = 0x800;
 	}
-	dcs.program = cpu_get_address_space(dcs.cpu, ADDRESS_SPACE_PROGRAM);
-	dcs.data = cpu_get_address_space(dcs.cpu, ADDRESS_SPACE_DATA);
+	dcs.program = dcs.cpu->space(AS_PROGRAM);
+	dcs.data = dcs.cpu->space(AS_DATA);
 	dcs.channels = 2;
 	dcs.dmadac[0] = machine->device<dmadac_sound_device>("dac1");
 	dcs.dmadac[1] = machine->device<dmadac_sound_device>("dac2");
@@ -1029,7 +1029,7 @@ void dcs2_init(running_machine *machine, int dram_in_mb, offs_t polling_offset)
 	/* install the speedup handler */
 	dcs.polling_offset = polling_offset;
 	if (polling_offset)
-		dcs_polling_base = memory_install_readwrite16_handler(cpu_get_address_space(dcs.cpu, ADDRESS_SPACE_DATA), polling_offset, polling_offset, 0, 0, dcs_polling_r, dcs_polling_w);
+		dcs_polling_base = memory_install_readwrite16_handler(dcs.cpu->space(AS_DATA), polling_offset, polling_offset, 0, 0, dcs_polling_r, dcs_polling_w);
 
 	/* allocate a watchdog timer for HLE transfers */
 	transfer.hle_enabled = (ENABLE_HLE_TRANSFERS && dram_in_mb != 0);
@@ -1168,7 +1168,7 @@ static void sdrc_remap_memory(running_machine *machine)
 
 	/* reinstall the polling hotspot */
 	if (dcs.polling_offset)
-		dcs_polling_base = memory_install_readwrite16_handler(cpu_get_address_space(dcs.cpu, ADDRESS_SPACE_DATA), dcs.polling_offset, dcs.polling_offset, 0, 0, dcs_polling_r, dcs_polling_w);
+		dcs_polling_base = memory_install_readwrite16_handler(dcs.cpu->space(AS_DATA), dcs.polling_offset, dcs.polling_offset, 0, 0, dcs_polling_r, dcs_polling_w);
 }
 
 
@@ -1440,7 +1440,7 @@ WRITE32_HANDLER( dsio_idma_addr_w )
 {
 	if (LOG_DCS_TRANSFERS)
 		logerror("%08X:IDMA_addr = %04X\n", cpu_get_pc(space->cpu), data);
-	adsp2181_idma_addr_w(dcs.cpu, data);
+	downcast<adsp2181_device *>(dcs.cpu)->idma_addr_w(data);
 	if (data == 0)
 		dsio.start_on_next_write = 2;
 }
@@ -1452,14 +1452,14 @@ WRITE32_HANDLER( dsio_idma_data_w )
 	if (ACCESSING_BITS_0_15)
 	{
 		if (LOG_DCS_TRANSFERS)
-			logerror("%08X:IDMA_data_w(%04X) = %04X\n", pc, adsp2181_idma_addr_r(dcs.cpu), data & 0xffff);
-		adsp2181_idma_data_w(dcs.cpu, data & 0xffff);
+			logerror("%08X:IDMA_data_w(%04X) = %04X\n", pc, downcast<adsp2181_device *>(dcs.cpu)->idma_addr_r(), data & 0xffff);
+		downcast<adsp2181_device *>(dcs.cpu)->idma_data_w(data & 0xffff);
 	}
 	if (ACCESSING_BITS_16_31)
 	{
 		if (LOG_DCS_TRANSFERS)
-			logerror("%08X:IDMA_data_w(%04X) = %04X\n", pc, adsp2181_idma_addr_r(dcs.cpu), data >> 16);
-		adsp2181_idma_data_w(dcs.cpu, data >> 16);
+			logerror("%08X:IDMA_data_w(%04X) = %04X\n", pc, downcast<adsp2181_device *>(dcs.cpu)->idma_addr_r(), data >> 16);
+		downcast<adsp2181_device *>(dcs.cpu)->idma_data_w(data >> 16);
 	}
 	if (dsio.start_on_next_write && --dsio.start_on_next_write == 0)
 	{
@@ -1472,9 +1472,9 @@ WRITE32_HANDLER( dsio_idma_data_w )
 READ32_HANDLER( dsio_idma_data_r )
 {
 	UINT32 result;
-	result = adsp2181_idma_data_r(dcs.cpu);
+	result = downcast<adsp2181_device *>(dcs.cpu)->idma_data_r();
 	if (LOG_DCS_TRANSFERS)
-		logerror("%08X:IDMA_data_r(%04X) = %04X\n", cpu_get_pc(space->cpu), adsp2181_idma_addr_r(dcs.cpu), result);
+		logerror("%08X:IDMA_data_r(%04X) = %04X\n", cpu_get_pc(space->cpu), downcast<adsp2181_device *>(dcs.cpu)->idma_addr_r(), result);
 	return result;
 }
 
@@ -1791,7 +1791,7 @@ static void reset_timer(running_machine *machine)
 }
 
 
-static void timer_enable_callback(cpu_device &device, int enable)
+static void timer_enable_callback(adsp21xx_device &device, int enable)
 {
 	dcs.timer_enable = enable;
 	dcs.timer_ignore = 0;
@@ -1845,7 +1845,7 @@ static READ16_HANDLER( adsp_control_r )
 			break;
 
 		case IDMA_CONTROL_REG:
-			result = adsp2181_idma_addr_r(dcs.cpu);
+			result = downcast<adsp2181_device *>(dcs.cpu)->idma_addr_r();
 			break;
 
 		case TIMER_COUNT_REG:
@@ -1926,7 +1926,7 @@ static WRITE16_HANDLER( adsp_control_w )
 			break;
 
 		case IDMA_CONTROL_REG:
-			adsp2181_idma_addr_w(dcs.cpu, data);
+			downcast<adsp2181_device *>(dcs.cpu)->idma_addr_w(data);
 			break;
 	}
 }
@@ -2007,7 +2007,7 @@ static void recompute_sample_rate(running_machine *machine)
 }
 
 
-static void sound_tx_callback(cpu_device &device, int port, INT32 data)
+static void sound_tx_callback(adsp21xx_device &device, int port, INT32 data)
 {
 	/* check if it's for SPORT1 */
 	if (port != 1)

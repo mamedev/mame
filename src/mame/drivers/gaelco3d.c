@@ -171,7 +171,7 @@ static UINT8 adsp_ireg;
 static offs_t adsp_ireg_base, adsp_incs, adsp_size;
 static dmadac_sound_device *dmadac[SOUND_CHANNELS];
 
-static void adsp_tx_callback(cpu_device &device, int port, INT32 data);
+static void adsp_tx_callback(adsp21xx_device &device, int port, INT32 data);
 
 
 /*************************************
@@ -599,7 +599,7 @@ static TIMER_DEVICE_CALLBACK( adsp_autobuffer_irq )
 }
 
 
-static void adsp_tx_callback(cpu_device &device, int port, INT32 data)
+static void adsp_tx_callback(adsp21xx_device &device, int port, INT32 data)
 {
 	/* check if it's for SPORT1 */
 	if (port != 1)
@@ -965,7 +965,7 @@ static MACHINE_CONFIG_START( gaelco3d, driver_device )
 	MDRV_CPU_PROGRAM_MAP(tms_map)
 
 	MDRV_CPU_ADD("adsp", ADSP2115, 16000000)
-	MDRV_CPU_CONFIG(adsp_config)
+	MDRV_ADSP21XX_CONFIG(adsp_config)
 	MDRV_CPU_PROGRAM_MAP(adsp_program_map)
 	MDRV_CPU_DATA_MAP(adsp_data_map)
 

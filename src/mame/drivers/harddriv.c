@@ -320,11 +320,6 @@ Notes:
 
 
 #include "emu.h"
-#include "cpu/m68000/m68000.h"
-#include "cpu/tms34010/tms34010.h"
-#include "cpu/tms32010/tms32010.h"
-#include "cpu/adsp2100/adsp2100.h"
-#include "cpu/dsp32/dsp32.h"
 #include "machine/atarigen.h"
 #include "machine/asic65.h"
 #include "audio/atarijsa.h"
@@ -1235,10 +1230,10 @@ static MACHINE_CONFIG_FRAGMENT( ds4 )
 	MDRV_CPU_PROGRAM_MAP(ds3_program_map)
 	MDRV_CPU_DATA_MAP(ds3_data_map)
 
-//  MDRV_CPU_ADD("soundcpu", ADSP2105, 10000000)
+//  MDRV_CPU_ADD("ds4cpu1", ADSP2105, 10000000)
 //  MDRV_CPU_PROGRAM_MAP(ds3snd_program_map)
 
-//  MDRV_CPU_ADD("sounddsp", ADSP2105, 10000000)
+//  MDRV_CPU_ADD("ds4cpu2", ADSP2105, 10000000)
 //  MDRV_CPU_PROGRAM_MAP(ds3snd_program_map)
 
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
@@ -3698,11 +3693,11 @@ static void init_ds3(running_machine *machine)
 	memory_install_write16_handler(cpu_get_address_space(state->maincpu, ADDRESS_SPACE_PROGRAM), 0x823800, 0x823fff, 0, 0, hd68k_ds3_control_w);
 
 	/* if we have a sound DSP, boot it */
-	if (state->soundcpu != NULL && state->soundcpu->type() == ADSP2105)
-		adsp2105_load_boot_data(state->soundcpu->region()->base() + 0x10000, &state->soundcpu->region()->u32());
+	if (state->ds4cpu1 != NULL)
+		state->ds4cpu1->load_boot_data(state->soundcpu->region()->base() + 0x10000, &state->soundcpu->region()->u32());
 
-	if (state->sounddsp != NULL && state->sounddsp->type() == ADSP2105)
-		adsp2105_load_boot_data(state->sounddsp->region()->base() + 0x10000, &state->sounddsp->region()->u32());
+	if (state->ds4cpu2 != NULL)
+		state->ds4cpu2->load_boot_data(state->sounddsp->region()->base() + 0x10000, &state->sounddsp->region()->u32());
 
 /*
 

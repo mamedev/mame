@@ -255,7 +255,6 @@ Logic:
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "cpu/adsp2100/adsp2100.h"
 #include "cpu/tms34010/tms34010.h"
 #include "cpu/dsp32/dsp32.h"
 #include "audio/cage.h"
@@ -746,7 +745,7 @@ static MACHINE_CONFIG_START( metalmx, metalmx_state )
 	MDRV_CPU_PROGRAM_MAP(main_map)
 
 	MDRV_CPU_ADD("adsp", ADSP2105, XTAL_10MHz)
-	MDRV_CPU_CONFIG(adsp_config)
+	MDRV_ADSP21XX_CONFIG(adsp_config)
 	MDRV_CPU_PROGRAM_MAP(adsp_program_map)
 	MDRV_CPU_DATA_MAP(adsp_data_map)
 
@@ -786,13 +785,7 @@ static DRIVER_INIT( metalmx )
 	UINT8 *adsp_boot = (UINT8*)memory_region(machine, "adsp");
 	metalmx_state *state = machine->driver_data<metalmx_state>();
 
-	state->maincpu = machine->device("maincpu");
-	state->adsp = machine->device("adsp");
-	state->gsp = machine->device("gsp");
-	state->dsp32c_1 = machine->device("dsp32c_1");
-	state->dsp32c_2 = machine->device("dsp32c_2");
-
-	adsp2105_load_boot_data(adsp_boot, state->adsp_internal_program_ram);
+	state->adsp->load_boot_data(adsp_boot, state->adsp_internal_program_ram);
 
 	cage_init(machine, 0); // TODO: speedup address
 	cage_set_irq_handler(cage_irq_callback);
