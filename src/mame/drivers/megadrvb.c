@@ -6,6 +6,7 @@
         * Aladdin
         * Mortal Kombat 3
         * Super Street Fighter II - The New Challengers
+        * Sunset Riders
         * Top Shooter
 
 
@@ -110,10 +111,10 @@ Stephh's notes (based on the game M68000 code and some tests) :
       0xff7e16.l      0x30303300        0x30303600        0x30303900
 
     But what makes the arcade version much harder is how energy is handled : in 'g_aladj', you can
-    be hit 8 times before you lose a life, while in 'aladbl', you lose a life as soon as you are hit !
+    be hit 8 times before you lose a life, while in 'aladmdb', you lose a life as soon as you are hit !
     This is done via code change at 0x1aee3c and patched code at 0x1afc00 :
 
-      diff aladbl.asm g_aladj.asm
+      diff aladmdb.asm g_aladj.asm
 
       < 1AEE3C: 4EB9 001A FC00             jsr     $1afc00.l
       > 1AEE3C: 5339 00FF EFFA             subq.b  #1, $ffeffa.l
@@ -127,6 +128,13 @@ Stephh's notes (based on the game M68000 code and some tests) :
 
     Surprisingly, when you are in "demo mode", player can be again be hit 8 times
     before losing a life (this is the purpose of the 0xfff57c "flag") !
+
+****************************************************************************
+
+Sunset Riders info
+====================
+
+ - title raster effect is broken (bug in megadrive code, happens with normal set too)
 
 ****************************************************************************
 
@@ -256,19 +264,19 @@ connector, but of course, I can be wrong.
  *
  *************************************/
 
-static WRITE16_HANDLER( aladbl_w )
+static WRITE16_HANDLER( aladmdb_w )
 {
     /*
     Values returned from the log file :
-      - aladbl_w : 1b2a6c - data = 6600 (each time a coin is inserted)
-      - aladbl_w : 1b2a82 - data = 0000 (each time a coin is inserted)
-      - aladbl_w : 1b2d18 - data = aa00 (only once on reset)
-      - aladbl_w : 1b2d42 - data = 0000 (only once on reset)
+      - aladmdb_w : 1b2a6c - data = 6600 (each time a coin is inserted)
+      - aladmdb_w : 1b2a82 - data = 0000 (each time a coin is inserted)
+      - aladmdb_w : 1b2d18 - data = aa00 (only once on reset)
+      - aladmdb_w : 1b2d42 - data = 0000 (only once on reset)
     */
-	logerror("aladbl_w : %06x - data = %04x\n",cpu_get_pc(space->cpu),data);
+	logerror("aladmdb_w : %06x - data = %04x\n",cpu_get_pc(space->cpu),data);
 }
 
-static READ16_HANDLER( aladbl_r )
+static READ16_HANDLER( aladmdb_r )
 {
 	if (cpu_get_pc(space->cpu)==0x1b2a56)
 	{
@@ -290,14 +298,19 @@ static READ16_HANDLER( aladbl_r )
 	return 0x0000;
 }
 
-
-static READ16_HANDLER( mk3ghw_dsw_r )
+static READ16_HANDLER( mk3mdb_dsw_r )
 {
 	static const char *const dswname[3] = { "DSWA", "DSWB", "DSWC" };
 	return input_port_read(space->machine, dswname[offset]);
 }
 
-static READ16_HANDLER( ssf2ghw_dsw_r )
+static READ16_HANDLER( ssf2mdb_dsw_r )
+{
+	static const char *const dswname[3] = { "DSWA", "DSWB", "DSWC" };
+	return input_port_read(space->machine, dswname[offset]);
+}
+
+static READ16_HANDLER( srmdb_dsw_r )
 {
 	static const char *const dswname[3] = { "DSWA", "DSWB", "DSWC" };
 	return input_port_read(space->machine, dswname[offset]);
@@ -313,6 +326,227 @@ static READ16_HANDLER(topshoot_200051_r)
  *  Game-specific port definitions
  *
  *************************************/
+
+/* verified from M68000 code */
+INPUT_PORTS_START( ssf2mdb )
+	PORT_INCLUDE( md_common )
+
+	PORT_MODIFY("PAD1")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )
+
+	PORT_MODIFY("PAD2")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START2 )
+
+	PORT_START("EXTRA1")	/* Extra buttons for Joypad 1 (6 button + start + mode) NOT READ DIRECTLY */
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("EXTRA2")	/* Extra buttons for Joypad 2 (6 button + start + mode) NOT READ DIRECTLY */
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0")		/* 3rd I/O port */
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
+
+	PORT_START("DSWA")
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
+//  PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+
+	PORT_START("DSWB")
+	PORT_DIPNAME( 0x07, 0x03, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x07, "0 (Easiest)" )
+	PORT_DIPSETTING(    0x06, "1" )
+	PORT_DIPSETTING(    0x05, "2" )
+	PORT_DIPSETTING(    0x04, "3" )
+	PORT_DIPSETTING(    0x03, "4" )
+	PORT_DIPSETTING(    0x02, "5" )
+	PORT_DIPSETTING(    0x01, "6" )
+	PORT_DIPSETTING(    0x00, "7 (Hardest)" )
+
+	PORT_START("DSWC")
+	PORT_DIPNAME( 0x0f, 0x0b, "Speed" )
+	PORT_DIPSETTING(    0x0f, "0 (Slowest)" )
+	PORT_DIPSETTING(    0x0e, "1" )
+	PORT_DIPSETTING(    0x0d, "2" )
+	PORT_DIPSETTING(    0x0c, "3" )
+	PORT_DIPSETTING(    0x0b, "4" )
+	PORT_DIPSETTING(    0x0a, "5" )
+	PORT_DIPSETTING(    0x09, "6" )
+	PORT_DIPSETTING(    0x08, "7" )
+	PORT_DIPSETTING(    0x07, "8" )
+	PORT_DIPSETTING(    0x06, "9" )
+	PORT_DIPSETTING(    0x05, "10 (Fastest)" )
+//  PORT_DIPSETTING(    0x04, "10 (Fastest)" )
+//  PORT_DIPSETTING(    0x03, "10 (Fastest)" )
+//  PORT_DIPSETTING(    0x02, "10 (Fastest)" )
+//  PORT_DIPSETTING(    0x01, "10 (Fastest)" )
+//  PORT_DIPSETTING(    0x00, "10 (Fastest)" )
+INPUT_PORTS_END
+
+/* verified from M68000 code */
+INPUT_PORTS_START( mk3mdb )
+	PORT_INCLUDE( md_common )
+
+	PORT_MODIFY("PAD1")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 )
+
+	PORT_MODIFY("PAD2")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START2 )
+
+	PORT_START("EXTRA1")	/* Extra buttons for Joypad 1 (6 button + start + mode) NOT READ DIRECTLY */
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("EXTRA2")	/* Extra buttons for Joypad 2 (6 button + start + mode) NOT READ DIRECTLY */
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN0")
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
+
+	PORT_START("DSWA")
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
+//  PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+
+	PORT_START("DSWB")
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( Easiest ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( Medium ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( Hardest ) )
+//  PORT_DIPSETTING(    0x02, DEF_STR( Hardest ) )
+//  PORT_DIPSETTING(    0x01, DEF_STR( Hardest ) )
+//  PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+	PORT_DIPUNUSED( 0x08, IP_ACTIVE_HIGH )
+	PORT_DIPUNUSED( 0x10, IP_ACTIVE_HIGH )
+	PORT_DIPUNUSED( 0x20, IP_ACTIVE_HIGH )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Blood" )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( On ) )
+
+	PORT_START("DSWC")        /* not even read in this set */
+INPUT_PORTS_END
+
+/* verified from M68000 code */
+INPUT_PORTS_START( aladmdb )
+	PORT_INCLUDE( md_common )
+
+	PORT_MODIFY("PAD1")		/* Joypad 1 (3 button + start) NOT READ DIRECTLY */
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Throw") // a
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Sword") // b
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME("P1 Jump") // c
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 ) // start
+
+	PORT_MODIFY("PAD2")		/* Joypad 2 (3 button + start) NOT READ DIRECTLY - not used */
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
+
+    /* As I don't know how it is on real hardware, this is more a guess than anything */
+	PORT_START("MCU")
+	PORT_DIPNAME( 0x07, 0x01, DEF_STR( Coinage ) )          /* code at 0x1b2a50 - unsure if there are so many settings */
+//  PORT_DIPSETTING(    0x00, "INVALID" )                   /* adds 0 credit */
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_6C ) )
+    PORT_DIPSETTING(    0x07, DEF_STR( 1C_7C ) )
+//  PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_SPECIAL )         /* to avoid it being changed and corrupting Coinage settings */
+	PORT_DIPNAME( 0x30, 0x00, DEF_STR( Difficulty ) )       /* code at 0x1b2680 */
+	PORT_DIPSETTING(    0x10, DEF_STR( Easy ) )             /* "PRACTICE" */
+	PORT_DIPSETTING(    0x00, DEF_STR( Normal ) )           /* "NORMAL" */
+	PORT_DIPSETTING(    0x20, DEF_STR( Hard ) )             /* "DIFFICULT" */
+//  PORT_DIPSETTING(    0x30, DEF_STR( Normal ) )
+	PORT_DIPUNUSED( 0x40, IP_ACTIVE_HIGH )
+	PORT_DIPUNUSED( 0x80, IP_ACTIVE_HIGH )
+	PORT_BIT( 0x0100, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(1)     /* needed to avoid credits getting mad */
+INPUT_PORTS_END
+
+/* verified from M68000 code */
+INPUT_PORTS_START( srmdb )
+	PORT_INCLUDE( md_common )
+
+	PORT_MODIFY("PAD1")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME("P1 Shoot") // a
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME("P1 Jump") // b
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED ) // c (duplicate shoot button)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START1 ) // start
+
+	PORT_MODIFY("PAD2")
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2) PORT_NAME("P1 Shoot") // a
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2) PORT_NAME("P1 Jump") // b
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED ) // c (duplicate shoot button)
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_START2 )
+
+	PORT_START("IN0")		/* 3rd I/O port */
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_COIN2 )
+
+	PORT_START("DSWA")
+	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_5C ) )
+
+	PORT_START("DSWB")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( Easy ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Medium ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
+
+	PORT_START("DSWC")
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x03, "3" )
+	PORT_DIPSETTING(    0x02, "4" )
+	PORT_DIPSETTING(    0x01, "5" )
+	PORT_DIPSETTING(    0x00, "6" )
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( topshoot ) /* Top Shooter Input Ports */
 
@@ -342,7 +576,7 @@ INPUT_PORTS_END
  *
  *************************************/
 
-ROM_START( aladbl )
+ROM_START( aladmdb )
 	ROM_REGION( 0x400000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "m1.bin", 0x000001, 0x080000,  CRC(5e2671e4) SHA1(54705c7614fc7b5a1065478fa41f51dd1d8045b7) )
 	ROM_LOAD16_BYTE( "m2.bin", 0x000000, 0x080000,  CRC(142a0366) SHA1(6c94aa9936cd11ccda503b52019a6721e64a32f0) )
@@ -350,7 +584,7 @@ ROM_START( aladbl )
 	ROM_LOAD16_BYTE( "m4.bin", 0x100000, 0x080000,  CRC(bc712661) SHA1(dfd554d000399e17b4ddc69761e572195ed4e1f0))
 ROM_END
 
-ROM_START( mk3ghw ) // roms are scrambled, we take care of the address descramble in the ROM load, and the data descramble in the init
+ROM_START( mk3mdb ) // roms are scrambled, we take care of the address descramble in the ROM load, and the data descramble in the init
                     // this is bootlegged from  "Mortal Kombat 3 (4) [!].bin"
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASE00 ) /* 68000 Code */
 	ROM_LOAD16_BYTE( "1.u1", 0x080001, 0x020000,  CRC(0dc01b23) SHA1(f1aa7ac88c8e3deb5a0a065862722e9d27b87b4c) )
@@ -375,13 +609,21 @@ ROM_START( mk3ghw ) // roms are scrambled, we take care of the address descrambl
 	ROM_CONTINUE(            0x300000, 0x040000)
 ROM_END
 
-ROM_START( ssf2ghw )
+ROM_START( ssf2mdb )
 	ROM_REGION( 0x1400000, "maincpu", 0 ) /* 68000 Code */
 	/* Special Case, custom PCB, linear ROM mapping of 5meg */
 	ROM_LOAD16_BYTE( "rom_a", 0x000000, 0x200000,  CRC(59726521) SHA1(3120bac17f56c01ffb9d3f9e31efa0263e3774af) )
 	ROM_LOAD16_BYTE( "rom_b", 0x000001, 0x200000,  CRC(7dad5540) SHA1(9279068b2218d239fdd557dd959ac70e74853178) )
 	ROM_LOAD16_BYTE( "rom_c", 0x400000, 0x080000,  CRC(deb48624) SHA1(39ffa7de7b808e0b95cb039bb381705d77420933) )
 	ROM_LOAD16_BYTE( "rom_d", 0x400001, 0x080000,  CRC(b99f6a5b) SHA1(adbe28a7522024bc66328ac86fecf9ded3310e8e) )
+ROM_END
+
+ROM_START( srmdb )
+	ROM_REGION( 0x400000, "maincpu", 0 ) /* 68000 Code */
+	ROM_LOAD16_BYTE( "u1", 0x000001, 0x020000,  CRC(c59f33bd) SHA1(bd5bce7698a70ea005b79ab34bcdb056872ef980) )
+	ROM_LOAD16_BYTE( "u2", 0x000000, 0x020000,  CRC(9125c054) SHA1(c73bdeb6b11c59d2b5f5968959b02697957ca894) )
+	ROM_LOAD16_BYTE( "u3", 0x040001, 0x020000,  CRC(0fee0fbe) SHA1(001e0fda12707512aad537e533acf28e726e6107) )
+	ROM_LOAD16_BYTE( "u4", 0x040000, 0x020000,  CRC(fc2aed41) SHA1(27eb3957f5ed26ee5276523b1df46fa7eb298e1f))
 ROM_END
 
 ROM_START( topshoot ) /* Top Shooter (c)1995 Sun Mixing */
@@ -402,7 +644,7 @@ ROM_END
 
 #define ENERGY_CONSOLE_MODE 0
 
-static DRIVER_INIT( aladbl )
+static DRIVER_INIT( aladmdb )
 {
 	/*
      * Game does a check @ 1afc00 with work RAM fff57c that makes it play like the original console version (i.e. 8 energy hits instead of 2)
@@ -413,15 +655,15 @@ static DRIVER_INIT( aladbl )
 	#endif
 
 	// 220000 = writes to mcu? 330000 = reads?
-	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x220000, 0x220001, 0, 0, aladbl_w);
-	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x330000, 0x330001, 0, 0, aladbl_r);
+	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x220000, 0x220001, 0, 0, aladmdb_w);
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x330000, 0x330001, 0, 0, aladmdb_r);
 
 	DRIVER_INIT_CALL(megadrij);
 }
 
 // this should be correct, the areas of the ROM that differ to the original
 // after this decode look like intentional changes
-static DRIVER_INIT( mk3ghw )
+static DRIVER_INIT( mk3mdb )
 {
 	int x;
 	UINT8 *rom = memory_region(machine, "maincpu");
@@ -463,12 +705,12 @@ static DRIVER_INIT( mk3ghw )
 	rom[0x07] = 0x02;
 	rom[0x06] = 0x10;
 
-	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x770070, 0x770075, 0, 0, mk3ghw_dsw_r );
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x770070, 0x770075, 0, 0, mk3mdb_dsw_r );
 
 	DRIVER_INIT_CALL(megadriv);
 }
 
-static DRIVER_INIT( ssf2ghw )
+static DRIVER_INIT( ssf2mdb )
 {
 	memory_nop_write(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xA130F0, 0xA130FF, 0, 0); // custom banking is disabled (!)
 	memory_install_read_bank(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400000, 0x5fffff, 0, 0, "bank5");
@@ -476,10 +718,52 @@ static DRIVER_INIT( ssf2ghw )
 
 	memory_set_bankptr(machine,  "bank5", memory_region( machine, "maincpu" ) + 0x400000 );
 
-	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x770070, 0x770075, 0, 0, ssf2ghw_dsw_r );
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x770070, 0x770075, 0, 0, ssf2mdb_dsw_r );
 
 	DRIVER_INIT_CALL(megadrij);
 
+}
+
+static DRIVER_INIT( srmdb )
+{
+	int x;
+	UINT8* rom = memory_region(machine, "maincpu");
+
+	/* todo, reduce bitswaps to single swap */
+	for (x=0x00001;x<0x40000;x+=2)
+	{
+		rom[x] = rom[x] ^ 0xff;
+		rom[x] = BITSWAP8(rom[x], 7,6,5,4,3,2,1,0 );
+		rom[x] = BITSWAP8(rom[x], 1,6,5,4,3,2,7,0 );
+		rom[x] = BITSWAP8(rom[x], 7,6,5,3,4,2,1,0 );
+		rom[x] = BITSWAP8(rom[x], 7,6,5,2,3,4,1,0 );
+		rom[x] = BITSWAP8(rom[x], 5,6,7,4,3,2,1,0 );
+		rom[x] = BITSWAP8(rom[x], 7,5,6,4,3,2,1,0 );
+	}
+
+	for (x=0x40001;x<0x80000;x+=2)
+	{
+		rom[x] = BITSWAP8(rom[x], 7,6,5,4,3,2,1,0 );
+		rom[x] = BITSWAP8(rom[x], 7,6,1,4,3,2,5,0 );
+		rom[x] = BITSWAP8(rom[x], 7,6,5,4,0,2,1,3 );
+		rom[x] = BITSWAP8(rom[x], 2,6,5,4,3,7,1,0 );
+		rom[x] = BITSWAP8(rom[x], 7,6,5,0,3,2,1,4 );
+		rom[x] = BITSWAP8(rom[x], 7,6,5,1,3,2,4,0 );
+
+	}
+
+	// boot vectors don't seem to be valid, so they are patched...
+	rom[0x01] = 0x01;
+	rom[0x00] = 0x00;
+	rom[0x03] = 0x00;
+	rom[0x02] = 0x00;
+
+	rom[0x06] = 0xd2;
+	rom[0x07] = 0x00;
+
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x770070, 0x770075, 0, 0, srmdb_dsw_r );
+
+	DRIVER_INIT_CALL(megadriv);
 }
 
 static DRIVER_INIT(topshoot)
@@ -499,7 +783,8 @@ static DRIVER_INIT(topshoot)
  *
  *************************************/
 
-GAME( 1993, aladbl,   0, megadriv,   aladbl,   aladbl,   ROT0, "bootleg / Sega",   "Aladdin (bootleg of Japanese Megadrive version)", 0)
-GAME( 1996, mk3ghw,   0, megadriv,   mk3ghw,   mk3ghw,   ROT0, "bootleg / Midway", "Mortal Kombat 3 (bootleg of Megadrive version)", 0)
-GAME( 1994, ssf2ghw,  0, megadriv,   ssf2ghw,  ssf2ghw,  ROT0, "bootleg / Capcom", "Super Street Fighter II - The New Challengers (Arcade bootleg of Japanese MegaDrive version)", 0)
+GAME( 1993, aladmdb,  0, megadriv,   aladmdb,  aladmdb,  ROT0, "bootleg / Sega",   "Aladdin (bootleg of Japanese Megadrive version)", 0)
+GAME( 1996, mk3mdb,   0, megadriv,   mk3mdb,   mk3mdb,   ROT0, "bootleg / Midway", "Mortal Kombat 3 (bootleg of Megadrive version)", 0)
+GAME( 1994, ssf2mdb,  0, megadriv,   ssf2mdb,  ssf2mdb,  ROT0, "bootleg / Capcom", "Super Street Fighter II - The New Challengers (bootleg of Japanese MegaDrive version)", 0)
+GAME( 1993, srmdb,    0, megadriv,   srmdb,    srmdb,    ROT0, "bootleg / Konami", "Sunset Riders (bootleg of Megadrive version)", 0)
 GAME( 1995, topshoot, 0, md_bootleg, topshoot, topshoot, ROT0, "Sun Mixing",       "Top Shooter", 0)

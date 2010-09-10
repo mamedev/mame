@@ -4581,10 +4581,10 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( mp_mazin )	/* 11 */
 	DRIVER( mp_col3 )	/* ?? */
 
-	DRIVER( ssf2ghw )	/* MegaDrive-based hack */
-	DRIVER( aladbl )	/* MegaDrive-based hack */
-	DRIVER( mk3ghw )	/* MegaDrive-based hack */
-	DRIVER( ssgbl )		/* MegaDrive-based hack */
+	DRIVER( ssf2mdb )	/* MegaDrive-based hack */
+	DRIVER( aladmdb )	/* MegaDrive-based hack */
+	DRIVER( mk3mdb )	/* MegaDrive-based hack */
+	DRIVER( srmdb )		/* MegaDrive-based hack */
 
 	/* Sega Naomi-based (Dreamcast) systems */
 	DRIVER( naomi )
