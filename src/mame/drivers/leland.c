@@ -44,6 +44,7 @@
 #include "emu.h"
 #include "cpu/i86/i86.h"
 #include "machine/eeprom.h"
+#include "machine/nvram.h"
 #include "cpu/z80/z80.h"
 #include "includes/leland.h"
 #include "sound/ay8910.h"
@@ -64,8 +65,7 @@
 static ADDRESS_MAP_START( master_map_program, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x9fff) AM_ROMBANK("bank1")
-	AM_RANGE(0xa000, 0xdfff) AM_ROMBANK("bank2")
-	AM_RANGE(0xa000, 0xdfff) AM_WRITE(leland_battery_ram_w)
+	AM_RANGE(0xa000, 0xdfff) AM_ROMBANK("bank2") AM_WRITE(leland_battery_ram_w) AM_SHARE("battery")
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xf3ff) AM_READWRITE(leland_gated_paletteram_r, leland_gated_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xf800, 0xf801) AM_WRITE(leland_master_video_addr_w)
@@ -745,9 +745,9 @@ static MACHINE_CONFIG_START( leland, driver_device )
 
 	MDRV_MACHINE_START(leland)
 	MDRV_MACHINE_RESET(leland)
-	MDRV_NVRAM_HANDLER(leland)
 
 	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
+	MDRV_NVRAM_ADD_0FILL("battery")
 
 	/* video hardware */
 	MDRV_FRAGMENT_ADD(leland_video)

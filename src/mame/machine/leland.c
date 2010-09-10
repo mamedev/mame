@@ -363,7 +363,7 @@ WRITE8_HANDLER( indyheat_analog_w )
 MACHINE_START( leland )
 {
 	/* allocate extra stuff */
-	battery_ram = auto_alloc_array(machine, UINT8, LELAND_BATTERY_RAM_SIZE);
+	battery_ram = reinterpret_cast<UINT8 *>(memory_get_shared(*machine, "battery"));
 
 	/* start scanline interrupts going */
 	master_int_timer = timer_alloc(machine, leland_interrupt_callback, NULL);
@@ -416,7 +416,7 @@ MACHINE_RESET( leland )
 MACHINE_START( ataxx )
 {
 	/* set the odd data banks */
-	battery_ram = auto_alloc_array(machine, UINT8, LELAND_BATTERY_RAM_SIZE);
+	battery_ram = reinterpret_cast<UINT8 *>(memory_get_shared(*machine, "battery"));
 	extra_tram = auto_alloc_array(machine, UINT8, ATAXX_EXTRA_TRAM_SIZE);
 
 	/* start scanline interrupts going */
@@ -909,17 +909,6 @@ WRITE8_HANDLER( ataxx_battery_ram_w )
 		ataxx_qram[((master_bank & 0xc0) << 8) + offset] = data;
 	else
 		logerror("%04X:BatteryW@%04X (invalid!)\n", cpu_get_pc(space->cpu), offset);
-}
-
-
-NVRAM_HANDLER( leland )
-{
-	if (read_or_write)
-		mame_fwrite(file, battery_ram, LELAND_BATTERY_RAM_SIZE);
-	else if (file)
-		mame_fread(file, battery_ram, LELAND_BATTERY_RAM_SIZE);
-	else
-		memset(battery_ram, 0x00, LELAND_BATTERY_RAM_SIZE);
 }
 
 
