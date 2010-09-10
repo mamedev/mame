@@ -303,7 +303,6 @@ public:
 		: code(_exitcode)
 	{
 		vsprintf(text, format, ap);
-		osd_break_into_debugger(text);
 	}
 
 	const char *string() const { return text; }
