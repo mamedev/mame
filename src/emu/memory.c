@@ -280,9 +280,9 @@ private:
 	memory_block *			m_next;					// next memory block in the list
 	running_machine &		m_machine;				// need the machine to free our memory
 	address_space &			m_space;				// which address space are we associated with?
-	bool					m_isallocated;			// did we allocate this ourselves?
 	offs_t					m_bytestart, m_byteend;	// byte-normalized start/end for verifying a match
 	UINT8 *					m_data;					// pointer to the data for this block
+	UINT8 *					m_allocated;			// pointer to the actually allocated block
 };
 
 
@@ -1961,6 +1961,7 @@ void address_space::prepare_map()
 		// if we have a share entry, add it to our map
 		if (entry->m_share != NULL && m_machine.memory_data->sharemap.find(entry->m_share) == NULL)
 		{
+			VPRINTF(("Creating share '%s' of length 0x%X\n", entry->m_share, entry->m_byteend + 1 - entry->m_bytestart));
 			memory_share *share = auto_alloc(&m_machine, memory_share(entry->m_byteend + 1 - entry->m_bytestart));
 			m_machine.memory_data->sharemap.add(entry->m_share, share, false);
 		}
@@ -2326,6 +2327,10 @@ address_map_entry *address_space::block_assign_intersecting(offs_t bytestart, of
 				entry->m_memory = share->ptr();
 				VPRINTF(("memory range %08X-%08X -> shared_ptr '%s' [%p]\n", entry->m_addrstart, entry->m_addrend, entry->m_share, entry->m_memory));
 			}
+			else
+			{
+				VPRINTF(("memory range %08X-%08X -> shared_ptr '%s' but not found\n", entry->m_addrstart, entry->m_addrend, entry->m_share));
+			}
 		}
 
 		// otherwise, look for a match in this block
@@ -2340,7 +2345,10 @@ address_map_entry *address_space::block_assign_intersecting(offs_t bytestart, of
 		{
 			memory_share *share = memdata->sharemap.find(entry->m_share);
 			if (share != NULL && share->ptr() == NULL)
+			{
 				share->set_ptr(entry->m_memory);
+				VPRINTF(("setting shared_ptr '%s' = %p\n", entry->m_share, entry->m_memory));
+			}
 		}
 
 		// keep track of the first unassigned entry
@@ -4053,12 +4061,25 @@ memory_block::memory_block(address_space &space, offs_t bytestart, offs_t byteen
 	: m_next(NULL),
 	  m_machine(space.m_machine),
 	  m_space(space),
-	  m_isallocated(memory == NULL),
 	  m_bytestart(bytestart),
 	  m_byteend(byteend),
-	  m_data((memory != NULL) ? reinterpret_cast<UINT8 *>(memory) : auto_alloc_array_clear(&space.m_machine, UINT8, byteend + 1 - bytestart))
+	  m_data(reinterpret_cast<UINT8 *>(memory)),
+	  m_allocated(NULL)
 {
 	VPRINTF(("block_allocate('%s',%s,%08X,%08X,%p)\n", space.device().tag(), space.name(), bytestart, byteend, memory));
+
+	// allocate a block if needed
+	if (m_data == NULL)
+	{
+		offs_t length = byteend + 1 - bytestart;
+		if (length < 4096)
+			m_allocated = m_data = auto_alloc_array_clear(&space.m_machine, UINT8, length);
+		else
+		{
+			m_allocated = auto_alloc_array_clear(&space.m_machine, UINT8, length + 0xfff);
+			m_data = reinterpret_cast<UINT8 *>((reinterpret_cast<FPTR>(m_allocated) + 0xfff) & ~0xfff);
+		}
+	}
 
 	// register for saving, but only if we're not part of a memory region
 	const region_info *region;
@@ -4086,8 +4107,8 @@ memory_block::memory_block(address_space &space, offs_t bytestart, offs_t byteen
 
 memory_block::~memory_block()
 {
-	if (m_isallocated)
-		auto_free(&m_machine, m_data);
+	if (m_allocated != NULL)
+		auto_free(&m_machine, m_allocated);
 }
 
 
