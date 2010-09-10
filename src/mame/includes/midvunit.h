@@ -15,7 +15,7 @@ public:
 		: driver_device(machine, config),
 		  m_nvram(*this, "nvram") { }
 
-	required_shared_ptr<UINT32>	m_nvram;
+	optional_shared_ptr<UINT32>	m_nvram;
 };
 
 

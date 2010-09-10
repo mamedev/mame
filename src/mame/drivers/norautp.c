@@ -1783,7 +1783,7 @@ ROM_START( norautjp )
 	ROM_LOAD( "2732-1char.bin",   0x0800, 0x0800, CRC(d94be899) SHA1(b7212162324fa2d67383a475052e3b351bb1af5f) )	/* first half 0xff filled */
 	ROM_CONTINUE(                 0x0800, 0x0800 )
 
-	ROM_REGION( 0x400,	"nvram", 0 )
+	ROM_REGION( 0x800,	"nvram", 0 )
 	ROM_LOAD( "norautjp_nv.bin",  0x0000, 0x0400, CRC(0a0614b2) SHA1(eb21b2723b41743daf787cfc379bc67cce2b8538) )	/* default NVRAM */
 
 ROM_END

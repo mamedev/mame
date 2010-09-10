@@ -152,6 +152,9 @@ protected:
 	virtual void nvram_default();
 	virtual void nvram_read(mame_file &file);
 	virtual void nvram_write(mame_file &file);
+	
+	// internal helpers
+	void determine_final_base();
 
 	// internal state
 	const nvram_device_config &	m_config;

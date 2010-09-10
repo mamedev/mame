@@ -485,7 +485,7 @@ static WRITE8_HANDLER(meritm_crt250_questions_bank_w)
 			default: logerror( "meritm_crt250_questions_bank_w: unknown data = %02x\n", data ); return;
 		}
 		logerror( "Reading question byte at %06X\n", questions_address | questions_loword_address);
-		*dst = memory_region(space->machine, "user1")[questions_address | questions_loword_address];
+		*dst = memory_region(space->machine, "extra")[questions_address | questions_loword_address];
 	}
 };
 
@@ -599,7 +599,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( meritm_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xdfff) AM_ROMBANK("bank2")
-	AM_RANGE(0xe000, 0xffff) AM_RAMBANK("bank3")
+	AM_RANGE(0xe000, 0xffff) AM_RAMBANK("bank3") AM_SHARE("nvram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( meritm_io_map, ADDRESS_SPACE_IO, 8 )
@@ -999,6 +999,7 @@ static MACHINE_START(meritm_crt250_crt252_crt258)
 static MACHINE_START(meritm_crt260)
 {
 	meritm_ram = auto_alloc_array(machine, UINT8,  0x8000 );
+	machine->device<nvram_device>("nvram")->set_base(meritm_ram, 0x8000);
 	memset(meritm_ram, 0x00, 0x8000);
 	memory_configure_bank(machine, "bank1", 0, 128, memory_region(machine, "maincpu"), 0x8000);
 	memory_configure_bank(machine, "bank2", 0, 128, memory_region(machine, "maincpu"), 0x8000);
@@ -1012,18 +1013,6 @@ static MACHINE_START(meritm_crt260)
 	state_save_register_global(machine, meritm_bank);
 	state_save_register_global(machine, meritm_psd_a15);
 	state_save_register_global_pointer(machine, meritm_ram, 0x8000);
-};
-
-static NVRAM_HANDLER(meritm_crt260)
-{
-	if (read_or_write)
-		mame_fwrite(file, meritm_ram, 0x8000);
-	else
-		if (file)
-			mame_fread(file, meritm_ram, 0x8000);
-		else
-			if ( memory_region(machine, "user1") )
-				memcpy(meritm_ram, memory_region(machine, "user1"), 0x8000);
 };
 
 // from MSX2 driver, may be not accurate for merit games
@@ -1111,8 +1100,6 @@ static MACHINE_CONFIG_DERIVED( meritm_crt260, meritm_crt250 )
 
 	MDRV_WATCHDOG_TIME_INIT(MSEC(1200))	// DS1232, TD connected to VCC
 	MDRV_MACHINE_START(meritm_crt260)
-
-	MDRV_NVRAM_HANDLER(meritm_crt260)
 
 MACHINE_CONFIG_END
 
@@ -1228,7 +1215,7 @@ ROM_START( pitbossm ) /* Dallas DS1204V security key attached to CRT-254 connect
 	ROM_RELOAD(     0x70000, 0x10000)
 
 
-	ROM_REGION( 0xc0000, "user1", 0 ) // extra data / extra banks?
+	ROM_REGION( 0xc0000, "extra", 0 ) // extra data / extra banks?
 	ROM_LOAD( "qs9243-00-01_u7-r0",  0x00000, 0x40000, CRC(35f4ca46) SHA1(87917b3017f505fae65d6bfa2c7d6fb503c2da6a) ) /* These 3 roms are on CRT-256 sattalite PCB */
 	ROM_LOAD( "qs9243-00-01_u6-r0",  0x40000, 0x40000, CRC(606f1656) SHA1(7f1e3a698a34d3c3b8f9f2cd8d5224b6c096e941) )
 	ROM_LOAD( "qs9243-00-01_u5-r0",  0x80000, 0x40000, CRC(590a1565) SHA1(b80ea967b6153847b2594e9c59bfe87559022b6c) )
@@ -1246,7 +1233,7 @@ ROM_START( pitbossma ) /* Unprotected or patched??  The manual shows a DS1204 ke
 	ROM_RELOAD(     0x70000, 0x10000)
 
 
-	ROM_REGION( 0xc0000, "user1", 0 ) // extra data / extra banks?
+	ROM_REGION( 0xc0000, "extra", 0 ) // extra data / extra banks?
 	ROM_LOAD( "qs9243-00-01_u7-r0",  0x00000, 0x40000, CRC(35f4ca46) SHA1(87917b3017f505fae65d6bfa2c7d6fb503c2da6a) ) /* These 3 roms are on CRT-256 sattalite PCB */
 	ROM_LOAD( "qs9243-00-01_u6-r0",  0x40000, 0x40000, CRC(606f1656) SHA1(7f1e3a698a34d3c3b8f9f2cd8d5224b6c096e941) )
 	ROM_LOAD( "qs9243-00-01_u5-r0",  0x80000, 0x40000, CRC(590a1565) SHA1(b80ea967b6153847b2594e9c59bfe87559022b6c) )
@@ -1263,7 +1250,7 @@ ROM_START( pbst30 ) /* Dallas DS1204V security key attached to CRT-254 connected
 	ROM_LOAD( "9234-10-01_u15-r0", 0x60000, 0x10000, CRC(9fbd8582) SHA1(c0f68c8a7cdca34c8736cefc71767c421bcaba8a) )
 
 
-	ROM_REGION( 0xc0000, "user1", 0 ) // extra data / extra banks?
+	ROM_REGION( 0xc0000, "extra", 0 ) // extra data / extra banks?
 	ROM_LOAD( "qs9234-01_u7-r0",  0x00000, 0x40000, CRC(c0534aaa) SHA1(4b3cbf03f29fd5b4b8fd423e73c0c8147692fa75) ) /* These 3 roms are on CRT-256 sattalite PCB */
 	ROM_LOAD( "qs9234-01_u6-r0",  0x40000, 0x40000, CRC(fe2cd934) SHA1(623011dc53ed6eefefa0725dba6fd1efee2077c1) )
 	ROM_LOAD( "qs9234-01_u5-r0",  0x80000, 0x40000, CRC(293fe305) SHA1(8a551ae8fb4fa4bf329128be1bfd6f1c3ff5a366) )
@@ -1280,7 +1267,7 @@ ROM_START( pbst30b ) /* Dallas DS1204V security key attached to CRT-254 connecte
 	ROM_LOAD( "9234-00-01_u15-r0a", 0x60000, 0x10000, CRC(f10f0d39) SHA1(2b5d5a93adb5251e09160b10c067b6e70289f608) )
 
 
-	ROM_REGION( 0xc0000, "user1", 0 ) // extra data / extra banks?
+	ROM_REGION( 0xc0000, "extra", 0 ) // extra data / extra banks?
 	ROM_LOAD( "qs9234-01_u7-r0",  0x00000, 0x40000, CRC(c0534aaa) SHA1(4b3cbf03f29fd5b4b8fd423e73c0c8147692fa75) ) /* These 3 roms are on CRT-256 sattalite PCB */
 	ROM_LOAD( "qs9234-01_u6-r0",  0x40000, 0x40000, CRC(fe2cd934) SHA1(623011dc53ed6eefefa0725dba6fd1efee2077c1) )
 	ROM_LOAD( "qs9234-01_u5-r0",  0x80000, 0x40000, CRC(293fe305) SHA1(8a551ae8fb4fa4bf329128be1bfd6f1c3ff5a366) )
@@ -1496,7 +1483,7 @@ ROM_START( megat4sn ) /* Dallas DS1204V security key at U5 labeled 9255-40-01 U5
 	ROM_LOAD( "9255-41-07_u38-r0g", 0x300000, 0x80000,  CRC(71eac4d4) SHA1(73b9ed876f0af94bbd88503921a2b4f26bcfd397) ) /* Location U38, 02/11/1997 11:59:41 - New Jersey version */
 	ROM_RELOAD(                     0x380000, 0x80000)
 
-	ROM_REGION( 0x8000, "user1", 0 ) // DS1225Y nv ram
+	ROM_REGION( 0x8000, "nvram", 0 ) // DS1225Y nv ram
 	ROM_LOAD( "mt4sn_ds1225y.u31",  0x0000, 0x8000, CRC(8d2a97e7) SHA1(7cb01d9499fed1674da6a04a11ed1cef0a39b3c0) ) /* No actual label, so use a unique name for this set */
 
 	ROM_REGION( 0x1000, "user2", 0 ) // PALs
@@ -1516,7 +1503,7 @@ ROM_START( megat4te ) /* Dallas DS1204V security key at U5 labeled 9255-50-01 U5
 	ROM_LOAD( "9255-50-01_u38-r0d", 0x300000, 0x080000, CRC(124d5b84) SHA1(3c2117f56d0dc406bfb508989729e36781e215a4) ) /* Location U38, 07/02/1996 14:41:59 - Standard Version */
 	ROM_RELOAD(                     0x380000, 0x080000 )
 
-	ROM_REGION( 0x8000, "user1", 0 ) // DS1644 nv ram
+	ROM_REGION( 0x8000, "nvram", 0 ) // DS1644 nv ram
 	ROM_LOAD( "mt4te_ds1644.u31",  0x00000,  0x8000,   CRC(d9485491) SHA1(c602bf954fe8b06f81b0f5002246e8fa89237705) ) /* No actual label, so use a unique name for this set */
 
 	ROM_REGION( 0x1000, "user2", 0 ) // PALs
@@ -1536,7 +1523,7 @@ ROM_START( megat4tea ) /* Dallas DS1204V security key at U5 labeled 9255-50-01 U
 	ROM_LOAD( "9255-50-01_u38-r0a", 0x300000, 0x080000, CRC(abf187a5) SHA1(d4d2327b4564f3cafa2640499f8c6ae818ed04b8) ) /* Location U38, 06/06/1996 13:43:39 - Standard Version */
 	ROM_RELOAD(                     0x380000, 0x080000 )
 
-	ROM_REGION( 0x8000, "user1", 0 ) // DS1644 nv ram
+	ROM_REGION( 0x8000, "nvram", 0 ) // DS1644 nv ram
 	ROM_LOAD( "mt4tea_ds1644.u31",  0x00000,  0x8000,   CRC(11e2c7ed) SHA1(99ee83410f7dbf5a259b11193829bb5c706d9fca) ) /* No actual label, so use a unique name for this set */
 
 	ROM_REGION( 0x1000, "user2", 0 ) // PALs
@@ -1556,7 +1543,7 @@ ROM_START( megat4st ) /* Dallas DS1204V security key at U5 labeled 9255-51-01 U5
 	ROM_LOAD( "9255-51-01_u38-r0b", 0x300000, 0x080000, CRC(181a83cb) SHA1(b8f92ae76ebba3849db76b084f0ab7d82256d81a) ) /* Location U38, 12/10/1996 16:59:23 - Standard Version */
 	ROM_RELOAD(                     0x380000, 0x080000 )
 
-	ROM_REGION( 0x8000, "user1", 0 ) // DS1644 nv ram
+	ROM_REGION( 0x8000, "nvram", 0 ) // DS1644 nv ram
 	ROM_LOAD( "mt4st_ds1644.u31",  0x00000,  0x8000,   CRC(c6226d91) SHA1(20c9fa7ad135ac229c6bdf85b901629a0ecb8a81) ) /* No actual label, so use a unique name for this set */
 
 	ROM_REGION( 0x1000, "user2", 0 ) // PALs
@@ -1576,7 +1563,7 @@ ROM_START( megat4stg ) /* Dallas DS1204V security key at U5 labeled 9255-51-50 U
 	ROM_LOAD( "9255-51-50_u38-r0a", 0x300000, 0x080000, CRC(f7c2914d) SHA1(5d05b8db5ca734f7b05c3e215c0ef5b917455537) ) /* Location U38, 11/18/1996 10:11:01 - Bi-Lingual GER/ENG Version */
 	ROM_RELOAD(                     0x380000, 0x080000 )
 
-	ROM_REGION( 0x8000, "user1", 0 ) // DS1644 nv ram
+	ROM_REGION( 0x8000, "nvram", 0 ) // DS1644 nv ram
 	ROM_LOAD( "mt4stg_ds1644.u31",  0x00000,  0x8000,   CRC(7f6f8e57) SHA1(d65f20ae19afc05b33d7605143b8362d6e955e89) ) /* No actual label, so use a unique name for this set */
 
 	ROM_REGION( 0x1000, "user2", 0 ) // PALs
@@ -1643,7 +1630,7 @@ ROM_START( megat5tg ) /* Dallas DS1204V security key at U5 labeled 9255-70-50 U5
 	ROM_RELOAD(                     0x280000, 0x80000)
 	ROM_LOAD( "9255-70-50_u38-r0d", 0x300000, 0x100000, CRC(044d123f) SHA1(d73df1f97f6da03fdee2ca3fda3845ec262a0f9a) ) /* Location U38, 10/29/1997 10:19:08 - Bi-Lingual GER/ENG Version */
 
-	ROM_REGION( 0x8000, "user1", 0 ) // DS1644 nv ram
+	ROM_REGION( 0x8000, "nvram", 0 ) // DS1644 nv ram
 	ROM_LOAD( "mt5tg_ds1644.u31",  0x00000,  0x8000,   CRC(a054bb32) SHA1(4efc19cb0a671dfe9249ce85d31f6bd633f2a237) ) /* No actual label, so use a unique name for this set */
 
 	ROM_REGION( 0x1000, "user2", 0 ) // PALs
@@ -1661,7 +1648,7 @@ ROM_START( megat6 ) /* Dallas DS1204V security key at U5 labeled 9255-80 U5-B-RO
 	ROM_LOAD( "qs9255-08_u37-r0",   0x200000, 0x100000, CRC(5ba01949) SHA1(1598949ea18d07bbc78af0ddd279a687173c1229) ) /* Location U37 */
 	ROM_LOAD( "9255-80-01_u38-r0a", 0x300000, 0x100000, CRC(3df6b840) SHA1(31ba1ac04eed3e76cdf637507dedcc5f7e22c919) ) /* Location U38, 08/07/1998 15:54:23 - Standard Version */
 
-	ROM_REGION( 0x8000, "user1", 0 ) // DS1230 nv ram
+	ROM_REGION( 0x8000, "nvram", 0 ) // DS1230 nv ram
 	ROM_LOAD( "ds1230y.u31",  0x00000, 0x8000, CRC(51b6da5c) SHA1(1d53af89d7867bb48b9d46feff6fc3b7e8e80ac8) )
 
 	ROM_REGION( 0x1000, "user2", 0 ) // PALs

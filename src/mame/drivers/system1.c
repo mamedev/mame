@@ -2099,7 +2099,7 @@ static Z80PIO_INTERFACE( pio_interface )
  *************************************/
 
 /* original board with 64kbit ROMs and an 8255 PPI for outputs */
-static MACHINE_CONFIG_START( sys1ppi, driver_device )
+static MACHINE_CONFIG_START( sys1ppi, system1_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK)	/* not really, see notes above */

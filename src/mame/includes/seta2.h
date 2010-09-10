@@ -5,7 +5,7 @@ public:
 		: driver_device(machine, config),
 		  m_nvram(*this, "nvram") { }
 
-	required_shared_ptr<UINT16> m_nvram;
+	optional_shared_ptr<UINT16> m_nvram;
 
 	UINT16 *vregs;
 	int yoffset;

@@ -1984,7 +1984,7 @@ static MACHINE_CONFIG_DERIVED( reactor, gottlieb1 )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(reactor_map)
 
-	MDRV_NVRAM_HANDLER(0)
+	MDRV_DEVICE_REMOVE("nvram")
 
 	/* sound hardware */
 	MDRV_SOUND_ADD("samples", SAMPLES, 0)
