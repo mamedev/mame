@@ -290,22 +290,23 @@ PORTB - MECHANICAL METERS
 
 static READ8_HANDLER(mkiv_pia_ina)
 {
-    return mc146818_port_r(space,1);
+    return space->machine->device<mc146818_device>("rtc")->read(*space,1);
 }
 
 //output a
 
 static WRITE8_HANDLER(mkiv_pia_outa)
 {
+	mc146818_device *mc = space->machine->device<mc146818_device>("rtc");
     if(rtc_data_strobe)
     {
-        mc146818_port_w(space,1,data);
+        mc->write(*space,1,data);
         //logerror("rtc protocol write data: %02X\n",data);
 
     }
     else
     {
-        mc146818_port_w(space,0,data);
+        mc->write(*space,0,data);
         //logerror("rtc protocol write address: %02X\n",data);
 
     }
@@ -1166,7 +1167,6 @@ static PALETTE_INIT( aristmk4 )
 
 static DRIVER_INIT( aristmk4 )
 {
-    mc146818_init(machine, MC146818_IGNORE_CENTURY);
 	shapeRomPtr = (UINT8 *)memory_region(machine, "tile_gfx");
     memcpy(shapeRom,shapeRomPtr,sizeof(shapeRom)); // back up
 }
@@ -1202,7 +1202,6 @@ static MACHINE_CONFIG_START( aristmk4, driver_device )
 	MDRV_CPU_PROGRAM_MAP(aristmk4_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 	MDRV_MACHINE_START(aristmk4)
-	MDRV_NVRAM_HANDLER( mc146818 )
     MDRV_MACHINE_RESET(aristmk4 )
 	MDRV_NVRAM_ADD_0FILL("nvram")
 
@@ -1225,6 +1224,7 @@ static MACHINE_CONFIG_START( aristmk4, driver_device )
 	MDRV_VIA6522_ADD("via6522_0", 0, via_interface)	/* 1 MHz.(only 1 or 2 MHz.are valid) */
 	MDRV_PIA6821_ADD("pia6821_0", aristmk4_pia1_intf)
     MDRV_MC6845_ADD("crtc", MC6845, MAIN_CLOCK/8, mc6845_intf)
+    MDRV_MC146818_ADD("rtc", MC146818_IGNORE_CENTURY)
 
     MDRV_SPEAKER_STANDARD_MONO("mono")
 

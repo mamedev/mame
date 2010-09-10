@@ -56,6 +56,7 @@ public:
 	attotime				period;			/* the repeat frequency of the timer */
 	attotime				start;			/* time when the timer was started */
 	attotime				expire;			/* time when the timer will expire */
+	device_t *				device;			/* for device timers, a pointer to the device */
 };
 
 
@@ -368,12 +369,17 @@ void timer_execute_timers(running_machine *machine)
 		global->callback_timer_expire_time = timer->expire;
 
 		/* call the callback */
-		if (was_enabled && timer->callback != NULL)
+		if (was_enabled)
 		{
-			LOG(("Timer %s:%d[%s] fired (expire=%s)\n", timer->file, timer->line, timer->func, attotime_string(timer->expire, 9)));
-			g_profiler.start(PROFILER_TIMER_CALLBACK);
-			(*timer->callback)(machine, timer->ptr, timer->param);
-			g_profiler.stop();
+			if (timer->device != NULL)
+				timer->device->timer_fired(*timer, timer->param, timer->ptr);
+			else if (timer->callback != NULL)
+			{
+				LOG(("Timer %s:%d[%s] fired (expire=%s)\n", timer->file, timer->line, timer->func, attotime_string(timer->expire, 9)));
+				g_profiler.start(PROFILER_TIMER_CALLBACK);
+				(*timer->callback)(machine, timer->ptr, timer->param);
+				g_profiler.stop();
+			}
 		}
 
 		/* clear the callback timer global */
@@ -603,6 +609,7 @@ INLINE emu_timer *_timer_alloc_common(running_machine *machine, timer_fired_func
 	timer->file = file;
 	timer->line = line;
 	timer->func = func;
+	timer->device = NULL;
 
 	/* compute the time of the next firing and insert into the list */
 	timer->start = time;
@@ -624,6 +631,14 @@ INLINE emu_timer *_timer_alloc_common(running_machine *machine, timer_fired_func
 emu_timer *_timer_alloc_internal(running_machine *machine, timer_fired_func callback, void *ptr, const char *file, int line, const char *func)
 {
 	return _timer_alloc_common(machine, callback, ptr, file, line, func, FALSE);
+}
+
+emu_timer *device_timer_alloc(device_t &device, void *ptr, int param)
+{
+	emu_timer *timer = _timer_alloc_common(device.machine, NULL, ptr, __FILE__, __LINE__, device.tag(), FALSE);
+	timer->param = param;
+	timer->device = &device;
+	return timer;
 }
 
 

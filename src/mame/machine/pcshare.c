@@ -27,6 +27,7 @@
 #include "machine/pic8259.h"
 #include "machine/pit8253.h"
 #include "machine/8042kbdc.h"
+#include "machine/mc146818.h"
 
 #define VERBOSE_DBG 0       /* general debug messages */
 #define DBG_LOG(N,M,A) \
@@ -321,7 +322,7 @@ ADDRESS_MAP_START( pcat32_io_common, ADDRESS_SPACE_IO, 32 )
 	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("pic8259_1", pic8259_r, pic8259_w, 0xffffffff)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8("pit8254", pit8253_r, pit8253_w, 0xffffffff)
 	AM_RANGE(0x0060, 0x006f) AM_READWRITE8(kbdc8042_8_r, kbdc8042_8_w, 0xffffffff)
-	AM_RANGE(0x0070, 0x007f) AM_RAM//READWRITE(mc146818_port32le_r,     mc146818_port32le_w)
+	AM_RANGE(0x0070, 0x007f) AM_RAM //AM_DEVREADWRITE8_MODERN("rtc", mc146818_device, read, write, 0xffffffff)
 	AM_RANGE(0x0080, 0x009f) AM_READWRITE8(dma_page_select_r,dma_page_select_w, 0xffffffff)//TODO
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_2", pic8259_r, pic8259_w, 0xffffffff)
 	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE8("dma8237_2", i8237_r, i8237_w, 0xffff)
@@ -333,4 +334,5 @@ MACHINE_CONFIG_FRAGMENT(pcat_common)
 	MDRV_I8237_ADD( "dma8237_1", XTAL_14_31818MHz/3, dma8237_1_config )
 	MDRV_I8237_ADD( "dma8237_2", XTAL_14_31818MHz/3, dma8237_2_config )
 	MDRV_PIT8254_ADD( "pit8254", at_pit8254_config )
+//	MDRV_MC146818_ADD( "rtc", MC146818_STANDARD )
 MACHINE_CONFIG_END

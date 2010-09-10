@@ -216,7 +216,6 @@ static MACHINE_START( streetg2 )
 	cpu_set_irq_callback(machine->device("maincpu"), pcat_irq_callback);
 
 	init_pc_common(machine, PCCOMMON_KEYBOARD_AT, streetg2_set_keyb_int);
-	mc146818_init(machine, MC146818_STANDARD);
 
 	memory_configure_bank(machine, "rombank", 0, 0x80, memory_region(machine, "game_prg"), 0x8000 );
 	memory_set_bank(machine, "rombank", 0);
@@ -238,7 +237,7 @@ static MACHINE_CONFIG_START( pcat_nit, driver_device )
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 
 	MDRV_MACHINE_START(streetg2)
-	MDRV_NVRAM_HANDLER( mc146818 )
+	MDRV_MC146818_ADD( "rtc", MC146818_STANDARD )
 
 //  MDRV_FRAGMENT_ADD( at_kbdc8042 )
 	MDRV_FRAGMENT_ADD( pcat_common )

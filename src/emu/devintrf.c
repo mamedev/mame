@@ -864,6 +864,17 @@ void device_t::device_debug_setup()
 
 
 //-------------------------------------------------
+//  device_timer - called whenever a device timer
+//  fires
+//-------------------------------------------------
+
+void device_t::device_timer(emu_timer &timer, int param, void *ptr)
+{
+	// do nothing by default
+}
+
+
+//-------------------------------------------------
 //  notify_clock_changed - notify all interfaces
 //  that the clock has changed
 //-------------------------------------------------

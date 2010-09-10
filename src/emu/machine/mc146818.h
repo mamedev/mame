@@ -11,45 +11,107 @@
 
 *********************************************************************/
 
-#ifndef MC146818_H
-#define MC146818_H
+#ifndef __MC146818_H__
+#define __MC146818_H__
 
-typedef enum
+
+//**************************************************************************
+//  INTERFACE CONFIGURATION MACROS
+//**************************************************************************
+
+#define MDRV_MC146818_ADD(_tag, _type) \
+	MDRV_DEVICE_ADD(_tag, MC146818, 0) \
+	mc146818_device_config::static_set_type(device, mc146818_device_config::_type); \
+
+
+
+//**************************************************************************
+//  TYPE DEFINITIONS
+//**************************************************************************
+
+class mc146818_device;
+
+
+// ======================> mc146818_device_config
+
+class mc146818_device_config :	public device_config,
+								public device_config_nvram_interface
 {
-	MC146818_STANDARD,
-	MC146818_IGNORE_CENTURY, // century is NOT set, for systems having other usage of this byte
-	MC146818_ENHANCED
-} MC146818_TYPE;
+	friend class mc146818_device;
+
+	// construction/destruction
+	mc146818_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+
+public:
+	// values
+	enum mc146818_type
+	{
+		MC146818_STANDARD,
+		MC146818_IGNORE_CENTURY, // century is NOT set, for systems having other usage of this byte
+		MC146818_ENHANCED
+	};
+
+	// allocators
+	static device_config *static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
+	virtual device_t *alloc_device(running_machine &machine) const;
+
+	// inline configuration helpers
+	static void static_set_type(device_config *device, mc146818_type type);
+
+protected:
+	// internal state
+	mc146818_type 		m_type;
+};
 
 
+// ======================> mc146818_device
 
-/* initialize mc146818 emulation, call only once at beginning */
-void mc146818_init(running_machine *machine, MC146818_TYPE type);
+class mc146818_device :	public device_t,
+						public device_nvram_interface
+{
+	friend class mc146818_device_config;
 
-/* loads data from standard nvram file */
-void mc146818_load(running_machine *machine);
+	// construction/destruction
+	mc146818_device(running_machine &_machine, const mc146818_device_config &config);
 
-/* loads data from file stream */
-void mc146818_load_stream(mame_file *file);
+public:
+	// read/write access
+	DECLARE_READ8_MEMBER( read );
+	DECLARE_WRITE8_MEMBER( write );
 
-/* saves data into standard nvram file */
-void mc146818_save(running_machine *machine);
+protected:
+	// device-level overrides
+	virtual void device_start();
+	virtual void device_timer(emu_timer &timer, int param, void *ptr);
 
-/* saves data into file stream */
-void mc146818_save_stream(mame_file *file);
+	// device_mc146818_interface overrides
+	virtual void nvram_default();
+	virtual void nvram_read(mame_file &file);
+	virtual void nvram_write(mame_file &file);
 
-NVRAM_HANDLER( mc146818 );
+	// internal helpers
+	int dec_2_local(int a);
+	void set_base_datetime();
+	
+	// internal state
+	static const int MC146818_DATA_SIZE	= 0x80;
 
-READ8_HANDLER(mc146818_port_r);
-WRITE8_HANDLER(mc146818_port_w);
+	const mc146818_device_config &	m_config;
 
-READ16_HANDLER(mc146818_port16le_r);
-WRITE16_HANDLER(mc146818_port16le_w);
+	UINT8 			m_index;
+	UINT8 			m_data[MC146818_DATA_SIZE];
 
-READ32_HANDLER(mc146818_port32le_r);
-WRITE32_HANDLER(mc146818_port32le_w);
+	UINT16 			m_eindex;
+	UINT8 			m_edata[0x2000];
 
-READ64_HANDLER(mc146818_port64be_r);
-WRITE64_HANDLER(mc146818_port64be_w);
+	bool 			m_updated;  /* update ended interrupt flag */
 
-#endif /* MC146818_H */
+	attotime 		m_last_refresh;
+};
+
+
+// device type definition
+extern const device_type MC146818;
+
+
+#endif /* __MC146818_H__ */

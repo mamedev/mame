@@ -509,7 +509,7 @@ static ADDRESS_MAP_START(gamecstl_io, ADDRESS_SPACE_IO, 32)
 	AM_RANGE(0x0020, 0x003f) AM_DEVREADWRITE8("pic8259_1", pic8259_r, pic8259_w, 0xffffffff)
 	AM_RANGE(0x0040, 0x005f) AM_DEVREADWRITE8("pit8254", pit8253_r, pit8253_w, 0xffffffff)
 	AM_RANGE(0x0060, 0x006f) AM_READWRITE(kbdc8042_32le_r,			kbdc8042_32le_w)
-	AM_RANGE(0x0070, 0x007f) AM_READWRITE(mc146818_port32le_r,		mc146818_port32le_w)
+	AM_RANGE(0x0070, 0x007f) AM_DEVREADWRITE8_MODERN("rtc", mc146818_device, read, write, 0xffffffff)
 	AM_RANGE(0x0080, 0x009f) AM_READWRITE(at_page32_r,				at_page32_w)
 	AM_RANGE(0x00a0, 0x00bf) AM_DEVREADWRITE8("pic8259_2", pic8259_r, pic8259_w, 0xffffffff)
 	AM_RANGE(0x00c0, 0x00df) AM_DEVREADWRITE("dma8237_2", at32_dma8237_2_r, at32_dma8237_2_w)
@@ -682,7 +682,7 @@ static MACHINE_CONFIG_START( gamecstl, driver_device )
 
 	MDRV_IDE_CONTROLLER_ADD("ide", ide_interrupt)
 
-	MDRV_NVRAM_HANDLER( mc146818 )
+	MDRV_MC146818_ADD( "rtc", MC146818_STANDARD )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -735,7 +735,6 @@ static DRIVER_INIT( gamecstl )
 	bios_ram = auto_alloc_array(machine, UINT32, 0x10000/4);
 
 	init_pc_common(machine, PCCOMMON_KEYBOARD_AT, gamecstl_set_keyb_int);
-	mc146818_init(machine, MC146818_STANDARD);
 
 	intel82439tx_init();
 

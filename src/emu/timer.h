@@ -63,8 +63,6 @@ typedef void (*timer_fired_func)(running_machine *machine, void *ptr, INT32 para
 typedef void (*timer_device_fired_func)(timer_device &timer, void *ptr, INT32 param);
 
 
-
-
 struct timer_execution_state
 {
 	attotime				nextfire;		/* time that the head of the timer list will fire */
@@ -149,6 +147,9 @@ int timer_count_anonymous(running_machine *machine);
 
 /* allocate a permament timer that isn't primed yet */
 emu_timer *_timer_alloc_internal(running_machine *machine, timer_fired_func callback, void *param, const char *file, int line, const char *func);
+
+/* allocate a permament device timer that isn't primed yet */
+emu_timer *device_timer_alloc(device_t &device, void *ptr = NULL, int param = 0);
 
 /* adjust the time when this timer will fire and disable any periodic firings */
 void timer_adjust_oneshot(emu_timer *which, attotime duration, INT32 param);

@@ -126,6 +126,7 @@ class device_memory_interface;
 class device_state_interface;
 struct rom_entry;
 class machine_config;
+class emu_timer;
 
 
 // exception classes
@@ -405,6 +406,8 @@ public:
 	const region_info *subregion(const char *tag) const;
 	device_t *subdevice(const char *tag) const;
 	device_t *siblingdevice(const char *tag) const;
+	template<class T> inline T *subdevice(const char *tag) { return downcast<T *>(subdevice(tag)); }
+	template<class T> inline T *siblingdevice(const char *tag) { return downcast<T *>(siblingdevice(tag)); }
 
 	// configuration helpers
 	const device_config &baseconfig() const { return m_baseconfig; }
@@ -422,6 +425,7 @@ public:
 	void set_clock_scale(double clockscale);
 	attotime clocks_to_attotime(UINT64 clocks) const;
 	UINT64 attotime_to_clocks(attotime duration) const;
+	void timer_fired(emu_timer &timer, int param, void *ptr) { device_timer(timer, param, ptr); }
 
 	// debugging
 	device_debug *debug() const { return m_debug; }
@@ -456,6 +460,7 @@ protected:
 	virtual void device_post_load();
 	virtual void device_clock_changed();
 	virtual void device_debug_setup();
+	virtual void device_timer(emu_timer &timer, int param, void *ptr);
 
 	//------------------- end derived class overrides
 
