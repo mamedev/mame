@@ -1049,6 +1049,9 @@ All chips are ST M27C4001
 
 Name_Board Location        Version               Use             Checksum
 -------------------------------------------------------------------------
+TM2K_v463.u51              4.63 Game Program & Cpu instructions   2342
+TM2K_v463.u52              4.63 Game Program & Cpu instructions   4619
+
 TM2K_v402.u51              4.02 Game Program & Cpu instructions   c517
 TM2K_v402.u52              4.02 Game Program & Cpu instructions   e82c
 
@@ -1059,13 +1062,33 @@ TM2K_graphic.u36           4.00 Video Images & Graphics           20cb
 TM2K_graphic.u37           4.00 Video Images & Graphics           f5cf
 TM2K_graphic.u38           4.00 Video Images & Graphics           14c7
 TM2K_graphic.u39           4.00 Video Images & Graphics           043e
-TM2K_sound.u8              1.0  Audio Program & sounds            9307
+TM2K_graphic.u40           4.62 Video Images & Graphics           14c7
+TM2K_graphic.u41           4.62 Video Images & Graphics           9334
+TM2K_sound.u8              1.0  Audio Program & sounds            dbde
 
 Does not require a security key
 
 ***************************************************************************/
 
 ROM_START( tm2k )
+	ROM_REGION( 0x200000, "maincpu", 0 ) // 68000 Code
+	ROM_LOAD16_BYTE( "tm2k_v463.u51", 0x000000, 0x100000, CRC(f73fdb23) SHA1(d0a5e98d5de85fd3f29d1efe6b7aebe9e348c59b) ) /* Ver: 4.63 Standard 9-3-97 */
+	ROM_LOAD16_BYTE( "tm2k_v463.u52", 0x000001, 0x100000, CRC(79ac719c) SHA1(7717362ea42fc36009e0fed430f07c946553bfd3) ) /* Ver: 4.63 Standard 9-3-97 */
+
+	ROM_REGION( 0x600000, "blitter", ROMREGION_ERASE )	// Blitter gfx
+	ROM_LOAD16_BYTE( "tm2k_graphic.u38", 0x100000, 0x080000, CRC(22bb6cc5) SHA1(fc6cfd4e1e6e1455d648a7b63f2c8e37cdfe86d6) ) /* First 4 graphic roms marked as Rev 4.00 */
+	ROM_LOAD16_BYTE( "tm2k_graphic.u36", 0x100001, 0x080000, CRC(7f0840ac) SHA1(1c3af419d571579a3f2c561617d55914d28ef22b) )
+	ROM_LOAD16_BYTE( "tm2k_graphic.u39", 0x300000, 0x080000, CRC(059e1bd8) SHA1(7451c1cfa0d090b0566e353738a1ffba732a8ad2) )
+	ROM_LOAD16_BYTE( "tm2k_graphic.u37", 0x300001, 0x080000, CRC(4cf65950) SHA1(74d49166da19ecc4b8fc1e8e3f01361dfb645eea) )
+	ROM_LOAD16_BYTE( "tm2k_graphic.u41", 0x500000, 0x080000, CRC(abac4ad3) SHA1(d3944a39b46f3e67ddb0ff7047685c6c716a393c) ) /* Last 2 graphics roms marked as Rev 4.62 */
+	ROM_LOAD16_BYTE( "tm2k_graphic.u40", 0x500001, 0x080000, CRC(ca86b9a2) SHA1(bb639af4e0ee48c3231de5f0a0f14de20836216a) )
+
+	ROM_REGION( 0x100000, "oki", 0 ) // Samples
+	ROM_LOAD( "tm2k_sound.u8", 0x40000, 0x040000, CRC(f39ad4cf) SHA1(9bcb9a5dd3636d6541eeb3e737c7253ab0ed4e8d) ) /* Marked as Rev 1.0 */
+	ROM_CONTINUE(              0xc0000, 0x040000 )
+ROM_END
+
+ROM_START( tm2ka )
 	ROM_REGION( 0x200000, "maincpu", 0 ) // 68000 Code
 	ROM_LOAD16_BYTE( "tm2k_v402.u51", 0x000000, 0x080000, CRC(47269aeb) SHA1(6b7ebfde290f7d21a36a72b00dc6523490581edb) ) /* Ver: 4.02 Standard 5-30-97 */
 	ROM_LOAD16_BYTE( "tm2k_v402.u52", 0x000001, 0x080000, CRC(2e3564ac) SHA1(9a71f38841bc17c291cb3f513b18ebe50fc18d9f) ) /* Ver: 4.02 Standard 5-30-97 */
@@ -1075,13 +1098,14 @@ ROM_START( tm2k )
 	ROM_LOAD16_BYTE( "tm2k_graphic.u36", 0x100001, 0x080000, CRC(7f0840ac) SHA1(1c3af419d571579a3f2c561617d55914d28ef22b) )
 	ROM_LOAD16_BYTE( "tm2k_graphic.u39", 0x300000, 0x080000, CRC(059e1bd8) SHA1(7451c1cfa0d090b0566e353738a1ffba732a8ad2) )
 	ROM_LOAD16_BYTE( "tm2k_graphic.u37", 0x300001, 0x080000, CRC(4cf65950) SHA1(74d49166da19ecc4b8fc1e8e3f01361dfb645eea) )
+	/* Sockets U40 & U41 not populated with earlier Touchmaster 2000 sets */
 
 	ROM_REGION( 0x100000, "oki", 0 ) // Samples
 	ROM_LOAD( "tm2k_sound.u8", 0x40000, 0x040000, CRC(f39ad4cf) SHA1(9bcb9a5dd3636d6541eeb3e737c7253ab0ed4e8d) ) /* Marked as Rev 1.0 */
 	ROM_CONTINUE(              0xc0000, 0x040000 )
 ROM_END
 
-ROM_START( tm2ka )
+ROM_START( tm2kb )
 	ROM_REGION( 0x200000, "maincpu", 0 ) // 68000 Code
 	ROM_LOAD16_BYTE( "tm2k_v400.u51", 0x000000, 0x080000, CRC(c110502b) SHA1(e9415ed23b9bb0851548e75c208ebcbe6ac2a708) ) /* Ver: 4.00 Standard 5-16-97 */
 	ROM_LOAD16_BYTE( "tm2k_v400.u52", 0x000001, 0x080000, CRC(a17c1d6e) SHA1(5ecb8f27f75469ab9600b3f640eb1acc7a3980e0) ) /* Ver: 4.00 Standard 5-16-97 */
@@ -1091,6 +1115,7 @@ ROM_START( tm2ka )
 	ROM_LOAD16_BYTE( "tm2k_graphic.u36", 0x100001, 0x080000, CRC(7f0840ac) SHA1(1c3af419d571579a3f2c561617d55914d28ef22b) )
 	ROM_LOAD16_BYTE( "tm2k_graphic.u39", 0x300000, 0x080000, CRC(059e1bd8) SHA1(7451c1cfa0d090b0566e353738a1ffba732a8ad2) )
 	ROM_LOAD16_BYTE( "tm2k_graphic.u37", 0x300001, 0x080000, CRC(4cf65950) SHA1(74d49166da19ecc4b8fc1e8e3f01361dfb645eea) )
+	/* Sockets U40 & U41 not populated with earlier Touchmaster 2000 sets */
 
 	ROM_REGION( 0x100000, "oki", 0 ) // Samples
 	ROM_LOAD( "tm2k_sound.u8", 0x40000, 0x040000, CRC(f39ad4cf) SHA1(9bcb9a5dd3636d6541eeb3e737c7253ab0ed4e8d) ) /* Marked as Rev 1.0 */
@@ -1182,7 +1207,10 @@ TM4K_v603.u52              6.03 Game Program & Cpu instructions 2842
 TM4K_v602.u51              6.02 Game Program & Cpu instructions FEA0
 TM4K_v602.u52              6.02 Game Program & Cpu instructions 9A71
 
-TM4K_graphic.u36           6.0  Video Images & Graphics         54f1 (same as TM3K)
+TM4K_v601.u51              6.01 Game Program & Cpu instructions 6FF1
+TM4K_v601.u52              6.01 Game Program & Cpu instructions 6643
+
+TM4K_graphic.u36           6.0  Video Images & Graphics         54F1 (same as TM3K)
 TM4K_graphic.u37           6.0  Video Images & Graphics         609E
 TM4K_graphic.u38           6.0  Video Images & Graphics         5493 (same as TM3K)
 TM4K_graphic.u39           6.0  Video Images & Graphics         CB90
@@ -1215,6 +1243,23 @@ ROM_START( tm4ka )
 	ROM_REGION( 0x200000, "maincpu", 0 ) // 68000 Code
 	ROM_LOAD16_BYTE( "tm4k_v602.u51", 0x000000, 0x100000, CRC(3d8d7848) SHA1(31638f23cdd5e6cfbb2270e953f84fe1bd437950) ) /* TOUCHMASTER 4000 U51 DOMESTIC  6.02 (Standard 4-14-98) */
 	ROM_LOAD16_BYTE( "tm4k_v602.u52", 0x000001, 0x100000, CRC(6d412871) SHA1(ae27c7723b292daf6682c53bafac22e4a3cd1ece) ) /* TOUCHMASTER 4000 U52 DOMESTIC  6.02 (Standard 4-14-98) */
+
+	ROM_REGION( 0x600000, "blitter", 0 )	// Blitter gfx
+	ROM_LOAD16_BYTE( "tm4k_graphic.u38", 0x000000, 0x100000, CRC(a6683899) SHA1(d05024390917cdb1871d030996da8e1eb6460918) ) /* Mask rom labeled 5341-15746-03 U38 VIDEO IMAGE */
+	ROM_LOAD16_BYTE( "tm4k_graphic.u36", 0x000001, 0x100000, CRC(7bde520d) SHA1(77750b689e2f0d47804042456e54bbd9c28deeac) ) /* Mask rom labeled 5341-15746-01 U36 VIDEO IMAGE */
+	ROM_LOAD16_BYTE( "tm4k_graphic.u39", 0x200000, 0x100000, CRC(bac88cfb) SHA1(26ed169296b890c5f5b50c418c15299355a6592f) ) /* Mask rom labeled 5341-15746-04 U39 VIDEO IMAGE */
+	ROM_LOAD16_BYTE( "tm4k_graphic.u37", 0x200001, 0x100000, CRC(bf49fafa) SHA1(b400667bf654dc9cd01a85c8b99670459400fd60) ) /* Mask rom labeled 5341-15746-02 U37 VIDEO IMAGE */
+	ROM_LOAD16_BYTE( "tm4k_graphic.u41", 0x400000, 0x100000, CRC(e97edb1e) SHA1(75510676cf1692ad03efd4ccd57d25af1cc8ef2a) ) /* Mask rom labeled 5341-15746-06 U41 VIDEO IMAGE */
+	ROM_LOAD16_BYTE( "tm4k_graphic.u40", 0x400001, 0x100000, CRC(f6771a09) SHA1(74f71d5e910006c83a38170f24aa811c38a3e020) ) /* Mask rom labeled 5341-15746-05 U40 VIDEO IMAGE */
+
+	ROM_REGION( 0x100000, "oki", 0 ) // Samples
+	ROM_LOAD( "tm4k_sound.u8", 0x00000, 0x100000, CRC(48c3782b) SHA1(bfe105ddbde8bbbd84665dfdd565d6d41926834a) ) /* Mask rom labeled 5341-15746-07 U8 SOUND IMAGE */
+ROM_END
+
+ROM_START( tm4kb )
+	ROM_REGION( 0x200000, "maincpu", 0 ) // 68000 Code
+	ROM_LOAD16_BYTE( "tm4k_v601.u51", 0x000000, 0x100000, CRC(cdcfd064) SHA1(51f022d25411d119a5f16ff7f09f4bed59b937e1) ) /* TOUCHMASTER 4000 U51 DOMESTIC  6.01 (Standard 3-23-98) */
+	ROM_LOAD16_BYTE( "tm4k_v601.u52", 0x000001, 0x100000, CRC(e0bf71a9) SHA1(8f5e70dee60cd95aceac4707ff73bdff578a6139) ) /* TOUCHMASTER 4000 U52 DOMESTIC  6.01 (Standard 3-23-98) */
 
 	ROM_REGION( 0x600000, "blitter", 0 )	// Blitter gfx
 	ROM_LOAD16_BYTE( "tm4k_graphic.u38", 0x000000, 0x100000, CRC(a6683899) SHA1(d05024390917cdb1871d030996da8e1eb6460918) ) /* Mask rom labeled 5341-15746-03 U38 VIDEO IMAGE */
@@ -1590,6 +1635,28 @@ Protection starts:
 
 }
 
+
+static DRIVER_INIT( tm4kb )
+{
+	UINT16 *ROM = (UINT16 *)memory_region( machine, "maincpu" );
+
+	// protection
+	ROM[0x82b7a/2] = 0x4e75;
+
+	ROM[0x82b30/2] = 0x601a;
+	ROM[0x82b70/2] = 0x6002;
+/*
+Protection starts:
+
+ 82B20: addi.w  #$384, D0       0640 0384
+ 82B24: move.w  D0, $207a84.l   33C0 0020 7A84
+ 82B2A: btst    #$7, ($1,A5)    082D 0007 0001
+ 82B30: beq     $83448          671A           <-- First patch goes here
+
+*/
+
+}
+
 static DRIVER_INIT( tm5k )
 {
 	UINT16 *ROM = (UINT16 *)memory_region( machine, "maincpu" );
@@ -1793,21 +1860,23 @@ static DRIVER_INIT( galgame2 )
 }
 
 
-GAME( 1996, tm,       0,        tm,       tm,       0,        ROT0, "CES Inc., Midway Games Inc.",             "Touchmaster (v3.00 Euro)",            0 )
-GAME( 1996, tmdo,     tm,       tm,       tm,       0,        ROT0, "CES Inc., Midway Games Inc.",             "Touchmaster (v2.2-01 Standard)",      0 )
-GAME( 1996, tm2k,     0,        tm3k,     tmaster,  0,        ROT0, "Midway Games Inc.",                       "Touchmaster 2000 (v4.02 Standard)",   0 )
-GAME( 1996, tm2ka,    tm2k,     tm3k,     tmaster,  0,        ROT0, "Midway Games Inc.",                       "Touchmaster 2000 (v4.00 Standard)",   0 )
-GAME( 1997, tm3k,     0,        tm3k,     tmaster,  0,        ROT0, "Midway Games Inc.",                       "Touchmaster 3000 (v5.02 Standard)",   0 )
-GAME( 1997, tm3ka,    tm3k,     tm3k,     tmaster,  0,        ROT0, "Midway Games Inc.",                       "Touchmaster 3000 (v5.01 Standard)",   0 )
-GAME( 1998, tm4k,     0,        tm3k,     tmaster,  tm4k,     ROT0, "Midway Games Inc.",                       "Touchmaster 4000 (v6.03 Standard)",   0 )
-GAME( 1998, tm4ka,    tm4k,     tm3k,     tmaster,  tm4ka,    ROT0, "Midway Games Inc.",                       "Touchmaster 4000 (v6.02 Standard)",   0 )
-GAME( 1998, tm5k,     0,        tm3k,     tmaster,  tm5k,     ROT0, "Midway Games Inc.",                       "Touchmaster 5000 (v7.10 Standard)",   0 )
-GAME( 1998, tm5kca,   tm5k,     tm3k,     tmaster,  tm5kca,   ROT0, "Midway Games Inc.",                       "Touchmaster 5000 (v7.10 California)", 0 )
-GAME( 1998, tm5ka,    tm5k,     tm3k,     tmaster,  tm5ka,    ROT0, "Midway Games Inc.",                       "Touchmaster 5000 (v7.01 Standard)",   0 )
-GAME( 1999, tm7k,     0,        tm3k,     tmaster,  tm7k,     ROT0, "Midway Games Inc.",                       "Touchmaster 7000 (v8.04 Standard)",   0 )
-GAME( 1999, tm7ka,    tm7k,     tm3k,     tmaster,  tm7ka,    ROT0, "Midway Games Inc.",                       "Touchmaster 7000 (v8.00 Standard)",   0 )
-GAME( 1999, tm7keval, tm7k,     tm3k,     tmaster,  tm7keval, ROT0, "Midway Games Inc.",                       "Touchmaster 7000 (v8.1X Evaluation)", 0 )
-GAME( 2000, tm8k,     0,        tm3k,     tmaster,  tm8k,     ROT0, "Midway Games Inc.",                       "Touchmaster 8000 (v9.04 Standard)",   0 )
-GAME( 2000, tm8k902,  tm8k,     tm3k,     tmaster,  tm8k,     ROT0, "Midway Games Inc.",                       "Touchmaster 8000 (v9.02 Standard)",   0 )
-GAME( 1998, galgbios, 0,        galgames, galgames, galgames, ROT0, "Creative Electronics & Software",         "Galaxy Games (BIOS v1.90)",           GAME_IS_BIOS_ROOT )
-GAME( 1998, galgame2, galgbios, galgame2, galgames, galgame2, ROT0, "Creative Electronics & Software / Namco", "Galaxy Games StarPak 2",              0 )
+GAME( 1996, tm,       0,        tm,       tm,       0,        ROT0, "CES Inc., Midway Games Inc.",             "Touchmaster (v3.00 Euro)",               0 )
+GAME( 1996, tmdo,     tm,       tm,       tm,       0,        ROT0, "CES Inc., Midway Games Inc.",             "Touchmaster (v2.2-01 Standard)",         0 )
+GAME( 1996, tm2k,     0,        tm3k,     tmaster,  0,        ROT0, "Midway Games Inc.",                       "Touchmaster 2000 Plus (v4.63 Standard)", 0 )
+GAME( 1996, tm2ka,    tm2k,     tm3k,     tmaster,  0,        ROT0, "Midway Games Inc.",                       "Touchmaster 2000 (v4.02 Standard)",      0 )
+GAME( 1996, tm2kb,    tm2k,     tm3k,     tmaster,  0,        ROT0, "Midway Games Inc.",                       "Touchmaster 2000 (v4.00 Standard)",      0 )
+GAME( 1997, tm3k,     0,        tm3k,     tmaster,  0,        ROT0, "Midway Games Inc.",                       "Touchmaster 3000 (v5.02 Standard)",      0 )
+GAME( 1997, tm3ka,    tm3k,     tm3k,     tmaster,  0,        ROT0, "Midway Games Inc.",                       "Touchmaster 3000 (v5.01 Standard)",      0 )
+GAME( 1998, tm4k,     0,        tm3k,     tmaster,  tm4k,     ROT0, "Midway Games Inc.",                       "Touchmaster 4000 (v6.03 Standard)",      0 )
+GAME( 1998, tm4ka,    tm4k,     tm3k,     tmaster,  tm4ka,    ROT0, "Midway Games Inc.",                       "Touchmaster 4000 (v6.02 Standard)",      0 )
+GAME( 1998, tm4kb,    tm4k,     tm3k,     tmaster,  tm4kb,    ROT0, "Midway Games Inc.",                       "Touchmaster 4000 (v6.01 Standard)",      0 )
+GAME( 1998, tm5k,     0,        tm3k,     tmaster,  tm5k,     ROT0, "Midway Games Inc.",                       "Touchmaster 5000 (v7.10 Standard)",      0 )
+GAME( 1998, tm5kca,   tm5k,     tm3k,     tmaster,  tm5kca,   ROT0, "Midway Games Inc.",                       "Touchmaster 5000 (v7.10 California)",    0 )
+GAME( 1998, tm5ka,    tm5k,     tm3k,     tmaster,  tm5ka,    ROT0, "Midway Games Inc.",                       "Touchmaster 5000 (v7.01 Standard)",      0 )
+GAME( 1999, tm7k,     0,        tm3k,     tmaster,  tm7k,     ROT0, "Midway Games Inc.",                       "Touchmaster 7000 (v8.04 Standard)",      0 )
+GAME( 1999, tm7ka,    tm7k,     tm3k,     tmaster,  tm7ka,    ROT0, "Midway Games Inc.",                       "Touchmaster 7000 (v8.00 Standard)",      0 )
+GAME( 1999, tm7keval, tm7k,     tm3k,     tmaster,  tm7keval, ROT0, "Midway Games Inc.",                       "Touchmaster 7000 (v8.1X Evaluation)",    0 )
+GAME( 2000, tm8k,     0,        tm3k,     tmaster,  tm8k,     ROT0, "Midway Games Inc.",                       "Touchmaster 8000 (v9.04 Standard)",      0 )
+GAME( 2000, tm8k902,  tm8k,     tm3k,     tmaster,  tm8k,     ROT0, "Midway Games Inc.",                       "Touchmaster 8000 (v9.02 Standard)",      0 )
+GAME( 1998, galgbios, 0,        galgames, galgames, galgames, ROT0, "Creative Electronics & Software",         "Galaxy Games (BIOS v1.90)",              GAME_IS_BIOS_ROOT )
+GAME( 1998, galgame2, galgbios, galgame2, galgames, galgame2, ROT0, "Creative Electronics & Software / Namco", "Galaxy Games StarPak 2",                 0 )
