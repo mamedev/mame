@@ -43,6 +43,14 @@
 
 
 //**************************************************************************
+//  DEVICE DEFINITIONS
+//**************************************************************************
+
+const device_type NVRAM = nvram_device_config::static_alloc_device_config;
+
+
+
+//**************************************************************************
 //  DEVICE CONFIGURATION
 //**************************************************************************
 
@@ -99,6 +107,7 @@ void nvram_device_config::static_set_default_value(device_config *device, defaul
 void nvram_device_config::static_set_custom_handler(device_config *device, nvram_init_proto_delegate handler)
 {
 	nvram_device_config *nvram = downcast<nvram_device_config *>(device);
+	nvram->m_default_value = DEFAULT_CUSTOM;
 	nvram->m_custom_handler = handler;
 }
 
@@ -208,6 +217,3 @@ void nvram_device::nvram_write(mame_file &file)
 {
 	mame_fwrite(&file, m_base, m_length);
 }
-
-
-const device_type NVRAM = nvram_device_config::static_alloc_device_config;
