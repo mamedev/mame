@@ -161,7 +161,7 @@ static WRITE16_HANDLER( sync_w )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x09ffff) AM_ROM
-	AM_RANGE(0x0e0000, 0x0e0fff) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_BASE_SIZE_MEMBER(eprom_state, eeprom, eeprom_size)
+	AM_RANGE(0x0e0000, 0x0e0fff) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_SHARE("eeprom")
 	AM_RANGE(0x16cc00, 0x16cc01) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0x160000, 0x16ffff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x1f0000, 0x1fffff) AM_WRITE(atarigen_eeprom_enable_w)
@@ -186,7 +186,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( guts_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x09ffff) AM_ROM
-	AM_RANGE(0x0e0000, 0x0e0fff) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_BASE_SIZE_MEMBER(eprom_state, eeprom, eeprom_size)
+	AM_RANGE(0x0e0000, 0x0e0fff) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_SHARE("eeprom")
 	AM_RANGE(0x16cc00, 0x16cc01) AM_RAM AM_SHARE("share2")
 	AM_RANGE(0x160000, 0x16ffff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x1f0000, 0x1fffff) AM_WRITE(atarigen_eeprom_enable_w)
@@ -420,7 +420,7 @@ static MACHINE_CONFIG_START( eprom, eprom_state )
 
 	MDRV_MACHINE_START(eprom)
 	MDRV_MACHINE_RESET(eprom)
-	MDRV_NVRAM_HANDLER(atarigen)
+	MDRV_NVRAM_ADD_1FILL("eeprom")
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -452,7 +452,7 @@ static MACHINE_CONFIG_START( klaxp, eprom_state )
 
 	MDRV_MACHINE_START(eprom)
 	MDRV_MACHINE_RESET(eprom)
-	MDRV_NVRAM_HANDLER(atarigen)
+	MDRV_NVRAM_ADD_1FILL("eeprom")
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -484,7 +484,7 @@ static MACHINE_CONFIG_START( guts, eprom_state )
 
 	MDRV_MACHINE_START(eprom)
 	MDRV_MACHINE_RESET(eprom)
-	MDRV_NVRAM_HANDLER(atarigen)
+	MDRV_NVRAM_ADD_1FILL("eeprom")
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)

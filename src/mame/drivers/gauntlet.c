@@ -310,7 +310,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	/* MBUS */
 	AM_RANGE(0x800000, 0x801fff) AM_MIRROR(0x2fc000) AM_RAM
-	AM_RANGE(0x802000, 0x802fff) AM_MIRROR(0x2fc000) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_BASE_SIZE_MEMBER(gauntlet_state, eeprom, eeprom_size)
+	AM_RANGE(0x802000, 0x802fff) AM_MIRROR(0x2fc000) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_SHARE("eeprom")
 	AM_RANGE(0x803000, 0x803001) AM_MIRROR(0x2fcef0) AM_READ_PORT("803000")
 	AM_RANGE(0x803002, 0x803003) AM_MIRROR(0x2fcef0) AM_READ_PORT("803002")
 	AM_RANGE(0x803004, 0x803005) AM_MIRROR(0x2fcef0) AM_READ_PORT("803004")
@@ -525,7 +525,7 @@ static MACHINE_CONFIG_START( gauntlet, gauntlet_state )
 
 	MDRV_MACHINE_START(gauntlet)
 	MDRV_MACHINE_RESET(gauntlet)
-	MDRV_NVRAM_HANDLER(atarigen)
+	MDRV_NVRAM_ADD_1FILL("eeprom")
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)

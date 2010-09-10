@@ -114,25 +114,10 @@
 #include "sound/okim6295.h"
 #include "sound/sn76496.h"
 #include "machine/8255ppi.h"
+#include "machine/nvram.h"
 #include "includes/goldstar.h"
 
 #include "lucky8.lh"
-
-
-static NVRAM_HANDLER( goldstar )
-{
-	goldstar_state *state = machine->driver_data<goldstar_state>();
-
-	if (read_or_write)
-		mame_fwrite(file,state->nvram,state->nvram_size);
-	else
-	{
-		if (file)
-			mame_fread(file,state->nvram,state->nvram_size);
-		else
-			memset(state->nvram,0xff,state->nvram_size);
-	}
-}
 
 
 static WRITE8_HANDLER( protection_w )
@@ -154,7 +139,7 @@ static READ8_HANDLER( protection_r )
 
 static ADDRESS_MAP_START( goldstar_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xb7ff) AM_ROM
-	AM_RANGE(0xb800, 0xbfff) AM_RAM AM_BASE_MEMBER(goldstar_state,nvram) AM_SIZE_MEMBER(goldstar_state,nvram_size)
+	AM_RANGE(0xb800, 0xbfff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xc000, 0xc7ff) AM_ROM
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE( goldstar_fg_vidram_w ) AM_BASE_MEMBER(goldstar_state,fg_vidram)
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE( goldstar_fg_atrram_w ) AM_BASE_MEMBER(goldstar_state,fg_atrram)
@@ -197,7 +182,7 @@ static WRITE8_HANDLER( ncb3_port81_w )
 
 static ADDRESS_MAP_START( ncb3_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xb7ff) AM_ROM
-	AM_RANGE(0xb800, 0xbfff) AM_RAM AM_BASE_MEMBER(goldstar_state,nvram) AM_SIZE_MEMBER(goldstar_state,nvram_size)
+	AM_RANGE(0xb800, 0xbfff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xc000, 0xc7ff) AM_ROM
 	AM_RANGE(0xc800, 0xcfff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_BASE_MEMBER(goldstar_state,fg_vidram)
 	AM_RANGE(0xd000, 0xd7ff) AM_RAM_WRITE(goldstar_fg_atrram_w) AM_BASE_MEMBER(goldstar_state,fg_atrram)
@@ -270,7 +255,7 @@ static WRITE8_HANDLER( cm_outport1_w )
 static ADDRESS_MAP_START( cm_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xcfff) AM_ROM AM_WRITENOP
 
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE_MEMBER(goldstar_state,nvram) AM_SIZE_MEMBER(goldstar_state,nvram_size)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("nvram")
 
 
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_BASE_MEMBER(goldstar_state,fg_vidram)
@@ -292,7 +277,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( nfm_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xd7ff) AM_ROM AM_WRITENOP
 
-	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_BASE_MEMBER(goldstar_state,nvram) AM_SIZE_MEMBER(goldstar_state,nvram_size)
+	AM_RANGE(0xd800, 0xdfff) AM_RAM AM_SHARE("nvram")
 
 
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_BASE_MEMBER(goldstar_state,fg_vidram)
@@ -377,7 +362,7 @@ static WRITE8_HANDLER( lucky8_outport_w )
 
 static ADDRESS_MAP_START( lucky8_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE_MEMBER(goldstar_state,nvram) AM_SIZE_MEMBER(goldstar_state,nvram_size)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_BASE_MEMBER(goldstar_state,fg_vidram)
 	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(goldstar_fg_atrram_w) AM_BASE_MEMBER(goldstar_state,fg_atrram)
 	AM_RANGE(0x9800, 0x99ff) AM_RAM_WRITE(goldstar_reel1_ram_w) AM_BASE_MEMBER(goldstar_state,reel1_ram)
@@ -422,7 +407,7 @@ static WRITE8_HANDLER( magical_outb860_w )
 static ADDRESS_MAP_START(magical_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	// where does the extra rom data map?? it seems like it should come straight after the existing rom, but it can't if this is a plain z80?
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("share1") AM_BASE_MEMBER(goldstar_state,nvram) AM_SIZE_MEMBER(goldstar_state,nvram_size)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("share1") AM_SHARE("nvram")
 	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_BASE_MEMBER(goldstar_state,fg_vidram)
 	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(goldstar_fg_atrram_w) AM_BASE_MEMBER(goldstar_state,fg_atrram)
 	AM_RANGE(0x9800, 0x99ff) AM_RAM_WRITE(goldstar_reel1_ram_w) AM_BASE_MEMBER(goldstar_state,reel1_ram)
@@ -484,7 +469,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ladylinr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE_MEMBER(goldstar_state,nvram) AM_SIZE_MEMBER(goldstar_state,nvram_size)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_BASE_MEMBER(goldstar_state,fg_vidram)
 	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(goldstar_fg_atrram_w) AM_BASE_MEMBER(goldstar_state,fg_atrram)
 	AM_RANGE(0x9800, 0x99ff) AM_RAM_WRITE(goldstar_reel1_ram_w) AM_BASE_MEMBER(goldstar_state,reel1_ram)
@@ -505,7 +490,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( wcat3_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_BASE_MEMBER(goldstar_state,nvram) AM_SIZE_MEMBER(goldstar_state,nvram_size)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x8800, 0x8fff) AM_RAM_WRITE(goldstar_fg_vidram_w) AM_BASE_MEMBER(goldstar_state,fg_vidram)
 	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(goldstar_fg_atrram_w) AM_BASE_MEMBER(goldstar_state,fg_atrram)
 	AM_RANGE(0x9800, 0x99ff) AM_RAM_WRITE(goldstar_reel1_ram_w) AM_BASE_MEMBER(goldstar_state,reel1_ram)
@@ -542,7 +527,7 @@ static ADDRESS_MAP_START( unkch_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xc1ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_split1_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xc800, 0xc9ff) AM_RAM_WRITE(paletteram_xBBBBBGGGGGRRRRR_split2_w) AM_BASE_GENERIC(paletteram2)
 
-	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_BASE_MEMBER(goldstar_state,nvram) AM_SIZE_MEMBER(goldstar_state,nvram_size)
+	AM_RANGE(0xd000, 0xd7ff) AM_RAM AM_SHARE("nvram")
 
 	AM_RANGE(0xd840, 0xd87f) AM_RAM AM_BASE_MEMBER(goldstar_state,reel1_scroll)
 	AM_RANGE(0xd880, 0xd8bf) AM_RAM AM_BASE_MEMBER(goldstar_state,reel2_scroll)
@@ -5529,7 +5514,7 @@ static MACHINE_CONFIG_START( goldstar, goldstar_state )
 
 	MDRV_GFXDECODE(goldstar)
 	MDRV_PALETTE_LENGTH(256)
-	MDRV_NVRAM_HANDLER(goldstar)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	MDRV_VIDEO_START(goldstar)
 	MDRV_VIDEO_UPDATE(goldstar)
@@ -5564,7 +5549,7 @@ static MACHINE_CONFIG_START( goldstbl, goldstar_state )
 
 	MDRV_GFXDECODE(bl)
 	MDRV_PALETTE_LENGTH(256)
-	MDRV_NVRAM_HANDLER(goldstar)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	MDRV_VIDEO_START(goldstar)
 	MDRV_VIDEO_UPDATE(goldstar)
@@ -5598,7 +5583,7 @@ static MACHINE_CONFIG_START( moonlght, goldstar_state )
 
 	MDRV_GFXDECODE(ml)
 	MDRV_PALETTE_LENGTH(256)
-	MDRV_NVRAM_HANDLER(goldstar)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	MDRV_VIDEO_START(goldstar)
 	MDRV_VIDEO_UPDATE(goldstar)
@@ -5699,7 +5684,7 @@ static MACHINE_CONFIG_START( chrygld, goldstar_state )
 	MDRV_GFXDECODE(chry10)
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_PALETTE_INIT(cm)
-	MDRV_NVRAM_HANDLER(goldstar)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	MDRV_VIDEO_START(goldstar)
 	MDRV_VIDEO_UPDATE(goldstar)
@@ -5741,7 +5726,7 @@ static MACHINE_CONFIG_START( cb3c, goldstar_state )
 	MDRV_GFXDECODE(cb3c)
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_PALETTE_INIT(cm)
-	MDRV_NVRAM_HANDLER(goldstar)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	MDRV_VIDEO_START(goldstar)
 	MDRV_VIDEO_UPDATE(goldstar)
@@ -5783,7 +5768,7 @@ static MACHINE_CONFIG_START( ncb3, goldstar_state )
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_PALETTE_INIT(cm)
 
-	MDRV_NVRAM_HANDLER(goldstar)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	MDRV_VIDEO_START(goldstar)
 	MDRV_VIDEO_UPDATE(goldstar)
@@ -5823,7 +5808,7 @@ static MACHINE_CONFIG_START( cm, goldstar_state )
 	MDRV_GFXDECODE(cmbitmap)
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_PALETTE_INIT(cm)
-	MDRV_NVRAM_HANDLER(goldstar)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	MDRV_VIDEO_START(cherrym)
 	MDRV_VIDEO_UPDATE(goldstar)
@@ -5864,7 +5849,7 @@ static MACHINE_CONFIG_START( cmnobmp, goldstar_state )
 	MDRV_GFXDECODE(cm)
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_PALETTE_INIT(cm)
-	MDRV_NVRAM_HANDLER(goldstar)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	MDRV_VIDEO_START(cherrym)
 	MDRV_VIDEO_UPDATE(goldstar)
@@ -5900,7 +5885,7 @@ static MACHINE_CONFIG_START( cmast91, goldstar_state )
 	MDRV_GFXDECODE(cmast91)
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_PALETTE_INIT(cmast91)
-	MDRV_NVRAM_HANDLER(goldstar)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	MDRV_VIDEO_START(cherrym)
 	MDRV_VIDEO_UPDATE(cmast91)
@@ -5944,7 +5929,7 @@ static MACHINE_CONFIG_START( lucky8, goldstar_state )
 
 	MDRV_GFXDECODE(ncb3)
 	MDRV_PALETTE_LENGTH(256)
-	MDRV_NVRAM_HANDLER(goldstar)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	MDRV_VIDEO_START(goldstar)
 	MDRV_VIDEO_UPDATE(goldstar)
@@ -6002,7 +5987,7 @@ static MACHINE_CONFIG_START( magical, goldstar_state )
 
 	MDRV_GFXDECODE(magical)
 	MDRV_PALETTE_LENGTH(256)
-	MDRV_NVRAM_HANDLER(goldstar)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	MDRV_VIDEO_START(magical)
 	MDRV_VIDEO_UPDATE(magical)
@@ -6080,7 +6065,7 @@ static MACHINE_CONFIG_START( ladylinr, goldstar_state )
 
 	MDRV_GFXDECODE(ncb3)
 	MDRV_PALETTE_LENGTH(256)
-	MDRV_NVRAM_HANDLER(goldstar)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	MDRV_VIDEO_START(goldstar)
 	MDRV_VIDEO_UPDATE(goldstar)
@@ -6121,7 +6106,7 @@ static MACHINE_CONFIG_START( wcat3, goldstar_state )
 
 	MDRV_GFXDECODE(ncb3)
 	MDRV_PALETTE_LENGTH(256)
-	MDRV_NVRAM_HANDLER(goldstar)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	MDRV_VIDEO_START(goldstar)
 	MDRV_VIDEO_UPDATE(goldstar)
@@ -6163,7 +6148,7 @@ static MACHINE_CONFIG_START( amcoe1, goldstar_state )
 	MDRV_GFXDECODE(cm)
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_PALETTE_INIT(cm)
-	MDRV_NVRAM_HANDLER(goldstar)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	MDRV_VIDEO_START(cherrym)
 	MDRV_VIDEO_UPDATE(goldstar)
@@ -6203,7 +6188,7 @@ static MACHINE_CONFIG_START( amcoe1a, goldstar_state )
 	MDRV_GFXDECODE(cm)
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_PALETTE_INIT(cm)
-	MDRV_NVRAM_HANDLER(goldstar)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	MDRV_VIDEO_START(cherrym)
 	MDRV_VIDEO_UPDATE(amcoe1a)
@@ -6243,7 +6228,7 @@ static MACHINE_CONFIG_START( amcoe2, goldstar_state )
 	MDRV_GFXDECODE(cm)
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_PALETTE_INIT(cm)
-	MDRV_NVRAM_HANDLER(goldstar)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	MDRV_VIDEO_START(cherrym)
 	MDRV_VIDEO_UPDATE(goldstar)
@@ -6278,7 +6263,7 @@ static MACHINE_CONFIG_START( nfm, goldstar_state )
 	MDRV_GFXDECODE(nfm)
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_PALETTE_INIT(cm)
-	MDRV_NVRAM_HANDLER(goldstar)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	MDRV_VIDEO_START(cherrym)
 	MDRV_VIDEO_UPDATE(goldstar)
@@ -6352,7 +6337,7 @@ static MACHINE_CONFIG_START( pkrmast, goldstar_state )
 	MDRV_GFXDECODE(pkrmast)
 	MDRV_PALETTE_LENGTH(256)
 	MDRV_PALETTE_INIT(cm)
-	MDRV_NVRAM_HANDLER(goldstar)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	MDRV_VIDEO_START(cherrym)
 	MDRV_VIDEO_UPDATE(goldstar)

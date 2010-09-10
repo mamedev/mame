@@ -363,7 +363,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xf40000, 0xf40001) AM_READ(asic65_io_r)
 	AM_RANGE(0xf60000, 0xf60001) AM_READ(asic65_r)
 	AM_RANGE(0xf80000, 0xf80003) AM_WRITE(asic65_data_w)
-	AM_RANGE(0xfa0000, 0xfa0fff) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_BASE_SIZE_MEMBER(atarig42_state, eeprom, eeprom_size)
+	AM_RANGE(0xfa0000, 0xfa0fff) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_SHARE("eeprom")
 	AM_RANGE(0xfc0000, 0xfc0fff) AM_RAM_WRITE(atarigen_666_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xff0000, 0xff0fff) AM_WRITE(atarirle_0_spriteram_w) AM_BASE(&atarirle_0_spriteram)
 	AM_RANGE(0xff2000, 0xff5fff) AM_WRITE(atarigen_playfield_w) AM_BASE_MEMBER(atarig42_state, playfield)
@@ -524,7 +524,7 @@ static MACHINE_CONFIG_START( atarig42, atarig42_state )
 
 	MDRV_MACHINE_START(atarig42)
 	MDRV_MACHINE_RESET(atarig42)
-	MDRV_NVRAM_HANDLER(atarigen)
+	MDRV_NVRAM_ADD_1FILL("eeprom")
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -602,6 +602,9 @@ ROM_START( roadriot )
 	ROM_LOAD( "136089-1050.15e",  0x40000, 0x20000, CRC(64d410bb) SHA1(877bccca7ff37a9dd8294bc1453487a2f516ca7d) )
 	ROM_LOAD( "136089-1051.12e",  0x60000, 0x20000, CRC(bffd01c8) SHA1(f6de000f61ea0c1ddb31ee5301506e5e966638c2) )
 
+	ROM_REGION( 0x1000, "eeprom", 0 )
+	ROM_LOAD( "roadriot-eeprom.bin", 0x0000, 0x1000, CRC(833d0d53) SHA1(239f791a29ed61317d639fab699752094984078e) )
+
 	ROM_REGION( 0x0600, "proms", 0 )	/* microcode for growth renderer */
 	ROM_LOAD( "136089-1001.bin",  0x0000, 0x0200, CRC(5836cb5a) SHA1(2c797f6a1227d6e1fd7a12f99f0254072c8c266e) )
 	ROM_LOAD( "136089-1002.bin",  0x0200, 0x0200, CRC(44288753) SHA1(811582015264f85a32643196cdb331a41430318f) )
@@ -648,6 +651,9 @@ ROM_START( guardian )
 	ROM_REGION( 0x80000, "adpcm", 0 )
 	ROM_LOAD( "136092-0010-snd",  0x00000, 0x80000, CRC(bca27f40) SHA1(91a41eac116eb7d9a790abc590eb06328726d1c2) )
 
+	ROM_REGION( 0x1000, "eeprom", 0 )
+	ROM_LOAD( "guardian-eeprom.bin", 0x0000, 0x1000, CRC(fba171dc) SHA1(c53f72b7c25602c5fedc38d34d1342fbd10e4a44) )
+
 	ROM_REGION( 0x0600, "proms", 0 )	/* microcode for growth renderer */
 	ROM_LOAD( "136092-1001.bin",  0x0000, 0x0200, CRC(b3251eeb) SHA1(5e83baa70aaa28f07f32657bf974fd87719972d3) )
 	ROM_LOAD( "136092-1002.bin",  0x0200, 0x0200, CRC(0c5314da) SHA1(a9c7ee3ab015c7f3ada4200acd2854eb9a5c74b0) )
@@ -675,20 +681,7 @@ ROM_END
 
 static DRIVER_INIT( roadriot )
 {
-	static const UINT16 default_eeprom[] =
-	{
-		0x0001,0x01B7,0x01AF,0x01E4,0x0100,0x0130,0x0300,0x01CC,
-		0x0700,0x01FE,0x0500,0x0102,0x0200,0x0108,0x011B,0x01C8,
-		0x0100,0x0107,0x0120,0x0100,0x0125,0x0500,0x0177,0x0162,
-		0x013A,0x010A,0x01B7,0x01AF,0x01E4,0x0100,0x0130,0x0300,
-		0x01CC,0x0700,0x01FE,0x0500,0x0102,0x0200,0x0108,0x011B,
-		0x01C8,0x0100,0x0107,0x0120,0x0100,0x0125,0x0500,0x0177,
-		0x0162,0x013A,0x010A,0xE700,0x0164,0x0106,0x0100,0x0104,
-		0x01B0,0x0146,0x012E,0x1A00,0x01C8,0x01D0,0x0118,0x0D00,
-		0x0118,0x0100,0x01C8,0x01D0,0x0000
-	};
 	atarig42_state *state = machine->driver_data<atarig42_state>();
-	state->eeprom_default = default_eeprom;
 	atarijsa_init(machine, "IN2", 0x0040);
 
 	state->playfield_base = 0x400;
@@ -725,21 +718,7 @@ static DRIVER_INIT( roadriot )
 
 static DRIVER_INIT( guardian )
 {
-	static const UINT16 default_eeprom[] =
-	{
-		0x0001,0x01FD,0x01FF,0x01EF,0x0100,0x01CD,0x0300,0x0104,
-		0x0700,0x0117,0x0F00,0x0133,0x1F00,0x0133,0x2400,0x0120,
-		0x0600,0x0104,0x0300,0x010C,0x01A0,0x0100,0x0152,0x0179,
-		0x012D,0x01BD,0x01FD,0x01FF,0x01EF,0x0100,0x01CD,0x0300,
-		0x0104,0x0700,0x0117,0x0F00,0x0133,0x1F00,0x0133,0x2400,
-		0x0120,0x0600,0x0104,0x0300,0x010C,0x01A0,0x0100,0x0152,
-		0x0179,0x012D,0x01BD,0x8C00,0x0118,0x01AB,0x015A,0x0100,
-		0x01D0,0x010B,0x01B8,0x01C7,0x01E2,0x0134,0x0100,0x010A,
-		0x01BE,0x016D,0x0142,0x0100,0x0120,0x0109,0x0110,0x0141,
-		0x0109,0x0100,0x0108,0x0134,0x0105,0x0148,0x1400,0x0000
-	};
 	atarig42_state *state = machine->driver_data<atarig42_state>();
-	state->eeprom_default = default_eeprom;
 	atarijsa_init(machine, "IN2", 0x0040);
 
 	state->playfield_base = 0x000;

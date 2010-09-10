@@ -127,7 +127,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff8800, 0xff8801) AM_MIRROR(0x4507fe) AM_READ_PORT("FF8800")
 	AM_RANGE(0xff9000, 0xff9001) AM_MIRROR(0x4507fe) AM_READ(special_port1_r)
 	AM_RANGE(0xff9800, 0xff9801) AM_MIRROR(0x4507fe) AM_READ(atarigen_sound_r)
-	AM_RANGE(0xffa000, 0xffafff) AM_MIRROR(0x451000) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_BASE_SIZE_MEMBER(toobin_state, eeprom, eeprom_size)
+	AM_RANGE(0xffa000, 0xffafff) AM_MIRROR(0x451000) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_SHARE("eeprom")
 	AM_RANGE(0xffc000, 0xffffff) AM_MIRROR(0x450000) AM_RAM
 ADDRESS_MAP_END
 
@@ -231,7 +231,7 @@ static MACHINE_CONFIG_START( toobin, toobin_state )
 
 	MDRV_MACHINE_START(toobin)
 	MDRV_MACHINE_RESET(toobin)
-	MDRV_NVRAM_HANDLER(atarigen)
+	MDRV_NVRAM_ADD_1FILL("eeprom")
 	MDRV_WATCHDOG_VBLANK_INIT(8)
 
 	/* video hardware */

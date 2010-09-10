@@ -6,9 +6,6 @@ public:
 
 	int dataoffset;
 
-	UINT8 *nvram;
-	size_t nvram_size;
-
 	UINT8 *atrram;
 	UINT8 *fg_atrram;
 	UINT8 *fg_vidram;

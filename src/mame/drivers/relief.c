@@ -153,7 +153,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x140010, 0x140011) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x140020, 0x140021) AM_WRITE(audio_volume_w)
 	AM_RANGE(0x140030, 0x140031) AM_WRITE(audio_control_w)
-	AM_RANGE(0x180000, 0x180fff) AM_READWRITE(atarigen_eeprom_upper_r, atarigen_eeprom_w) AM_BASE_SIZE_MEMBER(relief_state, eeprom, eeprom_size)
+	AM_RANGE(0x180000, 0x180fff) AM_READWRITE(atarigen_eeprom_upper_r, atarigen_eeprom_w) AM_SHARE("eeprom")
 	AM_RANGE(0x1c0030, 0x1c0031) AM_WRITE(atarigen_eeprom_enable_w)
 	AM_RANGE(0x260000, 0x260001) AM_READ_PORT("260000")
 	AM_RANGE(0x260002, 0x260003) AM_READ_PORT("260002")
@@ -301,7 +301,7 @@ static MACHINE_CONFIG_START( relief, relief_state )
 
 	MDRV_MACHINE_START(relief)
 	MDRV_MACHINE_RESET(relief)
-	MDRV_NVRAM_HANDLER(atarigen)
+	MDRV_NVRAM_ADD_1FILL("eeprom")
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -353,6 +353,9 @@ ROM_START( relief )
 	ROM_LOAD( "136093-0030a.9b",  0x100000, 0x80000, CRC(f4c567f5) SHA1(7e8c1d54d918b0b41625eacbaf6dcb5bd99d1949) )
 	ROM_LOAD( "136093-0031a.10b", 0x180000, 0x80000, CRC(ba908d73) SHA1(a83afd86f4c39394cf624b728a87b8d8b6de1944) )
 
+	ROM_REGION( 0x1000, "eeprom", 0 )
+	ROM_LOAD( "relief-eeprom.bin", 0x0000, 0x1000, CRC(71090711) SHA1(fc516dd84635e544c5f89640f77645e4a7d5bcc0) )
+
 	ROM_REGION( 0x001000, "plds", 0 )
 	ROM_LOAD( "gal16v8a-136093-0002.15f", 0x0000, 0x0117, CRC(b111d5f2) SHA1(0fe5b4ca786e839e6927a485109d33fe31c737a2) )
 	ROM_LOAD( "gal16v8a-136093-0003.11r", 0x0200, 0x0117, CRC(67165ed2) SHA1(c7d9b9c45dd34e588c3db4e23c9c562334d2172a) )
@@ -382,6 +385,9 @@ ROM_START( relief2 )
 	ROM_LOAD( "136093-0030a.9b",  0x100000, 0x80000, CRC(f4c567f5) SHA1(7e8c1d54d918b0b41625eacbaf6dcb5bd99d1949) )
 	ROM_LOAD( "136093-0031a.10b", 0x180000, 0x80000, CRC(ba908d73) SHA1(a83afd86f4c39394cf624b728a87b8d8b6de1944) )
 
+	ROM_REGION( 0x1000, "eeprom", 0 )
+	ROM_LOAD( "relief2-eeprom.bin", 0x0000, 0x1000, CRC(6cd70719) SHA1(1bbc52924931b68a546c85f689419200a4b6547b) )
+
 	ROM_REGION( 0x001000, "plds", 0 )
 	ROM_LOAD( "gal16v8a-136093-0002.15f", 0x0000, 0x0117, CRC(b111d5f2) SHA1(0fe5b4ca786e839e6927a485109d33fe31c737a2) )
 	ROM_LOAD( "gal16v8a-136093-0003.11r", 0x0200, 0x0117, CRC(67165ed2) SHA1(c7d9b9c45dd34e588c3db4e23c9c562334d2172a) )
@@ -401,12 +407,9 @@ ROM_END
  *
  *************************************/
 
-static void init_common(running_machine *machine, const UINT16 *def_eeprom)
+static DRIVER_INIT( relief )
 {
-	relief_state *state = machine->driver_data<relief_state>();
 	UINT8 *sound_base = memory_region(machine, "oki");
-
-	state->eeprom_default = def_eeprom;
 
 	/* expand the ADPCM data to avoid lots of memcpy's during gameplay */
 	/* the upper 128k is fixed, the lower 128k is bankswitched */
@@ -429,45 +432,6 @@ static void init_common(running_machine *machine, const UINT16 *def_eeprom)
 }
 
 
-static DRIVER_INIT( relief )
-{
-	static const UINT16 default_eeprom[] =
-	{
-		0x0001,0x0166,0x0128,0x01E6,0x0100,0x012C,0x0300,0x0144,
-		0x0700,0x01C0,0x2F00,0x01EC,0x0B00,0x0148,0x0140,0x0100,
-		0x0124,0x0188,0x0120,0x0600,0x0196,0x013C,0x0192,0x0150,
-		0x0166,0x0128,0x01E6,0x0100,0x012C,0x0300,0x0144,0x0700,
-		0x01C0,0x2F00,0x01EC,0x0B00,0x0148,0x0140,0x0100,0x0124,
-		0x0188,0x0120,0x0600,0x0196,0x013C,0x0192,0x0150,0xFF00,
-		0x9500,0x0000
-	};
-	init_common(machine, default_eeprom);
-}
-
-
-static DRIVER_INIT( relief2 )
-{
-	static const UINT16 default_eeprom[] =
-	{
-		0x0001,0x01FD,0x019F,0x015E,0x01FF,0x019E,0x03FF,0x015F,
-		0x07FF,0x01FD,0x12FF,0x01FC,0x01FB,0x07FF,0x01F7,0x01FF,
-		0x01DF,0x02FF,0x017F,0x03FF,0x0300,0x0110,0x0300,0x0140,
-		0x0300,0x018E,0x0400,0x0180,0x0101,0x0300,0x0180,0x0204,
-		0x0120,0x0182,0x0100,0x0102,0x0600,0x01D5,0x0138,0x0192,
-		0x0150,0x01FD,0x019F,0x015E,0x01FF,0x019E,0x03FF,0x015F,
-		0x07FF,0x01FD,0x12FF,0x01FC,0x01FB,0x07FF,0x01F7,0x01FF,
-		0x01DF,0x02FF,0x017F,0x03FF,0x0300,0x0110,0x0300,0x0140,
-		0x0300,0x018E,0x0400,0x0180,0x0101,0x0300,0x0180,0x0204,
-		0x0120,0x0182,0x0100,0x0102,0x0600,0x01D5,0x0138,0x0192,
-		0x0150,0xE600,0x01C3,0x019D,0x0131,0x0100,0x0116,0x0100,
-		0x010A,0x0190,0x010E,0x014A,0x0200,0x010B,0x018D,0x0121,
-		0x0100,0x0145,0x0100,0x0109,0x0184,0x012C,0x0200,0x0107,
-		0x01AA,0x0149,0x60FF,0x3300,0x0000
-	};
-	init_common(machine, default_eeprom);
-}
-
-
 
 /*************************************
  *
@@ -475,5 +439,5 @@ static DRIVER_INIT( relief2 )
  *
  *************************************/
 
-GAME( 1992, relief,  0,      relief, relief, relief,  ROT0, "Atari Games", "Relief Pitcher (set 1)", 0 )
-GAME( 1992, relief2, relief, relief, relief, relief2, ROT0, "Atari Games", "Relief Pitcher (set 2)", 0 )
+GAME( 1992, relief,  0,      relief, relief, relief, ROT0, "Atari Games", "Relief Pitcher (set 1)", 0 )
+GAME( 1992, relief2, relief, relief, relief, relief, ROT0, "Atari Games", "Relief Pitcher (set 2)", 0 )

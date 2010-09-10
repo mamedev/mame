@@ -149,7 +149,7 @@ static WRITE16_HANDLER( p2_reset_w )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0xfc0000, 0xfc0fff) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_BASE_SIZE_MEMBER(cyberbal_state, eeprom, eeprom_size)
+	AM_RANGE(0xfc0000, 0xfc0fff) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_SHARE("eeprom")
 	AM_RANGE(0xfc8000, 0xfcffff) AM_READ(atarigen_sound_upper_r)
 	AM_RANGE(0xfd0000, 0xfd1fff) AM_WRITE(atarigen_eeprom_enable_w)
 	AM_RANGE(0xfd2000, 0xfd3fff) AM_WRITE(atarigen_sound_reset_w)
@@ -253,7 +253,7 @@ static ADDRESS_MAP_START( cyberbal2p_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfc2000, 0xfc2003) AM_READ_PORT("IN1")
 	AM_RANGE(0xfc4000, 0xfc4003) AM_READ(special_port2_r)
 	AM_RANGE(0xfc6000, 0xfc6003) AM_READ(atarigen_sound_upper_r)
-	AM_RANGE(0xfc8000, 0xfc8fff) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_BASE_SIZE_MEMBER(cyberbal_state, eeprom, eeprom_size)
+	AM_RANGE(0xfc8000, 0xfc8fff) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_SHARE("eeprom")
 	AM_RANGE(0xfca000, 0xfcafff) AM_RAM_WRITE(atarigen_666_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xfd0000, 0xfd0003) AM_WRITE(atarigen_eeprom_enable_w)
 	AM_RANGE(0xfd2000, 0xfd2003) AM_WRITE(atarigen_sound_reset_w)
@@ -451,7 +451,7 @@ static MACHINE_CONFIG_START( cyberbal, cyberbal_state )
 
 	MDRV_MACHINE_START(cyberbal)
 	MDRV_MACHINE_RESET(cyberbal)
-	MDRV_NVRAM_HANDLER(atarigen)
+	MDRV_NVRAM_ADD_1FILL("eeprom")
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -498,7 +498,7 @@ static MACHINE_CONFIG_START( cyberbal2p, cyberbal_state )
 
 	MDRV_MACHINE_START(cyberbal)
 	MDRV_MACHINE_RESET(cyberbal2p)
-	MDRV_NVRAM_HANDLER(atarigen)
+	MDRV_NVRAM_ADD_1FILL("eeprom")
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -581,6 +581,9 @@ ROM_START( cyberbal )
 	ROM_LOAD( "gal16v8-136064-1028.b56", 0x0400, 0x0117, CRC(12d1a257) SHA1(32914dffd58ce694913c2108a27b078422a9dc63) )
 	ROM_LOAD( "gal16v8-136064-1029.d58", 0x0600, 0x0117, CRC(fd39d238) SHA1(55c1b9a56c9b2bfa434eed54f7baea436ea141b8) )
 	ROM_LOAD( "gal16v8-136064-1030.d91", 0x0800, 0x0117, CRC(84102588) SHA1(b6bffb47e5975c96b056d07357eb020caf3f0a0a) )
+
+	ROM_REGION( 0x1000, "eeprom", 0 )
+	ROM_LOAD( "cyberbal-eeprom.bin", 0x0000, 0x1000, CRC(72334788) SHA1(101a8057d616969ece4050a1e15593280099c5a5) )
 ROM_END
 
 
@@ -632,6 +635,9 @@ ROM_START( cyberbal2 )
 	ROM_REGION( 0x020000, "gfx3", 0 )
 	ROM_LOAD( "136064-1121.15n", 0x000000, 0x010000, CRC(0ca1e3b3) SHA1(d934bc9a1def4404fb86175878404cbb18127a11) )
 	ROM_LOAD( "136064-1122.16n", 0x010000, 0x010000, CRC(882f4e1c) SHA1(f7517ff03502ff029fb375260a35e45414567433) )
+
+	ROM_REGION( 0x1000, "eeprom", 0 )
+	ROM_LOAD( "cyberbal-eeprom.bin", 0x0000, 0x1000, CRC(72334788) SHA1(101a8057d616969ece4050a1e15593280099c5a5) )
 ROM_END
 
 
@@ -683,6 +689,9 @@ ROM_START( cyberbalp )
 	ROM_REGION( 0x020000, "gfx3", 0 )
 	ROM_LOAD( "136064-1121.15n", 0x000000, 0x010000, CRC(0ca1e3b3) SHA1(d934bc9a1def4404fb86175878404cbb18127a11) )
 	ROM_LOAD( "136064-1122.16n", 0x010000, 0x010000, CRC(882f4e1c) SHA1(f7517ff03502ff029fb375260a35e45414567433) )
+
+	ROM_REGION( 0x1000, "eeprom", 0 )
+	ROM_LOAD( "cyberbal-eeprom.bin", 0x0000, 0x1000, CRC(72334788) SHA1(101a8057d616969ece4050a1e15593280099c5a5) )
 ROM_END
 
 
@@ -730,6 +739,9 @@ ROM_START( cyberbal2p )
 	ROM_LOAD( "136071-1044.7j",  0x010000, 0x010000, CRC(87208e1e) SHA1(3647867ddc36df7633ed740c0b9365a979ef5621) )
 	ROM_LOAD( "136071-1045.7e",  0x020000, 0x010000, CRC(f82558b9) SHA1(afbecccc6203db9bdcf60638e0f4e95040d7aaf2) )
 	ROM_LOAD( "136071-1046.7d",  0x030000, 0x010000, CRC(d96437ad) SHA1(b0b5cd75de4048e54b9d7d09a75381eb73c22ee1) )
+
+	ROM_REGION( 0x1000, "eeprom", 0 )
+	ROM_LOAD( "cyberbal-eeprom.bin", 0x0000, 0x1000, CRC(72334788) SHA1(101a8057d616969ece4050a1e15593280099c5a5) )
 ROM_END
 
 
@@ -777,6 +789,9 @@ ROM_START( cyberbal2p3 )
 	ROM_LOAD( "136071-1044.7j",  0x010000, 0x010000, CRC(87208e1e) SHA1(3647867ddc36df7633ed740c0b9365a979ef5621) )
 	ROM_LOAD( "136071-1045.7e",  0x020000, 0x010000, CRC(f82558b9) SHA1(afbecccc6203db9bdcf60638e0f4e95040d7aaf2) )
 	ROM_LOAD( "136071-1046.7d",  0x030000, 0x010000, CRC(d96437ad) SHA1(b0b5cd75de4048e54b9d7d09a75381eb73c22ee1) )
+
+	ROM_REGION( 0x1000, "eeprom", 0 )
+	ROM_LOAD( "cyberbal-eeprom.bin", 0x0000, 0x1000, CRC(72334788) SHA1(101a8057d616969ece4050a1e15593280099c5a5) )
 ROM_END
 
 
@@ -824,6 +839,9 @@ ROM_START( cyberbal2p2 )
 	ROM_LOAD( "136071-1044.7j",  0x010000, 0x010000, CRC(87208e1e) SHA1(3647867ddc36df7633ed740c0b9365a979ef5621) )
 	ROM_LOAD( "136071-1045.7e",  0x020000, 0x010000, CRC(f82558b9) SHA1(afbecccc6203db9bdcf60638e0f4e95040d7aaf2) )
 	ROM_LOAD( "136071-1046.7d",  0x030000, 0x010000, CRC(d96437ad) SHA1(b0b5cd75de4048e54b9d7d09a75381eb73c22ee1) )
+
+	ROM_REGION( 0x1000, "eeprom", 0 )
+	ROM_LOAD( "cyberbal-eeprom.bin", 0x0000, 0x1000, CRC(72334788) SHA1(101a8057d616969ece4050a1e15593280099c5a5) )
 ROM_END
 
 
@@ -871,6 +889,9 @@ ROM_START( cyberbal2p1 )
 	ROM_LOAD( "136071-1044.7j",  0x010000, 0x010000, CRC(87208e1e) SHA1(3647867ddc36df7633ed740c0b9365a979ef5621) )
 	ROM_LOAD( "136071-1045.7e",  0x020000, 0x010000, CRC(f82558b9) SHA1(afbecccc6203db9bdcf60638e0f4e95040d7aaf2) )
 	ROM_LOAD( "136071-1046.7d",  0x030000, 0x010000, CRC(d96437ad) SHA1(b0b5cd75de4048e54b9d7d09a75381eb73c22ee1) )
+
+	ROM_REGION( 0x1000, "eeprom", 0 )
+	ROM_LOAD( "cyberbal-eeprom.bin", 0x0000, 0x1000, CRC(72334788) SHA1(101a8057d616969ece4050a1e15593280099c5a5) )
 ROM_END
 
 
@@ -920,6 +941,9 @@ ROM_START( cyberbalt )
 	ROM_REGION( 0x020000, "gfx3", 0 )
 	ROM_LOAD( "136073-1005.15n", 0x000000, 0x010000, CRC(833b4768) SHA1(754f00089d439fb0aa1f650c1fef73cf7e5f33a1) )
 	ROM_LOAD( "136073-1006.16n", 0x010000, 0x010000, CRC(4976cffd) SHA1(4cac8d9bd30743da6e6e4f013e6101ebc27060b6) )
+
+	ROM_REGION( 0x1000, "eeprom", 0 )
+	ROM_LOAD( "cyberbal-eeprom.bin", 0x0000, 0x1000, CRC(72334788) SHA1(101a8057d616969ece4050a1e15593280099c5a5) )
 ROM_END
 
 
@@ -969,6 +993,9 @@ ROM_START( cyberbalt1 )
 	ROM_REGION( 0x020000, "gfx3", 0 )
 	ROM_LOAD( "136073-1005.15n", 0x000000, 0x010000, CRC(833b4768) SHA1(754f00089d439fb0aa1f650c1fef73cf7e5f33a1) )
 	ROM_LOAD( "136073-1006.16n", 0x010000, 0x010000, CRC(4976cffd) SHA1(4cac8d9bd30743da6e6e4f013e6101ebc27060b6) )
+
+	ROM_REGION( 0x1000, "eeprom", 0 )
+	ROM_LOAD( "cyberbal-eeprom.bin", 0x0000, 0x1000, CRC(72334788) SHA1(101a8057d616969ece4050a1e15593280099c5a5) )
 ROM_END
 
 
@@ -979,40 +1006,20 @@ ROM_END
  *
  *************************************/
 
-static const UINT16 default_eeprom[] =
-{
-	0x0001,0x01FF,0x0F00,0x011A,0x014A,0x0100,0x01A1,0x0200,
-	0x010E,0x01AF,0x0300,0x01FF,0x0114,0x0144,0x01FF,0x0F00,
-	0x011A,0x014A,0x0100,0x01A1,0x0200,0x010E,0x01AF,0x0300,
-	0x01FF,0x0114,0x0144,0x01FF,0x0E00,0x01FF,0x0E00,0x01FF,
-	0x0E00,0x01FF,0x0E00,0x01FF,0x0E00,0x01FF,0x0E00,0x01FF,
-	0x0E00,0x01A8,0x0131,0x010B,0x0100,0x014C,0x0A00,0x01FF,
-	0x0E00,0x01FF,0x0E00,0x01FF,0x0E00,0xB5FF,0x0E00,0x01FF,
-	0x0E00,0x01FF,0x0E00,0x01FF,0x0E00,0x01FF,0x0E00,0x01FF,
-	0x0E00,0x01FF,0x0E00,0x0000
-};
-
-
 static DRIVER_INIT( cyberbal )
 {
-	cyberbal_state *state = machine->driver_data<cyberbal_state>();
-	state->eeprom_default = default_eeprom;
 	atarigen_slapstic_init(machine->device("maincpu"), 0x018000, 0, 0);
 }
 
 
 static DRIVER_INIT( cyberbalt )
 {
-	cyberbal_state *state = machine->driver_data<cyberbal_state>();
-	state->eeprom_default = default_eeprom;
 	atarigen_slapstic_init(machine->device("maincpu"), 0x018000, 0, 116);
 }
 
 
 static DRIVER_INIT( cyberbal2p )
 {
-	cyberbal_state *state = machine->driver_data<cyberbal_state>();
-	state->eeprom_default = default_eeprom;
 	atarijsa_init(machine, "IN2", 0x8000);
 }
 
@@ -1035,4 +1042,3 @@ GAME( 1989, cyberbal2p1, cyberbal, cyberbal2p, cyberbal2p, cyberbal2p, ROT0, "At
 
 GAMEL(1989, cyberbalt,  cyberbal, cyberbal, cyberbal, cyberbalt,  ROT0, "Atari Games", "Tournament Cyberball 2072 (rev 2)", 0, layout_dualhsxs )
 GAMEL(1989, cyberbalt1, cyberbal, cyberbal, cyberbal, cyberbalt,  ROT0, "Atari Games", "Tournament Cyberball 2072 (rev 1)", 0, layout_dualhsxs )
-

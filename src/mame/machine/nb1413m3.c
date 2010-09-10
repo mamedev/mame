@@ -27,8 +27,6 @@ int nb1413m3_sndrombank2;
 int nb1413m3_busyctr;
 int nb1413m3_busyflag;
 int nb1413m3_inputport;
-UINT8 *nb1413m3_nvram;
-size_t nb1413m3_nvram_size;
 
 static int nb1413m3_74ls193_counter;
 static int nb1413m3_nmi_count;			// for debug
@@ -223,19 +221,6 @@ INTERRUPT_GEN( nb1413m3_interrupt )
 	#include "nbmjchet.inc"
 	#endif
 #endif
-}
-
-NVRAM_HANDLER( nb1413m3 )
-{
-	if (read_or_write)
-		mame_fwrite(file, nb1413m3_nvram, nb1413m3_nvram_size);
-	else
-	{
-		if (file)
-			mame_fread(file, nb1413m3_nvram, nb1413m3_nvram_size);
-		else
-			memset(nb1413m3_nvram, 0, nb1413m3_nvram_size);
-	}
 }
 
 READ8_HANDLER( nb1413m3_sndrom_r )

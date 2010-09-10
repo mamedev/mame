@@ -299,6 +299,7 @@ CPU68 PCB:
 #include "sound/2151intf.h"
 #include "sound/c140.h"
 #include "includes/namcos21.h"
+#include "machine/nvram.h"
 
 #define PTRAM_SIZE 0x20000
 
@@ -1522,7 +1523,7 @@ static const c140_interface C140_interface_typeB =
 	C140_TYPE_SYSTEM21_B
 };
 
-static MACHINE_CONFIG_START( s21base, driver_device )
+static MACHINE_CONFIG_START( s21base, namcos21_state )
 	MDRV_CPU_ADD("maincpu", M68000,12288000) /* Master */
 	MDRV_CPU_PROGRAM_MAP(namcos21_68k_master)
 	MDRV_CPU_VBLANK_INT("screen", namcos2_68k_master_vblank)
@@ -1554,7 +1555,7 @@ static MACHINE_CONFIG_START( s21base, driver_device )
 
 	MDRV_MACHINE_START(namcos2)
 	MDRV_MACHINE_RESET(namcos2)
-	MDRV_NVRAM_HANDLER(namcos2)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1599,7 +1600,7 @@ static MACHINE_CONFIG_DERIVED( poly_c140_typeB, s21base )
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.30)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( driveyes, driver_device )
+static MACHINE_CONFIG_START( driveyes, namcos21_state )
 	MDRV_CPU_ADD("maincpu", M68000,12288000) /* Master */
 	MDRV_CPU_PROGRAM_MAP(driveyes_68k_master)
 	MDRV_CPU_VBLANK_INT("screen", namcos2_68k_master_vblank)
@@ -1626,7 +1627,7 @@ static MACHINE_CONFIG_START( driveyes, driver_device )
 
 	MDRV_MACHINE_START(namcos2)
 	MDRV_MACHINE_RESET(namcos2)
-	MDRV_NVRAM_HANDLER(namcos2)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1654,7 +1655,7 @@ static MACHINE_CONFIG_START( driveyes, driver_device )
 	MDRV_SOUND_ROUTE(1, "rspeaker", 0.30)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( winrun_c140_typeB, driver_device )
+static MACHINE_CONFIG_START( winrun_c140_typeB, namcos21_state )
 	MDRV_CPU_ADD("maincpu", M68000,12288000) /* Master */
 	MDRV_CPU_PROGRAM_MAP(am_master_winrun)
 	MDRV_CPU_VBLANK_INT("screen", namcos2_68k_master_vblank)
@@ -1685,7 +1686,7 @@ static MACHINE_CONFIG_START( winrun_c140_typeB, driver_device )
 
 	MDRV_MACHINE_START(namcos2)
 	MDRV_MACHINE_RESET(namcos2)
-	MDRV_NVRAM_HANDLER(namcos2)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -2042,6 +2043,9 @@ ROM_START( starblad )
 	ROM_LOAD("st1-voi1.bin",0x080000,0x80000,CRC(413e6181) SHA1(e827ec11f5755606affd2635718512aeac9354da) )
 	ROM_LOAD("st1-voi2.bin",0x100000,0x80000,CRC(067d0720) SHA1(a853b2d43027a46c5e707fc677afdaae00f450c7) )
 	ROM_LOAD("st1-voi3.bin",0x180000,0x80000,CRC(8b5aa45f) SHA1(e1214e639200758ad2045bde0368a2d500c1b84a) )
+
+	ROM_REGION( 0x2000, "nvram", ROMREGION_ERASE00)
+	// starblad needs default NVRAM to be all 0
 ROM_END
 
 ROM_START( solvalou )

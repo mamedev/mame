@@ -27,6 +27,7 @@ Memo:
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "includes/hyhoo.h"
+#include "machine/nvram.h"
 
 #define	SIGNED_DAC	0		// 0:unsigned DAC, 1:signed DAC
 #if SIGNED_DAC
@@ -49,7 +50,7 @@ static DRIVER_INIT( hyhoo2 )
 
 static ADDRESS_MAP_START( hyhoo_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xffff) AM_RAM AM_BASE(&nb1413m3_nvram) AM_SIZE(&nb1413m3_nvram_size)
+	AM_RANGE(0xf000, 0xffff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( hyhoo_io_map, ADDRESS_SPACE_IO, 8 )
@@ -253,7 +254,7 @@ static MACHINE_CONFIG_START( hyhoo, driver_device )
 	MDRV_CPU_VBLANK_INT("screen", nb1413m3_interrupt)
 
 	MDRV_MACHINE_RESET(nb1413m3)
-	MDRV_NVRAM_HANDLER(nb1413m3)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

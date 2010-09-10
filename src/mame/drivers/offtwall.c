@@ -278,7 +278,7 @@ static READ16_HANDLER( unknown_verify_r )
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x037fff) AM_ROM
 	AM_RANGE(0x038000, 0x03ffff) AM_READ(bankrom_r) AM_REGION("maincpu", 0x38000) AM_BASE_MEMBER(offtwall_state, bankrom_base)
-	AM_RANGE(0x120000, 0x120fff) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_BASE_SIZE_MEMBER(offtwall_state, eeprom, eeprom_size)
+	AM_RANGE(0x120000, 0x120fff) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_SHARE("eeprom")
 	AM_RANGE(0x260000, 0x260001) AM_READ_PORT("260000")
 	AM_RANGE(0x260002, 0x260003) AM_READ_PORT("260002")
 	AM_RANGE(0x260010, 0x260011) AM_READ(special_port3_r)
@@ -411,7 +411,7 @@ static MACHINE_CONFIG_START( offtwall, offtwall_state )
 
 	MDRV_MACHINE_START(offtwall)
 	MDRV_MACHINE_RESET(offtwall)
-	MDRV_NVRAM_HANDLER(atarigen)
+	MDRV_NVRAM_ADD_1FILL("eeprom")
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -455,6 +455,9 @@ ROM_START( offtwall )
 	ROM_LOAD( "otw1015.bin", 0x060000, 0x20000, CRC(271f7856) SHA1(928bc5e7dc589ceb5f55e536b5a05c3866116a24) )
 	ROM_LOAD( "otw1017.bin", 0x080000, 0x20000, CRC(7f7f8012) SHA1(1123ea3c6cd2c73617a87d6a5bbb26fca8941af3) )
 	ROM_LOAD( "otw1019.bin", 0x0a0000, 0x20000, CRC(9efe511b) SHA1(db1f1d8792bf497bc9ad652b0b7d78c3abf0e817) )
+
+	ROM_REGION( 0x1000, "eeprom", 0 )
+	ROM_LOAD( "offtwall-eeprom.bin", 0x0000, 0x1000, CRC(73dc2139) SHA1(28ee9be4b5a65708a4f3e7d88e98af15cd9badca) )
 ROM_END
 
 
@@ -474,6 +477,9 @@ ROM_START( offtwallc )
 	ROM_LOAD( "090-1615.rom", 0x060000, 0x20000, CRC(ac3642c7) SHA1(bb57e039c113c4ce5702983c8e01dbe286d7b58e) )
 	ROM_LOAD( "090-1617.rom", 0x080000, 0x20000, CRC(15208a89) SHA1(124484ab54959a1e6d9022a4f3ee4288a79c768b) )
 	ROM_LOAD( "090-1619.rom", 0x0a0000, 0x20000, CRC(8a5d79b3) SHA1(0a202d20e6c86989ce2223e10eadf9009dd6ca8e) )
+
+	ROM_REGION( 0x1000, "eeprom", 0 )
+	ROM_LOAD( "offtwall-eeprom.bin", 0x0000, 0x1000, CRC(73dc2139) SHA1(28ee9be4b5a65708a4f3e7d88e98af15cd9badca) )
 ROM_END
 
 
@@ -484,26 +490,10 @@ ROM_END
  *
  *************************************/
 
-static const UINT16 default_eeprom[] =
-{
-	0x0001,0x011A,0x012A,0x0146,0x0100,0x0168,0x0300,0x011E,
-	0x0700,0x0122,0x0600,0x0120,0x0400,0x0102,0x0300,0x017E,
-	0x0200,0x0128,0x0104,0x0100,0x014E,0x0100,0x013E,0x0122,
-	0x011A,0x012A,0x0146,0x0100,0x0168,0x0300,0x011E,0x0700,
-	0x0122,0x0600,0x0120,0x0400,0x0102,0x0300,0x017E,0x0200,
-	0x0128,0x0104,0x0100,0x014E,0x0100,0x013E,0x0122,0x1A00,
-	0x0154,0x0125,0x01DC,0x0100,0x0192,0x0105,0x01DC,0x0181,
-	0x012E,0x0106,0x0100,0x0105,0x0179,0x0132,0x0101,0x0100,
-	0x01D3,0x0105,0x0116,0x0127,0x0134,0x0100,0x0104,0x01B0,
-	0x0165,0x0102,0x1600,0x0000
-};
-
-
 static DRIVER_INIT( offtwall )
 {
 	offtwall_state *state = machine->driver_data<offtwall_state>();
 
-	state->eeprom_default = default_eeprom;
 	atarijsa_init(machine, "260010", 0x0040);
 
 	/* install son-of-slapstic workarounds */
@@ -517,7 +507,6 @@ static DRIVER_INIT( offtwalc )
 {
 	offtwall_state *state = machine->driver_data<offtwall_state>();
 
-	state->eeprom_default = default_eeprom;
 	atarijsa_init(machine, "260010", 0x0040);
 
 	/* install son-of-slapstic workarounds */

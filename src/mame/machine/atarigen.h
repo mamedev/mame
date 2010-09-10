@@ -6,6 +6,7 @@
 
 ***************************************************************************/
 
+#include "machine/nvram.h"
 #include "video/atarimo.h"
 #include "video/atarirle.h"
 
@@ -64,15 +65,18 @@ class atarigen_state : public driver_device
 {
 public:
 	atarigen_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: driver_device(machine, config),
+		  eeprom(*this, "eeprom"),
+		  eeprom_size(*this, "eeprom") { }
+
+	optional_shared_ptr<UINT16> eeprom;
+	optional_shared_size eeprom_size;
 
 	UINT8				scanline_int_state;
 	UINT8				sound_int_state;
 	UINT8				video_int_state;
 
 	const UINT16 *		eeprom_default;
-	UINT16 *			eeprom;
-	size_t				eeprom_size;
 
 	UINT8				cpu_to_sound_ready;
 	UINT8				sound_to_cpu_ready;

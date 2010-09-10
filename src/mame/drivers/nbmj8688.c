@@ -39,6 +39,7 @@ TODO:
 #include "rendlay.h"
 #include "nbmj8688.lh"
 #include "includes/nbmj8688.h"
+#include "machine/nvram.h"
 
 
 #define SIGNED_DAC	0		// 0:unsigned DAC, 1:signed DAC
@@ -281,17 +282,17 @@ static DRIVER_INIT( barline )
 
 static ADDRESS_MAP_START( mjsikaku_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xf7ff) AM_ROM
-	AM_RANGE(0xf800, 0xffff) AM_RAM AM_BASE(&nb1413m3_nvram) AM_SIZE(&nb1413m3_nvram_size)
+	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( secolove_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
-	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_BASE(&nb1413m3_nvram) AM_SIZE(&nb1413m3_nvram_size)
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( ojousan_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x6fff) AM_ROM
-	AM_RANGE(0x7000, 0x7fff) AM_RAM AM_BASE(&nb1413m3_nvram) AM_SIZE(&nb1413m3_nvram_size)
+	AM_RANGE(0x7000, 0x7fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -2923,7 +2924,7 @@ static MACHINE_CONFIG_START( NBMJDRV_4096, driver_device )
 	MDRV_CPU_VBLANK_INT("screen", nb1413m3_interrupt)
 
 	MDRV_MACHINE_RESET(nb1413m3)
-	MDRV_NVRAM_HANDLER(nb1413m3)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -3048,7 +3049,7 @@ static MACHINE_CONFIG_START( mbmj_p16bit_LCD, driver_device )
 	MDRV_CPU_IO_MAP(p16bit_LCD_io_map)
 
 	MDRV_MACHINE_RESET(nb1413m3)
-	MDRV_NVRAM_HANDLER(nb1413m3)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_PALETTE_LENGTH(65536)

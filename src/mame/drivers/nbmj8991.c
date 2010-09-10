@@ -35,6 +35,7 @@ Notes:
 #include "sound/3812intf.h"
 #include "sound/dac.h"
 #include "includes/nbmj8991.h"
+#include "machine/nvram.h"
 
 
 #define SIGNED_DAC	0		// 0:unsigned DAC, 1:signed DAC
@@ -193,14 +194,14 @@ static ADDRESS_MAP_START( pstadium_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf00f) AM_READWRITE(nbmj8991_clut_r,nbmj8991_clut_w)
 	AM_RANGE(0xf200, 0xf3ff) AM_RAM_WRITE(nbmj8991_palette_type3_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xf800, 0xffff) AM_RAM AM_BASE(&nb1413m3_nvram) AM_SIZE(&nb1413m3_nvram_size)	// finalbny
+	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("nvram")	// finalbny
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( triplew1_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf1ff) AM_RAM_WRITE(nbmj8991_palette_type3_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xf200, 0xf20f) AM_READWRITE(nbmj8991_clut_r,nbmj8991_clut_w)
-	AM_RANGE(0xf800, 0xffff) AM_RAM AM_BASE(&nb1413m3_nvram) AM_SIZE(&nb1413m3_nvram_size)	// mjgottub
+	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("nvram")	// mjgottub
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( triplew2_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -221,14 +222,14 @@ static ADDRESS_MAP_START( galkoku_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf00f) AM_READWRITE(nbmj8991_clut_r,nbmj8991_clut_w)
 	AM_RANGE(0xf400, 0xf5ff) AM_RAM_WRITE(nbmj8991_palette_type1_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xf800, 0xffff) AM_RAM AM_BASE(&nb1413m3_nvram) AM_SIZE(&nb1413m3_nvram_size)	// hyouban
+	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("nvram")	// hyouban
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( galkaika_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xefff) AM_ROM
 	AM_RANGE(0xf000, 0xf00f) AM_READWRITE(nbmj8991_clut_r,nbmj8991_clut_w)
 	AM_RANGE(0xf400, 0xf5ff) AM_RAM_WRITE(nbmj8991_palette_type2_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0xf800, 0xffff) AM_RAM AM_BASE(&nb1413m3_nvram) AM_SIZE(&nb1413m3_nvram_size)	// tokimbsj
+	AM_RANGE(0xf800, 0xffff) AM_RAM AM_SHARE("nvram")	// tokimbsj
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( tokyogal_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -1590,7 +1591,7 @@ static MACHINE_CONFIG_DERIVED( tokimbsj, nbmjdrv1 )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(galkaika_map)
 
-	MDRV_NVRAM_HANDLER(nb1413m3)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
 
@@ -1612,7 +1613,7 @@ static MACHINE_CONFIG_DERIVED( hyouban, nbmjdrv3 )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_IO_MAP(hyouban_io_map)
 
-	MDRV_NVRAM_HANDLER(nb1413m3)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
 
@@ -1661,7 +1662,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( finalbny, nbmjdrv2 )
 
 	/* basic machine hardware */
-	MDRV_NVRAM_HANDLER(nb1413m3)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
 
@@ -1677,7 +1678,7 @@ static MACHINE_CONFIG_DERIVED( mjgottub, nbmjdrv2 )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(triplew1_map)
 
-	MDRV_NVRAM_HANDLER(nb1413m3)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
 

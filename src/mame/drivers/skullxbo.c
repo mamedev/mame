@@ -143,7 +143,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff2000, 0xff2fff) AM_RAM_WRITE(atarigen_666_paletteram_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xff4000, 0xff47ff) AM_WRITE(skullxbo_yscroll_w) AM_BASE_MEMBER(skullxbo_state, yscroll)
 	AM_RANGE(0xff4800, 0xff4fff) AM_WRITE(skullxbo_mobwr_w)
-	AM_RANGE(0xff6000, 0xff6fff) AM_WRITE(atarigen_eeprom_w) AM_BASE_SIZE_MEMBER(skullxbo_state, eeprom, eeprom_size)
+	AM_RANGE(0xff6000, 0xff6fff) AM_WRITE(atarigen_eeprom_w) AM_SHARE("eeprom")
 	AM_RANGE(0xff5000, 0xff5001) AM_READ(atarigen_sound_r)
 	AM_RANGE(0xff5800, 0xff5801) AM_READ_PORT("FF5800")
 	AM_RANGE(0xff5802, 0xff5803) AM_READ(special_port1_r)
@@ -262,7 +262,7 @@ static MACHINE_CONFIG_START( skullxbo, skullxbo_state )
 
 	MDRV_MACHINE_START(skullxbo)
 	MDRV_MACHINE_RESET(skullxbo)
-	MDRV_NVRAM_HANDLER(atarigen)
+	MDRV_NVRAM_ADD_1FILL("eeprom")
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)

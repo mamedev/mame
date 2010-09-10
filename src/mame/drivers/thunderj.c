@@ -152,7 +152,7 @@ static WRITE16_HANDLER( thunderj_atarivc_w )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x09ffff) AM_ROM
-	AM_RANGE(0x0e0000, 0x0e0fff) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_BASE_SIZE_MEMBER(thunderj_state, eeprom, eeprom_size)
+	AM_RANGE(0x0e0000, 0x0e0fff) AM_READWRITE(atarigen_eeprom_r, atarigen_eeprom_w) AM_SHARE("eeprom")
 	AM_RANGE(0x160000, 0x16ffff) AM_RAM AM_SHARE("share1")
 	AM_RANGE(0x1f0000, 0x1fffff) AM_WRITE(atarigen_eeprom_enable_w)
 	AM_RANGE(0x260000, 0x26000f) AM_READ_PORT("260000")
@@ -294,7 +294,7 @@ static MACHINE_CONFIG_START( thunderj, thunderj_state )
 
 	MDRV_MACHINE_START(thunderj)
 	MDRV_MACHINE_RESET(thunderj)
-	MDRV_NVRAM_HANDLER(atarigen)
+	MDRV_NVRAM_ADD_1FILL("eeprom")
 
 	/* perfect synchronization due to shared RAM */
 	MDRV_QUANTUM_PERFECT_CPU("maincpu")

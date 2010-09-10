@@ -449,6 +449,7 @@ $a00000 checks have been seen on the Final Lap boards.
 #include "includes/namcos2.h"
 #include "cpu/m6809/m6809.h"
 #include "includes/namcoic.h"
+#include "machine/nvram.h"
 #include "sound/2151intf.h"
 #include "sound/c140.h"
 
@@ -1627,7 +1628,7 @@ static MACHINE_CONFIG_START( default, driver_device )
 
 	MDRV_MACHINE_START(namcos2)
 	MDRV_MACHINE_RESET(namcos2)
-	MDRV_NVRAM_HANDLER(namcos2)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
 
@@ -1704,7 +1705,7 @@ static MACHINE_CONFIG_START( gollygho, driver_device )
 
 	MDRV_MACHINE_START(namcos2)
 	MDRV_MACHINE_RESET(namcos2)
-	MDRV_NVRAM_HANDLER(namcos2)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
 
@@ -1754,7 +1755,7 @@ static MACHINE_CONFIG_START( finallap, driver_device )
 
 	MDRV_MACHINE_START(namcos2)
 	MDRV_MACHINE_RESET(namcos2)
-	MDRV_NVRAM_HANDLER(namcos2)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
 
@@ -1804,7 +1805,7 @@ static MACHINE_CONFIG_START( sgunner, driver_device )
 
 	MDRV_MACHINE_START(namcos2)
 	MDRV_MACHINE_RESET(namcos2)
-	MDRV_NVRAM_HANDLER(namcos2)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
 
@@ -1854,7 +1855,7 @@ static MACHINE_CONFIG_START( luckywld, driver_device )
 
 	MDRV_MACHINE_START(namcos2)
 	MDRV_MACHINE_RESET(namcos2)
-	MDRV_NVRAM_HANDLER(namcos2)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
 
@@ -1904,7 +1905,7 @@ static MACHINE_CONFIG_START( metlhawk, driver_device )
 
 	MDRV_MACHINE_START(namcos2)
 	MDRV_MACHINE_RESET(namcos2)
-	MDRV_NVRAM_HANDLER(namcos2)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
 

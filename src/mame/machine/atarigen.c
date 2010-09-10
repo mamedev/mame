@@ -36,9 +36,6 @@ static STATE_POSTLOAD( slapstic_postload );
 
 static TIMER_CALLBACK( scanline_interrupt_callback );
 
-static void decompress_eeprom_word(UINT16 *dest, const UINT16 *data);
-static void decompress_eeprom_byte(UINT8 *dest, const UINT16 *data);
-
 static void update_6502_irq(running_machine *machine);
 static TIMER_CALLBACK( delayed_sound_reset );
 static TIMER_CALLBACK( delayed_sound_w );
@@ -391,74 +388,6 @@ READ32_HANDLER( atarigen_eeprom_upper32_r )
 {
 	atarigen_state *state = space->machine->driver_data<atarigen_state>();
 	return (state->eeprom[offset * 2] << 16) | state->eeprom[offset * 2 + 1] | 0x00ff00ff;
-}
-
-
-/*---------------------------------------------------------------
-    NVRAM_HANDLER( atarigen ): Loads the EEPROM data.
----------------------------------------------------------------*/
-
-NVRAM_HANDLER( atarigen )
-{
-	atarigen_state *state = machine->driver_data<atarigen_state>();
-	if (read_or_write)
-		mame_fwrite(file, state->eeprom, state->eeprom_size);
-	else if (file)
-		mame_fread(file, state->eeprom, state->eeprom_size);
-	else
-	{
-		/* all 0xff's work for most games */
-		memset(state->eeprom, 0xff, state->eeprom_size);
-
-		/* anything else must be decompressed */
-		if (state->eeprom_default)
-		{
-			if (state->eeprom_default[0] == 0)
-				decompress_eeprom_byte((UINT8 *)state->eeprom, state->eeprom_default + 1);
-			else
-				decompress_eeprom_word(state->eeprom, state->eeprom_default + 1);
-		}
-	}
-}
-
-
-/*---------------------------------------------------------------
-    decompress_eeprom_word: Used for decompressing EEPROM data
-    that has every other byte invalid.
----------------------------------------------------------------*/
-
-void decompress_eeprom_word(UINT16 *dest, const UINT16 *data)
-{
-	UINT16 value;
-
-	while ((value = *data++) != 0)
-	{
-		int count = (value >> 8);
-		value = (value << 8) | (value & 0xff);
-
-		while (count--)
-			*dest++ = value;
-	}
-}
-
-
-/*---------------------------------------------------------------
-    decompress_eeprom_byte: Used for decompressing EEPROM data
-    that is byte-packed.
----------------------------------------------------------------*/
-
-void decompress_eeprom_byte(UINT8 *dest, const UINT16 *data)
-{
-	UINT16 value;
-
-	while ((value = *data++) != 0)
-	{
-		int count = (value >> 8);
-		value = (value << 8) | (value & 0xff);
-
-		while (count--)
-			*dest++ = value;
-	}
 }
 
 

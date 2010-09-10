@@ -26,6 +26,7 @@ Memo:
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "includes/pastelg.h"
+#include "machine/nvram.h"
 
 
 #define SIGNED_DAC	0		// 0:unsigned DAC, 1:signed DAC
@@ -51,7 +52,7 @@ static READ8_HANDLER( pastelg_sndrom_r )
 
 static ADDRESS_MAP_START( pastelg_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
-	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE(&nb1413m3_nvram) AM_SIZE(&nb1413m3_nvram_size)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_SHARE("nvram")
 ADDRESS_MAP_END
 
 static READ8_HANDLER( pastelg_irq_ack_r )
@@ -400,7 +401,7 @@ static MACHINE_CONFIG_START( pastelg, driver_device )
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
 
 	MDRV_MACHINE_RESET(nb1413m3)
-	MDRV_NVRAM_HANDLER(nb1413m3)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -459,7 +460,7 @@ static MACHINE_CONFIG_START( threeds, driver_device )
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
 
 	MDRV_MACHINE_RESET(nb1413m3)
-	MDRV_NVRAM_HANDLER(nb1413m3)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
