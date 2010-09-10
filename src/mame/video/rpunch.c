@@ -60,7 +60,7 @@ static TILE_GET_INFO( get_bg1_tile_info )
 {
 	rpunch_state *state = machine->driver_data<rpunch_state>();
 	UINT16 *videoram = state->videoram;
-	int data = videoram[0x4000 / 2 + tile_index];
+	int data = videoram[0x2000 / 2 + tile_index];
 	int code;
 	if (videoflags & 0x0800)	code = (data & 0x0fff) | 0x2000;
 	else						code = (data & 0x1fff);
@@ -90,7 +90,7 @@ static TIMER_CALLBACK( crtc_interrupt_gen )
 VIDEO_START( rpunch )
 {
 	/* allocate tilemaps for the backgrounds */
-	background[0] = tilemap_create(machine, get_bg0_tile_info,tilemap_scan_cols,     8,8,64,64);
+	background[0] = tilemap_create(machine, get_bg0_tile_info,tilemap_scan_cols,8,8,64,64);
 	background[1] = tilemap_create(machine, get_bg1_tile_info,tilemap_scan_cols,8,8,64,64);
 
 	/* configure the tilemaps */
