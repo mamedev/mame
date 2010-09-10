@@ -50,6 +50,7 @@
 // MAMEOS headers
 #include "winutf8.h"
 #include "strconv.h"
+#include "strconv.h"
 
 
 //============================================================
@@ -64,6 +65,14 @@
 
 // align allocations to start or end of the page?
 #define GUARD_ALIGN_START	0
+
+
+
+//============================================================
+//  GLOBAL VARIABLES
+//============================================================
+
+void (*s_debugger_stack_crawler)() = NULL;
 
 
 
@@ -167,4 +176,6 @@ void osd_break_into_debugger(const char *message)
 		win_output_debug_string_utf8(message);
 		DebugBreak();
 	}
+	else if (s_debugger_stack_crawler != NULL)
+		(*s_debugger_stack_crawler)();
 }

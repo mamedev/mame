@@ -118,11 +118,12 @@ class stack_walker
 {
 public:
 	stack_walker();
-
+	
 	FPTR ip() const { return m_stackframe.AddrPC.Offset; }
 	FPTR sp() const { return m_stackframe.AddrStack.Offset; }
 	FPTR frame() const { return m_stackframe.AddrFrame.Offset; }
 
+	bool reset();
 	void reset(CONTEXT &context, HANDLE thread);
 	bool unwind();
 
@@ -138,6 +139,7 @@ private:
 	dynamic_bind<BOOL (WINAPI *)(HANDLE, LPCTSTR, BOOL)> m_sym_initialize;
 	dynamic_bind<PVOID (WINAPI *)(HANDLE, DWORD64)> m_sym_function_table_access_64;
 	dynamic_bind<DWORD64 (WINAPI *)(HANDLE, DWORD64)> m_sym_get_module_base_64;
+	dynamic_bind<VOID (WINAPI *)(PCONTEXT)> m_rtl_capture_context;
 
 	static bool		s_initialized;
 };
@@ -392,10 +394,14 @@ int main(int argc, char *argv[])
 	// allocate symbols
 	symbol_manager local_symbols(argv[0]);
 	symbols = &local_symbols;
-
+	
 	// set up exception handling
 	pass_thru_filter = SetUnhandledExceptionFilter(exception_filter);
 	SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX);
+
+	// enable stack crawls for asserts
+	extern void (*s_debugger_stack_crawler)();
+	s_debugger_stack_crawler = winmain_dump_stack;
 
 	// if we're a GUI app, out errors to message boxes
 	if (win_is_gui_application() || is_double_click_start(argc))
@@ -583,6 +589,23 @@ static void osd_exit(running_machine &machine)
 
 
 //============================================================
+//  winmain_dump_stack
+//============================================================
+
+void winmain_dump_stack()
+{
+	// set up the stack walker
+	stack_walker walker;
+	if (!walker.reset())
+		return;
+
+	// walk the stack
+	while (walker.unwind())
+		fprintf(stderr, "  %p: %p%s\n", (void *)walker.frame(), (void *)walker.ip(), (symbols == NULL) ? "" : symbols->symbol_for_address(walker.ip()));
+}
+
+
+//============================================================
 //  check_for_double_click_start
 //============================================================
 
@@ -755,12 +778,11 @@ static LONG WINAPI exception_filter(struct _EXCEPTION_POINTERS *info)
 
 	// walk the stack
 	while (walker.unwind())
-		fprintf(stderr, "  %p: %p%s\n", (void *)walker.frame(), (void *)walker.ip(), symbols->symbol_for_address(walker.ip()));
+		fprintf(stderr, "  %p: %p%s\n", (void *)walker.frame(), (void *)walker.ip(), (symbols == NULL) ? "" : symbols->symbol_for_address(walker.ip()));
 
 	// exit
 	return EXCEPTION_CONTINUE_SEARCH;
 }
-
 
 
 //**************************************************************************
@@ -778,7 +800,8 @@ stack_walker::stack_walker()
 	  m_stack_walk_64(TEXT("dbghelp.dll"), "StackWalk64"),
 	  m_sym_initialize(TEXT("dbghelp.dll"), "SymInitialize"),
 	  m_sym_function_table_access_64(TEXT("dbghelp.dll"), "SymFunctionTableAccess64"),
-	  m_sym_get_module_base_64(TEXT("dbghelp.dll"), "SymGetModuleBase64")
+	  m_sym_get_module_base_64(TEXT("dbghelp.dll"), "SymGetModuleBase64"),
+	  m_rtl_capture_context(TEXT("kernel32.dll"), "RtlCaptureContext")
 {
 	// zap the structs
 	memset(&m_stackframe, 0, sizeof(m_stackframe));
@@ -796,6 +819,34 @@ stack_walker::stack_walker()
 //-------------------------------------------------
 //  reset - set up a new context
 //-------------------------------------------------
+
+bool stack_walker::reset()
+{
+	// set up the initial state
+	if (!m_rtl_capture_context)
+		return false;
+	(*m_rtl_capture_context)(&m_context);
+	m_thread = GetCurrentThread();
+	m_first = true;
+
+	// initialize the stackframe
+	memset(&m_stackframe, 0, sizeof(m_stackframe));
+	m_stackframe.AddrPC.Mode = AddrModeFlat;
+	m_stackframe.AddrFrame.Mode = AddrModeFlat;
+	m_stackframe.AddrStack.Mode = AddrModeFlat;
+
+	// pull architecture-specific fields from the context
+#ifdef PTR64
+	m_stackframe.AddrPC.Offset = m_context.Rip;
+	m_stackframe.AddrFrame.Offset = m_context.Rsp;
+	m_stackframe.AddrStack.Offset = m_context.Rsp;
+#else
+	m_stackframe.AddrPC.Offset = m_context.Eip;
+	m_stackframe.AddrFrame.Offset = m_context.Ebp;
+	m_stackframe.AddrStack.Offset = m_context.Esp;
+#endif
+	return true;
+}
 
 void stack_walker::reset(CONTEXT &initial, HANDLE thread)
 {
