@@ -2639,7 +2639,7 @@ static const es5506_interface es5506_config =
 
 ***************************************************************************/
 
-static void init_ssv(running_machine *machine, int sprites_offsx, int sprites_offsy, int tilemap_offsx, int tilemap_offsy, int interrupt_ultrax)
+static void init_ssv(running_machine *machine, int sprites_offsx, int sprites_offsy, int tilemap_offsx, int interrupt_ultrax)
 {
 	ssv_state *state = machine->driver_data<ssv_state>();
 	int i;
@@ -2654,7 +2654,6 @@ static void init_ssv(running_machine *machine, int sprites_offsx, int sprites_of
 	state->sprites_offsx = sprites_offsx;
 	state->sprites_offsy = sprites_offsy;
 	state->tilemap_offsx = tilemap_offsx;
-	state->tilemap_offsy = tilemap_offsy;
 }
 
 static void init_hypreac2(running_machine *machine)
@@ -2666,31 +2665,46 @@ static void init_hypreac2(running_machine *machine)
 		state->tile_code[i]	=	(i << 16);
 }
 
+// [1c0070-71 & 0x03ff] is the global y offset for tilemaps (it's negative if [1c0070-71 & 0x0100] == 0x0100)
+// 1c006a-6b is the y start visible area
+// tilemap_offsy = (1c0070-71) + (1c006a-6b)
+// drifto94:
+//	70-71 = 0x300 -> -0x100
+//	6a-6b = 0x13
+//	tilemap_offsy = -0x100 + 0x13 = -0xed
+// gdfs:
+//	70-71 = 0x3ec -> -0x14
+//	6a-6b = 0x12
+//	tilemap_offsy = -0x14 + 0x12 = -0x02
+// twineagl:
+//	70-71 = 0xffec -> 0x03ec -> -0x14
+//	6a-6b = 12
+//	tilemap_offsy = -0x14 + 0x12 = -0x02
 
-static DRIVER_INIT( drifto94 )		{	init_ssv(machine, -8, +0xf0, +0, -0xf0, 0);	}
-static DRIVER_INIT( eaglshot )		{	init_ssv(machine, -8, +0xf0, +0, -0xef, 0); init_hypreac2(machine);	}
-static DRIVER_INIT( gdfs )			{	init_ssv(machine, -8, +0x01, +0, +0x00, 0);	}
-static DRIVER_INIT( hypreact )		{	init_ssv(machine, +0, +0xf0, +0, -0xf7, 0);	}
-static DRIVER_INIT( hypreac2 )		{	init_ssv(machine, +0, +0xf0, +0, -0xf8, 0); init_hypreac2(machine);	}
-static DRIVER_INIT( janjans1 )		{	init_ssv(machine, +0, +0xe8, +0, -0xf0, 0);	}
-static DRIVER_INIT( keithlcy )		{	init_ssv(machine, -8, +0xf1, +0, -0xf0, 0);	}
-static DRIVER_INIT( meosism )			{	init_ssv(machine, +0, +0xe8, +0, -0xef, 0);	}
-static DRIVER_INIT( mslider )			{	init_ssv(machine, -8, +0xf0, +0, -0xf1, 0);	}
-static DRIVER_INIT( ryorioh )			{	init_ssv(machine, +0, +0xe8, +0, -0xf0, 0);	}
-static DRIVER_INIT( srmp4 )			{	init_ssv(machine, -8, +0xf0, +0, -0xf0, 0);
+static DRIVER_INIT( drifto94 )		{	init_ssv(machine, -8, +0xec, +0, 0);	}
+static DRIVER_INIT( eaglshot )		{	init_ssv(machine, -8, +0xf0, +0, 0); init_hypreac2(machine);	}
+static DRIVER_INIT( gdfs )			{	init_ssv(machine, -8 ,+0x00, +0, 0);	}
+static DRIVER_INIT( hypreact )		{	init_ssv(machine, +0, +0xe8, +0, 0);	}
+static DRIVER_INIT( hypreac2 )		{	init_ssv(machine, +0, +0xe8, +0, 0); init_hypreac2(machine);	}
+static DRIVER_INIT( janjans1 )		{	init_ssv(machine, +0, +0xe8, +0, 0);	}
+static DRIVER_INIT( keithlcy )		{	init_ssv(machine, -8, +0xec, +0, 0);	}
+static DRIVER_INIT( meosism )			{	init_ssv(machine, +0, +0xe4, +0, 0);	}
+static DRIVER_INIT( mslider )			{	init_ssv(machine, -8, +0xf0, +0, 0);	}
+static DRIVER_INIT( ryorioh )			{	init_ssv(machine, +0, +0xe8, +0, 0);	}
+static DRIVER_INIT( srmp4 )			{	init_ssv(machine, -8, +0xec, +0, 0);
 //  ((UINT16 *)memory_region(machine, "user1"))[0x2b38/2] = 0x037a;   /* patch to see gal test mode */
 }
-static DRIVER_INIT( srmp7 )			{	init_ssv(machine, +0, -0x0f, +0, -0xf0, 0);	}
-static DRIVER_INIT( stmblade )		{	init_ssv(machine, -8, +0xef, +0, -0xf0, 0);	}
-static DRIVER_INIT( survarts )		{	init_ssv(machine, +0, +0xe8, +0, -0xef, 0);	}
-static DRIVER_INIT( dynagear )		{	init_ssv(machine, -8, +0xec, +0, -0xef, 0);	}
-static DRIVER_INIT( sxyreact )		{	init_ssv(machine, +0, +0xe8, +0, -0xef, 0); init_hypreac2(machine);	}	// different
-static DRIVER_INIT( cairblad )		{	init_ssv(machine, +0, +0xe8, +0, -0xef, 0); init_hypreac2(machine);	}	// different
-static DRIVER_INIT( sxyreac2 )		{	init_ssv(machine, +0, +0xe8, +0, -0xef, 0); init_hypreac2(machine);	}
-static DRIVER_INIT( twineag2 )		{	init_ssv(machine, -6, +0x01, -2, +0x00, 1);	}
-static DRIVER_INIT( ultrax )			{	init_ssv(machine, -8, +0x01, +0, +0x00, 1);	}
-static DRIVER_INIT( vasara )			{	init_ssv(machine, +0, +0xf0, +0, -0xf8, 0);	}
-static DRIVER_INIT( jsk )			{	init_ssv(machine, -8, +0xf5, +0, -0xf4, 0);	}
+static DRIVER_INIT( srmp7 )			{	init_ssv(machine, +0, -0x0f, +0, 0);	}
+static DRIVER_INIT( stmblade )		{	init_ssv(machine, -8, +0xef, +0, 0);	}
+static DRIVER_INIT( survarts )		{	init_ssv(machine, +0, +0xe4, +0, 0);	}
+static DRIVER_INIT( dynagear )		{	init_ssv(machine, -8, +0xec, +0, 0);	}
+static DRIVER_INIT( sxyreact )		{	init_ssv(machine, +0, +0xe8, +0, 0); init_hypreac2(machine);	}
+static DRIVER_INIT( cairblad )		{	init_ssv(machine, +0, +0xe8, +0, 0); init_hypreac2(machine);	}
+static DRIVER_INIT( sxyreac2 )		{	init_ssv(machine, +0, +0xe8, +0, 0); init_hypreac2(machine);	}
+static DRIVER_INIT( twineag2 )		{	init_ssv(machine, -8, +0x01, +0, 1);	}
+static DRIVER_INIT( ultrax )			{	init_ssv(machine, -8, +0x01, +0, 1);	}
+static DRIVER_INIT( vasara )			{	init_ssv(machine, +0, +0xf0, +0, 0);	}
+static DRIVER_INIT( jsk )			{	init_ssv(machine, -8, +0xf5, +0, 0);	}
 
 
 static MACHINE_CONFIG_START( ssv, ssv_state )
@@ -2733,7 +2747,7 @@ static MACHINE_CONFIG_DERIVED( drifto94, ssv )
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0, 0x150-1, 1, 0xf0-1-1)
+	MDRV_SCREEN_VISIBLE_AREA(0, (0xcd-0x25)*2-1, 0, (0x101-0x13)-1)
 MACHINE_CONFIG_END
 
 
@@ -2748,7 +2762,7 @@ static MACHINE_CONFIG_DERIVED( gdfs, ssv )
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0, 0x152-1, 0, 0xf0-1)
+	MDRV_SCREEN_VISIBLE_AREA(0, (0xd5-0x2c)*2-1, 0, (0x102-0x12)-1)
 
 	MDRV_GFXDECODE(gdfs)
 	MDRV_VIDEO_START(gdfs)
@@ -2764,7 +2778,7 @@ static MACHINE_CONFIG_DERIVED( hypreact, ssv )
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0, 0x152-1, 8, 0xf8-1)
+	MDRV_SCREEN_VISIBLE_AREA(0, (0xcb-0x22)*2-1, 0, (0xfe - 0x0e)-1)
 MACHINE_CONFIG_END
 
 
@@ -2776,7 +2790,7 @@ static MACHINE_CONFIG_DERIVED( hypreac2, ssv )
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0, 0x152-1, 8, 0xf8-1)
+	MDRV_SCREEN_VISIBLE_AREA(0, (0xcb-0x22)*2-1, 0, (0xfe - 0x0e)-1)
 MACHINE_CONFIG_END
 
 
@@ -2788,7 +2802,7 @@ static MACHINE_CONFIG_DERIVED( janjans1, ssv )
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0, 0x150-1, 0, 0xf0-1-1)
+	MDRV_SCREEN_VISIBLE_AREA(0, (0xcb-0x23)*2-1, 0, (0xfe - 0x0f)-1)
 MACHINE_CONFIG_END
 
 
@@ -2800,7 +2814,7 @@ static MACHINE_CONFIG_DERIVED( keithlcy, ssv )
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0, 0x150-1, 1, 0xf0-1-1)
+	MDRV_SCREEN_VISIBLE_AREA(0, (0xcd-0x25)*2-1, 0, (0x101 - 0x13)-1)
 MACHINE_CONFIG_END
 
 
@@ -2814,7 +2828,7 @@ static MACHINE_CONFIG_DERIVED( meosism, ssv )
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0, 0x150-1+2, 2, 0xf0-1-2)
+	MDRV_SCREEN_VISIBLE_AREA(0, (0xd5-0x2c)*2-1, 0, (0xfe - 0x12)-1)
 MACHINE_CONFIG_END
 
 
@@ -2826,7 +2840,7 @@ static MACHINE_CONFIG_DERIVED( mslider, ssv )
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0, 0x160-1, 0, 0xf0-1)
+	MDRV_SCREEN_VISIBLE_AREA(0, (0xd6-0x26)*2-1, 0, (0xfe - 0x0e)-1)
 MACHINE_CONFIG_END
 
 
@@ -2838,7 +2852,7 @@ static MACHINE_CONFIG_DERIVED( ryorioh, ssv )
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0, 0x150-1, 0, 0xf0-1-1)
+	MDRV_SCREEN_VISIBLE_AREA(0, (0xcb-0x23)*2-1, 0, (0xfe - 0x0f)-1)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( vasara, ssv )
@@ -2849,7 +2863,7 @@ static MACHINE_CONFIG_DERIVED( vasara, ssv )
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0, 0x150-1, 0, 0xf0-1)
+	MDRV_SCREEN_VISIBLE_AREA(0, (0xcc-0x24)*2-1, 0,(0xfe - 0x0e)-1)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( srmp4, ssv )
@@ -2860,7 +2874,7 @@ static MACHINE_CONFIG_DERIVED( srmp4, ssv )
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0, 0x150-1, 4, 0xf4-1)
+	MDRV_SCREEN_VISIBLE_AREA(0, (0xd4-0x2c)*2-1, 0, (0x102 - 0x12)-1)
 MACHINE_CONFIG_END
 
 
@@ -2872,7 +2886,7 @@ static MACHINE_CONFIG_DERIVED( srmp7, ssv )
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0, 0x150-1, 0, 0xf0-1-1)
+	MDRV_SCREEN_VISIBLE_AREA(0, (0xd4-0x2c)*2-1, 0, (0xfd - 0x0e)-1)
 MACHINE_CONFIG_END
 
 
@@ -2885,7 +2899,7 @@ static MACHINE_CONFIG_DERIVED( stmblade, ssv )
 	MDRV_NVRAM_HANDLER(ssv)
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0, 0x160-1, 0, 0xf0-1)
+	MDRV_SCREEN_VISIBLE_AREA(0, (0xd6-0x26)*2-1, 0, (0xfe - 0x0e)-1)
 MACHINE_CONFIG_END
 
 
@@ -2897,15 +2911,16 @@ static MACHINE_CONFIG_DERIVED( survarts, ssv )
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0, 0x150-1, 4, 0xf4-1)
+	MDRV_SCREEN_VISIBLE_AREA(0, (0xd4-0x2c)*2-1, 0, (0x102 - 0x12)-1)
 MACHINE_CONFIG_END
+
 
 static MACHINE_CONFIG_DERIVED( dynagear, survarts )
 
 	/* basic machine hardware */
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0, 336-1, 0, 0xf0-1)
+	MDRV_SCREEN_VISIBLE_AREA(0, (0xd4-0x2c)*2-1, 0, (0x102 - 0x12)-1)
 MACHINE_CONFIG_END
 
 
@@ -2919,7 +2934,7 @@ static MACHINE_CONFIG_DERIVED( eaglshot, ssv )
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0, 0x140-1, 8, 0xe8-1)
+	MDRV_SCREEN_VISIBLE_AREA(0, (0xca - 0x2a)*2-1, 0, (0xf6 - 0x16)-1)
 
 	MDRV_GFXDECODE(eaglshot)
 	MDRV_VIDEO_START(eaglshot)
@@ -2937,7 +2952,7 @@ static MACHINE_CONFIG_DERIVED( sxyreact, ssv )
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0, 0x150-1+2, 0, 0xf0-1)
+	MDRV_SCREEN_VISIBLE_AREA(0, (0xcb - 0x22)*2-1, 0, (0xfe - 0x0e)-1)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( sxyreac2, ssv )
@@ -2950,7 +2965,7 @@ static MACHINE_CONFIG_DERIVED( sxyreac2, ssv )
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0, 0x150-1, 0, 0xf0-1)
+	MDRV_SCREEN_VISIBLE_AREA(0, (0xcb - 0x23)*2-1, 0, (0xfe - 0x0e)-1)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( cairblad, ssv )
@@ -2963,7 +2978,7 @@ static MACHINE_CONFIG_DERIVED( cairblad, ssv )
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0, 0x150-1+2, 0, 0xf0-1)
+	MDRV_SCREEN_VISIBLE_AREA(0, (0xcb - 0x22)*2-1, 0, (0xfe - 0x0e)-1)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( twineag2, ssv )
@@ -2974,7 +2989,7 @@ static MACHINE_CONFIG_DERIVED( twineag2, ssv )
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0, 0x150-1, 0, 0xf0-1)
+	MDRV_SCREEN_VISIBLE_AREA(0, (0xd4 - 0x2c)*2-1, 0, (0x102 - 0x12)-1)
 MACHINE_CONFIG_END
 
 
@@ -2986,7 +3001,7 @@ static MACHINE_CONFIG_DERIVED( ultrax, ssv )
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0, 0x150-1, 0, 0xf0-1)
+	MDRV_SCREEN_VISIBLE_AREA(0, (0xd4 - 0x2c)*2-1, 0, (0x102 - 0x12)-1)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( jsk, ssv )
@@ -3000,7 +3015,7 @@ static MACHINE_CONFIG_DERIVED( jsk, ssv )
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0, 0x150-1, 0, 0xf0-1)
+	MDRV_SCREEN_VISIBLE_AREA(0, (0xca - 0x22)*2-1, 0, (0xfe - 0x0e)-1)
 MACHINE_CONFIG_END
 
 

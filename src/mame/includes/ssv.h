@@ -15,7 +15,6 @@ public:
 	int sprites_offsx;
 	int sprites_offsy;
 	int tilemap_offsx;
-	int tilemap_offsy;
 	int shadow_pen_mask;
 	int shadow_pen_shift;
 
