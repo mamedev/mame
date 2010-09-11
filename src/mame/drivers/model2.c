@@ -89,6 +89,7 @@
 #include "emu.h"
 #include "deprecat.h"
 #include "machine/eeprom.h"
+#include "machine/nvram.h"
 #include "video/segaic24.h"
 #include "cpu/i960/i960.h"
 #include "cpu/m68000/m68000.h"
@@ -101,7 +102,7 @@
 #include "includes/model2.h"
 
 UINT32 *model2_bufferram, *model2_colorxlat;
-static UINT32 *model2_workram, *model2_backup1, *model2_backup2;
+static UINT32 *model2_workram;
 UINT32 *model2_textureram0, *model2_textureram1, *model2_lumaram;
 UINT32 *model2_paletteram32;
 static UINT32 model2_intreq;
@@ -274,34 +275,6 @@ static void copro_fifoout_push(running_device *device, UINT32 data)
 			sharc_set_flag_input(device, 1, CLEAR_LINE);
 
 			//cpu_set_input_line(device, SHARC_INPUT_FLAG1, CLEAR_LINE);
-		}
-	}
-}
-
-
-
-static NVRAM_HANDLER( model2 )
-{
-	if (read_or_write)
-	{
-		mame_fwrite(file, model2_backup1, 0x3fff);
-		if (model2_backup2)
-			mame_fwrite(file, model2_backup2, 0xff);
-	}
-	else
-	{
-		if (file)
-		{
-			mame_fread(file, model2_backup1, 0x3fff);
-			if (model2_backup2)
-				mame_fread(file, model2_backup2, 0xff);
-		}
-		else
-		{
-			/* Virtua Striker needs the nvram to be defaulted with 1s or the ranking gets un-inited. */
-			memset(model2_backup1, 0xff, 0x4000);
-			if (model2_backup2)
-				memset(model2_backup2, 0xff, 0x100);
 		}
 	}
 }
@@ -1402,7 +1375,7 @@ static ADDRESS_MAP_START( model2_base_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x01810000, 0x0181bfff) AM_RAM AM_BASE(&model2_colorxlat)
 	AM_RANGE(0x0181c000, 0x0181c003) AM_WRITE(model2_3d_zclip_w)
 	AM_RANGE(0x01a10000, 0x01a1ffff) AM_READWRITE(network_r, network_w)
-	AM_RANGE(0x01d00000, 0x01d03fff) AM_RAM AM_BASE( &model2_backup1 ) // Backup sram
+	AM_RANGE(0x01d00000, 0x01d03fff) AM_RAM AM_SHARE("backup1") // Backup sram
 	AM_RANGE(0x02000000, 0x03ffffff) AM_ROM AM_REGION("user1", 0)
 
 	// "extra" data
@@ -1439,7 +1412,7 @@ static ADDRESS_MAP_START( model2o_mem, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x01c00014, 0x01c00017) AM_READ_PORT("1c00014")
 	AM_RANGE(0x01c0001c, 0x01c0001f) AM_READ( desert_unk_r )
 	AM_RANGE(0x01c00040, 0x01c00043) AM_READ( daytona_unk_r )
-	AM_RANGE(0x01c00200, 0x01c002ff) AM_RAM AM_BASE( &model2_backup2 )
+	AM_RANGE(0x01c00200, 0x01c002ff) AM_RAM AM_SHARE("backup2")
 	AM_RANGE(0x01c80000, 0x01c80003) AM_READWRITE( model2_serial_r, model2o_serial_w )
 
 	AM_IMPORT_FROM(model2_base_mem)
@@ -2024,7 +1997,8 @@ static MACHINE_CONFIG_START( model2o, driver_device )
 	MDRV_MACHINE_RESET(model2o)
 
 	MDRV_EEPROM_93C46_ADD("eeprom")
-	MDRV_NVRAM_HANDLER( model2 )
+	MDRV_NVRAM_ADD_1FILL("backup1")
+	MDRV_NVRAM_ADD_1FILL("backup2")
 
 	MDRV_TIMER_ADD("timer0", model2_timer_cb)
 	MDRV_TIMER_PTR((FPTR)0)
@@ -2080,7 +2054,7 @@ static MACHINE_CONFIG_START( model2a, driver_device )
 	MDRV_MACHINE_RESET(model2)
 
 	MDRV_EEPROM_93C46_ADD("eeprom")
-	MDRV_NVRAM_HANDLER( model2 )
+	MDRV_NVRAM_ADD_1FILL("backup1")
 
 	MDRV_TIMER_ADD("timer0", model2_timer_cb)
 	MDRV_TIMER_PTR((FPTR)0)
@@ -2181,7 +2155,7 @@ static MACHINE_CONFIG_START( model2b, driver_device )
 	MDRV_MACHINE_RESET(model2b)
 
 	MDRV_EEPROM_93C46_ADD("eeprom")
-	MDRV_NVRAM_HANDLER( model2 )
+	MDRV_NVRAM_ADD_1FILL("backup1")
 
 	MDRV_TIMER_ADD("timer0", model2_timer_cb)
 	MDRV_TIMER_PTR((FPTR)0)
@@ -2226,7 +2200,7 @@ static MACHINE_CONFIG_START( model2c, driver_device )
 	MDRV_MACHINE_RESET(model2c)
 
 	MDRV_EEPROM_93C46_ADD("eeprom")
-	MDRV_NVRAM_HANDLER( model2 )
+	MDRV_NVRAM_ADD_1FILL("backup1")
 
 	MDRV_TIMER_ADD("timer0", model2_timer_cb)
 	MDRV_TIMER_PTR((FPTR)0)

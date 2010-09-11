@@ -18,6 +18,8 @@ public:
 	itech32_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config) { }
 
+	void nvram_init(nvram_device &nvram, void *base, size_t length);
+
 	UINT16 *videoram;
 };
 

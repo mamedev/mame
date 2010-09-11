@@ -501,6 +501,7 @@
 #include "cpu/m6809/m6809.h"
 #include "machine/6821pia.h"
 #include "machine/6522via.h"
+#include "machine/nvram.h"
 #include "machine/ticket.h"
 #include "video/tms34061.h"
 #include "video/tlc34076.h"
@@ -532,9 +533,6 @@ static UINT8 sound_data;
 
 static UINT8 pia_porta_data;
 static UINT8 pia_portb_data;
-
-static UINT8 *main_ram;
-static size_t main_ram_size;
 
 static const rectangle *visarea;
 
@@ -861,27 +859,6 @@ static WRITE16_HANDLER( palette16_w )
 
 /*************************************
  *
- *  NVRAM read/write
- *
- *************************************/
-
-static NVRAM_HANDLER( itech8 )
-{
-	int i;
-
-	if (read_or_write)
-		mame_fwrite(file, main_ram, main_ram_size);
-	else if (file)
-		mame_fread(file, main_ram, main_ram_size);
-	else
-		for (i = 0; i < main_ram_size; i++)
-			main_ram[i] = mame_rand(machine);
-}
-
-
-
-/*************************************
- *
  *  Main CPU memory handlers
  *
  *************************************/
@@ -897,7 +874,7 @@ static ADDRESS_MAP_START( tmslo_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x11a0, 0x11a0) AM_WRITE(itech8_nmi_ack_w)
 	AM_RANGE(0x11c0, 0x11df) AM_READWRITE(itech8_blitter_r, blitter_w)
 	AM_RANGE(0x11e0, 0x11ff) AM_WRITE(itech8_palette_w)
-	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE(&main_ram) AM_SIZE(&main_ram_size)
+	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x4000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
@@ -913,7 +890,7 @@ static ADDRESS_MAP_START( tmshi_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x01a0, 0x01a0) AM_WRITE(itech8_nmi_ack_w)
 	AM_RANGE(0x01c0, 0x01df) AM_READWRITE(itech8_blitter_r, blitter_w)
 	AM_RANGE(0x01e0, 0x01ff) AM_WRITE(itech8_palette_w)
-	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE(&main_ram) AM_SIZE(&main_ram_size)
+	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x4000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
@@ -929,7 +906,7 @@ static ADDRESS_MAP_START( gtg2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x01c0, 0x01c0) AM_WRITE(gtg2_sound_data_w)
 	AM_RANGE(0x01e0, 0x01e0) AM_WRITE(tms34061_latch_w)
 	AM_RANGE(0x1000, 0x1fff) AM_READWRITE(itech8_tms34061_r, itech8_tms34061_w)
-	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_BASE(&main_ram) AM_SIZE(&main_ram_size)
+	AM_RANGE(0x2000, 0x3fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x4000, 0xffff) AM_ROMBANK("bank1")
 ADDRESS_MAP_END
 
@@ -937,7 +914,7 @@ ADDRESS_MAP_END
 /*------ Ninja Clowns layout ------*/
 static ADDRESS_MAP_START( ninclown_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x00007f) AM_RAM AM_REGION("maincpu", 0)
-	AM_RANGE(0x000080, 0x003fff) AM_RAM AM_BASE((UINT16 **)&main_ram) AM_SIZE(&main_ram_size)
+	AM_RANGE(0x000080, 0x003fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x004000, 0x07ffff) AM_ROM
 	AM_RANGE(0x100080, 0x100081) AM_WRITE8(sound_data_w, 0xff00)
 	AM_RANGE(0x100100, 0x100101) AM_READ_PORT("40") AM_WRITE(grom_bank16_w) AM_BASE((UINT16 **)&itech8_grom_bank)
@@ -1722,7 +1699,7 @@ static MACHINE_CONFIG_START( itech8_core_lo, driver_device )
 	MDRV_CPU_VBLANK_INT("screen", generate_nmi)
 
 	MDRV_MACHINE_RESET(itech8)
-	MDRV_NVRAM_HANDLER(itech8)
+	MDRV_NVRAM_ADD_RANDOM_FILL("nvram")
 
 	MDRV_TICKET_DISPENSER_ADD("ticket", 200, TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
 

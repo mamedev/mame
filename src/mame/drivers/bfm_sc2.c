@@ -139,6 +139,8 @@ Adder hardware:
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 
+#include "machine/nvram.h"
+
 #include "video/bfm_adr2.h"
 
 #include "sound/2413intf.h"
@@ -188,7 +190,6 @@ static int sc2gui_update_mmtr;	// bit pattern which mechanical meter needs updat
 // local vars /////////////////////////////////////////////////////////////
 
 static UINT8 *nvram;		// pointer to NVRAM
-static size_t nvram_size;	// size of NVRAM
 static UINT8 key[16];		// security device on gamecard (video games only)
 
 static UINT8 e2ram[1024];	// x24C08 e2ram
@@ -443,19 +444,16 @@ static NVRAM_HANDLER( bfm_sc2 )
 	static const UINT8 init_e2ram[10] = { 1, 4, 10, 20, 0, 1, 1, 4, 10, 20 };
 	if ( read_or_write )
 	{	// writing
-		mame_fwrite(file,nvram,nvram_size);
 		mame_fwrite(file,e2ram,sizeof(e2ram));
 	}
 	else
 	{ // reading
 		if ( file )
 		{
-			mame_fread(file,nvram,nvram_size);
 			mame_fread(file,e2ram,sizeof(e2ram));
 		}
 		else
 		{
-			memset(nvram,0x00,nvram_size);
 			memset(e2ram,0x00,sizeof(e2ram));
 			memcpy(e2ram,init_e2ram,sizeof(init_e2ram));
 		}
@@ -1508,7 +1506,7 @@ static VIDEO_UPDATE( addersc2 )
 
 static ADDRESS_MAP_START( memmap_vid, ADDRESS_SPACE_PROGRAM, 8 )
 
-	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(ram_r, ram_w) AM_BASE(&nvram) AM_SIZE(&nvram_size)// 8k RAM
+	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(ram_r, ram_w) AM_BASE(&nvram) AM_SHARE("nvram") // 8k RAM
 	AM_RANGE(0x2000, 0x2000) AM_READ(vfd_status_hop_r)		// vfd status register
 	AM_RANGE(0x2000, 0x20FF) AM_WRITE(reel12_vid_w)
 	AM_RANGE(0x2100, 0x21FF) AM_WRITE(reel34_w)
@@ -2223,6 +2221,7 @@ static MACHINE_CONFIG_START( scorpion2_vid, driver_device )
 	MDRV_CPU_PROGRAM_MAP(memmap_vid)					// setup scorpion2 board memorymap
 	MDRV_CPU_PERIODIC_INT(timer_irq, 1000)				// generate 1000 IRQ's per second
 
+	MDRV_NVRAM_ADD_0FILL("nvram")
 	MDRV_NVRAM_HANDLER(bfm_sc2)
 	MDRV_DEFAULT_LAYOUT(layout_bfm_sc2)
 
@@ -2748,7 +2747,7 @@ static MACHINE_RESET( dm01_init )
 
 
 static ADDRESS_MAP_START( sc2_memmap, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1FFF) AM_READWRITE(ram_r, ram_w) AM_BASE(&nvram) AM_SIZE(&nvram_size)
+	AM_RANGE(0x0000, 0x1FFF) AM_READWRITE(ram_r, ram_w) AM_BASE(&nvram) AM_SHARE("nvram")
 	AM_RANGE(0x2000, 0x2000) AM_READ(vfd_status_r)
 	AM_RANGE(0x2000, 0x20FF) AM_WRITE(reel12_w)
 	AM_RANGE(0x2100, 0x21FF) AM_WRITE(reel34_w)
@@ -2797,7 +2796,7 @@ ADDRESS_MAP_END
 
 /* memory map for scorpion3 board */
 static ADDRESS_MAP_START( sc3_memmap, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1FFF) AM_READWRITE(ram_r, ram_w) AM_BASE(&nvram) AM_SIZE(&nvram_size)
+	AM_RANGE(0x0000, 0x1FFF) AM_READWRITE(ram_r, ram_w) AM_BASE(&nvram) AM_SHARE("nvram")
 	AM_RANGE(0x2000, 0x2000) AM_READ(vfd_status_r)
 	AM_RANGE(0x2000, 0x20FF) AM_WRITE(reel12_w)
 	AM_RANGE(0x2100, 0x21FF) AM_WRITE(reel34_w)
@@ -2846,7 +2845,7 @@ ADDRESS_MAP_END
 
 /* memory map for scorpion2 board + dm01 dot matrix board */
 static ADDRESS_MAP_START( memmap_sc2_dm01, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1FFF) AM_READWRITE(ram_r, ram_w) AM_BASE(&nvram) AM_SIZE(&nvram_size)
+	AM_RANGE(0x0000, 0x1FFF) AM_READWRITE(ram_r, ram_w) AM_BASE(&nvram) AM_SHARE("nvram")
 	AM_RANGE(0x2000, 0x2000) AM_READ(vfd_status_dm01_r)
 	AM_RANGE(0x2000, 0x20FF) AM_WRITE(reel12_w)
 	AM_RANGE(0x2100, 0x21FF) AM_WRITE(reel34_w)
@@ -3980,6 +3979,7 @@ static MACHINE_CONFIG_START( scorpion2, driver_device )
 	MDRV_SOUND_ADD("ymsnd",YM2413, XTAL_3_579545MHz)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
+	MDRV_NVRAM_ADD_0FILL("nvram")
 	MDRV_NVRAM_HANDLER(bfm_sc2)
 
 	/* video hardware */
@@ -4009,6 +4009,7 @@ static MACHINE_CONFIG_START( scorpion2_dm01, driver_device )
 	MDRV_SOUND_ADD("upd",UPD7759, UPD7759_STANDARD_CLOCK)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
+	MDRV_NVRAM_ADD_0FILL("nvram")
 	MDRV_NVRAM_HANDLER(bfm_sc2)
 
 	/* video hardware */

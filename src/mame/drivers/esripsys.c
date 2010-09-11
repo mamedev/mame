@@ -29,6 +29,7 @@
 #include "cpu/m6809/m6809.h"
 #include "cpu/esrip/esrip.h"
 #include "machine/6840ptm.h"
+#include "machine/nvram.h"
 #include "sound/dac.h"
 #include "sound/tms5220.h"
 #include "includes/esripsys.h"
@@ -679,6 +680,8 @@ static DRIVER_INIT( esripsys )
 	fdt_a = auto_alloc_array(machine, UINT8, FDT_RAM_SIZE);
 	fdt_b = auto_alloc_array(machine, UINT8, FDT_RAM_SIZE);
 	cmos_ram = auto_alloc_array(machine, UINT8, CMOS_RAM_SIZE);
+	
+	machine->device<nvram_device>("nvram")->set_base(cmos_ram, CMOS_RAM_SIZE);
 
 	memory_set_bankptr(machine, "bank2", &rom[0x0000]);
 	memory_set_bankptr(machine, "bank3", &rom[0x4000]);
@@ -715,16 +718,6 @@ static DRIVER_INIT( esripsys )
 	state_save_register_global(machine, _fbsel);
 }
 
-static NVRAM_HANDLER( esripsys )
-{
-	if (read_or_write)
-		mame_fwrite(file, cmos_ram, CMOS_RAM_SIZE);
-	else if (file)
-		mame_fread(file, cmos_ram, CMOS_RAM_SIZE);
-	else
-		memset(cmos_ram, 0x00, CMOS_RAM_SIZE);
-}
-
 static const esrip_config rip_config =
 {
 	fdt_rip_r,
@@ -749,7 +742,7 @@ static MACHINE_CONFIG_START( esripsys, driver_device )
 	MDRV_CPU_ADD("sound_cpu", M6809E, XTAL_8MHz)
 	MDRV_CPU_PROGRAM_MAP(sound_cpu_map)
 
-	MDRV_NVRAM_HANDLER(esripsys)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* Video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

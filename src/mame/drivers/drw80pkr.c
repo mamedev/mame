@@ -26,6 +26,7 @@
 
 ***********************************************************************************/
 #include "emu.h"
+#include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "cpu/mcs48/mcs48.h"
 
@@ -42,29 +43,10 @@ static UINT8 pkr_io_ram[0x100];
 static UINT16 video_ram[0x0400];
 static UINT8 color_ram[0x0400];
 
-/********************
-*   NVRAM Handler   *
-********************/
-
-static NVRAM_HANDLER( drw80pkr )
+static MACHINE_START( drw80pkr )
 {
-	if (read_or_write)
-	{
-		mame_fwrite(file, pkr_io_ram, DATA_NVRAM_SIZE);
-	}
-	else
-	{
-		if (file)
-		{
-			mame_fread(file, pkr_io_ram, DATA_NVRAM_SIZE);
-		}
-		else
-		{
-			memset(pkr_io_ram, 0, DATA_NVRAM_SIZE);
-		}
-	}
+	machine->device<nvram_device>("nvram")->set_base(pkr_io_ram, sizeof(pkr_io_ram));
 }
-
 
 /*****************
 * Write Handlers *
@@ -451,6 +433,8 @@ static MACHINE_CONFIG_START( drw80pkr, driver_device )
     MDRV_CPU_IO_MAP(drw80pkr_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
+	MDRV_MACHINE_START(drw80pkr)
+
 	// video hardware
 
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -466,7 +450,8 @@ static MACHINE_CONFIG_START( drw80pkr, driver_device )
 	MDRV_PALETTE_INIT(drw80pkr)
 	MDRV_VIDEO_START(drw80pkr)
 	MDRV_VIDEO_UPDATE(drw80pkr)
-	MDRV_NVRAM_HANDLER(drw80pkr)
+
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	// sound hardware
 	MDRV_SPEAKER_STANDARD_MONO("mono")

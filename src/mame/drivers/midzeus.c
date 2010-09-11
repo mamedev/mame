@@ -57,8 +57,6 @@ static UINT8			keypad_select;
 static UINT8			bitlatch[10];
 
 static UINT32 *ram_base;
-static UINT32 *zpram;
-static size_t zpram_size;
 static UINT8 cmos_protected;
 
 static UINT32 *linkram;
@@ -181,34 +179,18 @@ static WRITE32_DEVICE_HANDLER( zeus2_timekeeper_w )
 
 static READ32_HANDLER( zpram_r )
 {
-	return zpram[offset] | 0xffffff00;
+	midzeus_state *state = space->machine->driver_data<midzeus_state>();
+	return state->m_nvram[offset] | 0xffffff00;
 }
 
 
 static WRITE32_HANDLER( zpram_w )
 {
+	midzeus_state *state = space->machine->driver_data<midzeus_state>();
 	if (bitlatch[2])
-		COMBINE_DATA(&zpram[offset]);
+		COMBINE_DATA(&state->m_nvram[offset]);
 	else
 		logerror("%06X:zpram_w with bitlatch[2] = %d\n", cpu_get_pc(space->cpu), bitlatch[2]);
-}
-
-
-
-/*************************************
- *
- *  NVRAM handler (Zeus 2 only)
- *
- *************************************/
-
-static NVRAM_HANDLER( midzeus2 )
-{
-	if (read_or_write)
-		mame_fwrite(file, zpram, zpram_size);
-	else if (file)
-		mame_fread(file, zpram, zpram_size);
-	else
-		memset(zpram, 0xff, zpram_size);
 }
 
 
@@ -608,7 +590,7 @@ static ADDRESS_MAP_START( zeus2_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x880000, 0x88007f) AM_READWRITE(zeus2_r, zeus2_w) AM_BASE(&zeusbase)
 	AM_RANGE(0x8a0000, 0x8a003f) AM_READWRITE(linkram_r, linkram_w) AM_BASE(&linkram)
 	AM_RANGE(0x8d0000, 0x8d000a) AM_READWRITE(bitlatches_r, bitlatches_w)
-	AM_RANGE(0x900000, 0x91ffff) AM_READWRITE(zpram_r, zpram_w) AM_BASE(&zpram) AM_SIZE(&zpram_size) AM_MIRROR(0x020000)
+	AM_RANGE(0x900000, 0x91ffff) AM_READWRITE(zpram_r, zpram_w) AM_SHARE("nvram") AM_MIRROR(0x020000)
 	AM_RANGE(0x990000, 0x99000f) AM_READWRITE(midway_ioasic_r, midway_ioasic_w)
 	AM_RANGE(0x9c0000, 0x9c000f) AM_READWRITE(analog_r, analog_w)
 	AM_RANGE(0x9e0000, 0x9e0000) AM_WRITENOP		// watchdog?
@@ -1151,7 +1133,7 @@ static MACHINE_CONFIG_DERIVED( invasn, midzeus )
 	MDRV_CPU_IO_MAP(pic_io_map)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( midzeus2, driver_device )
+static MACHINE_CONFIG_START( midzeus2, midzeus_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", TMS32032, CPU_CLOCK)
@@ -1160,7 +1142,7 @@ static MACHINE_CONFIG_START( midzeus2, driver_device )
 
 	MDRV_MACHINE_START(midzeus)
 	MDRV_MACHINE_RESET(midzeus)
-	MDRV_NVRAM_HANDLER(midzeus2)
+	MDRV_NVRAM_ADD_1FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

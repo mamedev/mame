@@ -2,11 +2,12 @@ class bbusters_state : public driver_device
 {
 public:
 	bbusters_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: driver_device(machine, config),
+		  eprom_data(*this, "eeprom") { }
 
 	UINT16 *videoram;
 	UINT16 *ram;
-	UINT16 *eprom_data;
+	optional_shared_ptr<UINT16> eprom_data;
 	int sound_status;
 	int gun_select;
 

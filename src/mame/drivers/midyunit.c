@@ -171,24 +171,6 @@ static CUSTOM_INPUT( adpcm_irq_state_r )
 
 /*************************************
  *
- *  CMOS read/write
- *
- *************************************/
-
-static NVRAM_HANDLER( midyunit )
-{
-	if (read_or_write)
-		mame_fwrite(file, midyunit_cmos_ram, 0x8000);
-	else if (file)
-		mame_fread(file, midyunit_cmos_ram, 0x8000);
-	else
-		memset(midyunit_cmos_ram, 0, 0x8000);
-}
-
-
-
-/*************************************
- *
  *  Memory maps
  *
  *************************************/
@@ -1022,7 +1004,7 @@ static MACHINE_CONFIG_START( zunit, driver_device )
 	MDRV_CPU_PROGRAM_MAP(main_map)
 
 	MDRV_MACHINE_RESET(midyunit)
-	MDRV_NVRAM_HANDLER(midyunit)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
@@ -1055,7 +1037,7 @@ static MACHINE_CONFIG_START( yunit_core, driver_device )
 	MDRV_CPU_PROGRAM_MAP(main_map)
 
 	MDRV_MACHINE_RESET(midyunit)
-	MDRV_NVRAM_HANDLER(midyunit)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)

@@ -603,6 +603,7 @@ ALL VROM ROMs are 16M MASK
 #include "cpu/powerpc/ppc.h"
 #include "machine/eeprom.h"
 #include "machine/53c810.h"
+#include "machine/nvram.h"
 #include "sound/scsp.h"
 #include "includes/model3.h"
 
@@ -614,7 +615,6 @@ int model3_step;
 UINT32 *model3_vrom;
 
 static UINT64 *work_ram;
-static UINT64 *model3_backup;
 static int model3_crom_bank = 0;
 static int model3_controls_bank;
 static UINT32 real3d_device_id;
@@ -1163,21 +1163,6 @@ static const eeprom_interface eeprom_intf =
 	1,				/* enable_multi_read */
 	5				/* reset_delay (Lost World needs this, very similar to wbeachvl in playmark.c) */
 };
-
-static NVRAM_HANDLER( model3 )
-{
-	if (read_or_write)
-	{
-		mame_fwrite(file, model3_backup, 0x1ffff);
-	}
-	else
-	{
-		if (file)
-		{
-			mame_fread(file, model3_backup, 0x1ffff);
-		}
-	}
-}
 
 static const SCSIConfigTable scsi_dev_table =
 {
@@ -1792,25 +1777,18 @@ static ADDRESS_MAP_START( model3_mem, ADDRESS_SPACE_PROGRAM, 64)
 	AM_RANGE(0x8e000000, 0x8e0fffff) AM_WRITE( real3d_display_list_w )
 	AM_RANGE(0x98000000, 0x980fffff) AM_WRITE( real3d_polygon_ram_w )
 
-	AM_RANGE(0xf0040000, 0xf004003f) AM_READWRITE( model3_ctrl_r, model3_ctrl_w )
-	AM_RANGE(0xf0080000, 0xf0080007) AM_READWRITE( model3_sound_r, model3_sound_w )
-	AM_RANGE(0xf00c0000, 0xf00dffff) AM_RAM	AM_BASE(&model3_backup)	/* backup SRAM */
-	AM_RANGE(0xf0100000, 0xf010003f) AM_READWRITE( model3_sys_r, model3_sys_w )
-	AM_RANGE(0xf0140000, 0xf014003f) AM_READWRITE( model3_rtc_r, model3_rtc_w )
+	AM_RANGE(0xf0040000, 0xf004003f) AM_MIRROR(0x0e000000) AM_READWRITE( model3_ctrl_r, model3_ctrl_w )
+	AM_RANGE(0xf0080000, 0xf0080007) AM_MIRROR(0x0e000000) AM_READWRITE( model3_sound_r, model3_sound_w )
+	AM_RANGE(0xf00c0000, 0xf00dffff) AM_MIRROR(0x0e000000) AM_RAM AM_SHARE("backup")	/* backup SRAM */
+	AM_RANGE(0xf0100000, 0xf010003f) AM_MIRROR(0x0e000000) AM_READWRITE( model3_sys_r, model3_sys_w )
+	AM_RANGE(0xf0140000, 0xf014003f) AM_MIRROR(0x0e000000) AM_READWRITE( model3_rtc_r, model3_rtc_w )
+	AM_RANGE(0xf0180000, 0xf019ffff) AM_MIRROR(0x0e000000) AM_RAM							/* Security Board RAM */
+	AM_RANGE(0xf01a0000, 0xf01a003f) AM_MIRROR(0x0e000000) AM_READ( model3_security_r )	/* Security board */
 
 	AM_RANGE(0xf1000000, 0xf10f7fff) AM_READWRITE( model3_char_r, model3_char_w )	/* character RAM */
 	AM_RANGE(0xf10f8000, 0xf10fffff) AM_READWRITE( model3_tile_r, model3_tile_w )	/* tilemaps */
 	AM_RANGE(0xf1100000, 0xf111ffff) AM_READWRITE( model3_palette_r, model3_palette_w ) AM_BASE(&paletteram64) /* palette */
 	AM_RANGE(0xf1180000, 0xf11800ff) AM_READWRITE( model3_vid_reg_r, model3_vid_reg_w )
-
-	AM_RANGE(0xfe040000, 0xfe04003f) AM_READWRITE( model3_ctrl_r, model3_ctrl_w )
-	AM_RANGE(0xfe080000, 0xfe080007) AM_READWRITE( model3_sound_r, model3_sound_w )
-	AM_RANGE(0xfe0c0000, 0xfe0dffff) AM_RAM	AM_BASE(&model3_backup)	/* backup SRAM */
-	AM_RANGE(0xfe100000, 0xfe10003f) AM_READWRITE( model3_sys_r, model3_sys_w )
-	AM_RANGE(0xfe140000, 0xfe14003f) AM_READWRITE( model3_rtc_r, model3_rtc_w )
-
-	AM_RANGE(0xfe180000, 0xfe19ffff) AM_RAM							/* Security Board RAM */
-	AM_RANGE(0xfe1a0000, 0xfe1a003f) AM_READ( model3_security_r )	/* Security board */
 
 	AM_RANGE(0xff800000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
@@ -5007,7 +4985,7 @@ static MACHINE_CONFIG_START( model3_10, driver_device )
 	MDRV_MACHINE_RESET(model3_10)
 
 	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
-	MDRV_NVRAM_HANDLER(model3)
+	MDRV_NVRAM_ADD_1FILL("backup")
 
 
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -5047,7 +5025,7 @@ static MACHINE_CONFIG_START( model3_15, driver_device )
 	MDRV_MACHINE_RESET(model3_15)
 
 	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
-	MDRV_NVRAM_HANDLER(model3)
+	MDRV_NVRAM_ADD_1FILL("backup")
 
 
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -5087,7 +5065,7 @@ static MACHINE_CONFIG_START( model3_20, driver_device )
 	MDRV_MACHINE_RESET(model3_20)
 
 	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
-	MDRV_NVRAM_HANDLER(model3)
+	MDRV_NVRAM_ADD_1FILL("backup")
 
 
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -5127,7 +5105,7 @@ static MACHINE_CONFIG_START( model3_21, driver_device )
 	MDRV_MACHINE_RESET(model3_21)
 
 	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
-	MDRV_NVRAM_HANDLER(model3)
+	MDRV_NVRAM_ADD_1FILL("backup")
 
 
 	MDRV_SCREEN_ADD("screen", RASTER)

@@ -5,6 +5,7 @@
 **************************************************************************/
 
 #include "cpu/tms34010/tms34010.h"
+#include "machine/nvram.h"
 
 /*----------- defined in machine/midyunit.c -----------*/
 

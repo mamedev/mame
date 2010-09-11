@@ -217,6 +217,7 @@
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "includes/exidy440.h"
+#include "machine/nvram.h"
 
 
 /* constants */
@@ -232,28 +233,6 @@ static UINT8 showdown_bank_offset;
 
 static READ8_HANDLER( showdown_bank0_r );
 
-
-
-/*************************************
- *
- *  EEROM save/load
- *
- *************************************/
-
-static NVRAM_HANDLER( exidy440 )
-{
-	UINT8 *rom = memory_region(machine, "maincpu");
-	if (read_or_write)
-		/* the EEROM lives in the uppermost 8k of the top bank */
-		mame_fwrite(file, &rom[0x10000 + 15 * 0x4000 + 0x2000], 0x2000);
-	else
-	{
-		if (file)
-			mame_fread(file, &rom[0x10000 + 15 * 0x4000 + 0x2000], 0x2000);
-		else
-			memset(&rom[0x10000 + 15 * 0x4000 + 0x2000], 0, 0x2000);
-	}
-}
 
 
 /*************************************
@@ -452,6 +431,13 @@ static WRITE8_HANDLER( topsecex_yscroll_w )
  *  Reset
  *
  *************************************/
+
+static MACHINE_START( exidy440 )
+{
+	/* the EEROM lives in the uppermost 8k of the top bank */
+	UINT8 *rom = memory_region(machine, "maincpu");
+	machine->device<nvram_device>("nvram")->set_base(&rom[0x10000 + 15 * 0x4000 + 0x2000], 0x2000);
+}
 
 static MACHINE_RESET( exidy440 )
 {
@@ -1004,8 +990,9 @@ static MACHINE_CONFIG_START( exidy440, driver_device )
 	MDRV_CPU_PROGRAM_MAP(exidy440_map)
 	MDRV_CPU_VBLANK_INT("screen", exidy440_vblank_interrupt)
 
+	MDRV_MACHINE_START(exidy440)
 	MDRV_MACHINE_RESET(exidy440)
-	MDRV_NVRAM_HANDLER(exidy440)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_FRAGMENT_ADD(exidy440_video)
