@@ -63,7 +63,7 @@
 
 // static template for a read_line stub function that calls through a given READ_LINE_MEMBER
 template<class _Class, int (_Class::*_Function)()>
-int devcb_stub(device_t *device)
+int devcb_line_stub(device_t *device)
 {
 	_Class *target = downcast<_Class *>(device);
 	return (target->*_Function)();
@@ -79,7 +79,7 @@ UINT8 devcb_stub(device_t *device, offs_t offset)
 
 // static template for a write_line stub function that calls through a given WRITE_LINE_MEMBER
 template<class _Class, void (_Class::*_Function)(int state)>
-void devcb_stub(device_t *device, int state)
+void devcb_line_stub(device_t *device, int state)
 {
 	_Class *target = downcast<_Class *>(device);
 	(target->*_Function)(state);
@@ -97,7 +97,7 @@ void devcb_stub(device_t *device, offs_t offset, UINT8 data)
 
 /* standard line or read/write handlers with the calling device passed */
 #define DEVCB_LINE(func)						{ DEVCB_TYPE_SELF, NULL, (func), NULL, NULL }
-#define DEVCB_LINE_MEMBER(func)					{ DEVCB_TYPE_SELF, NULL, &devcb_stub<cls, &cls::memb>, NULL, NULL }
+#define DEVCB_LINE_MEMBER(func)					{ DEVCB_TYPE_SELF, NULL, &devcb_line_stub<cls, &cls::memb>, NULL, NULL }
 #define DEVCB_LINE_GND							{ DEVCB_TYPE_SELF, NULL, devcb_line_gnd_r, NULL, NULL }
 #define DEVCB_LINE_VCC							{ DEVCB_TYPE_SELF, NULL, devcb_line_vcc_r, NULL, NULL }
 #define DEVCB_HANDLER(func)						{ DEVCB_TYPE_SELF, NULL, NULL, (func), NULL }
@@ -105,7 +105,7 @@ void devcb_stub(device_t *device, offs_t offset, UINT8 data)
 
 /* line or read/write handlers for another device */
 #define DEVCB_DEVICE_LINE(tag,func)				{ DEVCB_TYPE_DEVICE, tag, (func), NULL, NULL }
-#define DEVCB_DEVICE_LINE_MEMBER(tag,cls,memb)	{ DEVCB_TYPE_DEVICE, tag, &devcb_stub<cls, &cls::memb>, NULL, NULL }
+#define DEVCB_DEVICE_LINE_MEMBER(tag,cls,memb)	{ DEVCB_TYPE_DEVICE, tag, &devcb_line_stub<cls, &cls::memb>, NULL, NULL }
 #define DEVCB_DEVICE_HANDLER(tag,func)			{ DEVCB_TYPE_DEVICE, tag, NULL, (func), NULL }
 #define DEVCB_DEVICE_MEMBER(tag,cls,memb)		{ DEVCB_TYPE_DEVICE, tag, NULL, &devcb_stub<cls, &cls::memb>, NULL }
 
