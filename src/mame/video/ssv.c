@@ -881,7 +881,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 				sprites_offsx = -((ssv_scroll[0x7a/2] & 0x0800) >> 8);
 
 				sprites_offsy = (-1)*((ssv_scroll[0x70/2] & 0x1ff) - (ssv_scroll[0x70/2] & 0x200)
-								 + ssv_scroll[0x6a/2] + 1) + ((!ssv_scroll[0x7a/2] & 0x0800) >> 8);
+								 + ssv_scroll[0x6a/2] + 1) - (((ssv_scroll[0x7a/2] ^ 0x0800) & 0x0800) >> 8);
 
 				if (ssv_scroll[0x74/2] & 0x4000)	// srmp7, twineag2, ultrax, vasara
 				{
@@ -889,13 +889,11 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 					if (ssv_scroll[0x74/2] & 0x8000)
 						sy += 0x00;			// srmp7, twineag2, ultrax
 					else
-						sy -= 0x08;			// vasara
+						sy -= 0x10;			// vasara
 				}
 
 				// sprites can use x and y coordinates relative to a side, the other side or the center
 				// for now we use a kludge
-
-				
 
 				if (ssv_scroll[0x74/2] & 0x8000)
 				{
@@ -924,7 +922,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 				}
 
 				/* Sprite code masking */
-				if(xnum == 2 && ynum == 4) // needed by hypreact
+				if (xnum == 2 && ynum == 4) // needed by hypreact
 				{
 					code &= ~7;
 				}
