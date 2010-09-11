@@ -291,10 +291,12 @@ VIDEO_START( gdfs )
 			---- ba98 ---- ----	? 							0101 for all games
 			---- ---- -6-- ----	y tilemap inversion?
 			---- ---- ---4 ----	x tilemap inversion?
-	1c0076-77	-e-- ---- ---- ----     global/local spites coordinates
+	1c0076-77	-e-- ---- ---- ----     global/local sprites coordinates
+			---- ---- -6-- ----     shadow (2bits - 4bits)
 	1c0078-79	---- ---- ---- ----     ?
 	1c007a-7b	---- ---- ---- ----     ?	
-
+			---- -a-- ---- ----     left-right up-down inversion
+	
 			1c0060-7f:
 
 	drifto94:	0000 0025 00cd 01c6 - 0001 0013 0101 0106
@@ -759,19 +761,20 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	{
 		int attr, code, color, num, sprite;
 		int sx, x, xoffs, flipx, xnum, xstart, xend, xinc, sprites_offsx;
-		int sy, y, yoffs, flipy, ynum, ystart, yend, yinc, sprites_offsy;
+		int sy, y, yoffs, flipy, ynum, ystart, yend, yinc, sprites_offsy, tilemaps_offsy;
 		int mode,global_depth,global_xnum,global_ynum;
 
-		mode	=		s1[ 0 ];
-		sprite	=		s1[ 1 ];
-		xoffs	=		s1[ 2 ];
-		yoffs	=		s1[ 3 ];
+		mode   = s1[ 0 ];
+		sprite = s1[ 1 ];
+		xoffs  = s1[ 2 ];
+		yoffs  = s1[ 3 ];
 
 		/* Last sprite */
 		if (sprite & 0x8000) break;
 
 		/* Single-sprite address */
-		s2		=		&spriteram16[ (sprite & 0x7fff) * 4 ];
+		s2 = &spriteram16[ (sprite & 0x7fff) * 4 ];
+		tilemaps_offsy = ((s2[3] & 0x1ff) - (s2[3] & 0x200));
 
 		/* Every single sprite is offset by x & yoffs, and additionally
 		by one of the 8 x & y offsets in the 1c0040-1c005f area   */
@@ -818,16 +821,18 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 				scroll	=	s2[ 0 ];	// scroll index
 
-				switch( ssv_scroll[0x7a/2] )
+				if (ssv_scroll[0x76/2] & 0x1000)		
+					sy -= 0x20;						// kludge for eaglshot
+				else
 				{
-					case 0x4940:	sy += 0x60;		break;		// srmp4
-					case 0x5940:	sy -= 0x20;		break;		// drifto94, dynagear, eaglshot, keithlcy, mslider, stmblade
-					case 0x5950:	sy += 0xdf;		break;		// gdfs
-					case 0x7940:	sy -= 0x10;		break;		// ultrax, twineag2
+					if (ssv_scroll[0x7a/2] & 0x0800)
+					{
+						if (ssv_scroll[0x7a/2] & 0x1000)	// drifto94, dynagear, keithlcy, mslider, stmblade, gdfs, ultrax, twineag2
+							sy -= tilemaps_offsy;
+						else						// srmp4
+							sy += tilemaps_offsy;
+					}
 				}
-
-//				sx += xoffs;
-//				sy += yoffs;
 
 				if ((mode & 0x001f) != 0)
 					draw_row(machine, bitmap, cliprect, sx, sy, scroll);
