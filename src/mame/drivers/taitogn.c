@@ -328,6 +328,10 @@ Type 3 (PCMCIA Compact Flash Adaptor + Compact Flash card, sealed together with 
 #include "sound/psx.h"
 #include "audio/taito_zm.h"
 
+static intel_te28f160_device *biosflash;
+static intel_e28f400_device *pgmflash;
+static intel_te28f160_device *sndflash[3];
+
 static unsigned char cis[512];
 static int locked;
 
@@ -438,75 +442,75 @@ static WRITE32_HANDLER(rf5c296_mem_w)
 
 // Flash handling
 
-static UINT32 gen_flash_r(running_machine *machine, int chip, offs_t offset, UINT32 mem_mask)
+static UINT32 gen_flash_r(intelfsh16_device *device, offs_t offset, UINT32 mem_mask)
 {
 	UINT32 res = 0;
 	offset *= 2;
 	if(ACCESSING_BITS_0_15)
-		res |= intelflash_read(chip, offset);
+		res |= device->read(offset);
 	if(ACCESSING_BITS_16_31)
-		res |= intelflash_read(chip, offset+1) << 16;
+		res |= device->read(offset+1) << 16;
 	return res;
 }
 
-static void gen_flash_w(running_machine *machine, int chip, offs_t offset, UINT32 data, UINT32 mem_mask)
+static void gen_flash_w(intelfsh16_device *device, offs_t offset, UINT32 data, UINT32 mem_mask)
 {
 	offset *= 2;
 	if(ACCESSING_BITS_0_15)
-		intelflash_write(chip, offset, data);
+		device->write(offset, data);
 	if(ACCESSING_BITS_16_31)
-	    intelflash_write(chip, offset+1, data >> 16);
+	    device->write(offset+1, data >> 16);
 }
 
 
 static READ32_HANDLER(flash_subbios_r)
 {
-	return gen_flash_r(space->machine, 0, offset, mem_mask);
+	return gen_flash_r(biosflash, offset, mem_mask);
 }
 
 static WRITE32_HANDLER(flash_subbios_w)
 {
-	gen_flash_w(space->machine, 0, offset, data, mem_mask);
+	gen_flash_w(biosflash, offset, data, mem_mask);
 }
 
 static READ32_HANDLER(flash_mn102_r)
 {
-	return gen_flash_r(space->machine, 1, offset, mem_mask);
+	return gen_flash_r(pgmflash, offset, mem_mask);
 }
 
 static WRITE32_HANDLER(flash_mn102_w)
 {
-	gen_flash_w(space->machine, 1, offset, data, mem_mask);
+	gen_flash_w(pgmflash, offset, data, mem_mask);
 }
 
 static READ32_HANDLER(flash_s1_r)
 {
-	return gen_flash_r(space->machine, 2, offset, mem_mask);
+	return gen_flash_r(sndflash[0], offset, mem_mask);
 }
 
 static WRITE32_HANDLER(flash_s1_w)
 {
-	gen_flash_w(space->machine, 2, offset, data, mem_mask);
+	gen_flash_w(sndflash[0], offset, data, mem_mask);
 }
 
 static READ32_HANDLER(flash_s2_r)
 {
-	return gen_flash_r(space->machine, 3, offset, mem_mask);
+	return gen_flash_r(sndflash[1], offset, mem_mask);
 }
 
 static WRITE32_HANDLER(flash_s2_w)
 {
-	gen_flash_w(space->machine, 3, offset, data, mem_mask);
+	gen_flash_w(sndflash[1], offset, data, mem_mask);
 }
 
 static READ32_HANDLER(flash_s3_r)
 {
-	return gen_flash_r(space->machine, 4, offset, mem_mask);
+	return gen_flash_r(sndflash[2], offset, mem_mask);
 }
 
 static WRITE32_HANDLER(flash_s3_w)
 {
-	gen_flash_w(space->machine, 4, offset, data, mem_mask);
+	gen_flash_w(sndflash[2], offset, data, mem_mask);
 }
 
 
@@ -800,32 +804,13 @@ static READ32_HANDLER( gnet_mahjong_panel_r )
 
 // Init and reset
 
-static NVRAM_HANDLER( coh3002t )
-{
-	nvram_handler_intelflash(machine, 0, file, read_or_write);
-	nvram_handler_intelflash(machine, 1, file, read_or_write);
-	nvram_handler_intelflash(machine, 2, file, read_or_write);
-	nvram_handler_intelflash(machine, 3, file, read_or_write);
-	nvram_handler_intelflash(machine, 4, file, read_or_write);
-
-	if(!file) {
-		// Only the subbios needs to preexist for the board to work
-		memcpy(intelflash_getmemptr(0), memory_region(machine, "subbios"), 0x200000);
-	}
-}
-
 static DRIVER_INIT( coh3002t )
 {
-	// Sub-bios (u30)
-	intelflash_init(machine, 0, FLASH_INTEL_TE28F160, 0);
-
-	// mn102 program flash (u27)
-	intelflash_init(machine, 1, FLASH_INTEL_E28F400, 0);
-
-	// Samples (u29, u55, u56)
-	intelflash_init(machine, 2, FLASH_INTEL_TE28F160, 0);
-	intelflash_init(machine, 3, FLASH_INTEL_TE28F160, 0);
-	intelflash_init(machine, 4, FLASH_INTEL_TE28F160, 0);
+	biosflash = machine->device<intel_te28f160_device>("biosflash");
+	pgmflash = machine->device<intel_e28f400_device>("pgmflash");
+	sndflash[0] = machine->device<intel_te28f160_device>("sndflash0");
+	sndflash[1] = machine->device<intel_te28f160_device>("sndflash1");
+	sndflash[2] = machine->device<intel_te28f160_device>("sndflash2");
 
 	psx_driver_init(machine);
 	znsec_init(0, tt10);
@@ -948,9 +933,14 @@ static MACHINE_CONFIG_START( coh3002t, driver_device )
 
 	MDRV_AT28C16_ADD( "at28c16", 0 )
 	MDRV_IDE_CONTROLLER_ADD( "card", 0 )
-	MDRV_NVRAM_HANDLER( coh3002t )
 
 	MDRV_MB3773_ADD("mb3773")
+
+	MDRV_INTEL_TE28F160_ADD("biosflash")
+	MDRV_INTEL_E28F008SA_ADD("pgmflash")
+	MDRV_INTEL_TE28F160_ADD("sndflash0")
+	MDRV_INTEL_TE28F160_ADD("sndflash1")
+	MDRV_INTEL_TE28F160_ADD("sndflash2")
 
 	MDRV_FRAGMENT_ADD( taito_zoom_sound )
 MACHINE_CONFIG_END
@@ -1075,7 +1065,7 @@ INPUT_PORTS_END
 #define TAITOGNET_BIOS \
 	ROM_REGION32_LE( 0x080000, "mainbios", 0 ) \
 	ROM_LOAD( "coh-3002t.353", 0x000000, 0x080000, CRC(03967fa7) SHA1(0e17fec2286e4e25deb23d40e41ce0986f373d49) ) \
-	ROM_REGION16_LE( 0x200000, "subbios", 0 ) \
+	ROM_REGION16_LE( 0x200000, "biosflash", 0 ) \
 	ROM_SYSTEM_BIOS( 0, "v1",   "G-NET Bios v1" ) \
     	ROM_LOAD16_WORD_BIOS(0, "flash.u30", 0x000000, 0x200000, CRC(c48c8236) SHA1(c6dad60266ce2ff635696bc0d91903c543273559) ) \
 	ROM_SYSTEM_BIOS( 1, "v2",   "G-NET Bios v2" ) \

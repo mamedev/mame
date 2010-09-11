@@ -337,6 +337,8 @@ Notes:
 #define DMA_XOR(a)		((a) ^ NATIVE_ENDIAN_VALUE_LE_BE(1,2))
 
 
+static fujitsu_29f016a_device *flashrom[48];
+
 static UINT32* decrypted_bios;
 
 static UINT32* decrypted_gamerom;
@@ -684,8 +686,6 @@ static void cps3_decrypt_bios(running_machine *machine)
 
 static DRIVER_INIT( cps3 )
 {
-	int i;
-
 	// cache pointers to regions
 	cps3_user4region = memory_region(machine,"user4");
 	cps3_user5region = memory_region(machine,"user5");
@@ -711,9 +711,9 @@ static DRIVER_INIT( cps3 )
 	main->set_direct_update_handler(direct_update_delegate_create_static(cps3_direct_handler, *machine));
 
 	// flash roms
-
-	for (i=0;i<48;i++)
-		intelflash_init( machine, i, FLASH_FUJITSU_29F016A, NULL );
+	astring tempstr;
+	for (int index = 0; index < 48; index++)
+		flashrom[index] = machine->device<fujitsu_29f016a_device>(tempstr.format("flash%d", index));
 
 	cps3_eeprom = auto_alloc_array(machine, UINT32, 0x400/4);
 }
@@ -1363,22 +1363,22 @@ static READ32_HANDLER( cps3_gfxflash_r )
 	if (ACCESSING_BITS_24_31)	// GFX Flash 1
 	{
 		logerror("read GFX flash chip %d addr %02x\n", flash1-8, (offset<<1));
-		result |= intelflash_read(flash1, (offset<<1) ) << 24;
+		result |= flashrom[flash1]->read( (offset<<1) ) << 24;
 	}
 	if (ACCESSING_BITS_16_23)	// GFX Flash 2
 	{
 		logerror("read GFX flash chip %d addr %02x\n", flash2-8, (offset<<1));
-		result |= intelflash_read(flash2, (offset<<1) ) << 16;
+		result |= flashrom[flash2]->read( (offset<<1) ) << 16;
 	}
 	if (ACCESSING_BITS_8_15)	// GFX Flash 1
 	{
 		logerror("read GFX flash chip %d addr %02x\n", flash1-8, (offset<<1)+1);
-		result |= intelflash_read(flash1, (offset<<1)+0x1 ) << 8;
+		result |= flashrom[flash1]->read( (offset<<1)+0x1 ) << 8;
 	}
 	if (ACCESSING_BITS_0_7)	// GFX Flash 2
 	{
 		logerror("read GFX flash chip %d addr %02x\n", flash2-8, (offset<<1)+1);
-		result |= intelflash_read(flash2, (offset<<1)+0x1 ) << 0;
+		result |= flashrom[flash2]->read( (offset<<1)+0x1 ) << 0;
 	}
 
 	//printf("read GFX flash chips addr %02x returning %08x mem_mask %08x crambank %08x gfxbank %08x\n", offset*2, result,mem_mask,  cram_bank, cram_gfxflash_bank  );
@@ -1404,25 +1404,25 @@ static WRITE32_HANDLER( cps3_gfxflash_w )
 	{
 		command = (data >> 24) & 0xff;
 		logerror("write to GFX flash chip %d addr %02x cmd %02x\n", flash1-8, (offset<<1), command);
-		intelflash_write(flash1, (offset<<1), command);
+		flashrom[flash1]->write( (offset<<1), command);
 	}
 	if (ACCESSING_BITS_16_23)	// GFX Flash 2
 	{
 		command = (data >> 16) & 0xff;
 		logerror("write to GFX flash chip %d addr %02x cmd %02x\n", flash2-8, (offset<<1), command);
-		intelflash_write(flash2, (offset<<1), command);
+		flashrom[flash2]->write( (offset<<1), command);
 	}
 	if (ACCESSING_BITS_8_15)	// GFX Flash 1
 	{
 		command = (data >> 8) & 0xff;
 		logerror("write to GFX flash chip %d addr %02x cmd %02x\n", flash1-8, (offset<<1)+1, command);
-		intelflash_write(flash1, (offset<<1)+0x1, command);
+		flashrom[flash1]->write( (offset<<1)+0x1, command);
 	}
 	if (ACCESSING_BITS_0_7)	// GFX Flash 2
 	{
 		command = (data >> 0) & 0xff;
 		//if ( ((offset<<1)+1) != 0x555) printf("write to GFX flash chip %d addr %02x cmd %02x\n", flash1-8, (offset<<1)+1, command);
-		intelflash_write(flash2, (offset<<1)+0x1, command);
+		flashrom[flash2]->write( (offset<<1)+0x1, command);
 	}
 
 	/* make a copy in the linear memory region we actually use for drawing etc.  having it stored in interleaved flash roms isnt' very useful */
@@ -1430,8 +1430,8 @@ static WRITE32_HANDLER( cps3_gfxflash_w )
 		UINT32* romdata = (UINT32*)cps3_user5region;
 		int real_offset = 0;
 		UINT32 newdata;
-		UINT8* ptr1 = (UINT8*)intelflash_getmemptr(flash1);
-		UINT8* ptr2 = (UINT8*)intelflash_getmemptr(flash2);
+		UINT8* ptr1 = (UINT8*)flashrom[flash1]->memory();
+		UINT8* ptr2 = (UINT8*)flashrom[flash2]->memory();
 
 		real_offset = ((cram_gfxflash_bank&0x3e) * 0x200000) + offset*4;
 
@@ -1454,22 +1454,22 @@ static UINT32 cps3_flashmain_r(int base, UINT32 offset, UINT32 mem_mask)
 	if (ACCESSING_BITS_24_31)	// Flash 1
 	{
 //      logerror("read flash chip %d addr %02x\n", base+0, offset*4 );
-		result |= (intelflash_read(base+0, offset)<<24);
+		result |= (flashrom[base+0]->read(offset)<<24);
 	}
 	if (ACCESSING_BITS_16_23)	// Flash 1
 	{
 //      logerror("read flash chip %d addr %02x\n", base+1, offset*4 );
-		result |= (intelflash_read(base+1, offset)<<16);
+		result |= (flashrom[base+1]->read(offset)<<16);
 	}
 	if (ACCESSING_BITS_8_15)	// Flash 1
 	{
 //      logerror("read flash chip %d addr %02x\n", base+2, offset*4 );
-		result |= (intelflash_read(base+2, offset)<<8);
+		result |= (flashrom[base+2]->read(offset)<<8);
 	}
 	if (ACCESSING_BITS_0_7)	// Flash 1
 	{
 //      logerror("read flash chip %d addr %02x\n", base+3, offset*4 );
-		result |= (intelflash_read(base+3, offset)<<0);
+		result |= (flashrom[base+3]->read(offset)<<0);
 	}
 
 //  if (base==4) logerror("read flash chips addr %02x returning %08x\n", offset*4, result );
@@ -1506,25 +1506,25 @@ static void cps3_flashmain_w(running_machine *machine, int base, UINT32 offset, 
 	{
 		command = (data >> 24) & 0xff;
 		logerror("write to flash chip %d addr %02x cmd %02x\n", base+0, offset, command);
-		intelflash_write(base+0, offset, command);
+		flashrom[base+0]->write(offset, command);
 	}
 	if (ACCESSING_BITS_16_23)	// Flash 2
 	{
 		command = (data >> 16) & 0xff;
 		logerror("write to flash chip %d addr %02x cmd %02x\n", base+1, offset, command);
-		intelflash_write(base+1, offset, command);
+		flashrom[base+1]->write(offset, command);
 	}
 	if (ACCESSING_BITS_8_15)	// Flash 2
 	{
 		command = (data >> 8) & 0xff;
 		logerror("write to flash chip %d addr %02x cmd %02x\n", base+2, offset, command);
-		intelflash_write(base+2, offset, command);
+		flashrom[base+2]->write(offset, command);
 	}
 	if (ACCESSING_BITS_0_7)	// Flash 2
 	{
 		command = (data >> 0) & 0xff;
 		logerror("write to flash chip %d addr %02x cmd %02x\n", base+3, offset, command);
-		intelflash_write(base+3, offset, command);
+		flashrom[base+3]->write(offset, command);
 	}
 
 	/* copy data into regions to execute from */
@@ -1533,10 +1533,10 @@ static void cps3_flashmain_w(running_machine *machine, int base, UINT32 offset, 
 		UINT32* romdata2 = (UINT32*)decrypted_gamerom;
 		int real_offset = 0;
 		UINT32 newdata;
-		UINT8* ptr1 = (UINT8*)intelflash_getmemptr(base+0);
-		UINT8* ptr2 = (UINT8*)intelflash_getmemptr(base+1);
-		UINT8* ptr3 = (UINT8*)intelflash_getmemptr(base+2);
-		UINT8* ptr4 = (UINT8*)intelflash_getmemptr(base+3);
+		UINT8* ptr1 = (UINT8*)flashrom[base+0]->memory();
+		UINT8* ptr2 = (UINT8*)flashrom[base+1]->memory();
+		UINT8* ptr3 = (UINT8*)flashrom[base+2]->memory();
+		UINT8* ptr4 = (UINT8*)flashrom[base+3]->memory();
 
 		real_offset = offset * 4;
 
@@ -2298,10 +2298,10 @@ static void precopy_to_flash(running_machine *machine)
 	for (i=0;i<0x800000;i+=4)
 	{
 		UINT32 data;
-		UINT8* ptr1 = (UINT8*)intelflash_getmemptr(0);
-		UINT8* ptr2 = (UINT8*)intelflash_getmemptr(1);
-		UINT8* ptr3 = (UINT8*)intelflash_getmemptr(2);
-		UINT8* ptr4 = (UINT8*)intelflash_getmemptr(3);
+		UINT8* ptr1 = (UINT8*)flashrom[0]->memory();
+		UINT8* ptr2 = (UINT8*)flashrom[1]->memory();
+		UINT8* ptr3 = (UINT8*)flashrom[2]->memory();
+		UINT8* ptr4 = (UINT8*)flashrom[3]->memory();
 
 		data = romdata[i/4];
 
@@ -2314,10 +2314,10 @@ static void precopy_to_flash(running_machine *machine)
 	for (i=0;i<0x800000;i+=4)
 	{
 		UINT32 data;
-		UINT8* ptr1 = (UINT8*)intelflash_getmemptr(4);
-		UINT8* ptr2 = (UINT8*)intelflash_getmemptr(5);
-		UINT8* ptr3 = (UINT8*)intelflash_getmemptr(6);
-		UINT8* ptr4 = (UINT8*)intelflash_getmemptr(7);
+		UINT8* ptr1 = (UINT8*)flashrom[4]->memory();
+		UINT8* ptr2 = (UINT8*)flashrom[5]->memory();
+		UINT8* ptr3 = (UINT8*)flashrom[6]->memory();
+		UINT8* ptr4 = (UINT8*)flashrom[7]->memory();
 
 		data = romdata[(0x800000+i)/4];
 
@@ -2339,8 +2339,8 @@ static void precopy_to_flash(running_machine *machine)
 
 			for (i=0;i<0x200000;i+=2)
 			{
-				UINT8* ptr1 = (UINT8*)intelflash_getmemptr(flashnum);
-				UINT8* ptr2 = (UINT8*)intelflash_getmemptr(flashnum+1);
+				UINT8* ptr1 = (UINT8*)flashrom[flashnum]->memory();
+				UINT8* ptr2 = (UINT8*)flashrom[flashnum+1]->memory();
 				UINT32 dat = romdata[(thebase+i)/2];
 
 				ptr1[BYTE_XOR_LE(i+1)] =  (dat&0xff000000)>>24;
@@ -2365,10 +2365,10 @@ static void copy_from_nvram(running_machine *machine)
 	for (i=0;i<0x800000;i+=4)
 	{
 		UINT32 data;
-		UINT8* ptr1 = (UINT8*)intelflash_getmemptr(0);
-		UINT8* ptr2 = (UINT8*)intelflash_getmemptr(1);
-		UINT8* ptr3 = (UINT8*)intelflash_getmemptr(2);
-		UINT8* ptr4 = (UINT8*)intelflash_getmemptr(3);
+		UINT8* ptr1 = (UINT8*)flashrom[0]->memory();
+		UINT8* ptr2 = (UINT8*)flashrom[1]->memory();
+		UINT8* ptr3 = (UINT8*)flashrom[2]->memory();
+		UINT8* ptr4 = (UINT8*)flashrom[3]->memory();
 
 		data = ((ptr1[i/4]<<24) | (ptr2[i/4]<<16) | (ptr3[i/4]<<8) | (ptr4[i/4]<<0));
 
@@ -2384,10 +2384,10 @@ static void copy_from_nvram(running_machine *machine)
 	for (i=0;i<0x800000;i+=4)
 	{
 		UINT32 data;
-		UINT8* ptr1 = (UINT8*)intelflash_getmemptr(4);
-		UINT8* ptr2 = (UINT8*)intelflash_getmemptr(5);
-		UINT8* ptr3 = (UINT8*)intelflash_getmemptr(6);
-		UINT8* ptr4 = (UINT8*)intelflash_getmemptr(7);
+		UINT8* ptr1 = (UINT8*)flashrom[4]->memory();
+		UINT8* ptr2 = (UINT8*)flashrom[5]->memory();
+		UINT8* ptr3 = (UINT8*)flashrom[6]->memory();
+		UINT8* ptr4 = (UINT8*)flashrom[7]->memory();
 
 		data = ((ptr1[i/4]<<24) | (ptr2[i/4]<<16) | (ptr3[i/4]<<8) | (ptr4[i/4]<<0));
 
@@ -2409,8 +2409,8 @@ static void copy_from_nvram(running_machine *machine)
 
 			for (i=0;i<0x200000;i+=2)
 			{
-				UINT8* ptr1 = (UINT8*)intelflash_getmemptr(flashnum);
-				UINT8* ptr2 = (UINT8*)intelflash_getmemptr(flashnum+1);
+				UINT8* ptr1 = (UINT8*)flashrom[flashnum]->memory();
+				UINT8* ptr2 = (UINT8*)flashrom[flashnum+1]->memory();
 				UINT32 dat = (ptr1[i+0]<<8) |
 					         (ptr1[i+1]<<24) |
 							 (ptr2[i+0]<<0) |
@@ -2446,21 +2446,15 @@ static void copy_from_nvram(running_machine *machine)
 
 static NVRAM_HANDLER( cps3 )
 {
-	int i;
-
 	if (read_or_write)
 	{
 		//printf("read_write\n");
 		mame_fwrite(file, cps3_eeprom, 0x400);
-		for (i=0;i<48;i++)
-			nvram_handler_intelflash( machine, i, file, read_or_write );
 	}
 	else if (file)
 	{
 		//printf("file\n");
 		mame_fread(file, cps3_eeprom, 0x400);
-		for (i=0;i<48;i++)
-			nvram_handler_intelflash( machine, i, file, read_or_write );
 
 		copy_from_nvram(machine); // copy data from flashroms back into user regions + decrypt into regions we execute/draw from.
 	}
@@ -2561,6 +2555,56 @@ static MACHINE_CONFIG_START( cps3, driver_device )
         60MHz       / 15.4335kHz = 3887.647 / 8 = 485.956 ~ 486 -> likely
          42.9545MHz / 15.4445kHz = 2781.217 / 6 = 463.536 -> unlikely
 */
+
+	// 48 flash chips
+	MDRV_FUJITSU_29F016A_ADD("flash0")
+	MDRV_FUJITSU_29F016A_ADD("flash1")
+	MDRV_FUJITSU_29F016A_ADD("flash2")
+	MDRV_FUJITSU_29F016A_ADD("flash3")
+	MDRV_FUJITSU_29F016A_ADD("flash4")
+	MDRV_FUJITSU_29F016A_ADD("flash5")
+	MDRV_FUJITSU_29F016A_ADD("flash6")
+	MDRV_FUJITSU_29F016A_ADD("flash7")
+	MDRV_FUJITSU_29F016A_ADD("flash8")
+	MDRV_FUJITSU_29F016A_ADD("flash9")
+	MDRV_FUJITSU_29F016A_ADD("flash10")
+	MDRV_FUJITSU_29F016A_ADD("flash11")
+	MDRV_FUJITSU_29F016A_ADD("flash12")
+	MDRV_FUJITSU_29F016A_ADD("flash13")
+	MDRV_FUJITSU_29F016A_ADD("flash14")
+	MDRV_FUJITSU_29F016A_ADD("flash15")
+	MDRV_FUJITSU_29F016A_ADD("flash16")
+	MDRV_FUJITSU_29F016A_ADD("flash17")
+	MDRV_FUJITSU_29F016A_ADD("flash18")
+	MDRV_FUJITSU_29F016A_ADD("flash19")
+	MDRV_FUJITSU_29F016A_ADD("flash20")
+	MDRV_FUJITSU_29F016A_ADD("flash21")
+	MDRV_FUJITSU_29F016A_ADD("flash22")
+	MDRV_FUJITSU_29F016A_ADD("flash23")
+	MDRV_FUJITSU_29F016A_ADD("flash24")
+	MDRV_FUJITSU_29F016A_ADD("flash25")
+	MDRV_FUJITSU_29F016A_ADD("flash26")
+	MDRV_FUJITSU_29F016A_ADD("flash27")
+	MDRV_FUJITSU_29F016A_ADD("flash28")
+	MDRV_FUJITSU_29F016A_ADD("flash29")
+	MDRV_FUJITSU_29F016A_ADD("flash30")
+	MDRV_FUJITSU_29F016A_ADD("flash31")
+	MDRV_FUJITSU_29F016A_ADD("flash32")
+	MDRV_FUJITSU_29F016A_ADD("flash33")
+	MDRV_FUJITSU_29F016A_ADD("flash34")
+	MDRV_FUJITSU_29F016A_ADD("flash35")
+	MDRV_FUJITSU_29F016A_ADD("flash36")
+	MDRV_FUJITSU_29F016A_ADD("flash37")
+	MDRV_FUJITSU_29F016A_ADD("flash38")
+	MDRV_FUJITSU_29F016A_ADD("flash39")
+	MDRV_FUJITSU_29F016A_ADD("flash40")
+	MDRV_FUJITSU_29F016A_ADD("flash41")
+	MDRV_FUJITSU_29F016A_ADD("flash42")
+	MDRV_FUJITSU_29F016A_ADD("flash43")
+	MDRV_FUJITSU_29F016A_ADD("flash44")
+	MDRV_FUJITSU_29F016A_ADD("flash45")
+	MDRV_FUJITSU_29F016A_ADD("flash46")
+	MDRV_FUJITSU_29F016A_ADD("flash47")
 
 	MDRV_MACHINE_START(cps3)
 	MDRV_MACHINE_RESET(cps3)

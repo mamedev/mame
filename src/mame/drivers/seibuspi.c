@@ -740,6 +740,8 @@ Notes:
 
 UINT32 *spimainram;
 
+static intel_e28f008sa_device *flash[2];
+
 static UINT8 *z80_rom;
 
 /********************************************************************/
@@ -1085,11 +1087,11 @@ static READ8_DEVICE_HANDLER( flashrom_read )
 	logerror("Flash Read: %08X\n", offset);
 	if( offset < 0x100000 )
 	{
-		return intelflash_read(0, offset);
+		return flash[0]->read(offset);
 	}
 	else if( offset < 0x200000 )
 	{
-		return intelflash_read(1, offset - 0x100000 );
+		return flash[1]->read(offset - 0x100000 );
 	}
 	return 0;
 }
@@ -1099,11 +1101,11 @@ static WRITE8_DEVICE_HANDLER( flashrom_write )
 	logerror("Flash Write: %08X, %02X\n", offset, data);
 	if( offset < 0x100000 )
 	{
-		intelflash_write(0, offset + 1, data);
+		flash[0]->write(offset + 1, data);
 	}
 	else if( offset < 0x200000 )
 	{
-		intelflash_write(1, offset - 0x100000 + 1, data);
+		flash[1]->write(offset - 0x100000 + 1, data);
 	}
 }
 
@@ -1785,12 +1787,6 @@ GFXDECODE_END
 
 /********************************************************************************/
 
-static NVRAM_HANDLER( spi )
-{
-	nvram_handler_intelflash(machine, 0, file, read_or_write);
-	nvram_handler_intelflash(machine, 1, file, read_or_write);
-}
-
 /* this is a 93C46 but with reset delay */
 static const eeprom_interface eeprom_intf =
 {
@@ -1842,19 +1838,19 @@ static MACHINE_RESET( spi )
 
 	/* If the first value doesn't match, the game shows a checksum error */
 	/* If any of the other values are wrong, the game goes to update mode */
-	intelflash_write(0, 0, 0xff);
-	intelflash_write(0, 0, 0x10);
-	intelflash_write(0, 0, flash_data);			/* country code */
+	flash[0]->write(0, 0xff);
+	flash[0]->write(0, 0x10);
+	flash[0]->write(0, flash_data);			/* country code */
 
 	for (i=0; i < 0x100000; i++)
 	{
-		intelflash_write(0, 0, 0xff);
-		sound[i] = intelflash_read(0, i);
+		flash[0]->write(0, 0xff);
+		sound[i] = flash[0]->read(i);
 	}
 	for (i=0; i < 0x100000; i++)
 	{
-		intelflash_write(1, 0, 0xff);
-		sound[0x100000+i] = intelflash_read(1, i);
+		flash[1]->write(0, 0xff);
+		sound[0x100000+i] = flash[1]->read(i);
 	}
 }
 
@@ -1872,11 +1868,13 @@ static MACHINE_CONFIG_START( spi, driver_device )
 
 	MDRV_MACHINE_START(spi)
 	MDRV_MACHINE_RESET(spi)
-	MDRV_NVRAM_HANDLER(spi)
 
 	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
 
 	MDRV_DS2404_ADD("ds2404", 1995, 1, 1)
+
+	MDRV_INTEL_E28F008SA_ADD("flash0")
+	MDRV_INTEL_E28F008SA_ADD("flash1")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1927,7 +1925,8 @@ static MACHINE_CONFIG_DERIVED( sxx2f, spi ) /* Intel i386DX @ 25MHz, YMF271 @ 16
 	MDRV_MACHINE_START(sxx2f)
 	MDRV_MACHINE_RESET(sxx2f)
 
-	MDRV_NVRAM_HANDLER(0)
+	MDRV_DEVICE_REMOVE("flash0")
+	MDRV_DEVICE_REMOVE("flash1")
 
 MACHINE_CONFIG_END
 
@@ -1948,7 +1947,8 @@ static MACHINE_CONFIG_DERIVED( sxx2g, spi ) /* single board version using measur
 	MDRV_MACHINE_START(sxx2f)
 	MDRV_MACHINE_RESET(sxx2f)
 
-	MDRV_NVRAM_HANDLER(0)
+	MDRV_DEVICE_REMOVE("flash0")
+	MDRV_DEVICE_REMOVE("flash1")
 
 MACHINE_CONFIG_END
 
@@ -2079,8 +2079,8 @@ static READ32_HANDLER ( rfjet_speedup_r )
 
 static void init_spi(running_machine *machine)
 {
-	intelflash_init( machine, 0, FLASH_INTEL_E28F008SA, NULL );
-	intelflash_init( machine, 1, FLASH_INTEL_E28F008SA, NULL );
+	flash[0] = machine->device<intel_e28f008sa_device>("flash0");
+	flash[1] = machine->device<intel_e28f008sa_device>("flash1");
 
 	seibuspi_text_decrypt(memory_region(machine, "gfx1"));
 	seibuspi_bg_decrypt(memory_region(machine, "gfx2"), memory_region_length(machine, "gfx2"));
@@ -2141,8 +2141,8 @@ static DRIVER_INIT( viprp1o )
 
 static void init_rf2(running_machine *machine)
 {
-	intelflash_init( machine, 0, FLASH_INTEL_E28F008SA, NULL );
-	intelflash_init( machine, 1, FLASH_INTEL_E28F008SA, NULL );
+	flash[0] = machine->device<intel_e28f008sa_device>("flash0");
+	flash[1] = machine->device<intel_e28f008sa_device>("flash1");
 
 	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0282AC, 0x0282AF, 0, 0, rf2_speedup_r );
 	seibuspi_rise10_text_decrypt(memory_region(machine, "gfx1"));
@@ -2165,8 +2165,8 @@ static DRIVER_INIT( rdft2us )
 
 static void init_rfjet(running_machine *machine)
 {
-	intelflash_init( machine, 0, FLASH_INTEL_E28F008SA, NULL );
-	intelflash_init( machine, 1, FLASH_INTEL_E28F008SA, NULL );
+	flash[0] = machine->device<intel_e28f008sa_device>("flash0");
+	flash[1] = machine->device<intel_e28f008sa_device>("flash1");
 
 	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x002894c, 0x002894f, 0, 0, rfjet_speedup_r );
 	seibuspi_rise11_text_decrypt(memory_region(machine, "gfx1"));

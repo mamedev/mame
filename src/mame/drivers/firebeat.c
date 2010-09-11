@@ -135,6 +135,8 @@ static UINT8 extend_board_irq_active;
 
 static emu_timer *keyboard_timer;
 
+static fujitsu_29f016a_device *flash[3];
+
 static GCU_REGS gcu[2];
 
 static VIDEO_START(firebeat)
@@ -709,19 +711,19 @@ static READ32_HANDLER(flashram_r)
 	UINT32 r = 0;
 	if (ACCESSING_BITS_24_31)
 	{
-		r |= (intelflash_read(0, (offset*4)+0) & 0xff) << 24;
+		r |= (flash[0]->read((offset*4)+0) & 0xff) << 24;
 	}
 	if (ACCESSING_BITS_16_23)
 	{
-		r |= (intelflash_read(0, (offset*4)+1) & 0xff) << 16;
+		r |= (flash[0]->read((offset*4)+1) & 0xff) << 16;
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		r |= (intelflash_read(0, (offset*4)+2) & 0xff) << 8;
+		r |= (flash[0]->read((offset*4)+2) & 0xff) << 8;
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		r |= (intelflash_read(0, (offset*4)+3) & 0xff) << 0;
+		r |= (flash[0]->read((offset*4)+3) & 0xff) << 0;
 	}
 	return r;
 }
@@ -730,85 +732,85 @@ static WRITE32_HANDLER(flashram_w)
 {
 	if (ACCESSING_BITS_24_31)
 	{
-		intelflash_write(0, (offset*4)+0, (data >> 24) & 0xff);
+		flash[0]->write((offset*4)+0, (data >> 24) & 0xff);
 	}
 	if (ACCESSING_BITS_16_23)
 	{
-		intelflash_write(0, (offset*4)+1, (data >> 16) & 0xff);
+		flash[0]->write((offset*4)+1, (data >> 16) & 0xff);
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		intelflash_write(0, (offset*4)+2, (data >> 8) & 0xff);
+		flash[0]->write((offset*4)+2, (data >> 8) & 0xff);
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		intelflash_write(0, (offset*4)+3, (data >> 0) & 0xff);
+		flash[0]->write((offset*4)+3, (data >> 0) & 0xff);
 	}
 }
 
 static READ32_HANDLER(soundflash_r)
 {
 	UINT32 r = 0;
-	int chip;
+	fujitsu_29f016a_device *chip;
 	if (offset >= 0 && offset < 0x200000/4)
 	{
-		chip = 1;
+		chip = flash[1];
 	}
 	else
 	{
-		chip = 2;
+		chip = flash[2];
 	}
 
 	offset &= 0x7ffff;
 
 	if (ACCESSING_BITS_24_31)
 	{
-		r |= (intelflash_read(chip, (offset*4)+0) & 0xff) << 24;
+		r |= (chip->read((offset*4)+0) & 0xff) << 24;
 	}
 	if (ACCESSING_BITS_16_23)
 	{
-		r |= (intelflash_read(chip, (offset*4)+1) & 0xff) << 16;
+		r |= (chip->read((offset*4)+1) & 0xff) << 16;
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		r |= (intelflash_read(chip, (offset*4)+2) & 0xff) << 8;
+		r |= (chip->read((offset*4)+2) & 0xff) << 8;
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		r |= (intelflash_read(chip, (offset*4)+3) & 0xff) << 0;
+		r |= (chip->read((offset*4)+3) & 0xff) << 0;
 	}
 	return r;
 }
 
 static WRITE32_HANDLER(soundflash_w)
 {
-	int chip;
+	fujitsu_29f016a_device *chip;
 	if (offset >= 0 && offset < 0x200000/4)
 	{
-		chip = 1;
+		chip = flash[1];
 	}
 	else
 	{
-		chip = 2;
+		chip = flash[2];
 	}
 
 	offset &= 0x7ffff;
 
 	if (ACCESSING_BITS_24_31)
 	{
-		intelflash_write(chip, (offset*4)+0, (data >> 24) & 0xff);
+		chip->write((offset*4)+0, (data >> 24) & 0xff);
 	}
 	if (ACCESSING_BITS_16_23)
 	{
-		intelflash_write(chip, (offset*4)+1, (data >> 16) & 0xff);
+		chip->write((offset*4)+1, (data >> 16) & 0xff);
 	}
 	if (ACCESSING_BITS_8_15)
 	{
-		intelflash_write(chip, (offset*4)+2, (data >> 8) & 0xff);
+		chip->write((offset*4)+2, (data >> 8) & 0xff);
 	}
 	if (ACCESSING_BITS_0_7)
 	{
-		intelflash_write(chip, (offset*4)+3, (data >> 0) & 0xff);
+		chip->write((offset*4)+3, (data >> 0) & 0xff);
 	}
 }
 
@@ -1687,6 +1689,10 @@ static MACHINE_START( firebeat )
 
 	/* configure fast RAM regions for DRC */
 	ppcdrc_add_fastram(machine->device("maincpu"), 0x00000000, 0x01ffffff, FALSE, work_ram);
+	
+	flash[0] = machine->device<fujitsu_29f016a_device>("flash0");
+	flash[1] = machine->device<fujitsu_29f016a_device>("flash1");
+	flash[2] = machine->device<fujitsu_29f016a_device>("flash2");
 }
 
 static ADDRESS_MAP_START( firebeat_map, ADDRESS_SPACE_PROGRAM, 32 )
@@ -1724,11 +1730,11 @@ static READ8_DEVICE_HANDLER( soundram_r )
 {
 	if (offset >= 0 && offset < 0x200000)
 	{
-		return intelflash_read(1, offset & 0x1fffff);
+		return flash[1]->read(offset & 0x1fffff);
 	}
 	else if (offset >= 0x200000 && offset < 0x400000)
 	{
-		return intelflash_read(2, offset & 0x1fffff);
+		return flash[2]->read(offset & 0x1fffff);
 	}
 	return 0;
 }
@@ -1742,13 +1748,6 @@ static const ymz280b_interface ymz280b_intf =
 	sound_irq_callback,			// irq
 	DEVCB_HANDLER(soundram_r)
 };
-
-static NVRAM_HANDLER(firebeat)
-{
-	nvram_handler_intelflash(machine, 0, file, read_or_write);
-	nvram_handler_intelflash(machine, 1, file, read_or_write);
-	nvram_handler_intelflash(machine, 2, file, read_or_write);
-}
 
 static INPUT_PORTS_START(ppp)
 	PORT_START("IN0")
@@ -1904,8 +1903,8 @@ static MACHINE_RESET( firebeat )
 
 	for (i=0; i < 0x200000; i++)
 	{
-		sound[i] = intelflash_read(1, i);
-		sound[i+0x200000] = intelflash_read(2, i);
+		sound[i] = flash[1]->read(i);
+		sound[i+0x200000] = flash[2]->read(i);
 	}
 
 	SCSIGetDevice( atapi_device_data[1], &cd );
@@ -1921,9 +1920,12 @@ static MACHINE_CONFIG_START( firebeat, driver_device )
 
 	MDRV_MACHINE_START(firebeat)
 	MDRV_MACHINE_RESET(firebeat)
-	MDRV_NVRAM_HANDLER(firebeat)
 
 	MDRV_RTC65271_ADD("rtc", NULL)
+
+	MDRV_FUJITSU_29F016A_ADD("flash0")
+	MDRV_FUJITSU_29F016A_ADD("flash1")
+	MDRV_FUJITSU_29F016A_ADD("flash2")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1960,10 +1962,14 @@ static MACHINE_CONFIG_START( firebeat2, driver_device )
 	MDRV_CPU_PROGRAM_MAP(firebeat_map)
 	MDRV_CPU_VBLANK_INT("lscreen", firebeat_interrupt)
 
+	MDRV_MACHINE_START(firebeat)
 	MDRV_MACHINE_RESET(firebeat)
-	MDRV_NVRAM_HANDLER(firebeat)
 
 	MDRV_RTC65271_ADD("rtc", NULL)
+
+	MDRV_FUJITSU_29F016A_ADD("flash0")
+	MDRV_FUJITSU_29F016A_ADD("flash1")
+	MDRV_FUJITSU_29F016A_ADD("flash2")
 
 	/* video hardware */
 	MDRV_PALETTE_LENGTH(32768)
@@ -2176,9 +2182,6 @@ static void init_firebeat(running_machine *machine)
 	UINT8 *rom = memory_region(machine, "user2");
 
 	atapi_init(machine);
-	intelflash_init(machine, 0, FLASH_FUJITSU_29F016A, NULL);
-	intelflash_init(machine, 1, FLASH_FUJITSU_29F016A, NULL);
-	intelflash_init(machine, 2, FLASH_FUJITSU_29F016A, NULL);
 
 	pc16552d_init(machine, 0, 19660800, comm_uart_irq_callback, 0);		// Network UART
 	pc16552d_init(machine, 1, 24000000, midi_uart_irq_callback, 0);		// MIDI UART

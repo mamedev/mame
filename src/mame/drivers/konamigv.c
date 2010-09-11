@@ -132,6 +132,9 @@ static UINT32 trackball_data[ 2 ];
 static UINT16 btc_trackball_prev[ 4 ];
 static UINT32 btc_trackball_data[ 4 ];
 
+static fujitsu_29f016a_device *flash8[4];
+static sharp_lh28f400_device *flash16[4];
+
 /* EEPROM handlers */
 
 static WRITE32_DEVICE_HANDLER( eeprom_w )
@@ -365,6 +368,7 @@ static MACHINE_CONFIG_START( konamigv, driver_device )
 	MDRV_SOUND_ROUTE( 1, "rspeaker", 1.0 )
 MACHINE_CONFIG_END
 
+
 static INPUT_PORTS_START( konamigv )
 	PORT_START("P1")
 	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
@@ -426,14 +430,6 @@ INPUT_PORTS_END
 
 /* Simpsons Bowling */
 
-static NVRAM_HANDLER( simpbowl )
-{
-	nvram_handler_intelflash( machine, 0, file, read_or_write );
-	nvram_handler_intelflash( machine, 1, file, read_or_write );
-	nvram_handler_intelflash( machine, 2, file, read_or_write );
-	nvram_handler_intelflash( machine, 3, file, read_or_write );
-}
-
 static READ32_HANDLER( flash_r )
 {
 	int reg = offset*2;
@@ -455,8 +451,8 @@ static READ32_HANDLER( flash_r )
 		int chip = (flash_address >= 0x200000) ? 2 : 0;
 		int ret;
 
-		ret = intelflash_read(chip, flash_address & 0x1fffff) & 0xff;
-		ret |= intelflash_read(chip+1, flash_address & 0x1fffff)<<8;
+		ret = flash8[chip]->read(flash_address & 0x1fffff) & 0xff;
+		ret |= flash8[chip+1]->read(flash_address & 0x1fffff)<<8;
 		flash_address++;
 
 		return ret;
@@ -479,8 +475,8 @@ static WRITE32_HANDLER( flash_w )
 	{
 		case 0:
 			chip = (flash_address >= 0x200000) ? 2 : 0;
-			intelflash_write(chip, flash_address & 0x1fffff, data&0xff);
-			intelflash_write(chip+1, flash_address & 0x1fffff, (data>>8)&0xff);
+			flash8[chip]->write(flash_address & 0x1fffff, data&0xff);
+			flash8[chip+1]->write(flash_address & 0x1fffff, (data>>8)&0xff);
 			break;
 
 		case 1:
@@ -525,10 +521,10 @@ static READ32_HANDLER( unknown_r )
 
 static DRIVER_INIT( simpbowl )
 {
-	intelflash_init( machine, 0, FLASH_FUJITSU_29F016A, NULL );
-	intelflash_init( machine, 1, FLASH_FUJITSU_29F016A, NULL );
-	intelflash_init( machine, 2, FLASH_FUJITSU_29F016A, NULL );
-	intelflash_init( machine, 3, FLASH_FUJITSU_29F016A, NULL );
+	flash8[0] = machine->device<fujitsu_29f016a_device>("flash0");
+	flash8[1] = machine->device<fujitsu_29f016a_device>("flash1");
+	flash8[2] = machine->device<fujitsu_29f016a_device>("flash2");
+	flash8[3] = machine->device<fujitsu_29f016a_device>("flash3");
 
 	memory_install_readwrite32_handler( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f680080, 0x1f68008f, 0, 0, flash_r, flash_w );
 	memory_install_read32_handler     ( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f6800c0, 0x1f6800c7, 0, 0, trackball_r );
@@ -538,7 +534,10 @@ static DRIVER_INIT( simpbowl )
 }
 
 static MACHINE_CONFIG_DERIVED( simpbowl, konamigv )
-	MDRV_NVRAM_HANDLER( simpbowl )
+	MDRV_FUJITSU_29F016A_ADD("flash0")
+	MDRV_FUJITSU_29F016A_ADD("flash1")
+	MDRV_FUJITSU_29F016A_ADD("flash2")
+	MDRV_FUJITSU_29F016A_ADD("flash3")
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( simpbowl )
@@ -558,11 +557,11 @@ static READ32_HANDLER( btcflash_r )
 {
 	if (mem_mask == 0x0000ffff)
 	{
-		return intelflash_read(0, offset*2);
+		return flash16[0]->read(offset*2);
 	}
 	else if (mem_mask == 0xffff0000)
 	{
-		return intelflash_read(0, (offset*2)+1)<<16;
+		return flash16[0]->read((offset*2)+1)<<16;
 	}
 
 	return 0;
@@ -572,11 +571,11 @@ static WRITE32_HANDLER( btcflash_w )
 {
 	if (mem_mask == 0x0000ffff)
 	{
-		intelflash_write(0, offset*2, data&0xffff);
+		flash16[0]->write(offset*2, data&0xffff);
 	}
 	else if (mem_mask == 0xffff0000)
 	{
-		intelflash_write(0, (offset*2)+1, (data>>16)&0xffff);
+		flash16[0]->write((offset*2)+1, (data>>16)&0xffff);
 	}
 }
 
@@ -607,14 +606,9 @@ static WRITE32_HANDLER( btc_trackball_w )
 //  mame_printf_debug( "w %08x %08x %08x %08x\n", cpu_get_pc(space->cpu), offset, data, mem_mask );
 }
 
-static NVRAM_HANDLER( btchamp )
-{
-	nvram_handler_intelflash( machine, 0, file, read_or_write );
-}
-
 static DRIVER_INIT( btchamp )
 {
-	intelflash_init( machine, 0, FLASH_SHARP_LH28F400, NULL );
+	flash16[0] = machine->device<sharp_lh28f400_device>("flash");
 
 	memory_install_readwrite32_handler( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f680080, 0x1f68008f, 0, 0, btc_trackball_r, btc_trackball_w );
 	memory_nop_write                  ( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f6800e0, 0x1f6800e3, 0, 0 );
@@ -624,7 +618,7 @@ static DRIVER_INIT( btchamp )
 }
 
 static MACHINE_CONFIG_DERIVED( btchamp, konamigv )
-	MDRV_NVRAM_HANDLER( btchamp )
+	MDRV_SHARP_LH28F400_ADD("flash")
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( btchamp )
@@ -700,7 +694,7 @@ static WRITE32_HANDLER( kdeadeye_0_w )
 
 static DRIVER_INIT( kdeadeye )
 {
-	intelflash_init( machine, 0, FLASH_SHARP_LH28F400, NULL );
+	flash16[0] = machine->device<sharp_lh28f400_device>("flash");
 
 	memory_install_read_port  ( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f680080, 0x1f680083, 0, 0, "GUNX1" );
 	memory_install_read_port  ( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f680090, 0x1f680093, 0, 0, "GUNY1" );
@@ -714,7 +708,7 @@ static DRIVER_INIT( kdeadeye )
 }
 
 static MACHINE_CONFIG_DERIVED( kdeadeye, konamigv )
-	MDRV_NVRAM_HANDLER( btchamp )
+	MDRV_SHARP_LH28F400_ADD("flash")
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( kdeadeye )

@@ -365,13 +365,8 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine *machine, int n_level, 
 	}
 }
 
-static INT32 flash_bank;
-static int flash_chips;
-static int onboard_flash_start;
-static int pccard1_flash_start;
-static int pccard2_flash_start;
-static int pccard3_flash_start;
-static int pccard4_flash_start;
+static int flash_bank;
+static fujitsu_29f016a_device *flash_device[5][16];
 static int security_cart_number = 0;
 
 static int chiptype[ 2 ];
@@ -386,8 +381,6 @@ static nvram_handler_func nvram_handler_security_cart_1;
 
 static NVRAM_HANDLER( konami573 )
 {
-	int i;
-
 	if( nvram_handler_security_cart_0 != NULL )
 	{
 		NVRAM_HANDLER_CALL(security_cart_0);
@@ -396,11 +389,6 @@ static NVRAM_HANDLER( konami573 )
 	if( nvram_handler_security_cart_1 != NULL )
 	{
 		NVRAM_HANDLER_CALL(security_cart_1);
-	}
-
-	for( i = 0; i < flash_chips; i++ )
-	{
-		nvram_handler_intelflash( machine, i, file, read_or_write );
 	}
 }
 
@@ -442,11 +430,11 @@ static READ32_HANDLER( jamma_r )
 		break;
 	}
 
-	if( pccard1_flash_start < 0 )
+	if( flash_device[1][0] == NULL )
 	{
 		data |= ( 1 << 26 );
 	}
-	if( pccard2_flash_start < 0 )
+	if( flash_device[2][0] == NULL )
 	{
 		data |= ( 1 << 27 );
 	}
@@ -481,29 +469,29 @@ static WRITE32_HANDLER( control_w )
 		break;
 	}
 
-	if( onboard_flash_start >= 0 && ( control & ~0x43 ) == 0x00 )
+	if( flash_device[0][0] != NULL && ( control & ~0x43 ) == 0x00 )
 	{
-		flash_bank = onboard_flash_start + ( ( control & 3 ) * 2 );
+		flash_bank = (0 << 8) + ( ( control & 3 ) * 2 );
 //      if( flash_bank != old_bank ) mame_printf_debug( "onboard %d\r", control & 3 );
 	}
-	else if( pccard1_flash_start >= 0 && ( control & ~0x47 ) == 0x10 )
+	else if( flash_device[1][0] != NULL && ( control & ~0x47 ) == 0x10 )
 	{
-		flash_bank = pccard1_flash_start + ( ( control & 7 ) * 2 );
+		flash_bank = (1 << 8) + ( ( control & 7 ) * 2 );
 //      if( flash_bank != old_bank ) mame_printf_debug( "pccard1 %d\r", control & 7 );
 	}
-	else if( pccard2_flash_start >= 0 && ( control & ~0x47 ) == 0x20 )
+	else if( flash_device[2][0] != NULL && ( control & ~0x47 ) == 0x20 )
 	{
-		flash_bank = pccard2_flash_start + ( ( control & 7 ) * 2 );
+		flash_bank = (2 << 8) + ( ( control & 7 ) * 2 );
 //      if( flash_bank != old_bank ) mame_printf_debug( "pccard2 %d\r", control & 7 );
 	}
-	else if( pccard3_flash_start >= 0 && ( control & ~0x47 ) == 0x20 )
+	else if( flash_device[3][0] != NULL && ( control & ~0x47 ) == 0x20 )
 	{
-		flash_bank = pccard3_flash_start + ( ( control & 7 ) * 2 );
+		flash_bank = (3 << 8) + ( ( control & 7 ) * 2 );
 //      if( flash_bank != old_bank ) mame_printf_debug( "pccard3 %d\r", control & 7 );
 	}
-	else if( pccard4_flash_start >= 0 && ( control & ~0x47 ) == 0x28 )
+	else if( flash_device[4][0] != NULL && ( control & ~0x47 ) == 0x28 )
 	{
-		flash_bank = pccard4_flash_start + ( ( control & 7 ) * 2 );
+		flash_bank = (4 << 8) + ( ( control & 7 ) * 2 );
 //      if( flash_bank != old_bank ) mame_printf_debug( "pccard4 %d\r", control & 7 );
 	}
 }
@@ -1128,23 +1116,24 @@ static READ32_HANDLER( flash_r )
 	}
 	else
 	{
+		fujitsu_29f016a_device **flash_base = &flash_device[flash_bank >> 8][flash_bank & 0xff];
 		int adr = offset * 2;
 
 		if( ACCESSING_BITS_0_7 )
 		{
-			data |= ( intelflash_read( flash_bank + 0, adr + 0 ) & 0xff ) << 0; // 31m/31l/31j/31h
+			data |= ( flash_base[0]->read( adr + 0 ) & 0xff ) << 0; // 31m/31l/31j/31h
 		}
 		if( ACCESSING_BITS_8_15 )
 		{
-			data |= ( intelflash_read( flash_bank + 1, adr + 0 ) & 0xff ) << 8; // 27m/27l/27j/27h
+			data |= ( flash_base[1]->read( adr + 0 ) & 0xff ) << 8; // 27m/27l/27j/27h
 		}
 		if( ACCESSING_BITS_16_23 )
 		{
-			data |= ( intelflash_read( flash_bank + 0, adr + 1 ) & 0xff ) << 16; // 31m/31l/31j/31h
+			data |= ( flash_base[0]->read( adr + 1 ) & 0xff ) << 16; // 31m/31l/31j/31h
 		}
 		if( ACCESSING_BITS_24_31 )
 		{
-			data |= ( intelflash_read( flash_bank + 1, adr + 1 ) & 0xff ) << 24; // 27m/27l/27j/27h
+			data |= ( flash_base[1]->read( adr + 1 ) & 0xff ) << 24; // 27m/27l/27j/27h
 		}
 	}
 
@@ -1163,23 +1152,24 @@ static WRITE32_HANDLER( flash_w )
 	}
 	else
 	{
+		fujitsu_29f016a_device **flash_base = &flash_device[flash_bank >> 8][flash_bank & 0xff];
 		int adr = offset * 2;
 
 		if( ACCESSING_BITS_0_7 )
 		{
-			intelflash_write( flash_bank + 0, adr + 0, ( data >> 0 ) & 0xff );
+			flash_base[0]->write( adr + 0, ( data >> 0 ) & 0xff );
 		}
 		if( ACCESSING_BITS_8_15 )
 		{
-			intelflash_write( flash_bank + 1, adr + 0, ( data >> 8 ) & 0xff );
+			flash_base[1]->write( adr + 0, ( data >> 8 ) & 0xff );
 		}
 		if( ACCESSING_BITS_16_23 )
 		{
-			intelflash_write( flash_bank + 0, adr + 1, ( data >> 16 ) & 0xff );
+			flash_base[0]->write( adr + 1, ( data >> 16 ) & 0xff );
 		}
 		if( ACCESSING_BITS_24_31 )
 		{
-			intelflash_write( flash_bank + 1, adr + 1, ( data >> 24 ) & 0xff );
+			flash_base[1]->write( adr + 1, ( data >> 24 ) & 0xff );
 		}
 	}
 }
@@ -1406,55 +1396,15 @@ ADDRESS_MAP_END
 
 static void flash_init( running_machine *machine )
 {
-	int i;
-	int chip;
-	int size;
-	UINT8 *data;
-	static const struct
-	{
-		int *start;
-		const char *rgntag;
-		int chips;
-		int type;
-		int size;
-	}
-	flash_init[] =
-	{
-		{ &onboard_flash_start, "user3",  8, FLASH_FUJITSU_29F016A, 0x200000 },
-		{ &pccard1_flash_start, "user4", 16, FLASH_FUJITSU_29F016A, 0x200000 },
-		{ &pccard2_flash_start, "user5", 16, FLASH_FUJITSU_29F016A, 0x200000 },
-		{ &pccard3_flash_start, "user6", 16, FLASH_FUJITSU_29F016A, 0x200000 },
-		{ &pccard4_flash_start, "user7", 16, FLASH_FUJITSU_29F016A, 0x200000 },
-		{ NULL, 0, 0, 0, 0 },
-	};
+	// find onboard flash devices
+	astring tempstr;
+	for (int index = 0; index < 8; index++)
+		flash_device[0][index] = machine->device<fujitsu_29f016a_device>(tempstr.format("onboard.%d", index));
 
-	flash_chips = 0;
-
-	i = 0;
-	while( flash_init[ i ].start != NULL )
-	{
-		data = memory_region( machine, flash_init[ i ].rgntag );
-		if( data != NULL )
-		{
-			size = 0;
-			*( flash_init[ i ].start ) = flash_chips;
-			for( chip = 0; chip < flash_init[ i ].chips; chip++ )
-			{
-				intelflash_init( machine, flash_chips, flash_init[ i ].type, data + size );
-				size += flash_init[ i ].size;
-				flash_chips++;
-			}
-			if( size != memory_region_length( machine, flash_init[ i ].rgntag ) )
-			{
-				fatalerror( "flash_init %d incorrect region length\n", i );
-			}
-		}
-		else
-		{
-			*( flash_init[ i ].start ) = -1;
-		}
-		i++;
-	}
+	// find pccard flash devices
+	for (int card = 1; card <= 4; card++)
+		for (int index = 0; index < 16; index++)
+			flash_device[card][index] = machine->device<fujitsu_29f016a_device>(tempstr.format("pccard%d.%d", card, index));
 
 	state_save_register_global(machine,  flash_bank );
 	state_save_register_global(machine,  control );
@@ -2849,6 +2799,16 @@ static MACHINE_CONFIG_START( konami573, driver_device )
 
 	MDRV_MACHINE_RESET( konami573 )
 	MDRV_NVRAM_HANDLER( konami573 )
+	
+	// onboard flash
+	MDRV_FUJITSU_29F016A_ADD("onboard.0")
+	MDRV_FUJITSU_29F016A_ADD("onboard.1")
+	MDRV_FUJITSU_29F016A_ADD("onboard.2")
+	MDRV_FUJITSU_29F016A_ADD("onboard.3")
+	MDRV_FUJITSU_29F016A_ADD("onboard.4")
+	MDRV_FUJITSU_29F016A_ADD("onboard.5")
+	MDRV_FUJITSU_29F016A_ADD("onboard.6")
+	MDRV_FUJITSU_29F016A_ADD("onboard.7")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -2879,6 +2839,46 @@ static MACHINE_CONFIG_START( konami573, driver_device )
 	MDRV_M48T58_ADD( "m48t58" )
 
 	MDRV_ADC0834_ADD( "adc0834", konami573_adc_interface )
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( pccard1, konami573 )
+	// flash for pccard 1
+	MDRV_FUJITSU_29F016A_ADD("pccard1.0")
+	MDRV_FUJITSU_29F016A_ADD("pccard1.1")
+	MDRV_FUJITSU_29F016A_ADD("pccard1.2")
+	MDRV_FUJITSU_29F016A_ADD("pccard1.3")
+	MDRV_FUJITSU_29F016A_ADD("pccard1.4")
+	MDRV_FUJITSU_29F016A_ADD("pccard1.5")
+	MDRV_FUJITSU_29F016A_ADD("pccard1.6")
+	MDRV_FUJITSU_29F016A_ADD("pccard1.7")
+	MDRV_FUJITSU_29F016A_ADD("pccard1.8")
+	MDRV_FUJITSU_29F016A_ADD("pccard1.9")
+	MDRV_FUJITSU_29F016A_ADD("pccard1.10")
+	MDRV_FUJITSU_29F016A_ADD("pccard1.11")
+	MDRV_FUJITSU_29F016A_ADD("pccard1.12")
+	MDRV_FUJITSU_29F016A_ADD("pccard1.13")
+	MDRV_FUJITSU_29F016A_ADD("pccard1.14")
+	MDRV_FUJITSU_29F016A_ADD("pccard1.15")
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( pccard2, konami573 )
+	// flash for pccard 2
+	MDRV_FUJITSU_29F016A_ADD("pccard2.0")
+	MDRV_FUJITSU_29F016A_ADD("pccard2.1")
+	MDRV_FUJITSU_29F016A_ADD("pccard2.2")
+	MDRV_FUJITSU_29F016A_ADD("pccard2.3")
+	MDRV_FUJITSU_29F016A_ADD("pccard2.4")
+	MDRV_FUJITSU_29F016A_ADD("pccard2.5")
+	MDRV_FUJITSU_29F016A_ADD("pccard2.6")
+	MDRV_FUJITSU_29F016A_ADD("pccard2.7")
+	MDRV_FUJITSU_29F016A_ADD("pccard2.8")
+	MDRV_FUJITSU_29F016A_ADD("pccard2.9")
+	MDRV_FUJITSU_29F016A_ADD("pccard2.10")
+	MDRV_FUJITSU_29F016A_ADD("pccard2.11")
+	MDRV_FUJITSU_29F016A_ADD("pccard2.12")
+	MDRV_FUJITSU_29F016A_ADD("pccard2.13")
+	MDRV_FUJITSU_29F016A_ADD("pccard2.14")
+	MDRV_FUJITSU_29F016A_ADD("pccard2.15")
 MACHINE_CONFIG_END
 
 
@@ -3155,9 +3155,6 @@ INPUT_PORTS_END
 ROM_START( sys573 )
 	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
-
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 ROM_END
 
 // Games
@@ -3167,9 +3164,6 @@ ROM_START( bassangl )
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "ge765ja.u1", 0x000000, 0x000224, BAD_DUMP CRC(ee1b32a7) SHA1(c0f6b14b054f5a95ce474e794a3e0ca78faac681) )
-
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
 	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "765jaa02", 0, SHA1(4291711b1025733cb97f6da5dc3b03c189fcc37c) )
@@ -3182,9 +3176,6 @@ ROM_START( bassang2 )
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gc865ja.u1", 0x000000, 0x000224, BAD_DUMP CRC(095cbfb5) SHA1(529ce0a7b0986cf7e64c37f466d6c2dac95cea7f) )
 
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
-
 	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "865jaa02", 0, SHA1(b98d9aa54f13aa73bea580d6494cb6a7f3217be3) )
 ROM_END
@@ -3193,9 +3184,6 @@ ROM_START( cr589fw )
 	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
 
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
-
 	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "700b04", 0, SHA1(2f65f62eb7ae202153a8544989675989ed33316f) )
 ROM_END
@@ -3203,9 +3191,6 @@ ROM_END
 ROM_START( cr589fwa )
 	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
-
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
 	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "700a04", 0, SHA1(554481f48eeb5daf8b4e7be2d66840d6c8454a52) )
@@ -3218,9 +3203,6 @@ ROM_START( darkhleg )
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gx706ja.u1", 0x000000, 0x000224, BAD_DUMP CRC(72b42574) SHA1(79dc959f0ce95ccb9ac0dbf0a72aec973e91bc56) )
 
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
-
 	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "706jaa02", 0, SHA1(58bd06855988250028086cba6b3670372b9d96a0) )
 ROM_END
@@ -3232,9 +3214,6 @@ ROM_START( fmania )
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
 	ROM_FILL( 0x000000, 0x000224, 0xff )
 
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
-
 	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "918xxb02", 0, SHA1(8ced8952fff3e70ce0621a491f0973af5a6ccd82) )
 ROM_END
@@ -3245,12 +3224,6 @@ ROM_START( ddrextrm )
 
 	ROM_REGION( 0x0001014, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gcc36ja.u1",   0x000000, 0x001014, BAD_DUMP CRC(c1601287) SHA1(929691a78f7bb6dd830f832f301116df0da1619b) )
-
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
-
-	ROM_REGION( 0x2000000, "user5", 0 ) /* PCCARD2 */
-	ROM_FILL( 0x0000000, 0x2000000, 0xff )
 
 	ROM_REGION( 0x000008, "user9", 0 ) /* security cart id */
 	ROM_LOAD( "gcc36ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
@@ -3266,9 +3239,6 @@ ROM_START( ddru )
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gn845ua.u1",   0x000000, 0x000224, BAD_DUMP CRC(c9e7fced) SHA1(aac4dde100091bc64d397f53484a0ffbf68b8101) )
 
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
-
 	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "845uaa02", 0, SHA1(d3f9290d4dadb5e9b82ebe77abf7b99d1a89f716) )
 ROM_END
@@ -3279,9 +3249,6 @@ ROM_START( ddrj )
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gc845jb.u1",   0x000000, 0x000224, BAD_DUMP CRC(a16f42b8) SHA1(da4f1eb3eb2b28cb3a0bc74bb9b9945970f56ac2) )
-
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
 	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "845jba02", 0, SHA1(2d10378c89fe85682f262f0987f8366b9ea72f11) )
@@ -3294,15 +3261,22 @@ ROM_START( ddrja )
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gc845ja.u1",   0x000000, 0x000224, NO_DUMP )
 
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "onboard.0", 0 ) /* onboard flash */
 	ROM_LOAD( "gc845jaa.31m",  0x000000, 0x200000, NO_DUMP )
-	ROM_LOAD( "gc845jaa.27m",  0x200000, 0x200000, NO_DUMP )
-	ROM_LOAD( "gc845jaa.31l",  0x400000, 0x200000, NO_DUMP )
-	ROM_LOAD( "gc845jaa.27l",  0x600000, 0x200000, NO_DUMP )
-	ROM_LOAD( "gc845jaa.31j",  0x800000, 0x200000, NO_DUMP )
-	ROM_LOAD( "gc845jaa.27j",  0xa00000, 0x200000, NO_DUMP )
-	ROM_LOAD( "gc845jaa.31h",  0xc00000, 0x200000, NO_DUMP )
-	ROM_LOAD( "gc845jaa.27h",  0xe00000, 0x200000, NO_DUMP )
+	ROM_REGION( 0x200000, "onboard.1", 0 ) /* onboard flash */
+	ROM_LOAD( "gc845jaa.27m",  0x000000, 0x200000, NO_DUMP )
+	ROM_REGION( 0x200000, "onboard.2", 0 ) /* onboard flash */
+	ROM_LOAD( "gc845jaa.31l",  0x000000, 0x200000, NO_DUMP )
+	ROM_REGION( 0x200000, "onboard.3", 0 ) /* onboard flash */
+	ROM_LOAD( "gc845jaa.27l",  0x000000, 0x200000, NO_DUMP )
+	ROM_REGION( 0x200000, "onboard.4", 0 ) /* onboard flash */
+	ROM_LOAD( "gc845jaa.31j",  0x000000, 0x200000, NO_DUMP )
+	ROM_REGION( 0x200000, "onboard.5", 0 ) /* onboard flash */
+	ROM_LOAD( "gc845jaa.27j",  0x000000, 0x200000, NO_DUMP )
+	ROM_REGION( 0x200000, "onboard.6", 0 ) /* onboard flash */
+	ROM_LOAD( "gc845jaa.31h",  0x000000, 0x200000, NO_DUMP )
+	ROM_REGION( 0x200000, "onboard.7", 0 ) /* onboard flash */
+	ROM_LOAD( "gc845jaa.27h",  0x000000, 0x200000, NO_DUMP )
 
 	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "845jaa02", 0, SHA1(37ca16be25bee39a5692dee2fa5f0fa0addfaaca) )
@@ -3318,15 +3292,22 @@ ROM_START( ddrjb )
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gc845ja.u1",   0x000000, 0x000224, NO_DUMP )
 
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "onboard.0", 0 ) /* onboard flash */
 	ROM_LOAD( "gc845jab.31m",  0x000000, 0x200000, NO_DUMP )
-	ROM_LOAD( "gc845jab.27m",  0x200000, 0x200000, NO_DUMP )
-	ROM_LOAD( "gc845jab.31l",  0x400000, 0x200000, NO_DUMP )
-	ROM_LOAD( "gc845jab.27l",  0x600000, 0x200000, NO_DUMP )
-	ROM_LOAD( "gc845jab.31j",  0x800000, 0x200000, NO_DUMP )
-	ROM_LOAD( "gc845jab.27j",  0xa00000, 0x200000, NO_DUMP )
-	ROM_LOAD( "gc845jab.31h",  0xc00000, 0x200000, NO_DUMP )
-	ROM_LOAD( "gc845jab.27h",  0xe00000, 0x200000, NO_DUMP )
+	ROM_REGION( 0x200000, "onboard.1", 0 ) /* onboard flash */
+	ROM_LOAD( "gc845jab.27m",  0x000000, 0x200000, NO_DUMP )
+	ROM_REGION( 0x200000, "onboard.2", 0 ) /* onboard flash */
+	ROM_LOAD( "gc845jab.31l",  0x000000, 0x200000, NO_DUMP )
+	ROM_REGION( 0x200000, "onboard.3", 0 ) /* onboard flash */
+	ROM_LOAD( "gc845jab.27l",  0x000000, 0x200000, NO_DUMP )
+	ROM_REGION( 0x200000, "onboard.4", 0 ) /* onboard flash */
+	ROM_LOAD( "gc845jab.31j",  0x000000, 0x200000, NO_DUMP )
+	ROM_REGION( 0x200000, "onboard.5", 0 ) /* onboard flash */
+	ROM_LOAD( "gc845jab.27j",  0x000000, 0x200000, NO_DUMP )
+	ROM_REGION( 0x200000, "onboard.6", 0 ) /* onboard flash */
+	ROM_LOAD( "gc845jab.31h",  0x000000, 0x200000, NO_DUMP )
+	ROM_REGION( 0x200000, "onboard.7", 0 ) /* onboard flash */
+	ROM_LOAD( "gc845jab.27h",  0x000000, 0x200000, NO_DUMP )
 
 	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "845jab02", 0, SHA1(7bdcef37bf376c23153dfd1580de5666cc681335) )
@@ -3342,9 +3323,6 @@ ROM_START( ddra )
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gn845aa.u1",   0x000000, 0x000224, BAD_DUMP CRC(327c4851) SHA1(f0939224af706fd103a67aae9c96518c1db90ac9) )
 
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
-
 	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "845aaa02", 0, SHA1(839e2f8698a1561ac364998b8b3158ef0dee6998) )
 ROM_END
@@ -3356,9 +3334,6 @@ ROM_START( ddr2m )
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gn895jaa.u1",  0x000000, 0x000224, BAD_DUMP CRC(363f427e) SHA1(adec886a07b9bd91f142f286b04fc6582205f037) )
 
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
-
 	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "895jaa02", 0, SHA1(cfe3a6f3ed62ba388b07045e29e22472d17dcfe4) )
 ROM_END
@@ -3369,9 +3344,6 @@ ROM_START( ddr2mc )
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gn896ja.u1",  0x000000, 0x000224, BAD_DUMP CRC(cbc984c5) SHA1(6c0cd78a41000999b4ffbd9fb3707738b50a9b50) )
-
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
 	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "896jaa01", 0, SHA1(f802a0e2ba0147eb71c54d92af409c3010a5715f) )
@@ -3386,9 +3358,6 @@ ROM_START( ddr2mc2 )
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "ge984ja.u1",  0x000000, 0x000224, BAD_DUMP CRC(cbc984c5) SHA1(6c0cd78a41000999b4ffbd9fb3707738b50a9b50) )
-
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
 	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "984jaa01", 0, SHA1(5505c28be27bfa9648060fd799bcf0c2c5f608ed) )
@@ -3407,12 +3376,6 @@ ROM_START( ddr2ml )
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "ge885jaa.u1",  0x000000, 0x000224, BAD_DUMP CRC(cbc984c5) SHA1(6c0cd78a41000999b4ffbd9fb3707738b50a9b50) )
 
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
-
-	ROM_REGION( 0x2000000, "user4", 0 ) /* PCCARD1 */
-	ROM_FILL( 0x0000000, 0x2000000, 0xff )
-
 	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "885jaa02", 0, SHA1(5d187aea247eefc5c065566ab277acd8c942ba27) )
 ROM_END
@@ -3426,12 +3389,6 @@ ROM_START( ddr3ma )
 
 	ROM_REGION( 0x0000084, "user8", 0 ) /* game security cart eeprom */
 	ROM_LOAD( "gn887aa.u1",   0x000000, 0x000084, BAD_DUMP CRC(bb14f9bd) SHA1(9d0adf5a32d8bbcaaea2f701f5c7a5d51ee0b8bf) )
-
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
-
-	ROM_REGION( 0x2000000, "user5", 0 ) /* PCCARD2 */
-	ROM_FILL( 0x0000000, 0x2000000, 0xff )
 
 	ROM_REGION( 0x000008, "user9", 0 ) /* install security cart id */
 	ROM_LOAD( "ge887aa.u6",   0x000000, 0x000008, BAD_DUMP CRC(af09e43c) SHA1(d8372f2d6e0ae07061b496a2242a63e5bc2e54dc) )
@@ -3453,12 +3410,6 @@ ROM_START( ddr3mj )
 	ROM_REGION( 0x0000084, "user8", 0 ) /* game security cart eeprom */
 	ROM_LOAD( "gn887ja.u1",   0x000000, 0x000084, BAD_DUMP CRC(2f633432) SHA1(bce44f20a5a7318af6aea4fdfa8af64ddb76047c) )
 
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
-
-	ROM_REGION( 0x2000000, "user5", 0 ) /* PCCARD2 */
-	ROM_FILL( 0x0000000, 0x2000000, 0xff )
-
 	ROM_REGION( 0x000008, "user9", 0 ) /* install security cart id */
 	ROM_LOAD( "ge887ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(af09e43c) SHA1(d8372f2d6e0ae07061b496a2242a63e5bc2e54dc) )
 
@@ -3478,12 +3429,6 @@ ROM_START( ddr3mk )
 
 	ROM_REGION( 0x0000084, "user8", 0 ) /* game security cart eeprom */
 	ROM_LOAD( "gn887kb.u1",   0x000000, 0x000084, BAD_DUMP CRC(bb14f9bd) SHA1(9d0adf5a32d8bbcaaea2f701f5c7a5d51ee0b8bf) )
-
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
-
-	ROM_REGION( 0x2000000, "user5", 0 ) /* PCCARD2 */
-	ROM_FILL( 0x0000000, 0x2000000, 0xff )
 
 	ROM_REGION( 0x000008, "user9", 0 ) /* install security cart id */
 	ROM_LOAD( "ge887kb.u6",   0x000000, 0x000008, BAD_DUMP CRC(af09e43c) SHA1(d8372f2d6e0ae07061b496a2242a63e5bc2e54dc) )
@@ -3505,12 +3450,6 @@ ROM_START( ddr3mka )
 	ROM_REGION( 0x0000084, "user8", 0 ) /* game security cart eeprom */
 	ROM_LOAD( "gn887ka.u1",   0x000000, 0x000084, BAD_DUMP CRC(bb14f9bd) SHA1(9d0adf5a32d8bbcaaea2f701f5c7a5d51ee0b8bf) )
 
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
-
-	ROM_REGION( 0x2000000, "user5", 0 ) /* PCCARD2 */
-	ROM_FILL( 0x0000000, 0x2000000, 0xff )
-
 	ROM_REGION( 0x000008, "user9", 0 ) /* install security cart id */
 	ROM_LOAD( "ge887ka.u6",   0x000000, 0x000008, BAD_DUMP CRC(af09e43c) SHA1(d8372f2d6e0ae07061b496a2242a63e5bc2e54dc) )
 
@@ -3530,12 +3469,6 @@ ROM_START( ddr3mp )
 
 	ROM_REGION( 0x0001014, "user8", 0 ) /* game security cart eeprom */
 	ROM_LOAD( "gca22ja.u1",   0x000000, 0x001014, BAD_DUMP CRC(6883c82c) SHA1(6fef1dc7150066eee427db685b6c5fb350b7768d) )
-
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
-
-	ROM_REGION( 0x2000000, "user5", 0 ) /* PCCARD2 */
-	ROM_FILL( 0x0000000, 0x2000000, 0xff )
 
 	ROM_REGION( 0x000008, "user9", 0 ) /* install security cart id */
 	ROM_LOAD( "gea22ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(af09e43c) SHA1(d8372f2d6e0ae07061b496a2242a63e5bc2e54dc) )
@@ -3557,12 +3490,6 @@ ROM_START( ddr4m )
 	ROM_REGION( 0x0001014, "user8", 0 ) /* game security cart eeprom */
 	ROM_LOAD( "gca33aa.u1",   0x000000, 0x001014, BAD_DUMP CRC(f6feb2bd) SHA1(dfd5bd532338849289e2e4c155c0ca86e79b9ae5) )
 
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
-
-	ROM_REGION( 0x2000000, "user5", 0 ) /* PCCARD2 */
-	ROM_FILL( 0x0000000, 0x2000000, 0xff )
-
 	ROM_REGION( 0x000008, "user9", 0 ) /* install security cart id */
 	ROM_LOAD( "gea33aa.u6",   0x000000, 0x000008, BAD_DUMP CRC(af09e43c) SHA1(d8372f2d6e0ae07061b496a2242a63e5bc2e54dc) )
 
@@ -3582,12 +3509,6 @@ ROM_START( ddr4mj )
 
 	ROM_REGION( 0x0001014, "user8", 0 ) /* game security cart eeprom */
 	ROM_LOAD( "gca33ja.u1",   0x000000, 0x001014, BAD_DUMP CRC(e5230867) SHA1(44aea9ccc90d81e7f41e5e9a62b28fcbdd75363b) )
-
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
-
-	ROM_REGION( 0x2000000, "user5", 0 ) /* PCCARD2 */
-	ROM_FILL( 0x0000000, 0x2000000, 0xff )
 
 	ROM_REGION( 0x000008, "user9", 0 ) /* install security cart id */
 	ROM_LOAD( "a33jaa.u6",    0x000000, 0x000008, BAD_DUMP CRC(af09e43c) SHA1(d8372f2d6e0ae07061b496a2242a63e5bc2e54dc) )
@@ -3609,12 +3530,6 @@ ROM_START( ddr4ms )
 	ROM_REGION( 0x0001014, "user8", 0 ) /* game security cart eeprom */
 	ROM_LOAD( "gca33ab.u1",   0x000000, 0x001014, BAD_DUMP CRC(312ac13f) SHA1(05d733edc03cfc5ea03db6c683f59ed6ff860b5a) )
 
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
-
-	ROM_REGION( 0x2000000, "user5", 0 ) /* PCCARD2 */
-	ROM_FILL( 0x0000000, 0x2000000, 0xff )
-
 	ROM_REGION( 0x000008, "user9", 0 ) /* install security cart id */
 	ROM_LOAD( "gea33ab.u6",   0x000000, 0x000008, BAD_DUMP CRC(af09e43c) SHA1(d8372f2d6e0ae07061b496a2242a63e5bc2e54dc) )
 
@@ -3635,12 +3550,6 @@ ROM_START( ddr4msj )
 	ROM_REGION( 0x0001014, "user8", 0 ) /* game security cart eeprom */
 	ROM_LOAD( "gca33jb.u1",   0x000000, 0x001014, BAD_DUMP CRC(00e4b531) SHA1(f421fc33642c5a3cd89fb14dc8cd601bdddd1f55) )
 
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
-
-	ROM_REGION( 0x2000000, "user5", 0 ) /* PCCARD2 */
-	ROM_FILL( 0x0000000, 0x2000000, 0xff )
-
 	ROM_REGION( 0x000008, "user9", 0 ) /* install security cart id */
 	ROM_LOAD( "a33jba.u6",    0x000000, 0x000008, BAD_DUMP CRC(af09e43c) SHA1(d8372f2d6e0ae07061b496a2242a63e5bc2e54dc) )
 
@@ -3660,12 +3569,6 @@ ROM_START( ddr4mp )
 
 	ROM_REGION( 0x0001014, "user8", 0 ) /* game security cart eeprom */
 	ROM_LOAD( "gca34ja.u1",   0x000000, 0x001014, BAD_DUMP CRC(e9b6ce56) SHA1(f040fba2b2b446baa840026dcd10f9785f8cc0a3) )
-
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
-
-	ROM_REGION( 0x2000000, "user5", 0 ) /* PCCARD2 */
-	ROM_FILL( 0x0000000, 0x2000000, 0xff )
 
 	ROM_REGION( 0x000008, "user9", 0 ) /* install security cart id */
 	ROM_LOAD( "gea34ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(af09e43c) SHA1(d8372f2d6e0ae07061b496a2242a63e5bc2e54dc) )
@@ -3690,12 +3593,6 @@ ROM_START( ddr4mps )
 	ROM_REGION( 0x0001014, "user8", 0 ) /* game security cart eeprom */
 	ROM_LOAD( "gca34jb.u1",   0x000000, 0x001014, BAD_DUMP CRC(0c717300) SHA1(00d21f39fe90494ffec2f8799767cc46a9cd2b00) )
 
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
-
-	ROM_REGION( 0x2000000, "user5", 0 ) /* PCCARD2 */
-	ROM_FILL( 0x0000000, 0x2000000, 0xff )
-
 	ROM_REGION( 0x000008, "user9", 0 ) /* install security cart id */
 	ROM_LOAD( "gea34jb.u6",   0x000000, 0x000008, BAD_DUMP CRC(af09e43c) SHA1(d8372f2d6e0ae07061b496a2242a63e5bc2e54dc) )
 
@@ -3716,12 +3613,6 @@ ROM_START( ddr5m )
 	ROM_REGION( 0x0001014, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gca27ja.u1",   0x000000, 0x001014, BAD_DUMP CRC(ec526036) SHA1(f47d94d19268fdfa3ae9d42db9f2e2f9be318f2b) )
 
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
-
-	ROM_REGION( 0x2000000, "user5", 0 ) /* PCCARD2 */
-	ROM_FILL( 0x0000000, 0x2000000, 0xff )
-
 	ROM_REGION( 0x000008, "user9", 0 ) /* security cart id */
 	ROM_LOAD( "gca27ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
@@ -3735,12 +3626,6 @@ ROM_START( ddrbocd )
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gn895jaa.u1",  0x000000, 0x000224, BAD_DUMP CRC(363f427e) SHA1(adec886a07b9bd91f142f286b04fc6582205f037) )
-
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
-
-	ROM_REGION( 0x2000000, "user4", 0 ) /* PCCARD1 */
-	ROM_FILL( 0x0000000, 0x2000000, 0xff )
 
 	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "892jaa01", 0, SHA1(46ace0feef48a2a6643c3cb4ac9164ba0beeea94) )
@@ -3758,9 +3643,6 @@ ROM_START( ddrs2k )
 
 	ROM_REGION( 0x0000084, "user8", 0 ) /* game security cart eeprom */
 	ROM_LOAD( "gc905aa.u1",   0x000000, 0x000084, BAD_DUMP CRC(21073a3e) SHA1(afa12404ceb462b9016a41c40775da87aa09cfeb) )
-
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
 	ROM_REGION( 0x000008, "user9", 0 ) /* install security cart id */
 	ROM_LOAD( "ge905aa.u6",   0x000000, 0x000008, BAD_DUMP CRC(af09e43c) SHA1(d8372f2d6e0ae07061b496a2242a63e5bc2e54dc) )
@@ -3782,9 +3664,6 @@ ROM_START( ddrs2kj )
 	ROM_REGION( 0x0000084, "user8", 0 ) /* game security cart eeprom */
 	ROM_LOAD( "gc905ja.u1",   0x000000, 0x000084, BAD_DUMP CRC(b7a104b0) SHA1(0f6901e41640f729f8a084a33148a9b900475594) )
 
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
-
 	ROM_REGION( 0x000008, "user9", 0 ) /* install security cart id */
 	ROM_LOAD( "ge905ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(af09e43c) SHA1(d8372f2d6e0ae07061b496a2242a63e5bc2e54dc) )
 
@@ -3802,12 +3681,6 @@ ROM_START( ddrmax )
 	ROM_REGION( 0x0001014, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gcb19ja.u1",   0x000000, 0x001014, BAD_DUMP CRC(2255626a) SHA1(cb70c4b551265ffc6cc41f7bd2678696e8067060) )
 
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
-
-	ROM_REGION( 0x2000000, "user5", 0 ) /* PCCARD2 */
-	ROM_FILL( 0x0000000, 0x2000000, 0xff )
-
 	ROM_REGION( 0x000008, "user9", 0 ) /* security cart id */
 	ROM_LOAD( "gcb19ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
@@ -3821,12 +3694,6 @@ ROM_START( ddrmax2 )
 
 	ROM_REGION( 0x0001014, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gcb20ja.u1",   0x000000, 0x001014, BAD_DUMP CRC(fb7e0f58) SHA1(e6da23257a2a2ba7c69e817a91a0a8864f009386) )
-
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
-
-	ROM_REGION( 0x2000000, "user5", 0 ) /* PCCARD2 */
-	ROM_FILL( 0x0000000, 0x2000000, 0xff )
 
 	ROM_REGION( 0x000008, "user9", 0 ) /* security cart id */
 	ROM_LOAD( "gcb20ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
@@ -3842,9 +3709,6 @@ ROM_START( ddrsbm )
 	ROM_REGION( 0x0000084, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gq894ja.u1",   0x000000, 0x000084, BAD_DUMP CRC(cc3a47de) SHA1(f6e2e101870370b1e295a4a9ed546aa2d8bc2010) )
 
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
-
 	ROM_REGION( 0x000008, "user9", 0 ) /* security cart id */
 	ROM_LOAD( "gq894ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
@@ -3858,9 +3722,6 @@ ROM_START( ddrusa )
 
 	ROM_REGION( 0x0001014, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gka44ua.u1",   0x000000, 0x001014, BAD_DUMP CRC(2ef7c4f1) SHA1(9004d27179ece86883d01b3e6bbfeebc1b478d57) )
-
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
 	ROM_REGION( 0x000008, "user9", 0 ) /* security cart id */
 	ROM_LOAD( "gka44ua.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
@@ -3876,10 +3737,10 @@ ROM_START( drmn )
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gq881ja.u1",   0x000000, 0x000224, BAD_DUMP CRC(7dca0b3f) SHA1(db6d5c527e2a99133b516e01433024d3173848c6) )
 
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x0c00000, 0xff )
-	ROM_LOAD( "gq881ja.31h",  0xc00000, 0x200000, CRC(a5b86ece) SHA1(9696f0c512501574bae6e436306675894bb2352e) )
-	ROM_LOAD( "gq881ja.27h",  0xe00000, 0x200000, CRC(fc0b94c1) SHA1(967d374288db757d161d0e9e8e396a1176071c5f) )
+	ROM_REGION( 0x200000, "onboard.6", 0 ) /* onboard flash */
+	ROM_LOAD( "gq881ja.31h",  0x000000, 0x200000, CRC(a5b86ece) SHA1(9696f0c512501574bae6e436306675894bb2352e) )
+	ROM_REGION( 0x200000, "onboard.7", 0 ) /* onboard flash */
+	ROM_LOAD( "gq881ja.27h",  0x000000, 0x200000, CRC(fc0b94c1) SHA1(967d374288db757d161d0e9e8e396a1176071c5f) )
 
 	ROM_REGION( 0x002000, "m48t58", 0 ) /* timekeeper */
 	ROM_LOAD( "gq881ja.22h",  0x000000, 0x002000, CRC(e834d5ec) SHA1(1c845811e43d7dfec657da288b5a38b8bc9c8366) )
@@ -3901,9 +3762,6 @@ ROM_START( drmn2m )
 	ROM_REGION( 0x0001014, "user8", 0 ) /* game security cart eeprom */
 	ROM_LOAD( "gn912ja.u1",   0x000000, 0x001014, BAD_DUMP CRC(34deea99) SHA1(f179e22eaf30453bb94177ed9c25d7996f020c99) )
 
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
-
 	ROM_REGION( 0x000008, "user9", 0 ) /* install security cart id */
 	ROM_LOAD( "ge912ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(af09e43c) SHA1(d8372f2d6e0ae07061b496a2242a63e5bc2e54dc) )
 
@@ -3923,9 +3781,6 @@ ROM_START( drmn2mpu )
 
 	ROM_REGION( 0x0001014, "user8", 0 ) /* game security cart eeprom */
 	ROM_LOAD( "gn912ja.u1",   0x000000, 0x001014, BAD_DUMP CRC(34deea99) SHA1(f179e22eaf30453bb94177ed9c25d7996f020c99) )
-
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
 	ROM_REGION( 0x000008, "user9", 0 ) /* install security cart id */
 	ROM_LOAD( "ge912ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(af09e43c) SHA1(d8372f2d6e0ae07061b496a2242a63e5bc2e54dc) )
@@ -3950,9 +3805,6 @@ ROM_START( drmn3m )
 	ROM_REGION( 0x0001014, "user8", 0 ) /* game security cart eeprom */
 	ROM_LOAD( "gca23ja.u1",   0x000000, 0x001014, BAD_DUMP CRC(5af1b5da) SHA1(cf862ef9ab60e8da89af96266943137827e4a261) )
 
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
-
 	ROM_REGION( 0x000008, "user9", 0 ) /* install security cart id */
 	ROM_LOAD( "a23jaa.u6",    0x000000, 0x000008, BAD_DUMP CRC(af09e43c) SHA1(d8372f2d6e0ae07061b496a2242a63e5bc2e54dc) )
 
@@ -3970,9 +3822,6 @@ ROM_START( dmx )
 	ROM_REGION( 0x0001014, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "ge874ja.u1",   0x000000, 0x001014, BAD_DUMP CRC(c5536373) SHA1(1492221f7dd9485f7745ecb0a982a88c8e768e53) )
 
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
-
 	ROM_REGION( 0x000008, "user9", 0 ) /* security cart id */
 	ROM_LOAD( "ge874ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
@@ -3986,9 +3835,6 @@ ROM_START( dmx2m )
 
 	ROM_REGION( 0x0001014, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gca39ja.u1",   0x000000, 0x001014, BAD_DUMP CRC(ecc75eb7) SHA1(af66ced28ba5e79ae32ae0ef12d2ebe4207f3822) )
-
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
 	ROM_REGION( 0x000008, "user9", 0 ) /* security cart id */
 	ROM_LOAD( "gca39ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
@@ -4004,10 +3850,10 @@ ROM_START( dmx2majp )
 	ROM_REGION( 0x0001014, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gca38ja.u1",   0x000000, 0x001014, BAD_DUMP CRC(99a746b8) SHA1(333236e59a707ecaf840a66f9b947ceade2cf2c9) )
 
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "onboard.0", 0 ) /* onboard flash */
 	ROM_LOAD( "gca38ja.31m",  0x000000, 0x200000, CRC(a0f54ab5) SHA1(a5ae67d7619393779c79a2e227cac0675eeef538) )
-	ROM_LOAD( "gca38ja.27m",  0x200000, 0x200000, CRC(6c3934b8) SHA1(f0e4a692b6caaf60fefaec87fd23da577439f69d) )
-	ROM_FILL( 0x400000, 0x0c00000, 0xff )
+	ROM_REGION( 0x200000, "onboard.1", 0 ) /* onboard flash */
+	ROM_LOAD( "gca38ja.27m",  0x000000, 0x200000, CRC(6c3934b8) SHA1(f0e4a692b6caaf60fefaec87fd23da577439f69d) )
 
 	ROM_REGION( 0x000008, "user9", 0 ) /* security cart id */
 	ROM_LOAD( "gca38ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
@@ -4023,9 +3869,6 @@ ROM_START( dncfrks )
 	ROM_REGION( 0x0001014, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gk874ka.u1",   0x000000, 0x001014, BAD_DUMP CRC(7a6f4672) SHA1(2e009e57760e92f48070a69cff5597c37a4783a2) )
 
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
-
 	ROM_REGION( 0x000008, "user9", 0 ) /* security cart id */
 	ROM_LOAD( "gk874ka.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
@@ -4040,9 +3883,6 @@ ROM_START( dsem )
 	ROM_REGION( 0x0000224, "user2", 0 ) /* install security cart eeprom */
 	ROM_LOAD( "ge936ea.u1",   0x000000, 0x000224, BAD_DUMP CRC(0f5b7ae3) SHA1(646dd49da1216cc2d3d6920bc9b3447d55ebfbf0) )
 
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
-
 	ROM_REGION( 0x000008, "user9", 0 ) /* install security cart id */
 	ROM_LOAD( "ge936ea.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
@@ -4056,12 +3896,6 @@ ROM_START( dsem2 )
 
 	ROM_REGION( 0x0001014, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gkc23ea.u1",   0x000000, 0x001014, BAD_DUMP CRC(aec2421a) SHA1(5ea9e9ce6161ebc99a50db0b7304385511bd4553) )
-
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
-
-	ROM_REGION( 0x2000000, "user5", 0 ) /* PCCARD2 */
-	ROM_FILL( 0x0000000, 0x2000000, 0xff )
 
 	ROM_REGION( 0x000008, "user9", 0 ) /* security cart id */
 	ROM_LOAD( "gkc23ea.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
@@ -4079,12 +3913,6 @@ ROM_START( dsfdct )
 
 	ROM_REGION( 0x0000084, "user8", 0 ) /* game security cart eeprom */
 	ROM_LOAD( "gc910jc.u1",   0x000000, 0x000084, BAD_DUMP CRC(3c1ca973) SHA1(32211a72e3ac88b2723f82dac0b26f93031b3a9c) )
-
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
-
-	ROM_REGION( 0x2000000, "user5", 0 ) /* PCCARD2 */
-	ROM_FILL( 0x0000000, 0x2000000, 0xff )
 
 	ROM_REGION( 0x000008, "user9", 0 ) /* install security cart id */
 	ROM_LOAD( "ge887ja_gn887ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
@@ -4106,12 +3934,6 @@ ROM_START( dsfdcta )
 	ROM_REGION( 0x0000084, "user8", 0 ) /* game security cart eeprom */
 	ROM_LOAD( "gc910ja.u1",   0x000000, 0x000084, BAD_DUMP CRC(59a23808) SHA1(fcff1c68ff6cfbd391ac997a40fb5253fc62de82) )
 
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
-
-	ROM_REGION( 0x2000000, "user5", 0 ) /* PCCARD2 */
-	ROM_FILL( 0x0000000, 0x2000000, 0xff )
-
 	ROM_REGION( 0x000008, "user9", 0 ) /* install security cart id */
 	ROM_LOAD( "gn884ja.u6",  0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
@@ -4132,9 +3954,6 @@ ROM_START( dsfdr )
 	ROM_REGION( 0x0001014, "user8", 0 ) /* game security cart eeprom */
         ROM_LOAD( "gca37ja.u1",   0x000000, 0x001014, BAD_DUMP CRC(b6d9e7f9) SHA1(bc5f491de53a96d46745df09bc94e7853052296c) )
 
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
-
 	ROM_REGION( 0x000008, "user9", 0 ) /* install security cart id */
 	ROM_LOAD( "gea37ja.u6",    0x000000, 0x000008, BAD_DUMP CRC(af09e43c) SHA1(d8372f2d6e0ae07061b496a2242a63e5bc2e54dc) )
 
@@ -4152,9 +3971,6 @@ ROM_START( dsftkd )
 	ROM_REGION( 0x0000084, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gn884ja.u1",  0x000000, 0x000084, BAD_DUMP CRC(ce6b98ce) SHA1(75549d9470345ce06d2706d373b19416d97e5b9a) )
 
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
-
 	ROM_REGION( 0x000008, "user9", 0 ) /* security cart id */
 	ROM_LOAD( "gn884ja.u6",  0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
@@ -4169,9 +3985,6 @@ ROM_START( dstage )
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gn845ea.u1",   0x000000, 0x000224, BAD_DUMP CRC(db643af7) SHA1(881221da640b883302e657b906ea0a4e74555679) )
 
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
-
 	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "845ea", 0, BAD_DUMP SHA1(d3f9290d4dadb5e9b82ebe77abf7b99d1a89f716) )
 ROM_END
@@ -4182,9 +3995,6 @@ ROM_START( fbait2bc )
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gc865ua.u1", 0x000000, 0x000224, BAD_DUMP CRC(ea8f0b4b) SHA1(363b1ea1a520b239ba8bca867366bbe8a9977a43) )
-
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
 	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "865uab02", 0, SHA1(d14dc066d4c16fba1e9b31d5f042ad249c4b5137) )
@@ -4197,9 +4007,6 @@ ROM_START( fbaitbc )
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "ge765ua.u1", 0x000000, 0x000224, BAD_DUMP CRC(588748c6) SHA1(ea1ead61e0dcb324ef7b6106cae00bcf6702d6c4) )
 
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
-
 	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "765uab02", 0, SHA1(07b09e763e4b90108aa924b518221b16667a7133) )
 ROM_END
@@ -4210,9 +4017,6 @@ ROM_START( fbaitmc )
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gx889ea.u1", 0x000000, 0x000224, BAD_DUMP CRC(753ad84e) SHA1(e024cefaaee7c9945ccc1f9a3d896b8560adce2e) )
-
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
 	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "889ea", 0, BAD_DUMP SHA1(0b567bf2f03ee8089e0b021ea502a53b3f6fe7ac) )
@@ -4225,9 +4029,6 @@ ROM_START( fbaitmca )
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gx889aa.u1", 0x000000, 0x000224, BAD_DUMP CRC(9c22aae8) SHA1(c107b0bf7fa76708f2d4f6aaf2cf27b3858378a3) )
 
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
-
 	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "889aa", 0, BAD_DUMP SHA1(0b567bf2f03ee8089e0b021ea502a53b3f6fe7ac) )
 ROM_END
@@ -4238,9 +4039,6 @@ ROM_START( fbaitmcj )
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gx889ja.u1", 0x000000, 0x000224, BAD_DUMP CRC(6278603c) SHA1(d6b59e270cfe4016e12565aedec8a4f0702e1a6f) )
-
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
 	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "889ja", 0, BAD_DUMP SHA1(0b567bf2f03ee8089e0b021ea502a53b3f6fe7ac) )
@@ -4253,9 +4051,6 @@ ROM_START( fbaitmcu )
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gx889ua.u1", 0x000000, 0x000224, BAD_DUMP CRC(67b91e54) SHA1(4d94bfab08e2bf6e34ee606dd3c4e345d8e5d158) )
 
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
-
 	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "889ua", 0, BAD_DUMP SHA1(0b567bf2f03ee8089e0b021ea502a53b3f6fe7ac) )
 ROM_END
@@ -4266,9 +4061,6 @@ ROM_START( gtrfrks )
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gq886eac.u1",  0x000000, 0x000224, BAD_DUMP CRC(06bd6c4f) SHA1(61930e467ad135e2f31393ff5af981ed52f3bef9) )
-
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
 	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "886ea", 0, BAD_DUMP SHA1(c0118b5539902e75853403a4979869d18c3d1b86) )
@@ -4281,9 +4073,6 @@ ROM_START( gtrfrksu )
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gq886uac.u1",  0x000000, 0x000224, BAD_DUMP CRC(143eaa55) SHA1(51a4fa3693f1cb1646a8986003f9b6cc1ae8b630) )
 
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
-
 	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "886ua", 0, BAD_DUMP SHA1(c0118b5539902e75853403a4979869d18c3d1b86) )
 ROM_END
@@ -4294,9 +4083,6 @@ ROM_START( gtrfrksj )
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gq886jac.u1",  0x000000, 0x000224, BAD_DUMP CRC(11ffd43d) SHA1(27f4f4d782604379254fb98c3c57e547aa4b321f) )
-
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
 	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "886ja", 0, BAD_DUMP SHA1(c0118b5539902e75853403a4979869d18c3d1b86) )
@@ -4309,9 +4095,6 @@ ROM_START( gtrfrksa )
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gq886aac.u1",  0x000000, 0x000224, BAD_DUMP CRC(efa51ee9) SHA1(3374d936de69c287e0161bc526546441c2943555) )
 
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
-
 	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "886aa", 0, BAD_DUMP SHA1(c0118b5539902e75853403a4979869d18c3d1b86) )
 ROM_END
@@ -4322,12 +4105,6 @@ ROM_START( gtrfrk2m )
 
 	ROM_REGION( 0x0000084, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gq883jad.u1",  0x000000, 0x000084, BAD_DUMP CRC(687868c4) SHA1(1230e74e4cf17953febe501df56d8bbec1de9356) )
-
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
-
-	ROM_REGION( 0x2000000, "user4", 0 ) /* PCCARD1 */
-	ROM_FILL( 0x0000000, 0x2000000, 0xff )
 
 	ROM_REGION( 0x000008, "user9", 0 ) /* security cart id */
 	ROM_LOAD( "gq883jad.u6",  0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
@@ -4345,12 +4122,6 @@ ROM_START( gtrfrk3m )
 
 	ROM_REGION( 0x0001014, "user8", 0 ) /* game security cart eeprom */
 	ROM_LOAD( "ge949jab.u1",  0x000000, 0x001014, BAD_DUMP CRC(8645e17f) SHA1(e8a833384cb6bdb05870fcd44e7c8ed48a03c852) )
-
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
-
-	ROM_REGION( 0x2000000, "user4", 0 ) /* PCCARD1 */
-	ROM_FILL( 0x0000000, 0x2000000, 0xff )
 
 	ROM_REGION( 0x000008, "user9", 0 ) /* install security cart id */
 	ROM_LOAD( "949jaa.u6",    0x000000, 0x000008, BAD_DUMP CRC(af09e43c) SHA1(d8372f2d6e0ae07061b496a2242a63e5bc2e54dc) )
@@ -4375,12 +4146,6 @@ ROM_START( gtfrk3ma )
 	ROM_REGION( 0x0001014, "user8", 0 ) /* game security cart eeprom */
 	ROM_LOAD( "ge949jab.u1",  0x000000, 0x001014, BAD_DUMP CRC(8645e17f) SHA1(e8a833384cb6bdb05870fcd44e7c8ed48a03c852) )
 
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
-
-	ROM_REGION( 0x2000000, "user4", 0 ) /* PCCARD1 */
-	ROM_FILL( 0x0000000, 0x2000000, 0xff )
-
 	ROM_REGION( 0x000008, "user9", 0 ) /* install security cart id */
 	ROM_LOAD( "949jaa.u6",    0x000000, 0x000008, BAD_DUMP CRC(af09e43c) SHA1(d8372f2d6e0ae07061b496a2242a63e5bc2e54dc) )
 
@@ -4397,12 +4162,6 @@ ROM_START( gtfrk3mb )
 
 	ROM_REGION( 0x0001014, "user2", 0 ) /* game security cart eeprom */
 	ROM_LOAD( "ge949jaa.u1",  0x000000, 0x001014, BAD_DUMP CRC(61f35ee1) SHA1(0a2b66742364d76ec18647b2761590bd49229625) )
-
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
-
-	ROM_REGION( 0x2000000, "user4", 0 ) /* PCCARD1 */
-	ROM_FILL( 0x0000000, 0x2000000, 0xff )
 
 	ROM_REGION( 0x000008, "user9", 0 ) /* game security cart id */
 	ROM_LOAD( "ge949jaa.u6",  0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
@@ -4421,12 +4180,6 @@ ROM_START( gtrfrk4m )
 	ROM_REGION( 0x0001014, "user8", 0 ) /* game security cart eeprom */
 	ROM_LOAD( "gea24ja.u1",   0x000000, 0x001014, BAD_DUMP CRC(d1fccf11) SHA1(6dcd79f3171d6e4bd7e1149901638f8ea58ff623) )
 
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
-
-	ROM_REGION( 0x2000000, "user4", 0 ) /* PCCARD1 */
-	ROM_FILL( 0x0000000, 0x2000000, 0xff )
-
 	ROM_REGION( 0x000008, "user9", 0 ) /* install security cart id */
 	ROM_LOAD( "a24jaa.u6",    0x000000, 0x000008, BAD_DUMP CRC(af09e43c) SHA1(d8372f2d6e0ae07061b496a2242a63e5bc2e54dc) )
 
@@ -4444,13 +4197,10 @@ ROM_START( gtrfrk5m )
 	ROM_REGION( 0x0001014, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gea26jaa.u1",  0x000000, 0x001014, BAD_DUMP CRC(c2725fca) SHA1(b70a3266c61af5cbe0478a6f3dd850ebcab980dc) )
 
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "onboard.0", 0 ) /* onboard flash */
 	ROM_LOAD( "gea26jaa.31m", 0x000000, 0x200000, CRC(1a25e660) SHA1(dbd8fad0bac307723c70d00763cadf4261a7ed73) )
-	ROM_LOAD( "gea26jaa.27m", 0x200000, 0x200000, CRC(345dc5f2) SHA1(61af3fcfe6119c1e8e18b92693855ab4fe708b30) )
-	ROM_FILL( 0x400000, 0x0c00000, 0xff )
-
-	ROM_REGION( 0x2000000, "user4", 0 ) /* PCCARD1 */
-	ROM_FILL( 0x0000000, 0x2000000, 0xff )
+	ROM_REGION( 0x200000, "onboard.1", 0 ) /* onboard flash */
+	ROM_LOAD( "gea26jaa.27m", 0x000000, 0x200000, CRC(345dc5f2) SHA1(61af3fcfe6119c1e8e18b92693855ab4fe708b30) )
 
 	ROM_REGION( 0x000008, "user9", 0 ) /* install security cart id */
 	ROM_LOAD( "gea26jaa.u6",    0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
@@ -4466,12 +4216,6 @@ ROM_START( gtrfrk6m )
 	ROM_REGION( 0x0001014, "user2", 0 ) /* install security cart eeprom */
 	ROM_LOAD( "gcb06ja.u1",   0x000000, 0x001014, BAD_DUMP CRC(673c98ab) SHA1(b1d889bf4fc5e425056acb6b72b2c563966fb7d7) )
 
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
-
-	ROM_REGION( 0x2000000, "user4", 0 ) /* PCCARD1 */
-	ROM_FILL( 0x0000000, 0x2000000, 0xff )
-
 	ROM_REGION( 0x000008, "user9", 0 ) /* install security cart id */
 	ROM_LOAD( "gcb06ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
@@ -4486,13 +4230,10 @@ ROM_START( gtrfrk7m )
 	ROM_REGION( 0x0001014, "user2", 0 ) /* install security cart eeprom */
 	ROM_LOAD( "gcb17jaa.u1",   0x000000, 0x001014, BAD_DUMP CRC(5a338c31) SHA1(0fd9ee306335858dd6bef680a62557a8bf055cc3) )
 
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
+	ROM_REGION( 0x200000, "onboard.0", 0 ) /* onboard flash */
 	ROM_LOAD( "gcb17jaa.31m", 0x000000, 0x200000, CRC(1e1cbfe3) SHA1(6c942820f915ea0e01f0e736d70780ad8408aa69) )
-	ROM_LOAD( "gcb17jaa.27m", 0x200000, 0x200000, CRC(7e7da9a9) SHA1(1882418779a48b5aefd113895756116379a6a4f7) )
-	ROM_FILL( 0x400000, 0x0c00000, 0xff )
-
-	ROM_REGION( 0x2000000, "user4", 0 ) /* PCCARD1 */
-	ROM_FILL( 0x0000000, 0x2000000, 0xff )
+	ROM_REGION( 0x200000, "onboard.1", 0 ) /* onboard flash */
+	ROM_LOAD( "gcb17jaa.27m", 0x000000, 0x200000, CRC(7e7da9a9) SHA1(1882418779a48b5aefd113895756116379a6a4f7) )
 
 	ROM_REGION( 0x000008, "user9", 0 ) /* install security cart id */
 	ROM_LOAD( "gcb17jaa.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
@@ -4508,12 +4249,6 @@ ROM_START( gtfrk11m )
 	ROM_REGION( 0x0001014, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gcd39ja.u1",   0x000000, 0x001014, BAD_DUMP CRC(9bd81d0a) SHA1(c95f6d7317bf88177f7217de4ba4376485d5cdbf) )
 
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
-
-	ROM_REGION( 0x2000000, "user4", 0 ) /* PCCARD1 */
-	ROM_FILL( 0x0000000, 0x2000000, 0xff )
-
 	ROM_REGION( 0x000008, "user9", 0 ) /* install security cart id */
 	ROM_LOAD( "gcd39ja.u6",   0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
 
@@ -4528,9 +4263,6 @@ ROM_START( hyperbbc )
 	ROM_REGION( 0x0000084, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gx908ja.u1",  0x000000, 0x000084, BAD_DUMP CRC(fb6c0635) SHA1(0d974462a0a244ffb1a651adb316242cde427756) )
 
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
-
 	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "908a02", 0, SHA1(573194ca9938c30415fc88dcc0c0152dd3024d71) )
 ROM_END
@@ -4541,9 +4273,6 @@ ROM_START( hyperbbck )
 
 	ROM_REGION( 0x0000084, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gx908ka.u1",  0x000000, 0x000084, BAD_DUMP CRC(f4f37fe1) SHA1(30f90cdb2d092e4f8d6c14cfd4ca4945e6d352cb) )
-
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
 	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "908a02", 0, SHA1(573194ca9938c30415fc88dcc0c0152dd3024d71) )
@@ -4556,9 +4285,6 @@ ROM_START( konam80a )
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gc826aa.u1", 0x000000, 0x000224, BAD_DUMP CRC(9b38b959) SHA1(6b4fca340a9b1c2ae21ad3903c1ac1e39ab08b1a) )
 
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
-
 	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "826aaa01", 0, BAD_DUMP SHA1(be5f8b31fd18ba631fe98c2132c56abf20193419) )
 ROM_END
@@ -4569,9 +4295,6 @@ ROM_START( konam80j )
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gc826ja.u1", 0x000000, 0x000224, BAD_DUMP CRC(e9e861e8) SHA1(45841db0b42d096213d9539a8d076d39391dca6d) )
-
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
 	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "826jaa01", 0, SHA1(be5f8b31fd18ba631fe98c2132c56abf20193419) )
@@ -4584,9 +4307,6 @@ ROM_START( konam80k )
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gc826ka.u1", 0x000000, 0x000224, BAD_DUMP CRC(d41f7e38) SHA1(73e2bb132e23be72e72ea5b0686ccad28e47574a) )
 
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
-
 	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "826kaa01", 0, BAD_DUMP SHA1(be5f8b31fd18ba631fe98c2132c56abf20193419) )
 ROM_END
@@ -4597,9 +4317,6 @@ ROM_START( konam80s )
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gc826ea.u1", 0x000000, 0x000224, BAD_DUMP CRC(6ce4c619) SHA1(d2be08c213c0a74e30b7ebdd93946374cc64457f) )
-
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
 	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "826eaa01", 0, BAD_DUMP SHA1(be5f8b31fd18ba631fe98c2132c56abf20193419) )
@@ -4612,9 +4329,6 @@ ROM_START( konam80u )
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gc826ua.u1", 0x000000, 0x000224, BAD_DUMP CRC(0577379b) SHA1(3988a2a5ef1f1d5981c4767cbed05b73351be903) )
 
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
-
 	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "826uaa01", 0, SHA1(be5f8b31fd18ba631fe98c2132c56abf20193419) )
 ROM_END
@@ -4625,9 +4339,6 @@ ROM_START( pbballex )
 
 	ROM_REGION( 0x0000224, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gx802ja.u1", 0x000000, 0x000224, BAD_DUMP CRC(ea8bdda3) SHA1(780034ab08871631ef0e3e9b779ca89e016c26a8) )
-
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
 	DISK_REGION( "cdrom0" )
 	DISK_IMAGE_READONLY( "802jab02", 0, SHA1(bcc2b6c3515e2420eef9fdf8b28115368a428a92) )
@@ -4642,9 +4353,6 @@ ROM_START( pcnfrk3m )
 
 	ROM_REGION( 0x0001014, "user8", 0 ) /* game security cart eeprom */
 	ROM_LOAD( "gca23ka.u1",   0x000000, 0x001014, BAD_DUMP CRC(f392349c) SHA1(e7eb7979db276de560d5820163a70d97e6c023d8) )
-
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
 	ROM_REGION( 0x000008, "user9", 0 ) /* install security cart id */
 	ROM_LOAD( "a23kaa.u6",    0x000000, 0x000008, BAD_DUMP CRC(af09e43c) SHA1(d8372f2d6e0ae07061b496a2242a63e5bc2e54dc) )
@@ -4662,9 +4370,6 @@ ROM_START( salarymc )
 
 	ROM_REGION( 0x0000084, "user2", 0 ) /* security cart eeprom */
 	ROM_LOAD( "gca18jaa.u1",  0x000000, 0x000084, CRC(c9197f67) SHA1(8e95a89008f756a79295f2cb557c39efca1351e7) )
-
-	ROM_REGION( 0x1000000, "user3", 0 ) /* onboard flash */
-	ROM_FILL( 0x0000000, 0x1000000, 0xff )
 
 	ROM_REGION( 0x000008, "user9", 0 ) /* security cart id */
 	ROM_LOAD( "gca18jaa.u6",  0x000000, 0x000008, CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
@@ -4703,55 +4408,55 @@ GAME( 1999, fbaitmcu, fbaitmc,  k573bait,  fbaitmc,   ge765pwbba, ROT0, "Konami"
 GAME( 1999, fbaitmcj, fbaitmc,  k573bait,  fbaitmc,   ge765pwbba, ROT0, "Konami", "Fisherman's Bait - Marlin Challenge (GX889 VER. JA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1999, fbaitmca, fbaitmc,  k573bait,  fbaitmc,   ge765pwbba, ROT0, "Konami", "Fisherman's Bait - Marlin Challenge (GX889 VER. AA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1999, ddr2m,    sys573,   konami573, ddr,       ddr,        ROT0, "Konami", "Dance Dance Revolution 2nd Mix (GN895 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1999, ddrbocd,  ddr2m,    konami573, ddr,       ddr,        ROT0, "Konami", "Dance Dance Revolution Best of Cool Dancers (GE892 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1999, ddr2ml,   ddr2m,    konami573, ddr,       ddr,        ROT0, "Konami", "Dance Dance Revolution 2nd Mix - Link Ver (GE885 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1999, ddrbocd,  ddr2m,    pccard1,   ddr,       ddr,        ROT0, "Konami", "Dance Dance Revolution Best of Cool Dancers (GE892 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1999, ddr2ml,   ddr2m,    pccard1,   ddr,       ddr,        ROT0, "Konami", "Dance Dance Revolution 2nd Mix - Link Ver (GE885 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1999, ddr2mc,   ddr2m,    konami573, ddr,       ddr,        ROT0, "Konami", "Dance Dance Revolution 2nd Mix with beatmaniaIIDX CLUB VERSiON (GE896 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1999, ddr2mc2,  ddr2m,    konami573, ddr,       ddr,        ROT0, "Konami", "Dance Dance Revolution 2nd Mix with beatmaniaIIDX substream CLUB VERSiON 2 (GE984 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1999, gtrfrk2m, sys573,   konami573, gtrfrks,   gtrfrks,    ROT0, "Konami", "Guitar Freaks 2nd Mix Ver 1.01 (GQ883 VER. JAD)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1999, gtrfrk2m, sys573,   pccard1,   gtrfrks,   gtrfrks,    ROT0, "Konami", "Guitar Freaks 2nd Mix Ver 1.01 (GQ883 VER. JAD)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1999, dsftkd,   sys573,   konami573, ddr,       ddr,        ROT0, "Konami", "Dancing Stage featuring TRUE KiSS DESTiNATiON (G*884 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1999, cr589fw,  sys573,   konami573, konami573, konami573,  ROT0, "Konami", "CD-ROM Drive Updater 2.0 (700B04)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1999, cr589fwa, sys573,   konami573, konami573, konami573,  ROT0, "Konami", "CD-ROM Drive Updater (700A04)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 2000, ddr3mk,   sys573,   konami573, ddr,       ddrdigital, ROT0, "Konami", "Dance Dance Revolution 3rd Mix - Ver.Korea2 (GN887 VER. KBA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.3 */
-GAME( 2000, ddr3mka,  ddr3mk,   konami573, ddr,       ddrdigital, ROT0, "Konami", "Dance Dance Revolution 3rd Mix - Ver.Korea (GN887 VER. KAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.3 */
-GAME( 1999, ddr3ma,   ddr3mk,   konami573, ddr,       ddrdigital, ROT0, "Konami", "Dance Dance Revolution 3rd Mix (GN887 VER. AAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.1 */
-GAME( 1999, ddr3mj,   ddr3mk,   konami573, ddr,       ddrdigital, ROT0, "Konami", "Dance Dance Revolution 3rd Mix (GN887 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.0 */
+GAME( 2000, ddr3mk,   sys573,   pccard2,   ddr,       ddrdigital, ROT0, "Konami", "Dance Dance Revolution 3rd Mix - Ver.Korea2 (GN887 VER. KBA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.3 */
+GAME( 2000, ddr3mka,  ddr3mk,   pccard2,   ddr,       ddrdigital, ROT0, "Konami", "Dance Dance Revolution 3rd Mix - Ver.Korea (GN887 VER. KAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.3 */
+GAME( 1999, ddr3ma,   ddr3mk,   pccard2,   ddr,       ddrdigital, ROT0, "Konami", "Dance Dance Revolution 3rd Mix (GN887 VER. AAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.1 */
+GAME( 1999, ddr3mj,   ddr3mk,   pccard2,   ddr,       ddrdigital, ROT0, "Konami", "Dance Dance Revolution 3rd Mix (GN887 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.0 */
 GAME( 1999, ddrsbm,   sys573,   konami573, ddrsolo,   ddrsolo,    ROT0, "Konami", "Dance Dance Revolution Solo Bass Mix (GQ894 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 GAME( 1999, ddrs2k,   sys573,   konami573, ddrsolo,   ddrsolo,    ROT0, "Konami", "Dance Dance Revolution Solo 2000 (GC905 VER. AAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.3 */
 GAME( 1999, ddrs2kj,  ddrs2k,   konami573, ddrsolo,   ddrsolo,    ROT0, "Konami", "Dance Dance Revolution Solo 2000 (GC905 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.2 */
 GAME( 1999, hyperbbc, sys573,   konami573, hyperbbc,  hyperbbc,   ROT0, "Konami", "Hyper Bishi Bashi Champ (GX908 1999/08/24 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1999, hyperbbck,hyperbbc, konami573, hyperbbc,  hyperbbc,   ROT0, "Konami", "Hyper Bishi Bashi Champ (GX908 1999/08/24 VER. KAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 1999, dsfdct,   sys573,   konami573, ddr,       ddrdigital, ROT0, "Konami", "Dancing Stage featuring Dreams Come True (GC910 VER. JCA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
-GAME( 1999, dsfdcta,  dsfdct,   konami573, ddr,       ddr,        ROT0, "Konami", "Dancing Stage featuring Dreams Come True (GC910 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1999, dsfdct,   sys573,   pccard2,   ddr,       ddrdigital, ROT0, "Konami", "Dancing Stage featuring Dreams Come True (GC910 VER. JCA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1999, dsfdcta,  dsfdct,   pccard2,   ddr,       ddr,        ROT0, "Konami", "Dancing Stage featuring Dreams Come True (GC910 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1999, drmn2m,   sys573,   konami573, drmn,      drmndigital,ROT0, "Konami", "DrumMania 2nd Mix (GE912 VER. JAB)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.5 */
 GAME( 1999, drmn2mpu, drmn2m,   konami573, drmn,      drmndigital,ROT0, "Konami", "DrumMania 2nd Mix Session Power Up Kit (GE912 VER. JAB)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.5 */
 GAME( 2000, dncfrks,  sys573,   konami573, dmx,       dmx,        ROT0, "Konami", "Dance Freaks (G*874 VER. KAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.6 */
 GAME( 2000, dmx,      dncfrks,  konami573, dmx,       dmx,        ROT0, "Konami", "Dance Maniax (G*874 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.6 */
 GAME( 2000, dsem,     sys573,   konami573, ddr,       ddrdigital, ROT0, "Konami", "Dancing Stage Euro Mix (G*936 VER. EAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.7 */
-GAME( 2000, gtrfrk3m, sys573,   konami573, gtrfrks,   gtrfrkdigital,ROT0, "Konami", "Guitar Freaks 3rd Mix (GE949 VER. JAC)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.4 */
-GAME( 2000, gtfrk3ma, gtrfrk3m, konami573, gtrfrks,   gtrfrkdigital,ROT0, "Konami", "Guitar Freaks 3rd Mix (GE949 VER. JAB)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.4 */
-GAME( 2000, gtfrk3mb, gtrfrk3m, konami573, gtrfrks,   gtrfrkdigital,ROT0, "Konami", "Guitar Freaks 3rd Mix - security cassette versionup (949JAZ02)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.4 */
+GAME( 2000, gtrfrk3m, sys573,   pccard1,   gtrfrks,   gtrfrkdigital,ROT0, "Konami", "Guitar Freaks 3rd Mix (GE949 VER. JAC)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.4 */
+GAME( 2000, gtfrk3ma, gtrfrk3m, pccard1,   gtrfrks,   gtrfrkdigital,ROT0, "Konami", "Guitar Freaks 3rd Mix (GE949 VER. JAB)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.4 */
+GAME( 2000, gtfrk3mb, gtrfrk3m, pccard1,   gtrfrks,   gtrfrkdigital,ROT0, "Konami", "Guitar Freaks 3rd Mix - security cassette versionup (949JAZ02)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.4 */
 GAME( 2000, salarymc, sys573,   konami573, hyperbbc,  salarymc,   ROT0, "Konami", "Salary Man Champ (GCA18 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
-GAME( 2000, ddr3mp,   sys573,   konami573, ddr,       ddrdigital, ROT0, "Konami", "Dance Dance Revolution 3rd Mix Plus (G*A22 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.6 */
+GAME( 2000, ddr3mp,   sys573,   pccard2,   ddr,       ddrdigital, ROT0, "Konami", "Dance Dance Revolution 3rd Mix Plus (G*A22 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.6 */
 GAME( 2000, pcnfrk3m, sys573,   konami573, drmn,      drmndigital,ROT0, "Konami", "Percussion Freaks 3rd Mix (G*A23 VER. KAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.8 */
 GAME( 2000, drmn3m,   pcnfrk3m, konami573, drmn,      drmndigital,ROT0, "Konami", "DrumMania 3rd Mix (G*A23 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.8 */
-GAME( 2000, gtrfrk4m, sys573,   konami573, gtrfrks,   gtrfrkdigital,ROT0, "Konami", "Guitar Freaks 4th Mix (G*A24 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.8 */
-GAME( 2000, ddr4m,    sys573,   konami573, ddr,       ddrdigital, ROT0, "Konami", "Dance Dance Revolution 4th Mix (G*A33 VER. AAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.8 */
-GAME( 2000, ddr4mj,   ddr4m,    konami573, ddr,       ddrdigital, ROT0, "Konami", "Dance Dance Revolution 4th Mix (G*A33 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.8 */
-GAME( 2000, ddr4ms,   sys573,   konami573, ddrsolo,   ddrsolo,    ROT0, "Konami", "Dance Dance Revolution 4th Mix Solo (G*A33 VER. ABA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.8 */
-GAME( 2000, ddr4msj,  ddr4ms,   konami573, ddrsolo,   ddrsolo,    ROT0, "Konami", "Dance Dance Revolution 4th Mix Solo (G*A33 VER. JBA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.8 */
+GAME( 2000, gtrfrk4m, sys573,   pccard1,   gtrfrks,   gtrfrkdigital,ROT0, "Konami", "Guitar Freaks 4th Mix (G*A24 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.8 */
+GAME( 2000, ddr4m,    sys573,   pccard2,   ddr,       ddrdigital, ROT0, "Konami", "Dance Dance Revolution 4th Mix (G*A33 VER. AAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.8 */
+GAME( 2000, ddr4mj,   ddr4m,    pccard2,   ddr,       ddrdigital, ROT0, "Konami", "Dance Dance Revolution 4th Mix (G*A33 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.8 */
+GAME( 2000, ddr4ms,   sys573,   pccard2,   ddrsolo,   ddrsolo,    ROT0, "Konami", "Dance Dance Revolution 4th Mix Solo (G*A33 VER. ABA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.8 */
+GAME( 2000, ddr4msj,  ddr4ms,   pccard2,   ddrsolo,   ddrsolo,    ROT0, "Konami", "Dance Dance Revolution 4th Mix Solo (G*A33 VER. JBA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.8 */
 GAME( 2000, dsfdr,    sys573,   konami573, ddr,       ddrdigital, ROT0, "Konami", "Dancing Stage Featuring Disney's Rave (GCA37JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.8 */
 GAME( 2000, ddrusa,   sys573,   konami573, ddr,       ddrdigital, ROT0, "Konami", "Dance Dance Revolution USA (G*A44 VER. UAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.8 */
-GAME( 2000, ddr4mp,   sys573,   konami573, ddr,       ddrdigital, ROT0, "Konami", "Dance Dance Revolution 4th Mix Plus (G*A34 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.9 */
-GAME( 2000, ddr4mps,  sys573,   konami573, ddrsolo,   ddrsolo,    ROT0, "Konami", "Dance Dance Revolution 4th Mix Plus Solo (G*A34 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.9 */
+GAME( 2000, ddr4mp,   sys573,   pccard2,   ddr,       ddrdigital, ROT0, "Konami", "Dance Dance Revolution 4th Mix Plus (G*A34 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.9 */
+GAME( 2000, ddr4mps,  sys573,   pccard2,   ddrsolo,   ddrsolo,    ROT0, "Konami", "Dance Dance Revolution 4th Mix Plus Solo (G*A34 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.9 */
 GAME( 2000, dmx2m,    sys573,   konami573, dmx,       dmx,        ROT0, "Konami", "Dance Maniax 2nd Mix (G*A39 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.9 */
 GAME( 2000, fmania,   sys573,   konami573, konami573, konami573,  ROT0, "Konami", "Fighting Mania (918 xx B02)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
-GAME( 2001, gtrfrk5m, sys573,   konami573, gtrfrks,   gtrfrkdigital,ROT0, "Konami", "Guitar Freaks 5th Mix (G*A26 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.9 */
-GAME( 2001, ddr5m,    sys573,   konami573, ddr,       ddrdigital, ROT0, "Konami", "Dance Dance Revolution 5th Mix (G*A27 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.9 */
+GAME( 2001, gtrfrk5m, sys573,   pccard1,   gtrfrks,   gtrfrkdigital,ROT0, "Konami", "Guitar Freaks 5th Mix (G*A26 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.9 */
+GAME( 2001, ddr5m,    sys573,   pccard2,   ddr,       ddrdigital, ROT0, "Konami", "Dance Dance Revolution 5th Mix (G*A27 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.9 */
 GAME( 2001, dmx2majp, sys573,   konami573, dmx,       dmx,        ROT0, "Konami", "Dance Maniax 2nd Mix Append J-Paradise (G*A38 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.9 */
-GAME( 2001, gtrfrk6m, sys573,   konami573, gtrfrks,   gtrfrkdigital,ROT0, "Konami", "Guitar Freaks 6th Mix (G*B06 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.9 */
-GAME( 2001, gtrfrk7m, sys573,   konami573, gtrfrks,   gtrfrkdigital,ROT0, "Konami", "Guitar Freaks 7th Mix (G*B17 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.95 */
-GAME( 2001, ddrmax,   sys573,   konami573, ddr,       ddrdigital, ROT0, "Konami", "DDR Max - Dance Dance Revolution 6th Mix (G*B19 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.9 */
-GAME( 2002, ddrmax2,  sys573,   konami573, ddr,       ddrdigital, ROT0, "Konami", "DDR Max 2 - Dance Dance Revolution 7th Mix (G*B20 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.9 */
-GAME( 2002, dsem2,    sys573,   konami573, ddr,       ddrdigital, ROT0, "Konami", "Dancing Stage Euro Mix 2 (G*C23 VER. EAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.95 */
-GAME( 2002, ddrextrm, sys573,   konami573, ddr,       ddrdigital, ROT0, "Konami", "Dance Dance Revolution Extreme (G*C36 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.95 */
-GAME( 2004, gtfrk11m, sys573,   konami573, gtrfrks,   gtrfrkdigital,ROT0, "Konami", "Guitar Freaks 11th Mix (G*D39 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.95 */
+GAME( 2001, gtrfrk6m, sys573,   pccard1,   gtrfrks,   gtrfrkdigital,ROT0, "Konami", "Guitar Freaks 6th Mix (G*B06 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.9 */
+GAME( 2001, gtrfrk7m, sys573,   pccard1,   gtrfrks,   gtrfrkdigital,ROT0, "Konami", "Guitar Freaks 7th Mix (G*B17 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.95 */
+GAME( 2001, ddrmax,   sys573,   pccard2,   ddr,       ddrdigital, ROT0, "Konami", "DDR Max - Dance Dance Revolution 6th Mix (G*B19 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.9 */
+GAME( 2002, ddrmax2,  sys573,   pccard2,   ddr,       ddrdigital, ROT0, "Konami", "DDR Max 2 - Dance Dance Revolution 7th Mix (G*B20 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.9 */
+GAME( 2002, dsem2,    sys573,   pccard2,   ddr,       ddrdigital, ROT0, "Konami", "Dancing Stage Euro Mix 2 (G*C23 VER. EAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.95 */
+GAME( 2002, ddrextrm, sys573,   pccard2,   ddr,       ddrdigital, ROT0, "Konami", "Dance Dance Revolution Extreme (G*C36 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.95 */
+GAME( 2004, gtfrk11m, sys573,   pccard1,   gtrfrks,   gtrfrkdigital,ROT0, "Konami", "Guitar Freaks 11th Mix (G*D39 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.95 */

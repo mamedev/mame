@@ -1242,6 +1242,8 @@ Notes:
 
 #define CPU_CLOCK (200000000)
 static UINT32 *dc_sound_ram;
+static macronix_29l001mc_device *awflash;
+
                                              /* MD2 MD1 MD0 MD6 MD4 MD3 MD5 MD7 MD8 */
 static const struct sh4_config sh4cpu_config = {  1,  0,  1,  0,  0,  0,  1,  1,  0, CPU_CLOCK };
 
@@ -1300,13 +1302,6 @@ jvseeprom_default_game[] =
 	{ "tetkiwam", { 0x3C, 0x11, 0x10, 0x42, 0x47, 0x43, 0x31, 0x09, 0x10, 0x00, 0x01, 0x01,	0x01, 0x00, 0x11, 0x11, 0x11, 0x11, 0x3C, 0x11, 0x10, 0x42, 0x47, 0x43,	0x31, 0x09, 0x10, 0x00, 0x01, 0x01, 0x01, 0x00, 0x11, 0x11, 0x11, 0x11,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } },
 	{ "keyboard", { 0x32, 0x7E, 0x10, 0x42, 0x45, 0x42, 0x30, 0x09, 0x10, 0x00, 0x01, 0x01,	0x01, 0x00, 0x11, 0x11, 0x11, 0x11, 0x32, 0x7E, 0x10, 0x42, 0x45, 0x42,	0x30, 0x09, 0x10, 0x00, 0x01, 0x01, 0x01, 0x00, 0x11, 0x11, 0x11, 0x11,	0xF0, 0x4A, 0x0C, 0x0C, 0xF0, 0x4A, 0x0C, 0x0C, 0x18, 0x09, 0x01, 0x20,	0x02, 0x00, 0x3C, 0x00, 0x32, 0x00, 0x00, 0x00, 0x18, 0x09, 0x01, 0x20,	0x02, 0x00, 0x3C, 0x00, 0x32, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 } }
 };
-
-static NVRAM_HANDLER( aw_nvram )
-{
-	nvram_handler_intelflash(machine, 0, file, read_or_write);
-
-	// TODO: save AW NVRAM at 00200000
-}
 
 static NVRAM_HANDLER( naomi_eeproms )
 {
@@ -1516,8 +1511,8 @@ ADDRESS_MAP_END
 
 static READ64_HANDLER( aw_flash_r )
 {
-	return (UINT64)intelflash_read(0, offset*8) | (UINT64)intelflash_read(0, (offset*8)+1)<<8 | (UINT64)intelflash_read(0, (offset*8)+2)<<16 | (UINT64)intelflash_read(0, (offset*8)+3)<<24 |
-	       (UINT64)intelflash_read(0, (offset*8)+4)<<32 | (UINT64)intelflash_read(0, (offset*8)+5)<<40 | (UINT64)intelflash_read(0, (offset*8)+6)<<48 | (UINT64)intelflash_read(0, (offset*8)+7)<<56;
+	return (UINT64)awflash->read(offset*8) | (UINT64)awflash->read((offset*8)+1)<<8 | (UINT64)awflash->read((offset*8)+2)<<16 | (UINT64)awflash->read((offset*8)+3)<<24 |
+	       (UINT64)awflash->read((offset*8)+4)<<32 | (UINT64)awflash->read((offset*8)+5)<<40 | (UINT64)awflash->read((offset*8)+6)<<48 | (UINT64)awflash->read((offset*8)+7)<<56;
 }
 
 static WRITE64_HANDLER( aw_flash_w )
@@ -1536,7 +1531,7 @@ static WRITE64_HANDLER( aw_flash_w )
 
 	data >>= (i*8);
 
-	intelflash_write(0, addr, data);
+	awflash->write(addr, data);
 }
 
 INLINE int decode_reg32_64(running_machine *machine, UINT32 offset, UINT64 mem_mask, UINT64 *shift)
@@ -1601,8 +1596,8 @@ static WRITE64_HANDLER( aw_modem_w )
 
 static ADDRESS_MAP_START( aw_map, ADDRESS_SPACE_PROGRAM, 64 )
 	/* Area 0 */
-	AM_RANGE(0x00000000, 0x0001ffff) AM_READWRITE( aw_flash_r, aw_flash_w )
-	AM_RANGE(0xa0000000, 0xa001ffff) AM_READWRITE( aw_flash_r, aw_flash_w )
+	AM_RANGE(0x00000000, 0x0001ffff) AM_READWRITE( aw_flash_r, aw_flash_w ) AM_REGION("awflash", 0)
+	AM_RANGE(0xa0000000, 0xa001ffff) AM_READWRITE( aw_flash_r, aw_flash_w ) AM_REGION("awflash", 0)
 
 	AM_RANGE(0x00200000, 0x0021ffff) AM_RAM 	// battery backed up RAM
 	AM_RANGE(0x005f6800, 0x005f69ff) AM_READWRITE( dc_sysctrl_r, dc_sysctrl_w )
@@ -1989,7 +1984,7 @@ static MACHINE_CONFIG_DERIVED( aw, naomi_base )
 //  MDRV_DEVICE_REMOVE("main_eeprom")
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(aw_map)
-	MDRV_NVRAM_HANDLER(aw_nvram)
+	MDRV_MACRONIX_29L001MC_ADD("awflash")
 	MDRV_AW_ROM_BOARD_ADD("rom_board", "user1")
 MACHINE_CONFIG_END
 
@@ -2264,7 +2259,7 @@ ROM_START( naomi2 )
 ROM_END
 
 ROM_START( awbios )
-	ROM_REGION( 0x200000, "maincpu", 0)
+	ROM_REGION( 0x200000, "awflash", 0)
 	AW_BIOS
 
 	ROM_REGION( 0x8400000, "user1", ROMREGION_ERASE)
@@ -6438,7 +6433,7 @@ static const UINT32 salmankt_key = 0x34b74;
 
 static DRIVER_INIT( atomiswave )
 {
-	UINT64 *ROM = (UINT64 *)memory_region(machine, "maincpu");
+	UINT64 *ROM = (UINT64 *)memory_region(machine, "awflash");
 #if 0
 	UINT8 *dcdata = (UINT8 *)memory_region(machine, "user1");
 	FILE *f;
@@ -6450,7 +6445,7 @@ static DRIVER_INIT( atomiswave )
 	// patch out long startup delay
 	ROM[0x98e/8] = (ROM[0x98e/8] & U64(0xffffffffffff)) | (UINT64)0x0009<<48;
 
-	intelflash_init(machine, 0, FLASH_MACRONIX_29L001MC, memory_region(machine, "maincpu"));
+	awflash = machine->device<macronix_29l001mc_device>("awflash");
 }
 
 #define AW_DRIVER_INIT(DRIVER)	\
@@ -6482,7 +6477,7 @@ AW_DRIVER_INIT(vfurlong)
 AW_DRIVER_INIT(salmankt)
 
 ROM_START( fotns )
-	ROM_REGION( 0x200000, "maincpu", 0)
+	ROM_REGION( 0x200000, "awflash", 0)
 	AW_BIOS
 
 	ROM_REGION( 0x8000000, "user1", ROMREGION_ERASE)
@@ -6497,7 +6492,7 @@ ROM_START( fotns )
 ROM_END
 
 ROM_START( rangrmsn )
-	ROM_REGION( 0x200000, "maincpu", 0)
+	ROM_REGION( 0x200000, "awflash", 0)
 	AW_BIOS
 
 	ROM_REGION( 0x8000000, "user1", ROMREGION_ERASE)
@@ -6510,7 +6505,7 @@ ROM_START( rangrmsn )
 ROM_END
 
 ROM_START( sprtshot )
-	ROM_REGION( 0x200000, "maincpu", 0)
+	ROM_REGION( 0x200000, "awflash", 0)
 	AW_BIOS
 
 	ROM_REGION( 0x8000000, "user1", ROMREGION_ERASE)
@@ -6522,7 +6517,7 @@ ROM_START( sprtshot )
 ROM_END
 
 ROM_START( xtrmhunt )
-	ROM_REGION( 0x200000, "maincpu", 0)
+	ROM_REGION( 0x200000, "awflash", 0)
 	AW_BIOS
 
 	ROM_REGION( 0x8000000, "user1", ROMREGION_ERASE)
@@ -6536,7 +6531,7 @@ ROM_START( xtrmhunt )
 ROM_END
 
 ROM_START( xtrmhnt2 )
-	ROM_REGION( 0x200000, "maincpu", 0)
+	ROM_REGION( 0x200000, "awflash", 0)
 	AW_BIOS
 
 	ROM_REGION( 0x8000000, "user1", ROMREGION_ERASE)
@@ -6555,7 +6550,7 @@ ROM_START( xtrmhnt2 )
 ROM_END
 
 ROM_START( dolphin )
-	ROM_REGION( 0x200000, "maincpu", 0)
+	ROM_REGION( 0x200000, "awflash", 0)
 	AW_BIOS
 
 	ROM_REGION( 0x8000000, "user1", ROMREGION_ERASE)
@@ -6568,7 +6563,7 @@ ROM_START( dolphin )
 ROM_END
 
 ROM_START( demofist )
-	ROM_REGION( 0x200000, "maincpu", 0)
+	ROM_REGION( 0x200000, "awflash", 0)
 	AW_BIOS
 
 	ROM_REGION( 0x8000000, "user1", ROMREGION_ERASE)
@@ -6583,7 +6578,7 @@ ROM_START( demofist )
 ROM_END
 
 ROM_START( rumblef )
-	ROM_REGION( 0x200000, "maincpu", 0)
+	ROM_REGION( 0x200000, "awflash", 0)
 	AW_BIOS
 
 	ROM_REGION( 0x8000000, "user1", ROMREGION_ERASE)
@@ -6598,7 +6593,7 @@ ROM_START( rumblef )
 ROM_END
 
 ROM_START( ngbc )
-	ROM_REGION( 0x200000, "maincpu", 0)
+	ROM_REGION( 0x200000, "awflash", 0)
 	AW_BIOS
 
 	ROM_REGION( 0x8000000, "user1", ROMREGION_ERASE)
@@ -6606,7 +6601,7 @@ ROM_START( ngbc )
 ROM_END
 
 ROM_START( kofnw )
-	ROM_REGION( 0x200000, "maincpu", 0)
+	ROM_REGION( 0x200000, "awflash", 0)
 	AW_BIOS
 
 	ROM_REGION( 0x8000000, "user1", ROMREGION_ERASE)
@@ -6620,7 +6615,7 @@ ROM_START( kofnw )
 ROM_END
 
 ROM_START( kofnwj )
-	ROM_REGION( 0x200000, "maincpu", 0)
+	ROM_REGION( 0x200000, "awflash", 0)
 	AW_BIOS
 
 	ROM_REGION( 0x8000000, "user1", ROMREGION_ERASE)
@@ -6635,7 +6630,7 @@ ROM_START( kofnwj )
 ROM_END
 
 ROM_START( kov7sprt )
-	ROM_REGION( 0x200000, "maincpu", 0)
+	ROM_REGION( 0x200000, "awflash", 0)
 	AW_BIOS
 
 	ROM_REGION( 0x8000000, "user1", ROMREGION_ERASE)
@@ -6650,7 +6645,7 @@ ROM_START( kov7sprt )
 ROM_END
 
 ROM_START( ggisuka )
-	ROM_REGION( 0x200000, "maincpu", 0)
+	ROM_REGION( 0x200000, "awflash", 0)
 	AW_BIOS
 
 	ROM_REGION( 0x9000000, "user1", ROMREGION_ERASE)
@@ -6666,7 +6661,7 @@ ROM_START( ggisuka )
 ROM_END
 
 ROM_START( vfurlong )
-	ROM_REGION( 0x200000, "maincpu", 0)
+	ROM_REGION( 0x200000, "awflash", 0)
 	AW_BIOS
 
 	ROM_REGION( 0x9000000, "user1", ROMREGION_ERASE)
@@ -6681,7 +6676,7 @@ ROM_START( vfurlong )
 ROM_END
 
 ROM_START( salmankt )
-	ROM_REGION( 0x200000, "maincpu", 0)
+	ROM_REGION( 0x200000, "awflash", 0)
 	AW_BIOS
 
 	ROM_REGION( 0x9000000, "user1", ROMREGION_ERASE)
