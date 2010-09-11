@@ -2639,7 +2639,7 @@ static const es5506_interface es5506_config =
 
 ***************************************************************************/
 
-static void init_ssv(running_machine *machine, int sprites_offsy, int tilemap_offsx, int interrupt_ultrax)
+static void init_ssv(running_machine *machine, int interrupt_ultrax)
 {
 	ssv_state *state = machine->driver_data<ssv_state>();
 	int i;
@@ -2650,9 +2650,6 @@ static void init_ssv(running_machine *machine, int sprites_offsy, int tilemap_of
 								( (i & 1) ? (8 << 16) : 0 ) ;
 	ssv_enable_video(machine, 1);
 	state->interrupt_ultrax = interrupt_ultrax;
-
-	state->sprites_offsy = sprites_offsy;
-	state->tilemap_offsx = tilemap_offsx;
 }
 
 static void init_hypreac2(running_machine *machine)
@@ -2664,46 +2661,30 @@ static void init_hypreac2(running_machine *machine)
 		state->tile_code[i]	=	(i << 16);
 }
 
-// [1c0070-71 & 0x03ff] is the global y offset for tilemaps (it's negative if [1c0070-71 & 0x0200] == 0x0200)
-// 1c006a-6b is the y start visible area
-// tilemap_offsy = (1c0070-71) + (1c006a-6b)
-// drifto94:
-//	70-71 = 0x300 -> -0x100
-//	6a-6b = 0x13
-//	tilemap_offsy = -0x100 + 0x13 = -0xed
-// gdfs:
-//	70-71 = 0x3ec -> -0x14
-//	6a-6b = 0x12
-//	tilemap_offsy = -0x14 + 0x12 = -0x02
-// twineagl:
-//	70-71 = 0xffec -> 0x03ec -> -0x14
-//	6a-6b = 12
-//	tilemap_offsy = -0x14 + 0x12 = -0x02
-
-static DRIVER_INIT( drifto94 )		{	init_ssv(machine, +0xec, +0, 0);	}
-static DRIVER_INIT( eaglshot )		{	init_ssv(machine, +0xf0, +0, 0); init_hypreac2(machine);	}
-static DRIVER_INIT( gdfs )			{	init_ssv(machine, +0x00, +0, 0);	}
-static DRIVER_INIT( hypreact )		{	init_ssv(machine, +0xe8, +0, 0);	}
-static DRIVER_INIT( hypreac2 )		{	init_ssv(machine, +0xe8, +0, 0); init_hypreac2(machine);	}
-static DRIVER_INIT( janjans1 )		{	init_ssv(machine, +0xe8, +0, 0);	}
-static DRIVER_INIT( keithlcy )		{	init_ssv(machine, +0xec, +0, 0);	}
-static DRIVER_INIT( meosism )			{	init_ssv(machine, +0xe4, +0, 0);	}
-static DRIVER_INIT( mslider )			{	init_ssv(machine, +0xf0, +0, 0);	}
-static DRIVER_INIT( ryorioh )			{	init_ssv(machine, +0xe8, +0, 0);	}
-static DRIVER_INIT( srmp4 )			{	init_ssv(machine, +0xec, +0, 0);
+static DRIVER_INIT( drifto94 )		{	init_ssv(machine, 0);	}
+static DRIVER_INIT( eaglshot )		{	init_ssv(machine, 0); init_hypreac2(machine);	}
+static DRIVER_INIT( gdfs )			{	init_ssv(machine, 0);	}
+static DRIVER_INIT( hypreact )		{	init_ssv(machine, 0);	}
+static DRIVER_INIT( hypreac2 )		{	init_ssv(machine, 0); init_hypreac2(machine);	}
+static DRIVER_INIT( janjans1 )		{	init_ssv(machine, 0);	}
+static DRIVER_INIT( keithlcy )		{	init_ssv(machine, 0);	}
+static DRIVER_INIT( meosism )			{	init_ssv(machine, 0);	}
+static DRIVER_INIT( mslider )			{	init_ssv(machine, 0);	}
+static DRIVER_INIT( ryorioh )			{	init_ssv(machine, 0);	}
+static DRIVER_INIT( srmp4 )			{	init_ssv(machine, 0);
 //  ((UINT16 *)memory_region(machine, "user1"))[0x2b38/2] = 0x037a;   /* patch to see gal test mode */
 }
-static DRIVER_INIT( srmp7 )			{	init_ssv(machine, -0x0f, +0, 0);	}
-static DRIVER_INIT( stmblade )		{	init_ssv(machine, +0xf0, +0, 0);	}
-static DRIVER_INIT( survarts )		{	init_ssv(machine, +0xe4, +0, 0);	}
-static DRIVER_INIT( dynagear )		{	init_ssv(machine, +0xec, +0, 0);	}
-static DRIVER_INIT( sxyreact )		{	init_ssv(machine, +0xe8, +0, 0); init_hypreac2(machine);	}
-static DRIVER_INIT( cairblad )		{	init_ssv(machine, +0xe8, +0, 0); init_hypreac2(machine);	}
-static DRIVER_INIT( sxyreac2 )		{	init_ssv(machine, +0xe8, +0, 0); init_hypreac2(machine);	}
-static DRIVER_INIT( twineag2 )		{	init_ssv(machine, +0x01, +0, 1);	}
-static DRIVER_INIT( ultrax )			{	init_ssv(machine, +0x01, +0, 1);	}
-static DRIVER_INIT( vasara )			{	init_ssv(machine, +0xf0, +0, 0);	}
-static DRIVER_INIT( jsk )			{	init_ssv(machine, +0xf5, +0, 0);	}
+static DRIVER_INIT( srmp7 )			{	init_ssv(machine, 0);	}
+static DRIVER_INIT( stmblade )		{	init_ssv(machine, 0);	}
+static DRIVER_INIT( survarts )		{	init_ssv(machine, 0);	}
+static DRIVER_INIT( dynagear )		{	init_ssv(machine, 0);	}
+static DRIVER_INIT( sxyreact )		{	init_ssv(machine, 0); init_hypreac2(machine);	}
+static DRIVER_INIT( cairblad )		{	init_ssv(machine, 0); init_hypreac2(machine);	}
+static DRIVER_INIT( sxyreac2 )		{	init_ssv(machine, 0); init_hypreac2(machine);	}
+static DRIVER_INIT( twineag2 )		{	init_ssv(machine, 1);	}
+static DRIVER_INIT( ultrax )			{	init_ssv(machine, 1);	}
+static DRIVER_INIT( vasara )			{	init_ssv(machine, 0);	}
+static DRIVER_INIT( jsk )			{	init_ssv(machine, 0);	}
 
 
 static MACHINE_CONFIG_START( ssv, ssv_state )

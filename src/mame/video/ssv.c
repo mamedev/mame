@@ -674,7 +674,7 @@ static void draw_row(running_machine *machine, bitmap_t *bitmap, const rectangle
 	y	+=	sy;
 
 	/* Tweak the scroll values (game specific) */
-	x	+=	state->tilemap_offsx;
+	// x	+=	0;
 	y	+=	((ssv_scroll[0x70/2] & 0x1ff) - (ssv_scroll[0x70/2] & 0x200) + ssv_scroll[0x6a/2] + 2);
 
 	/* Draw the rows */
@@ -894,6 +894,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 				// sprites can use x and y coordinates relative to a side, the other side or the center
 				// for now we use a kludge
+
+				
 
 				if (ssv_scroll[0x74/2] & 0x8000)
 				{

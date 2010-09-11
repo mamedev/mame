@@ -12,8 +12,6 @@ public:
 	int tile_code[16];
 
 	int enable_video;
-	int sprites_offsy;
-	int tilemap_offsx;
 	int shadow_pen_mask;
 	int shadow_pen_shift;
 
