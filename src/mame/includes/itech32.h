@@ -5,6 +5,8 @@
 
 **************************************************************************/
 
+#include "machine/nvram.h"
+
 #define VIDEO_CLOCK		XTAL_8MHz			/* video (pixel) clock */
 #define CPU_CLOCK		XTAL_12MHz			/* clock for 68000-based systems */
 #define CPU020_CLOCK	XTAL_25MHz			/* clock for 68EC020-based systems */
