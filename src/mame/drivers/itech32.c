@@ -1109,7 +1109,7 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0800, 0x083f) AM_MIRROR(0x80) AM_DEVREADWRITE("ensoniq", es5506_r, es5506_w)
 	AM_RANGE(0x0c00, 0x0c00) AM_WRITE(sound_bank_w)
 	AM_RANGE(0x1000, 0x1000) AM_WRITENOP	/* noisy */
-	AM_RANGE(0x1400, 0x140f) AM_DEVREADWRITE("via6522_0", via_r, via_w)
+	AM_RANGE(0x1400, 0x140f) AM_DEVREADWRITE_MODERN("via6522_0", via6522_device, read, write)
 	AM_RANGE(0x2000, 0x3fff) AM_RAM
 	AM_RANGE(0x4000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0xffff) AM_ROM
@@ -1728,7 +1728,7 @@ static const es5506_interface es5506_config =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( timekill, driver_device )
+static MACHINE_CONFIG_START( timekill, itech32_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, CPU_CLOCK)

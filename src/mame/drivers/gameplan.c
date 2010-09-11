@@ -217,9 +217,9 @@ static const riot6532_interface r6532_interface =
 
 static ADDRESS_MAP_START( gameplan_main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x03ff) AM_MIRROR(0x1c00) AM_RAM
-	AM_RANGE(0x2000, 0x200f) AM_MIRROR(0x07f0) AM_DEVREADWRITE("via6522_0", via_r, via_w)	/* VIA 1 */
-	AM_RANGE(0x2800, 0x280f) AM_MIRROR(0x07f0) AM_DEVREADWRITE("via6522_1", via_r, via_w)	/* VIA 2 */
-	AM_RANGE(0x3000, 0x300f) AM_MIRROR(0x07f0) AM_DEVREADWRITE("via6522_2", via_r, via_w)	/* VIA 3 */
+	AM_RANGE(0x2000, 0x200f) AM_MIRROR(0x07f0) AM_DEVREADWRITE_MODERN("via6522_0", via6522_device, read, write)	/* VIA 1 */
+	AM_RANGE(0x2800, 0x280f) AM_MIRROR(0x07f0) AM_DEVREADWRITE_MODERN("via6522_1", via6522_device, read, write)	/* VIA 2 */
+	AM_RANGE(0x3000, 0x300f) AM_MIRROR(0x07f0) AM_DEVREADWRITE_MODERN("via6522_2", via6522_device, read, write)	/* VIA 3 */
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -987,9 +987,6 @@ static MACHINE_START( gameplan )
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = machine->device("audiocpu");
 	state->riot = machine->device("riot");
-	state->via_0 = machine->device("via6522_0");
-	state->via_1 = machine->device("via6522_1");
-	state->via_2 = machine->device("via6522_2");
 
 	/* register for save states */
 	state_save_register_global(machine, state->current_port);

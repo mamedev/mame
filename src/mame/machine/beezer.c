@@ -19,18 +19,18 @@ static WRITE8_DEVICE_HANDLER( b_via_1_pb_w );
 const via6522_interface b_via_0_interface =
 {
 	/*inputs : A/B         */ DEVCB_NULL, DEVCB_HANDLER(b_via_0_pb_r),
-	/*inputs : CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_DEVICE_LINE("via6522_1", via_ca2_r), DEVCB_LINE(b_via_0_ca2_r), DEVCB_DEVICE_LINE("via6522_1", via_ca1_r),
+	/*inputs : CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_DEVICE_LINE_MEMBER("via6522_1", via6522_device, read_ca2), DEVCB_LINE(b_via_0_ca2_r), DEVCB_DEVICE_LINE_MEMBER("via6522_1", via6522_device, read_ca1),
 	/*outputs: A/B         */ DEVCB_HANDLER(b_via_0_pa_w), DEVCB_HANDLER(b_via_0_pb_w),
-	/*outputs: CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_LINE(b_via_0_ca2_w), DEVCB_DEVICE_LINE("via6522_1", via_ca1_w),
+	/*outputs: CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_LINE(b_via_0_ca2_w), DEVCB_DEVICE_LINE_MEMBER("via6522_1", via6522_device, write_ca1),
 	/*irq                  */ DEVCB_CPU_INPUT_LINE("maincpu", M6809_IRQ_LINE)
 };
 
 const via6522_interface b_via_1_interface =
 {
 	/*inputs : A/B         */ DEVCB_HANDLER(b_via_1_pa_r), DEVCB_HANDLER(b_via_1_pb_r),
-	/*inputs : CA/B1,CA/B2 */ DEVCB_DEVICE_LINE("via6522_0", via_cb2_r), DEVCB_NULL, DEVCB_DEVICE_LINE("via6522_0", via_cb1_r), DEVCB_NULL,
+	/*inputs : CA/B1,CA/B2 */ DEVCB_DEVICE_LINE_MEMBER("via6522_0", via6522_device, read_cb2), DEVCB_NULL, DEVCB_DEVICE_LINE_MEMBER("via6522_0", via6522_device, read_cb1), DEVCB_NULL,
 	/*outputs: A/B         */ DEVCB_HANDLER(b_via_1_pa_w), DEVCB_HANDLER(b_via_1_pb_w),
-	/*outputs: CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_DEVICE_LINE("via6522_0", via_cb1_w), DEVCB_NULL,
+	/*outputs: CA/B1,CA/B2 */ DEVCB_NULL, DEVCB_NULL, DEVCB_DEVICE_LINE_MEMBER("via6522_0", via6522_device, write_cb1), DEVCB_NULL,
 	/*irq                  */ DEVCB_CPU_INPUT_LINE("audiocpu", M6809_IRQ_LINE)
 };
 
@@ -108,11 +108,11 @@ WRITE8_HANDLER( beezer_bankswitch_w )
 {
 	if ((data & 0x07) == 0)
 	{
-		running_device *via_0 = space->machine->device("via6522_0");
+		via6522_device *via_0 = space->machine->device<via6522_device>("via6522_0");
 		memory_install_write8_handler(space, 0xc600, 0xc7ff, 0, 0, watchdog_reset_w);
 		memory_install_write8_handler(space, 0xc800, 0xc9ff, 0, 0, beezer_map_w);
 		memory_install_read8_handler(space, 0xca00, 0xcbff, 0, 0, beezer_line_r);
-		memory_install_readwrite8_device_handler(space, via_0, 0xce00, 0xcfff, 0, 0, via_r, via_w);
+		space->install_handler(0xce00, 0xcfff, 0, 0, read8_delegate_create(via6522_device, read, *via_0), write8_delegate_create(via6522_device, write, *via_0));
 	}
 	else
 	{

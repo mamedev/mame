@@ -7,10 +7,10 @@ static int scanline=0;
 
 INTERRUPT_GEN( beezer_interrupt )
 {
-	running_device *via_0 = device->machine->device("via6522_0");
+	via6522_device *via_0 = device->machine->device<via6522_device>("via6522_0");
 
 	scanline = (scanline + 1) % 0x80;
-	via_ca2_w(via_0, (scanline & 0x10) ? 1 : 0);
+	via_0->write_ca2((scanline & 0x10) ? 1 : 0);
 	if ((scanline & 0x78) == 0x78)
 		cpu_set_input_line(device, M6809_FIRQ_LINE, ASSERT_LINE);
 	else

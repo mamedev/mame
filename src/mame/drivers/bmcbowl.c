@@ -211,18 +211,6 @@ static WRITE16_HANDLER( scroll_w )
 }
 
 
-static READ16_HANDLER(bmcbowl_via_r)
-{
-	running_device *via_0 = space->machine->device("via6522_0");
-	return via_r(via_0, offset);
-}
-
-static WRITE16_HANDLER(bmcbowl_via_w)
-{
-	running_device *via_0 = space->machine->device("via6522_0");
-	via_w(via_0, offset, data);
-}
-
 static READ8_DEVICE_HANDLER(via_b_in)
 {
 	return input_port_read(device->machine, "IN3");
@@ -333,7 +321,7 @@ static ADDRESS_MAP_START( bmcbowl_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x091000, 0x091001) AM_WRITENOP
 	AM_RANGE(0x091800, 0x091801) AM_WRITE(scroll_w)
 
-	AM_RANGE(0x092000, 0x09201f) AM_READWRITE(bmcbowl_via_r, bmcbowl_via_w)
+	AM_RANGE(0x092000, 0x09201f) AM_DEVREADWRITE8_MODERN("via6522_0", via6522_device, read, write, 0x00ff)
 
 	AM_RANGE(0x093000, 0x093003) AM_WRITENOP  // related to music
 	AM_RANGE(0x092800, 0x092803) AM_DEVWRITE8("aysnd", ay8910_data_address_w, 0xff00)

@@ -74,25 +74,12 @@ static READ8_HANDLER( test_r )
 }
 
 
-static READ8_HANDLER(lions_via_r)
-{
-	running_device *via_0 = space->machine->device("via6522_0");
-	return via_r(via_0, offset);
-}
-
-static WRITE8_HANDLER(lions_via_w)
-{
-	running_device *via_0 = space->machine->device("via6522_0");
-	via_w(via_0, offset, data);
-}
-
-
 static ADDRESS_MAP_START( lions_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&lions_vram)
 	AM_RANGE(0x0800, 0x0fff) AM_RAM
 	AM_RANGE(0x1800, 0x1800) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0x1801, 0x1801) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
-	AM_RANGE(0x5000, 0x500f) AM_MIRROR(0x0010) AM_READWRITE(lions_via_r, lions_via_w)
+	AM_RANGE(0x5000, 0x500f) AM_MIRROR(0x0010) AM_DEVREADWRITE_MODERN("via6522_0", via6522_device, read, write)
 	AM_RANGE(0x5300, 0x5300) AM_READ(test_r)//AM_READ_PORT("IN0")
 	AM_RANGE(0x5382, 0x5383) AM_DEVWRITE("aysnd", ay8910_data_address_w)
 	AM_RANGE(0xe000, 0xffff) AM_ROM

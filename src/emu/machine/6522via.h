@@ -109,36 +109,31 @@ class via6522_device :  public device_t
     via6522_device(running_machine &_machine, const via6522_device_config &_config);
 
 public:
-    UINT8 via_r(UINT32 offset);
-    void via_w(UINT32 offset, UINT8 data);
+    DECLARE_READ8_MEMBER( read );
+    DECLARE_WRITE8_MEMBER( write );
 
-    void via_porta_w(UINT8 data) { m_in_a = data; }
+    DECLARE_WRITE8_MEMBER( write_porta ) { m_in_a = data; }
 
-    UINT8 via_portb_r() { return m_in_b; }
-    void via_portb_w(UINT8 data) { m_in_b = data; }
+    DECLARE_READ8_MEMBER( read_portb ) { return m_in_b; }
+    DECLARE_WRITE8_MEMBER( write_portb ) { m_in_b = data; }
 
-    UINT8 via_ca1_r() { return m_in_ca1; }
-    void via_ca1_w(UINT8 data);
+    DECLARE_READ_LINE_MEMBER( read_ca1 ) { return m_in_ca1; }
+    DECLARE_WRITE_LINE_MEMBER( write_ca1 );
 
-    UINT8 via_ca2_r() { return m_in_ca2; }
-    void via_ca2_w(UINT8 data);
+    DECLARE_READ_LINE_MEMBER( read_ca2 ) { return m_in_ca2; }
+    DECLARE_WRITE_LINE_MEMBER( write_ca2 );
 
-    UINT8 via_cb1_r() { return m_in_cb1; }
-    void via_cb1_w(UINT8 data);
+    DECLARE_READ_LINE_MEMBER( read_cb1 ) { return m_in_cb1; }
+    DECLARE_WRITE_LINE_MEMBER( write_cb1 );
 
-    UINT8 via_cb2_r() { return m_in_cb2; }
-    void via_cb2_w(UINT8 data);
+    DECLARE_READ_LINE_MEMBER( read_cb2 ) { return m_in_cb2; }
+    DECLARE_WRITE_LINE_MEMBER( write_cb2 );
 
 protected:
     // device-level overrides
     virtual void device_start();
     virtual void device_reset();
-    virtual void device_post_load() { }
-    virtual void device_clock_changed() { }
-
-    static TIMER_CALLBACK( t1_timeout_callback );
-    static TIMER_CALLBACK( t2_timeout_callback );
-    static TIMER_CALLBACK( shift_callback );
+	virtual void device_timer(emu_timer &timer, int param, void *ptr);
 
 private:
     attotime cycles_to_time(int c);
@@ -148,8 +143,6 @@ private:
     void set_int(int data);
     void clear_int(int data);
     void shift();
-    void t1_timeout();
-    void t2_timeout();
 
     devcb_resolved_read8 m_in_a_func;
     devcb_resolved_read8 m_in_b_func;
@@ -211,30 +204,5 @@ private:
 // device type definition
 extern const device_type VIA6522;
 
-
-
-/***************************************************************************
-    PROTOTYPES
-***************************************************************************/
-
-READ8_DEVICE_HANDLER(via_r);
-WRITE8_DEVICE_HANDLER(via_w);
-
-WRITE8_DEVICE_HANDLER(via_porta_w);
-
-READ8_DEVICE_HANDLER(via_portb_r);
-WRITE8_DEVICE_HANDLER(via_portb_w);
-
-READ_LINE_DEVICE_HANDLER(via_ca1_r);
-WRITE_LINE_DEVICE_HANDLER(via_ca1_w);
-
-READ_LINE_DEVICE_HANDLER(via_ca2_r);
-WRITE_LINE_DEVICE_HANDLER(via_ca2_w);
-
-READ_LINE_DEVICE_HANDLER(via_cb1_r);
-WRITE_LINE_DEVICE_HANDLER(via_cb1_w);
-
-READ_LINE_DEVICE_HANDLER(via_cb2_r);
-WRITE_LINE_DEVICE_HANDLER(via_cb2_w);
 
 #endif /* __6522VIA_H__ */

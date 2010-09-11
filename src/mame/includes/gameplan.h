@@ -25,7 +25,10 @@ class gameplan_state : public driver_device
 {
 public:
 	gameplan_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: driver_device(machine, config),
+		  via_0(*this, "via6522_0"),
+		  via_1(*this, "via6522_1"),
+		  via_2(*this, "via6522_2") { }
 
 	/* machine state */
 	UINT8   current_port;
@@ -44,9 +47,9 @@ public:
 	running_device *maincpu;
 	running_device *audiocpu;
 	running_device *riot;
-	running_device *via_0;
-	running_device *via_1;
-	running_device *via_2;
+	required_device<via6522_device> via_0;
+	required_device<via6522_device> via_1;
+	required_device<via6522_device> via_2;
 };
 
 
