@@ -275,19 +275,19 @@ VIDEO_START( gdfs )
 	(resolution, visible area, flipping etc.)
 
 	1c0060-61	?
-	1c0062-63	x start visible area
-	1c0064-65	x end visible area
-	1c0066-67	?
-	1c0068-69	?
-	1c006a-6b	y start visible area
-	1c006c-6d	y end visible area
-	1c006e-6f	?
-	1c0070-71	y global tilemap offset
-	1c0072-73	?
-	1c0074-75	?
-	1c0076-77	?
-	1c0078-79	?
-	1c007a-7b	?	
+	1c0062-63	fedc ba98 7654 3210     x start visible area
+	1c0064-65	fedc ba98 7654 3210     x end visible area
+	1c0066-67	f--- ---- ---- ----     ?
+	1c0068-69	f--- ---- ---- ----     ?
+	1c006a-6b	fedc ba98 7654 3210     y start visible area
+	1c006c-6d	fedc ba98 7654 3210     y end visible area
+	1c006e-6f	f--- ---- ---- ----     ?
+	1c0070-71	---- --98 7654 3210     y global tilemap offset
+	1c0072-73	f--- ---- ---- ----     ?
+	1c0074-75	f--- ---- ---- ----     ?
+	1c0076-77	-e-- ---- ---- ----     global/local spites coordinates
+	1c0078-79	f--- ---- ---- ----     ?
+	1c007a-7b	f--- ---- ---- ----     ?	
 
 			1c0060-7f:
 
@@ -370,6 +370,7 @@ VIDEO_START( gdfs )
 	vasara &	0021 0024 00cc 01c6 - 0001 000e 00fe 0106
 	vasara2:	03f1 0000 6500 c000 - 0015 5140
 			0301      3558  (flip)
+
 
 ***************************************************************************/
 
@@ -668,10 +669,7 @@ static void draw_row(running_machine *machine, bitmap_t *bitmap, const rectangle
 
 	/* Tweak the scroll values (game specific) */
 	x	+=	state->tilemap_offsx;
-	if (ssv_scroll[0x70/2] & 0x0200)
-		y	+=	((ssv_scroll[0x70/2] & 0x1ff) - 0x200 + ssv_scroll[0x6a/2] + 2);
-	else
-		y	+=	((ssv_scroll[0x70/2] & 0x1ff) + ssv_scroll[0x6a/2] + 2);
+	y	+=	((ssv_scroll[0x70/2] & 0x1ff) - (ssv_scroll[0x70/2] & 0x200) + ssv_scroll[0x6a/2] + 2);
 
 	/* Draw the rows */
 
@@ -754,7 +752,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	for ( ; s1 < end1; s1+=4 )
 	{
 		int attr, code, color, num, sprite;
-		int sx, x, xoffs, flipx, xnum, xstart, xend, xinc;
+		int sx, x, xoffs, flipx, xnum, xstart, xend, xinc, sprites_offsx;
 		int sy, y, yoffs, flipy, ynum, ystart, yend, yinc;
 		int mode,global_depth,global_xnum,global_ynum;
 
@@ -770,7 +768,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		s2		=		&spriteram16[ (sprite & 0x7fff) * 4 ];
 
 		/* Every single sprite is offset by x & yoffs, and additionally
-           by one of the 8 x & y offsets in the 1c0040-1c005f area   */
+		by one of the 8 x & y offsets in the 1c0040-1c005f area   */
 
 		xoffs	+=		ssv_scroll[((mode & 0x00e0) >> 4) + 0x40/2];
 		yoffs	+=		ssv_scroll[((mode & 0x00e0) >> 4) + 0x42/2];
@@ -874,27 +872,29 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 				sx	=	(sx & 0x1ff) - (sx & 0x200);
 				sy	=	(sy & 0x1ff) - (sy & 0x200);
 
+				sprites_offsx = -((ssv_scroll[0x7a/2] & 0x0800) >> 8);
+
 				if (ssv_scroll[0x74/2] == 0x6500)	// vasara
 					sy = 0xe8 - sy;
 
 				if (ssv_scroll[0x74/2] & 0x8000)		// srmp7, twineag2, ultrax
 				{
 					if (ssv_scroll[0x76/2] & 0x4000) {					// twineag2, ultrax
-						sx	=	state->sprites_offsx + sx - (xnum-1) * 8;
+						sx	=	sprites_offsx + sx - (xnum-1) * 8;
 						sy	=	state->sprites_offsy + sy - (ynum * 8) / 2;
 					} else {									// srmp7
-						sx	=	state->sprites_offsx + sx;
+						sx	=	sprites_offsx + sx;
 						sy	=	state->sprites_offsy + sy;
 					}
 				}
 				else if (ssv_scroll[0x76/2] & 0x1000)	// eaglshot
 				{
-					sx	=	state->sprites_offsx + sx - (xnum-1) * 8;
+					sx	=	sprites_offsx + sx - (xnum-1) * 8;
 					sy	=	state->sprites_offsy - sy - (ynum * 8) / 2;	// sy is the sprite center
 				}
 				else
 				{
-					sx	=	state->sprites_offsx + sx;
+					sx	=	sprites_offsx + sx;
 					sy	=	state->sprites_offsy - sy - (ynum-1) * 8;
 				}
 
