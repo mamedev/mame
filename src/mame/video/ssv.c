@@ -274,20 +274,26 @@ VIDEO_START( gdfs )
 	CRT controller, registers that are written
 	(resolution, visible area, flipping etc.)
 
-	1c0060-61	?
+	1c0060-61	---- ---- ---- ----	?							21 or 2b	for all games
 	1c0062-63	fedc ba98 7654 3210     x start visible area
 	1c0064-65	fedc ba98 7654 3210     x end visible area
-	1c0066-67	f--- ---- ---- ----     ?
-	1c0068-69	f--- ---- ---- ----     ?
+	1c0066-67	---- ---- ---- ----     ?							1c6		for all games
+	1c0068-69	---- ---- ---- ----     ?							1		for all games
 	1c006a-6b	fedc ba98 7654 3210     y start visible area
 	1c006c-6d	fedc ba98 7654 3210     y end visible area
-	1c006e-6f	f--- ---- ---- ----     ?
-	1c0070-71	---- --98 7654 3210     y global tilemap offset
-	1c0072-73	f--- ---- ---- ----     ?
-	1c0074-75	f--- ---- ---- ----     ?
+	1c006e-6f	---- ---- ---- ----     ?							106		for all games
+	1c0070-71	---- ---- ---- ----	?
+			---- --98 7654 3210     y global tilemap offset
+	1c0072-73	---- ---- ---- ----     ?
+	1c0074-75	---- ---- ---- ----     ?
+			-e-- ---- ---- ----	y sprite inversion 
+			---c ---- ---- ----	x sprite inversion?
+			---- ba98 ---- ----	? 							0101 for all games
+			---- ---- -6-- ----	y tilemap inversion?
+			---- ---- ---4 ----	x tilemap inversion?
 	1c0076-77	-e-- ---- ---- ----     global/local spites coordinates
-	1c0078-79	f--- ---- ---- ----     ?
-	1c007a-7b	f--- ---- ---- ----     ?	
+	1c0078-79	---- ---- ---- ----     ?
+	1c007a-7b	---- ---- ---- ----     ?	
 
 			1c0060-7f:
 
@@ -753,7 +759,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 	{
 		int attr, code, color, num, sprite;
 		int sx, x, xoffs, flipx, xnum, xstart, xend, xinc, sprites_offsx;
-		int sy, y, yoffs, flipy, ynum, ystart, yend, yinc;
+		int sy, y, yoffs, flipy, ynum, ystart, yend, yinc, sprites_offsy;
 		int mode,global_depth,global_xnum,global_ynum;
 
 		mode	=		s1[ 0 ];
@@ -874,28 +880,45 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 				sprites_offsx = -((ssv_scroll[0x7a/2] & 0x0800) >> 8);
 
-				if (ssv_scroll[0x74/2] == 0x6500)	// vasara
-					sy = 0xe8 - sy;
+				sprites_offsy = (-1)*((ssv_scroll[0x70/2] & 0x1ff) - (ssv_scroll[0x70/2] & 0x200)
+								 + ssv_scroll[0x6a/2] + 1) + ((!ssv_scroll[0x7a/2] & 0x0800) >> 8);
 
-				if (ssv_scroll[0x74/2] & 0x8000)		// srmp7, twineag2, ultrax
+				if (ssv_scroll[0x74/2] & 0x4000)	// srmp7, twineag2, ultrax, vasara
+				{
+					sy = -sy;
+					if (ssv_scroll[0x74/2] & 0x8000)
+						sy += 0x00;			// srmp7, twineag2, ultrax
+					else
+						sy -= 0x08;			// vasara
+				}
+
+				// sprites can use x and y coordinates relative to a side, the other side or the center
+				// for now we use a kludge
+
+				if (ssv_scroll[0x74/2] & 0x8000)
 				{
 					if (ssv_scroll[0x76/2] & 0x4000) {					// twineag2, ultrax
-						sx	=	sprites_offsx + sx - (xnum-1) * 8;
-						sy	=	state->sprites_offsy + sy - (ynum * 8) / 2;
+						sx	=	sprites_offsx + sx - (xnum - 1) * 8;
+						sy	=	sprites_offsy - sy - (ynum * 8) / 2;
 					} else {									// srmp7
 						sx	=	sprites_offsx + sx;
-						sy	=	state->sprites_offsy + sy;
+						sy	=	sprites_offsy - sy;
 					}
 				}
-				else if (ssv_scroll[0x76/2] & 0x1000)	// eaglshot
+				else if (ssv_scroll[0x76/2] & 0x1000)					// eaglshot
 				{
-					sx	=	sprites_offsx + sx - (xnum-1) * 8;
-					sy	=	state->sprites_offsy - sy - (ynum * 8) / 2;	// sy is the sprite center
+					sx	=	sprites_offsx + sx - (xnum - 1) * 8;
+					sy	=	sprites_offsy - sy - (ynum * 8) / 2;
 				}
-				else
+				else if (ssv_scroll[0x70/2] == 0x02fd)					// dynagear
 				{
 					sx	=	sprites_offsx + sx;
-					sy	=	state->sprites_offsy - sy - (ynum-1) * 8;
+					sy	=	sprites_offsy - sy - (ynum * 8) / 2;
+				}
+				else											// other games
+				{
+					sx	=	sprites_offsx + sx;
+					sy	=	sprites_offsy - sy - (ynum - 1) * 8;
 				}
 
 				/* Sprite code masking */
@@ -915,7 +938,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 												color,
 												flipx, flipy,
 												sx + x * 16, sy + y * 8,
-												shadow	);
+												shadow );
 					}
 				}
 
