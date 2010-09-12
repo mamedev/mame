@@ -651,17 +651,14 @@ static void draw_row(running_machine *machine, bitmap_t *bitmap, const rectangle
 
 	/* Get the scroll data */
 
-	x		=	ssv_scroll[ scroll * 4 + 0 ];	// x scroll
-	y		=	ssv_scroll[ scroll * 4 + 1 ];	// y scroll
-	//          ssv_scroll[ scroll * 4 + 2 ];   // Priority ?
-	mode	=	ssv_scroll[ scroll * 4 + 3 ];	// shadow, depth etc.
+	x    = ssv_scroll[ scroll * 4 + 0 ];	// x scroll
+	y    = ssv_scroll[ scroll * 4 + 1 ];	// y scroll
+	//     ssv_scroll[ scroll * 4 + 2 ];	// ???
+	mode = ssv_scroll[ scroll * 4 + 3 ];	// layer disabled, shadow, depth etc.
 
-	// Priority ?
-	if ( (ssv_scroll[ scroll * 4 + 2 ] < ssv_scroll[ 0 * 4 + 2 ]) )
+	/* Background layer disabled */
+	if ((mode & 0xf000) == 0)
 		return;
-
-	/* How is the background layer disabled ? */
-	if ((mode & 0x0700) == 0)	return;
 
 	shadow	=	(mode & 0x0800);
 
@@ -676,8 +673,8 @@ static void draw_row(running_machine *machine, bitmap_t *bitmap, const rectangle
 	y	+=	sy;
 
 	/* Tweak the scroll values (game specific) */
-	// x	+=	0;
-	y	+=	((ssv_scroll[0x70/2] & 0x1ff) - (ssv_scroll[0x70/2] & 0x200) + ssv_scroll[0x6a/2] + 2);
+	// x += 0;
+	y    += ((ssv_scroll[0x70/2] & 0x1ff) - (ssv_scroll[0x70/2] & 0x200) + ssv_scroll[0x6a/2] + 2);
 
 	/* Draw the rows */
 
