@@ -8,7 +8,8 @@
 
   Games running on this hardware:
 
-  * Swiss Poker '50 SG-.10' (V2.5),       1990, Golden Games / C+M Technics AG.
+  * Swiss Poker ('50 SG-.10', V2.5), 1990, Golden Games / C+M Technics AG.
+  * Movie Card,                      1998, Golden Games / C+M Technics AG.
 
 
 *******************************************************************************
@@ -172,6 +173,31 @@
 *******************************************************************************
 
 
+  Movie Card CPU Board...
+  Etched: "Golden Games"
+  Stickered "JQ 6.01"
+
+  CPU: 1x MC68000P8.
+  SND: 1x YM2149F.
+       1x LM380N (audio amp). 
+
+  RAM: 2x 84256A-10
+
+  OTHER:
+  1x EF6840P (timer)
+  1x Xilinx XC9572 PC84AEM9917 (In-System Programmable CPLD)
+  2x Philips SCN68681C1A44 (Dual asynchronous receiver/transmitter)
+
+  1x DS1307
+
+  1x 8.000 MHz Xtal.
+  1x Unreadable Xtal.
+  1x Unreadable Xtal.
+
+
+*******************************************************************************
+
+
   *** Game Notes ***
 
 
@@ -264,7 +290,7 @@ static READ16_HANDLER(unk_r)
 
 static ADDRESS_MAP_START( swisspkr_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
-	AM_RANGE(0x200000, 0x20ffff) AM_RAM //AM_BASE_SIZE_GENERIC(nvram)
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0x400002, 0x400003) AM_NOP // hopper status read ?
 	AM_RANGE(0x40000c, 0x40000d) AM_READ(unk_r)
 	AM_RANGE(0x40000e, 0x40000f) AM_READ_PORT("DSW2")	// not sure...
@@ -309,6 +335,20 @@ ADDRESS_MAP_END
 'maincpu' (0151BE): unmapped program memory word write to 401000 = 0300 & FF00
 'maincpu' (0151C6): unmapped program memory word write to 401000 = 1500 & FF00
 'maincpu' (0151CC): unmapped program memory word read from 401002 & FF00
+
+*/
+
+static ADDRESS_MAP_START( moviecrd_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+	AM_RANGE(0x200000, 0x20ffff) AM_RAM
+	AM_RANGE(0xc00000, 0xc3ffff) AM_RAM AM_BASE(&videoram)
+	AM_RANGE(0x503000, 0x5031ff) AM_RAM //int ack ?
+ADDRESS_MAP_END
+
+/*
+
+  502100-502102  YM2149?
+
 
 */
 
@@ -533,6 +573,14 @@ static MACHINE_CONFIG_START( swisspkr, driver_device )
 MACHINE_CONFIG_END
 
 
+static MACHINE_CONFIG_DERIVED( moviecrd, swisspkr )
+
+	/* basic machine hardware */
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_PROGRAM_MAP(moviecrd_map)
+MACHINE_CONFIG_END
+
+
 /*************************
 *        Rom Load        *
 *************************/
@@ -542,9 +590,21 @@ ROM_START( swisspkr )
 	ROM_LOAD16_BYTE( "v2.5_hi.pr", 0x00000, 0x10000, CRC(a7f85661) SHA1(aa307bcfe0dfb07120b9711d65916b8689626b00) )
 	ROM_LOAD16_BYTE( "v2.5_lo.pr", 0x00001, 0x10000, CRC(142db5d0) SHA1(cc6481a206ed1b0f19cccaab7d6158e81e483c9b) )
 
-	ROM_REGION( 0x40000, "gfx1", 0 )
+	ROM_REGION( 0x40000, "gfx1", 0 )	/* The following ROMs have code for 'Super Cherry' */
 	ROM_LOAD16_BYTE( "v1.0_hi.gr", 0x20000, 0x10000, CRC(ea750ab1) SHA1(d1284e7f2628c3aa3de9246e475d45e6be48890e) )
 	ROM_LOAD16_BYTE( "v1.0_lo.gr", 0x20001, 0x10000, CRC(d885b965) SHA1(5f2ae3e21cf4e0d20c99cec2dfd3a6f72358535a) )
+ROM_END
+
+ROM_START( moviecrd )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 code */
+	ROM_LOAD16_BYTE( "v1.2_hi.pro", 0x20000, 0x20000, CRC(2210dd79) SHA1(007e9930965d6281889fca487f00a1edaac54d85) )
+	ROM_CONTINUE(                   0x00000, 0x20000)
+	ROM_LOAD16_BYTE( "v1.2_lo.pro", 0x20001, 0x20000, CRC(adb6060f) SHA1(1aff8be7830f61f97720e773eab7985956c7569d) )
+	ROM_CONTINUE(                   0x00001, 0x20000)
+
+	ROM_REGION( 0x40000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "v1.2_hi.gfx", 0x00000, 0x10000, CRC(0b62d1a8) SHA1(4156379cc000cbea997b1c21cebea9021fa697b2) )
+	ROM_LOAD16_BYTE( "v1.2_lo.gfx", 0x00001, 0x10000, CRC(70e8e9d5) SHA1(c026493b4bd302d389219ba564aafa42fca86491) )
 ROM_END
 
 
@@ -554,3 +614,4 @@ ROM_END
 
 /*    YEAR  NAME      PARENT    MACHINE    INPUT      INIT  ROT    COMPANY                           FULLNAME                          FLAGS */
 GAME( 1990, swisspkr, 0,        swisspkr,  goldngam,  0,    ROT0, "Golden Games / C+M Technics AG", "Swiss Poker ('50 SG-.10', V2.5)", GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 1998, moviecrd, 0,        moviecrd,  goldngam,  0,    ROT0, "Golden Games / C+M Technics AG", "Movie Card",                      GAME_NO_SOUND | GAME_NOT_WORKING )
