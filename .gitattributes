@@ -1724,6 +1724,7 @@ src/mame/drivers/gng.c svneol=native#text/plain
 src/mame/drivers/go2000.c svneol=native#text/plain
 src/mame/drivers/goal92.c svneol=native#text/plain
 src/mame/drivers/goindol.c svneol=native#text/plain
+src/mame/drivers/goldngam.c svneol=native#text/plain
 src/mame/drivers/goldnpkr.c svneol=native#text/plain
 src/mame/drivers/goldstar.c svneol=native#text/plain
 src/mame/drivers/gomoku.c svneol=native#text/plain

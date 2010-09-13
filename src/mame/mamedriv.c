@@ -10438,4 +10438,7 @@ Other Sun games
 	/* Jubilee */
 	DRIVER( jubileep )
 
+	/* Golden Games / C+M Technics AG */
+	DRIVER( swisspkr )	/* (c) Golden Games 1990 */
+
 #endif	/* DRIVER_RECURSIVE */
