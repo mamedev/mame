@@ -934,7 +934,7 @@ or I/O, one for a communication module, one for a cooling fan and one for the se
 
 
 
-Atomiswave cart PCB layout and game usage (revision 0.3 19/7/2009 5:55pm)
+Atomiswave cart PCB layout and game usage (revision 0.4 13/9/2010 6:12pm)
 -----------------------------------------
 
 Type 1 ROM Board:
@@ -970,6 +970,7 @@ Notes:
                -----------------------------------------------
                Sports Shooting USA                   AX0101F01
                Dolphin Blue                          AX0401F01
+               Maximum Speed                         AX0501F01
                Demolish Fist                         AX0601F01
                Guilt Gear Isuka                      AX1201F01
                Knights Of Valour Seven Spirits       AX1301F01
@@ -1006,6 +1007,7 @@ IC10 to IC17 - Custom-badged 128M TSOP48 mask ROMs. I suspect they are Macronix
                -----------------------------------------------------------------------
                Sports Shooting USA                   AX0101M01 to AX0104M01    4
                Dolphin Blue                          AX0401M01 to AX0405M01    5
+               Maximum Speed                         AX0501M01 to AX0505M01    5
                Demolish Fist                         AX0601M01 to AX0607M01    7
                Guilty Gear Isuka                     AX1201M01 to AX1208M01    8
                Knights Of Valour Seven Spirits       AX1301M01 to AX1307M01    7
@@ -1123,7 +1125,6 @@ Notes:
                Force Five
                Guilty Gear X Version 1.5 *
                Kenju
-               Maximum Speed *
                Metal Slug 6 *
                Premier Eleven
                Sushi Bar
@@ -1226,7 +1227,6 @@ Notes:
       CN3 - Gun connection for player 2 pump switch
       CN4 - Gun connection for player 1 trigger and optical
       CN5 - Gun connection for player 1 pump switch
-
 */
 
 #include "emu.h"
