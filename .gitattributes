@@ -1250,7 +1250,6 @@ src/mame/audio/astrof.c svneol=native#text/plain
 src/mame/audio/atarifb.c svneol=native#text/plain
 src/mame/audio/atarijsa.c svneol=native#text/plain
 src/mame/audio/atarijsa.h svneol=native#text/plain
-src/mame/audio/attckufo.c svneol=native#text/plain
 src/mame/audio/avalnche.c svneol=native#text/plain
 src/mame/audio/aztarac.c svneol=native#text/plain
 src/mame/audio/blockade.c svneol=native#text/plain

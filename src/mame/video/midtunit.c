@@ -570,12 +570,6 @@ static const dma_draw_func prefix[32] =																			\
 };
 
 
-/* allow for custom blitters */
-#ifdef midtunit_CUSTOM_BLITTERS
-#include "midtblit.c"
-#endif
-
-
 /*** blitter family declarations ***/
 DECLARE_BLITTER_SET(dma_draw_skip_scale,       dma_state.bpp, EXTRACTGEN,   SKIP_YES, SCALE_YES)
 DECLARE_BLITTER_SET(dma_draw_noskip_scale,     dma_state.bpp, EXTRACTGEN,   SKIP_NO,  SCALE_YES)
