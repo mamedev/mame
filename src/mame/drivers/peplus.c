@@ -162,6 +162,7 @@ Stephh's log (2007.11.28) :
 
 #include "emu.h"
 #include "sound/ay8910.h"
+#include "machine/nvram.h"
 #include "cpu/mcs51/mcs51.h"
 #include "machine/i2cmem.h"
 #include "video/mc6845.h"
@@ -178,9 +179,11 @@ class peplus_state : public driver_device
 {
 public:
 	peplus_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: driver_device(machine, config),
+		  cmos_ram(*this, "cmos") { }
 
 	UINT8 *videoram;
+	required_shared_ptr<UINT8> cmos_ram;
 };
 
 
@@ -197,7 +200,6 @@ static UINT8 jumper_e16_e17; /* Set this to TRUE when CG chips are 27c512 instea
 
 /* Pointers to External RAM */
 static UINT8 *program_ram;
-static UINT8 *cmos_ram;
 static UINT8 *s3000_ram;
 static UINT8 *s5000_ram;
 static UINT8 *s7000_ram;
@@ -225,7 +227,6 @@ static UINT8 coin_out_state = 0;
 static int sda_dir = 0;
 
 /* Static Variables */
-#define CMOS_NVRAM_SIZE     0x2000
 #define eeprom_NVRAM_SIZE   0x200 // 4k Bit
 
 /* EEPROM is a X2404P 4K-bit Serial I2C Bus */
@@ -268,30 +269,6 @@ static void peplus_load_superdata(running_machine *machine, const char *bank_nam
     memcpy(sb000_ram, &super_data[0xb000], 0x1000);
     memcpy(sd000_ram, &super_data[0xd000], 0x1000);
     memcpy(sf000_ram, &super_data[0xf000], 0x1000);
-}
-
-
-/*****************
-* NVRAM Handlers *
-******************/
-
-static NVRAM_HANDLER( peplus )
-{
-	if (read_or_write)
-	{
-		mame_fwrite(file, cmos_ram, CMOS_NVRAM_SIZE);
-	}
-	else
-	{
-		if (file)
-		{
-			mame_fread(file, cmos_ram, CMOS_NVRAM_SIZE);
-		}
-		else
-		{
-			memset(cmos_ram, 0, CMOS_NVRAM_SIZE);
-		}
-	}
 }
 
 
@@ -392,6 +369,7 @@ static WRITE8_HANDLER( peplus_duart_w )
 
 static WRITE8_HANDLER( peplus_cmos_w )
 {
+	peplus_state *state = space->machine->driver_data<peplus_state>();
 	char bank_name[6];
 
 	/* Test for Wingboard PAL Trigger Condition */
@@ -401,7 +379,7 @@ static WRITE8_HANDLER( peplus_cmos_w )
 		peplus_load_superdata(space->machine, bank_name);
 	}
 
-	cmos_ram[offset] = data;
+	state->cmos_ram[offset] = data;
 }
 
 static WRITE8_HANDLER( peplus_s3000_w )
@@ -499,7 +477,8 @@ static READ8_HANDLER( peplus_duart_r )
 
 static READ8_HANDLER( peplus_cmos_r )
 {
-	return cmos_ram[offset];
+	peplus_state *state = space->machine->driver_data<peplus_state>();
+	return state->cmos_ram[offset];
 }
 
 static READ8_HANDLER( peplus_s3000_r )
@@ -748,7 +727,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( peplus_iomap, ADDRESS_SPACE_IO, 8 )
 	// Battery-backed RAM (0x1000-0x01fff Extended RAM for Superboards Only)
-	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(peplus_cmos_r, peplus_cmos_w) AM_BASE(&cmos_ram)
+	AM_RANGE(0x0000, 0x1fff) AM_READWRITE(peplus_cmos_r, peplus_cmos_w) AM_SHARE("cmos")
 
 	// CRT Controller
 	AM_RANGE(0x2008, 0x2008) AM_DEVWRITE("crtc", peplus_crtc_mode_w)
@@ -1043,7 +1022,7 @@ static MACHINE_CONFIG_START( peplus, peplus_state )
 	MDRV_CPU_IO_MAP(peplus_iomap)
 
 	MDRV_MACHINE_RESET(peplus)
-	MDRV_NVRAM_HANDLER(peplus)
+	MDRV_NVRAM_ADD_0FILL("cmos")
 
 	// video hardware
 	MDRV_SCREEN_ADD("screen", RASTER)
