@@ -3320,7 +3320,7 @@ V-V                           TP-027
 	DRIVER( aquarush )	/* 2000.02 Aqua Rush (AQ1/VER.A1, Japan) */
 	DRIVER( golgo13 )	/* 2000.03 Golgo 13 (GLG1/VER.A, Japan) */
 	DRIVER( sws2000 )	/* 2000.03 Super World Stadium 2000 (SS01/VER.A, Japan) */
-						/* 2000.06 Truck Kyousoukyoku (Metro) */
+	DRIVER( truckk )      	/* 2000.06 Truck Kyousoukyoku (Metro) */
 						/* 2000.07 Kart Duel */
 						/* 2000.08 Teknowerk */
 	DRIVER( g13knd )	/* 2000.10 Golgo 13 Kiseki no Dandou (GLS1/VER.A, Japan) */
@@ -4812,7 +4812,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 
 	/* Atomiswave (Dreamcast-based) games */
 	DRIVER( awbios )
-						/* 2002.12 Maximum Speed */
+	DRIVER( maxspeed )	/* 2002.12 Maximum Speed */
 	DRIVER( sprtshot )	/* 2002.12 Sports Shooting USA */
 						/* 2003.03 Guilty Gear X ver.1.5 */
 	DRIVER( demofist )	/* 2003.06 Demolish Fist */
