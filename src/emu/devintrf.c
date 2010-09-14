@@ -548,7 +548,8 @@ device_t::device_t(running_machine &_machine, const device_config &config)
 	  m_baseconfig(config),
 	  m_unscaled_clock(config.m_clock),
 	  m_clock_scale(1.0),
-	  m_attoseconds_per_clock((config.m_clock == 0) ? 0 : HZ_TO_ATTOSECONDS(config.m_clock))
+	  m_attoseconds_per_clock((config.m_clock == 0) ? 0 : HZ_TO_ATTOSECONDS(config.m_clock)),
+	  m_auto_finder_list(NULL)
 {
 }
 
@@ -691,6 +692,10 @@ void device_t::start()
 {
 	// populate the region field
 	m_region = m_machine.region(tag());
+
+	// find all the registered devices
+	for (auto_finder_base *autodev = m_auto_finder_list; autodev != NULL; autodev = autodev->m_next)
+		autodev->findit(*this);
 
 	// let the interfaces do their pre-work
 	for (device_interface *intf = m_interface_list; intf != NULL; intf = intf->interface_next())
@@ -887,4 +892,73 @@ void device_t::notify_clock_changed()
 
 	// then notify the device
 	device_clock_changed();
+}
+
+
+//-------------------------------------------------
+//  register_auto_finder - add a new item to the
+//  list of stuff to find after we go live
+//-------------------------------------------------
+
+void device_t::register_auto_finder(auto_finder_base &autodev)
+{
+	// add to this list
+	autodev.m_next = m_auto_finder_list;
+	m_auto_finder_list = &autodev;
+}
+
+
+//-------------------------------------------------
+//  auto_finder_base - constructor
+//-------------------------------------------------
+
+device_t::auto_finder_base::auto_finder_base(device_t &base, const char *tag)
+	: m_next(NULL),
+	  m_tag(tag)
+{
+	// register ourselves with our device class
+	base.register_auto_finder(*this);
+}
+
+
+//-------------------------------------------------
+//  ~auto_finder_base - destructor
+//-------------------------------------------------
+
+device_t::auto_finder_base::~auto_finder_base()
+{
+}
+
+
+//-------------------------------------------------
+//  find_device - find a device; done here instead
+//  of inline in the template due to include
+//  dependency ordering
+//-------------------------------------------------
+
+device_t *device_t::auto_finder_base::find_device(device_t &base, const char *tag)
+{
+	return base.subdevice(tag);
+}
+
+
+//-------------------------------------------------
+//  find_shared_ptr - find a shared pointer
+//-------------------------------------------------
+
+void *device_t::auto_finder_base::find_shared_ptr(device_t &base, const char *tag)
+{
+	return memory_get_shared(*base.machine, tag);
+}
+
+
+//-------------------------------------------------
+//  find_shared_size - find a shared pointer size
+//-------------------------------------------------
+
+size_t device_t::auto_finder_base::find_shared_size(device_t &base, const char *tag)
+{
+	size_t result = 0;
+	memory_get_shared(*base.machine, tag, result);
+	return result;
 }

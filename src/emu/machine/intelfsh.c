@@ -75,6 +75,41 @@ const device_type SHARP_UNK128MBIT = sharp_unk128mbit_device_config::static_allo
 
 
 //**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+static ADDRESS_MAP_START( memory_map8_512Kb, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x00000, 0x00ffff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( memory_map8_1Mb, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x00000, 0x01ffff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( memory_map8_8Mb, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x00000, 0x0fffff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( memory_map8_16Mb, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x00000, 0x1fffff) AM_RAM
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( memory_map16_4Mb, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x00000, 0x07ffff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( memory_map16_16Mb, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x00000, 0x1fffff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( memory_map16_64Mb, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x00000, 0x7fffff) AM_RAM
+ADDRESS_MAP_END
+
+
+
+//**************************************************************************
 //  DEVICE CONFIGURATION
 //**************************************************************************
 
@@ -84,9 +119,94 @@ const device_type SHARP_UNK128MBIT = sharp_unk128mbit_device_config::static_allo
 
 intelfsh_device_config::intelfsh_device_config(const machine_config &mconfig, device_type type, const char *name, const char *tag, const device_config *owner, UINT32 clock, UINT32 variant)
 	: device_config(mconfig, type, name, tag, owner, clock),
+	  device_config_memory_interface(mconfig, *this),
 	  device_config_nvram_interface(mconfig, *this),
-	  m_type(variant)
+	  m_type(variant),
+	  m_size(0),
+	  m_bits(8),
+	  m_device_id(0),
+	  m_maker_id(0),
+	  m_sector_is_4k(false)
 {
+	address_map_constructor map = NULL;
+
+	switch( variant )
+	{
+	case FLASH_INTEL_28F016S5:
+	case FLASH_SHARP_LH28F016S:
+		m_bits = 8;
+		m_size = 0x200000;
+		m_maker_id = 0x89;
+		m_device_id = 0xaa;
+		map = ADDRESS_MAP_NAME( memory_map8_16Mb );
+		break;
+	case FLASH_SHARP_LH28F400:
+	case FLASH_INTEL_E28F400:
+		m_bits = 16;
+		m_size = 0x80000;
+		m_maker_id = 0xb0;
+		m_device_id = 0xed;
+		map = ADDRESS_MAP_NAME( memory_map16_4Mb );
+		break;
+	case FLASH_FUJITSU_29F016A:
+		m_bits = 8;
+		m_size = 0x200000;
+		m_maker_id = 0x04;
+		m_device_id = 0xad;
+		map = ADDRESS_MAP_NAME( memory_map8_16Mb );
+		break;
+	case FLASH_INTEL_E28F008SA:
+		m_bits = 8;
+		m_size = 0x100000;
+		m_maker_id = 0x89;
+		m_device_id = 0xa2;
+		map = ADDRESS_MAP_NAME( memory_map8_8Mb );
+		break;
+	case FLASH_INTEL_TE28F160:
+		m_bits = 16;
+		m_size = 0x200000;
+		m_maker_id = 0xb0;
+		m_device_id = 0xd0;
+		map = ADDRESS_MAP_NAME( memory_map16_16Mb );
+		break;
+	case FLASH_SHARP_UNK128MBIT:
+		m_bits = 16;
+		m_size = 0x800000;
+		m_maker_id = 0xb0;
+		m_device_id = 0xb0;
+		map = ADDRESS_MAP_NAME( memory_map16_64Mb );
+		break;
+	case FLASH_MACRONIX_29L001MC:
+		m_bits = 8;
+		m_size = 0x20000;
+		m_maker_id = 0xc2;
+		m_device_id = 0x51;
+		map = ADDRESS_MAP_NAME( memory_map8_1Mb );
+		break;
+	case FLASH_PANASONIC_MN63F805MNP:
+		m_bits = 8;
+		m_size = 0x10000;
+		m_maker_id = 0x32;
+		m_device_id = 0x1b;
+		m_sector_is_4k = true;
+		map = ADDRESS_MAP_NAME( memory_map8_512Kb );
+		break;
+	case FLASH_SANYO_LE26FV10N1TS:
+		m_bits = 8;
+		m_size = 0x20000;
+		m_maker_id = 0x62;
+		m_device_id = 0x13;
+		m_sector_is_4k = true;
+		map = ADDRESS_MAP_NAME( memory_map8_1Mb );
+		break;
+	}
+	
+	int addrbits;
+	for (addrbits = 24; addrbits > 0; addrbits--)
+		if ((m_size & (1 << addrbits)) != 0)
+			break;
+
+	m_space_config = address_space_config("flash", ENDIANNESS_BIG, m_bits, addrbits, 0, map);
 }
 
 intelfsh8_device_config::intelfsh8_device_config(const machine_config &mconfig, device_type type, const char *name, const char *tag, const device_config *owner, UINT32 clock, UINT32 variant)
@@ -97,6 +217,17 @@ intelfsh8_device_config::intelfsh8_device_config(const machine_config &mconfig, 
 intelfsh16_device_config::intelfsh16_device_config(const machine_config &mconfig, device_type type, const char *name, const char *tag, const device_config *owner, UINT32 clock, UINT32 variant)
 	: intelfsh_device_config(mconfig, type, name, tag, owner, clock, variant)
 {
+}
+
+
+//-------------------------------------------------
+//  memory_space_config - return a description of
+//  any address spaces owned by this device
+//-------------------------------------------------
+
+const address_space_config *intelfsh_device_config::memory_space_config(int spacenum) const
+{
+	return (spacenum == 0) ? &m_space_config : NULL;
 }
 
 
@@ -111,84 +242,15 @@ intelfsh16_device_config::intelfsh16_device_config(const machine_config &mconfig
 
 intelfsh_device::intelfsh_device(running_machine &_machine, const intelfsh_device_config &config)
 	: device_t(_machine, config),
+	  device_memory_interface(_machine, config, *this),
 	  device_nvram_interface(_machine, config, *this),
 	  m_config(config),
-	  m_size(0),
-	  m_bits(config.m_type >> 8),
 	  m_status(0x80),
 	  m_erase_sector(0),
-	  m_sector_is_4k(false),
 	  m_flash_mode(FM_NORMAL),
 	  m_flash_master_lock(false),
-	  m_device_id(0),
-	  m_maker_id(0),
-	  m_timer(NULL),
-	  m_flash_memory(NULL)
+	  m_timer(NULL)
 {
-	switch( config.m_type )
-	{
-	case intelfsh_device_config::FLASH_INTEL_28F016S5:
-	case intelfsh_device_config::FLASH_SHARP_LH28F016S:
-		m_bits = 8;
-		m_size = 0x200000;
-		m_maker_id = 0x89;
-		m_device_id = 0xaa;
-		break;
-	case intelfsh_device_config::FLASH_SHARP_LH28F400:
-	case intelfsh_device_config::FLASH_INTEL_E28F400:
-		m_bits = 16;
-		m_size = 0x80000;
-		m_maker_id = 0xb0;
-		m_device_id = 0xed;
-		break;
-	case intelfsh_device_config::FLASH_FUJITSU_29F016A:
-		m_bits = 8;
-		m_size = 0x200000;
-		m_maker_id = 0x04;
-		m_device_id = 0xad;
-		break;
-	case intelfsh_device_config::FLASH_INTEL_E28F008SA:
-		m_bits = 8;
-		m_size = 0x100000;
-		m_maker_id = 0x89;
-		m_device_id = 0xa2;
-		break;
-	case intelfsh_device_config::FLASH_INTEL_TE28F160:
-		m_bits = 16;
-		m_size = 0x200000;
-		m_maker_id = 0xb0;
-		m_device_id = 0xd0;
-		break;
-	case intelfsh_device_config::FLASH_SHARP_UNK128MBIT:
-		m_bits = 16;
-		m_size = 0x800000;
-		m_maker_id = 0xb0;
-		m_device_id = 0xb0;
-		break;
-	case intelfsh_device_config::FLASH_MACRONIX_29L001MC:
-		m_bits = 8;
-		m_size = 0x20000;
-		m_maker_id = 0xc2;
-		m_device_id = 0x51;
-		break;
-
-	case intelfsh_device_config::FLASH_PANASONIC_MN63F805MNP:
-		m_bits = 8;
-		m_size = 0x10000;
-		m_maker_id = 0x32;
-		m_device_id = 0x1b;
-		m_sector_is_4k = true;
-		break;
-
-	case intelfsh_device_config::FLASH_SANYO_LE26FV10N1TS:
-		m_bits = 8;
-		m_size = 0x20000;
-		m_maker_id = 0x62;
-		m_device_id = 0x13;
-		m_sector_is_4k = true;
-		break;
-	}
-	m_flash_memory = auto_alloc_array( &m_machine, UINT8, m_size );
 }
 
 intelfsh8_device::intelfsh8_device(running_machine &_machine, const intelfsh_device_config &config)
@@ -209,7 +271,6 @@ void intelfsh_device::device_start()
 	state_save_register_device_item( this, 0, m_status );
 	state_save_register_device_item( this, 0, m_flash_mode );
 	state_save_register_device_item( this, 0, m_flash_master_lock );
-	state_save_register_memory( machine, name(), tag(), 0, "m_flash_memory", m_flash_memory, m_bits/8, m_size / (m_bits/8), __FILE__, __LINE__ );
 }
 
 
@@ -243,13 +304,25 @@ void intelfsh_device::nvram_default()
 	if (m_region != NULL)
 	{
 		UINT32 bytes = m_region->bytes();
-		if (bytes > m_size)
-			bytes = m_size;
-		memcpy(m_flash_memory, *m_region, bytes);
+		if (bytes > m_config.m_size)
+			bytes = m_config.m_size;
+
+		if (m_config.m_bits == 8)
+		{
+			for (offs_t offs = 0; offs < bytes; offs++)
+				m_addrspace[0]->write_byte(offs, m_region->u8(offs));
+		}
+		else
+		{
+			for (offs_t offs = 0; offs < bytes; offs += 2)
+				m_addrspace[0]->write_word(offs, m_region->u16(offs / 2));
+		}
 		return;
 	}
 
-	memset( m_flash_memory, 0xff, m_size );
+	// otherwise, default to 0xff
+	for (offs_t offs = 0; offs < m_config.m_size; offs++)
+		m_addrspace[0]->write_byte(offs, 0xff);
 }
 
 
@@ -260,7 +333,11 @@ void intelfsh_device::nvram_default()
 
 void intelfsh_device::nvram_read(mame_file &file)
 {
-	mame_fread(&file, m_flash_memory, m_size);
+	UINT8 *buffer = global_alloc_array(UINT8, m_config.m_size);
+	mame_fread(&file, buffer, m_config.m_size);
+	for (int byte = 0; byte < m_config.m_size; byte++)
+		m_addrspace[0]->write_byte(byte, buffer[byte]);
+	global_free(buffer);
 }
 
 
@@ -271,7 +348,11 @@ void intelfsh_device::nvram_read(mame_file &file)
 
 void intelfsh_device::nvram_write(mame_file &file)
 {
-	mame_fwrite(&file, m_flash_memory, m_size);
+	UINT8 *buffer = global_alloc_array(UINT8, m_config.m_size);
+	for (int byte = 0; byte < m_config.m_size; byte++)
+		buffer[byte] = m_addrspace[0]->read_byte(byte);
+	mame_fwrite(&file, buffer, m_config.m_size);
+	global_free(buffer);
 }
 
 
@@ -287,18 +368,16 @@ UINT32 intelfsh_device::read_full(UINT32 address)
 	{
 	default:
 	case FM_NORMAL:
-		switch( m_bits )
+		switch( m_config.m_bits )
 		{
 		case 8:
 			{
-				UINT8 *flash_memory = (UINT8 *)m_flash_memory;
-				data = flash_memory[ address ];
+				data = m_addrspace[0]->read_byte(address);
 			}
 			break;
 		case 16:
 			{
-				UINT16 *flash_memory = (UINT16 *)m_flash_memory;
-				data = flash_memory[ address ];
+				data = m_addrspace[0]->read_word(address * 2);
 			}
 			break;
 		}
@@ -309,8 +388,8 @@ UINT32 intelfsh_device::read_full(UINT32 address)
 	case FM_READAMDID3:
 		switch (address)
 		{
-			case 0:	data = m_maker_id; break;
-			case 1: data = m_device_id; break;
+			case 0:	data = m_config.m_maker_id; break;
+			case 1: data = m_config.m_device_id; break;
 			case 2: data = 0; break;
 		}
 		break;
@@ -318,10 +397,10 @@ UINT32 intelfsh_device::read_full(UINT32 address)
 		switch (address)
 		{
 		case 0:	// maker ID
-			data = m_maker_id;
+			data = m_config.m_maker_id;
 			break;
 		case 1:	// chip ID
-			data = m_device_id;
+			data = m_config.m_device_id;
 			break;
 		case 2:	// block lock config
 			data = 0; // we don't support this yet
@@ -342,18 +421,16 @@ UINT32 intelfsh_device::read_full(UINT32 address)
 		// reads outside of the erasing sector return normal data
 		if ((address < m_erase_sector) || (address >= m_erase_sector+(64*1024)))
 		{
-			switch( m_bits )
+			switch( m_config.m_bits )
 			{
 			case 8:
 				{
-					UINT8 *flash_memory = (UINT8 *)m_flash_memory;
-					data = flash_memory[ address ];
+					data = m_addrspace[0]->read_byte(address);
 				}
 				break;
 			case 16:
 				{
-					UINT16 *flash_memory = (UINT16 *)m_flash_memory;
-					data = flash_memory[ address ];
+					data = m_addrspace[0]->read_word(address * 2);
 				}
 				break;
 			}
@@ -506,7 +583,8 @@ void intelfsh_device::write_full(UINT32 address, UINT32 data)
 		if( ( address & 0xfff ) == 0x555 && ( data & 0xff ) == 0x10 )
 		{
 			// chip erase
-			memset( m_flash_memory, 0xff, m_size);
+			for (offs_t offs = 0; offs < m_config.m_size; offs++)
+				m_addrspace[0]->write_byte(offs, 0xff);
 
 			m_status = 1 << 3;
 			m_flash_mode = FM_ERASEAMD4;
@@ -517,42 +595,19 @@ void intelfsh_device::write_full(UINT32 address, UINT32 data)
 		{
 			// sector erase
 			// clear the 4k/64k block containing the current address to all 0xffs
-			switch( m_bits )
+			if (m_config.m_sector_is_4k)
 			{
-			case 8:
-				{
-					UINT8 *flash_memory = (UINT8 *)m_flash_memory;
-					if (m_sector_is_4k)
-					{
-						memset( &flash_memory[ address & ~0xfff ], 0xff, 4 * 1024 );
-						m_erase_sector = address & ~0xfff;
-						timer_adjust_oneshot( m_timer, ATTOTIME_IN_MSEC( 125 ), 0 );
-					}
-					else
-					{
-						memset( &flash_memory[ address & ~0xffff ], 0xff, 64 * 1024 );
-						m_erase_sector = address & ~0xffff;
-						timer_adjust_oneshot( m_timer, ATTOTIME_IN_SEC( 1 ), 0 );
-					}
-				}
-				break;
-			case 16:
-				{
-					UINT16 *flash_memory = (UINT16 *)m_flash_memory;
-					if (m_sector_is_4k)
-					{
-						memset( &flash_memory[ address & ~0x7ff ], 0xff, 4 * 1024 );
-						m_erase_sector = address & ~0x7ff;
-						timer_adjust_oneshot( m_timer, ATTOTIME_IN_MSEC( 125 ), 0 );
-					}
-					else
-					{
-						memset( &flash_memory[ address & ~0x7fff ], 0xff, 64 * 1024 );
-						m_erase_sector = address & ~0x7fff;
-						timer_adjust_oneshot( m_timer, ATTOTIME_IN_SEC( 1 ), 0 );
-					}
-				}
-				break;
+				for (offs_t offs = 0; offs < 4 * 1024; offs++)
+					m_addrspace[0]->write_byte((address & ~0xfff) + offs, 0xff);
+				m_erase_sector = address & ~0xfff;
+				timer_adjust_oneshot( m_timer, ATTOTIME_IN_MSEC( 125 ), 0 );
+			}
+			else
+			{
+				for (offs_t offs = 0; offs < 64 * 1024; offs++)
+					m_addrspace[0]->write_byte((address & ~0xffff) + offs, 0xff);
+				m_erase_sector = address & ~0xffff;
+				timer_adjust_oneshot( m_timer, ATTOTIME_IN_SEC( 1 ), 0 );
 			}
 
 			m_status = 1 << 3;
@@ -564,37 +619,34 @@ void intelfsh_device::write_full(UINT32 address, UINT32 data)
 		}
 		break;
 	case FM_BYTEPROGRAM:
-		switch( m_bits )
+		switch( m_config.m_bits )
 		{
 		case 8:
 			{
-				UINT8 *flash_memory = (UINT8 *)m_flash_memory;
-				flash_memory[ address ] = data;
+				m_addrspace[0]->write_byte(address, data);
 			}
 			break;
 		default:
-			logerror( "FM_BYTEPROGRAM not supported when m_bits == %d\n", m_bits );
+			logerror( "FM_BYTEPROGRAM not supported when m_bits == %d\n", m_config.m_bits );
 			break;
 		}
 		m_flash_mode = FM_NORMAL;
 		break;
 	case FM_WRITEPART1:
-		switch( m_bits )
+		switch( m_config.m_bits )
 		{
 		case 8:
 			{
-				UINT8 *flash_memory = (UINT8 *)m_flash_memory;
-				flash_memory[ address ] = data;
+				m_addrspace[0]->write_byte(address, data);
 			}
 			break;
 		case 16:
 			{
-				UINT16 *flash_memory = (UINT16 *)m_flash_memory;
-				flash_memory[ address ] = data;
+				m_addrspace[0]->write_word(address * 2, data);
 			}
 			break;
 		default:
-			logerror( "FM_WRITEPART1 not supported when m_bits == %d\n", m_bits );
+			logerror( "FM_WRITEPART1 not supported when m_bits == %d\n", m_config.m_bits );
 			break;
 		}
 		m_status = 0x80;
@@ -604,24 +656,9 @@ void intelfsh_device::write_full(UINT32 address, UINT32 data)
 		if( ( data & 0xff ) == 0xd0 )
 		{
 			// clear the 64k block containing the current address to all 0xffs
-			switch( m_bits )
-			{
-			case 8:
-				{
-					UINT8 *flash_memory = (UINT8 *)m_flash_memory;
-					memset( &flash_memory[ address & ~0xffff ], 0xff, 64 * 1024 );
-				}
-				break;
-			case 16:
-				{
-					UINT16 *flash_memory = (UINT16 *)m_flash_memory;
-					memset( &flash_memory[ address & ~0x7fff ], 0xff, 64 * 1024 );
-				}
-				break;
-			default:
-				logerror( "FM_CLEARPART1 not supported when m_bits == %d\n", m_bits );
-				break;
-			}
+			for (offs_t offs = 0; offs < 64 * 1024; offs++)
+				m_addrspace[0]->write_byte((address & ~0xffff) + offs, 0xff);
+
 			m_status = 0x00;
 			m_flash_mode = FM_READSTATUS;
 

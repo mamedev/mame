@@ -55,6 +55,7 @@ class intelfsh_device;
 // ======================> intelfsh_device_config
 
 class intelfsh_device_config :	public device_config,
+								public device_config_memory_interface,
 								public device_config_nvram_interface
 {
 	friend class intelfsh_device;
@@ -82,14 +83,24 @@ protected:
 	// construction/destruction
 	intelfsh_device_config(const machine_config &mconfig, device_type type, const char *name, const char *tag, const device_config *owner, UINT32 clock, UINT32 variant);
 
+	// device_config_memory_interface overrides
+	virtual const address_space_config *memory_space_config(int spacenum = 0) const;
+
 	// internal state
-	UINT32	 		m_type;
+	address_space_config	m_space_config;
+	UINT32		 			m_type;
+	INT32 					m_size;
+	UINT8 					m_bits;
+	UINT8 					m_device_id;
+	UINT8 					m_maker_id;
+	bool 					m_sector_is_4k;
 };
 
 
 // ======================> intelfsh_device
 
 class intelfsh_device :	public device_t,
+						public device_memory_interface,
 						public device_nvram_interface
 {
 	friend class intelfsh_device_config;
@@ -98,16 +109,12 @@ protected:
 	// construction/destruction
 	intelfsh_device(running_machine &_machine, const intelfsh_device_config &config);
 
-public:
-	// helpers
-	void *memory() const { return m_flash_memory; }
-
 protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_timer(emu_timer &timer, int param, void *ptr);
 
-	// device_intelfsh_interface overrides
+	// device_config_nvram_interface overrides
 	virtual void nvram_default();
 	virtual void nvram_read(mame_file &file);
 	virtual void nvram_write(mame_file &file);
@@ -119,17 +126,11 @@ protected:
 	// internal state
 	const intelfsh_device_config &	m_config;
 
-	INT32 		m_size;
-	UINT8 		m_bits;
-	UINT8 		m_status;
-	INT32 		m_erase_sector;
-	bool 		m_sector_is_4k;
-	INT32 		m_flash_mode;
-	bool 		m_flash_master_lock;
-	UINT8 		m_device_id;
-	UINT8 		m_maker_id;
-	emu_timer *	m_timer;
-	void *		m_flash_memory;
+	UINT8 						m_status;
+	INT32 						m_erase_sector;
+	INT32 						m_flash_mode;
+	bool 						m_flash_master_lock;
+	emu_timer *					m_timer;
 };
 
 
@@ -166,6 +167,9 @@ public:
 	// public interface
 	UINT8 read(offs_t offset) { return read_full(offset); }
 	void write(offs_t offset, UINT8 data) { write_full(offset, data); }
+	
+	UINT8 read_raw(offs_t offset) { return m_addrspace[0]->read_byte(offset); }
+	void write_raw(offs_t offset, UINT8 data) { m_addrspace[0]->write_byte(offset, data); }
 };
 
 
@@ -199,6 +203,9 @@ public:
 	// public interface
 	UINT16 read(offs_t offset) { return read_full(offset); }
 	void write(offs_t offset, UINT16 data) { write_full(offset, data); }
+	
+	UINT16 read_raw(offs_t offset) { return m_addrspace[0]->read_word(offset * 2); }
+	void write_raw(offs_t offset, UINT16 data) { m_addrspace[0]->write_word(offset * 2, data); }
 };
 
 

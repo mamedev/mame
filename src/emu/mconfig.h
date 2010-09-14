@@ -114,7 +114,7 @@ typedef void   (*memcard_handler_func)(running_machine *machine, mame_file *file
 
 
 
-// ======================> address_map_entry
+// ======================> machine_config
 
 // machine configuration definition
 class machine_config

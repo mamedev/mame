@@ -485,6 +485,111 @@ protected:
 	UINT32					m_unscaled_clock;		// unscaled clock
 	double					m_clock_scale;			// clock scale factor
 	attoseconds_t			m_attoseconds_per_clock;// period in attoseconds
+
+	// helper class to request auto-object discovery in the constructor of a derived class
+	class auto_finder_base
+	{
+	public:
+		// construction/destruction
+		auto_finder_base(device_t &base, const char *tag);
+		virtual ~auto_finder_base();
+
+		// getters
+		virtual void findit(device_t &base) = 0;
+		
+		// helpers
+		device_t *find_device(device_t &device, const char *tag);
+		void *find_shared_ptr(device_t &device, const char *tag);
+		size_t find_shared_size(device_t &device, const char *tag);
+	
+		// internal state
+		auto_finder_base *m_next;
+		const char *m_tag;
+	};
+
+	// templated version bound to a specific type
+	template<typename _TargetType, bool _Required>
+	class auto_finder_type : public auto_finder_base
+	{
+	public:
+		// construction/destruction
+		auto_finder_type(device_t &base, const char *tag) 
+			: auto_finder_base(base, tag), 
+			  m_target(0) { }
+
+		// operators to make use transparent
+		operator _TargetType() { return m_target; }
+		operator _TargetType() const { return m_target; }
+		_TargetType operator->() { return m_target; }
+
+		// setter for setting the object
+		void set_target(_TargetType target)
+		{
+			m_target = target;
+			if (target == 0 && _Required)
+				throw emu_fatalerror("Unable to find required object '%s'", this->m_tag);
+		}
+
+		// internal state
+		_TargetType m_target;
+	};
+	
+	// optional device finder
+	template<class _DeviceClass>
+	class optional_device : public auto_finder_type<_DeviceClass *, false>
+	{
+	public:
+		optional_device(device_t &base, const char *tag) : auto_finder_type<_DeviceClass *, false>(base, tag) { }
+		virtual void findit(device_t &base) { set_target(downcast<_DeviceClass *>(find_device(base, this->m_tag))); }
+	};
+	
+	// required devices are similar but throw an error if they are not found
+	template<class _DeviceClass>
+	class required_device : public auto_finder_type<_DeviceClass *, true>
+	{
+	public:
+		required_device(device_t &base, const char *tag) : auto_finder_type<_DeviceClass *, true>(base, tag) { }
+		virtual void findit(device_t &base) { set_target(downcast<_DeviceClass *>(find_device(base, this->m_tag))); }
+	};
+	
+	// optional shared pointer finder
+	template<typename _PointerType>
+	class optional_shared_ptr : public auto_finder_type<_PointerType *, false>
+	{
+	public:
+		optional_shared_ptr(device_t &base, const char *tag) : auto_finder_type<_PointerType *, false>(base, tag) { }
+		virtual void findit(device_t &base) { set_target(reinterpret_cast<_PointerType *>(find_shared_ptr(base, this->m_tag))); }
+	};
+	
+	// required shared pointer finder
+	template<typename _PointerType>
+	class required_shared_ptr : public auto_finder_type<_PointerType *, true>
+	{
+	public:
+		required_shared_ptr(device_t &base, const char *tag) : auto_finder_type<_PointerType *, true>(base, tag) { }
+		virtual void findit(device_t &base) { set_target(reinterpret_cast<_PointerType *>(find_shared_ptr(base, this->m_tag))); }
+	};
+	
+	// optional shared pointer size finder
+	class optional_shared_size : public auto_finder_type<size_t, false>
+	{
+	public:
+		optional_shared_size(device_t &base, const char *tag) : auto_finder_type<size_t, false>(base, tag) { }
+		virtual void findit(device_t &base) { set_target(find_shared_size(base, this->m_tag)); }
+	};
+	
+	// required shared pointer size finder
+	class required_shared_size : public auto_finder_type<size_t, true>
+	{
+	public:
+		required_shared_size(device_t &base, const char *tag) : auto_finder_type<size_t, true>(base, tag) { }
+		virtual void findit(device_t &base) { set_target(find_shared_size(base, this->m_tag)); }
+	};
+	
+	// internal helpers
+	void register_auto_finder(auto_finder_base &autodev);
+
+	auto_finder_base *		m_auto_finder_list;
 };
 
 
