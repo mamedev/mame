@@ -619,10 +619,10 @@ static void draw_row(running_machine *machine, bitmap_t *bitmap, const rectangle
 	int y, y1, sy1, flipy, ynum, ystart, yend, yinc;
 	UINT16 *s3;
 
-	xnum	=		0x20;		// width in tiles (screen-wide)
-	ynum	=		0x8;		// height in tiles (always 64 pixels?)
+	xnum = 0x20;		// width in tiles (screen-wide)
+	ynum = 0x8;			// height in tiles (always 64 pixels?)
 
-	scroll	&=		0x7;		// scroll register index
+	scroll &= 0x7;		// scroll register index
 
 	/* Sign extend the position */
 	sx = 0;
@@ -650,38 +650,38 @@ static void draw_row(running_machine *machine, bitmap_t *bitmap, const rectangle
 	if (clip.max_y > cliprect->max_y)	clip.max_y = cliprect->max_y;
 
 	/* Get the scroll data */
-
 	x    = ssv_scroll[ scroll * 4 + 0 ];	// x scroll
 	y    = ssv_scroll[ scroll * 4 + 1 ];	// y scroll
 	//     ssv_scroll[ scroll * 4 + 2 ];	// ???
 	mode = ssv_scroll[ scroll * 4 + 3 ];	// layer disabled, shadow, depth etc.
 
 	/* Background layer disabled */
-	if ((mode & 0xf000) == 0)
+	if ((mode & 0xe000) == 0)
 		return;
 
-	shadow	=	(mode & 0x0800);
+	shadow = (mode & 0x0800);
 
-	/* Decide the actual size of the tilemap. $200 and $400 pixels
-       are the only values actually used AFAIK */
+	/* Decide the actual size of the tilemap */
 	size	=	1 << (8 + ((mode & 0xe000) >> 13));
 	page	=	(x & 0x7fff) / size;
 
-	/* Given a fixed scroll value, the portion of tilemap displayed changes
-       with the sprite position */
-	x	+=	sx;
-	y	+=	sy;
+	/* Given a fixed scroll value, the portion of tilemap displayed changes with the sprite position */
+	x += sx;
+	y += sy;
 
-	/* Tweak the scroll values (game specific) */
+	/* Tweak the scroll values */
 	// x += 0;
 	y    += ((ssv_scroll[0x70/2] & 0x1ff) - (ssv_scroll[0x70/2] & 0x200) + ssv_scroll[0x6a/2] + 2);
 
-	/* Draw the rows */
+	// Kludge for eaglshot
+	if ((ssv_scroll[ scroll * 4 + 2 ] & 0x05ff) == 0x0440) x += -0x10;
+	if ((ssv_scroll[ scroll * 4 + 2 ] & 0x05ff) == 0x0401) x += -0x20;
 
-	x1	=	x;
-	y1	=	y;
-	sx1	=	sx - (x & 0xf);
-	sy1	=	sy - (y & 0xf);
+	/* Draw the rows */
+	x1  = x;
+	y1  = y;
+	sx1 = sx - (x & 0xf);
+	sy1 = sy - (y & 0xf);
 
 	for (sx=sx1,x=x1; sx <= clip.max_x; sx+=0x10,x+=0x10)
 	{
