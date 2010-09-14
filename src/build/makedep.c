@@ -399,7 +399,6 @@ static file_entry *compute_dependencies(int srcrootlen, const astring *srcfile)
 	UINT32 filelength;
 	file_entry *file;
 	char *filedata;
-	int found = 0;
 	int index;
 	
 	/* see if we already have an entry */
