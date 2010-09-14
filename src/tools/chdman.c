@@ -1740,6 +1740,19 @@ static int do_extractcd(int argc, char *argv[], int param)
 			/* read the raw data */
 			cdrom_read_data(cdrom, cdrom_get_track_start(cdrom, track) + frame, sector, toc->tracks[track].trktype);
 
+			/* for CDRWin, audio tracks must be reversed */
+			if ((cuemode) && (toc->tracks[track].trktype == CD_TRACK_AUDIO))
+			{
+				int swapindex;
+
+				for (swapindex = 0; swapindex < toc->tracks[track].datasize; swapindex += 2)
+				{
+					UINT8 swaptemp = sector[swapindex];
+					sector[swapindex] = sector[swapindex+1];
+					sector[swapindex + 1] = swaptemp;
+				}
+			}
+
 			/* write it out */
 			core_fseek(outfile2, out2offs, SEEK_SET);
 			byteswritten = core_fwrite(outfile2, sector, toc->tracks[track].datasize);
