@@ -7,6 +7,7 @@ docs/windows.txt svneol=native#text/plain
 /makefile svneol=native#text/plain
 src/build/build.mak svneol=native#text/plain
 src/build/file2str.c svneol=native#text/plain
+src/build/makedep.c svneol=native#text/plain
 src/build/png2bdc.c svneol=native#text/plain
 src/build/verinfo.c svneol=native#text/plain
 src/emu/addrmap.c svneol=native#text/plain
