@@ -388,7 +388,7 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc *outtoc, chdcd_track_i
 	/* now go over the files again and set the lengths */
 	for (trknum = 0; trknum < outtoc->numtrks; trknum++)
 	{
-		UINT64 tlen;
+		UINT64 tlen = 0;
 
 		if (outtoc->tracks[trknum].trktype == CD_TRACK_AUDIO)
 		{
@@ -402,12 +402,22 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc *outtoc, chdcd_track_i
 			if (!strcmp(&outinfo->fname[trknum][0], &outinfo->fname[trknum-1][0]))
 			{
 				tlen = get_file_size(outinfo->fname[trknum]);
+				if (tlen == 0)
+				{
+					printf("ERROR: couldn't find bin file [%s]\n", outinfo->fname[trknum-1]);
+					return CHDERR_FILE_NOT_FOUND;
+				}
 				outinfo->offset[trknum] = outinfo->offset[trknum-1] + outtoc->tracks[trknum-1].frames * (outtoc->tracks[trknum-1].datasize + outtoc->tracks[trknum-1].subsize);
 				outtoc->tracks[trknum].frames = (tlen - outinfo->offset[trknum]) / (outtoc->tracks[trknum].datasize + outtoc->tracks[trknum].subsize);
 			}
 			else	/* data files are different */
 			{
 				tlen = get_file_size(outinfo->fname[trknum]);
+				if (tlen == 0)
+				{
+					printf("ERROR: couldn't find bin file [%s]\n", outinfo->fname[trknum-1]);
+					return CHDERR_FILE_NOT_FOUND;
+				}
 				tlen /= (outtoc->tracks[trknum].datasize + outtoc->tracks[trknum].subsize);
 				outtoc->tracks[trknum].frames = tlen;
 				outinfo->offset[trknum] = 0;
@@ -437,7 +447,12 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc *outtoc, chdcd_track_i
 			}
 			else	/* data files are different */
 			{
-				tlen = get_file_size(outinfo->fname[trknum]);
+				tlen = get_file_size(outinfo->fname[trknum-1]);
+				if (tlen == 0)
+				{
+					printf("ERROR: couldn't find bin file [%s]\n", outinfo->fname[trknum-1]);
+					return CHDERR_FILE_NOT_FOUND;
+				}
 				tlen /= (outtoc->tracks[trknum].datasize + outtoc->tracks[trknum].subsize);
 				outtoc->tracks[trknum].frames = tlen;
 				outinfo->offset[trknum] = 0;
