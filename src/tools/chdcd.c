@@ -13,6 +13,7 @@
 #include "osdcore.h"
 #include "chd.h"
 #include "chdcd.h"
+#include "corefile.h"
 
 
 
@@ -49,6 +50,7 @@ static UINT64 get_file_size(const char *filename)
 	filerr = osd_open(filename, OPEN_FLAG_READ, &file, &filesize);
 	if (filerr == FILERR_NONE)
 		osd_close(file);
+
 	return filesize;
 }
 
@@ -120,6 +122,136 @@ static int msf_to_frames( char *token )
 
 	return f;
 }
+
+/*-------------------------------------------------
+    parse_wav_sample - takes a .WAV file, verifies 
+    that the file is 16 bits, and returns the 
+    length in bytes of the data and the offset in
+    bytes to where the data starts in the file.
+-------------------------------------------------*/
+static UINT32 parse_wav_sample(char *filename, UINT32 *dataoffs)
+{
+	unsigned long offset = 0;
+	UINT32 length, rate, filesize;
+	UINT16 bits, temp16;
+	char buf[32];
+	osd_file *file;
+	file_error filerr;
+	UINT64 fsize = 0;
+	UINT32 actual;
+
+	filerr = osd_open(filename, OPEN_FLAG_READ, &file, &fsize);
+	if (filerr != FILERR_NONE)
+	{
+		osd_close(file);
+		return 0;
+	}
+
+	/* read the core header and make sure it's a WAVE file */
+	osd_read(file, buf, 0, 4, &actual);
+	offset += actual;
+	if (offset < 4)
+		return 0;
+	if (memcmp(&buf[0], "RIFF", 4) != 0)
+		return 0;
+
+	/* get the total size */
+	osd_read(file, &filesize, offset, 4, &actual);
+	offset += actual;
+	if (offset < 8)
+		return 0;
+	filesize = LITTLE_ENDIANIZE_INT32(filesize);
+
+	/* read the RIFF file type and make sure it's a WAVE file */
+	osd_read(file, buf, offset, 4, &actual);
+	offset += actual;
+	if (offset < 12)
+		return 0;
+	if (memcmp(&buf[0], "WAVE", 4) != 0)
+		return 0;
+
+	/* seek until we find a format tag */
+	while (1)
+	{
+		osd_read(file, buf, offset, 4, &actual);
+		offset += actual;
+		osd_read(file, &length, offset, 4, &actual);
+		offset += actual;
+		length = LITTLE_ENDIANIZE_INT32(length);
+		if (memcmp(&buf[0], "fmt ", 4) == 0)
+			break;
+
+		/* seek to the next block */
+		offset += length;
+		if (offset >= filesize)
+			return 0;
+	}
+
+	/* read the format -- make sure it is PCM */
+	osd_read(file, &temp16, offset, 2, &actual);
+	offset += actual;
+	temp16 = LITTLE_ENDIANIZE_INT16(temp16);
+	if (temp16 != 1)
+		return 0;
+
+	/* number of channels -- only mono is supported */
+	osd_read(file, &temp16, offset, 2, &actual);
+	offset += actual;
+	temp16 = LITTLE_ENDIANIZE_INT16(temp16);
+	if (temp16 != 2)
+		return 0;
+
+	/* sample rate */
+	osd_read(file, &rate, offset, 4, &actual);
+	offset += actual;
+	rate = LITTLE_ENDIANIZE_INT32(rate);
+	if (rate != 44100)
+		return 0;
+
+	/* bytes/second and block alignment are ignored */
+	osd_read(file, buf, offset, 6, &actual);
+	offset += actual;
+
+	/* bits/sample */
+	osd_read(file, &bits, offset, 2, &actual);
+	offset += actual;
+	if (bits != 16)
+		return 0;
+
+	/* seek past any extra data */
+	offset += length - 16;
+
+	/* seek until we find a data tag */
+	while (1)
+	{
+		osd_read(file, buf, offset, 4, &actual);
+		offset += actual;
+		osd_read(file, &length, offset, 4, &actual);
+		offset += actual;
+		length = LITTLE_ENDIANIZE_INT32(length);
+		if (memcmp(&buf[0], "data", 4) == 0)
+			break;
+
+		/* seek to the next block */
+		offset += length;
+		if (offset >= filesize)
+			return 0;
+	}
+
+	/* if there was a 0 length data block, we're done */
+	if (length == 0)
+		return 0;
+
+	osd_close(file);
+
+	*dataoffs = offset;
+
+	return length;
+}
+
+/*-------------------------------------------------
+    chdcd_parse_gdi - parse a Sega GD-ROM rip
+-------------------------------------------------*/
 
 static chd_error chdcd_parse_gdi(const char *tocfname, cdrom_toc *outtoc, chdcd_track_input_info *outinfo)
 {
@@ -241,6 +373,7 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc *outtoc, chdcd_track_i
 	int i, trknum;
 	static char token[128];
 	static char lastfname[128];
+	UINT32 wavlen, wavoffs;
 
 	infile = fopen(tocfname, "rt");
 
@@ -254,6 +387,7 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc *outtoc, chdcd_track_i
 	memset(outinfo, 0, sizeof(chdcd_track_input_info));
 
 	trknum = -1;
+	wavoffs = wavlen = 0;
 
 	while (!feof(infile))
 	{
@@ -273,7 +407,6 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc *outtoc, chdcd_track_i
 				TOKENIZE
 
 				/* keep the filename */
-				strncpy(&outinfo->fname[trknum][0], token, strlen(token));
 				strncpy(lastfname, token, 128);
 
 				/* get the file type */
@@ -286,6 +419,22 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc *outtoc, chdcd_track_i
 				else if (!strcmp(token, "MOTOROLA"))
 				{
 					outinfo->swap[trknum] = 1;
+				}
+				else if (!strcmp(token, "WAVE"))
+				{
+					wavlen = parse_wav_sample(lastfname, &wavoffs);
+					if (!wavlen)
+					{
+						file_error err;
+						core_file *fhand;
+
+						err = core_fopen(lastfname, OPEN_FLAG_READ, &fhand);
+						if (err != FILERR_NONE) printf("holy shit!\n");
+						else core_fclose(fhand);
+
+						printf("ERROR: couldn't read [%s] or not a valid .WAV\n", lastfname);
+						return CHDERR_FILE_NOT_FOUND;
+					}
 				}
 				else
 				{
@@ -302,28 +451,32 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc *outtoc, chdcd_track_i
 				/* next token on the line is the track type */
 				TOKENIZE
 
-				outtoc->tracks[trknum].trktype = CD_TRACK_MODE1;
-				outtoc->tracks[trknum].datasize = 0;
+				if (wavlen != 0)
+				{
+					outtoc->tracks[trknum].trktype = CD_TRACK_AUDIO;
+					outtoc->tracks[trknum].frames = wavlen/2352;
+					outinfo->offset[trknum] = wavoffs;
+					wavoffs = wavlen = 0;
+				}
+				else
+				{
+					outtoc->tracks[trknum].trktype = CD_TRACK_MODE1;
+					outtoc->tracks[trknum].datasize = 0;
+					outinfo->offset[trknum] = 0;
+				}
 				outtoc->tracks[trknum].subtype = CD_SUB_NONE;
 				outtoc->tracks[trknum].subsize = 0;
 				outtoc->tracks[trknum].pregap = 0;
 				outinfo->idx0offs[trknum] = -1;
 				outinfo->idx1offs[trknum] = 0;
 				strcpy(&outinfo->fname[trknum][0], lastfname);	// default filename to the last one
-//				printf("trk %d: fname %s\n", trknum+1, &outinfo->fname[trknum][0]);
+//				printf("trk %d: fname %s offset %d\n", trknum, &outinfo->fname[trknum][0], outinfo->offset[trknum]);
 
 				cdrom_convert_type_string_to_track_info(token, &outtoc->tracks[trknum]);
 				if (outtoc->tracks[trknum].datasize == 0)
 				{
 					printf("ERROR: Unknown track type [%s].  Contact MAMEDEV.\n", token);
 					return CHDERR_FILE_NOT_FOUND;
-				}
-				else if (outtoc->tracks[trknum].trktype != CD_TRACK_MODE1_RAW &&
-					outtoc->tracks[trknum].trktype != CD_TRACK_MODE2_RAW &&
-					outtoc->tracks[trknum].trktype != CD_TRACK_AUDIO)
-				{
-					printf("Note: MAME prefers and can accept RAW format images.\n");
-					printf("At least one track of this rip is not either RAW or AUDIO.\n");
 				}
 
 				/* next (optional) token on the line is the subcode type */
@@ -379,7 +532,7 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc *outtoc, chdcd_track_i
 		}
 	}
 
-	/* close the input CUE */
+ 	/* close the input CUE */
 	fclose(infile);
 
 	/* store the number of tracks found */
@@ -390,75 +543,80 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc *outtoc, chdcd_track_i
 	{
 		UINT64 tlen = 0;
 
+		// this is true for cue/bin and cue/iso, and we need it for cue/wav since .WAV is little-endian
 		if (outtoc->tracks[trknum].trktype == CD_TRACK_AUDIO)
 		{
 			outinfo->swap[trknum] = 1;
 		}
 
-		// is this the last track?
-		if (trknum == (outtoc->numtrks-1))
+		// don't do this for .WAV tracks, we already have their length and offset filled out
+		if (outinfo->offset[trknum] == 0)
 		{
-			/* if we have the same filename as the last track, do it that way */
-			if (!strcmp(&outinfo->fname[trknum][0], &outinfo->fname[trknum-1][0]))
+			// is this the last track?
+			if (trknum == (outtoc->numtrks-1))
 			{
-				tlen = get_file_size(outinfo->fname[trknum]);
-				if (tlen == 0)
+				/* if we have the same filename as the last track, do it that way */
+				if (!strcmp(&outinfo->fname[trknum][0], &outinfo->fname[trknum-1][0]))
 				{
-					printf("ERROR: couldn't find bin file [%s]\n", outinfo->fname[trknum-1]);
-					return CHDERR_FILE_NOT_FOUND;
+					tlen = get_file_size(outinfo->fname[trknum]);
+					if (tlen == 0)
+					{
+						printf("ERROR: couldn't find bin file [%s]\n", outinfo->fname[trknum-1]);
+						return CHDERR_FILE_NOT_FOUND;
+					}
+					outinfo->offset[trknum] = outinfo->offset[trknum-1] + outtoc->tracks[trknum-1].frames * (outtoc->tracks[trknum-1].datasize + outtoc->tracks[trknum-1].subsize);
+					outtoc->tracks[trknum].frames = (tlen - outinfo->offset[trknum]) / (outtoc->tracks[trknum].datasize + outtoc->tracks[trknum].subsize);
 				}
-				outinfo->offset[trknum] = outinfo->offset[trknum-1] + outtoc->tracks[trknum-1].frames * (outtoc->tracks[trknum-1].datasize + outtoc->tracks[trknum-1].subsize);
-				outtoc->tracks[trknum].frames = (tlen - outinfo->offset[trknum]) / (outtoc->tracks[trknum].datasize + outtoc->tracks[trknum].subsize);
-			}
-			else	/* data files are different */
-			{
-				tlen = get_file_size(outinfo->fname[trknum]);
-				if (tlen == 0)
+				else	/* data files are different */
 				{
-					printf("ERROR: couldn't find bin file [%s]\n", outinfo->fname[trknum-1]);
-					return CHDERR_FILE_NOT_FOUND;
-				}
-				tlen /= (outtoc->tracks[trknum].datasize + outtoc->tracks[trknum].subsize);
-				outtoc->tracks[trknum].frames = tlen;
-				outinfo->offset[trknum] = 0;
-			}
-		}
-		else
-		{
-			/* if we have the same filename as the next track, do it that way */
-			if (!strcmp(&outinfo->fname[trknum][0], &outinfo->fname[trknum+1][0]))
-			{
-				outtoc->tracks[trknum].frames = outinfo->idx1offs[trknum+1] - outinfo->idx1offs[trknum];
-
-				if (trknum == 0)	// track 0 offset is 0
-				{
+					tlen = get_file_size(outinfo->fname[trknum]);
+					if (tlen == 0)
+					{
+						printf("ERROR: couldn't find bin file [%s]\n", outinfo->fname[trknum-1]);
+						return CHDERR_FILE_NOT_FOUND;
+					}
+					tlen /= (outtoc->tracks[trknum].datasize + outtoc->tracks[trknum].subsize);
+					outtoc->tracks[trknum].frames = tlen;
 					outinfo->offset[trknum] = 0;
 				}
-				else
-				{
-					outinfo->offset[trknum] = outinfo->offset[trknum-1] + outtoc->tracks[trknum-1].frames * (outtoc->tracks[trknum-1].datasize + outtoc->tracks[trknum-1].subsize); 
-				}
-
-				if (!outtoc->tracks[trknum].frames)
-				{
-					printf("ERROR: unable to determine size of track %d, missing INDEX 01 markers?\n", trknum+1);
-					return CHDERR_FILE_NOT_FOUND;
-				}
 			}
-			else	/* data files are different */
+			else
 			{
-				tlen = get_file_size(outinfo->fname[trknum-1]);
-				if (tlen == 0)
+				/* if we have the same filename as the next track, do it that way */
+				if (!strcmp(&outinfo->fname[trknum][0], &outinfo->fname[trknum+1][0]))
 				{
-					printf("ERROR: couldn't find bin file [%s]\n", outinfo->fname[trknum-1]);
-					return CHDERR_FILE_NOT_FOUND;
+					outtoc->tracks[trknum].frames = outinfo->idx1offs[trknum+1] - outinfo->idx1offs[trknum];
+
+					if (trknum == 0)	// track 0 offset is 0
+					{
+						outinfo->offset[trknum] = 0;
+					}
+					else
+					{
+						outinfo->offset[trknum] = outinfo->offset[trknum-1] + outtoc->tracks[trknum-1].frames * (outtoc->tracks[trknum-1].datasize + outtoc->tracks[trknum-1].subsize); 
+					}
+
+					if (!outtoc->tracks[trknum].frames)
+					{
+						printf("ERROR: unable to determine size of track %d, missing INDEX 01 markers?\n", trknum+1);
+						return CHDERR_FILE_NOT_FOUND;
+					}
 				}
-				tlen /= (outtoc->tracks[trknum].datasize + outtoc->tracks[trknum].subsize);
-				outtoc->tracks[trknum].frames = tlen;
-				outinfo->offset[trknum] = 0;
+				else	/* data files are different */
+				{
+					tlen = get_file_size(outinfo->fname[trknum]);
+					if (tlen == 0)
+					{
+						printf("ERROR: couldn't find bin file [%s]\n", outinfo->fname[trknum]);
+						return CHDERR_FILE_NOT_FOUND;
+					}
+					tlen /= (outtoc->tracks[trknum].datasize + outtoc->tracks[trknum].subsize);
+					outtoc->tracks[trknum].frames = tlen;
+					outinfo->offset[trknum] = 0;
+				}
 			}
 		}
-//		printf("trk %d: %d frames @ offset %d\n", trknum+1, outtoc->tracks[trknum].frames, outinfo->offset[trknum]);
+		printf("trk %d: %d frames @ offset %d\n", trknum+1, outtoc->tracks[trknum].frames, outinfo->offset[trknum]);
 	}
 
 	return CHDERR_NONE;
@@ -603,13 +761,6 @@ chd_error chdcd_parse_toc(const char *tocfname, cdrom_toc *outtoc, chdcd_track_i
 				{
 					printf("ERROR: Unknown track type [%s].  Contact MAMEDEV.\n", token);
 					return CHDERR_FILE_NOT_FOUND;
-				}
-				else if (outtoc->tracks[trknum].trktype != CD_TRACK_MODE1_RAW &&
-					outtoc->tracks[trknum].trktype != CD_TRACK_MODE2_RAW &&
-					outtoc->tracks[trknum].trktype != CD_TRACK_AUDIO)
-				{
-					printf("Note: MAME prefers and can accept RAW format images.\n");
-					printf("At least one track of this rip is not either RAW or AUDIO.\n");
 				}
 
 				/* next (optional) token on the line is the subcode type */
