@@ -4374,7 +4374,7 @@ void handler_entry::configure_subunits(UINT64 handlermask, int handlerbits)
 	// compute the maximum possible subunits
 	int maxunits = m_datawidth / handlerbits;
 	assert(maxunits > 1);
-	assert(maxunits < ARRAY_LENGTH(m_subshift));
+	assert(maxunits <= ARRAY_LENGTH(m_subshift));
 
 	// walk the handlermask to find out how many we have
 	m_subunits = 0;
