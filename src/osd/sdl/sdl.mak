@@ -161,7 +161,7 @@ endif
 
 ifeq ($(TARGETOS),macosx)
 BASE_TARGETOS = macosx
-DEFS += -DSDLMAME_UNIX -DSDLMAME_MACOSX
+DEFS += -DSDLMAME_UNIX -DSDLMAME_MACOSX -DSDLMAME_DARWIN
 DEBUGOBJS = $(SDLOBJ)/debugosx.o
 SYNC_IMPLEMENTATION = ntc
 SDLMAIN = $(SDLOBJ)/SDLMain_tmpl.o
@@ -208,8 +208,8 @@ else
 DEBUGOBJS = $(SDLOBJ)/debugwin.o $(SDLOBJ)/dview.o $(SDLOBJ)/debug-sup.o $(SDLOBJ)/debug-intf.o
 LIBS += -lgtk-win32-2.0 -lgdk-win32-2.0 -lgmodule-2.0 -lglib-2.0 -lgobject-2.0 \
 	-lpango-1.0 -latk-1.0 -lgdk_pixbuf-2.0
-CCOMFLAGS += -mms-bitfields \
-	-I$(GTK_INSTALL_ROOT)/include/gtk-2.0 -I$(GTK_INSTALL_ROOT)/include/glib-2.0 \
+CCOMFLAGS += -mms-bitfields
+INCPATH += -I$(GTK_INSTALL_ROOT)/include/gtk-2.0 -I$(GTK_INSTALL_ROOT)/include/glib-2.0 \
 	-I$(GTK_INSTALL_ROOT)/include/cairo -I$(GTK_INSTALL_ROOT)/include/pango-1.0 \
 	-I$(GTK_INSTALL_ROOT)/include/atk-1.0 \
 	-I$(GTK_INSTALL_ROOT)/lib/glib-2.0/include -I$(GTK_INSTALL_ROOT)/lib/gtk-2.0/include
@@ -289,10 +289,10 @@ DEFS += "-DSDLMAME_ARCH=$(ARCHOPTS)" -DSYNC_IMPLEMENTATION=$(SYNC_IMPLEMENTATION
 OSDCLEAN = sdlclean
 
 # add the debugger includes
-CCOMFLAGS += -Isrc/debug
+INCPATH += -Isrc/debug
 
 # add the prefix file
-CCOMFLAGS += -include $(SDLSRC)/sdlprefix.h
+INCPATH += -include $(SDLSRC)/sdlprefix.h
 
 #-------------------------------------------------
 # BASE_TARGETOS specific configurations
@@ -337,10 +337,11 @@ endif
 endif
 
 ifndef SDL_INSTALL_ROOT
-CCOMFLAGS += `sdl-config --cflags`
+INCPATH += `sdl-config --cflags`
 LIBS += -lm `sdl-config --libs`
 else
-CCOMFLAGS += -I$(SDL_INSTALL_ROOT)/include -D_GNU_SOURCE=1
+INCPATH += -I$(SDL_INSTALL_ROOT)/include 
+CCOMFLAGS += -D_GNU_SOURCE=1
 LIBS += -lm -L$(SDL_INSTALL_ROOT)/lib -Wl,-rpath,$(SDL_INSTALL_ROOT)/lib -lSDL
 endif
 
@@ -357,7 +358,7 @@ ifeq ($(BASE_TARGETOS),win32)
 OSDCOREOBJS += $(SDLMAIN)
 
 ifdef SDL_INSTALL_ROOT
-CCOMFLAGS += -I$(SDL_INSTALL_ROOT)/include
+INCPATH += -I$(SDL_INSTALL_ROOT)/include
 LIBS += -L$(SDL_INSTALL_ROOT)/lib
 #-Wl,-rpath,$(SDL_INSTALL_ROOT)/lib
 endif
@@ -387,7 +388,8 @@ else
 # Remove the "/SDL" component from the include path so that we can compile
 # files (header files are #include "SDL/something.h", so the extra "/SDL"
 # causes a significant problem)
-CCOMFLAGS += `sdl-config --cflags | sed 's:/SDL::'` -DNO_SDL_GLEXT
+INCPATH += `sdl-config --cflags | sed 's:/SDL::'` 
+CCOMFLAGS += -DNO_SDL_GLEXT
 # Remove libSDLmain, as its symbols conflict with SDLMain_tmpl.m
 LIBS += `sdl-config --libs | sed 's/-lSDLmain//'` -lpthread
 endif
@@ -400,7 +402,7 @@ endif	# Mac OS X
 
 ifeq ($(BASE_TARGETOS),os2)
 
-CCOMFLAGS += `sdl-config --cflags`
+INCPATH += `sdl-config --cflags`
 LIBS += `sdl-config --libs`
 
 endif # OS2
@@ -437,7 +439,7 @@ ifneq ($(USE_DISPATCH_GL),1)
 ifdef MESA_INSTALL_ROOT
 LIBS += -L$(MESA_INSTALL_ROOT)/lib
 LDFLAGS += -Wl,-rpath=$(MESA_INSTALL_ROOT)/lib
-CCOMFLAGS += -I$(MESA_INSTALL_ROOT)/include
+INCPATH += -I$(MESA_INSTALL_ROOT)/include
 endif
 endif
 
@@ -454,14 +456,15 @@ LIBS += -lX11 -lXinerama
 
 # the new debugger relies on GTK+ in addition to the base SDLMAME needs
 # Non-X11 builds can not use the debugger
-CCOMFLAGS += `pkg-config --cflags gtk+-2.0` `pkg-config --cflags gconf-2.0`
+INCPATH += `pkg-config --cflags-only-I gtk+-2.0` `pkg-config --cflags-only-I gconf-2.0`
+CCOMFLAGS += `pkg-config --cflags-only-other gtk+-2.0` `pkg-config --cflags-only-other gconf-2.0`
 LIBS += `pkg-config --libs gtk+-2.0` `pkg-config --libs gconf-2.0`
 #CCOMFLAGS += -DGTK_DISABLE_DEPRECATED
 
 # some systems still put important things in a different prefix
 LIBS += -L/usr/X11/lib -L/usr/X11R6/lib -L/usr/openwin/lib
 # make sure we can find X headers
-CCOMFLAGS += -I/usr/X11/include -I/usr/X11R6/include -I/usr/openwin/include
+INCPATH += -I/usr/X11/include -I/usr/X11R6/include -I/usr/openwin/include
 endif # NO_X11
 
 #-------------------------------------------------
@@ -482,7 +485,8 @@ $(OBJ)/emu/video/tms9927.o : CCOMFLAGS += -Wno-error
 endif # solaris
 
 # drawSDL depends on the core software renderer, so make sure it exists
-$(SDLOBJ)/drawsdl.o : $(SRC)/emu/rendersw.c $(SDLSRC)/drawogl.c $(SDLSRC)/texcopy.c
+$(SDLOBJ)/drawsdl.o : $(SRC)/emu/rendersw.c $(SDLSRC)/drawogl.c
+$(SDLOBJ)/drawogl.o : $(SDLSRC)/texcopy.c $(SDLSRC)/texsrc.h
 
 # draw13 depends on blit13.h
 $(SDLOBJ)/draw13.o : $(SDLSRC)/blit13.h
