@@ -38,6 +38,8 @@ void msm5205_playmode_w(running_device *device, int _select);
 
 void msm5205_set_volume(running_device *device,int volume);
 
+void msm5205_change_clock_w(running_device *device, INT32 clock);
+
 DECLARE_LEGACY_SOUND_DEVICE(MSM5205, msm5205);
 
 #endif /* __MSM5205_H__ */
