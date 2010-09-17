@@ -224,6 +224,7 @@ SOUNDS += CDP1864
 SOUNDS += ZSG2
 SOUNDS += MOS656X
 SOUNDS += S2636
+#SOUNDS += ASC
 
 #-------------------------------------------------
 # this is the list of driver libraries that

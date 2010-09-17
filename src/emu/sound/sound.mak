@@ -72,6 +72,15 @@ $(SOUNDOBJ)/discrete.o:	$(SOUNDSRC)/discrete.c \
 						$(SOUNDSRC)/disc_wav.c
 
 
+#-------------------------------------------------
+# Apple custom sound chips
+#-------------------------------------------------
+
+ifneq ($(filter ASC,$(SOUNDS)),)
+SOUNDOBJS += $(SOUNDOBJ)/asc.o
+endif
+
+
 
 #-------------------------------------------------
 # Atari custom sound chips
