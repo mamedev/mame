@@ -101,9 +101,17 @@ const device_type I8257 = i8257_device_config::static_alloc_device_config;
 
 i8257_device::i8257_device(running_machine &_machine, const i8257_device_config &config)
     : device_t(_machine, config),
+      m_mode(0),
+      m_rr(0),
+      m_msb(0),
+      m_drq(0),
+      m_status(0x0f),
       m_config(config)
 {
-
+	memset(m_registers, 0, sizeof(m_registers));
+	memset(m_address, 0, sizeof(m_address));
+	memset(m_count, 0, sizeof(m_count));
+	memset(m_rwmode, 0, sizeof(m_rwmode));
 }
 
 //-------------------------------------------------
@@ -129,9 +137,8 @@ void i8257_device::device_start()
 	}
 
 	/* set initial values */
-	m_status = 0x0f;
-	m_timer = timer_alloc(&m_machine, i8257_timerproc_callback, (void *) this);
-	m_msbflip_timer = timer_alloc(&m_machine, i8257_msbflip_timerproc_callback, (void *) this);
+	m_timer = device_timer_alloc(*this, TIMER_OPERATION);
+	m_msbflip_timer = device_timer_alloc(*this, TIMER_MSBFLIP);
 
 	/* register for state saving */
 	state_save_register_device_item_array(this, 0, m_address);
@@ -243,55 +250,72 @@ int i8257_device::i8257_do_operation(int channel)
 }
 
 
-TIMER_CALLBACK( i8257_device::i8257_timerproc_callback )
+void i8257_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	reinterpret_cast<i8257_device*>(ptr)->i8257_timerproc();
-}
-
-void i8257_device::i8257_timerproc()
-{
-	int i, channel = 0, rr;
-	int done;
-
-	rr = DMA_MODE_ROTPRIO(m_mode) ? m_rr : 0;
-	for (i = 0; i < I8257_NUM_CHANNELS; i++)
+	switch (id)
 	{
-		channel = (i + rr) % I8257_NUM_CHANNELS;
-		if ((m_status & (1 << channel)) == 0)
+		case TIMER_OPERATION:
 		{
-			if (m_mode & m_drq & (1 << channel))
+			int i, channel = 0, rr;
+			int done;
+
+			rr = DMA_MODE_ROTPRIO(m_mode) ? m_rr : 0;
+			for (i = 0; i < I8257_NUM_CHANNELS; i++)
 			{
-				break;
+				channel = (i + rr) % I8257_NUM_CHANNELS;
+				if ((m_status & (1 << channel)) == 0)
+				{
+					if (m_mode & m_drq & (1 << channel))
+					{
+						break;
+					}
+				}
 			}
+			done = i8257_do_operation(channel);
+
+			m_rr = (channel + 1) & 0x03;
+
+			if (done)
+			{
+				m_drq &= ~(0x01 << channel);
+				i8257_update_status();
+				if (!(DMA_MODE_AUTOLOAD(m_mode) && channel==2))
+				{
+					if (DMA_MODE_TCSTOP(m_mode))
+					{
+						m_mode &= ~(0x01 << channel);
+					}
+				}
+			}
+			break;
+		}
+	
+		case TIMER_MSBFLIP:
+			m_msb ^= 1;
+			break;
+		
+		case TIMER_DRQ_SYNC:
+		{
+			int channel = param >> 1;
+			int state = param & 0x01;
+
+			/* normalize state */
+			if (state)
+			{
+				m_drq |= 0x01 << channel;
+				m_address[channel] =  m_registers[channel * 2];
+				m_count[channel] =  m_registers[channel * 2 + 1] & 0x3FFF;
+				m_rwmode[channel] =  m_registers[channel * 2 + 1] >> 14;
+				/* clear channel TC */
+				m_status &= ~(0x01 << channel);
+			}
+			else
+				m_drq &= ~(0x01 << channel);
+
+			i8257_update_status();
+			break;
 		}
 	}
-	done = i8257_do_operation(channel);
-
-	m_rr = (channel + 1) & 0x03;
-
-	if (done)
-	{
-		m_drq &= ~(0x01 << channel);
-		i8257_update_status();
-		if (!(DMA_MODE_AUTOLOAD(m_mode) && channel==2))
-		{
-			if (DMA_MODE_TCSTOP(m_mode))
-			{
-				m_mode &= ~(0x01 << channel);
-			}
-		}
-	}
-}
-
-
-TIMER_CALLBACK( i8257_device::i8257_msbflip_timerproc_callback )
-{
-	reinterpret_cast<i8257_device*>(ptr)->i8257_msbflip_timerproc();
-}
-
-void i8257_device::i8257_msbflip_timerproc()
-{
-	m_msb ^= 1;
 }
 
 
@@ -421,37 +445,11 @@ WRITE8_DEVICE_HANDLER_TRAMPOLINE(i8257, i8257_w)
 }
 
 
-TIMER_CALLBACK( i8257_device::i8257_drq_write_callback )
-{
-	reinterpret_cast<i8257_device*>(ptr)->i8257_drq_write_timerproc(param);
-}
-
-void i8257_device::i8257_drq_write_timerproc(INT32 param)
-{
-	int channel = param >> 1;
-	int state = param & 0x01;
-
-	/* normalize state */
-	if (state)
-	{
-		m_drq |= 0x01 << channel;
-		m_address[channel] =  m_registers[channel * 2];
-		m_count[channel] =  m_registers[channel * 2 + 1] & 0x3FFF;
-		m_rwmode[channel] =  m_registers[channel * 2 + 1] >> 14;
-		/* clear channel TC */
-		m_status &= ~(0x01 << channel);
-	}
-	else
-		m_drq &= ~(0x01 << channel);
-
-	i8257_update_status();
-}
-
 void i8257_device::i8257_drq_w(int channel, int state)
 {
 	int param = (channel << 1) | (state ? 1 : 0);
 
-	timer_call_after_resynch(&m_machine, (void *)this, param, i8257_drq_write_callback);
+	device_timer_call_after_resynch(*this, TIMER_DRQ_SYNC, param);
 }
 
 WRITE_LINE_DEVICE_HANDLER( i8257_hlda_w ) { }

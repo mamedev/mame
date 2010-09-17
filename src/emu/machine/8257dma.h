@@ -117,22 +117,16 @@ public:
 	/* data request */
 	void i8257_drq_w(int channel, int state);
 
-	void i8257_timerproc();
-	void i8257_msbflip_timerproc();
-	void i8257_drq_write_timerproc(INT32 param);
-
 protected:
     // device-level overrides
     virtual void device_start();
     virtual void device_reset();
-    virtual void device_post_load() { }
-    virtual void device_clock_changed() { }
-
-	static TIMER_CALLBACK( i8257_timerproc_callback );
-	static TIMER_CALLBACK( i8257_msbflip_timerproc_callback );
-	static TIMER_CALLBACK( i8257_drq_write_callback );
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 private:
+	static const device_timer_id TIMER_OPERATION = 0;
+	static const device_timer_id TIMER_MSBFLIP = 1;
+	static const device_timer_id TIMER_DRQ_SYNC = 2;
 
 	int i8257_do_operation(int channel);
 	void i8257_update_status();

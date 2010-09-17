@@ -149,7 +149,7 @@ int timer_count_anonymous(running_machine *machine);
 emu_timer *_timer_alloc_internal(running_machine *machine, timer_fired_func callback, void *param, const char *file, int line, const char *func);
 
 /* allocate a permament device timer that isn't primed yet */
-emu_timer *device_timer_alloc(device_t &device, void *ptr = NULL, int param = 0);
+emu_timer *device_timer_alloc(device_t &device, device_timer_id id = 0, void *ptr = NULL);
 
 /* adjust the time when this timer will fire and disable any periodic firings */
 void timer_adjust_oneshot(emu_timer *which, attotime duration, INT32 param);
@@ -160,6 +160,9 @@ void timer_adjust_periodic(emu_timer *which, attotime start_delay, INT32 param, 
 
 
 /* ----- anonymous timer management ----- */
+
+/* request a one-shot temporary timer for a device */
+void device_timer_call_after_resynch(device_t &device, device_timer_id id = 0, INT32 param = 0, void *ptr = NULL);
 
 /* allocate a one-shot timer, which calls the callback after the given duration */
 void _timer_set_internal(running_machine *machine, attotime duration, void *ptr, INT32 param, timer_fired_func callback, const char *file, int line, const char *func);

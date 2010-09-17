@@ -133,9 +133,13 @@ protected:
     // device-level overrides
     virtual void device_start();
     virtual void device_reset();
-	virtual void device_timer(emu_timer &timer, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 private:
+	static const device_timer_id TIMER_SHIFT = 0;
+	static const device_timer_id TIMER_T1 = 1;
+	static const device_timer_id TIMER_T2 = 2;
+
     attotime cycles_to_time(int c);
     UINT32 time_to_cycles(attotime t);
     UINT16 get_counter1_value();

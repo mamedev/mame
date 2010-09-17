@@ -137,6 +137,10 @@ class device_missing_dependencies : public emu_exception { };
 typedef device_config *(*device_type)(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock);
 
 
+// timer IDs for devices
+typedef UINT32 device_timer_id;
+
+
 // read/write types for I/O lines (similar to read/write handlers but no offset)
 typedef int (*read_line_device_func)(device_t *device);
 typedef void (*write_line_device_func)(device_t *device, int state);
@@ -425,7 +429,7 @@ public:
 	void set_clock_scale(double clockscale);
 	attotime clocks_to_attotime(UINT64 clocks) const;
 	UINT64 attotime_to_clocks(attotime duration) const;
-	void timer_fired(emu_timer &timer, int param, void *ptr) { device_timer(timer, param, ptr); }
+	void timer_fired(emu_timer &timer, device_timer_id id, int param, void *ptr) { device_timer(timer, id, param, ptr); }
 
 	// debugging
 	device_debug *debug() const { return m_debug; }
@@ -460,7 +464,7 @@ protected:
 	virtual void device_post_load();
 	virtual void device_clock_changed();
 	virtual void device_debug_setup();
-	virtual void device_timer(emu_timer &timer, int param, void *ptr);
+	virtual void device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr);
 
 	//------------------- end derived class overrides
 

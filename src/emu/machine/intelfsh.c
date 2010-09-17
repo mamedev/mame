@@ -278,7 +278,7 @@ void intelfsh_device::device_start()
 //  device_timer - handler timer events
 //-------------------------------------------------
 
-void intelfsh_device::device_timer(emu_timer &timer, int param, void *ptr)
+void intelfsh_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	switch( m_flash_mode )
 	{

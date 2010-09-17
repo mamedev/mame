@@ -218,9 +218,9 @@ void via6522_device::device_start()
     m_t2ll = 0xff; /* taken from vice */
     m_t2lh = 0xff;
     m_time2 = m_time1 = timer_get_time(&m_machine);
-    m_t1 = device_timer_alloc(*this);
-    m_t2 = device_timer_alloc(*this);
-    m_shift_timer = device_timer_alloc(*this);
+    m_t1 = device_timer_alloc(*this, TIMER_T1);
+    m_t2 = device_timer_alloc(*this, TIMER_T2);
+    m_shift_timer = device_timer_alloc(*this, TIMER_SHIFT);
 
 	/* Default clock is from CPU1 */
 	if (clock() == 0)
@@ -415,54 +415,56 @@ void via6522_device::shift()
 }
 
 
-void via6522_device::device_timer(emu_timer &timer, int param, void *ptr)
+void via6522_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
-	// shift timer
-	if (&timer == m_shift_timer)
-		shift();
-	
-	// t1 timeout
-	else if (&timer == m_t1)
+	switch (id)
 	{
-	    if (T1_CONTINUOUS (m_acr))
-	    {
-	        if (T1_SET_PB7(m_acr))
-	        {
-	            m_out_b ^= 0x80;
-	        }
-	        timer_adjust_oneshot(m_t1, cycles_to_time(TIMER1_VALUE + IFR_DELAY), 0);
-	    }
-		else
-	    {
-	        if (T1_SET_PB7(m_acr))
-	        {
-	            m_out_b |= 0x80;
-	        }
-	        m_t1_active = 0;
-	        m_time1 = timer_get_time(&m_machine);
-	    }
-	    if (m_ddr_b)
-		{
-	        UINT8 write_data = (m_out_b & m_ddr_b) | (m_ddr_b ^ 0xff);
-	        devcb_call_write8(&m_out_b_func, 0, write_data);
-		}
+		// shift timer
+		case TIMER_SHIFT:
+			shift();
+			break;
+			
+		// t1 timeout
+		case TIMER_T1:
+		    if (T1_CONTINUOUS (m_acr))
+		    {
+		        if (T1_SET_PB7(m_acr))
+		        {
+		            m_out_b ^= 0x80;
+		        }
+		        timer_adjust_oneshot(m_t1, cycles_to_time(TIMER1_VALUE + IFR_DELAY), 0);
+		    }
+			else
+		    {
+		        if (T1_SET_PB7(m_acr))
+		        {
+		            m_out_b |= 0x80;
+		        }
+		        m_t1_active = 0;
+		        m_time1 = timer_get_time(&m_machine);
+		    }
+		    if (m_ddr_b)
+			{
+		        UINT8 write_data = (m_out_b & m_ddr_b) | (m_ddr_b ^ 0xff);
+		        devcb_call_write8(&m_out_b_func, 0, write_data);
+			}
 
-	    if (!(m_ifr & INT_T1))
-	    {
-			set_int(INT_T1);
-	    }
-	}
-	
-	// t2 timeout
-	else if (&timer == m_t2)
-	{
-	    m_t2_active = 0;
-	    m_time2 = timer_get_time(&m_machine);
+		    if (!(m_ifr & INT_T1))
+		    {
+				set_int(INT_T1);
+		    }
+		    break;
+		   
+		// t2 timeout
+		case TIMER_T2:
+		    m_t2_active = 0;
+		    m_time2 = timer_get_time(&m_machine);
 
-	    if (!(m_ifr & INT_T2))
-	    {
-			set_int(INT_T2);
-	    }
+		    if (!(m_ifr & INT_T2))
+		    {
+				set_int(INT_T2);
+		    }
+		    break;
 	}
 }
 

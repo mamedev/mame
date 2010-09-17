@@ -873,7 +873,7 @@ void device_t::device_debug_setup()
 //  fires
 //-------------------------------------------------
 
-void device_t::device_timer(emu_timer &timer, int param, void *ptr)
+void device_t::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
 {
 	// do nothing by default
 }
