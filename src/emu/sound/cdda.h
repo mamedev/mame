@@ -11,6 +11,7 @@ running_device *cdda_from_cdrom(running_machine *machine, void *file);
 void cdda_start_audio(running_device *device, UINT32 startlba, UINT32 numblocks);
 void cdda_stop_audio(running_device *device);
 void cdda_pause_audio(running_device *device, int pause);
+void cdda_set_volume(running_device *device,int volume);
 
 UINT32 cdda_get_audio_lba(running_device *device);
 int cdda_audio_active(running_device *device);

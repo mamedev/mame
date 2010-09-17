@@ -290,7 +290,18 @@ static void get_audio_data(cdda_info *info, stream_sample_t *bufL, stream_sample
 	get_audio_data(info, bufL, bufR, remaining);
 }
 
+/*-------------------------------------------------
+    cdda_set_volume - sets CD-DA volume level
+    for both speakers, used for fade in/out effects
+-------------------------------------------------*/
 
+void cdda_set_volume(running_device *device,int volume)
+{
+	cdda_info *cdda = get_safe_token(device);
+
+	stream_set_output_gain(cdda->stream,0,volume / 100.0);
+	stream_set_output_gain(cdda->stream,1,volume / 100.0);
+}
 
 /**************************************************************************
  * Generic get_info
