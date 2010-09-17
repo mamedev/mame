@@ -7835,7 +7835,7 @@ static INTERRUPT_GEN( rtc_irq )
 static MACHINE_CONFIG_START( quizchq, dynax_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 8000000)	/* ? */
+	MDRV_CPU_ADD("maincpu", Z80, XTAL_16MHz/2)	/* Verified */
 	MDRV_CPU_PROGRAM_MAP(quizchq_map)
 	MDRV_CPU_IO_MAP(quizchq_portmap)
 	MDRV_CPU_VBLANK_INT("screen", quizchq_irq)
@@ -7860,11 +7860,11 @@ static MACHINE_CONFIG_START( quizchq, dynax_state )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2413, 3579545)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MDRV_SOUND_ADD("ymsnd", YM2413, XTAL_28_63636MHz/8) // 3.579545Mhz, verified
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.50)
 
-	MDRV_OKIM6295_ADD("oki", 1022720, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MDRV_OKIM6295_ADD("oki", XTAL_28_63636MHz/28, OKIM6295_PIN7_HIGH) // clock frequency verified 1.022MHz, pin 7 verified high
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 
 	/* devices */
 	MDRV_MSM6242_ADD("rtc")
@@ -8607,7 +8607,7 @@ N73SUB
 CPU:    TMPZ84C015BF-8
 
 Sound:  YM2413
-        M6295
+        M6295 - 1.022Mhz pin 7 HI? (unverified from jpn ver)
 
 OSC:    16MHz
     28.6363MHz
@@ -8640,6 +8640,30 @@ ROM_START( quizchq )
 	ROM_LOAD( "nwc7301.1f",   0x00000, 0x80000, CRC(52c672e8) SHA1(bc05155f4d9c711cc2ed187a4dd2207b886452f0) )	// 2 banks
 ROM_END
 
+/***************************************************************************
+
+Quiz Channel Question (Chinese ver.)
+(c)1993 Laxan (licensed from Nakanihon)
+
+N7311208L1-2
+N73SUB
+
+CPU:    TMPZ84C015BF-8 @8mhz (16MHz/2) (verified)
+
+Sound:  YM2413 - 3.579545MHz (28.6363/8) (verified)
+        M6295 - 1.022MHz (28.6363/28); pin 7 HI (verified)
+
+OSC:    16MHz - cpu
+    28.6363MHz - ym2413 and m6295
+    32.768KHz - RTC
+
+Custom: NL-002 - Nakanihon
+    (1108F0405) - Dynax
+    (1427F0071) - Dynax
+
+Others: M6242B (RTC)
+
+***************************************************************************/
 ROM_START( quizchql )
 	ROM_REGION( 0x118000, "maincpu", 0 )	/* Z80 Code + space for banked RAM */
 	ROM_LOAD( "2.rom",        0x00000, 0x80000, CRC(1bf8fb25) SHA1(2f9a62654a018f19f6783be655d992c457551fc9) )

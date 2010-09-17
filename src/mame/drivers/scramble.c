@@ -1418,6 +1418,7 @@ static MACHINE_CONFIG_DERIVED( triplep, scramble )
 
 	/* sound hardware */
 	MDRV_SOUND_MODIFY("8910.1")
+	MDRV_SOUND_CLOCK(18432000/12) // triple punch/knock out ay clock is 1.535MHz, derived from main cpu xtal; verified on hardware
 	MDRV_SOUND_CONFIG(triplep_ay8910_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
