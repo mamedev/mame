@@ -935,6 +935,8 @@ static MACHINE_CONFIG_START( filetto, driver_device )
 
 	MDRV_PIC8259_ADD( "pic8259_2", pic8259_2_config )
 
+	MDRV_MC146818_ADD( "rtc", MC146818_STANDARD )
+
 	MDRV_GFXDECODE(filetto)
 
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -979,6 +981,8 @@ static MACHINE_CONFIG_START( tetriskr, driver_device )
 	MDRV_PIC8259_ADD( "pic8259_1", pic8259_1_config )
 
 	MDRV_PIC8259_ADD( "pic8259_2", pic8259_2_config )
+
+	MDRV_MC146818_ADD( "rtc", MC146818_STANDARD )
 
 	MDRV_GFXDECODE(tetriskr)
 

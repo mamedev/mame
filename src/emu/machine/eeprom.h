@@ -92,7 +92,7 @@ protected:
 	address_space_config		m_space_config;
 
 	// internal state
-	const UINT8 *				m_default_data;
+	generic_ptr					m_default_data;
 	int 						m_default_data_size;
 	UINT32						m_default_value;
 };

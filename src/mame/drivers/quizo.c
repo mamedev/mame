@@ -260,8 +260,7 @@ ROM_END
 static DRIVER_INIT(quizo)
 {
 	quizo_state *state = machine->driver_data<quizo_state>();
-	UINT8 *videoram = state->videoram;
-	videoram=auto_alloc_array(machine, UINT8, 0x4000*2);
+	state->videoram=auto_alloc_array(machine, UINT8, 0x4000*2);
 }
 
 GAME( 1985, quizo,  0,       quizo,  quizo,  quizo, ROT0, "Seoul Coin Corp.", "Quiz Olympic (set 1)", 0 )

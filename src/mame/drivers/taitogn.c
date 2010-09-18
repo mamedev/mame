@@ -937,7 +937,7 @@ static MACHINE_CONFIG_START( coh3002t, driver_device )
 	MDRV_MB3773_ADD("mb3773")
 
 	MDRV_INTEL_TE28F160_ADD("biosflash")
-	MDRV_INTEL_E28F008SA_ADD("pgmflash")
+	MDRV_INTEL_E28F400_ADD("pgmflash")
 	MDRV_INTEL_TE28F160_ADD("sndflash0")
 	MDRV_INTEL_TE28F160_ADD("sndflash1")
 	MDRV_INTEL_TE28F160_ADD("sndflash2")
@@ -1060,12 +1060,12 @@ INPUT_PORTS_END
 //
 
 #define ROM_LOAD16_WORD_BIOS(bios,name,offset,length,hash) \
-		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_BIOS(bios+1)) /* Note '+1' */
+		ROMX_LOAD(name, offset, length, hash, ROM_GROUPWORD | ROM_REVERSE | ROM_BIOS(bios+1)) /* Note '+1' */
 
 #define TAITOGNET_BIOS \
 	ROM_REGION32_LE( 0x080000, "mainbios", 0 ) \
 	ROM_LOAD( "coh-3002t.353", 0x000000, 0x080000, CRC(03967fa7) SHA1(0e17fec2286e4e25deb23d40e41ce0986f373d49) ) \
-	ROM_REGION16_LE( 0x200000, "biosflash", 0 ) \
+	ROM_REGION( 0x200000, "biosflash", 0 ) \
 	ROM_SYSTEM_BIOS( 0, "v1",   "G-NET Bios v1" ) \
     	ROM_LOAD16_WORD_BIOS(0, "flash.u30", 0x000000, 0x200000, CRC(c48c8236) SHA1(c6dad60266ce2ff635696bc0d91903c543273559) ) \
 	ROM_SYSTEM_BIOS( 1, "v2",   "G-NET Bios v2" ) \
