@@ -286,6 +286,7 @@ public:
 	const char *name() const { return m_name; }
 	const char *tag() const { return m_tag; }
 	const void *static_config() const { return m_static_config; }
+	const machine_config &mconfig() const { return m_machine_config; }
 
 	// methods that wrap both interface-level and device-level behavior
 	void config_complete();
