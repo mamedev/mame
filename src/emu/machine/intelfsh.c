@@ -589,7 +589,14 @@ void intelfsh_device::write_full(UINT32 address, UINT32 data)
 			m_status = 1 << 3;
 			m_flash_mode = FM_ERASEAMD4;
 
-			timer_adjust_oneshot( m_timer, ATTOTIME_IN_SEC( 17 ), 0 );
+			if (m_config.m_sector_is_4k)
+			{
+				timer_adjust_oneshot( m_timer, ATTOTIME_IN_SEC( 1 ), 0 );
+			}
+			else
+			{
+				timer_adjust_oneshot( m_timer, ATTOTIME_IN_SEC( 16 ), 0 );
+			}
 		}
 		else if( ( data & 0xff ) == 0x30 )
 		{
