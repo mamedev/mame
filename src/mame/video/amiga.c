@@ -13,18 +13,6 @@
 
 /*************************************
  *
- *  Debugging
- *
- *************************************/
-
-#define LOG_COPPER			0
-#define GUESS_COPPER_OFFSET	0
-#define LOG_SPRITE_DMA		0
-
-
-
-/*************************************
- *
  *  Macros
  *
  *************************************/
@@ -35,47 +23,12 @@
 
 /*************************************
  *
- *  Statics
- *
- *************************************/
-
-/* sprite states */
-static UINT8 sprite_comparitor_enable_mask;
-static UINT8 sprite_dma_reload_mask;
-static UINT8 sprite_dma_live_mask;
-static UINT32 sprite_shiftreg[8];
-static UINT8 sprite_remain[8];
-
-/* playfield states */
-static int last_scanline;
-static UINT16 ham_color;
-
-/* copper states */
-static UINT32 copper_pc;
-static UINT8 copper_waiting;
-static UINT8 copper_waitblit;
-static UINT16 copper_waitval;
-static UINT16 copper_waitmask;
-static UINT16 copper_pending_offset;
-static UINT16 copper_pending_data;
-
-/* misc states */
-static UINT16 genlock_color;
-
-#if GUESS_COPPER_OFFSET
-static int wait_offset = 3;
-#endif
-
-
-
-/*************************************
- *
  *  Tables
  *
  *************************************/
 
 /* expand an 8-bit bit pattern into 16 bits, every other bit */
-static const UINT16 expand_byte[256] =
+const UINT16 amiga_expand_byte[256] =
 {
 	0x0000, 0x0001, 0x0004, 0x0005, 0x0010, 0x0011, 0x0014, 0x0015,
 	0x0040, 0x0041, 0x0044, 0x0045, 0x0050, 0x0051, 0x0054, 0x0055,
@@ -112,9 +65,6 @@ static const UINT16 expand_byte[256] =
 	0x5540, 0x5541, 0x5544, 0x5545, 0x5550, 0x5551, 0x5554, 0x5555
 };
 
-/* separate 6 in-order bitplanes into 2 x 3-bit bitplanes in two nibbles */
-static UINT8 separate_bitplanes[2][64];
-
 
 
 /*************************************
@@ -141,6 +91,7 @@ PALETTE_INIT( amiga )
 
 VIDEO_START( amiga )
 {
+	amiga_state *state = machine->driver_data<amiga_state>();
 	int j;
 
 	/* generate tables that produce the correct playfield color for dual playfield mode */
@@ -149,12 +100,18 @@ VIDEO_START( amiga )
 		int pf1pix = ((j >> 0) & 1) | ((j >> 1) & 2) | ((j >> 2) & 4);
 		int pf2pix = ((j >> 1) & 1) | ((j >> 2) & 2) | ((j >> 3) & 4);
 
-		separate_bitplanes[0][j] = (pf1pix || !pf2pix) ? pf1pix : (pf2pix + 8);
-		separate_bitplanes[1][j] = pf2pix ? (pf2pix + 8) : pf1pix;
+		state->separate_bitplanes[0][j] = (pf1pix || !pf2pix) ? pf1pix : (pf2pix + 8);
+		state->separate_bitplanes[1][j] = pf2pix ? (pf2pix + 8) : pf1pix;
 	}
 
+#if GUESS_COPPER_OFFSET
+	state->wait_offset = 3;
+#endif
+
 	/* reset the genlock color */
-	genlock_color = 0xffff;
+	state->genlock_color = 0xffff;
+
+	state->sprite_ctl_written = 0;
 }
 
 
@@ -167,12 +124,13 @@ VIDEO_START( amiga )
 
 UINT32 amiga_gethvpos(screen_device &screen)
 {
-	UINT32 hvpos = (last_scanline << 8) | (screen.hpos() >> 2);
+	amiga_state *state = screen.machine->driver_data<amiga_state>();
+	UINT32 hvpos = (state->last_scanline << 8) | (screen.hpos() >> 2);
 	UINT32 latchedpos = input_port_read_safe(screen.machine, "HVPOS", 0);
 
 	/* if there's no latched position, or if we are in the active display area */
 	/* but before the latching point, return the live HV position */
-	if ((CUSTOM_REG(REG_BPLCON0) & 0x0008) == 0 || latchedpos == 0 || (last_scanline >= 20 && hvpos < latchedpos))
+	if ((CUSTOM_REG(REG_BPLCON0) & 0x0008) == 0 || latchedpos == 0 || (state->last_scanline >= 20 && hvpos < latchedpos))
 		return hvpos;
 
 	/* otherwise, return the latched position */
@@ -187,9 +145,11 @@ UINT32 amiga_gethvpos(screen_device &screen)
  *
  *************************************/
 
-void amiga_set_genlock_color(UINT16 color)
+void amiga_set_genlock_color(running_machine *machine, UINT16 color)
 {
-	genlock_color = color;
+	amiga_state *state = machine->driver_data<amiga_state>();
+
+	state->genlock_color = color;
 }
 
 
@@ -200,18 +160,21 @@ void amiga_set_genlock_color(UINT16 color)
  *
  *************************************/
 
-void copper_setpc(UINT32 pc)
+void amiga_copper_setpc(running_machine *machine, UINT32 pc)
 {
+	amiga_state *state = machine->driver_data<amiga_state>();
+
 	if (LOG_COPPER)
 		logerror("copper_setpc(%06x)\n", pc);
 
-	copper_pc = pc;
-	copper_waiting = FALSE;
+	state->copper_pc = pc;
+	state->copper_waiting = FALSE;
 }
 
 
-static int copper_execute_next(running_machine *machine, int xpos)
+int amiga_copper_execute_next(running_machine *machine, int xpos)
 {
+	amiga_state *state = machine->driver_data<amiga_state>();
 	int word0, word1;
 
 	/* bail if not enabled */
@@ -219,34 +182,34 @@ static int copper_execute_next(running_machine *machine, int xpos)
 		return 511;
 
 	/* flush any pending writes */
-	if (copper_pending_offset)
+	if (state->copper_pending_offset)
 	{
 		if (LOG_COPPER)
-			logerror("%02X.%02X: Write to %s = %04x\n", last_scanline, xpos / 2, amiga_custom_names[copper_pending_offset & 0xff], copper_pending_data);
+			logerror("%02X.%02X: Write to %s = %04x\n", state->last_scanline, xpos / 2, amiga_custom_names[state->copper_pending_offset & 0xff], state->copper_pending_data);
 
-		amiga_custom_w(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), copper_pending_offset, copper_pending_data, 0xffff);
-		copper_pending_offset = 0;
+		amiga_custom_w(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), state->copper_pending_offset, state->copper_pending_data, 0xffff);
+		state->copper_pending_offset = 0;
 	}
 
 	/* if we're waiting, check for a breakthrough */
-	if (copper_waiting)
+	if (state->copper_waiting)
 	{
-		int curpos = (last_scanline << 8) | (xpos >> 1);
+		int curpos = (state->last_scanline << 8) | (xpos >> 1);
 
 		/* if we're past the wait time, stop it and hold up 2 cycles */
-		if ((curpos & copper_waitmask) >= (copper_waitval & copper_waitmask) &&
-			(!copper_waitblit || !(CUSTOM_REG(REG_DMACON) & DMACON_BBUSY)))
+		if ((curpos & state->copper_waitmask) >= (state->copper_waitval & state->copper_waitmask) &&
+			(!state->copper_waitblit || !(CUSTOM_REG(REG_DMACON) & DMACON_BBUSY)))
 		{
-			copper_waiting = FALSE;
+			state->copper_waiting = FALSE;
 #if GUESS_COPPER_OFFSET
-			return xpos + COPPER_CYCLES_TO_PIXELS(1 + wait_offset);
+			return xpos + COPPER_CYCLES_TO_PIXELS(1 + state->wait_offset);
 #else
 			return xpos + COPPER_CYCLES_TO_PIXELS(1 + 3);
 #endif
 		}
 
 		/* otherwise, see if this line is even a possibility; if not, punt */
-		if (((curpos | 0xff) & copper_waitmask) < (copper_waitval & copper_waitmask))
+		if (((curpos | 0xff) & state->copper_waitmask) < (state->copper_waitval & state->copper_waitmask))
 			return 511;
 
 		/* else just advance another pixel */
@@ -255,17 +218,17 @@ static int copper_execute_next(running_machine *machine, int xpos)
 	}
 
 	/* fetch the first data word */
-	word0 = amiga_chip_ram_r(copper_pc);
-	copper_pc += 2;
+	word0 = (*state->chip_ram_r)(state, state->copper_pc);
+	state->copper_pc += 2;
 	xpos += COPPER_CYCLES_TO_PIXELS(1);
 
 	/* fetch the second data word */
-	word1 = amiga_chip_ram_r(copper_pc);
-	copper_pc += 2;
+	word1 = (*state->chip_ram_r)(state, state->copper_pc);
+	state->copper_pc += 2;
 	xpos += COPPER_CYCLES_TO_PIXELS(1);
 
 	if (LOG_COPPER)
-		logerror("%02X.%02X: Copper inst @ %06x = %04x %04x\n", last_scanline, xpos / 2, copper_pc, word0, word1);
+		logerror("%02X.%02X: Copper inst @ %06x = %04x %04x\n", state->last_scanline, xpos / 2, state->copper_pc, word0, word1);
 
 	/* handle a move */
 	if ((word0 & 1) == 0)
@@ -278,56 +241,56 @@ static int copper_execute_next(running_machine *machine, int xpos)
 		{
 			/* write it at the *end* of this instruction's cycles */
 			/* needed for Arcadia's Fast Break */
-			copper_pending_offset = word0;
-			copper_pending_data = word1;
+			state->copper_pending_offset = word0;
+			state->copper_pending_data = word1;
 		}
 
 		/* illegal writes suspend until next frame */
 		else
 		{
 			if (LOG_COPPER)
-				logerror("%02X.%02X: Aborting copper on illegal write\n", last_scanline, xpos / 2);
+				logerror("%02X.%02X: Aborting copper on illegal write\n", state->last_scanline, xpos / 2);
 
-			copper_waitval = 0xffff;
-			copper_waitmask = 0xffff;
-			copper_waitblit = FALSE;
-			copper_waiting = TRUE;
+			state->copper_waitval = 0xffff;
+			state->copper_waitmask = 0xffff;
+			state->copper_waitblit = FALSE;
+			state->copper_waiting = TRUE;
 			return 511;
 		}
 	}
 	else
 	{
 		/* extract common wait/skip values */
-		copper_waitval = word0 & 0xfffe;
-		copper_waitmask = word1 | 0x8001;
-		copper_waitblit = (~word1 >> 15) & 1;
+		state->copper_waitval = word0 & 0xfffe;
+		state->copper_waitmask = word1 | 0x8001;
+		state->copper_waitblit = (~word1 >> 15) & 1;
 
 		/* handle a wait */
 		if ((word1 & 1) == 0)
 		{
 			if (LOG_COPPER)
-				logerror("  Waiting for %04x & %04x (currently %04x)\n", copper_waitval, copper_waitmask, (last_scanline << 8) | (xpos >> 1));
+				logerror("  Waiting for %04x & %04x (currently %04x)\n", state->copper_waitval, state->copper_waitmask, (state->last_scanline << 8) | (xpos >> 1));
 
-			copper_waiting = TRUE;
+			state->copper_waiting = TRUE;
 		}
 
 		/* handle a skip */
 		else
 		{
-			int curpos = (last_scanline << 8) | (xpos >> 1);
+			int curpos = (state->last_scanline << 8) | (xpos >> 1);
 
 			if (LOG_COPPER)
-				logerror("  Skipping if %04x & %04x (currently %04x)\n", copper_waitval, copper_waitmask, (last_scanline << 8) | (xpos >> 1));
+				logerror("  Skipping if %04x & %04x (currently %04x)\n", state->copper_waitval, state->copper_waitmask, (state->last_scanline << 8) | (xpos >> 1));
 
 			/* if we're past the wait time, stop it and hold up 2 cycles */
-			if ((curpos & copper_waitmask) >= (copper_waitval & copper_waitmask) &&
-				(!copper_waitblit || !(CUSTOM_REG(REG_DMACON) & DMACON_BBUSY)))
+			if ((curpos & state->copper_waitmask) >= (state->copper_waitval & state->copper_waitmask) &&
+				(!state->copper_waitblit || !(CUSTOM_REG(REG_DMACON) & DMACON_BBUSY)))
 			{
 				if (LOG_COPPER)
 					logerror("  Skipped\n");
 
 				/* count the cycles it out have taken to fetch the next instruction */
-				copper_pc += 4;
+				state->copper_pc += 4;
 				xpos += COPPER_CYCLES_TO_PIXELS(2);
 			}
 		}
@@ -345,22 +308,31 @@ static int copper_execute_next(running_machine *machine, int xpos)
  *
  *************************************/
 
-void amiga_sprite_dma_reset(int which)
+void amiga_sprite_dma_reset(running_machine *machine, int which)
 {
-	sprite_dma_reload_mask |= 1 << which;
-	sprite_dma_live_mask |= 1 << which;
+	amiga_state *state = machine->driver_data<amiga_state>();
+
+	if (LOG_SPRITE_DMA) logerror("sprite %d dma reset\n", which );
+	state->sprite_dma_reload_mask |= 1 << which;
+	state->sprite_dma_live_mask |= 1 << which;
 }
 
 
-void amiga_sprite_enable_comparitor(int which, int enable)
+void amiga_sprite_enable_comparitor(running_machine *machine, int which, int enable)
 {
+	amiga_state *state = machine->driver_data<amiga_state>();
+
+	if (LOG_SPRITE_DMA) logerror("sprite %d comparitor %sable\n", which, enable ? "en" : "dis" );
 	if (enable)
 	{
-		sprite_comparitor_enable_mask |= 1 << which;
-		sprite_dma_live_mask &= ~(1 << which);
+		state->sprite_comparitor_enable_mask |= 1 << which;
+		state->sprite_dma_live_mask &= ~(1 << which);
 	}
 	else
-		sprite_comparitor_enable_mask &= ~(1 << which);
+	{
+		state->sprite_comparitor_enable_mask &= ~(1 << which);
+		state->sprite_ctl_written |= (1 << which);
+	}
 }
 
 
@@ -371,7 +343,15 @@ void amiga_sprite_enable_comparitor(int which, int enable)
  *
  *************************************/
 
-static void update_sprite_dma(int scanline)
+INLINE void fetch_sprite_data(amiga_state *state, int scanline, int sprite)
+{
+	CUSTOM_REG(REG_SPR0DATA + 4 * sprite) = (*state->chip_ram_r)(state, CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 0);
+	CUSTOM_REG(REG_SPR0DATB + 4 * sprite) = (*state->chip_ram_r)(state, CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) + 2);
+	CUSTOM_REG_LONG(REG_SPR0PTH + 2 * sprite) += 4;
+	if (LOG_SPRITE_DMA) logerror("%3d:sprite %d fetch: data=%04X-%04X\n", scanline, sprite, CUSTOM_REG(REG_SPR0DATA + 4 * sprite), CUSTOM_REG(REG_SPR0DATB + 4 * sprite));
+}
+
+static void update_sprite_dma(amiga_state *state, int scanline)
 {
 	int dmaenable = (CUSTOM_REG(REG_DMACON) & (DMACON_SPREN | DMACON_DMAEN)) == (DMACON_SPREN | DMACON_DMAEN);
 	int num, maxdma;
@@ -388,15 +368,15 @@ static void update_sprite_dma(int scanline)
 		int vstart, vstop;
 
 		/* if we are == VSTOP, fetch new control words */
-		if (dmaenable && (sprite_dma_live_mask & bitmask) && (sprite_dma_reload_mask & bitmask))
+		if (dmaenable && (state->sprite_dma_live_mask & bitmask) && (state->sprite_dma_reload_mask & bitmask))
 		{
 			/* disable the sprite */
-			sprite_comparitor_enable_mask &= ~bitmask;
-			sprite_dma_reload_mask &= ~bitmask;
+			state->sprite_comparitor_enable_mask &= ~bitmask;
+			state->sprite_dma_reload_mask &= ~bitmask;
 
 			/* fetch data into the control words */
-			CUSTOM_REG(REG_SPR0POS + 4 * num) = amiga_chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) + 0);
-			CUSTOM_REG(REG_SPR0CTL + 4 * num) = amiga_chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) + 2);
+			CUSTOM_REG(REG_SPR0POS + 4 * num) = (*state->chip_ram_r)(state, CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) + 0);
+			CUSTOM_REG(REG_SPR0CTL + 4 * num) = (*state->chip_ram_r)(state, CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) + 2);
 			CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) += 4;
 			if (LOG_SPRITE_DMA) logerror("%3d:sprite %d fetch: pos=%04X ctl=%04X\n", scanline, num, CUSTOM_REG(REG_SPR0POS + 4 * num), CUSTOM_REG(REG_SPR0CTL + 4 * num));
 		}
@@ -408,27 +388,25 @@ static void update_sprite_dma(int scanline)
 		/* if we hit vstart, enable the comparitor */
 		if (scanline == vstart)
 		{
-			sprite_comparitor_enable_mask |= 1 << num;
+			state->sprite_comparitor_enable_mask |= 1 << num;
 			if (LOG_SPRITE_DMA) logerror("%3d:sprite %d comparitor enable\n", scanline, num);
 		}
 
 		/* if we hit vstop, disable the comparitor and trigger a reload for the next scanline */
 		if (scanline == vstop)
 		{
-			sprite_comparitor_enable_mask &= ~bitmask;
-			sprite_dma_reload_mask |= 1 << num;
+			state->sprite_ctl_written &= ~bitmask;
+			state->sprite_comparitor_enable_mask &= ~bitmask;
+			state->sprite_dma_reload_mask |= 1 << num;
 			CUSTOM_REG(REG_SPR0DATA + 4 * num) = 0;		/* just a guess */
 			CUSTOM_REG(REG_SPR0DATB + 4 * num) = 0;
 			if (LOG_SPRITE_DMA) logerror("%3d:sprite %d comparitor disable, prepare for reload\n", scanline, num);
 		}
 
 		/* fetch data if this sprite is enabled */
-		if (dmaenable && (sprite_dma_live_mask & bitmask) && (sprite_comparitor_enable_mask & bitmask))
+		if (dmaenable && (state->sprite_dma_live_mask & bitmask) && (state->sprite_comparitor_enable_mask & bitmask))
 		{
-			CUSTOM_REG(REG_SPR0DATA + 4 * num) = amiga_chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) + 0);
-			CUSTOM_REG(REG_SPR0DATB + 4 * num) = amiga_chip_ram_r(CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) + 2);
-			CUSTOM_REG_LONG(REG_SPR0PTH + 2 * num) += 4;
-			if (LOG_SPRITE_DMA) logerror("%3d:sprite %d fetch: data=%04X-%04X\n", scanline, num, CUSTOM_REG(REG_SPR0DATA + 4 * num), CUSTOM_REG(REG_SPR0DATB + 4 * num));
+			fetch_sprite_data(state, scanline, num);
 		}
 	}
 }
@@ -443,37 +421,37 @@ static void update_sprite_dma(int scanline)
 
 INLINE UINT32 interleave_sprite_data(UINT16 lobits, UINT16 hibits)
 {
-	return (expand_byte[lobits & 0xff] << 0) | (expand_byte[lobits >> 8] << 16) |
-		   (expand_byte[hibits & 0xff] << 1) | (expand_byte[hibits >> 8] << 17);
+	return (amiga_expand_byte[lobits & 0xff] << 0) | (amiga_expand_byte[lobits >> 8] << 16) |
+		   (amiga_expand_byte[hibits & 0xff] << 1) | (amiga_expand_byte[hibits >> 8] << 17);
 }
 
 
-static int get_sprite_pixel(int x)
+static int get_sprite_pixel(amiga_state *state, int x)
 {
 	int pixels = 0;
 	int num, pair;
 
 	/* loop over sprite channels */
 	for (num = 0; num < 8; num++)
-		if (sprite_comparitor_enable_mask & (1 << num))
+		if (state->sprite_comparitor_enable_mask & (1 << num))
 		{
 			/* if we're not currently clocking, check against hstart */
-			if (sprite_remain[num] == 0)
+			if (state->sprite_remain[num] == 0)
 			{
 				int hstart = ((CUSTOM_REG(REG_SPR0POS + 4 * num) & 0xff) << 1) | (CUSTOM_REG(REG_SPR0CTL + 4 * num) & 1);
 				if (hstart == x)
 				{
-					sprite_remain[num] = 16;
-					sprite_shiftreg[num] = interleave_sprite_data(CUSTOM_REG(REG_SPR0DATA + 4 * num), CUSTOM_REG(REG_SPR0DATB + 4 * num));
+					state->sprite_remain[num] = 16;
+					state->sprite_shiftreg[num] = interleave_sprite_data(CUSTOM_REG(REG_SPR0DATA + 4 * num), CUSTOM_REG(REG_SPR0DATB + 4 * num));
 				}
 			}
 
 			/* clock the next pixel if we're doing it */
-			if (sprite_remain[num] != 0)
+			if (state->sprite_remain[num] != 0)
 			{
-				sprite_remain[num]--;
-				pixels |= (sprite_shiftreg[num] & 0xc0000000) >> (16 + 2 * (7 - num));
-				sprite_shiftreg[num] <<= 2;
+				state->sprite_remain[num]--;
+				pixels |= (state->sprite_shiftreg[num] & 0xc0000000) >> (16 + 2 * (7 - num));
+				state->sprite_shiftreg[num] <<= 2;
 			}
 		}
 
@@ -491,6 +469,7 @@ static int get_sprite_pixel(int x)
 			0x0000, 0x0800, 0x2000, 0x2a00, 0x4000, 0x4c00, 0x7000, 0x7e00
 		};
 		int collide;
+		const int esprm = 0x10, osprm = 0x10;
 
 		/* OR the two sprite bits together so we only have 1 bit per sprite */
 		collide = pixels | (pixels >> 1);
@@ -513,18 +492,19 @@ static int get_sprite_pixel(int x)
                     sprite present bitmask in bits 6-9
                     topmost sprite pair index in bits 10-11
                 */
+				UINT32 result = (collide << 6) | (pair << 10);
 
 				/* attached case */
 				if (CUSTOM_REG(REG_SPR1CTL + 8 * pair) & 0x0080)
-					return (pixels & 0xf) | 0x10 | (collide << 6) | (pair << 10);
+					return (pixels & 0xf) | osprm | result;
 
 				/* lower-numbered sprite of pair */
 				else if (pixels & 3)
-					return (pixels & 3) | 0x10 | (pair << 2) | (collide << 6) | (pair << 10);
+					return (pixels & 3) | esprm | (pair << 2) | result;
 
 				/* higher-numbered sprite of pair */
 				else
-					return ((pixels >> 2) & 3) | 0x10 | (pair << 2) | (collide << 6) | (pair << 10);
+					return ((pixels >> 2) & 3) | osprm | (pair << 2) | result;
 			}
 	}
 
@@ -539,7 +519,7 @@ static int get_sprite_pixel(int x)
  *
  *************************************/
 
-INLINE UINT8 assemble_odd_bitplanes(int planes, int obitoffs)
+INLINE UINT8 assemble_odd_bitplanes(amiga_state *state, int planes, int obitoffs)
 {
 	UINT8 pix = (CUSTOM_REG(REG_BPL1DAT) >> obitoffs) & 1;
 	if (planes >= 3)
@@ -552,7 +532,7 @@ INLINE UINT8 assemble_odd_bitplanes(int planes, int obitoffs)
 }
 
 
-INLINE UINT8 assemble_even_bitplanes(int planes, int ebitoffs)
+INLINE UINT8 assemble_even_bitplanes(amiga_state *state, int planes, int ebitoffs)
 {
 	UINT8 pix = 0;
 	if (planes >= 2)
@@ -568,6 +548,11 @@ INLINE UINT8 assemble_even_bitplanes(int planes, int ebitoffs)
 	return pix;
 }
 
+INLINE void fetch_bitplane_data(amiga_state *state, int plane)
+{
+	CUSTOM_REG(REG_BPL1DAT + plane) = (*state->chip_ram_r)(state, CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2));
+	CUSTOM_REG_LONG(REG_BPL1PTH + plane * 2) += 2;
+}
 
 
 /*************************************
@@ -576,27 +561,27 @@ INLINE UINT8 assemble_even_bitplanes(int planes, int ebitoffs)
  *
  *************************************/
 
-INLINE int update_ham(int newpix)
+INLINE int update_ham(amiga_state *state, int newpix)
 {
 	switch (newpix >> 4)
 	{
 		case 0:
-			ham_color = CUSTOM_REG(REG_COLOR00 + (newpix & 0xf));
+			state->ham_color = CUSTOM_REG(REG_COLOR00 + (newpix & 0xf));
 			break;
 
 		case 1:
-			ham_color = (ham_color & 0xff0) | ((newpix & 0xf) << 0);
+			state->ham_color = (state->ham_color & 0xff0) | ((newpix & 0xf) << 0);
 			break;
 
 		case 2:
-			ham_color = (ham_color & 0x0ff) | ((newpix & 0xf) << 8);
+			state->ham_color = (state->ham_color & 0x0ff) | ((newpix & 0xf) << 8);
 			break;
 
 		case 3:
-			ham_color = (ham_color & 0xf0f) | ((newpix & 0xf) << 4);
+			state->ham_color = (state->ham_color & 0xf0f) | ((newpix & 0xf) << 4);
 			break;
 	}
-	return ham_color;
+	return state->ham_color;
 }
 
 
@@ -609,6 +594,7 @@ INLINE int update_ham(int newpix)
 
 void amiga_render_scanline(running_machine *machine, bitmap_t *bitmap, int scanline)
 {
+	amiga_state *state = machine->driver_data<amiga_state>();
 	UINT16 save_color0 = CUSTOM_REG(REG_COLOR00);
 	int ddf_start_pixel = 0, ddf_stop_pixel = 0;
 	int hires = 0, dualpf = 0, lace = 0, ham = 0;
@@ -624,29 +610,30 @@ void amiga_render_scanline(running_machine *machine, bitmap_t *bitmap, int scanl
 	int edelay = 0, odelay = 0;
 	int next_copper_x;
 	int pl;
+	const int defbitoffs = 15;
 
-	last_scanline = scanline;
+	state->last_scanline = scanline;
 
 	/* on the first scanline, reset the COPPER and HAM color */
 	if (scanline == 0)
 	{
-		copper_setpc(CUSTOM_REG_LONG(REG_COP1LCH));
-		ham_color = CUSTOM_REG(REG_COLOR00);
+		amiga_copper_setpc(machine, CUSTOM_REG_LONG(REG_COP1LCH));
+		state->ham_color = CUSTOM_REG(REG_COLOR00);
 	}
 
 	/* update sprite data fetching */
-	update_sprite_dma(scanline);
+	update_sprite_dma(state, scanline);
 
 	/* start of a new line, signal we're not done with it and fill up vars */
 	if (bitmap != NULL)
 		dst = BITMAP_ADDR16(bitmap, scanline, 0);
 
 	/* all sprites off at the start of the line */
-	memset(sprite_remain, 0, sizeof(sprite_remain));
+	memset(state->sprite_remain, 0, sizeof(state->sprite_remain));
 
 	/* temporary set color 0 to the genlock color */
-	if (genlock_color != 0xffff)
-		CUSTOM_REG(REG_COLOR00) = genlock_color;
+	if (state->genlock_color != 0xffff)
+		CUSTOM_REG(REG_COLOR00) = state->genlock_color;
 
 	/* loop over the line */
 	next_copper_x = 2;	/* copper runs on odd timeslots */
@@ -659,10 +646,10 @@ void amiga_render_scanline(running_machine *machine, bitmap_t *bitmap, int scanl
 		{
 			/* execute the next batch, restoring and re-saving color 0 around it */
 			CUSTOM_REG(REG_COLOR00) = save_color0;
-			next_copper_x = copper_execute_next(machine, x);
+			next_copper_x = amiga_copper_execute_next(machine, x);
 			save_color0 = CUSTOM_REG(REG_COLOR00);
-			if (genlock_color != 0xffff)
-				CUSTOM_REG(REG_COLOR00) = genlock_color;
+			if (state->genlock_color != 0xffff)
+				CUSTOM_REG(REG_COLOR00) = state->genlock_color;
 
 			/* compute update-related register values */
 			planes = (CUSTOM_REG(REG_BPLCON0) & (BPLCON0_BPU0 | BPLCON0_BPU1 | BPLCON0_BPU2)) >> 12;
@@ -673,18 +660,20 @@ void amiga_render_scanline(running_machine *machine, bitmap_t *bitmap, int scanl
 
 			/* compute the pixel fetch parameters */
 			ddf_start_pixel = ( CUSTOM_REG(REG_DDFSTRT) & 0xfc ) * 2 + (hires ? 9 : 17);
-			ddf_stop_pixel = ( CUSTOM_REG(REG_DDFSTOP) & 0xfc ) * 2 + (hires ? (9 + 15) : (17 + 15));
+			ddf_stop_pixel = ( CUSTOM_REG(REG_DDFSTOP) & 0xfc ) * 2 + (hires ? (9 + defbitoffs) : (17 + defbitoffs));
 
 			if ( ( CUSTOM_REG(REG_DDFSTRT) ^ CUSTOM_REG(REG_DDFSTOP) ) & 0x04 )
 				ddf_stop_pixel += 8;
 
 			/* compute the horizontal start/stop */
 			hstart = CUSTOM_REG(REG_DIWSTRT) & 0xff;
-			hstop = 0x100 + (CUSTOM_REG(REG_DIWSTOP) & 0xff);
+			hstop = (CUSTOM_REG(REG_DIWSTOP) & 0xff);
+			hstop |= 0x100;
 
 			/* compute the vertical start/stop */
 			vstart = CUSTOM_REG(REG_DIWSTRT) >> 8;
-			vstop = (CUSTOM_REG(REG_DIWSTOP) >> 8) | ((~CUSTOM_REG(REG_DIWSTOP) >> 7) & 0x100);
+			vstop = (CUSTOM_REG(REG_DIWSTOP) >> 8);
+			vstop |= ((~CUSTOM_REG(REG_DIWSTOP) >> 7) & 0x100);
 
 			/* extract playfield priorities */
 			pf1pri = CUSTOM_REG(REG_BPLCON2) & 7;
@@ -708,8 +697,8 @@ void amiga_render_scanline(running_machine *machine, bitmap_t *bitmap, int scanl
 
 			if ( hires )
 			{
-				obitoffs = 15 + ( odelay << 1 );
-				ebitoffs = 15 + ( edelay << 1 );
+				obitoffs = defbitoffs + ( odelay << 1 );
+				ebitoffs = defbitoffs + ( edelay << 1 );
 			}
 			else
 			{
@@ -719,8 +708,8 @@ void amiga_render_scanline(running_machine *machine, bitmap_t *bitmap, int scanl
 					edelay = ( edelay + 8 ) & 0x0f;
 				}
 
-				obitoffs = 15 + odelay;
-				ebitoffs = 15 + edelay;
+				obitoffs = defbitoffs + odelay;
+				ebitoffs = defbitoffs + edelay;
 			}
 
 			for (pl = 0; pl < 6; pl++)
@@ -728,7 +717,7 @@ void amiga_render_scanline(running_machine *machine, bitmap_t *bitmap, int scanl
 		}
 
 		/* need to run the sprite engine every pixel to ensure display */
-		sprpix = get_sprite_pixel(x);
+		sprpix = get_sprite_pixel(state, x);
 
 		/* to render, we must have bitplane DMA enabled, at least 1 plane, and be within the */
 		/* vertical display window */
@@ -741,15 +730,16 @@ void amiga_render_scanline(running_machine *machine, bitmap_t *bitmap, int scanl
 			if (x >= ddf_start_pixel && x <= ddf_stop_pixel + odelay)
 			{
 				/* if we need to fetch more data, do it now */
-				if (obitoffs == 15)
+				if (obitoffs == defbitoffs)
+				{
 					for (pl = 0; pl < planes; pl += 2)
 					{
-						CUSTOM_REG(REG_BPL1DAT + pl) = amiga_chip_ram_r(CUSTOM_REG_LONG(REG_BPL1PTH + pl * 2));
-						CUSTOM_REG_LONG(REG_BPL1PTH + pl * 2) += 2;
+						fetch_bitplane_data(state, pl);
 					}
+				}
 
 				/* now assemble the bits */
-				pfpix0 |= assemble_odd_bitplanes(planes, obitoffs);
+				pfpix0 |= assemble_odd_bitplanes(state, planes, obitoffs);
 				obitoffs--;
 
 				/* for high res, assemble a second set of bits */
@@ -758,16 +748,15 @@ void amiga_render_scanline(running_machine *machine, bitmap_t *bitmap, int scanl
 					/* reset bit offsets and fetch more data if needed */
 					if (obitoffs < 0)
 					{
-						obitoffs = 15;
+						obitoffs = defbitoffs;
 
 						for (pl = 0; pl < planes; pl += 2)
 						{
-							CUSTOM_REG(REG_BPL1DAT + pl) = amiga_chip_ram_r(CUSTOM_REG_LONG(REG_BPL1PTH + pl * 2));
-							CUSTOM_REG_LONG(REG_BPL1PTH + pl * 2) += 2;
+							fetch_bitplane_data(state, pl);
 						}
 					}
 
-					pfpix1 |= assemble_odd_bitplanes(planes, obitoffs);
+					pfpix1 |= assemble_odd_bitplanes(state, planes, obitoffs);
 					obitoffs--;
 				}
 				else
@@ -775,22 +764,23 @@ void amiga_render_scanline(running_machine *machine, bitmap_t *bitmap, int scanl
 
 				/* reset bit offsets if needed */
 				if (obitoffs < 0)
-					obitoffs = 15;
+					obitoffs = defbitoffs;
 			}
 
 			/* fetch the even bits if we are within the fetching region */
 			if (x >= ddf_start_pixel && x <= ddf_stop_pixel + edelay)
 			{
 				/* if we need to fetch more data, do it now */
-				if (ebitoffs == 15)
+				if (ebitoffs == defbitoffs)
+				{
 					for (pl = 1; pl < planes; pl += 2)
 					{
-						CUSTOM_REG(REG_BPL1DAT + pl) = amiga_chip_ram_r(CUSTOM_REG_LONG(REG_BPL1PTH + pl * 2));
-						CUSTOM_REG_LONG(REG_BPL1PTH + pl * 2) += 2;
+						fetch_bitplane_data(state, pl);
 					}
+				}
 
 				/* now assemble the bits */
-				pfpix0 |= assemble_even_bitplanes(planes, ebitoffs);
+				pfpix0 |= assemble_even_bitplanes(state, planes, ebitoffs);
 				ebitoffs--;
 
 				/* for high res, assemble a second set of bits */
@@ -799,16 +789,15 @@ void amiga_render_scanline(running_machine *machine, bitmap_t *bitmap, int scanl
 					/* reset bit offsets and fetch more data if needed */
 					if (ebitoffs < 0)
 					{
-						ebitoffs = 15;
+						ebitoffs = defbitoffs;
 
 						for (pl = 1; pl < planes; pl += 2)
 						{
-							CUSTOM_REG(REG_BPL1DAT + pl) = amiga_chip_ram_r(CUSTOM_REG_LONG(REG_BPL1PTH + pl * 2));
-							CUSTOM_REG_LONG(REG_BPL1PTH + pl * 2) += 2;
+							fetch_bitplane_data(state, pl);
 						}
 					}
 
-					pfpix1 |= assemble_even_bitplanes(planes, ebitoffs);
+					pfpix1 |= assemble_even_bitplanes(state, planes, ebitoffs);
 					ebitoffs--;
 				}
 				else
@@ -816,7 +805,7 @@ void amiga_render_scanline(running_machine *machine, bitmap_t *bitmap, int scanl
 
 				/* reset bit offsets if needed */
 				if (ebitoffs < 0)
-					ebitoffs = 15;
+					ebitoffs = defbitoffs;
 			}
 
 			/* compute playfield/sprite collisions for first pixel */
@@ -840,17 +829,22 @@ void amiga_render_scanline(running_machine *machine, bitmap_t *bitmap, int scanl
 			/* if we are within the display region, render */
 			if (dst != NULL && x >= hstart && x < hstop)
 			{
+				int pix, pri;
+
 				/* hold-and-modify mode -- assume low-res (hi-res not supported by the hardware) */
 				if (ham)
 				{
 					/* update the HAM color */
-					pfpix0 = update_ham(pfpix0);
+					pfpix0 = update_ham(state, pfpix0);
+
+					pix = sprpix & 0x1f;
+					pri = (sprpix >> 10);
 
 					/* sprite has priority */
-					if (sprpix && pf1pri > (sprpix >> 10))
+					if (sprpix && pf1pri > pri)
 					{
 						dst[x*2+0] =
-						dst[x*2+1] = CUSTOM_REG(REG_COLOR00 + (sprpix & 0x1f));
+						dst[x*2+1] = CUSTOM_REG(REG_COLOR00 + pix);
 					}
 
 					/* playfield has priority */
@@ -864,15 +858,14 @@ void amiga_render_scanline(running_machine *machine, bitmap_t *bitmap, int scanl
 				/* dual playfield mode */
 				else if (dualpf)
 				{
-					int pix;
-
 					/* mask out the sprite if it doesn't have priority */
 					pix = sprpix & 0x1f;
+					pri = (sprpix >> 10);
 					if (pix)
 					{
-						if ((pfpix0 & 0x15) && pf1pri <= (sprpix >> 10))
+						if ((pfpix0 & 0x15) && pf1pri <= pri)
 							pix = 0;
-						if ((pfpix0 & 0x2a) && pf2pri <= (sprpix >> 10))
+						if ((pfpix0 & 0x2a) && pf2pri <= pri)
 							pix = 0;
 					}
 
@@ -880,15 +873,15 @@ void amiga_render_scanline(running_machine *machine, bitmap_t *bitmap, int scanl
 					if (pix)
 						dst[x*2+0] = CUSTOM_REG(REG_COLOR00 + pix);
 					else
-						dst[x*2+0] = CUSTOM_REG(REG_COLOR00 + separate_bitplanes[(CUSTOM_REG(REG_BPLCON2) >> 6) & 1][pfpix0]);
+						dst[x*2+0] = CUSTOM_REG(REG_COLOR00 + state->separate_bitplanes[(CUSTOM_REG(REG_BPLCON2) >> 6) & 1][pfpix0]);
 
 					/* mask out the sprite if it doesn't have priority */
 					pix = sprpix & 0x1f;
 					if (pix)
 					{
-						if ((pfpix1 & 0x15) && pf1pri <= (sprpix >> 10))
+						if ((pfpix1 & 0x15) && pf1pri <= pri)
 							pix = 0;
-						if ((pfpix1 & 0x2a) && pf2pri <= (sprpix >> 10))
+						if ((pfpix1 & 0x2a) && pf2pri <= pri)
 							pix = 0;
 					}
 
@@ -896,17 +889,20 @@ void amiga_render_scanline(running_machine *machine, bitmap_t *bitmap, int scanl
 					if (pix)
 						dst[x*2+1] = CUSTOM_REG(REG_COLOR00 + pix);
 					else
-						dst[x*2+1] = CUSTOM_REG(REG_COLOR00 + separate_bitplanes[(CUSTOM_REG(REG_BPLCON2) >> 6) & 1][pfpix1]);
+						dst[x*2+1] = CUSTOM_REG(REG_COLOR00 + state->separate_bitplanes[(CUSTOM_REG(REG_BPLCON2) >> 6) & 1][pfpix1]);
 				}
 
 				/* single playfield mode */
 				else
 				{
+					pix = sprpix & 0x1f;
+					pri = (sprpix >> 10);
+
 					/* sprite has priority */
-					if (sprpix && pf1pri > (sprpix >> 10))
+					if (sprpix && pf1pri > pri)
 					{
 						dst[x*2+0] =
-						dst[x*2+1] = CUSTOM_REG(REG_COLOR00 + (sprpix & 0x1f));
+						dst[x*2+1] = CUSTOM_REG(REG_COLOR00 + pix);
 					}
 
 					/* playfield has priority */
@@ -961,9 +957,9 @@ void amiga_render_scanline(running_machine *machine, bitmap_t *bitmap, int scanl
 	if (machine->primary_screen->frame_number() % 64 == 0 && scanline == 0)
 	{
 		if (input_code_pressed(machine, KEYCODE_Q))
-			popmessage("%d", wait_offset -= 1);
+			popmessage("%d", state->wait_offset -= 1);
 		if (input_code_pressed(machine, KEYCODE_W))
-			popmessage("%d", wait_offset += 1);
+			popmessage("%d", state->wait_offset += 1);
 	}
 #endif
 }

@@ -29,10 +29,18 @@
 #include "machine/nvram.h"
 
 
-static running_device *laserdisc;
-static emu_timer *serial_timer;
-static UINT8 serial_timer_active;
-static UINT16 input_select;
+class alg_state : public amiga_state
+{
+public:
+	alg_state(running_machine &machine, const driver_device_config_base &config)
+		: amiga_state(machine, config) { }
+
+
+	running_device *laserdisc;
+	emu_timer *serial_timer;
+	UINT8 serial_timer_active;
+	UINT16 input_select;
+};
 
 static TIMER_CALLBACK( response_timer );
 
@@ -74,7 +82,7 @@ static VIDEO_START( alg )
 
 	/* configure pen 4096 as transparent in the renderer and use it for the genlock color */
 	palette_set_color(machine, 4096, MAKE_ARGB(0,0,0,0));
-	amiga_set_genlock_color(4096);
+	amiga_set_genlock_color(machine, 4096);
 }
 
 
@@ -87,10 +95,11 @@ static VIDEO_START( alg )
 
 static MACHINE_START( alg )
 {
-	laserdisc = machine->device("laserdisc");
+	alg_state *state = machine->driver_data<alg_state>();
+	state->laserdisc = machine->device("laserdisc");
 
-	serial_timer = timer_alloc(machine, response_timer, NULL);
-	serial_timer_active = FALSE;
+	state->serial_timer = timer_alloc(machine, response_timer, NULL);
+	state->serial_timer_active = FALSE;
 }
 
 
@@ -109,44 +118,50 @@ static MACHINE_RESET( alg )
 
 static TIMER_CALLBACK( response_timer )
 {
+	alg_state *state = machine->driver_data<alg_state>();
+
 	/* if we still have data to send, do it now */
-	if (laserdisc_line_r(laserdisc, LASERDISC_LINE_DATA_AVAIL) == ASSERT_LINE)
+	if (laserdisc_line_r(state->laserdisc, LASERDISC_LINE_DATA_AVAIL) == ASSERT_LINE)
 	{
-		UINT8 data = laserdisc_data_r(laserdisc);
+		UINT8 data = laserdisc_data_r(state->laserdisc);
 		if (data != 0x0a)
 			mame_printf_debug("Sending serial data = %02X\n", data);
 		amiga_serial_in_w(machine, data);
 	}
 
 	/* if there's more to come, set another timer */
-	if (laserdisc_line_r(laserdisc, LASERDISC_LINE_DATA_AVAIL) == ASSERT_LINE)
-		timer_adjust_oneshot(serial_timer, amiga_get_serial_char_period(machine), 0);
+	if (laserdisc_line_r(state->laserdisc, LASERDISC_LINE_DATA_AVAIL) == ASSERT_LINE)
+		timer_adjust_oneshot(state->serial_timer, amiga_get_serial_char_period(machine), 0);
 	else
-		serial_timer_active = FALSE;
+		state->serial_timer_active = FALSE;
 }
 
 
 static void vsync_callback(running_machine *machine)
 {
+	alg_state *state = machine->driver_data<alg_state>();
+
 	/* if we have data available, set a timer to read it */
-	if (!serial_timer_active && laserdisc_line_r(laserdisc, LASERDISC_LINE_DATA_AVAIL) == ASSERT_LINE)
+	if (!state->serial_timer_active && laserdisc_line_r(state->laserdisc, LASERDISC_LINE_DATA_AVAIL) == ASSERT_LINE)
 	{
-		timer_adjust_oneshot(serial_timer, amiga_get_serial_char_period(machine), 0);
-		serial_timer_active = TRUE;
+		timer_adjust_oneshot(state->serial_timer, amiga_get_serial_char_period(machine), 0);
+		state->serial_timer_active = TRUE;
 	}
 }
 
 
 static void serial_w(running_machine *machine, UINT16 data)
 {
+	alg_state *state = machine->driver_data<alg_state>();
+
 	/* write to the laserdisc player */
-	laserdisc_data_w(laserdisc, data & 0xff);
+	laserdisc_data_w(state->laserdisc, data & 0xff);
 
 	/* if we have data available, set a timer to read it */
-	if (!serial_timer_active && laserdisc_line_r(laserdisc, LASERDISC_LINE_DATA_AVAIL) == ASSERT_LINE)
+	if (!state->serial_timer_active && laserdisc_line_r(state->laserdisc, LASERDISC_LINE_DATA_AVAIL) == ASSERT_LINE)
 	{
-		timer_adjust_oneshot(serial_timer, amiga_get_serial_char_period(machine), 0);
-		serial_timer_active = TRUE;
+		timer_adjust_oneshot(state->serial_timer, amiga_get_serial_char_period(machine), 0);
+		state->serial_timer_active = TRUE;
 	}
 }
 
@@ -160,33 +175,40 @@ static void serial_w(running_machine *machine, UINT16 data)
 
 static void alg_potgo_w(running_machine *machine, UINT16 data)
 {
+	alg_state *state = machine->driver_data<alg_state>();
+
 	/* bit 15 controls whether pin 9 is input/output */
 	/* bit 14 controls the value, which selects which player's controls to read */
-	input_select = (data & 0x8000) ? ((data >> 14) & 1) : 0;
+	state->input_select = (data & 0x8000) ? ((data >> 14) & 1) : 0;
 }
 
 
 static CUSTOM_INPUT( lightgun_pos_r )
 {
+	alg_state *state = field->port->machine->driver_data<alg_state>();
 	int x = 0, y = 0;
 
 	/* get the position based on the input select */
-	get_lightgun_pos(*field->port->machine->primary_screen, input_select, &x, &y);
+	get_lightgun_pos(*field->port->machine->primary_screen, state->input_select, &x, &y);
 	return (y << 8) | (x >> 2);
 }
 
 
 static CUSTOM_INPUT( lightgun_trigger_r )
 {
+	alg_state *state = field->port->machine->driver_data<alg_state>();
+
 	/* read the trigger control based on the input select */
-	return (input_port_read(field->port->machine, "TRIGGERS") >> input_select) & 1;
+	return (input_port_read(field->port->machine, "TRIGGERS") >> state->input_select) & 1;
 }
 
 
 static CUSTOM_INPUT( lightgun_holster_r )
 {
+	alg_state *state = field->port->machine->driver_data<alg_state>();
+
 	/* read the holster control based on the input select */
-	return (input_port_read(field->port->machine, "TRIGGERS") >> (2 + input_select)) & 1;
+	return (input_port_read(field->port->machine, "TRIGGERS") >> (2 + state->input_select)) & 1;
 }
 
 
@@ -257,9 +279,9 @@ static WRITE8_DEVICE_HANDLER( alg_cia_1_porta_w )
 
 static ADDRESS_MAP_START( main_map_r1, ADDRESS_SPACE_PROGRAM, 16 )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x07ffff) AM_RAMBANK("bank1") AM_BASE(&amiga_chip_ram)	AM_SIZE(&amiga_chip_ram_size)
+	AM_RANGE(0x000000, 0x07ffff) AM_RAMBANK("bank1") AM_BASE_SIZE_MEMBER(alg_state, chip_ram, chip_ram_size)
 	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE(amiga_cia_r, amiga_cia_w)
-	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(amiga_custom_r, amiga_custom_w) AM_BASE(&amiga_custom_regs)
+	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(amiga_custom_r, amiga_custom_w) AM_BASE_MEMBER(alg_state, custom_regs)
 	AM_RANGE(0xe80000, 0xe8ffff) AM_READWRITE(amiga_autoconfig_r, amiga_autoconfig_w)
 	AM_RANGE(0xfc0000, 0xffffff) AM_ROM AM_REGION("user1", 0)			/* System ROM */
 
@@ -270,9 +292,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_map_r2, ADDRESS_SPACE_PROGRAM, 16 )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x07ffff) AM_RAMBANK("bank1") AM_BASE(&amiga_chip_ram)	AM_SIZE(&amiga_chip_ram_size)
+	AM_RANGE(0x000000, 0x07ffff) AM_RAMBANK("bank1") AM_BASE_SIZE_MEMBER(alg_state, chip_ram, chip_ram_size)
 	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE(amiga_cia_r, amiga_cia_w)
-	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(amiga_custom_r, amiga_custom_w) AM_BASE(&amiga_custom_regs)
+	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(amiga_custom_r, amiga_custom_w) AM_BASE_MEMBER(alg_state, custom_regs)
 	AM_RANGE(0xe80000, 0xe8ffff) AM_READWRITE(amiga_autoconfig_r, amiga_autoconfig_w)
 	AM_RANGE(0xfc0000, 0xffffff) AM_ROM AM_REGION("user1", 0)			/* System ROM */
 
@@ -283,9 +305,9 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_map_picmatic, ADDRESS_SPACE_PROGRAM, 16 )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x07ffff) AM_RAMBANK("bank1") AM_BASE(&amiga_chip_ram)	AM_SIZE(&amiga_chip_ram_size)
+	AM_RANGE(0x000000, 0x07ffff) AM_RAMBANK("bank1") AM_BASE_SIZE_MEMBER(alg_state, chip_ram, chip_ram_size)
 	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE(amiga_cia_r, amiga_cia_w)
-	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(amiga_custom_r, amiga_custom_w) AM_BASE(&amiga_custom_regs)
+	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(amiga_custom_r, amiga_custom_w) AM_BASE_MEMBER(alg_state, custom_regs)
 	AM_RANGE(0xe80000, 0xe8ffff) AM_READWRITE(amiga_autoconfig_r, amiga_autoconfig_w)
 	AM_RANGE(0xfc0000, 0xffffff) AM_ROM AM_REGION("user1", 0)			/* System ROM */
 
@@ -404,7 +426,7 @@ static const mos6526_interface cia_1_intf =
 	DEVCB_NULL								/* port B */
 };
 
-static MACHINE_CONFIG_START( alg_r1, driver_device )
+static MACHINE_CONFIG_START( alg_r1, alg_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, AMIGA_68000_NTSC_CLOCK)
@@ -418,7 +440,7 @@ static MACHINE_CONFIG_START( alg_r1, driver_device )
 	MDRV_LASERDISC_OVERLAY(amiga, 512*2, 262, BITMAP_FORMAT_INDEXED16)
 	MDRV_LASERDISC_OVERLAY_CLIP((129-8)*2, (449+8-1)*2, 44-8, 244+8-1)
 
-    /* video hardware */
+	/* video hardware */
 	MDRV_LASERDISC_SCREEN_ADD_NTSC("screen", BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_REFRESH_RATE(59.997)
 	MDRV_SCREEN_SIZE(512*2, 262)
@@ -658,6 +680,7 @@ ROM_END
 
 static void alg_init(running_machine *machine)
 {
+	alg_state *state = machine->driver_data<alg_state>();
 	static const amiga_machine_interface alg_intf =
 	{
 		ANGUS_CHIP_RAM_MASK,
@@ -672,7 +695,7 @@ static void alg_init(running_machine *machine)
 	amiga_machine_config(machine, &alg_intf);
 
 	/* set up memory */
-	memory_configure_bank(machine, "bank1", 0, 1, amiga_chip_ram, 0);
+	memory_configure_bank(machine, "bank1", 0, 1, state->chip_ram, 0);
 	memory_configure_bank(machine, "bank1", 1, 1, memory_region(machine, "user1"), 0);
 }
 

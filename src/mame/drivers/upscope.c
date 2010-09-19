@@ -30,11 +30,11 @@
 #include "machine/nvram.h"
 
 
-class upscope_state : public driver_device
+class upscope_state : public amiga_state
 {
 public:
 	upscope_state(running_machine &machine, const driver_device_config_base &config)
-		: driver_device(machine, config) { }
+		: amiga_state(machine, config) { }
 
 	UINT8	m_nvram[0x100];
 };
@@ -248,9 +248,9 @@ static WRITE8_DEVICE_HANDLER( upscope_cia_1_porta_w )
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x07ffff) AM_RAMBANK("bank1") AM_BASE(&amiga_chip_ram)	AM_SIZE(&amiga_chip_ram_size)
+	AM_RANGE(0x000000, 0x07ffff) AM_RAMBANK("bank1") AM_BASE_SIZE_MEMBER(upscope_state, chip_ram, chip_ram_size)
 	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE(amiga_cia_r, amiga_cia_w)
-	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(amiga_custom_r, amiga_custom_w) AM_BASE(&amiga_custom_regs)
+	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(amiga_custom_r, amiga_custom_w)  AM_BASE_MEMBER(upscope_state, custom_regs)
 	AM_RANGE(0xe80000, 0xe8ffff) AM_READWRITE(amiga_autoconfig_r, amiga_autoconfig_w)
 	AM_RANGE(0xfc0000, 0xffffff) AM_ROM AM_REGION("user1", 0)			/* System ROM */
 
@@ -321,7 +321,7 @@ static MACHINE_CONFIG_START( upscope, upscope_state )
 	MDRV_MACHINE_RESET(amiga)
 	MDRV_NVRAM_ADD_0FILL("nvram")
 
-    /* video hardware */
+	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -391,6 +391,7 @@ ROM_END
 
 static DRIVER_INIT( upscope )
 {
+	upscope_state *state = machine->driver_data<upscope_state>();
 	static const amiga_machine_interface upscope_intf =
 	{
 		ANGUS_CHIP_RAM_MASK,
@@ -403,11 +404,10 @@ static DRIVER_INIT( upscope )
 	amiga_machine_config(machine, &upscope_intf);
 
 	/* allocate NVRAM */
-	upscope_state *state = machine->driver_data<upscope_state>();
 	machine->device<nvram_device>("nvram")->set_base(state->m_nvram, sizeof(state->m_nvram));
 
 	/* set up memory */
-	memory_configure_bank(machine, "bank1", 0, 1, amiga_chip_ram, 0);
+	memory_configure_bank(machine, "bank1", 0, 1, state->chip_ram, 0);
 	memory_configure_bank(machine, "bank1", 1, 1, memory_region(machine, "user1"), 0);
 }
 

@@ -55,13 +55,14 @@
 
 
 
-/*************************************
- *
- *  Globals
- *
- *************************************/
+class arcadia_state : public amiga_state
+{
+public:
+	arcadia_state(running_machine &machine, const driver_device_config_base &config)
+		: amiga_state(machine, config) { }
 
-static UINT8 coin_counter[2];
+	UINT8 coin_counter[2];
+};
 
 
 
@@ -136,6 +137,8 @@ static WRITE8_DEVICE_HANDLER( arcadia_cia_0_portb_w )
 	/* writing a 0 in the low bit clears one of the coins */
 	if ((data & 1) == 0)
 	{
+		UINT8 *coin_counter = device->machine->driver_data<arcadia_state>()->coin_counter;
+
 		if (coin_counter[0] > 0)
 			coin_counter[0]--;
 		else if (coin_counter[1] > 0)
@@ -153,23 +156,29 @@ static WRITE8_DEVICE_HANDLER( arcadia_cia_0_portb_w )
 
 static CUSTOM_INPUT( coin_counter_r )
 {
+	int coin = (FPTR)param;
+	UINT8 *coin_counter = field->port->machine->driver_data<arcadia_state>()->coin_counter;
+
 	/* return coin counter values */
-	return *(UINT8 *)param & 3;
+	return coin_counter[coin] & 3;
 }
 
 
 static INPUT_CHANGED( coin_changed_callback )
 {
-	UINT8 *counter = (UINT8 *)param;
+	int coin = (FPTR)param;
+	UINT8 *coin_counter = field->port->machine->driver_data<arcadia_state>()->coin_counter;
 
 	/* check for a 0 -> 1 transition */
-	if (!oldval && newval && *counter < 3)
-		*counter += 1;
+	if (!oldval && newval && coin_counter[coin] < 3)
+		coin_counter[coin] += 1;
 }
 
 
 static void arcadia_reset_coins(running_machine *machine)
 {
+	UINT8 *coin_counter = machine->driver_data<arcadia_state>()->coin_counter;
+
 	/* reset coin counters */
 	coin_counter[0] = coin_counter[1] = 0;
 }
@@ -184,9 +193,9 @@ static void arcadia_reset_coins(running_machine *machine)
 
 static ADDRESS_MAP_START( amiga_map, ADDRESS_SPACE_PROGRAM, 16 )
 	ADDRESS_MAP_UNMAP_HIGH
-	AM_RANGE(0x000000, 0x07ffff) AM_RAMBANK("bank1") AM_BASE(&amiga_chip_ram) AM_SIZE(&amiga_chip_ram_size)
+	AM_RANGE(0x000000, 0x07ffff) AM_RAMBANK("bank1") AM_BASE_SIZE_MEMBER(arcadia_state, chip_ram, chip_ram_size)
 	AM_RANGE(0xbfd000, 0xbfefff) AM_READWRITE(amiga_cia_r, amiga_cia_w)
-	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(amiga_custom_r, amiga_custom_w) AM_BASE(&amiga_custom_regs)
+	AM_RANGE(0xc00000, 0xdfffff) AM_READWRITE(amiga_custom_r, amiga_custom_w) AM_BASE_MEMBER(arcadia_state, custom_regs)
 	AM_RANGE(0xe80000, 0xe8ffff) AM_READWRITE(amiga_autoconfig_r, amiga_autoconfig_w)
 	AM_RANGE(0xf80000, 0xffffff) AM_ROM AM_REGION("user1", 0)		/* Kickstart BIOS */
 
@@ -218,8 +227,8 @@ static INPUT_PORTS_START( arcadia )
 	PORT_SERVICE_NO_TOGGLE( 0x02, IP_ACTIVE_LOW )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_START2 )
 	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(coin_counter_r, &coin_counter[0])
-	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(coin_counter_r, &coin_counter[1])
+	PORT_BIT( 0x30, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(coin_counter_r, 0)
+	PORT_BIT( 0xc0, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(coin_counter_r, 1)
 
 	PORT_START("JOY0DAT")
 	PORT_BIT( 0x0303, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(amiga_joystick_convert, "P1JOY")
@@ -249,8 +258,8 @@ static INPUT_PORTS_START( arcadia )
 	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
 
 	PORT_START("COINS")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(coin_changed_callback, &coin_counter[0])
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED(coin_changed_callback, &coin_counter[1])
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(coin_changed_callback, 0)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED(coin_changed_callback, 1)
 INPUT_PORTS_END
 
 
@@ -287,7 +296,7 @@ static const mos6526_interface cia_1_intf =
 	DEVCB_NULL
 };
 
-static MACHINE_CONFIG_START( arcadia, driver_device )
+static MACHINE_CONFIG_START( arcadia, arcadia_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, AMIGA_68000_NTSC_CLOCK)
@@ -753,6 +762,7 @@ INLINE void generic_decode(running_machine *machine, const char *tag, int bit7, 
 
 static void arcadia_init(running_machine *machine)
 {
+	arcadia_state *state = machine->driver_data<arcadia_state>();
 	static const amiga_machine_interface arcadia_intf =
 	{
 		ANGUS_CHIP_RAM_MASK,
@@ -768,7 +778,7 @@ static void arcadia_init(running_machine *machine)
 	amiga_machine_config(machine, &arcadia_intf);
 
 	/* set up memory */
-	memory_configure_bank(machine, "bank1", 0, 1, amiga_chip_ram, 0);
+	memory_configure_bank(machine, "bank1", 0, 1, state->chip_ram, 0);
 	memory_configure_bank(machine, "bank1", 1, 1, memory_region(machine, "user1"), 0);
 
 	/* OnePlay bios is encrypted, TenPlay is not */
