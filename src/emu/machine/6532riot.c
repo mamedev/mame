@@ -15,9 +15,17 @@ The timer seems to follow these rules:
 #include "6532riot.h"
 
 
-/***************************************************************************
-    CONSTANTS
-***************************************************************************/
+//**************************************************************************
+//  DEVICE DEFINITIONS
+//**************************************************************************
+
+const device_type RIOT6532 = riot6532_device_config::static_alloc_device_config;
+
+
+
+//**************************************************************************
+//  CONSTANTS
+//**************************************************************************
 
 enum
 {
@@ -574,5 +582,3 @@ void riot6532_device::device_reset()
 	m_timerstate = TIMER_IDLE;
 	timer_adjust_oneshot(m_timer, attotime_never, 0);
 }
-
-const device_type RIOT6532 = riot6532_device_config::static_alloc_device_config;

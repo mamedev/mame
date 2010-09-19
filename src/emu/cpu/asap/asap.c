@@ -46,6 +46,14 @@
 
 
 //**************************************************************************
+//  DEVICE DEFINITIONS
+//**************************************************************************
+
+const device_type ASAP = asap_device_config::static_alloc_device_config;
+
+
+
+//**************************************************************************
 //  CONSTANTS
 //**************************************************************************
 
@@ -1745,7 +1753,3 @@ void asap_device::trapf()
 {
 	generate_exception(EXCEPTION_TRAPF);
 }
-
-
-
-const device_type ASAP = asap_device_config::static_alloc_device_config;

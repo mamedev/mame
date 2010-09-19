@@ -55,6 +55,7 @@ INLINE void ATTR_PRINTF( 3, 4 ) verboselog( running_device *device, int n_level,
 //  GLOBAL VARIABLES
 //**************************************************************************
 
+const device_type I2CMEM = i2cmem_device_config::static_alloc_device_config;
 
 static ADDRESS_MAP_START( i2cmem_map8, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x0fff) AM_RAM
@@ -603,5 +604,3 @@ int i2cmem_device::data_offset()
 {
 	return ( ( ( m_devsel << 7 ) & 0xff00 ) | ( m_byteaddr & 0xff ) ) & address_mask();
 }
-
-const device_type I2CMEM = i2cmem_device_config::static_alloc_device_config;

@@ -20,6 +20,7 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
+const device_type AT28C16 = at28c16_device_config::static_alloc_device_config;
 
 static ADDRESS_MAP_START( at28c16_map8, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x081f) AM_RAM
@@ -333,7 +334,3 @@ TIMER_CALLBACK( at28c16_device::write_finished )
 {
 	reinterpret_cast<at28c16_device *>(ptr)->m_last_write = -1;
 }
-
-
-
-const device_type AT28C16 = at28c16_device_config::static_alloc_device_config;

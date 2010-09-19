@@ -72,6 +72,14 @@
 
 
 /***************************************************************************
+    DEVICE DEFINITIONS
+***************************************************************************/
+
+const device_type SCREEN = screen_device_config::static_alloc_device_config;
+
+
+
+/***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
 
@@ -2653,5 +2661,3 @@ void screen_device::finalize_burnin()
 #define BILINEAR_FILTER		1
 
 #include "rendersw.c"
-
-const device_type SCREEN = screen_device_config::static_alloc_device_config;

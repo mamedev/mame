@@ -40,6 +40,15 @@
 #include "emu.h"
 #include "7474.h"
 
+
+//**************************************************************************
+//  DEVICE DEFINITIONS
+//**************************************************************************
+
+const device_type MACHINE_TTL7474 = ttl7474_device_config::static_alloc_device_config;
+
+
+
 //**************************************************************************
 //  DEVICE CONFIGURATION
 //**************************************************************************
@@ -319,5 +328,3 @@ void ttl7474_device::init()
     m_last_clock = 1;
     m_last_output = -1;
 }
-
-const device_type MACHINE_TTL7474 = ttl7474_device_config::static_alloc_device_config;

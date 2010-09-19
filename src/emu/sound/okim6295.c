@@ -44,6 +44,9 @@
 //  GLOBAL VARIABLES
 //**************************************************************************
 
+// devices
+const device_type OKIM6295 = okim6295_device_config::static_alloc_device_config;
+
 // ADPCM state and tables
 bool adpcm_state::s_tables_computed = false;
 const INT8 adpcm_state::s_index_shift[8] = { -1, -1, -1, -1, 2, 4, 6, 8 };
@@ -542,5 +545,3 @@ void adpcm_state::compute_tables()
 		}
 	}
 }
-
-const device_type OKIM6295 = okim6295_device_config::static_alloc_device_config;

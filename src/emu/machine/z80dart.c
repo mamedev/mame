@@ -44,6 +44,19 @@
 
 
 //**************************************************************************
+//  DEVICE DEFINITIONS
+//**************************************************************************
+
+const device_type Z80DART = z80dart_device_config::static_alloc_device_config;
+const device_type Z80SIO0 = z80dart_device_config::static_alloc_device_config; // FIXME
+const device_type Z80SIO1 = z80dart_device_config::static_alloc_device_config; // FIXME
+const device_type Z80SIO2 = z80dart_device_config::static_alloc_device_config; // FIXME
+const device_type Z80SIO3 = z80dart_device_config::static_alloc_device_config; // FIXME
+const device_type Z80SIO4 = z80dart_device_config::static_alloc_device_config; // FIXME
+
+
+
+//**************************************************************************
 //  CONSTANTS
 //**************************************************************************
 
@@ -1488,10 +1501,3 @@ WRITE8_DEVICE_HANDLER( z80dart_ba_cd_w )
 	else
 		z80dart_d_w(device, channel, data);
 }
-
-const device_type Z80DART = z80dart_device_config::static_alloc_device_config;
-const device_type Z80SIO0 = z80dart_device_config::static_alloc_device_config; // FIXME
-const device_type Z80SIO1 = z80dart_device_config::static_alloc_device_config; // FIXME
-const device_type Z80SIO2 = z80dart_device_config::static_alloc_device_config; // FIXME
-const device_type Z80SIO3 = z80dart_device_config::static_alloc_device_config; // FIXME
-const device_type Z80SIO4 = z80dart_device_config::static_alloc_device_config; // FIXME

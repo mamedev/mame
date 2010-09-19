@@ -36,6 +36,14 @@
 
 
 /***************************************************************************
+    DEVICE DEFINITIONS
+***************************************************************************/
+
+const device_type TIMER = timer_device_config::static_alloc_device_config;
+
+
+
+/***************************************************************************
     TYPE DEFINITIONS
 ***************************************************************************/
 
@@ -1265,5 +1273,3 @@ void timer_device::scanline_timer_callback(int scanline)
 	// adjust the timer
 	timer_adjust_oneshot(m_timer, m_screen->time_until_pos(next_vpos), 0);
 }
-
-const device_type TIMER = timer_device_config::static_alloc_device_config;

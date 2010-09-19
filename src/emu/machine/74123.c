@@ -15,6 +15,13 @@
 
 
 //**************************************************************************
+//  DEVICE DEFINITIONS
+//**************************************************************************
+
+const device_type TTL74123 = ttl74123_device_config::static_alloc_device_config;
+
+
+//**************************************************************************
 //  DEVICE CONFIGURATION
 //**************************************************************************
 
@@ -340,5 +347,3 @@ void ttl74123_device::reset_w()
 {
 	set_output();
 }
-
-const device_type TTL74123 = ttl74123_device_config::static_alloc_device_config;

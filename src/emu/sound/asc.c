@@ -13,9 +13,13 @@
 #include "streams.h"
 #include "asc.h"
 
+
 //**************************************************************************
 //  GLOBAL VARIABLES
 //**************************************************************************
+
+const device_type ASC = asc_device_config::static_alloc_device_config;
+
 
 //**************************************************************************
 //  DEVICE CONFIGURATION
@@ -185,6 +189,4 @@ void asc_device::write(UINT16 offset, UINT8 data)
 		regs[offset-0x800] = data;
 	}
 }
-
-const device_type ASC = asc_device_config::static_alloc_device_config;
 

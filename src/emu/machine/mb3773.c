@@ -14,6 +14,13 @@
 #include "mb3773.h"
 
 
+//**************************************************************************
+//  DEVICE DEFINITIONS
+//**************************************************************************
+
+const device_type MB3773 = mb3773_device_config::static_alloc_device_config;
+
+
 
 //**************************************************************************
 //  DEVICE CONFIGURATION
@@ -151,7 +158,3 @@ TIMER_CALLBACK( mb3773_device::watchdog_timeout )
 {
 	reinterpret_cast<mb3773_device *>(ptr)->m_machine.schedule_soft_reset();
 }
-
-
-
-const device_type MB3773 = mb3773_device_config::static_alloc_device_config;
