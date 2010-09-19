@@ -423,7 +423,7 @@ void via6522_device::device_timer(emu_timer &timer, device_timer_id id, int para
 		case TIMER_SHIFT:
 			shift();
 			break;
-			
+
 		// t1 timeout
 		case TIMER_T1:
 		    if (T1_CONTINUOUS (m_acr))
@@ -454,7 +454,7 @@ void via6522_device::device_timer(emu_timer &timer, device_timer_id id, int para
 				set_int(INT_T1);
 		    }
 		    break;
-		   
+
 		// t2 timeout
 		case TIMER_T2:
 		    m_t2_active = 0;

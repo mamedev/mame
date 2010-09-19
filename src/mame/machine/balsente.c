@@ -80,7 +80,7 @@ MACHINE_START( balsente )
 {
 	balsente_state *state = machine->driver_data<balsente_state>();
 	int i;
-	
+
 	state->cem_device[0] = state->m_cem1;
 	state->cem_device[1] = state->m_cem2;
 	state->cem_device[2] = state->m_cem3;

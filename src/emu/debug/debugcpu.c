@@ -354,7 +354,7 @@ bool debug_comment_save(running_machine *machine)
 				if (curnode == NULL)
 					throw emu_exception();
 				xml_set_attribute(curnode, "tag", device->tag());
-				
+
 				// export the comments
 				if (!device->debug()->comment_export(*curnode))
 					throw emu_exception();
@@ -1982,7 +1982,7 @@ void device_debug::instruction_hook(offs_t curpc)
 	if (global->execution_state == EXECUTION_STATE_STOPPED)
 	{
 		int firststop = true;
-		
+
 		// load comments if we haven't yet
 		if (!global->comments_loaded)
 		{
@@ -2561,7 +2561,7 @@ offs_t device_debug::history_pc(int index) const
 
 
 //-------------------------------------------------
-//  comment_add - adds a comment to the list at 
+//  comment_add - adds a comment to the list at
 //  the given address
 //-------------------------------------------------
 
@@ -2570,7 +2570,7 @@ void device_debug::comment_add(offs_t addr, const char *comment, rgb_t color)
 	// create a new item for the list
 	UINT32 crc = compute_opcode_crc32(addr);
 	dasm_comment *newcomment = auto_alloc(m_device.machine, dasm_comment(comment, addr, color, crc));
-	
+
 	// figure out where to insert it
 	dasm_comment *prev = NULL;
 	dasm_comment *curr;
@@ -2581,14 +2581,14 @@ void device_debug::comment_add(offs_t addr, const char *comment, rgb_t color)
 	// we could be the new head
 	if (prev == NULL)
 		m_comment_list.prepend(*newcomment);
-	
-	// or else we just insert ourselves here 
+
+	// or else we just insert ourselves here
 	else
 	{
 		newcomment->m_next = prev->m_next;
 		prev->m_next = newcomment;
 	}
-	
+
 	// scan forward from here to delete any exact matches
 	for ( ; curr != NULL && curr->m_address == addr; curr = curr->next())
 		if (curr->m_crc == crc)
@@ -2603,7 +2603,7 @@ void device_debug::comment_add(offs_t addr, const char *comment, rgb_t color)
 
 
 //-------------------------------------------------
-//  comment_remove - removes a comment at the 
+//  comment_remove - removes a comment at the
 //  given address with a matching CRC
 //-------------------------------------------------
 
@@ -2616,7 +2616,7 @@ bool device_debug::comment_remove(offs_t addr)
 		// if we're past the address, we failed
 		if (curr->m_address > addr)
 			break;
-		
+
 		// find an exact match
 		if (curr->m_address == addr && curr->m_crc == crc)
 		{
@@ -2626,7 +2626,7 @@ bool device_debug::comment_remove(offs_t addr)
 			return true;
 		}
 	}
-	
+
 	// failure is an option
 	return false;
 }
@@ -2645,12 +2645,12 @@ const char *device_debug::comment_text(offs_t addr) const
 		// if we're past the address, we failed
 		if (curr->m_address > addr)
 			break;
-		
+
 		// find an exact match
 		if (curr->m_address == addr && curr->m_crc == crc)
 			return curr->m_text;
 	}
-	
+
 	// failure is an option
 	return NULL;
 }
@@ -2694,7 +2694,7 @@ bool device_debug::comment_import(xml_data_node &cpunode)
 		rgb_t color = xml_get_attribute_int(datanode, "color", 0);
 		UINT32 crc;
 		sscanf(xml_get_attribute_string(datanode, "crc", 0), "%08X", &crc);
-		
+
 		// add the new comment; we assume they were saved ordered
 		m_comment_list.append(*auto_alloc(m_device.machine, dasm_comment(datanode->value, address, color, crc)));
 	}
@@ -2742,7 +2742,7 @@ UINT32 device_debug::compute_opcode_crc32(offs_t address) const
 	address_space *space = m_memory->space(AS_PROGRAM);
 	if (space == NULL)
 		return 0;
-		
+
 	// zero out the buffers
 	UINT8 opbuf[64], argbuf[64];
 	memset(opbuf, 0x00, sizeof(opbuf));

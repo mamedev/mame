@@ -340,7 +340,7 @@ ifndef SDL_INSTALL_ROOT
 INCPATH += `sdl-config --cflags`
 LIBS += -lm `sdl-config --libs`
 else
-INCPATH += -I$(SDL_INSTALL_ROOT)/include 
+INCPATH += -I$(SDL_INSTALL_ROOT)/include
 CCOMFLAGS += -D_GNU_SOURCE=1
 LIBS += -lm -L$(SDL_INSTALL_ROOT)/lib -Wl,-rpath,$(SDL_INSTALL_ROOT)/lib -lSDL
 endif
@@ -388,7 +388,7 @@ else
 # Remove the "/SDL" component from the include path so that we can compile
 # files (header files are #include "SDL/something.h", so the extra "/SDL"
 # causes a significant problem)
-INCPATH += `sdl-config --cflags | sed 's:/SDL::'` 
+INCPATH += `sdl-config --cflags | sed 's:/SDL::'`
 CCOMFLAGS += -DNO_SDL_GLEXT
 # Remove libSDLmain, as its symbols conflict with SDLMain_tmpl.m
 LIBS += `sdl-config --libs | sed 's/-lSDLmain//'` -lpthread

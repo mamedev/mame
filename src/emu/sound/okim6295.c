@@ -303,7 +303,7 @@ UINT8 okim6295_device::read_status()
 	return result;
 }
 
-	
+
 //-------------------------------------------------
 //  read - memory interface for read
 //-------------------------------------------------

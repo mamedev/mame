@@ -694,7 +694,7 @@ UINT16 mc6845_get_ma(running_device *device)
 	mc6845_t *mc6845 = get_safe_token(device);
 
 	mc6845_update_counters( mc6845 );
-	
+
 	return ( mc6845->line_address + mc6845->character_counter ) & 0x3fff;
 }
 

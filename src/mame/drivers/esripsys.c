@@ -680,7 +680,7 @@ static DRIVER_INIT( esripsys )
 	fdt_a = auto_alloc_array(machine, UINT8, FDT_RAM_SIZE);
 	fdt_b = auto_alloc_array(machine, UINT8, FDT_RAM_SIZE);
 	cmos_ram = auto_alloc_array(machine, UINT8, CMOS_RAM_SIZE);
-	
+
 	machine->device<nvram_device>("nvram")->set_base(cmos_ram, CMOS_RAM_SIZE);
 
 	memory_set_bankptr(machine, "bank2", &rom[0x0000]);

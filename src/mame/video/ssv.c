@@ -243,141 +243,141 @@ VIDEO_START( gdfs )
 
 /***************************************************************************
 
-	CRT controller, registers that are read
-	(vblank etc.?)
+    CRT controller, registers that are read
+    (vblank etc.?)
 
-			1c0000 (wait for bit .. to become ..)
+            1c0000 (wait for bit .. to become ..)
 
-	keithlcy:	bit D, 0 -> 1
+    keithlcy:   bit D, 0 -> 1
 
-	mslider:	bit A, 0
+    mslider:    bit A, 0
 
-	hypreact:
-	meosism:
-	srmp7:
-	sxyreact:
-	ultrax:	bit F, 0
+    hypreact:
+    meosism:
+    srmp7:
+    sxyreact:
+    ultrax: bit F, 0
 
-	twineag2:
-	hypreac2:	bit C, 1 -> 0
-  			bit F, 0
+    twineag2:
+    hypreac2:   bit C, 1 -> 0
+            bit F, 0
 
-	janjans1:
-	srmp4:
-	survarts:	no checks
+    janjans1:
+    srmp4:
+    survarts:   no checks
 
-	ryorioh:
-	drifto94:	bit D, 0 -> 1
- 			bit A, 0
+    ryorioh:
+    drifto94:   bit D, 0 -> 1
+            bit A, 0
 
 
-	CRT controller, registers that are written
-	(resolution, visible area, flipping etc.)
+    CRT controller, registers that are written
+    (resolution, visible area, flipping etc.)
 
-	1c0060-61	---- ---- ---- ----	?							21 or 2b	for all games
-	1c0062-63	fedc ba98 7654 3210     x start visible area
-	1c0064-65	fedc ba98 7654 3210     x end visible area
-	1c0066-67	---- ---- ---- ----     ?							1c6		for all games
-	1c0068-69	---- ---- ---- ----     ?							1		for all games
-	1c006a-6b	fedc ba98 7654 3210     y start visible area
-	1c006c-6d	fedc ba98 7654 3210     y end visible area
-	1c006e-6f	---- ---- ---- ----     ?							106		for all games
-	1c0070-71	---- ---- ---- ----	?
-			---- --98 7654 3210     y global tilemap offset
-	1c0072-73	---- ---- ---- ----     ?
-	1c0074-75	---- ---- ---- ----     ?
-			-e-- ---- ---- ----	y sprite inversion 
-			---c ---- ---- ----	x sprite inversion?
-			---- ba98 ---- ----	? 							0101 for all games
-			---- ---- -6-- ----	y tilemap inversion?
-			---- ---- ---4 ----	x tilemap inversion?
-	1c0076-77	-e-- ---- ---- ----     global/local sprites coordinates
-			---- ---- -6-- ----     shadow (2bits - 4bits)
-	1c0078-79	---- ---- ---- ----     ?
-	1c007a-7b	---- ---- ---- ----     ?	
-			---- -a-- ---- ----     left-right up-down inversion
-	
-			1c0060-7f:
+    1c0060-61   ---- ---- ---- ---- ?                           21 or 2b    for all games
+    1c0062-63   fedc ba98 7654 3210     x start visible area
+    1c0064-65   fedc ba98 7654 3210     x end visible area
+    1c0066-67   ---- ---- ---- ----     ?                           1c6     for all games
+    1c0068-69   ---- ---- ---- ----     ?                           1       for all games
+    1c006a-6b   fedc ba98 7654 3210     y start visible area
+    1c006c-6d   fedc ba98 7654 3210     y end visible area
+    1c006e-6f   ---- ---- ---- ----     ?                           106     for all games
+    1c0070-71   ---- ---- ---- ---- ?
+            ---- --98 7654 3210     y global tilemap offset
+    1c0072-73   ---- ---- ---- ----     ?
+    1c0074-75   ---- ---- ---- ----     ?
+            -e-- ---- ---- ---- y sprite inversion
+            ---c ---- ---- ---- x sprite inversion?
+            ---- ba98 ---- ---- ?                           0101 for all games
+            ---- ---- -6-- ---- y tilemap inversion?
+            ---- ---- ---4 ---- x tilemap inversion?
+    1c0076-77   -e-- ---- ---- ----     global/local sprites coordinates
+            ---- ---- -6-- ----     shadow (2bits - 4bits)
+    1c0078-79   ---- ---- ---- ----     ?
+    1c007a-7b   ---- ---- ---- ----     ?
+            ---- -a-- ---- ----     left-right up-down inversion
 
-	drifto94:	0000 0025 00cd 01c6 - 0001 0013 0101 0106
-			0300 0711 0500 0000 - 0015 5940
-			03ea      5558  (flip)
+            1c0060-7f:
 
-	dynagear:	002b 002c 00d4 01c6 - 0001 0012 0102 0106
-  			02fd 0000 0500 0000 - 0015 5940
-			????      ????  (flip)
+    drifto94:   0000 0025 00cd 01c6 - 0001 0013 0101 0106
+            0300 0711 0500 0000 - 0015 5940
+            03ea      5558  (flip)
 
-	eaglshot:	0021 002a 00ca 01c6 - 0001 0016 00f6 0106
- 			0301 0000 0500 d000 - 0015 5940
-			????      ????  (flip)
+    dynagear:   002b 002c 00d4 01c6 - 0001 0012 0102 0106
+            02fd 0000 0500 0000 - 0015 5940
+            ????      ????  (flip)
 
-	gdfs:		002b 002c 00d5 01c6 - 0001 0012 0102 0106
-			03ec 0711 0500 0000 - 00d5 5950
-			03ec      1557  (flip)
+    eaglshot:   0021 002a 00ca 01c6 - 0001 0016 00f6 0106
+            0301 0000 0500 d000 - 0015 5940
+            ????      ????  (flip)
 
-	hypreact:	0021 0022 00cb 01c6 - 0001 000e 00fe 0106
-			0301 0000 0500 c000 - 0015 5140
-			03f0      5558  (flip)
+    gdfs:       002b 002c 00d5 01c6 - 0001 0012 0102 0106
+            03ec 0711 0500 0000 - 00d5 5950
+            03ec      1557  (flip)
 
-	hypreac2:	0021 0022 00cb 01c6 - 0001 000e 00fe 0106
-			0301 0000 05ff c000 - 0015 5140
-			03ea      5558  (flip)
+    hypreact:   0021 0022 00cb 01c6 - 0001 000e 00fe 0106
+            0301 0000 0500 c000 - 0015 5140
+            03f0      5558  (flip)
 
-	janjans1:	0021 0023 00cb 01c6 - 0001 000f 00fe 0106
-			0300 0000 0500 c000 - 0015 5140
-			0300			(flip)
+    hypreac2:   0021 0022 00cb 01c6 - 0001 000e 00fe 0106
+            0301 0000 05ff c000 - 0015 5140
+            03ea      5558  (flip)
 
-	keithlcy:	002b 0025 00cd 01c6 - 0001 0013 0101 0106
-			0300 0711 0500 0000 - 0015 5940
-			03ea      5558  (flip)
+    janjans1:   0021 0023 00cb 01c6 - 0001 000f 00fe 0106
+            0300 0000 0500 c000 - 0015 5140
+            0300            (flip)
 
-	meosism:	002b 002c 00d5 01c6 - 0001 0012 00fe 0106
-			0301 0000 0500 c000 - 0015 5140
-			(no flip)
+    keithlcy:   002b 0025 00cd 01c6 - 0001 0013 0101 0106
+            0300 0711 0500 0000 - 0015 5940
+            03ea      5558  (flip)
 
-	mslider:	0021 0026 00d6 01c6 - 0001 000e 00fe 0106
-			03f1 0711 5550 c080 - 0015 5940
-			0301      0500  (flip)
+    meosism:    002b 002c 00d5 01c6 - 0001 0012 00fe 0106
+            0301 0000 0500 c000 - 0015 5140
+            (no flip)
 
-	ryorioh:	0021 0023*00cb 01c6 - 0001 000f 00fe 0106
-			0300 0000 0500 c000 - 0015 5140
-			03ed      5558  (flip) *0025
+    mslider:    0021 0026 00d6 01c6 - 0001 000e 00fe 0106
+            03f1 0711 5550 c080 - 0015 5940
+            0301      0500  (flip)
 
-	srmp4:	002b 002c 00d4 01c6 - 0001 0012 0102 0106
-			0301 0711 0500 0000 - 0015 4940
-			ffe8      5557  (flip)
+    ryorioh:    0021 0023*00cb 01c6 - 0001 000f 00fe 0106
+            0300 0000 0500 c000 - 0015 5140
+            03ed      5558  (flip) *0025
 
-	srmp7:	002b 002c 00d4 01c6 - 0001 000e 00fd 0106
-			0000 0000 e500 0000 - 0015 7140
-			02f2      b558  (flip)
+    srmp4:  002b 002c 00d4 01c6 - 0001 0012 0102 0106
+            0301 0711 0500 0000 - 0015 4940
+            ffe8      5557  (flip)
 
-	stmblade:	0021 0026 00d6 01c6 - 0001 000e 00fe 0106
-			03f1 0711 5550 c080 - 0015 5940			<- 711 becomes 0 during gameplay
-			0301      0500  (flip)
+    srmp7:  002b 002c 00d4 01c6 - 0001 000e 00fd 0106
+            0000 0000 e500 0000 - 0015 7140
+            02f2      b558  (flip)
 
-	survarts:	002b 002c 00d4 01c6 - 0001 0012 0102 0106
-			0301 0000 0500 0000 - 0015 5140
-			03e9      5558  (flip)
+    stmblade:   0021 0026 00d6 01c6 - 0001 000e 00fe 0106
+            03f1 0711 5550 c080 - 0015 5940         <- 711 becomes 0 during gameplay
+            0301      0500  (flip)
 
-	sxyreact:	0021 0022 00cb 01c6 - 0001 000e 00fe 0106
-			0301 0000 0500 c000 - 0015 5140
-			03ef      5558  (flip)
+    survarts:   002b 002c 00d4 01c6 - 0001 0012 0102 0106
+            0301 0000 0500 0000 - 0015 5140
+            03e9      5558  (flip)
 
-	sxyreac2:	0021 0023 00cb 01c6 - 0001 000e 00fe 0106
-			0301 0000 0500 c000 - 0015 5140
-			????      ????  (flip)
+    sxyreact:   0021 0022 00cb 01c6 - 0001 000e 00fe 0106
+            0301 0000 0500 c000 - 0015 5140
+            03ef      5558  (flip)
 
-	twineag2:	002b 002c 00d4 01c6 - 0001 0012 0102 0106
-			ffec 0000 e500 4000 - 0315 7940
- 			????      ????  (flip)
+    sxyreac2:   0021 0023 00cb 01c6 - 0001 000e 00fe 0106
+            0301 0000 0500 c000 - 0015 5140
+            ????      ????  (flip)
 
-	ultrax:	002b 002c 00d4 01c6 - 0001 0012 0102 0106
-			ffec 0000 e500 4000 - 0315 7940
-			02fe      b558  (flip)
+    twineag2:   002b 002c 00d4 01c6 - 0001 0012 0102 0106
+            ffec 0000 e500 4000 - 0315 7940
+            ????      ????  (flip)
 
-	vasara &	0021 0024 00cc 01c6 - 0001 000e 00fe 0106
-	vasara2:	03f1 0000 6500 c000 - 0015 5140
-			0301      3558  (flip)
+    ultrax: 002b 002c 00d4 01c6 - 0001 0012 0102 0106
+            ffec 0000 e500 4000 - 0315 7940
+            02fe      b558  (flip)
+
+    vasara &    0021 0024 00cc 01c6 - 0001 000e 00fe 0106
+    vasara2:    03f1 0000 6500 c000 - 0015 5140
+            0301      3558  (flip)
 
 
 ***************************************************************************/
@@ -652,7 +652,7 @@ static void draw_row(running_machine *machine, bitmap_t *bitmap, const rectangle
 	/* Get the scroll data */
 	x    = ssv_scroll[ scroll * 4 + 0 ];	// x scroll
 	y    = ssv_scroll[ scroll * 4 + 1 ];	// y scroll
-	//     ssv_scroll[ scroll * 4 + 2 ];	// ???
+	//     ssv_scroll[ scroll * 4 + 2 ];    // ???
 	mode = ssv_scroll[ scroll * 4 + 3 ];	// layer disabled, shadow, depth etc.
 
 	/* Background layer disabled */
@@ -774,7 +774,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		tilemaps_offsy = ((s2[3] & 0x1ff) - (s2[3] & 0x200));
 
 		/* Every single sprite is offset by x & yoffs, and additionally
-		by one of the 8 x & y offsets in the 1c0040-1c005f area   */
+        by one of the 8 x & y offsets in the 1c0040-1c005f area   */
 
 		xoffs	+=		ssv_scroll[((mode & 0x00e0) >> 4) + 0x40/2];
 		yoffs	+=		ssv_scroll[((mode & 0x00e0) >> 4) + 0x42/2];
@@ -818,7 +818,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 				scroll	=	s2[ 0 ];	// scroll index
 
-				if (ssv_scroll[0x76/2] & 0x1000)		
+				if (ssv_scroll[0x76/2] & 0x1000)
 					sy -= 0x20;						// kludge for eaglshot
 				else
 				{
@@ -1189,7 +1189,7 @@ VIDEO_UPDATE( ssv )
 	clip.min_y = (cliprect->max_y     + state->scroll[0x6a/2])     - state->scroll[0x6c/2]     + 1;
 	clip.max_y = (cliprect->max_y     + state->scroll[0x6a/2])     - state->scroll[0x6a/2]        ;
 
-//	printf("%04x %04x %04x %04x\n",clip.min_x, clip.max_x, clip.min_y, clip.max_y);
+//  printf("%04x %04x %04x %04x\n",clip.min_x, clip.max_x, clip.min_y, clip.max_y);
 
 	if (clip.min_x < 0) clip.min_x = 0;
 	if (clip.min_y < 0) clip.min_y = 0;

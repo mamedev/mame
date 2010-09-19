@@ -61,7 +61,7 @@ const int EXCEPTION_TRAP0		= 1;
 const int EXCEPTION_TRAPF		= 2;
 const int EXCEPTION_INTERRUPT	= 3;
 
-const int REGBASE 				= 0xffe0;
+const int REGBASE				= 0xffe0;
 
 
 
@@ -146,9 +146,9 @@ const asap_device::ophandler asap_device::s_opcodetable[32][4] =
 
 const asap_device::ophandler asap_device::s_conditiontable[16] =
 {
-	&asap_device::bsp, &asap_device::bmz, &asap_device::bgt, &asap_device::ble, 
+	&asap_device::bsp, &asap_device::bmz, &asap_device::bgt, &asap_device::ble,
 	&asap_device::bge, &asap_device::blt, &asap_device::bhi, &asap_device::bls,
-	&asap_device::bcc, &asap_device::bcs, &asap_device::bpl, &asap_device::bmi, 
+	&asap_device::bcc, &asap_device::bcs, &asap_device::bpl, &asap_device::bmi,
 	&asap_device::bne, &asap_device::beq, &asap_device::bvc, &asap_device::bvs
 };
 
@@ -336,7 +336,7 @@ void asap_device::device_start()
 	state_save_register_device_item(this, 0, m_ppc);
 	state_save_register_device_item(this, 0, m_nextpc);
 	state_save_register_device_item(this, 0, m_irq_state);
-	
+
 	// set our instruction counter
 	m_icountptr = &m_icount;
 }

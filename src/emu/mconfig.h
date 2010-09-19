@@ -126,7 +126,7 @@ class machine_config
 public:
 	machine_config(const game_driver &gamedrv);
 	~machine_config();
-	
+
 	const game_driver &gamedrv() const { return m_gamedrv; }
 
 	attotime				m_minimum_quantum;			// minimum scheduling quantum

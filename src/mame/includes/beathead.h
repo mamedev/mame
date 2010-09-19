@@ -25,7 +25,7 @@ public:
 	required_device<asap_device> m_maincpu;
 
 	required_shared_ptr<UINT32>	m_nvram;
-	
+
 	UINT32 *		m_videoram;
 	UINT32 *		m_paletteram;
 

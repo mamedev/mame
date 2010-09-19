@@ -4,7 +4,7 @@
 
     Apple Sound Chip (ASC) 344S0063
     Enhanced Apple Sound Chip (EASC) 343S1063
-    
+
     Emulation by R. Belmont
 
 ***************************************************************************/

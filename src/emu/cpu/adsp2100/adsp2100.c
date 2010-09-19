@@ -1,8 +1,8 @@
 /***************************************************************************
 
-	ADSP2100.c
+    ADSP2100.c
 
-	ADSP-21xx series emulator.
+    ADSP-21xx series emulator.
 
 ****************************************************************************
 
@@ -190,12 +190,12 @@ device_config *adsp2100_device_config::static_alloc_device_config(const machine_
 {
 	return global_alloc(adsp2100_device_config(mconfig, tag, owner, clock));
 }
-	
+
 device_config *adsp2101_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
 {
 	return global_alloc(adsp2101_device_config(mconfig, static_alloc_device_config, "ADSP-2101", tag, owner, clock, CHIP_TYPE_ADSP2101));
 }
-	
+
 device_config *adsp2181_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
 {
 	return global_alloc(adsp2181_device_config(mconfig, tag, owner, clock));
@@ -285,23 +285,23 @@ UINT32 adsp2181_device_config::execute_input_lines() const
 
 const address_space_config *adsp2100_device_config::memory_space_config(int spacenum) const
 {
-	return 	(spacenum == AS_PROGRAM) ? &m_program_config : 
-			(spacenum == AS_DATA) ? &m_data_config : 
+	return	(spacenum == AS_PROGRAM) ? &m_program_config :
+			(spacenum == AS_DATA) ? &m_data_config :
 			NULL;
 }
 
 const address_space_config *adsp2101_device_config::memory_space_config(int spacenum) const
 {
-	return 	(spacenum == AS_PROGRAM) ? &m_program_config : 
-			(spacenum == AS_DATA) ? &m_data_config : 
+	return	(spacenum == AS_PROGRAM) ? &m_program_config :
+			(spacenum == AS_DATA) ? &m_data_config :
 			NULL;
 }
 
 const address_space_config *adsp2181_device_config::memory_space_config(int spacenum) const
 {
-	return 	(spacenum == AS_PROGRAM) ? &m_program_config : 
-			(spacenum == AS_DATA) ? &m_data_config : 
-			(spacenum == AS_IO) ? &m_io_config : 
+	return	(spacenum == AS_PROGRAM) ? &m_program_config :
+			(spacenum == AS_DATA) ? &m_data_config :
+			(spacenum == AS_IO) ? &m_io_config :
 			NULL;
 }
 
@@ -369,8 +369,8 @@ adsp21xx_device::adsp21xx_device(running_machine &_machine, const adsp21xx_devic
 	  m_ifc(0),
 	  m_icount(0),
 	  m_mstat_mask((config.m_chip_type >= adsp21xx_device_config::CHIP_TYPE_ADSP2101) ? 0x7f : 0x0f),
-	  m_imask_mask((config.m_chip_type >= adsp21xx_device_config::CHIP_TYPE_ADSP2181) ? 0x3ff : 
-	  			   (config.m_chip_type >= adsp21xx_device_config::CHIP_TYPE_ADSP2101) ? 0x3f : 0x0f)
+	  m_imask_mask((config.m_chip_type >= adsp21xx_device_config::CHIP_TYPE_ADSP2181) ? 0x3ff :
+				   (config.m_chip_type >= adsp21xx_device_config::CHIP_TYPE_ADSP2101) ? 0x3f : 0x0f)
 {
 	// initialize remaining state
 	memset(&m_core, 0, sizeof(m_core));
@@ -774,7 +774,7 @@ void adsp21xx_device::device_start()
 	state_add(ADSP2100_FL0,     "FL0",       m_fl0).mask(1);
 	state_add(ADSP2100_FL1,     "FL1",       m_fl1).mask(1);
 	state_add(ADSP2100_FL2,     "FL2",       m_fl2).mask(1);
-	
+
 	// set our instruction counter
 	m_icountptr = &m_icount;
 }

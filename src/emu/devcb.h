@@ -126,7 +126,7 @@ void devcb_stub(device_t *device, offs_t offset, UINT8 data)
 #define DECLARE_READ_LINE_MEMBER(name)		int  name()
 #define READ_LINE_MEMBER(name)				int  name()
 #define DECLARE_WRITE_LINE_MEMBER(name) 	void name(ATTR_UNUSED int state)
-#define WRITE_LINE_MEMBER(name)			 	void name(ATTR_UNUSED int state)
+#define WRITE_LINE_MEMBER(name)				void name(ATTR_UNUSED int state)
 
 /* macros for inline device handler initialization */
 

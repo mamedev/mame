@@ -230,7 +230,7 @@ static INPUT_PORTS_START( pipeline )
 	PORT_DIPSETTING(	0x03, DEF_STR( 5C_1C ) )
 	PORT_DIPSETTING(	0x01, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(	0x00, DEF_STR( 1C_1C ) )
-//	PORT_DIPSETTING(	0x7f, DEF_STR( 1C_1C ) )            /* duplicated setting */
+//  PORT_DIPSETTING(    0x7f, DEF_STR( 1C_1C ) )            /* duplicated setting */
 	PORT_DIPSETTING(	0x0f, DEF_STR( 1C_2C ) )
 	PORT_DIPSETTING(	0x1f, DEF_STR( 1C_3C ) )
 	PORT_DIPSETTING(	0x3f, DEF_STR( 1C_4C ) )
@@ -243,7 +243,7 @@ static INPUT_PORTS_START( pipeline )
 	PORT_DIPNAME( 0x07, 0x00, DEF_STR( Difficulty ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Easy ) )             /* table at 0x35eb */
 	PORT_DIPSETTING(    0x01, DEF_STR( Medium ) )           /* table at 0x35c5 */
-//	PORT_DIPSETTING(    0x07, DEF_STR( Medium ) )           /* duplicated setting */
+//  PORT_DIPSETTING(    0x07, DEF_STR( Medium ) )           /* duplicated setting */
 	PORT_DIPSETTING(    0x03, DEF_STR( Hard ) )             /* table at 0x35a0 */
 	PORT_DIPNAME( 0x18, 0x18, "Water Speed" )               /* check code at 0x2619 - table at 0x5685 */
 	PORT_DIPSETTING(    0x18, "Slowest" )                   /* 0x12 */

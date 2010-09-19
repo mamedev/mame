@@ -300,10 +300,10 @@ inline void adsp21xx_device::stat_stack_pop()
 /*
 inline int adsp21xx_device::condition(int c)
 {
-	if (c != 14)
-		return m_condition_table[((c) << 8) | m_astat];
-	else 
-		return slow_condition(c);
+    if (c != 14)
+        return m_condition_table[((c) << 8) | m_astat];
+    else
+        return slow_condition(c);
 }
 */
 
@@ -367,22 +367,22 @@ void adsp21xx_device::write_reg1(int regnum, INT32 val)
 			m_i[index] = val & 0x3fff;
 			update_i(index);
 			break;
-		
+
 		case 1:
 			m_m[index] = (INT32)(val << 18) >> 18;
 			break;
-		
+
 		case 2:
-			m_l[index] = val & 0x3fff; 
+			m_l[index] = val & 0x3fff;
 			update_l(index);
 			break;
-		
+
 		case 3:
 			logerror("ADSP %04x: Writing to an invalid register!\n", m_ppc);
 			break;
 	}
 }
-			
+
 void adsp21xx_device::write_reg2(int regnum, INT32 val)
 {
 	int index = 4 + (regnum & 3);
@@ -392,16 +392,16 @@ void adsp21xx_device::write_reg2(int regnum, INT32 val)
 			m_i[index] = val & 0x3fff;
 			update_i(index);
 			break;
-		
+
 		case 1:
 			m_m[index] = (INT32)(val << 18) >> 18;
 			break;
-		
+
 		case 2:
-			m_l[index] = val & 0x3fff; 
+			m_l[index] = val & 0x3fff;
 			update_l(index);
 			break;
-		
+
 		case 3:
 			logerror("ADSP %04x: Writing to an invalid register!\n", m_ppc);
 			break;
@@ -413,7 +413,7 @@ void adsp21xx_device::write_reg3(int regnum, INT32 val)
 	switch (regnum)
 	{
 		case 0x00:	m_astat = val & 0x00ff;							break;
-		case 0x01:	m_mstat = val & m_mstat_mask; update_mstat(); 	break;
+		case 0x01:	m_mstat = val & m_mstat_mask; update_mstat();	break;
 		case 0x03:	m_imask = val & m_imask_mask; check_irqs(); 	break;
 		case 0x04:	m_icntl = val & 0x001f; check_irqs();			break;
 		case 0x05:	cntr_stack_push(); m_cntr = val & 0x3fff;		break;
@@ -464,7 +464,7 @@ void adsp21xx_device::write_reg3(int regnum, INT32 val)
 		default:	logerror("ADSP %04x: Writing to an invalid register!\n", m_ppc); break;
 	}
 }
-			
+
 #define WRITE_REG(adsp,grp,reg,val) ((this->*wr_reg[grp][reg])(val))
 
 

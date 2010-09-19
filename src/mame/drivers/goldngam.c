@@ -23,7 +23,7 @@
 
   CPU: 1x MC68000P8.               [IC2]
   SND: 1x Microchip AY38910A.      [IC18]
-       1x LM380N (audio amp). 
+       1x LM380N (audio amp).
 
   RAM: 2x HM62256LP-10             [IC4, IC5]
 
@@ -95,7 +95,7 @@
   SG51 = SG51K 0382 80000 MHz
 
 
-  
+
   Swiss Card Graphics Board...
   Stickered "960210"
 
@@ -179,7 +179,7 @@
 
   CPU: 1x MC68000P8.
   SND: 1x YM2149F.
-       1x LM380N (audio amp). 
+       1x LM380N (audio amp).
 
   RAM: 2x 84256A-10
 
@@ -245,17 +245,17 @@ static UINT16 *videoram;
 
 static VIDEO_START( goldngam )
 {
-	
+
 }
 
 static VIDEO_UPDATE( goldngam )
 {
-	
+
 	int x, y;
-	
+
 	UINT8 *tmp = (UINT8 *) videoram;
 	int index = 0;
-	
+
 	for(y = 0; y < 512; ++y)
 	{
 		for(x = 0; x < 384; ++x)
@@ -264,7 +264,7 @@ static VIDEO_UPDATE( goldngam )
 			++index;
 		}
 	}
-	
+
 	return 0;
 }
 
@@ -283,7 +283,7 @@ static PALETTE_INIT( goldngam )
 static READ16_HANDLER(unk_r)
 {
     int test1 = (mame_rand(space->machine) & 0xae00);
-//	popmessage("VAL = %02x", test1);
+//  popmessage("VAL = %02x", test1);
 
 	return test1;
 }
@@ -443,7 +443,7 @@ static INPUT_PORTS_START( goldngam )
 	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	
+
 	PORT_START("DSW2")
 	PORT_DIPNAME( 0x0001, 0x0001, "switch 2" )
 	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
@@ -502,7 +502,7 @@ INPUT_PORTS_END
 *************************/
 
 /* Used 1bpp gfx just to see the tiles.
-   See tiles 1d30 onward... 
+   See tiles 1d30 onward...
 */
 
 static const gfx_layout charlayout =
@@ -535,11 +535,11 @@ static const ay8910_interface goldngam_ay8910_interface =
 {
 	AY8910_LEGACY_OUTPUT,
 	AY8910_DEFAULT_LOADS,
-	DEVCB_NULL, //r 
+	DEVCB_NULL, //r
 	DEVCB_NULL, //r
 	DEVCB_NULL,
 	DEVCB_NULL
-}; 
+};
 
 static MACHINE_CONFIG_START( swisspkr, driver_device )
 
@@ -563,7 +563,7 @@ static MACHINE_CONFIG_START( swisspkr, driver_device )
 
 	MDRV_VIDEO_START(goldngam)
 	MDRV_VIDEO_UPDATE(goldngam)
-	
+
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 

@@ -124,8 +124,8 @@ static int msf_to_frames( char *token )
 }
 
 /*-------------------------------------------------
-    parse_wav_sample - takes a .WAV file, verifies 
-    that the file is 16 bits, and returns the 
+    parse_wav_sample - takes a .WAV file, verifies
+    that the file is 16 bits, and returns the
     length in bytes of the data and the offset in
     bytes to where the data starts in the file.
 -------------------------------------------------*/
@@ -470,7 +470,7 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc *outtoc, chdcd_track_i
 				outinfo->idx0offs[trknum] = -1;
 				outinfo->idx1offs[trknum] = 0;
 				strcpy(&outinfo->fname[trknum][0], lastfname);	// default filename to the last one
-//				printf("trk %d: fname %s offset %d\n", trknum, &outinfo->fname[trknum][0], outinfo->offset[trknum]);
+//              printf("trk %d: fname %s offset %d\n", trknum, &outinfo->fname[trknum][0], outinfo->offset[trknum]);
 
 				cdrom_convert_type_string_to_track_info(token, &outtoc->tracks[trknum]);
 				if (outtoc->tracks[trknum].datasize == 0)
@@ -532,7 +532,7 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc *outtoc, chdcd_track_i
 		}
 	}
 
- 	/* close the input CUE */
+	/* close the input CUE */
 	fclose(infile);
 
 	/* store the number of tracks found */
@@ -593,7 +593,7 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc *outtoc, chdcd_track_i
 					}
 					else
 					{
-						outinfo->offset[trknum] = outinfo->offset[trknum-1] + outtoc->tracks[trknum-1].frames * (outtoc->tracks[trknum-1].datasize + outtoc->tracks[trknum-1].subsize); 
+						outinfo->offset[trknum] = outinfo->offset[trknum-1] + outtoc->tracks[trknum-1].frames * (outtoc->tracks[trknum-1].datasize + outtoc->tracks[trknum-1].subsize);
 					}
 
 					if (!outtoc->tracks[trknum].frames)

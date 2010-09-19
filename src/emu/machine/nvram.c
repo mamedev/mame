@@ -100,7 +100,7 @@ void nvram_device_config::static_set_default_value(device_config *device, defaul
 
 
 //-------------------------------------------------
-//  static_set_custom_handler - configuration 
+//  static_set_custom_handler - configuration
 //  helper to set a custom callback
 //-------------------------------------------------
 
@@ -182,7 +182,7 @@ void nvram_device::nvram_default()
 				nvram[index] = mame_rand(&m_machine);
 			break;
 		}
-		
+
 		// custom handler
 		case nvram_device_config::DEFAULT_CUSTOM:
 			m_custom_handler(*this, m_base, m_length);

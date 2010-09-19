@@ -200,7 +200,7 @@ intelfsh_device_config::intelfsh_device_config(const machine_config &mconfig, de
 		map = ADDRESS_MAP_NAME( memory_map8_1Mb );
 		break;
 	}
-	
+
 	int addrbits;
 	for (addrbits = 24; addrbits > 0; addrbits--)
 		if ((m_size & (1 << addrbits)) != 0)

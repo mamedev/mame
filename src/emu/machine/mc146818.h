@@ -60,7 +60,7 @@ public:
 
 protected:
 	// internal state
-	mc146818_type 		m_type;
+	mc146818_type		m_type;
 };
 
 
@@ -92,21 +92,21 @@ protected:
 	// internal helpers
 	int dec_2_local(int a);
 	void set_base_datetime();
-	
+
 	// internal state
 	static const int MC146818_DATA_SIZE	= 0x80;
 
 	const mc146818_device_config &	m_config;
 
-	UINT8 			m_index;
-	UINT8 			m_data[MC146818_DATA_SIZE];
+	UINT8			m_index;
+	UINT8			m_data[MC146818_DATA_SIZE];
 
-	UINT16 			m_eindex;
-	UINT8 			m_edata[0x2000];
+	UINT16			m_eindex;
+	UINT8			m_edata[0x2000];
 
-	bool 			m_updated;  /* update ended interrupt flag */
+	bool			m_updated;  /* update ended interrupt flag */
 
-	attotime 		m_last_refresh;
+	attotime		m_last_refresh;
 };
 
 

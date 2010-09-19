@@ -6811,7 +6811,7 @@ static WRITE16_HANDLER( isgsm_data_w )
 					{
 						bytes_to_write = 1;
 					}
-					
+
 					isgsm_rle_control_position++;
 				}
 			}
@@ -6822,7 +6822,7 @@ static WRITE16_HANDLER( isgsm_data_w )
 				data = isgsm_rle_byte;
 			}
 		}
-		
+
 		for (int i=0;i<bytes_to_write;i++)
 		{
 			if (isgsm_mode&0x8)
@@ -7129,7 +7129,7 @@ ROM_END
 
 ROM_START( shinfz )
 	ISGSM_BIOS
-	
+
 	ROM_REGION16_BE( 0x200000, "gamecart_rgn", 0 )
 	ROM_LOAD16_WORD_SWAP("shin06.u13",0x00000,0x200000, CRC(39d773e9) SHA1(5284f90cb5190128a17ebee8b539a39c8914c364) )
 ROM_END

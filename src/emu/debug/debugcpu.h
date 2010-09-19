@@ -53,7 +53,7 @@ const UINT8 WATCHPOINT_READ				= 1;
 const UINT8 WATCHPOINT_WRITE			= 2;
 const UINT8 WATCHPOINT_READWRITE		= WATCHPOINT_READ | WATCHPOINT_WRITE;
 
-const int COMMENT_VERSION 				= 1;
+const int COMMENT_VERSION				= 1;
 
 
 
@@ -205,7 +205,7 @@ public:
 	// hotspots
 	bool hotspot_tracking_enabled() const { return (m_hotspots != NULL); }
 	void hotspot_track(int numspots, int threshhold);
-	
+
 	// comments
 	void comment_add(offs_t address, const char *comment, rgb_t color);
 	bool comment_remove(offs_t addr);
@@ -329,9 +329,9 @@ private:
 	{
 	public:
 		dasm_comment(const char *text, offs_t address, rgb_t color, UINT32 crc);
-		
+
 		dasm_comment *next() const { return m_next; }
-	
+
 		dasm_comment *		m_next;						// next comment in the list
 		offs_t				m_address;					// address in question
 		rgb_t				m_color;					// color to use

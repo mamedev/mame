@@ -200,7 +200,7 @@ int main(int argc, char *argv[])
 	/* make sure we got 1 parameter */
 	if (srcdir == NULL)
 		goto usage;
-	
+
 	/* create a tagmap for tracking files we've visited */
 	file_map = tagmap_alloc();
 
@@ -242,17 +242,17 @@ static void recurse_dependencies(file_entry *file, tagmap *map)
 	int filelen = astring_len(file->name);
 	exclude_path *exclude;
 	dependency *dep;
-	
+
 	/* skip if we're in an exclude path */
 	for (exclude = excpaths; exclude != NULL; exclude = exclude->next)
 		if (exclude->pathlen < filelen && strncmp(astring_c(file->name), astring_c(exclude->path), exclude->pathlen) == 0)
 			if (exclude->recursive || astring_chr(file->name, exclude->pathlen + 1, '/') == -1)
 				return;
-	
+
 	/* attempt to add; if we get an error, we're already present */
 	if (tagmap_add(map, astring_c(file->name), file->name, FALSE) != TMERR_NONE)
 		return;
-	
+
 	/* recurse the list from there */
 	for (dep = file->deplist; dep != NULL; dep = dep->next)
 		recurse_dependencies(dep->file, map);
@@ -344,7 +344,7 @@ static int recurse_dir(int srcrootlen, const astring *srcdir)
 					file_entry *file;
 					astring *target;
 					int taghash;
-					
+
 					/* find dependencies */
 					file = compute_dependencies(srcrootlen, srcfile);
 					recurse_dependencies(file, depend_map);
@@ -354,12 +354,12 @@ static int recurse_dir(int srcrootlen, const astring *srcdir)
 					astring_replacec(target, 0, "src/", "$(OBJ)/");
 					astring_replacec(target, 0, ".c", ".o");
 					printf("\n%s : \\\n", astring_c(target));
-					
+
 					/* iterate over the hashed dependencies and output them as well */
 					for (taghash = 0; taghash < TAGMAP_HASH_SIZE; taghash++)
 						for (entry = depend_map->table[taghash]; entry != NULL; entry = entry->next)
 							printf("\t%s \\\n", astring_c((astring *)entry->object));
-					
+
 					astring_free(target);
 					tagmap_free(depend_map);
 				}
@@ -400,7 +400,7 @@ static file_entry *compute_dependencies(int srcrootlen, const astring *srcfile)
 	file_entry *file;
 	char *filedata;
 	int index;
-	
+
 	/* see if we already have an entry */
 	normalfile = astring_dup(srcfile);
 	astring_replacechr(normalfile, PATH_SEPARATOR[0], '/');
@@ -429,23 +429,23 @@ static file_entry *compute_dependencies(int srcrootlen, const astring *srcfile)
 			int scan = index;
 			dependency *dep;
 			int start;
-			
+
 			/* first make sure we're not commented or quoted */
 			for (scan = index; scan > 2 && filedata[scan] != 13 && filedata[scan] != 10; scan--)
 				if ((filedata[scan] == '/' && filedata[scan - 1] == '/') || filedata[scan] == '"')
 					break;
 			if (filedata[scan] != 13 && filedata[scan] != 10)
 				continue;
-			
+
 			/* scan forward to find the quotes or bracket */
 			index += 7;
 			for (scan = index; scan < filelength && filedata[scan] != '<' && filedata[scan] != '"' && filedata[scan] != 13 && filedata[scan] != 10; scan++) ;
-				
+
 			/* ignore if not found or if it's bracketed */
 			if (scan >= filelength || filedata[scan] != '"')
 				continue;
 			start = ++scan;
-			
+
 			/* find the closing quote */
 			while (scan < filelength && filedata[scan] != '"')
 				scan++;
@@ -455,7 +455,7 @@ static file_entry *compute_dependencies(int srcrootlen, const astring *srcfile)
 			/* find the include file */
 			filename = astring_dupch(&filedata[start], scan - start);
 			target = find_include_file(srcrootlen, srcfile, filename);
-			
+
 			/* create a new dependency */
 			if (target != NULL)
 			{

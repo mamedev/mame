@@ -289,11 +289,11 @@ void i8257_device::device_timer(emu_timer &timer, device_timer_id id, int param,
 			}
 			break;
 		}
-	
+
 		case TIMER_MSBFLIP:
 			m_msb ^= 1;
 			break;
-		
+
 		case TIMER_DRQ_SYNC:
 		{
 			int channel = param >> 1;

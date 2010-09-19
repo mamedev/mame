@@ -45,7 +45,7 @@
 
   TMS9980A memory map:
 
-  
+
   0000-0003 ---> Reset
   0004-0007 ---> Level 1
   0008-000B ---> Level 2
@@ -172,9 +172,9 @@ static READ8_HANDLER(unk_r)
 }
 
 static ADDRESS_MAP_START( jubileep_cru_map, ADDRESS_SPACE_IO, 8 )
-//	AM_RANGE(0x0000, 0xffff) AM_READ(unk_r)
-//	AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("crtc",  mc6845_status_r, mc6845_address_w)
-//	AM_RANGE(0x01, 0x01) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
+//  AM_RANGE(0x0000, 0xffff) AM_READ(unk_r)
+//  AM_RANGE(0x00, 0x00) AM_DEVREADWRITE("crtc",  mc6845_status_r, mc6845_address_w)
+//  AM_RANGE(0x01, 0x01) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0xc8, 0xc8) AM_READ(unk_r)
 ADDRESS_MAP_END
 

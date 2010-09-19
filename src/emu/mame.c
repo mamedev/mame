@@ -239,7 +239,7 @@ core_options *mame_options(void)
 
 /*-------------------------------------------------
     set_mame_options - set mame options, used by
-	validate option
+    validate option
 -------------------------------------------------*/
 
 void set_mame_options(core_options *options)

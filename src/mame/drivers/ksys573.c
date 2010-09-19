@@ -2799,7 +2799,7 @@ static MACHINE_CONFIG_START( konami573, driver_device )
 
 	MDRV_MACHINE_RESET( konami573 )
 	MDRV_NVRAM_HANDLER( konami573 )
-	
+
 	// onboard flash
 	MDRV_FUJITSU_29F016A_ADD("onboard.0")
 	MDRV_FUJITSU_29F016A_ADD("onboard.1")

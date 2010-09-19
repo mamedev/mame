@@ -586,7 +586,7 @@ public:
 	{
 		return global_alloc(driver_device_config(mconfig, tag, owner));
 	}
-	
+
 	virtual device_t *alloc_device(running_machine &machine) const
 	{
 		// we clear here for historical reasons, as many existing driver states
@@ -627,7 +627,7 @@ protected:
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
-	
+
 	// internal state
 	const driver_device_config_base &m_config;
 };

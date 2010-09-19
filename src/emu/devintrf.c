@@ -148,7 +148,7 @@ void device_list::start_all()
 			mame_printf_verbose("Starting %s '%s'\n", device->name(), device->tag());
 			device->start();
 		}
-		
+
 		// handle missing dependencies by moving the device to the end
 		catch (device_missing_dependencies &)
 		{
@@ -190,7 +190,7 @@ void device_list::static_exit(running_machine &machine)
 	// first let the debugger save comments
 	if ((machine.debug_flags & DEBUG_FLAG_ENABLED) != 0)
 		debug_comment_save(&machine);
-	
+
 	// then nuke the devices
 	machine.m_devicelist.reset();
 }
@@ -724,7 +724,7 @@ void device_t::start()
 
 	// force an update of the clock
 	notify_clock_changed();
-	
+
 	// if we're debugging, create a device_debug object
 	if ((m_machine.debug_flags & DEBUG_FLAG_ENABLED) != 0)
 	{

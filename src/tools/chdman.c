@@ -1610,7 +1610,7 @@ static int do_extractcd(int argc, char *argv[], int param)
 		{
 			char modestr[16];
 
-			if (track == 0) 
+			if (track == 0)
 			{
 				fprintf(outfile, "FILE \"%s\" BINARY\n", outputfile2);
 			}

@@ -1689,7 +1689,7 @@ static MACHINE_START( firebeat )
 
 	/* configure fast RAM regions for DRC */
 	ppcdrc_add_fastram(machine->device("maincpu"), 0x00000000, 0x01ffffff, FALSE, work_ram);
-	
+
 	flash[0] = machine->device<fujitsu_29f016a_device>("flash0");
 	flash[1] = machine->device<fujitsu_29f016a_device>("flash1");
 	flash[2] = machine->device<fujitsu_29f016a_device>("flash2");

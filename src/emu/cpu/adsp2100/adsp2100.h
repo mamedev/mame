@@ -2,7 +2,7 @@
 
     adsp2100.h
 
-	ADSP-21xx series emulator.
+    ADSP-21xx series emulator.
 
 ****************************************************************************
 
@@ -137,7 +137,7 @@ protected:
 	// address spaces
 	const address_space_config		m_program_config;
 	const address_space_config		m_data_config;
-	
+
 	// internal state
 	UINT32							m_chip_type;
 };
@@ -192,7 +192,7 @@ protected:
 	inline void loop_stack_pop();
 	inline void stat_stack_push();
 	inline void stat_stack_pop();
-//	inline int condition(int c);
+//  inline int condition(int c);
 	int slow_condition();
 	inline void modify_address(UINT32 ireg, UINT32 mreg);
 	inline void data_write_dag1(UINT32 op, INT32 val);
@@ -233,11 +233,11 @@ protected:
 	inline INT32 read_reg1(int regnum);
 	inline INT32 read_reg2(int regnum);
 	inline INT32 read_reg3(int regnum);
-	
+
 	// interrupts
 	virtual bool generate_irq(int which, int indx = 0) = 0;
 	virtual void check_irqs() = 0;
-	
+
 	// internal state
 	static const int PC_STACK_DEPTH		= 16;
 	static const int CNTR_STACK_DEPTH	= 4;
@@ -381,13 +381,13 @@ protected:
     direct_read_data *	m_direct;
 
 	// tables
-	UINT8 				m_condition_table[0x1000];
+	UINT8				m_condition_table[0x1000];
 	UINT16				m_mask_table[0x4000];
 	UINT16				m_reverse_table[0x4000];
 
 	// debugging
 #if ADSP_TRACK_HOTSPOTS
-	UINT32 				m_pcbucket[0x4000];
+	UINT32				m_pcbucket[0x4000];
 #endif
 
 	// flag definitions
@@ -430,7 +430,7 @@ protected:
 class adsp2100_device : public adsp21xx_device
 {
 	friend class adsp2100_device_config;
-	
+
 	// construction/destruction
 	adsp2100_device(running_machine &_machine, const adsp2100_device_config &config);
 
@@ -472,7 +472,7 @@ class adsp2101_device : public adsp21xx_device
 	friend class adsp2104_device_config;
 	friend class adsp2105_device_config;
 	friend class adsp2115_device_config;
-	
+
 protected:
 	// construction/destruction
 	adsp2101_device(running_machine &_machine, const adsp2101_device_config &config);
@@ -514,7 +514,7 @@ protected:
 class adsp2181_device : public adsp21xx_device
 {
 	friend class adsp2181_device_config;
-	
+
 	// construction/destruction
 	adsp2181_device(running_machine &_machine, const adsp2181_device_config &config);
 

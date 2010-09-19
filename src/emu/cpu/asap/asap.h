@@ -258,10 +258,10 @@ protected:
 	int					m_icount;
 	address_space *		m_program;
 	direct_read_data *	m_direct;
-	
+
 	// src2val table, registers are at the end
 	UINT32				m_src2val[65536];
-	
+
 	// opcode/condition tables
 	typedef void (asap_device::*ophandler)();
 

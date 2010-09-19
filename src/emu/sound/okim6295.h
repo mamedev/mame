@@ -122,7 +122,7 @@ public:
 
 	UINT8 read_status();
 	void write_command(UINT8 command);
-	
+
 	DECLARE_READ8_MEMBER( read );
 	DECLARE_WRITE8_MEMBER( write );
 

@@ -65,7 +65,7 @@ machine_config::machine_config(const game_driver &gamedrv)
 {
 	// construct the config
 	(*gamedrv.machine_config)(*this, NULL);
-	
+
 	// when finished, set the game driver
 	device_config *config = m_devicelist.find("root");
 	if (config == NULL)

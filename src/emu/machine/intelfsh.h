@@ -88,12 +88,12 @@ protected:
 
 	// internal state
 	address_space_config	m_space_config;
-	UINT32		 			m_type;
-	INT32 					m_size;
-	UINT8 					m_bits;
-	UINT8 					m_device_id;
-	UINT8 					m_maker_id;
-	bool 					m_sector_is_4k;
+	UINT32					m_type;
+	INT32					m_size;
+	UINT8					m_bits;
+	UINT8					m_device_id;
+	UINT8					m_maker_id;
+	bool					m_sector_is_4k;
 };
 
 
@@ -118,7 +118,7 @@ protected:
 	virtual void nvram_default();
 	virtual void nvram_read(mame_file &file);
 	virtual void nvram_write(mame_file &file);
-	
+
 	// derived helpers
 	UINT32 read_full(UINT32 offset);
 	void write_full(UINT32 offset, UINT32 data);
@@ -126,10 +126,10 @@ protected:
 	// internal state
 	const intelfsh_device_config &	m_config;
 
-	UINT8 						m_status;
-	INT32 						m_erase_sector;
-	INT32 						m_flash_mode;
-	bool 						m_flash_master_lock;
+	UINT8						m_status;
+	INT32						m_erase_sector;
+	INT32						m_flash_mode;
+	bool						m_flash_master_lock;
 	emu_timer *					m_timer;
 };
 
@@ -167,7 +167,7 @@ public:
 	// public interface
 	UINT8 read(offs_t offset) { return read_full(offset); }
 	void write(offs_t offset, UINT8 data) { write_full(offset, data); }
-	
+
 	UINT8 read_raw(offs_t offset) { return m_addrspace[0]->read_byte(offset); }
 	void write_raw(offs_t offset, UINT8 data) { m_addrspace[0]->write_byte(offset, data); }
 };
@@ -203,7 +203,7 @@ public:
 	// public interface
 	UINT16 read(offs_t offset) { return read_full(offset); }
 	void write(offs_t offset, UINT16 data) { write_full(offset, data); }
-	
+
 	UINT16 read_raw(offs_t offset) { return m_addrspace[0]->read_word(offset * 2); }
 	void write_raw(offs_t offset, UINT16 data) { m_addrspace[0]->write_word(offset * 2, data); }
 };
@@ -226,7 +226,7 @@ DECLARE_TRIVIAL_DERIVED_DEVICE(sharp_lh28f400_device_config, intelfsh16_device_c
 DECLARE_TRIVIAL_DERIVED_DEVICE(intel_te28f160_device_config, intelfsh16_device_config, intel_te28f160_device, intelfsh16_device)
 DECLARE_TRIVIAL_DERIVED_DEVICE(intel_e28f400_device_config, intelfsh16_device_config, intel_e28f400_device, intelfsh16_device)
 DECLARE_TRIVIAL_DERIVED_DEVICE(sharp_unk128mbit_device_config, intelfsh16_device_config, sharp_unk128mbit_device, intelfsh16_device)
-		
+
 
 
 // device type definition

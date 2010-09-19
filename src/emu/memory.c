@@ -399,14 +399,14 @@ public:
 	memory_share(size_t size, void *ptr = NULL)
 		: m_ptr(ptr),
 		  m_size(size) { }
-	
+
 	// getters
 	void *ptr() const { return m_ptr; }
 	size_t size() const { return m_size; }
-	
+
 	// setters
 	void set_ptr(void *ptr) { m_ptr = ptr; }
-	
+
 private:
 	// internal state
 	void *					m_ptr;					// pointer to the memory backing the region
@@ -1698,7 +1698,7 @@ void memory_set_bankptr(running_machine *machine, const char *tag, void *base)
 
 
 //-------------------------------------------------
-//  memory_get_shared - get a pointer to a shared 
+//  memory_get_shared - get a pointer to a shared
 //  memory region by tag
 //-------------------------------------------------
 
@@ -3010,14 +3010,14 @@ bool address_space::needs_backing_store(const address_map_entry *entry)
 	// if we are asked to provide a base pointer, then yes, we do need backing
 	if (entry->m_baseptr != NULL || entry->m_baseptroffs_plus1 != 0 || entry->m_genbaseptroffs_plus1 != 0)
 		return true;
-	
+
 	// if we are sharing, and we don't have a pointer yet, create one
 	if (entry->m_share != NULL)
 	{
 		memory_share *share = m_machine.memory_data->sharemap.find(entry->m_share);
 		if (share != NULL && share->ptr() == NULL)
 			return true;
-	} 
+	}
 
 	// if we're writing to any sort of bank or RAM, then yes, we do need backing
 	if (entry->m_write.m_type == AMH_BANK || entry->m_write.m_type == AMH_RAM)

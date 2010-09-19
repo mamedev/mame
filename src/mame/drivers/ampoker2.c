@@ -564,11 +564,11 @@ static WRITE8_HANDLER( ampoker2_watchdog_reset_w )
 	if (((data >> 3) & 0x01) == 0)		/* check for refresh value (0x08) */
 	{
 		watchdog_reset(space->machine);
-//		popmessage("%02x", data);
+//      popmessage("%02x", data);
 	}
 	else
 	{
-//		popmessage("%02x", data);
+//      popmessage("%02x", data);
 	}
 }
 
@@ -1263,7 +1263,7 @@ ROM_END
 
 /*
 
-Piccolo Poker (Admiral, licenced by Novomatic). 
+Piccolo Poker (Admiral, licenced by Novomatic).
 Seems a interesting American Poker II variant.
 
 Roms have swapped halves.
@@ -1333,10 +1333,10 @@ static DRIVER_INIT( piccolop )
 
 */
 
-//	UINT8 *rom = memory_region(machine, "maincpu");
+//  UINT8 *rom = memory_region(machine, "maincpu");
 
-//	rom[0x138f] = 0x00;
-//	rom[0x1390] = 0x00;
+//  rom[0x138f] = 0x00;
+//  rom[0x1390] = 0x00;
 
 }
 

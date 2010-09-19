@@ -118,7 +118,7 @@ class stack_walker
 {
 public:
 	stack_walker();
-	
+
 	FPTR ip() const { return m_stackframe.AddrPC.Offset; }
 	FPTR sp() const { return m_stackframe.AddrStack.Offset; }
 	FPTR frame() const { return m_stackframe.AddrFrame.Offset; }
@@ -394,7 +394,7 @@ int main(int argc, char *argv[])
 	// allocate symbols
 	symbol_manager local_symbols(argv[0]);
 	symbols = &local_symbols;
-	
+
 	// set up exception handling
 	pass_thru_filter = SetUnhandledExceptionFilter(exception_filter);
 	SetErrorMode(SEM_FAILCRITICALERRORS | SEM_NOGPFAULTERRORBOX);
@@ -457,7 +457,7 @@ static void output_oslog(running_machine &machine, const char *buffer)
 void osd_init(running_machine *machine)
 {
 	const char *stemp;
-	
+
 	// determine if we are benchmarking, and adjust options appropriately
 	int bench = options_get_int(machine->options(), WINOPTION_BENCH);
 	if (bench > 0)

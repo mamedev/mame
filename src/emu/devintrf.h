@@ -66,8 +66,8 @@ typedef _DeviceBase _DeviceClass;														\
 class _ConfigClass;																		\
 																						\
 class _ConfigClass : public _ConfigBase 												\
-{ 																						\
-protected: 																				\
+{																						\
+protected:																				\
 	_ConfigClass(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock, UINT32 param = 0); \
 																						\
 public: 																				\
@@ -80,17 +80,17 @@ public: 																				\
 _ConfigClass::_ConfigClass(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock, UINT32 param) \
 	: _ConfigBase(mconfig, static_alloc_device_config, _Name, tag, owner, clock, param)	\
 {																						\
-} 																						\
+}																						\
 																						\
 device_config *_ConfigClass::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock) \
-{	 																					\
-	return global_alloc(_ConfigClass(mconfig, tag, owner, clock, _Param)); 				\
-} 																						\
+{																						\
+	return global_alloc(_ConfigClass(mconfig, tag, owner, clock, _Param));				\
+}																						\
 																						\
-device_t *_ConfigClass::alloc_device(running_machine &machine) const 					\
-{ 																						\
-	return auto_alloc(&machine, _DeviceClass(machine, *this)); 							\
-} 																						\
+device_t *_ConfigClass::alloc_device(running_machine &machine) const					\
+{																						\
+	return auto_alloc(&machine, _DeviceClass(machine, *this));							\
+}																						\
 
 
 
@@ -501,12 +501,12 @@ protected:
 
 		// getters
 		virtual void findit(device_t &base) = 0;
-		
+
 		// helpers
 		device_t *find_device(device_t &device, const char *tag);
 		void *find_shared_ptr(device_t &device, const char *tag);
 		size_t find_shared_size(device_t &device, const char *tag);
-	
+
 		// internal state
 		auto_finder_base *m_next;
 		const char *m_tag;
@@ -518,8 +518,8 @@ protected:
 	{
 	public:
 		// construction/destruction
-		auto_finder_type(device_t &base, const char *tag) 
-			: auto_finder_base(base, tag), 
+		auto_finder_type(device_t &base, const char *tag)
+			: auto_finder_base(base, tag),
 			  m_target(0) { }
 
 		// operators to make use transparent
@@ -538,7 +538,7 @@ protected:
 		// internal state
 		_TargetType m_target;
 	};
-	
+
 	// optional device finder
 	template<class _DeviceClass>
 	class optional_device : public auto_finder_type<_DeviceClass *, false>
@@ -547,7 +547,7 @@ protected:
 		optional_device(device_t &base, const char *tag) : auto_finder_type<_DeviceClass *, false>(base, tag) { }
 		virtual void findit(device_t &base) { set_target(downcast<_DeviceClass *>(find_device(base, this->m_tag))); }
 	};
-	
+
 	// required devices are similar but throw an error if they are not found
 	template<class _DeviceClass>
 	class required_device : public auto_finder_type<_DeviceClass *, true>
@@ -556,7 +556,7 @@ protected:
 		required_device(device_t &base, const char *tag) : auto_finder_type<_DeviceClass *, true>(base, tag) { }
 		virtual void findit(device_t &base) { set_target(downcast<_DeviceClass *>(find_device(base, this->m_tag))); }
 	};
-	
+
 	// optional shared pointer finder
 	template<typename _PointerType>
 	class optional_shared_ptr : public auto_finder_type<_PointerType *, false>
@@ -565,7 +565,7 @@ protected:
 		optional_shared_ptr(device_t &base, const char *tag) : auto_finder_type<_PointerType *, false>(base, tag) { }
 		virtual void findit(device_t &base) { set_target(reinterpret_cast<_PointerType *>(find_shared_ptr(base, this->m_tag))); }
 	};
-	
+
 	// required shared pointer finder
 	template<typename _PointerType>
 	class required_shared_ptr : public auto_finder_type<_PointerType *, true>
@@ -574,7 +574,7 @@ protected:
 		required_shared_ptr(device_t &base, const char *tag) : auto_finder_type<_PointerType *, true>(base, tag) { }
 		virtual void findit(device_t &base) { set_target(reinterpret_cast<_PointerType *>(find_shared_ptr(base, this->m_tag))); }
 	};
-	
+
 	// optional shared pointer size finder
 	class optional_shared_size : public auto_finder_type<size_t, false>
 	{
@@ -582,7 +582,7 @@ protected:
 		optional_shared_size(device_t &base, const char *tag) : auto_finder_type<size_t, false>(base, tag) { }
 		virtual void findit(device_t &base) { set_target(find_shared_size(base, this->m_tag)); }
 	};
-	
+
 	// required shared pointer size finder
 	class required_shared_size : public auto_finder_type<size_t, true>
 	{
@@ -590,7 +590,7 @@ protected:
 		required_shared_size(device_t &base, const char *tag) : auto_finder_type<size_t, true>(base, tag) { }
 		virtual void findit(device_t &base) { set_target(find_shared_size(base, this->m_tag)); }
 	};
-	
+
 	// internal helpers
 	void register_auto_finder(auto_finder_base &autodev);
 

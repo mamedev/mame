@@ -182,7 +182,7 @@ static ADDRESS_MAP_START( aristmk5_map, ADDRESS_SPACE_PROGRAM, 32 )
 	/* MK-5 overrides */
 	AM_RANGE(0x03010420, 0x03010423) AM_WRITE(sram_banksel_w) // SRAM bank select write
 
-//	AM_RANGE(0x0301049c, 0x0301051f) AM_DEVREADWRITE("eeprom", eeprom_r, eeprom_w) // eeprom ???
+//  AM_RANGE(0x0301049c, 0x0301051f) AM_DEVREADWRITE("eeprom", eeprom_r, eeprom_w) // eeprom ???
 
 	AM_RANGE(0x03010810, 0x03010813) AM_READNOP //MK-5 specific, watchdog
 //  System Startup Code Enabled protection appears to be located at 0x3010400 - 0x30104ff
@@ -280,7 +280,7 @@ static MACHINE_CONFIG_START( aristmk5, driver_device )
 	MDRV_MACHINE_START( aristmk5 )
 	MDRV_MACHINE_RESET( aristmk5 )
 
-//	MDRV_I2CMEM_ADD("i2cmem",i2cmem_interface)
+//  MDRV_I2CMEM_ADD("i2cmem",i2cmem_interface)
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
