@@ -12,7 +12,7 @@ public:
 		  dsp32c_2(*this, "dsp32c_2") { }
 
 	required_device<m68ec020_device> maincpu;
-	required_device<tms34010_device> gsp;
+	required_device<tms34020_device> gsp;
 	required_device<adsp2105_device> adsp;
 	required_device<dsp32c_device> dsp32c_1;
 	required_device<dsp32c_device> dsp32c_2;

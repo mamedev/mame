@@ -6705,7 +6705,7 @@ ROM_START( salmankt )
 ROM_END
 
 /* Atomiswave */
-GAME( 2001, awbios,   0,        aw,    aw,    0,        ROT0, "Sammy",                           "Atomiswave Bios", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
+GAME( 2001, awbios,   0,        aw,    aw,    atomiswave, ROT0, "Sammy",                           "Atomiswave Bios", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
 
 GAME( 2002, maxspeed, awbios,   aw,    aw,    maxspeed, ROT0, "Sammy",                           "Maximum Speed", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2002, sprtshot, awbios,   aw,    aw,    sprtshot, ROT0, "Sammy USA",                       "Sports Shooting USA", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
