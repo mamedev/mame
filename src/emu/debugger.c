@@ -11,6 +11,7 @@
 
 #include "emu.h"
 #include "debugger.h"
+#include "osdepend.h"
 #include "debug/debugcpu.h"
 #include "debug/debugcmd.h"
 #include "debug/debugcon.h"
@@ -89,6 +90,9 @@ void debugger_init(running_machine *machine)
 
 		/* listen in on the errorlog */
 		machine->add_logerror_callback(debug_errorlog_write_line);
+        
+		/* initialize osd debugger features */
+		osd_init_debugger(machine);
 	}
 }
 

@@ -22,6 +22,8 @@
 #include "debug-sup.h"
 #include "debug-cb.h"
 
+#include "config.h"
+
 //============================================================
 //  PARAMETERS
 //============================================================
@@ -86,7 +88,6 @@ static win_i *win_list;
 //============================================================
 
 static void debugmain_init(running_machine *machine);
-
 
 //============================================================
 //  run_func_on_win_list
@@ -444,6 +445,69 @@ static void debugmain_set_cpu(running_device *device)
 }
 
 
+//============================================================
+//  configuration_load
+//============================================================
+
+static void configuration_load(running_machine *machine, int config_type, xml_data_node *parentnode)
+{
+	/* we only care about game files */
+	if (config_type != CONFIG_TYPE_GAME)
+		return;
+
+	/* might not have any data */
+	if (parentnode == NULL)
+		return;
+
+    // debug // printf("CONFIG LOAD\n");
+    //gtk_window_move(GTK_WINDOW(dmain->win), 100, 100);
+    //gtk_window_resize(GTK_WINDOW(dmain->win), 1000, 500);
+}
+
+//============================================================
+//  configuration_save
+//============================================================
+
+static void configuration_save(running_machine *machine, int config_type, xml_data_node *parentnode)
+{
+	/* we only care about game files */
+	if (config_type != CONFIG_TYPE_GAME)
+		return;
+
+	// Loop over all the nodes
+	for(win_i *p = win_list; p != NULL; p = p->next)
+	{
+	    /* create a node */
+	    xml_data_node *debugger_node;
+	    debugger_node = xml_add_child(parentnode, "window", NULL);
+
+	    xml_set_attribute_int(debugger_node, "type", p->type);
+
+	    if (debugger_node != NULL)
+	    {
+	        int x, y;
+	        gtk_window_get_position(GTK_WINDOW(p->win), &x, &y);
+            xml_set_attribute_int(debugger_node, "position_x", x);
+            xml_set_attribute_int(debugger_node, "position_y", y);
+
+	        gtk_window_get_size(GTK_WINDOW(p->win), &x, &y);
+            xml_set_attribute_int(debugger_node, "size_x", x);
+            xml_set_attribute_int(debugger_node, "size_y", y);
+        }
+    }
+}
+
+
+//============================================================
+//  osd_init_debugger
+//============================================================
+
+void osd_init_debugger(running_machine *machine)
+{
+	/* register callbacks */
+	config_register(machine, "debugger_sdl", configuration_load, configuration_save);
+}
+
 
 //============================================================
 //  osd_wait_for_debugger
@@ -468,7 +532,6 @@ void osd_wait_for_debugger(running_device *device, int firststop)
 }
 
 
-
 //============================================================
 //  debugwin_update_during_game
 //============================================================
@@ -481,7 +544,6 @@ void debugwin_update_during_game(running_machine *machine)
 		gtk_main_iteration_do(FALSE);
 	}
 }
-
 
 
 //============================================================
@@ -1143,6 +1205,10 @@ on_memoryview_key_press_event             (GtkWidget   *widget,
 #include "emu.h"
 
 // win32 stubs for linking
+void osd_init_debugger(running_machine *machine)
+{
+}
+
 void osd_wait_for_debugger(running_device *device, int firststop)
 {
 }

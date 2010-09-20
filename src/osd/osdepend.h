@@ -126,6 +126,7 @@ class device_t;
 -----------------------------------------------------------------------------*/
 void osd_init(running_machine *machine);
 
+void osd_init_debugger(running_machine *machine);
 void osd_wait_for_debugger(device_t *device, int firststop);
 
 
