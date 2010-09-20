@@ -236,6 +236,7 @@ Notes:
 #include "includes/segas16.h"
 #include "cpu/m68000/m68000.h"
 #include "machine/segaic16.h"
+#include "machine/nvram.h"
 #include "sound/2151intf.h"
 #include "sound/segapcm.h"
 #include "video/segaic16.h"
@@ -245,14 +246,6 @@ Notes:
 #define SOUND_CLOCK				16000000
 
 
-
-/*************************************
- *
- *  Statics
- *
- *************************************/
-
-static UINT16 *backupram1, *backupram2;
 
 /*************************************
  *
@@ -714,28 +707,6 @@ static WRITE16_HANDLER( smgp_excs_w )
 
 /*************************************
  *
- *  Capacitor-backed RAM
- *
- *************************************/
-
-static NVRAM_HANDLER( xboard )
-{
-	if (read_or_write)
-	{
-		mame_fwrite(file, backupram1, 0x4000);
-		mame_fwrite(file, backupram2, 0x4000);
-	}
-	else if (file)
-	{
-		mame_fread(file, backupram1, 0x4000);
-		mame_fread(file, backupram2, 0x4000);
-	}
-}
-
-
-
-/*************************************
- *
  *  Main CPU memory handlers
  *
  *************************************/
@@ -744,8 +715,8 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	ADDRESS_MAP_UNMAP_HIGH
 	ADDRESS_MAP_GLOBAL_MASK(0x3fffff)
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
-	AM_RANGE(0x080000, 0x083fff) AM_MIRROR(0x01c000) AM_RAM AM_SHARE("share1") AM_BASE(&backupram1)
-	AM_RANGE(0x0a0000, 0x0a3fff) AM_MIRROR(0x01c000) AM_RAM AM_SHARE("share2") AM_BASE(&backupram2)
+	AM_RANGE(0x080000, 0x083fff) AM_MIRROR(0x01c000) AM_RAM AM_SHARE("backup1")
+	AM_RANGE(0x0a0000, 0x0a3fff) AM_MIRROR(0x01c000) AM_RAM AM_SHARE("backup2")
 	AM_RANGE(0x0c0000, 0x0cffff) AM_RAM_WRITE(segaic16_tileram_0_w) AM_BASE(&segaic16_tileram_0)
 	AM_RANGE(0x0d0000, 0x0d0fff) AM_MIRROR(0x00f000) AM_RAM_WRITE(segaic16_textram_0_w) AM_BASE(&segaic16_textram_0)
 	AM_RANGE(0x0e0000, 0x0e0007) AM_MIRROR(0x003ff8) AM_DEVREADWRITE("5248_main", segaic16_multiply_r, segaic16_multiply_w)
@@ -767,8 +738,8 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x2ec000, 0x2ecfff) AM_MIRROR(0x001000) AM_RAM AM_SHARE("share5") AM_BASE(&segaic16_roadram_0)
 	AM_RANGE(0x2ee000, 0x2effff) AM_READWRITE(segaic16_road_control_0_r, segaic16_road_control_0_w)
 //  AM_RANGE(0x2f0000, 0x2f3fff) AM_READWRITE(excs_r, excs_w)
-	AM_RANGE(0x3f8000, 0x3fbfff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0x3fc000, 0x3fffff) AM_RAM AM_SHARE("share2")
+	AM_RANGE(0x3f8000, 0x3fbfff) AM_RAM AM_SHARE("backup1")
+	AM_RANGE(0x3fc000, 0x3fffff) AM_RAM AM_SHARE("backup2")
 ADDRESS_MAP_END
 
 
@@ -1377,7 +1348,8 @@ static MACHINE_CONFIG_START( xboard, segas1x_state )
 	MDRV_CPU_IO_MAP(sound_portmap)
 
 	MDRV_MACHINE_RESET(xboard)
-	MDRV_NVRAM_HANDLER(xboard)
+	MDRV_NVRAM_ADD_0FILL("backup1")
+	MDRV_NVRAM_ADD_0FILL("backup2")
 	MDRV_QUANTUM_TIME(HZ(6000))
 
 	MDRV_315_5248_ADD("5248_main")

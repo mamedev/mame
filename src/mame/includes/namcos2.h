@@ -148,7 +148,6 @@ READ16_HANDLER( namcos2_flap_prot_r );
 /**************************************************************/
 #define NAMCOS2_68K_eeprom_W	namcos2_68k_eeprom_w
 #define NAMCOS2_68K_eeprom_R	namcos2_68k_eeprom_r
-NVRAM_HANDLER( namcos2 );
 WRITE16_HANDLER( namcos2_68k_eeprom_w );
 READ16_HANDLER( namcos2_68k_eeprom_r );
 

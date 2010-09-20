@@ -71,7 +71,6 @@ WRITE8_DEVICE_HANDLER( ataxx_eeprom_w );
 
 WRITE8_HANDLER( leland_battery_ram_w );
 WRITE8_HANDLER( ataxx_battery_ram_w );
-NVRAM_HANDLER( leland );
 
 READ8_HANDLER( leland_master_analog_key_r );
 WRITE8_HANDLER( leland_master_analog_key_w );

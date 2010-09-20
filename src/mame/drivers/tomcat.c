@@ -30,6 +30,7 @@
 #include "video/vector.h"
 #include "video/avgdvg.h"
 #include "machine/timekpr.h"
+#include "machine/nvram.h"
 #include "machine/6532riot.h"
 #include "sound/pokey.h"
 #include "sound/tms5220.h"
@@ -333,6 +334,7 @@ static MACHINE_START(tomcat)
 	((UINT16*)tomcat_shared_ram)[0x0003] = 0x0000;
 
 	tomcat_nvram = auto_alloc_array(machine, UINT8, 0x800);
+	machine->device<nvram_device>("nvram")->set_base(tomcat_nvram, 0x800);
 
 	state_save_register_global_pointer(machine, tomcat_nvram, 0x800);
 	state_save_register_global(machine, tomcat_control_num);
@@ -340,17 +342,6 @@ static MACHINE_START(tomcat)
 	state_save_register_global(machine, dsp_idle);
 
 	dsp_BIO = 0;
-}
-
-static NVRAM_HANDLER(tomcat)
-{
-	if (read_or_write)
-		mame_fwrite(file, tomcat_nvram, 0x800);
-	else
-		if (file)
-			mame_fread(file, tomcat_nvram, 0x800);
-		else
-			memset(tomcat_nvram, 0x00, 0x800);
 }
 
 static const riot6532_interface tomcat_riot6532_intf =
@@ -389,12 +380,12 @@ static MACHINE_CONFIG_START( tomcat, driver_device )
 	MDRV_CPU_PROGRAM_MAP( sound_map)
 
 	MDRV_RIOT6532_ADD("riot", XTAL_14_31818MHz / 8, tomcat_riot6532_intf)
-
+	
 	MDRV_QUANTUM_TIME(HZ(4000))
 
 	MDRV_MACHINE_START(tomcat)
 
-	MDRV_NVRAM_HANDLER(tomcat)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_M48T02_ADD( "m48t02" )
 

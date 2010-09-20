@@ -52,6 +52,7 @@
 #include "cpu/mcs51/mcs51.h"
 #include "cpu/e132xs/e132xs.h"
 #include "machine/eeprom.h"
+#include "machine/nvram.h"
 #include "sound/2151intf.h"
 #include "sound/okim6295.h"
 
@@ -636,21 +637,6 @@ static GFXDECODE_START( vamphalf )
 GFXDECODE_END
 
 
-static NVRAM_HANDLER( finalgdr )
-{
-	if (read_or_write)
-	{
-		mame_fwrite(file, finalgdr_backupram, 0x80*0x100);
-	}
-	else
-	{
-		if (file)
-		{
-			mame_fread(file, finalgdr_backupram, 0x80*0x100);
-		}
-	}
-}
-
 static ADDRESS_MAP_START( qs1000_prg_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE( 0x0000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -774,7 +760,7 @@ static MACHINE_CONFIG_DERIVED( finalgdr, common )
 	MDRV_CPU_IO_MAP(finalgdr_io)
 	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
 
-	MDRV_NVRAM_HANDLER(finalgdr)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_FRAGMENT_ADD(sound_ym_oki)
 MACHINE_CONFIG_END
@@ -784,7 +770,7 @@ static MACHINE_CONFIG_DERIVED( mrkicker, common )
 	MDRV_CPU_PROGRAM_MAP(common_32bit_map)
 	MDRV_CPU_IO_MAP(mrkicker_io)
 
-	MDRV_NVRAM_HANDLER(finalgdr)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_FRAGMENT_ADD(sound_ym_oki)
 MACHINE_CONFIG_END
@@ -1872,6 +1858,7 @@ static DRIVER_INIT( finalgdr )
 	finalgdr_backupram_bank = 1;
 	finalgdr_backupram = auto_alloc_array(machine, UINT8, 0x80*0x100);
 	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x005e874, 0x005e877, 0, 0, finalgdr_speedup_r );
+	machine->device<nvram_device>("nvram")->set_base(finalgdr_backupram, 0x80*0x100);
 
 	palshift = 0;
 	flip_bit = 1; //?

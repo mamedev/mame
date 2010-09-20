@@ -1,6 +1,7 @@
 #include "emu.h"
 #include "video/ppu2c0x.h"
 #include "machine/rp5h01.h"
+#include "machine/nvram.h"
 #include "includes/playch10.h"
 
 /* prototypes */
@@ -91,6 +92,9 @@ MACHINE_START( pc10 )
 		set_videoram_bank(machine, 0, 8, 0, 8);
 	else pc10_set_videorom_bank(machine, 0, 8, 0, 8);
 
+	nvram_device *nvram = machine->device<nvram_device>("nvram");
+	if (nvram != NULL)
+		nvram->set_base(memory_region( machine, "cart" ) + 0x6000, 0x1000);
 }
 
 MACHINE_START( playch10_hboard )

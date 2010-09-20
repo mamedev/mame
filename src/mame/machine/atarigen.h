@@ -183,8 +183,6 @@ WRITE32_HANDLER( atarigen_eeprom_enable32_w );
 WRITE32_HANDLER( atarigen_eeprom32_w );
 READ32_HANDLER( atarigen_eeprom_upper32_r );
 
-NVRAM_HANDLER( atarigen );
-
 
 /*---------------------------------------------------------------
     SLAPSTIC HANDLING

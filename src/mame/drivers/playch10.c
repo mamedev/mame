@@ -294,6 +294,7 @@ Notes & Todo:
 #include "video/ppu2c0x.h"
 #include "cpu/z80/z80.h"
 #include "machine/rp5h01.h"
+#include "machine/nvram.h"
 #include "sound/dac.h"
 #include "sound/nes_apu.h"
 
@@ -334,18 +335,6 @@ static WRITE8_HANDLER( sprite_dma_w )
 {
 	int source = ( data & 7 );
 	ppu2c0x_spriteram_dma( space, space->machine->device("ppu"), source );
-}
-
-static NVRAM_HANDLER( playch10 )
-{
-	UINT8 *mem = memory_region( machine, "cart" ) + 0x6000;
-
-	if ( read_or_write )
-		mame_fwrite( file, mem, 0x1000 );
-	else if (file)
-		mame_fread( file, mem, 0x1000 );
-	else
-		memset(mem, 0, 0x1000);
 }
 
 /* Only used in single monitor bios */
@@ -733,7 +722,7 @@ static MACHINE_CONFIG_START( playch10, playch10_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( playchnv, playch10 )
-	MDRV_NVRAM_HANDLER(playch10)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( playch10_hboard, playch10 )

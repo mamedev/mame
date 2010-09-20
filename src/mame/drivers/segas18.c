@@ -33,6 +33,7 @@
 #include "cpu/mcs51/mcs51.h"
 #include "deprecat.h"
 #include "machine/segaic16.h"
+#include "machine/nvram.h"
 #include "includes/segas16.h"
 #include "includes/genesis.h"
 #include "sound/2612intf.h"
@@ -178,6 +179,8 @@ static void system18_generic_init(running_machine *machine, int _rom_board)
 	state->maincpu = machine->device("maincpu");
 	state->soundcpu = machine->device("soundcpu");
 	state->mcu = machine->device("mcu");
+	
+	machine->device<nvram_device>("nvram")->set_base(workram, 0x4000);
 
 	state_save_register_global(machine, state->mcu_data);
 	state_save_register_global(machine, state->lghost_value);
@@ -593,22 +596,6 @@ static WRITE8_HANDLER( mcu_data_w )
 	segas1x_state *state = space->machine->driver_data<segas1x_state>();
 	state->mcu_data = data;
 	cpu_set_input_line(state->mcu, MCS51_INT1_LINE, HOLD_LINE);
-}
-
-
-
-/*************************************
- *
- *  Capacitor-backed RAM
- *
- *************************************/
-
-static NVRAM_HANDLER( system18 )
-{
-	if (read_or_write)
-		mame_fwrite(file, workram, 0x4000);
-	else if (file)
-		mame_fread(file, workram, 0x4000);
 }
 
 
@@ -1300,7 +1287,7 @@ static MACHINE_CONFIG_START( system18, segas1x_state )
 	MDRV_CPU_IO_MAP(sound_portmap)
 
 	MDRV_MACHINE_RESET(system18)
-	MDRV_NVRAM_HANDLER(system18)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

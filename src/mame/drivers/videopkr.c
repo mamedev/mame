@@ -283,6 +283,7 @@
 #include "emu.h"
 #include "cpu/mcs48/mcs48.h"
 #include "cpu/mcs51/mcs51.h"
+#include "machine/nvram.h"
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "videopkr.lh"
@@ -473,42 +474,6 @@ static VIDEO_UPDATE( videopkr )
 	tilemap_mark_all_tiles_dirty(bg_tilemap);
 	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
 	return 0;
-}
-
-/********************
-*   NVRAM Handler   *
-********************/
-
-static NVRAM_HANDLER( videopkr )
-{
-	if (read_or_write)
-	{
-		mame_fwrite(file, data_ram, DATA_NVRAM_SIZE);
-		mame_fwrite(file, &count1, 8);
-		mame_fwrite(file, &count2, 8);
-		mame_fwrite(file, &count3, 8);
-		mame_fwrite(file, &count4, 8);
-
-	}
-	else
-	{
-		if (file)
-		{
-			mame_fread(file, data_ram, DATA_NVRAM_SIZE);
-			mame_fread(file, &count1, 8);
-			mame_fread(file, &count2, 8);
-			mame_fread(file, &count3, 8);
-			mame_fread(file, &count4, 8);
-		}
-		else
-		{
-			memset(data_ram, 0, DATA_NVRAM_SIZE);
-			memset(data_ram, count0, 8);
-			memset(data_ram, count0, 8);
-			memset(data_ram, count0, 8);
-			memset(data_ram, count0, 8);
-		}
-	}
 }
 
 
@@ -1191,6 +1156,8 @@ static MACHINE_START(videopkr)
 	p1 = 0xff;
 	ant_cio = 0;
 	count0 = 0;
+
+	machine->device<nvram_device>("nvram")->set_base(data_ram, sizeof(data_ram));
 }
 
 static const ay8910_interface ay8910_config =
@@ -1221,7 +1188,7 @@ static MACHINE_CONFIG_START( videopkr, driver_device )
 	MDRV_CPU_PROGRAM_MAP(i8039_sound_mem)
 	MDRV_CPU_IO_MAP(i8039_sound_port)
 	MDRV_MACHINE_START(videopkr)
-	MDRV_NVRAM_HANDLER(videopkr)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_TIMER_ADD_PERIODIC("t1_timer", sound_t1_callback, HZ(50))
 

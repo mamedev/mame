@@ -39,6 +39,7 @@ Notes:
 #include "sound/ymz280b.h"
 #include "rocknms.lh"
 #include "includes/tetrisp2.h"
+#include "machine/nvram.h"
 
 UINT16 tetrisp2_systemregs[0x10];
 static UINT16 rocknms_sub_systemregs[0x10];
@@ -222,23 +223,6 @@ static READ16_HANDLER( tetrisp2_ip_1_word_r )
 ***************************************************************************/
 
 static UINT16 *tetrisp2_nvram;
-static size_t tetrisp2_nvram_size;
-
-static NVRAM_HANDLER( tetrisp2 )
-{
-	if (read_or_write)
-		mame_fwrite(file,tetrisp2_nvram,tetrisp2_nvram_size);
-	else
-	{
-		if (file)
-			mame_fread(file,tetrisp2_nvram,tetrisp2_nvram_size);
-		else
-		{
-			/* fill in the default values */
-			memset(tetrisp2_nvram,0,tetrisp2_nvram_size);
-		}
-	}
-}
 
 
 /* The game only ever writes even bytes and reads odd bytes */
@@ -322,7 +306,7 @@ static ADDRESS_MAP_START( tetrisp2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x600000, 0x60ffff) AM_RAM_WRITE(tetrisp2_vram_rot_w) AM_BASE(&tetrisp2_vram_rot)	// Rotation
 	AM_RANGE(0x650000, 0x651fff) AM_RAM_WRITE(tetrisp2_vram_rot_w)								// Rotation (mirror)
 	AM_RANGE(0x800000, 0x800003) AM_DEVREADWRITE8("ymz", ymz280b_r, ymz280b_w, 0x00ff)	// Sound
-	AM_RANGE(0x900000, 0x903fff) AM_READWRITE(tetrisp2_nvram_r, tetrisp2_nvram_w) AM_BASE(&tetrisp2_nvram) AM_SIZE(&tetrisp2_nvram_size)	// NVRAM
+	AM_RANGE(0x900000, 0x903fff) AM_READWRITE(tetrisp2_nvram_r, tetrisp2_nvram_w) AM_BASE(&tetrisp2_nvram) AM_SHARE("nvram")	// NVRAM
 	AM_RANGE(0x904000, 0x907fff) AM_READWRITE(tetrisp2_nvram_r, tetrisp2_nvram_w)				// NVRAM (mirror)
 	AM_RANGE(0xb00000, 0xb00001) AM_WRITE(tetrisp2_coincounter_w)								// Coin Counter
 	AM_RANGE(0xb20000, 0xb20001) AM_WRITENOP													// ???
@@ -384,7 +368,7 @@ static ADDRESS_MAP_START( nndmseal_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x800000, 0x800003) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff )	// Sound
 
-	AM_RANGE(0x900000, 0x903fff) AM_READWRITE(tetrisp2_nvram_r, tetrisp2_nvram_w) AM_BASE(&tetrisp2_nvram) AM_SIZE(&tetrisp2_nvram_size	)	// NVRAM
+	AM_RANGE(0x900000, 0x903fff) AM_READWRITE(tetrisp2_nvram_r, tetrisp2_nvram_w) AM_BASE(&tetrisp2_nvram) AM_SHARE("nvram")	// NVRAM
 
 	AM_RANGE(0xb00000, 0xb00001) AM_WRITE(nndmseal_coincounter_w)	// Coin Counter
 	AM_RANGE(0xb20000, 0xb20001) AM_WRITE(nndmseal_b20000_w)		// ???
@@ -423,7 +407,7 @@ static ADDRESS_MAP_START( rockn1_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x408000, 0x409fff) AM_RAM															// ???
 	AM_RANGE(0x500000, 0x50ffff) AM_RAM															// Line
 	AM_RANGE(0x600000, 0x60ffff) AM_RAM_WRITE(tetrisp2_vram_rot_w) AM_BASE(&tetrisp2_vram_rot)	// Rotation
-	AM_RANGE(0x900000, 0x903fff) AM_READWRITE(rockn_nvram_r, tetrisp2_nvram_w) AM_BASE(&tetrisp2_nvram) AM_SIZE(&tetrisp2_nvram_size)	// NVRAM
+	AM_RANGE(0x900000, 0x903fff) AM_READWRITE(rockn_nvram_r, tetrisp2_nvram_w) AM_BASE(&tetrisp2_nvram) AM_SHARE("nvram")	// NVRAM
 	AM_RANGE(0xa30000, 0xa30001) AM_READWRITE(rockn_soundvolume_r, rockn_soundvolume_w)			// Sound Volume
 	AM_RANGE(0xa40000, 0xa40003) AM_DEVREADWRITE8("ymz", ymz280b_r, ymz280b_w, 0x00ff)	// Sound
 	AM_RANGE(0xa44000, 0xa44001) AM_READWRITE(rockn_adpcmbank_r, rockn_adpcmbank_w)				// Sound Bank
@@ -457,7 +441,7 @@ static ADDRESS_MAP_START( rockn2_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(tetrisp2_vram_fg_w) AM_BASE(&tetrisp2_vram_fg)	// Foreground
 	AM_RANGE(0x804000, 0x807fff) AM_RAM_WRITE(tetrisp2_vram_bg_w) AM_BASE(&tetrisp2_vram_bg)	// Background
 	AM_RANGE(0x808000, 0x809fff) AM_RAM															// ???
-	AM_RANGE(0x900000, 0x903fff) AM_READWRITE(rockn_nvram_r, tetrisp2_nvram_w) AM_BASE(&tetrisp2_nvram) AM_SIZE(&tetrisp2_nvram_size)	// NVRAM
+	AM_RANGE(0x900000, 0x903fff) AM_READWRITE(rockn_nvram_r, tetrisp2_nvram_w) AM_BASE(&tetrisp2_nvram) AM_SHARE("nvram")	// NVRAM
 	AM_RANGE(0xa30000, 0xa30001) AM_READWRITE(rockn_soundvolume_r, rockn_soundvolume_w)			// Sound Volume
 	AM_RANGE(0xa40000, 0xa40003) AM_DEVREADWRITE8("ymz", ymz280b_r, ymz280b_w, 0x00ff)	// Sound
 	AM_RANGE(0xa44000, 0xa44001) AM_READWRITE(rockn_adpcmbank_r, rockn2_adpcmbank_w)			// Sound Bank
@@ -491,7 +475,7 @@ static ADDRESS_MAP_START( rocknms_main_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(tetrisp2_vram_fg_w) AM_BASE(&tetrisp2_vram_fg)	// Foreground
 	AM_RANGE(0x804000, 0x807fff) AM_RAM_WRITE(tetrisp2_vram_bg_w) AM_BASE(&tetrisp2_vram_bg)	// Background
 //  AM_RANGE(0x808000, 0x809fff) AM_RAM                                                         // ???
-	AM_RANGE(0x900000, 0x903fff) AM_READWRITE(rockn_nvram_r, tetrisp2_nvram_w) AM_BASE(&tetrisp2_nvram) AM_SIZE(&tetrisp2_nvram_size)	// NVRAM
+	AM_RANGE(0x900000, 0x903fff) AM_READWRITE(rockn_nvram_r, tetrisp2_nvram_w) AM_BASE(&tetrisp2_nvram) AM_SHARE("nvram")	// NVRAM
 	AM_RANGE(0xa30000, 0xa30001) AM_READWRITE(rockn_soundvolume_r, rockn_soundvolume_w)			// Sound Volume
 	AM_RANGE(0xa40000, 0xa40003) AM_DEVREADWRITE8("ymz", ymz280b_r, ymz280b_w, 0x00ff)	// Sound
 	AM_RANGE(0xa44000, 0xa44001) AM_READWRITE(rockn_adpcmbank_r, rockn_adpcmbank_w)				// Sound Bank
@@ -1113,7 +1097,7 @@ static MACHINE_CONFIG_START( tetrisp2, driver_device )
 	MDRV_CPU_PROGRAM_MAP(tetrisp2_map)
 	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
 
-	MDRV_NVRAM_HANDLER(tetrisp2)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 	MDRV_WATCHDOG_VBLANK_INIT(8)	/* guess */
 
 	/* video hardware */
@@ -1146,7 +1130,7 @@ static MACHINE_CONFIG_START( nndmseal, driver_device )
 	MDRV_CPU_PROGRAM_MAP(nndmseal_map)
 	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
 
-	MDRV_NVRAM_HANDLER(tetrisp2)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1177,7 +1161,7 @@ static MACHINE_CONFIG_START( rockn, driver_device )
 	MDRV_CPU_PROGRAM_MAP(rockn1_map)
 	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
 
-	MDRV_NVRAM_HANDLER(tetrisp2)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1209,7 +1193,7 @@ static MACHINE_CONFIG_START( rockn2, driver_device )
 	MDRV_CPU_PROGRAM_MAP(rockn2_map)
 	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
 
-	MDRV_NVRAM_HANDLER(tetrisp2)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1245,7 +1229,7 @@ static MACHINE_CONFIG_START( rocknms, driver_device )
 	MDRV_CPU_PROGRAM_MAP(rocknms_sub_map)
 	MDRV_CPU_VBLANK_INT("lscreen", irq2_line_hold)
 
-	MDRV_NVRAM_HANDLER(tetrisp2)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 

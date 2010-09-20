@@ -15,6 +15,7 @@
 #include "cpu/z80/z80.h"
 #include "includes/psx.h"
 #include "machine/at28c16.h"
+#include "machine/nvram.h"
 #include "machine/mb3773.h"
 #include "machine/znsec.h"
 #include "machine/idectrl.h"
@@ -1186,6 +1187,7 @@ static WRITE32_HANDLER( taitofx1a_ymsound_w )
 static DRIVER_INIT( coh1000ta )
 {
 	taitofx1_eeprom_size1 = 0x200; taitofx1_eeprom1 = auto_alloc_array(machine, UINT8,  taitofx1_eeprom_size1 );
+	machine->device<nvram_device>("eeprom1")->set_base(taitofx1_eeprom1, taitofx1_eeprom_size1);
 
 	memory_install_read_bank     ( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f000000, 0x1f7fffff, 0, 0, "bank1" );     /* banked game rom */
 	memory_install_write32_handler    ( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1fb40000, 0x1fb40003, 0, 0, bank_coh1000t_w ); /* bankswitch */
@@ -1200,22 +1202,6 @@ static MACHINE_RESET( coh1000ta )
 	memory_set_bankptr(machine,  "bank1", memory_region( machine, "user2" ) ); /* banked game rom */
 	memory_set_bankptr(machine,  "bank2", taitofx1_eeprom1 );
 	zn_machine_init(machine);
-}
-
-static NVRAM_HANDLER( coh1000ta )
-{
-	if (read_or_write)
-	{
-		mame_fwrite(file, taitofx1_eeprom1, taitofx1_eeprom_size1);
-	}
-	else if (file)
-	{
-		mame_fread(file, taitofx1_eeprom1, taitofx1_eeprom_size1);
-	}
-	else
-	{
-		memset(taitofx1_eeprom1, 0, taitofx1_eeprom_size1);
-	}
 }
 
 static ADDRESS_MAP_START( fx1a_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -1252,7 +1238,7 @@ static MACHINE_CONFIG_DERIVED( coh1000ta, zn1_1mb_vram )
 	MDRV_CPU_ADD("audiocpu", Z80, 16000000 / 4 )	/* 4 MHz */
 	MDRV_CPU_PROGRAM_MAP( fx1a_sound_map)
 	MDRV_MACHINE_RESET( coh1000ta )
-	MDRV_NVRAM_HANDLER( coh1000ta )
+	MDRV_NVRAM_ADD_0FILL("eeprom1")
 
 	MDRV_SOUND_ADD("ymsnd", YM2610B, 16000000/2)
 	MDRV_SOUND_CONFIG(ym2610_config)
@@ -1288,6 +1274,9 @@ static DRIVER_INIT( coh1000tb )
 	taitofx1_eeprom_size1 = 0x400; taitofx1_eeprom1 = auto_alloc_array(machine, UINT8,  taitofx1_eeprom_size1 );
 	taitofx1_eeprom_size2 = 0x200; taitofx1_eeprom2 = auto_alloc_array(machine, UINT8,  taitofx1_eeprom_size2 );
 
+	machine->device<nvram_device>("eeprom1")->set_base(taitofx1_eeprom1, taitofx1_eeprom_size1);
+	machine->device<nvram_device>("eeprom2")->set_base(taitofx1_eeprom2, taitofx1_eeprom_size2);
+
 	memory_install_read_bank     ( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f000000, 0x1f7fffff, 0, 0, "bank1" ); /* banked game rom */
 	memory_install_readwrite_bank( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1fb00000, 0x1fb00000 + ( taitofx1_eeprom_size1 - 1 ), 0, 0, "bank2" );
 	memory_install_write32_handler    ( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1fb40000, 0x1fb40003, 0, 0, bank_coh1000t_w ); /* bankswitch */
@@ -1307,30 +1296,11 @@ static MACHINE_RESET( coh1000tb )
 	zn_machine_init(machine);
 }
 
-static NVRAM_HANDLER( coh1000tb )
-{
-	if (read_or_write)
-	{
-		mame_fwrite(file, taitofx1_eeprom1, taitofx1_eeprom_size1);
-		mame_fwrite(file, taitofx1_eeprom2, taitofx1_eeprom_size2);
-	}
-	else if (file)
-	{
-		mame_fread(file, taitofx1_eeprom1, taitofx1_eeprom_size1);
-		mame_fread(file, taitofx1_eeprom2, taitofx1_eeprom_size2);
-	}
-	else
-	{
-		memset(taitofx1_eeprom1, 0, taitofx1_eeprom_size1);
-		memset(taitofx1_eeprom2, 0, taitofx1_eeprom_size2);
-	}
-}
-
-
 static MACHINE_CONFIG_DERIVED( coh1000tb, zn1_2mb_vram )
 
 	MDRV_MACHINE_RESET( coh1000tb )
-	MDRV_NVRAM_HANDLER( coh1000tb )
+	MDRV_NVRAM_ADD_0FILL("eeprom1")
+	MDRV_NVRAM_ADD_0FILL("eeprom2")
 
 	MDRV_MB3773_ADD("mb3773")
 

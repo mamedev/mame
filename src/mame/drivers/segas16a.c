@@ -152,6 +152,7 @@ Tetris         -         -         -         -         EPR12169  EPR12170  -    
 #include "machine/segacrp2.h"
 #include "machine/fd1089.h"
 #include "machine/i8243.h"
+#include "machine/nvram.h"
 #include "cpu/mcs48/mcs48.h"
 #include "sound/dac.h"
 #include "sound/2151intf.h"
@@ -997,22 +998,6 @@ static INTERRUPT_GEN( mcu_irq_assert )
 
 /*************************************
  *
- *  Capacitor-backed RAM
- *
- *************************************/
-
-static NVRAM_HANDLER( system16a )
-{
-	if (read_or_write)
-		mame_fwrite(file, workram, 0x4000);
-	else if (file)
-		mame_fread(file, workram, 0x4000);
-}
-
-
-
-/*************************************
- *
  *  Main CPU memory handlers
  *
  *************************************/
@@ -1026,7 +1011,7 @@ static ADDRESS_MAP_START( system16a_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x840000, 0x840fff) AM_MIRROR(0x3bf000) AM_RAM_WRITE(segaic16_paletteram_w) AM_BASE(&segaic16_paletteram)
 	AM_RANGE(0xc40000, 0xc43fff) AM_MIRROR(0x39c000) AM_READWRITE(misc_io_r, misc_io_w)
 	AM_RANGE(0xc60000, 0xc6ffff) AM_READ(watchdog_reset16_r)
-	AM_RANGE(0xc70000, 0xc73fff) AM_MIRROR(0x38c000) AM_RAM AM_BASE(&workram)
+	AM_RANGE(0xc70000, 0xc73fff) AM_MIRROR(0x38c000) AM_RAM AM_BASE(&workram) AM_SHARE("nvram")
 ADDRESS_MAP_END
 
 
@@ -1974,7 +1959,7 @@ static MACHINE_CONFIG_START( system16a, segas1x_state )
 
 	MDRV_MACHINE_START(system16a)
 	MDRV_MACHINE_RESET(system16a)
-	MDRV_NVRAM_HANDLER(system16a)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_PPI8255_ADD( "ppi8255", single_ppi_intf )
 

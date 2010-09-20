@@ -20,8 +20,6 @@ public:
 	UINT16 irq_enable;
 	UINT16 *mainram;
 
-	UINT16 *nvram;
-	size_t nvram_size;
 	UINT16 *dsp_ram;
 
 	UINT16 *eaglshot_gfxram;

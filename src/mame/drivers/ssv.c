@@ -184,6 +184,7 @@ Notes:
 #include "cpu/v60/v60.h"
 #include "deprecat.h"
 #include "machine/eeprom.h"
+#include "machine/nvram.h"
 #include "sound/es5506.h"
 #include "includes/ssv.h"
 
@@ -353,25 +354,6 @@ static MACHINE_RESET( ssv )
 /***************************************************************************
 
 
-                            Non-Volatile RAM
-
-
-***************************************************************************/
-
-static NVRAM_HANDLER( ssv )
-{
-	ssv_state *state = machine->driver_data<ssv_state>();
-
-	if (read_or_write)
-		mame_fwrite(file, state->nvram, state->nvram_size);
-	else
-		if (file)
-			mame_fread(file, state->nvram, state->nvram_size);
-}
-
-/***************************************************************************
-
-
                                 DSP
 
 
@@ -454,7 +436,7 @@ static ADDRESS_MAP_START( drifto94_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x500000, 0x500001) AM_WRITENOP										// ??
 	AM_RANGE(0x510000, 0x510001) AM_READ(drifto94_rand_r		)						// ??
 	AM_RANGE(0x520000, 0x520001) AM_READ(drifto94_rand_r		)						// ??
-	AM_RANGE(0x580000, 0x5807ff) AM_RAM AM_BASE_MEMBER(ssv_state, nvram) AM_SIZE_MEMBER(ssv_state, nvram_size)	// NVRAM
+	AM_RANGE(0x580000, 0x5807ff) AM_RAM AM_SHARE("nvram")	// NVRAM
 	SSV_MAP( 0xc00000 )
 ADDRESS_MAP_END
 
@@ -695,7 +677,7 @@ static ADDRESS_MAP_START( meosism_map, ADDRESS_SPACE_PROGRAM, 16 )
 //  AM_RANGE(0x210002, 0x210003) AM_WRITENOP                                      // ? 5 at the start
 //  AM_RANGE(0x280000, 0x280001) AM_READNOP                                       // ? read once, value not used
 //  AM_RANGE(0x500004, 0x500005) AM_WRITENOP                                      // ? 0,58,18
-	AM_RANGE(0x580000, 0x58ffff) AM_RAM AM_BASE_MEMBER(ssv_state, nvram) AM_SIZE_MEMBER(ssv_state, nvram_size)	// NVRAM
+	AM_RANGE(0x580000, 0x58ffff) AM_RAM AM_SHARE("nvram")	// NVRAM
 	SSV_MAP( 0xf00000 )
 ADDRESS_MAP_END
 
@@ -883,7 +865,7 @@ static ADDRESS_MAP_START( sxyreact_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x500002, 0x500003) AM_READ(sxyreact_ballswitch_r)							// ?
 	AM_RANGE(0x500004, 0x500005) AM_READWRITE(sxyreact_dial_r, sxyreact_motor_w)		// Dial Value (serial)
 	AM_RANGE(0x520000, 0x520001) AM_WRITE(sxyreact_dial_w)								// Dial Value (advance 1 bit)
-	AM_RANGE(0x580000, 0x58ffff) AM_RAM AM_BASE_MEMBER(ssv_state, nvram) AM_SIZE_MEMBER(ssv_state, nvram_size)	// NVRAM
+	AM_RANGE(0x580000, 0x58ffff) AM_RAM AM_SHARE("nvram")	// NVRAM
 	SSV_MAP( 0xe00000 )
 ADDRESS_MAP_END
 
@@ -1055,7 +1037,7 @@ static ADDRESS_MAP_START( eaglshot_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x800000, 0x800001) AM_WRITE(eaglshot_gfxrom_w)
 	AM_RANGE(0x900000, 0x900001) AM_WRITE(eaglshot_trackball_w)
 	AM_RANGE(0xa00000, 0xbfffff) AM_READ(eaglshot_gfxrom_r)
-	AM_RANGE(0xc00000, 0xc007ff) AM_RAM AM_BASE_MEMBER(ssv_state, nvram) AM_SIZE_MEMBER(ssv_state, nvram_size)	// NVRAM
+	AM_RANGE(0xc00000, 0xc007ff) AM_RAM AM_SHARE("nvram")	// NVRAM
 	AM_RANGE(0xd00000, 0xd00001) AM_READ(eaglshot_trackball_r)
 	SSV_MAP( 0xf00000 )
 ADDRESS_MAP_END
@@ -2723,7 +2705,7 @@ static MACHINE_CONFIG_DERIVED( drifto94, ssv )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(drifto94_map)
 
-	MDRV_NVRAM_HANDLER(ssv)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
@@ -2804,7 +2786,7 @@ static MACHINE_CONFIG_DERIVED( meosism, ssv )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(meosism_map)
 
-	MDRV_NVRAM_HANDLER(ssv)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
@@ -2876,7 +2858,7 @@ static MACHINE_CONFIG_DERIVED( stmblade, ssv )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(drifto94_map)
 
-	MDRV_NVRAM_HANDLER(ssv)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0, (0xd6-0x26)*2-1, 0, (0xfe - 0x0e)-1)
@@ -2910,7 +2892,7 @@ static MACHINE_CONFIG_DERIVED( eaglshot, ssv )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(eaglshot_map)
 
-	MDRV_NVRAM_HANDLER(ssv)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
@@ -2928,7 +2910,7 @@ static MACHINE_CONFIG_DERIVED( sxyreact, ssv )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(sxyreact_map)
 
-	MDRV_NVRAM_HANDLER(ssv)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
@@ -2941,7 +2923,7 @@ static MACHINE_CONFIG_DERIVED( sxyreac2, ssv )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(sxyreact_map)
 
-	MDRV_NVRAM_HANDLER(ssv)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")
@@ -2954,7 +2936,7 @@ static MACHINE_CONFIG_DERIVED( cairblad, ssv )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(sxyreact_map)
 
-	MDRV_NVRAM_HANDLER(ssv)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_SCREEN_MODIFY("screen")

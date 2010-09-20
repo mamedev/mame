@@ -877,6 +877,7 @@ CPU  - 317-0092  |--------------------------------------------------------------
 #include "machine/fd1089.h"
 #include "machine/fd1094.h"
 #include "machine/mc8123.h"
+#include "machine/nvram.h"
 #include "sound/2151intf.h"
 #include "sound/2413intf.h"
 #include "sound/upd7759.h"
@@ -908,6 +909,7 @@ CPU  - 317-0092  |--------------------------------------------------------------
  *************************************/
 
 static UINT16 *workram;
+
 
 
 /*************************************
@@ -1081,6 +1083,8 @@ static void system16b_generic_init(running_machine *machine, int _rom_board)
 
 	/* init the FD1094 */
 	fd1094_driver_init(machine, "maincpu", segaic16_memory_mapper_set_decrypted);
+
+	machine->device<nvram_device>("nvram")->set_base(workram, 0x4000);
 
 	state_save_register_global_pointer(machine, segaic16_spriteram_0, 0x00800/2);
 	state_save_register_global_pointer(machine, segaic16_paletteram,  0x01000/2);
@@ -1779,22 +1783,6 @@ static WRITE16_HANDLER( sjryuko_custom_io_w )
 			break;
 	}
 	standard_io_w(space, offset, data, mem_mask);
-}
-
-
-
-/*************************************
- *
- *  Capacitor-backed RAM
- *
- *************************************/
-
-static NVRAM_HANDLER( system16b )
-{
-	if (read_or_write)
-		mame_fwrite(file, workram, 0x4000);
-	else if (file)
-		mame_fread(file, workram, 0x4000);
 }
 
 
@@ -3293,7 +3281,7 @@ static MACHINE_CONFIG_START( system16b, segas1x_state )
 	MDRV_CPU_IO_MAP(sound_portmap)
 
 	MDRV_MACHINE_RESET(system16b)
-	MDRV_NVRAM_HANDLER(system16b)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_GFXDECODE(segas16b)
