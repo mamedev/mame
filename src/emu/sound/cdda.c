@@ -303,6 +303,21 @@ void cdda_set_volume(running_device *device,int volume)
 	stream_set_output_gain(cdda->stream,1,volume / 100.0);
 }
 
+/*-------------------------------------------------
+    cdda_set_channel_volume - sets CD-DA volume level
+    for either speaker, used for fade in/out effects
+-------------------------------------------------*/
+
+void cdda_set_channel_volume(running_device *device, int channel, int volume)
+{
+	cdda_info *cdda = get_safe_token(device);
+
+	if(channel == 0)
+		stream_set_output_gain(cdda->stream,0,volume / 100.0);
+	if(channel == 1)
+		stream_set_output_gain(cdda->stream,1,volume / 100.0);
+}
+
 /**************************************************************************
  * Generic get_info
  **************************************************************************/
