@@ -75,11 +75,15 @@ WRITE8_DEVICE_HANDLER( atari_vg_earom_ctrl_w )
         0x08 = set addr latch?
     */
 	if (data & 0x01)
+	{
 		earom->data = earom->rom[earom->offset];
+//printf("Read %02X = %02X\n", earom->offset, earom->data);
+	}
 	if ((data & 0x0c) == 0x0c)
 	{
 		earom->rom[earom->offset]=earom->data;
 		logerror("    written %02x:%02x\n", earom->offset, earom->data);
+//printf("Write %02X = %02X\n", earom->offset, earom->data);
 	}
 }
 

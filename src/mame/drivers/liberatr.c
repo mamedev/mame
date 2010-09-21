@@ -136,7 +136,7 @@
 #include "emu.h"
 #include "cpu/m6502/m6502.h"
 #include "deprecat.h"
-#include "machine/atari_vg.h"
+#include "machine/er2055.h"
 #include "sound/pokey.h"
 #include "includes/liberatr.h"
 
@@ -144,7 +144,16 @@
 
 static UINT8 trackball_offset;
 static UINT8 ctrld;
+static UINT8 earom_data;
+static UINT8 earom_control;
 
+
+
+static MACHINE_RESET( liberatr )
+{
+	er2055_device *earom = machine->device<er2055_device>("earom");
+	earom->set_control(0, 1, 1, 0, 0);
+}
 
 
 /*************************************
@@ -162,6 +171,44 @@ static WRITE8_HANDLER( liberatr_led_w )
 static WRITE8_HANDLER( liberatr_coin_counter_w )
 {
 	coin_counter_w(space->machine, offset ^ 0x01, data & 0x10);
+}
+
+
+
+/*************************************
+ *
+ *  EAROM interface
+ *
+ *************************************/
+
+static READ8_HANDLER( earom_r )
+{
+	er2055_device *earom = space->machine->device<er2055_device>("earom");
+	return earom->data();
+}
+
+
+static WRITE8_HANDLER( earom_w )
+{
+	er2055_device *earom = space->machine->device<er2055_device>("earom");
+	earom_data = data;
+	
+	// output latch only enabled if control bit 2 is set
+	if (earom_control & 4)
+		earom->set_data(earom_data);
+	earom->set_address(offset);
+}
+
+
+static WRITE8_HANDLER( earom_control_w )
+{
+	er2055_device *earom = space->machine->device<er2055_device>("earom");
+	earom_control = data;
+	
+	// ensure ouput data is put on data lines prior to updating controls
+	if (earom_control & 4)
+		earom->set_data(earom_data);
+	earom->set_control(data & 8, 1, ~data & 4, data & 2, data & 1);
 }
 
 
@@ -213,20 +260,20 @@ static ADDRESS_MAP_START( liberatr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0001, 0x0001) AM_RAM AM_BASE(&liberatr_y)
 	AM_RANGE(0x0002, 0x0002) AM_READWRITE(liberatr_bitmap_xy_r, liberatr_bitmap_xy_w)
 	AM_RANGE(0x0000, 0x3fff) AM_RAM_WRITE(liberatr_bitmap_w) AM_BASE(&liberatr_bitmapram)	/* overlapping for my convenience */
-	AM_RANGE(0x4000, 0x403f) AM_DEVREAD("earom", atari_vg_earom_r)
+	AM_RANGE(0x4000, 0x403f) AM_READ(earom_r)
 	AM_RANGE(0x5000, 0x5000) AM_READ(liberatr_input_port_0_r)
 	AM_RANGE(0x5001, 0x5001) AM_READ_PORT("IN1")
 	AM_RANGE(0x6000, 0x600f) AM_WRITEONLY AM_BASE(&liberatr_base_ram)
 	AM_RANGE(0x6200, 0x621f) AM_WRITEONLY AM_BASE(&liberatr_colorram)
 	AM_RANGE(0x6400, 0x6400) AM_WRITENOP
-	AM_RANGE(0x6600, 0x6600) AM_DEVWRITE("earom", atari_vg_earom_ctrl_w)
+	AM_RANGE(0x6600, 0x6600) AM_WRITE(earom_control_w)
 	AM_RANGE(0x6800, 0x6800) AM_WRITEONLY AM_BASE(&liberatr_planet_frame)
 	AM_RANGE(0x6a00, 0x6a00) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x6c00, 0x6c01) AM_WRITE(liberatr_led_w)
 	AM_RANGE(0x6c04, 0x6c04) AM_WRITE(liberatr_trackball_reset_w)
 	AM_RANGE(0x6c05, 0x6c06) AM_WRITE(liberatr_coin_counter_w)
 	AM_RANGE(0x6c07, 0x6c07) AM_WRITEONLY AM_BASE(&liberatr_planet_select)
-	AM_RANGE(0x6e00, 0x6e3f) AM_DEVWRITE("earom", atari_vg_earom_w)
+	AM_RANGE(0x6e00, 0x6e3f) AM_WRITE(earom_w)
 	AM_RANGE(0x7000, 0x701f) AM_DEVREADWRITE("pokey2", pokey_r, pokey_w)
 	AM_RANGE(0x7800, 0x781f) AM_DEVREADWRITE("pokey1", pokey_r, pokey_w)
 	AM_RANGE(0x8000, 0xefff) AM_ROM
@@ -251,15 +298,15 @@ static ADDRESS_MAP_START( liberat2_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x400f) AM_WRITEONLY AM_BASE(&liberatr_base_ram)
 	AM_RANGE(0x4200, 0x421f) AM_WRITEONLY AM_BASE(&liberatr_colorram)
 	AM_RANGE(0x4400, 0x4400) AM_WRITENOP
-	AM_RANGE(0x4600, 0x4600) AM_DEVWRITE("earom", atari_vg_earom_ctrl_w)
-	AM_RANGE(0x4800, 0x483f) AM_DEVREAD("earom", atari_vg_earom_r)
+	AM_RANGE(0x4600, 0x4600) AM_WRITE(earom_control_w)
+	AM_RANGE(0x4800, 0x483f) AM_READ(earom_r)
 	AM_RANGE(0x4800, 0x4800) AM_WRITEONLY AM_BASE(&liberatr_planet_frame)
 	AM_RANGE(0x4a00, 0x4a00) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x4c00, 0x4c01) AM_WRITE(liberatr_led_w)
 	AM_RANGE(0x4c04, 0x4c04) AM_WRITE(liberatr_trackball_reset_w)
 	AM_RANGE(0x4c05, 0x4c06) AM_WRITE(liberatr_coin_counter_w)
 	AM_RANGE(0x4c07, 0x4c07) AM_WRITEONLY AM_BASE(&liberatr_planet_select)
-	AM_RANGE(0x4e00, 0x4e3f) AM_DEVWRITE("earom", atari_vg_earom_w)
+	AM_RANGE(0x4e00, 0x4e3f) AM_WRITE(earom_w)
 	AM_RANGE(0x5000, 0x501f) AM_DEVREADWRITE("pokey2", pokey_r, pokey_w)
 	AM_RANGE(0x5800, 0x581f) AM_DEVREADWRITE("pokey1", pokey_r, pokey_w)
 	//AM_RANGE(0x6000, 0x601f) AM_WRITE(pokey1_w) /* bug ??? */
@@ -387,7 +434,8 @@ static MACHINE_CONFIG_START( liberatr, driver_device )
 	MDRV_CPU_PROGRAM_MAP(liberatr_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
 
-	MDRV_ATARIVGEAROM_ADD("earom")
+	MDRV_MACHINE_RESET(liberatr)
+	MDRV_ER2055_ADD("earom")
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
