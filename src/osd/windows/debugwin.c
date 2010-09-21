@@ -95,7 +95,7 @@
 #define EDIT_BOX_STYLE_EX		0
 
 // combo box styles
-#define COMBO_BOX_STYLE			WS_CHILD | WS_VISIBLE | CBS_DROPDOWNLIST
+#define COMBO_BOX_STYLE			WS_CHILD | WS_VISIBLE | CBS_DROPDOWNLIST | WS_VSCROLL
 #define COMBO_BOX_STYLE_EX		0
 
 // horizontal scroll bar styles
@@ -1784,14 +1784,19 @@ static void memory_create_window(running_machine *machine)
 	SendMessage(info->otherwnd[0], WM_SETFONT, (WPARAM)debug_font, (LPARAM)FALSE);
 
 	// populate the combobox
+	int maxlength = 0;
 	for (const debug_view_source *source = info->view[0].view->source_list().head(); source != NULL; source = source->next())
 	{
+		int length = strlen(source->name());
+		if (length > maxlength)
+			maxlength = length;
 		TCHAR *t_name = tstring_from_utf8(source->name());
 		SendMessage(info->otherwnd[0], CB_ADDSTRING, 0, (LPARAM)t_name);
 		osd_free(t_name);
 	}
 	const debug_view_source *source = info->view[0].view->source_list().match_device(curcpu);
 	SendMessage(info->otherwnd[0], CB_SETCURSEL, info->view[0].view->source_list().index(*source), 0);
+	SendMessage(info->otherwnd[0], CB_SETDROPPEDWIDTH, (maxlength + 2) * debug_font_width + vscroll_width, 0);
 	info->view[0].view->set_source(*source);
 
 	// set the child functions
@@ -2090,14 +2095,19 @@ static void disasm_create_window(running_machine *machine)
 	SendMessage(info->otherwnd[0], WM_SETFONT, (WPARAM)debug_font, (LPARAM)FALSE);
 
 	// populate the combobox
+	int maxlength = 0;
 	for (const debug_view_source *source = info->view[0].view->source_list().head(); source != NULL; source = source->next())
 	{
+		int length = strlen(source->name());
+		if (length > maxlength)
+			maxlength = length;
 		TCHAR *t_name = tstring_from_utf8(source->name());
 		SendMessage(info->otherwnd[0], CB_ADDSTRING, 0, (LPARAM)t_name);
 		osd_free(t_name);
 	}
 	const debug_view_source *source = info->view[0].view->source_list().match_device(curcpu);
 	SendMessage(info->otherwnd[0], CB_SETCURSEL, info->view[0].view->source_list().index(*source), 0);
+	SendMessage(info->otherwnd[0], CB_SETDROPPEDWIDTH, (maxlength + 2) * debug_font_width + vscroll_width, 0);
 	info->view[0].view->set_source(*source);
 
 	// set the child functions
