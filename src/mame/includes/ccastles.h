@@ -4,18 +4,21 @@
 
 *************************************************************************/
 
+#include "cpu/m6502/m6502.h"
+#include "machine/x2212.h"
+
 class ccastles_state : public driver_device
 {
 public:
 	ccastles_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config),
-		  nvram_stage(*this, "nvram") { }
+		  maincpu(*this, "maincpu"),
+		  nvram_4b(*this, "nvram_4b"),
+		  nvram_4a(*this, "nvram_4a") { }
 
 	/* memory pointers */
 	UINT8 *  videoram;
 	UINT8 *  spriteram;
-	required_shared_ptr<UINT8> nvram_stage;
-	UINT8    nvram[0x100];
 
 	/* video-related */
 	const UINT8 *syncprom;
@@ -36,7 +39,9 @@ public:
 	UINT8    nvram_store[2];
 
 	/* devices */
-	running_device *maincpu;
+	required_device<m6502_device> maincpu;
+	required_device<x2212_device> nvram_4b;
+	required_device<x2212_device> nvram_4a;
 };
 
 

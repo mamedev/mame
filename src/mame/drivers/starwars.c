@@ -168,13 +168,13 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4380, 0x439f) AM_READ(starwars_adc_r)			/* a-d control result */
 	AM_RANGE(0x4400, 0x4400) AM_READWRITE(starwars_main_read_r, starwars_main_wr_w)
 	AM_RANGE(0x4401, 0x4401) AM_READ(starwars_main_ready_flag_r)
-	AM_RANGE(0x4500, 0x45ff) AM_DEVREADWRITE("x2212", x2212_read, x2212_write)
+	AM_RANGE(0x4500, 0x45ff) AM_DEVREADWRITE_MODERN("x2212", x2212_device, read, write)
 	AM_RANGE(0x4600, 0x461f) AM_WRITE(avgdvg_go_w)
 	AM_RANGE(0x4620, 0x463f) AM_WRITE(avgdvg_reset_w)
 	AM_RANGE(0x4640, 0x465f) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x4660, 0x467f) AM_WRITE(irq_ack_w)
 	AM_RANGE(0x4680, 0x469f) AM_READNOP AM_WRITE(starwars_out_w)
-	AM_RANGE(0x46a0, 0x46bf) AM_DEVWRITE("x2212", starwars_nstore_w)
+	AM_RANGE(0x46a0, 0x46bf) AM_WRITE(starwars_nstore_w)
 	AM_RANGE(0x46c0, 0x46c2) AM_WRITE(starwars_adc_select_w)
 	AM_RANGE(0x46e0, 0x46e0) AM_WRITE(starwars_soundrst_w)
 	AM_RANGE(0x4700, 0x4707) AM_WRITE(starwars_math_w)
@@ -216,9 +216,6 @@ ADDRESS_MAP_END
  *  set for starwars and esb - 06/2009
  *
  *************************************/
-
-
-
 
 static INPUT_PORTS_START( starwars )
 	PORT_START("IN0")
@@ -339,7 +336,7 @@ static MACHINE_CONFIG_START( starwars, driver_device )
 
 	MDRV_RIOT6532_ADD("riot", MASTER_CLOCK / 8, starwars_riot6532_intf)
 
-	MDRV_X2212_ADD("x2212") /* nvram */
+	MDRV_X2212_ADD_AUTOSAVE("x2212") /* nvram */
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", VECTOR)

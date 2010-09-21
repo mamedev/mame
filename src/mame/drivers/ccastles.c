@@ -192,7 +192,6 @@ static MACHINE_START( ccastles )
 	rectangle visarea;
 
 	/* initialize globals */
-	state->maincpu = machine->device("maincpu");
 	state->syncprom = memory_region(machine, "proms") + 0x000;
 
 	/* find the start of VBLANK in the SYNC PROM */
@@ -228,7 +227,6 @@ static MACHINE_START( ccastles )
 	/* setup for save states */
 	state_save_register_global(machine, state->irq_state);
 	state_save_register_global_array(machine, state->nvram_store);
-	state_save_register_global_array(machine, state->nvram);
 }
 
 
@@ -291,36 +289,39 @@ static READ8_HANDLER( leta_r )
  *
  *************************************/
 
-static NVRAM_HANDLER( ccastles )
-{
-	ccastles_state *state = machine->driver_data<ccastles_state>();
-	if (read_or_write)
-	{
-		/* on power down, the EAROM is implicitly stored */
-		memcpy(state->nvram, state->nvram_stage, sizeof(state->nvram));
-		mame_fwrite(file, state->nvram, sizeof(state->nvram));
-	}
-	else if (file)
-		mame_fread(file, state->nvram, sizeof(state->nvram));
-	else
-		memset(state->nvram, 0, sizeof(state->nvram));
-}
-
-
 static WRITE8_HANDLER( nvram_recall_w )
 {
 	ccastles_state *state = space->machine->driver_data<ccastles_state>();
-	memcpy(state->nvram_stage, state->nvram, sizeof(state->nvram));
+	state->nvram_4b->recall(0);
+	state->nvram_4b->recall(1);
+	state->nvram_4b->recall(0);
+	state->nvram_4a->recall(0);
+	state->nvram_4a->recall(1);
+	state->nvram_4a->recall(0);
 }
 
 
 static WRITE8_HANDLER( nvram_store_w )
 {
 	ccastles_state *state = space->machine->driver_data<ccastles_state>();
-
 	state->nvram_store[offset] = data & 1;
-	if (!state->nvram_store[0] && state->nvram_store[1])
-		memcpy(state->nvram, state->nvram_stage, sizeof(state->nvram));
+	state->nvram_4b->store(~state->nvram_store[0] & state->nvram_store[1]);
+	state->nvram_4a->store(~state->nvram_store[0] & state->nvram_store[1]);
+}
+
+
+static READ8_HANDLER( nvram_r )
+{
+	ccastles_state *state = space->machine->driver_data<ccastles_state>();
+	return state->nvram_4b->read(*space, offset) | (state->nvram_4a->read(*space, offset) << 4);
+}
+
+
+static WRITE8_HANDLER( nvram_w )
+{
+	ccastles_state *state = space->machine->driver_data<ccastles_state>();
+	state->nvram_4b->write(*space, offset, data);
+	state->nvram_4a->write(*space, offset, data >> 4);
 }
 
 
@@ -338,7 +339,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_RAM_WRITE(ccastles_videoram_w) AM_BASE_MEMBER(ccastles_state, videoram)
 	AM_RANGE(0x8000, 0x8fff) AM_RAM
 	AM_RANGE(0x8e00, 0x8fff) AM_BASE_MEMBER(ccastles_state, spriteram)
-	AM_RANGE(0x9000, 0x90ff) AM_MIRROR(0x0300) AM_RAM AM_SHARE("nvram")
+	AM_RANGE(0x9000, 0x90ff) AM_MIRROR(0x0300) AM_READWRITE(nvram_r, nvram_w)
 	AM_RANGE(0x9400, 0x9403) AM_MIRROR(0x01fc) AM_READ(leta_r)
 	AM_RANGE(0x9600, 0x97ff) AM_READ_PORT("IN0")
 	AM_RANGE(0x9800, 0x980f) AM_MIRROR(0x01f0) AM_DEVREADWRITE("pokey1", pokey_r, pokey_w)
@@ -485,8 +486,10 @@ static MACHINE_CONFIG_START( ccastles, ccastles_state )
 
 	MDRV_MACHINE_START(ccastles)
 	MDRV_MACHINE_RESET(ccastles)
-	MDRV_NVRAM_HANDLER(ccastles)
 	MDRV_WATCHDOG_VBLANK_INIT(8)
+
+	MDRV_X2212_ADD_AUTOSAVE("nvram_4b")
+	MDRV_X2212_ADD_AUTOSAVE("nvram_4a")
 
 	/* video hardware */
 	MDRV_GFXDECODE(ccastles)

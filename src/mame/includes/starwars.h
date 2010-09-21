@@ -16,7 +16,7 @@ extern UINT8 starwars_is_esb;
 
 extern UINT8 *starwars_mathram;
 
-WRITE8_DEVICE_HANDLER( starwars_nstore_w );
+WRITE8_HANDLER( starwars_nstore_w );
 
 WRITE8_HANDLER( starwars_out_w );
 CUSTOM_INPUT( matrix_flag_r );

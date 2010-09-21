@@ -125,8 +125,8 @@ static WRITE8_HANDLER( firefox_disc_data_w )
 static unsigned char *tileram;
 static unsigned char *tile_palette;
 static unsigned char *sprite_palette;
-static running_device *nvram_1c;
-static running_device *nvram_1d;
+static x2212_device *nvram_1c;
+static x2212_device *nvram_1d;
 static tilemap_t *bgtiles;
 
 static int control_num;
@@ -351,25 +351,25 @@ static WRITE8_HANDLER( adc_select_w )
 
 static WRITE8_HANDLER( nvram_w )
 {
-	x2212_write( nvram_1c, offset, data >> 4 );
-	x2212_write( nvram_1d, offset, data & 0xf );
+	nvram_1c->write(*space, offset, data >> 4);
+	nvram_1d->write(*space, offset, data & 0xf);
 }
 
 static READ8_HANDLER( nvram_r )
 {
-	return ( x2212_read( nvram_1c, offset ) << 4 ) | x2212_read( nvram_1d, offset );
+	return (nvram_1c->read(*space, offset) << 4) | nvram_1d->read(*space, offset);
 }
 
 static WRITE8_HANDLER( novram_recall_w )
 {
-	x2212_array_recall( nvram_1c, ( data >> 7 ) & 1 );
-	x2212_array_recall( nvram_1d, ( data >> 7 ) & 1 );
+	nvram_1c->recall((data >> 7) & 1);
+	nvram_1d->recall((data >> 7) & 1);
 }
 
 static WRITE8_HANDLER( novram_store_w )
 {
-	x2212_store( nvram_1c, ( data >> 7 ) & 1 );
-	x2212_store( nvram_1d, ( data >> 7 ) & 1 );
+	nvram_1c->store((data >> 7) & 1);
+	nvram_1d->store((data >> 7) & 1);
 }
 
 
@@ -430,8 +430,8 @@ static void firq_gen(running_device *device, int state)
 static MACHINE_START( firefox )
 {
 	memory_configure_bank(machine, "bank1", 0, 32, memory_region(machine, "maincpu") + 0x10000, 0x1000);
-	nvram_1c = machine->device("nvram_1c");
-	nvram_1d = machine->device("nvram_1d");
+	nvram_1c = machine->device<x2212_device>("nvram_1c");
+	nvram_1d = machine->device<x2212_device>("nvram_1d");
 
 	laserdisc = machine->device("laserdisc");
 	vp931_set_data_ready_callback(laserdisc, firq_gen);
@@ -669,8 +669,8 @@ static MACHINE_CONFIG_START( firefox, driver_device )
 	MDRV_LASERDISC_OVERLAY(firefox, 64*8, 525, BITMAP_FORMAT_RGB32)
 	MDRV_LASERDISC_OVERLAY_CLIP(7*8, 53*8-1, 44, 480+44)
 
-	MDRV_X2212_ADD("nvram_1c")
-	MDRV_X2212_ADD("nvram_1d")
+	MDRV_X2212_ADD_AUTOSAVE("nvram_1c")
+	MDRV_X2212_ADD_AUTOSAVE("nvram_1d")
 	MDRV_RIOT6532_ADD("riot", MASTER_XTAL/8, riot_intf)
 
 	/* sound hardware */
