@@ -357,7 +357,7 @@ static WRITE8_HANDLER( nvram_w )
 
 static READ8_HANDLER( nvram_r )
 {
-	return (nvram_1c->read(*space, offset) << 4) | nvram_1d->read(*space, offset);
+	return (nvram_1c->read(*space, offset) << 4) | (nvram_1d->read(*space, offset) & 0x0f);
 }
 
 static WRITE8_HANDLER( novram_recall_w )

@@ -480,6 +480,7 @@ protected:
 	UINT8 **				m_rambaseptr;			// pointer to the bank base
 	UINT8					m_subunits;				// for width stubs, the number of subunits
 	UINT8					m_subshift[8];			// for width stubs, the shift of each subunit
+	UINT64					m_invsubmask;			// inverted mask of the populated subunits
 };
 
 
@@ -4370,6 +4371,9 @@ void handler_entry::configure_subunits(UINT64 handlermask, int handlerbits)
 {
 	UINT64 unitmask = ((UINT64)1 << handlerbits) - 1;
 	assert(handlermask != 0);
+	
+	// set the inverse mask
+	m_invsubmask = ~handlermask;
 
 	// compute the maximum possible subunits
 	int maxunits = m_datawidth / handlerbits;
@@ -4618,7 +4622,7 @@ void handler_entry_read::set_ioport(const input_port_config &ioport)
 
 UINT16 handler_entry_read::read_stub_16_from_8(address_space &space, offs_t offset, UINT16 mask)
 {
-	UINT16 result = 0;
+	UINT16 result = space.unmap() & m_invsubmask;
 	for (int index = 0; index < m_subunits; index++)
 	{
 		int shift = m_subshift[index];
@@ -4637,7 +4641,7 @@ UINT16 handler_entry_read::read_stub_16_from_8(address_space &space, offs_t offs
 
 UINT32 handler_entry_read::read_stub_32_from_8(address_space &space, offs_t offset, UINT32 mask)
 {
-	UINT32 result = 0;
+	UINT32 result = space.unmap() & m_invsubmask;
 	for (int index = 0; index < m_subunits; index++)
 	{
 		int shift = m_subshift[index];
@@ -4656,7 +4660,7 @@ UINT32 handler_entry_read::read_stub_32_from_8(address_space &space, offs_t offs
 
 UINT64 handler_entry_read::read_stub_64_from_8(address_space &space, offs_t offset, UINT64 mask)
 {
-	UINT64 result = 0;
+	UINT64 result = space.unmap() & m_invsubmask;
 	for (int index = 0; index < m_subunits; index++)
 	{
 		int shift = m_subshift[index];
@@ -4675,7 +4679,7 @@ UINT64 handler_entry_read::read_stub_64_from_8(address_space &space, offs_t offs
 
 UINT32 handler_entry_read::read_stub_32_from_16(address_space &space, offs_t offset, UINT32 mask)
 {
-	UINT32 result = 0;
+	UINT32 result = space.unmap() & m_invsubmask;
 	for (int index = 0; index < m_subunits; index++)
 	{
 		int shift = m_subshift[index];
@@ -4694,7 +4698,7 @@ UINT32 handler_entry_read::read_stub_32_from_16(address_space &space, offs_t off
 
 UINT64 handler_entry_read::read_stub_64_from_16(address_space &space, offs_t offset, UINT64 mask)
 {
-	UINT64 result = 0;
+	UINT64 result = space.unmap() & m_invsubmask;
 	for (int index = 0; index < m_subunits; index++)
 	{
 		int shift = m_subshift[index];
@@ -4713,7 +4717,7 @@ UINT64 handler_entry_read::read_stub_64_from_16(address_space &space, offs_t off
 
 UINT64 handler_entry_read::read_stub_64_from_32(address_space &space, offs_t offset, UINT64 mask)
 {
-	UINT64 result = 0;
+	UINT64 result = space.unmap() & m_invsubmask;
 	for (int index = 0; index < m_subunits; index++)
 	{
 		int shift = m_subshift[index];

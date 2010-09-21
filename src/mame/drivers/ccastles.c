@@ -313,7 +313,7 @@ static WRITE8_HANDLER( nvram_store_w )
 static READ8_HANDLER( nvram_r )
 {
 	ccastles_state *state = space->machine->driver_data<ccastles_state>();
-	return state->nvram_4b->read(*space, offset) | (state->nvram_4a->read(*space, offset) << 4);
+	return (state->nvram_4b->read(*space, offset) & 0x0f) | (state->nvram_4a->read(*space, offset) << 4);
 }
 
 

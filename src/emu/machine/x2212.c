@@ -215,7 +215,7 @@ WRITE8_MEMBER( x2212_device::write )
 
 READ8_MEMBER( x2212_device::read )
 {
-	return m_addrspace[0]->read_byte(offset) & 0x0f;
+	return (m_addrspace[0]->read_byte(offset) & 0x0f) | (space.unmap() & 0xf0);
 }
 
 
