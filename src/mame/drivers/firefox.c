@@ -362,14 +362,14 @@ static READ8_HANDLER( nvram_r )
 
 static WRITE8_HANDLER( novram_recall_w )
 {
-	nvram_1c->recall((data >> 7) & 1);
-	nvram_1d->recall((data >> 7) & 1);
+	nvram_1c->recall(data & 0x80);
+	nvram_1d->recall(data & 0x80);
 }
 
 static WRITE8_HANDLER( novram_store_w )
 {
-	nvram_1c->store((data >> 7) & 1);
-	nvram_1d->store((data >> 7) & 1);
+	nvram_1c->store(data & 0x80);
+	nvram_1d->store(data & 0x80);
 }
 
 

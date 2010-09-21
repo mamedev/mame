@@ -34,7 +34,8 @@ x2212_device_config::x2212_device_config(const machine_config &mconfig, const ch
 	: device_config(mconfig, static_alloc_device_config, "X2212", tag, owner, clock),
 	  device_config_memory_interface(mconfig, *this),
 	  device_config_nvram_interface(mconfig, *this),
-	  m_space_config("SRAM", ENDIANNESS_BIG, 8, 8, 0, *ADDRESS_MAP_NAME(x2212_map)),
+	  m_sram_space_config("SRAM", ENDIANNESS_BIG, 8, 8, 0, *ADDRESS_MAP_NAME(x2212_map)),
+	  m_e2prom_space_config("E2PROM", ENDIANNESS_BIG, 8, 8, 0, *ADDRESS_MAP_NAME(x2212_map)),
 	  m_auto_save(false)
 {
 }
@@ -68,7 +69,7 @@ device_t *x2212_device_config::alloc_device(running_machine &machine) const
 
 const address_space_config *x2212_device_config::memory_space_config(int spacenum) const
 {
-	return (spacenum == 0) ? &m_space_config : NULL;
+	return (spacenum == 0) ? &m_sram_space_config : (spacenum == 1) ? &m_e2prom_space_config : NULL;
 }
 
 
@@ -97,8 +98,8 @@ x2212_device::x2212_device(running_machine &_machine, const x2212_device_config 
 	  device_memory_interface(_machine, config, *this),
 	  device_nvram_interface(_machine, config, *this),
 	  m_config(config),
-	  m_store(true),
-	  m_array_recall(true)
+	  m_store(false),
+	  m_array_recall(false)
 {
 }
 
@@ -109,9 +110,11 @@ x2212_device::x2212_device(running_machine &_machine, const x2212_device_config 
 
 void x2212_device::device_start()
 {
-	state_save_register_device_item_array(this, 0, m_e2prom);
 	state_save_register_device_item(this, 0, m_store);
 	state_save_register_device_item(this, 0, m_array_recall);
+	
+	m_sram = m_addrspace[0];
+	m_e2prom = m_addrspace[1];
 }
 
 
@@ -123,9 +126,11 @@ void x2212_device::device_start()
 void x2212_device::nvram_default()
 {
 	// default to all-0xff
-	memset(m_e2prom, 0xff, SIZE_DATA);
 	for (int byte = 0; byte < SIZE_DATA; byte++)
-		m_addrspace[0]->write_byte(byte, 0xff);
+	{
+		m_sram->write_byte(byte, 0xff);
+		m_e2prom->write_byte(byte, 0xff);
+	}
 
 	// populate from a memory region if present
 	if (m_region != NULL)
@@ -135,7 +140,8 @@ void x2212_device::nvram_default()
 		if (m_region->width() != 1)
 			fatalerror("x2212 region '%s' needs to be an 8-bit region", tag());
 
-		memcpy(m_e2prom, *m_region, SIZE_DATA);
+		for (int byte = 0; byte < SIZE_DATA; byte++)
+			m_e2prom->write_byte(byte, m_region->u8(byte));
 	}
 }
 
@@ -147,7 +153,13 @@ void x2212_device::nvram_default()
 
 void x2212_device::nvram_read(mame_file &file)
 {
-	mame_fread(&file, m_e2prom, SIZE_DATA);
+	UINT8 buffer[SIZE_DATA];
+	mame_fread(&file, buffer, sizeof(buffer));
+	for (int byte = 0; byte < SIZE_DATA; byte++)
+	{
+		m_sram->write_byte(byte, 0xff);
+		m_e2prom->write_byte(byte, buffer[byte]);
+	}
 }
 
 
@@ -161,7 +173,11 @@ void x2212_device::nvram_write(mame_file &file)
 	// auto-save causes an implicit store prior to exiting (writing)
 	if (m_config.m_auto_save)
 		store();
-	mame_fwrite(&file, m_e2prom, SIZE_DATA);
+	
+	UINT8 buffer[SIZE_DATA];
+	for (int byte = 0; byte < SIZE_DATA; byte++)
+		buffer[byte] = m_e2prom->read_byte(byte);
+	mame_fwrite(&file, buffer, sizeof(buffer));
 }
 
 
@@ -178,7 +194,7 @@ void x2212_device::nvram_write(mame_file &file)
 void x2212_device::store()
 {
 	for (int byte = 0; byte < SIZE_DATA; byte++)
-		m_e2prom[byte] = m_addrspace[0]->read_byte(byte);
+		m_e2prom->write_byte(byte, m_sram->read_byte(byte));
 }
 
 
@@ -190,7 +206,7 @@ void x2212_device::store()
 void x2212_device::recall()
 {
 	for (int byte = 0; byte < SIZE_DATA; byte++)
-		m_addrspace[0]->write_byte(byte, m_e2prom[byte]);
+		m_sram->write_byte(byte, m_e2prom->read_byte(byte));
 }
 
 
@@ -205,7 +221,7 @@ void x2212_device::recall()
 
 WRITE8_MEMBER( x2212_device::write )
 {
-	m_addrspace[0]->write_byte(offset, data & 0x0f);
+	m_sram->write_byte(offset, data & 0x0f);
 }
 
 
@@ -215,7 +231,7 @@ WRITE8_MEMBER( x2212_device::write )
 
 READ8_MEMBER( x2212_device::read )
 {
-	return (m_addrspace[0]->read_byte(offset) & 0x0f) | (space.unmap() & 0xf0);
+	return (m_sram->read_byte(offset) & 0x0f) | (space.unmap() & 0xf0);
 }
 
 
@@ -226,10 +242,9 @@ READ8_MEMBER( x2212_device::read )
 
 WRITE_LINE_MEMBER( x2212_device::store )
 {
-	state &= 1;
-	if (!state && m_store)
+	if (state != 0 && !m_store)
 		store();
-	m_store = state;
+	m_store = (state != 0);
 }
 
 
@@ -240,8 +255,7 @@ WRITE_LINE_MEMBER( x2212_device::store )
 
 WRITE_LINE_MEMBER( x2212_device::recall )
 {
-	state &= 1;
-	if (!state && m_array_recall)
+	if (state != 0 && !m_array_recall)
 		recall();
-	m_array_recall = state;
+	m_array_recall = (state != 0);
 }

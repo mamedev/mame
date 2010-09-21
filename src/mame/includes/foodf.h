@@ -5,6 +5,7 @@
 *************************************************************************/
 
 #include "machine/atarigen.h"
+#include "machine/x2212.h"
 
 class foodf_state : public atarigen_state
 {
@@ -13,7 +14,7 @@ public:
 		: atarigen_state(machine, config),
 		  m_nvram(*this, "nvram") { }
 
-	required_shared_ptr<UINT16> m_nvram;
+	required_device<x2212_device> m_nvram;
 
 	double			rweights[3];
 	double			gweights[3];
