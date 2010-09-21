@@ -34,7 +34,7 @@ er2055_device_config::er2055_device_config(const machine_config &mconfig, const 
 	: device_config(mconfig, static_alloc_device_config, "ER2055", tag, owner, clock),
 	  device_config_memory_interface(mconfig, *this),
 	  device_config_nvram_interface(mconfig, *this),
-	  m_space_config("SRAM", ENDIANNESS_BIG, 8, 8, 0, *ADDRESS_MAP_NAME(er2055_map))
+	  m_space_config("EAROM", ENDIANNESS_BIG, 8, 6, 0, *ADDRESS_MAP_NAME(er2055_map))
 {
 }
 
