@@ -133,27 +133,24 @@
 
 ******************************************************************************************/
 
+#define ADDRESS_MAP_MODERN
+
 #include "emu.h"
-#include "cpu/m6502/m6502.h"
 #include "deprecat.h"
-#include "machine/er2055.h"
-#include "sound/pokey.h"
 #include "includes/liberatr.h"
 
 #define MASTER_CLOCK 20000000 /* 20Mhz Main Clock Xtal */
 
-static UINT8 trackball_offset;
-static UINT8 ctrld;
-static UINT8 earom_data;
-static UINT8 earom_control;
 
-
-
-static MACHINE_RESET( liberatr )
+void liberatr_state::machine_start()
 {
-	er2055_device *earom = machine->device<er2055_device>("earom");
-	earom->set_control(0, 1, 1, 0, 0);
+	atarigen_state::machine_start();
+
+	state_save_register_device_item(this, 0, m_trackball_offset);
+	state_save_register_device_item(this, 0, m_ctrld);
+	state_save_register_device_item_array(this, 0, m_videoram);
 }
+
 
 
 /*************************************
@@ -162,53 +159,15 @@ static MACHINE_RESET( liberatr )
  *
  *************************************/
 
-static WRITE8_HANDLER( liberatr_led_w )
+WRITE8_MEMBER( liberatr_state::led_w )
 {
-	set_led_status(space->machine, offset, ~data & 0x10);
+	set_led_status(&m_machine, offset, ~data & 0x10);
 }
 
 
-static WRITE8_HANDLER( liberatr_coin_counter_w )
+WRITE8_MEMBER( liberatr_state::coin_counter_w )
 {
-	coin_counter_w(space->machine, offset ^ 0x01, data & 0x10);
-}
-
-
-
-/*************************************
- *
- *  EAROM interface
- *
- *************************************/
-
-static READ8_HANDLER( earom_r )
-{
-	er2055_device *earom = space->machine->device<er2055_device>("earom");
-	return earom->data();
-}
-
-
-static WRITE8_HANDLER( earom_w )
-{
-	er2055_device *earom = space->machine->device<er2055_device>("earom");
-	earom_data = data;
-	
-	// output latch only enabled if control bit 2 is set
-	if (earom_control & 4)
-		earom->set_data(earom_data);
-	earom->set_address(offset);
-}
-
-
-static WRITE8_HANDLER( earom_control_w )
-{
-	er2055_device *earom = space->machine->device<er2055_device>("earom");
-	earom_control = data;
-	
-	// ensure ouput data is put on data lines prior to updating controls
-	if (earom_control & 4)
-		earom->set_data(earom_data);
-	earom->set_control(data & 8, 1, ~data & 4, data & 2, data & 1);
+	::coin_counter_w(&m_machine, offset ^ 0x01, data & 0x10);
 }
 
 
@@ -219,32 +178,32 @@ static WRITE8_HANDLER( earom_control_w )
  *
  *************************************/
 
-static WRITE8_HANDLER( liberatr_trackball_reset_w )
+WRITE8_MEMBER( liberatr_state::trackball_reset_w )
 {
 	/* on the rising edge of /ctrld, the /ld signal on the LS191 is released and the value of the switches */
 	/* input becomes the starting point for the trackball counters */
-	if (((data ^ ctrld) & 0x10) && (data & 0x10))
+	if (((data ^ m_ctrld) & 0x10) && (data & 0x10))
 	{
-		UINT8 trackball = input_port_read(space->machine, "FAKE");
-		UINT8 switches = input_port_read(space->machine, "IN0");
-		trackball_offset = ((trackball & 0xf0) - (switches & 0xf0)) | ((trackball - switches) & 0x0f);
+		UINT8 trackball = input_port_read(&m_machine, "FAKE");
+		UINT8 switches = input_port_read(&m_machine, "IN0");
+		m_trackball_offset = ((trackball & 0xf0) - (switches & 0xf0)) | ((trackball - switches) & 0x0f);
 	}
-	ctrld = data & 0x10;
+	m_ctrld = data & 0x10;
 }
 
 
-static READ8_HANDLER( liberatr_input_port_0_r )
+READ8_MEMBER( liberatr_state::port0_r )
 {
 	/* if ctrld is high, the /ld signal on the LS191 is NOT set, meaning that the trackball is counting */
-	if (ctrld)
+	if (m_ctrld)
 	{
-		UINT8 trackball = input_port_read(space->machine, "FAKE");
-		return ((trackball & 0xf0) - (trackball_offset & 0xf0)) | ((trackball - trackball_offset) & 0x0f);
+		UINT8 trackball = input_port_read(&m_machine, "FAKE");
+		return ((trackball & 0xf0) - (m_trackball_offset & 0xf0)) | ((trackball - m_trackball_offset) & 0x0f);
 	}
 
 	/* otherwise, the LS191 is simply passing through the raw switch inputs */
 	else
-		return input_port_read(space->machine, "IN0");
+		return input_port_read(&m_machine, "IN0");
 }
 
 
@@ -255,27 +214,27 @@ static READ8_HANDLER( liberatr_input_port_0_r )
  *
  *************************************/
 
-static ADDRESS_MAP_START( liberatr_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0000) AM_RAM AM_BASE(&liberatr_x)
-	AM_RANGE(0x0001, 0x0001) AM_RAM AM_BASE(&liberatr_y)
-	AM_RANGE(0x0002, 0x0002) AM_READWRITE(liberatr_bitmap_xy_r, liberatr_bitmap_xy_w)
-	AM_RANGE(0x0000, 0x3fff) AM_RAM_WRITE(liberatr_bitmap_w) AM_BASE(&liberatr_bitmapram)	/* overlapping for my convenience */
-	AM_RANGE(0x4000, 0x403f) AM_READ(earom_r)
-	AM_RANGE(0x5000, 0x5000) AM_READ(liberatr_input_port_0_r)
+static ADDRESS_MAP_START( liberatr_map, ADDRESS_SPACE_PROGRAM, 8, liberatr_state )
+	AM_RANGE(0x0000, 0x0000) AM_RAM AM_SHARE("xcoord")
+	AM_RANGE(0x0001, 0x0001) AM_RAM AM_SHARE("ycoord")
+	AM_RANGE(0x0002, 0x0002) AM_READWRITE(bitmap_xy_r, bitmap_xy_w)
+	AM_RANGE(0x0000, 0x3fff) AM_RAM_WRITE(bitmap_w) AM_SHARE("bitmapram")	/* overlapping for my convenience */
+	AM_RANGE(0x4000, 0x403f) AM_READ_BASE(atarigen_state, earom_r)
+	AM_RANGE(0x5000, 0x5000) AM_READ(port0_r)
 	AM_RANGE(0x5001, 0x5001) AM_READ_PORT("IN1")
-	AM_RANGE(0x6000, 0x600f) AM_WRITEONLY AM_BASE(&liberatr_base_ram)
-	AM_RANGE(0x6200, 0x621f) AM_WRITEONLY AM_BASE(&liberatr_colorram)
+	AM_RANGE(0x6000, 0x600f) AM_WRITEONLY AM_SHARE("base_ram")
+	AM_RANGE(0x6200, 0x621f) AM_WRITEONLY AM_SHARE("colorram")
 	AM_RANGE(0x6400, 0x6400) AM_WRITENOP
-	AM_RANGE(0x6600, 0x6600) AM_WRITE(earom_control_w)
-	AM_RANGE(0x6800, 0x6800) AM_WRITEONLY AM_BASE(&liberatr_planet_frame)
-	AM_RANGE(0x6a00, 0x6a00) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x6c00, 0x6c01) AM_WRITE(liberatr_led_w)
-	AM_RANGE(0x6c04, 0x6c04) AM_WRITE(liberatr_trackball_reset_w)
-	AM_RANGE(0x6c05, 0x6c06) AM_WRITE(liberatr_coin_counter_w)
-	AM_RANGE(0x6c07, 0x6c07) AM_WRITEONLY AM_BASE(&liberatr_planet_select)
-	AM_RANGE(0x6e00, 0x6e3f) AM_WRITE(earom_w)
-	AM_RANGE(0x7000, 0x701f) AM_DEVREADWRITE("pokey2", pokey_r, pokey_w)
-	AM_RANGE(0x7800, 0x781f) AM_DEVREADWRITE("pokey1", pokey_r, pokey_w)
+	AM_RANGE(0x6600, 0x6600) AM_WRITE_BASE(atarigen_state, earom_control_w)
+	AM_RANGE(0x6800, 0x6800) AM_WRITEONLY AM_SHARE("planet_frame")
+	AM_RANGE(0x6a00, 0x6a00) AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0x6c00, 0x6c01) AM_WRITE(led_w)
+	AM_RANGE(0x6c04, 0x6c04) AM_WRITE(trackball_reset_w)
+	AM_RANGE(0x6c05, 0x6c06) AM_WRITE(coin_counter_w)
+	AM_RANGE(0x6c07, 0x6c07) AM_WRITEONLY AM_SHARE("planet_select")
+	AM_RANGE(0x6e00, 0x6e3f) AM_WRITE_BASE(atarigen_state, earom_w)
+	AM_RANGE(0x7000, 0x701f) AM_DEVREADWRITE_LEGACY("pokey2", pokey_r, pokey_w)
+	AM_RANGE(0x7800, 0x781f) AM_DEVREADWRITE_LEGACY("pokey1", pokey_r, pokey_w)
 	AM_RANGE(0x8000, 0xefff) AM_ROM
 	AM_RANGE(0xfffa, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -288,27 +247,27 @@ ADDRESS_MAP_END
  *
  *************************************/
 
-static ADDRESS_MAP_START( liberat2_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x0000) AM_RAM AM_BASE(&liberatr_x)
-	AM_RANGE(0x0001, 0x0001) AM_RAM AM_BASE(&liberatr_y)
-	AM_RANGE(0x0002, 0x0002) AM_READWRITE(liberatr_bitmap_xy_r, liberatr_bitmap_xy_w)
-	AM_RANGE(0x0000, 0x3fff) AM_RAM_WRITE(liberatr_bitmap_w) AM_BASE(&liberatr_bitmapram)	/* overlapping for my convenience */
-	AM_RANGE(0x4000, 0x4000) AM_READ(liberatr_input_port_0_r)
+static ADDRESS_MAP_START( liberat2_map, ADDRESS_SPACE_PROGRAM, 8, liberatr_state )
+	AM_RANGE(0x0000, 0x0000) AM_RAM AM_SHARE("xcoord")
+	AM_RANGE(0x0001, 0x0001) AM_RAM AM_SHARE("ycoord")
+	AM_RANGE(0x0002, 0x0002) AM_READWRITE(bitmap_xy_r, bitmap_xy_w)
+	AM_RANGE(0x0000, 0x3fff) AM_RAM_WRITE(bitmap_w) AM_SHARE("bitmapram")	/* overlapping for my convenience */
+	AM_RANGE(0x4000, 0x4000) AM_READ(port0_r)
 	AM_RANGE(0x4001, 0x4001) AM_READ_PORT("IN1")
-	AM_RANGE(0x4000, 0x400f) AM_WRITEONLY AM_BASE(&liberatr_base_ram)
-	AM_RANGE(0x4200, 0x421f) AM_WRITEONLY AM_BASE(&liberatr_colorram)
+	AM_RANGE(0x4000, 0x400f) AM_WRITEONLY AM_SHARE("base_ram")
+	AM_RANGE(0x4200, 0x421f) AM_WRITEONLY AM_SHARE("colorram")
 	AM_RANGE(0x4400, 0x4400) AM_WRITENOP
-	AM_RANGE(0x4600, 0x4600) AM_WRITE(earom_control_w)
-	AM_RANGE(0x4800, 0x483f) AM_READ(earom_r)
-	AM_RANGE(0x4800, 0x4800) AM_WRITEONLY AM_BASE(&liberatr_planet_frame)
-	AM_RANGE(0x4a00, 0x4a00) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x4c00, 0x4c01) AM_WRITE(liberatr_led_w)
-	AM_RANGE(0x4c04, 0x4c04) AM_WRITE(liberatr_trackball_reset_w)
-	AM_RANGE(0x4c05, 0x4c06) AM_WRITE(liberatr_coin_counter_w)
-	AM_RANGE(0x4c07, 0x4c07) AM_WRITEONLY AM_BASE(&liberatr_planet_select)
-	AM_RANGE(0x4e00, 0x4e3f) AM_WRITE(earom_w)
-	AM_RANGE(0x5000, 0x501f) AM_DEVREADWRITE("pokey2", pokey_r, pokey_w)
-	AM_RANGE(0x5800, 0x581f) AM_DEVREADWRITE("pokey1", pokey_r, pokey_w)
+	AM_RANGE(0x4600, 0x4600) AM_WRITE_BASE(atarigen_state, earom_control_w)
+	AM_RANGE(0x4800, 0x483f) AM_READ_BASE(atarigen_state, earom_r)
+	AM_RANGE(0x4800, 0x4800) AM_WRITEONLY AM_SHARE("planet_frame")
+	AM_RANGE(0x4a00, 0x4a00) AM_WRITE_LEGACY(watchdog_reset_w)
+	AM_RANGE(0x4c00, 0x4c01) AM_WRITE(led_w)
+	AM_RANGE(0x4c04, 0x4c04) AM_WRITE(trackball_reset_w)
+	AM_RANGE(0x4c05, 0x4c06) AM_WRITE(coin_counter_w)
+	AM_RANGE(0x4c07, 0x4c07) AM_WRITEONLY AM_SHARE("planet_select")
+	AM_RANGE(0x4e00, 0x4e3f) AM_WRITE_BASE(atarigen_state, earom_w)
+	AM_RANGE(0x5000, 0x501f) AM_DEVREADWRITE_LEGACY("pokey2", pokey_r, pokey_w)
+	AM_RANGE(0x5800, 0x581f) AM_DEVREADWRITE_LEGACY("pokey1", pokey_r, pokey_w)
 	//AM_RANGE(0x6000, 0x601f) AM_WRITE(pokey1_w) /* bug ??? */
 	AM_RANGE(0x6000, 0xbfff) AM_ROM
 	AM_RANGE(0xfffa, 0xffff) AM_ROM
@@ -427,14 +386,13 @@ static const pokey_interface pokey_interface_2 =
  *
  *************************************/
 
-static MACHINE_CONFIG_START( liberatr, driver_device )
+static MACHINE_CONFIG_START( liberatr, liberatr_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6502, MASTER_CLOCK/16) /* 1.25Mhz divided from 20Mhz master clock */
 	MDRV_CPU_PROGRAM_MAP(liberatr_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
 
-	MDRV_MACHINE_RESET(liberatr)
 	MDRV_ER2055_ADD("earom")
 
 	/* video hardware */
@@ -444,9 +402,6 @@ static MACHINE_CONFIG_START( liberatr, driver_device )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(256,256)
 	MDRV_SCREEN_VISIBLE_AREA(8, 247, 13, 244)
-
-	MDRV_VIDEO_START(liberatr)
-	MDRV_VIDEO_UPDATE(liberatr)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -544,6 +499,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1982, liberatr, 0,        liberatr, liberatr, 0, ROT0, "Atari", "Liberator (set 1)", GAME_NO_COCKTAIL )
-GAME( 1982, liberatr2,liberatr, liberat2, liberatr, 0, ROT0, "Atari", "Liberator (set 2)", GAME_NO_COCKTAIL )
+GAME( 1982, liberatr, 0,        liberatr, liberatr, 0, ROT0, "Atari", "Liberator (set 1)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1982, liberatr2,liberatr, liberat2, liberatr, 0, ROT0, "Atari", "Liberator (set 2)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 

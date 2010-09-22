@@ -2,16 +2,48 @@
 
     atarigen.h
 
-    General functions for Atari raster games.
+    General functions for Atari games.
+
+****************************************************************************
+
+    Copyright Aaron Giles
+    All rights reserved.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are
+    met:
+
+        * Redistributions of source code must retain the above copyright
+          notice, this list of conditions and the following disclaimer.
+        * Redistributions in binary form must reproduce the above copyright
+          notice, this list of conditions and the following disclaimer in
+          the documentation and/or other materials provided with the
+          distribution.
+        * Neither the name 'MAME' nor the names of its contributors may be
+          used to endorse or promote products derived from this software
+          without specific prior written permission.
+
+    THIS SOFTWARE IS PROVIDED BY AARON GILES ''AS IS'' AND ANY EXPRESS OR
+    IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+    DISCLAIMED. IN NO EVENT SHALL AARON GILES BE LIABLE FOR ANY DIRECT,
+    INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+    SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+    HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+    STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+    IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
 
 ***************************************************************************/
+
+#ifndef __MACHINE_ATARIGEN__
+#define __MACHINE_ATARIGEN__
 
 #include "machine/nvram.h"
 #include "video/atarimo.h"
 #include "video/atarirle.h"
-
-#ifndef __MACHINE_ATARIGEN__
-#define __MACHINE_ATARIGEN__
+#include "machine/er2055.h"
 
 
 /***************************************************************************
@@ -66,8 +98,23 @@ class atarigen_state : public driver_device
 public:
 	atarigen_state(running_machine &machine, const driver_device_config_base &config)
 		: driver_device(machine, config),
+		  m_earom(*this, "earom"),
 		  eeprom(*this, "eeprom"),
 		  eeprom_size(*this, "eeprom") { }
+
+	// users must call through to these
+	virtual void machine_start();
+	virtual void machine_reset();
+
+	// vector and early raster EAROM interface
+	DECLARE_READ8_MEMBER( earom_r );
+	DECLARE_WRITE8_MEMBER( earom_w );
+	DECLARE_WRITE8_MEMBER( earom_control_w );
+
+	// vector and early raster EAROM interface
+	optional_device<er2055_device> m_earom;
+	UINT8 				m_earom_data;
+	UINT8 				m_earom_control;
 
 	optional_shared_ptr<UINT16> eeprom;
 	optional_shared_size eeprom_size;
@@ -115,7 +162,7 @@ public:
 	offs_t					slapstic_base;
 	offs_t					slapstic_mirror;
 
-	running_device *	sound_cpu;
+	running_device *		sound_cpu;
 	UINT8					cpu_to_sound;
 	UINT8					sound_to_cpu;
 	UINT8					timed_int;

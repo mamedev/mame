@@ -856,6 +856,48 @@ void ADDRESS_MAP_NAME(_name)(address_map &map, const device_config &devconfig) \
 	curentry->set_handler(devconfig, _tag, _rhandler, #_rhandler, _whandler, #_whandler, _unitmask); \
 
 
+// driver data base reads
+#define AM_READ_BASE(_class, _handler) \
+	curentry->set_handler(devconfig, NULL, read_proto_delegate::_create_member<_class, &_class::_handler>("driver_data::" #_handler)); \
+
+#define AM_READ8_BASE(_class, _handler, _unitmask) \
+	curentry->set_handler(devconfig, NULL, read8_proto_delegate::_create_member<_class, &_class::_handler>("driver_data::" #_handler), _unitmask); \
+
+#define AM_READ16_BASE(_class, _handler, _unitmask) \
+	curentry->set_handler(devconfig, NULL, read16_proto_delegate::_create_member<_class, &_class::_handler>("driver_data::" #_handler), _unitmask); \
+
+#define AM_READ32_BASE(_class, _handler, _unitmask) \
+	curentry->set_handler(devconfig, NULL, read32_proto_delegate::_create_member<_class, &_class::_handler>("driver_data::" #_handler), _unitmask); \
+
+
+// driver data base writes
+#define AM_WRITE_BASE(_class, _handler) \
+	curentry->set_handler(devconfig, NULL, write_proto_delegate::_create_member<_class, &_class::_handler>("driver_data::" #_handler)); \
+
+#define AM_WRITE8_BASE(_class, _handler, _unitmask) \
+	curentry->set_handler(devconfig, NULL, write8_proto_delegate::_create_member<_class, &_class::_handler>("driver_data::" #_handler), _unitmask); \
+
+#define AM_WRITE16_BASE(_class, _handler, _unitmask) \
+	curentry->set_handler(devconfig, NULL, write16_proto_delegate::_create_member<_class, &_class::_handler>("driver_data::" #_handler), _unitmask); \
+
+#define AM_WRITE32_BASE(_class, _handler, _unitmask) \
+	curentry->set_handler(devconfig, NULL, write32_proto_delegate::_create_member<_class, &_class::_handler>("driver_data::" #_handler), _unitmask); \
+
+
+// driver data base reads/writes
+#define AM_READWRITE_BASE(_class, _rhandler, _whandler) \
+	curentry->set_handler(devconfig, NULL, read_proto_delegate::_create_member<_class, &_class::_rhandler>("driver_data::" #_rhandler), write_proto_delegate::_create_member<_class, &_class::_whandler>("driver_data::" #_whandler)); \
+
+#define AM_READWRITE8_BASE(_class, _rhandler, _whandler, _unitmask) \
+	curentry->set_handler(devconfig, NULL, read8_proto_delegate::_create_member<_class, &_class::_rhandler>("driver_data::" #_rhandler), write8_proto_delegate::_create_member<_class, &_class::_whandler>("driver_data::" #_whandler), _unitmask); \
+
+#define AM_READWRITE16_BASE(_class, _rhandler, _whandler, _unitmask) \
+	curentry->set_handler(devconfig, NULL, read16_proto_delegate::_create_member<_class, &_class::_rhandler>("driver_data::" #_rhandler), write16_proto_delegate::_create_member<_class, &_class::_whandler>("driver_data::" #_whandler), _unitmask); \
+
+#define AM_READWRITE32_BASE(_class, _rhandler, _whandler, _unitmask) \
+	curentry->set_handler(devconfig, NULL, read32_proto_delegate::_create_member<_class, &_class::_rhandler>("driver_data::" #_rhandler), write32_proto_delegate::_create_member<_class, &_class::_whandler>("driver_data::" #_whandler), _unitmask); \
+
+
 // driver data reads
 #define AM_READ(_handler) \
 	curentry->set_handler(devconfig, NULL, read_proto_delegate::_create_member<drivdata_class, &drivdata_class::_handler>("driver_data::" #_handler)); \

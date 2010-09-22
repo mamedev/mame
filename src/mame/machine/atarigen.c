@@ -2,7 +2,38 @@
 
     atarigen.c
 
-    General functions for Atari raster games.
+    General functions for Atari games.
+
+****************************************************************************
+
+    Copyright Aaron Giles
+    All rights reserved.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are
+    met:
+
+        * Redistributions of source code must retain the above copyright
+          notice, this list of conditions and the following disclaimer.
+        * Redistributions in binary form must reproduce the above copyright
+          notice, this list of conditions and the following disclaimer in
+          the documentation and/or other materials provided with the
+          distribution.
+        * Neither the name 'MAME' nor the names of its contributors may be
+          used to endorse or promote products derived from this software
+          without specific prior written permission.
+
+    THIS SOFTWARE IS PROVIDED BY AARON GILES ''AS IS'' AND ANY EXPRESS OR
+    IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+    DISCLAIMED. IN NO EVENT SHALL AARON GILES BE LIABLE FOR ANY DIRECT,
+    INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+    SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+    HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+    STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+    IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
 
 ***************************************************************************/
 
@@ -1520,4 +1551,70 @@ void atarigen_blend_gfx(running_machine *machine, int gfx0, int gfx1, int mask0,
 
 	/* make the assembled data our new source data */
 	gfx_element_set_source(gx0, srcdata);
+}
+
+
+
+//**************************************************************************
+//  VECTOR AND EARLY RASTER EAROM INTERFACE
+//**************************************************************************
+
+void atarigen_state::machine_start()
+{
+	// until everyone is converted to modern devices, call our parent
+	driver_device::machine_start();
+
+	state_save_register_device_item(this, 0, m_earom_data);
+	state_save_register_device_item(this, 0, m_earom_control);
+}
+
+
+void atarigen_state::machine_reset()
+{
+	// until everyone is converted to modern devices, call our parent
+	driver_device::machine_reset();
+
+	// reset the control latch on the EAROM, if present
+	if (m_earom != NULL)
+		m_earom->set_control(0, 1, 1, 0, 0);
+}
+
+
+
+//**************************************************************************
+//  VECTOR AND EARLY RASTER EAROM INTERFACE
+//**************************************************************************
+
+READ8_MEMBER( atarigen_state::earom_r )
+{
+	// return data latched from previous clock
+	return m_earom->data();
+}
+
+
+WRITE8_MEMBER( atarigen_state::earom_w )
+{
+	// remember the value written
+	m_earom_data = data;
+	
+	// output latch only enabled if control bit 2 is set
+	if (m_earom_control & 4)
+		m_earom->set_data(m_earom_data);
+
+	// always latch the address
+	m_earom->set_address(offset);
+}
+
+
+WRITE8_MEMBER( atarigen_state::earom_control_w )
+{
+	// remember the control state
+	m_earom_control = data;
+	
+	// ensure ouput data is put on data lines prior to updating controls
+	if (m_earom_control & 4)
+		m_earom->set_data(m_earom_data);
+
+	// set the control lines; /CS2 is always held low
+	m_earom->set_control(data & 8, 1, ~data & 4, data & 2, data & 1);
 }
