@@ -1268,6 +1268,7 @@ const game_driver * const drivers[] =
 	DRIVER( seawolf )	/* 596 [1976] */
 	DRIVER( seawolfo )  /* 596 [1976] */
 	DRIVER( gunfight )	/* 597 [1975] */
+	DRIVER( gunfighto )	/* 597 [1975] */
 						/* 603 - Top Gun [1976] */
 	DRIVER( tornbase )	/* 605 [1976] */
 	DRIVER( 280zzzap )	/* 610 [1976] */

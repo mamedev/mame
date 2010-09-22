@@ -2955,6 +2955,17 @@ ROM_START( gunfight )
 	ROM_LOAD( "7609e.bin",  0x0c00, 0x0400, CRC(773264e2) SHA1(de3f2e6841122bbe6e2fda5b87d37842c072289a) )
 ROM_END
 
+ROM_START( gunfighto )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "gf-h.h",   0x0000, 0x0200, CRC(9d29cc7a) SHA1(3aef38948f1b82539e6c868ada6b9dcf2a743c4e) )
+	ROM_LOAD( "gf-g.g",   0x0200, 0x0200, CRC(5816911b) SHA1(eeb5835d3db1db1075d78a95f1f0189489910cce) )
+	ROM_LOAD( "gf-f.f",   0x0400, 0x0200, CRC(58f6ee8d) SHA1(03c3743424772202231d3066ce39d9c386887d22) )
+	ROM_LOAD( "gf-e.e",   0x0600, 0x0200, CRC(59078036) SHA1(4f3c1f2eb6ce3a1354b4031a225857b37e56cfcd) )
+	ROM_LOAD( "gf-d.d",   0x0800, 0x0200, CRC(2b64e17f) SHA1(8a5d52a859866f926ecd324ed97609102fa38e54) )
+	ROM_LOAD( "gf-c.c",   0x0a00, 0x0200, CRC(e0bbf98c) SHA1(eada3fdf09a752af98fdefdfad8de0b59beec422) )
+	ROM_LOAD( "gf-b.b",   0x0c00, 0x0200, CRC(91114108) SHA1(9480ddb45900b63ec295b983768e2825e06a0d71) )
+	ROM_LOAD( "gf-a.a",   0x0e00, 0x0200, CRC(3fbf9a91) SHA1(c74986362bc9db2aa3f881b3c98fe44537632979) )
+ROM_END
 
 ROM_START( tornbase )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -3190,8 +3201,9 @@ ROM_END
 /* PCB #              rom       parent    machine   inp */
 
 /* 596 */ GAME( 1976, seawolf,  0,        seawolf,  seawolf,  0, ROT0,   "Midway", "Sea Wolf", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-/* 596 */ GAME( 1976, seawolfo, 0,        seawolf,  seawolf,  0, ROT0,   "Midway", "Sea Wolf (older?)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+/* 596 */ GAME( 1976, seawolfo, seawolf,  seawolf,  seawolf,  0, ROT0,   "Midway", "Sea Wolf (older?)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 /* 597 */ GAMEL(1975, gunfight, 0,        gunfight, gunfight, 0, ROT0,   "Midway", "Gun Fight", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE , layout_hoffff20 )
+/* 597 */ GAMEL(1975, gunfighto,gunfight, gunfight, gunfight, 0, ROT0,   "Midway", "Gun Fight (older?)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE , layout_hoffff20 )
 /* 604 Gun Fight (cocktail, dump does not exist) */
 /* 605 */ GAME( 1976, tornbase, 0,        tornbase, tornbase, 0, ROT0,   "Midway / Taito", "Tornado Baseball / Ball Park", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE  )
 /* 610 */ GAMEL(1976, 280zzzap, 0,        zzzap,    zzzap,    0, ROT0,   "Midway", "Datsun 280 Zzzap", GAME_NO_SOUND | GAME_SUPPORTS_SAVE , layout_280zzzap )
