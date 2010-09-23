@@ -6711,6 +6711,7 @@ static UINT8 isgsm_rle_control_position = 8;
 static UINT8 isgsm_rle_control_byte;
 static int isgsm_rle_latched;
 static UINT8 isgsm_rle_byte;
+static UINT8 isgsm_read_xor;
 
 #define ISGSM_CART_BANK "gamecart"
 #define ISGSM_MAIN_BANK "mainbank"
@@ -6731,7 +6732,7 @@ static WRITE16_HANDLER( isgsm_cart_addr_low_w )
 }
 
 // the cart can be read here 8-bits at a time.
-// when reading from this port the data is xored by a fixed value (maybe other carts differ?)
+// when reading from this port the data is xored by a fixed value depending on the cart
 static READ16_HANDLER( isgsm_cart_data_r )
 {
 	int size = memory_region_length(space->machine,"gamecart_rgn");
@@ -6739,7 +6740,7 @@ static READ16_HANDLER( isgsm_cart_data_r )
 
 	isgsm_cart_addr++;
 
-	UINT8 data = rgn[(isgsm_cart_addr&(size-1))^1]^0x66;
+	UINT8 data = rgn[(isgsm_cart_addr&(size-1))^1]^isgsm_read_xor;
 
 	return data;
 }
@@ -6748,22 +6749,48 @@ static WRITE16_HANDLER( isgsm_data_w )
 {
 	UINT8* dest = 0;
 
-	switch (isgsm_type)
+	// isgsm_type
+	// rrrp o?dd
+	//
+	// r = bit-rotation
+	// p = apply rotation post-operation
+	// dd = destination (0 = sprites, 1 = tiles, 2 = soundcpu, 3 = maincpu)
+	// o = write opcodes? (not used by any dumped carts)
+
+
+	switch (isgsm_type&0x0f)
 	{
-		case 0x20: dest = memory_region(space->machine,"gfx2");
+		case 0x0: dest = memory_region(space->machine,"gfx2");
 			break;
 
-		case 0x21: dest = memory_region(space->machine,"gfx1");
+		case 0x1: dest = memory_region(space->machine,"gfx1");
 			break;
 
-		case 0x22: dest = memory_region(space->machine,"soundcpu");
+		case 0x2: dest = memory_region(space->machine,"soundcpu");
 			break;
 
-		case 0x23: dest = memory_region(space->machine,"maincpu");
+		case 0x3: dest = memory_region(space->machine,"maincpu");
 			break;
 
 		default: // no other cases?
 			break;
+	}
+
+	// pre-rotate
+	if ((isgsm_type&0x10) == 0x00)
+	{
+		// 8-bit rotation - used by bloxeed
+		switch (isgsm_type&0xe0)
+		{
+			case 0x00: data = BITSWAP8(data,0,7,6,5,4,3,2,1); break;
+			case 0x20: data = BITSWAP8(data,7,6,5,4,3,2,1,0); break;
+			case 0x40: data = BITSWAP8(data,6,5,4,3,2,1,0,7); break;
+			case 0x60: data = BITSWAP8(data,5,4,3,2,1,0,7,6); break;
+			case 0x80: data = BITSWAP8(data,4,3,2,1,0,7,6,5); break;
+			case 0xa0: data = BITSWAP8(data,3,2,1,0,7,6,5,4); break;
+ 			case 0xc0: data = BITSWAP8(data,2,1,0,7,6,5,4,3); break;
+			case 0xe0: data = BITSWAP8(data,1,0,7,6,5,4,3,2); break;
+		}
 	}
 
 	if (dest)
@@ -6813,6 +6840,8 @@ static WRITE16_HANDLER( isgsm_data_w )
 
 		for (int i=0;i<bytes_to_write;i++)
 		{
+			UINT8 byte;
+
 			if (isgsm_mode&0x8)
 			{
 				isgsm_addr++;
@@ -6826,11 +6855,30 @@ static WRITE16_HANDLER( isgsm_data_w )
 
 			switch (isgsm_mode&0x3)
 			{
-				case 0: dest[isgsm_addr]  = data; break;
-				case 1: dest[isgsm_addr] ^= data; break;
-				case 2: dest[isgsm_addr] |= data; break; // not used, based on real hw test
-				case 3: dest[isgsm_addr] &= data; break; // ^^
+				case 0: byte = data; break;
+				case 1: byte = dest[isgsm_addr] ^ data; break;
+				case 2: byte = dest[isgsm_addr] | data; break;
+				case 3: byte = dest[isgsm_addr] & data; break;
 			}
+
+			// post-rotate
+			if ((isgsm_type&0x10) == 0x10)
+			{
+				// 8-bit rotation - used by tetris
+				switch (isgsm_type&0xe0)
+				{
+					case 0x00: byte = BITSWAP8(byte,0,7,6,5,4,3,2,1); break;
+					case 0x20: byte = BITSWAP8(byte,7,6,5,4,3,2,1,0); break;
+					case 0x40: byte = BITSWAP8(byte,6,5,4,3,2,1,0,7); break;
+					case 0x60: byte = BITSWAP8(byte,5,4,3,2,1,0,7,6); break;
+					case 0x80: byte = BITSWAP8(byte,4,3,2,1,0,7,6,5); break;
+					case 0xa0: byte = BITSWAP8(byte,3,2,1,0,7,6,5,4); break;
+ 					case 0xc0: byte = BITSWAP8(byte,2,1,0,7,6,5,4,3); break;
+					case 0xe0: byte = BITSWAP8(byte,1,0,7,6,5,4,3,2); break;
+				}
+			}
+
+			dest[isgsm_addr] = byte;
 
 			if (dest == memory_region(space->machine,"gfx1"))
 			{
@@ -6841,6 +6889,7 @@ static WRITE16_HANDLER( isgsm_data_w )
 		}
 	}
 }
+
 
 static WRITE16_HANDLER( isgsm_type_w )
 {
@@ -6872,12 +6921,28 @@ static WRITE16_HANDLER( isgsm_cart_security_high_w )
 	isgsm_securitylatch = data;
 }
 
+typedef UINT32 (*isgsm_security_callback)(UINT32 input);
+isgsm_security_callback security_callback;
+
+static UINT32 shinfz_security(UINT32 input)
+{
+	return BITSWAP32(input, 19, 20, 25, 26, 15, 0, 16, 2, 8, 9, 13, 14, 31, 21, 7, 18, 11, 30, 22, 17, 3, 4, 12, 28, 29, 5, 27, 10, 23, 24, 1, 6);
+}
+
+static UINT32 tetrbx_security(UINT32 input)
+{
+	// no bitswap on this cart? just returns what was written
+	return input;
+}
+
+
+
 static WRITE16_HANDLER( isgsm_cart_security_low_w )
 {
 	isgsm_security = data | isgsm_securitylatch << 16;
 	// come up with security answer
 	// -- this probably depends on the cart.
-	isgsm_security = BITSWAP32(isgsm_security, 19, 20, 25, 26, 15, 0, 16, 2, 8, 9, 13, 14, 31, 21, 7, 18, 11, 30, 22, 17, 3, 4, 12, 28, 29, 5, 27, 10, 23, 24, 1, 6);
+	isgsm_security = (*security_callback)(isgsm_security);
 }
 
 static READ16_HANDLER( isgsm_cart_security_low_r )
@@ -7031,6 +7096,40 @@ static INPUT_PORTS_START( shinfz )
 	PORT_BIT( 0xfffc, IP_ACTIVE_HIGH, IPT_UNUSED )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( tetrbx )
+	PORT_INCLUDE( system16b_generic )
+
+	PORT_MODIFY("DSW2")
+	PORT_DIPUNUSED_DIPLOC( 0x0001, 0x0001, "SW2:1" )
+	PORT_DIPUNUSED_DIPLOC( 0x0002, 0x0002, "SW2:2" )
+	PORT_DIPUNUSED_DIPLOC( 0x0004, 0x0004, "SW2:3" )
+	PORT_DIPUNUSED_DIPLOC( 0x0008, 0x0008, "SW2:4" )
+	PORT_DIPUNUSED_DIPLOC( 0x0010, 0x0010, "SW2:5" )
+	PORT_DIPUNUSED_DIPLOC( 0x0020, 0x0020, "SW2:6" )
+	PORT_DIPUNUSED_DIPLOC( 0x0040, 0x0040, "SW2:7" )
+	PORT_DIPUNUSED_DIPLOC( 0x0080, 0x0080, "SW2:8" )
+
+	PORT_MODIFY("UNUSED")
+	PORT_BIT( 0xff, IP_ACTIVE_HIGH, IPT_UNUSED )
+
+	PORT_MODIFY("DSW1")
+	PORT_DIPUNUSED_DIPLOC( 0x0001, 0x0001, "SW1:1" )
+	PORT_DIPUNUSED_DIPLOC( 0x0002, 0x0002, "SW1:2" )
+	PORT_DIPUNUSED_DIPLOC( 0x0004, 0x0004, "SW1:3" )
+	PORT_DIPUNUSED_DIPLOC( 0x0008, 0x0008, "SW1:4" )
+	PORT_DIPUNUSED_DIPLOC( 0x0010, 0x0010, "SW1:5" )
+	PORT_DIPUNUSED_DIPLOC( 0x0020, 0x0020, "SW1:6" )
+	PORT_DIPUNUSED_DIPLOC( 0x0040, 0x0040, "SW1:7" )
+	PORT_DIPUNUSED_DIPLOC( 0x0080, 0x0080, "SW1:8" )
+
+	PORT_START("CARDDSW") // on the gamecard..
+	PORT_DIPNAME( 0x0003, 0x0000, "Game Type" )
+	PORT_DIPSETTING(      0x0000, "Tetris" )
+	PORT_DIPSETTING(      0x0001, "Tetris II (Blox)" )
+	PORT_DIPSETTING(      0x0002, "Tetris Turbo" )
+	PORT_DIPSETTING(      0x0003, "Invalid" ) // this (or higher) gives 'BAD SELECT - Check Switch' message.
+	PORT_BIT( 0xfffc, IP_ACTIVE_HIGH, IPT_UNUSED )
+INPUT_PORTS_END
 
 
 static MACHINE_RESET( isgsm )
@@ -7066,6 +7165,8 @@ DRIVER_INIT( isgsm )
 {
 	system16b_common_init(machine, ROM_BOARD_171_5521);
 
+	machine->device<nvram_device>("nvram")->set_base(workram, 0x4000);
+
 	// decrypt the bios...
 	UINT16* temp = (UINT16*)malloc(0x20000);
 	UINT16* rom = (UINT16*)memory_region(machine, "bios");
@@ -7095,8 +7196,33 @@ DRIVER_INIT( shinfz )
 
 	memcpy(rom, temp, 0x200000);
 	free(temp);
+
+	isgsm_read_xor = 0x66;
+	security_callback = &shinfz_security;
 }
 
+DRIVER_INIT( tetrbx )
+{
+	DRIVER_INIT_CALL( isgsm );
+
+	UINT16* temp = (UINT16*)malloc(0x80000);
+	UINT16* rom = (UINT16*)memory_region(machine, "gamecart_rgn");
+	int i;
+
+	for (i=0;i<0x80000/2;i++)
+	{
+		temp[i^0x2A6E6] = BITSWAP16(rom[i], 4, 0, 12, 5,
+			7, 3, 1, 14,
+			10, 11, 9,6, 
+			15, 2, 13, 8 );
+	}
+
+	memcpy(rom, temp, 0x80000);
+	free(temp);
+
+	isgsm_read_xor = 0x73;
+	security_callback = &tetrbx_security;
+}
 
 
 /* other regions are filled with data from the game cartridge at run-time via port accesses */
@@ -7114,6 +7240,12 @@ ROM_START( isgsm )
 	ROM_REGION16_BE( 0x200000, "gamecart_rgn", ROMREGION_ERASE00 )
 ROM_END
 
+ROM_START( tetrbx )
+	ISGSM_BIOS
+
+	ROM_REGION16_BE( 0x400000, "gamecart_rgn", ROMREGION_ERASE00 )
+	ROM_LOAD16_WORD_SWAP("tetr06.u13",0x00000,0x080000, CRC(884dd693) SHA1(33549613844be16f7903c9b0cf4e028f0bceaff2) )
+ROM_END
 
 ROM_START( shinfz )
 	ISGSM_BIOS
@@ -7122,7 +7254,12 @@ ROM_START( shinfz )
 	ROM_LOAD16_WORD_SWAP("shin06.u13",0x00000,0x200000, CRC(39d773e9) SHA1(5284f90cb5190128a17ebee8b539a39c8914c364) )
 ROM_END
 
+
+
 GAME( 2006, isgsm,  0,      isgsm, isgsm,  isgsm,         ROT0,  "ISG", "ISG Selection Master Type 2006 BIOS", GAME_IS_BIOS_ROOT )
-GAME( 2006, shinfz, isgsm,  isgsm, shinfz, shinfz,        ROT0,  "ISG", "Shinobi / FZ-2006 (Korean System 16 bootleg) (ISG Selection Master Type 2006)", 0 )
+
+/* 01 */ // ?? unknown
+/* 02 */ GAME( 2006, tetrbx, isgsm,  isgsm, tetrbx, tetrbx,        ROT0,  "ISG", "Tetris / Bloxeed (Korean System 16 bootleg) (ISG Selection Master Type 2006)", 0 )
+/* 03 */ GAME( 2006, shinfz, isgsm,  isgsm, shinfz, shinfz,        ROT0,  "ISG", "Shinobi / FZ-2006 (Korean System 16 bootleg) (ISG Selection Master Type 2006)", 0 )
 
 
