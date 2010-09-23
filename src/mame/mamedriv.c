@@ -4498,6 +4498,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 
 	/* Genie Hardware (uses Genesis VDP) also has 'Sun Mixing Co' put into tile ram */
 	DRIVER( puckpkmn )	/* (c) 2000 Genie */
+	DRIVER( puckpkmna )	/* (c) 2000 IBS */
 	DRIVER( topshoot )	/* (c) 1995 Sun Mixing */
 
 	/* Sega MegaTech, the number shown is on the label of the instruction rom */

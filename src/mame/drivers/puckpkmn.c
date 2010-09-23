@@ -148,6 +148,21 @@ static ADDRESS_MAP_START( puckpkmn_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xa11200, 0xa11201) AM_WRITENOP							/* ? */
 ADDRESS_MAP_END
 
+static READ16_HANDLER(puckpkmna_70001c_r)
+{
+	return 0x0e;
+}
+
+static READ16_HANDLER(puckpkmna_4b2476_r)
+{
+	return 0x3400;
+}
+
+static ADDRESS_MAP_START( puckpkmna_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_IMPORT_FROM( puckpkmn_map )
+	AM_RANGE(0x4b2476, 0x4b2477) AM_READ(puckpkmna_4b2476_r)
+	AM_RANGE(0x70001c, 0x70001d) AM_READ(puckpkmna_70001c_r)
+ADDRESS_MAP_END
 
 static MACHINE_CONFIG_DERIVED( puckpkmn, megadriv )
 
@@ -159,6 +174,13 @@ static MACHINE_CONFIG_DERIVED( puckpkmn, megadriv )
 	MDRV_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( puckpkmna, puckpkmn )
+
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_PROGRAM_MAP(puckpkmna_map)
+
 MACHINE_CONFIG_END
 
 /* Genie's Hardware (contains no real sega parts) */
@@ -258,5 +280,62 @@ ROM_START( puckpkmn ) /* Puckman Pockimon  (c)2000 Genie */
 	ROM_LOAD( "puckpoke.u3", 0x00000, 0x40000, CRC(7b066bac) SHA1(429616e21c672b07e0705bc63234249cac3af56f) )
 ROM_END
 
+/*
+Puckman Pokimon (alt.)
+
+
+PCB Layout
+----------
+
+|------------------------------------------------|
+|UPC1241                      4.000MHz     6264  |
+|    VOL             6295           555          |
+|                                                |
+|                                                |
+|  LM324                                TV16B    |
+|                    A.U3                        |
+|                                                |
+|                                                |
+|J                                               |
+|A                                   59.693175MHz|
+|M                                               |
+|M      DSW2(8)                                  |
+|A                                               |
+|                    62256    62256              |
+|       DSW1(8)      PAL      PAL                |
+|                                                |
+|                         B.U59          TA-06S  |
+|  PAL               TK-20K   PAL                |
+|                             PAL       MB81461  |
+|  PAL     PAL                          MB81461  |
+|------------------------------------------------|
+Notes:
+      TV16B  - custom graphics chip (QFP160)
+      TA-06S - custom chip (QFP128)
+      TK-20K - custom chip, probably the CPU (QFP100). Clock unknown.
+      M6295  - clock 1.000MHz [4/4]
+      
+      4x 1Mx8 flashROMs (B*.U59) are mounted onto a DIP42 carrier board to make a
+      32MBit EPROM equivalent. It appears to contain graphics plus the main program.
+      ROM A.U3 contains samples for the M6295.
+          
+*/
+
+ROM_START( puckpkmna ) /* Puckman Pockimon  (c)2000 IBS Co. Ltd */
+	ROM_REGION( 0x200000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "b2.u59", 0x000000, 0x080000, CRC(3fbea2c7) SHA1(89f3770ae92c62714f0795ddd2f311a9532eb25a) ) // FIRST AND SECOND HALF IDENTICAL
+	ROM_IGNORE(0x080000)
+	ROM_LOAD16_BYTE( "b1.u59", 0x000001, 0x080000, CRC(dc7b4254) SHA1(8ba5c5e8123e62e9af091971d0d0401d2df49350) ) // FIRST AND SECOND HALF IDENTICAL
+	ROM_IGNORE(0x080000)
+	ROM_LOAD16_BYTE( "b4.u59", 0x100000, 0x080000, CRC(375c9f80) SHA1(9b0eb729e95c22355e4117eec596f90e10282492) ) // FIRST AND SECOND HALF IDENTICAL
+	ROM_IGNORE(0x080000)
+	ROM_LOAD16_BYTE( "b3.u59", 0x100001, 0x080000, CRC(d5487df6) SHA1(d1d3d717e184a4e8e067665bbbe94e7cf45db478) ) // FIRST AND SECOND HALF IDENTICAL
+	ROM_IGNORE(0x080000)
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "a.u3", 0x00000, 0x80000, CRC(77891c9b) SHA1(66f28b418a480a89ddb3fae3a7c2fe702c62364c) )
+ROM_END
+
 /* Genie Hardware (uses Genesis VDP) also has 'Sun Mixing Co' put into tile ram */
-GAME( 2000, puckpkmn, 0,        puckpkmn, puckpkmn, puckpkmn, ROT0, "Genie",                  "Puckman Pockimon", 0 )
+GAME( 2000, puckpkmn, 0,        puckpkmn,  puckpkmn, puckpkmn, ROT0, "Genie",                  "Puckman Pockimon (set 1)", 0 )
+GAME( 2000, puckpkmna,puckpkmn, puckpkmna, puckpkmn, puckpkmn, ROT0, "IBS",                    "Puckman Pockimon (set 2)", 0 )
