@@ -688,7 +688,6 @@ create_memorywin (void)
   gtk_widget_add_accelerator (physical_addresses, "activate", accel_group,
                               GDK_y, (GdkModifierType) GDK_CONTROL_MASK,
                               GTK_ACCEL_VISIBLE);
-  gtk_check_menu_item_set_active (GTK_CHECK_MENU_ITEM (physical_addresses), TRUE);
 
   separatormenuitem1 = gtk_separator_menu_item_new ();
   gtk_widget_set_name (separatormenuitem1, "separatormenuitem1");
@@ -800,10 +799,10 @@ create_memorywin (void)
   g_signal_connect_swapped ((gpointer) chunks_4, "activate",
                             G_CALLBACK (on_chunks_4_activate),
                             GTK_OBJECT (memorywin));
-  g_signal_connect_swapped ((gpointer) logical_addresses, "group_changed",
+  g_signal_connect_swapped ((gpointer) logical_addresses, "activate",
                             G_CALLBACK (on_logical_addresses_group_changed),
                             GTK_OBJECT (memorywin));
-  g_signal_connect_swapped ((gpointer) physical_addresses, "group_changed",
+  g_signal_connect_swapped ((gpointer) physical_addresses, "activate",
                             G_CALLBACK (on_physical_addresses_group_changed),
                             GTK_OBJECT (memorywin));
   g_signal_connect_swapped ((gpointer) reverse, "activate",
