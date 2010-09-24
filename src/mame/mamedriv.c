@@ -3912,7 +3912,7 @@ DokiDoki Penguin Land *not confirmed
 	DRIVER( quartet2 )	/* (c) 1986 (8751) */
 	DRIVER( quartet2a )	/* (c) 1986 */
 
-	/* System16A */
+	/* System 16A */
 	DRIVER( aceattaca )	/* (c) 1988 (FD1094, decrypted) */
 	DRIVER( afighter )	/* (c) 1986 (FD1089A, decrypted) */
 	DRIVER( alexkidd )	/* (c) 1986 (FD1089A, decrypted) */
@@ -4029,6 +4029,7 @@ DokiDoki Penguin Land *not confirmed
 
 	/* ISG S16 bootleg system */
 	DRIVER( isgsm )
+	DRIVER( tetrbx )
 	DRIVER( shinfz )
 
 	/* System 18 */
@@ -8525,6 +8526,10 @@ Other Sun games
 	DRIVER( kov100 )		/* (c) 1999 */
 	DRIVER( kovsh )			/* (c) 1999 */
 	DRIVER( kovsh103 )		/* (c) 1999 */
+	DRIVER( kovqhsgs ) 		/* bootleg */
+	DRIVER( kovlsqh2 ) 		/* bootleg */
+	DRIVER( kovlsjb ) 		/* bootleg */
+	DRIVER( kovlsjba ) 		/* bootleg */
 	DRIVER( photoy2k )		/* (c) 1999 */
 	DRIVER( photoy2k102 )	/* (c) 1999 */
 	DRIVER( photoy2k104 )	/* (c) 1999 */
