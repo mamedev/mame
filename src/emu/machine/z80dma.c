@@ -662,6 +662,8 @@ void z80dma_device::write(UINT8 data)
 
 	if (m_num_follow == 0)
 	{
+		m_reset_pointer = 0;
+		
 		if ((data & 0x87) == 0) // WR2
 		{
 			WR2 = data;
@@ -841,6 +843,9 @@ void z80dma_device::write(UINT8 data)
 				m_regs_follow[m_num_follow++] = GET_REGNUM(INTERRUPT_VECTOR);
 			m_cur_follow = 0;
 		}
+
+		m_reset_pointer++;
+		if(m_reset_pointer >= 6) { m_reset_pointer = 0; }
 	}
 }
 
