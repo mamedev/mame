@@ -76,6 +76,33 @@ struct _win_i {
 	running_device *		cpu;	// current CPU
 };
 
+struct windowState
+{
+    windowState() : type(0), 
+                    sizeX(-1), sizeY(-1), 
+                    positionX(-1), positionY(-1) { }
+    ~windowState() { }
+    
+    void loadFromXmlDataNode(xml_data_node* wnode)
+    {
+        if (!wnode) return;
+        
+        type = xml_get_attribute_int(wnode, "type", type);
+
+        sizeX = xml_get_attribute_int(wnode, "size_x", sizeX);
+        sizeY = xml_get_attribute_int(wnode, "size_y", sizeY);
+        positionX = xml_get_attribute_int(wnode, "position_x", positionX);
+        positionY = xml_get_attribute_int(wnode, "position_y", positionY);
+    }
+
+    int type;
+    int sizeX;
+    int sizeY;
+    int positionX;
+    int positionY;
+};
+windowState windowStateArray[64];
+int windowStateCount = 0;
 
 //============================================================
 //  LOCAL VARIABLES
@@ -88,6 +115,10 @@ static win_i *win_list;
 //============================================================
 
 static void debugmain_init(running_machine *machine);
+static void memorywin_new(running_machine *machine);
+static void disasmwin_new(running_machine *machine);
+static void logwin_new(running_machine *machine);
+
 
 //============================================================
 //  run_func_on_win_list
@@ -451,6 +482,8 @@ static void debugmain_set_cpu(running_device *device)
 
 static void configuration_load(running_machine *machine, int config_type, xml_data_node *parentnode)
 {
+	xml_data_node *wnode;
+
 	/* we only care about game files */
 	if (config_type != CONFIG_TYPE_GAME)
 		return;
@@ -459,9 +492,14 @@ static void configuration_load(running_machine *machine, int config_type, xml_da
 	if (parentnode == NULL)
 		return;
 
-    // debug // printf("CONFIG LOAD\n");
-    //gtk_window_move(GTK_WINDOW(dmain->win), 100, 100);
-    //gtk_window_resize(GTK_WINDOW(dmain->win), 1000, 500);
+    /* configuration load */
+	int i = 0; 
+	for (wnode = xml_get_sibling(parentnode->child, "window"); wnode != NULL; wnode = xml_get_sibling(wnode->next, "window"))
+    {
+        windowStateArray[i].loadFromXmlDataNode(wnode);
+        i++;
+    }
+    windowStateCount = i;
 }
 
 //============================================================
@@ -505,7 +543,7 @@ static void configuration_save(running_machine *machine, int config_type, xml_da
 void osd_init_debugger(running_machine *machine)
 {
 	/* register callbacks */
-	config_register(machine, "debugger_sdl", configuration_load, configuration_save);
+	config_register(machine, "debugger", configuration_load, configuration_save);
 }
 
 
@@ -516,12 +554,41 @@ void osd_init_debugger(running_machine *machine)
 void osd_wait_for_debugger(running_device *device, int firststop)
 {
 	win_i *dmain = get_first_win_i(WIN_TYPE_MAIN);
-	// create a console window
+
+	// Create a console window if one doesn't already exist
 	if(!dmain)
 	{
 		// GTK init should probably be done earlier
 		gtk_init(0, 0);
 		debugmain_init(device->machine);
+
+        // Resize the main window
+        for (int i = 0; i < windowStateCount; i++)
+        {
+            if (windowStateArray[i].type == WIN_TYPE_MAIN)
+            {
+                gtk_window_move(GTK_WINDOW(win_list->win), windowStateArray[i].positionX, windowStateArray[i].positionY);
+                gtk_window_resize(GTK_WINDOW(win_list->win), windowStateArray[i].sizeX, windowStateArray[i].sizeY);
+            }
+        }
+        
+        // Respawn and reposition every other window
+        for (int i = 0; i < windowStateCount; i++)
+        {
+            if (!windowStateArray[i].type || windowStateArray[i].type == WIN_TYPE_MAIN) 
+                continue;
+            
+            switch (windowStateArray[i].type)
+            {
+                case WIN_TYPE_MEMORY: memorywin_new(device->machine); break;
+                case WIN_TYPE_DISASM: disasmwin_new(device->machine); break;
+                case WIN_TYPE_LOG:    logwin_new(device->machine); break;
+                default: break;
+            }
+            
+            gtk_window_move(GTK_WINDOW(win_list->win), windowStateArray[i].positionX, windowStateArray[i].positionY);
+            gtk_window_resize(GTK_WINDOW(win_list->win), windowStateArray[i].sizeX, windowStateArray[i].sizeY);
+        }
 	}
 
 	// update the views in the console to reflect the current CPU
