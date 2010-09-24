@@ -1118,6 +1118,10 @@ static ADDRESS_MAP_START( subsino_iomap, ADDRESS_SPACE_IO, 8 )
 ADDRESS_MAP_END
 
 
+static ADDRESS_MAP_START( mtrain_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE( 0x00000, 0x0bfff ) AM_ROM
+ADDRESS_MAP_END
+
 /***************************************************************************
 *                              Input Ports                                 *
 ***************************************************************************/
@@ -2212,6 +2216,9 @@ static GFXDECODE_START( subsino_stisub )
 	GFXDECODE_ENTRY( "reels", 0, layout_8x32x8, 0, 1 )
 GFXDECODE_END
 
+static GFXDECODE_START( subsino_mtrain )
+	GFXDECODE_ENTRY( "tilemap", 0, layout_8x8x8, 0, 1 )
+GFXDECODE_END
 
 /***************************************************************************
 *                             Machine Drivers                              *
@@ -2383,6 +2390,48 @@ static MACHINE_CONFIG_START( stisub, driver_device )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_SOUND_ADD("ymsnd", YM3812, XTAL_3_579545MHz)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+MACHINE_CONFIG_END
+
+VIDEO_START(mtrain)
+{
+
+}
+
+VIDEO_UPDATE(mtrain)
+{
+	return 0;
+}
+
+static MACHINE_CONFIG_START( mtrain, driver_device )
+	/* basic machine hardware */
+	MDRV_CPU_ADD("maincpu", Z180, XTAL_12MHz / 8)	/* Unknown clock */
+	MDRV_CPU_PROGRAM_MAP(mtrain_map)
+	MDRV_CPU_IO_MAP(subsino_iomap)
+
+	/* video hardware */
+	MDRV_SCREEN_ADD("screen", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(512, 256)
+	MDRV_SCREEN_VISIBLE_AREA(0, 512-1, 0+16, 256-16-1)
+
+	MDRV_GFXDECODE(subsino_mtrain)
+
+	MDRV_PALETTE_LENGTH(0x100)
+	MDRV_PALETTE_INIT(subsino_3proms)
+
+	MDRV_VIDEO_START(mtrain)
+	MDRV_VIDEO_UPDATE(mtrain)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD("ymsnd", YM3812, XTAL_3_579545MHz)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+
+	MDRV_OKIM6295_ADD("oki", XTAL_4_433619MHz / 4, OKIM6295_PIN7_HIGH)	/* Clock frequency & pin 7 not verified */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
@@ -2969,15 +3018,16 @@ ROM_END
 ***************************************************************************/
 
 ROM_START( mtrain )
-	ROM_REGION( 0x18000, "maincpu", 0 )
-	ROM_LOAD( "out_1v131.u17", 0x10000, 0x8000, CRC(6761be7f) SHA1(a492f8179d461a454516dde33ff04473d4cfbb27) )
-	ROM_CONTINUE(0x0000,0x8000)
+	ROM_REGION( 0x18100, "maincpu", 0 )
+	ROM_LOAD( "out_1v131.u17", 0x8000, 0x8100, CRC(6761be7f) SHA1(a492f8179d461a454516dde33ff04473d4cfbb27) )
+	// code starts at 0x8100???
+	ROM_CONTINUE(0x0000,0x8000-0x100)
 
 	ROM_REGION( 0x100000, "tilemap", 0 )
-	ROM_LOAD( "rom_1.u05", 0x00000, 0x40000, CRC(96067e95) SHA1(bec7dffaf6920ff2bd85a43fb001a997583e25ee) )
-	ROM_LOAD( "rom_2.u04", 0x40000, 0x40000, CRC(a794f287) SHA1(7b9c0d57224a700f49e55ba5aeb7ed9d35a71e02) )
-	ROM_LOAD( "rom_3.u03", 0x80000, 0x40000, CRC(cef2c079) SHA1(9ee54a08ef8db90a80a4b3568bb82ce09ee41e65) )
-	ROM_LOAD( "rom_4.u02", 0xc0000, 0x40000, CRC(b7e65d04) SHA1(5eea1b8c1129963b3b83a59410cd0e1de70621e4) )
+	ROM_LOAD( "rom_1.u05", 0xc0000, 0x40000, CRC(96067e95) SHA1(bec7dffaf6920ff2bd85a43fb001a997583e25ee) )
+	ROM_LOAD( "rom_2.u04", 0x80000, 0x40000, CRC(a794f287) SHA1(7b9c0d57224a700f49e55ba5aeb7ed9d35a71e02) )
+	ROM_LOAD( "rom_3.u03", 0x40000, 0x40000, CRC(cef2c079) SHA1(9ee54a08ef8db90a80a4b3568bb82ce09ee41e65) )
+	ROM_LOAD( "rom_4.u02", 0x00000, 0x40000, CRC(b7e65d04) SHA1(5eea1b8c1129963b3b83a59410cd0e1de70621e4) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
 	ROM_LOAD( "rom_5.snd", 0x00000, 0x40000, CRC(51cae476) SHA1(d1da4e5c3d53d18d8b69dfb57796d0ae311d99bf) )
@@ -3168,10 +3218,12 @@ static DRIVER_INIT( stisub )
 
 DRIVER_INIT( mtrain )
 {
-/*
-    - crsbingo XORs (0xbb, 0xcc, 0xcc, 0xdd, 0xaa, 0x11, 0x44, 0xee)
-    - start 8000
-*/
+	// this one is odd
+	// the code clearly starts at 0x8100 in the rom, not 0x8000
+	// and there are jumps to the 0xbxxx region, but I'm not sure
+	// which part of the ROM should map there, or how it should
+	// decrypt.
+	subsino_decrypt(machine, crsbingo_bitswaps, crsbingo_xors, 0xc000);
 }
 
 
@@ -3191,4 +3243,4 @@ GAMEL( 1996, sharkpya, sharkpy,  sharkpy,  sharkpy,  sharkpy,  ROT0, "Subsino", 
 GAMEL( 1995, sharkpye, sharkpy,  sharkpy,  sharkpye, sharkpye, ROT0, "American Alpha",  "Shark Party (English, Alpha license)", 0,      layout_sharkpye )	// PCB black-box was marked 'victor 6'
 GAMEL( 1996, smoto20,  0,        srider,   smoto20,  smoto20,  ROT0, "Subsino",         "Super Rider (Italy, v2.0)",            0,      layout_smoto )
 GAMEL( 1996, smoto16,  smoto20,  srider,   smoto16,  smoto16,  ROT0, "Subsino",         "Super Moto (Italy, v1.6)",             0,      layout_smoto )
-GAME(  1997, mtrain,   0,        sharkpy,  stisub,   mtrain,   ROT0, "Subsino",         "Magic Train",                          GAME_NOT_WORKING )
+GAME(  1997, mtrain,   0,        mtrain,   stisub,   mtrain,   ROT0, "Subsino",         "Magic Train",                          GAME_NOT_WORKING )
