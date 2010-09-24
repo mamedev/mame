@@ -204,7 +204,7 @@ int amiga_copper_execute_next(running_machine *machine, int xpos)
 #if GUESS_COPPER_OFFSET
 			return xpos + COPPER_CYCLES_TO_PIXELS(1 + state->wait_offset);
 #else
-			return xpos + COPPER_CYCLES_TO_PIXELS(1 + 3);
+			return xpos + COPPER_CYCLES_TO_PIXELS(1 + 1);
 #endif
 		}
 
@@ -636,7 +636,7 @@ void amiga_render_scanline(running_machine *machine, bitmap_t *bitmap, int scanl
 		CUSTOM_REG(REG_COLOR00) = state->genlock_color;
 
 	/* loop over the line */
-	next_copper_x = 2;	/* copper runs on odd timeslots */
+	next_copper_x = 0;
 	for (x = 0; x < 0xe4*2; x++)
 	{
 		int sprpix;
