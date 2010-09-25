@@ -3311,6 +3311,7 @@ WRITE16_HANDLER( raiden2_mcu_w )
 		default:
 			generic_cop_w(space, offset, data, mem_mask);
 			break;
+#if 0
 
 		case (0x2a0/2): sprcpt_val_1_w(space,offset,data,mem_mask); break;
 		case (0x2a2/2): sprcpt_val_1_w(space,offset,data,mem_mask); break;
@@ -3329,6 +3330,7 @@ WRITE16_HANDLER( raiden2_mcu_w )
 		case (0x2bc/2): sprcpt_adr_w(space,offset,data,mem_mask); break;
 		case (0x2be/2): sprcpt_adr_w(space,offset,data,mem_mask); break;
 		case (0x2ce/2): sprcpt_flags_2_w(space,offset,data,mem_mask); break;
+#endif
 
 		case (0x300/2):	{ seibu_main_word_w(space,0,cop_mcu_ram[offset],0x00ff); break; }
 		case (0x304/2):	{ seibu_main_word_w(space,1,cop_mcu_ram[offset],0x00ff); break; }

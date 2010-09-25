@@ -135,25 +135,250 @@ Current Problem(s) - in order of priority
 
 */
 
+#define ADDRESS_MAP_MODERN
 #include "emu.h"
 #include "cpu/nec/nec.h"
 #include "cpu/z80/z80.h"
 #include "audio/seibu.h"
 #include "machine/eeprom.h"
 #include "sound/okim6295.h"
-#include "machine/seicop.h"
 #include "includes/raiden2.h"
 
+static UINT16 rps(running_machine *machine)
+{
+	return cpu_get_reg(machine->device("maincpu"), NEC_CS);
+}
 
-static tilemap_t *background_layer,*midground_layer,*foreground_layer,*text_layer;
-static UINT16 *back_data,*fore_data,*mid_data, *w1ram;
-static int bg_bank, fg_bank, mid_bank;
-static int bg_col, fg_col, mid_col;
+static UINT16 rpc(running_machine *machine)
+{
+	return cpu_get_reg(machine->device("maincpu"), NEC_IP);
+}
 
-static int tick;
-static UINT16 *mainram;
+WRITE16_MEMBER(raiden2_state::cop_pgm_data_w)
+{
+	assert(ACCESSING_BITS_0_7 && ACCESSING_BITS_8_15);
+	cop_program[cop_latch_addr] = data;
+	int idx = cop_latch_addr >> 3;
+	cop_func_trigger[idx] = cop_latch_trigger;
+	cop_func_value[idx]   = cop_latch_value;
+	cop_func_mask[idx]    = cop_latch_mask;
+}
 
-static int c_r[0xc000], c_w[0xc000];
+WRITE16_MEMBER(raiden2_state::cop_pgm_addr_w)
+{
+	assert(ACCESSING_BITS_0_7 && ACCESSING_BITS_8_15);
+	assert(data < 0x100);
+	cop_latch_addr = data;
+}
+
+WRITE16_MEMBER(raiden2_state::cop_pgm_value_w)
+{
+	assert(ACCESSING_BITS_0_7 && ACCESSING_BITS_8_15);
+	cop_latch_value = data;
+}
+
+WRITE16_MEMBER(raiden2_state::cop_pgm_mask_w)
+{
+	assert(ACCESSING_BITS_0_7 && ACCESSING_BITS_8_15);
+	cop_latch_mask = data;
+}
+
+WRITE16_MEMBER(raiden2_state::cop_pgm_trigger_w)
+{
+	assert(ACCESSING_BITS_0_7 && ACCESSING_BITS_8_15);
+	cop_latch_trigger = data;
+}
+
+WRITE16_MEMBER(raiden2_state::cop_dma_v1_w)
+{
+	COMBINE_DATA(&cop_dma_v1);
+}
+
+WRITE16_MEMBER(raiden2_state::cop_dma_v2_w)
+{
+	COMBINE_DATA(&cop_dma_v2);
+}
+
+WRITE16_MEMBER(raiden2_state::cop_dma_v3_w)
+{
+	COMBINE_DATA(&cop_dma_v3);
+}
+
+WRITE16_MEMBER(raiden2_state::cop_dma_mode_w)
+{
+	COMBINE_DATA(&cop_dma_mode);
+}
+
+WRITE16_MEMBER(raiden2_state::cop_dma_adr_w)
+{
+	COMBINE_DATA(&cop_dma_adr);
+}
+
+WRITE16_MEMBER(raiden2_state::cop_dma_size_w)
+{
+	COMBINE_DATA(&cop_dma_size);
+}
+
+WRITE16_MEMBER(raiden2_state::cop_dma_trigger_w)
+{
+	//	logerror("COP DMA mode=%x adr=%x size=%x vals=%x %x %x\n", cop_dma_mode, cop_dma_adr, cop_dma_size, cop_dma_v1, cop_dma_v2, cop_dma_v3);
+
+	switch(cop_dma_mode) {
+	case 0x14: {
+		int rsize = 32*(0x7f-cop_dma_size);
+		int radr = 64*cop_dma_adr - rsize;
+		for(int i=0; i<rsize; i+=2)
+			sprites[i/2] = space.read_word(radr+i);
+		sprites_cur_start = rsize;
+		break;
+	}
+	}
+}
+
+WRITE16_MEMBER(raiden2_state::cop_itoa_low_w)
+{
+	cop_itoa = (cop_itoa & ~UINT32(mem_mask)) | (data & mem_mask);
+	
+	int digits = cop_itoa_digit_count;
+	UINT32 val = cop_itoa;
+
+	if(digits > 9)
+		digits = 9;
+	for(int i=0; i<digits; i++)
+		if(!val && i)
+			cop_itoa_digits[i] = 0x20;
+		else {
+			cop_itoa_digits[i] = 0x30 | (val % 10);
+			val = val / 10;
+		}
+	cop_itoa_digits[9] = 0;
+}
+
+WRITE16_MEMBER(raiden2_state::cop_itoa_high_w)
+{
+	cop_itoa = (cop_itoa & ~(mem_mask << 16)) | ((data & mem_mask) << 16);
+}
+
+WRITE16_MEMBER(raiden2_state::cop_itoa_digit_count_w)
+{
+	COMBINE_DATA(&cop_itoa_digit_count);
+}
+
+READ16_MEMBER(raiden2_state::cop_itoa_digits_r)
+{
+	return cop_itoa_digits[offset*2] | (cop_itoa_digits[offset*2+1] << 8);
+}
+
+READ16_MEMBER(raiden2_state::cop_status_r)
+{
+	return cop_status;
+}
+
+WRITE16_MEMBER(raiden2_state::cop_scale_w)
+{
+	COMBINE_DATA(&cop_scale);
+}
+
+READ16_MEMBER(raiden2_state::cop_reg_high_r)
+{
+	return cop_regs[offset] >> 16;
+}
+
+WRITE16_MEMBER(raiden2_state::cop_reg_high_w)
+{
+	cop_regs[offset] = (cop_regs[offset] & ~(mem_mask << 16)) | ((data & mem_mask) << 16);
+}
+
+READ16_MEMBER(raiden2_state::cop_reg_low_r)
+{
+	return cop_regs[offset];
+}
+
+WRITE16_MEMBER(raiden2_state::cop_reg_low_w)
+{
+	cop_regs[offset] = (cop_regs[offset] & ~UINT32(mem_mask)) | (data & mem_mask);
+}
+
+WRITE16_MEMBER(raiden2_state::cop_cmd_w)
+{
+	cop_status &= 0x7fff;
+
+	switch(data) {
+	case 0x0205:   // 0205 0006 ffeb 0000 - 0188 0282 0082 0b8e 098e 0000 0000 0000
+		space.write_dword(cop_regs[0] + 4 + offset*4, space.read_dword(cop_regs[0] + 4 + offset*4) + space.read_dword(cop_regs[0] + 16 + offset*4));
+		break;
+
+	case 0x138e: { // 130e 0005 bf7f 0010 - 0984 0aa4 0d82 0aa2 039b 0b9a 0b9a 0a9a
+		int dx = space.read_dword(cop_regs[1]+4) - space.read_dword(cop_regs[0]+4);
+		int dy = space.read_dword(cop_regs[1]+8) - space.read_dword(cop_regs[0]+8);
+		if(!dy)
+			cop_status |= 0x8000;
+		else {
+			UINT8 angle = atan(double(dx)/double(dy)) * 128 / M_PI;
+			if(dx<0)
+				angle += 0x80;
+			space.write_byte(cop_regs[0]+0x34, angle);
+		}
+		break;
+	}
+
+	case 0x3bb0: { // 3bb0 0004 007f 0038 - 0f9c 0b9c 0b9c 0b9c 0b9c 0b9c 0b9c 099c
+		int dx = (space.read_dword(cop_regs[1]+4) - space.read_dword(cop_regs[0]+4)) >> 16;
+		int dy = (space.read_dword(cop_regs[1]+8) - space.read_dword(cop_regs[0]+8)) >> 16;
+		space.write_word(cop_regs[0]+0x38, sqrt(dx*dx+dy*dy));
+		break;
+	}
+
+	case 0x42c2: { // 42c2 0005 fcdd 0040 - 0f9a 0b9a 0b9c 0b9c 0b9c 029c 0000 0000
+		int div = space.read_word(cop_regs[0]+0x36);
+		if(!div)
+			div = 1;
+		space.write_word(cop_regs[0]+0x38, (space.read_word(cop_regs[0]+0x38) << (5-cop_scale)) / div);
+		break;
+	}
+
+	case 0x8100: { // 8100 0007 fdfb 0080 - 0b9a 0b88 0888 0000 0000 0000 0000 0000
+		double angle = (space.read_word(cop_regs[0]+0x34) & 0xff) * M_PI / 128;
+		double amp = 65536*(space.read_word(cop_regs[0]+0x36) & 0xff);
+		space.write_dword(cop_regs[0] + 16, int(amp*sin(angle)) >> (5-cop_scale));
+		break;
+	}
+
+	case 0x8900: { // 8900 0007 fdfb 0088 - 0b9a 0b8a 088a 0000 0000 0000 0000 0000
+		double angle = (space.read_word(cop_regs[0]+0x34) & 0xff) * M_PI / 128;
+		double amp = 65536*(space.read_word(cop_regs[0]+0x36) & 0xff);
+		space.write_dword(cop_regs[0] + 20, int(amp*cos(angle)) >> (5-cop_scale));
+		break;
+	}
+
+	case 0x5205:   // 5205 0006 fff7 0050 - 0180 02e0 03a0 00a0 03a0 0000 0000 0000
+		space.write_dword(cop_regs[1], space.read_dword(cop_regs[0]));
+		break;
+
+	case 0x5a05:   // 5a05 0006 fff7 0058 - 0180 02e0 03a0 00a0 03a0 0000 0000 0000
+		space.write_dword(cop_regs[1], space.read_dword(cop_regs[0]));
+		break;
+
+	case 0xf205:   // f205 0006 fff7 00f0 - 0182 02e0 03c0 00c0 03c0 0000 0000 0000
+		space.write_dword(cop_regs[2], space.read_dword(cop_regs[0]+4));
+		break;
+
+		// raidndx only
+	case 0x7e05:
+		space.write_dword(0x470, space.read_dword(cop_regs[3]));
+		// Actually, wherever the bank selection actually is
+		// And probably 8 bytes too, but they zero all the rest
+		break;
+
+	default:
+		logerror("pcall %04x (%04x:%04x) [%x %x %x %x]\n", data, rps(space.machine), rpc(space.machine), cop_regs[0], cop_regs[1], cop_regs[2], cop_regs[3]);
+	}
+}
+
+//	case 0x6ca:
+//		logerror("select bank %d %04x\n", (data >> 15) & 1, data);
+//		memory_set_bank(space.machine, "bank1", (data >> 15) & 1);
+
 
 static void combine32(UINT32 *val, int offset, UINT16 data, UINT16 mem_mask)
 {
@@ -165,10 +390,9 @@ static void combine32(UINT32 *val, int offset, UINT16 data, UINT16 mem_mask)
 
 /* SPRITE DRAWING (move to video file) */
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect ,int pri_mask )
+void raiden2_state::draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect ,int pri_mask )
 {
-	const UINT16 *source = machine->generic.spriteram.u16 + 0x1000/2 - 4;
-	const UINT16 *finish = machine->generic.spriteram.u16;
+	const UINT16 *source = sprites + sprites_cur_start/2 - 4;
 
 	const gfx_element *gfx = machine->gfx[2];
 
@@ -194,7 +418,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
      */
 
 
-	while( source>finish ){
+	while( source>sprites ){
 		int tile_number = source[1];
 		int sx = source[2];
 		int sy = source[3];
@@ -260,62 +484,107 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 /* VIDEO RELATED WRITE HANDLERS (move to video file) */
 
-static WRITE16_HANDLER(raiden2_background_w)
+WRITE16_MEMBER(raiden2_state::raiden2_background_w)
 {
 	COMBINE_DATA(&back_data[offset]);
 	tilemap_mark_tile_dirty(background_layer, offset);
 }
 
-static WRITE16_HANDLER(raiden2_midground_w)
+WRITE16_MEMBER(raiden2_state::raiden2_midground_w)
 {
 	COMBINE_DATA(&mid_data[offset]);
 	tilemap_mark_tile_dirty(midground_layer,offset);
 }
 
-static WRITE16_HANDLER(raiden2_foreground_w)
+WRITE16_MEMBER(raiden2_state::raiden2_foreground_w)
 {
 	COMBINE_DATA(&fore_data[offset]);
 	tilemap_mark_tile_dirty(foreground_layer,offset);
 }
 
-static WRITE16_HANDLER(raiden2_text_w)
+WRITE16_MEMBER(raiden2_state::raiden2_text_w)
 {
-	raiden2_state *state = space->machine->driver_data<raiden2_state>();
-	UINT16 *videoram = state->videoram;
-	COMBINE_DATA(&videoram[offset]);
+	COMBINE_DATA(&text_data[offset]);
 	tilemap_mark_tile_dirty(text_layer, offset);
+}
+
+WRITE16_MEMBER(raiden2_state::tile_scroll_w)
+{
+	COMBINE_DATA(scrollvals + offset);
+	data = scrollvals[offset];
+
+	tilemap_t *tm = 0;
+	switch(offset/2) {
+	case 0: tm = background_layer; break;
+	case 1: tm = midground_layer; break;
+	case 2: tm = foreground_layer; break;
+	}
+	if(offset & 1)
+		tilemap_set_scrolly(tm, 0, data);
+	else
+		tilemap_set_scrollx(tm, 0, data);
+}
+
+WRITE16_MEMBER(raiden2_state::tile_bank_01_w)
+{
+	if(ACCESSING_BITS_0_7) {
+		int new_bank;
+		new_bank = 0 | (data & 1);
+		if(new_bank != bg_bank) {
+			bg_bank = new_bank;
+			tilemap_mark_all_tiles_dirty(background_layer);
+		}
+
+		new_bank = 2 | ((data >> 1) & 1);
+		if(new_bank != mid_bank) {
+			mid_bank = new_bank;
+			tilemap_mark_all_tiles_dirty(midground_layer);
+		}
+	}
+}
+
+WRITE16_MEMBER(raiden2_state::cop_tile_bank_2_w)
+{
+	if(ACCESSING_BITS_8_15) {
+		int new_bank = 4 | (data >> 14);
+		if(new_bank != fg_bank) {
+			fg_bank = new_bank;
+			tilemap_mark_all_tiles_dirty(foreground_layer);
+		}
+	}
 }
 
 /* TILEMAP RELATED (move to video file) */
 
 static TILE_GET_INFO( get_back_tile_info )
 {
-	int tile = back_data[tile_index];
-	int color = (tile >> 12) | (bg_col << 4);
+	raiden2_state *state = machine->driver_data<raiden2_state>();
+	int tile = state->back_data[tile_index];
+	int color = (tile >> 12) | (0 << 4);
 
-	tile = (tile & 0xfff) | (bg_bank << 12);
+	tile = (tile & 0xfff) | (state->bg_bank << 12);
 
 	SET_TILE_INFO(1,tile+0x0000,color,0);
 }
 
 static TILE_GET_INFO( get_mid_tile_info )
 {
-	int tile = mid_data[tile_index];
-	int color = (tile >> 12) | (mid_col << 4);
+	raiden2_state *state = machine->driver_data<raiden2_state>();
+	int tile = state->mid_data[tile_index];
+	int color = (tile >> 12) | (2 << 4);
 
-	tile = (tile & 0xfff) | (mid_bank << 12);
+	tile = (tile & 0xfff) | (state->mid_bank << 12);
 
 	SET_TILE_INFO(1,tile,color,0);
 }
 
 static TILE_GET_INFO( get_fore_tile_info )
 {
-	int tile = fore_data[tile_index];
-	int color = (tile >> 12) | (fg_col << 4);
+	raiden2_state *state = machine->driver_data<raiden2_state>();
+	int tile = state->fore_data[tile_index];
+	int color = (tile >> 12) | (1 << 4);
 
-
-	tile = (tile & 0xfff) | (fg_bank << 12);
-	//  tile = (tile & 0xfff) | (3<<12);  // 3000 intro (cliff) 1000 game (bg )
+	tile = (tile & 0xfff) | (state->fg_bank << 12);
 
 	SET_TILE_INFO(1,tile,color,0);
 }
@@ -323,8 +592,7 @@ static TILE_GET_INFO( get_fore_tile_info )
 static TILE_GET_INFO( get_text_tile_info )
 {
 	raiden2_state *state = machine->driver_data<raiden2_state>();
-	UINT16 *videoram = state->videoram;
-	int tile = videoram[tile_index];
+	int tile = state->text_data[tile_index];
 	int color = (tile>>12)&0xf;
 
 	tile &= 0xfff;
@@ -332,228 +600,40 @@ static TILE_GET_INFO( get_text_tile_info )
 	SET_TILE_INFO(0,tile,color,0);
 }
 
-#if 0
-static void set_scroll(tilemap_t *tm, int plane)
-{
-	int x = mainram[0x620/2+plane*2+0];
-	int y = mainram[0x620/2+plane*2+1];
-	tilemap_set_scrollx(tm, 0, x);
-	tilemap_set_scrolly(tm, 0, y);
-}
-#endif
 /* VIDEO START (move to video file) */
 
 static VIDEO_START( raiden2 )
 {
-	text_layer       = tilemap_create(machine, get_text_tile_info, tilemap_scan_rows,  8, 8, 64,32 );
-	background_layer = tilemap_create(machine, get_back_tile_info, tilemap_scan_rows, 16,16, 32,32 );
-	midground_layer  = tilemap_create(machine, get_mid_tile_info,  tilemap_scan_rows, 16,16, 32,32 );
-	foreground_layer = tilemap_create(machine, get_fore_tile_info, tilemap_scan_rows, 16,16, 32,32 );
+	raiden2_state *state = machine->driver_data<raiden2_state>();
+	state->text_layer       = tilemap_create(machine, get_text_tile_info, tilemap_scan_rows,  8, 8, 64,32 );
+	state->background_layer = tilemap_create(machine, get_back_tile_info, tilemap_scan_rows, 16,16, 32,32 );
+	state->midground_layer  = tilemap_create(machine, get_mid_tile_info,  tilemap_scan_rows, 16,16, 32,32 );
+	state->foreground_layer = tilemap_create(machine, get_fore_tile_info, tilemap_scan_rows, 16,16, 32,32 );
 
-	tilemap_set_transparent_pen(midground_layer, 15);
-	tilemap_set_transparent_pen(foreground_layer, 15);
-	tilemap_set_transparent_pen(text_layer, 15);
-
-	tick = 0;
+	tilemap_set_transparent_pen(state->midground_layer, 15);
+	tilemap_set_transparent_pen(state->foreground_layer, 15);
+	tilemap_set_transparent_pen(state->text_layer, 15);
 }
-
-// XXX
-// 000 bg = dis, mid = dis, fg = 4.012 // push 1/2 player button
-// 002 bg = 0.0, mid = 1.2, fg = 6.1,  // level 1 start
-// 000 bg = 0.0, mid = 1.2, fg = 6.1,  // level 1 run
-// 013 bg = 0.0, mid = 3.0, fg = 7.1   // attract mode p1
-// 012 bg = 0.0, mid = 3.0, fg = 6.1   // attract mode p1
-// 000 bg = 0.0, mid = 1.1, fg = 5.1   // attract mode level 1
-// 002 bg = 0.0, mid = dis, fg = 6.1   // high scores
 
 /* VIDEO UPDATE (move to video file) */
 
 static VIDEO_UPDATE ( raiden2 )
 {
-
-#if 0
-	int info_1, info_2, info_3;
-
-#if 0
-	static UINT8 zz[16];
-	static UINT8 zz2[32];
-	static UINT8 zz3[12];
-#endif
-
-	info_1 = mainram[0x6cc/2] & 1;
-	info_2 = (mainram[0x6cc/2] & 2)>>1;
-	info_3 = (mainram[0x470/2] & 0xc000)>>14;
-
-#if 1
-	set_scroll(background_layer, 0);
-	set_scroll(midground_layer,  1);
-	set_scroll(foreground_layer, 2);
-#endif
-
-#if 0
-	{
-		int new_bank;
-		new_bank = 0 | (mainram[0x6cc/2]&1);
-		if(new_bank != bg_bank) {
-			bg_bank = new_bank;
-			tilemap_mark_all_tiles_dirty(background_layer);
-		}
-
-		new_bank = 2 | ((mainram[0x6cc/2]>>1)&1);
-		if(new_bank != mid_bank) {
-			mid_bank = new_bank;
-			tilemap_mark_all_tiles_dirty(midground_layer);
-		}
-
-		new_bank = 4 | (mainram[0x470]>>14);
-		if(new_bank != fg_bank) {
-			fg_bank = new_bank;
-			tilemap_mark_all_tiles_dirty(foreground_layer);
-		}
-
-		bg_col = 0;
-		mid_col = 2;
-		fg_col = 1;
-	}
-#endif
-#if 0
-	if(0 && memcmp(zz, mainram+0x620/2, 16)) {
-		logerror("0:%04x %04x  1:%04x %04x 2:%04x %04x 3:%04x %04x\n",
-				 mainram[0x622/2],
-				 mainram[0x620/2],
-				 mainram[0x626/2],
-				 mainram[0x624/2],
-				 mainram[0x62a/2],
-				 mainram[0x628/2],
-				 mainram[0x62e/2],
-				 mainram[0x62c/2]);
-		memcpy(zz, mainram+0x620/2, 16);
-	}
-	if(0 && memcmp(zz2, mainram+0x470/2, 32)) {
-		logerror("%02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x  %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x %02x\n",
-				 mainram[0x470/2] & 0xff, mainram[0x471/2] >> 8, mainram[0x472/2] & 0xff, mainram[0x473/2] >> 8,
-				 mainram[0x474/2] & 0xff, mainram[0x475/2] >> 8, mainram[0x476/2] & 0xff, mainram[0x477/2] >> 8,
-				 mainram[0x478/2] & 0xff, mainram[0x479/2] >> 8, mainram[0x47a/2] & 0xff, mainram[0x47b/2] >> 8,
-				 mainram[0x47c/2] & 0xff, mainram[0x47d/2] >> 8, mainram[0x47e/2] & 0xff, mainram[0x47f/2] >> 8,
-				 mainram[0x480/2] & 0xff, mainram[0x481/2] >> 8, mainram[0x482/2] & 0xff, mainram[0x483/2] >> 8,
-				 mainram[0x484/2] & 0xff, mainram[0x485/2] >> 8, mainram[0x486/2] & 0xff, mainram[0x487/2] >> 8,
-				 mainram[0x488/2] & 0xff, mainram[0x489/2] >> 8, mainram[0x48a/2] & 0xff, mainram[0x48b/2] >> 8,
-				 mainram[0x48c/2] & 0xff, mainram[0x48d/2] >> 8, mainram[0x48e/2] & 0xff, mainram[0x48f/2] >> 8);
-		memcpy(zz2, mainram+0x470/2, 32);
-	}
-
-#endif
-#if 0
-	if(memcmp(zz3, mainram+0x620/2, 12)) {
-		logerror("%04x %04x  %04x %04x  %04x %04x\n",
-				 mainram[0x622/2], mainram[0x620/2],
-				 mainram[0x626/2], mainram[0x624/2],
-				 mainram[0x62a/2], mainram[0x628/2]);
-		memcpy(zz3, mainram+0x620/2, 12);
-	}
-#endif
-#if 1
-	tick++;
-	if(tick == 15) {
-		int mod = 0;
-		tick = 0;
-
-		if(input_code_pressed(screen->machine, KEYCODE_R)) {
-			mod = 1;
-			bg_bank++;
-			if(bg_bank == 8)
-				bg_bank = 0;
-		}
-		if(input_code_pressed(screen->machine, KEYCODE_T)) {
-			mod = 1;
-			if(bg_bank == 0)
-				bg_bank = 8;
-			bg_bank--;
-		}
-		if(input_code_pressed(screen->machine, KEYCODE_Y)) {
-			mod = 1;
-			mid_bank++;
-			if(mid_bank == 8)
-				mid_bank = 0;
-		}
-		if(input_code_pressed(screen->machine, KEYCODE_U)) {
-			mod = 1;
-			if(mid_bank == 0)
-				mid_bank = 8;
-			mid_bank--;
-		}
-		if(input_code_pressed(screen->machine, KEYCODE_O)) {
-			mod = 1;
-			fg_bank++;
-			if(fg_bank == 8)
-				fg_bank = 0;
-		}
-		if(input_code_pressed(screen->machine, KEYCODE_I)) {
-			mod = 1;
-			if(fg_bank == 0)
-				fg_bank = 8;
-			fg_bank--;
-		}
-
-		if(input_code_pressed(screen->machine, KEYCODE_D)) {
-			mod = 1;
-			bg_col++;
-			if(bg_col == 8)
-				bg_col = 0;
-		}
-		if(input_code_pressed(screen->machine, KEYCODE_F)) {
-			mod = 1;
-			if(bg_col == 0)
-				bg_col = 8;
-			bg_col--;
-		}
-		if(input_code_pressed(screen->machine, KEYCODE_G)) {
-			mod = 1;
-			mid_col++;
-			if(mid_col == 8)
-				mid_col = 0;
-		}
-		if(input_code_pressed(screen->machine, KEYCODE_H)) {
-			mod = 1;
-			if(mid_col == 0)
-				mid_col = 8;
-			mid_col--;
-		}
-		if(input_code_pressed(screen->machine, KEYCODE_J)) {
-			mod = 1;
-			fg_col++;
-			if(fg_col == 8)
-				fg_col = 0;
-		}
-		if(input_code_pressed(screen->machine, KEYCODE_K)) {
-			mod = 1;
-			if(fg_col == 0)
-				fg_col = 8;
-			fg_col--;
-		}
-		if(mod || input_code_pressed(screen->machine, KEYCODE_L)) {
-			popmessage("b:%x.%x m:%x.%x f:%x.%x %d%d%d", bg_bank, bg_col, mid_bank, mid_col, fg_bank, fg_col, info_1, info_2, info_3);
-			tilemap_mark_all_tiles_dirty(background_layer);
-			tilemap_mark_all_tiles_dirty(midground_layer);
-			tilemap_mark_all_tiles_dirty(foreground_layer);
-		}
-	}
-#endif
-#endif
-
+	raiden2_state *state = screen->machine->driver_data<raiden2_state>();
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
 	if (!input_code_pressed(screen->machine, KEYCODE_Q))
-		tilemap_draw(bitmap, cliprect, background_layer, 0, 0);
+		tilemap_draw(bitmap, cliprect, state->background_layer, 0, 0);
 	if (!input_code_pressed(screen->machine, KEYCODE_W))
-		tilemap_draw(bitmap, cliprect, midground_layer, 0, 0);
+		tilemap_draw(bitmap, cliprect, state->midground_layer, 0, 0);
 	if (!input_code_pressed(screen->machine, KEYCODE_E))
-		tilemap_draw(bitmap, cliprect, foreground_layer, 0, 0);
+		tilemap_draw(bitmap, cliprect, state->foreground_layer, 0, 0);
 
-	draw_sprites(screen->machine, bitmap, cliprect, 0);
+	if (!input_code_pressed(screen->machine, KEYCODE_S))
+		state->draw_sprites(screen->machine, bitmap, cliprect, 0);
 
 	if (!input_code_pressed(screen->machine, KEYCODE_A))
-		tilemap_draw(bitmap, cliprect, text_layer, 0, 0);
+		tilemap_draw(bitmap, cliprect, state->text_layer, 0, 0);
 
 	return 0;
 }
@@ -569,9 +649,7 @@ static VIDEO_UPDATE ( raiden2 )
 
 static INTERRUPT_GEN( raiden2_interrupt )
 {
-
 	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xc0/4);	/* VBL */
-	logerror("VSYNC\n");
 }
 
 
@@ -597,22 +675,22 @@ static void sprcpt_init(void)
 }
 
 
-WRITE16_HANDLER(sprcpt_adr_w)
+WRITE16_MEMBER(raiden2_state::sprcpt_adr_w)
 {
 	combine32(&sprcpt_adr, offset, data, mem_mask);
 }
 
-WRITE16_HANDLER(sprcpt_data_1_w)
+WRITE16_MEMBER(raiden2_state::sprcpt_data_1_w)
 {
 	combine32(sprcpt_data_1+sprcpt_adr, offset, data, mem_mask);
 }
 
-WRITE16_HANDLER(sprcpt_data_2_w)
+WRITE16_MEMBER(raiden2_state::sprcpt_data_2_w)
 {
 	combine32(sprcpt_data_2+sprcpt_adr, offset, data, mem_mask);
 }
 
-WRITE16_HANDLER(sprcpt_data_3_w)
+WRITE16_MEMBER(raiden2_state::sprcpt_data_3_w)
 {
 	combine32(sprcpt_data_3+sprcpt_idx, offset, data, mem_mask);
 	if(offset == 1) {
@@ -622,7 +700,7 @@ WRITE16_HANDLER(sprcpt_data_3_w)
 	}
 }
 
-WRITE16_HANDLER(sprcpt_data_4_w)
+WRITE16_MEMBER(raiden2_state::sprcpt_data_4_w)
 {
 	combine32(sprcpt_data_4+sprcpt_idx, offset, data, mem_mask);
 	if(offset == 1) {
@@ -632,17 +710,17 @@ WRITE16_HANDLER(sprcpt_data_4_w)
 	}
 }
 
-WRITE16_HANDLER(sprcpt_val_1_w)
+WRITE16_MEMBER(raiden2_state::sprcpt_val_1_w)
 {
 	combine32(sprcpt_val+0, offset, data, mem_mask);
 }
 
-WRITE16_HANDLER(sprcpt_val_2_w)
+WRITE16_MEMBER(raiden2_state::sprcpt_val_2_w)
 {
 	combine32(sprcpt_val+1, offset, data, mem_mask);
 }
 
-WRITE16_HANDLER(sprcpt_flags_1_w)
+WRITE16_MEMBER(raiden2_state::sprcpt_flags_1_w)
 {
 	combine32(&sprcpt_flags1, offset, data, mem_mask);
 	if(offset == 1) {
@@ -671,7 +749,7 @@ WRITE16_HANDLER(sprcpt_flags_1_w)
 	}
 }
 
-WRITE16_HANDLER(sprcpt_flags_2_w)
+WRITE16_MEMBER(raiden2_state::sprcpt_flags_2_w)
 {
 	COMBINE_DATA(&sprcpt_flags2);
 	if(offset == 0) {
@@ -683,153 +761,17 @@ WRITE16_HANDLER(sprcpt_flags_2_w)
 
 
 
-// XXX
-// write only: 4c0 4c1 500 501 502 503
-
-static UINT16 handle_io_r(address_space *space, int offset)
-{
-	logerror("io_r %04x, %04x (%x)\n", offset*2, mainram[offset], cpu_get_pc(space->cpu));
-	return mainram[offset];
-}
-
-static void handle_io_w(address_space *space, int offset, UINT16 data, UINT16 mem_mask)
-{
-	COMBINE_DATA(&mainram[offset]);
-	switch(offset) {
-	default:
-		logerror("io_w %04x, %04x & %04x (%x)\n", offset*2, data, mem_mask, cpu_get_pc(space->cpu));
-	}
-}
-
-static READ16_HANDLER(any_r)
-{
-	c_r[offset]++;
-
-	if(offset >= 0x400/2 && offset < 0x800/2)
-		return handle_io_r(space, offset);
-
-	return mainram[offset];
-}
-
-static WRITE16_HANDLER(any_w)
-{
-	int show = 0;
-	if(offset >= 0x400/2 && offset < 0x800/2)
-		handle_io_w(space, offset, data, mem_mask);
-
-	c_w[offset]++;
-	//  logerror("mainram_w %04x, %02x (%x)\n", offset, data, cpu_get_pc(space->cpu));
-	if(mainram[offset] != data && offset >= 0x400 && offset < 0x800) {
-		if(0 &&
-		   offset != 0x4c0/2 && offset != 0x500/2 &&
-		   offset != 0x444/2 && offset != 0x6de/2 && offset != 0x47e/2 &&
-		   offset != 0x4a0/2 && offset != 0x620/2 && offset != 0x6c6/2 &&
-		   offset != 0x628/2 && offset != 0x62a/2)
-			logerror("mainram_w %04x, %04x & %04x (%x)\n", offset*2, data, mem_mask, cpu_get_pc(space->cpu));
-	}
-
-	if(0 && c_w[offset]>1000 && !c_r[offset]) {
-		if(offset != 0x4c0/2 && (offset<0x500/2 || offset > 0x503/2))
-			logerror("mainram_w %04x, %04x & %04x [%d.%d] (%x)\n", offset*2, data, mem_mask, c_w[offset], c_r[offset], cpu_get_pc(space->cpu));
-	}
-
-	//  if(offset == 0x471 || (offset >= 0xb146 && offset < 0xb156))
-
-	//  show = show || offset == 0xbfc || offset == 0xbfd || offset == 0xc10 || offset == 0xc11;
-	//  show = offset >= 0x400 && offset < 0x800;
-	//  show = offset >= 0x500 && offset < 0x504 && data != mainram[offset]; // Son?
-	//  show = offset == 0x704 || offset == 0x710 || offset == 0x71c;
-
-	if(show)
-		logerror("mainram_w %04x, %04x & %04x (%x)\n", offset*2, data, mem_mask, cpu_get_pc(space->cpu));
-
-	//  if(offset == 0x700)
-	//      cpu_setbank(2, memory_region(space->machine, "user1")+0x20000*data);
-
-	COMBINE_DATA(&mainram[offset]);
-}
-
-static WRITE16_HANDLER(w1x)
-{
-	COMBINE_DATA(&w1ram[offset]);
-	if(0 && offset < 0x800/2)
-		logerror("w1x %05x, %04x & %04x (%05x)\n", offset*2+0x10000, data, mem_mask, cpu_get_pc(space->cpu));
-}
-
-#ifdef UNUSED_FUNCTION
-static void r2_dt(UINT16 sc, UINT16 cc, UINT16 ent, UINT16 tm, UINT16 x, UINT16 y)
-{
-	int bank = mainram[0x704/2];
-
-#if 0
-	switch(ent) {
-	case 0x01: // bank 0 = intro (plane) on layer 3, tb=7/6 ; 1 = jeu, tb=0
-		bank = 0;
-		break;
-	case 0x08: // bank 0 = intro (ciel) on layer 1, tb=0 ; 1 = jeu, tb=0
-		bank = 0;
-		break;
-	case 0x09: // bank 0 = intro (cliff) on layer 2, tb=3 ; 1 = jeu, tb=0
-		bank = 0;
-		break;
-	case 0x10: // bank 0 = jeu (route) on layer 1, tb=0, 1 = idem
-		bank = 0;
-		break;
-	case 0x11: // bank 0 = ?jeu (route) on layer 1, tb=0, 1 = idem
-		bank = 0;
-		break;
-	case 0x20: // bank 0 = jeu on layer 2, tb=1, 1 = idem with layer 3 required
-		bank = 0;
-		break;
-	case 0x21: // bank 0 = ?jeu on layer 2, tb=1, 1 = idem with layer 3 required
-		bank = 0;
-		break;
-	case 0x30: // bank 0 = jeu on layer 3
-		bank = 0;
-		break;
-	case 0x31: // bank 0 = ?jeu on layer 3
-		bank = 0;
-		break;
-	case 0x39: // bank 0 = porte avion on layer 3, tb=6; 1 = idem
-		bank = 0;
-		break;
-	case 0x3a: // bank 0 = press start on layer 3, tb=4 ; 1 = idem
-		bank = 1;
-		break;
-	default:
-		logerror("  -> unknown %x, using bank 0\n", ent);
-		bank = 0;
-	}
-#endif
-
-	logerror("Draw tilemap %04x:%04x  %04x %04x  %04x %04x, bank %d\n",
-			 sc, cc, ent, tm, x, y, bank);
-
-	//  cpu_setbank(2, memory_region(machine, "user1")+0x20000*bank);
-}
-
-static void r2_6f6c(UINT16 cc, UINT16 v1, UINT16 v2)
-{
-//  int bank = 0;
-	logerror("6f6c: 9800:%04x  %04x %04x\n",
-			 cc, v1, v2);
-	//  cpu_setbank(2, memory_region(machine, "user1")+0x20000*bank);
-}
-#endif
-
-static void common_reset(void)
+void raiden2_state::common_reset()
 {
 	bg_bank=0;
 	fg_bank=6;
 	mid_bank=1;
-	bg_col=0;
-	fg_col=1;
-	mid_col=2;
 }
 
 static MACHINE_RESET(raiden2)
 {
-	common_reset();
+	raiden2_state *state = machine->driver_data<raiden2_state>();
+	state->common_reset();
 	sprcpt_init();
 	MACHINE_RESET_CALL(seibu_sound);
 
@@ -837,26 +779,64 @@ static MACHINE_RESET(raiden2)
 }
 
 
+
 /* MEMORY MAPS */
 
-static ADDRESS_MAP_START( raiden2_mem, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x00400, 0x007ff) AM_READWRITE(raiden2_mcu_r, raiden2_mcu_w) AM_BASE(&cop_mcu_ram)
+static ADDRESS_MAP_START( raiden2_mem, ADDRESS_SPACE_PROGRAM, 16, raiden2_state )
+	AM_RANGE(0x00000, 0x003ff) AM_RAM
 
-	AM_RANGE(0x00000, 0x0bfff) AM_READWRITE(any_r, any_w) AM_BASE(&mainram)
-//  AM_RANGE(0x00000, 0x003ff) AM_RAM
+	AM_RANGE(0x00420, 0x00421) AM_WRITE(cop_itoa_low_w)
+	AM_RANGE(0x00422, 0x00423) AM_WRITE(cop_itoa_high_w)
+	AM_RANGE(0x00424, 0x00425) AM_WRITE(cop_itoa_digit_count_w)
+	AM_RANGE(0x00428, 0x00429) AM_WRITE(cop_dma_v1_w)
+	AM_RANGE(0x0042a, 0x0042b) AM_WRITE(cop_dma_v2_w)
+	AM_RANGE(0x00432, 0x00433) AM_WRITE(cop_pgm_data_w)
+	AM_RANGE(0x00434, 0x00435) AM_WRITE(cop_pgm_addr_w)
+	AM_RANGE(0x00438, 0x00439) AM_WRITE(cop_pgm_value_w)
+	AM_RANGE(0x0043a, 0x0043b) AM_WRITE(cop_pgm_mask_w)
+	AM_RANGE(0x0043c, 0x0043d) AM_WRITE(cop_pgm_trigger_w)
+	AM_RANGE(0x00444, 0x00445) AM_WRITE(cop_scale_w)
+	AM_RANGE(0x00470, 0x00471) AM_WRITE(cop_tile_bank_2_w)
+	AM_RANGE(0x00478, 0x00479) AM_WRITE(cop_dma_adr_w)
+	AM_RANGE(0x0047a, 0x0047b) AM_WRITE(cop_dma_size_w)
+	AM_RANGE(0x0047c, 0x0047d) AM_WRITE(cop_dma_v3_w)
+	AM_RANGE(0x0047e, 0x0047f) AM_WRITE(cop_dma_mode_w)
+	AM_RANGE(0x004a0, 0x004a7) AM_READWRITE(cop_reg_high_r, cop_reg_high_w)
+	AM_RANGE(0x004c0, 0x004c7) AM_READWRITE(cop_reg_low_r, cop_reg_low_w)
+	AM_RANGE(0x00500, 0x00503) AM_WRITE(cop_cmd_w)
+	AM_RANGE(0x00590, 0x00599) AM_READ(cop_itoa_digits_r)
+	AM_RANGE(0x005b0, 0x005b1) AM_READ(cop_status_r)
 
-	AM_RANGE(0x0c000, 0x0cfff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM_WRITE(raiden2_background_w) AM_BASE(&back_data)
-	AM_RANGE(0x0d800, 0x0dfff) AM_RAM_WRITE(raiden2_foreground_w) AM_BASE(&fore_data)
-    AM_RANGE(0x0e000, 0x0e7ff) AM_RAM_WRITE(raiden2_midground_w)  AM_BASE(&mid_data)
-    AM_RANGE(0x0e800, 0x0f7ff) AM_RAM_WRITE(raiden2_text_w) AM_BASE_MEMBER(raiden2_state, videoram)
+	AM_RANGE(0x00620, 0x0062b) AM_WRITE(tile_scroll_w)
+	AM_RANGE(0x006a0, 0x006a3) AM_WRITE(sprcpt_val_1_w)
+	AM_RANGE(0x006a4, 0x006a7) AM_WRITE(sprcpt_data_3_w)
+	AM_RANGE(0x006a8, 0x006ab) AM_WRITE(sprcpt_data_4_w)
+	AM_RANGE(0x006ac, 0x006af) AM_WRITE(sprcpt_flags_1_w)
+	AM_RANGE(0x006b0, 0x006b3) AM_WRITE(sprcpt_data_1_w)
+	AM_RANGE(0x006b4, 0x006b7) AM_WRITE(sprcpt_data_2_w)
+	AM_RANGE(0x006b8, 0x006bb) AM_WRITE(sprcpt_val_2_w)
+	AM_RANGE(0x006bc, 0x006bf) AM_WRITE(sprcpt_adr_w)
+	AM_RANGE(0x006cc, 0x006cd) AM_WRITE(tile_bank_01_w)
+	AM_RANGE(0x006ce, 0x006cf) AM_WRITE(sprcpt_flags_2_w)
+	AM_RANGE(0x006fc, 0x006fd) AM_WRITE(cop_dma_trigger_w)
+
+	AM_RANGE(0x00740, 0x00741) AM_READ_PORT("DSW")
+	AM_RANGE(0x00744, 0x00745) AM_READ_PORT("CONTROLS")
+	AM_RANGE(0x0074c, 0x0074d) AM_READ_PORT("SYSTEM")
+
+	AM_RANGE(0x00700, 0x0cfff) AM_RAM
+
+	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM_WRITE(raiden2_background_w) AM_BASE(back_data)
+	AM_RANGE(0x0d800, 0x0dfff) AM_RAM_WRITE(raiden2_foreground_w) AM_BASE(fore_data)
+    AM_RANGE(0x0e000, 0x0e7ff) AM_RAM_WRITE(raiden2_midground_w)  AM_BASE(mid_data)
+    AM_RANGE(0x0e800, 0x0f7ff) AM_RAM_WRITE(raiden2_text_w) AM_BASE(text_data)
 	AM_RANGE(0x0f800, 0x0ffff) AM_RAM /* Stack area */
 
-	AM_RANGE(0x10000, 0x1efff) AM_RAM_WRITE(w1x) AM_BASE(&w1ram)
-	AM_RANGE(0x1f000, 0x1ffff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x10000, 0x1efff) AM_RAM
+	AM_RANGE(0x1f000, 0x1ffff) AM_RAM AM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 
-	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("bank1")
-	AM_RANGE(0x40000, 0xfffff) AM_ROMBANK("bank2")
+	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("mainbank")
+	AM_RANGE(0x40000, 0xfffff) AM_ROM AM_REGION("mainprg", 0x40000)
 ADDRESS_MAP_END
 
 /* new zero team uses the copd3 protection... and uploads a 0x400 byte table, probably the mcu code, encrypted */
@@ -865,12 +845,12 @@ ADDRESS_MAP_END
 static UINT16 mcu_prog[0x400];
 static int mcu_prog_offs = 0;
 
-static WRITE16_HANDLER( mcu_prog_w )
+WRITE16_MEMBER(raiden2_state::mcu_prog_w )
 {
 	mcu_prog[mcu_prog_offs*2] = data;
 }
 
-static WRITE16_HANDLER( mcu_prog_w2 )
+WRITE16_MEMBER(raiden2_state::mcu_prog_w2 )
 {
 	mcu_prog[mcu_prog_offs*2+1] = data;
 
@@ -879,7 +859,7 @@ static WRITE16_HANDLER( mcu_prog_w2 )
     {
 		char tmp[64];
         FILE *fp;
-	    sprintf(tmp,"cop3_%s.data", space->machine->gamedrv->name);
+	    sprintf(tmp,"cop3_%s.data", space.machine->gamedrv->name);
 
 		fp=fopen(tmp, "w+b");
         if (fp)
@@ -891,41 +871,41 @@ static WRITE16_HANDLER( mcu_prog_w2 )
 #endif
 }
 
-static WRITE16_HANDLER( mcu_prog_offs_w )
+WRITE16_MEMBER(raiden2_state::mcu_prog_offs_w )
 {
 	mcu_prog_offs = data;
 }
 
 
 
-static READ16_HANDLER( rdx_v33_system_r )
+READ16_MEMBER(raiden2_state::rdx_v33_system_r )
 {
-	return input_port_read(space->machine, "SYSTEM");
+	return input_port_read(space.machine, "SYSTEM");
 }
 
 
-static READ16_HANDLER( r2_playerin_r )
+READ16_MEMBER(raiden2_state::r2_playerin_r )
 {
-	return input_port_read(space->machine, "INPUT");
+	return input_port_read(space.machine, "INPUT");
 }
 
-static READ16_HANDLER( rdx_v33_unknown_r )
-{
-	return 0x0000;
-}
-
-static READ16_HANDLER( rdx_v33_unknown2_r )
+READ16_MEMBER(raiden2_state::rdx_v33_unknown_r )
 {
 	return 0x0000;
 }
 
-static READ16_HANDLER( nzerotea_unknown_r )
+READ16_MEMBER(raiden2_state::rdx_v33_unknown2_r )
+{
+	return 0x0000;
+}
+
+READ16_MEMBER(raiden2_state::nzerotea_unknown_r )
 {
 	return 0xffff;
 }
 
 
-static ADDRESS_MAP_START( nzerotea_mem, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( nzerotea_mem, ADDRESS_SPACE_PROGRAM, 16, raiden2_state )
 //  AM_RANGE(0x00400, 0x007ff) AM_READWRITE(raiden2_mcu_r, raiden2_mcu_w) AM_BASE(&cop_mcu_ram)
 
 	/* results from cop? */
@@ -950,18 +930,18 @@ static ADDRESS_MAP_START( nzerotea_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00788, 0x00789) AM_READ(nzerotea_unknown_r)
 	AM_RANGE(0x00794, 0x00795) AM_READ(nzerotea_unknown_r)
 
-	AM_RANGE(0x00000, 0x0bfff) AM_READWRITE(any_r, any_w) AM_BASE(&mainram)
+	AM_RANGE(0x00000, 0x0bfff) AM_RAM
 //  AM_RANGE(0x00000, 0x003ff) AM_RAM
 
 	AM_RANGE(0x0c000, 0x0cfff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM_WRITE(raiden2_background_w) AM_BASE(&back_data)
-	AM_RANGE(0x0d800, 0x0dfff) AM_RAM_WRITE(raiden2_foreground_w) AM_BASE(&fore_data)
-    AM_RANGE(0x0e000, 0x0e7ff) AM_RAM_WRITE(raiden2_midground_w)  AM_BASE(&mid_data)
-    AM_RANGE(0x0e800, 0x0f7ff) AM_RAM_WRITE(raiden2_text_w) AM_BASE_MEMBER(raiden2_state, videoram)
+	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM_WRITE(raiden2_background_w) AM_BASE(back_data)
+	AM_RANGE(0x0d800, 0x0dfff) AM_RAM_WRITE(raiden2_foreground_w) AM_BASE(fore_data)
+    AM_RANGE(0x0e000, 0x0e7ff) AM_RAM_WRITE(raiden2_midground_w)  AM_BASE(mid_data)
+    AM_RANGE(0x0e800, 0x0f7ff) AM_RAM_WRITE(raiden2_text_w) AM_BASE(text_data)
 	AM_RANGE(0x0f800, 0x0ffff) AM_RAM /* Stack area */
 
-	AM_RANGE(0x10000, 0x1efff) AM_RAM_WRITE(w1x) AM_BASE(&w1ram)
-	AM_RANGE(0x1f000, 0x1ffff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x10000, 0x1efff) AM_RAM
+	AM_RANGE(0x1f000, 0x1ffff) AM_RAM AM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 
 	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("bank1")
 	AM_RANGE(0x40000, 0xfffff) AM_ROMBANK("bank2")
@@ -974,162 +954,154 @@ ADDRESS_MAP_END
 static INPUT_PORTS_START( raiden2 )
 	SEIBU_COIN_INPUTS	/* coin inputs read through sound cpu */
 
-	PORT_START("P1")	/* IN0 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("CONTROLS")	/* IN0/1 */
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("P2")	/* IN1 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("DSWA")	/* Dip switch A  */
-	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x06, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x38, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x28, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x18, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x40, 0x40, "Starting Coin" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x00, "X 2" )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("DSWB")	/* Dip switch B */
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Very_Hard ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x00, "1" )
-	PORT_DIPSETTING(    0x04, "4" )
-	PORT_DIPSETTING(    0x08, "2" )
-	PORT_DIPSETTING(    0x0c, "3" )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Bonus_Life ) )
-	PORT_DIPSETTING(    0x30, "200000 500000" )
-	PORT_DIPSETTING(    0x20, "400000 1000000" )
-	PORT_DIPSETTING(    0x10, "1000000 3000000" )
-	PORT_DIPSETTING(    0x00, "No Extend" )
-	PORT_DIPNAME( 0x40, 0x40, "Demo Sound" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Test Mode" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_START("DSW")	/* Dip switches  */
+	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coin_A ) )
+	PORT_DIPSETTING(      0x0001, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0007, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x0006, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x0005, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(      0x0003, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x0038, 0x0038, DEF_STR( Coin_B ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0038, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x0030, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x0028, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(      0x0018, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x0040, 0x0040, "Starting Coin" )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Normal ) )
+	PORT_DIPSETTING(      0x0000, "X 2" )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(      0x0300, DEF_STR( Normal ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Easy ) )
+	PORT_DIPSETTING(      0x0100, DEF_STR( Hard ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Very_Hard ) )
+	PORT_DIPNAME( 0x0c00, 0x0c00, DEF_STR( Lives ) )
+	PORT_DIPSETTING(      0x0000, "1" )
+	PORT_DIPSETTING(      0x0400, "4" )
+	PORT_DIPSETTING(      0x0800, "2" )
+	PORT_DIPSETTING(      0x0c00, "3" )
+	PORT_DIPNAME( 0x3000, 0x3000, DEF_STR( Bonus_Life ) )
+	PORT_DIPSETTING(      0x3000, "200000 500000" )
+	PORT_DIPSETTING(      0x2000, "400000 1000000" )
+	PORT_DIPSETTING(      0x1000, "1000000 3000000" )
+	PORT_DIPSETTING(      0x0000, "No Extend" )
+	PORT_DIPNAME( 0x4000, 0x4000, "Demo Sound" )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, "Test Mode" )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")	/* START BUTTONS */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0xfff0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( raidendx )
 	SEIBU_COIN_INPUTS	/* coin inputs read through sound cpu */
 
-	PORT_START("P1")	/* IN0 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("CONTROLS")	/* IN0/1 */
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
+	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNUSED )
 
-	PORT_START("P2")	/* IN1 */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
-
-	PORT_START("DSWA")	/* Dip switch A  */
-	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coin_A ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x07, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x06, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x05, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x38, 0x38, DEF_STR( Coin_B ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( 4C_1C ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( 3C_1C ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(    0x38, DEF_STR( 1C_1C ) )
-	PORT_DIPSETTING(    0x30, DEF_STR( 1C_2C ) )
-	PORT_DIPSETTING(    0x28, DEF_STR( 1C_3C ) )
-	PORT_DIPSETTING(    0x18, DEF_STR( 1C_4C ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Free_Play ) )
-	PORT_DIPNAME( 0x40, 0x40, "Starting Coin" )
-	PORT_DIPSETTING(    0x40, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x00, "X 2" )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Flip_Screen ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-
-	PORT_START("DSWB")	/* Dip switch B  */
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
-	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
-	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( Very_Hard ) )
-	PORT_DIPNAME( 0x0c, 0x0c, DEF_STR( Lives ) )
-	PORT_DIPSETTING(    0x00, "1" )
-	PORT_DIPSETTING(    0x04, "4" )
-	PORT_DIPSETTING(    0x08, "2" )
-	PORT_DIPSETTING(    0x0c, "3" )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) ) /* Manual shows "Not Used" */
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) ) /* Manual shows "Not Used" */
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, "Demo Sound" )
-	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, "Test Mode" )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_START("DSW")	/* Dip switches  */
+	PORT_DIPNAME( 0x0007, 0x0007, DEF_STR( Coin_A ) )
+	PORT_DIPSETTING(      0x0001, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0007, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x0006, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x0005, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(      0x0003, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x0038, 0x0038, DEF_STR( Coin_B ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x0038, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x0030, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x0028, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(      0x0018, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
+	PORT_DIPNAME( 0x0040, 0x0040, "Starting Coin" )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Normal ) )
+	PORT_DIPSETTING(      0x0000, "X 2" )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0300, 0x0300, DEF_STR( Difficulty ) )
+	PORT_DIPSETTING(      0x0300, DEF_STR( Normal ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Easy ) )
+	PORT_DIPSETTING(      0x0100, DEF_STR( Hard ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Very_Hard ) )
+	PORT_DIPNAME( 0x0c00, 0x0c00, DEF_STR( Lives ) )
+	PORT_DIPSETTING(      0x0000, "1" )
+	PORT_DIPSETTING(      0x0400, "4" )
+	PORT_DIPSETTING(      0x0800, "2" )
+	PORT_DIPSETTING(      0x0c00, "3" )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) ) /* Manual shows "Not Used" */
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) ) /* Manual shows "Not Used" */
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, "Demo Sound" )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, "Test Mode" )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 
 	PORT_START("SYSTEM")	/* START BUTTONS */
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x0004, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0xfff0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
 
@@ -1207,13 +1179,8 @@ static MACHINE_CONFIG_START( raiden2, raiden2_state )
 	MDRV_SCREEN_REFRESH_RATE(55.47)    /* verified on pcb */
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate *//2)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-#if 1
 	MDRV_SCREEN_SIZE(64*8, 64*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 43*8-1, 1, 30*8)
-#else
-	MDRV_SCREEN_SIZE(512, 512)
-	MDRV_SCREEN_VISIBLE_AREA(0,511,0,511)
-#endif
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0, 30*8-1)
 	MDRV_GFXDECODE(raiden2)
 	MDRV_PALETTE_LENGTH(2048)
 
@@ -1266,7 +1233,7 @@ YM2151   OKI M6295 VOI2  Z8400A
 */
 
 ROM_START( raiden2 )
-	ROM_REGION( 0x200000, "user1", 0 ) /* v30 main cpu */
+	ROM_REGION( 0x200000, "mainprg", 0 ) /* v30 main cpu */
 	ROM_LOAD16_BYTE("prg0",   0x000000, 0x80000, CRC(09475ec4) SHA1(05027f2d8f9e11fcbd485659eda68ada286dae32) )
 	ROM_RELOAD(0x100000, 0x80000)
 	ROM_LOAD16_BYTE("prg1",   0x000001, 0x80000, CRC(4609b5f2) SHA1(272d2aa75b8ea4d133daddf42c4fc9089093df2e) )
@@ -1319,7 +1286,7 @@ S5 U0724     27C1024     ROM7        966D
 */
 
 ROM_START( raiden2a )
-	ROM_REGION( 0x200000, "user1", 0 ) /* v30 main cpu */
+	ROM_REGION( 0x200000, "mainprg", 0 ) /* v30 main cpu */
 	ROM_LOAD16_BYTE("prg0",   0x000000, 0x80000, CRC(09475ec4) SHA1(05027f2d8f9e11fcbd485659eda68ada286dae32) ) // rom1
 	ROM_RELOAD(0x100000, 0x80000)
 	ROM_LOAD16_BYTE("rom2e",  0x000001, 0x80000, CRC(458d619c) SHA1(842bf0eeb5d192a6b188f4560793db8dad697683) )
@@ -1387,7 +1354,7 @@ CUSTOM:       SEI150
 */
 
 ROM_START( raiden2b )
-	ROM_REGION( 0x200000, "user1", 0 ) /* v30 main cpu */
+	ROM_REGION( 0x200000, "mainprg", 0 ) /* v30 main cpu */
 	ROM_LOAD16_BYTE("prg0",   0x000000, 0x80000, CRC(09475ec4) SHA1(05027f2d8f9e11fcbd485659eda68ada286dae32) ) // rom1
 	ROM_RELOAD(0x100000, 0x80000)
 	ROM_LOAD16_BYTE("rom2j",  0x000001, 0x80000, CRC(e4e4fb4c) SHA1(7ccf33fe9a1cddf0c7e80d7ed66d615a828b3bb9) )
@@ -1420,7 +1387,7 @@ ROM_START( raiden2b )
 ROM_END
 
 ROM_START( raiden2c )
-	ROM_REGION( 0x200000, "user1", 0 ) /* v30 main cpu */
+	ROM_REGION( 0x200000, "mainprg", 0 ) /* v30 main cpu */
 	ROM_LOAD16_BYTE("seibu1",   0x000000, 0x80000, CRC(c1fc70f5) SHA1(a054f5ae9583972c406d9cf871340d5e072d71a3) ) /* Italian set */
 	ROM_RELOAD(0x100000, 0x80000)
 	ROM_LOAD16_BYTE("seibu2",   0x000001, 0x80000, CRC(28d5365f) SHA1(21efe29c2d373229c2ff302d86e59c2c94fa6d03) )
@@ -1471,7 +1438,7 @@ http://www.gamefaqs.com/coinop/arcade/game/10729.html
 */
 
 ROM_START( raiden2d )
-	ROM_REGION( 0x200000, "user1", 0 ) /* v30 main cpu */
+	ROM_REGION( 0x200000, "mainprg", 0 ) /* v30 main cpu */
 	ROM_LOAD16_BYTE("r2_prg_0.bin",   0x000000, 0x80000, CRC(2abc848c) SHA1(1df4276d0074fcf1267757fa0b525a980a520f3d) )
 	ROM_RELOAD(0x100000, 0x80000)
 	ROM_LOAD16_BYTE("r2_prg_1.bin",   0x000001, 0x80000, CRC(509ade43) SHA1(7cdee7bb00a6a1c7899d10b96385d54c261f6f5a) )
@@ -1504,7 +1471,7 @@ ROM_START( raiden2d )
 ROM_END
 
 ROM_START( raiden2e )
-	ROM_REGION( 0x200000, "user1", 0 ) /* v30 main cpu */
+	ROM_REGION( 0x200000, "mainprg", 0 ) /* v30 main cpu */
 	ROM_LOAD16_BYTE("r2.1",  0x000000, 0x80000, CRC(d7041be4) SHA1(3cf97132fba6f7b00c9059265f4e9f0bf1505b71) )
 	ROM_RELOAD(0x100000, 0x80000)
 	ROM_LOAD16_BYTE("r2.2",  0x000001, 0x80000, CRC(bf7577ec) SHA1(98576af78760b8aef1ef3efe1ba963977c89d225) )
@@ -1539,7 +1506,7 @@ ROM_END
 /* Raiden DX sets */
 
 ROM_START( raidndx )
-	ROM_REGION( 0x200000, "user1", 0 ) /* v30 main cpu */
+	ROM_REGION( 0x200000, "mainprg", 0 ) /* v30 main cpu */
 	ROM_LOAD32_BYTE("1d.4n",   0x000000, 0x80000, CRC(14d725fc) SHA1(f12806f64f069fdc4ee29b309a32f7ca00b36f93) )
 	ROM_LOAD32_BYTE("2d.4p",   0x000001, 0x80000, CRC(5e7e45cb) SHA1(94eff893b5335c522f1c063c3175b9bac87b0a25) )
 	ROM_LOAD32_BYTE("3d.6n",   0x000002, 0x80000, CRC(f0a47e67) SHA1(8cbd21993077b2e01295db6e343cae9e0e4bfefe) )
@@ -1572,7 +1539,7 @@ ROM_START( raidndx )
 ROM_END
 
 ROM_START( raidndxa1 )
-	ROM_REGION( 0x200000, "user1", 0 ) /* v30 main cpu */
+	ROM_REGION( 0x200000, "mainprg", 0 ) /* v30 main cpu */
 	ROM_LOAD32_BYTE("dx_1h.4n",   0x000000, 0x80000, BAD_DUMP CRC(7624c36b) SHA1(84c17f2988031210d06536710e1eac558f4290a1) ) // bad
 	ROM_LOAD32_BYTE("dx_2h.4p",   0x000001, 0x80000, CRC(4940fdf3) SHA1(c87e307ed7191802583bee443c7c8e4f4e33db25) )
 	ROM_LOAD32_BYTE("dx_3h.6n",   0x000002, 0x80000, CRC(6c495bcf) SHA1(fb6153ecc443dabc829dda6f8d11234ad48de88a) )
@@ -1605,7 +1572,7 @@ ROM_START( raidndxa1 )
 ROM_END
 
 ROM_START( raidndxa2 )
-	ROM_REGION( 0x200000, "user1", 0 ) /* v30 main cpu */
+	ROM_REGION( 0x200000, "mainprg", 0 ) /* v30 main cpu */
 	ROM_LOAD32_BYTE("1d.bin",   0x000000, 0x80000, CRC(22b155ae) SHA1(388151e2c8fb301bd5bc66a974e9fe16816ae0bc) )
 	ROM_LOAD32_BYTE("2d.bin",   0x000001, 0x80000, CRC(2be98ca8) SHA1(491e990405b0ad3de45bdbcc2453af9215ae19c8) )
 	ROM_LOAD32_BYTE("3d.bin",   0x000002, 0x80000, CRC(b4785576) SHA1(aa5eee7b0c635c6d18a7fc1e037bf570a677dd90) )
@@ -1638,7 +1605,7 @@ ROM_START( raidndxa2 )
 ROM_END
 
 ROM_START( raidndxj )
-	ROM_REGION( 0x200000, "user1", 0 ) /* v30 main cpu */
+	ROM_REGION( 0x200000, "mainprg", 0 ) /* v30 main cpu */
 	ROM_LOAD32_BYTE("rdxj_1.bin",   0x000000, 0x80000, CRC(b5b32885) SHA1(fb3c592b2436d347103c17bd765176062be95fa2) )
 	ROM_LOAD32_BYTE("rdxj_2.bin",   0x000001, 0x80000, CRC(7efd581d) SHA1(4609a0d8afb3d62a38b461089295efed47beea91) )
 	ROM_LOAD32_BYTE("rdxj_3.bin",   0x000002, 0x80000, CRC(55ec0e1d) SHA1(6be7f268df51311a817c1c329a578b38abb659ae) )
@@ -1671,7 +1638,7 @@ ROM_START( raidndxj )
 ROM_END
 
 ROM_START( raidndxu )
-	ROM_REGION( 0x200000, "user1", 0 ) /* v30 main cpu */
+	ROM_REGION( 0x200000, "mainprg", 0 ) /* v30 main cpu */
 	ROM_LOAD32_BYTE("1a.u1210", 0x000000, 0x80000, CRC(53e63194) SHA1(a957330e14649cf46ad27fb99c460576c59e60b1) )
 	ROM_LOAD32_BYTE("2a.u1211", 0x000001, 0x80000, CRC(ec8d1647) SHA1(5ceae132c6c09d6bb8565e9141ee1170bbdfd5fc) )
 	ROM_LOAD32_BYTE("3a.u129",  0x000002, 0x80000, CRC(7dbfd73d) SHA1(43cb1dbc3ccbded64fc300c262d1fd528e0391a2) )
@@ -1704,7 +1671,7 @@ ROM_START( raidndxu )
 ROM_END
 
 ROM_START( raidndxg )
-	ROM_REGION( 0x200000, "user1", 0 ) /* v30 main cpu */
+	ROM_REGION( 0x200000, "mainprg", 0 ) /* v30 main cpu */
 	ROM_LOAD32_BYTE("1d.u1210", 0x000000, 0x80000, CRC(14d725fc) SHA1(f12806f64f069fdc4ee29b309a32f7ca00b36f93) )
 	ROM_LOAD32_BYTE("2d.u1211", 0x000001, 0x80000, CRC(5e7e45cb) SHA1(94eff893b5335c522f1c063c3175b9bac87b0a25) )
 	ROM_LOAD32_BYTE("3d.u129",  0x000002, 0x80000, CRC(f0a47e67) SHA1(8cbd21993077b2e01295db6e343cae9e0e4bfefe) )
@@ -1740,7 +1707,7 @@ ROM_END
 /* Zero Team sets */
 
 ROM_START( zeroteam )
-	ROM_REGION( 0x200000, "user1", 0 ) /* v30 main cpu */
+	ROM_REGION( 0x200000, "mainprg", 0 ) /* v30 main cpu */
 	ROM_LOAD32_BYTE("1.5k",   0x000000, 0x40000, CRC(25aa5ba4) SHA1(40e6047620fbd195c87ac3763569af099096eff9) )
 	ROM_LOAD32_BYTE("3.6k",   0x000002, 0x40000, CRC(ec79a12b) SHA1(515026a2fca92555284ac49818499af7395783d3) )
 	ROM_LOAD32_BYTE("2.6l",   0x000001, 0x40000, CRC(54f3d359) SHA1(869744185746d55c60d2f48eabe384a8499e00fd) )
@@ -1771,7 +1738,7 @@ ROM_START( zeroteam )
 ROM_END
 
 ROM_START( zeroteama )
-	ROM_REGION( 0x200000, "user1", 0 ) /* v30 main cpu */
+	ROM_REGION( 0x200000, "mainprg", 0 ) /* v30 main cpu */
 	ROM_LOAD32_BYTE("1.bin",   0x000000, 0x40000, CRC(bd7b3f3a) SHA1(896413901a429d0efa3290f61920063c81730e9b) )
 	ROM_LOAD32_BYTE("3.bin",   0x000002, 0x40000, CRC(19e02822) SHA1(36c9b887eaa9b9b67d65c55e8f7eefd08fe0be15) )
 	ROM_LOAD32_BYTE("2.bin",   0x000001, 0x40000, CRC(0580b7e8) SHA1(d4416264aa5acdaa781ebcf51f128b3e665cc903) )
@@ -1802,7 +1769,7 @@ ROM_START( zeroteama )
 ROM_END
 
 ROM_START( zeroteams )
-	ROM_REGION( 0x200000, "user1", 0 ) /* v30 main cpu */
+	ROM_REGION( 0x200000, "mainprg", 0 ) /* v30 main cpu */
 	ROM_LOAD32_BYTE("1_sel.bin",   0x000000, 0x40000, CRC(d99d6273) SHA1(21dccd5d71c720b8364406835812b3c9defaff6c) )
 	ROM_LOAD32_BYTE("3_sel.bin",   0x000002, 0x40000, CRC(0a9fe0b1) SHA1(3588fe19788f77d07e9b5ab8182b94362ffd0024) )
 	ROM_LOAD32_BYTE("2_sel.bin",   0x000001, 0x40000, CRC(4e114e74) SHA1(fcccbb68c6b7ffe8d109ed3a1ec9120d338398f9) )
@@ -1834,7 +1801,7 @@ ROM_END
 
 /* set contained only program roms, was marked as 'non-encrytped' but program isn't encrypted anyway?! */
 ROM_START( zeroteamb )
-	ROM_REGION( 0x200000, "user1", 0 ) /* v30 main cpu */
+	ROM_REGION( 0x200000, "mainprg", 0 ) /* v30 main cpu */
 	ROM_LOAD32_BYTE("z1",   0x000000, 0x40000, CRC(157743d0) SHA1(f9c84c9025319f76807ef0e79f1ee1599f915b45) )
 	ROM_LOAD32_BYTE("z3",   0x000002, 0x40000, CRC(fea7e4e8) SHA1(08c4bdff82362ae4bcf86fa56fcfc384bbf82b71) )
 	ROM_LOAD32_BYTE("z2",   0x000001, 0x40000, CRC(21d68f62) SHA1(8aa85b38e8f36057ef6c7dce5a2878958ce93ce8) )
@@ -1865,7 +1832,7 @@ ROM_START( zeroteamb )
 ROM_END
 
 ROM_START( zeroteamc )
-	ROM_REGION( 0x200000, "user1", 0 ) /* v30 main cpu */
+	ROM_REGION( 0x200000, "mainprg", 0 ) /* v30 main cpu */
 	ROM_LOAD32_BYTE("b1.024",   0x000000, 0x40000, CRC(528de3b9) SHA1(9ca8cdc0212f2540e852d20ab4c04f68b967d024) )
 	ROM_LOAD32_BYTE("b3.023",   0x000002, 0x40000, CRC(3688739a) SHA1(f98f461fb8e7804b3b4020a5e3762d36d6458a62) )
 	ROM_LOAD32_BYTE("b2.025",   0x000001, 0x40000, CRC(5176015e) SHA1(6b372564b2f1b1f56cae0c98f4ca588b784bfa3d) )
@@ -1897,7 +1864,7 @@ ROM_END
 
 /* Different hardware, uses COPX-D3 for protection  */
 ROM_START( nzerotea )
-	ROM_REGION( 0x200000, "user1", 0 ) /* v30 main cpu */
+	ROM_REGION( 0x200000, "mainprg", 0 ) /* v30 main cpu */
 	ROM_LOAD16_BYTE("prg1",   0x000000, 0x80000, CRC(3c7d9410) SHA1(25f2121b6c2be73f11263934266901ed5d64d2ee) )
 	ROM_LOAD16_BYTE("prg2",   0x000001, 0x80000, CRC(6cba032d) SHA1(bf5d488cd578fff09e62e3650efdee7658033e3f) )
 
@@ -2058,10 +2025,10 @@ Notes:
 */
 
 ROM_START( xsedae )
-	ROM_REGION( 0x200000, "user1", 0 ) /* v30 main cpu */
+	ROM_REGION( 0x200000, "mainprg", 0 ) /* v30 main cpu */
 	ROM_LOAD32_BYTE("1.u024",   0x000000, 0x40000, CRC(185437f9) SHA1(e46950b6a549d11dc57105dd7d9cb512a8ecbe70) )
-	ROM_LOAD32_BYTE("3.u023",   0x000002, 0x40000, CRC(293fd6c1) SHA1(8b1a231f4bedbf9c0f347330e13fdf092b9888b4) )
 	ROM_LOAD32_BYTE("2.u025",   0x000001, 0x40000, CRC(a2b052df) SHA1(e8bf9ab3d5d4e601ea9386e1f2d4e017b025407e) )
+	ROM_LOAD32_BYTE("3.u023",   0x000002, 0x40000, CRC(293fd6c1) SHA1(8b1a231f4bedbf9c0f347330e13fdf092b9888b4) )
 	ROM_LOAD32_BYTE("4.u026",   0x000003, 0x40000, CRC(5adf20bf) SHA1(42a0bb5a460c656675b2c432c043fc61a9049276) )
 
 	ROM_REGION( 0x40000, "user2", ROMREGION_ERASEFF )	/* COPX */
@@ -2090,25 +2057,17 @@ ROM_END
 
 static DRIVER_INIT (raiden2)
 {
-	/* wrong , there must be some banking this just stops it crashing */
-	UINT8 *RAM = memory_region(machine, "user1");
-
-	memory_set_bankptr(machine, "bank1",&RAM[0x100000]);
-	memory_set_bankptr(machine, "bank2",&RAM[0x040000]);
-
+	memory_configure_bank(machine, "mainbank", 0, 2, memory_region(machine, "mainprg"), 0x20000);
 	raiden2_decrypt_sprites(machine);
 }
 
 static DRIVER_INIT (xsedae)
 {
-	/* wrong , there must be some banking this just stops it crashing */
-	UINT8 *RAM = memory_region(machine, "user1");
-	memory_set_bankptr(machine, "bank1",&RAM[0x100000]);
-	memory_set_bankptr(machine, "bank2",&RAM[0x040000]);
+	memory_configure_bank(machine, "mainbank", 0, 2, memory_region(machine, "mainprg"), 0x20000);
 }
 
 
-static WRITE16_DEVICE_HANDLER( rdx_v33_eeprom_w )
+WRITE16_DEVICE_HANDLER( rdx_v33_eeprom_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
@@ -2125,7 +2084,7 @@ static WRITE16_DEVICE_HANDLER( rdx_v33_eeprom_w )
 }
 
 
-static ADDRESS_MAP_START( rdx_v33_map, ADDRESS_SPACE_PROGRAM, 16 )
+static ADDRESS_MAP_START( rdx_v33_map, ADDRESS_SPACE_PROGRAM, 16, raiden2_state )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM // vectors copied here
 
 	/* results from cop? */
@@ -2151,25 +2110,25 @@ static ADDRESS_MAP_START( rdx_v33_map, ADDRESS_SPACE_PROGRAM, 16 )
 //  AM_RANGE(0x006d8, 0x006d9) AM_WRITE(bbbbll_w) // scroll?
 	AM_RANGE(0x006dc, 0x006dd) AM_READ(rdx_v33_unknown2_r)
 //  AM_RANGE(0x006de, 0x006df) AM_WRITE(mcu_unkaa_w) // mcu command related?
-	AM_RANGE(0x00700, 0x00701) AM_DEVWRITE("eeprom", rdx_v33_eeprom_w)
+	AM_RANGE(0x00700, 0x00701) AM_DEVWRITE_LEGACY("eeprom", rdx_v33_eeprom_w)
 	AM_RANGE(0x00740, 0x00741) AM_READ(rdx_v33_unknown2_r)
 	AM_RANGE(0x00744, 0x00745) AM_READ(r2_playerin_r)
 	AM_RANGE(0x0074c, 0x0074d) AM_READ(rdx_v33_system_r)
 	AM_RANGE(0x00762, 0x00763) AM_READ(rdx_v33_unknown2_r)
 
-	AM_RANGE(0x00780, 0x00781) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff) // single OKI chip on this version
+	AM_RANGE(0x00780, 0x00781) AM_DEVREADWRITE8("oki", okim6295_device, read, write, 0x00ff) // single OKI chip on this version
 
 	AM_RANGE(0x00800, 0x0087f) AM_RAM // copies eeprom here?
 	AM_RANGE(0x00880, 0x0bfff) AM_RAM
 
 	AM_RANGE(0x0c000, 0x0cfff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM_WRITE(raiden2_background_w) AM_BASE(&back_data)
-	AM_RANGE(0x0d800, 0x0dfff) AM_RAM_WRITE(raiden2_foreground_w) AM_BASE(&fore_data)
-	AM_RANGE(0x0e000, 0x0e7ff) AM_RAM_WRITE(raiden2_midground_w)  AM_BASE(&mid_data)
-	AM_RANGE(0x0e800, 0x0f7ff) AM_RAM_WRITE(raiden2_text_w) AM_BASE_MEMBER(raiden2_state, videoram)
+	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM_WRITE(raiden2_background_w) AM_BASE(back_data)
+	AM_RANGE(0x0d800, 0x0dfff) AM_RAM_WRITE(raiden2_foreground_w) AM_BASE(fore_data)
+	AM_RANGE(0x0e000, 0x0e7ff) AM_RAM_WRITE(raiden2_midground_w)  AM_BASE(mid_data)
+	AM_RANGE(0x0e800, 0x0f7ff) AM_RAM_WRITE(raiden2_text_w) AM_BASE(text_data)
 	AM_RANGE(0x0f800, 0x0ffff) AM_RAM /* Stack area */
 	AM_RANGE(0x10000, 0x1efff) AM_RAM
-	AM_RANGE(0x1f000, 0x1ffff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x1f000, 0x1ffff) AM_RAM AM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 
 	/* not sure of bank sizes etc. */
 	AM_RANGE(0x20000, 0x2ffff) AM_ROMBANK("bank1")
@@ -2274,7 +2233,8 @@ static INTERRUPT_GEN( rdx_v33_interrupt )
 
 static MACHINE_RESET( rdx_v33 )
 {
-	common_reset();
+	raiden2_state *state = machine->driver_data<raiden2_state>();
+	state->common_reset();
 }
 
 static MACHINE_CONFIG_START( rdx_v33, raiden2_state )
