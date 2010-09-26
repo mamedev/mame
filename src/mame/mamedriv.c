@@ -8569,6 +8569,7 @@ Other Sun games
 
 	/* RamTek games */
 	DRIVER( hitme )		/* (c) 1976 Ramtek */
+	DRIVER( hitme1 )	/* (c) 1976 Ramtek */
 	DRIVER( m21 )		/* (c) 1976 Mirco */
 	DRIVER( barricad )	/* (c) 1976 Ramtek */
 	DRIVER( brickyrd )	/* (c) 1976 Ramtek */

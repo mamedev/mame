@@ -226,7 +226,7 @@ static WRITE8_DEVICE_HANDLER( output_port_1_w )
 
 static ADDRESS_MAP_START( hitme_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
-	AM_RANGE(0x0000, 0x07ff) AM_ROM
+	AM_RANGE(0x0000, 0x09ff) AM_ROM
 	AM_RANGE(0x0c00, 0x0eff) AM_RAM_WRITE(hitme_vidram_w) AM_BASE_MEMBER(hitme_state, videoram)
 	AM_RANGE(0x1000, 0x10ff) AM_MIRROR(0x300) AM_RAM
 	AM_RANGE(0x1400, 0x14ff) AM_READ(hitme_port_0_r)
@@ -539,7 +539,48 @@ INPUT_PORTS_END
  *
  *************************************/
 
+/*
+Hit me by Ramtek
+
+Etched in copper on board	HIT ME by RAMTEK Made in U.S.A
+				ASSY 550596 D				D was as sticker
+				SER 957					957 was a sticker
+
+Etched in copper on back	FAB 550595-C
+
+.b7			stamped 	15347 7625
+					HM2-0
+
+
+.c7	IM5605		handwritten	HM-2-2
+
+.d7			stamped 	15349 7625
+					HM1-4
+
+.e7			stamped 	15350 7625
+					HM1-6
+
+.f7			stamped 	15351 7625
+					HM2-8
+
+.h7	IM560?		handwritten	HM0-CG	hard to read
+
+All chips we read as 82s141 - guessed becuase of 24 pin pinout and 512x8 rom according to mame
+*/
+
 ROM_START( hitme )
+	ROM_REGION( 0x2000, "maincpu", ROMREGION_INVERT )
+	ROM_LOAD( "hm2-0.b7", 0x0000, 0x0200, CRC(1b94caad) SHA1(30987e5cb0d55f3666dd63f04132a0e65988caea) )
+	ROM_LOAD( "hm-2-2.c7", 0x0200, 0x0200, CRC(fa7e8c33) SHA1(2d04635cee32d49cccd9a9a855b3a2be4295c2a5) )
+	ROM_LOAD( "hm1-4.d7", 0x0400, 0x0200, CRC(10dd4581) SHA1(eaa7c9e75f79befc8abf0bd0913bbf15dd04230e) )
+	ROM_LOAD( "hm1-6.e7", 0x0600, 0x0200, CRC(18e4c83c) SHA1(bce987da371b7946262d7dff65f61ff2fcb55bf6) )
+	ROM_LOAD( "hm2-8.f7", 0x0800, 0x0200, CRC(f28983f8) SHA1(89167cf41ba71d90cd6133751158bb99bfc5e829) )
+
+	ROM_REGION( 0x0400, "gfx1", ROMREGION_ERASE00 )
+	ROM_LOAD( "hmcg.h7", 0x0000, 0x0200, CRC(818f5fbe) SHA1(e2b3349e51ba57d14f3388ba93891bc6274b7a14) )
+ROM_END
+
+ROM_START( hitme1 )
 	ROM_REGION( 0x2000, "maincpu", ROMREGION_INVERT )
 	ROM_LOAD( "hm0.b7", 0x0000, 0x0200, CRC(6c48c50f) SHA1(42dc7c3461687e5be4393cc21d695bc84ae4f5dc) )
 	ROM_LOAD( "hm2.c7", 0x0200, 0x0200, CRC(25d47ba4) SHA1(6f3bb4ca6918dc07f37d0c0c7fe5ec53aa7171a5) )
@@ -594,7 +635,8 @@ ROM_END
  *
  *************************************/
 
-GAME( 1976, hitme,    0,        hitme,    hitme,    0, ROT0, "RamTek", "Hit Me",     GAME_SUPPORTS_SAVE )
+GAME( 1976, hitme,    0,        hitme,    hitme,    0, ROT0, "RamTek", "Hit Me (set 1)",  GAME_SUPPORTS_SAVE )
+GAME( 1976, hitme1,   hitme,    hitme,    hitme,    0, ROT0, "RamTek", "Hit Me (set 2)",  GAME_SUPPORTS_SAVE )
 GAME( 1976, m21,      hitme,    hitme,    hitme,    0, ROT0, "Mirco",  "21 (Mirco)", GAME_SUPPORTS_SAVE )
 GAME( 1976, barricad, 0,        barricad, barricad, 0, ROT0, "RamTek", "Barricade",  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1976, brickyrd, barricad, barricad, barricad, 0, ROT0, "RamTek", "Brickyard",  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
