@@ -38,7 +38,7 @@ TODO:
 
 #define VERBOSE_LEVEL   (5)
 
-#define ENABLE_VERBOSE_LOG (0)
+//#define ENABLE_VERBOSE_LOG (0)
 
 #if ENABLE_VERBOSE_LOG
 INLINE void verboselog(running_machine *machine, int n_level, const char *s_fmt, ...)
