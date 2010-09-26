@@ -62,6 +62,7 @@ struct _sh2_cpu_core
 {
 	int is_slave;
 	int  (*dma_callback_kludge)(UINT32 src, UINT32 dst, UINT32 data, int size);
+	int  (*dma_callback_fifo_data_available)(UINT32 src, UINT32 dst, UINT32 data, int size);
 };
 
 DECLARE_LEGACY_CPU_DEVICE(SH1, sh1);

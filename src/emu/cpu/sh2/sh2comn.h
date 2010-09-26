@@ -132,11 +132,19 @@ typedef struct
 	int				icount;
 
 	emu_timer *timer;
-	emu_timer *dma_timer[2];
+	emu_timer *dma_current_active_timer[2];
 	int     dma_timer_active[2];
+
+	int active_dma_incs[2];
+	int active_dma_incd[2];
+	int active_dma_size[2];
+	UINT32 active_dma_src[2]; 
+	UINT32 active_dma_dst[2]; 
+	UINT32 active_dma_count[2];
 
 	int     is_slave, cpu_type;
 	int  (*dma_callback_kludge)(UINT32 src, UINT32 dst, UINT32 data, int size);
+	int  (*dma_callback_fifo_data_available)(UINT32 src, UINT32 dst, UINT32 data, int size);
 
 	void	(*ftcsr_read_callback)(UINT32 data);
 

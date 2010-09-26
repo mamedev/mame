@@ -2148,6 +2148,7 @@ static CPU_RESET( sh2 )
 	emu_timer *tsave, *tsaved0, *tsaved1;
 	UINT32 *m;
 	int  (*dma_callback_kludge)(UINT32 src, UINT32 dst, UINT32 data, int size);
+	int  (*dma_callback_fifo_data_available)(UINT32 src, UINT32 dst, UINT32 data, int size);
 	int save_is_slave;
 
 	void (*f)(UINT32 data);
@@ -2155,13 +2156,14 @@ static CPU_RESET( sh2 )
 
 	m = sh2->m;
 	tsave = sh2->timer;
-	tsaved0 = sh2->dma_timer[0];
-	tsaved1 = sh2->dma_timer[1];
+	tsaved0 = sh2->dma_current_active_timer[0];
+	tsaved1 = sh2->dma_current_active_timer[1];
 
 	f = sh2->ftcsr_read_callback;
 	save_irqcallback = sh2->irq_callback;
 	save_is_slave = sh2->is_slave;
 	dma_callback_kludge = sh2->dma_callback_kludge;
+	dma_callback_fifo_data_available = sh2->dma_callback_fifo_data_available;
 
 	sh2->ppc = sh2->pc = sh2->pr = sh2->sr = sh2->gbr = sh2->vbr = sh2->mach = sh2->macl = 0;
 	sh2->evec = sh2->irqsr = 0;
@@ -2176,14 +2178,15 @@ static CPU_RESET( sh2 )
 	sh2->dma_timer_active[0] = sh2->dma_timer_active[1] = 0;
 
 	sh2->dma_callback_kludge = dma_callback_kludge;
+	sh2->dma_callback_fifo_data_available = dma_callback_fifo_data_available;
 	sh2->is_slave = save_is_slave;
 	sh2->ftcsr_read_callback = f;
 	sh2->irq_callback = save_irqcallback;
 	sh2->device = device;
 
 	sh2->timer = tsave;
-	sh2->dma_timer[0] = tsaved0;
-	sh2->dma_timer[1] = tsaved1;
+	sh2->dma_current_active_timer[0] = tsaved0;
+	sh2->dma_current_active_timer[1] = tsaved1;
 	sh2->m = m;
 	memset(sh2->m, 0, 0x200);
 
