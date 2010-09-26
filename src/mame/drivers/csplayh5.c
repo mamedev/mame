@@ -5,8 +5,9 @@
 	preliminary driver by Angelo Salese
 
 	TODO:
-	- V9958 timings are screwed, it doesn't work perfectly.
-	- game timing seems busted either, could be due of missing DVD hook-up
+	- identify DVD daughter board CPU
+	- V9958 timings are screwed, some places have missing gfxs.
+	- game timings seem busted either, could be due of missing DVD hook-up
 
 ***************************************************************************/
 
@@ -20,6 +21,7 @@
 #include "sound/dac.h"
 #include "sound/3812intf.h"
 #include "cpu/z80/z80daisy.h"
+#include "machine/nvram.h"
 
 static bitmap_t *vdp0_bitmap;
 
@@ -94,10 +96,17 @@ static ADDRESS_MAP_START( csplayh5_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x800000, 0xbfffff) AM_ROM AM_REGION("blit_gfx",0) // GFX ROM routes here
 
-	AM_RANGE(0xc80000, 0xcfffff) AM_RAM // work RAM
+	AM_RANGE(0xc80000, 0xcfffff) AM_RAM AM_SHARE("nvram") // work RAM
 
 	AM_RANGE(0xfffc00, 0xffffff) AM_READWRITE(tmp68301_regs_r, tmp68301_regs_w)	// TMP68301 Registers
 ADDRESS_MAP_END
+
+#if 0
+static ADDRESS_MAP_START( csplayh5_sub_map, ADDRESS_SPACE_PROGRAM, 32 )
+	AM_RANGE(0x000000, 0x01ffff) AM_ROM
+
+ADDRESS_MAP_END
+#endif
 
 /*
 sound HW is identical to Niyanpai
@@ -476,6 +485,11 @@ static MACHINE_CONFIG_START( csplayh5, driver_device )
 	MDRV_CPU_VBLANK_INT("screen", csplayh5_irq )
 	MDRV_CPU_PERIODIC_INT(scanline_irq,262*60) // unknown timing
 
+	#if 0
+	MDRV_CPU_ADD("subcpu",xxx,16000000) /* unknown CPU / clock */
+	MDRV_CPU_PROGRAM_MAP(csplayh5_sub_map)
+	#endif
+
 	MDRV_CPU_ADD("audiocpu", Z80, 8000000)	/* TMPZ84C011, unknown clock */
 	MDRV_CPU_CONFIG(daisy_chain_sound)
 	MDRV_CPU_PROGRAM_MAP(csplayh5_sound_map)
@@ -484,6 +498,8 @@ static MACHINE_CONFIG_START( csplayh5, driver_device )
 	MDRV_Z80CTC_ADD("ctc", 8000000, ctc_intf)
 
 	MDRV_MACHINE_RESET(csplayh5)
+
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
@@ -522,10 +538,14 @@ MACHINE_CONFIG_END
 
 static DRIVER_INIT( csplayh5 )
 {
+	UINT16 *MAINROM = (UINT16 *)memory_region(machine, "maincpu");
 	UINT8 *SNDROM = memory_region(machine, "audiocpu");
 
 	// initialize sound rom bank
 	csplayh5_soundbank_w(machine, 0);
+
+	/* patch DVD comms check */
+	MAINROM[0x4cb4/2] = 0x6018;
 
 	/* patch sound program */
 	SNDROM[0x0213] = 0x00;			// DI -> NOP
@@ -536,8 +556,8 @@ ROM_START( csplayh5 )
 	ROM_LOAD16_BYTE( "2.ic3",   0x00000, 0x20000, CRC(980bf3b0) SHA1(89da7354552f30aaa9d46442972c060b4b0f8979) )
 	ROM_LOAD16_BYTE( "1.ic2",   0x00001, 0x20000, CRC(81ca49a4) SHA1(601b6802ab85be61f45a64f5b4c7e1f1ae5ee887) )
 
-	ROM_REGION( 0x20000, "subcpu", 0 ) //m68k-based
-	ROM_LOAD( "daughter.bin",   0x00000, 0x20000, CRC(36135792) SHA1(1b9c50bd02df8227b228b35cc485efd5a13ec639) )
+	ROM_REGION( 0x20000, "subcpu", 0 ) // ???
+	ROM_LOAD16_WORD_SWAP( "daughter.bin",   0x00000, 0x20000, CRC(36135792) SHA1(1b9c50bd02df8227b228b35cc485efd5a13ec639) )
 
 	ROM_REGION( 0x20000, "audiocpu", 0 ) // z80
 	ROM_LOAD( "11.ic51",   0x00000, 0x20000, CRC(0b920806) SHA1(95f50ebfb296ba29aaa8079a41f5362cb9e879cc) )
