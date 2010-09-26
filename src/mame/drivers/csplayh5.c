@@ -575,7 +575,7 @@ ROM_END
 // 01 : Mahjong Gal-pri (World Gal-con Grandprix) : Nichibutsu/Just&Just
 // 02 : Sengoku Mahjong Kurenai Otome-tai : Nichibutsu/Just&Just
 // 03 : Jyunai - Manatsu no First Kiss : Nichibutsu/eic
-/* 04 */ GAME( 1998, csplayh5,  0,   csplayh5,  csplayh5,  csplayh5, ROT0, "Nichibutsu", "Cosplay Heaven 5 (Japan)", GAME_NOT_WORKING )
+/* 04 */ GAME( 1998, csplayh5,  0,   csplayh5,  csplayh5,  csplayh5, ROT0, "Nichibutsu", "Mahjong Hanafuda Cosplay Tengoku 5 (Japan)", GAME_NOT_WORKING )
 // 05 : Jyunai2 - White Love Story : Nichibutsu/eic
 // 06 : Mahjong Mogitate : Nichibutsu/Just&Just/NVS/Astro System/AV Japan
 
