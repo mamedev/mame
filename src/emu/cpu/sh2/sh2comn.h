@@ -14,6 +14,9 @@
 
 #define USE_SH2DRC
 
+// do we use a timer for the DMA, or have it in CPU_EXECUTE
+//#define USE_TIMER_FOR_DMA
+
 #ifdef USE_SH2DRC
 #include "cpu/drcfe.h"
 #include "cpu/drcuml.h"
@@ -184,5 +187,6 @@ void sh2_common_init(sh2_state *sh2, legacy_cpu_device *device, device_irq_callb
 void sh2_recalc_irq(sh2_state *sh2);
 void sh2_set_irq_line(sh2_state *sh2, int irqline, int state);
 void sh2_exception(sh2_state *sh2, const char *message, int irqline);
+void sh2_do_dma(sh2_state *sh2, int dma);
 
 #endif /* __SH2COMN_H__ */

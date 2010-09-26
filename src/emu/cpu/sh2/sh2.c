@@ -2219,6 +2219,18 @@ static CPU_EXECUTE( sh2 )
 		return;
 	}
 
+	// run any active DMAs now
+#ifndef USE_TIMER_FOR_DMA
+	for ( int i = 0; i < sh2->icount ; i++)
+	{
+		for( int dma=0;dma<1;dma++)
+		{
+			if (sh2->dma_timer_active[dma])
+				sh2_do_dma(sh2, dma);
+		}
+	}
+#endif
+
 	do
 	{
 		UINT32 opcode;

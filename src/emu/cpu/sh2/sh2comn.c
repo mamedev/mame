@@ -134,7 +134,6 @@ static TIMER_CALLBACK( sh2_timer_callback )
 }
 
 
-
 /* 
   We have to do DMA on a timer (or at least, in chunks) due to the way some systems use it.
   The 32x is a difficult case, they set the SOURCE of the DMA to a FIFO buffer, which at most
@@ -142,11 +141,21 @@ static TIMER_CALLBACK( sh2_timer_callback )
   because the game is expecting the 68k of the system to feed data into the FIFO at the same
   time as the SH2 is transfering it out via DMA
 
-  It might be possible to avoid the timer (which causes a performance hit) by calling this
-  from the CPU_EXECUTE loop instead when there is active DMA
+  There are two ways we can do this
+
+  a) with a high frequency timer (more accurate, but a large performance hit)
+
+  or
+  
+  b) in the CPU_EXECUTE loop
+
+
+  we're currently doing b)
+
 */
 
-static void sh2_do_dma(sh2_state *sh2, int dma)
+
+void sh2_do_dma(sh2_state *sh2, int dma)
 {
 	UINT32 dmadata;
 
@@ -154,8 +163,10 @@ static void sh2_do_dma(sh2_state *sh2, int dma)
 
 	if (sh2->active_dma_count[dma] > 0)
 	{
-		// schedule next DMA callback
+#ifdef USE_TIMER_FOR_DMA
+		 //schedule next DMA callback
 		timer_adjust_oneshot(sh2->dma_current_active_timer[dma], sh2->device->cycles_to_attotime(2), dma);
+#endif
 
 		// process current DMA
 		switch(sh2->active_dma_size[dma])
@@ -393,10 +404,10 @@ static void sh2_dmac_check(sh2_state *sh2, int dma)
 				sh2->active_dma_count[dma] &= ~3;
 				break;
 			}
-
+#ifdef USE_TIMER_FOR_DMA
 			// start DMA timer
 			timer_adjust_oneshot(sh2->dma_current_active_timer[dma], sh2->device->cycles_to_attotime(2), dma);
-
+#endif
 
 		}
 	}
