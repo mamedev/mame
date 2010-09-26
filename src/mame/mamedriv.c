@@ -595,6 +595,8 @@ const game_driver * const drivers[] =
 	DRIVER( musobana )	/* (c) 1995 */
 	DRIVER( niyanpai )	/* (c) 1996 */
 
+	DRIVER( csplayh5 )	/* (c) 1998 */
+
 	/* "Phoenix hardware" (and variations) games */
 	DRIVER( safarir )	/* Shin Nihon Kikaku (SNK) */
 	DRIVER( phoenix )	/* (c) 1980 Amstar */

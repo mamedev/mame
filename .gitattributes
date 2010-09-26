@@ -1573,6 +1573,7 @@ src/mame/drivers/crospang.c svneol=native#text/plain
 src/mame/drivers/crshrace.c svneol=native#text/plain
 src/mame/drivers/crystal.c svneol=native#text/plain
 src/mame/drivers/cshooter.c svneol=native#text/plain
+src/mame/drivers/csplayh5.c svneol=native#text/plain
 src/mame/drivers/cubeqst.c svneol=native#text/plain
 src/mame/drivers/cubocd32.c svneol=native#text/plain
 src/mame/drivers/cultures.c svneol=native#text/plain

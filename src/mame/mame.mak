@@ -981,6 +981,7 @@ $(MAMEOBJ)/nichibut.a: \
 	$(DRIVERS)/bigfghtr.o \
 	$(DRIVERS)/cclimber.o $(MACHINE)/cclimber.o $(AUDIO)/cclimber.o $(VIDEO)/cclimber.o \
 	$(DRIVERS)/clshroad.o $(VIDEO)/clshroad.o \
+	$(DRIVERS)/csplayh5.o \
 	$(DRIVERS)/cop01.o $(VIDEO)/cop01.o \
 	$(DRIVERS)/dacholer.o \
 	$(DRIVERS)/galivan.o $(VIDEO)/galivan.o \
