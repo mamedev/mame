@@ -190,14 +190,7 @@ static MACHINE_RESET( niyanpai )
 
 static DRIVER_INIT( niyanpai )
 {
-	UINT8 *MAINROM = memory_region(machine, "maincpu");
 	UINT8 *SNDROM = memory_region(machine, "audiocpu");
-
-	// main program patch (USR0 -> IRQ LEVEL1)
-	MAINROM[(25 * 4) + 0] = MAINROM[(64 * 4) + 0];
-	MAINROM[(25 * 4) + 1] = MAINROM[(64 * 4) + 1];
-	MAINROM[(25 * 4) + 2] = MAINROM[(64 * 4) + 2];
-	MAINROM[(25 * 4) + 3] = MAINROM[(64 * 4) + 3];
 
 	// sound program patch
 	SNDROM[0x0213] = 0x00;			// DI -> NOP
@@ -762,7 +755,7 @@ INPUT_PORTS_END
 
 static INTERRUPT_GEN( niyanpai_interrupt )
 {
-	cpu_set_input_line(device, 1, HOLD_LINE);
+	cpu_set_input_line_and_vector(device, 1, HOLD_LINE,0x100/4);
 }
 
 static const z80_daisy_config daisy_chain_sound[] =
