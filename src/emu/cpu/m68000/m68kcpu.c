@@ -571,6 +571,22 @@ static CPU_TRANSLATE( m68k )
 	return TRUE;
 }
 
+/* translate logical to physical addresses for Apple HMMU */
+static CPU_TRANSLATE( m68khmmu )
+{
+	m68ki_cpu_core *m68k = get_safe_token(device);
+
+	/* only applies to the program address space and only does something if the MMU's enabled */
+	if (m68k)
+	{
+		if ((space == ADDRESS_SPACE_PROGRAM) && (m68k->hmmu_enabled))
+		{
+			*address = hmmu_translate_addr(m68k, *address);
+		}
+	}
+	return TRUE;
+}
+
 /* Execute some instructions until we use up cycles clock cycles */
 static CPU_EXECUTE( m68k )
 {
@@ -633,6 +649,12 @@ static CPU_INIT( m68k )
 	m68k->program = device->space(AS_PROGRAM);
 	m68k->int_ack_callback = irqcallback;
 
+	/* disable all MMUs */
+	m68k->has_pmmu	       = 0;
+	m68k->has_hmmu	       = 0;
+	m68k->pmmu_enabled     = 0;
+	m68k->hmmu_enabled     = 0;
+
 	/* The first call to this function initializes the opcode handler jump table */
 	if(!emulation_initialized)
 	{
@@ -667,8 +689,9 @@ static CPU_RESET( m68k )
 {
 	m68ki_cpu_core *m68k = get_safe_token(device);
 
-	/* Disable the PMMU on reset */
+	/* Disable the PMMU/HMMU on reset, if any */
 	m68k->pmmu_enabled = 0;
+	m68k->hmmu_enabled = 0;
 
 	/* Clear all stop levels and eat up all remaining cycles */
 	m68k->stopped = 0;
@@ -702,6 +725,9 @@ static CPU_RESET( m68k )
 	m68k->run_mode = RUN_MODE_NORMAL;
 
 	m68k->reset_cycles = m68k->cyc_exception[EXCEPTION_RESET];
+
+	/* flush the MMU's cache */
+	pmmu_atc_flush(m68k);
 }
 
 static CPU_DISASSEMBLE( m68k )
@@ -940,6 +966,13 @@ void m68k_set_encrypted_opcode_range(running_device *device, offs_t start, offs_
 	m68k->encrypted_end = end;
 }
 
+void m68k_set_hmmu_enable(running_device *device, int enable)
+{
+	m68ki_cpu_core *m68k = get_safe_token(device);
+
+	m68k->hmmu_enabled = enable;
+}
+
 /****************************************************************************
  * 8-bit data memory interface
  ****************************************************************************/
@@ -1143,6 +1176,132 @@ void m68k_memory_interface::init32mmu(address_space &space)
 }
 
 
+/* interface for 32-bit data bus with PMMU (68EC020, 68020) */
+UINT8 m68k_memory_interface::read_byte_32_hmmu(offs_t address)
+{
+	if (m_cpustate->hmmu_enabled)
+	{
+		address = hmmu_translate_addr(m_cpustate, address);
+	}
+
+	return m_space->read_byte(address);
+}
+
+void m68k_memory_interface::write_byte_32_hmmu(offs_t address, UINT8 data)
+{
+	if (m_cpustate->hmmu_enabled)
+	{
+		address = hmmu_translate_addr(m_cpustate, address);
+	}
+
+	m_space->write_byte(address, data);
+}
+
+UINT16 m68k_memory_interface::read_immediate_16_hmmu(offs_t address)
+{
+	if (m_cpustate->hmmu_enabled)
+	{
+		address = hmmu_translate_addr(m_cpustate, address);
+	}
+
+	return m_direct->read_decrypted_word((address) ^ m_cpustate->memory.opcode_xor);
+}
+
+/* potentially misaligned 16-bit reads with a 32-bit data bus (and 24-bit address bus) */
+UINT16 m68k_memory_interface::readword_d32_hmmu(offs_t address)
+{
+	UINT16 result;
+
+	if (m_cpustate->hmmu_enabled)
+	{
+		address = hmmu_translate_addr(m_cpustate, address);
+	}
+
+	if (!(address & 1))
+		return m_space->read_word(address);
+	result = m_space->read_byte(address) << 8;
+	return result | m_space->read_byte(address + 1);
+}
+
+/* potentially misaligned 16-bit writes with a 32-bit data bus (and 24-bit address bus) */
+void m68k_memory_interface::writeword_d32_hmmu(offs_t address, UINT16 data)
+{
+	if (m_cpustate->hmmu_enabled)
+	{
+		address = hmmu_translate_addr(m_cpustate, address);
+	}
+
+	if (!(address & 1))
+	{
+		m_space->write_word(address, data);
+		return;
+	}
+	m_space->write_byte(address, data >> 8);
+	m_space->write_byte(address + 1, data);
+}
+
+/* potentially misaligned 32-bit reads with a 32-bit data bus (and 24-bit address bus) */
+UINT32 m68k_memory_interface::readlong_d32_hmmu(offs_t address)
+{
+	UINT32 result;
+
+	if (m_cpustate->hmmu_enabled)
+	{
+		address = hmmu_translate_addr(m_cpustate, address);
+	}
+
+	if (!(address & 3))
+		return m_space->read_dword(address);
+	else if (!(address & 1))
+	{
+		result = m_space->read_word(address) << 16;
+		return result | m_space->read_word(address + 2);
+	}
+	result = m_space->read_byte(address) << 24;
+	result |= m_space->read_word(address + 1) << 8;
+	return result | m_space->read_byte(address + 3);
+}
+
+/* potentially misaligned 32-bit writes with a 32-bit data bus (and 24-bit address bus) */
+void m68k_memory_interface::writelong_d32_hmmu(offs_t address, UINT32 data)
+{
+	if (m_cpustate->hmmu_enabled)
+	{
+		address = hmmu_translate_addr(m_cpustate, address);
+	}
+
+	if (!(address & 3))
+	{
+		m_space->write_dword(address, data);
+		return;
+	}
+	else if (!(address & 1))
+	{
+		m_space->write_word(address, data >> 16);
+		m_space->write_word(address + 2, data);
+		return;
+	}
+	m_space->write_byte(address, data >> 24);
+	m_space->write_word(address + 1, data >> 8);
+	m_space->write_byte(address + 3, data);
+}
+
+void m68k_memory_interface::init32hmmu(address_space &space)
+{
+	m_space = &space;
+	m_direct = &space.direct();
+	m_cpustate = get_safe_token(&space.device());
+	opcode_xor = WORD_XOR_BE(0);
+
+	readimm16 = m68k_readimm16_delegate(m68k_readimm16_proto_delegate::create_member(m68k_memory_interface, read_immediate_16_hmmu), *this);
+	read8 = m68k_read8_delegate(m68k_read8_proto_delegate::create_member(m68k_memory_interface, read_byte_32_hmmu), *this);
+	read16 = m68k_read16_delegate(m68k_read16_proto_delegate::create_member(m68k_memory_interface, readword_d32_hmmu), *this);
+	read32 = m68k_read32_delegate(m68k_read32_proto_delegate::create_member(m68k_memory_interface, readlong_d32_hmmu), *this);
+	write8 = m68k_write8_delegate(m68k_write8_proto_delegate::create_member(m68k_memory_interface, write_byte_32_hmmu), *this);
+	write16 = m68k_write16_delegate(m68k_write16_proto_delegate::create_member(m68k_memory_interface, writeword_d32_hmmu), *this);
+	write32 = m68k_write32_delegate(m68k_write32_proto_delegate::create_member(m68k_memory_interface, writelong_d32_hmmu), *this);
+}
+
 void m68k_set_reset_callback(running_device *device, m68k_reset_func callback)
 {
 	m68ki_cpu_core *m68k = get_safe_token(device);
@@ -1253,6 +1412,7 @@ static CPU_INIT( m68000 )
 	m68k->cyc_shift        = 1;
 	m68k->cyc_reset        = 132;
 	m68k->has_pmmu	       = 0;
+	m68k->has_hmmu	       = 0;
 
 	define_state(device);
 }
@@ -1403,7 +1563,6 @@ static CPU_INIT( m68020 )
 	m68k->cyc_movem_l      = 2;
 	m68k->cyc_shift        = 0;
 	m68k->cyc_reset        = 518;
-	m68k->has_pmmu	       = 0;
 
 	define_state(device);
 }
@@ -1456,6 +1615,36 @@ CPU_GET_INFO( m68020pmmu )
 		case DEVINFO_STR_NAME:							strcpy(info->s, "68020, 68851");				break;
 
 		default:										CPU_GET_INFO_CALL(m68020);				break;
+	}
+}
+
+// 68020 with Apple HMMU
+static CPU_INIT( m68020hmmu )
+{
+	m68ki_cpu_core *m68k = get_safe_token(device);
+
+	CPU_INIT_CALL(m68020);
+
+	m68k->has_hmmu = 1;
+// hack alert: we use placement new to ensure we are properly initialized
+// because we live in the device state which is allocated as bytes
+// remove me when we have a real C++ device
+	new(&m68k->memory) m68k_memory_interface;
+	m68k->memory.init32mmu(*m68k->program);
+}
+
+CPU_GET_INFO( m68020hmmu )
+{
+	switch (state)
+	{
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case CPUINFO_FCT_INIT:		info->init = CPU_INIT_NAME(m68020hmmu);			break;
+		case CPUINFO_FCT_TRANSLATE:	info->translate = CPU_TRANSLATE_NAME(m68khmmu);		break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:		strcpy(info->s, "68020, Apple HMMU");			break;
+
+		default:			CPU_GET_INFO_CALL(m68020);				break;
 	}
 }
 
@@ -1803,6 +1992,7 @@ DEFINE_LEGACY_CPU_DEVICE(M68010, m68010);
 DEFINE_LEGACY_CPU_DEVICE(M68EC020, m68ec020);
 DEFINE_LEGACY_CPU_DEVICE(M68020, m68020);
 DEFINE_LEGACY_CPU_DEVICE(M68020PMMU, m68020pmmu);
+DEFINE_LEGACY_CPU_DEVICE(M68020HMMU, m68020hmmu);
 DEFINE_LEGACY_CPU_DEVICE(M68EC030, m68ec030);
 DEFINE_LEGACY_CPU_DEVICE(M68030, m68030);
 DEFINE_LEGACY_CPU_DEVICE(M68EC040, m68ec040);

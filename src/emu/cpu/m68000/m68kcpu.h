@@ -100,6 +100,8 @@ typedef struct _m68ki_cpu_core m68ki_cpu_core;
 #define RUN_MODE_NORMAL          0
 #define RUN_MODE_BERR_AERR_RESET 1
 
+/* MMU constants */
+#define MMU_ATC_ENTRIES	(22)	// 68851 has 64, 030 has 22
 
 /* ======================================================================== */
 /* ================================ MACROS ================================ */
@@ -558,6 +560,7 @@ public:
 	void init16(address_space &space);
 	void init32(address_space &space);
 	void init32mmu(address_space &space);
+	void init32hmmu(address_space &space);
 
 	offs_t	opcode_xor;						// Address Calculation
 	m68k_readimm16_delegate readimm16;		// Immediate read 16 bit
@@ -580,6 +583,14 @@ private:
 	void writeword_d32_mmu(offs_t address, UINT16 data);
 	UINT32 readlong_d32_mmu(offs_t address);
 	void writelong_d32_mmu(offs_t address, UINT32 data);
+
+	UINT8 read_byte_32_hmmu(offs_t address);
+	void write_byte_32_hmmu(offs_t address, UINT8 data);
+	UINT16 read_immediate_16_hmmu(offs_t address);
+	UINT16 readword_d32_hmmu(offs_t address);
+	void writeword_d32_hmmu(offs_t address, UINT16 data);
+	UINT32 readlong_d32_hmmu(offs_t address);
+	void writelong_d32_hmmu(offs_t address, UINT32 data);
 
 	address_space *m_space;
 	direct_read_data *m_direct;
@@ -622,7 +633,9 @@ struct _m68ki_cpu_core
 	UINT32 instr_mode;   /* Stores whether we are in instruction mode or group 0/1 exception mode */
 	UINT32 run_mode;     /* Stores whether we are processing a reset, bus error, address error, or something else */
 	int    has_pmmu;     /* Indicates if a PMMU available (yes on 030, 040, no on EC030) */
+	int    has_hmmu;     /* Indicates if an Apple HMMU is available in place of the 68851 (020 only) */
 	int    pmmu_enabled; /* Indicates if the PMMU is enabled */
+	int    hmmu_enabled; /* Indicates if the HMMU is enabled */
 	int    fpu_just_reset; /* Indicates the FPU was just reset */
 
 	/* Clocks required for instructions / exceptions */
@@ -683,6 +696,9 @@ struct _m68ki_cpu_core
 	UINT32 mmu_srp_aptr, mmu_srp_limit;
 	UINT32 mmu_tc;
 	UINT16 mmu_sr;
+	UINT32 mmu_atc_tag[MMU_ATC_ENTRIES], mmu_atc_data[MMU_ATC_ENTRIES];
+	UINT32 mmu_atc_rr;
+	UINT32 mmu_tt0, mmu_tt1;
 };
 
 
