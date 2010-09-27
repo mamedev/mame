@@ -52,12 +52,12 @@ public:
 	/* memory pointers */
 	UINT16 *  pf1_rowscroll;
 	UINT16 *  pf2_rowscroll;
-	UINT16 *  spriteram;
+//	UINT16 *  spriteram;
 //  UINT16 *  paletteram;    // currently this uses generic palette handling (in deco16ic.c)
-	size_t    spriteram_size;
+//	size_t    spriteram_size;
 
 	/* misc */
-	UINT32 mux_data;
+	UINT8 mux_data;
 
 	/* devices */
 	required_device<m68000_device> maincpu;
@@ -69,8 +69,8 @@ public:
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int pri )
 {
-	mirage_state *state = machine->driver_data<mirage_state>();
-	UINT16 *spriteram = state->spriteram;
+	//mirage_state *state = machine->driver_data<mirage_state>();
+	UINT16 *spriteram = machine->generic.buffered_spriteram.u16;//state->spriteram;
 	int offs;
 
 	for (offs = 0; offs < 0x400; offs += 4)
@@ -158,6 +158,12 @@ static VIDEO_UPDATE( mirage )
 	return 0;
 }
 
+static VIDEO_EOF( mirage )
+{
+	address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+	buffer_spriteram16_w(space,0,0,0xffff);
+}
+
 
 static WRITE16_HANDLER( mirage_mux_w )
 {
@@ -202,7 +208,7 @@ static ADDRESS_MAP_START( mirage_map, ADDRESS_SPACE_PROGRAM, 16 )
 	/* linescroll */
 	AM_RANGE(0x110000, 0x110bff) AM_RAM AM_BASE_MEMBER(mirage_state, pf1_rowscroll)
 	AM_RANGE(0x112000, 0x112bff) AM_RAM AM_BASE_MEMBER(mirage_state, pf2_rowscroll)
-	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_BASE_SIZE_MEMBER(mirage_state, spriteram, spriteram_size)
+	AM_RANGE(0x120000, 0x1207ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x130000, 0x1307ff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x140000, 0x14000f) AM_DEVREADWRITE8_MODERN("oki_sfx", okim6295_device, read, write, 0x00ff)
 	AM_RANGE(0x150000, 0x15000f) AM_DEVREADWRITE8_MODERN("oki_bgm", okim6295_device, read, write, 0x00ff)
@@ -385,6 +391,8 @@ static MACHINE_CONFIG_START( mirage, mirage_state )
 	MDRV_MACHINE_RESET(mirage)
 
 	/* video hardware */
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
+
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(58)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(529))
@@ -396,6 +404,7 @@ static MACHINE_CONFIG_START( mirage, mirage_state )
 	MDRV_PALETTE_LENGTH(1024)
 
 	MDRV_VIDEO_UPDATE(mirage)
+	MDRV_VIDEO_EOF(mirage)
 
 	MDRV_DECO16IC_ADD("deco_custom", mirage_deco16ic_intf)
 
