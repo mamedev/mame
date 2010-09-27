@@ -150,10 +150,17 @@ static TIMER_CALLBACK( sh2_timer_callback )
   b) in the CPU_EXECUTE loop
 
 
-  we're currently doing b)
+  we're currently doing a)
+  b) seems to cause issues with ST-V games
 
 */
 
+// Fever Soccer requires stupidly fast DMA or the palette gets corrupt due
+// to DMA being cancelled mid-flight.  Are we incorrectly emulating some other register?
+#define DMA_TIMER_STEP (ATTOTIME_IN_NSEC(1))
+// have a bigger delay if no data is available, as it will take some time before there is
+// any, and having such a high frequency timer with no data is not a good idea
+#define DMA_TIMER_STEP_IF_UNAVAILABLE (ATTOTIME_IN_NSEC(1000))
 
 void sh2_do_dma(sh2_state *sh2, int dma)
 {
@@ -163,10 +170,7 @@ void sh2_do_dma(sh2_state *sh2, int dma)
 
 	if (sh2->active_dma_count[dma] > 0)
 	{
-#ifdef USE_TIMER_FOR_DMA
-		 //schedule next DMA callback
-		timer_adjust_oneshot(sh2->dma_current_active_timer[dma], sh2->device->cycles_to_attotime(2), dma);
-#endif
+
 
 		// process current DMA
 		switch(sh2->active_dma_size[dma])
@@ -192,9 +196,20 @@ void sh2_do_dma(sh2_state *sh2, int dma)
 					int available = sh2->dma_callback_fifo_data_available(tempsrc, tempdst, 0, sh2->active_dma_size[dma]);
 	
 					if (!available)
+					{
+						#ifdef USE_TIMER_FOR_DMA
+						//schedule next DMA callback
+						timer_adjust_oneshot(sh2->dma_current_active_timer[dma], DMA_TIMER_STEP_IF_UNAVAILABLE , dma);
+						#endif
 						return;
+					}
+						
 				}
 					
+				#ifdef USE_TIMER_FOR_DMA
+				 //schedule next DMA callback
+				timer_adjust_oneshot(sh2->dma_current_active_timer[dma], DMA_TIMER_STEP , dma);
+				#endif
 
 				dmadata = sh2->program->read_byte(tempsrc);
 				if (sh2->dma_callback_kludge) dmadata = sh2->dma_callback_kludge(tempsrc, tempdst, dmadata, sh2->active_dma_size[dma]);
@@ -231,8 +246,19 @@ void sh2_do_dma(sh2_state *sh2, int dma)
 					int available = sh2->dma_callback_fifo_data_available(tempsrc, tempdst, 0, sh2->active_dma_size[dma]);
 	
 					if (!available)
+					{
+						#ifdef USE_TIMER_FOR_DMA
+						//schedule next DMA callback
+						timer_adjust_oneshot(sh2->dma_current_active_timer[dma], DMA_TIMER_STEP_IF_UNAVAILABLE , dma);
+						#endif
 						return;
+					}
 				}
+
+				#ifdef USE_TIMER_FOR_DMA
+				 //schedule next DMA callback
+				timer_adjust_oneshot(sh2->dma_current_active_timer[dma], DMA_TIMER_STEP , dma);
+				#endif
 
 				// check: should this really be using read_word_32 / write_word_32?
 				dmadata	= sh2->program->read_word(tempsrc);
@@ -269,8 +295,19 @@ void sh2_do_dma(sh2_state *sh2, int dma)
 					int available = sh2->dma_callback_fifo_data_available(tempsrc, tempdst, 0, sh2->active_dma_size[dma]);
 	
 					if (!available)
+					{
+						#ifdef USE_TIMER_FOR_DMA
+						//schedule next DMA callback
+						timer_adjust_oneshot(sh2->dma_current_active_timer[dma], DMA_TIMER_STEP_IF_UNAVAILABLE , dma);
+						#endif
 						return;
+					}
 				}
+
+				#ifdef USE_TIMER_FOR_DMA
+				 //schedule next DMA callback
+				timer_adjust_oneshot(sh2->dma_current_active_timer[dma], DMA_TIMER_STEP , dma);
+				#endif
 
 				dmadata	= sh2->program->read_dword(tempsrc);
 				if (sh2->dma_callback_kludge) dmadata = sh2->dma_callback_kludge(tempsrc, tempdst, dmadata, sh2->active_dma_size[dma]);
@@ -307,6 +344,12 @@ void sh2_do_dma(sh2_state *sh2, int dma)
 					if (!available)
 						fatalerror("SH2 dma_callback_fifo_data_available == 0 in unsupported mode");
 				}
+
+
+				#ifdef USE_TIMER_FOR_DMA
+				 //schedule next DMA callback
+				timer_adjust_oneshot(sh2->dma_current_active_timer[dma], DMA_TIMER_STEP , dma);
+				#endif
 
 				dmadata = sh2->program->read_dword(tempsrc);
 				if (sh2->dma_callback_kludge) dmadata = sh2->dma_callback_kludge(tempsrc, tempdst, dmadata, sh2->active_dma_size[dma]);
@@ -406,7 +449,7 @@ static void sh2_dmac_check(sh2_state *sh2, int dma)
 			}
 #ifdef USE_TIMER_FOR_DMA
 			// start DMA timer
-			timer_adjust_oneshot(sh2->dma_current_active_timer[dma], sh2->device->cycles_to_attotime(2), dma);
+			timer_adjust_oneshot(sh2->dma_current_active_timer[dma], attotime_zero, dma);
 #endif
 
 		}
