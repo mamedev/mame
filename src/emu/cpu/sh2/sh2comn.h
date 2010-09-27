@@ -15,7 +15,7 @@
 #define USE_SH2DRC
 
 // do we use a timer for the DMA, or have it in CPU_EXECUTE
-//#define USE_TIMER_FOR_DMA
+#define USE_TIMER_FOR_DMA
 
 #ifdef USE_SH2DRC
 #include "cpu/drcfe.h"
