@@ -9075,6 +9075,7 @@ Other Sun games
 	DRIVER( mouseatk )	/* (c) 1996 ICE */
 	DRIVER( rapidfir )	/* (c) 1998 Hanaho Games */
 	DRIVER( rapidfire )	/* (c) 1998 Hanaho Games */
+	DRIVER( maletmad )	/* (c) 1999 Hanaho Games, licensed to Capcom */
 	DRIVER( crgolf )	/* (c) 1984 Nasco Japan */
 	DRIVER( crgolfa )	/* (c) 1984 Nasco Japan */
 	DRIVER( crgolfb )	/* (c) 1984 Nasco Japan */
