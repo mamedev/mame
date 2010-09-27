@@ -2314,7 +2314,32 @@ static READ16_HANDLER( _32x_68k_dram_r )
 
 static WRITE16_HANDLER( _32x_68k_dram_w )
 {
-	COMBINE_DATA(&_32x_access_dram[offset]);
+	if ((mem_mask&0xffff) == 0xffff)
+	{
+		// 16-bit accesses are normal
+		COMBINE_DATA(&_32x_access_dram[offset]);
+	}
+	else
+	{
+		// 8-bit writes act as if they were going to the overwrite region!
+		// bc-racers and world series baseball rely on this!
+		// (tested on real hw)
+
+		if ((mem_mask & 0xffff) == 0xff00)
+		{
+			if ((data & 0xff00) != 0x0000)
+			{
+				_32x_access_dram[offset] = (data & 0xff00) |  (_32x_access_dram[offset] & 0x00ff);
+			}
+		}
+		else if ((mem_mask & 0xffff) == 0x00ff)
+		{
+			if ((data & 0x00ff) != 0x0000)
+			{
+				_32x_access_dram[offset] = (data & 0x00ff) |  (_32x_access_dram[offset] & 0xff00);
+			}
+		}
+	}
 }
 
 static READ16_HANDLER( _32x_68k_dram_overwrite_r )
