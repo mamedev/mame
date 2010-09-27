@@ -793,6 +793,7 @@ static const struct game_keys keys_table[] =
 	{ "xmcotaj3", { 0x46027315,0xaf8bcd9e }, 0x100000 },	// 0C80 1972 0301  cmpi.l  #$19720301,D0
 	{ "xmcotajr", { 0x46027315,0xaf8bcd9e }, 0x100000 },	// 0C80 1972 0301  cmpi.l  #$19720301,D0
 	{ "xmcotaa",  { 0x0795a4e2,0xdb3f861c }, 0x100000 },	// 0C80 1972 0301  cmpi.l  #$19720301,D0
+	{ "xmcotaar1",{ 0x0795a4e2,0xdb3f861c }, 0x100000 },	// 0C80 1972 0301  cmpi.l  #$19720301,D0
 	{ "armwar",   { 0x9e9d4c0b,0x8a39081f }, 0x100000 },	// 3039 0080 4020  move.w  $00804020,D0
 	{ "armwarr1", { 0x9e9d4c0b,0x8a39081f }, 0x100000 },	// 3039 0080 4020  move.w  $00804020,D0
 	{ "armwaru",  { 0xd4c0b8a3,0x9081f9e9 }, 0x100000 },	// 3039 0080 4020  move.w  $00804020,D0

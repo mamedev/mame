@@ -7444,6 +7444,37 @@ ROM_END
 
 ROM_START( xmcotaa )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
+	ROM_LOAD16_WORD_SWAP( "xmna.03e", 0x000000, 0x80000, CRC(f1ade6e7) SHA1(b212b6107a7ab01db3a60ccc7e1376fdba6f2e6a) )
+	ROM_LOAD16_WORD_SWAP( "xmna.04e", 0x080000, 0x80000, CRC(b5a8843d) SHA1(e45381725a7356760dc71e027f3b7059e5919621) )
+	ROM_LOAD16_WORD_SWAP( "xmn.05a",  0x100000, 0x80000, CRC(ac0d7759) SHA1(650d4474b13f16af7910a0f721fcda2ddb2414fd) )
+	ROM_LOAD16_WORD_SWAP( "xmn.06a",  0x180000, 0x80000, CRC(1b86a328) SHA1(2469cd705139ee9f1142e6e379e68d0c9675b37e) )
+	ROM_LOAD16_WORD_SWAP( "xmn.07a",  0x200000, 0x80000, CRC(2c142a44) SHA1(7624875f9c39b361fc83e52e87e0fd5e96279713) )
+	ROM_LOAD16_WORD_SWAP( "xmn.08a",  0x280000, 0x80000, CRC(f712d44f) SHA1(0d18d4a4eacad94a66beca6ec509ac7f690c6882) )
+	ROM_LOAD16_WORD_SWAP( "xmn.09a",  0x300000, 0x80000, CRC(9241cae8) SHA1(bb6980abf25aaf3eb14e230ca6942f3e2ab2c660) )
+	ROM_LOAD16_WORD_SWAP( "xmn.10a",  0x380000, 0x80000, CRC(53c0eab9) SHA1(e3b1ec1fd517735f7801cfebb257c43185c6d3fb) )
+
+	ROM_REGION( 0x2000000, "gfx", 0 )
+	ROMX_LOAD( "xmn.13m",   0x0000000, 0x400000, CRC(bf4df073) SHA1(4d2740c3a827f0ec2cf75ad99c65e393c6a11c23) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "xmn.15m",   0x0000002, 0x400000, CRC(4d7e4cef) SHA1(50b8797b8099a8d76ad063ba1201a13dbb88ae3a) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "xmn.17m",   0x0000004, 0x400000, CRC(513eea17) SHA1(a497477ad9ac13180911d8745ef6ee1955c0b877) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "xmn.19m",   0x0000006, 0x400000, CRC(d23897fc) SHA1(1e31627999736652252164d32662779a1ac6ca29) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "xmn.14m",   0x1000000, 0x400000, CRC(778237b7) SHA1(89a759ec383518ec52f5059d10ec342f2247aa20) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "xmn.16m",   0x1000002, 0x400000, CRC(67b36948) SHA1(692fb6e4096b880aa22996d554b160f664bbd907) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "xmn.18m",   0x1000004, 0x400000, CRC(015a7c4c) SHA1(cccc95dafd076a1a9fa004710006149c42d058ba) , ROM_GROUPWORD | ROM_SKIP(6) )
+	ROMX_LOAD( "xmn.20m",   0x1000006, 0x400000, CRC(9dde2758) SHA1(17ba259cad03c7b5d56c0a5eda9ab53521665729) , ROM_GROUPWORD | ROM_SKIP(6) )
+
+	ROM_REGION( QSOUND_SIZE, "audiocpu", 0 ) /* 64k for the audio CPU (+banks) */
+	ROM_LOAD( "xmn.01a",  0x00000, 0x08000, CRC(40f479ea) SHA1(f29e15f537675305264ae2138a0a537fb9e2008b) )
+	ROM_CONTINUE(         0x10000, 0x18000 )
+	ROM_LOAD( "xmn.02a",  0x28000, 0x20000, CRC(39d9b5ad) SHA1(af502debfd36100d4fc971ed25fdf9d7121d6f18) )
+
+	ROM_REGION( 0x400000, "qsound", 0 ) /* QSound samples */
+	ROM_LOAD16_WORD_SWAP( "xmn.11m",   0x000000, 0x200000, CRC(c848a6bc) SHA1(ac8ac564d3c43225822f8bc330eba9f35b24b0a4) )
+	ROM_LOAD16_WORD_SWAP( "xmn.12m",   0x200000, 0x200000, CRC(729c188f) SHA1(3279774ad8aebbcf0fc779cdfcbe21044dd192ad) )
+ROM_END
+
+ROM_START( xmcotaar1 )
+	ROM_REGION( CODE_SIZE, "maincpu", 0 )      /* 68000 code */
 	ROM_LOAD16_WORD_SWAP( "xmna.03a", 0x000000, 0x80000, CRC(7df8b27e) SHA1(2f0ce6b10857e04ddaf7a76edf126282c53511b3) )
 	ROM_LOAD16_WORD_SWAP( "xmna.04a", 0x080000, 0x80000, CRC(b44e30a7) SHA1(27b0a8b06aa11673dd145717c6286eb27186cf79) )
 	ROM_LOAD16_WORD_SWAP( "xmn.05",   0x100000, 0x80000, CRC(c3ed62a2) SHA1(4e3317d7ca981e33318822103a16e59f4ce20deb) )
@@ -7984,7 +8015,8 @@ GAME( 1994, xmcotaj1,   xmcota,   cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "
 GAME( 1994, xmcotaj2,   xmcota,   cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "X-Men: Children of the Atom (Japan 941219)", GAME_SUPPORTS_SAVE )
 GAME( 1994, xmcotaj3,   xmcota,   cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "X-Men: Children of the Atom (Japan 941217)", GAME_SUPPORTS_SAVE )
 GAME( 1994, xmcotajr,   xmcota,   cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "X-Men: Children of the Atom (Japan 941208 rent version)", GAME_SUPPORTS_SAVE )
-GAME( 1994, xmcotaa,    xmcota,   cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "X-Men: Children of the Atom (Asia 941217)", GAME_SUPPORTS_SAVE )
+GAME( 1994, xmcotaa,    xmcota,   cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "X-Men: Children of the Atom (Asia 950105)", GAME_SUPPORTS_SAVE )
+GAME( 1994, xmcotaar1,  xmcota,   cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "X-Men: Children of the Atom (Asia 941217)", GAME_SUPPORTS_SAVE )
 GAME( 1995, nwarr,      0,        cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Night Warriors: Darkstalkers' Revenge (Euro 950316)", GAME_SUPPORTS_SAVE )
 GAME( 1995, nwarru,     nwarr,    cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Night Warriors: Darkstalkers' Revenge (USA 950406)", GAME_SUPPORTS_SAVE )
 GAME( 1995, nwarrh,     nwarr,    cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Night Warriors: Darkstalkers' Revenge (Hispanic 950403)", GAME_SUPPORTS_SAVE )

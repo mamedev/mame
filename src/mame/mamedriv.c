@@ -2882,7 +2882,8 @@ V-V                           TP-027
 	DRIVER( xmcotaj1 )	/* 22/12/1994 (c) 1994 (Japan) */
 	DRIVER( xmcotaj2 )	/* 19/12/1994 (c) 1994 (Japan) */
 	DRIVER( xmcotaj3 )	/* 17/12/1994 (c) 1994 (Japan) */
-	DRIVER( xmcotaa )	/* 17/12/1994 (c) 1994 (Asia) */
+	DRIVER( xmcotaa )	/* 05/01/1995 (c) 1994 (Asia) */
+	DRIVER( xmcotaar1 )	/* 17/12/1994 (c) 1994 (Asia) */
 	DRIVER( xmcotajr )	/* 08/12/1994 (c) 1994 (Japan Rent) */
 	DRIVER( nwarr )		/* 16/03/1995 (c) 1995 (Euro) */
 	DRIVER( nwarru )	/* 06/04/1995 (c) 1995 (US) */
