@@ -325,7 +325,7 @@ WRITE16_MEMBER(raiden2_state::cop_cmd_w)
 	case 0x3bb0: { // 3bb0 0004 007f 0038 - 0f9c 0b9c 0b9c 0b9c 0b9c 0b9c 0b9c 099c
 		int dx = (space.read_dword(cop_regs[1]+4) - space.read_dword(cop_regs[0]+4)) >> 16;
 		int dy = (space.read_dword(cop_regs[1]+8) - space.read_dword(cop_regs[0]+8)) >> 16;
-		space.write_word(cop_regs[0]+0x38, sqrt(dx*dx+dy*dy));
+		space.write_word(cop_regs[0]+0x38, sqrt((double)(dx*dx+dy*dy)));
 		break;
 	}
 
