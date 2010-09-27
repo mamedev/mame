@@ -5,7 +5,8 @@
 	preliminary driver by Angelo Salese
 
 	TODO:
-	- identify DVD daughter board CPU
+	- fix h8 CPU core bugs, it trips various unhandled opcodes
+	- Implement DVD routing and YUV decoding;
 	- V9958 timings are screwed, some places have missing gfxs.
 	- game timings seem busted either, could be due of missing DVD hook-up
 
@@ -22,8 +23,11 @@
 #include "sound/3812intf.h"
 #include "cpu/z80/z80daisy.h"
 #include "machine/nvram.h"
+#include "cpu/h83002/h8.h"
 
 static bitmap_t *vdp0_bitmap;
+
+#define USE_H8 0
 
 // from MSX2 driver, may be not accurate for this HW
 #define MSX2_XBORDER_PIXELS		16
@@ -101,12 +105,28 @@ static ADDRESS_MAP_START( csplayh5_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfffc00, 0xffffff) AM_READWRITE(tmp68301_regs_r, tmp68301_regs_w)	// TMP68301 Registers
 ADDRESS_MAP_END
 
-#if 0
-static ADDRESS_MAP_START( csplayh5_sub_map, ADDRESS_SPACE_PROGRAM, 32 )
+#if USE_H8
+static READ16_HANDLER( test_r )
+{
+	return 0;//mame_rand(space->machine);
+}
+
+static ADDRESS_MAP_START( csplayh5_sub_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
+
+	AM_RANGE(0x04002a, 0x04002b) AM_READ(test_r)
+	AM_RANGE(0x040036, 0x040037) AM_READ(test_r)
+
+	AM_RANGE(0x078000, 0x07ffff) AM_RAM AM_SHARE("nvram")
+	AM_RANGE(0x080000, 0x0fffff) AM_RAM
+ADDRESS_MAP_END
+
+
+static ADDRESS_MAP_START( csplayh5_sub_io_map, ADDRESS_SPACE_IO, 16 )
 
 ADDRESS_MAP_END
 #endif
+
 
 /*
 sound HW is identical to Niyanpai
@@ -485,10 +505,11 @@ static MACHINE_CONFIG_START( csplayh5, driver_device )
 	MDRV_CPU_VBLANK_INT("screen", csplayh5_irq )
 	MDRV_CPU_PERIODIC_INT(scanline_irq,262*60) // unknown timing
 
-	#if 0
-	MDRV_CPU_ADD("subcpu",xxx,16000000) /* unknown CPU / clock */
+#if USE_H8
+	MDRV_CPU_ADD("subcpu", H83002, 16000000)	/* unknown clock */
 	MDRV_CPU_PROGRAM_MAP(csplayh5_sub_map)
-	#endif
+	MDRV_CPU_IO_MAP(csplayh5_sub_io_map)
+#endif
 
 	MDRV_CPU_ADD("audiocpu", Z80, 8000000)	/* TMPZ84C011, unknown clock */
 	MDRV_CPU_CONFIG(daisy_chain_sound)
