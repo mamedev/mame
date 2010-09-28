@@ -1133,6 +1133,10 @@ static MACHINE_RESET( neogeo )
 	update_interrupts(machine);
 
 	state->recurse = 0;
+
+	/* AES apparently always uses the cartridge's fixed bank mode */
+	// neogeo_set_fixed_layer_source(machine,1);
+
 }
 
 
