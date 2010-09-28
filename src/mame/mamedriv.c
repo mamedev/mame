@@ -8913,6 +8913,7 @@ Other Sun games
 	DRIVER( spacebrd )	/* bootleg */
 	DRIVER( spacedem )	/* (c) 1980 Fortrek + made by Nintendo */
 	DRIVER( omegrace )	/* (c) 1981 Midway */
+	DRIVER( omegrace2 )	/* (c) 1981 Midway */
 	DRIVER( deltrace )	/* bootleg */
 	DRIVER( monzagp )	/* (c) 1981 Olympia */
 	DRIVER( dday )		/* (c) 1982 Olympia */
