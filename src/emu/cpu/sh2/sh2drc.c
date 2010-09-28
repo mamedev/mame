@@ -3112,6 +3112,7 @@ static int generate_group_12(sh2_state *sh2, drcuml_block *block, compiler_state
 		UML_ADD(block, IREG(0), R32(0), MEM(&sh2->gbr));	// add r0, R0, gbr
 		UML_CALLH(block, sh2->read8);				// read8
 
+		UML_AND(block, IREG(0), IREG(0), IMM(opcode & 0xff));
 		UML_CMP(block, IREG(0), IMM(0));			// cmp r0, #0
 		UML_JMPc(block, IF_NZ, compiler->labelnum);		// jnz labelnum
 
