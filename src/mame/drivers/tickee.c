@@ -16,6 +16,7 @@
     Known bugs:
         * (Tickee) gun sometimes misfires
         * Mouse Attack dips and inputs need fixing
+        * Mallet Madness ticket dispenser isn't working
 
 ***************************************************************************/
 
@@ -298,9 +299,14 @@ static READ16_HANDLER( rapidfir_gun2_r )
 
 static READ16_HANDLER( ff7f_r )
 {
+	/* Ticket dispenser status? */
 	return 0xff7f;
 }
 
+static WRITE16_HANDLER( ff7f_w )
+{
+	/* Ticket dispenser output? */
+}
 
 static WRITE16_HANDLER( rapidfir_control_w )
 {
@@ -418,10 +424,10 @@ static ADDRESS_MAP_START( rapidfir_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xfc000b00, 0xfc000b0f) AM_READ_PORT("DSW0")
 	AM_RANGE(0xfc000c00, 0xfc000c1f) AM_READ_PORT("DSW1")
 	AM_RANGE(0xfc000e00, 0xfc000e1f) AM_READ(watchdog_reset16_r)
-	AM_RANGE(0xfc100000, 0xfc1000ff) AM_DEVREADWRITE8("tlc34076", tlc34076_r, tlc34076_w, 0x00ff)
+	AM_RANGE(0xfc100000, 0xfc1000ff) AM_MIRROR(0x80000) AM_DEVREADWRITE8("tlc34076", tlc34076_r, tlc34076_w, 0x00ff)
 	AM_RANGE(0xfc200000, 0xfc207fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xfc300000, 0xfc30000f) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
-	AM_RANGE(0xfc400010, 0xfc40001f) AM_READ(ff7f_r)
+	AM_RANGE(0xfc400010, 0xfc40001f) AM_READWRITE(ff7f_r, ff7f_w)
 	AM_RANGE(0xfe000000, 0xffffffff) AM_ROM AM_REGION("user1", 0)
 ADDRESS_MAP_END
 
@@ -1087,8 +1093,7 @@ Same exact PCB as Rapid Fire
 
 ROM_START( maletmad ) /* Version 2.1 */
 	ROM_REGION16_LE( 0x400000, "user1", 0 )	/* 34010 code */
-//	ROM_LOAD16_BYTE( "malletmadness_v2.1.u8",  0x000000, 0x80000, CRC(00000000) SHA1(0000000000000000000000000000000000000000) ) /* U8 & U9 not populated */
-//	ROM_LOAD16_BYTE( "malletmadness_v2.1.u9",  0x000001, 0x80000, CRC(00000000) SHA1(0000000000000000000000000000000000000000) ) /* U8 & U9 not populated */
+	/* U8 & U9 not populated */
 	ROM_LOAD16_BYTE( "malletmadness_v2.1.u6",  0x100000, 0x80000, CRC(83309174) SHA1(d387c8bc4d3c640f16525241892cc8d5d5da7f60) )
 	ROM_LOAD16_BYTE( "malletmadness_v2.1.u7",  0x100001, 0x80000, CRC(4642587e) SHA1(076eda538d570074028e9b4394f1a8a459678137) )
 	ROM_LOAD16_BYTE( "malletmadness_v2.1.u4",  0x200000, 0x80000, CRC(70ca968c) SHA1(74c66a67568b428ae5e20377038c7ea0cd33b25e) )
