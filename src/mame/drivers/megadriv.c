@@ -2844,6 +2844,8 @@ static READ16_HANDLER( _32x_68k_a1518a_r )
 
 	if (megadrive_hblank_flag) retdata |= 0x4000;
 
+	if (megadrive_hblank_flag && megadrive_vblank_flag) { retdata |= 0x2000; } // palette approval (TODO: active high or low?)
+
 	return retdata;
 }
 
@@ -2895,7 +2897,7 @@ static READ16_HANDLER( _32x_sh2_master_4000_r )
 	UINT16 retvalue = 0x0200;
 	retvalue |= _32x_access_auth << 15;
 
-	retvalue |=	sh2_hint_in_vbl;;
+	retvalue |=	sh2_hint_in_vbl;
 	retvalue |= sh2_master_vint_enable;
 	retvalue |= sh2_master_hint_enable;
 	retvalue |= sh2_master_cmdint_enable;
@@ -2908,7 +2910,7 @@ static WRITE16_HANDLER( _32x_sh2_master_4000_w )
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		_32x_access_auth = (data &0x80) >> 7;
+		_32x_access_auth = (data &0x8000) >> 15;
 	}
 
 	if (ACCESSING_BITS_0_7)
@@ -2921,7 +2923,6 @@ static WRITE16_HANDLER( _32x_sh2_master_4000_w )
 
 		if (sh2_master_hint_enable) printf("sh2_master_hint_enable enable!\n");
 		//if (sh2_master_pwmint_enable) printf("sh2_master_pwn_enable enable!\n");
-
 	}
 }
 
@@ -2931,7 +2932,7 @@ static READ16_HANDLER( _32x_sh2_slave_4000_r )
 {
 	UINT16 retvalue = 0x0200;
 	retvalue |= _32x_access_auth << 15;
-	retvalue |=	sh2_hint_in_vbl;;
+	retvalue |=	sh2_hint_in_vbl;
 	retvalue |= sh2_slave_vint_enable;
 	retvalue |= sh2_slave_hint_enable;
 	retvalue |= sh2_slave_cmdint_enable;
@@ -2945,8 +2946,7 @@ static WRITE16_HANDLER( _32x_sh2_slave_4000_w )
 {
 	if (ACCESSING_BITS_8_15)
 	{
-		_32x_access_auth = (data &0x80) >> 7;
-
+		_32x_access_auth = (data &0x8000) >> 15;
 	}
 
 	if (ACCESSING_BITS_0_7)
