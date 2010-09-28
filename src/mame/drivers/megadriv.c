@@ -619,6 +619,11 @@ static UINT16 (*vdp_get_word_from_68k_mem)(running_machine *machine, UINT32 sour
 
 static UINT16 vdp_get_word_from_68k_mem_default(running_machine *machine, UINT32 source)
 {
+	// should we limit the valid areas here?
+	// how does this behave with the segacd etc?
+	// with the 32x it seems to see the raw cart? - using 68k space causes the character to vanish
+	// svp uses it's own function elsewhere...
+
 	if (( source >= 0x000000 ) && ( source <= 0x3fffff ))
 	{
 		UINT16 *rom = (UINT16*)memory_region(machine, "maincpu");
@@ -635,6 +640,7 @@ static UINT16 vdp_get_word_from_68k_mem_default(running_machine *machine, UINT32
 		printf("DMA Read unmapped %06x\n",source);
 		return mame_rand(machine);
 	}
+
 
 }
 
@@ -2100,48 +2106,22 @@ static WRITE16_HANDLER ( megadriv_68k_req_z80_reset )
 	timer_set( space->machine, attotime_zero, NULL, 0, megadriv_z80_run_state );
 }
 
+
+// just directly access the 68k space, this makes it easier to deal with
+// add-on hardware which changes the cpu mapping like the 32x and SegaCD.
+// - we might need to add exceptions for example, z80 reading / writing the
+//   z80 area of the 68k if games misbehave
 static READ8_HANDLER( z80_read_68k_banked_data )
 {
-	// genz80.z80_bank_addr contains the address to read
+	address_space *space68k = space->machine->device<legacy_cpu_device>("maincpu")->space();
+	UINT8 ret = space68k->read_byte(genz80.z80_bank_addr+offset);
+	return ret;
+}
 
-	if ((genz80.z80_bank_addr >= 0x000000) && (genz80.z80_bank_addr <= 0x3fffff)) // ROM Addresses
-	{
-		UINT32 fulladdress;
-		fulladdress = genz80.z80_bank_addr + offset;
-
-		return memory_region(space->machine, "maincpu")[fulladdress^1]; // ^1? better..
-
-
-	}
-	else
-	{
-		if (_32x_is_connected)
-		{
-			if ((genz80.z80_bank_addr >= 0x880000) && (genz80.z80_bank_addr <= 0x900000)) // 'fixed' 512kb 32x rom
-			{
-				UINT32 fulladdress;
-				fulladdress = (genz80.z80_bank_addr + offset)&0x3ffff;
-
-				return memory_region(space->machine, "gamecart")[fulladdress^1]; // ^1? better..
-
-
-			}
-			else if ((genz80.z80_bank_addr >= 0x900000) && (genz80.z80_bank_addr <= 0x9fffff)) // 'banked' 1mb 32x rom
-			{
-				UINT32 fulladdress;
-				fulladdress = (genz80.z80_bank_addr + offset)&0x7ffff;
-
-				fulladdress |= (_32x_68k_a15104_reg&0x3)*0x80000;
-
-				return memory_region(space->machine, "gamecart")[fulladdress^1]; // ^1? better..
-
-			}
-		}
-
-		printf("unhandled z80 bank read, gen.z80_bank_addr %08x\n",genz80.z80_bank_addr);
-		return 0x0000;
-	}
-
+static WRITE8_HANDLER( z80_write_68k_banked_data )
+{
+	address_space *space68k = space->machine->device<legacy_cpu_device>("maincpu")->space();
+	space68k->write_byte(genz80.z80_bank_addr+offset,data);
 }
 
 
@@ -2162,37 +2142,7 @@ static WRITE8_HANDLER( megadriv_z80_vdp_write )
 
 }
 
-static WRITE8_HANDLER( z80_write_68k_banked_data )
-{
-	UINT32 fulladdress;
-	fulladdress = genz80.z80_bank_addr + offset;
 
-
-//  mame_printf_debug("z80_write_68k_banked_data %04x %02x\n",offset,data);
-	if ((fulladdress >= 0x000000) && (fulladdress <= 0x3fffff)) // ROM Addresses
-	{
-
-		//mame_printf_debug("z80 write to 68k rom??\n");
-	}
-	else if ((fulladdress >= 0xe00000) && (fulladdress <= 0xffffff)) // ROM Addresses
-	{
-		fulladdress &=0xffff;
-		/* Cheese Cat-Astrophe Starring Speedy Gonzales (E) (M4) [!] has no sound without this */
-		if (fulladdress&1) megadrive_ram[fulladdress>>1] = (megadrive_ram[fulladdress>>1]&0xff00) | (data);
-		else  megadrive_ram[fulladdress>>1] = (megadrive_ram[fulladdress>>1]&0x00ff) | (data <<8);
-	}
-	else if (fulladdress == 0xc00011)
-	{
-		/* quite a few early games write here, most of the later ones don't */
-		sn76496_w(space->machine->device("snsnd"), 0, data);
-	}
-	else
-	{
-
-		//printf("z80 write to 68k address %06x\n",fulladdress);
-	}
-
-}
 
 static READ8_HANDLER( megadriv_z80_vdp_read )
 {
