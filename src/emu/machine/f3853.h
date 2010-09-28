@@ -1,4 +1,4 @@
-/**********************************************************************
+/***************************************************************************
 
     Fairchild F3853 SRAM interface with integrated interrupt
     controller and timer
@@ -6,7 +6,30 @@
     This chip is a timer shift register, basically the same as in the
     F3851.
 
-**********************************************************************/
+****************************************************************************
+                            _____   _____
+                   Vgg   1 |*    \_/     | 40  Vdd
+                   PHI   2 |             | 39  ROMC4
+                 WRITE   3 |             | 38  ROMC3
+              _INT REQ   4 |             | 37  ROMC2
+               _PRI IN   5 |             | 36  ROMC1
+            _RAM WRITE   6 |             | 35  ROMC0
+              _EXT INT   7 |             | 34  CPU READ
+                 ADDR7   8 |             | 33  REG DR
+                 ADDR6   9 |             | 32  ADDR15
+                 ADDR5  10 |    F3853    | 31  ADDR14
+                 ADDR4  11 |             | 30  ADDR13
+                 ADDR3  12 |             | 29  ADDR12
+                 ADDR2  13 |             | 28  ADDR11
+                 ADDR1  14 |             | 27  ADDR10
+                 ADDR0  15 |             | 26  ADDR9
+                   DB0  16 |             | 25  ADDR8
+                   DB1  17 |             | 24  DB7
+                   DB2  18 |             | 23  DB6
+                   DB3  19 |             | 22  DB5
+                   Vss  20 |_____________| 21  DB4
+
+***************************************************************************/
 
 #pragma once
 

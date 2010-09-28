@@ -1878,9 +1878,9 @@ static CPU_EXECUTE( f8 )
 	    break;
 	default:
 	    if (cpustate->w&I && cpustate->irq_request) {
-		ROMC_1C(cpustate, cL);
-		ROMC_0F(cpustate);
-		ROMC_13(cpustate);
+			ROMC_1C(cpustate, cL);
+			ROMC_0F(cpustate);
+			ROMC_13(cpustate);
 	    }
 	    if((op>=0x30)&&(op<=0x3f))	/* SKR - DS is a long cycle inst */
 	    	ROMC_00(cpustate, cL);
@@ -1930,7 +1930,7 @@ static CPU_SET_INFO( f8 )
     	cpustate->pc0 += 1;
 		break;
 	case CPUINFO_INT_PREVIOUSPC:	break;	/* TODO? */
-	case CPUINFO_INT_INPUT_STATE:		cpustate->irq_request = info->i;				break;
+	case CPUINFO_INT_INPUT_STATE + F8_INPUT_LINE_INT_REQ:		cpustate->irq_request = info->i;				break;
 	case CPUINFO_INT_REGISTER + F8_PC0:
 		cpustate->pc0 = info->i;
 		cpustate->dbus = cpustate->direct->read_decrypted_byte(cpustate->pc0);
@@ -2048,7 +2048,7 @@ CPU_GET_INFO( f8 )
 	case CPUINFO_INT_PC:				info->i = (cpustate->pc0 - 1) & 0xffff;	break;
 	case CPUINFO_INT_PREVIOUSPC:		info->i = 0;	/* TODO??? */		break;
 
-	case CPUINFO_INT_INPUT_STATE:			info->i = cpustate->irq_request;			break;
+	case CPUINFO_INT_INPUT_STATE + F8_INPUT_LINE_INT_REQ:			info->i = cpustate->irq_request;			break;
 
 	case CPUINFO_INT_REGISTER + F8_PC0:	info->i = (cpustate->pc0 - 1) & 0xffff;	break;
 	case CPUINFO_INT_REGISTER + F8_PC1: info->i = cpustate->pc1;					break;

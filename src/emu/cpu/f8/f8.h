@@ -43,8 +43,7 @@ enum
         F8_R56, F8_R57, F8_R58, F8_R59, F8_R60, F8_R61, F8_R62, F8_R63
 };
 
-#define F8_INT_NONE  0
-#define F8_INT_INTR  1
+#define F8_INPUT_LINE_INT_REQ	1
 
 DECLARE_LEGACY_CPU_DEVICE(F8, f8);
 
