@@ -2394,7 +2394,7 @@ static WRITE16_HANDLER( _32x_68k_a15112_w )
 
  F = Fifo FULL
  K = 68k CPU Write mode (0 = no, 1 = CPU write)
- 0 = always 0
+ 0 = always 0? no, marsch test wants it to be latched or 1
  R = RV (0 = no operation, 1 = DMA Start allowed)
 
 */
@@ -2417,7 +2417,7 @@ static WRITE16_HANDLER( _32x_68k_a15106_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		a15106_reg = data & 0x5;
+		a15106_reg = data & 0x7;
 
 		//printf("_32x_68k_a15106_w %04x\n", data);
 		/*
@@ -2433,6 +2433,82 @@ static WRITE16_HANDLER( _32x_68k_a15106_w )
 
         */
 	}
+}
+
+static UINT16 dreq_src_addr[2],dreq_dst_addr[2],dreq_size;
+
+static READ16_HANDLER( _32x_68k_a15108_r )
+{
+	return dreq_src_addr[offset];
+}
+
+static WRITE16_HANDLER( _32x_68k_a15108_w )
+{
+	dreq_src_addr[offset] = (offset == 0) ? (data & 0xff) : (data & 0xfffe);
+
+	printf("DREQ set SRC = %08x\n",dreq_src_addr[0]<<16|dreq_src_addr[1]);
+}
+
+static READ16_HANDLER( _32x_68k_a1510c_r )
+{
+	return dreq_dst_addr[offset];
+}
+
+static WRITE16_HANDLER( _32x_68k_a1510c_w )
+{
+	dreq_dst_addr[offset] = (offset == 0) ? (data & 0xff) : (data & 0xffff);
+
+	printf("DREQ set DST = %08x\n",(dreq_dst_addr[0]<<16)|dreq_dst_addr[1]);
+}
+
+static READ16_HANDLER( _32x_68k_a15110_r )
+{
+	return dreq_size;
+}
+
+static WRITE16_HANDLER( _32x_68k_a15110_w )
+{
+	dreq_size = data & 0xfffc;
+
+	printf("DREQ set SIZE = %04x\n",dreq_size);
+}
+
+/*
+a1511a SEGA TV register
+---- ---x Cartridge Mode (0) ROM (1) DRAM
+
+Sega disallows the use of this register
+
+*/
+
+static UINT8 sega_tv;
+
+static READ16_HANDLER( _32x_68k_a1511a_r )
+{
+	return sega_tv;
+}
+
+static WRITE16_HANDLER( _32x_68k_a1511a_w )
+{
+	sega_tv = data & 1;
+
+	printf("SEGA TV register set = %04x\n",data);
+}
+
+/*
+000070 H interrupt vector can be overwritten apparently
+*/
+
+static UINT16 hint_vector[2];
+
+static READ16_HANDLER( _32x_68k_hint_vector_r )
+{
+	return hint_vector[offset];
+}
+
+static WRITE16_HANDLER( _32x_68k_hint_vector_w )
+{
+	hint_vector[offset] = data;
 }
 
 // returns MARS, the system ID of the 32x
@@ -2497,17 +2573,14 @@ static WRITE16_HANDLER( _32x_68k_a15100_w )
 			memory_install_readwrite16_handler(space, 0x0840000, 0x085ffff, 0, 0, _32x_68k_dram_r, _32x_68k_dram_w); // access to 'display ram' (framebuffer)
 			memory_install_readwrite16_handler(space, 0x0860000, 0x087ffff, 0, 0, _32x_68k_dram_overwrite_r, _32x_68k_dram_overwrite_w); // access to 'display ram' (framebuffer)
 
-
-
-
+			memory_install_readwrite16_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x000070, 0x000073, 0, 0, _32x_68k_hint_vector_r, _32x_68k_hint_vector_w); // h interrupt vector
 		}
 		else
 		{
 			_32x_adapter_enabled = 0;
 
 			memory_install_rom(space, 0x0000000, 0x03fffff, 0, 0, memory_region(space->machine, "gamecart"));
-
-
+			memory_install_readwrite16_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x000070, 0x000073, 0, 0, _32x_68k_hint_vector_r, _32x_68k_hint_vector_w); // h interrupt vector
 		}
 	}
 
@@ -2528,14 +2601,14 @@ static int _32x_68k_a15102_reg;
 static READ16_HANDLER( _32x_68k_a15102_r )
 {
 	//printf("_32x_68k_a15102_r\n");
-	return 0x0000;//_32x_68k_a15102_reg;
+	return _32x_68k_a15102_reg;
 }
 
 static WRITE16_HANDLER( _32x_68k_a15102_w )
 {
 	if (ACCESSING_BITS_0_7)
 	{
-		_32x_68k_a15102_reg = data;
+		_32x_68k_a15102_reg = data & 3;
 
 		if (data&0x1)
 		{
@@ -2606,6 +2679,7 @@ static WRITE16_HANDLER( _32x_68k_commsram_w )
 /**********************************************************************************************/
 
 static UINT16 pwm_ctrl,pwm_cycle,pwm_tm_reg;
+static UINT16 pwm_cycle_reg; //used for latching
 static emu_timer *_32x_pwm_timer;
 
 static void calculate_pwm_timer(void)
@@ -2655,12 +2729,12 @@ static WRITE16_HANDLER( _32x_sh2_pwm_control_reg_w )
 
 static READ16_HANDLER( _32x_68k_pwm_cycle_reg_r )
 {
-	return pwm_cycle;
+	return pwm_cycle_reg;
 }
 
 static WRITE16_HANDLER( _32x_68k_pwm_cycle_reg_w )
 {
-	pwm_cycle = data & 0xfff;
+	pwm_cycle = pwm_cycle_reg = data & 0xfff;
 
 	calculate_pwm_timer();
 }
@@ -2891,7 +2965,6 @@ P = PWM Interrupt Mask (0 masked, 1 allowed)
 /**********************************************************************************************/
 
 /* MASTER */
-
 static READ16_HANDLER( _32x_sh2_master_4000_r )
 {
 	UINT16 retvalue = 0x0200;
@@ -2969,7 +3042,6 @@ static WRITE16_HANDLER( _32x_sh2_slave_4000_w )
 // Shouldn't be used
 /**********************************************************************************************/
 
-
 static READ16_HANDLER( _32x_sh2_common_4002_r )
 {
 	printf("reading 4002!\n");
@@ -2987,7 +3059,6 @@ static WRITE16_HANDLER( _32x_sh2_common_4002_w )
 // H Count Register (H Interrupt)
 // 0 = every line
 /**********************************************************************************************/
-
 static UINT16 hcount;
 
 static READ16_HANDLER( _32x_sh2_common_4004_r )
@@ -6613,6 +6684,7 @@ DRIVER_INIT( _32x )
 	if (_32x_adapter_enabled == 0)
 	{
 		memory_install_rom(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0000000, 0x03fffff, 0, 0, memory_region(machine, "gamecart"));
+		memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x000070, 0x000073, 0, 0, _32x_68k_hint_vector_r, _32x_68k_hint_vector_w); // h interrupt vector
 	};
 
 
@@ -6621,16 +6693,18 @@ DRIVER_INIT( _32x )
 	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa15102, 0xa15103, 0, 0, _32x_68k_a15102_r, _32x_68k_a15102_w); // send irq to sh2
 	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa15104, 0xa15105, 0, 0, _32x_68k_a15104_r, _32x_68k_a15104_w); // 68k BANK rom set
 	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa15106, 0xa15107, 0, 0, _32x_68k_a15106_r, _32x_68k_a15106_w); // dreq stuff
-
+	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa15108, 0xa1510b, 0, 0, _32x_68k_a15108_r, _32x_68k_a15108_w); // dreq src address
+	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa1510c, 0xa1510f, 0, 0, _32x_68k_a1510c_r, _32x_68k_a1510c_w); // dreq dst address
+	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa15110, 0xa15111, 0, 0, _32x_68k_a15110_r, _32x_68k_a15110_w); // dreq length
 	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa15112, 0xa15113, 0, 0, _32x_68k_a15112_r, _32x_68k_a15112_w); // fifo
+
+	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa1511a, 0xa1511b, 0, 0, _32x_68k_a1511a_r, _32x_68k_a1511a_w); // SEGA TV
 
 	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa15120, 0xa1512f, 0, 0, _32x_68k_commsram_r, _32x_68k_commsram_w); // comms reg 0-7
 	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa15130, 0xa15131, 0, 0, _32x_68k_pwm_control_reg_r, _32x_68k_pwm_control_reg_w);
 	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa15132, 0xa15133, 0, 0, _32x_68k_pwm_cycle_reg_r, _32x_68k_pwm_cycle_reg_w);
 
 	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0a130ec, 0x0a130ef, 0, 0, _32x_68k_MARS_r); // system ID
-
-
 
 
 	/* Interrupts are masked / disabled at first */
