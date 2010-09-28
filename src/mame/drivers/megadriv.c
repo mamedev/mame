@@ -2988,10 +2988,34 @@ static WRITE16_HANDLER( _32x_sh2_common_4002_w )
 // 0 = every line
 /**********************************************************************************************/
 
+static UINT16 hcount;
+
+static READ16_HANDLER( _32x_sh2_common_4004_r )
+{
+	return hcount;
+}
+
+static WRITE16_HANDLER( _32x_sh2_common_4004_w )
+{
+	hcount = data & 0xff;
+}
+
+
 /**********************************************************************************************/
 // SH2 side 4006
 // DReq Control Register
 /**********************************************************************************************/
+
+static READ16_HANDLER( _32x_sh2_common_4006_r )
+{
+	printf("DREQ read!\n");
+	return 0;
+}
+
+static WRITE16_HANDLER( _32x_sh2_common_4006_w )
+{
+	printf("DREQ write!\n");
+}
 
 /**********************************************************************************************/
 // SH2 side 4008
@@ -3342,6 +3366,9 @@ _32X_MAP_WRITEHANDLERS(master_4000,common_4002) // _32x_sh2_master_4000_common_4
 _32X_MAP_READHANDLERS(slave_4000,common_4002)  // _32x_sh2_slave_4000_common_4002_r
 _32X_MAP_WRITEHANDLERS(slave_4000,common_4002) // _32x_sh2_slave_4000_common_4002_w
 
+_32X_MAP_READHANDLERS(common_4004,common_4006)
+_32X_MAP_WRITEHANDLERS(common_4004,common_4006)
+
 _32X_MAP_WRITEHANDLERS(master_4014,master_4016) // _32x_sh2_master_4014_master_4016_w
 _32X_MAP_WRITEHANDLERS(master_4018,master_401a) // _32x_sh2_master_4018_master_401a_w
 _32X_MAP_WRITEHANDLERS(master_401c,master_401e) // _32x_sh2_master_401c_master_401e_w
@@ -3387,6 +3414,7 @@ static ADDRESS_MAP_START( sh2_main_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x00003fff) AM_ROM
 
 	AM_RANGE(0x00004000, 0x00004003) AM_READWRITE( _32x_sh2_master_4000_common_4002_r, _32x_sh2_master_4000_common_4002_w )
+	AM_RANGE(0x00004004, 0x00004007) AM_READWRITE( _32x_sh2_common_4004_common_4006_r, _32x_sh2_common_4004_common_4006_w)
 
 	AM_RANGE(0x00004010, 0x00004013) AM_READ( _32x_sh2_common_4010_common_4012_r )
 
@@ -3416,6 +3444,7 @@ static ADDRESS_MAP_START( sh2_slave_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00000000, 0x00003fff) AM_ROM
 
 	AM_RANGE(0x00004000, 0x00004003) AM_READWRITE( _32x_sh2_slave_4000_common_4002_r, _32x_sh2_slave_4000_common_4002_w )
+	AM_RANGE(0x00004004, 0x00004007) AM_READWRITE( _32x_sh2_common_4004_common_4006_r, _32x_sh2_common_4004_common_4006_w)
 
 	AM_RANGE(0x00004010, 0x00004013) AM_READ( _32x_sh2_common_4010_common_4012_r )
 
