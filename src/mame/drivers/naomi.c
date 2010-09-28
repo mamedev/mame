@@ -388,6 +388,7 @@ Notes:
 Game                      on cart    IC7#         FLASHROMs   IC2#    IC3#          IC4#    Notes
 -----------------------------------------------------------------------------------------------------------------------
 Touch De Zunou (Rev A)    840-0166C  unpopulated   2 (512Mb)  XC3S50  317-0435-JPN  XCF01S  IC4# is marked "18"
+Mamonoro                  841-0060C  unpopulated   4 (512Mb)  XC3S50  317-5132-JPN  XCF01S  IC2# is labeled "VER.2"
 
 
 
@@ -433,7 +434,7 @@ Notes:
 
 
    Games known to use this PCB include....
-                                  Sticker   FL0-FL3    # of SOP48  IC @ 1F        IC @ 1M
+                                   Sticker   FL0-FL3    # of SOP48  IC @ 1F        IC @ 1M
  Game                              on cart   FLASHROM   FLASHROMs   X76F100        315-5581      Notes
 ---------------------------------------------------------------------------------------------------------------------------------------
 /Shin Nihon Prowrestling                                                                         FL0 & FL1 have pin55 raised from PCB.
