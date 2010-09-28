@@ -151,16 +151,11 @@ static TIMER_CALLBACK( sh2_timer_callback )
 
 
   we're currently doing a)
-  b) seems to cause issues with ST-V games
+  
+  b) causes problems with ST-V games
 
 */
 
-// Fever Soccer requires stupidly fast DMA or the palette gets corrupt due
-// to DMA being cancelled mid-flight.  Are we incorrectly emulating some other register?
-#define DMA_TIMER_STEP (ATTOTIME_IN_NSEC(1))
-// have a bigger delay if no data is available, as it will take some time before there is
-// any, and having such a high frequency timer with no data is not a good idea
-#define DMA_TIMER_STEP_IF_UNAVAILABLE (ATTOTIME_IN_NSEC(1000))
 
 void sh2_do_dma(sh2_state *sh2, int dma)
 {
@@ -170,7 +165,10 @@ void sh2_do_dma(sh2_state *sh2, int dma)
 
 	if (sh2->active_dma_count[dma] > 0)
 	{
-
+#ifdef USE_TIMER_FOR_DMA
+		 //schedule next DMA callback
+		timer_adjust_oneshot(sh2->dma_current_active_timer[dma], sh2->device->cycles_to_attotime(2), dma);
+#endif
 
 		// process current DMA
 		switch(sh2->active_dma_size[dma])
@@ -196,20 +194,9 @@ void sh2_do_dma(sh2_state *sh2, int dma)
 					int available = sh2->dma_callback_fifo_data_available(tempsrc, tempdst, 0, sh2->active_dma_size[dma]);
 	
 					if (!available)
-					{
-						#ifdef USE_TIMER_FOR_DMA
-						//schedule next DMA callback
-						timer_adjust_oneshot(sh2->dma_current_active_timer[dma], DMA_TIMER_STEP_IF_UNAVAILABLE , dma);
-						#endif
 						return;
-					}
-						
 				}
 					
-				#ifdef USE_TIMER_FOR_DMA
-				 //schedule next DMA callback
-				timer_adjust_oneshot(sh2->dma_current_active_timer[dma], DMA_TIMER_STEP , dma);
-				#endif
 
 				dmadata = sh2->program->read_byte(tempsrc);
 				if (sh2->dma_callback_kludge) dmadata = sh2->dma_callback_kludge(tempsrc, tempdst, dmadata, sh2->active_dma_size[dma]);
@@ -246,19 +233,8 @@ void sh2_do_dma(sh2_state *sh2, int dma)
 					int available = sh2->dma_callback_fifo_data_available(tempsrc, tempdst, 0, sh2->active_dma_size[dma]);
 	
 					if (!available)
-					{
-						#ifdef USE_TIMER_FOR_DMA
-						//schedule next DMA callback
-						timer_adjust_oneshot(sh2->dma_current_active_timer[dma], DMA_TIMER_STEP_IF_UNAVAILABLE , dma);
-						#endif
 						return;
-					}
 				}
-
-				#ifdef USE_TIMER_FOR_DMA
-				 //schedule next DMA callback
-				timer_adjust_oneshot(sh2->dma_current_active_timer[dma], DMA_TIMER_STEP , dma);
-				#endif
 
 				// check: should this really be using read_word_32 / write_word_32?
 				dmadata	= sh2->program->read_word(tempsrc);
@@ -295,19 +271,8 @@ void sh2_do_dma(sh2_state *sh2, int dma)
 					int available = sh2->dma_callback_fifo_data_available(tempsrc, tempdst, 0, sh2->active_dma_size[dma]);
 	
 					if (!available)
-					{
-						#ifdef USE_TIMER_FOR_DMA
-						//schedule next DMA callback
-						timer_adjust_oneshot(sh2->dma_current_active_timer[dma], DMA_TIMER_STEP_IF_UNAVAILABLE , dma);
-						#endif
 						return;
-					}
 				}
-
-				#ifdef USE_TIMER_FOR_DMA
-				 //schedule next DMA callback
-				timer_adjust_oneshot(sh2->dma_current_active_timer[dma], DMA_TIMER_STEP , dma);
-				#endif
 
 				dmadata	= sh2->program->read_dword(tempsrc);
 				if (sh2->dma_callback_kludge) dmadata = sh2->dma_callback_kludge(tempsrc, tempdst, dmadata, sh2->active_dma_size[dma]);
@@ -345,12 +310,6 @@ void sh2_do_dma(sh2_state *sh2, int dma)
 						fatalerror("SH2 dma_callback_fifo_data_available == 0 in unsupported mode");
 				}
 
-
-				#ifdef USE_TIMER_FOR_DMA
-				 //schedule next DMA callback
-				timer_adjust_oneshot(sh2->dma_current_active_timer[dma], DMA_TIMER_STEP , dma);
-				#endif
-
 				dmadata = sh2->program->read_dword(tempsrc);
 				if (sh2->dma_callback_kludge) dmadata = sh2->dma_callback_kludge(tempsrc, tempdst, dmadata, sh2->active_dma_size[dma]);
 				sh2->program->write_dword(tempdst, dmadata);
@@ -384,6 +343,13 @@ void sh2_do_dma(sh2_state *sh2, int dma)
 	//	int dma = param & 1;
 	//	sh2_state *sh2 = (sh2_state *)ptr;
 
+		// fever soccer uses cycle-stealing mode, resume the CPU now DMA has finished
+		if (sh2->active_dma_steal[dma])
+		{
+			sh2->device->resume(SUSPEND_REASON_HALT );
+		}
+			
+
 		LOG(("SH2.%s: DMA %d complete\n", sh2->device->tag(), dma));
 		sh2->m[0x63+4*dma] |= 2;
 		sh2->dma_timer_active[dma] = 0;
@@ -411,6 +377,8 @@ static void sh2_dmac_check(sh2_state *sh2, int dma)
 			sh2->active_dma_incd[dma] = (sh2->m[0x63+4*dma] >> 14) & 3;
 			sh2->active_dma_incs[dma] = (sh2->m[0x63+4*dma] >> 12) & 3;
 			sh2->active_dma_size[dma] = (sh2->m[0x63+4*dma] >> 10) & 3;
+			sh2->active_dma_steal[dma] = (sh2->m[0x63+4*dma] &0x10);
+			
 			if(sh2->active_dma_incd[dma] == 3 || sh2->active_dma_incs[dma] == 3)
 			{
 				logerror("SH2: DMA: bad increment values (%d, %d, %d, %04x)\n", sh2->active_dma_incd[dma], sh2->active_dma_incs[dma], sh2->active_dma_size[dma], sh2->m[0x63+4*dma]);
@@ -447,9 +415,21 @@ static void sh2_dmac_check(sh2_state *sh2, int dma)
 				sh2->active_dma_count[dma] &= ~3;
 				break;
 			}
+			
+			
+
+			
 #ifdef USE_TIMER_FOR_DMA
 			// start DMA timer
-			timer_adjust_oneshot(sh2->dma_current_active_timer[dma], attotime_zero, dma);
+			
+			// fever soccer uses cycle-stealing mode, requiring the CPU to be halted
+			if (sh2->active_dma_steal[dma])
+			{
+				//printf("cycle stealing DMA\n");
+				sh2->device->suspend(SUSPEND_REASON_HALT, 1 );
+			}
+			
+			timer_adjust_oneshot(sh2->dma_current_active_timer[dma], sh2->device->cycles_to_attotime(2), dma);
 #endif
 
 		}
