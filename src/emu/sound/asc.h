@@ -39,17 +39,21 @@ enum
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MDRV_ASC_ADD(_tag, _clock, _type) \
+#define MDRV_ASC_ADD(_tag, _clock, _type, _irqf) \
 	MDRV_DEVICE_ADD(_tag, ASC, _clock) \
-	MDRV_ASC_TYPE(_type)
+	MDRV_ASC_TYPE(_type) \
+	MDRV_IRQ_FUNC(_irqf)
 
-#define MDRV_ASC_REPLACE(_tag, _clock, _type) \
+#define MDRV_ASC_REPLACE(_tag, _clock, _type, _irqf) \
 	MDRV_DEVICE_REPLACE(_tag, ASC, _clock) \
-	MDRV_ASC_TYPE(_type)
+	MDRV_ASC_TYPE(_type) \
+	MDRV_IRQ_FUNC(_irqf)
 
 #define MDRV_ASC_TYPE(_type) \
 	asc_device_config::static_set_type(device, _type); \
 
+#define MDRV_IRQ_FUNC(_irqf) \
+	asc_device_config::static_set_irqf(device, _irqf); \
 
 
 //**************************************************************************
@@ -72,16 +76,12 @@ public:
 
 	// inline configuration helpers
 	static void static_set_type(device_config *device, int type);
+	static void static_set_irqf(device_config *device, void (*irqf)(running_device *device, int state));
 
 protected:
-	// device_config overrides
-	virtual const address_space_config *memory_space_config(int spacenum = 0) const;
-
-	// internal state
-	const address_space_config  m_space_config;
-
 	// inline data
-	UINT8						m_type;
+	UINT8			m_type;
+	void (*m_irq_func)(running_device *device, int state);
 };
 
 
@@ -100,6 +100,26 @@ public:
 	void write(UINT16 offset, UINT8 data);
 
 protected:
+	enum
+	{
+		R_VERSION = 0x800,
+		R_MODE,
+		R_CONTROL,
+		R_FIFOMODE,
+		R_FIFOSTAT,
+		R_WTCONTROL,
+		R_VOLUME,
+		R_CLOCK,
+		R_REG8,
+		R_REG9,
+		R_PLAYRECA,
+		R_REGB,
+		R_REGC,
+		R_REGD,
+		R_REGE,
+		R_TEST
+	};
+
 	// device-level overrides
 	virtual void device_start();
 	virtual void device_reset();
@@ -112,12 +132,19 @@ protected:
 	const asc_device_config &m_config;
 
 	UINT8	m_chip_type;
+	void (*m_irq_cb)(running_device *device, int state);
 	sound_stream *m_stream;
 
-	UINT8	fifo_a[0x400];
-	UINT8	fifo_b[0x400];
+	UINT8	m_fifo_a[0x400];
+	UINT8	m_fifo_b[0x400];
 
-	UINT8	regs[0x100];
+	UINT8	m_regs[0x100];
+
+	UINT32	m_phase[4], m_incr[4];
+
+	int	m_fifo_a_rdptr, m_fifo_b_rdptr;
+	int	m_fifo_a_wrptr, m_fifo_b_wrptr;
+	int	m_fifo_a_wrhalf[2], m_fifo_b_wrhalf[2];
 };
 
 
