@@ -2446,7 +2446,8 @@ static WRITE16_HANDLER( _32x_68k_a15108_w )
 {
 	dreq_src_addr[offset] = (offset == 0) ? (data & 0xff) : (data & 0xfffe);
 
-	printf("DREQ set SRC = %08x\n",dreq_src_addr[0]<<16|dreq_src_addr[1]);
+	if((dreq_src_addr[0]<<16)|dreq_src_addr[1])
+		printf("DREQ set SRC = %08x\n",(dreq_src_addr[0]<<16)|dreq_src_addr[1]);
 }
 
 static READ16_HANDLER( _32x_68k_a1510c_r )
@@ -2458,7 +2459,8 @@ static WRITE16_HANDLER( _32x_68k_a1510c_w )
 {
 	dreq_dst_addr[offset] = (offset == 0) ? (data & 0xff) : (data & 0xffff);
 
-	printf("DREQ set DST = %08x\n",(dreq_dst_addr[0]<<16)|dreq_dst_addr[1]);
+	if((dreq_dst_addr[0]<<16)|dreq_dst_addr[1])
+		printf("DREQ set DST = %08x\n",(dreq_dst_addr[0]<<16)|dreq_dst_addr[1]);
 }
 
 static READ16_HANDLER( _32x_68k_a15110_r )
@@ -2470,7 +2472,8 @@ static WRITE16_HANDLER( _32x_68k_a15110_w )
 {
 	dreq_size = data & 0xfffc;
 
-	printf("DREQ set SIZE = %04x\n",dreq_size);
+//	if(dreq_size)
+//		printf("DREQ set SIZE = %04x\n",dreq_size);
 }
 
 /*
@@ -2917,6 +2920,8 @@ static READ16_HANDLER( _32x_68k_a1518a_r )
 	if (hpos>460) megadrive_hblank_flag = 0;
 
 	if (megadrive_hblank_flag) retdata |= 0x4000;
+
+	if (megadrive_vblank_flag && _32x_access_auth) { retdata |= 2; } // framebuffer approval (TODO: condition is unknown at current time)
 
 	if (megadrive_hblank_flag && megadrive_vblank_flag) { retdata |= 0x2000; } // palette approval (TODO: active high or low?)
 
@@ -3489,9 +3494,9 @@ static ADDRESS_MAP_START( sh2_main_map, ADDRESS_SPACE_PROGRAM, 32 )
 
 	AM_RANGE(0x00004010, 0x00004013) AM_READ( _32x_sh2_common_4010_common_4012_r )
 
-	AM_RANGE(0x00004014, 0x00004017) AM_WRITE( _32x_sh2_master_4014_master_4016_w ) // IRQ clear
-	AM_RANGE(0x00004018, 0x0000401b) AM_WRITE( _32x_sh2_master_4018_master_401a_w ) // IRQ clear
-	AM_RANGE(0x0000401c, 0x0000401f) AM_WRITE( _32x_sh2_master_401c_master_401e_w ) // IRQ clear
+	AM_RANGE(0x00004014, 0x00004017) AM_READNOP AM_WRITE( _32x_sh2_master_4014_master_4016_w ) // IRQ clear
+	AM_RANGE(0x00004018, 0x0000401b) AM_READNOP AM_WRITE( _32x_sh2_master_4018_master_401a_w ) // IRQ clear
+	AM_RANGE(0x0000401c, 0x0000401f) AM_READNOP AM_WRITE( _32x_sh2_master_401c_master_401e_w ) // IRQ clear
 
 	AM_RANGE(0x00004020, 0x0000402f) AM_READWRITE( _32x_sh2_commsram_r, _32x_sh2_commsram_w )
 	AM_RANGE(0x00004030, 0x00004033) AM_READWRITE( _32x_sh2_pwm_control_reg_pwm_cycle_reg_r, _32x_sh2_pwm_control_reg_pwm_cycle_reg_w )
