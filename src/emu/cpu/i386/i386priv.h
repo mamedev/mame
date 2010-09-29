@@ -894,10 +894,14 @@ INLINE void BUMP_DI(i386_state *cpustate,int adjustment)
 /***********************************************************************************/
 
 #define READPORT8(port)		    	(cpustate->io->read_byte(port))
-#define READPORT16(port)	    	(cpustate->io->read_word(port))
-#define READPORT32(port)	    	(cpustate->io->read_dword(port))
+#define READPORT16(port)	    	(READPORT8(port) | (READPORT8(port+1) << 8))
+#define READPORT32(port)	    	(READPORT8(port) | (READPORT8(port+1) << 8) | (READPORT8(port+2) << 16) | (READPORT8(port+3) << 24))
 #define WRITEPORT8(port, value)		(cpustate->io->write_byte(port, value))
-#define WRITEPORT16(port, value)	(cpustate->io->write_word(port, value))
-#define WRITEPORT32(port, value)	(cpustate->io->write_dword(port, value))
+#define WRITEPORT16(port, value)	WRITEPORT8(port,value & 0xff); \
+									(WRITEPORT8(port+1,(value >> 8) & 0xff))
+#define WRITEPORT32(port, value)	WRITEPORT8(port,value & 0xff); \
+									(WRITEPORT8(port+1,(value >> 8) & 0xff)); \
+									(WRITEPORT8(port+2,(value >> 16) & 0xff)); \
+									(WRITEPORT8(port+3,(value >> 24) & 0xff))
 
 #endif /* __I386_H__ */
