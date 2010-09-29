@@ -9454,7 +9454,6 @@ Other Sun games
 	DRIVER( carrera )	/* (c) 19?? BS Electronics */
 
 	/* Golden Poker / Potten's Poker / Witch Card hardware */
-	DRIVER( pmpoker )	/* (c) 1981 PlayMan */
 	DRIVER( goldnpkr )	/* (c) 1981 Bonanza */
 	DRIVER( goldnpkb )	/* (c) 1981 Bonanza */
 	DRIVER( pottnpkr )	/* Bootleg */
@@ -9463,21 +9462,19 @@ Other Sun games
 	DRIVER( potnpkrc )	/* Bootleg */
 	DRIVER( potnpkrd )	/* Bootleg */
 	DRIVER( potnpkre )	/* Bootleg */
-	DRIVER( goodluck )	/* Unknown */
-	DRIVER( royale )	/* Unknown */
-	DRIVER( royalea )	/* Unknown */
-	DRIVER( witchcrd )	/* 1991, Video Klein */
+	DRIVER( witchcrd )	/* (c) 1991, Video Klein */
 	DRIVER( witchcda )	/* 1991, Unknown */
 	DRIVER( witchcdb )	/* 1991, Unknown */
 	DRIVER( witchcdc )	/* 1991, Unknown */
 	DRIVER( witchcdd )	/* 1991, Unknown */
 	DRIVER( witchcde )	/* 1994, Unknown */
-	DRIVER( witchcdf )	/* (c) 1991 PlayMan */
-	DRIVER( sloco93 )	/* 1993, Unknown */
-	DRIVER( sloco93a )	/* 1993, Unknown */
-	DRIVER( maverik )	/* 198?, Unknown */
-	DRIVER( brasil89 )	/* 1989, Unknown */
-	DRIVER( poker91 )	/* 1991, Unknown */
+	DRIVER( witchcdf )	/* (c) 1991, PlayMan */
+	DRIVER( witchcdg )	/* (c) 199?, Falcon */
+	DRIVER( witchcdh )	/* (c) 1991, TV Game Elektronik - Proma */
+	DRIVER( witchgme )	/* (c) 1991 Video Klein */
+	DRIVER( falcnwld )	/* 1991, TVG */
+	DRIVER( falcnwlda )	/* (c) 1990, Video Klein */
+	DRIVER( falcnwldb )	/* (c) 1983, Falcon */
 	DRIVER( bsuerte )	/* 1990, Unknown */
 	DRIVER( bsuertea )	/* 1991, Unknown */
 	DRIVER( bsuerteb )	/* 1991, Unknown */
@@ -9500,6 +9497,16 @@ Other Sun games
 	DRIVER( bsuertes )	/* 1991, Unknown */
 	DRIVER( bsuertet )	/* 1991, Unknown */
 	DRIVER( bsuerteu )	/* 1991, Unknown */
+	DRIVER( pmpoker )	/* (c) 1981 PlayMan */
+	DRIVER( goodluck )	/* Unknown */
+	DRIVER( royale )	/* Unknown */
+	DRIVER( royalea )	/* Unknown */
+	DRIVER( sloco93 )	/* 1993, Unknown */
+	DRIVER( sloco93a )	/* 1993, Unknown */
+	DRIVER( maverik )	/* 198?, Unknown */
+	DRIVER( brasil89 )	/* 1989, Unknown */
+	DRIVER( poker91 )	/* 1991, Unknown */
+	DRIVER( genie )		/* (c) 198? Video Fun Games Ltd. */
 
 	/* Cal Omega */
 	DRIVER( comg074 )	/* (c) 1981 Cal Omega Inc. */
@@ -10440,9 +10447,6 @@ Other Sun games
 
 	/* Blitz System Inc. */
 	DRIVER( megadpkr )	/* (c) 1990 Blitz System Inc */
-
-	/* Video Fun Games Ltd. */
-	DRIVER( genie )		/* (c) 198? Video Fun Games Ltd. */
 
 	/* Olympic Video Gaming */
 	DRIVER( hotstuff )
