@@ -2786,8 +2786,9 @@ static WRITE16_HANDLER( _32x_68k_pwm_cycle_reg_w )
 
 static READ16_HANDLER( _32x_68k_a15180_r )
 {
-	printf("_32x_68k_a15180_r (a15180) %04x\n",mem_mask);
-
+//	printf("_32x_68k_a15180_r (a15180) %04x\n",mem_mask);
+	
+	// read needs authorization too I think, undefined behavior otherwise
 	
 	// the flag is inverted compared to the megadrive
 	int ntsc;
@@ -2801,10 +2802,14 @@ static READ16_HANDLER( _32x_68k_a15180_r )
 
 }
 
-static WRITE16_HANDLER( _32x_68k_a15180_w )
+void write_32x_68k_a15180_w_sh2_4100( UINT16 data, UINT16 mem_mask, int source )
 {
-	printf("_32x_68k_a15180_w (a15180) %04x %04x\n",data,mem_mask);
+	printf("_32x_68k_a15180_w (a15180) %04x %04x   source %04x _32x_access_auth %04x\n",data,mem_mask, source, _32x_access_auth);
   
+	// authorization is needed to access vdp registers?
+	// spiderman attempts to write here without authorization and ends up setting the priority regsiter badly
+	if (_32x_access_auth != source )
+		return;
  
 	if (ACCESSING_BITS_0_7)
 	{
@@ -2812,6 +2817,13 @@ static WRITE16_HANDLER( _32x_68k_a15180_w )
 		_32x_240mode   = (data & 0x40) >> 6;
 		_32x_displaymode   = (data & 0x03) >> 0;
 	}
+
+
+}
+
+static WRITE16_HANDLER( _32x_68k_a15180_w )
+{
+	write_32x_68k_a15180_w_sh2_4100( data, mem_mask, 0 );
 }
 
 /**********************************************************************************************/
@@ -3315,6 +3327,8 @@ static WRITE16_HANDLER( _32x_sh2_pwm_cycle_reg_w ) { _32x_68k_pwm_cycle_reg_w(sp
 // Mono Pulse Width Register
 /**********************************************************************************************/
 
+/* 4100 - 43ff are VDP registers, you need permission to access them - ensure this is true for all! */
+
 /**********************************************************************************************/
 // SH2 side 4100
 // Access to Framebuffer control
@@ -3322,7 +3336,7 @@ static WRITE16_HANDLER( _32x_sh2_pwm_cycle_reg_w ) { _32x_68k_pwm_cycle_reg_w(sp
 /**********************************************************************************************/
 
 static READ16_HANDLER( _32x_sh2_common_4100_r ) { return _32x_68k_a15180_r(space,offset,mem_mask); }
-static WRITE16_HANDLER( _32x_sh2_common_4100_w ) { _32x_68k_a15180_w(space,offset,data,mem_mask); }
+static WRITE16_HANDLER( _32x_sh2_common_4100_w ) { write_32x_68k_a15180_w_sh2_4100(data,mem_mask, 1); }
 
 /**********************************************************************************************/
 // SH2 side 4102
@@ -3371,7 +3385,7 @@ static WRITE16_HANDLER( _32x_sh2_common_410a_w ) { _32x_68k_a1518a_w(space,offse
 
 /**********************************************************************************************/
 // SH2 side 4200 - 43ff
-// framebuffer status / control
+// palette
 // maps through to 68k at a15200 - a153ff
 /**********************************************************************************************/
 
