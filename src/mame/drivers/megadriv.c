@@ -2221,19 +2221,8 @@ MACHINE_CONFIG_END
 /**********************************************************************************************/
 
 
-static READ16_HANDLER( _32x_68k_a15180_r );
-static READ16_HANDLER( _32x_68k_a15182_r );
-static READ16_HANDLER( _32x_68k_a15184_r );
-static READ16_HANDLER( _32x_68k_a15186_r );
-static READ16_HANDLER( _32x_68k_a15188_r );
-static READ16_HANDLER( _32x_68k_a1518a_r );
-
-static WRITE16_HANDLER( _32x_68k_a15180_w );
-static WRITE16_HANDLER( _32x_68k_a15182_w );
-static WRITE16_HANDLER( _32x_68k_a15184_w );
-static WRITE16_HANDLER( _32x_68k_a15186_w );
-static WRITE16_HANDLER( _32x_68k_a15188_w );
-static WRITE16_HANDLER( _32x_68k_a1518a_w );
+static READ16_HANDLER( _32x_common_vdp_regs_r );
+static WRITE16_HANDLER( _32x_common_vdp_regs_w );
 
 static UINT16 _32x_autofill_length;
 static UINT16 _32x_autofill_address;
@@ -2598,17 +2587,13 @@ static WRITE16_HANDLER( _32x_68k_a15100_w )
 
 			memory_install_rom(space, 0x0000000, 0x03fffff, 0, 0, memory_region(space->machine, "32x_68k_bios"));
 
-			memory_install_readwrite16_handler(space, 0x0a15180, 0x0a15181, 0, 0, _32x_68k_a15180_r, _32x_68k_a15180_w); // mode control regs
-			memory_install_readwrite16_handler(space, 0x0a15182, 0x0a15183, 0, 0, _32x_68k_a15182_r, _32x_68k_a15182_w); // screen shift
-			memory_install_readwrite16_handler(space, 0x0a15184, 0x0a15185, 0, 0, _32x_68k_a15184_r, _32x_68k_a15184_w); // autofill length reg
-			memory_install_readwrite16_handler(space, 0x0a15186, 0x0a15187, 0, 0, _32x_68k_a15186_r, _32x_68k_a15186_w); // autofill address reg
-			memory_install_readwrite16_handler(space, 0x0a15188, 0x0a15189, 0, 0, _32x_68k_a15188_r, _32x_68k_a15188_w); // autofill data reg / start fill
-			memory_install_readwrite16_handler(space, 0x0a1518a, 0x0a1518b, 0, 0, _32x_68k_a1518a_r, _32x_68k_a1518a_w); // framebuffer control regs
-
+			/* VDP area */
+			memory_install_readwrite16_handler(space, 0x0a15180, 0x0a1518b, 0, 0, _32x_common_vdp_regs_r, _32x_common_vdp_regs_w); // common / shared VDP regs
 			memory_install_readwrite16_handler(space, 0x0a15200, 0x0a153ff, 0, 0, _32x_68k_palette_r, _32x_68k_palette_w); // access to 'palette' xRRRRRGGGGGBBBBB
-
 			memory_install_readwrite16_handler(space, 0x0840000, 0x085ffff, 0, 0, _32x_68k_dram_r, _32x_68k_dram_w); // access to 'display ram' (framebuffer)
 			memory_install_readwrite16_handler(space, 0x0860000, 0x087ffff, 0, 0, _32x_68k_dram_overwrite_r, _32x_68k_dram_overwrite_w); // access to 'display ram' (framebuffer)
+
+
 
 			memory_install_readwrite16_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x000070, 0x000073, 0, 0, _32x_68k_hint_vector_r, _32x_68k_hint_vector_w); // h interrupt vector
 		}
@@ -2784,215 +2769,180 @@ static WRITE16_HANDLER( _32x_68k_pwm_cycle_reg_w )
 // also accessed from the SH2 @ 4100
 /**********************************************************************************************/
 
-static READ16_HANDLER( _32x_68k_a15180_r )
+static UINT16 _32x_a1518a_reg;
+
+static READ16_HANDLER( _32x_common_vdp_regs_r )
 {
+	// what happens if the z80 accesses it, what authorization do we use?
+
+
+
 //	printf("_32x_68k_a15180_r (a15180) %04x\n",mem_mask);
 	
 	// read needs authorization too I think, undefined behavior otherwise
+	switch (offset)
+	{
+		case 0x00:
+		
+		// the flag is inverted compared to the megadrive
+		int ntsc;
+		if (megadrive_region_pal) ntsc = 0;
+		else ntsc = 1;
+
+		return (ntsc << 15) |
+			   (_32x_videopriority << 7 ) |
+			   ( _32x_240mode << 6 ) |
+			   ( _32x_displaymode << 0 );
+			   
 	
-	// the flag is inverted compared to the megadrive
-	int ntsc;
-	if (megadrive_region_pal) ntsc = 0;
-	else ntsc = 1;
+	
+		case 0x02/2:
+			return _32x_screenshift;
+			
+		case 0x04/2:
+			return _32x_autofill_length;
+			
+		case 0x06/2:
+			return _32x_autofill_address;
+			
+		case 0x08/2:
+			return _32x_autofill_data;
+			
+		case 0x0a/2:
+			UINT16 retdata = _32x_a1518a_reg;
+			UINT16 hpos = get_hposition();
+			int megadrive_hblank_flag = 0;
 
-	return (ntsc << 15) |
-	       (_32x_videopriority << 7 ) |
-	       ( _32x_240mode << 6 ) |
-	       ( _32x_displaymode << 0 );
+			if (megadrive_vblank_flag) retdata |= 0x8000;
 
+			if (hpos>400) megadrive_hblank_flag = 1;
+			if (hpos>460) megadrive_hblank_flag = 0;
+
+			if (megadrive_hblank_flag) retdata |= 0x4000;
+
+			if (megadrive_vblank_flag && _32x_access_auth) { retdata |= 2; } // framebuffer approval (TODO: condition is unknown at current time)
+
+			if (megadrive_hblank_flag && megadrive_vblank_flag) { retdata |= 0x2000; } // palette approval (TODO: active high or low?)
+
+			return retdata;
+	}
+	
+	return 0x0000;
 }
 
-void write_32x_68k_a15180_w_sh2_4100( UINT16 data, UINT16 mem_mask, int source )
+
+
+static WRITE16_HANDLER( _32x_common_vdp_regs_w )
 {
-	printf("_32x_68k_a15180_w (a15180) %04x %04x   source %04x _32x_access_auth %04x\n",data,mem_mask, source, _32x_access_auth);
-  
-	// authorization is needed to access vdp registers?
-	// spiderman attempts to write here without authorization and ends up setting the priority regsiter badly
-	if (_32x_access_auth != source )
-		return;
- 
-	if (ACCESSING_BITS_0_7)
+	// what happens if the z80 accesses it, what authorization do we use? which address space do we get?? the z80 *can* write here and to the framebuffer via the window
+	
+	address_space* _68kspace = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+
+	if (space!= _68kspace)
 	{
-		_32x_videopriority = (data & 0x80) >> 7;
-		_32x_240mode   = (data & 0x40) >> 6;
-		_32x_displaymode   = (data & 0x03) >> 0;
+		if (_32x_access_auth!=1)
+			return;
 	}
 
-
-}
-
-static WRITE16_HANDLER( _32x_68k_a15180_w )
-{
-	write_32x_68k_a15180_w_sh2_4100( data, mem_mask, 0 );
-}
-
-/**********************************************************************************************/
-// 68k side a15182
-// screenshift register
-// also accessed from the SH2 @ 4102
-// used to shift 32x framebuffer by 1 pixel
-/**********************************************************************************************/
-
-static READ16_HANDLER( _32x_68k_a15182_r )
-{
-	return _32x_screenshift;
-}
-
-static WRITE16_HANDLER( _32x_68k_a15182_w )
-{
-	if (ACCESSING_BITS_0_7)
+	if (space== _68kspace)
 	{
-		_32x_screenshift = data & 1; // allows 1 pixel shifting
+		if (_32x_access_auth!=0)
+			return;
 	}
-	if (ACCESSING_BITS_8_15)
+		
+	
+	switch (offset)
 	{
+	
+		case 0x00:	
+			printf("_32x_68k_a15180_w (a15180) %04x %04x   source _32x_access_auth %04x\n",data,mem_mask, _32x_access_auth);
+		  	 
+			if (ACCESSING_BITS_0_7)
+			{
+				_32x_videopriority = (data & 0x80) >> 7;
+				_32x_240mode   = (data & 0x40) >> 6;
+				_32x_displaymode   = (data & 0x03) >> 0;
+			}
+			break;
+			
+		case 0x02/2:
+			if (ACCESSING_BITS_0_7)
+			{
+				_32x_screenshift = data & 1; // allows 1 pixel shifting
+			}
+			if (ACCESSING_BITS_8_15)
+			{
 
+			}
+			break;
+			
+		case 0x04/2:
+			if (ACCESSING_BITS_0_7)
+			{
+				_32x_autofill_length = data & 0xff;
+			}
+
+			if (ACCESSING_BITS_8_15)
+			{
+
+			}
+			break;
+			
+		case 0x06/2:
+			if (ACCESSING_BITS_0_7)
+			{
+				_32x_autofill_address = (_32x_autofill_address & 0xff00) | (data & 0x00ff);
+			}
+
+			if (ACCESSING_BITS_8_15)
+			{
+				_32x_autofill_address = (_32x_autofill_address & 0x00ff) | (data & 0xff00);
+			}
+			break;
+			
+		case 0x08/2:
+			if (ACCESSING_BITS_0_7)
+			{
+				_32x_autofill_data = (_32x_autofill_data & 0xff00) | (data & 0x00ff);
+			}
+
+			if (ACCESSING_BITS_8_15)
+			{
+				_32x_autofill_data = (_32x_autofill_data & 0x00ff) | (data & 0xff00);
+			}
+
+			// do the fill - shouldn't be instant..
+			{
+				int i;
+				for (i=0; i<_32x_autofill_length+1;i++)
+				{
+					_32x_access_dram[_32x_autofill_address] = _32x_autofill_data;
+					_32x_autofill_address = (_32x_autofill_address & 0xff00) | ((_32x_autofill_address+1) & 0x00ff);
+				}
+			}
+			break;
+			
+		case 0x0a/2:
+			// bit 0 is the framebuffer select;
+			_32x_a1518a_reg = (_32x_a1518a_reg & 0xfffe) | (data & 1);
+
+			if (_32x_a1518a_reg & 1)
+			{
+				_32x_access_dram = _32x_dram0;
+				_32x_display_dram = _32x_dram1;
+			}
+			else
+			{
+				_32x_display_dram = _32x_dram0;
+				_32x_access_dram = _32x_dram1;
+			}
+			break;
+		
+	
 	}
+	
+	
 }
-
-/**********************************************************************************************/
-// 68k side a15184
-// autofill length
-// also accessed from the SH2 @ 4104
-/**********************************************************************************************/
-
-
-static READ16_HANDLER( _32x_68k_a15184_r )
-{
-	return _32x_autofill_length;
-}
-
-static WRITE16_HANDLER( _32x_68k_a15184_w )
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		_32x_autofill_length = data & 0xff;
-	}
-
-	if (ACCESSING_BITS_8_15)
-	{
-
-	}
-}
-
-/**********************************************************************************************/
-// 68k side a15186
-// auto fill addres
-// also accessed from the SH2 @ 4106
-/**********************************************************************************************/
-
-
-static READ16_HANDLER( _32x_68k_a15186_r )
-{
-	return _32x_autofill_address;
-}
-
-static WRITE16_HANDLER( _32x_68k_a15186_w )
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		_32x_autofill_address = (_32x_autofill_address & 0xff00) | (data & 0x00ff);
-	}
-
-	if (ACCESSING_BITS_8_15)
-	{
-		_32x_autofill_address = (_32x_autofill_address & 0x00ff) | (data & 0xff00);
-	}
-}
-
-/**********************************************************************************************/
-// 68k side a15188
-// auto fill data (start command)
-// also accessed from the SH2 @ 4108
-/**********************************************************************************************/
-
-
-static READ16_HANDLER( _32x_68k_a15188_r )
-{
-	return _32x_autofill_data;
-}
-
-static WRITE16_HANDLER( _32x_68k_a15188_w )
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		_32x_autofill_data = (_32x_autofill_data & 0xff00) | (data & 0x00ff);
-	}
-
-	if (ACCESSING_BITS_8_15)
-	{
-		_32x_autofill_data = (_32x_autofill_data & 0x00ff) | (data & 0xff00);
-	}
-
-	// do the fill - shouldn't be instant..
-	{
-		int i;
-		for (i=0; i<_32x_autofill_length+1;i++)
-		{
-			_32x_access_dram[_32x_autofill_address] = _32x_autofill_data;
-			_32x_autofill_address = (_32x_autofill_address & 0xff00) | ((_32x_autofill_address+1) & 0x00ff);
-		}
-	}
-}
-
-
-/**********************************************************************************************/
-// 68k side a1518a
-// framebuffer status / control
-// also accessed from the SH2 @ 410A
-
-/*
-vhp- ---- ---- --fb
-
-v = 1=vblank   r/o
-h = 1=hblank   r/o
-p = 0=palette access approval   r/o
-- = unused
-f = 0=MD framebuffer access, 1 = SH2   r/o
-b = 0=DRAM0 accessed by VDP, 1=DRAM1   r/w
-
-*/
-
-/**********************************************************************************************/
-
-static UINT16 _32x_a1518a_reg;
-static READ16_HANDLER( _32x_68k_a1518a_r )
-{
-	UINT16 retdata = _32x_a1518a_reg;
-	UINT16 hpos = get_hposition();
-	int megadrive_hblank_flag = 0;
-
-	if (megadrive_vblank_flag) retdata |= 0x8000;
-
-	if (hpos>400) megadrive_hblank_flag = 1;
-	if (hpos>460) megadrive_hblank_flag = 0;
-
-	if (megadrive_hblank_flag) retdata |= 0x4000;
-
-	if (megadrive_vblank_flag && _32x_access_auth) { retdata |= 2; } // framebuffer approval (TODO: condition is unknown at current time)
-
-	if (megadrive_hblank_flag && megadrive_vblank_flag) { retdata |= 0x2000; } // palette approval (TODO: active high or low?)
-
-	return retdata;
-}
-
-static WRITE16_HANDLER( _32x_68k_a1518a_w )
-{
-	// bit 0 is the framebuffer select;
-	_32x_a1518a_reg = (_32x_a1518a_reg & 0xfffe) | (data & 1);
-
-	if (_32x_a1518a_reg & 1)
-	{
-		_32x_access_dram = _32x_dram0;
-		_32x_display_dram = _32x_dram1;
-	}
-	else
-	{
-		_32x_display_dram = _32x_dram0;
-		_32x_access_dram = _32x_dram1;
-	}
-}
-
 
 
 /**********************************************************************************************/
@@ -3330,60 +3280,6 @@ static WRITE16_HANDLER( _32x_sh2_pwm_cycle_reg_w ) { _32x_68k_pwm_cycle_reg_w(sp
 /* 4100 - 43ff are VDP registers, you need permission to access them - ensure this is true for all! */
 
 /**********************************************************************************************/
-// SH2 side 4100
-// Access to Framebuffer control
-// maps through to 68k at a15180
-/**********************************************************************************************/
-
-static READ16_HANDLER( _32x_sh2_common_4100_r ) { return _32x_68k_a15180_r(space,offset,mem_mask); }
-static WRITE16_HANDLER( _32x_sh2_common_4100_w ) { write_32x_68k_a15180_w_sh2_4100(data,mem_mask, 1); }
-
-/**********************************************************************************************/
-// SH2 side 4102
-// Screenshift register
-// maps through to 68k at a15182
-/**********************************************************************************************/
-
-static READ16_HANDLER( _32x_sh2_common_4102_r ) { return _32x_68k_a15182_r(space,offset,mem_mask); }
-static WRITE16_HANDLER( _32x_sh2_common_4102_w ) { _32x_68k_a15182_w(space,offset,data,mem_mask); }
-
-/**********************************************************************************************/
-// SH2 side 4104
-// autofill length
-// maps through to 68k at a15184
-/**********************************************************************************************/
-
-static READ16_HANDLER( _32x_sh2_common_4104_r ) { return _32x_68k_a15184_r(space,offset,mem_mask); }
-static WRITE16_HANDLER( _32x_sh2_common_4104_w ) { _32x_68k_a15184_w(space,offset,data,mem_mask); }
-
-/**********************************************************************************************/
-// SH2 side 4106
-// autofill address
-// maps through to 68k at a15186
-/**********************************************************************************************/
-
-static READ16_HANDLER( _32x_sh2_common_4106_r ) { return _32x_68k_a15186_r(space,offset,mem_mask); }
-static WRITE16_HANDLER( _32x_sh2_common_4106_w ) { _32x_68k_a15186_w(space,offset,data,mem_mask); }
-
-/**********************************************************************************************/
-// SH2 side 4108
-// autofill start
-// maps through to 68k at a15188
-/**********************************************************************************************/
-
-static READ16_HANDLER( _32x_sh2_common_4108_r ) { return _32x_68k_a15188_r(space,offset,mem_mask); }
-static WRITE16_HANDLER( _32x_sh2_common_4108_w ) { _32x_68k_a15188_w(space,offset,data,mem_mask); }
-
-/**********************************************************************************************/
-// SH2 side 410a
-// framebuffer status / control
-// maps through to 68k at a1518a
-/**********************************************************************************************/
-
-static READ16_HANDLER( _32x_sh2_common_410a_r ) { return _32x_68k_a1518a_r(space,offset,mem_mask); }
-static WRITE16_HANDLER( _32x_sh2_common_410a_w ) { _32x_68k_a1518a_w(space,offset,data,mem_mask); }
-
-/**********************************************************************************************/
 // SH2 side 4200 - 43ff
 // palette
 // maps through to 68k at a15200 - a153ff
@@ -3516,16 +3412,6 @@ _32X_MAP_WRITEHANDLERS(pwm_control_reg,pwm_cycle_reg)
 
 _32X_MAP_READHANDLERS(common_4010,common_4012)
 
-_32X_MAP_READHANDLERS(common_4100,common_4102) // _32x_sh2_common_4100_common_4102_r
-_32X_MAP_WRITEHANDLERS(common_4100,common_4102) // _32x_sh2_common_4100_common_4102_w
-
-
-_32X_MAP_READHANDLERS(common_4104,common_4106) // _32x_sh2_common_4104_common_4106_r
-_32X_MAP_WRITEHANDLERS(common_4104,common_4106) // _32x_sh2_common_4104_common_4106_w
-
-_32X_MAP_READHANDLERS(common_4108,common_410a) // _32x_sh2_common_4108_common_410a_r
-_32X_MAP_WRITEHANDLERS(common_4108,common_410a) // _32x_sh2_common_4108_common_410a_w
-
 
 _32X_MAP_RAM_READHANDLERS(framebuffer_dram) // _32x_sh2_framebuffer_dram_r
 _32X_MAP_RAM_WRITEHANDLERS(framebuffer_dram) // _32x_sh2_framebuffer_dram_w
@@ -3557,9 +3443,7 @@ static ADDRESS_MAP_START( sh2_main_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00004030, 0x00004033) AM_READWRITE( _32x_sh2_pwm_control_reg_pwm_cycle_reg_r, _32x_sh2_pwm_control_reg_pwm_cycle_reg_w )
 	AM_RANGE(0x00004034, 0x0000403f) AM_NOP
 
-	AM_RANGE(0x00004100, 0x00004103) AM_READWRITE( _32x_sh2_common_4100_common_4102_r, _32x_sh2_common_4100_common_4102_w )
-	AM_RANGE(0x00004104, 0x00004107) AM_READWRITE( _32x_sh2_common_4104_common_4106_r, _32x_sh2_common_4104_common_4106_w )
-	AM_RANGE(0x00004108, 0x0000410b) AM_READWRITE( _32x_sh2_common_4108_common_410a_r, _32x_sh2_common_4108_common_410a_w )
+	AM_RANGE(0x00004100, 0x0000410b) AM_READWRITE16( _32x_common_vdp_regs_r, _32x_common_vdp_regs_w , 0xffffffff)
 	AM_RANGE(0x00004200, 0x000043ff) AM_READWRITE( _32x_sh2_paletteram_r, _32x_sh2_paletteram_w)
 
 	AM_RANGE(0x04000000, 0x0401ffff) AM_READWRITE(_32x_sh2_framebuffer_dram_r, _32x_sh2_framebuffer_dram_w)
@@ -3589,9 +3473,7 @@ static ADDRESS_MAP_START( sh2_slave_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00004030, 0x00004033) AM_READWRITE( _32x_sh2_pwm_control_reg_pwm_cycle_reg_r, _32x_sh2_pwm_control_reg_pwm_cycle_reg_w )
 	AM_RANGE(0x00004034, 0x0000403f) AM_NOP
 
-	AM_RANGE(0x00004100, 0x00004103) AM_READWRITE( _32x_sh2_common_4100_common_4102_r, _32x_sh2_common_4100_common_4102_w )
-	AM_RANGE(0x00004104, 0x00004107) AM_READWRITE( _32x_sh2_common_4104_common_4106_r, _32x_sh2_common_4104_common_4106_w )
-	AM_RANGE(0x00004108, 0x0000410b) AM_READWRITE( _32x_sh2_common_4108_common_410a_r, _32x_sh2_common_4108_common_410a_w )
+	AM_RANGE(0x00004100, 0x0000410b) AM_READWRITE16( _32x_common_vdp_regs_r, _32x_common_vdp_regs_w , 0xffffffff)
 	AM_RANGE(0x00004200, 0x000043ff) AM_READWRITE(_32x_sh2_paletteram_r, _32x_sh2_paletteram_w)
 
 	AM_RANGE(0x04000000, 0x0401ffff) AM_READWRITE(_32x_sh2_framebuffer_dram_r, _32x_sh2_framebuffer_dram_w)
