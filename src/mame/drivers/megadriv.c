@@ -622,12 +622,16 @@ static UINT16 vdp_get_word_from_68k_mem_default(running_machine *machine, UINT32
 {
 	// should we limit the valid areas here?
 	// how does this behave with the segacd etc?
-	// svp uses it's own function elsewhere...
 	// note, the RV bit on 32x is important for this to work, because it causes a normal cart mapping - see tempo
 	address_space *space68k = machine->device<legacy_cpu_device>("maincpu")->space();
 
 	if (( source >= 0x000000 ) && ( source <= 0x3fffff ))
 	{
+		if (_svp_cpu != NULL)
+		{
+			source -= 2; // the SVP introduces some kind of DMA 'lag', which we have to compensate for, this is obvious even on gfx DMAd from ROM (the Speedometer)
+		}
+	
 		return space68k->read_word(source);
 	}
 	else if (( source >= 0xe00000 ) && ( source <= 0xffffff ))
@@ -3893,33 +3897,6 @@ static ADDRESS_MAP_START( svp_ext_map, ADDRESS_SPACE_IO, 16 )
 ADDRESS_MAP_END
 
 
-/* DMA read function for SVP */
-static UINT16 vdp_get_word_from_68k_mem_svp(running_machine *machine, UINT32 source)
-{
-	if ((source & 0xe00000) == 0x000000)
-	{
-		UINT16 *rom = (UINT16*)memory_region(machine, "maincpu");
-		source -= 2; // DMA latency
-		return rom[source >> 1];
-	}
-	else if ((source & 0xfe0000) == 0x300000)
-	{
-		UINT16 *dram = (UINT16*)svp.dram;
-		source &= 0x1fffe;
-		source -= 2;
-		return dram[source >> 1];
-	}
-	else if ((source & 0xe00000) == 0xe00000)
-	{
-		return megadrive_ram[(source&0xffff)>>1];
-	}
-	else
-	{
-		mame_printf_debug("DMA Read unmapped %06x\n",source);
-		return mame_rand(machine);
-	}
-}
-
 /* emulate testmode plug */
 static UINT8 megadrive_io_read_data_port_svp(running_machine *machine, int portnum)
 {
@@ -3960,7 +3937,6 @@ static void svp_init(running_machine *machine)
 	ROM = memory_region(machine, "maincpu");
 	memory_set_bankptr(machine,  "bank4", ROM + 0x800 );
 
-	vdp_get_word_from_68k_mem = vdp_get_word_from_68k_mem_svp;
 	megadrive_io_read_data_port_ptr	= megadrive_io_read_data_port_svp;
 }
 
