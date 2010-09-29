@@ -117,6 +117,11 @@ static int sh2_master_cmdint_enable, sh2_slave_cmdint_enable;
 static int sh2_master_pwmint_enable, sh2_slave_pwmint_enable;
 static int sh2_hint_in_vbl;
 
+static int sh2_master_vint_pending;
+static int sh2_slave_vint_pending;
+
+void _32x_check_irqs(running_machine* machine);
+
 #define SH2_VRES_IRQ_LEVEL 14
 #define SH2_VINT_IRQ_LEVEL 12
 #define SH2_HINT_IRQ_LEVEL 10
@@ -2643,11 +2648,13 @@ static WRITE16_HANDLER( _32x_68k_a15102_w )
 		if (data&0x1)
 		{
 			if (sh2_master_cmdint_enable) cpu_set_input_line(_32x_master_cpu,SH2_CINT_IRQ_LEVEL,ASSERT_LINE);
+			else printf("master cmdint when masked!\n");
 		}
 
 		if (data&0x2)
 		{
 			if (sh2_slave_cmdint_enable) cpu_set_input_line(_32x_slave_cpu,SH2_CINT_IRQ_LEVEL,ASSERT_LINE);
+			else printf("slave cmdint when masked!\n");
 		}
 	}
 }
@@ -3028,6 +3035,8 @@ static WRITE16_HANDLER( _32x_sh2_master_4000_w )
 
 		if (sh2_master_hint_enable) printf("sh2_master_hint_enable enable!\n");
 		//if (sh2_master_pwmint_enable) printf("sh2_master_pwn_enable enable!\n");
+		
+		_32x_check_irqs(space->machine);
 	}
 }
 
@@ -3064,6 +3073,8 @@ static WRITE16_HANDLER( _32x_sh2_slave_4000_w )
 
 		if (sh2_slave_hint_enable) printf("sh2_slave_hint_enable enable!\n");
 		//if (sh2_slave_pwmint_enable) printf("sh2_slave_pwm_enable enable!\n");
+
+		_32x_check_irqs(space->machine);
 
 	}
 }
@@ -3217,8 +3228,8 @@ static WRITE16_HANDLER( _32x_sh2_slave_4014_w ) { cpu_set_input_line(_32x_slave_
 // VINT (vertical interrupt) clear
 /**********************************************************************************************/
 
-static WRITE16_HANDLER( _32x_sh2_master_4016_w ){cpu_set_input_line(_32x_master_cpu,SH2_VINT_IRQ_LEVEL,CLEAR_LINE);}
-static WRITE16_HANDLER( _32x_sh2_slave_4016_w ) { cpu_set_input_line(_32x_slave_cpu, SH2_VINT_IRQ_LEVEL,CLEAR_LINE);}
+static WRITE16_HANDLER( _32x_sh2_master_4016_w ){ sh2_master_vint_pending = 0; _32x_check_irqs(space->machine); }
+static WRITE16_HANDLER( _32x_sh2_slave_4016_w ) { sh2_slave_vint_pending = 0; _32x_check_irqs(space->machine); }
 
 /**********************************************************************************************/
 // SH2 side 4018
@@ -5876,6 +5887,16 @@ static TIMER_DEVICE_CALLBACK( render_timer_callback )
 	}
 }
 
+void _32x_check_irqs(running_machine* machine)
+{
+
+	if (sh2_master_vint_enable && sh2_master_vint_pending) cpu_set_input_line(_32x_master_cpu,SH2_VINT_IRQ_LEVEL,ASSERT_LINE);
+	else cpu_set_input_line(_32x_master_cpu,SH2_VINT_IRQ_LEVEL,CLEAR_LINE);
+
+	if (sh2_slave_vint_enable && sh2_slave_vint_pending) cpu_set_input_line(_32x_slave_cpu,SH2_VINT_IRQ_LEVEL,ASSERT_LINE);
+	else cpu_set_input_line(_32x_slave_cpu,SH2_VINT_IRQ_LEVEL,CLEAR_LINE);	
+}
+
 
 static TIMER_DEVICE_CALLBACK( scanline_timer_callback )
 {
@@ -5908,8 +5929,9 @@ static TIMER_DEVICE_CALLBACK( scanline_timer_callback )
 			// 32x interrupt!
 			if (_32x_is_connected)
 			{
-				if (sh2_master_vint_enable) cpu_set_input_line(_32x_master_cpu,SH2_VINT_IRQ_LEVEL,ASSERT_LINE);
-				if (sh2_slave_vint_enable) cpu_set_input_line(_32x_slave_cpu,SH2_VINT_IRQ_LEVEL,ASSERT_LINE);
+				sh2_master_vint_pending = 1;		
+				sh2_slave_vint_pending = 1;
+				_32x_check_irqs(timer.machine);			
 			}
 
 		}
@@ -6721,6 +6743,7 @@ DRIVER_INIT( _32x )
 	sh2_master_hint_enable = sh2_slave_hint_enable = 0;
 	sh2_master_cmdint_enable = sh2_slave_cmdint_enable = 0;
 	sh2_master_pwmint_enable = sh2_slave_pwmint_enable = 0;
+	sh2_master_vint_pending = sh2_slave_vint_pending = 0;
 
 	// start in a reset state
 	sh2_are_running = 0;
