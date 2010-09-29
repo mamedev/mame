@@ -106,6 +106,7 @@ static void sh2_timer_activate(sh2_state *sh2)
 	}
 }
 
+
 static TIMER_CALLBACK( sh2_timer_callback )
 {
 	sh2_state *sh2 = (sh2_state *)ptr;
@@ -157,6 +158,26 @@ static TIMER_CALLBACK( sh2_timer_callback )
 */
 
 
+
+void sh2_notify_dma_data_available(running_device *device)
+{
+	sh2_state *sh2 = GET_SH2(device);
+	//printf("call notify\n");
+	
+	for (int dma=0;dma<2;dma++)
+	{
+		//printf("sh2->dma_timer_active[dma] %04x\n",sh2->dma_timer_active[dma]);
+		
+		if (sh2->dma_timer_active[dma]==2) // 2 = stalled
+		{
+		//	printf("resuming stalled dma\n");
+			sh2->dma_timer_active[dma]=1;
+			timer_adjust_oneshot(sh2->dma_current_active_timer[dma], attotime_zero, dma);
+		}		
+	}
+
+}
+
 void sh2_do_dma(sh2_state *sh2, int dma)
 {
 	UINT32 dmadata;
@@ -165,10 +186,7 @@ void sh2_do_dma(sh2_state *sh2, int dma)
 
 	if (sh2->active_dma_count[dma] > 0)
 	{
-#ifdef USE_TIMER_FOR_DMA
-		 //schedule next DMA callback
-		timer_adjust_oneshot(sh2->dma_current_active_timer[dma], sh2->device->cycles_to_attotime(2), dma);
-#endif
+
 
 		// process current DMA
 		switch(sh2->active_dma_size[dma])
@@ -194,9 +212,18 @@ void sh2_do_dma(sh2_state *sh2, int dma)
 					int available = sh2->dma_callback_fifo_data_available(tempsrc, tempdst, 0, sh2->active_dma_size[dma]);
 	
 					if (!available)
+					{
+						//printf("dma stalled\n");
+						sh2->dma_timer_active[dma]=2;// mark as stalled
 						return;
+					}
 				}
-					
+			
+				#ifdef USE_TIMER_FOR_DMA
+				 //schedule next DMA callback
+				timer_adjust_oneshot(sh2->dma_current_active_timer[dma], sh2->device->cycles_to_attotime(2), dma);
+				#endif
+		
 
 				dmadata = sh2->program->read_byte(tempsrc);
 				if (sh2->dma_callback_kludge) dmadata = sh2->dma_callback_kludge(tempsrc, tempdst, dmadata, sh2->active_dma_size[dma]);
@@ -233,8 +260,17 @@ void sh2_do_dma(sh2_state *sh2, int dma)
 					int available = sh2->dma_callback_fifo_data_available(tempsrc, tempdst, 0, sh2->active_dma_size[dma]);
 	
 					if (!available)
+					{
+						//printf("dma stalled\n");
+						sh2->dma_timer_active[dma]=2;// mark as stalled
 						return;
+					}
 				}
+
+				#ifdef USE_TIMER_FOR_DMA
+				 //schedule next DMA callback
+				timer_adjust_oneshot(sh2->dma_current_active_timer[dma], sh2->device->cycles_to_attotime(2), dma);
+				#endif
 
 				// check: should this really be using read_word_32 / write_word_32?
 				dmadata	= sh2->program->read_word(tempsrc);
@@ -271,8 +307,17 @@ void sh2_do_dma(sh2_state *sh2, int dma)
 					int available = sh2->dma_callback_fifo_data_available(tempsrc, tempdst, 0, sh2->active_dma_size[dma]);
 	
 					if (!available)
+					{
+						//printf("dma stalled\n");
+						sh2->dma_timer_active[dma]=2;// mark as stalled
 						return;
+					}
 				}
+
+				#ifdef USE_TIMER_FOR_DMA
+				 //schedule next DMA callback
+				timer_adjust_oneshot(sh2->dma_current_active_timer[dma], sh2->device->cycles_to_attotime(2), dma);
+				#endif
 
 				dmadata	= sh2->program->read_dword(tempsrc);
 				if (sh2->dma_callback_kludge) dmadata = sh2->dma_callback_kludge(tempsrc, tempdst, dmadata, sh2->active_dma_size[dma]);
@@ -307,8 +352,17 @@ void sh2_do_dma(sh2_state *sh2, int dma)
 					int available = sh2->dma_callback_fifo_data_available(tempsrc, tempdst, 0, sh2->active_dma_size[dma]);
 	
 					if (!available)
+					{
+						//printf("dma stalled\n");
+						sh2->dma_timer_active[dma]=2;// mark as stalled
 						fatalerror("SH2 dma_callback_fifo_data_available == 0 in unsupported mode");
+					}
 				}
+
+				#ifdef USE_TIMER_FOR_DMA
+				 //schedule next DMA callback
+				timer_adjust_oneshot(sh2->dma_current_active_timer[dma], sh2->device->cycles_to_attotime(2), dma);
+				#endif
 
 				dmadata = sh2->program->read_dword(tempsrc);
 				if (sh2->dma_callback_kludge) dmadata = sh2->dma_callback_kludge(tempsrc, tempdst, dmadata, sh2->active_dma_size[dma]);

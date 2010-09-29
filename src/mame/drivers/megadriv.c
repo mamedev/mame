@@ -75,6 +75,7 @@ On SegaC2 the VDP never turns on the IRQ6 enable register
 #include "cpu/m68000/m68000.h"
 #include "includes/megadriv.h"
 #include "cpu/sh2/sh2.h"
+#include "cpu/sh2/sh2comn.h"
 
 #define MEGADRIV_VDP_VRAM(address) megadrive_vdp_vram[(address)&0x7fff]
 
@@ -621,19 +622,17 @@ static UINT16 vdp_get_word_from_68k_mem_default(running_machine *machine, UINT32
 {
 	// should we limit the valid areas here?
 	// how does this behave with the segacd etc?
-	// with the 32x it seems to see the raw cart? - using 68k space causes the character to vanish
 	// svp uses it's own function elsewhere...
+	// note, the RV bit on 32x is important for this to work, because it causes a normal cart mapping - see tempo
+	address_space *space68k = machine->device<legacy_cpu_device>("maincpu")->space();
 
 	if (( source >= 0x000000 ) && ( source <= 0x3fffff ))
 	{
-		UINT16 *rom = (UINT16*)memory_region(machine, "maincpu");
-		return rom[(source&0x3fffff)>>1];
+		return space68k->read_word(source);
 	}
 	else if (( source >= 0xe00000 ) && ( source <= 0xffffff ))
 	{
-//      mame_printf_debug("dma\n");
-	//  return ((megadrive_ram[(source&0xffff)>>1]&0xff00)>>8)|((megadrive_ram[(source&0xffff)>>1]&0x00ff)<<8);
-		return megadrive_ram[(source&0xffff)>>1];
+		return space68k->read_word(source);
 	}
 	else
 	{
@@ -2366,6 +2365,10 @@ static WRITE16_HANDLER( _32x_68k_a15112_w )
 			{
 				current_fifo_block = fifo_block_b;
 				current_fifo_readblock = fifo_block_a;
+				// incase we have a stalled DMA in progress, let the SH2 know there is data available
+				sh2_notify_dma_data_available(space->machine->device("32x_master_sh2"));
+				sh2_notify_dma_data_available(space->machine->device("32x_slave_sh2"));
+				
 			}
 			current_fifo_write_pos = 0;
 		}
@@ -2377,6 +2380,10 @@ static WRITE16_HANDLER( _32x_68k_a15112_w )
 			{
 				current_fifo_block = fifo_block_a;
 				current_fifo_readblock = fifo_block_b;
+				// incase we have a stalled DMA in progress, let the SH2 know there is data available
+				sh2_notify_dma_data_available(space->machine->device("32x_master_sh2"));
+				sh2_notify_dma_data_available(space->machine->device("32x_slave_sh2"));
+
 			}
 
 			current_fifo_write_pos = 0;
@@ -2395,7 +2402,7 @@ static WRITE16_HANDLER( _32x_68k_a15112_w )
  F = Fifo FULL
  K = 68k CPU Write mode (0 = no, 1 = CPU write)
  0 = always 0? no, marsch test wants it to be latched or 1
- R = RV (0 = no operation, 1 = DMA Start allowed)
+ R = RV (0 = no operation, 1 = DMA Start allowed) <-- RV bit actually affects memory mapping, this is misleading..  it just sets the memory up in a suitable way to use the genesis VDP DMA
 
 */
 
@@ -2420,8 +2427,21 @@ static WRITE16_HANDLER( _32x_68k_a15106_w )
 		a15106_reg = data & 0x7;
 
         if (a15106_reg & 0x1) /* NBA Jam TE relies on this */
+		{
+			
+			// install the game rom in the normal 0x000000-0x03fffff space used by the genesis - this allows VDP DMA operations to work as they have to be from this area or RAM
+			// it should also UNMAP the banked rom area...
 			memory_install_rom(space, 0x0000100, 0x03fffff, 0, 0, memory_region(space->machine, "gamecart") + 0x100);
-
+		}
+		else
+		{
+			// we should be careful and map back any rom overlay (hint) and backup ram too I think...
+			
+			// this is actually blank / nop area
+			// we should also map the banked area back (we don't currently unmap it tho)
+			memory_install_rom(space, 0x0000100, 0x03fffff, 0, 0, memory_region(space->machine, "maincpu")+0x100);
+		}
+		
 		//printf("_32x_68k_a15106_w %04x\n", data);
 		/*
         if (a15106_reg & 0x4)
@@ -3087,7 +3107,7 @@ static WRITE16_HANDLER( _32x_sh2_common_4004_w )
 
 static READ16_HANDLER( _32x_sh2_common_4006_r )
 {
-	printf("DREQ read!\n");
+	//printf("DREQ read!\n"); // tempo reads it, shut up for now
 	return 0;
 }
 
@@ -6810,7 +6830,6 @@ ROM_START( 32x_bios )
 
 	ROM_REGION16_BE( 0x400000, "maincpu", ROMREGION_ERASE00 )
 	// temp, rom should only be visible here when one of the regs is set, tempo needs it
-	ROM_COPY( "gamecart", 0x0, 0x0, 0x400000)
 	ROM_COPY( "32x_68k_bios", 0x0, 0x0, 0x100)
 
 	ROM_REGION( 0x400000, "32x_master_sh2", 0 ) /* SH2 Code */
