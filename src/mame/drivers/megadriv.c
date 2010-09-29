@@ -105,6 +105,8 @@ static int _32x_adapter_enabled;
 static int _32x_access_auth;
 static int _32x_screenshift;
 static int _32x_videopriority;
+static int _32x_videopriority_alt;
+
 static int _32x_displaymode;
 static int _32x_240mode;
 
@@ -2784,6 +2786,9 @@ static WRITE16_HANDLER( _32x_68k_pwm_cycle_reg_w )
 
 static READ16_HANDLER( _32x_68k_a15180_r )
 {
+	printf("_32x_68k_a15180_r (a15180) %04x\n",mem_mask);
+
+	
 	// the flag is inverted compared to the megadrive
 	int ntsc;
 	if (megadrive_region_pal) ntsc = 0;
@@ -2798,17 +2803,14 @@ static READ16_HANDLER( _32x_68k_a15180_r )
 
 static WRITE16_HANDLER( _32x_68k_a15180_w )
 {
-//  printf("_32x_68k_a15180_w (a15180) %04x %04x\n",data,mem_mask);
+	printf("_32x_68k_a15180_w (a15180) %04x %04x\n",data,mem_mask);
+  
+ 
 	if (ACCESSING_BITS_0_7)
 	{
 		_32x_videopriority = (data & 0x80) >> 7;
 		_32x_240mode   = (data & 0x40) >> 6;
 		_32x_displaymode   = (data & 0x03) >> 0;
-	}
-
-	if (ACCESSING_BITS_8_15)
-	{
-		// nothing?  (pal flag is read only)
 	}
 }
 
@@ -5422,6 +5424,13 @@ static void genesis_render_videobuffer_to_screenbuffer(running_machine *machine,
 		}
 	}
 
+	// hack - spiderman web of fire
+	//_32x_videopriority_alt = 1;
+	// normal
+	_32x_videopriority_alt = 0;
+
+	int _32x_priority = _32x_videopriority ^ _32x_videopriority_alt;
+
 
 	if (!MEGADRIVE_REG0C_SHADOW_HIGLIGHT)
 	{
@@ -5430,75 +5439,75 @@ static void genesis_render_videobuffer_to_screenbuffer(running_machine *machine,
 		{
 			UINT32 dat;
 			dat = video_renderline[x];
+			int drawn = 0;
+
+			// low priority 32x - if it's the bg pen, we have a 32x, and it's display is enabled...
 			if ((dat&0x20000) && (_32x_is_connected) && (_32x_displaymode != 0))
 			{
-				if (_32x_linerender[x]&0x8000)
+				if (!_32x_priority)
 				{
-					if (_32x_videopriority)
+					if (!(_32x_linerender[x]&0x8000))
 					{
 						lineptr[x] = _32x_linerender[x]&0x7fff;
-					}
-					else
-					{
-						// display md bg?
+						drawn = 1;
 					}
 				}
 				else
 				{
-					if (_32x_videopriority)
-					{
-						// display md bg?
-					}
-					else
+					if ((_32x_linerender[x]&0x8000))
 					{
 						lineptr[x] = _32x_linerender[x]&0x7fff;
-					}
+						drawn = 1;
+					}						
 				}
-			}
-			else
+			}	
+
+			
+			if (drawn==0)
 			{
 				if (dat&0x10000)
 					lineptr[x] = megadrive_vdp_palette_lookup_sprite[(dat&0x0f) | segac2_sp_pal_lookup[(dat&0x30)>>4]];
 				else
 					lineptr[x] = megadrive_vdp_palette_lookup[(dat&0x0f) | segac2_bg_pal_lookup[(dat&0x30)>>4]];
 			}
+			
 
+			
 		}
 	}
 	else
 	{
+		
 		for (x=0;x<320;x++)
 		{
 			UINT32 dat;
 			dat = video_renderline[x];
 
+			int drawn = 0;
+
+			// low priority 32x - if it's the bg pen, we have a 32x, and it's display is enabled...
 			if ((dat&0x20000) && (_32x_is_connected) && (_32x_displaymode != 0))
 			{
-				if (_32x_linerender[x]&0x8000)
+				if (!_32x_priority)
 				{
-					if (_32x_videopriority)
+					if (!(_32x_linerender[x]&0x8000))
 					{
 						lineptr[x] = _32x_linerender[x]&0x7fff;
-					}
-					else
-					{
-						// display md bg?
+						drawn = 1;
 					}
 				}
 				else
 				{
-					if (_32x_videopriority)
-					{
-						// display md bg?
-					}
-					else
+					if ((_32x_linerender[x]&0x8000))
 					{
 						lineptr[x] = _32x_linerender[x]&0x7fff;
-					}
+						drawn = 1;
+					}						
 				}
+			}	
 
-			}
-			else
+			
+			if (drawn==0)
 			{
 				/* Verify my handling.. I'm not sure all cases are correct */
 				switch (dat&0x1e000)
@@ -5537,37 +5546,28 @@ static void genesis_render_videobuffer_to_screenbuffer(running_machine *machine,
 					break;
 				}
 			}
+			
+			
+			
 		}
 
 	}
 
 
-	if (_32x_is_connected && ( _32x_displaymode != 0))
+	// high priority 32x
+	if ((_32x_is_connected) && (_32x_displaymode != 0))
 	{
 		for (x=0;x<320;x++)
 		{
-			if (_32x_linerender[x]&0x8000)
+			if (!_32x_priority)
 			{
-				if (_32x_videopriority)
-				{
-					// display md screen?
-
-				}
-				else
-				{
+				if ((_32x_linerender[x]&0x8000))
 					lineptr[x] = _32x_linerender[x]&0x7fff;
-				}
 			}
 			else
 			{
-				if (_32x_videopriority)
-				{
+				if (!(_32x_linerender[x]&0x8000))
 					lineptr[x] = _32x_linerender[x]&0x7fff;
-				}
-				else
-				{
-					// display md screen?
-				}
 			}
 		}
 	}
