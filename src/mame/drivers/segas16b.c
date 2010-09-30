@@ -6840,7 +6840,7 @@ static WRITE16_HANDLER( isgsm_data_w )
 
 		for (int i=0;i<bytes_to_write;i++)
 		{
-			UINT8 byte;
+			UINT8 byte=0;
 
 			if (isgsm_mode&0x8)
 			{
