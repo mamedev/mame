@@ -2780,45 +2780,62 @@ static TIMER_CALLBACK( _32x_pwm_callback )
 {
 	// ...
 
-	/* disabled, we need PWM FIFO support first! */
-//	if(sh2_master_pwmint_enable) { cpu_set_input_line(_32x_master_cpu, SH2_PINT_IRQ_LEVEL,ASSERT_LINE); }
+	if(sh2_master_pwmint_enable) { cpu_set_input_line(_32x_master_cpu, SH2_PINT_IRQ_LEVEL,ASSERT_LINE); }
 
-//	if(sh2_slave_pwmint_enable) { cpu_set_input_line(_32x_slave_cpu, SH2_PINT_IRQ_LEVEL,ASSERT_LINE); }
+	if(sh2_slave_pwmint_enable) { cpu_set_input_line(_32x_slave_cpu, SH2_PINT_IRQ_LEVEL,ASSERT_LINE); }
 
 	timer_adjust_oneshot(_32x_pwm_timer, ATTOTIME_IN_HZ(((MASTER_CLOCK_NTSC*3 / 7) / (pwm_cycle - 1)) * pwm_tm_reg), 0);
 }
 
-static READ16_HANDLER( _32x_68k_pwm_control_reg_r )
+static READ16_HANDLER( _32x_pwm_r )
 {
-	return pwm_ctrl;
+	switch(offset)
+	{
+		case 0/2: return pwm_ctrl; //control register
+		case 2/2: return pwm_cycle_reg; // cycle register
+		case 4/2: return mame_rand(space->machine) & 0xc000; // l ch TODO
+		case 6/2: return mame_rand(space->machine) & 0xc000; // r ch TODO
+		case 8/2: return mame_rand(space->machine) & 0xc000; // mono ch TODO
+	}
+
+	printf("Read at undefined PWM register %02x\n",offset);
+	return 0xffff;
 }
 
-static WRITE16_HANDLER( _32x_68k_pwm_control_reg_w )
+static WRITE16_HANDLER( _32x_pwm_w )
 {
-	pwm_ctrl = (data & 0x7f) | (pwm_ctrl & 0xff80);
-
-	calculate_pwm_timer();
+	switch(offset)
+	{
+		case 0/2:
+			pwm_ctrl = data & 0xffff;
+			pwm_tm_reg = (pwm_ctrl & 0xf00) >> 8;
+			calculate_pwm_timer();
+			break;
+		case 2/2:
+			pwm_cycle = pwm_cycle_reg = data & 0xfff;
+			calculate_pwm_timer();
+			break;
+		case 4/2:
+			// l ch TODO
+			break;
+		case 6/2:
+			// r ch TODO
+			break;
+		case 8/2:
+			// mono TODO
+			break;
+		default:
+			printf("Write at undefined PWM register %02x %04x\n",offset,data);
+			break;
+	}
 }
 
-static WRITE16_HANDLER( _32x_sh2_pwm_control_reg_w )
+static WRITE16_HANDLER( _32x_68k_pwm_w )
 {
-	pwm_ctrl = data & 0xffff;
-
-	pwm_tm_reg = (pwm_ctrl & 0xf00) >> 8;
-
-	calculate_pwm_timer();
-}
-
-static READ16_HANDLER( _32x_68k_pwm_cycle_reg_r )
-{
-	return pwm_cycle_reg;
-}
-
-static WRITE16_HANDLER( _32x_68k_pwm_cycle_reg_w )
-{
-	pwm_cycle = pwm_cycle_reg = data & 0xfff;
-
-	calculate_pwm_timer();
+	if(offset == 0/2)
+		_32x_pwm_w(space,offset,(data & 0x7f) | (pwm_ctrl & 0xff80),mem_mask);
+	else
+		_32x_pwm_w(space,offset,data,mem_mask);
 }
 
 /**********************************************************************************************/
@@ -3225,16 +3242,10 @@ static WRITE16_HANDLER( _32x_sh2_commsram16_w ) { _32x_68k_commsram_w(space, off
 // PWM Control Register
 /**********************************************************************************************/
 
-static READ16_HANDLER( _32x_sh2_pwm_control_reg_r ) { return _32x_68k_pwm_control_reg_r(space, offset, mem_mask); }
-//static WRITE16_HANDLER( _32x_sh2_pwm_control_reg_w ) { _32x_sh2_pwm_control_reg_w(space, offset, data, mem_mask); }
-
 /**********************************************************************************************/
 // SH2 side 4032
 // Cycle Register
 /**********************************************************************************************/
-
-static READ16_HANDLER( _32x_sh2_pwm_cycle_reg_r ) { return _32x_68k_pwm_cycle_reg_r(space, offset, mem_mask); }
-static WRITE16_HANDLER( _32x_sh2_pwm_cycle_reg_w ) { _32x_68k_pwm_cycle_reg_w(space, offset, data, mem_mask); }
 
 
 /**********************************************************************************************/
@@ -3382,10 +3393,6 @@ _32X_MAP_WRITEHANDLERS(slave_401c,slave_401e) // _32x_sh2_slave_401c_slave_401e_
 _32X_MAP_RAM_READHANDLERS(commsram) // _32x_sh2_commsram_r
 _32X_MAP_RAM_WRITEHANDLERS(commsram) // _32x_sh2_commsram_w
 
-_32X_MAP_READHANDLERS(pwm_control_reg,pwm_cycle_reg)
-_32X_MAP_WRITEHANDLERS(pwm_control_reg,pwm_cycle_reg)
-
-
 _32X_MAP_RAM_READHANDLERS(framebuffer_dram) // _32x_sh2_framebuffer_dram_r
 _32X_MAP_RAM_WRITEHANDLERS(framebuffer_dram) // _32x_sh2_framebuffer_dram_w
 
@@ -3413,8 +3420,7 @@ static ADDRESS_MAP_START( sh2_main_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x0000401c, 0x0000401f) AM_READNOP AM_WRITE( _32x_sh2_master_401c_master_401e_w ) // IRQ clear
 
 	AM_RANGE(0x00004020, 0x0000402f) AM_READWRITE( _32x_sh2_commsram_r, _32x_sh2_commsram_w )
-	AM_RANGE(0x00004030, 0x00004033) AM_READWRITE( _32x_sh2_pwm_control_reg_pwm_cycle_reg_r, _32x_sh2_pwm_control_reg_pwm_cycle_reg_w )
-	AM_RANGE(0x00004034, 0x0000403f) AM_NOP
+	AM_RANGE(0x00004030, 0x0000403f) AM_READWRITE16( _32x_pwm_r, _32x_pwm_w, 0xffffffff )
 
 	AM_RANGE(0x00004100, 0x0000410b) AM_READWRITE16( _32x_common_vdp_regs_r, _32x_common_vdp_regs_w , 0xffffffff)
 	AM_RANGE(0x00004200, 0x000043ff) AM_READWRITE( _32x_sh2_paletteram_r, _32x_sh2_paletteram_w)
@@ -3443,8 +3449,7 @@ static ADDRESS_MAP_START( sh2_slave_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x0000401c, 0x0000401f) AM_READNOP AM_WRITE( _32x_sh2_slave_401c_slave_401e_w ) // IRQ clear
 
 	AM_RANGE(0x00004020, 0x0000402f) AM_READWRITE( _32x_sh2_commsram_r, _32x_sh2_commsram_w )
-	AM_RANGE(0x00004030, 0x00004033) AM_READWRITE( _32x_sh2_pwm_control_reg_pwm_cycle_reg_r, _32x_sh2_pwm_control_reg_pwm_cycle_reg_w )
-	AM_RANGE(0x00004034, 0x0000403f) AM_NOP
+	AM_RANGE(0x00004030, 0x0000403f) AM_READWRITE16( _32x_pwm_r, _32x_pwm_w, 0xffffffff )
 
 	AM_RANGE(0x00004100, 0x0000410b) AM_READWRITE16( _32x_common_vdp_regs_r, _32x_common_vdp_regs_w , 0xffffffff)
 	AM_RANGE(0x00004200, 0x000043ff) AM_READWRITE(_32x_sh2_paletteram_r, _32x_sh2_paletteram_w)
@@ -6598,8 +6603,7 @@ DRIVER_INIT( _32x )
 	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa1511a, 0xa1511b, 0, 0, _32x_68k_a1511a_r, _32x_68k_a1511a_w); // SEGA TV
 
 	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa15120, 0xa1512f, 0, 0, _32x_68k_commsram_r, _32x_68k_commsram_w); // comms reg 0-7
-	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa15130, 0xa15131, 0, 0, _32x_68k_pwm_control_reg_r, _32x_68k_pwm_control_reg_w);
-	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa15132, 0xa15133, 0, 0, _32x_68k_pwm_cycle_reg_r, _32x_68k_pwm_cycle_reg_w);
+	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa15130, 0xa1513f, 0, 0, _32x_pwm_r, _32x_68k_pwm_w);
 
 	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x0a130ec, 0x0a130ef, 0, 0, _32x_68k_MARS_r); // system ID
 
