@@ -1269,7 +1269,7 @@ void adsp21xx_device::execute_run()
 		// debugging
 		m_ppc = m_pc;	// copy PC to previous PC
 		if (check_debugger)
-			debugger_instruction_hook(*this, m_pc);
+			debugger_instruction_hook(this, m_pc);
 
 #if ADSP_TRACK_HOTSPOTS
 		m_pcbucket[m_pc & 0x3fff]++;
