@@ -2331,65 +2331,6 @@ int current_fifo_read_pos;
 int fifo_block_a_full;
 int fifo_block_b_full;
 
-static READ16_HANDLER( _32x_68k_a15112_r)
-{
-	printf("read write-only FIFO register\n");
-	return 0;
-}
-
-static WRITE16_HANDLER( _32x_68k_a15112_w )
-{
-	//printf("write to FIFO %04x!\n", data);
-
-	if (current_fifo_block==fifo_block_a && fifo_block_a_full)
-	{
-		printf("attempt to write to Full Fifo block a!\n");
-		return;
-	}
-
-	if (current_fifo_block==fifo_block_b && fifo_block_b_full)
-	{
-		printf("attempt to write to Full Fifo block b!\n");
-		return;
-	}
-
-	current_fifo_block[current_fifo_write_pos] = data;
-	current_fifo_write_pos++;
-
-	if (current_fifo_write_pos==4)
-	{
-		if (current_fifo_block==fifo_block_a)
-		{
-			fifo_block_a_full = 1;
-			if (!fifo_block_b_full)
-			{
-				current_fifo_block = fifo_block_b;
-				current_fifo_readblock = fifo_block_a;
-				// incase we have a stalled DMA in progress, let the SH2 know there is data available
-				sh2_notify_dma_data_available(space->machine->device("32x_master_sh2"));
-				sh2_notify_dma_data_available(space->machine->device("32x_slave_sh2"));
-
-			}
-			current_fifo_write_pos = 0;
-		}
-		else
-		{
-			fifo_block_b_full = 1;
-
-			if (!fifo_block_a_full)
-			{
-				current_fifo_block = fifo_block_a;
-				current_fifo_readblock = fifo_block_b;
-				// incase we have a stalled DMA in progress, let the SH2 know there is data available
-				sh2_notify_dma_data_available(space->machine->device("32x_master_sh2"));
-				sh2_notify_dma_data_available(space->machine->device("32x_slave_sh2"));
-
-			}
-
-			current_fifo_write_pos = 0;
-		}
-	}
-}
 
 
 
@@ -2460,52 +2401,169 @@ static WRITE16_HANDLER( _32x_68k_a15106_w )
 
 static UINT16 dreq_src_addr[2],dreq_dst_addr[2],dreq_size;
 
-static READ16_HANDLER( _32x_68k_a15108_r )
+static READ16_HANDLER( _32x_dreq_common_r )
 {
-	return dreq_src_addr[offset];
+	address_space* _68kspace = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+
+	switch (offset)
+	{
+		case 0x00/2: // a15108 / 4008
+		case 0x02/2: // a1510a / 400a
+			return dreq_src_addr[offset&1];
+
+		case 0x04/2: // a1510c / 400c
+		case 0x06/2: // a1510e / 400e
+			return dreq_dst_addr[offset&1];
+
+		case 0x08/2: // a15110 / 4010
+			return dreq_size;
+
+		case 0x0a/2: // a15112 / 4012
+			if (space == _68kspace)
+			{
+				printf("attempting to READ FIFO with 68k!\n");
+				return 0xffff;
+			}
+
+			UINT16 retdat = current_fifo_readblock[current_fifo_read_pos];
+
+			current_fifo_read_pos++;
+
+		//	printf("reading FIFO!\n");
+
+			if (current_fifo_readblock == fifo_block_a && !fifo_block_a_full)
+				printf("Fifo block a isn't filled!\n");
+
+			if (current_fifo_readblock == fifo_block_b && !fifo_block_b_full)
+				printf("Fifo block b isn't filled!\n");
+
+
+			if (current_fifo_read_pos==4)
+			{
+				if (current_fifo_readblock == fifo_block_a)
+				{
+					fifo_block_a_full = 0;
+
+					if (fifo_block_b_full)
+					{
+						current_fifo_readblock = fifo_block_b;
+						current_fifo_block = fifo_block_a;
+					}
+
+					current_fifo_read_pos = 0;
+				}
+				else if (current_fifo_readblock == fifo_block_b)
+				{
+					fifo_block_b_full = 0;
+
+					if (fifo_block_a_full)
+					{
+						current_fifo_readblock = fifo_block_a;
+						current_fifo_block = fifo_block_b;
+					}
+
+					current_fifo_read_pos = 0;
+				}
+			}
+
+			return retdat;
+	}
+
+	return 0x0000;
 }
 
-static WRITE16_HANDLER( _32x_68k_a15108_w )
+static WRITE16_HANDLER( _32x_dreq_common_w )
 {
-	dreq_src_addr[offset] = (offset == 0) ? (data & 0xff) : (data & 0xfffe);
+	address_space* _68kspace = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
-	if((dreq_src_addr[0]<<16)|dreq_src_addr[1])
-		printf("DREQ set SRC = %08x\n",(dreq_src_addr[0]<<16)|dreq_src_addr[1]);
+	switch (offset)
+	{
+		case 0x00/2: // a15108 / 4008
+		case 0x02/2: // a1510a / 400a
+			dreq_src_addr[offset&1] = ((offset&1) == 0) ? (data & 0xff) : (data & 0xfffe);
+
+			if((dreq_src_addr[0]<<16)|dreq_src_addr[1])
+				printf("DREQ set SRC = %08x\n",(dreq_src_addr[0]<<16)|dreq_src_addr[1]);
+
+			break;
+
+		case 0x04/2: // a1510c / 400c
+		case 0x06/2: // a1510e / 400e
+			dreq_dst_addr[offset&1] = ((offset&1) == 0) ? (data & 0xff) : (data & 0xffff);
+
+			if((dreq_dst_addr[0]<<16)|dreq_dst_addr[1])
+				printf("DREQ set DST = %08x\n",(dreq_dst_addr[0]<<16)|dreq_dst_addr[1]);
+
+			break;
+
+		case 0x08/2: // a15110 / 4010
+			dreq_size = data & 0xfffc;
+
+			//	if(dreq_size)
+			//		printf("DREQ set SIZE = %04x\n",dreq_size);
+
+			break;
+
+		case 0x0a/2: // a15112 / 4012 - FIFO Write (68k only!)
+			if (space != _68kspace)
+			{
+				printf("attempting to WRITE FIFO with SH2!\n");
+				return;
+			}
+
+			if (current_fifo_block==fifo_block_a && fifo_block_a_full)
+			{
+				printf("attempt to write to Full Fifo block a!\n");
+				return;
+			}
+
+			if (current_fifo_block==fifo_block_b && fifo_block_b_full)
+			{
+				printf("attempt to write to Full Fifo block b!\n");
+				return;
+			}
+
+			current_fifo_block[current_fifo_write_pos] = data;
+			current_fifo_write_pos++;
+
+			if (current_fifo_write_pos==4)
+			{
+				if (current_fifo_block==fifo_block_a)
+				{
+					fifo_block_a_full = 1;
+					if (!fifo_block_b_full)
+					{
+						current_fifo_block = fifo_block_b;
+						current_fifo_readblock = fifo_block_a;
+						// incase we have a stalled DMA in progress, let the SH2 know there is data available
+						sh2_notify_dma_data_available(space->machine->device("32x_master_sh2"));
+						sh2_notify_dma_data_available(space->machine->device("32x_slave_sh2"));
+
+					}
+					current_fifo_write_pos = 0;
+				}
+				else
+				{
+					fifo_block_b_full = 1;
+
+					if (!fifo_block_a_full)
+					{
+						current_fifo_block = fifo_block_a;
+						current_fifo_readblock = fifo_block_b;
+						// incase we have a stalled DMA in progress, let the SH2 know there is data available
+						sh2_notify_dma_data_available(space->machine->device("32x_master_sh2"));
+						sh2_notify_dma_data_available(space->machine->device("32x_slave_sh2"));
+
+					}
+
+					current_fifo_write_pos = 0;
+				}
+			}
+
+			break;
+	}
 }
 
-static READ16_HANDLER( _32x_68k_a1510c_r )
-{
-	return dreq_dst_addr[offset];
-}
-
-static WRITE16_HANDLER( _32x_68k_a1510c_w )
-{
-	dreq_dst_addr[offset] = (offset == 0) ? (data & 0xff) : (data & 0xffff);
-
-	if((dreq_dst_addr[0]<<16)|dreq_dst_addr[1])
-		printf("DREQ set DST = %08x\n",(dreq_dst_addr[0]<<16)|dreq_dst_addr[1]);
-}
-
-static READ16_HANDLER( _32x_68k_a15110_r )
-{
-	return dreq_size;
-}
-
-static WRITE16_HANDLER( _32x_68k_a15110_w )
-{
-	dreq_size = data & 0xfffc;
-
-//	if(dreq_size)
-//		printf("DREQ set SIZE = %04x\n",dreq_size);
-}
-
-/*
-a1511a SEGA TV register
----- ---x Cartridge Mode (0) ROM (1) DRAM
-
-Sega disallows the use of this register
-
-*/
 
 static UINT8 sega_tv;
 
@@ -2820,7 +2878,7 @@ static READ16_HANDLER( _32x_common_vdp_regs_r )
 
 			if (megadrive_hblank_flag) retdata |= 0x4000;
 
-			if (megadrive_vblank_flag && _32x_access_auth) { retdata |= 2; } // framebuffer approval (TODO: condition is unknown at current time)
+			if (megadrive_vblank_flag) { retdata |= 2; } // framebuffer approval (TODO: condition is unknown at current time)
 
 			if (megadrive_hblank_flag && megadrive_vblank_flag) { retdata |= 0x2000; } // palette approval (TODO: active high or low?)
 
@@ -3095,89 +3153,6 @@ static WRITE16_HANDLER( _32x_sh2_common_4006_w )
 	printf("DREQ write!\n");
 }
 
-/**********************************************************************************************/
-// SH2 side 4008
-// 68k To SH2 DReq Source Address Register ( High Bits )
-/**********************************************************************************************/
-
-/**********************************************************************************************/
-// SH2 side 400A
-// 68k To SH2 DReq Source Address Register ( Low Bits )
-/**********************************************************************************************/
-
-/**********************************************************************************************/
-// SH2 side 400C
-// 68k To SH2 DReq Destination Address Register ( High Bits )
-/**********************************************************************************************/
-
-/**********************************************************************************************/
-// SH2 side 400E
-// 68k To SH2 DReq Destination Address Register ( Low Bits )
-/**********************************************************************************************/
-
-/**********************************************************************************************/
-// SH2 side 4010
-// 68k To SH2 DReq Length Register
-/**********************************************************************************************/
-
-static READ16_HANDLER( _32x_sh2_common_4010_r )
-{
-//	printf("reading DReq Length!\n");
-	return 0x0000;
-}
-
-/**********************************************************************************************/
-// SH2 side 4012
-// FIFO Register (read)
-/**********************************************************************************************/
-
-static READ16_HANDLER( _32x_sh2_common_4012_r )
-{
-	UINT16 retdat = current_fifo_readblock[current_fifo_read_pos];
-
-	current_fifo_read_pos++;
-
-//	printf("reading FIFO!\n");
-
-	if (current_fifo_readblock == fifo_block_a && !fifo_block_a_full)
-		printf("Fifo block a isn't filled!\n");
-
-	if (current_fifo_readblock == fifo_block_b && !fifo_block_b_full)
-		printf("Fifo block b isn't filled!\n");
-
-
-	if (current_fifo_read_pos==4)
-	{
-		if (current_fifo_readblock == fifo_block_a)
-		{
-			fifo_block_a_full = 0;
-
-			if (fifo_block_b_full)
-			{
-				current_fifo_readblock = fifo_block_b;
-				current_fifo_block = fifo_block_a;
-			}
-
-			current_fifo_read_pos = 0;
-		}
-		else if (current_fifo_readblock == fifo_block_b)
-		{
-			fifo_block_b_full = 0;
-
-			if (fifo_block_a_full)
-			{
-				current_fifo_readblock = fifo_block_a;
-				current_fifo_block = fifo_block_b;
-			}
-
-			current_fifo_read_pos = 0;
-		}
-	}
-
-	return retdat;
-}
-
-
 
 /**********************************************************************************************/
 // SH2 side 4014
@@ -3410,8 +3385,6 @@ _32X_MAP_RAM_WRITEHANDLERS(commsram) // _32x_sh2_commsram_w
 _32X_MAP_READHANDLERS(pwm_control_reg,pwm_cycle_reg)
 _32X_MAP_WRITEHANDLERS(pwm_control_reg,pwm_cycle_reg)
 
-_32X_MAP_READHANDLERS(common_4010,common_4012)
-
 
 _32X_MAP_RAM_READHANDLERS(framebuffer_dram) // _32x_sh2_framebuffer_dram_r
 _32X_MAP_RAM_WRITEHANDLERS(framebuffer_dram) // _32x_sh2_framebuffer_dram_w
@@ -3433,7 +3406,7 @@ static ADDRESS_MAP_START( sh2_main_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00004000, 0x00004003) AM_READWRITE( _32x_sh2_master_4000_common_4002_r, _32x_sh2_master_4000_common_4002_w )
 	AM_RANGE(0x00004004, 0x00004007) AM_READWRITE( _32x_sh2_common_4004_common_4006_r, _32x_sh2_common_4004_common_4006_w)
 
-	AM_RANGE(0x00004010, 0x00004013) AM_READ( _32x_sh2_common_4010_common_4012_r )
+	AM_RANGE(0x00004008, 0x00004013) AM_READWRITE16( _32x_dreq_common_r, _32x_dreq_common_w, 0xffffffff )
 
 	AM_RANGE(0x00004014, 0x00004017) AM_READNOP AM_WRITE( _32x_sh2_master_4014_master_4016_w ) // IRQ clear
 	AM_RANGE(0x00004018, 0x0000401b) AM_READNOP AM_WRITE( _32x_sh2_master_4018_master_401a_w ) // IRQ clear
@@ -3463,7 +3436,7 @@ static ADDRESS_MAP_START( sh2_slave_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x00004000, 0x00004003) AM_READWRITE( _32x_sh2_slave_4000_common_4002_r, _32x_sh2_slave_4000_common_4002_w )
 	AM_RANGE(0x00004004, 0x00004007) AM_READWRITE( _32x_sh2_common_4004_common_4006_r, _32x_sh2_common_4004_common_4006_w)
 
-	AM_RANGE(0x00004010, 0x00004013) AM_READ( _32x_sh2_common_4010_common_4012_r )
+	AM_RANGE(0x00004008, 0x00004013) AM_READWRITE16( _32x_dreq_common_r, _32x_dreq_common_w, 0xffffffff )
 
 	AM_RANGE(0x00004014, 0x00004017) AM_READNOP AM_WRITE( _32x_sh2_slave_4014_slave_4016_w ) // IRQ clear
 	AM_RANGE(0x00004018, 0x0000401b) AM_READNOP AM_WRITE( _32x_sh2_slave_4018_slave_401a_w ) // IRQ clear
@@ -6620,10 +6593,7 @@ DRIVER_INIT( _32x )
 	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa15102, 0xa15103, 0, 0, _32x_68k_a15102_r, _32x_68k_a15102_w); // send irq to sh2
 	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa15104, 0xa15105, 0, 0, _32x_68k_a15104_r, _32x_68k_a15104_w); // 68k BANK rom set
 	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa15106, 0xa15107, 0, 0, _32x_68k_a15106_r, _32x_68k_a15106_w); // dreq stuff
-	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa15108, 0xa1510b, 0, 0, _32x_68k_a15108_r, _32x_68k_a15108_w); // dreq src address
-	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa1510c, 0xa1510f, 0, 0, _32x_68k_a1510c_r, _32x_68k_a1510c_w); // dreq dst address
-	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa15110, 0xa15111, 0, 0, _32x_68k_a15110_r, _32x_68k_a15110_w); // dreq length
-	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa15112, 0xa15113, 0, 0, _32x_68k_a15112_r, _32x_68k_a15112_w); // fifo
+	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa15108, 0xa15113, 0, 0, _32x_dreq_common_r, _32x_dreq_common_w); // dreq src / dst / length /fifo
 
 	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa1511a, 0xa1511b, 0, 0, _32x_68k_a1511a_r, _32x_68k_a1511a_w); // SEGA TV
 
