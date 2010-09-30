@@ -1043,7 +1043,7 @@ static ADDRESS_MAP_START( wildcrdb_mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1000, 0x2fff) AM_RAM
 ADDRESS_MAP_END
 
-static ADDRESS_MAP_START( wildcrdb_mcu_io_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( wildcrdb_mcu_io_map, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
 ADDRESS_MAP_END
 
@@ -4009,5 +4009,4 @@ GAME(  198?, maverik,  0,        witchcrd, bsuerte,  0,        ROT0,   "<unknown
 GAMEL( 1989, brasil89, 0,        witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                "Brasil 89",                               0,                layout_goldnpkr )
 GAME(  1991, poker91,  0,        witchcrd, poker91,  0,        ROT0,   "<unknown>",                "Poker 91",                                0 )
 GAME(  198?, genie,    0,        genie,    genie,    0,        ROT0,   "Video Fun Games Ltd.",     "Genie",                                   0 )
-
 
