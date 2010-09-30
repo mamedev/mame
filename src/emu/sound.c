@@ -372,7 +372,7 @@ static TIMER_CALLBACK( sound_update )
 
 	/* force all the speaker streams to generate the proper number of samples */
 	for (speaker_device *speaker = speaker_first(*machine); speaker != NULL; speaker = speaker_next(speaker))
-		speaker->mix(leftmix, rightmix, samples_this_update, !global->enabled || global->nosound_mode);
+		speaker->mix(leftmix, rightmix, samples_this_update, !global->enabled);
 
 	/* now downmix the final result */
 	finalmix_step = video_get_speed_factor();
@@ -403,7 +403,8 @@ static TIMER_CALLBACK( sound_update )
 	/* play the result */
 	if (finalmix_offset > 0)
 	{
-		osd_update_audio_stream(machine, finalmix, finalmix_offset / 2);
+ 		if (!global->nosound_mode)
+	 		osd_update_audio_stream(machine, finalmix, finalmix_offset / 2);
 		video_avi_add_sound(machine, finalmix, finalmix_offset / 2);
 		if (global->wavfile != NULL)
 			wav_add_data_16(global->wavfile, finalmix, finalmix_offset);
