@@ -67,11 +67,12 @@ On SegaC2 the VDP never turns on the IRQ6 enable register
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "deprecat.h"
+//#include "deprecat.h"
 #include "sound/sn76496.h"
 #include "sound/2612intf.h"
 #include "sound/upd7759.h"
 #include "sound/fm.h"
+#include "sound/dac.h"
 #include "cpu/m68000/m68000.h"
 #include "includes/megadriv.h"
 #include "cpu/sh2/sh2.h"
@@ -2760,8 +2761,15 @@ static WRITE16_HANDLER( _32x_68k_commsram_w )
 // access from the SH2 via 4030 - 403f
 /**********************************************************************************************/
 
+#define PWM_FIFO_SIZE pwm_tm_reg // guess, check this (Doom wants 3, Virtua Racing wants 1 like they sets this register?)
+
 static UINT16 pwm_ctrl,pwm_cycle,pwm_tm_reg;
+static UINT16 cur_lch[0x10],cur_rch[0x10];
 static UINT16 pwm_cycle_reg; //used for latching
+static UINT8 pwm_timer_tick;
+static UINT8 lch_index_r,rch_index_r,lch_index_w,rch_index_w;
+static UINT16 lch_fifo_state,rch_fifo_state;
+
 static emu_timer *_32x_pwm_timer;
 
 static void calculate_pwm_timer(void)
@@ -2773,29 +2781,54 @@ static void calculate_pwm_timer(void)
 	if(pwm_cycle == 1 || ((pwm_ctrl & 0xf) == 0))
 		timer_adjust_oneshot(_32x_pwm_timer, attotime_never, 0);
 	else
-		timer_adjust_oneshot(_32x_pwm_timer, ATTOTIME_IN_HZ(((MASTER_CLOCK_NTSC*3 / 7) / (pwm_cycle - 1)) * pwm_tm_reg), 0);
+	{
+		pwm_timer_tick = 0;
+		lch_fifo_state = rch_fifo_state = 0x4000;
+		lch_index_r = rch_index_r = 0;
+		lch_index_w = rch_index_w = 0;
+		timer_adjust_oneshot(_32x_pwm_timer, ATTOTIME_IN_HZ(((MASTER_CLOCK_NTSC*3 / 7) / (pwm_cycle - 1))), 0);
+	}
 }
 
 static TIMER_CALLBACK( _32x_pwm_callback )
 {
-	// ...
+	if(lch_index_r < PWM_FIFO_SIZE)
+	{
+		dac_signed_data_16_w(machine->device("lch_pwm"), cur_lch[lch_index_r++]);
+		lch_index_w = 0;
+	}
 
-	if(sh2_master_pwmint_enable) { cpu_set_input_line(_32x_master_cpu, SH2_PINT_IRQ_LEVEL,ASSERT_LINE); }
+	lch_fifo_state = (lch_index_r == PWM_FIFO_SIZE) ? 0x4000 : 0x0000;
 
-	if(sh2_slave_pwmint_enable) { cpu_set_input_line(_32x_slave_cpu, SH2_PINT_IRQ_LEVEL,ASSERT_LINE); }
+	if(rch_index_r < PWM_FIFO_SIZE)
+	{
+		dac_signed_data_16_w(machine->device("rch_pwm"), cur_rch[rch_index_r++]);
+		rch_index_w = 0;
+	}
 
-	timer_adjust_oneshot(_32x_pwm_timer, ATTOTIME_IN_HZ(((MASTER_CLOCK_NTSC*3 / 7) / (pwm_cycle - 1)) * pwm_tm_reg), 0);
+	rch_fifo_state = (rch_index_r == PWM_FIFO_SIZE) ? 0x4000 : 0x0000;
+
+	pwm_timer_tick++;
+
+	if(pwm_timer_tick == pwm_tm_reg)
+	{
+		pwm_timer_tick = 0;
+		if(sh2_master_pwmint_enable) { cpu_set_input_line(_32x_master_cpu, SH2_PINT_IRQ_LEVEL,ASSERT_LINE); }
+		if(sh2_slave_pwmint_enable) { cpu_set_input_line(_32x_slave_cpu, SH2_PINT_IRQ_LEVEL,ASSERT_LINE); }
+	}
+
+	timer_adjust_oneshot(_32x_pwm_timer, ATTOTIME_IN_HZ(((MASTER_CLOCK_NTSC*3 / 7) / (pwm_cycle - 1))), 0);
 }
 
 static READ16_HANDLER( _32x_pwm_r )
 {
 	switch(offset)
 	{
-		case 0/2: return pwm_ctrl; //control register
-		case 2/2: return pwm_cycle_reg; // cycle register
-		case 4/2: return mame_rand(space->machine) & 0xc000; // l ch TODO
-		case 6/2: return mame_rand(space->machine) & 0xc000; // r ch TODO
-		case 8/2: return mame_rand(space->machine) & 0xc000; // mono ch TODO
+		case 0x00/2: return pwm_ctrl; //control register
+		case 0x02/2: return pwm_cycle_reg; // cycle register
+		case 0x04/2: return lch_fifo_state; // l ch
+		case 0x06/2: return rch_fifo_state; // r ch
+		case 0x08/2: return lch_fifo_state & rch_fifo_state; // mono ch
 	}
 
 	printf("Read at undefined PWM register %02x\n",offset);
@@ -2806,23 +2839,50 @@ static WRITE16_HANDLER( _32x_pwm_w )
 {
 	switch(offset)
 	{
-		case 0/2:
+		case 0x00/2:
 			pwm_ctrl = data & 0xffff;
 			pwm_tm_reg = (pwm_ctrl & 0xf00) >> 8;
 			calculate_pwm_timer();
 			break;
-		case 2/2:
+		case 0x02/2:
 			pwm_cycle = pwm_cycle_reg = data & 0xfff;
 			calculate_pwm_timer();
 			break;
-		case 4/2:
-			// l ch TODO
+		case 0x04/2:
+			if(lch_index_w < PWM_FIFO_SIZE)
+			{
+				cur_lch[lch_index_w++] = ((data & 0xfff) << 4) | (data & 0xf);
+				lch_index_r = 0;
+			}
+
+			lch_fifo_state = (lch_index_w == PWM_FIFO_SIZE) ? 0x8000 : 0x0000;
 			break;
-		case 6/2:
-			// r ch TODO
+		case 0x06/2:
+			if(rch_index_w < PWM_FIFO_SIZE)
+			{
+				cur_rch[rch_index_w++] = ((data & 0xfff) << 4) | (data & 0xf);
+				rch_index_r = 0;
+			}
+
+			rch_fifo_state = (rch_index_w == PWM_FIFO_SIZE) ? 0x8000 : 0x0000;
+
 			break;
-		case 8/2:
-			// mono TODO
+		case 0x08/2:
+			if(lch_index_w < PWM_FIFO_SIZE)
+			{
+				cur_lch[lch_index_w++] = ((data & 0xfff) << 4) | (data & 0xf);
+				lch_index_r = 0;
+			}
+
+			if(rch_index_w < PWM_FIFO_SIZE)
+			{
+				cur_rch[rch_index_w++] = ((data & 0xfff) << 4) | (data & 0xf);
+				rch_index_r = 0;
+			}
+
+			lch_fifo_state = (lch_index_w == PWM_FIFO_SIZE) ? 0x8000 : 0x0000;
+			rch_fifo_state = (rch_index_w == PWM_FIFO_SIZE) ? 0x8000 : 0x0000;
+
 			break;
 		default:
 			printf("Write at undefined PWM register %02x %04x\n",offset,data);
@@ -3300,7 +3360,7 @@ static WRITE16_HANDLER( _32x_sh2_framebuffer_overwrite_dram16_w ) { _32x_68k_dra
 
 
 /* the 32x treats everything as 16-bit registers, so we remap the 32-bit read & writes
-   to 2x 16-bit handlers here */
+   to 2x 16-bit handlers here (TODO: nuke this shit) */
 
 #define _32X_MAP_READHANDLERS(NAMEA,NAMEB)                                          \
 static READ32_HANDLER( _32x_sh2_##NAMEA##_##NAMEB##_r )                             \
@@ -6296,6 +6356,12 @@ MACHINE_CONFIG_DERIVED( genesis_32x, megadriv )
 	// boosting the interleave here actually makes Kolibri run incorrectly however, that
 	// one works best just boosting the interleave on communications?!
 	MDRV_QUANTUM_TIME(HZ(1800000))
+
+	MDRV_SOUND_ADD("lch_pwm", DAC, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
+
+	MDRV_SOUND_ADD("rch_pwm", DAC, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
 MACHINE_CONFIG_END
 
 
@@ -6309,6 +6375,18 @@ MACHINE_CONFIG_DERIVED( genesis_32x_pal, megadpal )
 	MDRV_CPU_PROGRAM_MAP(sh2_slave_map)
 	MDRV_CPU_CONFIG(sh2_conf_slave)
 
+	// brutal needs at least 30000 or the backgrounds don't animate properly / lock up, and the game
+	// freezes.  Some stage seem to need as high as 80000 ?   this *KILLS* performance
+	//
+	// boosting the interleave here actually makes Kolibri run incorrectly however, that
+	// one works best just boosting the interleave on communications?!
+	MDRV_QUANTUM_TIME(HZ(1800000))
+
+	MDRV_SOUND_ADD("lch_pwm", DAC, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
+
+	MDRV_SOUND_ADD("rch_pwm", DAC, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED( genesis_scd, megadriv )
