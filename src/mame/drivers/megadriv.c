@@ -638,7 +638,7 @@ static UINT16 vdp_get_word_from_68k_mem_default(running_machine *machine, UINT32
 		{
 			source -= 2; // the SVP introduces some kind of DMA 'lag', which we have to compensate for, this is obvious even on gfx DMAd from ROM (the Speedometer)
 		}
-	
+
 		return space68k->read_word(source);
 	}
 	else if (( source >= 0xe00000 ) && ( source <= 0xffffff ))
@@ -2368,7 +2368,7 @@ static WRITE16_HANDLER( _32x_68k_a15112_w )
 				// incase we have a stalled DMA in progress, let the SH2 know there is data available
 				sh2_notify_dma_data_available(space->machine->device("32x_master_sh2"));
 				sh2_notify_dma_data_available(space->machine->device("32x_slave_sh2"));
-				
+
 			}
 			current_fifo_write_pos = 0;
 		}
@@ -2428,7 +2428,7 @@ static WRITE16_HANDLER( _32x_68k_a15106_w )
 
         if (a15106_reg & 0x1) /* NBA Jam TE relies on this */
 		{
-			
+
 			// install the game rom in the normal 0x000000-0x03fffff space used by the genesis - this allows VDP DMA operations to work as they have to be from this area or RAM
 			// it should also UNMAP the banked rom area...
 			memory_install_rom(space, 0x0000100, 0x03fffff, 0, 0, memory_region(space->machine, "gamecart") + 0x100);
@@ -2436,12 +2436,12 @@ static WRITE16_HANDLER( _32x_68k_a15106_w )
 		else
 		{
 			// we should be careful and map back any rom overlay (hint) and backup ram too I think...
-			
+
 			// this is actually blank / nop area
 			// we should also map the banked area back (we don't currently unmap it tho)
 			memory_install_rom(space, 0x0000100, 0x03fffff, 0, 0, memory_region(space->machine, "maincpu")+0x100);
 		}
-		
+
 		//printf("_32x_68k_a15106_w %04x\n", data);
 		/*
         if (a15106_reg & 0x4)
@@ -2583,7 +2583,7 @@ static WRITE16_HANDLER( _32x_68k_a15100_w )
 			memory_install_rom(space, 0x0880000, 0x08fffff, 0, 0, memory_region(space->machine, "gamecart")); // 'fixed' 512kb rom bank
 
 			memory_install_read_bank(space, 0x0900000, 0x09fffff, 0, 0, "bank12"); // 'bankable' 1024kb rom bank
-			memory_set_bankptr(space->machine,  "bank12", memory_region(space->machine, "gamecart") );
+			memory_set_bankptr(space->machine,  "bank12", memory_region(space->machine, "gamecart")+((_32x_68k_a15104_reg&0x3)*0x100000) );
 
 			memory_install_rom(space, 0x0000000, 0x03fffff, 0, 0, memory_region(space->machine, "32x_68k_bios"));
 
@@ -2778,12 +2778,12 @@ static READ16_HANDLER( _32x_common_vdp_regs_r )
 
 
 //	printf("_32x_68k_a15180_r (a15180) %04x\n",mem_mask);
-	
+
 	// read needs authorization too I think, undefined behavior otherwise
 	switch (offset)
 	{
 		case 0x00:
-		
+
 		// the flag is inverted compared to the megadrive
 		int ntsc;
 		if (megadrive_region_pal) ntsc = 0;
@@ -2793,21 +2793,21 @@ static READ16_HANDLER( _32x_common_vdp_regs_r )
 			   (_32x_videopriority << 7 ) |
 			   ( _32x_240mode << 6 ) |
 			   ( _32x_displaymode << 0 );
-			   
-	
-	
+
+
+
 		case 0x02/2:
 			return _32x_screenshift;
-			
+
 		case 0x04/2:
 			return _32x_autofill_length;
-			
+
 		case 0x06/2:
 			return _32x_autofill_address;
-			
+
 		case 0x08/2:
 			return _32x_autofill_data;
-			
+
 		case 0x0a/2:
 			UINT16 retdata = _32x_a1518a_reg;
 			UINT16 hpos = get_hposition();
@@ -2826,7 +2826,7 @@ static READ16_HANDLER( _32x_common_vdp_regs_r )
 
 			return retdata;
 	}
-	
+
 	return 0x0000;
 }
 
@@ -2835,7 +2835,7 @@ static READ16_HANDLER( _32x_common_vdp_regs_r )
 static WRITE16_HANDLER( _32x_common_vdp_regs_w )
 {
 	// what happens if the z80 accesses it, what authorization do we use? which address space do we get?? the z80 *can* write here and to the framebuffer via the window
-	
+
 	address_space* _68kspace = cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	if (space!= _68kspace)
@@ -2849,14 +2849,14 @@ static WRITE16_HANDLER( _32x_common_vdp_regs_w )
 		if (_32x_access_auth!=0)
 			return;
 	}
-		
-	
+
+
 	switch (offset)
 	{
-	
-		case 0x00:	
+
+		case 0x00:
 			printf("_32x_68k_a15180_w (a15180) %04x %04x   source _32x_access_auth %04x\n",data,mem_mask, _32x_access_auth);
-		  	 
+
 			if (ACCESSING_BITS_0_7)
 			{
 				_32x_videopriority = (data & 0x80) >> 7;
@@ -2864,7 +2864,7 @@ static WRITE16_HANDLER( _32x_common_vdp_regs_w )
 				_32x_displaymode   = (data & 0x03) >> 0;
 			}
 			break;
-			
+
 		case 0x02/2:
 			if (ACCESSING_BITS_0_7)
 			{
@@ -2875,7 +2875,7 @@ static WRITE16_HANDLER( _32x_common_vdp_regs_w )
 
 			}
 			break;
-			
+
 		case 0x04/2:
 			if (ACCESSING_BITS_0_7)
 			{
@@ -2887,7 +2887,7 @@ static WRITE16_HANDLER( _32x_common_vdp_regs_w )
 
 			}
 			break;
-			
+
 		case 0x06/2:
 			if (ACCESSING_BITS_0_7)
 			{
@@ -2899,7 +2899,7 @@ static WRITE16_HANDLER( _32x_common_vdp_regs_w )
 				_32x_autofill_address = (_32x_autofill_address & 0x00ff) | (data & 0xff00);
 			}
 			break;
-			
+
 		case 0x08/2:
 			if (ACCESSING_BITS_0_7)
 			{
@@ -2921,7 +2921,7 @@ static WRITE16_HANDLER( _32x_common_vdp_regs_w )
 				}
 			}
 			break;
-			
+
 		case 0x0a/2:
 			// bit 0 is the framebuffer select;
 			_32x_a1518a_reg = (_32x_a1518a_reg & 0xfffe) | (data & 1);
@@ -2937,11 +2937,11 @@ static WRITE16_HANDLER( _32x_common_vdp_regs_w )
 				_32x_access_dram = _32x_dram1;
 			}
 			break;
-		
-	
+
+
 	}
-	
-	
+
+
 }
 
 
@@ -2999,7 +2999,7 @@ static WRITE16_HANDLER( _32x_sh2_master_4000_w )
 
 		if (sh2_master_hint_enable) printf("sh2_master_hint_enable enable!\n");
 		//if (sh2_master_pwmint_enable) printf("sh2_master_pwn_enable enable!\n");
-		
+
 		_32x_check_irqs(space->machine);
 	}
 }
@@ -5354,11 +5354,11 @@ static void genesis_render_videobuffer_to_screenbuffer(running_machine *machine,
 					{
 						lineptr[x] = _32x_linerender[x]&0x7fff;
 						drawn = 1;
-					}						
+					}
 				}
-			}	
+			}
 
-			
+
 			if (drawn==0)
 			{
 				if (dat&0x10000)
@@ -5366,14 +5366,14 @@ static void genesis_render_videobuffer_to_screenbuffer(running_machine *machine,
 				else
 					lineptr[x] = megadrive_vdp_palette_lookup[(dat&0x0f) | segac2_bg_pal_lookup[(dat&0x30)>>4]];
 			}
-			
 
-			
+
+
 		}
 	}
 	else
 	{
-		
+
 		for (x=0;x<320;x++)
 		{
 			UINT32 dat;
@@ -5398,11 +5398,11 @@ static void genesis_render_videobuffer_to_screenbuffer(running_machine *machine,
 					{
 						lineptr[x] = _32x_linerender[x]&0x7fff;
 						drawn = 1;
-					}						
+					}
 				}
-			}	
+			}
 
-			
+
 			if (drawn==0)
 			{
 				/* Verify my handling.. I'm not sure all cases are correct */
@@ -5442,9 +5442,9 @@ static void genesis_render_videobuffer_to_screenbuffer(running_machine *machine,
 					break;
 				}
 			}
-			
-			
-			
+
+
+
 		}
 
 	}
@@ -5790,7 +5790,7 @@ void _32x_check_irqs(running_machine* machine)
 	else cpu_set_input_line(_32x_master_cpu,SH2_VINT_IRQ_LEVEL,CLEAR_LINE);
 
 	if (sh2_slave_vint_enable && sh2_slave_vint_pending) cpu_set_input_line(_32x_slave_cpu,SH2_VINT_IRQ_LEVEL,ASSERT_LINE);
-	else cpu_set_input_line(_32x_slave_cpu,SH2_VINT_IRQ_LEVEL,CLEAR_LINE);	
+	else cpu_set_input_line(_32x_slave_cpu,SH2_VINT_IRQ_LEVEL,CLEAR_LINE);
 }
 
 
@@ -5825,9 +5825,9 @@ static TIMER_DEVICE_CALLBACK( scanline_timer_callback )
 			// 32x interrupt!
 			if (_32x_is_connected)
 			{
-				sh2_master_vint_pending = 1;		
+				sh2_master_vint_pending = 1;
 				sh2_slave_vint_pending = 1;
-				_32x_check_irqs(timer.machine);			
+				_32x_check_irqs(timer.machine);
 			}
 
 		}
