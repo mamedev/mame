@@ -124,12 +124,17 @@ void sound_init(running_machine *machine)
 {
 	sound_private *global;
 	const char *filename;
+        const char *filenameavi;
 
 	machine->sound_data = global = auto_alloc_clear(machine, sound_private);
 
-	/* handle -nosound */
+        /* get filename for WAV file or AVI file if specified */
+	filename = options_get_string(machine->options(), OPTION_WAVWRITE);
+        filenameavi = options_get_string(machine->options(), OPTION_AVIWRITE);
+
+	/* handle -nosound and lower sample rate if not recording WAV or AVI*/
 	global->nosound_mode = !options_get_bool(machine->options(), OPTION_SOUND);
-	if (global->nosound_mode)
+	if (global->nosound_mode && filename[0] == 0 && filenameavi[0] == 0)
 		machine->sample_rate = 11025;
 
 	/* count the speakers */
@@ -145,7 +150,6 @@ void sound_init(running_machine *machine)
 	timer_adjust_periodic(global->update_timer, STREAMS_UPDATE_ATTOTIME, 0, STREAMS_UPDATE_ATTOTIME);
 
 	/* open the output WAV file if specified */
-	filename = options_get_string(machine->options(), OPTION_WAVWRITE);
 	if (filename[0] != 0)
 		global->wavfile = wav_open(filename, machine->sample_rate, 2);
 
