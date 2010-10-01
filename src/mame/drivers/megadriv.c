@@ -106,25 +106,96 @@ MD side check:
 #38 SH-2 Serial Communication (ERROR - returns a Timeout Error)
 MD & 32x check:
 #39 MD&SH-2 Master Communication (ERROR)
-#40 (something related to SCI) (STALLS)
-#41 MD&SH-2 Master FM Bit R/W (ERROR)
-#42 MD&SH-2 Slave FM Bit R/W (STALLS?)
+#40 MD&SH-2 Slave Communication (STALLS)
+#41 MD&SH-2 Master FM Bit R/W
+#42 MD&SH-2 Slave FM Bit R/W
 #43 MD&SH-2 Master DREQ CTL (ERROR)
 #44 MD&SH-2 Slave DREQ CTL (ERROR)
-#45 MD&SH-2 Master DREQ SRC address (ERROR)
-#46 MD&SH-2 Slave DREQ SRC address (ERROR)
-#47 MD&SH-2 Master DREQ DST address (ERROR)
-#48 MD&SH-2 Slave DREQ DST address (ERROR)
-#49 MD&SH-2 Master DREQ SIZE address (ERROR)
-#50 MD&SH-2 Slave DREQ SIZE address (ERROR)
-#51 SH-2 Master V IRQ (ERROR)
-#52 SH-2 Slave V IRQ (ERROR)
+#45 MD&SH-2 Master DREQ SRC address
+#46 MD&SH-2 Slave DREQ SRC address
+#47 MD&SH-2 Master DREQ DST address
+#48 MD&SH-2 Slave DREQ DST address
+#49 MD&SH-2 Master DREQ SIZE address
+#50 MD&SH-2 Slave DREQ SIZE address
+#51 SH-2 Master V IRQ
+#52 SH-2 Slave V IRQ
 #53 SH2 Master H IRQ (MD 0) (ERROR)
 #54 SH2 Slave H IRQ (MD 0) (ERROR)
 #55 SH2 Master H IRQ (MD 1) (ERROR)
 #56 SH2 Slave H IRQ (MD 1) (ERROR)
 #57 SH2 Master H IRQ (MD 2) (ERROR)
 #58 SH2 Slave H IRQ (MD 2) (ERROR)
+MD VDP check:
+#59 Bitmap Mode Register
+#60 Shift Register
+#61 Auto Fill Length Register
+#62 Auto Fill Start Address Register
+#63 V Blank BIT
+#64 H Blank BIT
+#65 Palette Enable BIT
+SH-2 VDP check:
+#66 Frame Swap BIT
+#67 SH-2 Master Bitmap MD
+#68 SH-2 Slave Bitmap MD
+#69 SH-2 Master Shift
+#70 SH-2 Slave Shift
+#71 SH-2 Master Fill SIZE
+#72 SH-2 Slave Fill SIZE
+#73 SH-2 Master Fill START
+#74 SH-2 Slave Fill START
+#75 SH-2 Master V Blank Bit
+#76 SH-2 Slave V Blank Bit
+#77 SH-2 Master H Blank Bit
+#78 SH-2 Slave H Blank Bit
+#79 SH-2 Master Palette Enable Bit
+#80 SH-2 Slave Palette Enable Bit
+#81 SH-2 Master Frame Swap Bit
+#82 SH-2 Slave Frame Swap Bit
+Framebuffer Check:
+#83 MD Frame Buffer 0
+#84 MD Frame Buffer 1
+#85 SH-2 Master Frame Buffer 0
+#86 SH-2 Slave Frame Buffer 0
+#87 SH-2 Master Frame Buffer 1
+#88 SH-2 Slave Frame Buffer 1
+#89 MD Frame Buffer 0 Overwrite
+#90 MD Frame Buffer 1 Overwrite
+#91 MD Frame Buffer 0 Byte Write
+#92 MD Frame Buffer 1 Byte Write
+#93 SH-2 Master Frame Buffer 0 Overwrite
+#94 SH-2 Slave Frame Buffer 0 Overwrite
+#95 SH-2 Master Frame Buffer 1 Overwrite
+#96 SH-2 Slave Frame Buffer 1 Overwrite
+#97 SH-2 Master Frame Buffer 0 Byte Write
+#98 SH-2 Slave Frame Buffer 0 Byte Write
+#99 SH-2 Master Frame Buffer 1 Byte Write
+#100 SH-2 Slave Frame Buffer 1 Byte Write
+#101 MD Frame Buffer 0 Fill Data
+#102 MD Frame Buffer 1 Fill Data
+#103 MD Frame Buffer 0 Fill Length & Address
+#104 MD Frame Buffer 1 Fill Length & Address
+#105 SH-2 Master Frame Buffer 0 Fill Data
+#106 SH-2 Slave Frame Buffer 0 Fill Data
+#107 SH-2 Master Frame Buffer 1 Fill Data
+#108 SH-2 Slave Frame Buffer 1 Fill Data
+#109 SH-2 Master Frame Buffer 0 Fill Address
+#110 SH-2 Slave Frame Buffer 0 Fill Address
+#111 SH-2 Master Frame Buffer 1 Fill Address
+#112 SH-2 Slave Frame Buffer 1 Fill Address
+#113 MD Palette R/W (Blank Mode)
+#114 MD Palette R/W (Display Mode)
+#115 MD Palette R/W (Fill Mode)
+#116 SH-2 Master Palette R/W (Blank Mode)
+#117 SH-2 Slave Palette R/W (Blank Mode)
+#118 SH-2 Master Palette R/W (Display Mode)
+#119 SH-2 Slave Palette R/W (Display Mode)
+#120 SH-2 Master Palette R/W (Fill Mode)
+#121 SH-2 Slave Palette R/W (Fill Mode)
+MD or SH-2 DMA check:
+#122 SH-2 Master CPU Write DMA (68S) (ERROR)
+#123 SH-2 Slave CPU Write DMA (68S) (ERROR)
+#124 MD ROM to VRAM DMA
+(asserts after this)
 
 */
 
@@ -2824,7 +2895,13 @@ static WRITE16_HANDLER( _32x_68k_commsram_w )
 // access from the SH2 via 4030 - 403f
 /**********************************************************************************************/
 
-#define PWM_FIFO_SIZE pwm_tm_reg // guess, check this (Doom wants 3, Virtua Racing wants 1 like they sets this register?)
+/*
+TODO:
+- noticeable static noise on Virtua Fighter Sega logo at start-up
+- Understand if Speaker OFF makes the FIFO to advance or not
+*/
+
+#define PWM_FIFO_SIZE pwm_tm_reg // guess, Marsch calls this register as FIFO width
 
 static UINT16 pwm_ctrl,pwm_cycle,pwm_tm_reg;
 static UINT16 cur_lch[0x10],cur_rch[0x10];
@@ -2857,7 +2934,14 @@ static TIMER_CALLBACK( _32x_pwm_callback )
 {
 	if(lch_index_r < PWM_FIFO_SIZE)
 	{
-		dac_signed_data_16_w(machine->device("lch_pwm"), cur_lch[lch_index_r++]);
+		switch(pwm_ctrl & 3)
+		{
+			case 0: lch_index_r++; /*Speaker OFF*/ break;
+			case 1: dac_signed_data_16_w(machine->device("lch_pwm"), cur_lch[lch_index_r++]); break;
+			case 2: dac_signed_data_16_w(machine->device("rch_pwm"), cur_lch[lch_index_r++]); break;
+			case 3: popmessage("Undefined PWM Lch value 3, contact MESSdev"); break;
+		}
+
 		lch_index_w = 0;
 	}
 
@@ -2865,7 +2949,14 @@ static TIMER_CALLBACK( _32x_pwm_callback )
 
 	if(rch_index_r < PWM_FIFO_SIZE)
 	{
-		dac_signed_data_16_w(machine->device("rch_pwm"), cur_rch[rch_index_r++]);
+		switch((pwm_ctrl & 0xc) >> 2)
+		{
+			case 0: rch_index_r++; /*Speaker OFF*/ break;
+			case 1: dac_signed_data_16_w(machine->device("rch_pwm"), cur_rch[rch_index_r++]); break;
+			case 2: dac_signed_data_16_w(machine->device("lch_pwm"), cur_rch[rch_index_r++]); break;
+			case 3: popmessage("Undefined PWM Rch value 3, contact MESSdev"); break;
+		}
+
 		rch_index_w = 0;
 	}
 
@@ -3596,7 +3687,177 @@ ADDRESS_MAP_END
 *************************************************************************************************/
 
 static UINT16* segacd_4meg_prgram;  // pointer to SubCPU PrgRAM
+
+
+static UINT16 a12000_halt_reset_reg = 0x0000;
+
+static WRITE16_HANDLER( scd_a12000_halt_reset_w )
+{
+	COMBINE_DATA(&a12000_halt_reset_reg);
+
+	if (ACCESSING_BITS_0_7)
+	{
+		// reset line
+		if (a12000_halt_reset_reg&0x0001)
+			cputag_set_input_line(space->machine, "segacd_68k", INPUT_LINE_RESET, CLEAR_LINE);
+		else
+			cputag_set_input_line(space->machine, "segacd_68k", INPUT_LINE_RESET, ASSERT_LINE);
+
+		// request BUS
+		if (a12000_halt_reset_reg&0x0002)
+			cputag_set_input_line(space->machine, "segacd_68k", INPUT_LINE_HALT, ASSERT_LINE);
+		else
+			cputag_set_input_line(space->machine, "segacd_68k", INPUT_LINE_HALT, CLEAR_LINE);
+	}
+
+	if (ACCESSING_BITS_8_15)
+	{
+		if (a12000_halt_reset_reg&0x0100)
+		{
+			// check if it's masked! (irq check function?)
+			cputag_set_input_line(space->machine, "segacd_68k", 2, ASSERT_LINE);
+		}
+
+		if (a12000_halt_reset_reg&0x8000)
+		{
+			printf("a12000_halt_reset_reg & 0x8000 set\n"); // irq2 mask?
+		}
+
+
+	}
+}
+
+static READ16_HANDLER( scd_a12000_halt_reset_r )
+{
+	return a12000_halt_reset_reg;
+}
+
+
+/********************************************************************************
+ MEMORY MODE CONTROL
+  - main / sub sides differ!
+********************************************************************************/
+
+//
+// we might need a delay on the segacd_maincpu_has_ram_access registers, as they actually indicate requests being made
+// so probably don't change instantly...
+//
+
+static UINT8 segacd_ram_writeprotect_bits;
+static int segacd_ram_mode;
+
+static int segacd_maincpu_has_ram_access = 0;
 static int segacd_4meg_prgbank = 0; // which bank the MainCPU can see of the SubCPU PrgRAM
+static int segacd_memory_priority_mode = 0;
+
+
+static READ16_HANDLER( scd_a12002_memory_mode_r )
+{
+	return (segacd_ram_writeprotect_bits << 8) |
+		   (segacd_4meg_prgbank << 6) |
+		   (segacd_ram_mode << 2) |
+		   ((segacd_maincpu_has_ram_access^1) << 1) |
+		   ((segacd_maincpu_has_ram_access) << 0);
+}
+
+static WRITE16_HANDLER( scd_a12002_memory_mode_w )
+{
+	printf("scd_a12002_memory_mode_w %04x %04x\n", data, mem_mask);
+
+	if (ACCESSING_BITS_0_7)
+	{
+
+		if (data&0x0001) printf("ret bit set (invalid? can't set from main68k?)\n");
+		if (data&0x0002)
+		{
+			printf("dmn set (swap requested)\n"); // give ram to sub?
+
+			// this should take some time?
+			segacd_maincpu_has_ram_access = 0;
+		}
+
+
+		if (data&0x0004) printf("mode set (invalid? can't set from main68k?)\n");
+		if (data&0x0038) printf("unknown bits set\n");
+
+		//if (data&0x00c0)
+		{
+			printf("bank set to %02x\n", (data&0x00c0)>>6);
+			segacd_4meg_prgbank = (data&0x00c0)>>6;
+
+		}
+
+	}
+
+	if (ACCESSING_BITS_8_15)
+	{
+		if (data & 0xff00)
+		{
+			printf("write protect bits set %02x\n", data >> 8);
+		}
+
+		segacd_ram_writeprotect_bits = data >> 8;
+	}
+
+}
+
+// can't read the bank?
+static READ16_HANDLER( segacd_sub_memory_mode_r )
+{
+	return (segacd_ram_writeprotect_bits << 8) |
+	 	 /*(segacd_4meg_prgbank << 6) | */
+		   (segacd_memory_priority_mode << 3) |
+		   (segacd_ram_mode << 2) |
+		   ((segacd_maincpu_has_ram_access^1) << 1) |
+		   ((segacd_maincpu_has_ram_access) << 0);
+}
+
+static WRITE16_HANDLER( segacd_sub_memory_mode_w )
+{
+	printf("segacd_sub_memory_mode_w %04x %04x\n", data, mem_mask);
+
+	if (ACCESSING_BITS_0_7)
+	{
+		if (data&0x0001)
+		{
+			printf("ret bit set\n");
+			segacd_maincpu_has_ram_access = 1;
+		}
+
+
+		if (data&0x0002) printf("dmn set (swap requested) (invalid, can't be set from sub68k?\n");
+
+		//if (data&0x0004)
+		{
+			segacd_ram_mode = (data&0x0004)>>2;
+			printf("mode set %d\n", segacd_ram_mode);
+		}
+
+		//if (data&0x0018)
+		{
+
+			segacd_memory_priority_mode = (data&0x0018)>>3;
+			printf("priority mode bits set to %d\n", segacd_memory_priority_mode);
+
+		}
+
+		if (data&0x00e0) printf("unknown bits set\n");
+	}
+
+	if (ACCESSING_BITS_8_15)
+	{
+		if (data & 0xff00)
+		{
+			printf("write protect bits set %02x (invalid, can only be set by main68k)\n", data >> 8);
+		}
+	}
+
+}
+
+
+/********************************************************************************
+ END MEMORY MODE CONTROL
+********************************************************************************/
 
 
 static WRITE16_HANDLER( scd_4m_prgbank_ram_w )
@@ -3610,6 +3871,21 @@ static WRITE16_HANDLER( scd_4m_prgbank_ram_w )
 
 }
 
+
+/* Callback when the genesis enters interrupt code */
+static IRQ_CALLBACK(segacd_sub_int_callback)
+{
+	if (irqline==2)
+	{
+		// clear this bit
+		a12000_halt_reset_reg &= ~0x0100;
+		cputag_set_input_line(device->machine, "segacd_68k", 2, CLEAR_LINE);
+	}
+
+	return (0x60+irqline*4)/4; // vector address
+}
+
+
 /* main CPU map set up in INIT */
 void segacd_init_main_cpu( running_machine* machine )
 {
@@ -3621,6 +3897,10 @@ void segacd_init_main_cpu( running_machine* machine )
 	memory_set_bankptr(space->machine,  "scd_4m_prgbank", segacd_4meg_prgram + segacd_4meg_prgbank * 0x20000 );
 	memory_install_write16_handler (space, 0x0020000, 0x003ffff, 0, 0, scd_4m_prgbank_ram_w );
 
+	memory_install_readwrite16_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa12000, 0xa12001, 0, 0, scd_a12000_halt_reset_r, scd_a12000_halt_reset_w); // sub-cpu control
+	memory_install_readwrite16_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa12002, 0xa12003, 0, 0, scd_a12002_memory_mode_r, scd_a12002_memory_mode_w); // memory mode / write protect
+
+	cpu_set_irq_callback(machine->device("segacd_68k"), segacd_sub_int_callback);
 
 }
 
@@ -3631,8 +3911,54 @@ static MACHINE_RESET( segacd )
 }
 
 
+static int segacd_redled = 0;
+static int segacd_greenled = 0;
+static int segacd_ready = 1; // actually set 100ms after startup?
+
+static READ16_HANDLER( segacd_sub_led_ready_r )
+{
+	UINT16 retdata = 0x0000;
+
+	if (ACCESSING_BITS_0_7)
+	{
+		retdata |= segacd_ready;
+	}
+
+	if (ACCESSING_BITS_8_15)
+	{
+		retdata |= segacd_redled << 8;
+		retdata |= segacd_greenled << 9;
+	}
+
+	return retdata;
+}
+
+static WRITE16_HANDLER( segacd_sub_led_ready_w )
+{
+	if (ACCESSING_BITS_0_7)
+	{
+		if ((data&0x01) == 0x00)
+		{
+			// reset CD unit
+		}
+	}
+
+	if (ACCESSING_BITS_8_15)
+	{
+		segacd_redled = (data >> 8)&1;
+		segacd_greenled = (data >> 9)&1;
+	}
+
+}
+
+
 static ADDRESS_MAP_START( segacd_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0000000, 0x007ffff) AM_RAM AM_BASE(&segacd_4meg_prgram)
+
+	AM_RANGE(0x0ff8000 ,0x0ff8001) AM_READWRITE(segacd_sub_led_ready_r, segacd_sub_led_ready_w)
+	AM_RANGE(0x0ff8002 ,0x0ff8003) AM_READWRITE(segacd_sub_memory_mode_r, segacd_sub_memory_mode_w)
+
+
 ADDRESS_MAP_END
 
 
