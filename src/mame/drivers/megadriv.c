@@ -62,12 +62,75 @@ On SegaC2 the VDP never turns on the IRQ6 enable register
   vdp line state change, which can be configured in the init
   rather than hardcoding them.
 
+32x Marsch tests documentation:
+
+MD side check:
+#1 Communication Check
+#2 FM Bit
+#3 Irq Register
+#4 Bank Control Register
+#5 DREQ Control FULL bit (ERROR - presumably 7 bytes written, but FIFO sets FULL size?)
+#6 DREQ SRC Address
+#7 DREQ DST Address
+#8 DREQ SIZE Address
+#9 SEGA TV Register
+#10 H IRQ Vector
+#11 PWM Control Register
+#12 PWM Frequency Register
+#13 PWM Lch Pulse Width Register
+#14 PWM Rch Pulse Width Register
+#15 PWM MONO Pulse Width Register
+32x side check:
+#16 SH-2 Master Communication Check
+#17 SH-2 Slave Communication Check
+#18 SH-2 Master FM Bit
+#19 SH-2 Slave FM Bit
+#20 SH-2 Master IRQ Mask Register
+#21 SH-2 Slave IRQ Mask Register
+#22 SH-2 Master H Counter Register
+#23 SH-2 Slave H Counter Register
+#24 SH-2 Master PWM Timer Register
+#25 SH-2 Slave PWM Timer Register
+#26 SH-2 Master PWM Cont. Register
+#27 SH-2 Slave PWM Cont. Register
+#28 SH-2 Master PWM Freq. Register
+#29 SH-2 Slave PWM Freq. Register
+#30 SH-2 Master PWM Lch Register
+#31 SH-2 Slave PWM Lch Register
+#32 SH-2 Master PWM Rch Register
+#33 SH-2 Slave PWM Rch Register
+#34 SH-2 Master PWM Mono Register
+#35 SH-2 Slave PWM Mono Register
+#36 SH-2 Master ROM Read Check
+#37 SH-2 Slave ROM Read Check
+#38 SH-2 Serial Communication (ERROR - returns a Timeout Error)
+MD & 32x check:
+#39 MD&SH-2 Master Communication (ERROR)
+#40 (something related to SCI) (STALLS)
+#41 MD&SH-2 Master FM Bit R/W (ERROR)
+#42 MD&SH-2 Slave FM Bit R/W (STALLS?)
+#43 MD&SH-2 Master DREQ CTL (ERROR)
+#44 MD&SH-2 Slave DREQ CTL (ERROR)
+#45 MD&SH-2 Master DREQ SRC address (ERROR)
+#46 MD&SH-2 Slave DREQ SRC address (ERROR)
+#47 MD&SH-2 Master DREQ DST address (ERROR)
+#48 MD&SH-2 Slave DREQ DST address (ERROR)
+#49 MD&SH-2 Master DREQ SIZE address (ERROR)
+#50 MD&SH-2 Slave DREQ SIZE address (ERROR)
+#51 SH-2 Master V IRQ (ERROR)
+#52 SH-2 Slave V IRQ (ERROR)
+#53 SH2 Master H IRQ (MD 0) (ERROR)
+#54 SH2 Slave H IRQ (MD 0) (ERROR)
+#55 SH2 Master H IRQ (MD 1) (ERROR)
+#56 SH2 Slave H IRQ (MD 1) (ERROR)
+#57 SH2 Master H IRQ (MD 2) (ERROR)
+#58 SH2 Slave H IRQ (MD 2) (ERROR)
+
 */
 
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-//#include "deprecat.h"
 #include "sound/sn76496.h"
 #include "sound/2612intf.h"
 #include "sound/upd7759.h"
@@ -106,7 +169,6 @@ static int _32x_adapter_enabled;
 static int _32x_access_auth;
 static int _32x_screenshift;
 static int _32x_videopriority;
-static int _32x_videopriority_alt;
 
 static int _32x_displaymode;
 static int _32x_240mode;
@@ -179,6 +241,7 @@ static timer_device* irq4_on_timer;
 static bitmap_t* render_bitmap;
 //emu_timer* vblankirq_off_timer;
 
+static int sega_cd_connected = 0x00;
 
 #ifdef UNUSED_FUNCTION
 /* taken from segaic16.c */
@@ -1740,11 +1803,11 @@ READ16_HANDLER( megadriv_68k_io_read )
 			logerror("%06x read version register\n", cpu_get_pc(space->cpu));
 			retdata = megadrive_region_export<<7 | // Export
 			          megadrive_region_pal<<6 | // NTSC
-			          0x20 | // No Sega CD
+			          (sega_cd_connected?0x00:0x20) | // 0x20 = no sega cd
 			          0x00 | // Unused (Always 0)
-			          0x01 | // Bit 3 of Version Number
-			          0x01 | // Bit 2 of Version Number
-			          0x01 | // Bit 1 of Version Number
+			          0x00 | // Bit 3 of Version Number
+			          0x00 | // Bit 2 of Version Number
+			          0x00 | // Bit 1 of Version Number
 			          0x01 ; // Bit 0 of Version Number
 			break;
 
@@ -3525,12 +3588,59 @@ static ADDRESS_MAP_START( sh2_slave_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0xc0000000, 0xc0000fff) AM_RAM
 ADDRESS_MAP_END
 
+/****************************************** END 32X related *************************************/
+
+
+/*************************************************************************************************
+ Sega CD related
+*************************************************************************************************/
+
+static UINT16* segacd_4meg_prgram;  // pointer to SubCPU PrgRAM
+static int segacd_4meg_prgbank = 0; // which bank the MainCPU can see of the SubCPU PrgRAM
+
+
+static WRITE16_HANDLER( scd_4m_prgbank_ram_w )
+{
+	UINT16 realoffset = ((segacd_4meg_prgbank * 0x20000)/2) + offset;
+
+	// todo:
+	// check for write protection? (or does that only apply to writes on the SubCPU side?
+
+	COMBINE_DATA(&segacd_4meg_prgram[realoffset]);
+
+}
+
+/* main CPU map set up in INIT */
+void segacd_init_main_cpu( running_machine* machine )
+{
+	address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+
+	segacd_4meg_prgbank = 0;
+
+	memory_install_read_bank(space, 0x0020000, 0x003ffff, 0, 0, "scd_4m_prgbank");
+	memory_set_bankptr(space->machine,  "scd_4m_prgbank", segacd_4meg_prgram + segacd_4meg_prgbank * 0x20000 );
+	memory_install_write16_handler (space, 0x0020000, 0x003ffff, 0, 0, scd_4m_prgbank_ram_w );
+
+
+}
+
+static MACHINE_RESET( segacd )
+{
+	cpu_set_input_line(_segacd_68k_cpu, INPUT_LINE_RESET, ASSERT_LINE);
+	cpu_set_input_line(_segacd_68k_cpu, INPUT_LINE_HALT, ASSERT_LINE);
+}
+
+
 static ADDRESS_MAP_START( segacd_map, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x0000000, 0x0003fff) AM_RAM
+	AM_RANGE(0x0000000, 0x007ffff) AM_RAM AM_BASE(&segacd_4meg_prgram)
 ADDRESS_MAP_END
 
 
-/****************************************** END 32X related *************************************/
+
+
+
+
+
 
 /****************************************** SVP related *****************************************/
 
@@ -5358,12 +5468,7 @@ static void genesis_render_videobuffer_to_screenbuffer(running_machine *machine,
 		}
 	}
 
-	// hack - spiderman web of fire
-	//_32x_videopriority_alt = 1;
-	// normal
-	_32x_videopriority_alt = 0;
-
-	int _32x_priority = _32x_videopriority ^ _32x_videopriority_alt;
+	int _32x_priority = _32x_videopriority;
 
 
 	if (!MEGADRIVE_REG0C_SHADOW_HIGLIGHT)
@@ -6050,9 +6155,9 @@ MACHINE_RESET( megadriv )
 
 	if (_segacd_68k_cpu != NULL )
 	{
-		cpu_set_input_line(_segacd_68k_cpu, INPUT_LINE_RESET, ASSERT_LINE);
-		cpu_set_input_line(_segacd_68k_cpu, INPUT_LINE_HALT, ASSERT_LINE);
+		MACHINE_RESET_CALL( segacd );
 	}
+
 
 	current_fifo_block = fifo_block_a;
 	current_fifo_readblock = fifo_block_b;
@@ -6467,10 +6572,14 @@ static void megadriv_init_common(running_machine *machine)
 		timer_adjust_oneshot(_32x_pwm_timer, attotime_never, 0);
 	}
 
+	sega_cd_connected = 0;
 	_segacd_68k_cpu = machine->device<cpu_device>("segacd_68k");
 	if (_segacd_68k_cpu != NULL)
 	{
 		printf("Sega CD secondary 68k cpu found '%s'\n", _segacd_68k_cpu->tag() );
+		sega_cd_connected = 1;
+		segacd_init_main_cpu(machine);
+
 	}
 
 	_svp_cpu = machine->device<cpu_device>("svp");
@@ -6718,55 +6827,7 @@ DRIVER_INIT( _32x )
 
 ROM_START( 32x_bios )
 
-	ROM_REGION16_BE( 0x400000, "gamecart", 0 ) /* 68000 Code */
-	// test sets
-//  ROM_LOAD( "32xquin.rom",  0x000000,  0x05d124, CRC(93d4b0a3) SHA1(128bd0b6e048c749da1a2f4c3abd6a867539a293))
-//  ROM_LOAD( "32x_babe.rom", 0x000000,  0x014f80, CRC(816b0cb4) SHA1(dc16d3170d5809b57192e03864b7136935eada64) )
-//  ROM_LOAD( "32x_hot.rom",  0x000000,  0x01235c, CRC(da9c93c9) SHA1(a62652eb8ad8c62b36f6b1ffb96922d045c4e3ac))
-//  ROM_LOAD( "32x_rot.bin",  0x000000,  0x001638, CRC(98c25033) SHA1(8d9ab3084bd29e60b8cdf4b9f1cb755eb4c88d29) )
-//  ROM_LOAD( "32x_3d.bin",   0x000000,  0x006568, CRC(0171743e) SHA1(bbe6fec182baae5e4d47d263fae6b419db5366ae) )
-//  ROM_LOAD( "32x_h15.bin",  0x000000,  0x024564, CRC(938f4e1d) SHA1(ab7270121be53c6c82c4cb45f8f41dd24eb3a2a5) ) // test demo for 15bpp mode
-//  ROM_LOAD( "32x_spin.bin", 0x000000,  0x012c28, CRC(3d1d1191) SHA1(221a74408653e18cef8ce2f9b4d33ed93e4218b7) )
-//  ROM_LOAD( "32x_ecco.bin", 0x000000,  0x300000, CRC(b06178df) SHA1(10409f2245b058e8a32cba51e1ea391ca4480108) ) // fails after sega logo
-
-	// actual games, for testing
-//  ROM_LOAD( "32x_knux.rom", 0x000000,  0x300000, CRC(d0b0b842) SHA1(0c2fff7bc79ed26507c08ac47464c3af19f7ced7) )
-//  ROM_LOAD( "32x_doom.bin", 0x000000,  0x300000, CRC(208332fd) SHA1(b68e9c7af81853b8f05b8696033dfe4c80327e38) ) // works!
-//  ROM_LOAD( "32x_koli.bin", 0x000000,  0x300000, CRC(20ca53ef) SHA1(191ae0b525ecf32664086d8d748e0b35f776ddfe) ) // works but needs sync ONLY on command writes / reads or game stutters?!
-//  ROM_LOAD( "32x_head.bin", 0x000000,  0x300000, CRC(ef5553ff) SHA1(4e872fbb44ecb2bd730abd8cc8f32f96b10582c0) ) // doesn't boot
-//  ROM_LOAD( "32x_pit.bin",  0x000000,  0x300000, CRC(f9126f15) SHA1(ee864d1677c6d976d0846eb5f8d8edb839acfb76) ) // ok, needs vram fill on intro screens tho?
-//  ROM_LOAD( "32x_spid.bin", 0x000000,  0x300000, CRC(29dce257) SHA1(7cc2ea1e10f110338ad880bd3e7ff3bce72e7e9e) ) // needs cmdint status reads, overwrite image support wrong? priority handling wrong??
-//  ROM_LOAD( "32x_carn.bin", 0x000000,  0x300000, CRC(7c7be6a2) SHA1(9a563ed821b483148339561ebd2b876efa58847b) ) // ?? doesn't boot
-//  ROM_LOAD( "32x_raw.bin",  0x000000,  0x400000, CRC(8eb7cd2c) SHA1(94b974f2f69f0c10bc18b349fa4ff95ca56fa47b) ) // needs cmdint status reads
-//  ROM_LOAD( "32x_darx.bin", 0x000000,  0x200000, CRC(22d7c906) SHA1(108b4ffed8643abdefa921cfb58389b119b47f3d) ) // ?? probably abuses the hardware, euro only ;D
-//  ROM_LOAD( "32x_prim.bin", 0x000000,  0x400000, CRC(e78a4d28) SHA1(5084dcca51d76173c383ab7d04cbc661673545f7) ) // needs tight sync or fails after sega logo - works with tight sync, but VERY slow
-//  ROM_LOAD( "32x_brut.bin", 0x000000,  0x300000, CRC(7a72c939) SHA1(40aa2c787f37772cdbd7280b8be06b15421fabae) ) // needs *very* heavy sync to work..
-//  ROM_LOAD( "32x_temp.bin", 0x000000,  0x300000, CRC(14e5c575) SHA1(6673ba83570b4f2c1b4a22415a56594c3cc6c6a9) ) // works (heavy slowdowns) RV emulation - really should hide 68k rom when transfer is off
-//  ROM_LOAD( "32x_vr.bin",   0x000000,  0x300000, CRC(7896b62e) SHA1(18dfdeb50780c2623e60a6587d7ed701a1cf81f1) ) // doesn't work
-//  ROM_LOAD( "32x_vf.bin",   0x000000,  0x400000, CRC(b5de9626) SHA1(f35754f4bfe3a53722d7a799f88face0fd13c424) ) // locks up when starting game
-//  ROM_LOAD( "32x_zaxx.bin", 0x000000,  0x200000, CRC(447d44be) SHA1(60c390f76c394bdd221936c21aecbf98aec49a3d) ) // nothing
-//  ROM_LOAD( "32x_trek.bin", 0x000000,  0x200000, CRC(dd9708b9) SHA1(e5248328b64a1ec4f1079c88ee53ef8d48e99e58) ) // boots, seems to run.. enables hints tho
-//  ROM_LOAD( "32x_sw.bin",   0x000000,  0x280000, CRC(2f16b44a) SHA1(f4ffaaf1d8330ea971643021be3f3203e1ea065d) ) // gets stuck in impossible (buggy?) 68k loop
-//  ROM_LOAD( "32x_wwfa.bin", 0x000000,  0x400000, CRC(61833503) SHA1(551eedc963cba0e1410b3d229b332ef9ea061469) ) // 32x game gfx missing, doesn't progress properly into game
-//  ROM_LOAD( "32x_shar.bin", 0x000000,  0x200000, CRC(86e7f989) SHA1(f32a52a7082761982024e40291dbd962a835b231) ) // doesn't boot
-//  ROM_LOAD( "32x_golf.bin", 0x000000,  0x300000, CRC(d3d0a2fe) SHA1(dc77b1e5c888c2c4284766915a5020bb14ee681d) ) // works
-//  ROM_LOAD( "32x_moto.bin", 0x000000,  0x200000, CRC(a21c5761) SHA1(5f1a107991aaf9eff0b3ce864b2e3151f56abe7b) ) // works (with sound!)
-//  ROM_LOAD( "32x_tmek.bin", 0x000000,  0x300000, CRC(66d2c48f) SHA1(173c8425921d83db3e8d181158e7599364f4c0f6) ) // works?
-//  ROM_LOAD( "32x_bcr.bin",  0x000000,  0x300000, CRC(936c3d27) SHA1(9b5fd499eaa442d48a2c97fceb1d505dc8e8ddff) ) // overwrite image problems, locks going ingame
-//  ROM_LOAD( "32x_blak.bin", 0x000000,  0x300000, CRC(d1a60a47) SHA1(4bf120cf056fe1417ca5b02fa0372ef33cb8ec11) ) // works?
-//  ROM_LOAD( "32x_shad.bin", 0x000000,  0x200000, CRC(60c49e4d) SHA1(561c8c63dbcabc0b1b6f31673ca75a0bde7abc72) ) // works (nasty sound)
-//  ROM_LOAD( "32x_abur.bin", 0x000000,  0x200000, CRC(204044c4) SHA1(9cf575feb036e2f26e78350154d5eb2fd3825325) ) // doesn't boot
-//  ROM_LOAD( "32x_darx.bin", 0x000000,  0x200000, CRC(22d7c906) SHA1(108b4ffed8643abdefa921cfb58389b119b47f3d) ) // doesn't boot (PAL only too)
-//  ROM_LOAD( "32x_fifa.bin", 0x000000,  0x300000, CRC(fb14a7c8) SHA1(131ebb717dee4dd1d8f5ab2b9393c23785d3a359) ) // crash
-//  ROM_LOAD( "32x_tman.bin", 0x000000,  0x400000, CRC(14eac7a6) SHA1(7588b0b8f4e93d5fdc920d3ab7e464154e423da9) ) // ok, some bad gfx
-//  ROM_LOAD( "32x_nba.bin",  0x000000,  0x400000, CRC(6b7994aa) SHA1(c8af3e74c49514669ba6652ec0c81bccf77873b6) ) // crash
-//  ROM_LOAD( "32x_nfl.bin",  0x000000,  0x300000, CRC(0bc7018d) SHA1(a0dc24f2f3a7fc5bfd12791cf25af7f7888843cf) ) // doesn't boot
-//  ROM_LOAD( "32x_rbi.bin",  0x000000,  0x200000, CRC(ff795fdc) SHA1(4f90433a4403fd74cafeea49272689046de4ae43) ) // doesn't boot
-	ROM_LOAD( "32x_wsb.bin",  0x000000,  0x300000, CRC(6de1bc75) SHA1(ab3026eae46a775adb7eaebc13702699557ddc41) ) // working - overwrite problems
-//  ROM_LOAD( "32x_mk2.bin",  0x000000,  0x400000, CRC(211085ce) SHA1(f75698de887d0ef980f73e35fc4615887a9ad58f) ) // working
-//  ROM_LOAD( "32x_sang.bin", 0x000000,  0x400000, CRC(e4de7625) SHA1(74a3ba27c55cff12409bf6c9324ece6247abbad1) ) // hangs after sega logo
-
-//  ROM_LOAD( "32x_mars.bin", 0x000000,  0x400000, CRC(8f7260fb) SHA1(7654c6d3cf2883c30df51cf38d723ab7902280c4) ) // official hw test program? reports lots of errors seems to get stuck on test 39?
+	ROM_REGION16_BE( 0x400000, "gamecart", ROMREGION_ERASEFF ) /* 68000 Code */
 
 	ROM_REGION32_BE( 0x400000, "gamecart_sh2", 0 ) /* Copy for the SH2 */
 	ROM_COPY( "gamecart", 0x0, 0x0, 0x400000)
