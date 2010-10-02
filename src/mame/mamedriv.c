@@ -4687,6 +4687,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( gunsur2 )	/* 2001.07 Gun Survivor 2: Bio Hazard Code Veronica */
 	DRIVER( starseek )	/* 2001.07 Dokidoki Idol Star Seeker */
 	DRIVER( cvs2gd )	/* 2001.08 Capcom vs. SNK 2 */
+	DRIVER( wrungp )  	/* 2001.08 Wave Runner GP */
 	DRIVER( gundmxgd )	/* 2001.09 Kidou Senshi Gundam Renpou vs. Zeon DX */
 						/* 2001.09 Alien Front */
 	DRIVER( hmgeo )		/* 2001.09 Heavy Metal Geo Matrix */
@@ -4782,7 +4783,6 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( wldrider )	/* 2001.05 Wild Riders */
 						/* 2001.06 Club Kart */
 	DRIVER( beachspi )	/* 2001.07 Beach Spikers */
-						/* 2001.08 Wave Runner GP */
 	DRIVER( vf4cart )	/* 2001.08.02 Virtua Fighter 4 (cartridge) */
 	DRIVER( vf4 )		/* 2001.08.02 Virtua Fighter 4 (GD-ROM) */
 	DRIVER( vf4b )		/* 2001.08.20 Virtua Fighter 4 ver.B */
@@ -4834,7 +4834,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( kofnwj )    	/* 2004.07 The King of Fighters Neo Wave (Japan) */
 	DRIVER( xtrmhunt )	/* 2004.09 Extreme Hunting */
 						/* 2004.09 Dirty Pig Skin Football */
-						/* 2004.09 Faster than Speed */
+	DRIVER( ftspeed )	/* 2004.09 Faster than Speed */
 	DRIVER( kov7sprt )	/* 2004.?? Knights of Valour - The Seven Sprits */
 	DRIVER( vfurlong )	/* 2005.03 Net Select Keiba Victory Furlong */
 						/* 2005.03 The Rumble Fish 2 */

@@ -304,7 +304,7 @@ Virtua Tennis 2 / Power Smash 2 (Rev A) 840-0084C  22327A  18 (64Mb)  A54SX32   
 
 
 837-14114-01  171-8132B (C) Sega 2000
-|---------------------------------------------------------|
+|----------------------------------------------------------|
 |      IC11  IC10  IC9                  ----CN2----       -|
 |      21/22 19/20 17/18            IC44 IC45              |
 |                                            IC27          |
@@ -345,9 +345,10 @@ Giga Wing 2                             841-0014C  22270    5 (128Mb)  315-6319A
 Moero Justice Gakuen / Project Justice  841-0015C  23548A  11 (128Mb)  315-6319A  315-6213  317-5065-COM
 Samba de Amigo Ver.2000                 840-0047C  23600    ? (128Mb)  315-6319A  315-6213  317-0295-COM
 The King of Route 66 (Rev A)            840-0087C  23819A   ? (128Mb)  ?          ?         ?
+Wave Runner GP                          840-0064B  24059    6 (128Mb)  315-6319A  315-6213  not populated
 Wild Riders                             840-0046C  23622   10 (128Mb)  315-6319A  315-6213  317-0301-COM
 WWF Royal Rumble                        840-0040C  22261    8 (128Mb)  315-6319   315-6213  317-0285-COM
-Zero Gunner 2                           841-0020C  23689    ? (128Mb)  315-6319A  315-6213  317-5073-COM
+Zero Gunner 2                           841-0020C  23689    5 (128Mb)  315-6319A  315-6213  317-5073-COM
 
 
 
@@ -977,6 +978,7 @@ Notes:
                Knights Of Valour Seven Spirits       AX1301F01
                Salaryman Kintaro                     AX1401F01
                Ranger Mission                        AX1601F01
+               Faster Than Speed                     AX1701F01
                Rumble Fish                           AX1801F01
                Fist Of The North Star                AX1901F01
                Victory Furlong : Horse Racing        AX2001F01
@@ -990,7 +992,8 @@ Notes:
 IC10 to IC17 - Custom-badged 128M TSOP48 mask ROMs. I suspect they are Macronix
                ROMs because the ROM on the main board is also a custom Macronix
                ROM and they have a history of producing custom ROMs for other
-               companies that hide their ROM types like Nintendo etc.
+               companies that hide their ROM types like Nintendo etc. May as well
+               be MX23L12810 or MR27V12800J, which have the same pinout.
 
                IC10 - Not Populated for 7 ROMs or less (ROM 01 if 8 ROMs are populated)
                IC11 - ROM 01 (or ROM 02 if 8 ROMs are populated)
@@ -1014,6 +1017,7 @@ IC10 to IC17 - Custom-badged 128M TSOP48 mask ROMs. I suspect they are Macronix
                Knights Of Valour Seven Spirits       AX1301M01 to AX1307M01    7
                Salaryman Kintaro                     AX1401M01 to AX1407M01    7
                Ranger Mission                        AX1601M01 to AX1605M01    5
+               Faster Than Speed                     AX1701M01 to AX1706M01    6
                Rumble Fish                           AX1801M01 to AX1807M01    7
                Fist Of The North Star                AX1901M01 to AX1907M01    7
                Victory Furlong : Horse Racing        AX2001M01 to AX2007M01    7
@@ -1053,6 +1057,7 @@ Notes:
                Game (sorted by code)                 Code
                -----------------------------------------------
                Samurai Spirits Tenkaichi Kenkakuden  AX2901F01
+               The King Of Fighters XI               AX3201F01
                Neogeo Battle Coliseum                AX3301F01
                Rumble Fish 2                         AX3401F01
 
@@ -1072,6 +1077,7 @@ Notes:
                Game (sorted by code)                 Code                      of ROMs
                -----------------------------------------------------------------------
                Samurai Spirits Tenkaichi Kenkakuden  AX2901M01 to AX2907M01    7
+               The King Of Fighters XI               AX3201M01 to AX3207M01    7
                Neogeo Battle Coliseum                AX3301M01 to AX3307M01    7
                Rumble Fish 2                         AX3401M01 to AX3405M01    5
 
@@ -1122,14 +1128,13 @@ Notes:
                ----------------------
                Chase 1929
                Dirty Pigskin
-               Faster Than Speed *
                Force Five
                Guilty Gear X Version 1.5 *
                Kenju
                Metal Slug 6 *
                Premier Eleven
                Sushi Bar
-               The King Of Fighters XI *
+	       The King Of Fighters XI *
                Sega Clay Challenge *
                Sega Bass Fishing Challenge *
 
@@ -4507,6 +4512,21 @@ ROM_START( kick4csh )
         ROM_LOAD32_WORD( "opr-24235a.ic32s", 0x7800002, 0x800000, BAD_DUMP CRC(1c55e3eb) SHA1(17a23c28d866b12f6249d513aea201edb2c43a68) )
 ROM_END
 
+ROM_START( wrungp )
+	ROM_REGION( 0x200000, "maincpu", 0)
+	NAOMI_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0x6800000, "user1", ROMREGION_ERASEFF)
+        ROM_LOAD( "epr-24059.ic22", 0x0000000, 0x400000, CRC(f82c00b5) SHA1(e885a46b2d3d52d9222d9ce038766858a2046ea1) ) 
+        ROM_LOAD( "mpr-23719.ic1",  0x0800000, 0x1000000, CRC(b9fb79df) SHA1(1568320c25118f4ee5c508dcca4e4496ff23c067) ) 
+        ROM_LOAD( "mpr-23720.ic2",  0x1800000, 0x1000000, CRC(d3f19874) SHA1(cde22c56dac233f5407d2e3ac8e6ea4f8681d0bf) ) 
+        ROM_LOAD( "mpr-23721.ic3",  0x2800000, 0x1000000, CRC(f599a52e) SHA1(ca0edc2e9496f218117cef7d71bf1761bed8d4ac) ) 
+        ROM_LOAD( "mpr-23722.ic4",  0x3800000, 0x1000000, CRC(e08a6a36) SHA1(ef37d8c7bc9d5055008d522825ef3e80e27745c2) ) 
+        ROM_LOAD( "mpr-23723.ic5",  0x4800000, 0x1000000, CRC(651610eb) SHA1(4dfe4f876a5440bd1034f41a4d76e1d6bd3e0e32) ) 
+        ROM_LOAD( "mpr-23724.ic6",  0x5800000, 0x1000000, CRC(c633c45a) SHA1(23b45140f965428d33e2424b0574715c0b952d05) ) 
+ROM_END
+
 /* GD-ROM titles - a PIC supplies a decryption key
 
 PIC stuff
@@ -4673,6 +4693,7 @@ GAME( 1998, naomi,    0,        naomi,    naomi,    naomi, ROT0, "Sega",        
 /* 0088C */ GAME( 2001, derbyocw, naomi,    naomi,    naomi,    naomi,    ROT0, "Sega",  "Derby Owners Club World Edition (JPN, USA, EXP, KOR, AUS) (Rev C)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0098C */ GAME( 2001, shootopl, naomi,    naomi,    naomi,    naomi,    ROT0, "Sega",  "Shootout Pool", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0128C */ GAME( 2001, shootpl,  naomi,    naomi,    naomi,    naomi,    ROT0, "Sega",  "Shootout Pool (JPN, USA, KOR, AUS) / Shootout Pool Prize (EXP)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 00??C */ GAME( 2001, wrungp,   naomi,    naomi,    naomi,    naomi,    ROT0, "Sega",  "Wave Runner GP", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0140C */ GAME( 2004, kick4csh, naomi,    naomi,    naomi,    kick4csh, ROT0, "Sega",  "Kick '4' Cash", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 
 /* 841-xxxxx ("Licensed by Sega" games)*/
@@ -6431,6 +6452,7 @@ static const UINT32 ggisuka_key  = 0x8b10a;
 static const UINT32 vfurlong_key = 0xa547a;
 static const UINT32 salmankt_key = 0x34b74;
 static const UINT32 maxspeed_key = 0x28dd6;
+static const UINT32 ftspeed_key  = 0x0762f;
 
 static DRIVER_INIT( atomiswave )
 {
@@ -6477,6 +6499,7 @@ AW_DRIVER_INIT(ggisuka)
 AW_DRIVER_INIT(vfurlong)
 AW_DRIVER_INIT(salmankt)
 AW_DRIVER_INIT(maxspeed)
+AW_DRIVER_INIT(ftspeed)
 
 ROM_START( fotns )
 	ROM_REGION( 0x200000, "awflash", 0)
@@ -6705,6 +6728,20 @@ ROM_START( salmankt )
         ROM_LOAD( "ax1407m01.ic17", 0x7000000, 0x1000000, CRC(6b6acc0a) SHA1(a8c692c875271a0806460caa79c67fd756231273) )
 ROM_END
 
+ROM_START( ftspeed )
+	ROM_REGION( 0x200000, "awflash", 0)
+	AW_BIOS
+
+	ROM_REGION( 0x9000000, "user1", ROMREGION_ERASE)
+        ROM_LOAD( "ax1701p01.ic18", 0x0000000, 0x0800000, CRC(480cade7) SHA1(487d4b27d7e5196d8321c5a80175ec7b1b32c1e8) ) 
+        ROM_LOAD( "ax1701m01.ic11", 0x1000000, 0x1000000, CRC(7dcdc784) SHA1(5eeef9a760a0b090ed5aad8b7bdee2baa69a088b) ) 
+        ROM_LOAD( "ax1702m01.ic12", 0x2000000, 0x1000000, CRC(06c9bf85) SHA1(636262dca7140397436646754fb204b97aa08ce9) ) 
+        ROM_LOAD( "ax1703m01.ic13", 0x3000000, 0x1000000, CRC(8f8e0224) SHA1(2a9a17ed726913c00bf1c6a94bdd4fb32e800868) ) 
+        ROM_LOAD( "ax1704m01.ic14", 0x4000000, 0x1000000, CRC(fbb4bb16) SHA1(b582680a880166c5bbdd2ad77b7903fedf9b01ad) ) 
+        ROM_LOAD( "ax1705m01.ic15", 0x5000000, 0x1000000, CRC(d9e69723) SHA1(22ed4dab76320a286b66215607bda5adf21304d1) ) 
+        ROM_LOAD( "ax1706m01.ic16", 0x6000000, 0x1000000, CRC(804b2eb2) SHA1(fcca02a5a8c09eb16548255115fb105c9c49c4e0) ) 
+ROM_END				      
+
 /* Atomiswave */
 GAME( 2001, awbios,   0,        aw,    aw,    atomiswave, ROT0, "Sammy",                           "Atomiswave Bios", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
 
@@ -6716,6 +6753,7 @@ GAME( 2003, ggisuka,  awbios,   aw,    aw,    ggisuka,  ROT0, "Sammy / Arc Syste
 GAME( 2004, rumblef,  awbios,   aw,    aw,    rumblef,  ROT0, "Sammy / Dimps",                   "The Rumble Fish", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 GAME( 2004, rangrmsn, awbios,   aw,    aw,    rangrmsn, ROT0, "Sammy",                           "Ranger Mission", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2004, salmankt, awbios,   aw,    aw,    salmankt, ROT0, "Sammy",                           "Salary Man Kintarou", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+GAME( 2004, ftspeed,  awbios,   aw,    aw,    ftspeed,  ROT0, "Sammy",			 	 "Faster Than Speed", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2004, kov7sprt, awbios,   aw,    aw,    kov7sprt, ROT0, "Sammy / IGS",			 "Knights of Valour - The Seven Spirits", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 GAME( 2005, vfurlong, awbios,   aw,    aw,    vfurlong, ROT0, "Sammy",			         "Net Select Keiba Victory Furlong", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2005, ngbc,     awbios,   aw,    aw,    ngbc,     ROT0, "Sammy / SNK Playmore",            "Neo-Geo Battle Coliseum", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
