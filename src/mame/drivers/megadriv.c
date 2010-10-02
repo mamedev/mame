@@ -3643,9 +3643,9 @@ static ADDRESS_MAP_START( sh2_main_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x04020000, 0x0403ffff) AM_READWRITE(_32x_sh2_framebuffer_overwrite_dram_r, _32x_sh2_framebuffer_overwrite_dram_w)
 
 	AM_RANGE(0x06000000, 0x0603ffff) AM_RAM AM_SHARE("share10")
-	AM_RANGE(0x02000000, 0x023fffff) AM_ROM AM_REGION("gamecart_sh2", 0)
+	AM_RANGE(0x02000000, 0x023fffff) AM_RAM AM_REGION("gamecart_sh2", 0) // program is writeable (wwfraw)
 
-	AM_RANGE(0x22000000, 0x223fffff) AM_ROM AM_REGION("gamecart_sh2", 0) // cart mirror (fifa96)
+	AM_RANGE(0x22000000, 0x223fffff) AM_RAM AM_REGION("gamecart_sh2", 0) // cart mirror (fifa96)
 
 	AM_RANGE(0xc0000000, 0xc0000fff) AM_RAM
 ADDRESS_MAP_END
@@ -3672,9 +3672,9 @@ static ADDRESS_MAP_START( sh2_slave_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x04020000, 0x0403ffff) AM_READWRITE(_32x_sh2_framebuffer_overwrite_dram_r, _32x_sh2_framebuffer_overwrite_dram_w)
 
 	AM_RANGE(0x06000000, 0x0603ffff) AM_RAM AM_SHARE("share10")
-	AM_RANGE(0x02000000, 0x023fffff) AM_ROM AM_REGION("gamecart_sh2", 0)
+	AM_RANGE(0x02000000, 0x023fffff) AM_RAM AM_REGION("gamecart_sh2", 0) // program is writeable (wwfraw)
 
-	AM_RANGE(0x22000000, 0x223fffff) AM_ROM AM_REGION("gamecart_sh2", 0) // cart mirror (fifa96)
+	AM_RANGE(0x22000000, 0x223fffff) AM_RAM AM_REGION("gamecart_sh2", 0) // cart mirror (fifa96)
 
 	AM_RANGE(0xc0000000, 0xc0000fff) AM_RAM
 ADDRESS_MAP_END
