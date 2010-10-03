@@ -36,10 +36,26 @@
 
     Fix 32X support (not used by any arcade systems?)
      - this seems to require far greater sync and timing accuracy on rom / ram access than MAME can provide
-     - World Series Baseball 95 (and others) are odd, they write data to the normal DRAM framebuffer
-       expecting it to act like the 'overwrite area' (where 00 bytes ignored)  this can't be right..
-
-
+     - split NTSC / PAL drivers
+     - 36greatju: missing backup ram, has issues with golfer select due of that
+     - afterbju: black screen, has a bug with Master SH-2 code snippet at 060037f8 (R0 should be 0x3ff but it's instead 0x3fff****)
+     - bcracers: write to undefined PWM register?
+     - cosmiccp: black screen, Master SH-2 stalls on a RTS? (unchecked)
+     - eccodemo: black screen after the Sega logo, faulty comms check
+     - fifa96 / nbajamte: dies on the gameplay, waiting for a comm change that never occurs;
+     - nbajamte: missing I2C hookup, startup fails due of that (same I2C type as plain MD version);
+     - nflquart: black screen, missing h irq?
+     - sangoku4: black screen after the Sega logo
+     - sharrierju: black screen;
+     - soulstar: hangs almost soon, it just plays the BGM and shows a galaxy background;
+     - tempo: intro is too fast, mostly noticeable with the PWM sound that cuts off too early when it gets to the title screen;
+     - tmek: gameplay is clearly too fast
+     - vfju: dies when a match starts or when attempts to enter into attract mode, master SH-2 jumps to a misaligned vector;
+     - vham: Master SH-2 crashes when entering into gameplay
+     - vrdxu: no 3d gfxs
+     - wwfraw: writes fb data to the cart area and expects it to be read back, kludging the cart area to be writeable makes the 32x gfxs to appear
+     - wwfwre: no 32x gfxs
+     - xmen: black screen after that you choose the level
 
     Add PicoDrive support (not arcade)
 
@@ -2428,12 +2444,12 @@ static WRITE16_HANDLER( _32x_68k_dram_w )
 
 static READ16_HANDLER( _32x_68k_dram_overwrite_r )
 {
-	return _32x_access_dram[offset+0x10000];
+	return _32x_access_dram[offset];
 }
 
 static WRITE16_HANDLER( _32x_68k_dram_overwrite_w )
 {
-	COMBINE_DATA(&_32x_access_dram[offset+0x10000]);
+	//COMBINE_DATA(&_32x_access_dram[offset+0x10000]);
 
 	if (ACCESSING_BITS_8_15)
 	{
@@ -2570,7 +2586,7 @@ static READ16_HANDLER( _32x_dreq_common_r )
 				printf("Fifo block a isn't filled!\n");
 
 			if (current_fifo_readblock == fifo_block_b && !fifo_block_b_full)
-				printf("Fifo block b isn't filled!\n");
+				printf("%08x Fifo block b isn't filled!\n",cpu_get_pc(space->cpu));
 
 
 			if (current_fifo_read_pos==4)
@@ -2617,8 +2633,8 @@ static WRITE16_HANDLER( _32x_dreq_common_w )
 		case 0x02/2: // a1510a / 400a
 			dreq_src_addr[offset&1] = ((offset&1) == 0) ? (data & 0xff) : (data & 0xfffe);
 
-			if((dreq_src_addr[0]<<16)|dreq_src_addr[1])
-				printf("DREQ set SRC = %08x\n",(dreq_src_addr[0]<<16)|dreq_src_addr[1]);
+			//if((dreq_src_addr[0]<<16)|dreq_src_addr[1])
+			//	printf("DREQ set SRC = %08x\n",(dreq_src_addr[0]<<16)|dreq_src_addr[1]);
 
 			break;
 
@@ -2626,8 +2642,8 @@ static WRITE16_HANDLER( _32x_dreq_common_w )
 		case 0x06/2: // a1510e / 400e
 			dreq_dst_addr[offset&1] = ((offset&1) == 0) ? (data & 0xff) : (data & 0xffff);
 
-			if((dreq_dst_addr[0]<<16)|dreq_dst_addr[1])
-				printf("DREQ set DST = %08x\n",(dreq_dst_addr[0]<<16)|dreq_dst_addr[1]);
+			//if((dreq_dst_addr[0]<<16)|dreq_dst_addr[1])
+			//	printf("DREQ set DST = %08x\n",(dreq_dst_addr[0]<<16)|dreq_dst_addr[1]);
 
 			break;
 
@@ -3212,7 +3228,7 @@ static WRITE16_HANDLER( _32x_common_vdp_regs_w )
 			break;
 
 		case 0x0a/2:
-			// bit 0 is the framebuffer select;
+			// bit 0 is the framebuffer select, change is delayed until vblank;
 			_32x_a1518a_reg = (_32x_a1518a_reg & 0xfffe) | (data & 1);
 
 			if (_32x_a1518a_reg & 1)
@@ -3643,9 +3659,9 @@ static ADDRESS_MAP_START( sh2_main_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x04020000, 0x0403ffff) AM_READWRITE(_32x_sh2_framebuffer_overwrite_dram_r, _32x_sh2_framebuffer_overwrite_dram_w)
 
 	AM_RANGE(0x06000000, 0x0603ffff) AM_RAM AM_SHARE("share10")
-	AM_RANGE(0x02000000, 0x023fffff) AM_RAM AM_REGION("gamecart_sh2", 0) // program is writeable (wwfraw)
+	AM_RANGE(0x02000000, 0x023fffff) AM_ROM AM_REGION("gamecart_sh2", 0) // program is writeable (wwfraw)
 
-	AM_RANGE(0x22000000, 0x223fffff) AM_RAM AM_REGION("gamecart_sh2", 0) // cart mirror (fifa96)
+	AM_RANGE(0x22000000, 0x223fffff) AM_ROM AM_REGION("gamecart_sh2", 0) // cart mirror (fifa96)
 
 	AM_RANGE(0xc0000000, 0xc0000fff) AM_RAM
 ADDRESS_MAP_END
@@ -3672,9 +3688,9 @@ static ADDRESS_MAP_START( sh2_slave_map, ADDRESS_SPACE_PROGRAM, 32 )
 	AM_RANGE(0x04020000, 0x0403ffff) AM_READWRITE(_32x_sh2_framebuffer_overwrite_dram_r, _32x_sh2_framebuffer_overwrite_dram_w)
 
 	AM_RANGE(0x06000000, 0x0603ffff) AM_RAM AM_SHARE("share10")
-	AM_RANGE(0x02000000, 0x023fffff) AM_RAM AM_REGION("gamecart_sh2", 0) // program is writeable (wwfraw)
+	AM_RANGE(0x02000000, 0x023fffff) AM_ROM AM_REGION("gamecart_sh2", 0) // program is writeable (wwfraw)
 
-	AM_RANGE(0x22000000, 0x223fffff) AM_RAM AM_REGION("gamecart_sh2", 0) // cart mirror (fifa96)
+	AM_RANGE(0x22000000, 0x223fffff) AM_ROM AM_REGION("gamecart_sh2", 0) // cart mirror (fifa96)
 
 	AM_RANGE(0xc0000000, 0xc0000fff) AM_RAM
 ADDRESS_MAP_END
@@ -6301,11 +6317,26 @@ static TIMER_DEVICE_CALLBACK( scanline_timer_callback )
 
 		}
 
-		if (megadrive_vblank_flag>=224)
-			megadrive_vblank_flag = 1;
+		#if 0
+		if(_32x_is_connected)
+		{
+			if (genesis_scanline_counter >= megadrive_irq6_scanline)
+			{
+				_32x_a1518a_reg = (_32x_a1518a_reg & 0xfffe) | (_32x_fb_swap & 1);
 
-		if (megadrive_vblank_flag>=236)
-			megadrive_vblank_flag = 0;
+				if (_32x_fb_swap & 1)
+				{
+					_32x_access_dram = _32x_dram0;
+					_32x_display_dram = _32x_dram1;
+				}
+				else
+				{
+					_32x_display_dram = _32x_dram0;
+					_32x_access_dram = _32x_dram1;
+				}
+			}
+		}
+		#endif
 
 	//  if (genesis_scanline_counter==0) irq4counter = MEGADRIVE_REG0A_HINT_VALUE;
 		// irq4counter = MEGADRIVE_REG0A_HINT_VALUE;
