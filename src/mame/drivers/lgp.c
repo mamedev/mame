@@ -78,6 +78,8 @@ static running_device *laserdisc;
 static UINT8 *tile_ram;
 static UINT8 *tile_control_ram;
 
+static emu_timer *irq_timer;
+
 
 /* VIDEO GOODS */
 static VIDEO_UPDATE( lgp )
@@ -327,13 +329,14 @@ static INTERRUPT_GEN( vblank_callback_lgp )
 
 	// IRQ
 	cpu_set_input_line(device, 0, ASSERT_LINE);
-	timer_set(device->machine, ATTOTIME_IN_USEC(50), NULL, 0, irq_stop);
+	timer_adjust_oneshot(irq_timer, ATTOTIME_IN_USEC(50), 0);
 }
 
 
 static MACHINE_START( lgp )
 {
 	laserdisc = machine->device("laserdisc");
+    irq_timer = timer_alloc(machine, irq_stop, 0);
 }
 
 

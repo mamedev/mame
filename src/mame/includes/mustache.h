@@ -5,6 +5,8 @@ public:
 		: driver_device(machine, config) { }
 
 	UINT8 *videoram;
+    
+    emu_timer *clear_irq_timer;
 };
 
 

@@ -175,8 +175,9 @@ static TIMER_CALLBACK( clear_irq_cb )
 
 static INTERRUPT_GEN( assert_irq )
 {
+	mustache_state *state = device->machine->driver_data<mustache_state>();
 	cpu_set_input_line(device, 0, ASSERT_LINE);
-	timer_set(device->machine, downcast<cpu_device *>(device)->cycles_to_attotime(14288), NULL, 0, clear_irq_cb);
+    timer_adjust_oneshot(state->clear_irq_timer, downcast<cpu_device *>(device)->cycles_to_attotime(14288), 0);
        /* Timing here is an educated GUESS, Z80 /INT must stay high so the irq
           fires no less than TWICE per frame, else game doesn't work right.
       6000000 / 56.747 = 105732.4616 cycles per frame, we'll call it A
@@ -186,6 +187,12 @@ static INTERRUPT_GEN( assert_irq )
       So (A/(L+V))*V = the number of cycles spent in vblank.
       (105732.4616 / (256+40)) * 40 = 14288.17049 z80 clocks in vblank
        */
+}
+
+static MACHINE_START( mustache )
+{
+	mustache_state *state = machine->driver_data<mustache_state>();
+	state->clear_irq_timer = timer_alloc(machine, clear_irq_cb, 0);
 }
 
 static MACHINE_CONFIG_START( mustache, mustache_state )
@@ -198,6 +205,8 @@ static MACHINE_CONFIG_START( mustache, mustache_state )
 	MDRV_CPU_ADD(CPUTAG_T5182,Z80, T5182_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(t5182_map)
 	MDRV_CPU_IO_MAP(t5182_io)
+
+	MDRV_MACHINE_START(mustache)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)

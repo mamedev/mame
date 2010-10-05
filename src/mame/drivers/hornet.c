@@ -328,6 +328,7 @@ static UINT32 *sharc_dataram[2];
 static UINT8 *jvs_sdata;
 static UINT32 jvs_sdata_ptr = 0;
 
+static emu_timer *sound_irq_timer;
 
 static READ32_HANDLER( hornet_k037122_sram_r )
 {
@@ -829,6 +830,7 @@ static const sharc_config sharc_cfg =
     NMI:    SCI
 
 */
+static TIMER_CALLBACK( irq_off );
 
 static MACHINE_START( hornet )
 {
@@ -845,6 +847,8 @@ static MACHINE_START( hornet )
 	state_save_register_global(machine, led_reg1);
 	state_save_register_global_pointer(machine, jvs_sdata, 1024);
 	state_save_register_global(machine, jvs_sdata_ptr);
+    
+    sound_irq_timer = timer_alloc(machine, irq_off, 0);
 }
 
 static MACHINE_RESET( hornet )
@@ -882,7 +886,7 @@ static void sound_irq_callback( running_machine *machine, int irq )
 	int line = (irq == 0) ? INPUT_LINE_IRQ1 : INPUT_LINE_IRQ2;
 
 	cputag_set_input_line(machine, "audiocpu", line, ASSERT_LINE);
-	timer_set(machine, ATTOTIME_IN_USEC(1), NULL, line, irq_off);
+    timer_adjust_oneshot(sound_irq_timer, ATTOTIME_IN_USEC(1), line);
 }
 
 static const k056800_interface hornet_k056800_interface =

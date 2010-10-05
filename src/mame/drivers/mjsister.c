@@ -35,10 +35,11 @@ public:
 	/* misc */
 	int  input_sel1;
 	int  input_sel2;
-
-	int  rombank0,rombank1;
+	int  rombank0, rombank1;
 
 	UINT32 dac_adr, dac_bank, dac_adr_s, dac_adr_e, dac_busy;
+
+	emu_timer *dac_timer;
 
 	/* devices */
 	running_device *maincpu;
@@ -160,7 +161,7 @@ static TIMER_CALLBACK( dac_callback )
 	dac_data_w(state->dac, DACROM[(state->dac_bank * 0x10000 + state->dac_adr++) & 0x1ffff]);
 
 	if (((state->dac_adr & 0xff00 ) >> 8) !=  state->dac_adr_e)
-		timer_set(machine, attotime_mul(ATTOTIME_IN_HZ(MCLK), 1024), NULL, 0, dac_callback);
+        timer_adjust_oneshot(state->dac_timer, attotime_mul(ATTOTIME_IN_HZ(MCLK), 1024), 0);
 	else
 		state->dac_busy = 0;
 }
@@ -178,7 +179,7 @@ static WRITE8_HANDLER( mjsister_dac_adr_e_w )
 	state->dac_adr = state->dac_adr_s << 8;
 
 	if (state->dac_busy == 0)
-		timer_call_after_resynch(space->machine, NULL, 0, dac_callback);
+        timer_adjust_oneshot(state->dac_timer, attotime_zero, 0);
 
 	state->dac_busy = 1;
 }
@@ -468,6 +469,8 @@ static MACHINE_START( mjsister )
 	state_save_register_global(machine, state->dac_adr_s);
 	state_save_register_global(machine, state->dac_adr_e);
 	state_save_register_postload(machine, mjsister_redraw, 0);
+    
+    state->dac_timer = timer_alloc(machine, dac_callback, 0);
 }
 
 static MACHINE_RESET( mjsister )

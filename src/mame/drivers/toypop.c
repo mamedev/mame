@@ -102,6 +102,7 @@ static TIMER_CALLBACK( namcoio_run )
 
 static INTERRUPT_GEN( toypop_main_interrupt )
 {
+	toypop_state *state = device->machine->driver_data<toypop_state>();
 	running_device *namcoio_0 = device->machine->device("58xx");
 	running_device *namcoio_1 = device->machine->device("56xx_1");
 	running_device *namcoio_2 = device->machine->device("56xx_2");
@@ -110,14 +111,13 @@ static INTERRUPT_GEN( toypop_main_interrupt )
 								// so don't replace with cputag_set_input_line(machine, "maincpu", 0, ASSERT_LINE);
 
 	if (!namcoio_read_reset_line(namcoio_0))		/* give the cpu a tiny bit of time to write the command before processing it */
-		timer_set(device->machine, ATTOTIME_IN_USEC(50), NULL, 0, namcoio_run);
+		timer_adjust_oneshot(state->io_timer_0, ATTOTIME_IN_USEC(50), 0);
 
 	if (!namcoio_read_reset_line(namcoio_1))		/* give the cpu a tiny bit of time to write the command before processing it */
-		timer_set(device->machine, ATTOTIME_IN_USEC(50), NULL, 1, namcoio_run);
+		timer_adjust_oneshot(state->io_timer_1, ATTOTIME_IN_USEC(50), 1);
 
 	if (!namcoio_read_reset_line(namcoio_2))		/* give the cpu a tiny bit of time to write the command before processing it */
-		timer_set(device->machine, ATTOTIME_IN_USEC(50), NULL, 2, namcoio_run);
-
+		timer_adjust_oneshot(state->io_timer_2, ATTOTIME_IN_USEC(50), 2);
 }
 
 static WRITE8_HANDLER( toypop_sound_clear_w )
@@ -150,11 +150,21 @@ static TIMER_CALLBACK( disable_interrupts )
 	state->interrupt_enable_68k = 0;
 }
 
+static MACHINE_START( toypop )
+{
+    toypop_state *state = machine->driver_data<toypop_state>();
+	state->io_timer_0 = timer_alloc(machine, namcoio_run, 0);
+	state->io_timer_1 = timer_alloc(machine, namcoio_run, 0);
+	state->io_timer_2 = timer_alloc(machine, namcoio_run, 0);
+	state->irq_disable_timer = timer_alloc(machine, disable_interrupts, 0);
+}
+
 static MACHINE_RESET( toypop )
 {
 	/* we must do this on a timer in order to have it take effect */
 	/* otherwise, the reset process will override our changes */
-	timer_call_after_resynch(machine, NULL, 0, disable_interrupts);
+    toypop_state *state = machine->driver_data<toypop_state>();
+	timer_adjust_oneshot(state->irq_disable_timer, attotime_zero, 0);
 }
 
 static INTERRUPT_GEN( toypop_m68000_interrupt )
@@ -558,8 +568,9 @@ static MACHINE_CONFIG_START( liblrabl, toypop_state )
 	MDRV_CPU_PROGRAM_MAP(m68k_map)
 	MDRV_CPU_VBLANK_INT("screen", toypop_m68000_interrupt)
 
-	MDRV_QUANTUM_TIME(HZ(6000))    /* 100 CPU slices per frame - an high value to ensure proper */
-							/* synchronization of the CPUs */
+	MDRV_QUANTUM_TIME(HZ(6000)) /* 100 CPU slices per frame - an high value to ensure proper */
+								/* synchronization of the CPUs */
+	MDRV_MACHINE_START(toypop)
 	MDRV_MACHINE_RESET(toypop)
 
 	MDRV_NAMCO58XX_ADD("58xx", intf0)

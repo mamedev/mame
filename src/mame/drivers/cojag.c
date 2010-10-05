@@ -327,6 +327,7 @@ UINT32 *jaguar_gpu_clut;
 UINT32 *jaguar_dsp_ram;
 UINT32 *jaguar_wave_rom;
 UINT8 cojag_is_r3000;
+emu_timer *gpu_sync_timer;
 
 
 
@@ -581,11 +582,11 @@ static UINT32 *gpu_jump_address;
 static UINT8 gpu_command_pending;
 static UINT32 gpu_spin_pc;
 
-static TIMER_CALLBACK( gpu_sync_timer )
+static TIMER_CALLBACK( gpu_sync_timer_callback )
 {
 	/* if a command is still pending, and we haven't maxed out our timer, set a new one */
 	if (gpu_command_pending && param < 1000)
-		timer_set(machine, ATTOTIME_IN_USEC(50), NULL, ++param, gpu_sync_timer);
+        timer_adjust_oneshot(gpu_sync_timer, ATTOTIME_IN_USEC(50), ++param);
 }
 
 
@@ -599,7 +600,7 @@ static WRITE32_HANDLER( gpu_jump_w )
 	jaguar_gpu_resume(space->machine);
 
 	/* start the sync timer going, and note that there is a command pending */
-	timer_call_after_resynch(space->machine, NULL, 0, gpu_sync_timer);
+	timer_adjust_oneshot(gpu_sync_timer, attotime_zero, 0);
 	gpu_command_pending = 1;
 }
 
@@ -1533,6 +1534,9 @@ static void cojag_common_init(running_machine *machine, UINT16 gpu_jump_offs, UI
 
 	/* init the sound system and install DSP speedups */
 	cojag_sound_init(machine);
+    
+    /* init the timer */
+    gpu_sync_timer = timer_alloc(machine, gpu_sync_timer_callback, 0);
 }
 
 
