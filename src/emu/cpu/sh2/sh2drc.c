@@ -1838,9 +1838,11 @@ static int generate_group_0(sh2_state *sh2, drcuml_block *block, compiler_state 
 			UML_ADD(block, MEM(&sh2->target), R32(Rn), IMM(4));	// add target, Rm, #4
 			UML_ADD(block, MEM(&sh2->target), MEM(&sh2->target), IMM(desc->pc));	// add target, target, pc
 
-			generate_delay_slot(sh2, block, compiler, desc);
-
+			// 32x Cosmic Carnage @ 6002cb0 relies on the delay slot
+			// clobbering the calculated PR, so do it first
 			UML_ADD(block, MEM(&sh2->pr), IMM(desc->pc), IMM(4));	// add sh2->pr, desc->pc, #4 (skip the current insn & delay slot)
+
+			generate_delay_slot(sh2, block, compiler, desc);
 
 			generate_update_cycles(sh2, block, compiler, MEM(&sh2->target), TRUE);	// <subtract cycles>
 			UML_HASHJMP(block, IMM(0), MEM(&sh2->target), sh2->nocode);	// jmp target
@@ -2455,9 +2457,9 @@ static int generate_group_4(sh2_state *sh2, drcuml_block *block, compiler_state 
 	case 0x0b: // JSR(Rn);
 		UML_MOV(block, MEM(&sh2->target), R32(Rn));		// mov target, Rn
 
-		generate_delay_slot(sh2, block, compiler, desc);
-
 		UML_ADD(block, MEM(&sh2->pr), IMM(desc->pc), IMM(4));	// add sh2->pr, desc->pc, #4 (skip the current insn & delay slot)
+
+		generate_delay_slot(sh2, block, compiler, desc);
 
 		generate_update_cycles(sh2, block, compiler, MEM(&sh2->target), TRUE);	// <subtract cycles>
 		UML_HASHJMP(block, IMM(0), MEM(&sh2->target), sh2->nocode);	// and do the jump
