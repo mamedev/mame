@@ -2237,11 +2237,11 @@ static CPU_EXECUTE( sh2 )
 
 		if (sh2->delay)
 		{
-			opcode = memory_decrypted_read_word(sh2->program, WORD_XOR_BE((UINT32)(sh2->delay & AM)));
+			opcode = sh2->program->read_word(((UINT32)(sh2->delay & AM)));
 			sh2->pc -= 2;
 		}
 		else
-			opcode = memory_decrypted_read_word(sh2->program, WORD_XOR_BE((UINT32)(sh2->pc & AM)));
+			opcode = sh2->program->read_word(((UINT32)(sh2->pc & AM)));
 
 		debugger_instruction_hook(device, sh2->pc);
 
