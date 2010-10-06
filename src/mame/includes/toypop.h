@@ -13,11 +13,6 @@ public:
 	int bitmapflip;
 	int palettebank;
 	int interrupt_enable_68k;
-    
-    emu_timer *io_timer_0;
-    emu_timer *io_timer_1;
-    emu_timer *io_timer_2;
-    emu_timer *irq_disable_timer;
 };
 
 
