@@ -576,6 +576,18 @@ void v9938_reset (int which)
 	vdp->INT = 0;
 	vdp->read_ahead = 0; vdp->address_latch = 0; /* ??? */
 	vdp->scanline = 0;
+	// MZ: The status registers 4 and 6 hold the high bits of the sprite
+	// collision location. The unused bits are set to 1.
+	// SR3: x x x x x x x x
+	// SR4: 1 1 1 1 1 1 1 x
+	// SR5: y y y y y y y y
+	// SR6: 1 1 1 1 1 1 y y
+	// Note that status register 4 is used in detection algorithms to tell
+	// apart the tms9929 from the v99x8.
+
+	// TODO: SR3-S6 do not yet store the information about the sprite collision
+	vdp->statReg[4] = 0xfe;
+	vdp->statReg[6] = 0xfc;	
 }
 
 static void v9938_check_int (running_machine *machine)
