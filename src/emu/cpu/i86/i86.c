@@ -66,6 +66,9 @@ struct _i8086_state
 	char seg_prefix;				   /* prefix segment indicator */
 	unsigned ea;
 	UINT16 eo; /* HJB 12/13/98 effective offset of the address (before segment is added) */
+
+	devcb_resolved_write_line	out_tmrout0_func;
+	devcb_resolved_write_line	out_tmrout1_func;
 };
 
 INLINE i8086_state *get_safe_token(running_device *device)
@@ -209,6 +212,22 @@ static CPU_INIT( i8088 )
 	cpustate->fetch_xor = 0;
 }
 
+static CPU_INIT( i80186 )
+{
+	i8086_state *cpustate = get_safe_token(device);
+
+	CPU_INIT_CALL(i8086);
+
+	/* resolve callbacks */
+	i80186_interface *intf = (i80186_interface *) device->baseconfig().static_config();
+
+	if (intf != NULL)
+	{
+		devcb_resolve_write_line(&cpustate->out_tmrout0_func, &intf->out_tmrout0_func, device);
+		devcb_resolve_write_line(&cpustate->out_tmrout1_func, &intf->out_tmrout1_func, device);
+	}
+}
+
 static CPU_RESET( i8086 )
 {
 	i8086_state *cpustate = get_safe_token(device);
@@ -264,6 +283,16 @@ static void set_irq_line(i8086_state *cpustate, int irqline, int state)
 		if (state != CLEAR_LINE && cpustate->IF)
 			PREFIX(_interrupt)(cpustate, (UINT32)-1);
 	}
+}
+
+static void set_drq_line(i8086_state *cpustate, int irqline, int state)
+{
+	// TODO implement me
+}
+
+static void set_tmrin_line(i8086_state *cpustate, int irqline, int state)
+{
+	// TODO implement me
 }
 
 /* PJB 03/05 */
@@ -501,7 +530,7 @@ static CPU_SET_INFO( i8086 )
 	switch (state)
 	{
 		/* --- the following bits of info are set as 64-bit signed integers --- */
-		case CPUINFO_INT_INPUT_STATE + 0:				set_irq_line(cpustate, 0, info->i);				break;
+		case CPUINFO_INT_INPUT_STATE + 0:				set_irq_line(cpustate, 0, info->i);					break;
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	set_irq_line(cpustate, INPUT_LINE_NMI, info->i);	break;
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_TEST:	set_test_line(cpustate, info->i);					break; /* PJB 03/05 */
 	}
@@ -563,10 +592,10 @@ CPU_GET_INFO( i8086 )
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "8086");				break;
-		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Intel 80x86");			break;
-		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.4");					break;
-		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);				break;
-		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Real mode i286 emulator v1.4 by Fabrice Frances\n(initial work cpustate->based on David Hedley's pcemu)"); break;
+		case DEVINFO_STR_FAMILY:						strcpy(info->s, "Intel 80x86");			break;
+		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.4");					break;
+		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);				break;
+		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Real mode i286 emulator v1.4 by Fabrice Frances\n(initial work cpustate->based on David Hedley's pcemu)"); break;
 	}
 }
 
@@ -598,21 +627,43 @@ CPU_GET_INFO( i8088 )
  * CPU-specific get_info/set_info
  **************************************************************************/
 
+static CPU_SET_INFO( i80186 )
+{
+	i8086_state *cpustate = get_safe_token(device);
+
+	switch (state)
+	{
+		/* --- the following bits of info are set as 64-bit signed integers --- */
+		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_INT0:		set_irq_line(cpustate, 0, info->i);					break;
+		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_INT1:		set_irq_line(cpustate, 1, info->i);					break;
+		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_INT2:		set_irq_line(cpustate, 2, info->i);					break;
+		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_INT3:		set_irq_line(cpustate, 3, info->i);					break;
+		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_DRQ0:		set_drq_line(cpustate, 0, info->i);					break;
+		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_DRQ1:		set_drq_line(cpustate, 1, info->i);					break;
+		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_TMRIN0:	set_tmrin_line(cpustate, 0, info->i);				break;
+		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_TMRIN1:	set_tmrin_line(cpustate, 1, info->i);				break;
+		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:		set_irq_line(cpustate, INPUT_LINE_NMI, info->i);	break;
+		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_TEST:		set_test_line(cpustate, info->i);					break; /* PJB 03/05 */
+	}
+}
+
 CPU_GET_INFO( i80186 )
 {
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
-		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 2;							break;
+		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;								break;
+		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 2;								break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(i80186);break;
+		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(i80186);	break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(i80186);			break;
+		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(i80186);	break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "80186");				break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "80186");					break;
 
-		default:										CPU_GET_INFO_CALL(i8086);				break;
+		default:										CPU_GET_INFO_CALL(i8086);					break;
 	}
 }
 
