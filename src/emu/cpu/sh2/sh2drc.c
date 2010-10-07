@@ -1758,7 +1758,7 @@ static int generate_opcode(sh2_state *sh2, drcuml_block *block, compiler_state *
 			disp = ((INT32)opcode << 20) >> 20;
 			sh2->ea = (desc->pc + 2) + disp * 2 + 2;			// sh2->ea = pc+4 + disp*2 + 2
 
-			generate_delay_slot(sh2, block, compiler, desc, sh2->ea);
+			generate_delay_slot(sh2, block, compiler, desc, sh2->ea-2);
 
 			generate_update_cycles(sh2, block, compiler, IMM(sh2->ea), TRUE);	// <subtract cycles>
 			UML_HASHJMP(block, IMM(0), IMM(sh2->ea), sh2->nocode);	// hashjmp sh2->ea
@@ -1772,7 +1772,7 @@ static int generate_opcode(sh2_state *sh2, drcuml_block *block, compiler_state *
 			disp = ((INT32)opcode << 20) >> 20;
 			sh2->ea = (desc->pc + 2) + disp * 2 + 2;			// sh2->ea = pc+4 + disp*2 + 2
 
-			generate_delay_slot(sh2, block, compiler, desc, sh2->ea);
+			generate_delay_slot(sh2, block, compiler, desc, sh2->ea-2);
 
 			generate_update_cycles(sh2, block, compiler, IMM(sh2->ea), TRUE);	// <subtract cycles>
 			UML_HASHJMP(block, IMM(0), IMM(sh2->ea), sh2->nocode);	// hashjmp sh2->ea
@@ -2473,7 +2473,7 @@ static int generate_group_4(sh2_state *sh2, drcuml_block *block, compiler_state 
 
 		UML_ADD(block, MEM(&sh2->pr), IMM(desc->pc), IMM(4));	// add sh2->pr, desc->pc, #4 (skip the current insn & delay slot)
 
-		generate_delay_slot(sh2, block, compiler, desc, sh2->target);
+		generate_delay_slot(sh2, block, compiler, desc, sh2->target-4);
 
 		generate_update_cycles(sh2, block, compiler, MEM(&sh2->target), TRUE);	// <subtract cycles>
 		UML_HASHJMP(block, IMM(0), MEM(&sh2->target), sh2->nocode);	// and do the jump
@@ -2970,7 +2970,7 @@ static int generate_group_8(sh2_state *sh2, drcuml_block *block, compiler_state 
 
 			templabel = compiler->labelnum;			// save our label
 			compiler->labelnum++;				// make sure the delay slot doesn't use it
-			generate_delay_slot(sh2, block, compiler, desc, sh2->ea);
+			generate_delay_slot(sh2, block, compiler, desc, sh2->ea-2);
 
 			generate_update_cycles(sh2, block, compiler, IMM(sh2->ea), TRUE);	// <subtract cycles>
 			UML_HASHJMP(block, IMM(0), IMM(sh2->ea), sh2->nocode);	// jmp sh2->ea
@@ -2991,7 +2991,7 @@ static int generate_group_8(sh2_state *sh2, drcuml_block *block, compiler_state 
 
 			templabel = compiler->labelnum;			// save our label
 			compiler->labelnum++;				// make sure the delay slot doesn't use it
-			generate_delay_slot(sh2, block, compiler, desc, sh2->ea);	// delay slot only if the branch is taken
+			generate_delay_slot(sh2, block, compiler, desc, sh2->ea-2);	// delay slot only if the branch is taken
 
 			generate_update_cycles(sh2, block, compiler, IMM(sh2->ea), TRUE);	// <subtract cycles>
 			UML_HASHJMP(block, IMM(0), IMM(sh2->ea), sh2->nocode);	// jmp sh2->ea
