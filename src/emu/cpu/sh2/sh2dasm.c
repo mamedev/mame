@@ -574,7 +574,7 @@ static UINT32 op1111(char *buffer, UINT32 pc, UINT16 opcode)
 	return 0;
 }
 
-static unsigned DasmSH2(char *buffer, unsigned pc, UINT16 opcode)
+unsigned DasmSH2(char *buffer, unsigned pc, UINT16 opcode)
 {
 	UINT32 flags;
 
