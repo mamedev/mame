@@ -38,25 +38,20 @@
      - this seems to require far greater sync and timing accuracy on rom / ram access than MAME can provide
      - split NTSC / PAL drivers
      - 36greatju: missing backup ram, has issues with golfer select due of that
-     - afterbju: black screen, has a bug with Master SH-2 code snippet at 060037f8 (R0 should be 0x3ff but it's instead 0x3fff****)
      - bcracers: write to undefined PWM register?
-     - cosmiccp: black screen, Master SH-2 stalls on a RTS? (unchecked)
-     - eccodemo: black screen after the Sega logo, faulty comms check
      - fifa96 / nbajamte: dies on the gameplay, waiting for a comm change that never occurs;
      - marsch1: doesn't boot, Master / Slave communicates through SCI
      - nbajamte: missing I2C hookup, startup fails due of that (same I2C type as plain MD version);
      - nflquart: black screen, missing h irq?
      - sangoku4: black screen after the Sega logo
-     - sharrierju: black screen;
-     - soulstar: hangs almost soon, it just plays the BGM and shows a galaxy background;
+     - soulstar: OSD and player sprite isn't drawn;
      - tempo: intro is too fast, mostly noticeable with the PWM sound that cuts off too early when it gets to the title screen;
      - tmek: gameplay is clearly too fast
-     - vfju: dies when a match starts or when attempts to enter into attract mode, master SH-2 jumps to a misaligned vector;
-     - vham: Master SH-2 crashes when entering into gameplay
-     - vrdxu: no 3d gfxs
-     - wwfraw: writes fb data to the cart area and expects it to be read back, kludging the cart area to be writeable makes the 32x gfxs to appear
+     - vrdxu: has 3d geometry bugs, caused by a SH-2 DRC bug;
+     - vrdxu: crashes if you attempt to enter into main menu;
+     - wwfraw: writes fb data to the cart area and expects it to be read back, kludging the cart area to be writeable makes the 32x gfxs to appear, why?
      - wwfwre: no 32x gfxs
-     - xmen: black screen after that you choose the level
+     - xmen: black screen after that you choose the level, needs bare minimum SH-2 SCI support
 
     Add PicoDrive support (not arcade)
 
@@ -3259,7 +3254,7 @@ static WRITE16_HANDLER( _32x_common_vdp_regs_w )
 	{
 
 		case 0x00:
-			printf("_32x_68k_a15180_w (a15180) %04x %04x   source _32x_access_auth %04x\n",data,mem_mask, _32x_access_auth);
+			//printf("_32x_68k_a15180_w (a15180) %04x %04x   source _32x_access_auth %04x\n",data,mem_mask, _32x_access_auth);
 
 			if (ACCESSING_BITS_0_7)
 			{
@@ -3332,10 +3327,10 @@ static WRITE16_HANDLER( _32x_common_vdp_regs_w )
 			if (ACCESSING_BITS_0_7)
 			{
 				_32x_fb_swap = data & 1;
-				
+
 				_32x_check_framebuffer_swap();
 			}
-				
+
 			break;
 
 
@@ -3990,7 +3985,7 @@ static WRITE16_HANDLER( segacd_comms_flags_subcpu_w )
 		segacd_comms_flags = (segacd_comms_flags & 0xff00) | (data & 0x00ff);
 		timer_call_after_resynch(space->machine, NULL, 0, NULL);
 	}
-	
+
 	if (ACCESSING_BITS_8_15)
 	{
 		if (data & 0xff00)
@@ -4010,7 +4005,7 @@ static WRITE16_HANDLER( segacd_comms_flags_maincpu_w )
 		}
 
 	}
-	
+
 	if (ACCESSING_BITS_8_15)
 	{
 		segacd_comms_flags = (segacd_comms_flags & 0x00ff) | (data & 0xff00);
@@ -4109,7 +4104,7 @@ static WRITE16_HANDLER( segacd_cdc_mode_address_w )
 	{
 		segacd_cdc_regaddress = data & 0x0f;
 		if (data & 0xf0) printf("unknown bits set in register address write %04x\n", data);
-		
+
 		printf("CDC register address set to %02x\n" , segacd_cdc_regaddress);
 	}
 
@@ -4117,7 +4112,7 @@ static WRITE16_HANDLER( segacd_cdc_mode_address_w )
 	{
 		segacd_cdc_destination_device = (data & 0x0700)>>8;
 		if (data & 0xf800) printf("unknown bits set in destination address write %04x\n",data);
-		
+
 		printf("destination set to: ");
 		switch (segacd_cdc_destination_device&0x7)
 		{
@@ -4128,7 +4123,7 @@ static WRITE16_HANDLER( segacd_cdc_mode_address_w )
 			case 0x04: printf("RFC5164 PCM\n"); break;
 			case 0x05: printf("PRG RAM\n"); break;
 			case 0x06: printf("Illegal\n"); break;
-			case 0x07: printf("2M AM (2M Mode) / SUB CPU 1H RAM\n"); break; 
+			case 0x07: printf("2M AM (2M Mode) / SUB CPU 1H RAM\n"); break;
 		}
 	}
 }
@@ -4136,25 +4131,25 @@ static WRITE16_HANDLER( segacd_cdc_mode_address_w )
 static READ16_HANDLER( segacd_cdc_mode_address_r )
 {
 	UINT16 retdata = 0x0000;
-	
+
 	if (ACCESSING_BITS_0_7)
 	{
 		retdata |= segacd_cdc_regaddress;
 	}
-	
+
 	if (ACCESSING_BITS_8_15)
 	{
 		retdata |= segacd_cdc_destination_device << 8;
-		
+
 		// todo: hook them up
 		int data_set_ready = 0;
 		int end_of_data_transfer = 0;
-		
+
 		if (data_set_ready) retdata |= 0x4000;
 		if (end_of_data_transfer) retdata |= 0x8000;
-	
+
 	}
-	
+
 	return retdata;
 }
 
@@ -4165,7 +4160,7 @@ static WRITE16_HANDLER( segacd_cdc_data_w )
 		segacd_cdc_registers[segacd_cdc_regaddress] = data;
 		printf("CDC Register %02x set to %02x\n", segacd_cdc_regaddress, data & 0xff);
 	}
-	
+
 	if (ACCESSING_BITS_8_15)
 	{
 		// nothing here?
@@ -4181,12 +4176,12 @@ static READ16_HANDLER( segacd_cdc_data_r )
 		retdata |= segacd_cdc_registers[segacd_cdc_regaddress];
 		printf("CDC Register %02x Read\n", segacd_cdc_regaddress);
 	}
-	
+
 	if (ACCESSING_BITS_8_15)
 	{
 		// nothing here?
 	}
-	
+
 	return retdata;
 }
 
@@ -4213,12 +4208,12 @@ static READ16_HANDLER( segacd_main_dataram_part1_r )
 		printf("Unspported: segacd_main_dataram_part1_r in mode 1\n");
 		return 0x0000;
 	}
-	
+
 	return 0x0000;
 }
 
 static WRITE16_HANDLER( segacd_main_dataram_part1_w )
-{	
+{
 	if (segacd_ram_mode==0)
 	{
 		// is this correct?
@@ -4226,7 +4221,7 @@ static WRITE16_HANDLER( segacd_main_dataram_part1_w )
 			COMBINE_DATA(&segacd_dataram[offset]);
 		else
 		{
-			printf("Illegal: segacd_main_dataram_part1_w in mode 0 without permission\n");		
+			printf("Illegal: segacd_main_dataram_part1_w in mode 0 without permission\n");
 		}
 	}
 	else if (segacd_ram_mode==1)
@@ -4247,7 +4242,7 @@ static READ16_HANDLER( scd_hint_vector_r )
 		case 0x01:
 			return segacd_hint_register;
 	}
-	
+
 	return 0;
 
 }
@@ -4302,7 +4297,7 @@ static MACHINE_RESET( segacd )
 {
 	cpu_set_input_line(_segacd_68k_cpu, INPUT_LINE_RESET, ASSERT_LINE);
 	cpu_set_input_line(_segacd_68k_cpu, INPUT_LINE_HALT, ASSERT_LINE);
-	
+
 	segacd_hint_register = 0xffff; // -1
 }
 
@@ -4359,7 +4354,7 @@ static READ16_HANDLER( segacd_sub_dataram_part1_r )
 		else
 		{
 			printf("Illegal: segacd_sub_dataram_part1_r in mode 0 without permission\n");
-			return 0x0000;		
+			return 0x0000;
 		}
 	}
 	else if (segacd_ram_mode==1)
@@ -4367,12 +4362,12 @@ static READ16_HANDLER( segacd_sub_dataram_part1_r )
 		printf("Unspported: segacd_sub_dataram_part1_r in mode 1\n");
 		return 0x0000;
 	}
-	
+
 	return 0x0000;
 }
 
 static WRITE16_HANDLER( segacd_sub_dataram_part1_w )
-{	
+{
 	if (segacd_ram_mode==0)
 	{
 		// is this correct?
@@ -4401,7 +4396,7 @@ static READ16_HANDLER( segacd_sub_dataram_part2_r )
 		printf("Unspported: segacd_sub_dataram_part2_r in mode 1\n");
 		return 0x0000;
 	}
-	
+
 	return 0x0000;
 }
 
@@ -6777,10 +6772,10 @@ static TIMER_DEVICE_CALLBACK( scanline_timer_callback )
 
 		}
 
-		
+
 
 		_32x_check_framebuffer_swap();
-		
+
 
 	//  if (genesis_scanline_counter==0) irq4counter = MEGADRIVE_REG0A_HINT_VALUE;
 		// irq4counter = MEGADRIVE_REG0A_HINT_VALUE;
@@ -7672,7 +7667,11 @@ ROM_START( 32x_bios )
 	ROM_COPY( "32x_68k_bios", 0x0, 0x0, 0x100)
 
 	ROM_REGION( 0x400000, "32x_master_sh2", 0 ) /* SH2 Code */
-	ROM_LOAD( "32x_m_bios.bin", 0x000000,  0x000800, CRC(dd9c46b8) SHA1(1e5b0b2441a4979b6966d942b20cc76c413b8c5e) )
+	ROM_SYSTEM_BIOS( 0, "retail", "Mars Version 1.0 (retail)" )
+	ROMX_LOAD( "32x_m_bios.bin", 0x000000,  0x000800, CRC(dd9c46b8) SHA1(1e5b0b2441a4979b6966d942b20cc76c413b8c5e), ROM_BIOS(1) )
+	ROM_SYSTEM_BIOS( 1, "sdk", "Mars Version 1.0 (early sdk)" )
+	ROMX_LOAD( "32x_m_bios_sdk.bin", 0x000000,  0x000800, BAD_DUMP CRC(c7102c53) SHA1(ed73a47f186b373b8eff765f84ef26c3d9ef6cb0), ROM_BIOS(2) )
+
 
 	ROM_REGION( 0x400000, "32x_slave_sh2", 0 ) /* SH2 Code */
 	ROM_LOAD( "32x_s_bios.bin", 0x000000,  0x000400, CRC(bfda1fe5) SHA1(4103668c1bbd66c5e24558e73d4f3f92061a109a) )
