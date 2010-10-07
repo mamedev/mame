@@ -3798,7 +3798,7 @@ ADDRESS_MAP_END
 *************************************************************************************************/
 
 static UINT16* segacd_4meg_prgram;  // pointer to SubCPU PrgRAM
-
+static UINT16 segacd_hint_register;
 
 static UINT16 a12000_halt_reset_reg = 0x0000;
 
@@ -4235,6 +4235,32 @@ static WRITE16_HANDLER( segacd_main_dataram_part1_w )
 	}
 }
 
+static READ16_HANDLER( scd_hint_vector_r )
+{
+//	printf("read HINT offset %d\n", offset);
+
+	switch (offset&1)
+	{
+		case 0x00:
+			//return 0x00ff; // doesn't make much sense..
+			return 0xffff;
+		case 0x01:
+			return segacd_hint_register;
+	}
+	
+	return 0;
+
+}
+
+static READ16_HANDLER( scd_a12006_hint_register_r )
+{
+	return segacd_hint_register;
+}
+
+static WRITE16_HANDLER( scd_a12006_hint_register_w )
+{
+	COMBINE_DATA(&segacd_hint_register);
+}
 
 
 /* main CPU map set up in INIT */
@@ -4243,6 +4269,9 @@ void segacd_init_main_cpu( running_machine* machine )
 	address_space* space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 	segacd_4meg_prgbank = 0;
+
+
+	memory_unmap_readwrite(space, 0x20000,0x3fffff,0,0);
 
 	memory_install_read_bank(space, 0x0020000, 0x003ffff, 0, 0, "scd_4m_prgbank");
 	memory_set_bankptr(space->machine,  "scd_4m_prgbank", segacd_4meg_prgram + segacd_4meg_prgbank * 0x20000 );
@@ -4253,6 +4282,9 @@ void segacd_init_main_cpu( running_machine* machine )
 	memory_install_readwrite16_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa12000, 0xa12001, 0, 0, scd_a12000_halt_reset_r, scd_a12000_halt_reset_w); // sub-cpu control
 	memory_install_readwrite16_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa12002, 0xa12003, 0, 0, scd_a12002_memory_mode_r, scd_a12002_memory_mode_w); // memory mode / write protect
 
+	memory_install_readwrite16_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa12006, 0xa12007, 0, 0, scd_a12006_hint_register_r, scd_a12006_hint_register_w); // where HINT points on main CPU
+
+
 	memory_install_readwrite16_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa1200e, 0xa1200f, 0, 0, segacd_comms_flags_r, segacd_comms_flags_maincpu_w); // communication flags block
 
 	memory_install_readwrite16_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xa12010, 0xa1201f, 0, 0, segacd_comms_main_part1_r, segacd_comms_main_part1_w);
@@ -4261,12 +4293,17 @@ void segacd_init_main_cpu( running_machine* machine )
 
 	cpu_set_irq_callback(machine->device("segacd_68k"), segacd_sub_int_callback);
 
+	memory_install_read16_handler (space, 0x0000070, 0x0000073, 0, 0, scd_hint_vector_r );
+
+
 }
 
 static MACHINE_RESET( segacd )
 {
 	cpu_set_input_line(_segacd_68k_cpu, INPUT_LINE_RESET, ASSERT_LINE);
 	cpu_set_input_line(_segacd_68k_cpu, INPUT_LINE_HALT, ASSERT_LINE);
+	
+	segacd_hint_register = 0xffff; // -1
 }
 
 
