@@ -2013,6 +2013,7 @@ src/mame/drivers/nmg5.c svneol=native#text/plain
 src/mame/drivers/nmk16.c svneol=native#text/plain
 src/mame/drivers/norautp.c svneol=native#text/plain
 src/mame/drivers/nova2001.c svneol=native#text/plain
+src/mame/drivers/nsmpoker.c svneol=native#text/plain
 src/mame/drivers/nss.c svneol=native#text/plain
 src/mame/drivers/nwk-tr.c svneol=native#text/plain
 src/mame/drivers/nycaptor.c svneol=native#text/plain

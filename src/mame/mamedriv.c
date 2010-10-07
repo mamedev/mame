@@ -10462,4 +10462,7 @@ Other Sun games
 	DRIVER( swisspkr )	/* (c) Golden Games 1990 */
 	DRIVER( moviecrd )	/* (c) Golden Games 1998 */
 
+	/* NSM */
+	DRIVER( nsmpoker )
+
 #endif	/* DRIVER_RECURSIVE */
