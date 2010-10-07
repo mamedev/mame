@@ -10428,6 +10428,7 @@ Other Sun games
 
 	/* Videotronics */
 	DRIVER( vpoker )	/* (c) 198? */
+	DRIVER( 5acespkr )	/* (c) 198? */
 
 	/* Play Mechanix */
 	DRIVER( jnero )		/* (c) 2004 */
