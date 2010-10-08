@@ -4632,7 +4632,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( samba )		/* 1999.12 Samba de Amigo */
 	DRIVER( vtennis )	/* 1999.12 Virtua Tennis / Power Smash (ROM) */
 	DRIVER( vtennisg )	/* 1999.12 Virtua Tennis / Power Smash (GD-ROM) */
-						/* 1999.12 Puyopuyo DA! */
+	DRIVER( puyoda )	/* 1999.12 Puyopuyo DA! */ 
+						
 	DRIVER( 18wheelr )	/* 2000.01 18 Wheeler */
 	DRIVER( totd )		/* 2000.01 The Typing of the Dead */
 	DRIVER( spawn )		/* 2000.01 Spawn */
@@ -4676,6 +4677,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( csmasho )
 	DRIVER( sfz3ugd )	/* 2001.02 Street Fighter ZERO3 Upper */
 	DRIVER( gundmgd )	/* 2001.03 Kidou Senshi Gundam Renpou vs. Zeon */
+	DRIVER( gundmct )	/* 2001.03 Mobile Suit Gundam: Federation vs. Zeon (cartridge) */
 						/* 2001.04 Shakatto Tambourine Motto Norinori Shinkyoku Tsuika */
 	DRIVER( dygolf )	/* 2001.04 Dynamic Golf */
 						/* 2001.05 Zero Gunner 2 */
@@ -4778,7 +4780,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2008.07 Issyo ni Turbo Drive */
 
 	/* NAOMI 2 */
-	DRIVER( vstrik3c )	/* 2001.04 Virtua Striker 3 */
+	DRIVER( vstrik3c )	/* 2001.04 Virtua Striker 3 (rev. C) */
+	DRIVER( vstrik3cb )	/* 2001.04 Virtua Striker 3 (rev. B) */
 	DRIVER( vstrik3 )
 	DRIVER( wldrider )	/* 2001.05 Wild Riders */
 						/* 2001.06 Club Kart */
