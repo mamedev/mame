@@ -429,7 +429,7 @@ chd_error chdcd_parse_cue(const char *tocfname, cdrom_toc *outtoc, chdcd_track_i
 						core_file *fhand;
 
 						err = core_fopen(lastfname, OPEN_FLAG_READ, &fhand);
-						if (err != FILERR_NONE) printf("holy shit!\n");
+						if (err != FILERR_NONE) printf("holy moley!\n");
 						else core_fclose(fhand);
 
 						printf("ERROR: couldn't read [%s] or not a valid .WAV\n", lastfname);

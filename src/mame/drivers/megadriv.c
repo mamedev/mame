@@ -3620,7 +3620,7 @@ static WRITE16_HANDLER( _32x_sh2_framebuffer_overwrite_dram16_w ) { _32x_68k_dra
 
 
 /* the 32x treats everything as 16-bit registers, so we remap the 32-bit read & writes
-   to 2x 16-bit handlers here (TODO: nuke this shit) */
+   to 2x 16-bit handlers here (TODO: nuke this eventually) */
 
 #define _32X_MAP_READHANDLERS(NAMEA,NAMEB)                                          \
 static READ32_HANDLER( _32x_sh2_##NAMEA##_##NAMEB##_r )                             \
