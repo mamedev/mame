@@ -61,6 +61,14 @@ typedef struct
 	UINT8 transmit_holding_register;
 	UINT8 reserved5;
 	UINT8 receive_holding_register;
+
+	INT16 receive_pointer;
+	UINT8 receive_buffer[32768];
+	emu_timer* rx_timer;
+
+	INT16 transmit_pointer;
+	UINT8 transmit_buffer[32768];
+	emu_timer* tx_timer;
 } scc68070_uart_regs_t;
 
 #define UMR_OM			0xc0
@@ -224,9 +232,15 @@ typedef struct
 
 // Member functions
 extern TIMER_CALLBACK( scc68070_timer0_callback );
+extern TIMER_CALLBACK( scc68070_rx_callback );
+extern TIMER_CALLBACK( scc68070_tx_callback );
 extern READ16_HANDLER( scc68070_periphs_r );
 extern WRITE16_HANDLER( scc68070_periphs_w );
+extern READ16_HANDLER( uart_loopback_enable );
+
 extern void scc68070_init(running_machine *machine, scc68070_regs_t *scc68070);
+extern void scc68070_uart_rx(running_machine *machine, scc68070_regs_t *scc68070, UINT8 data);
+extern void scc68070_uart_tx(running_machine *machine, scc68070_regs_t *scc68070, UINT8 data);
 extern void scc68070_register_globals(running_machine *machine, scc68070_regs_t *scc68070);
 
 #endif // _MACHINE_CDI070_H_

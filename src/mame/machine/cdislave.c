@@ -173,6 +173,7 @@ UINT16 cdislave_device::register_read(const UINT32 offset, const UINT16 mem_mask
                 case 0xb1:
                 case 0xf0:
                 case 0xf3:
+                case 0xf4:
                 case 0xf7:
                     verboselog(&m_machine, 0, "slave_r: De-asserting IRQ2\n" );
                     cputag_set_input_line(&m_machine, "maincpu", M68K_IRQ_2, CLEAR_LINE);
@@ -337,14 +338,14 @@ void cdislave_device::register_write(const UINT32 offset, const UINT16 data, con
                 m_in_index++;
                 switch(data & 0x00ff)
                 {
-                    case 0x82: // Mute audio
+                    case 0x82: // Mute Audio
                         verboselog(&m_machine, 0, "slave_w: Channel %d: Mute Audio (0x82)\n", offset );
                         dmadac_enable(&state->dmadac[0], 2, 0);
                         m_in_index = 0;
                         m_in_count = 0;
                         //timer_adjust_oneshot(cdic->audio_sample_timer, attotime_never, 0);
                         break;
-                    case 0x83: // Unmute audio
+                    case 0x83: // Unmute Audio
                         verboselog(&m_machine, 0, "slave_w: Channel %d: Unmute Audio (0x83)\n", offset );
                         dmadac_enable(&state->dmadac[0], 2, 1);
                         m_in_index = 0;
@@ -403,31 +404,36 @@ void cdislave_device::register_write(const UINT32 offset, const UINT16 data, con
                         verboselog(&m_machine, 0, "slave_w: Channel %d: Request Disc Status (0xb0)\n", offset );
                         m_in_count = 4;
                         break;
-                    case 0xb1: // Request Disc Status
+                    case 0xb1: // Request Disc Base
                         verboselog(&m_machine, 0, "slave_w: Channel %d: Request Disc Base (0xb1)\n", offset );
                         m_in_count = 4;
                         break;
-                    case 0xf0: // Get SLAVE revision
-                        verboselog(&m_machine, 0, "slave_w: Channel %d: Get SLAVE Revision (0xf0)\n", offset );
+                    case 0xf0: // Request SLAVE Revision
+                        verboselog(&m_machine, 0, "slave_w: Channel %d: Request SLAVE Revision (0xf0)\n", offset );
                         prepare_readback(ATTOTIME_IN_HZ(10000), 2, 2, 0xf0, 0x32, 0x31, 0, 0xf0);
                         m_in_index = 0;
                         break;
-                    case 0xf3: // Query Pointer Type
-                        verboselog(&m_machine, 0, "slave_w: Channel %d: Query Pointer Type (0xf3)\n", offset );
+                    case 0xf3: // Request Pointer Type
+                        verboselog(&m_machine, 0, "slave_w: Channel %d: Request Pointer Type (0xf3)\n", offset );
                         m_in_index = 0;
                         prepare_readback(ATTOTIME_IN_HZ(10000), 2, 2, 0xf3, 1, 0, 0, 0xf3);
                         break;
-                    case 0xf6: // NTSC/PAL
-                        verboselog(&m_machine, 0, "slave_w: Channel %d: Check NTSC/PAL (0xf6)\n", offset );
-                        prepare_readback(attotime_never, 2, 2, 0xf6, 1, 0, 0, 0xf6);
+                    case 0xf4: // Request Test Plug Status
+                        verboselog(&m_machine, 0, "slave_w: Channel %d: Request Test Plug Status (0xf4)\n", offset );
+                        m_in_index = 0;
+                        prepare_readback(ATTOTIME_IN_HZ(10000), 2, 2, 0xf4, 0, 0, 0, 0xf4);
+                        break;
+                    case 0xf6: // Request NTSC/PAL Status
+                        verboselog(&m_machine, 0, "slave_w: Channel %d: Request NTSC/PAL Status (0xf6)\n", offset );
+                        prepare_readback(attotime_never, 2, 2, 0xf6, 2, 0, 0, 0xf6);
                         m_in_index = 0;
                         break;
-                    case 0xf7: // Activate input polling
+                    case 0xf7: // Enable Input Polling
                         verboselog(&m_machine, 0, "slave_w: Channel %d: Activate Input Polling (0xf7)\n", offset );
                         m_polling_active = 1;
                         m_in_index = 0;
                         break;
-                    case 0xfa: // Enable X-Bus interrupts
+                    case 0xfa: // Enable X-Bus Interrupts
                         verboselog(&m_machine, 0, "slave_w: Channel %d: X-Bus Interrupt Enable (0xfa)\n", offset );
                         m_xbus_interrupt_enable = 1;
                         m_in_index = 0;
