@@ -9590,7 +9590,7 @@ Other Sun games
 	DRIVER( miniboy7a )	/* (c) 1983, Bonanza Enterprises */
 	DRIVER( 39in1 )		/* MAME based bootleg */
 	DRIVER( 48in1 )		/* MAME based bootleg */
-	DRIVER( 48in1a )    	/* MAME based bootleg */
+	DRIVER( 48in1a )    /* MAME based bootleg */
 	DRIVER( kingpin )	/* (c) 1983 American Communications Laboratories Inc. */
 	DRIVER( kingpinm )	/* (c) 1983 American Communications Laboratories Inc. */
 	DRIVER( thayers )	/* (c) 1983 RDI Video Systems */

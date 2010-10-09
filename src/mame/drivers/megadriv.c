@@ -74,7 +74,7 @@ On SegaC2 the VDP never turns on the IRQ6 enable register
   vdp line state change, which can be configured in the init
   rather than hardcoding them.
 
-32x Marsch tests documentation:
+32x Marsch tests documentation (keep start pressed at start-up for individual tests):
 
 MD side check:
 #1 Communication Check
@@ -117,12 +117,12 @@ MD side check:
 #37 SH-2 Slave ROM Read Check
 #38 SH-2 Serial Communication (ERROR - returns a Timeout Error)
 MD & 32x check:
-#39 MD&SH-2 Master Communication (ERROR)
-#40 MD&SH-2 Slave Communication (STALLS)
+#39 MD&SH-2 Master Communication
+#40 MD&SH-2 Slave Communication
 #41 MD&SH-2 Master FM Bit R/W
 #42 MD&SH-2 Slave FM Bit R/W
-#43 MD&SH-2 Master DREQ CTL (ERROR)
-#44 MD&SH-2 Slave DREQ CTL (ERROR)
+#43 MD&SH-2 Master DREQ CTL
+#44 MD&SH-2 Slave DREQ CTL
 #45 MD&SH-2 Master DREQ SRC address
 #46 MD&SH-2 Slave DREQ SRC address
 #47 MD&SH-2 Master DREQ DST address
@@ -131,12 +131,12 @@ MD & 32x check:
 #50 MD&SH-2 Slave DREQ SIZE address
 #51 SH-2 Master V IRQ
 #52 SH-2 Slave V IRQ
-#53 SH2 Master H IRQ (MD 0) (ERROR)
-#54 SH2 Slave H IRQ (MD 0) (ERROR)
-#55 SH2 Master H IRQ (MD 1) (ERROR)
-#56 SH2 Slave H IRQ (MD 1) (ERROR)
-#57 SH2 Master H IRQ (MD 2) (ERROR)
-#58 SH2 Slave H IRQ (MD 2) (ERROR)
+#53 SH2 Master H IRQ (MD 0)
+#54 SH2 Slave H IRQ (MD 0)
+#55 SH2 Master H IRQ (MD 1)
+#56 SH2 Slave H IRQ (MD 1)
+#57 SH2 Master H IRQ (MD 2)
+#58 SH2 Slave H IRQ (MD 2)
 MD VDP check:
 #59 Bitmap Mode Register
 #60 Shift Register
@@ -304,6 +304,7 @@ static int sh2_hint_in_vbl;
 static int sh2_master_vint_pending;
 static int sh2_slave_vint_pending;
 static int _32x_fb_swap;
+static int _32x_hcount_reg,_32x_hcount_compare_val;
 
 void _32x_check_irqs(running_machine* machine);
 
@@ -2985,6 +2986,7 @@ TODO:
 */
 
 #define PWM_FIFO_SIZE pwm_tm_reg // guess, Marsch calls this register as FIFO width
+#define PWM_CLOCK megadrive_region_pal ? ((MASTER_CLOCK_PAL*3) / 7) : ((MASTER_CLOCK_NTSC*3) / 7)
 
 static UINT16 pwm_ctrl,pwm_cycle,pwm_tm_reg;
 static UINT16 cur_lch[0x10],cur_rch[0x10];
@@ -3009,7 +3011,7 @@ static void calculate_pwm_timer(void)
 		lch_fifo_state = rch_fifo_state = 0x4000;
 		lch_index_r = rch_index_r = 0;
 		lch_index_w = rch_index_w = 0;
-		timer_adjust_oneshot(_32x_pwm_timer, ATTOTIME_IN_HZ(((MASTER_CLOCK_NTSC*3 / 7) / (pwm_cycle - 1))), 0);
+		timer_adjust_oneshot(_32x_pwm_timer, ATTOTIME_IN_HZ((PWM_CLOCK) / (pwm_cycle - 1)), 0);
 	}
 }
 
@@ -3054,7 +3056,7 @@ static TIMER_CALLBACK( _32x_pwm_callback )
 		if(sh2_slave_pwmint_enable) { cpu_set_input_line(_32x_slave_cpu, SH2_PINT_IRQ_LEVEL,ASSERT_LINE); }
 	}
 
-	timer_adjust_oneshot(_32x_pwm_timer, ATTOTIME_IN_HZ(((MASTER_CLOCK_NTSC*3 / 7) / (pwm_cycle - 1))), 0);
+	timer_adjust_oneshot(_32x_pwm_timer, ATTOTIME_IN_HZ((PWM_CLOCK) / (pwm_cycle - 1)), 0);
 }
 
 static READ16_HANDLER( _32x_pwm_r )
@@ -3392,7 +3394,7 @@ static WRITE16_HANDLER( _32x_sh2_master_4000_w )
 		sh2_master_cmdint_enable = data & 0x2;
 		sh2_master_pwmint_enable = data & 0x1;
 
-		if (sh2_master_hint_enable) printf("sh2_master_hint_enable enable!\n");
+		//if (sh2_master_hint_enable) printf("sh2_master_hint_enable enable!\n");
 		//if (sh2_master_pwmint_enable) printf("sh2_master_pwn_enable enable!\n");
 
 		_32x_check_irqs(space->machine);
@@ -3430,7 +3432,7 @@ static WRITE16_HANDLER( _32x_sh2_slave_4000_w )
 		sh2_slave_cmdint_enable = data & 0x2;
 		sh2_slave_pwmint_enable = data & 0x1;
 
-		if (sh2_slave_hint_enable) printf("sh2_slave_hint_enable enable!\n");
+		//if (sh2_slave_hint_enable) printf("sh2_slave_hint_enable enable!\n");
 		//if (sh2_slave_pwmint_enable) printf("sh2_slave_pwm_enable enable!\n");
 
 		_32x_check_irqs(space->machine);
@@ -3461,16 +3463,14 @@ static WRITE16_HANDLER( _32x_sh2_common_4002_w )
 // H Count Register (H Interrupt)
 // 0 = every line
 /**********************************************************************************************/
-static UINT16 hcount;
-
 static READ16_HANDLER( _32x_sh2_common_4004_r )
 {
-	return hcount;
+	return _32x_hcount_reg;
 }
 
 static WRITE16_HANDLER( _32x_sh2_common_4004_w )
 {
-	hcount = data & 0xff;
+	_32x_hcount_reg = data & 0xff;
 }
 
 
@@ -4338,6 +4338,8 @@ static WRITE16_HANDLER( segacd_sub_led_ready_w )
 	{
 		segacd_redled = (data >> 8)&1;
 		segacd_greenled = (data >> 9)&1;
+
+		popmessage("%02x %02x",segacd_greenled,segacd_redled);
 	}
 
 }
@@ -4408,27 +4410,52 @@ static WRITE16_HANDLER( segacd_sub_dataram_part2_w )
 	}
 	else if (segacd_ram_mode==1)
 	{
-		printf("Unspported: segacd_sub_dataram_part2_w in mode 1\n");
+		printf("Unsupported: segacd_sub_dataram_part2_w in mode 1\n");
 	}
 }
 
 
 static ADDRESS_MAP_START( segacd_map, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x0000000, 0x007ffff) AM_RAM AM_BASE(&segacd_4meg_prgram)
+	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_BASE(&segacd_4meg_prgram)
 
-	AM_RANGE(0x0080000, 0x00bffff) AM_READWRITE(segacd_sub_dataram_part1_r, segacd_sub_dataram_part1_w) AM_BASE(&segacd_dataram)
-	AM_RANGE(0x00c0000, 0x00dffff) AM_READWRITE(segacd_sub_dataram_part2_r, segacd_sub_dataram_part2_w) AM_BASE(&segacd_dataram2)
+	AM_RANGE(0x080000, 0x0bffff) AM_READWRITE(segacd_sub_dataram_part1_r, segacd_sub_dataram_part1_w) AM_BASE(&segacd_dataram)
+	AM_RANGE(0x0c0000, 0x0dffff) AM_READWRITE(segacd_sub_dataram_part2_r, segacd_sub_dataram_part2_w) AM_BASE(&segacd_dataram2)
 
+//	AM_RANGE(0xfe0000, 0xfe3fff) // backup RAM, odd bytes only!
 
-	AM_RANGE(0x0ff8000 ,0x0ff8001) AM_READWRITE(segacd_sub_led_ready_r, segacd_sub_led_ready_w)
-	AM_RANGE(0x0ff8002 ,0x0ff8003) AM_READWRITE(segacd_sub_memory_mode_r, segacd_sub_memory_mode_w)
+//	AM_RANGE(0xff0000, 0xff7fff) // PCM, RF5C164
+	AM_RANGE(0xff8000 ,0xff8001) AM_READWRITE(segacd_sub_led_ready_r, segacd_sub_led_ready_w)
+	AM_RANGE(0xff8002 ,0xff8003) AM_READWRITE(segacd_sub_memory_mode_r, segacd_sub_memory_mode_w)
 
-	AM_RANGE(0x0ff8004 ,0x0ff8005) AM_READWRITE(segacd_cdc_mode_address_r, segacd_cdc_mode_address_w)
-	AM_RANGE(0x0ff8006 ,0x0ff8007) AM_READWRITE(segacd_cdc_data_r, segacd_cdc_data_w)
+	AM_RANGE(0xff8004 ,0xff8005) AM_READWRITE(segacd_cdc_mode_address_r, segacd_cdc_mode_address_w)
+	AM_RANGE(0xff8006 ,0xff8007) AM_READWRITE(segacd_cdc_data_r, segacd_cdc_data_w)
+//	AM_RANGE(0xff8008, 0xff8009) // CDC Host Data
+//	AM_RANGE(0xff800a, 0xff800b) // CDC DMA Address
+//	AM_RANGE(0xff800c, 0xff800d) // Stopwatch timer
+	AM_RANGE(0xff800e ,0xff800f) AM_READWRITE(segacd_comms_flags_r, segacd_comms_flags_subcpu_w)
+	AM_RANGE(0xff8010 ,0xff801f) AM_READWRITE(segacd_comms_sub_part1_r, segacd_comms_sub_part1_w)
+	AM_RANGE(0xff8020 ,0xff802f) AM_READWRITE(segacd_comms_sub_part2_r, segacd_comms_sub_part2_w)
+//	AM_RANGE(0xff8030, 0xff8031) // Timer W/INT3
+//	AM_RANGE(0xff8032, 0xff8033) // IRQ Mask
+//	AM_RANGE(0xff8034, 0xff8035) // CD Fader
+//	AM_RANGE(0xff8036, 0xff8037) // CDD Control
+//	AM_RANGE(0xff8038, 0xff804b) // CDD Communication ports 0-9
+//	AM_RANGE(0xff804c, 0xff804d) // Font Color
+//	AM_RANGE(0xff804e, 0xff804f) // Font bit
+//	AM_RANGE(0xff8050, 0xff8057) // Font data (read only)
+//	AM_RANGE(0xff8058, 0xff8059) // Stamp size
+//	AM_RANGE(0xff805a, 0xff805b) // Stamp map base address
+//	AM_RANGE(0xff805c, 0xff805d) // Image buffer V cell size
+//	AM_RANGE(0xff805e, 0xff805f) // Image buffer start address
+//	AM_RANGE(0xff8060, 0xff8061) // Image buffer offset
+//	AM_RANGE(0xff8062, 0xff8063) // Image buffer H dot size
+//	AM_RANGE(0xff8064, 0xff8065) // Image buffer V dot size
+//	AM_RANGE(0xff8066, 0xff8067) // Trace vector base address
+//	AM_RANGE(0xff8068, 0xff8069) // Subcode address
 
-	AM_RANGE(0x0ff800e ,0x0ff800f) AM_READWRITE(segacd_comms_flags_r, segacd_comms_flags_subcpu_w)
-	AM_RANGE(0x0ff8010 ,0x0ff801f) AM_READWRITE(segacd_comms_sub_part1_r, segacd_comms_sub_part1_w)
-	AM_RANGE(0x0ff8020 ,0x0ff802f) AM_READWRITE(segacd_comms_sub_part2_r, segacd_comms_sub_part2_w)
+//	AM_RANGE(0xff8100, 0xff817f) // Subcode buffer area
+//	AM_RANGE(0xff8180, 0xff81ff) // Image of subcode buffer area
+
 ADDRESS_MAP_END
 
 
@@ -6780,8 +6807,6 @@ static TIMER_DEVICE_CALLBACK( scanline_timer_callback )
 	//  if (genesis_scanline_counter==0) irq4counter = MEGADRIVE_REG0A_HINT_VALUE;
 		// irq4counter = MEGADRIVE_REG0A_HINT_VALUE;
 
-
-
 		if (genesis_scanline_counter<=224)
 		{
 			irq4counter--;
@@ -6808,7 +6833,21 @@ static TIMER_DEVICE_CALLBACK( scanline_timer_callback )
 
 		//if (genesis_scanline_counter==0) irq4_on_timer->adjust(ATTOTIME_IN_USEC(2));
 
+		if(_32x_is_connected)
+		{
+			_32x_hcount_compare_val++;
 
+			if(_32x_hcount_compare_val >= _32x_hcount_reg)
+			{
+				_32x_hcount_compare_val = -1;
+
+				if(genesis_scanline_counter < 224 || sh2_hint_in_vbl)
+				{
+					if(sh2_master_hint_enable) { cpu_set_input_line(_32x_master_cpu,SH2_HINT_IRQ_LEVEL,ASSERT_LINE); }
+					if(sh2_slave_hint_enable) { cpu_set_input_line(_32x_slave_cpu,SH2_HINT_IRQ_LEVEL,ASSERT_LINE); }
+				}
+			}
+		}
 
 
 		if (timer.machine->device("genesis_snd_z80") != NULL)
@@ -6955,13 +6994,17 @@ MACHINE_RESET( megadriv )
 	}
 
 
-	current_fifo_block = fifo_block_a;
-	current_fifo_readblock = fifo_block_b;
-	current_fifo_write_pos = 0;
-	current_fifo_read_pos = 0;
-	fifo_block_a_full = 0;
-	fifo_block_b_full = 0;
+	if(_32x_is_connected)
+	{
+		current_fifo_block = fifo_block_a;
+		current_fifo_readblock = fifo_block_b;
+		current_fifo_write_pos = 0;
+		current_fifo_read_pos = 0;
+		fifo_block_a_full = 0;
+		fifo_block_b_full = 0;
 
+		_32x_hcount_compare_val = -1;
+	}
 }
 
 void megadriv_stop_scanline_timer(void)
@@ -7087,6 +7130,8 @@ int megadrive_z80irq_hpos = 320;
 
 	scanline_timer->adjust(attotime_zero);
 
+	if(_32x_is_connected)
+		_32x_hcount_compare_val = -1;
 }
 
 
