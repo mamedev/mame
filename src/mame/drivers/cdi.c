@@ -34,12 +34,6 @@ TODO:
 #include "cdi.lh"
 
 
-#define ENABLE_UART_PRINTING (0)
-
-#define VERBOSE_LEVEL   (5)
-
-//#define ENABLE_VERBOSE_LOG (0)
-
 #if ENABLE_VERBOSE_LOG
 INLINE void verboselog(running_machine *machine, int n_level, const char *s_fmt, ...)
 {
@@ -75,9 +69,9 @@ static ADDRESS_MAP_START( cdimono1_mem, ADDRESS_SPACE_PROGRAM, 16 )
     AM_RANGE(0x00320000, 0x00323fff) AM_DEVREADWRITE8("mk48t08", timekeeper_r, timekeeper_w, 0xff00)    /* nvram (only low bytes used) */
     AM_RANGE(0x00400000, 0x0047ffff) AM_ROM AM_REGION("maincpu", 0)
     AM_RANGE(0x004fffe0, 0x004fffff) AM_READWRITE(mcd212_r, mcd212_w)
-    AM_RANGE(0x00500000, 0x0057ffff) AM_RAM
-    AM_RANGE(0x00580000, 0x00ffffff) AM_NOP
-    AM_RANGE(0x00e00000, 0x00efffff) AM_RAM // DVC
+    //AM_RANGE(0x00500000, 0x0057ffff) AM_RAM
+    AM_RANGE(0x00500000, 0x00ffffff) AM_NOP
+    //AM_RANGE(0x00e00000, 0x00efffff) AM_RAM // DVC
     AM_RANGE(0x80000000, 0x8000807f) AM_READWRITE(scc68070_periphs_r, scc68070_periphs_w)
 ADDRESS_MAP_END
 
