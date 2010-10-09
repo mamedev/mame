@@ -181,7 +181,7 @@ Atomiswave ROM board specs from Cah4e3 @ http://cah4e3.wordpress.com/2009/07/26/
 #define NAOMIBD_FLAG_SPECIAL_MODE	(4)	// used to access protection registers
 #define NAOMIBD_FLAG_ADDRESS_SHUFFLE	(2)	// 0 to let protection chip en/decrypt, 1 for normal
 
-#define NAOMIBD_PRINTF_PROTECTION	(0)	// 1 to printf protection access details
+#define NAOMIBD_PRINTF_PROTECTION	(1)	// 1 to printf protection access details
 
 /*************************************
  *
@@ -252,6 +252,7 @@ static const naomibd_config_table naomibd_translate_tbl[] =
 	{ "f355twin", 0, 0x6efd4, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
 	{ "f355twn2", 0, 0x666c6, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
 	{ "ggram2", 0, 0x74a61, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "gundmct",  0, 0xe8010, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
 	{ "gwing2",  0, 0xb25d0, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
 	{ "hmgeo",   0, 0x38510, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
 	{ "jambo",    0, 0xfab95, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
@@ -259,6 +260,7 @@ static const naomibd_config_table naomibd_translate_tbl[] =
 	{ "pjustic", 0, 0x725d0, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
 	{ "pstone", 0, 0xe69c1, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
 	{ "pstone2", 0, 0xb8dc0, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "puyoda", 0, 0xacd40, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
 	{ "samba", 0, 0xa8b5d, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
 	{ "slasho", 0, 0xa66ca, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
 	{ "smlg99", 0, 0x48a01, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
