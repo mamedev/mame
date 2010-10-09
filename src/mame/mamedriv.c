@@ -10440,9 +10440,9 @@ Other Sun games
 	DRIVER( jnero )		/* (c) 2004 */
 
 	/* Amatic Trading GMBH */
-	DRIVER( am_uslot )	/* (c) Amatic 1996 */
-	DRIVER( am_mg24 )	/* (c) Amatic 2000 */
-	DRIVER( am_mg3 )	/* (c) Amatic 2000 */
+	DRIVER( am_uslot )	/* (c) 1996 Amatic */
+	DRIVER( am_mg24 )	/* (c) 2000 Amatic */
+	DRIVER( am_mg3 )	/* (c) 2000 Amatic */
 
 	DRIVER( neptunp2 )
 	DRIVER( rgum )
@@ -10465,10 +10465,13 @@ Other Sun games
 	DRIVER( jubileep )
 
 	/* Golden Games / C+M Technics AG */
-	DRIVER( swisspkr )	/* (c) Golden Games 1990 */
-	DRIVER( moviecrd )	/* (c) Golden Games 1998 */
+	DRIVER( swisspkr )	/* (c) 1990 Golden Games */
+	DRIVER( moviecrd )	/* (c) 1998 Golden Games */
 
 	/* NSM */
 	DRIVER( nsmpoker )
+
+	/* Labtronix Technologies */
+	DRIVER( dualgame )	/* (c) 1995 Labtronix Technologies */
 
 #endif	/* DRIVER_RECURSIVE */
