@@ -4632,8 +4632,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( samba )		/* 1999.12 Samba de Amigo */
 	DRIVER( vtennis )	/* 1999.12 Virtua Tennis / Power Smash (ROM) */
 	DRIVER( vtennisg )	/* 1999.12 Virtua Tennis / Power Smash (GD-ROM) */
-	DRIVER( puyoda )	/* 1999.12 Puyopuyo DA! */ 
-						
+	DRIVER( puyoda )	/* 1999.12 Puyopuyo DA! */
+
 	DRIVER( 18wheelr )	/* 2000.01 18 Wheeler */
 	DRIVER( totd )		/* 2000.01 The Typing of the Dead */
 	DRIVER( spawn )		/* 2000.01 Spawn */
@@ -9430,6 +9430,9 @@ Other Sun games
 	DRIVER( sharkpy )	/* (c) 1996 Subsino */
 	DRIVER( sharkpya )	/* (c) 1996 Subsino */
 	DRIVER( sharkpye )	/* (c) 1996 Subsino (Alpha license) */
+	DRIVER( victor6 )	/* (c) 1995 Subsino (Alpha license) */
+	DRIVER( victor6a )	/* (c) 1995 Subsino (Alpha license) */
+	DRIVER( victor6b )	/* (c) 1995 Subsino (Alpha license) */
 	DRIVER( smoto20 )	/* (c) 1996 Subsino */
 	DRIVER( smoto16 )	/* (c) 1996 Subsino */
 	DRIVER( mtrain )	/* (c) 1997 Subsino */

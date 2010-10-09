@@ -1634,6 +1634,7 @@ src/mame/drivers/dribling.c svneol=native#text/plain
 src/mame/drivers/drmicro.c svneol=native#text/plain
 src/mame/drivers/drtomy.c svneol=native#text/plain
 src/mame/drivers/drw80pkr.c svneol=native#text/plain
+src/mame/drivers/dualgame.c svneol=native#text/plain
 src/mame/drivers/dunhuang.c svneol=native#text/plain
 src/mame/drivers/dwarfd.c svneol=native#text/plain
 src/mame/drivers/dynadice.c svneol=native#text/plain
