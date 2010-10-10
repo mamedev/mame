@@ -10474,4 +10474,10 @@ Other Sun games
 	/* Labtronix Technologies */
 	DRIVER( dualgame )	/* (c) 1995 Labtronix Technologies */
 
+	/* Advanced Video Technologies */
+	DRIVER( avtsym14 )	/* (c) 1985 AVT */
+	DRIVER( avtsym25 )	/* (c) 1985 AVT */
+	DRIVER( avtbingo )	/* (c) 1985 AVT */
+	DRIVER( avtnfl )	/* (c) 1989 AVT */
+
 #endif	/* DRIVER_RECURSIVE */

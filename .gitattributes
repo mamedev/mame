@@ -1441,6 +1441,7 @@ src/mame/drivers/ataxx.c svneol=native#text/plain
 src/mame/drivers/atetris.c svneol=native#text/plain
 src/mame/drivers/attckufo.c svneol=native#text/plain
 src/mame/drivers/avalnche.c svneol=native#text/plain
+src/mame/drivers/avt.c svneol=native#text/plain
 src/mame/drivers/aztarac.c svneol=native#text/plain
 src/mame/drivers/backfire.c svneol=native#text/plain
 src/mame/drivers/badlands.c svneol=native#text/plain
