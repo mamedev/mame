@@ -557,7 +557,7 @@ static void mcd212_update_visible_area(running_machine *machine)
     visarea1.min_y = visarea.min_y;
     visarea1.max_y = visarea.max_y;
 
-    machine->primary_screen->configure(width, 262, visarea1, period);
+    machine->primary_screen->configure(width, 302, visarea1, period);
 }
 
 static UINT32 mcd212_get_screen_width(mcd212_regs_t *mcd212)
@@ -1500,13 +1500,13 @@ TIMER_CALLBACK( mcd212_perform_scan )
                     mcd212_process_dca(mcd212, index);
                 }
             }
-            if(scanline == 261)
+            if(scanline == 301)
             {
                 mcd212->channel[0].csrr ^= 0x20;
             }
         }
     }
-    timer_adjust_oneshot(mcd212->scan_timer, machine->primary_screen->time_until_pos(( scanline + 1 ) % 262, 0), 0);
+    timer_adjust_oneshot(mcd212->scan_timer, machine->primary_screen->time_until_pos(( scanline + 1 ) % 302, 0), 0);
 }
 
 void mcd212_init(running_machine *machine, mcd212_regs_t *mcd212)
