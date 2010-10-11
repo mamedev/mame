@@ -41,15 +41,17 @@
   ------------------
 
 
-  ** ARROW BINGO **
+  ********** ARROW BINGO **********
+
+  Arrow Bingo is a skill game with the ever-popular Bingo theme. Columns are moved up and down
+  to line up the winning numbers with the time clock running... (from the flyer).
 
   The code has a timer that takes a couple of minutes to boot into the game.
   This is completely normal and expected.
   
 
   
-  ** SYMBOLS **
-
+  ************ SYMBOLS ************
 
   INTRODUCTION
 
@@ -95,6 +97,7 @@
   labeled SW1 and SW2. First depress and hold SW2 and momentarily depress SW1, until the MAIN
   MENU display appears on the screen. At this point you should see a menu that looks as follows:
 
+
        MAIN MENU
       -----------
     ACCOUNTING MODE
@@ -103,6 +106,7 @@
     BUSINESS NAME SETUP
     SYSTEM TESTS
     GAME STATS
+
 
   When you have this display on the screen you are in the setup mode. You will note a different
   color band around one of the selections. This band indicates which module is to be selected
@@ -116,6 +120,7 @@
   the PLAY button on your front panel and presto, we are in the accounting mode. The display you
   see should look something like this:
 
+
     ACCOUNTING MODE
     ----------------
     COINS IN:          0000
@@ -125,6 +130,7 @@
     STARS AWARDED:     0000
     GAMES PLAYED:      0000
 
+
   To clear the accounting back to zero, use the second arrow down button on your front panel for
   each item and use your first arrow up or down to move to each item.
 
@@ -132,13 +138,16 @@
   To enter POINTS SETUP, move the shaded color bar to POINTS SETUP and depress the PLAY button on
   your front panel. You should have a display that looks as follows:
 
+
     POINTS MENU
     --------------
     POINTS SETUP
     POINTS MULTIPLIER
 
+
   Select the POINTS SETUP by depressing the PLAY button on your front panel and you should have
   a display that looks similar to the following:
+
 
     POINTS SETUP
     --------------
@@ -156,6 +165,7 @@
     11       3
     12       2
     13       1
+
 
   To change any of the above values, move the shaded bar by depressing the first up or down arrow
   to the desired award and then change the values by depressing the second up or down arrow until
@@ -176,11 +186,13 @@
   up arrow. When you are finished with your message just exit by pressing START button and the me-
   ssage will automatically center when you exit.
 
+
   SYSTEM TESTS
 
   The SYSTEM TESTS mode allows you to test the ROM, RAM, CTC, MONITOR, and perform I/O tests.
   The I/O tests allow you to check each front panel switch and the coins in switch individually.
   To exit from the I/O mode, you have to press the SW1 reset switch on the logic board.
+
 
   GAME STATS
 
@@ -368,7 +380,7 @@
   [2010-10-10]
 
   - Initial release.
-  - Preliminary memory map.
+  - Almost accurate memory map.
   - Decoded graphics.
   - Decoded the bipolar PROM.
   - Detected a CRTC (MC6845 type) reversing the code.
