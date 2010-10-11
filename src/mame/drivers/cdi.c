@@ -79,6 +79,62 @@ ADDRESS_MAP_END
 *      Input ports       *
 *************************/
 
+static INPUT_CHANGED( mcu_input )
+{
+    cdi_state *state = field->port->machine->driver_data<cdi_state>();
+    scc68070_regs_t *scc68070 = &state->scc68070_regs;
+	bool send = false;
+
+	switch((int)param)
+	{
+		case 0x39:
+			if(input_port_read(field->port->machine, "INPUT1") & 0x01) send = true;
+			break;
+		case 0x37:
+			if(input_port_read(field->port->machine, "INPUT1") & 0x02) send = true;
+			break;
+		case 0x31:
+			if(input_port_read(field->port->machine, "INPUT1") & 0x04) send = true;
+			break;
+		case 0x32:
+			if(input_port_read(field->port->machine, "INPUT1") & 0x08) send = true;
+			break;
+		case 0x33:
+			if(input_port_read(field->port->machine, "INPUT1") & 0x10) send = true;
+			break;
+
+		case 0x30:
+			if(input_port_read(field->port->machine, "INPUT2") & 0x01) send = true;
+			break;
+		case 0x38:
+			if(input_port_read(field->port->machine, "INPUT2") & 0x02) send = true;
+			break;
+		case 0x34:
+			if(input_port_read(field->port->machine, "INPUT2") & 0x04) send = true;
+			break;
+		case 0x35:
+			if(input_port_read(field->port->machine, "INPUT2") & 0x08) send = true;
+			break;
+		case 0x36:
+			if(input_port_read(field->port->machine, "INPUT2") & 0x10) send = true;
+			break;
+	}
+
+	if(send)
+	{
+		scc68070_uart_rx(field->port->machine, scc68070, 0x5a);
+		scc68070_uart_rx(field->port->machine, scc68070, 0x21);
+		scc68070_uart_rx(field->port->machine, scc68070, 0x21);
+		scc68070_uart_rx(field->port->machine, scc68070, 0x21);
+		scc68070_uart_rx(field->port->machine, scc68070, 0x21);
+		scc68070_uart_rx(field->port->machine, scc68070, 0x21);
+		scc68070_uart_rx(field->port->machine, scc68070, 0x21);
+		scc68070_uart_rx(field->port->machine, scc68070, 0x21);
+		scc68070_uart_rx(field->port->machine, scc68070, 0x21);
+		scc68070_uart_rx(field->port->machine, scc68070, (UINT8)((UINT32)param & 0x000000ff));
+	}
+}
+
 static INPUT_PORTS_START( cdi )
     PORT_START("MOUSEX")
     PORT_BIT(0x3ff, 0x000, IPT_MOUSE_X) PORT_SENSITIVITY(100) PORT_MINMAX(0x000, 0x3ff) PORT_KEYDELTA(0) PORT_CHANGED(cdislave_device::mouse_update, 0)
@@ -90,6 +146,22 @@ static INPUT_PORTS_START( cdi )
     PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_CODE(MOUSECODE_BUTTON1) PORT_NAME("Mouse Button 1") PORT_CHANGED(cdislave_device::mouse_update, 0)
     PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_BUTTON2) PORT_CODE(MOUSECODE_BUTTON2) PORT_NAME("Mouse Button 2") PORT_CHANGED(cdislave_device::mouse_update, 0)
     PORT_BIT(0xfc, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+    PORT_START("INPUT1")
+    PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_COIN1) PORT_NAME("Coin 1") PORT_CHANGED(mcu_input, (void*)0x39)
+    PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_START1) PORT_NAME("Start 1") PORT_CHANGED(mcu_input, (void*)0x37)
+    PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON3) PORT_NAME("Player 1 A") PORT_CHANGED(mcu_input, (void*)0x31)
+    PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON4) PORT_NAME("Player 1 B") PORT_CHANGED(mcu_input, (void*)0x32)
+    PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON5) PORT_NAME("Player 1 C") PORT_CHANGED(mcu_input, (void*)0x33)
+    PORT_BIT(0xe0, IP_ACTIVE_HIGH, IPT_UNUSED)
+
+    PORT_START("INPUT2")
+    PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_SERVICE1) PORT_NAME("Service") PORT_CHANGED(mcu_input, (void*)0x30)
+    PORT_BIT(0x02, IP_ACTIVE_HIGH, IPT_START2) PORT_NAME("Start 2") PORT_CHANGED(mcu_input, (void*)0x38)
+    PORT_BIT(0x04, IP_ACTIVE_HIGH, IPT_BUTTON6) PORT_NAME("Player 2 A") PORT_CHANGED(mcu_input, (void*)0x34)
+    PORT_BIT(0x08, IP_ACTIVE_HIGH, IPT_BUTTON7) PORT_NAME("Player 2 B") PORT_CHANGED(mcu_input, (void*)0x35)
+    PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_BUTTON8) PORT_NAME("Player 2 C") PORT_CHANGED(mcu_input, (void*)0x36)
+    PORT_BIT(0xe0, IP_ACTIVE_HIGH, IPT_UNUSED)
 
     PORT_START("DEBUG")
     PORT_CONFNAME( 0x01, 0x00, "Plane A Disable")
@@ -136,6 +208,7 @@ static MACHINE_RESET( cdi )
     memcpy(dst, src, 0x8);
 
     scc68070_init(machine, &state->scc68070_regs);
+    scc68070_set_hack_value(0x021f);
 
     machine->device("maincpu")->reset();
 
@@ -298,11 +371,15 @@ ROM_END
 *      Game driver(s)    *
 *************************/
 
-/*          rom       parent    machine   inp       init */
+// BIOS
 GAME( 1991, cdi,      0,        cdi,      cdi,      0,        ROT0,     "Philips", "CD-i (Mono-I) BIOS", GAME_IS_BIOS_ROOT )
-GAME( 1996, quizard,  cdi,      cdi,      cdi,      0,        ROT0,     "TAB Austria",  "Quizard 3.2", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
-GAME( 1995, quizrd22, cdi,      cdi,      cdi,      0,        ROT0,     "TAB Austria",  "Quizard 2.2", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
-GAME( 1995, quizrd17, cdi,      cdi,      cdi,      0,        ROT0,     "TAB Austria",  "Quizard 1.7", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
-GAME( 1995, quizrd12, cdi,      cdi,      cdi,      0,        ROT0,     "TAB Austria",  "Quizard 1.2", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
-GAME( 1998, quizrr42, cdi,      cdi,      cdi,      0,        ROT0,     "TAB Austria",  "Quizard Rainbow 4.2", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
-GAME( 1998, quizrr41, cdi,      cdi,      cdi,      0,        ROT0,     "TAB Austria",  "Quizard Rainbow 4.1", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION )
+
+// Non-working
+GAME( 1996, quizard,  cdi,      cdi,      cdi,      0,        ROT0,     "TAB Austria",  "Quizard 3.2", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
+GAME( 1995, quizrd22, cdi,      cdi,      cdi,      0,        ROT0,     "TAB Austria",  "Quizard 2.2", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
+GAME( 1995, quizrd12, cdi,      cdi,      cdi,      0,        ROT0,     "TAB Austria",  "Quizard 1.2", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
+GAME( 1998, quizrr42, cdi,      cdi,      cdi,      0,        ROT0,     "TAB Austria",  "Quizard Rainbow 4.2", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
+GAME( 1998, quizrr41, cdi,      cdi,      cdi,      0,        ROT0,     "TAB Austria",  "Quizard Rainbow 4.1", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
+
+// Working
+GAME( 1995, quizrd17, cdi,      cdi,      cdi,      0,        ROT0,     "TAB Austria",  "Quizard 1.7", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )

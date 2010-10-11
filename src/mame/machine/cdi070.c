@@ -60,6 +60,58 @@ static void scc68070_set_timer_callback(scc68070_regs_t *scc68070, int channel)
 }
 
 static bool hack_active = false;
+static UINT16 hack_value = 0;
+
+void scc68070_set_hack_value(UINT16 value)
+{
+	hack_value = 0x021f;
+}
+
+static void quizard_patch(running_machine *machine)
+{
+    address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+
+	if(space->read_byte(0x264dc4) == 0xfe && space->read_byte(0x264dc5) == 0xf0 && hack_active)
+	{
+		// Patch out:
+		// 00264C42: C0EE 86BE                  mulu.w  (-$7942,A6), D0
+		// 00264C46: 2200                       move.l  D0, D1
+		// 00264C48: 41EE 86C0                  lea     (-$7940,A6), A0
+		// 00264C4C: 2008                       move.l  A0, D0
+		// 00264C4E: 6100 FE6A                  bsr     $264aba
+		// 00264C52: 3400                       move.w  D0, D2
+		// 00264C54: 3017                       move.w  (A7), D0
+		// 00264C56: C0EE 86BE                  mulu.w  (-$7942,A6), D0
+		// 00264C5A: 2200                       move.l  D0, D1
+		// 00264C5C: 41EE 86C0                  lea     (-$7940,A6), A0
+		// 00264C60: 2008                       move.l  A0, D0
+		// 00264C62: 6100 FE56                  bsr     $264aba
+		// 00264C66: B142                       eor.w   D0, D2
+		// 00264C68: 7000                       moveq   #$0, D0
+		// 00264C6A: 3002                       move.w  D2, D0
+		space->write_word(0x264C42, 0);
+		space->write_word(0x264C44, 0);
+		space->write_word(0x264C46, 0);
+		space->write_word(0x264C48, 0);
+		space->write_word(0x264C4A, 0);
+		space->write_word(0x264C4C, 0);
+		space->write_word(0x264C4E, 0);
+		space->write_word(0x264C50, 0);
+		space->write_word(0x264C52, 0);
+		space->write_word(0x264C54, 0);
+		space->write_word(0x264C56, 0);
+		space->write_word(0x264C58, 0);
+		space->write_word(0x264C5A, 0);
+		space->write_word(0x264C5C, 0);
+		space->write_word(0x264C5E, 0);
+		space->write_word(0x264C60, 0);
+		space->write_word(0x264C62, 0);
+		space->write_word(0x264C64, 0);
+		space->write_word(0x264C66, 0x203C);
+		space->write_word(0x264C68, 0x0000);
+		space->write_word(0x264C6A, hack_value);
+	}
+}
 
 TIMER_CALLBACK( scc68070_timer0_callback )
 {
@@ -80,14 +132,7 @@ TIMER_CALLBACK( scc68070_timer0_callback )
     }
 
 #if ENABLE_QUIZARD_HACK
-    address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-
-	if(hack_active)
-	{
-    	space->write_byte(0x264dc2,0x60);
-    	space->write_byte(0x264dc5,0xec);
-    	space->write_byte(0xc000-0x7a6c,0x01);
-	}
+	quizard_patch(machine);
 #endif
 
     scc68070_set_timer_callback(&state->scc68070_regs, 0);
@@ -96,8 +141,7 @@ TIMER_CALLBACK( scc68070_timer0_callback )
 static void scc68070_uart_rx_check(running_machine *machine, scc68070_regs_t *scc68070)
 {
 	if((scc68070->uart.command_register & 3) == 1 &&
-		scc68070->uart.receive_pointer > -1 &&
-		attotime_compare(timer_timeleft(scc68070->uart.rx_timer), attotime_never) == 0)
+		scc68070->uart.receive_pointer > -1)
 	{
 		scc68070->uart.status_register |= USR_RXRDY;
 		UINT32 div = 0x10000 >> ((scc68070->uart.clock_select >> 4) & 7);
@@ -127,7 +171,6 @@ static void scc68070_uart_tx_check(running_machine *machine, scc68070_regs_t *sc
 
 void scc68070_uart_rx(running_machine *machine, scc68070_regs_t *scc68070, UINT8 data)
 {
-	hack_active = true;
 	scc68070->uart.receive_pointer++;
 	scc68070->uart.receive_buffer[scc68070->uart.receive_pointer] = data;
 	scc68070->uart.status_register |= USR_RXRDY;
@@ -150,15 +193,15 @@ TIMER_CALLBACK( scc68070_rx_callback )
 
 	if((scc68070->uart.command_register & 3) == 1)
 	{
+		scc68070->uart.receive_holding_register = scc68070->uart.receive_buffer[0];
 		if(scc68070->uart.receive_pointer > -1)
 		{
-			scc68070->uart.receive_holding_register = scc68070->uart.receive_buffer[0];
 			verboselog(machine, 2, "scc68070_rx_callback: Receiving %02x\n", scc68070->uart.receive_holding_register);
-			scc68070->uart.receive_pointer--;
 			for(int index = 0; index < scc68070->uart.receive_pointer; index++)
 			{
 				scc68070->uart.receive_buffer[index] = scc68070->uart.receive_buffer[index + 1];
 			}
+			scc68070->uart.receive_pointer--;
 
 			UINT8 interrupt = (scc68070->picr2 >> 4) & 7;
 			if(interrupt)
@@ -625,7 +668,8 @@ WRITE16_HANDLER( scc68070_periphs_w )
 					count++;
 					if(count == 2)
 					{
-						static unsigned char check_array[9] = { 0x5a, 0x59, 0x58, 0x57, 0x56, 0x55, 0x54, 0x53, 0x52 };
+						static unsigned char check_array[9] = { 0x5a, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+
 						for(int index = 0; index < 9; index++)
 						{
                 			verboselog(space->machine, 2, "scc68070_periphs_w: Sending to receiver: 0x5a\n");
@@ -636,9 +680,11 @@ WRITE16_HANDLER( scc68070_periphs_w )
 							}
 						}
 						count = 0;
+
+						hack_active = true;
+						quizard_patch(space->machine);
 					}
 				}
-                //printf("%02x ", data & 0x00ff);
             }
             else
             {

@@ -238,6 +238,7 @@ extern READ16_HANDLER( scc68070_periphs_r );
 extern WRITE16_HANDLER( scc68070_periphs_w );
 //extern READ16_HANDLER( uart_loopback_enable );
 
+extern void scc68070_set_hack_value(UINT16 value);
 extern void scc68070_init(running_machine *machine, scc68070_regs_t *scc68070);
 extern void scc68070_uart_rx(running_machine *machine, scc68070_regs_t *scc68070, UINT8 data);
 extern void scc68070_uart_tx(running_machine *machine, scc68070_regs_t *scc68070, UINT8 data);
