@@ -322,6 +322,8 @@ static UINT16* _32x_palette;
 static UINT16* _32x_palette_lookup;
 /* SegaCD! */
 static cpu_device *_segacd_68k_cpu;
+static emu_timer *segacd_gfx_conversion_timer;
+
 /* SVP (virtua racing) */
 static cpu_device *_svp_cpu;
 
@@ -362,7 +364,20 @@ static timer_device* irq4_on_timer;
 static bitmap_t* render_bitmap;
 //emu_timer* vblankirq_off_timer;
 
+/* Sega CD stuff */
 static int sega_cd_connected = 0x00;
+static UINT16 segacd_irq_mask;
+static UINT8 segacd_cdd_rx[10];
+static UINT8 segacd_cdd_tx[10];
+static struct
+{
+	UINT8 status;
+	UINT8 minute;
+	UINT8 seconds;
+	UINT8 frame;
+	UINT8 ext;
+	UINT8 ctrl;
+}segacd_cdd;
 
 #ifdef UNUSED_FUNCTION
 /* taken from segaic16.c */
@@ -3496,7 +3511,7 @@ static WRITE16_HANDLER( _32x_sh2_common_4006_w )
 // VRES (md reset button interrupt) clear
 /**********************************************************************************************/
 
-static WRITE16_HANDLER( _32x_sh2_master_4014_w ){cpu_set_input_line(_32x_master_cpu,SH2_VRES_IRQ_LEVEL,CLEAR_LINE);}
+static WRITE16_HANDLER( _32x_sh2_master_4014_w ){ cpu_set_input_line(_32x_master_cpu,SH2_VRES_IRQ_LEVEL,CLEAR_LINE);}
 static WRITE16_HANDLER( _32x_sh2_slave_4014_w ) { cpu_set_input_line(_32x_slave_cpu, SH2_VRES_IRQ_LEVEL,CLEAR_LINE);}
 
 /**********************************************************************************************/
@@ -4097,6 +4112,7 @@ static WRITE16_HANDLER( segacd_comms_sub_part2_w )
 static int segacd_cdc_regaddress;
 static int segacd_cdc_destination_device;
 static UINT8 segacd_cdc_registers[0x10];
+int segacd_conversion_active = 0;
 
 static WRITE16_HANDLER( segacd_cdc_mode_address_w )
 {
@@ -4258,6 +4274,20 @@ static WRITE16_HANDLER( scd_a12006_hint_register_w )
 }
 
 
+static TIMER_CALLBACK( segacd_gfx_conversion_timer_callback )
+{
+	// todo irqmask
+
+	printf("segacd_gfx_conversion_timer_callback\n");
+
+	if (segacd_irq_mask & 0x02)
+		cputag_set_input_line(machine, "segacd_68k", 1, HOLD_LINE);
+	
+	segacd_conversion_active = 0;
+}
+
+
+
 /* main CPU map set up in INIT */
 void segacd_init_main_cpu( running_machine* machine )
 {
@@ -4290,15 +4320,25 @@ void segacd_init_main_cpu( running_machine* machine )
 
 	memory_install_read16_handler (space, 0x0000070, 0x0000073, 0, 0, scd_hint_vector_r );
 
+	segacd_gfx_conversion_timer = timer_alloc(machine, segacd_gfx_conversion_timer_callback, 0);
+	timer_adjust_oneshot(segacd_gfx_conversion_timer, attotime_never, 0);
 
 }
 
 static MACHINE_RESET( segacd )
 {
+	int i;
 	cpu_set_input_line(_segacd_68k_cpu, INPUT_LINE_RESET, ASSERT_LINE);
 	cpu_set_input_line(_segacd_68k_cpu, INPUT_LINE_HALT, ASSERT_LINE);
 
 	segacd_hint_register = 0xffff; // -1
+
+	for(i=0;i<10;i++)
+	{
+		segacd_cdd_rx[i] = 0;
+	}
+
+	segacd_cdd_rx[9] = 0xf; // default checksum
 }
 
 
@@ -4414,6 +4454,205 @@ static WRITE16_HANDLER( segacd_sub_dataram_part2_w )
 	}
 }
 
+static void cdd_hock_irq(running_machine *machine,UINT8 dir)
+{
+	int i,cdd_crc;
+
+	if((segacd_cdd.ctrl & 4 || dir) && segacd_irq_mask & 0x10) // export status, check if bit 2 (HOst ClocK) and irq is enabled
+	{
+		// TODO: this shouldn't be instant, CDD should first fill receive data.
+		segacd_cdd.ctrl &= 0x103; // clear HOCK flag
+
+		segacd_cdd_rx[0] = (segacd_cdd.status & 0xf0) >> 4;
+		segacd_cdd_rx[1] = (segacd_cdd.status & 0x0f) >> 0;
+		segacd_cdd_rx[2] = (segacd_cdd.minute & 0xf0) >> 4;
+		segacd_cdd_rx[3] = (segacd_cdd.minute & 0x0f) >> 0;
+		segacd_cdd_rx[4] = (segacd_cdd.seconds & 0xf0) >> 4;
+		segacd_cdd_rx[5] = (segacd_cdd.seconds & 0x0f) >> 0;
+		segacd_cdd_rx[6] = (segacd_cdd.frame & 0xf0) >> 4;
+		segacd_cdd_rx[7] = (segacd_cdd.frame & 0x0f) >> 0;
+		segacd_cdd_rx[8] = (segacd_cdd.ext & 0x0f) >> 0;
+
+		/* Do checksum calculation of the above registers */
+		cdd_crc = 0;
+		for(i=0;i<9;i++)
+			cdd_crc += segacd_cdd_rx[i];
+
+		segacd_cdd_rx[9] = ((cdd_crc & 0xf) ^ 0xf);
+
+		cputag_set_input_line(machine, "segacd_68k", 4, HOLD_LINE);
+	}
+}
+
+static READ16_HANDLER( segacd_irq_mask_r )
+{
+	return segacd_irq_mask;
+}
+
+static WRITE16_HANDLER( segacd_irq_mask_w )
+{
+	segacd_irq_mask = data & 0x7e;
+
+	cdd_hock_irq(space->machine,0);
+	// check here other pending IRQs
+}
+
+static READ16_HANDLER( segacd_cdd_ctrl_r )
+{
+	return segacd_cdd.ctrl;
+}
+
+static WRITE16_HANDLER( segacd_cdd_ctrl_w )
+{
+	segacd_cdd.ctrl = data;
+
+	cdd_hock_irq(space->machine,0);
+}
+
+/* 68k <- CDD communication comms are 4-bit wide */
+static READ8_HANDLER( segacd_cdd_rx_r )
+{
+	return segacd_cdd_rx[offset] & 0xf;
+}
+
+static const char *const segacd_cdd_cmd[] =
+{
+	"Status",
+	"Stop All",
+	"Get TOC Info",
+	"Read",
+	"Seek",
+	"Pause/Stop",
+	"Resume",
+	"Fast Forward",
+	"Fast Rewind",
+	"Recover Initial state",
+	"Close Tray",
+	"Open Tray",
+	"Unknown 0xE",
+	"Unknown 0xF"
+};
+
+static const char *const segacd_cdd_get_toc_cmd[] =
+{
+	"Get Current Position",
+	"Get Elapsed Time of Current Track",
+	"Get Current Track",
+	"Get Total Length",
+	"Get First and Last Track Number",
+	"Get Track Addresses",
+	"Invalid 0x6",
+	"Invalid 0x7",
+	"Invalid 0x8",
+	"Invalid 0x9",
+	"Invalid 0xA",
+	"Invalid 0xB",
+	"Invalid 0xC",
+	"Invalid 0xD",
+	"Invalid 0xE",
+	"Invalid 0xF",
+};
+
+static void segacd_cdd_get_status(running_machine *machine)
+{
+	// ...
+
+	cdd_hock_irq(machine,1);
+}
+
+static void segacd_cdd_stop_all(running_machine *machine)
+{
+	// ...
+	segacd_cdd.ctrl |= 0x100; // set data bit
+
+	//cdd_hock_irq(machine,1); // doesn't work?
+}
+
+
+static void segacd_cdd_get_toc_info(running_machine *machine)
+{
+	segacd_cdd.status = ((segacd_cdd_tx[3] & 0xf) << 4) | (segacd_cdd.status & 0xf);
+
+	switch(segacd_cdd_tx[3] & 0xf)
+	{
+		default: printf("CDD: unhandled TOC command %s issued\n",segacd_cdd_get_toc_cmd[segacd_cdd_tx[3] & 0xf]);
+	}
+
+	cdd_hock_irq(machine,1);
+}
+
+static WRITE8_HANDLER( segacd_cdd_tx_w )
+{
+	//printf("CDD Communication write %02x -> [%02x]\n",data,offset);
+	segacd_cdd_tx[offset] = data & 0xf;
+
+	if(offset == 9) //execute the command when crc is sent (TODO: I wonder if we need to check if crc is valid. Plus obviously this shouldn't be instant)
+	{
+		switch(segacd_cdd_tx[0] & 0xf)
+		{
+			case 0x0: segacd_cdd_get_status(space->machine); break;
+			case 0x1: segacd_cdd_stop_all(space->machine); break;
+			case 0x2: segacd_cdd_get_toc_info(space->machine); break;
+			default: printf("CDD: unhandled command %s issued\n",segacd_cdd_cmd[segacd_cdd_tx[0] & 0xf]);
+		}
+	}
+}
+
+int segacd_stampsize;
+
+static READ16_HANDLER( segacd_stampsize_r )
+{
+	UINT16 retdata = 0x0000;
+
+	retdata |= segacd_conversion_active<<15;
+
+	retdata |= segacd_stampsize & 0x7;
+
+	return retdata;
+
+}
+
+static WRITE16_HANDLER( segacd_stampsize_w )
+{
+	printf("segacd_stampsize_w %04x %04x\n",data, mem_mask);
+	if (ACCESSING_BITS_0_7)
+	{
+		segacd_stampsize = data & 0x07;
+		if (data & 0xf8)
+			printf("    unused bits (LSB) set in stampsize!\n");
+
+		if (data&1) printf("    Repeat On\n");
+		else printf("    Repeat Off\n");
+
+		if (data&2) printf("    32x32 dots\n");
+		else printf("    16x16 dots\n");
+
+		if (data&4) printf("    16x16 screens\n");
+		else printf("    1x1 screen\n");
+
+
+	}
+	
+	if (ACCESSING_BITS_8_15)
+	{
+		if (data&0xff00) printf("    unused bits (MSB) set in stampsize!\n");
+	}
+}
+
+// this triggers the conversion operation, which will cause an IRQ1 when finished
+WRITE16_HANDLER( segacd_trace_vector_base_address_w )
+{
+	if (segacd_ram_mode==1)
+	{
+		printf("ILLEGAL: segacd_trace_vector_base_address_w %04x %04x in mode 1!\n",data,mem_mask);
+	}
+
+	printf("segacd_trace_vector_base_address_w %04x %04x\n",data,mem_mask);
+
+	segacd_conversion_active = 1;
+
+	timer_adjust_oneshot(segacd_gfx_conversion_timer, ATTOTIME_IN_HZ(1), 0);
+}
 
 static ADDRESS_MAP_START( segacd_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_BASE(&segacd_4meg_prgram)
@@ -4421,9 +4660,9 @@ static ADDRESS_MAP_START( segacd_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x080000, 0x0bffff) AM_READWRITE(segacd_sub_dataram_part1_r, segacd_sub_dataram_part1_w) AM_BASE(&segacd_dataram)
 	AM_RANGE(0x0c0000, 0x0dffff) AM_READWRITE(segacd_sub_dataram_part2_r, segacd_sub_dataram_part2_w) AM_BASE(&segacd_dataram2)
 
-//	AM_RANGE(0xfe0000, 0xfe3fff) // backup RAM, odd bytes only!
+	AM_RANGE(0xfe0000, 0xfe3fff) AM_RAM // backup RAM, odd bytes only!
 
-//	AM_RANGE(0xff0000, 0xff7fff) // PCM, RF5C164
+	AM_RANGE(0xff0000, 0xff7fff) AM_RAM // PCM, RF5C164
 	AM_RANGE(0xff8000 ,0xff8001) AM_READWRITE(segacd_sub_led_ready_r, segacd_sub_led_ready_w)
 	AM_RANGE(0xff8002 ,0xff8003) AM_READWRITE(segacd_sub_memory_mode_r, segacd_sub_memory_mode_w)
 
@@ -4436,25 +4675,26 @@ static ADDRESS_MAP_START( segacd_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff8010 ,0xff801f) AM_READWRITE(segacd_comms_sub_part1_r, segacd_comms_sub_part1_w)
 	AM_RANGE(0xff8020 ,0xff802f) AM_READWRITE(segacd_comms_sub_part2_r, segacd_comms_sub_part2_w)
 //	AM_RANGE(0xff8030, 0xff8031) // Timer W/INT3
-//	AM_RANGE(0xff8032, 0xff8033) // IRQ Mask
-//	AM_RANGE(0xff8034, 0xff8035) // CD Fader
-//	AM_RANGE(0xff8036, 0xff8037) // CDD Control
-//	AM_RANGE(0xff8038, 0xff804b) // CDD Communication ports 0-9
+	AM_RANGE(0xff8032, 0xff8033) AM_READWRITE(segacd_irq_mask_r,segacd_irq_mask_w)
+	AM_RANGE(0xff8034, 0xff8035) AM_NOP // CD Fader
+	AM_RANGE(0xff8036, 0xff8037) AM_READWRITE(segacd_cdd_ctrl_r,segacd_cdd_ctrl_w)
+	AM_RANGE(0xff8038, 0xff8041) AM_READ8(segacd_cdd_rx_r,0xffff)
+	AM_RANGE(0xff8042, 0xff804b) AM_WRITE8(segacd_cdd_tx_w,0xffff)
 //	AM_RANGE(0xff804c, 0xff804d) // Font Color
 //	AM_RANGE(0xff804e, 0xff804f) // Font bit
 //	AM_RANGE(0xff8050, 0xff8057) // Font data (read only)
-//	AM_RANGE(0xff8058, 0xff8059) // Stamp size
+	AM_RANGE(0xff8058, 0xff8059) AM_READWRITE(segacd_stampsize_r, segacd_stampsize_w) // Stamp size
 //	AM_RANGE(0xff805a, 0xff805b) // Stamp map base address
 //	AM_RANGE(0xff805c, 0xff805d) // Image buffer V cell size
 //	AM_RANGE(0xff805e, 0xff805f) // Image buffer start address
 //	AM_RANGE(0xff8060, 0xff8061) // Image buffer offset
 //	AM_RANGE(0xff8062, 0xff8063) // Image buffer H dot size
 //	AM_RANGE(0xff8064, 0xff8065) // Image buffer V dot size
-//	AM_RANGE(0xff8066, 0xff8067) // Trace vector base address
+	AM_RANGE(0xff8066, 0xff8067) AM_WRITE(segacd_trace_vector_base_address_w)// Trace vector base address
 //	AM_RANGE(0xff8068, 0xff8069) // Subcode address
 
 //	AM_RANGE(0xff8100, 0xff817f) // Subcode buffer area
-//	AM_RANGE(0xff8180, 0xff81ff) // Image of subcode buffer area
+//	AM_RANGE(0xff8180, 0xff81ff) // mirror of subcode buffer area
 
 ADDRESS_MAP_END
 
