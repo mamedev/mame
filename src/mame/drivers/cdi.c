@@ -85,7 +85,7 @@ static INPUT_CHANGED( mcu_input )
     scc68070_regs_t *scc68070 = &state->scc68070_regs;
 	bool send = false;
 
-	switch((int)param)
+	switch((FPTR)param)
 	{
 		case 0x39:
 			if(input_port_read(field->port->machine, "INPUT1") & 0x01) send = true;
@@ -131,7 +131,7 @@ static INPUT_CHANGED( mcu_input )
 		scc68070_uart_rx(field->port->machine, scc68070, 0x21);
 		scc68070_uart_rx(field->port->machine, scc68070, 0x21);
 		scc68070_uart_rx(field->port->machine, scc68070, 0x21);
-		scc68070_uart_rx(field->port->machine, scc68070, (UINT8)((UINT32)param & 0x000000ff));
+		scc68070_uart_rx(field->port->machine, scc68070, (UINT8)((FPTR)param & 0x000000ff));
 	}
 }
 
