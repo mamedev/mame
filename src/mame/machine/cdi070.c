@@ -62,6 +62,18 @@ static void scc68070_set_timer_callback(scc68070_regs_t *scc68070, int channel)
 static bool hack_active = false;
 static UINT16 hack_value = 0;
 static UINT32 hack_base = 0;
+static UINT8 hack_ack = 0;
+static UINT32 hack2_addr = 0;
+
+void scc68070_set_secondary_hack(UINT32 address)
+{
+	hack2_addr = address;
+}
+
+void scc68070_set_hack_ack(UINT8 ack)
+{
+	hack_ack = ack;
+}
 
 void scc68070_set_hack_value(UINT16 value)
 {
@@ -116,6 +128,11 @@ static void quizard_patch(running_machine *machine)
 		space->write_word(hack_base + 0x24, 0x203C);
 		space->write_word(hack_base + 0x26, 0x0000);
 		space->write_word(hack_base + 0x28, hack_value);
+
+		if(hack2_addr)
+		{
+			//space->write_byte(hack2_addr, 1);
+		}
 	}
 }
 
@@ -669,7 +686,9 @@ WRITE16_HANDLER( scc68070_periphs_w )
 				scc68070_uart_tx(space->machine, scc68070, data & 0x00ff);
                 scc68070->uart.transmit_holding_register = data & 0x00ff;
 
-                if((data & 0x00ff) == 0x5a)
+				printf("%02x ", scc68070->uart.transmit_holding_register);
+
+                if((data & 0x00ff) == hack_ack)
                 {
 					count++;
 					if(count == 2)
@@ -678,7 +697,6 @@ WRITE16_HANDLER( scc68070_periphs_w )
 
 						for(int index = 0; index < 9; index++)
 						{
-                			verboselog(space->machine, 2, "scc68070_periphs_w: Sending to receiver: 0x5a\n");
 							scc68070_uart_rx(space->machine, scc68070, check_array[index]);
 							if(index > 0)
 							{
@@ -690,6 +708,10 @@ WRITE16_HANDLER( scc68070_periphs_w )
 						hack_active = true;
 						quizard_patch(space->machine);
 					}
+				}
+				else
+				{
+					count = 0;
 				}
             }
             else

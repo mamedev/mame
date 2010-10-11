@@ -199,16 +199,33 @@ static MACHINE_START( cdi )
     scc68070_register_globals(machine, &state->scc68070_regs);
 }
 
+static DRIVER_INIT( quizrr41 )
+{
+	scc68070_set_hack_base(0x267EA8);
+	scc68070_set_hack_value(0x004d);
+	scc68070_set_hack_ack(0x57);
+}
+
 static DRIVER_INIT( quizrd12 )
 {
 	scc68070_set_hack_base(0x26F39C);
     scc68070_set_hack_value(0x021f);
+    scc68070_set_hack_ack(0x5a);
 }
 
 static DRIVER_INIT( quizrd17 )
 {
 	scc68070_set_hack_base(0x264C42);
     scc68070_set_hack_value(0x021f);
+    scc68070_set_hack_ack(0x5a);
+}
+
+static DRIVER_INIT( quizrd32 )
+{
+	scc68070_set_hack_base(0x266E28);
+	scc68070_set_hack_value(0x00ae);
+    scc68070_set_hack_ack(0x58);
+    scc68070_set_secondary_hack(0xc000-0x7b76);
 }
 
 static MACHINE_RESET( cdi )
@@ -386,11 +403,13 @@ ROM_END
 GAME( 1991, cdi,      0,        cdi,      cdi,      0,        ROT0,     "Philips", "CD-i (Mono-I) BIOS", GAME_IS_BIOS_ROOT )
 
 // Non-working
-GAME( 1996, quizard,  cdi,      cdi,      cdi,      0,        ROT0,     "TAB Austria",  "Quizard 3.2", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
 GAME( 1995, quizrd22, cdi,      cdi,      cdi,      0,        ROT0,     "TAB Austria",  "Quizard 2.2", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
-GAME( 1995, quizrd12, cdi,      cdi,      cdi,      quizrd12,        ROT0,     "TAB Austria",  "Quizard 1.2", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
 GAME( 1998, quizrr42, cdi,      cdi,      cdi,      0,        ROT0,     "TAB Austria",  "Quizard Rainbow 4.2", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
-GAME( 1998, quizrr41, cdi,      cdi,      cdi,      0,        ROT0,     "TAB Austria",  "Quizard Rainbow 4.1", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
+GAME( 1998, quizrr41, cdi,      cdi,      cdi,      quizrr41, ROT0,     "TAB Austria",  "Quizard Rainbow 4.1", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
+
+// Partially working
+GAME( 1996, quizard,  cdi,      cdi,      cdi,      quizrd32,        ROT0,     "TAB Austria",  "Quizard 3.2", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
 
 // Working
+GAME( 1995, quizrd12, cdi,      cdi,      cdi,      quizrd12,        ROT0,     "TAB Austria",  "Quizard 1.2", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
 GAME( 1995, quizrd17, cdi,      cdi,      cdi,      quizrd17,        ROT0,     "TAB Austria",  "Quizard 1.7", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
