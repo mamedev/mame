@@ -199,6 +199,18 @@ static MACHINE_START( cdi )
     scc68070_register_globals(machine, &state->scc68070_regs);
 }
 
+static DRIVER_INIT( quizrd12 )
+{
+	scc68070_set_hack_base(0x26F39C);
+    scc68070_set_hack_value(0x021f);
+}
+
+static DRIVER_INIT( quizrd17 )
+{
+	scc68070_set_hack_base(0x264C42);
+    scc68070_set_hack_value(0x021f);
+}
+
 static MACHINE_RESET( cdi )
 {
     cdi_state *state = machine->driver_data<cdi_state>();
@@ -208,7 +220,6 @@ static MACHINE_RESET( cdi )
     memcpy(dst, src, 0x8);
 
     scc68070_init(machine, &state->scc68070_regs);
-    scc68070_set_hack_value(0x021f);
 
     machine->device("maincpu")->reset();
 
@@ -377,9 +388,9 @@ GAME( 1991, cdi,      0,        cdi,      cdi,      0,        ROT0,     "Philips
 // Non-working
 GAME( 1996, quizard,  cdi,      cdi,      cdi,      0,        ROT0,     "TAB Austria",  "Quizard 3.2", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
 GAME( 1995, quizrd22, cdi,      cdi,      cdi,      0,        ROT0,     "TAB Austria",  "Quizard 2.2", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
-GAME( 1995, quizrd12, cdi,      cdi,      cdi,      0,        ROT0,     "TAB Austria",  "Quizard 1.2", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
+GAME( 1995, quizrd12, cdi,      cdi,      cdi,      quizrd12,        ROT0,     "TAB Austria",  "Quizard 1.2", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
 GAME( 1998, quizrr42, cdi,      cdi,      cdi,      0,        ROT0,     "TAB Austria",  "Quizard Rainbow 4.2", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
 GAME( 1998, quizrr41, cdi,      cdi,      cdi,      0,        ROT0,     "TAB Austria",  "Quizard Rainbow 4.1", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
 
 // Working
-GAME( 1995, quizrd17, cdi,      cdi,      cdi,      0,        ROT0,     "TAB Austria",  "Quizard 1.7", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
+GAME( 1995, quizrd17, cdi,      cdi,      cdi,      quizrd17,        ROT0,     "TAB Austria",  "Quizard 1.7", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )

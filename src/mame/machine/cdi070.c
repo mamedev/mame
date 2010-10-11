@@ -61,17 +61,23 @@ static void scc68070_set_timer_callback(scc68070_regs_t *scc68070, int channel)
 
 static bool hack_active = false;
 static UINT16 hack_value = 0;
+static UINT32 hack_base = 0;
 
 void scc68070_set_hack_value(UINT16 value)
 {
-	hack_value = 0x021f;
+	hack_value = value;
+}
+
+void scc68070_set_hack_base(UINT32 base)
+{
+	hack_base = base;
 }
 
 static void quizard_patch(running_machine *machine)
 {
     address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
-	if(space->read_byte(0x264dc4) == 0xfe && space->read_byte(0x264dc5) == 0xf0 && hack_active)
+	if(hack_active)
 	{
 		// Patch out:
 		// 00264C42: C0EE 86BE                  mulu.w  (-$7942,A6), D0
@@ -89,27 +95,27 @@ static void quizard_patch(running_machine *machine)
 		// 00264C66: B142                       eor.w   D0, D2
 		// 00264C68: 7000                       moveq   #$0, D0
 		// 00264C6A: 3002                       move.w  D2, D0
-		space->write_word(0x264C42, 0);
-		space->write_word(0x264C44, 0);
-		space->write_word(0x264C46, 0);
-		space->write_word(0x264C48, 0);
-		space->write_word(0x264C4A, 0);
-		space->write_word(0x264C4C, 0);
-		space->write_word(0x264C4E, 0);
-		space->write_word(0x264C50, 0);
-		space->write_word(0x264C52, 0);
-		space->write_word(0x264C54, 0);
-		space->write_word(0x264C56, 0);
-		space->write_word(0x264C58, 0);
-		space->write_word(0x264C5A, 0);
-		space->write_word(0x264C5C, 0);
-		space->write_word(0x264C5E, 0);
-		space->write_word(0x264C60, 0);
-		space->write_word(0x264C62, 0);
-		space->write_word(0x264C64, 0);
-		space->write_word(0x264C66, 0x203C);
-		space->write_word(0x264C68, 0x0000);
-		space->write_word(0x264C6A, hack_value);
+		space->write_word(hack_base + 0x00, 0);
+		space->write_word(hack_base + 0x02, 0);
+		space->write_word(hack_base + 0x04, 0);
+		space->write_word(hack_base + 0x06, 0);
+		space->write_word(hack_base + 0x08, 0);
+		space->write_word(hack_base + 0x0a, 0);
+		space->write_word(hack_base + 0x0c, 0);
+		space->write_word(hack_base + 0x0e, 0);
+		space->write_word(hack_base + 0x10, 0);
+		space->write_word(hack_base + 0x12, 0);
+		space->write_word(hack_base + 0x14, 0);
+		space->write_word(hack_base + 0x16, 0);
+		space->write_word(hack_base + 0x18, 0);
+		space->write_word(hack_base + 0x1a, 0);
+		space->write_word(hack_base + 0x1c, 0);
+		space->write_word(hack_base + 0x1e, 0);
+		space->write_word(hack_base + 0x20, 0);
+		space->write_word(hack_base + 0x22, 0);
+		space->write_word(hack_base + 0x24, 0x203C);
+		space->write_word(hack_base + 0x26, 0x0000);
+		space->write_word(hack_base + 0x28, hack_value);
 	}
 }
 
