@@ -245,6 +245,16 @@ GFX check (these don't explicitly fails):
 #159 Runlength Mode
 #160 Runlength Mode
 #161 Runlength Mode
+
+
+----------------------------
+SegaCD notes
+----------------------------
+
+the use of the MAME tilemap system for the SegaCD 'Roz tilemap' isn't intended as a long-term
+solution.  (In reality it's not a displayable tilemap anyway, just a source buffer which has
+a tilemap-like structure, from which data is copied)
+
 */
 
 
@@ -378,6 +388,7 @@ static struct
 	UINT8 ext;
 	UINT8 ctrl;
 }segacd_cdd;
+static void segacd_mark_tiles_dirty(running_machine* machine, int offset);
 
 #ifdef UNUSED_FUNCTION
 /* taken from segaic16.c */
@@ -3809,8 +3820,14 @@ ADDRESS_MAP_END
 
 static UINT16* segacd_4meg_prgram;  // pointer to SubCPU PrgRAM
 static UINT16 segacd_hint_register;
+static UINT16 segacd_imagebuffer_vdot_size;
 
 static UINT16 a12000_halt_reset_reg = 0x0000;
+int segacd_conversion_active = 0;
+static UINT16 segacd_stampmap_base_address;
+static tilemap_t    *segacd_stampmap[4];
+static void segacd_mark_stampmaps_dirty(void);
+
 
 static WRITE16_HANDLER( scd_a12000_halt_reset_w )
 {
@@ -3870,6 +3887,7 @@ static int segacd_ram_mode;
 static int segacd_maincpu_has_ram_access = 0;
 static int segacd_4meg_prgbank = 0; // which bank the MainCPU can see of the SubCPU PrgRAM
 static int segacd_memory_priority_mode = 0;
+static int segacd_stampsize;
 
 
 static READ16_HANDLER( scd_a12002_memory_mode_r )
@@ -4112,7 +4130,7 @@ static WRITE16_HANDLER( segacd_comms_sub_part2_w )
 static int segacd_cdc_regaddress;
 static int segacd_cdc_destination_device;
 static UINT8 segacd_cdc_registers[0x10];
-int segacd_conversion_active = 0;
+
 
 static WRITE16_HANDLER( segacd_cdc_mode_address_w )
 {
@@ -4234,7 +4252,10 @@ static WRITE16_HANDLER( segacd_main_dataram_part1_w )
 	{
 		// is this correct?
 		if (segacd_maincpu_has_ram_access)
+		{
 			COMBINE_DATA(&segacd_dataram[offset]);
+			segacd_mark_tiles_dirty(space->machine, offset);
+		}
 		else
 		{
 			printf("Illegal: segacd_main_dataram_part1_w in mode 0 without permission\n");
@@ -4287,6 +4308,291 @@ static TIMER_CALLBACK( segacd_gfx_conversion_timer_callback )
 }
 
 
+// the tiles in RAM are 8x8 tiles
+// they are referenced in the cell look-up map as either 16x16 or 32x32 tiles (made of 4 / 16 8x8 tiles)
+
+#define SEGACD_BYTES_PER_TILE16 (128)
+#define SEGACD_BYTES_PER_TILE32 (512)
+
+#define SEGACD_NUM_TILES16 (0x40000/SEGACD_BYTES_PER_TILE16)
+#define SEGACD_NUM_TILES32 (0x40000/SEGACD_BYTES_PER_TILE32)
+
+/*
+static const gfx_layout sega_8x8_layout =
+{
+	8,8,
+	SEGACD_NUM_TILES16,
+	4,
+	{ 0,1,2,3 },
+	{ 8,12,0,4,24,28,16,20 },
+	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
+	8*32
+};
+*/
+
+/* also create pre-rotated versions.. - it might still be possible to use these decodes with our own copying routines */
+
+
+#define _16x16_SEQUENCE_1  { 8,12,0,4,24,28,16,20, 512+8, 512+12, 512+0, 512+4, 512+24, 512+28, 512+16, 512+20 },
+#define _16x16_SEQUENCE_1_FLIP  { 512+20,512+16,512+28,512+24,512+4,512+0, 512+12,512+8, 20,16,28,24,4,0,12,8 },
+
+#define _16x16_SEQUENCE_2  { 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32, 8*32, 9*32,10*32,11*32,12*32,13*32,14*32,15*32 },
+#define _16x16_SEQUENCE_2_FLIP  { 16*32, 14*32, 13*32, 12*32, 11*32, 10*32, 9*32, 8*32, 7*32, 6*32, 5*32, 4*32, 3*32, 2*32, 1*32, 0*32 },
+
+
+#define _16x16_START \
+{ \
+	16,16, \
+	SEGACD_NUM_TILES16, \
+	4, \
+	{ 0,1,2,3 }, \
+
+#define _16x16_END \
+		8*128 \
+}; \
+
+#define _32x32_START \
+{ \
+	32,32, \
+	SEGACD_NUM_TILES32, \
+	4, \
+	{ 0,1,2,3 }, \
+
+
+#define _32x32_END \
+	8*512 \
+}; \
+
+
+
+#define _32x32_SEQUENCE_1 \
+	{ 8,12,0,4,24,28,16,20, \
+	1024+8, 1024+12, 1024+0, 1024+4, 1024+24, 1024+28, 1024+16, 1024+20, \
+	2048+8, 2048+12, 2048+0, 2048+4, 2048+24, 2048+28, 2048+16, 2048+20, \
+	3072+8, 3072+12, 3072+0, 3072+4, 3072+24, 3072+28, 3072+16, 3072+20  \
+	}, \
+
+#define _32x32_SEQUENCE_1_FLIP \
+{ 3072+20, 3072+16, 3072+28, 3072+24, 3072+4, 3072+0, 3072+12, 3072+8, \
+  2048+20, 2048+16, 2048+28, 2048+24, 2048+4, 2048+0, 2048+12, 2048+8, \
+  1024+20, 1024+16, 1024+28, 1024+24, 1024+4, 1024+0, 1024+12, 1024+8, \
+  20, 16, 28, 24, 4, 0, 12, 8}, \
+
+
+#define _32x32_SEQUENCE_2 \
+		{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32, \
+     	8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32, \
+ 	 16*32,17*32,18*32,19*32,20*32,21*32,22*32,23*32, \
+	 24*32,25*32, 26*32, 27*32, 28*32, 29*32, 30*32, 31*32}, \
+
+#define _32x32_SEQUENCE_2_FLIP \
+{ 31*32, 30*32, 29*32, 28*32, 27*32, 26*32, 25*32, 24*32, \
+  23*32, 22*32, 21*32, 20*32, 19*32, 18*32, 17*32, 16*32, \
+  15*32, 14*32, 13*32, 12*32, 11*32, 10*32, 9*32 , 8*32 , \
+  7*32 , 6*32 , 5*32 , 4*32 , 3*32 , 2*32 , 1*32 , 0*32}, \
+
+
+/* 16x16 decodes */
+static const gfx_layout sega_16x16_r00_f0_layout =
+_16x16_START
+	_16x16_SEQUENCE_1
+	_16x16_SEQUENCE_2
+_16x16_END
+
+static const gfx_layout sega_16x16_r01_f0_layout =
+_16x16_START
+	_16x16_SEQUENCE_2
+	_16x16_SEQUENCE_1_FLIP
+_16x16_END
+
+static const gfx_layout sega_16x16_r10_f0_layout =
+_16x16_START
+	_16x16_SEQUENCE_1_FLIP
+	_16x16_SEQUENCE_2_FLIP
+_16x16_END
+
+static const gfx_layout sega_16x16_r11_f0_layout =
+_16x16_START
+	_16x16_SEQUENCE_2_FLIP
+	_16x16_SEQUENCE_1
+_16x16_END
+
+static const gfx_layout sega_16x16_r00_f1_layout =
+_16x16_START
+	_16x16_SEQUENCE_1_FLIP
+	_16x16_SEQUENCE_2
+_16x16_END
+
+static const gfx_layout sega_16x16_r01_f1_layout =
+_16x16_START
+	_16x16_SEQUENCE_2
+	_16x16_SEQUENCE_1
+_16x16_END
+
+static const gfx_layout sega_16x16_r10_f1_layout =
+_16x16_START
+	_16x16_SEQUENCE_1
+	_16x16_SEQUENCE_2_FLIP
+_16x16_END
+
+static const gfx_layout sega_16x16_r11_f1_layout =
+_16x16_START
+	_16x16_SEQUENCE_2_FLIP
+	_16x16_SEQUENCE_1_FLIP
+_16x16_END
+
+/* 32x32 decodes */
+static const gfx_layout sega_32x32_r00_f0_layout =
+_32x32_START
+	_32x32_SEQUENCE_1
+	_32x32_SEQUENCE_2
+_32x32_END
+
+static const gfx_layout sega_32x32_r01_f0_layout =
+_32x32_START
+	_32x32_SEQUENCE_2
+	_32x32_SEQUENCE_1_FLIP
+_32x32_END
+
+static const gfx_layout sega_32x32_r10_f0_layout =
+_32x32_START
+	_32x32_SEQUENCE_1_FLIP
+	_32x32_SEQUENCE_2_FLIP
+_32x32_END
+
+static const gfx_layout sega_32x32_r11_f0_layout =
+_32x32_START
+	_32x32_SEQUENCE_2_FLIP
+	_32x32_SEQUENCE_1
+_32x32_END
+
+static const gfx_layout sega_32x32_r00_f1_layout =
+_32x32_START
+	_32x32_SEQUENCE_1_FLIP
+	_32x32_SEQUENCE_2
+_32x32_END
+
+static const gfx_layout sega_32x32_r01_f1_layout =
+_32x32_START
+	_32x32_SEQUENCE_2
+	_32x32_SEQUENCE_1
+_32x32_END
+
+static const gfx_layout sega_32x32_r10_f1_layout =
+_32x32_START
+	_32x32_SEQUENCE_1
+	_32x32_SEQUENCE_2_FLIP
+_32x32_END
+
+static const gfx_layout sega_32x32_r11_f1_layout =
+_32x32_START
+	_32x32_SEQUENCE_2_FLIP
+	_32x32_SEQUENCE_1_FLIP
+_32x32_END
+
+
+static void segacd_mark_tiles_dirty(running_machine* machine, int offset)
+{
+	gfx_element_mark_dirty(machine->gfx[0], (offset*2)/(SEGACD_BYTES_PER_TILE16));
+	gfx_element_mark_dirty(machine->gfx[1], (offset*2)/(SEGACD_BYTES_PER_TILE16));
+	gfx_element_mark_dirty(machine->gfx[2], (offset*2)/(SEGACD_BYTES_PER_TILE16));
+	gfx_element_mark_dirty(machine->gfx[3], (offset*2)/(SEGACD_BYTES_PER_TILE16));
+	gfx_element_mark_dirty(machine->gfx[4], (offset*2)/(SEGACD_BYTES_PER_TILE16));
+	gfx_element_mark_dirty(machine->gfx[5], (offset*2)/(SEGACD_BYTES_PER_TILE16));
+	gfx_element_mark_dirty(machine->gfx[6], (offset*2)/(SEGACD_BYTES_PER_TILE16));
+	gfx_element_mark_dirty(machine->gfx[7], (offset*2)/(SEGACD_BYTES_PER_TILE16));
+
+	gfx_element_mark_dirty(machine->gfx[8], (offset*2)/(SEGACD_BYTES_PER_TILE32));
+	gfx_element_mark_dirty(machine->gfx[9], (offset*2)/(SEGACD_BYTES_PER_TILE32));
+	gfx_element_mark_dirty(machine->gfx[10],(offset*2)/(SEGACD_BYTES_PER_TILE32));
+	gfx_element_mark_dirty(machine->gfx[11],(offset*2)/(SEGACD_BYTES_PER_TILE32));
+	gfx_element_mark_dirty(machine->gfx[12],(offset*2)/(SEGACD_BYTES_PER_TILE32));
+	gfx_element_mark_dirty(machine->gfx[13],(offset*2)/(SEGACD_BYTES_PER_TILE32));
+	gfx_element_mark_dirty(machine->gfx[14],(offset*2)/(SEGACD_BYTES_PER_TILE32));
+	gfx_element_mark_dirty(machine->gfx[15],(offset*2)/(SEGACD_BYTES_PER_TILE32));
+}
+
+// mame specific.. map registers to which tilemap cache we use
+static int segacd_get_active_stampmap_tilemap(void)
+{
+	return (segacd_stampsize & 0x6)>>1;
+}
+
+static void segacd_mark_stampmaps_dirty(void)
+{
+	tilemap_mark_all_tiles_dirty(segacd_stampmap[segacd_get_active_stampmap_tilemap()]);
+
+	//tilemap_mark_all_tiles_dirty(segacd_stampmap[0]);
+	//tilemap_mark_all_tiles_dirty(segacd_stampmap[1]);
+	//tilemap_mark_all_tiles_dirty(segacd_stampmap[2]);
+	//tilemap_mark_all_tiles_dirty(segacd_stampmap[3]);
+}
+
+static TILE_GET_INFO( get_stampmap_16x16_1x1_tile_info )
+{
+	int tile_region = 0; // 16x16 tiles
+	int tile_base = (segacd_stampmap_base_address & 0xff80) * 4;
+
+	int tiledat = segacd_dataram[((tile_base>>1)+tile_index) & 0x1ffff];
+	int tileno = tiledat & 0x07ff;
+	int xflip =  tiledat & 0x8000;
+	int roll  =  (tiledat & 0x6000)>>13;
+
+	if (xflip) tile_region += 4;
+	tile_region+=roll;
+
+	SET_TILE_INFO(tile_region, tileno, 0, 0);
+}
+
+static TILE_GET_INFO( get_stampmap_16x16_16x16_tile_info )
+{
+	int tile_region = 0; // 16x16 tiles
+	int tile_base = (0x8000) * 4; // fixed address in this mode
+
+	int tiledat = segacd_dataram[((tile_base>>1)+tile_index) & 0x1ffff];
+	int tileno = tiledat & 0x07ff;
+	int xflip =  tiledat & 0x8000;
+	int roll  =  (tiledat & 0x6000)>>13;
+
+	if (xflip) tile_region += 4;
+	tile_region+=roll;
+
+	SET_TILE_INFO(tile_region, tileno, 0, 0);
+}
+
+static TILE_GET_INFO( get_stampmap_32x32_1x1_tile_info )
+{
+	int tile_region = 8; // 32x32 tiles
+	int tile_base = (segacd_stampmap_base_address & 0xffe0) * 4;
+
+	int tiledat = segacd_dataram[((tile_base>>1)+tile_index) & 0x1ffff];
+	int tileno = (tiledat & 0x07fc)>>2;
+	int xflip =  tiledat & 0x8000;
+	int roll  =  (tiledat & 0x6000)>>13;
+
+	if (xflip) tile_region += 4;
+	tile_region+=roll;
+
+	SET_TILE_INFO(tile_region, tileno, 0, 0);
+}
+
+static TILE_GET_INFO( get_stampmap_32x32_16x16_tile_info )
+{
+	int tile_region = 8; // 32x32 tiles
+	int tile_base = (segacd_stampmap_base_address & 0xe000) * 4;
+
+	int tiledat = segacd_dataram[((tile_base>>1)+tile_index) & 0x1ffff];
+	int tileno = (tiledat & 0x07fc)>>2;
+	int xflip =  tiledat & 0x8000;
+	int roll  =  (tiledat & 0x6000)>>13;
+
+	if (xflip) tile_region += 4;
+	tile_region+=roll;
+
+	SET_TILE_INFO(tile_region, tileno, 0, 0);
+}
+
+
 
 /* main CPU map set up in INIT */
 void segacd_init_main_cpu( running_machine* machine )
@@ -4323,7 +4629,38 @@ void segacd_init_main_cpu( running_machine* machine )
 	segacd_gfx_conversion_timer = timer_alloc(machine, segacd_gfx_conversion_timer_callback, 0);
 	timer_adjust_oneshot(segacd_gfx_conversion_timer, attotime_never, 0);
 
+
+	/* create the char set (gfx will then be updated dynamically from RAM) */
+	machine->gfx[0] = gfx_element_alloc(machine, &sega_16x16_r00_f0_layout, (UINT8 *)segacd_dataram, 0, 0);
+	machine->gfx[1] = gfx_element_alloc(machine, &sega_16x16_r01_f0_layout, (UINT8 *)segacd_dataram, 0, 0);
+	machine->gfx[2] = gfx_element_alloc(machine, &sega_16x16_r10_f0_layout, (UINT8 *)segacd_dataram, 0, 0);
+	machine->gfx[3] = gfx_element_alloc(machine, &sega_16x16_r11_f0_layout, (UINT8 *)segacd_dataram, 0, 0);
+	machine->gfx[4] = gfx_element_alloc(machine, &sega_16x16_r00_f1_layout, (UINT8 *)segacd_dataram, 0, 0);
+	machine->gfx[5] = gfx_element_alloc(machine, &sega_16x16_r01_f1_layout, (UINT8 *)segacd_dataram, 0, 0);
+	machine->gfx[6] = gfx_element_alloc(machine, &sega_16x16_r10_f1_layout, (UINT8 *)segacd_dataram, 0, 0);
+	machine->gfx[7] = gfx_element_alloc(machine, &sega_16x16_r11_f1_layout, (UINT8 *)segacd_dataram, 0, 0);
+
+	machine->gfx[8] = gfx_element_alloc(machine, &sega_32x32_r00_f0_layout, (UINT8 *)segacd_dataram, 0, 0);
+	machine->gfx[9] = gfx_element_alloc(machine, &sega_32x32_r01_f0_layout, (UINT8 *)segacd_dataram, 0, 0);
+	machine->gfx[10]= gfx_element_alloc(machine, &sega_32x32_r10_f0_layout, (UINT8 *)segacd_dataram, 0, 0);
+	machine->gfx[11]= gfx_element_alloc(machine, &sega_32x32_r11_f0_layout, (UINT8 *)segacd_dataram, 0, 0);
+	machine->gfx[12]= gfx_element_alloc(machine, &sega_32x32_r00_f1_layout, (UINT8 *)segacd_dataram, 0, 0);
+	machine->gfx[13]= gfx_element_alloc(machine, &sega_32x32_r01_f1_layout, (UINT8 *)segacd_dataram, 0, 0);
+	machine->gfx[14]= gfx_element_alloc(machine, &sega_32x32_r10_f1_layout, (UINT8 *)segacd_dataram, 0, 0);
+	machine->gfx[15]= gfx_element_alloc(machine, &sega_32x32_r11_f1_layout, (UINT8 *)segacd_dataram, 0, 0);
+
+	/* as a temporary measure we use the MAME tilemaps, this is hideously inefficient as we have to mark the active one as
+       dirty before each operation due to the RAM based tiles.  For the larger tilemaps this means we have to re-render a 4096x4096
+	   bitmap to the tilemap cache on each blit operation just to copy the few needed tiles out of it, needless to say, this is SLOW.
+	   Eventually the tilemaps will be replaced with a get_pixel function which will perform all the needed lookups on a per-pixel
+	   basis instead of re-rendering the whole thing */
+	segacd_stampmap[0] = tilemap_create(machine, get_stampmap_16x16_1x1_tile_info, tilemap_scan_rows, 16, 16, 16, 16);
+	segacd_stampmap[1] = tilemap_create(machine, get_stampmap_32x32_1x1_tile_info, tilemap_scan_rows, 32, 32, 8, 8);
+	segacd_stampmap[2] = tilemap_create(machine, get_stampmap_16x16_16x16_tile_info, tilemap_scan_rows, 16, 16, 256, 256); // 128kb!
+	segacd_stampmap[3] = tilemap_create(machine, get_stampmap_32x32_16x16_tile_info, tilemap_scan_rows, 32, 32, 128, 128); // 32kb!
 }
+
+
 
 static MACHINE_RESET( segacd )
 {
@@ -4414,7 +4751,10 @@ static WRITE16_HANDLER( segacd_sub_dataram_part1_w )
 	{
 		// is this correct?
 		if (!segacd_maincpu_has_ram_access)
+		{
 			COMBINE_DATA(&segacd_dataram[offset]);
+			segacd_mark_tiles_dirty(space->machine, offset);
+		}
 		else
 		{
 			printf("Illegal: segacd_sub_dataram_part1_w in mode 0 without permission\n");
@@ -4598,7 +4938,7 @@ static WRITE8_HANDLER( segacd_cdd_tx_w )
 	}
 }
 
-int segacd_stampsize;
+
 
 static READ16_HANDLER( segacd_stampsize_r )
 {
@@ -4648,10 +4988,76 @@ WRITE16_HANDLER( segacd_trace_vector_base_address_w )
 	}
 
 	printf("segacd_trace_vector_base_address_w %04x %04x\n",data,mem_mask);
+	
+	{
+		int base = (data & 0xfffe) * 4;
 
-	segacd_conversion_active = 1;
+		printf("actual base = %06x\n", base + 0x80000);
 
-	timer_adjust_oneshot(segacd_gfx_conversion_timer, ATTOTIME_IN_HZ(1), 0);
+		// nasty nasty nasty
+		segacd_mark_stampmaps_dirty();
+
+		segacd_conversion_active = 1;
+		timer_adjust_oneshot(segacd_gfx_conversion_timer, ATTOTIME_IN_HZ(1), 0);
+		
+
+		int i;
+
+		for (i=0;i<segacd_imagebuffer_vdot_size;i++)
+		{
+			int currbase = base + i * 0x8;
+			UINT16 param1 = segacd_dataram[(currbase+0x0)>>1];
+			UINT16 param2 = segacd_dataram[(currbase+0x2)>>1];
+			UINT16 param3 = segacd_dataram[(currbase+0x4)>>1];
+			UINT16 param4 = segacd_dataram[(currbase+0x6)>>1];
+
+
+			printf("%06x:  %04x %04x %04x %04x\n", currbase, param1, param2, param3, param4); 
+
+		}
+		
+		{
+			// not real code.. yet
+			// should copy part of the stamp into the imagebuffer area using the rotation / zooming parameters given
+			// (while we're using the MAME tilemaps that means, part of the tilemap cache into the ram buffer for the image)
+
+			bitmap_t *srcbitmap = tilemap_get_pixmap(segacd_stampmap[segacd_get_active_stampmap_tilemap()]);
+			UINT16* x;
+			x = BITMAP_ADDR16(srcbitmap,10,10);
+			UINT16 datax;
+			datax = x[0]; 
+		
+		}
+
+	}
+
+}
+
+// actually just the low 8 bits?
+READ16_HANDLER( segacd_imagebuffer_vdot_size_r )
+{
+	return segacd_imagebuffer_vdot_size;
+}
+
+WRITE16_HANDLER( segacd_imagebuffer_vdot_size_w )
+{
+	printf("segacd_imagebuffer_vdot_size_w %04x %04x\n",data,mem_mask);
+	COMBINE_DATA(&segacd_imagebuffer_vdot_size);
+}
+
+
+// basically the 'tilemap' base address, for the 16x16 / 32x32 source tiles
+static READ16_HANDLER( segacd_stampmap_base_address_r )
+{
+	// different bits are valid in different modes, but I'm guessing the register
+	// always returns all the bits set, even if they're not used?
+	return segacd_stampmap_base_address;
+
+}
+
+static WRITE16_HANDLER( segacd_stampmap_base_address_w )
+{
+	COMBINE_DATA(&segacd_stampmap_base_address);
 }
 
 static ADDRESS_MAP_START( segacd_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -4684,12 +5090,12 @@ static ADDRESS_MAP_START( segacd_map, ADDRESS_SPACE_PROGRAM, 16 )
 //	AM_RANGE(0xff804e, 0xff804f) // Font bit
 //	AM_RANGE(0xff8050, 0xff8057) // Font data (read only)
 	AM_RANGE(0xff8058, 0xff8059) AM_READWRITE(segacd_stampsize_r, segacd_stampsize_w) // Stamp size
-//	AM_RANGE(0xff805a, 0xff805b) // Stamp map base address
+	AM_RANGE(0xff805a, 0xff805b) AM_READWRITE(segacd_stampmap_base_address_r, segacd_stampmap_base_address_w) // Stamp map base address
 //	AM_RANGE(0xff805c, 0xff805d) // Image buffer V cell size
 //	AM_RANGE(0xff805e, 0xff805f) // Image buffer start address
 //	AM_RANGE(0xff8060, 0xff8061) // Image buffer offset
 //	AM_RANGE(0xff8062, 0xff8063) // Image buffer H dot size
-//	AM_RANGE(0xff8064, 0xff8065) // Image buffer V dot size
+	AM_RANGE(0xff8064, 0xff8065) AM_READWRITE(segacd_imagebuffer_vdot_size_r, segacd_imagebuffer_vdot_size_w ) // Image buffer V dot size
 	AM_RANGE(0xff8066, 0xff8067) AM_WRITE(segacd_trace_vector_base_address_w)// Trace vector base address
 //	AM_RANGE(0xff8068, 0xff8069) // Subcode address
 
@@ -7604,6 +8010,8 @@ MACHINE_CONFIG_DERIVED( genesis_32x_pal, megadpal )
 	MDRV_SOUND_ADD("rch_pwm", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 MACHINE_CONFIG_END
+
+
 
 MACHINE_CONFIG_DERIVED( genesis_scd, megadriv )
 
