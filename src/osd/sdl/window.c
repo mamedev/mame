@@ -986,7 +986,7 @@ void sdlwindow_video_window_update(running_machine *machine, sdl_window_info *wi
 			clear_worker_param(&wp);
 
 			// ensure the target bounds are up-to-date, and then get the primitives
-			primlist = window->get_primitives(window);
+			primlist = &window->get_primitives(window);
 
 			// and redraw now
 
@@ -1148,7 +1148,7 @@ static OSDWORK_CALLBACK( draw_video_contents_wt )
 	// Some configurations require events to be polled in the worker thread
 	sdlinput_process_events_buf(wp->machine);
 
-	window->primlist = wp->list;
+	window->primlist = (render_primitive_list*)wp->list;
 
 	// if no bitmap, just fill
 	if (window->primlist == NULL)
