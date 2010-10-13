@@ -327,6 +327,10 @@ void _32x_check_irqs(running_machine* machine);
 #define SH2_CINT_IRQ_LEVEL 8
 #define SH2_PINT_IRQ_LEVEL 6
 
+// Fifa96 needs the CPUs swapped for the gameplay to enter due to some race conditions
+// when using the DRC core.  Needs further investigation, the non-DRC core works either
+// way
+#define _32X_SWAP_MASTER_SLAVE_HACK
 
 static UINT16* _32x_dram0;
 static UINT16* _32x_dram1;
@@ -336,6 +340,7 @@ static UINT16* _32x_palette_lookup;
 /* SegaCD! */
 static cpu_device *_segacd_68k_cpu;
 static emu_timer *segacd_gfx_conversion_timer;
+static int segacd_wordram_mapped = 0;
 
 /* SVP (virtua racing) */
 static cpu_device *_svp_cpu;
@@ -863,6 +868,13 @@ static UINT16 vdp_get_word_from_68k_mem_default(running_machine *machine, UINT32
 		if (_svp_cpu != NULL)
 		{
 			source -= 2; // the SVP introduces some kind of DMA 'lag', which we have to compensate for, this is obvious even on gfx DMAd from ROM (the Speedometer)
+		}
+		
+		// likewise segaCD, at least when reading wordram?
+		// we might need to check what mode we're in here..
+		if (segacd_wordram_mapped)
+		{
+			source -= 2;
 		}
 
 		return space68k->read_word(source);
@@ -3836,6 +3848,8 @@ ADDRESS_MAP_END
 static UINT16* segacd_4meg_prgram;  // pointer to SubCPU PrgRAM
 static UINT16 segacd_hint_register;
 static UINT16 segacd_imagebuffer_vdot_size;
+static UINT16 segacd_imagebuffer_vcell_size;
+static UINT16 segacd_imagebuffer_hdot_size;
 
 static UINT16 a12000_halt_reset_reg = 0x0000;
 int segacd_conversion_active = 0;
@@ -3918,27 +3932,27 @@ static READ16_HANDLER( scd_a12002_memory_mode_r )
 
 static WRITE16_HANDLER( scd_a12002_memory_mode_w )
 {
-	printf("scd_a12002_memory_mode_w %04x %04x\n", data, mem_mask);
+	//printf("scd_a12002_memory_mode_w %04x %04x\n", data, mem_mask);
 
 	if (ACCESSING_BITS_0_7)
 	{
 
-		if (data&0x0001) printf("ret bit set (invalid? can't set from main68k?)\n");
+		//if (data&0x0001) printf("ret bit set (invalid? can't set from main68k?)\n");
 		if (data&0x0002)
 		{
-			printf("dmn set (swap requested)\n"); // give ram to sub?
+			//printf("dmn set (swap requested)\n"); // give ram to sub?
 
 			// this should take some time?
 			segacd_maincpu_has_ram_access = 0;
 		}
 
 
-		if (data&0x0004) printf("mode set (invalid? can't set from main68k?)\n");
-		if (data&0x0038) printf("unknown bits set\n");
+		//if (data&0x0004) printf("mode set (invalid? can't set from main68k?)\n");
+		//if (data&0x0038) printf("unknown bits set\n");
 
 		//if (data&0x00c0)
 		{
-			printf("bank set to %02x\n", (data&0x00c0)>>6);
+			//printf("bank set to %02x\n", (data&0x00c0)>>6);
 			segacd_4meg_prgbank = (data&0x00c0)>>6;
 
 		}
@@ -3970,34 +3984,34 @@ static READ16_HANDLER( segacd_sub_memory_mode_r )
 
 static WRITE16_HANDLER( segacd_sub_memory_mode_w )
 {
-	printf("segacd_sub_memory_mode_w %04x %04x\n", data, mem_mask);
+	//printf("segacd_sub_memory_mode_w %04x %04x\n", data, mem_mask);
 
 	if (ACCESSING_BITS_0_7)
 	{
 		if (data&0x0001)
 		{
-			printf("ret bit set\n");
+			//printf("ret bit set\n");
 			segacd_maincpu_has_ram_access = 1;
 		}
 
 
-		if (data&0x0002) printf("dmn set (swap requested) (invalid, can't be set from sub68k?\n");
+		//if (data&0x0002) printf("dmn set (swap requested) (invalid, can't be set from sub68k?\n");
 
 		//if (data&0x0004)
 		{
 			segacd_ram_mode = (data&0x0004)>>2;
-			printf("mode set %d\n", segacd_ram_mode);
+			//printf("mode set %d\n", segacd_ram_mode);
 		}
 
 		//if (data&0x0018)
 		{
 
 			segacd_memory_priority_mode = (data&0x0018)>>3;
-			printf("priority mode bits set to %d\n", segacd_memory_priority_mode);
+			//printf("priority mode bits set to %d\n", segacd_memory_priority_mode);
 
 		}
 
-		if (data&0x00e0) printf("unknown bits set\n");
+		//if (data&0x00e0) printf("unknown bits set\n");
 	}
 
 	if (ACCESSING_BITS_8_15)
@@ -4629,6 +4643,8 @@ void segacd_init_main_cpu( running_machine* machine )
 	memory_install_read_bank(space, 0x0020000, 0x003ffff, 0, 0, "scd_4m_prgbank");
 	memory_set_bankptr(space->machine,  "scd_4m_prgbank", segacd_4meg_prgram + segacd_4meg_prgbank * 0x20000 );
 	memory_install_write16_handler (space, 0x0020000, 0x003ffff, 0, 0, scd_4m_prgbank_ram_w );
+	segacd_wordram_mapped = 1;
+	
 
 	memory_install_readwrite16_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x200000, 0x23ffff, 0, 0, segacd_main_dataram_part1_r, segacd_main_dataram_part1_w); // RAM shared with sub
 
@@ -5096,7 +5112,9 @@ WRITE16_HANDLER( segacd_trace_vector_base_address_w )
 		segacd_mark_stampmaps_dirty();
 
 		segacd_conversion_active = 1;
-		timer_adjust_oneshot(segacd_gfx_conversion_timer, ATTOTIME_IN_HZ(1), 0);
+		
+		// todo: proper time calculation
+		timer_adjust_oneshot(segacd_gfx_conversion_timer, ATTOTIME_IN_HZ(1000), 0);
 
 
 		int i;
@@ -5124,8 +5142,13 @@ WRITE16_HANDLER( segacd_trace_vector_base_address_w )
 			x = BITMAP_ADDR16(srcbitmap,10,10);
 			UINT16 datax;
 			datax = x[0];
-
-			for (int i=0;i<0x100;i++)
+			
+			// I don't quite understand what happens if the lower bits of hdotsize are set.. do we end up rounding up?
+			// this 'buffersize' clearly fills the frame for the SegaCD logo screen at least
+			int buffersize = ((segacd_imagebuffer_vcell_size+1) * (segacd_imagebuffer_hdot_size>>3)*0x20)/2;  // 0x20 = 8x8x4 tile, /2 due to word offset
+			//buffersize -= 8;
+			
+			for (int i=0;i< buffersize ;i++)
 			{
 				int offsetx = ((segacd_imagebuffer_start_address&0xfff8)*2)+i;
 
@@ -5199,6 +5222,28 @@ static WRITE16_HANDLER( segacd_imagebuffer_offset_w )
 	printf("segacd_imagebuffer_offset_w %04x\n", segacd_imagebuffer_offset);
 }
 
+static READ16_HANDLER( segacd_imagebuffer_vcell_size_r )
+{
+	return segacd_imagebuffer_vcell_size;
+}	
+
+static WRITE16_HANDLER( segacd_imagebuffer_vcell_size_w )
+{
+	COMBINE_DATA(&segacd_imagebuffer_vcell_size);
+}
+
+
+static READ16_HANDLER( segacd_imagebuffer_hdot_size_r )
+{
+	return segacd_imagebuffer_hdot_size;
+}	
+
+static WRITE16_HANDLER( segacd_imagebuffer_hdot_size_w )
+{
+	COMBINE_DATA(&segacd_imagebuffer_hdot_size);
+}
+
+
 
 static ADDRESS_MAP_START( segacd_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_RAM AM_BASE(&segacd_4meg_prgram)
@@ -5231,10 +5276,10 @@ static ADDRESS_MAP_START( segacd_map, ADDRESS_SPACE_PROGRAM, 16 )
 //	AM_RANGE(0xff8050, 0xff8057) // Font data (read only)
 	AM_RANGE(0xff8058, 0xff8059) AM_READWRITE(segacd_stampsize_r, segacd_stampsize_w) // Stamp size
 	AM_RANGE(0xff805a, 0xff805b) AM_READWRITE(segacd_stampmap_base_address_r, segacd_stampmap_base_address_w) // Stamp map base address
-//	AM_RANGE(0xff805c, 0xff805d) // Image buffer V cell size
+	AM_RANGE(0xff805c, 0xff805d) AM_READWRITE(segacd_imagebuffer_vcell_size_r, segacd_imagebuffer_vcell_size_w)// Image buffer V cell size
 	AM_RANGE(0xff805e, 0xff805f) AM_READWRITE(segacd_imagebuffer_start_address_r, segacd_imagebuffer_start_address_w) // Image buffer start address
 	AM_RANGE(0xff8060, 0xff8061) AM_READWRITE(segacd_imagebuffer_offset_r, segacd_imagebuffer_offset_w)
-//	AM_RANGE(0xff8062, 0xff8063) // Image buffer H dot size
+	AM_RANGE(0xff8062, 0xff8063) AM_READWRITE(segacd_imagebuffer_hdot_size_r, segacd_imagebuffer_hdot_size_w) // Image buffer H dot size
 	AM_RANGE(0xff8064, 0xff8065) AM_READWRITE(segacd_imagebuffer_vdot_size_r, segacd_imagebuffer_vdot_size_w ) // Image buffer V dot size
 	AM_RANGE(0xff8066, 0xff8067) AM_WRITE(segacd_trace_vector_base_address_w)// Trace vector base address
 //	AM_RANGE(0xff8068, 0xff8069) // Subcode address
@@ -8074,13 +8119,21 @@ static const sh2_cpu_core sh2_conf_slave  = { 1, NULL, _32x_fifo_available_callb
 
 MACHINE_CONFIG_DERIVED( genesis_32x, megadriv )
 
+#ifndef _32X_SWAP_MASTER_SLAVE_HACK
 	MDRV_CPU_ADD("32x_master_sh2", SH2, (MASTER_CLOCK_NTSC*3)/7 )
 	MDRV_CPU_PROGRAM_MAP(sh2_main_map)
 	MDRV_CPU_CONFIG(sh2_conf_master)
+#endif
 
 	MDRV_CPU_ADD("32x_slave_sh2", SH2, (MASTER_CLOCK_NTSC*3)/7 )
 	MDRV_CPU_PROGRAM_MAP(sh2_slave_map)
 	MDRV_CPU_CONFIG(sh2_conf_slave)
+
+#ifdef _32X_SWAP_MASTER_SLAVE_HACK
+	MDRV_CPU_ADD("32x_master_sh2", SH2, (MASTER_CLOCK_NTSC*3)/7 )
+	MDRV_CPU_PROGRAM_MAP(sh2_main_map)
+	MDRV_CPU_CONFIG(sh2_conf_master)
+#endif
 
 	// brutal needs at least 30000 or the backgrounds don't animate properly / lock up, and the game
 	// freezes.  Some stage seem to need as high as 80000 ?   this *KILLS* performance
@@ -8114,13 +8167,21 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED( genesis_32x_pal, megadpal )
 
+#ifndef _32X_SWAP_MASTER_SLAVE_HACK
 	MDRV_CPU_ADD("32x_master_sh2", SH2, (MASTER_CLOCK_PAL*3)/7 )
 	MDRV_CPU_PROGRAM_MAP(sh2_main_map)
 	MDRV_CPU_CONFIG(sh2_conf_master)
+#endif
 
 	MDRV_CPU_ADD("32x_slave_sh2", SH2, (MASTER_CLOCK_PAL*3)/7 )
 	MDRV_CPU_PROGRAM_MAP(sh2_slave_map)
 	MDRV_CPU_CONFIG(sh2_conf_slave)
+
+#ifdef _32X_SWAP_MASTER_SLAVE_HACK
+	MDRV_CPU_ADD("32x_master_sh2", SH2, (MASTER_CLOCK_PAL*3)/7 )
+	MDRV_CPU_PROGRAM_MAP(sh2_main_map)
+	MDRV_CPU_CONFIG(sh2_conf_master)
+#endif
 
 	// brutal needs at least 30000 or the backgrounds don't animate properly / lock up, and the game
 	// freezes.  Some stage seem to need as high as 80000 ?   this *KILLS* performance
@@ -8244,6 +8305,7 @@ static void megadriv_init_common(running_machine *machine)
 	}
 
 	sega_cd_connected = 0;
+	segacd_wordram_mapped = 0;
 	_segacd_68k_cpu = machine->device<cpu_device>("segacd_68k");
 	if (_segacd_68k_cpu != NULL)
 	{
