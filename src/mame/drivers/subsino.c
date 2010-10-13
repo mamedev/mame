@@ -213,6 +213,16 @@
   - Added technical notes.
 
 
+  2010-10-12
+  ----------
+
+  - Added Victor 6 (3 sets).
+  - Created proper inputs for all sets.
+  - Fixed/extended Magic Train technical notes.
+  - Eliminated the 3 undumped bipolar PROMs from Magic Train,
+     since these are in fact Darlington Arrays instead of PROMs.
+
+
 
 ***************************************************************************/
 
@@ -2137,6 +2147,330 @@ static INPUT_PORTS_START( smoto20 )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( victor6 )
+
+	PORT_START( "SW1" )
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x07, "1 Coin / 10 Credits" )
+	PORT_DIPSETTING(    0x03, "1 Coin / 20 Credits" )
+	PORT_DIPSETTING(    0x02, "1 Coin / 25 Credits" )
+	PORT_DIPSETTING(    0x01, "1 Coin / 50 Credits" )
+	PORT_DIPSETTING(    0x00, "1 Coin / 100 Credits" )
+	PORT_DIPNAME( 0x38, 0x38, "Remote Credits" )
+	PORT_DIPSETTING(    0x30, "1 Pulse / 1 Credits" )
+	PORT_DIPSETTING(    0x28, "1 Pulse / 2 Credits" )
+	PORT_DIPSETTING(    0x20, "1 Pulse / 5 Credits" )
+	PORT_DIPSETTING(    0x18, "1 Pulse / 10 Credits" )
+	PORT_DIPSETTING(    0x10, "1 Pulse / 50 Credits" )
+	PORT_DIPSETTING(    0x38, "1 Pulse / 100 Credits" )
+	PORT_DIPSETTING(    0x08, "1 Pulse / 200 Credits" )
+	PORT_DIPSETTING(    0x00, "1 Pulse / 500 Credits" )
+	PORT_DIPUNKNOWN( 0x40, 0x40 )
+	PORT_DIPUNKNOWN( 0x80, 0x80 )
+
+	PORT_START( "SW2" )
+	PORT_DIPNAME( 0x03, 0x03, "Minimum Bet" )
+	PORT_DIPSETTING(    0x03, "1" )
+	PORT_DIPSETTING(    0x02, "5" )
+	PORT_DIPSETTING(    0x01, "10" )
+	PORT_DIPSETTING(    0x00, "20" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Max Bet" )
+	PORT_DIPSETTING(    0x00, "8" )
+	PORT_DIPSETTING(    0x08, "10" )
+	PORT_DIPSETTING(    0x04, "40" )
+	PORT_DIPSETTING(    0x0c, "50" )
+	PORT_DIPNAME( 0x10, 0x10, "Jokers" )
+	PORT_DIPSETTING(    0x10, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPUNKNOWN( 0x20, 0x20 )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNKNOWN( 0x80, 0x80 )
+
+	PORT_START( "SW3" )
+	PORT_DIPNAME( 0x07, 0x07, "Main Game Rate" )
+	PORT_DIPSETTING(    0x00, "87%" )
+	PORT_DIPSETTING(    0x01, "89%" )
+	PORT_DIPSETTING(    0x02, "91%" )
+	PORT_DIPSETTING(    0x03, "93%" )
+	PORT_DIPSETTING(    0x04, "95%" )
+	PORT_DIPSETTING(    0x07, "97%" )
+	PORT_DIPSETTING(    0x05, "99%" )
+	PORT_DIPSETTING(    0x06, "101%" )
+	PORT_DIPNAME( 0x38, 0x38, "Double-Up Rate" )
+	PORT_DIPSETTING(    0x00, "82" )
+	PORT_DIPSETTING(    0x08, "84" )
+	PORT_DIPSETTING(    0x10, "86" )
+	PORT_DIPSETTING(    0x18, "88" )
+	PORT_DIPSETTING(    0x20, "90" )
+	PORT_DIPSETTING(    0x38, "92" )
+	PORT_DIPSETTING(    0x28, "94" )
+	PORT_DIPSETTING(    0x30, "96" )
+	PORT_DIPUNKNOWN( 0x40, 0x40 )
+	PORT_DIPUNKNOWN( 0x80, 0x80 )
+
+	PORT_START( "SW4" )
+	PORT_DIPUNKNOWN( 0x01, 0x01 )
+	PORT_DIPUNKNOWN( 0x02, 0x02 )
+	PORT_DIPUNKNOWN( 0x04, 0x04 )
+	PORT_DIPUNKNOWN( 0x08, 0x08 )
+	PORT_DIPUNKNOWN( 0x10, 0x10 )
+	PORT_DIPUNKNOWN( 0x20, 0x20 )
+	PORT_DIPUNKNOWN( 0x40, 0x40 )
+	PORT_DIPUNKNOWN( 0x80, 0x80 )
+
+	PORT_START( "INA" )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )	PORT_NAME("Start")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )	PORT_NAME("Hold 1 / Bet")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )	PORT_NAME("Hold 3 / Double-Up")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START( "INB" )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )			PORT_IMPULSE(3)	// coin
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )		PORT_CODE(KEYCODE_9)	PORT_NAME("Stats / Test")	// Bookkeeping.
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE )		PORT_CODE(KEYCODE_0)	PORT_NAME("Settings")	// Game Rate & others.
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
+
+	PORT_START( "INC" )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )	PORT_NAME("Hold 4 / Small")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )		PORT_CODE(KEYCODE_R)	PORT_NAME("Reset Switch")	// hard reset
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )	PORT_NAME("Hold 5 / Big")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )	PORT_NAME("Hold 2 / Take")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( victor6a )
+
+	PORT_START( "SW1" )
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x07, "1 Coin / 10 Credits" )
+	PORT_DIPSETTING(    0x03, "1 Coin / 20 Credits" )
+	PORT_DIPSETTING(    0x02, "1 Coin / 25 Credits" )
+	PORT_DIPSETTING(    0x01, "1 Coin / 50 Credits" )
+	PORT_DIPSETTING(    0x00, "1 Coin / 100 Credits" )
+	PORT_DIPNAME( 0x38, 0x38, "Remote Credits" )
+	PORT_DIPSETTING(    0x30, "1 Pulse / 1 Credits" )
+	PORT_DIPSETTING(    0x28, "1 Pulse / 2 Credits" )
+	PORT_DIPSETTING(    0x20, "1 Pulse / 5 Credits" )
+	PORT_DIPSETTING(    0x18, "1 Pulse / 10 Credits" )
+	PORT_DIPSETTING(    0x10, "1 Pulse / 50 Credits" )
+	PORT_DIPSETTING(    0x38, "1 Pulse / 100 Credits" )
+	PORT_DIPSETTING(    0x08, "1 Pulse / 200 Credits" )
+	PORT_DIPSETTING(    0x00, "1 Pulse / 500 Credits" )
+	PORT_DIPUNKNOWN( 0x40, 0x40 )
+	PORT_DIPUNKNOWN( 0x80, 0x80 )
+
+	PORT_START( "SW2" )
+	PORT_DIPNAME( 0x03, 0x03, "Minimum Bet" )
+	PORT_DIPSETTING(    0x03, "1" )
+	PORT_DIPSETTING(    0x02, "5" )
+	PORT_DIPSETTING(    0x01, "10" )
+	PORT_DIPSETTING(    0x00, "20" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Max Bet" )
+	PORT_DIPSETTING(    0x08, "10" )
+	PORT_DIPSETTING(    0x04, "40" )
+	PORT_DIPSETTING(    0x0c, "50" )
+	PORT_DIPSETTING(    0x00, "80" )
+	PORT_DIPNAME( 0x10, 0x10, "Jokers" )
+	PORT_DIPSETTING(    0x10, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPUNKNOWN( 0x20, 0x20 )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNKNOWN( 0x80, 0x80 )
+
+	PORT_START( "SW3" )
+	PORT_DIPNAME( 0x07, 0x07, "Main Game Rate" )
+	PORT_DIPSETTING(    0x00, "94%" )
+	PORT_DIPSETTING(    0x01, "95%" )
+	PORT_DIPSETTING(    0x02, "96%" )
+	PORT_DIPSETTING(    0x03, "97%" )
+	PORT_DIPSETTING(    0x04, "98%" )
+	PORT_DIPSETTING(    0x07, "99%" )
+	PORT_DIPSETTING(    0x05, "100%" )
+	PORT_DIPSETTING(    0x06, "101%" )
+	PORT_DIPNAME( 0x38, 0x38, "Double-Up Rate" )
+	PORT_DIPSETTING(    0x00, "82" )
+	PORT_DIPSETTING(    0x08, "84" )
+	PORT_DIPSETTING(    0x10, "86" )
+	PORT_DIPSETTING(    0x18, "88" )
+	PORT_DIPSETTING(    0x20, "90" )
+	PORT_DIPSETTING(    0x38, "92" )
+	PORT_DIPSETTING(    0x28, "94" )
+	PORT_DIPSETTING(    0x30, "96" )
+	PORT_DIPUNKNOWN( 0x40, 0x40 )
+	PORT_DIPUNKNOWN( 0x80, 0x80 )
+
+	PORT_START( "SW4" )
+	PORT_DIPUNKNOWN( 0x01, 0x01 )
+	PORT_DIPUNKNOWN( 0x02, 0x02 )
+	PORT_DIPUNKNOWN( 0x04, 0x04 )
+	PORT_DIPUNKNOWN( 0x08, 0x08 )
+	PORT_DIPUNKNOWN( 0x10, 0x10 )
+	PORT_DIPUNKNOWN( 0x20, 0x20 )
+	PORT_DIPUNKNOWN( 0x40, 0x40 )
+	PORT_DIPUNKNOWN( 0x80, 0x80 )
+
+	PORT_START( "INA" )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )	PORT_NAME("Start")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )	PORT_NAME("Hold 1 / Bet")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )	PORT_NAME("Hold 3 / Double-Up")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START( "INB" )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )			PORT_IMPULSE(3)	// coin
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )		PORT_CODE(KEYCODE_9)	PORT_NAME("Stats / Test")	// Bookkeeping.
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE )		PORT_CODE(KEYCODE_0)	PORT_NAME("Settings")	// Game Rate & others.
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
+
+	PORT_START( "INC" )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )	PORT_NAME("Hold 4 / Small")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )		PORT_CODE(KEYCODE_R)	PORT_NAME("Reset Switch")	// hard reset
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )	PORT_NAME("Hold 5 / Big")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )	PORT_NAME("Hold 2 / Take")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( victor6b )
+
+	PORT_START( "SW1" )
+	PORT_DIPNAME( 0x07, 0x07, DEF_STR( Coinage ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x07, "1 Coin / 10 Credits" )
+	PORT_DIPSETTING(    0x03, "1 Coin / 20 Credits" )
+	PORT_DIPSETTING(    0x02, "1 Coin / 25 Credits" )
+	PORT_DIPSETTING(    0x01, "1 Coin / 50 Credits" )
+	PORT_DIPSETTING(    0x00, "1 Coin / 100 Credits" )
+	PORT_DIPNAME( 0x38, 0x38, "Remote Credits" )
+	PORT_DIPSETTING(    0x30, "1 Pulse / 1 Credits" )
+	PORT_DIPSETTING(    0x28, "1 Pulse / 2 Credits" )
+	PORT_DIPSETTING(    0x20, "1 Pulse / 5 Credits" )
+	PORT_DIPSETTING(    0x18, "1 Pulse / 10 Credits" )
+	PORT_DIPSETTING(    0x10, "1 Pulse / 50 Credits" )
+	PORT_DIPSETTING(    0x38, "1 Pulse / 100 Credits" )
+	PORT_DIPSETTING(    0x08, "1 Pulse / 200 Credits" )
+	PORT_DIPSETTING(    0x00, "1 Pulse / 500 Credits" )
+	PORT_DIPUNKNOWN( 0x40, 0x40 )
+	PORT_DIPUNKNOWN( 0x80, 0x80 )
+
+	PORT_START( "SW2" )
+	PORT_DIPNAME( 0x03, 0x03, "Minimum Bet" )
+	PORT_DIPSETTING(    0x03, "1" )
+	PORT_DIPSETTING(    0x02, "5" )
+	PORT_DIPSETTING(    0x01, "10" )
+	PORT_DIPSETTING(    0x00, "20" )
+	PORT_DIPNAME( 0x0c, 0x0c, "Max Bet" )
+	PORT_DIPSETTING(    0x08, "Invalid" )
+	PORT_DIPSETTING(    0x04, "40" )
+	PORT_DIPSETTING(    0x0c, "50" )
+	PORT_DIPSETTING(    0x00, "80" )
+	PORT_DIPNAME( 0x10, 0x10, "Jokers" )
+	PORT_DIPSETTING(    0x10, DEF_STR( No ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Yes ) )
+	PORT_DIPUNKNOWN( 0x20, 0x20 )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPUNKNOWN( 0x80, 0x80 )
+
+	PORT_START( "SW3" )
+	PORT_DIPNAME( 0x07, 0x07, "Main Game Rate" )
+	PORT_DIPSETTING(    0x00, "94%" )
+	PORT_DIPSETTING(    0x01, "95%" )
+	PORT_DIPSETTING(    0x02, "96%" )
+	PORT_DIPSETTING(    0x03, "97%" )
+	PORT_DIPSETTING(    0x04, "98%" )
+	PORT_DIPSETTING(    0x07, "99%" )
+	PORT_DIPSETTING(    0x05, "100%" )
+	PORT_DIPSETTING(    0x06, "101%" )
+	PORT_DIPNAME( 0x38, 0x38, "Double-Up Rate" )
+	PORT_DIPSETTING(    0x00, "82" )
+	PORT_DIPSETTING(    0x08, "84" )
+	PORT_DIPSETTING(    0x10, "86" )
+	PORT_DIPSETTING(    0x18, "88" )
+	PORT_DIPSETTING(    0x20, "90" )
+	PORT_DIPSETTING(    0x38, "92" )
+	PORT_DIPSETTING(    0x28, "94" )
+	PORT_DIPSETTING(    0x30, "96" )
+	PORT_DIPUNKNOWN( 0x40, 0x40 )
+	PORT_DIPUNKNOWN( 0x80, 0x80 )
+
+	PORT_START( "SW4" )
+	PORT_DIPUNKNOWN( 0x01, 0x01 )
+	PORT_DIPUNKNOWN( 0x02, 0x02 )
+	PORT_DIPUNKNOWN( 0x04, 0x04 )
+	PORT_DIPUNKNOWN( 0x08, 0x08 )
+	PORT_DIPUNKNOWN( 0x10, 0x10 )
+	PORT_DIPUNKNOWN( 0x20, 0x20 )
+	PORT_DIPUNKNOWN( 0x40, 0x40 )
+	PORT_DIPUNKNOWN( 0x80, 0x80 )
+
+	PORT_START( "INA" )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_GAMBLE_DEAL )	PORT_NAME("Start")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_POKER_HOLD1 )	PORT_NAME("Hold 1 / Bet")
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_POKER_HOLD3 )	PORT_NAME("Hold 3 / Double-Up")
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START( "INB" )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_COIN1 )			PORT_IMPULSE(3)	// coin
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_GAMBLE_KEYIN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_SERVICE )		PORT_CODE(KEYCODE_9)	PORT_NAME("Stats / Test")	// Bookkeeping.
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_SERVICE )		PORT_CODE(KEYCODE_0)	PORT_NAME("Settings")	// Game Rate & others.
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_GAMBLE_KEYOUT )
+
+	PORT_START( "INC" )
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_POKER_HOLD4 )	PORT_NAME("Hold 4 / Small")
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE )		PORT_CODE(KEYCODE_R)	PORT_NAME("Reset Switch")	// hard reset
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_POKER_HOLD5 )	PORT_NAME("Hold 5 / Big")
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_POKER_HOLD2 )	PORT_NAME("Hold 2 / Take")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+
 /***************************************************************************
 *                             Graphics Layout                              *
 ***************************************************************************/
@@ -2840,6 +3174,20 @@ ROM_START( sharkpye )
 	ROM_LOAD( "n82s129an.u13", 0x200, 0x100, CRC(0ef5f218) SHA1(a02cf266661385aa078563bd83240d36549c1cf0) )
 ROM_END
 
+
+/****************************************************************************
+
+  Victor 6 (Subsino/Alpha)
+
+  SET        MAINRATE  MAXBET
+  ----------------------------
+  victor6    87-101%    50
+  victor6a   94-101%    80
+  victor6b   94-101%    80 (no 10 option)
+
+
+****************************************************************************/
+
 ROM_START( victor6 )
 	ROM_REGION( 0x14000, "maincpu", 0 )
 	ROM_LOAD( "victor_6ii-rom_1.ver2.3n.u18", 0x0a000, 0x6000, CRC(d496ecbd) SHA1(1f982b42bc46c09298916a6cb2db0b38c6451ec3) )
@@ -3077,19 +3425,47 @@ ROM_END
   Magic Train
   -----------
 
-  CPU:   1x Hitachi 6D1R - HD647180X0CP6 (Subsino - SS9600) (U23)
+  Board silkscreened: "SUBSINO" (logo), "CS186P012". Stickered "1056439". 
 
-  NVRAM: 1x SANYO LC36256AML (SMD) (U16).
-  VRAM:  2x UMC UM62256 (U7-U8).
+
+  CPU:   1x Hitachi HD647180X0CP6 - 6D1R (Subsino - SS9600) (U23).
+  SND:   1x U6295 (OKI compatible) (U25).
+         1x TDA1519A (PHILIPS, 22W BTL or 2x 11W stereo car radio power amplifier (U34). 
+
+  NVRAM:     1x SANYO LC36256AML (SMD) (U16).
+  VRAM:      2x UMC UM62256E-70LL (U7-U8, next to gfx ROMs).
+  Other RAM: 1x HMC HM86171-80 (U29, next to sound ROM).
 
   Video: Subsino (SMD-40PX40P) SS9601 - 9732WX011 (U1).
   I/O:   Subsino (SMD-30PX20P) SS9602 - 9732LX006 (U11).
 
-  ROM?: HMC HM86171-80 9745E-C7B34
+  PRG ROM:  Stickered "M-TRAIN-N OUT_1 V1.31".
+
+  GFX ROMs: 1x 27C2000DC-12  Stickered "M-TRAIN-N ROM_1 V1.0" (U5).
+            1x 27C2000DC-12  Stickered "M-TRAIN-N ROM_2 V1.0" (U4).
+            1x 27C2000DC-12  Stickered "M-TRAIN-N ROM_3 V1.0" (U3).
+            1x 27C2000DC-12  Stickered "M-TRAIN-N ROM_4 V1.0" (U2).
+
+  SND ROM:  1x 27C2000DC-12 (U27, no sticker).
+
+  PLDs: 1x GAL16V8D (U31, next to sound ROM).
+        3x GAL16V8D (U18-U19-U6, next to CPU, program ROM and NVRAM).
+        1x GAL16V8D (U26, near sound amp)
+
+  Battery: 1x VARTA 3.6v, 60mAh.
 
   Xtal: 12 MHz.
 
-  Color PROMs (3) are undumped.
+  4x 8 DIP switches banks (SW1-SW2-SW3-SW4).
+  1x Push button (S1, next to battery).
+
+  1x 2x36 Edge connector.
+  1x 2x10 Edge connector.
+
+
+  The hardware lacks of color PROMs...
+  U12, U13 & U14 are Darlington arrays.
+
 
 ***************************************************************************/
 
@@ -3106,12 +3482,7 @@ ROM_START( mtrain )
 	ROM_LOAD( "rom_4.u02", 0x00000, 0x40000, CRC(b7e65d04) SHA1(5eea1b8c1129963b3b83a59410cd0e1de70621e4) )
 
 	ROM_REGION( 0x40000, "oki", 0 )
-	ROM_LOAD( "rom_5.snd", 0x00000, 0x40000, CRC(51cae476) SHA1(d1da4e5c3d53d18d8b69dfb57796d0ae311d99bf) )
-
-	ROM_REGION( 0x300, "proms", 0 )
-	ROM_LOAD( "82s129.u11", 0x000, 0x100, NO_DUMP )
-	ROM_LOAD( "82s129.u12", 0x100, 0x100, NO_DUMP )
-	ROM_LOAD( "82s129.u13", 0x200, 0x100, NO_DUMP )
+	ROM_LOAD( "rom_5.u27", 0x00000, 0x40000, CRC(51cae476) SHA1(d1da4e5c3d53d18d8b69dfb57796d0ae311d99bf) )
 ROM_END
 
 
@@ -3317,9 +3688,9 @@ GAMEL( 1995, stisub,   0,        stisub,   stisub,   stisub,   ROT0, "American A
 GAMEL( 1996, sharkpy,  0,        sharkpy,  sharkpy,  sharkpy,  ROT0, "Subsino",         "Shark Party (Italy, v1.3)",            0,      layout_sharkpy )	// missing POST messages?
 GAMEL( 1996, sharkpya, sharkpy,  sharkpy,  sharkpy,  sharkpy,  ROT0, "Subsino",         "Shark Party (Italy, v1.6)",            0,      layout_sharkpy )	// missing POST messages?
 GAMEL( 1995, sharkpye, sharkpy,  sharkpy,  sharkpye, sharkpye, ROT0, "American Alpha",  "Shark Party (English, Alpha license)", 0,      layout_sharkpye )	// PCB black-box was marked 'victor 6'
-GAMEL( 1995, victor6,  0,        sharkpy,  sharkpye, sharkpye, ROT0, "American Alpha",  "Victor 6 (v2.3N)",                     0,      layout_sharkpye )	// ^^
-GAMEL( 1995, victor6a, victor6,  sharkpy,  sharkpye, sharkpye, ROT0, "American Alpha",  "Victor 6 (v2.3)",                      0,      layout_sharkpye )	// ^^
-GAMEL( 1995, victor6b, victor6,  sharkpy,  sharkpye, sharkpye, ROT0, "American Alpha",  "Victor 6 (v1.2)",                      0,      layout_sharkpye )	// ^^ Version # according to label, not displayed
+GAMEL( 1995, victor6,  0,        sharkpy,  victor6,  sharkpye, ROT0, "American Alpha",  "Victor 6 (v2.3N)",                     0,      layout_sharkpye )	// ^^
+GAMEL( 1995, victor6a, victor6,  sharkpy,  victor6a, sharkpye, ROT0, "American Alpha",  "Victor 6 (v2.3)",                      0,      layout_sharkpye )	// ^^
+GAMEL( 1995, victor6b, victor6,  sharkpy,  victor6b, sharkpye, ROT0, "American Alpha",  "Victor 6 (v1.2)",                      0,      layout_sharkpye )	// ^^ Version # according to label, not displayed
 GAMEL( 1996, smoto20,  0,        srider,   smoto20,  smoto20,  ROT0, "Subsino",         "Super Rider (Italy, v2.0)",            0,      layout_smoto )
 GAMEL( 1996, smoto16,  smoto20,  srider,   smoto16,  smoto16,  ROT0, "Subsino",         "Super Moto (Italy, v1.6)",             0,      layout_smoto )
 GAME(  1997, mtrain,   0,        mtrain,   stisub,   mtrain,   ROT0, "Subsino",         "Magic Train",                          GAME_NOT_WORKING )
