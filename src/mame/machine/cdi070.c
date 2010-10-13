@@ -59,41 +59,20 @@ static void scc68070_set_timer_callback(scc68070_regs_t *scc68070, int channel)
     }
 }
 
-static bool hack_active = false;
-static UINT16 hack_value = 0;
-static UINT32 hack_base = 0;
-static UINT8 hack_ack = 0;
-
-void scc68070_set_hack_ack(UINT8 ack)
+void scc68070_set_quizard_mcu_ack(running_machine *machine, UINT8 ack)
 {
-	hack_ack = ack;
+    cdi_state *state = machine->driver_data<cdi_state>();
+    scc68070_regs_t *scc68070 = &state->scc68070_regs;
+
+	scc68070->mcu_ack = ack;
 }
 
-void scc68070_set_hack_value(UINT16 value)
+void scc68070_set_quizard_mcu_value(running_machine *machine, UINT16 value)
 {
-	hack_value = value;
-}
+    cdi_state *state = machine->driver_data<cdi_state>();
+    scc68070_regs_t *scc68070 = &state->scc68070_regs;
 
-void scc68070_set_hack_base(UINT32 base)
-{
-	hack_base = base;
-}
-
-static void quizard_patch(running_machine *machine)
-{
-    address_space *space = cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-
-	if(hack_active)
-	{
-		space->write_word(hack_base    ,0x7001);
-		space->write_word(hack_base + 2,0x7001);
-	}
-}
-
-void scc68070_set_hack_active(running_machine *machine, bool active)
-{
-	hack_active = active;
-	quizard_patch(machine);
+	scc68070->mcu_value = value;
 }
 
 TIMER_CALLBACK( scc68070_timer0_callback )
@@ -113,10 +92,6 @@ TIMER_CALLBACK( scc68070_timer0_callback )
         	cputag_set_input_line(machine, "maincpu", M68K_IRQ_1 + (interrupt - 1), ASSERT_LINE);
 		}
     }
-
-#if ENABLE_QUIZARD_HACK
-	quizard_patch(machine);
-#endif
 
     scc68070_set_timer_callback(&state->scc68070_regs, 0);
 }
@@ -262,7 +237,7 @@ static void quizard_set_seeds(UINT8 *rx)
 
 static void quizard_calculate_state(running_machine *machine, scc68070_regs_t *scc68070)
 {
-	const UINT16 desired_bitfield = hack_value;
+	const UINT16 desired_bitfield = scc68070->mcu_value;
 	const UINT16 field0 = 0x00ff;
 	const UINT16 field1 = desired_bitfield ^ field0;
 
@@ -316,10 +291,10 @@ static void quizard_handle_byte_tx(running_machine *machine, scc68070_regs_t *sc
 			break;
 
 		case 1:
-			if(tx == hack_ack)
+			if(tx == scc68070->mcu_ack)
 			{
 				ack_count++;
-				if(ack_count == 1)
+				if(ack_count == 2)
 				{
 					state++;
 					quizard_set_seeds(rx);
@@ -339,9 +314,9 @@ static void quizard_handle_byte_tx(running_machine *machine, scc68070_regs_t *sc
 			break;
 
 		case 2:
-			if(tx == hack_ack)
+			if(tx == 0x56)
 			{
-				state = 0;
+				state = 1;
 			}
 			break;
 	}
@@ -756,37 +731,9 @@ WRITE16_HANDLER( scc68070_periphs_w )
         case 0x2018/2:
             if(ACCESSING_BITS_0_7)
             {
-				static int count = 0;
-
                 verboselog(space->machine, 2, "scc68070_periphs_w: UART Transmit Holding Register: %04x & %04x: %c\n", data, mem_mask, (data >= 0x20 && data < 0x7f) ? (data & 0x00ff) : ' ');
 				scc68070_uart_tx(space->machine, scc68070, data & 0x00ff);
                 scc68070->uart.transmit_holding_register = data & 0x00ff;
-
-                if((data & 0x00ff) == hack_ack)
-                {
-					count++;
-					if(count == 2)
-					{
-						static unsigned char check_array[9] = { 0x5a, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
-
-						for(int index = 0; index < 9; index++)
-						{
-							//scc68070_uart_rx(space->machine, scc68070, check_array[index]);
-							if(index > 0)
-							{
-								check_array[index]++;
-							}
-						}
-						count = 0;
-
-						//hack_active = true;
-						//quizard_patch(space->machine);
-					}
-				}
-				else
-				{
-					count = 0;
-				}
             }
             else
             {

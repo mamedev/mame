@@ -228,6 +228,9 @@ typedef struct
 	scc68070_timer_regs_t timers;
 	scc68070_dma_regs_t dma;
 	scc68070_mmu_regs_t mmu;
+
+	UINT16 mcu_value;
+	UINT8 mcu_ack;
 } scc68070_regs_t;
 
 // Member functions
@@ -243,11 +246,9 @@ extern void scc68070_uart_rx(running_machine *machine, scc68070_regs_t *scc68070
 extern void scc68070_uart_tx(running_machine *machine, scc68070_regs_t *scc68070, UINT8 data);
 extern void scc68070_register_globals(running_machine *machine, scc68070_regs_t *scc68070);
 
-// Hacks for Quizard
-extern void scc68070_set_hack_value(UINT16 value);
-extern void scc68070_set_hack_base(UINT32 base);
-extern void scc68070_set_hack_ack(UINT8 ack);
-extern void scc68070_set_hack_active(running_machine *machine, bool active);
+// UART Access for Quizard
+extern void scc68070_set_quizard_mcu_value(running_machine *machine, UINT16 value);
+extern void scc68070_set_quizard_mcu_ack(running_machine *machine, UINT8 ack);
 extern void scc68070_quizard_rx(running_machine *machine, scc68070_regs_t *scc68070, UINT8 data);
 
 #endif // _MACHINE_CDI070_H_

@@ -352,11 +352,6 @@ void cdislave_device::register_write(const UINT32 offset, const UINT16 data, con
                         m_in_index = 0;
                         m_in_count = 0;
                         break;
-                    case 0xc0: // SetAttn (used as hack for Quizard)
-                    	scc68070_set_hack_active(&m_machine, true);
-                    	m_in_index = 0;
-                    	m_in_count = 0;
-                    	break;
                     case 0xf0: // Set Front Panel LCD
                         verboselog(&m_machine, 0, "slave_w: Channel %d: Set Front Panel LCD (0xf0)\n", offset );
                         m_in_count = 17;

@@ -193,50 +193,43 @@ static MACHINE_START( cdi )
 
 static DRIVER_INIT( quizrd12 )
 {
-	scc68070_set_hack_base(0x26F39C);
-    scc68070_set_hack_value(0x021f);
-    scc68070_set_hack_ack(0x5a);
+    scc68070_set_quizard_mcu_value(machine, 0x021f);
+    scc68070_set_quizard_mcu_ack(machine, 0x5a);
 }
 
 static DRIVER_INIT( quizrd17 )
 {
-	scc68070_set_hack_base(0x264B4A);
-    scc68070_set_hack_value(0x021f);
-    scc68070_set_hack_ack(0x5a);
+    scc68070_set_quizard_mcu_value(machine, 0x021f);
+    scc68070_set_quizard_mcu_ack(machine, 0x5a);
 }
 
 static DRIVER_INIT( quizrd22 )
 {
-	scc68070_set_hack_base(0x26D9C2);
-
 	// 0x2b1: Italian
 	// 0x001: French
 	// 0x188: German
 
-	scc68070_set_hack_value(0x188);
+	scc68070_set_quizard_mcu_value(machine, 0x188);
 
-    scc68070_set_hack_ack(0x59);
+    scc68070_set_quizard_mcu_ack(machine, 0x59);
 }
 
 static DRIVER_INIT( quizrd32 )
 {
-	scc68070_set_hack_base(0x266D30);
-	scc68070_set_hack_value(0x00ae);
-    scc68070_set_hack_ack(0x58);
+	scc68070_set_quizard_mcu_value(machine, 0x00ae);
+    scc68070_set_quizard_mcu_ack(machine, 0x58);
 }
 
 static DRIVER_INIT( quizrr41 )
 {
-	scc68070_set_hack_base(0x267DB0);
-	scc68070_set_hack_value(0x011f);
-	scc68070_set_hack_ack(0x57);
+	scc68070_set_quizard_mcu_value(machine, 0x011f);
+	scc68070_set_quizard_mcu_ack(machine, 0x57);
 }
 
 static DRIVER_INIT( quizrr42 )
 {
-	scc68070_set_hack_base(0x267DB0);
-	scc68070_set_hack_value(0x011f);
-	scc68070_set_hack_ack(0x57);
+	scc68070_set_quizard_mcu_value(machine, 0x011f);
+	scc68070_set_quizard_mcu_ack(machine, 0x57);
 }
 
 static MACHINE_RESET( cdi )
@@ -413,12 +406,12 @@ ROM_END
 // BIOS
 GAME( 1991, cdi,      0,        cdi,      cdi,      0,        ROT0,     "Philips", "CD-i (Mono-I) BIOS", GAME_IS_BIOS_ROOT )
 
-// Partially working
-GAME( 1996, quizard,  cdi,      cdi,      cdi,      quizrd32, ROT0,     "TAB Austria",  "Quizard 3.2", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
-GAME( 1998, quizrr41, cdi,      cdi,      cdi,      quizrr41, ROT0,     "TAB Austria",  "Quizard Rainbow 4.1", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
-GAME( 1998, quizrr42, cdi,      cdi,      cdi,      quizrr42, ROT0,     "TAB Austria",  "Quizard Rainbow 4.2", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
-
 // Working
 GAME( 1995, quizrd12, cdi,      cdi,      cdi,      quizrd12, ROT0,     "TAB Austria",  "Quizard 1.2", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
 GAME( 1995, quizrd17, cdi,      cdi,      cdi,      quizrd17, ROT0,     "TAB Austria",  "Quizard 1.7", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
 GAME( 1995, quizrd22, cdi,      cdi,      cdi,      quizrd22, ROT0,     "TAB Austria",  "Quizard 2.2", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
+
+// Partially working
+GAME( 1996, quizard,  cdi,      cdi,      cdi,      quizrd32, ROT0,     "TAB Austria",  "Quizard 3.2", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
+GAME( 1998, quizrr41, cdi,      cdi,      cdi,      quizrr41, ROT0,     "TAB Austria",  "Quizard Rainbow 4.1", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
+GAME( 1998, quizrr42, cdi,      cdi,      cdi,      quizrr42, ROT0,     "TAB Austria",  "Quizard Rainbow 4.2", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
