@@ -381,17 +381,6 @@ public:
 
 	void reset() { while (m_head != NULL) remove(*m_head); }
 
-	int index(T *object) const
-	{
-		int num = 0;
-		for (T *cur = m_head; cur != NULL; cur = cur->m_next)
-			if (cur == object)
-				return num;
-			else
-				num++;
-		return -1;
-	}
-
 	T &prepend(T &object)
 	{
 		object.m_next = m_head;
@@ -400,6 +389,20 @@ public:
 			m_tail = m_head;
 		m_count++;
 		return object;
+	}
+	
+	void prepend_list(simple_list<T> &list)
+	{
+		int count = list.count();
+		if (count == 0)
+			return;
+		T *tail = list.last();
+		T *head = list.detach_all();
+		tail->m_next = m_head;
+		m_head = head;
+		if (m_tail == NULL)
+			m_tail = tail;
+		m_count += count;
 	}
 
 	T &append(T &object)
@@ -413,7 +416,35 @@ public:
 		return object;
 	}
 
-	void detach(T &object)
+	void append_list(simple_list<T> &list)
+	{
+		int count = list.count();
+		if (count == 0)
+			return;
+		T *tail = list.last();
+		T *head = list.detach_all();
+		if (m_tail != NULL)
+			m_tail->m_next = head;
+		else
+			m_head = head;
+		m_tail = tail;
+		m_count += count;
+	}
+
+	T *detach_head()
+	{
+		T *result = m_head;
+		if (result != NULL)
+		{
+			m_head = result->m_next;
+			m_count--;
+			if (m_head == NULL)
+				m_tail = NULL;
+		}
+		return result;
+	}
+
+	T &detach(T &object)
 	{
 		T *prev = NULL;
 		for (T *cur = m_head; cur != NULL; prev = cur, cur = cur->m_next)
@@ -426,8 +457,17 @@ public:
 				if (m_tail == &object)
 					m_tail = prev;
 				m_count--;
-				return;
+				return object;
 			}
+		return object;
+	}
+
+	T *detach_all()
+	{
+		T *result = m_head;
+		m_head = m_tail = NULL;
+		m_count = 0;
+		return result;
 	}
 
 	void remove(T &object)
@@ -435,7 +475,7 @@ public:
 		detach(object);
 		pool_free(m_pool, &object);
 	}
-
+	
 	T *find(int index) const
 	{
 		for (T *cur = m_head; cur != NULL; cur = cur->m_next)
@@ -443,6 +483,48 @@ public:
 				return cur;
 		return NULL;
 	}
+	
+	int indexof(const T &object) const
+	{
+		int index = 0;
+		for (T *cur = m_head; cur != NULL; cur = cur->m_next)
+		{
+			if (cur == &object)
+				return index;
+			index++;
+		}
+		return -1;
+	}
+};
+
+
+// ======================> fixed_allocator
+
+template<class T>
+class fixed_allocator
+{
+	DISABLE_COPYING(fixed_allocator);
+
+public:
+	fixed_allocator(resource_pool &pool = global_resource_pool)
+		: m_pool(pool),
+		  m_freelist(pool) { }
+
+	T *alloc()
+	{
+		T *result = m_freelist.detach_head();
+		if (result == NULL)
+			result = m_pool.add_object(new T);
+		return result;
+	}
+	
+	void reclaim(T *item) { if (item != NULL) m_freelist.append(*item); }
+	void reclaim(T &item) { m_freelist.append(item); }
+	void reclaim_all(simple_list<T> &list) { m_freelist.append_list(list); }
+
+private:
+	resource_pool &m_pool;
+	simple_list<T> m_freelist;
 };
 
 

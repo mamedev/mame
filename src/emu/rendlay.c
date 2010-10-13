@@ -149,26 +149,26 @@ struct _element_component
 ***************************************************************************/
 
 /* layout elements */
-static void layout_element_scale(bitmap_t *dest, const bitmap_t *source, const rectangle *sbounds, void *param);
-static void layout_element_draw_rect(bitmap_t *dest, const rectangle *bounds, const render_color *color);
-static void layout_element_draw_disk(bitmap_t *dest, const rectangle *bounds, const render_color *color);
-static void layout_element_draw_text(bitmap_t *dest, const rectangle *bounds, const render_color *color, const char *string);
-static void layout_element_draw_led7seg(bitmap_t *dest, const rectangle *bounds, const render_color *color, int state);
-static void layout_element_draw_led14seg(bitmap_t *dest, const rectangle *bounds, const render_color *color, int state);
-static void layout_element_draw_led16seg(bitmap_t *dest, const rectangle *bounds, const render_color *color, int state);
-static void layout_element_draw_led14segsc(bitmap_t *dest, const rectangle *bounds, const render_color *color, int state);
-static void layout_element_draw_led16segsc(bitmap_t *dest, const rectangle *bounds, const render_color *color, int state);
-static void layout_element_draw_dotmatrix(bitmap_t *dest, const rectangle *bounds, const render_color *color, int state);
+static void layout_element_scale(bitmap_t &dest, const bitmap_t &source, const rectangle &sbounds, void *param);
+static void layout_element_draw_rect(bitmap_t &dest, const rectangle &bounds, const render_color &color);
+static void layout_element_draw_disk(bitmap_t &dest, const rectangle &bounds, const render_color &color);
+static void layout_element_draw_text(running_machine &machine, bitmap_t &dest, const rectangle &bounds, const render_color &color, const char *string);
+static void layout_element_draw_led7seg(bitmap_t &dest, const rectangle &bounds, const render_color &color, int state);
+static void layout_element_draw_led14seg(bitmap_t &dest, const rectangle &bounds, const render_color &color, int state);
+static void layout_element_draw_led16seg(bitmap_t &dest, const rectangle &bounds, const render_color &color, int state);
+static void layout_element_draw_led14segsc(bitmap_t &dest, const rectangle &bounds, const render_color &color, int state);
+static void layout_element_draw_led16segsc(bitmap_t &dest, const rectangle &bounds, const render_color &color, int state);
+static void layout_element_draw_dotmatrix(bitmap_t &dest, const rectangle &bounds, const render_color &color, int state);
 
 /* layout file parsing */
-static layout_element *load_layout_element(const machine_config *config, xml_data_node *elemnode, const char *dirname);
-static element_component *load_element_component(const machine_config *config, xml_data_node *compnode, const char *dirname);
-static layout_view *load_layout_view(const machine_config *config, xml_data_node *viewnode, layout_element *elemlist);
-static view_item *load_view_item(const machine_config *config, xml_data_node *itemnode, layout_element *elemlist);
+static layout_element *load_layout_element(running_machine &machine, xml_data_node *elemnode, const char *dirname);
+static element_component *load_element_component(running_machine &machine, xml_data_node *compnode, const char *dirname);
+static layout_view *load_layout_view(running_machine &machine, xml_data_node *viewnode, layout_element *elemlist);
+static view_item *load_view_item(running_machine &machine, xml_data_node *itemnode, layout_element *elemlist);
 static bitmap_t *load_component_bitmap(const char *dirname, const char *file, const char *alphafile, int *hasalpha);
-static int load_bounds(const machine_config *config, xml_data_node *boundsnode, render_bounds *bounds);
-static int load_color(const machine_config *config, xml_data_node *colornode, render_color *color);
-static int load_orientation(const machine_config *config, xml_data_node *orientnode, int *orientation);
+static int load_bounds(running_machine &machine, xml_data_node *boundsnode, render_bounds *bounds);
+static int load_color(running_machine &machine, xml_data_node *colornode, render_color *color);
+static int load_orientation(running_machine &machine, xml_data_node *orientnode, int *orientation);
 static void layout_view_free(layout_view *view);
 static void layout_element_free(layout_element *element);
 
@@ -351,7 +351,7 @@ void layout_view_recompute(layout_view *view, int layerconfig)
     appropriate resolution
 -------------------------------------------------*/
 
-static void layout_element_scale(bitmap_t *dest, const bitmap_t *source, const rectangle *sbounds, void *param)
+static void layout_element_scale(bitmap_t &dest, const bitmap_t &source, const rectangle &sbounds, void *param)
 {
 	element_texture *elemtex = (element_texture *)param;
 	element_component *component;
@@ -363,10 +363,10 @@ static void layout_element_scale(bitmap_t *dest, const bitmap_t *source, const r
 			rectangle bounds;
 
 			/* get the local scaled bounds */
-			bounds.min_x = render_round_nearest(component->bounds.x0 * dest->width);
-			bounds.min_y = render_round_nearest(component->bounds.y0 * dest->height);
-			bounds.max_x = render_round_nearest(component->bounds.x1 * dest->width);
-			bounds.max_y = render_round_nearest(component->bounds.y1 * dest->height);
+			bounds.min_x = render_round_nearest(component->bounds.x0 * dest.width);
+			bounds.min_y = render_round_nearest(component->bounds.y0 * dest.height);
+			bounds.max_x = render_round_nearest(component->bounds.x1 * dest.width);
+			bounds.max_y = render_round_nearest(component->bounds.y1 * dest.height);
 
 			/* based on the component type, add to the texture */
 			switch (component->type)
@@ -375,47 +375,47 @@ static void layout_element_scale(bitmap_t *dest, const bitmap_t *source, const r
 					if (component->bitmap == NULL)
 						component->bitmap = load_component_bitmap(component->dirname, component->imagefile, component->alphafile, &component->hasalpha);
 					render_resample_argb_bitmap_hq(
-							BITMAP_ADDR32(dest, bounds.min_y, bounds.min_x),
-							dest->rowpixels,
+							BITMAP_ADDR32(&dest, bounds.min_y, bounds.min_x),
+							dest.rowpixels,
 							bounds.max_x - bounds.min_x,
 							bounds.max_y - bounds.min_y,
 							component->bitmap, NULL, &component->color);
 					break;
 
 				case COMPONENT_TYPE_RECT:
-					layout_element_draw_rect(dest, &bounds, &component->color);
+					layout_element_draw_rect(dest, bounds, component->color);
 					break;
 
 				case COMPONENT_TYPE_DISK:
-					layout_element_draw_disk(dest, &bounds, &component->color);
+					layout_element_draw_disk(dest, bounds, component->color);
 					break;
 
 				case COMPONENT_TYPE_TEXT:
-					layout_element_draw_text(dest, &bounds, &component->color, component->string);
+					layout_element_draw_text(*elemtex->element->machine, dest, bounds, component->color, component->string);
 					break;
 
 				case COMPONENT_TYPE_LED7SEG:
-					layout_element_draw_led7seg(dest, &bounds, &component->color, elemtex->state);
+					layout_element_draw_led7seg(dest, bounds, component->color, elemtex->state);
 					break;
 
 				case COMPONENT_TYPE_LED14SEG:
-					layout_element_draw_led14seg(dest, &bounds, &component->color, elemtex->state);
+					layout_element_draw_led14seg(dest, bounds, component->color, elemtex->state);
 					break;
 
 				case COMPONENT_TYPE_LED16SEG:
-					layout_element_draw_led16seg(dest, &bounds, &component->color, elemtex->state);
+					layout_element_draw_led16seg(dest, bounds, component->color, elemtex->state);
 					break;
 
 				case COMPONENT_TYPE_LED14SEGSC:
-					layout_element_draw_led14segsc(dest, &bounds, &component->color, elemtex->state);
+					layout_element_draw_led14segsc(dest, bounds, component->color, elemtex->state);
 					break;
 
 				case COMPONENT_TYPE_LED16SEGSC:
-					layout_element_draw_led16segsc(dest, &bounds, &component->color, elemtex->state);
+					layout_element_draw_led16segsc(dest, bounds, component->color, elemtex->state);
 					break;
 
 				case COMPONENT_TYPE_DOTMATRIX:
-					layout_element_draw_dotmatrix(dest, &bounds, &component->color, elemtex->state);
+					layout_element_draw_dotmatrix(dest, bounds, component->color, elemtex->state);
 					break;
 			}
 		}
@@ -427,20 +427,20 @@ static void layout_element_scale(bitmap_t *dest, const bitmap_t *source, const r
     in the specified color
 -------------------------------------------------*/
 
-static void layout_element_draw_rect(bitmap_t *dest, const rectangle *bounds, const render_color *color)
+static void layout_element_draw_rect(bitmap_t &dest, const rectangle &bounds, const render_color &color)
 {
 	UINT32 r, g, b, inva;
 	UINT32 x, y;
 
 	/* compute premultiplied colors */
-	r = color->r * color->a * 255.0;
-	g = color->g * color->a * 255.0;
-	b = color->b * color->a * 255.0;
-	inva = (1.0f - color->a) * 255.0;
+	r = color.r * color.a * 255.0;
+	g = color.g * color.a * 255.0;
+	b = color.b * color.a * 255.0;
+	inva = (1.0f - color.a) * 255.0;
 
 	/* iterate over X and Y */
-	for (y = bounds->min_y; y < bounds->max_y; y++)
-		for (x = bounds->min_x; x < bounds->max_x; x++)
+	for (y = bounds.min_y; y < bounds.max_y; y++)
+		for (x = bounds.min_x; x < bounds.max_x; x++)
 		{
 			UINT32 finalr = r;
 			UINT32 finalg = g;
@@ -449,14 +449,14 @@ static void layout_element_draw_rect(bitmap_t *dest, const rectangle *bounds, co
 			/* if we're translucent, add in the destination pixel contribution */
 			if (inva > 0)
 			{
-				UINT32 dpix = *BITMAP_ADDR32(dest, y, x);
+				UINT32 dpix = *BITMAP_ADDR32(&dest, y, x);
 				finalr += (RGB_RED(dpix) * inva) >> 8;
 				finalg += (RGB_GREEN(dpix) * inva) >> 8;
 				finalb += (RGB_BLUE(dpix) * inva) >> 8;
 			}
 
 			/* store the target pixel, dividing the RGBA values by the overall scale factor */
-			*BITMAP_ADDR32(dest, y, x) = MAKE_ARGB(0xff, finalr, finalg, finalb);
+			*BITMAP_ADDR32(&dest, y, x) = MAKE_ARGB(0xff, finalr, finalg, finalb);
 		}
 }
 
@@ -466,7 +466,7 @@ static void layout_element_draw_rect(bitmap_t *dest, const rectangle *bounds, co
     in the specified color
 -------------------------------------------------*/
 
-static void layout_element_draw_disk(bitmap_t *dest, const rectangle *bounds, const render_color *color)
+static void layout_element_draw_disk(bitmap_t &dest, const rectangle &bounds, const render_color &color)
 {
 	float xcenter, ycenter;
 	float xradius, yradius, ooyradius2;
@@ -474,20 +474,20 @@ static void layout_element_draw_disk(bitmap_t *dest, const rectangle *bounds, co
 	UINT32 x, y;
 
 	/* compute premultiplied colors */
-	r = color->r * color->a * 255.0;
-	g = color->g * color->a * 255.0;
-	b = color->b * color->a * 255.0;
-	inva = (1.0f - color->a) * 255.0;
+	r = color.r * color.a * 255.0;
+	g = color.g * color.a * 255.0;
+	b = color.b * color.a * 255.0;
+	inva = (1.0f - color.a) * 255.0;
 
 	/* find the center */
-	xcenter = (float)(bounds->min_x + bounds->max_x) * 0.5f;
-	ycenter = (float)(bounds->min_y + bounds->max_y) * 0.5f;
-	xradius = (float)(bounds->max_x - bounds->min_x) * 0.5f;
-	yradius = (float)(bounds->max_y - bounds->min_y) * 0.5f;
+	xcenter = (float)(bounds.min_x + bounds.max_x) * 0.5f;
+	ycenter = (float)(bounds.min_y + bounds.max_y) * 0.5f;
+	xradius = (float)(bounds.max_x - bounds.min_x) * 0.5f;
+	yradius = (float)(bounds.max_y - bounds.min_y) * 0.5f;
 	ooyradius2 = 1.0f / (yradius * yradius);
 
 	/* iterate over y */
-	for (y = bounds->min_y; y < bounds->max_y; y++)
+	for (y = bounds.min_y; y < bounds.max_y; y++)
 	{
 		float ycoord = ycenter - ((float)y + 0.5f);
 		float xval = xradius * sqrt(1.0f - (ycoord * ycoord) * ooyradius2);
@@ -507,14 +507,14 @@ static void layout_element_draw_disk(bitmap_t *dest, const rectangle *bounds, co
 			/* if we're translucent, add in the destination pixel contribution */
 			if (inva > 0)
 			{
-				UINT32 dpix = *BITMAP_ADDR32(dest, y, x);
+				UINT32 dpix = *BITMAP_ADDR32(&dest, y, x);
 				finalr += (RGB_RED(dpix) * inva) >> 8;
 				finalg += (RGB_GREEN(dpix) * inva) >> 8;
 				finalb += (RGB_BLUE(dpix) * inva) >> 8;
 			}
 
 			/* store the target pixel, dividing the RGBA values by the overall scale factor */
-			*BITMAP_ADDR32(dest, y, x) = MAKE_ARGB(0xff, finalr, finalg, finalb);
+			*BITMAP_ADDR32(&dest, y, x) = MAKE_ARGB(0xff, finalr, finalg, finalb);
 		}
 	}
 }
@@ -525,9 +525,9 @@ static void layout_element_draw_disk(bitmap_t *dest, const rectangle *bounds, co
     specified color
 -------------------------------------------------*/
 
-static void layout_element_draw_text(bitmap_t *dest, const rectangle *bounds, const render_color *color, const char *string)
+static void layout_element_draw_text(running_machine &machine, bitmap_t &dest, const rectangle &bounds, const render_color &color, const char *string)
 {
-	render_font *font = render_font_alloc(NULL);
+	render_font *font = render_font_alloc(machine, NULL);
 	bitmap_t *tempbitmap;
 	UINT32 r, g, b, a;
 	float aspect = 1.0f;
@@ -535,23 +535,23 @@ static void layout_element_draw_text(bitmap_t *dest, const rectangle *bounds, co
 	const char *s;
 
 	/* compute premultiplied colors */
-	r = color->r * 255.0;
-	g = color->g * 255.0;
-	b = color->b * 255.0;
-	a = color->a * 255.0;
+	r = color.r * 255.0;
+	g = color.g * 255.0;
+	b = color.b * 255.0;
+	a = color.a * 255.0;
 
 	/* get the width of the string */
 	while (1)
 	{
-		width = render_font_get_string_width(font, bounds->max_y - bounds->min_y, aspect, string);
-		if (width < bounds->max_x - bounds->min_x)
+		width = render_font_get_string_width(font, bounds.max_y - bounds.min_y, aspect, string);
+		if (width < bounds.max_x - bounds.min_x)
 			break;
 		aspect *= 0.9f;
 	}
-	curx = bounds->min_x + (bounds->max_x - bounds->min_x - width) / 2;
+	curx = bounds.min_x + (bounds.max_x - bounds.min_x - width) / 2;
 
 	/* allocate a temporary bitmap */
-	tempbitmap = global_alloc(bitmap_t(dest->width, dest->height, BITMAP_FORMAT_ARGB32));
+	tempbitmap = global_alloc(bitmap_t(dest.width, dest.height, BITMAP_FORMAT_ARGB32));
 
 	/* loop over characters */
 	for (s = string; *s != 0; s++)
@@ -560,20 +560,20 @@ static void layout_element_draw_text(bitmap_t *dest, const rectangle *bounds, co
 		int x, y;
 
 		/* get the font bitmap */
-		render_font_get_scaled_bitmap_and_bounds(font, tempbitmap, bounds->max_y - bounds->min_y, aspect, *s, &chbounds);
+		render_font_get_scaled_bitmap_and_bounds(font, tempbitmap, bounds.max_y - bounds.min_y, aspect, *s, &chbounds);
 
 		/* copy the data into the target */
 		for (y = 0; y < chbounds.max_y - chbounds.min_y; y++)
 		{
-			int effy = bounds->min_y + y;
-			if (effy >= bounds->min_y && effy <= bounds->max_y)
+			int effy = bounds.min_y + y;
+			if (effy >= bounds.min_y && effy <= bounds.max_y)
 			{
 				UINT32 *src = BITMAP_ADDR32(tempbitmap, y, 0);
-				UINT32 *d = BITMAP_ADDR32(dest, effy, 0);
+				UINT32 *d = BITMAP_ADDR32(&dest, effy, 0);
 				for (x = 0; x < chbounds.max_x - chbounds.min_x; x++)
 				{
 					int effx = curx + x + chbounds.min_x;
-					if (effx >= bounds->min_x && effx <= bounds->max_x)
+					if (effx >= bounds.min_x && effx <= bounds.max_x)
 					{
 						UINT32 spix = RGB_ALPHA(src[x]);
 						if (spix != 0)
@@ -593,7 +593,7 @@ static void layout_element_draw_text(bitmap_t *dest, const rectangle *bounds, co
 		}
 
 		/* advance in the X direction */
-		curx += render_font_get_char_width(font, bounds->max_y - bounds->min_y, aspect, *s);
+		curx += render_font_get_char_width(font, bounds.max_y - bounds.min_y, aspect, *s);
 	}
 
 	/* free the temporary bitmap and font */
@@ -608,15 +608,15 @@ static void layout_element_draw_text(bitmap_t *dest, const rectangle *bounds, co
     and start points
 -------------------------------------------------*/
 
-static void draw_segment_horizontal_caps(bitmap_t *dest, int minx, int maxx, int midy, int width, int caps, rgb_t color)
+static void draw_segment_horizontal_caps(bitmap_t &dest, int minx, int maxx, int midy, int width, int caps, rgb_t color)
 {
 	int x, y;
 
 	/* loop over the width of the segment */
 	for (y = 0; y < width / 2; y++)
 	{
-		UINT32 *d0 = BITMAP_ADDR32(dest, midy - y, 0);
-		UINT32 *d1 = BITMAP_ADDR32(dest, midy + y, 0);
+		UINT32 *d0 = BITMAP_ADDR32(&dest, midy - y, 0);
+		UINT32 *d1 = BITMAP_ADDR32(&dest, midy + y, 0);
 		int ty = (y < width / 8) ? width / 8 : y;
 
 		/* loop over the length of the segment */
@@ -631,7 +631,7 @@ static void draw_segment_horizontal_caps(bitmap_t *dest, int minx, int maxx, int
     LED segment
 -------------------------------------------------*/
 
-static void draw_segment_horizontal(bitmap_t *dest, int minx, int maxx, int midy, int width, rgb_t color)
+static void draw_segment_horizontal(bitmap_t &dest, int minx, int maxx, int midy, int width, rgb_t color)
 {
 	draw_segment_horizontal_caps(dest, minx, maxx, midy, width, LINE_CAP_START | LINE_CAP_END, color);
 }
@@ -643,20 +643,20 @@ static void draw_segment_horizontal(bitmap_t *dest, int minx, int maxx, int midy
     and start points
 -------------------------------------------------*/
 
-static void draw_segment_vertical_caps(bitmap_t *dest, int miny, int maxy, int midx, int width, int caps, rgb_t color)
+static void draw_segment_vertical_caps(bitmap_t &dest, int miny, int maxy, int midx, int width, int caps, rgb_t color)
 {
 	int x, y;
 
 	/* loop over the width of the segment */
 	for (x = 0; x < width / 2; x++)
 	{
-		UINT32 *d0 = BITMAP_ADDR32(dest, 0, midx - x);
-		UINT32 *d1 = BITMAP_ADDR32(dest, 0, midx + x);
+		UINT32 *d0 = BITMAP_ADDR32(&dest, 0, midx - x);
+		UINT32 *d1 = BITMAP_ADDR32(&dest, 0, midx + x);
 		int tx = (x < width / 8) ? width / 8 : x;
 
 		/* loop over the length of the segment */
 		for (y = miny + ((caps & LINE_CAP_START) ? tx : 0); y < maxy - ((caps & LINE_CAP_END) ? tx : 0); y++)
-			d0[y * dest->rowpixels] = d1[y * dest->rowpixels] = color;
+			d0[y * dest.rowpixels] = d1[y * dest.rowpixels] = color;
 	}
 }
 
@@ -666,7 +666,7 @@ static void draw_segment_vertical_caps(bitmap_t *dest, int miny, int maxy, int m
     LED segment
 -------------------------------------------------*/
 
-static void draw_segment_vertical(bitmap_t *dest, int miny, int maxy, int midx, int width, rgb_t color)
+static void draw_segment_vertical(bitmap_t &dest, int miny, int maxy, int midx, int width, rgb_t color)
 {
 	draw_segment_vertical_caps(dest, miny, maxy, midx, width, LINE_CAP_START | LINE_CAP_END, color);
 }
@@ -677,7 +677,7 @@ static void draw_segment_vertical(bitmap_t *dest, int miny, int maxy, int midx, 
     LED segment that looks like this: /
 -------------------------------------------------*/
 
-static void draw_segment_diagonal_1(bitmap_t *dest, int minx, int maxx, int miny, int maxy, int width, rgb_t color)
+static void draw_segment_diagonal_1(bitmap_t &dest, int minx, int maxx, int miny, int maxy, int width, rgb_t color)
 {
 	int x, y;
 	float ratio;
@@ -688,15 +688,15 @@ static void draw_segment_diagonal_1(bitmap_t *dest, int minx, int maxx, int miny
 
 	/* draw line */
 	for (x = minx; x < maxx; x++)
-		if (x >= 0 && x < dest->width)
+		if (x >= 0 && x < dest.width)
 		{
-			UINT32 *d = BITMAP_ADDR32(dest, 0, x);
+			UINT32 *d = BITMAP_ADDR32(&dest, 0, x);
 			int step = (x - minx) * ratio;
 
 			for (y = maxy - width - step; y < maxy - step; y++)
-				if (y >= 0 && y < dest->height)
+				if (y >= 0 && y < dest.height)
 				{
-					d[y * dest->rowpixels] = color;
+					d[y * dest.rowpixels] = color;
 				}
 		}
 }
@@ -707,7 +707,7 @@ static void draw_segment_diagonal_1(bitmap_t *dest, int minx, int maxx, int miny
     LED segment that looks like this: \
 -------------------------------------------------*/
 
-static void draw_segment_diagonal_2(bitmap_t *dest, int minx, int maxx, int miny, int maxy, int width, rgb_t color)
+static void draw_segment_diagonal_2(bitmap_t &dest, int minx, int maxx, int miny, int maxy, int width, rgb_t color)
 {
 	int x, y;
 	float ratio;
@@ -718,15 +718,15 @@ static void draw_segment_diagonal_2(bitmap_t *dest, int minx, int maxx, int miny
 
 	/* draw line */
 	for (x = minx; x < maxx; x++)
-		if (x >= 0 && x < dest->width)
+		if (x >= 0 && x < dest.width)
 		{
-			UINT32 *d = BITMAP_ADDR32(dest, 0, x);
+			UINT32 *d = BITMAP_ADDR32(&dest, 0, x);
 			int step = (x - minx) * ratio;
 
 			for (y = miny + step; y < miny + step + width; y++)
-				if (y >= 0 && y < dest->height)
+				if (y >= 0 && y < dest.height)
 				{
-					d[y * dest->rowpixels] = color;
+					d[y * dest.rowpixels] = color;
 				}
 		}
 }
@@ -736,7 +736,7 @@ static void draw_segment_diagonal_2(bitmap_t *dest, int minx, int maxx, int miny
     draw_segment_decimal - draw a decimal point
 -------------------------------------------------*/
 
-static void draw_segment_decimal(bitmap_t *dest, int midx, int midy, int width, rgb_t color)
+static void draw_segment_decimal(bitmap_t &dest, int midx, int midy, int width, rgb_t color)
 {
 	float ooradius2;
 	UINT32 x, y;
@@ -748,8 +748,8 @@ static void draw_segment_decimal(bitmap_t *dest, int midx, int midy, int width, 
 	/* iterate over y */
 	for (y = 0; y <= width; y++)
 	{
-		UINT32 *d0 = BITMAP_ADDR32(dest, midy - y, 0);
-		UINT32 *d1 = BITMAP_ADDR32(dest, midy + y, 0);
+		UINT32 *d0 = BITMAP_ADDR32(&dest, midy - y, 0);
+		UINT32 *d1 = BITMAP_ADDR32(&dest, midy + y, 0);
 		float xval = width * sqrt(1.0f - (float)(y * y) * ooradius2);
 		INT32 left, right;
 
@@ -767,7 +767,7 @@ static void draw_segment_decimal(bitmap_t *dest, int midx, int midy, int width, 
     draw_segment_comma - draw a comma tail
 -------------------------------------------------*/
 #if 0
-static void draw_segment_comma(bitmap_t *dest, int minx, int maxx, int miny, int maxy, int width, rgb_t color)
+static void draw_segment_comma(bitmap_t &dest, int minx, int maxx, int miny, int maxy, int width, rgb_t color)
 {
 	int x, y;
 	float ratio;
@@ -779,12 +779,12 @@ static void draw_segment_comma(bitmap_t *dest, int minx, int maxx, int miny, int
 	/* draw line */
 	for (x = minx; x < maxx; x++)
 	{
-		UINT32 *d = BITMAP_ADDR32(dest, 0, x);
+		UINT32 *d = BITMAP_ADDR32(&dest, 0, x);
 		int step = (x - minx) * ratio;
 
 		for (y = maxy; y < maxy  - width - step; y--)
 		{
-			d[y * dest->rowpixels] = color;
+			d[y * dest.rowpixels] = color;
 		}
 	}
 }
@@ -795,15 +795,15 @@ static void draw_segment_comma(bitmap_t *dest, int minx, int maxx, int miny, int
     apply_skew - apply skew to a bitmap_t
 -------------------------------------------------*/
 
-static void apply_skew(bitmap_t *dest, int skewwidth)
+static void apply_skew(bitmap_t &dest, int skewwidth)
 {
 	int x, y;
 
-	for (y = 0; y < dest->height; y++)
+	for (y = 0; y < dest.height; y++)
 	{
-		UINT32 *destrow = BITMAP_ADDR32(dest, y, 0);
-		int offs = skewwidth * (dest->height - y) / dest->height;
-		for (x = dest->width - skewwidth - 1; x >= 0; x--)
+		UINT32 *destrow = BITMAP_ADDR32(&dest, y, 0);
+		int offs = skewwidth * (dest.height - y) / dest.height;
+		for (x = dest.width - skewwidth - 1; x >= 0; x--)
 			destrow[x + offs] = destrow[x];
 		for (x = 0; x < offs; x++)
 			destrow[x] = 0;
@@ -816,7 +816,7 @@ static void apply_skew(bitmap_t *dest, int skewwidth)
     7-segment LCD
 -------------------------------------------------*/
 
-static void layout_element_draw_led7seg(bitmap_t *dest, const rectangle *bounds, const render_color *color, int pattern)
+static void layout_element_draw_led7seg(bitmap_t &dest, const rectangle &bounds, const render_color &color, int pattern)
 {
 	const rgb_t onpen = MAKE_ARGB(0xff,0xff,0xff,0xff);
 	const rgb_t offpen = MAKE_ARGB(0xff,0x20,0x20,0x20);
@@ -834,34 +834,34 @@ static void layout_element_draw_led7seg(bitmap_t *dest, const rectangle *bounds,
 	bitmap_fill(tempbitmap, NULL, MAKE_ARGB(0xff,0x00,0x00,0x00));
 
 	/* top bar */
-	draw_segment_horizontal(tempbitmap, 0 + 2*segwidth/3, bmwidth - 2*segwidth/3, 0 + segwidth/2, segwidth, (pattern & (1 << 0)) ? onpen : offpen);
+	draw_segment_horizontal(*tempbitmap, 0 + 2*segwidth/3, bmwidth - 2*segwidth/3, 0 + segwidth/2, segwidth, (pattern & (1 << 0)) ? onpen : offpen);
 
 	/* top-right bar */
-	draw_segment_vertical(tempbitmap, 0 + 2*segwidth/3, bmheight/2 - segwidth/3, bmwidth - segwidth/2, segwidth, (pattern & (1 << 1)) ? onpen : offpen);
+	draw_segment_vertical(*tempbitmap, 0 + 2*segwidth/3, bmheight/2 - segwidth/3, bmwidth - segwidth/2, segwidth, (pattern & (1 << 1)) ? onpen : offpen);
 
 	/* bottom-right bar */
-	draw_segment_vertical(tempbitmap, bmheight/2 + segwidth/3, bmheight - 2*segwidth/3, bmwidth - segwidth/2, segwidth, (pattern & (1 << 2)) ? onpen : offpen);
+	draw_segment_vertical(*tempbitmap, bmheight/2 + segwidth/3, bmheight - 2*segwidth/3, bmwidth - segwidth/2, segwidth, (pattern & (1 << 2)) ? onpen : offpen);
 
 	/* bottom bar */
-	draw_segment_horizontal(tempbitmap, 0 + 2*segwidth/3, bmwidth - 2*segwidth/3, bmheight - segwidth/2, segwidth, (pattern & (1 << 3)) ? onpen : offpen);
+	draw_segment_horizontal(*tempbitmap, 0 + 2*segwidth/3, bmwidth - 2*segwidth/3, bmheight - segwidth/2, segwidth, (pattern & (1 << 3)) ? onpen : offpen);
 
 	/* bottom-left bar */
-	draw_segment_vertical(tempbitmap, bmheight/2 + segwidth/3, bmheight - 2*segwidth/3, 0 + segwidth/2, segwidth, (pattern & (1 << 4)) ? onpen : offpen);
+	draw_segment_vertical(*tempbitmap, bmheight/2 + segwidth/3, bmheight - 2*segwidth/3, 0 + segwidth/2, segwidth, (pattern & (1 << 4)) ? onpen : offpen);
 
 	/* top-left bar */
-	draw_segment_vertical(tempbitmap, 0 + 2*segwidth/3, bmheight/2 - segwidth/3, 0 + segwidth/2, segwidth, (pattern & (1 << 5)) ? onpen : offpen);
+	draw_segment_vertical(*tempbitmap, 0 + 2*segwidth/3, bmheight/2 - segwidth/3, 0 + segwidth/2, segwidth, (pattern & (1 << 5)) ? onpen : offpen);
 
 	/* middle bar */
-	draw_segment_horizontal(tempbitmap, 0 + 2*segwidth/3, bmwidth - 2*segwidth/3, bmheight/2, segwidth, (pattern & (1 << 6)) ? onpen : offpen);
+	draw_segment_horizontal(*tempbitmap, 0 + 2*segwidth/3, bmwidth - 2*segwidth/3, bmheight/2, segwidth, (pattern & (1 << 6)) ? onpen : offpen);
 
 	/* apply skew */
-	apply_skew(tempbitmap, 40);
+	apply_skew(*tempbitmap, 40);
 
 	/* decimal point */
-	draw_segment_decimal(tempbitmap, bmwidth + segwidth/2, bmheight - segwidth/2, segwidth, (pattern & (1 << 7)) ? onpen : offpen);
+	draw_segment_decimal(*tempbitmap, bmwidth + segwidth/2, bmheight - segwidth/2, segwidth, (pattern & (1 << 7)) ? onpen : offpen);
 
 	/* resample to the target size */
-	render_resample_argb_bitmap_hq(dest->base, dest->rowpixels, dest->width, dest->height, tempbitmap, NULL, color);
+	render_resample_argb_bitmap_hq(dest.base, dest.rowpixels, dest.width, dest.height, tempbitmap, NULL, &color);
 
 	global_free(tempbitmap);
 }
@@ -872,7 +872,7 @@ static void layout_element_draw_led7seg(bitmap_t *dest, const rectangle *bounds,
     14-segment LCD
 -------------------------------------------------*/
 
-static void layout_element_draw_led14seg(bitmap_t *dest, const rectangle *bounds, const render_color *color, int pattern)
+static void layout_element_draw_led14seg(bitmap_t &dest, const rectangle &bounds, const render_color &color, int pattern)
 {
 	const rgb_t onpen = MAKE_ARGB(0xff, 0xff, 0xff, 0xff);
 	const rgb_t offpen = MAKE_ARGB(0xff, 0x20, 0x20, 0x20);
@@ -890,84 +890,84 @@ static void layout_element_draw_led14seg(bitmap_t *dest, const rectangle *bounds
 	bitmap_fill(tempbitmap, NULL, MAKE_ARGB(0xff, 0x00, 0x00, 0x00));
 
 	/* top bar */
-	draw_segment_horizontal(tempbitmap,
+	draw_segment_horizontal(*tempbitmap,
 		0 + 2*segwidth/3, bmwidth - 2*segwidth/3, 0 + segwidth/2,
 		segwidth, (pattern & (1 << 0)) ? onpen : offpen);
 
 	/* right-top bar */
-	draw_segment_vertical(tempbitmap,
+	draw_segment_vertical(*tempbitmap,
 		0 + 2*segwidth/3, bmheight/2 - segwidth/3, bmwidth - segwidth/2,
 		segwidth, (pattern & (1 << 1)) ? onpen : offpen);
 
 	/* right-bottom bar */
-	draw_segment_vertical(tempbitmap,
+	draw_segment_vertical(*tempbitmap,
 		bmheight/2 + segwidth/3, bmheight - 2*segwidth/3, bmwidth - segwidth/2,
 		segwidth, (pattern & (1 << 2)) ? onpen : offpen);
 
 	/* bottom bar */
-	draw_segment_horizontal(tempbitmap,
+	draw_segment_horizontal(*tempbitmap,
 		0 + 2*segwidth/3, bmwidth - 2*segwidth/3, bmheight - segwidth/2,
 		segwidth, (pattern & (1 << 3)) ? onpen : offpen);
 
 	/* left-bottom bar */
-	draw_segment_vertical(tempbitmap,
+	draw_segment_vertical(*tempbitmap,
 		bmheight/2 + segwidth/3, bmheight - 2*segwidth/3, 0 + segwidth/2,
 		segwidth, (pattern & (1 << 4)) ? onpen : offpen);
 
 	/* left-top bar */
-	draw_segment_vertical(tempbitmap,
+	draw_segment_vertical(*tempbitmap,
 		0 + 2*segwidth/3, bmheight/2 - segwidth/3, 0 + segwidth/2,
 		segwidth, (pattern & (1 << 5)) ? onpen : offpen);
 
 	/* horizontal-middle-left bar */
-	draw_segment_horizontal_caps(tempbitmap,
+	draw_segment_horizontal_caps(*tempbitmap,
 		0 + 2*segwidth/3, bmwidth/2 - segwidth/10, bmheight/2,
 		segwidth, LINE_CAP_START, (pattern & (1 << 6)) ? onpen : offpen);
 
 	/* horizontal-middle-right bar */
-	draw_segment_horizontal_caps(tempbitmap,
+	draw_segment_horizontal_caps(*tempbitmap,
 		0 + bmwidth/2 + segwidth/10, bmwidth - 2*segwidth/3, bmheight/2,
 		segwidth, LINE_CAP_END, (pattern & (1 << 7)) ? onpen : offpen);
 
 	/* vertical-middle-top bar */
-	draw_segment_vertical_caps(tempbitmap,
+	draw_segment_vertical_caps(*tempbitmap,
 		0 + segwidth + segwidth/3, bmheight/2 - segwidth/2 - segwidth/3, bmwidth/2,
 		segwidth, LINE_CAP_NONE, (pattern & (1 << 8)) ? onpen : offpen);
 
 	/* vertical-middle-bottom bar */
-	draw_segment_vertical_caps(tempbitmap,
+	draw_segment_vertical_caps(*tempbitmap,
 		bmheight/2 + segwidth/2 + segwidth/3, bmheight - segwidth - segwidth/3, bmwidth/2,
 		segwidth, LINE_CAP_NONE, (pattern & (1 << 9)) ? onpen : offpen);
 
 	/* diagonal-left-bottom bar */
-	draw_segment_diagonal_1(tempbitmap,
+	draw_segment_diagonal_1(*tempbitmap,
 		0 + segwidth + segwidth/5, bmwidth/2 - segwidth/2 - segwidth/5,
 		bmheight/2 + segwidth/2 + segwidth/3, bmheight - segwidth - segwidth/3,
 		segwidth, (pattern & (1 << 10)) ? onpen : offpen);
 
 	/* diagonal-left-top bar */
-	draw_segment_diagonal_2(tempbitmap,
+	draw_segment_diagonal_2(*tempbitmap,
 		0 + segwidth + segwidth/5, bmwidth/2 - segwidth/2 - segwidth/5,
 		0 + segwidth + segwidth/3, bmheight/2 - segwidth/2 - segwidth/3,
 		segwidth, (pattern & (1 << 11)) ? onpen : offpen);
 
 	/* diagonal-right-top bar */
-	draw_segment_diagonal_1(tempbitmap,
+	draw_segment_diagonal_1(*tempbitmap,
 		bmwidth/2 + segwidth/2 + segwidth/5, bmwidth - segwidth - segwidth/5,
 		0 + segwidth + segwidth/3, bmheight/2 - segwidth/2 - segwidth/3,
 		segwidth, (pattern & (1 << 12)) ? onpen : offpen);
 
 	/* diagonal-right-bottom bar */
-	draw_segment_diagonal_2(tempbitmap,
+	draw_segment_diagonal_2(*tempbitmap,
 		bmwidth/2 + segwidth/2 + segwidth/5, bmwidth - segwidth - segwidth/5,
 		bmheight/2 + segwidth/2 + segwidth/3, bmheight - segwidth - segwidth/3,
 		segwidth, (pattern & (1 << 13)) ? onpen : offpen);
 
 	/* apply skew */
-	apply_skew(tempbitmap, 40);
+	apply_skew(*tempbitmap, 40);
 
 	/* resample to the target size */
-	render_resample_argb_bitmap_hq(dest->base, dest->rowpixels, dest->width, dest->height, tempbitmap, NULL, color);
+	render_resample_argb_bitmap_hq(dest.base, dest.rowpixels, dest.width, dest.height, tempbitmap, NULL, &color);
 
 	global_free(tempbitmap);
 }
@@ -978,7 +978,7 @@ static void layout_element_draw_led14seg(bitmap_t *dest, const rectangle *bounds
     14-segment LCD with semicolon (2 extra segments)
 -------------------------------------------------*/
 
-static void layout_element_draw_led14segsc(bitmap_t *dest, const rectangle *bounds, const render_color *color, int pattern)
+static void layout_element_draw_led14segsc(bitmap_t &dest, const rectangle &bounds, const render_color &color, int pattern)
 {
 	const rgb_t onpen = MAKE_ARGB(0xff, 0xff, 0xff, 0xff);
 	const rgb_t offpen = MAKE_ARGB(0xff, 0x20, 0x20, 0x20);
@@ -996,93 +996,93 @@ static void layout_element_draw_led14segsc(bitmap_t *dest, const rectangle *boun
 	bitmap_fill(tempbitmap, NULL, MAKE_ARGB(0xff, 0x00, 0x00, 0x00));
 
 	/* top bar */
-	draw_segment_horizontal(tempbitmap,
+	draw_segment_horizontal(*tempbitmap,
 		0 + 2*segwidth/3, bmwidth - 2*segwidth/3, 0 + segwidth/2,
 		segwidth, (pattern & (1 << 0)) ? onpen : offpen);
 
 	/* right-top bar */
-	draw_segment_vertical(tempbitmap,
+	draw_segment_vertical(*tempbitmap,
 		0 + 2*segwidth/3, bmheight/2 - segwidth/3, bmwidth - segwidth/2,
 		segwidth, (pattern & (1 << 1)) ? onpen : offpen);
 
 	/* right-bottom bar */
-	draw_segment_vertical(tempbitmap,
+	draw_segment_vertical(*tempbitmap,
 		bmheight/2 + segwidth/3, bmheight - 2*segwidth/3, bmwidth - segwidth/2,
 		segwidth, (pattern & (1 << 2)) ? onpen : offpen);
 
 	/* bottom bar */
-	draw_segment_horizontal(tempbitmap,
+	draw_segment_horizontal(*tempbitmap,
 		0 + 2*segwidth/3, bmwidth - 2*segwidth/3, bmheight - segwidth/2,
 		segwidth, (pattern & (1 << 3)) ? onpen : offpen);
 
 	/* left-bottom bar */
-	draw_segment_vertical(tempbitmap,
+	draw_segment_vertical(*tempbitmap,
 		bmheight/2 + segwidth/3, bmheight - 2*segwidth/3, 0 + segwidth/2,
 		segwidth, (pattern & (1 << 4)) ? onpen : offpen);
 
 	/* left-top bar */
-	draw_segment_vertical(tempbitmap,
+	draw_segment_vertical(*tempbitmap,
 		0 + 2*segwidth/3, bmheight/2 - segwidth/3, 0 + segwidth/2,
 		segwidth, (pattern & (1 << 5)) ? onpen : offpen);
 
 	/* horizontal-middle-left bar */
-	draw_segment_horizontal_caps(tempbitmap,
+	draw_segment_horizontal_caps(*tempbitmap,
 		0 + 2*segwidth/3, bmwidth/2 - segwidth/10, bmheight/2,
 		segwidth, LINE_CAP_START, (pattern & (1 << 6)) ? onpen : offpen);
 
 	/* horizontal-middle-right bar */
-	draw_segment_horizontal_caps(tempbitmap,
+	draw_segment_horizontal_caps(*tempbitmap,
 		0 + bmwidth/2 + segwidth/10, bmwidth - 2*segwidth/3, bmheight/2,
 		segwidth, LINE_CAP_END, (pattern & (1 << 7)) ? onpen : offpen);
 
 	/* vertical-middle-top bar */
-	draw_segment_vertical_caps(tempbitmap,
+	draw_segment_vertical_caps(*tempbitmap,
 		0 + segwidth + segwidth/3, bmheight/2 - segwidth/2 - segwidth/3, bmwidth/2,
 		segwidth, LINE_CAP_NONE, (pattern & (1 << 8)) ? onpen : offpen);
 
 	/* vertical-middle-bottom bar */
-	draw_segment_vertical_caps(tempbitmap,
+	draw_segment_vertical_caps(*tempbitmap,
 		bmheight/2 + segwidth/2 + segwidth/3, bmheight - segwidth - segwidth/3, bmwidth/2,
 		segwidth, LINE_CAP_NONE, (pattern & (1 << 9)) ? onpen : offpen);
 
 	/* diagonal-left-bottom bar */
-	draw_segment_diagonal_1(tempbitmap,
+	draw_segment_diagonal_1(*tempbitmap,
 		0 + segwidth + segwidth/5, bmwidth/2 - segwidth/2 - segwidth/5,
 		bmheight/2 + segwidth/2 + segwidth/3, bmheight - segwidth - segwidth/3,
 		segwidth, (pattern & (1 << 10)) ? onpen : offpen);
 
 	/* diagonal-left-top bar */
-	draw_segment_diagonal_2(tempbitmap,
+	draw_segment_diagonal_2(*tempbitmap,
 		0 + segwidth + segwidth/5, bmwidth/2 - segwidth/2 - segwidth/5,
 		0 + segwidth + segwidth/3, bmheight/2 - segwidth/2 - segwidth/3,
 		segwidth, (pattern & (1 << 11)) ? onpen : offpen);
 
 	/* diagonal-right-top bar */
-	draw_segment_diagonal_1(tempbitmap,
+	draw_segment_diagonal_1(*tempbitmap,
 		bmwidth/2 + segwidth/2 + segwidth/5, bmwidth - segwidth - segwidth/5,
 		0 + segwidth + segwidth/3, bmheight/2 - segwidth/2 - segwidth/3,
 		segwidth, (pattern & (1 << 12)) ? onpen : offpen);
 
 	/* diagonal-right-bottom bar */
-	draw_segment_diagonal_2(tempbitmap,
+	draw_segment_diagonal_2(*tempbitmap,
 		bmwidth/2 + segwidth/2 + segwidth/5, bmwidth - segwidth - segwidth/5,
 		bmheight/2 + segwidth/2 + segwidth/3, bmheight - segwidth - segwidth/3,
 		segwidth, (pattern & (1 << 13)) ? onpen : offpen);
 
 	/* apply skew */
-	apply_skew(tempbitmap, 40);
+	apply_skew(*tempbitmap, 40);
 
 	/* decimal point */
-	draw_segment_decimal(tempbitmap, bmwidth + segwidth/2, bmheight - segwidth/2, segwidth, (pattern & (1 << 14)) ? onpen : offpen);
+	draw_segment_decimal(*tempbitmap, bmwidth + segwidth/2, bmheight - segwidth/2, segwidth, (pattern & (1 << 14)) ? onpen : offpen);
 
 	/* comma tail */
-	draw_segment_diagonal_1(tempbitmap,
+	draw_segment_diagonal_1(*tempbitmap,
 		bmwidth - (segwidth/2), bmwidth + segwidth,
 		bmheight - (segwidth), bmheight + segwidth*1.5,
 		segwidth/2, (pattern & (1 << 15)) ? onpen : offpen);
 
 	/* resample to the target size */
-	render_resample_argb_bitmap_hq(dest->base, dest->rowpixels, dest->width, dest->height, tempbitmap, NULL, color);
+	render_resample_argb_bitmap_hq(dest.base, dest.rowpixels, dest.width, dest.height, tempbitmap, NULL, &color);
 
 	global_free(tempbitmap);
 }
@@ -1093,7 +1093,7 @@ static void layout_element_draw_led14segsc(bitmap_t *dest, const rectangle *boun
     16-segment LCD
 -------------------------------------------------*/
 
-static void layout_element_draw_led16seg(bitmap_t *dest, const rectangle *bounds, const render_color *color, int pattern)
+static void layout_element_draw_led16seg(bitmap_t &dest, const rectangle &bounds, const render_color &color, int pattern)
 {
 	const rgb_t onpen = MAKE_ARGB(0xff, 0xff, 0xff, 0xff);
 	const rgb_t offpen = MAKE_ARGB(0xff, 0x20, 0x20, 0x20);
@@ -1111,94 +1111,94 @@ static void layout_element_draw_led16seg(bitmap_t *dest, const rectangle *bounds
 	bitmap_fill(tempbitmap, NULL, MAKE_ARGB(0xff, 0x00, 0x00, 0x00));
 
 	/* top-left bar */
-	draw_segment_horizontal_caps(tempbitmap,
+	draw_segment_horizontal_caps(*tempbitmap,
 		0 + 2*segwidth/3, bmwidth/2 - segwidth/10, 0 + segwidth/2,
 		segwidth, LINE_CAP_START, (pattern & (1 << 0)) ? onpen : offpen);
 
 	/* top-right bar */
-	draw_segment_horizontal_caps(tempbitmap,
+	draw_segment_horizontal_caps(*tempbitmap,
 		0 + bmwidth/2 + segwidth/10, bmwidth - 2*segwidth/3, 0 + segwidth/2,
 		segwidth, LINE_CAP_END, (pattern & (1 << 1)) ? onpen : offpen);
 
 	/* right-top bar */
-	draw_segment_vertical(tempbitmap,
+	draw_segment_vertical(*tempbitmap,
 		0 + 2*segwidth/3, bmheight/2 - segwidth/3, bmwidth - segwidth/2,
 		segwidth, (pattern & (1 << 2)) ? onpen : offpen);
 
 	/* right-bottom bar */
-	draw_segment_vertical(tempbitmap,
+	draw_segment_vertical(*tempbitmap,
 		bmheight/2 + segwidth/3, bmheight - 2*segwidth/3, bmwidth - segwidth/2,
 		segwidth, (pattern & (1 << 3)) ? onpen : offpen);
 
 	/* bottom-right bar */
-	draw_segment_horizontal_caps(tempbitmap,
+	draw_segment_horizontal_caps(*tempbitmap,
 		0 + bmwidth/2 + segwidth/10, bmwidth - 2*segwidth/3, bmheight - segwidth/2,
 		segwidth, LINE_CAP_END, (pattern & (1 << 4)) ? onpen : offpen);
 
 	/* bottom-left bar */
-	draw_segment_horizontal_caps(tempbitmap,
+	draw_segment_horizontal_caps(*tempbitmap,
 		0 + 2*segwidth/3, bmwidth/2 - segwidth/10, bmheight - segwidth/2,
 		segwidth, LINE_CAP_START, (pattern & (1 << 5)) ? onpen : offpen);
 
 	/* left-bottom bar */
-	draw_segment_vertical(tempbitmap,
+	draw_segment_vertical(*tempbitmap,
 		bmheight/2 + segwidth/3, bmheight - 2*segwidth/3, 0 + segwidth/2,
 		segwidth, (pattern & (1 << 6)) ? onpen : offpen);
 
 	/* left-top bar */
-	draw_segment_vertical(tempbitmap,
+	draw_segment_vertical(*tempbitmap,
 		0 + 2*segwidth/3, bmheight/2 - segwidth/3, 0 + segwidth/2,
 		segwidth, (pattern & (1 << 7)) ? onpen : offpen);
 
 	/* horizontal-middle-left bar */
-	draw_segment_horizontal_caps(tempbitmap,
+	draw_segment_horizontal_caps(*tempbitmap,
 		0 + 2*segwidth/3, bmwidth/2 - segwidth/10, bmheight/2,
 		segwidth, LINE_CAP_START, (pattern & (1 << 8)) ? onpen : offpen);
 
 	/* horizontal-middle-right bar */
-	draw_segment_horizontal_caps(tempbitmap,
+	draw_segment_horizontal_caps(*tempbitmap,
 		0 + bmwidth/2 + segwidth/10, bmwidth - 2*segwidth/3, bmheight/2,
 		segwidth, LINE_CAP_END, (pattern & (1 << 9)) ? onpen : offpen);
 
 	/* vertical-middle-top bar */
-	draw_segment_vertical_caps(tempbitmap,
+	draw_segment_vertical_caps(*tempbitmap,
 		0 + segwidth + segwidth/3, bmheight/2 - segwidth/2 - segwidth/3, bmwidth/2,
 		segwidth, LINE_CAP_NONE, (pattern & (1 << 10)) ? onpen : offpen);
 
 	/* vertical-middle-bottom bar */
-	draw_segment_vertical_caps(tempbitmap,
+	draw_segment_vertical_caps(*tempbitmap,
 		bmheight/2 + segwidth/2 + segwidth/3, bmheight - segwidth - segwidth/3, bmwidth/2,
 		segwidth, LINE_CAP_NONE, (pattern & (1 << 11)) ? onpen : offpen);
 
 	/* diagonal-left-bottom bar */
-	draw_segment_diagonal_1(tempbitmap,
+	draw_segment_diagonal_1(*tempbitmap,
 		0 + segwidth + segwidth/5, bmwidth/2 - segwidth/2 - segwidth/5,
 		bmheight/2 + segwidth/2 + segwidth/3, bmheight - segwidth - segwidth/3,
 		segwidth, (pattern & (1 << 12)) ? onpen : offpen);
 
 	/* diagonal-left-top bar */
-	draw_segment_diagonal_2(tempbitmap,
+	draw_segment_diagonal_2(*tempbitmap,
 		0 + segwidth + segwidth/5, bmwidth/2 - segwidth/2 - segwidth/5,
 		0 + segwidth + segwidth/3, bmheight/2 - segwidth/2 - segwidth/3,
 		segwidth, (pattern & (1 << 13)) ? onpen : offpen);
 
 	/* diagonal-right-top bar */
-	draw_segment_diagonal_1(tempbitmap,
+	draw_segment_diagonal_1(*tempbitmap,
 		bmwidth/2 + segwidth/2 + segwidth/5, bmwidth - segwidth - segwidth/5,
 		0 + segwidth + segwidth/3, bmheight/2 - segwidth/2 - segwidth/3,
 		segwidth, (pattern & (1 << 14)) ? onpen : offpen);
 
 	/* diagonal-right-bottom bar */
-	draw_segment_diagonal_2(tempbitmap,
+	draw_segment_diagonal_2(*tempbitmap,
 		bmwidth/2 + segwidth/2 + segwidth/5, bmwidth - segwidth - segwidth/5,
 		bmheight/2 + segwidth/2 + segwidth/3, bmheight - segwidth - segwidth/3,
 		segwidth, (pattern & (1 << 15)) ? onpen : offpen);
 
 	/* apply skew */
-	apply_skew(tempbitmap, 40);
+	apply_skew(*tempbitmap, 40);
 
 	/* resample to the target size */
-	render_resample_argb_bitmap_hq(dest->base, dest->rowpixels, dest->width, dest->height, tempbitmap, NULL, color);
+	render_resample_argb_bitmap_hq(dest.base, dest.rowpixels, dest.width, dest.height, tempbitmap, NULL, &color);
 
 	global_free(tempbitmap);
 }
@@ -1209,7 +1209,7 @@ static void layout_element_draw_led16seg(bitmap_t *dest, const rectangle *bounds
     16-segment LCD with semicolon (2 extra segments)
 -------------------------------------------------*/
 
-static void layout_element_draw_led16segsc(bitmap_t *dest, const rectangle *bounds, const render_color *color, int pattern)
+static void layout_element_draw_led16segsc(bitmap_t &dest, const rectangle &bounds, const render_color &color, int pattern)
 {
 	const rgb_t onpen = MAKE_ARGB(0xff, 0xff, 0xff, 0xff);
 	const rgb_t offpen = MAKE_ARGB(0xff, 0x20, 0x20, 0x20);
@@ -1227,103 +1227,103 @@ static void layout_element_draw_led16segsc(bitmap_t *dest, const rectangle *boun
 	bitmap_fill(tempbitmap, NULL, MAKE_ARGB(0xff, 0x00, 0x00, 0x00));
 
 	/* top-left bar */
-	draw_segment_horizontal_caps(tempbitmap,
+	draw_segment_horizontal_caps(*tempbitmap,
 		0 + 2*segwidth/3, bmwidth/2 - segwidth/10, 0 + segwidth/2,
 		segwidth, LINE_CAP_START, (pattern & (1 << 0)) ? onpen : offpen);
 
 	/* top-right bar */
-	draw_segment_horizontal_caps(tempbitmap,
+	draw_segment_horizontal_caps(*tempbitmap,
 		0 + bmwidth/2 + segwidth/10, bmwidth - 2*segwidth/3, 0 + segwidth/2,
 		segwidth, LINE_CAP_END, (pattern & (1 << 1)) ? onpen : offpen);
 
 	/* right-top bar */
-	draw_segment_vertical(tempbitmap,
+	draw_segment_vertical(*tempbitmap,
 		0 + 2*segwidth/3, bmheight/2 - segwidth/3, bmwidth - segwidth/2,
 		segwidth, (pattern & (1 << 2)) ? onpen : offpen);
 
 	/* right-bottom bar */
-	draw_segment_vertical(tempbitmap,
+	draw_segment_vertical(*tempbitmap,
 		bmheight/2 + segwidth/3, bmheight - 2*segwidth/3, bmwidth - segwidth/2,
 		segwidth, (pattern & (1 << 3)) ? onpen : offpen);
 
 	/* bottom-right bar */
-	draw_segment_horizontal_caps(tempbitmap,
+	draw_segment_horizontal_caps(*tempbitmap,
 		0 + bmwidth/2 + segwidth/10, bmwidth - 2*segwidth/3, bmheight - segwidth/2,
 		segwidth, LINE_CAP_END, (pattern & (1 << 4)) ? onpen : offpen);
 
 	/* bottom-left bar */
-	draw_segment_horizontal_caps(tempbitmap,
+	draw_segment_horizontal_caps(*tempbitmap,
 		0 + 2*segwidth/3, bmwidth/2 - segwidth/10, bmheight - segwidth/2,
 		segwidth, LINE_CAP_START, (pattern & (1 << 5)) ? onpen : offpen);
 
 	/* left-bottom bar */
-	draw_segment_vertical(tempbitmap,
+	draw_segment_vertical(*tempbitmap,
 		bmheight/2 + segwidth/3, bmheight - 2*segwidth/3, 0 + segwidth/2,
 		segwidth, (pattern & (1 << 6)) ? onpen : offpen);
 
 	/* left-top bar */
-	draw_segment_vertical(tempbitmap,
+	draw_segment_vertical(*tempbitmap,
 		0 + 2*segwidth/3, bmheight/2 - segwidth/3, 0 + segwidth/2,
 		segwidth, (pattern & (1 << 7)) ? onpen : offpen);
 
 	/* horizontal-middle-left bar */
-	draw_segment_horizontal_caps(tempbitmap,
+	draw_segment_horizontal_caps(*tempbitmap,
 		0 + 2*segwidth/3, bmwidth/2 - segwidth/10, bmheight/2,
 		segwidth, LINE_CAP_START, (pattern & (1 << 8)) ? onpen : offpen);
 
 	/* horizontal-middle-right bar */
-	draw_segment_horizontal_caps(tempbitmap,
+	draw_segment_horizontal_caps(*tempbitmap,
 		0 + bmwidth/2 + segwidth/10, bmwidth - 2*segwidth/3, bmheight/2,
 		segwidth, LINE_CAP_END, (pattern & (1 << 9)) ? onpen : offpen);
 
 	/* vertical-middle-top bar */
-	draw_segment_vertical_caps(tempbitmap,
+	draw_segment_vertical_caps(*tempbitmap,
 		0 + segwidth + segwidth/3, bmheight/2 - segwidth/2 - segwidth/3, bmwidth/2,
 		segwidth, LINE_CAP_NONE, (pattern & (1 << 10)) ? onpen : offpen);
 
 	/* vertical-middle-bottom bar */
-	draw_segment_vertical_caps(tempbitmap,
+	draw_segment_vertical_caps(*tempbitmap,
 		bmheight/2 + segwidth/2 + segwidth/3, bmheight - segwidth - segwidth/3, bmwidth/2,
 		segwidth, LINE_CAP_NONE, (pattern & (1 << 11)) ? onpen : offpen);
 
 	/* diagonal-left-bottom bar */
-	draw_segment_diagonal_1(tempbitmap,
+	draw_segment_diagonal_1(*tempbitmap,
 		0 + segwidth + segwidth/5, bmwidth/2 - segwidth/2 - segwidth/5,
 		bmheight/2 + segwidth/2 + segwidth/3, bmheight - segwidth - segwidth/3,
 		segwidth, (pattern & (1 << 12)) ? onpen : offpen);
 
 	/* diagonal-left-top bar */
-	draw_segment_diagonal_2(tempbitmap,
+	draw_segment_diagonal_2(*tempbitmap,
 		0 + segwidth + segwidth/5, bmwidth/2 - segwidth/2 - segwidth/5,
 		0 + segwidth + segwidth/3, bmheight/2 - segwidth/2 - segwidth/3,
 		segwidth, (pattern & (1 << 13)) ? onpen : offpen);
 
 	/* diagonal-right-top bar */
-	draw_segment_diagonal_1(tempbitmap,
+	draw_segment_diagonal_1(*tempbitmap,
 		bmwidth/2 + segwidth/2 + segwidth/5, bmwidth - segwidth - segwidth/5,
 		0 + segwidth + segwidth/3, bmheight/2 - segwidth/2 - segwidth/3,
 		segwidth, (pattern & (1 << 14)) ? onpen : offpen);
 
 	/* diagonal-right-bottom bar */
-	draw_segment_diagonal_2(tempbitmap,
+	draw_segment_diagonal_2(*tempbitmap,
 		bmwidth/2 + segwidth/2 + segwidth/5, bmwidth - segwidth - segwidth/5,
 		bmheight/2 + segwidth/2 + segwidth/3, bmheight - segwidth - segwidth/3,
 		segwidth, (pattern & (1 << 15)) ? onpen : offpen);
 
 	/* decimal point */
-	draw_segment_decimal(tempbitmap, bmwidth + segwidth/2, bmheight - segwidth/2, segwidth, (pattern & (1 << 16)) ? onpen : offpen);
+	draw_segment_decimal(*tempbitmap, bmwidth + segwidth/2, bmheight - segwidth/2, segwidth, (pattern & (1 << 16)) ? onpen : offpen);
 
 	/* comma tail */
-	draw_segment_diagonal_1(tempbitmap,
+	draw_segment_diagonal_1(*tempbitmap,
 		bmwidth - (segwidth/2), bmwidth + segwidth,
 		bmheight - (segwidth), bmheight + segwidth*1.5,
 		segwidth/2, (pattern & (1 << 17)) ? onpen : offpen);
 
 	/* apply skew */
-	apply_skew(tempbitmap, 40);
+	apply_skew(*tempbitmap, 40);
 
 	/* resample to the target size */
-	render_resample_argb_bitmap_hq(dest->base, dest->rowpixels, dest->width, dest->height, tempbitmap, NULL, color);
+	render_resample_argb_bitmap_hq(dest.base, dest.rowpixels, dest.width, dest.height, tempbitmap, NULL, &color);
 
 	global_free(tempbitmap);
 }
@@ -1333,7 +1333,7 @@ static void layout_element_draw_led16segsc(bitmap_t *dest, const rectangle *boun
     row of 8 dots for a dotmatrix
 -------------------------------------------------*/
 
-static void layout_element_draw_dotmatrix(bitmap_t *dest, const rectangle *bounds, const render_color *color, int pattern)
+static void layout_element_draw_dotmatrix(bitmap_t &dest, const rectangle &bounds, const render_color &color, int pattern)
 {
 	const rgb_t onpen = MAKE_ARGB(0xff, 0xff, 0xff, 0xff);
 	const rgb_t offpen = MAKE_ARGB(0xff, 0x20, 0x20, 0x20);
@@ -1351,11 +1351,11 @@ static void layout_element_draw_dotmatrix(bitmap_t *dest, const rectangle *bound
 
 	for (i = 0; i < 8; i++)
 	{//                                                             height
-		draw_segment_decimal(tempbitmap, ((dotwidth/2 )+ (i * dotwidth)), bmheight/2, dotwidth, (pattern & (1 << i))?onpen:offpen);
+		draw_segment_decimal(*tempbitmap, ((dotwidth/2 )+ (i * dotwidth)), bmheight/2, dotwidth, (pattern & (1 << i))?onpen:offpen);
 	}
 
 	/* resample to the target size */
-	render_resample_argb_bitmap_hq(dest->base, dest->rowpixels, dest->width, dest->height, tempbitmap, NULL, color);
+	render_resample_argb_bitmap_hq(dest.base, dest.rowpixels, dest.width, dest.height, tempbitmap, NULL, &color);
 
 	global_free(tempbitmap);
 }
@@ -1370,16 +1370,16 @@ static void layout_element_draw_dotmatrix(bitmap_t *dest, const rectangle *bound
     a variable in an XML attribute
 -------------------------------------------------*/
 
-static int get_variable_value(const machine_config *config, const char *string, char **outputptr)
+static int get_variable_value(running_machine &machine, const char *string, char **outputptr)
 {
 	const screen_device_config *devconfig;
 	int num, den;
 	char temp[100];
 
 	/* screen 0 parameters */
-	for (devconfig = screen_first(*config); devconfig != NULL; devconfig = screen_next(devconfig))
+	for (devconfig = screen_first(machine.m_config); devconfig != NULL; devconfig = screen_next(devconfig))
 	{
-		int scrnum = config->m_devicelist.index(SCREEN, devconfig->tag());
+		int scrnum = machine.m_config.m_devicelist.index(SCREEN, devconfig->tag());
 
 		/* native X aspect factor */
 		sprintf(temp, "~scr%dnativexaspect~", scrnum);
@@ -1433,7 +1433,7 @@ static int get_variable_value(const machine_config *config, const char *string, 
     substitution
 -------------------------------------------------*/
 
-static const char *xml_get_attribute_string_with_subst(const machine_config *config, xml_data_node *node, const char *attribute, const char *defvalue)
+static const char *xml_get_attribute_string_with_subst(running_machine &machine, xml_data_node *node, const char *attribute, const char *defvalue)
 {
 	const char *str = xml_get_attribute_string(node, attribute, NULL);
 	static char buffer[1000];
@@ -1457,7 +1457,7 @@ static const char *xml_get_attribute_string_with_subst(const machine_config *con
 
 		/* extract the variable */
 		else
-			s += get_variable_value(config, s, &d);
+			s += get_variable_value(machine, s, &d);
 	}
 	*d = 0;
 	return buffer;
@@ -1470,9 +1470,9 @@ static const char *xml_get_attribute_string_with_subst(const machine_config *con
     substitution
 -------------------------------------------------*/
 
-static int xml_get_attribute_int_with_subst(const machine_config *config, xml_data_node *node, const char *attribute, int defvalue)
+static int xml_get_attribute_int_with_subst(running_machine &machine, xml_data_node *node, const char *attribute, int defvalue)
 {
-	const char *string = xml_get_attribute_string_with_subst(config, node, attribute, NULL);
+	const char *string = xml_get_attribute_string_with_subst(machine, node, attribute, NULL);
 	int value;
 
 	if (string == NULL)
@@ -1493,9 +1493,9 @@ static int xml_get_attribute_int_with_subst(const machine_config *config, xml_da
     substitution
 -------------------------------------------------*/
 
-static float xml_get_attribute_float_with_subst(const machine_config *config, xml_data_node *node, const char *attribute, float defvalue)
+static float xml_get_attribute_float_with_subst(running_machine &machine, xml_data_node *node, const char *attribute, float defvalue)
 {
-	const char *string = xml_get_attribute_string_with_subst(config, node, attribute, NULL);
+	const char *string = xml_get_attribute_string_with_subst(machine, node, attribute, NULL);
 	float value;
 
 	if (!string || sscanf(string, "%f", &value) != 1)
@@ -1509,7 +1509,7 @@ static float xml_get_attribute_float_with_subst(const machine_config *config, xm
     into a layout_file
 -------------------------------------------------*/
 
-layout_file *layout_file_load(const machine_config *config, const char *dirname, const char *filename)
+layout_file *layout_file_load(running_machine &machine, const char *dirname, const char *filename)
 {
 	xml_data_node *rootnode, *mamelayoutnode, *elemnode, *viewnode;
 	layout_element **elemnext;
@@ -1561,7 +1561,7 @@ layout_file *layout_file_load(const machine_config *config, const char *dirname,
 	elemnext = &file->elemlist;
 	for (elemnode = xml_get_sibling(mamelayoutnode->child, "element"); elemnode; elemnode = xml_get_sibling(elemnode->next, "element"))
 	{
-		layout_element *element = load_layout_element(config, elemnode, dirname);
+		layout_element *element = load_layout_element(machine, elemnode, dirname);
 		if (element == NULL)
 			goto error;
 
@@ -1575,7 +1575,7 @@ layout_file *layout_file_load(const machine_config *config, const char *dirname,
 	viewnext = &file->viewlist;
 	for (viewnode = xml_get_sibling(mamelayoutnode->child, "view"); viewnode; viewnode = xml_get_sibling(viewnode->next, "view"))
 	{
-		layout_view *view = load_layout_view(config, viewnode, file->elemlist);
+		layout_view *view = load_layout_view(machine, viewnode, file->elemlist);
 		if (view == NULL)
 			goto error;
 
@@ -1599,7 +1599,7 @@ error:
     node from the layout file
 -------------------------------------------------*/
 
-static layout_element *load_layout_element(const machine_config *config, xml_data_node *elemnode, const char *dirname)
+static layout_element *load_layout_element(running_machine &machine, xml_data_node *elemnode, const char *dirname)
 {
 	render_bounds bounds = { 0 };
 	element_component **nextcomp;
@@ -1616,14 +1616,15 @@ static layout_element *load_layout_element(const machine_config *config, xml_dat
 	element = global_alloc_clear(layout_element);
 
 	/* extract the name */
-	name = xml_get_attribute_string_with_subst(config, elemnode, "name", NULL);
+	name = xml_get_attribute_string_with_subst(machine, elemnode, "name", NULL);
 	if (name == NULL)
 	{
 		logerror("All layout elements must have a name!\n");
 		goto error;
 	}
+	element->machine = &machine;
 	element->name = copy_string(name);
-	element->defstate = xml_get_attribute_int_with_subst(config, elemnode, "defstate", -1);
+	element->defstate = xml_get_attribute_int_with_subst(machine, elemnode, "defstate", -1);
 
 	/* parse components in order */
 	first = TRUE;
@@ -1631,7 +1632,7 @@ static layout_element *load_layout_element(const machine_config *config, xml_dat
 	for (compnode = elemnode->child; compnode; compnode = compnode->next)
 	{
 		/* allocate a new component */
-		element_component *new_component = load_element_component(config, compnode, dirname);
+		element_component *new_component = load_element_component(machine, compnode, dirname);
 		if (new_component == NULL)
 			goto error;
 
@@ -1681,7 +1682,7 @@ static layout_element *load_layout_element(const machine_config *config, xml_dat
 	{
 		element->elemtex[state].element = element;
 		element->elemtex[state].state = state;
-		element->elemtex[state].texture = render_texture_alloc(layout_element_scale, &element->elemtex[state]);
+		element->elemtex[state].texture = machine.render().texture_alloc(layout_element_scale, &element->elemtex[state]);
 	}
 
 	return element;
@@ -1697,7 +1698,7 @@ error:
     XML node (image/rect/disk)
 -------------------------------------------------*/
 
-static element_component *load_element_component(const machine_config *config, xml_data_node *compnode, const char *dirname)
+static element_component *load_element_component(running_machine &machine, xml_data_node *compnode, const char *dirname)
 {
 	element_component *component;
 
@@ -1705,17 +1706,17 @@ static element_component *load_element_component(const machine_config *config, x
 	component = global_alloc_clear(element_component);
 
 	/* fetch common data */
-	component->state = xml_get_attribute_int_with_subst(config, compnode, "state", -1);
-	if (load_bounds(config, xml_get_sibling(compnode->child, "bounds"), &component->bounds))
+	component->state = xml_get_attribute_int_with_subst(machine, compnode, "state", -1);
+	if (load_bounds(machine, xml_get_sibling(compnode->child, "bounds"), &component->bounds))
 		goto error;
-	if (load_color(config, xml_get_sibling(compnode->child, "color"), &component->color))
+	if (load_color(machine, xml_get_sibling(compnode->child, "color"), &component->color))
 		goto error;
 
 	/* image nodes */
 	if (strcmp(compnode->name, "image") == 0)
 	{
-		const char *file = xml_get_attribute_string_with_subst(config, compnode, "file", NULL);
-		const char *afile = xml_get_attribute_string_with_subst(config, compnode, "alphafile", NULL);
+		const char *file = xml_get_attribute_string_with_subst(machine, compnode, "file", NULL);
+		const char *afile = xml_get_attribute_string_with_subst(machine, compnode, "alphafile", NULL);
 
 		/* load and allocate the bitmap */
 		component->type = COMPONENT_TYPE_IMAGE;
@@ -1727,7 +1728,7 @@ static element_component *load_element_component(const machine_config *config, x
 	/* text nodes */
 	else if (strcmp(compnode->name, "text") == 0)
 	{
-		const char *text = xml_get_attribute_string_with_subst(config, compnode, "string", "");
+		const char *text = xml_get_attribute_string_with_subst(machine, compnode, "string", "");
 		char *string;
 
 		/* allocate a copy of the string */
@@ -1785,7 +1786,7 @@ error:
     load_layout_view - parse a view XML node
 -------------------------------------------------*/
 
-static layout_view *load_layout_view(const machine_config *config, xml_data_node *viewnode, layout_element *elemlist)
+static layout_view *load_layout_view(running_machine &machine, xml_data_node *viewnode, layout_element *elemlist)
 {
 	xml_data_node *boundsnode;
 	view_item **itemnext;
@@ -1796,11 +1797,11 @@ static layout_view *load_layout_view(const machine_config *config, xml_data_node
 	view = global_alloc_clear(layout_view);
 
 	/* allocate a copy of the name */
-	view->name = copy_string(xml_get_attribute_string_with_subst(config, viewnode, "name", ""));
+	view->name = copy_string(xml_get_attribute_string_with_subst(machine, viewnode, "name", ""));
 
 	/* if we have a bounds item, load it */
 	boundsnode = xml_get_sibling(viewnode->child, "bounds");
-	if (boundsnode != NULL && load_bounds(config, xml_get_sibling(boundsnode, "bounds"), &view->expbounds))
+	if (boundsnode != NULL && load_bounds(machine, xml_get_sibling(boundsnode, "bounds"), &view->expbounds))
 		goto error;
 
 	/* loop over all the layer types we support */
@@ -1816,7 +1817,7 @@ static layout_view *load_layout_view(const machine_config *config, xml_data_node
 		/* parse all of the elements of that type */
 		for (itemnode = xml_get_sibling(viewnode->child, layer_node_name[layer]); itemnode; itemnode = xml_get_sibling(itemnode->next, layer_node_name[layer]))
 		{
-			view_item *item = load_view_item(config, itemnode, elemlist);
+			view_item *item = load_view_item(machine, itemnode, elemlist);
 			if (!item)
 				goto error;
 
@@ -1840,7 +1841,7 @@ error:
     load_view_item - parse an item XML node
 -------------------------------------------------*/
 
-static view_item *load_view_item(const machine_config *config, xml_data_node *itemnode, layout_element *elemlist)
+static view_item *load_view_item(running_machine &machine, xml_data_node *itemnode, layout_element *elemlist)
 {
 	view_item *item;
 	const char *name;
@@ -1849,13 +1850,13 @@ static view_item *load_view_item(const machine_config *config, xml_data_node *it
 	item = global_alloc_clear(view_item);
 
 	/* allocate a copy of the output name */
-	item->output_name = copy_string(xml_get_attribute_string_with_subst(config, itemnode, "name", ""));
+	item->output_name = copy_string(xml_get_attribute_string_with_subst(machine, itemnode, "name", ""));
 
 	/* allocate a copy of the input tag */
-	item->input_tag = copy_string(xml_get_attribute_string_with_subst(config, itemnode, "inputtag", ""));
+	item->input_tag = copy_string(xml_get_attribute_string_with_subst(machine, itemnode, "inputtag", ""));
 
 	/* find the associated element */
-	name = xml_get_attribute_string_with_subst(config, itemnode, "element", NULL);
+	name = xml_get_attribute_string_with_subst(machine, itemnode, "element", NULL);
 	if (name != NULL)
 	{
 		layout_element *element;
@@ -1872,15 +1873,15 @@ static view_item *load_view_item(const machine_config *config, xml_data_node *it
 	}
 
 	/* fetch common data */
-	item->index = xml_get_attribute_int_with_subst(config, itemnode, "index", -1);
-	item->input_mask = xml_get_attribute_int_with_subst(config, itemnode, "inputmask", 0);
+	item->index = xml_get_attribute_int_with_subst(machine, itemnode, "index", -1);
+	item->input_mask = xml_get_attribute_int_with_subst(machine, itemnode, "inputmask", 0);
 	if (item->output_name[0] != 0 && item->element != 0)
 		output_set_value(item->output_name, item->element->defstate);
-	if (load_bounds(config, xml_get_sibling(itemnode->child, "bounds"), &item->rawbounds))
+	if (load_bounds(machine, xml_get_sibling(itemnode->child, "bounds"), &item->rawbounds))
 		goto error;
-	if (load_color(config, xml_get_sibling(itemnode->child, "color"), &item->color))
+	if (load_color(machine, xml_get_sibling(itemnode->child, "color"), &item->color))
 		goto error;
-	if (load_orientation(config, xml_get_sibling(itemnode->child, "orientation"), &item->orientation))
+	if (load_orientation(machine, xml_get_sibling(itemnode->child, "orientation"), &item->orientation))
 		goto error;
 
 	/* sanity checks */
@@ -1954,7 +1955,7 @@ static bitmap_t *load_component_bitmap(const char *dirname, const char *file, co
     load_bounds - parse a bounds XML node
 -------------------------------------------------*/
 
-static int load_bounds(const machine_config *config, xml_data_node *boundsnode, render_bounds *bounds)
+static int load_bounds(running_machine &machine, xml_data_node *boundsnode, render_bounds *bounds)
 {
 	/* skip if nothing */
 	if (boundsnode == NULL)
@@ -1968,18 +1969,18 @@ static int load_bounds(const machine_config *config, xml_data_node *boundsnode, 
 	if (xml_get_attribute(boundsnode, "left") != NULL)
 	{
 		/* left/right/top/bottom format */
-		bounds->x0 = xml_get_attribute_float_with_subst(config, boundsnode, "left", 0.0f);
-		bounds->x1 = xml_get_attribute_float_with_subst(config, boundsnode, "right", 1.0f);
-		bounds->y0 = xml_get_attribute_float_with_subst(config, boundsnode, "top", 0.0f);
-		bounds->y1 = xml_get_attribute_float_with_subst(config, boundsnode, "bottom", 1.0f);
+		bounds->x0 = xml_get_attribute_float_with_subst(machine, boundsnode, "left", 0.0f);
+		bounds->x1 = xml_get_attribute_float_with_subst(machine, boundsnode, "right", 1.0f);
+		bounds->y0 = xml_get_attribute_float_with_subst(machine, boundsnode, "top", 0.0f);
+		bounds->y1 = xml_get_attribute_float_with_subst(machine, boundsnode, "bottom", 1.0f);
 	}
 	else if (xml_get_attribute(boundsnode, "x") != NULL)
 	{
 		/* x/y/width/height format */
-		bounds->x0 = xml_get_attribute_float_with_subst(config, boundsnode, "x", 0.0f);
-		bounds->x1 = bounds->x0 + xml_get_attribute_float_with_subst(config, boundsnode, "width", 1.0f);
-		bounds->y0 = xml_get_attribute_float_with_subst(config, boundsnode, "y", 0.0f);
-		bounds->y1 = bounds->y0 + xml_get_attribute_float_with_subst(config, boundsnode, "height", 1.0f);
+		bounds->x0 = xml_get_attribute_float_with_subst(machine, boundsnode, "x", 0.0f);
+		bounds->x1 = bounds->x0 + xml_get_attribute_float_with_subst(machine, boundsnode, "width", 1.0f);
+		bounds->y0 = xml_get_attribute_float_with_subst(machine, boundsnode, "y", 0.0f);
+		bounds->y1 = bounds->y0 + xml_get_attribute_float_with_subst(machine, boundsnode, "height", 1.0f);
 	}
 	else
 	{
@@ -2001,7 +2002,7 @@ static int load_bounds(const machine_config *config, xml_data_node *boundsnode, 
     load_color - parse a color XML node
 -------------------------------------------------*/
 
-static int load_color(const machine_config *config, xml_data_node *colornode, render_color *color)
+static int load_color(running_machine &machine, xml_data_node *colornode, render_color *color)
 {
 	/* skip if nothing */
 	if (colornode == NULL)
@@ -2011,10 +2012,10 @@ static int load_color(const machine_config *config, xml_data_node *colornode, re
 	}
 
 	/* parse out the data */
-	color->r = xml_get_attribute_float_with_subst(config, colornode, "red", 1.0);
-	color->g = xml_get_attribute_float_with_subst(config, colornode, "green", 1.0);
-	color->b = xml_get_attribute_float_with_subst(config, colornode, "blue", 1.0);
-	color->a = xml_get_attribute_float_with_subst(config, colornode, "alpha", 1.0);
+	color->r = xml_get_attribute_float_with_subst(machine, colornode, "red", 1.0);
+	color->g = xml_get_attribute_float_with_subst(machine, colornode, "green", 1.0);
+	color->b = xml_get_attribute_float_with_subst(machine, colornode, "blue", 1.0);
+	color->a = xml_get_attribute_float_with_subst(machine, colornode, "alpha", 1.0);
 
 	/* check for errors */
 	if (color->r < 0.0 || color->r > 1.0 || color->g < 0.0 || color->g > 1.0 ||
@@ -2032,7 +2033,7 @@ static int load_color(const machine_config *config, xml_data_node *colornode, re
     node
 -------------------------------------------------*/
 
-static int load_orientation(const machine_config *config, xml_data_node *orientnode, int *orientation)
+static int load_orientation(running_machine &machine, xml_data_node *orientnode, int *orientation)
 {
 	int rotate;
 
@@ -2044,7 +2045,7 @@ static int load_orientation(const machine_config *config, xml_data_node *orientn
 	}
 
 	/* parse out the data */
-	rotate = xml_get_attribute_int_with_subst(config, orientnode, "rotate", 0);
+	rotate = xml_get_attribute_int_with_subst(machine, orientnode, "rotate", 0);
 	switch (rotate)
 	{
 		case 0:		*orientation = ROT0;	break;
@@ -2055,11 +2056,11 @@ static int load_orientation(const machine_config *config, xml_data_node *orientn
 			fatalerror("Invalid rotation in XML orientation node: %d", rotate);
 			return 1;
 	}
-	if (strcmp("yes", xml_get_attribute_string_with_subst(config, orientnode, "swapxy", "no")) == 0)
+	if (strcmp("yes", xml_get_attribute_string_with_subst(machine, orientnode, "swapxy", "no")) == 0)
 		*orientation ^= ORIENTATION_SWAP_XY;
-	if (strcmp("yes", xml_get_attribute_string_with_subst(config, orientnode, "flipx", "no")) == 0)
+	if (strcmp("yes", xml_get_attribute_string_with_subst(machine, orientnode, "flipx", "no")) == 0)
 		*orientation ^= ORIENTATION_FLIP_X;
-	if (strcmp("yes", xml_get_attribute_string_with_subst(config, orientnode, "flipy", "no")) == 0)
+	if (strcmp("yes", xml_get_attribute_string_with_subst(machine, orientnode, "flipy", "no")) == 0)
 		*orientation ^= ORIENTATION_FLIP_Y;
 	return 0;
 }
@@ -2153,8 +2154,7 @@ static void layout_element_free(layout_element *element)
 
 		/* loop over all states and free their textures */
 		for (state = 0; state <= element->maxstate; state++)
-			if (element->elemtex[state].texture != NULL)
-				render_texture_free(element->elemtex[state].texture);
+			element->machine->render().texture_free(element->elemtex[state].texture);
 
 		global_free(element->elemtex);
 	}

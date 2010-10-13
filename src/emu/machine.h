@@ -181,6 +181,7 @@ const int DEBUG_FLAG_OSD_ENABLED	= 0x00001000;		// The OSD debugger is enabled
 class gfx_element;
 class colortable_t;
 class debug_view_manager;
+class render_manager;
 
 typedef struct _mame_private mame_private;
 typedef struct _cpuexec_private cpuexec_private;
@@ -329,6 +330,8 @@ class running_machine : public bindable_object
 {
 	DISABLE_COPYING(running_machine);
 
+	friend void debugger_init(running_machine *machine);
+
 	typedef void (*notify_callback)(running_machine &machine);
 	typedef void (*logerror_callback)(running_machine &machine, const char *string);
 
@@ -381,6 +384,10 @@ public:
 	// regions
 	region_info *region_alloc(const char *name, UINT32 length, UINT32 flags);
 	void region_free(const char *name);
+	
+	// managers
+	render_manager &render() const { assert(m_render != NULL); return *m_render; }
+	debug_view_manager &debug_view() const { assert(m_debug_view != NULL); return *m_debug_view; }
 
 	// misc
 	void CLIB_DECL logerror(const char *format, ...);
@@ -448,8 +455,6 @@ public:
 	generic_machine_private *generic_machine_data; // internal data from machine/generic.c
 	generic_video_private *	generic_video_data;	// internal data from video/generic.c
 	generic_audio_private *	generic_audio_data;	// internal data from audio/generic.c
-
-	debug_view_manager *	m_debug_view;		// internal data from debugvw.c
 
 	// driver-specific information
 	driver_device *driver_data() const { return m_driver_device; }
@@ -520,6 +525,8 @@ private:
 	time_t					m_base_time;
 
 	driver_device *			m_driver_device;
+	render_manager *		m_render;			// internal data from render.c
+	debug_view_manager *	m_debug_view;		// internal data from debugvw.c
 };
 
 

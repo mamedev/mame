@@ -77,11 +77,11 @@ public:
 	void *				m_base;				// base of the allocation
 	const char *		m_file;				// file the allocation was made from
 	int					m_line;				// line number within that file
-	int					m_id;				// unique id
+	UINT64				m_id;				// unique id
 
 	static const int	k_hash_prime = 193;
 
-	static int			s_curid;			// current ID
+	static UINT64		s_curid;			// current ID
 	static osd_lock *	s_lock;				// lock for managing the list
 	static bool			s_lock_alloc;		// set to true temporarily during lock allocation
 	static memory_entry *s_hash[k_hash_prime];// hash table based on pointer
@@ -110,7 +110,7 @@ resource_pool global_resource_pool;
 const zeromem_t zeromem = { };
 
 // globals for memory_entry
-int memory_entry::s_curid = 0;
+UINT64 memory_entry::s_curid = 0;
 osd_lock *memory_entry::s_lock = NULL;
 bool memory_entry::s_lock_alloc = false;
 memory_entry *memory_entry::s_hash[memory_entry::k_hash_prime] = { NULL };
@@ -134,10 +134,10 @@ void *malloc_file_line(size_t size, const char *file, int line)
 	if (result == NULL)
 		return NULL;
 
-#ifdef MAME_DEBUG
 	// add a new entry
 	memory_entry::allocate(size, result, file, line);
 
+#ifdef MAME_DEBUG
 	// randomize the memory
 	rand_memory(result, size);
 #endif
@@ -153,7 +153,6 @@ void *malloc_file_line(size_t size, const char *file, int line)
 
 void free_file_line(void *memory, const char *file, int line)
 {
-#ifdef MAME_DEBUG
 	// find the memory entry
 	memory_entry *entry = memory_entry::find(memory);
 
@@ -165,6 +164,7 @@ void free_file_line(void *memory, const char *file, int line)
 		return;
 	}
 
+#ifdef MAME_DEBUG
 	// clear memory to a bogus value
 	memset(memory, 0xfc, entry->m_size);
 
@@ -236,15 +236,42 @@ void resource_pool::add(resource_pool_item &item)
 	int hashval = reinterpret_cast<FPTR>(item.m_ptr) % k_hash_prime;
 	item.m_next = m_hash[hashval];
 	m_hash[hashval] = &item;
-
-	// insert into ordered list
-	item.m_ordered_next = NULL;
-	item.m_ordered_prev = m_ordered_tail;
-	if (m_ordered_tail != NULL)
-		m_ordered_tail->m_ordered_next = &item;
-	m_ordered_tail = &item;
-	if (m_ordered_head == NULL)
+	
+	// fetch the ID of this item's pointer; some implementations put hidden data
+	// before, so if we don't find it, check 4 bytes ahead
+	memory_entry *entry = memory_entry::find(item.m_ptr);
+	if (entry == NULL)
+		entry = memory_entry::find(reinterpret_cast<UINT8 *>(item.m_ptr) - sizeof(size_t));
+	assert(entry != NULL);
+	item.m_id = entry->m_id;
+	
+	// find the entry to insert after
+	resource_pool_item *insert_after;
+	for (insert_after = m_ordered_tail; insert_after != NULL; insert_after = insert_after->m_ordered_prev)
+		if (insert_after->m_id < item.m_id)
+			break;
+	
+	// insert into the appropriate spot
+	if (insert_after != NULL)
+	{
+		item.m_ordered_next = insert_after->m_ordered_next;
+		if (item.m_ordered_next != NULL)
+			item.m_ordered_next->m_ordered_prev = &item;
+		else
+			m_ordered_tail = &item;
+		item.m_ordered_prev = insert_after;
+		insert_after->m_ordered_next = &item;
+	}
+	else
+	{
+		item.m_ordered_next = m_ordered_head;
+		if (item.m_ordered_next != NULL)
+			item.m_ordered_next->m_ordered_prev = &item;
+		else
+			m_ordered_tail = &item;
+		item.m_ordered_prev = NULL;
 		m_ordered_head = &item;
+	}
 
 	osd_lock_release(m_listlock);
 }
@@ -516,7 +543,7 @@ void memory_entry::report_unfreed()
 				if (total == 0)
 					fprintf(stderr, "--- memory leak warning ---\n");
 				total += entry->m_size;
-				fprintf(stderr, "allocation #%06d, %d bytes (%s:%d)\n", entry->m_id, static_cast<UINT32>(entry->m_size), entry->m_file, (int)entry->m_line);
+				fprintf(stderr, "allocation #%06d, %d bytes (%s:%d)\n", (UINT32)entry->m_id, static_cast<UINT32>(entry->m_size), entry->m_file, (int)entry->m_line);
 			}
 
 	release_lock();

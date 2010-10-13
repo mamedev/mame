@@ -522,7 +522,7 @@ void cheat_render_text(running_machine *machine, render_container *container)
 			{
 				/* output the text */
 				ui_draw_text_full(container, cheatinfo->output[linenum],
-						0.0f, (float)linenum * ui_get_line_height(), 1.0f,
+						0.0f, (float)linenum * ui_get_line_height(*machine), 1.0f,
 						cheatinfo->justify[linenum], WRAP_NEVER, DRAW_OPAQUE,
 						ARGB_WHITE, ARGB_BLACK, NULL, NULL);
 			}
@@ -901,7 +901,7 @@ static void cheat_frame(running_machine &machine)
 
 	/* set up for accumulating output */
 	cheatinfo->lastline = 0;
-	cheatinfo->numlines = floor(1.0f / ui_get_line_height());
+	cheatinfo->numlines = floor(1.0f / ui_get_line_height(machine));
 	cheatinfo->numlines = MIN(cheatinfo->numlines, ARRAY_LENGTH(cheatinfo->output));
 	for (linenum = 0; linenum < ARRAY_LENGTH(cheatinfo->output); linenum++)
 		cheatinfo->output[linenum].reset();

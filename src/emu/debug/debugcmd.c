@@ -1114,7 +1114,7 @@ static void execute_comment(running_machine *machine, int ref, int params, const
 
 	/* Now try adding the comment */
 	cpu->debug()->comment_add(address, param[1], 0x00ff0000);
-	cpu->machine->m_debug_view->update_all(DVT_DISASSEMBLY);
+	cpu->machine->debug_view().update_all(DVT_DISASSEMBLY);
 }
 
 
@@ -1138,7 +1138,7 @@ static void execute_comment_del(running_machine *machine, int ref, int params, c
 	/* If it's a number, it must be an address */
 	/* The bankoff and cbn will be pulled from what's currently active */
 	cpu->debug()->comment_remove(address);
-	cpu->machine->m_debug_view->update_all(DVT_DISASSEMBLY);
+	cpu->machine->debug_view().update_all(DVT_DISASSEMBLY);
 }
 
 
@@ -2427,9 +2427,9 @@ static void execute_snap(running_machine *machine, int ref, int params, const ch
 		const char *filename = param[0];
 		int scrnum = (params > 1) ? atoi(param[1]) : 0;
 
-		device_t *screen = machine->m_devicelist.find(SCREEN, scrnum);
+		screen_device *screen = downcast<screen_device *>(machine->m_devicelist.find(SCREEN, scrnum));
 
-		if ((screen == NULL) || !render_is_live_screen(screen))
+		if ((screen == NULL) || !machine->render().is_live(*screen))
 		{
 			debug_console_printf(machine, "Invalid screen number '%d'\n", scrnum);
 			return;

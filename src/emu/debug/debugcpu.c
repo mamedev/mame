@@ -1813,8 +1813,8 @@ void device_debug::start_hook(attotime endtime)
 		// check for periodic updates
 		if (&m_device == global->visiblecpu && osd_ticks() > global->last_periodic_update_time + osd_ticks_per_second()/4)
 		{
-			m_device.machine->m_debug_view->update_all();
-			m_device.machine->m_debug_view->flush_osd_updates();
+			m_device.machine->debug_view().update_all();
+			m_device.machine->debug_view().flush_osd_updates();
 			global->last_periodic_update_time = osd_ticks();
 		}
 
@@ -1949,8 +1949,8 @@ void device_debug::instruction_hook(offs_t curpc)
 			// update every 100 steps until we are within 200 of the end
 			else if ((m_flags & DEBUG_FLAG_STEPPING_OUT) == 0 && (m_stepsleft < 200 || m_stepsleft % 100 == 0))
 			{
-				m_device.machine->m_debug_view->update_all();
-				m_device.machine->m_debug_view->flush_osd_updates();
+				m_device.machine->debug_view().update_all();
+				m_device.machine->debug_view().flush_osd_updates();
 				debugger_refresh_display(m_device.machine);
 			}
 		}
@@ -1998,7 +1998,7 @@ void device_debug::instruction_hook(offs_t curpc)
 		global->visiblecpu = &m_device;
 
 		// update all views
-		m_device.machine->m_debug_view->update_all();
+		m_device.machine->debug_view().update_all();
 		debugger_refresh_display(m_device.machine);
 
 		// wait for the debugger; during this time, disable sound output
@@ -2006,7 +2006,7 @@ void device_debug::instruction_hook(offs_t curpc)
 		while (global->execution_state == EXECUTION_STATE_STOPPED)
 		{
 			// flush any pending updates before waiting again
-			m_device.machine->m_debug_view->flush_osd_updates();
+			m_device.machine->debug_view().flush_osd_updates();
 
 			// clear the memory modified flag and wait
 			global->memory_modified = false;
@@ -2019,7 +2019,7 @@ void device_debug::instruction_hook(offs_t curpc)
 			// if something modified memory, update the screen
 			if (global->memory_modified)
 			{
-				m_device.machine->m_debug_view->update_all(DVT_DISASSEMBLY);
+				m_device.machine->debug_view().update_all(DVT_DISASSEMBLY);
 				debugger_refresh_display(m_device.machine);
 			}
 

@@ -102,7 +102,7 @@ static void drawsdl_attach(sdl_draw_info *info, sdl_window_info *window);
 static int drawsdl_window_create(sdl_window_info *window, int width, int height);
 static void drawsdl_window_resize(sdl_window_info *window, int width, int height);
 static void drawsdl_window_destroy(sdl_window_info *window);
-static const render_primitive_list *drawsdl_window_get_primitives(sdl_window_info *window);
+static render_primitive_list &drawsdl_window_get_primitives(sdl_window_info *window);
 static int drawsdl_window_draw(sdl_window_info *window, UINT32 dc, int update);
 static void drawsdl_destroy_all_textures(sdl_window_info *window);
 static void drawsdl_window_clear(sdl_window_info *window);
@@ -113,11 +113,11 @@ static void setup_texture(sdl_window_info *window, int tempwidth, int tempheight
 #endif
 
 // soft rendering
-static void drawsdl_rgb888_draw_primitives(const render_primitive *primlist, void *dstdata, UINT32 width, UINT32 height, UINT32 pitch);
-static void drawsdl_bgr888_draw_primitives(const render_primitive *primlist, void *dstdata, UINT32 width, UINT32 height, UINT32 pitch);
-static void drawsdl_bgra888_draw_primitives(const render_primitive *primlist, void *dstdata, UINT32 width, UINT32 height, UINT32 pitch);
-static void drawsdl_rgb565_draw_primitives(const render_primitive *primlist, void *dstdata, UINT32 width, UINT32 height, UINT32 pitch);
-static void drawsdl_rgb555_draw_primitives(const render_primitive *primlist, void *dstdata, UINT32 width, UINT32 height, UINT32 pitch);
+static void drawsdl_rgb888_draw_primitives(const render_primitive_list &primlist, void *dstdata, UINT32 width, UINT32 height, UINT32 pitch);
+static void drawsdl_bgr888_draw_primitives(const render_primitive_list &primlist, void *dstdata, UINT32 width, UINT32 height, UINT32 pitch);
+static void drawsdl_bgra888_draw_primitives(const render_primitive_list &primlist, void *dstdata, UINT32 width, UINT32 height, UINT32 pitch);
+static void drawsdl_rgb565_draw_primitives(const render_primitive_list &primlist, void *dstdata, UINT32 width, UINT32 height, UINT32 pitch);
+static void drawsdl_rgb555_draw_primitives(const render_primitive_list &primlist, void *dstdata, UINT32 width, UINT32 height, UINT32 pitch);
 
 // YUV overlays
 
@@ -265,7 +265,7 @@ static void setup_texture(sdl_window_info *window, int tempwidth, int tempheight
 
 	if (sdl_sm->is_scale)
 	{
-		render_target_get_minimum_size(window->target, &sdl->hw_scale_width, &sdl->hw_scale_height);
+		window->target->compute_minimum_size(sdl->hw_scale_width, sdl->hw_scale_height);
 		if (video_config.prescale)
 		{
 			sdl->hw_scale_width *= video_config.prescale;
@@ -308,7 +308,7 @@ static void yuv_overlay_init(sdl_window_info *window)
 	const sdl_scale_mode *sdl_sm = sdl->scale_mode;
 	int minimum_width, minimum_height;
 
-	render_target_get_minimum_size(window->target, &minimum_width, &minimum_height);
+	window->target->compute_minimum_size(minimum_width, minimum_height);
 
 	if (video_config.prescale)
 	{
@@ -615,7 +615,7 @@ static int drawsdl_xy_to_render_target(sdl_window_info *window, int x, int y, in
 //  drawsdl_window_get_primitives
 //============================================================
 
-static const render_primitive_list *drawsdl_window_get_primitives(sdl_window_info *window)
+static render_primitive_list &drawsdl_window_get_primitives(sdl_window_info *window)
 {
 	sdl_info *sdl = (sdl_info *) window->dxdata;
 
@@ -628,10 +628,10 @@ static const render_primitive_list *drawsdl_window_get_primitives(sdl_window_inf
 		sdlwindow_blit_surface_size(window, window->monitor->center_width, window->monitor->center_height);
 	}
 	if (!sdl->scale_mode->is_scale)
-		render_target_set_bounds(window->target, window->blitwidth, window->blitheight, sdlvideo_monitor_get_aspect(window->monitor));
+		window->target->set_bounds(window->blitwidth, window->blitheight, sdlvideo_monitor_get_aspect(window->monitor));
 	else
-		render_target_set_bounds(window->target, sdl->hw_scale_width, sdl->hw_scale_height, 0);
-	return render_target_get_primitives(window->target);
+		window->target->set_bounds(sdl->hw_scale_width, sdl->hw_scale_height);
+	return window->target->get_primitives();
 }
 
 //============================================================
@@ -768,7 +768,7 @@ static int drawsdl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 	sdl->last_hofs = hofs;
 	sdl->last_vofs = vofs;
 
-	osd_lock_acquire(window->primlist->lock);
+	window->primlist->acquire_lock();
 
 	// render to it
 	if (!sdl->scale_mode->is_yuv)
@@ -791,23 +791,23 @@ static int drawsdl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 		switch (rmask)
 		{
 			case 0x0000ff00:
-				drawsdl_bgra888_draw_primitives(window->primlist->head, surfptr, mamewidth, mameheight, pitch / 4);
+				drawsdl_bgra888_draw_primitives(*window->primlist, surfptr, mamewidth, mameheight, pitch / 4);
 				break;
 
 			case 0x00ff0000:
-				drawsdl_rgb888_draw_primitives(window->primlist->head, surfptr, mamewidth, mameheight, pitch / 4);
+				drawsdl_rgb888_draw_primitives(*window->primlist, surfptr, mamewidth, mameheight, pitch / 4);
 				break;
 
 			case 0x000000ff:
-				drawsdl_bgr888_draw_primitives(window->primlist->head, surfptr, mamewidth, mameheight, pitch / 4);
+				drawsdl_bgr888_draw_primitives(*window->primlist, surfptr, mamewidth, mameheight, pitch / 4);
 				break;
 
 			case 0xf800:
-				drawsdl_rgb565_draw_primitives(window->primlist->head, surfptr, mamewidth, mameheight, pitch / 2);
+				drawsdl_rgb565_draw_primitives(*window->primlist, surfptr, mamewidth, mameheight, pitch / 2);
 				break;
 
 			case 0x7c00:
-				drawsdl_rgb555_draw_primitives(window->primlist->head, surfptr, mamewidth, mameheight, pitch / 2);
+				drawsdl_rgb555_draw_primitives(*window->primlist, surfptr, mamewidth, mameheight, pitch / 2);
 				break;
 
 			default:
@@ -819,11 +819,11 @@ static int drawsdl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 	{
 		assert (sdl->yuv_bitmap != NULL);
 		assert (surfptr != NULL);
-		drawsdl_rgb555_draw_primitives(window->primlist->head, sdl->yuv_bitmap, sdl->hw_scale_width, sdl->hw_scale_height, sdl->hw_scale_width);
+		drawsdl_rgb555_draw_primitives(*window->primlist, sdl->yuv_bitmap, sdl->hw_scale_width, sdl->hw_scale_height, sdl->hw_scale_width);
 		sdl->scale_mode->yuv_blit((UINT16 *)sdl->yuv_bitmap, sdl, surfptr, pitch);
 	}
 
-	osd_lock_release(window->primlist->lock);
+	window->primlist->release_lock();
 
 	// unlock and flip
 #if (!SDL_VERSION_ATLEAST(1,3,0))

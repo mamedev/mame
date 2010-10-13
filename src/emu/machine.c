@@ -173,7 +173,6 @@ running_machine::running_machine(const machine_config &_config, core_options &op
 	  generic_machine_data(NULL),
 	  generic_video_data(NULL),
 	  generic_audio_data(NULL),
-	  m_debug_view(NULL),
 	  m_logerror_list(NULL),
 	  m_scheduler(*this),
 	  m_options(options),
@@ -190,7 +189,9 @@ running_machine::running_machine(const machine_config &_config, core_options &op
 	  m_saveload_schedule_time(attotime_zero),
 	  m_saveload_searchpath(NULL),
 	  m_rand_seed(0x9d14abd7),
-	  m_driver_device(NULL)
+	  m_driver_device(NULL),
+	  m_render(NULL),
+	  m_debug_view(NULL)
 {
 	memset(gfx, 0, sizeof(gfx));
 	memset(&generic, 0, sizeof(generic));
@@ -271,7 +272,7 @@ void running_machine::start()
 	state_init(this);
 	state_save_allow_registration(this, true);
 	palette_init(this);
-	render_init(this);
+	m_render = auto_alloc(this, render_manager(*this));
 	ui_init(this);
 	generic_machine_init(this);
 	generic_video_init(this);
@@ -453,7 +454,7 @@ void running_machine::schedule_exit()
 	if (m_exit_to_game_select && options_get_string(&m_options, OPTION_GAMENAME)[0] != 0)
 	{
 		options_set_string(&m_options, OPTION_GAMENAME, "", OPTION_PRIORITY_CMDLINE);
-		ui_menu_force_game_select(this, render_container_get_ui());
+		ui_menu_force_game_select(this, &render().ui_container());
 	}
 
 	// otherwise, exit for real

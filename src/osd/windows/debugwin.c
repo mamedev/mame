@@ -607,7 +607,7 @@ static void debugwin_window_free(debugwin_info *info)
 	for (viewnum = 0; viewnum < ARRAY_LENGTH(info->view); viewnum++)
 		if (info->view[viewnum].view != NULL)
 		{
-			info->machine->m_debug_view->free_view(*info->view[viewnum].view);
+			info->machine->debug_view().free_view(*info->view[viewnum].view);
 			info->view[viewnum].view = NULL;
 		}
 
@@ -851,7 +851,7 @@ static int debugwin_view_create(debugwin_info *info, int which, debug_view_type 
 		goto cleanup;
 
 	// create the debug view
-	view->view = info->machine->m_debug_view->alloc_view(type, debugwin_view_update, view);
+	view->view = info->machine->debug_view().alloc_view(type, debugwin_view_update, view);
 	if (view->view == NULL)
 		goto cleanup;
 
@@ -859,7 +859,7 @@ static int debugwin_view_create(debugwin_info *info, int which, debug_view_type 
 
 cleanup:
 	if (view->view)
-		info->machine->m_debug_view->free_view(*view->view);
+		info->machine->debug_view().free_view(*view->view);
 	if (view->hscroll)
 		DestroyWindow(view->hscroll);
 	if (view->vscroll)
@@ -1468,7 +1468,7 @@ static LRESULT CALLBACK debugwin_view_proc(HWND wnd, UINT message, WPARAM wparam
 			debug_view_xy topleft = info->view->visible_position();
 			topleft.x = debugwin_view_process_scroll(info, LOWORD(wparam), (HWND)lparam);
 			info->view->set_visible_position(topleft);
-			info->owner->machine->m_debug_view->flush_osd_updates();
+			info->owner->machine->debug_view().flush_osd_updates();
 			break;
 		}
 
@@ -1478,7 +1478,7 @@ static LRESULT CALLBACK debugwin_view_proc(HWND wnd, UINT message, WPARAM wparam
 			debug_view_xy topleft = info->view->visible_position();
 			topleft.y = debugwin_view_process_scroll(info, LOWORD(wparam), (HWND)lparam);
 			info->view->set_visible_position(topleft);
-			info->owner->machine->m_debug_view->flush_osd_updates();
+			info->owner->machine->debug_view().flush_osd_updates();
 			break;
 		}
 
@@ -2484,11 +2484,11 @@ void console_create_window(running_machine *machine)
 
 cleanup:
 	if (info->view[2].view)
-		machine->m_debug_view->free_view(*info->view[2].view);
+		machine->debug_view().free_view(*info->view[2].view);
 	if (info->view[1].view)
-		machine->m_debug_view->free_view(*info->view[1].view);
+		machine->debug_view().free_view(*info->view[1].view);
 	if (info->view[0].view)
-		machine->m_debug_view->free_view(*info->view[0].view);
+		machine->debug_view().free_view(*info->view[0].view);
 }
 
 

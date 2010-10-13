@@ -136,11 +136,11 @@ void ui_update_and_render(running_machine *machine, render_container *container)
 render_font *ui_get_font(void);
 
 /* returns the line height of the font used by the UI system */
-float ui_get_line_height(void);
+float ui_get_line_height(running_machine &machine);
 
 /* returns the width of a character or string in the UI font */
-float ui_get_char_width(unicode_char ch);
-float ui_get_string_width(const char *s);
+float ui_get_char_width(running_machine &machine, unicode_char ch);
+float ui_get_string_width(running_machine &machine, const char *s);
 
 /* draw an outlined box filled with a given color */
 void ui_draw_outlined_box(render_container *container, float x0, float y0, float x1, float y1, rgb_t backcolor);

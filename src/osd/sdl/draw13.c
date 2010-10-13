@@ -686,8 +686,8 @@ static const render_primitive_list *draw13_window_get_primitives(sdl_window_info
 	{
 		sdlwindow_blit_surface_size(window, window->monitor->center_width, window->monitor->center_height);
 	}
-	render_target_set_bounds(window->target, window->blitwidth, window->blitheight, sdlvideo_monitor_get_aspect(window->monitor));
-	return render_target_get_primitives(window->target);
+	window->target->set_bounds(window->blitwidth, window->blitheight, sdlvideo_monitor_get_aspect(window->monitor));
+	return window->target->get_primitives();
 }
 
 //============================================================
@@ -758,7 +758,7 @@ static int draw13_window_draw(sdl_window_info *window, UINT32 dc, int update)
 
 		switch (prim->type)
 		{
-			case RENDER_PRIMITIVE_LINE:
+			case render_primitive::LINE:
 				sr = (int)(255.0f * prim->color.r);
 				sg = (int)(255.0f * prim->color.g);
 				sb = (int)(255.0f * prim->color.b);
@@ -769,7 +769,7 @@ static int draw13_window_draw(sdl_window_info *window, UINT32 dc, int update)
 				SDL_RenderDrawLine(prim->bounds.x0 + hofs, prim->bounds.y0 + vofs,
 						prim->bounds.x1 + hofs, prim->bounds.y1 + vofs);
 				break;
-			case RENDER_PRIMITIVE_QUAD:
+			case render_primitive::QUAD:
 				texture = texture_update(window, prim);
 				if (texture)
 					blit_pixels += (texture->rawheight * texture->rawwidth);

@@ -75,11 +75,11 @@ struct _gdi_info
 static void drawgdi_exit(void);
 static int drawgdi_window_init(win_window_info *window);
 static void drawgdi_window_destroy(win_window_info *window);
-static const render_primitive_list *drawgdi_window_get_primitives(win_window_info *window);
+static render_primitive_list *drawgdi_window_get_primitives(win_window_info *window);
 static int drawgdi_window_draw(win_window_info *window, HDC dc, int update);
 
 // rendering
-static void drawgdi_rgb888_draw_primitives(const render_primitive *primlist, void *dstdata, UINT32 width, UINT32 height, UINT32 pitch);
+static void drawgdi_rgb888_draw_primitives(const render_primitive_list &primlist, void *dstdata, UINT32 width, UINT32 height, UINT32 pitch);
 
 
 
@@ -172,12 +172,12 @@ static void drawgdi_window_destroy(win_window_info *window)
 //  drawgdi_window_get_primitives
 //============================================================
 
-static const render_primitive_list *drawgdi_window_get_primitives(win_window_info *window)
+static render_primitive_list *drawgdi_window_get_primitives(win_window_info *window)
 {
 	RECT client;
 	GetClientRect(window->hwnd, &client);
-	render_target_set_bounds(window->target, rect_width(&client), rect_height(&client), winvideo_monitor_get_aspect(window->monitor));
-	return render_target_get_primitives(window->target);
+	window->target->set_bounds(rect_width(&client), rect_height(&client), winvideo_monitor_get_aspect(window->monitor));
+	return &window->target->get_primitives();
 }
 
 
@@ -213,9 +213,9 @@ static int drawgdi_window_draw(win_window_info *window, HDC dc, int update)
 	}
 
 	// draw the primitives to the bitmap
-	osd_lock_acquire(window->primlist->lock);
-	drawgdi_rgb888_draw_primitives(window->primlist->head, gdi->bmdata, width, height, pitch);
-	osd_lock_release(window->primlist->lock);
+	window->primlist->acquire_lock();
+	drawgdi_rgb888_draw_primitives(*window->primlist, gdi->bmdata, width, height, pitch);
+	window->primlist->release_lock();
 
 	// fill in bitmap-specific info
 	gdi->bminfo.bmiHeader.biWidth = pitch;

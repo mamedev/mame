@@ -347,14 +347,14 @@ void sdlwindow_blit_surface_size(sdl_window_info *window, int window_width, int 
 	INT32 target_height = window_height;
 
 	// start with the minimum size
-	render_target_get_minimum_size(window->target, &newwidth, &newheight);
+	window->target->compute_minimum_size(newwidth, newheight);
 
 	// compute the appropriate visible area if we're trying to keepaspect
 	if (video_config.keepaspect)
 	{
 		// make sure the monitor is up-to-date
 		sdlvideo_monitor_refresh(window->monitor);
-		render_target_compute_visible_area(window->target, target_width, target_height, sdlvideo_monitor_get_aspect(window->monitor), render_target_get_orientation(window->target), &target_width, &target_height);
+		window->target->compute_visible_area(target_width, target_height, sdlvideo_monitor_get_aspect(window->monitor), window->target->orientation(), target_width, target_height);
 		desired_aspect = (float)target_width / (float)target_height;
 	}
 
@@ -406,7 +406,7 @@ void sdlwindow_blit_surface_size(sdl_window_info *window, int window_width, int 
 	}
 
     //FIXME: really necessary to distinguish for yuv_modes ?
-	if ((render_target_get_layer_config(window->target) & LAYER_CONFIG_ZOOM_TO_SCREEN)
+	if (window->target->zoom_to_screen()
 		&& (window->scale_mode == VIDEO_SCALE_MODE_NONE ))
 		newwidth = window_width;
 
@@ -695,12 +695,7 @@ int sdlwindow_video_window_create(running_machine *machine, int index, sdl_monit
 	window->rendered_event = osd_event_alloc(FALSE, TRUE);
 
 	// load the layout
-	window->target = render_target_alloc(machine, NULL, FALSE);
-	if (window->target == NULL)
-	{
-		osd_free(wp);
-		goto error;
-	}
+	window->target = machine->render().target_alloc();
 
 	// set the specific view
 	sprintf(option, SDLOPTION_VIEW("%d"), index);
@@ -789,8 +784,7 @@ static void sdlwindow_video_window_destroy(running_machine *machine, sdl_window_
 	execute_async_wait(&sdlwindow_video_window_destroy_wt, &wp);
 
 	// free the render target, after the textures!
-	if (window->target != NULL)
-		render_target_free(window->target);
+	window->machine->render().target_free(window->target);
 
 	// free the event
 	osd_event_free(window->rendered_event);
@@ -813,7 +807,7 @@ static void pick_best_mode(sdl_window_info *window, int *fswidth, int *fsheight)
 	float size_score, best_score = 0.0f;
 
 	// determine the minimum width/height for the selected target
-	render_target_get_minimum_size(window->target, &minimum_width, &minimum_height);
+	window->target->compute_minimum_size(minimum_width, minimum_height);
 
 	// use those as the target for now
 	target_width = minimum_width * MAX(1, window->prescale);
@@ -880,7 +874,7 @@ static void pick_best_mode(sdl_window_info *window, int *fswidth, int *fsheight)
 	SDL_Rect **modes;
 
 	// determine the minimum width/height for the selected target
-	render_target_get_minimum_size(window->target, &minimum_width, &minimum_height);
+	window->target->compute_minimum_size(minimum_width, minimum_height);
 
 	// use those as the target for now
 	target_width = minimum_width * MAX(1, window->prescale);
@@ -966,7 +960,7 @@ void sdlwindow_video_window_update(running_machine *machine, sdl_window_info *wi
 		int tempwidth, tempheight;
 
 		// see if the games video mode has changed
-		render_target_get_minimum_size(window->target, &tempwidth, &tempheight);
+		window->target->compute_minimum_size(tempwidth, tempheight);
 		if (tempwidth != window->minwidth || tempheight != window->minheight)
 		{
 			window->minwidth = tempwidth;
@@ -1026,7 +1020,7 @@ static void set_starting_view(running_machine *machine, int index, sdl_window_in
 	viewindex = video_get_view_for_target(machine, window->target, view, index, video_config.numscreens);
 
 	// set the view
-	render_target_set_view(window->target, viewindex);
+	window->target->set_view(viewindex);
 	window->start_viewscreen=viewindex;
 }
 
@@ -1208,21 +1202,21 @@ static void constrain_to_aspect_ratio(sdl_window_info *window, int *window_width
 	{
 		case WMSZ_BOTTOM:
 		case WMSZ_TOP:
-			render_target_compute_visible_area(window->target, 10000, propheight, pixel_aspect, render_target_get_orientation(window->target), &propwidth, &propheight);
+			window->target->compute_visible_area(10000, propheight, pixel_aspect, window->target->orientation(), propwidth, propheight);
 			break;
 
 		case WMSZ_LEFT:
 		case WMSZ_RIGHT:
-			render_target_compute_visible_area(window->target, propwidth, 10000, pixel_aspect, render_target_get_orientation(window->target), &propwidth, &propheight);
+			window->target->compute_visible_area(propwidth, 10000, pixel_aspect, window->target->orientation(), propwidth, propheight);
 			break;
 
 		default:
-			render_target_compute_visible_area(window->target, propwidth, propheight, pixel_aspect, render_target_get_orientation(window->target), &propwidth, &propheight);
+			window->target->compute_visible_area(propwidth, propheight, pixel_aspect, window->target->orientation(), propwidth, propheight);
 			break;
 	}
 
 	// get the minimum width/height for the current layout
-	render_target_get_minimum_size(window->target, &minwidth, &minheight);
+	window->target->compute_minimum_size(minwidth, minheight);
 
 	// clamp against the absolute minimum
 	propwidth = MAX(propwidth, MIN_WINDOW_DIM);
@@ -1255,7 +1249,7 @@ static void constrain_to_aspect_ratio(sdl_window_info *window, int *window_width
 	propheight = MIN(propheight, maxheight);
 
 	// compute the visible area based on the proposed rectangle
-	render_target_compute_visible_area(window->target, propwidth, propheight, pixel_aspect, render_target_get_orientation(window->target), &viswidth, &visheight);
+	window->target->compute_visible_area(propwidth, propheight, pixel_aspect, window->target->orientation(), viswidth, visheight);
 
 	*window_width = viswidth;
 	*window_height = visheight;
@@ -1272,7 +1266,7 @@ static void get_min_bounds(sdl_window_info *window, int *window_width, int *wind
 	INT32 minwidth, minheight;
 
 	// get the minimum target size
-	render_target_get_minimum_size(window->target, &minwidth, &minheight);
+	window->target->compute_minimum_size(minwidth, minheight);
 
 	// expand to our minimum dimensions
 	if (minwidth < MIN_WINDOW_DIM)

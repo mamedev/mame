@@ -1246,22 +1246,22 @@ VIDEO_UPDATE( laserdisc )
 			if (overbitmap != NULL)
 			{
 				if (overbitmap->format == BITMAP_FORMAT_INDEXED16)
-					render_texture_set_bitmap(ldcore->overtex, overbitmap, &ldcore->config.overclip, TEXFORMAT_PALETTEA16, laserdisc->machine->palette);
+					ldcore->overtex->set_bitmap(overbitmap, &ldcore->config.overclip, TEXFORMAT_PALETTEA16, laserdisc->machine->palette);
 				else if (overbitmap->format == BITMAP_FORMAT_RGB32)
-					render_texture_set_bitmap(ldcore->overtex, overbitmap, &ldcore->config.overclip, TEXFORMAT_ARGB32, NULL);
+					ldcore->overtex->set_bitmap(overbitmap, &ldcore->config.overclip, TEXFORMAT_ARGB32);
 			}
 
 			/* get the laserdisc video */
 			laserdisc_get_video(laserdisc, &vidbitmap);
 			if (vidbitmap != NULL)
-				render_texture_set_bitmap(ldcore->videotex, vidbitmap, NULL, TEXFORMAT_YUY16, ldcore->videopalette);
+				ldcore->videotex->set_bitmap(vidbitmap, NULL, TEXFORMAT_YUY16, ldcore->videopalette);
 
 			/* reset the screen contents */
-			render_container_empty(render_container_get_screen(screen));
+			screen->container().empty();
 
 			/* add the video texture */
 			if (ldcore->videoenable)
-				render_screen_add_quad(screen, 0.0f, 0.0f, 1.0f, 1.0f, MAKE_ARGB(0xff,0xff,0xff,0xff), ldcore->videotex, PRIMFLAG_BLENDMODE(BLENDMODE_NONE) | PRIMFLAG_SCREENTEX(1));
+				screen->container().add_quad(0.0f, 0.0f, 1.0f, 1.0f, MAKE_ARGB(0xff,0xff,0xff,0xff), ldcore->videotex, PRIMFLAG_BLENDMODE(BLENDMODE_NONE) | PRIMFLAG_SCREENTEX(1));
 
 			/* add the overlay */
 			if (ldcore->overenable && overbitmap != NULL)
@@ -1270,7 +1270,7 @@ VIDEO_UPDATE( laserdisc )
 				float y0 = 0.5f - 0.5f * ldcore->config.overscaley + ldcore->config.overposy;
 				float x1 = x0 + ldcore->config.overscalex;
 				float y1 = y0 + ldcore->config.overscaley;
-				render_screen_add_quad(screen, x0, y0, x1, y1, MAKE_ARGB(0xff,0xff,0xff,0xff), ldcore->overtex, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_SCREENTEX(1));
+				screen->container().add_quad(x0, y0, x1, y1, MAKE_ARGB(0xff,0xff,0xff,0xff), ldcore->overtex, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_SCREENTEX(1));
 			}
 
 			/* swap to the next bitmap */
@@ -1418,7 +1418,7 @@ static void init_video(running_device *device)
 
 	/* allocate texture for rendering */
 	ldcore->videoenable = TRUE;
-	ldcore->videotex = render_texture_alloc(NULL, NULL);
+	ldcore->videotex = device->machine->render().texture_alloc();
 	if (ldcore->videotex == NULL)
 		fatalerror("Out of memory allocating video texture");
 
@@ -1435,7 +1435,7 @@ static void init_video(running_device *device)
 		ldcore->overenable = TRUE;
 		ldcore->overbitmap[0] = auto_bitmap_alloc(device->machine, ldcore->config.overwidth, ldcore->config.overheight, (bitmap_format)ldcore->config.overformat);
 		ldcore->overbitmap[1] = auto_bitmap_alloc(device->machine, ldcore->config.overwidth, ldcore->config.overheight, (bitmap_format)ldcore->config.overformat);
-		ldcore->overtex = render_texture_alloc(NULL, NULL);
+		ldcore->overtex = device->machine->render().texture_alloc();
 		if (ldcore->overtex == NULL)
 			fatalerror("Out of memory allocating overlay texture");
 	}
@@ -1536,12 +1536,10 @@ static DEVICE_STOP( laserdisc )
 		chd_async_complete(ldcore->disc);
 
 	/* free any textures and palettes */
-	if (ldcore->videotex != NULL)
-		render_texture_free(ldcore->videotex);
+	device->machine->render().texture_free(ldcore->videotex);
 	if (ldcore->videopalette != NULL)
 		palette_deref(ldcore->videopalette);
-	if (ldcore->overtex != NULL)
-		render_texture_free(ldcore->overtex);
+	device->machine->render().texture_free(ldcore->overtex);
 }
 
 

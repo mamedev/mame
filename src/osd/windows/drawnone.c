@@ -59,7 +59,7 @@
 static void drawnone_exit(void);
 static int drawnone_window_init(win_window_info *window);
 static void drawnone_window_destroy(win_window_info *window);
-static const render_primitive_list *drawnone_window_get_primitives(win_window_info *window);
+static render_primitive_list *drawnone_window_get_primitives(win_window_info *window);
 static int drawnone_window_draw(win_window_info *window, HDC dc, int update);
 
 
@@ -116,12 +116,12 @@ static void drawnone_window_destroy(win_window_info *window)
 //  drawnone_window_get_primitives
 //============================================================
 
-static const render_primitive_list *drawnone_window_get_primitives(win_window_info *window)
+static render_primitive_list *drawnone_window_get_primitives(win_window_info *window)
 {
 	RECT client;
 	GetClientRect(window->hwnd, &client);
-	render_target_set_bounds(window->target, rect_width(&client), rect_height(&client), winvideo_monitor_get_aspect(window->monitor));
-	return render_target_get_primitives(window->target);
+	window->target->set_bounds(rect_width(&client), rect_height(&client), winvideo_monitor_get_aspect(window->monitor));
+	return &window->target->get_primitives();
 }
 
 

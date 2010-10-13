@@ -159,8 +159,8 @@ public:
 	  {
 		this->target = target;
 		//dv->container = render_target_get_component_container(target, name, &pos);
-		this->container = render_debug_alloc(target);
-		this->view = machine->m_debug_view->alloc_view(type, dview_update, this);
+		this->container = target->debug_alloc();
+		this->view = machine->debug_view().alloc_view(type, dview_update, this);
 		this->type = type;
 		this->machine = machine;
 		this->state = flags | VIEW_STATE_NEEDS_UPDATE;
@@ -185,8 +185,8 @@ public:
 	  }
 	~DView()
 	{
-		render_debug_free(this->target, this->container);
-		machine->m_debug_view->free_view(*this->view);
+		this->target->debug_free(*this->container);
+		machine->debug_view().free_view(*this->view);
 	}
 
 	DView *				next;
@@ -295,7 +295,7 @@ static void set_focus_view(DView *dv)
 		focus_view = dv;
 		LIST_REMOVE(list, dv, DView);
 		LIST_ADD_FRONT(list, dv, DView);
-		render_debug_top(dv->target, dv->container);
+		dv->target->debug_top(*dv->container);
 	}
 }
 
@@ -364,7 +364,7 @@ static void dview_get_rect(DView *dv, int type, rectangle *rect)
 
 static void dview_clear(DView *dv)
 {
-	render_container_empty(dv->container);
+	dv->container->empty();
 }
 
 static void dview_draw_outlined_box(DView *dv, int rtype, int x, int y, int w, int h, rgb_t bg)
@@ -381,7 +381,7 @@ static void dview_draw_box(DView *dv, int rtype, int x, int y, int w, int h, rgb
 	rectangle r;
 
 	dview_get_rect(dv, rtype, &r);
-	render_container_add_rect(dv->container, NX(dv, x + r.min_x), NY(dv, y + r.min_y),
+	dv->container->add_rect(NX(dv, x + r.min_x), NY(dv, y + r.min_y),
 			NX(dv, x + r.min_x + w), NY(dv, y + r.min_y + h), col,
 			PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 }
@@ -391,14 +391,14 @@ static void dview_draw_char(DView *dv, int rtype, int x, int y, int h, rgb_t col
 	rectangle r;
 
 	dview_get_rect(dv, rtype, &r);
-	render_container_add_char(dv->container,
+	dv->container->add_char(
 			NX(dv, x + r.min_x),
 			NY(dv, y + r.min_y),
 			NY(dv, h),
 			debug_font_aspect,
 			//(float) rect_get_height(&dv->bounds) / (float) rect_get_width(&dv->bounds), //render_get_ui_aspect(),
 			col,
-			debug_font,
+			*debug_font,
 			ch);
 }
 
@@ -777,15 +777,15 @@ static void dview_draw(DView *dv)
 static void dview_size_allocate(DView *dv)
 {
 	debug_view_xy size, pos, col, vsize;
-	render_container_user_settings rcus;
+	render_container::user_settings rcus;
 	rectangle r;
 
-	render_container_get_user_settings(dv->container, &rcus);
-	rcus.xoffset = (float) dv->ofs_x / (float) dv->rt_width;
-	rcus.yoffset = (float) dv->ofs_y / (float) dv->rt_height;
-	rcus.xscale = 1.0; //(float) rect_get_width(&dv->bounds) / (float) dv->rt_width;
-	rcus.yscale = 1.0; //(float) rect_get_height(&dv->bounds) / (float) dv->rt_height;
-	render_container_set_user_settings(dv->container, &rcus);
+	dv->container->get_user_settings(rcus);
+	rcus.m_xoffset = (float) dv->ofs_x / (float) dv->rt_width;
+	rcus.m_yoffset = (float) dv->ofs_y / (float) dv->rt_height;
+	rcus.m_xscale = 1.0; //(float) rect_get_width(&dv->bounds) / (float) dv->rt_width;
+	rcus.m_yscale = 1.0; //(float) rect_get_height(&dv->bounds) / (float) dv->rt_height;
+	dv->container->set_user_settings(rcus);
 	//printf("%d %d %d %d\n", wpos.min_x, wpos.max_x, wpos.min_y, wpos.max_y);
 
 	pos = dv->view->visible_position();
@@ -899,7 +899,7 @@ void debugint_init(running_machine *machine)
 {
 	unicode_char ch;
 	int chw;
-	debug_font = render_font_alloc("ui.bdf"); //ui_get_font();
+	debug_font = render_font_alloc(*machine, "ui.bdf"); //ui_get_font();
 	debug_font_width = 0;
 	debug_font_height = 15;
 
@@ -908,7 +908,7 @@ void debugint_init(running_machine *machine)
 	list = NULL;
 	focus_view = NULL;
 
-	debug_font_aspect = render_get_ui_aspect();
+	debug_font_aspect = machine->render().ui_aspect();
 
 	for (ch=0;ch<=127;ch++)
 	{
@@ -930,14 +930,14 @@ static void set_view_by_name(render_target *target, const char *name)
 
 	for (i = 0; ; i++ )
 	{
-		s = render_target_get_view_name(target, i);
+		s = target->view_name(i);
 		if (s == NULL)
 			return;
 		//printf("%d %s\n", i, s);
 		if (strcmp(name, s) == 0)
 		{
-			render_target_set_view(target, i);
-			//printf("%d\n", render_target_get_view(target) );
+			target->set_view(i);
+			//printf("%d\n", target->view() );
 			return;
 		}
 	}
@@ -977,11 +977,11 @@ static void on_disassembly_window_activate(DView *dv, const ui_menu_event *event
 	render_target *target;
 	const debug_view_source *source;
 
-	target = render_get_ui_target();
+	target = &dv->machine->render().ui_target();
 
 	ndv = dview_alloc(target, dv->machine, DVT_DISASSEMBLY, 0);
 	ndv->editor.active = TRUE;
-	ndv->editor.container = render_container_get_ui();
+	ndv->editor.container = &dv->machine->render().ui_container();
 	source = ndv->view->source();
 	dview_set_title(ndv, source->name());
 	set_focus_view(ndv);
@@ -1010,7 +1010,7 @@ static void on_log_window_activate(DView *dv, const ui_menu_event *event)
 	DView *ndv;
 	render_target *target;
 
-	target = render_get_ui_target();
+	target = &dv->machine->render().ui_target();
 	ndv = dview_alloc(target, dv->machine, DVT_LOG, 0);
 	dview_set_title(ndv, "Log");
 	set_focus_view(ndv);
@@ -1125,7 +1125,7 @@ static void render_editor(DView_edit *editor)
 	float width, maxwidth;
 	float x1, y1, x2, y2;
 
-	render_container_empty(editor->container);
+	editor->container->empty();
 	/* get the size of the text */
 	ui_draw_text_full(editor->container, editor->str, 0.0f, 0.0f, 1.0f, JUSTIFY_CENTER, WRAP_TRUNCATE,
 					  DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &width, NULL);
@@ -1165,7 +1165,7 @@ static void CreateMainMenu(running_machine *machine)
 
 	if (menu != NULL)
 		ui_menu_free(menu);
-	menu = ui_menu_alloc(machine, render_container_get_ui(),NULL,NULL);
+	menu = ui_menu_alloc(machine, &machine->render().ui_container(),NULL,NULL);
 
 	switch (focus_view->type)
 	{
@@ -1348,7 +1348,7 @@ static void handle_menus(running_machine *machine)
 {
 	const ui_menu_event *event;
 
-	render_container_empty(render_container_get_ui());
+	machine->render().ui_container().empty();
 	ui_input_frame_update(*machine);
 	if (menu != NULL)
 	{
@@ -1414,7 +1414,8 @@ static void dview_update_view(DView *dv)
 	INT32 old_rt_width = dv->rt_width;
 	INT32 old_rt_height = dv->rt_height;
 
-	render_target_get_bounds(dv->target, &dv->rt_width, &dv->rt_height, NULL);
+	dv->rt_width = dv->target->width();
+	dv->rt_height = dv->target->height();
 	if (dview_is_state(dv, VIEW_STATE_NEEDS_UPDATE) || dv->rt_width != old_rt_width || dv->rt_height != old_rt_height)
 	{
 		dview_size_allocate(dv);
@@ -1446,24 +1447,24 @@ void debugint_wait_for_debugger(running_device *device, int firststop)
 		DView *dv;
 		render_target *target;
 
-		target = render_get_ui_target();
+		target = &device->machine->render().ui_target();
 
 		//set_view_by_name(target, "Debug");
 
 		dv = dview_alloc(target, device->machine, DVT_DISASSEMBLY, VIEW_STATE_FOLLOW_CPU);
 		dv->editor.active = TRUE;
-		dv->editor.container = render_container_get_ui();
+		dv->editor.container = &device->machine->render().ui_container();
 		dv = dview_alloc(target, device->machine, DVT_STATE, VIEW_STATE_FOLLOW_CPU);
 		dv = dview_alloc(target, device->machine, DVT_CONSOLE, VIEW_STATE_FOLLOW_CPU);
 		dview_set_title(dv, "Console");
 		dv->editor.active = TRUE;
-		dv->editor.container = render_container_get_ui();
+		dv->editor.container = &device->machine->render().ui_container();
 		set_focus_view(dv);
 	}
 
 	followers_set_cpu(device);
 
-	//ui_update_and_render(device->machine, render_container_get_ui());
+	//ui_update_and_render(device->machine, &device->machine->render().ui_container()());
 	update_views();
 	osd_update(device->machine, FALSE);
 	handle_menus(device->machine);

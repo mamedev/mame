@@ -1077,7 +1077,7 @@ void deco16ic_print_debug_info(running_device *device, bitmap_t *bitmap)
 
 	sprintf(&buf[strlen(buf)],"%04X", deco16ic->priority);
 
-	ui_draw_text(render_container_get_ui(), buf, 60, 40);
+	ui_draw_text(&device->machine->render().ui_container(), buf, 60, 40);
 }
 
 /*****************************************************************************************/

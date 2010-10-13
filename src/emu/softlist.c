@@ -1455,7 +1455,7 @@ void ui_image_menu_software(running_machine *machine, ui_menu *menu, void *param
 
 	if (event != NULL && event->iptkey == IPT_UI_SELECT)
 	{
-		ui_menu *child_menu = ui_menu_alloc(machine, render_container_get_ui(), ui_mess_menu_software_list, NULL);
+		ui_menu *child_menu = ui_menu_alloc(machine, &machine->render().ui_container(), ui_mess_menu_software_list, NULL);
 		software_menu_state *child_menustate = (software_menu_state *)ui_menu_alloc_state(child_menu, sizeof(*child_menustate), NULL);
 		child_menustate->list_name = (char *)event->itemref;
 		child_menustate->image = image;

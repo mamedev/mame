@@ -96,6 +96,7 @@ struct _element_texture
 struct _layout_element
 {
 	layout_element *	next;				/* link to next element */
+	running_machine *	machine;
 	const char *		name;				/* name of this element */
 	element_component *	complist;			/* head of the list of components */
 	int					defstate;			/* default state of this element */
@@ -164,7 +165,7 @@ void layout_view_recompute(layout_view *view, int layerconfig);
 
 
 /* ----- layout file parsing ----- */
-layout_file *layout_file_load(const machine_config *config, const char *dirname, const char *filename);
+layout_file *layout_file_load(running_machine &machine, const char *dirname, const char *filename);
 void layout_file_free(layout_file *file);
 
 

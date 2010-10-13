@@ -215,7 +215,7 @@ VIDEO_UPDATE( test_vcu )
 	if (dbg_info)
 	{
 		sprintf(buf,"I-info, G-gfx, C-color, V-vbank, 1-4 enable planes");
-		ui_draw_text(buf, 10, 0 * ui_get_line_height());
+		ui_draw_text(buf, 10, 0 * ui_get_line_height(*screen->machine));
 
 		sprintf(buf,"g:%1i c:%1i v:%1i vbk=%1i  planes=%1i%1i%1i%1i  ", dbg_gfx_e&1, dbg_clr_e&1, dbg_vbank, vbank&1,
 			planes_enabled[0],
@@ -223,7 +223,7 @@ VIDEO_UPDATE( test_vcu )
 			planes_enabled[2],
 			planes_enabled[3] );
 
-		ui_draw_text(buf, 10, 1 * ui_get_line_height());
+		ui_draw_text(buf, 10, 1 * ui_get_line_height(*screen->machine));
 
 		if (dbg_lookup!=4)
 		{
@@ -238,7 +238,7 @@ VIDEO_UPDATE( test_vcu )
 				{
 					sprintf(buf + strlen(buf), "%02x ", lookup_ram[lookup_offs + x + y * 16]);
 				}
-				ui_draw_text(buf, 0, (2 + y) * ui_get_line_height());
+				ui_draw_text(buf, 0, (2 + y) * ui_get_line_height(*screen->machine));
 			}
 		}
 	}

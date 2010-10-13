@@ -439,7 +439,7 @@ INLINE void reset_render_states(d3d_info *d3d)
 static void drawd3d_exit(void);
 static int drawd3d_window_init(win_window_info *window);
 static void drawd3d_window_destroy(win_window_info *window);
-static const render_primitive_list *drawd3d_window_get_primitives(win_window_info *window);
+static render_primitive_list *drawd3d_window_get_primitives(win_window_info *window);
 static int drawd3d_window_draw(win_window_info *window, HDC dc, int update);
 
 // devices
@@ -591,7 +591,7 @@ static void drawd3d_window_destroy(win_window_info *window)
 //  drawd3d_window_get_primitives
 //============================================================
 
-static const render_primitive_list *drawd3d_window_get_primitives(win_window_info *window)
+static render_primitive_list *drawd3d_window_get_primitives(win_window_info *window)
 {
 	d3d_info *d3d = (d3d_info *)window->drawdata;
 	RECT client;
@@ -599,10 +599,10 @@ static const render_primitive_list *drawd3d_window_get_primitives(win_window_inf
 	GetClientRectExceptMenu(window->hwnd, &client, window->fullscreen);
 	if (rect_width(&client) > 0 && rect_height(&client) > 0)
 	{
-		render_target_set_bounds(window->target, rect_width(&client), rect_height(&client), winvideo_monitor_get_aspect(window->monitor));
-		render_target_set_max_update_rate(window->target, (d3d->refresh == 0) ? d3d->origmode.RefreshRate : d3d->refresh);
+		window->target->set_bounds(rect_width(&client), rect_height(&client), winvideo_monitor_get_aspect(window->monitor));
+		window->target->set_max_update_rate((d3d->refresh == 0) ? d3d->origmode.RefreshRate : d3d->refresh);
 	}
-	return render_target_get_primitives(window->target);
+	return &window->target->get_primitives();
 }
 
 
@@ -614,7 +614,7 @@ static const render_primitive_list *drawd3d_window_get_primitives(win_window_inf
 static int drawd3d_window_draw(win_window_info *window, HDC dc, int update)
 {
 	d3d_info *d3d = (d3d_info *)window->drawdata;
-	const render_primitive *prim;
+	render_primitive *prim;
 	HRESULT result;
 
 	// if we haven't been created, just punt
@@ -644,8 +644,8 @@ static int drawd3d_window_draw(win_window_info *window, HDC dc, int update)
 mtlog_add("drawd3d_window_draw: begin");
 
 	// first update any textures
-	osd_lock_acquire(window->primlist->lock);
-	for (prim = window->primlist->head; prim != NULL; prim = prim->next)
+	window->primlist->acquire_lock();
+	for (prim = window->primlist->first(); prim != NULL; prim = prim->next())
 		if (prim->texture.base != NULL)
 			texture_update(d3d, prim);
 
@@ -658,19 +658,22 @@ mtlog_add("drawd3d_window_draw: begin_scene");
 
 	// loop over primitives
 mtlog_add("drawd3d_window_draw: primitive loop begin");
-	for (prim = window->primlist->head; prim != NULL; prim = prim->next)
+	for (prim = window->primlist->first(); prim != NULL; prim = prim->next())
 		switch (prim->type)
 		{
-			case RENDER_PRIMITIVE_LINE:
+			case render_primitive::LINE:
 				draw_line(d3d, prim);
 				break;
 
-			case RENDER_PRIMITIVE_QUAD:
+			case render_primitive::QUAD:
 				draw_quad(d3d, prim);
 				break;
+			
+			default:
+				throw emu_fatalerror("Unexpected render_primitive type");
 		}
 mtlog_add("drawd3d_window_draw: primitive loop end");
-	osd_lock_release(window->primlist->lock);
+	window->primlist->release_lock();
 
 	// flush any pending polygons
 mtlog_add("drawd3d_window_draw: flush_pending begin");
@@ -796,7 +799,7 @@ try_again:
 	mame_printf_verbose("Direct3D: Device created at %dx%d\n", d3d->width, d3d->height);
 
 	// set the max texture size
-	render_target_set_max_texture_size(window->target, d3d->texture_max_width, d3d->texture_max_height);
+	window->target->set_max_texture_size(d3d->texture_max_width, d3d->texture_max_height);
 	mame_printf_verbose("Direct3D: Max texture size = %dx%d\n", (int)d3d->texture_max_width, (int)d3d->texture_max_height);
 
 	// set the gamma if we need to
@@ -1288,7 +1291,7 @@ static void pick_best_mode(win_window_info *window)
 	// note: technically we should not be calling this from an alternate window
 	// thread; however, it is only done during init time, and the init code on
 	// the main thread is waiting for us to finish, so it is safe to do so here
-	render_target_get_minimum_size(window->target, &minwidth, &minheight);
+	window->target->compute_minimum_size(minwidth, minheight);
 
 	// use those as the target for now
 	target_width = minwidth;

@@ -411,7 +411,7 @@ static int (**dpix_sp[9])(UINT32 s_pix);
 
 /******************************************************************************/
 
-static void print_debug_info(bitmap_t *bitmap)
+static void print_debug_info(running_machine *machine, bitmap_t *bitmap)
 {
 	int l[16];
 	char buf[64*16];
@@ -480,7 +480,7 @@ static void print_debug_info(bitmap_t *bitmap)
 	l[3]=f3_line_ram[0x15e0]&0xffff;
 	bufptr += sprintf(bufptr,"5000: %04x %04x %04x %04x\n",l[0],l[1],l[2],l[3]);
 
-	ui_draw_text(render_container_get_ui(), buf, 60, 40);
+	ui_draw_text(&machine->render().ui_container(), buf, 60, 40);
 }
 
 /******************************************************************************/
@@ -3292,6 +3292,6 @@ VIDEO_UPDATE( f3 )
 	scanline_draw(screen->machine, bitmap,cliprect);
 
 	if (VERBOSE)
-		print_debug_info(bitmap);
+		print_debug_info(screen->machine, bitmap);
 	return 0;
 }

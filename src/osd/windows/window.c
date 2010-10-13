@@ -636,18 +636,16 @@ void winwindow_video_window_create(running_machine *machine, int index, win_moni
 	window->render_lock = osd_lock_alloc();
 
 	// load the layout
-	window->target = render_target_alloc(machine, NULL, 0);
-	if (window->target == NULL)
-		fatalerror("Error creating render target for window %d", index);
+	window->target = machine->render().target_alloc();
 
 	// set the specific view
 	sprintf(option, "view%d", index);
 	set_starting_view(index, window, options_get_string(machine->options(), option));
 
 	// remember the current values in case they change
-	window->targetview = render_target_get_view(window->target);
-	window->targetorient = render_target_get_orientation(window->target);
-	window->targetlayerconfig = render_target_get_layer_config(window->target);
+	window->targetview = window->target->view();
+	window->targetorient = window->target->orientation();
+	window->targetlayerconfig = window->target->layer_config();
 
 	// make the window title
 	if (video_config.numscreens == 1)
@@ -702,8 +700,7 @@ static void winwindow_video_window_destroy(win_window_info *window)
 		SendMessage(window->hwnd, WM_USER_SELF_TERMINATE, 0, 0);
 
 	// free the render target
-	if (window->target != NULL)
-		render_target_free(window->target);
+	window->machine->render().target_free(window->target);
 
 	// free the lock
 	osd_lock_free(window->render_lock);
@@ -728,9 +725,9 @@ void winwindow_video_window_update(win_window_info *window)
 	mtlog_add("winwindow_video_window_update: begin");
 
 	// see if the target has changed significantly in window mode
-	targetview = render_target_get_view(window->target);
-	targetorient = render_target_get_orientation(window->target);
-	targetlayerconfig = render_target_get_layer_config(window->target);
+	targetview = window->target->view();
+	targetorient = window->target->orientation();
+	targetlayerconfig = window->target->layer_config();
 	if (targetview != window->targetview || targetorient != window->targetorient || targetlayerconfig != window->targetlayerconfig)
 	{
 		window->targetview = targetview;
@@ -763,7 +760,7 @@ void winwindow_video_window_update(win_window_info *window)
 		// only render if we were able to get the lock
 		if (got_lock)
 		{
-			const render_primitive_list *primlist;
+			render_primitive_list *primlist;
 
 			mtlog_add("winwindow_video_window_update: got lock");
 
@@ -873,7 +870,7 @@ static void set_starting_view(int index, win_window_info *window, const char *vi
 	viewindex = video_get_view_for_target(window->machine, window->target, view, index, video_config.numscreens);
 
 	// set the view
-	render_target_set_view(window->target, viewindex);
+	window->target->set_view(viewindex);
 }
 
 
@@ -1361,7 +1358,7 @@ LRESULT CALLBACK winwindow_video_window_proc(HWND wnd, UINT message, WPARAM wpar
 			HDC hdc = GetDC(wnd);
 
 			mtlog_add("winwindow_video_window_proc: WM_USER_REDRAW begin");
-			window->primlist = (const render_primitive_list *)lparam;
+			window->primlist = (render_primitive_list *)lparam;
 			draw_video_contents(window, hdc, FALSE);
 			mtlog_add("winwindow_video_window_proc: WM_USER_REDRAW end");
 
@@ -1480,21 +1477,21 @@ static void constrain_to_aspect_ratio(win_window_info *window, RECT *rect, int a
 	{
 		case WMSZ_BOTTOM:
 		case WMSZ_TOP:
-			render_target_compute_visible_area(window->target, 10000, propheight, pixel_aspect, render_target_get_orientation(window->target), &propwidth, &propheight);
+			window->target->compute_visible_area(10000, propheight, pixel_aspect, window->target->orientation(), propwidth, propheight);
 			break;
 
 		case WMSZ_LEFT:
 		case WMSZ_RIGHT:
-			render_target_compute_visible_area(window->target, propwidth, 10000, pixel_aspect, render_target_get_orientation(window->target), &propwidth, &propheight);
+			window->target->compute_visible_area(propwidth, 10000, pixel_aspect, window->target->orientation(), propwidth, propheight);
 			break;
 
 		default:
-			render_target_compute_visible_area(window->target, propwidth, propheight, pixel_aspect, render_target_get_orientation(window->target), &propwidth, &propheight);
+			window->target->compute_visible_area(propwidth, propheight, pixel_aspect, window->target->orientation(), propwidth, propheight);
 			break;
 	}
 
 	// get the minimum width/height for the current layout
-	render_target_get_minimum_size(window->target, &minwidth, &minheight);
+	window->target->compute_minimum_size(minwidth, minheight);
 
 	// clamp against the absolute minimum
 	propwidth = MAX(propwidth, MIN_WINDOW_DIM);
@@ -1527,7 +1524,7 @@ static void constrain_to_aspect_ratio(win_window_info *window, RECT *rect, int a
 	propheight = MIN(propheight, maxheight);
 
 	// compute the visible area based on the proposed rectangle
-	render_target_compute_visible_area(window->target, propwidth, propheight, pixel_aspect, render_target_get_orientation(window->target), &viswidth, &visheight);
+	window->target->compute_visible_area(propwidth, propheight, pixel_aspect, window->target->orientation(), viswidth, visheight);
 
 	// compute the adjustments we need to make
 	adjwidth = (viswidth + extrawidth) - rect_width(rect);
@@ -1576,7 +1573,7 @@ static void get_min_bounds(win_window_info *window, RECT *bounds, int constrain)
 	assert(GetCurrentThreadId() == window_threadid);
 
 	// get the minimum target size
-	render_target_get_minimum_size(window->target, &minwidth, &minheight);
+	window->target->compute_minimum_size(minwidth, minheight);
 
 	// expand to our minimum dimensions
 	if (minwidth < MIN_WINDOW_DIM)

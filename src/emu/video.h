@@ -72,7 +72,7 @@ enum screen_type_enum
 
 // forward references
 class render_target;
-struct render_texture;
+class render_texture;
 class screen_device;
 
 
@@ -155,6 +155,7 @@ public:
 	int height() const { return m_height; }
 	const rectangle &visible_area() const { return m_visarea; }
 	bitmap_format format() const { return m_config.m_format; }
+	render_container &container() const { assert(m_container != NULL); return *m_container; }
 
 	// dynamic configuration
 	void configure(int width, int height, const rectangle &visarea, attoseconds_t frame_period);
@@ -218,6 +219,7 @@ private:
 
 	// internal state
 	const screen_device_config &m_config;
+	render_container *		m_container;			// pointer to our container
 
 	// dimensions
 	int						m_width;				// current width (HTOTAL)

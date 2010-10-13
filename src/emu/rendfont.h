@@ -20,7 +20,7 @@
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-render_font *render_font_alloc(const char *filename);
+render_font *render_font_alloc(running_machine &machine, const char *filename);
 void render_font_free(render_font *font);
 INT32 render_font_get_pixel_height(render_font *font);
 render_texture *render_font_get_char_texture_and_bounds(render_font *font, float height, float aspect, unicode_char ch, render_bounds *bounds);

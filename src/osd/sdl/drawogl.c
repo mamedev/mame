@@ -349,7 +349,7 @@ static int drawogl_window_create(sdl_window_info *window, int width, int height)
 static void drawogl_window_resize(sdl_window_info *window, int width, int height);
 static void drawogl_window_destroy(sdl_window_info *window);
 static int drawogl_window_draw(sdl_window_info *window, UINT32 dc, int update);
-static const render_primitive_list *drawogl_window_get_primitives(sdl_window_info *window);
+static render_primitive_list &drawogl_window_get_primitives(sdl_window_info *window);
 static void drawogl_destroy_all_textures(sdl_window_info *window);
 static void drawogl_window_clear(sdl_window_info *window);
 static int drawogl_xy_to_render_target(sdl_window_info *window, int x, int y, int *xt, int *yt);
@@ -837,7 +837,7 @@ static int drawogl_xy_to_render_target(sdl_window_info *window, int x, int y, in
 //  drawogl_window_get_primitives
 //============================================================
 
-static const render_primitive_list *drawogl_window_get_primitives(sdl_window_info *window)
+static render_primitive_list &drawogl_window_get_primitives(sdl_window_info *window)
 {
 	if ((!window->fullscreen) || (video_config.switchres))
 	{
@@ -847,8 +847,8 @@ static const render_primitive_list *drawogl_window_get_primitives(sdl_window_inf
 	{
 		sdlwindow_blit_surface_size(window, window->monitor->center_width, window->monitor->center_height);
 	}
-	render_target_set_bounds(window->target, window->blitwidth, window->blitheight, sdlvideo_monitor_get_aspect(window->monitor));
-	return render_target_get_primitives(window->target);
+	window->target->set_bounds(window->blitwidth, window->blitheight, sdlvideo_monitor_get_aspect(window->monitor));
+	return window->target->get_primitives();
 }
 
 //============================================================
@@ -1324,10 +1324,10 @@ static int drawogl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 	sdl->last_hofs = hofs;
 	sdl->last_vofs = vofs;
 
-	osd_lock_acquire(window->primlist->lock);
+	window->primlist->acquire_lock();
 
 	// now draw
-	for (prim = window->primlist->head; prim != NULL; prim = prim->next)
+	for (prim = window->primlist->first(); prim != NULL; prim = prim->next())
 	{
 		int i;
 
@@ -1337,7 +1337,7 @@ static int drawogl_window_draw(sdl_window_info *window, UINT32 dc, int update)
              * Try to stay in one Begin/End block as long as possible,
              * since entering and leaving one is most expensive..
              */
-			case RENDER_PRIMITIVE_LINE:
+			case render_primitive::LINE:
 				#if !USE_WIN32_STYLE_LINES
 				// check if it's really a point
 				if (((prim->bounds.x1 - prim->bounds.x0) == 0) && ((prim->bounds.y1 - prim->bounds.y0) == 0))
@@ -1465,7 +1465,7 @@ static int drawogl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 				#endif
 				break;
 
-			case RENDER_PRIMITIVE_QUAD:
+			case render_primitive::QUAD:
 
 				if(pendingPrimitive!=GL_NO_PRIMITIVE)
 				{
@@ -1531,6 +1531,9 @@ static int drawogl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 					texture=NULL;
 				}
 				break;
+			
+			default:
+				throw emu_fatalerror("Unexpected render_primitive type");
 		}
 	}
 
@@ -1540,7 +1543,7 @@ static int drawogl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 		pendingPrimitive=GL_NO_PRIMITIVE;
 	}
 
-	osd_lock_release(window->primlist->lock);
+	window->primlist->release_lock();
 	sdl->init_context = 0;
 
 #if (!SDL_VERSION_ATLEAST(1,3,0))
@@ -2945,7 +2948,7 @@ static void texture_shader_update(sdl_window_info *window, texture_info *texture
 		{
 			if (scrnum == window->start_viewscreen)
 			{
-				container = render_container_get_screen(screen);
+				container = &screen->container();
 			}
 
 			scrnum++;
@@ -2953,8 +2956,8 @@ static void texture_shader_update(sdl_window_info *window, texture_info *texture
 
 		if (container!=NULL)
 		{
-			render_container_user_settings settings;
-			render_container_get_user_settings(container, &settings);
+			render_container::user_settings settings;
+			container->get_user_settings(settings);
 			//FIXME: Intended behaviour
 #if 1
 			vid_attributes[0] = options_get_float(window->machine->options(), OPTION_GAMMA);
@@ -3128,10 +3131,10 @@ static void drawogl_destroy_all_textures(sdl_window_info *window)
 	SDL_GL_MakeCurrent(window->sdl_window, sdl->gl_context_id);
 #endif
 
-	if(window->primlist && window->primlist->lock)
+	if(window->primlist)
 	{
 		lock=TRUE;
-		osd_lock_acquire(window->primlist->lock);
+		window->primlist->acquire_lock();
 	}
 
 	glFinish();
@@ -3210,7 +3213,7 @@ static void drawogl_destroy_all_textures(sdl_window_info *window)
 	sdl->initialized = 0;
 
 	if (lock)
-		osd_lock_release(window->primlist->lock);
+		window->primlist->release_lock();
 }
 
 //============================================================

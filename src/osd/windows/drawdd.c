@@ -178,7 +178,7 @@ INLINE int better_mode(int width0, int height0, int width1, int height1, float d
 static void drawdd_exit(void);
 static int drawdd_window_init(win_window_info *window);
 static void drawdd_window_destroy(win_window_info *window);
-static const render_primitive_list *drawdd_window_get_primitives(win_window_info *window);
+static render_primitive_list *drawdd_window_get_primitives(win_window_info *window);
 static int drawdd_window_draw(win_window_info *window, HDC dc, int update);
 
 // surface management
@@ -201,14 +201,14 @@ static void get_adapter_for_monitor(dd_info *dd, win_monitor_info *monitor);
 static void pick_best_mode(win_window_info *window);
 
 // rendering
-static void drawdd_rgb888_draw_primitives(const render_primitive *primlist, void *dstdata, UINT32 width, UINT32 height, UINT32 pitch);
-static void drawdd_bgr888_draw_primitives(const render_primitive *primlist, void *dstdata, UINT32 width, UINT32 height, UINT32 pitch);
-static void drawdd_rgb565_draw_primitives(const render_primitive *primlist, void *dstdata, UINT32 width, UINT32 height, UINT32 pitch);
-static void drawdd_rgb555_draw_primitives(const render_primitive *primlist, void *dstdata, UINT32 width, UINT32 height, UINT32 pitch);
-static void drawdd_rgb888_nr_draw_primitives(const render_primitive *primlist, void *dstdata, UINT32 width, UINT32 height, UINT32 pitch);
-static void drawdd_bgr888_nr_draw_primitives(const render_primitive *primlist, void *dstdata, UINT32 width, UINT32 height, UINT32 pitch);
-static void drawdd_rgb565_nr_draw_primitives(const render_primitive *primlist, void *dstdata, UINT32 width, UINT32 height, UINT32 pitch);
-static void drawdd_rgb555_nr_draw_primitives(const render_primitive *primlist, void *dstdata, UINT32 width, UINT32 height, UINT32 pitch);
+static void drawdd_rgb888_draw_primitives(const render_primitive_list &primlist, void *dstdata, UINT32 width, UINT32 height, UINT32 pitch);
+static void drawdd_bgr888_draw_primitives(const render_primitive_list &primlist, void *dstdata, UINT32 width, UINT32 height, UINT32 pitch);
+static void drawdd_rgb565_draw_primitives(const render_primitive_list &primlist, void *dstdata, UINT32 width, UINT32 height, UINT32 pitch);
+static void drawdd_rgb555_draw_primitives(const render_primitive_list &primlist, void *dstdata, UINT32 width, UINT32 height, UINT32 pitch);
+static void drawdd_rgb888_nr_draw_primitives(const render_primitive_list &primlist, void *dstdata, UINT32 width, UINT32 height, UINT32 pitch);
+static void drawdd_bgr888_nr_draw_primitives(const render_primitive_list &primlist, void *dstdata, UINT32 width, UINT32 height, UINT32 pitch);
+static void drawdd_rgb565_nr_draw_primitives(const render_primitive_list &primlist, void *dstdata, UINT32 width, UINT32 height, UINT32 pitch);
+static void drawdd_rgb555_nr_draw_primitives(const render_primitive_list &primlist, void *dstdata, UINT32 width, UINT32 height, UINT32 pitch);
 
 
 
@@ -327,15 +327,15 @@ static void drawdd_window_destroy(win_window_info *window)
 //  drawdd_window_get_primitives
 //============================================================
 
-static const render_primitive_list *drawdd_window_get_primitives(win_window_info *window)
+static render_primitive_list *drawdd_window_get_primitives(win_window_info *window)
 {
 	dd_info *dd = (dd_info *)window->drawdata;
 
 	compute_blit_surface_size(window);
-	render_target_set_bounds(window->target, dd->blitwidth, dd->blitheight, 0);
-	render_target_set_max_update_rate(window->target, (dd->refresh == 0) ? dd->origmode.dwRefreshRate : dd->refresh);
+	window->target->set_bounds(dd->blitwidth, dd->blitheight, 0);
+	window->target->set_max_update_rate((dd->refresh == 0) ? dd->origmode.dwRefreshRate : dd->refresh);
 
-	return render_target_get_primitives(window->target);
+	return &window->target->get_primitives();
 }
 
 
@@ -347,7 +347,7 @@ static const render_primitive_list *drawdd_window_get_primitives(win_window_info
 static int drawdd_window_draw(win_window_info *window, HDC dc, int update)
 {
 	dd_info *dd = (dd_info *)window->drawdata;
-	const render_primitive *prim;
+	render_primitive *prim;
 	int usemembuffer = FALSE;
 	HRESULT result;
 
@@ -386,10 +386,10 @@ static int drawdd_window_draw(win_window_info *window, HDC dc, int update)
 	}
 
 	// render to it
-	osd_lock_acquire(window->primlist->lock);
+	window->primlist->acquire_lock();
 
 	// scan the list of primitives for tricky stuff
-	for (prim = window->primlist->head; prim != NULL; prim = prim->next)
+	for (prim = window->primlist->first(); prim != NULL; prim = prim->next())
 		if (PRIMFLAG_GET_BLENDMODE(prim->flags) != BLENDMODE_NONE ||
 			(prim->texture.base != NULL && PRIMFLAG_GET_TEXFORMAT(prim->flags) == TEXFORMAT_ARGB32))
 		{
@@ -405,10 +405,10 @@ static int drawdd_window_draw(win_window_info *window, HDC dc, int update)
 		// based on the target format, use one of our standard renderers
 		switch (dd->blitdesc.ddpfPixelFormat.dwRBitMask)
 		{
-			case 0x00ff0000:	drawdd_rgb888_draw_primitives(window->primlist->head, dd->membuffer, dd->blitwidth, dd->blitheight, dd->blitwidth);	break;
-			case 0x000000ff:	drawdd_bgr888_draw_primitives(window->primlist->head, dd->membuffer, dd->blitwidth, dd->blitheight, dd->blitwidth);	break;
-			case 0xf800:		drawdd_rgb565_draw_primitives(window->primlist->head, dd->membuffer, dd->blitwidth, dd->blitheight, dd->blitwidth);	break;
-			case 0x7c00:		drawdd_rgb555_draw_primitives(window->primlist->head, dd->membuffer, dd->blitwidth, dd->blitheight, dd->blitwidth);	break;
+			case 0x00ff0000:	drawdd_rgb888_draw_primitives(*window->primlist, dd->membuffer, dd->blitwidth, dd->blitheight, dd->blitwidth);	break;
+			case 0x000000ff:	drawdd_bgr888_draw_primitives(*window->primlist, dd->membuffer, dd->blitwidth, dd->blitheight, dd->blitwidth);	break;
+			case 0xf800:		drawdd_rgb565_draw_primitives(*window->primlist, dd->membuffer, dd->blitwidth, dd->blitheight, dd->blitwidth);	break;
+			case 0x7c00:		drawdd_rgb555_draw_primitives(*window->primlist, dd->membuffer, dd->blitwidth, dd->blitheight, dd->blitwidth);	break;
 			default:
 				mame_printf_verbose("DirectDraw: Unknown target mode: R=%08X G=%08X B=%08X\n", (int)dd->blitdesc.ddpfPixelFormat.dwRBitMask, (int)dd->blitdesc.ddpfPixelFormat.dwGBitMask, (int)dd->blitdesc.ddpfPixelFormat.dwBBitMask);
 				break;
@@ -441,16 +441,16 @@ static int drawdd_window_draw(win_window_info *window, HDC dc, int update)
 		// based on the target format, use one of our standard renderers
 		switch (dd->blitdesc.ddpfPixelFormat.dwRBitMask)
 		{
-			case 0x00ff0000:	drawdd_rgb888_nr_draw_primitives(window->primlist->head, dd->blitdesc.lpSurface, dd->blitwidth, dd->blitheight, dd->blitdesc.lPitch / 4);	break;
-			case 0x000000ff:	drawdd_bgr888_nr_draw_primitives(window->primlist->head, dd->blitdesc.lpSurface, dd->blitwidth, dd->blitheight, dd->blitdesc.lPitch / 4);	break;
-			case 0xf800:		drawdd_rgb565_nr_draw_primitives(window->primlist->head, dd->blitdesc.lpSurface, dd->blitwidth, dd->blitheight, dd->blitdesc.lPitch / 2);	break;
-			case 0x7c00:		drawdd_rgb555_nr_draw_primitives(window->primlist->head, dd->blitdesc.lpSurface, dd->blitwidth, dd->blitheight, dd->blitdesc.lPitch / 2);	break;
+			case 0x00ff0000:	drawdd_rgb888_nr_draw_primitives(*window->primlist, dd->blitdesc.lpSurface, dd->blitwidth, dd->blitheight, dd->blitdesc.lPitch / 4);	break;
+			case 0x000000ff:	drawdd_bgr888_nr_draw_primitives(*window->primlist, dd->blitdesc.lpSurface, dd->blitwidth, dd->blitheight, dd->blitdesc.lPitch / 4);	break;
+			case 0xf800:		drawdd_rgb565_nr_draw_primitives(*window->primlist, dd->blitdesc.lpSurface, dd->blitwidth, dd->blitheight, dd->blitdesc.lPitch / 2);	break;
+			case 0x7c00:		drawdd_rgb555_nr_draw_primitives(*window->primlist, dd->blitdesc.lpSurface, dd->blitwidth, dd->blitheight, dd->blitdesc.lPitch / 2);	break;
 			default:
 				mame_printf_verbose("DirectDraw: Unknown target mode: R=%08X G=%08X B=%08X\n", (int)dd->blitdesc.ddpfPixelFormat.dwRBitMask, (int)dd->blitdesc.ddpfPixelFormat.dwGBitMask, (int)dd->blitdesc.ddpfPixelFormat.dwBBitMask);
 				break;
 		}
 	}
-	osd_lock_release(window->primlist->lock);
+	window->primlist->release_lock();
 
 	// unlock and blit
 	result = IDirectDrawSurface7_Unlock(dd->blit, NULL);
@@ -879,7 +879,7 @@ static void compute_blit_surface_size(win_window_info *window)
 	RECT client;
 
 	// start with the minimum size
-	render_target_get_minimum_size(window->target, &newwidth, &newheight);
+	window->target->compute_minimum_size(newwidth, newheight);
 
 	// get the window's client rectangle
 	GetClientRect(window->hwnd, &client);
@@ -909,7 +909,7 @@ static void compute_blit_surface_size(win_window_info *window)
 		if (video_config.keepaspect)
 		{
 			win_monitor_info *monitor = winwindow_video_window_monitor(window, NULL);
-			render_target_compute_visible_area(window->target, target_width, target_height, winvideo_monitor_get_aspect(monitor), render_target_get_orientation(window->target), &target_width, &target_height);
+			window->target->compute_visible_area(target_width, target_height, winvideo_monitor_get_aspect(monitor), window->target->orientation(), target_width, target_height);
 			desired_aspect = (float)target_width / (float)target_height;
 		}
 
@@ -1054,7 +1054,7 @@ static void blit_to_primary(win_window_info *window, int srcwidth, int srcheight
 	else if (video_config.keepaspect)
 	{
 		// compute the appropriate visible area
-		render_target_compute_visible_area(window->target, rect_width(&outer), rect_height(&outer), winvideo_monitor_get_aspect(monitor), render_target_get_orientation(window->target), &dstwidth, &dstheight);
+		window->target->compute_visible_area(rect_width(&outer), rect_height(&outer), winvideo_monitor_get_aspect(monitor), window->target->orientation(), dstwidth, dstheight);
 	}
 
 	// center within
@@ -1325,7 +1325,7 @@ static void pick_best_mode(win_window_info *window)
 	// note: technically we should not be calling this from an alternate window
 	// thread; however, it is only done during init time, and the init code on
 	// the main thread is waiting for us to finish, so it is safe to do so here
-	render_target_get_minimum_size(window->target, &einfo.minimum_width, &einfo.minimum_height);
+	window->target->compute_minimum_size(einfo.minimum_width, einfo.minimum_height);
 
 	// use those as the target for now
 	einfo.target_width = einfo.minimum_width * MAX(1, video_config.prescale);

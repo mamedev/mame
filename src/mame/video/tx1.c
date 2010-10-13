@@ -124,7 +124,6 @@ static UINT8 *tx1_obj_bmp;
 static UINT8 *tx1_rod_bmp;
 
 static bitmap_t *tx1_bitmap;
-static render_texture *tx1_texture;
 
 
 /***************************************************************************
@@ -1122,7 +1121,6 @@ VIDEO_START( tx1 )
 {
 	/* Allocate a large bitmap that covers the three screens */
 	tx1_bitmap = auto_bitmap_alloc(machine, 768, 256, BITMAP_FORMAT_INDEXED16);
-	tx1_texture = render_texture_alloc(NULL, NULL);
 
 	/* Allocate some bitmaps */
 	tx1_chr_bmp = auto_alloc_array(machine, UINT8, 256 * 3 * 240);

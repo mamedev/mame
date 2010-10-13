@@ -490,7 +490,7 @@ static void load_effect_overlay(running_machine *machine, const char *filename)
 
 	// set the overlay on all screens
 	for (screen_device *screen = screen_first(*machine); screen != NULL; screen = screen_next(screen))
-		render_container_set_overlay(render_container_get_screen(screen), effect_bitmap);
+		screen->container().set_overlay(effect_bitmap);
 
 	global_free(tempstr);
 }

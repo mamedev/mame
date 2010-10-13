@@ -136,8 +136,7 @@ void ui_gfx_init(running_machine *machine)
 static void ui_gfx_exit(running_machine &machine)
 {
 	/* free the texture */
-	if (ui_gfx.texture != NULL)
-		render_texture_free(ui_gfx.texture);
+	machine.render().texture_free(ui_gfx.texture);
 	ui_gfx.texture = NULL;
 
 	/* free the bitmap */
@@ -253,8 +252,8 @@ static void palette_handler(running_machine *machine, render_container *containe
 	int x, y, skip;
 
 	/* add a half character padding for the box */
-	chheight = ui_get_line_height();
-	chwidth = render_font_get_char_width(ui_font, chheight, render_get_ui_aspect(), '0');
+	chheight = ui_get_line_height(*machine);
+	chwidth = render_font_get_char_width(ui_font, chheight, machine->render().ui_aspect(), '0');
 	boxbounds.x0 = 0.0f + 0.5f * chwidth;
 	boxbounds.x1 = 1.0f - 0.5f * chwidth;
 	boxbounds.y0 = 0.0f + 0.5f * chheight;
@@ -274,7 +273,7 @@ static void palette_handler(running_machine *machine, render_container *containe
 	cellboxbounds.y0 += 3.0f * chheight;
 
 	/* figure out the title and expand the outer box to fit */
-	titlewidth = render_font_get_string_width(ui_font, chheight, render_get_ui_aspect(), title);
+	titlewidth = render_font_get_string_width(ui_font, chheight, machine->render().ui_aspect(), title);
 	x0 = 0.0f;
 	if (boxbounds.x1 - boxbounds.x0 < titlewidth + chwidth)
 		x0 = boxbounds.x0 - (0.5f - 0.5f * (titlewidth + chwidth));
@@ -287,8 +286,8 @@ static void palette_handler(running_machine *machine, render_container *containe
 	y0 = boxbounds.y0 + 0.5f * chheight;
 	for (x = 0; title[x] != 0; x++)
 	{
-		render_container_add_char(container, x0, y0, chheight, render_get_ui_aspect(), ARGB_WHITE, ui_font, title[x]);
-		x0 += render_font_get_char_width(ui_font, chheight, render_get_ui_aspect(), title[x]);
+		container->add_char(x0, y0, chheight, machine->render().ui_aspect(), ARGB_WHITE, *ui_font, title[x]);
+		x0 += render_font_get_char_width(ui_font, chheight, machine->render().ui_aspect(), title[x]);
 	}
 
 	/* compute the cell size */
@@ -301,12 +300,12 @@ static void palette_handler(running_machine *machine, render_container *containe
 	{
 		x0 = boxbounds.x0 + 6.0f * chwidth + (float)x * cellwidth;
 		y0 = boxbounds.y0 + 2.0f * chheight;
-		render_container_add_char(container, x0 + 0.5f * (cellwidth - chwidth), y0, chheight, render_get_ui_aspect(), ARGB_WHITE, ui_font, "0123456789ABCDEF"[x & 0xf]);
+		container->add_char(x0 + 0.5f * (cellwidth - chwidth), y0, chheight, machine->render().ui_aspect(), ARGB_WHITE, *ui_font, "0123456789ABCDEF"[x & 0xf]);
 
 		/* if we're skipping, draw a point between the character and the box to indicate which */
 		/* one it's referring to */
 		if (skip != 0)
-			render_container_add_point(container, x0 + 0.5f * cellwidth, 0.5f * (y0 + chheight + cellboxbounds.y0), UI_LINE_WIDTH, ARGB_WHITE, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+			container->add_point(x0 + 0.5f * cellwidth, 0.5f * (y0 + chheight + cellboxbounds.y0), UI_LINE_WIDTH, ARGB_WHITE, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 	}
 
 	/* draw the side column headers */
@@ -323,14 +322,14 @@ static void palette_handler(running_machine *machine, render_container *containe
 			x0 = boxbounds.x0 + 5.5f * chwidth;
 			y0 = boxbounds.y0 + 3.5f * chheight + (float)y * cellheight;
 			if (skip != 0)
-				render_container_add_point(container, 0.5f * (x0 + cellboxbounds.x0), y0 + 0.5f * cellheight, UI_LINE_WIDTH, ARGB_WHITE, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+				container->add_point(0.5f * (x0 + cellboxbounds.x0), y0 + 0.5f * cellheight, UI_LINE_WIDTH, ARGB_WHITE, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
 			/* draw the row header */
 			sprintf(buffer, "%5X", state->palette.offset + y * state->palette.count);
 			for (x = 4; x >= 0; x--)
 			{
-				x0 -= render_font_get_char_width(ui_font, chheight, render_get_ui_aspect(), buffer[x]);
-				render_container_add_char(container, x0, y0 + 0.5f * (cellheight - chheight), chheight, render_get_ui_aspect(), ARGB_WHITE, ui_font, buffer[x]);
+				x0 -= render_font_get_char_width(ui_font, chheight, machine->render().ui_aspect(), buffer[x]);
+				container->add_char(x0, y0 + 0.5f * (cellheight - chheight), chheight, machine->render().ui_aspect(), ARGB_WHITE, *ui_font, buffer[x]);
 			}
 		}
 
@@ -342,7 +341,7 @@ static void palette_handler(running_machine *machine, render_container *containe
 			if (index < total)
 			{
 				pen_t pen = state->palette.which ? colortable_palette_get_color(machine->colortable, index) : raw_color[index];
-				render_container_add_rect(container, cellboxbounds.x0 + x * cellwidth, cellboxbounds.y0 + y * cellheight,
+				container->add_rect(cellboxbounds.x0 + x * cellwidth, cellboxbounds.y0 + y * cellheight,
 									cellboxbounds.x0 + (x + 1) * cellwidth, cellboxbounds.y0 + (y + 1) * cellheight,
 									0xff000000 | pen, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 			}
@@ -440,19 +439,17 @@ static void gfxset_handler(running_machine *machine, render_container *container
 	render_bounds cellboxbounds;
 	render_bounds boxbounds;
 	int cellboxwidth, cellboxheight;
-	int targwidth, targheight;
+	int targwidth = machine->render().ui_target().width();
+	int targheight = machine->render().ui_target().height();
 	int cellxpix, cellypix;
 	int xcells, ycells;
 	int pixelscale = 0;
 	int x, y, skip;
 	char title[100];
 
-	/* get the bounds of our target */
-	render_target_get_bounds(render_get_ui_target(), &targwidth, &targheight, NULL);
-
 	/* add a half character padding for the box */
-	chheight = ui_get_line_height();
-	chwidth = render_font_get_char_width(ui_font, chheight, render_get_ui_aspect(), '0');
+	chheight = ui_get_line_height(*machine);
+	chwidth = render_font_get_char_width(ui_font, chheight, machine->render().ui_aspect(), '0');
 	boxbounds.x0 = 0.0f + 0.5f * chwidth;
 	boxbounds.x1 = 1.0f - 0.5f * chwidth;
 	boxbounds.y0 = 0.0f + 0.5f * chheight;
@@ -517,7 +514,7 @@ static void gfxset_handler(running_machine *machine, render_container *container
 	/* figure out the title and expand the outer box to fit */
 	for (x = 0; x < MAX_GFX_ELEMENTS && machine->gfx[x] != NULL; x++) ;
 	sprintf(title, "GFX %d/%d %dx%d COLOR %X", state->gfxset.set, x - 1, gfx->width, gfx->height, state->gfxset.color[set]);
-	titlewidth = render_font_get_string_width(ui_font, chheight, render_get_ui_aspect(), title);
+	titlewidth = render_font_get_string_width(ui_font, chheight, machine->render().ui_aspect(), title);
 	x0 = 0.0f;
 	if (boxbounds.x1 - boxbounds.x0 < titlewidth + chwidth)
 		x0 = boxbounds.x0 - (0.5f - 0.5f * (titlewidth + chwidth));
@@ -530,8 +527,8 @@ static void gfxset_handler(running_machine *machine, render_container *container
 	y0 = boxbounds.y0 + 0.5f * chheight;
 	for (x = 0; title[x] != 0; x++)
 	{
-		render_container_add_char(container, x0, y0, chheight, render_get_ui_aspect(), ARGB_WHITE, ui_font, title[x]);
-		x0 += render_font_get_char_width(ui_font, chheight, render_get_ui_aspect(), title[x]);
+		container->add_char(x0, y0, chheight, machine->render().ui_aspect(), ARGB_WHITE, *ui_font, title[x]);
+		x0 += render_font_get_char_width(ui_font, chheight, machine->render().ui_aspect(), title[x]);
 	}
 
 	/* draw the top column headers */
@@ -540,12 +537,12 @@ static void gfxset_handler(running_machine *machine, render_container *container
 	{
 		x0 = boxbounds.x0 + 6.0f * chwidth + (float)x * cellwidth;
 		y0 = boxbounds.y0 + 2.0f * chheight;
-		render_container_add_char(container, x0 + 0.5f * (cellwidth - chwidth), y0, chheight, render_get_ui_aspect(), ARGB_WHITE, ui_font, "0123456789ABCDEF"[x & 0xf]);
+		container->add_char(x0 + 0.5f * (cellwidth - chwidth), y0, chheight, machine->render().ui_aspect(), ARGB_WHITE, *ui_font, "0123456789ABCDEF"[x & 0xf]);
 
 		/* if we're skipping, draw a point between the character and the box to indicate which */
 		/* one it's referring to */
 		if (skip != 0)
-			render_container_add_point(container, x0 + 0.5f * cellwidth, 0.5f * (y0 + chheight + boxbounds.y0 + 3.5f * chheight), UI_LINE_WIDTH, ARGB_WHITE, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+			container->add_point(x0 + 0.5f * cellwidth, 0.5f * (y0 + chheight + boxbounds.y0 + 3.5f * chheight), UI_LINE_WIDTH, ARGB_WHITE, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 	}
 
 	/* draw the side column headers */
@@ -562,14 +559,14 @@ static void gfxset_handler(running_machine *machine, render_container *container
 			x0 = boxbounds.x0 + 5.5f * chwidth;
 			y0 = boxbounds.y0 + 3.5f * chheight + (float)y * cellheight;
 			if (skip != 0)
-				render_container_add_point(container, 0.5f * (x0 + boxbounds.x0 + 6.0f * chwidth), y0 + 0.5f * cellheight, UI_LINE_WIDTH, ARGB_WHITE, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
+				container->add_point(0.5f * (x0 + boxbounds.x0 + 6.0f * chwidth), y0 + 0.5f * cellheight, UI_LINE_WIDTH, ARGB_WHITE, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
 
 			/* draw the row header */
 			sprintf(buffer, "%5X", state->gfxset.offset[set] + y * xcells);
 			for (x = 4; x >= 0; x--)
 			{
-				x0 -= render_font_get_char_width(ui_font, chheight, render_get_ui_aspect(), buffer[x]);
-				render_container_add_char(container, x0, y0 + 0.5f * (cellheight - chheight), chheight, render_get_ui_aspect(), ARGB_WHITE, ui_font, buffer[x]);
+				x0 -= render_font_get_char_width(ui_font, chheight, machine->render().ui_aspect(), buffer[x]);
+				container->add_char(x0, y0 + 0.5f * (cellheight - chheight), chheight, machine->render().ui_aspect(), ARGB_WHITE, *ui_font, buffer[x]);
 			}
 		}
 
@@ -577,7 +574,7 @@ static void gfxset_handler(running_machine *machine, render_container *container
 	gfxset_update_bitmap(machine, state, xcells, ycells, gfx);
 
 	/* add the final quad */
-	render_container_add_quad(container, boxbounds.x0 + 6.0f * chwidth, boxbounds.y0 + 3.5f * chheight,
+	container->add_quad(boxbounds.x0 + 6.0f * chwidth, boxbounds.y0 + 3.5f * chheight,
 						boxbounds.x0 + 6.0f * chwidth + (float)cellboxwidth / (float)targwidth,
 						boxbounds.y0 + 3.5f * chheight + (float)cellboxheight / (float)targheight,
 						ARGB_WHITE, state->texture, PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA));
@@ -699,14 +696,13 @@ static void gfxset_update_bitmap(running_machine *machine, ui_gfx_state *state, 
 	if (state->bitmap == NULL || state->texture == NULL || state->bitmap->bpp != 32 || state->bitmap->width != cellxpix * xcells || state->bitmap->height != cellypix * ycells)
 	{
 		/* free the old stuff */
-		if (state->texture != NULL)
-			render_texture_free(state->texture);
+		machine->render().texture_free(state->texture);
 		global_free(state->bitmap);
 
 		/* allocate new stuff */
 		state->bitmap = global_alloc(bitmap_t(cellxpix * xcells, cellypix * ycells, BITMAP_FORMAT_ARGB32));
-		state->texture = render_texture_alloc(NULL, NULL);
-		render_texture_set_bitmap(state->texture, state->bitmap, NULL, TEXFORMAT_ARGB32, NULL);
+		state->texture = machine->render().texture_alloc();
+		state->texture->set_bitmap(state->bitmap, NULL, TEXFORMAT_ARGB32);
 
 		/* force a redraw */
 		state->bitmap_dirty = TRUE;
@@ -754,7 +750,7 @@ static void gfxset_update_bitmap(running_machine *machine, ui_gfx_state *state, 
 		}
 
 		/* reset the texture to force an update */
-		render_texture_set_bitmap(state->texture, state->bitmap, NULL, TEXFORMAT_ARGB32, NULL);
+		state->texture->set_bitmap(state->bitmap, NULL, TEXFORMAT_ARGB32);
 		state->bitmap_dirty = FALSE;
 	}
 }
@@ -848,7 +844,8 @@ static void tilemap_handler(running_machine *machine, render_container *containe
 	float chwidth, chheight;
 	render_bounds mapboxbounds;
 	render_bounds boxbounds;
-	int targwidth, targheight;
+	int targwidth = machine->render().ui_target().width();
+	int targheight = machine->render().ui_target().height();
 	float titlewidth;
 	float x0, y0;
 	int mapboxwidth, mapboxheight;
@@ -857,17 +854,14 @@ static void tilemap_handler(running_machine *machine, render_container *containe
 	int x, pixelscale;
 	char title[100];
 
-	/* get the bounds of our target */
-	render_target_get_bounds(render_get_ui_target(), &targwidth, &targheight, NULL);
-
 	/* get the size of the tilemap itself */
 	tilemap_size_by_index(machine, state->tilemap.which, &mapwidth, &mapheight);
 	if (state->tilemap.rotate & ORIENTATION_SWAP_XY)
 		{ UINT32 temp = mapwidth; mapwidth = mapheight; mapheight = temp; }
 
 	/* add a half character padding for the box */
-	chheight = ui_get_line_height();
-	chwidth = render_font_get_char_width(ui_font, chheight, render_get_ui_aspect(), '0');
+	chheight = ui_get_line_height(*machine);
+	chwidth = render_font_get_char_width(ui_font, chheight, machine->render().ui_aspect(), '0');
 	boxbounds.x0 = 0.0f + 0.5f * chwidth;
 	boxbounds.x1 = 1.0f - 0.5f * chwidth;
 	boxbounds.y0 = 0.0f + 0.5f * chheight;
@@ -914,7 +908,7 @@ static void tilemap_handler(running_machine *machine, render_container *containe
 
 	/* figure out the title and expand the outer box to fit */
 	sprintf(title, "TMAP %d/%d %dx%d OFFS %d,%d", state->tilemap.which, tilemap_count(machine) - 1, mapwidth, mapheight, state->tilemap.xoffs, state->tilemap.yoffs);
-	titlewidth = render_font_get_string_width(ui_font, chheight, render_get_ui_aspect(), title);
+	titlewidth = render_font_get_string_width(ui_font, chheight, machine->render().ui_aspect(), title);
 	if (boxbounds.x1 - boxbounds.x0 < titlewidth + chwidth)
 	{
 		boxbounds.x0 = 0.5f - 0.5f * (titlewidth + chwidth);
@@ -929,15 +923,15 @@ static void tilemap_handler(running_machine *machine, render_container *containe
 	y0 = boxbounds.y0 + 0.5f * chheight;
 	for (x = 0; title[x] != 0; x++)
 	{
-		render_container_add_char(container, x0, y0, chheight, render_get_ui_aspect(), ARGB_WHITE, ui_font, title[x]);
-		x0 += render_font_get_char_width(ui_font, chheight, render_get_ui_aspect(), title[x]);
+		container->add_char(x0, y0, chheight, machine->render().ui_aspect(), ARGB_WHITE, *ui_font, title[x]);
+		x0 += render_font_get_char_width(ui_font, chheight, machine->render().ui_aspect(), title[x]);
 	}
 
 	/* update the bitmap */
 	tilemap_update_bitmap(machine, state, mapboxwidth / pixelscale, mapboxheight / pixelscale);
 
 	/* add the final quad */
-	render_container_add_quad(container, mapboxbounds.x0, mapboxbounds.y0,
+	container->add_quad(mapboxbounds.x0, mapboxbounds.y0,
 						mapboxbounds.x1, mapboxbounds.y1,
 						ARGB_WHITE, state->texture,
 						PRIMFLAG_BLENDMODE(BLENDMODE_ALPHA) | PRIMFLAG_TEXORIENT(state->tilemap.rotate));
@@ -1058,14 +1052,13 @@ static void tilemap_update_bitmap(running_machine *machine, ui_gfx_state *state,
 	if (state->bitmap == NULL || state->texture == NULL || state->bitmap->format != screen_format || state->bitmap->width != width || state->bitmap->height != height)
 	{
 		/* free the old stuff */
-		if (state->texture != NULL)
-			render_texture_free(state->texture);
+		machine->render().texture_free(state->texture);
 		global_free(state->bitmap);
 
 		/* allocate new stuff */
 		state->bitmap = global_alloc(bitmap_t(width, height, screen_format));
-		state->texture = render_texture_alloc(NULL, NULL);
-		render_texture_set_bitmap(state->texture, state->bitmap, NULL, screen_texformat, palette);
+		state->texture = machine->render().texture_alloc();
+		state->texture->set_bitmap(state->bitmap, NULL, screen_texformat, palette);
 
 		/* force a redraw */
 		state->bitmap_dirty = TRUE;
@@ -1077,7 +1070,7 @@ static void tilemap_update_bitmap(running_machine *machine, ui_gfx_state *state,
 		tilemap_draw_by_index(machine, state->bitmap, state->tilemap.which, state->tilemap.xoffs, state->tilemap.yoffs);
 
 		/* reset the texture to force an update */
-		render_texture_set_bitmap(state->texture, state->bitmap, NULL, screen_texformat, palette);
+		state->texture->set_bitmap(state->bitmap, NULL, screen_texformat, palette);
 		state->bitmap_dirty = FALSE;
 	}
 }

@@ -45,7 +45,7 @@ struct _sdl_window_info
 	int (*create)(sdl_window_info *window, int width, int height);
 	void (*resize)(sdl_window_info *window, int width, int height);
 	int (*draw)(sdl_window_info *window, UINT32 dc, int update);
-	const render_primitive_list *(*get_primitives)(sdl_window_info *window);
+	render_primitive_list &(*get_primitives)(sdl_window_info *window);
 	int (*xy_to_render_target)(sdl_window_info *window, int x, int y, int *xt, int *yt);
 	void (*destroy_all_textures)(sdl_window_info *window);
 	void (*destroy)(sdl_window_info *window);
@@ -71,7 +71,7 @@ struct _sdl_window_info
 	// rendering info
 	osd_event *			rendered_event;
 	render_target *		target;
-	const render_primitive_list *primlist;
+	render_primitive_list *primlist;
 
 	// drawing data
 	void *				dxdata;

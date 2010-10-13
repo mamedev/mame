@@ -87,7 +87,8 @@ public:
 		  m_ordered_next(NULL),
 		  m_ordered_prev(NULL),
 		  m_ptr(ptr),
-		  m_size(size) { }
+		  m_size(size),
+		  m_id(~(UINT64)0) { }
 	virtual ~resource_pool_item() { }
 
 	resource_pool_item *	m_next;
@@ -95,6 +96,7 @@ public:
 	resource_pool_item *	m_ordered_prev;
 	void *					m_ptr;
 	size_t					m_size;
+	UINT64					m_id;
 };
 
 

@@ -147,14 +147,14 @@ static void input_character(char *buffer, size_t buffer_length, unicode_char uni
     or footer text
 -------------------------------------------------*/
 
-static void extra_text_draw_box(float origx1, float origx2, float origy, float yspan, const char *text, int direction)
+static void extra_text_draw_box(render_container &ui_container, float origx1, float origx2, float origy, float yspan, const char *text, int direction)
 {
 	float text_width, text_height;
 	float width, maxwidth;
 	float x1, y1, x2, y2, temp;
 
 	/* get the size of the text */
-	ui_draw_text_full( render_container_get_ui(),text, 0.0f, 0.0f, 1.0f, JUSTIFY_LEFT, WRAP_WORD,
+	ui_draw_text_full(&ui_container,text, 0.0f, 0.0f, 1.0f, JUSTIFY_LEFT, WRAP_WORD,
 		DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &text_width, &text_height);
 	width = text_width + (2 * UI_BOX_LR_BORDER);
 	maxwidth = MAX(width, origx2 - origx1);
@@ -173,7 +173,7 @@ static void extra_text_draw_box(float origx1, float origx2, float origy, float y
 	}
 
 	/* draw a box */
-	ui_draw_outlined_box(render_container_get_ui(),x1, y1, x2, y2, UI_BACKGROUND_COLOR);
+	ui_draw_outlined_box(&ui_container,x1, y1, x2, y2, UI_BACKGROUND_COLOR);
 
 	/* take off the borders */
 	x1 += UI_BOX_LR_BORDER;
@@ -182,7 +182,7 @@ static void extra_text_draw_box(float origx1, float origx2, float origy, float y
 	y2 -= UI_BOX_TB_BORDER;
 
 	/* draw the text within it */
-	ui_draw_text_full(render_container_get_ui(),text, x1, y1, text_width, JUSTIFY_LEFT, WRAP_WORD,
+	ui_draw_text_full(&ui_container,text, x1, y1, text_width, JUSTIFY_LEFT, WRAP_WORD,
 					  DRAW_NORMAL, ARGB_WHITE, ARGB_BLACK, NULL, NULL);
 }
 
@@ -201,9 +201,9 @@ static void extra_text_render(running_machine *machine, ui_menu *menu, void *sta
 	footer = ((footer != NULL) && (footer[0] != '\0')) ? footer : NULL;
 
 	if (header != NULL)
-		extra_text_draw_box(origx1, origx2, origy1, top, header, -1);
+		extra_text_draw_box(machine->render().ui_container(), origx1, origx2, origy1, top, header, -1);
 	if (footer != NULL)
-		extra_text_draw_box(origx1, origx2, origy2, bottom, footer, +1);
+		extra_text_draw_box(machine->render().ui_container(), origx1, origx2, origy2, bottom, footer, +1);
 }
 
 
@@ -338,7 +338,7 @@ static void menu_file_create_populate(running_machine *machine, ui_menu *menu, v
 	ui_menu_item_append(menu, "Create", NULL, 0, ITEMREF_CREATE);
 
 	/* set up custom render proc */
-	ui_menu_set_custom_render(menu, file_create_render_extra, ui_get_line_height() + 3.0f * UI_BOX_TB_BORDER, 0);
+	ui_menu_set_custom_render(menu, file_create_render_extra, ui_get_line_height(*machine) + 3.0f * UI_BOX_TB_BORDER, 0);
 }
 
 
@@ -379,7 +379,7 @@ static int create_new_image(device_image_interface *image, const char *directory
 
 		case ENTTYPE_FILE:
 			/* a file exists here - ask for permission from the user */
-			child_menu = ui_menu_alloc(image->device().machine, render_container_get_ui(), menu_confirm_save_as, NULL);
+			child_menu = ui_menu_alloc(image->device().machine, &image->device().machine->render().ui_container(), menu_confirm_save_as, NULL);
 			child_menustate = (confirm_save_as_menu_state*)ui_menu_alloc_state(child_menu, sizeof(*child_menustate), NULL);
 			child_menustate->yes = yes;
 			ui_menu_stack_push(child_menu);
@@ -742,7 +742,7 @@ static file_error menu_file_selector_populate(running_machine *machine, ui_menu 
 		ui_menu_set_selection(menu, (void *) selected_entry);
 
 	/* set up custom render proc */
-	ui_menu_set_custom_render(menu, file_selector_render_extra, ui_get_line_height() + 3.0f * UI_BOX_TB_BORDER, 0);
+	ui_menu_set_custom_render(menu, file_selector_render_extra, ui_get_line_height(*machine) + 3.0f * UI_BOX_TB_BORDER, 0);
 
 done:
 	if (directory != NULL)
@@ -811,13 +811,13 @@ static void menu_file_selector(running_machine *machine, ui_menu *menu, void *pa
 
 				case SELECTOR_ENTRY_TYPE_CREATE:
 					/* create */
-					child_menu = ui_menu_alloc(machine, render_container_get_ui(), menu_file_create, NULL);
+					child_menu = ui_menu_alloc(machine, &machine->render().ui_container(), menu_file_create, NULL);
 					child_menustate = (file_create_menu_state*)ui_menu_alloc_state(child_menu, sizeof(*child_menustate), NULL);
 					child_menustate->manager_menustate = menustate->manager_menustate;
 					ui_menu_stack_push(child_menu);
 					break;
 				case SELECTOR_ENTRY_TYPE_SOFTWARE_LIST:
-					child_menu = ui_menu_alloc(machine, render_container_get_ui(), ui_image_menu_software, menustate->manager_menustate->selected_device);
+					child_menu = ui_menu_alloc(machine, &machine->render().ui_container(), ui_image_menu_software, menustate->manager_menustate->selected_device);
 					ui_menu_stack_push(child_menu);
 					break;
 				case SELECTOR_ENTRY_TYPE_DRIVE:
@@ -919,7 +919,7 @@ static void menu_file_manager_populate(running_machine *machine, ui_menu *menu, 
 	}
 
 	/* set up custom render proc */
-	ui_menu_set_custom_render(menu, file_manager_render_extra, 0, ui_get_line_height() + 3.0f * UI_BOX_TB_BORDER);
+	ui_menu_set_custom_render(menu, file_manager_render_extra, 0, ui_get_line_height(*machine) + 3.0f * UI_BOX_TB_BORDER);
 }
 
 
@@ -988,7 +988,7 @@ void ui_image_menu_file_manager(running_machine *machine, ui_menu *menu, void *p
 			ui_menu_reset(menu, UI_MENU_RESET_REMEMBER_POSITION);
 
 			/* push the menu */
-			child_menu = ui_menu_alloc(machine, render_container_get_ui(), menu_file_selector, NULL);
+			child_menu = ui_menu_alloc(machine, &machine->render().ui_container(), menu_file_selector, NULL);
 			child_menustate = (file_selector_menu_state *)ui_menu_alloc_state(child_menu, sizeof(*child_menustate), NULL);
 			child_menustate->manager_menustate = menustate;
 			ui_menu_stack_push(child_menu);

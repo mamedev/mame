@@ -105,9 +105,7 @@ int main(int argc, char *argv[])
 void osd_init(running_machine *machine)
 {
 	// initialize the video system by allocating a rendering target
-	our_target = render_target_alloc(machine, NULL, 0);
-	if (our_target == NULL)
-		fatalerror("Error creating render target");
+	our_target = machine->render().target_alloc();
 
 	// nothing yet to do to initialize sound, since we don't have any
 	// sound updates are handled by osd_update_audio_stream() below
@@ -164,13 +162,13 @@ void osd_update(running_machine *machine, int skip_redraw)
 	int minwidth, minheight;
 
 	// get the minimum width/height for the current layout
-	render_target_get_minimum_size(our_target, &minwidth, &minheight);
+	our_target->compute_minimum_size(minwidth, minheight);
 
 	// make that the size of our target
-	render_target_set_bounds(our_target, minwidth, minheight, 0);
+	our_target->render_target_set_bounds(minwidth, minheight);
 
 	// get the list of primitives for the target at the current size
-	primlist = render_target_get_primitives(our_target);
+	primlist = our_target->get_primitives();
 
 	// lock them, and then render them
 	osd_lock_acquire(primlist->lock);
