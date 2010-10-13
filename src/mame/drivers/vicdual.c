@@ -1696,6 +1696,62 @@ static INPUT_PORTS_START( brdrline )
 	PORT_DIPSETTING(    0x00, "3" )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( starrkr )
+	PORT_START("IN0")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_DIPNAME( 0x04, 0x04, "Infinite Lives" )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Cocktail ) )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_4WAY
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN ) /* probably unused */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(brdrline_lives, (void *)0x01)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(vicdual_get_vblank_comp, NULL)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_4WAY
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* probably unused */
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(brdrline_lives, (void *)0x02)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(vicdual_get_64v, NULL)	/* yes, this is different */
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("IN3")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* probably unused */
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(vicdual_read_coin_status, NULL)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )	/* probably unused */
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0xc0, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_COIN
+
+	PORT_START("FAKE_LIVES")
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x02, "5" )
+	PORT_DIPSETTING(    0x01, "4" )
+	PORT_DIPSETTING(    0x00, "3" )
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( pulsar )
 	PORT_START("IN0")
@@ -3135,6 +3191,55 @@ ROM_START( brdrline )
 	ROM_LOAD( "prom93427.2", 0x0000, 0x0100, CRC(bda82367) SHA1(1c96453c2ae372892c39b5657cf2b252a90a10a9) )
 ROM_END
 
+/*
+Star Raker
+
+Notes from dumper:
+There is a mainboard and a small board. The main board is a normal VIC board and is from a working cab we own. 
+From an op we got a box with a similar board plus a small board which I assumed belongs to it, 
+but I have no idea what its purpose is. Its not the soundboard and its not included in our working Star Raker cab. 
+So maybe it belongs to a different game, but I had it dumped anyway.
+*/
+
+ROM_START( starrkr )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "epr-767.u33", 0x0000, 0x0400, CRC(2cfe979c) SHA1(a64f7035788ed428bc5f3ca32e8b1208c378dea9) )
+	ROM_LOAD( "epr-768.u32", 0x0400, 0x0400, CRC(cf85f158) SHA1(f091fdc30b10a202318a0c39af450f765b905528) )
+	ROM_LOAD( "epr-769.u31", 0x0800, 0x0400, CRC(22ac6362) SHA1(de60ea8480ada2b029956d65f9edbf680efae846) )
+	ROM_LOAD( "epr-770.u30", 0x0c00, 0x0400, CRC(d8d2fc6a) SHA1(950f60f3ef11345a08face4d421a678462be917c) )
+	ROM_LOAD( "epr-771.u29", 0x1000, 0x0400, CRC(9a88d577) SHA1(aac34dffda10e513e8c656983de42387167b7e92) )
+	ROM_LOAD( "epr-772.u28", 0x1400, 0x0400, CRC(bab1574f) SHA1(cf569545383e7b5080b2a363cbc5f90fc3a5f84e) )
+	ROM_LOAD( "epr-773.u27", 0x1800, 0x0400, CRC(c2406abd) SHA1(be1d31686a5192c4e72b549ee44160a65ac1a3b1) )
+	ROM_LOAD( "epr-774.u26", 0x1c00, 0x0400, CRC(77686d3b) SHA1(16b8f8ea1bfdbe684113c96128c6324ce63ef4f3) )
+	ROM_LOAD( "epr-775.u8",  0x2000, 0x0400, CRC(1d00b276) SHA1(d4f850288c0757c937583b1cd80ca540c29fb84d) )
+	ROM_LOAD( "epr-776.u7",  0x2400, 0x0400, CRC(7215a72b) SHA1(bbf1f7e291f26cd8379679bab2fd1890b1c7524a) )
+	ROM_LOAD( "epr-777.u6",  0x2800, 0x0400, CRC(59176c4c) SHA1(22b9cf5661eb0660039d6d36fb57b0a187b202da) )
+	ROM_LOAD( "epr-778.u5",  0x2c00, 0x0400, CRC(b4586631) SHA1(82dbbcf991c4ffda70518401d5cc700da14afb9c) )
+	ROM_LOAD( "epr-779.u4",  0x3000, 0x0400, CRC(1f9a736d) SHA1(629bf6da13278cb521d291d0551effba1f415027) )
+	ROM_LOAD( "epr-780.u3",  0x3400, 0x0400, CRC(01d89786) SHA1(ccc5644ff6c7f577db4ac4b66a5cd6eb1ff66c1e) )
+	ROM_LOAD( "epr-781.u2",  0x3800, 0x0400, CRC(7d1238a2) SHA1(b9195608b0255ddd4c4a03d863f7749a4ee9f706) )
+	ROM_LOAD( "epr-782.u1",  0x3c00, 0x0400, CRC(121ce164) SHA1(9d046ad189a3c009547eb775028143e2fffe243d) )
+
+	ROM_REGION( 0x0020, "proms", 0 )
+	ROM_LOAD( "pr-23.u49",   0x0000, 0x0020, CRC(0a2156b3) SHA1(504abe8e253ff9b12ac6ffacd92722f8ee8a30ae) )
+
+	ROM_REGION( 0x0800, "cpu1", 0 )	/* sound ROM */
+	ROM_LOAD( "epr-613.1",   0x0000, 0x0400, CRC(ff4be0c7) SHA1(7311c34aa88f6ba905a01e7a9f2ed99a0353a06b) )
+
+	ROM_REGION( 0x0800, "user1", 0 )	/* misc PROM */
+	ROM_LOAD( "pr-33.u15",  0x0000, 0x0020, CRC(a1506b9d) SHA1(037c3db2ea40eca459e8acba9d1506dd28d72d10) )
+	ROM_LOAD( "pr-34.u14",  0x0000, 0x0020, CRC(e60a7960) SHA1(b8b8716e859c57c35310efc4594262afedb84823) )
+	/* following from Small PCB (#97270-P) */
+	ROM_LOAD( "pr-58.5",    0x0000, 0x0800, CRC(526ed9d8) SHA1(173a05b7e01147e415b92ec66661f2544dce0ffd) )
+	ROM_LOAD( "pr-60.6",    0x0000, 0x0800, CRC(59e6067f) SHA1(e6bd08e23ba6c140fca2b280e7d39ac1092d3926) )
+	ROM_LOAD( "pr-59.12",   0x0000, 0x0800, CRC(a2e8090a) SHA1(61d8133d4469243a6a1bbeb851e51c73b22bc3e1) )
+	ROM_LOAD( "pr-61.13",   0x0000, 0x0800, CRC(fc663474) SHA1(9fd28575606e19e84abbc63fb66b85b7edc5bc99) )
+	ROM_LOAD( "pr-65.17",   0x0000, 0x0800, CRC(a12430b2) SHA1(2df1fc2a0e5afcb41e4b0b1cbe7927d7ae8b5146) )
+	ROM_LOAD( "pr-63.18",   0x0000, 0x0800, CRC(b3297499) SHA1(67a9e22c80627fe1924112774201add339f40c62) )
+	ROM_LOAD( "pr-64.25",   0x0000, 0x0800, CRC(7342cf53) SHA1(761aa5a38a28c044cbbbe66e3a8a2f47c493d56d) )
+	ROM_LOAD( "pr-62.26",   0x0000, 0x0800, CRC(d352c545) SHA1(6da4f7a7974e2f471b081d230a47767315b2f1a7) )
+	ROM_LOAD( "pr-66.28",   0x0000, 0x0800, CRC(895c5733) SHA1(881a274cdcf23292ea658dcab793303cfb445e51) )
+ROM_END
 
 /*
 Notes on Sidam set
@@ -3360,6 +3465,7 @@ GAME( 1980, carnivalc,carnival, carnival, carnvckt, 0, ROT270, "Sega", "Carnival
 GAME( 1980, carnivalh,carnival, carnivalh,carnivalh,0, ROT270, "Sega", "Carnival (Head On hardware, set 1)",  GAME_IMPERFECT_SOUND )
 GAME( 1980, carnivalha,carnival,carnivalh,carnivalh,0, ROT270, "Sega", "Carnival (Head On hardware, set 2)",  GAME_IMPERFECT_SOUND )
 GAME( 1981, brdrline, 0,        brdrline, brdrline, 0, ROT270, "Sega", "Borderline", GAME_NO_SOUND )
+GAME( 1981, starrkr,  brdrline, brdrline, starrkr,  0, ROT270, "Sega", "Star Raker", GAME_NO_SOUND )
 GAME( 1981, brdrlins, brdrline, brdrline, brdrline, 0, ROT270, "bootleg (Sidam)", "Borderline (Sidam bootleg)", GAME_NO_SOUND )
 GAME( 1981, brdrlinb, brdrline, brdrline, brdrline, 0, ROT270, "bootleg (Karateco)", "Borderline (Karateco bootleg)", GAME_NO_SOUND )
 GAME( 1980, digger,   0,        digger,   digger,   0, ROT270, "Sega", "Digger", GAME_NO_SOUND )

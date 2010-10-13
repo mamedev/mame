@@ -3714,6 +3714,7 @@ V-V                           TP-027
 	DRIVER( carnivalh )
 	DRIVER( carnivalha )
 	DRIVER( brdrline )	/* (c) 1980 Sega */
+	DRIVER( starrkr )   /* (c) 1981 Sega */
 	DRIVER( brdrlins )	/* Sidam bootleg */
 	DRIVER( brdrlinb )	/* Karateco bootleg */
 	DRIVER( digger )	/* 684-691 no copyright notice */
