@@ -410,22 +410,22 @@ static INPUT_PORTS_START( bombkick )
 	PORT_DIPSETTING(      0x0003, "3" )
 	PORT_DIPSETTING(      0x0002, "4" )
 	PORT_DIPSETTING(      0x0001, "5" )
-	PORT_DIPNAME( 0x0004, 0x0004, "DON'T CHANGE IT!" )      /* Must be OFF ! - read notes */
+	PORT_DIPNAME( 0x0004, 0x0004, "DSW 2:3 - LEAVE OFF!" )	/* Must be OFF ! - read notes */
 	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, "DON'T CHANGE IT!" )      /* Must be OFF ! - read notes */
+	PORT_DIPNAME( 0x0008, 0x0008, "DSW 2:4 - LEAVE OFF!" )	/* Must be OFF ! - read notes */
 	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0000, "DON'T CHANGE IT!" )      /* Must be ON  ! - read notes */
+	PORT_DIPNAME( 0x0010, 0x0000, "DSW 2:5 - LEAVE ON!" )	/* Must be ON  ! - read notes */
 	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, "DON'T CHANGE IT!" )      /* Must be OFF ! - read notes */
+	PORT_DIPNAME( 0x0020, 0x0020, "DSW 2:6 - LEAVE OFF!" )	/* Must be OFF ! - read notes */
 	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0000, "DON'T CHANGE IT!" )      /* Must be ON  ! - read notes */
+	PORT_DIPNAME( 0x0040, 0x0000, "DSW 2:7 - LEAVE ON!" )	/* Must be ON  ! - read notes */
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, "DON'T CHANGE IT!" )      /* Must be OFF ! - read notes */
+	PORT_DIPNAME( 0x0080, 0x0080, "DSW 2:8 - LEAVE OFF!" )	/* Must be OFF ! - read notes */
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
