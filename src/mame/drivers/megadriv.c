@@ -270,8 +270,10 @@ a tilemap-like structure, from which data is copied)
 #include "includes/megadriv.h"
 #include "cpu/sh2/sh2.h"
 #include "cpu/sh2/sh2comn.h"
-#include "devices/chd_cd.h"
 #include "sound/cdda.h"
+#ifdef MESS
+#include "devices/chd_cd.h"
+#endif
 
 #define MEGADRIV_VDP_VRAM(address) megadrive_vdp_vram[(address)&0x7fff]
 
@@ -396,6 +398,7 @@ static struct
 	UINT8 ext;
 	UINT8 ctrl;
 }segacd_cdd;
+#ifdef MESS
 static struct
 {
 	UINT32	current_frame;
@@ -405,6 +408,7 @@ static struct
 	cdrom_file	*cd;
 	const cdrom_toc*	toc;
 }segacd;
+#endif
 
 static void segacd_mark_tiles_dirty(running_machine* machine, int offset);
 
@@ -869,7 +873,7 @@ static UINT16 vdp_get_word_from_68k_mem_default(running_machine *machine, UINT32
 		{
 			source -= 2; // the SVP introduces some kind of DMA 'lag', which we have to compensate for, this is obvious even on gfx DMAd from ROM (the Speedometer)
 		}
-		
+
 		// likewise segaCD, at least when reading wordram?
 		// we might need to check what mode we're in here..
 		if (segacd_wordram_mapped)
@@ -4644,7 +4648,7 @@ void segacd_init_main_cpu( running_machine* machine )
 	memory_set_bankptr(space->machine,  "scd_4m_prgbank", segacd_4meg_prgram + segacd_4meg_prgbank * 0x20000 );
 	memory_install_write16_handler (space, 0x0020000, 0x003ffff, 0, 0, scd_4m_prgbank_ram_w );
 	segacd_wordram_mapped = 1;
-	
+
 
 	memory_install_readwrite16_handler(cputag_get_address_space(space->machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x200000, 0x23ffff, 0, 0, segacd_main_dataram_part1_r, segacd_main_dataram_part1_w); // RAM shared with sub
 
@@ -4717,6 +4721,7 @@ static MACHINE_RESET( segacd )
 
 	/* init cd-rom device */
 
+	#ifdef MESS
 	{
 		running_device *device;
 
@@ -4734,6 +4739,7 @@ static MACHINE_RESET( segacd )
 			}
 		}
 	}
+	#endif
 }
 
 
@@ -4951,6 +4957,7 @@ static const char *const segacd_cdd_get_toc_cmd[] =
 	"Invalid 0xF",
 };
 
+#ifdef MESS
 static void segacd_cdd_get_status(running_machine *machine)
 {
 	// ...
@@ -5033,11 +5040,14 @@ static void segacd_cdd_get_toc_info(running_machine *machine)
 	cdd_hock_irq(machine,1);
 }
 
+#endif
+
 static WRITE8_HANDLER( segacd_cdd_tx_w )
 {
 	//printf("CDD Communication write %02x -> [%02x]\n",data,offset);
 	segacd_cdd_tx[offset] = data & 0xf;
 
+	#ifdef MESS
 	if(offset == 9) //execute the command when crc is sent (TODO: I wonder if we need to check if crc is valid. Plus obviously this shouldn't be instant)
 	{
 		logerror("CDD: command %s issued\n",segacd_cdd_cmd[segacd_cdd_tx[0] & 0xf]);
@@ -5050,6 +5060,7 @@ static WRITE8_HANDLER( segacd_cdd_tx_w )
 			//default: logerror("CDD: unhandled command %s issued\n",segacd_cdd_cmd[segacd_cdd_tx[0] & 0xf]);
 		}
 	}
+	#endif
 }
 
 
@@ -5112,7 +5123,7 @@ WRITE16_HANDLER( segacd_trace_vector_base_address_w )
 		segacd_mark_stampmaps_dirty();
 
 		segacd_conversion_active = 1;
-		
+
 		// todo: proper time calculation
 		timer_adjust_oneshot(segacd_gfx_conversion_timer, ATTOTIME_IN_HZ(1000), 0);
 
@@ -5142,12 +5153,12 @@ WRITE16_HANDLER( segacd_trace_vector_base_address_w )
 			x = BITMAP_ADDR16(srcbitmap,10,10);
 			UINT16 datax;
 			datax = x[0];
-			
+
 			// I don't quite understand what happens if the lower bits of hdotsize are set.. do we end up rounding up?
 			// this 'buffersize' clearly fills the frame for the SegaCD logo screen at least
 			int buffersize = ((segacd_imagebuffer_vcell_size+1) * (segacd_imagebuffer_hdot_size>>3)*0x20)/2;  // 0x20 = 8x8x4 tile, /2 due to word offset
 			//buffersize -= 8;
-			
+
 			for (int i=0;i< buffersize ;i++)
 			{
 				int offsetx = ((segacd_imagebuffer_start_address&0xfff8)*2)+i;
@@ -5225,7 +5236,7 @@ static WRITE16_HANDLER( segacd_imagebuffer_offset_w )
 static READ16_HANDLER( segacd_imagebuffer_vcell_size_r )
 {
 	return segacd_imagebuffer_vcell_size;
-}	
+}
 
 static WRITE16_HANDLER( segacd_imagebuffer_vcell_size_w )
 {
@@ -5236,7 +5247,7 @@ static WRITE16_HANDLER( segacd_imagebuffer_vcell_size_w )
 static READ16_HANDLER( segacd_imagebuffer_hdot_size_r )
 {
 	return segacd_imagebuffer_hdot_size;
-}	
+}
 
 static WRITE16_HANDLER( segacd_imagebuffer_hdot_size_w )
 {
@@ -8223,7 +8234,9 @@ MACHINE_CONFIG_DERIVED( genesis_scd, megadriv )
 	MDRV_SOUND_ROUTE( 0, "lspeaker", 1.00 )
 	MDRV_SOUND_ROUTE( 1, "rspeaker", 1.00 )
 
+	#ifdef MESS
 	MDRV_CDROM_ADD( "cdrom" )
+	#endif
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED( genesis_32x_scd, genesis_32x )
@@ -8235,7 +8248,9 @@ MACHINE_CONFIG_DERIVED( genesis_32x_scd, genesis_32x )
 	MDRV_SOUND_ROUTE( 0, "lspeaker", 1.00 )
 	MDRV_SOUND_ROUTE( 1, "rspeaker", 1.00 )
 
+	#ifdef MESS
 	MDRV_CDROM_ADD( "cdrom" )
+	#endif
 MACHINE_CONFIG_END
 
 
