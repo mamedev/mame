@@ -247,6 +247,7 @@ extern void scc68070_register_globals(running_machine *machine, scc68070_regs_t 
 extern void scc68070_set_hack_value(UINT16 value);
 extern void scc68070_set_hack_base(UINT32 base);
 extern void scc68070_set_hack_ack(UINT8 ack);
-extern void scc68070_set_secondary_hack(UINT32 address);
+extern void scc68070_set_hack_active(running_machine *machine, bool active);
+extern void scc68070_quizard_rx(running_machine *machine, scc68070_regs_t *scc68070, UINT8 data);
 
 #endif // _MACHINE_CDI070_H_

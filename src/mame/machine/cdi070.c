@@ -63,12 +63,6 @@ static bool hack_active = false;
 static UINT16 hack_value = 0;
 static UINT32 hack_base = 0;
 static UINT8 hack_ack = 0;
-static UINT32 hack2_addr = 0;
-
-void scc68070_set_secondary_hack(UINT32 address)
-{
-	hack2_addr = address;
-}
 
 void scc68070_set_hack_ack(UINT8 ack)
 {
@@ -91,49 +85,15 @@ static void quizard_patch(running_machine *machine)
 
 	if(hack_active)
 	{
-		// Patch out:
-		// 00264C42: C0EE 86BE                  mulu.w  (-$7942,A6), D0
-		// 00264C46: 2200                       move.l  D0, D1
-		// 00264C48: 41EE 86C0                  lea     (-$7940,A6), A0
-		// 00264C4C: 2008                       move.l  A0, D0
-		// 00264C4E: 6100 FE6A                  bsr     $264aba
-		// 00264C52: 3400                       move.w  D0, D2
-		// 00264C54: 3017                       move.w  (A7), D0
-		// 00264C56: C0EE 86BE                  mulu.w  (-$7942,A6), D0
-		// 00264C5A: 2200                       move.l  D0, D1
-		// 00264C5C: 41EE 86C0                  lea     (-$7940,A6), A0
-		// 00264C60: 2008                       move.l  A0, D0
-		// 00264C62: 6100 FE56                  bsr     $264aba
-		// 00264C66: B142                       eor.w   D0, D2
-		// 00264C68: 7000                       moveq   #$0, D0
-		// 00264C6A: 3002                       move.w  D2, D0
-		space->write_word(hack_base + 0x00, 0);
-		space->write_word(hack_base + 0x02, 0);
-		space->write_word(hack_base + 0x04, 0);
-		space->write_word(hack_base + 0x06, 0);
-		space->write_word(hack_base + 0x08, 0);
-		space->write_word(hack_base + 0x0a, 0);
-		space->write_word(hack_base + 0x0c, 0);
-		space->write_word(hack_base + 0x0e, 0);
-		space->write_word(hack_base + 0x10, 0);
-		space->write_word(hack_base + 0x12, 0);
-		space->write_word(hack_base + 0x14, 0);
-		space->write_word(hack_base + 0x16, 0);
-		space->write_word(hack_base + 0x18, 0);
-		space->write_word(hack_base + 0x1a, 0);
-		space->write_word(hack_base + 0x1c, 0);
-		space->write_word(hack_base + 0x1e, 0);
-		space->write_word(hack_base + 0x20, 0);
-		space->write_word(hack_base + 0x22, 0);
-		space->write_word(hack_base + 0x24, 0x203C);
-		space->write_word(hack_base + 0x26, 0x0000);
-		space->write_word(hack_base + 0x28, hack_value);
-
-		if(hack2_addr)
-		{
-			//space->write_byte(hack2_addr, 1);
-		}
+		space->write_word(hack_base    ,0x7001);
+		space->write_word(hack_base + 2,0x7001);
 	}
+}
+
+void scc68070_set_hack_active(running_machine *machine, bool active)
+{
+	hack_active = active;
+	quizard_patch(machine);
 }
 
 TIMER_CALLBACK( scc68070_timer0_callback )
@@ -273,6 +233,120 @@ static void scc68070_tx_empty(running_machine *machine, scc68070_regs_t *scc6807
 	}
 }
 
+static UINT16 seeds[10] = { 0 };
+static UINT8 g_state[8] = { 0 };
+
+void scc68070_quizard_rx(running_machine *machine, scc68070_regs_t *scc68070, UINT8 data)
+{
+	scc68070_uart_rx(machine, scc68070, 0x5a);
+	for(int index = 0; index < 8; index++)
+	{
+		scc68070_uart_rx(machine, scc68070, 0);
+	}
+	scc68070_uart_rx(machine, scc68070, data);
+}
+
+static void quizard_set_seeds(UINT8 *rx)
+{
+	seeds[0] = (rx[1] << 8) | rx[0];
+	seeds[1] = (rx[3] << 8) | rx[2];
+	seeds[2] = (rx[5] << 8) | rx[4];
+	seeds[3] = (rx[7] << 8) | rx[6];
+	seeds[4] = (rx[9] << 8) | rx[8];
+	seeds[5] = (rx[11] << 8) | rx[10];
+	seeds[6] = (rx[13] << 8) | rx[12];
+	seeds[7] = (rx[15] << 8) | rx[14];
+	seeds[8] = (rx[17] << 8) | rx[16];
+	seeds[9] = (rx[19] << 8) | rx[18];
+}
+
+static void quizard_calculate_state(running_machine *machine, scc68070_regs_t *scc68070)
+{
+	const UINT16 desired_bitfield = hack_value;
+	const UINT16 field0 = 0x00ff;
+	const UINT16 field1 = desired_bitfield ^ field0;
+
+	UINT16 total0 = 0;
+	UINT16 total1 = 0;
+
+	for(int index = 0; index < 10; index++)
+	{
+		if(field0 & (1 << index))
+		{
+			total0 += seeds[index];
+		}
+		if(field1 & (1 << index))
+		{
+			total1 += seeds[index];
+		}
+	}
+
+	UINT16 hi0 = (total0 >> 8) + 0x40;
+	g_state[2] = hi0 / 2;
+	g_state[3] = hi0 - g_state[2];
+
+	UINT16 lo0 = (total0 & 0x00ff) + 0x40;
+	g_state[0] = lo0 / 2;
+	g_state[1] = lo0 - g_state[0];
+
+	UINT16 hi1 = (total1 >> 8) + 0x40;
+	g_state[6] = hi1 / 2;
+	g_state[7] = hi1 - g_state[6];
+
+	UINT16 lo1 = (total1 & 0x00ff) + 0x40;
+	g_state[4] = lo1 / 2;
+	g_state[5] = lo1 - g_state[4];
+}
+
+static void quizard_handle_byte_tx(running_machine *machine, scc68070_regs_t *scc68070)
+{
+	static UINT8 rx[0x100];
+	static UINT8 rx_ptr = 0xff;
+	static UINT8 state = 0;
+	static UINT8 ack_count = 0;
+	UINT8 tx = scc68070->uart.transmit_holding_register;
+
+	switch(state)
+	{
+		case 0:
+			if(tx == 0x56)
+			{
+				state++;
+			}
+			break;
+
+		case 1:
+			if(tx == hack_ack)
+			{
+				ack_count++;
+				if(ack_count == 1)
+				{
+					state++;
+					quizard_set_seeds(rx);
+					quizard_calculate_state(machine, scc68070);
+					scc68070_uart_rx(machine, scc68070, 0x5a);
+					for(int index = 0; index < 8; index++)
+					{
+						scc68070_uart_rx(machine, scc68070, g_state[index]);
+					}
+				}
+			}
+			else
+			{
+				rx_ptr++;
+				rx[rx_ptr] = tx;
+			}
+			break;
+
+		case 2:
+			if(tx == hack_ack)
+			{
+				state = 0;
+			}
+			break;
+	}
+}
+
 TIMER_CALLBACK( scc68070_tx_callback )
 {
 	cdi_state *state = machine->driver_data<cdi_state>();
@@ -283,6 +357,8 @@ TIMER_CALLBACK( scc68070_tx_callback )
 		if(scc68070->uart.transmit_pointer > -1)
 		{
 			scc68070->uart.transmit_holding_register = scc68070->uart.transmit_buffer[0];
+			quizard_handle_byte_tx(machine, scc68070);
+
 			verboselog(machine, 2, "scc68070_tx_callback: Transmitting %02x\n", scc68070->uart.transmit_holding_register);
 			scc68070->uart.transmit_pointer--;
 			for(int index = 0; index < scc68070->uart.transmit_pointer; index++)
@@ -686,8 +762,6 @@ WRITE16_HANDLER( scc68070_periphs_w )
 				scc68070_uart_tx(space->machine, scc68070, data & 0x00ff);
                 scc68070->uart.transmit_holding_register = data & 0x00ff;
 
-				printf("%02x ", scc68070->uart.transmit_holding_register);
-
                 if((data & 0x00ff) == hack_ack)
                 {
 					count++;
@@ -697,7 +771,7 @@ WRITE16_HANDLER( scc68070_periphs_w )
 
 						for(int index = 0; index < 9; index++)
 						{
-							scc68070_uart_rx(space->machine, scc68070, check_array[index]);
+							//scc68070_uart_rx(space->machine, scc68070, check_array[index]);
 							if(index > 0)
 							{
 								check_array[index]++;
@@ -705,8 +779,8 @@ WRITE16_HANDLER( scc68070_periphs_w )
 						}
 						count = 0;
 
-						hack_active = true;
-						quizard_patch(space->machine);
+						//hack_active = true;
+						//quizard_patch(space->machine);
 					}
 				}
 				else
