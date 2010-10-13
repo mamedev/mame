@@ -99,7 +99,7 @@ static sdl_draw_info draw;
 typedef struct _worker_param worker_param;
 struct _worker_param {
 	sdl_window_info *window;
-	const render_primitive_list *list;
+	render_primitive_list *list;
 	running_machine *machine;
 	int resize_new_width;
 	int resize_new_height;
@@ -981,7 +981,7 @@ void sdlwindow_video_window_update(running_machine *machine, sdl_window_info *wi
 		if (osd_event_wait(window->rendered_event, 0))
 		{
 			worker_param wp;
-			const render_primitive_list *primlist;
+			render_primitive_list *primlist;
 
 			clear_worker_param(&wp);
 
@@ -1148,7 +1148,7 @@ static OSDWORK_CALLBACK( draw_video_contents_wt )
 	// Some configurations require events to be polled in the worker thread
 	sdlinput_process_events_buf(wp->machine);
 
-	window->primlist = (render_primitive_list*)wp->list;
+	window->primlist = wp->list;
 
 	// if no bitmap, just fill
 	if (window->primlist == NULL)
