@@ -140,6 +140,7 @@ void i8237_device::device_reset()
 	m_state = DMA8237_SI;
 	m_last_service_channel = 3;
 
+	m_command = 0;
 	m_mask = 0x00;
 	m_status = 0x0F;
 	m_hrq = 0;
