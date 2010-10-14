@@ -206,7 +206,7 @@ intelfsh_device_config::intelfsh_device_config(const machine_config &mconfig, de
 		if ((m_size & (1 << addrbits)) != 0)
 			break;
 
-	m_space_config = address_space_config("flash", ENDIANNESS_BIG, m_bits, addrbits - 1, (m_bits == 8) ? 0 : -1, map);
+	m_space_config = address_space_config("flash", ENDIANNESS_BIG, m_bits, addrbits, (m_bits == 8) ? 0 : -1, map);
 }
 
 intelfsh8_device_config::intelfsh8_device_config(const machine_config &mconfig, device_type type, const char *name, const char *tag, const device_config *owner, UINT32 clock, UINT32 variant)
