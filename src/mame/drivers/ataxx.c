@@ -56,13 +56,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( master_map_io, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-    AM_RANGE(0x04, 0x04) AM_READ(leland_80186_response_r)
-    AM_RANGE(0x05, 0x05) AM_WRITE(leland_80186_command_hi_w)
-    AM_RANGE(0x06, 0x06) AM_WRITE(leland_80186_command_lo_w)
-    AM_RANGE(0x0c, 0x0c) AM_WRITE(ataxx_80186_control_w)
-    AM_RANGE(0x20, 0x20) AM_DEVREADWRITE("eeprom", ataxx_eeprom_r, ataxx_eeprom_w)
-    AM_RANGE(0xd0, 0xef) AM_READWRITE(ataxx_mvram_port_r, ataxx_mvram_port_w)
-    AM_RANGE(0xf0, 0xff) AM_READWRITE(ataxx_master_input_r, ataxx_master_output_w)
+	AM_RANGE(0x04, 0x04) AM_DEVREAD("custom", leland_80186_response_r)
+	AM_RANGE(0x05, 0x05) AM_DEVWRITE("custom", leland_80186_command_hi_w)
+	AM_RANGE(0x06, 0x06) AM_DEVWRITE("custom", leland_80186_command_lo_w)
+	AM_RANGE(0x0c, 0x0c) AM_DEVWRITE("custom", ataxx_80186_control_w)
+	AM_RANGE(0x20, 0x20) AM_DEVREADWRITE("eeprom", ataxx_eeprom_r, ataxx_eeprom_w)
+	AM_RANGE(0xd0, 0xef) AM_READWRITE(ataxx_mvram_port_r, ataxx_mvram_port_w)
+	AM_RANGE(0xf0, 0xff) AM_READWRITE(ataxx_master_input_r, ataxx_master_output_w)
 ADDRESS_MAP_END
 
 
@@ -337,7 +337,7 @@ static MACHINE_CONFIG_START( ataxx, driver_device )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("leland", LELAND_80186, 0)
+	MDRV_SOUND_ADD("custom", LELAND_80186, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 

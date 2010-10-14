@@ -52,8 +52,8 @@ MACHINE_RESET( buggybjr );
 MACHINE_RESET( buggyboy );
 
 /*----------- defined in audio/tx1.c -----------*/
-READ8_HANDLER( tx1_pit8253_r );
-WRITE8_HANDLER( tx1_pit8253_w );
+READ8_DEVICE_HANDLER( tx1_pit8253_r );
+WRITE8_DEVICE_HANDLER( tx1_pit8253_w );
 
 WRITE8_DEVICE_HANDLER( bb_ym1_a_w );
 WRITE8_DEVICE_HANDLER( bb_ym2_a_w );

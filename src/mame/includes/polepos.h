@@ -12,8 +12,8 @@
 
 DECLARE_LEGACY_SOUND_DEVICE(POLEPOS, polepos_sound);
 
-WRITE8_HANDLER( polepos_engine_sound_lsb_w );
-WRITE8_HANDLER( polepos_engine_sound_msb_w );
+WRITE8_DEVICE_HANDLER( polepos_engine_sound_lsb_w );
+WRITE8_DEVICE_HANDLER( polepos_engine_sound_msb_w );
 
 DISCRETE_SOUND_EXTERN( polepos );
 

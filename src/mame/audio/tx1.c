@@ -11,25 +11,13 @@
 #include "includes/tx1.h"
 
 
-/*************************************
- *
- *  Common
- *
- *************************************/
-
-static sound_stream *stream;
-static UINT32 freq_to_step;
-static UINT32 step0;
-static UINT32 step1;
-static UINT32 step2;
-
 
 /*************************************
  *
  *  8253 Programmable Interval Timer
  *
  *************************************/
-static struct
+struct _pit8253_state
 {
 	union
 	{
@@ -42,24 +30,66 @@ static struct
 	} counts[3];
 
 	int idx[3];
-} pit8253;
+};
 
-
-WRITE8_HANDLER( tx1_pit8253_w )
+typedef struct _tx1_sound_state tx1_sound_state;
+struct _tx1_sound_state
 {
-	stream_update(stream);
+	sound_stream *stream;
+	UINT32 freq_to_step;
+	UINT32 step0;
+	UINT32 step1;
+	UINT32 step2;
+
+	struct _pit8253_state pit8253;
+
+	UINT8 ay_outputa;
+	UINT8 ay_outputb;
+
+	stream_sample_t pit0;
+	stream_sample_t pit1;
+	stream_sample_t pit2;
+
+	double weights0[4], weights1[3], weights2[3];
+	int eng0[4];
+	int eng1[4];
+	int eng2[4];
+
+	int noise_lfsra;
+	int noise_lfsrb;
+	int noise_lfsrc;
+	int noise_lfsrd;
+	int noise_counter;
+	UINT8 ym1_outputa;
+	UINT8 ym2_outputa;
+	UINT8 ym2_outputb;
+	UINT16 eng_voltages[16];
+};
+
+INLINE tx1_sound_state *get_safe_token(running_device *device)
+{
+	assert(device != NULL);
+	assert(device->type() == TX1 || device->type() == BUGGYBOY);
+
+	return (tx1_sound_state *)downcast<legacy_device_base *>(device)->token();
+}
+
+WRITE8_DEVICE_HANDLER( tx1_pit8253_w )
+{
+	tx1_sound_state *state = get_safe_token(device);
+	stream_update(state->stream);
 
 	if (offset < 3)
 	{
-		if (pit8253.idx[offset] == 0)
+		if (state->pit8253.idx[offset] == 0)
 		{
-			pit8253.counts[offset].LSB = data;
-			pit8253.idx[offset] = 1;
+			state->pit8253.counts[offset].LSB = data;
+			state->pit8253.idx[offset] = 1;
 		}
 		else
 		{
-			pit8253.counts[offset].MSB = data;
-			pit8253.idx[offset] = 0;
+			state->pit8253.counts[offset].MSB = data;
+			state->pit8253.idx[offset] = 0;
 		}
 	}
 	else
@@ -69,15 +99,15 @@ WRITE8_HANDLER( tx1_pit8253_w )
 		if (mode == 3)
 		{
 			int cntsel = (data >> 6) & 3;
-			pit8253.idx[cntsel] = 0;
-			pit8253.counts[cntsel].val = 0;
+			state->pit8253.idx[cntsel] = 0;
+			state->pit8253.counts[cntsel].val = 0;
 		}
 		else
 			mame_printf_debug("PIT8253: Unsupported mode %d.\n", mode);
 	}
 }
 
-READ8_HANDLER( tx1_pit8253_r )
+READ8_DEVICE_HANDLER( tx1_pit8253_r )
 {
 	mame_printf_debug("PIT R: %x", offset);
 	return 0;
@@ -121,15 +151,6 @@ static const double tx1_engine_gains[16] =
 	-( 1.0/(1.0/TX1_R + 1.0/TX1_SHUNT + 1.0/TX1_R2 + 1.0/TX1_R1 + 1.0/TX1_R0) )/TX1_RI
 };
 
-static UINT8 ay_outputa;
-static UINT8 ay_outputb;
-
-static double weights0[4], weights1[3], weights2[3];
-static int eng0[4];
-static int eng1[4];
-static int eng2[4];
-
-
 /***************************************************************************
 
     AY-8910 port mappings:
@@ -150,22 +171,24 @@ static int eng2[4];
 
 WRITE8_DEVICE_HANDLER( tx1_ay8910_a_w )
 {
-	stream_update(stream);
+	tx1_sound_state *state = get_safe_token(device);
+	stream_update(state->stream);
 
 	/* All outputs inverted */
-	ay_outputa = ~data;
+	state->ay_outputa = ~data;
 }
 
 WRITE8_DEVICE_HANDLER( tx1_ay8910_b_w )
 {
+	tx1_sound_state *state = get_safe_token(device);
 	double gain;
 
-	stream_update(stream);
+	stream_update(state->stream);
 	/* Only B3-0 are inverted */
-	ay_outputb = data ^ 0xf;
+	state->ay_outputb = data ^ 0xf;
 
 	/* It'll do until we get quadrophonic speaker support! */
-	gain = BIT(ay_outputb, 4) ? 1.5 : 2.0;
+	gain = BIT(state->ay_outputb, 4) ? 1.5 : 2.0;
 	sound_set_output_gain(device, 0, gain);
 	sound_set_output_gain(device, 1, gain);
 	sound_set_output_gain(device, 2, gain);
@@ -197,7 +220,7 @@ WRITE8_DEVICE_HANDLER( tx1_ay8910_b_w )
 
  ***************************************************************************/
 
-INLINE void update_engine (int eng[4])
+INLINE void update_engine(int eng[4])
 {
 	int p0 = eng[0];
 	int p1 = eng[1];
@@ -213,65 +236,63 @@ INLINE void update_engine (int eng[4])
 
 static STREAM_UPDATE( tx1_stream_update )
 {
+	tx1_sound_state *state = get_safe_token(device);
 	UINT32 step_0, step_1, step_2;
 	double /*gain_0, gain_1,*/ gain_2, gain_3;
 
 	stream_sample_t *fl = &outputs[0][0];
 	stream_sample_t *fr = &outputs[1][0];
 
-	static stream_sample_t pit0 = 0;
-	static stream_sample_t pit1 = 0;
-	static stream_sample_t pit2 = 0;
-
 	/* Clear the buffers */
 	memset(outputs[0], 0, samples * sizeof(*outputs[0]));
 	memset(outputs[1], 0, samples * sizeof(*outputs[1]));
 
 	/* 8253 outputs for the player/opponent engine sounds. */
-	step_0 = pit8253.counts[0].val ? (TX1_PIT_CLOCK / pit8253.counts[0].val) * freq_to_step : 0;
-	step_1 = pit8253.counts[1].val ? (TX1_PIT_CLOCK / pit8253.counts[1].val) * freq_to_step : 0;
-	step_2 = pit8253.counts[2].val ? (TX1_PIT_CLOCK / pit8253.counts[2].val) * freq_to_step : 0;
+	step_0 = state->pit8253.counts[0].val ? (TX1_PIT_CLOCK / state->pit8253.counts[0].val) * state->freq_to_step : 0;
+	step_1 = state->pit8253.counts[1].val ? (TX1_PIT_CLOCK / state->pit8253.counts[1].val) * state->freq_to_step : 0;
+	step_2 = state->pit8253.counts[2].val ? (TX1_PIT_CLOCK / state->pit8253.counts[2].val) * state->freq_to_step : 0;
 
-	//gain_0 = tx1_engine_gains[ay_outputa & 0xf];
-	//gain_1 = tx1_engine_gains[ay_outputa >> 4];
-	gain_2 = tx1_engine_gains[ay_outputb & 0xf];
-	gain_3 = BIT(ay_outputb, 5) ? 1.0f : 1.5f;
+	//gain_0 = tx1_engine_gains[state->ay_outputa & 0xf];
+	//gain_1 = tx1_engine_gains[state->ay_outputa >> 4];
+	gain_2 = tx1_engine_gains[state->ay_outputb & 0xf];
+	gain_3 = BIT(state->ay_outputb, 5) ? 1.0f : 1.5f;
 
 	while (samples--)
 	{
-		if (step0 & ((1 << TX1_FRAC)))
+		if (state->step0 & ((1 << TX1_FRAC)))
 		{
-			update_engine(eng0);
-			pit0 = combine_4_weights(weights0, eng0[0], eng0[1], eng0[2], eng0[3]);
-			step0 &= ((1 << TX1_FRAC) - 1);
+			update_engine(state->eng0);
+			state->pit0 = combine_4_weights(state->weights0, state->eng0[0], state->eng0[1], state->eng0[2], state->eng0[3]);
+			state->step0 &= ((1 << TX1_FRAC) - 1);
 		}
 
-		if (step1 & ((1 << TX1_FRAC)))
+		if (state->step1 & ((1 << TX1_FRAC)))
 		{
-			update_engine(eng1);
-			pit1 = combine_3_weights(weights1, eng1[0], eng1[1], eng1[3]);
-			step1 &= ((1 << TX1_FRAC) - 1);
+			update_engine(state->eng1);
+			state->pit1 = combine_3_weights(state->weights1, state->eng1[0], state->eng1[1], state->eng1[3]);
+			state->step1 &= ((1 << TX1_FRAC) - 1);
 		}
 
-		if (step2 & ((1 << TX1_FRAC)))
+		if (state->step2 & ((1 << TX1_FRAC)))
 		{
-			update_engine(eng2);
-			pit2 = combine_3_weights(weights2, eng2[0], eng2[1], eng2[3]);
-			step2 &= ((1 << TX1_FRAC) - 1);
+			update_engine(state->eng2);
+			state->pit2 = combine_3_weights(state->weights2, state->eng2[0], state->eng2[1], state->eng2[3]);
+			state->step2 &= ((1 << TX1_FRAC) - 1);
 		}
 
-		*fl++ = (pit0 + pit1)*gain_3 + 2*pit2*gain_2;
-		*fr++ = (pit0 + pit1)*gain_3 + 2*pit2*gain_2;
+		*fl++ = (state->pit0 + state->pit1)*gain_3 + 2*state->pit2*gain_2;
+		*fr++ = (state->pit0 + state->pit1)*gain_3 + 2*state->pit2*gain_2;
 
-		step0 += step_0;
-		step1 += step_1;
-		step2 += step_2;
+		state->step0 += step_0;
+		state->step1 += step_1;
+		state->step2 += step_2;
 	}
 }
 
 
 static DEVICE_START( tx1_sound )
 {
+	tx1_sound_state *state = get_safe_token(device);
 	running_machine *machine = device->machine;
 	static const int r0[4] = { 390e3, 180e3, 180e3, 180e3 };
 	static const int r1[3] = { 180e3, 390e3, 56e3 };
@@ -279,25 +300,30 @@ static DEVICE_START( tx1_sound )
 
 
 	/* Allocate the stream */
-	stream = stream_create(device, 0, 2, machine->sample_rate, NULL, tx1_stream_update);
-	freq_to_step = (double)(1 << TX1_FRAC) / (double)machine->sample_rate;
+	state->stream = stream_create(device, 0, 2, machine->sample_rate, NULL, tx1_stream_update);
+	state->freq_to_step = (double)(1 << TX1_FRAC) / (double)machine->sample_rate;
 
 	/* Compute the engine resistor weights */
 	compute_resistor_weights(0,	10000, -1.0,
-			4, &r0[0], weights0, 0, 0,
-			3, &r1[0], weights1, 0, 0,
-			3, &r2[0], weights2, 0, 0);
+			4, &r0[0], state->weights0, 0, 0,
+			3, &r1[0], state->weights1, 0, 0,
+			3, &r2[0], state->weights2, 0, 0);
 }
 
 static DEVICE_RESET( tx1_sound )
 {
-	step0 = step1 = step2 = 0;
+	tx1_sound_state *state = get_safe_token(device);
+
+	state->step0 = state->step1 = state->step2 = 0;
 }
 
 DEVICE_GET_INFO( tx1_sound )
 {
 	switch (state)
 	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(tx1_sound_state);			break;
+
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(tx1_sound);		break;
 		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(tx1_sound);		break;
@@ -328,16 +354,6 @@ DEVICE_GET_INFO( tx1_sound )
 #define BUGGYBOY_R2S	(1.0/(1.0/BUGGYBOY_R2 + 1.0/BUGGYBOY_SHUNT))
 #define BUGGYBOY_R3S	(1.0/(1.0/BUGGYBOY_R3 + 1.0/BUGGYBOY_SHUNT))
 #define BUGGYBOY_R4S	(1.0/(1.0/BUGGYBOY_R4 + 1.0/BUGGYBOY_SHUNT))
-
-static int noise_lfsra;
-static int noise_lfsrb;
-static int noise_lfsrc;
-static int noise_lfsrd;
-static int noise_counter;
-static UINT8 ym1_outputa;
-static UINT8 ym2_outputa;
-static UINT8 ym2_outputb;
-static UINT16 buggyboy_eng_voltages[16];
 
 static const double bb_engine_gains[16] =
 {
@@ -400,25 +416,30 @@ static const double bb_engine_gains[16] =
 
 WRITE8_DEVICE_HANDLER( bb_ym1_a_w )
 {
-	stream_update(stream);
-	ym1_outputa = data ^ 0xff;
+	tx1_sound_state *state = get_safe_token(device);
+
+	stream_update(state->stream);
+	state->ym1_outputa = data ^ 0xff;
 }
 
 WRITE8_DEVICE_HANDLER( bb_ym2_a_w )
 {
-	stream_update(stream);
-	ym2_outputa = data ^ 0xff;
+	tx1_sound_state *state = get_safe_token(device);
+
+	stream_update(state->stream);
+	state->ym2_outputa = data ^ 0xff;
 }
 
 WRITE8_DEVICE_HANDLER( bb_ym2_b_w )
 {
+	tx1_sound_state *state = get_safe_token(device);
 	running_device *ym1 = device->machine->device("ym1");
 	running_device *ym2 = device->machine->device("ym2");
 	double gain;
 
-	stream_update(stream);
+	stream_update(state->stream);
 
-	ym2_outputb = data ^ 0xff;
+	state->ym2_outputb = data ^ 0xff;
 
 	if (!strcmp(device->machine->gamedrv->name, "buggybjr"))
 	{
@@ -448,6 +469,7 @@ WRITE8_DEVICE_HANDLER( bb_ym2_b_w )
 /* This is admittedly a bit of a hack job... */
 static STREAM_UPDATE( buggyboy_stream_update )
 {
+	tx1_sound_state *state = get_safe_token(device);
 	UINT32 step_0, step_1;
 	int n1_en, n2_en;
 	double gain0, gain1_l, gain1_r;
@@ -460,59 +482,59 @@ static STREAM_UPDATE( buggyboy_stream_update )
 	memset(outputs[1], 0, samples * sizeof(*outputs[1]));
 
 	/* 8253 outputs for the player/opponent buggy engine sounds. */
-	step_0 = pit8253.counts[0].val ? (BUGGYBOY_PIT_CLOCK / pit8253.counts[0].val) * freq_to_step : 0;
-	step_1 = pit8253.counts[1].val ? (BUGGYBOY_PIT_CLOCK / pit8253.counts[1].val) * freq_to_step : 0;
+	step_0 = state->pit8253.counts[0].val ? (BUGGYBOY_PIT_CLOCK / state->pit8253.counts[0].val) * state->freq_to_step : 0;
+	step_1 = state->pit8253.counts[1].val ? (BUGGYBOY_PIT_CLOCK / state->pit8253.counts[1].val) * state->freq_to_step : 0;
 
 	if (!strcmp(device->machine->gamedrv->name, "buggybjr"))
-		gain0 = BIT(ym2_outputb, 3) ? 1.0 : 2.0;
+		gain0 = BIT(state->ym2_outputb, 3) ? 1.0 : 2.0;
 	else
-		gain0 = BIT(ym1_outputa, 3) ? 1.0 : 2.0;
+		gain0 = BIT(state->ym1_outputa, 3) ? 1.0 : 2.0;
 
-	n1_en = BIT(ym2_outputb, 4);
-	n2_en = BIT(ym2_outputb, 5);
+	n1_en = BIT(state->ym2_outputb, 4);
+	n2_en = BIT(state->ym2_outputb, 5);
 
-	gain1_l = bb_engine_gains[ym2_outputa >> 4] * 5;
-	gain1_r = bb_engine_gains[ym2_outputa & 0xf] * 5;
+	gain1_l = bb_engine_gains[state->ym2_outputa >> 4] * 5;
+	gain1_r = bb_engine_gains[state->ym2_outputa & 0xf] * 5;
 
 	while (samples--)
 	{
 		int i;
 		stream_sample_t pit0, pit1, n1, n2;
-		pit0 = buggyboy_eng_voltages[(step0 >> 24) & 0xf];
-		pit1 = buggyboy_eng_voltages[(step1 >> 24) & 0xf];
+		pit0 = state->eng_voltages[(state->step0 >> 24) & 0xf];
+		pit1 = state->eng_voltages[(state->step1 >> 24) & 0xf];
 
 		/* Calculate the tyre screech noise source */
 		for (i = 0; i < BUGGYBOY_NOISE_CLOCK / device->machine->sample_rate; ++i)
 		{
 			/* CD4006 is a 4-4-1-4-4-1 shift register */
-			int p13 = BIT(noise_lfsra, 3);
-			int p12 = BIT(noise_lfsrb, 4);
-			int p10 = BIT(noise_lfsrc, 3);
-			int p8 = BIT(noise_lfsrd, 3);
+			int p13 = BIT(state->noise_lfsra, 3);
+			int p12 = BIT(state->noise_lfsrb, 4);
+			int p10 = BIT(state->noise_lfsrc, 3);
+			int p8 = BIT(state->noise_lfsrd, 3);
 
 			/* Update the register */
-			noise_lfsra = p12 | ((noise_lfsra << 1) & 0xf);
-			noise_lfsrb = (p8 ^ p12) | ((noise_lfsrb << 1) & 0x1f);
-			noise_lfsrc = p13 | ((noise_lfsrc << 1) & 0xf);
-			noise_lfsrd = p10 | ((noise_lfsrd << 1) & 0x1f);
+			state->noise_lfsra = p12 | ((state->noise_lfsra << 1) & 0xf);
+			state->noise_lfsrb = (p8 ^ p12) | ((state->noise_lfsrb << 1) & 0x1f);
+			state->noise_lfsrc = p13 | ((state->noise_lfsrc << 1) & 0xf);
+			state->noise_lfsrd = p10 | ((state->noise_lfsrd << 1) & 0x1f);
 
 			/* 4040 12-bit counter is clocked on the falling edge of Q13 */
-			if ( !BIT(noise_lfsrc, 3) && p10 )
-				noise_counter = (noise_counter + 1) & 0x0fff;
+			if ( !BIT(state->noise_lfsrc, 3) && p10 )
+				state->noise_counter = (state->noise_counter + 1) & 0x0fff;
 		}
 
 		if (n1_en)
 		{
-			n1 = !BIT(noise_counter, 7-1) * 16000;
-			if ( BIT(noise_counter, 11-1) ) n1 /=2;
+			n1 = !BIT(state->noise_counter, 7-1) * 16000;
+			if ( BIT(state->noise_counter, 11-1) ) n1 /=2;
 		}
 		else
 			n1 = 8192;
 
 		if (n2_en)
 		{
-			n2 = !BIT(noise_counter, 6-1) * 16000;
-			if ( BIT(noise_counter, 11-1) ) n2 /=2;
+			n2 = !BIT(state->noise_counter, 6-1) * 16000;
+			if ( BIT(state->noise_counter, 11-1) ) n2 /=2;
 		}
 		else
 			n2 = 8192;
@@ -520,13 +542,14 @@ static STREAM_UPDATE( buggyboy_stream_update )
 		*fl++ = n1 + n2 + (pit0 * gain0) + (pit1 * gain1_l);
 		*fr++ = n1 + n2 + (pit0 * gain0) + (pit1 * gain1_r);
 
-		step0 += step_0;
-		step1 += step_1;
+		state->step0 += step_0;
+		state->step1 += step_1;
 	}
 }
 
 static DEVICE_START( buggyboy_sound )
 {
+	tx1_sound_state *state = get_safe_token(device);
 	running_machine *machine = device->machine;
 	static const int resistors[4] = { 330000, 220000, 330000, 220000 };
 	double aweights[4];
@@ -542,28 +565,32 @@ static DEVICE_START( buggyboy_sound )
 							0, 0, 0, 0, 0 );
 
 	for (i = 0; i < 16; i++)
-		buggyboy_eng_voltages[i] = combine_4_weights(aweights, BIT(tmp[i], 0), BIT(tmp[i], 1), BIT(tmp[i], 2), BIT(tmp[i], 3));
+		state->eng_voltages[i] = combine_4_weights(aweights, BIT(tmp[i], 0), BIT(tmp[i], 1), BIT(tmp[i], 2), BIT(tmp[i], 3));
 
 	/* Allocate the stream */
-	stream = stream_create(device, 0, 2, machine->sample_rate, NULL, buggyboy_stream_update);
-	freq_to_step = (double)(1 << 24) / (double)machine->sample_rate;
+	state->stream = stream_create(device, 0, 2, machine->sample_rate, NULL, buggyboy_stream_update);
+	state->freq_to_step = (double)(1 << 24) / (double)machine->sample_rate;
 }
 
 static DEVICE_RESET( buggyboy_sound )
 {
-	step0 = step1 = 0;
+	tx1_sound_state *state = get_safe_token(device);
+
+	state->step0 = state->step1 = 0;
 
 	/* Reset noise LFSR */
-	noise_lfsra = 0;
-	noise_lfsrb = 1;
-	noise_lfsrc = 0;
-	noise_lfsrd = 0;
+	state->noise_lfsra = 0;
+	state->noise_lfsrb = 1;
+	state->noise_lfsrc = 0;
+	state->noise_lfsrd = 0;
 }
 
 DEVICE_GET_INFO( buggyboy_sound )
 {
 	switch (state)
 	{
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(tx1_sound_state);			break;
+
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(buggyboy_sound);	break;
 		case DEVINFO_FCT_RESET:							info->reset = DEVICE_RESET_NAME(buggyboy_sound);	break;

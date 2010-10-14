@@ -318,8 +318,8 @@ static WRITE8_HANDLER( polepos_latch_w )
 			polepos_sound_enable(space->machine->device("namco"),bit);
 			if (!bit)
 			{
-				polepos_engine_sound_lsb_w(space, 0, 0);
-				polepos_engine_sound_msb_w(space, 0, 0);
+				polepos_engine_sound_lsb_w(space->machine->device("polepos"), 0, 0);
+				polepos_engine_sound_msb_w(space->machine->device("polepos"), 0, 0);
 			}
 			break;
 
@@ -494,8 +494,8 @@ static ADDRESS_MAP_START( z80_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa000, 0xa000) AM_MIRROR(0x0cff) AM_READ(polepos_ready_r)					/* READY */
 	AM_RANGE(0xa000, 0xa007) AM_MIRROR(0x0cf8) AM_WRITE(polepos_latch_w)				/* misc latches */
 	AM_RANGE(0xa100, 0xa100) AM_MIRROR(0x0cff) AM_WRITE(watchdog_reset_w)				/* Watchdog */
-	AM_RANGE(0xa200, 0xa200) AM_MIRROR(0x0cff) AM_WRITE(polepos_engine_sound_lsb_w) 	/* Car Sound ( Lower Nibble ) */
-	AM_RANGE(0xa300, 0xa300) AM_MIRROR(0x0cff) AM_WRITE(polepos_engine_sound_msb_w) 	/* Car Sound ( Upper Nibble ) */
+	AM_RANGE(0xa200, 0xa200) AM_MIRROR(0x0cff) AM_DEVWRITE("polepos", polepos_engine_sound_lsb_w) 	/* Car Sound ( Lower Nibble ) */
+	AM_RANGE(0xa300, 0xa300) AM_MIRROR(0x0cff) AM_DEVWRITE("polepos", polepos_engine_sound_msb_w) 	/* Car Sound ( Upper Nibble ) */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( z80_io, ADDRESS_SPACE_IO, 8 )

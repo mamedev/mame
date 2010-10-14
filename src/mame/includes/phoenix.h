@@ -18,8 +18,6 @@
 
 /*----------- defined in audio/phoenix.c -----------*/
 
-SOUND_START( phoenix );
-
 DISCRETE_SOUND_EXTERN( phoenix );
 
 WRITE8_DEVICE_HANDLER( phoenix_sound_control_a_w );

@@ -143,7 +143,7 @@ VIDEO_START( naughtyb )
 WRITE8_HANDLER( naughtyb_videoreg_w )
 {
 	// bits 4+5 control the sound circuit
-	pleiads_sound_control_c_w(space,offset,data);
+	pleiads_sound_control_c_w(space->machine->device("cust"),offset,data);
 
 	naughtyb_cocktail =
 		( ( input_port_read(space->machine, "DSW0") & 0x80 ) &&	// cabinet == cocktail
@@ -155,7 +155,7 @@ WRITE8_HANDLER( naughtyb_videoreg_w )
 WRITE8_HANDLER( popflame_videoreg_w )
 {
 	// bits 4+5 control the sound circuit
-	pleiads_sound_control_c_w(space,offset,data);
+	pleiads_sound_control_c_w(space->machine->device("cust"),offset,data);
 
 	naughtyb_cocktail =
 		( ( input_port_read(space->machine, "DSW0") & 0x80 ) &&	// cabinet == cocktail

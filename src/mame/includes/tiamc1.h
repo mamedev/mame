@@ -4,9 +4,9 @@
 
 DECLARE_LEGACY_SOUND_DEVICE(TIAMC1, tiamc1_sound);
 
-WRITE8_HANDLER( tiamc1_timer0_w );
-WRITE8_HANDLER( tiamc1_timer1_w );
-WRITE8_HANDLER( tiamc1_timer1_gate_w );
+WRITE8_DEVICE_HANDLER( tiamc1_timer0_w );
+WRITE8_DEVICE_HANDLER( tiamc1_timer1_w );
+WRITE8_DEVICE_HANDLER( tiamc1_timer1_gate_w );
 
 
 /*----------- defined in video/tiamc1.c -----------*/

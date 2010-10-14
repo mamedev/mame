@@ -405,11 +405,6 @@ MACHINE_RESET( leland )
 	slave_base = memory_region(machine, "slave");
 	if (slave_length > 0x10000)
 		memory_set_bankptr(machine, "bank3", &slave_base[0x10000]);
-
-	/* if we have an I80186 CPU, reset it */
-	device_t *audiocpu = machine->device("audiocpu");
-	if (audiocpu != NULL && audiocpu->type() == I80186)
-		leland_80186_sound_init();
 }
 
 
@@ -454,9 +449,6 @@ MACHINE_RESET( ataxx )
 	slave_base = memory_region(machine, "slave");
 	if (slave_length > 0x10000)
 		memory_set_bankptr(machine, "bank3", &slave_base[0x10000]);
-
-	/* reset the 80186 */
-	leland_80186_sound_init();
 }
 
 
@@ -520,7 +512,7 @@ WRITE8_HANDLER( leland_master_alt_bankswitch_w )
 	(*leland_update_master_bank)(space->machine);
 
 	/* sound control is in the rest */
-	leland_80186_control_w(space, offset, data);
+	leland_80186_control_w(space->machine->device("custom"), offset, data);
 }
 
 

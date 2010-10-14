@@ -24,15 +24,15 @@ WRITE8_HANDLER( geebee_videoram_w );
 
 /*----------- defined in audio/geebee.c -----------*/
 
-WRITE8_HANDLER( geebee_sound_w );
+WRITE8_DEVICE_HANDLER( geebee_sound_w );
 
 DECLARE_LEGACY_SOUND_DEVICE(GEEBEE, geebee_sound);
 
 
 /*----------- defined in audio/warpwarp.c -----------*/
 
-WRITE8_HANDLER( warpwarp_sound_w );
-WRITE8_HANDLER( warpwarp_music1_w );
-WRITE8_HANDLER( warpwarp_music2_w );
+WRITE8_DEVICE_HANDLER( warpwarp_sound_w );
+WRITE8_DEVICE_HANDLER( warpwarp_music1_w );
+WRITE8_DEVICE_HANDLER( warpwarp_music2_w );
 
 DECLARE_LEGACY_SOUND_DEVICE(WARPWARP, warpwarp_sound);

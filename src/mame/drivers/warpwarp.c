@@ -179,7 +179,7 @@ static WRITE8_HANDLER( geebee_out6_w )
 			/* n.c. */
 			break;
 		case 3:
-			geebee_sound_w(space,0,data);
+			geebee_sound_w(space->machine->device("geebee"),0,data);
 			break;
 	}
 }
@@ -226,17 +226,17 @@ static READ8_HANDLER( warpwarp_sw_r )
 }
 
 /* Read Dipswitches */
-static READ8_HANDLER( warpwarp_dsw1_r )
+static READ8_DEVICE_HANDLER( warpwarp_dsw1_r )
 {
-	return (input_port_read(space->machine, "DSW1") >> (offset & 7)) & 1;
+	return (input_port_read(device->machine, "DSW1") >> (offset & 7)) & 1;
 }
 
 /* Read mux Controller Inputs */
-static READ8_HANDLER( warpwarp_vol_r )
+static READ8_DEVICE_HANDLER( warpwarp_vol_r )
 {
 	int res;
 
-	res = input_port_read(space->machine, (flip_screen_get(space->machine) & 1) ? "VOLIN2" : "VOLIN1");
+	res = input_port_read(device->machine, (flip_screen_get(device->machine) & 1) ? "VOLIN2" : "VOLIN1");
 	if (handle_joystick)
 	{
 		if (res & 1) return 0x0f;
@@ -259,7 +259,7 @@ static WRITE8_HANDLER( warpwarp_out0_w )
 			warpwarp_ball_v = data;
 			break;
 		case 2:
-			warpwarp_sound_w(space,0,data);
+			warpwarp_sound_w(space->machine->device("warpwarp"),0,data);
 			break;
 		case 3:
 			watchdog_reset_w(space,0,data);
@@ -327,8 +327,8 @@ static ADDRESS_MAP_START( bombbee_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x47ff) AM_RAM_WRITE(warpwarp_videoram_w) AM_BASE(&warpwarp_videoram)
 	AM_RANGE(0x4800, 0x4fff) AM_ROM AM_REGION("gfx1", 0)
 	AM_RANGE(0x6000, 0x600f) AM_READWRITE(warpwarp_sw_r, warpwarp_out0_w)
-	AM_RANGE(0x6010, 0x601f) AM_READWRITE(warpwarp_vol_r, warpwarp_music1_w)
-	AM_RANGE(0x6020, 0x602f) AM_READWRITE(warpwarp_dsw1_r, warpwarp_music2_w)
+	AM_RANGE(0x6010, 0x601f) AM_DEVREADWRITE("warpwarp", warpwarp_vol_r, warpwarp_music1_w)
+	AM_RANGE(0x6020, 0x602f) AM_DEVREADWRITE("warpwarp", warpwarp_dsw1_r, warpwarp_music2_w)
 	AM_RANGE(0x6030, 0x603f) AM_WRITE(warpwarp_out3_w)
 ADDRESS_MAP_END
 
@@ -338,8 +338,8 @@ static ADDRESS_MAP_START( warpwarp_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x47ff) AM_RAM_WRITE(warpwarp_videoram_w) AM_BASE(&warpwarp_videoram)
 	AM_RANGE(0x4800, 0x4fff) AM_ROM AM_REGION("gfx1", 0)
 	AM_RANGE(0xc000, 0xc00f) AM_READWRITE(warpwarp_sw_r, warpwarp_out0_w)
-	AM_RANGE(0xc010, 0xc01f) AM_READWRITE(warpwarp_vol_r, warpwarp_music1_w)
-	AM_RANGE(0xc020, 0xc02f) AM_READWRITE(warpwarp_dsw1_r, warpwarp_music2_w)
+	AM_RANGE(0xc010, 0xc01f) AM_DEVREADWRITE("warpwarp", warpwarp_vol_r, warpwarp_music1_w)
+	AM_RANGE(0xc020, 0xc02f) AM_DEVREADWRITE("warpwarp", warpwarp_dsw1_r, warpwarp_music2_w)
 	AM_RANGE(0xc030, 0xc03f) AM_WRITE(warpwarp_out3_w)
 ADDRESS_MAP_END
 

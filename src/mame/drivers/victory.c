@@ -133,8 +133,8 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc800, 0xdfff) AM_RAM AM_BASE(&victory_charram)
 	AM_RANGE(0xe000, 0xefff) AM_RAM
 	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_SHARE("nvram")
-	AM_RANGE(0xf800, 0xf800) AM_MIRROR(0x07fc) AM_READWRITE(victory_sound_response_r, victory_sound_command_w)
-	AM_RANGE(0xf801, 0xf801) AM_MIRROR(0x07fc) AM_READ(victory_sound_status_r)
+	AM_RANGE(0xf800, 0xf800) AM_MIRROR(0x07fc) AM_DEVREADWRITE("custom", victory_sound_response_r, victory_sound_command_w)
+	AM_RANGE(0xf801, 0xf801) AM_MIRROR(0x07fc) AM_DEVREAD("custom", victory_sound_status_r)
 ADDRESS_MAP_END
 
 

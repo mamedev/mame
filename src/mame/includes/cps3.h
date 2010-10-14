@@ -15,5 +15,5 @@ extern UINT8* cps3_user5region;
 
 DECLARE_LEGACY_SOUND_DEVICE(CPS3, cps3_sound);
 
-WRITE32_HANDLER( cps3_sound_w );
-READ32_HANDLER( cps3_sound_r );
+WRITE32_DEVICE_HANDLER( cps3_sound_w );
+READ32_DEVICE_HANDLER( cps3_sound_r );

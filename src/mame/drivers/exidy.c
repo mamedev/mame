@@ -869,7 +869,7 @@ static MACHINE_CONFIG_DERIVED( teetert, venture )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_VBLANK_INT_HACK(teetert_vblank_interrupt,10)
 
-    MDRV_MACHINE_START( teetert )
+	MDRV_MACHINE_START( teetert )
 
 MACHINE_CONFIG_END
 

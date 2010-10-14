@@ -9,29 +9,39 @@
 
 #define CPS3_VOICES		16
 
-static sound_stream *cps3_stream;
-
-typedef struct _cps3_voice_
+typedef struct _cps3_voice cps3_voice;
+struct _cps3_voice
 {
 	UINT32 regs[8];
 	UINT32 pos;
 	UINT16 frac;
-} cps3_voice;
+};
 
-static struct
+typedef struct _cps3_sound_state cps3_sound_state;
+struct _cps3_sound_state
 {
+	sound_stream *stream;
 	cps3_voice voice[CPS3_VOICES];
 	UINT16     key;
 	INT8*	   base;
-} chip;
+};
+
+INLINE cps3_sound_state *get_safe_token(running_device *device)
+{
+	assert(device != NULL);
+	assert(device->type() == CPS3);
+
+	return (cps3_sound_state *)downcast<legacy_device_base *>(device)->token();
+}
 
 static STREAM_UPDATE( cps3_stream_update )
 {
+	cps3_sound_state *state = get_safe_token(device);
 	int i;
 
 	// the actual 'user5' region only exists on the nocd sets, on the others it's allocated in the initialization.
 	// it's a shared gfx/sound region, so can't be allocated as part of the sound device.
-	chip.base = (INT8*)cps3_user5region;
+	state->base = (INT8*)cps3_user5region;
 
 	/* Clear the buffers */
 	memset(outputs[0], 0, samples*sizeof(*outputs[0]));
@@ -39,14 +49,14 @@ static STREAM_UPDATE( cps3_stream_update )
 
 	for (i = 0; i < CPS3_VOICES; i ++)
 	{
-		if (chip.key & (1 << i))
+		if (state->key & (1 << i))
 		{
 			int j;
 
 			/* TODO */
 			#define SWAP(a) ((a >> 16) | ((a & 0xffff) << 16))
 
-			cps3_voice *vptr = &chip.voice[i];
+			cps3_voice *vptr = &state->voice[i];
 
 			UINT32 start = vptr->regs[1];
 			UINT32 end   = vptr->regs[5];
@@ -81,12 +91,12 @@ static STREAM_UPDATE( cps3_stream_update )
 					}
 					else
 					{
-						chip.key &= ~(1 << i);
+						state->key &= ~(1 << i);
 						break;
 					}
 				}
 
-				sample = chip.base[BYTE4_XOR_LE(start + pos)];
+				sample = state->base[BYTE4_XOR_LE(start + pos)];
 				frac += step;
 
 				outputs[0][j] += (sample * (vol_l >> 8));
@@ -102,16 +112,19 @@ static STREAM_UPDATE( cps3_stream_update )
 
 static DEVICE_START( cps3_sound )
 {
-	/* Allocate the stream */
-	cps3_stream = stream_create(device, 0, 2, device->clock() / 384, NULL, cps3_stream_update);
+	cps3_sound_state *state = get_safe_token(device);
 
-	memset(&chip, 0, sizeof(chip));
+	/* Allocate the stream */
+	state->stream = stream_create(device, 0, 2, device->clock() / 384, NULL, cps3_stream_update);
 }
 
 DEVICE_GET_INFO( cps3_sound )
 {
 	switch (state)
 	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(cps3_sound_state);			break;
+
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(cps3_sound);	break;
 
@@ -122,13 +135,15 @@ DEVICE_GET_INFO( cps3_sound )
 }
 
 
-WRITE32_HANDLER( cps3_sound_w )
+WRITE32_DEVICE_HANDLER( cps3_sound_w )
 {
-	stream_update(cps3_stream);
+	cps3_sound_state *state = get_safe_token(device);
+
+	stream_update(state->stream);
 
 	if (offset < 0x80)
 	{
-		COMBINE_DATA(&chip.voice[offset / 8].regs[offset & 7]);
+		COMBINE_DATA(&state->voice[offset / 8].regs[offset & 7]);
 	}
 	else if (offset == 0x80)
 	{
@@ -138,13 +153,13 @@ WRITE32_HANDLER( cps3_sound_w )
 		for (i = 0; i < CPS3_VOICES; i++)
 		{
 			// Key off -> Key on
-			if ((key & (1 << i)) && !(chip.key & (1 << i)))
+			if ((key & (1 << i)) && !(state->key & (1 << i)))
 			{
-				chip.voice[i].frac = 0;
-				chip.voice[i].pos = 0;
+				state->voice[i].frac = 0;
+				state->voice[i].pos = 0;
 			}
 		}
-		chip.key = key;
+		state->key = key;
 	}
 	else
 	{
@@ -152,17 +167,18 @@ WRITE32_HANDLER( cps3_sound_w )
 	}
 }
 
-READ32_HANDLER( cps3_sound_r )
+READ32_DEVICE_HANDLER( cps3_sound_r )
 {
-	stream_update(cps3_stream);
+	cps3_sound_state *state = get_safe_token(device);
+	stream_update(state->stream);
 
 	if (offset < 0x80)
 	{
-		return chip.voice[offset / 8].regs[offset & 7] & mem_mask;
+		return state->voice[offset / 8].regs[offset & 7] & mem_mask;
 	}
 	else if (offset == 0x80)
 	{
-		return chip.key << 16;
+		return state->key << 16;
 	}
 	else
 	{

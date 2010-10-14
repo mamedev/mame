@@ -254,8 +254,8 @@ static ADDRESS_MAP_START( naughtyb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8800, 0x8fff) AM_RAM AM_BASE(&naughtyb_videoram2)
 	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(naughtyb_videoreg_w)
 	AM_RANGE(0x9800, 0x9fff) AM_RAM AM_BASE(&naughtyb_scrollreg)
-	AM_RANGE(0xa000, 0xa7ff) AM_WRITE(pleiads_sound_control_a_w)
-	AM_RANGE(0xa800, 0xafff) AM_WRITE(pleiads_sound_control_b_w)
+	AM_RANGE(0xa000, 0xa7ff) AM_DEVWRITE("cust", pleiads_sound_control_a_w)
+	AM_RANGE(0xa800, 0xafff) AM_DEVWRITE("cust", pleiads_sound_control_b_w)
 	AM_RANGE(0xb000, 0xb7ff) AM_READ(in0_port_r)	// IN0
 	AM_RANGE(0xb800, 0xbfff) AM_READ(dsw0_port_r)	// DSW0
 ADDRESS_MAP_END
@@ -267,8 +267,8 @@ static ADDRESS_MAP_START( popflame_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8800, 0x8fff) AM_RAM AM_BASE(&naughtyb_videoram2)
 	AM_RANGE(0x9000, 0x97ff) AM_RAM_WRITE(popflame_videoreg_w)
 	AM_RANGE(0x9800, 0x9fff) AM_RAM AM_BASE(&naughtyb_scrollreg)
-	AM_RANGE(0xa000, 0xa7ff) AM_WRITE(pleiads_sound_control_a_w)
-	AM_RANGE(0xa800, 0xafff) AM_WRITE(pleiads_sound_control_b_w)
+	AM_RANGE(0xa000, 0xa7ff) AM_DEVWRITE("cust", pleiads_sound_control_a_w)
+	AM_RANGE(0xa800, 0xafff) AM_DEVWRITE("cust", pleiads_sound_control_b_w)
 	AM_RANGE(0xb000, 0xb7ff) AM_READ(in0_port_r)	// IN0
 	AM_RANGE(0xb800, 0xbfff) AM_READ(dsw0_port_r)	// DSW0
 ADDRESS_MAP_END
@@ -464,7 +464,7 @@ static MACHINE_CONFIG_START( naughtyb, naughtyb_state )
 	MDRV_SOUND_CONFIG(tms3615_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.60)
 
-	MDRV_SOUND_ADD("naughtyb", NAUGHTYB, 0)
+	MDRV_SOUND_ADD("cust", NAUGHTYB, 0)
 	MDRV_SOUND_ROUTE(0, "mono", 0.40)
 MACHINE_CONFIG_END
 
@@ -499,7 +499,7 @@ static MACHINE_CONFIG_START( popflame, naughtyb_state )
 	MDRV_SOUND_CONFIG(tms3615_interface)
 	MDRV_SOUND_ROUTE(0, "mono", 0.60)
 
-	MDRV_SOUND_ADD("popflame", POPFLAME, 0)
+	MDRV_SOUND_ADD("cust", POPFLAME, 0)
 	MDRV_SOUND_ROUTE(0, "mono", 1.0)
 MACHINE_CONFIG_END
 

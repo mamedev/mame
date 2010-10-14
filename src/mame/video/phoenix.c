@@ -53,7 +53,7 @@ static const res_net_decode_info phoenix_decode_info =
 	//  R,   G,   B,   R,   G,   B
 	{   0,   0,   0, 256, 256, 256},		// offsets
 	{   0,   2,   1,  -1,   1,   0},		// shifts
-	{0x01,0x01,0x01,0x02,0x02,0x02}		    // masks
+	{0x01,0x01,0x01,0x02,0x02,0x02}			// masks
 };
 
 static const res_net_info phoenix_net_info =
@@ -186,12 +186,12 @@ VIDEO_START( phoenix )
 	memory_configure_bank(machine, "bank1", 1, 1, videoram_pg[1], 0);
 	memory_set_bank(machine, "bank1", 0);
 
-    videoram_pg_index = 0;
+	videoram_pg_index = 0;
 	palette_bank = 0;
 	cocktail_mode = 0;
 
 	fg_tilemap = tilemap_create(machine, get_fg_tile_info,tilemap_scan_rows,8,8,32,32);
-	bg_tilemap = tilemap_create(machine, get_bg_tile_info,tilemap_scan_rows,     8,8,32,32);
+	bg_tilemap = tilemap_create(machine, get_bg_tile_info,tilemap_scan_rows,8,8,32,32);
 
 	tilemap_set_transparent_pen(fg_tilemap,0);
 
@@ -249,7 +249,7 @@ WRITE8_HANDLER( phoenix_videoram_w )
 
 WRITE8_HANDLER( phoenix_videoreg_w )
 {
-    if (videoram_pg_index != (data & 1))
+	if (videoram_pg_index != (data & 1))
 	{
 		/* set memory bank */
 		videoram_pg_index = data & 1;
@@ -289,7 +289,7 @@ WRITE8_HANDLER( pleiads_videoreg_w )
        Four palette changes by level.  The palette selection is
        wrong, but the same paletter is used for both layers. */
 
-    if (palette_bank != ((data >> 1) & 3))
+	if (palette_bank != ((data >> 1) & 3))
 	{
 		palette_bank = ((data >> 1) & 3);
 
@@ -301,7 +301,7 @@ WRITE8_HANDLER( pleiads_videoreg_w )
 	pleiads_protection_question = data & 0xfc;
 
 	/* send two bits to sound control C (not sure if they are there) */
-	pleiads_sound_control_c_w(space, offset, data);
+	pleiads_sound_control_c_w(space->machine->device("cust"), offset, data);
 }
 
 

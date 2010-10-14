@@ -61,14 +61,28 @@ struct n_state
 	INT32 lowpass_polybit;
 };
 
-static struct c_state		c24_state;
-static struct c_state		c25_state;
-static struct n_state		noise_state;
-static UINT8				sound_latch_a;
-static sound_stream *		channel;
-static UINT32 *				poly18;
+typedef struct _phoenix_sound_state phoenix_sound_state;
+struct _phoenix_sound_state
+{
+	struct c_state		c24_state;
+	struct c_state		c25_state;
+	struct n_state		noise_state;
+	UINT8				sound_latch_a;
+	sound_stream *		channel;
+	UINT32 *				poly18;
+	running_device *discrete;
+	running_device *tms;
+};
 
-INLINE int update_c24(int samplerate)
+INLINE phoenix_sound_state *get_safe_token( running_device *device )
+{
+	assert(device != NULL);
+	assert(device->type() == PHOENIX);
+
+	return (phoenix_sound_state *)downcast<legacy_device_base *>(device)->token();
+}
+
+INLINE int update_c24(phoenix_sound_state *state, int samplerate)
 {
 	/*
      * Noise frequency control (Port B):
@@ -78,40 +92,43 @@ INLINE int update_c24(int samplerate)
      */
 	#define C24 6.8e-6
 	#define R49 1000
-    #define R51 330
+	#define R51 330
 	#define R52 20000
-	if( sound_latch_a & 0x40 )
+
+	c_state *c24_state = &state->c24_state;
+
+	if( state->sound_latch_a & 0x40 )
 	{
-		if (c24_state.level > VMIN)
+		if (c24_state->level > VMIN)
 		{
-			c24_state.counter -= (int)((c24_state.level - VMIN) / (R52 * C24));
-			if( c24_state.counter <= 0 )
+			c24_state->counter -= (int)((c24_state->level - VMIN) / (R52 * C24));
+			if( c24_state->counter <= 0 )
 			{
-				int n = -c24_state.counter / samplerate + 1;
-				c24_state.counter += n * samplerate;
-				if( (c24_state.level -= n) < VMIN)
-					c24_state.level = VMIN;
+				int n = -c24_state->counter / samplerate + 1;
+				c24_state->counter += n * samplerate;
+				if( (c24_state->level -= n) < VMIN)
+					c24_state->level = VMIN;
 			}
 		}
-    }
+	}
 	else
 	{
-		if (c24_state.level < VMAX)
+		if (c24_state->level < VMAX)
 		{
-			c24_state.counter -= (int)((VMAX - c24_state.level) / ((R51+R49) * C24));
-			if( c24_state.counter <= 0 )
+			c24_state->counter -= (int)((VMAX - c24_state->level) / ((R51+R49) * C24));
+			if( c24_state->counter <= 0 )
 			{
-				int n = -c24_state.counter / samplerate + 1;
-				c24_state.counter += n * samplerate;
-				if( (c24_state.level += n) > VMAX)
-					c24_state.level = VMAX;
+				int n = -c24_state->counter / samplerate + 1;
+				c24_state->counter += n * samplerate;
+				if( (c24_state->level += n) > VMAX)
+					c24_state->level = VMAX;
 			}
 		}
-    }
-	return VMAX - c24_state.level;
+	}
+	return VMAX - c24_state->level;
 }
 
-INLINE int update_c25(int samplerate)
+INLINE int update_c25(phoenix_sound_state *state, int samplerate)
 {
 	/*
      * Bit 7 hi charges C25 (6.8u) over a R50 (1k) and R53 (330) and when
@@ -120,46 +137,49 @@ INLINE int update_c25(int samplerate)
      */
 	#define C25 6.8e-6
 	#define R50 1000
-    #define R53 330
+	#define R53 330
 	#define R54 47000
 
-	if( sound_latch_a & 0x80 )
+	c_state *c25_state = &state->c25_state;
+
+	if( state->sound_latch_a & 0x80 )
 	{
-		if (c25_state.level < VMAX)
+		if (c25_state->level < VMAX)
 		{
-			c25_state.counter -= (int)((VMAX - c25_state.level) / ((R50+R53) * C25));
-			if( c25_state.counter <= 0 )
+			c25_state->counter -= (int)((VMAX - c25_state->level) / ((R50+R53) * C25));
+			if( c25_state->counter <= 0 )
 			{
-				int n = -c25_state.counter / samplerate + 1;
-				c25_state.counter += n * samplerate;
-				if( (c25_state.level += n) > VMAX )
-					c25_state.level = VMAX;
+				int n = -c25_state->counter / samplerate + 1;
+				c25_state->counter += n * samplerate;
+				if( (c25_state->level += n) > VMAX )
+					c25_state->level = VMAX;
 			}
 		}
 	}
 	else
 	{
-		if (c25_state.level > VMIN)
+		if (c25_state->level > VMIN)
 		{
-			c25_state.counter -= (int)((c25_state.level - VMIN) / (R54 * C25));
-			if( c25_state.counter <= 0 )
+			c25_state->counter -= (int)((c25_state->level - VMIN) / (R54 * C25));
+			if( c25_state->counter <= 0 )
 			{
-				int n = -c25_state.counter / samplerate + 1;
-				c25_state.counter += n * samplerate;
-				if( (c25_state.level -= n) < VMIN )
-					c25_state.level = VMIN;
+				int n = -c25_state->counter / samplerate + 1;
+				c25_state->counter += n * samplerate;
+				if( (c25_state->level -= n) < VMIN )
+					c25_state->level = VMIN;
 			}
 		}
 	}
-	return c25_state.level;
+	return c25_state->level;
 }
 
 
-INLINE int noise(int samplerate)
+INLINE int noise(phoenix_sound_state *state, int samplerate)
 {
-	int vc24 = update_c24(samplerate);
-	int vc25 = update_c25(samplerate);
+	int vc24 = update_c24(state, samplerate);
+	int vc25 = update_c25(state, samplerate);
 	int sum = 0, level, frequency;
+	n_state *noise_state = &state->noise_state;
 
 	/*
      * The voltage levels are added and control I(CE) of transistor TR1
@@ -179,25 +199,25 @@ INLINE int noise(int samplerate)
      * R71 (2700 Ohms) parallel to R73 (47k Ohms) = approx. 2553 Ohms
      * maxfreq = 1.44 / ((2553+2*1000) * 0.05e-6) = approx. 6325 Hz
      */
-	noise_state.counter -= frequency;
-	if( noise_state.counter <= 0 )
+	noise_state->counter -= frequency;
+	if( noise_state->counter <= 0 )
 	{
-		int n = (-noise_state.counter / samplerate) + 1;
-		noise_state.counter += n * samplerate;
-		noise_state.polyoffs = (noise_state.polyoffs + n) & 0x3ffff;
-		noise_state.polybit = (poly18[noise_state.polyoffs>>5] >> (noise_state.polyoffs & 31)) & 1;
+		int n = (-noise_state->counter / samplerate) + 1;
+		noise_state->counter += n * samplerate;
+		noise_state->polyoffs = (noise_state->polyoffs + n) & 0x3ffff;
+		noise_state->polybit = (state->poly18[noise_state->polyoffs>>5] >> (noise_state->polyoffs & 31)) & 1;
 	}
-	if (!noise_state.polybit)
+	if (!noise_state->polybit)
 		sum += vc24;
 
 	/* 400Hz crude low pass filter: this is only a guess!! */
-	noise_state.lowpass_counter -= 400;
-	if( noise_state.lowpass_counter <= 0 )
+	noise_state->lowpass_counter -= 400;
+	if( noise_state->lowpass_counter <= 0 )
 	{
-		noise_state.lowpass_counter += samplerate;
-		noise_state.lowpass_polybit = noise_state.polybit;
+		noise_state->lowpass_counter += samplerate;
+		noise_state->lowpass_polybit = noise_state->polybit;
 	}
-	if (!noise_state.lowpass_polybit)
+	if (!noise_state->lowpass_polybit)
 		sum += vc25;
 
 	return sum;
@@ -205,13 +225,14 @@ INLINE int noise(int samplerate)
 
 static STREAM_UPDATE( phoenix_sound_update )
 {
+	phoenix_sound_state *state = get_safe_token(device);
 	int samplerate = device->machine->sample_rate;
 	stream_sample_t *buffer = outputs[0];
 
 	while( samples-- > 0 )
 	{
 		int sum = 0;
-		sum = noise(samplerate) / 2;
+		sum = noise(state, samplerate) / 2;
 		*buffer++ = sum < 32768 ? sum > -32768 ? sum : -32768 : 32767;
 	}
 }
@@ -473,56 +494,65 @@ DISCRETE_SOUND_END
 
 WRITE8_DEVICE_HANDLER( phoenix_sound_control_a_w )
 {
-	discrete_sound_w(device, PHOENIX_EFFECT_2_DATA, data & 0x0f);
-	discrete_sound_w(device, PHOENIX_EFFECT_2_FREQ, (data & 0x30) >> 4);
+	phoenix_sound_state *state = get_safe_token(device);
+
+	discrete_sound_w(state->discrete, PHOENIX_EFFECT_2_DATA, data & 0x0f);
+	discrete_sound_w(state->discrete, PHOENIX_EFFECT_2_FREQ, (data & 0x30) >> 4);
 #if 0
 	/* future handling of noise sounds */
-	discrete_sound_w(device, PHOENIX_EFFECT_3_EN  , data & 0x40);
-	discrete_sound_w(device, PHOENIX_EFFECT_4_EN  , data & 0x80);
+	discrete_sound_w(state->discrete, PHOENIX_EFFECT_3_EN  , data & 0x40);
+	discrete_sound_w(state->discrete, PHOENIX_EFFECT_4_EN  , data & 0x80);
 #endif
-	stream_update(channel);
-	sound_latch_a = data;
+	stream_update(state->channel);
+	state->sound_latch_a = data;
 }
 
-SOUND_START( phoenix)
+static void register_state(running_device *device)
 {
-	sound_latch_a = 0;
-	memset(&c24_state, 0, sizeof(c24_state));
-	memset(&c25_state, 0, sizeof(c25_state));
-	memset(&noise_state, 0, sizeof(noise_state));
+	phoenix_sound_state *state = get_safe_token(device);
 
-	state_save_register_global(machine, sound_latch_a);
-	state_save_register_global(machine, c24_state.counter);
-	state_save_register_global(machine, c24_state.level);
-	state_save_register_global(machine, c25_state.counter);
-	state_save_register_global(machine, c25_state.level);
-	state_save_register_global(machine, noise_state.counter);
-	state_save_register_global(machine, noise_state.polybit);
-	state_save_register_global(machine, noise_state.polyoffs);
-	state_save_register_global(machine, noise_state.lowpass_counter);
-	state_save_register_global(machine, noise_state.lowpass_polybit);
-
+	state_save_register_device_item(device, 0, state->sound_latch_a);
+	state_save_register_device_item(device, 0, state->c24_state.counter);
+	state_save_register_device_item(device, 0, state->c24_state.level);
+	state_save_register_device_item(device, 0, state->c25_state.counter);
+	state_save_register_device_item(device, 0, state->c25_state.level);
+	state_save_register_device_item(device, 0, state->noise_state.counter);
+	state_save_register_device_item(device, 0, state->noise_state.polybit);
+	state_save_register_device_item(device, 0, state->noise_state.polyoffs);
+	state_save_register_device_item(device, 0, state->noise_state.lowpass_counter);
+	state_save_register_device_item(device, 0, state->noise_state.lowpass_polybit);
+	state_save_register_device_item_pointer(device, 0, state->poly18, (1ul << (18-5)));
 }
 
 WRITE8_DEVICE_HANDLER( phoenix_sound_control_b_w )
 {
-	discrete_sound_w(device, PHOENIX_EFFECT_1_DATA, data & 0x0f);
-	discrete_sound_w(device, PHOENIX_EFFECT_1_FILT, data & 0x20);
-	discrete_sound_w(device, PHOENIX_EFFECT_1_FREQ, data & 0x10);
+	phoenix_sound_state *state = get_safe_token(device);
+
+	discrete_sound_w(state->discrete, PHOENIX_EFFECT_1_DATA, data & 0x0f);
+	discrete_sound_w(state->discrete, PHOENIX_EFFECT_1_FILT, data & 0x20);
+	discrete_sound_w(state->discrete, PHOENIX_EFFECT_1_FREQ, data & 0x10);
 
 	/* update the tune that the MM6221AA is playing */
-	mm6221aa_tune_w(device->machine->device("tms"), data >> 6);
+	mm6221aa_tune_w(state->tms, data >> 6);
 }
 
 static DEVICE_START( phoenix_sound )
 {
-	running_machine *machine = device->machine;
+	phoenix_sound_state *state = get_safe_token(device);
 	int i, j;
 	UINT32 shiftreg;
 
-	poly18 = auto_alloc_array(machine, UINT32, 1ul << (18-5));
+	state->sound_latch_a = 0;
+	memset(&state->c24_state, 0, sizeof(state->c24_state));
+	memset(&state->c25_state, 0, sizeof(state->c25_state));
+	memset(&state->noise_state, 0, sizeof(state->noise_state));
 
-    shiftreg = 0;
+	state->discrete = device->machine->device("discrete");
+	state->tms = device->machine->device("tms");
+
+	state->poly18 = auto_alloc_array(device->machine, UINT32, 1ul << (18-5));
+
+	shiftreg = 0;
 	for( i = 0; i < (1ul << (18-5)); i++ )
 	{
 		UINT32 bits = 0;
@@ -534,18 +564,21 @@ static DEVICE_START( phoenix_sound )
 			else
 				shiftreg <<= 1;
 		}
-		poly18[i] = bits;
+		state->poly18[i] = bits;
 	}
 
-	channel = stream_create(device, 0, 1, machine->sample_rate, 0, phoenix_sound_update);
+	state->channel = stream_create(device, 0, 1, device->machine->sample_rate, 0, phoenix_sound_update);
 
-	state_save_register_global_pointer(machine, poly18, (1ul << (18-5)) );
+	register_state(device);
 }
 
 DEVICE_GET_INFO( phoenix_sound )
 {
 	switch (state)
 	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(phoenix_sound_state);			break;
+
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(phoenix_sound);	break;
 

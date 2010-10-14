@@ -38,9 +38,6 @@
 #define CLOCK_DIVIDER 16
 #define BUF_LEN 100000
 
-static sound_stream *channel;
-static int timer1_divider;
-
 struct timer8253chan {
 	UINT16 count;
 	UINT16 cnval;
@@ -57,14 +54,30 @@ struct timer8253struct {
 	struct timer8253chan channel[3];
 };
 
-static struct timer8253struct timer0;
-static struct timer8253struct timer1;
+typedef struct _tiamc1_sound_state tiamc1_sound_state;
+struct _tiamc1_sound_state
+{
+	sound_stream *channel;
+	int timer1_divider;
+
+	struct timer8253struct timer0;
+	struct timer8253struct timer1;
+};
 
 
 #define T8253_CHAN0		0
 #define T8253_CHAN1		1
 #define T8253_CHAN2		2
 #define T8253_CWORD		3
+
+
+INLINE tiamc1_sound_state *get_safe_token(running_device *device)
+{
+	assert(device != NULL);
+	assert(device->type() == TIAMC1);
+
+	return (tiamc1_sound_state *)downcast<legacy_device_base *>(device)->token();
+}
 
 
 static void timer8253_reset(struct timer8253struct *t) {
@@ -226,50 +239,55 @@ static char timer8253_get_output(struct timer8253struct *t, int chn)
 }
 
 
-WRITE8_HANDLER( tiamc1_timer0_w )
+
+WRITE8_DEVICE_HANDLER( tiamc1_timer0_w )
 {
-	timer8253_wr(&timer0, offset, data);
+	tiamc1_sound_state *state = get_safe_token(device);
+	timer8253_wr(&state->timer0, offset, data);
 }
 
-WRITE8_HANDLER( tiamc1_timer1_w )
+WRITE8_DEVICE_HANDLER( tiamc1_timer1_w )
 {
-	timer8253_wr(&timer1, offset, data);
+	tiamc1_sound_state *state = get_safe_token(device);
+	timer8253_wr(&state->timer1, offset, data);
 }
 
-WRITE8_HANDLER( tiamc1_timer1_gate_w )
+WRITE8_DEVICE_HANDLER( tiamc1_timer1_gate_w )
 {
-	timer8253_set_gate(&timer1, 0, (data & 1) ? 1 : 0);
-	timer8253_set_gate(&timer1, 1, (data & 2) ? 1 : 0);
-	timer8253_set_gate(&timer1, 2, (data & 4) ? 1 : 0);
+	tiamc1_sound_state *state = get_safe_token(device);
+	timer8253_set_gate(&state->timer1, 0, (data & 1) ? 1 : 0);
+	timer8253_set_gate(&state->timer1, 1, (data & 2) ? 1 : 0);
+	timer8253_set_gate(&state->timer1, 2, (data & 4) ? 1 : 0);
 }
 
 
 static STREAM_UPDATE( tiamc1_sound_update )
 {
+	tiamc1_sound_state *state = get_safe_token(device);
 	int count, o0, o1, o2, len, orval = 0;
 
 	len = samples * CLOCK_DIVIDER;
 
 	for (count = 0; count < len; count++) {
-		timer1_divider++;
-		if (timer1_divider == 228) {
-			timer1_divider = 0;
-			timer8253_tick(&timer1, 0);
-			timer8253_tick(&timer1, 1);
-			timer8253_tick(&timer1, 2);
+		state->timer1_divider++;
+		if (state->timer1_divider == 228) {
+			state->timer1_divider = 0;
+			timer8253_tick(&state->timer1, 0);
+			timer8253_tick(&state->timer1, 1);
+			timer8253_tick(&state->timer1, 2);
 
-			timer8253_set_gate(&timer0, 0, timer8253_get_output(&timer1, 0));
-			timer8253_set_gate(&timer0, 1, timer8253_get_output(&timer1, 1));
-			timer8253_set_gate(&timer0, 2, timer8253_get_output(&timer1, 2));
+			timer8253_set_gate(&state->timer0, 0, timer8253_get_output(&state->timer1, 0));
+			timer8253_set_gate(&state->timer0, 1, timer8253_get_output(&state->timer1, 1));
+			timer8253_set_gate(&state->timer0, 2, timer8253_get_output(&state->timer1, 2));
 		}
 
-		timer8253_tick(&timer0, 0);
-		timer8253_tick(&timer0, 1);
-		timer8253_tick(&timer0, 2);
+		timer8253_tick(&state->timer0, 0);
+		timer8253_tick(&state->timer0, 1);
+		timer8253_tick(&state->timer0, 2);
 
-		o0 = timer8253_get_output(&timer0, 0) ? 1 : 0;
-		o1 = timer8253_get_output(&timer0, 1) ? 1 : 0;
-		o2 = timer8253_get_output(&timer0, 2) ? 1 : 0;
+		o0 = timer8253_get_output(&state->timer0, 0) ? 1 : 0;
+		o1 = timer8253_get_output(&state->timer0, 1) ? 1 : 0;
+		o2 = timer8253_get_output(&state->timer0, 2) ? 1 : 0;
 
 		orval = (orval << 1) | (((o0 | o1) ^ 0xff) & o2);
 
@@ -282,18 +300,19 @@ static STREAM_UPDATE( tiamc1_sound_update )
 
 static DEVICE_START( tiamc1_sound )
 {
+	tiamc1_sound_state *state = get_safe_token(device);
 	running_machine *machine = device->machine;
 	int i, j;
 
-	timer8253_reset(&timer0);
-	timer8253_reset(&timer1);
+	timer8253_reset(&state->timer0);
+	timer8253_reset(&state->timer1);
 
-	channel = stream_create(device, 0, 1, device->clock() / CLOCK_DIVIDER, 0, tiamc1_sound_update);
+	state->channel = stream_create(device, 0, 1, device->clock() / CLOCK_DIVIDER, 0, tiamc1_sound_update);
 
-	timer1_divider = 0;
+	state->timer1_divider = 0;
 
 	for (i = 0; i < 2; i++) {
-		struct timer8253struct *t = (i ? &timer1 : &timer0);
+		struct timer8253struct *t = (i ? &state->timer1 : &state->timer0);
 
 		for (j = 0; j < 3; j++) {
 			state_save_register_item(machine, "channel", NULL, i * 3 + j, t->channel[j].count);
@@ -308,7 +327,7 @@ static DEVICE_START( tiamc1_sound )
 		}
 	}
 
-	state_save_register_global(machine, timer1_divider);
+	state_save_register_global(machine, state->timer1_divider);
 }
 
 
@@ -316,6 +335,9 @@ DEVICE_GET_INFO( tiamc1_sound )
 {
 	switch (state)
 	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(tiamc1_sound_state);			break;
+
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(tiamc1_sound);	break;
 

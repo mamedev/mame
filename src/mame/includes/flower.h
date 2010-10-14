@@ -2,10 +2,8 @@
 
 /*----------- defined in audio/flower.c -----------*/
 
-extern UINT8 *flower_soundregs1,*flower_soundregs2;
-
-WRITE8_HANDLER( flower_sound1_w );
-WRITE8_HANDLER( flower_sound2_w );
+WRITE8_DEVICE_HANDLER( flower_sound1_w );
+WRITE8_DEVICE_HANDLER( flower_sound2_w );
 
 DECLARE_LEGACY_SOUND_DEVICE(FLOWER, flower_sound);
 

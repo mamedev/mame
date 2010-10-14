@@ -216,7 +216,7 @@
 
 static UINT8 analog_data;
 
-UINT8 rb_input_select;
+static UINT8 rb_input_select;
 
 
 
@@ -284,6 +284,12 @@ static READ8_DEVICE_HANDLER( redbaron_joy_r )
 	return input_port_read(device->machine, rb_input_select ? "FAKE1" : "FAKE2");
 }
 
+static WRITE8_DEVICE_HANDLER( redbaron_joysound_w )
+{
+	rb_input_select = data & 1;
+	redbaron_sounds_w(device, offset, data);
+}
+
 
 
 /*************************************
@@ -326,7 +332,7 @@ static ADDRESS_MAP_START( redbaron_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1802, 0x1802) AM_READ_PORT("IN4")
 	AM_RANGE(0x1804, 0x1804) AM_DEVREAD("mathbox", mathbox_lo_r)
 	AM_RANGE(0x1806, 0x1806) AM_DEVREAD("mathbox", mathbox_hi_r)
-	AM_RANGE(0x1808, 0x1808) AM_WRITE(redbaron_sounds_w)	/* and select joystick pot also */
+	AM_RANGE(0x1808, 0x1808) AM_DEVWRITE("custom", redbaron_joysound_w)	/* and select joystick pot also */
 	AM_RANGE(0x180a, 0x180a) AM_WRITENOP				/* sound reset, yet todo */
 	AM_RANGE(0x180c, 0x180c) AM_DEVWRITE("earom", atari_vg_earom_ctrl_w)
 	AM_RANGE(0x1810, 0x181f) AM_DEVREADWRITE("pokey", pokey_r, pokey_w)

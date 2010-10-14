@@ -103,16 +103,14 @@ DECLARE_LEGACY_SOUND_DEVICE(LELAND, leland_sound);
 DECLARE_LEGACY_SOUND_DEVICE(LELAND_80186, leland_80186_sound);
 DECLARE_LEGACY_SOUND_DEVICE(REDLINE_80186, redline_80186_sound);
 
-void leland_dac_update(int dacnum, UINT8 sample);
+void leland_dac_update(running_device *device, int dacnum, UINT8 sample);
 
-void leland_80186_sound_init(void);
+READ8_DEVICE_HANDLER( leland_80186_response_r );
 
-READ8_HANDLER( leland_80186_response_r );
-
-WRITE8_HANDLER( leland_80186_control_w );
-WRITE8_HANDLER( leland_80186_command_lo_w );
-WRITE8_HANDLER( leland_80186_command_hi_w );
-WRITE8_HANDLER( ataxx_80186_control_w );
+WRITE8_DEVICE_HANDLER( leland_80186_control_w );
+WRITE8_DEVICE_HANDLER( leland_80186_command_lo_w );
+WRITE8_DEVICE_HANDLER( leland_80186_command_hi_w );
+WRITE8_DEVICE_HANDLER( ataxx_80186_control_w );
 
 ADDRESS_MAP_EXTERN(leland_80186_map_program, 16);
 ADDRESS_MAP_EXTERN(leland_80186_map_io, 16);

@@ -132,8 +132,8 @@ static ADDRESS_MAP_START( flower_sound_cpu, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x4000) AM_WRITE(sn_irq_enable_w) AM_BASE(&sn_irq_enable)
 	AM_RANGE(0x4001, 0x4001) AM_WRITEONLY AM_BASE(&sn_nmi_enable)
 	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_r)
-	AM_RANGE(0x8000, 0x803f) AM_WRITE(flower_sound1_w) AM_BASE(&flower_soundregs1)
-	AM_RANGE(0xa000, 0xa03f) AM_WRITE(flower_sound2_w) AM_BASE(&flower_soundregs2)
+	AM_RANGE(0x8000, 0x803f) AM_DEVWRITE("flower", flower_sound1_w)
+	AM_RANGE(0xa000, 0xa03f) AM_DEVWRITE("flower", flower_sound2_w)
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM
 ADDRESS_MAP_END
 

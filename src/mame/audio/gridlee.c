@@ -12,27 +12,22 @@
 
 /*************************************
  *
- *  Constants
+ *  Structures
  *
  *************************************/
 
+struct gridlee_sound_state
+{
+	/* tone variables */
+	UINT32 tone_step;
+	UINT32 tone_fraction;
+	UINT8 tone_volume;
 
-
-/*************************************
- *
- *  Local variables
- *
- *************************************/
-
-/* tone variables */
-static UINT32 tone_step;
-static UINT32 tone_fraction;
-static UINT8 tone_volume;
-
-/* sound streaming variables */
-static sound_stream *gridlee_stream;
-static double freq_to_step;
-
+	/* sound streaming variables */
+	sound_stream *stream;
+	running_device *samples;
+	double freq_to_step;
+};
 
 
 /*************************************
@@ -41,16 +36,25 @@ static double freq_to_step;
  *
  *************************************/
 
+INLINE gridlee_sound_state *get_safe_token( running_device *device )
+{
+	assert(device != NULL);
+	assert(device->type() == GRIDLEE);
+
+	return (gridlee_sound_state *)downcast<legacy_device_base *>(device)->token();
+}
+
 static STREAM_UPDATE( gridlee_stream_update )
 {
+	gridlee_sound_state *state = get_safe_token(device);
 	stream_sample_t *buffer = outputs[0];
 
 	/* loop over samples */
 	while (samples--)
 	{
 		/* tone channel */
-		tone_fraction += tone_step;
-		*buffer++ = (tone_fraction & 0x0800000) ? (tone_volume << 6) : 0;
+		state->tone_fraction += state->tone_step;
+		*buffer++ = (state->tone_fraction & 0x0800000) ? (state->tone_volume << 6) : 0;
 	}
 }
 
@@ -64,12 +68,15 @@ static STREAM_UPDATE( gridlee_stream_update )
 
 static DEVICE_START( gridlee_sound )
 {
+	gridlee_sound_state *state = get_safe_token(device);
 	running_machine *machine = device->machine;
 
 	/* allocate the stream */
-	gridlee_stream = stream_create(device, 0, 1, machine->sample_rate, NULL, gridlee_stream_update);
+	state->stream = stream_create(device, 0, 1, machine->sample_rate, NULL, gridlee_stream_update);
 
-	freq_to_step = (double)(1 << 24) / (double)machine->sample_rate;
+	state->samples = device->machine->device("samples");
+
+	state->freq_to_step = (double)(1 << 24) / (double)machine->sample_rate;
 }
 
 
@@ -77,6 +84,9 @@ DEVICE_GET_INFO( gridlee_sound )
 {
 	switch (state)
 	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(gridlee_sound_state);			break;
+
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(gridlee_sound);	break;
 
@@ -88,12 +98,13 @@ DEVICE_GET_INFO( gridlee_sound )
 
 
 
-WRITE8_HANDLER( gridlee_sound_w )
+WRITE8_DEVICE_HANDLER( gridlee_sound_w )
 {
+	gridlee_sound_state *state = get_safe_token(device);
 	static UINT8 sound_data[24];
-	running_device *samples = space->machine->device("samples");
+	running_device *samples = state->samples;
 
-	stream_update(gridlee_stream);
+	stream_update(state->stream);
 
 	switch (offset)
 	{
@@ -120,13 +131,13 @@ WRITE8_HANDLER( gridlee_sound_w )
 
 		case 0x08+0x08:
 			if (data)
-				tone_step = freq_to_step * (double)(data * 5);
+				state->tone_step = state->freq_to_step * (double)(data * 5);
 			else
-				tone_step = 0;
+				state->tone_step = 0;
 			break;
 
 		case 0x09+0x08:
-			tone_volume = data;
+			state->tone_volume = data;
 			break;
 
 		case 0x0b+0x08:

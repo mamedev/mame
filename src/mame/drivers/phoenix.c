@@ -43,8 +43,8 @@ static ADDRESS_MAP_START( phoenix_memory_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x4fff) AM_READ_BANK("bank1") AM_WRITE(phoenix_videoram_w)	/* 2 pages selected by bit 0 of the video register */
 	AM_RANGE(0x5000, 0x53ff) AM_WRITE(phoenix_videoreg_w)
 	AM_RANGE(0x5800, 0x5bff) AM_WRITE(phoenix_scroll_w)
-	AM_RANGE(0x6000, 0x63ff) AM_DEVWRITE("discrete", phoenix_sound_control_a_w)
-	AM_RANGE(0x6800, 0x6bff) AM_DEVWRITE("discrete", phoenix_sound_control_b_w)
+	AM_RANGE(0x6000, 0x63ff) AM_DEVWRITE("cust", phoenix_sound_control_a_w)
+	AM_RANGE(0x6800, 0x6bff) AM_DEVWRITE("cust", phoenix_sound_control_b_w)
 	AM_RANGE(0x7000, 0x73ff) AM_READ_PORT("IN0")							/* IN0 or IN1 */
 	AM_RANGE(0x7800, 0x7bff) AM_READ_PORT("DSW0")							/* DSW */
 ADDRESS_MAP_END
@@ -54,8 +54,8 @@ static ADDRESS_MAP_START( pleiads_memory_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4000, 0x4fff) AM_READ_BANK("bank1") AM_WRITE(phoenix_videoram_w)	/* 2 pages selected by bit 0 of the video register */
 	AM_RANGE(0x5000, 0x53ff) AM_WRITE(pleiads_videoreg_w)
 	AM_RANGE(0x5800, 0x5bff) AM_WRITE(phoenix_scroll_w)
-	AM_RANGE(0x6000, 0x63ff) AM_WRITE(pleiads_sound_control_a_w)
-	AM_RANGE(0x6800, 0x6bff) AM_WRITE(pleiads_sound_control_b_w)
+	AM_RANGE(0x6000, 0x63ff) AM_DEVWRITE("cust", pleiads_sound_control_a_w)
+	AM_RANGE(0x6800, 0x6bff) AM_DEVWRITE("cust", pleiads_sound_control_b_w)
 	AM_RANGE(0x7000, 0x73ff) AM_READ_PORT("IN0")							/* IN0 or IN1 + protection */
 	AM_RANGE(0x7800, 0x7bff) AM_READ_PORT("DSW0")							/* DSW */
 ADDRESS_MAP_END
@@ -469,8 +469,6 @@ static MACHINE_CONFIG_START( phoenix, driver_device )
 	MDRV_PALETTE_INIT(phoenix)
 	MDRV_VIDEO_START(phoenix)
 	MDRV_VIDEO_UPDATE(phoenix)
-
-	MDRV_SOUND_START(phoenix)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")

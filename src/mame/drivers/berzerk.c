@@ -511,12 +511,12 @@ static WRITE8_HANDLER( berzerk_audio_w )
 
 	/* offset 6 writes to the sfxcontrol latch */
 	case 6:
-		exidy_sfxctrl_w(space, data >> 6, data);
+		exidy_sfxctrl_w(space->machine->device("exidy"), data >> 6, data);
 		break;
 
 	/* everything else writes to the 6840 */
 	default:
-		exidy_sh6840_w(space, offset, data);
+		exidy_sh6840_w(space->machine->device("exidy"), offset, data);
 		break;
 
 	}
@@ -537,7 +537,7 @@ static READ8_HANDLER( berzerk_audio_r )
 		return 0;
 	/* everything else reads from the 6840 */
 	default:
-		return exidy_sh6840_r(space, offset);
+		return exidy_sh6840_r(space->machine->device(""), offset);
 	}
 }
 

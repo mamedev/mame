@@ -52,14 +52,15 @@ static emu_timer *scanline_timer;
 
 static TIMER_CALLBACK( scanline_callback )
 {
+	running_device *audio = machine->device("custom");
 	int scanline = param;
 
 	/* update the DACs */
 	if (!(leland_dac_control & 0x01))
-		leland_dac_update(0, leland_video_ram[(last_scanline) * 256 + 160]);
+		leland_dac_update(audio, 0, leland_video_ram[(last_scanline) * 256 + 160]);
 
 	if (!(leland_dac_control & 0x02))
-		leland_dac_update(1, leland_video_ram[(last_scanline) * 256 + 161]);
+		leland_dac_update(audio, 1, leland_video_ram[(last_scanline) * 256 + 161]);
 
 	last_scanline = scanline;
 

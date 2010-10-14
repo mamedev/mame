@@ -2,11 +2,8 @@
 
 /*----------- defined in audio/gomoku.c -----------*/
 
-extern UINT8 *gomoku_soundregs1;
-extern UINT8 *gomoku_soundregs2;
-
-WRITE8_HANDLER( gomoku_sound1_w );
-WRITE8_HANDLER( gomoku_sound2_w );
+WRITE8_DEVICE_HANDLER( gomoku_sound1_w );
+WRITE8_DEVICE_HANDLER( gomoku_sound2_w );
 
 DECLARE_LEGACY_SOUND_DEVICE(GOMOKU, gomoku_sound);
 
