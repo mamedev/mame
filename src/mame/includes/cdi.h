@@ -33,9 +33,9 @@ public:
 
 /*----------- debug defines -----------*/
 
-#define VERBOSE_LEVEL   (5)
+#define VERBOSE_LEVEL   (0)
 
-#define ENABLE_VERBOSE_LOG (1)
+#define ENABLE_VERBOSE_LOG (0)
 
 #define ENABLE_UART_PRINTING (0)
 

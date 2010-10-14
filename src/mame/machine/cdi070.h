@@ -228,9 +228,6 @@ typedef struct
 	scc68070_timer_regs_t timers;
 	scc68070_dma_regs_t dma;
 	scc68070_mmu_regs_t mmu;
-
-	UINT16 mcu_value;
-	UINT8 mcu_ack;
 } scc68070_regs_t;
 
 // Member functions
@@ -250,5 +247,7 @@ extern void scc68070_register_globals(running_machine *machine, scc68070_regs_t 
 extern void scc68070_set_quizard_mcu_value(running_machine *machine, UINT16 value);
 extern void scc68070_set_quizard_mcu_ack(running_machine *machine, UINT8 ack);
 extern void scc68070_quizard_rx(running_machine *machine, scc68070_regs_t *scc68070, UINT8 data);
+
+extern INTERRUPT_GEN( scc68070_mcu_frame );
 
 #endif // _MACHINE_CDI070_H_

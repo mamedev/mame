@@ -191,47 +191,6 @@ static MACHINE_START( cdi )
     scc68070_register_globals(machine, &state->scc68070_regs);
 }
 
-static DRIVER_INIT( quizrd12 )
-{
-    scc68070_set_quizard_mcu_value(machine, 0x021f);
-    scc68070_set_quizard_mcu_ack(machine, 0x5a);
-}
-
-static DRIVER_INIT( quizrd17 )
-{
-    scc68070_set_quizard_mcu_value(machine, 0x021f);
-    scc68070_set_quizard_mcu_ack(machine, 0x5a);
-}
-
-static DRIVER_INIT( quizrd22 )
-{
-	// 0x2b1: Italian
-	// 0x001: French
-	// 0x188: German
-
-	scc68070_set_quizard_mcu_value(machine, 0x188);
-
-    scc68070_set_quizard_mcu_ack(machine, 0x59);
-}
-
-static DRIVER_INIT( quizrd32 )
-{
-	scc68070_set_quizard_mcu_value(machine, 0x00ae);
-    scc68070_set_quizard_mcu_ack(machine, 0x58);
-}
-
-static DRIVER_INIT( quizrr41 )
-{
-	scc68070_set_quizard_mcu_value(machine, 0x011f);
-	scc68070_set_quizard_mcu_ack(machine, 0x57);
-}
-
-static DRIVER_INIT( quizrr42 )
-{
-	scc68070_set_quizard_mcu_value(machine, 0x011f);
-	scc68070_set_quizard_mcu_ack(machine, 0x57);
-}
-
 static MACHINE_RESET( cdi )
 {
     cdi_state *state = machine->driver_data<cdi_state>();
@@ -248,6 +207,58 @@ static MACHINE_RESET( cdi )
     state->dmadac[1] = machine->device<dmadac_sound_device>("dac2");
 }
 
+static MACHINE_RESET( quizrd12 )
+{
+	MACHINE_RESET_CALL( cdi );
+
+    scc68070_set_quizard_mcu_value(machine, 0x021f);
+    scc68070_set_quizard_mcu_ack(machine, 0x5a);
+}
+
+static MACHINE_RESET( quizrd17 )
+{
+	MACHINE_RESET_CALL( cdi );
+
+    scc68070_set_quizard_mcu_value(machine, 0x021f);
+    scc68070_set_quizard_mcu_ack(machine, 0x5a);
+}
+
+static MACHINE_RESET( quizrd22 )
+{
+	MACHINE_RESET_CALL( cdi );
+
+	// 0x2b1: Italian
+	// 0x001: French
+	// 0x188: German
+
+	scc68070_set_quizard_mcu_value(machine, 0x188);
+    scc68070_set_quizard_mcu_ack(machine, 0x59);
+}
+
+static MACHINE_RESET( quizrd32 )
+{
+	MACHINE_RESET_CALL( cdi );
+
+	scc68070_set_quizard_mcu_value(machine, 0x00ae);
+    scc68070_set_quizard_mcu_ack(machine, 0x58);
+}
+
+static MACHINE_RESET( quizrr41 )
+{
+	MACHINE_RESET_CALL( cdi );
+
+	scc68070_set_quizard_mcu_value(machine, 0x0139);
+	scc68070_set_quizard_mcu_ack(machine, 0x57);
+}
+
+static MACHINE_RESET( quizrr42 )
+{
+	MACHINE_RESET_CALL( cdi );
+
+	scc68070_set_quizard_mcu_value(machine, 0x011f);
+	scc68070_set_quizard_mcu_ack(machine, 0x57);
+}
+
 /*************************
 *    Machine Drivers     *
 *************************/
@@ -256,6 +267,7 @@ static MACHINE_CONFIG_START( cdi, cdi_state )
 
     MDRV_CPU_ADD("maincpu", SCC68070, CLOCK_A/2)
     MDRV_CPU_PROGRAM_MAP(cdimono1_mem)
+    MDRV_CPU_VBLANK_INT("screen", scc68070_mcu_frame)
 
     MDRV_SCREEN_ADD("screen", RASTER)
     MDRV_SCREEN_REFRESH_RATE(60)
@@ -278,7 +290,6 @@ static MACHINE_CONFIG_START( cdi, cdi_state )
     MDRV_VIDEO_START(cdimono1)
     MDRV_VIDEO_UPDATE(cdimono1)
 
-    MDRV_MACHINE_RESET(cdi)
     MDRV_MACHINE_START(cdi)
 
     MDRV_CDICDIC_ADD( "cdic" )
@@ -298,6 +309,30 @@ static MACHINE_CONFIG_START( cdi, cdi_state )
     MDRV_SOUND_ROUTE( ALL_OUTPUTS, "rspeaker", 1.0 )
 
     MDRV_MK48T08_ADD( "mk48t08" )
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( quizrd12, cdi )
+	MDRV_MACHINE_RESET( quizrd12 )
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( quizrd17, cdi )
+	MDRV_MACHINE_RESET( quizrd17 )
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( quizrd22, cdi )
+	MDRV_MACHINE_RESET( quizrd22 )
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( quizrd32, cdi )
+	MDRV_MACHINE_RESET( quizrd32 )
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( quizrr41, cdi )
+	MDRV_MACHINE_RESET( quizrr41 )
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( quizrr42, cdi )
+	MDRV_MACHINE_RESET( quizrr42 )
 MACHINE_CONFIG_END
 
 /*************************
@@ -404,14 +439,14 @@ ROM_END
 *************************/
 
 // BIOS
-GAME( 1991, cdi,      0,        cdi,      cdi,      0,        ROT0,     "Philips", "CD-i (Mono-I) BIOS", GAME_IS_BIOS_ROOT )
+GAME( 1991, cdi,      0,        cdi,           cdi,      0, ROT0,     "Philips", "CD-i (Mono-I) BIOS", GAME_IS_BIOS_ROOT )
 
 // Working
-GAME( 1995, quizrd12, cdi,      cdi,      cdi,      quizrd12, ROT0,     "TAB Austria",  "Quizard 1.2", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
-GAME( 1995, quizrd17, cdi,      cdi,      cdi,      quizrd17, ROT0,     "TAB Austria",  "Quizard 1.7", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
-GAME( 1995, quizrd22, cdi,      cdi,      cdi,      quizrd22, ROT0,     "TAB Austria",  "Quizard 2.2", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
+GAME( 1995, quizrd12, cdi,      quizrd12,      cdi,      0, ROT0,     "TAB Austria",  "Quizard 1.2", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
+GAME( 1995, quizrd17, cdi,      quizrd17,      cdi,      0, ROT0,     "TAB Austria",  "Quizard 1.7", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
+GAME( 1995, quizrd22, cdi,      quizrd22,      cdi,      0, ROT0,     "TAB Austria",  "Quizard 2.2", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
 
 // Partially working
-GAME( 1996, quizard,  cdi,      cdi,      cdi,      quizrd32, ROT0,     "TAB Austria",  "Quizard 3.2", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
-GAME( 1998, quizrr41, cdi,      cdi,      cdi,      quizrr41, ROT0,     "TAB Austria",  "Quizard Rainbow 4.1", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
-GAME( 1998, quizrr42, cdi,      cdi,      cdi,      quizrr42, ROT0,     "TAB Austria",  "Quizard Rainbow 4.2", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
+GAME( 1996, quizard,  cdi,      quizrd32,      cdi,      0, ROT0,     "TAB Austria",  "Quizard 3.2", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
+GAME( 1998, quizrr41, cdi,      quizrr41,      cdi,      0, ROT0,     "TAB Austria",  "Quizard Rainbow 4.1", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
+GAME( 1998, quizrr42, cdi,      quizrr42,      cdi,      0, ROT0,     "TAB Austria",  "Quizard Rainbow 4.2", GAME_NOT_WORKING | GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )

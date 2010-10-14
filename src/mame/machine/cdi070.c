@@ -24,8 +24,6 @@ TODO:
 #include "machine/cdi070.h"
 #include "includes/cdi.h"
 
-#define ENABLE_QUIZARD_HACK (1)
-
 #if ENABLE_VERBOSE_LOG
 INLINE void verboselog(running_machine *machine, int n_level, const char *s_fmt, ...)
 {
@@ -42,6 +40,9 @@ INLINE void verboselog(running_machine *machine, int n_level, const char *s_fmt,
 #else
 #define verboselog(x,y,z,...)
 #endif
+
+static UINT16 mcu_value = 0;
+static UINT8 mcu_ack = 0;
 
 static void scc68070_set_timer_callback(scc68070_regs_t *scc68070, int channel)
 {
@@ -61,18 +62,12 @@ static void scc68070_set_timer_callback(scc68070_regs_t *scc68070, int channel)
 
 void scc68070_set_quizard_mcu_ack(running_machine *machine, UINT8 ack)
 {
-    cdi_state *state = machine->driver_data<cdi_state>();
-    scc68070_regs_t *scc68070 = &state->scc68070_regs;
-
-	scc68070->mcu_ack = ack;
+	mcu_ack = ack;
 }
 
 void scc68070_set_quizard_mcu_value(running_machine *machine, UINT16 value)
 {
-    cdi_state *state = machine->driver_data<cdi_state>();
-    scc68070_regs_t *scc68070 = &state->scc68070_regs;
-
-	scc68070->mcu_value = value;
+	mcu_value = value;
 }
 
 TIMER_CALLBACK( scc68070_timer0_callback )
@@ -98,10 +93,8 @@ TIMER_CALLBACK( scc68070_timer0_callback )
 
 static void scc68070_uart_rx_check(running_machine *machine, scc68070_regs_t *scc68070)
 {
-	if((scc68070->uart.command_register & 3) == 1 &&
-		scc68070->uart.receive_pointer > -1)
+	if((scc68070->uart.command_register & 3) == 1)
 	{
-		scc68070->uart.status_register |= USR_RXRDY;
 		UINT32 div = 0x10000 >> ((scc68070->uart.clock_select >> 4) & 7);
 		timer_adjust_oneshot(scc68070->uart.rx_timer, ATTOTIME_IN_HZ((49152000 / div) / 8), 0);
 	}
@@ -114,12 +107,22 @@ static void scc68070_uart_rx_check(running_machine *machine, scc68070_regs_t *sc
 
 static void scc68070_uart_tx_check(running_machine *machine, scc68070_regs_t *scc68070)
 {
-	if(((scc68070->uart.command_register >> 2) & 3) == 1 &&
-		scc68070->uart.transmit_pointer > -1 &&
-		attotime_compare(timer_timeleft(scc68070->uart.tx_timer), attotime_never) == 0)
+	if(((scc68070->uart.command_register >> 2) & 3) == 1)
 	{
-		UINT32 div = 0x10000 >> (scc68070->uart.clock_select & 7);
-		timer_adjust_oneshot(scc68070->uart.tx_timer, ATTOTIME_IN_HZ((49152000 / div) / 8), 0);
+		if(scc68070->uart.transmit_pointer >= 0)
+		{
+			scc68070->uart.status_register &= ~USR_TXRDY;
+		}
+		else
+		{
+			scc68070->uart.status_register |= USR_TXRDY;
+		}
+
+		if(attotime_compare(timer_timeleft(scc68070->uart.tx_timer), attotime_never) == 0)
+		{
+			UINT32 div = 0x10000 >> (scc68070->uart.clock_select & 7);
+			timer_adjust_oneshot(scc68070->uart.tx_timer, ATTOTIME_IN_HZ((49152000 / div) / 8), 0);
+		}
 	}
 	else
 	{
@@ -129,9 +132,9 @@ static void scc68070_uart_tx_check(running_machine *machine, scc68070_regs_t *sc
 
 void scc68070_uart_rx(running_machine *machine, scc68070_regs_t *scc68070, UINT8 data)
 {
+	//printf("%d: %02x\n", scc68070->uart.receive_pointer + 1, data);
 	scc68070->uart.receive_pointer++;
 	scc68070->uart.receive_buffer[scc68070->uart.receive_pointer] = data;
-	scc68070->uart.status_register |= USR_RXRDY;
 	scc68070_uart_rx_check(machine, scc68070);
 }
 
@@ -139,37 +142,36 @@ void scc68070_uart_tx(running_machine *machine, scc68070_regs_t *scc68070, UINT8
 {
 	scc68070->uart.transmit_pointer++;
 	scc68070->uart.transmit_buffer[scc68070->uart.transmit_pointer] = data;
-	scc68070->uart.status_register |= USR_TXRDY;
 	scc68070_uart_tx_check(machine, scc68070);
 }
 
 TIMER_CALLBACK( scc68070_rx_callback )
 {
-	bool clear_int = false;
 	cdi_state *state = machine->driver_data<cdi_state>();
 	scc68070_regs_t *scc68070 = &state->scc68070_regs;
 
 	if((scc68070->uart.command_register & 3) == 1)
 	{
+		if(scc68070->uart.receive_pointer >= 0)
+		{
+			scc68070->uart.status_register |= USR_RXRDY;
+		}
+		else
+		{
+			scc68070->uart.status_register &= ~USR_RXRDY;
+		}
+
 		scc68070->uart.receive_holding_register = scc68070->uart.receive_buffer[0];
+
 		if(scc68070->uart.receive_pointer > -1)
 		{
 			verboselog(machine, 2, "scc68070_rx_callback: Receiving %02x\n", scc68070->uart.receive_holding_register);
-			for(int index = 0; index < scc68070->uart.receive_pointer; index++)
-			{
-				scc68070->uart.receive_buffer[index] = scc68070->uart.receive_buffer[index + 1];
-			}
-			scc68070->uart.receive_pointer--;
 
 			UINT8 interrupt = (scc68070->picr2 >> 4) & 7;
 			if(interrupt)
 			{
 				cpu_set_input_line_vector(machine->device("maincpu"), M68K_IRQ_1 + (interrupt - 1), 56 + interrupt);
 				cputag_set_input_line(machine, "maincpu", M68K_IRQ_1 + (interrupt - 1), ASSERT_LINE);
-			}
-			else
-			{
-				clear_int = true;
 			}
 
 			scc68070->uart.status_register |= USR_RXRDY;
@@ -178,34 +180,15 @@ TIMER_CALLBACK( scc68070_rx_callback )
 		}
 		else
 		{
-			clear_int = true;
 			scc68070->uart.status_register &= ~USR_RXRDY;
-			timer_adjust_oneshot(scc68070->uart.rx_timer, attotime_never, 0);
 		}
 	}
 	else
 	{
-		clear_int = true;
 		scc68070->uart.status_register &= ~USR_RXRDY;
-		timer_adjust_oneshot(scc68070->uart.rx_timer, attotime_never, 0);
 	}
 
-	if(clear_int)
-	{
-		UINT8 interrupt = scc68070->picr2 & 7;
-		cputag_set_input_line(machine, "maincpu", M68K_IRQ_1 + (interrupt - 1), CLEAR_LINE);
-	}
-}
-
-static void scc68070_tx_empty(running_machine *machine, scc68070_regs_t *scc68070)
-{
-	UINT8 interrupt = scc68070->picr2 & 7;
-	scc68070->uart.status_register |= USR_TXRDY;
-	if(interrupt)
-	{
-		cpu_set_input_line_vector(machine->device("maincpu"), M68K_IRQ_1 + (interrupt - 1), 56 + interrupt);
-		cputag_set_input_line(machine, "maincpu", M68K_IRQ_1 + (interrupt - 1), ASSERT_LINE);
-	}
+	scc68070_uart_rx_check(machine, scc68070);
 }
 
 static UINT16 seeds[10] = { 0 };
@@ -216,7 +199,7 @@ void scc68070_quizard_rx(running_machine *machine, scc68070_regs_t *scc68070, UI
 	scc68070_uart_rx(machine, scc68070, 0x5a);
 	for(int index = 0; index < 8; index++)
 	{
-		scc68070_uart_rx(machine, scc68070, 0);
+		scc68070_uart_rx(machine, scc68070, g_state[index]);
 	}
 	scc68070_uart_rx(machine, scc68070, data);
 }
@@ -237,7 +220,7 @@ static void quizard_set_seeds(UINT8 *rx)
 
 static void quizard_calculate_state(running_machine *machine, scc68070_regs_t *scc68070)
 {
-	const UINT16 desired_bitfield = scc68070->mcu_value;
+	const UINT16 desired_bitfield = mcu_value;
 	const UINT16 field0 = 0x00ff;
 	const UINT16 field1 = desired_bitfield ^ field0;
 
@@ -273,52 +256,87 @@ static void quizard_calculate_state(running_machine *machine, scc68070_regs_t *s
 	g_state[5] = lo1 - g_state[4];
 }
 
+INTERRUPT_GEN( scc68070_mcu_frame )
+{
+    cdi_state *state = device->machine->driver_data<cdi_state>();
+    scc68070_regs_t *scc68070 = &state->scc68070_regs;
+
+	if(0)//mcu_active)
+	{
+		quizard_calculate_state(device->machine, scc68070);
+		scc68070_uart_rx(device->machine, scc68070, 0x5a);
+		for(int index = 0; index < 8; index++)
+		{
+			scc68070_uart_rx(device->machine, scc68070, g_state[index]);
+		}
+	}
+}
+
 static void quizard_handle_byte_tx(running_machine *machine, scc68070_regs_t *scc68070)
 {
 	static UINT8 rx[0x100];
 	static UINT8 rx_ptr = 0xff;
-	static UINT8 state = 0;
 	static UINT8 ack_count = 0;
 	UINT8 tx = scc68070->uart.transmit_holding_register;
 
-	switch(state)
+	/*
+	if((tx >= 0x20 && tx < 0x7f) || tx == 0x0d || tx == 0x0a)
 	{
-		case 0:
-			if(tx == 0x56)
-			{
-				state++;
-			}
-			break;
+		printf("%c", tx);
+	}
+	else
+	{
+		printf("\n%02x? %02x\n", tx, mcu_ack);
+	}
+	*/
 
-		case 1:
-			if(tx == scc68070->mcu_ack)
-			{
-				ack_count++;
-				if(ack_count == 2)
-				{
-					state++;
-					quizard_set_seeds(rx);
-					quizard_calculate_state(machine, scc68070);
-					scc68070_uart_rx(machine, scc68070, 0x5a);
-					for(int index = 0; index < 8; index++)
-					{
-						scc68070_uart_rx(machine, scc68070, g_state[index]);
-					}
-				}
-			}
-			else
-			{
-				rx_ptr++;
-				rx[rx_ptr] = tx;
-			}
-			break;
-
-		case 2:
-			if(tx == 0x56)
-			{
-				state = 1;
-			}
-			break;
+	if(tx == 0x56)
+	{
+		ack_count = 0;
+		rx_ptr = 0xff;
+		// We're about to lead off a sequence!
+	}
+	else if(tx == 0x0d || tx == 0x0a)
+	{
+		ack_count++;
+		if(ack_count == 2)
+		{
+			scc68070_uart_rx(machine, scc68070, 0x5a);
+			scc68070_uart_rx(machine, scc68070, g_state[0]);
+			scc68070_uart_rx(machine, scc68070, g_state[1]);
+			scc68070_uart_rx(machine, scc68070, g_state[2]);
+			scc68070_uart_rx(machine, scc68070, g_state[3]);
+			scc68070_uart_rx(machine, scc68070, g_state[4]);
+			scc68070_uart_rx(machine, scc68070, g_state[5]);
+			scc68070_uart_rx(machine, scc68070, g_state[6]);
+			scc68070_uart_rx(machine, scc68070, g_state[7]);
+		}
+	}
+	else if(tx == mcu_ack)
+	{
+		ack_count++;
+		if(ack_count == 2)
+		{
+			//printf("Calculating seeds\n");
+			quizard_set_seeds(rx);
+			quizard_calculate_state(machine, scc68070);
+			scc68070_uart_rx(machine, scc68070, 0x5a);
+			scc68070_uart_rx(machine, scc68070, g_state[0]);
+			scc68070_uart_rx(machine, scc68070, g_state[1]);
+			scc68070_uart_rx(machine, scc68070, g_state[2]);
+			scc68070_uart_rx(machine, scc68070, g_state[3]);
+			scc68070_uart_rx(machine, scc68070, g_state[4]);
+			scc68070_uart_rx(machine, scc68070, g_state[5]);
+			scc68070_uart_rx(machine, scc68070, g_state[6]);
+			scc68070_uart_rx(machine, scc68070, g_state[7]);
+			rx_ptr = 0xff;
+		}
+	}
+	else
+	{
+		ack_count = 0;
+		rx_ptr++;
+		rx[rx_ptr] = tx;
 	}
 }
 
@@ -329,17 +347,24 @@ TIMER_CALLBACK( scc68070_tx_callback )
 
 	if(((scc68070->uart.command_register >> 2) & 3) == 1)
 	{
+		UINT8 interrupt = scc68070->picr2 & 7;
+		if(interrupt)
+		{
+			cpu_set_input_line_vector(machine->device("maincpu"), M68K_IRQ_1 + (interrupt - 1), 56 + interrupt);
+			cputag_set_input_line(machine, "maincpu", M68K_IRQ_1 + (interrupt - 1), ASSERT_LINE);
+		}
+
 		if(scc68070->uart.transmit_pointer > -1)
 		{
 			scc68070->uart.transmit_holding_register = scc68070->uart.transmit_buffer[0];
 			quizard_handle_byte_tx(machine, scc68070);
 
 			verboselog(machine, 2, "scc68070_tx_callback: Transmitting %02x\n", scc68070->uart.transmit_holding_register);
-			scc68070->uart.transmit_pointer--;
 			for(int index = 0; index < scc68070->uart.transmit_pointer; index++)
 			{
 				scc68070->uart.transmit_buffer[index] = scc68070->uart.transmit_buffer[index+1];
 			}
+			scc68070->uart.transmit_pointer--;
 
 			UINT32 div = 0x10000 >> (scc68070->uart.clock_select & 7);
 			timer_adjust_oneshot(scc68070->uart.tx_timer, ATTOTIME_IN_HZ((49152000 / div) / 8), 0);
@@ -347,18 +372,14 @@ TIMER_CALLBACK( scc68070_tx_callback )
 		else
 		{
 			timer_adjust_oneshot(scc68070->uart.tx_timer, attotime_never, 0);
-			scc68070_tx_empty(machine, scc68070);
 		}
 	}
 	else
 	{
 		timer_adjust_oneshot(scc68070->uart.tx_timer, attotime_never, 0);
-		UINT8 interrupt = (scc68070->picr2 >> 4) & 7;
-		if(interrupt)
-		{
-			cputag_set_input_line(machine, "maincpu", M68K_IRQ_1 + (interrupt - 1), CLEAR_LINE);
-		}
 	}
+
+	scc68070_uart_tx_check(machine, scc68070);
 }
 
 READ16_HANDLER( scc68070_periphs_r )
@@ -425,7 +446,19 @@ READ16_HANDLER( scc68070_periphs_r )
             {
             	verboselog(space->machine, 0, "scc68070_periphs_r: Unknown address: %04x & %04x\n", offset * 2, mem_mask);
 			}
+
+			if((scc68070->picr2 >> 4) & 7)
+			{
+				cputag_set_input_line(space->machine, "maincpu", M68K_IRQ_1 + (((scc68070->picr2 >> 4) & 7) - 1), ASSERT_LINE);
+			}
+
+			if(scc68070->picr2 & 7)
+			{
+				cputag_set_input_line(space->machine, "maincpu", M68K_IRQ_1 + ((scc68070->picr2 & 7) - 1), ASSERT_LINE);
+			}
+
             return scc68070->uart.status_register;
+
         case 0x2014/2:
             if(ACCESSING_BITS_0_7)
             {
@@ -465,6 +498,21 @@ READ16_HANDLER( scc68070_periphs_r )
             {
             	verboselog(space->machine, 0, "scc68070_periphs_r: Unknown address: %04x & %04x\n", offset * 2, mem_mask);
 			}
+			if((scc68070->picr2 >> 4) & 7)
+			{
+				cputag_set_input_line(space->machine, "maincpu", M68K_IRQ_1 + (((scc68070->picr2 >> 4) & 7) - 1), CLEAR_LINE);
+			}
+
+			scc68070->uart.receive_holding_register = scc68070->uart.receive_buffer[0];
+			if(scc68070->uart.receive_pointer >= 0)
+			{
+				for(int index = 0; index < scc68070->uart.receive_pointer; index++)
+				{
+					scc68070->uart.receive_buffer[index] = scc68070->uart.receive_buffer[index + 1];
+				}
+				scc68070->uart.receive_pointer--;
+			}
+			//printf("R: %02x\n", scc68070->uart.receive_holding_register);
 			return scc68070->uart.receive_holding_register;
 
         // Timers: 80002020 to 80002029
@@ -715,11 +763,6 @@ WRITE16_HANDLER( scc68070_periphs_w )
             {
                 verboselog(space->machine, 2, "scc68070_periphs_w: UART Command Register: %04x & %04x\n", data, mem_mask);
                 scc68070->uart.command_register = data & 0x00ff;
-                if(((scc68070->uart.command_register >> 2) & 3) == 1 &&
-                	scc68070->uart.transmit_pointer == -1)
-                {
-					scc68070_tx_empty(space->machine, scc68070);
-				}
 				scc68070_uart_rx_check(space->machine, scc68070);
 				scc68070_uart_tx_check(space->machine, scc68070);
             }
@@ -958,7 +1001,7 @@ void scc68070_init(running_machine *machine, scc68070_regs_t *scc68070)
     scc68070->i2c.clock_control_register = 0;
 
     scc68070->uart.mode_register = 0;
-    scc68070->uart.status_register = 0;
+    scc68070->uart.status_register = USR_TXRDY;
     scc68070->uart.clock_select = 0;
     scc68070->uart.command_register = 0;
     scc68070->uart.transmit_holding_register = 0;
