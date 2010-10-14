@@ -10021,6 +10021,7 @@ Other Sun games
 	DRIVER( funriver )	/* (c) 2005 Amcoe - Fun River */
 	DRIVER( funriverv )	/* (c) 2005 Amcoe */
 	DRIVER( dvisland )	/* (c) 2006 Amcoe - Devil's Island */
+	DRIVER( dvislando )	/* (c) 2006 Amcoe */
 	DRIVER( atworld )	/* (c) 2007 Amcoe - Around The World */
 	DRIVER( atworldd1 )	/* (c) 2007 Amcoe */
 	DRIVER( amclink )	/* (c) 200? Amcoe - Amcoe Link Control Box? */

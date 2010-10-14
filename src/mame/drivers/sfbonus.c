@@ -5259,6 +5259,45 @@ ROM_START( bugfeverv2 )
 	ROM_LOAD_OPTIONAL( "bf17ex.id", 0x00, 0x20, CRC(38bd8ec4) SHA1(4e6b85348f2fa821934f7666f77ba0f016e200ec) )
 ROM_END
 
+/* Devil Island */
+ROM_START( dvisland )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
+	ROM_LOAD( "did14r.bin", 0x00000, 0x80000, CRC(28c3a7eb) SHA1(5389338ef42e05542e3ff052b2bbc918cf619874) )
+
+	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD( "dirom2.bin", 0x00000, 0x40000, CRC(9fddeea4) SHA1(6651b70011798a2e58a468b57323da344bd4b2b6) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "dirom3.bin", 0x00000, 0x80000, CRC(a61036ce) SHA1(d125899ae7d672f258cd383949fffc73bf232ffd) )
+	ROM_LOAD16_BYTE( "dirom4.bin", 0x00001, 0x80000, CRC(4b34ea74) SHA1(9564f65f48354f589e291fc505e187ae8a3b0d71) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "dirom5.bin", 0x00000, 0x80000, CRC(041eb83f) SHA1(d50784b52ac3b801cfd83adba9ced0f9eab39890) )
+	ROM_LOAD16_BYTE( "dirom6.bin", 0x00001, 0x80000, CRC(291cbe5c) SHA1(fd15dceff0705c8c8d992e5047c7280247e21520) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "di24re.id", 0x00, 0x20, CRC(d69c8ee5) SHA1(122c196fe03817b5c507339c7c64d6ee7ae12bad) )
+ROM_END
+
+ROM_START( dvislando )
+	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
+	ROM_LOAD( "did10r.bin", 0x00000, 0x80000, CRC(cfd9f256) SHA1(a7786c47094f8ace2d83bc4d6f1cf4b4367d13ca) )
+
+	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
+	ROM_LOAD( "dirom2.bin", 0x00000, 0x40000, CRC(9fddeea4) SHA1(6651b70011798a2e58a468b57323da344bd4b2b6) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )
+	ROM_LOAD16_BYTE( "dirom3.bin", 0x00000, 0x80000, CRC(a61036ce) SHA1(d125899ae7d672f258cd383949fffc73bf232ffd) )
+	ROM_LOAD16_BYTE( "dirom4.bin", 0x00001, 0x80000, CRC(4b34ea74) SHA1(9564f65f48354f589e291fc505e187ae8a3b0d71) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 )
+	ROM_LOAD16_BYTE( "dirom5.bin", 0x00000, 0x80000, CRC(041eb83f) SHA1(d50784b52ac3b801cfd83adba9ced0f9eab39890) )
+	ROM_LOAD16_BYTE( "dirom6.bin", 0x00001, 0x80000, CRC(291cbe5c) SHA1(fd15dceff0705c8c8d992e5047c7280247e21520) )
+
+	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
+	ROM_LOAD_OPTIONAL( "di20re.id", 0x00, 0x20, CRC(8b70dfe9) SHA1(080e9797c766f116e794d6ba48bd38a922da740e) )
+ROM_END
+
 /* Around The World */
 ROM_START( atworld )
 	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
@@ -5316,25 +5355,6 @@ ROM_START( version4 )
 
 	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
 	ROM_LOAD_OPTIONAL( "fcs40r1.id", 0x00, 0x20, CRC(b3638cdb) SHA1(283824c57f3f62f6e2b505f6e13b100a7d7f33af) )
-ROM_END
-
-ROM_START( dvisland )
-	ROM_REGION( 0x80000, "maincpu", 0 ) /* Z80 Code */
-	ROM_LOAD( "did14r.bin", 0x00000, 0x80000, CRC(28c3a7eb) SHA1(5389338ef42e05542e3ff052b2bbc918cf619874) )
-
-	ROM_REGION( 0x040000, "oki", ROMREGION_ERASE00 ) /* Samples */
-	ROM_LOAD( "dirom2.bin", 0x00000, 0x40000, NO_DUMP )
-
-	ROM_REGION( 0x100000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "dirom3.bin", 0x00000, 0x80000, NO_DUMP )
-	ROM_LOAD16_BYTE( "dirom4.bin", 0x00001, 0x80000, NO_DUMP )
-
-	ROM_REGION( 0x100000, "gfx2", 0 )
-	ROM_LOAD16_BYTE( "dirom5.bin", 0x00000, 0x80000, NO_DUMP )
-	ROM_LOAD16_BYTE( "dirom6.bin", 0x00001, 0x80000, NO_DUMP )
-
-	ROM_REGION( 0x20, "defaults", 0 ) /* default settings */
-	ROM_LOAD_OPTIONAL( "di24re.id", 0x00, 0x20, CRC(d69c8ee5) SHA1(122c196fe03817b5c507339c7c64d6ee7ae12bad) )
 ROM_END
 
 ROM_START( funriver )
@@ -5899,6 +5919,9 @@ GAME( 2006, bugfeverd,   bugfever, sfbonus,    amcoe1_reels3,    bugfeverd,     
 GAME( 2006, bugfeverv2,  bugfever, sfbonus,    amcoe1_reels3,    bugfeverv2,      ROT0,  "Amcoe", "Bugs Fever (Version 1.7E Dual)", 0)
 GAME( 2006, bugfevero,   bugfever, sfbonus,    amcoe1_reels3,    bugfever,        ROT0,  "Amcoe", "Bugs Fever (Version 1.6R CGA)", 0)
 
+GAME( 2006, dvisland,    0,        sfbonus,    amcoe1_reels3,    dvisland,        ROT0,  "Amcoe", "Devil Island (Version 1.4R CGA)", 0)
+GAME( 2006, dvislando,   dvisland, sfbonus,    amcoe1_reels3,    dvisland,        ROT0,  "Amcoe", "Devil Island (Version 1.0R CGA)", 0)
+
 GAME( 2007, atworld,     0,        sfbonus,    amcoe1_reels3,    atworld,         ROT0,  "Amcoe", "Around The World (Version 1.3E CGA)", 0) /* Year according to Amcoe web site */
 GAME( 2007, atworldd1,   atworld,  sfbonus,    amcoe1_reels3,    atworldd,        ROT0,  "Amcoe", "Around The World (Version 1.3R CGA)", 0) /* Year according to Amcoe web site */
 
@@ -5906,7 +5929,6 @@ GAME( 2007, atworldd1,   atworld,  sfbonus,    amcoe1_reels3,    atworldd,      
 GAME( 2005, funriver,    0,        sfbonus,    amcoe1_reels3,    funriver,        ROT0,  "Amcoe", "Fun River (set 1)", GAME_NOT_WORKING)
 GAME( 2005, funriverv,   funriver, sfbonus,    amcoe1_reels3,    funriverv,       ROT0,  "Amcoe", "Fun River (set 2)", GAME_NOT_WORKING)
 GAME( 2006, version4,    0,        sfbonus,    amcoe1_reels3,    version4,        ROT0,  "Amcoe", "Version 4 (Version 4.2R)", GAME_NOT_WORKING)
-GAME( 2006, dvisland,    0,        sfbonus,    amcoe1_reels3,    dvisland,        ROT0,  "Amcoe", "Devil Island", GAME_NOT_WORKING)
 GAME( 200?, spooky,      0,        sfbonus,    amcoe1_reels3,    spooky,          ROT0,  "Amcoe", "Spooky Night (Version 2.0.4)", GAME_NOT_WORKING) /* After Around The World */
 GAME( 200?, fbdeluxe,    0,        sfbonus,    amcoe1_reels3,    fbdeluxe,        ROT0,  "Amcoe", "Fruit Bonus Deluxe (Version 1.0.7)", GAME_NOT_WORKING) /* After Around The World */
 
