@@ -221,6 +221,20 @@ void microtouch_rx(int count, UINT8* data)
 		{
 			microtouch.format_decimal = 1;
 		}
+		else if ( microtouch_check_command("OI", microtouch.rx_buffer_ptr, microtouch.rx_buffer ) )
+		{
+			// output identity - SMT3, ver 01.00
+			microtouch.tx_buffer[microtouch.tx_buffer_num++] = 0x01;
+			microtouch.tx_buffer[microtouch.tx_buffer_num++] = 'Q';
+			microtouch.tx_buffer[microtouch.tx_buffer_num++] = '1';
+			microtouch.tx_buffer[microtouch.tx_buffer_num++] = '0';
+			microtouch.tx_buffer[microtouch.tx_buffer_num++] = '1';
+			microtouch.tx_buffer[microtouch.tx_buffer_num++] = '0';
+			microtouch.tx_buffer[microtouch.tx_buffer_num++] = '0';
+			microtouch.tx_buffer[microtouch.tx_buffer_num++] = 0x0d;
+			microtouch.rx_buffer_ptr = 0;
+			return;
+		}
 		// send response
 		microtouch.tx_buffer[microtouch.tx_buffer_num++] = 0x01;
 		microtouch.tx_buffer[microtouch.tx_buffer_num++] = 0x30;

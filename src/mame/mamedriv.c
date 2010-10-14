@@ -10144,6 +10144,9 @@ Other Sun games
 	DRIVER( streetg2 )	/* (c) 1993 */
 	DRIVER( streetg2r5 )	/* (c) 1993 */
 
+	/* Micro Manufacturing */
+	DRIVER( magtouch )  /* (c) 1995 */
+
 	/* Coinmaster-Gaming VGA based */
 	DRIVER( colorama )	/* (c) 2001 Coinmaster-Gaming, Ltd. */
 	DRIVER( cmrltv75 )	/* (c) 2001 Coinmaster-Gaming, Ltd. */

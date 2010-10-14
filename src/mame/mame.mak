@@ -1579,6 +1579,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/magicard.o \
 	$(DRIVERS)/magicfly.o \
 	$(DRIVERS)/magictg.o \
+	$(DRIVERS)/magtouch.o \
 	$(DRIVERS)/malzak.o $(VIDEO)/malzak.o \
 	$(DRIVERS)/mcatadv.o $(VIDEO)/mcatadv.o \
 	$(DRIVERS)/micro3d.o $(MACHINE)/micro3d.o $(VIDEO)/micro3d.o $(AUDIO)/micro3d.o \

@@ -1890,6 +1890,7 @@ src/mame/drivers/magicard.c svneol=native#text/plain
 src/mame/drivers/magicfly.c svneol=native#text/plain
 src/mame/drivers/magictg.c svneol=native#text/plain
 src/mame/drivers/magmax.c svneol=native#text/plain
+src/mame/drivers/magtouch.c svneol=native#text/plain
 src/mame/drivers/mainevt.c svneol=native#text/plain
 src/mame/drivers/mainsnk.c svneol=native#text/plain
 src/mame/drivers/malzak.c svneol=native#text/plain
