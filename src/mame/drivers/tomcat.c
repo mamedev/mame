@@ -380,7 +380,7 @@ static MACHINE_CONFIG_START( tomcat, driver_device )
 	MDRV_CPU_PROGRAM_MAP( sound_map)
 
 	MDRV_RIOT6532_ADD("riot", XTAL_14_31818MHz / 8, tomcat_riot6532_intf)
-	
+
 	MDRV_QUANTUM_TIME(HZ(4000))
 
 	MDRV_MACHINE_START(tomcat)

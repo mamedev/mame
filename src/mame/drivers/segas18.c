@@ -179,7 +179,7 @@ static void system18_generic_init(running_machine *machine, int _rom_board)
 	state->maincpu = machine->device("maincpu");
 	state->soundcpu = machine->device("soundcpu");
 	state->mcu = machine->device("mcu");
-	
+
 	machine->device<nvram_device>("nvram")->set_base(workram, 0x4000);
 
 	state_save_register_global(machine, state->mcu_data);

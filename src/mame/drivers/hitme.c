@@ -542,28 +542,28 @@ INPUT_PORTS_END
 /*
 Hit me by Ramtek
 
-Etched in copper on board	HIT ME by RAMTEK Made in U.S.A
-				ASSY 550596 D				D was as sticker
-				SER 957					957 was a sticker
+Etched in copper on board   HIT ME by RAMTEK Made in U.S.A
+                ASSY 550596 D               D was as sticker
+                SER 957                 957 was a sticker
 
-Etched in copper on back	FAB 550595-C
+Etched in copper on back    FAB 550595-C
 
-.b7			stamped 	15347 7625
-					HM2-0
+.b7         stamped     15347 7625
+                    HM2-0
 
 
-.c7	IM5605		handwritten	HM-2-2
+.c7 IM5605      handwritten HM-2-2
 
-.d7			stamped 	15349 7625
-					HM1-4
+.d7         stamped     15349 7625
+                    HM1-4
 
-.e7			stamped 	15350 7625
-					HM1-6
+.e7         stamped     15350 7625
+                    HM1-6
 
-.f7			stamped 	15351 7625
-					HM2-8
+.f7         stamped     15351 7625
+                    HM2-8
 
-.h7	IM560?		handwritten	HM0-CG	hard to read
+.h7 IM560?      handwritten HM0-CG  hard to read
 
 All chips we read as 82s141 - guessed becuase of 24 pin pinout and 512x8 rom according to mame
 */

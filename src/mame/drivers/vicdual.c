@@ -3195,9 +3195,9 @@ ROM_END
 Star Raker
 
 Notes from dumper:
-There is a mainboard and a small board. The main board is a normal VIC board and is from a working cab we own. 
-From an op we got a box with a similar board plus a small board which I assumed belongs to it, 
-but I have no idea what its purpose is. Its not the soundboard and its not included in our working Star Raker cab. 
+There is a mainboard and a small board. The main board is a normal VIC board and is from a working cab we own.
+From an op we got a box with a similar board plus a small board which I assumed belongs to it,
+but I have no idea what its purpose is. Its not the soundboard and its not included in our working Star Raker cab.
 So maybe it belongs to a different game, but I had it dumped anyway.
 */
 

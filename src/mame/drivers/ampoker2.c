@@ -125,7 +125,7 @@
     If you win some credits, you'll be on troubles due to unemulated hopper.
     Just discharge the credits one by one pressing quickly the door switch (O)
     If you want to play without the hopper issues, just leave the door open (O). In this mode,
-	the game is playable but doesn't contabilize in the meters.
+    the game is playable but doesn't contabilize in the meters.
 
 
 *********************************************************************************
@@ -1429,7 +1429,7 @@ static DRIVER_INIT( piccolop )
 {
 /*
   The protection is based on a stuck bit at RAM offset $C416.
-  
+
   1382: 41            ld   b,c
   1383: 80            add  a,b
   1384: 00            nop  ------\

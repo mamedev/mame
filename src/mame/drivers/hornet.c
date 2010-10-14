@@ -847,7 +847,7 @@ static MACHINE_START( hornet )
 	state_save_register_global(machine, led_reg1);
 	state_save_register_global_pointer(machine, jvs_sdata, 1024);
 	state_save_register_global(machine, jvs_sdata_ptr);
-    
+
     sound_irq_timer = timer_alloc(machine, irq_off, 0);
 }
 

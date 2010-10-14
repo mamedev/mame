@@ -236,7 +236,7 @@ void resource_pool::add(resource_pool_item &item)
 	int hashval = reinterpret_cast<FPTR>(item.m_ptr) % k_hash_prime;
 	item.m_next = m_hash[hashval];
 	m_hash[hashval] = &item;
-	
+
 	// fetch the ID of this item's pointer; some implementations put hidden data
 	// before, so if we don't find it, check 4 bytes ahead
 	memory_entry *entry = memory_entry::find(item.m_ptr);
@@ -244,13 +244,13 @@ void resource_pool::add(resource_pool_item &item)
 		entry = memory_entry::find(reinterpret_cast<UINT8 *>(item.m_ptr) - sizeof(size_t));
 	assert(entry != NULL);
 	item.m_id = entry->m_id;
-	
+
 	// find the entry to insert after
 	resource_pool_item *insert_after;
 	for (insert_after = m_ordered_tail; insert_after != NULL; insert_after = insert_after->m_ordered_prev)
 		if (insert_after->m_id < item.m_id)
 			break;
-	
+
 	// insert into the appropriate spot
 	if (insert_after != NULL)
 	{

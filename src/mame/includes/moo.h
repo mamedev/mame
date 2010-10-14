@@ -33,7 +33,7 @@ public:
 	running_device *k053251;
 	running_device *k056832;
 	running_device *k054338;
-    
+
     emu_timer *dmaend_timer;
 };
 

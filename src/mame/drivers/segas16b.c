@@ -6788,7 +6788,7 @@ static WRITE16_HANDLER( isgsm_data_w )
 			case 0x60: data = BITSWAP8(data,5,4,3,2,1,0,7,6); break;
 			case 0x80: data = BITSWAP8(data,4,3,2,1,0,7,6,5); break;
 			case 0xa0: data = BITSWAP8(data,3,2,1,0,7,6,5,4); break;
- 			case 0xc0: data = BITSWAP8(data,2,1,0,7,6,5,4,3); break;
+			case 0xc0: data = BITSWAP8(data,2,1,0,7,6,5,4,3); break;
 			case 0xe0: data = BITSWAP8(data,1,0,7,6,5,4,3,2); break;
 		}
 	}
@@ -6873,7 +6873,7 @@ static WRITE16_HANDLER( isgsm_data_w )
 					case 0x60: byte = BITSWAP8(byte,5,4,3,2,1,0,7,6); break;
 					case 0x80: byte = BITSWAP8(byte,4,3,2,1,0,7,6,5); break;
 					case 0xa0: byte = BITSWAP8(byte,3,2,1,0,7,6,5,4); break;
- 					case 0xc0: byte = BITSWAP8(byte,2,1,0,7,6,5,4,3); break;
+					case 0xc0: byte = BITSWAP8(byte,2,1,0,7,6,5,4,3); break;
 					case 0xe0: byte = BITSWAP8(byte,1,0,7,6,5,4,3,2); break;
 				}
 			}
@@ -7213,7 +7213,7 @@ DRIVER_INIT( tetrbx )
 	{
 		temp[i^0x2A6E6] = BITSWAP16(rom[i], 4, 0, 12, 5,
 			7, 3, 1, 14,
-			10, 11, 9,6, 
+			10, 11, 9,6,
 			15, 2, 13, 8 );
 	}
 

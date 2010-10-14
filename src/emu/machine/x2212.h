@@ -101,12 +101,12 @@ protected:
 
 	// internal state
 	const x2212_device_config &m_config;
-	
+
 	address_space *	m_sram;
 	address_space *	m_e2prom;
 
-	bool 		m_store;
-	bool 		m_array_recall;
+	bool		m_store;
+	bool		m_array_recall;
 };
 
 

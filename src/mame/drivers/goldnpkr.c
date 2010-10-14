@@ -846,18 +846,18 @@ static WRITE8_DEVICE_HANDLER( mux_port_w )
 /* Demuxing ay8910 data/address from Falcon board, PIA portA out */
 
 int wcfalcon_flag = 0;
- 
+
 static WRITE8_DEVICE_HANDLER( wcfalcon_snd_w )
 {
 	if (wcfalcon_flag == 0)
 	{
 		ay8910_data_address_w(device->machine->device("ay8910"), 0, data);
-//		logerror("sound address: %02x %02x\n", data, wcfalcon_flag);
+//      logerror("sound address: %02x %02x\n", data, wcfalcon_flag);
 	}
 	else
 	{
 		ay8910_data_address_w(device->machine->device("ay8910"), 1, data);
-//		logerror("sound data: %02x %02x\n", data, wcfalcon_flag);
+//      logerror("sound data: %02x %02x\n", data, wcfalcon_flag);
 	}
 
 	wcfalcon_flag = wcfalcon_flag ^ 1;
@@ -1003,7 +1003,7 @@ static ADDRESS_MAP_START( witchcrd_falcon_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( wildcard_map, ADDRESS_SPACE_PROGRAM, 8 )
-//	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
+//  ADDRESS_MAP_GLOBAL_MASK(0x7fff)
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_SHARE("nvram")	/* battery backed RAM */
 	AM_RANGE(0x0800, 0x0800) AM_DEVWRITE("crtc", mc6845_address_w)
 	AM_RANGE(0x0801, 0x0801) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
@@ -1038,7 +1038,7 @@ static ADDRESS_MAP_START( wildcrdb_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( wildcrdb_mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
-//	ADDRESS_MAP_GLOBAL_MASK(0x3fff)
+//  ADDRESS_MAP_GLOBAL_MASK(0x3fff)
 	AM_RANGE(0x0000, 0x0fff) AM_ROM
 	AM_RANGE(0x1000, 0x2fff) AM_RAM
 ADDRESS_MAP_END
@@ -2640,9 +2640,9 @@ static MACHINE_CONFIG_DERIVED( wildcard, goldnpkr_base )
 	MDRV_PIA6821_MODIFY("pia0", pottnpkr_pia0_intf)
 
 	/* video hardware */
-//	MDRV_GFXDECODE(wildcard)
+//  MDRV_GFXDECODE(wildcard)
 	MDRV_PALETTE_INIT(witchcrd)
-//	MDRV_VIDEO_START(wildcard)
+//  MDRV_VIDEO_START(wildcard)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -2666,9 +2666,9 @@ static MACHINE_CONFIG_DERIVED( wildcrdb, goldnpkr_base )
 	MDRV_PIA6821_MODIFY("pia1", wcfalcon_pia1_intf)
 
 	/* video hardware */
-//	MDRV_GFXDECODE(wildcard)
+//  MDRV_GFXDECODE(wildcard)
 	MDRV_PALETTE_INIT(witchcrd)
-//	MDRV_VIDEO_START(wildcard)
+//  MDRV_VIDEO_START(wildcard)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
@@ -3081,7 +3081,7 @@ ROM_START( witchcdg )
 	ROM_COPY( "gfx2",	0x2800, 0x2000, 0x0800 )	/* srctag, srcoffs, offset, length */
 
 	ROM_REGION( 0x0100, "proms", 0 )
-//	ROM_LOAD( "82s129.7d",			0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* original PCB PROM */
+//  ROM_LOAD( "82s129.7d",          0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* original PCB PROM */
 	ROM_LOAD( "tbp24s10n.d2",	0x0000, 0x0100, BAD_DUMP CRC(3db3b9e0) SHA1(c956493d5d754665d214b416e6a473d73c22716c) )
 ROM_END
 
@@ -3532,8 +3532,8 @@ ROM_END
 /*********************************************
 
     Falcons Wild - Wild Card 1991.
-	1992-1992 TVG D-6310 GRUENBERG.
-	(bootleg in real Bonanza hardware).
+    1992-1992 TVG D-6310 GRUENBERG.
+    (bootleg in real Bonanza hardware).
 
   dm74s287n.7d     FIXED BITS (0000xxxx)
   fw1.2a           BADADDR     x-xxxxxxxxxxx
@@ -3613,7 +3613,7 @@ ROM_END
 
 ROM_START( falcnwldb )
 	ROM_REGION( 0x10000, "maincpu", 0 )	/* Falcons Wild, Falcon original */
-//	ROM_LOAD( "nosticker.12a",	0x0000, 0x10000, CRC(54ae4a8a) SHA1(0507098b53d807059b78ec098203d095d19028f8) )
+//  ROM_LOAD( "nosticker.12a",  0x0000, 0x10000, CRC(54ae4a8a) SHA1(0507098b53d807059b78ec098203d095d19028f8) )
 	ROM_LOAD( "4.b6",			0x3000, 0x1000, CRC(88684a8f) SHA1(5ffa0808b502e93ddcb8f13929008aec2836a773) )
 	ROM_LOAD( "5.b8",			0x4000, 0x1000, CRC(aa5de05c) SHA1(98559b35c7c31a41b1818a6e60ec82f43a5d1b4a) )
 	ROM_LOAD( "6-syncmod.b9",	0x5000, 0x1000, CRC(21cfa807) SHA1(ff908a5a43b3736494127539d6485648d8be1a9a) )	// ok

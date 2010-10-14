@@ -221,7 +221,7 @@ WRITE16_MEMBER(raiden2_state::cop_dma_size_w)
 
 WRITE16_MEMBER(raiden2_state::cop_dma_trigger_w)
 {
-	//	logerror("COP DMA mode=%x adr=%x size=%x vals=%x %x %x\n", cop_dma_mode, cop_dma_adr, cop_dma_size, cop_dma_v1, cop_dma_v2, cop_dma_v3);
+	//  logerror("COP DMA mode=%x adr=%x size=%x vals=%x %x %x\n", cop_dma_mode, cop_dma_adr, cop_dma_size, cop_dma_v1, cop_dma_v2, cop_dma_v3);
 
 	switch(cop_dma_mode) {
 	case 0x14: {
@@ -238,7 +238,7 @@ WRITE16_MEMBER(raiden2_state::cop_dma_trigger_w)
 WRITE16_MEMBER(raiden2_state::cop_itoa_low_w)
 {
 	cop_itoa = (cop_itoa & ~UINT32(mem_mask)) | (data & mem_mask);
-	
+
 	int digits = cop_itoa_digit_count;
 	UINT32 val = cop_itoa;
 
@@ -375,9 +375,9 @@ WRITE16_MEMBER(raiden2_state::cop_cmd_w)
 	}
 }
 
-//	case 0x6ca:
-//		logerror("select bank %d %04x\n", (data >> 15) & 1, data);
-//		memory_set_bank(space.machine, "bank1", (data >> 15) & 1);
+//  case 0x6ca:
+//      logerror("select bank %d %04x\n", (data >> 15) & 1, data);
+//      memory_set_bank(space.machine, "bank1", (data >> 15) & 1);
 
 
 static void combine32(UINT32 *val, int offset, UINT16 data, UINT16 mem_mask)

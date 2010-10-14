@@ -384,7 +384,7 @@ public:
 	// regions
 	region_info *region_alloc(const char *name, UINT32 length, UINT32 flags);
 	void region_free(const char *name);
-	
+
 	// managers
 	render_manager &render() const { assert(m_render != NULL); return *m_render; }
 	debug_view_manager &debug_view() const { assert(m_debug_view != NULL); return *m_debug_view; }

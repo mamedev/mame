@@ -12,7 +12,7 @@
         - Only memory to memory is tested!
 
     TODO:
-		- reset command (C3) is handled improperly
+        - reset command (C3) is handled improperly
         - rewrite to match documentation
         - implement missing features
         - implement more asserts
@@ -663,7 +663,7 @@ void z80dma_device::write(UINT8 data)
 	if (m_num_follow == 0)
 	{
 		m_reset_pointer = 0;
-		
+
 		if ((data & 0x87) == 0) // WR2
 		{
 			WR2 = data;

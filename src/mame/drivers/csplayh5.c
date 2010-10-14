@@ -1,14 +1,14 @@
 /***************************************************************************
 
-	'High Rate DVD' HW (c) 1998 Nichibutsu
+    'High Rate DVD' HW (c) 1998 Nichibutsu
 
-	preliminary driver by Angelo Salese
+    preliminary driver by Angelo Salese
 
-	TODO:
-	- fix h8 CPU core bugs, it trips various unhandled opcodes
-	- Implement DVD routing and YUV decoding;
-	- V9958 timings are screwed, some places have missing gfxs.
-	- game timings seem busted either, could be due of missing DVD hook-up
+    TODO:
+    - fix h8 CPU core bugs, it trips various unhandled opcodes
+    - Implement DVD routing and YUV decoding;
+    - V9958 timings are screwed, some places have missing gfxs.
+    - game timings seem busted either, could be due of missing DVD hook-up
 
 ***************************************************************************/
 

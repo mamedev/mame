@@ -447,7 +447,7 @@ static MACHINE_START( moo )
 	state_save_register_global_array(machine, state->layer_colorbase);
 	state_save_register_global_array(machine, state->layerpri);
 	state_save_register_global_array(machine, state->protram);
-    
+
     state->dmaend_timer = timer_alloc(machine, dmaend_callback, 0);
 }
 

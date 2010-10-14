@@ -48,9 +48,9 @@
 
   The code has a timer that takes a couple of minutes to boot into the game.
   This is completely normal and expected.
-  
 
-  
+
+
   ************ SYMBOLS ************
 
   INTRODUCTION
@@ -204,7 +204,7 @@
 
   Symbols front panel layout:
 
-            .------. .------. .------. .------. .------. 
+            .------. .------. .------. .------. .------.
             |  UP  | |  UP  | |  UP  | |  UP  | |  UP  |
   .-------. |   1  | |   2  | |   3  | |   4  | |   5  | .------.
   | START | '------' '------' '------' '------' '------' | PLAY |
@@ -222,7 +222,7 @@
 
   Pin #    Description
   --------------------
-  01       +12V DC  
+  01       +12V DC
   02       +5V DC
   03       N/C
   04       GND
@@ -360,8 +360,8 @@
   '-----------'----'----'----'----'----'----'----'----'----'----'----'----'----'----'----'----'
 
   Being....
-  
-  
+
+
   7654 3210
   ---- ---x  Unknown (intensity?).
   ---- --x-  Red.
@@ -486,12 +486,12 @@ static PALETTE_INIT( avt )
 
 		intenmin = 0xe0;
 		intenmax = 0xff;
-		
+
 		i = ((j & 0x7) << 4) | ((j & 0x78) >> 3);
-		
+
 
 		/* intensity component */
-//		inten = 1 - (color_prom[i] & 0x01);
+//      inten = 1 - (color_prom[i] & 0x01);
 		inten = (color_prom[i] & 0x01);
 
 		/* red component */
@@ -522,7 +522,7 @@ static PALETTE_INIT( avt )
 
 //static WRITE8_HANDLER( debug_w )
 //{
-//	popmessage("written : %02X", data);
+//  popmessage("written : %02X", data);
 //}
 
 
@@ -541,12 +541,12 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( avt_portmap, ADDRESS_SPACE_IO, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0xff)
-//	AM_RANGE(0x00, 0x03) unk, maybe IO
-//	AM_RANGE(0x00, 0x00)  AM_READ_PORT("IN0")
-//	AM_RANGE(0x01, 0x01)  AM_READ_PORT("IN1")
-//	AM_RANGE(0x08, 0x0b) unk, maybe IO
-//	AM_RANGE(0x08, 0x08)  AM_READ_PORT("IN2")
-//	AM_RANGE(0x09, 0x09)  AM_READ_PORT("IN3")
+//  AM_RANGE(0x00, 0x03) unk, maybe IO
+//  AM_RANGE(0x00, 0x00)  AM_READ_PORT("IN0")
+//  AM_RANGE(0x01, 0x01)  AM_READ_PORT("IN1")
+//  AM_RANGE(0x08, 0x0b) unk, maybe IO
+//  AM_RANGE(0x08, 0x08)  AM_READ_PORT("IN2")
+//  AM_RANGE(0x09, 0x09)  AM_READ_PORT("IN3")
 	AM_RANGE(0x21, 0x21) AM_DEVWRITE("aysnd", ay8910_data_w)		/* AY8910 data */
 	AM_RANGE(0x23, 0x23) AM_DEVWRITE("aysnd", ay8910_address_w)		/* AY8910 control */
 	AM_RANGE(0x28, 0x28) AM_DEVWRITE("crtc", mc6845_address_w)
@@ -802,7 +802,7 @@ static MACHINE_CONFIG_START( avt, driver_device )
 	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK)	/* guess */
 	MDRV_CPU_PROGRAM_MAP(avt_map)
 	MDRV_CPU_IO_MAP(avt_portmap)
-//	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
+//  MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -884,8 +884,8 @@ ROM_START( avtnfl )
 	ROM_LOAD( "u40-14.33", 0x4000, 0x2000, CRC(205910dd) SHA1(37fee06926e4dcd89ec6390b4914a852f12a9e25) )
 
 	/* GFX from Symbols for debugging purposes.
-	   Original graphics are missing.
-	*/
+       Original graphics are missing.
+    */
 	ROM_REGION( 0x6000, "gfx1", 0 )
 	ROM_LOAD( "avtnfl.blu", 0x0000, 0x2000, BAD_DUMP CRC(ee07339b) SHA1(260ac4739c90efa60597bf815d12fb96cf5391ed) )
 	ROM_LOAD( "avtnfl.grn", 0x2000, 0x2000, BAD_DUMP CRC(1df023ac) SHA1(1919ddb835d525fd1843326de939af74693fc88a) )

@@ -33,9 +33,9 @@ public:
 
 protected:
 	struct planet;
-	
+
 	virtual void machine_start();
-	
+
 	virtual void video_start();
 	virtual bool video_update(screen_device &screen, bitmap_t &bitmap, const rectangle &cliprect);
 
@@ -51,9 +51,9 @@ protected:
 	required_shared_ptr<UINT8> m_ycoord;
 	required_shared_ptr<UINT8> m_bitmapram;
 	required_shared_ptr<UINT8> m_colorram;
-	
-	UINT8 		m_trackball_offset;
-	UINT8 		m_ctrld;
+
+	UINT8		m_trackball_offset;
+	UINT8		m_ctrld;
 	UINT8		m_videoram[0x10000];
 
 	// The following structure describes the (up to 32) line segments
@@ -64,7 +64,7 @@ protected:
 	{
 		UINT8 segment_count;	// the number of segments on this line
 		UINT8 max_x;			// the maximum value of x_array for this line
-		UINT8 color_array[32];	// the color values 
+		UINT8 color_array[32];	// the color values
 		UINT8 x_array[32];		// and maximum x values for each segment
 	};
 

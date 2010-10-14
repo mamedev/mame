@@ -3425,12 +3425,12 @@ ROM_END
   Magic Train
   -----------
 
-  Board silkscreened: "SUBSINO" (logo), "CS186P012". Stickered "1056439". 
+  Board silkscreened: "SUBSINO" (logo), "CS186P012". Stickered "1056439".
 
 
   CPU:   1x Hitachi HD647180X0CP6 - 6D1R (Subsino - SS9600) (U23).
   SND:   1x U6295 (OKI compatible) (U25).
-         1x TDA1519A (PHILIPS, 22W BTL or 2x 11W stereo car radio power amplifier (U34). 
+         1x TDA1519A (PHILIPS, 22W BTL or 2x 11W stereo car radio power amplifier (U34).
 
   NVRAM:     1x SANYO LC36256AML (SMD) (U16).
   VRAM:      2x UMC UM62256E-70LL (U7-U8, next to gfx ROMs).

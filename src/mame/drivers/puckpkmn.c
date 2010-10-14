@@ -314,11 +314,11 @@ Notes:
       TA-06S - custom chip (QFP128)
       TK-20K - custom chip, probably the CPU (QFP100). Clock unknown.
       M6295  - clock 1.000MHz [4/4]
-      
+
       4x 1Mx8 flashROMs (B*.U59) are mounted onto a DIP42 carrier board to make a
       32MBit EPROM equivalent. It appears to contain graphics plus the main program.
       ROM A.U3 contains samples for the M6295.
-          
+
 */
 
 ROM_START( puckpkmna ) /* Puckman Pockimon  (c)2000 IBS Co. Ltd */

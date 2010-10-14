@@ -3071,7 +3071,7 @@ ROM_START( finalap3jc )
 
 	ROM_REGION( 0x010000, "mcu", 0 ) /* M37450S2FP I/O MCU */
 	/* The M37450 is unemulated so we're using the C65/6805 program instead.
-	   This particular M37450 variant has no internal ROM. */
+       This particular M37450 variant has no internal ROM. */
 	ROM_LOAD( "sys2mcpu.bin",  0x000000, 0x002000, CRC(a342a97e) SHA1(2c420d34dba21e409bf78ddca710fc7de65a6642) )
 	ROM_LOAD( "sys2_c68.3f",   0x008000, 0x008000, CRC(ca64550a) SHA1(38d1ad1b1287cadef0c999aff9357927315f8e6b) )
 

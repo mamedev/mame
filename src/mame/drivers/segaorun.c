@@ -415,7 +415,7 @@ static void outrun_generic_init(running_machine *machine)
 	state->soundcpu = machine->device("soundcpu");
 	state->subcpu = machine->device("sub");
 	state->ppi8255 = machine->device("ppi8255");
-	
+
 	nvram_device *nvram = machine->device<nvram_device>("nvram");
 	if (nvram != NULL)
 		nvram->set_base(workram, 0x8000);

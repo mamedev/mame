@@ -135,7 +135,7 @@ static TIMER_CALLBACK( sh2_timer_callback )
 }
 
 
-/* 
+/*
   We have to do DMA on a timer (or at least, in chunks) due to the way some systems use it.
   The 32x is a difficult case, they set the SOURCE of the DMA to a FIFO buffer, which at most
   can have 8 words in it.  Attempting to do an 'instant DMA' in this scenario is impossible
@@ -147,12 +147,12 @@ static TIMER_CALLBACK( sh2_timer_callback )
   a) with a high frequency timer (more accurate, but a large performance hit)
 
   or
-  
+
   b) in the CPU_EXECUTE loop
 
 
   we're currently doing a)
-  
+
   b) causes problems with ST-V games
 
 */
@@ -163,17 +163,17 @@ void sh2_notify_dma_data_available(running_device *device)
 {
 	sh2_state *sh2 = GET_SH2(device);
 	//printf("call notify\n");
-	
+
 	for (int dma=0;dma<2;dma++)
 	{
 		//printf("sh2->dma_timer_active[dma] %04x\n",sh2->dma_timer_active[dma]);
-		
+
 		if (sh2->dma_timer_active[dma]==2) // 2 = stalled
 		{
-		//	printf("resuming stalled dma\n");
+		//  printf("resuming stalled dma\n");
 			sh2->dma_timer_active[dma]=1;
 			timer_adjust_oneshot(sh2->dma_current_active_timer[dma], attotime_zero, dma);
-		}		
+		}
 	}
 
 }
@@ -210,7 +210,7 @@ void sh2_do_dma(sh2_state *sh2, int dma)
 				if (sh2->dma_callback_fifo_data_available)
 				{
 					int available = sh2->dma_callback_fifo_data_available(tempsrc, tempdst, 0, sh2->active_dma_size[dma]);
-	
+
 					if (!available)
 					{
 						//printf("dma stalled\n");
@@ -218,12 +218,12 @@ void sh2_do_dma(sh2_state *sh2, int dma)
 						return;
 					}
 				}
-			
+
 				#ifdef USE_TIMER_FOR_DMA
 				 //schedule next DMA callback
 				timer_adjust_oneshot(sh2->dma_current_active_timer[dma], sh2->device->cycles_to_attotime(2), dma);
 				#endif
-		
+
 
 				dmadata = sh2->program->read_byte(tempsrc);
 				if (sh2->dma_callback_kludge) dmadata = sh2->dma_callback_kludge(tempsrc, tempdst, dmadata, sh2->active_dma_size[dma]);
@@ -258,7 +258,7 @@ void sh2_do_dma(sh2_state *sh2, int dma)
 				if (sh2->dma_callback_fifo_data_available)
 				{
 					int available = sh2->dma_callback_fifo_data_available(tempsrc, tempdst, 0, sh2->active_dma_size[dma]);
-	
+
 					if (!available)
 					{
 						//printf("dma stalled\n");
@@ -286,7 +286,7 @@ void sh2_do_dma(sh2_state *sh2, int dma)
 					sh2->active_dma_src[dma] += 2;
 				if(sh2->active_dma_incd[dma] == 1)
 					sh2->active_dma_dst[dma] += 2;
-			
+
 				sh2->active_dma_count[dma] --;
 			}
 			break;
@@ -305,7 +305,7 @@ void sh2_do_dma(sh2_state *sh2, int dma)
 				if (sh2->dma_callback_fifo_data_available)
 				{
 					int available = sh2->dma_callback_fifo_data_available(tempsrc, tempdst, 0, sh2->active_dma_size[dma]);
-	
+
 					if (!available)
 					{
 						//printf("dma stalled\n");
@@ -350,7 +350,7 @@ void sh2_do_dma(sh2_state *sh2, int dma)
 				if (sh2->dma_callback_fifo_data_available)
 				{
 					int available = sh2->dma_callback_fifo_data_available(tempsrc, tempdst, 0, sh2->active_dma_size[dma]);
-	
+
 					if (!available)
 					{
 						//printf("dma stalled\n");
@@ -386,7 +386,7 @@ void sh2_do_dma(sh2_state *sh2, int dma)
 				sh2->active_dma_src[dma] += 16;
 				if(sh2->active_dma_incd[dma] == 1)
 					sh2->active_dma_dst[dma] += 16;
-			
+
 				sh2->active_dma_count[dma]-=4;
 			}
 			break;
@@ -394,15 +394,15 @@ void sh2_do_dma(sh2_state *sh2, int dma)
 	}
 	else // the dma is complete
 	{
-	//	int dma = param & 1;
-	//	sh2_state *sh2 = (sh2_state *)ptr;
+	//  int dma = param & 1;
+	//  sh2_state *sh2 = (sh2_state *)ptr;
 
 		// fever soccer uses cycle-stealing mode, resume the CPU now DMA has finished
 		if (sh2->active_dma_steal[dma])
 		{
 			sh2->device->resume(SUSPEND_REASON_HALT );
 		}
-			
+
 
 		LOG(("SH2.%s: DMA %d complete\n", sh2->device->tag(), dma));
 		sh2->m[0x63+4*dma] |= 2;
@@ -432,7 +432,7 @@ static void sh2_dmac_check(sh2_state *sh2, int dma)
 			sh2->active_dma_incs[dma] = (sh2->m[0x63+4*dma] >> 12) & 3;
 			sh2->active_dma_size[dma] = (sh2->m[0x63+4*dma] >> 10) & 3;
 			sh2->active_dma_steal[dma] = (sh2->m[0x63+4*dma] &0x10);
-			
+
 			if(sh2->active_dma_incd[dma] == 3 || sh2->active_dma_incs[dma] == 3)
 			{
 				logerror("SH2: DMA: bad increment values (%d, %d, %d, %04x)\n", sh2->active_dma_incd[dma], sh2->active_dma_incs[dma], sh2->active_dma_size[dma], sh2->m[0x63+4*dma]);
@@ -457,7 +457,7 @@ static void sh2_dmac_check(sh2_state *sh2, int dma)
 				break;
 			case 1:
 				sh2->active_dma_src[dma] &= ~1;
-				sh2->active_dma_dst[dma] &= ~1;	
+				sh2->active_dma_dst[dma] &= ~1;
 				break;
 			case 2:
 				sh2->active_dma_src[dma] &= ~3;
@@ -469,20 +469,20 @@ static void sh2_dmac_check(sh2_state *sh2, int dma)
 				sh2->active_dma_count[dma] &= ~3;
 				break;
 			}
-			
-			
 
-			
+
+
+
 #ifdef USE_TIMER_FOR_DMA
 			// start DMA timer
-			
+
 			// fever soccer uses cycle-stealing mode, requiring the CPU to be halted
 			if (sh2->active_dma_steal[dma])
 			{
 				//printf("cycle stealing DMA\n");
 				sh2->device->suspend(SUSPEND_REASON_HALT, 1 );
 			}
-			
+
 			timer_adjust_oneshot(sh2->dma_current_active_timer[dma], sh2->device->cycles_to_attotime(2), dma);
 #endif
 
@@ -495,7 +495,7 @@ static void sh2_dmac_check(sh2_state *sh2, int dma)
 			logerror("SH2: DMA %d cancelled in-flight\n", dma);
 			//timer_adjust_oneshot(sh2->dma_complete_timer[dma], attotime_never, 0);
 			timer_adjust_oneshot(sh2->dma_current_active_timer[dma], attotime_never, 0);
-		
+
 			sh2->dma_timer_active[dma] = 0;
 		}
 	}

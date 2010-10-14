@@ -5144,7 +5144,7 @@ static DRIVER_INIT( kovlsqh2 )
 {
 	pgm_decode_kovqhsgs2_program(machine);
 	pgm_decode_kovlsqh2_tiles(machine);
-	
+
 	pgm_decode_kovlsqh2_sprites(machine, memory_region(machine, "sprcol") + 0x0000000);
 	pgm_decode_kovlsqh2_sprites(machine, memory_region(machine, "sprcol") + 0x0800000);
 	pgm_decode_kovlsqh2_sprites(machine, memory_region(machine, "sprcol") + 0x1000000);
@@ -5153,17 +5153,17 @@ static DRIVER_INIT( kovlsqh2 )
 	pgm_decode_kovlsqh2_sprites(machine, memory_region(machine, "sprcol") + 0x2800000);
 	pgm_decode_kovlsqh2_sprites(machine, memory_region(machine, "sprmask") + 0x0000000);
 	pgm_decode_kovlsqh2_sprites(machine, memory_region(machine, "sprmask") + 0x0800000);
-	
+
 	pgm_decode_kovlsqh2_samples(machine);
 	pgm_basic_init(machine);
- 	kovsh_latch_init(machine);
+	kovsh_latch_init(machine);
 }
 
 static DRIVER_INIT( kovqhsgs )
 {
 	pgm_decode_kovqhsgs_program(machine);
 	pgm_decode_kovlsqh2_tiles(machine);
-	
+
 	pgm_decode_kovlsqh2_sprites(machine, memory_region(machine, "sprcol") + 0x0000000);
 	pgm_decode_kovlsqh2_sprites(machine, memory_region(machine, "sprcol") + 0x0800000);
 	pgm_decode_kovlsqh2_sprites(machine, memory_region(machine, "sprcol") + 0x1000000);
@@ -5172,11 +5172,11 @@ static DRIVER_INIT( kovqhsgs )
 	pgm_decode_kovlsqh2_sprites(machine, memory_region(machine, "sprcol") + 0x2800000);
 	pgm_decode_kovlsqh2_sprites(machine, memory_region(machine, "sprmask") + 0x0000000);
 	pgm_decode_kovlsqh2_sprites(machine, memory_region(machine, "sprmask") + 0x0800000);
-	
+
 	pgm_decode_kovlsqh2_samples(machine);
-	
+
 	pgm_basic_init(machine);
- 	kovsh_latch_init(machine);
+	kovsh_latch_init(machine);
 }
 
 

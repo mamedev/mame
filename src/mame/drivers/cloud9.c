@@ -435,7 +435,7 @@ static MACHINE_CONFIG_START( cloud9, cloud9_state )
 	MDRV_MACHINE_START(cloud9)
 	MDRV_MACHINE_RESET(cloud9)
 	MDRV_WATCHDOG_VBLANK_INIT(8)
-	
+
 	MDRV_X2212_ADD_AUTOSAVE("nvram")
 
 	/* video hardware */

@@ -1531,7 +1531,7 @@ static int drawogl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 					texture=NULL;
 				}
 				break;
-			
+
 			default:
 				throw emu_fatalerror("Unexpected render_primitive type");
 		}

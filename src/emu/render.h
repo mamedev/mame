@@ -36,28 +36,28 @@
     POSSIBILITY OF SUCH DAMAGE.
 
 ****************************************************************************
-  
+
     Theory of operation
     -------------------
-  
+
     A render "target" is described by 5 parameters:
-  
+
         - width = width, in pixels
         - height = height, in pixels
         - bpp = depth, in bits per pixel
         - orientation = orientation of the target
         - pixel_aspect = aspect ratio of the pixels
-  
+
     Width, height, and bpp are self-explanatory. The remaining parameters
     need some additional explanation.
-  
+
     Regarding orientation, there are three orientations that need to be
     dealt with: target orientation, UI orientation, and game orientation.
     In the current model, the UI orientation tracks the target orientation
     so that the UI is (in theory) facing the correct direction. The game
     orientation is specified by the game driver and indicates how the
     game and artwork are rotated.
-  
+
     Regarding pixel_aspect, this is the aspect ratio of the individual
     pixels, not the aspect ratio of the screen. You can determine this by
     dividing the aspect ratio of the screen by the aspect ratio of the
@@ -66,10 +66,10 @@
     square. That same screen displaying 1280x1024 would have a pixel
     aspect ratio of (4/3)/(1280/1024) = 1.06666, meaning the pixels are
     slightly wider than they are tall.
-  
+
     Artwork is always assumed to be a 1.0 pixel aspect ratio. The game
     screens themselves can be variable aspect ratios.
-  
+
 ***************************************************************************/
 
 #ifndef __RENDER_H__
@@ -114,13 +114,13 @@ const UINT8 RENDER_CREATE_HIDDEN		= 0x04;			// don't make this target visible
 
 
 // layer config masks
-const UINT8 LAYER_CONFIG_ENABLE_BACKDROP	 	= 0x01;	// enable backdrop layers
+const UINT8 LAYER_CONFIG_ENABLE_BACKDROP		= 0x01;	// enable backdrop layers
 const UINT8 LAYER_CONFIG_ENABLE_OVERLAY			= 0x02;	// enable overlay layers
 const UINT8 LAYER_CONFIG_ENABLE_BEZEL			= 0x04;	// enable bezel layers
 const UINT8 LAYER_CONFIG_ZOOM_TO_SCREEN			= 0x08;	// zoom to screen area by default
-const UINT8 LAYER_CONFIG_ENABLE_SCREEN_OVERLAY 	= 0x10;	// enable screen overlays
+const UINT8 LAYER_CONFIG_ENABLE_SCREEN_OVERLAY	= 0x10;	// enable screen overlays
 
-const UINT8 LAYER_CONFIG_DEFAULT = 	(LAYER_CONFIG_ENABLE_BACKDROP |
+const UINT8 LAYER_CONFIG_DEFAULT =	(LAYER_CONFIG_ENABLE_BACKDROP |
 									 LAYER_CONFIG_ENABLE_OVERLAY |
 									 LAYER_CONFIG_ENABLE_BEZEL |
 									 LAYER_CONFIG_ENABLE_SCREEN_OVERLAY);
@@ -249,7 +249,7 @@ struct render_texinfo
 class render_primitive
 {
 	friend class simple_list<render_primitive>;
-	
+
 public:
 	// render primitive types
 	enum primitive_type
@@ -261,7 +261,7 @@ public:
 
 	// getters
 	render_primitive *next() const { return m_next; }
-	
+
 	// reset to prepare for re-use
 	void reset();
 
@@ -295,10 +295,10 @@ public:
 	// getters
 	render_primitive *first() const { return m_primlist.first(); }
 
-	// lock management	
+	// lock management
 	void acquire_lock() { osd_lock_acquire(m_lock); }
 	void release_lock() { osd_lock_release(m_lock); }
-	
+
 	// reference management
 	void add_reference(void *refptr);
 	bool has_reference(void *refptr) const;
@@ -320,13 +320,13 @@ private:
 	};
 
 	// internal state
- 	simple_list<render_primitive> m_primlist;				// list of primitives
- 	simple_list<reference> m_reflist;						// list of references
+	simple_list<render_primitive> m_primlist;				// list of primitives
+	simple_list<reference> m_reflist;						// list of references
 
 	fixed_allocator<render_primitive> m_primitive_allocator;// allocator for primitives
-	fixed_allocator<reference> m_reference_allocator; 		// allocator for references
+	fixed_allocator<reference> m_reference_allocator;		// allocator for references
 
- 	osd_lock *			m_lock;								// lock to protect list accesses
+	osd_lock *			m_lock;								// lock to protect list accesses
 };
 
 
@@ -344,10 +344,10 @@ class render_texture
 	// construction/destruction
 	render_texture();
 	~render_texture();
-	
+
 	// reset before re-use
 	void reset(render_manager &manager, texture_scaler_func scaler = NULL, void *param = NULL);
-	
+
 public:
 	// getters
 	int format() const { return m_format; }
@@ -397,7 +397,7 @@ class render_container
 	friend class simple_list<render_container>;
 	friend class render_manager;
 	friend class render_target;
-	
+
 	// construction/destruction
 	render_container(render_manager &manager, screen_device *screen = NULL);
 	~render_container();
@@ -408,7 +408,7 @@ public:
 	{
 		// construction/destruction
 		user_settings();
-	
+
 		// public state
 		int					m_orientation;		// orientation
 		float				m_brightness;		// brightness
@@ -459,7 +459,7 @@ private:
 	{
 		friend class render_container;
 		friend class simple_list<item>;
-		
+
 	public:
 		// getters
 		item *next() const { return m_next; }
@@ -495,8 +495,8 @@ private:
 	// internal state
 	render_container *		m_next;					// the next container in the list
 	render_manager &		m_manager;				// reference back to the owning manager
-	simple_list<item> 		m_itemlist;				// head of the item list
-	fixed_allocator<item> 	m_item_allocator; 		// free container items
+	simple_list<item>		m_itemlist;				// head of the item list
+	fixed_allocator<item>	m_item_allocator;		// free container items
 	screen_device *			m_screen;				// the screen device
 	user_settings			m_user;					// user settings
 	bitmap_t *				m_overlaybitmap;		// overlay bitmap
@@ -540,7 +540,7 @@ public:
 	bool zoom_to_screen() const { return (m_layerconfig & LAYER_CONFIG_ZOOM_TO_SCREEN) != 0; }
 	bool is_ui_target() const;
 	int index() const;
-	
+
 	// setters
 	void set_bounds(INT32 width, INT32 height, float pixel_aspect = 0);
 	void set_max_update_rate(float updates_per_second) { m_max_refresh = updates_per_second; }
@@ -608,7 +608,7 @@ private:
 	layout_view *			m_curview;					// current view
 	layout_file *			m_filelist;					// list of layout files
 	UINT32					m_flags;					// creation flags
-	render_primitive_list 	m_primlist[NUM_PRIMLISTS];	// list of primitives
+	render_primitive_list	m_primlist[NUM_PRIMLISTS];	// list of primitives
 	int						m_listindex;				// index of next primlist to use
 	INT32					m_width;					// width in pixels
 	INT32					m_height;					// height in pixels
@@ -622,9 +622,9 @@ private:
 	int						m_base_layerconfig;			// the layer configuration at the time of first frame
 	int						m_maxtexwidth;				// maximum width of a texture
 	int						m_maxtexheight;				// maximum height of a texture
-	simple_list<render_container> m_debug_containers; 	// list of debug containers
-	INT32 					m_clear_extent_count;		// number of clear extents
-	INT32 					m_clear_extents[MAX_CLEAR_EXTENTS]; // array of clear extents
+	simple_list<render_container> m_debug_containers;	// list of debug containers
+	INT32					m_clear_extent_count;		// number of clear extents
+	INT32					m_clear_extents[MAX_CLEAR_EXTENTS]; // array of clear extents
 };
 
 
@@ -634,36 +634,36 @@ private:
 class render_manager
 {
 	friend class render_target;
-	
+
 public:
 	// construction/destruction
 	render_manager(running_machine &machine);
 	~render_manager();
-	
+
 	// getters
 	running_machine &machine() const { return m_machine; }
-	
+
 	// global queries
 	bool is_live(screen_device &screen) const;
 	float max_update_rate() const;
-	
+
 	// targets
 	render_target *target_alloc(const char *layoutfile = NULL, UINT32 flags = 0);
 	void target_free(render_target *target);
 	render_target *first_target() const { return m_targetlist.first(); }
 	render_target *target_by_index(int index) const;
-	
+
 	// UI targets
 	render_target &ui_target() const { assert(m_ui_target != NULL); return *m_ui_target; }
 	void set_ui_target(render_target &target) { m_ui_target = &target; }
 	float ui_aspect();
-	
+
 	// screen containers
 	render_container *container_for_screen(screen_device *screen);
-	
+
 	// UI containers
 	render_container &ui_container() const { assert(m_ui_container != NULL); return *m_ui_container; }
-	
+
 	// textures
 	render_texture *texture_alloc(texture_scaler_func scaler = NULL, void *param = NULL);
 	void texture_free(render_texture *texture);
@@ -686,16 +686,16 @@ private:
 	running_machine &				m_machine;			// reference back to the machine
 
 	// array of live targets
-	simple_list<render_target> 		m_targetlist;		// list of targets
+	simple_list<render_target>		m_targetlist;		// list of targets
 	render_target *					m_ui_target;		// current UI target
-	
+
 	// texture lists
 	UINT32							m_live_textures;	// number of live textures
 	fixed_allocator<render_texture>	m_texture_allocator;// texture allocator
 
 	// containers for the UI and for screens
 	render_container *				m_ui_container;		// UI container
-	simple_list<render_container> 	m_screen_container_list; // list of containers for the screen
+	simple_list<render_container>	m_screen_container_list; // list of containers for the screen
 };
 
 

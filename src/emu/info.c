@@ -630,7 +630,7 @@ static void print_game_sampleof(FILE *out, const game_driver *game, const machin
 					/* only output sampleof if different from the game name */
 					if (cursampname[0] == '*' && strcmp(cursampname + 1, game->name) != 0)
 						fprintf(out, " sampleof=\"%s\"", xml_normalize_string(cursampname + 1));
-					
+
 					/* must stop here, as there can only be one attribute of the same name */
 					return;
 				}

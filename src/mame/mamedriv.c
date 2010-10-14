@@ -4690,7 +4690,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( gunsur2 )	/* 2001.07 Gun Survivor 2: Bio Hazard Code Veronica */
 	DRIVER( starseek )	/* 2001.07 Dokidoki Idol Star Seeker */
 	DRIVER( cvs2gd )	/* 2001.08 Capcom vs. SNK 2 */
-	DRIVER( wrungp )  	/* 2001.08 Wave Runner GP */
+	DRIVER( wrungp )	/* 2001.08 Wave Runner GP */
 	DRIVER( gundmxgd )	/* 2001.09 Kidou Senshi Gundam Renpou vs. Zeon DX */
 						/* 2001.09 Alien Front */
 	DRIVER( hmgeo )		/* 2001.09 Heavy Metal Geo Matrix */
@@ -8534,10 +8534,10 @@ Other Sun games
 	DRIVER( kov100 )		/* (c) 1999 */
 	DRIVER( kovsh )			/* (c) 1999 */
 	DRIVER( kovsh103 )		/* (c) 1999 */
-	DRIVER( kovqhsgs ) 		/* bootleg */
-	DRIVER( kovlsqh2 ) 		/* bootleg */
-	DRIVER( kovlsjb ) 		/* bootleg */
-	DRIVER( kovlsjba ) 		/* bootleg */
+	DRIVER( kovqhsgs )		/* bootleg */
+	DRIVER( kovlsqh2 )		/* bootleg */
+	DRIVER( kovlsjb )		/* bootleg */
+	DRIVER( kovlsjba )		/* bootleg */
 	DRIVER( photoy2k )		/* (c) 1999 */
 	DRIVER( photoy2k102 )	/* (c) 1999 */
 	DRIVER( photoy2k104 )	/* (c) 1999 */

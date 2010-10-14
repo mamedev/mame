@@ -3043,7 +3043,7 @@ static void menu_video_options(running_machine *machine, ui_menu *menu, void *pa
 					changed = TRUE;
 				}
 				break;
-				
+
 			case VIDEO_ITEM_OVERLAYS:
 				if (event->iptkey == IPT_UI_LEFT || event->iptkey == IPT_UI_RIGHT)
 				{
@@ -3051,7 +3051,7 @@ static void menu_video_options(running_machine *machine, ui_menu *menu, void *pa
 					changed = TRUE;
 				}
 				break;
-				
+
 			case VIDEO_ITEM_BEZELS:
 				if (event->iptkey == IPT_UI_LEFT || event->iptkey == IPT_UI_RIGHT)
 				{
@@ -3059,7 +3059,7 @@ static void menu_video_options(running_machine *machine, ui_menu *menu, void *pa
 					changed = TRUE;
 				}
 				break;
-				
+
 			case VIDEO_ITEM_ZOOM:
 				if (event->iptkey == IPT_UI_LEFT || event->iptkey == IPT_UI_RIGHT)
 				{

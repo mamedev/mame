@@ -4371,7 +4371,7 @@ void handler_entry::configure_subunits(UINT64 handlermask, int handlerbits)
 {
 	UINT64 unitmask = ((UINT64)1 << handlerbits) - 1;
 	assert(handlermask != 0);
-	
+
 	// set the inverse mask
 	m_invsubmask = ~handlermask;
 

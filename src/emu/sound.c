@@ -407,8 +407,8 @@ static TIMER_CALLBACK( sound_update )
 	/* play the result */
 	if (finalmix_offset > 0)
 	{
- 		if (!global->nosound_mode)
-	 		osd_update_audio_stream(machine, finalmix, finalmix_offset / 2);
+		if (!global->nosound_mode)
+			osd_update_audio_stream(machine, finalmix, finalmix_offset / 2);
 		video_avi_add_sound(machine, finalmix, finalmix_offset / 2);
 		if (global->wavfile != NULL)
 			wav_add_data_16(global->wavfile, finalmix, finalmix_offset);

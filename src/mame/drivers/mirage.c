@@ -52,9 +52,9 @@ public:
 	/* memory pointers */
 	UINT16 *  pf1_rowscroll;
 	UINT16 *  pf2_rowscroll;
-//	UINT16 *  spriteram;
+//  UINT16 *  spriteram;
 //  UINT16 *  paletteram;    // currently this uses generic palette handling (in deco16ic.c)
-//	size_t    spriteram_size;
+//  size_t    spriteram_size;
 
 	/* misc */
 	UINT8 mux_data;

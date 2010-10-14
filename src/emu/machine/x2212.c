@@ -112,7 +112,7 @@ void x2212_device::device_start()
 {
 	state_save_register_device_item(this, 0, m_store);
 	state_save_register_device_item(this, 0, m_array_recall);
-	
+
 	m_sram = m_addrspace[0];
 	m_e2prom = m_addrspace[1];
 }
@@ -173,7 +173,7 @@ void x2212_device::nvram_write(mame_file &file)
 	// auto-save causes an implicit store prior to exiting (writing)
 	if (m_config.m_auto_save)
 		store();
-	
+
 	UINT8 buffer[SIZE_DATA];
 	for (int byte = 0; byte < SIZE_DATA; byte++)
 		buffer[byte] = m_e2prom->read_byte(byte);
@@ -187,7 +187,7 @@ void x2212_device::nvram_write(mame_file &file)
 //**************************************************************************
 
 //-------------------------------------------------
-//  store - store data from live RAM into the 
+//  store - store data from live RAM into the
 //  EEPROM
 //-------------------------------------------------
 
@@ -199,7 +199,7 @@ void x2212_device::store()
 
 
 //-------------------------------------------------
-//  recall - fetch data from the EEPROM into live 
+//  recall - fetch data from the EEPROM into live
 //  RAM
 //-------------------------------------------------
 

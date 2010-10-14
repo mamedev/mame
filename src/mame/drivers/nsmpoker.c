@@ -95,10 +95,10 @@ static TILE_GET_INFO( get_bg_tile_info )
     ---- ----   color code.
     ---- ----   seems unused.
 */
-//	int attr = colorram[tile_index];
+//  int attr = colorram[tile_index];
 	int code = videoram[tile_index];
-//	int bank = (attr & 0x08) >> 3;
-//	int color = (attr & 0x03);
+//  int bank = (attr & 0x08) >> 3;
+//  int color = (attr & 0x03);
 
 	SET_TILE_INFO( 0 /* bank */, code, 0 /* color */, 0);
 }
@@ -134,7 +134,7 @@ static INTERRUPT_GEN( nsmpoker_interrupt )
 
 //static WRITE8_HANDLER( debug_w )
 //{
-//	popmessage("written : %02X", data);
+//  popmessage("written : %02X", data);
 //}
 
 static READ8_HANDLER( debug_r )
@@ -406,14 +406,14 @@ MACHINE_CONFIG_END
 *************************/
 
 ROM_START( nsmpoker )
-//	ROM_REGION( 0x10000, "maincpu", 0 )
-//	ROM_LOAD( "113_277.6e",	0x0000, 0x2000, CRC(247ad554) SHA1(5cfdfb95920d7e89e3e485a06d0099191e8d41a0) )
+//  ROM_REGION( 0x10000, "maincpu", 0 )
+//  ROM_LOAD( "113_277.6e", 0x0000, 0x2000, CRC(247ad554) SHA1(5cfdfb95920d7e89e3e485a06d0099191e8d41a0) )
 
-//	ROM_REGION( 0x8000, "gfx1", 0 )
-//	ROM_LOAD( "113_278.6g",	0x0000, 0x2000, CRC(08eb7305) SHA1(4e555aa481c6b4476b71909ddabf405dd6f767ed) )
-//	ROM_LOAD( "113_279.5g",	0x2000, 0x2000, CRC(ac6ab327) SHA1(1012dc581b2be7df5e079ace44a721d17d21366a) )
-//	ROM_LOAD( "113_280.3g",	0x4000, 0x2000, CRC(9b9be79d) SHA1(8301e74c4869d04eba680d156de9edaadd7ff83b) )
-//	ROM_LOAD( "113_281.2g",	0x6000, 0x2000, CRC(4b9b448a) SHA1(3ca1f5714cf5535d2ea1e7e03bca456c89af222c) )
+//  ROM_REGION( 0x8000, "gfx1", 0 )
+//  ROM_LOAD( "113_278.6g", 0x0000, 0x2000, CRC(08eb7305) SHA1(4e555aa481c6b4476b71909ddabf405dd6f767ed) )
+//  ROM_LOAD( "113_279.5g", 0x2000, 0x2000, CRC(ac6ab327) SHA1(1012dc581b2be7df5e079ace44a721d17d21366a) )
+//  ROM_LOAD( "113_280.3g", 0x4000, 0x2000, CRC(9b9be79d) SHA1(8301e74c4869d04eba680d156de9edaadd7ff83b) )
+//  ROM_LOAD( "113_281.2g", 0x6000, 0x2000, CRC(4b9b448a) SHA1(3ca1f5714cf5535d2ea1e7e03bca456c89af222c) )
 
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "113_277.6e",	0x0000, 0x2000, CRC(247ad554) SHA1(5cfdfb95920d7e89e3e485a06d0099191e8d41a0) )

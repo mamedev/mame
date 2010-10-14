@@ -132,7 +132,7 @@ void er2055_device::device_start()
 	state_save_register_device_item(this, 0, m_control_state);
 	state_save_register_device_item(this, 0, m_address);
 	state_save_register_device_item(this, 0, m_data);
-	
+
 	m_control_state = 0;
 }
 
@@ -214,7 +214,7 @@ void er2055_device::set_control(UINT8 cs1, UINT8 cs2, UINT8 c1, UINT8 c2, UINT8 
 	// if not selected, or if change from previous, we're done
 	if ((m_control_state & (CS1 | CS2)) != (CS1 | CS2) || m_control_state == oldstate)
 		return;
-	
+
 	// something changed, see what it is based on what mode we're in
 	switch (m_control_state & (C1 | C2))
 	{
@@ -230,7 +230,7 @@ void er2055_device::set_control(UINT8 cs1, UINT8 cs2, UINT8 c1, UINT8 c2, UINT8 
 			m_addrspace[0]->write_byte(m_address, 0xff);
 //printf("Erase %02X\n", m_address);
 			break;
-		
+
 		// read mode
 		case C1:
 			if ((oldstate & CK) != 0 && (m_control_state & CK) == 0)

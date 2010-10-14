@@ -99,7 +99,7 @@ public:
 	UINT8 data() const { return m_data; }
 	void set_address(UINT8 address) { m_address = address & 0x3f; }
 	void set_data(UINT8 data) { m_data = data; }
-	
+
 	// control lines -- all lines are specified as active-high (even CS2)
 	void set_control(UINT8 cs1, UINT8 cs2, UINT8 c1, UINT8 c2, UINT8 ck);
 
@@ -122,7 +122,7 @@ protected:
 
 	// internal state
 	const er2055_device_config &m_config;
-	
+
 	UINT8		m_control_state;
 	UINT8		m_address;
 	UINT8		m_data;

@@ -2351,7 +2351,7 @@ static void FUNC_PREFIX(draw_primitives)(const render_primitive_list &primlist, 
 				else
 					FUNC_PREFIX(setup_and_draw_textured_quad)(prim, dstdata, width, height, pitch);
 				break;
-			
+
 			default:
 				throw emu_fatalerror("Unexpected render_primitive type");
 		}

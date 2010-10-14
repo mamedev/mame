@@ -668,7 +668,7 @@ mtlog_add("drawd3d_window_draw: primitive loop begin");
 			case render_primitive::QUAD:
 				draw_quad(d3d, prim);
 				break;
-			
+
 			default:
 				throw emu_fatalerror("Unexpected render_primitive type");
 		}

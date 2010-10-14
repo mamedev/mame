@@ -83,26 +83,26 @@ mm74c920J/mmc6551j-9    x2
 .1 is closest to the connector
 .7 is closest to the cpu
 
-Etched in copper on top by .1 eprom	6000
+Etched in copper on top by .1 eprom 6000
 
-.1	2732	handwritten sticker	GJOK1
-.2	2732	handwritten sticker	GJOK2
-.3	2732	handwritten sticker	BJOK1
-.4	2732	handwritten sticker	BJOK2
-.5	2732	handwritten sticker	RJOK1
-.6	2732	handwritten sticker	RJOK2
-.7	2764	handwritten sticker	688C
+.1  2732    handwritten sticker GJOK1
+.2  2732    handwritten sticker GJOK2
+.3  2732    handwritten sticker BJOK1
+.4  2732    handwritten sticker BJOK2
+.5  2732    handwritten sticker RJOK1
+.6  2732    handwritten sticker RJOK2
+.7  2764    handwritten sticker 688C
 
 
 4 Mhz crystal
 6809
 MC6840P
-nmc6514-9	x2
-nm23114		x2
+nmc6514-9   x2
+nm23114     x2
 
-16 pin chip marked	74166F 7745
-			SA2889-0697 
-	stamped		ETC
+16 pin chip marked  74166F 7745
+            SA2889-0697
+    stamped     ETC
 
 **************************************************************************************************************/
 
@@ -662,7 +662,7 @@ static MACHINE_CONFIG_START( vpoker, vpoker_state )
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(512, 256)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 480-1, 0*8, 240-1)
-//	MDRV_SCREEN_VISIBLE_AREA(0*8, 512-1, 0*8, 256-1)
+//  MDRV_SCREEN_VISIBLE_AREA(0*8, 512-1, 0*8, 256-1)
 	MDRV_GFXDECODE(vpoker)
 	MDRV_PALETTE_LENGTH(8)
 	MDRV_PALETTE_INIT(vpoker)

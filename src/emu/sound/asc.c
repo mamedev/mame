@@ -4,7 +4,7 @@
 
     Apple Sound Chip (ASC) 344S0063
     Enhanced Apple Sound Chip (EASC) 343S1063
-    
+
     Emulation by R. Belmont
 
     Registers:
@@ -179,11 +179,11 @@ void asc_device::stream_generate(stream_sample_t **inputs, stream_sample_t **out
 		case 1:	// FIFO mode
 			if ((m_fifo_a_rdptr == 0) && (!m_fifo_a_wrhalf[0]))
 			{
-			   halt = 1;		
+			   halt = 1;
 			}
 			else if ((m_fifo_a_rdptr == 0x200) && (!m_fifo_a_wrhalf[1]))
 			{
-			   halt = 1;		
+			   halt = 1;
 			}
 
 			for (i = 0; i < samples; i++)
@@ -203,7 +203,7 @@ void asc_device::stream_generate(stream_sample_t **inputs, stream_sample_t **out
 
 				smpll = (INT8)m_fifo_a[m_fifo_a_rdptr++]^0x80;
 				smplr = (INT8)m_fifo_b[m_fifo_b_rdptr++]^0x80;
-				
+
 				if ((m_fifo_a_rdptr == 0x200) || (m_fifo_a_rdptr == 0x400))
 				{
 					m_regs[R_FIFOSTAT-0x800] |= 1;	// fifo A half-empty
@@ -231,7 +231,7 @@ void asc_device::stream_generate(stream_sample_t **inputs, stream_sample_t **out
 
 			if (halt)
 			{
-//				m_regs[R_MODE-0x800] = 0;
+//              m_regs[R_MODE-0x800] = 0;
 			}
 			break;
 
@@ -242,7 +242,7 @@ void asc_device::stream_generate(stream_sample_t **inputs, stream_sample_t **out
 				INT8 smpl;
 
 				mixL = mixR = 0;
-		 	
+
 				// update channel pointers
 				for (ch = 0; ch < 4; ch++)
 				{
@@ -277,7 +277,7 @@ UINT8 asc_device::read(UINT16 offset)
 {
 	UINT8 rv;
 
-//	printf("ASC: read at %x\n", offset);
+//  printf("ASC: read at %x\n", offset);
 
 	// not sure what actually happens when the CPU reads the FIFO...
 	if (offset < 0x400)
@@ -409,7 +409,7 @@ UINT8 asc_device::read(UINT16 offset)
 
 void asc_device::write(UINT16 offset, UINT8 data)
 {
-//	printf("ASC: write %02x to %x\n", data, offset);
+//  printf("ASC: write %02x to %x\n", data, offset);
 
 	if (offset < 0x400)
 	{
@@ -475,7 +475,7 @@ void asc_device::write(UINT16 offset, UINT8 data)
 	}
 	else
 	{
-//		printf("ASC: %02x to %x (was %x)\n", data, offset, m_regs[offset-0x800]);
+//      printf("ASC: %02x to %x (was %x)\n", data, offset, m_regs[offset-0x800]);
 
 		stream_update(m_stream);
 		switch (offset)
@@ -491,10 +491,10 @@ void asc_device::write(UINT16 offset, UINT8 data)
 				break;
 
 			case R_WTCONTROL:
-//				printf("One-shot wavetable %02x\n", data);
+//              printf("One-shot wavetable %02x\n", data);
 				break;
 
-			case 0x811: 
+			case 0x811:
 				m_phase[0] &= 0x00ffff;
 				m_phase[0] |= data<<16;
 				break;
@@ -509,7 +509,7 @@ void asc_device::write(UINT16 offset, UINT8 data)
 				m_phase[0] |= data;
 				break;
 
-			case 0x815: 
+			case 0x815:
 				m_incr[0] &= 0x00ffff;
 				m_incr[0] |= data<<16;
 				break;
@@ -524,7 +524,7 @@ void asc_device::write(UINT16 offset, UINT8 data)
 				m_incr[0] |= data;
 				break;
 
-			case 0x819: 
+			case 0x819:
 				m_phase[1] &= 0x00ffff;
 				m_phase[1] |= data<<16;
 				break;
@@ -539,7 +539,7 @@ void asc_device::write(UINT16 offset, UINT8 data)
 				m_phase[1] |= data;
 				break;
 
-			case 0x81d: 
+			case 0x81d:
 				m_incr[1] &= 0x00ffff;
 				m_incr[1] |= data<<16;
 				break;
@@ -554,7 +554,7 @@ void asc_device::write(UINT16 offset, UINT8 data)
 				m_incr[1] |= data;
 				break;
 
-			case 0x821: 
+			case 0x821:
 				m_phase[2] &= 0x00ffff;
 				m_phase[2] |= data<<16;
 				break;
@@ -569,7 +569,7 @@ void asc_device::write(UINT16 offset, UINT8 data)
 				m_phase[2] |= data;
 				break;
 
-			case 0x825: 
+			case 0x825:
 				m_incr[2] &= 0x00ffff;
 				m_incr[2] |= data<<16;
 				break;
@@ -584,7 +584,7 @@ void asc_device::write(UINT16 offset, UINT8 data)
 				m_incr[2] |= data;
 				break;
 
-			case 0x829: 
+			case 0x829:
 				m_phase[3] &= 0x00ffff;
 				m_phase[3] |= data<<16;
 				break;
@@ -599,7 +599,7 @@ void asc_device::write(UINT16 offset, UINT8 data)
 				m_phase[3] |= data;
 				break;
 
-			case 0x82d: 
+			case 0x82d:
 				m_incr[3] &= 0x00ffff;
 				m_incr[3] |= data<<16;
 				break;

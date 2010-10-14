@@ -1596,7 +1596,7 @@ WRITE8_MEMBER( atarigen_state::earom_w )
 {
 	// remember the value written
 	m_earom_data = data;
-	
+
 	// output latch only enabled if control bit 2 is set
 	if (m_earom_control & 4)
 		m_earom->set_data(m_earom_data);
@@ -1610,7 +1610,7 @@ WRITE8_MEMBER( atarigen_state::earom_control_w )
 {
 	// remember the control state
 	m_earom_control = data;
-	
+
 	// ensure ouput data is put on data lines prior to updating controls
 	if (m_earom_control & 4)
 		m_earom->set_data(m_earom_data);

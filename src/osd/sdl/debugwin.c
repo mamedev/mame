@@ -78,15 +78,15 @@ struct _win_i {
 
 struct windowState
 {
-    windowState() : type(0), 
-                    sizeX(-1), sizeY(-1), 
+    windowState() : type(0),
+                    sizeX(-1), sizeY(-1),
                     positionX(-1), positionY(-1) { }
     ~windowState() { }
-    
+
     void loadFromXmlDataNode(xml_data_node* wnode)
     {
         if (!wnode) return;
-        
+
         type = xml_get_attribute_int(wnode, "type", type);
 
         sizeX = xml_get_attribute_int(wnode, "size_x", sizeX);
@@ -493,7 +493,7 @@ static void configuration_load(running_machine *machine, int config_type, xml_da
 		return;
 
     /* configuration load */
-	int i = 0; 
+	int i = 0;
 	for (wnode = xml_get_sibling(parentnode->child, "window"); wnode != NULL; wnode = xml_get_sibling(wnode->next, "window"))
     {
         windowStateArray[i].loadFromXmlDataNode(wnode);
@@ -571,13 +571,13 @@ void osd_wait_for_debugger(running_device *device, int firststop)
                 gtk_window_resize(GTK_WINDOW(win_list->win), windowStateArray[i].sizeX, windowStateArray[i].sizeY);
             }
         }
-        
+
         // Respawn and reposition every other window
         for (int i = 0; i < windowStateCount; i++)
         {
-            if (!windowStateArray[i].type || windowStateArray[i].type == WIN_TYPE_MAIN) 
+            if (!windowStateArray[i].type || windowStateArray[i].type == WIN_TYPE_MAIN)
                 continue;
-            
+
             switch (windowStateArray[i].type)
             {
                 case WIN_TYPE_MEMORY: memorywin_new(device->machine); break;
@@ -585,7 +585,7 @@ void osd_wait_for_debugger(running_device *device, int firststop)
                 case WIN_TYPE_LOG:    logwin_new(device->machine); break;
                 default: break;
             }
-            
+
             gtk_window_move(GTK_WINDOW(win_list->win), windowStateArray[i].positionX, windowStateArray[i].positionY);
             gtk_window_resize(GTK_WINDOW(win_list->win), windowStateArray[i].sizeX, windowStateArray[i].sizeY);
         }

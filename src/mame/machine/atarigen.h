@@ -113,8 +113,8 @@ public:
 
 	// vector and early raster EAROM interface
 	optional_device<er2055_device> m_earom;
-	UINT8 				m_earom_data;
-	UINT8 				m_earom_control;
+	UINT8				m_earom_data;
+	UINT8				m_earom_control;
 
 	optional_shared_ptr<UINT16> eeprom;
 	optional_shared_size eeprom_size;

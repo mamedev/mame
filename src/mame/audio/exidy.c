@@ -1057,7 +1057,7 @@ static const pia6821_interface victory_pia1_intf =
 static DEVICE_START( victory_sound )
 {
 	exidy_sound_state *state = get_safe_token(device);
-	
+
 	state_save_register_device_item(device, 0, state->victory_sound_response_ack_clk);
 
 	DEVICE_START_CALL(venture_common_sh_start);

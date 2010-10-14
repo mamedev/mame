@@ -142,8 +142,8 @@ typedef struct
 	int active_dma_incd[2];
 	int active_dma_size[2];
 	int active_dma_steal[2];
-	UINT32 active_dma_src[2]; 
-	UINT32 active_dma_dst[2]; 
+	UINT32 active_dma_src[2];
+	UINT32 active_dma_dst[2];
 	UINT32 active_dma_count[2];
 
 	int     is_slave, cpu_type;

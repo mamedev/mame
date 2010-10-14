@@ -72,7 +72,7 @@ public:
 	UINT16 cop_func_mask[0x100/8];			/* function mask (?) */
 	UINT16 cop_program[0x100];				/* program "code" */
 	UINT16 cop_latch_addr, cop_latch_trigger, cop_latch_value, cop_latch_mask;
-	
+
 	void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect ,int pri_mask );
 };
 

@@ -210,7 +210,7 @@ inline int get_layer_and_blendmode(const layout_view &view, int index, int &blen
     //      backdrop (add) + screens (add) + bezels (alpha)
     //  else render:
     //      screens (add) + overlays (RGB multiply) + backdrop (add) + bezels (alpha)
-   
+
 	if (view.itemlist[ITEM_LAYER_BACKDROP] != NULL && view.itemlist[ITEM_LAYER_BACKDROP]->next != NULL && view.itemlist[ITEM_LAYER_OVERLAY] == NULL)
 		layer_order = layer_order_alternate;
 
@@ -334,8 +334,8 @@ void render_primitive_list::release_all()
 
 
 //-------------------------------------------------
-//  append_or_return - append a primitive to the 
-//  end of the list, or return it to the free 
+//  append_or_return - append a primitive to the
+//  end of the list, or return it to the free
 //  list, based on a flag
 //-------------------------------------------------
 
@@ -450,7 +450,7 @@ void render_texture::set_bitmap(bitmap_t *bitmap, const rectangle *sbounds, int 
 
 
 //-------------------------------------------------
-//  hq_scale - generic high quality resampling 
+//  hq_scale - generic high quality resampling
 //  scaler
 //-------------------------------------------------
 
@@ -726,7 +726,7 @@ render_container::~render_container()
 
 
 //-------------------------------------------------
-//  set_overlay - set the overlay bitmap for the 
+//  set_overlay - set the overlay bitmap for the
 //  container
 //-------------------------------------------------
 
@@ -746,7 +746,7 @@ void render_container::set_overlay(bitmap_t *bitmap)
 
 
 //-------------------------------------------------
-//  set_user_settings - set the current user 
+//  set_user_settings - set the current user
 //  settings for a container
 //-------------------------------------------------
 
@@ -838,15 +838,15 @@ const rgb_t *render_container::bcg_lookup_table(int texformat, palette_t *palett
 		case TEXFORMAT_PALETTE16:
 		case TEXFORMAT_PALETTEA16:
 			return (palette != NULL && palette == palette_client_get_palette(m_palclient)) ? m_bcglookup : NULL;
-		
+
 		case TEXFORMAT_RGB15:
 			return m_bcglookup32;
-		
+
 		case TEXFORMAT_RGB32:
 		case TEXFORMAT_ARGB32:
 		case TEXFORMAT_YUY16:
 			return m_bcglookup256;
-		
+
 		default:
 			return NULL;
 	}
@@ -878,7 +878,7 @@ void render_container::overlay_scale(bitmap_t &dest, const bitmap_t &source, con
 
 
 //-------------------------------------------------
-//  add_generic - add a generic item to a 
+//  add_generic - add a generic item to a
 //  container
 //-------------------------------------------------
 
@@ -907,7 +907,7 @@ render_container::item &render_container::add_generic(UINT8 type, float x0, floa
 
 
 //-------------------------------------------------
-//  recompute_lookups - recompute the lookup table 
+//  recompute_lookups - recompute the lookup table
 //  for the render container
 //-------------------------------------------------
 
@@ -953,7 +953,7 @@ void render_container::recompute_lookups()
 
 
 //-------------------------------------------------
-//  update_palette - update any dirty palette 
+//  update_palette - update any dirty palette
 //  entries
 //-------------------------------------------------
 
@@ -1118,7 +1118,7 @@ int render_target::index() const
 
 
 //-------------------------------------------------
-//  set_bounds - set the bounds and pixel aspect 
+//  set_bounds - set the bounds and pixel aspect
 //  of a target
 //-------------------------------------------------
 
@@ -1134,7 +1134,7 @@ void render_target::set_bounds(INT32 width, INT32 height, float pixel_aspect)
 
 
 //-------------------------------------------------
-//  set_layer_config - set the layer config of a 
+//  set_layer_config - set the layer config of a
 //  target
 //-------------------------------------------------
 
@@ -1146,7 +1146,7 @@ void render_target::set_layer_config(int layerconfig)
 
 
 //-------------------------------------------------
-//  set_view - dynamically change the view for 
+//  set_view - dynamically change the view for
 //  a target
 //-------------------------------------------------
 
@@ -1162,7 +1162,7 @@ void render_target::set_view(int viewindex)
 
 
 //-------------------------------------------------
-//  set_max_texture_size - set the upper bound on 
+//  set_max_texture_size - set the upper bound on
 //  the texture size
 //-------------------------------------------------
 
@@ -1198,8 +1198,8 @@ UINT32 render_target::view_screens(int viewindex)
 
 
 //-------------------------------------------------
-//  compute_visible_area - compute the visible 
-//  area for the given target with the current 
+//  compute_visible_area - compute the visible
+//  area for the given target with the current
 //  layout and proposed new parameters
 //-------------------------------------------------
 
@@ -1244,9 +1244,9 @@ void render_target::compute_visible_area(INT32 target_width, INT32 target_height
 
 
 //-------------------------------------------------
-//  compute_minimum_size - compute the "minimum" 
-//  size of a target, which is the smallest bounds 
-//  that will ensure at least 1 target pixel per 
+//  compute_minimum_size - compute the "minimum"
+//  size of a target, which is the smallest bounds
+//  that will ensure at least 1 target pixel per
 //  source pixel for all included screens
 //-------------------------------------------------
 
@@ -1314,7 +1314,7 @@ void render_target::compute_minimum_size(INT32 &minwidth, INT32 &minheight)
 
 
 //-------------------------------------------------
-//  get_primitives - return a list of primitives 
+//  get_primitives - return a list of primitives
 //  for a given render target
 //-------------------------------------------------
 
@@ -1461,8 +1461,8 @@ render_primitive_list &render_target::get_primitives()
 
 
 //-------------------------------------------------
-//  map_point_container - attempts to map a point 
-//  on the specified render_target to the 
+//  map_point_container - attempts to map a point
+//  on the specified render_target to the
 //  specified container, if possible
 //-------------------------------------------------
 
@@ -1474,8 +1474,8 @@ bool render_target::map_point_container(INT32 target_x, INT32 target_y, render_c
 
 
 //-------------------------------------------------
-//  map_point_input - attempts to map a point on 
-//  the specified render_target to the specified 
+//  map_point_input - attempts to map a point on
+//  the specified render_target to the specified
 //  container, if possible
 //-------------------------------------------------
 
@@ -1505,7 +1505,7 @@ void render_target::invalidate_all(void *refptr)
 	for (int listnum = 0; listnum < ARRAY_LENGTH(m_primlist); listnum++)
 	{
 		render_primitive_list &list = m_primlist[listnum];
-		
+
 		// if we have a reference to this object, release our list
 		list.acquire_lock();
 		if (list.has_reference(refptr))
@@ -1777,7 +1777,7 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 		prim->color = container_xform.color;
 		width = render_round_nearest(prim->bounds.x1) - render_round_nearest(prim->bounds.x0);
 		height = render_round_nearest(prim->bounds.y1) - render_round_nearest(prim->bounds.y0);
-		
+
 		bool got_scaled = container.overlay()->get_scaled(
 				(container_xform.orientation & ORIENTATION_SWAP_XY) ? height : width,
 				(container_xform.orientation & ORIENTATION_SWAP_XY) ? width : height, prim->texture, list);
@@ -1852,7 +1852,7 @@ void render_target::add_element_primitives(render_primitive_list &list, const ob
 
 
 //-------------------------------------------------
-//  map_point_internal - internal logic for 
+//  map_point_internal - internal logic for
 //  mapping points
 //-------------------------------------------------
 
@@ -1918,7 +1918,7 @@ bool render_target::map_point_internal(INT32 target_x, INT32 target_y, render_co
 
 
 //-------------------------------------------------
-//  view_name - return the name of the indexed 
+//  view_name - return the name of the indexed
 //  view, or NULL if it doesn't exist
 //-------------------------------------------------
 
@@ -2025,7 +2025,7 @@ void render_target::config_load(xml_data_node &targetnode)
 
 //-------------------------------------------------
 //  config_save - save our configuration, or
-//	return false if we are the same as the default
+//  return false if we are the same as the default
 //-------------------------------------------------
 
 bool render_target::config_save(xml_data_node &targetnode)
@@ -2066,7 +2066,7 @@ bool render_target::config_save(xml_data_node &targetnode)
 		xml_set_attribute_int(&targetnode, "rotate", rotate);
 		changed = true;
 	}
-	
+
 	return changed;
 }
 
@@ -2325,7 +2325,7 @@ void render_target::add_clear_and_optimize_primitive_list(render_primitive_list 
 				prim->color.a = 1.0f;
 				break;
 			}
-			
+
 			default:
 				throw emu_fatalerror("Unexpected primitive type");
 		}
@@ -2357,7 +2357,7 @@ render_manager::render_manager(running_machine &machine)
 {
 	// register callbacks
 	config_register(&machine, "video", config_load_static, config_save_static);
-	
+
 	// create one container per screen
 	for (screen_device *screen = screen_first(machine); screen != NULL; screen = screen_next(screen))
 		container_alloc(screen);
@@ -2397,7 +2397,7 @@ bool render_manager::is_live(screen_device &screen) const
 
 
 //-------------------------------------------------
-//  max_update_rate - return the smallest maximum 
+//  max_update_rate - return the smallest maximum
 //  update rate across all targets
 //-------------------------------------------------
 
@@ -2455,7 +2455,7 @@ render_target *render_manager::target_by_index(int index) const
 
 
 //-------------------------------------------------
-//  ui_aspect - return the aspect ratio for UI 
+//  ui_aspect - return the aspect ratio for UI
 //  fonts
 //-------------------------------------------------
 
@@ -2525,7 +2525,7 @@ void render_manager::texture_free(render_texture *texture)
 
 
 //-------------------------------------------------
-//  invalidate_all - remove all refs to a 
+//  invalidate_all - remove all refs to a
 //  particular reference pointer
 //-------------------------------------------------
 
@@ -2611,7 +2611,7 @@ void render_manager::config_load(int config_type, xml_data_node *parentnode)
 
 		// fetch current settings
 		container->get_user_settings(settings);
-		
+
 		// fetch color controls
 		settings.m_brightness = xml_get_attribute_float(screennode, "brightness", settings.m_brightness);
 		settings.m_contrast = xml_get_attribute_float(screennode, "contrast", settings.m_contrast);

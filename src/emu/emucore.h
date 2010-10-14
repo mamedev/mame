@@ -390,7 +390,7 @@ public:
 		m_count++;
 		return object;
 	}
-	
+
 	void prepend_list(simple_list<T> &list)
 	{
 		int count = list.count();
@@ -475,7 +475,7 @@ public:
 		detach(object);
 		pool_free(m_pool, &object);
 	}
-	
+
 	T *find(int index) const
 	{
 		for (T *cur = m_head; cur != NULL; cur = cur->m_next)
@@ -483,7 +483,7 @@ public:
 				return cur;
 		return NULL;
 	}
-	
+
 	int indexof(const T &object) const
 	{
 		int index = 0;
@@ -517,7 +517,7 @@ public:
 			result = m_pool.add_object(new T);
 		return result;
 	}
-	
+
 	void reclaim(T *item) { if (item != NULL) m_freelist.append(*item); }
 	void reclaim(T &item) { m_freelist.append(item); }
 	void reclaim_all(simple_list<T> &list) { m_freelist.append_list(list); }
