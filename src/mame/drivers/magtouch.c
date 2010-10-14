@@ -118,17 +118,6 @@ static const ins8250_interface magtouch_com0_interface =
  *
  *************************************/
 
-static WRITE32_HANDLER(magtouch_rombank_w)
-{
-	if ( ACCESSING_BITS_16_23 )
-	{
-		int bank = data >> 16;
-
-		logerror( "rom bank #%02x at PC=%08X\n", bank, cpu_get_pc(space->cpu) );
-		memory_set_bank(space->machine, "rombank", bank & 0x7f );
-	}
-}
-
 static READ8_HANDLER(magtouch_io_r)
 {
 	switch(offset)
