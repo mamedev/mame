@@ -84,7 +84,7 @@ device_t *cdislave_device_config::alloc_device(running_machine &machine) const
 
 TIMER_CALLBACK( cdislave_device::trigger_readback_int )
 {
-    cdislave_device *slave = reinterpret_cast<cdislave_device *>(machine->device("slave"));
+    cdislave_device *slave = static_cast<cdislave_device *>(machine->device("slave"));
     slave->readback_trigger();
 }
 
@@ -151,7 +151,7 @@ void cdislave_device::perform_mouse_update()
 
 INPUT_CHANGED( cdislave_device::mouse_update )
 {
-    cdislave_device *slave = reinterpret_cast<cdislave_device *>(field->port->machine->device("slave"));
+    cdislave_device *slave = static_cast<cdislave_device *>(field->port->machine->device("slave"));
     slave->perform_mouse_update();
 }
 

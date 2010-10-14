@@ -153,6 +153,9 @@ CPPONLYFLAGS += /wd4290 /wd4355
 # disable performance warnings about casting ints to bools
 CPPONLYFLAGS += /wd4800
 
+# disable better packing warning
+CPPONLYFLAGS += /wd4371
+
 # explicitly set the entry point for UNICODE builds
 LDFLAGS += /ENTRY:wmainCRTStartup
 
@@ -232,7 +235,7 @@ endif
 LDFLAGS += -static-libgcc
 
 # add the windows libraries
-LIBS += -luser32 -lgdi32 -lddraw -ldsound -ldxguid -lwinmm -ladvapi32 -lcomctl32 -lshlwapi -ldinput8
+LIBS += -luser32 -lgdi32 -ldsound -ldxguid -lwinmm -ladvapi32 -lcomctl32 -lshlwapi -ldinput8
 
 ifeq ($(DIRECTINPUT),8)
 LIBS += -ldinput8

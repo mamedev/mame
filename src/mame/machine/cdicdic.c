@@ -564,7 +564,7 @@ void cdicdic_device::decode_audio_sector(const UINT8 *xa, INT32 triggered)
 // After an appropriate delay for decoding to take place...
 TIMER_CALLBACK( cdicdic_device::audio_sample_trigger )
 {
-    cdicdic_device *cdic = reinterpret_cast<cdicdic_device *>(machine->device("cdic"));
+    cdicdic_device *cdic = static_cast<cdicdic_device *>(machine->device("cdic"));
     cdic->sample_trigger();
 }
 
@@ -624,7 +624,7 @@ void cdicdic_device::sample_trigger()
 
 TIMER_CALLBACK( cdicdic_device::trigger_readback_int )
 {
-    cdicdic_device *cdic = reinterpret_cast<cdicdic_device *>(machine->device("cdic"));
+    cdicdic_device *cdic = static_cast<cdicdic_device *>(machine->device("cdic"));
     cdic->process_delayed_command();
 }
 
