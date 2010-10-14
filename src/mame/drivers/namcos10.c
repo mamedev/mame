@@ -267,8 +267,15 @@ Utyuu Daisakusen Chocovader Contactee CVC1  Ver.A   KC022A
 #include "cpu/mips/psx.h"
 #include "includes/psx.h"
 
+class namcos10_state : public psx_state
+{
+public:
+	namcos10_state(running_machine &machine, const driver_device_config_base &config)
+		: psx_state(machine, config) { }
+};
+
 static ADDRESS_MAP_START( namcos10_map, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("share1") AM_BASE(&g_p_n_psxram) AM_SIZE(&g_n_psxramsize) /* ram */
+	AM_RANGE(0x00000000, 0x003fffff) AM_RAM AM_SHARE("share1") /* ram */
 	AM_RANGE(0x1f800000, 0x1f8003ff) AM_RAM /* scratchpad */
 	AM_RANGE(0x1f801000, 0x1f801007) AM_WRITENOP
 	AM_RANGE(0x1f801008, 0x1f80100b) AM_RAM /* ?? */
@@ -375,9 +382,9 @@ static MACHINE_RESET( namcos10 )
 	psx_machine_init(machine);
 }
 
-static MACHINE_CONFIG_START( namcos10, driver_device )
+static MACHINE_CONFIG_START( namcos10, namcos10_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",  PSXCPU, XTAL_101_4912MHz )
+	MDRV_CPU_ADD( "maincpu", PSXCPU, XTAL_101_4912MHz )
 	MDRV_CPU_PROGRAM_MAP( namcos10_map)
 	MDRV_CPU_VBLANK_INT("screen", psx_vblank)
 

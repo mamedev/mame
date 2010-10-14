@@ -55,16 +55,27 @@
 #include "harddisk.h"
 #include "sound/k054539.h"
 
-/* Sound */
+class konamigq_state : public psx_state
+{
+public:
+	konamigq_state(running_machine &machine, const driver_device_config_base &config)
+		: psx_state(machine, config) { }
 
-static UINT8 sndto000[ 16 ];
-static UINT8 sndtor3k[ 16 ];
+	UINT8 sndto000[ 16 ];
+	UINT8 sndtor3k[ 16 ];
+	UINT8 *p_n_pcmram;
+	UINT8 sector_buffer[ 512 ];
+};
+
+/* Sound */
 
 static WRITE32_HANDLER( soundr3k_w )
 {
+	konamigq_state *state = space->machine->driver_data<konamigq_state>();
+
 	if( ACCESSING_BITS_16_31 )
 	{
-		sndto000[ ( offset << 1 ) + 1 ] = data >> 16;
+		state->sndto000[ ( offset << 1 ) + 1 ] = data >> 16;
 		if( offset == 3 )
 		{
 			cputag_set_input_line(space->machine, "soundcpu", 1, HOLD_LINE );
@@ -72,15 +83,16 @@ static WRITE32_HANDLER( soundr3k_w )
 	}
 	if( ACCESSING_BITS_0_15 )
 	{
-		sndto000[ offset << 1 ] = data;
+		state->sndto000[ offset << 1 ] = data;
 	}
 }
 
 static READ32_HANDLER( soundr3k_r )
 {
+	konamigq_state *state = space->machine->driver_data<konamigq_state>();
 	UINT32 data;
 
-	data = ( sndtor3k[ ( offset << 1 ) + 1 ] << 16 ) | sndtor3k[ offset << 1 ];
+	data = ( state->sndtor3k[ ( offset << 1 ) + 1 ] << 16 ) | state->sndtor3k[ offset << 1 ];
 
 	/* hack to help the main program start up */
 	if( offset == 1 )
@@ -125,29 +137,31 @@ static WRITE32_HANDLER( eeprom_w )
 
 /* PCM RAM */
 
-static UINT8 *m_p_n_pcmram;
-
 static WRITE32_HANDLER( pcmram_w )
 {
+	konamigq_state *state = space->machine->driver_data<konamigq_state>();
+
 	if( ACCESSING_BITS_0_7 )
 	{
-		m_p_n_pcmram[ offset << 1 ] = data;
+		state->p_n_pcmram[ offset << 1 ] = data;
 	}
 	if( ACCESSING_BITS_16_23 )
 	{
-		m_p_n_pcmram[ ( offset << 1 ) + 1 ] = data >> 16;
+		state->p_n_pcmram[ ( offset << 1 ) + 1 ] = data >> 16;
 	}
 }
 
 static READ32_HANDLER( pcmram_r )
 {
-	return ( m_p_n_pcmram[ ( offset << 1 ) + 1 ] << 16 ) | m_p_n_pcmram[ offset << 1 ];
+	konamigq_state *state = space->machine->driver_data<konamigq_state>();
+
+	return ( state->p_n_pcmram[ ( offset << 1 ) + 1 ] << 16 ) | state->p_n_pcmram[ offset << 1 ];
 }
 
 /* Video */
 
 static ADDRESS_MAP_START( konamigq_map, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x003fffff) AM_RAM	AM_SHARE("share1") AM_BASE(&g_p_n_psxram) AM_SIZE(&g_n_psxramsize) /* ram */
+	AM_RANGE(0x00000000, 0x003fffff) AM_RAM	AM_SHARE("share1") /* ram */
 	AM_RANGE(0x1f000000, 0x1f00001f) AM_READWRITE(am53cf96_r, am53cf96_w)
 	AM_RANGE(0x1f100000, 0x1f10000f) AM_WRITE(soundr3k_w)
 	AM_RANGE(0x1f100010, 0x1f10001f) AM_READ(soundr3k_r)
@@ -222,12 +236,16 @@ static WRITE16_HANDLER( dual539_w )
 
 static READ16_HANDLER( sndcomm68k_r )
 {
-	return sndto000[ offset ];
+	konamigq_state *state = space->machine->driver_data<konamigq_state>();
+
+	return state->sndto000[ offset ];
 }
 
 static WRITE16_HANDLER( sndcomm68k_w )
 {
-	sndtor3k[ offset ] = data;
+	konamigq_state *state = space->machine->driver_data<konamigq_state>();
+
+	state->sndtor3k[ offset ] = data;
 }
 
 static READ16_HANDLER(tms57002_data_word_r)
@@ -268,18 +286,19 @@ static const k054539_interface k054539_config =
 
 /* SCSI */
 
-static UINT8 sector_buffer[ 512 ];
-
 static void scsi_dma_read( running_machine *machine, UINT32 n_address, INT32 n_size )
 {
+	konamigq_state *state = machine->driver_data<konamigq_state>();
+	UINT32 *p_n_psxram = state->p_n_psxram;
+	UINT8 *sector_buffer = state->sector_buffer;
 	int i;
 	int n_this;
 
 	while( n_size > 0 )
 	{
-		if( n_size > sizeof( sector_buffer ) / 4 )
+		if( n_size > sizeof( state->sector_buffer ) / 4 )
 		{
-			n_this = sizeof( sector_buffer ) / 4;
+			n_this = sizeof( state->sector_buffer ) / 4;
 		}
 		else
 		{
@@ -291,7 +310,7 @@ static void scsi_dma_read( running_machine *machine, UINT32 n_address, INT32 n_s
 		i = 0;
 		while( n_this > 0 )
 		{
-			g_p_n_psxram[ n_address / 4 ] =
+			p_n_psxram[ n_address / 4 ] =
 				( sector_buffer[ i + 0 ] << 0 ) |
 				( sector_buffer[ i + 1 ] << 8 ) |
 				( sector_buffer[ i + 2 ] << 16 ) |
@@ -328,9 +347,11 @@ static const struct AM53CF96interface scsi_intf =
 
 static DRIVER_INIT( konamigq )
 {
+	konamigq_state *state = machine->driver_data<konamigq_state>();
+
 	psx_driver_init(machine);
 
-	m_p_n_pcmram = memory_region( machine, "shared" ) + 0x80000;
+	state->p_n_pcmram = memory_region( machine, "shared" ) + 0x80000;
 }
 
 static void konamigq_exit(running_machine &machine)
@@ -340,16 +361,18 @@ static void konamigq_exit(running_machine &machine)
 
 static MACHINE_START( konamigq )
 {
+	konamigq_state *state = machine->driver_data<konamigq_state>();
+
 	/* init the scsi controller and hook up it's DMA */
 	am53cf96_init(machine, &scsi_intf);
 	machine->add_notifier(MACHINE_NOTIFY_EXIT, konamigq_exit);
-	psx_dma_install_read_handler(5, scsi_dma_read);
-	psx_dma_install_write_handler(5, scsi_dma_write);
+	psx_dma_install_read_handler(machine, 5, scsi_dma_read);
+	psx_dma_install_write_handler(machine, 5, scsi_dma_write);
 
-	state_save_register_global_pointer(machine, m_p_n_pcmram, 0x380000);
-	state_save_register_global_array(machine, sndto000);
-	state_save_register_global_array(machine, sndtor3k);
-	state_save_register_global_array(machine, sector_buffer);
+	state_save_register_global_pointer(machine, state->p_n_pcmram, 0x380000);
+	state_save_register_global_array(machine, state->sndto000);
+	state_save_register_global_array(machine, state->sndtor3k);
+	state_save_register_global_array(machine, state->sector_buffer);
 }
 
 static MACHINE_RESET( konamigq )
@@ -357,9 +380,9 @@ static MACHINE_RESET( konamigq )
 	psx_machine_init(machine);
 }
 
-static MACHINE_CONFIG_START( konamigq, driver_device )
+static MACHINE_CONFIG_START( konamigq, konamigq_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",  PSXCPU, XTAL_67_7376MHz )
+	MDRV_CPU_ADD( "maincpu", PSXCPU, XTAL_67_7376MHz )
 	MDRV_CPU_PROGRAM_MAP( konamigq_map)
 	MDRV_CPU_VBLANK_INT("screen", psx_vblank)
 

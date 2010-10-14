@@ -122,18 +122,24 @@ Notes:
 #include "sound/psx.h"
 #include "sound/cdda.h"
 
-/* static variables */
+class konamigv_state : public psx_state
+{
+public:
+	konamigv_state(running_machine &machine, const driver_device_config_base &config)
+		: psx_state(machine, config) { }
 
-static UINT8 sector_buffer[ 4096 ];
-static UINT32 flash_address;
+	UINT32 flash_address;
 
-static UINT16 trackball_prev[ 2 ];
-static UINT32 trackball_data[ 2 ];
-static UINT16 btc_trackball_prev[ 4 ];
-static UINT32 btc_trackball_data[ 4 ];
+	UINT16 trackball_prev[ 2 ];
+	UINT32 trackball_data[ 2 ];
+	UINT16 btc_trackball_prev[ 4 ];
+	UINT32 btc_trackball_data[ 4 ];
 
-static fujitsu_29f016a_device *flash8[4];
-static sharp_lh28f400_device *flash16[4];
+	fujitsu_29f016a_device *flash8[4];
+	sharp_lh28f400_device *flash16[4];
+
+	UINT8 sector_buffer[ 4096 ];
+};
 
 /* EEPROM handlers */
 
@@ -154,7 +160,7 @@ static READ32_HANDLER( mb89371_r )
 }
 
 static ADDRESS_MAP_START( konamigv_map, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x001fffff) AM_RAM	AM_SHARE("share1") AM_BASE(&g_p_n_psxram) AM_SIZE(&g_n_psxramsize) /* ram */
+	AM_RANGE(0x00000000, 0x001fffff) AM_RAM	AM_SHARE("share1") /* ram */
 	AM_RANGE(0x1f000000, 0x1f00001f) AM_READWRITE(am53cf96_r, am53cf96_w)
 	AM_RANGE(0x1f100000, 0x1f100003) AM_READ_PORT("P1")
 	AM_RANGE(0x1f100004, 0x1f100007) AM_READ_PORT("P2")
@@ -190,14 +196,17 @@ ADDRESS_MAP_END
 
 static void scsi_dma_read( running_machine *machine, UINT32 n_address, INT32 n_size )
 {
+	konamigv_state *state = machine->driver_data<konamigv_state>();
+	UINT32 *p_n_psxram = state->p_n_psxram;
+	UINT8 *sector_buffer = state->sector_buffer;
 	int i;
 	int n_this;
 
 	while( n_size > 0 )
 	{
-		if( n_size > sizeof( sector_buffer ) / 4 )
+		if( n_size > sizeof( state->sector_buffer ) / 4 )
 		{
-			n_this = sizeof( sector_buffer ) / 4;
+			n_this = sizeof( state->sector_buffer ) / 4;
 		}
 		else
 		{
@@ -219,7 +228,7 @@ static void scsi_dma_read( running_machine *machine, UINT32 n_address, INT32 n_s
 		i = 0;
 		while( n_this > 0 )
 		{
-			g_p_n_psxram[ n_address / 4 ] =
+			p_n_psxram[ n_address / 4 ] =
 				( sector_buffer[ i + 0 ] << 0 ) |
 				( sector_buffer[ i + 1 ] << 8 ) |
 				( sector_buffer[ i + 2 ] << 16 ) |
@@ -233,14 +242,17 @@ static void scsi_dma_read( running_machine *machine, UINT32 n_address, INT32 n_s
 
 static void scsi_dma_write( running_machine *machine, UINT32 n_address, INT32 n_size )
 {
+	konamigv_state *state = machine->driver_data<konamigv_state>();
+	UINT32 *p_n_psxram = state->p_n_psxram;
+	UINT8 *sector_buffer = state->sector_buffer;
 	int i;
 	int n_this;
 
 	while( n_size > 0 )
 	{
-		if( n_size > sizeof( sector_buffer ) / 4 )
+		if( n_size > sizeof( state->sector_buffer ) / 4 )
 		{
-			n_this = sizeof( sector_buffer ) / 4;
+			n_this = sizeof( state->sector_buffer ) / 4;
 		}
 		else
 		{
@@ -251,10 +263,10 @@ static void scsi_dma_write( running_machine *machine, UINT32 n_address, INT32 n_
 		i = 0;
 		while( n_this > 0 )
 		{
-			sector_buffer[ i + 0 ] = ( g_p_n_psxram[ n_address / 4 ] >> 0 ) & 0xff;
-			sector_buffer[ i + 1 ] = ( g_p_n_psxram[ n_address / 4 ] >> 8 ) & 0xff;
-			sector_buffer[ i + 2 ] = ( g_p_n_psxram[ n_address / 4 ] >> 16 ) & 0xff;
-			sector_buffer[ i + 3 ] = ( g_p_n_psxram[ n_address / 4 ] >> 24 ) & 0xff;
+			sector_buffer[ i + 0 ] = ( p_n_psxram[ n_address / 4 ] >> 0 ) & 0xff;
+			sector_buffer[ i + 1 ] = ( p_n_psxram[ n_address / 4 ] >> 8 ) & 0xff;
+			sector_buffer[ i + 2 ] = ( p_n_psxram[ n_address / 4 ] >> 16 ) & 0xff;
+			sector_buffer[ i + 3 ] = ( p_n_psxram[ n_address / 4 ] >> 24 ) & 0xff;
 			n_address += 4;
 			i += 4;
 			n_this--;
@@ -295,18 +307,20 @@ static DRIVER_INIT( konamigv )
 	/* init the scsi controller and hook up it's DMA */
 	am53cf96_init(machine, &scsi_intf);
 	machine->add_notifier(MACHINE_NOTIFY_EXIT, konamigv_exit);
-	psx_dma_install_read_handler(5, scsi_dma_read);
-	psx_dma_install_write_handler(5, scsi_dma_write);
+	psx_dma_install_read_handler(machine, 5, scsi_dma_read);
+	psx_dma_install_write_handler(machine, 5, scsi_dma_write);
 }
 
 static MACHINE_START( konamigv )
 {
-	state_save_register_global_array(machine, sector_buffer);
-	state_save_register_global(machine, flash_address);
-	state_save_register_global_array(machine, trackball_prev);
-	state_save_register_global_array(machine, trackball_data);
-	state_save_register_global_array(machine, btc_trackball_prev);
-	state_save_register_global_array(machine, btc_trackball_data);
+	konamigv_state *state = machine->driver_data<konamigv_state>();
+
+	state_save_register_global_array(machine, state->sector_buffer);
+	state_save_register_global(machine, state->flash_address);
+	state_save_register_global_array(machine, state->trackball_prev);
+	state_save_register_global_array(machine, state->trackball_data);
+	state_save_register_global_array(machine, state->btc_trackball_prev);
+	state_save_register_global_array(machine, state->btc_trackball_data);
 }
 
 static MACHINE_RESET( konamigv )
@@ -324,15 +338,14 @@ static void spu_irq(running_device *device, UINT32 data)
 
 static const psx_spu_interface konamigv_psxspu_interface =
 {
-	&g_p_n_psxram,
 	spu_irq,
 	psx_dma_install_read_handler,
 	psx_dma_install_write_handler
 };
 
-static MACHINE_CONFIG_START( konamigv, driver_device )
+static MACHINE_CONFIG_START( konamigv, konamigv_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",  PSXCPU, XTAL_67_7376MHz )
+	MDRV_CPU_ADD( "maincpu", PSXCPU, XTAL_67_7376MHz )
 	MDRV_CPU_PROGRAM_MAP( konamigv_map)
 	MDRV_CPU_VBLANK_INT("screen", psx_vblank)
 
@@ -432,6 +445,7 @@ INPUT_PORTS_END
 
 static READ32_HANDLER( flash_r )
 {
+	konamigv_state *state = space->machine->driver_data<konamigv_state>();
 	int reg = offset*2;
 	//int shift = 0;
 
@@ -443,17 +457,17 @@ static READ32_HANDLER( flash_r )
 
 	if (reg == 4)	// set odd address
 	{
-		flash_address |= 1;
+		state->flash_address |= 1;
 	}
 
 	if (reg == 0)
 	{
-		int chip = (flash_address >= 0x200000) ? 2 : 0;
+		int chip = (state->flash_address >= 0x200000) ? 2 : 0;
 		int ret;
 
-		ret = flash8[chip]->read(flash_address & 0x1fffff) & 0xff;
-		ret |= flash8[chip+1]->read(flash_address & 0x1fffff)<<8;
-		flash_address++;
+		ret = state->flash8[chip]->read(state->flash_address & 0x1fffff) & 0xff;
+		ret |= state->flash8[chip+1]->read(state->flash_address & 0x1fffff)<<8;
+		state->flash_address++;
 
 		return ret;
 	}
@@ -462,6 +476,7 @@ static READ32_HANDLER( flash_r )
 
 static WRITE32_HANDLER( flash_w )
 {
+	konamigv_state *state = space->machine->driver_data<konamigv_state>();
 	int reg = offset*2;
 	int chip;
 
@@ -474,28 +489,30 @@ static WRITE32_HANDLER( flash_w )
 	switch (reg)
 	{
 		case 0:
-			chip = (flash_address >= 0x200000) ? 2 : 0;
-			flash8[chip]->write(flash_address & 0x1fffff, data&0xff);
-			flash8[chip+1]->write(flash_address & 0x1fffff, (data>>8)&0xff);
+			chip = (state->flash_address >= 0x200000) ? 2 : 0;
+			state->flash8[chip]->write(state->flash_address & 0x1fffff, data&0xff);
+			state->flash8[chip+1]->write(state->flash_address & 0x1fffff, (data>>8)&0xff);
 			break;
 
 		case 1:
-			flash_address = 0;
-			flash_address |= (data<<1);
+			state->flash_address = 0;
+			state->flash_address |= (data<<1);
 			break;
 		case 2:
-			flash_address &= 0xff00ff;
-			flash_address |= (data<<8);
+			state->flash_address &= 0xff00ff;
+			state->flash_address |= (data<<8);
 			break;
 		case 3:
-			flash_address &= 0x00ffff;
-			flash_address |= (data<<15);
+			state->flash_address &= 0x00ffff;
+			state->flash_address |= (data<<15);
 			break;
 	}
 }
 
 static READ32_HANDLER( trackball_r )
 {
+	konamigv_state *state = space->machine->driver_data<konamigv_state>();
+
 	if( offset == 0 && mem_mask == 0x0000ffff )
 	{
 		int axis;
@@ -506,12 +523,12 @@ static READ32_HANDLER( trackball_r )
 		for( axis = 0; axis < 2; axis++ )
 		{
 			value = input_port_read(space->machine, axisnames[axis]);
-			diff = value - trackball_prev[ axis ];
-			trackball_prev[ axis ] = value;
-			trackball_data[ axis ] = ( ( diff & 0xf00 ) << 16 ) | ( ( diff & 0xff ) << 8 );
+			diff = value - state->trackball_prev[ axis ];
+			state->trackball_prev[ axis ] = value;
+			state->trackball_data[ axis ] = ( ( diff & 0xf00 ) << 16 ) | ( ( diff & 0xff ) << 8 );
 		}
 	}
-	return trackball_data[ offset ];
+	return state->trackball_data[ offset ];
 }
 
 static READ32_HANDLER( unknown_r )
@@ -521,10 +538,12 @@ static READ32_HANDLER( unknown_r )
 
 static DRIVER_INIT( simpbowl )
 {
-	flash8[0] = machine->device<fujitsu_29f016a_device>("flash0");
-	flash8[1] = machine->device<fujitsu_29f016a_device>("flash1");
-	flash8[2] = machine->device<fujitsu_29f016a_device>("flash2");
-	flash8[3] = machine->device<fujitsu_29f016a_device>("flash3");
+	konamigv_state *state = machine->driver_data<konamigv_state>();
+
+	state->flash8[0] = machine->device<fujitsu_29f016a_device>("flash0");
+	state->flash8[1] = machine->device<fujitsu_29f016a_device>("flash1");
+	state->flash8[2] = machine->device<fujitsu_29f016a_device>("flash2");
+	state->flash8[3] = machine->device<fujitsu_29f016a_device>("flash3");
 
 	memory_install_readwrite32_handler( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f680080, 0x1f68008f, 0, 0, flash_r, flash_w );
 	memory_install_read32_handler     ( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f6800c0, 0x1f6800c7, 0, 0, trackball_r );
@@ -555,13 +574,15 @@ INPUT_PORTS_END
 
 static READ32_HANDLER( btcflash_r )
 {
+	konamigv_state *state = space->machine->driver_data<konamigv_state>();
+
 	if (mem_mask == 0x0000ffff)
 	{
-		return flash16[0]->read(offset*2);
+		return state->flash16[0]->read(offset*2);
 	}
 	else if (mem_mask == 0xffff0000)
 	{
-		return flash16[0]->read((offset*2)+1)<<16;
+		return state->flash16[0]->read((offset*2)+1)<<16;
 	}
 
 	return 0;
@@ -569,18 +590,22 @@ static READ32_HANDLER( btcflash_r )
 
 static WRITE32_HANDLER( btcflash_w )
 {
+	konamigv_state *state = space->machine->driver_data<konamigv_state>();
+
 	if (mem_mask == 0x0000ffff)
 	{
-		flash16[0]->write(offset*2, data&0xffff);
+		state->flash16[0]->write(offset*2, data&0xffff);
 	}
 	else if (mem_mask == 0xffff0000)
 	{
-		flash16[0]->write((offset*2)+1, (data>>16)&0xffff);
+		state->flash16[0]->write((offset*2)+1, (data>>16)&0xffff);
 	}
 }
 
 static READ32_HANDLER( btc_trackball_r )
 {
+	konamigv_state *state = space->machine->driver_data<konamigv_state>();
+
 //  mame_printf_debug( "r %08x %08x %08x\n", cpu_get_pc(space->cpu), offset, mem_mask );
 
 	if( offset == 1 && mem_mask == 0xffff0000 )
@@ -593,12 +618,13 @@ static READ32_HANDLER( btc_trackball_r )
 		for( axis = 0; axis < 4; axis++ )
 		{
 			value = input_port_read(space->machine, axisnames[axis]);
-			diff = value - btc_trackball_prev[ axis ];
-			btc_trackball_prev[ axis ] = value;
-			btc_trackball_data[ axis ] = ( ( diff & 0xf00 ) << 16 ) | ( ( diff & 0xff ) << 8 );
+			diff = value - state->btc_trackball_prev[ axis ];
+			state->btc_trackball_prev[ axis ] = value;
+			state->btc_trackball_data[ axis ] = ( ( diff & 0xf00 ) << 16 ) | ( ( diff & 0xff ) << 8 );
 		}
 	}
-	return btc_trackball_data[ offset ] | ( btc_trackball_data[ offset + 2 ] >> 8 );
+
+	return state->btc_trackball_data[ offset ] | ( state->btc_trackball_data[ offset + 2 ] >> 8 );
 }
 
 static WRITE32_HANDLER( btc_trackball_w )
@@ -608,7 +634,9 @@ static WRITE32_HANDLER( btc_trackball_w )
 
 static DRIVER_INIT( btchamp )
 {
-	flash16[0] = machine->device<sharp_lh28f400_device>("flash");
+	konamigv_state *state = machine->driver_data<konamigv_state>();
+
+	state->flash16[0] = machine->device<sharp_lh28f400_device>("flash");
 
 	memory_install_readwrite32_handler( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f680080, 0x1f68008f, 0, 0, btc_trackball_r, btc_trackball_w );
 	memory_nop_write                  ( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f6800e0, 0x1f6800e3, 0, 0 );
@@ -694,7 +722,9 @@ static WRITE32_HANDLER( kdeadeye_0_w )
 
 static DRIVER_INIT( kdeadeye )
 {
-	flash16[0] = machine->device<sharp_lh28f400_device>("flash");
+	konamigv_state *state = machine->driver_data<konamigv_state>();
+
+	state->flash16[0] = machine->device<sharp_lh28f400_device>("flash");
 
 	memory_install_read_port  ( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f680080, 0x1f680083, 0, 0, "GUNX1" );
 	memory_install_read_port  ( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f680090, 0x1f680093, 0, 0, "GUNY1" );

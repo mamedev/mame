@@ -39,7 +39,7 @@ struct psxinfo
 	const psx_spu_interface *intf;
 	running_device *device;
 
-	UINT32 *g_p_n_psxram;
+	UINT32 *m_p_n_psxram;
 	UINT16 m_n_mainvolumeleft;
 	UINT16 m_n_mainvolumeright;
 	UINT16 m_n_reverberationdepthleft;
@@ -82,6 +82,7 @@ struct psxinfo
 
 	sound_stream *stream;
 	int installHack;
+	UINT32 m_n_spu_delay;
 };
 
 INLINE struct psxinfo *get_safe_token(running_device *device)
@@ -241,7 +242,7 @@ static void spu_read( running_machine *machine, UINT32 n_address, INT32 n_size )
 
 	while( n_size > 0 )
 	{
-		chip->g_p_n_psxram[ n_address / 4 ] =
+		chip->m_p_n_psxram[ n_address / 4 ] =
 			( chip->m_p_n_spuram[ chip->m_n_spuoffset + 0 ] << 0 ) |
 			( chip->m_p_n_spuram[ chip->m_n_spuoffset + 1 ] << 16 );
 		verboselog( machine, 2, "%08x > %04x\n", chip->m_n_spuoffset + 0, chip->m_p_n_spuram[ chip->m_n_spuoffset + 0 ] );
@@ -260,8 +261,8 @@ static void spu_write( running_machine *machine, UINT32 n_address, INT32 n_size 
 
 	while( n_size > 0 )
 	{
-		chip->m_p_n_spuram[ chip->m_n_spuoffset + 0 ] = ( chip->g_p_n_psxram[ n_address / 4 ] >> 0 );
-		chip->m_p_n_spuram[ chip->m_n_spuoffset + 1 ] = ( chip->g_p_n_psxram[ n_address / 4 ] >> 16 );
+		chip->m_p_n_spuram[ chip->m_n_spuoffset + 0 ] = ( chip->m_p_n_psxram[ n_address / 4 ] >> 0 );
+		chip->m_p_n_spuram[ chip->m_n_spuoffset + 1 ] = ( chip->m_p_n_psxram[ n_address / 4 ] >> 16 );
 		verboselog( machine, 2, "%08x < %04x\n", chip->m_n_spuoffset + 0, chip->m_p_n_spuram[ chip->m_n_spuoffset + 0 ] );
 		verboselog( machine, 2, "%08x < %04x\n", chip->m_n_spuoffset + 1, chip->m_p_n_spuram[ chip->m_n_spuoffset + 1 ] );
 		chip->m_n_spuoffset += 2;
@@ -279,7 +280,7 @@ static DEVICE_START( psxspu )
 
 	chip->intf = (const psx_spu_interface *)device->baseconfig().static_config();
 	chip->device = device;
-	chip->g_p_n_psxram = *(chip->intf->p_psxram);
+	chip->m_p_n_psxram = (UINT32 *)memory_get_shared(*device->machine, "share1");
 
 	chip->m_n_mainvolumeleft = 0;
 	chip->m_n_mainvolumeright = 0;
@@ -373,18 +374,20 @@ static DEVICE_START( psxspu )
 }
 
 
-static UINT32 psx_spu_delay = 0;
-
 WRITE32_DEVICE_HANDLER( psx_spu_delay_w )
 {
-	COMBINE_DATA( &psx_spu_delay );
+	struct psxinfo *chip = get_safe_token(device);
+
+	COMBINE_DATA( &chip->m_n_spu_delay );
 	verboselog( device->machine, 1, "psx_spu_delay_w( %08x %08x )\n", data, mem_mask );
 }
 
 READ32_DEVICE_HANDLER( psx_spu_delay_r )
 {
+	struct psxinfo *chip = get_safe_token(device);
+
 	verboselog( device->machine, 1, "psx_spu_delay_r( %08x )\n", mem_mask );
-	return psx_spu_delay;
+	return chip->m_n_spu_delay;
 }
 
 READ32_DEVICE_HANDLER( psx_spu_r )
@@ -466,8 +469,8 @@ WRITE32_DEVICE_HANDLER( psx_spu_w )
 
 	if( !chip->installHack )
 	{
-		chip->intf->spu_install_read_handler( 4, spu_read );
-		chip->intf->spu_install_write_handler( 4, spu_write );
+		chip->intf->spu_install_read_handler( device->machine, 4, spu_read );
+		chip->intf->spu_install_write_handler( device->machine, 4, spu_write );
 
 		chip->installHack = 1;
 	}

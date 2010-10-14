@@ -352,6 +352,74 @@ G: gun mania only, drives air soft gun (this game uses real BB bullet)
 
 #define VERBOSE_LEVEL ( 0 )
 
+class ksys573_state : public psx_state
+{
+public:
+	ksys573_state(running_machine &machine, const driver_device_config_base &config)
+		: psx_state(machine, config) { }
+
+	int flash_bank;
+	fujitsu_29f016a_device *flash_device[5][16];
+	int security_cart_number;
+
+	int chiptype[ 2 ];
+	int has_ds2401[ 2 ];
+
+	nvram_handler_func nvram_handler_security_cart_0;
+	nvram_handler_func nvram_handler_security_cart_1;
+
+	UINT32 control;
+
+	UINT8 *atapi_regs;
+	emu_timer *atapi_timer;
+	SCSIInstance *inserted_cdrom;
+	SCSIInstance *available_cdroms[ 2 ];
+	UINT8 *atapi_data;
+	int atapi_data_ptr;
+	int atapi_data_len;
+	int atapi_xferlen;
+	int atapi_xferbase;
+	int atapi_cdata_wait;
+	int atapi_xfermod;
+
+	UINT32 m_n_security_control;
+	void (*security_callback)( running_machine *machine, int data );
+
+	emu_timer *m_p_timer_root[ 3 ];
+	UINT16 m_p_n_root_count[ 3 ];
+	UINT16 m_p_n_root_mode[ 3 ];
+	UINT16 m_p_n_root_target[ 3 ];
+	UINT64 m_p_n_root_start[ 3 ];
+
+	UINT8 gx700pwbf_output_data[ 4 ];
+	void (*gx700pwfbf_output_callback)( running_machine *machine, int offset, int data );
+	UINT16 gx894pwbba_output_data[ 8 ];
+	void (*gx894pwbba_output_callback)( running_machine *machine, int offset, int data );
+
+	UINT32 stage_mask;
+	struct
+	{
+		int DO;
+		int clk;
+		int shift;
+		int state;
+		int bit;
+	} stage[ 2 ];
+
+	UINT32 gx894_ram_write_offset;
+	UINT32 gx894_ram_read_offset;
+	UINT16 *gx894_ram;
+	int f, o, s;
+	UINT32 a,b,c,d;
+
+	int salarymc_lamp_bits;
+	int salarymc_lamp_shift;
+	int salarymc_lamp_clk;
+
+	int hyperbbc_lamp_strobe1;
+	int hyperbbc_lamp_strobe2;
+};
+
 INLINE void ATTR_PRINTF(3,4) verboselog( running_machine *machine, int n_level, const char *s_fmt, ... )
 {
 	if( VERBOSE_LEVEL >= n_level )
@@ -365,30 +433,22 @@ INLINE void ATTR_PRINTF(3,4) verboselog( running_machine *machine, int n_level, 
 	}
 }
 
-static int flash_bank;
-static fujitsu_29f016a_device *flash_device[5][16];
-static int security_cart_number = 0;
-
-static int chiptype[ 2 ];
-static int has_ds2401[ 2 ];
-
 static const char *const diskregions[] = { "cdrom0", "cdrom1" };
 
 /* EEPROM handlers */
 
-static nvram_handler_func nvram_handler_security_cart_0;
-static nvram_handler_func nvram_handler_security_cart_1;
-
 static NVRAM_HANDLER( konami573 )
 {
-	if( nvram_handler_security_cart_0 != NULL )
+	ksys573_state *state = machine->driver_data<ksys573_state>();
+
+	if( state->nvram_handler_security_cart_0 != NULL )
 	{
-		NVRAM_HANDLER_CALL(security_cart_0);
+		state->nvram_handler_security_cart_0(machine, file, read_or_write);
 	}
 
-	if( nvram_handler_security_cart_1 != NULL )
+	if( state->nvram_handler_security_cart_1 != NULL )
 	{
-		NVRAM_HANDLER_CALL(security_cart_1);
+		state->nvram_handler_security_cart_1(machine, file, read_or_write);
 	}
 }
 
@@ -406,16 +466,18 @@ static READ32_HANDLER( mb89371_r )
 
 static READ32_HANDLER( jamma_r )
 {
+	ksys573_state *state = space->machine->driver_data<ksys573_state>();
 	running_machine *machine = space->machine;
+	int security_cart_number = state->security_cart_number;
 	UINT32 data = input_port_read(machine, "IN1");
 	data |= 0x000000c0;
 
-	if( has_ds2401[ security_cart_number ] )
+	if( state->has_ds2401[ security_cart_number ] )
 	{
 		data |= ds2401_read( machine, security_cart_number ) << 14;
 	}
 
-	switch( chiptype[ security_cart_number ] )
+	switch( state->chiptype[ security_cart_number ] )
 	{
 	case 1:
 		data |= x76f041_sda_read( machine, security_cart_number ) << 18;
@@ -430,11 +492,11 @@ static READ32_HANDLER( jamma_r )
 		break;
 	}
 
-	if( flash_device[1][0] == NULL )
+	if( state->flash_device[1][0] == NULL )
 	{
 		data |= ( 1 << 26 );
 	}
-	if( flash_device[2][0] == NULL )
+	if( state->flash_device[2][0] == NULL )
 	{
 		data |= ( 1 << 27 );
 	}
@@ -444,55 +506,59 @@ static READ32_HANDLER( jamma_r )
 	return data;
 }
 
-static UINT32 control;
-
 static READ32_HANDLER( control_r )
 {
-	verboselog( space->machine, 2, "control_r( %08x, %08x ) %08x\n", offset, mem_mask, control );
+	ksys573_state *state = space->machine->driver_data<ksys573_state>();
 
-	return control;
+	verboselog( space->machine, 2, "control_r( %08x, %08x ) %08x\n", offset, mem_mask, state->control );
+
+	return state->control;
 }
 
 static WRITE32_HANDLER( control_w )
 {
+	ksys573_state *state = space->machine->driver_data<ksys573_state>();
+	UINT32 control;
 //  int old_bank = flash_bank;
-	COMBINE_DATA(&control);
+
+	COMBINE_DATA(&state->control);
+	control = state->control;
 
 	verboselog( space->machine, 2, "control_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
 
-	flash_bank = -1;
+	state->flash_bank = -1;
 
-	switch( chiptype[ security_cart_number ] )
+	switch( state->chiptype[ state->security_cart_number ] )
 	{
 	case 3:
-		zs01_sda_write( space->machine, security_cart_number, !( ( control >> 6 ) & 1 ) ); /* 0x40 */
+		zs01_sda_write( space->machine, state->security_cart_number, !( ( control >> 6 ) & 1 ) ); /* 0x40 */
 		break;
 	}
 
-	if( flash_device[0][0] != NULL && ( control & ~0x43 ) == 0x00 )
+	if( state->flash_device[0][0] != NULL && ( control & ~0x43 ) == 0x00 )
 	{
-		flash_bank = (0 << 8) + ( ( control & 3 ) * 2 );
-//      if( flash_bank != old_bank ) mame_printf_debug( "onboard %d\r", control & 3 );
+		state->flash_bank = (0 << 8) + ( ( control & 3 ) * 2 );
+//      if( state->flash_bank != old_bank ) mame_printf_debug( "onboard %d\r", control & 3 );
 	}
-	else if( flash_device[1][0] != NULL && ( control & ~0x47 ) == 0x10 )
+	else if( state->flash_device[1][0] != NULL && ( control & ~0x47 ) == 0x10 )
 	{
-		flash_bank = (1 << 8) + ( ( control & 7 ) * 2 );
-//      if( flash_bank != old_bank ) mame_printf_debug( "pccard1 %d\r", control & 7 );
+		state->flash_bank = (1 << 8) + ( ( control & 7 ) * 2 );
+//      if( state->flash_bank != old_bank ) mame_printf_debug( "pccard1 %d\r", control & 7 );
 	}
-	else if( flash_device[2][0] != NULL && ( control & ~0x47 ) == 0x20 )
+	else if( state->flash_device[2][0] != NULL && ( control & ~0x47 ) == 0x20 )
 	{
-		flash_bank = (2 << 8) + ( ( control & 7 ) * 2 );
-//      if( flash_bank != old_bank ) mame_printf_debug( "pccard2 %d\r", control & 7 );
+		state->flash_bank = (2 << 8) + ( ( control & 7 ) * 2 );
+//      if( state->flash_bank != old_bank ) mame_printf_debug( "pccard2 %d\r", control & 7 );
 	}
-	else if( flash_device[3][0] != NULL && ( control & ~0x47 ) == 0x20 )
+	else if( state->flash_device[3][0] != NULL && ( control & ~0x47 ) == 0x20 )
 	{
-		flash_bank = (3 << 8) + ( ( control & 7 ) * 2 );
-//      if( flash_bank != old_bank ) mame_printf_debug( "pccard3 %d\r", control & 7 );
+		state->flash_bank = (3 << 8) + ( ( control & 7 ) * 2 );
+//      if( state->flash_bank != old_bank ) mame_printf_debug( "pccard3 %d\r", control & 7 );
 	}
-	else if( flash_device[4][0] != NULL && ( control & ~0x47 ) == 0x28 )
+	else if( state->flash_device[4][0] != NULL && ( control & ~0x47 ) == 0x28 )
 	{
-		flash_bank = (4 << 8) + ( ( control & 7 ) * 2 );
-//      if( flash_bank != old_bank ) mame_printf_debug( "pccard4 %d\r", control & 7 );
+		state->flash_bank = (4 << 8) + ( ( control & 7 ) * 2 );
+//      if( state->flash_bank != old_bank ) mame_printf_debug( "pccard4 %d\r", control & 7 );
 	}
 }
 
@@ -522,66 +588,63 @@ static WRITE32_HANDLER( control_w )
 
 #define ATAPI_DATA_SIZE ( 64 * 1024 )
 
-static UINT8 *atapi_regs;
-static emu_timer *atapi_timer;
-static SCSIInstance *inserted_cdrom;
-static SCSIInstance *available_cdroms[ 2 ];
-static UINT8 *atapi_data;
-static int atapi_data_ptr, atapi_data_len, atapi_xferlen, atapi_xferbase, atapi_cdata_wait, atapi_xfermod;
-
 #define MAX_TRANSFER_SIZE ( 63488 )
 
 static TIMER_CALLBACK( atapi_xfer_end )
 {
+	ksys573_state *state = machine->driver_data<ksys573_state>();
+	UINT32 *p_n_psxram = state->p_n_psxram;
+	UINT8 *atapi_regs = state->atapi_regs;
 	int i, n_this;
 	UINT8 sector_buffer[ 4096 ];
 
-	timer_adjust_oneshot(atapi_timer, attotime_never, 0);
+	timer_adjust_oneshot(state->atapi_timer, attotime_never, 0);
 
 //  verboselog( machine, 2, "atapi_xfer_end( %d ) atapi_xferlen = %d, atapi_xfermod=%d\n", x, atapi_xfermod, atapi_xferlen );
 
 //  mame_printf_debug("ATAPI: xfer_end.  xferlen = %d, atapi_xfermod = %d\n", atapi_xferlen, atapi_xfermod);
 
-	while (atapi_xferlen > 0 )
+	while( state->atapi_xferlen > 0 )
 	{
 		// get a sector from the SCSI device
-		SCSIReadData( inserted_cdrom, sector_buffer, 2048 );
+		SCSIReadData( state->inserted_cdrom, sector_buffer, 2048 );
 
-		atapi_xferlen -= 2048;
+		state->atapi_xferlen -= 2048;
 
 		i = 0;
 		n_this = 2048 / 4;
 		while( n_this > 0 )
 		{
-			g_p_n_psxram[ atapi_xferbase / 4 ] =
+			p_n_psxram[ state->atapi_xferbase / 4 ] =
 				( sector_buffer[ i + 0 ] << 0 ) |
 				( sector_buffer[ i + 1 ] << 8 ) |
 				( sector_buffer[ i + 2 ] << 16 ) |
 				( sector_buffer[ i + 3 ] << 24 );
-			atapi_xferbase += 4;
+			state->atapi_xferbase += 4;
 			i += 4;
 			n_this--;
 		}
 	}
 
-	if (atapi_xfermod > MAX_TRANSFER_SIZE)
+	if (state->atapi_xfermod > MAX_TRANSFER_SIZE)
 	{
-		atapi_xferlen = MAX_TRANSFER_SIZE;
-		atapi_xfermod = atapi_xfermod - MAX_TRANSFER_SIZE;
+		state->atapi_xferlen = MAX_TRANSFER_SIZE;
+		state->atapi_xfermod = state->atapi_xfermod - MAX_TRANSFER_SIZE;
 	}
 	else
 	{
-		atapi_xferlen = atapi_xfermod;
-		atapi_xfermod = 0;
+		state->atapi_xferlen = state->atapi_xfermod;
+		state->atapi_xfermod = 0;
 	}
 
-	if (atapi_xferlen > 0)
+
+	if (state->atapi_xferlen > 0)
 	{
 		//mame_printf_debug("ATAPI: starting next piece of multi-part transfer\n");
-		atapi_regs[ATAPI_REG_COUNTLOW] = atapi_xferlen & 0xff;
-		atapi_regs[ATAPI_REG_COUNTHIGH] = (atapi_xferlen>>8)&0xff;
+		atapi_regs[ATAPI_REG_COUNTLOW] = state->atapi_xferlen & 0xff;
+		atapi_regs[ATAPI_REG_COUNTHIGH] = (state->atapi_xferlen>>8)&0xff;
 
-		timer_adjust_oneshot(atapi_timer, machine->device<cpu_device>("maincpu")->cycles_to_attotime((ATAPI_CYCLES_PER_SECTOR * (atapi_xferlen/2048))), 0);
+		timer_adjust_oneshot(state->atapi_timer, machine->device<cpu_device>("maincpu")->cycles_to_attotime((ATAPI_CYCLES_PER_SECTOR * (state->atapi_xferlen/2048))), 0);
 	}
 	else
 	{
@@ -592,11 +655,13 @@ static TIMER_CALLBACK( atapi_xfer_end )
 
 	psx_irq_set(machine, 0x400);
 
-	verboselog( machine, 2, "atapi_xfer_end: %d %d\n", atapi_xferlen, atapi_xfermod );
+	verboselog( machine, 2, "atapi_xfer_end: %d %d\n", state->atapi_xferlen, state->atapi_xfermod );
 }
 
 static READ32_HANDLER( atapi_r )
 {
+	ksys573_state *state = space->machine->driver_data<ksys573_state>();
+	UINT8 *atapi_regs = state->atapi_regs;
 	running_machine *machine = space->machine;
 	int reg, data;
 
@@ -605,28 +670,28 @@ static READ32_HANDLER( atapi_r )
 //      mame_printf_debug("ATAPI: packet read = %04x\n", atapi_data[atapi_data_ptr]);
 
 		// assert IRQ and drop DRQ
-		if (atapi_data_ptr == 0 && atapi_data_len == 0)
+		if (state->atapi_data_ptr == 0 && state->atapi_data_len == 0)
 		{
 			// get the data from the device
-			if( atapi_xferlen > 0 )
+			if( state->atapi_xferlen > 0 )
 			{
-				SCSIReadData( inserted_cdrom, atapi_data, atapi_xferlen );
-				atapi_data_len = atapi_xferlen;
+				SCSIReadData( state->inserted_cdrom, state->atapi_data, state->atapi_xferlen );
+				state->atapi_data_len = state->atapi_xferlen;
 			}
 
-			if (atapi_xfermod > MAX_TRANSFER_SIZE)
+			if (state->atapi_xfermod > MAX_TRANSFER_SIZE)
 			{
-				atapi_xferlen = MAX_TRANSFER_SIZE;
-				atapi_xfermod = atapi_xfermod - MAX_TRANSFER_SIZE;
+				state->atapi_xferlen = MAX_TRANSFER_SIZE;
+				state->atapi_xfermod = state->atapi_xfermod - MAX_TRANSFER_SIZE;
 			}
 			else
 			{
-				atapi_xferlen = atapi_xfermod;
-				atapi_xfermod = 0;
+				state->atapi_xferlen = state->atapi_xfermod;
+				state->atapi_xfermod = 0;
 			}
 
-			verboselog( machine, 2, "atapi_r: atapi_xferlen=%d\n", atapi_xferlen );
-			if( atapi_xferlen != 0 )
+			verboselog( machine, 2, "atapi_r: atapi_xferlen=%d\n", state->atapi_xferlen );
+			if( state->atapi_xferlen != 0 )
 			{
 				atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ | ATAPI_STAT_SERVDSC;
 				atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO;
@@ -638,23 +703,23 @@ static READ32_HANDLER( atapi_r )
 				atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO;
 			}
 
-			atapi_regs[ATAPI_REG_COUNTLOW] = atapi_xferlen & 0xff;
-			atapi_regs[ATAPI_REG_COUNTHIGH] = (atapi_xferlen>>8)&0xff;
+			atapi_regs[ATAPI_REG_COUNTLOW] = state->atapi_xferlen & 0xff;
+			atapi_regs[ATAPI_REG_COUNTHIGH] = (state->atapi_xferlen>>8)&0xff;
 
 			psx_irq_set(space->machine, 0x400);
 		}
 
-		if( atapi_data_ptr < atapi_data_len )
+		if( state->atapi_data_ptr < state->atapi_data_len )
 		{
-			data = atapi_data[atapi_data_ptr++];
-			data |= ( atapi_data[atapi_data_ptr++] << 8 );
-			if( atapi_data_ptr >= atapi_data_len )
+			data = state->atapi_data[state->atapi_data_ptr++];
+			data |= ( state->atapi_data[state->atapi_data_ptr++] << 8 );
+			if( state->atapi_data_ptr >= state->atapi_data_len )
 			{
 //              verboselog( machine, 2, "atapi_r: read all bytes\n" );
-				atapi_data_ptr = 0;
-				atapi_data_len = 0;
+				state->atapi_data_ptr = 0;
+				state->atapi_data_len = 0;
 
-				if( atapi_xferlen == 0 )
+				if( state->atapi_xferlen == 0 )
 				{
 					atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
 					atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_IO;
@@ -719,6 +784,9 @@ static READ32_HANDLER( atapi_r )
 
 static WRITE32_HANDLER( atapi_w )
 {
+	ksys573_state *state = space->machine->driver_data<ksys573_state>();
+	UINT8 *atapi_regs = state->atapi_regs;
+	UINT8 *atapi_data = state->atapi_data;
 	running_machine *machine = space->machine;
 	int reg;
 
@@ -729,16 +797,16 @@ static WRITE32_HANDLER( atapi_w )
 		verboselog( machine, 2, "atapi_w: data=%04x\n", data );
 
 //      mame_printf_debug("ATAPI: packet write %04x\n", data);
-		atapi_data[atapi_data_ptr++] = data & 0xff;
-		atapi_data[atapi_data_ptr++] = data >> 8;
+		atapi_data[state->atapi_data_ptr++] = data & 0xff;
+		atapi_data[state->atapi_data_ptr++] = data >> 8;
 
-		if (atapi_cdata_wait)
+		if (state->atapi_cdata_wait)
 		{
-//          mame_printf_debug("ATAPI: waiting, ptr %d wait %d\n", atapi_data_ptr, atapi_cdata_wait);
-			if (atapi_data_ptr == atapi_cdata_wait)
+//          mame_printf_debug("ATAPI: waiting, ptr %d wait %d\n", state->atapi_data_ptr, state->atapi_cdata_wait);
+			if (state->atapi_data_ptr == state->atapi_cdata_wait)
 			{
 				// send it to the device
-				SCSIWriteData( inserted_cdrom, atapi_data, atapi_cdata_wait );
+				SCSIWriteData( state->inserted_cdrom, atapi_data, state->atapi_cdata_wait );
 
 				// assert IRQ
 				psx_irq_set(space->machine, 0x400);
@@ -748,38 +816,38 @@ static WRITE32_HANDLER( atapi_w )
 			}
 		}
 
-		else if ( atapi_data_ptr == 12 )
+		else if ( state->atapi_data_ptr == 12 )
 		{
 			int phase;
 
 			verboselog( machine, 2, "atapi_w: command %02x\n", atapi_data[0]&0xff );
 
 			// reset data pointer for reading SCSI results
-			atapi_data_ptr = 0;
-			atapi_data_len = 0;
+			state->atapi_data_ptr = 0;
+			state->atapi_data_len = 0;
 
 			// send it to the SCSI device
-			SCSISetCommand( inserted_cdrom, atapi_data, 12 );
-			SCSIExecCommand( inserted_cdrom, &atapi_xferlen );
-			SCSIGetPhase( inserted_cdrom, &phase );
+			SCSISetCommand( state->inserted_cdrom, state->atapi_data, 12 );
+			SCSIExecCommand( state->inserted_cdrom, &state->atapi_xferlen );
+			SCSIGetPhase( state->inserted_cdrom, &phase );
 
-			if (atapi_xferlen != -1)
+			if (state->atapi_xferlen != -1)
 			{
-//              mame_printf_debug("ATAPI: SCSI command %02x returned %d bytes from the device\n", atapi_data[0]&0xff, atapi_xferlen);
+//              mame_printf_debug("ATAPI: SCSI command %02x returned %d bytes from the device\n", atapi_data[0]&0xff, state->atapi_xferlen);
 
 				// store the returned command length in the ATAPI regs, splitting into
 				// multiple transfers if necessary
-				atapi_xfermod = 0;
-				if (atapi_xferlen > MAX_TRANSFER_SIZE)
+				state->atapi_xfermod = 0;
+				if (state->atapi_xferlen > MAX_TRANSFER_SIZE)
 				{
-					atapi_xfermod = atapi_xferlen - MAX_TRANSFER_SIZE;
-					atapi_xferlen = MAX_TRANSFER_SIZE;
+					state->atapi_xfermod = state->atapi_xferlen - MAX_TRANSFER_SIZE;
+					state->atapi_xferlen = MAX_TRANSFER_SIZE;
 				}
 
-				atapi_regs[ATAPI_REG_COUNTLOW] = atapi_xferlen & 0xff;
-				atapi_regs[ATAPI_REG_COUNTHIGH] = (atapi_xferlen>>8)&0xff;
+				atapi_regs[ATAPI_REG_COUNTLOW] = state->atapi_xferlen & 0xff;
+				atapi_regs[ATAPI_REG_COUNTHIGH] = (state->atapi_xferlen>>8)&0xff;
 
-				if (atapi_xferlen == 0)
+				if (state->atapi_xferlen == 0)
 				{
 					// if no data to return, set the registers properly
 					atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRDY;
@@ -795,7 +863,7 @@ static WRITE32_HANDLER( atapi_w )
 				switch( phase )
 				{
 				case SCSI_PHASE_DATAOUT:
-					atapi_cdata_wait = atapi_xferlen;
+					state->atapi_cdata_wait = state->atapi_xferlen;
 					break;
 				}
 
@@ -809,7 +877,7 @@ static WRITE32_HANDLER( atapi_w )
 
 					case 0x45: // PLAY
 						atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_BSY;
-						timer_adjust_oneshot( atapi_timer, downcast<cpu_device *>(space->cpu)->cycles_to_attotime( ATAPI_CYCLES_PER_SECTOR ), 0 );
+						timer_adjust_oneshot( state->atapi_timer, downcast<cpu_device *>(space->cpu)->cycles_to_attotime( ATAPI_CYCLES_PER_SECTOR ), 0 );
 						break;
 				}
 
@@ -877,27 +945,27 @@ static WRITE32_HANDLER( atapi_w )
 					atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ;
 					atapi_regs[ATAPI_REG_INTREASON] = ATAPI_INTREASON_COMMAND;
 
-					atapi_data_ptr = 0;
-					atapi_data_len = 0;
+					state->atapi_data_ptr = 0;
+					state->atapi_data_len = 0;
 
 					/* we have no data */
-					atapi_xferlen = 0;
-					atapi_xfermod = 0;
+					state->atapi_xferlen = 0;
+					state->atapi_xfermod = 0;
 
-					atapi_cdata_wait = 0;
+					state->atapi_cdata_wait = 0;
 					break;
 
 				case 0xa1:	// IDENTIFY PACKET DEVICE
 					atapi_regs[ATAPI_REG_CMDSTATUS] = ATAPI_STAT_DRQ;
 
-					atapi_data_ptr = 0;
-					atapi_data_len = 512;
+					state->atapi_data_ptr = 0;
+					state->atapi_data_len = 512;
 
 					/* we have no data */
-					atapi_xferlen = 0;
-					atapi_xfermod = 0;
+					state->atapi_xferlen = 0;
+					state->atapi_xfermod = 0;
 
-					memset( atapi_data, 0, atapi_data_len );
+					memset( atapi_data, 0, state->atapi_data_len );
 
 					atapi_data[ 0 ^ 1 ] = 0x85;	// ATAPI device, cmd set 5 compliant, DRQ within 3 ms of PACKET command
 					atapi_data[ 1 ^ 1 ] = 0x00;
@@ -937,8 +1005,8 @@ static WRITE32_HANDLER( atapi_w )
 				case 0xef:	// SET FEATURES
 					atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
 
-					atapi_data_ptr = 0;
-					atapi_data_len = 0;
+					state->atapi_data_ptr = 0;
+					state->atapi_data_len = 0;
 
 					psx_irq_set(space->machine, 0x400);
 					break;
@@ -953,63 +1021,68 @@ static WRITE32_HANDLER( atapi_w )
 
 static void atapi_exit(running_machine& machine)
 {
+	ksys573_state *state = machine.driver_data<ksys573_state>();
 	int i;
 
 	for( i = 0; i < 2; i++ )
 	{
 		if( get_disk_handle( &machine, diskregions[i] ) != NULL )
 		{
-			SCSIDeleteInstance( available_cdroms[ i ] );
+			SCSIDeleteInstance( state->available_cdroms[ i ] );
 		}
 	}
 }
 
 static void atapi_init(running_machine *machine)
 {
+	ksys573_state *state = machine->driver_data<ksys573_state>();
+	UINT8 *atapi_regs;
 	int i;
 
-	atapi_regs = auto_alloc_array(machine, UINT8,  ATAPI_REG_MAX );
-	memset(atapi_regs, 0, sizeof(atapi_regs));
+	atapi_regs = state->atapi_regs = auto_alloc_array( machine, UINT8, ATAPI_REG_MAX );
 
 	atapi_regs[ATAPI_REG_CMDSTATUS] = 0;
 	atapi_regs[ATAPI_REG_ERRFEAT] = 1;
 	atapi_regs[ATAPI_REG_COUNTLOW] = 0x14;
 	atapi_regs[ATAPI_REG_COUNTHIGH] = 0xeb;
 
-	atapi_data_ptr = 0;
-	atapi_data_len = 0;
-	atapi_cdata_wait = 0;
+	state->atapi_data_ptr = 0;
+	state->atapi_data_len = 0;
+	state->atapi_cdata_wait = 0;
 
-	atapi_timer = timer_alloc(machine,  atapi_xfer_end , NULL);
-	timer_adjust_oneshot(atapi_timer, attotime_never, 0);
+	state->atapi_timer = timer_alloc(machine, atapi_xfer_end, NULL);
+	timer_adjust_oneshot(state->atapi_timer, attotime_never, 0);
 
 	for( i = 0; i < 2; i++ )
 	{
 		if( get_disk_handle( machine, diskregions[i] ) != NULL )
 		{
-			SCSIAllocInstance( machine, &SCSIClassCr589, &available_cdroms[ i ], diskregions[i] );
+			SCSIAllocInstance( machine, &SCSIClassCr589, &state->available_cdroms[ i ], diskregions[i] );
 		}
 		else
 		{
-			available_cdroms[ i ] = NULL;
+			state->available_cdroms[ i ] = NULL;
 		}
 	}
 	machine->add_notifier(MACHINE_NOTIFY_EXIT, atapi_exit);
 
-	atapi_data = auto_alloc_array(machine, UINT8,  ATAPI_DATA_SIZE );
+	state->atapi_data = auto_alloc_array( machine, UINT8, ATAPI_DATA_SIZE );
 
-	state_save_register_global_pointer(machine,  atapi_regs, ATAPI_REG_MAX );
-	state_save_register_global_pointer(machine,  atapi_data, ATAPI_DATA_SIZE / 2 );
-	state_save_register_global(machine,  atapi_data_ptr );
-	state_save_register_global(machine,  atapi_data_len );
-	state_save_register_global(machine,  atapi_xferlen );
-	state_save_register_global(machine,  atapi_xferbase );
-	state_save_register_global(machine,  atapi_cdata_wait );
-	state_save_register_global(machine,  atapi_xfermod );
+	state_save_register_global_pointer( machine, state->atapi_regs, ATAPI_REG_MAX );
+	state_save_register_global_pointer( machine, state->atapi_data, ATAPI_DATA_SIZE / 2 );
+	state_save_register_global( machine, state->atapi_data_ptr );
+	state_save_register_global( machine, state->atapi_data_len );
+	state_save_register_global( machine, state->atapi_xferlen );
+	state_save_register_global( machine, state->atapi_xferbase );
+	state_save_register_global( machine, state->atapi_cdata_wait );
+	state_save_register_global( machine, state->atapi_xfermod );
 }
 
 static WRITE32_HANDLER( atapi_reset_w )
 {
+	ksys573_state *state = space->machine->driver_data<ksys573_state>();
+	UINT8 *atapi_regs = state->atapi_regs;
+
 	verboselog( space->machine, 2, "atapi_reset_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
 
 	if (data)
@@ -1023,12 +1096,12 @@ static WRITE32_HANDLER( atapi_reset_w )
 		atapi_regs[ATAPI_REG_COUNTLOW] = 0x14;
 		atapi_regs[ATAPI_REG_COUNTHIGH] = 0xeb;
 
-		atapi_data_ptr = 0;
-		atapi_data_len = 0;
-		atapi_cdata_wait = 0;
+		state->atapi_data_ptr = 0;
+		state->atapi_data_len = 0;
+		state->atapi_cdata_wait = 0;
 
-		atapi_xferlen = 0;
-		atapi_xfermod = 0;
+		state->atapi_xferlen = 0;
+		state->atapi_xfermod = 0;
 	}
 }
 
@@ -1040,30 +1113,31 @@ static void cdrom_dma_read( running_machine *machine, UINT32 n_address, INT32 n_
 
 static void cdrom_dma_write( running_machine *machine, UINT32 n_address, INT32 n_size )
 {
+	ksys573_state *state = machine->driver_data<ksys573_state>();
+
 	verboselog( machine, 2, "cdrom_dma_write( %08x, %08x )\n", n_address, n_size );
 //  mame_printf_debug("DMA write: address %08x size %08x\n", n_address, n_size);
 
-	atapi_xferbase = n_address;
+	state->atapi_xferbase = n_address;
 
-	verboselog( machine, 2, "atapi_xfer_end: %d %d\n", atapi_xferlen, atapi_xfermod );
+	verboselog( machine, 2, "atapi_xfer_end: %d %d\n", state->atapi_xferlen, state->atapi_xfermod );
 
 	// set a transfer complete timer (Note: CYCLES_PER_SECTOR can't be lower than 2000 or the BIOS ends up "out of order")
-	timer_adjust_oneshot(atapi_timer, machine->device<cpu_device>("maincpu")->cycles_to_attotime((ATAPI_CYCLES_PER_SECTOR * (atapi_xferlen/2048))), 0);
+	timer_adjust_oneshot(state->atapi_timer, machine->device<cpu_device>("maincpu")->cycles_to_attotime((ATAPI_CYCLES_PER_SECTOR * (state->atapi_xferlen/2048))), 0);
 }
-
-static UINT32 m_n_security_control;
-static void (*security_callback)( running_machine *machine, int data );
 
 static WRITE32_HANDLER( security_w )
 {
+	ksys573_state *state = space->machine->driver_data<ksys573_state>();
+	int security_cart_number = state->security_cart_number;
 	running_machine *machine = space->machine;
-	COMBINE_DATA( &m_n_security_control );
+	COMBINE_DATA( &state->m_n_security_control );
 
 	verboselog( space->machine, 2, "security_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
 
 	if( ACCESSING_BITS_0_15 )
 	{
-		switch( chiptype[ security_cart_number ] )
+		switch( state->chiptype[ security_cart_number ] )
 		{
 		case 1:
 			x76f041_sda_write( machine, security_cart_number, ( data >> 0 ) & 1 );
@@ -1086,37 +1160,40 @@ static WRITE32_HANDLER( security_w )
 			break;
 		}
 
-		if( has_ds2401[ security_cart_number ] )
+		if( state->has_ds2401[ security_cart_number ] )
 		{
 			ds2401_write( machine, security_cart_number, !( ( data >> 4 ) & 1 ) );
 		}
 
-		if( security_callback != NULL )
+		if( state->security_callback != NULL )
 		{
-			security_callback( machine, data & 0xff );
+			(*state->security_callback)( machine, data & 0xff );
 		}
 	}
 }
 
 static READ32_HANDLER( security_r )
 {
-	UINT32 data = m_n_security_control;
+	ksys573_state *state = space->machine->driver_data<ksys573_state>();
+
+	UINT32 data = state->m_n_security_control;
 	verboselog( space->machine, 2, "security_r( %08x, %08x ) %08x\n", offset, mem_mask, data );
 	return data;
 }
 
 static READ32_HANDLER( flash_r )
 {
+	ksys573_state *state = space->machine->driver_data<ksys573_state>();
 	UINT32 data = 0;
 
-	if( flash_bank < 0 )
+	if( state->flash_bank < 0 )
 	{
-		mame_printf_debug( "%08x: flash_r( %08x, %08x ) no bank selected %08x\n", cpu_get_pc(space->cpu), offset, mem_mask, control );
+		mame_printf_debug( "%08x: flash_r( %08x, %08x ) no bank selected %08x\n", cpu_get_pc(space->cpu), offset, mem_mask, state->control );
 		data = 0xffffffff;
 	}
 	else
 	{
-		fujitsu_29f016a_device **flash_base = &flash_device[flash_bank >> 8][flash_bank & 0xff];
+		fujitsu_29f016a_device **flash_base = &state->flash_device[state->flash_bank >> 8][state->flash_bank & 0xff];
 		int adr = offset * 2;
 
 		if( ACCESSING_BITS_0_7 )
@@ -1144,15 +1221,17 @@ static READ32_HANDLER( flash_r )
 
 static WRITE32_HANDLER( flash_w )
 {
+	ksys573_state *state = space->machine->driver_data<ksys573_state>();
+
 	verboselog( space->machine, 2, "flash_w( %08x, %08x, %08x\n", offset, mem_mask, data );
 
-	if( flash_bank < 0 )
+	if( state->flash_bank < 0 )
 	{
-		mame_printf_debug( "%08x: flash_w( %08x, %08x, %08x ) no bank selected %08x\n", cpu_get_pc(space->cpu), offset, mem_mask, data, control );
+		mame_printf_debug( "%08x: flash_w( %08x, %08x, %08x ) no bank selected %08x\n", cpu_get_pc(space->cpu), offset, mem_mask, data, state->control );
 	}
 	else
 	{
-		fujitsu_29f016a_device **flash_base = &flash_device[flash_bank >> 8][flash_bank & 0xff];
+		fujitsu_29f016a_device **flash_base = &state->flash_device[state->flash_bank >> 8][state->flash_bank & 0xff];
 		int adr = offset * 2;
 
 		if( ACCESSING_BITS_0_7 )
@@ -1176,39 +1255,26 @@ static WRITE32_HANDLER( flash_w )
 
 /* Root Counters */
 
-static emu_timer *m_p_timer_root[ 3 ];
-static UINT16 m_p_n_root_count[ 3 ];
-static UINT16 m_p_n_root_mode[ 3 ];
-static UINT16 m_p_n_root_target[ 3 ];
-static UINT64 m_p_n_root_start[ 3 ];
-
-#define RC_STOP ( 0x01 )
-#define RC_RESET ( 0x04 ) /* guess */
-#define RC_COUNTTARGET ( 0x08 )
-#define RC_IRQTARGET ( 0x10 )
-#define RC_IRQOVERFLOW ( 0x20 )
-#define RC_REPEAT ( 0x40 )
-#define RC_CLC ( 0x100 )
-#define RC_DIV ( 0x200 )
-
 static UINT64 psxcpu_gettotalcycles( running_machine *machine )
 {
 	/* TODO: should return the start of the current tick. */
 	return machine->firstcpu->total_cycles() * 2;
 }
 
-static int root_divider( int n_counter )
+static int root_divider( running_machine *machine, int n_counter )
 {
-	if( n_counter == 0 && ( m_p_n_root_mode[ n_counter ] & RC_CLC ) != 0 )
+	ksys573_state *state = machine->driver_data<ksys573_state>();
+
+	if( n_counter == 0 && ( state->m_p_n_root_mode[ n_counter ] & PSX_RC_CLC ) != 0 )
 	{
 		/* TODO: pixel clock, probably based on resolution */
 		return 5;
 	}
-	else if( n_counter == 1 && ( m_p_n_root_mode[ n_counter ] & RC_CLC ) != 0 )
+	else if( n_counter == 1 && ( state->m_p_n_root_mode[ n_counter ] & PSX_RC_CLC ) != 0 )
 	{
 		return 2150;
 	}
-	else if( n_counter == 2 && ( m_p_n_root_mode[ n_counter ] & RC_DIV ) != 0 )
+	else if( n_counter == 2 && ( state->m_p_n_root_mode[ n_counter ] & PSX_RC_DIV ) != 0 )
 	{
 		return 8;
 	}
@@ -1217,74 +1283,81 @@ static int root_divider( int n_counter )
 
 static UINT16 root_current( running_machine *machine, int n_counter )
 {
-	if( ( m_p_n_root_mode[ n_counter ] & RC_STOP ) != 0 )
+	ksys573_state *state = machine->driver_data<ksys573_state>();
+
+	if( ( state->m_p_n_root_mode[ n_counter ] & PSX_RC_STOP ) != 0 )
 	{
-		return m_p_n_root_count[ n_counter ];
+		return state->m_p_n_root_count[ n_counter ];
 	}
 	else
 	{
 		UINT64 n_current;
-		n_current = psxcpu_gettotalcycles(machine) - m_p_n_root_start[ n_counter ];
-		n_current /= root_divider( n_counter );
-		n_current += m_p_n_root_count[ n_counter ];
+		n_current = psxcpu_gettotalcycles(machine) - state->m_p_n_root_start[ n_counter ];
+		n_current /= root_divider( machine, n_counter );
+		n_current += state->m_p_n_root_count[ n_counter ];
 		if( n_current > 0xffff )
 		{
 			/* TODO: use timer for wrap on 0x10000. */
-			m_p_n_root_count[ n_counter ] = n_current;
-			m_p_n_root_start[ n_counter ] = psxcpu_gettotalcycles(machine);
+			state->m_p_n_root_count[ n_counter ] = n_current;
+			state->m_p_n_root_start[ n_counter ] = psxcpu_gettotalcycles(machine);
 		}
 		return n_current;
 	}
 }
 
-static int root_target( int n_counter )
+static int root_target( running_machine *machine, int n_counter )
 {
-	if( ( m_p_n_root_mode[ n_counter ] & RC_COUNTTARGET ) != 0 ||
-		( m_p_n_root_mode[ n_counter ] & RC_IRQTARGET ) != 0 )
+	ksys573_state *state = machine->driver_data<ksys573_state>();
+
+	if( ( state->m_p_n_root_mode[ n_counter ] & PSX_RC_COUNTTARGET ) != 0 ||
+		( state->m_p_n_root_mode[ n_counter ] & PSX_RC_IRQTARGET ) != 0 )
 	{
-		return m_p_n_root_target[ n_counter ];
+		return state->m_p_n_root_target[ n_counter ];
 	}
 	return 0x10000;
 }
 
 static void root_timer_adjust( running_machine *machine, int n_counter )
 {
-	if( ( m_p_n_root_mode[ n_counter ] & RC_STOP ) != 0 )
+	ksys573_state *state = machine->driver_data<ksys573_state>();
+
+	if( ( state->m_p_n_root_mode[ n_counter ] & PSX_RC_STOP ) != 0 )
 	{
-		timer_adjust_oneshot( m_p_timer_root[ n_counter ], attotime_never, n_counter);
+		timer_adjust_oneshot( state->m_p_timer_root[ n_counter ], attotime_never, n_counter);
 	}
 	else
 	{
 		int n_duration;
 
-		n_duration = root_target( n_counter ) - root_current( machine, n_counter );
+		n_duration = root_target( machine, n_counter ) - root_current( machine, n_counter );
 		if( n_duration < 1 )
 		{
 			n_duration += 0x10000;
 		}
 
-		n_duration *= root_divider( n_counter );
+		n_duration *= root_divider( machine, n_counter );
 
-		timer_adjust_oneshot( m_p_timer_root[ n_counter ], attotime_mul(ATTOTIME_IN_HZ(33868800), n_duration), n_counter);
+		timer_adjust_oneshot( state->m_p_timer_root[ n_counter ], attotime_mul(ATTOTIME_IN_HZ(33868800), n_duration), n_counter);
 	}
 }
 
 static TIMER_CALLBACK( root_finished )
 {
+	ksys573_state *state = machine->driver_data<ksys573_state>();
 	int n_counter = param;
 
-//  if( ( m_p_n_root_mode[ n_counter ] & RC_COUNTTARGET ) != 0 )
+//  if( ( state->m_p_n_root_mode[ n_counter ] & PSX_RC_COUNTTARGET ) != 0 )
 	{
-		/* TODO: wrap should be handled differently as RC_COUNTTARGET & RC_IRQTARGET don't have to be the same. */
-		m_p_n_root_count[ n_counter ] = 0;
-		m_p_n_root_start[ n_counter ] = psxcpu_gettotalcycles(machine);
+		/* TODO: wrap should be handled differently as PSX_RC_COUNTTARGET & PSX_RC_IRQTARGET don't have to be the same. */
+		state->m_p_n_root_count[ n_counter ] = 0;
+		state->m_p_n_root_start[ n_counter ] = psxcpu_gettotalcycles(machine);
 	}
-	if( ( m_p_n_root_mode[ n_counter ] & RC_REPEAT ) != 0 )
+	if( ( state->m_p_n_root_mode[ n_counter ] & PSX_RC_REPEAT ) != 0 )
 	{
 		root_timer_adjust( machine, n_counter );
 	}
-	if( ( m_p_n_root_mode[ n_counter ] & RC_IRQOVERFLOW ) != 0 ||
-		( m_p_n_root_mode[ n_counter ] & RC_IRQTARGET ) != 0 )
+	if( ( state->m_p_n_root_mode[ n_counter ] & PSX_RC_IRQOVERFLOW ) != 0 ||
+		( state->m_p_n_root_mode[ n_counter ] & PSX_RC_IRQTARGET ) != 0 )
 	{
 		psx_irq_set( machine, 0x10 << n_counter );
 	}
@@ -1292,6 +1365,7 @@ static TIMER_CALLBACK( root_finished )
 
 static WRITE32_HANDLER( k573_counter_w )
 {
+	ksys573_state *state = space->machine->driver_data<ksys573_state>();
 	int n_counter;
 
 	n_counter = offset / 4;
@@ -1299,29 +1373,31 @@ static WRITE32_HANDLER( k573_counter_w )
 	switch( offset % 4 )
 	{
 	case 0:
-		m_p_n_root_count[ n_counter ] = data;
-		m_p_n_root_start[ n_counter ] = psxcpu_gettotalcycles(space->machine);
+		state->m_p_n_root_count[ n_counter ] = data;
+		state->m_p_n_root_start[ n_counter ] = psxcpu_gettotalcycles(space->machine);
 		break;
 	case 1:
-		m_p_n_root_count[ n_counter ] = root_current( space->machine, n_counter );
-		m_p_n_root_start[ n_counter ] = psxcpu_gettotalcycles(space->machine);
-		m_p_n_root_mode[ n_counter ] = data;
+		state->m_p_n_root_count[ n_counter ] = root_current( space->machine, n_counter );
+		state->m_p_n_root_start[ n_counter ] = psxcpu_gettotalcycles(space->machine);
+		state->m_p_n_root_mode[ n_counter ] = data;
 
-		if( ( m_p_n_root_mode[ n_counter ] & RC_RESET ) != 0 )
+		if( ( state->m_p_n_root_mode[ n_counter ] & PSX_RC_RESET ) != 0 )
 		{
 			/* todo: check this is correct */
-			m_p_n_root_count[ n_counter ] = 0;
-			m_p_n_root_mode[ n_counter ] &= ~( RC_STOP | RC_RESET );
+			state->m_p_n_root_count[ n_counter ] = 0;
+			state->m_p_n_root_mode[ n_counter ] &= ~( PSX_RC_STOP | PSX_RC_RESET );
 		}
-//      if( ( data & 0xfca6 ) != 0 ||
-//          ( ( data & 0x0100 ) != 0 && n_counter != 0 && n_counter != 1 ) ||
-//          ( ( data & 0x0200 ) != 0 && n_counter != 2 ) )
-//      {
-//          printf( "mode %d 0x%04x\n", n_counter, data & 0xfca6 );
-//      }
+#if 0
+		if( ( data & 0xfca6 ) != 0 ||
+			( ( data & 0x0100 ) != 0 && n_counter != 0 && n_counter != 1 ) ||
+			( ( data & 0x0200 ) != 0 && n_counter != 2 ) )
+		{
+			printf( "mode %d 0x%04x\n", n_counter, data & 0xfca6 );
+		}
+#endif
 		break;
 	case 2:
-		m_p_n_root_target[ n_counter ] = data;
+		state->m_p_n_root_target[ n_counter ] = data;
 		break;
 	default:
 		return;
@@ -1332,6 +1408,7 @@ static WRITE32_HANDLER( k573_counter_w )
 
 static READ32_HANDLER( k573_counter_r )
 {
+	ksys573_state *state = space->machine->driver_data<ksys573_state>();
 	int n_counter;
 	UINT32 data;
 
@@ -1343,10 +1420,10 @@ static READ32_HANDLER( k573_counter_r )
 		data = root_current( space->machine, n_counter );
 		break;
 	case 1:
-		data = m_p_n_root_mode[ n_counter ];
+		data = state->m_p_n_root_mode[ n_counter ];
 		break;
 	case 2:
-		data = m_p_n_root_target[ n_counter ];
+		data = state->m_p_n_root_target[ n_counter ];
 		break;
 	default:
 		return 0;
@@ -1355,7 +1432,7 @@ static READ32_HANDLER( k573_counter_r )
 }
 
 static ADDRESS_MAP_START( konami573_map, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x003fffff) AM_RAM	AM_SHARE("share1") AM_BASE(&g_p_n_psxram) AM_SIZE(&g_n_psxramsize) /* ram */
+	AM_RANGE(0x00000000, 0x003fffff) AM_RAM	AM_SHARE("share1") /* ram */
 	AM_RANGE(0x1f000000, 0x1f3fffff) AM_READWRITE( flash_r, flash_w )
 	AM_RANGE(0x1f400000, 0x1f400003) AM_READ_PORT( "IN0" ) AM_WRITE_PORT( "OUT0" )
 	AM_RANGE(0x1f400004, 0x1f400007) AM_READ( jamma_r )
@@ -1397,28 +1474,31 @@ ADDRESS_MAP_END
 static void flash_init( running_machine *machine )
 {
 	// find onboard flash devices
+	ksys573_state *state = machine->driver_data<ksys573_state>();
 	astring tempstr;
 	for (int index = 0; index < 8; index++)
-		flash_device[0][index] = machine->device<fujitsu_29f016a_device>(tempstr.format("onboard.%d", index));
+		state->flash_device[0][index] = machine->device<fujitsu_29f016a_device>(tempstr.format("onboard.%d", index));
 
 	// find pccard flash devices
 	for (int card = 1; card <= 4; card++)
 		for (int index = 0; index < 16; index++)
-			flash_device[card][index] = machine->device<fujitsu_29f016a_device>(tempstr.format("pccard%d.%d", card, index));
+			state->flash_device[card][index] = machine->device<fujitsu_29f016a_device>(tempstr.format("pccard%d.%d", card, index));
 
-	state_save_register_global(machine,  flash_bank );
-	state_save_register_global(machine,  control );
+	state_save_register_global( machine, state->flash_bank );
+	state_save_register_global( machine, state->control );
 }
 
-static void *atapi_get_device(void)
+static void *atapi_get_device(running_machine *machine)
 {
+	ksys573_state *state = machine->driver_data<ksys573_state>();
 	void *ret;
-	SCSIGetDevice( inserted_cdrom, &ret );
+	SCSIGetDevice( state->inserted_cdrom, &ret );
 	return ret;
 }
 
 static void security_cart_init( running_machine *machine, int cart, const char *eeprom_region, const char *ds2401_region )
 {
+	ksys573_state *state = machine->driver_data<ksys573_state>();
 	UINT8 *eeprom_rom = memory_region( machine, eeprom_region );
 	int eeprom_length = memory_region_length( machine, eeprom_region );
 	UINT8 *ds2401_rom = memory_region( machine, ds2401_region );
@@ -1429,15 +1509,15 @@ static void security_cart_init( running_machine *machine, int cart, const char *
 		{
 		case 0x224:
 			x76f041_init( machine, cart, eeprom_rom );
-			chiptype[ cart ] = 1;
+			state->chiptype[ cart ] = 1;
 
 			switch( cart )
 			{
 			case 0:
-				nvram_handler_security_cart_0 = NVRAM_HANDLER_NAME(x76f041_0);
+				state->nvram_handler_security_cart_0 = NVRAM_HANDLER_NAME(x76f041_0);
 				break;
 			case 1:
-				nvram_handler_security_cart_1 = NVRAM_HANDLER_NAME(x76f041_1);
+				state->nvram_handler_security_cart_1 = NVRAM_HANDLER_NAME(x76f041_1);
 				break;
 			}
 
@@ -1445,15 +1525,15 @@ static void security_cart_init( running_machine *machine, int cart, const char *
 
 		case 0x84:
 			x76f100_init( machine, cart, eeprom_rom );
-			chiptype[ cart ] = 2;
+			state->chiptype[ cart ] = 2;
 
 			switch( cart )
 			{
 			case 0:
-				nvram_handler_security_cart_0 = NVRAM_HANDLER_NAME(x76f100_0);
+				state->nvram_handler_security_cart_0 = NVRAM_HANDLER_NAME(x76f100_0);
 				break;
 			case 1:
-				nvram_handler_security_cart_1 = NVRAM_HANDLER_NAME(x76f100_1);
+				state->nvram_handler_security_cart_1 = NVRAM_HANDLER_NAME(x76f100_1);
 				break;
 			}
 
@@ -1461,15 +1541,15 @@ static void security_cart_init( running_machine *machine, int cart, const char *
 
 		case 0x1014:
 			zs01_init( machine, cart, eeprom_rom, NULL, NULL, ds2401_rom );
-			chiptype[ cart ] = 3;
+			state->chiptype[ cart ] = 3;
 
 			switch( cart )
 			{
 			case 0:
-				nvram_handler_security_cart_0 = NVRAM_HANDLER_NAME(zs01_0);
+				state->nvram_handler_security_cart_0 = NVRAM_HANDLER_NAME(zs01_0);
 				break;
 			case 1:
-				nvram_handler_security_cart_1 = NVRAM_HANDLER_NAME(zs01_1);
+				state->nvram_handler_security_cart_1 = NVRAM_HANDLER_NAME(zs01_1);
 				break;
 			}
 
@@ -1482,58 +1562,61 @@ static void security_cart_init( running_machine *machine, int cart, const char *
 	}
 	else
 	{
-		chiptype[ cart ] = 0;
+		state->chiptype[ cart ] = 0;
 	}
 
-	if( chiptype[ cart ] != 3 && ds2401_rom != NULL )
+	if( state->chiptype[ cart ] != 3 && ds2401_rom != NULL )
 	{
 		ds2401_init( machine, cart, ds2401_rom );
-		has_ds2401[ cart ] = 1;
+		state->has_ds2401[ cart ] = 1;
 	}
 	else
 	{
-		has_ds2401[ cart ] = 0;
+		state->has_ds2401[ cart ] = 0;
 	}
 }
 
 static DRIVER_INIT( konami573 )
 {
+	ksys573_state *state = machine->driver_data<ksys573_state>();
 	int i;
 
 	psx_driver_init(machine);
 	atapi_init(machine);
-	psx_dma_install_read_handler(5, cdrom_dma_read);
-	psx_dma_install_write_handler(5, cdrom_dma_write);
+	psx_dma_install_read_handler(machine, 5, cdrom_dma_read);
+	psx_dma_install_write_handler(machine, 5, cdrom_dma_write);
 
 	for (i = 0; i < 3; i++)
 	{
-		m_p_timer_root[i] = timer_alloc(machine, root_finished, NULL);
+		state->m_p_timer_root[i] = timer_alloc(machine, root_finished, NULL);
 	}
 
-	state_save_register_global(machine,  m_n_security_control );
+	state_save_register_global( machine, state->m_n_security_control );
 
 	security_cart_init( machine, 0, "user2", "user9" );
 	security_cart_init( machine, 1, "user8", "user10" );
 
-	state_save_register_item_array( machine, "KSYS573", NULL, 0, m_p_n_root_count );
-	state_save_register_item_array( machine, "KSYS573", NULL, 0, m_p_n_root_mode );
-	state_save_register_item_array( machine, "KSYS573", NULL, 0, m_p_n_root_target );
-	state_save_register_item_array( machine, "KSYS573", NULL, 0, m_p_n_root_start );
+	state_save_register_item_array( machine, "KSYS573", NULL, 0, state->m_p_n_root_count );
+	state_save_register_item_array( machine, "KSYS573", NULL, 0, state->m_p_n_root_mode );
+	state_save_register_item_array( machine, "KSYS573", NULL, 0, state->m_p_n_root_target );
+	state_save_register_item_array( machine, "KSYS573", NULL, 0, state->m_p_n_root_start );
 
 	flash_init(machine);
 }
 
 static MACHINE_RESET( konami573 )
 {
+	ksys573_state *state = machine->driver_data<ksys573_state>();
+
 	psx_machine_init(machine);
 
-	if( chiptype[ 0 ] != 0 )
+	if( state->chiptype[ 0 ] != 0 )
 	{
 		/* security cart */
 		psx_sio_input( machine, 1, PSX_SIO_IN_DSR, PSX_SIO_IN_DSR );
 	}
 
-	flash_bank = -1;
+	state->flash_bank = -1;
 }
 
 static void spu_irq(running_device *device, UINT32 data)
@@ -1543,7 +1626,6 @@ static void spu_irq(running_device *device, UINT32 data)
 
 static const psx_spu_interface konami573_psxspu_interface =
 {
-	&g_p_n_psxram,
 	spu_irq,
 	psx_dma_install_read_handler,
 	psx_dma_install_write_handler
@@ -1551,37 +1633,41 @@ static const psx_spu_interface konami573_psxspu_interface =
 
 static void update_mode( running_machine *machine )
 {
-	int cart = input_port_read(machine,  "CART" );
-	int cd = input_port_read(machine,  "CD" );
-	static SCSIInstance *new_cdrom;
+	ksys573_state *state = machine->driver_data<ksys573_state>();
+	int cart = input_port_read(machine, "CART");
+	int cd = input_port_read( machine, "CD" );
+	SCSIInstance *new_cdrom;
 
-	if( chiptype[ 1 ] != 0 )
+	if( state->chiptype[ 1 ] != 0 )
 	{
-		security_cart_number = cart;
+		state->security_cart_number = cart;
 	}
 	else
 	{
-		security_cart_number = 0;
+		state->security_cart_number = 0;
 	}
 
-	if( available_cdroms[ 1 ] != NULL )
+	if( state->available_cdroms[ 1 ] != NULL )
 	{
-		new_cdrom = available_cdroms[ cd ];
+		new_cdrom = state->available_cdroms[ cd ];
 	}
 	else
 	{
-		new_cdrom = available_cdroms[ 0 ];
+		new_cdrom = state->available_cdroms[ 0 ];
 	}
 
-	if( inserted_cdrom != new_cdrom )
+	if( state->inserted_cdrom != new_cdrom )
 	{
-		inserted_cdrom = new_cdrom;
-		cdda_set_cdrom(machine->device("cdda"), atapi_get_device());
+		state->inserted_cdrom = new_cdrom;
+		cdda_set_cdrom(machine->device("cdda"), atapi_get_device(machine));
 	}
 }
 
 static INTERRUPT_GEN( sys573_vblank )
 {
+	ksys573_state *state = device->machine->driver_data<ksys573_state>();
+	UINT32 *p_n_psxram = state->p_n_psxram;
+
 	update_mode(device->machine);
 
 	if( strcmp( device->machine->gamedrv->name, "ddr2ml" ) == 0 )
@@ -1589,10 +1675,10 @@ static INTERRUPT_GEN( sys573_vblank )
 		/* patch out security-plate error */
 
 		/* 8001f850: jal $8003221c */
-		if( g_p_n_psxram[ 0x1f850 / 4 ] == 0x0c00c887 )
+		if( p_n_psxram[ 0x1f850 / 4 ] == 0x0c00c887 )
 		{
 			/* 8001f850: j $8001f888 */
-			g_p_n_psxram[ 0x1f850 / 4 ] = 0x08007e22;
+			p_n_psxram[ 0x1f850 / 4 ] = 0x08007e22;
 		}
 	}
 
@@ -1699,9 +1785,6 @@ Analogue I/O board
 
 */
 
-static UINT8 gx700pwbf_output_data[ 4 ];
-static void (*gx700pwfbf_output_callback)( running_machine *machine, int offset, int data );
-
 static READ32_HANDLER( gx700pwbf_io_r )
 {
 	UINT32 data = 0;
@@ -1735,21 +1818,23 @@ static READ32_HANDLER( gx700pwbf_io_r )
 
 static void gx700pwbf_output( running_machine *machine, int offset, UINT8 data )
 {
-	if( gx700pwfbf_output_callback != NULL )
+	ksys573_state *state = machine->driver_data<ksys573_state>();
+
+	if( state->gx700pwfbf_output_callback != NULL )
 	{
 		int i;
 		static const int shift[] = { 7, 6, 1, 0, 5, 4, 3, 2 };
 		for( i = 0; i < 8; i++ )
 		{
-			int oldbit = ( gx700pwbf_output_data[ offset ] >> shift[ i ] ) & 1;
+			int oldbit = ( state->gx700pwbf_output_data[ offset ] >> shift[ i ] ) & 1;
 			int newbit = ( data >> shift[ i ] ) & 1;
 			if( oldbit != newbit )
 			{
-				gx700pwfbf_output_callback( machine, ( offset * 8 ) + i, newbit );
+				(*state->gx700pwfbf_output_callback)( machine, ( offset * 8 ) + i, newbit );
 			}
 		}
 	}
-	gx700pwbf_output_data[ offset ] = data;
+	state->gx700pwbf_output_data[ offset ] = data;
 }
 
 static WRITE32_HANDLER( gx700pwbf_io_w )
@@ -1795,13 +1880,15 @@ static WRITE32_HANDLER( gx700pwbf_io_w )
 
 static void gx700pwfbf_init( running_machine *machine, void (*output_callback_func)( running_machine *machine, int offset, int data ) )
 {
-	memset( gx700pwbf_output_data, 0, sizeof( gx700pwbf_output_data ) );
+	ksys573_state *state = machine->driver_data<ksys573_state>();
 
-	gx700pwfbf_output_callback = output_callback_func;
+	memset( state->gx700pwbf_output_data, 0, sizeof( state->gx700pwbf_output_data ) );
+
+	state->gx700pwfbf_output_callback = output_callback_func;
 
 	memory_install_readwrite32_handler( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f640000, 0x1f6400ff, 0, 0, gx700pwbf_io_r, gx700pwbf_io_w );
 
-	state_save_register_global_array(machine,  gx700pwbf_output_data );
+	state_save_register_global_array( machine, state->gx700pwbf_output_data );
 }
 
 /*
@@ -1812,19 +1899,8 @@ DDR Stage Multiplexor
 
 */
 
-static UINT32 stage_mask;
-
 #define DDR_STAGE_IDLE ( 0 )
 #define DDR_STAGE_INIT ( 1 )
-
-static struct
-{
-	int DO;
-	int clk;
-	int shift;
-	int state;
-	int bit;
-} stage[ 2 ];
 
 static const int mask[] =
 {
@@ -1836,61 +1912,67 @@ static const int mask[] =
 	0, 4, 0, 6
 };
 
-static void gn845pwbb_do_w( int offset, int data )
+static void gn845pwbb_do_w( running_machine *machine, int offset, int data )
 {
-	stage[ offset ].DO = !data;
+	ksys573_state *state = machine->driver_data<ksys573_state>();
+
+	state->stage[ offset ].DO = !data;
 }
 
 static void gn845pwbb_clk_w( running_machine *machine, int offset, int data )
 {
+	ksys573_state *state = machine->driver_data<ksys573_state>();
 	int clk = !data;
 
-	if( clk != stage[ offset ].clk )
+	if( clk != state->stage[ offset ].clk )
 	{
-		stage[ offset ].clk = clk;
+		state->stage[ offset ].clk = clk;
 
 		if( clk )
 		{
-			stage[ offset ].shift = ( stage[ offset ].shift >> 1 ) | ( stage[ offset ].DO << 12 );
+			state->stage[ offset ].shift = ( state->stage[ offset ].shift >> 1 ) | ( state->stage[ offset ].DO << 12 );
 
-			switch( stage[ offset ].state )
+			switch( state->stage[ offset ].state )
 			{
 			case DDR_STAGE_IDLE:
-				if( stage[ offset ].shift == 0xc90 )
+				if( state->stage[ offset ].shift == 0xc90 )
 				{
-					stage[ offset ].state = DDR_STAGE_INIT;
-					stage[ offset ].bit = 0;
-					stage_mask = 0xfffff9f9;
+					state->stage[ offset ].state = DDR_STAGE_INIT;
+					state->stage[ offset ].bit = 0;
+					state->stage_mask = 0xfffff9f9;
 				}
 				break;
 
 			case DDR_STAGE_INIT:
-				stage[ offset ].bit++;
-				if( stage[ offset ].bit < 22 )
+				state->stage[ offset ].bit++;
+				if( state->stage[ offset ].bit < 22 )
 				{
-					int a = ( ( ( ( ~0x06 ) | mask[ stage[ 0 ].bit ] ) & 0xff ) << 8 );
-					int b = ( ( ( ( ~0x06 ) | mask[ stage[ 1 ].bit ] ) & 0xff ) << 0 );
+					int a = ( ( ( ( ~0x06 ) | mask[ state->stage[ 0 ].bit ] ) & 0xff ) << 8 );
+					int b = ( ( ( ( ~0x06 ) | mask[ state->stage[ 1 ].bit ] ) & 0xff ) << 0 );
 
-					stage_mask = 0xffff0000 | a | b;
+					state->stage_mask = 0xffff0000 | a | b;
 				}
 				else
 				{
-					stage[ offset ].bit = 0;
-					stage[ offset ].state = DDR_STAGE_IDLE;
+					state->stage[ offset ].bit = 0;
+					state->stage[ offset ].state = DDR_STAGE_IDLE;
 
-					stage_mask = 0xffffffff;
+					state->stage_mask = 0xffffffff;
 				}
 				break;
 			}
 		}
 	}
 
-	verboselog( machine, 2, "stage: %dp data clk=%d state=%d d0=%d shift=%08x bit=%d stage_mask=%08x\n", offset + 1, clk, stage[ offset ].state, stage[ offset ].DO, stage[ offset ].shift, stage[ offset ].bit, stage_mask );
+	verboselog( machine, 2, "stage: %dp data clk=%d state=%d d0=%d shift=%08x bit=%d stage_mask=%08x\n", offset + 1, clk,
+		state->stage[ offset ].state, state->stage[ offset ].DO, state->stage[ offset ].shift, state->stage[ offset ].bit, state->stage_mask );
 }
 
 static CUSTOM_INPUT( gn845pwbb_read )
 {
-	return input_port_read(field->port->machine,  "STAGE" ) & stage_mask;
+	ksys573_state *state = field->port->machine->driver_data<ksys573_state>();
+
+	return input_port_read(field->port->machine, "STAGE") & state->stage_mask;
 }
 
 static void gn845pwbb_output_callback( running_machine *machine, int offset, int data )
@@ -1914,7 +1996,7 @@ static void gn845pwbb_output_callback( running_machine *machine, int offset, int
 		break;
 
 	case 4:
-		gn845pwbb_do_w( 0, !data );
+		gn845pwbb_do_w( machine, 0, !data );
 		break;
 
 	case 7:
@@ -1938,7 +2020,7 @@ static void gn845pwbb_output_callback( running_machine *machine, int offset, int
 		break;
 
 	case 12:
-		gn845pwbb_do_w( 1, !data );
+		gn845pwbb_do_w( machine, 1, !data );
 		break;
 
 	case 15:
@@ -1982,12 +2064,14 @@ static void gn845pwbb_output_callback( running_machine *machine, int offset, int
 
 static DRIVER_INIT( ddr )
 {
+	ksys573_state *state = machine->driver_data<ksys573_state>();
+
 	DRIVER_INIT_CALL(konami573);
 
-	stage_mask = 0xffffffff;
+	state->stage_mask = 0xffffffff;
 	gx700pwfbf_init( machine, gn845pwbb_output_callback );
 
-	state_save_register_global(machine,  stage_mask );
+	state_save_register_global( machine, state->stage_mask );
 }
 
 /*
@@ -2053,13 +2137,11 @@ static const UINT8 ds2401_xid[] =
 	0x3d, 0xbc, 0x9a, 0x78, 0x56, 0x34, 0x12, 0x01
 };
 
-static UINT32 gx894_ram_write_offset;
-static UINT32 gx894_ram_read_offset;
-static UINT16 *gx894_ram;
-
 static READ32_HANDLER( gx894pwbba_r )
 {
+	ksys573_state *state = space->machine->driver_data<ksys573_state>();
 	UINT32 data = 0;
+
 	switch( offset )
 	{
 	case 0x00:
@@ -2086,9 +2168,9 @@ static READ32_HANDLER( gx894pwbba_r )
 	case 0x2d:
 		if( ACCESSING_BITS_0_15 )
 		{
-			data |= gx894_ram[ gx894_ram_read_offset / 2 ];
-//          printf( "reading %08x %04x\r", gx894_ram_read_offset, gx894_ram[ gx894_ram_read_offset / 2 ] );
-			gx894_ram_read_offset += 2;
+			data |= state->gx894_ram[ state->gx894_ram_read_offset / 2 ];
+//          printf( "reading %08x %04x\r", state->gx894_ram_read_offset, state->gx894_ram[ state->gx894_ram_read_offset / 2 ] );
+			state->gx894_ram_read_offset += 2;
 		}
 		if( ACCESSING_BITS_16_31 )
 		{
@@ -2159,9 +2241,8 @@ static READ32_HANDLER( gx894pwbba_r )
 	return data;
 }
 
-static char *binary( UINT32 data )
+static char *binary( char *s, UINT32 data )
 {
-	static char s[ 33 ];
 	int i;
 	for( i = 0; i < 32; i++ )
 	{
@@ -2171,33 +2252,32 @@ static char *binary( UINT32 data )
 	return s;
 }
 
-static UINT32 a,b,c,d;
-
-static UINT16 gx894pwbba_output_data[ 8 ];
-static void (*gx894pwbba_output_callback)( running_machine *machine, int offset, int data );
-
 static void gx894pwbba_output( running_machine *machine, int offset, UINT8 data )
 {
-	if( gx894pwbba_output_callback != NULL )
+	ksys573_state *state = machine->driver_data<ksys573_state>();
+
+	if( state->gx894pwbba_output_callback != NULL )
 	{
 		int i;
 		static const int shift[] = { 0, 2, 3, 1 };
 		for( i = 0; i < 4; i++ )
 		{
-			int oldbit = ( gx894pwbba_output_data[ offset ] >> shift[ i ] ) & 1;
+			int oldbit = ( state->gx894pwbba_output_data[ offset ] >> shift[ i ] ) & 1;
 			int newbit = ( data >> shift[ i ] ) & 1;
 			if( oldbit != newbit )
 			{
-				gx894pwbba_output_callback( machine, ( offset * 4 ) + i, newbit );
+				(*state->gx894pwbba_output_callback)( machine, ( offset * 4 ) + i, newbit );
 			}
 		}
 	}
-	gx894pwbba_output_data[ offset ] = data;
+	state->gx894pwbba_output_data[ offset ] = data;
 }
 
 static WRITE32_HANDLER( gx894pwbba_w )
 {
-	UINT32 olda=a,oldb=b,oldc=c,oldd=d;
+	ksys573_state *state = space->machine->driver_data<ksys573_state>();
+	char buff[33];
+	UINT32 olda=state->a,oldb=state->b,oldc=state->c,oldd=state->d;
 
 //  printf( "gx894pwbba_w( %08x, %08x, %08x )\n", offset, mem_mask, data );
 
@@ -2206,7 +2286,7 @@ static WRITE32_HANDLER( gx894pwbba_w )
 		return;
 	}
 
-	verboselog( space->machine, 2, "gx894pwbba_w( %08x, %08x, %08x) %s\n", offset, mem_mask, data, binary( data ) );
+	verboselog( space->machine, 2, "gx894pwbba_w( %08x, %08x, %08x) %s\n", offset, mem_mask, data, binary( buff, data ) );
 
 	switch( offset )
 	{
@@ -2216,33 +2296,33 @@ static WRITE32_HANDLER( gx894pwbba_w )
 	case 0x2c:
 		if( ACCESSING_BITS_0_15 )
 		{
-			gx894_ram_write_offset &= 0x0000ffff;
-			gx894_ram_write_offset |= ( data & 0x0000ffff ) << 16;
+			state->gx894_ram_write_offset &= 0x0000ffff;
+			state->gx894_ram_write_offset |= ( data & 0x0000ffff ) << 16;
 		}
 		if( ACCESSING_BITS_16_31 )
 		{
-			gx894_ram_write_offset &= 0xffff0000;
-			gx894_ram_write_offset |= ( data & 0xffff0000 ) >> 16;
+			state->gx894_ram_write_offset &= 0xffff0000;
+			state->gx894_ram_write_offset |= ( data & 0xffff0000 ) >> 16;
 		}
 		break;
 	case 0x2d:
 		if( ACCESSING_BITS_0_15 )
 		{
-			gx894_ram[ gx894_ram_write_offset / 2 ] = data & 0xffff;
-//          printf( "writing %08x %04x\r", gx894_ram_write_offset, gx894_ram[ gx894_ram_write_offset / 2 ] );
-			gx894_ram_write_offset += 2;
+			state->gx894_ram[ state->gx894_ram_write_offset / 2 ] = data & 0xffff;
+//          printf( "writing %08x %04x\r", state->gx894_ram_write_offset, state->gx894_ram[ state->gx894_ram_write_offset / 2 ] );
+			state->gx894_ram_write_offset += 2;
 		}
 		if( ACCESSING_BITS_16_31 )
 		{
-			gx894_ram_read_offset &= 0x0000ffff;
-			gx894_ram_read_offset |= ( data & 0xffff0000 ) << 0;
+			state->gx894_ram_read_offset &= 0x0000ffff;
+			state->gx894_ram_read_offset |= ( data & 0xffff0000 ) << 0;
 		}
 		break;
 	case 0x2e:
 		if( ACCESSING_BITS_0_15 )
 		{
-			gx894_ram_read_offset &= 0xffff0000;
-			gx894_ram_read_offset |= ( data & 0x0000ffff ) >> 0;
+			state->gx894_ram_read_offset &= 0xffff0000;
+			state->gx894_ram_read_offset |= ( data & 0x0000ffff ) >> 0;
 		}
 		if( ACCESSING_BITS_16_31 )
 		{
@@ -2258,7 +2338,7 @@ static WRITE32_HANDLER( gx894pwbba_w )
 		{
 			gx894pwbba_output( space->machine, 1, ( data >> 12 ) & 0xf );
 		}
-		COMBINE_DATA( &a );
+		COMBINE_DATA( &state->a );
 		break;
 	case 0x39:
 		if( ACCESSING_BITS_16_31 )
@@ -2269,7 +2349,7 @@ static WRITE32_HANDLER( gx894pwbba_w )
 		{
 			gx894pwbba_output( space->machine, 3, ( data >> 12 ) & 0xf );
 		}
-		COMBINE_DATA( &b );
+		COMBINE_DATA( &state->b );
 		break;
 	case 0x3b:
 		if( ACCESSING_BITS_16_31 )
@@ -2285,19 +2365,15 @@ static WRITE32_HANDLER( gx894pwbba_w )
 			/* 14 */
 			/* 15 */
 
-			static int s = 0;
-			static int b = 0;
-			static int o = 0;
-
 			/* fpga */
-			s = ( s >> 1 ) | ( ( data & 0x8000 ) >> 8 );
-			b++;
-			if( b == 8 )
+			state->s = ( state->s >> 1 ) | ( ( data & 0x8000 ) >> 8 );
+			state->f++;
+			if( state->f == 8 )
 			{
 //              printf( "%04x %02x\n", o, s );
-				c = 0;
-				b = 0;
-				o++;
+				state->c = 0;
+				state->f = 0;
+				state->o++;
 			}
 		}
 
@@ -2305,7 +2381,7 @@ static WRITE32_HANDLER( gx894pwbba_w )
 		{
 			gx894pwbba_output( space->machine, 4, ( data >> 28 ) & 0xf );
 		}
-		COMBINE_DATA( &c );
+		COMBINE_DATA( &state->c );
 		break;
 	case 0x3f:
 		if( ACCESSING_BITS_16_31 )
@@ -2316,13 +2392,13 @@ static WRITE32_HANDLER( gx894pwbba_w )
 		{
 			gx894pwbba_output( space->machine, 5, ( data >> 12 ) & 0xf );
 		}
-		COMBINE_DATA( &d );
+		COMBINE_DATA( &state->d );
 		break;
 	default:
 //      printf( "write offset %08x\n", offset );
 		break;
 	}
-	if( a != olda || b != oldb || c != oldc || d != oldd )
+	if( state->a != olda || state->b != oldb || state->c != oldc || state->d != oldd )
 	{
 //      printf( "%08x %08x %08x %08x\n", a, b, c, d );
 	}
@@ -2330,20 +2406,21 @@ static WRITE32_HANDLER( gx894pwbba_w )
 
 static void gx894pwbba_init( running_machine *machine, void (*output_callback_func)( running_machine *machine, int offset, int data ) )
 {
+	ksys573_state *state = machine->driver_data<ksys573_state>();
 	int gx894_ram_size = 24 * 1024 * 1024;
 
-	gx894pwbba_output_callback = output_callback_func;
+	state->gx894pwbba_output_callback = output_callback_func;
 
 	memory_install_readwrite32_handler( cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f640000, 0x1f6400ff, 0, 0, gx894pwbba_r, gx894pwbba_w );
 
-	gx894_ram_write_offset = 0;
-	gx894_ram_read_offset = 0;
-	gx894_ram = auto_alloc_array(machine, UINT16,  gx894_ram_size/2);
+	state->gx894_ram_write_offset = 0;
+	state->gx894_ram_read_offset = 0;
+	state->gx894_ram = auto_alloc_array( machine, UINT16, gx894_ram_size/2 );
 
 	ds2401_init( machine, 2, ds2401_xid ); /* todo: load this from roms */
 
-	state_save_register_global_array(machine,  gx894pwbba_output_data );
-	state_save_register_global_pointer(machine,  gx894_ram, gx894_ram_size / 4 );
+	state_save_register_global_array( machine, state->gx894pwbba_output_data );
+	state_save_register_global_pointer( machine, state->gx894_ram, gx894_ram_size / 4 );
 }
 
 /* ddr digital */
@@ -2661,50 +2738,47 @@ static DRIVER_INIT( dmx )
 
 /* salary man champ */
 
-static int salarymc_lamp_bits;
-static int salarymc_lamp_shift;
-static int salarymc_lamp_clk;
-
 static void salarymc_lamp_callback( running_machine *machine, int data )
 {
+	ksys573_state *state = machine->driver_data<ksys573_state>();
 	int d = ( data >> 7 ) & 1;
 	int rst = ( data >> 6 ) & 1;
 	int clk = ( data >> 5 ) & 1;
 
 	if( rst )
 	{
-		salarymc_lamp_bits = 0;
-		salarymc_lamp_shift = 0;
+		state->salarymc_lamp_bits = 0;
+		state->salarymc_lamp_shift = 0;
 	}
 
-	if( salarymc_lamp_clk != clk )
+	if( state->salarymc_lamp_clk != clk )
 	{
-		salarymc_lamp_clk = clk;
+		state->salarymc_lamp_clk = clk;
 
-		if( salarymc_lamp_clk )
+		if( state->salarymc_lamp_clk )
 		{
-			salarymc_lamp_shift <<= 1;
+			state->salarymc_lamp_shift <<= 1;
 
-			salarymc_lamp_shift |= d;
+			state->salarymc_lamp_shift |= d;
 
-			salarymc_lamp_bits++;
-			if( salarymc_lamp_bits == 16 )
+			state->salarymc_lamp_bits++;
+			if( state->salarymc_lamp_bits == 16 )
 			{
-				if( ( salarymc_lamp_shift & ~0xe38 ) != 0 )
+				if( ( state->salarymc_lamp_shift & ~0xe38 ) != 0 )
 				{
-					verboselog( machine, 0, "unknown bits in salarymc_lamp_shift %08x\n", salarymc_lamp_shift & ~0xe38 );
+					verboselog( machine, 0, "unknown bits in salarymc_lamp_shift %08x\n", state->salarymc_lamp_shift & ~0xe38 );
 				}
 
-				output_set_value( "player 1 red", ( salarymc_lamp_shift >> 11 ) & 1 );
-				output_set_value( "player 1 green", ( salarymc_lamp_shift >> 10 ) & 1 );
-				output_set_value( "player 1 blue", ( salarymc_lamp_shift >> 9 ) & 1 );
+				output_set_value( "player 1 red", ( state->salarymc_lamp_shift >> 11 ) & 1 );
+				output_set_value( "player 1 green", ( state->salarymc_lamp_shift >> 10 ) & 1 );
+				output_set_value( "player 1 blue", ( state->salarymc_lamp_shift >> 9 ) & 1 );
 
-				output_set_value( "player 2 red", ( salarymc_lamp_shift >> 5 ) & 1 );
-				output_set_value( "player 2 green", ( salarymc_lamp_shift >> 4 ) & 1 );
-				output_set_value( "player 2 blue", ( salarymc_lamp_shift >> 3 ) & 1 );
+				output_set_value( "player 2 red", ( state->salarymc_lamp_shift >> 5 ) & 1 );
+				output_set_value( "player 2 green", ( state->salarymc_lamp_shift >> 4 ) & 1 );
+				output_set_value( "player 2 blue", ( state->salarymc_lamp_shift >> 3 ) & 1 );
 
-				salarymc_lamp_bits = 0;
-				salarymc_lamp_shift = 0;
+				state->salarymc_lamp_bits = 0;
+				state->salarymc_lamp_shift = 0;
 			}
 		}
 	}
@@ -2712,55 +2786,57 @@ static void salarymc_lamp_callback( running_machine *machine, int data )
 
 static DRIVER_INIT( salarymc )
 {
+	ksys573_state *state = machine->driver_data<ksys573_state>();
+
 	DRIVER_INIT_CALL(konami573);
 
-	security_callback = salarymc_lamp_callback;
+	state->security_callback = salarymc_lamp_callback;
 
-	state_save_register_global(machine,  salarymc_lamp_bits );
-	state_save_register_global(machine,  salarymc_lamp_shift );
-	state_save_register_global(machine,  salarymc_lamp_clk );
+	state_save_register_global( machine, state->salarymc_lamp_bits );
+	state_save_register_global( machine, state->salarymc_lamp_shift );
+	state_save_register_global( machine, state->salarymc_lamp_clk );
 }
 
 /* Hyper Bishi Bashi Champ */
 
-static int hyperbbc_lamp_strobe1;
-static int hyperbbc_lamp_strobe2;
-
 static void hyperbbc_lamp_callback( running_machine *machine, int data )
 {
+	ksys573_state *state = machine->driver_data<ksys573_state>();
 	int red = ( data >> 6 ) & 1;
 	int blue = ( data >> 5 ) & 1;
 	int green = ( data >> 4 ) & 1;
 	int strobe1 = ( data >> 3 ) & 1;
 	int strobe2 = ( data >> 0 ) & 1;
 
-	if( strobe1 && !hyperbbc_lamp_strobe1 )
+	if( strobe1 && !state->hyperbbc_lamp_strobe1 )
 	{
 		output_set_value( "player 1 red", red );
 		output_set_value( "player 1 green", green );
 		output_set_value( "player 1 blue", blue );
 	}
 
-	hyperbbc_lamp_strobe1 = strobe1;
+	state->hyperbbc_lamp_strobe1 = strobe1;
 
-	if( strobe2 && !hyperbbc_lamp_strobe2 )
+	if( strobe2 && !state->hyperbbc_lamp_strobe2 )
 	{
 		output_set_value( "player 2 red", red );
 		output_set_value( "player 2 green", green );
 		output_set_value( "player 2 blue", blue );
 	}
 
-	hyperbbc_lamp_strobe2 = strobe2;
+	state->hyperbbc_lamp_strobe2 = strobe2;
 }
 
 static DRIVER_INIT( hyperbbc )
 {
+	ksys573_state *state = machine->driver_data<ksys573_state>();
+
 	DRIVER_INIT_CALL(konami573);
 
-	security_callback = hyperbbc_lamp_callback;
+	state->security_callback = hyperbbc_lamp_callback;
 
-	state_save_register_global(machine,  hyperbbc_lamp_strobe1 );
-	state_save_register_global(machine,  hyperbbc_lamp_strobe2 );
+	state_save_register_global( machine, state->hyperbbc_lamp_strobe1 );
+	state_save_register_global( machine, state->hyperbbc_lamp_strobe2 );
 }
 
 
@@ -2771,13 +2847,13 @@ static double analogue_inputs_callback( running_device *device, UINT8 input )
 	switch (input)
 	{
 	case ADC083X_CH0:
-		return (double)(5 * input_port_read_safe(device->machine,  "analog0", 0)) / 255.0;
+		return (double)(5 * input_port_read_safe( device->machine, "analog0", 0 )) / 255.0;
 	case ADC083X_CH1:
-		return (double)(5 * input_port_read_safe(device->machine,  "analog1", 0)) / 255.0;
+		return (double)(5 * input_port_read_safe( device->machine, "analog1", 0 )) / 255.0;
 	case ADC083X_CH2:
-		return (double)(5 * input_port_read_safe(device->machine,  "analog2", 0)) / 255.0;
+		return (double)(5 * input_port_read_safe( device->machine, "analog2", 0 )) / 255.0;
 	case ADC083X_CH3:
-		return (double)(5 * input_port_read_safe(device->machine,  "analog3", 0)) / 255.0;
+		return (double)(5 * input_port_read_safe( device->machine, "analog3", 0 )) / 255.0;
 	case ADC083X_AGND:
 		return 0;
 	case ADC083X_VREF:
@@ -2791,9 +2867,9 @@ static const adc083x_interface konami573_adc_interface = {
 	analogue_inputs_callback
 };
 
-static MACHINE_CONFIG_START( konami573, driver_device )
+static MACHINE_CONFIG_START( konami573, ksys573_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",  PSXCPU, XTAL_67_7376MHz )
+	MDRV_CPU_ADD( "maincpu", PSXCPU, XTAL_67_7376MHz )
 	MDRV_CPU_PROGRAM_MAP( konami573_map)
 	MDRV_CPU_VBLANK_INT("screen", sys573_vblank)
 
