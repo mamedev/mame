@@ -348,7 +348,7 @@ void console_create_window(running_machine *machine)
 		return nil;
 	type = t;
 	machine = m;
-	view = machine->m_debug_view->alloc_view((debug_view_type)type, debugwin_view_update, self);
+	view = machine->debug_view().alloc_view((debug_view_type)type, debugwin_view_update, self);
 	if (view == nil) {
 		[self release];
 		return nil;
