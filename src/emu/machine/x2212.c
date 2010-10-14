@@ -16,7 +16,11 @@
 
 const device_type X2212 = x2212_device_config::static_alloc_device_config;
 
-static ADDRESS_MAP_START( x2212_map, ADDRESS_SPACE_PROGRAM, 8 )
+static ADDRESS_MAP_START( x2212_sram_map, ADDRESS_SPACE_0, 8 )
+	AM_RANGE(0x0000, 0x00ff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( x2212_e2prom_map, ADDRESS_SPACE_1, 8 )
 	AM_RANGE(0x0000, 0x00ff) AM_RAM
 ADDRESS_MAP_END
 
@@ -34,8 +38,8 @@ x2212_device_config::x2212_device_config(const machine_config &mconfig, const ch
 	: device_config(mconfig, static_alloc_device_config, "X2212", tag, owner, clock),
 	  device_config_memory_interface(mconfig, *this),
 	  device_config_nvram_interface(mconfig, *this),
-	  m_sram_space_config("SRAM", ENDIANNESS_BIG, 8, 8, 0, *ADDRESS_MAP_NAME(x2212_map)),
-	  m_e2prom_space_config("E2PROM", ENDIANNESS_BIG, 8, 8, 0, *ADDRESS_MAP_NAME(x2212_map)),
+	  m_sram_space_config("SRAM", ENDIANNESS_BIG, 8, 8, 0, *ADDRESS_MAP_NAME(x2212_sram_map)),
+	  m_e2prom_space_config("E2PROM", ENDIANNESS_BIG, 8, 8, 0, *ADDRESS_MAP_NAME(x2212_e2prom_map)),
 	  m_auto_save(false)
 {
 }
