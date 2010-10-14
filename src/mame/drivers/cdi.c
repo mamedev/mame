@@ -122,7 +122,7 @@ static INPUT_CHANGED( mcu_input )
 
 	if(send)
 	{
-		UINT8 data = (UINT8)((UINT32)param & 0x000000ff);
+		UINT8 data = (UINT8)((FPTR)param & 0x000000ff);
 		scc68070_quizard_rx(field->port->machine, scc68070, data);
 	}
 }
