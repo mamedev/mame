@@ -548,11 +548,11 @@ public:
 	void set_layer_config(int layerconfig);
 	void set_view(int viewindex);
 	void set_max_texture_size(int maxwidth, int maxheight);
-	void set_backdrops_enabled(bool enable) { if (enable) m_layerconfig |= LAYER_CONFIG_ENABLE_BACKDROP; else m_layerconfig &= ~LAYER_CONFIG_ENABLE_BACKDROP; }
-	void set_overlays_enabled(bool enable) { if (enable) m_layerconfig |= LAYER_CONFIG_ENABLE_OVERLAY; else m_layerconfig &= ~LAYER_CONFIG_ENABLE_OVERLAY; }
-	void set_bezels_enabled(bool enable) { if (enable) m_layerconfig |= LAYER_CONFIG_ENABLE_BEZEL; else m_layerconfig &= ~LAYER_CONFIG_ENABLE_BEZEL; }
-	void set_screen_overlay_enabled(bool enable) { if (enable) m_layerconfig |= LAYER_CONFIG_ENABLE_SCREEN_OVERLAY; else m_layerconfig &= ~LAYER_CONFIG_ENABLE_SCREEN_OVERLAY; }
-	void set_zoom_to_screen(bool zoom) { if (zoom) m_layerconfig |= LAYER_CONFIG_ZOOM_TO_SCREEN; else m_layerconfig &= ~LAYER_CONFIG_ZOOM_TO_SCREEN; }
+	void set_backdrops_enabled(bool enable) { set_layer_config(enable ? (m_layerconfig | LAYER_CONFIG_ENABLE_BACKDROP) : (m_layerconfig & ~LAYER_CONFIG_ENABLE_BACKDROP)); }
+	void set_overlays_enabled(bool enable) { set_layer_config(enable ? (m_layerconfig | LAYER_CONFIG_ENABLE_OVERLAY) : (m_layerconfig & ~LAYER_CONFIG_ENABLE_OVERLAY)); }
+	void set_bezels_enabled(bool enable) { set_layer_config(enable ? (m_layerconfig | LAYER_CONFIG_ENABLE_BEZEL) : (m_layerconfig & ~LAYER_CONFIG_ENABLE_BEZEL)); }
+	void set_screen_overlay_enabled(bool enable) { set_layer_config(enable ? (m_layerconfig | LAYER_CONFIG_ENABLE_SCREEN_OVERLAY) : (m_layerconfig & ~LAYER_CONFIG_ENABLE_SCREEN_OVERLAY)); }
+	void set_zoom_to_screen(bool zoom) { set_layer_config(zoom ? (m_layerconfig | LAYER_CONFIG_ZOOM_TO_SCREEN) : (m_layerconfig & ~LAYER_CONFIG_ZOOM_TO_SCREEN)); }
 
 	// view information
 	const char *view_name(int viewindex);
