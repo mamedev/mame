@@ -2681,7 +2681,7 @@ static READ16_HANDLER( _32x_dreq_common_r )
 
 			current_fifo_read_pos++;
 
-		//  printf("reading FIFO!\n");
+		//	printf("reading FIFO!\n");
 
 			if (current_fifo_readblock == fifo_block_a && !fifo_block_a_full)
 				printf("Fifo block a isn't filled!\n");
@@ -2741,7 +2741,7 @@ static WRITE16_HANDLER( _32x_dreq_common_w )
 			dreq_src_addr[offset&1] = ((offset&1) == 0) ? (data & 0xff) : (data & 0xfffe);
 
 			//if((dreq_src_addr[0]<<16)|dreq_src_addr[1])
-			//  printf("DREQ set SRC = %08x\n",(dreq_src_addr[0]<<16)|dreq_src_addr[1]);
+			//	printf("DREQ set SRC = %08x\n",(dreq_src_addr[0]<<16)|dreq_src_addr[1]);
 
 			break;
 
@@ -2756,7 +2756,7 @@ static WRITE16_HANDLER( _32x_dreq_common_w )
 			dreq_dst_addr[offset&1] = ((offset&1) == 0) ? (data & 0xff) : (data & 0xffff);
 
 			//if((dreq_dst_addr[0]<<16)|dreq_dst_addr[1])
-			//  printf("DREQ set DST = %08x\n",(dreq_dst_addr[0]<<16)|dreq_dst_addr[1]);
+			//	printf("DREQ set DST = %08x\n",(dreq_dst_addr[0]<<16)|dreq_dst_addr[1]);
 
 			break;
 
@@ -2769,8 +2769,8 @@ static WRITE16_HANDLER( _32x_dreq_common_w )
 
 			dreq_size = data & 0xfffc;
 
-			//  if(dreq_size)
-			//      printf("DREQ set SIZE = %04x\n",dreq_size);
+			//	if(dreq_size)
+			//		printf("DREQ set SIZE = %04x\n",dreq_size);
 
 			break;
 
@@ -3208,7 +3208,7 @@ static READ16_HANDLER( _32x_common_vdp_regs_r )
 
 
 
-//  printf("_32x_68k_a15180_r (a15180) %04x\n",mem_mask);
+//	printf("_32x_68k_a15180_r (a15180) %04x\n",mem_mask);
 
 	// read needs authorization too I think, undefined behavior otherwise
 	switch (offset)
@@ -3382,7 +3382,7 @@ static WRITE16_HANDLER( _32x_common_vdp_regs_w )
 
 		case 0x0a/2:
 			// bit 0 is the framebuffer select, change is delayed until vblank;
-		//  _32x_a1518a_reg = (_32x_a1518a_reg & 0xfffe);
+		//	_32x_a1518a_reg = (_32x_a1518a_reg & 0xfffe);
 			if (ACCESSING_BITS_0_7)
 			{
 				_32x_fb_swap = data & 1;
@@ -3861,7 +3861,7 @@ static UINT16 segacd_stampmap_base_address;
 static UINT16 segacd_imagebuffer_start_address;
 static UINT16 segacd_imagebuffer_offset;
 static tilemap_t    *segacd_stampmap[4];
-static void segacd_mark_stampmaps_dirty(void);
+//static void segacd_mark_stampmaps_dirty(void);
 
 
 static WRITE16_HANDLER( scd_a12000_halt_reset_w )
@@ -3979,7 +3979,7 @@ static WRITE16_HANDLER( scd_a12002_memory_mode_w )
 static READ16_HANDLER( segacd_sub_memory_mode_r )
 {
 	return (segacd_ram_writeprotect_bits << 8) |
-		 /*(segacd_4meg_prgbank << 6) | */
+	 	 /*(segacd_4meg_prgbank << 6) | */
 		   (segacd_memory_priority_mode << 3) |
 		   (segacd_ram_mode << 2) |
 		   ((segacd_maincpu_has_ram_access^1) << 1) |
@@ -4309,7 +4309,7 @@ static WRITE16_HANDLER( segacd_main_dataram_part1_w )
 
 static READ16_HANDLER( scd_hint_vector_r )
 {
-//  printf("read HINT offset %d\n", offset);
+//	printf("read HINT offset %d\n", offset);
 
 	switch (offset&1)
 	{
@@ -4339,7 +4339,7 @@ static TIMER_CALLBACK( segacd_gfx_conversion_timer_callback )
 {
 	// todo irqmask
 
-	printf("segacd_gfx_conversion_timer_callback\n");
+	//printf("segacd_gfx_conversion_timer_callback\n");
 
 	if (segacd_irq_mask & 0x02)
 		cputag_set_input_line(machine, "segacd_68k", 1, HOLD_LINE);
@@ -4360,13 +4360,13 @@ static TIMER_CALLBACK( segacd_gfx_conversion_timer_callback )
 /*
 static const gfx_layout sega_8x8_layout =
 {
-    8,8,
-    SEGACD_NUM_TILES16,
-    4,
-    { 0,1,2,3 },
-    { 8,12,0,4,24,28,16,20 },
-    { 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-    8*32
+	8,8,
+	SEGACD_NUM_TILES16,
+	4,
+	{ 0,1,2,3 },
+	{ 8,12,0,4,24,28,16,20 },
+	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
+	8*32
 };
 */
 
@@ -4377,7 +4377,7 @@ static const gfx_layout sega_8x8_layout =
 #define _16x16_SEQUENCE_1_FLIP  { 512+20,512+16,512+28,512+24,512+4,512+0, 512+12,512+8, 20,16,28,24,4,0,12,8 },
 
 #define _16x16_SEQUENCE_2  { 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32, 8*32, 9*32,10*32,11*32,12*32,13*32,14*32,15*32 },
-#define _16x16_SEQUENCE_2_FLIP  { 16*32, 14*32, 13*32, 12*32, 11*32, 10*32, 9*32, 8*32, 7*32, 6*32, 5*32, 4*32, 3*32, 2*32, 1*32, 0*32 },
+#define _16x16_SEQUENCE_2_FLIP  { 15*32, 14*32, 13*32, 12*32, 11*32, 10*32, 9*32, 8*32, 7*32, 6*32, 5*32, 4*32, 3*32, 2*32, 1*32, 0*32 },
 
 
 #define _16x16_START \
@@ -4421,8 +4421,8 @@ static const gfx_layout sega_8x8_layout =
 
 #define _32x32_SEQUENCE_2 \
 		{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32, \
-    	8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32, \
-	 16*32,17*32,18*32,19*32,20*32,21*32,22*32,23*32, \
+     	8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32, \
+ 	 16*32,17*32,18*32,19*32,20*32,21*32,22*32,23*32, \
 	 24*32,25*32, 26*32, 27*32, 28*32, 29*32, 30*32, 31*32}, \
 
 #define _32x32_SEQUENCE_2_FLIP \
@@ -4552,12 +4552,14 @@ static void segacd_mark_tiles_dirty(running_machine* machine, int offset)
 	gfx_element_mark_dirty(machine->gfx[15],(offset*2)/(SEGACD_BYTES_PER_TILE32));
 }
 
+
 // mame specific.. map registers to which tilemap cache we use
 static int segacd_get_active_stampmap_tilemap(void)
 {
 	return (segacd_stampsize & 0x6)>>1;
 }
 
+#if 0
 static void segacd_mark_stampmaps_dirty(void)
 {
 	tilemap_mark_all_tiles_dirty(segacd_stampmap[segacd_get_active_stampmap_tilemap()]);
@@ -4567,70 +4569,245 @@ static void segacd_mark_stampmaps_dirty(void)
 	//tilemap_mark_all_tiles_dirty(segacd_stampmap[2]);
 	//tilemap_mark_all_tiles_dirty(segacd_stampmap[3]);
 }
+#endif
 
-static TILE_GET_INFO( get_stampmap_16x16_1x1_tile_info )
+void SCD_GET_TILE_INFO_16x16_1x1( int& tile_region, int& tileno, int tile_index )
 {
-	int tile_region = 0; // 16x16 tiles
+	tile_region = 0; // 16x16 tiles
 	int tile_base = (segacd_stampmap_base_address & 0xff80) * 4;
 
 	int tiledat = segacd_dataram[((tile_base>>1)+tile_index) & 0x1ffff];
-	int tileno = tiledat & 0x07ff;
+	tileno = tiledat & 0x07ff;
 	int xflip =  tiledat & 0x8000;
 	int roll  =  (tiledat & 0x6000)>>13;
 
 	if (xflip) tile_region += 4;
 	tile_region+=roll;
-
-	SET_TILE_INFO(tile_region, tileno, 0, 0);
 }
 
-static TILE_GET_INFO( get_stampmap_16x16_16x16_tile_info )
+void SCD_GET_TILE_INFO_32x32_1x1( int& tile_region, int& tileno, int tile_index )
 {
-	int tile_region = 0; // 16x16 tiles
+	tile_region = 8; // 32x32 tiles
+	int tile_base = (segacd_stampmap_base_address & 0xffe0) * 4;
+
+	int tiledat = segacd_dataram[((tile_base>>1)+tile_index) & 0x1ffff];
+	tileno = (tiledat & 0x07fc)>>2;
+	int xflip =  tiledat & 0x8000;
+	int roll  =  (tiledat & 0x6000)>>13;
+
+	if (xflip) tile_region += 4;
+	tile_region+=roll;
+}
+
+
+void SCD_GET_TILE_INFO_16x16_16x16( int& tile_region, int& tileno, int tile_index )
+{
+	tile_region = 0; // 16x16 tiles
 	int tile_base = (0x8000) * 4; // fixed address in this mode
 
 	int tiledat = segacd_dataram[((tile_base>>1)+tile_index) & 0x1ffff];
-	int tileno = tiledat & 0x07ff;
+	tileno = tiledat & 0x07ff;
 	int xflip =  tiledat & 0x8000;
 	int roll  =  (tiledat & 0x6000)>>13;
 
 	if (xflip) tile_region += 4;
 	tile_region+=roll;
+}
 
+
+void SCD_GET_TILE_INFO_32x32_16x16( int& tile_region, int& tileno, int tile_index )
+{
+	tile_region = 8; // 32x32 tiles
+	int tile_base = (segacd_stampmap_base_address & 0xe000) * 4;
+
+	int tiledat = segacd_dataram[((tile_base>>1)+tile_index) & 0x1ffff];
+	tileno = (tiledat & 0x07fc)>>2;
+	int xflip =  tiledat & 0x8000;
+	int roll  =  (tiledat & 0x6000)>>13;
+
+	if (xflip) tile_region += 4;
+	tile_region+=roll;
+}
+
+/* Tilemap callbacks (we don't actually use the tilemaps due to the excessive overhead */
+
+
+
+static TILE_GET_INFO( get_stampmap_16x16_1x1_tile_info )
+{
+	int tile_region, tileno;
+	SCD_GET_TILE_INFO_16x16_1x1(tile_region,tileno,(int)tile_index);
 	SET_TILE_INFO(tile_region, tileno, 0, 0);
 }
 
 static TILE_GET_INFO( get_stampmap_32x32_1x1_tile_info )
 {
-	int tile_region = 8; // 32x32 tiles
-	int tile_base = (segacd_stampmap_base_address & 0xffe0) * 4;
+	int tile_region, tileno;
+	SCD_GET_TILE_INFO_32x32_1x1(tile_region,tileno,(int)tile_index);
+	SET_TILE_INFO(tile_region, tileno, 0, 0);
+}
 
-	int tiledat = segacd_dataram[((tile_base>>1)+tile_index) & 0x1ffff];
-	int tileno = (tiledat & 0x07fc)>>2;
-	int xflip =  tiledat & 0x8000;
-	int roll  =  (tiledat & 0x6000)>>13;
 
-	if (xflip) tile_region += 4;
-	tile_region+=roll;
-
+static TILE_GET_INFO( get_stampmap_16x16_16x16_tile_info )
+{
+	int tile_region, tileno;
+	SCD_GET_TILE_INFO_16x16_16x16(tile_region,tileno,(int)tile_index);
 	SET_TILE_INFO(tile_region, tileno, 0, 0);
 }
 
 static TILE_GET_INFO( get_stampmap_32x32_16x16_tile_info )
 {
-	int tile_region = 8; // 32x32 tiles
-	int tile_base = (segacd_stampmap_base_address & 0xe000) * 4;
-
-	int tiledat = segacd_dataram[((tile_base>>1)+tile_index) & 0x1ffff];
-	int tileno = (tiledat & 0x07fc)>>2;
-	int xflip =  tiledat & 0x8000;
-	int roll  =  (tiledat & 0x6000)>>13;
-
-	if (xflip) tile_region += 4;
-	tile_region+=roll;
-
+	int tile_region, tileno;
+	SCD_GET_TILE_INFO_32x32_16x16(tile_region,tileno,(int)tile_index);
 	SET_TILE_INFO(tile_region, tileno, 0, 0);
 }
+
+// non-tilemap functions to get a pixel from a 'tilemap' based on the above, but looking up each pixel, as to avoid the heavy cache bitmap
+
+INLINE UINT8 get_stampmap_16x16_1x1_tile_info_pixel(running_machine* machine, int xpos, int ypos)
+{
+	const int tilesize = 4; // 0xf pixels
+	const int tilemapsize = 0x0f;
+	
+	int wraparound = segacd_stampsize&1;
+	
+	int xtile = xpos / (1<<tilesize);
+	int ytile = ypos / (1<<tilesize);
+
+	if (wraparound)
+	{
+		// wrap...
+		xtile &= tilemapsize;
+		ytile &= tilemapsize;
+	}
+	else
+	{
+		if (xtile>tilemapsize) return 0;
+		if (xtile<0) return 0;
+		
+		if (ytile>tilemapsize) return 0;
+		if (ytile<0) return 0;
+	}
+
+	int tile_index = (ytile * (tilemapsize+1)) + xtile;
+
+	int tile_region, tileno;
+	SCD_GET_TILE_INFO_16x16_1x1(tile_region,tileno,(int)tile_index);
+
+	const gfx_element *gfx = machine->gfx[tile_region];
+	tileno %= gfx->total_elements;
+	const UINT8* srcdata = gfx_element_get_data(gfx, tileno);
+	return srcdata[((ypos&((1<<tilesize)-1))*(1<<tilesize))+(xpos&((1<<tilesize)-1))];
+}
+
+INLINE UINT8 get_stampmap_32x32_1x1_tile_info_pixel(running_machine* machine, int xpos, int ypos)
+{
+	const int tilesize = 5; // 0x1f pixels
+	const int tilemapsize = 0x07;
+	
+	int wraparound = segacd_stampsize&1;
+	
+	int xtile = xpos / (1<<tilesize);
+	int ytile = ypos / (1<<tilesize);
+
+	if (wraparound)
+	{
+		// wrap...
+		xtile &= tilemapsize;
+		ytile &= tilemapsize;
+	}
+	else
+	{
+		if (xtile>tilemapsize) return 0;
+		if (xtile<0) return 0;
+		
+		if (ytile>tilemapsize) return 0;
+		if (ytile<0) return 0;
+	}
+	
+	int tile_index = (ytile * (tilemapsize+1)) + xtile;
+	
+	int tile_region, tileno;
+	SCD_GET_TILE_INFO_32x32_1x1(tile_region,tileno,(int)tile_index);
+
+	const gfx_element *gfx = machine->gfx[tile_region];
+	tileno %= gfx->total_elements;
+	const UINT8* srcdata = gfx_element_get_data(gfx, tileno);
+	return srcdata[((ypos&((1<<tilesize)-1))*(1<<tilesize))+(xpos&((1<<tilesize)-1))];
+}
+
+INLINE UINT8 get_stampmap_16x16_16x16_tile_info_pixel(running_machine* machine, int xpos, int ypos)
+{
+	const int tilesize = 4; // 0xf pixels
+	const int tilemapsize = 0xff;
+	
+	int wraparound = segacd_stampsize&1;
+	
+	int xtile = xpos / (1<<tilesize);
+	int ytile = ypos / (1<<tilesize);
+
+	if (wraparound)
+	{
+		// wrap...
+		xtile &= tilemapsize;
+		ytile &= tilemapsize;
+	}
+	else
+	{
+		if (xtile>tilemapsize) return 0;
+		if (xtile<0) return 0;
+		
+		if (ytile>tilemapsize) return 0;
+		if (ytile<0) return 0;
+	}
+
+	int tile_index = (ytile * (tilemapsize+1)) + xtile;
+
+	int tile_region, tileno;
+	SCD_GET_TILE_INFO_16x16_16x16(tile_region,tileno,(int)tile_index);
+
+	const gfx_element *gfx = machine->gfx[tile_region];
+	tileno %= gfx->total_elements;
+	const UINT8* srcdata = gfx_element_get_data(gfx, tileno);
+	return srcdata[((ypos&((1<<tilesize)-1))*(1<<tilesize))+(xpos&((1<<tilesize)-1))];
+}
+
+INLINE UINT8 get_stampmap_32x32_16x16_tile_info_pixel(running_machine* machine, int xpos, int ypos)
+{
+	const int tilesize = 5; // 0x1f pixels
+	const int tilemapsize = 0x7f;
+	
+	int wraparound = segacd_stampsize&1;
+	
+	int xtile = xpos / (1<<tilesize);
+	int ytile = ypos / (1<<tilesize);
+
+	if (wraparound)
+	{
+		// wrap...
+		xtile &= tilemapsize;
+		ytile &= tilemapsize;
+	}
+	else
+	{
+		if (xtile>tilemapsize) return 0;
+		if (xtile<0) return 0;
+		
+		if (ytile>tilemapsize) return 0;
+		if (ytile<0) return 0;
+	}
+	
+	int tile_index = (ytile * (tilemapsize+1)) + xtile;
+	
+	int tile_region, tileno;
+	SCD_GET_TILE_INFO_32x32_16x16(tile_region,tileno,(int)tile_index);
+
+	const gfx_element *gfx = machine->gfx[tile_region];
+	tileno %= gfx->total_elements;
+	const UINT8* srcdata = gfx_element_get_data(gfx, tileno);
+	return srcdata[((ypos&((1<<tilesize)-1))*(1<<tilesize))+(xpos&((1<<tilesize)-1))];
+}
+
 
 
 
@@ -4693,9 +4870,9 @@ void segacd_init_main_cpu( running_machine* machine )
 
 	/* as a temporary measure we use the MAME tilemaps, this is hideously inefficient as we have to mark the active one as
        dirty before each operation due to the RAM based tiles.  For the larger tilemaps this means we have to re-render a 4096x4096
-       bitmap to the tilemap cache on each blit operation just to copy the few needed tiles out of it, needless to say, this is SLOW.
-       Eventually the tilemaps will be replaced with a get_pixel function which will perform all the needed lookups on a per-pixel
-       basis instead of re-rendering the whole thing */
+	   bitmap to the tilemap cache on each blit operation just to copy the few needed tiles out of it, needless to say, this is SLOW.
+	   Eventually the tilemaps will be replaced with a get_pixel function which will perform all the needed lookups on a per-pixel
+	   basis instead of re-rendering the whole thing */
 	segacd_stampmap[0] = tilemap_create(machine, get_stampmap_16x16_1x1_tile_info, tilemap_scan_rows, 16, 16, 16, 16);
 	segacd_stampmap[1] = tilemap_create(machine, get_stampmap_32x32_1x1_tile_info, tilemap_scan_rows, 32, 32, 8, 8);
 	segacd_stampmap[2] = tilemap_create(machine, get_stampmap_16x16_16x16_tile_info, tilemap_scan_rows, 16, 16, 256, 256); // 128kb!
@@ -4963,10 +5140,10 @@ static void segacd_cdd_get_status(running_machine *machine)
 	// ...
 
 	/*segacd_cdd.status = 0;
-    segacd_cdd.minute = 0;
-    segacd_cdd.seconds = 0;
-    segacd_cdd.frame = 0;
-    segacd_cdd.ext = 0;*/
+	segacd_cdd.minute = 0;
+	segacd_cdd.seconds = 0;
+	segacd_cdd.frame = 0;
+	segacd_cdd.ext = 0;*/
 
 	cdd_hock_irq(machine,1);
 }
@@ -5104,6 +5281,96 @@ static WRITE16_HANDLER( segacd_stampsize_w )
 	}
 }
 
+// these functions won't cope if
+//
+// the lower 3 bits of segacd_imagebuffer_hdot_size are set
+
+// this really needs to be doing it's own lookups rather than depending on the inefficient MAME cache..
+INLINE UINT8 read_pixel_from_stampmap( running_machine* machine, bitmap_t* srcbitmap, int x, int y)
+{
+/*
+	if (!srcbitmap)
+	{
+		return mame_rand(machine);
+	}
+
+	if (x >= srcbitmap->width) return 0;
+	if (y >= srcbitmap->height) return 0;
+	
+	UINT16* cacheptr = BITMAP_ADDR16( srcbitmap, y, x);
+
+	return cacheptr[0] & 0xf;
+*/
+
+	switch (segacd_get_active_stampmap_tilemap()&3)
+	{
+		case 0x00: return get_stampmap_16x16_1x1_tile_info_pixel( machine, x, y );
+		case 0x01: return get_stampmap_32x32_1x1_tile_info_pixel( machine, x, y );
+		case 0x02: return get_stampmap_16x16_16x16_tile_info_pixel( machine, x, y );
+		case 0x03: return get_stampmap_32x32_16x16_tile_info_pixel( machine, x, y );
+	}
+	
+	return 0;
+}
+
+INLINE void write_pixel_to_imagebuffer( running_machine* machine, UINT32 pix, int line, int xpos )
+{
+
+	UINT32 bufferstart = (segacd_imagebuffer_start_address&0xfff8)*2;
+	UINT32 bufferend = bufferstart + (((segacd_imagebuffer_vcell_size+1) * (segacd_imagebuffer_hdot_size>>3)*0x20)/2);
+	UINT32 offset;
+
+	offset = bufferstart+(((segacd_imagebuffer_vcell_size+1)*0x10)*xpos);
+	
+	// lines of each output cell
+	offset+= (line*2);
+			
+	while (offset>=bufferend)
+		offset-= bufferend;
+	
+	
+	switch (segacd_memory_priority_mode)
+	{
+		case 0x00: // normal write, just write the data
+			segacd_dataram[offset] = pix >> 16;
+			segacd_dataram[offset+1] = pix & 0xffff;
+			break;
+			
+		case 0x01: // underwrite, only write if the existing data is 0
+			if ((segacd_dataram[offset]&0xf000) == 0x0000) segacd_dataram[offset] |= (pix>>16)&0xf000;
+			if ((segacd_dataram[offset]&0x0f00) == 0x0000) segacd_dataram[offset] |= (pix>>16)&0x0f00;
+			if ((segacd_dataram[offset]&0x00f0) == 0x0000) segacd_dataram[offset] |= (pix>>16)&0x00f0;
+			if ((segacd_dataram[offset]&0x000f) == 0x0000) segacd_dataram[offset] |= (pix>>16)&0x000f;
+			if ((segacd_dataram[offset+1]&0xf000) == 0x0000) segacd_dataram[offset+1] |= (pix)&0xf000;
+			if ((segacd_dataram[offset+1]&0x0f00) == 0x0000) segacd_dataram[offset+1] |= (pix)&0x0f00;
+			if ((segacd_dataram[offset+1]&0x00f0) == 0x0000) segacd_dataram[offset+1] |= (pix)&0x00f0;
+			if ((segacd_dataram[offset+1]&0x000f) == 0x0000) segacd_dataram[offset+1] |= (pix)&0x000f;
+			break;
+			
+		case 0x02: // overwrite, only write non-zero data
+			if ((pix>>16)&0xf000) segacd_dataram[offset] = (segacd_dataram[offset] & 0x0fff) | ((pix>>16)&0xf000);
+			if ((pix>>16)&0x0f00) segacd_dataram[offset] = (segacd_dataram[offset] & 0xf0ff) | ((pix>>16)&0x0f00);
+			if ((pix>>16)&0x00f0) segacd_dataram[offset] = (segacd_dataram[offset] & 0xff0f) | ((pix>>16)&0x00f0);
+			if ((pix>>16)&0x000f) segacd_dataram[offset] = (segacd_dataram[offset] & 0xfff0) | ((pix>>16)&0x000f);
+			if ((pix)&0xf000) segacd_dataram[offset+1] = (segacd_dataram[offset+1] & 0x0fff) | ((pix)&0xf000);
+			if ((pix)&0x0f00) segacd_dataram[offset+1] = (segacd_dataram[offset+1] & 0xf0ff) | ((pix)&0x0f00);
+			if ((pix)&0x00f0) segacd_dataram[offset+1] = (segacd_dataram[offset+1] & 0xff0f) | ((pix)&0x00f0);
+			if ((pix)&0x000f) segacd_dataram[offset+1] = (segacd_dataram[offset+1] & 0xfff0) | ((pix)&0x000f);
+			break;
+			
+		default:
+		case 0x03: // invalid?
+			segacd_dataram[offset] = mame_rand(machine);
+			segacd_dataram[offset+1] = mame_rand(machine);
+			break;
+	
+	}
+	
+	segacd_mark_tiles_dirty(machine, offset);
+	segacd_mark_tiles_dirty(machine, offset+1);
+
+}
+
 // this triggers the conversion operation, which will cause an IRQ1 when finished
 WRITE16_HANDLER( segacd_trace_vector_base_address_w )
 {
@@ -5112,15 +5379,15 @@ WRITE16_HANDLER( segacd_trace_vector_base_address_w )
 		printf("ILLEGAL: segacd_trace_vector_base_address_w %04x %04x in mode 1!\n",data,mem_mask);
 	}
 
-	logerror("segacd_trace_vector_base_address_w %04x %04x\n",data,mem_mask);
+	//printf("segacd_trace_vector_base_address_w %04x %04x\n",data,mem_mask);
 
 	{
 		int base = (data & 0xfffe) * 4;
 
-		logerror("actual base = %06x\n", base + 0x80000);
+		//printf("actual base = %06x\n", base + 0x80000);
 
 		// nasty nasty nasty
-		segacd_mark_stampmaps_dirty();
+		//segacd_mark_stampmaps_dirty();
 
 		segacd_conversion_active = 1;
 
@@ -5128,52 +5395,51 @@ WRITE16_HANDLER( segacd_trace_vector_base_address_w )
 		timer_adjust_oneshot(segacd_gfx_conversion_timer, ATTOTIME_IN_HZ(1000), 0);
 
 
-		int i;
+		int line;
+		//bitmap_t *srcbitmap = tilemap_get_pixmap(segacd_stampmap[segacd_get_active_stampmap_tilemap()]);
+		bitmap_t *srcbitmap = 0;
 
-		for (i=0;i<segacd_imagebuffer_vdot_size;i++)
+		for (line=0;line<segacd_imagebuffer_vdot_size;line++)
 		{
-			int currbase = base + i * 0x8;
-			UINT16 param1 = segacd_dataram[(currbase+0x0)>>1];
-			UINT16 param2 = segacd_dataram[(currbase+0x2)>>1];
-			UINT16 param3 = segacd_dataram[(currbase+0x4)>>1];
-			UINT16 param4 = segacd_dataram[(currbase+0x6)>>1];
+			int currbase = base + line * 0x8;
+			
+			// are the 256x256 tile modes using the same sign bits?
+			INT16 tilemapxoffs,tilemapyoffs;
+			INT16 deltax,deltay;
+			
+			tilemapxoffs = segacd_dataram[(currbase+0x0)>>1];
+			tilemapyoffs = segacd_dataram[(currbase+0x2)>>1];
+			deltax = segacd_dataram[(currbase+0x4)>>1]; // x-zoom
+			deltay = segacd_dataram[(currbase+0x6)>>1]; // rotation
 
+			//printf("%06x:  %04x (%d) %04x (%d) %04x %04x\n", currbase, tilemapxoffs, tilemapxoffs>>3, tilemapyoffs, tilemapyoffs>>3, deltax, deltay);
 
-			logerror("%06x:  %04x %04x %04x %04x\n", currbase, param1, param2, param3, param4);
-
-		}
-
-		{
-			// not real code.. yet
-			// should copy part of the stamp into the imagebuffer area using the rotation / zooming parameters given
-			// (while we're using the MAME tilemaps that means, part of the tilemap cache into the ram buffer for the image)
-
-			bitmap_t *srcbitmap = tilemap_get_pixmap(segacd_stampmap[segacd_get_active_stampmap_tilemap()]);
-			UINT16* x;
-			x = BITMAP_ADDR16(srcbitmap,10,10);
-			UINT16 datax;
-			datax = x[0];
-
-			// I don't quite understand what happens if the lower bits of hdotsize are set.. do we end up rounding up?
-			// this 'buffersize' clearly fills the frame for the SegaCD logo screen at least
-			int buffersize = ((segacd_imagebuffer_vcell_size+1) * (segacd_imagebuffer_hdot_size>>3)*0x20)/2;  // 0x20 = 8x8x4 tile, /2 due to word offset
-			//buffersize -= 8;
-
-			for (int i=0;i< buffersize ;i++)
+			int xbase = tilemapxoffs * 256;
+			int ybase = tilemapyoffs * 256;
+			int count;
+						
+			for (count=0;count<(segacd_imagebuffer_hdot_size>>3);count++)
 			{
-				int offsetx = ((segacd_imagebuffer_start_address&0xfff8)*2)+i;
+				int i;
+				UINT32 pixblock = 0x00000000;
+				for (i=7*4;i>=0;i-=4)
+				{	
+					pixblock |= read_pixel_from_stampmap(space->machine, srcbitmap, xbase>>(3+8), ybase>>(3+8)) << (i);
+					
+					
+					xbase += deltax;
+					ybase += deltay;
+					
 
-				//printf("data write %08x\n", offsetx*2);
-
-
-				segacd_dataram[offsetx]=mame_rand(space->machine);
-
-				segacd_mark_tiles_dirty(space->machine, offsetx);
+				}
+				
+				
+				
+				
+				write_pixel_to_imagebuffer(space->machine, pixblock, line, count);
 			}
 
-
 		}
-
 	}
 
 }
@@ -5186,7 +5452,7 @@ READ16_HANDLER( segacd_imagebuffer_vdot_size_r )
 
 WRITE16_HANDLER( segacd_imagebuffer_vdot_size_w )
 {
-	printf("segacd_imagebuffer_vdot_size_w %04x %04x\n",data,mem_mask);
+	//printf("segacd_imagebuffer_vdot_size_w %04x %04x\n",data,mem_mask);
 	COMBINE_DATA(&segacd_imagebuffer_vdot_size);
 }
 
@@ -5217,9 +5483,8 @@ static WRITE16_HANDLER( segacd_imagebuffer_start_address_w )
 {
 	COMBINE_DATA(&segacd_imagebuffer_start_address);
 
-	int base = (segacd_imagebuffer_start_address & 0xfffe) * 4;
-
-	printf("segacd_imagebuffer_start_address_w %04x %04x (actual base = %06x)\n", data, segacd_imagebuffer_start_address, base);
+	//int base = (segacd_imagebuffer_start_address & 0xfffe) * 4;
+	//printf("segacd_imagebuffer_start_address_w %04x %04x (actual base = %06x)\n", data, segacd_imagebuffer_start_address, base);
 }
 
 static READ16_HANDLER( segacd_imagebuffer_offset_r )
@@ -5270,21 +5535,21 @@ static ADDRESS_MAP_START( segacd_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0xff8004 ,0xff8005) AM_READWRITE(segacd_cdc_mode_address_r, segacd_cdc_mode_address_w)
 	AM_RANGE(0xff8006 ,0xff8007) AM_READWRITE(segacd_cdc_data_r, segacd_cdc_data_w)
-//  AM_RANGE(0xff8008, 0xff8009) // CDC Host Data
-//  AM_RANGE(0xff800a, 0xff800b) // CDC DMA Address
-//  AM_RANGE(0xff800c, 0xff800d) // Stopwatch timer
+//	AM_RANGE(0xff8008, 0xff8009) // CDC Host Data
+//	AM_RANGE(0xff800a, 0xff800b) // CDC DMA Address
+//	AM_RANGE(0xff800c, 0xff800d) // Stopwatch timer
 	AM_RANGE(0xff800e ,0xff800f) AM_READWRITE(segacd_comms_flags_r, segacd_comms_flags_subcpu_w)
 	AM_RANGE(0xff8010 ,0xff801f) AM_READWRITE(segacd_comms_sub_part1_r, segacd_comms_sub_part1_w)
 	AM_RANGE(0xff8020 ,0xff802f) AM_READWRITE(segacd_comms_sub_part2_r, segacd_comms_sub_part2_w)
-//  AM_RANGE(0xff8030, 0xff8031) // Timer W/INT3
+//	AM_RANGE(0xff8030, 0xff8031) // Timer W/INT3
 	AM_RANGE(0xff8032, 0xff8033) AM_READWRITE(segacd_irq_mask_r,segacd_irq_mask_w)
 	AM_RANGE(0xff8034, 0xff8035) AM_NOP // CD Fader
 	AM_RANGE(0xff8036, 0xff8037) AM_READWRITE(segacd_cdd_ctrl_r,segacd_cdd_ctrl_w)
 	AM_RANGE(0xff8038, 0xff8041) AM_READ8(segacd_cdd_rx_r,0xffff)
 	AM_RANGE(0xff8042, 0xff804b) AM_WRITE8(segacd_cdd_tx_w,0xffff)
-//  AM_RANGE(0xff804c, 0xff804d) // Font Color
-//  AM_RANGE(0xff804e, 0xff804f) // Font bit
-//  AM_RANGE(0xff8050, 0xff8057) // Font data (read only)
+//	AM_RANGE(0xff804c, 0xff804d) // Font Color
+//	AM_RANGE(0xff804e, 0xff804f) // Font bit
+//	AM_RANGE(0xff8050, 0xff8057) // Font data (read only)
 	AM_RANGE(0xff8058, 0xff8059) AM_READWRITE(segacd_stampsize_r, segacd_stampsize_w) // Stamp size
 	AM_RANGE(0xff805a, 0xff805b) AM_READWRITE(segacd_stampmap_base_address_r, segacd_stampmap_base_address_w) // Stamp map base address
 	AM_RANGE(0xff805c, 0xff805d) AM_READWRITE(segacd_imagebuffer_vcell_size_r, segacd_imagebuffer_vcell_size_w)// Image buffer V cell size
@@ -5293,10 +5558,10 @@ static ADDRESS_MAP_START( segacd_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff8062, 0xff8063) AM_READWRITE(segacd_imagebuffer_hdot_size_r, segacd_imagebuffer_hdot_size_w) // Image buffer H dot size
 	AM_RANGE(0xff8064, 0xff8065) AM_READWRITE(segacd_imagebuffer_vdot_size_r, segacd_imagebuffer_vdot_size_w ) // Image buffer V dot size
 	AM_RANGE(0xff8066, 0xff8067) AM_WRITE(segacd_trace_vector_base_address_w)// Trace vector base address
-//  AM_RANGE(0xff8068, 0xff8069) // Subcode address
+//	AM_RANGE(0xff8068, 0xff8069) // Subcode address
 
-//  AM_RANGE(0xff8100, 0xff817f) // Subcode buffer area
-//  AM_RANGE(0xff8180, 0xff81ff) // mirror of subcode buffer area
+//	AM_RANGE(0xff8100, 0xff817f) // Subcode buffer area
+//	AM_RANGE(0xff8180, 0xff81ff) // mirror of subcode buffer area
 
 ADDRESS_MAP_END
 
