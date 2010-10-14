@@ -96,15 +96,15 @@ ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( memory_map16_4Mb, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x00000, 0x07ffff) AM_RAM
+	AM_RANGE(0x00000, 0x03ffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( memory_map16_16Mb, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x00000, 0x1fffff) AM_RAM
+	AM_RANGE(0x00000, 0x0fffff) AM_RAM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( memory_map16_64Mb, ADDRESS_SPACE_PROGRAM, 16 )
-	AM_RANGE(0x00000, 0x7fffff) AM_RAM
+	AM_RANGE(0x00000, 0x3fffff) AM_RAM
 ADDRESS_MAP_END
 
 
@@ -206,7 +206,7 @@ intelfsh_device_config::intelfsh_device_config(const machine_config &mconfig, de
 		if ((m_size & (1 << addrbits)) != 0)
 			break;
 
-	m_space_config = address_space_config("flash", ENDIANNESS_BIG, m_bits, addrbits, 0, map);
+	m_space_config = address_space_config("flash", ENDIANNESS_BIG, m_bits, addrbits - 1, (m_bits == 8) ? 0 : -1, map);
 }
 
 intelfsh8_device_config::intelfsh8_device_config(const machine_config &mconfig, device_type type, const char *name, const char *tag, const device_config *owner, UINT32 clock, UINT32 variant)
@@ -602,18 +602,19 @@ void intelfsh_device::write_full(UINT32 address, UINT32 data)
 		{
 			// sector erase
 			// clear the 4k/64k block containing the current address to all 0xffs
+			UINT32 base = address * ((m_config.m_bits == 16) ? 2 : 1);
 			if (m_config.m_sector_is_4k)
 			{
 				for (offs_t offs = 0; offs < 4 * 1024; offs++)
-					m_addrspace[0]->write_byte((address & ~0xfff) + offs, 0xff);
-				m_erase_sector = address & ~0xfff;
+					m_addrspace[0]->write_byte((base & ~0xfff) + offs, 0xff);
+				m_erase_sector = address & ((m_config.m_bits == 16) ? ~0x7ff : ~0xfff);
 				timer_adjust_oneshot( m_timer, ATTOTIME_IN_MSEC( 125 ), 0 );
 			}
 			else
 			{
 				for (offs_t offs = 0; offs < 64 * 1024; offs++)
-					m_addrspace[0]->write_byte((address & ~0xffff) + offs, 0xff);
-				m_erase_sector = address & ~0xffff;
+					m_addrspace[0]->write_byte((base & ~0xffff) + offs, 0xff);
+				m_erase_sector = address & ((m_config.m_bits == 16) ? ~0x7fff : ~0xffff);
 				timer_adjust_oneshot( m_timer, ATTOTIME_IN_SEC( 1 ), 0 );
 			}
 
@@ -663,8 +664,9 @@ void intelfsh_device::write_full(UINT32 address, UINT32 data)
 		if( ( data & 0xff ) == 0xd0 )
 		{
 			// clear the 64k block containing the current address to all 0xffs
+			UINT32 base = address * ((m_config.m_bits == 16) ? 2 : 1);
 			for (offs_t offs = 0; offs < 64 * 1024; offs++)
-				m_addrspace[0]->write_byte((address & ~0xffff) + offs, 0xff);
+				m_addrspace[0]->write_byte((base & ~0xffff) + offs, 0xff);
 
 			m_status = 0x00;
 			m_flash_mode = FM_READSTATUS;
