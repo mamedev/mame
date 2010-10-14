@@ -416,7 +416,9 @@ static void outrun_generic_init(running_machine *machine)
 	state->subcpu = machine->device("sub");
 	state->ppi8255 = machine->device("ppi8255");
 	
-	machine->device<nvram_device>("nvram")->set_base(workram, 0x8000);
+	nvram_device *nvram = machine->device<nvram_device>("nvram");
+	if (nvram != NULL)
+		nvram->set_base(workram, 0x8000);
 
 	state_save_register_global(machine, state->adc_select);
 	state_save_register_global(machine, state->vblank_irq_state);
@@ -1128,7 +1130,6 @@ static MACHINE_CONFIG_START( outrun_base, segas1x_state )
 
 	MDRV_VIDEO_START(outrun)
 	MDRV_VIDEO_UPDATE(outrun)
-
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")

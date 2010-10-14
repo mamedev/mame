@@ -1873,6 +1873,7 @@ static DRIVER_INIT( mrkicker )
 	finalgdr_backupram_bank = 1;
 	finalgdr_backupram = auto_alloc_array(machine, UINT8, 0x80*0x100);
 //  memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x005e874, 0x005e877, 0, 0, mrkicker_speedup_r );
+	machine->device<nvram_device>("nvram")->set_base(finalgdr_backupram, 0x80*0x100);
 
 	palshift = 0;
 	flip_bit = 1; //?

@@ -2061,6 +2061,11 @@ static DRIVER_INIT (raiden2)
 	raiden2_decrypt_sprites(machine);
 }
 
+static DRIVER_INIT (nzerotea)
+{
+	raiden2_decrypt_sprites(machine);
+}
+
 static DRIVER_INIT (xsedae)
 {
 	memory_configure_bank(machine, "mainbank", 0, 2, memory_region(machine, "mainprg"), 0x20000);
@@ -2315,7 +2320,7 @@ GAME( 1993, zeroteams,zeroteam,raiden2,  raiden2,  raiden2,  ROT0,   "Seibu Kaih
 GAME( 1995, xsedae,   0,       raiden2,  raiden2,  xsedae,   ROT0,   "Dream Island",   "X Se Dae Quiz", GAME_NOT_WORKING|GAME_NO_SOUND)
 
 // 'V33 system type_b' - uses V33 CPU, COPX-D3 external protection rom, but still has the proper sound system
-GAME( 1993, nzerotea, zeroteam,  nzerotea, nzerotea,  raiden2,  ROT0,   "Seibu Kaihatsu", "New Zero Team", GAME_NOT_WORKING|GAME_NO_SOUND) // this uses a v33 and COPD3
+GAME( 1993, nzerotea, zeroteam,  nzerotea, nzerotea,  nzerotea,  ROT0,   "Seibu Kaihatsu", "New Zero Team", GAME_NOT_WORKING|GAME_NO_SOUND) // this uses a v33 and COPD3
 
 // newer PCB, with V33 CPU and COPD3 protection, but weak sound hardware. - was marked as Raiden DX New in the rom dump, but boots as Raiden 2 New version, is it switchable?
 GAME( 1996, r2dx_v33, 0, rdx_v33,  rdx_v33, rdx_v33,  ROT270, "Seibu Kaihatsu", "Raiden II / DX (newer V33 PCB)", GAME_NOT_WORKING|GAME_NO_SOUND)
