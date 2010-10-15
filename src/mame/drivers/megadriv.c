@@ -342,7 +342,9 @@ static UINT16* _32x_palette_lookup;
 /* SegaCD! */
 static cpu_device *_segacd_68k_cpu;
 static emu_timer *segacd_gfx_conversion_timer;
+static emu_timer *segacd_irq3_timer;
 static int segacd_wordram_mapped = 0;
+static TIMER_CALLBACK( segacd_irq3_timer_callback );
 
 /* SVP (virtua racing) */
 static cpu_device *_svp_cpu;
@@ -4848,6 +4850,10 @@ void segacd_init_main_cpu( running_machine* machine )
 	segacd_gfx_conversion_timer = timer_alloc(machine, segacd_gfx_conversion_timer_callback, 0);
 	timer_adjust_oneshot(segacd_gfx_conversion_timer, attotime_never, 0);
 
+	segacd_irq3_timer = timer_alloc(machine, segacd_irq3_timer_callback, 0);
+	timer_adjust_oneshot(segacd_irq3_timer, attotime_never, 0);
+
+
 
 	/* create the char set (gfx will then be updated dynamically from RAM) */
 	machine->gfx[0] = gfx_element_alloc(machine, &sega_16x16_r00_f0_layout, (UINT8 *)segacd_dataram, 0, 0);
@@ -5523,6 +5529,39 @@ static WRITE16_HANDLER( segacd_imagebuffer_hdot_size_w )
 	COMBINE_DATA(&segacd_imagebuffer_hdot_size);
 }
 
+static UINT16 segacd_irq3_timer_reg;
+
+static READ16_HANDLER( segacd_irq3timer_r )
+{
+	return segacd_irq3_timer_reg; // always returns value written, not current counter!
+}
+
+#define SEGACD_IRQ3_TIMER_SPEED (ATTOTIME_IN_NSEC(segacd_irq3_timer_reg*30720))
+
+static WRITE16_HANDLER( segacd_irq3timer_w )
+{
+	if (ACCESSING_BITS_0_7)
+	{
+		segacd_irq3_timer_reg = data & 0xff;
+
+		// time = reg * 30.72 us
+
+		if (segacd_irq3_timer_reg)
+			timer_adjust_oneshot(segacd_irq3_timer, SEGACD_IRQ3_TIMER_SPEED, 0);
+		else
+			timer_adjust_oneshot(segacd_irq3_timer, attotime_never, 0);
+
+		printf("segacd_irq3timer_w %02x\n", segacd_irq3_timer_reg);
+	}
+}
+
+static TIMER_CALLBACK( segacd_irq3_timer_callback )
+{
+	if (segacd_irq_mask & 0x08)
+		cputag_set_input_line(machine, "segacd_68k", 3, HOLD_LINE);
+		
+	timer_adjust_oneshot(segacd_irq3_timer, SEGACD_IRQ3_TIMER_SPEED, 0);
+}
 
 
 static ADDRESS_MAP_START( segacd_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -5545,7 +5584,7 @@ static ADDRESS_MAP_START( segacd_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff800e ,0xff800f) AM_READWRITE(segacd_comms_flags_r, segacd_comms_flags_subcpu_w)
 	AM_RANGE(0xff8010 ,0xff801f) AM_READWRITE(segacd_comms_sub_part1_r, segacd_comms_sub_part1_w)
 	AM_RANGE(0xff8020 ,0xff802f) AM_READWRITE(segacd_comms_sub_part2_r, segacd_comms_sub_part2_w)
-//	AM_RANGE(0xff8030, 0xff8031) // Timer W/INT3
+	AM_RANGE(0xff8030, 0xff8031) AM_READWRITE(segacd_irq3timer_r, segacd_irq3timer_w) // Timer W/INT3
 	AM_RANGE(0xff8032, 0xff8033) AM_READWRITE(segacd_irq_mask_r,segacd_irq_mask_w)
 	AM_RANGE(0xff8034, 0xff8035) AM_NOP // CD Fader
 	AM_RANGE(0xff8036, 0xff8037) AM_READWRITE(segacd_cdd_ctrl_r,segacd_cdd_ctrl_w)
