@@ -5430,6 +5430,10 @@ WRITE16_HANDLER( segacd_trace_vector_base_address_w )
 					xbase += deltax;
 					ybase += deltay;
 					
+					// clamp to 24-bits, seems to be required for all the intro effects to work
+					xbase &= 0xffffff;
+					ybase &= 0xffffff;
+					
 
 				}
 				
