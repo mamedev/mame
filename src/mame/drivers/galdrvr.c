@@ -3641,6 +3641,45 @@ ROM_START( streakng )
 	ROM_LOAD( "sk.bpr",       0x0000, 0x0020, CRC(bce79607) SHA1(49d60fde149240bcd025f721b0fbbbdbc549a42f) )
 ROM_END
 
+/*
+sk2          [1/2]      st3.BIN                 IDENTICAL
+sk3          [1/2]      5st.BIN                 IDENTICAL
+sk6          [1/2]      9.BIN                   IDENTICAL
+sk5          [1/2]      11.BIN                  IDENTICAL
+sk1          [2/2]      st2.BIN                 IDENTICAL
+sk2          [2/2]      st4.BIN                 IDENTICAL
+sk3          [2/2]      6st.BIN                 IDENTICAL
+sk4          [2/2]      8st.BIN                 IDENTICAL
+sk5          [2/2]      12.BIN                  IDENTICAL
+sk6          [2/2]      10.BIN                  IDENTICAL
+sk1          [1/2]      st1.BIN                 99.951172%
+sk4          [1/2]      7st.BIN                 99.951172%
+sk.bpr                                          NO MATCH
+*/
+
+ROM_START( streaknga )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "st1.bin",  0x0000, 0x0800, CRC(c827e124) SHA1(85d84bb678cb80e7ca4a591b6c30a247e9aac213) )
+	ROM_LOAD( "st2.bin",  0x0800, 0x0800, CRC(b01d4f8f) SHA1(1116374b5e90c7e525319c92d6dd9ba6641ca231) )
+	ROM_LOAD( "st3.bin",  0x1000, 0x0800, CRC(c7a9c493) SHA1(58c25bdf68807ecfe6fcaf90137a5f8701696d1d) )
+	ROM_LOAD( "st4.bin",  0x1800, 0x0800, CRC(12487c75) SHA1(12796dab558ab13b42ee87181d60c3fa290c64e4) )
+	ROM_LOAD( "5st.bin",  0x2000, 0x0800, CRC(f9f9e2be) SHA1(3efa850361137f50a42de9dcd868519fbc4680b4) )
+	ROM_LOAD( "6st.bin",  0x2800, 0x0800, CRC(c22fe6c2) SHA1(fb8bf579f6bd413ae5ef49facf1d21125da52833) )
+	ROM_LOAD( "7st.bin",  0x3000, 0x0800, CRC(9cd7869a) SHA1(5edccf4a1dff184ebbec8748216353805abff29d) )
+	ROM_LOAD( "8st.bin",  0x3800, 0x0800, CRC(5e750ad3) SHA1(55f77564a9bb07d66c2f13ee1a4ff39c8029a383) )
+
+	ROM_REGION( 0x1000, "gfx1", 0 )
+	ROM_LOAD( "11.bin",   0x0000, 0x0800, CRC(cddd8924) SHA1(340ed1d4da62388d49838db25f09a569a0e17dee) )
+	ROM_LOAD( "12.bin",   0x0800, 0x0800, CRC(10cda095) SHA1(488def62d52296c7482b349c1aeaeaa1d45bad77) )
+
+	ROM_REGION( 0x1000, "gfx2", 0 )
+	ROM_LOAD( "9.bin",    0x0000, 0x0800, CRC(6a2a8a0f) SHA1(1822c2f4c48740fee2d4e048410db5e846c8a2db) )
+	ROM_LOAD( "10.bin",   0x0800, 0x0800, CRC(3563dfbe) SHA1(9056b618e19a40cc96d90f393c1c40a573497ca7) )
+
+	ROM_REGION( 0x0020, "proms", 0 )	/* from parent set */
+	ROM_LOAD( "sk.bpr",   0x0000, 0x0020, BAD_DUMP CRC(bce79607) SHA1(49d60fde149240bcd025f721b0fbbbdbc549a42f) )
+ROM_END
+
 ROM_START( pacmanbl ) /* Artic Multi-System */
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "1",  0x0000, 0x0800, CRC(6718df42) SHA1(ee15c3f583d381fba4878f824f83d04479a0cee5) )
@@ -5929,7 +5968,8 @@ GAME( 1980, skyraidr, uniwars,  galaxian, superg,   pisces,   ROT90,  "bootleg",
 
 
 /* Artic Multi-System games - separate tile/sprite ROMs */
-GAME( 1981, streakng, 0,        pacmanbl, streakng, galaxian, ROT90,  "Shoei", "Streaking", GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1980, streakng, 0,        pacmanbl, streakng, galaxian, ROT90,  "Shoei", "Streaking (set 1)", GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )
+GAME( 1980, streaknga,streakng, pacmanbl, streakng, galaxian, ROT90,  "Shoei", "Streaking (set 2)", GAME_IMPERFECT_COLORS | GAME_SUPPORTS_SAVE )
 GAME( 1981, pacmanbl, puckman,  pacmanbl, pacmanbl, pacmanbl, ROT270, "bootleg", "Pac-Man (Galaxian hardware, set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1981, pacmanbla,puckman,  pacmanbl, pacmanbl, pacmanbl, ROT270, "bootleg", "Pac-Man (Galaxian hardware, set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1981, phoenxp2, phoenix,  galaxian, phoenxp2, batman2,  ROT270, "bootleg", "Phoenix Part 2", GAME_SUPPORTS_SAVE )

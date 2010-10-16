@@ -176,6 +176,7 @@ const game_driver * const drivers[] =
 	DRIVER( redufob )	/* bootleg */
 	DRIVER( exodus )	/* Subelectro - bootleg? */
 	DRIVER( streakng )	/* [1980] Shoei */
+	DRIVER( streaknga )	/* [1980] Shoei */
 	DRIVER( pacmanbl )	/* bootleg */
 	DRIVER( pacmanbla )	/* bootleg */
 	DRIVER( phoenxp2 )	/* bootleg */
