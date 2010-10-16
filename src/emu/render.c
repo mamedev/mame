@@ -2370,11 +2370,12 @@ render_manager::render_manager(running_machine &machine)
 
 render_manager::~render_manager()
 {
+	// free all the containers since they may own textures
+	container_free(m_ui_container);
+	m_screen_container_list.reset();
+
 	// better not be any outstanding textures when we die
 	assert(m_live_textures == 0);
-
-	// free the UI container
-	container_free(m_ui_container);
 }
 
 

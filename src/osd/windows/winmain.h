@@ -66,7 +66,6 @@
 #define WINOPTION_MAXIMIZE				"maximize"
 #define WINOPTION_KEEPASPECT			"keepaspect"
 #define WINOPTION_PRESCALE				"prescale"
-#define WINOPTION_EFFECT				"effect"
 #define WINOPTION_WAITVSYNC				"waitvsync"
 #define WINOPTION_SYNCREFRESH			"syncrefresh"
 

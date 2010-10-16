@@ -106,6 +106,7 @@
 #define OPTION_CONTRAST				"contrast"
 #define OPTION_GAMMA				"gamma"
 #define OPTION_PAUSE_BRIGHTNESS		"pause_brightness"
+#define OPTION_EFFECT				"effect"
 
 /* core vector options */
 #define OPTION_ANTIALIAS			"antialias"

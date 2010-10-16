@@ -316,7 +316,6 @@ const options_entry mame_win_options[] =
 	{ "maximize;max",             "1",        OPTION_BOOLEAN,    "default to maximized windows; otherwise, windows will be minimized" },
 	{ "keepaspect;ka",            "1",        OPTION_BOOLEAN,    "constrain to the proper aspect ratio" },
 	{ "prescale",                 "1",        0,                 "scale screen rendering by this amount in software" },
-	{ "effect",                   "none",     0,                 "name of a PNG file to use for visual effects, or 'none'" },
 	{ "waitvsync",                "0",        OPTION_BOOLEAN,    "enable waiting for the start of VBLANK before flipping screens; reduces tearing effects" },
 	{ "syncrefresh",              "0",        OPTION_BOOLEAN,    "enable using the start of VBLANK for throttling instead of the game time" },
 

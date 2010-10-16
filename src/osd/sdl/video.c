@@ -82,8 +82,6 @@ osd_gl_dispatch *gl_dispatch;
 static sdl_monitor_info *primary_monitor;
 static sdl_monitor_info *sdl_monitor_list;
 
-static bitmap_t *effect_bitmap;
-
 //============================================================
 //  PROTOTYPES
 //============================================================
@@ -96,7 +94,6 @@ static void check_osd_inputs(running_machine *machine);
 
 static void extract_video_config(running_machine *machine);
 static void extract_window_config(running_machine *machine, int index, sdl_window_config *conf);
-static void load_effect_overlay(running_machine *machine, const char *filename);
 static float get_aspect(const char *name, int report_error);
 static void get_resolution(const char *name, sdl_window_config *config, int report_error);
 
@@ -152,10 +149,6 @@ error:
 
 static void video_exit(running_machine &machine)
 {
-	// free the overlay effect
-	global_free(effect_bitmap);
-	effect_bitmap = NULL;
-
 	// free all of our monitor information
 	while (sdl_monitor_list != NULL)
 	{
@@ -646,10 +639,6 @@ static void extract_video_config(running_machine *machine)
 	if (machine->debug_flags & DEBUG_FLAG_OSD_ENABLED)
 		video_config.windowed = TRUE;
 
-	stemp = options_get_string(machine->options(), SDLOPTION_EFFECT);
-	if (stemp != NULL && strcmp(stemp, "none") != 0)
-		load_effect_overlay(machine, stemp);
-
 	// default to working video please
 	video_config.novideo = 0;
 
@@ -808,39 +797,6 @@ static void extract_video_config(running_machine *machine)
 		mame_printf_warning("scalemode is only for -video soft, overriding\n");
 		video_config.scale_mode = VIDEO_SCALE_MODE_NONE;
 	}
-}
-
-
-//============================================================
-//  load_effect_overlay
-//============================================================
-
-static void load_effect_overlay(running_machine *machine, const char *filename)
-{
-	char *tempstr = global_alloc_array(char, strlen(filename) + 5);
-	char *dest;
-
-	// append a .PNG extension
-	strcpy(tempstr, filename);
-	dest = strrchr(tempstr, '.');
-	if (dest == NULL)
-		dest = &tempstr[strlen(tempstr)];
-	strcpy(dest, ".png");
-
-	// load the file
-	effect_bitmap = render_load_png(OPTION_ARTPATH, NULL, tempstr, NULL, NULL);
-	if (effect_bitmap == NULL)
-	{
-		mame_printf_error("Unable to load PNG file '%s'\n", tempstr);
-		global_free(tempstr);
-		return;
-	}
-
-	// set the overlay on all screens
-	for (screen_device *screen = screen_first(*machine); screen != NULL; screen = screen_next(screen))
-		screen->container().set_overlay(effect_bitmap);
-
-	global_free(tempstr);
 }
 
 

@@ -48,7 +48,6 @@
 #define SDLOPTION_UNEVENSTRETCH			"unevenstretch"
 #define SDLOPTION_USEALLHEADS			"useallheads"
 #define SDLOPTION_MAXIMIZE				"maximize"
-#define SDLOPTION_EFFECT				"effect"
 #define SDLOPTION_VIDEO					"video"
 #define SDLOPTION_SWITCHRES				"switchres"
 #define SDLOPTION_FILTER				"filter"

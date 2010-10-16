@@ -94,7 +94,6 @@ static const options_entry mame_sdl_options[] =
 	{ SDLOPTION_MAXIMIZE ";max",              "1",        OPTION_BOOLEAN,    "default to maximized windows; otherwise, windows will be minimized" },
 	{ SDLOPTION_KEEPASPECT ";ka",             "1",        OPTION_BOOLEAN,    "constrain to the proper aspect ratio" },
 	{ SDLOPTION_UNEVENSTRETCH ";ues",         "1",        OPTION_BOOLEAN,    "allow non-integer stretch factors" },
-	{ SDLOPTION_EFFECT,                  SDLOPTVAL_NONE,  0,                 "name of a PNG file to use for visual effects, or 'none'" },
 	{ SDLOPTION_CENTERH,                      "1",        OPTION_BOOLEAN,    "center horizontally within the view area" },
 	{ SDLOPTION_CENTERV,                      "1",        OPTION_BOOLEAN,    "center vertically within the view area" },
 	#if (SDL_VERSION_ATLEAST(1,2,10))

@@ -1903,6 +1903,7 @@ screen_device::screen_device(running_machine &_machine, const screen_device_conf
 	  m_texture_format(0),
 	  m_changed(true),
 	  m_last_partial_scan(0),
+	  m_screen_overlay_bitmap(NULL),
 	  m_frame_period(m_config.m_refresh),
 	  m_scantime(1),
 	  m_pixeltime(1),
@@ -1931,6 +1932,7 @@ screen_device::~screen_device()
 	m_machine.render().texture_free(m_texture[1]);
 	if (m_burnin != NULL)
 		finalize_burnin();
+	global_free(m_screen_overlay_bitmap);
 }
 
 
@@ -1985,6 +1987,11 @@ void screen_device::device_start()
 			fatalerror("Error allocating burn-in bitmap for screen at (%dx%d)\n", width, height);
 		bitmap_fill(m_burnin, NULL, 0);
 	}
+
+	// load the effect overlay
+	const char *overname = options_get_string(machine->options(), OPTION_EFFECT);
+	if (overname != NULL && strcmp(overname, "none") != 0)
+		load_effect_overlay(overname);
 
 	state_save_register_device_item(this, 0, m_width);
 	state_save_register_device_item(this, 0, m_height);
@@ -2552,8 +2559,7 @@ void screen_device::update_burnin()
 
 
 //-------------------------------------------------
-//  video_finalize_burnin - finalize the burnin
-//  bitmap
+//  finalize_burnin - finalize the burnin bitmap
 //-------------------------------------------------
 
 void screen_device::finalize_burnin()
@@ -2634,6 +2640,28 @@ void screen_device::finalize_burnin()
 		png_free(&pnginfo);
 		mame_fclose(file);
 	}
+}
+
+
+//-------------------------------------------------
+//  finalize_burnin - finalize the burnin bitmap
+//-------------------------------------------------
+
+void screen_device::load_effect_overlay(const char *filename)
+{
+	// ensure that there is a .png extension
+	astring fullname(filename);
+	int extension = fullname.rchr(0, '.');
+	if (extension != -1)
+		fullname.del(extension, -1);
+	fullname.cat(".png");
+
+	// load the file
+	m_screen_overlay_bitmap = render_load_png(OPTION_ARTPATH, NULL, fullname, NULL, NULL);
+	if (m_screen_overlay_bitmap != NULL)
+		m_container->set_overlay(m_screen_overlay_bitmap);
+	else
+		mame_printf_warning("Unable to load effect PNG file '%s'\n", fullname.cstr());
 }
 
 

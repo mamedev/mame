@@ -216,6 +216,7 @@ private:
 	void scanline_update_callback(int scanline);
 
 	void finalize_burnin();
+	void load_effect_overlay(const char *filename);
 
 	// internal state
 	const screen_device_config &m_config;
@@ -235,6 +236,7 @@ private:
 	INT32					m_texture_format;		// texture format of bitmap for this screen
 	bool					m_changed;				// has this bitmap changed?
 	INT32					m_last_partial_scan;	// scanline of last partial update
+	bitmap_t *				m_screen_overlay_bitmap;// screen overlay bitmap
 
 	// screen timing
 	attoseconds_t			m_frame_period;			// attoseconds per frame
