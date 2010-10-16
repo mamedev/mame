@@ -2097,12 +2097,10 @@ void screen_device::realloc_screen_bitmaps()
 	if (m_width > curwidth || m_height > curheight)
 	{
 		// free what we have currently
-		global_free(m_texture[0]);
-		global_free(m_texture[1]);
-		if (m_bitmap[0] != NULL)
-			auto_free(machine, m_bitmap[0]);
-		if (m_bitmap[1] != NULL)
-			auto_free(machine, m_bitmap[1]);
+		m_machine.render().texture_free(m_texture[0]);
+		m_machine.render().texture_free(m_texture[1]);
+		auto_free(machine, m_bitmap[0]);
+		auto_free(machine, m_bitmap[1]);
 
 		// compute new width/height
 		curwidth = MAX(m_width, curwidth);
