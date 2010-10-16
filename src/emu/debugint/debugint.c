@@ -956,7 +956,7 @@ static void process_string(DView *dv, const char *str)
 		downcast<debug_view_disasm *>(dv->view)->set_expression(str);
 		break;
 	case DVT_CONSOLE:
-		if(!dv->editor.str[0])
+		if(!dv->editor.str[(long)0])
 			debug_cpu_get_visible_cpu(dv->machine)->debug()->single_step();
 		else
 			debug_console_execute_command(dv->machine, str, 1);

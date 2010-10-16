@@ -220,13 +220,13 @@ inline void *operator new[](std::size_t size) throw (std::bad_alloc)
 	return result;
 }
 
-inline void operator delete(void *ptr)
+inline void operator delete(void *ptr) throw()
 {
 	if (ptr != NULL)
 		free_file_line(ptr, NULL, 0);
 }
 
-inline void operator delete[](void *ptr)
+inline void operator delete[](void *ptr) throw()
 {
 	if (ptr != NULL)
 		free_file_line(ptr, NULL, 0);

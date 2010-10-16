@@ -545,7 +545,7 @@ protected:
 	{
 	public:
 		optional_device(device_t &base, const char *tag) : auto_finder_type<_DeviceClass *, false>(base, tag) { }
-		virtual void findit(device_t &base) { this->set_target(downcast<_DeviceClass *>(find_device(base, this->m_tag))); }
+		virtual void findit(device_t &base) { this->set_target(downcast<_DeviceClass *>(this->find_device(base, this->m_tag))); }
 	};
 
 	// required devices are similar but throw an error if they are not found
@@ -554,7 +554,7 @@ protected:
 	{
 	public:
 		required_device(device_t &base, const char *tag) : auto_finder_type<_DeviceClass *, true>(base, tag) { }
-		virtual void findit(device_t &base) { this->set_target(downcast<_DeviceClass *>(find_device(base, this->m_tag))); }
+		virtual void findit(device_t &base) { this->set_target(downcast<_DeviceClass *>(this->find_device(base, this->m_tag))); }
 	};
 
 	// optional shared pointer finder
@@ -563,7 +563,7 @@ protected:
 	{
 	public:
 		optional_shared_ptr(device_t &base, const char *tag) : auto_finder_type<_PointerType *, false>(base, tag) { }
-		virtual void findit(device_t &base) { this->set_target(reinterpret_cast<_PointerType *>(find_shared_ptr(base, this->m_tag))); }
+		virtual void findit(device_t &base) { this->set_target(reinterpret_cast<_PointerType *>(this->find_shared_ptr(base, this->m_tag))); }
 	};
 
 	// required shared pointer finder
@@ -572,7 +572,7 @@ protected:
 	{
 	public:
 		required_shared_ptr(device_t &base, const char *tag) : auto_finder_type<_PointerType *, true>(base, tag) { }
-		virtual void findit(device_t &base) { this->set_target(reinterpret_cast<_PointerType *>(find_shared_ptr(base, this->m_tag))); }
+		virtual void findit(device_t &base) { this->set_target(reinterpret_cast<_PointerType *>(this->find_shared_ptr(base, this->m_tag))); }
 	};
 
 	// optional shared pointer size finder
