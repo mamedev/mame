@@ -345,6 +345,8 @@ bp 6f8d check the EEPROM2 results
 
 bp 6dce onward looks bogus, but it's probably the way it's intended to be
 
+M50458 charset is checked at 1382, a word checksum is provided at offsets 0xffe-0xfff of the given ROM
+
 */
 
 static READ8_HANDLER( nss_eeprom_r )
@@ -372,13 +374,13 @@ static READ8_HANDLER( m50458_r )
 	{
 		UINT8 *gfx_rom = memory_region(space->machine, "m50458_gfx");
 
-		return gfx_rom[offset & 0x7ff];
+		return gfx_rom[offset & 0xfff];
 	}
 	else
 	{
 		UINT8 *gfx_ram = memory_region(space->machine, "m50458_vram");
 
-		return gfx_ram[offset & 0x7ff];
+		return gfx_ram[offset & 0xfff];
 	}
 
 	return 0;
@@ -392,7 +394,7 @@ static WRITE8_HANDLER( m50458_w )
 	{
 		UINT8 *gfx_ram = memory_region(space->machine, "m50458_vram");
 
-		gfx_ram[offset & 0x7ff] = data;
+		gfx_ram[offset & 0xfff] = data;
 	}
 }
 
@@ -401,7 +403,7 @@ static ADDRESS_MAP_START( bios_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROMBANK("bank1")
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
 	AM_RANGE(0x8800, 0x8fff) AM_RAM // vram perhaps?
-	AM_RANGE(0x9000, 0x97ff) AM_MIRROR(0x800) AM_READWRITE(m50458_r,m50458_w) // M50458 vram & GFX rom routes here
+	AM_RANGE(0x9000, 0x9fff) AM_READWRITE(m50458_r,m50458_w) // M50458 vram & GFX rom routes here
 	AM_RANGE(0xa000, 0xa000) AM_READ(nss_eeprom_r)
 	AM_RANGE(0xe000, 0xe000) AM_WRITE(nss_eeprom_w)
 	AM_RANGE(0xc000, 0xdfff) AM_MIRROR(0x2000) AM_RAM AM_REGION("ibios_rom", 0x6000)
@@ -450,13 +452,13 @@ static READ8_HANDLER( port03_r )
 static WRITE8_HANDLER( port80_w )
 {
 	/*
-    ---- x--- written when 0x9000-0x9fff is read, probably a bankswitch
+    ---- -x-- written when 0x9000-0x9fff is read, probably a bankswitch
     ---- --x- see port 0x02 note
     ---- ---x BIOS bankswitch
     */
 
 	memory_set_bank(space->machine, "bank1", data & 1);
-	m50458_rom_bank = data & 8;
+	m50458_rom_bank = data & 4;
 }
 
 static WRITE8_HANDLER( port82_w ) // EEPROM2?
@@ -609,6 +611,35 @@ static INPUT_PORTS_START( snes )
 #endif
 INPUT_PORTS_END
 
+static const gfx_layout nss_char_layout_16x18 =
+{
+	16,18,
+	RGN_FRAC(1,1),
+	1,
+	{ 0 },
+	{ 0, 1, 2, 3, 4, 5, 6, 7,8,9,10,11,12,13,14,15 },
+	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16, 16*16,17*16 },
+	16*18
+};
+
+static const gfx_layout nss_char_layout_16x16 =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	1,
+	{ 0 },
+	{ 0, 1, 2, 3, 4, 5, 6, 7,8,9,10,11,12,13,14,15 },
+	{ 0*16, 1*16, 2*16, 3*16, 4*16, 5*16, 6*16, 7*16,8*16, 9*16, 10*16, 11*16, 12*16, 13*16, 14*16, 15*16 },
+	16*16
+};
+
+
+/* decoded for debugging purpose, this will be nuked in the end... */
+static GFXDECODE_START( nss )
+	GFXDECODE_ENTRY( "chargen",   0x00000, nss_char_layout_16x18,    0, 1 )
+	GFXDECODE_ENTRY( "m50458_gfx",   0x00000, nss_char_layout_16x16,    0, 1 )
+GFXDECODE_END
+
 static MACHINE_CONFIG_START( snes, snes_state )
 
 	/* basic machine hardware */
@@ -646,6 +677,8 @@ static MACHINE_CONFIG_DERIVED( nss, snes )
 	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
 //  MDRV_CPU_FLAGS(CPU_DISABLE)
 
+	MDRV_GFXDECODE( nss )
+	MDRV_PALETTE_LENGTH(2)
 	MDRV_MACHINE_START( nss )
 MACHINE_CONFIG_END
 
@@ -663,9 +696,13 @@ MACHINE_CONFIG_END
 	ROM_REGION(0x20000,         "bios",  0)		/* Bios CPU (what is it?) */ \
 	ROM_LOAD("nss-c.dat"  , 0x10000, 0x8000, CRC(a8e202b3) SHA1(b7afcfe4f5cf15df53452dc04be81929ced1efb2) )	/* bios */ \
 	ROM_LOAD("nss-ic14.02", 0x18000, 0x8000, CRC(e06cb58f) SHA1(62f507e91a2797919a78d627af53f029c7d81477) )	/* bios */ \
-	ROM_REGION( 0x800, "m50458_gfx", ROMREGION_ERASEFF ) \
-	ROM_LOAD("m50458_char", 0x000, 0x800, NO_DUMP ) \
-	ROM_REGION( 0x800, "m50458_vram", ROMREGION_ERASE00 ) \
+	ROM_REGION( 0x1200, "chargen", ROMREGION_ERASEFF ) \
+	ROM_LOAD("m50458_char.bin",     0x0000, 0x1200, BAD_DUMP CRC(011cc342) SHA1(d5b9f32d6e251b4b25945267d7c68c099bd83e96) ) \
+	ROM_REGION( 0x1000, "m50458_gfx", ROMREGION_ERASEFF ) \
+	ROM_LOAD("m50458_char_mod.bin", 0x0000, 0x1000, BAD_DUMP CRC(8c4326ef) SHA1(21a63c5245ff7f3f70cb45e217b3045b19d0d799) ) \
+	ROM_REGION( 0x1000, "m50458_vram", ROMREGION_ERASE00 ) \
+
+
 
 ROM_START( nss )
 	NSS_BIOS
