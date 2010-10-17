@@ -30,7 +30,7 @@ VIDEO_START( balsente )
 	state->sprite_mask = memory_region_length(machine, "gfx1") - 1;
 
 	/* register for saving */
-	state_save_register_global_array(machine, state->videoram);
+	state_save_register_global_array(machine, state->expanded_videoram);
 	state_save_register_global(machine, state->palettebank_vis);
 }
 
@@ -47,8 +47,10 @@ WRITE8_HANDLER( balsente_videoram_w )
 	balsente_state *state = space->machine->driver_data<balsente_state>();
 
 	/* expand the two pixel values into two bytes */
-	state->videoram[offset * 2 + 0] = data >> 4;
-	state->videoram[offset * 2 + 1] = data & 15;
+	state->videoram[offset] = data;
+
+	state->expanded_videoram[offset * 2 + 0] = data >> 4;
+	state->expanded_videoram[offset * 2 + 1] = data & 15;
 }
 
 
@@ -144,7 +146,7 @@ static void draw_one_sprite(running_machine *machine, bitmap_t *bitmap, const re
 		if (ypos >= (16 + BALSENTE_VBEND) && ypos >= cliprect->min_y && ypos <= cliprect->max_y)
 		{
 			const pen_t *pens = &machine->pens[state->palettebank_vis * 256];
-			UINT8 *old = &state->videoram[(ypos - BALSENTE_VBEND) * 256 + xpos];
+			UINT8 *old = &state->expanded_videoram[(ypos - BALSENTE_VBEND) * 256 + xpos];
 			int currx = xpos;
 
 			/* standard case */
@@ -216,7 +218,7 @@ VIDEO_UPDATE( balsente )
 
 	/* draw scanlines from the VRAM directly */
 	for (y = cliprect->min_y; y <= cliprect->max_y; y++)
-		draw_scanline8(bitmap, 0, y, 256, &state->videoram[(y - BALSENTE_VBEND) * 256], pens);
+		draw_scanline8(bitmap, 0, y, 256, &state->expanded_videoram[(y - BALSENTE_VBEND) * 256], pens);
 
 	/* draw the sprite images */
 	for (i = 0; i < 40; i++)

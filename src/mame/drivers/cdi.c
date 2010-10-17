@@ -247,7 +247,8 @@ static MACHINE_RESET( quizrr41 )
 {
 	MACHINE_RESET_CALL( cdi );
 
-	scc68070_set_quizard_mcu_value(machine, 0x0139);
+	//scc68070_set_quizard_mcu_value(machine, 0x0139);
+	scc68070_set_quizard_mcu_value(machine, 0x011f);
 	scc68070_set_quizard_mcu_ack(machine, 0x57);
 }
 

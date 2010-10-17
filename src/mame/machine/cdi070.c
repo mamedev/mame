@@ -197,10 +197,6 @@ static UINT8 g_state[8] = { 0 };
 void scc68070_quizard_rx(running_machine *machine, scc68070_regs_t *scc68070, UINT8 data)
 {
 	scc68070_uart_rx(machine, scc68070, 0x5a);
-	for(int index = 0; index < 8; index++)
-	{
-		scc68070_uart_rx(machine, scc68070, g_state[index]);
-	}
 	scc68070_uart_rx(machine, scc68070, data);
 }
 
@@ -274,69 +270,95 @@ INTERRUPT_GEN( scc68070_mcu_frame )
 
 static void quizard_handle_byte_tx(running_machine *machine, scc68070_regs_t *scc68070)
 {
+	static int state = 0;
 	static UINT8 rx[0x100];
 	static UINT8 rx_ptr = 0xff;
-	static UINT8 ack_count = 0;
 	UINT8 tx = scc68070->uart.transmit_holding_register;
 
-	/*
+	//printf("T: %02x ", tx );
 	if((tx >= 0x20 && tx < 0x7f) || tx == 0x0d || tx == 0x0a)
 	{
-		printf("%c", tx);
+		//printf("%c ", tx);
 	}
-	else
-	{
-		printf("\n%02x? %02x\n", tx, mcu_ack);
-	}
-	*/
+	//printf("\n");
 
-	if(tx == 0x56)
+	switch(state)
 	{
-		ack_count = 0;
-		rx_ptr = 0xff;
-		// We're about to lead off a sequence!
-	}
-	else if(tx == 0x0d || tx == 0x0a)
-	{
-		ack_count++;
-		if(ack_count == 2)
-		{
-			scc68070_uart_rx(machine, scc68070, 0x5a);
-			scc68070_uart_rx(machine, scc68070, g_state[0]);
-			scc68070_uart_rx(machine, scc68070, g_state[1]);
-			scc68070_uart_rx(machine, scc68070, g_state[2]);
-			scc68070_uart_rx(machine, scc68070, g_state[3]);
-			scc68070_uart_rx(machine, scc68070, g_state[4]);
-			scc68070_uart_rx(machine, scc68070, g_state[5]);
-			scc68070_uart_rx(machine, scc68070, g_state[6]);
-			scc68070_uart_rx(machine, scc68070, g_state[7]);
-		}
-	}
-	else if(tx == mcu_ack)
-	{
-		ack_count++;
-		if(ack_count == 2)
-		{
-			//printf("Calculating seeds\n");
-			quizard_set_seeds(rx);
-			quizard_calculate_state(machine, scc68070);
-			scc68070_uart_rx(machine, scc68070, 0x5a);
-			scc68070_uart_rx(machine, scc68070, g_state[0]);
-			scc68070_uart_rx(machine, scc68070, g_state[1]);
-			scc68070_uart_rx(machine, scc68070, g_state[2]);
-			scc68070_uart_rx(machine, scc68070, g_state[3]);
-			scc68070_uart_rx(machine, scc68070, g_state[4]);
-			scc68070_uart_rx(machine, scc68070, g_state[5]);
-			scc68070_uart_rx(machine, scc68070, g_state[6]);
-			scc68070_uart_rx(machine, scc68070, g_state[7]);
-			rx_ptr = 0xff;
-		}
-	}
-	else
-	{
-		ack_count = 0;
-		rx_ptr++;
-		rx[rx_ptr] = tx;
+		case 0: // Waiting for a leadoff byte
+			if(tx == mcu_ack) // Sequence end
+			{
+				//scc68070_uart_rx(machine, scc68070, 0x5a);
+				//scc68070_uart_rx(machine, scc68070, 0x42);
+			}
+			else
+			{
+				switch(tx)
+				{
+					case 0x44: // DATABASEPATH = **_DATABASE/
+						rx[0] = 0x44;
+						rx_ptr = 1;
+						state = 3;
+						break;
+					case 0x2e: // Unknown; ignored
+						break;
+					case 0x56: // Seed start
+						rx_ptr = 0;
+						state = 1;
+						break;
+					default:
+						//printf("Unknown leadoff byte: %02x\n", tx);
+						break;
+				}
+			}
+			break;
+
+		case 1: // Receiving the seed
+			rx[rx_ptr] = tx;
+			rx_ptr++;
+			if(rx_ptr == 20)
+			{
+				//printf("Calculating seeds\n");
+				quizard_set_seeds(rx);
+				quizard_calculate_state(machine, scc68070);
+				state = 2;
+			}
+			break;
+
+		case 2: // Receiving the seed acknowledge
+			if(tx == mcu_ack)
+			{
+				state = 0;
+				scc68070_uart_rx(machine, scc68070, 0x5a);
+				scc68070_uart_rx(machine, scc68070, g_state[0]);
+				scc68070_uart_rx(machine, scc68070, g_state[1]);
+				scc68070_uart_rx(machine, scc68070, g_state[2]);
+				scc68070_uart_rx(machine, scc68070, g_state[3]);
+				scc68070_uart_rx(machine, scc68070, g_state[4]);
+				scc68070_uart_rx(machine, scc68070, g_state[5]);
+				scc68070_uart_rx(machine, scc68070, g_state[6]);
+				scc68070_uart_rx(machine, scc68070, g_state[7]);
+			}
+			break;
+
+		case 3: // Receiving the database path
+			rx[rx_ptr] = tx;
+			rx_ptr++;
+			if(tx == 0x0a)
+			{
+				rx[rx_ptr] = 0;
+				//printf("Database path: %s\n", rx);
+				scc68070_uart_rx(machine, scc68070, 0x5a);
+				scc68070_uart_rx(machine, scc68070, g_state[0]);
+				scc68070_uart_rx(machine, scc68070, g_state[1]);
+				scc68070_uart_rx(machine, scc68070, g_state[2]);
+				scc68070_uart_rx(machine, scc68070, g_state[3]);
+				scc68070_uart_rx(machine, scc68070, g_state[4]);
+				scc68070_uart_rx(machine, scc68070, g_state[5]);
+				scc68070_uart_rx(machine, scc68070, g_state[6]);
+				scc68070_uart_rx(machine, scc68070, g_state[7]);
+				state = 0;
+			}
+			break;
 	}
 }
 

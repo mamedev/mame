@@ -115,7 +115,8 @@ public:
 	UINT8 grudge_last_steering[3];
 
 	/* video data */
-	UINT8 videoram[256 * 256];
+	UINT8 *videoram;
+	UINT8 expanded_videoram[256*256];
 	UINT8 *sprite_data;
 	UINT32 sprite_mask;
 	UINT8 *sprite_bank[2];
