@@ -273,7 +273,10 @@ TODO:
 
 static READ8_HANDLER ( snk_cpuA_nmi_trigger_r )
 {
-	cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
+	if(!space->debugger_access())
+	{
+		cputag_set_input_line(space->machine, "maincpu", INPUT_LINE_NMI, ASSERT_LINE);
+	}
 	return 0xff;
 }
 
@@ -284,7 +287,10 @@ static WRITE8_HANDLER( snk_cpuA_nmi_ack_w )
 
 static READ8_HANDLER ( snk_cpuB_nmi_trigger_r )
 {
-	cputag_set_input_line(space->machine, "sub", INPUT_LINE_NMI, ASSERT_LINE);
+	if(!space->debugger_access())
+	{
+		cputag_set_input_line(space->machine, "sub", INPUT_LINE_NMI, ASSERT_LINE);
+	}
 	return 0xff;
 }
 
