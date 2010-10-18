@@ -651,6 +651,9 @@ static TIMER_CALLBACK( line_timer_cb )
 			mc6845->line_enable_ff = 1;
 			/* also update the cursor state now */
 			update_cursor_state(mc6845);
+
+			if (mc6845->screen != NULL)
+				mc6845->screen->reset_origin();
 		}
 		else
 		{

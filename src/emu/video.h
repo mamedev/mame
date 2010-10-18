@@ -160,6 +160,7 @@ public:
 
 	// dynamic configuration
 	void configure(int width, int height, const rectangle &visarea, attoseconds_t frame_period);
+	void reset_origin(int beamy = 0, int beamx = 0);
 	void set_visible_area(int min_x, int max_x, int min_y, int max_y);
 
 	// beam positioning and state

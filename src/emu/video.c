@@ -2088,6 +2088,23 @@ void screen_device::configure(int width, int height, const rectangle &visarea, a
 
 
 //-------------------------------------------------
+//  reset_origin - reset the timing such that the
+//  given (x,y) occurs at the current time
+//-------------------------------------------------
+
+void screen_device::reset_origin(int beamy, int beamx)
+{
+	// compute the effective VBLANK start/end times
+	m_vblank_end_time = attotime_sub_attoseconds(timer_get_time(machine), beamy * m_scantime + beamx * m_pixeltime);
+	m_vblank_start_time = attotime_sub_attoseconds(m_vblank_end_time, m_vblank_period);
+
+	// re-adjust the scanline 0 and VBLANK timers
+	timer_adjust_oneshot(m_scanline0_timer, time_until_pos(0), 0);
+	timer_adjust_oneshot(m_vblank_begin_timer, time_until_vblank_start(), 0);
+}
+
+
+//-------------------------------------------------
 //  realloc_screen_bitmaps - reallocate bitmaps
 //  and textures as necessary
 //-------------------------------------------------
