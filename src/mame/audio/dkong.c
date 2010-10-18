@@ -910,6 +910,21 @@ DISCRETE_TASK_START(1)
 		1, NODE_110,								/* ENAB, SWITCH */
 		TTL_HIGH, 0)								/* INP0, INP1 */
 	DISCRETE_RCFILTER(NODE_112, NODE_111, JR_R10, JR_C17)
+
+/* Breadboarded measurements IC 5K, pin 7
+   D.R. Oct 2010
+    V       Hz
+    0.151   3139
+    0.25    2883
+    0.5     2820
+    0.75    3336
+    1       3805
+    2       6498
+    3       9796
+    4       13440
+    4.14    13980
+*/
+
 #if (USE_LS629)
 	DISCRETE_74LS629(NODE_113,						/* IC 5K, pin 7 */
 		1,											/* ENAB */
@@ -926,8 +941,23 @@ DISCRETE_TASK_START(1)
 		1, NODE_107,								/* ENAB, SWITCH */
 		TTL_HIGH, 0)								/* INP0, INP1 */
 	DISCRETE_RCFILTER(NODE_117, NODE_116, JR_R11, JR_C16)
+
+/* Breadboarded measurements IC 5K, pin 10
+   D.R. Oct 2010
+    V       Hz
+    0.135   14450
+    0.25    13320
+    0.5     12980
+    0.75    15150
+    1       17270
+    2       28230
+    3       41910
+    4       56950
+    4.15    59400
+*/
+
 #if (0 && USE_LS629)
-	DISCRETE_74LS629(NODE_118,						/* IC 5K, pin 7 */
+	DISCRETE_74LS629(NODE_118,						/* IC 5K, pin 10 */
 		1,											/* ENAB */
 		NODE_117, DK_SUP_V,							/* VMOD, VRNG */
 		JR_C19, JR_R11,								/* C, R_FREQ_IN */
@@ -935,14 +965,6 @@ DISCRETE_TASK_START(1)
 #else
 	DISCRETE_74LS624(NODE_118, NODE_117, DK_SUP_V, JR_C19, DISC_LS624_OUT_COUNT_F)
 #endif
-
-//DISCRETE_74LS629(NODE_30,                     /* IC 5K, pin 7 */
-//      1,                                          /* ENAB */
-//      NODE_117, DK_SUP_V,                         /* VMOD, VRNG */
-//      JR_C19, JR_R11,                             /* C, R_FREQ_IN */
-//      DISC_LS624_OUT_COUNT_F)
-//DISCRETE_74LS624(NODE_31, NODE_117, DK_SUP_V, JR_C19, DISC_LS624_OUT_COUNT_F)
-//DISCRETE_WAVELOG2(NODE_30, 1000,NODE_31, 1000)
 
 	DISCRETE_LOGIC_NAND(NODE_120, NODE_115, NODE_110)
 	DISCRETE_MULTIPLY(DS_OUT_SOUND0, NODE_120, TTL_HIGH)
@@ -960,6 +982,21 @@ DISCRETE_TASK_START(2)
 		TTL_HIGH, 0)								/* INP0, INP1 */
 	DISCRETE_LOGIC_INVERT(NODE_12, NODE_10)
 	DISCRETE_MIXER2(NODE_13, 1, NODE_10, NODE_11, &dkongjr_s1_mixer_desc)
+
+/* Breadboarded measurements IC 8L, pin 10
+   D.R. Oct 2010
+    V       Hz
+    0.151   313
+    0.25    288
+    0.5     275
+    0.75    324
+    1       370
+    2       635
+    3       965
+    4       1325
+    4.14    1378
+*/
+
 #if (USE_LS629)
 	DISCRETE_74LS629(NODE_14,						/* IC 8L, pin 10 */
 		1,											/* ENAB */
@@ -1003,6 +1040,20 @@ DISCRETE_TASK_END()
      ************************************************/
 
 DISCRETE_TASK_START(1)
+/* Breadboarded measurements IC 7P, pin 7
+   D.R. Oct 2010
+    V       Hz
+    0.134   570
+    0.25    538
+    0.5     489
+    0.75    560
+    1       636
+    2       1003
+    3       1484
+    4       2016
+    4.16    2111
+*/
+
 #if (USE_LS629)
 	DISCRETE_RCFILTER(NODE_90, DS_SOUND9_INV, JR_R14, JR_C26)
 	DISCRETE_74LS629(NODE_91,				/* IC 7P, pin 7 */
