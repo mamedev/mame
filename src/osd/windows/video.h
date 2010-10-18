@@ -42,6 +42,8 @@
 #ifndef __WIN_VIDEO__
 #define __WIN_VIDEO__
 
+#include "render.h"
+
 
 //============================================================
 //  CONSTANTS
@@ -90,7 +92,7 @@ struct _win_video_config
 	int					prescale;					// prescale factor
 	int					keepaspect;					// keep aspect ratio
 	int					numscreens;					// number of screens
-	int					layerconfig;				// default configuration of layers
+	render_layer_config	layerconfig;				// default configuration of layers
 
 	// per-window configuration
 	win_window_config	window[MAX_WINDOWS];		// configuration data per-window

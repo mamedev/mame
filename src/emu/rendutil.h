@@ -28,7 +28,7 @@ void render_resample_argb_bitmap_hq(void *dest, UINT32 drowpixels, UINT32 dwidth
 int render_clip_line(render_bounds *bounds, const render_bounds *clip);
 int render_clip_quad(render_bounds *bounds, const render_bounds *clip, render_quad_texuv *texcoords);
 void render_line_to_quad(const render_bounds *bounds, float width, render_bounds *bounds0, render_bounds *bounds1);
-bitmap_t *render_load_png(const char *path, const char *dirname, const char *filename, bitmap_t *alphadest, int *hasalpha);
+bitmap_t *render_load_png(const char *path, const char *dirname, const char *filename, bitmap_t *alphadest, bool *hasalpha);
 
 
 

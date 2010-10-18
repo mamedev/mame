@@ -718,7 +718,8 @@ static void winwindow_video_window_destroy(win_window_info *window)
 
 void winwindow_video_window_update(win_window_info *window)
 {
-	int targetview, targetorient, targetlayerconfig;
+	int targetview, targetorient;
+	render_layer_config targetlayerconfig;
 
 	assert(GetCurrentThreadId() == main_threadid);
 

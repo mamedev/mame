@@ -113,19 +113,6 @@ const UINT8 RENDER_CREATE_SINGLE_FILE	= 0x02;			// only load views from the file
 const UINT8 RENDER_CREATE_HIDDEN		= 0x04;			// don't make this target visible
 
 
-// layer config masks
-const UINT8 LAYER_CONFIG_ENABLE_BACKDROP		= 0x01;	// enable backdrop layers
-const UINT8 LAYER_CONFIG_ENABLE_OVERLAY			= 0x02;	// enable overlay layers
-const UINT8 LAYER_CONFIG_ENABLE_BEZEL			= 0x04;	// enable bezel layers
-const UINT8 LAYER_CONFIG_ZOOM_TO_SCREEN			= 0x08;	// zoom to screen area by default
-const UINT8 LAYER_CONFIG_ENABLE_SCREEN_OVERLAY	= 0x10;	// enable screen overlays
-
-const UINT8 LAYER_CONFIG_DEFAULT =	(LAYER_CONFIG_ENABLE_BACKDROP |
-									 LAYER_CONFIG_ENABLE_OVERLAY |
-									 LAYER_CONFIG_ENABLE_BEZEL |
-									 LAYER_CONFIG_ENABLE_SCREEN_OVERLAY);
-
-
 // flags for primitives
 const int PRIMFLAG_TEXORIENT_SHIFT = 0;
 const UINT32 PRIMFLAG_TEXORIENT_MASK = 15 << PRIMFLAG_TEXORIENT_SHIFT;
@@ -183,10 +170,9 @@ class render_manager;
 typedef struct _xml_data_node xml_data_node;
 typedef struct _render_font render_font;
 struct object_transform;
-typedef struct _layout_element layout_element;
-typedef struct _layout_view layout_view;
-typedef struct _view_item view_item;
-typedef struct _layout_file layout_file;
+class layout_element;
+class layout_view;
+class layout_file;
 
 
 // texture scaling callback
@@ -240,6 +226,90 @@ struct render_texinfo
 	UINT32				height;				// height of the image
 	const rgb_t *		palette;			// palette for PALETTE16 textures, LUTs for RGB15/RGB32
 	UINT32				seqid;				// sequence ID
+};
+
+
+// ======================> render_screen_list
+
+// a render_screen_list is a list of screen_devices
+class render_screen_list
+{
+	// screen list item
+	class item
+	{
+		friend class simple_list<item>;
+		friend class render_screen_list;
+		
+	public:
+		// construction/destruction
+		item(screen_device &screen)
+			: m_next(NULL),
+			  m_screen(screen) { }
+
+		// state
+		item *				m_next;				// next screen in list
+		screen_device &		m_screen;			// reference to screen device
+	};
+
+public:
+	// construction/destruction
+	render_screen_list(resource_pool &pool = global_resource_pool)
+		: m_list(pool) { }
+
+	// getters
+	int count() const { return m_list.count(); }
+
+	// operations
+	void add(screen_device &screen) { m_list.append(*pool_alloc(m_list.pool(), item(screen))); }
+	void reset() { m_list.reset(); }
+	
+	// query
+	bool contains(screen_device &screen) const
+	{
+		for (item *curitem = m_list.first(); curitem != NULL; curitem = curitem->m_next)
+			if (&curitem->m_screen == &screen) return true;
+		return false;
+	}
+
+private:
+	// internal state
+	simple_list<item> m_list;
+};
+
+
+// ======================> render_layer_config
+
+// render_layer_config - describes the state of layers
+class render_layer_config
+{
+	static const UINT8 ENABLE_BACKDROP			= 0x01;	// enable backdrop layers
+	static const UINT8 ENABLE_OVERLAY			= 0x02;	// enable overlay layers
+	static const UINT8 ENABLE_BEZEL				= 0x04;	// enable bezel layers
+	static const UINT8 ZOOM_TO_SCREEN			= 0x08;	// zoom to screen area by default
+	static const UINT8 ENABLE_SCREEN_OVERLAY	= 0x10;	// enable screen overlays
+	static const UINT8 DEFAULT = ENABLE_BACKDROP | ENABLE_OVERLAY | ENABLE_BEZEL | ENABLE_SCREEN_OVERLAY;
+
+public:
+	render_layer_config()
+		: m_state(DEFAULT) { }
+
+	bool operator==(const render_layer_config &rhs) const { return m_state == rhs.m_state; }
+	bool operator!=(const render_layer_config &rhs) const { return m_state != rhs.m_state; }
+
+	bool backdrops_enabled() const { return ((m_state & ENABLE_BACKDROP) != 0); }
+	bool overlays_enabled() const { return ((m_state & ENABLE_OVERLAY) != 0); }
+	bool bezels_enabled() const { return ((m_state & ENABLE_BEZEL) != 0); }
+	bool screen_overlay_enabled() const { return ((m_state & ENABLE_SCREEN_OVERLAY) != 0); }
+	bool zoom_to_screen() const { return ((m_state & ZOOM_TO_SCREEN) != 0); }
+
+	render_layer_config &set_backdrops_enabled(bool enable) { if (enable) m_state |= ENABLE_BACKDROP; else m_state &= ~ENABLE_BACKDROP; return *this; }
+	render_layer_config &set_overlays_enabled(bool enable) { if (enable) m_state |= ENABLE_OVERLAY; else m_state &= ~ENABLE_OVERLAY; return *this; }
+	render_layer_config &set_bezels_enabled(bool enable) { if (enable) m_state |= ENABLE_BEZEL; else m_state &= ~ENABLE_BEZEL; return *this; }
+	render_layer_config &set_screen_overlay_enabled(bool enable) { if (enable) m_state |= ENABLE_SCREEN_OVERLAY; else m_state &= ~ENABLE_SCREEN_OVERLAY; return *this; }
+	render_layer_config &set_zoom_to_screen(bool zoom) { if (zoom) m_state |= ZOOM_TO_SCREEN; else m_state &= ~ZOOM_TO_SCREEN; return *this; }
+
+private:
+	UINT8				m_state;
 };
 
 
@@ -530,14 +600,9 @@ public:
 	float pixel_aspect() const { return m_pixel_aspect; }
 	float max_update_rate() const { return m_max_refresh; }
 	int orientation() const { return m_orientation; }
-	int layer_config() const { return m_layerconfig; }
+	render_layer_config layer_config() const { return m_layerconfig; }
 	int view() const { return view_index(*m_curview); }
 	bool hidden() const { return ((m_flags & RENDER_CREATE_HIDDEN) != 0); }
-	bool backdrops_enabled() const { return (m_layerconfig & LAYER_CONFIG_ENABLE_BACKDROP) != 0; }
-	bool overlays_enabled() const { return (m_layerconfig & LAYER_CONFIG_ENABLE_OVERLAY) != 0; }
-	bool bezels_enabled() const { return (m_layerconfig & LAYER_CONFIG_ENABLE_BEZEL) != 0; }
-	bool screen_overlay_enabled() const { return (m_layerconfig & LAYER_CONFIG_ENABLE_SCREEN_OVERLAY) != 0; }
-	bool zoom_to_screen() const { return (m_layerconfig & LAYER_CONFIG_ZOOM_TO_SCREEN) != 0; }
 	bool is_ui_target() const;
 	int index() const;
 
@@ -545,18 +610,26 @@ public:
 	void set_bounds(INT32 width, INT32 height, float pixel_aspect = 0);
 	void set_max_update_rate(float updates_per_second) { m_max_refresh = updates_per_second; }
 	void set_orientation(int orientation) { m_orientation = orientation; }
-	void set_layer_config(int layerconfig);
 	void set_view(int viewindex);
 	void set_max_texture_size(int maxwidth, int maxheight);
-	void set_backdrops_enabled(bool enable) { set_layer_config(enable ? (m_layerconfig | LAYER_CONFIG_ENABLE_BACKDROP) : (m_layerconfig & ~LAYER_CONFIG_ENABLE_BACKDROP)); }
-	void set_overlays_enabled(bool enable) { set_layer_config(enable ? (m_layerconfig | LAYER_CONFIG_ENABLE_OVERLAY) : (m_layerconfig & ~LAYER_CONFIG_ENABLE_OVERLAY)); }
-	void set_bezels_enabled(bool enable) { set_layer_config(enable ? (m_layerconfig | LAYER_CONFIG_ENABLE_BEZEL) : (m_layerconfig & ~LAYER_CONFIG_ENABLE_BEZEL)); }
-	void set_screen_overlay_enabled(bool enable) { set_layer_config(enable ? (m_layerconfig | LAYER_CONFIG_ENABLE_SCREEN_OVERLAY) : (m_layerconfig & ~LAYER_CONFIG_ENABLE_SCREEN_OVERLAY)); }
-	void set_zoom_to_screen(bool zoom) { set_layer_config(zoom ? (m_layerconfig | LAYER_CONFIG_ZOOM_TO_SCREEN) : (m_layerconfig & ~LAYER_CONFIG_ZOOM_TO_SCREEN)); }
+
+	// layer config getters
+	bool backdrops_enabled() const { return m_layerconfig.backdrops_enabled(); }
+	bool overlays_enabled() const { return m_layerconfig.overlays_enabled(); }
+	bool bezels_enabled() const { return m_layerconfig.bezels_enabled(); }
+	bool screen_overlay_enabled() const { return m_layerconfig.screen_overlay_enabled(); }
+	bool zoom_to_screen() const { return m_layerconfig.zoom_to_screen(); }
+
+	// layer config setters
+	void set_backdrops_enabled(bool enable) { m_layerconfig.set_backdrops_enabled(enable); update_layer_config(); }
+	void set_overlays_enabled(bool enable) { m_layerconfig.set_overlays_enabled(enable); update_layer_config(); }
+	void set_bezels_enabled(bool enable) { m_layerconfig.set_bezels_enabled(enable); update_layer_config(); }
+	void set_screen_overlay_enabled(bool enable) { m_layerconfig.set_screen_overlay_enabled(enable); update_layer_config(); }
+	void set_zoom_to_screen(bool zoom) { m_layerconfig.set_zoom_to_screen(zoom); update_layer_config(); }
 
 	// view information
 	const char *view_name(int viewindex);
-	UINT32 view_screens(int viewindex);
+	const render_screen_list &view_screens(int viewindex);
 
 	// bounds computations
 	void compute_visible_area(INT32 target_width, INT32 target_height, float target_pixel_aspect, int target_orientation, INT32 &visible_width, INT32 &visible_height);
@@ -579,10 +652,12 @@ public:
 
 private:
 	// internal helpers
+	void update_layer_config();
 	void load_layout_files(const char *layoutfile, bool singlefile);
+	bool load_layout_file(const char *dirname, const char *filename);
 	void add_container_primitives(render_primitive_list &list, const object_transform &xform, render_container &container, int blendmode);
-	void add_element_primitives(render_primitive_list &list, const object_transform &xform, const layout_element &element, int state, int blendmode);
-	bool map_point_internal(INT32 target_x, INT32 target_y, render_container *container, float &mapped_x, float &mapped_y, view_item *&mapped_item);
+	void add_element_primitives(render_primitive_list &list, const object_transform &xform, layout_element &element, int state, int blendmode);
+	bool map_point_internal(INT32 target_x, INT32 target_y, render_container *container, float &mapped_x, float &mapped_y, const char *&mapped_input_tag, UINT32 &mapped_input_mask);
 
 	// config callbacks
 	void config_load(xml_data_node &targetnode);
@@ -606,7 +681,7 @@ private:
 	render_target *			m_next;						// link to next target
 	render_manager &		m_manager;					// reference to our owning manager
 	layout_view *			m_curview;					// current view
-	layout_file *			m_filelist;					// list of layout files
+	simple_list<layout_file> &m_filelist;				// list of layout files
 	UINT32					m_flags;					// creation flags
 	render_primitive_list	m_primlist[NUM_PRIMLISTS];	// list of primitives
 	int						m_listindex;				// index of next primlist to use
@@ -616,15 +691,17 @@ private:
 	float					m_pixel_aspect;				// aspect ratio of individual pixels
 	float					m_max_refresh;				// maximum refresh rate, 0 or if none
 	int						m_orientation;				// orientation
-	int						m_layerconfig;				// layer configuration
+	render_layer_config		m_layerconfig;				// layer configuration
 	layout_view *			m_base_view;				// the view at the time of first frame
 	int						m_base_orientation;			// the orientation at the time of first frame
-	int						m_base_layerconfig;			// the layer configuration at the time of first frame
+	render_layer_config		m_base_layerconfig;			// the layer configuration at the time of first frame
 	int						m_maxtexwidth;				// maximum width of a texture
 	int						m_maxtexheight;				// maximum height of a texture
 	simple_list<render_container> m_debug_containers;	// list of debug containers
 	INT32					m_clear_extent_count;		// number of clear extents
 	INT32					m_clear_extents[MAX_CLEAR_EXTENTS]; // array of clear extents
+
+	static const render_screen_list s_empty_screen_list;
 };
 
 
@@ -657,9 +734,6 @@ public:
 	render_target &ui_target() const { assert(m_ui_target != NULL); return *m_ui_target; }
 	void set_ui_target(render_target &target) { m_ui_target = &target; }
 	float ui_aspect();
-
-	// screen containers
-	render_container *container_for_screen(screen_device *screen);
 
 	// UI containers
 	render_container &ui_container() const { assert(m_ui_container != NULL); return *m_ui_container; }

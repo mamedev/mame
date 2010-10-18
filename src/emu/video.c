@@ -312,7 +312,11 @@ void video_init(running_machine *machine)
 	if (global.snap_native)
 	{
 		global.snap_target = machine->render().target_alloc(layout_snap, RENDER_CREATE_SINGLE_FILE | RENDER_CREATE_HIDDEN);
-		global.snap_target->set_layer_config(0);
+		global.snap_target->set_backdrops_enabled(false);
+		global.snap_target->set_overlays_enabled(false);
+		global.snap_target->set_bezels_enabled(false);
+		global.snap_target->set_screen_overlay_enabled(false);
+		global.snap_target->set_zoom_to_screen(false);
 	}
 
 	/* other targets select the specified view and turn off effects */
@@ -1603,13 +1607,19 @@ int video_get_view_for_target(running_machine *machine, render_target *target, c
 		/* if we have enough targets to be one per screen, assign in order */
 		if (numtargets >= scrcount)
 		{
+			int index = target->index() % scrcount;
+			screen_device *screen;
+			for (screen = screen_first(*machine); screen != NULL; screen = screen_next(screen))
+				if (index-- == 0)
+					break;
+		
 			/* find the first view with this screen and this screen only */
 			for (viewindex = 0; ; viewindex++)
 			{
-				UINT32 viewscreens = target->view_screens(viewindex);
-				if (viewscreens == (1 << targetindex))
+				const render_screen_list &viewscreens = target->view_screens(viewindex);
+				if (viewscreens.count() == 1 && viewscreens.contains(*screen))
 					break;
-				if (viewscreens == 0)
+				if (viewscreens.count() == 0)
 				{
 					viewindex = -1;
 					break;
@@ -1622,11 +1632,18 @@ int video_get_view_for_target(running_machine *machine, render_target *target, c
 		{
 			for (viewindex = 0; ; viewindex++)
 			{
-				UINT32 viewscreens = target->view_screens(viewindex);
-				if (viewscreens == (1 << scrcount) - 1)
+				const render_screen_list &viewscreens = target->view_screens(viewindex);
+				if (viewscreens.count() == 0)
 					break;
-				if (viewscreens == 0)
-					break;
+				if (viewscreens.count() >= scrcount)
+				{
+					screen_device *screen;
+					for (screen = screen_first(*machine); screen != NULL; screen = screen_next(screen))
+						if (!viewscreens.contains(*screen))
+							break;
+					if (screen == NULL)
+						break;
+				}
 			}
 		}
 	}
@@ -1942,9 +1959,6 @@ screen_device::~screen_device()
 
 void screen_device::device_start()
 {
-	// get and validate that the container for this screen exists
-	m_container = m_machine.render().container_for_screen(this);
-
 	// configure the default cliparea
 	render_container::user_settings settings;
 	m_container->get_user_settings(settings);

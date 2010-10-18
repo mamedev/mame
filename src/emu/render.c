@@ -201,21 +201,19 @@ inline void normalize_bounds(render_bounds &bounds)
 //  appropriate layer index and blendmode
 //-------------------------------------------------
 
-inline int get_layer_and_blendmode(const layout_view &view, int index, int &blendmode)
+inline item_layer get_layer_and_blendmode(const layout_view &view, int index, int &blendmode)
 {
-    const int *layer_order = layer_order_standard;
-    int layer;
-
 	//  if we have multiple backdrop pieces and no overlays, render:
     //      backdrop (add) + screens (add) + bezels (alpha)
     //  else render:
     //      screens (add) + overlays (RGB multiply) + backdrop (add) + bezels (alpha)
 
-	if (view.itemlist[ITEM_LAYER_BACKDROP] != NULL && view.itemlist[ITEM_LAYER_BACKDROP]->next != NULL && view.itemlist[ITEM_LAYER_OVERLAY] == NULL)
+    const int *layer_order = layer_order_standard;
+	if (view.first_item(ITEM_LAYER_BACKDROP) != NULL && view.first_item(ITEM_LAYER_BACKDROP)->next() != NULL && view.first_item(ITEM_LAYER_OVERLAY) == NULL)
 		layer_order = layer_order_alternate;
 
 	// select the layer
-	layer = layer_order[index];
+	int layer = layer_order[index];
 
 	// pick a blendmode
 	if (layer == ITEM_LAYER_SCREEN && layer_order == layer_order_standard)
@@ -227,7 +225,7 @@ inline int get_layer_and_blendmode(const layout_view &view, int index, int &blen
 	else
 		blendmode = BLENDMODE_ALPHA;
 
-	return layer;
+	return item_layer(layer);
 }
 
 
@@ -1025,7 +1023,7 @@ render_target::render_target(render_manager &manager, const char *layoutfile, UI
 	: m_next(NULL),
 	  m_manager(manager),
 	  m_curview(NULL),
-	  m_filelist(NULL),
+	  m_filelist(*auto_alloc(&manager.machine(), simple_list<layout_file>(manager.machine().m_respool))),
 	  m_flags(flags),
 	  m_listindex(0),
 	  m_width(640),
@@ -1033,19 +1031,17 @@ render_target::render_target(render_manager &manager, const char *layoutfile, UI
 	  m_pixel_aspect(0.0f),
 	  m_max_refresh(0),
 	  m_orientation(0),
-	  m_layerconfig(LAYER_CONFIG_DEFAULT),
 	  m_base_view(NULL),
 	  m_base_orientation(ROT0),
-	  m_base_layerconfig(LAYER_CONFIG_DEFAULT),
 	  m_maxtexwidth(65536),
 	  m_maxtexheight(65536),
 	  m_debug_containers(manager.machine().m_respool)
 {
 	// determine the base layer configuration based on options
-	if (!options_get_bool(manager.machine().options(), OPTION_USE_BACKDROPS)) m_base_layerconfig &= ~LAYER_CONFIG_ENABLE_BACKDROP;
-	if (!options_get_bool(manager.machine().options(), OPTION_USE_OVERLAYS)) m_base_layerconfig &= ~LAYER_CONFIG_ENABLE_OVERLAY;
-	if (!options_get_bool(manager.machine().options(), OPTION_USE_BEZELS)) m_base_layerconfig &= ~LAYER_CONFIG_ENABLE_BEZEL;
-	if (options_get_bool(manager.machine().options(), OPTION_ARTWORK_CROP)) m_base_layerconfig |= LAYER_CONFIG_ZOOM_TO_SCREEN;
+	m_base_layerconfig.set_backdrops_enabled(options_get_bool(manager.machine().options(), OPTION_USE_BACKDROPS));
+	m_base_layerconfig.set_overlays_enabled(options_get_bool(manager.machine().options(), OPTION_USE_OVERLAYS));
+	m_base_layerconfig.set_bezels_enabled(options_get_bool(manager.machine().options(), OPTION_USE_BEZELS));
+	m_base_layerconfig.set_zoom_to_screen(options_get_bool(manager.machine().options(), OPTION_ARTWORK_CROP));
 
 	// determine the base orientation based on options
 	m_orientation = ROT0;
@@ -1086,13 +1082,7 @@ render_target::render_target(render_manager &manager, const char *layoutfile, UI
 
 render_target::~render_target()
 {
-	// free the layout files
-	while (m_filelist != NULL)
-	{
-		layout_file *temp = m_filelist;
-		m_filelist = temp->next;
-		layout_file_free(temp);
-	}
+	auto_free(&m_manager.machine(), &m_filelist);
 }
 
 
@@ -1134,18 +1124,6 @@ void render_target::set_bounds(INT32 width, INT32 height, float pixel_aspect)
 
 
 //-------------------------------------------------
-//  set_layer_config - set the layer config of a
-//  target
-//-------------------------------------------------
-
-void render_target::set_layer_config(int layerconfig)
-{
-	m_layerconfig = layerconfig;
-	layout_view_recompute(m_curview, layerconfig);
-}
-
-
-//-------------------------------------------------
 //  set_view - dynamically change the view for
 //  a target
 //-------------------------------------------------
@@ -1156,7 +1134,7 @@ void render_target::set_view(int viewindex)
 	if (view != NULL)
 	{
 		m_curview = view;
-		layout_view_recompute(view, m_layerconfig);
+		view->recompute(m_layerconfig);
 	}
 }
 
@@ -1180,7 +1158,7 @@ void render_target::set_max_texture_size(int maxwidth, int maxheight)
 const char *render_target::view_name(int viewindex)
 {
 	layout_view *view = view_by_index(viewindex);
-	return (view != NULL) ? view->name : NULL;
+	return (view != NULL) ? view->name() : NULL;
 }
 
 
@@ -1190,10 +1168,10 @@ const char *render_target::view_name(int viewindex)
 //  given view
 //-------------------------------------------------
 
-UINT32 render_target::view_screens(int viewindex)
+const render_screen_list &render_target::view_screens(int viewindex)
 {
 	layout_view *view = view_by_index(viewindex);
-	return (view != NULL) ? view->screens : NULL;
+	return (view != NULL) ? view->screens() : s_empty_screen_list;
 }
 
 
@@ -1212,7 +1190,7 @@ void render_target::compute_visible_area(INT32 target_width, INT32 target_height
 	if (target_pixel_aspect != 0.0f)
 	{
 		// start with the aspect ratio of the square pixel layout
-		width = (zoom_to_screen() && m_curview->screens > 0) ? m_curview->scraspect : m_curview->aspect;
+		width = m_curview->effective_aspect(m_layerconfig);
 		height = 1.0f;
 
 		// first apply target orientation
@@ -1254,44 +1232,43 @@ void render_target::compute_minimum_size(INT32 &minwidth, INT32 &minheight)
 {
 	float maxxscale = 1.0f, maxyscale = 1.0f;
 	int screens_considered = 0;
+	
+	// early exit in case we are called between device teardown and render teardown
+	if (m_manager.machine().m_devicelist.count() == 0)
+	{
+		minwidth = 640;
+		minheight = 480;
+		return;
+	}
 
 	// scan the current view for all screens
-	for (int layer = 0; layer < ITEM_LAYER_MAX; layer++)
+	for (item_layer layer = ITEM_LAYER_FIRST; layer < ITEM_LAYER_MAX; layer++)
 
 		// iterate over items in the layer
-		for (view_item *item = m_curview->itemlist[layer]; item != NULL; item = item->next)
-			if (item->element == NULL)
+		for (layout_view::item *curitem = m_curview->first_item(layer); curitem != NULL; curitem = curitem->next())
+			if (curitem->screen() != NULL)
 			{
-				const screen_device_config *scrconfig = downcast<const screen_device_config *>(m_manager.machine().config->m_devicelist.find(SCREEN, item->index));
-				screen_device *screendev = m_manager.machine().device<screen_device>(scrconfig->tag());
-
-				// we may be called very early, before machine->visible_area is initialized; handle that case
+				// use a hard-coded default visible area for vector screens
+				screen_device *screen = curitem->screen();
 				const rectangle vectorvis = { 0, 639, 0, 479 };
-				const rectangle *visarea = NULL;
-				if (scrconfig->screen_type() == SCREEN_TYPE_VECTOR)
-					visarea = &vectorvis;
-				else if (screendev != NULL && screendev->started())
-					visarea = &screendev->visible_area();
-				else
-					visarea = &scrconfig->visible_area();
+				const rectangle &visarea = (screen->screen_type() == SCREEN_TYPE_VECTOR) ? vectorvis : screen->visible_area();
 
 				// apply target orientation to the bounds
-				render_bounds bounds = item->bounds;
+				render_bounds bounds = curitem->bounds();
 				apply_orientation(bounds, m_orientation);
 				normalize_bounds(bounds);
 
 				// based on the orientation of the screen container, check the bitmap
-				render_container *container = m_manager.m_screen_container_list.find(item->index);
 				float xscale, yscale;
-				if (!(orientation_add(m_orientation, container->orientation()) & ORIENTATION_SWAP_XY))
+				if (!(orientation_add(m_orientation, screen->container().orientation()) & ORIENTATION_SWAP_XY))
 				{
-					xscale = (float)(visarea->max_x + 1 - visarea->min_x) / (bounds.x1 - bounds.x0);
-					yscale = (float)(visarea->max_y + 1 - visarea->min_y) / (bounds.y1 - bounds.y0);
+					xscale = (float)(visarea.max_x + 1 - visarea.min_x) / (bounds.x1 - bounds.x0);
+					yscale = (float)(visarea.max_y + 1 - visarea.min_y) / (bounds.y1 - bounds.y0);
 				}
 				else
 				{
-					xscale = (float)(visarea->max_y + 1 - visarea->min_y) / (bounds.x1 - bounds.x0);
-					yscale = (float)(visarea->max_x + 1 - visarea->min_x) / (bounds.y1 - bounds.y0);
+					xscale = (float)(visarea.max_y + 1 - visarea.min_y) / (bounds.x1 - bounds.x0);
+					yscale = (float)(visarea.max_x + 1 - visarea.min_x) / (bounds.y1 - bounds.y0);
 				}
 
 				// pick the greater
@@ -1348,17 +1325,17 @@ render_primitive_list &render_target::get_primitives()
 
 	// iterate over layers back-to-front, but only if we're running
 	if (m_manager.machine().phase() >= MACHINE_PHASE_RESET)
-		for (int layernum = 0; layernum < ITEM_LAYER_MAX; layernum++)
+		for (item_layer layernum = ITEM_LAYER_FIRST; layernum < ITEM_LAYER_MAX; layernum++)
 		{
 			int blendmode;
-			int layer = get_layer_and_blendmode(*m_curview, layernum, blendmode);
-			if (m_curview->layenabled[layer])
+			item_layer layer = get_layer_and_blendmode(*m_curview, layernum, blendmode);
+			if (m_curview->layer_enabled(layer))
 			{
 				// iterate over items in the layer
-				for (view_item *item = m_curview->itemlist[layer]; item != NULL; item = item->next)
+				for (layout_view::item *curitem = m_curview->first_item(layer); curitem != NULL; curitem = curitem->next())
 				{
 					// first apply orientation to the bounds
-					render_bounds bounds = item->bounds;
+					render_bounds bounds = curitem->bounds();
 					apply_orientation(bounds, root_xform.orientation);
 					normalize_bounds(bounds);
 
@@ -1368,32 +1345,18 @@ render_primitive_list &render_target::get_primitives()
 					item_xform.yoffs = root_xform.yoffs + bounds.y0 * root_xform.yscale;
 					item_xform.xscale = (bounds.x1 - bounds.x0) * root_xform.xscale;
 					item_xform.yscale = (bounds.y1 - bounds.y0) * root_xform.yscale;
-					item_xform.color.r = item->color.r * root_xform.color.r;
-					item_xform.color.g = item->color.g * root_xform.color.g;
-					item_xform.color.b = item->color.b * root_xform.color.b;
-					item_xform.color.a = item->color.a * root_xform.color.a;
-					item_xform.orientation = orientation_add(item->orientation, root_xform.orientation);
+					item_xform.color.r = curitem->color().r * root_xform.color.r;
+					item_xform.color.g = curitem->color().g * root_xform.color.g;
+					item_xform.color.b = curitem->color().b * root_xform.color.b;
+					item_xform.color.a = curitem->color().a * root_xform.color.a;
+					item_xform.orientation = orientation_add(curitem->orientation(), root_xform.orientation);
                     item_xform.no_center = false;
 
 					// if there is no associated element, it must be a screen element
-					if (item->element != NULL)
-					{
-						int state = 0;
-						if (item->output_name[0] != 0)
-							state = output_get_value(item->output_name);
-						else if (item->input_tag[0] != 0)
-						{
-							const input_field_config *field = input_field_by_tag_and_mask(m_manager.machine().m_portlist, item->input_tag, item->input_mask);
-							if (field != NULL)
-								state = ((input_port_read_safe(&m_manager.machine(), item->input_tag, 0) ^ field->defvalue) & item->input_mask) ? 1 : 0;
-						}
-						add_element_primitives(list, item_xform, *item->element, state, blendmode);
-					}
+					if (curitem->screen() != NULL)
+						add_container_primitives(list, item_xform, curitem->screen()->container(), blendmode);
 					else
-					{
-						render_container *container = m_manager.m_screen_container_list.find(item->index);
-						add_container_primitives(list, item_xform, *container, blendmode);
-					}
+						add_element_primitives(list, item_xform, *curitem->element(), curitem->state(), blendmode);
 				}
 			}
 		}
@@ -1468,8 +1431,9 @@ render_primitive_list &render_target::get_primitives()
 
 bool render_target::map_point_container(INT32 target_x, INT32 target_y, render_container &container, float &container_x, float &container_y)
 {
-	view_item *item;
-	return map_point_internal(target_x, target_y, &container, container_x, container_y, item);
+	const char *input_tag;
+	UINT32 input_mask;
+	return map_point_internal(target_x, target_y, &container, container_x, container_y, input_tag, input_mask);
 }
 
 
@@ -1481,15 +1445,7 @@ bool render_target::map_point_container(INT32 target_x, INT32 target_y, render_c
 
 bool render_target::map_point_input(INT32 target_x, INT32 target_y, const char *&input_tag, UINT32 &input_mask, float &input_x, float &input_y)
 {
-	view_item *item = NULL;
-
-	bool result = map_point_internal(target_x, target_y, NULL, input_x, input_y, item);
-	if (result && item != NULL)
-	{
-		input_tag = item->input_tag;
-		input_mask = item->input_mask;
-	}
-	return result;
+	return map_point_internal(target_x, target_y, NULL, input_x, input_y, input_tag, input_mask);
 }
 
 
@@ -1548,22 +1504,27 @@ void render_target::debug_top(render_container &container)
 
 
 //-------------------------------------------------
+//  update_layer_config - recompute after a layer
+//  config change
+//-------------------------------------------------
+
+void render_target::update_layer_config()
+{
+	m_curview->recompute(m_layerconfig);
+}
+
+
+//-------------------------------------------------
 //  load_layout_files - load layout files for a
 //  given render target
 //-------------------------------------------------
 
 void render_target::load_layout_files(const char *layoutfile, bool singlefile)
 {
-	layout_file **nextfile = &m_filelist;
-
 	// if there's an explicit file, load that first
 	const char *basename = m_manager.machine().basename();
 	if (layoutfile != NULL)
-	{
-		*nextfile = layout_file_load(m_manager.machine(), basename, layoutfile);
-		if (*nextfile != NULL)
-			nextfile = &(*nextfile)->next;
-	}
+		load_layout_file(basename, layoutfile);
 
 	// if we're only loading this file, we know our final result
 	if (singlefile)
@@ -1571,47 +1532,92 @@ void render_target::load_layout_files(const char *layoutfile, bool singlefile)
 
 	// try to load a file based on the driver name
 	const game_driver *gamedrv = m_manager.machine().gamedrv;
-	*nextfile = layout_file_load(m_manager.machine(), basename, gamedrv->name);
-	if (*nextfile == NULL)
-		*nextfile = layout_file_load(m_manager.machine(), basename, "default");
-	if (*nextfile != NULL)
-		nextfile = &(*nextfile)->next;
+	if (!load_layout_file(basename, gamedrv->name))
+		load_layout_file(basename, "default");
 
 	// if a default view has been specified, use that as a fallback
 	if (gamedrv->default_layout != NULL)
-	{
-		*nextfile = layout_file_load(m_manager.machine(), NULL, gamedrv->default_layout);
-		if (*nextfile != NULL)
-			nextfile = &(*nextfile)->next;
-	}
+		load_layout_file(NULL, gamedrv->default_layout);
 	if (m_manager.machine().m_config.m_default_layout != NULL)
-	{
-		*nextfile = layout_file_load(m_manager.machine(), NULL, m_manager.machine().m_config.m_default_layout);
-		if (*nextfile != NULL)
-			nextfile = &(*nextfile)->next;
-	}
+		load_layout_file(NULL, m_manager.machine().m_config.m_default_layout);
 
 	// try to load another file based on the parent driver name
 	const game_driver *cloneof = driver_get_clone(gamedrv);
 	if (cloneof != NULL)
-	{
-		*nextfile = layout_file_load(m_manager.machine(), cloneof->name, cloneof->name);
-		if (*nextfile == NULL)
-			*nextfile = layout_file_load(m_manager.machine(), cloneof->name, "default");
-		if (*nextfile != NULL)
-			nextfile = &(*nextfile)->next;
-	}
+		if (!load_layout_file(cloneof->name, cloneof->name))
+			load_layout_file(cloneof->name, "default");
 
 	// now do the built-in layouts for single-screen games
 	if (screen_count(m_manager.machine().m_config) == 1)
 	{
 		if (gamedrv->flags & ORIENTATION_SWAP_XY)
-			*nextfile = layout_file_load(m_manager.machine(), NULL, layout_vertical);
+			load_layout_file(NULL, layout_vertical);
 		else
-			*nextfile = layout_file_load(m_manager.machine(), NULL, layout_horizont);
-		assert_always(*nextfile != NULL, "Couldn't parse default layout??");
-		nextfile = &(*nextfile)->next;
+			load_layout_file(NULL, layout_horizont);
+		assert_always(m_filelist.count() > 0, "Couldn't parse default layout??");
 	}
+}
+
+
+//-------------------------------------------------
+//  load_layout_file - load a single layout file
+//  and append it to our list
+//-------------------------------------------------
+
+bool render_target::load_layout_file(const char *dirname, const char *filename)
+{
+	// if the first character of the "file" is an open brace, assume it is an XML string
+	xml_data_node *rootnode;
+	if (filename[0] == '<')
+		rootnode = xml_string_read(filename, NULL);
+
+	// otherwise, assume it is a file
+	else
+	{
+		// build the path and optionally prepend the directory
+		astring fname(filename, ".lay");
+		if (dirname != NULL)
+			fname.ins(0, PATH_SEPARATOR).ins(0, dirname);
+
+		// attempt to open the file; bail if we can't
+		mame_file *layoutfile;
+		file_error filerr = mame_fopen(SEARCHPATH_ARTWORK, fname, OPEN_FLAG_READ, &layoutfile);
+		if (filerr != FILERR_NONE)
+			return false;
+			
+		// read the file
+		rootnode = xml_file_read(mame_core_file(layoutfile), NULL);
+		mame_fclose(layoutfile);
+	}
+	
+	// if we didn't get a properly-formatted XML file, record a warning and exit
+	if (rootnode == NULL)
+	{
+		if (filename[0] != '<')
+			mame_printf_warning("Improperly formatted XML file '%s', ignorning\n", filename);
+		else
+			mame_printf_warning("Improperly formatted XML string, ignorning");
+		return false;
+	}
+	
+	// parse and catch any errors
+	bool result = true;
+	try
+	{
+		m_filelist.append(*auto_alloc(&m_manager.machine(), layout_file(m_manager.machine(), *rootnode, dirname)));
+	}
+	catch (emu_fatalerror &err)
+	{
+		if (filename[0] != '<')
+			mame_printf_warning("Error in XML file '%s': %s\n", filename, err.string());
+		else
+			mame_printf_warning("Error in XML string: %s", err.string());
+		result = false;
+	}
+
+	// free the root node
+	xml_file_free(rootnode);
+	return result;
 }
 
 
@@ -1767,7 +1773,7 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 	}
 
 	// add the overlay if it exists
-	if (container.overlay() != NULL && screen_overlay_enabled())
+	if (container.overlay() != NULL && m_layerconfig.screen_overlay_enabled())
 	{
 		INT32 width, height;
 
@@ -1801,16 +1807,16 @@ void render_target::add_container_primitives(render_primitive_list &list, const 
 //  for an element in the current state
 //-------------------------------------------------
 
-void render_target::add_element_primitives(render_primitive_list &list, const object_transform &xform, const layout_element &element, int state, int blendmode)
+void render_target::add_element_primitives(render_primitive_list &list, const object_transform &xform, layout_element &element, int state, int blendmode)
 {
 	// if we're out of range, bail
-	if (state > element.maxstate)
+	if (state > element.maxstate())
 		return;
 	if (state < 0)
 		state = 0;
 
 	// get a pointer to the relevant texture
-	render_texture *texture = element.elemtex[state].texture;
+	render_texture *texture = element.state_texture(state);
 	if (texture != NULL)
 	{
 		render_primitive *prim = list.alloc(render_primitive::QUAD);
@@ -1856,11 +1862,13 @@ void render_target::add_element_primitives(render_primitive_list &list, const ob
 //  mapping points
 //-------------------------------------------------
 
-bool render_target::map_point_internal(INT32 target_x, INT32 target_y, render_container *container, float &mapped_x, float &mapped_y, view_item *&mapped_item)
+bool render_target::map_point_internal(INT32 target_x, INT32 target_y, render_container *container, float &mapped_x, float &mapped_y, const char *&mapped_input_tag, UINT32 &mapped_input_mask)
 {
 	// default to point not mapped
 	mapped_x = -1.0;
 	mapped_y = -1.0;
+	mapped_input_tag = NULL;
+	mapped_input_mask = 0;
 
 	// convert target coordinates to float
 	float target_fx = (float)target_x / m_width;
@@ -1875,39 +1883,38 @@ bool render_target::map_point_internal(INT32 target_x, INT32 target_y, render_co
 			// this point was successfully mapped
 			mapped_x = target_fx;
 			mapped_y = target_fy;
-			mapped_item = NULL;
 			return true;
 		}
 		return false;
 	}
 
 	// loop through each layer
-	for (int layernum = 0; layernum < ITEM_LAYER_MAX; layernum++)
+	for (item_layer layernum = ITEM_LAYER_FIRST; layernum < ITEM_LAYER_MAX; layernum++)
 	{
 		int blendmode;
-		int layer = get_layer_and_blendmode(*m_curview, layernum, blendmode);
-		if (m_curview->layenabled[layer])
+		item_layer layer = get_layer_and_blendmode(*m_curview, layernum, blendmode);
+		if (m_curview->layer_enabled(layer))
 		{
 			// iterate over items in the layer
-			for (view_item *item = m_curview->itemlist[layer]; item != NULL; item = item->next)
+			for (layout_view::item *item = m_curview->first_item(layer); item != NULL; item = item->next())
 			{
 				bool checkit;
 
 				// if we're looking for a particular container, verify that we have the right one
 				if (container != NULL)
-					checkit = (item->element == NULL && container == m_manager.m_screen_container_list.find(item->index));
+					checkit = (item->screen() != NULL && &item->screen()->container() == container);
 
 				// otherwise, assume we're looking for an input
 				else
-					checkit = (item->input_tag[0] != 0);
+					checkit = item->has_input();
 
 				// this target is worth looking at; now check the point
-				if (checkit && target_fx >= item->bounds.x0 && target_fx < item->bounds.x1 && target_fy >= item->bounds.y0 && target_fy < item->bounds.y1)
+				if (checkit && target_fx >= item->bounds().x0 && target_fx < item->bounds().x1 && target_fy >= item->bounds().y0 && target_fy < item->bounds().y1)
 				{
 					// point successfully mapped
-					mapped_x = (target_fx - item->bounds.x0) / (item->bounds.x1 - item->bounds.x0);
-					mapped_y = (target_fy - item->bounds.y0) / (item->bounds.y1 - item->bounds.y0);
-					mapped_item = item;
+					mapped_x = (target_fx - item->bounds().x0) / (item->bounds().x1 - item->bounds().x0);
+					mapped_y = (target_fy - item->bounds().y0) / (item->bounds().y1 - item->bounds().y0);
+					mapped_input_tag = item->input_tag_and_mask(mapped_input_mask);
 					return true;
 				}
 			}
@@ -1925,9 +1932,9 @@ bool render_target::map_point_internal(INT32 target_x, INT32 target_y, render_co
 layout_view *render_target::view_by_index(int index) const
 {
 	// scan the list of views within each layout, skipping those that don't apply
-	for (layout_file *file = m_filelist; file != NULL; file = file->next)
-		for (layout_view *view = file->viewlist; view != NULL; view = view->next)
-			if (!(m_flags & RENDER_CREATE_NO_ART) || !layout_view_has_art(view))
+	for (layout_file *file = m_filelist.first(); file != NULL; file = file->next())
+		for (layout_view *view = file->first_view(); view != NULL; view = view->next())
+			if (!(m_flags & RENDER_CREATE_NO_ART) || !view->has_art())
 				if (index-- == 0)
 					return view;
 	return NULL;
@@ -1945,9 +1952,9 @@ int render_target::view_index(layout_view &targetview) const
 	int index = 0;
 
 	// scan the list of views within each layout, skipping those that don't apply
-	for (layout_file *file = m_filelist; file != NULL; file = file->next)
-		for (layout_view *view = file->viewlist; view != NULL; view = view->next)
-			if (!(m_flags & RENDER_CREATE_NO_ART) || !layout_view_has_art(view))
+	for (layout_file *file = m_filelist.first(); file != NULL; file = file->next())
+		for (layout_view *view = file->first_view(); view != NULL; view = view->next())
+			if (!(m_flags & RENDER_CREATE_NO_ART) || !view->has_art())
 			{
 				if (&targetview == view)
 					return index;
@@ -2038,17 +2045,17 @@ bool render_target::config_save(xml_data_node &targetnode)
 	// output the view
 	if (m_curview != m_base_view)
 	{
-		xml_set_attribute(&targetnode, "view", m_curview->name);
+		xml_set_attribute(&targetnode, "view", m_curview->name());
 		changed = true;
 	}
 
 	// output the layer config
 	if (m_layerconfig != m_base_layerconfig)
 	{
-		xml_set_attribute_int(&targetnode, "backdrops", backdrops_enabled());
-		xml_set_attribute_int(&targetnode, "overlays", overlays_enabled());
-		xml_set_attribute_int(&targetnode, "bezels", bezels_enabled());
-		xml_set_attribute_int(&targetnode, "zoom", zoom_to_screen());
+		xml_set_attribute_int(&targetnode, "backdrops", m_layerconfig.backdrops_enabled());
+		xml_set_attribute_int(&targetnode, "overlays", m_layerconfig.overlays_enabled());
+		xml_set_attribute_int(&targetnode, "bezels", m_layerconfig.bezels_enabled());
+		xml_set_attribute_int(&targetnode, "zoom", m_layerconfig.zoom_to_screen());
 		changed = true;
 	}
 
@@ -2360,7 +2367,7 @@ render_manager::render_manager(running_machine &machine)
 
 	// create one container per screen
 	for (screen_device *screen = screen_first(machine); screen != NULL; screen = screen_next(screen))
-		container_alloc(screen);
+		screen->set_container(*container_alloc(screen));
 }
 
 
@@ -2385,15 +2392,11 @@ render_manager::~render_manager()
 
 bool render_manager::is_live(screen_device &screen) const
 {
-	int screen_index = screen.machine->m_devicelist.index(SCREEN, screen.tag());
-	assert(screen_index != -1);
-
 	// iterate over all live targets and or together their screen masks
-	UINT32 bitmask = 0;
 	for (render_target *target = m_targetlist.first(); target != NULL; target = target->next())
-		bitmask |= target->view_screens(target->view());
-
-	return (bitmask & (1 << screen_index)) ? true : false;
+		if (target->view_screens(target->view()).contains(screen))
+			return true;
+	return false;
 }
 
 
@@ -2481,21 +2484,6 @@ float render_manager::ui_aspect()
 	if (aspect > 1.5f)
 		aspect = 1.5f;
 	return aspect;
-}
-
-
-//-------------------------------------------------
-//  container_for_screen - return the container
-//  allocated for the given screen device
-//-------------------------------------------------
-
-render_container *render_manager::container_for_screen(screen_device *screen)
-{
-	// scan the list of screen containers for a match
-	for (render_container *container = m_screen_container_list.first(); container != NULL; container = container->next())
-		if (container->screen() == screen)
-			return container;
-	return NULL;
 }
 
 

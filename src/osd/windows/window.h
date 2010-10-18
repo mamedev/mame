@@ -100,7 +100,7 @@ struct _win_window_info
 	render_target *		target;
 	int					targetview;
 	int					targetorient;
-	int					targetlayerconfig;
+	render_layer_config	targetlayerconfig;
 	render_primitive_list *primlist;
 
 	// input info

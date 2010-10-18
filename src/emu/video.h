@@ -141,6 +141,7 @@ private:
 class screen_device : public device_t
 {
 	friend class screen_device_config;
+	friend class render_manager;
 	friend resource_pool_object<screen_device>::~resource_pool_object();
 
 	// construction/destruction
@@ -199,6 +200,7 @@ private:
 	virtual void device_post_load();
 
 	// internal helpers
+	void set_container(render_container &container) { m_container = &container; }
 	void realloc_screen_bitmaps();
 
 	static TIMER_CALLBACK( static_vblank_begin_callback ) { reinterpret_cast<screen_device *>(ptr)->vblank_begin_callback(); }

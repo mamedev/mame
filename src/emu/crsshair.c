@@ -154,8 +154,9 @@ static void create_bitmap(running_machine *machine, int player)
 	char filename[20];
 	rgb_t color = crosshair_colors[player];
 
-	/* if we have a bitmap for this player, kill it */
+	/* if we have a bitmap and texture for this player, kill it */
 	global_free(global.bitmap[player]);
+	machine->render().texture_free(global.texture[player]);
 
 	if (global.name[player][0] != 0)
 	{
@@ -208,9 +209,6 @@ static void create_bitmap(running_machine *machine, int player)
 
 void crosshair_init(running_machine *machine)
 {
-	const input_port_config *port;
-	const input_field_config *field;
-
 	/* request a callback upon exiting */
 	machine->add_notifier(MACHINE_NOTIFY_EXIT, crosshair_exit);
 
@@ -221,8 +219,8 @@ void crosshair_init(running_machine *machine)
 	global.auto_time = CROSSHAIR_VISIBILITY_AUTOTIME_DEFAULT;
 
 	/* determine who needs crosshairs */
-	for (port = machine->m_portlist.first(); port != NULL; port = port->next())
-		for (field = port->fieldlist; field != NULL; field = field->next)
+	for (const input_port_config *port = machine->m_portlist.first(); port != NULL; port = port->next())
+		for (const input_field_config *field = port->fieldlist; field != NULL; field = field->next)
 			if (field->crossaxis != CROSSHAIR_AXIS_NONE)
 			{
 				int player = field->player;
@@ -258,10 +256,8 @@ void crosshair_init(running_machine *machine)
 
 static void crosshair_exit(running_machine &machine)
 {
-	int player;
-
 	/* free bitmaps and textures for each player */
-	for (player = 0; player < MAX_PLAYERS; player++)
+	for (int player = 0; player < MAX_PLAYERS; player++)
 	{
 		machine.render().texture_free(global.texture[player]);
 		global.texture[player] = NULL;

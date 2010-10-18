@@ -23,8 +23,8 @@
 /* utilities */
 static void resample_argb_bitmap_average(UINT32 *dest, UINT32 drowpixels, UINT32 dwidth, UINT32 dheight, const UINT32 *source, UINT32 srowpixels, UINT32 swidth, UINT32 sheight, const render_color *color, UINT32 dx, UINT32 dy);
 static void resample_argb_bitmap_bilinear(UINT32 *dest, UINT32 drowpixels, UINT32 dwidth, UINT32 dheight, const UINT32 *source, UINT32 srowpixels, UINT32 swidth, UINT32 sheight, const render_color *color, UINT32 dx, UINT32 dy);
-static void copy_png_to_bitmap(bitmap_t *bitmap, const png_info *png, int *hasalpha);
-static void copy_png_alpha_to_bitmap(bitmap_t *bitmap, const png_info *png, int *hasalpha);
+static void copy_png_to_bitmap(bitmap_t *bitmap, const png_info *png, bool *hasalpha);
+static void copy_png_alpha_to_bitmap(bitmap_t *bitmap, const png_info *png, bool *hasalpha);
 
 
 
@@ -560,7 +560,7 @@ void render_line_to_quad(const render_bounds *bounds, float width, render_bounds
     bitmap_t
 -------------------------------------------------*/
 
-bitmap_t *render_load_png(const char *path, const char *dirname, const char *filename, bitmap_t *alphadest, int *hasalpha)
+bitmap_t *render_load_png(const char *path, const char *dirname, const char *filename, bitmap_t *alphadest, bool *hasalpha)
 {
 	bitmap_t *bitmap = NULL;
 	file_error filerr;
@@ -636,7 +636,7 @@ bitmap_t *render_load_png(const char *path, const char *dirname, const char *fil
     bitmap
 -------------------------------------------------*/
 
-static void copy_png_to_bitmap(bitmap_t *bitmap, const png_info *png, int *hasalpha)
+static void copy_png_to_bitmap(bitmap_t *bitmap, const png_info *png, bool *hasalpha)
 {
 	UINT8 accumalpha = 0xff;
 	UINT8 *src;
@@ -701,7 +701,7 @@ static void copy_png_to_bitmap(bitmap_t *bitmap, const png_info *png, int *hasal
     to the alpha channel of a bitmap
 -------------------------------------------------*/
 
-static void copy_png_alpha_to_bitmap(bitmap_t *bitmap, const png_info *png, int *hasalpha)
+static void copy_png_alpha_to_bitmap(bitmap_t *bitmap, const png_info *png, bool *hasalpha)
 {
 	UINT8 accumalpha = 0xff;
 	UINT8 *src;
