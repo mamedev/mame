@@ -105,8 +105,8 @@ void devcb_stub(device_t *device, offs_t offset, UINT8 data)
 #define DEVCB_MEMBER(cls,memb)					{ DEVCB_TYPE_SELF, NULL, NULL, &devcb_stub<cls, &cls::memb>, NULL }
 
 /* line or read/write handlers for the driver device */
-#define DEVCB_DRIVER_LINE_MEMBER(tag,cls,memb)	{ DEVCB_TYPE_DRIVER, NULL, &devcb_line_stub<cls, &cls::memb>, NULL, NULL }
-#define DEVCB_DRIVER_MEMBER(tag,cls,memb)		{ DEVCB_TYPE_DRIVER, NULL, NULL, &devcb_stub<cls, &cls::memb>, NULL }
+#define DEVCB_DRIVER_LINE_MEMBER(cls,memb)		{ DEVCB_TYPE_DRIVER, NULL, &devcb_line_stub<cls, &cls::memb>, NULL, NULL }
+#define DEVCB_DRIVER_MEMBER(cls,memb)			{ DEVCB_TYPE_DRIVER, NULL, NULL, &devcb_stub<cls, &cls::memb>, NULL }
 
 /* line or read/write handlers for another device */
 #define DEVCB_DEVICE_LINE(tag,func)				{ DEVCB_TYPE_DEVICE, tag, (func), NULL, NULL }
