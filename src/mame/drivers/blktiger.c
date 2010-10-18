@@ -281,6 +281,7 @@ static const ym2203_interface ym2203_config =
 
 static MACHINE_START( blktiger )
 {
+	printf("machine_start_start\n"); fflush(stdout);
 	blktiger_state *state = machine->driver_data<blktiger_state>();
 
 	state->audiocpu = machine->device("audiocpu");
@@ -298,10 +299,12 @@ static MACHINE_START( blktiger )
 	state_save_register_global(machine, state->i8751_latch);
 	state_save_register_global_array(machine, state->scroll_x);
 	state_save_register_global_array(machine, state->scroll_y);
+	printf("machine_start_end\n"); fflush(stdout);
 }
 
 static MACHINE_RESET( blktiger )
 {
+	printf("machine_reset_start\n"); fflush(stdout);
 	blktiger_state *state = machine->driver_data<blktiger_state>();
 
 	/* configure bankswitching */
@@ -313,11 +316,9 @@ static MACHINE_RESET( blktiger )
 	state->scroll_y[1] = 0;
 	state->scroll_bank = 0;
 	state->screen_layout = 0;
-	state->chon = 0;
-	state->objon = 0;
-	state->bgon = 0;
 	state->z80_latch = 0;
 	state->i8751_latch = 0;
+	printf("machine_reset_end\n"); fflush(stdout);
 }
 
 static MACHINE_CONFIG_START( blktiger, blktiger_state )

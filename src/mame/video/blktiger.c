@@ -68,6 +68,11 @@ VIDEO_START( blktiger )
 {
 	blktiger_state *state = machine->driver_data<blktiger_state>();
 
+	state->chon = 1;
+	state->bgon = 1;
+	state->objon = 1;
+	state->screen_layout = 0;
+
 	state->scroll_ram = auto_alloc_array(machine, UINT8, BGRAM_BANK_SIZE * BGRAM_BANKS);
 
 	state->tx_tilemap =    tilemap_create(machine, get_tx_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
@@ -242,6 +247,7 @@ VIDEO_UPDATE( blktiger )
 
 	if (state->chon)
 		tilemap_draw(bitmap, cliprect, state->tx_tilemap, 0, 0);
+
 	return 0;
 }
 
