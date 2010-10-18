@@ -343,6 +343,7 @@ static UINT16* _32x_palette_lookup;
 /* SegaCD! */
 static cpu_device *_segacd_68k_cpu;
 static emu_timer *segacd_gfx_conversion_timer;
+static emu_timer *segacd_dmna_ret_timer;
 static emu_timer *segacd_irq3_timer;
 static int segacd_wordram_mapped = 0;
 static TIMER_CALLBACK( segacd_irq3_timer_callback );
@@ -3919,10 +3920,46 @@ static READ16_HANDLER( scd_a12000_halt_reset_r )
 // so probably don't change instantly...
 //
 
+int segacd_dmna = 0;
+int segacd_ret = 0;
+
+static TIMER_CALLBACK( segacd_dmna_ret_timer_callback )
+{
+
+	// this is the initial state, and the state after changing modes?
+	if ((segacd_dmna==0) && (segacd_ret ==0))
+	{
+		//printf("aaa %d %d\n", segacd_dmna, segacd_ret);
+		segacd_dmna = 0;
+		segacd_ret = 1;
+		//printf("bbb %d %d\n", segacd_dmna, segacd_ret);
+	}
+	else if ((segacd_dmna==1) && (segacd_ret == 1))
+	{
+		//printf("aaa %d %d\n", segacd_dmna, segacd_ret);
+		segacd_dmna = 1;
+		segacd_ret = 0;
+		//printf("bbb %d %d\n", segacd_dmna, segacd_ret);
+	}
+	else if ((segacd_dmna==1) && (segacd_ret == 0))
+	{
+		//printf("aaa %d %d\n", segacd_dmna, segacd_ret);
+		segacd_dmna = 0;
+		segacd_ret = 1;
+		//printf("bbb %d %d\n", segacd_dmna, segacd_ret);
+	}
+	else
+	{
+		printf("huh? %d %d\n", segacd_dmna, segacd_ret);
+	}
+}
+
+
 static UINT8 segacd_ram_writeprotect_bits;
 static int segacd_ram_mode;
+static int segacd_ram_mode_old;
 
-static int segacd_maincpu_has_ram_access = 0;
+//static int segacd_maincpu_has_ram_access = 0;
 static int segacd_4meg_prgbank = 0; // which bank the MainCPU can see of the SubCPU PrgRAM
 static int segacd_memory_priority_mode = 0;
 static int segacd_stampsize;
@@ -3933,13 +3970,16 @@ static READ16_HANDLER( scd_a12002_memory_mode_r )
 	return (segacd_ram_writeprotect_bits << 8) |
 		   (segacd_4meg_prgbank << 6) |
 		   (segacd_ram_mode << 2) |
-		   ((segacd_maincpu_has_ram_access^1) << 1) |
-		   ((segacd_maincpu_has_ram_access) << 0);
+		   ((segacd_dmna) << 1) |
+		   ((segacd_ret) << 0);
 }
 
 
 /* I'm still not 100% clear how this works, the sources I have are a bit vague,
    it might still be incorrect in both modes
+
+  for a simple way to swap blocks of ram between cpus this is stupidly convoluted
+
  */
 
 // DMNA = Decleration Mainram No Access (bit 0)
@@ -3956,10 +3996,10 @@ RET
 
 0 = Main CPU Accesses WordRam0 (1st Half of WordRAM)
     Sub CPU  Accesses WordRam1 (2nd Half of WordRAM)
-	
+
 1 = Main CPU Accesses WordRam1 (2nd Half of WordRAM)
     Sub  CPU Accesses WordRam0 (1st Half of WordRAM)
-	
+
 DMNA
 
 Setting this bis sends a Swap request to the SUB-CPU (Main CPU access only?)
@@ -3983,7 +4023,26 @@ static WRITE16_HANDLER( scd_a12002_memory_mode_w )
 			//printf("dmna set (swap requested)\n"); // give ram to sub?
 
 			// this should take some time?
-			segacd_maincpu_has_ram_access = 0;
+
+			//segacd_ret = 1;
+
+			//printf("main cpu dmna set dmna: %d ret: %d\n", segacd_dmna, segacd_ret);
+			if (segacd_ram_mode==0)
+			{
+				if (!timer_enabled(segacd_dmna_ret_timer))
+				{
+					if (!segacd_dmna)
+					{
+						//printf("main dmna\n");
+						segacd_dmna = 1;
+						timer_adjust_oneshot(segacd_dmna_ret_timer, ATTOTIME_IN_USEC(100), 0);
+					}
+				}
+			}
+			else
+			{
+				printf("dmna bit in mode 1\n");
+			}
 		}
 
 
@@ -4018,8 +4077,8 @@ static READ16_HANDLER( segacd_sub_memory_mode_r )
 	 	 /*(segacd_4meg_prgbank << 6) | */
 		   (segacd_memory_priority_mode << 3) |
 		   (segacd_ram_mode << 2) |
-		   ((segacd_maincpu_has_ram_access^1) << 1) |
-		   ((segacd_maincpu_has_ram_access) << 0);
+		   ((segacd_dmna) << 1) |
+		   ((segacd_ret) << 0);
 }
 
 static WRITE16_HANDLER( segacd_sub_memory_mode_w )
@@ -4031,7 +4090,42 @@ static WRITE16_HANDLER( segacd_sub_memory_mode_w )
 		if (data&0x0001)
 		{
 			//printf("ret bit set\n");
-			segacd_maincpu_has_ram_access = 1;
+			//segacd_dmna = 0;
+
+
+			//printf("sub cpu ret set dmna: %d ret: %d\n", segacd_dmna, segacd_ret);
+
+			if (segacd_ram_mode==0)
+			{
+				if (!timer_enabled(segacd_dmna_ret_timer))
+				{
+					if (segacd_dmna)
+					{
+					//	printf("sub ret\n");
+					//	segacd_ret = 1;
+					//	segacd_dmna = 0;
+						timer_adjust_oneshot(segacd_dmna_ret_timer, ATTOTIME_IN_USEC(100), 0);
+					}
+				}
+			}
+			else
+			{
+				// in mode 1 this changes the word ram 1 to main cpu and word ram 0 to sub cpu?
+				// but should be proceeded by a dmna request? is this only valid if dmna has been
+				// set to 1 by the main CPU first?
+				printf("ret bit in mode 1\n");
+				segacd_ret = 1;
+			}
+		}
+		else
+		{
+			// in mode 1 this changes the word ram 0 to main cpu and word ram 1 to sub cpu?
+			// but should be proceeded by a dmna request? is this only valid if dmna has been
+			// set to 1 by the main CPU first?
+			if (segacd_ram_mode==1)
+			{
+				segacd_ret = 0;
+			}
 		}
 
 
@@ -4040,7 +4134,26 @@ static WRITE16_HANDLER( segacd_sub_memory_mode_w )
 		//if (data&0x0004)
 		{
 			segacd_ram_mode = (data&0x0004)>>2;
-			//printf("mode set %d\n", segacd_ram_mode);
+			if (segacd_ram_mode!=segacd_ram_mode_old)
+			{
+				printf("mode set %d\n", segacd_ram_mode);
+				segacd_ram_mode_old = segacd_ram_mode;
+
+				if (segacd_ram_mode==0)
+				{
+					// reset it flags etc.?
+					segacd_ret = 0;
+					segacd_dmna = 0;
+					timer_adjust_oneshot(segacd_dmna_ret_timer, ATTOTIME_IN_USEC(100), 0);
+				}
+				else
+				{
+					segacd_ret = 0;
+					segacd_dmna = 0;
+
+
+				}
+			}
 		}
 
 		//if (data&0x0018)
@@ -4300,7 +4413,7 @@ static READ16_HANDLER( segacd_main_dataram_part1_r )
 	if (segacd_ram_mode==0)
 	{
 		// is this correct?
-		if (segacd_maincpu_has_ram_access)
+		if (!segacd_dmna)
 		{
 			//printf("segacd_main_dataram_part1_r in mode 0 %08x %04x\n", offset*2, segacd_dataram[offset]);
 
@@ -4312,6 +4425,7 @@ static READ16_HANDLER( segacd_main_dataram_part1_r )
 			printf("Illegal: segacd_main_dataram_part1_r in mode 0 without permission\n");
 			return 0xffff;
 		}
+
 	}
 	else if (segacd_ram_mode==1)
 	{
@@ -4319,14 +4433,24 @@ static READ16_HANDLER( segacd_main_dataram_part1_r )
 		if (offset<0x20000/2)
 		{
 			// wordram accees
-			printf("Unspported: segacd_main_dataram_part1_r (word RAM) in mode 1\n");
-			return 0x0000;
+			//printf("Unspported: segacd_main_dataram_part1_r (word RAM) in mode 1\n");
+
+			// ret bit set by sub cpu determines which half of WorkRAM we have access to?
+			if (segacd_ret)
+			{
+				return segacd_dataram[offset+0x20000/2];
+			}
+			else
+			{
+				return segacd_dataram[offset+0x00000/2];
+			}
+
 		}
 		else
 		{
-			printf("Unspported: segacd_main_dataram_part1_r (Cell rearranged RAM) in mode 1\n"); 
+			printf("Unspported: segacd_main_dataram_part1_r (Cell rearranged RAM) in mode 1\n");
 			return 0x0000;
-		}		
+		}
 	}
 
 	return 0x0000;
@@ -4337,7 +4461,7 @@ static WRITE16_HANDLER( segacd_main_dataram_part1_w )
 	if (segacd_ram_mode==0)
 	{
 		// is this correct?
-		if (segacd_maincpu_has_ram_access)
+		if (!segacd_dmna)
 		{
 			COMBINE_DATA(&segacd_dataram[offset]);
 			segacd_mark_tiles_dirty(space->machine, offset);
@@ -4346,18 +4470,29 @@ static WRITE16_HANDLER( segacd_main_dataram_part1_w )
 		{
 			printf("Illegal: segacd_main_dataram_part1_w in mode 0 without permission\n");
 		}
+
 	}
 	else if (segacd_ram_mode==1)
 	{
 		if (offset<0x20000/2)
 		{
-			printf("Unspported: segacd_main_dataram_part1_w (word RAM) in mode 1\n");
+			//printf("Unspported: segacd_main_dataram_part1_w (word RAM) in mode 1\n");
 			// wordram accees
+
+			// ret bit set by sub cpu determines which half of WorkRAM we have access to?
+			if (segacd_ret)
+			{
+				COMBINE_DATA(&segacd_dataram[offset+0x20000/2]);
+			}
+			else
+			{
+				COMBINE_DATA(&segacd_dataram[offset+0x00000/2]);
+			}
 		}
 		else
 		{
 			printf("Unspported: segacd_main_dataram_part1_w (Cell rearranged RAM) in mode 1 (illega?)\n"); // is this legal??
-		}		
+		}
 	}
 }
 
@@ -4722,9 +4857,9 @@ INLINE UINT8 get_stampmap_16x16_1x1_tile_info_pixel(running_machine* machine, in
 {
 	const int tilesize = 4; // 0xf pixels
 	const int tilemapsize = 0x0f;
-	
+
 	int wraparound = segacd_stampsize&1;
-	
+
 	int xtile = xpos / (1<<tilesize);
 	int ytile = ypos / (1<<tilesize);
 
@@ -4738,7 +4873,7 @@ INLINE UINT8 get_stampmap_16x16_1x1_tile_info_pixel(running_machine* machine, in
 	{
 		if (xtile>tilemapsize) return 0;
 		if (xtile<0) return 0;
-		
+
 		if (ytile>tilemapsize) return 0;
 		if (ytile<0) return 0;
 	}
@@ -4758,9 +4893,9 @@ INLINE UINT8 get_stampmap_32x32_1x1_tile_info_pixel(running_machine* machine, in
 {
 	const int tilesize = 5; // 0x1f pixels
 	const int tilemapsize = 0x07;
-	
+
 	int wraparound = segacd_stampsize&1;
-	
+
 	int xtile = xpos / (1<<tilesize);
 	int ytile = ypos / (1<<tilesize);
 
@@ -4774,13 +4909,13 @@ INLINE UINT8 get_stampmap_32x32_1x1_tile_info_pixel(running_machine* machine, in
 	{
 		if (xtile>tilemapsize) return 0;
 		if (xtile<0) return 0;
-		
+
 		if (ytile>tilemapsize) return 0;
 		if (ytile<0) return 0;
 	}
-	
+
 	int tile_index = (ytile * (tilemapsize+1)) + xtile;
-	
+
 	int tile_region, tileno;
 	SCD_GET_TILE_INFO_32x32_1x1(tile_region,tileno,(int)tile_index);
 
@@ -4794,9 +4929,9 @@ INLINE UINT8 get_stampmap_16x16_16x16_tile_info_pixel(running_machine* machine, 
 {
 	const int tilesize = 4; // 0xf pixels
 	const int tilemapsize = 0xff;
-	
+
 	int wraparound = segacd_stampsize&1;
-	
+
 	int xtile = xpos / (1<<tilesize);
 	int ytile = ypos / (1<<tilesize);
 
@@ -4810,7 +4945,7 @@ INLINE UINT8 get_stampmap_16x16_16x16_tile_info_pixel(running_machine* machine, 
 	{
 		if (xtile>tilemapsize) return 0;
 		if (xtile<0) return 0;
-		
+
 		if (ytile>tilemapsize) return 0;
 		if (ytile<0) return 0;
 	}
@@ -4830,9 +4965,9 @@ INLINE UINT8 get_stampmap_32x32_16x16_tile_info_pixel(running_machine* machine, 
 {
 	const int tilesize = 5; // 0x1f pixels
 	const int tilemapsize = 0x7f;
-	
+
 	int wraparound = segacd_stampsize&1;
-	
+
 	int xtile = xpos / (1<<tilesize);
 	int ytile = ypos / (1<<tilesize);
 
@@ -4846,13 +4981,13 @@ INLINE UINT8 get_stampmap_32x32_16x16_tile_info_pixel(running_machine* machine, 
 	{
 		if (xtile>tilemapsize) return 0;
 		if (xtile<0) return 0;
-		
+
 		if (ytile>tilemapsize) return 0;
 		if (ytile<0) return 0;
 	}
-	
+
 	int tile_index = (ytile * (tilemapsize+1)) + xtile;
-	
+
 	int tile_region, tileno;
 	SCD_GET_TILE_INFO_32x32_16x16(tile_region,tileno,(int)tile_index);
 
@@ -4901,6 +5036,10 @@ void segacd_init_main_cpu( running_machine* machine )
 
 	segacd_gfx_conversion_timer = timer_alloc(machine, segacd_gfx_conversion_timer_callback, 0);
 	timer_adjust_oneshot(segacd_gfx_conversion_timer, attotime_never, 0);
+
+	segacd_dmna_ret_timer = timer_alloc(machine, segacd_dmna_ret_timer_callback, 0);
+	timer_adjust_oneshot(segacd_gfx_conversion_timer, attotime_never, 0);
+
 
 	segacd_irq3_timer = timer_alloc(machine, segacd_irq3_timer_callback, 0);
 	timer_adjust_oneshot(segacd_irq3_timer, attotime_never, 0);
@@ -4975,6 +5114,14 @@ static MACHINE_RESET( segacd )
 		}
 	}
 	#endif
+
+	segacd_dmna = 0;
+	segacd_ret = 0;
+
+	segacd_ram_mode = 0;
+	segacd_ram_mode_old = 0;
+
+	timer_adjust_oneshot(segacd_dmna_ret_timer, attotime_zero, 0);
 }
 
 
@@ -5027,7 +5174,7 @@ static READ16_HANDLER( segacd_sub_dataram_part1_r )
 	if (segacd_ram_mode==0)
 	{
 		// is this correct?
-		if (!segacd_maincpu_has_ram_access)
+		if (segacd_dmna)
 			return segacd_dataram[offset];
 		else
 		{
@@ -5049,7 +5196,7 @@ static WRITE16_HANDLER( segacd_sub_dataram_part1_w )
 	if (segacd_ram_mode==0)
 	{
 		// is this correct?
-		if (!segacd_maincpu_has_ram_access)
+		if (segacd_dmna)
 		{
 			COMBINE_DATA(&segacd_dataram[offset]);
 			segacd_mark_tiles_dirty(space->machine, offset);
@@ -5074,8 +5221,17 @@ static READ16_HANDLER( segacd_sub_dataram_part2_r )
 	}
 	else if (segacd_ram_mode==1)
 	{
-		printf("Unspported: segacd_sub_dataram_part2_r in mode 1 (Word RAM)\n");
-		return 0x0000;
+		//printf("Unsupported: segacd_sub_dataram_part2_r in mode 1 (Word RAM)\n");
+		// ret bit set by sub cpu determines which half of WorkRAM we have access to?
+		if (!segacd_ret)
+		{
+			return segacd_dataram[offset+0x20000/2];
+		}
+		else
+		{
+			return segacd_dataram[offset+0x00000/2];
+		}
+
 	}
 
 	return 0x0000;
@@ -5089,37 +5245,52 @@ static WRITE16_HANDLER( segacd_sub_dataram_part2_w )
 	}
 	else if (segacd_ram_mode==1)
 	{
-		printf("Unsupported: segacd_sub_dataram_part2_w in mode 1 (Word RAM)\n");
+		//printf("Unsupported: segacd_sub_dataram_part2_w in mode 1 (Word RAM)\n");
+		// ret bit set by sub cpu determines which half of WorkRAM we have access to?
+		if (!segacd_ret)
+		{
+			COMBINE_DATA(&segacd_dataram[offset+0x20000/2]);
+		}
+		else
+		{
+			COMBINE_DATA(&segacd_dataram[offset+0x00000/2]);
+		}
+
 	}
+}
+
+static TIMER_CALLBACK( execute_hock_irq )
+{
+	int i,cdd_crc;
+
+	segacd_cdd.ctrl &= ~4; // clear HOCK flag
+
+	segacd_cdd_rx[0] = (segacd_cdd.status & 0xf0) >> 4;
+	segacd_cdd_rx[1] = (segacd_cdd.status & 0x0f) >> 0;
+	segacd_cdd_rx[2] = (segacd_cdd.minute & 0xf0) >> 4;
+	segacd_cdd_rx[3] = (segacd_cdd.minute & 0x0f) >> 0;
+	segacd_cdd_rx[4] = (segacd_cdd.seconds & 0xf0) >> 4;
+	segacd_cdd_rx[5] = (segacd_cdd.seconds & 0x0f) >> 0;
+	segacd_cdd_rx[6] = (segacd_cdd.frame & 0xf0) >> 4;
+	segacd_cdd_rx[7] = (segacd_cdd.frame & 0x0f) >> 0;
+	segacd_cdd_rx[8] = (segacd_cdd.ext & 0x0f) >> 0;
+
+	/* Do checksum calculation of the above registers */
+	cdd_crc = 0;
+	for(i=0;i<9;i++)
+		cdd_crc += segacd_cdd_rx[i];
+
+	segacd_cdd_rx[9] = ((cdd_crc & 0xf) ^ 0xf);
+
+	cputag_set_input_line(machine, "segacd_68k", 4, HOLD_LINE);
 }
 
 static void cdd_hock_irq(running_machine *machine,UINT8 dir)
 {
-	int i,cdd_crc;
-
 	if((segacd_cdd.ctrl & 4 || dir) && segacd_irq_mask & 0x10) // export status, check if bit 2 (HOst ClocK) and irq is enabled
 	{
-		// TODO: this shouldn't be instant, CDD should first fill receive data.
-		segacd_cdd.ctrl &= 0x103; // clear HOCK flag
-
-		segacd_cdd_rx[0] = (segacd_cdd.status & 0xf0) >> 4;
-		segacd_cdd_rx[1] = (segacd_cdd.status & 0x0f) >> 0;
-		segacd_cdd_rx[2] = (segacd_cdd.minute & 0xf0) >> 4;
-		segacd_cdd_rx[3] = (segacd_cdd.minute & 0x0f) >> 0;
-		segacd_cdd_rx[4] = (segacd_cdd.seconds & 0xf0) >> 4;
-		segacd_cdd_rx[5] = (segacd_cdd.seconds & 0x0f) >> 0;
-		segacd_cdd_rx[6] = (segacd_cdd.frame & 0xf0) >> 4;
-		segacd_cdd_rx[7] = (segacd_cdd.frame & 0x0f) >> 0;
-		segacd_cdd_rx[8] = (segacd_cdd.ext & 0x0f) >> 0;
-
-		/* Do checksum calculation of the above registers */
-		cdd_crc = 0;
-		for(i=0;i<9;i++)
-			cdd_crc += segacd_cdd_rx[i];
-
-		segacd_cdd_rx[9] = ((cdd_crc & 0xf) ^ 0xf);
-
-		cputag_set_input_line(machine, "segacd_68k", 4, HOLD_LINE);
+		segacd_cdd.ctrl |= 4; // enable Hock bit if it isn't already active
+		timer_set(machine, ATTOTIME_IN_HZ(75), NULL,0, execute_hock_irq); // 1 / 75th of a second
 	}
 }
 
@@ -5197,11 +5368,11 @@ static void segacd_cdd_get_status(running_machine *machine)
 {
 	// ...
 
-	/*segacd_cdd.status = 0;
+	segacd_cdd.status = 0;
 	segacd_cdd.minute = 0;
 	segacd_cdd.seconds = 0;
 	segacd_cdd.frame = 0;
-	segacd_cdd.ext = 0;*/
+	segacd_cdd.ext = 0;
 
 	cdd_hock_irq(machine,1);
 }
@@ -5216,7 +5387,7 @@ static void segacd_cdd_stop_all(running_machine *machine)
 	segacd_cdd.frame = 0;
 	segacd_cdd.ext = 0;
 
-	//cdd_hock_irq(machine,1); // doesn't work?
+	cdd_hock_irq(machine,1);
 }
 
 
@@ -5354,7 +5525,7 @@ INLINE UINT8 read_pixel_from_stampmap( running_machine* machine, bitmap_t* srcbi
 
 	if (x >= srcbitmap->width) return 0;
 	if (y >= srcbitmap->height) return 0;
-	
+
 	UINT16* cacheptr = BITMAP_ADDR16( srcbitmap, y, x);
 
 	return cacheptr[0] & 0xf;
@@ -5367,7 +5538,7 @@ INLINE UINT8 read_pixel_from_stampmap( running_machine* machine, bitmap_t* srcbi
 		case 0x02: return get_stampmap_16x16_16x16_tile_info_pixel( machine, x, y );
 		case 0x03: return get_stampmap_32x32_16x16_tile_info_pixel( machine, x, y );
 	}
-	
+
 	return 0;
 }
 
@@ -5379,21 +5550,21 @@ INLINE void write_pixel_to_imagebuffer( running_machine* machine, UINT32 pix, in
 	UINT32 offset;
 
 	offset = bufferstart+(((segacd_imagebuffer_vcell_size+1)*0x10)*xpos);
-	
+
 	// lines of each output cell
 	offset+= (line*2);
-			
+
 	while (offset>=bufferend)
 		offset-= bufferend;
-	
-	
+
+
 	switch (segacd_memory_priority_mode)
 	{
 		case 0x00: // normal write, just write the data
 			segacd_dataram[offset] = pix >> 16;
 			segacd_dataram[offset+1] = pix & 0xffff;
 			break;
-			
+
 		case 0x01: // underwrite, only write if the existing data is 0
 			if ((segacd_dataram[offset]&0xf000) == 0x0000) segacd_dataram[offset] |= (pix>>16)&0xf000;
 			if ((segacd_dataram[offset]&0x0f00) == 0x0000) segacd_dataram[offset] |= (pix>>16)&0x0f00;
@@ -5404,7 +5575,7 @@ INLINE void write_pixel_to_imagebuffer( running_machine* machine, UINT32 pix, in
 			if ((segacd_dataram[offset+1]&0x00f0) == 0x0000) segacd_dataram[offset+1] |= (pix)&0x00f0;
 			if ((segacd_dataram[offset+1]&0x000f) == 0x0000) segacd_dataram[offset+1] |= (pix)&0x000f;
 			break;
-			
+
 		case 0x02: // overwrite, only write non-zero data
 			if ((pix>>16)&0xf000) segacd_dataram[offset] = (segacd_dataram[offset] & 0x0fff) | ((pix>>16)&0xf000);
 			if ((pix>>16)&0x0f00) segacd_dataram[offset] = (segacd_dataram[offset] & 0xf0ff) | ((pix>>16)&0x0f00);
@@ -5415,15 +5586,15 @@ INLINE void write_pixel_to_imagebuffer( running_machine* machine, UINT32 pix, in
 			if ((pix)&0x00f0) segacd_dataram[offset+1] = (segacd_dataram[offset+1] & 0xff0f) | ((pix)&0x00f0);
 			if ((pix)&0x000f) segacd_dataram[offset+1] = (segacd_dataram[offset+1] & 0xfff0) | ((pix)&0x000f);
 			break;
-			
+
 		default:
 		case 0x03: // invalid?
 			segacd_dataram[offset] = mame_rand(machine);
 			segacd_dataram[offset+1] = mame_rand(machine);
 			break;
-	
+
 	}
-	
+
 	segacd_mark_tiles_dirty(machine, offset);
 	segacd_mark_tiles_dirty(machine, offset+1);
 
@@ -5450,7 +5621,7 @@ WRITE16_HANDLER( segacd_trace_vector_base_address_w )
 		segacd_conversion_active = 1;
 
 		// todo: proper time calculation
-		timer_adjust_oneshot(segacd_gfx_conversion_timer, ATTOTIME_IN_HZ(1000), 0);
+		timer_adjust_oneshot(segacd_gfx_conversion_timer, ATTOTIME_IN_HZ(500), 0);
 
 
 		int line;
@@ -5460,11 +5631,11 @@ WRITE16_HANDLER( segacd_trace_vector_base_address_w )
 		for (line=0;line<segacd_imagebuffer_vdot_size;line++)
 		{
 			int currbase = base + line * 0x8;
-			
+
 			// are the 256x256 tile modes using the same sign bits?
 			INT16 tilemapxoffs,tilemapyoffs;
 			INT16 deltax,deltay;
-			
+
 			tilemapxoffs = segacd_dataram[(currbase+0x0)>>1];
 			tilemapyoffs = segacd_dataram[(currbase+0x2)>>1];
 			deltax = segacd_dataram[(currbase+0x4)>>1]; // x-zoom
@@ -5475,29 +5646,29 @@ WRITE16_HANDLER( segacd_trace_vector_base_address_w )
 			int xbase = tilemapxoffs * 256;
 			int ybase = tilemapyoffs * 256;
 			int count;
-						
+
 			for (count=0;count<(segacd_imagebuffer_hdot_size>>3);count++)
 			{
 				int i;
 				UINT32 pixblock = 0x00000000;
 				for (i=7*4;i>=0;i-=4)
-				{	
+				{
 					pixblock |= read_pixel_from_stampmap(space->machine, srcbitmap, xbase>>(3+8), ybase>>(3+8)) << (i);
-					
-					
+
+
 					xbase += deltax;
 					ybase += deltay;
-					
+
 					// clamp to 24-bits, seems to be required for all the intro effects to work
 					xbase &= 0xffffff;
 					ybase &= 0xffffff;
-					
+
 
 				}
-				
-				
-				
-				
+
+
+
+
 				write_pixel_to_imagebuffer(space->machine, pixblock, line, count);
 			}
 
@@ -5611,7 +5782,7 @@ static TIMER_CALLBACK( segacd_irq3_timer_callback )
 {
 	if (segacd_irq_mask & 0x08)
 		cputag_set_input_line(machine, "segacd_68k", 3, HOLD_LINE);
-		
+
 	timer_adjust_oneshot(segacd_irq3_timer, SEGACD_IRQ3_TIMER_SPEED, 0);
 }
 
@@ -5626,8 +5797,8 @@ static ADDRESS_MAP_START( segacd_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0xff0000, 0xff001f) AM_DEVWRITE8("rfsnd", rf5c68_w, 0x00ff)  // PCM, RF5C164
 	AM_RANGE(0xff2000, 0xff3fff) AM_DEVREADWRITE8("rfsnd", rf5c68_mem_r, rf5c68_mem_w,0x00ff)  // PCM, RF5C164
-	
-	 
+
+
 	AM_RANGE(0xff8000 ,0xff8001) AM_READWRITE(segacd_sub_led_ready_r, segacd_sub_led_ready_w)
 	AM_RANGE(0xff8002 ,0xff8003) AM_READWRITE(segacd_sub_memory_mode_r, segacd_sub_memory_mode_w)
 
