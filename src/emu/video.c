@@ -1600,10 +1600,9 @@ int video_get_view_for_target(running_machine *machine, render_target *target, c
 	}
 
 	/* if we don't have a match, default to the nth view */
-	if (viewindex == -1)
+	int scrcount = screen_count(*machine->config);
+	if (viewindex == -1 && scrcount > 0)
 	{
-		int scrcount = screen_count(*machine->config);
-
 		/* if we have enough targets to be one per screen, assign in order */
 		if (numtargets >= scrcount)
 		{
