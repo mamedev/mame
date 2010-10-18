@@ -1,6 +1,6 @@
 #include "emu.h"
 #include "streams.h"
-#include "cpu/cdp1802/cdp1802.h"
+#include "cpu/cosmac/cosmac.h"
 #include "sound/cdp1869.h"
 
 /*
@@ -135,22 +135,22 @@ static void update_prd_changed_timer(cdp1869_t *cdp1869)
 		if (scanline < start)
 		{
 			next_scanline = start;
-			level = 0;
+			level = ASSERT_LINE;
 		}
 		else if (scanline < end)
 		{
 			next_scanline = end;
-			level = 1;
+			level = CLEAR_LINE;
 		}
 		else
 		{
 			next_scanline = start;
-			level = 0;
+			level = ASSERT_LINE;
 		}
 
 		if (cdp1869->dispoff)
 		{
-			level = 1;
+			level = CLEAR_LINE;
 		}
 
 		duration = cdp1869->screen->time_until_pos(next_scanline);
@@ -188,7 +188,7 @@ static STATE_POSTLOAD( cdp1869_state_save_postload )
 
 static UINT16 cdp1802_get_r_x(cdp1869_t *cdp1869)
 {
-	return cpu_get_reg(cdp1869->cpu, CDP1802_R0 + cpu_get_reg(cdp1869->cpu, CDP1802_X));
+	return cpu_get_reg(cdp1869->cpu, COSMAC_R0 + cpu_get_reg(cdp1869->cpu, COSMAC_X));
 }
 
 /*-------------------------------------------------
@@ -710,6 +710,17 @@ READ_LINE_DEVICE_HANDLER( cdp1869_predisplay_r )
 	cdp1869_t *cdp1869 = get_safe_token(device);
 
 	return cdp1869->prd;
+}
+
+/*-------------------------------------------------
+    cdp1869_pal_ntsc_r - PAL/NTSC read
+-------------------------------------------------*/
+
+READ_LINE_DEVICE_HANDLER( cdp1869_pal_ntsc_r )
+{
+	cdp1869_t *cdp1869 = get_safe_token(device);
+
+	return devcb_call_read_line(&cdp1869->in_pal_ntsc_func);
 }
 
 /*-------------------------------------------------

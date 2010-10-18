@@ -291,6 +291,21 @@ $(CPUOBJ)/cdp1802/cdp1802.o:	$(CPUSRC)/cdp1802/cdp1802.c \
 
 
 #-------------------------------------------------
+# RCA COSMAC
+#-------------------------------------------------
+
+ifneq ($(filter COSMAC,$(CPUS)),)
+OBJDIRS += $(CPUOBJ)/cosmac
+CPUOBJS += $(CPUOBJ)/cosmac/cosmac.o
+DASMOBJS += $(CPUOBJ)/cosmac/cosdasm.o
+endif
+
+$(CPUOBJ)/cosmac/cosmac.o:	$(CPUSRC)/cosmac/cosmac.c \
+							$(CPUSRC)/cosmac/cosmac.h
+
+
+
+#-------------------------------------------------
 # National Semiconductor COP400 family
 #-------------------------------------------------
 

@@ -183,6 +183,9 @@ WRITE8_DEVICE_HANDLER ( cdp1869_pageram_w );
 /* predisplay */
 READ_LINE_DEVICE_HANDLER( cdp1869_predisplay_r );
 
+/* PAL/NTSC */
+READ_LINE_DEVICE_HANDLER( cdp1869_pal_ntsc_r );
+
 /* screen update */
 void cdp1869_update(running_device *device, bitmap_t *bitmap, const rectangle *cliprect);
 

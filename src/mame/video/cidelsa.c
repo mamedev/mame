@@ -1,4 +1,5 @@
 #include "emu.h"
+#include "cpu/cosmac/cosmac.h"
 #include "sound/cdp1869.h"
 #include "sound/ay8910.h"
 #include "includes/cidelsa.h"
@@ -130,8 +131,8 @@ static WRITE_LINE_DEVICE_HANDLER( cidelsa_prd_w )
 	cidelsa_state *driver_state = device->machine->driver_data<cidelsa_state>();
 
 	/* invert PRD signal */
-	cpu_set_input_line(driver_state->cdp1802, INPUT_LINE_IRQ0, !state);
-	driver_state->cdp1869_prd = !state;
+	cpu_set_input_line(driver_state->cdp1802, COSMAC_INPUT_LINE_INT, state ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(driver_state->cdp1802, COSMAC_INPUT_LINE_EF1, state ? CLEAR_LINE : ASSERT_LINE);
 }
 
 /* CDP1869 Interface */
@@ -175,7 +176,7 @@ static CDP1869_INTERFACE( draco_cdp1869_intf )
 	draco_pcb_r,
 	draco_charram_r,
 	draco_charram_w,
-	DEVCB_NULL
+	DEVCB_CPU_INPUT_LINE(CDP1802_TAG, COSMAC_INPUT_LINE_EF1)
 };
 
 /* Video Start */

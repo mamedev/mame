@@ -1,5 +1,5 @@
 #include "emu.h"
-#include "cpu/cdp1802/cdp1802.h"
+#include "cpu/cosmac/cosmac.h"
 #include "cpu/cop400/cop400.h"
 #include "sound/cdp1869.h"
 #include "sound/ay8910.h"
@@ -9,23 +9,11 @@
 
 /* CDP1802 Interface */
 
-static CDP1802_MODE_READ( cidelsa_mode_r )
+static READ_LINE_DEVICE_HANDLER( clear_r )
 {
 	cidelsa_state *state = device->machine->driver_data<cidelsa_state>();
 
-	return state->cdp1802_mode;
-}
-
-static CDP1802_EF_READ( cidelsa_ef_r )
-{
-	/*
-        EF1     CDP1869 _PRD
-        EF2     Test
-        EF3     Coin 2
-        EF4     Coin 1
-    */
-
-	return input_port_read(device->machine, "EF");
+	return state->reset;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( cidelsa_q_w )
@@ -35,14 +23,20 @@ static WRITE_LINE_DEVICE_HANDLER( cidelsa_q_w )
 	driver_state->cdp1802_q = state;
 }
 
-static CDP1802_INTERFACE( cidelsa_cdp1802_config )
+static COSMAC_INTERFACE( cidelsa_cdp1802_config )
 {
-	cidelsa_mode_r,				// MODE
-	cidelsa_ef_r,				// EF
-	NULL,						// SC
-	DEVCB_LINE(cidelsa_q_w),	// Q
-	DEVCB_NULL,					// DMA read
-	DEVCB_NULL					// DMA write
+	DEVCB_LINE_VCC,
+	DEVCB_LINE(clear_r),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_NULL,
+	DEVCB_LINE(cidelsa_q_w),
+	DEVCB_NULL,
+	DEVCB_NULL,
+	NULL,
+	DEVCB_NULL,
+	DEVCB_NULL
 };
 
 /* Sound Interface */
@@ -258,7 +252,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( altair_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x2fff) AM_ROM
-	AM_RANGE(0x3000, 0x30ff) AM_RAM
+	AM_RANGE(0x3000, 0x30ff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0xf400, 0xf7ff) AM_DEVREADWRITE(CDP1869_TAG, cdp1869_charram_r, cdp1869_charram_w)
 	AM_RANGE(0xf800, 0xffff) AM_DEVREADWRITE(CDP1869_TAG, cdp1869_pageram_r, cdp1869_pageram_w)
 ADDRESS_MAP_END
@@ -314,11 +308,9 @@ static CUSTOM_INPUT( cdp1869_pcb_r )
 	return state->cdp1869_pcb;
 }
 
-static CUSTOM_INPUT( cidelsa_prd_r )
+static INPUT_CHANGED( ef_w )
 {
-	cidelsa_state *state = field->port->machine->driver_data<cidelsa_state>();
-
-	return state->cdp1869_prd;
+	cputag_set_input_line(field->port->machine, CDP1802_TAG, (int)(FPTR)param, newval);
 }
 
 static INPUT_PORTS_START( destryer )
@@ -355,10 +347,10 @@ static INPUT_PORTS_START( destryer )
 	PORT_DIPSETTING(    0x00, "Slot A: 2.5  Slot B: 5" )
 
 	PORT_START("EF")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(cidelsa_prd_r, NULL)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) // ST
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 ) // M2
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 ) // M1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) // inverted CDP1869 PRD, pushed
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_CHANGED(ef_w, (void*)COSMAC_INPUT_LINE_EF2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED(ef_w, (void*)COSMAC_INPUT_LINE_EF3)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(ef_w, (void*)COSMAC_INPUT_LINE_EF4)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( altair )
@@ -405,10 +397,10 @@ static INPUT_PORTS_START( altair )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("EF")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_CUSTOM(cidelsa_prd_r, NULL)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) // ST
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 ) // M2
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 ) // M1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) // inverted CDP1869 PRD, pushed
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_CHANGED(ef_w, (void*)COSMAC_INPUT_LINE_EF2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED(ef_w, (void*)COSMAC_INPUT_LINE_EF3)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(ef_w, (void*)COSMAC_INPUT_LINE_EF4)
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( draco )
@@ -457,10 +449,10 @@ static INPUT_PORTS_START( draco )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_JOYSTICKLEFT_LEFT )
 
 	PORT_START("EF")
-	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_SPECIAL ) PORT_READ_LINE_DEVICE(CDP1869_TAG, cdp1869_predisplay_r)
-	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_SERVICE ) // ST
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_COIN2 ) // M2
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_COIN1 ) // M1
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_SPECIAL ) // CDP1869 PRD, pushed
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_SERVICE ) PORT_CHANGED(ef_w, (void*)COSMAC_INPUT_LINE_EF2)
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_CHANGED(ef_w, (void*)COSMAC_INPUT_LINE_EF3)
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_CHANGED(ef_w, (void*)COSMAC_INPUT_LINE_EF4)
 INPUT_PORTS_END
 
 /* Machine Start */
@@ -469,21 +461,18 @@ static TIMER_CALLBACK( set_cpu_mode )
 {
 	cidelsa_state *state = machine->driver_data<cidelsa_state>();
 
-	state->cdp1802_mode = CDP1802_MODE_RUN;
+	state->reset = 1;
 }
 
 static MACHINE_START( cidelsa )
 {
 	cidelsa_state *state = machine->driver_data<cidelsa_state>();
 
+	/* find devices */
 	state->cdp1802 = machine->device(CDP1802_TAG);
 
-	/* reset the CPU */
-	state->cdp1802_mode = CDP1802_MODE_RESET;
-	timer_set(machine, ATTOTIME_IN_MSEC(200), NULL, 0, set_cpu_mode);
-
 	/* register for state saving */
-	state_save_register_global(machine, state->cdp1802_mode);
+	state_save_register_global(machine, state->reset);
 }
 
 static MACHINE_START( draco )
@@ -493,7 +482,7 @@ static MACHINE_START( draco )
 	MACHINE_START_CALL( cidelsa );
 
 	/* setup COP402 memory banking */
-	memory_configure_bank(machine, "bank1", 0, 2, memory_region(machine, "audiocpu"), 0x400);
+	memory_configure_bank(machine, "bank1", 0, 2, memory_region(machine, COP402N_TAG), 0x400);
 	memory_set_bank(machine, "bank1", 0);
 
 	/* register for state saving */
@@ -505,15 +494,18 @@ static MACHINE_START( draco )
 
 static MACHINE_RESET( cidelsa )
 {
-	cputag_set_input_line(machine, CDP1802_TAG, INPUT_LINE_RESET, PULSE_LINE);
+	cidelsa_state *state = machine->driver_data<cidelsa_state>();
+
+	/* reset the CPU */
+	state->reset = 0;
+	timer_set(machine, ATTOTIME_IN_MSEC(200), NULL, 0, set_cpu_mode);
 }
 
 /* Machine Drivers */
 
 static MACHINE_CONFIG_START( destryer, cidelsa_state )
-
 	/* basic system hardware */
-	MDRV_CPU_ADD(CDP1802_TAG, CDP1802, DESTRYER_CHR1)
+	MDRV_CPU_ADD(CDP1802_TAG, COSMAC, DESTRYER_CHR1)
 	MDRV_CPU_PROGRAM_MAP(destryer_map)
 	MDRV_CPU_IO_MAP(destryer_io_map)
 	MDRV_CPU_CONFIG(cidelsa_cdp1802_config)
@@ -527,9 +519,8 @@ static MACHINE_CONFIG_START( destryer, cidelsa_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( destryera, cidelsa_state )
-
 	/* basic system hardware */
-	MDRV_CPU_ADD(CDP1802_TAG, CDP1802, DESTRYER_CHR1)
+	MDRV_CPU_ADD(CDP1802_TAG, COSMAC, DESTRYER_CHR1)
 	MDRV_CPU_PROGRAM_MAP(destryera_map)
 	MDRV_CPU_IO_MAP(destryer_io_map)
 	MDRV_CPU_CONFIG(cidelsa_cdp1802_config)
@@ -543,13 +534,12 @@ static MACHINE_CONFIG_START( destryera, cidelsa_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( altair, cidelsa_state )
-
 	/* basic system hardware */
-
-	MDRV_CPU_ADD(CDP1802_TAG, CDP1802, ALTAIR_CHR1)
+	MDRV_CPU_ADD(CDP1802_TAG, COSMAC, ALTAIR_CHR1)
 	MDRV_CPU_PROGRAM_MAP(altair_map)
 	MDRV_CPU_IO_MAP(altair_io_map)
 	MDRV_CPU_CONFIG(cidelsa_cdp1802_config)
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_MACHINE_START(cidelsa)
 	MDRV_MACHINE_RESET(cidelsa)
@@ -565,9 +555,8 @@ static MACHINE_CONFIG_START( altair, cidelsa_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( draco, cidelsa_state )
-
 	/* basic system hardware */
-	MDRV_CPU_ADD(CDP1802_TAG, CDP1802, DRACO_CHR1)
+	MDRV_CPU_ADD(CDP1802_TAG, COSMAC, DRACO_CHR1)
 	MDRV_CPU_PROGRAM_MAP(draco_map)
 	MDRV_CPU_IO_MAP(draco_io_map)
 	MDRV_CPU_CONFIG(cidelsa_cdp1802_config)
@@ -576,7 +565,7 @@ static MACHINE_CONFIG_START( draco, cidelsa_state )
 	MDRV_MACHINE_START(draco)
 	MDRV_MACHINE_RESET(cidelsa)
 
-	MDRV_CPU_ADD("audiocpu", COP402, DRACO_SND_CHR1) // COP402N
+	MDRV_CPU_ADD(COP402N_TAG, COP402, DRACO_SND_CHR1)
 	MDRV_CPU_PROGRAM_MAP(draco_sound_map)
 	MDRV_CPU_IO_MAP(draco_sound_io_map)
 	MDRV_CPU_CONFIG(draco_cop_intf)
@@ -594,7 +583,7 @@ MACHINE_CONFIG_END
 /* ROMs */
 
 ROM_START( destryer )
-	ROM_REGION( 0x10000, CDP1802_TAG, 0 )
+	ROM_REGION( 0x2000, CDP1802_TAG, 0 )
 	ROM_LOAD( "des a 2.ic4", 0x0000, 0x0800, CRC(63749870) SHA1(a8eee4509d7a52dcf33049de221d928da3632174) )
 	ROM_LOAD( "des b 2.ic5", 0x0800, 0x0800, CRC(60604f40) SHA1(32ca95c5b38b0f4992e04d77123d217f143ae084) )
 	ROM_LOAD( "des c 2.ic6", 0x1000, 0x0800, CRC(a7cdeb7b) SHA1(a5a7748967d4ca89fb09632e1f0130ef050dbd68) )
@@ -603,7 +592,7 @@ ROM_END
 
 // this was destroyer2.rom in standalone emu..
 ROM_START( destryera )
-	ROM_REGION( 0x10000, CDP1802_TAG, 0 )
+	ROM_REGION( 0x2000, CDP1802_TAG, 0 )
 	ROM_LOAD( "destryera_1", 0x0000, 0x0800, CRC(421428e9) SHA1(0ac3a1e7f61125a1cd82145fa28cbc4b93505dc9) )
 	ROM_LOAD( "destryera_2", 0x0800, 0x0800, CRC(55dc8145) SHA1(a0066d3f3ac0ae56273485b74af90eeffea5e64e) )
 	ROM_LOAD( "destryera_3", 0x1000, 0x0800, CRC(5557bdf8) SHA1(37a9cbc5d25051d3bed7535c58aac937cd7c64e1) )
@@ -611,7 +600,7 @@ ROM_START( destryera )
 ROM_END
 
 ROM_START( altair )
-	ROM_REGION( 0x10000, CDP1802_TAG, 0 )
+	ROM_REGION( 0x3000, CDP1802_TAG, 0 )
 	ROM_LOAD( "alt a 1.ic7",  0x0000, 0x0800, CRC(37c26c4e) SHA1(30df7efcf5bd12dafc1cb6e894fc18e7b76d3e61) )
 	ROM_LOAD( "alt b 1.ic8",  0x0800, 0x0800, CRC(76b814a4) SHA1(e8ab1d1cbcef974d929ef8edd10008f60052a607) )
 	ROM_LOAD( "alt c 1.ic9",  0x1000, 0x0800, CRC(2569ce44) SHA1(a09597d2f8f50fab9a09ed9a59c50a2bdcba47bb) )
@@ -621,7 +610,7 @@ ROM_START( altair )
 ROM_END
 
 ROM_START( draco )
-	ROM_REGION( 0x10000, CDP1802_TAG, 0 )
+	ROM_REGION( 0x4000, CDP1802_TAG, 0 )
 	ROM_LOAD( "dra a 1.ic10", 0x0000, 0x0800, CRC(ca127984) SHA1(46721cf42b1c891f7c88bc063a2149dd3cefea74) )
 	ROM_LOAD( "dra b 1.ic11", 0x0800, 0x0800, CRC(e4936e28) SHA1(ddbbf769994d32a6bce75312306468a89033f0aa) )
 	ROM_LOAD( "dra c 1.ic12", 0x1000, 0x0800, CRC(94480f5d) SHA1(8f49ce0f086259371e999d097a502482c83c6e9e) )
@@ -631,7 +620,7 @@ ROM_START( draco )
 	ROM_LOAD( "dra g 1.ic16", 0x3000, 0x0800, CRC(f28546c0) SHA1(daedf1d64f94358b15580d697dd77d3c977aa22c) )
 	ROM_LOAD( "dra h 1.ic17", 0x3800, 0x0800, CRC(dce782ea) SHA1(f558096f43fb30337bc4a527169718326c265c2c) )
 
-	ROM_REGION( 0x800, "audiocpu", 0 )
+	ROM_REGION( 0x800, COP402N_TAG, 0 )
 	ROM_LOAD( "dra s 1.ic4",  0x0000, 0x0800, CRC(292a57f8) SHA1(b34a189394746d77c3ee669db24109ee945c3be7) )
 ROM_END
 

@@ -1,11 +1,12 @@
 #ifndef __CIDELSA__
 #define __CIDELSA__
 
-#include "cpu/cdp1802/cdp1802.h"
+#include "cpu/cosmac/cosmac.h"
 
 #define SCREEN_TAG	"screen"
 #define CDP1802_TAG	"cdp1802"
 #define CDP1869_TAG	"cdp1869"
+#define COP402N_TAG	"cop402n"
 #define AY8910_TAG	"ay8910"
 
 #define DESTRYER_CHR1	3579000.0 // unverified
@@ -31,7 +32,7 @@ public:
 		: driver_device(machine, config) { }
 
 	/* cpu state */
-	cdp1802_control_mode cdp1802_mode;
+	int reset;
 
 	/* video state */
 	int cdp1802_q;
