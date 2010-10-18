@@ -52,8 +52,9 @@
 #define DEVCB_TYPE_SELF				(1)
 #define DEVCB_TYPE_INPUT			(2)
 #define DEVCB_TYPE_DEVICE			(3)
-#define DEVCB_TYPE_MEMORY(space)	(4 + (space))
-#define DEVCB_TYPE_CPU_LINE(line)	(4 + ADDRESS_SPACES + (line))
+#define DEVCB_TYPE_DRIVER			(4)
+#define DEVCB_TYPE_MEMORY(space)	(5 + (space))
+#define DEVCB_TYPE_CPU_LINE(line)	(5 + ADDRESS_SPACES + (line))
 
 
 
@@ -97,11 +98,15 @@ void devcb_stub(device_t *device, offs_t offset, UINT8 data)
 
 /* standard line or read/write handlers with the calling device passed */
 #define DEVCB_LINE(func)						{ DEVCB_TYPE_SELF, NULL, (func), NULL, NULL }
-#define DEVCB_LINE_MEMBER(func)					{ DEVCB_TYPE_SELF, NULL, &devcb_line_stub<cls, &cls::memb>, NULL, NULL }
+#define DEVCB_LINE_MEMBER(cls,memb)				{ DEVCB_TYPE_SELF, NULL, &devcb_line_stub<cls, &cls::memb>, NULL, NULL }
 #define DEVCB_LINE_GND							{ DEVCB_TYPE_SELF, NULL, devcb_line_gnd_r, NULL, NULL }
 #define DEVCB_LINE_VCC							{ DEVCB_TYPE_SELF, NULL, devcb_line_vcc_r, NULL, NULL }
 #define DEVCB_HANDLER(func)						{ DEVCB_TYPE_SELF, NULL, NULL, (func), NULL }
 #define DEVCB_MEMBER(cls,memb)					{ DEVCB_TYPE_SELF, NULL, NULL, &devcb_stub<cls, &cls::memb>, NULL }
+
+/* line or read/write handlers for the driver device */
+#define DEVCB_DRIVER_LINE_MEMBER(tag,cls,memb)	{ DEVCB_TYPE_DRIVER, NULL, &devcb_line_stub<cls, &cls::memb>, NULL, NULL }
+#define DEVCB_DRIVER_MEMBER(tag,cls,memb)		{ DEVCB_TYPE_DRIVER, NULL, NULL, &devcb_stub<cls, &cls::memb>, NULL }
 
 /* line or read/write handlers for another device */
 #define DEVCB_DEVICE_LINE(tag,func)				{ DEVCB_TYPE_DEVICE, tag, (func), NULL, NULL }

@@ -68,11 +68,13 @@ void devcb_resolve_read_line(devcb_resolved_read_line *resolved, const devcb_rea
 	}
 
 	/* device handlers */
-	else if ((config->type == DEVCB_TYPE_DEVICE || config->type == DEVCB_TYPE_SELF) && (config->readline != NULL || config->readdevice != NULL))
+	else if ((config->type == DEVCB_TYPE_DEVICE || config->type == DEVCB_TYPE_SELF || config->type == DEVCB_TYPE_DRIVER) && (config->readline != NULL || config->readdevice != NULL))
 	{
 		/* locate the device */
 		if (config->type == DEVCB_TYPE_SELF)
 			resolved->target = device;
+		else if (config->type == DEVCB_TYPE_DRIVER)
+			resolved->target = device->machine->driver_data();
 		else
 			resolved->target = device->siblingdevice(config->tag);
 
@@ -167,11 +169,13 @@ void devcb_resolve_write_line(devcb_resolved_write_line *resolved, const devcb_w
 	}
 
 	/* device handlers */
-	else if ((config->type == DEVCB_TYPE_DEVICE || config->type == DEVCB_TYPE_SELF) && (config->writeline != NULL || config->writedevice != NULL))
+	else if ((config->type == DEVCB_TYPE_DEVICE || config->type == DEVCB_TYPE_SELF || config->type == DEVCB_TYPE_DRIVER) && (config->writeline != NULL || config->writedevice != NULL))
 	{
 		/* locate the device */
 		if (config->type == DEVCB_TYPE_SELF)
 			resolved->target = device;
+		else if (config->type == DEVCB_TYPE_DRIVER)
+			resolved->target = device->machine->driver_data();
 		else
 			resolved->target = device->siblingdevice(config->tag);
 
@@ -243,9 +247,14 @@ void devcb_resolve_read8(devcb_resolved_read8 *resolved, const devcb_read8 *conf
 	}
 
 	/* device handlers */
-	else if ((config->type == DEVCB_TYPE_DEVICE || config->type == DEVCB_TYPE_SELF) && (config->readline != NULL || config->readdevice != NULL))
+	else if ((config->type == DEVCB_TYPE_DEVICE || config->type == DEVCB_TYPE_SELF || config->type == DEVCB_TYPE_DRIVER) && (config->readline != NULL || config->readdevice != NULL))
 	{
-		resolved->target = (config->type == DEVCB_TYPE_SELF) ? device : device->machine->device(config->tag);
+		if (config->type == DEVCB_TYPE_SELF)
+			resolved->target = device;
+		else if (config->type == DEVCB_TYPE_DRIVER)
+			resolved->target = device->machine->driver_data();
+		else
+			resolved->target = device->siblingdevice(config->tag);
 		if (resolved->target == NULL)
 			fatalerror("devcb_resolve_read8: unable to find device '%s' (requested by %s '%s')", config->tag, device->name(), device->tag());
 
@@ -313,9 +322,14 @@ void devcb_resolve_write8(devcb_resolved_write8 *resolved, const devcb_write8 *c
 	}
 
 	/* device handlers */
-	else if ((config->type == DEVCB_TYPE_DEVICE || config->type == DEVCB_TYPE_SELF) && (config->writeline != NULL || config->writedevice != NULL))
+	else if ((config->type == DEVCB_TYPE_DEVICE || config->type == DEVCB_TYPE_SELF || config->type == DEVCB_TYPE_DRIVER) && (config->writeline != NULL || config->writedevice != NULL))
 	{
-		resolved->target = (config->type == DEVCB_TYPE_SELF) ? device : device->machine->device(config->tag);
+		if (config->type == DEVCB_TYPE_SELF)
+			resolved->target = device;
+		else if (config->type == DEVCB_TYPE_DRIVER)
+			resolved->target = device->machine->driver_data();
+		else
+			resolved->target = device->siblingdevice(config->tag);
 		if (resolved->target == NULL)
 			fatalerror("devcb_resolve_write8: unable to find device '%s' (requested by %s '%s')", config->tag, device->name(), device->tag());
 
