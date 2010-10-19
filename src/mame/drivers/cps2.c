@@ -1059,6 +1059,14 @@ static INPUT_PORTS_START( cps2_2p6b )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(2)
 INPUT_PORTS_END
 
+/* 2 players, 6 buttons, and 1 ticket dispenser (2 rows of 3 buttons) */
+static INPUT_PORTS_START( cps2_2p6bt )
+	PORT_INCLUDE(cps2_2p6b)
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x2000, IP_ACTIVE_HIGH, IPT_UNUSED )           /* Ticket Empty line*/
+INPUT_PORTS_END
+
 /* 1 player and 4 buttons */
 static INPUT_PORTS_START( cps2_1p4b )
 	PORT_INCLUDE(cps2_2p4b)
@@ -8144,8 +8152,8 @@ GAME( 1998, mvscb,      mvsc,     cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "
 GAME( 1998, sfa3,       0,        cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Street Fighter Alpha 3 (Euro 980904)", GAME_SUPPORTS_SAVE )
 GAME( 1998, sfa3u,      sfa3,     cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Street Fighter Alpha 3 (USA 980904)", GAME_SUPPORTS_SAVE )
 GAME( 1998, sfa3ur1,    sfa3,     cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Street Fighter Alpha 3 (USA 980629)", GAME_SUPPORTS_SAVE )
-GAME( 1998, sfa3h,      sfa3,     cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Street Fighter Alpha 3 (Hispanic 980629)", GAME_SUPPORTS_SAVE )
-GAME( 1998, sfa3b,      sfa3,     cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Street Fighter Alpha 3 (Brazil 980629)", GAME_SUPPORTS_SAVE )
+GAME( 1998, sfa3h,      sfa3,     cps2, cps2_2p6bt,cps2,     ROT0,   "Capcom", "Street Fighter Alpha 3 (Hispanic 980629)", GAME_SUPPORTS_SAVE )
+GAME( 1998, sfa3b,      sfa3,     cps2, cps2_2p6bt,cps2,     ROT0,   "Capcom", "Street Fighter Alpha 3 (Brazil 980629)", GAME_SUPPORTS_SAVE )
 GAME( 1998, sfz3j,      sfa3,     cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Street Fighter Zero 3 (Japan 980904)", GAME_SUPPORTS_SAVE )
 GAME( 1998, sfz3jr1,    sfa3,     cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Street Fighter Zero 3 (Japan 980727)", GAME_SUPPORTS_SAVE )
 GAME( 1998, sfz3jr2,    sfa3,     cps2, cps2_2p6b, cps2,     ROT0,   "Capcom", "Street Fighter Zero 3 (Japan 980629)", GAME_SUPPORTS_SAVE )
