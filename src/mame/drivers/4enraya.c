@@ -30,10 +30,8 @@ Video :
 
     3 gfx ROMS
     ROM1 - R component (ROM ->(parallel in) shift register 74166 (serial out) -> jamma output
-    ROM2 - B component
-    ROM3 - G component
-
-    Default MAME color palette is used
+    ROM2 - G component
+    ROM3 - B component
 
 Sound :
  AY 3 8910
@@ -49,7 +47,6 @@ Sound :
 ***************************************************************************/
 
 #include "emu.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
 #include "includes/4enraya.h"
@@ -144,7 +141,7 @@ static const gfx_layout charlayout =
 };
 
 static GFXDECODE_START( 4enraya )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 8 )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 1 )
 GFXDECODE_END
 
 static MACHINE_START( 4enraya )
@@ -163,13 +160,22 @@ static MACHINE_RESET( 4enraya )
 	state->last_snd_ctrl = 0;
 }
 
+static PALETTE_INIT( 4enraya )
+{
+	int i;
+
+	/* RGB format */
+	for(i=0;i<8;i++)
+		palette_set_color(machine, i, MAKE_RGB(pal1bit(i >> 0),pal1bit(i >> 1),pal1bit(i >> 2)));
+}
+
 static MACHINE_CONFIG_START( 4enraya, _4enraya_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80,8000000/2)
 	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_IO_MAP(main_portmap)
-	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
+	MDRV_CPU_PERIODIC_INT(irq0_line_hold,4*60) // unknown timing
 
 	MDRV_MACHINE_START(4enraya)
 	MDRV_MACHINE_RESET(4enraya)
@@ -182,14 +188,16 @@ static MACHINE_CONFIG_START( 4enraya, _4enraya_state )
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 	MDRV_GFXDECODE(4enraya)
-	MDRV_PALETTE_LENGTH(512)
+
+	MDRV_PALETTE_INIT(4enraya)
+	MDRV_PALETTE_LENGTH(8)
 
 	MDRV_VIDEO_START(4enraya)
 	MDRV_VIDEO_UPDATE(4enraya)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("aysnd", AY8910, 8000000/4 /* guess */)
+	MDRV_SOUND_ADD("aysnd", AY8910, 8000000/4) /* guess */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
