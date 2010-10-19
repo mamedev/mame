@@ -65,7 +65,6 @@ correctly.
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "deprecat.h"
 #include "sound/ay8910.h"
 #include "includes/1942.h"
 
@@ -75,12 +74,15 @@ static WRITE8_HANDLER( c1942_bankswitch_w )
 	memory_set_bank(space->machine, "bank1", data & 0x03);
 }
 
-static INTERRUPT_GEN( c1942_interrupt )
+static TIMER_DEVICE_CALLBACK( c1942_scanline )
 {
-	if (cpu_getiloops(device) != 0)
-		cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xcf);	/* RST 08h */
-	else
-		cpu_set_input_line_and_vector(device, 0, HOLD_LINE, 0xd7);	/* RST 10h - vblank */
+	int scanline = param;
+
+	if(scanline == 240) // vblank-out irq
+		cputag_set_input_line_and_vector(timer.machine, "maincpu", 0, HOLD_LINE, 0xd7);	/* RST 10h - vblank */
+
+	if(scanline == 0) // unknown irq event, presumably vblank-in or a periodic one (writes to the soundlatch and drives freeze dip-switch)
+		cputag_set_input_line_and_vector(timer.machine, "maincpu", 0, HOLD_LINE, 0xcf);	/* RST 08h */
 }
 
 
@@ -258,11 +260,11 @@ static MACHINE_CONFIG_START( 1942, _1942_state )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MAIN_CPU_CLOCK)	/* 4 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(c1942_map)
-	MDRV_CPU_VBLANK_INT_HACK(c1942_interrupt,2)
+	MDRV_TIMER_ADD_SCANLINE("scantimer", c1942_scanline, "screen", 0, 1)
 
 	MDRV_CPU_ADD("audiocpu", Z80, SOUND_CPU_CLOCK)	/* 3 MHz ??? */
 	MDRV_CPU_PROGRAM_MAP(sound_map)
-	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
+	MDRV_CPU_PERIODIC_INT(irq0_line_hold,4*60)
 
 	MDRV_MACHINE_START(1942)
 	MDRV_MACHINE_RESET(1942)
