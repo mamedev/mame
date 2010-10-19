@@ -555,6 +555,16 @@ inline void cosmac_device::write_io_byte(offs_t address, UINT8 data)
 //**************************************************************************
 
 //-------------------------------------------------
+//  get_memory_address - get current memory address
+//-------------------------------------------------
+
+offs_t cosmac_device::get_memory_address()
+{
+	// this is valid for INP/OUT opcodes
+	return R[X];
+}
+
+//-------------------------------------------------
 //  execute_set_input - 
 //-------------------------------------------------
 

@@ -4,52 +4,34 @@
 #include "sound/ay8910.h"
 #include "includes/cidelsa.h"
 
-/* Page RAM Access */
+/* Register Access */
 
-static READ8_DEVICE_HANDLER( cidelsa_pageram_r )
+WRITE8_MEMBER( cidelsa_state::cdp1869_w )
 {
-	cidelsa_state *state = device->machine->driver_data<cidelsa_state>();
+	UINT16 ma = m_maincpu->get_memory_address();
 
-	UINT16 addr = offset & CIDELSA_PAGERAM_MASK;
-
-	if (BIT(offset, 10))
+	switch (offset + 3)
 	{
-		return 0xff;
+	case 3:
+		m_vis->out3_w(space, ma, data);
+		break;
+
+	case 4:
+		m_vis->out4_w(space, ma, data);
+		break;
+		
+	case 5:
+		m_vis->out5_w(space, ma, data);
+		break;
+
+	case 6:
+		m_vis->out6_w(space, ma, data);
+		break;
+
+	case 7:
+		m_vis->out7_w(space, ma, data);
+		break;
 	}
-
-	return state->pageram[addr];
-}
-
-static WRITE8_DEVICE_HANDLER( cidelsa_pageram_w )
-{
-	cidelsa_state *state = device->machine->driver_data<cidelsa_state>();
-
-	UINT16 addr = offset & CIDELSA_PAGERAM_MASK;
-
-	if (BIT(offset, 10))
-	{
-		return;
-	}
-
-	state->pageram[addr] = data;
-}
-
-static READ8_DEVICE_HANDLER( draco_pageram_r )
-{
-	cidelsa_state *state = device->machine->driver_data<cidelsa_state>();
-
-	UINT16 addr = offset & DRACO_PAGERAM_MASK;
-
-	return state->pageram[addr];
-}
-
-static WRITE8_DEVICE_HANDLER( draco_pageram_w )
-{
-	cidelsa_state *state = device->machine->driver_data<cidelsa_state>();
-
-	UINT16 addr = offset & DRACO_PAGERAM_MASK;
-
-	state->pageram[addr] = data;
 }
 
 /* Character RAM Access */
@@ -58,11 +40,11 @@ static CDP1869_CHAR_RAM_READ( cidelsa_charram_r )
 {
 	cidelsa_state *state = device->machine->driver_data<cidelsa_state>();
 
-	UINT8 column = BIT(pma, 10) ? 0xff : state->pageram[pma & CIDELSA_PAGERAM_MASK];
+	UINT8 column = BIT(pma, 10) ? 0xff : pmd;
 	UINT16 addr = ((column << 3) | (cma & 0x07)) & CIDELSA_CHARRAM_MASK;
 
-	UINT8 data = state->charram[addr];
-	state->cdp1869_pcb = state->pcbram[addr];
+	UINT8 data = state->m_charram[addr];
+	state->m_cdp1869_pcb = state->m_pcbram[addr];
 
 	return data;
 }
@@ -71,22 +53,21 @@ static CDP1869_CHAR_RAM_WRITE( cidelsa_charram_w )
 {
 	cidelsa_state *state = device->machine->driver_data<cidelsa_state>();
 
-	UINT8 column = BIT(pma, 10) ? 0xff : state->pageram[pma & CIDELSA_PAGERAM_MASK];
+	UINT8 column = BIT(pma, 10) ? 0xff : pmd;
 	UINT16 addr = ((column << 3) | (cma & 0x07)) & CIDELSA_CHARRAM_MASK;
 
-	state->charram[addr] = data;
-	state->pcbram[addr] = state->cdp1802_q;
+	state->m_charram[addr] = data;
+	state->m_pcbram[addr] = state->m_cdp1802_q;
 }
 
 static CDP1869_CHAR_RAM_READ( draco_charram_r )
 {
 	cidelsa_state *state = device->machine->driver_data<cidelsa_state>();
 
-	UINT8 column = state->pageram[pma & DRACO_PAGERAM_MASK];
-	UINT16 addr = ((column << 3) | (cma & 0x07)) & CIDELSA_CHARRAM_MASK;
+	UINT16 addr = ((pmd << 3) | (cma & 0x07)) & CIDELSA_CHARRAM_MASK;
 
-	UINT8 data = state->charram[addr];
-	state->cdp1869_pcb = state->pcbram[addr];
+	UINT8 data = state->m_charram[addr];
+	state->m_cdp1869_pcb = state->m_pcbram[addr];
 
 	return data;
 }
@@ -95,11 +76,10 @@ static CDP1869_CHAR_RAM_WRITE( draco_charram_w )
 {
 	cidelsa_state *state = device->machine->driver_data<cidelsa_state>();
 
-	UINT8 column = state->pageram[pma & DRACO_PAGERAM_MASK];
-	UINT16 addr = ((column << 3) | (cma & 0x07)) & CIDELSA_CHARRAM_MASK;
+	UINT16 addr = ((pmd << 3) | (cma & 0x07)) & CIDELSA_CHARRAM_MASK;
 
-	state->charram[addr] = data;
-	state->pcbram[addr] = state->cdp1802_q;
+	state->m_charram[addr] = data;
+	state->m_pcbram[addr] = state->m_cdp1802_q;
 }
 
 /* Page Color Bit Access */
@@ -108,71 +88,70 @@ static CDP1869_PCB_READ( cidelsa_pcb_r )
 {
 	cidelsa_state *state = device->machine->driver_data<cidelsa_state>();
 
-	UINT8 column = state->pageram[pma & CIDELSA_PAGERAM_MASK];
-	UINT16 addr = ((column << 3) | (cma & 0x07)) & CIDELSA_CHARRAM_MASK;
+	UINT16 addr = ((pmd << 3) | (cma & 0x07)) & CIDELSA_CHARRAM_MASK;
 
-	return state->pcbram[addr];
+	return state->m_pcbram[addr];
 }
 
 static CDP1869_PCB_READ( draco_pcb_r )
 {
 	cidelsa_state *state = device->machine->driver_data<cidelsa_state>();
 
-	UINT8 column = state->pageram[pma & DRACO_PAGERAM_MASK];
-	UINT16 addr = ((column << 3) | (cma & 0x07)) & CIDELSA_CHARRAM_MASK;
+	UINT16 addr = ((pmd << 3) | (cma & 0x07)) & CIDELSA_CHARRAM_MASK;
 
-	return state->pcbram[addr];
+	return state->m_pcbram[addr];
 }
 
 /* Predisplay Changed Handler */
 
-static WRITE_LINE_DEVICE_HANDLER( cidelsa_prd_w )
+WRITE_LINE_MEMBER( cidelsa_state::prd_w )
 {
-	cidelsa_state *driver_state = device->machine->driver_data<cidelsa_state>();
-
 	/* invert PRD signal */
-	cpu_set_input_line(driver_state->cdp1802, COSMAC_INPUT_LINE_INT, state ? CLEAR_LINE : ASSERT_LINE);
-	cpu_set_input_line(driver_state->cdp1802, COSMAC_INPUT_LINE_EF1, state ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(m_maincpu, COSMAC_INPUT_LINE_INT, state ? CLEAR_LINE : ASSERT_LINE);
+	cpu_set_input_line(m_maincpu, COSMAC_INPUT_LINE_EF1, state ? CLEAR_LINE : ASSERT_LINE);
 }
+
+/* Page RAM */
+
+static ADDRESS_MAP_START( cidelsa_page_ram, 0, 8 )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x000, 0x3ff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( draco_page_ram, 0, 8 )
+	ADDRESS_MAP_UNMAP_HIGH
+	AM_RANGE(0x000, 0x7ff) AM_RAM
+ADDRESS_MAP_END
 
 /* CDP1869 Interface */
 
 static CDP1869_INTERFACE( destryer_cdp1869_intf )
 {
-	CDP1802_TAG,
 	SCREEN_TAG,
 	0,
 	CDP1869_PAL,
-	DEVCB_HANDLER(cidelsa_pageram_r),
-	DEVCB_HANDLER(cidelsa_pageram_w),
 	cidelsa_pcb_r,
 	cidelsa_charram_r,
 	cidelsa_charram_w,
-	DEVCB_LINE(cidelsa_prd_w)
+	DEVCB_DRIVER_LINE_MEMBER(cidelsa_state, prd_w)
 };
 
 static CDP1869_INTERFACE( altair_cdp1869_intf )
 {
-	CDP1802_TAG,
 	SCREEN_TAG,
 	0,
 	CDP1869_PAL,
-	DEVCB_HANDLER(cidelsa_pageram_r),
-	DEVCB_HANDLER(cidelsa_pageram_w),
 	cidelsa_pcb_r,
 	cidelsa_charram_r,
 	cidelsa_charram_w,
-	DEVCB_LINE(cidelsa_prd_w)
+	DEVCB_DRIVER_LINE_MEMBER(cidelsa_state, prd_w)
 };
 
 static CDP1869_INTERFACE( draco_cdp1869_intf )
 {
-	CDP1802_TAG,
 	SCREEN_TAG,
 	0,
 	CDP1869_PAL,
-	DEVCB_HANDLER(draco_pageram_r),
-	DEVCB_HANDLER(draco_pageram_w),
 	draco_pcb_r,
 	draco_charram_r,
 	draco_charram_w,
@@ -181,49 +160,21 @@ static CDP1869_INTERFACE( draco_cdp1869_intf )
 
 /* Video Start */
 
-static void video_start(running_machine *machine, UINT16 pageram_size)
+void cidelsa_state::video_start()
 {
-	cidelsa_state *state = machine->driver_data<cidelsa_state>();
+	// allocate memory
+	m_pcbram = auto_alloc_array(machine, UINT8, CIDELSA_CHARRAM_SIZE);
+	m_charram = auto_alloc_array(machine, UINT8, CIDELSA_CHARRAM_SIZE);
 
-	/* allocate memory */
-	state->pageram = auto_alloc_array(machine, UINT8, pageram_size);
-	state->pcbram = auto_alloc_array(machine, UINT8, CIDELSA_CHARRAM_SIZE);
-	state->charram = auto_alloc_array(machine, UINT8, CIDELSA_CHARRAM_SIZE);
-
-	/* find devices */
-	state->cdp1869 = machine->device(CDP1869_TAG);
-
-	/* register for state saving */
-	state_save_register_global(machine, state->cdp1869_pcb);
-	state_save_register_global_pointer(machine, state->pageram, pageram_size);
-	state_save_register_global_pointer(machine, state->pcbram, CIDELSA_CHARRAM_SIZE);
-	state_save_register_global_pointer(machine, state->charram, CIDELSA_CHARRAM_SIZE);
-}
-
-static VIDEO_START(cidelsa)
-{
-	video_start(machine, CIDELSA_PAGERAM_SIZE);
-}
-
-static VIDEO_START(draco)
-{
-	video_start(machine, DRACO_PAGERAM_SIZE);
-}
-
-/* Video Update */
-
-static VIDEO_UPDATE( cidelsa )
-{
-	cidelsa_state *state = screen->machine->driver_data<cidelsa_state>();
-
-	cdp1869_update(state->cdp1869, bitmap, cliprect);
-
-	return 0;
+	// register for state saving
+	state_save_register_global(machine, m_cdp1869_pcb);
+	state_save_register_global_pointer(machine, m_pcbram, CIDELSA_CHARRAM_SIZE);
+	state_save_register_global_pointer(machine, m_charram, CIDELSA_CHARRAM_SIZE);
 }
 
 /* AY-3-8910 */
 
-static WRITE8_DEVICE_HANDLER( draco_ay8910_port_b_w )
+WRITE8_MEMBER( cidelsa_state::draco_ay8910_port_b_w )
 {
 	/*
 
@@ -248,7 +199,7 @@ static const ay8910_interface ay8910_config =
 	DEVCB_NULL,
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(draco_ay8910_port_b_w)
+	DEVCB_DRIVER_MEMBER(cidelsa_state, draco_ay8910_port_b_w)
 };
 
 /* Machine Drivers */
@@ -257,11 +208,8 @@ MACHINE_CONFIG_FRAGMENT( destryer_video )
 	MDRV_CDP1869_SCREEN_PAL_ADD(SCREEN_TAG, DESTRYER_CHR2)
 	MDRV_SCREEN_DEFAULT_POSITION(1.226, 0.012, 1.4, 0.044)
 
-	MDRV_VIDEO_START(cidelsa)
-	MDRV_VIDEO_UPDATE(cidelsa)
-
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_CDP1869_ADD(CDP1869_TAG, DESTRYER_CHR2, destryer_cdp1869_intf)
+	MDRV_CDP1869_ADD(CDP1869_TAG, DESTRYER_CHR2, destryer_cdp1869_intf, cidelsa_page_ram)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -269,11 +217,8 @@ MACHINE_CONFIG_FRAGMENT( altair_video )
 	MDRV_CDP1869_SCREEN_PAL_ADD(SCREEN_TAG, ALTAIR_CHR2)
 	MDRV_SCREEN_DEFAULT_POSITION(1.226, 0.012, 1.4, 0.044)
 
-	MDRV_VIDEO_START(cidelsa)
-	MDRV_VIDEO_UPDATE(cidelsa)
-
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_CDP1869_ADD(CDP1869_TAG, ALTAIR_CHR2, altair_cdp1869_intf)
+	MDRV_CDP1869_ADD(CDP1869_TAG, ALTAIR_CHR2, altair_cdp1869_intf, cidelsa_page_ram)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
@@ -281,11 +226,8 @@ MACHINE_CONFIG_FRAGMENT( draco_video )
 	MDRV_CDP1869_SCREEN_PAL_ADD(SCREEN_TAG, DRACO_CHR2)
 	MDRV_SCREEN_DEFAULT_POSITION(1.226, 0.012, 1.360, 0.024)
 
-	MDRV_VIDEO_START(draco)
-	MDRV_VIDEO_UPDATE(cidelsa)
-
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_CDP1869_ADD(CDP1869_TAG, DRACO_CHR2, draco_cdp1869_intf)
+	MDRV_CDP1869_ADD(CDP1869_TAG, DRACO_CHR2, draco_cdp1869_intf, draco_page_ram)
 	MDRV_SOUND_ADD(AY8910_TAG, AY8910, DRACO_SND_CHR1)
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)

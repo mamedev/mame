@@ -1,25 +1,34 @@
-#include "emu.h"
-#include "streams.h"
-#include "cpu/cosmac/cosmac.h"
-#include "sound/cdp1869.h"
+/**********************************************************************
+
+	RCA CDP1869/1870/1876 Video Interface System (VIS) emulation
+
+    Copyright MESS Team.
+    Visit http://mamedev.org for licensing and usage restrictions.
+
+**********************************************************************/
 
 /*
 
     TODO:
 
-    - remove CDP1802 dependency
-    - sound base frequencies are TPA/TPB
     - white noise
     - scanline based update
     - CMSEL output
 
 */
 
-/***************************************************************************
-    PARAMETERS
-***************************************************************************/
+#include "emu.h"
+#include "cdp1869.h"
 
-#define CDP1869_WEIGHT_RED		30 /* % of max luminance */
+
+
+//**************************************************************************
+//	MACROS / CONSTANTS
+//**************************************************************************
+
+#define LOG 0
+
+#define CDP1869_WEIGHT_RED		30 // % of max luminance
 #define CDP1869_WEIGHT_GREEN	59
 #define CDP1869_WEIGHT_BLUE		11
 
@@ -28,10 +37,6 @@
 #define CDP1869_ROWS_HALF		12
 #define CDP1869_ROWS_FULL_PAL	25
 #define CDP1869_ROWS_FULL_NTSC	24
-
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
 
 enum
 {
@@ -45,157 +50,232 @@ enum
 	CCB1
 };
 
-typedef struct _cdp1869_t cdp1869_t;
-struct _cdp1869_t
+
+
+//**************************************************************************
+//  GLOBAL VARIABLES
+//**************************************************************************
+
+// devices
+const device_type CDP1869 = cdp1869_device_config::static_alloc_device_config;
+
+
+// default address map
+static ADDRESS_MAP_START( cdp1869, 0, 8 )
+	AM_RANGE(0x000, 0x7ff) AM_RAM
+ADDRESS_MAP_END
+
+
+
+//**************************************************************************
+//  DEVICE CONFIGURATION
+//**************************************************************************
+
+//-------------------------------------------------
+//  cdp1869_device_config - constructor
+//-------------------------------------------------
+
+cdp1869_device_config::cdp1869_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
+	: device_config(mconfig, static_alloc_device_config, "RCA CDP1869", tag, owner, clock),
+	  device_config_sound_interface(mconfig, *this),
+	  device_config_memory_interface(mconfig, *this),
+	  m_space_config("pageram", ENDIANNESS_LITTLE, 8, 11, 0, NULL, *ADDRESS_MAP_NAME(cdp1869))
 {
-	devcb_resolved_read8		in_page_ram_func;
-	devcb_resolved_write8		out_page_ram_func;
-	devcb_resolved_write_line	out_prd_func;
-	devcb_resolved_read_line	in_pal_ntsc_func;
-
-	running_device *device;
-	const cdp1869_interface *intf;	/* interface */
-	screen_device *screen;	/* screen */
-	running_device *cpu;		/* CPU */
-	sound_stream *stream;			/* sound output */
-	int color_clock;
-
-	/* video state */
-	int prd;						/* predisplay */
-	int dispoff;					/* display off */
-	int fresvert;					/* full resolution vertical */
-	int freshorz;					/* full resolution horizontal */
-	int cmem;						/* character memory access mode */
-	int dblpage;					/* double page mode */
-	int line16;						/* 16-line hi-res mode */
-	int line9;						/* 9 line mode */
-	int cfc;						/* color format control */
-	UINT8 col;						/* character color control */
-	UINT8 bkg;						/* background color */
-	UINT16 pma;						/* page memory address */
-	UINT16 hma;						/* home memory address */
-
-	/* video timer */
-	emu_timer *prd_changed_timer;	/* predisplay changed timer */
-
-	/* sound state */
-	INT16 signal;					/* current signal */
-	int incr;						/* initial wave state */
-	int toneoff;					/* tone off */
-	int wnoff;						/* white noise off */
-	UINT8 tonediv;					/* tone divisor */
-	UINT8 tonefreq;					/* tone range select */
-	UINT8 toneamp;					/* tone output amplitude */
-	UINT8 wnfreq;					/* white noise range select */
-	UINT8 wnamp;					/* white noise output amplitude */
-};
-
-/***************************************************************************
-    INLINE FUNCTIONS
-***************************************************************************/
-
-INLINE cdp1869_t *get_safe_token(running_device *device)
-{
-	assert(device != NULL);
-	return (cdp1869_t *)downcast<legacy_device_base *>(device)->token();
 }
 
-/***************************************************************************
-    IMPLEMENTATION
-***************************************************************************/
 
-#define CDP1869_IS_NTSC \
-	(!devcb_call_read_line(&cdp1869->in_pal_ntsc_func))
+//-------------------------------------------------
+//  static_alloc_device_config - allocate a new
+//  configuration object
+//-------------------------------------------------
 
-/*-------------------------------------------------
-    update_prd_changed_timer - update predisplay
-    changed timer
--------------------------------------------------*/
-
-static void update_prd_changed_timer(cdp1869_t *cdp1869)
+device_config *cdp1869_device_config::static_alloc_device_config(const machine_config &mconfig, const char *tag, const device_config *owner, UINT32 clock)
 {
-	if (cdp1869->prd_changed_timer != NULL)
+	return global_alloc(cdp1869_device_config(mconfig, tag, owner, clock));
+}
+
+
+//-------------------------------------------------
+//  alloc_device - allocate a new device object
+//-------------------------------------------------
+
+device_t *cdp1869_device_config::alloc_device(running_machine &machine) const
+{
+	return auto_alloc(&machine, cdp1869_device(machine, *this));
+}
+
+
+//-------------------------------------------------
+//  memory_space_config - return a description of
+//  any address spaces owned by this device
+//-------------------------------------------------
+
+const address_space_config *cdp1869_device_config::memory_space_config(int spacenum) const
+{
+	return (spacenum == 0) ? &m_space_config : NULL;
+}
+
+
+//-------------------------------------------------
+//  device_config_complete - perform any
+//  operations now that the configuration is
+//  complete
+//-------------------------------------------------
+
+void cdp1869_device_config::device_config_complete()
+{
+	// inherit a copy of the static data
+	const cdp1869_interface *intf = reinterpret_cast<const cdp1869_interface *>(static_config());
+	if (intf != NULL)
+		*static_cast<cdp1869_interface *>(this) = *intf;
+
+	// or initialize to defaults if none provided
+	else
 	{
-		attotime duration;
-		int start, end, level;
-		int scanline = cdp1869->screen->vpos();
-		int next_scanline;
-
-		if (CDP1869_IS_NTSC)
-		{
-			start = CDP1869_SCANLINE_PREDISPLAY_START_NTSC;
-			end = CDP1869_SCANLINE_PREDISPLAY_END_NTSC;
-		}
-		else
-		{
-			start = CDP1869_SCANLINE_PREDISPLAY_START_PAL;
-			end = CDP1869_SCANLINE_PREDISPLAY_END_PAL;
-		}
-
-		if (scanline < start)
-		{
-			next_scanline = start;
-			level = ASSERT_LINE;
-		}
-		else if (scanline < end)
-		{
-			next_scanline = end;
-			level = CLEAR_LINE;
-		}
-		else
-		{
-			next_scanline = start;
-			level = ASSERT_LINE;
-		}
-
-		if (cdp1869->dispoff)
-		{
-			level = CLEAR_LINE;
-		}
-
-		duration = cdp1869->screen->time_until_pos(next_scanline);
-		timer_adjust_oneshot(cdp1869->prd_changed_timer, duration, level);
+		memset(&in_pal_ntsc_func, 0, sizeof(in_pal_ntsc_func));
+		memset(&out_prd_func, 0, sizeof(out_prd_func));
+		in_pcb_func = NULL;
+		in_char_ram_func = NULL;
+		out_char_ram_func = NULL;
 	}
 }
 
-/*-------------------------------------------------
-    TIMER_CALLBACK( prd_changed_tick )
--------------------------------------------------*/
 
-static TIMER_CALLBACK( prd_changed_tick )
+
+//**************************************************************************
+//  INLINE HELPERS
+//**************************************************************************
+
+//-------------------------------------------------
+//  is_ntsc - is device in NTSC mode
+//-------------------------------------------------
+
+inline bool cdp1869_device::is_ntsc()
 {
-	running_device *device = (running_device *)ptr;
-	cdp1869_t *cdp1869 = get_safe_token(device);
-
-	devcb_call_write_line(&cdp1869->out_prd_func, param);
-	cdp1869->prd = param;
-
-	update_prd_changed_timer(cdp1869);
+	return devcb_call_read_line(&m_in_pal_ntsc_func) ? false : true;
 }
 
-/*-------------------------------------------------
-    STATE_POSTLOAD( cdp1869_state_save_postload )
--------------------------------------------------*/
 
-static STATE_POSTLOAD( cdp1869_state_save_postload )
+//-------------------------------------------------
+//  read_page_ram_byte - read a page RAM byte at 
+//  the given address
+//-------------------------------------------------
+
+inline UINT8 cdp1869_device::read_page_ram_byte(offs_t pma)
 {
-	update_prd_changed_timer((cdp1869_t *)param);
+	return space()->read_byte(pma);
 }
 
-/*-------------------------------------------------
-    cdp1802_get_r_x - get CDP1802 R(X) value
--------------------------------------------------*/
 
-static UINT16 cdp1802_get_r_x(cdp1869_t *cdp1869)
+//-------------------------------------------------
+//  write_page_ram_byte - write a page RAM byte at 
+//  the given address
+//-------------------------------------------------
+
+inline void cdp1869_device::write_page_ram_byte(offs_t pma, UINT8 data)
 {
-	return cpu_get_reg(cdp1869->cpu, COSMAC_R0 + cpu_get_reg(cdp1869->cpu, COSMAC_X));
+	space()->write_byte(pma, data);
 }
 
-/*-------------------------------------------------
-    get_rgb - get RGB value
--------------------------------------------------*/
 
-static rgb_t get_rgb(int i, int c, int l)
+//-------------------------------------------------
+//  read_char_ram_byte - read a char RAM byte at 
+//  the given address
+//-------------------------------------------------
+
+inline UINT8 cdp1869_device::read_char_ram_byte(offs_t pma, offs_t cma, UINT8 pmd)
+{
+	UINT8 data = 0;
+
+	if (m_in_char_ram_func != NULL)
+	{
+		data = m_in_char_ram_func(this, pma, cma, pmd);
+	}
+
+	return data;
+}
+
+
+//-------------------------------------------------
+//  write_char_ram_byte - write a char RAM byte at 
+//  the given address
+//-------------------------------------------------
+
+inline void cdp1869_device::write_char_ram_byte(offs_t pma, offs_t cma, UINT8 pmd, UINT8 data)
+{
+	if (m_out_char_ram_func != NULL)
+	{
+		m_out_char_ram_func(this, pma, cma, pmd, data);
+	}
+}
+
+
+//-------------------------------------------------
+//  read_pcb - read page control bit
+//-------------------------------------------------
+
+inline int cdp1869_device::read_pcb(offs_t pma, offs_t cma, UINT8 pmd)
+{
+	int pcb = 0;
+
+	if (m_in_pcb_func != NULL)
+	{
+		pcb = m_in_pcb_func(this, pma, cma, pmd);
+	}
+
+	return pcb;
+}
+
+
+//-------------------------------------------------
+//  update_prd_changed_timer - 
+//-------------------------------------------------
+
+inline void cdp1869_device::update_prd_changed_timer()
+{
+	int start = CDP1869_SCANLINE_PREDISPLAY_START_PAL;
+	int end = CDP1869_SCANLINE_PREDISPLAY_END_PAL;
+	int next_state;
+	int scanline = m_screen->vpos();
+	int next_scanline;
+
+	if (is_ntsc())
+	{
+		start = CDP1869_SCANLINE_PREDISPLAY_START_NTSC;
+		end = CDP1869_SCANLINE_PREDISPLAY_END_NTSC;
+	}
+
+	if (scanline < start)
+	{
+		next_scanline = start;
+		next_state = ASSERT_LINE;
+	}
+	else if (scanline < end)
+	{
+		next_scanline = end;
+		next_state = CLEAR_LINE;
+	}
+	else
+	{
+		next_scanline = start;
+		next_state = ASSERT_LINE;
+	}
+
+	if (m_dispoff)
+	{
+		next_state = CLEAR_LINE;
+	}
+
+	attotime duration = m_screen->time_until_pos(next_scanline);
+	timer_adjust_oneshot(m_prd_timer, duration, next_state);
+}
+
+
+//-------------------------------------------------
+//  get_rgb - get RGB value
+//-------------------------------------------------
+
+inline rgb_t cdp1869_device::get_rgb(int i, int c, int l)
 {
 	int luma = 0, r, g, b;
 
@@ -212,19 +292,18 @@ static rgb_t get_rgb(int i, int c, int l)
 	return MAKE_RGB(r, g, b);
 }
 
-/*-------------------------------------------------
-    get_lines - get number of character lines
--------------------------------------------------*/
 
-static int get_lines(running_device *device)
+//-------------------------------------------------
+//	get_lines - get number of character lines
+//-------------------------------------------------
+
+inline int cdp1869_device::get_lines()
 {
-	cdp1869_t *cdp1869 = get_safe_token(device);
-
-	if (cdp1869->line16 && !cdp1869->dblpage)
+	if (m_line16 && !m_dblpage)
 	{
 		return 16;
 	}
-	else if (!cdp1869->line9)
+	else if (!m_line9)
 	{
 		return 9;
 	}
@@ -234,51 +313,48 @@ static int get_lines(running_device *device)
 	}
 }
 
-/*-------------------------------------------------
-    get_pmemsize - get page memory size
--------------------------------------------------*/
 
-static UINT16 get_pmemsize(running_device *device, int cols, int rows)
+//-------------------------------------------------
+//	get_pmemsize - get page memory size
+//-------------------------------------------------
+
+inline UINT16 cdp1869_device::get_pmemsize(int cols, int rows)
 {
-	cdp1869_t *cdp1869 = get_safe_token(device);
-
 	int pmemsize = cols * rows;
 
-	if (cdp1869->dblpage) pmemsize *= 2;
-	if (cdp1869->line16) pmemsize *= 2;
+	if (m_dblpage) pmemsize *= 2;
+	if (m_line16) pmemsize *= 2;
 
 	return pmemsize;
 }
 
-/*-------------------------------------------------
-    get_pma - get page memory address
--------------------------------------------------*/
 
-static UINT16 get_pma(running_device *device)
+//-------------------------------------------------
+//	get_pma - get page memory address
+//-------------------------------------------------
+
+inline UINT16 cdp1869_device::get_pma()
 {
-	cdp1869_t *cdp1869 = get_safe_token(device);
-
-	if (cdp1869->dblpage)
+	if (m_dblpage)
 	{
-		return cdp1869->pma;
+		return m_pma;
 	}
 	else
 	{
-		return cdp1869->pma & 0x3ff;
+		return m_pma & 0x3ff;
 	}
 }
 
-/*-------------------------------------------------
-    get_pen - get pen for color bits
--------------------------------------------------*/
 
-static int get_pen(running_device *device, int ccb0, int ccb1, int pcb)
+//-------------------------------------------------
+//	get_pen - get pen for color bits
+//-------------------------------------------------
+
+inline int cdp1869_device::get_pen(int ccb0, int ccb1, int pcb)
 {
-	cdp1869_t *cdp1869 = get_safe_token(device);
+	int r = 0, g = 0, b = 0;
 
-	int r = 0, g = 0, b = 0, color;
-
-	switch (cdp1869->col)
+	switch (m_col)
 	{
 	case 0:
 		r = ccb0;
@@ -300,11 +376,11 @@ static int get_pen(running_device *device, int ccb0, int ccb1, int pcb)
 		break;
 	}
 
-	color = (r << 2) + (b << 1) + g;
+	int color = (r << 2) + (b << 1) + g;
 
-	if (cdp1869->cfc)
+	if (m_cfc)
 	{
-		return color + ((cdp1869->bkg + 1) * 8);
+		return color + ((m_bkg + 1) * 8);
 	}
 	else
 	{
@@ -312,14 +388,204 @@ static int get_pen(running_device *device, int ccb0, int ccb1, int pcb)
 	}
 }
 
-/*-------------------------------------------------
-    draw_line - draw character line
--------------------------------------------------*/
 
-static void draw_line(running_device *device, bitmap_t *bitmap, int x, int y, int data, int color)
+
+//**************************************************************************
+//  LIVE DEVICE
+//**************************************************************************
+
+//-------------------------------------------------
+//  cdp1869_device - constructor
+//-------------------------------------------------
+
+cdp1869_device::cdp1869_device(running_machine &_machine, const cdp1869_device_config &config)
+    : device_t(_machine, config),
+	  device_sound_interface(_machine, config, *this),
+	  device_memory_interface(_machine, config, *this),
+	  m_stream(NULL),
+      m_config(config)
 {
-	cdp1869_t *cdp1869 = get_safe_token(device);
 
+}
+
+
+//-------------------------------------------------
+//  device_start - device-specific startup
+//-------------------------------------------------
+
+void cdp1869_device::device_start()
+{
+	// get the screen device
+	m_screen = m_machine.device<screen_device>(m_config.screen_tag);
+	assert(m_screen != NULL);
+
+	// resolve callbacks
+	devcb_resolve_read_line(&m_in_pal_ntsc_func, &m_config.in_pal_ntsc_func, this);
+	devcb_resolve_write_line(&m_out_prd_func, &m_config.out_prd_func, this);
+	m_in_pcb_func = m_config.in_pcb_func;
+	m_in_char_ram_func = m_config.in_char_ram_func;
+	m_out_char_ram_func = m_config.out_char_ram_func;
+
+	// allocate timers
+	m_prd_timer = device_timer_alloc(*this);
+	update_prd_changed_timer();
+
+	// initialize palette
+	initialize_palette();
+
+	// create sound stream
+	m_stream = stream_create(this, 0, 1, m_machine.sample_rate, this, static_stream_generate);
+
+	// register for state saving
+	state_save_register_device_item(this, 0, m_prd);
+	state_save_register_device_item(this, 0, m_dispoff);
+	state_save_register_device_item(this, 0, m_fresvert);
+	state_save_register_device_item(this, 0, m_freshorz);
+	state_save_register_device_item(this, 0, m_cmem);
+	state_save_register_device_item(this, 0, m_dblpage);
+	state_save_register_device_item(this, 0, m_line16);
+	state_save_register_device_item(this, 0, m_line9);
+	state_save_register_device_item(this, 0, m_cfc);
+	state_save_register_device_item(this, 0, m_col);
+	state_save_register_device_item(this, 0, m_bkg);
+	state_save_register_device_item(this, 0, m_pma);
+	state_save_register_device_item(this, 0, m_hma);
+	state_save_register_device_item(this, 0, m_signal);
+	state_save_register_device_item(this, 0, m_incr);
+	state_save_register_device_item(this, 0, m_toneoff);
+	state_save_register_device_item(this, 0, m_wnoff);
+	state_save_register_device_item(this, 0, m_tonediv);
+	state_save_register_device_item(this, 0, m_tonefreq);
+	state_save_register_device_item(this, 0, m_toneamp);
+	state_save_register_device_item(this, 0, m_wnfreq);
+	state_save_register_device_item(this, 0, m_wnamp);
+}
+
+
+//-------------------------------------------------
+//  device_post_load - device-specific post-load
+//-------------------------------------------------
+
+void cdp1869_device::device_post_load()
+{
+	update_prd_changed_timer();
+}
+
+
+//-------------------------------------------------
+//  device_timer - handler timer events
+//-------------------------------------------------
+
+void cdp1869_device::device_timer(emu_timer &timer, device_timer_id id, int param, void *ptr)
+{
+	devcb_call_write_line(&m_out_prd_func, param);
+	m_prd = param;
+
+	update_prd_changed_timer();
+}
+
+
+//-------------------------------------------------
+//  initialize_palette - initialize palette
+//-------------------------------------------------
+
+void cdp1869_device::initialize_palette()
+{
+	// color-on-color display (CFC=0)
+	int i;
+
+	for (i = 0; i < 8; i++)
+	{
+		palette_set_color(machine, i, get_rgb(i, i, 15));
+	}
+
+	// tone-on-tone display (CFC=1)
+	for (int c = 0; c < 8; c++)
+	{
+		for (int l = 0; l < 8; l++)
+		{
+			palette_set_color(machine, i, get_rgb(i, c, l));
+			i++;
+		}
+	}
+}
+
+
+//-------------------------------------------------
+//  stream_generate - handle update requests for
+//  our sound stream
+//-------------------------------------------------
+
+STREAM_UPDATE( cdp1869_device::static_stream_generate )
+{
+	reinterpret_cast<cdp1869_device *>(param)->stream_generate(inputs, outputs, samples);
+}
+
+void cdp1869_device::stream_generate(stream_sample_t **inputs, stream_sample_t **outputs, int samples)
+{
+	// reset the output stream
+	memset(outputs[0], 0, samples * sizeof(*outputs[0]));
+
+	INT16 signal = m_signal;
+	stream_sample_t *buffer = outputs[0];
+
+	if (!m_toneoff && m_toneamp)
+	{
+		double frequency = (clock() / 2) / (512 >> m_tonefreq) / (m_tonediv + 1);
+//      double amplitude = m_toneamp * ((0.78*5) / 15);
+
+		int rate = m_machine.sample_rate / 2;
+
+		/* get progress through wave */
+		int incr = m_incr;
+
+		if (signal < 0)
+		{
+			signal = -(m_toneamp * (0x07fff / 15));
+		}
+		else
+		{
+			signal = m_toneamp * (0x07fff / 15);
+		}
+
+		while( samples-- > 0 )
+		{
+			*buffer++ = signal;
+			incr -= frequency;
+			while( incr < 0 )
+			{
+				incr += rate;
+				signal = -signal;
+			}
+		}
+
+		/* store progress through wave */
+		m_incr = incr;
+		m_signal = signal;
+	}
+/*
+    if (!m_wnoff)
+    {
+        double amplitude = m_wnamp * ((0.78*5) / 15);
+
+        for (int wndiv = 0; wndiv < 128; wndiv++)
+        {
+            double frequency = (clock() / 2) / (4096 >> m_wnfreq) / (wndiv + 1):
+
+            sum_square_wave(buffer, frequency, amplitude);
+        }
+    }
+*/
+
+}
+
+
+//-------------------------------------------------
+//	draw_line - draw character line
+//-------------------------------------------------
+
+void cdp1869_device::draw_line(bitmap_t *bitmap, const rectangle *rect, int x, int y, UINT8 data, int color)
+{
 	int i;
 
 	data <<= 2;
@@ -330,23 +596,23 @@ static void draw_line(running_device *device, bitmap_t *bitmap, int x, int y, in
 		{
 			*BITMAP_ADDR16(bitmap, y, x) = color;
 
-			if (!cdp1869->fresvert)
+			if (!m_fresvert)
 			{
 				*BITMAP_ADDR16(bitmap, y + 1, x) = color;
 			}
 
-			if (!cdp1869->freshorz)
+			if (!m_freshorz)
 			{
 				*BITMAP_ADDR16(bitmap, y, x + 1) = color;
 
-				if (!cdp1869->fresvert)
+				if (!m_fresvert)
 				{
 					*BITMAP_ADDR16(bitmap, y + 1, x + 1) = color;
 				}
 			}
 		}
 
-		if (!cdp1869->freshorz)
+		if (!m_freshorz)
 		{
 			x++;
 		}
@@ -357,67 +623,42 @@ static void draw_line(running_device *device, bitmap_t *bitmap, int x, int y, in
 	}
 }
 
-/*-------------------------------------------------
-    draw_char - draw character
--------------------------------------------------*/
 
-static void draw_char(running_device *device, bitmap_t *bitmap, int x, int y, UINT16 pma, const rectangle *screenrect)
+//-------------------------------------------------
+//	draw_char - draw character
+//-------------------------------------------------
+
+void cdp1869_device::draw_char(bitmap_t *bitmap, const rectangle *rect, int x, int y, UINT16 pma)
 {
-	cdp1869_t *cdp1869 = get_safe_token(device);
+	UINT8 pmd = read_page_ram_byte(pma);
 
-	UINT8 cma = 0;
-
-	for (cma = 0; cma < get_lines(device); cma++)
+	for (UINT8 cma = 0; cma < get_lines(); cma++)
 	{
-		UINT8 data = cdp1869->intf->char_ram_r(device, pma, cma);
+		UINT8 data = read_char_ram_byte(pma, cma, pmd);
 
 		int ccb0 = BIT(data, CCB0);
 		int ccb1 = BIT(data, CCB1);
-		int pcb = BIT(cdp1869->intf->pcb_r(device, pma, cma), 0);
+		int pcb = read_pcb(pma, cma, pmd);
 
-		int color = get_pen(device, ccb0, ccb1, pcb);
+		int color = get_pen(ccb0, ccb1, pcb);
 
-		draw_line(device, bitmap, screenrect->min_x + x, screenrect->min_y + y, data, color);
+		draw_line(bitmap, rect, rect->min_x + x, rect->min_y + y, data, color);
 
 		y++;
 
-		if (!cdp1869->fresvert)
+		if (!m_fresvert)
 		{
 			y++;
 		}
 	}
 }
 
-/*-------------------------------------------------
-    PALETTE_INIT( cdp1869 )
--------------------------------------------------*/
 
-PALETTE_INIT( cdp1869 )
-{
-	int i, c, l;
+//-------------------------------------------------
+//  out3_w - register 3 write
+//-------------------------------------------------
 
-	/* color-on-color display (CFC=0) */
-	for (i = 0; i < 8; i++)
-	{
-		palette_set_color(machine, i, get_rgb(i, i, 15));
-	}
-
-	/* tone-on-tone display (CFC=1) */
-	for (c = 0; c < 8; c++)
-	{
-		for (l = 0; l < 8; l++)
-		{
-			palette_set_color(machine, i, get_rgb(i, c, l));
-			i++;
-		}
-	}
-}
-
-/*-------------------------------------------------
-    cdp1869_out3_w - register 3 write
--------------------------------------------------*/
-
-WRITE8_DEVICE_HANDLER( cdp1869_out3_w )
+WRITE8_MEMBER( cdp1869_device::out3_w )
 {
 	/*
       bit   description
@@ -432,20 +673,19 @@ WRITE8_DEVICE_HANDLER( cdp1869_out3_w )
         7   fres horz
     */
 
-	cdp1869_t *cdp1869 = get_safe_token(device);
-
-	cdp1869->bkg = data & 0x07;
-	cdp1869->cfc = BIT(data, 3);
-	cdp1869->dispoff = BIT(data, 4);
-	cdp1869->col = (data & 0x60) >> 5;
-	cdp1869->freshorz = BIT(data, 7);
+	m_bkg = data & 0x07;
+	m_cfc = BIT(data, 3);
+	m_dispoff = BIT(data, 4);
+	m_col = (data & 0x60) >> 5;
+	m_freshorz = BIT(data, 7);
 }
 
-/*-------------------------------------------------
-    cdp1869_out4_w - register 4 write
--------------------------------------------------*/
 
-WRITE8_DEVICE_HANDLER( cdp1869_out4_w )
+//-------------------------------------------------
+//  out4_w - register 4 write
+//-------------------------------------------------
+
+WRITE8_MEMBER( cdp1869_device::out4_w )
 {
 	/*
       bit   description
@@ -468,20 +708,20 @@ WRITE8_DEVICE_HANDLER( cdp1869_out4_w )
        15   always 0
     */
 
-	cdp1869_t *cdp1869 = get_safe_token(device);
-	UINT16 word = cdp1802_get_r_x(cdp1869);
+	m_toneamp = offset & 0x0f;
+	m_tonefreq = (offset & 0x70) >> 4;
+	m_toneoff = BIT(offset, 7);
+	m_tonediv = (offset & 0x7f00) >> 8;
 
-	cdp1869->toneamp = word & 0x0f;
-	cdp1869->tonefreq = (word & 0x70) >> 4;
-	cdp1869->toneoff = BIT(word, 7);
-	cdp1869->tonediv = (word & 0x7f00) >> 8;
+	stream_update(m_stream);
 }
 
-/*-------------------------------------------------
-    cdp1869_out5_w - register 5 write
--------------------------------------------------*/
 
-WRITE8_DEVICE_HANDLER( cdp1869_out5_w )
+//-------------------------------------------------
+//  out5_w - register 5 write
+//-------------------------------------------------
+
+WRITE8_MEMBER( cdp1869_device::out5_w )
 {
 	/*
       bit   description
@@ -504,39 +744,33 @@ WRITE8_DEVICE_HANDLER( cdp1869_out5_w )
        15   wn off
     */
 
-	cdp1869_t *cdp1869 = get_safe_token(device);
-	UINT16 word = cdp1802_get_r_x(cdp1869);
+	m_cmem = BIT(offset, 0);
+	m_line9 = BIT(offset, 3);
+	m_line16 = BIT(offset, 5);
+	m_dblpage = BIT(offset, 6);
+	m_fresvert = BIT(offset, 7);
+	m_wnamp = (offset & 0x0f00) >> 8;
+	m_wnfreq = (offset & 0x7000) >> 12;
+	m_wnoff = BIT(offset, 15);
 
-	cdp1869->cmem = BIT(word, 0);
-	cdp1869->line9 = BIT(word, 3);
+	stream_update(m_stream);
 
-	if (CDP1869_IS_NTSC)
+	if (m_cmem)
 	{
-		cdp1869->line16 = BIT(word, 5);
-	}
-
-	cdp1869->dblpage = BIT(word, 6);
-	cdp1869->fresvert = BIT(word, 7);
-
-	cdp1869->wnamp = (word & 0x0f00) >> 8;
-	cdp1869->wnfreq = (word & 0x7000) >> 12;
-	cdp1869->wnoff = BIT(word, 15);
-
-	if (cdp1869->cmem)
-	{
-		cdp1869->pma = word;
+		m_pma = offset;
 	}
 	else
 	{
-		cdp1869->pma = 0;
+		m_pma = 0;
 	}
 }
 
-/*-------------------------------------------------
-    cdp1869_out6_w - register 6 write
--------------------------------------------------*/
 
-WRITE8_DEVICE_HANDLER( cdp1869_out6_w )
+//-------------------------------------------------
+//  out6_w - register 6 write
+//-------------------------------------------------
+
+WRITE8_MEMBER( cdp1869_device::out6_w )
 {
 	/*
       bit   description
@@ -559,17 +793,15 @@ WRITE8_DEVICE_HANDLER( cdp1869_out6_w )
        15   x
     */
 
-	cdp1869_t *cdp1869 = get_safe_token(device);
-	UINT16 word = cdp1802_get_r_x(cdp1869);
-
-	cdp1869->pma = word & 0x7ff;
+	m_pma = offset & 0x7ff;
 }
 
-/*-------------------------------------------------
-    cdp1869_out7_w - register 7 write
--------------------------------------------------*/
 
-WRITE8_DEVICE_HANDLER( cdp1869_out7_w )
+//-------------------------------------------------
+//  out7_w - register 7 write
+//-------------------------------------------------
+
+WRITE8_MEMBER( cdp1869_device::out7_w )
 {
 	/*
       bit   description
@@ -592,148 +824,139 @@ WRITE8_DEVICE_HANDLER( cdp1869_out7_w )
        15   x
     */
 
-	cdp1869_t *cdp1869 = get_safe_token(device);
-	UINT16 word = cdp1802_get_r_x(cdp1869);
-
-	cdp1869->hma = word & 0x7fc;
+	m_hma = offset & 0x7fc;
 }
 
-/*-------------------------------------------------
-    cdp1869_pageram_r - page memory read
--------------------------------------------------*/
 
-READ8_DEVICE_HANDLER( cdp1869_pageram_r )
+//-------------------------------------------------
+//  char_ram_r - character RAM read
+//-------------------------------------------------
+
+READ8_MEMBER( cdp1869_device::char_ram_r )
 {
-	cdp1869_t *cdp1869 = get_safe_token(device);
-
-	UINT16 pma;
-
-	if (cdp1869->cmem)
-	{
-		pma = get_pma(device);
-	}
-	else
-	{
-		pma = offset;
-	}
-
-	return devcb_call_read8(&cdp1869->in_page_ram_func, pma);
-}
-
-/*-------------------------------------------------
-    cdp1869_pageram_w - page memory write
--------------------------------------------------*/
-
-WRITE8_DEVICE_HANDLER( cdp1869_pageram_w )
-{
-	cdp1869_t *cdp1869 = get_safe_token(device);
-
-	UINT16 pma;
-
-	if (cdp1869->cmem)
-	{
-		pma = get_pma(device);
-	}
-	else
-	{
-		pma = offset;
-	}
-
-	devcb_call_write8(&cdp1869->out_page_ram_func, pma, data);
-}
-
-/*-------------------------------------------------
-    cdp1869_charram_r - character memory read
--------------------------------------------------*/
-
-READ8_DEVICE_HANDLER( cdp1869_charram_r )
-{
-	cdp1869_t *cdp1869 = get_safe_token(device);
-
 	UINT8 cma = offset & 0x0f;
 	UINT16 pma;
 
-	if (cdp1869->cmem)
+	if (m_cmem)
 	{
-		pma = get_pma(device);
+		pma = get_pma();
 	}
 	else
 	{
 		pma = offset;
 	}
 
-	if (cdp1869->dblpage)
+	if (m_dblpage)
 	{
 		cma &= 0x07;
 	}
 
-	return cdp1869->intf->char_ram_r(device, pma, cma);
+	UINT8 pmd = read_page_ram_byte(pma);
+
+	return read_char_ram_byte(pma, cma, pmd);
 }
 
-/*-------------------------------------------------
-    cdp1869_charram_w - character memory write
--------------------------------------------------*/
 
-WRITE8_DEVICE_HANDLER( cdp1869_charram_w )
+//-------------------------------------------------
+//  char_ram_w - character RAM write
+//-------------------------------------------------
+
+WRITE8_MEMBER( cdp1869_device::char_ram_w )
 {
-	cdp1869_t *cdp1869 = get_safe_token(device);
-
 	UINT8 cma = offset & 0x0f;
 	UINT16 pma;
 
-	if (cdp1869->cmem)
+	if (m_cmem)
 	{
-		pma = get_pma(device);
+		pma = get_pma();
 	}
 	else
 	{
 		pma = offset;
 	}
 
-	if (cdp1869->dblpage)
+	if (m_dblpage)
 	{
 		cma &= 0x07;
 	}
 
-	if (cdp1869->intf->char_ram_w)
+	UINT8 pmd = read_page_ram_byte(pma);
+
+	write_char_ram_byte(pma, cma, pmd, data);
+}
+
+
+//-------------------------------------------------
+//  page_ram_r - page RAM read
+//-------------------------------------------------
+
+READ8_MEMBER( cdp1869_device::page_ram_r )
+{
+	UINT16 pma;
+
+	if (m_cmem)
 	{
-		cdp1869->intf->char_ram_w(device, pma, cma, data);
+		pma = get_pma();
 	}
+	else
+	{
+		pma = offset;
+	}
+
+	return read_page_ram_byte(pma);
 }
 
-/*-------------------------------------------------
-    cdp1869_predisplay_r - predisplay read
--------------------------------------------------*/
 
-READ_LINE_DEVICE_HANDLER( cdp1869_predisplay_r )
+//-------------------------------------------------
+//  page_ram_w - page RAM write
+//-------------------------------------------------
+
+WRITE8_MEMBER( cdp1869_device::page_ram_w )
 {
-	cdp1869_t *cdp1869 = get_safe_token(device);
+	UINT16 pma;
 
-	return cdp1869->prd;
+	if (m_cmem)
+	{
+		pma = get_pma();
+	}
+	else
+	{
+		pma = offset;
+	}
+
+	write_page_ram_byte(pma, data);
 }
 
-/*-------------------------------------------------
-    cdp1869_pal_ntsc_r - PAL/NTSC read
--------------------------------------------------*/
 
-READ_LINE_DEVICE_HANDLER( cdp1869_pal_ntsc_r )
+//-------------------------------------------------
+//  page_ram_w - predisplay
+//-------------------------------------------------
+
+READ_LINE_MEMBER( cdp1869_device::predisplay_r )
 {
-	cdp1869_t *cdp1869 = get_safe_token(device);
-
-	return devcb_call_read_line(&cdp1869->in_pal_ntsc_func);
+	return m_prd;
 }
 
-/*-------------------------------------------------
-    cdp1869_update - screen update
--------------------------------------------------*/
 
-void cdp1869_update(running_device *device, bitmap_t *bitmap, const rectangle *cliprect)
+//-------------------------------------------------
+//  pal_ntsc_r - PAL/NTSC
+//-------------------------------------------------
+
+READ_LINE_MEMBER( cdp1869_device::pal_ntsc_r )
 {
-	cdp1869_t *cdp1869 = get_safe_token(device);
+	return devcb_call_read_line(&m_in_pal_ntsc_func);
+}
 
+
+//-------------------------------------------------
+//  update_screen - update screen
+//-------------------------------------------------
+
+void cdp1869_device::update_screen(bitmap_t *bitmap, const rectangle *cliprect)
+{
 	rectangle screen_rect, outer;
 
-	if (CDP1869_IS_NTSC)
+	if (is_ntsc())
 	{
 		outer.min_x = CDP1869_HBLANK_END;
 		outer.max_x = CDP1869_HBLANK_START - 1;
@@ -757,42 +980,38 @@ void cdp1869_update(running_device *device, bitmap_t *bitmap, const rectangle *c
 	}
 
 	sect_rect(&outer, cliprect);
-	bitmap_fill(bitmap, &outer, device->machine->pens[cdp1869->bkg]);
+	bitmap_fill(bitmap, &outer, m_bkg);
 
-	if (!cdp1869->dispoff)
+	if (!m_dispoff)
 	{
-		int sx, sy, rows, cols, width, height;
-		UINT16 addr, pmemsize;
+		int width = CDP1869_CHAR_WIDTH;
+		int height = get_lines();
 
-		width = CDP1869_CHAR_WIDTH;
-		height = get_lines(device);
-
-		if (!cdp1869->freshorz)
+		if (!m_freshorz)
 		{
 			width *= 2;
 		}
 
-		if (!cdp1869->fresvert)
+		if (!m_fresvert)
 		{
 			height *= 2;
 		}
 
-		cols = cdp1869->freshorz ? CDP1869_COLUMNS_FULL : CDP1869_COLUMNS_HALF;
-		rows = (screen_rect.max_y - screen_rect.min_y + 1) / height;
+		int cols = m_freshorz ? CDP1869_COLUMNS_FULL : CDP1869_COLUMNS_HALF;
+		int rows = (screen_rect.max_y - screen_rect.min_y + 1) / height;
 
-		pmemsize = get_pmemsize(device, cols, rows);
+		UINT16 pmemsize = get_pmemsize(cols, rows);
+		UINT16 addr = m_hma;
 
-		addr = cdp1869->hma;
-
-		for (sy = 0; sy < rows; sy++)
+		for (int sy = 0; sy < rows; sy++)
 		{
-			for (sx = 0; sx < cols; sx++)
+			for (int sx = 0; sx < cols; sx++)
 			{
 				int x = sx * width;
 				int y = sy * height;
 
-				draw_char(device, bitmap, x, y, addr, &screen_rect);
-
+				draw_char(bitmap, &screen_rect, x, y, addr);
+				
 				addr++;
 
 				if (addr == pmemsize) addr = 0;
@@ -800,160 +1019,3 @@ void cdp1869_update(running_device *device, bitmap_t *bitmap, const rectangle *c
 		}
 	}
 }
-
-/*-------------------------------------------------
-    STREAM_UPDATE( cdp1869_stream_update )
--------------------------------------------------*/
-
-static STREAM_UPDATE( cdp1869_stream_update )
-{
-	cdp1869_t *cdp1869 = (cdp1869_t *)param;
-	INT16 signal = cdp1869->signal;
-	stream_sample_t *buffer = outputs[0];
-
-	memset( buffer, 0, samples * sizeof(*buffer) );
-
-	if (!cdp1869->toneoff && cdp1869->toneamp)
-	{
-		double frequency = (cdp1869->device->clock() / 2) / (512 >> cdp1869->tonefreq) / (cdp1869->tonediv + 1);
-//      double amplitude = cdp1869->toneamp * ((0.78*5) / 15);
-
-		int rate = cdp1869->device->machine->sample_rate / 2;
-
-		/* get progress through wave */
-		int incr = cdp1869->incr;
-
-		if (signal < 0)
-		{
-			signal = -(cdp1869->toneamp * (0x07fff / 15));
-		}
-		else
-		{
-			signal = cdp1869->toneamp * (0x07fff / 15);
-		}
-
-		while( samples-- > 0 )
-		{
-			*buffer++ = signal;
-			incr -= frequency;
-			while( incr < 0 )
-			{
-				incr += rate;
-				signal = -signal;
-			}
-		}
-
-		/* store progress through wave */
-		cdp1869->incr = incr;
-		cdp1869->signal = signal;
-	}
-/*
-    if (!cdp1869->wnoff)
-    {
-        double amplitude = cdp1869->wnamp * ((0.78*5) / 15);
-
-        for (int wndiv = 0; wndiv < 128; wndiv++)
-        {
-            double frequency = (cdp1869->clock / 2) / (4096 >> cdp1869->wnfreq) / (wndiv + 1):
-
-            sum_square_wave(buffer, frequency, amplitude);
-        }
-    }
-*/
-}
-
-/*-------------------------------------------------
-    DEVICE_START( cdp1869 )
--------------------------------------------------*/
-
-static DEVICE_START( cdp1869 )
-{
-	cdp1869_t *cdp1869 = get_safe_token(device);
-
-	/* validate arguments */
-	cdp1869->intf = (const cdp1869_interface *)device->baseconfig().static_config();
-
-	assert(cdp1869->intf->pcb_r != NULL);
-	assert(cdp1869->intf->char_ram_r != NULL);
-
-	/* resolve callbacks */
-	devcb_resolve_read8(&cdp1869->in_page_ram_func, &cdp1869->intf->in_page_ram_func, device);
-	devcb_resolve_write8(&cdp1869->out_page_ram_func, &cdp1869->intf->out_page_ram_func, device);
-	devcb_resolve_write_line(&cdp1869->out_prd_func, &cdp1869->intf->out_prd_func, device);
-	devcb_resolve_read_line(&cdp1869->in_pal_ntsc_func, &cdp1869->intf->in_pal_ntsc_func, device);
-
-	/* set initial values */
-	cdp1869->device = device;
-	cdp1869->stream = stream_create(device, 0, 1, device->machine->sample_rate, cdp1869, cdp1869_stream_update);
-	cdp1869->incr = 0;
-	cdp1869->signal = 0x07fff;
-	cdp1869->toneoff = 1;
-	cdp1869->wnoff = 1;
-
-	/* get the screen device */
-	cdp1869->screen = downcast<screen_device *>(device->machine->device(cdp1869->intf->screen_tag));
-	assert(cdp1869->screen != NULL);
-
-	/* get the CPU device */
-	cdp1869->cpu = device->machine->device(cdp1869->intf->cpu_tag);
-	assert(cdp1869->cpu != NULL);
-
-	/* allocate predisplay timer */
-	cdp1869->prd_changed_timer = timer_alloc(device->machine, prd_changed_tick, (void *)device);
-	update_prd_changed_timer(cdp1869);
-
-	/* register for state saving */
-	state_save_register_postload(device->machine, cdp1869_state_save_postload, cdp1869);
-
-	state_save_register_device_item(device, 0, cdp1869->prd);
-	state_save_register_device_item(device, 0, cdp1869->dispoff);
-	state_save_register_device_item(device, 0, cdp1869->fresvert);
-	state_save_register_device_item(device, 0, cdp1869->freshorz);
-	state_save_register_device_item(device, 0, cdp1869->cmem);
-	state_save_register_device_item(device, 0, cdp1869->dblpage);
-	state_save_register_device_item(device, 0, cdp1869->line16);
-	state_save_register_device_item(device, 0, cdp1869->line9);
-	state_save_register_device_item(device, 0, cdp1869->cfc);
-	state_save_register_device_item(device, 0, cdp1869->col);
-	state_save_register_device_item(device, 0, cdp1869->bkg);
-	state_save_register_device_item(device, 0, cdp1869->pma);
-	state_save_register_device_item(device, 0, cdp1869->hma);
-
-	state_save_register_device_item(device, 0, cdp1869->signal);
-	state_save_register_device_item(device, 0, cdp1869->incr);
-	state_save_register_device_item(device, 0, cdp1869->toneoff);
-	state_save_register_device_item(device, 0, cdp1869->wnoff);
-	state_save_register_device_item(device, 0, cdp1869->tonediv);
-	state_save_register_device_item(device, 0, cdp1869->tonefreq);
-	state_save_register_device_item(device, 0, cdp1869->toneamp);
-	state_save_register_device_item(device, 0, cdp1869->wnfreq);
-	state_save_register_device_item(device, 0, cdp1869->wnamp);
-}
-
-/*-------------------------------------------------
-    DEVICE_GET_INFO( cdp1869 )
--------------------------------------------------*/
-
-DEVICE_GET_INFO( cdp1869 )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case DEVINFO_INT_TOKEN_BYTES:					info->i = sizeof(cdp1869_t);				break;
-
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case DEVINFO_FCT_START:							info->start = DEVICE_START_NAME(cdp1869);	break;
-		case DEVINFO_FCT_STOP:							/* Nothing */								break;
-		case DEVINFO_FCT_RESET:							/* Nothing */								break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "RCA CDP1869");				break;
-		case DEVINFO_STR_FAMILY:						strcpy(info->s, "RCA CDP1800");				break;
-		case DEVINFO_STR_VERSION:						strcpy(info->s, "1.0");						break;
-		case DEVINFO_STR_SOURCE_FILE:					strcpy(info->s, __FILE__);					break;
-		case DEVINFO_STR_CREDITS:						strcpy(info->s, "Copyright Nicola Salmoria and the MAME Team"); break;
-	}
-}
-
-
-DEFINE_LEGACY_SOUND_DEVICE(CDP1869, cdp1869);

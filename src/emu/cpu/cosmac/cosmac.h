@@ -189,6 +189,7 @@ class cosmac_device : public cpu_device
 
 public:
 	// public interfaces
+	offs_t get_memory_address();
 
 protected:
 	// device-level overrides

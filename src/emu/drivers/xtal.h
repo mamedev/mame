@@ -62,6 +62,8 @@ enum
 	XTAL_4_9152MHz  	= 4915200,
 	XTAL_5MHz   		= 5000000,		/* Mutant Night */
 	XTAL_5_0688MHz		= 5068800,		/* Xerox 820, DEC VK100 */
+	XTAL_5_626MHz		= 5626000,		/* RCA CDP1869 PAL dot clock */
+	XTAL_5_67MHz		= 5670000,		/* RCA CDP1869 NTSC dot clock */
 	XTAL_5_7143MHz		= 5714300,		/* Cidelsa Destroyer */
 	XTAL_5_9904MHz		= 5990400,		/* Luxor ABC 800 keyboard */
 	XTAL_6MHz   		= 6000000,		/* American Poker II */
@@ -74,6 +76,7 @@ enum
 	XTAL_8_2MHz			= 8200000,		/* Universal Mr. Do - Model 8021 PCB */
 	XTAL_8_4672MHz		= 8467200,		/* Subsino's Ying Hua Lian */
 	XTAL_8_664MHz		= 8664000,		/* Touchmaster */
+	XTAL_8_867236MHz	= 8867236,		/* RCA CDP1869 PAL color clock */
 	XTAL_8_867238MHz	= 8867238,		/* ETI-660 */
 	XTAL_8_945MHz		= 8945000,		/* Hit Me */
 	XTAL_9_828MHz		= 9828000,		/* Universal PCBs */
