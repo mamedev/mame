@@ -57,7 +57,6 @@ JALCF1   BIN     1,048,576  02-07-99  1:11a JALCF1.BIN
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
-#include "deprecat.h"
 #include "sound/okim6295.h"
 
 static tilemap_t *tx_tilemap,*bg_tilemap;
@@ -555,13 +554,15 @@ static GFXDECODE_START( acommand )
 	GFXDECODE_ENTRY( "gfx3", 0, tilelayout, 0x1800, 256 )
 GFXDECODE_END
 
-static INTERRUPT_GEN( acommand_irq )
+static TIMER_DEVICE_CALLBACK( acommand_scanline )
 {
-	switch ( cpu_getiloops(device) )
-	{
-		case 0:		cpu_set_input_line(device, 3, HOLD_LINE);
-		case 1:		cpu_set_input_line(device, 2, HOLD_LINE);
-	}
+	int scanline = param;
+
+	if(scanline == 240) // vblank-out irq
+		cputag_set_input_line(timer.machine, "maincpu", 2, HOLD_LINE);
+
+	if(scanline == 0) // vblank-in irq? (update palette and layers)
+		cputag_set_input_line(timer.machine, "maincpu", 3, HOLD_LINE);
 }
 
 static MACHINE_CONFIG_START( acommand, driver_device )
@@ -569,7 +570,7 @@ static MACHINE_CONFIG_START( acommand, driver_device )
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",M68000,12000000)
 	MDRV_CPU_PROGRAM_MAP(acommand_map)
-	MDRV_CPU_VBLANK_INT_HACK(acommand_irq,2)
+	MDRV_TIMER_ADD_SCANLINE("scantimer", acommand_scanline, "screen", 0, 1)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
