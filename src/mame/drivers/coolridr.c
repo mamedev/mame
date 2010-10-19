@@ -231,9 +231,7 @@ Note: This hardware appears to have been designed as a test-bed for a new RLE ba
       H1 (CPU)    1994    837-10389  315-5800 315-5801 315-5802
       H1 (Video)  1994    837-9621   315-5803 315-5864
 
-******************************************************************************************************/
 
-/=
    NOTE:  While the hardware and title screen might list 1994 as a copyright, MAME uses 1995 due to the
    abudance of evidence in trade journals and even it's own service manuals showing the year as 1995.
 
@@ -241,8 +239,9 @@ Note: This hardware appears to have been designed as a test-bed for a new RLE ba
    Arcade game magazine called 'Gamest' show released on 04.28.1995
    VGL (Ultimate Video Game List published by AMP group) - year is printed as '94(4.95)'
    Sega Arcade History (published by Enterbrain) is '1995/4'.
-*/
- 
+
+
+******************************************************************************************************/
 
 
 #include "emu.h"
