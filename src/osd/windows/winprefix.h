@@ -42,6 +42,7 @@
 #define _WIN32_WINNT 0x0501
 
 #ifdef _MSC_VER
+#include <assert.h>
 #include <malloc.h>
 #define alloca _alloca
 #define round(x) floor((x) + 0.5)
