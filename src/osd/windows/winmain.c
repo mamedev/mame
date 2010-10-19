@@ -254,6 +254,8 @@ static HANDLE watchdog_reset_event;
 static HANDLE watchdog_exit_event;
 static HANDLE watchdog_thread;
 
+static running_machine *g_current_machine;
+
 
 #ifndef MESS
 static const TCHAR helpfile[] = TEXT("docs\\windows.txt");
@@ -278,7 +280,7 @@ bool stack_walker::s_initialized = false;
 //**************************************************************************
 
 static void osd_exit(running_machine &machine);
-
+static BOOL WINAPI control_handler(DWORD type);
 static int is_double_click_start(int argc);
 static DWORD WINAPI watchdog_thread_entry(LPVOID lpParameter);
 static LONG WINAPI exception_filter(struct _EXCEPTION_POINTERS *info);
@@ -389,6 +391,9 @@ int main(int argc, char *argv[])
 {
 	// initialize common controls
 	InitCommonControls();
+	
+	// set a handler to catch ctrl-c
+	SetConsoleCtrlHandler(control_handler, TRUE);
 
 	// allocate symbols
 	symbol_manager local_symbols(argv[0]);
@@ -418,6 +423,43 @@ int main(int argc, char *argv[])
 	// free symbols
 	symbols = NULL;
 	return result;
+}
+
+
+//============================================================
+//  control_handler
+//============================================================
+
+static BOOL WINAPI control_handler(DWORD type)
+{
+	// indicate to the user that we detected something
+	switch (type)
+	{
+		case CTRL_C_EVENT:			fprintf(stderr, "Caught Ctrl+C");					break;
+		case CTRL_BREAK_EVENT:		fprintf(stderr, "Caught Ctrl+break");				break;
+		case CTRL_CLOSE_EVENT:		fprintf(stderr, "Caught console close");			break;
+		case CTRL_LOGOFF_EVENT:		fprintf(stderr, "Caught logoff");					break;
+		case CTRL_SHUTDOWN_EVENT:	fprintf(stderr, "Caught shutdown");					break;
+		default:					fprintf(stderr, "Caught unexpected console event");	break;
+	}
+
+	// if we don't have a machine yet, or if we are handling ctrl+c/ctrl+break,
+	// just terminate hard, without throwing or handling any atexit stuff
+	if (g_current_machine == NULL || type == CTRL_C_EVENT || type == CTRL_BREAK_EVENT)
+	{
+		fprintf(stderr, ", exiting\n");
+		TerminateProcess(GetCurrentProcess(), MAMERR_FATALERROR);
+	}
+	
+	// all other situations attempt to do a clean exit
+	else
+	{
+		fprintf(stderr, ", exit requested\n");
+		g_current_machine->schedule_exit();
+	}
+	
+	// in all cases we handled it
+	return TRUE;
 }
 
 
@@ -456,7 +498,7 @@ static void output_oslog(running_machine &machine, const char *buffer)
 void osd_init(running_machine *machine)
 {
 	const char *stemp;
-
+	
 	// determine if we are benchmarking, and adjust options appropriately
 	int bench = options_get_int(machine->options(), WINOPTION_BENCH);
 	if (bench > 0)
@@ -544,6 +586,9 @@ void osd_init(running_machine *machine)
 		profiler = global_alloc(sampling_profiler(1000, profile - 1));
 		profiler->start();
 	}
+
+	// note the existence of a machine
+	g_current_machine = machine;
 }
 
 
@@ -553,6 +598,9 @@ void osd_init(running_machine *machine)
 
 static void osd_exit(running_machine &machine)
 {
+	// no longer have a machine
+	g_current_machine = NULL;
+
 	// take down the watchdog thread if it exists
 	if (watchdog_thread != NULL)
 	{
