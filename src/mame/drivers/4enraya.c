@@ -23,6 +23,8 @@ Memory Map :
   0xd000 - 0xdfff - VRAM mirrored write,
         tilemap offset = address & 0x3ff
         tile number =  bits 0-7 = data, bits 8,9  = address bits 10,11
+  0xe000 - 0xefff - VRAM mirror
+  0xf000 - 0xffff - (unconnected)
 
 Video :
     No scrolling , no sprites.
@@ -71,6 +73,8 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xcfff) AM_RAM
 	AM_RANGE(0xd000, 0xdfff) AM_WRITE(fenraya_videoram_w) AM_BASE_SIZE_MEMBER(_4enraya_state, videoram, videoram_size)
+	AM_RANGE(0xe000, 0xefff) AM_WRITE(fenraya_videoram_w)
+	AM_RANGE(0xf000, 0xffff) AM_NOP
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( main_portmap, ADDRESS_SPACE_IO, 8 )
@@ -218,7 +222,7 @@ ROM_START( 4enraya )
 	ROM_LOAD( "3.bin",   0x4000, 0x2000, CRC(f6940836) SHA1(afde21ffa0c141cf73243e50da62ecfd474aaac2) )
 
 	ROM_REGION( 0x0020,  "proms", 0 )
-	ROM_LOAD( "1.bpr",   0x0000, 0x0020, CRC(dcbd2352) SHA1(ce72e84129ed1b455aaf648e1dfaa4333e7e7628) )	/* not used */
+	ROM_LOAD( "1.bpr",   0x0000, 0x0020, CRC(dcbd2352) SHA1(ce72e84129ed1b455aaf648e1dfaa4333e7e7628) )	/* system control - not used */
 ROM_END
 
 GAME( 1990, 4enraya,  0,   4enraya,  4enraya,  0, ROT0, "IDSA", "4 En Raya", GAME_SUPPORTS_SAVE )
