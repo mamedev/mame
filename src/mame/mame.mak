@@ -124,12 +124,13 @@ CPUS += SCMP
 CPUS += MN10200
 CPUS += COSMAC
 
+
+
 #-------------------------------------------------
 # specify available sound cores; some of these are
 # only for MESS and so aren't included
 #-------------------------------------------------
 
-SOUNDS += CUSTOM
 SOUNDS += SAMPLES
 SOUNDS += DAC
 SOUNDS += DMADAC
@@ -226,6 +227,8 @@ SOUNDS += ZSG2
 SOUNDS += MOS656X
 SOUNDS += S2636
 #SOUNDS += ASC
+
+
 
 #-------------------------------------------------
 # this is the list of driver libraries that
@@ -1673,6 +1676,8 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/wldarrow.o \
 	$(DRIVERS)/xyonix.o $(VIDEO)/xyonix.o \
 
+
+
 #-------------------------------------------------
 # layout dependencies
 #-------------------------------------------------
@@ -1899,6 +1904,7 @@ $(DRIVERS)/warpwarp.o:	$(LAYOUT)/geebee.lh \
 $(DRIVERS)/wecleman.o:	$(LAYOUT)/wecleman.lh
 
 $(DRIVERS)/zac2650.o:	$(LAYOUT)/tinv2650.lh
+
 
 
 #-------------------------------------------------

@@ -45,6 +45,7 @@ SOUNDS += WAVE
 
 DRVLIBS = \
 	$(LDPOBJ)/ldpdriv.o \
+	$(EMUDRIVERS)/emudummy.o \
 	$(LDPOBJ)/ldplayer.o \
 
 
