@@ -72,7 +72,7 @@ DIRECT_UPDATE_HANDLER( dsp56k_direct_handler )
 	if (address >= (0x0000<<1) && address <= (0x07ff<<1))
 	{
 		dsp56k_core* cpustate = get_safe_token(direct.space().cpu);
-		direct.explicit_configure(0x0000<<1, 0x07ff<<1, 0x07ff<<1, cpustate->program_ram);
+		direct.explicit_configure(0x0000<<1, 0x07ff<<1, (0x07ff<<1) | 1, cpustate->program_ram);
 		return ~0;
 	}
 
