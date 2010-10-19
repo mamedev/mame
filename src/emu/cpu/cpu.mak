@@ -276,21 +276,6 @@ $(CPUOBJ)/esrip/esrip.o:	$(CPUSRC)/esrip/esrip.c \
 
 
 #-------------------------------------------------
-# RCA CDP1802
-#-------------------------------------------------
-
-ifneq ($(filter CDP1802,$(CPUS)),)
-OBJDIRS += $(CPUOBJ)/cdp1802
-CPUOBJS += $(CPUOBJ)/cdp1802/cdp1802.o
-DASMOBJS += $(CPUOBJ)/cdp1802/1802dasm.o
-endif
-
-$(CPUOBJ)/cdp1802/cdp1802.o:	$(CPUSRC)/cdp1802/cdp1802.c \
-								$(CPUSRC)/cdp1802/cdp1802.h
-
-
-
-#-------------------------------------------------
 # RCA COSMAC
 #-------------------------------------------------
 
