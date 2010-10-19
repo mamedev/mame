@@ -233,6 +233,18 @@ Note: This hardware appears to have been designed as a test-bed for a new RLE ba
 
 ******************************************************************************************************/
 
+/=
+   NOTE:  While the hardware and title screen might list 1994 as a copyright, MAME uses 1995 due to the
+   abudance of evidence in trade journals and even it's own service manuals showing the year as 1995.
+
+   References:
+   Arcade game magazine called 'Gamest' show released on 04.28.1995
+   VGL (Ultimate Video Game List published by AMP group) - year is printed as '94(4.95)'
+   Sega Arcade History (published by Enterbrain) is '1995/4'.
+*/
+ 
+
+
 #include "emu.h"
 #include "debugger.h"
 #include "cpu/sh2/sh2.h"
