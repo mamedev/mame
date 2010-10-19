@@ -29,7 +29,6 @@
 */
 
 #include "emu.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "sound/2203intf.h"
 #include "includes/1943.h"
@@ -266,7 +265,7 @@ static MACHINE_CONFIG_START( 1943, _1943_state )
 
 	MDRV_CPU_ADD("audiocpu", Z80, XTAL_24MHz/8)	/* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sound_map)
-	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold, 4)
+	MDRV_CPU_PERIODIC_INT(irq0_line_hold, 4*60)
 
 	MDRV_MACHINE_RESET(1943)
 
