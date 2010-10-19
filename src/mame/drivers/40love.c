@@ -217,7 +217,6 @@ Notes - Has jumper setting for 122HZ or 61HZ)
 */
 
 #include "emu.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "cpu/m6805/m6805.h"
 #include "sound/ay8910.h"
@@ -1128,7 +1127,7 @@ static MACHINE_CONFIG_START( 40love, buggychl_state )
 
 	MDRV_CPU_ADD("audiocpu",Z80,8000000/2) /* OK */
 	MDRV_CPU_PROGRAM_MAP(sound_map)
-	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)	/* source/number of IRQs is unknown */
+	MDRV_CPU_PERIODIC_INT(irq0_line_hold,2*60)	/* source/number of IRQs is unknown */
 
 	MDRV_CPU_ADD("mcu",M68705,18432000/6) /* OK */
 	MDRV_CPU_PROGRAM_MAP(mcu_map)
@@ -1185,7 +1184,7 @@ static MACHINE_CONFIG_START( undoukai, buggychl_state )
 
 	MDRV_CPU_ADD("audiocpu",Z80,8000000/2)
 	MDRV_CPU_PROGRAM_MAP(sound_map)
-	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)	/* source/number of IRQs is unknown */
+	MDRV_CPU_PERIODIC_INT(irq0_line_hold,2*60)	/* source/number of IRQs is unknown */
 
 //  MDRV_CPU_ADD("mcu",M68705,18432000/6)
 //  MDRV_CPU_PROGRAM_MAP(mcu_map)
