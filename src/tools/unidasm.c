@@ -94,7 +94,6 @@ CPU_DISASSEMBLE( arm7thumb );
 CPU_DISASSEMBLE( asap );
 CPU_DISASSEMBLE( avr8 );
 CPU_DISASSEMBLE( ccpu );
-CPU_DISASSEMBLE( cdp1802 );
 CPU_DISASSEMBLE( cop410 );
 CPU_DISASSEMBLE( cop420 );
 CPU_DISASSEMBLE( cop444 );
@@ -217,7 +216,6 @@ static const dasm_table_entry dasm_table[] =
 	{ "asap",		_32le,  0, CPU_DISASSEMBLE_NAME(asap) },
 	{ "avr8",		_16le,  0, CPU_DISASSEMBLE_NAME(avr8) },
 	{ "ccpu",		_8bit,  0, CPU_DISASSEMBLE_NAME(ccpu) },
-	{ "cdp1802",	_8bit,  0, CPU_DISASSEMBLE_NAME(cdp1802) },
 	{ "cop410",		_8bit,  0, CPU_DISASSEMBLE_NAME(cop410) },
 	{ "cop420",		_8bit,  0, CPU_DISASSEMBLE_NAME(cop420) },
 	{ "cop444",		_8bit,  0, CPU_DISASSEMBLE_NAME(cop444) },
