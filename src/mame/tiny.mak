@@ -40,6 +40,8 @@ CPUS += MCS51
 CPUS += M6800
 CPUS += M6809
 CPUS += M680X0
+CPUS += TMS9900
+CPUS += COP400
 
 
 
@@ -75,7 +77,9 @@ DRVLIBS = \
 	$(DRIVERS)/carpolo.o $(MACHINE)/carpolo.o $(VIDEO)/carpolo.o \
 	$(DRIVERS)/circus.o $(AUDIO)/circus.o $(VIDEO)/circus.o \
 	$(DRIVERS)/exidy.o $(AUDIO)/exidy.o $(VIDEO)/exidy.o \
+	$(AUDIO)/exidy440.o \
 	$(DRIVERS)/starfire.o $(VIDEO)/starfire.o \
+	$(DRIVERS)/vertigo.o $(MACHINE)/vertigo.o $(VIDEO)/vertigo.o \
 	$(DRIVERS)/victory.o $(VIDEO)/victory.o \
 	$(AUDIO)/targ.o \
 	$(DRIVERS)/astrocde.o $(VIDEO)/astrocde.o \
@@ -85,6 +89,8 @@ DRVLIBS = \
 	$(AUDIO)/wow.o \
 	$(DRIVERS)/gaelco.o $(VIDEO)/gaelco.o $(MACHINE)/gaelcrpt.o \
 	$(DRIVERS)/wrally.o $(MACHINE)/wrally.o $(VIDEO)/wrally.o \
+	$(DRIVERS)/looping.o \
+	$(DRIVERS)/supertnk.o \
 
 
 

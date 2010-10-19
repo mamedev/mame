@@ -41,11 +41,15 @@ const game_driver * const drivers[] =
 	DRIVER( robby )		/* (c) 1981 Bally Midway */
 	DRIVER( gridlee )	/* [1983 Videa] prototype - no copyright notice */
 	DRIVER( alienar )	/* (c) 1985 Duncan Brown */
+
 	DRIVER( carpolo )	/* (c) 1977 Exidy */
 	DRIVER( sidetrac )	/* (c) 1979 Exidy */
 	DRIVER( targ )		/* (c) 1980 Exidy */
 	DRIVER( spectar )	/* (c) 1980 Exidy */
 	DRIVER( teetert )	/* (c) 1982 Exidy */
+	DRIVER( hardhat )	/* (c) 1982 */
+	DRIVER( fax )		/* (c) 1983 */
+	DRIVER( fax2 )		/* (c) 1983 */
 	DRIVER( circus )	/* (c) 1977 Exidy */
 	DRIVER( robotbwl )	/* (c) 197? Exidy */
 	DRIVER( crash )		/* (c) 1979 Exidy */
@@ -54,6 +58,13 @@ const game_driver * const drivers[] =
 	DRIVER( starfirea )	/* (c) 1979 Exidy */
 	DRIVER( fireone )	/* (c) 1979 Exidy */
 	DRIVER( starfir2 )	/* (c) 1979 Exidy */
+	DRIVER( victory )	/* (c) 1982 */
+	DRIVER( victorba )	/* (c) 1982 */
+	DRIVER( topgunnr )	/* (c) 1986 */
+
+	DRIVER( looping )	/* (c) 1982 Video Games GMBH */
+	DRIVER( supertnk )	/* (c) 1981 VIDEO GAMES GmbH, W.-GERMANY */
+
 	DRIVER( wrally )	/* (c) 1993 - Ref 930705 */
 
 #endif	/* DRIVER_RECURSIVE */
