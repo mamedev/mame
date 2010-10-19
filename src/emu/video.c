@@ -1255,7 +1255,7 @@ static file_error mame_fopen_next(running_machine *machine, const char *pathopti
 
 	/* determine if the template has an index; if not, we always use the same name */
 	if (snapstr.find(0, "%i") == -1)
-		snapstr.cpy(snapstr);
+		fname.cpy(snapstr);
 
 	/* otherwise, we scan for the next available filename */
 	else
