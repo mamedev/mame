@@ -395,11 +395,7 @@ static UINT8 segacd_cdd_rx[10];
 static UINT8 segacd_cdd_tx[10];
 static struct
 {
-	UINT8 status;
-	UINT8 minute;
-	UINT8 seconds;
-	UINT8 frame;
-	UINT8 ext;
+	UINT8 buffer[5];
 	UINT8 ctrl;
 }segacd_cdd;
 #ifdef MESS
@@ -5162,7 +5158,7 @@ static WRITE16_HANDLER( segacd_sub_led_ready_w )
 		segacd_redled = (data >> 8)&1;
 		segacd_greenled = (data >> 9)&1;
 
-		popmessage("%02x %02x",segacd_greenled,segacd_redled);
+		//popmessage("%02x %02x",segacd_greenled,segacd_redled);
 	}
 
 }
@@ -5265,15 +5261,15 @@ static TIMER_CALLBACK( execute_hock_irq )
 
 	segacd_cdd.ctrl &= ~4; // clear HOCK flag
 
-	segacd_cdd_rx[0] = (segacd_cdd.status & 0xf0) >> 4;
-	segacd_cdd_rx[1] = (segacd_cdd.status & 0x0f) >> 0;
-	segacd_cdd_rx[2] = (segacd_cdd.minute & 0xf0) >> 4;
-	segacd_cdd_rx[3] = (segacd_cdd.minute & 0x0f) >> 0;
-	segacd_cdd_rx[4] = (segacd_cdd.seconds & 0xf0) >> 4;
-	segacd_cdd_rx[5] = (segacd_cdd.seconds & 0x0f) >> 0;
-	segacd_cdd_rx[6] = (segacd_cdd.frame & 0xf0) >> 4;
-	segacd_cdd_rx[7] = (segacd_cdd.frame & 0x0f) >> 0;
-	segacd_cdd_rx[8] = (segacd_cdd.ext & 0x0f) >> 0;
+	segacd_cdd_rx[0] = (segacd_cdd.buffer[0] & 0xf0) >> 4;
+	segacd_cdd_rx[1] = (segacd_cdd.buffer[0] & 0x0f) >> 0;
+	segacd_cdd_rx[2] = (segacd_cdd.buffer[1] & 0xf0) >> 4;
+	segacd_cdd_rx[3] = (segacd_cdd.buffer[1] & 0x0f) >> 0;
+	segacd_cdd_rx[4] = (segacd_cdd.buffer[2] & 0xf0) >> 4;
+	segacd_cdd_rx[5] = (segacd_cdd.buffer[2] & 0x0f) >> 0;
+	segacd_cdd_rx[6] = (segacd_cdd.buffer[3] & 0xf0) >> 4;
+	segacd_cdd_rx[7] = (segacd_cdd.buffer[3] & 0x0f) >> 0;
+	segacd_cdd_rx[8] = (segacd_cdd.buffer[4] & 0x0f) >> 0;
 
 	/* Do checksum calculation of the above registers */
 	cdd_crc = 0;
@@ -5322,7 +5318,7 @@ static WRITE16_HANDLER( segacd_cdd_ctrl_w )
 /* 68k <- CDD communication comms are 4-bit wide */
 static READ8_HANDLER( segacd_cdd_rx_r )
 {
-	return segacd_cdd_rx[offset] & 0xf;
+	return (segacd_cdd_rx[offset] & 0xf);
 }
 
 static const char *const segacd_cdd_cmd[] =
@@ -5364,15 +5360,16 @@ static const char *const segacd_cdd_get_toc_cmd[] =
 };
 
 #ifdef MESS
+
+#define LOG_CDD 1
+
 static void segacd_cdd_get_status(running_machine *machine)
 {
-	// ...
-
-	segacd_cdd.status = 0;
-	segacd_cdd.minute = 0;
-	segacd_cdd.seconds = 0;
-	segacd_cdd.frame = 0;
-	segacd_cdd.ext = 0;
+	segacd_cdd.buffer[0] = 0;
+	segacd_cdd.buffer[1] = 0;
+	segacd_cdd.buffer[2] = 0;
+	segacd_cdd.buffer[3] = 0;
+	segacd_cdd.buffer[4] = 0;
 
 	cdd_hock_irq(machine,1);
 }
@@ -5381,11 +5378,11 @@ static void segacd_cdd_stop_all(running_machine *machine)
 {
 	segacd_cdd.ctrl |= 0x100;
 
-	segacd_cdd.status = 0;
-	segacd_cdd.minute = 0;
-	segacd_cdd.seconds = 0;
-	segacd_cdd.frame = 0;
-	segacd_cdd.ext = 0;
+	segacd_cdd.buffer[0] = 0;
+	segacd_cdd.buffer[1] = 0;
+	segacd_cdd.buffer[2] = 0;
+	segacd_cdd.buffer[3] = 0;
+	segacd_cdd.buffer[4] = 0;
 
 	cdd_hock_irq(machine,1);
 }
@@ -5393,21 +5390,40 @@ static void segacd_cdd_stop_all(running_machine *machine)
 
 static void segacd_cdd_get_toc_info(running_machine *machine)
 {
-	segacd_cdd.status = (segacd_cdd_tx[3] & 0xf) | (segacd_cdd.status & 0xf0);
+	segacd_cdd.buffer[0] = (segacd_cdd_tx[3] & 0xf) | (segacd_cdd.buffer[0] & 0xf0);
 
-	logerror("CDD: TOC command %s issued\n",segacd_cdd_get_toc_cmd[segacd_cdd_tx[3] & 0xf]);
+	#if LOG_CDD
+	printf("CDD: TOC command %s issued\n",segacd_cdd_get_toc_cmd[segacd_cdd_tx[3] & 0xf]);
+	#endif
 
-	switch(segacd_cdd_tx[3] & 0xf)
+	if ( ! segacd.cd ) // no cd is present
 	{
-		case 0x3: //Get Total Length (in MSF)
-			if ( ! segacd.cd ) // no cd is present
+		segacd_cdd.buffer[0] = (0) | (segacd_cdd.buffer[0] & 0xf0);
+		segacd_cdd.buffer[1] = 0;
+		segacd_cdd.buffer[2] = 0;
+		segacd_cdd.buffer[3] = 0;
+		segacd_cdd.buffer[4] = 0;
+
+		cdd_hock_irq(machine,1);
+		return;
+	}
+	else
+	{
+		switch(segacd_cdd_tx[3] & 0xf)
+		{
+			case 0x2: //Get Current Track
 			{
-				segacd_cdd.status = (0) | (segacd_cdd.status & 0xf0);
-				segacd_cdd.minute = 0;
-				segacd_cdd.seconds = 0;
-				segacd_cdd.frame = 0;
+				segacd_cdd.buffer[0] = (0x2 & 0xf) | (segacd_cdd.buffer[0] & 0xf0);
+
+				segacd_cdd.buffer[0] = 1; // current track number, TODO
+				segacd_cdd.buffer[1] = 0;
+				segacd_cdd.buffer[2] = 0;
+				segacd_cdd.buffer[3] = 0;
+				segacd_cdd.buffer[4] = 0;
+				cdd_hock_irq(machine,1);
+				return;
 			}
-			else
+			case 0x3: //Get Total Length (in MSF)
 			{
 				UINT32 frame,msf;
 
@@ -5415,32 +5431,29 @@ static void segacd_cdd_get_toc_info(running_machine *machine)
 				frame += segacd.toc->tracks[segacd.toc->numtrks-1].frames;
 				msf = lba_to_msf( frame );
 
-				segacd_cdd.status = (0x3 & 0xf) | (segacd_cdd.status & 0xf0);
-				segacd_cdd.minute = ((msf >> 16) & 0xff);
-				segacd_cdd.seconds = ((msf >> 8) & 0xff);
-				segacd_cdd.frame = ((msf >> 0) & 0xff);
+				segacd_cdd.buffer[0] = (0x3 & 0xf) | (segacd_cdd.buffer[0] & 0xf0);
+				segacd_cdd.buffer[1] = ((msf >> 16) & 0xff);
+				segacd_cdd.buffer[2] = ((msf >> 8) & 0xff);
+				segacd_cdd.buffer[3] = ((msf >> 0) & 0xff);
+				segacd_cdd.buffer[4] = 0;
+
+				cdd_hock_irq(machine,1);
+				return;
+
 			}
-			segacd_cdd.ext = 0;
-			cdd_hock_irq(machine,1);
-			return;
 		case 0x4: //Get First and Last Track Number
-			if ( ! segacd.cd ) // no cd is present
 			{
-				segacd_cdd.status = (0) | (segacd_cdd.status & 0xf0);
-				segacd_cdd.minute = 0;
-				segacd_cdd.seconds = 0;
+				segacd_cdd.buffer[0] = (0x4 & 0xf) | (segacd_cdd.buffer[0] & 0xf0);
+				segacd_cdd.buffer[1] = dec_2_bcd(1);
+				segacd_cdd.buffer[2] = dec_2_bcd(segacd.toc->numtrks);
+				segacd_cdd.buffer[3] = 0;
+				segacd_cdd.buffer[4] = 0;
+
+				cdd_hock_irq(machine,1);
 			}
-			else
-			{
-				segacd_cdd.status = (0x4 & 0xf) | (segacd_cdd.status & 0xf0);
-				segacd_cdd.minute = dec_2_bcd(1);
-				segacd_cdd.seconds = dec_2_bcd(segacd.toc->numtrks);
-			}
-			segacd_cdd.frame = 0;
-			segacd_cdd.ext = 0;
-			cdd_hock_irq(machine,1);
 			return;
-		//default: logerror("CDD: unhandled TOC command %s issued\n",segacd_cdd_get_toc_cmd[segacd_cdd_tx[3] & 0xf]);
+			//default: logerror("CDD: unhandled TOC command %s issued\n",segacd_cdd_get_toc_cmd[segacd_cdd_tx[3] & 0xf]);
+		}
 	}
 
 	cdd_hock_irq(machine,1);
@@ -5456,7 +5469,10 @@ static WRITE8_HANDLER( segacd_cdd_tx_w )
 	#ifdef MESS
 	if(offset == 9) //execute the command when crc is sent (TODO: I wonder if we need to check if crc is valid. Plus obviously this shouldn't be instant)
 	{
-		logerror("CDD: command %s issued\n",segacd_cdd_cmd[segacd_cdd_tx[0] & 0xf]);
+		#if LOG_CDD
+		if(segacd_cdd_tx[0] != 0)
+			printf("CDD: command %s issued\n",segacd_cdd_cmd[segacd_cdd_tx[0] & 0xf]);
+		#endif
 
 		switch(segacd_cdd_tx[0] & 0xf)
 		{
