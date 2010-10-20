@@ -2095,12 +2095,23 @@ void screen_device::configure(int width, int height, const rectangle &visarea, a
 void screen_device::reset_origin(int beamy, int beamx)
 {
 	// compute the effective VBLANK start/end times
-	m_vblank_end_time = attotime_sub_attoseconds(timer_get_time(machine), beamy * m_scantime + beamx * m_pixeltime);
+	attotime curtime = timer_get_time(machine);
+	m_vblank_end_time = attotime_sub_attoseconds(curtime, beamy * m_scantime + beamx * m_pixeltime);
 	m_vblank_start_time = attotime_sub_attoseconds(m_vblank_end_time, m_vblank_period);
+	
+	// if we are resetting relative to (0,0) == VBLANK end, call the
+	// scanline 0 timer by hand now; otherwise, adjust it for the future
+	if (beamy == 0 && beamx == 0)
+		scanline0_callback(); 
+	else
+		timer_adjust_oneshot(m_scanline0_timer, time_until_pos(0), 0);
 
-	// re-adjust the scanline 0 and VBLANK timers
-	timer_adjust_oneshot(m_scanline0_timer, time_until_pos(0), 0);
-	timer_adjust_oneshot(m_vblank_begin_timer, time_until_vblank_start(), 0);
+	// if we are resetting relative to (visarea.max_y + 1, 0) == VBLANK start,
+	// call the VBLANK start timer now; otherwise, adjust it for the future
+	if (beamy == m_visarea.max_y + 1 && beamx == 0)
+		vblank_begin_callback();
+	else
+		timer_adjust_oneshot(m_vblank_begin_timer, time_until_vblank_start(), 0);
 }
 
 
