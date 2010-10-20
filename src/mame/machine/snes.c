@@ -48,6 +48,8 @@ struct snes_cart_info snes_cart;
 #include "machine/snesst10.c"
 #include "machine/snesbsx.c"
 
+#define USE_CYCLE_STEAL 1
+
 /*************************************
 
     Timers
@@ -844,6 +846,7 @@ address               |         |          |       |     |         |        |   
 
 */
 
+#if USE_CYCLE_STEAL
 /*FIXME: missing work RAM access steal / we need to do this less "aggressive" otherwise we lose too much CPU horsepower, why? */
 static int snes_bank_0x00_0x3f_cycles(running_machine *machine,UINT32 offset)
 {
@@ -905,6 +908,7 @@ static int snes_bank_0x80_0xbf_cycles(running_machine *machine,UINT32 offset)
 
 	return 0; //TODO: 6
 }
+#endif
 
 /* 0x000000 - 0x2fffff */
 READ8_HANDLER( snes_r_bank1 )
@@ -957,8 +961,10 @@ READ8_HANDLER( snes_r_bank1 )
 	else
 		value = snes_ram[offset];
 
+	#if USE_CYCLE_STEAL
 	if(!space->debugger_access())
 		cpu_adjust_icount(space->cpu, -snes_bank_0x00_0x3f_cycles(space->machine, offset));
+	#endif
 
 	return value;
 }
@@ -1020,8 +1026,10 @@ READ8_HANDLER( snes_r_bank2 )
 	else
 		value = snes_ram[0x300000 + offset];
 
+	#if USE_CYCLE_STEAL
 	if(!space->debugger_access())
 		cpu_adjust_icount(space->cpu, -snes_bank_0x00_0x3f_cycles(space->machine, offset));
+	#endif
 
 	return value;
 }
@@ -1061,8 +1069,10 @@ READ8_HANDLER( snes_r_bank3 )
 	else											/* Mode 21 & 25 + SuperFX games */
 		value = snes_ram[0x400000 + offset];
 
+	#if USE_CYCLE_STEAL
 	if(!space->debugger_access())
 		cpu_adjust_icount(space->cpu, -8);
+	#endif
 
 	return value;
 }
@@ -1099,8 +1109,10 @@ READ8_HANDLER( snes_r_bank4 )
 	else if (state->cart[0].mode & 0x0a)					/* Mode 21 & 25 */
 		value = snes_ram[0x600000 + offset];
 
+	#if USE_CYCLE_STEAL
 	if(!space->debugger_access())
 		cpu_adjust_icount(space->cpu, -8);
+	#endif
 
 	return value;
 }
@@ -1135,8 +1147,10 @@ READ8_HANDLER( snes_r_bank5 )
 	else
 		value = snes_ram[0x700000 + offset];
 
+	#if USE_CYCLE_STEAL
 	if(!space->debugger_access())
 		cpu_adjust_icount(space->cpu, -8);
+	#endif
 
 	return value;
 }
@@ -1183,8 +1197,10 @@ READ8_HANDLER( snes_r_bank6 )
 	else
 		value = snes_ram[0x800000 + offset];
 
+	#if USE_CYCLE_STEAL
 	if(!space->debugger_access())
 		cpu_adjust_icount(space->cpu, -snes_bank_0x80_0xbf_cycles(space->machine, offset));
+	#endif
 
 	return value;
 }
@@ -1236,8 +1252,10 @@ READ8_HANDLER( snes_r_bank7 )
 	else								/* Mode 21 & 25 + SuperFX Games */
 		value = snes_ram[0xc00000 + offset];
 
+	#if USE_CYCLE_STEAL
 	if(!space->debugger_access())
 		cpu_adjust_icount(space->cpu, -((snes_ram[MEMSEL] & 1) ? 6 : 8));
+	#endif
 
 	return value;
 }
@@ -1290,8 +1308,10 @@ WRITE8_HANDLER( snes_w_bank1 )
 	else
 		logerror( "(PC=%06x) Attempt to write to ROM address: %X\n",cpu_get_pc(space->cpu),offset );
 
+	#if USE_CYCLE_STEAL
 	if(!space->debugger_access())
 		cpu_adjust_icount(space->cpu, -snes_bank_0x00_0x3f_cycles(space->machine, offset));
+	#endif
 }
 
 /* 0x300000 - 0x3fffff */
@@ -1347,8 +1367,10 @@ WRITE8_HANDLER( snes_w_bank2 )
 	else
 		logerror("(PC=%06x) Attempt to write to ROM address: %X\n",cpu_get_pc(space->cpu),offset + 0x300000);
 
+	#if USE_CYCLE_STEAL
 	if(!space->debugger_access())
 		cpu_adjust_icount(space->cpu, -snes_bank_0x00_0x3f_cycles(space->machine, offset));
+	#endif
 }
 
 /* 0x600000 - 0x6fffff */
@@ -1373,8 +1395,10 @@ WRITE8_HANDLER( snes_w_bank4 )
 	else if (state->cart[0].mode & 0x0a)
 		logerror("(PC=%06x) Attempt to write to ROM address: %X\n",cpu_get_pc(space->cpu),offset + 0x600000);
 
+	#if USE_CYCLE_STEAL
 	if(!space->debugger_access())
 		cpu_adjust_icount(space->cpu, -8);
+	#endif
 }
 
 /* 0x700000 - 0x7dffff */
@@ -1398,8 +1422,10 @@ WRITE8_HANDLER( snes_w_bank5 )
 	else if (state->cart[0].mode & 0x0a)
 		logerror("(PC=%06x) Attempt to write to ROM address: %X\n",cpu_get_pc(space->cpu),offset + 0x700000);
 
+	#if USE_CYCLE_STEAL
 	if(!space->debugger_access())
 		cpu_adjust_icount(space->cpu, -8);
+	#endif
 }
 
 
@@ -1446,8 +1472,10 @@ WRITE8_HANDLER( snes_w_bank6 )
 	else
 		logerror("(PC=%06x) Attempt to write to ROM address: %X\n",cpu_get_pc(space->cpu),offset + 0x800000);
 
+	#if USE_CYCLE_STEAL
 	if(!space->debugger_access())
 		cpu_adjust_icount(space->cpu, -snes_bank_0x80_0xbf_cycles(space->machine, offset));
+	#endif
 }
 
 
@@ -1486,8 +1514,10 @@ WRITE8_HANDLER( snes_w_bank7 )
 	else if (state->cart[0].mode & 0x0a)
 		logerror("(PC=%06x) Attempt to write to ROM address: %X\n",cpu_get_pc(space->cpu),offset + 0xc00000);
 
+	#if USE_CYCLE_STEAL
 	if(!space->debugger_access())
 		cpu_adjust_icount(space->cpu, -((snes_ram[MEMSEL] & 1) ? 6 : 8));
+	#endif
 }
 
 
@@ -1597,7 +1627,7 @@ static void snes_init_timers( running_machine *machine )
 
 	// SNES hcounter has a 0-339 range.  hblank starts at counter 260.
 	// clayfighter sets an HIRQ at 260, apparently it wants it to be before hdma kicks off, so we'll delay 2 pixels.
-	state->hblank_offset = 268;
+	state->hblank_offset = 274;
 	timer_adjust_oneshot(state->hblank_timer, machine->primary_screen->time_until_pos(((snes_ram[STAT78] & 0x10) == SNES_NTSC) ? SNES_VTOTAL_NTSC - 1 : SNES_VTOTAL_PAL - 1, state->hblank_offset), 0);
 }
 
@@ -1988,8 +2018,10 @@ INLINE void snes_dma_transfer( address_space *space, UINT8 dma, UINT32 abus, UIN
 {
 	snes_state *state = space->machine->driver_data<snes_state>();
 
+	#if USE_CYCLE_STEAL
 	/* every byte transfer takes 8 master cycles */
 	cpu_adjust_icount(space->cpu,-8);
+	#endif
 
 	if (state->dma_channel[dma].dmap & 0x80)	/* PPU->CPU */
 	{
@@ -2197,8 +2229,10 @@ static void snes_dma( address_space *space, UINT8 channels )
 
 	/* FIXME: we also need to round to the nearest 8 master cycles */
 
+	#if USE_CYCLE_STEAL
 	/* overhead steals 8 master cycles, correct? */
 	cpu_adjust_icount(space->cpu,-8);
+	#endif
 
 	/* Assume priority of the 8 DMA channels is 0-7 */
 	for (i = 0; i < 8; i++)
@@ -2309,13 +2343,17 @@ static void snes_dma( address_space *space, UINT8 channels )
 			state->dma_channel[i].src_addr = abus;
 			state->dma_channel[i].trans_size = 0;
 
+			#if USE_CYCLE_STEAL
 			/* active channel takes 8 master cycles */
 			cpu_adjust_icount(space->cpu,-8);
+			#endif
 		}
 	}
 
 	/* finally, take yet another 8 master cycles for the aforementioned overhead */
+	#if USE_CYCLE_STEAL
 	cpu_adjust_icount(space->cpu,-8);
+	#endif
 }
 
 READ8_HANDLER( superfx_r_bank1 )

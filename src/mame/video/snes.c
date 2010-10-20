@@ -2233,7 +2233,8 @@ READ8_HANDLER( snes_ppu_read )
 			return snes_ppu.ppu2_open_bus;
 	}
 
-	return snes_ppu.ppu1_open_bus;
+	/* note: remaining registers (Namely TM in Super Kick Boxing) returns MDR open bus, not PPU Open Bus! */
+	return snes_open_bus_r(space, 0);
 }
 
 
