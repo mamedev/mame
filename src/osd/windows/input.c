@@ -791,7 +791,7 @@ void osd_customize_input_type_list(input_type_desc *typelist)
 
 #ifdef MESS
 			case IPT_UI_THROTTLE:
-				input_seq_set_0(&typedesc->seq[SEQ_TYPE_STANDARD]);
+				input_seq_set_1(&typedesc->seq[SEQ_TYPE_STANDARD], KEYCODE_F10);
 				break;
 #endif
 		}
