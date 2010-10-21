@@ -1,6 +1,6 @@
 //============================================================
 //
-//  minimisc.c - Minimal core miscellaneous functions
+//  osdmini.h - Core header
 //
 //============================================================
 //
@@ -39,69 +39,60 @@
 //
 //============================================================
 
-#include "osdcore.h"
-#include <stdlib.h>
+#include "options.h"
+#include "osdepend.h"
 
 
 //============================================================
-//  osd_alloc
+//  TYPE DEFINITIONS
 //============================================================
 
-void *osd_malloc(size_t size)
+class mini_osd_interface : public osd_interface
 {
-	return malloc(size);
-}
+public:
+	// construction/destruction
+	mini_osd_interface();
+	virtual ~mini_osd_interface();
+	
+	// general overridables
+	virtual void init(running_machine &machine);
+	virtual void update(bool skip_redraw);
 
+	// debugger overridables
+//	virtual void init_debugger();
+//	virtual void wait_for_debugger(device_t &device, bool firststop);
+	
+	// audio overridables
+	virtual void update_audio_stream(const INT16 *buffer, int samples_this_frame);
+	virtual void set_mastervolume(int attenuation);
 
-//============================================================
-//  osd_free
-//============================================================
+	// input overridables
+	virtual void customize_input_type_list(input_type_desc *typelist);
+	
+private:
+	static void osd_exit(running_machine &machine);
+};
 
-void osd_free(void *ptr)
-{
-	free(ptr);
-}
-
-
-//============================================================
-//  osd_alloc_executable
-//============================================================
-
-void *osd_alloc_executable(size_t size)
-{
-	// to use this version of the code, we have to assume that
-	// code injected into a malloc'ed region can be safely executed
-	return malloc(size);
-}
-
-
-//============================================================
-//  osd_free_executable
-//============================================================
-
-void osd_free_executable(void *ptr, size_t size)
-{
-	free(ptr);
-}
 
 
 //============================================================
-//  osd_break_into_debugger
+//  GLOBAL VARIABLES
 //============================================================
 
-void osd_break_into_debugger(const char *message)
-{
-	// there is no standard way to do this, so ignore it
-}
+extern const options_entry mame_win_options[];
+
+// defined in winwork.c
+extern int osd_num_processors;
+
 
 
 //============================================================
-//  osd_get_clipboard_text
+//  FUNCTION PROTOTYPES
 //============================================================
 
-char *osd_get_clipboard_text(void)
-{
-	// can't support clipboards generically
-	return NULL;
-}
+// use if you want to print something with the verbose flag
+void CLIB_DECL mame_printf_verbose(const char *text, ...) ATTR_PRINTF(1,2);
 
+// use this to ping the watchdog
+void winmain_watchdog_ping(void);
+void winmain_dump_stack();

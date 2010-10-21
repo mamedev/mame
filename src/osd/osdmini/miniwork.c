@@ -40,6 +40,7 @@
 //============================================================
 
 #include "osdcore.h"
+#include <stdlib.h>
 
 
 //============================================================
@@ -107,7 +108,7 @@ osd_work_item *osd_work_item_queue_multiple(osd_work_queue *queue, osd_work_call
 	int itemnum;
 
 	// allocate memory to hold the result
-	item = malloc(sizeof(*item));
+	item = (osd_work_item *)malloc(sizeof(*item));
 	if (item == NULL)
 		return NULL;
 

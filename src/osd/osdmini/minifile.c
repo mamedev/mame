@@ -40,6 +40,7 @@
 //============================================================
 
 #include "osdcore.h"
+#include <stdlib.h>
 
 
 //============================================================
@@ -164,4 +165,56 @@ int osd_uchar_from_osdchar(UINT32 /* unicode_char */ *uchar, const char *osdchar
 	// we assume a standard 1:1 mapping of characters to the first 256 unicode characters
 	*uchar = (UINT8)*osdchar;
 	return 1;
+}
+
+
+//============================================================
+//  osd_stat
+//============================================================
+
+osd_directory_entry *osd_stat(const char *path)
+{
+	osd_directory_entry *result = NULL;
+
+	// create an osd_directory_entry; be sure to make sure that the caller can
+	// free all resources by just freeing the resulting osd_directory_entry
+	result = (osd_directory_entry *)malloc(sizeof(*result) + strlen(path) + 1);
+	strcpy((char *)(result + 1), path);
+	result->name = (char *)(result + 1);
+	result->type = ENTTYPE_NONE;
+	result->size = 0;
+	
+	FILE *f = fopen(path, "rb");
+	if (f != NULL)
+	{
+		fseek(f, 0, SEEK_END);
+		result->type = ENTTYPE_FILE;
+		result->size = ftell(f);
+		fclose(f);
+	}
+	return result;
+}
+
+
+//============================================================
+//  osd_get_full_path
+//============================================================
+
+file_error osd_get_full_path(char **dst, const char *path)
+{
+	// derive the full path of the file in an allocated string
+	// for now just fake it since we don't presume any underlying file system
+	*dst = strdup(path);
+	return FILERR_NONE;
+}
+
+
+//============================================================
+//  osd_get_volume_name
+//============================================================
+
+const char *osd_get_volume_name(int idx)
+{
+	// we don't expose volumes
+	return NULL;
 }

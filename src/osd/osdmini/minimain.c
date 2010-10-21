@@ -43,6 +43,7 @@
 #include "osdepend.h"
 #include "render.h"
 #include "clifront.h"
+#include "osdmini.h"
 
 
 //============================================================
@@ -94,7 +95,26 @@ int main(int argc, char *argv[])
 {
 	// cli_execute does the heavy lifting; if we have osd-specific options, we
 	// would pass them as the third parameter here
-	return cli_execute(argc, argv, NULL);
+	mini_osd_interface osd;
+	return cli_execute(argc, argv, osd, NULL);
+}
+
+
+//============================================================
+//  constructor
+//============================================================
+
+mini_osd_interface::mini_osd_interface()
+{
+}
+
+
+//============================================================
+//  destructor
+//============================================================
+
+mini_osd_interface::~mini_osd_interface()
+{
 }
 
 
@@ -147,20 +167,20 @@ void mini_osd_interface::update(bool skip_redraw)
 	our_target->compute_minimum_size(minwidth, minheight);
 
 	// make that the size of our target
-	our_target->render_target_set_bounds(minwidth, minheight);
+	our_target->set_bounds(minwidth, minheight);
 
 	// get the list of primitives for the target at the current size
-	const render_primitive_list *primlist = our_target->get_primitives();
+	render_primitive_list &primlist = our_target->get_primitives();
 
 	// lock them, and then render them
-	primlist->acquire_locK();
+	primlist.acquire_lock();
 
 	// do the drawing here
-	primlist->release_lock();
+	primlist.release_lock();
 
 	// after 5 seconds, exit
-	if (attotime_compare(timer_get_time(machine), attotime_make(5, 0)) > 0)
-		machine->schedule_exit();
+	if (attotime_compare(timer_get_time(&machine()), attotime_make(5, 0)) > 0)
+		machine().schedule_exit();
 }
 
 

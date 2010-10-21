@@ -4196,6 +4196,7 @@ src/osd/osdmini/minimisc.c svneol=native#text/plain
 src/osd/osdmini/minisync.c svneol=native#text/plain
 src/osd/osdmini/minitime.c svneol=native#text/plain
 src/osd/osdmini/miniwork.c svneol=native#text/plain
+src/osd/osdmini/osdmini.h svneol=native#text/plain
 src/osd/osdmini/osdmini.mak svneol=native#text/plain
 src/osd/sdl/README_SDL13.txt svneol=native#text/plain
 src/osd/sdl/SDL1211_opengl.h svneol=native#text/plain
