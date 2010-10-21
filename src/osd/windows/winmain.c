@@ -391,7 +391,7 @@ int main(int argc, char *argv[])
 {
 	// initialize common controls
 	InitCommonControls();
-	
+
 	// set a handler to catch ctrl-c
 	SetConsoleCtrlHandler(control_handler, TRUE);
 
@@ -450,14 +450,14 @@ static BOOL WINAPI control_handler(DWORD type)
 		fprintf(stderr, ", exiting\n");
 		TerminateProcess(GetCurrentProcess(), MAMERR_FATALERROR);
 	}
-	
+
 	// all other situations attempt to do a clean exit
 	else
 	{
 		fprintf(stderr, ", exit requested\n");
 		g_current_machine->schedule_exit();
 	}
-	
+
 	// in all cases we handled it
 	return TRUE;
 }
@@ -498,7 +498,7 @@ static void output_oslog(running_machine &machine, const char *buffer)
 void osd_init(running_machine *machine)
 {
 	const char *stemp;
-	
+
 	// determine if we are benchmarking, and adjust options appropriately
 	int bench = options_get_int(machine->options(), WINOPTION_BENCH);
 	if (bench > 0)

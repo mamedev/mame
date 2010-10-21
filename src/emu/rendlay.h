@@ -71,13 +71,13 @@ DECLARE_ENUM_OPERATORS(item_layer);
 class layout_element
 {
 	friend class simple_list<layout_element>;
-	
+
 public:
 	// construction/destruction
 	layout_element(running_machine &machine, xml_data_node &elemnode, const char *dirname);
 	virtual ~layout_element();
 
-	// getters	
+	// getters
 	layout_element *next() const { return m_next; }
 	const char *name() const { return m_name; }
 	running_machine &machine() const { return m_machine; }
@@ -91,7 +91,7 @@ private:
 	{
 		friend class layout_element;
 		friend class simple_list<component>;
-		
+
 	public:
 		// construction/destruction
 		component(running_machine &machine, xml_data_node &compnode, const char *dirname);
@@ -100,7 +100,7 @@ private:
 		// getters
 		component *next() const { return m_next; }
 		const render_bounds &bounds() const { return m_bounds; }
-		
+
 		// operations
 		void draw(running_machine &machine, bitmap_t &dest, const rectangle &bounds, int state);
 
@@ -121,7 +121,7 @@ private:
 			CTYPE_DOTMATRIX,
 			CTYPE_MAX
 		};
-		
+
 		// helpers
 		void draw_rect(bitmap_t &dest, const rectangle &bounds);
 		void draw_disk(bitmap_t &dest, const rectangle &bounds);
@@ -163,7 +163,7 @@ private:
 	public:
 		texture();
 		~texture();
-	
+
 		layout_element *	m_element;		// pointer back to the element
 		render_texture *	m_texture;		// texture for this state
 		int					m_state;		// associated state number
@@ -212,7 +212,7 @@ public:
 		render_container *screen_container(running_machine &machine) const { return (m_screen != NULL) ? &m_screen->container() : NULL; }
 		bool has_input() const { return bool(m_input_tag); }
 		const char *input_tag_and_mask(UINT32 &mask) const { mask = m_input_mask; return m_input_tag; }
-		
+
 		// fetch state based on configured source
 		int state() const;
 
@@ -229,7 +229,7 @@ public:
 		render_bounds		m_rawbounds;		// raw (original) bounds of the item
 		render_color		m_color;			// color of the item
 	};
-	
+
 	// construction/destruction
 	layout_view(running_machine &machine, xml_data_node &viewnode, simple_list<layout_element> &elemlist);
 	virtual ~layout_view();
@@ -241,7 +241,7 @@ public:
 	const render_screen_list &screens() const { return m_screens; }
 	bool layer_enabled(item_layer layer) const { return m_layenabled[layer]; }
 
-	// 
+	//
 	bool has_art() const { return (m_backdrop_list.count() + m_overlay_list.count() + m_bezel_list.count() != 0); }
 	float effective_aspect(render_layer_config config) const { return (config.zoom_to_screen() && m_screens.count() != 0) ? m_scraspect : m_aspect; }
 
@@ -254,15 +254,15 @@ private:
 	astring				m_name;				// name of the layout
 	float				m_aspect;			// X/Y of the layout
 	float				m_scraspect;		// X/Y of the screen areas
-	render_screen_list 	m_screens; 			// list of active screens
+	render_screen_list	m_screens;			// list of active screens
 	render_bounds		m_bounds;			// computed bounds of the view
 	render_bounds		m_scrbounds;		// computed bounds of the screens within the view
 	render_bounds		m_expbounds;		// explicit bounds of the view
 	bool				m_layenabled[ITEM_LAYER_MAX]; // is this layer enabled?
-	simple_list<item> 	m_backdrop_list;	// list of backdrop items
-	simple_list<item> 	m_screen_list;		// list of screen items
-	simple_list<item> 	m_overlay_list;		// list of overlay items
-	simple_list<item> 	m_bezel_list;		// list of bezel items
+	simple_list<item>	m_backdrop_list;	// list of backdrop items
+	simple_list<item>	m_screen_list;		// list of screen items
+	simple_list<item>	m_overlay_list;		// list of overlay items
+	simple_list<item>	m_bezel_list;		// list of bezel items
 };
 
 
@@ -272,7 +272,7 @@ private:
 class layout_file
 {
 	friend class simple_list<layout_file>;
-	
+
 public:
 	// construction/destruction
 	layout_file(running_machine &machine, xml_data_node &rootnode, const char *dirname);

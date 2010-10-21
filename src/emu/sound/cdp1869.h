@@ -1,6 +1,6 @@
 /**********************************************************************
 
-	RCA CDP1869/1870/1876 Video Interface System (VIS) emulation
+    RCA CDP1869/1870/1876 Video Interface System (VIS) emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -84,7 +84,7 @@
 
 
 //**************************************************************************
-//	MACROS / CONSTANTS
+//  MACROS / CONSTANTS
 //**************************************************************************
 
 #define CDP1869_DOT_CLK_PAL			(float)XTAL_5_626MHz
@@ -170,7 +170,7 @@
 
 
 //**************************************************************************
-//	TYPE DEFINITIONS
+//  TYPE DEFINITIONS
 //**************************************************************************
 
 typedef UINT8 (*cdp1869_char_ram_read_func)(running_device *device, UINT16 pma, UINT8 cma, UINT8 pmd);

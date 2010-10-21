@@ -14,11 +14,11 @@
 
 /*
 
-	TODO:
+    TODO:
 
-	- debugger cursor is not on R(P)
-	- divide clock by 8
-	- min cycles -> 2 and 3
+    - debugger cursor is not on R(P)
+    - divide clock by 8
+    - min cycles -> 2 and 3
 
 */
 
@@ -47,7 +47,7 @@ const cosmac_state_code COSMAC_STATE_CODE[] =
 	COSMAC_STATE_CODE_S1_EXECUTE,	// COSMAC_STATE_1_RESET
 	COSMAC_STATE_CODE_S1_EXECUTE,	// COSMAC_STATE_1_INIT
 	COSMAC_STATE_CODE_S1_EXECUTE,	// COSMAC_STATE_1_EXECUTE
-	COSMAC_STATE_CODE_S2_DMA, 		// COSMAC_STATE_2_DMA_IN
+	COSMAC_STATE_CODE_S2_DMA,		// COSMAC_STATE_2_DMA_IN
 	COSMAC_STATE_CODE_S2_DMA,		// COSMAC_STATE_2_DMA_OUT
 	COSMAC_STATE_CODE_S3_INTERRUPT	// COSMAC_STATE_3_INT
 };
@@ -109,9 +109,9 @@ const cosmac_device::ophandler cosmac_device::s_opcodetable[256] =
 	&cosmac_device::dec,	&cosmac_device::dec,	&cosmac_device::dec,	&cosmac_device::dec,
 
 	&cosmac_device::br,		&cosmac_device::bq,		&cosmac_device::bz,		&cosmac_device::bdf,
-	&cosmac_device::b,		&cosmac_device::b,		&cosmac_device::b,		&cosmac_device::b,	
+	&cosmac_device::b,		&cosmac_device::b,		&cosmac_device::b,		&cosmac_device::b,
 	&cosmac_device::nbr,	&cosmac_device::bnq,	&cosmac_device::bnz,	&cosmac_device::bnf,
-	&cosmac_device::bn,		&cosmac_device::bn,		&cosmac_device::bn,		&cosmac_device::bn,	
+	&cosmac_device::bn,		&cosmac_device::bn,		&cosmac_device::bn,		&cosmac_device::bn,
 
 	&cosmac_device::lda,	&cosmac_device::lda,	&cosmac_device::lda,	&cosmac_device::lda,
 	&cosmac_device::lda,	&cosmac_device::lda,	&cosmac_device::lda,	&cosmac_device::lda,
@@ -169,7 +169,7 @@ const cosmac_device::ophandler cosmac_device::s_opcodetable[256] =
 	&cosmac_device::sex,	&cosmac_device::sex,	&cosmac_device::sex,	&cosmac_device::sex,
 
 	&cosmac_device::ldx,	&cosmac_device::_or,	&cosmac_device::_and,	&cosmac_device::_xor,
-	&cosmac_device::add,	&cosmac_device::sd,		&cosmac_device::shr,	&cosmac_device::sm,	
+	&cosmac_device::add,	&cosmac_device::sd,		&cosmac_device::shr,	&cosmac_device::sm,
 	&cosmac_device::ldi,	&cosmac_device::ori,	&cosmac_device::ani,	&cosmac_device::xri,
 	&cosmac_device::adi,	&cosmac_device::sdi,	&cosmac_device::shl,	&cosmac_device::smi
 };
@@ -360,16 +360,16 @@ void cosmac_device::device_start()
 	// register our state for the debugger
 	state_add(STATE_GENPC,		"GENPC",		R[P]).noshow();
 	state_add(STATE_GENFLAGS,	"GENFLAGS",		m_flagsio).mask(0x7).callimport().callexport().noshow().formatstr("%3s");
-	
+
 	state_add(COSMAC_P,		"P",	m_p).mask(0xf);
 	state_add(COSMAC_X,		"X",	m_x).mask(0xf);
 	state_add(COSMAC_D,		"D",	m_d);
 	state_add(COSMAC_B,		"B",	m_b);
 	state_add(COSMAC_T,		"T",	m_t);
-	
+
 	state_add(COSMAC_I,		"I",	m_i).mask(0xf);
 	state_add(COSMAC_N,		"N",	m_n).mask(0xf);
-	
+
 	astring tempstr;
 	for (int regnum = 0; regnum < 16; regnum++)
 		state_add(COSMAC_R0 + regnum, tempstr.format("R%x", regnum), m_r[regnum]);
@@ -427,7 +427,7 @@ void cosmac_device::device_start()
 void cosmac_device::device_reset()
 {
 }
-	
+
 
 //-------------------------------------------------
 //  state_import - import state into the device,
@@ -518,7 +518,7 @@ inline UINT8 cosmac_device::read_byte(offs_t address)
 
 
 //-------------------------------------------------
-//  read_io_byte - read an I/O byte at the given 
+//  read_io_byte - read an I/O byte at the given
 //  address
 //-------------------------------------------------
 
@@ -539,7 +539,7 @@ inline void cosmac_device::write_byte(offs_t address, UINT8 data)
 
 
 //-------------------------------------------------
-//  write_io_byte - write an I/O byte at the given 
+//  write_io_byte - write an I/O byte at the given
 //  address
 //-------------------------------------------------
 
@@ -565,7 +565,7 @@ offs_t cosmac_device::get_memory_address()
 }
 
 //-------------------------------------------------
-//  execute_set_input - 
+//  execute_set_input -
 //-------------------------------------------------
 
 void cosmac_device::execute_set_input(int inputnum, int state)
@@ -595,7 +595,7 @@ void cosmac_device::execute_set_input(int inputnum, int state)
 
 
 //-------------------------------------------------
-//  execute_run - 
+//  execute_run -
 //-------------------------------------------------
 
 void cosmac_device::execute_run()
@@ -676,7 +676,7 @@ void cosmac_device::execute_run()
 inline void cosmac_device::run()
 {
 	output_state_code();
-	
+
 	switch (m_state)
 	{
 	case COSMAC_STATE_0_FETCH:
@@ -1129,7 +1129,7 @@ void cosmac_device::lsnf()	{ long_skip(!DF); }
 void cosmac_device::lsq()	{ long_skip(Q); }
 void cosmac_device::lsnq()	{ long_skip(!Q); }
 void cosmac_device::lsie()	{ long_skip(IE); }
-	
+
 // control instructions opcode handlers
 void cosmac_device::idl()	{ /* idle */ }
 void cosmac_device::nop()	{ m_icount -= CLOCKS_EXECUTE; }

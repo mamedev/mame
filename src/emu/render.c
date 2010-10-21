@@ -1232,7 +1232,7 @@ void render_target::compute_minimum_size(INT32 &minwidth, INT32 &minheight)
 {
 	float maxxscale = 1.0f, maxyscale = 1.0f;
 	int screens_considered = 0;
-	
+
 	// early exit in case we are called between device teardown and render teardown
 	if (m_manager.machine().m_devicelist.count() == 0)
 	{
@@ -1584,12 +1584,12 @@ bool render_target::load_layout_file(const char *dirname, const char *filename)
 		file_error filerr = mame_fopen(SEARCHPATH_ARTWORK, fname, OPEN_FLAG_READ, &layoutfile);
 		if (filerr != FILERR_NONE)
 			return false;
-			
+
 		// read the file
 		rootnode = xml_file_read(mame_core_file(layoutfile), NULL);
 		mame_fclose(layoutfile);
 	}
-	
+
 	// if we didn't get a properly-formatted XML file, record a warning and exit
 	if (rootnode == NULL)
 	{
@@ -1599,7 +1599,7 @@ bool render_target::load_layout_file(const char *dirname, const char *filename)
 			mame_printf_warning("Improperly formatted XML string, ignorning");
 		return false;
 	}
-	
+
 	// parse and catch any errors
 	bool result = true;
 	try

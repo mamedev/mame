@@ -29,14 +29,14 @@
                    Vss  20 |_____________| 21  _EF4
 
 
-	Type            Internal ROM    Internal RAM    Timer	Pin 16 (*)
+    Type            Internal ROM    Internal RAM    Timer   Pin 16 (*)
     ------------------------------------------------------------------
-    CDP1802         none            none            no			Vcc
-    CDP1803         ?               ?               ?			?
-    CDP1804         2 KB            64 bytes        yes			?
-    CDP1805         none            64 bytes        yes			_ME
-    CDP1806         none            none            yes			Vdd
-	
+    CDP1802         none            none            no          Vcc
+    CDP1803         ?               ?               ?           ?
+    CDP1804         2 KB            64 bytes        yes         ?
+    CDP1805         none            64 bytes        yes         _ME
+    CDP1806         none            none            yes         Vdd
+
 **********************************************************************/
 
 #pragma once
@@ -319,7 +319,7 @@ protected:
 	void lsq();
 	void lsnq();
 	void lsie();
-	
+
 	// control instructions opcode handlers
 	void idl();
 	void nop();
@@ -346,7 +346,7 @@ protected:
 	cosmac_out_sc_func			m_out_sc_func;
 	devcb_resolved_write_line	m_out_tpa_func;
 	devcb_resolved_write_line	m_out_tpb_func;
-		
+
 	// control modes
 	enum _cosmac_mode
 	{

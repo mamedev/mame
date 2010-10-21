@@ -441,7 +441,7 @@ layout_element::layout_element(running_machine &machine, xml_data_node &elemnode
 	if (name == NULL)
 		throw emu_fatalerror("All layout elements must have a name!\n");
 	m_name = name;
-	
+
 	// get the default state
 	m_defstate = xml_get_attribute_int_with_subst(machine, elemnode, "defstate", -1);
 
@@ -474,7 +474,7 @@ layout_element::layout_element(running_machine &machine, xml_data_node &elemnode
 		if (newcomp.m_type == component::CTYPE_DOTMATRIX)
 			m_maxstate = 255;
 	}
-	
+
 	// determine the scale/offset for normalization
 	float xoffs = bounds.x0;
 	float yoffs = bounds.y0;
@@ -526,8 +526,8 @@ render_texture *layout_element::state_texture(int state)
 
 
 //-------------------------------------------------
-//  element_scale - scale an element by rendering 
-//  all the components at the appropriate 
+//  element_scale - scale an element by rendering
+//  all the components at the appropriate
 //  resolution
 //-------------------------------------------------
 
@@ -718,7 +718,7 @@ void layout_element::component::draw(running_machine &machine, bitmap_t &dest, c
 		case CTYPE_DOTMATRIX:
 			draw_dotmatrix(dest, bounds, state);
 			break;
-		
+
 		default:
 			throw emu_fatalerror("Unknown component type requested draw()");
 	}
@@ -726,7 +726,7 @@ void layout_element::component::draw(running_machine &machine, bitmap_t &dest, c
 
 
 //-------------------------------------------------
-//  draw_rect - draw a rectangle in the specified 
+//  draw_rect - draw a rectangle in the specified
 //  color
 //-------------------------------------------------
 
@@ -762,7 +762,7 @@ void layout_element::component::draw_rect(bitmap_t &dest, const rectangle &bound
 
 
 //-------------------------------------------------
-//  draw_disk - draw an ellipse in the specified 
+//  draw_disk - draw an ellipse in the specified
 //  color
 //-------------------------------------------------
 
@@ -888,7 +888,7 @@ void layout_element::component::draw_text(running_machine &machine, bitmap_t &de
 
 
 //-------------------------------------------------
-//  load_bitmap - load a PNG file with artwork for 
+//  load_bitmap - load a PNG file with artwork for
 //  a component
 //-------------------------------------------------
 
@@ -1083,7 +1083,7 @@ void layout_element::component::draw_led14seg(bitmap_t &dest, const rectangle &b
 
 
 //-------------------------------------------------
-//  draw_led14segsc - draw a 14-segment LCD with 
+//  draw_led14segsc - draw a 14-segment LCD with
 //  semicolon (2 extra segments)
 //-------------------------------------------------
 
@@ -1309,7 +1309,7 @@ void layout_element::component::draw_led16seg(bitmap_t &dest, const rectangle &b
 
 
 //-------------------------------------------------
-//  draw_led16segsc - draw a 16-segment LCD with 
+//  draw_led16segsc - draw a 16-segment LCD with
 //  semicolon (2 extra segments)
 //-------------------------------------------------
 
@@ -1432,7 +1432,7 @@ void layout_element::component::draw_led16segsc(bitmap_t &dest, const rectangle 
 
 
 //-------------------------------------------------
-//  draw_dotmatrix - draw a row of 8 dots for a 
+//  draw_dotmatrix - draw a row of 8 dots for a
 //  dotmatrix
 //-------------------------------------------------
 
@@ -1553,7 +1553,7 @@ void layout_element::component::draw_segment_diagonal_1(bitmap_t &dest, int minx
 
 //-------------------------------------------------
 //  draw_segment_diagonal_2 - draw a diagonal
-//  LED segment that looks like this: 
+//  LED segment that looks like this:
 //-------------------------------------------------
 
 void layout_element::component::draw_segment_diagonal_2(bitmap_t &dest, int minx, int maxx, int miny, int maxy, int width, rgb_t color)
@@ -1722,7 +1722,7 @@ layout_view::item *layout_view::first_item(item_layer layer) const
 
 
 //-------------------------------------------------
-//  recompute - recompute the bounds and aspect 
+//  recompute - recompute the bounds and aspect
 //  ratio of a view and all of its contained items
 //-------------------------------------------------
 
@@ -1895,13 +1895,13 @@ layout_view::item::~item()
 int layout_view::item::state() const
 {
 	int state = 0;
-	
+
 	assert(m_element != NULL);
-	
+
 	// if configured to an output, fetch the output value
 	if (m_output_name[0] != 0)
 		state = output_get_value(m_output_name);
-	
+
 	// if configured to an input, fetch the input value
 	else if (m_input_tag[0] != 0)
 	{

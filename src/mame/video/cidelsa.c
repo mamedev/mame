@@ -19,7 +19,7 @@ WRITE8_MEMBER( cidelsa_state::cdp1869_w )
 	case 4:
 		m_vis->out4_w(space, ma, data);
 		break;
-		
+
 	case 5:
 		m_vis->out5_w(space, ma, data);
 		break;

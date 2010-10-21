@@ -4,45 +4,45 @@ Magical Touch by Micro MFG
 Preliminary driver by Mariusz Wojcieszek
 
 Big daughter card
-silkscreend			2296
-				COMPONENT SIDE
-				EPROM/IO GAME BOARD
-				JNS-0001 REV-C
+silkscreend         2296
+                COMPONENT SIDE
+                EPROM/IO GAME BOARD
+                JNS-0001 REV-C
 
-sticker on back		
-				Warranty Void If Removed
-				Date: 07-30-1996
-				SER# MTC-COM-170065
+sticker on back
+                Warranty Void If Removed
+                Date: 07-30-1996
+                SER# MTC-COM-170065
 
-.u20	27c801	stickered	MTOUCH
-				ROM-0
-				U20
-				041296
-				MICRO
-				MFG.
-				COPYRIGHT (C)
+.u20    27c801  stickered   MTOUCH
+                ROM-0
+                U20
+                041296
+                MICRO
+                MFG.
+                COPYRIGHT (C)
 
-.u21	27c801	stickered	MTOUCH
-				ROM-1
-				U21
-				041296
-				MICRO
-				MFG.
-				COPYRIGHT (C)
+.u21    27c801  stickered   MTOUCH
+                ROM-1
+                U21
+                041296
+                MICRO
+                MFG.
+                COPYRIGHT (C)
 
-.u22	27c801	stickered	MTOUCH
-				ROM-2
-				U22
-				041296
-				MICRO
-				MFG.
-				COPYRIGHT (C)
+.u22    27c801  stickered   MTOUCH
+                ROM-2
+                U22
+                041296
+                MICRO
+                MFG.
+                COPYRIGHT (C)
 
-.u7	ds1225y-150		read as 2764
+.u7 ds1225y-150     read as 2764
 
-.u8	tibpal16l8-15		blue dot on it	checksum was 0
+.u8 tibpal16l8-15       blue dot on it  checksum was 0
 
-.u4	gal20v8b
+.u4 gal20v8b
 
 1.8432 MHz crystal
 18.00 Mhz Crystal
@@ -51,9 +51,9 @@ es488f d465 wf62225
 
 
 motherboard
-.u13	27c512			stickered	Warranty Void If Removed
-						Date: 07-30-1996
-						SER# MTC-MBD-170065
+.u13    27c512          stickered   Warranty Void If Removed
+                        Date: 07-30-1996
+                        SER# MTC-MBD-170065
 
 am386dx-40 ng80386dx-40
 ali m1429 a1 9504 ts6 ab3519
@@ -61,13 +61,13 @@ ali m1431 a2 9503 ts6ab0511b
 jetkey v5.0 fastest keyboard bios
 
 video card
-.u6 - unknown chip type		stickered	Warranty Void If Removed
-						Date: 07-30-1996
-						SER# MTC-VGA-170065
-				silkscreend	Trident Ver. D4.01E
-						(c)'95 Trident Microsystems
-						(C)'90 Phoenix Technologies
-						*605C61W6ANJDH009		* = a triangle character
+.u6 - unknown chip type     stickered   Warranty Void If Removed
+                        Date: 07-30-1996
+                        SER# MTC-VGA-170065
+                silkscreend Trident Ver. D4.01E
+                        (c)'95 Trident Microsystems
+                        (C)'90 Phoenix Technologies
+                        *605C61W6ANJDH009       * = a triangle character
 
 */
 

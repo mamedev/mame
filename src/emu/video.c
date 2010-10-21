@@ -1611,7 +1611,7 @@ int video_get_view_for_target(running_machine *machine, render_target *target, c
 			for (screen = screen_first(*machine); screen != NULL; screen = screen_next(screen))
 				if (index-- == 0)
 					break;
-		
+
 			/* find the first view with this screen and this screen only */
 			for (viewindex = 0; ; viewindex++)
 			{
@@ -2098,11 +2098,11 @@ void screen_device::reset_origin(int beamy, int beamx)
 	attotime curtime = timer_get_time(machine);
 	m_vblank_end_time = attotime_sub_attoseconds(curtime, beamy * m_scantime + beamx * m_pixeltime);
 	m_vblank_start_time = attotime_sub_attoseconds(m_vblank_end_time, m_vblank_period);
-	
+
 	// if we are resetting relative to (0,0) == VBLANK end, call the
 	// scanline 0 timer by hand now; otherwise, adjust it for the future
 	if (beamy == 0 && beamx == 0)
-		scanline0_callback(); 
+		scanline0_callback();
 	else
 		timer_adjust_oneshot(m_scanline0_timer, time_until_pos(0), 0);
 

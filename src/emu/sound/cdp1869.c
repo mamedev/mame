@@ -1,6 +1,6 @@
 /**********************************************************************
 
-	RCA CDP1869/1870/1876 Video Interface System (VIS) emulation
+    RCA CDP1869/1870/1876 Video Interface System (VIS) emulation
 
     Copyright MESS Team.
     Visit http://mamedev.org for licensing and usage restrictions.
@@ -23,7 +23,7 @@
 
 
 //**************************************************************************
-//	MACROS / CONSTANTS
+//  MACROS / CONSTANTS
 //**************************************************************************
 
 #define LOG 0
@@ -157,7 +157,7 @@ inline bool cdp1869_device::is_ntsc()
 
 
 //-------------------------------------------------
-//  read_page_ram_byte - read a page RAM byte at 
+//  read_page_ram_byte - read a page RAM byte at
 //  the given address
 //-------------------------------------------------
 
@@ -168,7 +168,7 @@ inline UINT8 cdp1869_device::read_page_ram_byte(offs_t pma)
 
 
 //-------------------------------------------------
-//  write_page_ram_byte - write a page RAM byte at 
+//  write_page_ram_byte - write a page RAM byte at
 //  the given address
 //-------------------------------------------------
 
@@ -179,7 +179,7 @@ inline void cdp1869_device::write_page_ram_byte(offs_t pma, UINT8 data)
 
 
 //-------------------------------------------------
-//  read_char_ram_byte - read a char RAM byte at 
+//  read_char_ram_byte - read a char RAM byte at
 //  the given address
 //-------------------------------------------------
 
@@ -197,7 +197,7 @@ inline UINT8 cdp1869_device::read_char_ram_byte(offs_t pma, offs_t cma, UINT8 pm
 
 
 //-------------------------------------------------
-//  write_char_ram_byte - write a char RAM byte at 
+//  write_char_ram_byte - write a char RAM byte at
 //  the given address
 //-------------------------------------------------
 
@@ -228,7 +228,7 @@ inline int cdp1869_device::read_pcb(offs_t pma, offs_t cma, UINT8 pmd)
 
 
 //-------------------------------------------------
-//  update_prd_changed_timer - 
+//  update_prd_changed_timer -
 //-------------------------------------------------
 
 inline void cdp1869_device::update_prd_changed_timer()
@@ -294,7 +294,7 @@ inline rgb_t cdp1869_device::get_rgb(int i, int c, int l)
 
 
 //-------------------------------------------------
-//	get_lines - get number of character lines
+//  get_lines - get number of character lines
 //-------------------------------------------------
 
 inline int cdp1869_device::get_lines()
@@ -315,7 +315,7 @@ inline int cdp1869_device::get_lines()
 
 
 //-------------------------------------------------
-//	get_pmemsize - get page memory size
+//  get_pmemsize - get page memory size
 //-------------------------------------------------
 
 inline UINT16 cdp1869_device::get_pmemsize(int cols, int rows)
@@ -330,7 +330,7 @@ inline UINT16 cdp1869_device::get_pmemsize(int cols, int rows)
 
 
 //-------------------------------------------------
-//	get_pma - get page memory address
+//  get_pma - get page memory address
 //-------------------------------------------------
 
 inline UINT16 cdp1869_device::get_pma()
@@ -347,7 +347,7 @@ inline UINT16 cdp1869_device::get_pma()
 
 
 //-------------------------------------------------
-//	get_pen - get pen for color bits
+//  get_pen - get pen for color bits
 //-------------------------------------------------
 
 inline int cdp1869_device::get_pen(int ccb0, int ccb1, int pcb)
@@ -581,7 +581,7 @@ void cdp1869_device::stream_generate(stream_sample_t **inputs, stream_sample_t *
 
 
 //-------------------------------------------------
-//	draw_line - draw character line
+//  draw_line - draw character line
 //-------------------------------------------------
 
 void cdp1869_device::draw_line(bitmap_t *bitmap, const rectangle *rect, int x, int y, UINT8 data, int color)
@@ -625,7 +625,7 @@ void cdp1869_device::draw_line(bitmap_t *bitmap, const rectangle *rect, int x, i
 
 
 //-------------------------------------------------
-//	draw_char - draw character
+//  draw_char - draw character
 //-------------------------------------------------
 
 void cdp1869_device::draw_char(bitmap_t *bitmap, const rectangle *rect, int x, int y, UINT16 pma)
@@ -1011,7 +1011,7 @@ void cdp1869_device::update_screen(bitmap_t *bitmap, const rectangle *cliprect)
 				int y = sy * height;
 
 				draw_char(bitmap, &screen_rect, x, y, addr);
-				
+
 				addr++;
 
 				if (addr == pmemsize) addr = 0;

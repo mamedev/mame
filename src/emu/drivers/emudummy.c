@@ -3,8 +3,8 @@
     emudummy.c
 
     Dummy driver file that references CPU devices which are in turn
-    referenced by devices in libemu.a. 
-    
+    referenced by devices in libemu.a.
+
     The reason we need this is due to link ordering issues with gcc
     if the actual drivers being linked don't reference these CPU
     devices. Since we link libcpu first, if libemu needs stuff from

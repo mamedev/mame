@@ -239,7 +239,7 @@ class render_screen_list
 	{
 		friend class simple_list<item>;
 		friend class render_screen_list;
-		
+
 	public:
 		// construction/destruction
 		item(screen_device &screen)
@@ -262,7 +262,7 @@ public:
 	// operations
 	void add(screen_device &screen) { m_list.append(*pool_alloc(m_list.pool(), item(screen))); }
 	void reset() { m_list.reset(); }
-	
+
 	// query
 	bool contains(screen_device &screen) const
 	{

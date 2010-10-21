@@ -2681,7 +2681,7 @@ static READ16_HANDLER( _32x_dreq_common_r )
 
 			current_fifo_read_pos++;
 
-		//	printf("reading FIFO!\n");
+		//  printf("reading FIFO!\n");
 
 			if (current_fifo_readblock == fifo_block_a && !fifo_block_a_full)
 				printf("Fifo block a isn't filled!\n");
@@ -2741,7 +2741,7 @@ static WRITE16_HANDLER( _32x_dreq_common_w )
 			dreq_src_addr[offset&1] = ((offset&1) == 0) ? (data & 0xff) : (data & 0xfffe);
 
 			//if((dreq_src_addr[0]<<16)|dreq_src_addr[1])
-			//	printf("DREQ set SRC = %08x\n",(dreq_src_addr[0]<<16)|dreq_src_addr[1]);
+			//  printf("DREQ set SRC = %08x\n",(dreq_src_addr[0]<<16)|dreq_src_addr[1]);
 
 			break;
 
@@ -2756,7 +2756,7 @@ static WRITE16_HANDLER( _32x_dreq_common_w )
 			dreq_dst_addr[offset&1] = ((offset&1) == 0) ? (data & 0xff) : (data & 0xffff);
 
 			//if((dreq_dst_addr[0]<<16)|dreq_dst_addr[1])
-			//	printf("DREQ set DST = %08x\n",(dreq_dst_addr[0]<<16)|dreq_dst_addr[1]);
+			//  printf("DREQ set DST = %08x\n",(dreq_dst_addr[0]<<16)|dreq_dst_addr[1]);
 
 			break;
 
@@ -2769,8 +2769,8 @@ static WRITE16_HANDLER( _32x_dreq_common_w )
 
 			dreq_size = data & 0xfffc;
 
-			//	if(dreq_size)
-			//		printf("DREQ set SIZE = %04x\n",dreq_size);
+			//  if(dreq_size)
+			//      printf("DREQ set SIZE = %04x\n",dreq_size);
 
 			break;
 
@@ -3208,7 +3208,7 @@ static READ16_HANDLER( _32x_common_vdp_regs_r )
 
 
 
-//	printf("_32x_68k_a15180_r (a15180) %04x\n",mem_mask);
+//  printf("_32x_68k_a15180_r (a15180) %04x\n",mem_mask);
 
 	// read needs authorization too I think, undefined behavior otherwise
 	switch (offset)
@@ -3382,7 +3382,7 @@ static WRITE16_HANDLER( _32x_common_vdp_regs_w )
 
 		case 0x0a/2:
 			// bit 0 is the framebuffer select, change is delayed until vblank;
-		//	_32x_a1518a_reg = (_32x_a1518a_reg & 0xfffe);
+		//  _32x_a1518a_reg = (_32x_a1518a_reg & 0xfffe);
 			if (ACCESSING_BITS_0_7)
 			{
 				_32x_fb_swap = data & 1;
@@ -4070,7 +4070,7 @@ static WRITE16_HANDLER( scd_a12002_memory_mode_w )
 static READ16_HANDLER( segacd_sub_memory_mode_r )
 {
 	return (segacd_ram_writeprotect_bits << 8) |
-	 	 /*(segacd_4meg_prgbank << 6) | */
+		 /*(segacd_4meg_prgbank << 6) | */
 		   (segacd_memory_priority_mode << 3) |
 		   (segacd_ram_mode << 2) |
 		   ((segacd_dmna) << 1) |
@@ -4097,9 +4097,9 @@ static WRITE16_HANDLER( segacd_sub_memory_mode_w )
 				{
 					if (segacd_dmna)
 					{
-					//	printf("sub ret\n");
-					//	segacd_ret = 1;
-					//	segacd_dmna = 0;
+					//  printf("sub ret\n");
+					//  segacd_ret = 1;
+					//  segacd_dmna = 0;
 						timer_adjust_oneshot(segacd_dmna_ret_timer, ATTOTIME_IN_USEC(100), 0);
 					}
 				}
@@ -4494,7 +4494,7 @@ static WRITE16_HANDLER( segacd_main_dataram_part1_w )
 
 static READ16_HANDLER( scd_hint_vector_r )
 {
-//	printf("read HINT offset %d\n", offset);
+//  printf("read HINT offset %d\n", offset);
 
 	switch (offset&1)
 	{
@@ -4545,13 +4545,13 @@ static TIMER_CALLBACK( segacd_gfx_conversion_timer_callback )
 /*
 static const gfx_layout sega_8x8_layout =
 {
-	8,8,
-	SEGACD_NUM_TILES16,
-	4,
-	{ 0,1,2,3 },
-	{ 8,12,0,4,24,28,16,20 },
-	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
-	8*32
+    8,8,
+    SEGACD_NUM_TILES16,
+    4,
+    { 0,1,2,3 },
+    { 8,12,0,4,24,28,16,20 },
+    { 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
+    8*32
 };
 */
 
@@ -4606,8 +4606,8 @@ static const gfx_layout sega_8x8_layout =
 
 #define _32x32_SEQUENCE_2 \
 		{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32, \
-     	8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32, \
- 	 16*32,17*32,18*32,19*32,20*32,21*32,22*32,23*32, \
+    	8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32, \
+	 16*32,17*32,18*32,19*32,20*32,21*32,22*32,23*32, \
 	 24*32,25*32, 26*32, 27*32, 28*32, 29*32, 30*32, 31*32}, \
 
 #define _32x32_SEQUENCE_2_FLIP \
@@ -5063,9 +5063,9 @@ void segacd_init_main_cpu( running_machine* machine )
 
 	/* as a temporary measure we use the MAME tilemaps, this is hideously inefficient as we have to mark the active one as
        dirty before each operation due to the RAM based tiles.  For the larger tilemaps this means we have to re-render a 4096x4096
-	   bitmap to the tilemap cache on each blit operation just to copy the few needed tiles out of it, needless to say, this is SLOW.
-	   Eventually the tilemaps will be replaced with a get_pixel function which will perform all the needed lookups on a per-pixel
-	   basis instead of re-rendering the whole thing */
+       bitmap to the tilemap cache on each blit operation just to copy the few needed tiles out of it, needless to say, this is SLOW.
+       Eventually the tilemaps will be replaced with a get_pixel function which will perform all the needed lookups on a per-pixel
+       basis instead of re-rendering the whole thing */
 	segacd_stampmap[0] = tilemap_create(machine, get_stampmap_16x16_1x1_tile_info, tilemap_scan_rows, 16, 16, 16, 16);
 	segacd_stampmap[1] = tilemap_create(machine, get_stampmap_32x32_1x1_tile_info, tilemap_scan_rows, 32, 32, 8, 8);
 	segacd_stampmap[2] = tilemap_create(machine, get_stampmap_16x16_16x16_tile_info, tilemap_scan_rows, 16, 16, 256, 256); // 128kb!
@@ -5534,17 +5534,17 @@ static WRITE16_HANDLER( segacd_stampsize_w )
 INLINE UINT8 read_pixel_from_stampmap( running_machine* machine, bitmap_t* srcbitmap, int x, int y)
 {
 /*
-	if (!srcbitmap)
-	{
-		return mame_rand(machine);
-	}
+    if (!srcbitmap)
+    {
+        return mame_rand(machine);
+    }
 
-	if (x >= srcbitmap->width) return 0;
-	if (y >= srcbitmap->height) return 0;
+    if (x >= srcbitmap->width) return 0;
+    if (y >= srcbitmap->height) return 0;
 
-	UINT16* cacheptr = BITMAP_ADDR16( srcbitmap, y, x);
+    UINT16* cacheptr = BITMAP_ADDR16( srcbitmap, y, x);
 
-	return cacheptr[0] & 0xf;
+    return cacheptr[0] & 0xf;
 */
 
 	switch (segacd_get_active_stampmap_tilemap()&3)
@@ -5820,9 +5820,9 @@ static ADDRESS_MAP_START( segacd_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0xff8004 ,0xff8005) AM_READWRITE(segacd_cdc_mode_address_r, segacd_cdc_mode_address_w)
 	AM_RANGE(0xff8006 ,0xff8007) AM_READWRITE(segacd_cdc_data_r, segacd_cdc_data_w)
-//	AM_RANGE(0xff8008, 0xff8009) // CDC Host Data
-//	AM_RANGE(0xff800a, 0xff800b) // CDC DMA Address
-//	AM_RANGE(0xff800c, 0xff800d) // Stopwatch timer
+//  AM_RANGE(0xff8008, 0xff8009) // CDC Host Data
+//  AM_RANGE(0xff800a, 0xff800b) // CDC DMA Address
+//  AM_RANGE(0xff800c, 0xff800d) // Stopwatch timer
 	AM_RANGE(0xff800e ,0xff800f) AM_READWRITE(segacd_comms_flags_r, segacd_comms_flags_subcpu_w)
 	AM_RANGE(0xff8010 ,0xff801f) AM_READWRITE(segacd_comms_sub_part1_r, segacd_comms_sub_part1_w)
 	AM_RANGE(0xff8020 ,0xff802f) AM_READWRITE(segacd_comms_sub_part2_r, segacd_comms_sub_part2_w)
@@ -5832,9 +5832,9 @@ static ADDRESS_MAP_START( segacd_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff8036, 0xff8037) AM_READWRITE(segacd_cdd_ctrl_r,segacd_cdd_ctrl_w)
 	AM_RANGE(0xff8038, 0xff8041) AM_READ8(segacd_cdd_rx_r,0xffff)
 	AM_RANGE(0xff8042, 0xff804b) AM_WRITE8(segacd_cdd_tx_w,0xffff)
-//	AM_RANGE(0xff804c, 0xff804d) // Font Color
-//	AM_RANGE(0xff804e, 0xff804f) // Font bit
-//	AM_RANGE(0xff8050, 0xff8057) // Font data (read only)
+//  AM_RANGE(0xff804c, 0xff804d) // Font Color
+//  AM_RANGE(0xff804e, 0xff804f) // Font bit
+//  AM_RANGE(0xff8050, 0xff8057) // Font data (read only)
 	AM_RANGE(0xff8058, 0xff8059) AM_READWRITE(segacd_stampsize_r, segacd_stampsize_w) // Stamp size
 	AM_RANGE(0xff805a, 0xff805b) AM_READWRITE(segacd_stampmap_base_address_r, segacd_stampmap_base_address_w) // Stamp map base address
 	AM_RANGE(0xff805c, 0xff805d) AM_READWRITE(segacd_imagebuffer_vcell_size_r, segacd_imagebuffer_vcell_size_w)// Image buffer V cell size
@@ -5843,10 +5843,10 @@ static ADDRESS_MAP_START( segacd_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xff8062, 0xff8063) AM_READWRITE(segacd_imagebuffer_hdot_size_r, segacd_imagebuffer_hdot_size_w) // Image buffer H dot size
 	AM_RANGE(0xff8064, 0xff8065) AM_READWRITE(segacd_imagebuffer_vdot_size_r, segacd_imagebuffer_vdot_size_w ) // Image buffer V dot size
 	AM_RANGE(0xff8066, 0xff8067) AM_WRITE(segacd_trace_vector_base_address_w)// Trace vector base address
-//	AM_RANGE(0xff8068, 0xff8069) // Subcode address
+//  AM_RANGE(0xff8068, 0xff8069) // Subcode address
 
-//	AM_RANGE(0xff8100, 0xff817f) // Subcode buffer area
-//	AM_RANGE(0xff8180, 0xff81ff) // mirror of subcode buffer area
+//  AM_RANGE(0xff8100, 0xff817f) // Subcode buffer area
+//  AM_RANGE(0xff8180, 0xff81ff) // mirror of subcode buffer area
 
 ADDRESS_MAP_END
 
