@@ -756,10 +756,10 @@ int wininput_vkey_for_mame_code(input_code code)
 
 
 //============================================================
-//  osd_customize_mapping_list
+//  customize_input_type_list
 //============================================================
 
-void osd_customize_input_type_list(input_type_desc *typelist)
+void windows_osd_interface::customize_input_type_list(input_type_desc *typelist)
 {
 	input_type_desc *typedesc;
 

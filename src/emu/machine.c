@@ -138,7 +138,7 @@ static char giant_string_buffer[65536] = { 0 };
 //  running_machine - constructor
 //-------------------------------------------------
 
-running_machine::running_machine(const machine_config &_config, core_options &options, bool exit_to_game_select)
+running_machine::running_machine(const machine_config &_config, osd_interface &osd, core_options &options, bool exit_to_game_select)
 	: m_regionlist(m_respool),
 	  m_devicelist(m_respool),
 	  config(&_config),
@@ -176,6 +176,7 @@ running_machine::running_machine(const machine_config &_config, core_options &op
 	  m_logerror_list(NULL),
 	  m_scheduler(*this),
 	  m_options(options),
+	  m_osd(osd),
 	  m_basename(_config.gamedrv().name),
 	  m_current_phase(MACHINE_PHASE_PREINIT),
 	  m_paused(false),
@@ -284,7 +285,7 @@ void running_machine::start()
 	m_soft_reset_timer = timer_alloc(this, static_soft_reset, NULL);
 
 	// init the osd layer
-	osd_init(this);
+	m_osd.init(*this);
 
 	// initialize the base time (needed for doing record/playback)
 	time(&m_base_time);

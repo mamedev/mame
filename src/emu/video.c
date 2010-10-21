@@ -467,7 +467,7 @@ void video_frame_update(running_machine *machine, int debug)
 
 	/* ask the OSD to update */
 	g_profiler.start(PROFILER_BLIT);
-	osd_update(machine, !debug && skipped_it);
+	machine->osd().update(!debug && skipped_it);
 	g_profiler.stop();
 
 	/* perform tasks for this frame */

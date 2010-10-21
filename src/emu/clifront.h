@@ -47,7 +47,7 @@
     FUNCTION PROTOTYPES
 ***************************************************************************/
 
-int cli_execute(int argc, char **argv, const options_entry *osd_options);
+int cli_execute(int argc, char **argv, osd_interface &osd, const options_entry *osd_options);
 
 /* informational functions */
 int cli_info_listxml(core_options *options, const char *gamename);

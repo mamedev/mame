@@ -1916,7 +1916,8 @@ void device_debug::exception_hook(int exception)
 
 void device_debug::instruction_hook(offs_t curpc)
 {
-	debugcpu_private *global = m_device.machine->debugcpu_data;
+	running_machine &machine = *m_device.machine;
+	debugcpu_private *global = machine.debugcpu_data;
 
 	// note that we are in the debugger code
 	global->within_instruction_hook = true;
@@ -1949,9 +1950,9 @@ void device_debug::instruction_hook(offs_t curpc)
 			// update every 100 steps until we are within 200 of the end
 			else if ((m_flags & DEBUG_FLAG_STEPPING_OUT) == 0 && (m_stepsleft < 200 || m_stepsleft % 100 == 0))
 			{
-				m_device.machine->debug_view().update_all();
-				m_device.machine->debug_view().flush_osd_updates();
-				debugger_refresh_display(m_device.machine);
+				machine.debug_view().update_all();
+				machine.debug_view().flush_osd_updates();
+				debugger_refresh_display(&machine);
 			}
 		}
 	}
@@ -1960,16 +1961,16 @@ void device_debug::instruction_hook(offs_t curpc)
 	if (global->execution_state != EXECUTION_STATE_STOPPED && (m_flags & (DEBUG_FLAG_STOP_TIME | DEBUG_FLAG_STOP_PC | DEBUG_FLAG_LIVE_BP)) != 0)
 	{
 		// see if we hit a target time
-		if ((m_flags & DEBUG_FLAG_STOP_TIME) != 0 && attotime_compare(timer_get_time(m_device.machine), m_stoptime) >= 0)
+		if ((m_flags & DEBUG_FLAG_STOP_TIME) != 0 && attotime_compare(timer_get_time(&machine), m_stoptime) >= 0)
 		{
-			debug_console_printf(m_device.machine, "Stopped at time interval %.1g\n", attotime_to_double(timer_get_time(m_device.machine)));
+			debug_console_printf(&machine, "Stopped at time interval %.1g\n", attotime_to_double(timer_get_time(&machine)));
 			global->execution_state = EXECUTION_STATE_STOPPED;
 		}
 
 		// check the temp running breakpoint and break if we hit it
 		else if ((m_flags & DEBUG_FLAG_STOP_PC) != 0 && m_stopaddr == curpc)
 		{
-			debug_console_printf(m_device.machine, "Stopped at temporary breakpoint %X on CPU '%s'\n", m_stopaddr, m_device.tag());
+			debug_console_printf(&machine, "Stopped at temporary breakpoint %X on CPU '%s'\n", m_stopaddr, m_device.tag());
 			global->execution_state = EXECUTION_STATE_STOPPED;
 		}
 
@@ -1981,7 +1982,7 @@ void device_debug::instruction_hook(offs_t curpc)
 	// if we are supposed to halt, do it now
 	if (global->execution_state == EXECUTION_STATE_STOPPED)
 	{
-		int firststop = true;
+		bool firststop = true;
 
 		// load comments if we haven't yet
 		if (!global->comments_loaded)
@@ -1998,7 +1999,7 @@ void device_debug::instruction_hook(offs_t curpc)
 		global->visiblecpu = &m_device;
 
 		// update all views
-		m_device.machine->debug_view().update_all();
+		machine.debug_view().update_all();
 		debugger_refresh_display(m_device.machine);
 
 		// wait for the debugger; during this time, disable sound output
@@ -2006,20 +2007,20 @@ void device_debug::instruction_hook(offs_t curpc)
 		while (global->execution_state == EXECUTION_STATE_STOPPED)
 		{
 			// flush any pending updates before waiting again
-			m_device.machine->debug_view().flush_osd_updates();
+			machine.debug_view().flush_osd_updates();
 
 			// clear the memory modified flag and wait
 			global->memory_modified = false;
-			if (m_device.machine->debug_flags & DEBUG_FLAG_OSD_ENABLED)
-				osd_wait_for_debugger(&m_device, firststop);
-			else if (m_device.machine->debug_flags & DEBUG_FLAG_ENABLED)
-				debugint_wait_for_debugger(&m_device, firststop);
+			if (machine.debug_flags & DEBUG_FLAG_OSD_ENABLED)
+				machine.osd().wait_for_debugger(m_device, firststop);
+			else if (machine.debug_flags & DEBUG_FLAG_ENABLED)
+				debugint_wait_for_debugger(m_device, firststop);
 			firststop = false;
 
 			// if something modified memory, update the screen
 			if (global->memory_modified)
 			{
-				m_device.machine->debug_view().update_all(DVT_DISASSEMBLY);
+				machine.debug_view().update_all(DVT_DISASSEMBLY);
 				debugger_refresh_display(m_device.machine);
 			}
 
@@ -2027,7 +2028,7 @@ void device_debug::instruction_hook(offs_t curpc)
 			process_source_file(m_device.machine);
 
 			// if an event got scheduled, resume
-			if (m_device.machine->scheduled_event_pending())
+			if (machine.scheduled_event_pending())
 				global->execution_state = EXECUTION_STATE_RUNNING;
 		}
 		sound_mute(m_device.machine, false);

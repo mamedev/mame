@@ -1586,10 +1586,10 @@ int sdlinput_should_hide_mouse(running_machine *machine)
 
 
 //============================================================
-//  osd_customize_inputport_list
+//  customize_input_type_list
 //============================================================
 
-void osd_customize_input_type_list(input_type_desc *typelist)
+void sdl_osd_interface::customize_input_type_list(input_type_desc *typelist)
 {
 	int mameid_code ,ui_code;
 	input_type_desc *typedesc;

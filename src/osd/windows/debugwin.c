@@ -262,29 +262,20 @@ static void smart_show_all(BOOL show);
 
 
 //============================================================
-//  osd_init_debugger
+//  wait_for_debugger
 //============================================================
 
-void osd_init_debugger(running_machine *machine)
-{
-}
-
-
-//============================================================
-//  osd_wait_for_debugger
-//============================================================
-
-void osd_wait_for_debugger(running_device *device, int firststop)
+void windows_osd_interface::wait_for_debugger(running_device &device, bool firststop)
 {
 	MSG message;
 
 	// create a console window
 	if (main_console == NULL)
-		console_create_window(device->machine);
+		console_create_window(&machine());
 
 	// update the views in the console to reflect the current CPU
 	if (main_console != NULL)
-		console_set_cpu(device);
+		console_set_cpu(&device);
 
 	// when we are first stopped, adjust focus to us
 	if (firststop && main_console != NULL)
@@ -299,7 +290,7 @@ void osd_wait_for_debugger(running_device *device, int firststop)
 	smart_show_all(TRUE);
 
 	// run input polling to ensure that our status is in sync
-	wininput_poll(device->machine);
+	wininput_poll(&machine());
 
 	// get and process messages
 	GetMessage(&message, NULL, 0, 0);
@@ -317,7 +308,7 @@ void osd_wait_for_debugger(running_device *device, int firststop)
 
 		// process everything else
 		default:
-			winwindow_dispatch_message(device->machine, &message);
+			winwindow_dispatch_message(&machine(), &message);
 			break;
 	}
 

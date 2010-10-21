@@ -4187,6 +4187,7 @@ src/mame/video/zerozone.c svneol=native#text/plain
 src/mame/video/zodiack.c svneol=native#text/plain
 src/osd/osdcomm.h svneol=native#text/plain
 src/osd/osdcore.h svneol=native#text/plain
+src/osd/osdepend.c svneol=native#text/plain
 src/osd/osdepend.h svneol=native#text/plain
 src/osd/osdmini/minidir.c svneol=native#text/plain
 src/osd/osdmini/minifile.c svneol=native#text/plain

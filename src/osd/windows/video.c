@@ -210,25 +210,23 @@ win_monitor_info *winvideo_monitor_from_handle(HMONITOR hmonitor)
 
 
 //============================================================
-//  osd_update
+//  update
 //============================================================
 
-void osd_update(running_machine *machine, int skip_redraw)
+void windows_osd_interface::update(bool skip_redraw)
 {
-	win_window_info *window;
-
 	// ping the watchdog on each update
 	winmain_watchdog_ping();
 
 	// if we're not skipping this redraw, update all windows
 	if (!skip_redraw)
-		for (window = win_window_list; window != NULL; window = window->next)
+		for (win_window_info *window = win_window_list; window != NULL; window = window->next)
 			winwindow_video_window_update(window);
 
 	// poll the joystick values here
-	winwindow_process_events(machine, TRUE);
-	wininput_poll(machine);
-	check_osd_inputs(machine);
+	winwindow_process_events(&machine(), TRUE);
+	wininput_poll(&machine());
+	check_osd_inputs(&machine());
 }
 
 

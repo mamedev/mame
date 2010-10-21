@@ -537,21 +537,21 @@ static void configuration_save(running_machine *machine, int config_type, xml_da
 
 
 //============================================================
-//  osd_init_debugger
+//  sdl_osd_interface::init_debugger
 //============================================================
 
-void osd_init_debugger(running_machine *machine)
+void sdl_osd_interface::init_debugger()
 {
 	/* register callbacks */
-	config_register(machine, "debugger", configuration_load, configuration_save);
+	config_register(&machine(), "debugger", configuration_load, configuration_save);
 }
 
 
 //============================================================
-//  osd_wait_for_debugger
+//  wait_for_debugger
 //============================================================
 
-void osd_wait_for_debugger(running_device *device, int firststop)
+void sdl_osd_interface::wait_for_debugger(running_device &device, bool firststop)
 {
 	win_i *dmain = get_first_win_i(WIN_TYPE_MAIN);
 
@@ -560,7 +560,7 @@ void osd_wait_for_debugger(running_device *device, int firststop)
 	{
 		// GTK init should probably be done earlier
 		gtk_init(0, 0);
-		debugmain_init(device->machine);
+		debugmain_init(&machine());
 
         // Resize the main window
         for (int i = 0; i < windowStateCount; i++)
@@ -580,9 +580,9 @@ void osd_wait_for_debugger(running_device *device, int firststop)
 
             switch (windowStateArray[i].type)
             {
-                case WIN_TYPE_MEMORY: memorywin_new(device->machine); break;
-                case WIN_TYPE_DISASM: disasmwin_new(device->machine); break;
-                case WIN_TYPE_LOG:    logwin_new(device->machine); break;
+                case WIN_TYPE_MEMORY: memorywin_new(&machine()); break;
+                case WIN_TYPE_DISASM: disasmwin_new(&machine()); break;
+                case WIN_TYPE_LOG:    logwin_new(&machine()); break;
                 default: break;
             }
 
@@ -592,7 +592,7 @@ void osd_wait_for_debugger(running_device *device, int firststop)
 	}
 
 	// update the views in the console to reflect the current CPU
-	debugmain_set_cpu(device);
+	debugmain_set_cpu(&device);
 
 	debugwin_show(1);
 	gtk_main_iteration();
@@ -1269,17 +1269,23 @@ on_memoryview_key_press_event             (GtkWidget   *widget,
 
 #else
 
+#include <SDL/SDL.h>
+#include <SDL/SDL_version.h>
+
 #include "emu.h"
+#include "osdepend.h"
+#include "osdsdl.h"
+
+ // win32 stubs for linking
+void sdl_osd_interface::init_debugger()
+{
+}
+
+void sdl_osd_interface::wait_for_debugger(running_device &device, bool firststop)
+{
+}
 
 // win32 stubs for linking
-void osd_init_debugger(running_machine *machine)
-{
-}
-
-void osd_wait_for_debugger(running_device *device, int firststop)
-{
-}
-
 void debugwin_update_during_game(running_machine *machine)
 {
 }

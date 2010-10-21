@@ -99,20 +99,23 @@ int main(int argc, char *argv[])
 
 
 //============================================================
-//  osd_init
+//  init
 //============================================================
 
-void osd_init(running_machine *machine)
+void mini_osd_interface::init(running_machine &machine)
 {
+	// call our parent
+	osd_interface::init(machine);
+
 	// initialize the video system by allocating a rendering target
-	our_target = machine->render().target_alloc();
+	our_target = machine.render().target_alloc();
 
 	// nothing yet to do to initialize sound, since we don't have any
-	// sound updates are handled by osd_update_audio_stream() below
+	// sound updates are handled by update_audio_stream() below
 
 	// initialize the input system by adding devices
 	// let's pretend like we have a keyboard device
-	keyboard_device = input_device_add(machine, DEVICE_CLASS_KEYBOARD, "Keyboard", NULL);
+	keyboard_device = input_device_add(&machine, DEVICE_CLASS_KEYBOARD, "Keyboard", NULL);
 	if (keyboard_device == NULL)
 		fatalerror("Error creating keyboard device");
 
@@ -134,46 +137,26 @@ void osd_init(running_machine *machine)
 
 
 //============================================================
-//  osd_init_debugger
-//============================================================
-
-void osd_init_debugger(running_machine *machine)
-{
-}
-
-
-//============================================================
-//  osd_wait_for_debugger
-//============================================================
-
-void osd_wait_for_debugger(running_device *device, int firststop)
-{
-	// we don't have a debugger, so we just return here
-}
-
-
-//============================================================
 //  osd_update
 //============================================================
 
-void osd_update(running_machine *machine, int skip_redraw)
+void mini_osd_interface::update(bool skip_redraw)
 {
-	const render_primitive_list *primlist;
-	int minwidth, minheight;
-
 	// get the minimum width/height for the current layout
+	int minwidth, minheight;
 	our_target->compute_minimum_size(minwidth, minheight);
 
 	// make that the size of our target
 	our_target->render_target_set_bounds(minwidth, minheight);
 
 	// get the list of primitives for the target at the current size
-	primlist = our_target->get_primitives();
+	const render_primitive_list *primlist = our_target->get_primitives();
 
 	// lock them, and then render them
-	osd_lock_acquire(primlist->lock);
+	primlist->acquire_locK();
+
 	// do the drawing here
-	osd_lock_release(primlist->lock);
+	primlist->release_lock();
 
 	// after 5 seconds, exit
 	if (attotime_compare(timer_get_time(machine), attotime_make(5, 0)) > 0)
@@ -182,10 +165,10 @@ void osd_update(running_machine *machine, int skip_redraw)
 
 
 //============================================================
-//  osd_update_audio_stream
+//  update_audio_stream
 //============================================================
 
-void osd_update_audio_stream(running_machine *machine, INT16 *buffer, int samples_this_frame)
+void mini_osd_interface::update_audio_stream(const INT16 *buffer, int samples_this_frame)
 {
 	// if we had actual sound output, we would copy the
 	// interleaved stereo samples to our sound stream
@@ -193,10 +176,10 @@ void osd_update_audio_stream(running_machine *machine, INT16 *buffer, int sample
 
 
 //============================================================
-//  osd_set_mastervolume
+//  set_mastervolume
 //============================================================
 
-void osd_set_mastervolume(int attenuation)
+void mini_osd_interface::set_mastervolume(int attenuation)
 {
 	// if we had actual sound output, we would adjust the global
 	// volume in response to this function
@@ -204,10 +187,10 @@ void osd_set_mastervolume(int attenuation)
 
 
 //============================================================
-//  osd_customize_input_type_list
+//  customize_input_type_list
 //============================================================
 
-void osd_customize_input_type_list(input_type_desc *typelist)
+void mini_osd_interface::customize_input_type_list(input_type_desc *typelist)
 {
 	// This function is called on startup, before reading the
 	// configuration from disk. Scan the list, and change the

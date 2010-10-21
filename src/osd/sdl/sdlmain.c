@@ -303,7 +303,10 @@ int main(int argc, char *argv[])
 	}
 #endif
 
-	res = cli_execute(argc, argv, mame_sdl_options);
+	{
+		sdl_osd_interface osd;
+		res = cli_execute(argc, argv, osd, mame_sdl_options);
+	}
 
 #ifdef MALLOC_DEBUG
 	{
@@ -334,10 +337,28 @@ static void output_oslog(running_machine &machine, const char *buffer)
 
 
 //============================================================
+//  constructor
+//============================================================
+
+sdl_osd_interface::sdl_osd_interface()
+{
+}
+
+
+//============================================================
+//  destructor
+//============================================================
+
+sdl_osd_interface::~sdl_osd_interface()
+{
+}
+
+
+//============================================================
 //  osd_exit
 //============================================================
 
-static void osd_exit(running_machine &machine)
+void sdl_osd_interface::osd_exit(running_machine &machine)
 {
 
 	if (!SDLMAME_INIT_IN_WORKER_THREAD)
@@ -462,22 +483,25 @@ static void osd_sdl_info(void)
 
 
 //============================================================
-//  osd_init
+//  init
 //============================================================
 
-void osd_init(running_machine *machine)
+void sdl_osd_interface::init(running_machine &machine)
 {
+	// call our parent
+	osd_interface::init(machine);
+
 	const char *stemp;
 
 	// Some driver options - must be before audio init!
-	stemp = options_get_string(machine->options(), SDLOPTION_AUDIODRIVER);
+	stemp = options_get_string(machine.options(), SDLOPTION_AUDIODRIVER);
 	if (stemp != NULL && strcmp(stemp, SDLOPTVAL_AUTO) != 0)
 	{
 		mame_printf_verbose("Setting SDL audiodriver '%s' ...\n", stemp);
 		osd_setenv(SDLENV_AUDIODRIVER, stemp, 1);
 	}
 
-	stemp = options_get_string(machine->options(), SDLOPTION_VIDEODRIVER);
+	stemp = options_get_string(machine.options(), SDLOPTION_VIDEODRIVER);
 	if (stemp != NULL && strcmp(stemp, SDLOPTVAL_AUTO) != 0)
 	{
 		mame_printf_verbose("Setting SDL videodriver '%s' ...\n", stemp);
@@ -486,7 +510,7 @@ void osd_init(running_machine *machine)
 
 	if (SDL_VERSION_ATLEAST(1,3,0))
 	{
-		stemp = options_get_string(machine->options(), SDLOPTION_RENDERDRIVER);
+		stemp = options_get_string(machine.options(), SDLOPTION_RENDERDRIVER);
 		if (stemp != NULL && strcmp(stemp, SDLOPTVAL_AUTO) != 0)
 		{
 			mame_printf_verbose("Setting SDL renderdriver '%s' ...\n", stemp);
@@ -499,7 +523,7 @@ void osd_init(running_machine *machine)
      */
 	/* FIXME: move lib loading code from drawogl.c here */
 
-	stemp = options_get_string(machine->options(), SDLOPTION_GL_LIB);
+	stemp = options_get_string(machine.options(), SDLOPTION_GL_LIB);
 	if (stemp != NULL && strcmp(stemp, SDLOPTVAL_AUTO) != 0)
 	{
 		osd_setenv("SDL_VIDEO_GL_DRIVER", stemp, 1);
@@ -507,7 +531,7 @@ void osd_init(running_machine *machine)
 	}
 
 	/* get number of processors */
-	stemp = options_get_string(machine->options(), SDLOPTION_NUMPROCESSORS);
+	stemp = options_get_string(machine.options(), SDLOPTION_NUMPROCESSORS);
 
 	sdl_num_processors = 0;
 
@@ -536,35 +560,35 @@ void osd_init(running_machine *machine)
 		osd_sdl_info();
 	}
 	// must be before sdlvideo_init!
-	machine->add_notifier(MACHINE_NOTIFY_EXIT, osd_exit);
+	machine.add_notifier(MACHINE_NOTIFY_EXIT, osd_exit);
 
 	defines_verbose();
 
 	if (!SDLMAME_HAS_DEBUGGER)
-		if (machine->debug_flags & DEBUG_FLAG_OSD_ENABLED)
+		if (machine.debug_flags & DEBUG_FLAG_OSD_ENABLED)
 		{
 			mame_printf_error("sdlmame: -debug not supported on X11-less builds\n\n");
-			osd_exit(*machine);
+			osd_exit(machine);
 			exit(-1);
 		}
 
-	if (sdlvideo_init(machine))
+	if (sdlvideo_init(&machine))
 	{
-		osd_exit(*machine);
+		osd_exit(machine);
 		mame_printf_error("sdlvideo_init: Initialization failed!\n\n\n");
 		fflush(stderr);
 		fflush(stdout);
 		exit(-1);
 	}
 
-	sdlinput_init(machine);
+	sdlinput_init(&machine);
 
-	sdlaudio_init(machine);
+	sdlaudio_init(&machine);
 
-	sdloutput_init(machine);
+	sdloutput_init(&machine);
 
-	if (options_get_bool(machine->options(), SDLOPTION_OSLOG))
-		machine->add_logerror_callback(output_oslog);
+	if (options_get_bool(machine.options(), SDLOPTION_OSLOG))
+		machine.add_logerror_callback(output_oslog);
 
 #if (SDL_VERSION_ATLEAST(1,3,0))
 	SDL_EventState(SDL_TEXTINPUT, SDL_TRUE);

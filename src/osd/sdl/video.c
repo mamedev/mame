@@ -326,10 +326,10 @@ sdl_monitor_info *sdlvideo_monitor_from_handle(UINT32 hmonitor)
 
 
 //============================================================
-//  osd_update
+//  update
 //============================================================
 
-void osd_update(running_machine *machine, int skip_redraw)
+void sdl_osd_interface::update(bool skip_redraw)
 {
 	sdl_window_info *window;
 
@@ -338,16 +338,16 @@ void osd_update(running_machine *machine, int skip_redraw)
 	{
 //      profiler_mark(PROFILER_BLIT);
 		for (window = sdl_window_list; window != NULL; window = window->next)
-			sdlwindow_video_window_update(machine, window);
+			sdlwindow_video_window_update(&machine(), window);
 //      profiler_mark(PROFILER_END);
 	}
 
 	// poll the joystick values here
-	sdlinput_poll(machine);
-	check_osd_inputs(machine);
+	sdlinput_poll(&machine());
+	check_osd_inputs(&machine());
 
-	if ((machine->debug_flags & DEBUG_FLAG_OSD_ENABLED) != 0)
-		debugwin_update_during_game(machine);
+	if ((machine().debug_flags & DEBUG_FLAG_OSD_ENABLED) != 0)
+		debugwin_update_during_game(&machine());
 }
 
 

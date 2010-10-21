@@ -1439,7 +1439,7 @@ static void update_views(void)
 }
 
 
-void debugint_wait_for_debugger(running_device *device, int firststop)
+void debugint_wait_for_debugger(running_device &device, bool firststop)
 {
 
 	if (firststop && list == NULL)
@@ -1447,28 +1447,28 @@ void debugint_wait_for_debugger(running_device *device, int firststop)
 		DView *dv;
 		render_target *target;
 
-		target = &device->machine->render().ui_target();
+		target = &device.machine->render().ui_target();
 
 		//set_view_by_name(target, "Debug");
 
-		dv = dview_alloc(target, device->machine, DVT_DISASSEMBLY, VIEW_STATE_FOLLOW_CPU);
+		dv = dview_alloc(target, device.machine, DVT_DISASSEMBLY, VIEW_STATE_FOLLOW_CPU);
 		dv->editor.active = TRUE;
-		dv->editor.container = &device->machine->render().ui_container();
-		dv = dview_alloc(target, device->machine, DVT_STATE, VIEW_STATE_FOLLOW_CPU);
-		dv = dview_alloc(target, device->machine, DVT_CONSOLE, VIEW_STATE_FOLLOW_CPU);
+		dv->editor.container = &device.machine->render().ui_container();
+		dv = dview_alloc(target, device.machine, DVT_STATE, VIEW_STATE_FOLLOW_CPU);
+		dv = dview_alloc(target, device.machine, DVT_CONSOLE, VIEW_STATE_FOLLOW_CPU);
 		dview_set_title(dv, "Console");
 		dv->editor.active = TRUE;
-		dv->editor.container = &device->machine->render().ui_container();
+		dv->editor.container = &device.machine->render().ui_container();
 		set_focus_view(dv);
 	}
 
-	followers_set_cpu(device);
+	followers_set_cpu(&device);
 
-	//ui_update_and_render(device->machine, &device->machine->render().ui_container()());
+	//ui_update_and_render(device.machine, &device.machine->render().ui_container()());
 	update_views();
-	osd_update(device->machine, FALSE);
-	handle_menus(device->machine);
-	handle_mouse(device->machine);
+	device.machine->osd().update(false);
+	handle_menus(device.machine);
+	handle_mouse(device.machine);
 	//osd_sleep(osd_ticks_per_second()/60);
 
 }

@@ -96,7 +96,7 @@ extern const char build_version[];
 /* ----- core system management ----- */
 
 /* execute as configured by the OPTION_GAMENAME option on the specified options */
-int mame_execute(core_options *options);
+int mame_execute(osd_interface &osd, core_options *options);
 
 /* accesses the core_options for the currently running emulation */
 core_options *mame_options(void);

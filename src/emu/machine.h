@@ -182,6 +182,7 @@ class gfx_element;
 class colortable_t;
 class debug_view_manager;
 class render_manager;
+class osd_interface;
 
 typedef struct _mame_private mame_private;
 typedef struct _cpuexec_private cpuexec_private;
@@ -337,7 +338,7 @@ class running_machine : public bindable_object
 
 public:
 	// construction/destruction
-	running_machine(const machine_config &config, core_options &options, bool exit_to_game_select = false);
+	running_machine(const machine_config &config, osd_interface &osd, core_options &options, bool exit_to_game_select = false);
 	~running_machine();
 
 	// fetch items by name
@@ -360,6 +361,7 @@ public:
 	bool new_driver_pending() const { return (m_new_driver_pending != NULL); }
 	const char *new_driver_name() const { return m_new_driver_pending->name; }
 	device_scheduler &scheduler() { return m_scheduler; }
+	osd_interface &osd() const { return m_osd; }
 
 	// immediate operations
 	int run(bool firstrun);
@@ -493,6 +495,7 @@ private:
 
 	device_scheduler		m_scheduler;		// scheduler object
 	core_options &			m_options;
+	osd_interface &			m_osd;
 
 	astring					m_context;			// context string
 	astring					m_basename;			// basename used for game-related paths
