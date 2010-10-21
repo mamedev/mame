@@ -675,7 +675,8 @@ static READ8_HANDLER(mk4_printer_r)
 static ADDRESS_MAP_START( aristmk4_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x07ff) AM_RAM AM_BASE(&mkiv_vram) // video ram -  chips U49 / U50
 	AM_RANGE(0x0800, 0x17ff) AM_RAM
-	AM_RANGE(0x1800, 0x1801) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
+	AM_RANGE(0x1800, 0x1800) AM_DEVWRITE("crtc", mc6845_address_w)
+	AM_RANGE(0x1801, 0x1801) AM_DEVREADWRITE("crtc", mc6845_register_r, mc6845_register_w)
 	AM_RANGE(0x1c00, 0x1cff) AM_WRITE(mk4_printer_w)
 	AM_RANGE(0x1900, 0x19ff) AM_READ(mk4_printer_r)
 	AM_RANGE(0x2000, 0x3fff) AM_ROM  // graphics rom map
