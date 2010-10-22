@@ -99,6 +99,8 @@ public:
 	UINT8 read(UINT16 offset);
 	void write(UINT16 offset, UINT8 data);
 
+	sound_stream *m_stream;
+
 protected:
 	enum
 	{
@@ -133,7 +135,6 @@ protected:
 
 	UINT8	m_chip_type;
 	void (*m_irq_cb)(running_device *device, int state);
-	sound_stream *m_stream;
 
 	UINT8	m_fifo_a[0x400];
 	UINT8	m_fifo_b[0x400];
@@ -145,6 +146,8 @@ protected:
 	int	m_fifo_a_rdptr, m_fifo_b_rdptr;
 	int	m_fifo_a_wrptr, m_fifo_b_wrptr;
 	int 	m_fifo_cap_a, m_fifo_cap_b;
+
+	emu_timer *m_sync_timer;
 };
 
 
