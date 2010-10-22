@@ -38,15 +38,15 @@
 
   CRT 260:
   *Megatouch Video (c)1994?
-  *Megatouch II (c)1995
+  Megatouch II (c)1994
   Megatouch III (c)1995
   Megatouch III Tournament Edition (c)1996
   Megatouch IV (c)1996
   Megatouch IV Tournament Edition (c)1996
   Super Megatouch IV (c) 1996  (rom labels 9255-41-0x, see below)
   Super Megatouch IV Tournament Edition (c) 1996
-  *Megatouch 5 (c)1997
-  *Megatouch 5 Tournament Edition (c)1997
+  Megatouch 5 (c)1997
+  Megatouch 5 Tournament Edition (c)1997
   Megatouch 6 (c)1998
   *Megatouch 7 Encore (c)2000
 
@@ -90,7 +90,7 @@ Not all regional versions are available for each Megatouch series
 
   Notes/ToDo:
   - offset for top V9938 layer is hardcoded, probably should be taken from V9938 setup
-  - blinking on Meagtouch title screen is probably incorrect
+  - blinking on Megatouch title screen is probably incorrect
   - clean up V9938 interrupt implementation
   - finish inputs, dsw, outputs (lamps)
   - problem with registering touches on the bottom of the screen (currently hacked to work)
@@ -1215,7 +1215,7 @@ ROM_START( pitbossm ) /* Dallas DS1204V security key attached to CRT-254 connect
 	ROM_RELOAD(     0x70000, 0x10000)
 
 
-	ROM_REGION( 0xc0000, "extra", 0 ) // extra data / extra banks?
+	ROM_REGION( 0xc0000, "extra", 0 ) // question roms
 	ROM_LOAD( "qs9243-00-01_u7-r0",  0x00000, 0x40000, CRC(35f4ca46) SHA1(87917b3017f505fae65d6bfa2c7d6fb503c2da6a) ) /* These 3 roms are on CRT-256 sattalite PCB */
 	ROM_LOAD( "qs9243-00-01_u6-r0",  0x40000, 0x40000, CRC(606f1656) SHA1(7f1e3a698a34d3c3b8f9f2cd8d5224b6c096e941) )
 	ROM_LOAD( "qs9243-00-01_u5-r0",  0x80000, 0x40000, CRC(590a1565) SHA1(b80ea967b6153847b2594e9c59bfe87559022b6c) )
@@ -1233,7 +1233,7 @@ ROM_START( pitbossma ) /* Unprotected or patched??  The manual shows a DS1204 ke
 	ROM_RELOAD(     0x70000, 0x10000)
 
 
-	ROM_REGION( 0xc0000, "extra", 0 ) // extra data / extra banks?
+	ROM_REGION( 0xc0000, "extra", 0 ) // question roms
 	ROM_LOAD( "qs9243-00-01_u7-r0",  0x00000, 0x40000, CRC(35f4ca46) SHA1(87917b3017f505fae65d6bfa2c7d6fb503c2da6a) ) /* These 3 roms are on CRT-256 sattalite PCB */
 	ROM_LOAD( "qs9243-00-01_u6-r0",  0x40000, 0x40000, CRC(606f1656) SHA1(7f1e3a698a34d3c3b8f9f2cd8d5224b6c096e941) )
 	ROM_LOAD( "qs9243-00-01_u5-r0",  0x80000, 0x40000, CRC(590a1565) SHA1(b80ea967b6153847b2594e9c59bfe87559022b6c) )
@@ -1250,7 +1250,7 @@ ROM_START( pbst30 ) /* Dallas DS1204V security key attached to CRT-254 connected
 	ROM_LOAD( "9234-10-01_u15-r0", 0x60000, 0x10000, CRC(9fbd8582) SHA1(c0f68c8a7cdca34c8736cefc71767c421bcaba8a) )
 
 
-	ROM_REGION( 0xc0000, "extra", 0 ) // extra data / extra banks?
+	ROM_REGION( 0xc0000, "extra", 0 ) // question roms
 	ROM_LOAD( "qs9234-01_u7-r0",  0x00000, 0x40000, CRC(c0534aaa) SHA1(4b3cbf03f29fd5b4b8fd423e73c0c8147692fa75) ) /* These 3 roms are on CRT-256 sattalite PCB */
 	ROM_LOAD( "qs9234-01_u6-r0",  0x40000, 0x40000, CRC(fe2cd934) SHA1(623011dc53ed6eefefa0725dba6fd1efee2077c1) )
 	ROM_LOAD( "qs9234-01_u5-r0",  0x80000, 0x40000, CRC(293fe305) SHA1(8a551ae8fb4fa4bf329128be1bfd6f1c3ff5a366) )
@@ -1267,7 +1267,7 @@ ROM_START( pbst30b ) /* Dallas DS1204V security key attached to CRT-254 connecte
 	ROM_LOAD( "9234-00-01_u15-r0a", 0x60000, 0x10000, CRC(f10f0d39) SHA1(2b5d5a93adb5251e09160b10c067b6e70289f608) )
 
 
-	ROM_REGION( 0xc0000, "extra", 0 ) // extra data / extra banks?
+	ROM_REGION( 0xc0000, "extra", 0 ) // question roms
 	ROM_LOAD( "qs9234-01_u7-r0",  0x00000, 0x40000, CRC(c0534aaa) SHA1(4b3cbf03f29fd5b4b8fd423e73c0c8147692fa75) ) /* These 3 roms are on CRT-256 sattalite PCB */
 	ROM_LOAD( "qs9234-01_u6-r0",  0x40000, 0x40000, CRC(fe2cd934) SHA1(623011dc53ed6eefefa0725dba6fd1efee2077c1) )
 	ROM_LOAD( "qs9234-01_u5-r0",  0x80000, 0x40000, CRC(293fe305) SHA1(8a551ae8fb4fa4bf329128be1bfd6f1c3ff5a366) )
@@ -1354,6 +1354,18 @@ SC3981-0A.u51 = PALCE16V8H-25
 SC3943.u20    = ATF16V8B25PC
 
 */
+
+ROM_START( megat2 ) /* Dallas DS1204U-3 security key labeled 9255-10-01-U5-R0 */
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD( "qs9235-01_u5oru32-r0b", 0x000000, 0x080000, CRC(f7ecd49b) SHA1(34c1293da7304e8a46a96f1dbd7add3291afe3fc) )
+	ROM_RELOAD(                        0x080000, 0x080000)
+	ROM_LOAD( "qs9235-01_u6oru36-r0",  0x100000, 0x080000, CRC(0a358743) SHA1(cc7c1b75e391204a7bdae2e1cecd9b55b572f8d5) )
+	ROM_RELOAD(                        0x180000, 0x080000)
+	ROM_LOAD( "qs9235-01_u7oru37-r0",  0x200000, 0x080000, CRC(16643f83) SHA1(347af99f535a8b473c8780067d5132add7fa0d8c) )
+	ROM_RELOAD(                        0x280000, 0x080000)
+	ROM_LOAD( "9255-01-06_u38-r0g",    0x300000, 0x080000, CRC(51b8160a) SHA1(f2dd44ff3bd62c86c385b5e1438c560947f6c253) )
+	ROM_RELOAD(                        0x380000, 0x080000)
+ROM_END
 
 ROM_START( megat3 ) /* Dallas DS1204V security key at U5 labeled 9255-20-01 U5-RO1 C1995 MII */
 	ROM_REGION( 0x400000, "maincpu", 0 )
@@ -1684,13 +1696,25 @@ static DRIVER_INIT(pbst30)
 
 static DRIVER_INIT(pbst30b)
 {
-	static const UINT8 megat3_ds1204_key[8] =
+	static const UINT8 pbst30b_ds1204_key[8] =
 		{ 0xf0, 0xaa, 0x0f, 0x0f, 0x55, 0x55, 0xff, 0xab };
 
-	static const UINT8 megat3_ds1204_nvram[16] =
+	static const UINT8 pbst30b_ds1204_nvram[16] =
 		{ 0xa9, 0xdb, 0x41, 0xf8, 0xe4, 0x42, 0x20, 0x6e, 0xde, 0xaf, 0x4f, 0x046, 0x3d, 0x55, 0x44, 0x00 };
 
-	ds1204_init(machine, megat3_ds1204_key, megat3_ds1204_nvram);
+	ds1204_init(machine, pbst30b_ds1204_key, pbst30b_ds1204_nvram);
+
+};
+
+static DRIVER_INIT(megat2)
+{
+	static const UINT8 pitbosmt_ds1204_key[8] =
+		{ 0xf0, 0xaa, 0x0f, 0x0f, 0x55, 0x55, 0xff, 0xab };
+
+	static const UINT8 pitbosmt_ds1204_nvram[16] =
+		{ 0x00, 0xfe, 0x03, 0x03, 0x08, 0x00, 0xa2, 0x03, 0x4b, 0x07, 0x00, 0xe6, 0x02, 0xd3, 0x05, 0x00 }; 
+
+	ds1204_init(machine, pitbosmt_ds1204_key, pitbosmt_ds1204_nvram);
 
 };
 
@@ -1793,6 +1817,7 @@ GAME( 1994, pitbossm,  0,         meritm_crt250_questions, pitbossm, pitbossm, R
 GAME( 1994, pitbossma, pitbossm,  meritm_crt250_questions, pitbossa, 0,        ROT0, "Merit", "Pit Boss Megastar (9243-00-01)", GAME_IMPERFECT_GRAPHICS )
 
 /* CRT 260 */
+GAME( 1994, megat2,    0,      meritm_crt260, meritm_crt260, megat2,   ROT0, "Merit", "Pit Boss Megatouch II (9255-10-06 ROG, California version)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, megat3,    0,      meritm_crt260, meritm_crt260, megat3,   ROT0, "Merit", "Megatouch III (9255-20-01 RON, Standard version)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1995, megat3a,   megat3, meritm_crt260, meritm_crt260, megat3,   ROT0, "Merit", "Megatouch III (9255-20-01 ROF, Standard version)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, megat3ca,  megat3, meritm_crt260, meritm_crt260, megat3,   ROT0, "Merit", "Megatouch III (9255-20-06 RON, California version)", GAME_IMPERFECT_GRAPHICS )

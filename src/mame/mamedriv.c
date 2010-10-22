@@ -9241,6 +9241,7 @@ Other Sun games
 	DRIVER( pitbossma )	/* (c) 1994 Merit */
 	DRIVER( pbst30 )	/* (c) 1994 Merit */
 	DRIVER( pbst30b )	/* (c) 1993 Merit */
+	DRIVER( megat2 )	/* (c) 1994 Merit */
 	DRIVER( megat3 )	/* (c) 1996 Merit */
 	DRIVER( megat3a )	/* (c) 1996 Merit */
 	DRIVER( megat3ca )	/* (c) 1996 Merit */
