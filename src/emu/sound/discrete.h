@@ -275,13 +275,21 @@
  * DISCRETE_LOGIC_NOR3(NODE,INP0,INP1,INP2)
  * DISCRETE_LOGIC_NOR4(NODE,INP0,INP1,INP2,INP3)
  * DISCRETE_LOGIC_XOR(NODE,INP0,INP1)
- * DISCRETE_LOGIC_NXOR(NODE,INP0,INP1)
+ * DISCRETE_LOGIC_XNOR(NODE,INP0,INP1)
  * DISCRETE_LOGIC_DFLIPFLOP(NODE,RESET,SET,CLK,INP)
  * DISCRETE_LOGIC_JKFLIPFLOP(NODE,RESET,SET,CLK,J,K)
  * DISCRETE_LOGIC_SHIFT(NODE,INP0,RESET,CLK,SIZE,OPTIONS)
  * DISCRETE_MULTIPLEX2(NODE,ADDR,INP0,INP1)
  * DISCRETE_MULTIPLEX4(NODE,ADDR,INP0,INP1,INP2,INP3)
  * DISCRETE_MULTIPLEX8(NODE,ADDR,INP0,INP1,INP2,INP3,INP4,INP5,INP6,INP7)
+ * DISCRETE_XTIME_BUFFER(NODE,IN0,LOW,HIGH)
+ * DISCRETE_XTIME_INVERTER(NODE,IN0,LOW,HIGH)
+ * DISCRETE_XTIME_AND(NODE,IN0,IN1,LOW,HIGH)
+ * DISCRETE_XTIME_NAND(NODE,IN0,IN1,LOW,HIGH)
+ * DISCRETE_XTIME_OR(NODE,IN0,IN1,LOW,HIGH)
+ * DISCRETE_XTIME_NOR(NODE,IN0,IN1,LOW,HIGH)
+ * DISCRETE_XTIME_XOR(NODE,IN0,IN1,LOW,HIGH)
+ * DISCRETE_XTIME_XNOR(NODE,IN0,IN1,LOW,HIGH)
  *
  * DISCRETE_FILTER1(NODE,ENAB,INP0,FREQ,TYPE)
  * DISCRETE_FILTER2(NODE,ENAB,INP0,FREQ,DAMP,TYPE)
@@ -1300,6 +1308,10 @@
  *                         bit number static value,
  *                         output voltage (logic high) static value)
  *
+ * Note: This module can decode x_time from counters, etc.
+ *       If you set the output voltage to 0, then 0/1 with x_time will be output.
+ *       Otherwise it will be used as energy based on the output voltage.
+ *
  *  Example config lines
  *
  *     DISCRETE_BIT_DECODE(NODE_03,7,0,5)
@@ -1331,7 +1343,7 @@
  * DISCRETE_LOGIC_OR   - Logic OR gate (3 & 4 input also available)
  * DISCRETE_LOGIC_NOR  - Logic NOR gate (3 & 4 input also available)
  * DISCRETE_LOGIC_XOR  - Logic XOR gate
- * DISCRETE_LOGIC_NXOR - Logic NXOR gate
+ * DISCRETE_LOGIC_XNOR - Logic NXOR gate
  *
  *                        .------------.
  *                        |            |
@@ -1362,6 +1374,34 @@
  *
  *  Node output is always either 0.0 or 1.0 any input value !=0.0 is
  *  taken as a logic 1.
+ *
+ ***********************************************************************
+ *
+ * DISCRETE_XTIME_BUFFER
+ * DISCRETE_XTIME_INVERTER
+ * DISCRETE_XTIME_AND
+ * DISCRETE_XTIME_NAND
+ * DISCRETE_XTIME_OR
+ * DISCRETE_XTIME_NOR
+ * DISCRETE_XTIME_XOR
+ * DISCRETE_XTIME_XNOR
+ *
+ *  Declaration syntax
+ *
+ *     DISCRETE_XTIME_xxx(name of node,
+ *      (xxx=INV/AND/etc)
+ *                        input0 node or static value,
+ *                        [input1 node or static value],
+ *                        logic Low voltage (static value),
+ *                        logic High voltage (static value))
+ *
+ * These modules all take 0/1 with x_time data and perform the logic
+ * while keeping and using the x_time anti-alaising data.
+ * If both logic Low and High are set to 0, the 0/1 + x_time data
+ * will be output.  Otherwise the Low/High voltages will be used
+ * to convert the x_time to energy.
+ *
+ * EXAMPLES: see Mario, Donkey Kong Jr
  *
  ***********************************************************************
  *
@@ -3685,6 +3725,7 @@ enum
 #define DISC_LS624_OUT_SQUARE				0x01
 #define DISC_LS624_OUT_ENERGY				0x02
 #define DISC_LS624_OUT_LOGIC				0x03
+#define DISC_LS624_OUT_LOGIC_X				0x08
 #define DISC_LS624_OUT_COUNT_F				0x04
 #define DISC_LS624_OUT_COUNT_R				0x05
 #define DISC_LS624_OUT_COUNT_F_X			0x06
@@ -4302,6 +4343,10 @@ enum
 	DST_OP_AMP_1SHT,	/* Op Amp One Shot */
 	DST_TVCA_OP_AMP,	/* Triggered Op Amp Voltage controlled  amplifier circuits */
 	DST_VCA,			/* IC Voltage controlled  amplifiers */
+	DST_XTIME_BUFFER,
+	DST_XTIME_AND,
+	DST_XTIME_OR,
+	DST_XTIME_XOR,
 
 	/* from disc_flt.c */
 	/* generic modules */
@@ -4375,6 +4420,8 @@ enum
 #define DISCRETE_SOUND_START(name) const discrete_sound_block name##_discrete_interface[] = {
 #define DISCRETE_SOUND_END                                              { NODE_00, DSS_NULL     , 0, { NODE_NC }, { 0 } ,NULL  ,"DISCRETE_SOUND_END" }  };
 
+/*      Module Name                                                       out,  enum value,      #in,   {variable inputs},              {static inputs},    data pointer,   "name" */
+
 /* from disc_inp.c */
 #define DISCRETE_ADJUSTMENT(NODE,MIN,MAX,LOGLIN,TAG)	                { NODE, DSS_ADJUSTMENT  , 7, { NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC }, { MIN,MAX,LOGLIN,0   ,0   ,100  }, TAG   , "DISCRETE_ADJUSTMENT" },
 #define DISCRETE_ADJUSTMENTX(NODE,MIN,MAX,LOGLIN,TAG,PMIN,PMAX)         { NODE, DSS_ADJUSTMENT  , 7, { NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC }, { MIN,MAX,LOGLIN,0   ,PMIN,PMAX }, TAG   , "DISCRETE_ADJUSTMENTX"  },
@@ -4425,8 +4472,8 @@ enum
 #define DISCRETE_INVERT(NODE,INP0)                                      { NODE, DST_GAIN        , 3, { INP0,NODE_NC,NODE_NC }, { INP0,-1,0 }, NULL, "DISCRETE_INVERT" },
 #define DISCRETE_LOGIC_INVERT(NODE,INP0)                                { NODE, DST_LOGIC_INV   , 1, { INP0 }, { INP0 }, NULL, "DISCRETE_LOGIC_INVERT" },
 
-#define DISCRETE_BIT_DECODE(NODE, INP, BIT_N, VOUT)                     { NODE, DST_BITS_DECODE , 3, { INP,NODE_NC,NODE_NC,NODE_NC }, { INP,BIT_N,BIT_N, VOUT }, NULL, "DISCRETE_BIT_DECODE" },
-#define DISCRETE_BITS_DECODE(NODE, INP, BIT_FROM, BIT_TO, VOUT)         { NODE, DST_BITS_DECODE , 4, { INP,NODE_NC,NODE_NC,NODE_NC }, { INP,BIT_FROM,BIT_TO, VOUT }, NULL, "DISCRETE_BITS_DECODE" },
+#define DISCRETE_BIT_DECODE(NODE, INP, BIT_N, VOUT)                     { NODE, DST_BITS_DECODE , 4, { INP,NODE_NC,NODE_NC,NODE_NC }, { INP,BIT_N,BIT_N,VOUT }, NULL, "DISCRETE_BIT_DECODE" },
+#define DISCRETE_BITS_DECODE(NODE, INP, BIT_FROM, BIT_TO, VOUT)         { NODE, DST_BITS_DECODE , 4, { INP,NODE_NC,NODE_NC,NODE_NC }, { INP,BIT_FROM,BIT_TO,VOUT }, NULL, "DISCRETE_BITS_DECODE" },
 
 #define DISCRETE_LOGIC_AND(NODE,INP0,INP1)                              { NODE, DST_LOGIC_AND   , 4, { INP0,INP1,NODE_NC,NODE_NC }, { INP0,INP1,1.0,1.0 }, NULL, "DISCRETE_LOGIC_AND" },
 #define DISCRETE_LOGIC_AND3(NODE,INP0,INP1,INP2)                        { NODE, DST_LOGIC_AND   , 4, { INP0,INP1,INP2,NODE_NC }, { INP0,INP1,INP2,1.0 }, NULL, "DISCRETE_LOGIC_AND3" },
@@ -4441,7 +4488,7 @@ enum
 #define DISCRETE_LOGIC_NOR3(NODE,INP0,INP1,INP2)                        { NODE, DST_LOGIC_NOR   , 4, { INP0,INP1,INP2,NODE_NC }, { INP0,INP1,INP2,0.0 }, NULL, "DISCRETE_LOGIC_NOR3" },
 #define DISCRETE_LOGIC_NOR4(NODE,INP0,INP1,INP2,INP3)                   { NODE, DST_LOGIC_NOR   , 4, { INP0,INP1,INP2,INP3 }, { INP0,INP1,INP2,INP3 }, NULL, "DISCRETE_LOGIC_NOR4" },
 #define DISCRETE_LOGIC_XOR(NODE,INP0,INP1)                              { NODE, DST_LOGIC_XOR   , 2, { INP0,INP1 }, { INP0,INP1 }, NULL, "DISCRETE_LOGIC_XOR" },
-#define DISCRETE_LOGIC_NXOR(NODE,INP0,INP1)                             { NODE, DST_LOGIC_NXOR  , 2, { INP0,INP1 }, { INP0,INP1 }, NULL, "DISCRETE_LOGIC_NXOR" },
+#define DISCRETE_LOGIC_XNOR(NODE,INP0,INP1)                             { NODE, DST_LOGIC_NXOR  , 2, { INP0,INP1 }, { INP0,INP1 }, NULL, "DISCRETE_LOGIC_XNOR" },
 #define DISCRETE_LOGIC_DFLIPFLOP(NODE,RESET,SET,CLK,INP)                { NODE, DST_LOGIC_DFF   , 4, { RESET,SET,CLK,INP }, { RESET,SET,CLK,INP }, NULL, "DISCRETE_LOGIC_DFLIPFLOP" },
 #define DISCRETE_LOGIC_JKFLIPFLOP(NODE,RESET,SET,CLK,J,K)               { NODE, DST_LOGIC_JKFF  , 5, { RESET,SET,CLK,J,K }, { RESET,SET,CLK,J,K }, NULL, "DISCRETE_LOGIC_JKFLIPFLOP" },
 #define DISCRETE_LOGIC_SHIFT(NODE,INP0,RESET,CLK,SIZE,OPTIONS)          { NODE, DST_LOGIC_SHIFT , 5, { INP0,RESET,CLK,NODE_NC,NODE_NC }, { INP0,RESET,CLK,SIZE,OPTIONS }, NULL, "DISCRETE_LOGIC_SHIFT" },
@@ -4480,6 +4527,14 @@ enum
 #define DISCRETE_OP_AMP_ONESHOT(NODE,TRIG,INFO)                         { NODE, DST_OP_AMP_1SHT , 1, { TRIG }, { TRIG }, INFO, "DISCRETE_OP_AMP_ONESHOT" },
 #define DISCRETE_OP_AMP_TRIG_VCA(NODE,TRG0,TRG1,TRG2,IN0,IN1,INFO)      { NODE, DST_TVCA_OP_AMP , 5, { TRG0,TRG1,TRG2,IN0,IN1 }, { TRG0,TRG1,TRG2,IN0,IN1 }, INFO, "DISCRETE_OP_AMP_TRIG_VCA" },
 #define DISCRETE_VCA(NODE,ENAB,IN0,CTRL,TYPE)                           { NODE, DST_VCA         , 4, { ENAB,IN0,CTRL,NODE_NC }, { ENAB,IN0,CTRL,TYPE }, NULL, "DISCRETE_VCA" },
+#define DISCRETE_XTIME_BUFFER(NODE,IN0,LOW,HIGH)                        { NODE, DST_XTIME_BUFFER, 4, { IN0,LOW,HIGH,NODE_NC }, { IN0,LOW,HIGH,0 }, NULL, "DISCRETE_XTIME_BUFFER" },
+#define DISCRETE_XTIME_INVERTER(NODE,IN0,LOW,HIGH)                      { NODE, DST_XTIME_BUFFER, 4, { IN0,LOW,HIGH,NODE_NC }, { IN0,LOW,HIGH,1 }, NULL, "DISCRETE_XTIME_INVERTER" },
+#define DISCRETE_XTIME_AND(NODE,IN0,IN1,LOW,HIGH)                       { NODE, DST_XTIME_AND,    5, { IN0,IN1,LOW,HIGH,NODE_NC }, { IN0,IN1,LOW,HIGH,0 }, NULL, "DISCRETE_XTIME_AND" },
+#define DISCRETE_XTIME_NAND(NODE,IN0,IN1,LOW,HIGH)                      { NODE, DST_XTIME_AND,    5, { IN0,IN1,LOW,HIGH,NODE_NC }, { IN0,IN1,LOW,HIGH,1 }, NULL, "DISCRETE_XTIME_NAND" },
+#define DISCRETE_XTIME_OR(NODE,IN0,IN1,LOW,HIGH)                        { NODE, DST_XTIME_OR,     5, { IN0,IN1,LOW,HIGH,NODE_NC }, { IN0,IN1,LOW,HIGH,0 }, NULL, "DISCRETE_XTIME_OR" },
+#define DISCRETE_XTIME_NOR(NODE,IN0,IN1,LOW,HIGH)                       { NODE, DST_XTIME_OR,     5, { IN0,IN1,LOW,HIGH,NODE_NC }, { IN0,IN1,LOW,HIGH,1 }, NULL, "DISCRETE_XTIME_NOR" },
+#define DISCRETE_XTIME_XOR(NODE,IN0,IN1,LOW,HIGH)                       { NODE, DST_XTIME_XOR,    5, { IN0,IN1,LOW,HIGH,NODE_NC }, { IN0,IN1,LOW,HIGH,0 }, NULL, "DISCRETE_XTIME_XOR" },
+#define DISCRETE_XTIME_XNOR(NODE,IN0,IN1,LOW,HIGH)                      { NODE, DST_XTIME_XNOR,   5, { IN0,IN1,LOW,HIGH,NODE_NC }, { IN0,IN1,LOW,HIGH,1 }, NULL, "DISCRETE_XTIME_XNOR" },
 
 /* from disc_flt.c */
 /* generic modules */

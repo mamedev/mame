@@ -276,6 +276,10 @@ static const discrete_module module_list[] =
 	{ DST_OP_AMP_1SHT ,"DST_OP_AMP_1SHT" , 1 ,sizeof(struct dst_op_amp_1sht_context) ,dst_op_amp_1sht_reset ,dst_op_amp_1sht_step ,NULL                  ,NULL                 },
 	{ DST_TVCA_OP_AMP ,"DST_TVCA_OP_AMP" , 1 ,sizeof(struct dst_tvca_op_amp_context) ,dst_tvca_op_amp_reset ,dst_tvca_op_amp_step ,NULL                  ,NULL                 },
 	{ DST_VCA         ,"DST_VCA"         , 1 ,0                                      ,NULL                  ,NULL                 ,NULL                  ,NULL                 },
+	{ DST_XTIME_BUFFER,"DST_XTIME_BUFFER", 1 ,0                                      ,NULL                  ,dst_xtime_buffer_step,NULL                  ,NULL                 },
+	{ DST_XTIME_AND   ,"DST_XTIME_AND"   , 1 ,0                                      ,NULL                  ,dst_xtime_and_step   ,NULL                  ,NULL                 },
+	{ DST_XTIME_OR    ,"DST_XTIME_OR"    , 1 ,0                                      ,NULL                  ,dst_xtime_or_step    ,NULL                  ,NULL                 },
+	{ DST_XTIME_XOR   ,"DST_XTIME_XOR"   , 1 ,0                                      ,NULL                  ,dst_xtime_xor_step   ,NULL                  ,NULL                 },
 
 	/* from disc_flt.c */
 	/* Generic modules */
@@ -996,7 +1000,7 @@ static int dbufptr = 2;
 static double *getDoublePtr(double val)
 {
 	int i;
-	for (i=0; i<dbufptr; i+=1)
+	for (i=0; i < dbufptr; i += 1)
 	{
 		if (dbuf[i] == val)
 		{

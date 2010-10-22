@@ -1951,6 +1951,9 @@ static DISCRETE_STEP(dsd_ls629)
 		case DISC_LS624_OUT_LOGIC:
 				node->output[0] = context->flip_flop;
 			break;
+		case DISC_LS624_OUT_LOGIC_X:
+				node->output[0] = context->flip_flop  + x_time;
+			break;
 		case DISC_LS624_OUT_COUNT_F_X:
 			node->output[0] = count_f ? count_f + x_time : count_f;
 			break;
