@@ -435,7 +435,7 @@ static void disasmview_update_checks(win_i *info)
 {
 	DView *disasm;
 	assert(info != NULL);
-	assert(info->type == WIN_TYPE_MAIN);
+	// assert(info->type == WIN_TYPE_MAIN);
 
 	disasm = get_view(info, DVT_DISASSEMBLY);
 
@@ -493,14 +493,14 @@ static void configuration_load(running_machine *machine, int config_type, xml_da
 	if (parentnode == NULL)
 		return;
 
-    /* configuration load */
+	/* configuration load */
 	int i = 0;
 	for (wnode = xml_get_sibling(parentnode->child, "window"); wnode != NULL; wnode = xml_get_sibling(wnode->next, "window"))
-    {
-        windowStateArray[i].loadFromXmlDataNode(wnode);
-        i++;
-    }
-    windowStateCount = i;
+	{
+		windowStateArray[i].loadFromXmlDataNode(wnode);
+		i++;
+	}
+	windowStateCount = i;
 }
 
 //============================================================
@@ -516,24 +516,24 @@ static void configuration_save(running_machine *machine, int config_type, xml_da
 	// Loop over all the nodes
 	for(win_i *p = win_list; p != NULL; p = p->next)
 	{
-	    /* create a node */
-	    xml_data_node *debugger_node;
-	    debugger_node = xml_add_child(parentnode, "window", NULL);
+		/* create a node */
+		xml_data_node *debugger_node;
+		debugger_node = xml_add_child(parentnode, "window", NULL);
 
-	    xml_set_attribute_int(debugger_node, "type", p->type);
+		xml_set_attribute_int(debugger_node, "type", p->type);
 
-	    if (debugger_node != NULL)
-	    {
-	        int x, y;
-	        gtk_window_get_position(GTK_WINDOW(p->win), &x, &y);
-            xml_set_attribute_int(debugger_node, "position_x", x);
-            xml_set_attribute_int(debugger_node, "position_y", y);
+		if (debugger_node != NULL)
+		{
+			int x, y;
+			gtk_window_get_position(GTK_WINDOW(p->win), &x, &y);
+			xml_set_attribute_int(debugger_node, "position_x", x);
+			xml_set_attribute_int(debugger_node, "position_y", y);
 
-	        gtk_window_get_size(GTK_WINDOW(p->win), &x, &y);
-            xml_set_attribute_int(debugger_node, "size_x", x);
-            xml_set_attribute_int(debugger_node, "size_y", y);
-        }
-    }
+			gtk_window_get_size(GTK_WINDOW(p->win), &x, &y);
+			xml_set_attribute_int(debugger_node, "size_x", x);
+			xml_set_attribute_int(debugger_node, "size_y", y);
+		}
+	}
 }
 
 
@@ -563,33 +563,36 @@ void sdl_osd_interface::wait_for_debugger(running_device &device, bool firststop
 		gtk_init(0, 0);
 		debugmain_init(&machine());
 
-        // Resize the main window
-        for (int i = 0; i < windowStateCount; i++)
-        {
-            if (windowStateArray[i].type == WIN_TYPE_MAIN)
-            {
-                gtk_window_move(GTK_WINDOW(win_list->win), windowStateArray[i].positionX, windowStateArray[i].positionY);
-                gtk_window_resize(GTK_WINDOW(win_list->win), windowStateArray[i].sizeX, windowStateArray[i].sizeY);
-            }
-        }
+		// Resize the main window
+		for (int i = 0; i < windowStateCount; i++)
+		{
+			if (windowStateArray[i].type == WIN_TYPE_MAIN)
+			{
+				gtk_window_move(GTK_WINDOW(win_list->win), windowStateArray[i].positionX, windowStateArray[i].positionY);
+				gtk_window_resize(GTK_WINDOW(win_list->win), windowStateArray[i].sizeX, windowStateArray[i].sizeY);
+			}
+		}
 
-        // Respawn and reposition every other window
-        for (int i = 0; i < windowStateCount; i++)
-        {
-            if (!windowStateArray[i].type || windowStateArray[i].type == WIN_TYPE_MAIN)
-                continue;
+		// Respawn and reposition every other window
+		for (int i = 0; i < windowStateCount; i++)
+		{
+			if (!windowStateArray[i].type || windowStateArray[i].type == WIN_TYPE_MAIN)
+			    continue;
 
-            switch (windowStateArray[i].type)
-            {
-                case WIN_TYPE_MEMORY: memorywin_new(&machine()); break;
-                case WIN_TYPE_DISASM: disasmwin_new(&machine()); break;
-                case WIN_TYPE_LOG:    logwin_new(&machine()); break;
-                default: break;
-            }
+			switch (windowStateArray[i].type)
+			{
+				case WIN_TYPE_MEMORY: memorywin_new(&machine()); break;
+				case WIN_TYPE_DISASM: disasmwin_new(&machine()); break;
+				case WIN_TYPE_LOG:    logwin_new(&machine()); break;
+				default: break;
+			}
 
-            gtk_window_move(GTK_WINDOW(win_list->win), windowStateArray[i].positionX, windowStateArray[i].positionY);
-            gtk_window_resize(GTK_WINDOW(win_list->win), windowStateArray[i].sizeX, windowStateArray[i].sizeY);
-        }
+			gtk_window_move(GTK_WINDOW(win_list->win), windowStateArray[i].positionX, windowStateArray[i].positionY);
+			gtk_window_resize(GTK_WINDOW(win_list->win), windowStateArray[i].sizeX, windowStateArray[i].sizeY);
+		}
+
+		// Bring focus back to the main window
+		gtk_window_present(GTK_WINDOW(get_first_win_i(WIN_TYPE_MAIN)->win));
 	}
 
 	// update the views in the console to reflect the current CPU
@@ -1163,9 +1166,9 @@ on_set_breakpoint_at_cursor_activate(GtkWidget *win)
 }
 
 gboolean
-on_disasm_button_press_event           (GtkWidget       *widget,
-                                        GdkEventButton  *event,
-                                        gpointer         user_data)
+on_disasm_button_press_event(GtkWidget       *widget,
+                             GdkEventButton  *event,
+                             gpointer         user_data)
 {
 	DView *info = (DView *) widget;
 	LOG(("gef %f %f %p %p\n", event->x, event->y, info, widget));
@@ -1185,17 +1188,17 @@ on_disasm_button_press_event           (GtkWidget       *widget,
 }
 
 gboolean
-on_memoryview_button_press_event           (GtkWidget       *widget,
-                                        GdkEventButton  *event,
-                                        gpointer         user_data)
+on_memoryview_button_press_event(GtkWidget       *widget,
+                                 GdkEventButton  *event,
+                                 gpointer         user_data)
 {
 	return on_disasm_button_press_event(widget, event, user_data);
 }
 
 gboolean
-on_memoryview_key_press_event             (GtkWidget   *widget,
-                                                        GdkEventKey *event,
-                                                        gpointer     user_data)
+on_memoryview_key_press_event(GtkWidget   *widget,
+                              GdkEventKey *event,
+                              gpointer     user_data)
 {
 	DView *info = (DView *) widget;
 	//printf("%s\n", event->string);
