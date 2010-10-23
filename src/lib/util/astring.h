@@ -317,6 +317,11 @@ public:
 	astring &operator=(const char *string) { return cpy(string); }
 	astring &operator=(const astring &string) { return cpy(string); }
 
+	astring& operator+=(const astring &string) { return cat(string); }
+	friend astring operator+(const astring &lhs, const astring &rhs) { return astring(lhs) += rhs; }
+	friend astring operator+(const astring &lhs, const char *rhs) { return astring(lhs) += rhs; }
+	friend astring operator+(const char *lhs, const astring &rhs) { return astring(lhs) += rhs; }
+
 	bool operator==(const char *string) const { return (cmp(string) == 0); }
 	bool operator==(const astring &string) const { return (cmp(string) == 0); }
 	bool operator!=(const char *string) const { return (cmp(string) != 0); }
