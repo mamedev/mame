@@ -41,7 +41,7 @@ Instruction* Instruction::decodeInstruction(const Opcode* opc,
 				dynamic_cast<Sub*>(op)  ||
 				dynamic_cast<Tfr*>(op)  ||
 				dynamic_cast<Tst*>(op)
-                /* TODO: More? */)
+				/* TODO: More? */)
 			{
 				op->m_sizeIncrement = 1;
 				return op;

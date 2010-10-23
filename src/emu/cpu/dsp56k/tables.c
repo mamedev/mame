@@ -1,4 +1,3 @@
-#include <string>
 #include <cstdio>
 #include <cstring>
 #include <cstdlib>
@@ -285,7 +284,7 @@ void decode_JF_table(const UINT16 J, const UINT16 F, reg_id& S, reg_id& D)
 // NEW //   }
 // NEW // }
 
-void decode_kSign_table(const UINT16 k, std::string& plusMinus)
+void decode_kSign_table(const UINT16 k, astring& plusMinus)
 {
 	switch(k)
 	{
@@ -433,7 +432,7 @@ void decode_ss_table(const UINT16 ss, op_mnem& arithmetic)
 	}
 }
 
-void decode_uuuuF_table(const UINT16 uuuu, const UINT16 F, std::string& arg, reg_id& S, reg_id& D)
+void decode_uuuuF_table(const UINT16 uuuu, const UINT16 F, astring& arg, reg_id& S, reg_id& D)
 {
 	const UINT16 switchVal = (uuuu << 1) | F;
 
@@ -475,7 +474,7 @@ void decode_uuuuF_table(const UINT16 uuuu, const UINT16 F, std::string& arg, reg
 	}
 }
 
-void decode_Z_table(const UINT16 Z, std::string& ea)
+void decode_Z_table(const UINT16 Z, astring& ea)
 {
 	/* This is fixed as per the Family Manual errata addendum */
 	switch(Z)
@@ -485,7 +484,7 @@ void decode_Z_table(const UINT16 Z, std::string& ea)
 	}
 }
 
-void assemble_ea_from_m_table(const UINT16 m, const int n, std::string& ea)
+void assemble_ea_from_m_table(const UINT16 m, const int n, astring& ea)
 {
 	char temp[32];
 	switch(m)
@@ -496,7 +495,7 @@ void assemble_ea_from_m_table(const UINT16 m, const int n, std::string& ea)
 	ea = temp;
 }
 
-void assemble_eas_from_mm_table(UINT16 mm, int n1, int n2, std::string& ea1, std::string& ea2)
+void assemble_eas_from_mm_table(UINT16 mm, int n1, int n2, astring& ea1, astring& ea2)
 {
 	char temp1[32];
 	char temp2[32];
@@ -515,7 +514,7 @@ void assemble_eas_from_mm_table(UINT16 mm, int n1, int n2, std::string& ea1, std
 	ea2 = temp2;
 }
 
-void assemble_ea_from_MM_table(UINT16 MM, int n, std::string& ea)
+void assemble_ea_from_MM_table(UINT16 MM, int n, astring& ea)
 {
 	char temp[32];
 	switch(MM)
@@ -528,7 +527,7 @@ void assemble_ea_from_MM_table(UINT16 MM, int n, std::string& ea)
 	ea = temp;
 }
 
-void assemble_ea_from_q_table(UINT16 q, int n, std::string& ea)
+void assemble_ea_from_q_table(UINT16 q, int n, astring& ea)
 {
 	char temp[32];
 	switch(q)
@@ -539,7 +538,7 @@ void assemble_ea_from_q_table(UINT16 q, int n, std::string& ea)
 	ea = temp;
 }
 
-void assemble_ea_from_t_table(UINT16 t, UINT16 val, std::string& ea)
+void assemble_ea_from_t_table(UINT16 t, UINT16 val, astring& ea)
 {
 	char temp[32];
 	switch(t)
@@ -552,7 +551,7 @@ void assemble_ea_from_t_table(UINT16 t, UINT16 val, std::string& ea)
 	ea = temp;
 }
 
-void assemble_ea_from_z_table(UINT16 z, int n, std::string& ea)
+void assemble_ea_from_z_table(UINT16 z, int n, astring& ea)
 {
 	char temp[32];
 	switch(z)
@@ -563,10 +562,10 @@ void assemble_ea_from_z_table(UINT16 z, int n, std::string& ea)
 	ea = temp;
 }
 
-void assemble_D_from_P_table(UINT16 P, UINT16 ppppp, std::string& D)
+void assemble_D_from_P_table(UINT16 P, UINT16 ppppp, astring& D)
 {
 	char temp[32];
-	std::string fullAddy;	 /* Convert Short Absolute Address to full 16-bit */
+	astring fullAddy;	 /* Convert Short Absolute Address to full 16-bit */
 
 	switch(P)
 	{
@@ -576,18 +575,18 @@ void assemble_D_from_P_table(UINT16 P, UINT16 ppppp, std::string& D)
 			break;
 		case 0x1:
 			assemble_address_from_IO_short_address(ppppp, fullAddy);
-			sprintf(temp, "X:<<$%s", fullAddy.c_str());
-			// NEW // sprintf(temp, "X:$%s", fullAddy.c_str());
+			sprintf(temp, "X:<<$%s", fullAddy.cstr());
+			// NEW // sprintf(temp, "X:$%s", fullAddy.cstr());
 			break;
 	}
 	D = temp;
 }
 
-void assemble_arguments_from_W_table(UINT16 W, char ma, const reg_id& SD, const std::string& ea,
-									 std::string& source, std::string& destination)
+void assemble_arguments_from_W_table(UINT16 W, char ma, const reg_id& SD, const astring& ea,
+									 astring& source, astring& destination)
 {
 	char temp[32];
-	sprintf(temp, "%c:%s", ma, ea.c_str());
+	sprintf(temp, "%c:%s", ma, ea.cstr());
 	switch(W)
 	{
 		case 0x0: source = regIdAsString(SD); destination = temp; break;
@@ -595,11 +594,11 @@ void assemble_arguments_from_W_table(UINT16 W, char ma, const reg_id& SD, const 
 	}
 }
 
-void assemble_arguments_from_W_table(UINT16 W, char ma, const std::string& SD, const std::string& ea,
-									 std::string& source, std::string& destination)
+void assemble_arguments_from_W_table(UINT16 W, char ma, const astring& SD, const astring& ea,
+									 astring& source, astring& destination)
 {
 	char temp[32];
-	sprintf(temp, "%c:%s", ma, ea.c_str());
+	sprintf(temp, "%c:%s", ma, ea.cstr());
 	switch(W)
 	{
 		case 0x0: source = SD;   destination = temp; break;
@@ -607,7 +606,7 @@ void assemble_arguments_from_W_table(UINT16 W, char ma, const std::string& SD, c
 	}
 }
 
-void assemble_reg_from_W_table(UINT16 W, char ma, const reg_id& SD, const INT8 xx, std::string& S, std::string& D)
+void assemble_reg_from_W_table(UINT16 W, char ma, const reg_id& SD, const INT8 xx, astring& S, astring& D)
 {
 	UINT8 abs_xx;
 	char temp[32];
@@ -629,7 +628,7 @@ void assemble_reg_from_W_table(UINT16 W, char ma, const reg_id& SD, const INT8 x
 	}
 }
 
-void assemble_address_from_IO_short_address(UINT16 pp, std::string& ea)
+void assemble_address_from_IO_short_address(UINT16 pp, astring& ea)
 {
 	char temp[32];
 
@@ -753,7 +752,7 @@ void setReg16(dsp56k_core* cpustate, const UINT16& value, const reg_id& reg)
     if (reg == iM3) M3 = value;
 }
 
-std::string regIdAsString(const reg_id& regId)
+astring regIdAsString(const reg_id& regId)
 {
     switch(regId)
     {
@@ -801,7 +800,7 @@ std::string regIdAsString(const reg_id& regId)
     return "INVALID_REG_ID";
 }
 
-std::string opMnemonicAsString(const op_mnem& mnem)
+astring opMnemonicAsString(const op_mnem& mnem)
 {
     switch(mnem)
     {
@@ -831,7 +830,7 @@ std::string opMnemonicAsString(const op_mnem& mnem)
     return "INVALID_OPCODE_MNEMONIC";
 }
 
-reg_id stringAsRegID(const std::string& str)
+reg_id stringAsRegID(const astring& str)
 {
     if (str == "X") return iX;
     if (str == "X0") return iX0;
