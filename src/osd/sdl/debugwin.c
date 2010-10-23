@@ -15,6 +15,7 @@
 #include <gtk/gtk.h>
 
 #include "dview.h"
+#include "osdsdl.h"
 #include "debug/dvdisasm.h"
 #include "debug/dvmemory.h"
 #include "debug/dvstate.h"
