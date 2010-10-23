@@ -168,7 +168,7 @@ class screen_device;
 class render_container;
 class render_manager;
 typedef struct _xml_data_node xml_data_node;
-typedef struct _render_font render_font;
+class render_font;
 struct object_transform;
 class layout_element;
 class layout_view;
@@ -741,6 +741,10 @@ public:
 	// textures
 	render_texture *texture_alloc(texture_scaler_func scaler = NULL, void *param = NULL);
 	void texture_free(render_texture *texture);
+	
+	// fonts
+	render_font *font_alloc(const char *filename = NULL);
+	void font_free(render_font *font);
 
 	// reference tracking
 	void invalidate_all(void *refptr);

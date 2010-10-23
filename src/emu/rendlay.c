@@ -827,12 +827,12 @@ void layout_element::component::draw_text(running_machine &machine, bitmap_t &de
 	UINT32 a = m_color.a * 255.0;
 
 	// get the width of the string
-	render_font *font = render_font_alloc(machine, NULL);
+	render_font *font = machine.render().font_alloc();
 	float aspect = 1.0f;
 	INT32 width;
 	while (1)
 	{
-		width = render_font_get_string_width(font, bounds.max_y - bounds.min_y, aspect, m_string);
+		width = font->string_width(bounds.max_y - bounds.min_y, aspect, m_string);
 		if (width < bounds.max_x - bounds.min_x)
 			break;
 		aspect *= 0.9f;
@@ -847,7 +847,7 @@ void layout_element::component::draw_text(running_machine &machine, bitmap_t &de
 	{
 		// get the font bitmap
 		rectangle chbounds;
-		render_font_get_scaled_bitmap_and_bounds(font, tempbitmap, bounds.max_y - bounds.min_y, aspect, *s, &chbounds);
+		font->get_scaled_bitmap_and_bounds(*tempbitmap, bounds.max_y - bounds.min_y, aspect, *s, chbounds);
 
 		// copy the data into the target
 		for (int y = 0; y < chbounds.max_y - chbounds.min_y; y++)
@@ -878,12 +878,12 @@ void layout_element::component::draw_text(running_machine &machine, bitmap_t &de
 		}
 
 		// advance in the X direction
-		curx += render_font_get_char_width(font, bounds.max_y - bounds.min_y, aspect, *s);
+		curx += font->char_width(bounds.max_y - bounds.min_y, aspect, *s);
 	}
 
 	// free the temporary bitmap and font
 	global_free(tempbitmap);
-	render_font_free(font);
+	machine.render().font_free(font);
 }
 
 

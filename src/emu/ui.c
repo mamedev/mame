@@ -240,7 +240,7 @@ int ui_init(running_machine *machine)
 	machine->add_notifier(MACHINE_NOTIFY_EXIT, ui_exit);
 
 	/* allocate the font and messagebox string */
-	ui_font = render_font_alloc(*machine, "ui.bdf");
+	ui_font = machine->render().font_alloc("ui.bdf");
 
 	/* initialize the other UI bits */
 	ui_menu_init(machine);
@@ -263,8 +263,7 @@ int ui_init(running_machine *machine)
 static void ui_exit(running_machine &machine)
 {
 	/* free the font */
-	if (ui_font != NULL)
-		render_font_free(ui_font);
+	machine.render().font_free(ui_font);
 	ui_font = NULL;
 }
 
@@ -424,7 +423,7 @@ render_font *ui_get_font(void)
 
 float ui_get_line_height(running_machine &machine)
 {
-	INT32 raw_font_pixel_height = render_font_get_pixel_height(ui_font);
+	INT32 raw_font_pixel_height = ui_font->pixel_height();
 	render_target &ui_target = machine.render().ui_target();
 	INT32 target_pixel_height = ui_target.height();
 	float one_to_one_line_height;
@@ -469,7 +468,7 @@ float ui_get_line_height(running_machine &machine)
 
 float ui_get_char_width(running_machine &machine, unicode_char ch)
 {
-	return render_font_get_char_width(ui_font, ui_get_line_height(machine), machine.render().ui_aspect(), ch);
+	return ui_font->char_width(ui_get_line_height(machine), machine.render().ui_aspect(), ch);
 }
 
 
@@ -480,7 +479,7 @@ float ui_get_char_width(running_machine &machine, unicode_char ch)
 
 float ui_get_string_width(running_machine &machine, const char *s)
 {
-	return render_font_get_utf8string_width(ui_font, ui_get_line_height(machine), machine.render().ui_aspect(), s);
+	return ui_font->utf8string_width(ui_get_line_height(machine), machine.render().ui_aspect(), s);
 }
 
 

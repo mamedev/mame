@@ -789,7 +789,7 @@ void render_container::add_char(float x0, float y0, float height, float aspect, 
 	render_bounds bounds;
 	bounds.x0 = x0;
 	bounds.y0 = y0;
-	render_texture *texture = render_font_get_char_texture_and_bounds(&font, height, aspect, ch, &bounds);
+	render_texture *texture = font.get_char_texture_and_bounds(height, aspect, ch, bounds);
 
 	// add it like a quad
 	item &newitem = add_generic(CONTAINER_ITEM_QUAD, bounds.x0, bounds.y0, bounds.x1, bounds.y1, argb);
@@ -2510,6 +2510,26 @@ void render_manager::texture_free(render_texture *texture)
 	if (texture != NULL)
 		m_live_textures--;
 	m_texture_allocator.reclaim(texture);
+}
+
+
+//-------------------------------------------------
+//  font_alloc - allocate a new font instance
+//-------------------------------------------------
+
+render_font *render_manager::font_alloc(const char *filename)
+{
+	return auto_alloc(&m_machine, render_font(*this, filename));
+}
+
+
+//-------------------------------------------------
+//  font_free - release a font instance
+//-------------------------------------------------
+
+void render_manager::font_free(render_font *font)
+{
+	auto_free(&m_machine, font);
 }
 
 

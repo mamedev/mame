@@ -889,7 +889,7 @@ static void debugint_exit(running_machine &machine)
 	}
 	if (debug_font != NULL)
 	{
-		render_font_free(debug_font);
+		machine.render().font_free(debug_font);
 		debug_font = NULL;
 	}
 
@@ -899,7 +899,7 @@ void debugint_init(running_machine *machine)
 {
 	unicode_char ch;
 	int chw;
-	debug_font = render_font_alloc(*machine, "ui.bdf"); //ui_get_font();
+	debug_font = machine->render().font_alloc("ui.bdf"); //ui_get_font();
 	debug_font_width = 0;
 	debug_font_height = 15;
 
@@ -912,7 +912,7 @@ void debugint_init(running_machine *machine)
 
 	for (ch=0;ch<=127;ch++)
 	{
-		chw = render_font_get_char_width(debug_font, debug_font_height, debug_font_aspect, ch);
+		chw = debug_font->char_width(debug_font_height, debug_font_aspect, ch);
 		if (chw>debug_font_width)
 			debug_font_width = chw;
 	}
