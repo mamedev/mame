@@ -722,35 +722,43 @@ void ui_draw_text_full(render_container *container, const char *origs, float x, 
 
 void ui_draw_text_box(render_container *container, const char *text, int justify, float xpos, float ypos, rgb_t backcolor)
 {
-	float target_width, target_height;
+	float line_height = ui_get_line_height(container->manager().machine());
+	float target_width = 2.0f - ((xpos <= 0.5f) ? xpos : 1.0f - xpos) - 2.0f * UI_BOX_LR_BORDER;
+	float target_height = line_height;
 	float target_x, target_y;
+	float last_target_height = 0;
 
-	/* compute the multi-line target width/height */
-	ui_draw_text_full(container, text, 0, 0, 1.0f - 2.0f * UI_BOX_LR_BORDER,
-				justify, WRAP_WORD, DRAW_NONE, ARGB_WHITE, ARGB_BLACK, &target_width, &target_height);
-	if (target_height > 1.0f - 2.0f * UI_BOX_TB_BORDER)
-		target_height = floor((1.0f - 2.0f * UI_BOX_TB_BORDER) / ui_get_line_height(container->manager().machine())) * ui_get_line_height(container->manager().machine());
+	do
+	{
+		/* determine the target location */
+		target_x = xpos - 0.5f * target_width;
+		target_y = ypos - 0.5f * target_height;
 
-	/* determine the target location */
-	target_x = xpos - 0.5f * target_width;
-	target_y = ypos - 0.5f * target_height;
+		/* make sure we stay on-screen */
+		if (target_x < UI_BOX_LR_BORDER)
+			target_x = UI_BOX_LR_BORDER;
+		if (target_x + target_width + UI_BOX_LR_BORDER > 1.0f)
+			target_x = 1.0f - UI_BOX_LR_BORDER - target_width;
+		if (target_y < UI_BOX_TB_BORDER)
+			target_y = UI_BOX_TB_BORDER;
+		if (target_y + target_height + UI_BOX_TB_BORDER > 1.0f)
+			target_y = 1.0f - UI_BOX_TB_BORDER - target_height;
 
-	/* make sure we stay on-screen */
-	if (target_x < UI_BOX_LR_BORDER)
-		target_x = UI_BOX_LR_BORDER;
-	if (target_x + target_width + UI_BOX_LR_BORDER > 1.0f)
-		target_x = 1.0f - UI_BOX_LR_BORDER - target_width;
-	if (target_y < UI_BOX_TB_BORDER)
-		target_y = UI_BOX_TB_BORDER;
-	if (target_y + target_height + UI_BOX_TB_BORDER > 1.0f)
-		target_y = 1.0f - UI_BOX_TB_BORDER - target_height;
+		/* compute the multi-line target width/height */
+		last_target_height = target_height;
+		ui_draw_text_full(container, text, target_x, target_y, target_width + 0.00001,
+					justify, WRAP_WORD, DRAW_NONE, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, &target_width, &target_height);
+		if (target_height > 1.0f - 2.0f * UI_BOX_TB_BORDER)
+			target_height = floor((1.0f - 2.0f * UI_BOX_TB_BORDER) / line_height) * line_height;
+
+	} while (target_height != last_target_height);
 
 	/* add a box around that */
 	ui_draw_outlined_box(container, target_x - UI_BOX_LR_BORDER,
 					 target_y - UI_BOX_TB_BORDER,
 					 target_x + target_width + UI_BOX_LR_BORDER,
 					 target_y + target_height + UI_BOX_TB_BORDER, backcolor);
-	ui_draw_text_full(container, text, target_x, target_y, target_width,
+	ui_draw_text_full(container, text, target_x, target_y, target_width + 0.00001,
 				justify, WRAP_WORD, DRAW_NORMAL, UI_TEXT_COLOR, UI_TEXT_BG_COLOR, NULL, NULL);
 }
 
