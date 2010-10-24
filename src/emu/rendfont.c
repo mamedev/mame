@@ -79,16 +79,18 @@ inline const char *next_line(const char *ptr)
 inline render_font::glyph &render_font::get_char(unicode_char chnum)
 {
 	static glyph dummy_glyph;
-
+	
 	// grab the table; if none, return the dummy character
 	glyph *glyphtable = m_glyphs[chnum / 256];
+	if (glyphtable == NULL && m_format == FF_OSD)
+		glyphtable = m_glyphs[chnum / 256] = auto_alloc_array_clear(&m_manager.machine(), glyph, 256);
 	if (glyphtable == NULL)
 		return dummy_glyph;
 
 	// if the character isn't generated yet, do it now
 	glyph &gl = glyphtable[chnum % 256];
 	if (gl.bitmap == NULL)
-		char_expand(gl);
+		char_expand(chnum, gl);
 
 	// return the resulting character
 	return gl;
@@ -111,9 +113,26 @@ render_font::render_font(render_manager &manager, const char *filename)
 	  m_yoffs(0),
 	  m_scale(1.0f),
 	  m_rawdata(NULL),
-	  m_rawsize(0)
+	  m_rawsize(0),
+	  m_osdfont(NULL)
 {
 	memset(m_glyphs, 0, sizeof(m_glyphs));
+	
+	// if this is an OSD font, we're done
+	if (filename != NULL)
+	{
+		m_osdfont = manager.machine().osd().font_open(filename, m_height);
+		if (m_osdfont != NULL)
+		{
+			m_scale = 1.0f / (float)m_height;
+			m_format = FF_OSD;
+			return;
+		}
+	}
+	
+	// if the filename is 'default' default to 'ui.bdf' for backwards compatibility
+	if (mame_stricmp(filename, "default") == 0)
+		filename = "ui.bdf";
 
 	// attempt to load the cached version of the font first
 	if (filename != NULL && load_cached_bdf(filename))
@@ -154,6 +173,10 @@ render_font::~render_font()
 
 	// free the raw data and the size itself
 	auto_free(&m_manager.machine(), m_rawdata);
+	
+	// release the OSD font
+	if (m_osdfont != NULL)
+		m_manager.machine().osd().font_close(m_osdfont);
 }
 
 
@@ -162,68 +185,89 @@ render_font::~render_font()
 //  character into a bitmap
 //-------------------------------------------------
 
-void render_font::char_expand(glyph &gl)
+void render_font::char_expand(unicode_char chnum, glyph &gl)
 {
-	// punt if nothing there
-	if (gl.bmwidth == 0 || gl.bmheight == 0 || gl.rawdata == NULL)
-		return;
-
-	// allocate a new bitmap of the size we need
-	gl.bitmap = auto_alloc(&m_manager.machine(), bitmap_t(gl.bmwidth, m_height, BITMAP_FORMAT_ARGB32));
-	bitmap_fill(gl.bitmap, NULL, 0);
-
-	// extract the data
-	const char *ptr = gl.rawdata;
-	UINT8 accum = 0, accumbit = 7;
-	for (int y = 0; y < gl.bmheight; y++)
+	// if we're an OSD font, query the info
+	if (m_format == FF_OSD)
 	{
-		int desty = y + m_height + m_yoffs - gl.yoffs - gl.bmheight;
-		UINT32 *dest = (desty >= 0 && desty < m_height) ? BITMAP_ADDR32(gl.bitmap, desty, 0) : NULL;
+		// we set bmwidth to -1 if we've previously queried and failed
+		if (gl.bmwidth == -1)
+			return;
+		
+		// attempt to get the font bitmap; if we fail, set bmwidth to -1
+		gl.bitmap = m_manager.machine().osd().font_get_bitmap(m_osdfont, chnum, gl.width, gl.xoffs, gl.yoffs);
+		if (gl.bitmap == NULL)
+			return;
 
-		// text format
-		if (m_format == FF_TEXT)
+		// populate the bmwidth/bmheight fields
+		gl.bmwidth = gl.bitmap->width;
+		gl.bmheight = gl.bitmap->height;
+	}
+	
+	// other formats need to parse their data
+	else
+	{
+		// punt if nothing there
+		if (gl.bmwidth == 0 || gl.bmheight == 0 || gl.rawdata == NULL)
+			return;
+
+		// allocate a new bitmap of the size we need
+		gl.bitmap = auto_alloc(&m_manager.machine(), bitmap_t(gl.bmwidth, m_height, BITMAP_FORMAT_ARGB32));
+		bitmap_fill(gl.bitmap, NULL, 0);
+
+		// extract the data
+		const char *ptr = gl.rawdata;
+		UINT8 accum = 0, accumbit = 7;
+		for (int y = 0; y < gl.bmheight; y++)
 		{
-			// loop over bytes
-			for (int x = 0; x < gl.bmwidth; x += 4)
+			int desty = y + m_height + m_yoffs - gl.yoffs - gl.bmheight;
+			UINT32 *dest = (desty >= 0 && desty < m_height) ? BITMAP_ADDR32(gl.bitmap, desty, 0) : NULL;
+
+			// text format
+			if (m_format == FF_TEXT)
 			{
-				// scan for the next hex digit
-				int bits = -1;
-				while (*ptr != 13 && bits == -1)
+				// loop over bytes
+				for (int x = 0; x < gl.bmwidth; x += 4)
 				{
-					if (*ptr >= '0' && *ptr <= '9')
-						bits = *ptr++ - '0';
-					else if (*ptr >= 'A' && *ptr <= 'F')
-						bits = *ptr++ - 'A' + 10;
-					else if (*ptr >= 'a' && *ptr <= 'f')
-						bits = *ptr++ - 'a' + 10;
-					else
-						ptr++;
+					// scan for the next hex digit
+					int bits = -1;
+					while (*ptr != 13 && bits == -1)
+					{
+						if (*ptr >= '0' && *ptr <= '9')
+							bits = *ptr++ - '0';
+						else if (*ptr >= 'A' && *ptr <= 'F')
+							bits = *ptr++ - 'A' + 10;
+						else if (*ptr >= 'a' && *ptr <= 'f')
+							bits = *ptr++ - 'a' + 10;
+						else
+							ptr++;
+					}
+
+					// expand the four bits
+					if (dest != NULL)
+					{
+						*dest++ = (bits & 8) ? MAKE_ARGB(0xff,0xff,0xff,0xff) : MAKE_ARGB(0x00,0xff,0xff,0xff);
+						*dest++ = (bits & 4) ? MAKE_ARGB(0xff,0xff,0xff,0xff) : MAKE_ARGB(0x00,0xff,0xff,0xff);
+						*dest++ = (bits & 2) ? MAKE_ARGB(0xff,0xff,0xff,0xff) : MAKE_ARGB(0x00,0xff,0xff,0xff);
+						*dest++ = (bits & 1) ? MAKE_ARGB(0xff,0xff,0xff,0xff) : MAKE_ARGB(0x00,0xff,0xff,0xff);
+					}
 				}
 
-				// expand the four bits
-				if (dest != NULL)
-				{
-					*dest++ = (bits & 8) ? MAKE_ARGB(0xff,0xff,0xff,0xff) : MAKE_ARGB(0x00,0xff,0xff,0xff);
-					*dest++ = (bits & 4) ? MAKE_ARGB(0xff,0xff,0xff,0xff) : MAKE_ARGB(0x00,0xff,0xff,0xff);
-					*dest++ = (bits & 2) ? MAKE_ARGB(0xff,0xff,0xff,0xff) : MAKE_ARGB(0x00,0xff,0xff,0xff);
-					*dest++ = (bits & 1) ? MAKE_ARGB(0xff,0xff,0xff,0xff) : MAKE_ARGB(0x00,0xff,0xff,0xff);
-				}
+				// advance to the next line
+				ptr = next_line(ptr);
 			}
 
-			// advance to the next line
-			ptr = next_line(ptr);
-		}
-
-		// cached format
-		else if (m_format == FF_CACHED)
-		{
-			for (int x = 0; x < gl.bmwidth; x++)
+			// cached format
+			else if (m_format == FF_CACHED)
 			{
-				if (accumbit == 7)
-					accum = *ptr++;
-				if (dest != NULL)
-					*dest++ = (accum & (1 << accumbit)) ? MAKE_ARGB(0xff,0xff,0xff,0xff) : MAKE_ARGB(0x00,0xff,0xff,0xff);
-				accumbit = (accumbit - 1) & 7;
+				for (int x = 0; x < gl.bmwidth; x++)
+				{
+					if (accumbit == 7)
+						accum = *ptr++;
+					if (dest != NULL)
+						*dest++ = (accum & (1 << accumbit)) ? MAKE_ARGB(0xff,0xff,0xff,0xff) : MAKE_ARGB(0x00,0xff,0xff,0xff);
+					accumbit = (accumbit - 1) & 7;
+				}
 			}
 		}
 	}

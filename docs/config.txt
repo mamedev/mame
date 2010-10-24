@@ -1004,3 +1004,11 @@ Core misc options
 
 	Forces MAME to skip displaying the game info screen. The default is
 	OFF (-noskip_gameinfo).
+
+-uifont <fontname>
+
+	Specifies the name of a BDF font file to use for the UI font. If this
+	font cannot be found or cannot be loaded, the system will fall back
+	to its built-in UI font. On some platforms 'fontname' can be a system
+	font name instead of a BDF font file. The default is 'default' (use 
+	the OSD-determined default font).

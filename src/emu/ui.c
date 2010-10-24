@@ -240,7 +240,7 @@ int ui_init(running_machine *machine)
 	machine->add_notifier(MACHINE_NOTIFY_EXIT, ui_exit);
 
 	/* allocate the font and messagebox string */
-	ui_font = machine->render().font_alloc("ui.bdf");
+	ui_font = machine->render().font_alloc(options_get_string(machine->options(), OPTION_UI_FONT));
 
 	/* initialize the other UI bits */
 	ui_menu_init(machine);
