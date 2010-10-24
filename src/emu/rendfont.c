@@ -131,7 +131,7 @@ render_font::render_font(render_manager &manager, const char *filename)
 	}
 	
 	// if the filename is 'default' default to 'ui.bdf' for backwards compatibility
-	if (mame_stricmp(filename, "default") == 0)
+	if (filename != NULL && mame_stricmp(filename, "default") == 0)
 		filename = "ui.bdf";
 
 	// attempt to load the cached version of the font first
@@ -324,6 +324,13 @@ void render_font::get_scaled_bitmap_and_bounds(bitmap_t &dest, float height, flo
 	// if the bitmap isn't big enough, bail
 	if (dest.width < bounds.max_x - bounds.min_x || dest.height < bounds.max_y - bounds.min_y)
 		return;
+
+	// if no texture, fill the target
+	if (gl.texture == NULL)
+	{
+		bitmap_fill(&dest, NULL, 0);
+		return;
+	}
 
 	// scale the font
 	INT32 origwidth = dest.width;

@@ -239,9 +239,6 @@ int ui_init(running_machine *machine)
 	/* make sure we clean up after ourselves */
 	machine->add_notifier(MACHINE_NOTIFY_EXIT, ui_exit);
 
-	/* allocate the font and messagebox string */
-	ui_font = machine->render().font_alloc(options_get_string(machine->options(), OPTION_UI_FONT));
-
 	/* initialize the other UI bits */
 	ui_menu_init(machine);
 	ui_gfx_init(machine);
@@ -410,8 +407,11 @@ void ui_update_and_render(running_machine *machine, render_container *container)
     ui_get_font - return the UI font
 -------------------------------------------------*/
 
-render_font *ui_get_font(void)
+render_font *ui_get_font(running_machine &machine)
 {
+	/* allocate the font and messagebox string */
+	if (ui_font == NULL)
+		ui_font = machine.render().font_alloc(options_get_string(machine.options(), OPTION_UI_FONT));
 	return ui_font;
 }
 
@@ -423,7 +423,7 @@ render_font *ui_get_font(void)
 
 float ui_get_line_height(running_machine &machine)
 {
-	INT32 raw_font_pixel_height = ui_font->pixel_height();
+	INT32 raw_font_pixel_height = ui_get_font(machine)->pixel_height();
 	render_target &ui_target = machine.render().ui_target();
 	INT32 target_pixel_height = ui_target.height();
 	float one_to_one_line_height;
@@ -468,7 +468,7 @@ float ui_get_line_height(running_machine &machine)
 
 float ui_get_char_width(running_machine &machine, unicode_char ch)
 {
-	return ui_font->char_width(ui_get_line_height(machine), machine.render().ui_aspect(), ch);
+	return ui_get_font(machine)->char_width(ui_get_line_height(machine), machine.render().ui_aspect(), ch);
 }
 
 
@@ -479,7 +479,7 @@ float ui_get_char_width(running_machine &machine, unicode_char ch)
 
 float ui_get_string_width(running_machine &machine, const char *s)
 {
-	return ui_font->utf8string_width(ui_get_line_height(machine), machine.render().ui_aspect(), s);
+	return ui_get_font(machine)->utf8string_width(ui_get_line_height(machine), machine.render().ui_aspect(), s);
 }
 
 
@@ -666,7 +666,7 @@ void ui_draw_text_full(render_container *container, const char *origs, float x, 
 
 			if (draw != DRAW_NONE)
 			{
-				container->add_char(curx, cury, lineheight, machine.render().ui_aspect(), fgcolor, *ui_font, linechar);
+				container->add_char(curx, cury, lineheight, machine.render().ui_aspect(), fgcolor, *ui_get_font(machine), linechar);
 				curx += ui_get_char_width(machine, linechar);
 			}
 			linestart += linecharcount;
@@ -675,11 +675,11 @@ void ui_draw_text_full(render_container *container, const char *origs, float x, 
 		/* append ellipses if needed */
 		if (wrap == WRAP_TRUNCATE && *s != 0 && draw != DRAW_NONE)
 		{
-			container->add_char(curx, cury, lineheight, machine.render().ui_aspect(), fgcolor, *ui_font, '.');
+			container->add_char(curx, cury, lineheight, machine.render().ui_aspect(), fgcolor, *ui_get_font(machine), '.');
 			curx += ui_get_char_width(machine, '.');
-			container->add_char(curx, cury, lineheight, machine.render().ui_aspect(), fgcolor, *ui_font, '.');
+			container->add_char(curx, cury, lineheight, machine.render().ui_aspect(), fgcolor, *ui_get_font(machine), '.');
 			curx += ui_get_char_width(machine, '.');
-			container->add_char(curx, cury, lineheight, machine.render().ui_aspect(), fgcolor, *ui_font, '.');
+			container->add_char(curx, cury, lineheight, machine.render().ui_aspect(), fgcolor, *ui_get_font(machine), '.');
 			curx += ui_get_char_width(machine, '.');
 		}
 

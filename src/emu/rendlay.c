@@ -827,7 +827,7 @@ void layout_element::component::draw_text(running_machine &machine, bitmap_t &de
 	UINT32 a = m_color.a * 255.0;
 
 	// get the width of the string
-	render_font *font = machine.render().font_alloc();
+	render_font *font = machine.render().font_alloc("default");
 	float aspect = 1.0f;
 	INT32 width;
 	while (1)

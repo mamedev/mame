@@ -899,7 +899,7 @@ void debugint_init(running_machine *machine)
 {
 	unicode_char ch;
 	int chw;
-	debug_font = machine->render().font_alloc("ui.bdf"); //ui_get_font();
+	debug_font = machine->render().font_alloc("ui.bdf"); //ui_get_font(machine);
 	debug_font_width = 0;
 	debug_font_height = 15;
 

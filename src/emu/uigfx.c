@@ -242,7 +242,7 @@ static void palette_handler(running_machine *machine, render_container *containe
 	int total = state->palette.which ? colortable_palette_get_size(machine->colortable) : machine->total_colors();
 	const char *title = state->palette.which ? "COLORTABLE" : "PALETTE";
 	const rgb_t *raw_color = palette_entry_list_raw(machine->palette);
-	render_font *ui_font = ui_get_font();
+	render_font *ui_font = ui_get_font(*machine);
 	float cellwidth, cellheight;
 	float chwidth, chheight;
 	float titlewidth;
@@ -427,7 +427,7 @@ static void palette_handle_keys(running_machine *machine, ui_gfx_state *state)
 
 static void gfxset_handler(running_machine *machine, render_container *container, ui_gfx_state *state)
 {
-	render_font *ui_font = ui_get_font();
+	render_font *ui_font = ui_get_font(*machine);
 	int set = state->gfxset.set;
 	gfx_element *gfx = machine->gfx[set];
 	float fullwidth, fullheight;
@@ -840,7 +840,7 @@ static void gfxset_draw_item(running_machine *machine, const gfx_element *gfx, i
 
 static void tilemap_handler(running_machine *machine, render_container *container, ui_gfx_state *state)
 {
-	render_font *ui_font = ui_get_font();
+	render_font *ui_font = ui_get_font(*machine);
 	float chwidth, chheight;
 	render_bounds mapboxbounds;
 	render_bounds boxbounds;

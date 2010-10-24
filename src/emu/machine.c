@@ -274,7 +274,6 @@ void running_machine::start()
 	state_save_allow_registration(this, true);
 	palette_init(this);
 	m_render = auto_alloc(this, render_manager(*this));
-	ui_init(this);
 	generic_machine_init(this);
 	generic_video_init(this);
 	generic_sound_init(this);
@@ -286,6 +285,7 @@ void running_machine::start()
 
 	// init the osd layer
 	m_osd.init(*this);
+	ui_init(this);
 
 	// initialize the base time (needed for doing record/playback)
 	time(&m_base_time);
