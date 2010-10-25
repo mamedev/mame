@@ -9332,6 +9332,7 @@ Other Sun games
 	DRIVER( royalcrdd )	/* (c) 1991 TAB-Austria */
 	DRIVER( royalcrde )	/* (c) 1991 TAB-Austria */
 	DRIVER( royalcrdf )	/* (c) 1991 Evona Electronic */
+	DRIVER( royalcrdt )	/* (c) 1991 TAB-Austria orig */
 	DRIVER( royalcrdp )	/* (c) 1993 Digital Dreams */
 	DRIVER( lluck3x3 )	/* (c) 1991 TAB-Austria */
 	DRIVER( lluck4x1 )	/* (c) 1991 TAB-Austria */

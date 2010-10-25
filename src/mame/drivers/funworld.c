@@ -40,6 +40,7 @@
   * Royal Card (austrian, set 4),                     TAB Austria,        1991.
   * Royal Card (austrian, set 5),                     TAB Austria,        1991.
   * Royal Card (austrian, set 6),                     TAB Austria,        1991.
+  * Royal Card (TAB original),                        TAB Austria,        1991.
   * Royal Card (slovak, encrypted),                   Evona Electronic,   1991.
   * Royal Card Professional 2.0,                      Digital Dreams,     1993.
   * Lucky Lady (3x3 deal),                            TAB Austria,        1991.
@@ -3271,6 +3272,30 @@ ROM_END
 
 
 /*
+   Royal Card (TAB Austria original)
+   With respective original PLD properly dumped.
+*/
+
+ROM_START( royalcrdt )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "r1_0.bin", 0x8000, 0x8000, CRC(829a6a1d) SHA1(b7064e4d60e33d0875eb73525230ea3b99f10542) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "novr3_0.bin", 0x0000, 0x8000, CRC(85e77661) SHA1(7d7a765c1bfcfeb9eb91d2519b22d734f20eab24) )
+	ROM_LOAD( "novr2_0.bin", 0x8000, 0x8000, CRC(41f7a0b3) SHA1(9aff2b8832d2a4f868daa9849a0bfe5e44f88fc0) )
+
+	ROM_REGION( 0x0200, "proms", 0 )
+	ROM_LOAD( "jop1.bin",    0x0000, 0x0200, CRC(8bc86f48) SHA1(4c677ab9314a1f571e35104b22659e6811aeb194) )
+
+	ROM_REGION( 0x0800, "nvram", 0 )
+	ROM_LOAD( "royalcrdt_nv.bin",  0x0000, 0x0800, CRC(67a6e68b) SHA1(d7ab01c4d9bd4fe58b5d0f4a945c00c5c4906008) )
+
+	ROM_REGION( 0x0200, "plds", 0 )	/* Device type is 16L8 */
+	ROM_LOAD( "tab01_3.bin",    0x0000, 0x0104, CRC(a13a7a0a) SHA1(28e918ece4dcfa3883d2439c226b2f125d43f386) )
+ROM_END
+
+
+/*
     Royal Card (set 7, encrypted)
     -----------------------------
 
@@ -3309,6 +3334,7 @@ ROM_START( royalcrdf )	/* encrypted program rom */
 	ROM_LOAD( "1-peel18cv8p.bin", 0x0200, 0x0155, NO_DUMP )	/* not present in the set */
 	ROM_LOAD( "2-peel18cv8p.bin", 0x0400, 0x0155, NO_DUMP )	/* not present in the set */
 ROM_END
+
 
 
 ROM_START( royalcrdp )
@@ -4323,6 +4349,7 @@ GAMEL( 1991, royalcrdb, royalcrd, royalcd1, royalcrd,  0,        ROT0, "TAB Aust
 GAMEL( 1991, royalcrdc, royalcrd, royalcd2, royalcrd,  0,        ROT0, "TAB Austria",     "Royal Card (Austrian, set 4)",                    GAME_IMPERFECT_GRAPHICS, layout_jollycrd )
 GAMEL( 1991, royalcrdd, royalcrd, royalcd1, royalcrd,  0,        ROT0, "TAB Austria",     "Royal Card (Austrian, set 5)",                    0,                       layout_royalcrd )
 GAMEL( 1991, royalcrde, royalcrd, royalcd1, royalcrd,  0,        ROT0, "TAB Austria",     "Royal Card (Austrian, set 6)",                    0,                       layout_jollycrd )
+GAMEL( 1991, royalcrdt, royalcrd, royalcd1, royalcrd,  0,        ROT0, "TAB Austria",     "Royal Card (TAB original)",                       0,                       layout_jollycrd )
 GAME(  1991, royalcrdf, royalcrd, royalcd1, royalcrd,  royalcdc, ROT0, "Evona Electronic","Royal Card (Slovak, encrypted)",                  GAME_NOT_WORKING )
 GAME(  1993, royalcrdp, royalcrd, cuoreuno, royalcrd,  0,        ROT0, "Digital Dreams",  "Royal Card v2.0 Professional",                    GAME_NOT_WORKING )
 GAMEL( 1991, lluck3x3,  royalcrd, cuoreuno, royalcrd,  0,        ROT0, "TAB Austria",     "Lucky Lady (3x3 deal)",                           0,                       layout_jollycrd )

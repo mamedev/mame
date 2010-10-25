@@ -8,12 +8,12 @@
 
   Games running on this hardware:
 
-  * Jolly Card (austrian),                            TAB-Austria,        1985.
-  * Jolly Card (3x3 deal),                            TAB-Austria,        1985.
+  * Jolly Card (austrian),                            TAB Austria,        1985.
+  * Jolly Card (3x3 deal),                            TAB Austria,        1985.
   * Jolly Card Professional 2.0 (MZS Tech),           MZS Tech,           1993.
   * Jolly Card Professional 2.0 (Spale Soft),         Spale Soft,         2000.
   * Jolly Card (Evona Electronic),                    Evona Electronic    1998.
-  * Jolly Card (croatian, set 1),                     TAB-Austria,        1985.
+  * Jolly Card (croatian, set 1),                     TAB Austria,        1985.
   * Jolly Card (croatian, set 2),                     Soft Design,        1993.
   * Jolly Card (italian, blue TAB board, encrypted),  bootleg,            199?.
   * Jolly Card (italian, encrypted bootleg),          bootleg,            1990.
@@ -33,16 +33,17 @@
   * Pot Game (italian),                               C.M.C.,             1996.
   * Bottle 10 (italian, set 1),                       C.M.C.,             1996.
   * Bottle 10 (italian, set 2),                       C.M.C.,             1996.
-  * Royal Card (austrian, set 1),                     TAB-Austria,        1991.
-  * Royal Card (austrian, set 2),                     TAB-Austria,        1991.
-  * Royal Card (austrian/polish, set 3),              TAB-Austria,        1991.
-  * Royal Card (austrian, set 4),                     TAB-Austria,        1991.
-  * Royal Card (austrian, set 5),                     TAB-Austria,        1991.
-  * Royal Card (austrian, set 6),                     TAB-Austria,        1991.
+  * Royal Card (austrian, set 1),                     TAB Austria,        1991.
+  * Royal Card (austrian, set 2),                     TAB Austria,        1991.
+  * Royal Card (austrian/polish, set 3),              TAB Austria,        1991.
+  * Royal Card (austrian, set 4),                     TAB Austria,        1991.
+  * Royal Card (austrian, set 5),                     TAB Austria,        1991.
+  * Royal Card (austrian, set 6),                     TAB Austria,        1991.
+  * Royal Card (TAB original),                        TAB Austria,        1991.
   * Royal Card (slovak, encrypted),                   Evona Electronic,   1991.
   * Royal Card Professional 2.0,                      Digital Dreams,     1993.
-  * Lucky Lady (3x3 deal),                            TAB-Austria,        1991.
-  * Lucky Lady (4x1 aces),                            TAB-Austria,        1991.
+  * Lucky Lady (3x3 deal),                            TAB Austria,        1991.
+  * Lucky Lady (4x1 aces),                            TAB Austria,        1991.
   * Magic Card II (bulgarian),                        Impera,             1996.
   * Magic Card II (green TAB or Impera board),        Impera,             1996.
   * Magic Card II (blue TAB board, encrypted),        Impera,             1996.
