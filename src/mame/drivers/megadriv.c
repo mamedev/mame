@@ -345,6 +345,8 @@ static cpu_device *_segacd_68k_cpu;
 static emu_timer *segacd_gfx_conversion_timer;
 static emu_timer *segacd_dmna_ret_timer;
 static emu_timer *segacd_irq3_timer;
+static emu_timer *segacd_hock_timer;
+static UINT8 hock_cmd;
 static int segacd_wordram_mapped = 0;
 static TIMER_CALLBACK( segacd_irq3_timer_callback );
 
@@ -397,6 +399,7 @@ static struct
 {
 	UINT8 buffer[5];
 	UINT8 ctrl;
+	UINT8 scd_status; // SCSI status?
 }segacd_cdd;
 #ifdef MESS
 static struct
@@ -404,6 +407,8 @@ static struct
 	UINT32	current_frame;
 	UINT32	end_frame;
 	UINT32	last_frame;
+	UINT8	first_track;
+	UINT8	last_track;
 
 	cdrom_file	*cd;
 	const cdrom_toc*	toc;
@@ -4994,6 +4999,39 @@ INLINE UINT8 get_stampmap_32x32_16x16_tile_info_pixel(running_machine* machine, 
 }
 
 
+static TIMER_CALLBACK( segacd_hock_callback )
+{
+	int i,cdd_crc;
+
+	if(hock_cmd)
+	{
+//		segacd_cdd.ctrl &= ~4; // clear HOCK flag
+
+		segacd_cdd_rx[0] = (segacd_cdd.buffer[0] & 0xf0) >> 4;
+		segacd_cdd_rx[1] = (segacd_cdd.buffer[0] & 0x0f) >> 0;
+		segacd_cdd_rx[2] = (segacd_cdd.buffer[1] & 0xf0) >> 4;
+		segacd_cdd_rx[3] = (segacd_cdd.buffer[1] & 0x0f) >> 0;
+		segacd_cdd_rx[4] = (segacd_cdd.buffer[2] & 0xf0) >> 4;
+		segacd_cdd_rx[5] = (segacd_cdd.buffer[2] & 0x0f) >> 0;
+		segacd_cdd_rx[6] = (segacd_cdd.buffer[3] & 0xf0) >> 4;
+		segacd_cdd_rx[7] = (segacd_cdd.buffer[3] & 0x0f) >> 0;
+		segacd_cdd_rx[8] = (segacd_cdd.buffer[4] & 0x0f) >> 0;
+
+		/* Do checksum calculation of the above registers */
+		cdd_crc = 0;
+		for(i=0;i<9;i++)
+			cdd_crc += segacd_cdd_rx[i];
+
+		segacd_cdd_rx[9] = ((cdd_crc & 0xf) ^ 0xf);
+
+		if(segacd_irq_mask & 0x10)
+			cputag_set_input_line(machine, "segacd_68k", 4, HOLD_LINE);
+
+		hock_cmd = 0;
+	}
+
+	timer_adjust_oneshot(segacd_hock_timer, ATTOTIME_IN_HZ(75), 0);
+}
 
 
 /* main CPU map set up in INIT */
@@ -5036,6 +5074,8 @@ void segacd_init_main_cpu( running_machine* machine )
 	segacd_dmna_ret_timer = timer_alloc(machine, segacd_dmna_ret_timer_callback, 0);
 	timer_adjust_oneshot(segacd_gfx_conversion_timer, attotime_never, 0);
 
+	segacd_hock_timer = timer_alloc(machine, segacd_hock_callback, 0);
+	timer_adjust_oneshot(segacd_hock_timer, attotime_never, 0);
 
 	segacd_irq3_timer = timer_alloc(machine, segacd_irq3_timer_callback, 0);
 	timer_adjust_oneshot(segacd_irq3_timer, attotime_never, 0);
@@ -5108,6 +5148,8 @@ static MACHINE_RESET( segacd )
 				segacd.end_frame = segacd.last_frame;
 			}
 		}
+
+		segacd_cdd.scd_status = 0x00; // initial state
 	}
 	#endif
 
@@ -5118,6 +5160,8 @@ static MACHINE_RESET( segacd )
 	segacd_ram_mode_old = 0;
 
 	timer_adjust_oneshot(segacd_dmna_ret_timer, attotime_zero, 0);
+	timer_adjust_oneshot(segacd_hock_timer, attotime_zero, 0);
+	hock_cmd = 0;
 }
 
 
@@ -5255,32 +5299,8 @@ static WRITE16_HANDLER( segacd_sub_dataram_part2_w )
 	}
 }
 
-static TIMER_CALLBACK( execute_hock_irq )
-{
-	int i,cdd_crc;
 
-	segacd_cdd.ctrl &= ~4; // clear HOCK flag
-
-	segacd_cdd_rx[0] = (segacd_cdd.buffer[0] & 0xf0) >> 4;
-	segacd_cdd_rx[1] = (segacd_cdd.buffer[0] & 0x0f) >> 0;
-	segacd_cdd_rx[2] = (segacd_cdd.buffer[1] & 0xf0) >> 4;
-	segacd_cdd_rx[3] = (segacd_cdd.buffer[1] & 0x0f) >> 0;
-	segacd_cdd_rx[4] = (segacd_cdd.buffer[2] & 0xf0) >> 4;
-	segacd_cdd_rx[5] = (segacd_cdd.buffer[2] & 0x0f) >> 0;
-	segacd_cdd_rx[6] = (segacd_cdd.buffer[3] & 0xf0) >> 4;
-	segacd_cdd_rx[7] = (segacd_cdd.buffer[3] & 0x0f) >> 0;
-	segacd_cdd_rx[8] = (segacd_cdd.buffer[4] & 0x0f) >> 0;
-
-	/* Do checksum calculation of the above registers */
-	cdd_crc = 0;
-	for(i=0;i<9;i++)
-		cdd_crc += segacd_cdd_rx[i];
-
-	segacd_cdd_rx[9] = ((cdd_crc & 0xf) ^ 0xf);
-
-	cputag_set_input_line(machine, "segacd_68k", 4, HOLD_LINE);
-}
-
+#if 0
 static void cdd_hock_irq(running_machine *machine,UINT8 dir)
 {
 	if((segacd_cdd.ctrl & 4 || dir) && segacd_irq_mask & 0x10) // export status, check if bit 2 (HOst ClocK) and irq is enabled
@@ -5289,6 +5309,7 @@ static void cdd_hock_irq(running_machine *machine,UINT8 dir)
 		timer_set(machine, ATTOTIME_IN_HZ(75), NULL,0, execute_hock_irq); // 1 / 75th of a second
 	}
 }
+#endif
 
 static READ16_HANDLER( segacd_irq_mask_r )
 {
@@ -5299,8 +5320,7 @@ static WRITE16_HANDLER( segacd_irq_mask_w )
 {
 	segacd_irq_mask = data & 0x7e;
 
-	cdd_hock_irq(space->machine,0);
-	// check here other pending IRQs
+	// TODO: check here pending IRQs
 }
 
 static READ16_HANDLER( segacd_cdd_ctrl_r )
@@ -5312,7 +5332,12 @@ static WRITE16_HANDLER( segacd_cdd_ctrl_w )
 {
 	segacd_cdd.ctrl = data;
 
-	cdd_hock_irq(space->machine,0);
+	hock_cmd = (data & 4) >> 2;
+
+	if(data & 4) // enable Hock timer
+		timer_adjust_oneshot(segacd_hock_timer, ATTOTIME_IN_HZ(75), 0);
+	else
+		timer_adjust_oneshot(segacd_hock_timer, attotime_never, 0);
 }
 
 /* 68k <- CDD communication comms are 4-bit wide */
@@ -5326,7 +5351,7 @@ static const char *const segacd_cdd_cmd[] =
 	"Status",
 	"Stop All",
 	"Get TOC Info",
-	"Read",
+	"Play",
 	"Seek",
 	"Pause/Stop",
 	"Resume",
@@ -5365,13 +5390,13 @@ static const char *const segacd_cdd_get_toc_cmd[] =
 
 static void segacd_cdd_get_status(running_machine *machine)
 {
-	segacd_cdd.buffer[0] = 0;
-	segacd_cdd.buffer[1] = 0;
-	segacd_cdd.buffer[2] = 0;
-	segacd_cdd.buffer[3] = 0;
-	segacd_cdd.buffer[4] = 0;
+	//segacd_cdd.buffer[0] = 0;
+	//segacd_cdd.buffer[1] = 0;
+	//segacd_cdd.buffer[2] = 0;
+	//segacd_cdd.buffer[3] = 0;
+	//segacd_cdd.buffer[4] = 0;
 
-	cdd_hock_irq(machine,1);
+	hock_cmd = 1;
 }
 
 static void segacd_cdd_stop_all(running_machine *machine)
@@ -5384,43 +5409,83 @@ static void segacd_cdd_stop_all(running_machine *machine)
 	segacd_cdd.buffer[3] = 0;
 	segacd_cdd.buffer[4] = 0;
 
-	cdd_hock_irq(machine,1);
+	hock_cmd = 1;
 }
 
 
 static void segacd_cdd_get_toc_info(running_machine *machine)
 {
-	segacd_cdd.buffer[0] = (segacd_cdd_tx[3] & 0xf) | (segacd_cdd.buffer[0] & 0xf0);
+	segacd_cdd.buffer[0] = (segacd_cdd_tx[3] & 0xf) | (segacd_cdd.scd_status & 0xf0); // TODO: remove me
 
 	#if LOG_CDD
-	printf("CDD: TOC command %s issued\n",segacd_cdd_get_toc_cmd[segacd_cdd_tx[3] & 0xf]);
+	if(segacd_cdd_tx[3] >= 6)
+		printf("CDD: TOC command %s issued\n",segacd_cdd_get_toc_cmd[segacd_cdd_tx[3] & 0xf]);
 	#endif
+
+	// TODO: check if tray is open
 
 	if ( ! segacd.cd ) // no cd is present
 	{
-		segacd_cdd.buffer[0] = (0) | (segacd_cdd.buffer[0] & 0xf0);
+		segacd_cdd.scd_status = 0x00;
+		segacd_cdd.buffer[0] = (0) | (segacd_cdd.scd_status & 0xf0);
 		segacd_cdd.buffer[1] = 0;
 		segacd_cdd.buffer[2] = 0;
 		segacd_cdd.buffer[3] = 0;
 		segacd_cdd.buffer[4] = 0;
 
-		cdd_hock_irq(machine,1);
+		hock_cmd = 1;
 		return;
 	}
 	else
 	{
 		switch(segacd_cdd_tx[3] & 0xf)
 		{
+			case 0x0: //Get Current Position
+			{
+				UINT32 msf;
+
+				segacd_cdd.scd_status = 0x40; //TODO: check this
+
+				msf = lba_to_msf( segacd.current_frame );
+				segacd_cdd.buffer[0] = (0x0 & 0xf) | (segacd_cdd.scd_status & 0xf0);
+				segacd_cdd.buffer[1] = dec_2_bcd( msf >> 16 ) & 0xff;
+				segacd_cdd.buffer[2] = dec_2_bcd( msf >> 8 ) & 0xff;
+				segacd_cdd.buffer[3] = dec_2_bcd( msf >> 0 ) & 0xff;
+				segacd_cdd.buffer[4] = 0;
+
+				hock_cmd = 1;
+				return;
+			}
+			case 0x1: //Get Elapsed Time of Current Track
+			{
+				UINT32 msf;
+				UINT32 end_frame_track;
+
+				segacd_cdd.scd_status = 0x40; //TODO: check this
+
+				end_frame_track = segacd.toc->tracks[ cdrom_get_track(segacd.cd, segacd.current_frame) + 1 ].physframeofs; // correct?
+
+				msf = lba_to_msf( end_frame_track - segacd.current_frame );
+
+				segacd_cdd.buffer[0] = (0x1 & 0xf) | (segacd_cdd.scd_status & 0xf0);
+				segacd_cdd.buffer[1] = dec_2_bcd( msf >> 16 ) & 0xff;
+				segacd_cdd.buffer[2] = dec_2_bcd( msf >> 8 ) & 0xff;
+				segacd_cdd.buffer[3] = dec_2_bcd( msf >> 0 ) & 0xff;
+				segacd_cdd.buffer[4] = 0;
+
+				hock_cmd = 1;
+				return;
+			}
 			case 0x2: //Get Current Track
 			{
 				segacd_cdd.buffer[0] = (0x2 & 0xf) | (segacd_cdd.buffer[0] & 0xf0);
 
-				segacd_cdd.buffer[0] = 1; // current track number, TODO
-				segacd_cdd.buffer[1] = 0;
+				segacd_cdd.buffer[1] = cdrom_get_track(segacd.cd, segacd.current_frame);
 				segacd_cdd.buffer[2] = 0;
 				segacd_cdd.buffer[3] = 0;
 				segacd_cdd.buffer[4] = 0;
-				cdd_hock_irq(machine,1);
+
+				hock_cmd = 1;
 				return;
 			}
 			case 0x3: //Get Total Length (in MSF)
@@ -5429,37 +5494,104 @@ static void segacd_cdd_get_toc_info(running_machine *machine)
 
 				frame = segacd.toc->tracks[segacd.toc->numtrks-1].physframeofs;
 				frame += segacd.toc->tracks[segacd.toc->numtrks-1].frames;
+				frame += 150; // 2 seconds of pre-gap
 				msf = lba_to_msf( frame );
 
-				segacd_cdd.buffer[0] = (0x3 & 0xf) | (segacd_cdd.buffer[0] & 0xf0);
+				segacd_cdd.buffer[0] = (0x3 & 0xf) | (segacd_cdd.scd_status & 0xf0);
 				segacd_cdd.buffer[1] = ((msf >> 16) & 0xff);
 				segacd_cdd.buffer[2] = ((msf >> 8) & 0xff);
 				segacd_cdd.buffer[3] = ((msf >> 0) & 0xff);
 				segacd_cdd.buffer[4] = 0;
 
-				cdd_hock_irq(machine,1);
+				printf("%02x %02x %02x %02x %02x\n",segacd_cdd.buffer[0],segacd_cdd.buffer[1],segacd_cdd.buffer[2],segacd_cdd.buffer[3],segacd_cdd.buffer[4]);
+
+				hock_cmd = 1;
 				return;
 
 			}
-		case 0x4: //Get First and Last Track Number
+			case 0x4: //Get First and Last Track Number
 			{
-				segacd_cdd.buffer[0] = (0x4 & 0xf) | (segacd_cdd.buffer[0] & 0xf0);
-				segacd_cdd.buffer[1] = dec_2_bcd(1);
-				segacd_cdd.buffer[2] = dec_2_bcd(segacd.toc->numtrks);
+				segacd_cdd.scd_status = 0x40;
+				segacd_cdd.buffer[0] = (0x4 & 0xf) | (segacd_cdd.scd_status & 0xf0);
+				segacd.first_track = dec_2_bcd(1);
+				segacd.last_track = dec_2_bcd(segacd.toc->numtrks - 1);
+				segacd_cdd.buffer[1] = segacd.first_track;
+				segacd_cdd.buffer[2] = segacd.last_track;
 				segacd_cdd.buffer[3] = 0;
 				segacd_cdd.buffer[4] = 0;
 
-				cdd_hock_irq(machine,1);
+				printf("%02x %02x %02x %02x %02x\n",segacd_cdd.buffer[0],segacd_cdd.buffer[1],segacd_cdd.buffer[2],segacd_cdd.buffer[3],segacd_cdd.buffer[4]);
+
+				hock_cmd = 1;
+				return;
 			}
-			return;
+			case 0x5: //Get Track Addresses
+			{
+				UINT8 track_num;
+				UINT32 start_frame,frame,msf;
+
+				track_num = ((segacd_cdd_tx[4] & 0xf) * 10) | (segacd_cdd_tx[5] & 0x0f);
+
+				if(track_num > segacd.last_track)
+					track_num = segacd.last_track;
+				if(track_num < segacd.first_track)
+					track_num = segacd.first_track;
+				start_frame = segacd.toc->tracks[ bcd_2_dec( track_num - 1 ) ].physframeofs;
+				//end_frame = segacd.toc->tracks[ bcd_2_dec( track_num ) ].physframeofs;
+				frame = start_frame;
+				msf = lba_to_msf( frame );
+
+				segacd_cdd.buffer[0] = (0x5 & 0xf) | (segacd_cdd.scd_status & 0xf0);
+				segacd_cdd.buffer[1] = ((msf >> 16) & 0xff);
+				segacd_cdd.buffer[2] = ((msf >> 8) & 0xff);
+				segacd_cdd.buffer[3] = ((msf >> 0) & 0xff);
+				segacd_cdd.buffer[4] = (track_num % 10) | (( segacd.toc->tracks[track_num-1].trktype == CD_TRACK_AUDIO ) ? 0x80 : 0x00);
+
+				printf("%02x %02x %02x %02x %02x\n",segacd_cdd.buffer[0],segacd_cdd.buffer[1],segacd_cdd.buffer[2],segacd_cdd.buffer[3],segacd_cdd.buffer[4]);
+
+				hock_cmd = 1;
+				return;
+			}
 			//default: logerror("CDD: unhandled TOC command %s issued\n",segacd_cdd_get_toc_cmd[segacd_cdd_tx[3] & 0xf]);
 		}
 	}
 
-	cdd_hock_irq(machine,1);
+	hock_cmd = 1;
 }
 
 #endif
+
+static void segacd_cdd_seek(running_machine *machine)
+{
+	UINT8 m,s,f;
+	UINT8 track_num;
+	UINT32 frame;
+
+	// TODO: check if tray is open or CD isn't there and throw an error if so
+
+	segacd_cdd.scd_status = 0x20; //READY flag
+
+	m = ((segacd_cdd_tx[2] & 0xf) * 10) | (segacd_cdd_tx[3] & 0x0f);
+	s = ((segacd_cdd_tx[4] & 0xf) * 10) | (segacd_cdd_tx[5] & 0x0f);
+	f = ((segacd_cdd_tx[6] & 0xf) * 10) | (segacd_cdd_tx[7] & 0x0f);
+
+	frame = (m << 16) | (s << 8) | (f);
+
+	track_num = cdrom_get_track(segacd.cd, frame);
+	segacd.current_frame = frame;
+//	printf("%02x %02x %02x %02x\n",m,s,f,track_num);
+
+	segacd_cdd.ctrl &= 0xfeff;
+	segacd_cdd.ctrl |= (( segacd.toc->tracks[track_num-1].trktype == CD_TRACK_AUDIO ) ? 0x000 : 0x100);
+
+	segacd_cdd.buffer[0] = segacd_cdd.scd_status & 0x20; // set READY
+	segacd_cdd.buffer[1] = 0;
+	segacd_cdd.buffer[2] = 0;
+	segacd_cdd.buffer[3] = 0;
+	segacd_cdd.buffer[4] = 0;
+
+	hock_cmd = 1;
+}
 
 static WRITE8_HANDLER( segacd_cdd_tx_w )
 {
@@ -5470,7 +5602,7 @@ static WRITE8_HANDLER( segacd_cdd_tx_w )
 	if(offset == 9) //execute the command when crc is sent (TODO: I wonder if we need to check if crc is valid. Plus obviously this shouldn't be instant)
 	{
 		#if LOG_CDD
-		if(segacd_cdd_tx[0] != 0)
+		if(segacd_cdd_tx[0] != 0 && segacd_cdd_tx[0] != 2)
 			printf("CDD: command %s issued\n",segacd_cdd_cmd[segacd_cdd_tx[0] & 0xf]);
 		#endif
 
@@ -5479,6 +5611,8 @@ static WRITE8_HANDLER( segacd_cdd_tx_w )
 			case 0x0: segacd_cdd_get_status(space->machine); break;
 			case 0x1: segacd_cdd_stop_all(space->machine); break;
 			case 0x2: segacd_cdd_get_toc_info(space->machine); break;
+			//case 0x3: segacd_cdd_play(space->machine); break;
+			case 0x4: segacd_cdd_seek(space->machine); break;
 			//default: logerror("CDD: unhandled command %s issued\n",segacd_cdd_cmd[segacd_cdd_tx[0] & 0xf]);
 		}
 	}
