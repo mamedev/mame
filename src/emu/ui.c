@@ -729,7 +729,8 @@ void ui_draw_text_box(render_container *container, const char *text, int justify
 	float target_x, target_y;
 	float last_target_height = 0;
 
-	while (1)
+	// limit this iteration to a finite number of passes
+	for (int pass = 0; pass < 5; pass++)
 	{
 		/* determine the target location */
 		target_x = xpos - 0.5f * target_width;
