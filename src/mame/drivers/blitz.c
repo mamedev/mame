@@ -9,7 +9,8 @@
 
   Games running on this hardware:
 
-  * Mega Double Poker (conversion kit). 1990, Blitz System Inc.
+  * Mega Double Poker (conversion kit, set 1). 1990, Blitz System Inc.
+  * Mega Double Poker (conversion kit, set 2). 1990, Blitz System Inc.
 
 
 *******************************************************************************
@@ -837,10 +838,64 @@ ROM_START( megadpkr )
 	ROM_LOAD( "m3-7611-5.7d",	0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
 ROM_END
 
+/*
+
+manufacturer : Blitz system
+Game name :    Mega Double Poker
+Platform  :    Bonanza golden poker interface
+
+
+BoardID
+BO-BL-01
+
+Protection:    U11  MC68705P5S  microcontroller with window
+
+maincpu:
+U6  UM6502
+U5  MK48T02B-15   time/clock backup ram
+
+U2.bin  27C256 ROM
+U3.bin  27C256 ROM
+
+Graphics ic
+car1_5a.bin  27C32 ROM
+car2_4a.bin  27C32 ROM
+car3_2a.bin  27C32 ROM
+
+
+note : MC68705P5S is protected
+
+*/
+
+ROM_START( megadpkrb )
+	ROM_REGION( 0x10000, "maincpu", 0 )	/* program ROM */
+	ROM_LOAD( "u2.bin",	0x8000, 0x8000, CRC(0efdf472) SHA1(4b1ae10427c2ae8d7cbbe525a6b30973372d4420) )
+
+	/* sharing the same space, but not totally understood... banked through MCU? */
+	ROM_REGION( 0x10000, "cpubank", 0 )
+	ROM_LOAD( "u3.bin",	0x8000, 0x8000, CRC(c973e345) SHA1(aae9da8cbaf0cf07086e5acacf9052e49fbdd896) )
+
+	ROM_REGION( 0x0800, "mcu", 0 )	/* 2k for the undumped 68705 microcontroller */
+	ROM_LOAD( "u11.bin",  0x0000, 0x0800, NO_DUMP )
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_FILL(				0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
+	ROM_LOAD( "car1_5a.bin",	0x2000, 0x1000, CRC(29e244d2) SHA1(c309a5ee6922bf2752d218c134edb3ef5f808afa) )    /* text chars / cards deck gfx, bitplane3 */
+
+	ROM_REGION( 0x3000, "gfx2", 0 )
+	ROM_LOAD( "car3_2a.bin",	0x0000, 0x1000, CRC(819c06c4) SHA1(45b874554fb487173acf12daa4ff99e49e335362) )    /* cards deck gfx, bitplane1 */
+	ROM_LOAD( "car2_4a.bin",	0x1000, 0x1000, CRC(41eec680) SHA1(3723f66e1def3908f2e6ba2989def229d9846b02) )    /* cards deck gfx, bitplane2 */
+	ROM_COPY( "gfx1",	0x2800, 0x2000, 0x0800 )    /* cards deck gfx, bitplane3. found in the 2nd quarter of the chars rom */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "m3-7611-5.7d",	0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+ROM_END
+
 
 /*********************************************
 *                Game Drivers                *
 *********************************************/
 
-/*    YEAR  NAME      PARENT    MACHINE   INPUT     INIT  ROT     COMPANY              FULLNAME                             FLAGS */
-GAME( 1990, megadpkr, 0,        megadpkr, megadpkr, 0,    ROT0,  "Blitz System Inc.", "Mega Double Poker (conversion kit)", GAME_NO_SOUND | GAME_NOT_WORKING )
+/*    YEAR  NAME       PARENT    MACHINE   INPUT     INIT  ROT     COMPANY              FULLNAME                                    FLAGS */
+GAME( 1990, megadpkr,  0,        megadpkr, megadpkr, 0,    ROT0,  "Blitz System Inc.", "Mega Double Poker (conversion kit, set 1)", GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 1990, megadpkrb, megadpkr, megadpkr, megadpkr, 0,    ROT0,  "Blitz System Inc.", "Mega Double Poker (conversion kit, set 2)", GAME_NO_SOUND | GAME_NOT_WORKING )
