@@ -197,7 +197,10 @@ void render_font::char_expand(unicode_char chnum, glyph &gl)
 		// attempt to get the font bitmap; if we fail, set bmwidth to -1
 		gl.bitmap = m_manager.machine().osd().font_get_bitmap(m_osdfont, chnum, gl.width, gl.xoffs, gl.yoffs);
 		if (gl.bitmap == NULL)
+		{
+			gl.bmwidth = -1;
 			return;
+		}
 
 		// populate the bmwidth/bmheight fields
 		gl.bmwidth = gl.bitmap->width;
