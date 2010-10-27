@@ -1153,6 +1153,13 @@ ROM_START( mgnumber )
 	DISK_IMAGE_READONLY( "magicnumber", 0, SHA1(60e1fadc42694742d19cc0ac2b6e99e9e33faa3d) )
 ROM_END
 
+ROM_START( odeontw2 )
+	CD32_BIOS
+
+	DISK_REGION( "cdrom" )
+	DISK_IMAGE_READONLY( "odeontw2", 0, SHA1(f39e09f35b65a6ae9f1eba4a22f970626b7d3b71) )
+ROM_END
+
 /***************************************************************************************************/
 
 static DRIVER_INIT( cd32 )
@@ -1343,3 +1350,4 @@ GAME( 1995, lsrquiz2, cd32, cd32, lsrquiz2, lsrquiz2, ROT0, "CD Express", "Laser
 GAME( 1995, lasstixx, cd32, cd32, lasstixx, lasstixx, ROT0, "CD Express", "Laser Strixx 2",            GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 GAME( 1995, mgnumber, cd32, cd32, mgnumber, mgnumber, ROT0, "CD Express", "Magic Number",              GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 GAME( 1996, mgprem11, cd32, cd32, mgprem11, mgprem11, ROT0, "CD Express", "Magic Premium (v1.1)",      GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
+GAME( 1999, odeontw2, cd32, cd32, cd32,     cd32,     ROT0, "CD Express", "Odeon Twister 2 (v202.19)", GAME_NOT_WORKING )
