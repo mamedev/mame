@@ -168,7 +168,6 @@ running_machine::running_machine(const machine_config &_config, osd_interface &o
 	  input_data(NULL),
 	  input_port_data(NULL),
 	  ui_input_data(NULL),
-	  cheat_data(NULL),
 	  debugcpu_data(NULL),
 	  generic_machine_data(NULL),
 	  generic_video_data(NULL),
@@ -191,6 +190,7 @@ running_machine::running_machine(const machine_config &_config, osd_interface &o
 	  m_saveload_searchpath(NULL),
 	  m_rand_seed(0x9d14abd7),
 	  m_driver_device(NULL),
+	  m_cheat(NULL),
 	  m_render(NULL),
 	  m_debug_view(NULL)
 {
@@ -344,8 +344,7 @@ void running_machine::start()
 		schedule_load("auto");
 
 	// set up the cheat engine
-	if (options_get_bool(&m_options, OPTION_CHEAT))
-		cheat_init(this);
+	m_cheat = auto_alloc(this, cheat_manager(*this));
 
 	// disallow save state registrations starting here
 	state_save_allow_registration(this, false);

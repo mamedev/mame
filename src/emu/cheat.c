@@ -1,13 +1,41 @@
-/*********************************************************************
+/***************************************************************************
 
     cheat.c
 
     MAME cheat system.
 
-    Copyright Nicola Salmoria and the MAME Team.
-    Visit http://mamedev.org for licensing and usage restrictions.
+****************************************************************************
 
-**********************************************************************
+    Copyright Aaron Giles
+    All rights reserved.
+
+    Redistribution and use in source and binary forms, with or without
+    modification, are permitted provided that the following conditions are
+    met:
+
+        * Redistributions of source code must retain the above copyright
+          notice, this list of conditions and the following disclaimer.
+        * Redistributions in binary form must reproduce the above copyright
+          notice, this list of conditions and the following disclaimer in
+          the documentation and/or other materials provided with the
+          distribution.
+        * Neither the name 'MAME' nor the names of its contributors may be
+          used to endorse or promote products derived from this software
+          without specific prior written permission.
+
+    THIS SOFTWARE IS PROVIDED BY AARON GILES ''AS IS'' AND ANY EXPRESS OR
+    IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+    WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+    DISCLAIMED. IN NO EVENT SHALL AARON GILES BE LIABLE FOR ANY DIRECT,
+    INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+    (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+    SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+    HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT,
+    STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+    IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+    POSSIBILITY OF SUCH DAMAGE.
+
+****************************************************************************
 
     Cheat XML format:
 
@@ -33,7 +61,7 @@
         ...
     </mamecheat>
 
-**********************************************************************
+****************************************************************************
 
     Expressions are standard debugger expressions. Note that & and
     < must be escaped per XML rules. Within attributes you must use
@@ -51,7 +79,7 @@
     variables may be requested via the 'tempvariables' attribute
     on the cheat.
 
-**********************************************************************
+****************************************************************************
 
     Cheats are generally broken down into categories based on
     which actions are defined and whether or not there is a
@@ -71,7 +99,7 @@
      ?    Y    ?    ?    List   Item list parameter (off or a live value)
      ?    ?    Y    ?    List   Item list parameter (off or a live value)
 
-*********************************************************************/
+***************************************************************************/
 
 #include "emu.h"
 #include "emuopts.h"
@@ -86,273 +114,43 @@
 
 
 
+//**************************************************************************
+//  PARAMETERS
+//**************************************************************************
 
-/***************************************************************************
-    CONSTANTS
-***************************************************************************/
-
-/* turn this on to enable removing duplicate cheats; not sure if we should */
+// turn this on to enable removing duplicate cheats; not sure if we should
 #define REMOVE_DUPLICATE_CHEATS	0
 
-#define CHEAT_VERSION			1
 
-#define DEFAULT_TEMP_VARIABLES	10
-#define MAX_ARGUMENTS			32
 
-enum _script_state
+//**************************************************************************
+//  NUMBER AND FORMAT
+//**************************************************************************
+
+//-------------------------------------------------
+//  format - format an integer according to
+//  the format
+//-------------------------------------------------
+
+inline const char *number_and_format::format(astring &string) const
 {
-	SCRIPT_STATE_OFF = 0,
-	SCRIPT_STATE_ON,
-	SCRIPT_STATE_RUN,
-	SCRIPT_STATE_CHANGE,
-	SCRIPT_STATE_COUNT
-};
-typedef enum _script_state script_state;
-DECLARE_ENUM_OPERATORS(script_state)
-
-
-
-/***************************************************************************
-    TYPE DEFINITIONS
-***************************************************************************/
-
-/* a single item (string + value) for a cheat parameter */
-typedef struct _parameter_item parameter_item;
-struct _parameter_item
-{
-	parameter_item *	next;							/* next item in list */
-	astring				text;							/* name of the item */
-	UINT64				value;							/* value of the item */
-	int					valformat;						/* format of value */
-	astring				curtext;						/* name of the current item */
-};
-
-
-/* a parameter for a cheat, which can be set in the UI */
-typedef struct _cheat_parameter cheat_parameter;
-struct _cheat_parameter
-{
-	UINT64				minval;							/* minimum value */
-	int					minformat;						/* format of minimum value */
-	UINT64				maxval;							/* maximum value */
-	int					maxformat;						/* format of maximum value */
-	UINT64				stepval;						/* step value */
-	int					stepformat;						/* format of step value */
-	UINT64				value;							/* live value of the parameter */
-	char				valuestring[32];				/* small space for a value string */
-	parameter_item *	itemlist;						/* list of items */
-};
-
-
-/* a single argument for an output display */
-typedef struct _output_argument output_argument;
-struct _output_argument
-{
-	output_argument *	next;							/* link to next argument */
-	parsed_expression *	expression;						/* expression for argument */
-	UINT64				count;							/* number of repetitions */
-};
-
-
-/* a single entry within a script, either an expression to execute or a string to output */
-typedef struct _script_entry script_entry;
-struct _script_entry
-{
-	script_entry *		next;							/* link to next entry */
-	parsed_expression *	condition;						/* condition under which this is executed */
-	parsed_expression *	expression;						/* expression to execute */
-	astring				format;							/* string format to print */
-	output_argument *	arglist;						/* list of arguments */
-	INT8				line;							/* which line to print on */
-	UINT8				justify;						/* justification when printing */
-};
-
-
-/* a script entry, specifying which state to execute under */
-typedef struct _cheat_script cheat_script;
-struct _cheat_script
-{
-	script_entry *		entrylist;						/* list of actions to perform */
-	script_state		state;							/* which state this script is for */
-};
-
-
-/* a single cheat */
-typedef struct _cheat_entry cheat_entry;
-struct _cheat_entry
-{
-	cheat_entry *		next;							/* next cheat entry */
-	astring				description;					/* string description/menu title */
-	astring				comment;						/* comment data */
-	cheat_parameter *	parameter;						/* parameter */
-	cheat_script *		script[SCRIPT_STATE_COUNT];		/* up to 1 script for each state */
-	symbol_table *		symbols;						/* symbol table for this cheat */
-	script_state		state;							/* current cheat state */
-	UINT32				numtemp;						/* number of temporary variables */
-	UINT64				argindex;						/* argument index variable */
-	UINT64 *			tempvar;						/* value of the temporary variables */
-};
-
-
-/* private machine-global data */
-struct _cheat_private
-{
-	cheat_entry *		cheatlist;						/* cheat list */
-	UINT64				framecount;						/* frame count */
-	astring				output[UI_TARGET_FONT_ROWS*2];	/* array of output strings */
-	UINT8				justify[UI_TARGET_FONT_ROWS*2];	/* justification for each string */
-	UINT8				numlines;						/* number of lines available for output */
-	INT8				lastline;						/* last line used for output */
-	UINT8				disabled;						/* true if the cheat engine is disabled */
-};
-
-
-
-/***************************************************************************
-    FUNCTION PROTOTYPES
-***************************************************************************/
-
-static void cheat_exit(running_machine &machine);
-static void cheat_frame(running_machine &machine);
-static void cheat_execute_script(cheat_private *cheatinfo, cheat_entry *cheat, script_state state);
-
-static cheat_entry *cheat_list_load(running_machine *machine, const char *filename);
-static int cheat_list_save(const char *filename, const cheat_entry *cheatlist);
-static void cheat_list_free(running_machine *machine, cheat_entry *cheat);
-static cheat_entry *cheat_entry_load(running_machine *machine, const char *filename, xml_data_node *cheatnode);
-static void cheat_entry_save(mame_file *cheatfile, const cheat_entry *cheat);
-static void cheat_entry_free(running_machine *machine, cheat_entry *cheat);
-static cheat_parameter *cheat_parameter_load(running_machine *machine, const char *filename, xml_data_node *paramnode);
-static void cheat_parameter_save(mame_file *cheatfile, const cheat_parameter *param);
-static void cheat_parameter_free(running_machine *machine, cheat_parameter *param);
-static cheat_script *cheat_script_load(running_machine *machine, const char *filename, xml_data_node *scriptnode, cheat_entry *cheat);
-static void cheat_script_save(mame_file *cheatfile, const cheat_script *script);
-static void cheat_script_free(running_machine *machine, cheat_script *script);
-static script_entry *script_entry_load(running_machine *machine, const char *filename, xml_data_node *entrynode, cheat_entry *cheat, int isaction);
-static void script_entry_save(mame_file *cheatfile, const script_entry *entry);
-static void script_entry_free(running_machine *machine, script_entry *entry);
-
-static astring &quote_astring_expression(astring &string, int isattribute);
-static int validate_format(const char *filename, int line, const script_entry *entry);
-static UINT64 cheat_variable_get(void *globalref, void *ref);
-static void cheat_variable_set(void *globalref, void *ref, UINT64 value);
-static UINT64 execute_frombcd(void *globalref, void *ref, UINT32 params, const UINT64 *param);
-static UINT64 execute_tobcd(void *globalref, void *ref, UINT32 params, const UINT64 *param);
-
-
-
-/***************************************************************************
-    INLINE FUNCTIONS
-***************************************************************************/
-
-/*-------------------------------------------------
-    is_text_only_cheat - return TRUE if this
-    cheat entry is text-only (no actions)
--------------------------------------------------*/
-
-INLINE int is_text_only_cheat(const cheat_entry *cheat)
-{
-	return (cheat->parameter == NULL &&
-			cheat->script[SCRIPT_STATE_RUN] == NULL &&
-			cheat->script[SCRIPT_STATE_OFF] == NULL &&
-			cheat->script[SCRIPT_STATE_ON] == NULL);
-}
-
-
-/*-------------------------------------------------
-    is_oneshot_cheat - return TRUE if this cheat
-    entry is a one-shot cheat (no "run" or "off"
-    action, but a valid "on" action)
--------------------------------------------------*/
-
-INLINE int is_oneshot_cheat(const cheat_entry *cheat)
-{
-	return (cheat->parameter == NULL &&
-			cheat->script[SCRIPT_STATE_RUN] == NULL &&
-			cheat->script[SCRIPT_STATE_OFF] == NULL &&
-			cheat->script[SCRIPT_STATE_ON] != NULL);
-}
-
-
-/*-------------------------------------------------
-    is_onoff_cheat - return TRUE if this cheat
-    entry is a simple on/off toggle (either the
-    "run" or "off" actions are present)
--------------------------------------------------*/
-
-INLINE int is_onoff_cheat(const cheat_entry *cheat)
-{
-	return (cheat->parameter == NULL &&
-			(cheat->script[SCRIPT_STATE_RUN] != NULL ||
-			 (cheat->script[SCRIPT_STATE_OFF] != NULL &&
-			  cheat->script[SCRIPT_STATE_ON] != NULL)));
-}
-
-
-/*-------------------------------------------------
-    is_value_parameter_cheat - return TRUE if this
-    cheat entry has a parameter represented by an
-    integer value
--------------------------------------------------*/
-
-INLINE int is_value_parameter_cheat(const cheat_entry *cheat)
-{
-	return (cheat->parameter != NULL && cheat->parameter->itemlist == NULL);
-}
-
-
-/*-------------------------------------------------
-    is_itemlist_parameter_cheat - return TRUE if
-    this cheat entry has a parameter represented
-    by an item list
--------------------------------------------------*/
-
-INLINE int is_itemlist_parameter_cheat(const cheat_entry *cheat)
-{
-	return (cheat->parameter != NULL && cheat->parameter->itemlist != NULL);
-}
-
-
-/*-------------------------------------------------
-    is_oneshot_parameter_cheat - return TRUE if
-    this cheat entry is a one-shot cheat with a
-    parameter (no "run" or "off" actions, but a
-    valid "change" action)
--------------------------------------------------*/
-
-INLINE int is_oneshot_parameter_cheat(const cheat_entry *cheat)
-{
-	return (cheat->parameter != NULL &&
-			cheat->script[SCRIPT_STATE_RUN] == NULL &&
-			cheat->script[SCRIPT_STATE_OFF] == NULL &&
-			cheat->script[SCRIPT_STATE_CHANGE] != NULL);
-}
-
-
-/*-------------------------------------------------
-    format_int - format an integer according to
-    the format
--------------------------------------------------*/
-
-INLINE const char *format_int(astring &string, UINT64 value, int format)
-{
-	switch (format)
+	switch (m_format)
 	{
 		default:
 		case XML_INT_FORMAT_DECIMAL:
-			string.printf("%d", (UINT32)value);
+			string.printf("%d", (UINT32)m_value);
 			break;
 
 		case XML_INT_FORMAT_DECIMAL_POUND:
-			string.printf("#%d", (UINT32)value);
+			string.printf("#%d", (UINT32)m_value);
 			break;
 
 		case XML_INT_FORMAT_HEX_DOLLAR:
-			string.printf("$%X", (UINT32)value);
+			string.printf("$%X", (UINT32)m_value);
 			break;
 
 		case XML_INT_FORMAT_HEX_C:
-			string.printf("0x%X", (UINT32)value);
+			string.printf("0x%X", (UINT32)m_value);
 			break;
 	}
 	return string;
@@ -360,57 +158,1051 @@ INLINE const char *format_int(astring &string, UINT64 value, int format)
 
 
 
-/***************************************************************************
-    SYSTEM INTERACTION
-***************************************************************************/
+//**************************************************************************
+//  CHEAT PARAMETER
+//**************************************************************************
 
-/*-------------------------------------------------
-    cheat_init - initialize the cheat engine,
-    loading the cheat file
--------------------------------------------------*/
+//-------------------------------------------------
+//  cheat_parameter - constructor
+//-------------------------------------------------
 
-void cheat_init(running_machine *machine)
+cheat_parameter::cheat_parameter(cheat_manager &manager, symbol_table &symbols, const char *filename, xml_data_node &paramnode)
+	: m_value(0),
+	  m_itemlist(manager.machine().m_respool)
 {
-	cheat_private *cheatinfo;
+	// read the core attributes
+	m_minval = number_and_format(xml_get_attribute_int(&paramnode, "min", 0), xml_get_attribute_int_format(&paramnode, "min"));
+	m_maxval = number_and_format(xml_get_attribute_int(&paramnode, "max", 0), xml_get_attribute_int_format(&paramnode, "max"));
+	m_stepval = number_and_format(xml_get_attribute_int(&paramnode, "step", 1), xml_get_attribute_int_format(&paramnode, "step"));
+	
+	// iterate over items
+	for (xml_data_node *itemnode = xml_get_sibling(paramnode.child, "item"); itemnode != NULL; itemnode = xml_get_sibling(itemnode->next, "item"))
+	{
+		// check for NULL text
+		if (itemnode->value == NULL || itemnode->value[0] == 0)
+			throw emu_fatalerror("%s.xml(%d): item is missing text\n", filename, itemnode->line);
 
-	/* request a callback */
-	machine->add_notifier(MACHINE_NOTIFY_FRAME, cheat_frame);
-	machine->add_notifier(MACHINE_NOTIFY_EXIT, cheat_exit);
+		// check for non-existant value
+		if (xml_get_attribute(itemnode, "value") == NULL)
+			throw emu_fatalerror("%s.xml(%d): item is value\n", filename, itemnode->line);
+		
+		// extract the parameters
+		UINT64 value = xml_get_attribute_int(itemnode, "value", 0);
+		int format = xml_get_attribute_int_format(itemnode, "value");
+		
+		// allocate and append a new item
+		item &curitem = m_itemlist.append(*auto_alloc(&manager.machine(), item(itemnode->value, value, format)));
 
-	/* allocate memory */
-	cheatinfo = auto_alloc_clear(machine, cheat_private);
-	machine->cheat_data = cheatinfo;
+		// ensure the maximum expands to suit
+		m_maxval = MAX(m_maxval, curitem.value());
+	}
 
-	/* load the cheats */
-	cheat_reload(machine);
-
-	/* we rely on the debugger expression callbacks; if the debugger isn't
-       enabled, we must jumpstart them manually */
-	if ((machine->debug_flags & DEBUG_FLAG_ENABLED) == 0)
-		debug_cpu_init(machine);
+	// add a variable to the symbol table for our value
+	symtable_add_register(&symbols, "param", &m_value, cheat_manager::variable_get, NULL);
 }
 
 
-/*-------------------------------------------------
-    cheat_reload - re-initialize the cheat engine,
-    and reload the cheat file(s)
--------------------------------------------------*/
+//-------------------------------------------------
+//  text - return the current text for a parameter
+//-------------------------------------------------
 
-void cheat_reload(running_machine *machine)
+const char *cheat_parameter::text()
 {
-	cheat_private *cheatinfo = machine->cheat_data;
+	// are we a value cheat?
+	if (!has_itemlist())
+		m_curtext.format("%d (0x%X)", UINT32(m_value), UINT32(m_value));
+	
+	// if not, we're an item cheat
+	else
+	{
+		m_curtext.format("??? (%d)", UINT32(m_value));
+		for (item *curitem = m_itemlist.first(); curitem != NULL; curitem = curitem->next())
+			if (curitem->value() == m_value)
+			{
+				m_curtext.cpy(curitem->text());
+				break;
+			}
+	}
+	return m_curtext;
+}
 
-	/* free everything */
-	cheat_exit(*machine);
 
-	/* reset our memory */
-	auto_free(machine, cheatinfo);
-	cheatinfo = machine->cheat_data = auto_alloc_clear(machine, cheat_private);
+//-------------------------------------------------
+//  save - save a single cheat parameter
+//-------------------------------------------------
 
-	/* load the cheat file, MESS will load a crc32.xml ( eg. 01234567.xml )
-       and MAME will load gamename.xml */
+void cheat_parameter::save(mame_file &cheatfile) const
+{
+	// output the parameter tag
+	mame_fprintf(&cheatfile, "\t\t<parameter");
+
+	// if no items, just output min/max/step
+	astring string;
+	if (!has_itemlist())
+	{
+		if (m_minval != 0)
+			mame_fprintf(&cheatfile, " min=\"%s\"", m_minval.format(string));
+		if (m_maxval != 0)
+			mame_fprintf(&cheatfile, " max=\"%s\"", m_maxval.format(string));
+		if (m_stepval != 1)
+			mame_fprintf(&cheatfile, " step=\"%s\"", m_stepval.format(string));
+		mame_fprintf(&cheatfile, "/>\n");
+	}
+
+	// iterate over items
+	else
+	{
+		for (const item *curitem = m_itemlist.first(); curitem != NULL; curitem = curitem->next())
+			mame_fprintf(&cheatfile, "\t\t\t<item value=\"%s\">%s</item>\n", curitem->value().format(string), curitem->text());
+		mame_fprintf(&cheatfile, "\t\t</parameter>\n");
+	}
+}
+
+
+//-------------------------------------------------
+//  set_minimum_state - set the minimum state
+//-------------------------------------------------
+
+bool cheat_parameter::set_minimum_state()
+{
+	UINT64 origvalue = m_value;
+
+	// set based on whether we have an item list
+	m_value = (!has_itemlist()) ? m_minval : m_itemlist.first()->value();
+
+	return (m_value != origvalue);
+}
+
+
+//-------------------------------------------------
+//  set_minimum_state - set the previous state
+//-------------------------------------------------
+
+bool cheat_parameter::set_prev_state()
+{
+	UINT64 origvalue = m_value;
+	
+	// are we a value cheat?
+	if (!has_itemlist())
+	{
+		if (m_value < m_minval + m_stepval)
+			m_value = m_minval;
+		else
+			m_value -= m_stepval;
+	}
+	
+	// if not, we're an item cheat
+	else
+	{
+		item *curitem, *previtem = NULL;
+		for (curitem = m_itemlist.first(); curitem != NULL; previtem = curitem, curitem = curitem->next())
+			if (curitem->value() == m_value)
+				break;
+		if (previtem != NULL)
+			m_value = previtem->value();
+	}
+	
+	return (m_value != origvalue);
+}
+
+
+//-------------------------------------------------
+//  set_next_state - advance to the next state
+//-------------------------------------------------
+
+bool cheat_parameter::set_next_state()
+{
+	UINT64 origvalue = m_value;
+	
+	// are we a value cheat?
+	if (!has_itemlist())
+	{
+		if (m_value > m_maxval - m_stepval)
+			m_value = m_maxval;
+		else
+			m_value += m_stepval;
+	}
+	
+	// if not, we're an item cheat
+	else
+	{
+		item *curitem;
+		for (curitem = m_itemlist.first(); curitem != NULL; curitem = curitem->next())
+			if (curitem->value() == m_value)
+				break;
+		if (curitem != NULL && curitem->next() != NULL)
+			m_value = curitem->next()->value();
+	}
+	
+	return (m_value != origvalue);
+}
+
+
+
+//**************************************************************************
+//  CHEAT SCRIPT
+//**************************************************************************
+
+//-------------------------------------------------
+//  cheat_script - constructor
+//-------------------------------------------------
+
+cheat_script::cheat_script(cheat_manager &manager, symbol_table &symbols, const char *filename, xml_data_node &scriptnode)
+	: m_entrylist(manager.machine().m_respool),
+	  m_state(SCRIPT_STATE_RUN)
+{
+	// read the core attributes
+	const char *state = xml_get_attribute_string(&scriptnode, "state", "run");
+	if (strcmp(state, "on") == 0)
+		m_state = SCRIPT_STATE_ON;
+	else if (strcmp(state, "off") == 0)
+		m_state = SCRIPT_STATE_OFF;
+	else if (strcmp(state, "change") == 0)
+		m_state = SCRIPT_STATE_CHANGE;
+	else if (strcmp(state, "run") != 0)
+		throw emu_fatalerror("%s.xml(%d): invalid script state '%s'\n", filename, scriptnode.line, state);
+
+	// iterate over nodes within the script
+	for (xml_data_node *entrynode = scriptnode.child; entrynode != NULL; entrynode = entrynode->next)
+	{
+		// handle action nodes
+		if (strcmp(entrynode->name, "action") == 0)
+			m_entrylist.append(*auto_alloc(&manager.machine(), script_entry(manager, symbols, filename, *entrynode, true)));
+
+		// handle output nodes
+		else if (strcmp(entrynode->name, "output") == 0)
+			m_entrylist.append(*auto_alloc(&manager.machine(), script_entry(manager, symbols, filename, *entrynode, false)));
+
+		// anything else is ignored
+		else
+		{
+			mame_printf_warning("%s.xml(%d): unknown script item '%s' will be lost if saved\n", filename, entrynode->line, entrynode->name);
+			continue;
+		}
+	}
+}
+
+
+//-------------------------------------------------
+//  execute - execute ourself
+//-------------------------------------------------
+
+void cheat_script::execute(cheat_manager &manager, UINT64 &argindex)
+{
+	// do nothing if disabled
+	if (!manager.enabled())
+		return;
+
+	// iterate over entries
+	for (script_entry *entry = m_entrylist.first(); entry != NULL; entry = entry->next())
+		entry->execute(manager, argindex);
+}
+
+
+//-------------------------------------------------
+//  save - save a single cheat script
+//-------------------------------------------------
+
+void cheat_script::save(mame_file &cheatfile) const
+{
+	// output the script tag
+	mame_fprintf(&cheatfile, "\t\t<script");
+	switch (m_state)
+	{
+		case SCRIPT_STATE_OFF:		mame_fprintf(&cheatfile, " state=\"off\"");		break;
+		case SCRIPT_STATE_ON:		mame_fprintf(&cheatfile, " state=\"on\"");		break;
+		default:
+		case SCRIPT_STATE_RUN:		mame_fprintf(&cheatfile, " state=\"run\"");		break;
+		case SCRIPT_STATE_CHANGE:	mame_fprintf(&cheatfile, " state=\"change\"");	break;
+	}
+	mame_fprintf(&cheatfile, ">\n");
+
+	// output entries
+	for (const script_entry *entry = m_entrylist.first(); entry != NULL; entry = entry->next())
+		entry->save(cheatfile);
+
+	// close the tag
+	mame_fprintf(&cheatfile, "\t\t</script>\n");
+}
+
+
+//-------------------------------------------------
+//  script_entry - constructor
+//-------------------------------------------------
+
+cheat_script::script_entry::script_entry(cheat_manager &manager, symbol_table &symbols, const char *filename, xml_data_node &entrynode, bool isaction)
+	: m_next(NULL),
+	  m_condition(NULL),
+	  m_expression(NULL),
+	  m_arglist(manager.machine().m_respool)
+{
+	try
+	{
+		// read the condition if present
+		const char *expression = xml_get_attribute_string(&entrynode, "condition", NULL);
+		if (expression != NULL)
+		{
+			EXPRERR experr = expression_parse(expression, &symbols, &debug_expression_callbacks, &manager.machine(), &m_condition);
+			if (experr != EXPRERR_NONE)
+				throw emu_fatalerror("%s.xml(%d): error parsing cheat expression \"%s\" (%s)\n", filename, entrynode.line, expression, exprerr_to_string(experr));
+		}
+
+		// if this is an action, parse the expression
+		if (isaction)
+		{
+			expression = entrynode.value;
+			if (expression == NULL || expression[0] == 0)
+				throw emu_fatalerror("%s.xml(%d): missing expression in action tag\n", filename, entrynode.line);
+
+			EXPRERR experr = expression_parse(expression, &symbols, &debug_expression_callbacks, &manager.machine(), &m_expression);
+			if (experr != EXPRERR_NONE)
+				throw emu_fatalerror("%s.xml(%d): error parsing cheat expression \"%s\" (%s)\n", filename, entrynode.line, expression, exprerr_to_string(experr));
+		}
+
+		// otherwise, parse the attributes and arguments
+		else
+		{
+			// extract format
+			const char *format = xml_get_attribute_string(&entrynode, "format", NULL);
+			if (format == NULL || format[0] == 0)
+				throw emu_fatalerror("%s.xml(%d): missing format in output tag\n", filename, entrynode.line);
+			m_format.cpy(format);
+
+			// extract other attributes
+			m_line = xml_get_attribute_int(&entrynode, "line", 0);
+			m_justify = JUSTIFY_LEFT;
+			const char *align = xml_get_attribute_string(&entrynode, "align", "left");
+			if (strcmp(align, "center") == 0)
+				m_justify = JUSTIFY_CENTER;
+			else if (strcmp(align, "right") == 0)
+				m_justify = JUSTIFY_RIGHT;
+			else if (strcmp(align, "left") != 0)
+				throw emu_fatalerror("%s.xml(%d): invalid alignment '%s' specified\n", filename, entrynode.line, align);
+
+			// then parse arguments
+			int totalargs = 0;
+			for (xml_data_node *argnode = xml_get_sibling(entrynode.child, "argument"); argnode != NULL; argnode = xml_get_sibling(argnode->next, "argument"))
+			{
+				output_argument &curarg = m_arglist.append(*auto_alloc(&manager.machine(), output_argument(manager, symbols, filename, *argnode)));
+				
+				// verify we didn't overrun the argument count
+				totalargs += curarg.count();
+				if (totalargs > MAX_ARGUMENTS)
+					throw emu_fatalerror("%s.xml(%d): too many arguments (found %d, max is %d)\n", filename, argnode->line, totalargs, MAX_ARGUMENTS);
+			}
+
+			// validate the format against the arguments
+			validate_format(filename, entrynode.line);
+		}
+	}
+	catch (emu_fatalerror &)
+	{
+		// call our destructor and re-throw
+		this->~script_entry();
+		throw;
+	}
+}
+
+
+//-------------------------------------------------
+//  script_entry - destructor
+//-------------------------------------------------
+
+cheat_script::script_entry::~script_entry()
+{
+	if (m_condition != NULL)
+		expression_free(m_condition);
+	if (m_expression != NULL)
+		expression_free(m_expression);
+}
+
+
+//-------------------------------------------------
+//  execute - execute a single script entry
+//-------------------------------------------------
+
+void cheat_script::script_entry::execute(cheat_manager &manager, UINT64 &argindex)
+{
+	// evaluate the condition
+	if (m_condition != NULL)
+	{
+		UINT64 result;
+		EXPRERR error = expression_execute(m_condition, &result);
+		if (error != EXPRERR_NONE)
+			mame_printf_warning("Error executing conditional expression \"%s\": %s\n", expression_original_string(m_condition), exprerr_to_string(error));
+
+		// if the condition is false, or we got an error, don't execute
+		if (error != EXPRERR_NONE || result == 0)
+			return;
+	}
+
+	// if there is an action, execute it
+	if (m_expression != NULL)
+	{
+		UINT64 result;
+		EXPRERR error = expression_execute(m_expression, &result);
+		if (error != EXPRERR_NONE)
+			mame_printf_warning("Error executing expression \"%s\": %s\n", expression_original_string(m_expression), exprerr_to_string(error));
+	}
+
+	// if there is a string to display, compute it
+	if (m_format)
+	{
+		// iterate over arguments and evaluate them
+		UINT64 params[MAX_ARGUMENTS];
+		int curarg = 0;
+		for (output_argument *arg = m_arglist.first(); arg != NULL; arg = arg->next())
+			curarg += arg->values(argindex, &params[curarg]);
+
+		// generate the astring
+		manager.get_output_astring(m_line, m_justify).printf(m_format,
+			(UINT32)params[0],  (UINT32)params[1],  (UINT32)params[2],  (UINT32)params[3],
+			(UINT32)params[4],  (UINT32)params[5],  (UINT32)params[6],  (UINT32)params[7],
+			(UINT32)params[8],  (UINT32)params[9],  (UINT32)params[10], (UINT32)params[11],
+			(UINT32)params[12], (UINT32)params[13], (UINT32)params[14], (UINT32)params[15],
+			(UINT32)params[16], (UINT32)params[17], (UINT32)params[18], (UINT32)params[19],
+			(UINT32)params[20], (UINT32)params[21], (UINT32)params[22], (UINT32)params[23],
+			(UINT32)params[24], (UINT32)params[25], (UINT32)params[26], (UINT32)params[27],
+			(UINT32)params[28], (UINT32)params[29], (UINT32)params[30], (UINT32)params[31]);
+	}
+}
+
+
+//-------------------------------------------------
+//  save - save a single action or output
+//-------------------------------------------------
+
+void cheat_script::script_entry::save(mame_file &cheatfile) const
+{
+	astring tempstring;
+
+	// output an action
+	if (!m_format)
+	{
+		mame_fprintf(&cheatfile, "\t\t\t<action");
+		if (m_condition != NULL)
+			mame_fprintf(&cheatfile, " condition=\"%s\"", cheat_manager::quote_expression(tempstring, *m_condition));
+		mame_fprintf(&cheatfile, ">%s</action>\n", cheat_manager::quote_expression(tempstring, *m_expression));
+	}
+
+	// output an output
+	else
+	{
+		mame_fprintf(&cheatfile, "\t\t\t<output format=\"%s\"", m_format.cstr());
+		if (m_condition != NULL)
+			mame_fprintf(&cheatfile, " condition=\"%s\"", cheat_manager::quote_expression(tempstring, *m_condition));
+		if (m_line != 0)
+			mame_fprintf(&cheatfile, " line=\"%d\"", m_line);
+		if (m_justify == JUSTIFY_CENTER)
+			mame_fprintf(&cheatfile, " align=\"center\"");
+		else if (m_justify == JUSTIFY_RIGHT)
+			mame_fprintf(&cheatfile, " align=\"right\"");
+		if (m_arglist.count() == 0)
+			mame_fprintf(&cheatfile, " />\n");
+
+		// output arguments
+		else
+		{
+			mame_fprintf(&cheatfile, ">\n");
+			for (const output_argument *curarg = m_arglist.first(); curarg != NULL; curarg = curarg->next())
+				curarg->save(cheatfile);
+			mame_fprintf(&cheatfile, "\t\t\t</output>\n");
+		}
+	}
+}
+
+
+//-------------------------------------------------
+//  validate_format - check that a format string
+//  has the correct number and type of arguments
+//-------------------------------------------------
+
+void cheat_script::script_entry::validate_format(const char *filename, int line)
+{
+	// first count arguments
+	int argsprovided = 0;
+	for (const output_argument *curarg = m_arglist.first(); curarg != NULL; curarg = curarg->next())
+		argsprovided += curarg->count();
+
+	// now scan the string for valid argument usage
+	const char *p = strchr(m_format, '%');
+	int argscounted = 0;
+	while (p != NULL)
+	{
+		// skip past any valid attributes
+		p++;
+		while (strchr("lh0123456789.-+ #", *p) != NULL)
+			p++;
+
+		// look for a valid type
+		if (strchr("cdiouxX", *p) == NULL)
+			throw emu_fatalerror("%s.xml(%d): invalid format specification \"%s\"\n", filename, line, m_format.cstr());
+		argscounted++;
+
+		// look for the next one
+		p = strchr(p, '%');
+	}
+
+	// did we match?
+	if (argscounted < argsprovided)
+		throw emu_fatalerror("%s.xml(%d): too many arguments provided (%d) for format \"%s\"\n", filename, line, argsprovided, m_format.cstr());
+	if (argscounted > argsprovided)
+		throw emu_fatalerror("%s.xml(%d): not enough arguments provided (%d) for format \"%s\"\n", filename, line, argsprovided, m_format.cstr());
+}
+
+
+//-------------------------------------------------
+//  output_argument - constructor
+//-------------------------------------------------
+
+cheat_script::script_entry::output_argument::output_argument(cheat_manager &manager, symbol_table &symbols, const char *filename, xml_data_node &argnode)
+	: m_next(NULL),
+	  m_expression(NULL),
+	  m_count(0)
+{
+	// first extract attributes
+	m_count = xml_get_attribute_int(&argnode, "count", 1);
+
+	// read the expression
+	const char *expression = argnode.value;
+	if (expression == NULL || expression[0] == 0)
+		throw emu_fatalerror("%s.xml(%d): missing expression in argument tag\n", filename, argnode.line);
+
+	EXPRERR experr = expression_parse(expression, &symbols, &debug_expression_callbacks, &manager.machine(), &m_expression);
+	if (experr != EXPRERR_NONE)
+		throw emu_fatalerror("%s.xml(%d): error parsing cheat expression \"%s\" (%s)\n", filename, argnode.line, expression, exprerr_to_string(experr));
+}
+
+
+//-------------------------------------------------
+//  output_argument - destructor
+//-------------------------------------------------
+
+cheat_script::script_entry::output_argument::~output_argument()
+{
+	if (m_expression != NULL)
+		expression_free(m_expression);
+}
+
+
+//-------------------------------------------------
+//  value - return the evaluated value of the
+//  given output argument
+//-------------------------------------------------
+
+int cheat_script::script_entry::output_argument::values(UINT64 &argindex, UINT64 *result)
+{
+	for (argindex = 0; argindex < m_count; argindex++)
+	{
+		EXPRERR error = expression_execute(m_expression, &result[argindex]);
+		if (error != EXPRERR_NONE)
+			mame_printf_warning("Error executing argument expression \"%s\": %s\n", expression_original_string(m_expression), exprerr_to_string(error));
+	}
+	return m_count;
+}
+
+
+//-------------------------------------------------
+//  save - save a single output argument
+//-------------------------------------------------
+
+void cheat_script::script_entry::output_argument::save(mame_file &cheatfile) const
+{
+	astring tempstring;
+
+	mame_fprintf(&cheatfile, "\t\t\t\t<argument");
+	if (m_count != 1)
+		mame_fprintf(&cheatfile, " count=\"%d\"", (int)m_count);
+	mame_fprintf(&cheatfile, ">%s</argument>\n", cheat_manager::quote_expression(tempstring, *m_expression));
+}
+
+
+
+//**************************************************************************
+//  CHEAT ENTRY
+//**************************************************************************
+
+//-------------------------------------------------
+//  cheat_entry - constructor
+//-------------------------------------------------
+
+cheat_entry::cheat_entry(cheat_manager &manager, symbol_table &globaltable, const char *filename, xml_data_node &cheatnode)
+	: m_manager(manager),
+	  m_next(NULL),
+	  m_parameter(NULL),
+	  m_on_script(NULL),
+	  m_off_script(NULL),
+	  m_change_script(NULL),
+	  m_run_script(NULL),
+	  m_symbols(NULL),
+	  m_state(SCRIPT_STATE_OFF),
+	  m_numtemp(DEFAULT_TEMP_VARIABLES),
+	  m_argindex(0),
+	  m_tempvar(NULL)
+{
+	// reset scripts
+	try
+	{
+		// pull the variable count out ahead of things
+		int tempcount = xml_get_attribute_int(&cheatnode, "tempvariables", DEFAULT_TEMP_VARIABLES);
+		if (tempcount < 1)
+			throw emu_fatalerror("%s.xml(%d): invalid tempvariables attribute (%d)\n", filename, cheatnode.line, tempcount);
+
+		// allocate memory for the cheat
+		m_numtemp = tempcount;
+		m_tempvar = auto_alloc_array_clear(&manager.machine(), UINT64, tempcount);
+
+		// get the description
+		const char *description = xml_get_attribute_string(&cheatnode, "desc", NULL);
+		if (description == NULL || description[0] == 0)
+			throw emu_fatalerror("%s.xml(%d): empty or missing desc attribute on cheat\n", filename, cheatnode.line);
+		m_description = description;
+
+		// create the symbol table
+		m_symbols = symtable_alloc(&globaltable, &manager.machine());
+		symtable_add_register(m_symbols, "argindex", &m_argindex, cheat_manager::variable_get, NULL);
+		astring tempname;
+		for (int curtemp = 0; curtemp < tempcount; curtemp++)
+			symtable_add_register(m_symbols, tempname.format("temp%d", curtemp), &m_tempvar[curtemp], cheat_manager::variable_get, cheat_manager::variable_set);
+
+		// read the first comment node
+		xml_data_node *commentnode = xml_get_sibling(cheatnode.child, "comment");
+		if (commentnode != NULL)
+		{
+			// set the value if not NULL
+			if (commentnode->value != NULL && commentnode->value[0] != 0)
+				m_comment.cpy(commentnode->value);
+
+			// only one comment is kept
+			commentnode = xml_get_sibling(commentnode->next, "comment");
+			if (commentnode != NULL)
+				mame_printf_warning("%s.xml(%d): only one comment node is retained; ignoring additional nodes\n", filename, commentnode->line);
+		}
+
+		// read the first parameter node
+		xml_data_node *paramnode = xml_get_sibling(cheatnode.child, "parameter");
+		if (paramnode != NULL)
+		{
+			// load this parameter
+			m_parameter = auto_alloc(&manager.machine(), cheat_parameter(manager, *m_symbols, filename, *paramnode));
+
+			// only one parameter allowed
+			paramnode = xml_get_sibling(paramnode->next, "parameter");
+			if (paramnode != NULL)
+				mame_printf_warning("%s.xml(%d): only one parameter node allowed; ignoring additional nodes\n", filename, paramnode->line);
+		}
+
+		// read the script nodes
+		for (xml_data_node *scriptnode = xml_get_sibling(cheatnode.child, "script"); scriptnode != NULL; scriptnode = xml_get_sibling(scriptnode->next, "script"))
+		{
+			// load this entry
+			cheat_script *curscript = auto_alloc(&manager.machine(), cheat_script(manager, *m_symbols, filename, *scriptnode));
+
+			// if we have a script already for this slot, it is an error
+			cheat_script *&slot = script_for_state(curscript->state());
+			if (slot != NULL)
+				mame_printf_warning("%s.xml(%d): only one on script allowed; ignoring additional scripts\n", filename, scriptnode->line);
+			else
+				slot = curscript;
+		}
+	}
+	catch (emu_fatalerror &)
+	{
+		// call our destructor to clean up and re-throw
+		this->~cheat_entry();
+		throw;
+	}
+}
+
+
+//-------------------------------------------------
+//  ~cheat_entry - destructor
+//-------------------------------------------------
+
+cheat_entry::~cheat_entry()
+{
+	if (m_symbols != NULL)
+		symtable_free(m_symbols);
+	auto_free(&m_manager.machine(), m_on_script);
+	auto_free(&m_manager.machine(), m_off_script);
+	auto_free(&m_manager.machine(), m_change_script);
+	auto_free(&m_manager.machine(), m_run_script);
+	auto_free(&m_manager.machine(), m_parameter);
+	auto_free(&m_manager.machine(), m_tempvar);
+}
+
+
+//-------------------------------------------------
+//  save - save a single cheat entry
+//-------------------------------------------------
+
+void cheat_entry::save(mame_file &cheatfile) const
+{
+	// determine if we have scripts
+	bool has_scripts = (m_off_script != NULL || m_on_script != NULL || m_run_script != NULL || m_change_script != NULL);
+
+	// output the cheat tag
+	mame_fprintf(&cheatfile, "\t<cheat desc=\"%s\"", m_description.cstr());
+	if (m_numtemp != DEFAULT_TEMP_VARIABLES)
+		mame_fprintf(&cheatfile, " tempvariables=\"%d\"", m_numtemp);
+	if (!m_comment && m_parameter == NULL && !has_scripts)
+		mame_fprintf(&cheatfile, " />\n");
+	else
+	{
+		mame_fprintf(&cheatfile, ">\n");
+
+		// save the comment
+		if (m_comment)
+			mame_fprintf(&cheatfile, "\t\t<comment><![CDATA[\n%s\n\t\t]]></comment>\n", m_comment.cstr());
+
+		// output the parameter, if present
+		if (m_parameter != NULL)
+			m_parameter->save(cheatfile);
+
+		// output the script nodes
+		if (m_on_script != NULL)
+			m_on_script->save(cheatfile);
+		if (m_off_script != NULL)
+			m_off_script->save(cheatfile);
+		if (m_change_script != NULL)
+			m_change_script->save(cheatfile);
+		if (m_run_script != NULL)
+			m_run_script->save(cheatfile);
+
+		// close the cheat tag
+		mame_fprintf(&cheatfile, "\t</cheat>\n");
+	}
+}
+
+
+//-------------------------------------------------
+//  activate - activate a oneshot cheat
+//-------------------------------------------------
+
+bool cheat_entry::activate()
+{
+	bool changed = false;
+
+	// if cheats have been toggled off no point in even trying to do anything
+	if (!m_manager.enabled())
+		return changed;
+
+	// if we're a oneshot cheat, execute the "on" script and indicate change
+	if (is_oneshot())
+	{
+		execute_on_script();
+		changed = true;
+		popmessage("Activated %s", m_description.cstr());
+	}
+
+	// if we're a oneshot parameter cheat and we're active, execute the "state change" script and indicate change
+	else if (is_oneshot_parameter() && m_state != SCRIPT_STATE_OFF)
+	{
+		execute_change_script();
+		changed = true;
+		popmessage("Activated\n %s = %s", m_description.cstr(), m_parameter->text());
+	}
+
+	return changed;
+}
+
+
+//-------------------------------------------------
+//  select_default_state - select the default 
+//  state for a cheat, or activate a oneshot cheat
+//-------------------------------------------------
+
+bool cheat_entry::select_default_state()
+{
+	bool changed = false;
+
+	// if we're a oneshot cheat, there is no default state
+	if (is_oneshot())
+		;
+
+	// all other types switch to the "off" state
+	else
+		changed = set_state(SCRIPT_STATE_OFF);
+
+	return changed;
+}
+
+
+//-------------------------------------------------
+//  select_previous_state - select the previous 
+//  state for a cheat
+//-------------------------------------------------
+
+bool cheat_entry::select_previous_state()
+{
+	bool changed = false;
+
+	// if we're a oneshot, there is no previous state
+	if (is_oneshot())
+		;
+
+	// if we're on/off, toggle to off
+	else if (is_onoff())
+		changed = set_state(SCRIPT_STATE_OFF);
+
+	// if we have a parameter, set the previous state
+	else if (m_parameter != NULL)
+	{
+		// if we're at our minimum, turn off
+		if (m_parameter->is_minimum())
+			changed = set_state(SCRIPT_STATE_OFF);
+		else
+		{
+			// if we changed, ensure we are in the running state and signal state change
+			changed = m_parameter->set_prev_state();
+			if (changed)
+			{
+				set_state(SCRIPT_STATE_RUN);
+				if (!is_oneshot_parameter())
+					execute_change_script();
+			}
+		}
+	}
+	return changed;
+}
+
+
+//-------------------------------------------------
+//  select_next_state - select the next state for 
+//  a cheat
+//-------------------------------------------------
+
+bool cheat_entry::select_next_state()
+{
+	bool changed = false;
+
+	// if we're a oneshot, there is no next state
+	if (is_oneshot())
+		;
+
+	// if we're on/off, toggle to running state
+	else if (is_onoff())
+		changed = set_state(SCRIPT_STATE_RUN);
+
+	// if we have a parameter, set the next state
+	else if (m_parameter != NULL)
+	{
+		// if we're off, switch on to the minimum state
+		if (m_state == SCRIPT_STATE_OFF)
+		{
+			changed = set_state(SCRIPT_STATE_RUN);
+			m_parameter->set_minimum_state();
+		}
+		
+		// otherwise, switch to the next state
+		else
+			changed = m_parameter->set_next_state();
+		
+		// if we changed, signal a state change
+		if (changed && !is_oneshot_parameter())
+			execute_change_script();
+	}
+	return changed;
+}
+
+
+//-------------------------------------------------
+//  menu_text - return the text needed to display 
+//  this cheat in a menu item
+//-------------------------------------------------
+
+void cheat_entry::menu_text(astring &description, astring &state, UINT32 &flags)
+{
+	// description is standard
+	description.cpy(m_description);
+	state.reset();
+	flags = 0;
+
+	// some cheat entries are just text for display
+	if (is_text_only())
+	{
+		if (description)
+		{
+			description.trimspace();
+			if (!description)
+				description.cpy(MENU_SEPARATOR_ITEM);
+		}
+		flags = MENU_FLAG_DISABLE;
+	}
+
+	// if we have no parameter and no run or off script, it's a oneshot cheat
+	else if (is_oneshot())
+		state.cpy("Set");
+
+	// if we have no parameter, it's just on/off
+	else if (is_onoff())
+	{
+		state.cpy((m_state == SCRIPT_STATE_RUN) ? "On" : "Off");
+		flags = (m_state != 0) ? MENU_FLAG_LEFT_ARROW : MENU_FLAG_RIGHT_ARROW;
+	}
+
+	// if we have a value parameter, compute it
+	else if (m_parameter != NULL)
+	{
+		if (m_state == SCRIPT_STATE_OFF)
+		{
+			state.cpy(is_oneshot_parameter() ? "Set" : "Off");
+			flags = MENU_FLAG_RIGHT_ARROW;
+		}
+		else
+		{
+			state.cpy(m_parameter->text());
+			flags = MENU_FLAG_LEFT_ARROW;
+			if (!m_parameter->is_maximum())
+				flags |= MENU_FLAG_RIGHT_ARROW;
+		}
+	}
+}
+
+
+//-------------------------------------------------
+//  set_state - switch to the given state
+//-------------------------------------------------
+
+bool cheat_entry::set_state(script_state newstate)
+{
+	// if we're already in the state, indicate no change
+	if (m_state == newstate)
+		return false;
+
+	// change to the state and run the appropriate script
+	m_state = newstate;
+	if (newstate == SCRIPT_STATE_OFF)
+		execute_off_script();
+	else if (newstate == SCRIPT_STATE_ON || newstate == SCRIPT_STATE_RUN)
+		execute_on_script();
+	return true;
+}
+
+
+//-------------------------------------------------
+//  script_for_state - get a reference to the
+//  given script pointer
+//-------------------------------------------------
+
+cheat_script *&cheat_entry::script_for_state(script_state state)
+{
+	switch (state)
+	{
+		case SCRIPT_STATE_ON:		return m_on_script;
+		case SCRIPT_STATE_OFF:		return m_off_script;
+		case SCRIPT_STATE_CHANGE:	return m_change_script;
+		default:
+		case SCRIPT_STATE_RUN:		return m_run_script;
+	}
+}
+
+
+
+//**************************************************************************
+//  CHEAT MANAGER
+//**************************************************************************
+
+//-------------------------------------------------
+//  cheat_manager - constructor
+//-------------------------------------------------
+
+cheat_manager::cheat_manager(running_machine &machine)
+	: m_machine(machine),
+	  m_cheatlist(machine.m_respool),
+	  m_disabled(true)
+{
+	// if the cheat engine is disabled, we're done
+	if (!options_get_bool(machine.options(), OPTION_CHEAT))
+		return;
+
+	// request a callback
+	machine.add_notifier(MACHINE_NOTIFY_FRAME, frame_update_static);
+
+	// create a global symbol table
+	m_symtable = symtable_alloc(NULL, &machine);
+	symtable_add_register(m_symtable, "frame", &m_framecount, variable_get, NULL);
+	symtable_add_function(m_symtable, "frombcd", NULL, 1, 1, execute_frombcd);
+	symtable_add_function(m_symtable, "tobcd", NULL, 1, 1, execute_tobcd);
+
+	// load the cheats
+	reload();
+
+	// we rely on the debugger expression callbacks; if the debugger isn't
+    // enabled, we must jumpstart them manually
+	if ((machine.debug_flags & DEBUG_FLAG_ENABLED) == 0)
+		debug_cpu_init(&machine);
+}
+
+
+//-------------------------------------------------
+//  ~cheat_manager - destructor
+//-------------------------------------------------
+
+cheat_manager::~cheat_manager()
+{
+}
+
+
+//-------------------------------------------------
+//  set_enable - globally enable or disable the 
+//  cheat engine
+//-------------------------------------------------
+
+void cheat_manager::set_enable(bool enable)
+{
+	// if the cheat engine is disabled, we're done
+	if (!options_get_bool(m_machine.options(), OPTION_CHEAT))
+		return;
+
+	// if we're enabled currently and we don't want to be, turn things off
+	if (!m_disabled && !enable)
+	{
+		// iterate over running cheats and execute any OFF Scripts
+		for (cheat_entry *cheat = m_cheatlist.first(); cheat != NULL; cheat = cheat->next())
+			if (cheat->state() == SCRIPT_STATE_RUN)
+				cheat->execute_off_script();
+		popmessage("Cheats Disabled");
+		m_disabled = true;
+	}
+
+	// if we're disabled currently and we want to be enabled, turn things on
+	else if (m_disabled && enable)
+	{
+		// iterate over running cheats and execute any ON Scripts
+		m_disabled = false;
+		for (cheat_entry *cheat = m_cheatlist.first(); cheat != NULL; cheat = cheat->next())
+			if (cheat->state() == SCRIPT_STATE_RUN)
+				cheat->execute_on_script();
+		popmessage("Cheats Enabled");
+	}
+}
+
+
+//-------------------------------------------------
+//  reload - re-initialize the cheat engine, and
+//  and reload the cheat file(s)
+//-------------------------------------------------
+
+void cheat_manager::reload()
+{
+	// if the cheat engine is disabled, we're done
+	if (!options_get_bool(m_machine.options(), OPTION_CHEAT))
+		return;
+
+	// free everything
+	m_cheatlist.reset();
+	
+	// reset state
+	m_framecount = 0;
+	m_numlines = 0;
+	m_lastline = 0;
+	m_disabled = false;
+
+	// load the cheat file, MESS will load a crc32.xml ( eg. 01234567.xml )
+    // and MAME will load gamename.xml
 	device_image_interface *image = NULL;
-	for (bool gotone = machine->m_devicelist.first(image); gotone; gotone = image->next(image))
+	for (bool gotone = m_machine.m_devicelist.first(image); gotone; gotone = image->next(image))
 		if (image->exists())
 		{
 			UINT32 crc = image->crc();
@@ -418,1381 +1210,124 @@ void cheat_reload(running_machine *machine)
 			{
 				astring filename;
 				filename.printf("%08X", crc);
-				cheatinfo->cheatlist = cheat_list_load(machine, filename);
+				load_cheats(filename);
 				break;
 			}
 		}
 
-	if (cheatinfo->cheatlist == NULL)
-		cheatinfo->cheatlist = cheat_list_load(machine, machine->basename());
+	// if we haven't found the cheats yet, load by basename
+	if (m_cheatlist.count() == 0)
+		load_cheats(m_machine.basename());
 
-	/* temporary: save the file back out as output.xml for comparison */
-	if (cheatinfo->cheatlist != NULL)
-		cheat_list_save("output", cheatinfo->cheatlist);
+	// temporary: save the file back out as output.xml for comparison
+	if (m_cheatlist.count() != 0)
+		save_all("output");
 }
 
 
-/*-------------------------------------------------
-    cheat_exit - clean up on the way out
--------------------------------------------------*/
+//-------------------------------------------------
+//  cheat_list_save - save a cheat file from
+//  memory to the given filename
+//-------------------------------------------------
 
-static void cheat_exit(running_machine &machine)
+bool cheat_manager::save_all(const char *filename)
 {
-	cheat_private *cheatinfo = machine.cheat_data;
-
-	/* free the list of cheats */
-	if (cheatinfo->cheatlist != NULL)
-		cheat_list_free(&machine, cheatinfo->cheatlist);
-}
-
-
-/*-------------------------------------------------
-    cheat_get_global_enable - return the global
-    enabled state of the cheat engine
--------------------------------------------------*/
-
-int cheat_get_global_enable(running_machine *machine)
-{
-	cheat_private *cheatinfo = machine->cheat_data;
-
-	if (cheatinfo != NULL)
-		return !cheatinfo->disabled;
-
-	return 0;
-}
-
-
-/*-------------------------------------------------
-    cheat_set_global_enable - globally enable or
-    disable the cheat engine
--------------------------------------------------*/
-
-void cheat_set_global_enable(running_machine *machine, int enable)
-{
-	cheat_private *cheatinfo = machine->cheat_data;
-	cheat_entry *cheat;
-
-	if (cheatinfo != NULL)
-	{
-		/* if we're enabled currently and we don't want to be, turn things off */
-		if (!cheatinfo->disabled && !enable)
-		{
-			/* iterate over running cheats and execute any OFF Scripts */
-			for (cheat = cheatinfo->cheatlist; cheat != NULL; cheat = cheat->next)
-				if (cheat->state == SCRIPT_STATE_RUN)
-					cheat_execute_script(cheatinfo, cheat, SCRIPT_STATE_OFF);
-			popmessage("Cheats Disabled");
-			cheatinfo->disabled = TRUE;
-		}
-
-		/* if we're disabled currently and we want to be enabled, turn things on */
-		else if (cheatinfo->disabled && enable)
-		{
-			/* iterate over running cheats and execute any ON Scripts */
-			cheatinfo->disabled = FALSE;
-			for (cheat = cheatinfo->cheatlist; cheat != NULL; cheat = cheat->next)
-				if (cheat->state == SCRIPT_STATE_RUN)
-					cheat_execute_script(cheatinfo, cheat, SCRIPT_STATE_ON);
-			popmessage("Cheats Enabled");
-		}
-	}
-}
-
-
-
-/***************************************************************************
-    CHEAT UI
-***************************************************************************/
-
-/*-------------------------------------------------
-    cheat_render_text - called by the UI system
-    to render text
--------------------------------------------------*/
-
-void cheat_render_text(running_machine *machine, render_container *container)
-{
-	cheat_private *cheatinfo = machine->cheat_data;
-	if (cheatinfo != NULL)
-	{
-		int linenum;
-
-		/* render any text and free it along the way */
-		for (linenum = 0; linenum < ARRAY_LENGTH(cheatinfo->output); linenum++)
-			if (cheatinfo->output[linenum])
-			{
-				/* output the text */
-				ui_draw_text_full(container, cheatinfo->output[linenum],
-						0.0f, (float)linenum * ui_get_line_height(*machine), 1.0f,
-						cheatinfo->justify[linenum], WRAP_NEVER, DRAW_OPAQUE,
-						ARGB_WHITE, ARGB_BLACK, NULL, NULL);
-			}
-	}
-}
-
-
-/*-------------------------------------------------
-    cheat_get_next_menu_entry - return the
-    text needed to display this cheat in a menu
-    item
--------------------------------------------------*/
-
-void *cheat_get_next_menu_entry(running_machine *machine, void *previous, const char **description, const char **state, UINT32 *flags)
-{
-	cheat_private *cheatinfo = machine->cheat_data;
-	cheat_entry *preventry = (cheat_entry *)previous;
-	cheat_entry *cheat;
-
-	/* NULL previous means get the first */
-	cheat = (preventry == NULL) ? cheatinfo->cheatlist : preventry->next;
-	if (cheat == NULL)
-		return NULL;
-
-	/* description is standard */
-	if (description != NULL)
-		*description = cheat->description;
-
-	/* some cheat entries are just text for display */
-	if (is_text_only_cheat(cheat))
-	{
-		if (description != NULL)
-		{
-			while (isspace((UINT8)**description))
-				*description += 1;
-			if (**description == 0)
-				*description = MENU_SEPARATOR_ITEM;
-		}
-		if (state != NULL)
-			*state = NULL;
-		if (flags != NULL)
-			*flags = MENU_FLAG_DISABLE;
-	}
-
-	/* if we have no parameter and no run or off script, it's a oneshot cheat */
-	else if (is_oneshot_cheat(cheat))
-	{
-		if (state != NULL)
-			*state = "Set";
-		if (flags != NULL)
-			*flags = 0;
-	}
-
-	/* if we have no parameter, it's just on/off */
-	else if (is_onoff_cheat(cheat))
-	{
-		if (state != NULL)
-			*state = (cheat->state == SCRIPT_STATE_RUN) ? "On" : "Off";
-		if (flags != NULL)
-			*flags = cheat->state ? MENU_FLAG_LEFT_ARROW : MENU_FLAG_RIGHT_ARROW;
-	}
-
-	/* if we have a value parameter, compute it */
-	else if (is_value_parameter_cheat(cheat))
-	{
-		if (cheat->state == SCRIPT_STATE_OFF)
-		{
-			if (state != NULL)
-				*state = is_oneshot_parameter_cheat(cheat) ? "Set" : "Off";
-			if (flags != NULL)
-				*flags = MENU_FLAG_RIGHT_ARROW;
-		}
-		else
-		{
-			if (state != NULL)
-			{
-				sprintf(cheat->parameter->valuestring, "%d", (UINT32)cheat->parameter->value);
-				*state = cheat->parameter->valuestring;
-			}
-			if (flags != NULL)
-			{
-				*flags = MENU_FLAG_LEFT_ARROW;
-				if (cheat->parameter->value < cheat->parameter->maxval)
-					*flags |= MENU_FLAG_RIGHT_ARROW;
-			}
-		}
-	}
-
-	/* if we have an item list, pick the index */
-	else if (is_itemlist_parameter_cheat(cheat))
-	{
-		if (cheat->state == SCRIPT_STATE_OFF)
-		{
-			if (state != NULL)
-				*state = is_oneshot_parameter_cheat(cheat) ? "Set" : "Off";
-			if (flags != NULL)
-				*flags = MENU_FLAG_RIGHT_ARROW;
-		}
-		else
-		{
-			parameter_item *item = NULL/*, *prev = NULL*/;
-
-			for (item = cheat->parameter->itemlist; item != NULL; /*prev = item, */item = item->next)
-				if (item->value == cheat->parameter->value)
-					break;
-			if (state != NULL)
-				*state = (item != NULL) ? item->text.cstr() : "??Invalid??";
-			if (flags != NULL)
-			{
-				*flags = MENU_FLAG_LEFT_ARROW;
-				if (item == NULL || item->next != NULL)
-					*flags |= MENU_FLAG_RIGHT_ARROW;
-				cheat->parameter->itemlist->curtext = item->text; /* Take a copy of the most current parameter for the popmessage (if used) */
-			}
-		}
-	}
-
-	/* return a pointer to this item */
-	return cheat;
-}
-
-
-/*-------------------------------------------------
-    cheat_activate - activate a oneshot cheat
--------------------------------------------------*/
-
-int cheat_activate(running_machine *machine, void *entry)
-{
-	cheat_private *cheatinfo = machine->cheat_data;
-	cheat_entry *cheat = (cheat_entry *)entry;
-	int changed = FALSE;
-
-	/* if cheats have been toggled off no point in even trying to do anything */
-	if (cheatinfo->disabled)
-		return changed;
-
-	/* if we have no parameter and no run or off script, but we do have an on script, it's a oneshot cheat */
-	if (is_oneshot_cheat(cheat))
-	{
-		cheat_execute_script(cheatinfo, cheat, SCRIPT_STATE_ON);
-		changed = TRUE;
-		popmessage("Activated %s", cheat->description.cstr());
-	}
-
-	/* if we have no run or off script, but we do have parameter and change scripts and it's not in the off state, it's a oneshot list or selectable value cheat */
-	else if (is_oneshot_parameter_cheat(cheat) && cheat->state != SCRIPT_STATE_OFF)
-	{
-		cheat_execute_script(cheatinfo, cheat, SCRIPT_STATE_CHANGE);
-		changed = TRUE;
-		if (cheat->parameter->itemlist != NULL)
-			popmessage("Activated\n %s = %s", cheat->description.cstr(), cheat->parameter->itemlist->curtext.cstr() );
-		else
-			popmessage("Activated\n %s = %d (0x%X)", cheat->description.cstr(), (UINT32)cheat->parameter->value, (UINT32)cheat->parameter->value );
-	}
-
-	return changed;
-}
-
-
-/*-------------------------------------------------
-    cheat_select_default_state - select the
-    default state for a cheat, or activate a
-    oneshot cheat
--------------------------------------------------*/
-
-int cheat_select_default_state(running_machine *machine, void *entry)
-{
-	cheat_private *cheatinfo = machine->cheat_data;
-	cheat_entry *cheat = (cheat_entry *)entry;
-	int changed = FALSE;
-
-	/* if we have no parameter and no run or off script, it's either text or a oneshot cheat */
-	if (is_oneshot_cheat(cheat))
-		;
-
-	/* if we have no parameter, it's just on/off; default to off */
-	else
-	{
-		if (cheat->state != SCRIPT_STATE_OFF)
-		{
-			cheat->state = SCRIPT_STATE_OFF;
-			cheat_execute_script(cheatinfo, cheat, SCRIPT_STATE_OFF);
-			changed = TRUE;
-		}
-	}
-	return changed;
-}
-
-
-/*-------------------------------------------------
-    cheat_select_previous_state - select the
-    previous state for a cheat
--------------------------------------------------*/
-
-int cheat_select_previous_state(running_machine *machine, void *entry)
-{
-	cheat_private *cheatinfo = machine->cheat_data;
-	cheat_entry *cheat = (cheat_entry *)entry;
-	int changed = FALSE;
-
-	/* if we have no parameter and no run or off script, it's either text or a oneshot cheat */
-	if (is_oneshot_cheat(cheat))
-		;
-
-	/* if we have no parameter, it's just on/off */
-	else if (is_onoff_cheat(cheat))
-	{
-		if (cheat->state != SCRIPT_STATE_OFF)
-		{
-			cheat->state = SCRIPT_STATE_OFF;
-			cheat_execute_script(cheatinfo, cheat, SCRIPT_STATE_OFF);
-			changed = TRUE;
-		}
-	}
-
-	/* if we have a value parameter, compute it */
-	else if (is_value_parameter_cheat(cheat))
-	{
-		if (cheat->parameter->value > cheat->parameter->minval)
-		{
-			if (cheat->parameter->value < cheat->parameter->minval + cheat->parameter->stepval)
-				cheat->parameter->value = cheat->parameter->minval;
-			else
-				cheat->parameter->value -= cheat->parameter->stepval;
-			if (!is_oneshot_parameter_cheat(cheat))
-				cheat_execute_script(cheatinfo, cheat, SCRIPT_STATE_CHANGE);
-			changed = TRUE;
-		}
-		else if (cheat->state != SCRIPT_STATE_OFF)
-		{
-			cheat_execute_script(cheatinfo, cheat, SCRIPT_STATE_OFF);
-			cheat->state = SCRIPT_STATE_OFF;
-			changed = TRUE;
-		}
-	}
-
-	/* if we have an item list, pick the index */
-	else
-	{
-		parameter_item *item, *prev = NULL;
-
-		for (item = cheat->parameter->itemlist; item != NULL; prev = item, item = item->next)
-			if (item->value == cheat->parameter->value)
-				break;
-		if (prev != NULL)
-		{
-			if (cheat->state == SCRIPT_STATE_OFF)
-			{
-				cheat_execute_script(cheatinfo, cheat, SCRIPT_STATE_ON);
-				cheat->state = SCRIPT_STATE_RUN;
-			}
-			cheat->parameter->value = prev->value;
-			if (!is_oneshot_parameter_cheat(cheat))
-				cheat_execute_script(cheatinfo, cheat, SCRIPT_STATE_CHANGE);
-			changed = TRUE;
-		}
-		else if (cheat->state != SCRIPT_STATE_OFF)
-		{
-			cheat_execute_script(cheatinfo, cheat, SCRIPT_STATE_OFF);
-			cheat->state = SCRIPT_STATE_OFF;
-			changed = TRUE;
-		}
-	}
-	return changed;
-}
-
-
-/*-------------------------------------------------
-    cheat_select_next_state - select the
-    next state for a cheat
--------------------------------------------------*/
-
-int cheat_select_next_state(running_machine *machine, void *entry)
-{
-	cheat_private *cheatinfo = machine->cheat_data;
-	cheat_entry *cheat = (cheat_entry *)entry;
-	int changed = FALSE;
-
-	/* if we have no parameter and no run or off script, it's a oneshot cheat */
-	if (is_oneshot_cheat(cheat))
-		;
-
-	/* if we have no parameter, it's just on/off */
-	else if (is_onoff_cheat(cheat))
-	{
-		if (cheat->state != SCRIPT_STATE_RUN)
-		{
-			cheat->state = SCRIPT_STATE_RUN;
-			cheat_execute_script(cheatinfo, cheat, SCRIPT_STATE_ON);
-			changed = TRUE;
-		}
-	}
-
-	/* if we have a value parameter, compute it */
-	else if (is_value_parameter_cheat(cheat))
-	{
-		if (cheat->state == SCRIPT_STATE_OFF)
-		{
-			cheat_execute_script(cheatinfo, cheat, SCRIPT_STATE_ON);
-			cheat->state = SCRIPT_STATE_RUN;
-			cheat->parameter->value = cheat->parameter->minval;
-			if (!is_oneshot_parameter_cheat(cheat))
-				cheat_execute_script(cheatinfo, cheat, SCRIPT_STATE_CHANGE);
-			changed = TRUE;
-		}
-		else if (cheat->parameter->value < cheat->parameter->maxval)
-		{
-			if (cheat->parameter->value > cheat->parameter->maxval - cheat->parameter->stepval)
-				cheat->parameter->value = cheat->parameter->maxval;
-			else
-				cheat->parameter->value += cheat->parameter->stepval;
-			if (!is_oneshot_parameter_cheat(cheat))
-				cheat_execute_script(cheatinfo, cheat, SCRIPT_STATE_CHANGE);
-			changed = TRUE;
-		}
-	}
-
-	/* if we have an item list, pick the index */
-	else
-	{
-		parameter_item *item;
-
-		if (cheat->state == SCRIPT_STATE_OFF)
-		{
-			cheat_execute_script(cheatinfo, cheat, SCRIPT_STATE_ON);
-			cheat->state = SCRIPT_STATE_RUN;
-			cheat->parameter->value = cheat->parameter->itemlist->value;
-			if (!is_oneshot_parameter_cheat(cheat))
-				cheat_execute_script(cheatinfo, cheat, SCRIPT_STATE_CHANGE);
-			changed = TRUE;
-		}
-		else
-		{
-			for (item = cheat->parameter->itemlist; item != NULL; item = item->next)
-				if (item->value == cheat->parameter->value)
-					break;
-			if (item->next != NULL)
-			{
-				cheat->parameter->value = item->next->value;
-				if (!is_oneshot_parameter_cheat(cheat))
-					cheat_execute_script(cheatinfo, cheat, SCRIPT_STATE_CHANGE);
-				changed = TRUE;
-			}
-		}
-	}
-	return changed;
-}
-
-
-/*-------------------------------------------------
-    cheat_get_comment - called by the UI system
-    to help render displayable comments
--------------------------------------------------*/
-
-astring &cheat_get_comment(void *entry)
-{
-	cheat_entry *cheat = (cheat_entry *)entry;
-	return cheat->comment;
-}
-
-
-
-/***************************************************************************
-    CHEAT EXECUTION
-***************************************************************************/
-
-/*-------------------------------------------------
-    cheat_frame - per-frame callback
--------------------------------------------------*/
-
-static void cheat_frame(running_machine &machine)
-{
-	cheat_private *cheatinfo = machine.cheat_data;
-	cheat_entry *cheat;
-	int linenum;
-
-	/* set up for accumulating output */
-	cheatinfo->lastline = 0;
-	cheatinfo->numlines = floor(1.0f / ui_get_line_height(machine));
-	cheatinfo->numlines = MIN(cheatinfo->numlines, ARRAY_LENGTH(cheatinfo->output));
-	for (linenum = 0; linenum < ARRAY_LENGTH(cheatinfo->output); linenum++)
-		cheatinfo->output[linenum].reset();
-
-	/* iterate over running cheats and execute them */
-	for (cheat = cheatinfo->cheatlist; cheat != NULL; cheat = cheat->next)
-		if (cheat->state == SCRIPT_STATE_RUN)
-			cheat_execute_script(cheatinfo, cheat, SCRIPT_STATE_RUN);
-
-	/* increment the frame counter */
-	cheatinfo->framecount++;
-}
-
-
-/*-------------------------------------------------
-    cheat_execute_script - execute the
-    appropriate script
--------------------------------------------------*/
-
-static void cheat_execute_script(cheat_private *cheatinfo, cheat_entry *cheat, script_state state)
-{
-	script_entry *entry;
-
-	/* if cheat engine has been temporarily disabled or no script, bail */
-	if (cheatinfo->disabled || cheat->script[state] == NULL)
-		return;
-
-	/* iterate over entries */
-	for (entry = cheat->script[state]->entrylist; entry != NULL; entry = entry->next)
-	{
-		EXPRERR error;
-		UINT64 result;
-
-		/* evaluate the condition */
-		if (entry->condition != NULL)
-		{
-			error = expression_execute(entry->condition, &result);
-			if (error != EXPRERR_NONE)
-				mame_printf_warning("Error executing conditional expression \"%s\": %s\n", expression_original_string(entry->condition), exprerr_to_string(error));
-
-			/* if the condition is false, or we got an error, don't execute */
-			if (error != EXPRERR_NONE || result == 0)
-				continue;
-		}
-
-		/* if there is an action, execute it */
-		if (entry->expression != NULL)
-		{
-			error = expression_execute(entry->expression, &result);
-			if (error != EXPRERR_NONE)
-				mame_printf_warning("Error executing expression \"%s\": %s\n", expression_original_string(entry->expression), exprerr_to_string(error));
-		}
-
-		/* if there is a string to display, compute it */
-		if (entry->format)
-		{
-			UINT64 params[MAX_ARGUMENTS];
-			output_argument *arg;
-			int curarg = 0;
-			int row;
-
-			/* iterate over arguments and evaluate them */
-			for (arg = entry->arglist; arg != NULL; arg = arg->next)
-				for (cheat->argindex = 0; cheat->argindex < arg->count; cheat->argindex++)
-				{
-					error = expression_execute(arg->expression, &params[curarg++]);
-					if (error != EXPRERR_NONE)
-						mame_printf_warning("Error executing argument expression \"%s\": %s\n", expression_original_string(arg->expression), exprerr_to_string(error));
-				}
-
-			/* determine which row we belong to */
-			row = entry->line;
-			if (row == 0)
-				row = (cheatinfo->lastline >= 0) ? cheatinfo->lastline + 1 : cheatinfo->lastline - 1;
-			cheatinfo->lastline = row;
-			row = (row < 0) ? cheatinfo->numlines + row : row - 1;
-			row = MAX(row, 0);
-			row = MIN(row, cheatinfo->numlines - 1);
-
-			/* either re-use or allocate a string */
-			astring &string = cheatinfo->output[row];
-			cheatinfo->justify[row] = entry->justify;
-
-			/* generate the astring */
-			string.printf(entry->format,
-				(UINT32)params[0],  (UINT32)params[1],  (UINT32)params[2],  (UINT32)params[3],
-				(UINT32)params[4],  (UINT32)params[5],  (UINT32)params[6],  (UINT32)params[7],
-				(UINT32)params[8],  (UINT32)params[9],  (UINT32)params[10], (UINT32)params[11],
-				(UINT32)params[12], (UINT32)params[13], (UINT32)params[14], (UINT32)params[15],
-				(UINT32)params[16], (UINT32)params[17], (UINT32)params[18], (UINT32)params[19],
-				(UINT32)params[20], (UINT32)params[21], (UINT32)params[22], (UINT32)params[23],
-				(UINT32)params[24], (UINT32)params[25], (UINT32)params[26], (UINT32)params[27],
-				(UINT32)params[28], (UINT32)params[29], (UINT32)params[30], (UINT32)params[31]);
-		}
-	}
-}
-
-
-
-/***************************************************************************
-    CHEAT FILE ACCESS
-***************************************************************************/
-
-/*-------------------------------------------------
-    cheat_list_load - load a cheat file into
-    memory and create the cheat entry list
--------------------------------------------------*/
-
-static cheat_entry *cheat_list_load(running_machine *machine, const char *filename)
-{
-	xml_data_node *rootnode = NULL;
-	cheat_entry *cheatlist = NULL;
-	cheat_entry **cheattailptr = &cheatlist;
-	mame_file *cheatfile = NULL;
-	file_error filerr;
-
-	/* open the file with the proper name */
+	// open the file with the proper name
 	astring fname(filename, ".xml");
-	filerr = mame_fopen(SEARCHPATH_CHEAT, fname, OPEN_FLAG_READ, &cheatfile);
-
-	/* loop over all instrances of the files found in our search paths */
-	while (filerr == FILERR_NONE)
-	{
-		xml_data_node *mamecheatnode, *cheatnode;
-		xml_parse_options options;
-		xml_parse_error error;
-		cheat_entry *scannode;
-		int version;
-
-		mame_printf_verbose("Loading cheats file from %s\n", mame_file_full_name(cheatfile).cstr());
-
-		/* read the XML file into internal data structures */
-		memset(&options, 0, sizeof(options));
-		options.error = &error;
-		rootnode = xml_file_read(mame_core_file(cheatfile), &options);
-
-		/* if unable to parse the file, just bail */
-		if (rootnode == NULL)
-		{
-			mame_printf_error("%s.xml(%d): error parsing XML (%s)\n", filename, error.error_line, error.error_message);
-			goto error;
-		}
-
-		/* find the layout node */
-		mamecheatnode = xml_get_sibling(rootnode->child, "mamecheat");
-		if (mamecheatnode == NULL)
-		{
-			mame_printf_error("%s.xml: missing mamecheatnode node", filename);
-			goto error;
-		}
-
-		/* validate the config data version */
-		version = xml_get_attribute_int(mamecheatnode, "version", 0);
-		if (version != CHEAT_VERSION)
-		{
-			mame_printf_error("%s.xml(%d): Invalid cheat XML file: unsupported version", filename, mamecheatnode->line);
-			goto error;
-		}
-
-		/* parse all the elements */
-		for (cheatnode = xml_get_sibling(mamecheatnode->child, "cheat"); cheatnode != NULL; cheatnode = xml_get_sibling(cheatnode->next, "cheat"))
-		{
-			/* load this entry */
-			cheat_entry *curcheat = cheat_entry_load(machine, filename, cheatnode);
-			if (curcheat == NULL)
-				goto error;
-
-			/* make sure we're not a duplicate */
-			scannode = NULL;
-			if (REMOVE_DUPLICATE_CHEATS)
-				for (scannode = cheatlist; scannode != NULL; scannode = scannode->next)
-					if (scannode->description == curcheat->description)
-					{
-						mame_printf_verbose("Ignoring duplicate cheat '%s' from file %s\n", curcheat->description.cstr(), mame_file_full_name(cheatfile).cstr());
-						break;
-					}
-
-			/* add to the end of the list */
-			if (scannode == NULL)
-			{
-				*cheattailptr = curcheat;
-				cheattailptr = &curcheat->next;
-			}
-		}
-
-		/* free the file and loop for the next one */
-		xml_file_free(rootnode);
-
-		/* open the next file in sequence */
-		filerr = mame_fclose_and_open_next(&cheatfile, fname, OPEN_FLAG_READ);
-	}
-
-	/* return the cheat list */
-	return cheatlist;
-
-error:
-	cheat_list_free(machine, cheatlist);
-	xml_file_free(rootnode);
-	if (cheatfile != NULL)
-		mame_fclose(cheatfile);
-	return NULL;
-}
-
-
-/*-------------------------------------------------
-    cheat_list_save - save a cheat file from
-    memory to the given filename
--------------------------------------------------*/
-
-static int cheat_list_save(const char *filename, const cheat_entry *cheatlist)
-{
 	mame_file *cheatfile;
-	file_error filerr;
+	file_error filerr = mame_fopen(SEARCHPATH_CHEAT, fname, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &cheatfile);
 
-	/* open the file with the proper name */
-	astring fname(filename, ".xml");
-	filerr = mame_fopen(SEARCHPATH_CHEAT, fname, OPEN_FLAG_WRITE | OPEN_FLAG_CREATE | OPEN_FLAG_CREATE_PATHS, &cheatfile);
-
-	/* if that failed, return nothing */
+	// if that failed, return nothing
 	if (filerr != FILERR_NONE)
-		return FALSE;
+		return false;
+		
+	// wrap the rest of catch errors
+	try
+	{
+		// output the outer layers
+		mame_fprintf(cheatfile, "<?xml version=\"1.0\"?>\n");
+		mame_fprintf(cheatfile, "<!-- This file is autogenerated; comments and unknown tags will be stripped -->\n");
+		mame_fprintf(cheatfile, "<mamecheat version=\"%d\">\n", CHEAT_VERSION);
 
-	/* output the outer layers */
-	mame_fprintf(cheatfile, "<?xml version=\"1.0\"?>\n");
-	mame_fprintf(cheatfile, "<!-- This file is autogenerated; comments and unknown tags will be stripped -->\n");
-	mame_fprintf(cheatfile, "<mamecheat version=\"%d\">\n", CHEAT_VERSION);
+		// iterate over cheats in the list and save them
+		for (cheat_entry *cheat = m_cheatlist.first(); cheat != NULL; cheat = cheat->next())
+			cheat->save(*cheatfile);
 
-	/* iterate over cheats in the list and save them */
-	for ( ; cheatlist != NULL; cheatlist = cheatlist->next)
-		cheat_entry_save(cheatfile, cheatlist);
-
-	/* close out the file */
-	mame_fprintf(cheatfile, "</mamecheat>\n");
-	mame_fclose(cheatfile);
-	return TRUE;
+		// close out the file
+		mame_fprintf(cheatfile, "</mamecheat>\n");
+		mame_fclose(cheatfile);
+		return true;
+	}
+	
+	// catch errors and cleanup
+	catch (emu_fatalerror &err)
+	{
+		mame_printf_error("%s\n", err.string());
+		mame_fclose(cheatfile);
+		osd_rmfile(filename);
+	}
+	return false;
 }
 
 
-/*-------------------------------------------------
-    cheat_list_free - free a list of cheats
--------------------------------------------------*/
+//-------------------------------------------------
+//  render_text - called by the UI system to 
+//  render text
+//-------------------------------------------------
 
-static void cheat_list_free(running_machine *machine, cheat_entry *cheat)
+void cheat_manager::render_text(render_container &container)
 {
-	while (cheat != NULL)
-	{
-		cheat_entry *entry = cheat;
-		cheat = entry->next;
-		cheat_entry_free(machine, entry);
-	}
-}
-
-
-/*-------------------------------------------------
-    cheat_entry_load - load a single cheat
-    entry and create the underlying data
-    structures
--------------------------------------------------*/
-
-static cheat_entry *cheat_entry_load(running_machine *machine, const char *filename, xml_data_node *cheatnode)
-{
-	cheat_private *cheatinfo = machine->cheat_data;
-	xml_data_node *paramnode, *scriptnode, *commentnode;
-	const char *description;
-	int tempcount, curtemp;
-	cheat_entry *cheat;
-
-	/* pull the variable count out ahead of things */
-	tempcount = xml_get_attribute_int(cheatnode, "tempvariables", DEFAULT_TEMP_VARIABLES);
-	if (tempcount < 1)
-	{
-		mame_printf_error("%s.xml(%d): invalid tempvariables attribute (%d)\n", filename, cheatnode->line, tempcount);
-		return NULL;
-	}
-
-	/* allocate memory for the cheat */
-	cheat = auto_alloc_clear(machine, cheat_entry);
-	cheat->tempvar = auto_alloc_array_clear(machine, UINT64, tempcount);
-	cheat->numtemp = tempcount;
-
-	/* get the description */
-	description = xml_get_attribute_string(cheatnode, "desc", NULL);
-	if (description == NULL || description[0] == 0)
-	{
-		mame_printf_error("%s.xml(%d): empty or missing desc attribute on cheat\n", filename, cheatnode->line);
-		return NULL;
-	}
-	cheat->description = description;
-
-	/* create the symbol table */
-	cheat->symbols = symtable_alloc(NULL, machine);
-	symtable_add_register(cheat->symbols, "frame", &cheatinfo->framecount, cheat_variable_get, NULL);
-	symtable_add_register(cheat->symbols, "argindex", &cheat->argindex, cheat_variable_get, NULL);
-	for (curtemp = 0; curtemp < tempcount; curtemp++)
-	{
-		char tempname[20];
-		sprintf(tempname, "temp%d", curtemp);
-		symtable_add_register(cheat->symbols, tempname, &cheat->tempvar[curtemp], cheat_variable_get, cheat_variable_set);
-	}
-	symtable_add_function(cheat->symbols, "frombcd", NULL, 1, 1, execute_frombcd);
-	symtable_add_function(cheat->symbols, "tobcd", NULL, 1, 1, execute_tobcd);
-
-	/* read the first comment node */
-	commentnode = xml_get_sibling(cheatnode->child, "comment");
-	if (commentnode != NULL)
-	{
-		if (commentnode->value != NULL && commentnode->value[0] != 0)
-			cheat->comment = commentnode->value;
-
-		/* only one comment is kept */
-		commentnode = xml_get_sibling(commentnode->next, "comment");
-		if (commentnode != NULL)
-			mame_printf_warning("%s.xml(%d): only one comment node is retained; ignoring additional nodes\n", filename, commentnode->line);
-	}
-
-	/* read the first parameter node */
-	paramnode = xml_get_sibling(cheatnode->child, "parameter");
-	if (paramnode != NULL)
-	{
-		/* load this parameter */
-		cheat_parameter *curparam = cheat_parameter_load(machine, filename, paramnode);
-		if (curparam == NULL)
-			goto error;
-
-		/* set this as the parameter and add the symbol */
-		cheat->parameter = curparam;
-		symtable_add_register(cheat->symbols, "param", &curparam->value, cheat_variable_get, NULL);
-
-		/* only one parameter allowed */
-		paramnode = xml_get_sibling(paramnode->next, "parameter");
-		if (paramnode != NULL)
-			mame_printf_warning("%s.xml(%d): only one parameter node allowed; ignoring additional nodes\n", filename, paramnode->line);
-	}
-
-	/* read the script nodes */
-	for (scriptnode = xml_get_sibling(cheatnode->child, "script"); scriptnode != NULL; scriptnode = xml_get_sibling(scriptnode->next, "script"))
-	{
-		/* load this entry */
-		cheat_script *curscript = cheat_script_load(machine, filename, scriptnode, cheat);
-		if (curscript == NULL)
-			goto error;
-
-		/* if we have a script already for this slot, it is an error */
-		if (cheat->script[curscript->state] != NULL)
-			mame_printf_warning("%s.xml(%d): only one script per state allowed; ignoring additional scripts\n", filename, scriptnode->line);
-
-		/* otherwise, fill in the slot */
-		else
-			cheat->script[curscript->state] = curscript;
-	}
-
-	/* set the initial state */
-	cheat->state = SCRIPT_STATE_OFF;
-	return cheat;
-
-error:
-	cheat_entry_free(machine, cheat);
-	return NULL;
-}
-
-
-/*-------------------------------------------------
-    cheat_entry_save - save a single cheat
-    entry
--------------------------------------------------*/
-
-static void cheat_entry_save(mame_file *cheatfile, const cheat_entry *cheat)
-{
-	script_state state;
-	int scriptcount;
-
-	/* count the scripts */
-	scriptcount = 0;
-	for (state = SCRIPT_STATE_OFF; state < SCRIPT_STATE_COUNT; state++)
-		if (cheat->script[state] != NULL)
-			scriptcount++;
-
-	/* output the cheat tag */
-	mame_fprintf(cheatfile, "\t<cheat desc=\"%s\"", cheat->description.cstr());
-	if (cheat->numtemp != DEFAULT_TEMP_VARIABLES)
-		mame_fprintf(cheatfile, " tempvariables=\"%d\"", cheat->numtemp);
-	if (!cheat->comment && cheat->parameter == NULL && scriptcount == 0)
-		mame_fprintf(cheatfile, " />\n");
-	else
-	{
-		mame_fprintf(cheatfile, ">\n");
-
-		/* save the comment */
-		if (cheat->comment)
-			mame_fprintf(cheatfile, "\t\t<comment><![CDATA[\n%s\n\t\t]]></comment>\n", cheat->comment.cstr());
-
-		/* output the parameter, if present */
-		if (cheat->parameter != NULL)
-			cheat_parameter_save(cheatfile, cheat->parameter);
-
-		/* output the script nodes */
-		for (state = SCRIPT_STATE_OFF; state < SCRIPT_STATE_COUNT; state++)
-			if (cheat->script[state] != NULL)
-				cheat_script_save(cheatfile, cheat->script[state]);
-
-		/* close the cheat tag */
-		mame_fprintf(cheatfile, "\t</cheat>\n");
-	}
-}
-
-
-/*-------------------------------------------------
-    cheat_entry_free - free a single cheat entry
--------------------------------------------------*/
-
-static void cheat_entry_free(running_machine *machine, cheat_entry *cheat)
-{
-	script_state state;
-
-	if (cheat->parameter != NULL)
-		cheat_parameter_free(machine, cheat->parameter);
-
-	for (state = SCRIPT_STATE_OFF; state < SCRIPT_STATE_COUNT; state++)
-		if (cheat->script[state] != NULL)
-			cheat_script_free(machine, cheat->script[state]);
-
-	if (cheat->symbols != NULL)
-		symtable_free(cheat->symbols);
-
-	auto_free(machine, cheat->tempvar);
-	auto_free(machine, cheat);
-}
-
-
-/*-------------------------------------------------
-    cheat_parameter_load - load a single cheat
-    parameter and create the underlying data
-    structures
--------------------------------------------------*/
-
-static cheat_parameter *cheat_parameter_load(running_machine *machine, const char *filename, xml_data_node *paramnode)
-{
-	parameter_item **itemtailptr;
-	xml_data_node *itemnode;
-	cheat_parameter *param;
-
-	/* allocate memory for it */
-	param = auto_alloc_clear(machine, cheat_parameter);
-
-	/* read the core attributes */
-	param->minval = xml_get_attribute_int(paramnode, "min", 0);
-	param->minformat = xml_get_attribute_int_format(paramnode, "min");
-	param->maxval = xml_get_attribute_int(paramnode, "max", 0);
-	param->maxformat = xml_get_attribute_int_format(paramnode, "max");
-	param->stepval = xml_get_attribute_int(paramnode, "step", 1);
-	param->stepformat = xml_get_attribute_int_format(paramnode, "step");
-
-	/* iterate over items */
-	itemtailptr = &param->itemlist;
-	for (itemnode = xml_get_sibling(paramnode->child, "item"); itemnode != NULL; itemnode = xml_get_sibling(itemnode->next, "item"))
-	{
-		parameter_item *curitem;
-
-		/* allocate memory for it */
-		curitem = auto_alloc_clear(machine, parameter_item);
-
-		/* check for NULL text */
-		if (itemnode->value == NULL || itemnode->value[0] == 0)
+	// render any text and free it along the way
+	for (int linenum = 0; linenum < ARRAY_LENGTH(m_output); linenum++)
+		if (m_output[linenum])
 		{
-			mame_printf_error("%s.xml(%d): item is missing text\n", filename, itemnode->line);
-			goto error;
+			// output the text
+			ui_draw_text_full(&container, m_output[linenum],
+					0.0f, (float)linenum * ui_get_line_height(m_machine), 1.0f,
+					m_justify[linenum], WRAP_NEVER, DRAW_OPAQUE,
+					ARGB_WHITE, ARGB_BLACK, NULL, NULL);
 		}
-		curitem->text.cpy(itemnode->value);
-
-		/* read the attributes */
-		if (xml_get_attribute(itemnode, "value") == NULL)
-		{
-			mame_printf_error("%s.xml(%d): item is value\n", filename, itemnode->line);
-			goto error;
-		}
-		curitem->value = xml_get_attribute_int(itemnode, "value", 0);
-		curitem->valformat = xml_get_attribute_int_format(itemnode, "value");
-
-		/* ensure the maximum expands to suit */
-		param->maxval = MAX(param->maxval, curitem->value);
-
-		/* add to the end of the list */
-		*itemtailptr = curitem;
-		itemtailptr = &curitem->next;
-	}
-
-	/* start at the minimum */
-	param->value = param->minval;
-
-	return param;
-
-error:
-	cheat_parameter_free(machine, param);
-	return NULL;
 }
 
 
-/*-------------------------------------------------
-    cheat_parameter_save - save a single cheat
-    parameter
--------------------------------------------------*/
+//-------------------------------------------------
+//  get_output_astring - return a reference to
+//  the given row's string, and set the 
+//  justification
+//-------------------------------------------------
 
-static void cheat_parameter_save(mame_file *cheatfile, const cheat_parameter *param)
+astring &cheat_manager::get_output_astring(int row, int justify)
 {
-	/* output the parameter tag */
-	mame_fprintf(cheatfile, "\t\t<parameter");
+	// if the row is not specified, grab the next one
+	if (row == 0)
+		row = (m_lastline >= 0) ? m_lastline + 1 : m_lastline - 1;
 
-	/* if no items, just output min/max/step */
-	astring string;
-	if (param->itemlist == NULL)
-	{
-		if (param->minval != 0)
-			mame_fprintf(cheatfile, " min=\"%s\"", format_int(string, param->minval, param->minformat));
-		if (param->maxval != 0)
-			mame_fprintf(cheatfile, " max=\"%s\"", format_int(string, param->maxval, param->maxformat));
-		if (param->stepval != 1)
-			mame_fprintf(cheatfile, " step=\"%s\"", format_int(string, param->stepval, param->stepformat));
-		mame_fprintf(cheatfile, "/>\n");
-	}
+	// remember the last request
+	m_lastline = row;
+	
+	// invert if negative
+	row = (row < 0) ? m_numlines + row : row - 1;
+	
+	// clamp within range
+	row = MAX(row, 0);
+	row = MIN(row, m_numlines - 1);
 
-	/* iterate over items */
-	else
-	{
-		const parameter_item *curitem;
-
-		for (curitem = param->itemlist; curitem != NULL; curitem = curitem->next)
-			mame_fprintf(cheatfile, "\t\t\t<item value=\"%s\">%s</item>\n", format_int(string, curitem->value, curitem->valformat), curitem->text.cstr());
-		mame_fprintf(cheatfile, "\t\t</parameter>\n");
-	}
+	// return the appropriate string
+	m_justify[row] = justify;
+	return m_output[row];
 }
 
 
-/*-------------------------------------------------
-    cheat_parameter_free - free a single cheat
-    parameter
--------------------------------------------------*/
+//-------------------------------------------------
+//  quote_expression - quote an expression
+//  string so that it is valid to embed in an XML
+//  document
+//-------------------------------------------------
 
-static void cheat_parameter_free(running_machine *machine, cheat_parameter *param)
+const char *cheat_manager::quote_expression(astring &string, parsed_expression &expression)
 {
-	while (param->itemlist != NULL)
-	{
-		parameter_item *item = param->itemlist;
-		param->itemlist = item->next;
+	string.cpy(expression_original_string(&expression));
 
-		auto_free(machine, item);
-	}
-
-	auto_free(machine, param);
-}
-
-
-/*-------------------------------------------------
-    cheat_script_load - load a single cheat
-    script and create the underlying data
-    structures
--------------------------------------------------*/
-
-static cheat_script *cheat_script_load(running_machine *machine, const char *filename, xml_data_node *scriptnode, cheat_entry *cheat)
-{
-	script_entry **entrytailptr;
-	xml_data_node *entrynode;
-	cheat_script *script;
-	const char *state;
-
-	/* allocate memory for it */
-	script = auto_alloc_clear(machine, cheat_script);
-
-	/* read the core attributes */
-	script->state = SCRIPT_STATE_RUN;
-	state = xml_get_attribute_string(scriptnode, "state", "run");
-	if (strcmp(state, "on") == 0)
-		script->state = SCRIPT_STATE_ON;
-	else if (strcmp(state, "off") == 0)
-		script->state = SCRIPT_STATE_OFF;
-	else if (strcmp(state, "change") == 0)
-		script->state = SCRIPT_STATE_CHANGE;
-	else if (strcmp(state, "run") != 0)
-	{
-		mame_printf_error("%s.xml(%d): invalid script state '%s'\n", filename, scriptnode->line, state);
-		goto error;
-	}
-
-	/* iterate over nodes within the script */
-	entrytailptr = &script->entrylist;
-	for (entrynode = scriptnode->child; entrynode != NULL; entrynode = entrynode->next)
-	{
-		script_entry *curentry = NULL;
-
-		/* handle action nodes */
-		if (strcmp(entrynode->name, "action") == 0)
-			curentry = script_entry_load(machine, filename, entrynode, cheat, TRUE);
-
-		/* handle output nodes */
-		else if (strcmp(entrynode->name, "output") == 0)
-			curentry = script_entry_load(machine, filename, entrynode, cheat, FALSE);
-
-		/* anything else is ignored */
-		else
-		{
-			mame_printf_warning("%s.xml(%d): unknown script item '%s' will be lost if saved\n", filename, entrynode->line, entrynode->name);
-			continue;
-		}
-
-		if (curentry == NULL)
-			goto error;
-
-		/* add to the end of the list */
-		*entrytailptr = curentry;
-		entrytailptr = &curentry->next;
-	}
-	return script;
-
-error:
-	cheat_script_free(machine, script);
-	return NULL;
-}
-
-
-/*-------------------------------------------------
-    cheat_script_save - save a single cheat
-    script
--------------------------------------------------*/
-
-static void cheat_script_save(mame_file *cheatfile, const cheat_script *script)
-{
-	const script_entry *entry;
-
-	/* output the script tag */
-	mame_fprintf(cheatfile, "\t\t<script");
-	switch (script->state)
-	{
-		case SCRIPT_STATE_OFF:		mame_fprintf(cheatfile, " state=\"off\"");		break;
-		case SCRIPT_STATE_ON:		mame_fprintf(cheatfile, " state=\"on\"");		break;
-		default:
-		case SCRIPT_STATE_RUN:		mame_fprintf(cheatfile, " state=\"run\"");		break;
-		case SCRIPT_STATE_CHANGE:	mame_fprintf(cheatfile, " state=\"change\"");	break;
-	}
-	mame_fprintf(cheatfile, ">\n");
-
-	/* output entries */
-	for (entry = script->entrylist; entry != NULL; entry = entry->next)
-		script_entry_save(cheatfile, entry);
-
-	/* close the tag */
-	mame_fprintf(cheatfile, "\t\t</script>\n");
-}
-
-
-/*-------------------------------------------------
-    cheat_script_free - free a single cheat
-    script
--------------------------------------------------*/
-
-static void cheat_script_free(running_machine *machine, cheat_script *script)
-{
-	while (script->entrylist != NULL)
-	{
-		script_entry *entry = script->entrylist;
-		script->entrylist = entry->next;
-		script_entry_free(machine, entry);
-	}
-
-	auto_free(machine, script);
-}
-
-
-/*-------------------------------------------------
-    script_entry_load - load a single action
-    or output create the underlying data
-    structures
--------------------------------------------------*/
-
-static script_entry *script_entry_load(running_machine *machine, const char *filename, xml_data_node *entrynode, cheat_entry *cheat, int isaction)
-{
-	const char *expression;
-	script_entry *entry;
-	EXPRERR experr;
-
-	/* allocate memory for it */
-	entry = auto_alloc_clear(machine, script_entry);
-
-	/* read the condition if present */
-	expression = xml_get_attribute_string(entrynode, "condition", NULL);
-	if (expression != NULL)
-	{
-		experr = expression_parse(expression, cheat->symbols, &debug_expression_callbacks, machine, &entry->condition);
-		if (experr != EXPRERR_NONE)
-		{
-			mame_printf_error("%s.xml(%d): error parsing cheat expression \"%s\" (%s)\n", filename, entrynode->line, expression, exprerr_to_string(experr));
-			goto error;
-		}
-	}
-
-	/* if this is an action, parse the expression */
-	if (isaction)
-	{
-		expression = entrynode->value;
-		if (expression == NULL || expression[0] == 0)
-		{
-			mame_printf_error("%s.xml(%d): missing expression in action tag\n", filename, entrynode->line);
-			goto error;
-		}
-		experr = expression_parse(expression, cheat->symbols, &debug_expression_callbacks, machine, &entry->expression);
-		if (experr != EXPRERR_NONE)
-		{
-			mame_printf_error("%s.xml(%d): error parsing cheat expression \"%s\" (%s)\n", filename, entrynode->line, expression, exprerr_to_string(experr));
-			goto error;
-		}
-	}
-
-	/* otherwise, parse the attributes and arguments */
-	else
-	{
-		output_argument **argtailptr;
-		const char *align, *format;
-		xml_data_node *argnode;
-		int totalargs = 0;
-
-		/* extract format */
-		format = xml_get_attribute_string(entrynode, "format", NULL);
-		if (format == NULL || format[0] == 0)
-		{
-			mame_printf_error("%s.xml(%d): missing format in output tag\n", filename, entrynode->line);
-			goto error;
-		}
-		entry->format.cpy(format);
-
-		/* extract other attributes */
-		entry->line = xml_get_attribute_int(entrynode, "line", 0);
-		entry->justify = JUSTIFY_LEFT;
-		align = xml_get_attribute_string(entrynode, "align", "left");
-		if (strcmp(align, "center") == 0)
-			entry->justify = JUSTIFY_CENTER;
-		else if (strcmp(align, "right") == 0)
-			entry->justify = JUSTIFY_RIGHT;
-		else if (strcmp(align, "left") != 0)
-		{
-			mame_printf_error("%s.xml(%d): invalid alignment '%s' specified\n", filename, entrynode->line, align);
-			goto error;
-		}
-
-		/* then parse arguments */
-		argtailptr = &entry->arglist;
-		for (argnode = xml_get_sibling(entrynode->child, "argument"); argnode != NULL; argnode = xml_get_sibling(argnode->next, "argument"))
-		{
-			output_argument *curarg;
-
-			/* allocate memory for it */
-			curarg = auto_alloc_clear(machine, output_argument);
-
-			/* first extract attributes */
-			curarg->count = xml_get_attribute_int(argnode, "count", 1);
-			totalargs += curarg->count;
-
-			/* max out on arguments */
-			if (totalargs > MAX_ARGUMENTS)
-			{
-				mame_printf_error("%s.xml(%d): too many arguments (found %d, max is %d)\n", filename, argnode->line, totalargs, MAX_ARGUMENTS);
-				goto error;
-			}
-
-			/* read the expression */
-			expression = argnode->value;
-			if (expression == NULL || expression[0] == 0)
-			{
-				mame_printf_error("%s.xml(%d): missing expression in argument tag\n", filename, argnode->line);
-				goto error;
-			}
-			experr = expression_parse(expression, cheat->symbols, &debug_expression_callbacks, machine, &curarg->expression);
-			if (experr != EXPRERR_NONE)
-			{
-				mame_printf_error("%s.xml(%d): error parsing cheat expression \"%s\" (%s)\n", filename, argnode->line, expression, exprerr_to_string(experr));
-				goto error;
-			}
-
-			/* add to the end of the list */
-			*argtailptr = curarg;
-			argtailptr = &curarg->next;
-		}
-
-		/* validate the format against the arguments */
-		if (!validate_format(filename, entrynode->line, entry))
-			goto error;
-	}
-	return entry;
-
-error:
-	script_entry_free(machine, entry);
-	return NULL;
-}
-
-
-/*-------------------------------------------------
-    script_entry_save - save a single action
-    or output
--------------------------------------------------*/
-
-static void script_entry_save(mame_file *cheatfile, const script_entry *entry)
-{
-	astring tempstring;
-
-	/* output an action */
-	if (!entry->format)
-	{
-		mame_fprintf(cheatfile, "\t\t\t<action");
-		if (entry->condition != NULL)
-		{
-			quote_astring_expression(tempstring.cpy(expression_original_string(entry->condition)), TRUE);
-			mame_fprintf(cheatfile, " condition=\"%s\"", tempstring.cstr());
-		}
-		quote_astring_expression(tempstring.cpy(expression_original_string(entry->expression)), FALSE);
-		mame_fprintf(cheatfile, ">%s</action>\n", tempstring.cstr());
-	}
-
-	/* output an output */
-	else
-	{
-		mame_fprintf(cheatfile, "\t\t\t<output format=\"%s\"", entry->format.cstr());
-		if (entry->condition != NULL)
-		{
-			quote_astring_expression(tempstring.cpy(expression_original_string(entry->condition)), TRUE);
-			mame_fprintf(cheatfile, " condition=\"%s\"", tempstring.cstr());
-		}
-		if (entry->line != 0)
-			mame_fprintf(cheatfile, " line=\"%d\"", entry->line);
-		if (entry->justify == JUSTIFY_CENTER)
-			mame_fprintf(cheatfile, " align=\"center\"");
-		else if (entry->justify == JUSTIFY_RIGHT)
-			mame_fprintf(cheatfile, " align=\"right\"");
-		if (entry->arglist == NULL)
-			mame_fprintf(cheatfile, " />\n");
-
-		/* output arguments */
-		else
-		{
-			const output_argument *curarg;
-
-			mame_fprintf(cheatfile, ">\n");
-			for (curarg = entry->arglist; curarg != NULL; curarg = curarg->next)
-			{
-				mame_fprintf(cheatfile, "\t\t\t\t<argument");
-				if (curarg->count != 1)
-					mame_fprintf(cheatfile, " count=\"%d\"", (int)curarg->count);
-				quote_astring_expression(tempstring.cpy(expression_original_string(curarg->expression)), FALSE);
-				mame_fprintf(cheatfile, ">%s</argument>\n", tempstring.cstr());
-			}
-			mame_fprintf(cheatfile, "\t\t\t</output>\n");
-		}
-	}
-}
-
-
-/*-------------------------------------------------
-    script_entry_free - free a single script
-    entry
--------------------------------------------------*/
-
-static void script_entry_free(running_machine *machine, script_entry *entry)
-{
-	if (entry->condition != NULL)
-		expression_free(entry->condition);
-	if (entry->expression != NULL)
-		expression_free(entry->expression);
-
-	while (entry->arglist != NULL)
-	{
-		output_argument *curarg = entry->arglist;
-		entry->arglist = curarg->next;
-
-		if (curarg->expression != NULL)
-			expression_free(curarg->expression);
-		auto_free(machine, curarg);
-	}
-
-	auto_free(machine, entry);
-}
-
-
-
-/***************************************************************************
-    MISC HELPERS
-***************************************************************************/
-
-/*-------------------------------------------------
-    quote_astring_expression - quote an expression
-    string so that it is valid to embed in an XML
-    document
--------------------------------------------------*/
-
-static astring &quote_astring_expression(astring &string, int isattribute)
-{
 	string.replace(0, " && ", " and ");
 	string.replace(0, " &&", " and ");
 	string.replace(0, "&& ", " and ");
@@ -1822,87 +1357,31 @@ static astring &quote_astring_expression(astring &string, int isattribute)
 }
 
 
-/*-------------------------------------------------
-    validate_format - check that a format string
-    has the correct number and type of arguments
--------------------------------------------------*/
+//-------------------------------------------------
+//  variable_get - return the value of a variable
+//-------------------------------------------------
 
-static int validate_format(const char *filename, int line, const script_entry *entry)
-{
-	const char *p = entry->format;
-	const output_argument *curarg;
-	int argsprovided;
-	int argscounted;
-
-	/* first count arguments */
-	argsprovided = 0;
-	for (curarg = entry->arglist; curarg != NULL; curarg = curarg->next)
-		argsprovided += curarg->count;
-
-	/* now scan the string for valid argument usage */
-	p = strchr(p, '%');
-	argscounted = 0;
-	while (p != NULL)
-	{
-		/* skip past any valid attributes */
-		p++;
-		while (strchr("lh0123456789.-+ #", *p) != NULL)
-			p++;
-
-		/* look for a valid type */
-		if (strchr("cdiouxX", *p) == NULL)
-		{
-			mame_printf_error("%s.xml(%d): invalid format specification \"%s\"\n", filename, line, entry->format.cstr());
-			return FALSE;
-		}
-		argscounted++;
-
-		/* look for the next one */
-		p = strchr(p, '%');
-	}
-
-	/* did we match? */
-	if (argscounted < argsprovided)
-	{
-		mame_printf_error("%s.xml(%d): too many arguments provided (%d) for format \"%s\"\n", filename, line, argsprovided, entry->format.cstr());
-		return FALSE;
-	}
-	if (argscounted > argsprovided)
-	{
-		mame_printf_error("%s.xml(%d): not enough arguments provided (%d) for format \"%s\"\n", filename, line, argsprovided, entry->format.cstr());
-		return FALSE;
-	}
-	return TRUE;
-}
-
-
-/*-------------------------------------------------
-    cheat_variable_get - return the value of a
-    cheat variable
--------------------------------------------------*/
-
-static UINT64 cheat_variable_get(void *globalref, void *ref)
+UINT64 cheat_manager::variable_get(void *globalref, void *ref)
 {
 	return *(UINT64 *)ref;
 }
 
 
-/*-------------------------------------------------
-    cheat_variable_set - set the value of a
-    cheat variable
--------------------------------------------------*/
+//-------------------------------------------------
+//  variable_set - set the value of a variable
+//-------------------------------------------------
 
-static void cheat_variable_set(void *globalref, void *ref, UINT64 value)
+void cheat_manager::variable_set(void *globalref, void *ref, UINT64 value)
 {
 	*(UINT64 *)ref = value;
 }
 
 
-/*-------------------------------------------------
-    execute_frombcd - convert a value from BCD
--------------------------------------------------*/
+//-------------------------------------------------
+//  execute_frombcd - convert a value from BCD
+//-------------------------------------------------
 
-static UINT64 execute_frombcd(void *globalref, void *ref, UINT32 params, const UINT64 *param)
+UINT64 cheat_manager::execute_frombcd(void *globalref, void *ref, UINT32 params, const UINT64 *param)
 {
 	UINT64 value = param[0];
 	UINT64 multiplier = 1;
@@ -1918,11 +1397,11 @@ static UINT64 execute_frombcd(void *globalref, void *ref, UINT32 params, const U
 }
 
 
-/*-------------------------------------------------
-    execute_tobcd - convert a value to BCD
--------------------------------------------------*/
+//-------------------------------------------------
+//  execute_tobcd - convert a value to BCD
+//-------------------------------------------------
 
-static UINT64 execute_tobcd(void *globalref, void *ref, UINT32 params, const UINT64 *param)
+UINT64 cheat_manager::execute_tobcd(void *globalref, void *ref, UINT32 params, const UINT64 *param)
 {
 	UINT64 value = param[0];
 	UINT64 result = 0;
@@ -1938,3 +1417,112 @@ static UINT64 execute_tobcd(void *globalref, void *ref, UINT32 params, const UIN
 }
 
 
+//-------------------------------------------------
+//  frame_update - per-frame callback
+//-------------------------------------------------
+
+void cheat_manager::frame_update_static(running_machine &machine)
+{
+	machine.cheat().frame_update();
+}
+
+void cheat_manager::frame_update()
+{
+	// set up for accumulating output
+	m_lastline = 0;
+	m_numlines = floor(1.0f / ui_get_line_height(m_machine));
+	m_numlines = MIN(m_numlines, ARRAY_LENGTH(m_output));
+	for (int linenum = 0; linenum < ARRAY_LENGTH(m_output); linenum++)
+		m_output[linenum].reset();
+
+	// iterate over running cheats and execute them
+	for (cheat_entry *cheat = m_cheatlist.first(); cheat != NULL; cheat = cheat->next())
+		cheat->frame_update();
+
+	// increment the frame counter
+	m_framecount++;
+}
+
+
+//-------------------------------------------------
+//  load_cheats - load a cheat file into memory 
+//  and create the cheat entry list
+//-------------------------------------------------
+
+void cheat_manager::load_cheats(const char *filename)
+{
+	xml_data_node *rootnode = NULL;
+	mame_file *cheatfile = NULL;
+	try
+	{
+		// open the file with the proper name
+		astring fname(filename, ".xml");
+		file_error filerr = mame_fopen(SEARCHPATH_CHEAT, fname, OPEN_FLAG_READ, &cheatfile);
+
+		// loop over all instrances of the files found in our search paths
+		while (filerr == FILERR_NONE)
+		{
+			mame_printf_verbose("Loading cheats file from %s\n", mame_file_full_name(cheatfile).cstr());
+
+			// read the XML file into internal data structures
+			xml_parse_options options = { 0 };
+			xml_parse_error error;
+			options.error = &error;
+			rootnode = xml_file_read(mame_core_file(cheatfile), &options);
+
+			// if unable to parse the file, just bail
+			if (rootnode == NULL)
+				throw emu_fatalerror("%s.xml(%d): error parsing XML (%s)\n", filename, error.error_line, error.error_message);
+
+			// find the layout node
+			xml_data_node *mamecheatnode = xml_get_sibling(rootnode->child, "mamecheat");
+			if (mamecheatnode == NULL)
+				throw emu_fatalerror("%s.xml: missing mamecheatnode node", filename);
+
+			// validate the config data version
+			int version = xml_get_attribute_int(mamecheatnode, "version", 0);
+			if (version != CHEAT_VERSION)
+				throw emu_fatalerror("%s.xml(%d): Invalid cheat XML file: unsupported version", filename, mamecheatnode->line);
+
+			// parse all the elements
+			for (xml_data_node *cheatnode = xml_get_sibling(mamecheatnode->child, "cheat"); cheatnode != NULL; cheatnode = xml_get_sibling(cheatnode->next, "cheat"))
+			{
+				// load this entry
+				cheat_entry *curcheat = auto_alloc(&m_machine, cheat_entry(*this, *m_symtable, filename, *cheatnode));
+
+				// make sure we're not a duplicate
+				cheat_entry *scannode = NULL;
+				if (REMOVE_DUPLICATE_CHEATS)
+					for (scannode = m_cheatlist.first(); scannode != NULL; scannode = scannode->next())
+						if (strcmp(scannode->description(), curcheat->description()) == 0)
+						{
+							mame_printf_verbose("Ignoring duplicate cheat '%s' from file %s\n", curcheat->description(), mame_file_full_name(cheatfile).cstr());
+							break;
+						}
+
+				// add to the end of the list
+				if (scannode == NULL)
+					m_cheatlist.append(*curcheat);
+				else
+					auto_free(&m_machine, curcheat);
+			}
+
+			// free the file and loop for the next one
+			xml_file_free(rootnode);
+
+			// open the next file in sequence
+			filerr = mame_fclose_and_open_next(&cheatfile, fname, OPEN_FLAG_READ);
+		}
+	}
+	
+	// handle errors cleanly
+	catch (emu_fatalerror &err)
+	{
+		mame_printf_error("%s\n", err.string());
+		m_cheatlist.reset();
+		if (rootnode != NULL)
+			xml_file_free(rootnode);
+		if (cheatfile != NULL)
+			mame_fclose(cheatfile);
+	}
+}

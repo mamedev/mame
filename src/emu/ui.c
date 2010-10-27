@@ -385,7 +385,8 @@ void ui_update_and_render(running_machine *machine, render_container *container)
 	}
 
 	/* render any cheat stuff at the bottom */
-	cheat_render_text(machine, container);
+	if (machine->phase() >= MACHINE_PHASE_RESET)
+		machine->cheat().render_text(*container);
 
 	/* call the current UI handler */
 	assert(ui_handler_callback != NULL);
@@ -726,7 +727,7 @@ void ui_draw_text_box(render_container *container, const char *text, int justify
 	float max_width = 2.0f * ((xpos <= 0.5f) ? xpos : 1.0f - xpos) - 2.0f * UI_BOX_LR_BORDER;
 	float target_width = max_width;
 	float target_height = line_height;
-	float target_x, target_y;
+	float target_x = 0, target_y = 0;
 	float last_target_height = 0;
 
 	// limit this iteration to a finite number of passes
@@ -1427,7 +1428,7 @@ static UINT32 handler_ingame(running_machine *machine, render_container *contain
 
 	/* handle a toggle cheats request */
 	if (ui_input_pressed(machine, IPT_UI_TOGGLE_CHEAT))
-		cheat_set_global_enable(machine, !cheat_get_global_enable(machine));
+		machine->cheat().set_enable(!machine->cheat().enabled());
 
 	/* toggle movie recording */
 	if (ui_input_pressed(machine, IPT_UI_RECORD_MOVIE))
