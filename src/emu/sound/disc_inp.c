@@ -146,9 +146,9 @@ WRITE8_DEVICE_HANDLER(discrete_sound_w)
 #define DSS_ADJUSTMENT__PMIN	DISCRETE_INPUT(4)
 #define DSS_ADJUSTMENT__PMAX	DISCRETE_INPUT(5)
 
-static DISCRETE_STEP(dss_adjustment)
+DISCRETE_STEP(dss_adjustment)
 {
-	struct dss_adjustment_context *context = (struct dss_adjustment_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dss_adjustment)
 
 	INT32  rawportval = input_port_read_direct(context->port);
 
@@ -166,9 +166,9 @@ static DISCRETE_STEP(dss_adjustment)
 	}
 }
 
-static DISCRETE_RESET(dss_adjustment)
+DISCRETE_RESET(dss_adjustment)
 {
-	struct dss_adjustment_context *context = (struct dss_adjustment_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dss_adjustment)
 
 	double min, max;
 
@@ -210,7 +210,7 @@ static DISCRETE_RESET(dss_adjustment)
  ************************************************************************/
 #define DSS_CONSTANT__INIT	DISCRETE_INPUT(0)
 
-static DISCRETE_RESET(dss_constant)
+DISCRETE_RESET(dss_constant)
 {
 	node->output[0]= DSS_CONSTANT__INIT;
 }
@@ -226,9 +226,9 @@ static DISCRETE_RESET(dss_constant)
  * input[3]    - Current data value
  *
  ************************************************************************/
-static DISCRETE_RESET(dss_input)
+DISCRETE_RESET(dss_input)
 {
-	struct dss_input_context *context = (struct dss_input_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dss_input)
 
 	context->is_buffered = FALSE;
 	context->is_stream = FALSE;
@@ -251,9 +251,9 @@ static DISCRETE_RESET(dss_input)
 	node->output[0] = context->data * context->gain + context->offset;
 }
 
-static DISCRETE_STEP(dss_input_pulse)
+DISCRETE_STEP(dss_input_pulse)
 {
-	struct dss_input_context *context = (struct dss_input_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dss_input)
 
 	/* Set a valid output */
 	node->output[0] = context->data;
@@ -276,10 +276,10 @@ static DISCRETE_STEP(dss_input_pulse)
 #define DSS_INPUT_STREAM__GAIN		DISCRETE_INPUT(1)
 #define DSS_INPUT_STREAM__OFFSET	DISCRETE_INPUT(2)
 
-static DISCRETE_STEP(dss_input_stream)
+DISCRETE_STEP(dss_input_stream)
 {
 	/* the context pointer is set to point to the current input stream data in discrete_stream_update */
-	struct dss_input_context *context = (struct dss_input_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dss_input)
 
 	if (EXPECTED(context->ptr))
 	{
@@ -290,17 +290,17 @@ static DISCRETE_STEP(dss_input_stream)
 		node->output[0] = 0;
 }
 
-static DISCRETE_RESET(dss_input_stream)
+DISCRETE_RESET(dss_input_stream)
 {
-	struct dss_input_context *context = (struct dss_input_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dss_input)
 
 	context->ptr = NULL;
 	context->data = 0;
 }
 
-static DISCRETE_START(dss_input_stream)
+DISCRETE_START(dss_input_stream)
 {
-	struct dss_input_context *context = (struct dss_input_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dss_input)
 
 	assert(DSS_INPUT_STREAM__STREAM < linked_list_count(node->info->input_list));
 

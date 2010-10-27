@@ -302,9 +302,9 @@ struct dkong_custom_mixer_context
 	double exp[2];
 };
 
-static DISCRETE_STEP( dkong_custom_mixer )
+DISCRETE_STEP( dkong_custom_mixer )
 {
-	struct dkong_custom_mixer_context *context = (struct dkong_custom_mixer_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dkong_custom_mixer)
 
 	int		in_1    = (int)DKONG_CUSTOM_IN1;
 
@@ -321,9 +321,9 @@ static DISCRETE_STEP( dkong_custom_mixer )
 
 #define	NE555_CV_R		RES_2_PARALLEL(RES_K(5), RES_K(10))
 
-static DISCRETE_RESET( dkong_custom_mixer )
+DISCRETE_RESET( dkong_custom_mixer )
 {
-	struct dkong_custom_mixer_context *context = (struct dkong_custom_mixer_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dkong_custom_mixer)
 
 	/* everything is based on the input to the O.C. inverter */
 	/* precalculate current from In1 */
@@ -786,6 +786,9 @@ DISCRETE_SOUND_END
 #define JR_R25		RES_K(47)
 #define JR_R27		RES_K(10)
 #define JR_R28		RES_K(100)
+#define JR_R33		RES_K(1)
+#define JR_R34		RES_K(1)
+#define JR_R35		RES_K(1)
 
 
 #define JR_C13		CAP_U(4.7)
@@ -883,13 +886,13 @@ DISCRETE_TASK_START(1)
 		0, 0x3FFF, DISC_COUNT_UP, 0, DISC_CLK_BY_COUNT | DISC_OUT_HAS_XTIME)
 
 	DISCRETE_BIT_DECODE(NODE_101,				/* IC 6L, pin 6 */
-		NODE_100,  6, 0)
+		NODE_100,  6, 0)						/* output x_time logic */
 	DISCRETE_BIT_DECODE(NODE_102,				/* IC 6L, pin 7 */
-		NODE_100,  3, 0)
+		NODE_100,  3, 0)						/* output x_time logic */
 	DISCRETE_BIT_DECODE(NODE_103,				/* IC 6L, pin 2 */
-		NODE_100, 12, 0)
+		NODE_100, 12, 0)						/* output x_time logic */
 	DISCRETE_BIT_DECODE(NODE_104,				/* IC 6L, pin 1 */
-		NODE_100, 11, 0)
+		NODE_100, 11, 0)						/* output x_time logic */
 
 	/* LS157 Switches - IC 6K */
 	DISCRETE_SWITCH(NODE_106,						/* IC 6K, pin 7 */
@@ -906,24 +909,24 @@ DISCRETE_TASK_START(1)
 		1, NODE_110,								/* ENAB; IC 4F, pin 11 */
 		4.14, 0.151)								/* INP0; INP1 (measured) */
 
-/* Breadboarded measurements IC 5K, pin 7
-   D.R. Oct 2010
-    V       Hz
-    0.151   3139
-    0.25    2883
-    0.5     2820
-    0.75    3336
-    1       3805
-    2       6498
-    3       9796
-    4       13440
-    4.14    13980
-*/
+	/* Breadboarded measurements IC 5K, pin 7
+	   D.R. Oct 2010
+	    V       Hz
+	    0.151   3139
+	    0.25    2883
+	    0.5     2820
+	    0.75    3336
+	    1       3805
+	    2       6498
+	    3       9796
+	    4       13440
+	    4.14    13980
+	*/
 
-	DISCRETE_74LS629(NODE_113,						/* IC 5K, pin 7 */
+	DISCRETE_74LS624(NODE_113,						/* IC 5K, pin 7 */
 		1,											/* ENAB */
 		NODE_111, DK_SUP_V,							/* VMOD - IC 5K, pin 2; VRNG */
-		JR_C18, JR_R10,	JR_C17,						/* C; R_FREQ_IN; C_FREQ_IN */
+		JR_C18, JR_R10,	JR_C17, JR_R33,				/* C; R_FREQ_IN; C_FREQ_IN; R_RNG_IN */
 		DISC_LS624_OUT_LOGIC_X)
 	DISCRETE_SWITCH(NODE_105,						/* IC 6K, pin 4 */
 		1,											/* ENAB */
@@ -938,24 +941,24 @@ DISCRETE_TASK_START(1)
 		NODE_107,									/* IC 5J, pin 9 */
 		0.135, 4.15)								/* measured Low/High */
 
-/* Breadboarded measurements IC 5K, pin 10
-   D.R. Oct 2010
-    V       Hz
-    0.135   14450 - measured 74LS04 low
-    0.25    13320
-    0.5     12980
-    0.75    15150
-    1       17270
-    2       28230
-    3       41910
-    4       56950
-    4.15    59400 - measured 74LS04 high
-*/
+	/* Breadboarded measurements IC 5K, pin 10
+	   D.R. Oct 2010
+	    V       Hz
+	    0.135   14450 - measured 74LS04 low
+	    0.25    13320
+	    0.5     12980
+	    0.75    15150
+	    1       17270
+	    2       28230
+	    3       41910
+	    4       56950
+	    4.15    59400 - measured 74LS04 high
+	*/
 
-	DISCRETE_74LS629(NODE_118,						/* IC 5K, pin 10 */
+	DISCRETE_74LS624(NODE_118,						/* IC 5K, pin 10 */
 		1,											/* ENAB */
 		NODE_116, DK_SUP_V,							/* VMOD - IC 5K, pin 1; VRNG */
-		JR_C19, JR_R11, JR_C16,						/* C; R_FREQ_IN; C_FREQ_IN */
+		JR_C19, JR_R11, JR_C16, JR_R33,				/* C; R_FREQ_IN; C_FREQ_IN; R_RNG_IN */
 		DISC_LS624_OUT_COUNT_F_X)
 	DISCRETE_SWITCH(NODE_119, 1, NODE_110, 0, 1)	/* convert from voltage to x_time logic */
 	DISCRETE_XTIME_NAND(DS_OUT_SOUND0,				/* IC 5N, pin 11 */
@@ -980,25 +983,25 @@ DISCRETE_TASK_START(2)
 		0.151, 4.14)								/* measured Low/High */
 	DISCRETE_MIXER2(NODE_13, 1, NODE_11, NODE_12, &dkongjr_s1_mixer_desc)
 
-/* Breadboarded measurements IC 8L, pin 10
-   D.R. Oct 2010
-    V       Hz
-    0.151   313
-    0.25    288
-    0.5     275
-    0.75    324
-    1       370
-    2       635
-    3       965
-    4       1325
-    4.14    1378
-*/
+	/* Breadboarded measurements IC 8L, pin 10
+	   D.R. Oct 2010
+	    V       Hz
+	    0.151   313
+	    0.25    288
+	    0.5     275
+	    0.75    324
+	    1       370
+	    2       635
+	    3       965
+	    4       1325
+	    4.14    1378
+	*/
 
-	DISCRETE_74LS629(NODE_14,						/* IC 8L, pin 10 */
+	DISCRETE_74LS624(NODE_14,						/* IC 8L, pin 10 */
 		1,											/* ENAB */
 		NODE_13, DK_SUP_V,							/* VMOD - IC 8L, pin 1, VRNG */
 		/* C_FREQ_IN is taken care of by the NODE_13 mixer */
-		JR_C22, RES_2_PARALLEL(JR_R13, JR_R12), 0,	/* C, R_FREQ_IN, C_FREQ_IN */
+		JR_C22, RES_2_PARALLEL(JR_R13, JR_R12), 0, JR_R35,	/* C; R_FREQ_IN; C_FREQ_IN; R_RNG_IN */
 		DISC_LS624_OUT_ENERGY)
 
 	DISCRETE_LOGIC_INVERT(NODE_15, NODE_10)			/* fake invert for NODE_16 */
@@ -1044,23 +1047,23 @@ DISCRETE_TASK_START(1)
 		DS_SOUND9_EN,						/* IC 7N, pin 9 */
 		0.134, 4.16)						/* measured Low/High */
 
-		/* Breadboarded measurements IC 7P, pin 7
-   D.R. Oct 2010
-    V       Hz
-    0.134   570
-    0.25    538
-    0.5     489
-    0.75    560
-    1       636
-    2       1003
-    3       1484
-    4       2016
-    4.16    2111
-*/
-	DISCRETE_74LS629(NODE_91,				/* IC 7P, pin 7 */
+	/* Breadboarded measurements IC 7P, pin 7
+	   D.R. Oct 2010
+	    V       Hz
+	    0.134   570
+	    0.25    538
+	    0.5     489
+	    0.75    560
+	    1       636
+	    2       1003
+	    3       1484
+	    4       2016
+	    4.16    2111
+	*/
+	DISCRETE_74LS624(NODE_91,				/* IC 7P, pin 7 */
 		1,									/* ENAB */
 		NODE_90, DK_SUP_V,					/* VMOD - IC 7P, pin 2, VRNG */
-		JR_C37, JR_R14, JR_C26,				/* C, R_FREQ_IN, C_FREQ_IN */
+		JR_C37, JR_R14, JR_C26, JR_R34,		/* C; R_FREQ_IN; C_FREQ_IN; R_RNG_IN */
 		DISC_LS624_OUT_LOGIC_X)
 	DISCRETE_XTIME_NAND(DS_OUT_SOUND9,		/* IC 5N, pin 8 */
 		DS_SOUND9_EN,						/* IC 5N, pin 9 */
@@ -1101,7 +1104,12 @@ DISCRETE_TASK_START(3)
      * Just a 1:n amplifier without filters - just the output filter
      */
 	DISCRETE_CRFILTER(NODE_295, NODE_288, 1000, JR_C13)
-	DISCRETE_OUTPUT(NODE_295, 32767.0/5.0 * 5)
+	/* approx -1.805V to 2.0V when playing, but turn on sound peaks at 2.36V */
+	/* we will set the full wav range to 1.18V which will cause clipping on the turn on
+	 * sound and explosions.  The real game would do this when the volume is turned up too.
+	 * Reducing MAME's master volume to 50% will provide full unclipped volume.
+	 */
+	DISCRETE_OUTPUT(NODE_295, 32767.0/1.18)
 DISCRETE_TASK_END()
 
 DISCRETE_SOUND_END
@@ -1245,16 +1253,16 @@ static READ8_DEVICE_HANDLER( dkong_voice_status_r )
 static READ8_DEVICE_HANDLER( dkong_tune_r )
 {
 	dkong_state *state = device->machine->driver_data<dkong_state>();
-	UINT8 page = latch8_r(state->dev_vp2,0) & 0x47;
+	UINT8 page = latch8_r(state->dev_vp2, 0) & 0x47;
 
 	if ( page & 0x40 )
 	{
-		return (latch8_r(device, 0) & 0x0F) | (dkong_voice_status_r(device,0)<<4);
+		return (latch8_r(device, 0) & 0x0F) | (dkong_voice_status_r(device, 0) << 4);
 	}
 	else
 	{
 		/* printf("%s:rom access\n",cpuexec_describe_context(device->machine)); */
-		return (state->snd_rom[0x1000+(page & 7)*256+offset]);
+		return (state->snd_rom[0x1000 + (page & 7) * 256 + offset]);
 	}
 }
 

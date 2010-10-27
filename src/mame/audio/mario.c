@@ -15,12 +15,6 @@
 /* FIXME: Capacitor aging - only in for calibration now        */
 /* Adjustments are needed to bring this close to recordings    */
 
-/* FIXME: Awaiting verification. VCO range inputs are shown    */
-/* as connected to +5V on schematics. This does not match      */
-/* recordings                                                  */
-
-#define USE_LS629	(0)		/* set to use new LS624 code */
-
 #define RUN_VCO_VOLTAGE		(0.0)	/* 5 in schematics */
 
 #define USE_8039	(0)			/* set to 1 to try 8039 hack */
@@ -93,6 +87,9 @@
 									/* 27 verified, 30K in schematics       */
 #define MR_R19		RES_K(22)		/* verified                             */
 #define MR_R20		RES_K(22)		/* verified                             */
+#define MR_R34		RES_M(2)		/*                             */
+#define MR_R35		RES_M(1)		/*                             */
+#define MR_R36		RES_M(1.8)		/*                             */
 #define MR_R40		RES_K(22)		/* verified                             */
 #define MR_R41		RES_K(100)		/* verified                             */
 #define MR_R42		RES_K(43)		/* verified                             */
@@ -124,298 +121,236 @@
 /* KT = 0.25 for diode circuit, 0.33 else */
 
 #define DISCRETE_LS123(_N, _T, _R, _C) \
-	DISCRETE_ONESHOTR(_N, 0, _T, TTL_HIGH, (0.25 * (_R) * (_C) * (1.0+700./(_R))), DISC_ONESHOT_RETRIG | DISC_ONESHOT_REDGE)
+	DISCRETE_ONESHOTR(_N, 0, _T, 1, (0.25 * (_R) * (_C) * (1.0+700./(_R))), DISC_ONESHOT_RETRIG | DISC_ONESHOT_REDGE)
 #define DISCRETE_LS123_INV(_N, _T, _R, _C) \
-	DISCRETE_ONESHOTR(_N, 0, _T, TTL_HIGH, (0.25 * (_R) * (_C) * (1.0+700./(_R))), DISC_ONESHOT_RETRIG | DISC_ONESHOT_REDGE | DISC_OUT_ACTIVE_LOW)
+	DISCRETE_ONESHOTR(_N, 0, _T, 1, (0.25 * (_R) * (_C) * (1.0+700./(_R))), DISC_ONESHOT_RETRIG | DISC_ONESHOT_REDGE | DISC_OUT_ACTIVE_LOW)
 
-/* speed optimization */
-/* pow(10, x) = exp(ln(10)*x) */
-#define pow10(x) exp(2.30258509299404568401*(x))
 
-/* The following formula was derived from figures 2 and 3 in LS624 datasheet. Coefficients
- * where calculated using least square approximation.
- * This approach gives a bit better results compared to the first approach.
- */
-//#define LS624_F(_C, _VI, _VR) pow10( -0.912029404 * log10(_C) + 0.243264328 * (_VI)
-//                - 0.091695877 * (_VR) -0.014110946 * (_VI) * (_VR) - 3.207072925)
-#define LS624_F(_in, _num)	pow10(context->k1_##_num + 0.243264328 * (_in) + context->k2_##_num * (_in))
-
-/************************************************************************
- *
- * Custom mario run
- *
- * Two VCO with XOR'd signal
- *
- * input[0]    - Enable / Amplitude
- * input[1]    - In1 VCO Control 1
- * input[2]    - In2 VCO Control 2
- * input[3]    - C1 VCO 1 Cap
- * input[4]    - C2 VCO 2 CAP
- * input[5]    - R1
- * input[6]    - C3
- *
- * Vout >--------------------------
- *                                 |
- *             C1                  |
- *            -||-                 |
- *           |    |                 -- +---
- *           ------          ---       |AND|    R1
- *  In1 >---+   Y1 +--------+   |      |(*)+---ZZZ--+------> Out
- *          |      |        |XOR+------+---         |
- *          |      |     ---+   |                   |
- *          |      |    |    ---                   ---
- *  In2 >---+   Y2 +----                           --- C3
- *           ------                                 |
- *           |    |                                Gnd
- *            -||-
- *             C2
- ************************************************************************/
-#define MARIO_CUSTOM_VOUT		DISCRETE_INPUT(0)
-#define MARIO_CUSTOM_IN1		DISCRETE_INPUT(1)
-#define MARIO_CUSTOM_IN2		DISCRETE_INPUT(2)
-#define MARIO_CUSTOM_C1			DISCRETE_INPUT(3)
-#define MARIO_CUSTOM_C2			DISCRETE_INPUT(4)
-#define MARIO_CUSTOM_R1			DISCRETE_INPUT(5)
-#define MARIO_CUSTOM_C3			DISCRETE_INPUT(6)
-
-struct mario_custom_run_context
+	static const discrete_op_amp_info mario_dac_amp =
 {
-	int		state1;
-	int		state2;
-	double	remain1;
-	double  remain2;
-	double  vc3;
-	double  r1_c3;
-	double	k1_1;
-	double	k2_1;
-	double	k1_2;
-	double	k2_2;
-	double	exponent_c3;
-	double	dt_in1_at_0;
-	double	dt_in2_at_0;
+	DISC_OP_AMP_IS_NORTON,
+	MR_R34, MR_R36, 0, MR_R35, 0,		/* r1, r2, r3, r4, c */
+	0, 5							/* vN, vP */
 };
 
-static DISCRETE_STEP( mario_custom_run )
-{
-	struct mario_custom_run_context *context = (struct mario_custom_run_context *)node->context;
-
-	double  sample_t = node->info->sample_time;
-	double  vn, exponent, t = 0;
-	int		update_exponent;
-	double	t1, t2;
-
-	if (EXPECTED(MARIO_CUSTOM_IN1 > 0.001))
-		t1	= 0.5 / LS624_F(MARIO_CUSTOM_IN1, 1);
-	else
-		/* close enough to 0, so we can speed things up by no longer call pow() */
-		t1 = context->dt_in1_at_0;
-
-	if (EXPECTED(MARIO_CUSTOM_IN2 > 0.001))
-		t2	= 0.5 / LS624_F(MARIO_CUSTOM_IN2, 2);
-	else
-		t2 = context->dt_in2_at_0;
-
-	while (sample_t > 0.0f)
-	{
-		/* state before time advance */
-		vn = (double) (context->state1 ^ context->state2);
-		vn *= MARIO_CUSTOM_VOUT;
-		update_exponent = 0;
-		if (context->remain1 < context->remain2)
-		{
-			if (EXPECTED(context->remain1 < sample_t))
-			{
-				t = context->remain1;
-				update_exponent = 1;
-				context->state1 ^= 1;
-				sample_t -= context->remain1;
-				context->remain2 -= context->remain1;
-				context->remain1 = t1;
-			}
-			else
-			{
-				context->remain1 -= sample_t;
-				context->remain2 -= sample_t;
-				sample_t = 0.0f;
-			}
-		}
-		else
-		{
-			if (EXPECTED(context->remain2 < sample_t))
-			{
-				t = context->remain2;
-				update_exponent = 1;
-				context->state2 ^= 1;
-				sample_t -= context->remain2;
-				context->remain1 -= context->remain2;
-				context->remain2 = t2;
-			}
-			else
-			{
-				context->remain1 -= sample_t;
-				context->remain2 -= sample_t;
-				sample_t = 0.0f;
-			}
-		}
-
-		if (EXPECTED(update_exponent))
-			exponent = RC_CHARGE_EXP_DT(context->r1_c3, t);
-		else
-			exponent = context->exponent_c3;
-		context->vc3 += (vn - context->vc3) * exponent;
-	}
-	node->output[0] = context->vc3;
-}
-
-static DISCRETE_RESET( mario_custom_run )
-{
-	struct mario_custom_run_context *context = (struct mario_custom_run_context *)node->context;
-
-	context->remain1 = 0.0;
-	context->remain2 = 0.0;
-	context->state1 = 0;
-	context->state2 = 0;
-	context->vc3 = 0;
-	context->r1_c3 = MARIO_CUSTOM_R1 * MARIO_CUSTOM_C3;
-	node->output[0] = 0;
-
-	/* precalculate some parts of the formulas for speed */
-	context->k1_1 = -0.912029404 * log10(MARIO_CUSTOM_C1) -0.091695877 * (RUN_VCO_VOLTAGE) - 3.207072925;
-	context->k2_1 = -0.014110946 * (RUN_VCO_VOLTAGE);
-	context->k1_2 = -0.912029404 * log10(MARIO_CUSTOM_C2) -0.091695877 * (RUN_VCO_VOLTAGE) - 3.207072925;
-	context->k2_2 = -0.014110946 * (RUN_VCO_VOLTAGE);
-	context->exponent_c3 = RC_CHARGE_EXP(context->r1_c3);
-
-	context->dt_in1_at_0 = 0.5 / LS624_F(0, 1);
-	context->dt_in2_at_0 = 0.5 / LS624_F(0, 2);
-}
-
-static const discrete_custom_info mario_custom_run_info =
-{
-	DISCRETE_CUSTOM_MODULE( mario_custom_run, struct mario_custom_run_context),
-	NULL
-};
-
-static const discrete_mixer_desc mario_mixer =
+	static const discrete_mixer_desc mario_mixer =
 {
 	DISC_MIXER_IS_RESISTOR,
 	{MR_R20, MR_R19, MR_R41, MR_R40},
 	{0}, {0}, 0, 0, MR_C31, MR_C32, 0, 1	/* r_node{}, c{}, rI, rF, cF, cAmp, vRef, gain*/
 };
 
-#define LS629_FREQ_R_IN		RES_K(95)
+#define LS629_FREQ_R_IN		RES_K(90)
 
 static DISCRETE_SOUND_START(mario)
 
-	/************************************************/
-	/* Input register mapping for mario             */
-	/************************************************/
+	/************************************************
+	 * Input register mapping for mario
+	 ************************************************/
 
 	/* DISCRETE_INPUT_DATA */
-    DISCRETE_INPUT_NOT(DS_SOUND7_INV)
+    DISCRETE_INPUT_NOT(DS_SOUND7_INV)				/* IC 7L, pin 8 */
 
-	/************************************************/
-	/* SOUND0                                       */
-	/************************************************/
+	/************************************************
+	 * SOUND0
+	 ************************************************/
 
     DISCRETE_TASK_START(1)
-    DISCRETE_INPUT_PULSE(DS_SOUND0_INV, 1)
-	DISCRETE_LS123(NODE_10, DS_SOUND0_INV, MR_R17, MR_C14)
-	DISCRETE_RCFILTER(NODE_11, NODE_10, MR_R6, MR_C3 )
-#if (USE_LS629)
-	DISCRETE_74LS629(NODE_12,						/* IC 1J, pin 10 */
+    DISCRETE_INPUT_PULSE(DS_SOUND0_INV, 1)			/* IC 4C, pin 15 */
+	DISCRETE_LS123(NODE_10,							/* IC 2H, pin 13 */
+		DS_SOUND0_INV,								/* IC 2H, pin 2 */
+		MR_R17, MR_C14)
+
+/* Breadboarded measurements IC 1J, pin 10
+   D.R. Oct 2010
+    V       Hz
+	0.115	14470
+	0.250	15190
+	0.500	14980
+	0.750	18150
+	1.000	21690
+	2.000	38790
+	3.000	58580
+	4.000	79890
+*/
+
+/* Breadboarded measurements IC 2J, pin 10
+   D.R. Oct 2010
+    V       Hz
+	0.116	2458
+	0.250	2593
+	0.500	2540
+	0.750	3081
+	1.000	3676
+	2.000	6590
+	3.000	9974
+	4.000	13620
+*/
+
+	/* covert logic to measured voltage */
+	DISCRETE_XTIME_BUFFER(NODE_11,					/* IC 1H, pin 10 */
+		NODE_10,									/* IC 1H, pin 11 */
+		0.115, 4.0)									/* measured Low/High */
+	/* work out cap charge of RC in parallel with 2 74LS629s */
+	DISCRETE_RCFILTER(NODE_12, NODE_11, RES_3_PARALLEL(MR_R6, LS629_FREQ_R_IN, LS629_FREQ_R_IN), MR_C3 )
+	/* work out voltage drop of RC in parallel with 2 74LS629s */
+	DISCRETE_GAIN(NODE_13, NODE_12, RES_VOLTAGE_DIVIDER(MR_R6, RES_2_PARALLEL(LS629_FREQ_R_IN, LS629_FREQ_R_IN)))
+	DISCRETE_74LS624(NODE_14,						/* IC 1J, pin 10 */
 		1,											/* ENAB */
-		NODE_11, 5,									/* VMOD, VRNG */
-		MR_C6, RES_2_PARALLEL(MR_R6, LS629_FREQ_R_IN),		/* C, R_FREQ_IN */
-		DISC_LS624_OUT_SQUARE)
-	DISCRETE_74LS629(NODE_13,						/* IC 2J, pin 10 */
+		NODE_13, 5,									/* VMOD -  IC 1J, pin 1; VRNG */
+		MR_C6, 0, 0, 0,								/* C; R_FREQ_IN; C_FREQ_IN; R_RNG_IN */
+		DISC_LS624_OUT_LOGIC_X)
+	DISCRETE_74LS624(NODE_15,						/* IC 2J, pin 10 */
 		1,											/* ENAB */
-		NODE_11, 5,									/* VMOD, VRNG */
-		MR_C17, RES_2_PARALLEL(MR_R6, LS629_FREQ_R_IN),		/* C, R_FREQ_IN */
-		DISC_LS624_OUT_SQUARE)
-	DISCRETE_LOGIC_XOR(NODE_14,						/* IC 1K, pin 6 */
-		NODE_12, NODE_13)
-	DISCRETE_SWITCH(DS_OUT_SOUND0,					/* IC 2K, pin 3 */
-		NODE_10, NODE_14,							/* ENAB, SWITCH */
-		0, TTL_HIGH)								/* INP0,INP1 */
-#else
-	DISCRETE_CUSTOM7(DS_OUT_SOUND0, NODE_10, NODE_11, NODE_11, MR_C6, MR_C17,
-			MR_MIXER_RPAR, MR_C31, &mario_custom_run_info)
-#endif
+		NODE_13, 5,									/* VMOD - IC 2J, pin 1; VRNG */
+		MR_C17, 0, 0, 0,							/* C; R_FREQ_IN; C_FREQ_IN; R_RNG_IN */
+		DISC_LS624_OUT_LOGIC_X)
+	DISCRETE_XTIME_XOR(NODE_16,						/* IC IC 1K, pin 6 */
+		NODE_14, NODE_15,							/* IC 1K, pin 5; pin 4 */
+		0, 0)										/* use x_time logic */
+	DISCRETE_XTIME_AND(DS_OUT_SOUND0,				/* IC 2K, pin 6 */
+		NODE_10, NODE_16,							/* IC 2K, pin 5; pin 4 */
+		0.066, 3.8)									/* LOW; HIGH (varies due to load 3.7 - 4.4) */
 	DISCRETE_TASK_END()
 
-	/************************************************/
-	/* SOUND1                                       */
-	/************************************************/
+	/************************************************
+	 * SOUND1
+	 ************************************************/
 
 	DISCRETE_TASK_START(1)
-	DISCRETE_INPUT_PULSE(DS_SOUND1_INV, 1)
-	DISCRETE_LS123(NODE_20, DS_SOUND1_INV, MR_R18, MR_C15)
-	DISCRETE_RCFILTER(NODE_21, NODE_20, MR_R7, MR_C4 )
-#if (USE_LS629)
-	DISCRETE_74LS629(NODE_22,						/* IC 1J, pin 7 */
+	DISCRETE_INPUT_PULSE(DS_SOUND1_INV, 1)			/* IC 4C, pin 14 */
+	DISCRETE_LS123(NODE_20,							/* IC 2H, pin 5 */
+		DS_SOUND1_INV,								/* IC 2H, pin 10 */
+		MR_R18, MR_C15)
+
+/* Breadboarded measurements IC 1J, pin 7
+   D.R. Oct 2010
+    V       Hz
+	0.116	1380
+	0.250	1448
+	0.500	1419
+	0.750	1717
+	1.000	2053
+	2.000	3677
+	3.000	5561
+	4.000	7610
+*/
+
+/* Breadboarded measurements IC 2J, pin 7
+   D.R. Oct 2010
+    V       Hz
+	0.112	8030
+	0.250	8490
+	0.500	8326
+	0.750	10030
+	1.000	12000
+	2.000	21460
+	3.000	32540
+	4.000	44300
+*/
+
+	/* covert logic to measured voltage */
+	DISCRETE_XTIME_BUFFER(NODE_21,					/* IC 1H, pin 8 */
+		NODE_20,									/* IC 1H, pin 9 */
+		0.115, 4.0)									/* measured Low/High */
+	/* work out cap charge of RC in parallel with 2 74LS629s */
+	DISCRETE_RCFILTER(NODE_22, NODE_21, RES_3_PARALLEL(MR_R7, LS629_FREQ_R_IN, LS629_FREQ_R_IN), MR_C4 )
+	/* work out voltage drop of RC in parallel with 2 74LS629s */
+	DISCRETE_GAIN(NODE_23, NODE_22, RES_VOLTAGE_DIVIDER(MR_R7, RES_2_PARALLEL(LS629_FREQ_R_IN, LS629_FREQ_R_IN)))
+	DISCRETE_74LS624(NODE_24,						/* IC 1J, pin 7 */
 		1,											/* ENAB */
-		NODE_21, 5,									/* VMOD, VRNG */
-		MR_C5, RES_2_PARALLEL(MR_R7, LS629_FREQ_R_IN),		/* C, R_FREQ_IN */
-		DISC_LS624_OUT_SQUARE)
-	DISCRETE_74LS629(NODE_23,						/* IC 2J, pin 7 */
+		NODE_23, 5,									/* VMOD, VRNG */
+		MR_C5, 0, 0, 0,								/* C; R_FREQ_IN; C_FREQ_IN; R_RNG_IN */
+		DISC_LS624_OUT_LOGIC_X)
+	DISCRETE_74LS624(NODE_25,						/* IC 2J, pin 7 */
 		1,											/* ENAB */
-		NODE_21, 5,									/* VMOD, VRNG */
-		MR_C16, RES_2_PARALLEL(MR_R7, LS629_FREQ_R_IN),		/* C, R_FREQ_IN */
-		DISC_LS624_OUT_SQUARE)
-	DISCRETE_LOGIC_XOR(NODE_24,						/* IC 1K, pin 3 */
-		NODE_22, NODE_23)
-	DISCRETE_SWITCH(DS_OUT_SOUND1,					/* IC 2K, pin 3 */
-		NODE_20, NODE_24,							/* ENAB, SWITCH */
-		0, TTL_HIGH)								/* INP0,INP1 */
-#else
-	DISCRETE_CUSTOM7(DS_OUT_SOUND1, NODE_20, NODE_21, NODE_21, MR_C5, MR_C16,
-		MR_MIXER_RPAR, MR_C31, &mario_custom_run_info)
-#endif
+		NODE_23, 5,									/* VMOD, VRNG */
+		MR_C16, 0, 0, 0,							/* C; R_FREQ_IN; C_FREQ_IN; R_RNG_IN */
+		DISC_LS624_OUT_LOGIC_X)
+	DISCRETE_XTIME_XOR(NODE_26,						/* IC IC 1K, pin 3 */
+		NODE_24, NODE_25,							/* IC 1K, pin 1; pin 2 */
+		0, 0)										/* use x_time logic */
+	DISCRETE_XTIME_AND(DS_OUT_SOUND1,				/* IC 2K, pin 3 */
+		NODE_20, NODE_26,							/* IC 2K, pin 2; pin 1 */
+		0.066, 3.8)									/* LOW; HIGH (varies due to load 3.7 - 4.4) */
 	DISCRETE_TASK_END()
 
-	/************************************************/
-	/* SOUND7                                       */
-	/************************************************/
+	/************************************************
+	 * SOUND7
+	 ************************************************/
 
 	DISCRETE_TASK_START(1)
-	DISCRETE_COUNTER(NODE_100,1,0,NODE_118,0,0xFFFF,DISC_COUNT_UP,0,DISC_CLK_BY_COUNT)
+	DISCRETE_COUNTER(NODE_100,						/* IC 3H */
+		1, 0,										/* ENAB; RESET */
+		NODE_118,									/* CLK - IC 3H, pin 10 */
+		0, 0x3FFF, DISC_COUNT_UP, 0, DISC_CLK_BY_COUNT | DISC_OUT_HAS_XTIME)
+	DISCRETE_BIT_DECODE(NODE_102,					/* IC 3H, pin 7 */
+		NODE_100,  3, 0)							/* output x_time logic */
+	DISCRETE_BIT_DECODE(NODE_104,					/* IC 3H, pin 1 */
+		NODE_100,  11, 0)							/* output x_time logic */
 
-	DISCRETE_BIT_DECODE(NODE_102, NODE_100, 3, 1)	//LS157 2B
-	DISCRETE_BIT_DECODE(NODE_104, NODE_100, 11, TTL_HIGH) //LS157 3B
+	DISCRETE_LS123(NODE_110,						/* IC 4L, pin 13 */
+		DS_SOUND7_INV,								/* IC 4L, pin 2 */
+		MR_R61, MR_C41)
+	DISCRETE_XTIME_INVERTER(NODE_111,				/* IC 4J, pin 8 */
+		NODE_110,									/* IC 4J, pin 9 */
+		0.151, 4.14)								/* measured Low/High */
 
-	DISCRETE_LS123(NODE_110, DS_SOUND7_INV, MR_R61, MR_C41)
-	DISCRETE_TRANSFORM2(NODE_111, NODE_110, TTL_HIGH, "0!1*")
-	DISCRETE_RCFILTER(NODE_112, NODE_111, MR_R65, MR_C44)
-#if (USE_LS629)
-	DISCRETE_74LS629(NODE_113,						/* IC 4K, pin 10 */
+/* Breadboarded measurements IC 4K, pin 10
+   D.R. Oct 2010
+    V       Hz
+    0.151   3139
+    0.25    2883
+    0.5     2820
+    0.75    3336
+    1       3805
+    2       6498
+    3       9796
+    4       13440
+    4.14    13980
+*/
+
+	DISCRETE_74LS624(NODE_113,						/* IC 4K, pin 10 */
 		1,											/* ENAB */
-		NODE_112, 5,								/* VMOD, VRNG */
-		MR_C40, MR_R65,								/* C, R_FREQ_IN */
-		DISC_LS624_OUT_LOGIC)
-#else
-	DISCRETE_74LS624(NODE_113, NODE_112, RUN_VCO_VOLTAGE /*VSS*/, MR_C40, DISC_LS624_OUT_LOGIC)
-#endif
+		NODE_111, 5,								/* VMOD - IC 4K, pin 1; VRNG */
+		MR_C40, MR_R65, MR_C44, 0,					/* C; R_FREQ_IN; C_FREQ_IN; R_RNG_IN */
+		DISC_LS624_OUT_LOGIC_X)
 
-	DISCRETE_LOGIC_XOR(NODE_115, NODE_102, NODE_113)
+	DISCRETE_XTIME_XOR(NODE_115,					/* IC 6N, pin 3 */
+		NODE_113, NODE_102,							/* IC 6N, pin 1; pin 2 */
+		0, 0)										/* use x_time logic */
 
-	DISCRETE_RCFILTER(NODE_117, NODE_104, MR_R64, MR_C43)
-#if (USE_LS629)
-	DISCRETE_74LS629(NODE_118,						/* IC 4K, pin 7 */
+/* Breadboarded measurements IC 4K, pin 7
+   D.R. Oct 2010
+    V       Hz
+    0.135   14450
+    0.25    13320
+    0.5     12980
+    0.75    15150
+    1       17270
+    2       28230
+    3       41910
+    4       56950
+    4.15    59400
+*/
+
+	DISCRETE_XTIME_INVERTER(NODE_117,				/* IC 4J, pin 4 */
+		NODE_104,									/* IC 4J, pin 3 */
+		0.135, 4.15)								/* measured Low/High */
+	DISCRETE_74LS624(NODE_118,						/* IC 4K, pin 7 */
 		1,											/* ENAB */
-		NODE_117, 5,								/* VMOD, VRNG */
-		MR_C39, MR_R64,								/* C, R_FREQ_IN */
-		DISC_LS624_OUT_LOGIC)
-#else
-	DISCRETE_74LS624(NODE_118, NODE_117, RUN_VCO_VOLTAGE /*VSS*/, MR_C39, DISC_LS624_OUT_COUNT_F)
-#endif
-	DISCRETE_LOGIC_AND(NODE_120, NODE_115, NODE_110)
-	DISCRETE_MULTIPLY(DS_OUT_SOUND7, NODE_120, TTL_HIGH)
+		NODE_117, 5,								/* VMOD - IC 4K, pin 2; VRNG */
+		MR_C39, MR_R64, MR_C43, 0,					/* C; R_FREQ_IN; C_FREQ_IN; R_RNG_IN */
+		DISC_LS624_OUT_LOGIC_X)
+
+	DISCRETE_XTIME_AND(DS_OUT_SOUND7,				/* IC 2K, pin 11 */
+		NODE_110, NODE_115,							/* IC 2K, pin 12; pin 13 */
+		0.066, 4.07)								/* LOW; HIGH (varies due to load 4.07 is lowest) */
 	DISCRETE_TASK_END()
 
-	/************************************************/
-	/* DAC                                          */
-	/************************************************/
+	/************************************************
+	 * DAC
+	 ************************************************/
 
 	/* following the resistor DAC are two opamps. The first is a 1:1 amplifier, the second
      * is a filter circuit. Simulation in LTSPICE shows, that the following is equivalent:
@@ -423,21 +358,34 @@ static DISCRETE_SOUND_START(mario)
 
 	DISCRETE_TASK_START(1)
 	DISCRETE_INPUT_BUFFER(DS_DAC, 0)
-	DISCRETE_MULTIPLY(NODE_170, DS_DAC, TTL_HIGH/256.0)
-	DISCRETE_RCFILTER(DS_OUT_DAC, NODE_170, RES_K(750), CAP_P(200))
+	DISCRETE_MULTIPLY(NODE_170, DS_DAC, TTL_HIGH / 256.0)		/* MXR1 */
+	/* this stage reduces the gain of the DAC by 50%, so yes the volume is much lower then the walk sound */
+	DISCRETE_OP_AMP(NODE_171,									/* IC 3M, pin 5 */
+		1,														/* ENAB */
+		NODE_170, 5,											/* IN0 - IC 3M, pin 6; IN1 - IC 3M, pin 1 */
+		&mario_dac_amp)
+	/* This provides a close simulation of the IC 3M, pin 10 filter circuit */
+	/* The Measured and SPICEd low freq gain is 1, it then has a high frequency
+	 * drop close to the following RC filter. */
+	DISCRETE_RCFILTER_VREF(DS_OUT_DAC, NODE_171, RES_K(750), CAP_P(180), 2.5)
 	DISCRETE_TASK_END()
 
 
-	/************************************************/
-	/* MIXER                                        */
-	/************************************************/
+	/************************************************
+	 * MIXER
+	 ************************************************/
 
 	DISCRETE_TASK_START(2)
 	DISCRETE_MIXER4(NODE_297,
 		1,															/* ENAB */
 		DS_OUT_SOUND0, DS_OUT_SOUND1, DS_OUT_SOUND7, DS_OUT_DAC,
 		&mario_mixer)
-	DISCRETE_OUTPUT(NODE_297, 32767.0/1.7)
+	/* approx -0.625V to 0.980V when playing, but turn on sound peaks at 2.38V */
+	/* we will set the full wav range to 1.19V which will cause clipping on the turn on
+	 * sound.  The real game would do this when the volume is turned up too.
+	 * Reducing MAME's master volume to 50% will provide full unclipped volume.
+	 */
+	DISCRETE_OUTPUT(NODE_297, 32767.0/1.19)
 	DISCRETE_TASK_END()
 
 DISCRETE_SOUND_END
@@ -496,12 +444,12 @@ static SOUND_RESET( mario )
 #endif
 
     /* FIXME: convert to latch8 */
-	soundlatch_clear_w(space,0,0);
-	soundlatch2_clear_w(space,0,0);
-	soundlatch3_clear_w(space,0,0);
-	soundlatch4_clear_w(space,0,0);
-	I8035_P1_W(space,0x00); /* Input port */
-	I8035_P2_W(space,0xff); /* Port is in high impedance state after reset */
+	soundlatch_clear_w(space, 0, 0);
+	soundlatch2_clear_w(space, 0, 0);
+	soundlatch3_clear_w(space, 0, 0);
+	soundlatch4_clear_w(space, 0, 0);
+	I8035_P1_W(space, 0x00); /* Input port */
+	I8035_P2_W(space, 0xff); /* Port is in high impedance state after reset */
 
 	state->last = 0;
 }
@@ -524,12 +472,12 @@ static READ8_HANDLER( mario_sh_p2_r )
 
 static READ8_HANDLER( mario_sh_t0_r )
 {
-	return I8035_T_R(space,0);
+	return I8035_T_R(space, 0);
 }
 
 static READ8_HANDLER( mario_sh_t1_r )
 {
-	return I8035_T_R(space,1);
+	return I8035_T_R(space, 1);
 }
 
 static READ8_HANDLER( mario_sh_tune_r )
@@ -539,24 +487,24 @@ static READ8_HANDLER( mario_sh_tune_r )
 	UINT8 p2 = I8035_P2_R(space);
 
 	if ((p2 >> 7) & 1)
-		return soundlatch_r(space,offset);
+		return soundlatch_r(space, offset);
 	else
-		return (SND[(0x1000 + (p2 & 0x0f)*256+offset) & mask]);
+		return (SND[(0x1000 + (p2 & 0x0f) * 256 + offset) & mask]);
 }
 
 static WRITE8_DEVICE_HANDLER( mario_sh_sound_w )
 {
-	discrete_sound_w(device,DS_DAC,data);
+	discrete_sound_w(device, DS_DAC, data);
 }
 
 static WRITE8_HANDLER( mario_sh_p1_w )
 {
-	I8035_P1_W(space,data);
+	I8035_P1_W(space, data);
 }
 
 static WRITE8_HANDLER( mario_sh_p2_w )
 {
-	I8035_P2_W(space,data);
+	I8035_P2_W(space, data);
 }
 
 /****************************************************************
@@ -572,7 +520,7 @@ WRITE8_HANDLER( masao_sh_irqtrigger_w )
 	if (state->last == 1 && data == 0)
 	{
 		/* setting bit 0 high then low triggers IRQ on the sound CPU */
-		cputag_set_input_line_and_vector(space->machine, "audiocpu",0,HOLD_LINE,0xff);
+		cputag_set_input_line_and_vector(space->machine, "audiocpu", 0, HOLD_LINE, 0xff);
 	}
 
 	state->last = data;
@@ -580,7 +528,7 @@ WRITE8_HANDLER( masao_sh_irqtrigger_w )
 
 WRITE8_HANDLER( mario_sh_tuneselect_w )
 {
-	soundlatch_w(space,offset,data);
+	soundlatch_w(space, offset, data);
 }
 
 /* Sound 0 and 1 are pulsed !*/
@@ -588,13 +536,13 @@ WRITE8_HANDLER( mario_sh_tuneselect_w )
 /* Mario running sample */
 WRITE8_DEVICE_HANDLER( mario_sh1_w )
 {
-	discrete_sound_w(device,DS_SOUND0_INP, 0);
+	discrete_sound_w(device, DS_SOUND0_INP, 0);
 }
 
 /* Luigi running sample */
 WRITE8_DEVICE_HANDLER( mario_sh2_w )
 {
-	discrete_sound_w(device,DS_SOUND1_INP, 0);
+	discrete_sound_w(device, DS_SOUND1_INP, 0);
 }
 
 /* Misc samples */
@@ -611,25 +559,25 @@ WRITE8_HANDLER( mario_sh3_w )
 				cputag_set_input_line(space->machine, "audiocpu",0,CLEAR_LINE);
 			break;
 		case 1: /* get coin */
-			I8035_T_W_AH(space,0,data & 1);
+			I8035_T_W_AH(space, 0,data & 1);
 			break;
 		case 2: /* ice */
-			I8035_T_W_AH(space,1,data & 1);
+			I8035_T_W_AH(space, 1, data & 1);
 			break;
 		case 3: /* crab */
-			I8035_P1_W_AH(space,0,data & 1);
+			I8035_P1_W_AH(space, 0, data & 1);
 			break;
 		case 4: /* turtle */
-			I8035_P1_W_AH(space,1,data & 1);
+			I8035_P1_W_AH(space, 1, data & 1);
 			break;
 		case 5: /* fly */
-			I8035_P1_W_AH(space,2,data & 1);
+			I8035_P1_W_AH(space, 2, data & 1);
 			break;
 		case 6: /* coin */
-			I8035_P1_W_AH(space,3,data & 1);
+			I8035_P1_W_AH(space, 3, data & 1);
 			break;
 		case 7: /* skid */
-			discrete_sound_w(space->machine->device("discrete"),DS_SOUND7_INP,data & 1);
+			discrete_sound_w(space->machine->device("discrete"), DS_SOUND7_INP, data & 1);
 			break;
 	}
 }
@@ -699,13 +647,13 @@ MACHINE_CONFIG_FRAGMENT( mario_audio )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
 	MDRV_SOUND_CONFIG_DISCRETE(mario)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.5)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1)
 
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_FRAGMENT( masao_audio )
 
-	MDRV_CPU_ADD("audiocpu", Z80,24576000/16)	/* ???? */
+	MDRV_CPU_ADD("audiocpu", Z80, 24576000/16)	/* ???? */
 	MDRV_CPU_PROGRAM_MAP(masao_sound_map)
 
 	MDRV_SOUND_START(mario)

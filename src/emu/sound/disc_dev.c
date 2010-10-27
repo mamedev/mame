@@ -14,8 +14,7 @@
  * DSD_555_CC            - NE555 Constant Current VCO
  * DSD_555_VCO1          - Op-Amp linear ramp based 555 VCO
  * DSD_566               - NE566 Simulation
- * DSD_LS624
- * DSD_LS629
+ * DSD_LS624             - 74LS624/629 Simulation
  *
  ************************************************************************
  *
@@ -127,20 +126,11 @@ struct dsd_566_context
 
 struct dsd_ls624_context
 {
-	int			state;
-	double		remain;			/* remaining time from last step */
-	int			out_type;
-	double		k1;				/* precalculated cap part of formula */
-	double		k2;				/* precalculated ring part of formula */
-	double		dt_vmod_at_0;
-};
-
-struct dsd_ls629_context
-{
 	double	exponent;
 	double	t_used;
-	double	vmod_scale;
 	double	v_cap_freq_in;
+	double	v_freq_scale;
+	double	v_rng_scale;
 	int		flip_flop;
 	int		has_freq_in_cap;
 	int		out_type;
@@ -176,10 +166,10 @@ struct dsd_ls629_context
 #define DSD_555_ASTBL_T_RC_CHARGE		((DSD_555_ASTBL__R1 + ((info->options & DISC_555_ASTABLE_HAS_FAST_CHARGE_DIODE) ? 0 : DSD_555_ASTBL__R2)) * DSD_555_ASTBL__C)
 #define DSD_555_ASTBL_T_RC_DISCHARGE	(DSD_555_ASTBL__R2 * DSD_555_ASTBL__C)
 
-static DISCRETE_STEP(dsd_555_astbl)
+DISCRETE_STEP(dsd_555_astbl)
 {
-	const  discrete_555_desc     *info    = (const  discrete_555_desc *)node->custom;
-	struct dsd_555_astbl_context *context = (struct dsd_555_astbl_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dsd_555_astbl)
+	DISCRETE_DECLARE_INFO(discrete_555_desc)
 
 	int		count_f = 0;
 	int		count_r = 0;
@@ -402,10 +392,11 @@ static DISCRETE_STEP(dsd_555_astbl)
 	context->flip_flop = flip_flop;
 }
 
-static DISCRETE_RESET(dsd_555_astbl)
+DISCRETE_RESET(dsd_555_astbl)
 {
-	const  discrete_555_desc     *info    = (const  discrete_555_desc *)node->custom;
-	struct dsd_555_astbl_context *context = (struct dsd_555_astbl_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dsd_555_astbl)
+	DISCRETE_DECLARE_INFO(discrete_555_desc)
+
 	node_description *v_charge_node;
 
 	context->use_ctrlv   = (node->input_is_node >> 4) & 1;
@@ -486,10 +477,10 @@ static DISCRETE_RESET(dsd_555_astbl)
 /* bit mask of the above RC inputs */
 #define DSD_555_MSTBL_RC_MASK	0x0c
 
-static DISCRETE_STEP(dsd_555_mstbl)
+DISCRETE_STEP(dsd_555_mstbl)
 {
-	const  discrete_555_desc     *info    = (const  discrete_555_desc *)node->custom;
-	struct dsd_555_mstbl_context *context = (struct dsd_555_mstbl_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dsd_555_mstbl)
+	DISCRETE_DECLARE_INFO(discrete_555_desc)
 
 	double v_cap;			/* Current voltage on capacitor, before dt */
 	double v_cap_next = 0;	/* Voltage on capacitor, after dt */
@@ -606,10 +597,10 @@ static DISCRETE_STEP(dsd_555_mstbl)
 	}
 }
 
-static DISCRETE_RESET(dsd_555_mstbl)
+DISCRETE_RESET(dsd_555_mstbl)
 {
-	const  discrete_555_desc     *info    = (const  discrete_555_desc *)node->custom;
-	struct dsd_555_mstbl_context *context = (struct dsd_555_mstbl_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dsd_555_mstbl)
+	DISCRETE_DECLARE_INFO(discrete_555_desc)
 
 	context->output_type = info->options & DISC_555_OUT_MASK;
 	if ((context->output_type == DISC_555_OUT_COUNT_F) || (context->output_type == DISC_555_OUT_COUNT_R))
@@ -682,10 +673,10 @@ static DISCRETE_RESET(dsd_555_mstbl)
 #define DSD_555_CC_T_RC_DISCHARGE		(r_discharge * DSD_555_CC__C)
 
 
-static DISCRETE_STEP(dsd_555_cc)
+DISCRETE_STEP(dsd_555_cc)
 {
-	const  discrete_555_cc_desc *info    = (const  discrete_555_cc_desc *)node->custom;
-	struct dsd_555_cc_context   *context = (struct dsd_555_cc_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dsd_555_cc)
+	DISCRETE_DECLARE_INFO(discrete_555_cc_desc)
 
 	int		count_f  = 0;
 	int		count_r  = 0;
@@ -1003,10 +994,10 @@ static DISCRETE_STEP(dsd_555_cc)
 	context->flip_flop = flip_flop;
 }
 
-static DISCRETE_RESET(dsd_555_cc)
+DISCRETE_RESET(dsd_555_cc)
 {
-	const  discrete_555_cc_desc *info    = (const  discrete_555_cc_desc *)node->custom;
-	struct dsd_555_cc_context   *context = (struct dsd_555_cc_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dsd_555_cc)
+	DISCRETE_DECLARE_INFO(discrete_555_cc_desc)
 
 	double	r_temp, r_discharge = 0, r_charge = 0;
 
@@ -1233,10 +1224,10 @@ static DISCRETE_RESET(dsd_555_cc)
 #define DSD_555_VCO1__VIN1	DISCRETE_INPUT(1)
 #define DSD_555_VCO1__VIN2	DISCRETE_INPUT(2)
 
-static DISCRETE_STEP(dsd_555_vco1)
+DISCRETE_STEP(dsd_555_vco1)
 {
-	const  discrete_555_vco1_desc *info    = (const  discrete_555_vco1_desc *)node->custom;
-	struct dsd_555_vco1_context   *context = (struct dsd_555_vco1_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dsd_555_vco1)
+	DISCRETE_DECLARE_INFO(discrete_555_vco1_desc)
 
 	int		count_f = 0;
 	int		count_r = 0;
@@ -1386,10 +1377,10 @@ static DISCRETE_STEP(dsd_555_vco1)
 	}
 }
 
-static DISCRETE_RESET(dsd_555_vco1)
+DISCRETE_RESET(dsd_555_vco1)
 {
-	const  discrete_555_vco1_desc *info    = (const  discrete_555_vco1_desc *)node->custom;
-	struct dsd_555_vco1_context   *context = (struct dsd_555_vco1_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dsd_555_vco1)
+	DISCRETE_DECLARE_INFO(discrete_555_vco1_desc)
 
 	double v_ratio_r3, v_ratio_r4_1, r_in_1;
 
@@ -1524,9 +1515,9 @@ static const struct
 	{4.495, /*4.895,*/ 5.343, /*5.703,*/ 5.997, 6.507, 7.016, 7.518}		/* osc_stop */
 };
 
-static DISCRETE_STEP(dsd_566)
+DISCRETE_STEP(dsd_566)
 {
-	struct dsd_566_context   *context = (struct dsd_566_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dsd_566)
 
 	double	i = 0;			/* Charging current created by vIn */
 	double	i_rise;			/* non-linear rise charge current */
@@ -1646,9 +1637,9 @@ static DISCRETE_STEP(dsd_566)
 	}
 }
 
-static DISCRETE_RESET(dsd_566)
+DISCRETE_RESET(dsd_566)
 {
-	struct dsd_566_context   *context = (struct dsd_566_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dsd_566)
 
 	int		v_int;
 	double	v_float;
@@ -1697,130 +1688,21 @@ static DISCRETE_RESET(dsd_566)
  *
  * DSD_LS624 - Usage of node_description values
  *
- * input[0]    - Modulation Voltage
- * input[1]    - Range Voltage
- * input[2]    - C value
- * input[3]    - Output type
- *
- * Dec 2007, Couriersud
- ************************************************************************/
-#define DSD_LS624__VMOD		DISCRETE_INPUT(0)
-#define DSD_LS624__VRNG		DISCRETE_INPUT(1)
-#define DSD_LS624__C		DISCRETE_INPUT(2)
-#define DSD_LS624__OUTTYPE	DISCRETE_INPUT(3)
-
-/*
- * The datasheet mentions a 600 ohm discharge. It also gives
- * equivalent circuits for VI and VR.
- */
-
-#define LS624_F1(x)			(0.19 + 20.0/90.0*(x))
-#define LS624_T(_C, _R, _F)		((-600.0 * (_C) * log(1.0-LS624_F1(_R)*0.12/LS624_F1(_F))) * 16.0 )
-
-/* The following formula was derived from figures 2 and 3 in LS624 datasheet. Coefficients
- * where calculated using least square approximation.
- * This approach gives a bit better results compared to the first approach.
- */
-/* Original formula before optimization of static values
- #define LS624_F(_C, _VI, _VR)  pow(10, -0.912029404 * log10(_C) + 0.243264328 * (_VI) \
-                  - 0.091695877 * (_VR) -0.014110946 * (_VI) * (_VR) - 3.207072925)
-*/
-
-/* pow(10, x) = exp(ln(10)*x) */
-#define pow10(x) exp(2.30258509299404568401*(x))
-
-#define LS624_F(_VI)	pow10(context->k1 + 0.243264328 * (_VI) + context->k2 * (_VI))
-
-static DISCRETE_STEP(dsd_ls624)
-{
-	struct dsd_ls624_context *context = (struct dsd_ls624_context *)node->context;
-
-	double	dt;	/* change in time */
-	double	sample_t;
-	double	t;
-	double  en = 0.0f;
-	int		cntf = 0, cntr = 0;
-
-	sample_t = node->info->sample_time;	/* Change in time */
-	//dt  = LS624_T(DSD_LS624__C, DSD_LS624__VRNG, DSD_LS624__VMOD) / 2.0;
-	if (EXPECTED(DSD_LS624__VMOD > 0.001))
-		dt = 0.5 / LS624_F(DSD_LS624__VMOD);
-	else
-		/* close enough to 0, so we can speed things up by no longer call pow() */
-		dt = context->dt_vmod_at_0;
-	t   = context->remain;
-	en += (double) context->state * t;
-	while (EXPECTED(t + dt <= sample_t))
-	{
-		en += (double) context->state * dt;
-		context->state = (1 - context->state);
-		if (context->state)
-			cntr++;
-		else
-			cntf++;
-		t += dt;
-	}
-	en += (sample_t - t) * (double) context->state;
-	context->remain = t - sample_t;
-
-	switch (context->out_type)
-	{
-		case DISC_LS624_OUT_ENERGY:
-			node->output[0] = en / sample_t;
-			break;
-		case DISC_LS624_OUT_LOGIC:
-			/* filter out randomness */
-			if (UNEXPECTED(cntf + cntr > 1))
-				node->output[0] = 1;
-			else
-				node->output[0] = context->state;
-			break;
-		case DISC_LS624_OUT_COUNT_F:
-			node->output[0] = cntf;
-			break;
-		case DISC_LS624_OUT_COUNT_R:
-			node->output[0] = cntr;
-			break;
-	}
-}
-
-static DISCRETE_RESET(dsd_ls624)
-{
-	struct dsd_ls624_context *context = (struct dsd_ls624_context *)node->context;
-
-	context->remain   = 0;
-	context->state    = 0;
-	context->out_type = DSD_LS624__OUTTYPE;
-
-	/* precalculate some parts of the formula for speed */
-	context->k1 = -0.912029404 * log10(DSD_LS624__C) -0.091695877 * (DSD_LS624__VRNG) - 3.207072925;
-	context->k2 = -0.014110946 * (DSD_LS624__VRNG);
-
-	context->dt_vmod_at_0 = 0.5 / LS624_F(0);
-
-	/* Step the output */
-	DISCRETE_STEP_CALL(dsd_ls624);
-}
-
-
-/************************************************************************
- *
- * DSD_LS629 - Usage of node_description values
- *
  * Dec 2007, Couriersud based on data sheet
  * Oct 2009, complete re-write based on IC testing
  ************************************************************************/
-#define DSD_LS629__ENABLE		DISCRETE_INPUT(0)
-#define DSD_LS629__VMOD			DISCRETE_INPUT(1)
-#define DSD_LS629__VRNG			DISCRETE_INPUT(2)
-#define DSD_LS629__C			DISCRETE_INPUT(3)
-#define DSD_LS629__R_FREQ_IN	DISCRETE_INPUT(4)
-#define DSD_LS629__C_FREQ_IN	DISCRETE_INPUT(5)
-#define DSD_LS629__OUTTYPE		DISCRETE_INPUT(6)
+#define DSD_LS624__ENABLE		DISCRETE_INPUT(0)
+#define DSD_LS624__VMOD			DISCRETE_INPUT(1)
+#define DSD_LS624__VRNG			DISCRETE_INPUT(2)
+#define DSD_LS624__C			DISCRETE_INPUT(3)
+#define DSD_LS624__R_FREQ_IN	DISCRETE_INPUT(4)
+#define DSD_LS624__C_FREQ_IN	DISCRETE_INPUT(5)
+#define DSD_LS624__R_RNG_IN		DISCRETE_INPUT(6)
+#define DSD_LS624__OUTTYPE		DISCRETE_INPUT(7)
 
 #define LS624_R_EXT			600.0		/* as specified in data sheet */
 #define LS624_OUT_HIGH		4.5			/* measured */
-#define LS624_FREQ_R_IN		RES_K(90)	/* measured & 70K + 20k per data sheet */
+#define LS624_IN_R		RES_K(90)	/* measured & 70K + 20k per data sheet */
 
 /*
  * The 74LS624 series are constant current based VCOs.  The Freq Control voltage
@@ -1856,17 +1738,17 @@ static DISCRETE_RESET(dsd_ls624)
  */
 
 
-static DISCRETE_STEP(dsd_ls629)
+DISCRETE_STEP(dsd_ls624)
 {
-	struct dsd_ls629_context *context = (struct dsd_ls629_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dsd_ls624)
 
 	double	x_time = 0;
 	double	freq, t1;
+	double	v_freq_2, v_freq_3, v_freq_4;
 	double	t_used = context->t_used;
 	double	dt = node->info->sample_time;;
-	double	vmod = DSD_LS629__VMOD;
-	double	vmod_2, vmod_3, vmod_4;
-	double	range = DSD_LS629__VRNG;
+	double	v_freq = DSD_LS624__VMOD;
+	double	v_rng = DSD_LS624__VRNG;
 	int		count_f = 0, count_r = 0;
 
 	/* coefficients */
@@ -1881,36 +1763,36 @@ static DISCRETE_STEP(dsd_ls629)
 	const double k9 = 2.9914575453819188E+00;
 	const double k10 = 1.6855569086173170E+00;
 
-	if (UNEXPECTED(DSD_LS629__ENABLE == 0))
+	if (UNEXPECTED(DSD_LS624__ENABLE == 0))
 		return;
 
 	/* scale due to input resistance */
-	if ((EXPECTED(DSD_LS629__R_FREQ_IN > 0)))
-		vmod *= context->vmod_scale;
+	v_freq *= context->v_freq_scale;
+	v_rng *= context->v_rng_scale;
 
 	/* apply cap if needed */
 	if (context->has_freq_in_cap)
 	{
-		context->v_cap_freq_in += (vmod - context->v_cap_freq_in) * context->exponent;
-		vmod = context->v_cap_freq_in;
+		context->v_cap_freq_in += (v_freq - context->v_cap_freq_in) * context->exponent;
+		v_freq = context->v_cap_freq_in;
 	}
 
 	/* Polyfunctional3D_model created by zunzun.com using sum of squared absolute error */
-	vmod_2 = vmod * vmod;
-	vmod_3 = vmod_2 * vmod;
-	vmod_4 = vmod_3 * vmod;
+	v_freq_2 = v_freq * v_freq;
+	v_freq_3 = v_freq_2 * v_freq;
+	v_freq_4 = v_freq_3 * v_freq;
 	freq = k1;
-	freq += k2 * vmod;
-	freq += k3 * vmod_2;
-	freq += k4 * vmod_3;
-	freq += k5 * vmod_4;
-	freq += k6 * range;
-	freq += k7 * range * vmod;
-	freq += k8 * range * vmod_2;
-	freq += k9 * range * vmod_3;
-	freq += k10 * range * vmod_4;
+	freq += k2 * v_freq;
+	freq += k3 * v_freq_2;
+	freq += k4 * v_freq_3;
+	freq += k5 * v_freq_4;
+	freq += k6 * v_rng;
+	freq += k7 * v_rng * v_freq;
+	freq += k8 * v_rng * v_freq_2;
+	freq += k9 * v_rng * v_freq_3;
+	freq += k10 * v_rng * v_freq_4;
 
-	freq *= CAP_U(0.1) / DSD_LS629__C;
+	freq *= CAP_U(0.1) / DSD_LS624__C;
 
 	t1 = 0.5 / freq ;
 	t_used += node->info->sample_time;
@@ -1941,16 +1823,6 @@ static DISCRETE_STEP(dsd_ls629)
 
 	switch (context->out_type)
 	{
-		case DISC_LS624_OUT_SQUARE:
-			node->output[0] = context->flip_flop ? LS624_OUT_HIGH : 0;
-			break;
-		case DISC_LS624_OUT_ENERGY:
-			if (x_time == 0) x_time = 1.0;
-			node->output[0] = LS624_OUT_HIGH * (context->flip_flop ? x_time : (1.0 - x_time));
-			break;
-		case DISC_LS624_OUT_LOGIC:
-				node->output[0] = context->flip_flop;
-			break;
 		case DISC_LS624_OUT_LOGIC_X:
 				node->output[0] = context->flip_flop  + x_time;
 			break;
@@ -1966,22 +1838,33 @@ static DISCRETE_STEP(dsd_ls629)
 		case DISC_LS624_OUT_COUNT_R:
 			node->output[0] = count_r;
 			break;
+		case DISC_LS624_OUT_ENERGY:
+			if (x_time == 0) x_time = 1.0;
+			node->output[0] = LS624_OUT_HIGH * (context->flip_flop ? x_time : (1.0 - x_time));
+			break;
+		case DISC_LS624_OUT_LOGIC:
+				node->output[0] = context->flip_flop;
+			break;
+		case DISC_LS624_OUT_SQUARE:
+			node->output[0] = context->flip_flop ? LS624_OUT_HIGH : 0;
+			break;
 	}
 }
 
-static DISCRETE_RESET(dsd_ls629)
+DISCRETE_RESET(dsd_ls624)
 {
-	struct dsd_ls629_context *context = (struct dsd_ls629_context *)node->context;
+	struct dsd_ls624_context *context = (struct dsd_ls624_context *)node->context;
 
-	context->out_type = (int)DSD_LS629__OUTTYPE;
+	context->out_type = (int)DSD_LS624__OUTTYPE;
 
 	context->flip_flop = 0;
 	context->t_used = 0;
-	context->vmod_scale = RES_K(90) / (DSD_LS629__R_FREQ_IN + RES_K(90));
-	if (DSD_LS629__C_FREQ_IN > 0)
+	context->v_freq_scale = LS624_IN_R / (DSD_LS624__R_FREQ_IN + LS624_IN_R);
+	context->v_rng_scale = LS624_IN_R / (DSD_LS624__R_RNG_IN + LS624_IN_R);
+	if (DSD_LS624__C_FREQ_IN > 0)
 	{
 		context->has_freq_in_cap = 1;
-		context->exponent = RC_CHARGE_EXP(RES_2_PARALLEL(DSD_LS629__R_FREQ_IN, RES_K(90)) * DSD_LS629__C_FREQ_IN);
+		context->exponent = RC_CHARGE_EXP(RES_2_PARALLEL(DSD_LS624__R_FREQ_IN, LS624_IN_R) * DSD_LS624__C_FREQ_IN);
 		context->v_cap_freq_in = 0;
 	}
 	else

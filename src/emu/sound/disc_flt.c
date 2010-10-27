@@ -27,7 +27,7 @@
  *
  ************************************************************************/
 
-struct dss_filter1_context
+struct dst_filter1_context
 {
 	double x1;		/* x[k-1], previous input value */
 	double y1;		/* y[k-1], previous output value */
@@ -35,7 +35,7 @@ struct dss_filter1_context
 	double b0, b1;		/* digital filter coefficients, numerator */
 };
 
-struct dss_filter2_context
+struct dst_filter2_context
 {
 	double x1, x2;		/* x[k-1], x[k-2], previous 2 input values */
 	double y1, y2;		/* y[k-1], y[k-2], previous 2 output values */
@@ -155,9 +155,9 @@ struct dst_rcintegrate_context
 #define DST_CRFILTER__C			DISCRETE_INPUT(2)
 #define DST_CRFILTER__VREF		DISCRETE_INPUT(3)
 
-static DISCRETE_STEP(dst_crfilter)
+DISCRETE_STEP(dst_crfilter)
 {
-	struct dst_rcfilter_context *context = (struct dst_rcfilter_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dst_rcfilter)
 
 	if (UNEXPECTED(context->has_rc_nodes))
 	{
@@ -174,9 +174,9 @@ static DISCRETE_STEP(dst_crfilter)
 	context->vCap += (node->output[0] - DST_CRFILTER__VREF) * context->exponent;
 }
 
-static DISCRETE_RESET(dst_crfilter)
+DISCRETE_RESET(dst_crfilter)
 {
-	struct dst_rcfilter_context *context = (struct dst_rcfilter_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dst_rcfilter)
 
 	context->has_rc_nodes = node->input_is_node & 0x6;
 	context->rc = DST_CRFILTER__R * DST_CRFILTER__C;
@@ -228,9 +228,9 @@ static void calculate_filter1_coefficients(const discrete_info *disc_info, doubl
 	}
 }
 
-static DISCRETE_STEP(dst_filter1)
+DISCRETE_STEP(dst_filter1)
 {
-	struct dss_filter1_context *context = (struct dss_filter1_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dst_filter1)
 
 	double gain = 1.0;
 
@@ -245,9 +245,9 @@ static DISCRETE_STEP(dst_filter1)
 	context->y1 = node->output[0];
 }
 
-static DISCRETE_RESET(dst_filter1)
+DISCRETE_RESET(dst_filter1)
 {
-	struct dss_filter1_context *context = (struct dss_filter1_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dst_filter1)
 
 	calculate_filter1_coefficients(node->info, DST_FILTER1__FREQ, DST_FILTER1__TYPE, &context->a1, &context->b0, &context->b1);
 	node->output[0] = 0;
@@ -314,9 +314,9 @@ static void calculate_filter2_coefficients(const discrete_info *disc_info,
 	}
 }
 
-static DISCRETE_STEP(dst_filter2)
+DISCRETE_STEP(dst_filter2)
 {
-	struct dss_filter2_context *context = (struct dss_filter2_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dst_filter2)
 
 	double gain = 1.0;
 
@@ -334,9 +334,9 @@ static DISCRETE_STEP(dst_filter2)
 	context->y1 = node->output[0];
 }
 
-static DISCRETE_RESET(dst_filter2)
+DISCRETE_RESET(dst_filter2)
 {
-	struct dss_filter2_context *context = (struct dss_filter2_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dst_filter2)
 
 	calculate_filter2_coefficients(node->info, DST_FILTER2__FREQ, DST_FILTER2__DAMP, DST_FILTER2__TYPE,
 								   &context->a1, &context->a2,
@@ -363,10 +363,10 @@ static DISCRETE_RESET(dst_filter2)
 #define DST_OP_AMP_FILT__INP2	DISCRETE_INPUT(2)
 #define DST_OP_AMP_FILT__TYPE	DISCRETE_INPUT(3)
 
-static DISCRETE_STEP(dst_op_amp_filt)
+DISCRETE_STEP(dst_op_amp_filt)
 {
-	const  discrete_op_amp_filt_info *info    = (const  discrete_op_amp_filt_info *)node->custom;
-	struct dst_op_amp_filt_context   *context = (struct dst_op_amp_filt_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dst_op_amp_filt)
+	DISCRETE_DECLARE_INFO(discrete_op_amp_filt_info)
 
 	double i, v = 0;
 
@@ -463,10 +463,10 @@ static DISCRETE_STEP(dst_op_amp_filt)
 
 }
 
-static DISCRETE_RESET(dst_op_amp_filt)
+DISCRETE_RESET(dst_op_amp_filt)
 {
-	const  discrete_op_amp_filt_info *info    = (const  discrete_op_amp_filt_info *)node->custom;
-	struct dst_op_amp_filt_context   *context = (struct dst_op_amp_filt_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dst_op_amp_filt)
+	DISCRETE_DECLARE_INFO(discrete_op_amp_filt_info)
 
 	/* Convert the passed filter type into an int for easy use. */
 	context->type = (int)DST_OP_AMP_FILT__TYPE & DISC_OP_AMP_FILTER_TYPE_MASK;
@@ -577,9 +577,9 @@ static DISCRETE_RESET(dst_op_amp_filt)
 
 #define CD4066_R_ON	270
 
-static DISCRETE_STEP( dst_rc_circuit_1 )
+DISCRETE_STEP( dst_rc_circuit_1 )
 {
-	struct dst_rc_circuit_1_context *context = (struct dst_rc_circuit_1_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dst_rc_circuit_1)
 
 	if (DST_RC_CIRCUIT_1__IN0 == 0)
 		if (DST_RC_CIRCUIT_1__IN1 == 0)
@@ -608,9 +608,9 @@ static DISCRETE_STEP( dst_rc_circuit_1 )
 		}
 }
 
-static DISCRETE_RESET( dst_rc_circuit_1 )
+DISCRETE_RESET( dst_rc_circuit_1 )
 {
-	struct dst_rc_circuit_1_context *context = (struct dst_rc_circuit_1_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dst_rc_circuit_1)
 
 	/* the charging voltage across the cap based on in2*/
 	context->v_drop =  RES_VOLTAGE_DIVIDER(CD4066_R_ON, CD4066_R_ON + DST_RC_CIRCUIT_1__R);
@@ -645,9 +645,9 @@ static DISCRETE_RESET( dst_rc_circuit_1 )
 #define DST_RCDISC__R		DISCRETE_INPUT(2)
 #define DST_RCDISC__C		DISCRETE_INPUT(3)
 
-static DISCRETE_STEP(dst_rcdisc)
+DISCRETE_STEP(dst_rcdisc)
 {
-	struct dst_rcdisc_context *context = (struct dst_rcdisc_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dst_rcdisc)
 
 	switch (context->state)
 	{
@@ -672,9 +672,9 @@ static DISCRETE_STEP(dst_rcdisc)
 	}
 }
 
-static DISCRETE_RESET(dst_rcdisc)
+DISCRETE_RESET(dst_rcdisc)
 {
-	struct dst_rcdisc_context *context = (struct dst_rcdisc_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dst_rcdisc)
 
 	node->output[0] = 0;
 
@@ -704,9 +704,9 @@ static DISCRETE_RESET(dst_rcdisc)
 #define DST_RCDISC2__R1		DISCRETE_INPUT(4)
 #define DST_RCDISC2__C		DISCRETE_INPUT(5)
 
-static DISCRETE_STEP(dst_rcdisc2)
+DISCRETE_STEP(dst_rcdisc2)
 {
-	struct dst_rcdisc_context *context = (struct dst_rcdisc_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dst_rcdisc)
 
 	double diff;
 
@@ -718,9 +718,9 @@ static DISCRETE_STEP(dst_rcdisc2)
 	node->output[0] += diff;
 }
 
-static DISCRETE_RESET(dst_rcdisc2)
+DISCRETE_RESET(dst_rcdisc2)
 {
-	struct dst_rcdisc_context *context = (struct dst_rcdisc_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dst_rcdisc)
 
 	node->output[0] = 0;
 
@@ -750,9 +750,9 @@ static DISCRETE_RESET(dst_rcdisc2)
 #define DST_RCDISC3__C		DISCRETE_INPUT(4)
 #define DST_RCDISC3__DJV	DISCRETE_INPUT(5)
 
-static DISCRETE_STEP(dst_rcdisc3)
+DISCRETE_STEP(dst_rcdisc3)
 {
-	struct dst_rcdisc_context *context = (struct dst_rcdisc_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dst_rcdisc)
 
 	double diff;
 
@@ -799,9 +799,9 @@ static DISCRETE_STEP(dst_rcdisc3)
 	}
 }
 
-static DISCRETE_RESET(dst_rcdisc3)
+DISCRETE_RESET(dst_rcdisc3)
 {
-	struct dst_rcdisc_context *context = (struct dst_rcdisc_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dst_rcdisc)
 
 	node->output[0] = 0;
 
@@ -835,9 +835,9 @@ static DISCRETE_RESET(dst_rcdisc3)
 #define DST_RCDISC4__VP		DISCRETE_INPUT(6)
 #define DST_RCDISC4__TYPE	DISCRETE_INPUT(7)
 
-static DISCRETE_STEP(dst_rcdisc4)
+DISCRETE_STEP(dst_rcdisc4)
 {
-	struct dst_rcdisc4_context *context = (struct dst_rcdisc4_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dst_rcdisc4)
 
 	int inp1 = (DST_RCDISC4__IN == 0) ? 0 : 1;
 
@@ -861,9 +861,9 @@ static DISCRETE_STEP(dst_rcdisc4)
 	if (node->output[0] < 0) node->output[0] = 0;
 }
 
-static DISCRETE_RESET( dst_rcdisc4)
+DISCRETE_RESET( dst_rcdisc4)
 {
-	struct dst_rcdisc4_context *context = (struct dst_rcdisc4_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dst_rcdisc4)
 
 	double	v, i, r, rT;
 
@@ -947,9 +947,9 @@ static DISCRETE_RESET( dst_rcdisc4)
 #define DST_RCDISC5__R		DISCRETE_INPUT(2)
 #define DST_RCDISC5__C		DISCRETE_INPUT(3)
 
-static DISCRETE_STEP( dst_rcdisc5)
+DISCRETE_STEP( dst_rcdisc5)
 {
-	struct dst_rcdisc_context *context = (struct dst_rcdisc_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dst_rcdisc)
 
 	double diff,u;
 
@@ -978,9 +978,9 @@ static DISCRETE_STEP( dst_rcdisc5)
 	}
 }
 
-static DISCRETE_RESET( dst_rcdisc5)
+DISCRETE_RESET( dst_rcdisc5)
 {
-	struct dst_rcdisc_context *context = (struct dst_rcdisc_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dst_rcdisc)
 
 	node->output[0] = 0;
 
@@ -1015,9 +1015,9 @@ static DISCRETE_RESET( dst_rcdisc5)
 #define DST_RCDISC_MOD__C		DISCRETE_INPUT(6)
 #define DST_RCDISC_MOD__VP		DISCRETE_INPUT(7)
 
-static DISCRETE_STEP(dst_rcdisc_mod)
+DISCRETE_STEP(dst_rcdisc_mod)
 {
-	struct dst_rcdisc_mod_context *context = (struct dst_rcdisc_mod_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dst_rcdisc_mod)
 
 	double	diff, v_cap, u, vD;
 	int		mod_state, mod1_state, mod2_state;
@@ -1050,9 +1050,9 @@ static DISCRETE_STEP(dst_rcdisc_mod)
 	context->v_cap = v_cap;
 }
 
-static DISCRETE_RESET(dst_rcdisc_mod)
+DISCRETE_RESET(dst_rcdisc_mod)
 {
-	struct dst_rcdisc_mod_context *context = (struct dst_rcdisc_mod_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dst_rcdisc_mod)
 
 	double	rc[2], rc2[2];
 
@@ -1104,9 +1104,9 @@ static DISCRETE_RESET(dst_rcdisc_mod)
 #define DST_RCFILTER__C			DISCRETE_INPUT(2)
 #define DST_RCFILTER__VREF		DISCRETE_INPUT(3)
 
-static DISCRETE_STEP(dst_rcfilter)
+DISCRETE_STEP(dst_rcfilter)
 {
-	struct dst_rcfilter_context *context = (struct dst_rcfilter_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dst_rcfilter)
 
 	if (UNEXPECTED(context->has_rc_nodes))
 	{
@@ -1126,15 +1126,16 @@ static DISCRETE_STEP(dst_rcfilter)
 	node->output[0] = context->vCap + DST_RCFILTER__VREF;
 }
 
-static DISCRETE_STEP(dst_rcfilter_fast)
+DISCRETE_STEP(dst_rcfilter_fast)
 {
-	struct dst_rcfilter_context *context = (struct dst_rcfilter_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dst_rcfilter)
+
 	node->output[0] += ((DST_RCFILTER__VIN - node->output[0]) * context->exponent);
 }
 
-static DISCRETE_RESET(dst_rcfilter)
+DISCRETE_RESET(dst_rcfilter)
 {
-	struct dst_rcfilter_context *context = (struct dst_rcfilter_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dst_rcfilter)
 
 	context->has_rc_nodes = node->input_is_node & 0x6;
 	context->rc = DST_RCFILTER__R * DST_RCFILTER__C;
@@ -1173,9 +1174,9 @@ static DISCRETE_RESET(dst_rcfilter)
 #define CD4066_ON_RES (40)
 
 // FIXME: This needs optimization !
-static DISCRETE_STEP(dst_rcfilter_sw)
+DISCRETE_STEP(dst_rcfilter_sw)
 {
-	struct dst_rcfilter_sw_context *context = (struct dst_rcfilter_sw_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dst_rcfilter_sw)
 
 	int i;
 	int bits = (int)DST_RCFILTER_SW__SWITCH;
@@ -1217,9 +1218,9 @@ static DISCRETE_STEP(dst_rcfilter_sw)
 	}
 }
 
-static DISCRETE_RESET(dst_rcfilter_sw)
+DISCRETE_RESET(dst_rcfilter_sw)
 {
-	struct dst_rcfilter_sw_context *context = (struct dst_rcfilter_sw_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dst_rcfilter_sw)
 
 	int i, bits;
 
@@ -1289,9 +1290,9 @@ static DISCRETE_RESET(dst_rcfilter_sw)
 #define KT		0.026
 #define EM_IC(x) (ALPHAT * IES * exp( (x) / KT - 1.0 ))
 
-static DISCRETE_STEP( dst_rcintegrate)
+DISCRETE_STEP( dst_rcintegrate)
 {
-	struct dst_rcintegrate_context *context = (struct dst_rcintegrate_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dst_rcintegrate)
 
 	double diff, u, iQ, iQc, iC, RG, vE;
 	double vP;
@@ -1350,9 +1351,9 @@ static DISCRETE_STEP( dst_rcintegrate)
 			break;
 	}
 }
-static DISCRETE_RESET(dst_rcintegrate)
+DISCRETE_RESET(dst_rcintegrate)
 {
-	struct dst_rcintegrate_context *context = (struct dst_rcintegrate_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dst_rcintegrate)
 
 	double r;
 	double dt = node->info->sample_time;
@@ -1394,9 +1395,9 @@ static DISCRETE_RESET(dst_rcintegrate)
 #define DST_SALLEN_KEY__INP0	DISCRETE_INPUT(1)
 #define DST_SALLEN_KEY__TYPE	DISCRETE_INPUT(2)
 
-static DISCRETE_STEP(dst_sallen_key)
+DISCRETE_STEP(dst_sallen_key)
 {
-	struct dss_filter2_context *context = (struct dss_filter2_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dst_filter2)
 
 	double gain = 1.0;
 
@@ -1414,10 +1415,10 @@ static DISCRETE_STEP(dst_sallen_key)
 	context->y1 = node->output[0];
 }
 
-static DISCRETE_RESET(dst_sallen_key)
+DISCRETE_RESET(dst_sallen_key)
 {
-	struct dss_filter2_context       *context = (struct dss_filter2_context *)node->context;
-	const  discrete_op_amp_filt_info *info    = (const  discrete_op_amp_filt_info *)node->custom;
+	DISCRETE_DECLARE_CONTEXT(dst_filter2)
+	DISCRETE_DECLARE_INFO(discrete_op_amp_filt_info)
 
 	double freq, q;
 
@@ -1456,7 +1457,7 @@ static DISCRETE_RESET(dst_sallen_key)
 #define DST_RCFILTERN__R		DISCRETE_INPUT(2)
 #define DST_RCFILTERN__C		DISCRETE_INPUT(3)
 
-static DISCRETE_RESET(dst_rcfilterN)
+DISCRETE_RESET(dst_rcfilterN)
 {
 #if 0
 	double f=1.0/(2*M_PI* DST_RCFILTERN__R * DST_RCFILTERN__C);
@@ -1489,7 +1490,7 @@ static DISCRETE_RESET(dst_rcfilterN)
 #define DST_RCDISCN__R		DISCRETE_INPUT(2)
 #define DST_RCDISCN__C		DISCRETE_INPUT(3)
 
-static DISCRETE_RESET(dst_rcdiscN)
+DISCRETE_RESET(dst_rcdiscN)
 {
 #if 0
 	double f = 1.0 / (2 * M_PI * DST_RCDISCN__R * DST_RCDISCN__C);
@@ -1505,9 +1506,9 @@ static DISCRETE_RESET(dst_rcdiscN)
 #endif
 }
 
-static DISCRETE_STEP(dst_rcdiscN)
+DISCRETE_STEP(dst_rcdiscN)
 {
-	struct dss_filter1_context *context = (struct dss_filter1_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dst_filter1)
 
 	double gain = 1.0;
 
@@ -1548,7 +1549,7 @@ static DISCRETE_STEP(dst_rcdiscN)
 #define DST_RCDISC2N__R1		DISCRETE_INPUT(4)
 #define DST_RCDISC2N__C			DISCRETE_INPUT(5)
 
-struct dss_rcdisc2_context
+struct dst_rcdisc2_context
 {
 	double x1;			/* x[k-1], last input value */
 	double y1;			/* y[k-1], last output value */
@@ -1556,9 +1557,9 @@ struct dss_rcdisc2_context
 	double a1_1, b0_1, b1_1;	/* digital filter coefficients, filter #2 */
 };
 
-static DISCRETE_STEP(dst_rcdisc2N)
+DISCRETE_STEP(dst_rcdisc2N)
 {
-	struct dss_rcdisc2_context *context = (struct dss_rcdisc2_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dst_rcdisc2)
 
 	double input = ((DST_RCDISC2N__ENABLE == 0) ? DST_RCDISC2N__IN0 : DST_RCDISC2N__IN1);
 
@@ -1571,9 +1572,9 @@ static DISCRETE_STEP(dst_rcdisc2N)
 	context->y1 = node->output[0];
 }
 
-static DISCRETE_RESET(dst_rcdisc2N)
+DISCRETE_RESET(dst_rcdisc2N)
 {
-	struct dss_rcdisc2_context *context = (struct dss_rcdisc2_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dst_rcdisc2)
 	double f1,f2;
 
 	f1 = 1.0 / (2 * M_PI * DST_RCDISC2N__R0 * DST_RCDISC2N__C);

@@ -25,7 +25,7 @@
  * http://www.ibiblio.org/obp/electricCircuits/
  * For a free circuit simulator:
  * http://qucs.sourceforge.net/index.html
- * For a free waveform editor to view DISCRETE_WAVELOG dumps:
+ * For a free waveform editor to view DISCRETE_WAVLOG dumps:
  * http://audacity.sourceforge.net/
  * http://www.sonicvisualiser.org/
  *
@@ -315,8 +315,7 @@
  * DISCRETE_555_VCO1(NODE,RESET,VIN,OPTIONS)
  * DISCRETE_555_VCO1_CV(NODE,RESET,VIN,CTRLV,OPTIONS)
  * DISCRETE_566(NODE,VMOD,R,C,VPOS,VNEG,VCHARGE,OPTIONS)
- * DISCRETE_74LS624(NODE,VMOD,VRNG,C,OUTTYPE)
- * DISCRETE_74LS629(NODE,ENAB,VMOD,VRNG,C,R_FREQ_IN,OUTTYPE)
+ * DISCRETE_74LS624(NODE,ENAB,VMOD,VRNG,C,R_FREQ_IN,C_FREQ_IN,R_RNG_IN,OUTTYPE)
  *
  * DISCRETE_CUSTOM1(NODE,IN0,INFO)
  * DISCRETE_CUSTOM2(NODE,IN0,IN1,INFO)
@@ -333,8 +332,8 @@
  * DISCRETE_CSVLOG3(NODE1,NODE2,NODE3)
  * DISCRETE_CSVLOG4(NODE1,NODE2,NODE3,NODE4)
  * DISCRETE_CSVLOG5(NODE1,NODE2,NODE3,NODE4,NODE5)
- * DISCRETE_WAVELOG1(NODE1,GAIN1)
- * DISCRETE_WAVELOG2(NODE1,GAIN1,NODE2,GAIN2)
+ * DISCRETE_WAVLOG1(NODE1,GAIN1)
+ * DISCRETE_WAVLOG2(NODE1,GAIN1,NODE2,GAIN2)
  * DISCRETE_OUTPUT(OPNODE,GAIN)
  *
  ***********************************************************************
@@ -1401,7 +1400,7 @@
  * will be output.  Otherwise the Low/High voltages will be used
  * to convert the x_time to energy.
  *
- * EXAMPLES: see Mario, Donkey Kong Jr
+ * EXAMPLES: see Mario Bros.; Donkey Kong Jr
  *
  ***********************************************************************
  *
@@ -3315,49 +3314,54 @@
  *
  ***********************************************************************
  *
- * DISCRETE_74LS624 - VCO.
+ * DISCRETE_74LS624 - VCO.  1/2 of 74LS629.
  *
- * Simplified 74LS624 - calculated frequencies should match datasheet
- * for C > 1nF. Output is Logic (1/0)
- *
- * The datasheet gives no formulae. The implementation therefore is
- * a rough model of the diagrams given.
+ * The datasheet gives no formulae. The implementation is based on
+ * testing a 74LS629.
  *
  * For a LS628, use VRng = 3.2
  *
- *                          V+
- *                           |
- *                     .---------.
- *   vRng >------------|Rng  V+  |
- *                     |         |
- *   vMod >------------|Freq   Z |---------> Netlist Node
- *                     |         |
- *                 .---|CX1      |
- *                 |   |         |
- *                ---  |         |
- *              C ---  |         |
- *                 |   |         |
- *                 '---|CX2      |
- *                     '---------'
- *                         |
- *                        GND
+ *                                    V+
+ *                                     |
+ *                  R_rng_in     .---------.
+ *   vRng >-----------ZZZZ-------|Rng  V+  |
+ *           R_freq_in           |         |
+ *   vMod >---ZZZZ-+-------------|Freq   Z |---------> Netlist Node
+ *                 |             |         |
+ *      C_freq_in ---        .---|CX1      |
+ *                ---        |   |         |
+ *                 |        ---  |         |
+ *                 |      C ---  |         |
+ *                Gnd        |   |         |
+ *                           '---|CX2      |
+ *                               '---------'
+ *                                   |
+ *                                  GND
  *
  *  Declaration syntax
  *
- *     DISCRETE_74LS624(name of node,
+ *     DISCRETE_74LS624(name of node,(NODE,ENAB,VMOD,VRNG,C,R_FREQ_IN,C_FREQ_IN,OUTTYPE)
+ *                      enable node or static value,
  *                      vMod node or static value,
  *                      vRng static value,
  *                      C static value in Farads,
- *                      Type of output static value)
+ *                      R_freq_in static value in Ohms,
+ *                      C_freq_in static value in Farads,
+ *                      R_rng_in static value in Ohms,
+ *                     Type of output static value)
  *
  * Type of Output
- *      DISC_LS624_OUT_ENERGY   Energy - use for audio output
- *      DISC_LS624_OUT_LOGIC    Logic ( 0 or 1)
- *      DISC_LS624_OUT_COUNT_F  Number of Falling edges
- *      DISC_LS624_OUT_COUNT_R  Number of Rising  edges
+ *      DISC_LS624_OUT_SQUARE      - 4.4V square wave
+ *      DISC_LS624_OUT_ENERGY      - 4.4V anti-aliased square wave
+ *      DISC_LS624_OUT_LOGIC       - Logic ( 0 or 1)
+ *      DISC_LS624_OUT_LOGIC_X     - Logic ( 0 or 1) with xime
+ *      DISC_LS624_OUT_COUNT_F     - Number of Falling edges
+ *      DISC_LS624_OUT_COUNT_F_X   - Number of Falling edges with xime
+ *      DISC_LS624_OUT_COUNT_R     - Number of Rising  edges
+ *      DISC_LS624_OUT_COUNT_R_X   - Number of Rising  edges with xime
  *
  *
- * EXAMPLES: see Donkey Kong Jr.
+ * EXAMPLES: see Donkey Kong Jr.; Mario Bros.
  *
  ***********************************************************************
  *
@@ -3380,7 +3384,7 @@
  * if you have used DISCRETE_STEP(basename) and DISCRETE_RESET(basename) to define
  * the step/reset procedures.
  *
- * EXAMPLES: see Donkey Kong, Mario Bros., Sky Raider
+ * EXAMPLES: see Sky Raider, Donkey Kong
  *
  ***********************************************************************
  =======================================================================
@@ -3409,21 +3413,21 @@
  *
  ************************************************************************
  *
- * DISCRETE_WAVELOG - Dump nodes into a wav file
+ * DISCRETE_WAVLOG - Dump nodes into a wav file
  *
  *  Declaration syntax
  *
- *     DISCRETE_WAVELOG1(node,
+ *     DISCRETE_WAVLOG1(node,
  *                       static gain for node)
  *
- *     DISCRETE_WAVELOG2(left node,
+ *     DISCRETE_WAVLOG2(left node,
  *                       static gain for left node,
  *                       right node,
  *                       static gain for right node)
  *
  *  Use this to monitor nodes while debugging the driver.  You should
  *  remove these nodes from the final driver.  You can use up to a maximum
- *  of DISCRETE_MAX_WAVELOGS.  Each file will be called discreteX_Y.wav,
+ *  of DISCRETE_MAX_WAVLOGS.  Each file will be called discreteX_Y.wav,
  *  where X is the sound tag.  Y is 0-9, in the order the file is
  *  created in the driver.
  *
@@ -3501,15 +3505,18 @@
 
 #define DISCRETE_FUNC(_func)					void _func (node_description *node)
 
-#define DISCRETE_STEP(_func)					DISCRETE_FUNC(DISCRETE_STEP_NAME(_func))
-#define DISCRETE_RESET(_func)					DISCRETE_FUNC(DISCRETE_RESET_NAME(_func))
-#define DISCRETE_START(_func)					DISCRETE_FUNC(DISCRETE_START_NAME(_func))
-#define DISCRETE_STOP(_func)					DISCRETE_FUNC(DISCRETE_STOP_NAME(_func))
+#define DISCRETE_STEP(_func)					static DISCRETE_FUNC(DISCRETE_STEP_NAME(_func))
+#define DISCRETE_RESET(_func)					static DISCRETE_FUNC(DISCRETE_RESET_NAME(_func))
+#define DISCRETE_START(_func)					static DISCRETE_FUNC(DISCRETE_START_NAME(_func))
+#define DISCRETE_STOP(_func)					static DISCRETE_FUNC(DISCRETE_STOP_NAME(_func))
 
 #define DISCRETE_STEP_CALL(_func)				DISCRETE_STEP_NAME(_func) (node)
 #define DISCRETE_RESET_CALL(_func)				DISCRETE_RESET_NAME(_func) (node)
 #define DISCRETE_START_CALL(_func)				DISCRETE_START_NAME(_func) (node)
 #define DISCRETE_STOP_CALL(_func)				DISCRETE_STOP_NAME(_func) (node)
+
+#define DISCRETE_DECLARE_CONTEXT(_name)			struct _name##_context *context = (struct _name##_context *)node->context;
+#define DISCRETE_DECLARE_INFO(_name)			const _name *info = (const  _name *)node->custom;
 
 #define DISCRETE_CUSTOM_MODULE(_basename, _context_type) \
 	{ DST_CUSTOM, "CUSTOM", 1, sizeof(_context_type), DISCRETE_RESET_NAME(_basename), DISCRETE_STEP_NAME(_basename) }
@@ -3725,11 +3732,11 @@ enum
 #define DISC_LS624_OUT_SQUARE				0x01
 #define DISC_LS624_OUT_ENERGY				0x02
 #define DISC_LS624_OUT_LOGIC				0x03
-#define DISC_LS624_OUT_LOGIC_X				0x08
-#define DISC_LS624_OUT_COUNT_F				0x04
-#define DISC_LS624_OUT_COUNT_R				0x05
-#define DISC_LS624_OUT_COUNT_F_X			0x06
-#define DISC_LS624_OUT_COUNT_R_X			0x07
+#define DISC_LS624_OUT_LOGIC_X				0x04
+#define DISC_LS624_OUT_COUNT_F				0x05
+#define DISC_LS624_OUT_COUNT_R				0x06
+#define DISC_LS624_OUT_COUNT_F_X			0x07
+#define DISC_LS624_OUT_COUNT_R_X			0x08
 
 /* Oneshot types */
 #define DISC_ONESHOT_FEDGE					0x00
@@ -4379,7 +4386,6 @@ enum
 	DSD_555_VCO1,		/* Op-Amp linear ramp based 555 VCO */
 	DSD_566,			/* NE566 Emulation */
 	DSD_LS624,			/* 74LS624 Emulation */
-	DSD_LS629,			/* 74LS624 Emulation - new */
 
 	/* Custom */
 	DST_CUSTOM,			/* whatever you want */
@@ -4580,8 +4586,7 @@ enum
 #define DISCRETE_555_VCO1(NODE,RESET,VIN,OPTIONS)                       { NODE, DSD_555_VCO1    , 3, { RESET,VIN,NODE_NC }, { RESET,VIN,-1 }, OPTIONS, "DISCRETE_555_VCO1" },
 #define DISCRETE_555_VCO1_CV(NODE,RESET,VIN,CTRLV,OPTIONS)              { NODE, DSD_555_VCO1    , 3, { RESET,VIN,CTRLV }, { RESET,VIN,CTRLV }, OPTIONS, "DISCRETE_555_VCO1_CV" },
 #define DISCRETE_566(NODE,VMOD,R,C,VPOS,VNEG,VCHARGE,OPTIONS)           { NODE, DSD_566         , 7, { VMOD,R,C,NODE_NC,NODE_NC,VCHARGE,NODE_NC }, { VMOD,R,C,VPOS,VNEG,VCHARGE,OPTIONS }, NULL, "DISCRETE_566" },
-#define DISCRETE_74LS624(NODE,VMOD,VRNG,C,OUTTYPE)                      { NODE, DSD_LS624       , 4, { VMOD,NODE_NC,NODE_NC,NODE_NC }, { VMOD,VRNG,C,OUTTYPE }, NULL, "DISCRETE_74LS624" },
-#define DISCRETE_74LS629(NODE,ENAB,VMOD,VRNG,C,R_FREQ_IN,C_FREQ_IN,OUTTYPE) { NODE, DSD_LS629   , 7, { ENAB,VMOD,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC }, { ENAB,VMOD,VRNG,C,R_FREQ_IN,C_FREQ_IN,OUTTYPE }, NULL, "DISCRETE_74LS629" },
+#define DISCRETE_74LS624(NODE,ENAB,VMOD,VRNG,C,R_FREQ_IN,C_FREQ_IN,R_RNG_IN,OUTTYPE) { NODE, DSD_LS624   , 8, { ENAB,VMOD,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC,NODE_NC }, { ENAB,VMOD,VRNG,C,R_FREQ_IN,C_FREQ_IN,R_RNG_IN,OUTTYPE }, NULL, "DISCRETE_74LS624" },
 
 /* NOP */
 #define DISCRETE_NOP(NODE)                                              { NODE, DSS_NOP         , 0, { 0 }, { 0 }, NULL, "DISCRETE_NOP" },
@@ -4592,8 +4597,8 @@ enum
 #define DISCRETE_CSVLOG3(NODE1,NODE2,NODE3)                             { NODE_SPECIAL, DSO_CSVLOG   , 3, { NODE1,NODE2,NODE3 }, { NODE1,NODE2,NODE3 }, NULL, "DISCRETE_CSVLOG3" },
 #define DISCRETE_CSVLOG4(NODE1,NODE2,NODE3,NODE4)                       { NODE_SPECIAL, DSO_CSVLOG   , 4, { NODE1,NODE2,NODE3,NODE4 }, { NODE1,NODE2,NODE3,NODE4 }, NULL, "DISCRETE_CSVLOG4" },
 #define DISCRETE_CSVLOG5(NODE1,NODE2,NODE3,NODE4,NODE5)                 { NODE_SPECIAL, DSO_CSVLOG   , 5, { NODE1,NODE2,NODE3,NODE4,NODE5 }, { NODE1,NODE2,NODE3,NODE4,NODE5 }, NULL, "DISCRETE_CSVLOG5" },
-#define DISCRETE_WAVELOG1(NODE1,GAIN1)                                  { NODE_SPECIAL, DSO_WAVELOG  , 2, { NODE1,NODE_NC }, { NODE1,GAIN1 }, NULL, "DISCRETE_WAVELOG1" },
-#define DISCRETE_WAVELOG2(NODE1,GAIN1,NODE2,GAIN2)                      { NODE_SPECIAL, DSO_WAVELOG  , 4, { NODE1,NODE_NC,NODE2,NODE_NC }, { NODE1,GAIN1,NODE2,GAIN2 }, NULL, "DISCRETE_WAVELOG2" },
+#define DISCRETE_WAVLOG1(NODE1,GAIN1)                                  { NODE_SPECIAL, DSO_WAVELOG  , 2, { NODE1,NODE_NC }, { NODE1,GAIN1 }, NULL, "DISCRETE_WAVLOG1" },
+#define DISCRETE_WAVLOG2(NODE1,GAIN1,NODE2,GAIN2)                      { NODE_SPECIAL, DSO_WAVELOG  , 4, { NODE1,NODE_NC,NODE2,NODE_NC }, { NODE1,GAIN1,NODE2,GAIN2 }, NULL, "DISCRETE_WAVLOG2" },
 
 /* import */
 #define DISCRETE_IMPORT(INFO)                                           { NODE_SPECIAL, DSO_IMPORT   , 0, { 0 }, { 0 }, &(INFO##_discrete_interface), "DISCRETE_IMPORT" },

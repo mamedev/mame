@@ -237,9 +237,9 @@ struct bzone_custom_filter_context
 
 #define CD4066_R_ON		270
 
-static DISCRETE_STEP(bzone_custom_filter)
+DISCRETE_STEP(bzone_custom_filter)
 {
-	struct bzone_custom_filter_context *context = (struct bzone_custom_filter_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(bzone_custom_filter)
 
 	int		in0 = (BZONE_CUSTOM_FILTER__IN0 == 0) ? 0 : 1;
 	double	v;
@@ -254,9 +254,9 @@ static DISCRETE_STEP(bzone_custom_filter)
 	node->output[0] += (v - node->output[0]) * context->exponent;
 }
 
-static DISCRETE_RESET(bzone_custom_filter)
+DISCRETE_RESET(bzone_custom_filter)
 {
-	struct bzone_custom_filter_context   *context = (struct bzone_custom_filter_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(bzone_custom_filter)
 
 	context->gain[0] = BZONE_CUSTOM_FILTER__R1 + BZONE_CUSTOM_FILTER__R2;
 	context->gain[0] = BZONE_CUSTOM_FILTER__R5 / context->gain[0] + 1;

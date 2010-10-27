@@ -151,9 +151,9 @@ struct skyraid_missle_custom_charge_context
 /* the high charge is clamped by the diode to 0.7V above the 5V line */
 #define SKYRAID_MISSLE_CHARGE_PLUS	(5.0 + 0.7)
 
-static DISCRETE_STEP( skyraid_missle_custom_charge )
+DISCRETE_STEP( skyraid_missle_custom_charge )
 {
-	struct skyraid_missle_custom_charge_context *context = (struct skyraid_missle_custom_charge_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(skyraid_missle_custom_charge)
 
 	int in_1 = (SKYRAID_MISSLE_CUSTOM_IN1 == 0) ? 0 : 1;
 
@@ -163,9 +163,9 @@ static DISCRETE_STEP( skyraid_missle_custom_charge )
 	node->output[0] = SKYRAID_MISSLE_CHARGE_PLUS - context->v_cap;
 }
 
-static DISCRETE_RESET( skyraid_missle_custom_charge )
+DISCRETE_RESET( skyraid_missle_custom_charge )
 {
-	struct skyraid_missle_custom_charge_context *context = (struct skyraid_missle_custom_charge_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(skyraid_missle_custom_charge)
 
 	/* everything is based on the input to the O.C. inverter */
 

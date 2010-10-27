@@ -71,7 +71,7 @@ struct dst_dac_r1_context
 	int		last_data;
 };
 
-struct dst_diode_mix__context
+struct dst_diode_mix_context
 {
 	int		size;
 	double	v_junction[8];
@@ -118,7 +118,7 @@ struct dst_oneshot_context
 	int		type;
 };
 
-struct dss_ramp_context
+struct dst_ramp_context
 {
 	double	step;
 	int		dir;		/* 1 if End is higher then Start */
@@ -209,7 +209,7 @@ struct dst_tvca_op_amp_context
 #define DST_ADDER__IN2		DISCRETE_INPUT(3)
 #define DST_ADDER__IN3		DISCRETE_INPUT(4)
 
-static DISCRETE_STEP(dst_adder)
+DISCRETE_STEP(dst_adder)
 {
 	if(DST_ADDER__ENABLE)
 	{
@@ -234,9 +234,9 @@ static DISCRETE_STEP(dst_adder)
  ************************************************************************/
 #define DST_COMP_ADDER__SELECT	DISCRETE_INPUT(0)
 
-static DISCRETE_STEP(dst_comp_adder)
+DISCRETE_STEP(dst_comp_adder)
 {
-	struct dst_comp_adder_context    *context = (struct dst_comp_adder_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dst_comp_adder)
 	int select;
 
 	select = (int)DST_COMP_ADDER__SELECT;
@@ -244,10 +244,10 @@ static DISCRETE_STEP(dst_comp_adder)
 	node->output[0] = context->total[select];
 }
 
-static DISCRETE_RESET(dst_comp_adder)
+DISCRETE_RESET(dst_comp_adder)
 {
-	const  discrete_comp_adder_table *info = (const  discrete_comp_adder_table *)node->custom;
-	struct dst_comp_adder_context    *context = (struct dst_comp_adder_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dst_comp_adder)
+	DISCRETE_DECLARE_INFO(discrete_comp_adder_table)
 
 	int i, bit;
 	int length = 1 << info->length;
@@ -292,7 +292,7 @@ static DISCRETE_RESET(dst_comp_adder)
 #define DST_CLAMP__MIN		DISCRETE_INPUT(1)
 #define DST_CLAMP__MAX		DISCRETE_INPUT(2)
 
-static DISCRETE_STEP(dst_clamp)
+DISCRETE_STEP(dst_clamp)
 {
 	if (DST_CLAMP__IN < DST_CLAMP__MIN) node->output[0] = DST_CLAMP__MIN;
 	else if (DST_CLAMP__IN > DST_CLAMP__MAX) node->output[0] = DST_CLAMP__MAX;
@@ -314,10 +314,10 @@ static DISCRETE_STEP(dst_clamp)
 #define DST_DAC_R1__DATA		DISCRETE_INPUT(0)
 #define DST_DAC_R1__VON			DISCRETE_INPUT(1)
 
-static DISCRETE_STEP(dst_dac_r1)
+DISCRETE_STEP(dst_dac_r1)
 {
-	const  discrete_dac_r1_ladder *info    = (const  discrete_dac_r1_ladder *)node->custom;
-	struct dst_dac_r1_context     *context = (struct dst_dac_r1_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dst_dac_r1)
+	DISCRETE_DECLARE_INFO(discrete_dac_r1_ladder)
 
 	int		bit, bit_val, data;
 	double	v, i_bit, i_total, x_time, von;
@@ -362,10 +362,10 @@ static DISCRETE_STEP(dst_dac_r1)
 	node->output[0] = info->cFilter ? node->output[0] + ((v - node->output[0]) * context->exponent) : v;
 }
 
-static DISCRETE_RESET(dst_dac_r1)
+DISCRETE_RESET(dst_dac_r1)
 {
-	const discrete_dac_r1_ladder *info = (const discrete_dac_r1_ladder *)node->custom;
-	struct dst_dac_r1_context *context = (struct dst_dac_r1_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dst_dac_r1)
+	DISCRETE_DECLARE_INFO(discrete_dac_r1_ladder)
 
 	int	bit;
 
@@ -427,9 +427,9 @@ static DISCRETE_RESET(dst_dac_r1)
 #define DST_DIODE_MIX_INP_OFFSET	0
 #define DST_DIODE_MIX__INP(addr)	DISCRETE_INPUT(DST_DIODE_MIX_INP_OFFSET + addr)
 
-static DISCRETE_STEP(dst_diode_mix)
+DISCRETE_STEP(dst_diode_mix)
 {
-	struct	dst_diode_mix__context *context = (struct	dst_diode_mix__context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dst_diode_mix)
 
 	double	val, max = 0;
 	int		addr;
@@ -443,10 +443,10 @@ static DISCRETE_STEP(dst_diode_mix)
 	node->output[0] = max;
 }
 
-static DISCRETE_RESET(dst_diode_mix)
+DISCRETE_RESET(dst_diode_mix)
 {
-	const  double *info = (const  double *)node->custom;
-	struct dst_diode_mix__context *context = (struct dst_diode_mix__context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dst_diode_mix)
+	DISCRETE_DECLARE_INFO(double)
 
 	int		addr;
 
@@ -483,7 +483,7 @@ static DISCRETE_RESET(dst_diode_mix)
 #define DST_DIVIDE__IN		DISCRETE_INPUT(1)
 #define DST_DIVIDE__DIV		DISCRETE_INPUT(2)
 
-static DISCRETE_STEP(dst_divide)
+DISCRETE_STEP(dst_divide)
 {
 	if(DST_DIVIDE__ENABLE)
 	{
@@ -517,7 +517,7 @@ static DISCRETE_STEP(dst_divide)
 #define DST_GAIN__GAIN		DISCRETE_INPUT(1)
 #define DST_GAIN__OFFSET	DISCRETE_INPUT(2)
 
-static DISCRETE_STEP(dst_gain)
+DISCRETE_STEP(dst_gain)
 {
 		node->output[0]  = DST_GAIN__IN * DST_GAIN__GAIN + DST_GAIN__OFFSET;
 }
@@ -571,10 +571,10 @@ static int dst_trigger_function(int trig0, int trig1, int trig2, int function)
 	return (result);
 }
 
-static DISCRETE_STEP(dst_integrate)
+DISCRETE_STEP(dst_integrate)
 {
-	const  discrete_integrate_info *info    = (const  discrete_integrate_info *)node->custom;
-	struct dst_integrate_context   *context = (struct dst_integrate_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dst_integrate)
+	DISCRETE_DECLARE_INFO(discrete_integrate_info)
 
 	int		trig0, trig1;
 	double	i_neg = 0;	/* current into - input */
@@ -616,10 +616,11 @@ static DISCRETE_STEP(dst_integrate)
 	if (node->output[0] > context->v_max_out) node->output[0] = context->v_max_out;
 }
 
-static DISCRETE_RESET(dst_integrate)
+DISCRETE_RESET(dst_integrate)
 {
-	const discrete_integrate_info *info = (const discrete_integrate_info *)node->custom;
-	struct dst_integrate_context *context = (struct dst_integrate_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dst_integrate)
+	DISCRETE_DECLARE_INFO(discrete_integrate_info)
+
 	double	i, v;
 
 	if (info->type & DISC_OP_AMP_IS_NORTON)
@@ -651,7 +652,7 @@ static DISCRETE_RESET(dst_integrate)
  ************************************************************************/
 #define DST_LOGIC_INV__IN		DISCRETE_INPUT(0)
 
-static DISCRETE_STEP(dst_logic_inv)
+DISCRETE_STEP(dst_logic_inv)
 {
 	node->output[0] = DST_LOGIC_INV__IN ? 0.0 : 1.0;
 }
@@ -666,9 +667,10 @@ static DISCRETE_STEP(dst_logic_inv)
 #define DST_BITS_DECODE__TO		DISCRETE_INPUT(2)
 #define DST_BITS_DECODE__VOUT	DISCRETE_INPUT(3)
 
-static DISCRETE_STEP(dst_bits_decode)
+DISCRETE_STEP(dst_bits_decode)
 {
-	struct dst_bits_decode_context *context = (struct dst_bits_decode_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dst_bits_decode)
+
 	int new_val = DST_BITS_DECODE__IN;
 	int last_val = context->last_val;
 	int last_had_x_time = context->last_had_x_time;
@@ -681,6 +683,7 @@ static DISCRETE_STEP(dst_bits_decode)
 		int count = context->count;
 		int decode_x_time = context->decode_x_time;
 		int has_x_time = x_time > 0 ? 1 : 0;
+		double out = 0;
 		double v_out = DST_BITS_DECODE__VOUT;
 
 		for (i = 0; i < count; i++ )
@@ -695,23 +698,24 @@ static DISCRETE_STEP(dst_bits_decode)
 
 			if (decode_x_time)
 			{
-				v_out = new_bit;
+				out = new_bit;
 				if (bit_changed)
-					v_out += x_time;
+					out += x_time;
 			}
 			else
 			{
+				out = v_out;
 				if (has_x_time && bit_changed)
 				{
 					if (new_bit)
-						v_out *= x_time;
+						out *= x_time;
 					else
-						v_out *= (1.0 - x_time);
+						out *= (1.0 - x_time);
 				}
 				else
-					v_out *= new_bit;
+					out *= new_bit;
 			}
-			node->output[i] = v_out;
+			node->output[i] = out;
 			if (has_x_time && bit_changed)
 				/* set */
 				context->last_had_x_time |= 1 << (i + from);
@@ -723,9 +727,9 @@ static DISCRETE_STEP(dst_bits_decode)
 	}
 }
 
-static DISCRETE_RESET(dst_bits_decode)
+DISCRETE_RESET(dst_bits_decode)
 {
-	struct dst_bits_decode_context *context = (struct dst_bits_decode_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dst_bits_decode)
 
 	context->from = DST_BITS_DECODE__FROM;
 	context->count = DST_BITS_DECODE__TO - context->from + 1;
@@ -754,7 +758,7 @@ static DISCRETE_RESET(dst_bits_decode)
 #define DST_LOGIC_AND__IN2		DISCRETE_INPUT(2)
 #define DST_LOGIC_AND__IN3		DISCRETE_INPUT(3)
 
-static DISCRETE_STEP(dst_logic_and)
+DISCRETE_STEP(dst_logic_and)
 {
 	node->output[0] = (DST_LOGIC_AND__IN0 && DST_LOGIC_AND__IN1 && DST_LOGIC_AND__IN2 && DST_LOGIC_AND__IN3)? 1.0 : 0.0;
 }
@@ -774,7 +778,7 @@ static DISCRETE_STEP(dst_logic_and)
 #define DST_LOGIC_NAND__IN2		DISCRETE_INPUT(2)
 #define DST_LOGIC_NAND__IN3		DISCRETE_INPUT(3)
 
-static DISCRETE_STEP(dst_logic_nand)
+DISCRETE_STEP(dst_logic_nand)
 {
 	node->output[0]= (DST_LOGIC_NAND__IN0 && DST_LOGIC_NAND__IN1 && DST_LOGIC_NAND__IN2 && DST_LOGIC_NAND__IN3)? 0.0 : 1.0;
 }
@@ -794,7 +798,7 @@ static DISCRETE_STEP(dst_logic_nand)
 #define DST_LOGIC_OR__IN2		DISCRETE_INPUT(2)
 #define DST_LOGIC_OR__IN3		DISCRETE_INPUT(3)
 
-static DISCRETE_STEP(dst_logic_or)
+DISCRETE_STEP(dst_logic_or)
 {
 	node->output[0] = (DST_LOGIC_OR__IN0 || DST_LOGIC_OR__IN1 || DST_LOGIC_OR__IN2 || DST_LOGIC_OR__IN3) ? 1.0 : 0.0;
 }
@@ -814,7 +818,7 @@ static DISCRETE_STEP(dst_logic_or)
 #define DST_LOGIC_NOR__IN2		DISCRETE_INPUT(2)
 #define DST_LOGIC_NOR__IN3		DISCRETE_INPUT(3)
 
-static DISCRETE_STEP(dst_logic_nor)
+DISCRETE_STEP(dst_logic_nor)
 {
 	node->output[0] = (DST_LOGIC_NOR__IN0 || DST_LOGIC_NOR__IN1 || DST_LOGIC_NOR__IN2 || DST_LOGIC_NOR__IN3) ? 0.0 : 1.0;
 }
@@ -830,7 +834,7 @@ static DISCRETE_STEP(dst_logic_nor)
 #define DST_LOGIC_XOR__IN0		DISCRETE_INPUT(0)
 #define DST_LOGIC_XOR__IN1		DISCRETE_INPUT(1)
 
-static DISCRETE_STEP(dst_logic_xor)
+DISCRETE_STEP(dst_logic_xor)
 {
 	node->output[0] = ((DST_LOGIC_XOR__IN0 && !DST_LOGIC_XOR__IN1) || (!DST_LOGIC_XOR__IN0 && DST_LOGIC_XOR__IN1)) ? 1.0 : 0.0;
 }
@@ -846,7 +850,7 @@ static DISCRETE_STEP(dst_logic_xor)
 #define DST_LOGIC_XNOR__IN0		DISCRETE_INPUT(0)
 #define DST_LOGIC_XNOR__IN1		DISCRETE_INPUT(1)
 
-static DISCRETE_STEP(dst_logic_nxor)
+DISCRETE_STEP(dst_logic_nxor)
 {
 	node->output[0] = ((DST_LOGIC_XNOR__IN0 && !DST_LOGIC_XNOR__IN1) || (!DST_LOGIC_XNOR__IN0 && DST_LOGIC_XNOR__IN1)) ? 0.0 : 1.0;
 }
@@ -867,9 +871,9 @@ static DISCRETE_STEP(dst_logic_nxor)
 #define DST_LOGIC_DFF__CLOCK	 DISCRETE_INPUT(2)
 #define DST_LOGIC_DFF__DATA 	 DISCRETE_INPUT(3)
 
-static DISCRETE_STEP(dst_logic_dff)
+DISCRETE_STEP(dst_logic_dff)
 {
-	struct dst_flipflop_context *context = (struct dst_flipflop_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dst_flipflop)
 
 	int clk = (int)DST_LOGIC_DFF__CLOCK;
 
@@ -882,9 +886,10 @@ static DISCRETE_STEP(dst_logic_dff)
 	context->last_clk = clk;
 }
 
-static DISCRETE_RESET(dst_logic_ff)
+DISCRETE_RESET(dst_logic_ff)
 {
-	struct dst_flipflop_context *context = (struct dst_flipflop_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dst_flipflop)
+
 
 	context->last_clk = 0;
 	node->output[0]   = 0;
@@ -908,9 +913,9 @@ static DISCRETE_RESET(dst_logic_ff)
 #define DST_LOGIC_JKFF__J		 DISCRETE_INPUT(3)
 #define DST_LOGIC_JKFF__K		 DISCRETE_INPUT(4)
 
-static DISCRETE_STEP(dst_logic_jkff)
+DISCRETE_STEP(dst_logic_jkff)
 {
-	struct dst_flipflop_context *context = (struct dst_flipflop_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dst_flipflop)
 
 	int clk = (int)DST_LOGIC_JKFF__CLOCK;
 	int j   = (int)DST_LOGIC_JKFF__J;
@@ -954,9 +959,9 @@ static DISCRETE_STEP(dst_logic_jkff)
 #define DST_LOGIC_SHIFT__SIZE		DISCRETE_INPUT(3)
 #define DST_LOGIC_SHIFT__OPTIONS	DISCRETE_INPUT(4)
 
-static DISCRETE_STEP(dst_logic_shift)
+DISCRETE_STEP(dst_logic_shift)
 {
-	struct dst_shift_context *context = (struct dst_shift_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dst_shift)
 
 	double	cycles;
 	double	ds_clock;
@@ -1030,9 +1035,9 @@ static DISCRETE_STEP(dst_logic_shift)
 	node->output[0] = context->shift_data;
 }
 
-static DISCRETE_RESET(dst_logic_shift)
+DISCRETE_RESET(dst_logic_shift)
 {
-	struct dst_shift_context *context = (struct dst_shift_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dst_shift)
 
 	context->bit_mask = (1 << (int)DST_LOGIC_SHIFT__SIZE) - 1;
 	context->clock_type = (int)DST_LOGIC_SHIFT__OPTIONS & DISC_CLK_MASK;
@@ -1059,16 +1064,16 @@ static DISCRETE_RESET(dst_logic_shift)
 #define DST_LOOKUP_TABLE__IN		DISCRETE_INPUT(0)
 #define DST_LOOKUP_TABLE__SIZE		DISCRETE_INPUT(1)
 
-static DISCRETE_STEP(dst_lookup_table)
+DISCRETE_STEP(dst_lookup_table)
 {
-	const double *table = (const double *)node->custom;
+	DISCRETE_DECLARE_INFO(double)
 
 	int	addr = DST_LOOKUP_TABLE__IN;
 
 	if (addr < 0 || addr >= DST_LOOKUP_TABLE__SIZE)
 		node->output[0] = 0;
 	else
-		node->output[0] = table[addr];
+		node->output[0] = info[addr];
 }
 
 
@@ -1125,10 +1130,10 @@ static DISCRETE_STEP(dst_lookup_table)
 #define DST_MIXER__ENABLE		DISCRETE_INPUT(0)
 #define DST_MIXER__IN(bit)		DISCRETE_INPUT(bit + 1)
 
-static DISCRETE_STEP(dst_mixer)
+DISCRETE_STEP(dst_mixer)
 {
-	const  discrete_mixer_desc *info    = (const  discrete_mixer_desc *)node->custom;
-	struct dst_mixer_context   *context = (struct dst_mixer_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dst_mixer)
+	DISCRETE_DECLARE_INFO(discrete_mixer_desc)
 
 	double	v, vTemp, r_total, rTemp, rTemp2 = 0;
 	double	i = 0;		/* total current of inputs */
@@ -1283,10 +1288,11 @@ static DISCRETE_STEP(dst_mixer)
 }
 
 
-static DISCRETE_RESET(dst_mixer)
+DISCRETE_RESET(dst_mixer)
 {
-	const  discrete_mixer_desc *info    = (const  discrete_mixer_desc *)node->custom;
-	struct dst_mixer_context   *context = (struct dst_mixer_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dst_mixer)
+	DISCRETE_DECLARE_INFO(discrete_mixer_desc)
+
 	node_description *r_node;
 
 	int		bit;
@@ -1405,9 +1411,9 @@ static DISCRETE_RESET(dst_mixer)
 #define DST_MULTIPLEX__ADDR			DISCRETE_INPUT(0)
 #define DST_MULTIPLEX__INP(addr)	DISCRETE_INPUT(1 + addr)
 
-static DISCRETE_STEP(dst_multiplex)
+DISCRETE_STEP(dst_multiplex)
 {
-	struct dst_size_context *context = (struct dst_size_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dst_size)
 
 	int addr;
 
@@ -1423,9 +1429,9 @@ static DISCRETE_STEP(dst_multiplex)
 	}
 }
 
-static DISCRETE_RESET(dst_multiplex)
+DISCRETE_RESET(dst_multiplex)
 {
-	struct dst_size_context *context = (struct dst_size_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dst_size)
 
 	context->size = node->active_inputs - 1;
 
@@ -1451,9 +1457,9 @@ static DISCRETE_RESET(dst_multiplex)
 #define DST_ONESHOT__WIDTH	DISCRETE_INPUT(3)
 #define DST_ONESHOT__TYPE	(int)DISCRETE_INPUT(4)
 
-static DISCRETE_STEP(dst_oneshot)
+DISCRETE_STEP(dst_oneshot)
 {
-	struct dst_oneshot_context *context = (struct dst_oneshot_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dst_oneshot)
 
 	int trigger = (DST_ONESHOT__TRIG != 0);
 
@@ -1511,9 +1517,9 @@ static DISCRETE_STEP(dst_oneshot)
 }
 
 
-static DISCRETE_RESET(dst_oneshot)
+DISCRETE_RESET(dst_oneshot)
 {
-	struct dst_oneshot_context *context = (struct dst_oneshot_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dst_oneshot)
 
 	context->countdown = 0;
 	context->state     = 0;
@@ -1544,9 +1550,9 @@ static DISCRETE_RESET(dst_oneshot)
 #define DST_RAMP__END		DISCRETE_INPUT(4)
 #define DST_RAMP__CLAMP		DISCRETE_INPUT(5)
 
-static DISCRETE_STEP(dst_ramp)
+DISCRETE_STEP(dst_ramp)
 {
-	struct dss_ramp_context *context = (struct dss_ramp_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dst_ramp)
 
 	if(DST_RAMP__ENABLE)
 	{
@@ -1571,9 +1577,9 @@ static DISCRETE_STEP(dst_ramp)
 	}
 }
 
-static DISCRETE_RESET(dst_ramp)
+DISCRETE_RESET(dst_ramp)
 {
-	struct dss_ramp_context *context = (struct dss_ramp_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dst_ramp)
 
 	node->output[0]  = DST_RAMP__CLAMP;
 	context->step    = DST_RAMP__GRAD / node->info->sample_rate;
@@ -1595,9 +1601,9 @@ static DISCRETE_RESET(dst_ramp)
 #define DST_SAMPHOLD__CLOCK		DISCRETE_INPUT(1)
 #define DST_SAMPHOLD__TYPE		DISCRETE_INPUT(2)
 
-static DISCRETE_STEP(dst_samphold)
+DISCRETE_STEP(dst_samphold)
 {
-	struct dst_samphold_context *context = (struct dst_samphold_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dst_samphold)
 
 	switch(context->clocktype)
 	{
@@ -1625,9 +1631,9 @@ static DISCRETE_STEP(dst_samphold)
 	context->last_input = DST_SAMPHOLD__CLOCK;
 }
 
-static DISCRETE_RESET(dst_samphold)
+DISCRETE_RESET(dst_samphold)
 {
-	struct dst_samphold_context *context = (struct dst_samphold_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dst_samphold)
 
 	node->output[0]     =  0;
 	context->last_input = -1;
@@ -1652,7 +1658,7 @@ static DISCRETE_RESET(dst_samphold)
 #define DST_SWITCH__IN0		DISCRETE_INPUT(2)
 #define DST_SWITCH__IN1		DISCRETE_INPUT(3)
 
-static DISCRETE_STEP(dst_switch)
+DISCRETE_STEP(dst_switch)
 {
 	if(DST_SWITCH__ENABLE)
 	{
@@ -1678,7 +1684,7 @@ static DISCRETE_STEP(dst_switch)
 #define DST_ASWITCH__THRESHOLD	DISCRETE_INPUT(2)
 
 
-static DISCRETE_STEP(dst_aswitch)
+DISCRETE_STEP(dst_aswitch)
 {
 	node->output[0] = DST_ASWITCH__CTRL > DST_ASWITCH__THRESHOLD ? DST_ASWITCH__IN : 0;
 }
@@ -1717,7 +1723,7 @@ INLINE void dst_transform_push(double *stack, int *pointer, double value)
 	stack[(*pointer)++] = value;
 }
 
-static DISCRETE_STEP(dst_transform)
+DISCRETE_STEP(dst_transform)
 {
 	double	trans_stack[MAX_TRANS_STACK];
 	double	number1,top;
@@ -1830,10 +1836,10 @@ static DISCRETE_STEP(dst_transform)
 #define DST_OP_AMP__INP0	DISCRETE_INPUT(1)
 #define DST_OP_AMP__INP1	DISCRETE_INPUT(2)
 
-static DISCRETE_STEP(dst_op_amp)
+DISCRETE_STEP(dst_op_amp)
 {
-	const  discrete_op_amp_info *info    = (const  discrete_op_amp_info *)node->custom;
-	struct dst_op_amp_context   *context = (struct dst_op_amp_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dst_op_amp)
+	DISCRETE_DECLARE_INFO(discrete_op_amp_info)
 
 	double i_pos = 0;
 	double i_neg = 0;
@@ -1897,10 +1903,10 @@ static DISCRETE_STEP(dst_op_amp)
 		node->output[0] = 0;
 }
 
-static DISCRETE_RESET(dst_op_amp)
+DISCRETE_RESET(dst_op_amp)
 {
-	const discrete_op_amp_info *info = (const discrete_op_amp_info *)node->custom;
-	struct dst_op_amp_context *context = (struct dst_op_amp_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dst_op_amp)
+	DISCRETE_DECLARE_INFO(discrete_op_amp_info)
 
 	context->has_r1 = info->r1 > 0;
 	context->has_r4 = info->r4 > 0;
@@ -1941,10 +1947,10 @@ static DISCRETE_RESET(dst_op_amp)
  ************************************************************************/
 #define DST_OP_AMP_1SHT__TRIGGER	DISCRETE_INPUT(0)
 
-static DISCRETE_STEP(dst_op_amp_1sht)
+DISCRETE_STEP(dst_op_amp_1sht)
 {
-	const  discrete_op_amp_1sht_info *info    = (const  discrete_op_amp_1sht_info *)node->custom;
-	struct dst_op_amp_1sht_context   *context = (struct dst_op_amp_1sht_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dst_op_amp_1sht)
+	DISCRETE_DECLARE_INFO(discrete_op_amp_1sht_info)
 
 	double i_pos;
 	double i_neg;
@@ -1981,10 +1987,10 @@ static DISCRETE_STEP(dst_op_amp_1sht)
 		context->v_cap1 += ((node->output[0] - OP_AMP_NORTON_VBE) * context->r34ratio + OP_AMP_NORTON_VBE - context->v_cap1) * context->exponent1c;
 }
 
-static DISCRETE_RESET(dst_op_amp_1sht)
+DISCRETE_RESET(dst_op_amp_1sht)
 {
-	const  discrete_op_amp_1sht_info *info    = (const  discrete_op_amp_1sht_info *)node->custom;
-	struct dst_op_amp_1sht_context   *context = (struct dst_op_amp_1sht_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dst_op_amp_1sht)
+	DISCRETE_DECLARE_INFO(discrete_op_amp_1sht_info)
 
 	context->exponent1c = RC_CHARGE_EXP(RES_2_PARALLEL(info->r3, info->r4) * info->c1);
 	context->exponent1d = RC_CHARGE_EXP(info->r4 * info->c1);
@@ -2016,10 +2022,10 @@ static DISCRETE_RESET(dst_op_amp_1sht)
 #define DST_TVCA_OP_AMP__INP0	DISCRETE_INPUT(3)
 #define DST_TVCA_OP_AMP__INP1	DISCRETE_INPUT(4)
 
-static DISCRETE_STEP(dst_tvca_op_amp)
+DISCRETE_STEP(dst_tvca_op_amp)
 {
-	const  discrete_op_amp_tvca_info *info    = (const  discrete_op_amp_tvca_info *)node->custom;
-	struct dst_tvca_op_amp_context   *context = (struct dst_tvca_op_amp_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dst_tvca_op_amp)
+	DISCRETE_DECLARE_INFO(discrete_op_amp_tvca_info)
 
 	int		trig0, trig1, trig2, f3;
 	double	i2 = 0;		/* current through r2 */
@@ -2116,10 +2122,10 @@ static DISCRETE_STEP(dst_tvca_op_amp)
 	if (node->output[0] > context->v_out_max) node->output[0] = context->v_out_max;
 }
 
-static DISCRETE_RESET(dst_tvca_op_amp)
+DISCRETE_RESET(dst_tvca_op_amp)
 {
-	const  discrete_op_amp_tvca_info *info    = (const  discrete_op_amp_tvca_info *)node->custom;
-	struct dst_tvca_op_amp_context   *context = (struct dst_tvca_op_amp_context *)node->context;
+	DISCRETE_DECLARE_CONTEXT(dst_tvca_op_amp)
+	DISCRETE_DECLARE_INFO(discrete_op_amp_tvca_info)
 
 	context->r67 = info->r6 + info->r7;
 
@@ -2195,7 +2201,7 @@ enum
 #define DST_XTIME_BUFFER_OUT_HIGH		DISCRETE_INPUT(2)
 #define DST_XTIME_BUFFER_INVERT			DISCRETE_INPUT(3)
 
-static DISCRETE_STEP(dst_xtime_buffer)
+DISCRETE_STEP(dst_xtime_buffer)
 {
 	int	in0 = (int)DST_XTIME_BUFFER__IN;
 	int	out = in0;
@@ -2242,7 +2248,7 @@ static DISCRETE_STEP(dst_xtime_buffer)
 #define DST_XTIME_AND_OUT_HIGH		DISCRETE_INPUT(3)
 #define DST_XTIME_AND_INVERT		DISCRETE_INPUT(4)
 
-static DISCRETE_STEP(dst_xtime_and)
+DISCRETE_STEP(dst_xtime_and)
 {
 	int	in0 = (int)DST_XTIME_AND__IN0;
 	int	in1 = (int)DST_XTIME_AND__IN1;
@@ -2462,7 +2468,7 @@ static DISCRETE_STEP(dst_xtime_and)
 #define DST_XTIME_OR_OUT_HIGH		DISCRETE_INPUT(3)
 #define DST_XTIME_OR_INVERT			DISCRETE_INPUT(4)
 
-static DISCRETE_STEP(dst_xtime_or)
+DISCRETE_STEP(dst_xtime_or)
 {
 	int	in0 = (int)DST_XTIME_OR__IN0;
 	int	in1 = (int)DST_XTIME_OR__IN1;
@@ -2687,7 +2693,7 @@ static DISCRETE_STEP(dst_xtime_or)
 #define DST_XTIME_XOR_OUT_HIGH		DISCRETE_INPUT(3)
 #define DST_XTIME_XOR_INVERT		DISCRETE_INPUT(4)
 
-static DISCRETE_STEP(dst_xtime_xor)
+DISCRETE_STEP(dst_xtime_xor)
 {
 	int	in0 = (int)DST_XTIME_XOR__IN0;
 	int	in1 = (int)DST_XTIME_XOR__IN1;

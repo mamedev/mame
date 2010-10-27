@@ -201,7 +201,7 @@ static const discrete_module module_list[] =
 {
 	{ DSO_OUTPUT      ,"DSO_OUTPUT"      , 0 ,0                                      ,dso_output_reset      ,dso_output_step      ,NULL                  ,NULL                 },
 	{ DSO_CSVLOG      ,"DSO_CSVLOG"      , 0 ,sizeof(struct dso_csvlog_context)      ,NULL                  ,dso_csvlog_step      ,dso_csvlog_start      ,dso_csvlog_stop      },
-	{ DSO_WAVELOG     ,"DSO_WAVELOG"     , 0 ,sizeof(struct dso_wavelog_context)     ,NULL                  ,dso_wavelog_step     ,dso_wavelog_start     ,dso_wavelog_stop     },
+	{ DSO_WAVELOG     ,"DSO_WAVELOG"     , 0 ,sizeof(struct dso_wavlog_context)      ,NULL                  ,dso_wavlog_step      ,dso_wavlog_start      ,dso_wavlog_stop     },
 	{ DSO_IMPORT      ,"DSO_IMPORT"      , 0 ,0                                      ,NULL                  ,NULL                 ,NULL                  ,NULL                 },
 
 	/* parallel modules */
@@ -261,7 +261,7 @@ static const discrete_module module_list[] =
 	{ DST_LOOKUP_TABLE,"DST_LOOKUP_TABLE", 1 ,0                                      ,NULL                  ,dst_lookup_table_step,NULL                  ,NULL                 },
 	{ DST_MULTIPLEX   ,"DST_MULTIPLEX"   , 1 ,sizeof(struct dst_size_context)        ,dst_multiplex_reset   ,dst_multiplex_step   ,NULL                  ,NULL                 },
 	{ DST_ONESHOT     ,"DST_ONESHOT"     , 1 ,sizeof(struct dst_oneshot_context)     ,dst_oneshot_reset     ,dst_oneshot_step     ,NULL                  ,NULL                 },
-	{ DST_RAMP        ,"DST_RAMP"        , 1 ,sizeof(struct dss_ramp_context)        ,dst_ramp_reset        ,dst_ramp_step        ,NULL                  ,NULL                 },
+	{ DST_RAMP        ,"DST_RAMP"        , 1 ,sizeof(struct dst_ramp_context)        ,dst_ramp_reset        ,dst_ramp_step        ,NULL                  ,NULL                 },
 	{ DST_SAMPHOLD    ,"DST_SAMPHOLD"    , 1 ,sizeof(struct dst_samphold_context)    ,dst_samphold_reset    ,dst_samphold_step    ,NULL                  ,NULL                 },
 	{ DST_SWITCH      ,"DST_SWITCH"      , 1 ,0                                      ,NULL                  ,dst_switch_step      ,NULL                  ,NULL                 },
 	{ DST_ASWITCH     ,"DST_ASWITCH"     , 1 ,0                                      ,NULL                  ,dst_aswitch_step     ,NULL                  ,NULL                 },
@@ -269,7 +269,7 @@ static const discrete_module module_list[] =
 	/* Component specific */
 	{ DST_COMP_ADDER  ,"DST_COMP_ADDER"  , 1 ,sizeof(struct dst_comp_adder_context)  ,dst_comp_adder_reset  ,dst_comp_adder_step  ,NULL                  ,NULL                 },
 	{ DST_DAC_R1      ,"DST_DAC_R1"      , 1 ,sizeof(struct dst_dac_r1_context)      ,dst_dac_r1_reset      ,dst_dac_r1_step      ,NULL                  ,NULL                 },
-	{ DST_DIODE_MIX   ,"DST_DIODE_MIX"   , 1 ,sizeof(struct dst_diode_mix__context)  ,dst_diode_mix_reset   ,dst_diode_mix_step   ,NULL                  ,NULL                 },
+	{ DST_DIODE_MIX   ,"DST_DIODE_MIX"   , 1 ,sizeof(struct dst_diode_mix_context)   ,dst_diode_mix_reset   ,dst_diode_mix_step   ,NULL                  ,NULL                 },
 	{ DST_INTEGRATE   ,"DST_INTEGRATE"   , 1 ,sizeof(struct dst_integrate_context)   ,dst_integrate_reset   ,dst_integrate_step   ,NULL                  ,NULL                 },
 	{ DST_MIXER       ,"DST_MIXER"       , 1 ,sizeof(struct dst_mixer_context)       ,dst_mixer_reset       ,dst_mixer_step       ,NULL                  ,NULL                 },
 	{ DST_OP_AMP      ,"DST_OP_AMP"      , 1 ,sizeof(struct dst_op_amp_context)      ,dst_op_amp_reset      ,dst_op_amp_step      ,NULL                  ,NULL                 },
@@ -283,10 +283,10 @@ static const discrete_module module_list[] =
 
 	/* from disc_flt.c */
 	/* Generic modules */
-	{ DST_FILTER1     ,"DST_FILTER1"     , 1 ,sizeof(struct dss_filter1_context)     ,dst_filter1_reset     ,dst_filter1_step     ,NULL                  ,NULL                 },
-	{ DST_FILTER2     ,"DST_FILTER2"     , 1 ,sizeof(struct dss_filter2_context)     ,dst_filter2_reset     ,dst_filter2_step     ,NULL                  ,NULL                 },
+	{ DST_FILTER1     ,"DST_FILTER1"     , 1 ,sizeof(struct dst_filter1_context)     ,dst_filter1_reset     ,dst_filter1_step     ,NULL                  ,NULL                 },
+	{ DST_FILTER2     ,"DST_FILTER2"     , 1 ,sizeof(struct dst_filter2_context)     ,dst_filter2_reset     ,dst_filter2_step     ,NULL                  ,NULL                 },
 	/* Component specific modules */
-	{ DST_SALLEN_KEY  ,"DST_SALLEN_KEY"  , 1 ,sizeof(struct dss_filter2_context)     ,dst_sallen_key_reset  ,dst_sallen_key_step  ,NULL                  ,NULL                 },
+	{ DST_SALLEN_KEY  ,"DST_SALLEN_KEY"  , 1 ,sizeof(struct dst_filter2_context)     ,dst_sallen_key_reset  ,dst_sallen_key_step  ,NULL                  ,NULL                 },
 	{ DST_CRFILTER    ,"DST_CRFILTER"    , 1 ,sizeof(struct dst_rcfilter_context)    ,dst_crfilter_reset    ,dst_crfilter_step    ,NULL                  ,NULL                 },
 	{ DST_OP_AMP_FILT ,"DST_OP_AMP_FILT" , 1 ,sizeof(struct dst_op_amp_filt_context) ,dst_op_amp_filt_reset ,dst_op_amp_filt_step ,NULL                  ,NULL                 },
 	{ DST_RC_CIRCUIT_1,"DST_RC_CIRCUIT_1", 1 ,sizeof(struct dst_rc_circuit_1_context),dst_rc_circuit_1_reset,dst_rc_circuit_1_step,NULL                  ,NULL                 },
@@ -300,9 +300,9 @@ static const discrete_module module_list[] =
 	{ DST_RCFILTER    ,"DST_RCFILTER"    , 1 ,sizeof(struct dst_rcfilter_context)    ,dst_rcfilter_reset    ,dst_rcfilter_step    ,NULL                  ,NULL                 },
 	{ DST_RCFILTER_SW ,"DST_RCFILTER_SW" , 1 ,sizeof(struct dst_rcfilter_sw_context) ,dst_rcfilter_sw_reset ,dst_rcfilter_sw_step ,NULL                  ,NULL                 },
 	/* For testing - seem to be buggered.  Use versions not ending in N. */
-	{ DST_RCFILTERN   ,"DST_RCFILTERN"   , 1 ,sizeof(struct dss_filter1_context)     ,dst_rcfilterN_reset   ,dst_filter1_step     ,NULL                  ,NULL                 },
-	{ DST_RCDISCN     ,"DST_RCDISCN"     , 1 ,sizeof(struct dss_filter1_context)     ,dst_rcdiscN_reset     ,dst_rcdiscN_step     ,NULL                  ,NULL                 },
-	{ DST_RCDISC2N    ,"DST_RCDISC2N"    , 1 ,sizeof(struct dss_rcdisc2_context)     ,dst_rcdisc2N_reset    ,dst_rcdisc2N_step    ,NULL                  ,NULL                 },
+	{ DST_RCFILTERN   ,"DST_RCFILTERN"   , 1 ,sizeof(struct dst_filter1_context)     ,dst_rcfilterN_reset   ,dst_filter1_step     ,NULL                  ,NULL                 },
+	{ DST_RCDISCN     ,"DST_RCDISCN"     , 1 ,sizeof(struct dst_filter1_context)     ,dst_rcdiscN_reset     ,dst_rcdiscN_step     ,NULL                  ,NULL                 },
+	{ DST_RCDISC2N    ,"DST_RCDISC2N"    , 1 ,sizeof(struct dst_rcdisc2_context)     ,dst_rcdisc2N_reset    ,dst_rcdisc2N_step    ,NULL                  ,NULL                 },
 
 	/* from disc_dev.c */
 	/* generic modules */
@@ -314,7 +314,6 @@ static const discrete_module module_list[] =
 	{ DSD_555_VCO1    ,"DSD_555_VCO1"    , 1 ,sizeof(struct dsd_555_vco1_context)    ,dsd_555_vco1_reset    ,dsd_555_vco1_step    ,NULL                  ,NULL                 },
 	{ DSD_566         ,"DSD_566"         , 1 ,sizeof(struct dsd_566_context)         ,dsd_566_reset         ,dsd_566_step         ,NULL                  ,NULL                 },
 	{ DSD_LS624       ,"DSD_LS624"       , 1 ,sizeof(struct dsd_ls624_context)       ,dsd_ls624_reset       ,dsd_ls624_step       ,NULL                  ,NULL                 },
-	{ DSD_LS629       ,"DSD_LS629"       , 1 ,sizeof(struct dsd_ls629_context)       ,dsd_ls629_reset       ,dsd_ls629_step       ,NULL                  ,NULL                 },
 	/* must be the last one */
 	{ DSS_NULL        ,"DSS_NULL"        , 0 ,0                                      ,NULL                  ,NULL                 ,NULL                  ,NULL                 }
 };

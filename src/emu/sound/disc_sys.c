@@ -23,7 +23,7 @@ struct dso_csvlog_context
 	char name[32];
 };
 
-struct dso_wavelog_context
+struct dso_wavlog_context
 {
 	wav_file *wavfile;
 	char name[32];
@@ -103,9 +103,12 @@ static void task_check(discrete_task *task, discrete_task *dest_task)
 	}
 }
 
-static DISCRETE_START( dso_task_start )
+#define DISCRETE_DECLARE_TASK	discrete_task *task = (discrete_task *) node->context;
+
+DISCRETE_START( dso_task_start )
 {
-	discrete_task *task =  (discrete_task *) node->context;
+	DISCRETE_DECLARE_TASK
+
 	const linked_list_entry *task_entry;
 
 	task->task_group = (int) DISCRETE_INPUT(0);
@@ -123,18 +126,20 @@ static DISCRETE_START( dso_task_start )
 
 }
 
-static DISCRETE_STEP( dso_task_end )
+DISCRETE_STEP( dso_task_end )
 {
-	discrete_task *task =  (discrete_task *) node->context;
+	DISCRETE_DECLARE_TASK
+
 	int i;
 
 	for (i = 0; i < task->numbuffered; i++)
 		*(task->ptr[i]++) = *task->source[i];
 }
 
-static DISCRETE_STEP( dso_task_start )
+DISCRETE_STEP( dso_task_start )
 {
-	const discrete_task *task =  (discrete_task *) node->context;
+	DISCRETE_DECLARE_TASK
+
 	const linked_list_entry *entry;
 
 	/* update source node buffer */
@@ -146,12 +151,12 @@ static DISCRETE_STEP( dso_task_start )
 }
 
 
-static DISCRETE_RESET( dso_task )
+DISCRETE_RESET( dso_task )
 {
 	/* nothing to do - just avoid being stepped */
 }
 
-static DISCRETE_STEP( dso_output )
+DISCRETE_STEP( dso_output )
 {
 	stream_sample_t **output = (stream_sample_t **) &node->context;
 	double val;
@@ -163,14 +168,15 @@ static DISCRETE_STEP( dso_output )
 	(*output)++;
 }
 
-static DISCRETE_RESET( dso_output )
+DISCRETE_RESET( dso_output )
 {
 	/* nothing to do - just avoid being stepped */
 }
 
-static DISCRETE_START( dso_csvlog )
+DISCRETE_START( dso_csvlog )
 {
-	struct dso_csvlog_context *context = (struct dso_csvlog_context *) node->context;
+	DISCRETE_DECLARE_CONTEXT(dso_csvlog)
+
 	int log_num, node_num;
 
 	log_num = node_module_index(node);
@@ -191,18 +197,19 @@ static DISCRETE_START( dso_csvlog )
 	fprintf(context->csv_file, "\n");
 }
 
-static DISCRETE_STOP( dso_csvlog )
+DISCRETE_STOP( dso_csvlog )
 {
-	struct dso_csvlog_context *context = (struct dso_csvlog_context *) node->context;
+	DISCRETE_DECLARE_CONTEXT(dso_csvlog)
 
 	/* close any csv files */
 	if (context->csv_file)
 		fclose(context->csv_file);
 }
 
-static DISCRETE_STEP( dso_csvlog )
+DISCRETE_STEP( dso_csvlog )
 {
-	struct dso_csvlog_context *context = (struct dso_csvlog_context *) node->context;
+	DISCRETE_DECLARE_CONTEXT(dso_csvlog)
+
 	int nodenum;
 
 	/* Dump any csv logs */
@@ -214,9 +221,10 @@ static DISCRETE_STEP( dso_csvlog )
 	fprintf(context->csv_file, "\n");
 }
 
-static DISCRETE_START( dso_wavelog )
+DISCRETE_START( dso_wavlog )
 {
-	struct dso_wavelog_context *context = (struct dso_wavelog_context *) node->context;
+	DISCRETE_DECLARE_CONTEXT(dso_wavlog)
+
 	int log_num;
 
 	log_num = node_module_index(node);
@@ -224,18 +232,19 @@ static DISCRETE_START( dso_wavelog )
 	context->wavfile = wav_open(context->name, node->info->sample_rate, node->active_inputs/2);
 }
 
-static DISCRETE_STOP( dso_wavelog )
+DISCRETE_STOP( dso_wavlog )
 {
-	struct dso_wavelog_context *context = (struct dso_wavelog_context *) node->context;
+	DISCRETE_DECLARE_CONTEXT(dso_wavlog)
 
 	/* close any wave files */
 	if (context->wavfile)
 		wav_close(context->wavfile);
 }
 
-static DISCRETE_STEP( dso_wavelog )
+DISCRETE_STEP( dso_wavlog )
 {
-	struct dso_wavelog_context *context = (struct dso_wavelog_context *) node->context;
+	DISCRETE_DECLARE_CONTEXT(dso_wavlog)
+
 	double val;
 	INT16 wave_data_l, wave_data_r;
 
@@ -246,12 +255,12 @@ static DISCRETE_STEP( dso_wavelog )
 	wave_data_l = (INT16)val;
 	if (node->active_inputs == 2)
 	{
-		/* DISCRETE_WAVELOG1 */
+		/* DISCRETE_WAVLOG1 */
 		wav_add_data_16(context->wavfile, &wave_data_l, 1);
 	}
 	else
 	{
-		/* DISCRETE_WAVELOG2 */
+		/* DISCRETE_WAVLOG2 */
 		val = DISCRETE_INPUT(2) * DISCRETE_INPUT(3);
 		val = (val < -32768) ? -32768 : (val > 32767) ? 32767 : val;
 		wave_data_r = (INT16)val;
