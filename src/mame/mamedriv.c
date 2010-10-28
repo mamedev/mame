@@ -4845,7 +4845,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2005.03 The Rumble Fish 2 */
 	DRIVER( ngbc )		/* 2005.07 NeoGeo Battle Colloseum */
 						/* 2005.09 Samurai Spirits Tenkaichi Kenkakuden */
-						/* 2005.10 The King of Fighters XI */
+	DRIVER( kofxi )		/* 2005.10 The King of Fighters XI */
 	DRIVER( fotns )		/* 2005.12 Hokuto no Ken */
 						/* 2006.02 Metal Slug 6 */
 	DRIVER( xtrmhnt2 )			/* 2006.09 Extreme Hunting 2 Tournament Edition */

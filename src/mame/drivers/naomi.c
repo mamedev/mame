@@ -6518,6 +6518,7 @@ static const UINT32 vfurlong_key = 0xa547a;
 static const UINT32 salmankt_key = 0x34b74;
 static const UINT32 maxspeed_key = 0x28dd6;
 static const UINT32 ftspeed_key  = 0x0762f;
+static const UINT32 kofxi_key    = 0xa4be3;
 
 static DRIVER_INIT( atomiswave )
 {
@@ -6558,6 +6559,7 @@ AW_DRIVER_INIT(xtrmhnt2)
 AW_DRIVER_INIT(dolphin)
 AW_DRIVER_INIT(rumblef)
 AW_DRIVER_INIT(ngbc)
+AW_DRIVER_INIT(kofxi)
 AW_DRIVER_INIT(kofnw)
 AW_DRIVER_INIT(kov7sprt)
 AW_DRIVER_INIT(ggisuka)
@@ -6814,6 +6816,21 @@ ROM_START( ftspeed )
         ROM_LOAD( "ax1706m01.ic16", 0x6000000, 0x1000000, CRC(804b2eb2) SHA1(fcca02a5a8c09eb16548255115fb105c9c49c4e0) )
 ROM_END
 
+ROM_START( kofxi )
+	ROM_REGION( 0x200000, "awflash", 0)
+	AW_BIOS
+
+	ROM_REGION( 0xf000000, "user1", ROMREGION_ERASE)
+        ROM_LOAD( "ax3201p01.fmem1", 0x0000000, 0x0800000, CRC(6dbdd71b) SHA1(cce3897b104f5d923d8136485fc80eb9717ff4b5) ) 
+        ROM_LOAD( "ax3201m01.mrom1", 0x1000000, 0x2000000, CRC(6b9933c3) SHA1(5f92e6ec988346fea0f53ef9968e930cc49784b7) ) 
+        ROM_LOAD( "ax3202m01.mrom2", 0x3000000, 0x2000000, CRC(9e5fc27f) SHA1(de66c9a3c425e154af9384bf470007ee5b734ca8) ) 
+        ROM_LOAD( "ax3207m01.mrom7", 0x5000000, 0x2000000, CRC(4acb6448) SHA1(ad15568c69701f4a04570bb374fe9f04f4e1435d) ) 
+        ROM_LOAD( "ax3203m01.mrom3", 0x7000000, 0x2000000, CRC(56a1c9ea) SHA1(fbf6748cea8ebf2f0cea72c01fef77a50533e077) ) 
+        ROM_LOAD( "ax3204m01.mrom4", 0x9000000, 0x2000000, CRC(47c59a1c) SHA1(c42f01f8ec2c6f82f3bc2d5f6d4c545c2ab84ef3) ) 
+        ROM_LOAD( "ax3205m01.mrom5", 0xb000000, 0x2000000, CRC(027f97d3) SHA1(e81e8843ce142bf03e7a4d122ef882cd13767fda) ) 
+        ROM_LOAD( "ax3206m01.mrom6", 0xd000000, 0x2000000, CRC(e922b8f2) SHA1(45dd5b804663807960b434aa9ed9f4e23ba66838) ) 
+ROM_END
+
 /* Atomiswave */
 GAME( 2001, awbios,   0,        aw,    aw,    atomiswave, ROT0, "Sammy",                           "Atomiswave Bios", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
 
@@ -6829,6 +6846,7 @@ GAME( 2004, ftspeed,  awbios,   aw,    aw,    ftspeed,  ROT0, "Sammy",				 "Fast
 GAME( 2004, kov7sprt, awbios,   aw,    aw,    kov7sprt, ROT0, "Sammy / IGS",			 "Knights of Valour - The Seven Spirits", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 GAME( 2005, vfurlong, awbios,   aw,    aw,    vfurlong, ROT0, "Sammy",			         "Net Select Keiba Victory Furlong", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2005, ngbc,     awbios,   aw,    aw,    ngbc,     ROT0, "Sammy / SNK Playmore",            "Neo-Geo Battle Coliseum", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+GAME( 2005, kofxi,    awbios,   aw,    aw,    kofxi,    ROT0, "Sammy / SNK Playmore",            "The King of Fighters XI", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2005, fotns,    awbios,   aw,    aw,    fotns,    ROT0, "Sega / Arc System Works",         "Fist Of The North Star", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2005, kofnw,    awbios,   aw,    aw,    kofnw,    ROT0, "Sammy / SNK Playmore",            "The King of Fighters Neowave", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2005, kofnwj,   kofnw,   aw,    aw,    kofnw,    ROT0, "Sammy / SNK Playmore",            "The King of Fighters Neowave (Japan)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
