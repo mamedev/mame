@@ -148,14 +148,6 @@ static void i80286_set_a20_line(i80286_state *cpustate, int state)
 static CPU_RESET( i80286 )
 {
 	i80286_state *cpustate = get_safe_token(device);
-	static int urinit=1;
-
-	/* in my docu not all registers are initialized! */
-	if (urinit) {
-		i80286_urinit();
-		urinit=0;
-
-	}
 
 	cpustate->sregs[CS] = 0xf000;
 	cpustate->base[CS] = 0xff0000;
@@ -302,6 +294,8 @@ static CPU_INIT( i80286 )
 		cpustate->amask = 0x00ffff;
 
 	cpustate->fetch_xor = BYTE_XOR_LE(0);
+
+	i80286_urinit();
 }
 
 
@@ -484,7 +478,7 @@ CPU_GET_INFO( i80286 )
 					cpustate->flags & 0x0001 ? 'C' : '.');
 			break;
 
-		case CPUINFO_STR_REGISTER + I80286_PC:			sprintf(info->s, "PC:%04X", cpustate->pc); break;
+		case CPUINFO_STR_REGISTER + I80286_PC:			sprintf(info->s, "PC:%06X", cpustate->pc); break;
 		case CPUINFO_STR_REGISTER + I80286_IP:			sprintf(info->s, "IP: %04X", cpustate->pc - cpustate->base[CS]); break;
 		case CPUINFO_STR_REGISTER + I80286_SP:			sprintf(info->s, "SP: %04X", cpustate->regs.w[SP]); break;
 		case CPUINFO_STR_REGISTER + I80286_FLAGS:		sprintf(info->s, "F:%04X", cpustate->flags); break;
