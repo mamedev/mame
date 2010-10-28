@@ -36,6 +36,7 @@
 
 // MAMEOS headers
 #include "debugosx.h"
+#include "osdsdl.h"
 
 
 
@@ -63,27 +64,27 @@ static void console_create_window(running_machine *machine);
 
 
 //============================================================
-//  osd_init_debugger
+//  sdl_osd_interface::init_debugger
 //============================================================
 
-void osd_init_debugger(running_machine *machine)
+void sdl_osd_interface::init_debugger()
 {
 }
 
 //============================================================
-//  osd_wait_for_debugger
+//  sdl_osd_interface::wait_for_debugger
 //============================================================
 
-void osd_wait_for_debugger(running_device *device, int firststop)
+void sdl_osd_interface::wait_for_debugger(running_device &device, bool firststop)
 {
 	// create a console window
 	if (main_console == nil)
-		console_create_window(device->machine);
+		console_create_window(&machine());
 
 	// make sure the debug windows are visible
 	waiting_for_debugger = YES;
 	if (firststop) {
-		NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:[NSValue valueWithPointer:device],
+		NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:[NSValue valueWithPointer:&device],
 																		@"MAMEDebugDevice",
 																		nil];
 		[[NSNotificationCenter defaultCenter] postNotificationName:MAMEShowDebuggerNotification
