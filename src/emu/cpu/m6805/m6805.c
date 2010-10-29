@@ -40,7 +40,8 @@ enum
 {
 	SUBTYPE_M6805,
 	SUBTYPE_M68705,
-	SUBTYPE_HD63705
+	SUBTYPE_HD63705,
+	SUBTYPE_M68HC05EG
 };
 
 /* 6805 Registers */
@@ -429,6 +430,24 @@ static void Interrupt( m6805_Regs *cpustate )
 				RM16( cpustate, 0x1fee, &pPC);
 			}
 		}
+		else if (SUBTYPE == SUBTYPE_M68HC05EG)
+		{
+			if((cpustate->pending_interrupts&(1<<M68HC05EG_INT_IRQ))!=0)
+			{
+				cpustate->pending_interrupts &= ~(1<<M68HC05EG_INT_IRQ);
+				RM16( cpustate, 0x1ffa, &pPC);
+			}
+			else if((cpustate->pending_interrupts&(1<<M68HC05EG_INT_TIMER))!=0)
+			{
+				cpustate->pending_interrupts &= ~(1<<M68HC05EG_INT_TIMER);
+				RM16( cpustate, 0x1ff8, &pPC);
+			}
+			else if((cpustate->pending_interrupts&(1<<M68HC05EG_INT_CPI))!=0)
+			{
+				cpustate->pending_interrupts &= ~(1<<M68HC05EG_INT_CPI);
+				RM16( cpustate, 0x1ff6, &pPC);
+			}
+		}
 		else
 		{
 			RM16( cpustate, 0xffff - 5, &pPC );
@@ -803,6 +822,43 @@ static CPU_EXECUTE( m6805 )
 }
 
 /****************************************************************************
+ * M68HC05EG section
+ ****************************************************************************/
+static CPU_INIT( m68hc05eg )
+{
+	m6805_Regs *cpustate = get_safe_token(device);
+	state_register(cpustate, "m68hc05eg", device);
+	cpustate->irq_callback = irqcallback;
+	cpustate->device = device;
+}
+
+static CPU_RESET( m68hc05eg )
+{
+	m6805_Regs *cpustate = get_safe_token(device);
+	CPU_RESET_CALL(m6805);
+
+	/* Overide default 6805 type */
+	cpustate->subtype = SUBTYPE_M68HC05EG;
+	SP_MASK = 0xff;
+	SP_LOW	= 0xc0;
+	RM16( cpustate, 0x1ffe, &cpustate->pc );
+}
+
+static void m68hc05eg_set_irq_line(m6805_Regs *cpustate, int irqline, int state)
+{
+	if (cpustate->irq_state[irqline] != state)
+	{
+		cpustate->irq_state[irqline] = state;
+
+		if (state != CLEAR_LINE)
+		{
+			cpustate->pending_interrupts |= 1<<irqline;
+		}
+	}
+}
+
+
+/****************************************************************************
  * M68705 section
  ****************************************************************************/
 static CPU_INIT( m68705 )
@@ -981,6 +1037,47 @@ CPU_GET_INFO( m6805 )
 	}
 }
 
+/**************************************************************************
+ * CPU-specific set_info for 68HC05EG
+ **************************************************************************/
+static CPU_SET_INFO( m68hc05eg )
+{
+	m6805_Regs *cpustate = get_safe_token(device);
+
+	switch(state)
+	{
+		case CPUINFO_INT_INPUT_STATE + M68HC05EG_INT_IRQ:	m68hc05eg_set_irq_line(cpustate, M68HC05EG_INT_IRQ, info->i); break;
+		case CPUINFO_INT_INPUT_STATE + M68HC05EG_INT_TIMER:	m68hc05eg_set_irq_line(cpustate, M68HC05EG_INT_TIMER, info->i); break;
+		case CPUINFO_INT_INPUT_STATE + M68HC05EG_INT_CPI:	m68hc05eg_set_irq_line(cpustate, M68HC05EG_INT_CPI, info->i); break;
+
+		default:						CPU_SET_INFO_CALL(m6805); break;
+	}
+}
+
+CPU_GET_INFO( m68hc05eg )
+{
+	m6805_Regs *cpustate = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
+
+	switch (state)
+	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case CPUINFO_INT_INPUT_STATE + M68HC05EG_INT_IRQ:	info->i = cpustate->irq_state[M68HC05EG_INT_IRQ]; break;
+		case CPUINFO_INT_INPUT_STATE + M68HC05EG_INT_TIMER:	info->i = cpustate->irq_state[M68HC05EG_INT_TIMER]; break;
+		case CPUINFO_INT_INPUT_STATE + M68HC05EG_INT_CPI:	info->i = cpustate->irq_state[M68HC05EG_INT_CPI]; break;
+
+		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 13;					break;
+
+		/* --- the following bits of info are returned as pointers to data or functions --- */
+		case CPUINFO_FCT_SET_INFO:		info->setinfo = CPU_SET_INFO_NAME(m68hc05eg);	break;
+		case CPUINFO_FCT_INIT:			info->init = CPU_INIT_NAME(m68hc05eg);			break;
+		case CPUINFO_FCT_RESET:			info->reset = CPU_RESET_NAME(m68hc05eg);		break;
+
+		/* --- the following bits of info are returned as NULL-terminated strings --- */
+		case DEVINFO_STR_NAME:			strcpy(info->s, "M68HC05EG");	break;
+
+		default:    				CPU_GET_INFO_CALL(m6805);	break;
+	}
+}
 
 /**************************************************************************
  * CPU-specific set_info
@@ -1079,5 +1176,6 @@ CPU_GET_INFO( hd63705 )
 }
 
 DEFINE_LEGACY_CPU_DEVICE(M6805, m6805);
+DEFINE_LEGACY_CPU_DEVICE(M68HC05EG, m68hc05eg);
 DEFINE_LEGACY_CPU_DEVICE(M68705, m68705);
 DEFINE_LEGACY_CPU_DEVICE(HD63705, hd63705);
