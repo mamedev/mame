@@ -185,6 +185,7 @@ src/emu/cpu/i86/instr286.h svneol=native#text/plain
 src/emu/cpu/i86/instr86.c svneol=native#text/plain
 src/emu/cpu/i86/instr86.h svneol=native#text/plain
 src/emu/cpu/i86/modrm.h svneol=native#text/plain
+src/emu/cpu/i86/modrm286.h svneol=native#text/plain
 src/emu/cpu/i86/table186.h svneol=native#text/plain
 src/emu/cpu/i86/table286.h svneol=native#text/plain
 src/emu/cpu/i86/table86.h svneol=native#text/plain

@@ -17,8 +17,9 @@
    7 p present 0 gives trap when accessed
    UINT16 reserved (should be zero)
 */
-#define WRITEABLE(a) ((a&0xa)==2)
-#define READABLE(a) ( ((a&0xa)==0xa)|| ((a&8)==0) )
+#define IS_PRESENT(a)		( ( (a) & 0x80 ) == 0x80 )
+#define IS_WRITEABLE(a)		( ( (a) & 0xa ) == 2 )
+#define IS_READABLE(a)		( ( ( (a) & 0xa ) == 0xa ) || ( ( (a) & 8 ) == 0 ) )
 
 static void i80286_trap2(i80286_state *cpustate,int number)
 {
@@ -205,22 +206,22 @@ static void PREFIX286(_0fpre)(i8086_state *cpustate)
 			if (!PM) i80286_trap2(cpustate,ILLEGAL_INSTRUCTION);
 			tmp=GetRMWord(ModRM);
 			if (tmp&4) {
-				cpustate->ZeroVal=( ((tmp&~7)<cpustate->ldtr.limit)
-							&& READABLE( ReadByte(cpustate->ldtr.base+(tmp&~7)+5)) );
+				cpustate->ZeroVal=! ( ((tmp&~7)<cpustate->ldtr.limit)
+							&& IS_READABLE( ReadByte(cpustate->ldtr.base+(tmp&~7)+5)) );
 			} else {
-				cpustate->ZeroVal=( ((tmp&~7)<cpustate->gdtr.limit)
-							&& READABLE( ReadByte(cpustate->gdtr.base+(tmp&~7)+5)) );
+				cpustate->ZeroVal=! ( ((tmp&~7)<cpustate->gdtr.limit)
+							&& IS_READABLE( ReadByte(cpustate->gdtr.base+(tmp&~7)+5)) );
 			}
 			break;
 		case 0x28: /* verw */
 			if (!PM) i80286_trap2(cpustate,ILLEGAL_INSTRUCTION);
 			tmp=GetRMWord(ModRM);
 			if (tmp&4) {
-				cpustate->ZeroVal=( ((tmp&~7)<cpustate->ldtr.limit)
-							&& WRITEABLE( ReadByte(cpustate->ldtr.base+(tmp&~7)+5)) );
+				cpustate->ZeroVal=! ( ((tmp&~7)<cpustate->ldtr.limit)
+							&& IS_WRITEABLE( ReadByte(cpustate->ldtr.base+(tmp&~7)+5)) );
 			} else {
-				cpustate->ZeroVal=( ((tmp&~7)<cpustate->gdtr.limit)
-							&& WRITEABLE( ReadByte(cpustate->gdtr.base+(tmp&~7)+5)) );
+				cpustate->ZeroVal=! ( ((tmp&~7)<cpustate->gdtr.limit)
+							&& IS_WRITEABLE( ReadByte(cpustate->gdtr.base+(tmp&~7)+5)) );
 			}
 			break;
 		default:
@@ -268,19 +269,29 @@ static void PREFIX286(_0fpre)(i8086_state *cpustate)
 	case 2: /* LAR */
 		ModRM = FETCHOP;
 		tmp=GetRMWord(ModRM);
-		cpustate->ZeroVal=i80286_selector_okay(cpustate,tmp);
-		if (cpustate->ZeroVal) {
-			RegWord(ModRM)=tmp;
+		if ( i80286_selector_okay(cpustate,tmp) )
+		{
+			cpustate->ZeroVal = 0;
+			RegWord(ModRM) = ReadByte( i80286_selector_to_address(cpustate,tmp) + 5 ) << 8;
+		}
+		else
+		{
+			cpustate->ZeroVal = 1;
 		}
 		break;
 	case 3: /* LSL */
 		if (!PM) i80286_trap2(cpustate,ILLEGAL_INSTRUCTION);
 		ModRM = FETCHOP;
 		tmp=GetRMWord(ModRM);
-		cpustate->ZeroVal=i80286_selector_okay(cpustate,tmp);
-		if (cpustate->ZeroVal) {
+		if ( i80286_selector_okay(cpustate,tmp) )
+		{
+			cpustate->ZeroVal = 0;
 			addr=i80286_selector_to_address(cpustate,tmp);
 			RegWord(ModRM)=ReadWord(addr);
+		}
+		else
+		{
+			cpustate->ZeroVal = 1;
 		}
 		break;
 	case 6: /* clts */
@@ -295,14 +306,59 @@ static void PREFIX286(_0fpre)(i8086_state *cpustate)
 
 static void PREFIX286(_arpl)(i8086_state *cpustate) /* 0x63 */
 {
-	if (PM) {
-		UINT16 ModRM=FETCHOP, tmp=GetRMWord(ModRM);
+	if (PM)
+	{
+		UINT16 ModRM=FETCHOP, tmp=GetRMWord(ModRM), source=RegWord(ModRM);
 
-		cpustate->ZeroVal=i80286_selector_okay(cpustate,RegWord(ModRM))
-			  &&i80286_selector_okay(cpustate,RegWord(ModRM))
-			  &&((tmp&3)<(RegWord(ModRM)&3));
-		if (cpustate->ZeroVal) PutbackRMWord(ModRM, (tmp&~3)|(RegWord(ModRM)&3));
-	} else {
+		if ( i80286_selector_okay(cpustate,tmp) &&i80286_selector_okay(cpustate,source) &&((tmp&3)<(source&3)) )
+		{
+			cpustate->ZeroVal = 0;
+			PutbackRMWord(ModRM, (tmp&~3)|(source&3));
+		}
+		else
+		{
+			cpustate->ZeroVal = 1;
+		}
+	}
+	else
+	{
 		i80286_trap2(cpustate,ILLEGAL_INSTRUCTION);
 	}
 }
+
+static void i80286_check_permission(i8086_state *cpustate, UINT8 check_seg, UINT16 offset, i80286_size size, i80286_operation operation)
+{
+	if (PM)
+	{
+		/* Is the segment physically present? */
+		if ( ! IS_PRESENT( cpustate->rights[check_seg] ) )
+			throw GENERAL_PROTECTION_FAULT;
+
+		/* Would we go past the segment boundary? */
+		if ( offset + size > cpustate->limit[check_seg] )
+		{
+			throw GENERAL_PROTECTION_FAULT;
+		}
+
+		switch(operation)
+		{
+		case I80286_READ:
+			/* Is the segment readable? */
+			if ( ! IS_READABLE( cpustate->rights[check_seg] ) )
+				throw GENERAL_PROTECTION_FAULT;
+			break;
+
+		case I80286_WRITE:
+			/* Is the segment writeable?  */
+			if ( ! IS_WRITEABLE( cpustate->rights[check_seg] ) )
+				throw GENERAL_PROTECTION_FAULT;
+			break;
+
+		case I80286_EXECUTE:
+			/* TODO */
+			break;
+		}
+		/* TODO: Mark segment as accessed? */
+	}
+}
+

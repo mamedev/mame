@@ -98,7 +98,8 @@ typedef enum {
 
 #define SegBase(Seg)			(cpustate->sregs[Seg] << 4)
 
-#define DefaultBase(Seg)		((cpustate->seg_prefix && (Seg == DS || Seg == SS)) ? cpustate->prefix_base : cpustate->base[Seg])
+#define DefaultSeg(Seg)			((cpustate->seg_prefix && (Seg == DS || Seg == SS)) ? cpustate->prefix_seg : Seg)
+#define DefaultBase(Seg)		((cpustate->seg_prefix && (Seg == DS || Seg == SS)) ? cpustate->base[cpustate->prefix_seg] : cpustate->base[Seg])
 
 #define GetMemB(Seg,Off)		(read_mem_byte((DefaultBase(Seg) + (Off)) & AMASK))
 #define GetMemW(Seg,Off)		(read_mem_word((DefaultBase(Seg) + (Off)) & AMASK))

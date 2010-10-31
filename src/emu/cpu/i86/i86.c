@@ -62,10 +62,11 @@ struct _i8086_state
 	address_space *io;
 	int icount;
 
-	unsigned prefix_base;		   /* base address of the latest prefix segment */
 	char seg_prefix;				   /* prefix segment indicator */
+	UINT8	prefix_seg;					/* The prefixed segment */
 	unsigned ea;
 	UINT16 eo; /* HJB 12/13/98 effective offset of the address (before segment is added) */
+	UINT8 ea_seg;	/* effective segment of the address */
 
 	devcb_resolved_write_line	out_tmrout0_func;
 	devcb_resolved_write_line	out_tmrout1_func;
@@ -556,7 +557,7 @@ CPU_GET_INFO( i8086 )
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 1;							break;
-		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:			info->i = 8;							break;
+		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:			info->i = 16;							break;
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;							break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 50;							break;
 

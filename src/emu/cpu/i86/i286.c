@@ -75,10 +75,11 @@ struct _i80286_state
 	int halted;         /* Is the CPU halted ? */
 
 	int icount;
-	unsigned prefix_base;
 	char seg_prefix;
+	UINT8	prefix_seg;
 	unsigned ea;
 	UINT16 eo; /* HJB 12/13/98 effective offset of the address (before segment is added) */
+	UINT8 ea_seg;	/* effective segment of the address */
 };
 
 INLINE i80286_state *get_safe_token(running_device *device)
@@ -105,7 +106,7 @@ static struct i80x86_timing timing;
 #define i8086_state i80286_state
 
 #include "ea.h"
-#include "modrm.h"
+#include "modrm286.h"
 #include "instr86.h"
 #include "instr186.h"
 #include "instr286.h"
@@ -226,7 +227,14 @@ static CPU_EXECUTE( i80286 )
 		cpustate->seg_prefix=FALSE;
 		cpustate->prevpc = cpustate->pc;
 
-		TABLE286 // call instruction
+		try
+		{
+			TABLE286 // call instruction
+		}
+		catch (int e)
+		{
+			i80286_trap2(cpustate,e);
+		}
     }
 
 	/* adjust for any interrupts that came in */

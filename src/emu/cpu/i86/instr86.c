@@ -391,29 +391,29 @@ static void PREFIX(rep)(i8086_state *cpustate,int flagval)
     switch(next)
     {
 	case 0x26:  /* ES: */
-		cpustate->seg_prefix=TRUE;
-		cpustate->prefix_base=cpustate->base[ES];
+		cpustate->seg_prefix = TRUE;
+		cpustate->prefix_seg = ES;
 		if (!cpustate->rep_in_progress)
 			ICOUNT -= timing.override;
 		PREFIX(rep)(cpustate, flagval);
 		break;
 	case 0x2e:  /* CS: */
-		cpustate->seg_prefix=TRUE;
-		cpustate->prefix_base=cpustate->base[CS];
+		cpustate->seg_prefix = TRUE;
+		cpustate->prefix_seg = CS;
 		if (!cpustate->rep_in_progress)
 			ICOUNT -= timing.override;
 		PREFIX(rep)(cpustate, flagval);
 		break;
 	case 0x36:  /* SS: */
-		cpustate->seg_prefix=TRUE;
-		cpustate->prefix_base=cpustate->base[SS];
+		cpustate->seg_prefix = TRUE;
+		cpustate->prefix_seg = SS;
 		if (!cpustate->rep_in_progress)
 			ICOUNT -= timing.override;
 		PREFIX(rep)(cpustate, flagval);
 		break;
 	case 0x3e:  /* DS: */
-		cpustate->seg_prefix=TRUE;
-		cpustate->prefix_base=cpustate->base[DS];
+		cpustate->seg_prefix = TRUE;
+		cpustate->prefix_seg = DS;
 		if (!cpustate->rep_in_progress)
 			ICOUNT -= timing.override;
 		PREFIX(rep)(cpustate, flagval);
@@ -958,8 +958,8 @@ static void PREFIX86(_and_axd16)(i8086_state *cpustate)    /* Opcode 0x25 */
 
 static void PREFIX86(_es)(i8086_state *cpustate)    /* Opcode 0x26 */
 {
-	cpustate->seg_prefix=TRUE;
-	cpustate->prefix_base=cpustate->base[ES];
+	cpustate->seg_prefix = TRUE;
+	cpustate->prefix_seg = ES;
 	ICOUNT -= timing.override;
 	PREFIX(_instruction)[FETCHOP](cpustate);
 }
@@ -1034,8 +1034,8 @@ static void PREFIX86(_sub_axd16)(i8086_state *cpustate)    /* Opcode 0x2d */
 
 static void PREFIX86(_cs)(i8086_state *cpustate)    /* Opcode 0x2e */
 {
-    cpustate->seg_prefix=TRUE;
-	cpustate->prefix_base=cpustate->base[CS];
+    cpustate->seg_prefix = TRUE;
+	cpustate->prefix_seg = CS;
 	ICOUNT -= timing.override;
 	PREFIX(_instruction)[FETCHOP](cpustate);
 }
@@ -1111,8 +1111,8 @@ static void PREFIX86(_xor_axd16)(i8086_state *cpustate)    /* Opcode 0x35 */
 
 static void PREFIX86(_ss)(i8086_state *cpustate)    /* Opcode 0x36 */
 {
-	cpustate->seg_prefix=TRUE;
-	cpustate->prefix_base=cpustate->base[SS];
+	cpustate->seg_prefix = TRUE;
+	cpustate->prefix_seg = SS;
 	ICOUNT -= timing.override;
 	PREFIX(_instruction)[FETCHOP](cpustate);
 }
@@ -1182,8 +1182,8 @@ static void PREFIX86(_cmp_axd16)(i8086_state *cpustate)    /* Opcode 0x3d */
 
 static void PREFIX86(_ds)(i8086_state *cpustate)    /* Opcode 0x3e */
 {
-	cpustate->seg_prefix=TRUE;
-	cpustate->prefix_base=cpustate->base[DS];
+	cpustate->seg_prefix = TRUE;
+	cpustate->prefix_seg = DS;
 	ICOUNT -= timing.override;
 	PREFIX(_instruction)[FETCHOP](cpustate);
 }
@@ -3165,10 +3165,9 @@ static void PREFIX86(_invalid)(i8086_state *cpustate)
 #ifdef I80286
 	i80286_trap2(cpustate,ILLEGAL_INSTRUCTION);
 #else
-	 /* makes the cpu loops forever until user resets it */
-	/*{ debugger_break(Machine); } */
-	logerror("illegal instruction %.2x at %.5x\n",PEEKBYTE(cpustate->pc), cpustate->pc);
-	cpustate->pc--;
+	/* i8086/i8088 ignore an invalid opcode. */
+	/* i80186/i80188 probably also ignore an invalid opcode. */
+	logerror("illegal instruction %.2x at %.5x\n",PEEKBYTE(cpustate->pc-1), cpustate->pc);
 	ICOUNT -= 10;
 #endif
 }

@@ -669,6 +669,7 @@ $(CPUOBJ)/i86/i286.o:	$(CPUSRC)/i86/i286.c \
 						$(CPUSRC)/i86/instr86.c \
 						$(CPUSRC)/i86/instr186.c \
 						$(CPUSRC)/i86/instr286.c \
+						$(CPUSRC)/i86/modrm286.h \
 						$(I86DEPS)
 
 $(CPUOBJ)/i386/i386.o:	$(CPUSRC)/i386/i386.c \
