@@ -49,7 +49,7 @@ static void PREFIX186(_bound)(i8086_state *cpustate)    /* Opcode 0x62 */
     int high= (INT16)GetnextRMWord;
 	int tmp= (INT16)RegWord(ModRM);
 	if (tmp<low || tmp>high) {
-		cpustate->pc-=2;
+		cpustate->pc-= ( cpustate->seg_prefix ? 3 : 2 );
 		PREFIX86(_interrupt)(cpustate, 5);
 	}
 	ICOUNT -= timing.bound;
