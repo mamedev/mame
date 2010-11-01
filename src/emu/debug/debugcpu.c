@@ -121,30 +121,13 @@ static UINT64 expression_read_memory_region(running_machine *machine, const char
 static void expression_write_memory(void *param, const char *name, int space, UINT32 address, int size, UINT64 data);
 static void expression_write_program_direct(address_space *space, int opcode, offs_t address, int size, UINT64 data);
 static void expression_write_memory_region(running_machine *machine, const char *rgntag, offs_t address, int size, UINT64 data);
-static EXPRERR expression_validate(void *param, const char *name, int space);
+static expression_error::error_code expression_validate(void *param, const char *name, int space);
 
 /* variable getters/setters */
-static UINT64 get_wpaddr(void *globalref, void *ref);
-static UINT64 get_wpdata(void *globalref, void *ref);
-static UINT64 get_cpunum(void *globalref, void *ref);
-static UINT64 get_tempvar(void *globalref, void *ref);
-static void set_tempvar(void *globalref, void *ref, UINT64 value);
-static UINT64 get_beamx(void *globalref, void *ref);
-static UINT64 get_beamy(void *globalref, void *ref);
-static UINT64 get_frame(void *globalref, void *ref);
-
-
-
-/***************************************************************************
-    GLOBAL CONSTANTS
-***************************************************************************/
-
-const express_callbacks debug_expression_callbacks =
-{
-	expression_read_memory,
-	expression_write_memory,
-	expression_validate
-};
+static UINT64 get_cpunum(symbol_table &table, void *ref);
+static UINT64 get_beamx(symbol_table &table, void *ref);
+static UINT64 get_beamy(symbol_table &table, void *ref);
+static UINT64 get_frame(symbol_table &table, void *ref);
 
 
 
@@ -170,22 +153,25 @@ void debug_cpu_init(running_machine *machine)
 	global->wpindex = 1;
 
 	/* create a global symbol table */
-	global->symtable = symtable_alloc(NULL, machine);
+	global->symtable = global_alloc(symbol_table(machine));
+	
+	// configure our base memory accessors
+	debug_cpu_configure_memory(*machine, *global->symtable);
 
 	/* add "wpaddr", "wpdata", "cycles", "cpunum", "logunmap" to the global symbol table */
-	symtable_add_register(global->symtable, "wpaddr", NULL, get_wpaddr, NULL);
-	symtable_add_register(global->symtable, "wpdata", NULL, get_wpdata, NULL);
-	symtable_add_register(global->symtable, "cpunum", NULL, get_cpunum, NULL);
-	symtable_add_register(global->symtable, "beamx", (void *)first_screen, get_beamx, NULL);
-	symtable_add_register(global->symtable, "beamy", (void *)first_screen, get_beamy, NULL);
-	symtable_add_register(global->symtable, "frame", (void *)first_screen, get_frame, NULL);
+	global->symtable->add("wpaddr", symbol_table::READ_ONLY, &global->wpaddr);
+	global->symtable->add("wpdata", symbol_table::READ_ONLY, &global->wpdata);
+	global->symtable->add("cpunum", NULL, get_cpunum);
+	global->symtable->add("beamx", (void *)first_screen, get_beamx);
+	global->symtable->add("beamy", (void *)first_screen, get_beamy);
+	global->symtable->add("frame", (void *)first_screen, get_frame);
 
 	/* add the temporary variables to the global symbol table */
 	for (regnum = 0; regnum < NUM_TEMP_VARIABLES; regnum++)
 	{
 		char symname[10];
 		sprintf(symname, "temp%d", regnum);
-		symtable_add_register(global->symtable, symname, &global->tempvar[regnum], get_tempvar, set_tempvar);
+		global->symtable->add(symname, symbol_table::READ_WRITE, &global->tempvar[regnum]);
 	}
 
 	/* first CPU is visible by default */
@@ -196,6 +182,12 @@ void debug_cpu_init(running_machine *machine)
 		machine->primary_screen->register_vblank_callback(on_vblank, NULL);
 
 	machine->add_notifier(MACHINE_NOTIFY_EXIT, debug_cpu_exit);
+}
+
+
+void debug_cpu_configure_memory(running_machine &machine, symbol_table &table)
+{
+	table.configure_memory(&machine, expression_validate, expression_read_memory, expression_write_memory);
 }
 
 
@@ -277,7 +269,7 @@ symbol_table *debug_cpu_get_global_symtable(running_machine *machine)
 
 symbol_table *debug_cpu_get_visible_symtable(running_machine *machine)
 {
-	return machine->debugcpu_data->visiblecpu->debug()->symtable();
+	return &machine->debugcpu_data->visiblecpu->debug()->symtable();
 }
 
 
@@ -1071,8 +1063,8 @@ static void debug_cpu_exit(running_machine &machine)
 	debugcpu_private *global = machine.debugcpu_data;
 
 	/* free the global symbol table */
-	if (global != NULL && global->symtable != NULL)
-		symtable_free(global->symtable);
+	if (global != NULL)
+		global_free(global->symtable);
 }
 
 
@@ -1523,7 +1515,7 @@ static void expression_write_memory_region(running_machine *machine, const char 
     appropriate name
 -------------------------------------------------*/
 
-static EXPRERR expression_validate(void *param, const char *name, int space)
+static expression_error::error_code expression_validate(void *param, const char *name, int space)
 {
 	running_machine *machine = (running_machine *)param;
 	device_t *device = NULL;
@@ -1538,12 +1530,12 @@ static EXPRERR expression_validate(void *param, const char *name, int space)
 			{
 				device = expression_get_device(machine, name);
 				if (device == NULL)
-					return EXPRERR_INVALID_MEMORY_NAME;
+					return expression_error::INVALID_MEMORY_NAME;
 			}
 			if (device == NULL)
 				device = debug_cpu_get_visible_cpu(machine);
 			if (cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM + (space - EXPSPACE_PROGRAM_LOGICAL)) == NULL)
-				return EXPRERR_NO_SUCH_MEMORY_SPACE;
+				return expression_error::NO_SUCH_MEMORY_SPACE;
 			break;
 
 		case EXPSPACE_PROGRAM_PHYSICAL:
@@ -1554,12 +1546,12 @@ static EXPRERR expression_validate(void *param, const char *name, int space)
 			{
 				device = expression_get_device(machine, name);
 				if (device == NULL)
-					return EXPRERR_INVALID_MEMORY_NAME;
+					return expression_error::INVALID_MEMORY_NAME;
 			}
 			if (device == NULL)
 				device = debug_cpu_get_visible_cpu(machine);
 			if (cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM + (space - EXPSPACE_PROGRAM_PHYSICAL)) == NULL)
-				return EXPRERR_NO_SUCH_MEMORY_SPACE;
+				return expression_error::NO_SUCH_MEMORY_SPACE;
 			break;
 
 		case EXPSPACE_OPCODE:
@@ -1568,22 +1560,22 @@ static EXPRERR expression_validate(void *param, const char *name, int space)
 			{
 				device = expression_get_device(machine, name);
 				if (device == NULL)
-					return EXPRERR_INVALID_MEMORY_NAME;
+					return expression_error::INVALID_MEMORY_NAME;
 			}
 			if (device == NULL)
 				device = debug_cpu_get_visible_cpu(machine);
 			if (cpu_get_address_space(device, ADDRESS_SPACE_PROGRAM) == NULL)
-				return EXPRERR_NO_SUCH_MEMORY_SPACE;
+				return expression_error::NO_SUCH_MEMORY_SPACE;
 			break;
 
 		case EXPSPACE_REGION:
 			if (name == NULL)
-				return EXPRERR_MISSING_MEMORY_NAME;
+				return expression_error::MISSING_MEMORY_NAME;
 			if (memory_region(machine, name) == NULL)
-				return EXPRERR_INVALID_MEMORY_NAME;
+				return expression_error::INVALID_MEMORY_NAME;
 			break;
 	}
-	return EXPRERR_NONE;
+	return expression_error::NONE;
 }
 
 
@@ -1596,7 +1588,7 @@ static EXPRERR expression_validate(void *param, const char *name, int space)
     get_beamx - get beam horizontal position
 -------------------------------------------------*/
 
-static UINT64 get_beamx(void *globalref, void *ref)
+static UINT64 get_beamx(symbol_table &table, void *ref)
 {
 	screen_device *screen = reinterpret_cast<screen_device *>(ref);
 	return (screen != NULL) ? screen->hpos() : 0;
@@ -1607,7 +1599,7 @@ static UINT64 get_beamx(void *globalref, void *ref)
     get_beamy - get beam vertical position
 -------------------------------------------------*/
 
-static UINT64 get_beamy(void *globalref, void *ref)
+static UINT64 get_beamy(symbol_table &table, void *ref)
 {
 	screen_device *screen = reinterpret_cast<screen_device *>(ref);
 	return (screen != NULL) ? screen->vpos() : 0;
@@ -1618,56 +1610,10 @@ static UINT64 get_beamy(void *globalref, void *ref)
     get_frame - get current frame number
 -------------------------------------------------*/
 
-static UINT64 get_frame(void *globalref, void *ref)
+static UINT64 get_frame(symbol_table &table, void *ref)
 {
 	screen_device *screen = reinterpret_cast<screen_device *>(ref);
 	return (screen != NULL) ? screen->frame_number() : 0;
-}
-
-
-/*-------------------------------------------------
-    get_tempvar - getter callback for the
-    'tempX' symbols
--------------------------------------------------*/
-
-static UINT64 get_tempvar(void *globalref, void *ref)
-{
-	return *(UINT64 *)ref;
-}
-
-
-/*-------------------------------------------------
-    set_tempvar - setter callback for the
-    'tempX' symbols
--------------------------------------------------*/
-
-static void set_tempvar(void *globalref, void *ref, UINT64 value)
-{
-	*(UINT64 *)ref = value;
-}
-
-
-/*-------------------------------------------------
-    get_wpaddr - getter callback for the
-    'wpaddr' symbol
--------------------------------------------------*/
-
-static UINT64 get_wpaddr(void *globalref, void *ref)
-{
-	running_machine *machine = (running_machine *)globalref;
-	return machine->debugcpu_data->wpaddr;
-}
-
-
-/*-------------------------------------------------
-    get_wpdata - getter callback for the
-    'wpdata' symbol
--------------------------------------------------*/
-
-static UINT64 get_wpdata(void *globalref, void *ref)
-{
-	running_machine *machine = (running_machine *)globalref;
-	return machine->debugcpu_data->wpdata;
 }
 
 
@@ -1676,9 +1622,9 @@ static UINT64 get_wpdata(void *globalref, void *ref)
     'cpunum' symbol
 -------------------------------------------------*/
 
-static UINT64 get_cpunum(void *globalref, void *ref)
+static UINT64 get_cpunum(symbol_table &table, void *ref)
 {
-	running_machine *machine = (running_machine *)globalref;
+	running_machine *machine = reinterpret_cast<running_machine *>(table.globalref());
 	device_t *target = machine->debugcpu_data->visiblecpu;
 
 	device_execute_interface *exec = NULL;
@@ -1709,7 +1655,7 @@ device_debug::device_debug(device_t &device)
 	  m_state(NULL),
 	  m_disasm(NULL),
 	  m_flags(0),
-	  m_symtable(symtable_alloc(debug_cpu_get_global_symtable(device.machine), (void *)&device)),
+	  m_symtable(&device, debug_cpu_get_global_symtable(device.machine)),
 	  m_instrhook(NULL),
 	  m_dasm_override(NULL),
 	  m_opwidth(0),
@@ -1741,23 +1687,23 @@ device_debug::device_debug(device_t &device)
 	{
 		// add a global symbol for the current instruction pointer
 		if (m_exec != NULL)
-			symtable_add_register(m_symtable, "cycles", NULL, get_cycles, NULL);
+			m_symtable.add("cycles", NULL, get_cycles);
 
 		// add entries to enable/disable unmap reporting for each space
 		if (m_memory != NULL)
 		{
 			if (m_memory->space(AS_PROGRAM) != NULL)
-				symtable_add_register(m_symtable, "logunmap", (void *)m_memory->space(AS_PROGRAM), get_logunmap, set_logunmap);
+				m_symtable.add("logunmap", (void *)m_memory->space(AS_PROGRAM), get_logunmap, set_logunmap);
 			if (m_memory->space(AS_DATA) != NULL)
-				symtable_add_register(m_symtable, "logunmapd", (void *)m_memory->space(AS_DATA), get_logunmap, set_logunmap);
+				m_symtable.add("logunmapd", (void *)m_memory->space(AS_DATA), get_logunmap, set_logunmap);
 			if (m_memory->space(AS_IO) != NULL)
-				symtable_add_register(m_symtable, "logunmapi", (void *)m_memory->space(AS_IO), get_logunmap, set_logunmap);
+				m_symtable.add("logunmapi", (void *)m_memory->space(AS_IO), get_logunmap, set_logunmap);
 		}
 
 		// add all registers into it
 		astring tempstr;
 		for (const device_state_entry *entry = m_state->state_first(); entry != NULL; entry = entry->next())
-			symtable_add_register(m_symtable, tempstr.cpy(entry->symbol()).tolower(), (void *)(FPTR)entry->index(), get_cpu_reg, set_state);
+			m_symtable.add(tempstr.cpy(entry->symbol()).tolower(), (void *)(FPTR)entry->index(), get_state, set_state);
 	}
 
 	// set up execution-related stuff
@@ -1767,8 +1713,8 @@ device_debug::device_debug(device_t &device)
 		m_opwidth = min_opcode_bytes();
 
 		// if no curpc, add one
-		if (m_state != NULL && symtable_find(m_symtable, "curpc") == NULL)
-			symtable_add_register(m_symtable, "curpc", NULL, get_current_pc, 0);
+		if (m_state != NULL && m_symtable.find("curpc") == NULL)
+			m_symtable.add("curpc", NULL, get_current_pc);
 	}
 }
 
@@ -1779,10 +1725,6 @@ device_debug::device_debug(device_t &device)
 
 device_debug::~device_debug()
 {
-	// free the symbol table
-	if (m_symtable != NULL)
-		symtable_free(m_symtable);
-
 	// free breakpoints and watchpoints
 	breakpoint_clear_all();
 	watchpoint_clear_all();
@@ -2337,10 +2279,10 @@ void device_debug::halt_on_next_instruction(const char *fmt, ...)
 //  returning its index
 //-------------------------------------------------
 
-int device_debug::breakpoint_set(offs_t address, parsed_expression *condition, const char *action)
+int device_debug::breakpoint_set(offs_t address, const char *condition, const char *action)
 {
 	// allocate a new one
-	breakpoint *bp = auto_alloc(m_device.machine, breakpoint(m_device.machine->debugcpu_data->bpindex++, address, condition, action));
+	breakpoint *bp = auto_alloc(m_device.machine, breakpoint(m_symtable, m_device.machine->debugcpu_data->bpindex++, address, condition, action));
 
 	// hook it into our list
 	bp->m_next = m_bplist;
@@ -2426,12 +2368,12 @@ void device_debug::breakpoint_enable_all(bool enable)
 //  returning its index
 //-------------------------------------------------
 
-int device_debug::watchpoint_set(address_space &space, int type, offs_t address, offs_t length, parsed_expression *condition, const char *action)
+int device_debug::watchpoint_set(address_space &space, int type, offs_t address, offs_t length, const char *condition, const char *action)
 {
 	assert(space.spacenum() < ARRAY_LENGTH(m_wplist));
 
 	// allocate a new one
-	watchpoint *wp = auto_alloc(m_device.machine, watchpoint(m_device.machine->debugcpu_data->bpindex++, space, type, address, length, condition, action));
+	watchpoint *wp = auto_alloc(m_device.machine, watchpoint(m_symtable, m_device.machine->debugcpu_data->bpindex++, space, type, address, length, condition, action));
 
 	// hook it into our list
 	wp->m_next = m_wplist[space.spacenum()];
@@ -3115,9 +3057,9 @@ UINT32 device_debug::dasm_wrapped(astring &buffer, offs_t pc)
 //  current instruction pointer
 //-------------------------------------------------
 
-UINT64 device_debug::get_current_pc(void *globalref, void *ref)
+UINT64 device_debug::get_current_pc(symbol_table &table, void *ref)
 {
-	device_t *device = reinterpret_cast<device_t *>(globalref);
+	device_t *device = reinterpret_cast<device_t *>(table.globalref());
 	return device->debug()->pc();
 }
 
@@ -3127,9 +3069,9 @@ UINT64 device_debug::get_current_pc(void *globalref, void *ref)
 //  'cycles' symbol
 //-------------------------------------------------
 
-UINT64 device_debug::get_cycles(void *globalref, void *ref)
+UINT64 device_debug::get_cycles(symbol_table &table, void *ref)
 {
-	device_t *device = reinterpret_cast<device_t *>(globalref);
+	device_t *device = reinterpret_cast<device_t *>(table.globalref());
 	return device->debug()->m_exec->cycles_remaining();
 }
 
@@ -3139,9 +3081,9 @@ UINT64 device_debug::get_cycles(void *globalref, void *ref)
 //  symbols
 //-------------------------------------------------
 
-UINT64 device_debug::get_logunmap(void *globalref, void *ref)
+UINT64 device_debug::get_logunmap(symbol_table &table, void *ref)
 {
-	address_space *space = reinterpret_cast<address_space *>(ref);
+	address_space *space = reinterpret_cast<address_space *>(table.globalref());
 	return space->log_unmap();
 }
 
@@ -3151,9 +3093,9 @@ UINT64 device_debug::get_logunmap(void *globalref, void *ref)
 //  symbols
 //-------------------------------------------------
 
-void device_debug::set_logunmap(void *globalref, void *ref, UINT64 value)
+void device_debug::set_logunmap(symbol_table &table, void *ref, UINT64 value)
 {
-	address_space *space = reinterpret_cast<address_space *>(ref);
+	address_space *space = reinterpret_cast<address_space *>(table.globalref());
 	space->set_log_unmap(value ? true : false);
 }
 
@@ -3163,9 +3105,9 @@ void device_debug::set_logunmap(void *globalref, void *ref, UINT64 value)
 //  state symbols
 //-------------------------------------------------
 
-UINT64 device_debug::get_cpu_reg(void *globalref, void *ref)
+UINT64 device_debug::get_state(symbol_table &table, void *ref)
 {
-	device_t *device = reinterpret_cast<device_t *>(globalref);
+	device_t *device = reinterpret_cast<device_t *>(table.globalref());
 	return device->debug()->m_state->state(reinterpret_cast<FPTR>(ref));
 }
 
@@ -3175,9 +3117,9 @@ UINT64 device_debug::get_cpu_reg(void *globalref, void *ref)
 //  state symbols
 //-------------------------------------------------
 
-void device_debug::set_state(void *globalref, void *ref, UINT64 value)
+void device_debug::set_state(symbol_table &table, void *ref, UINT64 value)
 {
-	device_t *device = reinterpret_cast<device_t *>(globalref);
+	device_t *device = reinterpret_cast<device_t *>(table.globalref());
 	device->debug()->m_state->set_state(reinterpret_cast<FPTR>(ref), value);
 }
 
@@ -3191,25 +3133,14 @@ void device_debug::set_state(void *globalref, void *ref, UINT64 value)
 //  breakpoint - constructor
 //-------------------------------------------------
 
-device_debug::breakpoint::breakpoint(int index, offs_t address, parsed_expression *condition, const char *action)
+device_debug::breakpoint::breakpoint(symbol_table &symbols, int index, offs_t address, const char *condition, const char *action)
 	: m_next(NULL),
 	  m_index(index),
 	  m_enabled(true),
 	  m_address(address),
-	  m_condition(condition),
+	  m_condition(&symbols, (condition != NULL) ? condition : "1"),
 	  m_action((action != NULL) ? action : "")
 {
-}
-
-
-//-------------------------------------------------
-//  ~breakpoint - destructor
-//-------------------------------------------------
-
-device_debug::breakpoint::~breakpoint()
-{
-	if (m_condition != NULL)
-		expression_free(m_condition);
 }
 
 
@@ -3228,9 +3159,17 @@ bool device_debug::breakpoint::hit(offs_t pc)
 		return false;
 
 	// must satisfy the condition
-	UINT64 result;
-	if (m_condition != NULL && expression_execute(m_condition, &result) == EXPRERR_NONE && result == 0)
-		return false;
+	if (!m_condition.is_empty())
+	{
+		try
+		{
+			return (m_condition.execute() != 0);
+		}
+		catch (expression_error &err)
+		{
+			return false;
+		}
+	}
 
 	return true;
 }
@@ -3245,7 +3184,7 @@ bool device_debug::breakpoint::hit(offs_t pc)
 //  watchpoint - constructor
 //-------------------------------------------------
 
-device_debug::watchpoint::watchpoint(int index, address_space &space, int type, offs_t address, offs_t length, parsed_expression *condition, const char *action)
+device_debug::watchpoint::watchpoint(symbol_table &symbols, int index, address_space &space, int type, offs_t address, offs_t length, const char *condition, const char *action)
 	: m_next(NULL),
 	  m_space(space),
 	  m_index(index),
@@ -3253,20 +3192,9 @@ device_debug::watchpoint::watchpoint(int index, address_space &space, int type, 
 	  m_type(type),
 	  m_address(space.address_to_byte(address) & space.bytemask()),
 	  m_length(space.address_to_byte(length)),
-	  m_condition(condition),
+	  m_condition(&symbols, (condition != NULL) ? condition : "1"),
 	  m_action((action != NULL) ? action : "")
 {
-}
-
-
-//-------------------------------------------------
-//  ~watchpoint - destructor
-//-------------------------------------------------
-
-device_debug::watchpoint::~watchpoint()
-{
-	if (m_condition != NULL)
-		expression_free(m_condition);
 }
 
 
@@ -3289,10 +3217,17 @@ bool device_debug::watchpoint::hit(int type, offs_t address, int size)
 		return false;
 
 	// must satisfy the condition
-	UINT64 result;
-	if (m_condition != NULL && expression_execute(m_condition, &result) == EXPRERR_NONE && result == 0)
-		return false;
-
+	if (!m_condition.is_empty())
+	{
+		try
+		{
+			return (m_condition.execute() != 0);
+		}
+		catch (expression_error &err)
+		{
+			return false;
+		}
+	}
 	return true;
 }
 

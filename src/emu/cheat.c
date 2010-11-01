@@ -108,7 +108,6 @@
 #include "uimenu.h"
 #include "cheat.h"
 #include "debug/debugcpu.h"
-#include "debug/express.h"
 
 #include <ctype.h>
 
@@ -198,7 +197,7 @@ cheat_parameter::cheat_parameter(cheat_manager &manager, symbol_table &symbols, 
 	}
 
 	// add a variable to the symbol table for our value
-	symtable_add_register(&symbols, "param", &m_value, cheat_manager::variable_get, NULL);
+	symbols.add("param", symbol_table::READ_ONLY, &m_value);
 }
 
 
@@ -432,20 +431,17 @@ void cheat_script::save(mame_file &cheatfile) const
 
 cheat_script::script_entry::script_entry(cheat_manager &manager, symbol_table &symbols, const char *filename, xml_data_node &entrynode, bool isaction)
 	: m_next(NULL),
-	  m_condition(NULL),
-	  m_expression(NULL),
+	  m_condition(&symbols),
+	  m_expression(&symbols),
 	  m_arglist(manager.machine().m_respool)
 {
+	const char *expression = NULL;
 	try
 	{
 		// read the condition if present
-		const char *expression = xml_get_attribute_string(&entrynode, "condition", NULL);
+		expression = xml_get_attribute_string(&entrynode, "condition", NULL);
 		if (expression != NULL)
-		{
-			EXPRERR experr = expression_parse(expression, &symbols, &debug_expression_callbacks, &manager.machine(), &m_condition);
-			if (experr != EXPRERR_NONE)
-				throw emu_fatalerror("%s.xml(%d): error parsing cheat expression \"%s\" (%s)\n", filename, entrynode.line, expression, exprerr_to_string(experr));
-		}
+			m_condition.parse(expression);
 
 		// if this is an action, parse the expression
 		if (isaction)
@@ -453,10 +449,7 @@ cheat_script::script_entry::script_entry(cheat_manager &manager, symbol_table &s
 			expression = entrynode.value;
 			if (expression == NULL || expression[0] == 0)
 				throw emu_fatalerror("%s.xml(%d): missing expression in action tag\n", filename, entrynode.line);
-
-			EXPRERR experr = expression_parse(expression, &symbols, &debug_expression_callbacks, &manager.machine(), &m_expression);
-			if (experr != EXPRERR_NONE)
-				throw emu_fatalerror("%s.xml(%d): error parsing cheat expression \"%s\" (%s)\n", filename, entrynode.line, expression, exprerr_to_string(experr));
+			m_expression.parse(expression);
 		}
 
 		// otherwise, parse the attributes and arguments
@@ -495,25 +488,10 @@ cheat_script::script_entry::script_entry(cheat_manager &manager, symbol_table &s
 			validate_format(filename, entrynode.line);
 		}
 	}
-	catch (emu_fatalerror &)
+	catch (expression_error &err)
 	{
-		// call our destructor and re-throw
-		this->~script_entry();
-		throw;
+		throw emu_fatalerror("%s.xml(%d): error parsing cheat expression \"%s\" (%s)\n", filename, entrynode.line, expression, err.code_string());
 	}
-}
-
-
-//-------------------------------------------------
-//  script_entry - destructor
-//-------------------------------------------------
-
-cheat_script::script_entry::~script_entry()
-{
-	if (m_condition != NULL)
-		expression_free(m_condition);
-	if (m_expression != NULL)
-		expression_free(m_expression);
 }
 
 
@@ -524,25 +502,32 @@ cheat_script::script_entry::~script_entry()
 void cheat_script::script_entry::execute(cheat_manager &manager, UINT64 &argindex)
 {
 	// evaluate the condition
-	if (m_condition != NULL)
+	if (!m_condition.is_empty())
 	{
-		UINT64 result;
-		EXPRERR error = expression_execute(m_condition, &result);
-		if (error != EXPRERR_NONE)
-			mame_printf_warning("Error executing conditional expression \"%s\": %s\n", expression_original_string(m_condition), exprerr_to_string(error));
-
-		// if the condition is false, or we got an error, don't execute
-		if (error != EXPRERR_NONE || result == 0)
+		try
+		{
+			UINT64 result = m_condition.execute();
+			if (result == 0)
+				return;
+		}
+		catch (expression_error &err)
+		{
+			mame_printf_warning("Error executing conditional expression \"%s\": %s\n", m_condition.original_string(), err.code_string());
 			return;
+		}
 	}
 
 	// if there is an action, execute it
-	if (m_expression != NULL)
+	if (!m_expression.is_empty())
 	{
-		UINT64 result;
-		EXPRERR error = expression_execute(m_expression, &result);
-		if (error != EXPRERR_NONE)
-			mame_printf_warning("Error executing expression \"%s\": %s\n", expression_original_string(m_expression), exprerr_to_string(error));
+		try
+		{
+			m_expression.execute();
+		}
+		catch (expression_error &err)
+		{
+			mame_printf_warning("Error executing expression \"%s\": %s\n", m_expression.original_string(), err.code_string());
+		}
 	}
 
 	// if there is a string to display, compute it
@@ -580,17 +565,17 @@ void cheat_script::script_entry::save(mame_file &cheatfile) const
 	if (!m_format)
 	{
 		mame_fprintf(&cheatfile, "\t\t\t<action");
-		if (m_condition != NULL)
-			mame_fprintf(&cheatfile, " condition=\"%s\"", cheat_manager::quote_expression(tempstring, *m_condition));
-		mame_fprintf(&cheatfile, ">%s</action>\n", cheat_manager::quote_expression(tempstring, *m_expression));
+		if (!m_condition.is_empty())
+			mame_fprintf(&cheatfile, " condition=\"%s\"", cheat_manager::quote_expression(tempstring, m_condition));
+		mame_fprintf(&cheatfile, ">%s</action>\n", cheat_manager::quote_expression(tempstring, m_expression));
 	}
 
 	// output an output
 	else
 	{
 		mame_fprintf(&cheatfile, "\t\t\t<output format=\"%s\"", m_format.cstr());
-		if (m_condition != NULL)
-			mame_fprintf(&cheatfile, " condition=\"%s\"", cheat_manager::quote_expression(tempstring, *m_condition));
+		if (!m_condition.is_empty())
+			mame_fprintf(&cheatfile, " condition=\"%s\"", cheat_manager::quote_expression(tempstring, m_condition));
 		if (m_line != 0)
 			mame_fprintf(&cheatfile, " line=\"%d\"", m_line);
 		if (m_justify == JUSTIFY_CENTER)
@@ -657,7 +642,7 @@ void cheat_script::script_entry::validate_format(const char *filename, int line)
 
 cheat_script::script_entry::output_argument::output_argument(cheat_manager &manager, symbol_table &symbols, const char *filename, xml_data_node &argnode)
 	: m_next(NULL),
-	  m_expression(NULL),
+	  m_expression(&symbols),
 	  m_count(0)
 {
 	// first extract attributes
@@ -668,20 +653,15 @@ cheat_script::script_entry::output_argument::output_argument(cheat_manager &mana
 	if (expression == NULL || expression[0] == 0)
 		throw emu_fatalerror("%s.xml(%d): missing expression in argument tag\n", filename, argnode.line);
 
-	EXPRERR experr = expression_parse(expression, &symbols, &debug_expression_callbacks, &manager.machine(), &m_expression);
-	if (experr != EXPRERR_NONE)
-		throw emu_fatalerror("%s.xml(%d): error parsing cheat expression \"%s\" (%s)\n", filename, argnode.line, expression, exprerr_to_string(experr));
-}
-
-
-//-------------------------------------------------
-//  output_argument - destructor
-//-------------------------------------------------
-
-cheat_script::script_entry::output_argument::~output_argument()
-{
-	if (m_expression != NULL)
-		expression_free(m_expression);
+	// parse it
+	try
+	{
+		m_expression.parse(expression);
+	}
+	catch (expression_error &err)
+	{
+		throw emu_fatalerror("%s.xml(%d): error parsing cheat expression \"%s\" (%s)\n", filename, argnode.line, expression, err.code_string());
+	}
 }
 
 
@@ -694,9 +674,14 @@ int cheat_script::script_entry::output_argument::values(UINT64 &argindex, UINT64
 {
 	for (argindex = 0; argindex < m_count; argindex++)
 	{
-		EXPRERR error = expression_execute(m_expression, &result[argindex]);
-		if (error != EXPRERR_NONE)
-			mame_printf_warning("Error executing argument expression \"%s\": %s\n", expression_original_string(m_expression), exprerr_to_string(error));
+		try
+		{
+			result[argindex] = m_expression.execute();
+		}
+		catch (expression_error &err)
+		{
+			mame_printf_warning("Error executing argument expression \"%s\": %s\n", m_expression.original_string(), err.code_string());
+		}
 	}
 	return m_count;
 }
@@ -713,7 +698,7 @@ void cheat_script::script_entry::output_argument::save(mame_file &cheatfile) con
 	mame_fprintf(&cheatfile, "\t\t\t\t<argument");
 	if (m_count != 1)
 		mame_fprintf(&cheatfile, " count=\"%d\"", (int)m_count);
-	mame_fprintf(&cheatfile, ">%s</argument>\n", cheat_manager::quote_expression(tempstring, *m_expression));
+	mame_fprintf(&cheatfile, ">%s</argument>\n", cheat_manager::quote_expression(tempstring, m_expression));
 }
 
 
@@ -734,11 +719,10 @@ cheat_entry::cheat_entry(cheat_manager &manager, symbol_table &globaltable, cons
 	  m_off_script(NULL),
 	  m_change_script(NULL),
 	  m_run_script(NULL),
-	  m_symbols(NULL),
+	  m_symbols(&manager.machine(), &globaltable),
 	  m_state(SCRIPT_STATE_OFF),
 	  m_numtemp(DEFAULT_TEMP_VARIABLES),
-	  m_argindex(0),
-	  m_tempvar(NULL)
+	  m_argindex(0)
 {
 	// reset scripts
 	try
@@ -750,7 +734,6 @@ cheat_entry::cheat_entry(cheat_manager &manager, symbol_table &globaltable, cons
 
 		// allocate memory for the cheat
 		m_numtemp = tempcount;
-		m_tempvar = auto_alloc_array_clear(&manager.machine(), UINT64, tempcount);
 
 		// get the description
 		const char *description = xml_get_attribute_string(&cheatnode, "desc", NULL);
@@ -759,11 +742,10 @@ cheat_entry::cheat_entry(cheat_manager &manager, symbol_table &globaltable, cons
 		m_description = description;
 
 		// create the symbol table
-		m_symbols = symtable_alloc(&globaltable, &manager.machine());
-		symtable_add_register(m_symbols, "argindex", &m_argindex, cheat_manager::variable_get, NULL);
+		m_symbols.add("argindex", symbol_table::READ_ONLY, &m_argindex);
 		astring tempname;
 		for (int curtemp = 0; curtemp < tempcount; curtemp++)
-			symtable_add_register(m_symbols, tempname.format("temp%d", curtemp), &m_tempvar[curtemp], cheat_manager::variable_get, cheat_manager::variable_set);
+			m_symbols.add(tempname.format("temp%d", curtemp), symbol_table::READ_WRITE);
 
 		// read the first comment node
 		xml_data_node *commentnode = xml_get_sibling(cheatnode.child, "comment");
@@ -784,7 +766,7 @@ cheat_entry::cheat_entry(cheat_manager &manager, symbol_table &globaltable, cons
 		if (paramnode != NULL)
 		{
 			// load this parameter
-			m_parameter = auto_alloc(&manager.machine(), cheat_parameter(manager, *m_symbols, filename, *paramnode));
+			m_parameter = auto_alloc(&manager.machine(), cheat_parameter(manager, m_symbols, filename, *paramnode));
 
 			// only one parameter allowed
 			paramnode = xml_get_sibling(paramnode->next, "parameter");
@@ -796,7 +778,7 @@ cheat_entry::cheat_entry(cheat_manager &manager, symbol_table &globaltable, cons
 		for (xml_data_node *scriptnode = xml_get_sibling(cheatnode.child, "script"); scriptnode != NULL; scriptnode = xml_get_sibling(scriptnode->next, "script"))
 		{
 			// load this entry
-			cheat_script *curscript = auto_alloc(&manager.machine(), cheat_script(manager, *m_symbols, filename, *scriptnode));
+			cheat_script *curscript = auto_alloc(&manager.machine(), cheat_script(manager, m_symbols, filename, *scriptnode));
 
 			// if we have a script already for this slot, it is an error
 			cheat_script *&slot = script_for_state(curscript->state());
@@ -821,14 +803,11 @@ cheat_entry::cheat_entry(cheat_manager &manager, symbol_table &globaltable, cons
 
 cheat_entry::~cheat_entry()
 {
-	if (m_symbols != NULL)
-		symtable_free(m_symbols);
 	auto_free(&m_manager.machine(), m_on_script);
 	auto_free(&m_manager.machine(), m_off_script);
 	auto_free(&m_manager.machine(), m_change_script);
 	auto_free(&m_manager.machine(), m_run_script);
 	auto_free(&m_manager.machine(), m_parameter);
-	auto_free(&m_manager.machine(), m_tempvar);
 }
 
 
@@ -1110,7 +1089,8 @@ cheat_script *&cheat_entry::script_for_state(script_state state)
 cheat_manager::cheat_manager(running_machine &machine)
 	: m_machine(machine),
 	  m_cheatlist(machine.m_respool),
-	  m_disabled(true)
+	  m_disabled(true),
+	  m_symtable(&machine)
 {
 	// if the cheat engine is disabled, we're done
 	if (!options_get_bool(machine.options(), OPTION_CHEAT))
@@ -1120,27 +1100,20 @@ cheat_manager::cheat_manager(running_machine &machine)
 	machine.add_notifier(MACHINE_NOTIFY_FRAME, frame_update_static);
 
 	// create a global symbol table
-	m_symtable = symtable_alloc(NULL, &machine);
-	symtable_add_register(m_symtable, "frame", &m_framecount, variable_get, NULL);
-	symtable_add_function(m_symtable, "frombcd", NULL, 1, 1, execute_frombcd);
-	symtable_add_function(m_symtable, "tobcd", NULL, 1, 1, execute_tobcd);
-
-	// load the cheats
-	reload();
+	m_symtable.add("frame", symbol_table::READ_ONLY, &m_framecount);
+	m_symtable.add("frombcd", NULL, 1, 1, execute_frombcd);
+	m_symtable.add("tobcd", NULL, 1, 1, execute_tobcd);
 
 	// we rely on the debugger expression callbacks; if the debugger isn't
     // enabled, we must jumpstart them manually
 	if ((machine.debug_flags & DEBUG_FLAG_ENABLED) == 0)
 		debug_cpu_init(&machine);
-}
 
+	// configure for memory access (shared with debugger)
+	debug_cpu_configure_memory(machine, m_symtable);
 
-//-------------------------------------------------
-//  ~cheat_manager - destructor
-//-------------------------------------------------
-
-cheat_manager::~cheat_manager()
-{
+	// load the cheats
+	reload();
 }
 
 
@@ -1324,9 +1297,9 @@ astring &cheat_manager::get_output_astring(int row, int justify)
 //  document
 //-------------------------------------------------
 
-const char *cheat_manager::quote_expression(astring &string, parsed_expression &expression)
+const char *cheat_manager::quote_expression(astring &string, const parsed_expression &expression)
 {
-	string.cpy(expression_original_string(&expression));
+	string.cpy(expression.original_string());
 
 	string.replace(0, " && ", " and ");
 	string.replace(0, " &&", " and ");
@@ -1358,30 +1331,10 @@ const char *cheat_manager::quote_expression(astring &string, parsed_expression &
 
 
 //-------------------------------------------------
-//  variable_get - return the value of a variable
-//-------------------------------------------------
-
-UINT64 cheat_manager::variable_get(void *globalref, void *ref)
-{
-	return *(UINT64 *)ref;
-}
-
-
-//-------------------------------------------------
-//  variable_set - set the value of a variable
-//-------------------------------------------------
-
-void cheat_manager::variable_set(void *globalref, void *ref, UINT64 value)
-{
-	*(UINT64 *)ref = value;
-}
-
-
-//-------------------------------------------------
 //  execute_frombcd - convert a value from BCD
 //-------------------------------------------------
 
-UINT64 cheat_manager::execute_frombcd(void *globalref, void *ref, UINT32 params, const UINT64 *param)
+UINT64 cheat_manager::execute_frombcd(symbol_table &table, void *ref, int params, const UINT64 *param)
 {
 	UINT64 value = param[0];
 	UINT64 multiplier = 1;
@@ -1401,7 +1354,7 @@ UINT64 cheat_manager::execute_frombcd(void *globalref, void *ref, UINT32 params,
 //  execute_tobcd - convert a value to BCD
 //-------------------------------------------------
 
-UINT64 cheat_manager::execute_tobcd(void *globalref, void *ref, UINT32 params, const UINT64 *param)
+UINT64 cheat_manager::execute_tobcd(symbol_table &table, void *ref, int params, const UINT64 *param)
 {
 	UINT64 value = param[0];
 	UINT64 result = 0;
@@ -1488,7 +1441,7 @@ void cheat_manager::load_cheats(const char *filename)
 			for (xml_data_node *cheatnode = xml_get_sibling(mamecheatnode->child, "cheat"); cheatnode != NULL; cheatnode = xml_get_sibling(cheatnode->next, "cheat"))
 			{
 				// load this entry
-				cheat_entry *curcheat = auto_alloc(&m_machine, cheat_entry(*this, *m_symtable, filename, *cheatnode));
+				cheat_entry *curcheat = auto_alloc(&m_machine, cheat_entry(*this, m_symtable, filename, *cheatnode));
 
 				// make sure we're not a duplicate
 				cheat_entry *scannode = NULL;

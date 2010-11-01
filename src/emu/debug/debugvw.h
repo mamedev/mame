@@ -40,6 +40,8 @@
 #ifndef __DEBUGVIEW_H__
 #define __DEBUGVIEW_H__
 
+#include "express.h"
+
 
 //**************************************************************************
 //  CONSTANTS
@@ -102,8 +104,6 @@ const int DCH_CTRLLEFT		= 12;		// ctrl+left
 
 // forward references
 class debug_view;
-typedef struct _symbol_table symbol_table;
-typedef struct _parsed_expression parsed_expression;
 
 
 // OSD callback function for a view
@@ -305,11 +305,11 @@ public:
 	UINT64 last_value() const { return m_result; }
 	UINT64 value() { recompute(); return m_result; }
 	const char *string() const { return m_string; }
-	symbol_table *context() const { return m_context; }
+	symbol_table *context() const { return m_parsed.symbols(); }
 
 	// setters
 	void mark_dirty() { m_dirty = true; }
-	void set_string(const char *string);
+	void set_string(const char *string) { m_string.cpy(string); m_dirty = true; }
 	void set_context(symbol_table *context);
 
 private:
@@ -320,9 +320,8 @@ private:
 	running_machine &	m_machine;				// reference to the machine
 	bool				m_dirty;				// true if the expression needs to be re-evaluated
 	UINT64				m_result;				// last result from the expression
-	parsed_expression *	m_parsed;				// parsed expression data
+	parsed_expression	m_parsed;				// parsed expression data
 	astring				m_string;				// copy of the expression string
-	symbol_table *		m_context;				// context we are using
 };
 
 

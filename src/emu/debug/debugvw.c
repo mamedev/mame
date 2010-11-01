@@ -38,6 +38,7 @@
 ***************************************************************************/
 
 #include "emu.h"
+#include "express.h"
 #include "debugvw.h"
 #include "dvtext.h"
 #include "dvstate.h"
@@ -46,7 +47,6 @@
 #include "debugcmd.h"
 #include "debugcpu.h"
 #include "debugcon.h"
-#include "express.h"
 #include <ctype.h>
 
 
@@ -559,9 +559,8 @@ debug_view_expression::debug_view_expression(running_machine &machine)
 	: m_machine(machine),
 	  m_dirty(true),
 	  m_result(0),
-	  m_parsed(NULL),
-	  m_string("0"),
-	  m_context(debug_cpu_get_global_symtable(&machine))
+	  m_parsed(debug_cpu_get_global_symtable(&machine)),
+	  m_string("0")
 {
 }
 
@@ -572,20 +571,6 @@ debug_view_expression::debug_view_expression(running_machine &machine)
 
 debug_view_expression::~debug_view_expression()
 {
-	// free our parsed expression
-	if (m_parsed != NULL)
-		expression_free(m_parsed);
-}
-
-
-//-------------------------------------------------
-//  set_string - set the expression string
-//-------------------------------------------------
-
-void debug_view_expression::set_string(const char *string)
-{
-	m_string = string;
-	m_dirty = true;
 }
 
 
@@ -596,7 +581,7 @@ void debug_view_expression::set_string(const char *string)
 
 void debug_view_expression::set_context(symbol_table *context)
 {
-	m_context = (context != NULL) ? context : debug_cpu_get_global_symtable(&m_machine);
+	m_parsed.set_symbols((context != NULL) ? context : debug_cpu_get_global_symtable(&m_machine)); 
 	m_dirty = true;
 }
 
@@ -613,28 +598,33 @@ bool debug_view_expression::recompute()
 	// if dirty, re-evaluate
 	if (m_dirty)
 	{
-		// parse the new expression
-		parsed_expression *expr;
-		EXPRERR exprerr = expression_parse(m_string, m_context, &debug_expression_callbacks, &m_machine, &expr);
-
-		// if it worked, update the expression
-		if (exprerr == EXPRERR_NONE)
+		astring oldstring(m_parsed.original_string());
+		try
 		{
-			if (m_parsed != NULL)
-				expression_free(m_parsed);
-			m_parsed = expr;
+			m_parsed.parse(m_string);
+		}
+		catch (expression_error &)
+		{
+			m_parsed.parse(oldstring);
 		}
 	}
 
 	// if we have a parsed expression, evalute it
-	if (m_parsed != NULL)
+	if (!m_parsed.is_empty())
 	{
-		UINT64 oldresult = m_result;
-
 		// recompute the value of the expression
-		expression_execute(m_parsed, &m_result);
-		if (m_result != oldresult)
-			changed = true;
+		try
+		{
+			UINT64 newresult = m_parsed.execute();
+			if (newresult != m_result)
+			{
+				m_result = newresult;
+				changed = true;
+			}
+		}
+		catch (expression_error &)
+		{
+		}
 	}
 
 	// expression no longer dirty by definition

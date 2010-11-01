@@ -51,6 +51,7 @@
 // MAME headers
 #include "emu.h"
 #include "uiinput.h"
+#include "debugger.h"
 #include "debug/debugvw.h"
 #include "debug/dvdisasm.h"
 #include "debug/dvmemory.h"
@@ -58,7 +59,6 @@
 #include "debug/debugvw.h"
 #include "debug/debugcon.h"
 #include "debug/debugcpu.h"
-#include "debugger.h"
 
 // MAMEOS headers
 #include "debugwin.h"

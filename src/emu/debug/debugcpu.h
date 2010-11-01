@@ -79,15 +79,14 @@ public:
 
 	public:
 		// construction/destruction
-		breakpoint(int index, offs_t address, parsed_expression *condition = NULL, const char *action = NULL);
-		~breakpoint();
+		breakpoint(symbol_table &symbols, int index, offs_t address, const char *condition = NULL, const char *action = NULL);
 
 		// getters
 		breakpoint *next() const { return m_next; }
 		int index() const { return m_index; }
 		bool enabled() const { return m_enabled; }
 		offs_t address() const { return m_address; }
-		const char *condition() const { return (m_condition != NULL) ? expression_original_string(m_condition) : NULL; }
+		const char *condition() const { return m_condition.original_string(); }
 		const char *action() const { return m_action; }
 
 	private:
@@ -98,7 +97,7 @@ public:
 		int					m_index;					// user reported index
 		UINT8				m_enabled;					// enabled?
 		offs_t				m_address;					// execution address
-		parsed_expression *	m_condition;				// condition
+		parsed_expression 	m_condition;				// condition
 		astring				m_action;					// action
 	};
 
@@ -109,8 +108,7 @@ public:
 
 	public:
 		// construction/destruction
-		watchpoint(int index, address_space &space, int type, offs_t address, offs_t length, parsed_expression *condition = NULL, const char *action = NULL);
-		~watchpoint();
+		watchpoint(symbol_table &symbols, int index, address_space &space, int type, offs_t address, offs_t length, const char *condition = NULL, const char *action = NULL);
 
 		// getters
 		watchpoint *next() const { return m_next; }
@@ -120,7 +118,7 @@ public:
 		bool enabled() const { return m_enabled; }
 		offs_t address() const { return m_address; }
 		offs_t length() const { return m_length; }
-		const char *condition() const { return (m_condition != NULL) ? expression_original_string(m_condition) : NULL; }
+		const char *condition() const { return m_condition.original_string(); }
 		const char *action() const { return m_action; }
 
 	private:
@@ -134,7 +132,7 @@ public:
 		UINT8				m_type;						// type (read/write)
 		offs_t				m_address;					// start address
 		offs_t				m_length;					// length of watch area
-		parsed_expression *	m_condition;				// condition
+		parsed_expression	m_condition;				// condition
 		astring				m_action;					// action
 	};
 
@@ -144,7 +142,7 @@ public:
 	~device_debug();
 
 	// getters
-	symbol_table *symtable() const { return m_symtable; }
+	symbol_table &symtable() { return m_symtable; }
 
 	// commonly-used pass-throughs
 	offs_t pc() const { return (m_state != NULL) ? m_state->pc() : 0; }
@@ -188,7 +186,7 @@ public:
 
 	// breakpoints
 	breakpoint *breakpoint_first() const { return m_bplist; }
-	int breakpoint_set(offs_t address, parsed_expression *condition = NULL, const char *action = NULL);
+	int breakpoint_set(offs_t address, const char *condition = NULL, const char *action = NULL);
 	bool breakpoint_clear(int index);
 	void breakpoint_clear_all();
 	bool breakpoint_enable(int index, bool enable = true);
@@ -196,7 +194,7 @@ public:
 
 	// watchpoints
 	watchpoint *watchpoint_first(int spacenum) const { return m_wplist[spacenum]; }
-	int watchpoint_set(address_space &space, int type, offs_t address, offs_t length, parsed_expression *condition, const char *action);
+	int watchpoint_set(address_space &space, int type, offs_t address, offs_t length, const char *condition, const char *action);
 	bool watchpoint_clear(int wpnum);
 	void watchpoint_clear_all();
 	bool watchpoint_enable(int index, bool enable = true);
@@ -243,12 +241,12 @@ private:
 	void hotspot_check(address_space &space, offs_t address);
 
 	// symbol get/set callbacks
-	static UINT64 get_current_pc(void *globalref, void *ref);
-	static UINT64 get_cycles(void *globalref, void *ref);
-	static UINT64 get_logunmap(void *globalref, void *ref);
-	static void set_logunmap(void *globalref, void *ref, UINT64 value);
-	static UINT64 get_cpu_reg(void *globalref, void *ref);
-	static void set_state(void *globalref, void *ref, UINT64 value);
+	static UINT64 get_current_pc(symbol_table &table, void *ref);
+	static UINT64 get_cycles(symbol_table &table, void *ref);
+	static UINT64 get_logunmap(symbol_table &table, void *ref);
+	static void set_logunmap(symbol_table &table, void *ref, UINT64 value);
+	static UINT64 get_state(symbol_table &table, void *ref);
+	static void set_state(symbol_table &table, void *ref, UINT64 value);
 
 	// basic device information
 	device_t &				m_device;					// device we are attached to
@@ -259,7 +257,7 @@ private:
 
 	// global state
 	UINT32					m_flags;					// debugging flags for this CPU
-	symbol_table *			m_symtable;					// symbol table for expression evaluation
+	symbol_table			m_symtable;					// symbol table for expression evaluation
 	debug_instruction_hook_func m_instrhook;			// per-instruction callback hook
 
 	// disassembly
@@ -367,14 +365,6 @@ private:
 
 
 //**************************************************************************
-//  GLOBAL VARIABLES
-//**************************************************************************
-
-extern const express_callbacks debug_expression_callbacks;
-
-
-
-//**************************************************************************
 //  FUNCTION PROTOTYPES
 //**************************************************************************
 
@@ -382,6 +372,7 @@ extern const express_callbacks debug_expression_callbacks;
 
 /* initialize the CPU tracking for the debugger */
 void debug_cpu_init(running_machine *machine);
+void debug_cpu_configure_memory(running_machine &machine, symbol_table &table);
 
 /* flushes all traces; this is useful if a trace is going on when we fatalerror */
 void debug_cpu_flush_traces(running_machine *machine);

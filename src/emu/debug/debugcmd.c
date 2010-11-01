@@ -92,12 +92,12 @@ static cheat_system cheat;
 
 static void debug_command_exit(running_machine &machine);
 
-static UINT64 execute_min(void *globalref, void *ref, UINT32 params, const UINT64 *param);
-static UINT64 execute_max(void *globalref, void *ref, UINT32 params, const UINT64 *param);
-static UINT64 execute_if(void *globalref, void *ref, UINT32 params, const UINT64 *param);
+static UINT64 execute_min(symbol_table &table, void *ref, int params, const UINT64 *param);
+static UINT64 execute_max(symbol_table &table, void *ref, int params, const UINT64 *param);
+static UINT64 execute_if(symbol_table &table, void *ref, int params, const UINT64 *param);
 
-static UINT64 global_get(void *globalref, void *ref);
-static void global_set(void *globalref, void *ref, UINT64 value);
+static UINT64 global_get(symbol_table &table, void *ref);
+static void global_set(symbol_table &table, void *ref, UINT64 value);
 
 static void execute_help(running_machine *machine, int ref, int params, const char **param);
 static void execute_print(running_machine *machine, int ref, int params, const char **param);
@@ -232,9 +232,9 @@ void debug_command_init(running_machine *machine)
 	int itemnum;
 
 	/* add a few simple global functions */
-	symtable_add_function(symtable, "min", NULL, 2, 2, execute_min);
-	symtable_add_function(symtable, "max", NULL, 2, 2, execute_max);
-	symtable_add_function(symtable, "if", NULL, 3, 3, execute_if);
+	symtable->add("min", NULL, 2, 2, execute_min);
+	symtable->add("max", NULL, 2, 2, execute_max);
+	symtable->add("if", NULL, 3, 3, execute_if);
 
 	/* add all single-entry save state globals */
 	for (itemnum = 0; itemnum < MAX_GLOBALS; itemnum++)
@@ -254,7 +254,7 @@ void debug_command_init(running_machine *machine)
 			sprintf(symname, ".%s", strrchr(name, '/') + 1);
 			global_array[itemnum].base = base;
 			global_array[itemnum].size = valsize;
-			symtable_add_register(symtable, symname, &global_array, global_get, global_set);
+			symtable->add(symname, &global_array, global_get, global_set);
 		}
 	}
 
@@ -397,7 +397,7 @@ static void debug_command_exit(running_machine &machine)
     execute_min - return the minimum of two values
 -------------------------------------------------*/
 
-static UINT64 execute_min(void *globalref, void *ref, UINT32 params, const UINT64 *param)
+static UINT64 execute_min(symbol_table &table, void *ref, int params, const UINT64 *param)
 {
 	return (param[0] < param[1]) ? param[0] : param[1];
 }
@@ -407,7 +407,7 @@ static UINT64 execute_min(void *globalref, void *ref, UINT32 params, const UINT6
     execute_max - return the maximum of two values
 -------------------------------------------------*/
 
-static UINT64 execute_max(void *globalref, void *ref, UINT32 params, const UINT64 *param)
+static UINT64 execute_max(symbol_table &table, void *ref, int params, const UINT64 *param)
 {
 	return (param[0] > param[1]) ? param[0] : param[1];
 }
@@ -417,7 +417,7 @@ static UINT64 execute_max(void *globalref, void *ref, UINT32 params, const UINT6
     execute_if - if (a) return b; else return c;
 -------------------------------------------------*/
 
-static UINT64 execute_if(void *globalref, void *ref, UINT32 params, const UINT64 *param)
+static UINT64 execute_if(symbol_table &table, void *ref, int params, const UINT64 *param)
 {
 	return param[0] ? param[1] : param[2];
 }
@@ -432,7 +432,7 @@ static UINT64 execute_if(void *globalref, void *ref, UINT32 params, const UINT64
     global_get - symbol table getter for globals
 -------------------------------------------------*/
 
-static UINT64 global_get(void *globalref, void *ref)
+static UINT64 global_get(symbol_table &table, void *ref)
 {
 	global_entry *global = (global_entry *)ref;
 	switch (global->size)
@@ -450,7 +450,7 @@ static UINT64 global_get(void *globalref, void *ref)
     global_set - symbol table setter for globals
 -------------------------------------------------*/
 
-static void global_set(void *globalref, void *ref, UINT64 value)
+static void global_set(symbol_table &table, void *ref, UINT64 value)
 {
 	global_entry *global = (global_entry *)ref;
 	switch (global->size)
@@ -475,22 +475,24 @@ static void global_set(void *globalref, void *ref, UINT64 value)
 
 int debug_command_parameter_number(running_machine *machine, const char *param, UINT64 *result)
 {
-	EXPRERR err;
-
 	/* NULL parameter does nothing and returns no error */
 	if (param == NULL)
 		return TRUE;
 
 	/* evaluate the expression; success if no error */
-	err = expression_evaluate(param, debug_cpu_get_visible_symtable(machine), &debug_expression_callbacks, machine, result);
-	if (err == EXPRERR_NONE)
+	try
+	{
+		parsed_expression expression(debug_cpu_get_visible_symtable(machine), param, result);
 		return TRUE;
-
-	/* print an error pointing to the character that caused it */
-	debug_console_printf(machine, "Error in expression: %s\n", param);
-	debug_console_printf(machine, "                     %*s^", EXPRERR_ERROR_OFFSET(err), "");
-	debug_console_printf(machine, "%s\n", exprerr_to_string(err));
-	return FALSE;
+	}
+	catch (expression_error &error)
+	{
+		/* print an error pointing to the character that caused it */
+		debug_console_printf(machine, "Error in expression: %s\n", param);
+		debug_console_printf(machine, "                     %*s^", error.offset(), "");
+		debug_console_printf(machine, "%s\n", error.code_string());
+		return FALSE;
+	}
 }
 
 
@@ -502,7 +504,6 @@ int debug_command_parameter_number(running_machine *machine, const char *param, 
 int debug_command_parameter_cpu(running_machine *machine, const char *param, device_t **result)
 {
 	UINT64 cpunum;
-	EXPRERR err;
 
 	/* if no parameter, use the visible CPU */
 	if (param == NULL)
@@ -522,8 +523,11 @@ int debug_command_parameter_cpu(running_machine *machine, const char *param, dev
 		return TRUE;
 
 	/* then evaluate as an expression; on an error assume it was a tag */
-	err = expression_evaluate(param, debug_cpu_get_visible_symtable(machine), &debug_expression_callbacks, machine, &cpunum);
-	if (err != EXPRERR_NONE)
+	try
+	{
+		parsed_expression expression(debug_cpu_get_visible_symtable(machine), param, &cpunum);
+	}
+	catch (expression_error &)
 	{
 		debug_console_printf(machine, "Unable to find CPU '%s'\n", param);
 		return FALSE;
@@ -574,27 +578,26 @@ int debug_command_parameter_cpu_space(running_machine *machine, const char *para
     an expression parameter
 -------------------------------------------------*/
 
-static int debug_command_parameter_expression(running_machine *machine, const char *param, parsed_expression **result)
+static int debug_command_parameter_expression(running_machine *machine, const char *param, parsed_expression &result)
 {
-	EXPRERR err;
-
 	/* NULL parameter does nothing and returns no error */
 	if (param == NULL)
-	{
-		*result = NULL;
 		return TRUE;
-	}
 
 	/* parse the expression; success if no error */
-	err = expression_parse(param, debug_cpu_get_visible_symtable(machine), &debug_expression_callbacks, machine, result);
-	if (err == EXPRERR_NONE)
+	try
+	{
+		result.parse(param);
 		return TRUE;
-
-	/* output an error */
-	debug_console_printf(machine, "Error in expression: %s\n", param);
-	debug_console_printf(machine, "                     %*s^", EXPRERR_ERROR_OFFSET(err), "");
-	debug_console_printf(machine, "%s\n", exprerr_to_string(err));
-	return FALSE;
+	}
+	catch (expression_error &err)
+	{
+		/* output an error */
+		debug_console_printf(machine, "Error in expression: %s\n", param);
+		debug_console_printf(machine, "                     %*s^", err.offset(), "");
+		debug_console_printf(machine, "%s\n", err.code_string());
+		return FALSE;
+	}
 }
 
 
@@ -1160,7 +1163,7 @@ static void execute_comment_save(running_machine *machine, int ref, int params, 
 
 static void execute_bpset(running_machine *machine, int ref, int params, const char *param[])
 {
-	parsed_expression *condition = NULL;
+	parsed_expression condition(debug_cpu_get_global_symtable(machine));
 	device_t *cpu;
 	const char *action = NULL;
 	UINT64 address;
@@ -1171,7 +1174,7 @@ static void execute_bpset(running_machine *machine, int ref, int params, const c
 		return;
 
 	/* param 2 is the condition */
-	if (!debug_command_parameter_expression(machine, param[1], &condition))
+	if (!debug_command_parameter_expression(machine, param[1], condition))
 		return;
 
 	/* param 3 is the action */
@@ -1183,7 +1186,7 @@ static void execute_bpset(running_machine *machine, int ref, int params, const c
 		return;
 
 	/* set the breakpoint */
-	bpnum = cpu->debug()->breakpoint_set(address, condition, action);
+	bpnum = cpu->debug()->breakpoint_set(address, (condition.is_empty()) ? NULL : condition.original_string(), action);
 	debug_console_printf(machine, "Breakpoint %X set\n", bpnum);
 }
 
@@ -1300,7 +1303,7 @@ static void execute_bplist(running_machine *machine, int ref, int params, const 
 
 static void execute_wpset(running_machine *machine, int ref, int params, const char *param[])
 {
-	parsed_expression *condition = NULL;
+	parsed_expression condition(debug_cpu_get_global_symtable(machine));
 	address_space *space;
 	const char *action = NULL;
 	UINT64 address, length;
@@ -1329,7 +1332,7 @@ static void execute_wpset(running_machine *machine, int ref, int params, const c
 	}
 
 	/* param 4 is the condition */
-	if (!debug_command_parameter_expression(machine, param[3], &condition))
+	if (!debug_command_parameter_expression(machine, param[3], condition))
 		return;
 
 	/* param 5 is the action */
@@ -1341,7 +1344,7 @@ static void execute_wpset(running_machine *machine, int ref, int params, const c
 		return;
 
 	/* set the watchpoint */
-	wpnum = space->cpu->debug()->watchpoint_set(*space, type, address, length, condition, action);
+	wpnum = space->cpu->debug()->watchpoint_set(*space, type, address, length, (condition.is_empty()) ? NULL : condition.original_string(), action);
 	debug_console_printf(machine, "Watchpoint %X set\n", wpnum);
 }
 
@@ -2544,7 +2547,7 @@ static void execute_symlist(running_machine *machine, int ref, int params, const
 
 	if (cpu != NULL)
 	{
-		symtable = cpu->debug()->symtable();
+		symtable = &cpu->debug()->symtable();
 		debug_console_printf(machine, "CPU '%s' symbols:\n", cpu->tag());
 	}
 	else
@@ -2554,19 +2557,12 @@ static void execute_symlist(running_machine *machine, int ref, int params, const
 	}
 
 	/* gather names for all symbols */
-	for (symnum = 0; symnum < 100000; symnum++)
+	for (symbol_entry *entry = symtable->first(); entry != NULL; entry = entry->next())
 	{
-		const symbol_entry *entry;
-		const char *name = symtable_find_indexed(symtable, symnum, &entry);
-
-		/* if we didn't get anything, we're done */
-		if (name == NULL)
-			break;
-
 		/* only display "register" type symbols */
-		if (entry->type == SMT_REGISTER)
+		if (!entry->is_function())
 		{
-			namelist[count++] = name;
+			namelist[count++] = entry->name();
 			if (count >= ARRAY_LENGTH(namelist))
 				break;
 		}
@@ -2579,13 +2575,13 @@ static void execute_symlist(running_machine *machine, int ref, int params, const
 	/* iterate over symbols and print out relevant ones */
 	for (symnum = 0; symnum < count; symnum++)
 	{
-		const symbol_entry *entry = symtable_find(symtable, namelist[symnum]);
-		UINT64 value = (*entry->info.reg.getter)(symtable_get_globalref(entry->table), entry->ref);
+		const symbol_entry *entry = symtable->find(namelist[symnum]);
 		assert(entry != NULL);
+		UINT64 value = entry->value();
 
 		/* only display "register" type symbols */
 		debug_console_printf(machine, "%s = %s", namelist[symnum], core_i64_hex_format(value, 0));
-		if (entry->info.reg.setter == NULL)
+		if (!entry->is_lval())
 			debug_console_printf(machine, "  (read-only)");
 		debug_console_printf(machine, "\n");
 	}

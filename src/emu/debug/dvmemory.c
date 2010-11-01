@@ -213,7 +213,7 @@ void debug_view_memory::view_notify(debug_view_notification type)
 		m_chunks_per_row = m_bytes_per_chunk * m_chunks_per_row / source.m_prefsize;
 		m_bytes_per_chunk = source.m_prefsize;
 		if (source.m_space != NULL)
-			m_expression.set_context(source.m_space->cpu->debug()->symtable());
+			m_expression.set_context(&source.m_space->cpu->debug()->symtable());
 		else
 			m_expression.set_context(NULL);
 	}

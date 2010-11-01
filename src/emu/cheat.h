@@ -42,6 +42,7 @@
 #ifndef __CHEAT_H__
 #define __CHEAT_H__
 
+#include "debug/express.h"
 #include "ui.h"
 
 
@@ -66,8 +67,6 @@ DECLARE_ENUM_OPERATORS(script_state)
 //**************************************************************************
 
 class cheat_manager;
-typedef struct _symbol_table symbol_table;
-typedef struct _parsed_expression parsed_expression;
 
 
 // ======================> number_and_format
@@ -180,7 +179,6 @@ private:
 	public:
 		// construction/destruction
 		script_entry(cheat_manager &manager, symbol_table &symbols, const char *filename, xml_data_node &entrynode, bool isaction);
-		~script_entry();
 
 		// getters
 		script_entry *next() const { return m_next; }
@@ -198,7 +196,6 @@ private:
 		public:
 			// construction/destruction
 			output_argument(cheat_manager &manager, symbol_table &symbols, const char *filename, xml_data_node &argnode);
-			~output_argument();
 
 			// getters
 			output_argument *next() const { return m_next; }
@@ -211,7 +208,7 @@ private:
 		private:
 			// internal state
 			output_argument *	m_next;							// link to next argument
-			parsed_expression *	m_expression;					// expression for argument
+			parsed_expression 	m_expression;					// expression for argument
 			UINT64				m_count;						// number of repetitions
 		};
 
@@ -220,8 +217,8 @@ private:
 
 		// internal state
 		script_entry *		m_next;							// link to next entry
-		parsed_expression *	m_condition;					// condition under which this is executed
-		parsed_expression *	m_expression;					// expression to execute
+		parsed_expression 	m_condition;					// condition under which this is executed
+		parsed_expression 	m_expression;					// expression to execute
 		astring				m_format;						// string format to print
 		simple_list<output_argument> m_arglist;				// list of arguments
 		INT8				m_line;							// which line to print on
@@ -304,11 +301,10 @@ private:
 	cheat_script *		m_off_script;					// script to run when turning off
 	cheat_script *		m_change_script;				// script to run when value changes
 	cheat_script *		m_run_script;					// script to run each frame when on
-	symbol_table *		m_symbols;						// symbol table for this cheat
+	symbol_table		m_symbols;						// symbol table for this cheat
 	script_state		m_state;						// current cheat state
 	UINT32				m_numtemp;						// number of temporary variables
 	UINT64				m_argindex;						// argument index variable
-	UINT64 *			m_tempvar;						// value of the temporary variables
 
 	// constants
 	static const int DEFAULT_TEMP_VARIABLES = 10;
@@ -323,7 +319,6 @@ class cheat_manager
 public:
 	// construction/destruction
 	cheat_manager(running_machine &machine);
-	~cheat_manager();
 	
 	// getters
 	running_machine &machine() const { return m_machine; }
@@ -342,11 +337,9 @@ public:
 	astring &get_output_astring(int row, int justify);
 
 	// global helpers
-	static const char *quote_expression(astring &string, parsed_expression &expression);
-	static UINT64 variable_get(void *globalref, void *ref);
-	static void variable_set(void *globalref, void *ref, UINT64 value);
-	static UINT64 execute_frombcd(void *globalref, void *ref, UINT32 params, const UINT64 *param);
-	static UINT64 execute_tobcd(void *globalref, void *ref, UINT32 params, const UINT64 *param);
+	static const char *quote_expression(astring &string, const parsed_expression &expression);
+	static UINT64 execute_frombcd(symbol_table &table, void *ref, int params, const UINT64 *param);
+	static UINT64 execute_tobcd(symbol_table &table, void *ref, int params, const UINT64 *param);
 
 private:
 	// internal helpers
@@ -363,7 +356,7 @@ private:
 	UINT8				m_numlines;							// number of lines available for output
 	INT8				m_lastline;							// last line used for output
 	bool				m_disabled;							// true if the cheat engine is disabled
-	symbol_table *		m_symtable;							// global symbol table
+	symbol_table		m_symtable;							// global symbol table
 	
 	// constants
 	static const int CHEAT_VERSION = 1;
@@ -371,4 +364,3 @@ private:
 
 
 #endif	/* __CHEAT_H__ */
-

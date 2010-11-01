@@ -338,10 +338,15 @@ static CMDERR internal_parse_command(running_machine *machine, const char *origi
 		/* if it smells like an assignment expression, treat it as such */
 		if (isexpr && paramcount == 1)
 		{
-			UINT64 expresult;
-			EXPRERR exprerr = expression_evaluate(command_start, debug_cpu_get_visible_symtable(machine), &debug_expression_callbacks, machine, &expresult);
-			if (exprerr != EXPRERR_NONE)
-				return MAKE_CMDERR_EXPRESSION_ERROR(EXPRERR_ERROR_OFFSET(exprerr));
+			try
+			{
+				UINT64 expresult;
+				parsed_expression expression(debug_cpu_get_visible_symtable(machine), command_start, &expresult);
+			}
+			catch (expression_error &err)
+			{
+				return MAKE_CMDERR_EXPRESSION_ERROR(err);
+			}
 		}
 		else
 		{

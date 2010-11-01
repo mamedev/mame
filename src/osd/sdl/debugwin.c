@@ -16,6 +16,7 @@
 
 #include "dview.h"
 #include "osdsdl.h"
+#include "debugger.h"
 #include "debug/dvdisasm.h"
 #include "debug/dvmemory.h"
 #include "debug/dvstate.h"
