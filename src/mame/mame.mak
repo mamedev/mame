@@ -411,7 +411,7 @@ $(MAMEOBJ)/atari.a: \
 	$(DRIVERS)/cloud9.o $(VIDEO)/cloud9.o \
 	$(DRIVERS)/cmmb.o \
 	$(DRIVERS)/cojag.o $(AUDIO)/jaguar.o $(VIDEO)/jaguar.o \
-	$(DRIVERS)/copsnrob.o $(MACHINE)/copsnrob.o $(VIDEO)/copsnrob.o \
+	$(DRIVERS)/copsnrob.o $(AUDIO)/copsnrob.o $(VIDEO)/copsnrob.o \
 	$(DRIVERS)/cyberbal.o $(AUDIO)/cyberbal.o $(VIDEO)/cyberbal.o \
 	$(DRIVERS)/destroyr.o \
 	$(DRIVERS)/dragrace.o $(AUDIO)/dragrace.o $(VIDEO)/dragrace.o \

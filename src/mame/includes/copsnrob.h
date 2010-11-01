@@ -4,6 +4,9 @@
 
 *************************************************************************/
 
+#include "sound/discrete.h"
+
+
 class copsnrob_state : public driver_device
 {
 public:
@@ -21,6 +24,7 @@ public:
 
 	/* misc */
 	UINT8          misc;
+	UINT8          ic_h3_data;
 };
 
 
@@ -32,3 +36,9 @@ READ8_HANDLER( copsnrob_gun_position_r );
 /*----------- defined in video/copsnrob.c -----------*/
 
 VIDEO_UPDATE( copsnrob );
+
+
+/*----------- defined in audio/copsnrob.c -----------*/
+
+DISCRETE_SOUND_EXTERN( copsnrob );
+WRITE8_HANDLER( copsnrob_misc_w );

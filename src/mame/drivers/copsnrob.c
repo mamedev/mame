@@ -38,8 +38,7 @@
 
     I/O Write:
 
-    0500-0503 Direction of the cars
-    0504-0507 (sounds/enable) - 0506: LED 1
+    0500-0507 (sounds/enable) - 0506: LED 1
     0600      Beer Truck Y
     0700-07ff Beer Truck Sync Area
     0800-08ff Bullets RAM
@@ -76,26 +75,22 @@ static PALETTE_INIT( copsnrob )
 
 /*************************************
  *
- *  LEDs
+ *  I/O
  *
  *************************************/
 
 static READ8_HANDLER( copsnrob_misc_r )
 {
-	copsnrob_state *state = space->machine->driver_data<copsnrob_state>();
-	return state->misc | (input_port_read(space->machine, "IN0") & 0x80);
+	return input_port_read(space->machine, "IN0") & 0x80;
 }
 
-static WRITE8_HANDLER( copsnrob_misc_w )
+static WRITE8_HANDLER( copsnrob_misc2_w )
 {
 	copsnrob_state *state = space->machine->driver_data<copsnrob_state>();
+
 	state->misc = data & 0x7f;
-	set_led_status(space->machine, 1, ~data & 0x40);
-}
-
-static WRITE8_HANDLER( copsnrob_led_w )
-{
-	set_led_status(space->machine, 0, ~data & 0x01);
+	/* Multi Player Start */
+	set_led_status(space->machine, 1, !((data >> 6) & 0x01));
 }
 
 
@@ -109,9 +104,7 @@ static WRITE8_HANDLER( copsnrob_led_w )
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x1fff)
 	AM_RANGE(0x0000, 0x01ff) AM_RAM
-	AM_RANGE(0x0500, 0x0503) AM_WRITEONLY
-//  AM_RANGE(0x0504, 0x0507) AM_WRITENOP  // ???
-	AM_RANGE(0x0506, 0x0506) AM_WRITE(copsnrob_led_w)
+	AM_RANGE(0x0500, 0x0507) AM_WRITE(copsnrob_misc_w)
 	AM_RANGE(0x0600, 0x0600) AM_WRITEONLY AM_BASE_MEMBER(copsnrob_state, trucky)
 	AM_RANGE(0x0700, 0x07ff) AM_WRITEONLY AM_BASE_MEMBER(copsnrob_state, truckram)
 	AM_RANGE(0x0800, 0x08ff) AM_RAM AM_BASE_MEMBER(copsnrob_state, bulletsram)
@@ -122,8 +115,11 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 //  AM_RANGE(0x1000, 0x1003) AM_WRITENOP
 //  AM_RANGE(0x1000, 0x1000) AM_READ_PORT("IN0")
 	AM_RANGE(0x1000, 0x1000) AM_READ(copsnrob_misc_r)
-	AM_RANGE(0x1000, 0x1000) AM_WRITE(copsnrob_misc_w)
-	AM_RANGE(0x1002, 0x100e) AM_READ(copsnrob_gun_position_r)
+	AM_RANGE(0x1000, 0x1000) AM_WRITE(copsnrob_misc2_w)
+	AM_RANGE(0x1002, 0x1002) AM_READ_PORT("CTRL1")
+	AM_RANGE(0x1006, 0x1006) AM_READ_PORT("CTRL2")
+	AM_RANGE(0x100a, 0x100a) AM_READ_PORT("CTRL3")
+	AM_RANGE(0x100e, 0x100e) AM_READ_PORT("CTRL4")
 	AM_RANGE(0x1012, 0x1012) AM_READ_PORT("DSW")
 	AM_RANGE(0x1016, 0x1016) AM_READ_PORT("IN1")
 	AM_RANGE(0x101a, 0x101a) AM_READ_PORT("IN2")
@@ -137,6 +133,8 @@ ADDRESS_MAP_END
  *  Port definitions
  *
  *************************************/
+
+static const int gun_table[] = {0x3f, 0x5f, 0x6f, 0x77, 0x7b, 0x7d, 0x7e};
 
 static INPUT_PORTS_START( copsnrob )
 	PORT_START("IN0")
@@ -166,25 +164,20 @@ static INPUT_PORTS_START( copsnrob )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_PLAYER(1)
 
-	/* These input ports are fake */
-	PORT_START("FAKE0")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH,IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(1)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH,IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(1)
+	PORT_START("CTRL1")
+	PORT_BIT( 0x7f, 0x03, IPT_POSITIONAL_V ) PORT_POSITIONS(7) PORT_REMAP_TABLE(gun_table) PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_CENTERDELTA(0) PORT_PLAYER(1)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 
-	PORT_START("FAKE1")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH,IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(2)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH,IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(2)
+	PORT_START("CTRL2")
+	PORT_BIT( 0x7f, 0x03, IPT_POSITIONAL_V ) PORT_POSITIONS(7) PORT_REMAP_TABLE(gun_table) PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_CENTERDELTA(0) PORT_PLAYER(2)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 
-	PORT_START("FAKE2")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH,IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(3)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH,IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(3)
+	PORT_START("CTRL3")
+	PORT_BIT( 0x7f, 0x03, IPT_POSITIONAL_V ) PORT_POSITIONS(7) PORT_REMAP_TABLE(gun_table) PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_CENTERDELTA(0) PORT_PLAYER(3)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(3)
 
-	PORT_START("FAKE3")
-	PORT_BIT( 0x01, IP_ACTIVE_HIGH,IPT_JOYSTICK_UP ) PORT_4WAY PORT_PLAYER(4)
-	PORT_BIT( 0x02, IP_ACTIVE_HIGH,IPT_JOYSTICK_DOWN ) PORT_4WAY PORT_PLAYER(4)
+	PORT_START("CTRL4")
+	PORT_BIT( 0x7f, 0x03, IPT_POSITIONAL_V ) PORT_POSITIONS(7) PORT_REMAP_TABLE(gun_table) PORT_SENSITIVITY(15) PORT_KEYDELTA(1) PORT_CENTERDELTA(0) PORT_PLAYER(4)
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(4)
 INPUT_PORTS_END
 
@@ -260,6 +253,7 @@ static MACHINE_START( copsnrob )
 {
 	copsnrob_state *state = machine->driver_data<copsnrob_state>();
 
+	state_save_register_global(machine, state->ic_h3_data);
 	state_save_register_global(machine, state->misc);
 }
 
@@ -267,6 +261,7 @@ static MACHINE_RESET( copsnrob )
 {
 	copsnrob_state *state = machine->driver_data<copsnrob_state>();
 
+	state->ic_h3_data = 0;
 	state->misc = 0;
 }
 
@@ -293,6 +288,14 @@ static MACHINE_CONFIG_START( copsnrob, copsnrob_state )
 
 	MDRV_PALETTE_INIT(copsnrob)
 	MDRV_VIDEO_UPDATE(copsnrob)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
+	MDRV_SOUND_CONFIG_DISCRETE(copsnrob)
+	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -341,4 +344,4 @@ ROM_END
  *
  *************************************/
 
-GAMEL( 1976, copsnrob, 0, copsnrob, copsnrob, 0, ROT0, "Atari", "Cops'n Robbers", GAME_NO_SOUND | GAME_SUPPORTS_SAVE, layout_copsnrob )
+GAMEL( 1976, copsnrob, 0, copsnrob, copsnrob, 0, ROT0, "Atari", "Cops'n Robbers", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE, layout_copsnrob )

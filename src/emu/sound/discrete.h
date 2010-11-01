@@ -1866,7 +1866,7 @@
  *
  *     DISCRETE_DAC_R1(name of node,
  *                     data node (static value is useless),
- *                     vData node or static value (voltage when a bit is on ),
+ *                     vData static value (voltage when a bit is on ),
  *                     address of discrete_dac_r1_ladder structure)
  *
  *     discrete_dac_r1_ladder = {ladderLength, r{}, vBias, rBias, rGnd, cFilter}
@@ -4517,7 +4517,7 @@ enum
 #define DISCRETE_TRANSFORM5(NODE,INP0,INP1,INP2,INP3,INP4,FUNCT)        { NODE, DST_TRANSFORM   , 5, { INP0,INP1,INP2,INP3,INP4 }, { INP0,INP1,INP2,INP3,INP4 }, FUNCT, "DISCRETE_TRANSFORM5" },
 /* Component specific */
 #define DISCRETE_COMP_ADDER(NODE,DATA,TABLE)                            { NODE, DST_COMP_ADDER  , 1, { DATA }, { DATA }, TABLE, "DISCRETE_COMP_ADDER" },
-#define DISCRETE_DAC_R1(NODE,DATA,VDATA,LADDER)                         { NODE, DST_DAC_R1      , 2, { DATA,VDATA }, { DATA,VDATA }, LADDER, "DISCRETE_DAC_R1" },
+#define DISCRETE_DAC_R1(NODE,DATA,VDATA,LADDER)                         { NODE, DST_DAC_R1      , 2, { DATA,NODE_NC }, { DATA,VDATA }, LADDER, "DISCRETE_DAC_R1" },
 #define DISCRETE_DIODE_MIXER2(NODE,IN0,IN1,TABLE)                       { NODE, DST_DIODE_MIX   , 3, { IN0,IN1 }, { IN0,IN1 }, TABLE, "DISCRETE_DIODE_MIXER2" },
 #define DISCRETE_DIODE_MIXER3(NODE,IN0,IN1,IN2,TABLE)                   { NODE, DST_DIODE_MIX   , 4, { IN0,IN1,IN2 }, { IN0,IN1,IN2 }, TABLE, "DISCRETE_DIODE_MIXER3" },
 #define DISCRETE_DIODE_MIXER4(NODE,IN0,IN1,IN2,IN3,TABLE)               { NODE, DST_DIODE_MIX   , 5, { IN0,IN1,IN2,IN3 }, { IN0,IN1,IN2,IN3 }, TABLE, "DISCRETE_DIODE_MIXER4" },

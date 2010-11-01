@@ -56,7 +56,6 @@ struct dsd_555_mstbl_context
 	int		trig_is_logic;
 	int		trig_discharges_cap;
 	int		output_type;
-	int		output_is_ac;
 	double	ac_shift;				/* DC shift needed to make waveform ac */
 	int		flip_flop;				/* 555 flip/flop output state */
 	int		has_rc_nodes;
@@ -483,14 +482,15 @@ DISCRETE_STEP(dsd_555_mstbl)
 	DISCRETE_DECLARE_INFO(discrete_555_desc)
 
 	double v_cap;			/* Current voltage on capacitor, before dt */
-	double v_cap_next = 0;	/* Voltage on capacitor, after dt */
-	double x_time  = 0;		/* time since change happened */
+	double x_time = 0;		/* time since change happened */
 	double dt, exponent;
+	double out = 0;
 	int trigger = 0;
 	int trigger_type;
-	int update_exponent = 0;
+	int update_exponent = context->has_rc_nodes;
+	int flip_flop;
 
-	if(DSD_555_MSTBL__RESET)
+	if(UNEXPECTED(DSD_555_MSTBL__RESET))
 	{
 		/* We are in RESET */
 		node->output[0]     = 0;
@@ -499,102 +499,115 @@ DISCRETE_STEP(dsd_555_mstbl)
 		return;
 	}
 
-	trigger_type = info->options;
 	dt = node->info->sample_time;
+	flip_flop = context->flip_flop;
+	trigger_type = info->options;
+	v_cap = context->cap_voltage;
 
 	switch (trigger_type & DSD_555_TRIGGER_TYPE_MASK)
 	{
 		case DISC_555_TRIGGER_IS_LOGIC:
-			trigger = (int)!DSD_555_MSTBL__TRIGGER;
+			trigger = ((int)DSD_555_MSTBL__TRIGGER) ? 0 : 1;
+			if (UNEXPECTED(trigger))
+				x_time = 1.0 - DSD_555_MSTBL__TRIGGER;
 			break;
 		case DISC_555_TRIGGER_IS_VOLTAGE:
 			trigger = (int)(DSD_555_MSTBL__TRIGGER < context->trigger);
 			break;
 		case DISC_555_TRIGGER_IS_COUNT:
 			trigger = (int)DSD_555_MSTBL__TRIGGER;
-			if (trigger && !context->flip_flop)
-			{
+			if (UNEXPECTED(trigger))
 				x_time = DSD_555_MSTBL__TRIGGER - trigger;
-				if (x_time != 0)
-				{
-					/* adjust sample to after trigger */
-					x_time = (1.0 - x_time);
-					update_exponent = 1;
-					dt = x_time * node->info->sample_time;
-				}
-			}
 			break;
 	}
+
+	if (UNEXPECTED(trigger && !flip_flop && x_time != 0))
+	{
+		/* adjust sample to after trigger */
+		update_exponent = 1;
+		dt *= x_time;
+	}
+	x_time = 0;
 
 	if ((trigger_type & DISC_555_TRIGGER_DISCHARGES_CAP) && trigger)
 		context->cap_voltage = 0;
 
 	/* Wait for trigger */
-	if (!context->flip_flop && trigger)
-		context->flip_flop = 1;
-
-	if (context->flip_flop)
+	if (UNEXPECTED(!flip_flop && trigger))
 	{
-		v_cap = context->cap_voltage;
+		flip_flop = 1;
+		context->flip_flop = 1;
+	}
 
+	if (flip_flop)
+	{
 		/* Sometimes a switching network is used to setup the capacitance.
          * These may select 'no' capacitor, causing oscillation to stop.
          */
-		if (DSD_555_MSTBL__C == 0)
+		if (UNEXPECTED(DSD_555_MSTBL__C == 0))
 		{
-			context->flip_flop = 0;
-			/* The voltage goes high because the cap circuit is open. */
-			v_cap_next = info->v_pos;
-			v_cap      = info->v_pos;
+			/* The trigger voltage goes high because the cap circuit is open.
+			 * and the cap discharges */
+			v_cap = info->v_pos;	/* needed for cap output type */
 			context->cap_voltage = 0;
+
+			if (!trigger)
+			{
+				flip_flop = 0;
+				context->flip_flop = 0;
+			}
 		}
 		else
 		{
 			/* Charging */
-			update_exponent |= context->has_rc_nodes;
-			if (update_exponent)
+			double v_diff = context->v_charge - v_cap;
+
+			if (UNEXPECTED(update_exponent))
 				exponent = RC_CHARGE_EXP_DT(DSD_555_MSTBL__R * DSD_555_MSTBL__C, dt);
 			else
 				exponent = context->exp_charge;
-			v_cap_next = v_cap + ((info->v_pos - v_cap) * exponent);
+			v_cap += v_diff * exponent;
 
 			/* Has it charged past upper limit? */
 			/* If trigger is still enabled, then we keep charging,
              * regardless of threshold. */
-			if ((v_cap_next >= context->threshold) && !trigger)
+			if (UNEXPECTED((v_cap >= context->threshold) && !trigger))
 			{
-				dt = DSD_555_MSTBL__R * DSD_555_MSTBL__C  * log(1.0 / (1.0 - ((v_cap_next - context->threshold) / (context->v_charge - v_cap))));
-				x_time = dt / node->info->sample_time;
-				v_cap_next = 0;
-				v_cap      = context->threshold;
+				dt = DSD_555_MSTBL__R * DSD_555_MSTBL__C  * log(1.0 / (1.0 - ((v_cap - context->threshold) / v_diff)));
+				x_time = 1.0 - dt / node->info->sample_time;
+				v_cap  = 0;
+				flip_flop = 0;
 				context->flip_flop = 0;
 			}
+			context->cap_voltage = v_cap;
 		}
-
-		context->cap_voltage = v_cap_next;
 	}
 
-	switch (info->options & DISC_555_OUT_MASK)
+	switch (context->output_type)
 	{
 		case DISC_555_OUT_SQW:
-			node->output[0] = context->flip_flop * context->v_out_high;
-			/* Fake it to AC if needed */
-			if (context->output_is_ac)
-				node->output[0] -= context->v_out_high / 2.0;
+			out = flip_flop * context->v_out_high - context->ac_shift;
 			break;
 		case DISC_555_OUT_CAP:
-			node->output[0] = v_cap_next;
-			/* Fake it to AC if needed */
-			if (context->output_is_ac)
-				node->output[0] -= context->threshold * 3.0 /4.0;
+			if (x_time > 0)
+				out = v_cap * x_time;
+			else
+				out = v_cap;
+
+			out -= context->ac_shift;
 			break;
 		case DISC_555_OUT_ENERGY:
-			if (x_time == 0) x_time = 1.0;
-			node->output[0] = context->v_out_high * (context->flip_flop ? x_time : (1.0 - x_time));
-				if (context->output_is_ac)
-					node->output[0] -= context->v_out_high / 2.0;
+			if (x_time > 0)
+				out = context->v_out_high * x_time;
+			else if (flip_flop)
+				out = context->v_out_high;
+			else
+				out = 0;
+
+			out -= context->ac_shift;
 			break;
 	}
+	node->output[0] = out;
 }
 
 DISCRETE_RESET(dsd_555_mstbl)
@@ -617,9 +630,16 @@ DISCRETE_RESET(dsd_555_mstbl)
 	context->threshold = info->v_pos * 2.0 / 3.0;
 	context->trigger   = info->v_pos / 3.0;
 
-	context->output_is_ac = info->options & DISC_555_OUT_AC;
-	/* Calculate DC shift needed to make squarewave waveform AC */
-	context->ac_shift     = context->output_is_ac ? -context->v_out_high / 2.0 : 0;
+	/* Calculate DC shift needed to make waveform AC */
+	if (info->options & DISC_555_OUT_AC)
+	{
+		if (context->output_type == DISC_555_OUT_CAP)
+			context->ac_shift = context->threshold * 3.0 /4.0;
+		else
+			context->ac_shift = context->v_out_high / 2.0;
+	}
+	else
+		context->ac_shift = 0;
 
 	context->trig_is_logic       = (info->options & DISC_555_TRIGGER_IS_VOLTAGE) ? 0: 1;
 	context->trig_discharges_cap = (info->options & DISC_555_TRIGGER_DISCHARGES_CAP) ? 1: 0;
@@ -1869,7 +1889,6 @@ DISCRETE_RESET(dsd_ls624)
 	}
 	else
 		context->has_freq_in_cap = 0;
-
 
 	node->output[0] = 0;
 }

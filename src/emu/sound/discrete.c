@@ -306,7 +306,7 @@ static const discrete_module module_list[] =
 
 	/* from disc_dev.c */
 	/* generic modules */
-	{ DST_CUSTOM      ,"DST_CUSTOM"      , 1 ,0                                      ,NULL                  ,NULL                 ,NULL                  ,NULL                 },
+	{ DST_CUSTOM      ,"DST_CUSTOM"      , 8 ,0                                      ,NULL                  ,NULL                 ,NULL                  ,NULL                 },
 	/* Component specific modules */
 	{ DSD_555_ASTBL   ,"DSD_555_ASTBL"   , 1 ,sizeof(struct dsd_555_astbl_context)   ,dsd_555_astbl_reset   ,dsd_555_astbl_step   ,NULL                  ,NULL                 },
 	{ DSD_555_MSTBL   ,"DSD_555_MSTBL"   , 1 ,sizeof(struct dsd_555_mstbl_context)   ,dsd_555_mstbl_reset   ,dsd_555_mstbl_step   ,NULL                  ,NULL                 },
@@ -1035,7 +1035,7 @@ static void find_input_nodes(const discrete_info *info)
 				if (!node_ref)
 					fatalerror("discrete_start - NODE_%02d referenced a non existent node NODE_%02d", NODE_BLOCKINDEX(node), NODE_INDEX(inputnode));
 
-				if (NODE_CHILD_NODE_NUM(inputnode) >= node_ref->module->num_output)
+				if ((NODE_CHILD_NODE_NUM(inputnode) >= node_ref->module->num_output) && (node_ref->module->type != DST_CUSTOM))
 					fatalerror("discrete_start - NODE_%02d referenced non existent output %d on node NODE_%02d", NODE_BLOCKINDEX(node), NODE_CHILD_NODE_NUM(inputnode), NODE_INDEX(inputnode));
 
 				node->input[inputnum] = &(node_ref->output[NODE_CHILD_NODE_NUM(inputnode)]);	/* Link referenced node out to input */

@@ -65,10 +65,10 @@ struct dst_bits_decode_context
 
 struct dst_dac_r1_context
 {
-	double	i_bias;		/* current of the bias circuit */
-	double	exponent;	/* smoothing curve */
-	double	r_total;	/* all resistors in parallel */
-	int		last_data;
+	double	exponent;
+	double	last_v;
+	double	v_step[256];
+	int		has_c_filter;
 };
 
 struct dst_diode_mix_context
@@ -250,7 +250,8 @@ DISCRETE_RESET(dst_comp_adder)
 	DISCRETE_DECLARE_INFO(discrete_comp_adder_table)
 
 	int i, bit;
-	int length = 1 << info->length;
+	int bit_length = info->length;
+	int length = 1 << bit_length;
 
 	assert(length <= 256);
 
@@ -261,18 +262,21 @@ DISCRETE_RESET(dst_comp_adder)
 		{
 			case DISC_COMP_P_CAPACITOR:
 				context->total[i] = info->cDefault;
-				for(bit = 0; bit < info->length; bit++)
+				for(bit = 0; bit < bit_length; bit++)
 				{
-					if (i & (1 << bit)) context->total[i] += info->c[bit];
+					if (i & (1 << bit))
+						context->total[i] += info->c[bit];
 				}
 				break;
 			case DISC_COMP_P_RESISTOR:
 				context->total[i] = (info->cDefault != 0) ? 1.0 / info->cDefault : 0;
-				for(bit = 0; bit < info->length; bit++)
+				for(bit = 0; bit < bit_length; bit++)
 				{
-					if ((i & (1 << bit)) && (info->c[bit] != 0)) context->total[i] += 1.0 / info->c[bit];
+					if ((i & (1 << bit)) && (info->c[bit] != 0))
+						context->total[i] += 1.0 / info->c[bit];
 				}
-				if (context->total[i] != 0) context->total[i] = 1.0 / context->total[i];
+				if (context->total[i] != 0)
+					context->total[i] = 1.0 / context->total[i];
 				break;
 		}
 	}
@@ -310,6 +314,7 @@ DISCRETE_STEP(dst_clamp)
  * also passed discrete_dac_r1_ladder structure
  *
  * Mar 2004, D Renaud.
+ * Nov 2010, D Renaud. - optimized for speed
  ************************************************************************/
 #define DST_DAC_R1__DATA		DISCRETE_INPUT(0)
 #define DST_DAC_R1__VON			DISCRETE_INPUT(1)
@@ -317,49 +322,33 @@ DISCRETE_STEP(dst_clamp)
 DISCRETE_STEP(dst_dac_r1)
 {
 	DISCRETE_DECLARE_CONTEXT(dst_dac_r1)
-	DISCRETE_DECLARE_INFO(discrete_dac_r1_ladder)
 
-	int		bit, bit_val, data;
-	double	v, i_bit, i_total, x_time, von;
+	int		data = (int)DST_DAC_R1__DATA;
+	double	v = context->v_step[data];
+	double	x_time = DST_DAC_R1__DATA - data;
+	double	last_v = context->last_v;
 
-	i_total = context->i_bias;
+	context->last_v = v;
 
-	data   = (int)DST_DAC_R1__DATA;
-	x_time = DST_DAC_R1__DATA - data;
-
-	von = DST_DAC_R1__VON;
-	for (bit=0; bit < info->ladderLength; bit++)
-	{
-		/* Add up currents of ON circuits per Millman. */
-
-		/* ignore if no resistor present */
-		if (info->r[bit] != 0)
-		{
-			i_bit   = von / info->r[bit];
-			bit_val = (data >> bit) & 0x01;
-
-			if ((x_time != 0.0) && (bit_val != ((context->last_data >> bit) & 0x01)))
-			{
-				/* there is x_time and a change in bit,
-                 * so anti-alias the current */
-				i_bit *= bit_val ? x_time : 1.0 - x_time;
-			}
-			else
-			{
-				/* there is no x_time or a change in bit,
-                 * so 0 the current if the bit value is 0 */
-				 if (bit_val == 0)
-					 i_bit = 0;
-			}
-			i_total += i_bit;
-		}
-	}
-
-	v = i_total * context->r_total;
-	context->last_data = data;
+	if (x_time > 0)
+		v = x_time * (v - last_v) + last_v;
 
 	/* Filter if needed, else just output voltage */
-	node->output[0] = info->cFilter ? node->output[0] + ((v - node->output[0]) * context->exponent) : v;
+	if (context->has_c_filter)
+	{
+		double out = node->output[0];
+		double v_diff = v - out;
+		/* optimization - if charged close enough to voltage */
+		if (fabs(v_diff) < 0.000001)
+			node->output[0] = v;
+		else
+		{
+			out += v_diff * context->exponent;
+			node->output[0] = out;
+		}
+	}
+	else
+		node->output[0] = v;
 }
 
 DISCRETE_RESET(dst_dac_r1)
@@ -368,24 +357,31 @@ DISCRETE_RESET(dst_dac_r1)
 	DISCRETE_DECLARE_INFO(discrete_dac_r1_ladder)
 
 	int	bit;
+	int ladderLength = info->ladderLength;
+	int total_steps = 1 << ladderLength;
+	double r_total = 0;
+	double i_bias;
+	double v_on = DST_DAC_R1__VON;
+
+	context->last_v = 0;
 
 	/* Calculate the Millman current of the bias circuit */
 	if (info->rBias)
-		context->i_bias = info->vBias / info->rBias;
+		i_bias = info->vBias / info->rBias;
 	else
-		context->i_bias = 0;
+		i_bias = 0;
 
 	/*
      * We will do a small amount of error checking.
      * But if you are an idiot and pass a bad ladder table
      * then you deserve a crash.
      */
-	if (info->ladderLength < 2)
+	if (ladderLength < 2 && info->rBias == 0 && info->rGnd == 0)
 	{
 		/* You need at least 2 resistors for a ladder */
 		discrete_log(node->info, "dst_dac_r1_reset - Ladder length too small");
 	}
-	if (info->ladderLength > DISC_LADDER_MAXRES )
+	if (ladderLength > DISC_LADDER_MAXRES )
 	{
 		discrete_log(node->info, "dst_dac_r1_reset - Ladder length exceeds DISC_LADDER_MAXRES");
 	}
@@ -395,22 +391,48 @@ DISCRETE_RESET(dst_dac_r1)
      * This is the combined resistance of the voltage sources.
      * This is used for the charging curve.
      */
-	context->r_total = 0;
-	for(bit = 0; bit < info->ladderLength; bit++)
+	for(bit = 0; bit < ladderLength; bit++)
 	{
 		if (info->r[bit] != 0)
-			context->r_total += 1.0 / info->r[bit];
+			r_total += 1.0 / info->r[bit];
 	}
-	if (info->rBias) context->r_total += 1.0 / info->rBias;
-	if (info->rGnd)  context->r_total += 1.0 / info->rGnd;
-	context->r_total = 1.0 / context->r_total;
+	if (info->rBias) r_total += 1.0 / info->rBias;
+	if (info->rGnd)  r_total += 1.0 / info->rGnd;
+	r_total = 1.0 / r_total;
 
 	node->output[0] = 0;
 
-	if (info->cFilter)
+	if (info->cFilter > 0)
 	{
-		/* Setup filter constants */
-		context->exponent = RC_CHARGE_EXP(context->r_total * info->cFilter);
+		context->has_c_filter = 1;
+		/* Setup filter constant */
+		context->exponent = RC_CHARGE_EXP(r_total * info->cFilter);
+	}
+	else
+		context->has_c_filter = 0;
+
+	/* pre-calculate all possible values to speed up step routine */
+	for(int i = 0; i < total_steps; i++)
+	{
+		double i_total = i_bias;
+		for (bit = 0; bit < ladderLength; bit++)
+		{
+			/* Add up currents of ON circuits per Millman. */
+
+			/* ignore if no resistor present */
+			if (EXPECTED(info->r[bit] != 0))
+			{
+				double i_bit;
+				int bit_val = (i >> bit) & 0x01;
+
+				if (bit_val != 0)
+					i_bit   = v_on / info->r[bit];
+				else
+					i_bit = 0;
+				i_total += i_bit;
+			}
+		}
+		context->v_step[i] = i_total * r_total;
 	}
 }
 
