@@ -135,6 +135,18 @@ void asc_device::device_start()
 	memset(m_regs, 0, sizeof(m_regs));
 
 	m_sync_timer = timer_alloc(this->machine, sync_timer_cb, this);
+
+	state_save_register_device_item(this, 0, m_fifo_a_rdptr);
+	state_save_register_device_item(this, 0, m_fifo_b_rdptr);
+	state_save_register_device_item(this, 0, m_fifo_a_wrptr);
+	state_save_register_device_item(this, 0, m_fifo_b_wrptr);
+	state_save_register_device_item(this, 0, m_fifo_cap_a);
+	state_save_register_device_item(this, 0, m_fifo_cap_b);
+	state_save_register_device_item_array(this, 0, m_fifo_a);
+	state_save_register_device_item_array(this, 0, m_fifo_b);
+	state_save_register_device_item_array(this, 0, m_regs);
+	state_save_register_device_item_array(this, 0, m_phase);
+	state_save_register_device_item_array(this, 0, m_incr);
 }
 
 
@@ -304,7 +316,7 @@ void asc_device::stream_generate(stream_sample_t **inputs, stream_sample_t **out
 //  read - read from the chip's registers and internal RAM
 //-------------------------------------------------
 
-UINT8 asc_device::read(UINT16 offset)
+READ8_MEMBER( asc_device::read )
 {
 	UINT8 rv;
 
@@ -440,7 +452,7 @@ UINT8 asc_device::read(UINT16 offset)
 //  write - write to the chip's registers and internal RAM
 //-------------------------------------------------
 
-void asc_device::write(UINT16 offset, UINT8 data)
+WRITE8_MEMBER( asc_device::write )
 {
 //	printf("ASC: write %02x to %x\n", data, offset);
 
