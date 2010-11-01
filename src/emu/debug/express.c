@@ -1685,6 +1685,7 @@ parsed_expression::parse_token::parse_token(int offset)
 	  m_type(INVALID),
 	  m_offset(offset),
 	  m_value(0),
+	  m_flags(0),
 	  m_string(NULL),
 	  m_symbol(NULL)
 {
