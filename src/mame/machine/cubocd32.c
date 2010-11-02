@@ -372,7 +372,7 @@ static void akiko_set_cd_status(akiko_state *state, UINT32 status)
 
 static TIMER_CALLBACK(akiko_frame_proc)
 {
-	akiko_state *state = (akiko_state *)param;
+	akiko_state *state = (akiko_state *)ptr;
 	running_device *cdda = cdda_from_cdrom(machine, state->cdrom);
 
 	(void)param;
