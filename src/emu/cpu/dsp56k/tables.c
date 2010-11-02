@@ -1,6 +1,6 @@
-#include <cstdio>
-#include <cstring>
-#include <cstdlib>
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 
 #include "tables.h"
 #include "dsp56def.h"

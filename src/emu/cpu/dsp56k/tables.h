@@ -1,8 +1,8 @@
 #ifndef __DSP56K_OPS_H__
 #define __DSP56K_OPS_H__
 
-#include <cstdio>
-#include <cstdlib>
+#include <stdio.h>
+#include <stdlib.h>
 
 #include "emu.h"
 #include "dsp56k.h"
