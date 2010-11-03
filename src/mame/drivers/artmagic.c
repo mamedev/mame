@@ -8,6 +8,7 @@
         * Cheese Chase
         * Ultimate Tennis
         * Stone Ball
+		* Shooting Star (not emulated)
 
     Known bugs:
         * measured against a real PCB, the games run slightly too fast
@@ -24,6 +25,7 @@
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/tms34010/tms34010.h"
+#include "cpu/mcs51/mcs51.h"
 #include "video/tlc34076.h"
 #include "includes/artmagic.h"
 #include "sound/okim6295.h"
@@ -461,6 +463,31 @@ static ADDRESS_MAP_START( stonebal_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x380000, 0x380007) AM_READWRITE(tms_host_r, tms_host_w)
 ADDRESS_MAP_END
 
+static READ16_HANDLER(unk_r)
+{
+	return mame_rand(space->machine);
+}
+
+static ADDRESS_MAP_START( shtstar_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+	AM_RANGE(0x200000, 0x27ffff) AM_RAM
+	AM_RANGE(0x280000, 0x280fff) AM_RAM AM_SHARE("nvram")
+	
+	AM_RANGE(0x3c0000, 0x3c0001) AM_READ_PORT("3c0000")
+	AM_RANGE(0x3c0002, 0x3c0003) AM_READ_PORT("3c0002")
+	AM_RANGE(0x3c0004, 0x3c0005) AM_READ_PORT("3c0004")
+	AM_RANGE(0x3c0006, 0x3c0007) AM_READ_PORT("3c0006")
+	AM_RANGE(0x3c0008, 0x3c0009) AM_READ_PORT("3c0008")
+	AM_RANGE(0x3c000a, 0x3c000b) AM_READ_PORT("3c000a")
+	
+	AM_RANGE(0x3c0012, 0x3c0013) AM_READ(unk_r)
+	AM_RANGE(0x3c0014, 0x3c0015) AM_NOP
+	
+	AM_RANGE(0x300000, 0x300003) AM_WRITE(control_w) AM_BASE(&control)
+	AM_RANGE(0x3c0004, 0x3c0007) AM_WRITE(protection_bit_w)
+	AM_RANGE(0x340000, 0x340001) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
+	AM_RANGE(0x380000, 0x380007) AM_READWRITE(tms_host_r, tms_host_w)
+ADDRESS_MAP_END
 
 
 /*************************************
@@ -501,6 +528,26 @@ static ADDRESS_MAP_START( stonebal_tms_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0xffc00000, 0xffffffff) AM_RAM
 ADDRESS_MAP_END
 
+/*************************************
+ *
+ *  Extra CPU memory handlers 
+ *   (Shooting Star)
+ *
+ *************************************/
+ 
+/* see adp.c */ 
+static ADDRESS_MAP_START( shtstar_subcpu_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x03ffff) AM_ROM
+	AM_RANGE(0xffc000, 0xffffff) AM_RAM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( shtstar_guncpu_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( shtstar_guncpu_io_map, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(0xc000, 0xcfff) AM_RAM
+ADDRESS_MAP_END
 
 
 /*************************************
@@ -700,6 +747,93 @@ static INPUT_PORTS_START( stoneba2 )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( shtstar )
+
+	PORT_START("3c0000")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_START1 )
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("3c0002")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_START2 )
+	PORT_BIT( 0x0020, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0040, IP_ACTIVE_HIGH, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x0080, IP_ACTIVE_HIGH, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("3c0004")
+	PORT_DIPUNUSED_DIPLOC( 0x0001, 0x0001, "SWB:8" )		/* Listed as "Unused" */
+	PORT_DIPNAME( 0x0006, 0x0004, DEF_STR( Language ) )		PORT_DIPLOCATION("SWB:6,7")
+	PORT_DIPSETTING(      0x0000, DEF_STR( French ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Italian ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( English ) )
+	PORT_DIPSETTING(      0x0006, DEF_STR( German ) )
+	PORT_DIPNAME( 0x0018, 0x0018, DEF_STR( Lives ))			PORT_DIPLOCATION("SWB:4,5")
+	PORT_DIPSETTING(      0x0008, "3" )
+	PORT_DIPSETTING(      0x0018, "4" )
+	PORT_DIPSETTING(      0x0000, "5" )
+	PORT_DIPSETTING(      0x0010, "6" )
+	PORT_DIPNAME( 0x0020, 0x0000, DEF_STR( Demo_Sounds ))	PORT_DIPLOCATION("SWB:3")
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ))
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
+	PORT_DIPNAME( 0x00c0, 0x0040, DEF_STR( Difficulty ))	PORT_DIPLOCATION("SWB:1,2")
+	PORT_DIPSETTING(      0x00c0, DEF_STR( Easy ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Normal ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Hard ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Very_Hard ) )
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("3c0006")
+	PORT_DIPNAME( 0x0007, 0x0007, "Right Coinage" )		PORT_DIPLOCATION("SWA:6,7,8")
+	PORT_DIPSETTING(      0x0002, DEF_STR( 6C_1C ))
+	PORT_DIPSETTING(      0x0006, DEF_STR( 5C_1C ))
+	PORT_DIPSETTING(      0x0001, DEF_STR( 4C_1C ))
+	PORT_DIPSETTING(      0x0005, DEF_STR( 3C_1C ))
+	PORT_DIPSETTING(      0x0003, DEF_STR( 2C_1C ))
+	PORT_DIPSETTING(      0x0007, DEF_STR( 1C_1C ))
+	PORT_DIPSETTING(      0x0004, DEF_STR( 1C_2C ))
+	PORT_DIPSETTING(      0x0000, DEF_STR( 1C_4C ))
+	PORT_DIPNAME( 0x0038, 0x0038, "Left Coinage"  )		PORT_DIPLOCATION("SWA:3,4,5")
+	PORT_DIPSETTING(      0x0000, DEF_STR( 4C_1C ))
+	PORT_DIPSETTING(      0x0020, DEF_STR( 2C_1C ))
+	PORT_DIPSETTING(      0x0038, DEF_STR( 1C_1C ))
+	PORT_DIPSETTING(      0x0018, DEF_STR( 1C_2C ))
+	PORT_DIPSETTING(      0x0028, DEF_STR( 1C_3C ))
+	PORT_DIPSETTING(      0x0008, DEF_STR( 1C_4C ))
+	PORT_DIPSETTING(      0x0030, DEF_STR( 1C_5C ))
+	PORT_DIPSETTING(      0x0010, DEF_STR( 1C_6C ))
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Free_Play ))	PORT_DIPLOCATION("SWA:2")
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ))
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ))
+	PORT_SERVICE_DIPLOC(  0x0080, IP_ACTIVE_LOW, "SWA:1" )
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("3c0008")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x0004, IP_ACTIVE_HIGH, IPT_COIN3 )
+	PORT_BIT( 0x0008, IP_ACTIVE_HIGH, IPT_COIN4 )
+	PORT_BIT( 0x00f0, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
+
+	PORT_START("3c000a")
+	PORT_BIT( 0x0001, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(prot_r, NULL)	/* protection data */
+	PORT_BIT( 0x0002, IP_ACTIVE_HIGH, IPT_SPECIAL )		/* protection ready */
+	PORT_BIT( 0x00fc, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+
 /*************************************
  *
  *  Machine driver
@@ -756,6 +890,22 @@ static MACHINE_CONFIG_DERIVED( stonebal, artmagic )
 
 	MDRV_SOUND_MODIFY("oki")
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_DERIVED( shtstar, artmagic )
+
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_PROGRAM_MAP(shtstar_map)
+
+	/* sub cpu*/
+	MDRV_CPU_ADD("subcpu", M68000, MASTER_CLOCK_25MHz/2)
+	MDRV_CPU_PROGRAM_MAP(shtstar_subcpu_map)
+	
+	/*gun board cpu*/
+	MDRV_CPU_ADD("guncpu", I80C31, 6000000)
+	MDRV_CPU_IO_MAP(shtstar_guncpu_io_map)
+	MDRV_CPU_PROGRAM_MAP(shtstar_guncpu_map)
+
 MACHINE_CONFIG_END
 
 
@@ -873,6 +1023,109 @@ ROM_START( stonebal2 )
 	ROM_LOAD( "u1801.bin", 0x00000, 0x80000, CRC(d98f7378) SHA1(700df7f29c039b96791c2704a67f01a722dc96dc) )
 ROM_END
 
+/*
+
+Shooting Star:
+
+- Small pcb "gewehr controller" (gun controller) adp 1994
+	romless MCU 80c31BH-3 16P philips
+	27c256 eprom "2207 7b42c5"
+	LC36648L-10
+	8 connectors
+	3X led
+	osc 12.0000M
+
+- common adp cpu board adp 1994.12
+	MC68ec0000FN8
+	2x 27c1001 eproms
+	2x mk48t08b-15 timekeeper RAM
+	
+- common adp i/o board (see adp.c ) with MC68681 an YM2149F
+
+- lamp board with triacs
+
+- a couple of tiny boards with some logic parts
+
+- Art & Magic jamma pcb,  11 connectors (jamma not connected)   "am005c0494 0310"
+	MC68000p12
+	TMS34010fnl-40
+	fpga actel a1020a  pl84c  16b.u110
+	cpld xilinx xc7236a 0 25  15b.u111
+	MC68681p
+	ramdac adv476kn80e 03-56 os
+	Oki M6295
+	25.000mhz
+	40.000mhz
+
+	13 pals/gals (not dumped) labelled:
+		a&m005c0494 06a u126
+		a&m005c0494 03a u125
+		a&m005c0494 02a u307
+		a&m005c0494 18a u306
+		a&m005c0494 17a u305
+		a&m005c0494 05a u206
+		a&m005c0494 01a u205
+		a&m005c0494 04a u601
+		a&m005c0494 08a u916
+		a&m005c0494 07a u705
+		a&m005c0494 10a u917
+		a&m005c0494 09a u903
+		a&m005c0494 11a u112
+
+	27c2001 near oki  "a&m005c0494 12a"
+	2x 27c010 68k labelled u101 and u102
+	2x 27c040 "a&m005c0494 13a"  and "a&m005c0494 14a"
+
+
+Shooting Star
+Nova (Art & Magic ?), 1994
+
+PCB No: AM005C0494 0310
+CPUs  : TMS34010FNL-40, MC68000P12
+SND   : OKI M6295
+OSC   : 40.000MHz, 25.000MHz
+
+
+*/
+
+
+ROM_START( shtstar )
+	ROM_REGION( 0x80000, "maincpu", 0 )	
+	ROM_LOAD16_BYTE( "rom.u102", 0x00000, 0x20000, CRC(cce9877e) SHA1(3e2b3b29d5dd73bfe0c7faf84309b50adbcded3b) )
+	ROM_LOAD16_BYTE( "rom.u101", 0x00001, 0x20000, CRC(3a330d9d) SHA1(0f3cd75e9e5483e3cf51f0c4eb4f15b6c3b33b67) )
+			
+	ROM_REGION( 0x40000, "subcpu", 0 )
+	ROM_LOAD16_BYTE( "shooting_star_f1_i.u2",  0x00000, 0x20000, CRC(2780d8d6) SHA1(a8db3a9771f6918eb8bb3b94db82ca8ada2aae7d) )
+	ROM_LOAD16_BYTE( "shooting_star_f1_ii.u7", 0x00001, 0x20000, CRC(0d127d9c) SHA1(e9d209901e55a743a4916c850083caa23c5ebb39) )
+
+	/* 80c31 MCU */
+	ROM_REGION( 0x10000, "guncpu", 0 )	
+	ROM_LOAD( "2207_7b42c5.u6", 0x00000, 0x8000, CRC(6dd4b4ed) SHA1(b37e9e5ddfb5d88c5412dc79643adfc4362fbb46) )
+
+	ROM_REGION16_LE( 0x100000, "gfx1", 0 )
+	ROM_LOAD( "a&m005c0494_13a.u134", 0x00000, 0x80000, CRC(f101136a) SHA1(9ff7275e0c1fc41f3d97ae0bd628581e2803910a) )
+	ROM_LOAD( "a&m005c0494_14a.u135", 0x80000, 0x80000, CRC(3e847f8f) SHA1(c99159951303b7f752305fa8e7e6d4bfb4fc54ba) )
+
+	ROM_REGION( 0x80000, "oki", 0 )
+	ROM_LOAD( "a&m005c0494_12a.u151", 0x00000, 0x40000, CRC(2df3db1e) SHA1(d2e588db577de6fd527cd496f5eae9964d557da3) )
+	
+	ROM_REGION( 0x1a00,  "plds", 0 )
+	ROM_LOAD( "a&m005c0494_06a.u126",   0x0000, 0x0200, NO_DUMP )
+	ROM_LOAD( "a&m005c0494_03a.u125",   0x0200, 0x0200, NO_DUMP )
+	ROM_LOAD( "a&m005c0494_02a.u307",   0x0400, 0x0200, NO_DUMP )
+	ROM_LOAD( "a&m005c0494_18a.u306",   0x0600, 0x0200, NO_DUMP )
+	ROM_LOAD( "a&m005c0494_17a.u305",   0x0800, 0x0200, NO_DUMP )
+	ROM_LOAD( "a&m005c0494_05a.u206",   0x0a00, 0x0200, NO_DUMP )
+	ROM_LOAD( "a&m005c0494_01a.u205",   0x0c00, 0x0200, NO_DUMP )
+	ROM_LOAD( "a&m005c0494_04a.u601",   0x0e00, 0x0200, NO_DUMP )
+	ROM_LOAD( "a&m005c0494_08a.u916",   0x1000, 0x0200, NO_DUMP )
+	ROM_LOAD( "a&m005c0494_07a.u705",   0x1200, 0x0200, NO_DUMP )
+	ROM_LOAD( "a&m005c0494_10a.u917",   0x1400, 0x0200, NO_DUMP )
+	ROM_LOAD( "a&m005c0494_09a.u903",   0x1600, 0x0200, NO_DUMP )
+	ROM_LOAD( "a&m005c0494_11a.u112",   0x1800, 0x0200, NO_DUMP )
+
+ROM_END
+
 
 
 /*************************************
@@ -939,6 +1192,14 @@ static DRIVER_INIT( stonebal )
 	protection_handler = stonebal_protection;
 }
 
+static DRIVER_INIT( shtstar )
+{
+	/* wrong */
+	decrypt_ultennis();
+	artmagic_is_stoneball =0;	
+	protection_handler = stonebal_protection;
+}
+
 
 
 /*************************************
@@ -952,3 +1213,6 @@ GAME( 1993, ultennisj,ultennis, artmagic, ultennis, ultennis, ROT0, "Art & Magic
 GAME( 1994, cheesech, 0,        cheesech, cheesech, cheesech, ROT0, "Art & Magic", "Cheese Chase", GAME_SUPPORTS_SAVE )
 GAME( 1994, stonebal, 0,        stonebal, stonebal, stonebal, ROT0, "Art & Magic", "Stone Ball (4 Players)", GAME_SUPPORTS_SAVE )
 GAME( 1994, stonebal2,stonebal, stonebal, stoneba2, stonebal, ROT0, "Art & Magic", "Stone Ball (2 Players)", GAME_SUPPORTS_SAVE )
+GAME( 1994, shtstar, 0, shtstar, shtstar, shtstar, ROT0, "Nova", "Shooting Star", GAME_NOT_WORKING )
+
+

@@ -8681,6 +8681,8 @@ Other Sun games
 	DRIVER( cheesech )	/* (c) 1994 */
 	DRIVER( stonebal )	/* (c) 1994 */
 	DRIVER( stonebal2 )	/* (c) 1994 */
+	
+	DRIVER( shtstar )	/* (c) 1994 Nova */
 
 	/* Dynamo games */
 	DRIVER( skeetsht )	/* (c) 1991 */
