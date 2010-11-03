@@ -3165,7 +3165,7 @@ bool device_debug::breakpoint::hit(offs_t pc)
 		{
 			return (m_condition.execute() != 0);
 		}
-		catch (expression_error &err)
+		catch (expression_error &)
 		{
 			return false;
 		}
@@ -3223,7 +3223,7 @@ bool device_debug::watchpoint::hit(int type, offs_t address, int size)
 		{
 			return (m_condition.execute() != 0);
 		}
-		catch (expression_error &err)
+		catch (expression_error &)
 		{
 			return false;
 		}
