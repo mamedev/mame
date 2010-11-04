@@ -68,6 +68,8 @@
 #define UTF8_MULTIPLY		"\xc3\x97"			/* multiplication symbol */
 #define UTF8_DEGREES		"\xc2\xb0"			/* degrees symbol */
 
+#define O_UMLAUT 			"\xc3\x96"			/* capital O with an umlaut */
+
 
 
 /***************************************************************************
