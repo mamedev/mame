@@ -366,7 +366,7 @@ DISCRETE_RESET(dst_dac_r1)
 	context->last_v = 0;
 
 	/* Calculate the Millman current of the bias circuit */
-	if (info->rBias)
+	if (info->rBias > 0)
 		i_bias = info->vBias / info->rBias;
 	else
 		i_bias = 0;
@@ -393,11 +393,11 @@ DISCRETE_RESET(dst_dac_r1)
      */
 	for(bit = 0; bit < ladderLength; bit++)
 	{
-		if (info->r[bit] != 0)
+		if (info->r[bit] > 0)
 			r_total += 1.0 / info->r[bit];
 	}
-	if (info->rBias) r_total += 1.0 / info->rBias;
-	if (info->rGnd)  r_total += 1.0 / info->rGnd;
+	if (info->rBias > 0) r_total += 1.0 / info->rBias;
+	if (info->rGnd > 0)  r_total += 1.0 / info->rGnd;
 	r_total = 1.0 / r_total;
 
 	node->output[0] = 0;
@@ -420,7 +420,7 @@ DISCRETE_RESET(dst_dac_r1)
 			/* Add up currents of ON circuits per Millman. */
 
 			/* ignore if no resistor present */
-			if (EXPECTED(info->r[bit] != 0))
+			if (EXPECTED(info->r[bit] > 0))
 			{
 				double i_bit;
 				int bit_val = (i >> bit) & 0x01;

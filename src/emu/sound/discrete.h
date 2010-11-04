@@ -3340,7 +3340,7 @@
  *
  *  Declaration syntax
  *
- *     DISCRETE_74LS624(name of node,(NODE,ENAB,VMOD,VRNG,C,R_FREQ_IN,C_FREQ_IN,OUTTYPE)
+ *     DISCRETE_74LS624(name of node,(NODE,ENAB,VMOD,VRNG,C,R_FREQ_IN,C_FREQ_IN,R_RNG_IN,OUTTYPE)
  *                      enable node or static value,
  *                      vMod node or static value,
  *                      vRng static value,
@@ -3354,11 +3354,11 @@
  *      DISC_LS624_OUT_SQUARE      - 4.4V square wave
  *      DISC_LS624_OUT_ENERGY      - 4.4V anti-aliased square wave
  *      DISC_LS624_OUT_LOGIC       - Logic ( 0 or 1)
- *      DISC_LS624_OUT_LOGIC_X     - Logic ( 0 or 1) with xime
+ *      DISC_LS624_OUT_LOGIC_X     - Logic ( 0 or 1) with x_time
  *      DISC_LS624_OUT_COUNT_F     - Number of Falling edges
- *      DISC_LS624_OUT_COUNT_F_X   - Number of Falling edges with xime
+ *      DISC_LS624_OUT_COUNT_F_X   - Number of Falling edges with x_time
  *      DISC_LS624_OUT_COUNT_R     - Number of Rising  edges
- *      DISC_LS624_OUT_COUNT_R_X   - Number of Rising  edges with xime
+ *      DISC_LS624_OUT_COUNT_R_X   - Number of Rising  edges with x_time
  *
  *
  * EXAMPLES: see Donkey Kong Jr.; Mario Bros.

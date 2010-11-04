@@ -169,9 +169,10 @@ DISCRETE_STEP(dst_crfilter)
 		}
 	}
 
-	node->output[0] = DST_CRFILTER__IN - context->vCap;
-	//context->vCap += ((DST_CRFILTER__IN - context->vRef) - context->vCap) * context->exponent;
-	context->vCap += (node->output[0] - DST_CRFILTER__VREF) * context->exponent;
+	double v_out = DST_CRFILTER__IN - context->vCap;
+	double v_diff = v_out - DST_CRFILTER__VREF;
+	node->output[0] = v_out;
+	context->vCap += v_diff * context->exponent;
 }
 
 DISCRETE_RESET(dst_crfilter)

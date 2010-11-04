@@ -33,6 +33,8 @@ struct dss_counter_context
 	int		clock_type;
 	int		out_type;
 	int		is_7492;
+	int		last_clock;
+	UINT32	last_count;
 	UINT32	last;		/* Last clock state */
 	UINT32	min;
 	UINT32	max;
@@ -196,9 +198,10 @@ DISCRETE_STEP(dss_counter)
 
 	double	cycles;
 	double	ds_clock;
-	int		clock = 0, last_count, inc = 0;
+	int		clock = 0, inc = 0;
+	UINT32	last_count = context->last_count;	/* it is different then output in 7492 */
 	double	x_time = 0;
-	UINT32	count = node->output[0];
+	UINT32	count = last_count;
 
 	ds_clock = DSS_COUNTER__CLOCK;
 	if (UNEXPECTED(context->clock_type == DISC_CLK_IS_FREQ))
@@ -220,6 +223,7 @@ DISCRETE_STEP(dss_counter)
 	/* If reset enabled then set output to the reset value.  No x_time in reset. */
 	if (UNEXPECTED(DSS_COUNTER__RESET))
 	{
+		context->last_count = (int)DSS_COUNTER__INIT;
 		node->output[0] = (int)DSS_COUNTER__INIT;
 		return;
 	}
@@ -230,17 +234,15 @@ DISCRETE_STEP(dss_counter)
      */
 	if (EXPECTED(DSS_COUNTER__ENABLE))
 	{
-		last_count = count;
-
 		switch (context->clock_type)
 		{
 			case DISC_CLK_ON_F_EDGE:
 			case DISC_CLK_ON_R_EDGE:
 				/* See if the clock has toggled to the proper edge */
 				clock = (clock != 0);
-				if (context->last != clock)
+				if (context->last_clock != clock)
 				{
-					context->last = clock;
+					context->last_clock = clock;
 					if (context->clock_type == clock)
 					{
 						/* Toggled */
@@ -273,6 +275,7 @@ DISCRETE_STEP(dss_counter)
 			}
 		}
 
+		context->last_count = count;
 		node->output[0] = context->is_7492 ? disc_7492_count[count] : count;
 
 		if (UNEXPECTED(count != last_count))
@@ -300,9 +303,6 @@ DISCRETE_RESET(dss_counter)
 {
 	DISCRETE_DECLARE_CONTEXT(dss_counter)
 
-	if (DSS_COUNTER__MAX < DSS_COUNTER__MIN)
-		fatalerror("MAX < MIN in NODE_%02d", NODE_INDEX(node->block->node));
-
 	if ((int)DSS_COUNTER__CLOCK_TYPE & DISC_COUNTER_IS_7492)
 	{
 		context->is_7492    = 1;
@@ -319,12 +319,18 @@ DISCRETE_RESET(dss_counter)
 		context->min = DSS_COUNTER__MIN;
 		context->diff = context->max - context->min + 1;
 	}
+
+
+	if (!context->is_7492 && (DSS_COUNTER__MAX < DSS_COUNTER__MIN))
+		fatalerror("MAX < MIN in NODE_%02d", NODE_INDEX(node->block->node));
+
 	context->out_type    = context->clock_type & DISC_OUT_MASK;
 	context->clock_type &= DISC_CLK_MASK;
 
-	context->t_left  = 0;
-	context->last    = 0;
-	node->output[0]  = DSS_COUNTER__INIT; /* count starts at reset value */
+	context->t_left = 0;
+	context->last_count = 0;
+	context->last_clock = 0;
+	node->output[0] = DSS_COUNTER__INIT; /* count starts at reset value */
 }
 
 
