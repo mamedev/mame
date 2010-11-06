@@ -636,7 +636,7 @@ MACHINE_CONFIG_END
  *
  *************************************/
 
-ROM_START( bigkarnk )
+ROM_START( bigkarnk ) /* PCB silkscreened REF.901112 */
 	ROM_REGION( 0x080000, "maincpu", 0 )	/* 68000 code */
 	ROM_LOAD16_BYTE(	"d16",	0x000000, 0x040000, CRC(44fb9c73) SHA1(c33852b37afea15482f4a43cb045434660e7a056) )
 	ROM_LOAD16_BYTE(	"d19",	0x000001, 0x040000, CRC(ff79dfdd) SHA1(2bfa440299317967ba2018d3a148291ae0c144ae) )
