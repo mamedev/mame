@@ -270,6 +270,7 @@ static const naomibd_config_table naomibd_translate_tbl[] =
 	{ "toyfight", 0, 0x2ca85, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
 	{ "vtennis", 0, 0x3eb15, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
 	{ "wwfroyal",0, 0x627c3, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "zerogu2", 0, 0x7c010, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
 	{ "zombrvn", 0, 0x12b41, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
 
 	// games where the encryption is stacked with the ASIC's compression

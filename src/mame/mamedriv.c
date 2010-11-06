@@ -4682,7 +4682,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( gundmct )	/* 2001.03 Mobile Suit Gundam: Federation vs. Zeon (cartridge) */
 						/* 2001.04 Shakatto Tambourine Motto Norinori Shinkyoku Tsuika */
 	DRIVER( dygolf )	/* 2001.04 Dynamic Golf */
-						/* 2001.05 Zero Gunner 2 */
+	DRIVER( zerogu2 ) 	/* 2001.05 Zero Gunner 2 */
 	DRIVER( monkeyba )	/* 2001.05 Monkey Ball */
 	DRIVER( cvsgd )		/* 2001.06 Capcom vs. SNK Pro */
 						/* 2001.06 Crackin' DJ Part2 */
