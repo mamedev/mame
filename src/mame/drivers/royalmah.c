@@ -7,34 +7,35 @@ driver by Zsolt Vasvari, Nicola Salmoria, Luca Elia
 
 CPU:    Z80 or TLCS-90
 Video:  Framebuffer
-Sound:  AY-3-8910
+Sound:  AY-3-8910 (or YM2149)
 OSC:    18.432MHz and 8MHz
 
----------------------------------------------------------------------------------------------------------------------
-Year + Game               Board(s)             CPU      Company            Notes
----------------------------------------------------------------------------------------------------------------------
-81  Royal Mahjong                              Z80      Nichibutsu
-81? Open Mahjong                               Z80      Sapporo Mechanic
-82  Royal Mahjong         ? + FRM-03           Z80      Falcon             bootleg
-83  Janyou Part II                             Z80        Cosmo Denshi
-84? Jan Oh                FRM-00?              Z80      Toaplan            Incomplete program roms
-86  Ippatsu Gyakuten                           Z80      Public/Paradais
-86  Don Den Mahjong       D039198L-0           Z80      Dyna Electronics
-86  Watashiha Suzumechan  D8803288L1-0         Z80      Dyna Electronics
-87  Mahjong Diplomat      D0706088L1-0         Z80      Dynax
-87  Mahjong Studio 101    D1708228L1           Z80      Dynax
-87  Tonton                D0908288L1-0         Z80      Dynax
-88  Almond Pinky          D1401128L-0 + RM-1D  Z80      Dynax
-89  Mahjong Shinkirou     D210301BL2 + FRM-00? TLCS-90  Dynax
-89  Mahjong Derringer     D2203018L            Z80      Dynax              Larger palette
-90  Mahjong If..?         D2909278L            TLCS-90  Dynax              Larger palette
-91  Mahjong Vegas         D5011308L1 + FRM-00  TLCS-90  Dynax              Undumped internal rom (mjvegas set)
-92  Mahjong Cafe Time     D6310128L1-1         TLCS-90  Dynax              Larger palette, RTC
-93  Mahjong Cafe Doll     D76052208L-2         TLCS-90  Dynax              Larger palette, RTC, Undumped internal rom
-95  Mahjong Tensinhai     D10010318L1          TLCS-90  Dynax              Larger palette, RTC
-96  Janputer '96          NS503X0727           Z80      Dynax              Larger palette, RTC
-99  Mahjong Cafe Break    NS528-9812           TLCS-90  Nakanihon / Dynax  Undumped internal rom
----------------------------------------------------------------------------------------------------------------------
+-----------------------------------------------------------------------------------------------------------------------
+Year + Game               Board(s)               CPU      Company            Notes
+-----------------------------------------------------------------------------------------------------------------------
+81  Royal Mahjong                                Z80      Nichibutsu
+81? Open Mahjong                                 Z80      Sapporo Mechanic
+82  Royal Mahjong         ? + FRM-03             Z80      Falcon             bootleg
+83  Janyou Part II                               Z80        Cosmo Denshi
+84? Jan Oh                FRM-00?                Z80      Toaplan            Incomplete program roms
+86  Ippatsu Gyakuten                             Z80      Public/Paradais
+86  Don Den Mahjong       D039198L-0             Z80      Dyna Electronics
+86  Watashiha Suzumechan  D8803288L1-0           Z80      Dyna Electronics
+87  Mahjong Diplomat      D0706088L1-0           Z80      Dynax
+87  Mahjong Studio 101    D1708228L1             Z80      Dynax
+87  Tonton                D0908288L1-0           Z80      Dynax
+88  Almond Pinky          D1401128L-0 + RM-1D    Z80      Dynax
+89  Mahjong Shinkirou     D210301BL2 + FRM-00?   TLCS-90  Dynax
+89  Mahjong Derringer     D2203018L              Z80      Dynax              Larger palette
+90  Mahjong If..?         D2909278L              TLCS-90  Dynax              Larger palette
+91  Mahjong Vegas         D5011308L1 + FRM-00    TLCS-90  Dynax              Undumped internal rom (mjvegas set)
+92  Mahjong Cafe Time     D6310128L1-1           TLCS-90  Dynax              Larger palette, RTC
+93  Mahjong Cafe Doll     D76052208L-2           TLCS-90  Dynax              Larger palette, RTC, Undumped internal rom
+95  Mahjong Tensinhai     D10010318L1            TLCS-90  Dynax              Larger palette, RTC
+96  Janputer '96          NS503X0727             Z80      Dynax              Larger palette, RTC
+97  Janputer Special      CS166P008 + NS5110207  Z80      Dynax              Larger palette, RTC
+99  Mahjong Cafe Break    NS528-9812             TLCS-90  Nakanihon / Dynax  Undumped internal rom
+-----------------------------------------------------------------------------------------------------------------------
 
 TODO:
 
@@ -80,7 +81,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
     front of a random combination. It's value remains *1 though.
     Could it be a leftover from another game ('tontonb' for exemple) ?
 
-- janptr96: in service mode press in sequence N,Ron,Ron,N to access some
+- janptr96, janptrsp: in service mode press in sequence N,Ron,Ron,N to access some
   hidden options. (thanks bnathan)
 
 2009-03-25 FP: fixed verified DSW and default settings for mjclub (thanks to
@@ -3254,7 +3255,7 @@ static INTERRUPT_GEN( janptr96_interrupt )
 }
 
 static MACHINE_CONFIG_DERIVED( janptr96, mjderngr )
-	MDRV_CPU_REPLACE("maincpu",Z80,24000000/4)	/* 6 MHz? */
+	MDRV_CPU_REPLACE("maincpu",Z80,XTAL_16MHz/2)	/* 8 MHz? */
 	MDRV_CPU_PROGRAM_MAP(janptr96_map)
 	MDRV_CPU_IO_MAP(janptr96_iomap)
 	MDRV_CPU_VBLANK_INT_HACK(janptr96_interrupt,3)	/* IM 2 needs a vector on the data bus */
@@ -3710,7 +3711,10 @@ ROM_END
 
 /***************************************************************************
 
-    Colour proms are TBP28S42's
+Janputer '96
+(c)1996 Dynax
+
+Colour proms are TBP28S42's
 
 ***************************************************************************/
 
@@ -3727,6 +3731,29 @@ ROM_START( janptr96 )
 	ROM_REGION( 0x400, "proms", 0 )
 	ROM_LOAD( "ns503b.3h", 0x000, 0x200, CRC(3b2a6b12) SHA1(ebd2929e6acbde989964bfef602b81f2f2fe04eb) )
 	ROM_LOAD( "ns503a.3j", 0x200, 0x200, CRC(fe49b2f0) SHA1(a36ca005380cc92dfe473254c26be2cef2ced9b4) )
+ROM_END
+
+/***************************************************************************
+
+Janputer Special
+(c)1997 Dynax
+
+Colour proms are TBP28642's
+
+***************************************************************************/
+
+ROM_START( janptrsp )
+	ROM_REGION( 0x210000, "maincpu", 0 )
+	ROM_LOAD( "ns51101.1h", 0x000000, 0x80000, CRC(44492ca1) SHA1(49e3dc9872a26e446599deb47161b8f52e4968c4) )
+	/* bank switched ROMs follow */
+	ROM_RELOAD(             0x010000, 0x80000 )
+	ROM_LOAD( "ns51102.1g", 0x090000, 0x80000, CRC(01e6aa19) SHA1(a761fe69fb69c0bf101033e71813742c9fc2d747) )
+	ROM_LOAD( "ns51103.1f", 0x110000, 0x80000, CRC(0fc94805) SHA1(035002e8354673a063faacd3cb91d0512cab677a) )
+	ROM_LOAD( "ns51104.1e", 0x190000, 0x80000, CRC(00442508) SHA1(268cc0c76bb9c21213c941952dbc891778ad397e) )
+
+	ROM_REGION( 0x400, "proms", 0 )
+	ROM_LOAD( "ns511b.3h", 0x000, 0x200, CRC(1286434f) SHA1(6818549d0e8b231d7071e67923f47b96fc6e1bb6) )
+	ROM_LOAD( "ns511a.3j", 0x200, 0x200, CRC(26b6714c) SHA1(0d110c1e3f7050a3c4ecbed630a0a8b522f1b0b0) )
 ROM_END
 
 /***************************************************************************
@@ -4657,4 +4684,5 @@ GAME( 1992,  cafetime, 0,        cafetime, cafetime, 0,        ROT0,   "Dynax", 
 GAME( 1993,  cafedoll, 0,        mjifb,    mjifb,    0,        ROT0,   "Dynax",                      "Mahjong Cafe Doll (Japan)",             GAME_NOT_WORKING )
 GAME( 1995,  mjtensin, 0,        mjtensin, mjtensin, 0,        ROT0,   "Dynax",                      "Mahjong Tensinhai (Japan)",             GAME_NOT_WORKING )
 GAME( 1996,  janptr96, 0,        janptr96, janptr96, janptr96, ROT0,   "Dynax",                      "Janputer '96 (Japan)",                  0 )
+GAME( 1997,  janptrsp, 0,        janptr96, janptr96, janptr96, ROT0,   "Dynax",                      "Janputer Special (Japan)",              0 )
 GAME( 1999,  cafebrk,  0,        mjifb,    mjifb,    0,        ROT0,   "Nakanihon / Dynax",          "Mahjong Cafe Break",                    GAME_NOT_WORKING )

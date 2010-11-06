@@ -8335,6 +8335,7 @@ Other Sun games
 	DRIVER( cafetime )	/* 1992 Dynax */
 	DRIVER( cafedoll )	/* 1993 Dynax */
 	DRIVER( janptr96 )	/* 1996 Dynax */
+	DRIVER( janptrsp )	/* 1997 Dynax */
 	DRIVER( sprtmtch )	/* "31" (c) 1989 Dynax + Fabtek license */
 	DRIVER( maya )		/* (c) 1994 Promat */
 	DRIVER( mayaa )		/* (c) 1994 Promat */
@@ -8342,7 +8343,8 @@ Other Sun games
 	DRIVER( blktouch )	/* (c) Yang Gi Co Ltd. */
 	DRIVER( mcnpshnt )	/* "33" Mahjong Campus Hunting 1990 Dynax */
 	DRIVER( 7jigen )	/* "37" 7jigen no Youseitachi 1990 Dynax */
-	DRIVER( neruton )	/* "45" Neruton Haikujiradan 1990 Dynax */
+	DRIVER( neruton )	/* "45" Mahjong Neruton Haikujiradan 1990 Dynax */
+	DRIVER( nerutona )	/* "45" Mahjong Neruton Haikujiradan 1990 Dynax */
 	DRIVER( mjcomv1 )	/* 1991 Dynax */
 	DRIVER( shpeng )	/* (c) 1995 WSAC Systems */
 	DRIVER( tenkai )	/* 1991 Dynax */

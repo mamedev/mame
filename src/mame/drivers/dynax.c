@@ -10,34 +10,34 @@ VDP:    HD46505SP (6845) (CRT controller)
 Custom: TC17G032AP-0246 (blitter)
 
 ---------------------------------------------------------------------------------------------------------------------
-Year + Game              Main Board   Sub Board    CPU   Sound                      Clock Color Notes
+Year + Game                Main Board   Sub Board    CPU   Sound                      Clock Color Notes
 ---------------------------------------------------------------------------------------------------------------------
-88 Hana no Mai           D1610088L1                Z80   AY8912 YM2203        M5205       PROM
-88 Hana Kochou           D201901L2    D201901L1-0  Z80   AY8912 YM2203        M5205       PROM
-89 Hana Oriduru          D2304268L                 Z80   AY8912        YM2413 M5205       RAM
-89 Dragon Punch          D24?                      Z80          YM2203                    PROM
-89 Mj Friday             D2607198L1                Z80                 YM2413             PROM
-89 Mj Gekisha            D2809218L-1  D2809218L-2  TLCS                YM2413             PROM  Battery
-89 Sports Match          D31?                      Z80          YM2203                    PROM
-90 Jong Tou Ki           D1505178-A   D2711078L-B  Z80*2 AY8912 YM2203        M5205       PROM  2 x Blitter
-90 Mj Campus Hunting     D3312108L1-1 D23SUB1      Z80   AY8912        YM2413 M5205       RAM
-90 Hana Jingi            no number    D3312108L1-2 Z80   AY8912        YM2413 M5205       RAM
-90 7jigen no Youseitachi D3707198L1   D23SUB1      Z80   AY8912        YM2413 M5205       RAM
-90 Mj Electron Base                                Z80   AY8912        YM2413             RAM
-90 Mj X-Tal/Diamond 7    D4005208L1-1 D23SUB       Z80   AY8912        YM2413 M5205       RAM
-90 Neruton Haikujiradan  D4005208L1-1 D4508308L-2  Z80   AY8912        YM2413 M5205       RAM
-91 Mj Dial Q2            D5212298L-1               Z80                 YM2413             PROM
-91 Mj Yarunara           D5512068L1-1 D4508308L-2  Z80   AY8912        YM2413 M5205 M6242 RAM   NL-001
-91 Hana wo Yaraneba!     D5512068L1-1 D4508308L-2  Z80   AY8912        YM2413 M5205 M6242 RAM   NL-001, Battery
-91 Mj Angels             D5512068L1-1 D6107068L-1  Z80   AY8912        YM2413 M5205       RAM
-91 Mj Comic Gekijou V.1  D5512068L1-1 D6107068L-1  Z80   AY8912        YM2413 M5205 M6242 RAM   NL-001, Battery
-91 Mj Tenkaigen                                    TLCS  AY8910        YM2413       M6242 RAM   Protection, Battery
-92 Quiz TV Gassyuukoku   D5512068L1-2 D6410288L-1  Z80   AY8912        YM2413 M5205       RAM
-92 Hanafuda Hana Tengoku D6502208L1   D6107068L-1  Z80   AY8910        YM2413       M6242 RAM
-94 Mj Reach (bootleg)    bootleg                   TLCS  AY8910        YM2413       M6242 PROM  Battery
-94 Maya                                            Z80          YM2203                    PROM
-96 Mj Raijinhai DX       D10010318L1  D10502168    TLCS  AY8910                     M6242 PROM  Undumped TMP91P640 Code, Battery
-9? Inca                                            Z80          YM2203                    PROM
+88 Hana no Mai             D1610088L1                Z80   AY8912 YM2203        M5205       PROM
+88 Hana Kochou             D201901L2    D201901L1-0  Z80   AY8912 YM2203        M5205       PROM
+89 Hana Oriduru            D2304268L                 Z80   AY8912        YM2413 M5205       RAM
+89 Dragon Punch            D24?                      Z80          YM2203                    PROM
+89 Mj Friday               D2607198L1                Z80                 YM2413             PROM
+89 Mj Gekisha              D2809218L-1  D2809218L-2  TLCS                YM2413             PROM  Battery
+89 Sports Match            D31?                      Z80          YM2203                    PROM
+90 Jong Tou Ki             D1505178-A   D2711078L-B  Z80*2 AY8912 YM2203        M5205       PROM  2 x Blitter
+90 Mj Campus Hunting       D3312108L1-1 D23SUB1      Z80   AY8912        YM2413 M5205       RAM
+90 Hana Jingi              no number    D3312108L1-2 Z80   AY8912        YM2413 M5205       RAM
+90 7jigen no Youseitachi   D3707198L1   D23SUB1      Z80   AY8912        YM2413 M5205       RAM
+90 Mj Electron Base                                  Z80   AY8912        YM2413             RAM
+90 Mj X-Tal/Diamond 7      D4005208L1-1 D23SUB       Z80   AY8912        YM2413 M5205       RAM
+90 Mj Neruton Haikujiradan D4005208L1-1 D4508308L-2  Z80   AY8912        YM2413 M5205       RAM
+91 Mj Dial Q2              D5212298L-1               Z80                 YM2413             PROM
+91 Mj Yarunara             D5512068L1-1 D4508308L-2  Z80   AY8912        YM2413 M5205 M6242 RAM   NL-001
+91 Hana wo Yaraneba!       D5512068L1-1 D4508308L-2  Z80   AY8912        YM2413 M5205 M6242 RAM   NL-001, Battery
+91 Mj Angels               D5512068L1-1 D6107068L-1  Z80   AY8912        YM2413 M5205       RAM
+91 Mj Comic Gekijou V.1    D5512068L1-1 D6107068L-1  Z80   AY8912        YM2413 M5205 M6242 RAM   NL-001, Battery
+91 Mj Tenkaigen                                      TLCS  AY8910        YM2413       M6242 RAM   Protection, Battery
+92 Quiz TV Gassyuukoku     D5512068L1-2 D6410288L-1  Z80   AY8912        YM2413 M5205       RAM
+92 Hanafuda Hana Tengoku   D6502208L1   D6107068L-1  Z80   AY8910        YM2413       M6242 RAM
+94 Mj Reach (bootleg)      bootleg                   TLCS  AY8910        YM2413       M6242 PROM  Battery
+94 Maya                                              Z80          YM2203                    PROM
+96 Mj Raijinhai DX         D10010318L1  D10502168    TLCS  AY8910                     M6242 PROM  Undumped TMP91P640 Code, Battery
+9? Inca                                              Z80          YM2203                    PROM
 ---------------------------------------------------------------------------------------------------------------------
 
 Notes:
@@ -6178,7 +6178,7 @@ static DRIVER_INIT( mjelct3a )
 
 /***************************************************************************
 
-Neruton Haikujiradan
+Mahjong Neruton Haikujiradan (Rev. B?)
 (c)1990 Dynax / Yukiyoshi Tokoro (Illustration)
 D4005208L1-1
 D4508308L-2 (sub board)
@@ -6225,9 +6225,48 @@ HD46505SP (6845)
 
 ROM_START( neruton )
 	ROM_REGION( 0x50000, "maincpu", 0 )	// Z80 Code
-	ROM_LOAD( "4501b.1a", 0x000000, 0x020000, CRC(0e53eeee) SHA1(883138618a11295bfac148da4a092e01d92229b3) )
-	ROM_RELOAD(           0x010000, 0x020000 )
-	ROM_LOAD( "4502.3a",  0x030000, 0x020000, CRC(c296293f) SHA1(466e87f7eca102568f1f00c6ba77dacc3df300dd) )
+	ROM_LOAD( "4501b.1a", 0x00000, 0x20000, CRC(0e53eeee) SHA1(883138618a11295bfac148da4a092e01d92229b3) )
+	ROM_RELOAD(           0x10000, 0x20000 )
+	ROM_LOAD( "4502.3a",  0x30000, 0x20000, CRC(c296293f) SHA1(466e87f7eca102568f1f00c6ba77dacc3df300dd) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 )	// blitter data
+	ROM_LOAD( "4511.11a", 0x00000, 0x20000, CRC(c4a96b6e) SHA1(15a6776509e0d30929f6a261798afe7dc0401d4e) )
+	ROM_LOAD( "4512.13a", 0x20000, 0x20000, CRC(d7ebbcb9) SHA1(b8edd8b93eca8d36056c02f8b69ff8313c9ab120) )
+	ROM_LOAD( "4513.14a", 0x40000, 0x20000, CRC(e3bed454) SHA1(03a66d31b8f41abc4ce83ebe22f8d14414d92152) )
+	ROM_LOAD( "4514.15a", 0x60000, 0x20000, CRC(ee258483) SHA1(8c685fee4eaff5978f0ec222c33d55123a8fa496) )
+	ROM_LOAD( "4515.17a", 0x80000, 0x20000, CRC(3bce0ca1) SHA1(1d0bb379077c52a63aa982bbe77f89df7b5b7b14) )
+	ROM_LOAD( "4516.18a", 0xa0000, 0x20000, CRC(ee6b7e3b) SHA1(5290fad850c7a52039cd9d26082bff8615bf3797) )
+	ROM_LOAD( "4517.19a", 0xc0000, 0x20000, CRC(b31f9694) SHA1(f22fc44908be4f1ef8dada57860f95ee74495605) )
+	ROM_LOAD( "4519.18c", 0xe0000, 0x20000, CRC(68aca5f3) SHA1(f03328362777e6d536f730bc3b52371d5daca54e) )
+
+	ROM_REGION( 0x40000, "gfx2", 0 )	// blitter data
+	ROM_LOAD( "4520.19c", 0x00000, 0x20000, CRC(7bb2b298) SHA1(643d21f6a45640bad5ec84af9745339487a7408c) )
+	ROM_LOAD( "4518.17c", 0x20000, 0x20000, CRC(fa88668e) SHA1(fce80a8badacf39f30c36952cbe0a1491b8faef1) )
+
+	ROM_REGION( 0x100000, "gfx3", 0 )	// blitter data
+	ROM_LOAD( "4510.4b",  0x00000, 0x20000, CRC(455305a1) SHA1(103e1eaac485b37786a1d1d411819788ed385467) )
+	ROM_LOAD( "4509.3b",  0x20000, 0x20000, CRC(4e1e6a2d) SHA1(04c71dd11594921142b6aa9554c0fe1b40254463) )
+	ROM_LOAD( "4508.2b",  0x40000, 0x20000, CRC(5c451ed4) SHA1(59a27ddfae541cb61dafb32bdb5de8ddbc5abb8d) )
+	ROM_LOAD( "4507.1b",  0x60000, 0x20000, CRC(106e6133) SHA1(d08deb17ea82fe43e458a11eea26ce98c26c51c1) )
+	ROM_LOAD( "4506.4a",  0x80000, 0x20000, CRC(6eac8b3c) SHA1(70dbe3af582384571872e7b6b51df4192daed227) )
+	ROM_LOAD( "4505.3a",  0xa0000, 0x20000, CRC(6f9fd275) SHA1(123a928dcb60624d61a55b2fef25156975ba26c9) )
+	ROM_LOAD( "4504.2a",  0xc0000, 0x20000, CRC(7b3387af) SHA1(403cf67287469ae6ce9a7f662f6d82f62dac349b) )
+	ROM_LOAD( "4503.1a",  0xe0000, 0x20000, CRC(dcbe2805) SHA1(713edd2e3c950bc689446441eb85197bb7b1eb89) )
+ROM_END
+
+/***************************************************************************
+
+Mahjong Neruton Haikujiradan (Rev. A?) [Mahjong Crimson-Whales]
+
+Only one rom differs from neruton: 4501a.1a (4501b.1a in neruton)
+
+***************************************************************************/
+
+ROM_START( nerutona )
+	ROM_REGION( 0x50000, "maincpu", 0 )	// Z80 Code
+	ROM_LOAD( "4501a.1a", 0x00000, 0x20000, CRC(82361a95) SHA1(360fa767dc1515bf853458e95e321fc66f8dcf47) )
+	ROM_RELOAD(           0x10000, 0x20000 )
+	ROM_LOAD( "4502.3a",  0x30000, 0x20000, CRC(c296293f) SHA1(466e87f7eca102568f1f00c6ba77dacc3df300dd) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )	// blitter data
 	ROM_LOAD( "4511.11a", 0x00000, 0x20000, CRC(c4a96b6e) SHA1(15a6776509e0d30929f6a261798afe7dc0401d4e) )
@@ -7201,7 +7240,8 @@ GAME( 1990, mjelct3,  mjelctrn, mjelctrn, mjelct3,  mjelct3,  ROT180, "Dynax",  
 GAME( 1990, mjelct3a, mjelctrn, mjelctrn, mjelct3,  mjelct3a, ROT180, "Dynax",                    "Mahjong Electron Base (parts 2 & 3, alt., Japan)",              GAME_SUPPORTS_SAVE )
 GAME( 1993, mjelctrb, mjelctrn, mjelctrn, mjelct3,  mjelct3,  ROT180, "bootleg",                  "Mahjong Electron Base (parts 2 & 4, Japan, bootleg)",           GAME_SUPPORTS_SAVE )
 GAME( 1990, majxtal7, 0,        majxtal7, majxtal7, mjelct3,  ROT180, "Dynax",                    "Mahjong X-Tal 7 - Crystal Mahjong / Mahjong Diamond 7 (Japan)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
-GAME( 1990, neruton,  0,        neruton,  neruton,  mjelct3,  ROT180, "Dynax / Yukiyoshi Tokoro", "Mahjong Neruton Haikujiradan (Japan)",                          GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1990, neruton,  0,        neruton,  neruton,  mjelct3,  ROT180, "Dynax / Yukiyoshi Tokoro", "Mahjong Neruton Haikujiradan (Japan, Rev. B?)",                 GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
+GAME( 1990, nerutona, neruton,  neruton,  neruton,  mjelct3,  ROT180, "Dynax / Yukiyoshi Tokoro", "Mahjong Neruton Haikujiradan (Japan, Rev. A?)",                 GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )
 GAME( 1991, hanayara, 0,        yarunara, hanayara, 0,        ROT180, "Dynax",                    "Hana wo Yaraneba! (Japan)",                                     GAME_SUPPORTS_SAVE )
 GAME( 1991, mjcomv1,  0,        yarunara, yarunara, 0,        ROT180, "Dynax",                    "Mahjong Comic Gekijou Vol.1 (Japan)",                           GAME_SUPPORTS_SAVE )
 GAME( 1991, tenkai,   0,        tenkai,   tenkai,   0,        ROT0,   "Dynax",                    "Mahjong Tenkaigen",                                             GAME_SUPPORTS_SAVE )
