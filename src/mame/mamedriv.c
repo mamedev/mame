@@ -1776,6 +1776,7 @@ const game_driver * const drivers[] =
 	DRIVER( lkageb )	/* bootleg */
 	DRIVER( lkageb2 )	/* bootleg */
 	DRIVER( lkageb3 )	/* bootleg */
+	DRIVER( bygone )	/* prototype ? A53 (c) 1985 Taito Corporation */
 	DRIVER( msisaac )	/* A34 (c) 1985 Taito Corporation */
 	DRIVER( retofinv )	/* A37 (c) 1985 Taito Corporation */
 	DRIVER( retofinv1 )	/* bootleg */

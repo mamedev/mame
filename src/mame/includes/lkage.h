@@ -13,7 +13,9 @@ public:
 
 	/* video-related */
 	tilemap_t *bg_tilemap, *fg_tilemap, *tx_tilemap;
-	UINT8 bg_tile_bank, fg_tile_bank;
+	UINT8 bg_tile_bank, fg_tile_bank, tx_tile_bank;
+	
+	int sprite_dx;
 
 	/* misc */
 	int sound_nmi_enable, pending_nmi;

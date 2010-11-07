@@ -57,6 +57,11 @@ Stephh's notes (based on the games Z80 code and some tests) :
   - Hi-scores, scores, and as a consequence bonus lives, have been divided by 10,
     but it's only a cosmetical effect as data from 0xe200 to 0xe22f is unchanged.
 
+4) 'bygone'
+
+  - is it prototype ?
+  - MCU (same code as lkage) is not used
+  - No music ? (could be emulation bug) (the 2nd YM is not used...)
 
 TODO:
 
@@ -83,6 +88,11 @@ TODO:
 #include "cpu/m6805/m6805.h"
 #include "sound/2203intf.h"
 #include "includes/lkage.h"
+
+#define MAIN_CPU_CLOCK		(XTAL_12MHz/2) 
+#define SOUND_CPU_CLOCK		(XTAL_8MHz/2)
+#define AUDIO_CLOCK			(XTAL_8MHz/2) 
+#define MCU_CLOCK			(XTAL_12MHz/4) 
 
 
 static TIMER_CALLBACK( nmi_callback )
@@ -119,13 +129,18 @@ static WRITE8_HANDLER( lkage_sh_nmi_enable_w )
 	}
 }
 
+static READ8_HANDLER(sound_status_r)
+{
+	return 0xff;
+}
+
 static ADDRESS_MAP_START( lkage_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xdfff) AM_ROM
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM /* work ram */
 	AM_RANGE(0xe800, 0xefff) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_le_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xf000, 0xf003) AM_RAM AM_BASE_MEMBER(lkage_state, vreg) /* video registers */
 	AM_RANGE(0xf060, 0xf060) AM_WRITE(lkage_sound_command_w)
-	AM_RANGE(0xf061, 0xf061) AM_WRITENOP
+	AM_RANGE(0xf061, 0xf061) AM_WRITENOP AM_READ(sound_status_r)
 	AM_RANGE(0xf062, 0xf062) AM_READWRITE(lkage_mcu_r,lkage_mcu_w)
 	AM_RANGE(0xf063, 0xf063) AM_WRITENOP /* pulsed; nmi on sound cpu? */
 	AM_RANGE(0xf080, 0xf080) AM_READ_PORT("DSW1")
@@ -139,8 +154,10 @@ static ADDRESS_MAP_START( lkage_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf0c0, 0xf0c5) AM_RAM AM_BASE_MEMBER(lkage_state, scroll)
 	AM_RANGE(0xf0e1, 0xf0e1) AM_WRITENOP /* pulsed */
 	AM_RANGE(0xf100, 0xf15f) AM_RAM AM_BASE_MEMBER(lkage_state, spriteram)
+	AM_RANGE(0xf160, 0xf1ff) AM_RAM /* unknown - no valid sprite data */
 	AM_RANGE(0xf400, 0xffff) AM_RAM_WRITE(lkage_videoram_w) AM_BASE_MEMBER(lkage_state, videoram)
 ADDRESS_MAP_END
+
 
 static READ8_HANDLER( port_fetch_r )
 {
@@ -175,6 +192,7 @@ static ADDRESS_MAP_START( lkage_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xb000, 0xb000) AM_READ(soundlatch_r) AM_WRITENOP	/* ??? */
 	AM_RANGE(0xb001, 0xb001) AM_READNOP	/* ??? */ AM_WRITE(lkage_sh_nmi_enable_w)
 	AM_RANGE(0xb002, 0xb002) AM_WRITE(lkage_sh_nmi_disable_w)
+	AM_RANGE(0xb003, 0xb003) AM_WRITENOP
 	AM_RANGE(0xe000, 0xefff) AM_ROM	/* space for diagnostic ROM? */
 ADDRESS_MAP_END
 
@@ -311,6 +329,126 @@ static INPUT_PORTS_START( lkageb )
 INPUT_PORTS_END
 
 
+static INPUT_PORTS_START( bygone )
+	PORT_START("DSW1")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Free_Play ) ) //
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x18, 0x18, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x18, "3" )
+	PORT_DIPSETTING(    0x10, "4" )
+	PORT_DIPSETTING(    0x08, "5" )
+	PORT_DIPSETTING(	0x00, "255 (Cheat)")
+	PORT_DIPUNUSED( 0x20, IP_ACTIVE_LOW )
+	PORT_DIPNAME( 0x40, 0x00, DEF_STR( Flip_Screen ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Cocktail ) )
+
+	PORT_START("DSW2")
+	PORT_DIPNAME( 0x0f, 0x00, DEF_STR( Coin_A ) )
+	PORT_DIPSETTING(    0x0f, DEF_STR( 9C_1C ) )
+	PORT_DIPSETTING(    0x0e, DEF_STR( 8C_1C ) )
+	PORT_DIPSETTING(    0x0d, DEF_STR( 7C_1C ) )
+	PORT_DIPSETTING(    0x0c, DEF_STR( 6C_1C ) )
+	PORT_DIPSETTING(    0x0b, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0x0a, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x09, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x03, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x05, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(    0x06, DEF_STR( 1C_7C ) )
+	PORT_DIPSETTING(    0x07, DEF_STR( 1C_8C ) )
+	PORT_DIPNAME( 0xf0, 0x00, DEF_STR( Coin_B ) )
+	PORT_DIPSETTING(    0xf0, DEF_STR( 9C_1C ) )
+	PORT_DIPSETTING(    0xe0, DEF_STR( 8C_1C ) )
+	PORT_DIPSETTING(    0xd0, DEF_STR( 7C_1C ) )
+	PORT_DIPSETTING(    0xc0, DEF_STR( 6C_1C ) )
+	PORT_DIPSETTING(    0xb0, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(    0xa0, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(    0x90, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(    0x30, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(    0x40, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(    0x50, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(    0x60, DEF_STR( 1C_7C ) )
+	PORT_DIPSETTING(    0x70, DEF_STR( 1C_8C ) )
+
+	PORT_START("DSW3")
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x40, 0x40, "Invulnerability (Cheat)")
+	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x00, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+
+
+	PORT_START("SYSTEM")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x04, IP_ACTIVE_HIGH, IPT_SERVICE1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_TILT )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x40, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_HIGH, IPT_UNKNOWN )
+
+	PORT_START("P1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P2")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT )  PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+
+
 static const gfx_layout tile_layout =
 {
 	8,8,
@@ -366,6 +504,9 @@ static MACHINE_START( lkage )
 
 	state_save_register_global(machine, state->bg_tile_bank);
 	state_save_register_global(machine, state->fg_tile_bank);
+	state_save_register_global(machine, state->tx_tile_bank);
+	
+	state_save_register_global(machine, state->sprite_dx);
 
 	state_save_register_global(machine, state->mcu_ready);
 	state_save_register_global(machine, state->mcu_val);
@@ -391,7 +532,7 @@ static MACHINE_RESET( lkage )
 {
 	lkage_state *state = machine->driver_data<lkage_state>();
 
-	state->bg_tile_bank = state->fg_tile_bank = 0;
+	state->bg_tile_bank = state->fg_tile_bank = state->tx_tile_bank =0;
 
 	state->mcu_ready = 3;
 	state->mcu_val = 0;
@@ -413,20 +554,19 @@ static MACHINE_RESET( lkage )
 	state->from_mcu = 0;
 }
 
-
 static MACHINE_CONFIG_START( lkage, lkage_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80,6000000)
+	MDRV_CPU_ADD("maincpu", Z80, MAIN_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(lkage_map)
 	MDRV_CPU_IO_MAP(lkage_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audiocpu", Z80, 6000000)
+	MDRV_CPU_ADD("audiocpu", Z80, SOUND_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(lkage_sound_map)
 								/* IRQs are triggered by the YM2203 */
 
-	MDRV_CPU_ADD("mcu", M68705,4000000)	/* ??? */
+	MDRV_CPU_ADD("mcu", M68705,MCU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(lkage_m68705_map)
 
 	MDRV_MACHINE_START(lkage)
@@ -449,14 +589,14 @@ static MACHINE_CONFIG_START( lkage, lkage_state )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym1", YM2203, 4000000)
+	MDRV_SOUND_ADD("ym1", YM2203, AUDIO_CLOCK )
 	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.15)
 	MDRV_SOUND_ROUTE(1, "mono", 0.15)
 	MDRV_SOUND_ROUTE(2, "mono", 0.15)
 	MDRV_SOUND_ROUTE(3, "mono", 0.40)
 
-	MDRV_SOUND_ADD("ym2", YM2203, 4000000)
+	MDRV_SOUND_ADD("ym2", YM2203, AUDIO_CLOCK )
 	MDRV_SOUND_ROUTE(0, "mono", 0.15)
 	MDRV_SOUND_ROUTE(1, "mono", 0.15)
 	MDRV_SOUND_ROUTE(2, "mono", 0.15)
@@ -467,12 +607,12 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( lkageb, lkage_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80,6000000)
+	MDRV_CPU_ADD("maincpu", Z80,MAIN_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(lkage_map)
 	MDRV_CPU_IO_MAP(lkage_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audiocpu", Z80, 6000000)
+	MDRV_CPU_ADD("audiocpu", Z80, SOUND_CPU_CLOCK)
 	MDRV_CPU_PROGRAM_MAP(lkage_sound_map)
 								/* IRQs are triggered by the YM2203 */
 
@@ -496,20 +636,19 @@ static MACHINE_CONFIG_START( lkageb, lkage_state )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym1", YM2203, 4000000)
+	MDRV_SOUND_ADD("ym1", YM2203, AUDIO_CLOCK)
 	MDRV_SOUND_CONFIG(ym2203_config)
 	MDRV_SOUND_ROUTE(0, "mono", 0.15)
 	MDRV_SOUND_ROUTE(1, "mono", 0.15)
 	MDRV_SOUND_ROUTE(2, "mono", 0.15)
 	MDRV_SOUND_ROUTE(3, "mono", 0.40)
 
-	MDRV_SOUND_ADD("ym2", YM2203, 4000000)
+	MDRV_SOUND_ADD("ym2", YM2203, AUDIO_CLOCK)
 	MDRV_SOUND_ROUTE(0, "mono", 0.15)
 	MDRV_SOUND_ROUTE(1, "mono", 0.15)
 	MDRV_SOUND_ROUTE(2, "mono", 0.15)
 	MDRV_SOUND_ROUTE(3, "mono", 0.40)
 MACHINE_CONFIG_END
-
 
 ROM_START( lkage )
 	ROM_REGION( 0x14000, "maincpu", 0 ) /* Z80 code (main CPU) */
@@ -664,6 +803,121 @@ ROM_START( lkageb3 )
 	ROM_LOAD( "a54-10.2",    0x0000, 0x0200, CRC(17dfbd14) SHA1(f8f0b6dfedd4ba108dad43ccc7697ef4ab9cbf86) )	/* unknown */
 ROM_END
 
+/*
+Bygone
+Taito, 1985?
+
+This is a rare prototype platform game conversion on a Legend Of Kage PCB. 
+There are some wire mods on the video board. 
+
+
+PCB Layouts 
+-----------
+
+K1100135A
+J1100057A
+CPU PCB
+M4300040A (sticker, also matches The Legend Of Kage)
+|------------------------------------------------------|
+|        VOL  LM324   TL074                    PC040DA |
+|             PC010SA YM3014    YM2203         PC040DA |
+|     MB3731                                   PC040DA |
+|             PC010SA YM3014    YM2203      MB2148     |
+|    PC030CM                                MB2148     |
+|                      8MHz                 MB2148     |
+|          6116                                       |-| 
+|2                                                    | |
+|2         A53_07.IC54   Z80A                         | |
+|W                                                    | |
+|A         A51_09.IC53                                | |
+|Y                                                    | |
+|                                                     | |
+|                                                     | |
+|                                     A54-14.IC27     |-|
+|          A53_08.IC51     A53_06.IC38                 |
+|                                                      |
+|                                                      |
+|                                                      |
+|          6264            A53_05.IC37   Z80B          |
+|             DSW3 DSW2 DSW1    TL7700                 |
+|------------------------------------------------------|
+Notes:
+      Z80A   - clock 4.000MHz [8/2]
+      Z80B   - clock 6.000MHz [12/2]
+      YM2203 - clock 4.000MHz [8/2]
+      A51_09 - MC68705P5 microcontroller, clock 3.000MHz [12/4]. 
+               It seems to be from Taito game A51, which is unknown? 
+               It was not protected ^_^
+      A54-14 - PAL16L8
+      A53*   - 27C128 and 27C256 EPROMs
+      6264   - 8k x8 SRAM
+      6116   - 2k x8 SRAM
+      2148   - 1k x4 SRAM
+      DIPs have 8 switches each
+      
+
+K1100136A
+J1100058A
+VIDEO PCB
+|------------------------------------------------------|
+|    12MHz                                             |
+|                                                      |
+|                                                      |
+|                                                      |
+|                                            6116      |
+|                         6116                         |
+|                                            6116     |-| 
+|1                                                    | |
+|8                                                    | |
+|W                                                    | |
+|A        A54-11.IC76                                 | |
+|Y                                    93422  93422    | |
+|                                                     | |
+|                                     93422  93422    | |
+|  A53_04.IC87  MB112S146 MB112S146  A54-13.IC35      |-|
+|                                                      |
+|  A53_03.IC86  MB112S146 MB112S146  A54-12.IC34       |
+|                                                      |
+|  A53_02.IC85  MB112S146 MB112S146                    |
+|                                                      |
+|  A53_01.IC84  MB112S146 MB112S146          A54-10.IC2|
+|------------------------------------------------------|
+Notes:
+      A54-10 - MB7122 PROM
+      A54-11 - PAL16L8
+      A54-12 - PAL16L8
+      A54-13 - PAL16L8
+      6116   - 2k x8 SRAM
+      93422  - 256b x4 SRAM
+      A53*   - 27C128 EPROMs
+      
+*/
+ 
+ROM_START( bygone )
+	ROM_REGION( 0x14000, "maincpu", 0 ) /* Z80 code (main CPU) */
+	ROM_LOAD( "a53_05.ic37", 0x0000, 0x8000, CRC(63a3f08b) SHA1(781539077cb1d3b8eecc8bd3717330c0f281833d) )
+	ROM_LOAD( "a53_06.ic38", 0x8000, 0x8000, CRC(cb0dcb08) SHA1(6b12b018b983b8225b5f33fb9fcd8004a00fd8ff) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 code (sound CPU) */
+	ROM_LOAD( "a53_07.ic54",   0x0000, 0x8000, CRC(72f69a77) SHA1(dfc1050a4123b3c83ae733ece1b6fe2836beb901) )
+
+	ROM_REGION( 0x10000, "mcu", 0 ) /* 68705 MCU code */
+	ROM_LOAD( "a51_09.ic53",   0x0000, 0x0800, CRC(0e8b8846) SHA1(a4a105462b0127229bb7edfadd2e581c7e40f1cc) ) /* the same as lkage */
+
+	ROM_REGION( 0x4000, "user1", 0 ) /* data */
+	ROM_LOAD( "a53_08.ic51",   0x0000, 0x4000, CRC(f85139f9) SHA1(7e089d1dd5c5fa8abb396b44aa15aabcf8677940) )
+
+	ROM_REGION( 0x10000, "gfx1", 0 )
+	ROM_LOAD( "a53_01.ic84", 0x0000, 0x4000, CRC(38cf7fb2) SHA1(424efabe2386fa5f1c22444a53952d85c05c2d64) )
+	ROM_LOAD( "a53_02.ic85", 0x4000, 0x4000, CRC(dca7adfe) SHA1(83b159e92dab96d9e20fa3a9d1ce7a7d2e83b313) )
+	ROM_LOAD( "a53_03.ic86", 0x8000, 0x4000, CRC(af3eb997) SHA1(ba66ffb9d83f91c98446ac38bb0e712ec0800625) )
+	ROM_LOAD( "a53_04.ic87", 0xc000, 0x4000, CRC(65af72d3) SHA1(759a1dd7548075630ddb9c692bdb32ad4712c579) )
+
+	ROM_REGION( 0x0400, "proms", 0 )
+	ROM_LOAD( "a54-10.ic2",    0x0000, 0x0400, CRC(369722d9) SHA1(2df9932ad8ce87c0a9d2c89222a4cec12c29046d) )	/* unknown */
+ROM_END
+
+
 /*Note: This probably uses another MCU dump,which is undumped.*/
 
 static READ8_HANDLER( fake_mcu_r )
@@ -714,16 +968,32 @@ static READ8_HANDLER( fake_status_r )
 	return state->mcu_ready;
 }
 
+static DRIVER_INIT( lkage )
+{
+	lkage_state *state = machine->driver_data<lkage_state>();
+	state->sprite_dx=0;
+}
+
 static DRIVER_INIT( lkageb )
 {
+	lkage_state *state = machine->driver_data<lkage_state>();
 	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf062, 0xf062, 0, 0, fake_mcu_r);
 	memory_install_read8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf087, 0xf087, 0, 0, fake_status_r);
 	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xf062, 0xf062, 0, 0, fake_mcu_w );
+	state->sprite_dx=0;
 }
 
-GAME( 1984, lkage,    0,        lkage,    lkage,    0,        ROT0, "Taito Corporation", "The Legend of Kage", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1984, lkageo,   lkage,    lkage,    lkage,    0,        ROT0, "Taito Corporation", "The Legend of Kage (older)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
-GAME( 1984, lkageoo,  lkage,    lkage,    lkage,    0,        ROT0, "Taito Corporation", "The Legend of Kage (oldest)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+static DRIVER_INIT( bygone )
+{
+	lkage_state *state = machine->driver_data<lkage_state>();
+	state->sprite_dx=1;
+}
+
+GAME( 1984, lkage,    0,        lkage,    lkage,    lkage,    ROT0, "Taito Corporation", "The Legend of Kage", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1984, lkageo,   lkage,    lkage,    lkage,    lkage,    ROT0, "Taito Corporation", "The Legend of Kage (older)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1984, lkageoo,  lkage,    lkage,    lkage,    lkage,    ROT0, "Taito Corporation", "The Legend of Kage (oldest)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1984, lkageb,   lkage,    lkageb,   lkageb,   lkageb,   ROT0, "bootleg", "The Legend of Kage (bootleg set 1)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1984, lkageb2,  lkage,    lkageb,   lkageb,   lkageb,   ROT0, "bootleg", "The Legend of Kage (bootleg set 2)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
 GAME( 1984, lkageb3,  lkage,    lkageb,   lkageb,   lkageb,   ROT0, "bootleg", "The Legend of Kage (bootleg set 3)", GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+GAME( 1985, bygone,   0,        lkage,    bygone,   bygone,   ROT0, "Taito Corporation", "Bygone", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NO_COCKTAIL | GAME_SUPPORTS_SAVE )
+

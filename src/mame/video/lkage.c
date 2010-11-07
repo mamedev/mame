@@ -11,6 +11,7 @@
     lkage_scroll[0x05]: background layer vertical scroll
 
     lkage_vreg[0]: 0x00,0x04
+		0x02: tx tile bank select (bygone only?)
         0x04: fg tile bank select
         0x08: ?
 
@@ -82,7 +83,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 static TILE_GET_INFO( get_tx_tile_info )
 {
 	lkage_state *state = machine->driver_data<lkage_state>();
-	int code = state->videoram[tile_index];
+	int code = state->videoram[tile_index] + 256 * (state->tx_tile_bank ? 4 : 0);
 	SET_TILE_INFO( 0/*gfx*/, code, 0/*color*/, 0/*flags*/);
 }
 
@@ -108,7 +109,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	lkage_state *state = machine->driver_data<lkage_state>();
 	const UINT8 *source = state->spriteram;
 	const UINT8 *finish = source + 0x60;
-
+		
 	while (source < finish)
 	{
 		int attributes = source[2];
@@ -124,7 +125,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 		int flipx = attributes & 0x01;
 		int flipy = attributes & 0x02;
 		int height = (attributes & 0x08) ? 2 : 1;
-		int sx = source[0] - 15;
+		int sx = source[0] - 15 + state->sprite_dx;
 		int sy = 256 - 16 * height - source[1];
 		int sprite_number = source[3] + ((attributes & 0x04) << 6);
 		int y;
@@ -180,6 +181,7 @@ VIDEO_UPDATE( lkage )
 	flip_screen_y_set(screen->machine, ~state->vreg[2] & 0x02);
 
 	bank = state->vreg[1] & 0x08;
+	
 	if (state->bg_tile_bank != bank)
 	{
 		state->bg_tile_bank = bank;
@@ -191,6 +193,13 @@ VIDEO_UPDATE( lkage )
 	{
 		state->fg_tile_bank = bank;
 		tilemap_mark_all_tiles_dirty(state->fg_tilemap);
+	}
+	
+	bank = state->vreg[0]&0x02;
+	if (state->tx_tile_bank != bank)
+	{
+		state->tx_tile_bank = bank;
+		tilemap_mark_all_tiles_dirty(state->tx_tilemap);
 	}
 
 	tilemap_set_palette_offset(state->bg_tilemap, 0x300 + (state->vreg[1] & 0xf0));
@@ -212,11 +221,12 @@ VIDEO_UPDATE( lkage )
 		tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 1);
 		tilemap_draw(bitmap, cliprect, state->fg_tilemap, 0, (state->vreg[1] & 2) ? 2 : 4);
 		tilemap_draw(bitmap, cliprect, state->tx_tilemap, 0, 4);
+		draw_sprites(screen->machine, bitmap, cliprect);
 	}
 	else
 	{
 		tilemap_draw(bitmap, cliprect, state->tx_tilemap, TILEMAP_DRAW_OPAQUE, 0);
 	}
-	draw_sprites(screen->machine, bitmap, cliprect);
+	
 	return 0;
 }
