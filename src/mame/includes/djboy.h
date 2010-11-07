@@ -18,7 +18,6 @@ public:
 
 	/* ROM banking */
 	UINT8		bankxor;
-	UINT8		addr;
 
 	/* video-related */
 	tilemap_t	*background;

@@ -137,7 +137,6 @@ Notes:
 */
 
 #include "emu.h"
-#include "deprecat.h"
 #include "cpu/z80/z80.h"
 #include "cpu/mcs51/mcs51.h"
 #include "sound/2203intf.h"
@@ -513,11 +512,17 @@ GFXDECODE_END
 
 /******************************************************************************/
 
-static INTERRUPT_GEN( djboy_interrupt )
-{ /* CPU1 uses interrupt mode 2. For now, just alternate the two interrupts. */
-	djboy_state *state = device->machine->driver_data<djboy_state>();
-	state->addr ^= 0x02;
-	cpu_set_input_line_and_vector(device, 0, HOLD_LINE, state->addr);
+/* Main Z80 uses IM2 */
+static TIMER_DEVICE_CALLBACK( djboy_scanline )
+{
+	int scanline = param;
+
+	if(scanline == 240) // vblank-out irq
+		cputag_set_input_line_and_vector(timer.machine, "maincpu", 0, HOLD_LINE, 0xfd);
+
+	/* Pandora "sprite end dma" irq? TODO: timing is clearly off, attract mode relies on this */
+	if(scanline == 64)
+		cputag_set_input_line_and_vector(timer.machine, "maincpu", 0, HOLD_LINE, 0xff);
 }
 
 static const kaneko_pandora_interface djboy_pandora_config =
@@ -553,8 +558,6 @@ static MACHINE_START( djboy )
 	state_save_register_global(machine, state->scrollx);
 	state_save_register_global(machine, state->scrolly);
 
-	state_save_register_global(machine, state->addr);
-
 	/* Kaneko BEAST */
 	state_save_register_global(machine, state->data_to_beast);
 	state_save_register_global(machine, state->data_to_z80);
@@ -575,8 +578,6 @@ static MACHINE_RESET( djboy )
 	state->scrollx = 0;
 	state->scrolly = 0;
 
-	state->addr = 0xff;
-
 	state->beast_int0_l = 1;
 	state->beast_to_z80_full = 0;
 	state->z80_to_beast_full = 0;
@@ -587,7 +588,7 @@ static MACHINE_CONFIG_START( djboy, djboy_state )
 	MDRV_CPU_ADD("maincpu", Z80, 6000000)
 	MDRV_CPU_PROGRAM_MAP(cpu0_am)
 	MDRV_CPU_IO_MAP(cpu0_port_am)
-	MDRV_CPU_VBLANK_INT_HACK(djboy_interrupt, 2)
+	MDRV_TIMER_ADD_SCANLINE("scantimer", djboy_scanline, "screen", 0, 1)
 
 	MDRV_CPU_ADD("cpu1", Z80, 6000000)
 	MDRV_CPU_PROGRAM_MAP(cpu1_am)
