@@ -482,19 +482,31 @@ void symbol_table::add(const char *name, void *ref, int minparams, int maxparams
 
 
 //-------------------------------------------------
-//  value - return the value of a symbol 
+//  find_deep - do a deep search for a symbol,
+//  looking in the parent if needed
 //-------------------------------------------------
 
-UINT64 symbol_table::value(const char *symbol)
+symbol_entry *symbol_table::find_deep(const char *symbol)
 {
 	// walk up the table hierarchy to find the owner
 	for (symbol_table *symtable = this; symtable != NULL; symtable = symtable->m_parent)
 	{
 		symbol_entry *entry = symtable->find(symbol);
 		if (entry != NULL)
-			return entry->value();
+			return entry;
 	}
-	return 0;
+	return NULL;
+}
+
+
+//-------------------------------------------------
+//  value - return the value of a symbol 
+//-------------------------------------------------
+
+UINT64 symbol_table::value(const char *symbol)
+{
+	symbol_entry *entry = find_deep(symbol);
+	return (entry != NULL) ? entry->value() : 0;
 }
 
 
@@ -504,16 +516,9 @@ UINT64 symbol_table::value(const char *symbol)
 
 void symbol_table::set_value(const char *symbol, UINT64 value)
 {
-	// walk up the table hierarchy to find the owner
-	for (symbol_table *symtable = this; symtable != NULL; symtable = symtable->m_parent)
-	{
-		symbol_entry *entry = symtable->find(symbol);
-		if (entry != NULL)
-		{
-			entry->set_value(value);
-			return;
-		}
-	}
+	symbol_entry *entry = find_deep(symbol);
+	if (entry != NULL)
+		entry->set_value(value);
 }
 
 
@@ -961,7 +966,7 @@ void parsed_expression::parse_symbol_or_number(parse_token &token, const char *&
 		return parse_number(token, &buffer[1], 16, expression_error::INVALID_NUMBER);
 		
 	// check for a symbol match
-	symbol_entry *symbol = m_symtable->find(buffer);
+	symbol_entry *symbol = m_symtable->find_deep(buffer);
 	if (symbol != NULL)
 	{
 		token.configure_symbol(*symbol);

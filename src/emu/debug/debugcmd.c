@@ -1163,26 +1163,26 @@ static void execute_comment_save(running_machine *machine, int ref, int params, 
 
 static void execute_bpset(running_machine *machine, int ref, int params, const char *param[])
 {
-	parsed_expression condition(debug_cpu_get_global_symtable(machine));
 	device_t *cpu;
 	const char *action = NULL;
 	UINT64 address;
 	int bpnum;
+
+	/* CPU is implicit */
+	if (!debug_command_parameter_cpu(machine, NULL, &cpu))
+		return;
 
 	/* param 1 is the address */
 	if (!debug_command_parameter_number(machine, param[0], &address))
 		return;
 
 	/* param 2 is the condition */
+	parsed_expression condition(&cpu->debug()->symtable());
 	if (!debug_command_parameter_expression(machine, param[1], condition))
 		return;
 
 	/* param 3 is the action */
 	if (!debug_command_parameter_command(machine, action = param[2]))
-		return;
-
-	/* CPU is implicit */
-	if (!debug_command_parameter_cpu(machine, NULL, &cpu))
 		return;
 
 	/* set the breakpoint */
@@ -1303,12 +1303,15 @@ static void execute_bplist(running_machine *machine, int ref, int params, const 
 
 static void execute_wpset(running_machine *machine, int ref, int params, const char *param[])
 {
-	parsed_expression condition(debug_cpu_get_global_symtable(machine));
 	address_space *space;
 	const char *action = NULL;
 	UINT64 address, length;
 	int type = 0;
 	int wpnum;
+
+	/* CPU is implicit */
+	if (!debug_command_parameter_cpu_space(machine, NULL, ref, &space))
+		return;
 
 	/* param 1 is the address */
 	if (!debug_command_parameter_number(machine, param[0], &address))
@@ -1332,15 +1335,12 @@ static void execute_wpset(running_machine *machine, int ref, int params, const c
 	}
 
 	/* param 4 is the condition */
+	parsed_expression condition(&space->cpu->debug()->symtable());
 	if (!debug_command_parameter_expression(machine, param[3], condition))
 		return;
 
 	/* param 5 is the action */
 	if (!debug_command_parameter_command(machine, action = param[4]))
-		return;
-
-	/* CPU is implicit */
-	if (!debug_command_parameter_cpu_space(machine, NULL, ref, &space))
 		return;
 
 	/* set the watchpoint */
