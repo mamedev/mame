@@ -910,18 +910,18 @@ DISCRETE_TASK_START(1)
 		4.14, 0.151)								/* INP0; INP1 (measured) */
 
 	/* Breadboarded measurements IC 5K, pin 7
-	   D.R. Oct 2010
-	    V       Hz
-	    0.151   3139
-	    0.25    2883
-	    0.5     2820
-	    0.75    3336
-	    1       3805
-	    2       6498
-	    3       9796
-	    4       13440
-	    4.14    13980
-	*/
+       D.R. Oct 2010
+        V       Hz
+        0.151   3139
+        0.25    2883
+        0.5     2820
+        0.75    3336
+        1       3805
+        2       6498
+        3       9796
+        4       13440
+        4.14    13980
+    */
 
 	DISCRETE_74LS624(NODE_113,						/* IC 5K, pin 7 */
 		1,											/* ENAB */
@@ -942,18 +942,18 @@ DISCRETE_TASK_START(1)
 		0.135, 4.15)								/* measured Low/High */
 
 	/* Breadboarded measurements IC 5K, pin 10
-	   D.R. Oct 2010
-	    V       Hz
-	    0.135   14450 - measured 74LS04 low
-	    0.25    13320
-	    0.5     12980
-	    0.75    15150
-	    1       17270
-	    2       28230
-	    3       41910
-	    4       56950
-	    4.15    59400 - measured 74LS04 high
-	*/
+       D.R. Oct 2010
+        V       Hz
+        0.135   14450 - measured 74LS04 low
+        0.25    13320
+        0.5     12980
+        0.75    15150
+        1       17270
+        2       28230
+        3       41910
+        4       56950
+        4.15    59400 - measured 74LS04 high
+    */
 
 	DISCRETE_74LS624(NODE_118,						/* IC 5K, pin 10 */
 		1,											/* ENAB */
@@ -984,18 +984,18 @@ DISCRETE_TASK_START(2)
 	DISCRETE_MIXER2(NODE_13, 1, NODE_11, NODE_12, &dkongjr_s1_mixer_desc)
 
 	/* Breadboarded measurements IC 8L, pin 10
-	   D.R. Oct 2010
-	    V       Hz
-	    0.151   313
-	    0.25    288
-	    0.5     275
-	    0.75    324
-	    1       370
-	    2       635
-	    3       965
-	    4       1325
-	    4.14    1378
-	*/
+       D.R. Oct 2010
+        V       Hz
+        0.151   313
+        0.25    288
+        0.5     275
+        0.75    324
+        1       370
+        2       635
+        3       965
+        4       1325
+        4.14    1378
+    */
 
 	DISCRETE_74LS624(NODE_14,						/* IC 8L, pin 10 */
 		1,											/* ENAB */
@@ -1015,8 +1015,8 @@ DISCRETE_TASK_START(2)
 DISCRETE_TASK_END()
 
 	/************************************************
-	 * SOUND2 - climbing
-	 ************************************************/
+     * SOUND2 - climbing
+     ************************************************/
 
 DISCRETE_TASK_START(1)
 	/* the noise source clock is a 74LS629 IC 7P, pin 10.
@@ -1048,18 +1048,18 @@ DISCRETE_TASK_START(1)
 		0.134, 4.16)						/* measured Low/High */
 
 	/* Breadboarded measurements IC 7P, pin 7
-	   D.R. Oct 2010
-	    V       Hz
-	    0.134   570
-	    0.25    538
-	    0.5     489
-	    0.75    560
-	    1       636
-	    2       1003
-	    3       1484
-	    4       2016
-	    4.16    2111
-	*/
+       D.R. Oct 2010
+        V       Hz
+        0.134   570
+        0.25    538
+        0.5     489
+        0.75    560
+        1       636
+        2       1003
+        3       1484
+        4       2016
+        4.16    2111
+    */
 	DISCRETE_74LS624(NODE_91,				/* IC 7P, pin 7 */
 		1,									/* ENAB */
 		NODE_90, DK_SUP_V,					/* VMOD - IC 7P, pin 2, VRNG */
@@ -1072,8 +1072,8 @@ DISCRETE_TASK_START(1)
 DISCRETE_TASK_END()
 
 	/************************************************
-	 * DAC
-	 ************************************************/
+     * DAC
+     ************************************************/
 
 DISCRETE_TASK_START(1)
 	DISCRETE_INPUT_BUFFER(DS_DAC, 0)
@@ -1094,8 +1094,8 @@ DISCRETE_TASK_START(1)
 DISCRETE_TASK_END()
 
 	/************************************************
-	 * Amplifier
-	 ************************************************/
+     * Amplifier
+     ************************************************/
 
 DISCRETE_TASK_START(3)
 	DISCRETE_MIXER5(NODE_288, 1, DS_OUT_SOUND9, DS_OUT_SOUND0, DS_OUT_SOUND2, DS_OUT_SOUND1, DS_OUT_DAC, &dkongjr_mixer_desc)
@@ -1106,9 +1106,9 @@ DISCRETE_TASK_START(3)
 	DISCRETE_CRFILTER(NODE_295, NODE_288, 1000, JR_C13)
 	/* approx -1.805V to 2.0V when playing, but turn on sound peaks at 2.36V */
 	/* we will set the full wav range to 1.18V which will cause clipping on the turn on
-	 * sound and explosions.  The real game would do this when the volume is turned up too.
-	 * Reducing MAME's master volume to 50% will provide full unclipped volume.
-	 */
+     * sound and explosions.  The real game would do this when the volume is turned up too.
+     * Reducing MAME's master volume to 50% will provide full unclipped volume.
+     */
 	DISCRETE_OUTPUT(NODE_295, 32767.0/1.18)
 DISCRETE_TASK_END()
 

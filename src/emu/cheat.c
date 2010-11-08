@@ -173,7 +173,7 @@ cheat_parameter::cheat_parameter(cheat_manager &manager, symbol_table &symbols, 
 	m_minval = number_and_format(xml_get_attribute_int(&paramnode, "min", 0), xml_get_attribute_int_format(&paramnode, "min"));
 	m_maxval = number_and_format(xml_get_attribute_int(&paramnode, "max", 0), xml_get_attribute_int_format(&paramnode, "max"));
 	m_stepval = number_and_format(xml_get_attribute_int(&paramnode, "step", 1), xml_get_attribute_int_format(&paramnode, "step"));
-	
+
 	// iterate over items
 	for (xml_data_node *itemnode = xml_get_sibling(paramnode.child, "item"); itemnode != NULL; itemnode = xml_get_sibling(itemnode->next, "item"))
 	{
@@ -184,11 +184,11 @@ cheat_parameter::cheat_parameter(cheat_manager &manager, symbol_table &symbols, 
 		// check for non-existant value
 		if (xml_get_attribute(itemnode, "value") == NULL)
 			throw emu_fatalerror("%s.xml(%d): item is value\n", filename, itemnode->line);
-		
+
 		// extract the parameters
 		UINT64 value = xml_get_attribute_int(itemnode, "value", 0);
 		int format = xml_get_attribute_int_format(itemnode, "value");
-		
+
 		// allocate and append a new item
 		item &curitem = m_itemlist.append(*auto_alloc(&manager.machine(), item(itemnode->value, value, format)));
 
@@ -210,7 +210,7 @@ const char *cheat_parameter::text()
 	// are we a value cheat?
 	if (!has_itemlist())
 		m_curtext.format("%d (0x%X)", UINT32(m_value), UINT32(m_value));
-	
+
 	// if not, we're an item cheat
 	else
 	{
@@ -280,7 +280,7 @@ bool cheat_parameter::set_minimum_state()
 bool cheat_parameter::set_prev_state()
 {
 	UINT64 origvalue = m_value;
-	
+
 	// are we a value cheat?
 	if (!has_itemlist())
 	{
@@ -289,7 +289,7 @@ bool cheat_parameter::set_prev_state()
 		else
 			m_value -= m_stepval;
 	}
-	
+
 	// if not, we're an item cheat
 	else
 	{
@@ -300,7 +300,7 @@ bool cheat_parameter::set_prev_state()
 		if (previtem != NULL)
 			m_value = previtem->value();
 	}
-	
+
 	return (m_value != origvalue);
 }
 
@@ -312,7 +312,7 @@ bool cheat_parameter::set_prev_state()
 bool cheat_parameter::set_next_state()
 {
 	UINT64 origvalue = m_value;
-	
+
 	// are we a value cheat?
 	if (!has_itemlist())
 	{
@@ -321,7 +321,7 @@ bool cheat_parameter::set_next_state()
 		else
 			m_value += m_stepval;
 	}
-	
+
 	// if not, we're an item cheat
 	else
 	{
@@ -332,7 +332,7 @@ bool cheat_parameter::set_next_state()
 		if (curitem != NULL && curitem->next() != NULL)
 			m_value = curitem->next()->value();
 	}
-	
+
 	return (m_value != origvalue);
 }
 
@@ -477,7 +477,7 @@ cheat_script::script_entry::script_entry(cheat_manager &manager, symbol_table &s
 			for (xml_data_node *argnode = xml_get_sibling(entrynode.child, "argument"); argnode != NULL; argnode = xml_get_sibling(argnode->next, "argument"))
 			{
 				output_argument &curarg = m_arglist.append(*auto_alloc(&manager.machine(), output_argument(manager, symbols, filename, *argnode)));
-				
+
 				// verify we didn't overrun the argument count
 				totalargs += curarg.count();
 				if (totalargs > MAX_ARGUMENTS)
@@ -887,7 +887,7 @@ bool cheat_entry::activate()
 
 
 //-------------------------------------------------
-//  select_default_state - select the default 
+//  select_default_state - select the default
 //  state for a cheat, or activate a oneshot cheat
 //-------------------------------------------------
 
@@ -908,7 +908,7 @@ bool cheat_entry::select_default_state()
 
 
 //-------------------------------------------------
-//  select_previous_state - select the previous 
+//  select_previous_state - select the previous
 //  state for a cheat
 //-------------------------------------------------
 
@@ -947,7 +947,7 @@ bool cheat_entry::select_previous_state()
 
 
 //-------------------------------------------------
-//  select_next_state - select the next state for 
+//  select_next_state - select the next state for
 //  a cheat
 //-------------------------------------------------
 
@@ -972,11 +972,11 @@ bool cheat_entry::select_next_state()
 			changed = set_state(SCRIPT_STATE_RUN);
 			m_parameter->set_minimum_state();
 		}
-		
+
 		// otherwise, switch to the next state
 		else
 			changed = m_parameter->set_next_state();
-		
+
 		// if we changed, signal a state change
 		if (changed && !is_oneshot_parameter())
 			execute_change_script();
@@ -986,7 +986,7 @@ bool cheat_entry::select_next_state()
 
 
 //-------------------------------------------------
-//  menu_text - return the text needed to display 
+//  menu_text - return the text needed to display
 //  this cheat in a menu item
 //-------------------------------------------------
 
@@ -1118,7 +1118,7 @@ cheat_manager::cheat_manager(running_machine &machine)
 
 
 //-------------------------------------------------
-//  set_enable - globally enable or disable the 
+//  set_enable - globally enable or disable the
 //  cheat engine
 //-------------------------------------------------
 
@@ -1165,7 +1165,7 @@ void cheat_manager::reload()
 
 	// free everything
 	m_cheatlist.reset();
-	
+
 	// reset state
 	m_framecount = 0;
 	m_numlines = 0;
@@ -1213,7 +1213,7 @@ bool cheat_manager::save_all(const char *filename)
 	// if that failed, return nothing
 	if (filerr != FILERR_NONE)
 		return false;
-		
+
 	// wrap the rest of catch errors
 	try
 	{
@@ -1231,7 +1231,7 @@ bool cheat_manager::save_all(const char *filename)
 		mame_fclose(cheatfile);
 		return true;
 	}
-	
+
 	// catch errors and cleanup
 	catch (emu_fatalerror &err)
 	{
@@ -1244,7 +1244,7 @@ bool cheat_manager::save_all(const char *filename)
 
 
 //-------------------------------------------------
-//  render_text - called by the UI system to 
+//  render_text - called by the UI system to
 //  render text
 //-------------------------------------------------
 
@@ -1265,7 +1265,7 @@ void cheat_manager::render_text(render_container &container)
 
 //-------------------------------------------------
 //  get_output_astring - return a reference to
-//  the given row's string, and set the 
+//  the given row's string, and set the
 //  justification
 //-------------------------------------------------
 
@@ -1277,10 +1277,10 @@ astring &cheat_manager::get_output_astring(int row, int justify)
 
 	// remember the last request
 	m_lastline = row;
-	
+
 	// invert if negative
 	row = (row < 0) ? m_numlines + row : row - 1;
-	
+
 	// clamp within range
 	row = MAX(row, 0);
 	row = MIN(row, m_numlines - 1);
@@ -1398,7 +1398,7 @@ void cheat_manager::frame_update()
 
 
 //-------------------------------------------------
-//  load_cheats - load a cheat file into memory 
+//  load_cheats - load a cheat file into memory
 //  and create the cheat entry list
 //-------------------------------------------------
 
@@ -1467,7 +1467,7 @@ void cheat_manager::load_cheats(const char *filename)
 			filerr = mame_fclose_and_open_next(&cheatfile, fname, OPEN_FLAG_READ);
 		}
 	}
-	
+
 	// handle errors cleanly
 	catch (emu_fatalerror &err)
 	{

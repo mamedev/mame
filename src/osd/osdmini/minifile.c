@@ -183,7 +183,7 @@ osd_directory_entry *osd_stat(const char *path)
 	result->name = (char *)(result + 1);
 	result->type = ENTTYPE_NONE;
 	result->size = 0;
-	
+
 	FILE *f = fopen(path, "rb");
 	if (f != NULL)
 	{

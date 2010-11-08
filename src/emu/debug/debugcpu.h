@@ -97,7 +97,7 @@ public:
 		int					m_index;					// user reported index
 		UINT8				m_enabled;					// enabled?
 		offs_t				m_address;					// execution address
-		parsed_expression 	m_condition;				// condition
+		parsed_expression	m_condition;				// condition
 		astring				m_action;					// action
 	};
 

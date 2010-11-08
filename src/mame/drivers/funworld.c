@@ -3919,7 +3919,7 @@ ROM_END
 /**** Fun World Quiz ****
 
   Fun World Quiz
-  Öhlinger Ges.m.b.H.
+  ?hlinger Ges.m.b.H.
 
   Horizontal Display
   Currents

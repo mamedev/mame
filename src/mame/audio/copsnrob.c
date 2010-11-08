@@ -184,7 +184,7 @@ static const discrete_555_cc_desc copsnrob_motor01_555cc =
 	DISC_555_OUT_COUNT_R | DISCRETE_555_CC_TO_DISCHARGE_PIN,
 	5,							/* v_pos */
 	DEFAULT_555_CC_SOURCE,
-	1, 							/* v_out_high - ignored */
+	1,							/* v_out_high - ignored */
 	0.6							/* v_cc_junction */
 };
 
@@ -202,7 +202,7 @@ static const discrete_555_cc_desc copsnrob_motor01_555cc =
 #define COPSNROB_MOTOR01(_output, _input, _num)													\
 	 /* simulate the RC connected to the transistor with a DAC */								\
 	DISCRETE_DAC_R1(COPSNROB_MOTOR01_NODE(_num, 0),												\
-	 	_input, 4.2, &copsnrob_motor01_cc_dac)						/* DATA; VDATA - TTL with light load */		\
+		_input, 4.2, &copsnrob_motor01_cc_dac)						/* DATA; VDATA - TTL with light load */		\
 	DISCRETE_555_CC(COPSNROB_MOTOR01_NODE(_num, 1),					/* IC F2, pin 10 from IC F3, pin 9 */		\
 		1,															/* RESET - IC F3, pin 10 */		\
 		COPSNROB_MOTOR01_NODE(_num, 0),								/* VIN */						\
@@ -222,7 +222,7 @@ static const discrete_555_cc_desc copsnrob_motor01_555cc =
 		COPSNROB_MOTOR01_NODE(_num, 3),	2,							/* INP1, INP2 */			\
 		"02&2/12*+")												/* get bits ready for DAC */\
 	DISCRETE_DAC_R1(_output,																	\
-	 	COPSNROB_MOTOR01_NODE(_num, 4), 4.2, &copsnrob_motor01_out_dac)		/* DATA; VDATA - TTL with light load */
+		COPSNROB_MOTOR01_NODE(_num, 4), 4.2, &copsnrob_motor01_out_dac)		/* DATA; VDATA - TTL with light load */
 
 /************************************************
  * MOTOR0/1 Definition Start
@@ -235,7 +235,7 @@ static const discrete_555_cc_desc copsnrob_motor01_555cc =
 #define COPSNROB_MOTOR23(_output, _input, _num)													\
 	 /* simulate the RC connected to the 555 CV pin with a DAC */								\
 	DISCRETE_DAC_R1(COPSNROB_MOTOR23_NODE(_num, 0),												\
-	 	_input, 4.2, &copsnrob_motor23_cv_dac)						/* DATA; VDATA - TTL with light load */		\
+		_input, 4.2, &copsnrob_motor23_cv_dac)						/* DATA; VDATA - TTL with light load */		\
 	DISCRETE_555_ASTABLE_CV(COPSNROB_MOTOR23_NODE(_num, 1),			/* IC J2, pin 5 */			\
 		1,															/* RESET */					\
 		COPSNROB_R64, COPSNROB_R42, COPSNROB_C24,												\
@@ -294,8 +294,8 @@ DISCRETE_STEP(copsnrob_custom_noise)
 	t_used += node->info->sample_time;
 
 	/* This clock will never run faster then the sample rate,
-	 * so we do not bother to check.
-	 */
+     * so we do not bother to check.
+     */
 	if (t_used > t1)
 	{
 		/* calculate the overshoot time */
@@ -403,10 +403,10 @@ DISCRETE_STEP(copsnrob_zings_555_monostable)
 
 	/* From testing a real IC */
 	/* Trigger going low overides everything.  It forces the FF/Output high.
-	 * If Threshold is high, the output will still go high as long as trigger is low.
-	 * The output will then go low when trigger rises above it's 1/3VCC value.
-	 * If threshold is below it's 2/3VCC value, the output will remain high.
-	 */
+     * If Threshold is high, the output will still go high as long as trigger is low.
+     * The output will then go low when trigger rises above it's 1/3VCC value.
+     * If threshold is below it's 2/3VCC value, the output will remain high.
+     */
 	if (ff_set)
 	{
 		flip_flop = 1;
@@ -550,9 +550,9 @@ DISCRETE_STEP(copsnrob_zings_555_astable)
 	v_trigger = v_cap1 / 3;
 
 	/* This oscillator will never create a frequency greater then 1/2 the sample rate,
-	 * so we won't worry about missing samples */
+     * so we won't worry about missing samples */
 	/* No need to optimize the charge circuit.  It always charges/discharges to a voltage
-	 * greater then it will ever reach. */
+     * greater then it will ever reach. */
 	if (flip_flop)
 	{
 		/* charge */
@@ -619,15 +619,15 @@ static const discrete_custom_info copsnrob_zings_555_astable =
 DISCRETE_SOUND_START(copsnrob)
 
 	/************************************************
-	 * Input register mapping
-	 ************************************************/
+     * Input register mapping
+     ************************************************/
 	DISCRETE_INPUT_LOGIC(COPSNROB_MOTOR0_INV)
 	DISCRETE_INPUT_LOGIC(COPSNROB_MOTOR1_INV)
 	DISCRETE_INPUT_LOGIC(COPSNROB_MOTOR2_INV)
 	DISCRETE_INPUT_LOGIC(COPSNROB_MOTOR3_INV)
 /* !! DISABLED UNTIL ADDRESS IS FOUND !! */
-//	DISCRETE_INPUTX_LOGIC(COPSNROB_ZINGS_INV, 4, 0, 0)
-//	DISCRETE_INPUT_LOGIC(COPSNROB_FIRES_INV)
+//  DISCRETE_INPUTX_LOGIC(COPSNROB_ZINGS_INV, 4, 0, 0)
+//  DISCRETE_INPUT_LOGIC(COPSNROB_FIRES_INV)
 	DISCRETE_INPUT_NOT(COPSNROB_CRASH_INV)					/* inverted for counter use */
 	DISCRETE_INPUT_LOGIC(COPSNROB_SCREECH_INV)
 	DISCRETE_INPUT_NOT(COPSNROB_AUDIO_ENABLE)				/* IC A1, pins 2 & 12 */
@@ -639,20 +639,20 @@ DISCRETE_SOUND_START(copsnrob)
 	DISCRETE_CONSTANT(COPSNROB_FIRES_INV, 4)	/* data bit will be normally high */
 
 	/************************************************
-	 * MOTOR0/1
-	 ************************************************/
+     * MOTOR0/1
+     ************************************************/
 	COPSNROB_MOTOR01(COPSNROB_MOTOR0_SND, COPSNROB_MOTOR0_INV, 0)
 	COPSNROB_MOTOR01(COPSNROB_MOTOR1_SND, COPSNROB_MOTOR1_INV, 1)
 
 	/************************************************
-	 * MOTOR2/3
-	 ************************************************/
+     * MOTOR2/3
+     ************************************************/
 	COPSNROB_MOTOR23(COPSNROB_MOTOR2_SND, COPSNROB_MOTOR2_INV, 0)
 	COPSNROB_MOTOR23(COPSNROB_MOTOR3_SND, COPSNROB_MOTOR3_INV, 1)
 
 	/************************************************
-	 * CRASH
-	 ************************************************/
+     * CRASH
+     ************************************************/
 	DISCRETE_CUSTOM1(COPSNROB_NOISE_1,						/* IC J2, pin 10 */
 		COPSNROB_2V,										/* CLK */
 		&copsnrob_custom_noise)
@@ -672,13 +672,13 @@ DISCRETE_SOUND_START(copsnrob)
 		&copsnrob_crash_dac)
 
 	/************************************************
-	 * SCREECH
-	 ************************************************/
+     * SCREECH
+     ************************************************/
 	 DISCRETE_CONSTANT(COPSNROB_SCREECH_SND, 0)
 
 	/************************************************
-	 * FZ (Fires, Zings)
-	 ************************************************/
+     * FZ (Fires, Zings)
+     ************************************************/
 	DISCRETE_CUSTOM3(NODE_60,							/* IC D3, pin 5 */
 		/* We can ignore R47 & R48 */
 		COPSNROB_ZINGS_INV,								/* IC D3, pin 6 */
@@ -699,8 +699,8 @@ DISCRETE_SOUND_START(copsnrob)
 		COPSNROB_R73 / COPSNROB_R26)
 
 	/************************************************
-	 * MIXER
-	 ************************************************/
+     * MIXER
+     ************************************************/
 	 DISCRETE_MIXER5(NODE_90,								/* IC B3, pin 3 */
 		COPSNROB_AUDIO_ENABLE,								/* ENAB */
 		COPSNROB_MOTOR1_SND, COPSNROB_MOTOR0_SND, COPSNROB_FZ_SND, COPSNROB_SCREECH_SND, COPSNROB_CRASH_SND,

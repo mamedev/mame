@@ -5005,7 +5005,7 @@ static TIMER_CALLBACK( segacd_hock_callback )
 
 	if(hock_cmd)
 	{
-//		segacd_cdd.ctrl &= ~4; // clear HOCK flag
+//      segacd_cdd.ctrl &= ~4; // clear HOCK flag
 
 		segacd_cdd_rx[0] = (segacd_cdd.buffer[0] & 0xf0) >> 4;
 		segacd_cdd_rx[1] = (segacd_cdd.buffer[0] & 0x0f) >> 0;
@@ -5577,7 +5577,7 @@ static void segacd_cdd_seek(running_machine *machine)
 
 	track_num = cdrom_get_track(segacd.cd, frame);
 	segacd.current_frame = frame;
-//	printf("%02x %02x %02x %02x\n",m,s,f,track_num);
+//  printf("%02x %02x %02x %02x\n",m,s,f,track_num);
 
 	segacd_cdd.ctrl &= 0xfeff;
 	segacd_cdd.ctrl |= (( segacd.toc->tracks[track_num-1].trktype == CD_TRACK_AUDIO ) ? 0x000 : 0x100);

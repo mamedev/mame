@@ -581,7 +581,7 @@ debug_view_expression::~debug_view_expression()
 
 void debug_view_expression::set_context(symbol_table *context)
 {
-	m_parsed.set_symbols((context != NULL) ? context : debug_cpu_get_global_symtable(&m_machine)); 
+	m_parsed.set_symbols((context != NULL) ? context : debug_cpu_get_global_symtable(&m_machine));
 	m_dirty = true;
 }
 

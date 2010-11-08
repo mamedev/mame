@@ -547,7 +547,7 @@ DISCRETE_STEP(dsd_555_mstbl)
 		if (UNEXPECTED(DSD_555_MSTBL__C == 0))
 		{
 			/* The trigger voltage goes high because the cap circuit is open.
-			 * and the cap discharges */
+             * and the cap discharges */
 			v_cap = info->v_pos;	/* needed for cap output type */
 			context->cap_voltage = 0;
 

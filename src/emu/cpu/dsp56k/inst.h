@@ -925,7 +925,7 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		/* Note: This is a JJJF limited in the docs, but other opcodes sneak
-		         in before cmp, so the same decode function can be used. */
+                 in before cmp, so the same decode function can be used. */
 		decode_JJJF_table(BITSn(word0,0x07), BITSn(word0,0x08),
 						  m_source, m_destination);
 		return true;
@@ -950,7 +950,7 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		/* Note: This is a JJJF limited in the docs, but other opcodes sneak
-		         in before cmp, so the same decode function can be used. */
+                 in before cmp, so the same decode function can be used. */
 		decode_JJJF_table(BITSn(word0,0x07), BITSn(word0,0x08),
 						  m_source, m_destination);
 		return true;
@@ -2676,7 +2676,7 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		/* There are inconsistencies with the S1 & S2 operand ordering in the docs,
-		   but since it's a multiply it doesn't matter */
+           but since it's a multiply it doesn't matter */
 		decode_QQQF_table(BITSn(word0,0x07), BITSn(word0,0x08),
 						  m_source, m_source2, m_destination);
 
@@ -2772,7 +2772,7 @@ public:
 	bool decode(const UINT16 word0, const UINT16 word1)
 	{
 		/* There are inconsistencies with the S1 & S2 operand ordering in the docs,
-		   but since it's a multiply it doesn't matter */
+           but since it's a multiply it doesn't matter */
 		decode_QQQF_table(BITSn(word0,0x07), BITSn(word0,0x08),
 						  m_source, m_source2, m_destination);
 

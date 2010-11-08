@@ -145,15 +145,15 @@
 static DISCRETE_SOUND_START(mario)
 
 	/************************************************
-	 * Input register mapping for mario
-	 ************************************************/
+     * Input register mapping for mario
+     ************************************************/
 
 	/* DISCRETE_INPUT_DATA */
     DISCRETE_INPUT_NOT(DS_SOUND7_INV)				/* IC 7L, pin 8 */
 
 	/************************************************
-	 * SOUND0
-	 ************************************************/
+     * SOUND0
+     ************************************************/
 
     DISCRETE_TASK_START(1)
     DISCRETE_INPUT_PULSE(DS_SOUND0_INV, 1)			/* IC 4C, pin 15 */
@@ -164,27 +164,27 @@ static DISCRETE_SOUND_START(mario)
 /* Breadboarded measurements IC 1J, pin 10
    D.R. Oct 2010
     V       Hz
-	0.115	14470
-	0.250	15190
-	0.500	14980
-	0.750	18150
-	1.000	21690
-	2.000	38790
-	3.000	58580
-	4.000	79890
+    0.115   14470
+    0.250   15190
+    0.500   14980
+    0.750   18150
+    1.000   21690
+    2.000   38790
+    3.000   58580
+    4.000   79890
 */
 
 /* Breadboarded measurements IC 2J, pin 10
    D.R. Oct 2010
     V       Hz
-	0.116	2458
-	0.250	2593
-	0.500	2540
-	0.750	3081
-	1.000	3676
-	2.000	6590
-	3.000	9974
-	4.000	13620
+    0.116   2458
+    0.250   2593
+    0.500   2540
+    0.750   3081
+    1.000   3676
+    2.000   6590
+    3.000   9974
+    4.000   13620
 */
 
 	/* covert logic to measured voltage */
@@ -214,8 +214,8 @@ static DISCRETE_SOUND_START(mario)
 	DISCRETE_TASK_END()
 
 	/************************************************
-	 * SOUND1
-	 ************************************************/
+     * SOUND1
+     ************************************************/
 
 	DISCRETE_TASK_START(1)
 	DISCRETE_INPUT_PULSE(DS_SOUND1_INV, 1)			/* IC 4C, pin 14 */
@@ -226,27 +226,27 @@ static DISCRETE_SOUND_START(mario)
 /* Breadboarded measurements IC 1J, pin 7
    D.R. Oct 2010
     V       Hz
-	0.116	1380
-	0.250	1448
-	0.500	1419
-	0.750	1717
-	1.000	2053
-	2.000	3677
-	3.000	5561
-	4.000	7610
+    0.116   1380
+    0.250   1448
+    0.500   1419
+    0.750   1717
+    1.000   2053
+    2.000   3677
+    3.000   5561
+    4.000   7610
 */
 
 /* Breadboarded measurements IC 2J, pin 7
    D.R. Oct 2010
     V       Hz
-	0.112	8030
-	0.250	8490
-	0.500	8326
-	0.750	10030
-	1.000	12000
-	2.000	21460
-	3.000	32540
-	4.000	44300
+    0.112   8030
+    0.250   8490
+    0.500   8326
+    0.750   10030
+    1.000   12000
+    2.000   21460
+    3.000   32540
+    4.000   44300
 */
 
 	/* covert logic to measured voltage */
@@ -276,8 +276,8 @@ static DISCRETE_SOUND_START(mario)
 	DISCRETE_TASK_END()
 
 	/************************************************
-	 * SOUND7
-	 ************************************************/
+     * SOUND7
+     ************************************************/
 
 	DISCRETE_TASK_START(1)
 	DISCRETE_COUNTER(NODE_100,						/* IC 3H */
@@ -349,8 +349,8 @@ static DISCRETE_SOUND_START(mario)
 	DISCRETE_TASK_END()
 
 	/************************************************
-	 * DAC
-	 ************************************************/
+     * DAC
+     ************************************************/
 
 	/* following the resistor DAC are two opamps. The first is a 1:1 amplifier, the second
      * is a filter circuit. Simulation in LTSPICE shows, that the following is equivalent:
@@ -366,14 +366,14 @@ static DISCRETE_SOUND_START(mario)
 		&mario_dac_amp)
 	/* This provides a close simulation of the IC 3M, pin 10 filter circuit */
 	/* The Measured and SPICEd low freq gain is 1, it then has a high frequency
-	 * drop close to the following RC filter. */
+     * drop close to the following RC filter. */
 	DISCRETE_RCFILTER_VREF(DS_OUT_DAC, NODE_171, RES_K(750), CAP_P(180), 2.5)
 	DISCRETE_TASK_END()
 
 
 	/************************************************
-	 * MIXER
-	 ************************************************/
+     * MIXER
+     ************************************************/
 
 	DISCRETE_TASK_START(2)
 	DISCRETE_MIXER4(NODE_297,
@@ -382,9 +382,9 @@ static DISCRETE_SOUND_START(mario)
 		&mario_mixer)
 	/* approx -0.625V to 0.980V when playing, but turn on sound peaks at 2.38V */
 	/* we will set the full wav range to 1.19V which will cause clipping on the turn on
-	 * sound.  The real game would do this when the volume is turned up too.
-	 * Reducing MAME's master volume to 50% will provide full unclipped volume.
-	 */
+     * sound.  The real game would do this when the volume is turned up too.
+     * Reducing MAME's master volume to 50% will provide full unclipped volume.
+     */
 	DISCRETE_OUTPUT(NODE_297, 32767.0/1.19)
 	DISCRETE_TASK_END()
 

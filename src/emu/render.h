@@ -741,7 +741,7 @@ public:
 	// textures
 	render_texture *texture_alloc(texture_scaler_func scaler = NULL, void *param = NULL);
 	void texture_free(render_texture *texture);
-	
+
 	// fonts
 	render_font *font_alloc(const char *filename = NULL);
 	void font_free(render_font *font);

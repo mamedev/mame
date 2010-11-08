@@ -154,7 +154,7 @@ void debug_cpu_init(running_machine *machine)
 
 	/* create a global symbol table */
 	global->symtable = global_alloc(symbol_table(machine));
-	
+
 	// configure our base memory accessors
 	debug_cpu_configure_memory(*machine, *global->symtable);
 

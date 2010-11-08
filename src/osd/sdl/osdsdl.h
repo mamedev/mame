@@ -128,7 +128,7 @@ public:
 	// construction/destruction
 	sdl_osd_interface();
 	virtual ~sdl_osd_interface();
-	
+
 	// general overridables
 	virtual void init(running_machine &machine);
 	virtual void update(bool skip_redraw);
@@ -136,14 +136,14 @@ public:
 	// debugger overridables
 	virtual void init_debugger();
 	virtual void wait_for_debugger(device_t &device, bool firststop);
-	
+
 	// audio overridables
 	virtual void update_audio_stream(const INT16 *buffer, int samples_this_frame);
 	virtual void set_mastervolume(int attenuation);
 
 	// input overridables
 	virtual void customize_input_type_list(input_type_desc *typelist);
-	
+
 private:
 	static void osd_exit(running_machine &machine);
 };

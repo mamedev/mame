@@ -1,7 +1,7 @@
 /***************************************************************************
 
     express.c
-    
+
     Generic expressions engine.
 
 ****************************************************************************
@@ -37,24 +37,24 @@
 
 ****************************************************************************
 
-	Operator precedence
-	===================
-	0x0000		 ( )
-	0x0001		 ++ (postfix), -- (postfix)
-	0x0002		 ++ (prefix), -- (prefix), ~, !, - (unary), + (unary), b@, w@, d@, q@
-	0x0003		 *, /, %
-	0x0004		 + -
-	0x0005		 << >>
-	0x0006		 < <= > >=
-	0x0007		 == !=
-	0x0008		 &
-	0x0009		 ^
-	0x000a		 |
-	0x000b		 &&
-	0x000c		 ||
-	0x000d		 = *= /= %= += -= <<= >>= &= |= ^=
-	0x000e		 ,
-	0x000f		 func()
+    Operator precedence
+    ===================
+    0x0000       ( )
+    0x0001       ++ (postfix), -- (postfix)
+    0x0002       ++ (prefix), -- (prefix), ~, !, - (unary), + (unary), b@, w@, d@, q@
+    0x0003       *, /, %
+    0x0004       + -
+    0x0005       << >>
+    0x0006       < <= > >=
+    0x0007       == !=
+    0x0008       &
+    0x0009       ^
+    0x000a       |
+    0x000b       &&
+    0x000c       ||
+    0x000d       = *= /= %= += -= <<= >>= &= |= ^=
+    0x000e       ,
+    0x000f       func()
 
 ***************************************************************************/
 
@@ -155,9 +155,9 @@ private:
 	static UINT64 internal_getter(symbol_table &table, void *symref);
 	static void internal_setter(symbol_table &table, void *symref, UINT64 value);
 
-	// internal state	
-	symbol_table::getter_func 	m_getter;
-	symbol_table::setter_func 	m_setter;
+	// internal state
+	symbol_table::getter_func	m_getter;
+	symbol_table::setter_func	m_setter;
 	UINT64						m_value;
 };
 
@@ -191,7 +191,7 @@ private:
 //**************************************************************************
 
 //-------------------------------------------------
-//  code_string - return a friendly string for a 
+//  code_string - return a friendly string for a
 //  given expression error
 //-------------------------------------------------
 
@@ -321,7 +321,7 @@ void integer_symbol_entry::set_value(UINT64 newvalue)
 
 
 //-------------------------------------------------
-//  internal_getter - internal helper for 
+//  internal_getter - internal helper for
 //  returning the value of a variable
 //-------------------------------------------------
 
@@ -425,7 +425,7 @@ symbol_table::symbol_table(void *globalref, symbol_table *parent)
 
 
 //-------------------------------------------------
-//  add - add a new UINT64 pointer symbol 
+//  add - add a new UINT64 pointer symbol
 //-------------------------------------------------
 
 void symbol_table::configure_memory(void *param, valid_func valid, read_func read, write_func write)
@@ -438,7 +438,7 @@ void symbol_table::configure_memory(void *param, valid_func valid, read_func rea
 
 
 //-------------------------------------------------
-//  add - add a new UINT64 pointer symbol 
+//  add - add a new UINT64 pointer symbol
 //-------------------------------------------------
 
 void symbol_table::add(const char *name, read_write rw, UINT64 *ptr)
@@ -449,7 +449,7 @@ void symbol_table::add(const char *name, read_write rw, UINT64 *ptr)
 
 
 //-------------------------------------------------
-//  add - add a new value symbol 
+//  add - add a new value symbol
 //-------------------------------------------------
 
 void symbol_table::add(const char *name, UINT64 value)
@@ -460,7 +460,7 @@ void symbol_table::add(const char *name, UINT64 value)
 
 
 //-------------------------------------------------
-//  add - add a new register symbol 
+//  add - add a new register symbol
 //-------------------------------------------------
 
 void symbol_table::add(const char *name, void *ref, getter_func getter, setter_func setter)
@@ -471,7 +471,7 @@ void symbol_table::add(const char *name, void *ref, getter_func getter, setter_f
 
 
 //-------------------------------------------------
-//  add - add a new function symbol 
+//  add - add a new function symbol
 //-------------------------------------------------
 
 void symbol_table::add(const char *name, void *ref, int minparams, int maxparams, execute_func execute)
@@ -500,7 +500,7 @@ symbol_entry *symbol_table::find_deep(const char *symbol)
 
 
 //-------------------------------------------------
-//  value - return the value of a symbol 
+//  value - return the value of a symbol
 //-------------------------------------------------
 
 UINT64 symbol_table::value(const char *symbol)
@@ -511,7 +511,7 @@ UINT64 symbol_table::value(const char *symbol)
 
 
 //-------------------------------------------------
-//  set_value - set the value of a symbol 
+//  set_value - set the value of a symbol
 //-------------------------------------------------
 
 void symbol_table::set_value(const char *symbol, UINT64 value)
@@ -593,7 +593,7 @@ parsed_expression::parsed_expression(symbol_table *symtable, const char *express
 	// if we got an expression parse it
 	if (expression != NULL)
 		parse(expression);
-	
+
 	// if we get a result pointer, execute it
 	if (result != NULL)
 		*result = execute();
@@ -956,7 +956,7 @@ void parsed_expression::parse_symbol_or_number(parse_token &token, const char *&
 	// if we have an 0x prefix, we must be a hex value
 	if (buffer[0] == '0' && buffer[1] == 'x')
 		return parse_number(token, &buffer[2], 16, expression_error::INVALID_NUMBER);
-	
+
 	// if we have a # prefix, we must be a decimal value
 	if (buffer[0] == '#')
 		return parse_number(token, &buffer[1], 10, expression_error::INVALID_NUMBER);
@@ -964,7 +964,7 @@ void parsed_expression::parse_symbol_or_number(parse_token &token, const char *&
 	// if we have a $ prefix, we are a hex value
 	if (buffer[0] == '$')
 		return parse_number(token, &buffer[1], 16, expression_error::INVALID_NUMBER);
-		
+
 	// check for a symbol match
 	symbol_entry *symbol = m_symtable->find_deep(buffer);
 	if (symbol != NULL)
@@ -979,7 +979,7 @@ void parsed_expression::parse_symbol_or_number(parse_token &token, const char *&
 		}
 		return;
 	}
-	
+
 	// attempt to parse as a number in the default base
 	parse_number(token, buffer, DEFAULT_BASE, expression_error::UNKNOWN_SYMBOL);
 }
@@ -1006,7 +1006,7 @@ void parsed_expression::parse_number(parse_token &token, const char *string, int
 		int digit = ptr - numbers;
 		if (digit >= base)
 			break;
-		
+
 		// shift previous digits up and add in new digit
 		value = (value * (UINT64)base) + digit;
 		string++;
@@ -1223,7 +1223,7 @@ void parsed_expression::normalize_operator(parse_token *prevtoken, parse_token &
 				if (peek == NULL)
 					break;
 
-				// if we hit an execute function operator, or else a left parenthesis that is 
+				// if we hit an execute function operator, or else a left parenthesis that is
 				// already tagged, then tag us as well
 				if (peek->is_operator(TVL_EXECUTEFUNC) || (peek->is_operator(TVL_LPAREN) && peek->is_function_separator()))
 				{
@@ -1252,7 +1252,7 @@ void parsed_expression::infix_to_postfix()
 	{
 		// pre-determine our next token
 		next = token->next();
-	
+
 		// if the character is an operand, append it to the result string
 		if (token->is_number() || token->is_symbol() || token->is_string())
 			m_tokenlist.append(*token);
@@ -1686,7 +1686,7 @@ UINT64 parsed_expression::execute_tokens()
 //-------------------------------------------------
 
 parsed_expression::parse_token::parse_token(int offset)
-	: m_next(NULL), 
+	: m_next(NULL),
 	  m_type(INVALID),
 	  m_offset(offset),
 	  m_value(0),
@@ -1726,7 +1726,7 @@ inline void parsed_expression::parse_token::set_lval_value(symbol_table *table, 
 	// set the value of a symbol
 	if (is_symbol())
 		m_symbol->set_value(value);
-	
+
 	// or set the value via the memory callbacks
 	else if (is_memory() && table != NULL)
 		table->set_memory_value(m_string, memory_space(), address(), 1 << memory_size(), value);

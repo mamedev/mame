@@ -79,7 +79,7 @@ inline const char *next_line(const char *ptr)
 inline render_font::glyph &render_font::get_char(unicode_char chnum)
 {
 	static glyph dummy_glyph;
-	
+
 	// grab the table; if none, return the dummy character
 	glyph *glyphtable = m_glyphs[chnum / 256];
 	if (glyphtable == NULL && m_format == FF_OSD)
@@ -117,7 +117,7 @@ render_font::render_font(render_manager &manager, const char *filename)
 	  m_osdfont(NULL)
 {
 	memset(m_glyphs, 0, sizeof(m_glyphs));
-	
+
 	// if this is an OSD font, we're done
 	if (filename != NULL)
 	{
@@ -129,7 +129,7 @@ render_font::render_font(render_manager &manager, const char *filename)
 			return;
 		}
 	}
-	
+
 	// if the filename is 'default' default to 'ui.bdf' for backwards compatibility
 	if (filename != NULL && mame_stricmp(filename, "default") == 0)
 		filename = "ui.bdf";
@@ -173,7 +173,7 @@ render_font::~render_font()
 
 	// free the raw data and the size itself
 	auto_free(&m_manager.machine(), m_rawdata);
-	
+
 	// release the OSD font
 	if (m_osdfont != NULL)
 		m_manager.machine().osd().font_close(m_osdfont);
@@ -181,7 +181,7 @@ render_font::~render_font()
 
 
 //-------------------------------------------------
-//  char_expand - expand the raw data for a 
+//  char_expand - expand the raw data for a
 //  character into a bitmap
 //-------------------------------------------------
 
@@ -193,7 +193,7 @@ void render_font::char_expand(unicode_char chnum, glyph &gl)
 		// we set bmwidth to -1 if we've previously queried and failed
 		if (gl.bmwidth == -1)
 			return;
-		
+
 		// attempt to get the font bitmap; if we fail, set bmwidth to -1
 		gl.bitmap = m_manager.machine().osd().font_get_bitmap(m_osdfont, chnum, gl.width, gl.xoffs, gl.yoffs);
 		if (gl.bitmap == NULL)
@@ -206,7 +206,7 @@ void render_font::char_expand(unicode_char chnum, glyph &gl)
 		gl.bmwidth = gl.bitmap->width;
 		gl.bmheight = gl.bitmap->height;
 	}
-	
+
 	// other formats need to parse their data
 	else
 	{
@@ -282,8 +282,8 @@ void render_font::char_expand(unicode_char chnum, glyph &gl)
 
 
 //-------------------------------------------------
-//  get_char_texture_and_bounds - return the 
-//  texture for a character and compute the 
+//  get_char_texture_and_bounds - return the
+//  texture for a character and compute the
 //  bounds of the final bitmap
 //-------------------------------------------------
 
@@ -351,7 +351,7 @@ void render_font::get_scaled_bitmap_and_bounds(bitmap_t &dest, float height, flo
 
 
 //-------------------------------------------------
-//  char_width - return the width of a character 
+//  char_width - return the width of a character
 //  at the given height
 //-------------------------------------------------
 
@@ -362,7 +362,7 @@ float render_font::char_width(float height, float aspect, unicode_char ch)
 
 
 //-------------------------------------------------
-//  string_width - return the width of a string 
+//  string_width - return the width of a string
 //  at the given height
 //-------------------------------------------------
 
@@ -379,7 +379,7 @@ float render_font::string_width(float height, float aspect, const char *string)
 
 
 //-------------------------------------------------
-//  utf8string_width - return the width of a 
+//  utf8string_width - return the width of a
 //  UTF8-encoded string at the given height
 //-------------------------------------------------
 
@@ -406,9 +406,9 @@ float render_font::utf8string_width(float height, float aspect, const char *utf8
 
 
 //-------------------------------------------------
-//  load_cached_bdf - attempt to load a cached 
-//  version of the BDF font 'filename'; if that 
-//  fails, fall back on the regular BDF loader 
+//  load_cached_bdf - attempt to load a cached
+//  version of the BDF font 'filename'; if that
+//  fails, fall back on the regular BDF loader
 //  and create a new cached version
 //-------------------------------------------------
 
@@ -431,7 +431,7 @@ bool render_font::load_cached_bdf(const char *filename)
 		mame_fclose(file);
 		return false;
 	}
-	
+
 	// has the chunk
 	UINT32 hash = crc32(0, (const UINT8 *)data, bytes) ^ (UINT32)m_rawsize;
 
@@ -456,7 +456,7 @@ bool render_font::load_cached_bdf(const char *filename)
 			return true;
 		}
 	}
-	
+
 	// read in the rest of the font
 	if (bytes < m_rawsize)
 	{

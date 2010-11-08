@@ -8,7 +8,7 @@
         * Cheese Chase
         * Ultimate Tennis
         * Stone Ball
-		* Shooting Star (not emulated)
+        * Shooting Star (not emulated)
 
     Known bugs:
         * measured against a real PCB, the games run slightly too fast
@@ -472,17 +472,17 @@ static ADDRESS_MAP_START( shtstar_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x200000, 0x27ffff) AM_RAM
 	AM_RANGE(0x280000, 0x280fff) AM_RAM AM_SHARE("nvram")
-	
+
 	AM_RANGE(0x3c0000, 0x3c0001) AM_READ_PORT("3c0000")
 	AM_RANGE(0x3c0002, 0x3c0003) AM_READ_PORT("3c0002")
 	AM_RANGE(0x3c0004, 0x3c0005) AM_READ_PORT("3c0004")
 	AM_RANGE(0x3c0006, 0x3c0007) AM_READ_PORT("3c0006")
 	AM_RANGE(0x3c0008, 0x3c0009) AM_READ_PORT("3c0008")
 	AM_RANGE(0x3c000a, 0x3c000b) AM_READ_PORT("3c000a")
-	
+
 	AM_RANGE(0x3c0012, 0x3c0013) AM_READ(unk_r)
 	AM_RANGE(0x3c0014, 0x3c0015) AM_NOP
-	
+
 	AM_RANGE(0x300000, 0x300003) AM_WRITE(control_w) AM_BASE(&control)
 	AM_RANGE(0x3c0004, 0x3c0007) AM_WRITE(protection_bit_w)
 	AM_RANGE(0x340000, 0x340001) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff)
@@ -530,12 +530,12 @@ ADDRESS_MAP_END
 
 /*************************************
  *
- *  Extra CPU memory handlers 
+ *  Extra CPU memory handlers
  *   (Shooting Star)
  *
  *************************************/
- 
-/* see adp.c */ 
+
+/* see adp.c */
 static ADDRESS_MAP_START( shtstar_subcpu_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x03ffff) AM_ROM
 	AM_RANGE(0xffc000, 0xffffff) AM_RAM
@@ -900,7 +900,7 @@ static MACHINE_CONFIG_DERIVED( shtstar, artmagic )
 	/* sub cpu*/
 	MDRV_CPU_ADD("subcpu", M68000, MASTER_CLOCK_25MHz/2)
 	MDRV_CPU_PROGRAM_MAP(shtstar_subcpu_map)
-	
+
 	/*gun board cpu*/
 	MDRV_CPU_ADD("guncpu", I80C31, 6000000)
 	MDRV_CPU_IO_MAP(shtstar_guncpu_io_map)
@@ -1028,18 +1028,18 @@ ROM_END
 Shooting Star:
 
 - Small pcb "gewehr controller" (gun controller) adp 1994
-	romless MCU 80c31BH-3 16P philips
-	27c256 eprom "2207 7b42c5"
-	LC36648L-10
-	8 connectors
-	3X led
-	osc 12.0000M
+    romless MCU 80c31BH-3 16P philips
+    27c256 eprom "2207 7b42c5"
+    LC36648L-10
+    8 connectors
+    3X led
+    osc 12.0000M
 
 - common adp cpu board adp 1994.12
-	MC68ec0000FN8
-	2x 27c1001 eproms
-	2x mk48t08b-15 timekeeper RAM
-	
+    MC68ec0000FN8
+    2x 27c1001 eproms
+    2x mk48t08b-15 timekeeper RAM
+
 - common adp i/o board (see adp.c ) with MC68681 an YM2149F
 
 - lamp board with triacs
@@ -1047,34 +1047,34 @@ Shooting Star:
 - a couple of tiny boards with some logic parts
 
 - Art & Magic jamma pcb,  11 connectors (jamma not connected)   "am005c0494 0310"
-	MC68000p12
-	TMS34010fnl-40
-	fpga actel a1020a  pl84c  16b.u110
-	cpld xilinx xc7236a 0 25  15b.u111
-	MC68681p
-	ramdac adv476kn80e 03-56 os
-	Oki M6295
-	25.000mhz
-	40.000mhz
+    MC68000p12
+    TMS34010fnl-40
+    fpga actel a1020a  pl84c  16b.u110
+    cpld xilinx xc7236a 0 25  15b.u111
+    MC68681p
+    ramdac adv476kn80e 03-56 os
+    Oki M6295
+    25.000mhz
+    40.000mhz
 
-	13 pals/gals (not dumped) labelled:
-		a&m005c0494 06a u126
-		a&m005c0494 03a u125
-		a&m005c0494 02a u307
-		a&m005c0494 18a u306
-		a&m005c0494 17a u305
-		a&m005c0494 05a u206
-		a&m005c0494 01a u205
-		a&m005c0494 04a u601
-		a&m005c0494 08a u916
-		a&m005c0494 07a u705
-		a&m005c0494 10a u917
-		a&m005c0494 09a u903
-		a&m005c0494 11a u112
+    13 pals/gals (not dumped) labelled:
+        a&m005c0494 06a u126
+        a&m005c0494 03a u125
+        a&m005c0494 02a u307
+        a&m005c0494 18a u306
+        a&m005c0494 17a u305
+        a&m005c0494 05a u206
+        a&m005c0494 01a u205
+        a&m005c0494 04a u601
+        a&m005c0494 08a u916
+        a&m005c0494 07a u705
+        a&m005c0494 10a u917
+        a&m005c0494 09a u903
+        a&m005c0494 11a u112
 
-	27c2001 near oki  "a&m005c0494 12a"
-	2x 27c010 68k labelled u101 and u102
-	2x 27c040 "a&m005c0494 13a"  and "a&m005c0494 14a"
+    27c2001 near oki  "a&m005c0494 12a"
+    2x 27c010 68k labelled u101 and u102
+    2x 27c040 "a&m005c0494 13a"  and "a&m005c0494 14a"
 
 
 Shooting Star
@@ -1090,16 +1090,16 @@ OSC   : 40.000MHz, 25.000MHz
 
 
 ROM_START( shtstar )
-	ROM_REGION( 0x80000, "maincpu", 0 )	
+	ROM_REGION( 0x80000, "maincpu", 0 )
 	ROM_LOAD16_BYTE( "rom.u102", 0x00000, 0x20000, CRC(cce9877e) SHA1(3e2b3b29d5dd73bfe0c7faf84309b50adbcded3b) )
 	ROM_LOAD16_BYTE( "rom.u101", 0x00001, 0x20000, CRC(3a330d9d) SHA1(0f3cd75e9e5483e3cf51f0c4eb4f15b6c3b33b67) )
-			
+
 	ROM_REGION( 0x40000, "subcpu", 0 )
 	ROM_LOAD16_BYTE( "shooting_star_f1_i.u2",  0x00000, 0x20000, CRC(2780d8d6) SHA1(a8db3a9771f6918eb8bb3b94db82ca8ada2aae7d) )
 	ROM_LOAD16_BYTE( "shooting_star_f1_ii.u7", 0x00001, 0x20000, CRC(0d127d9c) SHA1(e9d209901e55a743a4916c850083caa23c5ebb39) )
 
 	/* 80c31 MCU */
-	ROM_REGION( 0x10000, "guncpu", 0 )	
+	ROM_REGION( 0x10000, "guncpu", 0 )
 	ROM_LOAD( "2207_7b42c5.u6", 0x00000, 0x8000, CRC(6dd4b4ed) SHA1(b37e9e5ddfb5d88c5412dc79643adfc4362fbb46) )
 
 	ROM_REGION16_LE( 0x100000, "gfx1", 0 )
@@ -1108,7 +1108,7 @@ ROM_START( shtstar )
 
 	ROM_REGION( 0x80000, "oki", 0 )
 	ROM_LOAD( "a&m005c0494_12a.u151", 0x00000, 0x40000, CRC(2df3db1e) SHA1(d2e588db577de6fd527cd496f5eae9964d557da3) )
-	
+
 	ROM_REGION( 0x1a00,  "plds", 0 )
 	ROM_LOAD( "a&m005c0494_06a.u126",   0x0000, 0x0200, NO_DUMP )
 	ROM_LOAD( "a&m005c0494_03a.u125",   0x0200, 0x0200, NO_DUMP )
@@ -1196,7 +1196,7 @@ static DRIVER_INIT( shtstar )
 {
 	/* wrong */
 	decrypt_ultennis();
-	artmagic_is_stoneball =0;	
+	artmagic_is_stoneball =0;
 	protection_handler = stonebal_protection;
 }
 

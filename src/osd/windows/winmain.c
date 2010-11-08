@@ -693,13 +693,13 @@ osd_font windows_osd_interface::font_open(const char *_name, int &height)
 	_tcsncpy(logfont.lfFaceName, face, sizeof(logfont.lfFaceName) / sizeof(TCHAR));
 	logfont.lfFaceName[sizeof(logfont.lfFaceName) / sizeof(TCHAR) - 1] = 0;
 	osd_free(face);
-	
+
 	// create the font
 	height = logfont.lfHeight;
 	osd_font font = reinterpret_cast<osd_font>(CreateFontIndirect(&logfont));
 	if (font == NULL)
 		return NULL;
-	
+
 	// select it into a temp DC and get the real font name
 	HDC dummyDC = CreateCompatibleDC(NULL);
 	HGDIOBJ oldfont = SelectObject(dummyDC, reinterpret_cast<HGDIOBJ>(font));
@@ -707,13 +707,13 @@ osd_font windows_osd_interface::font_open(const char *_name, int &height)
 	GetTextFace(dummyDC, ARRAY_LENGTH(realname), realname);
 	SelectObject(dummyDC, oldfont);
 	DeleteDC(dummyDC);
-	
+
 	// if it doesn't match our request, fail
 	char *utf = utf8_from_tstring(realname);
 	int result = mame_stricmp(utf, name);
 	osd_free(utf);
 
-	// if we didn't match, nuke our font and fall back	
+	// if we didn't match, nuke our font and fall back
 	if (result != 0)
 	{
 		DeleteObject(reinterpret_cast<HFONT>(font));
@@ -739,7 +739,7 @@ void windows_osd_interface::font_close(osd_font font)
 //-------------------------------------------------
 //  font_get_bitmap - allocate and populate a
 //  BITMAP_FORMAT_ARGB32 bitmap containing the
-//  pixel values MAKE_ARGB(0xff,0xff,0xff,0xff) 
+//  pixel values MAKE_ARGB(0xff,0xff,0xff,0xff)
 //  or MAKE_ARGB(0x00,0xff,0xff,0xff) for each
 //  pixel of a black & white font
 //-------------------------------------------------
@@ -749,7 +749,7 @@ bitmap_t *windows_osd_interface::font_get_bitmap(osd_font font, unicode_char chn
 	// create a dummy DC to work with
 	HDC dummyDC = CreateCompatibleDC(NULL);
 	HGDIOBJ oldfont = SelectObject(dummyDC, reinterpret_cast<HGDIOBJ>(font));
-	
+
 	// get the text metrics
 	TEXTMETRIC metrics = { 0 };
 	GetTextMetrics(dummyDC, &metrics);
@@ -763,11 +763,11 @@ bitmap_t *windows_osd_interface::font_get_bitmap(osd_font font, unicode_char chn
 		GetCharWidth32(dummyDC, chnum, chnum, reinterpret_cast<LPINT>(&abc.abcB));
 	}
 	width = abc.abcA + abc.abcB + abc.abcC;
-	
+
 	// determine desired bitmap size
 	int bmwidth = (50 + abc.abcA + abc.abcB + abc.abcC + 50 + 31) & ~31;
 	int bmheight = 50 + metrics.tmHeight + 50;
-	
+
 	// describe the bitmap we want
 	BYTE bitmapinfodata[sizeof(BITMAPINFOHEADER) + 2 * sizeof(RGBQUAD)] = { 0 };
 	BITMAPINFO &info = *reinterpret_cast<BITMAPINFO *>(bitmapinfodata);
@@ -784,7 +784,7 @@ bitmap_t *windows_osd_interface::font_get_bitmap(osd_font font, unicode_char chn
 	info.bmiHeader.biClrImportant = 0;
 	info.bmiColors[0].rgbBlue = info.bmiColors[0].rgbGreen = info.bmiColors[0].rgbRed = 0x00;
 	info.bmiColors[1].rgbBlue = info.bmiColors[1].rgbGreen = info.bmiColors[1].rgbRed = 0xff;
-	
+
 	// create a DIB to render to
 	BYTE *bits;
 	HBITMAP dib = CreateDIBSection(dummyDC, &info, DIB_RGB_COLORS, reinterpret_cast<VOID **>(&bits), NULL, 0);
@@ -793,7 +793,7 @@ bitmap_t *windows_osd_interface::font_get_bitmap(osd_font font, unicode_char chn
 	// clear the bitmap
 	int rowbytes = bmwidth / 8;
 	memset(bits, 0, rowbytes * bmheight);
-	
+
 	// now draw the character
 	WCHAR tempchar = chnum;
 	SetTextColor(dummyDC, RGB(0xff,0xff,0xff));
@@ -804,7 +804,7 @@ bitmap_t *windows_osd_interface::font_get_bitmap(osd_font font, unicode_char chn
 	rectangle actbounds;
 	actbounds.min_y = 50;
 	actbounds.max_y = 50 + metrics.tmHeight - 1;
-		
+
 	// determine the actual left of the character
 	for (actbounds.min_x = 0; actbounds.min_x < rowbytes; actbounds.min_x++)
 	{
@@ -825,7 +825,7 @@ bitmap_t *windows_osd_interface::font_get_bitmap(osd_font font, unicode_char chn
 			break;
 		}
 	}
-		
+
 	// determine the actual right of the character
 	for (actbounds.max_x = rowbytes - 1; actbounds.max_x >= 0; actbounds.max_x--)
 	{
@@ -846,7 +846,7 @@ bitmap_t *windows_osd_interface::font_get_bitmap(osd_font font, unicode_char chn
 			break;
 		}
 	}
-	
+
 	// allocate a new bitmap
 	bitmap_t *bitmap = NULL;
 	if (actbounds.max_x >= actbounds.min_x && actbounds.max_y >= actbounds.min_y)
@@ -864,7 +864,7 @@ bitmap_t *windows_osd_interface::font_get_bitmap(osd_font font, unicode_char chn
 				dstrow[x] = ((srcrow[effx / 8] << (effx % 8)) & 0x80) ? MAKE_ARGB(0xff,0xff,0xff,0xff) : MAKE_ARGB(0x00,0xff,0xff,0xff);
 			}
 		}
-		
+
 		// set the final offset values
 		xoffs = actbounds.min_x - (50 + abc.abcA);
 		yoffs = actbounds.max_y - (50 + metrics.tmAscent);

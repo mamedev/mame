@@ -83,7 +83,7 @@ public:
 	// pass-through to look like a regular number
 	operator UINT64 &() { return m_value; }
 	operator const UINT64 &() const { return m_value; }
-	
+
 	// format the number according to its format
 	const char *format(astring &string) const;
 
@@ -116,13 +116,13 @@ public:
 
 	// actions
 	void save(mame_file &cheatfile) const;
-		
+
 private:
 	// a single item in a parameter item list
 	class item
 	{
 		friend class simple_list<item>;
-		
+
 	public:
 		// construction/destruction
 		item(const char *text, UINT64 value, int valformat)
@@ -130,11 +130,11 @@ private:
 			  m_text(text),
 			  m_value(value, valformat) { }
 
-		// getters	
+		// getters
 		item *next() const { return m_next; }
 		const number_and_format &value() const { return m_value; }
 		const char *text() const { return m_text; }
-		
+
 	private:
 		// internal state
 		item *				m_next;							// next item in list
@@ -148,7 +148,7 @@ private:
 	number_and_format	m_stepval;						// step value
 	UINT64				m_value;						// live value of the parameter
 	astring				m_curtext;						// holding for a value string
-	simple_list<item> 	m_itemlist;						// list of items
+	simple_list<item>	m_itemlist;						// list of items
 };
 
 
@@ -204,11 +204,11 @@ private:
 
 			// actions
 			void save(mame_file &cheatfile) const;
-			
+
 		private:
 			// internal state
 			output_argument *	m_next;							// link to next argument
-			parsed_expression 	m_expression;					// expression for argument
+			parsed_expression	m_expression;					// expression for argument
 			UINT64				m_count;						// number of repetitions
 		};
 
@@ -217,8 +217,8 @@ private:
 
 		// internal state
 		script_entry *		m_next;							// link to next entry
-		parsed_expression 	m_condition;					// condition under which this is executed
-		parsed_expression 	m_expression;					// expression to execute
+		parsed_expression	m_condition;					// condition under which this is executed
+		parsed_expression	m_expression;					// expression to execute
 		astring				m_format;						// string format to print
 		simple_list<output_argument> m_arglist;				// list of arguments
 		INT8				m_line;							// which line to print on
@@ -227,7 +227,7 @@ private:
 		// constants
 		static const int MAX_ARGUMENTS = 32;
 	};
-	
+
 	// internal state
 	simple_list<script_entry> m_entrylist;				// list of actions to perform
 	script_state		m_state;						// which state this script is for
@@ -240,12 +240,12 @@ private:
 class cheat_entry
 {
 	friend class simple_list<cheat_entry>;
-	
+
 public:
 	// construction/destruction
 	cheat_entry(cheat_manager &manager, symbol_table &globaltable, const char *filename, xml_data_node &cheatnode);
 	~cheat_entry();
-	
+
 	// getters
 	cheat_manager &manager() const { return m_manager; }
 	cheat_entry *next() const { return m_next; }
@@ -283,7 +283,7 @@ public:
 	// UI helpers
 	void menu_text(astring &description, astring &state, UINT32 &flags);
 
-	// per-frame update	
+	// per-frame update
 	void frame_update() { if (m_state == SCRIPT_STATE_RUN) execute_run_script(); }
 
 private:
@@ -319,20 +319,20 @@ class cheat_manager
 public:
 	// construction/destruction
 	cheat_manager(running_machine &machine);
-	
+
 	// getters
 	running_machine &machine() const { return m_machine; }
 	bool enabled() const { return !m_disabled; }
 	cheat_entry *first() const { return m_cheatlist.first(); }
-	
+
 	// setters
 	void set_enable(bool enable = true);
-	
+
 	// actions
 	void reload();
 	bool save_all(const char *filename);
 	void render_text(render_container &container);
-	
+
 	// output helpers
 	astring &get_output_astring(int row, int justify);
 
@@ -346,7 +346,7 @@ private:
 	static void frame_update_static(running_machine &machine);
 	void frame_update();
 	void load_cheats(const char *filename);
-	
+
 	// internal state
 	running_machine &	m_machine;							// reference to our machine
 	simple_list<cheat_entry> m_cheatlist;					// cheat list
@@ -357,7 +357,7 @@ private:
 	INT8				m_lastline;							// last line used for output
 	bool				m_disabled;							// true if the cheat engine is disabled
 	symbol_table		m_symtable;							// global symbol table
-	
+
 	// constants
 	static const int CHEAT_VERSION = 1;
 };

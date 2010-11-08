@@ -89,10 +89,10 @@ TODO:
 #include "sound/2203intf.h"
 #include "includes/lkage.h"
 
-#define MAIN_CPU_CLOCK		(XTAL_12MHz/2) 
+#define MAIN_CPU_CLOCK		(XTAL_12MHz/2)
 #define SOUND_CPU_CLOCK		(XTAL_8MHz/2)
-#define AUDIO_CLOCK			(XTAL_8MHz/2) 
-#define MCU_CLOCK			(XTAL_12MHz/4) 
+#define AUDIO_CLOCK			(XTAL_8MHz/2)
+#define MCU_CLOCK			(XTAL_12MHz/4)
 
 
 static TIMER_CALLBACK( nmi_callback )
@@ -505,7 +505,7 @@ static MACHINE_START( lkage )
 	state_save_register_global(machine, state->bg_tile_bank);
 	state_save_register_global(machine, state->fg_tile_bank);
 	state_save_register_global(machine, state->tx_tile_bank);
-	
+
 	state_save_register_global(machine, state->sprite_dx);
 
 	state_save_register_global(machine, state->mcu_ready);
@@ -807,11 +807,11 @@ ROM_END
 Bygone
 Taito, 1985?
 
-This is a rare prototype platform game conversion on a Legend Of Kage PCB. 
-There are some wire mods on the video board. 
+This is a rare prototype platform game conversion on a Legend Of Kage PCB.
+There are some wire mods on the video board.
 
 
-PCB Layouts 
+PCB Layouts
 -----------
 
 K1100135A
@@ -825,7 +825,7 @@ M4300040A (sticker, also matches The Legend Of Kage)
 |             PC010SA YM3014    YM2203      MB2148     |
 |    PC030CM                                MB2148     |
 |                      8MHz                 MB2148     |
-|          6116                                       |-| 
+|          6116                                       |-|
 |2                                                    | |
 |2         A53_07.IC54   Z80A                         | |
 |W                                                    | |
@@ -845,8 +845,8 @@ Notes:
       Z80A   - clock 4.000MHz [8/2]
       Z80B   - clock 6.000MHz [12/2]
       YM2203 - clock 4.000MHz [8/2]
-      A51_09 - MC68705P5 microcontroller, clock 3.000MHz [12/4]. 
-               It seems to be from Taito game A51, which is unknown? 
+      A51_09 - MC68705P5 microcontroller, clock 3.000MHz [12/4].
+               It seems to be from Taito game A51, which is unknown?
                It was not protected ^_^
       A54-14 - PAL16L8
       A53*   - 27C128 and 27C256 EPROMs
@@ -854,7 +854,7 @@ Notes:
       6116   - 2k x8 SRAM
       2148   - 1k x4 SRAM
       DIPs have 8 switches each
-      
+
 
 K1100136A
 J1100058A
@@ -866,7 +866,7 @@ VIDEO PCB
 |                                                      |
 |                                            6116      |
 |                         6116                         |
-|                                            6116     |-| 
+|                                            6116     |-|
 |1                                                    | |
 |8                                                    | |
 |W                                                    | |
@@ -890,9 +890,9 @@ Notes:
       6116   - 2k x8 SRAM
       93422  - 256b x4 SRAM
       A53*   - 27C128 EPROMs
-      
+
 */
- 
+
 ROM_START( bygone )
 	ROM_REGION( 0x14000, "maincpu", 0 ) /* Z80 code (main CPU) */
 	ROM_LOAD( "a53_05.ic37", 0x0000, 0x8000, CRC(63a3f08b) SHA1(781539077cb1d3b8eecc8bd3717330c0f281833d) )

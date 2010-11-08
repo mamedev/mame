@@ -140,30 +140,30 @@ public:
 	// construction/destruction
 	windows_osd_interface();
 	virtual ~windows_osd_interface();
-	
+
 	// general overridables
 	virtual void init(running_machine &machine);
 	virtual void update(bool skip_redraw);
 
 	// debugger overridables
-//	virtual void init_debugger();
+//  virtual void init_debugger();
 	virtual void wait_for_debugger(device_t &device, bool firststop);
-	
+
 	// audio overridables
 	virtual void update_audio_stream(const INT16 *buffer, int samples_this_frame);
 	virtual void set_mastervolume(int attenuation);
 
 	// input overridables
 	virtual void customize_input_type_list(input_type_desc *typelist);
-	
+
 	// font overridables
 	virtual osd_font font_open(const char *name, int &height);
 	virtual void font_close(osd_font font);
 	virtual bitmap_t *font_get_bitmap(osd_font font, unicode_char chnum, INT32 &width, INT32 &xoffs, INT32 &yoffs);
-	
+
 private:
 	static void osd_exit(running_machine &machine);
-	
+
 	static const int DEFAULT_FONT_HEIGHT = 200;
 };
 

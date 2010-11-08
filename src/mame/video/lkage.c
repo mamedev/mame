@@ -11,7 +11,7 @@
     lkage_scroll[0x05]: background layer vertical scroll
 
     lkage_vreg[0]: 0x00,0x04
-		0x02: tx tile bank select (bygone only?)
+        0x02: tx tile bank select (bygone only?)
         0x04: fg tile bank select
         0x08: ?
 
@@ -109,7 +109,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	lkage_state *state = machine->driver_data<lkage_state>();
 	const UINT8 *source = state->spriteram;
 	const UINT8 *finish = source + 0x60;
-		
+
 	while (source < finish)
 	{
 		int attributes = source[2];
@@ -181,7 +181,7 @@ VIDEO_UPDATE( lkage )
 	flip_screen_y_set(screen->machine, ~state->vreg[2] & 0x02);
 
 	bank = state->vreg[1] & 0x08;
-	
+
 	if (state->bg_tile_bank != bank)
 	{
 		state->bg_tile_bank = bank;
@@ -194,7 +194,7 @@ VIDEO_UPDATE( lkage )
 		state->fg_tile_bank = bank;
 		tilemap_mark_all_tiles_dirty(state->fg_tilemap);
 	}
-	
+
 	bank = state->vreg[0]&0x02;
 	if (state->tx_tile_bank != bank)
 	{
@@ -227,6 +227,6 @@ VIDEO_UPDATE( lkage )
 	{
 		tilemap_draw(bitmap, cliprect, state->tx_tilemap, TILEMAP_DRAW_OPAQUE, 0);
 	}
-	
+
 	return 0;
 }

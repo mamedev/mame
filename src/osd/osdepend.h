@@ -66,7 +66,7 @@ public:
 	// construction/destruction
 	osd_interface();
 	virtual ~osd_interface();
-	
+
 	// getters
 	running_machine &machine() const { assert(m_machine != NULL); return *m_machine; }
 
@@ -77,14 +77,14 @@ public:
 	// debugger overridables
 	virtual void init_debugger();
 	virtual void wait_for_debugger(device_t &device, bool firststop);
-	
+
 	// audio overridables
 	virtual void update_audio_stream(const INT16 *buffer, int samples_this_frame);
 	virtual void set_mastervolume(int attenuation);
 
 	// input overridables
 	virtual void customize_input_type_list(input_type_desc *typelist);
-	
+
 	// font overridables
 	virtual osd_font font_open(const char *name, int &height);
 	virtual void font_close(osd_font font);

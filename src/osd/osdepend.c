@@ -69,28 +69,28 @@ void osd_interface::init(running_machine &machine)
 	// This function is responsible for initializing the OSD-specific
 	// video and input functionality, and registering that functionality
 	// with the MAME core.
-	// 
+	//
 	// In terms of video, this function is expected to create one or more
 	// render_targets that will be used by the MAME core to provide graphics
 	// data to the system. Although it is possible to do this later, the
 	// assumption in the MAME core is that the user interface will be
 	// visible starting at init() time, so you will have some work to
 	// do to avoid these assumptions.
-	// 
+	//
 	// In terms of input, this function is expected to enumerate all input
 	// devices available and describe them to the MAME core by adding
 	// input devices and their attached items (buttons/axes) via the input
 	// system.
-	// 
+	//
 	// Beyond these core responsibilities, init() should also initialize
 	// any other OSD systems that require information about the current
 	// running_machine.
-	// 
+	//
 	// This callback is also the last opportunity to adjust the options
 	// before they are consumed by the rest of the core.
-	// 
+	//
 	// Future work/changes:
-	// 
+	//
 	// Audio initialization may eventually move into here as well,
 	// instead of relying on independent callbacks from each system.
 	//
@@ -141,7 +141,7 @@ void osd_interface::wait_for_debugger(device_t &device, bool firststop)
 	//
 	// When implementing an OSD-driver debugger, this method should be
 	// overridden to wait for input, process it, and return. It will be
-	// called repeatedly until a command is issued that resumes 
+	// called repeatedly until a command is issued that resumes
 	// execution.
 	//
 }
@@ -169,7 +169,7 @@ void osd_interface::update_audio_stream(const INT16 *buffer, int samples_this_fr
 void osd_interface::set_mastervolume(int attenuation)
 {
 	//
-	// Attenuation is the attenuation in dB (a negative number). 
+	// Attenuation is the attenuation in dB (a negative number).
 	// To convert from dB to a linear volume scale do the following:
     //    volume = MAX_VOLUME;
     //    while (attenuation++ < 0)
@@ -222,7 +222,7 @@ void osd_interface::font_close(osd_font font)
 //-------------------------------------------------
 //  font_get_bitmap - allocate and populate a
 //  BITMAP_FORMAT_ARGB32 bitmap containing the
-//  pixel values MAKE_ARGB(0xff,0xff,0xff,0xff) 
+//  pixel values MAKE_ARGB(0xff,0xff,0xff,0xff)
 //  or MAKE_ARGB(0x00,0xff,0xff,0xff) for each
 //  pixel of a black & white font
 //-------------------------------------------------

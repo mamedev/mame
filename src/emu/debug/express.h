@@ -114,7 +114,7 @@ public:
 
 	// operators
 	operator error_code() const { return m_code; }
-	
+
 	// getters
 	error_code code() const { return m_code; }
 	int offset() const { return m_offset; }
@@ -134,7 +134,7 @@ class symbol_entry
 {
 	friend class tagged_list<symbol_entry>;
 
-protected:	
+protected:
 	// symbol types
 	enum symbol_type
 	{
@@ -150,10 +150,10 @@ public:
 	// getters
 	symbol_entry *next() const { return m_next; }
 	const char *name() const { return m_name; }
-	
+
 	// type checking
 	bool is_function() const { return (m_type == SMT_FUNCTION); }
-	
+
 	// symbol access
 	virtual bool is_lval() const = 0;
 	virtual UINT64 value() const = 0;
@@ -179,7 +179,7 @@ public:
 	// callback functions for getting/setting a symbol value
 	typedef UINT64 (*getter_func)(symbol_table &table, void *symref);
 	typedef void (*setter_func)(symbol_table &table, void *symref, UINT64 value);
-	
+
 	// callback functions for function execution
 	typedef UINT64 (*execute_func)(symbol_table &table, void *symref, int numparams, const UINT64 *paramlist);
 
@@ -196,15 +196,15 @@ public:
 
 	// construction/destruction
 	symbol_table(void *globalref, symbol_table *parent = NULL);
-	
+
 	// getters
 	symbol_entry *first() const { return m_symlist.first(); }
 	symbol_table *parent() const { return m_parent; }
 	void *globalref() const { return m_globalref; }
-	
+
 	// setters
 	void configure_memory(void *param, valid_func valid, read_func read, write_func write);
-	
+
 	// symbol access
 	void add(const char *name, read_write rw, UINT64 *ptr = NULL);
 	void add(const char *name, UINT64 constvalue);
@@ -212,7 +212,7 @@ public:
 	void add(const char *name, void *ref, int minparams, int maxparams, execute_func execute);
 	symbol_entry *find(const char *name) { return m_symlist.find(name); }
 	symbol_entry *find_deep(const char *name);
-	
+
 	// value getter/setter
 	UINT64 value(const char *symbol);
 	void set_value(const char *symbol, UINT64 value);
@@ -253,7 +253,7 @@ public:
 	const char *original_string() const { return m_original_string; }
 	symbol_table *symbols() const { return m_symtable; }
 
-	// setters	
+	// setters
 	void set_symbols(symbol_table *symtable) { m_symtable = symtable; }
 
 	// execution
@@ -265,7 +265,7 @@ private:
 	class parse_token
 	{
 		friend class simple_list<parse_token>;
-	
+
 		// operator flags
 		enum
 		{
@@ -297,7 +297,7 @@ private:
 	public:
 		// construction/destruction
 		parse_token(int offset = 0);
-		
+
 		// getters
 		parse_token *next() const { return m_next; }
 		int offset() const { return m_offset; }
@@ -328,7 +328,7 @@ private:
 		parse_token &configure_string(const char *string) { m_type = STRING; m_string = string; return *this; }
 		parse_token &configure_memory(UINT32 address, parse_token &memoryat) { m_type = MEMORY; m_value = address; m_flags = memoryat.m_flags; m_string = memoryat.m_string; return *this; }
 		parse_token &configure_symbol(symbol_entry &symbol) { m_type = SYMBOL; m_symbol = &symbol; return *this; }
-		parse_token &configure_operator(UINT8 optype, UINT8 precedence) 
+		parse_token &configure_operator(UINT8 optype, UINT8 precedence)
 			{ m_type = OPERATOR; m_flags = ((optype << TIN_OPTYPE_SHIFT) & TIN_OPTYPE_MASK) | ((precedence << TIN_PRECEDENCE_SHIFT) & TIN_PRECEDENCE_MASK); return *this; }
 
 		parse_token &set_function_separator() { assert(m_type == OPERATOR); m_flags |= TIN_FUNCTION_MASK; return *this; }
@@ -336,7 +336,7 @@ private:
 		parse_token &set_memory_space(expression_space space) { assert(m_type == OPERATOR || m_type == MEMORY); m_flags = (m_flags & ~TIN_MEMORY_SPACE_MASK) | ((space << TIN_MEMORY_SPACE_SHIFT) & TIN_MEMORY_SPACE_MASK); return *this; }
 		parse_token &set_memory_size(int log2ofbits) { assert(m_type == OPERATOR || m_type == MEMORY); m_flags = (m_flags & ~TIN_MEMORY_SIZE_MASK) | ((log2ofbits << TIN_MEMORY_SIZE_SHIFT) & TIN_MEMORY_SIZE_MASK); return *this; }
 		parse_token &set_memory_source(const char *string) { assert(m_type == OPERATOR || m_type == MEMORY); m_string = string; return *this; }
-		
+
 		// access
 		UINT64 get_lval_value(symbol_table *symtable);
 		void set_lval_value(symbol_table *symtable, UINT64 value);
@@ -351,22 +351,22 @@ private:
 		const char *			m_string;			// associated string
 		symbol_entry *			m_symbol;			// symbol pointer
 	};
-	
+
 	// an expression_string holds an indexed string parsed from the expression
 	class expression_string
 	{
 		friend class simple_list<expression_string>;
-	
+
 	public:
 		// construction/destruction
 		expression_string(const char *string, int length = 0)
 			: m_next(NULL),
 			  m_string(string, (length == 0) ? strlen(string) : length) { }
-		
+
 		// operators
 		operator const char *() { return m_string; }
 		operator const char *() const { return m_string; }
-		
+
 	private:
 		// internal state
 		expression_string *	m_next;						// next string in list
@@ -376,7 +376,7 @@ private:
 	// internal helpers
 	void copy(const parsed_expression &src);
 	void print_tokens(FILE *out);
-	
+
 	// parsing helpers
 	void parse_string_into_tokens();
 	void parse_symbol_or_number(parse_token &token, const char *&string);
