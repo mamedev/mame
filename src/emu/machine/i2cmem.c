@@ -367,7 +367,6 @@ void i2cmem_device::set_sda_line( int state )
 			{
 				verboselog( this, 1, "stop\n" );
 				m_state = STATE_IDLE;
-				m_byteaddr = 0;
 			}
 			else
 			{
@@ -570,7 +569,7 @@ READ_LINE_DEVICE_HANDLER( i2cmem_sda_read )
 
 int i2cmem_device::read_sda_line()
 {
-	int res = m_sdar & m_sdaw & 1;
+	int res = m_sdar & 1;
 
 	verboselog( this, 2, "read sda %d\n", res );
 
@@ -584,7 +583,7 @@ int i2cmem_device::read_sda_line()
 
 int i2cmem_device::address_mask()
 {
-	return ( 1 << m_config.m_address_bits ) - 1;
+	return (m_config.m_data_size - 1);
 }
 
 int i2cmem_device::select_device()

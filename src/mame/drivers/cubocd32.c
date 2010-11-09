@@ -41,7 +41,6 @@
 
    ToDo:
    - remove the hack needed to make inputs working
-   - settings are not saved
 
 
 Stephh's notes (based on the game M68EC020 code and some tests) :
