@@ -450,7 +450,7 @@ static WRITE8_HANDLER(meritm_crt250_questions_bank_w)
 	UINT32 questions_address;
 	UINT8 *dst;
 
-	if (meritm_bank != 0)
+	if ((meritm_bank & 0x07) != 0)
 	{
 		logerror("meritm_crt250_questions_bank_w: bank is %d\n", meritm_bank);
 		return;
