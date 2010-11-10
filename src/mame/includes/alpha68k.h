@@ -38,7 +38,7 @@ public:
 /* game_id - used to deal with a few game specific situations */
 enum
 {
-	ALPHA68K_BTLFIELDB = 0,		// used in alpha_II_trigger_r
+	ALPHA68K_BTLFIELDB = 1,		// used in alpha_II_trigger_r
 	ALPHA68K_JONGBOU,			// used in kyros_alpha_trigger_r & kyros_draw_sprites
 	ALPHA68K_KYROS			// used in kyros_draw_sprites
 };

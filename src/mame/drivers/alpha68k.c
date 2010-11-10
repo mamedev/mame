@@ -3075,6 +3075,7 @@ static DRIVER_INIT( sstingry )
 	state->invert_controls = 0;
 	state->microcontroller_id = 0x00ff;
 	state->coin_id = 0x22 | (0x22 << 8);
+	state->game_id = 0;
 }
 
 static DRIVER_INIT( kyros )
@@ -3101,6 +3102,7 @@ static DRIVER_INIT( paddlema )
 	alpha68k_state *state = machine->driver_data<alpha68k_state>();
 	state->microcontroller_id = 0;
 	state->coin_id = 0;				// Not needed !
+	state->game_id = 0;
 }
 
 static DRIVER_INIT( timesold )
@@ -3109,6 +3111,7 @@ static DRIVER_INIT( timesold )
 	state->invert_controls = 0;
 	state->microcontroller_id = 0;
 	state->coin_id = 0x22 | (0x22 << 8);
+	state->game_id = 0;
 }
 
 static DRIVER_INIT( timesold1 )
@@ -3117,6 +3120,7 @@ static DRIVER_INIT( timesold1 )
 	state->invert_controls = 1;
 	state->microcontroller_id = 0;
 	state->coin_id = 0x22 | (0x22 << 8);
+	state->game_id = 0;
 }
 
 static DRIVER_INIT( btlfield )
@@ -3125,6 +3129,7 @@ static DRIVER_INIT( btlfield )
 	state->invert_controls = 1;
 	state->microcontroller_id = 0;
 	state->coin_id = 0x22 | (0x22 << 8);
+	state->game_id = 0;
 }
 
 static DRIVER_INIT( btlfieldb )
@@ -3143,6 +3148,7 @@ static DRIVER_INIT( skysoldr )
 	state->invert_controls = 0;
 	state->microcontroller_id = 0;
 	state->coin_id = 0x22 | (0x22 << 8);
+	state->game_id = 0;
 }
 
 static DRIVER_INIT( goldmedl )
@@ -3151,6 +3157,7 @@ static DRIVER_INIT( goldmedl )
 	state->invert_controls = 0;
 	state->microcontroller_id = 0x8803; //AT
 	state->coin_id = 0x23 | (0x24 << 8);
+	state->game_id = 0;
 }
 
 static DRIVER_INIT( goldmedla )
@@ -3160,6 +3167,7 @@ static DRIVER_INIT( goldmedla )
 	state->invert_controls = 0;
 	state->microcontroller_id = 0x8803; //Guess - routine to handle coinage is the same as in 'goldmedl'
 	state->coin_id = 0x23 | (0x24 << 8);
+	state->game_id = 0;
 }
 
 static DRIVER_INIT( skyadvnt )
@@ -3168,6 +3176,7 @@ static DRIVER_INIT( skyadvnt )
 	state->invert_controls = 0;
 	state->microcontroller_id = 0x8814;
 	state->coin_id = 0x22 | (0x22 << 8);
+	state->game_id = 0;
 }
 
 static DRIVER_INIT( skyadvntu )
@@ -3176,6 +3185,7 @@ static DRIVER_INIT( skyadvntu )
 	state->invert_controls = 0;
 	state->microcontroller_id = 0x8814;
 	state->coin_id = 0x23 | (0x24 << 8);
+	state->game_id = 0;
 }
 
 static DRIVER_INIT( gangwarsu )
@@ -3185,6 +3195,7 @@ static DRIVER_INIT( gangwarsu )
 	state->invert_controls = 0;
 	state->microcontroller_id = 0x8512;
 	state->coin_id = 0x23 | (0x24 << 8);
+	state->game_id = 0;
 }
 
 static DRIVER_INIT( gangwars )
@@ -3194,6 +3205,7 @@ static DRIVER_INIT( gangwars )
 	state->invert_controls = 0;
 	state->microcontroller_id = 0x8512;
 	state->coin_id = 0x23 | (0x24 << 8);
+	state->game_id = 0;
 }
 
 static DRIVER_INIT( sbasebal )
@@ -3223,6 +3235,7 @@ static DRIVER_INIT( sbasebal )
 	state->invert_controls = 0;
 	state->microcontroller_id = 0x8512;	// Same as 'gangwars' ?
 	state->coin_id = 0x23 | (0x24 << 8);
+	state->game_id = 0;
 }
 
 static DRIVER_INIT( tnextspc )
@@ -3231,6 +3244,7 @@ static DRIVER_INIT( tnextspc )
 	state->invert_controls = 0;
 	state->microcontroller_id = 0x890a;
 	state->coin_id = 0;				// Not needed !
+	state->game_id = 0;
 }
 
 /******************************************************************************/
