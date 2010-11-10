@@ -1005,8 +1005,9 @@ READ8_HANDLER( snes_r_bank2 )
 		}
 		else if ((state->cart[0].mode == SNES_MODE_21) && (state->cart[0].sram > 0))
 		{
-//          int mask = state->cart[0].sram - 1; /* Limit SRAM size to what's actually present */
-			value = snes_ram[0x300000 + offset];
+			/* Donkey Kong Country checks this */
+			int mask = state->cart[0].sram - 1; /* Limit SRAM size to what's actually present */
+			value = snes_ram[0x300000 + (offset & mask)];
 		}
 		else
 		{
@@ -1176,8 +1177,8 @@ READ8_HANDLER( snes_r_bank6 )
 				value = space->read_byte(offset);
 			else if ((offset >= 0x300000) && (state->cart[0].sram > 0))
 			{
-//              int mask = state->cart[0].sram - 1; /* Limit SRAM size to what's actually present */
-				value = snes_ram[0x800000 + offset];
+				int mask = (state->cart[0].sram - 1) | 0xff0000; /* Limit SRAM size to what's actually present */
+				value = snes_ram[0x800000 + (offset & mask)];
 			}
 			else						/* Area 0x6000-0x8000 with offset < 0x300000 is reserved */
 			{
@@ -1344,8 +1345,9 @@ WRITE8_HANDLER( snes_w_bank2 )
 		}
 		else if ((state->cart[0].mode == SNES_MODE_21) && (state->cart[0].sram > 0))
 		{
-//          int mask = state->cart[0].sram - 1; /* Limit SRAM size to what's actually present */
-			snes_ram[0x300000 + offset] = data;
+			/* Donkey Kong Country checks this */
+			int mask = state->cart[0].sram - 1; /* Limit SRAM size to what's actually present */
+			snes_ram[0x300000 + (offset & mask)] = data;
 		}
 		else
 			logerror("snes_w_bank2: Attempt to write to reserved address: %X = %02x\n", offset + 0x300000, data);
@@ -1414,7 +1416,7 @@ WRITE8_HANDLER( snes_w_bank5 )
 		if (state->cart[0].sram > 0)
 		{
 			int mask = state->cart[0].sram - 1;	/* Limit SRAM size to what's actually present */
-			snes_ram[0x700000 +  + (offset & mask)] = data;
+			snes_ram[0x700000 + (offset & mask)] = data;
 		}
 		else
 			logerror("snes_w_bank5: Attempt to write to reserved address: %X = %02x\n", offset + 0x700000, data);
@@ -1449,8 +1451,8 @@ WRITE8_HANDLER( snes_w_bank6 )
 				space->write_byte(offset, data);
 			else if ((offset >= 0x300000) && (state->cart[0].sram > 0))
 			{
-//              int mask = state->cart[0].sram - 1; /* Limit SRAM size to what's actually present */
-				snes_ram[0x800000 + offset] = data;
+				int mask = (state->cart[0].sram - 1) | 0xff0000; /* Limit SRAM size to what's actually present */
+				snes_ram[0x800000 + (offset & mask)] = data;
 			}
 			else	/* Area in 0x6000-0x8000 && offset < 0x300000 is Reserved! */
 				logerror("snes_w_bank6: Attempt to write to reserved address: %X = %02x\n", offset + 0x800000, data);
