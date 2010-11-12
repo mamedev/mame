@@ -122,6 +122,10 @@
 //  TYPE DEFINITIONS
 //============================================================
 
+#ifdef SDLMAME_UNIX
+typedef void *osd_font;
+#endif
+
 class sdl_osd_interface : public osd_interface
 {
 public:
@@ -143,6 +147,13 @@ public:
 
 	// input overridables
 	virtual void customize_input_type_list(input_type_desc *typelist);
+
+#ifdef SDLMAME_UNIX
+	// font overridables
+	virtual osd_font font_open(const char *name, int &height);
+	virtual void font_close(osd_font font);
+	virtual bitmap_t *font_get_bitmap(osd_font font, unicode_char chnum, INT32 &width, INT32 &xoffs, INT32 &yoffs);
+#endif
 
 private:
 	static void osd_exit(running_machine &machine);

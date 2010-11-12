@@ -13,6 +13,10 @@
 #include <SDL/SDL.h>
 #include <SDL/SDL_version.h>
 
+#ifdef SDLMAME_UNIX
+#include <SDL_ttf.h>
+#endif
+
 // standard includes
 #ifdef MESS
 #include <unistd.h>
@@ -280,6 +284,13 @@ int main(int argc, char *argv[])
 	setvbuf(stdout, (char *) NULL, _IONBF, 0);
 	setvbuf(stderr, (char *) NULL, _IONBF, 0);
 
+	#ifdef SDLMAME_UNIX
+	if (TTF_Init() == -1)
+	{
+		printf("SDL_ttf failed: %s\n", TTF_GetError());
+	}
+	#endif
+
 	#ifdef SDLMAME_OS2
 	MorphToPM();
 	#endif
@@ -317,6 +328,10 @@ int main(int argc, char *argv[])
 
 	// already called...
 	//SDL_Quit();
+
+	#ifdef SDLMAME_UNIX
+	TTF_Quit();
+	#endif
 
 	exit(res);
 
@@ -596,3 +611,114 @@ void sdl_osd_interface::init(running_machine &machine)
 	SDL_EnableUNICODE(SDL_TRUE);
 #endif
 }
+
+#ifdef SDLMAME_UNIX
+//-------------------------------------------------
+//  font_open - attempt to "open" a handle to the
+//  font with the given name
+//-------------------------------------------------
+
+osd_font sdl_osd_interface::font_open(const char *_name, int &height)
+{
+	TTF_Font *font;
+	int style = 0;
+	
+	// accept qualifiers from the name
+	astring name(_name);
+
+	if (name == "default")
+	{
+		return NULL;
+	}
+
+	bool bold = (name.replace(0, "[B]", "") + name.replace(0, "[b]", "") > 0);
+	bool italic = (name.replace(0, "[I]", "") + name.replace(0, "[i]", "") > 0);
+	bool underline = (name.replace(0, "[U]", "") + name.replace(0, "[u]", "") > 0);
+	bool strike = (name.replace(0, "[S]", "") + name.replace(0, "[s]", "") > 0);
+
+	font = TTF_OpenFont(name.cstr(), 120);
+
+	if (!font)
+	{
+		printf("WARNING: Opening TrueType font %s failed, using MAME default\n", name.cstr());
+		return NULL;
+	}
+
+	// apply styles
+	style |= bold ? TTF_STYLE_BOLD : 0;
+	style |= italic ? TTF_STYLE_ITALIC : 0;
+	style |= underline ? TTF_STYLE_UNDERLINE : 0;
+	style |= strike ? TTF_STYLE_STRIKETHROUGH : 0;
+	TTF_SetFontStyle(font, style);
+
+	height = TTF_FontLineSkip(font);
+
+	return (osd_font)font;
+}
+
+//-------------------------------------------------
+//  font_close - release resources associated with
+//  a given OSD font
+//-------------------------------------------------
+
+void sdl_osd_interface::font_close(osd_font font)
+{
+	TTF_Font *ttffont;
+
+	ttffont = (TTF_Font *)font;
+
+	TTF_CloseFont(ttffont);
+}
+
+//-------------------------------------------------
+//  font_get_bitmap - allocate and populate a
+//  BITMAP_FORMAT_ARGB32 bitmap containing the
+//  pixel values MAKE_ARGB(0xff,0xff,0xff,0xff)
+//  or MAKE_ARGB(0x00,0xff,0xff,0xff) for each
+//  pixel of a black & white font
+//-------------------------------------------------
+
+bitmap_t *sdl_osd_interface::font_get_bitmap(osd_font font, unicode_char chnum, INT32 &width, INT32 &xoffs, INT32 &yoffs)
+{
+	TTF_Font *ttffont;
+	bitmap_t *bitmap = (bitmap_t *)NULL;
+	SDL_Surface *drawsurf;
+	SDL_Color fcol = { 0xff, 0xff, 0xff };
+	char ustr[16];
+
+	ttffont = (TTF_Font *)font;
+	
+	memset(ustr, 0, sizeof(ustr));
+	utf8_from_uchar(ustr, 1, chnum);
+	drawsurf = TTF_RenderUTF8_Solid(ttffont, ustr, fcol);
+
+	// was nothing returned?
+	if (drawsurf)
+	{
+		// allocate a MAME destination bitmap
+		bitmap = auto_alloc(&machine(), bitmap_t(drawsurf->w, drawsurf->h, BITMAP_FORMAT_ARGB32));
+
+		// copy the rendered character image into it
+		for (int y = 0; y < bitmap->height; y++)
+		{
+			UINT32 *dstrow = BITMAP_ADDR32(bitmap, y, 0);
+			UINT8 *srcrow = (UINT8 *)drawsurf->pixels;
+		
+			srcrow += (y * drawsurf->pitch);
+
+			for (int x = 0; x < drawsurf->w; x++)
+			{
+				dstrow[x] = srcrow[x] ? MAKE_ARGB(0xff,0xff,0xff,0xff) : MAKE_ARGB(0x00,0xff,0xff,0xff);
+			}
+		}
+
+		// what are these?
+		xoffs = yoffs = 0;
+		width = drawsurf->w;
+
+		SDL_FreeSurface(drawsurf);
+	}
+
+	return bitmap;
+}
+#endif
