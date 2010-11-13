@@ -14,8 +14,10 @@
 #include <SDL/SDL_version.h>
 
 #ifdef SDLMAME_UNIX
+#ifndef SDLMAME_MACOSX
 #include <SDL_ttf.h>
 #include <fontconfig/fontconfig.h>
+#endif
 #endif
 
 // standard includes
@@ -286,11 +288,13 @@ int main(int argc, char *argv[])
 	setvbuf(stderr, (char *) NULL, _IONBF, 0);
 
 	#ifdef SDLMAME_UNIX
+	#ifndef SDLMAME_MACOSX
 	if (TTF_Init() == -1)
 	{
 		printf("SDL_ttf failed: %s\n", TTF_GetError());
 	}
 	FcInit();
+	#endif
 	#endif
 
 	#ifdef SDLMAME_OS2
@@ -332,8 +336,10 @@ int main(int argc, char *argv[])
 	//SDL_Quit();
 
 	#ifdef SDLMAME_UNIX
+	#ifndef SDLMAME_MACOSX
 	TTF_Quit();
 	FcFini();
+	#endif
 	#endif
 
 	exit(res);
@@ -616,6 +622,39 @@ void sdl_osd_interface::init(running_machine &machine)
 }
 
 #ifdef SDLMAME_UNIX
+#ifdef SDLMAME_MACOSX
+//-------------------------------------------------
+//  font_open - attempt to "open" a handle to the
+//  font with the given name
+//-------------------------------------------------
+
+osd_font sdl_osd_interface::font_open(const char *_name, int &height)
+{
+	return (osd_font)NULL;
+}
+
+//-------------------------------------------------
+//  font_close - release resources associated with
+//  a given OSD font
+//-------------------------------------------------
+
+void sdl_osd_interface::font_close(osd_font font)
+{
+}
+
+//-------------------------------------------------
+//  font_get_bitmap - allocate and populate a
+//  BITMAP_FORMAT_ARGB32 bitmap containing the
+//  pixel values MAKE_ARGB(0xff,0xff,0xff,0xff)
+//  or MAKE_ARGB(0x00,0xff,0xff,0xff) for each
+//  pixel of a black & white font
+//-------------------------------------------------
+
+bitmap_t *sdl_osd_interface::font_get_bitmap(osd_font font, unicode_char chnum, INT32 &width, INT32 &xoffs, INT32 &yoffs)
+{
+	return (bitmap_t *)NULL;
+}
+#else
 //-------------------------------------------------
 //  font_open - attempt to "open" a handle to the
 //  font with the given name
@@ -828,5 +867,38 @@ bitmap_t *sdl_osd_interface::font_get_bitmap(osd_font font, unicode_char chnum, 
 	}
 
 	return bitmap;
+}
+#endif	// not OSX
+#else	// not UNIX
+//-------------------------------------------------
+//  font_open - attempt to "open" a handle to the
+//  font with the given name
+//-------------------------------------------------
+
+osd_font sdl_osd_interface::font_open(const char *_name, int &height)
+{
+	return (osd_font)NULL;
+}
+
+//-------------------------------------------------
+//  font_close - release resources associated with
+//  a given OSD font
+//-------------------------------------------------
+
+void sdl_osd_interface::font_close(osd_font font)
+{
+}
+
+//-------------------------------------------------
+//  font_get_bitmap - allocate and populate a
+//  BITMAP_FORMAT_ARGB32 bitmap containing the
+//  pixel values MAKE_ARGB(0xff,0xff,0xff,0xff)
+//  or MAKE_ARGB(0x00,0xff,0xff,0xff) for each
+//  pixel of a black & white font
+//-------------------------------------------------
+
+bitmap_t *sdl_osd_interface::font_get_bitmap(osd_font font, unicode_char chnum, INT32 &width, INT32 &xoffs, INT32 &yoffs)
+{
+	return (bitmap_t *)NULL;
 }
 #endif
