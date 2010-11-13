@@ -4615,7 +4615,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( alpilota )
 	DRIVER( ggram2 )	/* 1999.04 Giant Gram Zen Nippon Pro-wres 2 */
 						/* 1999.05 Taisen Puzzle Kurutto Stone */
-						/* 1999.06 Ringout 4x4 */
+	DRIVER( ringout )	/* 1999.06 Ringout 4x4 */
 	DRIVER( f355bios )	/* 1999.07 F355 Challenge */
 	DRIVER( f355 )
 	DRIVER( f355twin )	/* 1999.07 F355 Challenge Twin */
@@ -4650,7 +4650,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2000.04 Shin Nippon Pro-wres Toukon Retsuden 4 */
 	DRIVER( pstone2 )	/* 2000.04 Power Stone 2 */
 	DRIVER( qmegamis )	/* 2000.05 Quiz Ah Megamisama */
-						/* 2000.06 Virtual-on Oratorio Tangram M.S.B.S. ver.5.66 2000 edition */
+	DRIVER( vonot )		/* 2000.06 Virtual-on Oratorio Tangram M.S.B.S. ver.5.66 2000 edition */
 						/* 2000.06 Derby Owners Club 2000 */
 	DRIVER( ggx )		/* 2000.07 Guilty Gear X */
 	DRIVER( slasho )	/* 2000.07 Slashout */
@@ -4696,7 +4696,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( gundmxgd )	/* 2001.09 Kidou Senshi Gundam Renpou vs. Zeon DX */
 						/* 2001.09 Alien Front */
 	DRIVER( hmgeo )		/* 2001.09 Heavy Metal Geo Matrix */
-						/* 2001.10 Inu no Osanpo */
+	DRIVER( inunoos )	/* 2001.10 Inu no Osanpo */
 	DRIVER( derbyoc2 )	/* 2001.10 Derby Owners Club 2 */
 	DRIVER( vtennis2 )	/* 2001.10 Power Smash 2 / Virtua Tennis 2 */
 	DRIVER( vtenis2c )	/* Power Smash 2 / Virtua Tennis 2 (cartridge) */
@@ -4793,7 +4793,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( vf4 )		/* 2001.08.02 Virtua Fighter 4 (GD-ROM) */
 	DRIVER( vf4b )		/* 2001.08.20 Virtua Fighter 4 ver.B */
 	DRIVER( vf4c )		/* 2002.01.31 Virtua Fighter 4 ver.C */
-						/* 2002.02 The King of Route 66 */
+	DRIVER( kingrt66 )	/* 2002.02 The King of Route 66 */
 	DRIVER( initd )		/* 2002.03 Initial D Arcade Stage */
 	DRIVER( initdexp )	/* 200?.?? Initial D Export Version */
 	DRIVER( clubkrte )	/* 2002.?? Club Kart: European Session */
