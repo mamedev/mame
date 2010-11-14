@@ -4580,8 +4580,29 @@ ROM_END
 
 ROM_START( ssi )
 	ROM_REGION( 0x80000, "maincpu", 0 )     /* 512k for 68000 code */
-	ROM_LOAD16_BYTE( "c64_15-1.bin", 0x00000, 0x40000, CRC(ce9308a6) SHA1(02653218fe949803742e574eeed01dd421b0a671) )
-	ROM_LOAD16_BYTE( "c64_16-1.bin", 0x00001, 0x40000, CRC(470a483a) SHA1(880d43aec8c3bbae1d58e7d6d7719eb6fe67cc56) )
+	ROM_LOAD16_BYTE( "c64_15-1.ic9", 0x00000, 0x40000, CRC(ce9308a6) SHA1(02653218fe949803742e574eeed01dd421b0a671) )
+	ROM_LOAD16_BYTE( "c64_16-1.ic8", 0x00001, 0x40000, CRC(470a483a) SHA1(880d43aec8c3bbae1d58e7d6d7719eb6fe67cc56) )
+
+	ROM_REGION( 0x100000, "gfx1", ROMREGION_ERASEFF )
+	/* empty! */
+
+	ROM_REGION( 0x100000, "gfx2", 0 )	/* OBJ */
+	ROM_LOAD( "c64-01.1",     0x000000, 0x100000, CRC(a1b4f486) SHA1(bdd6bf144e50fe7b1d4cf4504471a689669415a4) )
+
+	ROM_REGION( 0x1c000, "audiocpu", 0 )		/* sound cpu */
+	ROM_LOAD( "c64-09.13",    0x00000, 0x04000, CRC(88d7f65c) SHA1(d6383bf8fd035772fa3c57b26b727eefe1aadd93) )
+	ROM_CONTINUE(             0x10000, 0x0c000 )	/* banked stuff */
+
+	ROM_REGION( 0x20000, "ymsnd", 0 )	/* ADPCM samples */
+	ROM_LOAD( "c64-02.2",     0x00000, 0x20000, CRC(3cb0b907) SHA1(7cbe437fe584575a2f26a582095fd49665c7003e) )
+
+	/* no Delta-T samples */
+ROM_END
+
+ROM_START( ssia )
+	ROM_REGION( 0x80000, "maincpu", 0 )     /* 512k for 68000 code */
+	ROM_LOAD16_BYTE( "c64_15.ic9", 0x00000, 0x40000, CRC(3a6d591b) SHA1(cc08aa89046e774046d1e47afb7d124c9a6b0b88) )
+	ROM_LOAD16_BYTE( "c64_16.ic8", 0x00001, 0x40000, CRC(8a567a4f) SHA1(9d309dd3f3bdde180908c46f13f112a0055bcae2) )
 
 	ROM_REGION( 0x100000, "gfx1", ROMREGION_ERASEFF )
 	/* empty! */
@@ -5629,7 +5650,8 @@ GAME( 1990, liquidk,    0,        liquidk,   liquidk,   0,        ROT0,   "Taito
 GAME( 1990, liquidku,   liquidk,  liquidk,   liquidku,  0,        ROT0,   "Taito America Corporation", "Liquid Kids (US)", GAME_SUPPORTS_SAVE )
 GAME( 1990, mizubaku,   liquidk,  liquidk,   mizubaku,  0,        ROT0,   "Taito Corporation",         "Mizubaku Daibouken (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1990, quizhq,     0,        quizhq,    quizhq,    0,        ROT0,   "Taito Corporation",         "Quiz H.Q. (Japan)", GAME_SUPPORTS_SAVE )
-GAME( 1990, ssi,        0,        ssi,       ssi,       0,        ROT270, "Taito Corporation Japan",   "Super Space Invaders '91 (World)", GAME_SUPPORTS_SAVE )
+GAME( 1990, ssi,        0,        ssi,       ssi,       0,        ROT270, "Taito Corporation Japan",   "Super Space Invaders '91 (World, Rev 1)", GAME_SUPPORTS_SAVE )
+GAME( 1990, ssia,       ssi,      ssi,       ssi,       0,        ROT270, "Taito Corporation Japan",   "Super Space Invaders '91 (World)", GAME_SUPPORTS_SAVE )
 GAME( 1990, majest12,   ssi,      ssi,       majest12,  0,        ROT270, "Taito Corporation",         "Majestic Twelve - The Space Invaders Part IV (Japan)", GAME_SUPPORTS_SAVE )
 GAME( 1990, gunfront,   0,        gunfront,  gunfront,  0,        ROT270, "Taito Corporation Japan",   "Gun & Frontier (World)", GAME_SUPPORTS_SAVE )
 GAME( 1990, gunfrontj,  gunfront, gunfront,  gunfrontj, 0,        ROT270, "Taito Corporation",         "Gun Frontier (Japan)", GAME_SUPPORTS_SAVE )

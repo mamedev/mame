@@ -2121,6 +2121,7 @@ const game_driver * const drivers[] =
 	DRIVER( mizubaku )	/* 1990.08 C49 (c) 1990 Taito Corporation (Japan) */
 	DRIVER( quizhq )	/* 1990.07 C53 (c) 1990 Taito Corporation (Japan) */
 	DRIVER( ssi )		/* 1990.?? C64 (c) 1990 Taito Corporation Japan (World) */
+	DRIVER( ssia )		/* 1990.?? C64 (c) 1990 Taito Corporation Japan (World) */
 	DRIVER( majest12 )	/* 1990.11 C64 (c) 1990 Taito Corporation (Japan) */
 						/* 1990.12 C64 (US) */
 	DRIVER( gunfront )	/* 1991.?? C71 (c) 1990 Taito Corporation Japan (World) */
