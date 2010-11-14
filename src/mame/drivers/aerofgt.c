@@ -2476,7 +2476,8 @@ GAME( 1991, pspikesc, pspikes,  pspikesc, pspikesc, 0, ROT0,   "bootleg",       
 GAME( 1991, karatblz, 0,        karatblz, karatblz, 0, ROT0,   "Video System Co.", "Karate Blazers (World)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
 GAME( 1991, karatblzu,karatblz, karatblz, karatblz, 0, ROT0,   "Video System Co.", "Karate Blazers (US)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
 GAME( 1991, karatblzj,karatblz, karatblz, karatblz, 0, ROT0,   "Video System Co.", "Karate Blazers (Japan)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
-GAME( 1991, turbofrc, 0,        turbofrc, turbofrc, 0, ROT270, "Video System Co.", "Turbo Force", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
+GAME( 1991, turbofrc, 0,        turbofrc, turbofrc, 0, ROT270, "Video System Co.", "Turbo Force (old revision)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
+// there's also an undumped Turbo Force (new revision). Most notable thing in there is the points value of the rocks in level 6 (5.000 versus 500).
 GAME( 1992, aerofgt,  0,        aerofgt,  aerofgt,  0, ROT270, "Video System Co.", "Aero Fighters", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
 GAME( 1992, aerofgtb, aerofgt,  aerofgtb, aerofgtb, 0, ROT270, "Video System Co.", "Aero Fighters (Turbo Force hardware set 1)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
 GAME( 1992, aerofgtc, aerofgt,  aerofgtb, aerofgtb, 0, ROT270, "Video System Co.", "Aero Fighters (Turbo Force hardware set 2)", GAME_SUPPORTS_SAVE | GAME_NO_COCKTAIL )
