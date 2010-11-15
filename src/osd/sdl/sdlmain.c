@@ -18,6 +18,9 @@
 #include <SDL_ttf.h>
 #include <fontconfig/fontconfig.h>
 #endif
+#ifdef SDLMAME_MACOSX
+#include <Carbon/Carbon.h>
+#endif
 #endif
 
 // standard includes
@@ -623,6 +626,11 @@ void sdl_osd_interface::init(running_machine &machine)
 
 #ifdef SDLMAME_UNIX
 #ifdef SDLMAME_MACOSX
+
+#define EXTRA_HEIGHT 1.0
+#define EXTRA_WIDTH 1.15
+#define POINT_SIZE 144.0
+
 //-------------------------------------------------
 //  font_open - attempt to "open" a handle to the
 //  font with the given name
@@ -630,7 +638,53 @@ void sdl_osd_interface::init(running_machine &machine)
 
 osd_font sdl_osd_interface::font_open(const char *_name, int &height)
 {
-	return (osd_font)NULL;
+	CFStringRef font_name = NULL;
+	CTFontRef ct_font;
+	CTFontDescriptorRef font_descriptor;
+	CGAffineTransform affine_transform = CGAffineTransformIdentity;
+	
+	astring name(_name);
+
+	if (name == "default")
+	{
+		name = "LucidaGrande";
+	}
+
+	font_name = CFStringCreateWithCString( NULL, _name, kCFStringEncodingUTF8 );
+	
+	if( font_name != NULL )
+	{
+      font_descriptor = CTFontDescriptorCreateWithNameAndSize( font_name, POINT_SIZE );
+      
+      if( font_descriptor != NULL )
+      {
+         ct_font = CTFontCreateWithFontDescriptor( font_descriptor, POINT_SIZE, &affine_transform );
+                  
+         CFRelease( font_descriptor );
+      }
+   }
+   
+   CFRelease( font_name );
+
+   if (!ct_font)
+	{
+		printf("WARNING: Couldn't find/open font %s, using MAME default\n", name.cstr());
+		return NULL;
+	}
+
+   CFStringRef real_name = CTFontCopyPostScriptName( ct_font );
+   char real_name_c_string[255];
+   CFStringGetCString ( real_name, real_name_c_string, 255, kCFStringEncodingUTF8 );
+   mame_printf_verbose("Matching font: %s\n", real_name_c_string);
+   CFRelease( real_name );
+   
+   CGFloat line_height = 0.0;
+   line_height += CTFontGetAscent(ct_font);
+   line_height += CTFontGetDescent(ct_font);
+   line_height += CTFontGetLeading(ct_font);
+   height = ceilf(line_height * EXTRA_HEIGHT);
+
+   return (osd_font)ct_font;
 }
 
 //-------------------------------------------------
@@ -640,6 +694,12 @@ osd_font sdl_osd_interface::font_open(const char *_name, int &height)
 
 void sdl_osd_interface::font_close(osd_font font)
 {
+   CTFontRef ct_font = (CTFontRef)font;
+   
+   if( ct_font != NULL )
+   {
+      CFRelease( ct_font );
+   }
 }
 
 //-------------------------------------------------
@@ -652,9 +712,72 @@ void sdl_osd_interface::font_close(osd_font font)
 
 bitmap_t *sdl_osd_interface::font_get_bitmap(osd_font font, unicode_char chnum, INT32 &width, INT32 &xoffs, INT32 &yoffs)
 {
-	return (bitmap_t *)NULL;
+   UniChar uni_char;
+   CGGlyph glyph;
+   bitmap_t *bitmap = (bitmap_t *)NULL;
+   CTFontRef ct_font = (CTFontRef)font;
+   const CFIndex count = 1;
+   CGRect bounding_rect, success_rect;
+   CGContextRef context_ref;
+   
+   if( chnum == ' ' )
+   {
+      uni_char = 'n';
+      CTFontGetGlyphsForCharacters( ct_font, &uni_char, &glyph, count );
+      success_rect = CTFontGetBoundingRectsForGlyphs( ct_font, kCTFontDefaultOrientation, &glyph, &bounding_rect, count );
+      uni_char = chnum;
+      CTFontGetGlyphsForCharacters( ct_font, &uni_char, &glyph, count );
+   }
+   else
+   {
+      uni_char = chnum;
+      CTFontGetGlyphsForCharacters( ct_font, &uni_char, &glyph, count );
+      success_rect = CTFontGetBoundingRectsForGlyphs( ct_font, kCTFontDefaultOrientation, &glyph, &bounding_rect, count );
+   }
+
+   if( CGRectEqualToRect( success_rect, CGRectNull ) == false )
+   {
+      size_t bitmap_width;
+      size_t bitmap_height;
+
+      bitmap_width = ceilf(bounding_rect.size.width * EXTRA_WIDTH);
+      bitmap_width = bitmap_width == 0 ? 1 : bitmap_width;
+      
+      bitmap_height = ceilf( (CTFontGetAscent(ct_font) + CTFontGetDescent(ct_font) + CTFontGetLeading(ct_font)) * EXTRA_HEIGHT);
+
+      xoffs = yoffs = 0;
+      width = bitmap_width;
+
+      size_t bits_per_component;
+      CGColorSpaceRef color_space;
+      CGBitmapInfo bitmap_info = kCGBitmapByteOrder32Host | kCGImageAlphaPremultipliedFirst;
+      
+      color_space = CGColorSpaceCreateDeviceRGB();
+      bits_per_component = 8;
+
+      bitmap = auto_alloc(&machine(), bitmap_t(bitmap_width, bitmap_height, BITMAP_FORMAT_ARGB32));
+      
+      context_ref = CGBitmapContextCreate( bitmap->base, bitmap_width, bitmap_height, bits_per_component, bitmap->rowpixels*4, color_space, bitmap_info );
+      
+      if( context_ref != NULL )
+      {
+         CGFontRef font_ref;
+         font_ref = CTFontCopyGraphicsFont( ct_font, NULL );
+         CGContextSetTextPosition(context_ref, -bounding_rect.origin.x*EXTRA_WIDTH, CTFontGetDescent(ct_font)+CTFontGetLeading(ct_font) );
+         CGContextSetRGBFillColor(context_ref, 1.0, 1.0, 1.0, 1.0);
+         CGContextSetFont( context_ref, font_ref );
+         CGContextSetFontSize( context_ref, POINT_SIZE );
+         CGContextShowGlyphs( context_ref, &glyph, count );
+         CGFontRelease( font_ref );
+         CGContextRelease( context_ref );
+      }
+
+      CGColorSpaceRelease( color_space );
+   }
+
+   return bitmap;
 }
-#else
+#else // UNIX but not OSX
 //-------------------------------------------------
 //  font_open - attempt to "open" a handle to the
 //  font with the given name
