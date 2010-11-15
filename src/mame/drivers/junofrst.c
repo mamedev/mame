@@ -85,8 +85,98 @@ Blitter source graphics
 #include "sound/dac.h"
 #include "sound/flt_rc.h"
 #include "machine/konami1.h"
-#include "includes/timeplt.h"
 #include "includes/konamipt.h"
+#include "includes/tutankhm.h"
+
+
+class junofrst_state : public tutankhm_state
+{
+public:
+	junofrst_state(running_machine &machine, const driver_device_config_base &config)
+		: tutankhm_state(machine, config) { }
+
+	UINT8     blitterdata[4];
+	int      i8039_status, last_irq;
+
+	cpu_device *soundcpu;
+	running_device *i8039;
+
+	running_device *filter_0_0;
+	running_device *filter_0_1;
+	running_device *filter_0_2;
+};
+
+
+/* Juno First Blitter Hardware emulation
+
+    Juno First can blit a 16x16 graphics which comes from un-memory mapped graphics roms
+
+    $8070->$8071 specifies the destination NIBBLE address
+    $8072->$8073 specifies the source NIBBLE address
+
+    Depending on bit 0 of the source address either the source pixels will be copied to
+    the destination address, or a zero will be written.
+
+    Only source pixels which aren't 0 are copied or cleared.
+
+    This allows the game to quickly clear the sprites from the screen
+
+    TODO: Does bit 1 of the source address mean something?
+          We have to mask it off otherwise the "Juno First" logo on the title screen is wrong.
+*/
+
+static WRITE8_HANDLER( junofrst_blitter_w )
+{
+	junofrst_state *state = space->machine->driver_data<junofrst_state>();
+	state->blitterdata[offset] = data;
+
+	/* blitter is triggered by $8073 */
+	if (offset == 3)
+	{
+		int i;
+		UINT8 *gfx_rom = memory_region(space->machine, "gfx1");
+
+		offs_t src = ((state->blitterdata[2] << 8) | state->blitterdata[3]) & 0xfffc;
+		offs_t dest = (state->blitterdata[0] << 8) | state->blitterdata[1];
+
+		int copy = state->blitterdata[3] & 0x01;
+
+		/* 16x16 graphics */
+		for (i = 0; i < 16; i++)
+		{
+			int j;
+
+			for (j = 0; j < 16; j++)
+			{
+				UINT8 data;
+
+				if (src & 1)
+					data = gfx_rom[src >> 1] & 0x0f;
+				else
+					data = gfx_rom[src >> 1] >> 4;
+
+				src += 1;
+
+				/* if there is a source pixel either copy the pixel or clear the pixel depending on the copy flag */
+
+				if (data)
+				{
+					if (copy == 0)
+						data = 0;
+
+					if (dest & 1)
+						state->videoram[dest >> 1] = (state->videoram[dest >> 1] & 0x0f) | (data << 4);
+					else
+						state->videoram[dest >> 1] = (state->videoram[dest >> 1] & 0xf0) | data;
+				}
+
+				dest += 1;
+			}
+
+			dest += 240;
+		}
+	}
+}
 
 
 static WRITE8_HANDLER( junofrst_bankselect_w )
@@ -97,7 +187,7 @@ static WRITE8_HANDLER( junofrst_bankselect_w )
 
 static READ8_DEVICE_HANDLER( junofrst_portA_r )
 {
-	timeplt_state *state = device->machine->driver_data<timeplt_state>();
+	junofrst_state *state = device->machine->driver_data<junofrst_state>();
 	int timer;
 
 	/* main xtal 14.318MHz, divided by 8 to get the CPU clock, further */
@@ -114,7 +204,7 @@ static READ8_DEVICE_HANDLER( junofrst_portA_r )
 
 static WRITE8_DEVICE_HANDLER( junofrst_portB_w )
 {
-	timeplt_state *state = device->machine->driver_data<timeplt_state>();
+	junofrst_state *state = device->machine->driver_data<junofrst_state>();
 	running_device *filter[3] = { state->filter_0_0, state->filter_0_1, state->filter_0_2 };
 	int i;
 
@@ -135,7 +225,7 @@ static WRITE8_DEVICE_HANDLER( junofrst_portB_w )
 
 static WRITE8_HANDLER( junofrst_sh_irqtrigger_w )
 {
-	timeplt_state *state = space->machine->driver_data<timeplt_state>();
+	junofrst_state *state = space->machine->driver_data<junofrst_state>();
 
 	if (state->last_irq == 0 && data == 1)
 	{
@@ -149,14 +239,14 @@ static WRITE8_HANDLER( junofrst_sh_irqtrigger_w )
 
 static WRITE8_HANDLER( junofrst_i8039_irq_w )
 {
-	timeplt_state *state = space->machine->driver_data<timeplt_state>();
+	junofrst_state *state = space->machine->driver_data<junofrst_state>();
 	cpu_set_input_line(state->i8039, 0, ASSERT_LINE);
 }
 
 
 static WRITE8_HANDLER( i8039_irqen_and_status_w )
 {
-	timeplt_state *state = space->machine->driver_data<timeplt_state>();
+	junofrst_state *state = space->machine->driver_data<junofrst_state>();
 
 	if ((data & 0x80) == 0)
 		cpu_set_input_line(state->i8039, 0, CLEAR_LINE);
@@ -179,8 +269,8 @@ static WRITE8_HANDLER( junofrst_coin_counter_w )
 
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_BASE_SIZE_MEMBER(timeplt_state, videoram, videoram_size)
-	AM_RANGE(0x8000, 0x800f) AM_RAM AM_BASE_MEMBER(timeplt_state, paletteram)
+	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_BASE_MEMBER(junofrst_state, videoram)
+	AM_RANGE(0x8000, 0x800f) AM_RAM AM_BASE_MEMBER(junofrst_state, paletteram)
 	AM_RANGE(0x8010, 0x8010) AM_READ_PORT("DSW2")
 	AM_RANGE(0x801c, 0x801c) AM_READ(watchdog_reset_r)
 	AM_RANGE(0x8020, 0x8020) AM_READ_PORT("SYSTEM")
@@ -189,7 +279,7 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x802c, 0x802c) AM_READ_PORT("DSW1")
 	AM_RANGE(0x8030, 0x8030) AM_WRITE(interrupt_enable_w)
 	AM_RANGE(0x8031, 0x8032) AM_WRITE(junofrst_coin_counter_w)
-	AM_RANGE(0x8033, 0x8033) AM_WRITEONLY AM_BASE_MEMBER(timeplt_state, scroll)  /* not used in Juno */
+	AM_RANGE(0x8033, 0x8033) AM_WRITEONLY AM_BASE_MEMBER(junofrst_state, scroll)  /* not used in Juno */
 	AM_RANGE(0x8034, 0x8035) AM_WRITE(flip_screen_w)
 	AM_RANGE(0x8040, 0x8040) AM_WRITE(junofrst_sh_irqtrigger_w)
 	AM_RANGE(0x8050, 0x8050) AM_WRITE(soundlatch_w)
@@ -280,7 +370,7 @@ static const ay8910_interface ay8910_config =
 
 static MACHINE_START( junofrst )
 {
-	timeplt_state *state = machine->driver_data<timeplt_state>();
+	junofrst_state *state = machine->driver_data<junofrst_state>();
 
 	state->maincpu = machine->device<cpu_device>("maincpu");
 	state->i8039 = machine->device("mcu");
@@ -298,7 +388,7 @@ static MACHINE_START( junofrst )
 
 static MACHINE_RESET( junofrst )
 {
-	timeplt_state *state = machine->driver_data<timeplt_state>();
+	junofrst_state *state = machine->driver_data<junofrst_state>();
 
 	state->i8039_status = 0;
 	state->last_irq = 0;
@@ -310,7 +400,7 @@ static MACHINE_RESET( junofrst )
 	state->blitterdata[3] = 0;
 }
 
-static MACHINE_CONFIG_START( junofrst, timeplt_state )
+static MACHINE_CONFIG_START( junofrst, junofrst_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 1500000)			/* 1.5 MHz ??? */

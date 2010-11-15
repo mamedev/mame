@@ -800,7 +800,7 @@ $(MAMEOBJ)/konami.a: \
 	$(DRIVERS)/hcastle.o $(VIDEO)/hcastle.o \
 	$(DRIVERS)/hexion.o $(VIDEO)/hexion.o \
 	$(DRIVERS)/hornet.o $(MACHINE)/konppc.o \
-	$(DRIVERS)/hyperspt.o $(VIDEO)/hyperspt.o \
+	$(DRIVERS)/hyperspt.o $(AUDIO)/hyprolyb.o $(VIDEO)/hyperspt.o \
 	$(DRIVERS)/ironhors.o $(VIDEO)/ironhors.o \
 	$(DRIVERS)/jackal.o $(VIDEO)/jackal.o \
 	$(DRIVERS)/jailbrek.o $(VIDEO)/jailbrek.o \

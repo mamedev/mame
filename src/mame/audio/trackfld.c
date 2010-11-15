@@ -1,10 +1,65 @@
 #include "emu.h"
 #include "sound/vlm5030.h"
 #include "sound/sn76496.h"
+#include "sound/msm5205.h"
+#include "cpu/m6800/m6800.h"
 #include "includes/trackfld.h"
+#include "audio/trackfld.h"
 
 
 #define TIMER_RATE (4096/4)
+
+typedef struct _trackfld_audio_state trackfld_audio_state;
+struct _trackfld_audio_state
+{
+	/* sound-related */
+	int      SN76496_latch;
+	int      last_addr;
+	int      last_irq;
+
+	cpu_device *audiocpu;
+	running_device *vlm;
+};
+
+
+INLINE trackfld_audio_state *get_safe_token( running_device *device )
+{
+	assert(device != NULL);
+	assert(device->type() == TRACKFLD_AUDIO);
+
+	return (trackfld_audio_state *)downcast<legacy_device_base *>(device)->token();
+}
+
+
+
+/*************************************
+ *
+ *  Initialization
+ *
+ *************************************/
+
+static DEVICE_START( trackfld_audio )
+{
+	trackfld_audio_state *state = get_safe_token(device);
+
+	state->audiocpu = device->machine->device<cpu_device>("audiocpu");
+	state->vlm = device->machine->device("vlm");
+
+	/* sound */
+	state_save_register_device_item(device, 0, state->SN76496_latch);
+	state_save_register_device_item(device, 0, state->last_addr);
+	state_save_register_device_item(device, 0, state->last_irq);
+}
+
+static DEVICE_RESET( trackfld_audio )
+{
+	trackfld_audio_state *state = get_safe_token(device);
+
+	state->SN76496_latch = 0;
+	state->last_addr = 0;
+	state->last_irq = 0;
+}
+
 
 
 /* The timer port on TnF and HyperSports sound hardware is derived from
@@ -20,8 +75,7 @@
 
 READ8_HANDLER( trackfld_sh_timer_r )
 {
-	trackfld_state *state = space->machine->driver_data<trackfld_state>();
-	UINT32 clock = state->audiocpu->total_cycles() / TIMER_RATE;
+	UINT32 clock = space->machine->device<cpu_device>("audiocpu")->total_cycles() / TIMER_RATE;
 
 	return clock & 0xF;
 }
@@ -33,7 +87,8 @@ READ8_DEVICE_HANDLER( trackfld_speech_r )
 
 WRITE8_DEVICE_HANDLER( trackfld_sound_w )
 {
-	trackfld_state *state = device->machine->driver_data<trackfld_state>();
+	running_device *audio = device->machine->device("trackfld_audio");
+	trackfld_audio_state *state = get_safe_token(audio);
 	int changes = offset ^ state->last_addr;
 
 	/* A7 = data enable for VLM5030 (don't care )          */
@@ -53,7 +108,8 @@ WRITE8_DEVICE_HANDLER( trackfld_sound_w )
 
 READ8_HANDLER( hyperspt_sh_timer_r )
 {
-	trackfld_state *state = space->machine->driver_data<trackfld_state>();
+	running_device *audio = space->machine->device("trackfld_audio");
+	trackfld_audio_state *state = get_safe_token(audio);
 	UINT32 clock = state->audiocpu->total_cycles() / TIMER_RATE;
 
 	if (state->vlm != NULL)
@@ -64,7 +120,8 @@ READ8_HANDLER( hyperspt_sh_timer_r )
 
 WRITE8_DEVICE_HANDLER( hyperspt_sound_w )
 {
-	trackfld_state *state = device->machine->driver_data<trackfld_state>();
+	running_device *audio = device->machine->device("trackfld_audio");
+	trackfld_audio_state *state = get_safe_token(audio);
 	int changes = offset ^ state->last_addr;
 
 	/* A3 = data enable for VLM5030 (don't care )          */
@@ -89,7 +146,8 @@ WRITE8_DEVICE_HANDLER( hyperspt_sound_w )
 
 WRITE8_HANDLER( konami_sh_irqtrigger_w )
 {
-	trackfld_state *state = space->machine->driver_data<trackfld_state>();
+	running_device *audio = space->machine->device("trackfld_audio");
+	trackfld_audio_state *state = get_safe_token(audio);
 	if (state->last_irq == 0 && data)
 	{
 		/* setting bit 0 low then high triggers IRQ on the sound CPU */
@@ -102,13 +160,30 @@ WRITE8_HANDLER( konami_sh_irqtrigger_w )
 
 WRITE8_HANDLER( konami_SN76496_latch_w )
 {
-	trackfld_state *state = space->machine->driver_data<trackfld_state>();
+	running_device *audio = space->machine->device("trackfld_audio");
+	trackfld_audio_state *state = get_safe_token(audio);
 	state->SN76496_latch = data;
 }
 
 
 WRITE8_DEVICE_HANDLER( konami_SN76496_w )
 {
-	trackfld_state *state = device->machine->driver_data<trackfld_state>();
+	running_device *audio = device->machine->device("trackfld_audio");
+	trackfld_audio_state *state = get_safe_token(audio);
 	sn76496_w(device, offset, state->SN76496_latch);
 }
+
+/*****************************************************************************
+    DEVICE DEFINITION
+*****************************************************************************/
+
+
+static const char DEVTEMPLATE_SOURCE[] = __FILE__;
+
+#define DEVTEMPLATE_ID(p,s)				p##trackfld_audio##s
+#define DEVTEMPLATE_FEATURES			DT_HAS_START | DT_HAS_RESET
+#define DEVTEMPLATE_NAME				"Track And Field Audio"
+#define DEVTEMPLATE_FAMILY				"Track And Field Audio IC"
+#include "devtempl.h"
+
+DEFINE_LEGACY_SOUND_DEVICE(TRACKFLD_AUDIO, trackfld_audio);

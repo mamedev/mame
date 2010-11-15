@@ -186,7 +186,8 @@ MAIN BOARD:
 #include "sound/sn76496.h"
 #include "sound/vlm5030.h"
 #include "sound/dac.h"
-#include "sound/msm5205.h"
+#include "audio/trackfld.h"
+#include "audio/hyprolyb.h"
 #include "includes/trackfld.h"
 #include "includes/konamipt.h"
 #include "machine/nvram.h"
@@ -220,48 +221,6 @@ static WRITE8_HANDLER( questions_bank_w )
 	else if (!(data & 0x80))
 		memory_set_bank(space->machine, "bank1", 7);
 }
-
-WRITE8_HANDLER( hyprolyb_adpcm_w )
-{
-	trackfld_state *state = space->machine->driver_data<trackfld_state>();
-	soundlatch2_w(space, offset, data);
-	state->hyprolyb_adpcm_ready = 0x80;
-}
-
-static READ8_HANDLER( hyprolyb_adpcm_busy_r )
-{
-	trackfld_state *state = space->machine->driver_data<trackfld_state>();
-	return state->hyprolyb_adpcm_busy ? 0x10 : 0x00;
-}
-
-static WRITE8_DEVICE_HANDLER( hyprolyb_msm_data_w )
-{
-	trackfld_state *state = device->machine->driver_data<trackfld_state>();
-	msm5205_data_w(device, data);
-	state->hyprolyb_adpcm_busy = ~data & 0x80;
-}
-
-static READ8_DEVICE_HANDLER( hyprolyb_msm_vck_r )
-{
-	trackfld_state *state = device->machine->driver_data<trackfld_state>();
-	UINT8 old = state->hyprolyb_vck_ready;
-	state->hyprolyb_vck_ready = 0x00;
-	return old;
-}
-
-static READ8_HANDLER( hyprolyb_adpcm_ready_r )
-{
-	trackfld_state *state = space->machine->driver_data<trackfld_state>();
-	return state->hyprolyb_adpcm_ready;
-}
-
-static READ8_HANDLER( hyprolyb_adpcm_data_r )
-{
-	trackfld_state *state = space->machine->driver_data<trackfld_state>();
-	state->hyprolyb_adpcm_ready = 0x00;
-	return soundlatch2_r(space, offset);
-}
-
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1000, 0x1000) AM_MIRROR(0x007f) AM_WRITE(watchdog_reset_w)		/* AFE */
@@ -431,34 +390,10 @@ static ADDRESS_MAP_START( hyprolyb_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x1fff) AM_DEVWRITE("snsnd", konami_SN76496_w)
 	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x1ff8) AM_DEVWRITE("dac", dac_w)
 	AM_RANGE(0xe001, 0xe001) AM_MIRROR(0x1ff8) AM_NOP			/* watch dog ?; reaktor reads here */
-	AM_RANGE(0xe002, 0xe002) AM_MIRROR(0x1ff8) AM_READ(hyprolyb_adpcm_busy_r)
+	AM_RANGE(0xe002, 0xe002) AM_MIRROR(0x1ff8) AM_DEVREAD("hyprolyb_adpcm", hyprolyb_adpcm_busy_r)
 	AM_RANGE(0xe003, 0xe003) AM_MIRROR(0x1ff8) AM_WRITENOP
-	AM_RANGE(0xe004, 0xe004) AM_MIRROR(0x1ff8) AM_WRITE(hyprolyb_adpcm_w)
+	AM_RANGE(0xe004, 0xe004) AM_MIRROR(0x1ff8) AM_DEVWRITE("hyprolyb_adpcm", hyprolyb_adpcm_w)
 ADDRESS_MAP_END
-
-ADDRESS_MAP_START( hyprolyb_adpcm_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x007f) AM_RAM
-	AM_RANGE(0x1000, 0x1000) AM_READ(hyprolyb_adpcm_data_r)
-	AM_RANGE(0x1001, 0x1001) AM_READ(hyprolyb_adpcm_ready_r)
-	AM_RANGE(0x1002, 0x1002) AM_DEVWRITE("msm", hyprolyb_msm_data_w)
-	AM_RANGE(0x1003, 0x1003) AM_DEVREAD("msm", hyprolyb_msm_vck_r)
-		// on init:
-		//    $1003 = $00
-		//    $1002 = $FF
-		//    $1003 = $34
-		//    $1001 = $36
-		//    $1002 = $80
-		// loops while ($1003) & 0x80 == 0
-		// 1002 = ADPCM data written (low 4 bits)
-		//
-		// $1003 & $80 (in) = 5205 DRQ
-		// $1002 & $0f (out) = 5205 data
-		// $1001 & $80 (in) = sound latch request
-		// $1000 (in) = sound latch data
-	AM_RANGE(0x8000, 0xffff) AM_ROM
-ADDRESS_MAP_END
-
-
 
 static INPUT_PORTS_START( trackfld )
 	PORT_START("SYSTEM")
@@ -926,48 +861,15 @@ GFXDECODE_END
 
 
 
-static void adpcm_vck_callback( running_device *device )
-{
-	trackfld_state *state = device->machine->driver_data<trackfld_state>();
-	state->hyprolyb_vck_ready = 0x80;
-}
-
-const msm5205_interface hyprolyb_msm5205_config =
-{
-	adpcm_vck_callback,	/* VCK function */
-	MSM5205_S96_4B		/* 4 kHz */
-};
-
-
-
 static MACHINE_START( trackfld )
 {
 	trackfld_state *state = machine->driver_data<trackfld_state>();
-
-	state->audiocpu = machine->device<cpu_device>("audiocpu");
-	state->vlm = machine->device("vlm");
 
 	/* video */
 	state_save_register_global(machine, state->bg_bank);
 	state_save_register_global(machine, state->sprite_bank1);
 	state_save_register_global(machine, state->sprite_bank2);
 	state_save_register_global(machine, state->old_gfx_bank);
-
-	/* sound */
-	state_save_register_global(machine, state->SN76496_latch);
-	state_save_register_global(machine, state->last_addr);
-	state_save_register_global(machine, state->last_irq);
-}
-
-static MACHINE_START( hyprolyb )
-{
-	trackfld_state *state = machine->driver_data<trackfld_state>();
-
-	MACHINE_START_CALL(trackfld);
-
-	state_save_register_global(machine, state->hyprolyb_adpcm_ready);	// only bootlegs
-	state_save_register_global(machine, state->hyprolyb_adpcm_busy);
-	state_save_register_global(machine, state->hyprolyb_vck_ready);
 }
 
 static MACHINE_RESET( trackfld )
@@ -978,20 +880,6 @@ static MACHINE_RESET( trackfld )
 	state->sprite_bank1 = 0;
 	state->sprite_bank2 = 0;
 	state->old_gfx_bank = 0;
-	state->SN76496_latch = 0;
-	state->last_addr = 0;
-	state->last_irq = 0;
-}
-
-static MACHINE_RESET( hyprolyb )
-{
-	trackfld_state *state = machine->driver_data<trackfld_state>();
-
-	MACHINE_RESET_CALL(trackfld);
-
-	state->hyprolyb_adpcm_ready = 0;
-	state->hyprolyb_adpcm_busy = 0;
-	state->hyprolyb_vck_ready = 0;
 }
 
 static MACHINE_CONFIG_START( trackfld, trackfld_state )
@@ -1025,6 +913,8 @@ static MACHINE_CONFIG_START( trackfld, trackfld_state )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD("trackfld_audio", TRACKFLD_AUDIO, 0)
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
@@ -1070,6 +960,8 @@ static MACHINE_CONFIG_START( yieartf, trackfld_state )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
+	MDRV_SOUND_ADD("trackfld_audio", TRACKFLD_AUDIO, 0)
+
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
@@ -1087,18 +979,12 @@ static MACHINE_CONFIG_DERIVED( hyprolyb, trackfld )
 	MDRV_CPU_MODIFY("audiocpu")
 	MDRV_CPU_PROGRAM_MAP(hyprolyb_sound_map)
 
-	MDRV_CPU_ADD("adpcm", M6802, SOUND_CLOCK/8)	/* unknown clock */
-	MDRV_CPU_PROGRAM_MAP(hyprolyb_adpcm_map)
-
-	MDRV_MACHINE_START(hyprolyb)
-	MDRV_MACHINE_RESET(hyprolyb)
+	MDRV_MACHINE_START(trackfld)
+	MDRV_MACHINE_RESET(trackfld)
 
 	/* sound hardware */
 	MDRV_DEVICE_REMOVE("vlm")
-
-	MDRV_SOUND_ADD("msm", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(hyprolyb_msm5205_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MDRV_FRAGMENT_ADD(hyprolyb_adpcm)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( atlantol, hyprolyb )

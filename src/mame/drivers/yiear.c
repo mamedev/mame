@@ -52,7 +52,8 @@ The 6809 NMI is used for sound timing.
 #include "sound/sn76496.h"
 #include "sound/vlm5030.h"
 #include "includes/konamipt.h"
-#include "includes/trackfld.h"
+#include "audio/trackfld.h"
+#include "includes/yiear.h"
 
 
 static READ8_DEVICE_HANDLER( yiear_speech_r )
@@ -72,7 +73,7 @@ static WRITE8_DEVICE_HANDLER( yiear_VLM5030_control_w )
 
 static INTERRUPT_GEN( yiear_nmi_interrupt )
 {
-	trackfld_state *state = device->machine->driver_data<trackfld_state>();
+	yiear_state *state = device->machine->driver_data<yiear_state>();
 
 	/* can't use nmi_line_pulse() because interrupt_enable_w() effects it */
 	if (state->yiear_nmi_enable)
@@ -94,9 +95,9 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x4e02, 0x4e02) AM_READ_PORT("P2")
 	AM_RANGE(0x4e03, 0x4e03) AM_READ_PORT("DSW3")
 	AM_RANGE(0x4f00, 0x4f00) AM_WRITE(watchdog_reset_w)
-	AM_RANGE(0x5000, 0x502f) AM_RAM AM_BASE_SIZE_MEMBER(trackfld_state, spriteram, spriteram_size)
-	AM_RANGE(0x5400, 0x542f) AM_RAM AM_BASE_MEMBER(trackfld_state, spriteram2)
-	AM_RANGE(0x5800, 0x5fff) AM_WRITE(yiear_videoram_w) AM_BASE_MEMBER(trackfld_state, videoram)
+	AM_RANGE(0x5000, 0x502f) AM_RAM AM_BASE_SIZE_MEMBER(yiear_state, spriteram, spriteram_size)
+	AM_RANGE(0x5400, 0x542f) AM_RAM AM_BASE_MEMBER(yiear_state, spriteram2)
+	AM_RANGE(0x5800, 0x5fff) AM_WRITE(yiear_videoram_w) AM_BASE_MEMBER(yiear_state, videoram)
 	AM_RANGE(0x5000, 0x5fff) AM_RAM
 	AM_RANGE(0x8000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -191,30 +192,19 @@ GFXDECODE_END
 
 static MACHINE_START( yiear )
 {
-	trackfld_state *state = machine->driver_data<trackfld_state>();
-
-	state->audiocpu = NULL;
-	state->vlm = machine->device("vlm");
+	yiear_state *state = machine->driver_data<yiear_state>();
 
 	state_save_register_global(machine, state->yiear_nmi_enable);
-
-	/* sound */
-	state_save_register_global(machine, state->SN76496_latch);
-	state_save_register_global(machine, state->last_addr);
-	state_save_register_global(machine, state->last_irq);
 }
 
 static MACHINE_RESET( yiear )
 {
-	trackfld_state *state = machine->driver_data<trackfld_state>();
+	yiear_state *state = machine->driver_data<yiear_state>();
 
 	state->yiear_nmi_enable = 0;
-	state->SN76496_latch = 0;
-	state->last_addr = 0;
-	state->last_irq = 0;
 }
 
-static MACHINE_CONFIG_START( yiear, trackfld_state )
+static MACHINE_CONFIG_START( yiear, yiear_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809,XTAL_18_432MHz/12)   /* verified on pcb */
@@ -242,6 +232,8 @@ static MACHINE_CONFIG_START( yiear, trackfld_state )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD("trackfld_audio", TRACKFLD_AUDIO, 0)
 
 	MDRV_SOUND_ADD("snsnd", SN76489A, XTAL_18_432MHz/12)   /* verified on pcb */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)

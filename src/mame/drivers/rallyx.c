@@ -192,7 +192,8 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "sound/namco.h"
 #include "sound/samples.h"
-#include "includes/timeplt.h"
+#include "audio/timeplt.h"
+#include "includes/rallyx.h"
 
 #define MASTER_CLOCK	XTAL_18_432MHz
 
@@ -205,7 +206,7 @@ TODO:
 
 static WRITE8_HANDLER( rallyx_interrupt_vector_w )
 {
-	timeplt_state *state = space->machine->driver_data<timeplt_state>();
+	rallyx_state *state = space->machine->driver_data<rallyx_state>();
 
 	cpu_set_input_line_vector(state->maincpu, 0, data);
 	cpu_set_input_line(state->maincpu, 0, CLEAR_LINE);
@@ -214,7 +215,7 @@ static WRITE8_HANDLER( rallyx_interrupt_vector_w )
 
 static WRITE8_HANDLER( rallyx_bang_w )
 {
-	timeplt_state *state = space->machine->driver_data<timeplt_state>();
+	rallyx_state *state = space->machine->driver_data<rallyx_state>();
 
 	if (data == 0 && state->last_bang != 0)
 		sample_start(state->samples, 0, 0, 0);
@@ -224,7 +225,7 @@ static WRITE8_HANDLER( rallyx_bang_w )
 
 static WRITE8_HANDLER( rallyx_latch_w )
 {
-	timeplt_state *state = space->machine->driver_data<timeplt_state>();
+	rallyx_state *state = space->machine->driver_data<rallyx_state>();
 	int bit = data & 1;
 
 	switch (offset)
@@ -269,7 +270,7 @@ static WRITE8_HANDLER( rallyx_latch_w )
 
 static WRITE8_HANDLER( locomotn_latch_w )
 {
-	timeplt_state *state = space->machine->driver_data<timeplt_state>();
+	rallyx_state *state = space->machine->driver_data<rallyx_state>();
 	int bit = data & 1;
 
 	switch (offset)
@@ -316,12 +317,12 @@ static WRITE8_HANDLER( locomotn_latch_w )
 
 static ADDRESS_MAP_START( rallyx_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x3fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE(rallyx_videoram_w) AM_BASE_MEMBER(timeplt_state, videoram)
+	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE(rallyx_videoram_w) AM_BASE_MEMBER(rallyx_state, videoram)
 	AM_RANGE(0x9800, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1")
 	AM_RANGE(0xa080, 0xa080) AM_READ_PORT("P2")
 	AM_RANGE(0xa100, 0xa100) AM_READ_PORT("DSW")
-	AM_RANGE(0xa000, 0xa00f) AM_WRITEONLY AM_BASE_MEMBER(timeplt_state, radarattr)
+	AM_RANGE(0xa000, 0xa00f) AM_WRITEONLY AM_BASE_MEMBER(rallyx_state, radarattr)
 	AM_RANGE(0xa080, 0xa080) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xa100, 0xa11f) AM_DEVWRITE("namco", pacman_sound_w)
 	AM_RANGE(0xa130, 0xa130) AM_WRITE(rallyx_scrollx_w)
@@ -338,13 +339,13 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( jungler_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE(rallyx_videoram_w) AM_BASE_MEMBER(timeplt_state, videoram)
+	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE(rallyx_videoram_w) AM_BASE_MEMBER(rallyx_state, videoram)
 	AM_RANGE(0x9800, 0x9fff) AM_RAM
 	AM_RANGE(0xa000, 0xa000) AM_READ_PORT("P1")
 	AM_RANGE(0xa080, 0xa080) AM_READ_PORT("P2")
 	AM_RANGE(0xa100, 0xa100) AM_READ_PORT("DSW1")
 	AM_RANGE(0xa180, 0xa180) AM_READ_PORT("DSW2")
-	AM_RANGE(0xa000, 0xa00f) AM_MIRROR(0x00f0) AM_WRITEONLY AM_BASE_MEMBER(timeplt_state, radarattr)	// jungler writes to a03x
+	AM_RANGE(0xa000, 0xa00f) AM_MIRROR(0x00f0) AM_WRITEONLY AM_BASE_MEMBER(rallyx_state, radarattr)	// jungler writes to a03x
 	AM_RANGE(0xa080, 0xa080) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xa100, 0xa100) AM_WRITE(soundlatch_w)
 	AM_RANGE(0xa130, 0xa130) AM_WRITE(rallyx_scrollx_w)	/* only jungler and tactcian */
@@ -874,7 +875,7 @@ static const samples_interface rallyx_samples_interface =
 
 static MACHINE_START( rallyx )
 {
-	timeplt_state *state = machine->driver_data<timeplt_state>();
+	rallyx_state *state = machine->driver_data<rallyx_state>();
 
 	state->maincpu = machine->device<cpu_device>("maincpu");
 	state->samples = machine->device("samples");
@@ -885,13 +886,13 @@ static MACHINE_START( rallyx )
 
 static MACHINE_RESET( rallyx )
 {
-	timeplt_state *state = machine->driver_data<timeplt_state>();
+	rallyx_state *state = machine->driver_data<rallyx_state>();
 
 	state->last_bang = 0;
 	state->stars_enable = 0;
 }
 
-static MACHINE_CONFIG_START( rallyx, timeplt_state )
+static MACHINE_CONFIG_START( rallyx, rallyx_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */
@@ -932,7 +933,7 @@ static MACHINE_CONFIG_START( rallyx, timeplt_state )
 MACHINE_CONFIG_END
 
 
-static MACHINE_CONFIG_START( jungler, timeplt_state )
+static MACHINE_CONFIG_START( jungler, rallyx_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)	/* 3.072 MHz */

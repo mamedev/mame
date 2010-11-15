@@ -50,8 +50,9 @@
 
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
-#include "includes/timeplt.h"
 #include "includes/konamipt.h"
+#include "audio/timeplt.h"
+#include "includes/tutankhm.h"
 
 
 /*************************************
@@ -62,7 +63,7 @@
 
 static INTERRUPT_GEN( tutankhm_interrupt )
 {
-	timeplt_state *state = device->machine->driver_data<timeplt_state>();
+	tutankhm_state *state = device->machine->driver_data<tutankhm_state>();
 
 	/* flip flops cause the interrupt to be signalled every other frame */
 	state->irq_toggle ^= 1;
@@ -73,7 +74,7 @@ static INTERRUPT_GEN( tutankhm_interrupt )
 
 static WRITE8_HANDLER( irq_enable_w )
 {
-	timeplt_state *state = space->machine->driver_data<timeplt_state>();
+	tutankhm_state *state = space->machine->driver_data<tutankhm_state>();
 
 	state->irq_enable = data & 1;
 	if (!state->irq_enable)
@@ -118,9 +119,9 @@ static WRITE8_HANDLER( tutankhm_coin_counter_w )
  *************************************/
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_BASE_SIZE_MEMBER(timeplt_state, videoram, videoram_size)
-	AM_RANGE(0x8000, 0x800f) AM_MIRROR(0x00f0) AM_RAM AM_BASE_MEMBER(timeplt_state, paletteram)
-	AM_RANGE(0x8100, 0x8100) AM_MIRROR(0x000f) AM_RAM AM_BASE_MEMBER(timeplt_state, scroll)
+	AM_RANGE(0x0000, 0x7fff) AM_RAM AM_BASE_MEMBER(tutankhm_state, videoram)
+	AM_RANGE(0x8000, 0x800f) AM_MIRROR(0x00f0) AM_RAM AM_BASE_MEMBER(tutankhm_state, paletteram)
+	AM_RANGE(0x8100, 0x8100) AM_MIRROR(0x000f) AM_RAM AM_BASE_MEMBER(tutankhm_state, scroll)
 	AM_RANGE(0x8120, 0x8120) AM_MIRROR(0x000f) AM_READ(watchdog_reset_r)
 	AM_RANGE(0x8160, 0x8160) AM_MIRROR(0x000f) AM_READ_PORT("DSW2")	/* DSW2 (inverted bits) */
 	AM_RANGE(0x8180, 0x8180) AM_MIRROR(0x000f) AM_READ_PORT("IN0")	/* IN0 I/O: Coin slots, service, 1P/2P buttons */
@@ -196,7 +197,7 @@ INPUT_PORTS_END
 
 static MACHINE_START( tutankhm )
 {
-	timeplt_state *state = machine->driver_data<timeplt_state>();
+	tutankhm_state *state = machine->driver_data<tutankhm_state>();
 
 	memory_configure_bank(machine, "bank1", 0, 16, memory_region(machine, "maincpu") + 0x10000, 0x1000);
 
@@ -210,7 +211,7 @@ static MACHINE_START( tutankhm )
 
 static MACHINE_RESET( tutankhm )
 {
-	timeplt_state *state = machine->driver_data<timeplt_state>();
+	tutankhm_state *state = machine->driver_data<tutankhm_state>();
 
 	state->irq_toggle = 0;
 	state->irq_enable = 0;
@@ -218,7 +219,7 @@ static MACHINE_RESET( tutankhm )
 	state->flip_y = 0;
 }
 
-static MACHINE_CONFIG_START( tutankhm, timeplt_state )
+static MACHINE_CONFIG_START( tutankhm, tutankhm_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, XTAL_18_432MHz/12)	/* 1.5 MHz ??? */

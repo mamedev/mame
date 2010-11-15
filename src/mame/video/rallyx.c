@@ -29,7 +29,7 @@ needs more color combination to render its graphics.
 
 #include "emu.h"
 #include "video/resnet.h"
-#include "includes/timeplt.h"
+#include "includes/rallyx.h"
 
 #define STARS_COLOR_BASE	(0x104)
 
@@ -222,7 +222,7 @@ static TILEMAP_MAPPER( fg_tilemap_scan )
 
 INLINE void rallyx_get_tile_info( running_machine *machine, tile_data *tileinfo, int tile_index, int ram_offs)
 {
-	timeplt_state *state = machine->driver_data<timeplt_state>();
+	rallyx_state *state = machine->driver_data<rallyx_state>();
 	UINT8 attr = state->videoram[ram_offs + tile_index + 0x800];
 	tileinfo->category = (attr & 0x20) >> 5;
 	SET_TILE_INFO(
@@ -245,7 +245,7 @@ static TILE_GET_INFO( rallyx_fg_get_tile_info )
 
 INLINE void locomotn_get_tile_info(running_machine *machine,tile_data *tileinfo,int tile_index,int ram_offs)
 {
-	timeplt_state *state = machine->driver_data<timeplt_state>();
+	rallyx_state *state = machine->driver_data<rallyx_state>();
 	UINT8 attr = state->videoram[ram_offs + tile_index + 0x800];
 	int code = state->videoram[ram_offs + tile_index];
 	code = (code & 0x7f) + 2 * (attr & 0x40) + 2 * (code & 0x80);
@@ -277,7 +277,7 @@ static TILE_GET_INFO( locomotn_fg_get_tile_info )
 
 static void calculate_star_field( running_machine *machine )
 {
-	timeplt_state *state = machine->driver_data<timeplt_state>();
+	rallyx_state *state = machine->driver_data<rallyx_state>();
 	int generator;
 	int x, y;
 
@@ -317,7 +317,7 @@ static void calculate_star_field( running_machine *machine )
 
 static void rallyx_video_start_common( running_machine *machine )
 {
-	timeplt_state *state = machine->driver_data<timeplt_state>();
+	rallyx_state *state = machine->driver_data<rallyx_state>();
 	int i;
 
 	state->spriteram = state->videoram + 0x00;
@@ -339,7 +339,7 @@ static void rallyx_video_start_common( running_machine *machine )
 
 VIDEO_START( rallyx )
 {
-	timeplt_state *state = machine->driver_data<timeplt_state>();
+	rallyx_state *state = machine->driver_data<rallyx_state>();
 
 	state->bg_tilemap = tilemap_create(machine, rallyx_bg_get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	state->fg_tilemap = tilemap_create(machine, rallyx_fg_get_tile_info, fg_tilemap_scan, 8, 8, 8, 32);
@@ -355,7 +355,7 @@ VIDEO_START( rallyx )
 
 VIDEO_START( jungler )
 {
-	timeplt_state *state = machine->driver_data<timeplt_state>();
+	rallyx_state *state = machine->driver_data<rallyx_state>();
 
 	state->bg_tilemap = tilemap_create(machine, rallyx_bg_get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	state->fg_tilemap = tilemap_create(machine, rallyx_fg_get_tile_info, fg_tilemap_scan, 8, 8, 8, 32);
@@ -369,7 +369,7 @@ VIDEO_START( jungler )
 
 VIDEO_START( locomotn )
 {
-	timeplt_state *state = machine->driver_data<timeplt_state>();
+	rallyx_state *state = machine->driver_data<rallyx_state>();
 
 	state->bg_tilemap = tilemap_create(machine, locomotn_bg_get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	state->fg_tilemap = tilemap_create(machine, locomotn_fg_get_tile_info, fg_tilemap_scan, 8, 8, 8, 32);
@@ -390,7 +390,7 @@ VIDEO_START( locomotn )
 
 VIDEO_START( commsega )
 {
-	timeplt_state *state = machine->driver_data<timeplt_state>();
+	rallyx_state *state = machine->driver_data<rallyx_state>();
 
 	state->bg_tilemap = tilemap_create(machine, locomotn_bg_get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	state->fg_tilemap = tilemap_create(machine, locomotn_fg_get_tile_info, fg_tilemap_scan, 8, 8, 8, 32);
@@ -418,7 +418,7 @@ VIDEO_START( commsega )
 
 WRITE8_HANDLER( rallyx_videoram_w )
 {
-	timeplt_state *state = space->machine->driver_data<timeplt_state>();
+	rallyx_state *state = space->machine->driver_data<rallyx_state>();
 
 	state->videoram[offset] = data;
 	if (offset & 0x400)
@@ -429,19 +429,19 @@ WRITE8_HANDLER( rallyx_videoram_w )
 
 WRITE8_HANDLER( rallyx_scrollx_w )
 {
-	timeplt_state *state = space->machine->driver_data<timeplt_state>();
+	rallyx_state *state = space->machine->driver_data<rallyx_state>();
 	tilemap_set_scrollx(state->bg_tilemap, 0, data);
 }
 
 WRITE8_HANDLER( rallyx_scrolly_w )
 {
-	timeplt_state *state = space->machine->driver_data<timeplt_state>();
+	rallyx_state *state = space->machine->driver_data<rallyx_state>();
 	tilemap_set_scrolly(state->bg_tilemap, 0, data);
 }
 
 WRITE8_HANDLER( tactcian_starson_w )
 {
-	timeplt_state *state = space->machine->driver_data<timeplt_state>();
+	rallyx_state *state = space->machine->driver_data<rallyx_state>();
 	state->stars_enable = data & 1;
 }
 
@@ -464,7 +464,7 @@ static void plot_star( running_machine *machine, bitmap_t *bitmap, const rectang
 
 static void draw_stars( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	timeplt_state *state = machine->driver_data<timeplt_state>();
+	rallyx_state *state = machine->driver_data<rallyx_state>();
 	int offs;
 
 	for (offs = 0; offs < state->total_stars; offs++)
@@ -480,7 +480,7 @@ static void draw_stars( running_machine *machine, bitmap_t *bitmap, const rectan
 
 static void rallyx_draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int displacement )
 {
-	timeplt_state *state = machine->driver_data<timeplt_state>();
+	rallyx_state *state = machine->driver_data<rallyx_state>();
 	UINT8 *spriteram = state->spriteram;
 	UINT8 *spriteram_2 = state->spriteram2;
 	int offs;
@@ -507,7 +507,7 @@ static void rallyx_draw_sprites( running_machine *machine, bitmap_t *bitmap, con
 
 static void locomotn_draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int displacement )
 {
-	timeplt_state *state = machine->driver_data<timeplt_state>();
+	rallyx_state *state = machine->driver_data<rallyx_state>();
 	UINT8 *spriteram = state->spriteram;
 	UINT8 *spriteram_2 = state->spriteram2;
 	int offs;
@@ -531,7 +531,7 @@ static void locomotn_draw_sprites( running_machine *machine, bitmap_t *bitmap, c
 
 static void rallyx_draw_bullets( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int transpen )
 {
-	timeplt_state *state = machine->driver_data<timeplt_state>();
+	rallyx_state *state = machine->driver_data<rallyx_state>();
 	int offs;
 
 	for (offs = state->spriteram_base; offs < 0x20; offs++)
@@ -562,7 +562,7 @@ static void rallyx_draw_bullets( running_machine *machine, bitmap_t *bitmap, con
 
 static void jungler_draw_bullets( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int transpen )
 {
-	timeplt_state *state = machine->driver_data<timeplt_state>();
+	rallyx_state *state = machine->driver_data<rallyx_state>();
 	int offs;
 
 	for (offs = state->spriteram_base; offs < 0x20; offs++)
@@ -591,7 +591,7 @@ static void jungler_draw_bullets( running_machine *machine, bitmap_t *bitmap, co
 
 static void locomotn_draw_bullets( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int transpen )
 {
-	timeplt_state *state = machine->driver_data<timeplt_state>();
+	rallyx_state *state = machine->driver_data<rallyx_state>();
 	int offs;
 
 	for (offs = state->spriteram_base; offs < 0x20; offs++)
@@ -629,7 +629,7 @@ static void locomotn_draw_bullets( running_machine *machine, bitmap_t *bitmap, c
 
 VIDEO_UPDATE( rallyx )
 {
-	timeplt_state *state = screen->machine->driver_data<timeplt_state>();
+	rallyx_state *state = screen->machine->driver_data<rallyx_state>();
 	/* the radar tilemap is just 8x32. We rely on the tilemap code to repeat it across
        the screen, and clip it to only the position where it is supposed to be shown */
 	rectangle fg_clip = *cliprect;
@@ -663,7 +663,7 @@ VIDEO_UPDATE( rallyx )
 
 VIDEO_UPDATE( jungler )
 {
-	timeplt_state *state = screen->machine->driver_data<timeplt_state>();
+	rallyx_state *state = screen->machine->driver_data<rallyx_state>();
 	/* the radar tilemap is just 8x32. We rely on the tilemap code to repeat it across
        the screen, and clip it to only the position where it is supposed to be shown */
 	rectangle fg_clip = *cliprect;
@@ -701,7 +701,7 @@ VIDEO_UPDATE( jungler )
 
 VIDEO_UPDATE( locomotn )
 {
-	timeplt_state *state = screen->machine->driver_data<timeplt_state>();
+	rallyx_state *state = screen->machine->driver_data<rallyx_state>();
 	/* the radar tilemap is just 8x32. We rely on the tilemap code to repeat it across
        the screen, and clip it to only the position where it is supposed to be shown */
 	rectangle fg_clip = *cliprect;

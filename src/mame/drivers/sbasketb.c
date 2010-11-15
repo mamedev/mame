@@ -46,13 +46,13 @@ CPU/Video Board Parts:
 #include "sound/vlm5030.h"
 #include "machine/konami1.h"
 #include "includes/konamipt.h"
-#include "includes/trackfld.h"
+#include "audio/trackfld.h"
+#include "includes/sbasketb.h"
 
 
 static WRITE8_HANDLER( sbasketb_sh_irqtrigger_w )
 {
-	trackfld_state *state = space->machine->driver_data<trackfld_state>();
-	cpu_set_input_line_and_vector(state->audiocpu, 0, HOLD_LINE, 0xff);
+	cpu_set_input_line_and_vector(space->machine->device<cpu_device>("audiocpu"), 0, HOLD_LINE, 0xff);
 }
 
 static WRITE8_HANDLER( sbasketb_coin_counter_w )
@@ -63,17 +63,17 @@ static WRITE8_HANDLER( sbasketb_coin_counter_w )
 
 static ADDRESS_MAP_START( sbasketb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x2000, 0x2fff) AM_RAM
-	AM_RANGE(0x3000, 0x33ff) AM_RAM_WRITE(sbasketb_colorram_w) AM_BASE_MEMBER(trackfld_state, colorram)
-	AM_RANGE(0x3400, 0x37ff) AM_RAM_WRITE(sbasketb_videoram_w) AM_BASE_MEMBER(trackfld_state, videoram)
-	AM_RANGE(0x3800, 0x39ff) AM_RAM AM_BASE_SIZE_MEMBER(trackfld_state, spriteram, spriteram_size)
+	AM_RANGE(0x3000, 0x33ff) AM_RAM_WRITE(sbasketb_colorram_w) AM_BASE_MEMBER(sbasketb_state, colorram)
+	AM_RANGE(0x3400, 0x37ff) AM_RAM_WRITE(sbasketb_videoram_w) AM_BASE_MEMBER(sbasketb_state, videoram)
+	AM_RANGE(0x3800, 0x39ff) AM_RAM AM_BASE_MEMBER(sbasketb_state, spriteram)
 	AM_RANGE(0x3a00, 0x3bff) AM_RAM           /* Probably unused, but initialized */
 	AM_RANGE(0x3c00, 0x3c00) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x3c10, 0x3c10) AM_READNOP    /* ???? */
-	AM_RANGE(0x3c20, 0x3c20) AM_WRITEONLY AM_BASE_MEMBER(trackfld_state, palettebank)
+	AM_RANGE(0x3c20, 0x3c20) AM_WRITEONLY AM_BASE_MEMBER(sbasketb_state, palettebank)
 	AM_RANGE(0x3c80, 0x3c80) AM_WRITE(sbasketb_flipscreen_w)
 	AM_RANGE(0x3c81, 0x3c81) AM_WRITE(interrupt_enable_w)
 	AM_RANGE(0x3c83, 0x3c84) AM_WRITE(sbasketb_coin_counter_w)
-	AM_RANGE(0x3c85, 0x3c85) AM_WRITEONLY AM_BASE_MEMBER(trackfld_state, spriteram_select)
+	AM_RANGE(0x3c85, 0x3c85) AM_WRITEONLY AM_BASE_MEMBER(sbasketb_state, spriteram_select)
 	AM_RANGE(0x3d00, 0x3d00) AM_WRITE(soundlatch_w)
 	AM_RANGE(0x3d80, 0x3d80) AM_WRITE(sbasketb_sh_irqtrigger_w)
 	AM_RANGE(0x3e00, 0x3e00) AM_READ_PORT("SYSTEM")
@@ -82,7 +82,7 @@ static ADDRESS_MAP_START( sbasketb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3e03, 0x3e03) AM_READNOP
 	AM_RANGE(0x3e80, 0x3e80) AM_READ_PORT("DSW2")
 	AM_RANGE(0x3f00, 0x3f00) AM_READ_PORT("DSW1")
-	AM_RANGE(0x3f80, 0x3f80) AM_WRITEONLY AM_BASE_MEMBER(trackfld_state, scroll)
+	AM_RANGE(0x3f80, 0x3f80) AM_WRITEONLY AM_BASE_MEMBER(sbasketb_state, scroll)
 	AM_RANGE(0x6000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
@@ -172,29 +172,7 @@ static GFXDECODE_START( sbasketb )
 GFXDECODE_END
 
 
-static MACHINE_START( sbasketb )
-{
-	trackfld_state *state = machine->driver_data<trackfld_state>();
-
-	state->audiocpu = machine->device<cpu_device>("audiocpu");
-	state->vlm = machine->device("vlm");
-
-	/* sound */
-	state_save_register_global(machine, state->SN76496_latch);
-	state_save_register_global(machine, state->last_addr);
-	state_save_register_global(machine, state->last_irq);
-}
-
-static MACHINE_RESET( sbasketb )
-{
-	trackfld_state *state = machine->driver_data<trackfld_state>();
-
-	state->SN76496_latch = 0;
-	state->last_addr = 0;
-	state->last_irq = 0;
-}
-
-static MACHINE_CONFIG_START( sbasketb, trackfld_state )
+static MACHINE_CONFIG_START( sbasketb, sbasketb_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, 1400000)        /* 1.400 MHz ??? */
@@ -203,9 +181,6 @@ static MACHINE_CONFIG_START( sbasketb, trackfld_state )
 
 	MDRV_CPU_ADD("audiocpu", Z80, XTAL_14_31818MHz / 4)	/* 3.5795 MHz */
 	MDRV_CPU_PROGRAM_MAP(sbasketb_sound_map)
-
-	MDRV_MACHINE_START(sbasketb)
-	MDRV_MACHINE_RESET(sbasketb)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -224,6 +199,8 @@ static MACHINE_CONFIG_START( sbasketb, trackfld_state )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD("trackfld_audio", TRACKFLD_AUDIO, 0)
 
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)

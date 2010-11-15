@@ -11,7 +11,8 @@
 #include "cpu/m6805/m6805.h"
 #include "sound/ay8910.h"
 #include "sound/msm5232.h"
-#include "includes/buggychl.h"
+#include "machine/buggychl.h"
+#include "includes/msisaac.h"
 
 /*
 TO DO:
@@ -23,7 +24,7 @@ TO DO:
 
 static TIMER_CALLBACK( nmi_callback )
 {
-	buggychl_state *state = machine->driver_data<buggychl_state>();
+	msisaac_state *state = machine->driver_data<msisaac_state>();
 	if (state->sound_nmi_enable)
 		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 	else
@@ -38,13 +39,13 @@ static WRITE8_HANDLER( sound_command_w )
 
 static WRITE8_HANDLER( nmi_disable_w )
 {
-	buggychl_state *state = space->machine->driver_data<buggychl_state>();
+	msisaac_state *state = space->machine->driver_data<msisaac_state>();
 	state->sound_nmi_enable = 0;
 }
 
 static WRITE8_HANDLER( nmi_enable_w )
 {
-	buggychl_state *state = space->machine->driver_data<buggychl_state>();
+	msisaac_state *state = space->machine->driver_data<msisaac_state>();
 	state->sound_nmi_enable = 1;
 	if (state->pending_nmi)
 	{
@@ -78,8 +79,6 @@ static WRITE8_HANDLER( ms_unknown_w )
 /* If good MCU dump will be available, it should be fully working game */
 /* To test the game without the MCU simply comment out #define USE_MCU */
 
-/* Disabled because the mcu dump is currently unavailable. -AS */
-//#define USE_MCU
 
 
 static READ8_HANDLER( msisaac_mcu_r )
@@ -93,7 +92,7 @@ MCU simulation TODO:
 \-Fix some graphics imperfections(*not* confirmed if they are caused by unhandled
   commands or imperfect video emulation).
 */
-	buggychl_state *state = space->machine->driver_data<buggychl_state>();
+	msisaac_state *state = space->machine->driver_data<msisaac_state>();
 
 	switch (state->mcu_val)
 	{
@@ -169,7 +168,7 @@ static WRITE8_HANDLER( msisaac_mcu_w )
 #ifdef USE_MCU
 	buggychl_mcu_w(offset,data);
 #else
-	buggychl_state *state = space->machine->driver_data<buggychl_state>();
+	msisaac_state *state = space->machine->driver_data<msisaac_state>();
 	//if(data != 0x0a && data != 0x42 && data != 0x02)
 	//  popmessage("PC = %04x %02x", cpu_get_pc(space->cpu), data);
 	state->mcu_val = data;
@@ -206,10 +205,10 @@ static ADDRESS_MAP_START( msisaac_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf084, 0xf084) AM_READ_PORT("IN1")
 //  AM_RANGE(0xf086, 0xf086) AM_READ_PORT("IN2")
 
-	AM_RANGE(0xf100, 0xf17f) AM_RAM AM_BASE_MEMBER(buggychl_state, spriteram)	//sprites
-	AM_RANGE(0xf400, 0xf7ff) AM_RAM_WRITE(msisaac_fg_videoram_w) AM_BASE_MEMBER(buggychl_state, videoram)
-	AM_RANGE(0xf800, 0xfbff) AM_RAM_WRITE(msisaac_bg2_videoram_w) AM_BASE_MEMBER(buggychl_state, videoram3)
-	AM_RANGE(0xfc00, 0xffff) AM_RAM_WRITE(msisaac_bg_videoram_w) AM_BASE_MEMBER(buggychl_state, videoram2)
+	AM_RANGE(0xf100, 0xf17f) AM_RAM AM_BASE_MEMBER(msisaac_state, spriteram)	//sprites
+	AM_RANGE(0xf400, 0xf7ff) AM_RAM_WRITE(msisaac_fg_videoram_w) AM_BASE_MEMBER(msisaac_state, videoram)
+	AM_RANGE(0xf800, 0xfbff) AM_RAM_WRITE(msisaac_bg2_videoram_w) AM_BASE_MEMBER(msisaac_state, videoram3)
+	AM_RANGE(0xfc00, 0xffff) AM_RAM_WRITE(msisaac_bg_videoram_w) AM_BASE_MEMBER(msisaac_state, videoram2)
 //  AM_RANGE(0xf801, 0xf801) AM_WRITE(msisaac_bgcolor_w)
 //  AM_RANGE(0xfc00, 0xfc00) AM_WRITE(flip_screen_w)
 //  AM_RANGE(0xfc03, 0xfc04) AM_WRITE(msisaac_coin_counter_w)
@@ -217,7 +216,7 @@ ADDRESS_MAP_END
 
 static MACHINE_RESET( ta7630 )
 {
-	buggychl_state *state = machine->driver_data<buggychl_state>();
+	msisaac_state *state = machine->driver_data<msisaac_state>();
 	int i;
 
 	double db			= 0.0;
@@ -243,7 +242,7 @@ static MACHINE_RESET( ta7630 )
 
 static WRITE8_DEVICE_HANDLER( sound_control_0_w )
 {
-	buggychl_state *state = device->machine->driver_data<buggychl_state>();
+	msisaac_state *state = device->machine->driver_data<msisaac_state>();
 	state->snd_ctrl0 = data & 0xff;
 	//popmessage("SND0 0=%2x 1=%2x", state->snd_ctrl0, state->snd_ctrl1);
 
@@ -258,7 +257,7 @@ static WRITE8_DEVICE_HANDLER( sound_control_0_w )
 }
 static WRITE8_HANDLER( sound_control_1_w )
 {
-	buggychl_state *state = space->machine->driver_data<buggychl_state>();
+	msisaac_state *state = space->machine->driver_data<msisaac_state>();
 	state->snd_ctrl1 = data & 0xff;
 	//popmessage("SND1 0=%2x 1=%2x", state->snd_ctrl0, state->snd_ctrl1);
 }
@@ -277,22 +276,6 @@ static ADDRESS_MAP_START( msisaac_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xc003, 0xc003) AM_WRITENOP /*???*/ /* this is NOT mixer_enable */
 	AM_RANGE(0xe000, 0xffff) AM_READNOP /*space for diagnostic ROM (not dumped, not reachable) */
 ADDRESS_MAP_END
-
-#ifdef USE_MCU
-
-static ADDRESS_MAP_START( msisaac_mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0000) AM_READ(buggychl_68705_port_a_r,buggychl_68705_port_a_w)
-	AM_RANGE(0x0001, 0x0001) AM_READ(buggychl_68705_port_b_r,buggychl_68705_port_b_w)
-	AM_RANGE(0x0002, 0x0002) AM_READ(buggychl_68705_port_c_r,buggychl_68705_port_c_w)
-	AM_RANGE(0x0004, 0x0004) AM_WRITE(buggychl_68705_ddr_a_w)
-	AM_RANGE(0x0005, 0x0005) AM_WRITE(buggychl_68705_ddr_b_w)
-	AM_RANGE(0x0006, 0x0006) AM_WRITE(buggychl_68705_ddr_c_w)
-	AM_RANGE(0x0010, 0x007f) AM_RAM
-	AM_RANGE(0x0080, 0x07ff) AM_ROM
-ADDRESS_MAP_END
-
-#endif
 
 static INPUT_PORTS_START( msisaac )
 	PORT_START("DSW1")
@@ -453,7 +436,7 @@ static const msm5232_interface msm5232_config =
 
 static MACHINE_START( msisaac )
 {
-	buggychl_state *state = machine->driver_data<buggychl_state>();
+	msisaac_state *state = machine->driver_data<msisaac_state>();
 
 	state->audiocpu = machine->device("audiocpu");
 
@@ -467,22 +450,6 @@ static MACHINE_START( msisaac )
 	state_save_register_global(machine, state->snd_ctrl1);
 
 #ifdef USE_MCU
-	state->mcu = machine->device("mcu");
-
-	/* mcu */
-	state_save_register_global(machine, state->from_main);
-	state_save_register_global(machine, state->from_mcu);
-	state_save_register_global(machine, state->mcu_sent);
-	state_save_register_global(machine, state->main_sent);
-	state_save_register_global(machine, state->port_a_in);
-	state_save_register_global(machine, state->port_a_out);
-	state_save_register_global(machine, state->ddr_a);
-	state_save_register_global(machine, state->port_b_in);
-	state_save_register_global(machine, state->port_b_out);
-	state_save_register_global(machine, state->ddr_b);
-	state_save_register_global(machine, state->port_c_in);
-	state_save_register_global(machine, state->port_c_out);
-	state_save_register_global(machine, state->ddr_c);
 #else
 	state_save_register_global(machine, state->mcu_val);
 	state_save_register_global(machine, state->direction);
@@ -491,7 +458,7 @@ static MACHINE_START( msisaac )
 
 static MACHINE_RESET( msisaac )
 {
-	buggychl_state *state = machine->driver_data<buggychl_state>();
+	msisaac_state *state = machine->driver_data<msisaac_state>();
 
 	MACHINE_RESET_CALL(ta7630);
 
@@ -505,28 +472,13 @@ static MACHINE_RESET( msisaac )
 
 #ifdef USE_MCU
 	cputag_set_input_line(machine, "mcu", 0, CLEAR_LINE);
-
-	/* mcu */
-	state->mcu_sent = 0;
-	state->main_sent = 0;
-	state->from_main = 0;
-	state->from_mcu = 0;
-	state->port_a_in = 0;
-	state->port_a_out = 0;
-	state->ddr_a = 0;
-	state->port_b_in = 0;
-	state->port_b_out = 0;
-	state->ddr_b = 0;
-	state->port_c_in = 0;
-	state->port_c_out = 0;
-	state->ddr_c = 0;
 #else
 	state->mcu_val = 0;
 	state->direction = 0;
 #endif
 }
 
-static MACHINE_CONFIG_START( msisaac, buggychl_state )
+static MACHINE_CONFIG_START( msisaac, msisaac_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)
@@ -539,7 +491,8 @@ static MACHINE_CONFIG_START( msisaac, buggychl_state )
 
 #ifdef USE_MCU
 	MDRV_CPU_ADD("mcu", M68705,8000000/2)  /* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(msisaac_mcu_map)
+	MDRV_CPU_PROGRAM_MAP(buggychl_mcu_map)
+	MDRV_DEVICE_ADD("bmcu", BUGGYCHL_MCU, 0)
 #endif
 
 	MDRV_MACHINE_START(msisaac)

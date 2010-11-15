@@ -14,8 +14,8 @@ Tile/sprite priority system (for the Kung Fu Master M62 board):
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/iremz80.h"
 #include "video/resnet.h"
+#include "includes/m62.h"
 
 /***************************************************************************
 
@@ -182,7 +182,7 @@ static const res_net_decode_info spelunk2_sprite_decode_info =
 
 PALETTE_INIT( m62 )
 {
-	irem_z80_state *state = machine->driver_data<irem_z80_state>();
+	m62_state *state = machine->driver_data<m62_state>();
 	rgb_t *rgb;
 
 	rgb = compute_res_net_all(machine, color_prom, &m62_tile_decode_info, &m62_tile_net_info);
@@ -202,7 +202,7 @@ PALETTE_INIT( m62 )
 
 PALETTE_INIT( lotlot )
 {
-	irem_z80_state *state = machine->driver_data<irem_z80_state>();
+	m62_state *state = machine->driver_data<m62_state>();
 	rgb_t *rgb;
 
 	rgb = compute_res_net_all(machine, color_prom, &lotlot_tile_decode_info, &m62_tile_net_info);
@@ -222,7 +222,7 @@ PALETTE_INIT( lotlot )
 
 PALETTE_INIT( battroad )
 {
-	irem_z80_state *state = machine->driver_data<irem_z80_state>();
+	m62_state *state = machine->driver_data<m62_state>();
 	rgb_t *rgb;
 
 	rgb = compute_res_net_all(machine, color_prom, &m62_tile_decode_info, &m62_tile_net_info);
@@ -245,7 +245,7 @@ PALETTE_INIT( battroad )
 
 PALETTE_INIT( spelunk2 )
 {
-	irem_z80_state *state = machine->driver_data<irem_z80_state>();
+	m62_state *state = machine->driver_data<m62_state>();
 	rgb_t *rgb;
 
 	rgb = compute_res_net_all(machine, color_prom, &spelunk2_tile_decode_info, &m62_tile_net_info);
@@ -265,7 +265,7 @@ PALETTE_INIT( spelunk2 )
 
 static void register_savestate( running_machine *machine )
 {
-	irem_z80_state *state = machine->driver_data<irem_z80_state>();
+	m62_state *state = machine->driver_data<m62_state>();
 
 	state_save_register_global(machine, state->flipscreen);
 	state_save_register_global(machine, state->m62_background_hscroll);
@@ -280,7 +280,7 @@ static void register_savestate( running_machine *machine )
 
 WRITE8_HANDLER( m62_flipscreen_w )
 {
-	irem_z80_state *state = space->machine->driver_data<irem_z80_state>();
+	m62_state *state = space->machine->driver_data<m62_state>();
 	/* screen flip is handled both by software and hardware */
 	data ^= ~input_port_read(space->machine, "DSW2") & 1;
 
@@ -296,38 +296,38 @@ WRITE8_HANDLER( m62_flipscreen_w )
 
 WRITE8_HANDLER( m62_hscroll_low_w )
 {
-	irem_z80_state *state = space->machine->driver_data<irem_z80_state>();
+	m62_state *state = space->machine->driver_data<m62_state>();
 	state->m62_background_hscroll = (state->m62_background_hscroll & 0xff00) | data;
 }
 
 WRITE8_HANDLER( m62_hscroll_high_w )
 {
-	irem_z80_state *state = space->machine->driver_data<irem_z80_state>();
+	m62_state *state = space->machine->driver_data<m62_state>();
 	state->m62_background_hscroll = (state->m62_background_hscroll & 0xff) | (data << 8);
 }
 
 WRITE8_HANDLER( m62_vscroll_low_w )
 {
-	irem_z80_state *state = space->machine->driver_data<irem_z80_state>();
+	m62_state *state = space->machine->driver_data<m62_state>();
 	state->m62_background_vscroll = (state->m62_background_vscroll & 0xff00) | data;
 }
 
 WRITE8_HANDLER( m62_vscroll_high_w )
 {
-	irem_z80_state *state = space->machine->driver_data<irem_z80_state>();
+	m62_state *state = space->machine->driver_data<m62_state>();
 	state->m62_background_vscroll = (state->m62_background_vscroll & 0xff) | (data << 8);
 }
 
 WRITE8_HANDLER( m62_tileram_w )
 {
-	irem_z80_state *state = space->machine->driver_data<irem_z80_state>();
+	m62_state *state = space->machine->driver_data<m62_state>();
 	state->m62_tileram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset >> 1);
 }
 
 WRITE8_HANDLER( m62_textram_w )
 {
-	irem_z80_state *state = space->machine->driver_data<irem_z80_state>();
+	m62_state *state = space->machine->driver_data<m62_state>();
 	state->m62_textram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset >> 1);
 }
@@ -335,7 +335,7 @@ WRITE8_HANDLER( m62_textram_w )
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int colormask, int prioritymask, int priority )
 {
-	irem_z80_state *state = machine->driver_data<irem_z80_state>();
+	m62_state *state = machine->driver_data<m62_state>();
 	int offs;
 
 	for (offs = 0; offs < state->spriteram_size; offs += 8)
@@ -394,7 +394,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 static void m62_start( running_machine *machine, tile_get_info_func tile_get_info, int rows, int cols, int x1, int y1, int x2, int y2 )
 {
-	irem_z80_state *state = machine->driver_data<irem_z80_state>();
+	m62_state *state = machine->driver_data<m62_state>();
 	state->bg_tilemap = tilemap_create(machine, tile_get_info, tilemap_scan_rows,  x1, y1, x2, y2);
 
 	register_savestate(machine);
@@ -408,7 +408,7 @@ static void m62_start( running_machine *machine, tile_get_info_func tile_get_inf
 
 static void m62_textlayer( running_machine *machine, tile_get_info_func tile_get_info, int rows, int cols, int x1, int y1, int x2, int y2 )
 {
-	irem_z80_state *state = machine->driver_data<irem_z80_state>();
+	m62_state *state = machine->driver_data<m62_state>();
 	state->fg_tilemap = tilemap_create(machine, tile_get_info, tilemap_scan_rows,  x1, y1, x2, y2);
 
 	if (rows != 0)
@@ -420,14 +420,14 @@ static void m62_textlayer( running_machine *machine, tile_get_info_func tile_get
 
 WRITE8_HANDLER( kungfum_tileram_w )
 {
-	irem_z80_state *state = space->machine->driver_data<irem_z80_state>();
+	m62_state *state = space->machine->driver_data<m62_state>();
 	state->m62_tileram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset & 0x7ff);
 }
 
 static TILE_GET_INFO( get_kungfum_bg_tile_info )
 {
-	irem_z80_state *state = machine->driver_data<irem_z80_state>();
+	m62_state *state = machine->driver_data<m62_state>();
 	int code;
 	int color;
 	int flags;
@@ -454,7 +454,7 @@ VIDEO_START( kungfum )
 
 VIDEO_UPDATE( kungfum )
 {
-	irem_z80_state *state = screen->machine->driver_data<irem_z80_state>();
+	m62_state *state = screen->machine->driver_data<m62_state>();
 	int i;
 	for (i = 0; i < 6; i++)
 	{
@@ -473,7 +473,7 @@ VIDEO_UPDATE( kungfum )
 
 static TILE_GET_INFO( get_ldrun_bg_tile_info )
 {
-	irem_z80_state *state = machine->driver_data<irem_z80_state>();
+	m62_state *state = machine->driver_data<m62_state>();
 
 	int code;
 	int color;
@@ -494,7 +494,7 @@ static TILE_GET_INFO( get_ldrun_bg_tile_info )
 
 VIDEO_START( ldrun )
 {
-	irem_z80_state *state = machine->driver_data<irem_z80_state>();
+	m62_state *state = machine->driver_data<m62_state>();
 
 	m62_start(machine, get_ldrun_bg_tile_info, 1, 1, 8, 8, 64, 32);
 	tilemap_set_transmask(state->bg_tilemap, 0, 0xffff, 0x0000);	/* split type 0 is totally transparent in front half */
@@ -503,7 +503,7 @@ VIDEO_START( ldrun )
 
 VIDEO_UPDATE( ldrun )
 {
-	irem_z80_state *state = screen->machine->driver_data<irem_z80_state>();
+	m62_state *state = screen->machine->driver_data<m62_state>();
 	tilemap_set_scrollx(state->bg_tilemap, 0, state->m62_background_hscroll);
 	tilemap_set_scrolly(state->bg_tilemap, 0, state->m62_background_vscroll);
 
@@ -516,7 +516,7 @@ VIDEO_UPDATE( ldrun )
 
 static TILE_GET_INFO( get_ldrun2_bg_tile_info )
 {
-	irem_z80_state *state = machine->driver_data<irem_z80_state>();
+	m62_state *state = machine->driver_data<m62_state>();
 	int code;
 	int color;
 	int flags;
@@ -536,7 +536,7 @@ static TILE_GET_INFO( get_ldrun2_bg_tile_info )
 
 VIDEO_START( ldrun2 )
 {
-	irem_z80_state *state = machine->driver_data<irem_z80_state>();
+	m62_state *state = machine->driver_data<m62_state>();
 	m62_start(machine, get_ldrun2_bg_tile_info, 1, 1, 8, 8, 64, 32);
 	tilemap_set_transmask(state->bg_tilemap, 0, 0xffff, 0x0000);	/* split type 0 is totally transparent in front half */
 	tilemap_set_transmask(state->bg_tilemap, 1, 0x0001, 0xfffe);	/* split type 1 has pen 0 transparent in front half */
@@ -545,13 +545,13 @@ VIDEO_START( ldrun2 )
 
 WRITE8_HANDLER( ldrun3_topbottom_mask_w )
 {
-	irem_z80_state *state = space->machine->driver_data<irem_z80_state>();
+	m62_state *state = space->machine->driver_data<m62_state>();
 	state->ldrun3_topbottom_mask = data & 1;
 }
 
 VIDEO_UPDATE( ldrun3 )
 {
-	irem_z80_state *state = screen->machine->driver_data<irem_z80_state>();
+	m62_state *state = screen->machine->driver_data<m62_state>();
 	VIDEO_UPDATE_CALL(ldrun);
 
 	if (state->ldrun3_topbottom_mask)
@@ -573,7 +573,7 @@ VIDEO_UPDATE( ldrun3 )
 
 static TILE_GET_INFO( get_battroad_bg_tile_info )
 {
-	irem_z80_state *state = machine->driver_data<irem_z80_state>();
+	m62_state *state = machine->driver_data<m62_state>();
 	int code;
 	int color;
 	int flags;
@@ -593,7 +593,7 @@ static TILE_GET_INFO( get_battroad_bg_tile_info )
 
 static TILE_GET_INFO( get_battroad_fg_tile_info )
 {
-	irem_z80_state *state = machine->driver_data<irem_z80_state>();
+	m62_state *state = machine->driver_data<m62_state>();
 	int code;
 	int color;
 	code = state->m62_textram[tile_index << 1];
@@ -603,7 +603,7 @@ static TILE_GET_INFO( get_battroad_fg_tile_info )
 
 VIDEO_START( battroad )
 {
-	irem_z80_state *state = machine->driver_data<irem_z80_state>();
+	m62_state *state = machine->driver_data<m62_state>();
 	m62_start(machine, get_battroad_bg_tile_info, 1, 1, 8, 8, 64, 32);
 	m62_textlayer(machine, get_battroad_fg_tile_info, 1, 1, 8, 8, 32, 32);
 	tilemap_set_transmask(state->bg_tilemap, 0, 0xffff, 0x0000);	/* split type 0 is totally transparent in front half */
@@ -612,7 +612,7 @@ VIDEO_START( battroad )
 
 VIDEO_UPDATE( battroad )
 {
-	irem_z80_state *state = screen->machine->driver_data<irem_z80_state>();
+	m62_state *state = screen->machine->driver_data<m62_state>();
 	tilemap_set_scrollx(state->bg_tilemap, 0, state->m62_background_hscroll);
 	tilemap_set_scrolly(state->bg_tilemap, 0, state->m62_background_vscroll);
 	tilemap_set_scrollx(state->fg_tilemap, 0, 128);
@@ -632,7 +632,7 @@ VIDEO_UPDATE( battroad )
 /* no char x flip, and more sprites */
 static TILE_GET_INFO( get_ldrun4_bg_tile_info )
 {
-	irem_z80_state *state = machine->driver_data<irem_z80_state>();
+	m62_state *state = machine->driver_data<m62_state>();
 	int code;
 	int color;
 	code = state->m62_tileram[tile_index << 1];
@@ -647,7 +647,7 @@ VIDEO_START( ldrun4 )
 
 VIDEO_UPDATE( ldrun4 )
 {
-	irem_z80_state *state = screen->machine->driver_data<irem_z80_state>();
+	m62_state *state = screen->machine->driver_data<m62_state>();
 	tilemap_set_scrollx(state->bg_tilemap, 0, state->m62_background_hscroll - 2);
 
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
@@ -658,7 +658,7 @@ VIDEO_UPDATE( ldrun4 )
 
 static TILE_GET_INFO( get_lotlot_bg_tile_info )
 {
-	irem_z80_state *state = machine->driver_data<irem_z80_state>();
+	m62_state *state = machine->driver_data<m62_state>();
 	int code;
 	int color;
 	int flags;
@@ -674,7 +674,7 @@ static TILE_GET_INFO( get_lotlot_bg_tile_info )
 
 static TILE_GET_INFO( get_lotlot_fg_tile_info )
 {
-	irem_z80_state *state = machine->driver_data<irem_z80_state>();
+	m62_state *state = machine->driver_data<m62_state>();
 	int code;
 	int color;
 	code = state->m62_textram[tile_index << 1];
@@ -690,7 +690,7 @@ VIDEO_START( lotlot )
 
 VIDEO_UPDATE( lotlot )
 {
-	irem_z80_state *state = screen->machine->driver_data<irem_z80_state>();
+	m62_state *state = screen->machine->driver_data<m62_state>();
 	tilemap_set_scrollx(state->bg_tilemap, 0, state->m62_background_hscroll - 64);
 	tilemap_set_scrolly(state->bg_tilemap, 0, state->m62_background_vscroll + 32);
 	tilemap_set_scrollx(state->fg_tilemap, 0, -64);
@@ -706,19 +706,19 @@ VIDEO_UPDATE( lotlot )
 
 WRITE8_HANDLER( kidniki_text_vscroll_low_w )
 {
-	irem_z80_state *state = space->machine->driver_data<irem_z80_state>();
+	m62_state *state = space->machine->driver_data<m62_state>();
 	state->kidniki_text_vscroll = (state->kidniki_text_vscroll & 0xff00) | data;
 }
 
 WRITE8_HANDLER( kidniki_text_vscroll_high_w )
 {
-	irem_z80_state *state = space->machine->driver_data<irem_z80_state>();
+	m62_state *state = space->machine->driver_data<m62_state>();
 	state->kidniki_text_vscroll = (state->kidniki_text_vscroll & 0xff) | (data << 8);
 }
 
 WRITE8_HANDLER( kidniki_background_bank_w )
 {
-	irem_z80_state *state = space->machine->driver_data<irem_z80_state>();
+	m62_state *state = space->machine->driver_data<m62_state>();
 	if (state->kidniki_background_bank != (data & 1))
 	{
 		state->kidniki_background_bank = data & 1;
@@ -728,7 +728,7 @@ WRITE8_HANDLER( kidniki_background_bank_w )
 
 static TILE_GET_INFO( get_kidniki_bg_tile_info )
 {
-	irem_z80_state *state = machine->driver_data<irem_z80_state>();
+	m62_state *state = machine->driver_data<m62_state>();
 	int code;
 	int color;
 	code = state->m62_tileram[tile_index << 1];
@@ -739,7 +739,7 @@ static TILE_GET_INFO( get_kidniki_bg_tile_info )
 
 static TILE_GET_INFO( get_kidniki_fg_tile_info )
 {
-	irem_z80_state *state = machine->driver_data<irem_z80_state>();
+	m62_state *state = machine->driver_data<m62_state>();
 	int code;
 	int color;
 	code = state->m62_textram[tile_index << 1];
@@ -749,7 +749,7 @@ static TILE_GET_INFO( get_kidniki_fg_tile_info )
 
 VIDEO_START( kidniki )
 {
-	irem_z80_state *state = machine->driver_data<irem_z80_state>();
+	m62_state *state = machine->driver_data<m62_state>();
 
 	state->bg_tilemap = tilemap_create(machine, get_kidniki_bg_tile_info, tilemap_scan_rows,  8, 8, 64, 32);
 	tilemap_set_transmask(state->bg_tilemap, 0, 0xffff, 0x0000);	/* split type 0 is totally transparent in front half */
@@ -762,7 +762,7 @@ VIDEO_START( kidniki )
 
 VIDEO_UPDATE( kidniki )
 {
-	irem_z80_state *state = screen->machine->driver_data<irem_z80_state>();
+	m62_state *state = screen->machine->driver_data<m62_state>();
 	tilemap_set_scrollx(state->bg_tilemap, 0, state->m62_background_hscroll);
 	tilemap_set_scrollx(state->fg_tilemap, 0, -64);
 	tilemap_set_scrolly(state->fg_tilemap, 0, state->kidniki_text_vscroll + 128);
@@ -778,7 +778,7 @@ VIDEO_UPDATE( kidniki )
 
 WRITE8_HANDLER( spelunkr_palbank_w )
 {
-	irem_z80_state *state = space->machine->driver_data<irem_z80_state>();
+	m62_state *state = space->machine->driver_data<m62_state>();
 	if (state->spelunkr_palbank != (data & 0x01))
 	{
 		state->spelunkr_palbank = data & 0x01;
@@ -789,7 +789,7 @@ WRITE8_HANDLER( spelunkr_palbank_w )
 
 static TILE_GET_INFO( get_spelunkr_bg_tile_info )
 {
-	irem_z80_state *state = machine->driver_data<irem_z80_state>();
+	m62_state *state = machine->driver_data<m62_state>();
 	int code;
 	int color;
 	code = state->m62_tileram[tile_index << 1];
@@ -799,7 +799,7 @@ static TILE_GET_INFO( get_spelunkr_bg_tile_info )
 
 static TILE_GET_INFO( get_spelunkr_fg_tile_info )
 {
-	irem_z80_state *state = machine->driver_data<irem_z80_state>();
+	m62_state *state = machine->driver_data<m62_state>();
 	int code;
 	int color;
 	code = state->m62_textram[tile_index << 1];
@@ -816,7 +816,7 @@ VIDEO_START( spelunkr )
 
 VIDEO_UPDATE( spelunkr )
 {
-	irem_z80_state *state = screen->machine->driver_data<irem_z80_state>();
+	m62_state *state = screen->machine->driver_data<m62_state>();
 	tilemap_set_scrollx(state->bg_tilemap, 0, state->m62_background_hscroll);
 	tilemap_set_scrolly(state->bg_tilemap, 0, state->m62_background_vscroll + 128);
 	tilemap_set_scrollx(state->fg_tilemap, 0, -64);
@@ -832,7 +832,7 @@ VIDEO_UPDATE( spelunkr )
 
 WRITE8_HANDLER( spelunk2_gfxport_w )
 {
-	irem_z80_state *state = space->machine->driver_data<irem_z80_state>();
+	m62_state *state = space->machine->driver_data<m62_state>();
 	m62_hscroll_high_w(space, 0, (data & 2) >> 1);
 	m62_vscroll_high_w(space, 0, (data & 1));
 	if (state->spelunkr_palbank != ((data & 0x0c) >> 2))
@@ -845,7 +845,7 @@ WRITE8_HANDLER( spelunk2_gfxport_w )
 
 static TILE_GET_INFO( get_spelunk2_bg_tile_info )
 {
-	irem_z80_state *state = machine->driver_data<irem_z80_state>();
+	m62_state *state = machine->driver_data<m62_state>();
 	int code;
 	int color;
 	code = state->m62_tileram[tile_index << 1];
@@ -861,7 +861,7 @@ VIDEO_START( spelunk2 )
 
 VIDEO_UPDATE( spelunk2 )
 {
-	irem_z80_state *state = screen->machine->driver_data<irem_z80_state>();
+	m62_state *state = screen->machine->driver_data<m62_state>();
 	tilemap_set_scrollx(state->bg_tilemap, 0, state->m62_background_hscroll - 1);
 	tilemap_set_scrolly(state->bg_tilemap, 0, state->m62_background_vscroll + 128);
 	tilemap_set_scrollx(state->fg_tilemap, 0, -65);
@@ -877,7 +877,7 @@ VIDEO_UPDATE( spelunk2 )
 
 static TILE_GET_INFO( get_youjyudn_bg_tile_info )
 {
-	irem_z80_state *state = machine->driver_data<irem_z80_state>();
+	m62_state *state = machine->driver_data<m62_state>();
 	int code;
 	int color;
 	code = state->m62_tileram[tile_index << 1];
@@ -891,7 +891,7 @@ static TILE_GET_INFO( get_youjyudn_bg_tile_info )
 
 static TILE_GET_INFO( get_youjyudn_fg_tile_info )
 {
-	irem_z80_state *state = machine->driver_data<irem_z80_state>();
+	m62_state *state = machine->driver_data<m62_state>();
 	int code;
 	int color;
 	code = state->m62_textram[tile_index << 1];
@@ -901,7 +901,7 @@ static TILE_GET_INFO( get_youjyudn_fg_tile_info )
 
 VIDEO_START( youjyudn )
 {
-	irem_z80_state *state = machine->driver_data<irem_z80_state>();
+	m62_state *state = machine->driver_data<m62_state>();
 	m62_start(machine, get_youjyudn_bg_tile_info, 1, 0, 8, 16, 64, 16);
 	m62_textlayer(machine, get_youjyudn_fg_tile_info, 1, 1, 12, 8, 32, 32);
 	tilemap_set_transmask(state->bg_tilemap, 0, 0xffff, 0x0000);	/* split type 0 is totally transparent in front half */
@@ -910,7 +910,7 @@ VIDEO_START( youjyudn )
 
 VIDEO_UPDATE( youjyudn )
 {
-	irem_z80_state *state = screen->machine->driver_data<irem_z80_state>();
+	m62_state *state = screen->machine->driver_data<m62_state>();
 	tilemap_set_scrollx(state->bg_tilemap, 0, state->m62_background_hscroll);
 	tilemap_set_scrollx(state->fg_tilemap, 0, -64);
 	tilemap_set_scrolly(state->fg_tilemap, 0, 0);
@@ -926,13 +926,13 @@ VIDEO_UPDATE( youjyudn )
 
 WRITE8_HANDLER( horizon_scrollram_w )
 {
-	irem_z80_state *state = space->machine->driver_data<irem_z80_state>();
+	m62_state *state = space->machine->driver_data<m62_state>();
 	state->scrollram[offset] = data;
 }
 
 static TILE_GET_INFO( get_horizon_bg_tile_info )
 {
-	irem_z80_state *state = machine->driver_data<irem_z80_state>();
+	m62_state *state = machine->driver_data<m62_state>();
 	int code;
 	int color;
 	code = state->m62_tileram[tile_index << 1];
@@ -947,7 +947,7 @@ static TILE_GET_INFO( get_horizon_bg_tile_info )
 
 VIDEO_START( horizon )
 {
-	irem_z80_state *state = machine->driver_data<irem_z80_state>();
+	m62_state *state = machine->driver_data<m62_state>();
 	m62_start(machine, get_horizon_bg_tile_info, 32, 0, 8, 8, 64, 32);
 	tilemap_set_transmask(state->bg_tilemap, 0, 0xffff, 0x0000);	/* split type 0 is totally transparent in front half */
 	tilemap_set_transmask(state->bg_tilemap, 1, 0x0001, 0xfffe);	/* split type 1 has pen 0 transparent in front half */
@@ -955,7 +955,7 @@ VIDEO_START( horizon )
 
 VIDEO_UPDATE( horizon )
 {
-	irem_z80_state *state = screen->machine->driver_data<irem_z80_state>();
+	m62_state *state = screen->machine->driver_data<m62_state>();
 	int i;
 	for (i = 0; i < 32; i++)
 	{

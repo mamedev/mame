@@ -7,8 +7,36 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/espial.h"
+#include "includes/marineb.h"
 
+
+PALETTE_INIT( marineb )
+{
+	int i;
+
+	for (i = 0; i < machine->total_colors(); i++)
+	{
+		int bit0, bit1, bit2, r, g, b;
+
+		/* red component */
+		bit0 = (color_prom[i] >> 0) & 0x01;
+		bit1 = (color_prom[i] >> 1) & 0x01;
+		bit2 = (color_prom[i] >> 2) & 0x01;
+		r = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		/* green component */
+		bit0 = (color_prom[i] >> 3) & 0x01;
+		bit1 = (color_prom[i + machine->total_colors()] >> 0) & 0x01;
+		bit2 = (color_prom[i + machine->total_colors()] >> 1) & 0x01;
+		g = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+		/* blue component */
+		bit0 = 0;
+		bit1 = (color_prom[i + machine->total_colors()] >> 2) & 0x01;
+		bit2 = (color_prom[i + machine->total_colors()] >> 3) & 0x01;
+		b = 0x21 * bit0 + 0x47 * bit1 + 0x97 * bit2;
+
+		palette_set_color(machine, i, MAKE_RGB(r,g,b));
+	}
+}
 
 /***************************************************************************
 
@@ -18,7 +46,7 @@
 
 static TILE_GET_INFO( get_tile_info )
 {
-	espial_state *state = machine->driver_data<espial_state>();
+	marineb_state *state = machine->driver_data<marineb_state>();
 
 	UINT8 code = state->videoram[tile_index];
 	UINT8 col = state->colorram[tile_index];
@@ -39,7 +67,7 @@ static TILE_GET_INFO( get_tile_info )
 
 VIDEO_START( marineb )
 {
-	espial_state *state = machine->driver_data<espial_state>();
+	marineb_state *state = machine->driver_data<marineb_state>();
 
 	state->bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	tilemap_set_scroll_cols(state->bg_tilemap, 32);
@@ -60,7 +88,7 @@ VIDEO_START( marineb )
 
 WRITE8_HANDLER( marineb_videoram_w )
 {
-	espial_state *state = space->machine->driver_data<espial_state>();
+	marineb_state *state = space->machine->driver_data<marineb_state>();
 
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
@@ -69,7 +97,7 @@ WRITE8_HANDLER( marineb_videoram_w )
 
 WRITE8_HANDLER( marineb_colorram_w )
 {
-	espial_state *state = space->machine->driver_data<espial_state>();
+	marineb_state *state = space->machine->driver_data<marineb_state>();
 
 	state->colorram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
@@ -78,14 +106,14 @@ WRITE8_HANDLER( marineb_colorram_w )
 
 WRITE8_HANDLER( marineb_column_scroll_w )
 {
-	espial_state *state = space->machine->driver_data<espial_state>();
+	marineb_state *state = space->machine->driver_data<marineb_state>();
 	state->column_scroll = data;
 }
 
 
 WRITE8_HANDLER( marineb_palette_bank_0_w )
 {
-	espial_state *state = space->machine->driver_data<espial_state>();
+	marineb_state *state = space->machine->driver_data<marineb_state>();
 	UINT8 old = state->palette_bank;
 
 	state->palette_bank = (state->palette_bank & 0x02) | (data & 0x01);
@@ -99,7 +127,7 @@ WRITE8_HANDLER( marineb_palette_bank_0_w )
 
 WRITE8_HANDLER( marineb_palette_bank_1_w )
 {
-	espial_state *state = space->machine->driver_data<espial_state>();
+	marineb_state *state = space->machine->driver_data<marineb_state>();
 	UINT8 old = state->palette_bank;
 
 	state->palette_bank = (state->palette_bank & 0x01) | ((data & 0x01) << 1);
@@ -113,7 +141,7 @@ WRITE8_HANDLER( marineb_palette_bank_1_w )
 
 WRITE8_HANDLER( marineb_flipscreen_x_w )
 {
-	espial_state *state = space->machine->driver_data<espial_state>();
+	marineb_state *state = space->machine->driver_data<marineb_state>();
 
 	state->flipscreen_x = data ^ state->marineb_active_low_flipscreen;
 	tilemap_set_flip(state->bg_tilemap, (state->flipscreen_x ? TILEMAP_FLIPX : 0) | (state->flipscreen_y ? TILEMAP_FLIPY : 0));
@@ -122,7 +150,7 @@ WRITE8_HANDLER( marineb_flipscreen_x_w )
 
 WRITE8_HANDLER( marineb_flipscreen_y_w )
 {
-	espial_state *state = space->machine->driver_data<espial_state>();
+	marineb_state *state = space->machine->driver_data<marineb_state>();
 
 	state->flipscreen_y = data ^ state->marineb_active_low_flipscreen;
 	tilemap_set_flip(state->bg_tilemap, (state->flipscreen_x ? TILEMAP_FLIPX : 0) | (state->flipscreen_y ? TILEMAP_FLIPY : 0));
@@ -138,7 +166,7 @@ WRITE8_HANDLER( marineb_flipscreen_y_w )
 
 static void set_tilemap_scrolly( running_machine *machine, int cols )
 {
-	espial_state *state = machine->driver_data<espial_state>();
+	marineb_state *state = machine->driver_data<marineb_state>();
 	int col;
 
 	for (col = 0; col < cols; col++)
@@ -151,7 +179,7 @@ static void set_tilemap_scrolly( running_machine *machine, int cols )
 
 VIDEO_UPDATE( marineb )
 {
-	espial_state *state = screen->machine->driver_data<espial_state>();
+	marineb_state *state = screen->machine->driver_data<marineb_state>();
 	int offs;
 
 	set_tilemap_scrolly(screen->machine, 24);
@@ -213,7 +241,7 @@ VIDEO_UPDATE( marineb )
 
 VIDEO_UPDATE( changes )
 {
-	espial_state *state = screen->machine->driver_data<espial_state>();
+	marineb_state *state = screen->machine->driver_data<marineb_state>();
 	int offs, sx, sy, code, col, flipx, flipy;
 
 	set_tilemap_scrolly(screen->machine, 26);
@@ -292,7 +320,7 @@ VIDEO_UPDATE( changes )
 
 VIDEO_UPDATE( springer )
 {
-	espial_state *state = screen->machine->driver_data<espial_state>();
+	marineb_state *state = screen->machine->driver_data<marineb_state>();
 	int offs;
 
 	set_tilemap_scrolly(screen->machine, 0);
@@ -352,7 +380,7 @@ VIDEO_UPDATE( springer )
 
 VIDEO_UPDATE( hoccer )
 {
-	espial_state *state = screen->machine->driver_data<espial_state>();
+	marineb_state *state = screen->machine->driver_data<marineb_state>();
 	int offs;
 
 	set_tilemap_scrolly(screen->machine, 0);
@@ -396,7 +424,7 @@ VIDEO_UPDATE( hoccer )
 
 VIDEO_UPDATE( hopprobo )
 {
-	espial_state *state = screen->machine->driver_data<espial_state>();
+	marineb_state *state = screen->machine->driver_data<marineb_state>();
 	int offs;
 
 	set_tilemap_scrolly(screen->machine, 0);

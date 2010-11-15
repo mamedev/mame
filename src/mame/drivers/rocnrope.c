@@ -9,8 +9,9 @@
 #include "emu.h"
 #include "cpu/m6809/m6809.h"
 #include "machine/konami1.h"
-#include "includes/timeplt.h"
+#include "audio/timeplt.h"
 #include "includes/konamipt.h"
+#include "includes/rocnrope.h"
 
 #define MASTER_CLOCK          XTAL_18_432MHz
 
@@ -43,11 +44,11 @@ static ADDRESS_MAP_START( rocnrope_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x3083, 0x3083) AM_READ_PORT("DSW1")
 	AM_RANGE(0x3000, 0x3000) AM_READ_PORT("DSW2")
 	AM_RANGE(0x3100, 0x3100) AM_READ_PORT("DSW3")
-	AM_RANGE(0x4000, 0x402f) AM_RAM AM_BASE_MEMBER(timeplt_state, spriteram2)
-	AM_RANGE(0x4400, 0x442f) AM_RAM AM_BASE_SIZE_MEMBER(timeplt_state, spriteram, spriteram_size)
+	AM_RANGE(0x4000, 0x402f) AM_RAM AM_BASE_MEMBER(rocnrope_state, spriteram2)
+	AM_RANGE(0x4400, 0x442f) AM_RAM AM_BASE_SIZE_MEMBER(rocnrope_state, spriteram, spriteram_size)
 	AM_RANGE(0x4000, 0x47ff) AM_RAM
-	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE(rocnrope_colorram_w) AM_BASE_MEMBER(timeplt_state, colorram)
-	AM_RANGE(0x4c00, 0x4fff) AM_RAM_WRITE(rocnrope_videoram_w) AM_BASE_MEMBER(timeplt_state, videoram)
+	AM_RANGE(0x4800, 0x4bff) AM_RAM_WRITE(rocnrope_colorram_w) AM_BASE_MEMBER(rocnrope_state, colorram)
+	AM_RANGE(0x4c00, 0x4fff) AM_RAM_WRITE(rocnrope_videoram_w) AM_BASE_MEMBER(rocnrope_state, videoram)
 	AM_RANGE(0x5000, 0x5fff) AM_RAM
 	AM_RANGE(0x8000, 0x8000) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x8080, 0x8080) AM_WRITE(rocnrope_flipscreen_w)
@@ -182,7 +183,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( rocnrope, timeplt_state )
+static MACHINE_CONFIG_START( rocnrope, rocnrope_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, MASTER_CLOCK / 3 / 4)        /* Verified in schematics */

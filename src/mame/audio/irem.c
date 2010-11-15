@@ -9,7 +9,27 @@
 #include "sound/ay8910.h"
 #include "sound/msm5205.h"
 #include "sound/discrete.h"
-#include "includes/iremz80.h"
+#include "audio/irem.h"
+
+typedef struct _irem_audio_state irem_audio_state;
+struct _irem_audio_state
+{
+	UINT8                port1, port2;
+
+	running_device *ay1;
+	running_device *ay2;
+	running_device *adpcm1;
+	running_device *adpcm2;
+};
+
+INLINE irem_audio_state *get_safe_token( running_device *device )
+{
+	assert(device != NULL);
+	assert(device->type() == IREM_AUDIO);
+
+	return (irem_audio_state *)downcast<legacy_device_base *>(device)->token();
+}
+
 
 
 /*************************************
@@ -18,17 +38,18 @@
  *
  *************************************/
 
-static SOUND_START( irem_audio )
+static DEVICE_START( irem_audio )
 {
-	irem_z80_state *state = machine->driver_data<irem_z80_state>();
+	irem_audio_state *state = get_safe_token(device);
+	running_machine *machine = device->machine;
 
 	state->adpcm1 = machine->device("msm1");
 	state->adpcm2 = machine->device("msm2");
 	state->ay1 = machine->device("ay1");
 	state->ay2 = machine->device("ay2");
 
-	state_save_register_global(machine, state->port1);
-	state_save_register_global(machine, state->port2);
+	state_save_register_device_item(device, 0, state->port1);
+	state_save_register_device_item(device, 0, state->port2);
 }
 
 
@@ -56,17 +77,17 @@ WRITE8_HANDLER( irem_sound_cmd_w )
  *
  *************************************/
 
-static WRITE8_HANDLER( m6803_port1_w )
+static WRITE8_DEVICE_HANDLER( m6803_port1_w )
 {
-	irem_z80_state *state = space->machine->driver_data<irem_z80_state>();
+	irem_audio_state *state = get_safe_token(device);
 
 	state->port1 = data;
 }
 
 
-static WRITE8_HANDLER( m6803_port2_w )
+static WRITE8_DEVICE_HANDLER( m6803_port2_w )
 {
-	irem_z80_state *state = space->machine->driver_data<irem_z80_state>();
+	irem_audio_state *state = get_safe_token(device);
 
 	/* write latch */
 	if ((state->port2 & 0x01) && !(data & 0x01))
@@ -100,9 +121,9 @@ static WRITE8_HANDLER( m6803_port2_w )
  *
  *************************************/
 
-static READ8_HANDLER( m6803_port1_r )
+static READ8_DEVICE_HANDLER( m6803_port1_r )
 {
-	irem_z80_state *state = space->machine->driver_data<irem_z80_state>();
+	irem_audio_state *state = get_safe_token(device);
 
 	/* PSG 0 or 1? */
 	if (state->port2 & 0x08)
@@ -113,7 +134,7 @@ static READ8_HANDLER( m6803_port1_r )
 }
 
 
-static READ8_HANDLER( m6803_port2_r )
+static READ8_DEVICE_HANDLER( m6803_port2_r )
 {
 	return 0;
 }
@@ -128,7 +149,7 @@ static READ8_HANDLER( m6803_port2_r )
 
 static WRITE8_DEVICE_HANDLER( ay8910_0_portb_w )
 {
-	irem_z80_state *state = device->machine->driver_data<irem_z80_state>();
+	irem_audio_state *state = get_safe_token(device);
 
 	/* bits 2-4 select MSM5205 clock & 3b/4b playback mode */
 	msm5205_playmode_w(state->adpcm1, (data >> 2) & 7);
@@ -163,9 +184,9 @@ static WRITE8_HANDLER( sound_irq_ack_w )
 }
 
 
-static WRITE8_HANDLER( m52_adpcm_w )
+static WRITE8_DEVICE_HANDLER( m52_adpcm_w )
 {
-	irem_z80_state *state = space->machine->driver_data<irem_z80_state>();
+	irem_audio_state *state = get_safe_token(device);
 
 	if (offset & 1)
 	{
@@ -179,9 +200,9 @@ static WRITE8_HANDLER( m52_adpcm_w )
 }
 
 
-static WRITE8_HANDLER( m62_adpcm_w )
+static WRITE8_DEVICE_HANDLER( m62_adpcm_w )
 {
-	irem_z80_state *state = space->machine->driver_data<irem_z80_state>();
+	irem_audio_state *state = get_safe_token(device);
 
 	running_device *adpcm = (offset & 1) ? state->adpcm2 : state->adpcm1;
 	if (adpcm != NULL)
@@ -198,15 +219,15 @@ static WRITE8_HANDLER( m62_adpcm_w )
 
 static void adpcm_int(running_device *device)
 {
-	irem_z80_state *state = device->machine->driver_data<irem_z80_state>();
+	running_device *adpcm2 = device->machine->device("msm2");
 
 	cputag_set_input_line(device->machine, "iremsound", INPUT_LINE_NMI, PULSE_LINE);
 
 	/* the first MSM5205 clocks the second */
-	if (state->adpcm2 != NULL)
+	if (adpcm2 != NULL)
 	{
-		msm5205_vclk_w(state->adpcm2, 1);
-		msm5205_vclk_w(state->adpcm2, 0);
+		msm5205_vclk_w(adpcm2, 1);
+		msm5205_vclk_w(adpcm2, 0);
 	}
 }
 
@@ -231,7 +252,7 @@ static const ay8910_interface irem_ay8910_interface_1 =
 	DEVCB_MEMORY_HANDLER("iremsound", PROGRAM, soundlatch_r),
 	DEVCB_NULL,
 	DEVCB_NULL,
-	DEVCB_HANDLER(ay8910_0_portb_w)
+	DEVCB_DEVICE_HANDLER("irem_audio", ay8910_0_portb_w)
 };
 
 static const ay8910_interface irem_ay8910_interface_2 =
@@ -357,13 +378,13 @@ DISCRETE_SOUND_END
 /* large map uses 8k ROMs, small map uses 4k ROMs; this is selected via a jumper */
 static ADDRESS_MAP_START( m52_small_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	ADDRESS_MAP_GLOBAL_MASK(0x7fff)
-	AM_RANGE(0x0000, 0x0fff) AM_WRITE(m52_adpcm_w)
+	AM_RANGE(0x0000, 0x0fff) AM_DEVWRITE("irem_audio", m52_adpcm_w)
 	AM_RANGE(0x1000, 0x1fff) AM_WRITE(sound_irq_ack_w)
 	AM_RANGE(0x2000, 0x7fff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( m52_large_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x0000, 0x1fff) AM_WRITE(m52_adpcm_w)
+	AM_RANGE(0x0000, 0x1fff) AM_DEVWRITE("irem_audio", m52_adpcm_w)
 	AM_RANGE(0x2000, 0x3fff) AM_WRITE(sound_irq_ack_w)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
@@ -372,14 +393,14 @@ ADDRESS_MAP_END
 /* complete address map verified from Kid Niki schematics */
 static ADDRESS_MAP_START( m62_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0800, 0x0800) AM_MIRROR(0xf7fc) AM_WRITE(sound_irq_ack_w)
-	AM_RANGE(0x0801, 0x0802) AM_MIRROR(0xf7fc) AM_WRITE(m62_adpcm_w)
+	AM_RANGE(0x0801, 0x0802) AM_MIRROR(0xf7fc) AM_DEVWRITE("irem_audio", m62_adpcm_w)
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 
 static ADDRESS_MAP_START( irem_sound_portmap, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(M6803_PORT1, M6803_PORT1) AM_READWRITE(m6803_port1_r, m6803_port1_w)
-	AM_RANGE(M6803_PORT2, M6803_PORT2) AM_READWRITE(m6803_port2_r, m6803_port2_w)
+	AM_RANGE(M6803_PORT1, M6803_PORT1) AM_DEVREADWRITE("irem_audio", m6803_port1_r, m6803_port1_w)
+	AM_RANGE(M6803_PORT2, M6803_PORT2) AM_DEVREADWRITE("irem_audio", m6803_port2_r, m6803_port2_w)
 ADDRESS_MAP_END
 
 
@@ -392,14 +413,14 @@ ADDRESS_MAP_END
 
 static MACHINE_CONFIG_FRAGMENT( irem_audio_base )
 
-	MDRV_SOUND_START(irem_audio)
-
 	/* basic machine hardware */
 	MDRV_CPU_ADD("iremsound", M6803, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_CPU_IO_MAP(irem_sound_portmap)
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD("irem_audio", IREM_AUDIO, 0)
 
 	MDRV_SOUND_ADD("ay1", AY8910, XTAL_3_579545MHz/4) /* verified on pcb */
 	MDRV_SOUND_CONFIG(irem_ay8910_interface_1)
@@ -420,8 +441,6 @@ MACHINE_CONFIG_END
 
 MACHINE_CONFIG_FRAGMENT( m52_sound_c_audio )
 
-	MDRV_SOUND_START(irem_audio)
-
 	/* basic machine hardware */
 	MDRV_CPU_ADD("iremsound", M6803, XTAL_3_579545MHz) /* verified on pcb */
 	MDRV_CPU_IO_MAP(irem_sound_portmap)
@@ -429,6 +448,8 @@ MACHINE_CONFIG_FRAGMENT( m52_sound_c_audio )
 
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD("irem_audio", IREM_AUDIO, 0)
 
 	MDRV_SOUND_ADD("ay1", AY8910, XTAL_3_579545MHz/4) /* verified on pcb */
 	MDRV_SOUND_CONFIG(irem_ay8910_interface_1)
@@ -462,3 +483,19 @@ MACHINE_CONFIG_DERIVED( m62_audio, irem_audio_base )
 	MDRV_CPU_MODIFY("iremsound")
 	MDRV_CPU_PROGRAM_MAP(m62_sound_map)
 MACHINE_CONFIG_END
+
+/*****************************************************************************
+    DEVICE DEFINITION
+*****************************************************************************/
+
+
+static const char DEVTEMPLATE_SOURCE[] = __FILE__;
+
+#define DEVTEMPLATE_ID(p,s)				p##irem_audio##s
+#define DEVTEMPLATE_FEATURES			DT_HAS_START
+#define DEVTEMPLATE_NAME				"Irem Audio"
+#define DEVTEMPLATE_FAMILY				"Irem Audio IC"
+#include "devtempl.h"
+
+
+DEFINE_LEGACY_SOUND_DEVICE(IREM_AUDIO, irem_audio);

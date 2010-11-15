@@ -7,11 +7,11 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/espial.h"
+#include "includes/zodiack.h"
 
 WRITE8_HANDLER( zodiack_videoram_w )
 {
-	espial_state *state = space->machine->driver_data<espial_state>();
+	zodiack_state *state = space->machine->driver_data<zodiack_state>();
 
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
@@ -19,7 +19,7 @@ WRITE8_HANDLER( zodiack_videoram_w )
 
 WRITE8_HANDLER( zodiack_videoram2_w )
 {
-	espial_state *state = space->machine->driver_data<espial_state>();
+	zodiack_state *state = space->machine->driver_data<zodiack_state>();
 
 	state->videoram_2[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
@@ -27,7 +27,7 @@ WRITE8_HANDLER( zodiack_videoram2_w )
 
 WRITE8_HANDLER( zodiack_attributes_w )
 {
-	espial_state *state = space->machine->driver_data<espial_state>();
+	zodiack_state *state = space->machine->driver_data<zodiack_state>();
 
 	if ((offset & 1) && state->attributeram[offset] != data)
 	{
@@ -106,7 +106,7 @@ PALETTE_INIT( zodiack )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	espial_state *state = machine->driver_data<espial_state>();
+	zodiack_state *state = machine->driver_data<zodiack_state>();
 
 	int code = state->videoram_2[tile_index];
 	int color = (state->attributeram[2 * (tile_index % 32) + 1] >> 4) & 0x07;
@@ -116,7 +116,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	espial_state *state = machine->driver_data<espial_state>();
+	zodiack_state *state = machine->driver_data<zodiack_state>();
 
 	int code = state->videoram[tile_index];
 	int color = state->attributeram[2 * (tile_index % 32) + 1] & 0x07;
@@ -126,7 +126,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 VIDEO_START( zodiack )
 {
-	espial_state *state = machine->driver_data<espial_state>();
+	zodiack_state *state = machine->driver_data<zodiack_state>();
 
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	state->fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
@@ -140,7 +140,7 @@ VIDEO_START( zodiack )
 
 static void draw_bullets( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	espial_state *state = machine->driver_data<espial_state>();
+	zodiack_state *state = machine->driver_data<zodiack_state>();
 	int offs;
 
 	for (offs = 0; offs < state->bulletsram_size; offs += 4)
@@ -167,7 +167,7 @@ static void draw_bullets( running_machine *machine, bitmap_t *bitmap, const rect
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	espial_state *state = machine->driver_data<espial_state>();
+	zodiack_state *state = machine->driver_data<zodiack_state>();
 	int offs;
 
 	for (offs = state->spriteram_size - 4; offs >= 0; offs -= 4)
@@ -197,7 +197,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 VIDEO_UPDATE( zodiack )
 {
-	espial_state *state = screen->machine->driver_data<espial_state>();
+	zodiack_state *state = screen->machine->driver_data<zodiack_state>();
 	int i;
 
 	for (i = 0; i < 32; i++)

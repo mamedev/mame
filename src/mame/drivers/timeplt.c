@@ -46,8 +46,9 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "includes/timeplt.h"
 #include "includes/konamipt.h"
+#include "audio/timeplt.h"
+#include "includes/timeplt.h"
 
 #define MASTER_CLOCK         XTAL_18_432MHz
 

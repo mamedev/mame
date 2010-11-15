@@ -82,31 +82,78 @@ TODO:
 #include "cpu/z80/z80.h"
 #include "deprecat.h"
 #include "sound/ay8910.h"
-#include "includes/espial.h"
+#include "includes/zodiack.h"
 
+
+static TIMER_CALLBACK( interrupt_disable )
+{
+	zodiack_state *state = machine->driver_data<zodiack_state>();
+	//interrupt_enable = 0;
+	cpu_interrupt_enable(state->maincpu, 0);
+}
+
+static WRITE8_HANDLER( zodiac_master_interrupt_enable_w )
+{
+	interrupt_enable_w(space, offset, ~data & 1);
+}
+
+static WRITE8_HANDLER( zodiac_sound_nmi_enable_w )
+{
+	zodiack_state *state = space->machine->driver_data<zodiack_state>();
+	state->sound_nmi_enabled = data & 1;
+}
+
+
+static INTERRUPT_GEN( zodiac_sound_nmi_gen )
+{
+	zodiack_state *state = device->machine->driver_data<zodiack_state>();
+
+	if (state->sound_nmi_enabled)
+		nmi_line_pulse(device);
+}
+
+static INTERRUPT_GEN( zodiac_master_interrupt )
+{
+	if (cpu_getiloops(device) == 0)
+		nmi_line_pulse(device);
+	else
+		irq0_line_hold(device);
+}
+
+static WRITE8_HANDLER( zodiac_master_soundlatch_w )
+{
+	zodiack_state *state = space->machine->driver_data<zodiack_state>();
+	soundlatch_w(space, offset, data);
+	cpu_set_input_line(state->audiocpu, 0, HOLD_LINE);
+}
 
 static MACHINE_START( zodiack )
 {
-	espial_state *state = machine->driver_data<espial_state>();
+	zodiack_state *state = machine->driver_data<zodiack_state>();
 
-	state_save_register_global(machine, state->percuss_hardware);
-	MACHINE_START_CALL(espial);
+	state->percuss_hardware = 0;
+	state->maincpu = machine->device("maincpu");
+	state->audiocpu = machine->device("audiocpu");
+
+	state_save_register_global(machine, state->sound_nmi_enabled);
 }
 
 static MACHINE_RESET( zodiack )
 {
-	espial_state *state = machine->driver_data<espial_state>();
+	zodiack_state *state = machine->driver_data<zodiack_state>();
 
-	state->percuss_hardware = 0;
-	MACHINE_RESET_CALL(espial);
+	/* we must start with NMI interrupts disabled */
+	timer_call_after_resynch(machine, NULL, 0, interrupt_disable);
+	state->sound_nmi_enabled = FALSE;
 }
 
-static MACHINE_RESET( percuss )
+static MACHINE_START( percuss )
 {
-	espial_state *state = machine->driver_data<espial_state>();
+	zodiack_state *state = machine->driver_data<zodiack_state>();
+
+	MACHINE_START_CALL( zodiack );
 
 	state->percuss_hardware = 1;
-	MACHINE_RESET_CALL(espial);
 }
 
 
@@ -131,19 +178,19 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x7000, 0x7000) AM_READNOP AM_WRITE(watchdog_reset_w)  /* NOP??? */
 	AM_RANGE(0x7100, 0x7100) AM_WRITE(zodiac_master_interrupt_enable_w)
 	AM_RANGE(0x7200, 0x7200) AM_WRITE(zodiack_flipscreen_w)
-	AM_RANGE(0x9000, 0x903f) AM_RAM_WRITE(zodiack_attributes_w) AM_BASE_MEMBER(espial_state, attributeram)
-	AM_RANGE(0x9040, 0x905f) AM_RAM AM_BASE_SIZE_MEMBER(espial_state, spriteram, spriteram_size)
-	AM_RANGE(0x9060, 0x907f) AM_RAM AM_BASE_SIZE_MEMBER(espial_state, bulletsram, bulletsram_size)
+	AM_RANGE(0x9000, 0x903f) AM_RAM_WRITE(zodiack_attributes_w) AM_BASE_MEMBER(zodiack_state, attributeram)
+	AM_RANGE(0x9040, 0x905f) AM_RAM AM_BASE_SIZE_MEMBER(zodiack_state, spriteram, spriteram_size)
+	AM_RANGE(0x9060, 0x907f) AM_RAM AM_BASE_SIZE_MEMBER(zodiack_state, bulletsram, bulletsram_size)
 	AM_RANGE(0x9080, 0x93ff) AM_RAM
-	AM_RANGE(0xa000, 0xa3ff) AM_RAM_WRITE(zodiack_videoram_w) AM_BASE_SIZE_MEMBER(espial_state, videoram, videoram_size)
-	AM_RANGE(0xb000, 0xb3ff) AM_RAM_WRITE(zodiack_videoram2_w) AM_BASE_MEMBER(espial_state, videoram_2)
+	AM_RANGE(0xa000, 0xa3ff) AM_RAM_WRITE(zodiack_videoram_w) AM_BASE_SIZE_MEMBER(zodiack_state, videoram, videoram_size)
+	AM_RANGE(0xb000, 0xb3ff) AM_RAM_WRITE(zodiack_videoram2_w) AM_BASE_MEMBER(zodiack_state, videoram_2)
 	AM_RANGE(0xc000, 0xcfff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM
 	AM_RANGE(0x2000, 0x23ff) AM_RAM
-	AM_RANGE(0x4000, 0x4000) AM_WRITE(espial_sound_nmi_enable_w)
+	AM_RANGE(0x4000, 0x4000) AM_WRITE(zodiac_sound_nmi_enable_w)
 	AM_RANGE(0x6000, 0x6000) AM_READWRITE(soundlatch_r, soundlatch_w)
 ADDRESS_MAP_END
 
@@ -523,7 +570,7 @@ static GFXDECODE_START( zodiack )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( zodiack, espial_state )
+static MACHINE_CONFIG_START( zodiack, zodiack_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)        /* 4.00 MHz??? */
@@ -533,7 +580,7 @@ static MACHINE_CONFIG_START( zodiack, espial_state )
 	MDRV_CPU_ADD("audiocpu", Z80, 14318000/8)	/* 1.78975 MHz??? */
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 	MDRV_CPU_IO_MAP(io_map)
-	MDRV_CPU_VBLANK_INT_HACK(espial_sound_nmi_gen,8)	/* IRQs are triggered by the main CPU */
+	MDRV_CPU_VBLANK_INT_HACK(zodiac_sound_nmi_gen,8)	/* IRQs are triggered by the main CPU */
 
 	MDRV_MACHINE_RESET(zodiack)
 	MDRV_MACHINE_START(zodiack)
@@ -561,7 +608,7 @@ static MACHINE_CONFIG_START( zodiack, espial_state )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( percuss, zodiack )
-	MDRV_MACHINE_RESET(percuss)
+	MDRV_MACHINE_START(percuss)
 MACHINE_CONFIG_END
 
 

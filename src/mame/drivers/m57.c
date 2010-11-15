@@ -49,8 +49,9 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "audio/irem.h"
 #include "includes/iremipt.h"
-#include "includes/iremz80.h"
+#include "includes/m57.h"
 
 
 #define MASTER_CLOCK		XTAL_18_432MHz
@@ -65,9 +66,9 @@
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(m57_videoram_w) AM_BASE_MEMBER(irem_z80_state, videoram)
-	AM_RANGE(0x9000, 0x91ff) AM_RAM AM_BASE_MEMBER(irem_z80_state, scrollram)
-	AM_RANGE(0xc820, 0xc8ff) AM_WRITEONLY AM_BASE_SIZE_MEMBER(irem_z80_state, spriteram, spriteram_size)
+	AM_RANGE(0x8000, 0x87ff) AM_RAM_WRITE(m57_videoram_w) AM_BASE_MEMBER(m57_state, videoram)
+	AM_RANGE(0x9000, 0x91ff) AM_RAM AM_BASE_MEMBER(m57_state, scrollram)
+	AM_RANGE(0xc820, 0xc8ff) AM_WRITEONLY AM_BASE_SIZE_MEMBER(m57_state, spriteram, spriteram_size)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(irem_sound_cmd_w)
 	AM_RANGE(0xd001, 0xd001) AM_WRITE(m57_flipscreen_w)	/* + coin counters */
 	AM_RANGE(0xd000, 0xd000) AM_READ_PORT("IN0")
@@ -222,7 +223,7 @@ GFXDECODE_END
  *
  *************************************/
 
-static MACHINE_CONFIG_START( m57, irem_z80_state )
+static MACHINE_CONFIG_START( m57, m57_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)	/* verified on pcb */

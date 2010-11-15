@@ -81,6 +81,7 @@ Dip locations and factory settings verified from dip listing
 #include "cpu/m6805/m6805.h"
 #include "sound/ay8910.h"
 #include "sound/msm5232.h"
+#include "machine/buggychl.h"
 #include "includes/buggychl.h"
 
 #include "buggychl.lh"
@@ -143,8 +144,8 @@ static ADDRESS_MAP_START( buggychl_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd200, 0xd200) AM_WRITE(bankswitch_w)
 	AM_RANGE(0xd300, 0xd300) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0xd303, 0xd303) AM_WRITE(buggychl_sprite_lookup_bank_w)
-	AM_RANGE(0xd400, 0xd400) AM_READWRITE(buggychl_mcu_r, buggychl_mcu_w)
-	AM_RANGE(0xd401, 0xd401) AM_READ(buggychl_mcu_status_r)
+	AM_RANGE(0xd400, 0xd400) AM_DEVREADWRITE("bmcu", buggychl_mcu_r, buggychl_mcu_w)
+	AM_RANGE(0xd401, 0xd401) AM_DEVREAD("bmcu", buggychl_mcu_status_r)
 	AM_RANGE(0xd500, 0xd57f) AM_WRITEONLY AM_BASE_SIZE_MEMBER(buggychl_state, spriteram, spriteram_size)
 	AM_RANGE(0xd600, 0xd600) AM_READ_PORT("DSW1")
 	AM_RANGE(0xd601, 0xd601) AM_READ_PORT("DSW2")
@@ -177,18 +178,6 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x5002, 0x5002) AM_WRITE(nmi_disable_w)
 	AM_RANGE(0x5003, 0x5003) AM_WRITE(sound_enable_w)
 	AM_RANGE(0xe000, 0xefff) AM_ROM	/* space for diagnostics ROM */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(buggychl_68705_port_a_r, buggychl_68705_port_a_w)
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE(buggychl_68705_port_b_r, buggychl_68705_port_b_w)
-	AM_RANGE(0x0002, 0x0002) AM_READWRITE(buggychl_68705_port_c_r, buggychl_68705_port_c_w)
-	AM_RANGE(0x0004, 0x0004) AM_WRITE(buggychl_68705_ddr_a_w)
-	AM_RANGE(0x0005, 0x0005) AM_WRITE(buggychl_68705_ddr_b_w)
-	AM_RANGE(0x0006, 0x0006) AM_WRITE(buggychl_68705_ddr_c_w)
-	AM_RANGE(0x0010, 0x007f) AM_RAM
-	AM_RANGE(0x0080, 0x07ff) AM_ROM
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -378,7 +367,6 @@ static MACHINE_START( buggychl )
 	memory_configure_bank(machine, "bank1", 0, 6, &ROM[0x10000], 0x2000);
 
 	state->audiocpu = machine->device("audiocpu");
-	state->mcu = machine->device("mcu");
 
 	state_save_register_global(machine, state->sound_nmi_enable);
 	state_save_register_global(machine, state->pending_nmi);
@@ -388,20 +376,6 @@ static MACHINE_START( buggychl )
 	state_save_register_global(machine, state->sky_on);
 	state_save_register_global(machine, state->sprite_color_base);
 	state_save_register_global(machine, state->bg_scrollx);
-	/* mcu */
-	state_save_register_global(machine, state->from_main);
-	state_save_register_global(machine, state->from_mcu);
-	state_save_register_global(machine, state->mcu_sent);
-	state_save_register_global(machine, state->main_sent);
-	state_save_register_global(machine, state->port_a_in);
-	state_save_register_global(machine, state->port_a_out);
-	state_save_register_global(machine, state->ddr_a);
-	state_save_register_global(machine, state->port_b_in);
-	state_save_register_global(machine, state->port_b_out);
-	state_save_register_global(machine, state->ddr_b);
-	state_save_register_global(machine, state->port_c_in);
-	state_save_register_global(machine, state->port_c_out);
-	state_save_register_global(machine, state->ddr_c);
 }
 
 static MACHINE_RESET( buggychl )
@@ -417,20 +391,6 @@ static MACHINE_RESET( buggychl )
 	state->sky_on = 0;
 	state->sprite_color_base = 0;
 	state->bg_scrollx = 0;
-	/* mcu */
-	state->mcu_sent = 0;
-	state->main_sent = 0;
-	state->from_main = 0;
-	state->from_mcu = 0;
-	state->port_a_in = 0;
-	state->port_a_out = 0;
-	state->ddr_a = 0;
-	state->port_b_in = 0;
-	state->port_b_out = 0;
-	state->ddr_b = 0;
-	state->port_c_in = 0;
-	state->port_c_out = 0;
-	state->ddr_c = 0;
 }
 
 static MACHINE_CONFIG_START( buggychl, buggychl_state )
@@ -446,7 +406,8 @@ static MACHINE_CONFIG_START( buggychl, buggychl_state )
 							/* nmi is caused by the main cpu */
 
 	MDRV_CPU_ADD("mcu", M68705,8000000/2)  /* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(mcu_map)
+	MDRV_CPU_PROGRAM_MAP(buggychl_mcu_map)
+	MDRV_DEVICE_ADD("bmcu", BUGGYCHL_MCU, 0)
 
 	MDRV_MACHINE_START(buggychl)
 	MDRV_MACHINE_RESET(buggychl)

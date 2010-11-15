@@ -8,7 +8,7 @@
 
 #include "emu.h"
 #include "video/resnet.h"
-#include "includes/trackfld.h"
+#include "includes/sbasketb.h"
 
 /***************************************************************************
 
@@ -96,14 +96,14 @@ PALETTE_INIT( sbasketb )
 
 WRITE8_HANDLER( sbasketb_videoram_w )
 {
-	trackfld_state *state = space->machine->driver_data<trackfld_state>();
+	sbasketb_state *state = space->machine->driver_data<sbasketb_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( sbasketb_colorram_w )
 {
-	trackfld_state *state = space->machine->driver_data<trackfld_state>();
+	sbasketb_state *state = space->machine->driver_data<sbasketb_state>();
 	state->colorram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
@@ -119,7 +119,7 @@ WRITE8_HANDLER( sbasketb_flipscreen_w )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	trackfld_state *state = machine->driver_data<trackfld_state>();
+	sbasketb_state *state = machine->driver_data<sbasketb_state>();
 	int code = state->videoram[tile_index] + ((state->colorram[tile_index] & 0x20) << 3);
 	int color = state->colorram[tile_index] & 0x0f;
 	int flags = ((state->colorram[tile_index] & 0x40) ? TILE_FLIPX : 0) | ((state->colorram[tile_index] & 0x80) ? TILE_FLIPY : 0);
@@ -129,7 +129,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( sbasketb )
 {
-	trackfld_state *state = machine->driver_data<trackfld_state>();
+	sbasketb_state *state = machine->driver_data<sbasketb_state>();
 
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	tilemap_set_scroll_cols(state->bg_tilemap, 32);
@@ -137,7 +137,7 @@ VIDEO_START( sbasketb )
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	trackfld_state *state = machine->driver_data<trackfld_state>();
+	sbasketb_state *state = machine->driver_data<sbasketb_state>();
 	UINT8 *spriteram = state->spriteram;
 	int offs = (*state->spriteram_select & 0x01) * 0x100;
 	int i;
@@ -173,7 +173,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 VIDEO_UPDATE( sbasketb )
 {
-	trackfld_state *state = screen->machine->driver_data<trackfld_state>();
+	sbasketb_state *state = screen->machine->driver_data<sbasketb_state>();
 	int col;
 
 	for (col = 6; col < 32; col++)

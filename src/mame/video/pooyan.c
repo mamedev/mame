@@ -6,7 +6,7 @@
 
 #include "emu.h"
 #include "video/resnet.h"
-#include "includes/timeplt.h"
+#include "includes/pooyan.h"
 
 /***************************************************************************
 
@@ -97,7 +97,7 @@ PALETTE_INIT( pooyan )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	timeplt_state *state = machine->driver_data<timeplt_state>();
+	pooyan_state *state = machine->driver_data<pooyan_state>();
 	int attr = state->colorram[tile_index];
 	int code = state->videoram[tile_index];
 	int color = attr & 0x0f;
@@ -116,7 +116,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 VIDEO_START( pooyan )
 {
-	timeplt_state *state = machine->driver_data<timeplt_state>();
+	pooyan_state *state = machine->driver_data<pooyan_state>();
 	state->bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 }
 
@@ -130,7 +130,7 @@ VIDEO_START( pooyan )
 
 WRITE8_HANDLER( pooyan_videoram_w )
 {
-	timeplt_state *state = space->machine->driver_data<timeplt_state>();
+	pooyan_state *state = space->machine->driver_data<pooyan_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
@@ -138,7 +138,7 @@ WRITE8_HANDLER( pooyan_videoram_w )
 
 WRITE8_HANDLER( pooyan_colorram_w )
 {
-	timeplt_state *state = space->machine->driver_data<timeplt_state>();
+	pooyan_state *state = space->machine->driver_data<pooyan_state>();
 	state->colorram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
@@ -159,7 +159,7 @@ WRITE8_HANDLER( pooyan_flipscreen_w )
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	timeplt_state *state = machine->driver_data<timeplt_state>();
+	pooyan_state *state = machine->driver_data<pooyan_state>();
 	UINT8 *spriteram = state->spriteram;
 	UINT8 *spriteram_2 = state->spriteram2;
 	int offs;
@@ -194,7 +194,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 VIDEO_UPDATE( pooyan )
 {
-	timeplt_state *state = screen->machine->driver_data<timeplt_state>();
+	pooyan_state *state = screen->machine->driver_data<pooyan_state>();
 
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	draw_sprites(screen->machine, bitmap, cliprect);

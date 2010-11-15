@@ -49,15 +49,16 @@ and 2764 eprom (swapped D3/D4 and D5/D6 data lines)
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
-#include "includes/iremz80.h"
+#include "audio/irem.h"
+#include "includes/travrusa.h"
 
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
-	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE(travrusa_videoram_w) AM_BASE_MEMBER(irem_z80_state, videoram)
+	AM_RANGE(0x8000, 0x8fff) AM_RAM_WRITE(travrusa_videoram_w) AM_BASE_MEMBER(travrusa_state, videoram)
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(travrusa_scroll_x_low_w)
 	AM_RANGE(0xa000, 0xa000) AM_WRITE(travrusa_scroll_x_high_w)
-	AM_RANGE(0xc800, 0xc9ff) AM_WRITEONLY AM_BASE_SIZE_MEMBER(irem_z80_state, spriteram, spriteram_size)
+	AM_RANGE(0xc800, 0xc9ff) AM_WRITEONLY AM_BASE_SIZE_MEMBER(travrusa_state, spriteram, spriteram_size)
 	AM_RANGE(0xd000, 0xd000) AM_WRITE(irem_sound_cmd_w)
 	AM_RANGE(0xd001, 0xd001) AM_WRITE(travrusa_flipscreen_w)	/* + coin counters - not written by shtrider */
 	AM_RANGE(0xd000, 0xd000) AM_READ_PORT("SYSTEM")		/* IN0 */
@@ -290,13 +291,13 @@ GFXDECODE_END
 
 static MACHINE_RESET( travrusa )
 {
-	irem_z80_state *state = machine->driver_data<irem_z80_state>();
+	travrusa_state *state = machine->driver_data<travrusa_state>();
 
 	state->scrollx[0] = 0;
 	state->scrollx[1] = 0;
 }
 
-static MACHINE_CONFIG_START( travrusa, irem_z80_state )
+static MACHINE_CONFIG_START( travrusa, travrusa_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz (?) */

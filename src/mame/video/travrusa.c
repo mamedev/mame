@@ -12,7 +12,7 @@ J Clegg
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/iremz80.h"
+#include "includes/travrusa.h"
 
 /***************************************************************************
 
@@ -197,7 +197,7 @@ PALETTE_INIT( shtrider )
 
 static TILE_GET_INFO( get_tile_info )
 {
-	irem_z80_state *state = machine->driver_data<irem_z80_state>();
+	travrusa_state *state = machine->driver_data<travrusa_state>();
 	UINT8 attr = state->videoram[2 * tile_index + 1];
 	int flags = TILE_FLIPXY((attr & 0x30) >> 4);
 
@@ -220,7 +220,7 @@ static TILE_GET_INFO( get_tile_info )
 
 VIDEO_START( travrusa )
 {
-	irem_z80_state *state = machine->driver_data<irem_z80_state>();
+	travrusa_state *state = machine->driver_data<travrusa_state>();
 
 	state_save_register_global_array(machine, state->scrollx);
 
@@ -242,7 +242,7 @@ VIDEO_START( travrusa )
 
 WRITE8_HANDLER( travrusa_videoram_w )
 {
-	irem_z80_state *state = space->machine->driver_data<irem_z80_state>();
+	travrusa_state *state = space->machine->driver_data<travrusa_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset / 2);
 }
@@ -250,7 +250,7 @@ WRITE8_HANDLER( travrusa_videoram_w )
 
 static void set_scroll( running_machine *machine )
 {
-	irem_z80_state *state = machine->driver_data<irem_z80_state>();
+	travrusa_state *state = machine->driver_data<travrusa_state>();
 	int i;
 
 	for (i = 0; i <= 2; i++)
@@ -261,14 +261,14 @@ static void set_scroll( running_machine *machine )
 
 WRITE8_HANDLER( travrusa_scroll_x_low_w )
 {
-	irem_z80_state *state = space->machine->driver_data<irem_z80_state>();
+	travrusa_state *state = space->machine->driver_data<travrusa_state>();
 	state->scrollx[0] = data;
 	set_scroll(space->machine);
 }
 
 WRITE8_HANDLER( travrusa_scroll_x_high_w )
 {
-	irem_z80_state *state = space->machine->driver_data<irem_z80_state>();
+	travrusa_state *state = space->machine->driver_data<travrusa_state>();
 	state->scrollx[1] = data;
 	set_scroll(space->machine);
 }
@@ -295,7 +295,7 @@ WRITE8_HANDLER( travrusa_flipscreen_w )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect)
 {
-	irem_z80_state *state = machine->driver_data<irem_z80_state>();
+	travrusa_state *state = machine->driver_data<travrusa_state>();
 	int offs;
 	static const rectangle spritevisiblearea =
 	{
@@ -342,7 +342,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 VIDEO_UPDATE( travrusa )
 {
-	irem_z80_state *state = screen->machine->driver_data<irem_z80_state>();
+	travrusa_state *state = screen->machine->driver_data<travrusa_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, TILEMAP_DRAW_LAYER1, 0);
 	draw_sprites(screen->machine, bitmap,cliprect);
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, TILEMAP_DRAW_LAYER0, 0);

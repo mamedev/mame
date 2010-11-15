@@ -38,36 +38,42 @@ write
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
-#include "includes/espial.h"
+#include "includes/marineb.h"
 
+
+static TIMER_CALLBACK( interrupt_disable )
+{
+	marineb_state *state = machine->driver_data<marineb_state>();
+	//interrupt_enable = 0;
+	cpu_interrupt_enable(state->maincpu, 0);
+}
 
 static MACHINE_RESET( marineb )
 {
-	espial_state *state = machine->driver_data<espial_state>();
+	marineb_state *state = machine->driver_data<marineb_state>();
 
 	state->palette_bank = 0;
 	state->column_scroll = 0;
 	state->flipscreen_x = 0;
 	state->flipscreen_y = 0;
 	state->marineb_active_low_flipscreen = 0;
-	MACHINE_RESET_CALL(espial);
+
+	/* we must start with NMI interrupts disabled */
+	timer_call_after_resynch(machine, NULL, 0, interrupt_disable);
 }
 
 static MACHINE_RESET( springer )
 {
-	espial_state *state = machine->driver_data<espial_state>();
+	marineb_state *state = machine->driver_data<marineb_state>();
 
-	state->palette_bank = 0;
-	state->column_scroll = 0;
-	state->flipscreen_x = 0;
-	state->flipscreen_y = 0;
+	MACHINE_RESET_CALL( marineb );
+
 	state->marineb_active_low_flipscreen = 1;
-	MACHINE_RESET_CALL(espial);
 }
 
 static MACHINE_START( marineb )
 {
-	espial_state *state = machine->driver_data<espial_state>();
+	marineb_state *state = machine->driver_data<marineb_state>();
 
 	state->maincpu = machine->device("maincpu");
 	state->audiocpu = NULL;
@@ -78,9 +84,9 @@ static MACHINE_START( marineb )
 static ADDRESS_MAP_START( marineb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM
-	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(marineb_videoram_w) AM_BASE_MEMBER(espial_state, videoram)
-	AM_RANGE(0x8c00, 0x8c3f) AM_RAM AM_BASE_MEMBER(espial_state, spriteram)  /* Hoccer only */
-	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(marineb_colorram_w) AM_BASE_MEMBER(espial_state, colorram)
+	AM_RANGE(0x8800, 0x8bff) AM_RAM_WRITE(marineb_videoram_w) AM_BASE_MEMBER(marineb_state, videoram)
+	AM_RANGE(0x8c00, 0x8c3f) AM_RAM AM_BASE_MEMBER(marineb_state, spriteram)  /* Hoccer only */
+	AM_RANGE(0x9000, 0x93ff) AM_RAM_WRITE(marineb_colorram_w) AM_BASE_MEMBER(marineb_state, colorram)
 	AM_RANGE(0x9800, 0x9800) AM_WRITE(marineb_column_scroll_w)
 	AM_RANGE(0x9a00, 0x9a00) AM_WRITE(marineb_palette_bank_0_w)
 	AM_RANGE(0x9c00, 0x9c00) AM_WRITE(marineb_palette_bank_1_w)
@@ -525,7 +531,7 @@ static GFXDECODE_START( hopprobo )
 GFXDECODE_END
 
 
-static MACHINE_CONFIG_START( marineb, espial_state )
+static MACHINE_CONFIG_START( marineb, marineb_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", Z80, 3072000)	/* 3.072 MHz */
@@ -547,7 +553,7 @@ static MACHINE_CONFIG_START( marineb, espial_state )
 	MDRV_GFXDECODE(marineb)
 	MDRV_PALETTE_LENGTH(256)
 
-	MDRV_PALETTE_INIT(espial)
+	MDRV_PALETTE_INIT(marineb)
 	MDRV_VIDEO_START(marineb)
 	MDRV_VIDEO_UPDATE(marineb)
 

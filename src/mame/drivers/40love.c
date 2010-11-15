@@ -222,11 +222,12 @@ Notes - Has jumper setting for 122HZ or 61HZ)
 #include "sound/ay8910.h"
 #include "sound/dac.h"
 #include "sound/msm5232.h"
-#include "includes/buggychl.h"
+#include "machine/buggychl.h"
+#include "includes/40love.h"
 
 static TIMER_CALLBACK( nmi_callback )
 {
-	buggychl_state *state = machine->driver_data<buggychl_state>();
+	fortyl_state *state = machine->driver_data<fortyl_state>();
 	if (state->sound_nmi_enable)
 		cpu_set_input_line(state->audiocpu, INPUT_LINE_NMI, PULSE_LINE);
 	else
@@ -241,13 +242,13 @@ static WRITE8_HANDLER( sound_command_w )
 
 static WRITE8_HANDLER( nmi_disable_w )
 {
-	buggychl_state *state = space->machine->driver_data<buggychl_state>();
+	fortyl_state *state = space->machine->driver_data<fortyl_state>();
 	state->sound_nmi_enable = 0;
 }
 
 static WRITE8_HANDLER( nmi_enable_w )
 {
-	buggychl_state *state = space->machine->driver_data<buggychl_state>();
+	fortyl_state *state = space->machine->driver_data<fortyl_state>();
 	state->sound_nmi_enable = 1;
 	if (state->pending_nmi)
 	{
@@ -266,21 +267,6 @@ static WRITE8_HANDLER( fortyl_coin_counter_w )
 #endif
 
 
-static READ8_HANDLER( fortyl_mcu_r )
-{
-	return buggychl_mcu_r(space, offset);
-}
-
-static READ8_HANDLER( fortyl_mcu_status_r )
-{
-	return buggychl_mcu_status_r(space, offset);
-}
-
-static WRITE8_HANDLER( fortyl_mcu_w )
-{
-	buggychl_mcu_w(space, offset, data);
-}
-
 static WRITE8_HANDLER( bank_select_w )
 {
 
@@ -295,15 +281,25 @@ static WRITE8_HANDLER( bank_select_w )
 
 static WRITE8_HANDLER( pix1_w )
 {
-	buggychl_state *state = space->machine->driver_data<buggychl_state>();
+	fortyl_state *state = space->machine->driver_data<fortyl_state>();
 //  if (data > 7)
 //      logerror("pix1 = %2x\n", data);
 
 	state->pix1 = data;
 }
+
+static WRITE8_DEVICE_HANDLER( pix1_mcu_w )
+{
+	fortyl_state *state = device->machine->driver_data<fortyl_state>();
+//  if (data > 7)
+//      logerror("pix1 = %2x\n", data);
+
+	state->pix1 = data;
+}
+
 static WRITE8_HANDLER( pix2_w )
 {
-	buggychl_state *state = space->machine->driver_data<buggychl_state>();
+	fortyl_state *state = space->machine->driver_data<fortyl_state>();
 //  if ((data!=0x00) && (data != 0xff))
 //      logerror("pix2 = %2x\n", data);
 
@@ -314,14 +310,14 @@ static WRITE8_HANDLER( pix2_w )
 #if 0
 static READ8_HANDLER( pix1_r )
 {
-	buggychl_state *state = space->machine->driver_data<buggychl_state>();
+	fortyl_state *state = space->machine->driver_data<fortyl_state>();
 	return state->pix1;
 }
 #endif
 
 static READ8_HANDLER( pix2_r )
 {
-	buggychl_state *state = space->machine->driver_data<buggychl_state>();
+	fortyl_state *state = space->machine->driver_data<fortyl_state>();
 	int res;
 	int d1 = state->pix1 & 7;
 
@@ -399,7 +395,7 @@ static const UINT8 mcu_data2[0x80] =
 
 static WRITE8_HANDLER( undoukai_mcu_w )
 {
-	buggychl_state *state = space->machine->driver_data<buggychl_state>();
+	fortyl_state *state = space->machine->driver_data<fortyl_state>();
 	int ram_adr = state->mcu_ram[0x1b5] * 0x100 + state->mcu_ram[0x1b4];
 
 	int d, i;
@@ -559,7 +555,7 @@ static WRITE8_HANDLER( undoukai_mcu_w )
 
 static READ8_HANDLER( undoukai_mcu_r )
 {
-	buggychl_state *state = space->machine->driver_data<buggychl_state>();
+	fortyl_state *state = space->machine->driver_data<fortyl_state>();
 
 	//  logerror("mcu_r %02x\n", state->from_mcu);
 
@@ -577,7 +573,7 @@ static READ8_HANDLER( undoukai_mcu_status_r )
 
 static DRIVER_INIT( undoukai )
 {
-	buggychl_state *state = machine->driver_data<buggychl_state>();
+	fortyl_state *state = machine->driver_data<fortyl_state>();
 	UINT8 *ROM = memory_region(machine, "maincpu");
 	memory_configure_bank(machine, "bank1", 0, 2, &ROM[0x10000], 0x2000);
 
@@ -589,7 +585,7 @@ static DRIVER_INIT( undoukai )
 
 static DRIVER_INIT( 40love )
 {
-	buggychl_state *state = machine->driver_data<buggychl_state>();
+	fortyl_state *state = machine->driver_data<fortyl_state>();
 	UINT8 *ROM = memory_region(machine, "maincpu");
 	memory_configure_bank(machine, "bank1", 0, 2, &ROM[0x10000], 0x2000);
 
@@ -615,20 +611,20 @@ static DRIVER_INIT( 40love )
 
 static READ8_HANDLER( from_snd_r )
 {
-	buggychl_state *state = space->machine->driver_data<buggychl_state>();
+	fortyl_state *state = space->machine->driver_data<fortyl_state>();
 	state->snd_flag = 0;
 	return state->snd_data;
 }
 
 static READ8_HANDLER( snd_flag_r )
 {
-	buggychl_state *state = space->machine->driver_data<buggychl_state>();
+	fortyl_state *state = space->machine->driver_data<fortyl_state>();
 	return state->snd_flag | 0xfd;
 }
 
 static WRITE8_HANDLER( to_main_w )
 {
-	buggychl_state *state = space->machine->driver_data<buggychl_state>();
+	fortyl_state *state = space->machine->driver_data<fortyl_state>();
 	state->snd_data = data;
 	state->snd_flag = 2;
 }
@@ -638,8 +634,8 @@ static WRITE8_HANDLER( to_main_w )
 static ADDRESS_MAP_START( 40love_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x87ff) AM_RAM	/* M5517P on main board */
-	AM_RANGE(0x8800, 0x8800) AM_READWRITE(fortyl_mcu_r, fortyl_mcu_w)
-	AM_RANGE(0x8801, 0x8801) AM_READWRITE(fortyl_mcu_status_r, pix1_w)		//pixel layer related
+	AM_RANGE(0x8800, 0x8800) AM_DEVREADWRITE("bmcu", buggychl_mcu_r, buggychl_mcu_w)
+	AM_RANGE(0x8801, 0x8801) AM_DEVREADWRITE("bmcu", buggychl_mcu_status_r, pix1_mcu_w)		//pixel layer related
 	AM_RANGE(0x8802, 0x8802) AM_WRITE(bank_select_w)
 	AM_RANGE(0x8803, 0x8803) AM_READWRITE(pix2_r, pix2_w)		//pixel layer related
 	AM_RANGE(0x8804, 0x8804) AM_READWRITE(from_snd_r, sound_command_w)
@@ -651,11 +647,11 @@ static ADDRESS_MAP_START( 40love_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x880b, 0x880b) AM_READ_PORT("P2")
 	AM_RANGE(0x880c, 0x880c) AM_READ_PORT("DSW1") AM_WRITE(fortyl_pixram_sel_w) /* pixram bank select */
 	AM_RANGE(0x880d, 0x880d) AM_READ_PORT("DSW2") AM_WRITENOP /* unknown */
-	AM_RANGE(0x9000, 0x97ff) AM_READWRITE(fortyl_bg_videoram_r, fortyl_bg_videoram_w) AM_BASE_MEMBER(buggychl_state, videoram)		/* #1 M5517P on video board */
-	AM_RANGE(0x9800, 0x983f) AM_RAM AM_BASE_MEMBER(buggychl_state, video_ctrl)			/* video control area */
-	AM_RANGE(0x9840, 0x987f) AM_RAM AM_BASE_SIZE_MEMBER(buggychl_state, spriteram, spriteram_size)	/* sprites part 1 */
-	AM_RANGE(0x9880, 0x98bf) AM_READWRITE(fortyl_bg_colorram_r, fortyl_bg_colorram_w) AM_BASE_MEMBER(buggychl_state, colorram)		/* background attributes (2 bytes per line) */
-	AM_RANGE(0x98c0, 0x98ff) AM_RAM AM_BASE_SIZE_MEMBER(buggychl_state, spriteram2, spriteram2_size)/* sprites part 2 */
+	AM_RANGE(0x9000, 0x97ff) AM_READWRITE(fortyl_bg_videoram_r, fortyl_bg_videoram_w) AM_BASE_MEMBER(fortyl_state, videoram)		/* #1 M5517P on video board */
+	AM_RANGE(0x9800, 0x983f) AM_RAM AM_BASE_MEMBER(fortyl_state, video_ctrl)			/* video control area */
+	AM_RANGE(0x9840, 0x987f) AM_RAM AM_BASE_SIZE_MEMBER(fortyl_state, spriteram, spriteram_size)	/* sprites part 1 */
+	AM_RANGE(0x9880, 0x98bf) AM_READWRITE(fortyl_bg_colorram_r, fortyl_bg_colorram_w) AM_BASE_MEMBER(fortyl_state, colorram)		/* background attributes (2 bytes per line) */
+	AM_RANGE(0x98c0, 0x98ff) AM_RAM AM_BASE_SIZE_MEMBER(fortyl_state, spriteram2, spriteram2_size)/* sprites part 2 */
 	AM_RANGE(0xa000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xffff) AM_READWRITE(fortyl_pixram_r, fortyl_pixram_w) /* banked pixel layer */
 ADDRESS_MAP_END
@@ -663,7 +659,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( undoukai_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
-	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_BASE_MEMBER(buggychl_state, mcu_ram) /* M5517P on main board */
+	AM_RANGE(0xa000, 0xa7ff) AM_RAM AM_BASE_MEMBER(fortyl_state, mcu_ram) /* M5517P on main board */
 	AM_RANGE(0xa800, 0xa800) AM_READWRITE(undoukai_mcu_r, undoukai_mcu_w)
 	AM_RANGE(0xa801, 0xa801) AM_READWRITE(undoukai_mcu_status_r, pix1_w)		//pixel layer related
 	AM_RANGE(0xa802, 0xa802) AM_WRITE(bank_select_w)
@@ -677,17 +673,17 @@ static ADDRESS_MAP_START( undoukai_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xa80b, 0xa80b) AM_READ_PORT("P2")
 	AM_RANGE(0xa80c, 0xa80c) AM_READ_PORT("DSW1") AM_WRITE(fortyl_pixram_sel_w) /* pixram bank select */
 	AM_RANGE(0xa80d, 0xa80d) AM_READ_PORT("DSW2") AM_WRITENOP /* unknown */
-	AM_RANGE(0xb000, 0xb7ff) AM_READWRITE(fortyl_bg_videoram_r, fortyl_bg_videoram_w) AM_BASE_MEMBER(buggychl_state, videoram)		/* #1 M5517P on video board */
-	AM_RANGE(0xb800, 0xb83f) AM_RAM AM_BASE_MEMBER(buggychl_state, video_ctrl)			/* video control area */
-	AM_RANGE(0xb840, 0xb87f) AM_RAM AM_BASE_SIZE_MEMBER(buggychl_state, spriteram, spriteram_size)	/* sprites part 1 */
-	AM_RANGE(0xb880, 0xb8bf) AM_READWRITE(fortyl_bg_colorram_r, fortyl_bg_colorram_w) AM_BASE_MEMBER(buggychl_state, colorram)		/* background attributes (2 bytes per line) */
-	AM_RANGE(0xb8e0, 0xb8ff) AM_RAM AM_BASE_SIZE_MEMBER(buggychl_state, spriteram2, spriteram2_size) /* sprites part 2 */
+	AM_RANGE(0xb000, 0xb7ff) AM_READWRITE(fortyl_bg_videoram_r, fortyl_bg_videoram_w) AM_BASE_MEMBER(fortyl_state, videoram)		/* #1 M5517P on video board */
+	AM_RANGE(0xb800, 0xb83f) AM_RAM AM_BASE_MEMBER(fortyl_state, video_ctrl)			/* video control area */
+	AM_RANGE(0xb840, 0xb87f) AM_RAM AM_BASE_SIZE_MEMBER(fortyl_state, spriteram, spriteram_size)	/* sprites part 1 */
+	AM_RANGE(0xb880, 0xb8bf) AM_READWRITE(fortyl_bg_colorram_r, fortyl_bg_colorram_w) AM_BASE_MEMBER(fortyl_state, colorram)		/* background attributes (2 bytes per line) */
+	AM_RANGE(0xb8e0, 0xb8ff) AM_RAM AM_BASE_SIZE_MEMBER(fortyl_state, spriteram2, spriteram2_size) /* sprites part 2 */
 	AM_RANGE(0xc000, 0xffff) AM_READWRITE(fortyl_pixram_r, fortyl_pixram_w)
 ADDRESS_MAP_END
 
 static MACHINE_RESET( ta7630 )
 {
-	buggychl_state *state = machine->driver_data<buggychl_state>();
+	fortyl_state *state = machine->driver_data<fortyl_state>();
 	int i;
 
 	double db			= 0.0;
@@ -712,7 +708,7 @@ static MACHINE_RESET( ta7630 )
 
 static WRITE8_DEVICE_HANDLER( sound_control_0_w )
 {
-	buggychl_state *state = device->machine->driver_data<buggychl_state>();
+	fortyl_state *state = device->machine->driver_data<fortyl_state>();
 	state->snd_ctrl0 = data & 0xff;
 //  popmessage("SND0 0=%02x 1=%02x 2=%02x 3=%02x", state->snd_ctrl0, state->snd_ctrl1, state->snd_ctrl2, state->snd_ctrl3);
 
@@ -725,7 +721,7 @@ static WRITE8_DEVICE_HANDLER( sound_control_0_w )
 }
 static WRITE8_DEVICE_HANDLER( sound_control_1_w )
 {
-	buggychl_state *state = device->machine->driver_data<buggychl_state>();
+	fortyl_state *state = device->machine->driver_data<fortyl_state>();
 	state->snd_ctrl1 = data & 0xff;
 //  popmessage("SND1 0=%02x 1=%02x 2=%02x 3=%02x", state->snd_ctrl0, state->snd_ctrl1, state->snd_ctrl2, state->snd_ctrl3);
 	sound_set_output_gain(device, 4, state->vol_ctrl[(state->snd_ctrl1 >> 4) & 15] / 100.0);	/* group2 from msm5232 */
@@ -736,7 +732,7 @@ static WRITE8_DEVICE_HANDLER( sound_control_1_w )
 
 static WRITE8_DEVICE_HANDLER( sound_control_2_w )
 {
-	buggychl_state *state = device->machine->driver_data<buggychl_state>();
+	fortyl_state *state = device->machine->driver_data<fortyl_state>();
 	int i;
 	state->snd_ctrl2 = data & 0xff;
 //  popmessage("SND2 0=%02x 1=%02x 2=%02x 3=%02x", state->snd_ctrl0, state->snd_ctrl1, state->snd_ctrl2, state->snd_ctrl3);
@@ -747,7 +743,7 @@ static WRITE8_DEVICE_HANDLER( sound_control_2_w )
 
 static WRITE8_DEVICE_HANDLER( sound_control_3_w ) /* unknown */
 {
-	buggychl_state *state = device->machine->driver_data<buggychl_state>();
+	fortyl_state *state = device->machine->driver_data<fortyl_state>();
 	state->snd_ctrl3 = data & 0xff;
 //  popmessage("SND3 0=%02x 1=%02x 2=%02x 3=%02x", state->snd_ctrl0, state->snd_ctrl1, state->snd_ctrl2, state->snd_ctrl3);
 }
@@ -764,18 +760,6 @@ static ADDRESS_MAP_START( sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xdc00, 0xdc00) AM_WRITE(nmi_disable_w)
 	AM_RANGE(0xde00, 0xde00) AM_READNOP AM_DEVWRITE("dac", dac_signed_w)		/* signed 8-bit DAC - unknown read */
 	AM_RANGE(0xe000, 0xefff) AM_ROM /* space for diagnostics ROM */
-ADDRESS_MAP_END
-
-static ADDRESS_MAP_START( mcu_map, ADDRESS_SPACE_PROGRAM, 8 )
-	ADDRESS_MAP_GLOBAL_MASK(0x7ff)
-	AM_RANGE(0x0000, 0x0000) AM_READWRITE(buggychl_68705_port_a_r, buggychl_68705_port_a_w)
-	AM_RANGE(0x0001, 0x0001) AM_READWRITE(buggychl_68705_port_b_r, buggychl_68705_port_b_w)
-	AM_RANGE(0x0002, 0x0002) AM_READWRITE(buggychl_68705_port_c_r, buggychl_68705_port_c_w)
-	AM_RANGE(0x0004, 0x0004) AM_WRITE(buggychl_68705_ddr_a_w)
-	AM_RANGE(0x0005, 0x0005) AM_WRITE(buggychl_68705_ddr_b_w)
-	AM_RANGE(0x0006, 0x0006) AM_WRITE(buggychl_68705_ddr_c_w)
-	AM_RANGE(0x0010, 0x007f) AM_RAM
-	AM_RANGE(0x0080, 0x07ff) AM_ROM
 ADDRESS_MAP_END
 
 
@@ -994,12 +978,11 @@ static const msm5232_interface msm5232_config =
 
 /*******************************************************************************/
 
-static MACHINE_START( common )
+static MACHINE_START( 40love )
 {
-	buggychl_state *state = machine->driver_data<buggychl_state>();
+	fortyl_state *state = machine->driver_data<fortyl_state>();
 
 	state->audiocpu = machine->device("audiocpu");
-	state->mcu = machine->device("mcu");
 
 	/* video */
 	state_save_register_global(machine, state->pix1);
@@ -1016,33 +999,11 @@ static MACHINE_START( common )
 	state_save_register_global(machine, state->snd_ctrl3);
 }
 
-static MACHINE_START( 40love )
-{
-	buggychl_state *state = machine->driver_data<buggychl_state>();
-
-	MACHINE_START_CALL(common);
-
-	/* mcu */
-	state_save_register_global(machine, state->from_main);
-	state_save_register_global(machine, state->from_mcu);
-	state_save_register_global(machine, state->mcu_sent);
-	state_save_register_global(machine, state->main_sent);
-	state_save_register_global(machine, state->port_a_in);
-	state_save_register_global(machine, state->port_a_out);
-	state_save_register_global(machine, state->ddr_a);
-	state_save_register_global(machine, state->port_b_in);
-	state_save_register_global(machine, state->port_b_out);
-	state_save_register_global(machine, state->ddr_b);
-	state_save_register_global(machine, state->port_c_in);
-	state_save_register_global(machine, state->port_c_out);
-	state_save_register_global(machine, state->ddr_c);
-}
-
 static MACHINE_START( undoukai )
 {
-	buggychl_state *state = machine->driver_data<buggychl_state>();
+	fortyl_state *state = machine->driver_data<fortyl_state>();
 
-	MACHINE_START_CALL(common);
+	MACHINE_START_CALL(40love);
 
 	/* fake mcu */
 	state_save_register_global(machine, state->from_mcu);
@@ -1055,7 +1016,7 @@ static MACHINE_START( undoukai )
 
 static MACHINE_RESET( common )
 {
-	buggychl_state *state = machine->driver_data<buggychl_state>();
+	fortyl_state *state = machine->driver_data<fortyl_state>();
 
 	MACHINE_RESET_CALL(ta7630);
 
@@ -1076,31 +1037,14 @@ static MACHINE_RESET( common )
 
 static MACHINE_RESET( 40love )
 {
-	buggychl_state *state = machine->driver_data<buggychl_state>();
-
 	cputag_set_input_line(machine, "mcu", 0, CLEAR_LINE);
 
 	MACHINE_RESET_CALL(common);
-
-	/* mcu */
-	state->mcu_sent = 0;
-	state->main_sent = 0;
-	state->from_main = 0;
-	state->from_mcu = 0;
-	state->port_a_in = 0;
-	state->port_a_out = 0;
-	state->ddr_a = 0;
-	state->port_b_in = 0;
-	state->port_b_out = 0;
-	state->ddr_b = 0;
-	state->port_c_in = 0;
-	state->port_c_out = 0;
-	state->ddr_c = 0;
 }
 
 static MACHINE_RESET( undoukai )
 {
-	buggychl_state *state = machine->driver_data<buggychl_state>();
+	fortyl_state *state = machine->driver_data<fortyl_state>();
 	int i;
 
 	MACHINE_RESET_CALL(common);
@@ -1118,7 +1062,7 @@ static MACHINE_RESET( undoukai )
 	}
 }
 
-static MACHINE_CONFIG_START( 40love, buggychl_state )
+static MACHINE_CONFIG_START( 40love, fortyl_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80,8000000/2) /* OK */
@@ -1130,7 +1074,8 @@ static MACHINE_CONFIG_START( 40love, buggychl_state )
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold,2*60)	/* source/number of IRQs is unknown */
 
 	MDRV_CPU_ADD("mcu",M68705,18432000/6) /* OK */
-	MDRV_CPU_PROGRAM_MAP(mcu_map)
+	MDRV_CPU_PROGRAM_MAP(buggychl_mcu_map)
+	MDRV_DEVICE_ADD("bmcu", BUGGYCHL_MCU, 0)
 
 	MDRV_QUANTUM_TIME(HZ(6000))	/* high interleave to ensure proper synchronization of CPUs */
 	MDRV_MACHINE_START(40love)
@@ -1175,7 +1120,7 @@ static MACHINE_CONFIG_START( 40love, buggychl_state )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
-static MACHINE_CONFIG_START( undoukai, buggychl_state )
+static MACHINE_CONFIG_START( undoukai, fortyl_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu",Z80,8000000/2)
@@ -1187,7 +1132,8 @@ static MACHINE_CONFIG_START( undoukai, buggychl_state )
 	MDRV_CPU_PERIODIC_INT(irq0_line_hold,2*60)	/* source/number of IRQs is unknown */
 
 //  MDRV_CPU_ADD("mcu",M68705,18432000/6)
-//  MDRV_CPU_PROGRAM_MAP(mcu_map)
+//  MDRV_CPU_PROGRAM_MAP(buggychl_mcu_map)
+//  MDRV_DEVICE_ADD("bmcu", BUGGYCHL_MCU, 0)
 
 	MDRV_MACHINE_START(undoukai)
 	MDRV_MACHINE_RESET(undoukai)	/* init machine */

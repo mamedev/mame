@@ -3,7 +3,7 @@
 */
 
 #include "emu.h"
-#include "includes/buggychl.h"
+#include "includes/40love.h"
 
 
 /*
@@ -63,7 +63,7 @@ colorram format (2 bytes per one tilemap character line, 8 pixels height):
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	buggychl_state *state = machine->driver_data<buggychl_state>();
+	fortyl_state *state = machine->driver_data<fortyl_state>();
 	int tile_number = state->videoram[tile_index];
 	int tile_attrib = state->colorram[(tile_index / 64) * 2];
 	int tile_h_bank = (tile_attrib & 0x40) << 3;	/* 0x40->0x200 */
@@ -88,7 +88,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static STATE_POSTLOAD( redraw_pixels )
 {
-	buggychl_state *state = machine->driver_data<buggychl_state>();
+	fortyl_state *state = machine->driver_data<fortyl_state>();
 	state->pix_redraw = 1;
 	tilemap_mark_all_tiles_dirty(state->bg_tilemap);
 }
@@ -102,7 +102,7 @@ static STATE_POSTLOAD( redraw_pixels )
 
 VIDEO_START( fortyl )
 {
-	buggychl_state *state = machine->driver_data<buggychl_state>();
+	fortyl_state *state = machine->driver_data<fortyl_state>();
 	state->pixram1 = auto_alloc_array_clear(machine, UINT8, 0x4000);
 	state->pixram2 = auto_alloc_array_clear(machine, UINT8, 0x4000);
 
@@ -135,7 +135,7 @@ VIDEO_START( fortyl )
 
 static void fortyl_set_scroll_x( running_machine *machine, int offset )
 {
-	buggychl_state *state = machine->driver_data<buggychl_state>();
+	fortyl_state *state = machine->driver_data<fortyl_state>();
 	int i = offset & ~1;
 	int x = ((state->colorram[i] & 0x80) << 1) | state->colorram[i + 1];	/* 9 bits signed */
 
@@ -152,7 +152,7 @@ static void fortyl_set_scroll_x( running_machine *machine, int offset )
 
 WRITE8_HANDLER( fortyl_pixram_sel_w )
 {
-	buggychl_state *state = space->machine->driver_data<buggychl_state>();
+	fortyl_state *state = space->machine->driver_data<fortyl_state>();
 	int offs;
 	int f = data & 0x01;
 
@@ -171,7 +171,7 @@ WRITE8_HANDLER( fortyl_pixram_sel_w )
 
 READ8_HANDLER( fortyl_pixram_r )
 {
-	buggychl_state *state = space->machine->driver_data<buggychl_state>();
+	fortyl_state *state = space->machine->driver_data<fortyl_state>();
 	if (state->pixram_sel)
 		return state->pixram2[offset];
 	else
@@ -180,7 +180,7 @@ READ8_HANDLER( fortyl_pixram_r )
 
 static void fortyl_plot_pix( running_machine *machine, int offset )
 {
-	buggychl_state *state = machine->driver_data<buggychl_state>();
+	fortyl_state *state = machine->driver_data<fortyl_state>();
 	int x, y, i, c, d1, d2;
 
 	x = (offset & 0x1f) * 8;
@@ -209,7 +209,7 @@ static void fortyl_plot_pix( running_machine *machine, int offset )
 
 WRITE8_HANDLER( fortyl_pixram_w )
 {
-	buggychl_state *state = space->machine->driver_data<buggychl_state>();
+	fortyl_state *state = space->machine->driver_data<fortyl_state>();
 	if (state->pixram_sel)
 		state->pixram2[offset] = data;
 	else
@@ -221,20 +221,20 @@ WRITE8_HANDLER( fortyl_pixram_w )
 
 WRITE8_HANDLER( fortyl_bg_videoram_w )
 {
-	buggychl_state *state = space->machine->driver_data<buggychl_state>();
+	fortyl_state *state = space->machine->driver_data<fortyl_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 READ8_HANDLER( fortyl_bg_videoram_r )
 {
-	buggychl_state *state = space->machine->driver_data<buggychl_state>();
+	fortyl_state *state = space->machine->driver_data<fortyl_state>();
 	return state->videoram[offset];
 }
 
 WRITE8_HANDLER( fortyl_bg_colorram_w )
 {
-	buggychl_state *state = space->machine->driver_data<buggychl_state>();
+	fortyl_state *state = space->machine->driver_data<fortyl_state>();
 	if (state->colorram[offset] != data)
 	{
 		int i;
@@ -249,7 +249,7 @@ WRITE8_HANDLER( fortyl_bg_colorram_w )
 
 READ8_HANDLER( fortyl_bg_colorram_r )
 {
-	buggychl_state *state = space->machine->driver_data<buggychl_state>();
+	fortyl_state *state = space->machine->driver_data<fortyl_state>();
 	return state->colorram[offset];
 }
 
@@ -276,7 +276,7 @@ spriteram format (4 bytes per sprite):
 
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	buggychl_state *state = machine->driver_data<buggychl_state>();
+	fortyl_state *state = machine->driver_data<fortyl_state>();
 	UINT8 *spriteram = state->spriteram;
 	UINT8 *spriteram_2 = state->spriteram2;
 	int offs;
@@ -340,7 +340,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 static void draw_pixram( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	buggychl_state *state = machine->driver_data<buggychl_state>();
+	fortyl_state *state = machine->driver_data<fortyl_state>();
 	int offs;
 	int f = state->flipscreen ^ 1;
 
@@ -360,7 +360,7 @@ static void draw_pixram( running_machine *machine, bitmap_t *bitmap, const recta
 
 VIDEO_UPDATE( fortyl )
 {
-	buggychl_state *state = screen->machine->driver_data<buggychl_state>();
+	fortyl_state *state = screen->machine->driver_data<fortyl_state>();
 	draw_pixram(screen->machine, bitmap, cliprect);
 
 	tilemap_set_scrolldy(state->bg_tilemap, - state->video_ctrl[1] + 1, - state->video_ctrl[1] - 1 );

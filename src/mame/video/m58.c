@@ -5,8 +5,8 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/iremz80.h"
 #include "video/resnet.h"
+#include "includes/m58.h"
 
 #define SCROLL_PANEL_WIDTH  (14*4)
 #define RADAR_PALETTE_BASE	(256)
@@ -105,7 +105,7 @@ PALETTE_INIT( yard )
 
 WRITE8_HANDLER( yard_videoram_w )
 {
-	irem_z80_state *state = space->machine->driver_data<irem_z80_state>();
+	m58_state *state = space->machine->driver_data<m58_state>();
 
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset / 2);
@@ -114,7 +114,7 @@ WRITE8_HANDLER( yard_videoram_w )
 
 WRITE8_HANDLER( yard_scroll_panel_w )
 {
-	irem_z80_state *state = space->machine->driver_data<irem_z80_state>();
+	m58_state *state = space->machine->driver_data<m58_state>();
 
 	int sx,sy,i;
 
@@ -147,7 +147,7 @@ WRITE8_HANDLER( yard_scroll_panel_w )
 
 static TILE_GET_INFO( yard_get_bg_tile_info )
 {
-	irem_z80_state *state = machine->driver_data<irem_z80_state>();
+	m58_state *state = machine->driver_data<m58_state>();
 
 	int offs = tile_index * 2;
 	int attr = state->videoram[offs + 1];
@@ -178,7 +178,7 @@ static UINT32 yard_tilemap_scan_rows( UINT32 col, UINT32 row, UINT32 num_cols, U
 
 VIDEO_START( yard )
 {
-	irem_z80_state *state = machine->driver_data<irem_z80_state>();
+	m58_state *state = machine->driver_data<m58_state>();
 
 	int width = machine->primary_screen->width();
 	int height = machine->primary_screen->height();
@@ -221,7 +221,7 @@ WRITE8_HANDLER( yard_flipscreen_w )
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	irem_z80_state *state = machine->driver_data<irem_z80_state>();
+	m58_state *state = machine->driver_data<m58_state>();
 	int offs;
 	const rectangle &visarea = machine->primary_screen->visible_area();
 
@@ -276,7 +276,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 static void draw_panel( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	irem_z80_state *state = machine->driver_data<irem_z80_state>();
+	m58_state *state = machine->driver_data<m58_state>();
 
 	if (!*state->yard_score_panel_disabled)
 	{
@@ -314,7 +314,7 @@ static void draw_panel( running_machine *machine, bitmap_t *bitmap, const rectan
 
 VIDEO_UPDATE( yard )
 {
-	irem_z80_state *state = screen->machine->driver_data<irem_z80_state>();
+	m58_state *state = screen->machine->driver_data<m58_state>();
 
 	tilemap_set_scrollx(state->bg_tilemap, 0, (*state->yard_scroll_x_high * 0x100) + *state->yard_scroll_x_low);
 	tilemap_set_scrolly(state->bg_tilemap, 0, *state->yard_scroll_y_low);

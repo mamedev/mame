@@ -5,8 +5,8 @@
 ***************************************************************************/
 
 #include "emu.h"
-#include "includes/iremz80.h"
 #include "video/resnet.h"
+#include "includes/m52.h"
 
 #define BGHEIGHT 64
 
@@ -116,7 +116,7 @@ PALETTE_INIT( m52 )
 
 static TILE_GET_INFO( get_tile_info )
 {
-	irem_z80_state *state = machine->driver_data<irem_z80_state>();
+	m52_state *state = machine->driver_data<m52_state>();
 	UINT8 video = state->videoram[tile_index];
 	UINT8 color = state->colorram[tile_index];
 
@@ -148,7 +148,7 @@ static TILE_GET_INFO( get_tile_info )
 
 VIDEO_START( m52 )
 {
-	irem_z80_state *state = machine->driver_data<irem_z80_state>();
+	m52_state *state = machine->driver_data<m52_state>();
 
 	state->bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
 
@@ -174,7 +174,7 @@ VIDEO_START( m52 )
 
 WRITE8_HANDLER( m52_scroll_w )
 {
-	irem_z80_state *state = space->machine->driver_data<irem_z80_state>();
+	m52_state *state = space->machine->driver_data<m52_state>();
 /*
     According to the schematics there is only one video register that holds the X scroll value
     with a NAND gate on the V64 and V128 lines to control when it's read, and when
@@ -198,7 +198,7 @@ WRITE8_HANDLER( m52_scroll_w )
 
 WRITE8_HANDLER( m52_videoram_w )
 {
-	irem_z80_state *state = space->machine->driver_data<irem_z80_state>();
+	m52_state *state = space->machine->driver_data<m52_state>();
 
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
@@ -207,7 +207,7 @@ WRITE8_HANDLER( m52_videoram_w )
 
 WRITE8_HANDLER( m52_colorram_w )
 {
-	irem_z80_state *state = space->machine->driver_data<irem_z80_state>();
+	m52_state *state = space->machine->driver_data<m52_state>();
 
 	state->colorram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
@@ -226,7 +226,7 @@ WRITE8_HANDLER( m52_colorram_w )
    follows: result = popcount(value & 0x7f) ^ (value >> 7) */
 READ8_HANDLER( m52_protection_r )
 {
-	irem_z80_state *state = space->machine->driver_data<irem_z80_state>();
+	m52_state *state = space->machine->driver_data<m52_state>();
 	int popcount = 0;
 	int temp;
 
@@ -245,31 +245,31 @@ READ8_HANDLER( m52_protection_r )
 
 WRITE8_HANDLER( m52_bg1ypos_w )
 {
-	irem_z80_state *state = space->machine->driver_data<irem_z80_state>();
+	m52_state *state = space->machine->driver_data<m52_state>();
 	state->bg1ypos = data;
 }
 
 WRITE8_HANDLER( m52_bg1xpos_w )
 {
-	irem_z80_state *state = space->machine->driver_data<irem_z80_state>();
+	m52_state *state = space->machine->driver_data<m52_state>();
 	state->bg1xpos = data;
 }
 
 WRITE8_HANDLER( m52_bg2xpos_w )
 {
-	irem_z80_state *state = space->machine->driver_data<irem_z80_state>();
+	m52_state *state = space->machine->driver_data<m52_state>();
 	state->bg2xpos = data;
 }
 
 WRITE8_HANDLER( m52_bg2ypos_w )
 {
-	irem_z80_state *state = space->machine->driver_data<irem_z80_state>();
+	m52_state *state = space->machine->driver_data<m52_state>();
 	state->bg2ypos = data;
 }
 
 WRITE8_HANDLER( m52_bgcontrol_w )
 {
-	irem_z80_state *state = space->machine->driver_data<irem_z80_state>();
+	m52_state *state = space->machine->driver_data<m52_state>();
 	state->bgcontrol = data;
 }
 
@@ -362,7 +362,7 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, const re
 
 VIDEO_UPDATE( m52 )
 {
-	irem_z80_state *state = screen->machine->driver_data<irem_z80_state>();
+	m52_state *state = screen->machine->driver_data<m52_state>();
 	int offs;
 
 	bitmap_fill(bitmap, cliprect, 0);

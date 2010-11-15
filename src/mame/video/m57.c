@@ -5,7 +5,7 @@
 ****************************************************************************/
 
 #include "emu.h"
-#include "includes/iremz80.h"
+#include "includes/m57.h"
 
 
 /***************************************************************************
@@ -111,7 +111,7 @@ PALETTE_INIT( m57 )
 
 static TILE_GET_INFO( get_tile_info )
 {
-	irem_z80_state *state = machine->driver_data<irem_z80_state>();
+	m57_state *state = machine->driver_data<m57_state>();
 
 	UINT8 attr = state->videoram[tile_index * 2 + 0];
 	UINT16 code = state->videoram[tile_index * 2 + 1] | ((attr & 0xc0) << 2);
@@ -128,7 +128,7 @@ static TILE_GET_INFO( get_tile_info )
 
 WRITE8_HANDLER( m57_videoram_w )
 {
-	irem_z80_state *state = space->machine->driver_data<irem_z80_state>();
+	m57_state *state = space->machine->driver_data<m57_state>();
 
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset / 2);
@@ -143,7 +143,7 @@ WRITE8_HANDLER( m57_videoram_w )
 
 VIDEO_START( m57 )
 {
-	irem_z80_state *state = machine->driver_data<irem_z80_state>();
+	m57_state *state = machine->driver_data<m57_state>();
 
 	state->bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows,  8, 8, 32, 32);
 	tilemap_set_scroll_rows(state->bg_tilemap, 256);
@@ -160,7 +160,7 @@ VIDEO_START( m57 )
 
 WRITE8_HANDLER( m57_flipscreen_w )
 {
-	irem_z80_state *state = space->machine->driver_data<irem_z80_state>();
+	m57_state *state = space->machine->driver_data<m57_state>();
 
 	/* screen flip is handled both by software and hardware */
 	state->flipscreen = (data & 0x01) ^ (~input_port_read(space->machine, "DSW2") & 0x01);
@@ -179,7 +179,7 @@ WRITE8_HANDLER( m57_flipscreen_w )
 
 static void draw_background(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	irem_z80_state *state = machine->driver_data<irem_z80_state>();
+	m57_state *state = machine->driver_data<m57_state>();
 	int y,x;
 	INT16 scrolly;
 
@@ -223,7 +223,7 @@ static void draw_background(running_machine *machine, bitmap_t *bitmap, const re
 
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
-	irem_z80_state *state = machine->driver_data<irem_z80_state>();
+	m57_state *state = machine->driver_data<m57_state>();
 	int offs;
 
 	for (offs = state->spriteram_size - 4; offs >= 0; offs -= 4)

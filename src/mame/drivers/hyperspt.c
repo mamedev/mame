@@ -16,7 +16,9 @@ Based on drivers from Juno First emulator by Chris Hardy (chrish@kcbbs.gen.nz)
 #include "machine/konami1.h"
 #include "machine/nvram.h"
 #include "includes/konamipt.h"
-#include "includes/trackfld.h"
+#include "audio/trackfld.h"
+#include "audio/hyprolyb.h"
+#include "includes/hyperspt.h"
 
 
 static WRITE8_HANDLER( hyperspt_coin_counter_w )
@@ -26,8 +28,8 @@ static WRITE8_HANDLER( hyperspt_coin_counter_w )
 
 
 static ADDRESS_MAP_START( hyperspt_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x1000, 0x10bf) AM_RAM AM_BASE_SIZE_MEMBER(trackfld_state, spriteram, spriteram_size)
-	AM_RANGE(0x10c0, 0x10ff) AM_RAM AM_BASE_MEMBER(trackfld_state, scroll)	/* Scroll amount */
+	AM_RANGE(0x1000, 0x10bf) AM_RAM AM_BASE_SIZE_MEMBER(hyperspt_state, spriteram, spriteram_size)
+	AM_RANGE(0x10c0, 0x10ff) AM_RAM AM_BASE_MEMBER(hyperspt_state, scroll)	/* Scroll amount */
 	AM_RANGE(0x1400, 0x1400) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x1480, 0x1480) AM_WRITE(hyperspt_flipscreen_w)
 	AM_RANGE(0x1481, 0x1481) AM_WRITE(konami_sh_irqtrigger_w)  /* cause interrupt on audio CPU */
@@ -39,16 +41,16 @@ static ADDRESS_MAP_START( hyperspt_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1681, 0x1681) AM_READ_PORT("P1_P2")
 	AM_RANGE(0x1682, 0x1682) AM_READ_PORT("P3_P4")
 	AM_RANGE(0x1683, 0x1683) AM_READ_PORT("DSW1")
-	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(hyperspt_videoram_w) AM_BASE_MEMBER(trackfld_state, videoram)
-	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(hyperspt_colorram_w) AM_BASE_MEMBER(trackfld_state, colorram)
+	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(hyperspt_videoram_w) AM_BASE_MEMBER(hyperspt_state, videoram)
+	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(hyperspt_colorram_w) AM_BASE_MEMBER(hyperspt_state, colorram)
 	AM_RANGE(0x3000, 0x37ff) AM_RAM
 	AM_RANGE(0x3800, 0x3fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x4000, 0xffff) AM_ROM
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( roadf_map, ADDRESS_SPACE_PROGRAM, 8 )
-	AM_RANGE(0x1000, 0x10bf) AM_RAM AM_BASE_SIZE_MEMBER(trackfld_state, spriteram, spriteram_size)
-	AM_RANGE(0x10c0, 0x10ff) AM_RAM AM_BASE_MEMBER(trackfld_state, scroll)	/* Scroll amount */
+	AM_RANGE(0x1000, 0x10bf) AM_RAM AM_BASE_SIZE_MEMBER(hyperspt_state, spriteram, spriteram_size)
+	AM_RANGE(0x10c0, 0x10ff) AM_RAM AM_BASE_MEMBER(hyperspt_state, scroll)	/* Scroll amount */
 	AM_RANGE(0x1400, 0x1400) AM_WRITE(watchdog_reset_w)
 	AM_RANGE(0x1480, 0x1480) AM_WRITE(hyperspt_flipscreen_w)
 	AM_RANGE(0x1481, 0x1481) AM_WRITE(konami_sh_irqtrigger_w)  /* cause interrupt on audio CPU */
@@ -60,8 +62,8 @@ static ADDRESS_MAP_START( roadf_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x1681, 0x1681) AM_READ_PORT("P1")
 	AM_RANGE(0x1682, 0x1682) AM_READ_PORT("P2")
 	AM_RANGE(0x1683, 0x1683) AM_READ_PORT("DSW1")
-	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(hyperspt_videoram_w) AM_BASE_MEMBER(trackfld_state, videoram)
-	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(hyperspt_colorram_w) AM_BASE_MEMBER(trackfld_state, colorram)
+	AM_RANGE(0x2000, 0x27ff) AM_RAM_WRITE(hyperspt_videoram_w) AM_BASE_MEMBER(hyperspt_state, videoram)
+	AM_RANGE(0x2800, 0x2fff) AM_RAM_WRITE(hyperspt_colorram_w) AM_BASE_MEMBER(hyperspt_state, colorram)
 	AM_RANGE(0x3000, 0x37ff) AM_RAM
 	AM_RANGE(0x3800, 0x3fff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x4000, 0xffff) AM_ROM
@@ -85,7 +87,7 @@ static ADDRESS_MAP_START( soundb_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x6000, 0x6000) AM_READ(soundlatch_r)
 	AM_RANGE(0x8000, 0x8000) AM_READ(hyperspt_sh_timer_r)
 	AM_RANGE(0xa000, 0xa000) AM_NOP
-	AM_RANGE(0xc000, 0xdfff) AM_WRITE(hyprolyb_adpcm_w)	  /* speech and output control */
+	AM_RANGE(0xc000, 0xdfff) AM_DEVWRITE("hyprolyb_adpcm", hyprolyb_adpcm_w)	  /* speech and output control */
 	AM_RANGE(0xe000, 0xe000) AM_DEVWRITE("dac", dac_w)
 	AM_RANGE(0xe001, 0xe001) AM_WRITE(konami_SN76496_latch_w)  /* Loads the snd command into the snd latch */
 	AM_RANGE(0xe002, 0xe002) AM_DEVWRITE("snsnd", konami_SN76496_w) 	 /* This address triggers the SN chip to read the data port. */
@@ -267,51 +269,7 @@ GFXDECODE_END
 
 
 
-static MACHINE_START( hyperspt )
-{
-	trackfld_state *state = machine->driver_data<trackfld_state>();
-
-	state->audiocpu = machine->device<cpu_device>("audiocpu");
-	state->vlm = machine->device("vlm");
-
-	/* sound */
-	state_save_register_global(machine, state->SN76496_latch);
-	state_save_register_global(machine, state->last_addr);
-	state_save_register_global(machine, state->last_irq);
-}
-
-static MACHINE_START( hypersptb )
-{
-	trackfld_state *state = machine->driver_data<trackfld_state>();
-
-	MACHINE_START_CALL(hyperspt);
-
-	state_save_register_global(machine, state->hyprolyb_adpcm_ready);	// only bootlegs
-	state_save_register_global(machine, state->hyprolyb_adpcm_busy);
-	state_save_register_global(machine, state->hyprolyb_vck_ready);
-}
-
-static MACHINE_RESET( hyperspt )
-{
-	trackfld_state *state = machine->driver_data<trackfld_state>();
-
-	state->SN76496_latch = 0;
-	state->last_addr = 0;
-	state->last_irq = 0;
-}
-
-static MACHINE_RESET( hypersptb )
-{
-	trackfld_state *state = machine->driver_data<trackfld_state>();
-
-	MACHINE_RESET_CALL(hyperspt);
-
-	state->hyprolyb_adpcm_ready = 0;
-	state->hyprolyb_adpcm_busy = 0;
-	state->hyprolyb_vck_ready = 0;
-}
-
-static MACHINE_CONFIG_START( hyperspt, trackfld_state )
+static MACHINE_CONFIG_START( hyperspt, hyperspt_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M6809, XTAL_18_432MHz/12)	/* verified on pcb */
@@ -321,8 +279,6 @@ static MACHINE_CONFIG_START( hyperspt, trackfld_state )
 	MDRV_CPU_ADD("audiocpu", Z80,XTAL_14_31818MHz/4) /* verified on pcb */
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 
-	MDRV_MACHINE_START(hyperspt)
-	MDRV_MACHINE_RESET(hyperspt)
 	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
@@ -343,6 +299,8 @@ static MACHINE_CONFIG_START( hyperspt, trackfld_state )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
+	MDRV_SOUND_ADD("trackfld_audio", TRACKFLD_AUDIO, 0)
+
 	MDRV_SOUND_ADD("dac", DAC, 0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
@@ -360,15 +318,7 @@ static MACHINE_CONFIG_DERIVED( hypersptb, hyperspt )
 	MDRV_CPU_MODIFY("audiocpu")
 	MDRV_CPU_PROGRAM_MAP(soundb_map)
 
-	MDRV_CPU_ADD("adpcm", M6802, XTAL_14_31818MHz/8)	/* unknown clock */
-	MDRV_CPU_PROGRAM_MAP(hyprolyb_adpcm_map)
-
-	MDRV_MACHINE_START(hypersptb)
-	MDRV_MACHINE_RESET(hypersptb)
-
-	MDRV_SOUND_ADD("msm", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(hyprolyb_msm5205_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MDRV_FRAGMENT_ADD(hyprolyb_adpcm)
 MACHINE_CONFIG_END
 
 

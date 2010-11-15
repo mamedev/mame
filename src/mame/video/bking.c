@@ -8,7 +8,7 @@
 
 #include "emu.h"
 #include "video/resnet.h"
-#include "includes/buggychl.h"
+#include "includes/bking.h"
 
 
 /***************************************************************************
@@ -84,44 +84,44 @@ PALETTE_INIT( bking )
 
 WRITE8_HANDLER( bking_xld1_w )
 {
-	buggychl_state *state = space->machine->driver_data<buggychl_state>();
+	bking_state *state = space->machine->driver_data<bking_state>();
 	state->xld1 = -data;
 }
 
 WRITE8_HANDLER( bking_yld1_w )
 {
-	buggychl_state *state = space->machine->driver_data<buggychl_state>();
+	bking_state *state = space->machine->driver_data<bking_state>();
 	state->yld1 = -data;
 }
 
 WRITE8_HANDLER( bking_xld2_w )
 {
-	buggychl_state *state = space->machine->driver_data<buggychl_state>();
+	bking_state *state = space->machine->driver_data<bking_state>();
 	state->xld2 = -data;
 }
 
 WRITE8_HANDLER( bking_yld2_w )
 {
-	buggychl_state *state = space->machine->driver_data<buggychl_state>();
+	bking_state *state = space->machine->driver_data<bking_state>();
 	state->yld2 = -data;
 }
 
 WRITE8_HANDLER( bking_xld3_w )
 {
-	buggychl_state *state = space->machine->driver_data<buggychl_state>();
+	bking_state *state = space->machine->driver_data<bking_state>();
 	state->xld3 = -data;
 }
 
 WRITE8_HANDLER( bking_yld3_w )
 {
-	buggychl_state *state = space->machine->driver_data<buggychl_state>();
+	bking_state *state = space->machine->driver_data<bking_state>();
 	state->yld3 = -data;
 }
 
 
 WRITE8_HANDLER( bking_cont1_w )
 {
-	buggychl_state *state = space->machine->driver_data<buggychl_state>();
+	bking_state *state = space->machine->driver_data<bking_state>();
 
 	/* D0 = COIN LOCK */
 	/* D1 = BALL 5 (Controller selection) */
@@ -142,7 +142,7 @@ WRITE8_HANDLER( bking_cont1_w )
 
 WRITE8_HANDLER( bking_cont2_w )
 {
-	buggychl_state *state = space->machine->driver_data<buggychl_state>();
+	bking_state *state = space->machine->driver_data<bking_state>();
 
 	/* D0-D2 = BALL10 - BALL12 (Selects player 1 ball picture) */
 	/* D3-D5 = BALL20 - BALL22 (Selects player 2 ball picture) */
@@ -157,7 +157,7 @@ WRITE8_HANDLER( bking_cont2_w )
 
 WRITE8_HANDLER( bking_cont3_w )
 {
-	buggychl_state *state = space->machine->driver_data<buggychl_state>();
+	bking_state *state = space->machine->driver_data<bking_state>();
 
 	/* D0 = CROW INV (inverts Crow picture and coordinates) */
 	/* D1-D2 = COLOR 0 - COLOR 1 (switches 4 color palettes, global across all graphics) */
@@ -178,14 +178,14 @@ WRITE8_HANDLER( bking_cont3_w )
 
 WRITE8_HANDLER( bking_msk_w )
 {
-	buggychl_state *state = space->machine->driver_data<buggychl_state>();
+	bking_state *state = space->machine->driver_data<bking_state>();
 	state->pc3259_mask++;
 }
 
 
 WRITE8_HANDLER( bking_hitclr_w )
 {
-	buggychl_state *state = space->machine->driver_data<buggychl_state>();
+	bking_state *state = space->machine->driver_data<bking_state>();
 	state->pc3259_mask = 0;
 
 	state->pc3259_output[0] = 0;
@@ -197,7 +197,7 @@ WRITE8_HANDLER( bking_hitclr_w )
 
 WRITE8_HANDLER( bking_playfield_w )
 {
-	buggychl_state *state = space->machine->driver_data<buggychl_state>();
+	bking_state *state = space->machine->driver_data<bking_state>();
 	state->playfield_ram[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset / 2);
 }
@@ -205,26 +205,26 @@ WRITE8_HANDLER( bking_playfield_w )
 
 READ8_HANDLER( bking_input_port_5_r )
 {
-	buggychl_state *state = space->machine->driver_data<buggychl_state>();
+	bking_state *state = space->machine->driver_data<bking_state>();
 	return input_port_read(space->machine, state->controller ? "TRACK1_X" : "TRACK0_X");
 }
 
 READ8_HANDLER( bking_input_port_6_r )
 {
-	buggychl_state *state = space->machine->driver_data<buggychl_state>();
+	bking_state *state = space->machine->driver_data<bking_state>();
 	return input_port_read(space->machine, state->controller ? "TRACK1_Y" : "TRACK0_Y");
 }
 
 READ8_HANDLER( bking_pos_r )
 {
-	buggychl_state *state = space->machine->driver_data<buggychl_state>();
+	bking_state *state = space->machine->driver_data<bking_state>();
 	return state->pc3259_output[offset / 8] << 4;
 }
 
 
 static TILE_GET_INFO( get_tile_info )
 {
-	buggychl_state *state = machine->driver_data<buggychl_state>();
+	bking_state *state = machine->driver_data<bking_state>();
 	UINT8 code0 = state->playfield_ram[2 * tile_index + 0];
 	UINT8 code1 = state->playfield_ram[2 * tile_index + 1];
 
@@ -239,7 +239,7 @@ static TILE_GET_INFO( get_tile_info )
 
 VIDEO_START( bking )
 {
-	buggychl_state *state = machine->driver_data<buggychl_state>();
+	bking_state *state = machine->driver_data<bking_state>();
 	state->bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	state->tmp_bitmap1 = machine->primary_screen->alloc_compatible_bitmap();
 	state->tmp_bitmap2 = machine->primary_screen->alloc_compatible_bitmap();
@@ -251,7 +251,7 @@ VIDEO_START( bking )
 
 VIDEO_UPDATE( bking )
 {
-	buggychl_state *state = screen->machine->driver_data<buggychl_state>();
+	bking_state *state = screen->machine->driver_data<bking_state>();
 
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 
@@ -280,7 +280,7 @@ VIDEO_UPDATE( bking )
 
 VIDEO_EOF( bking )
 {
-	buggychl_state *state = machine->driver_data<buggychl_state>();
+	bking_state *state = machine->driver_data<bking_state>();
 	static const rectangle rect = { 0, 7, 0, 15 };
 
 	int xld = 0;

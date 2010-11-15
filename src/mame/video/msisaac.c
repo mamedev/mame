@@ -3,7 +3,7 @@
 */
 
 #include "emu.h"
-#include "includes/buggychl.h"
+#include "includes/msisaac.h"
 
 
 /***************************************************************************
@@ -14,7 +14,7 @@
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
-	buggychl_state *state = machine->driver_data<buggychl_state>();
+	msisaac_state *state = machine->driver_data<msisaac_state>();
 	int tile_number = state->videoram[tile_index];
 	SET_TILE_INFO( 0,
 			tile_number,
@@ -24,7 +24,7 @@ static TILE_GET_INFO( get_fg_tile_info )
 
 static TILE_GET_INFO( get_bg_tile_info )
 {
-	buggychl_state *state = machine->driver_data<buggychl_state>();
+	msisaac_state *state = machine->driver_data<msisaac_state>();
 	int tile_number = state->videoram2[tile_index];
 	SET_TILE_INFO( 1,
 			0x100 + tile_number,
@@ -34,7 +34,7 @@ static TILE_GET_INFO( get_bg_tile_info )
 
 static TILE_GET_INFO( get_bg2_tile_info )
 {
-	buggychl_state *state = machine->driver_data<buggychl_state>();
+	msisaac_state *state = machine->driver_data<msisaac_state>();
 	int tile_number = state->videoram3[tile_index];
 
 	/* graphics 0 or 1 */
@@ -54,7 +54,7 @@ static TILE_GET_INFO( get_bg2_tile_info )
 
 VIDEO_START( msisaac )
 {
-	buggychl_state *state = machine->driver_data<buggychl_state>();
+	msisaac_state *state = machine->driver_data<msisaac_state>();
 	state->bg_tilemap  = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	state->bg2_tilemap = tilemap_create(machine, get_bg2_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 	state->fg_tilemap  = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
@@ -72,37 +72,37 @@ VIDEO_START( msisaac )
 
 WRITE8_HANDLER( msisaac_fg_scrolly_w )
 {
-	buggychl_state *state = space->machine->driver_data<buggychl_state>();
+	msisaac_state *state = space->machine->driver_data<msisaac_state>();
 	tilemap_set_scrolly(state->fg_tilemap, 0, data);
 }
 
 WRITE8_HANDLER( msisaac_fg_scrollx_w )
 {
-	buggychl_state *state = space->machine->driver_data<buggychl_state>();
+	msisaac_state *state = space->machine->driver_data<msisaac_state>();
 	tilemap_set_scrollx(state->fg_tilemap, 0, 9 + data);
 }
 
 WRITE8_HANDLER( msisaac_bg2_scrolly_w )
 {
-	buggychl_state *state = space->machine->driver_data<buggychl_state>();
+	msisaac_state *state = space->machine->driver_data<msisaac_state>();
 	tilemap_set_scrolly(state->bg2_tilemap, 0, data);
 }
 
 WRITE8_HANDLER( msisaac_bg2_scrollx_w )
 {
-	buggychl_state *state = space->machine->driver_data<buggychl_state>();
+	msisaac_state *state = space->machine->driver_data<msisaac_state>();
 	tilemap_set_scrollx(state->bg2_tilemap, 0, 9 + 2 + data);
 }
 
 WRITE8_HANDLER( msisaac_bg_scrolly_w )
 {
-	buggychl_state *state = space->machine->driver_data<buggychl_state>();
+	msisaac_state *state = space->machine->driver_data<msisaac_state>();
 	tilemap_set_scrolly(state->bg_tilemap, 0, data);
 }
 
 WRITE8_HANDLER( msisaac_bg_scrollx_w )
 {
-	buggychl_state *state = space->machine->driver_data<buggychl_state>();
+	msisaac_state *state = space->machine->driver_data<msisaac_state>();
 	tilemap_set_scrollx(state->bg_tilemap, 0, 9 + 4 + data);
 }
 
@@ -120,7 +120,7 @@ WRITE8_HANDLER( msisaac_textbank1_w )
 
 WRITE8_HANDLER( msisaac_bg2_textbank_w )
 {
-	buggychl_state *state = space->machine->driver_data<buggychl_state>();
+	msisaac_state *state = space->machine->driver_data<msisaac_state>();
 	if (state->bg2_textbank != data )
 	{
 		state->bg2_textbank = data;
@@ -136,21 +136,21 @@ WRITE8_HANDLER( msisaac_bg2_textbank_w )
 
 WRITE8_HANDLER( msisaac_bg_videoram_w )
 {
-	buggychl_state *state = space->machine->driver_data<buggychl_state>();
+	msisaac_state *state = space->machine->driver_data<msisaac_state>();
 	state->videoram2[offset] = data;
 	tilemap_mark_tile_dirty(state->bg_tilemap, offset);
 }
 
 WRITE8_HANDLER( msisaac_bg2_videoram_w )
 {
-	buggychl_state *state = space->machine->driver_data<buggychl_state>();
+	msisaac_state *state = space->machine->driver_data<msisaac_state>();
 	state->videoram3[offset] = data;
 	tilemap_mark_tile_dirty(state->bg2_tilemap, offset);
 }
 
 WRITE8_HANDLER( msisaac_fg_videoram_w )
 {
-	buggychl_state *state = space->machine->driver_data<buggychl_state>();
+	msisaac_state *state = space->machine->driver_data<msisaac_state>();
 	state->videoram[offset] = data;
 	tilemap_mark_tile_dirty(state->fg_tilemap, offset);
 }
@@ -163,7 +163,7 @@ WRITE8_HANDLER( msisaac_fg_videoram_w )
 ***************************************************************************/
 static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect )
 {
-	buggychl_state *state = machine->driver_data<buggychl_state>();
+	msisaac_state *state = machine->driver_data<msisaac_state>();
 	const UINT8 *source = state->spriteram + 32 * 4 - 4;
 	const UINT8 *finish = state->spriteram; /* ? */
 
@@ -246,7 +246,7 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 
 VIDEO_UPDATE( msisaac )
 {
-	buggychl_state *state = screen->machine->driver_data<buggychl_state>();
+	msisaac_state *state = screen->machine->driver_data<msisaac_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	tilemap_draw(bitmap, cliprect, state->bg2_tilemap, 0, 0);
 	draw_sprites(screen->machine, bitmap, cliprect);
