@@ -625,11 +625,12 @@ void sdl_osd_interface::init(running_machine &machine)
 }
 
 #ifdef SDLMAME_UNIX
+#define POINT_SIZE 144.0
+
 #ifdef SDLMAME_MACOSX
 
 #define EXTRA_HEIGHT 1.0
 #define EXTRA_WIDTH 1.15
-#define POINT_SIZE 144.0
 
 //-------------------------------------------------
 //  font_open - attempt to "open" a handle to the
@@ -805,10 +806,14 @@ osd_font sdl_osd_interface::font_open(const char *_name, int &height)
 	bool bold = (name.replace(0, "[B]", "") + name.replace(0, "[b]", "") > 0);
 	bool italic = (name.replace(0, "[I]", "") + name.replace(0, "[i]", "") > 0);
 	bool underline = (name.replace(0, "[U]", "") + name.replace(0, "[u]", "") > 0);
+#if TTF_MAJOR_VERSION >= 2
+#if TTF_PATCHLEVEL >= 10  // SDL_ttf 2.0.9 and earlier does not define TTF_STYLE_STRIKETHROUGH
 	bool strike = (name.replace(0, "[S]", "") + name.replace(0, "[s]", "") > 0);
+#endif // MAJOR_VERSION
+#endif // PATCHLEVEL
 
 	// first up, try it as a filename
-	font = TTF_OpenFont(name.cstr(), 120);
+	font = TTF_OpenFont(name.cstr(), POINT_SIZE);
 
 	// if that didn't work, crank up the FontConfig database
 	if (!font)
@@ -857,7 +862,7 @@ osd_font sdl_osd_interface::font_open(const char *_name, int &height)
 			}
 
 			mame_printf_verbose("Matching font: %s\n", val.u.s);
-			font = TTF_OpenFont((const char*)val.u.s, 120);
+			font = TTF_OpenFont((const char*)val.u.s, POINT_SIZE);
 
 			if (font)
 			{
@@ -891,7 +896,7 @@ osd_font sdl_osd_interface::font_open(const char *_name, int &height)
 				}
 
 				mame_printf_verbose("Matching unstyled font: %s\n", val.u.s);
-				font = TTF_OpenFont((const char*)val.u.s, 120);
+				font = TTF_OpenFont((const char*)val.u.s, POINT_SIZE);
 
 				if (font)
 				{
@@ -918,7 +923,11 @@ osd_font sdl_osd_interface::font_open(const char *_name, int &height)
 		style |= italic ? TTF_STYLE_ITALIC : 0;
 	}
 	style |= underline ? TTF_STYLE_UNDERLINE : 0;
+#if TTF_MAJOR_VERSION >= 2
+#if TTF_PATCHLEVEL >= 10
 	style |= strike ? TTF_STYLE_STRIKETHROUGH : 0;
+#endif // MAJOR_VERSION
+#endif // PATCHLEVEL
 	TTF_SetFontStyle(font, style);
 
 	height = TTF_FontLineSkip(font);
@@ -954,13 +963,13 @@ bitmap_t *sdl_osd_interface::font_get_bitmap(osd_font font, unicode_char chnum, 
 	bitmap_t *bitmap = (bitmap_t *)NULL;
 	SDL_Surface *drawsurf;
 	SDL_Color fcol = { 0xff, 0xff, 0xff };
-	char ustr[16];
+	UINT16 ustr[16];
 
 	ttffont = (TTF_Font *)font;
 	
-	memset(ustr, 0, sizeof(ustr));
-	utf8_from_uchar(ustr, 1, chnum);
-	drawsurf = TTF_RenderUTF8_Solid(ttffont, ustr, fcol);
+	memset(ustr,0,sizeof(ustr));
+	ustr[0] = (UINT16)chnum;
+	drawsurf = TTF_RenderUNICODE_Solid(ttffont, ustr, fcol);
 
 	// was nothing returned?
 	if (drawsurf)

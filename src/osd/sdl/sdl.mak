@@ -345,8 +345,9 @@ CCOMFLAGS += -D_GNU_SOURCE=1
 LIBS += -lm -L$(SDL_INSTALL_ROOT)/lib -Wl,-rpath,$(SDL_INSTALL_ROOT)/lib -lSDL
 endif
 
-INCPATH += `pkg-config --cflags SDL_ttf fontconfig`
-LIBS += `pkg-config --libs SDL_ttf fontconfig`
+INCPATH += `pkg-config --cflags fontconfig`
+LIBS += `pkg-config --libs fontconfig`
+LIBS += -lSDL_ttf
 
 endif # Unix
 
