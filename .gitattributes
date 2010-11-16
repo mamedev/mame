@@ -1457,6 +1457,7 @@ src/mame/drivers/bagman.c svneol=native#text/plain
 src/mame/drivers/balsente.c svneol=native#text/plain
 src/mame/drivers/bankp.c svneol=native#text/plain
 src/mame/drivers/baraduke.c svneol=native#text/plain
+src/mame/drivers/bartop52.c svneol=native#text/plain
 src/mame/drivers/batman.c svneol=native#text/plain
 src/mame/drivers/battlane.c svneol=native#text/plain
 src/mame/drivers/battlera.c svneol=native#text/plain

@@ -593,6 +593,8 @@ INTERRUPT_GEN( a800_interrupt );
 INTERRUPT_GEN( a800xl_interrupt );
 INTERRUPT_GEN( a5200_interrupt );
 
+extern PALETTE_INIT( atari );
+
 /*----------- defined in drivers/maxaflex.c -----------*/
 
 int atari_input_disabled(void);

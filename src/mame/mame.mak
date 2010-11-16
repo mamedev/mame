@@ -396,6 +396,7 @@ $(MAMEOBJ)/atari.a: \
 	$(DRIVERS)/atetris.o $(VIDEO)/atetris.o \
 	$(DRIVERS)/avalnche.o $(AUDIO)/avalnche.o \
 	$(DRIVERS)/badlands.o $(VIDEO)/badlands.o \
+	$(DRIVERS)/bartop52.o \
 	$(DRIVERS)/batman.o $(VIDEO)/batman.o \
 	$(DRIVERS)/beathead.o $(VIDEO)/beathead.o \
 	$(DRIVERS)/blstroid.o $(VIDEO)/blstroid.o \
