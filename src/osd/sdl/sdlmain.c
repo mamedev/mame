@@ -640,7 +640,7 @@ void sdl_osd_interface::init(running_machine &machine)
 osd_font sdl_osd_interface::font_open(const char *_name, int &height)
 {
 	CFStringRef font_name = NULL;
-	CTFontRef ct_font;
+	CTFontRef ct_font = NULL;
 	CTFontDescriptorRef font_descriptor;
 	CGAffineTransform affine_transform = CGAffineTransformIdentity;
 	
