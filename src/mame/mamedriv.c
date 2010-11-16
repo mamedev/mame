@@ -9253,10 +9253,12 @@ Other Sun games
 	DRIVER( megat3 )	/* (c) 1996 Merit */
 	DRIVER( megat3a )	/* (c) 1996 Merit */
 	DRIVER( megat3ca )	/* (c) 1996 Merit */
+	DRIVER( megat3cb )  /* (c) 1995 Merit */
 	DRIVER( megat3nj )	/* (c) 1995 Merit */
 	DRIVER( megat3te )	/* (c) 1996 Merit */
 	DRIVER( megat4 )	/* (c) 1996 Merit */
 	DRIVER( megat4a )	/* (c) 1996 Merit */
+	DRIVER( megat4b )	/* (c) 1996 Merit */
 	DRIVER( megat4sn )	/* (c) 1996 Merit */
 	DRIVER( megat4te )	/* (c) 1996 Merit */
 	DRIVER( megat4tea )	/* (c) 1996 Merit */
