@@ -26,6 +26,7 @@ Year + Game           License       PCB         Tilemaps        Sprites         
 95 Donpachi           Atlus         AT-C01DP-2  038 9429WX727   013 8647-01     NMK 112
 96 Air Gallet         Banpresto     BP962A      038 9437WX711   013 9346E7002   Z80
 96 Hotdog Storm       Marble        ASTC9501    038 9341EX702                   Z80
+96 Pac-Slot           Namco         A0442       038 9444WX010   013 9345E7006
 97 Dodonpachi         Atlus         ATC03D2     ?
 98 Dangun Feveron     Nihon System  CV01        038 9808WX003   013 9807EX004
 98 ESP Ra.De.         Atlus         ATC04       ?
@@ -402,6 +403,20 @@ static const eeprom_interface eeprom_interface_93C46_8bit =
 //  "*10010xxxx"    // erase all    1 00 10xxxx
 };
 
+static const eeprom_interface eeprom_interface_93C46_pacslot =
+{
+	6,				// address bits 6
+	16,				// data bits    16
+	"*110",			// read         1 10 aaaaaa
+	"*101",			// write        1 01 aaaaaa dddddddddddddddd
+	"*111",			// erase        1 11 aaaaaa
+	"*10000xxxx",	// lock         1 00 00xxxx
+	"*10011xxxx",	// unlock       1 00 11xxxx
+	1,				// enable_multi_read (needed by pacslot)
+	1				// reset_delay (otherwise pacslot will not recognize the eeprom)
+//  "*10001xxxx"    // write all    1 00 01xxxx dddddddddddddddd
+//  "*10010xxxx"    // erase all    1 00 10xxxx
+};
 
 
 /***************************************************************************
@@ -931,7 +946,7 @@ static CUSTOM_INPUT( tjumpman_hopper_r )
 
 static ADDRESS_MAP_START( tjumpman_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM																	// ROM
-	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_SHARE("nvram")									// RAM
+	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_SHARE("nvram")												// RAM
 	AM_RANGE(0x200000, 0x207fff) AM_RAM AM_BASE_SIZE_MEMBER(cave_state, spriteram, spriteram_size)		// Sprites
 	AM_RANGE(0x208000, 0x20ffff) AM_RAM AM_BASE_MEMBER(cave_state, spriteram_2)							// Sprite bank 2
 	AM_RANGE(0x304000, 0x307fff) AM_WRITE(cave_vram_0_w)												// Layer 0 - 16x16 tiles mapped here
@@ -943,8 +958,48 @@ static ADDRESS_MAP_START( tjumpman_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x700000, 0x700007) AM_READ(cave_irq_cause_r)												// IRQ Cause
 	AM_RANGE(0x700068, 0x700069) AM_WRITE(watchdog_reset16_w)											// Watchdog
 	AM_RANGE(0x700000, 0x70007f) AM_WRITEONLY AM_BASE_MEMBER(cave_state, videoregs)						// Video Regs
-	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE8_MODERN("oki1", okim6295_device, read, write, 0x00ff)				// M6295
+	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE8_MODERN("oki1", okim6295_device, read, write, 0x00ff)	// M6295
 	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(tjumpman_leds_w)												// Leds + Hopper
+	AM_RANGE(0xe00000, 0xe00001) AM_DEVWRITE("eeprom", tjumpman_eeprom_lsb_w)							// EEPROM
+ADDRESS_MAP_END
+
+
+/***************************************************************************
+                                   Pac-Slot
+***************************************************************************/
+
+static WRITE16_HANDLER( pacslot_leds_w )
+{
+	cave_state *state = space->machine->driver_data<cave_state>();
+	if (ACCESSING_BITS_0_7)
+	{
+		set_led_status(space->machine, 0,	data & 0x0001);	// pac-man
+		set_led_status(space->machine, 1,	data & 0x0002);	// ms. pac-man
+		set_led_status(space->machine, 2,	data & 0x0004);	// payout
+		set_led_status(space->machine, 3,	data & 0x0008);	// start
+		set_led_status(space->machine, 4,	data & 0x0010);	// bet
+		set_led_status(space->machine, 5,	data & 0x0020);	// medal
+		state->hopper	=					data & 0x0040;	// hopper
+	}
+
+//  popmessage("led %04X", data);
+}
+
+static ADDRESS_MAP_START( pacslot_map, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x07ffff) AM_ROM																	// ROM
+	AM_RANGE(0x100000, 0x10ffff) AM_RAM AM_SHARE("nvram")												// RAM
+	AM_RANGE(0x200000, 0x207fff) AM_RAM AM_BASE_SIZE_MEMBER(cave_state, spriteram, spriteram_size)		// Sprites
+	AM_RANGE(0x208000, 0x20ffff) AM_RAM AM_BASE_MEMBER(cave_state, spriteram_2)							// Sprite bank 2
+	AM_RANGE(0x300000, 0x307fff) AM_RAM_WRITE(cave_vram_0_w) AM_BASE_MEMBER(cave_state, vram_0)			// Layer 0
+	AM_RANGE(0x400000, 0x400007) AM_READ(cave_irq_cause_r)												// IRQ Cause
+	AM_RANGE(0x400068, 0x400069) AM_WRITE(watchdog_reset16_w)											// Watchdog
+	AM_RANGE(0x400000, 0x40007f) AM_WRITEONLY AM_BASE_MEMBER(cave_state, videoregs)						// Video Regs
+	AM_RANGE(0x500000, 0x500005) AM_WRITEONLY AM_BASE_MEMBER(cave_state, vctrl_0)						// Layer 0 Control
+	AM_RANGE(0x600000, 0x60ffff) AM_RAM AM_BASE_SIZE_MEMBER(cave_state, paletteram, paletteram_size)	// Palette
+	AM_RANGE(0x700000, 0x700001) AM_READ_PORT("IN0")													// Inputs + EEPROM + Hopper
+	AM_RANGE(0x700002, 0x700003) AM_READ_PORT("IN1")													// Inputs
+	AM_RANGE(0x800000, 0x800001) AM_DEVREADWRITE8_MODERN("oki1", okim6295_device, read, write, 0x00ff)	// M6295
+	AM_RANGE(0xc00000, 0xc00001) AM_WRITE(pacslot_leds_w)												// Leds + Hopper
 	AM_RANGE(0xe00000, 0xe00001) AM_DEVWRITE("eeprom", tjumpman_eeprom_lsb_w)							// EEPROM
 ADDRESS_MAP_END
 
@@ -1444,6 +1499,7 @@ static INPUT_PORTS_START( korokoro )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
+
 static INPUT_PORTS_START( tjumpman )
 	PORT_START("IN0")
 	PORT_SERVICE_NO_TOGGLE( 0x01, IP_ACTIVE_LOW )
@@ -1466,6 +1522,31 @@ static INPUT_PORTS_START( tjumpman )
 	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_NAME( "Go" )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1   )													// medal
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_NAME( "3 Bet" )
+INPUT_PORTS_END
+
+
+static INPUT_PORTS_START( pacslot )
+	PORT_START("IN0")
+	PORT_SERVICE( 0x01, IP_ACTIVE_LOW )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW,  IPT_COIN2 )	// credits
+	PORT_BIT( 0x04, IP_ACTIVE_LOW,  IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_READ_LINE_DEVICE("eeprom", eeprom_read_bit)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW,  IPT_OTHER ) PORT_NAME( "Pac-Man" ) PORT_CODE(KEYCODE_Y)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW,  IPT_GAMBLE_PAYOUT )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW,  IPT_BUTTON1 ) PORT_NAME( "Bet" )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW,  IPT_SPECIAL ) PORT_CUSTOM(tjumpman_hopper_r, NULL)
+
+	PORT_START("IN1")
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_CONFNAME( 0x08, 0x08, "Self Test" )
+	PORT_CONFSETTING(    0x08, DEF_STR( Off ) )
+	PORT_CONFSETTING(    0x00, DEF_STR( On ) )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_START2  ) PORT_NAME( "Ms. Pac-Man" ) PORT_CODE(KEYCODE_N)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_START1  )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_COIN1   ) // medal
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
 
 
@@ -2224,6 +2305,55 @@ MACHINE_CONFIG_END
 
 
 /***************************************************************************
+                                   Pac-Slot
+***************************************************************************/
+
+static MACHINE_CONFIG_START( pacslot, cave_state )
+
+	MDRV_NVRAM_ADD_0FILL("nvram")
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD("maincpu", M68000, XTAL_28MHz / 2)
+	MDRV_CPU_PROGRAM_MAP(pacslot_map)
+	MDRV_CPU_VBLANK_INT("screen", cave_interrupt)
+
+	MDRV_WATCHDOG_TIME_INIT(SEC(3))	/* a guess, and certainly wrong */
+
+	MDRV_MACHINE_START(cave)
+	MDRV_MACHINE_RESET(cave)
+	MDRV_EEPROM_ADD("eeprom", eeprom_interface_93C46_pacslot)
+
+	/* video hardware */
+	MDRV_SCREEN_ADD("screen", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(15625/271.5)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(0x200, 240)
+	MDRV_SCREEN_VISIBLE_AREA(0x80, 0x80 + 0x140-1, 0, 240-1)
+
+	MDRV_GFXDECODE(tjumpman)
+	MDRV_PALETTE_LENGTH(0x8000)
+	MDRV_PALETTE_INIT(cave)
+
+	MDRV_VIDEO_START(cave_1_layer)
+	MDRV_VIDEO_UPDATE(cave)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MDRV_OKIM6295_ADD("oki1", XTAL_28MHz / 28, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+
+	// oki2 chip is present but its rom socket is unpopulated
+	MDRV_OKIM6295_ADD("oki2", XTAL_28MHz / 28, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+
+MACHINE_CONFIG_END
+
+
+/***************************************************************************
                                 Power Instinct 2
 ***************************************************************************/
 
@@ -2384,7 +2514,7 @@ static MACHINE_CONFIG_START( tjumpman, cave_state )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	// oki2 spot is unpopulated
+	// oki2 chip spot and rom socket are both unpopulated
 MACHINE_CONFIG_END
 
 
@@ -3578,6 +3708,50 @@ ROM_END
 
 /***************************************************************************
 
+  Pac-Slot by Namco, 1996 (according to http://pacman.com/ja/museum/index.html)
+  Namco N-44 EM VIDEO platform, PCB A0442
+
+  TMP 68HC000P-16
+
+  013 9345E7006
+  038 9444WX010
+
+  OKI M6295 x 2
+
+  Battery
+  93C46 EEPROM (at U24)
+
+  28MHz XTAL
+
+***************************************************************************/
+
+ROM_START( pacslot )
+	ROM_REGION( 0x080000, "maincpu", 0 )		/* 68000 code */
+	ROM_LOAD16_WORD_SWAP( "pa1-mprob.u41", 0x00000, 0x80000, CRC(56281370) SHA1(b75a7c5997adac14486cef7be4e41d113c86021f) )
+
+	ROM_REGION( 0x100000 * 2, "sprites", 0 )		/* Sprites */
+	ROM_LOAD16_BYTE( "pa1-obj0.u52", 0x00000, 0x80000, CRC(bf9232ce) SHA1(9a887a964e9a75e16c59dcf217c664404e74cc2a) )
+	ROM_LOAD16_BYTE( "pa1-obj1.u53", 0x00001, 0x80000, CRC(6eb76a04) SHA1(66c8e36bee4439c203a02b30898e4f741205d681) )
+
+	ROM_REGION( 0x80000, "layer0", 0 )	/* Layer 0 */
+	ROM_LOAD( "pa1-cha0.u60", 0x00000, 0x40000, CRC(314b51a6) SHA1(eef102c4f0c0e0f668a7cf228cd4fbe45b2ce45f) )
+	ROM_LOAD( "pa1-cha1.u61", 0x40000, 0x40000, CRC(f7a2c846) SHA1(3b505a7a3c7f30e6cd87803f5ae7e962205fc1f0) )
+
+	ROM_REGION( 0x40000, "oki1", 0 )	/* OKIM6295 #1 Samples */
+	ROM_LOAD( "pa1-voi0.u27", 0x00000, 0x40000, CRC(e3e623e1) SHA1(396accc7f7384277b700f019b5083def8a48ccd7) )
+
+	ROM_REGION( 0x40000, "oki2", ROMREGION_ERASE00 )	/* OKIM6295 #2 Samples */
+	// empty ROM socket
+
+	ROM_REGION( 0x117 * 3, "plds", 0 )
+	ROM_LOAD( "n44u1a.u1",   0x117*0, 0x117, NO_DUMP )	// GAL16V8B-15LP (Protected)
+	ROM_LOAD( "n44u3a.u3",   0x117*1, 0x117, NO_DUMP )	// GAL16V8B-15LP (Protected)
+	ROM_LOAD( "n44u51a.u51", 0x117*2, 0x117, NO_DUMP )	// GAL16V8B-15LP (Protected)
+ROM_END
+
+
+/***************************************************************************
+
            Power Instinct 2 (USA) / Gouketsuji Ichizoku 2 (Japan)
 
 (c)1994 Atlus
@@ -4065,7 +4239,7 @@ ROM_END
   OKI M6295
 
   Battery
-  EEPROM?
+  93C46 EEPROM? (at U24)
 
   28MHz XTAL
 
@@ -4086,9 +4260,9 @@ ROM_START( tjumpman )
 	ROM_REGION( 0x40000, "oki1", 0 )	/* OKIM6295 #1 Samples */
 	ROM_LOAD( "tj1_voi-0a.u27", 0x00000, 0x40000, CRC(b5693aae) SHA1(8887ae98030cb5d184e3d57d2b4e48bf1e76a232) )
 
-	ROM_REGION( 0x0002, "plds", 0 )
-	ROM_LOAD( "tj1_gal.uxx", 0x0000, 0x0001, NO_DUMP )	// GAL16V8D-15LP
-	ROM_LOAD( "tj1_gal.uyy", 0x0000, 0x0001, NO_DUMP )	// GAL16V8D-15LP
+	ROM_REGION( 0x117 * 2, "plds", 0 )
+	ROM_LOAD( "n44u1g.u1", 0x117*0, 0x117, CRC(e226ec18) SHA1(c14098e06413d6fc88926e31538d496ef7314903) )	// GAL16V8D-15LP
+	ROM_LOAD( "n44u3b.u3", 0x117*1, 0x117, CRC(4cd79750) SHA1(cfb3331cd8bb2eaaf5d2a80ae76a5a15ae92d379) )	// GAL16V8D-15LP
 ROM_END
 
 
@@ -4509,6 +4683,8 @@ GAME( 1996, agallett,   agallet,  sailormn, cave,     agallet,  ROT270, "Banpres
 GAME( 1996, agalleth,   agallet,  sailormn, cave,     agallet,  ROT270, "Banpresto / Gazelle",                    "Air Gallet (Hong Kong)",                               0 )
 
 GAME( 1996, hotdogst,   0,        hotdogst, cave,     hotdogst, ROT90,  "Marble",                                 "Hotdog Storm (International)",                         0 )
+
+GAME( 1996, pacslot,    0,        pacslot,  pacslot,  tjumpman, ROT0,   "Namco",                                  "Pac-Slot",                                             0 )
 
 GAME( 1997, ddonpach,   0,        ddonpach, cave,     ddonpach, ROT270, "Cave (Atlus license)",                   "DoDonPachi (International, Master Ver. 97/02/05)",     0 )
 GAME( 1997, ddonpachj,  ddonpach, ddonpach, cave,     ddonpach, ROT270, "Cave (Atlus license)",                   "DoDonPachi (Japan, Master Ver. 97/02/05)",             0 )

@@ -2476,6 +2476,7 @@ V-V                           TP-027
 	DRIVER( agallett )	/* (c) 1996 Banpresto / Gazelle (country is in EEPROM) */
 	DRIVER( agalleth )	/* (c) 1996 Banpresto / Gazelle (country is in EEPROM) */
 	DRIVER( hotdogst )	/* (c) 1996 Marble */
+	DRIVER( pacslot )	/* (c) 1996 Namco */
 	DRIVER( ddonpach )	/* (c) 1997 Atlus/Cave */
 	DRIVER( ddonpachj )	/* (c) 1997 Atlus/Cave */
 	DRIVER( dfeveron )	/* (c) 1998 Cave + Nihon System license */
