@@ -237,43 +237,43 @@ struct _naomibd_state
 static const naomibd_config_table naomibd_translate_tbl[] =
 {
 	// games where on-the-fly decryption works (many of these are fully playable in MAME, just slow)
-	{ "18wheelr", 0, 0x7cf54, { 0x1502, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "alpilota", 0, 0x70e41, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "alpiltdx", 0, 0x70e41, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "18wheelr", 0, 0x07cf54, { 0x1502, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "alpilota", 0, 0x070e41, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "alpiltdx", 0, 0x070e41, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
 	{ "capsnk", 0, 0, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
 	{ "capsnka", 0, 0, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "crackndj", 0, 0xc2347, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "crzytaxi", 0, 0xd2f45, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "csmash", 1, 0x03347, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "csmasho", 1, 0x03347, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "cspike", 0, 0xe2010, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "deathcox", 0, 0xb64d0, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "dybb99", 0, 0x48a01, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "f355twin", 0, 0x6efd4, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "f355twn2", 0, 0x666c6, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "ggram2", 0, 0x74a61, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "gundmct",  0, 0xe8010, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "gwing2",  0, 0xb25d0, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "hmgeo",   0, 0x38510, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "jambo",    0, 0xfab95, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "otrigger", 0, 0xfea94, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "pjustic", 0, 0x725d0, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "pstone", 0, 0xe69c1, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "pstone2", 0, 0xb8dc0, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "puyoda", 0, 0xacd40, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "ringout", 0, 0xb1e40, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "samba", 0, 0xa8b5d, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "slasho", 0, 0xa66ca, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "smlg99", 0, 0x48a01, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "spawn", 0, 0x78d01, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "sstrkfgt", 0, 0x32303, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "suchie3", 0, 0x368e1, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "toyfight", 0, 0x2ca85, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "vtennis", 0, 0x3eb15, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "vonot", 0, 0x10715, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "wwfroyal",0, 0x627c3, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "zerogu2", 0, 0x7c010, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "zombrvn", 0, 0x12b41, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "crackndj", 0, 0x1c2347, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "crzytaxi", 0, 0x0d2f45, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "csmash", 1, 0x103347, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "csmasho", 1, 0x103347, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "cspike", 0, 0x0e2010, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "deathcox", 0, 0x0b64d0, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "dybb99", 0, 0x048a01, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "f355twin", 0, 0x06efd4, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "f355twn2", 0, 0x1666c6, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "ggram2", 0, 0x074a61, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "gundmct",  0, 0x0e8010, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "gwing2",  0, 0x0b25d0, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "hmgeo",   0, 0x038510, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "jambo",    0, 0x0fab95, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "otrigger", 0, 0x0fea94, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "pjustic", 0, 0x0725d0, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "pstone", 0, 0x0e69c1, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "pstone2", 0, 0x0b8dc0, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "puyoda", 0, 0x0acd40, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "ringout", 0, 0x0b1e40, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "samba", 0, 0x0a8b5d, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "slasho", 0, 0x1a66ca, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "smlg99", 0, 0x048a01, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "spawn", 0, 0x078d01, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "sstrkfgt", 0, 0x132303, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "suchie3", 0, 0x0368e1, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "toyfight", 0, 0x02ca85, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "vtennis", 0, 0x03eb15, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "vonot", 0, 0x010715, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "wwfroyal",0, 0x1627c3, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "zerogu2", 0, 0x07c010, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "zombrvn", 0, 0x012b41, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
 
 	// games where the encryption is stacked with the ASIC's compression
 	{ "doa2", 0, -1, { -1, 0x500, 0, -1, 0x20504, 0x20000, -1, 0x40508, 0x40000, -1, 0x6050c, 0x60000, -1, 0x80510, 0x80000,	// 0x8ad01, has compression
@@ -290,7 +290,7 @@ static const naomibd_config_table naomibd_translate_tbl[] =
 			  0x2924, 0, 0x080000, 0x3222, 0, 0x090000, 0x7954, 0, 0x0a0000, 0x5acd, 0, 0x0b0000,
 			  0xdd19, 0, 0x0c0000, 0x2428, 0, 0x0d0000, 0x3329, 0, 0x0e0000, 0x2142, 0, 0x0f0000,
 		          0xffffffff, 0xffffffff, 0xffffffff } },
-	{ "sgtetris", 0, -1, { 0x1234, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },	// 0x8ae51, uses compression
+	{ "sgtetris", 0, -1, { 0x1234, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },	// 0x08ae51, uses compression
 //  { "virnbao", 0, 0x68b58, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },     // note: "virnba" set doesn't have protection
 //  { "vs2_2k", 0, 0x88b08, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
 };
@@ -1158,7 +1158,7 @@ internal block-cipher. So, at a given step, the internal block cipher will outpu
 given plaintext word, and the remaining 2 to the next plaintext word.
 
 The underlying block cipher consists of two 4-round Feistel Networks (FN): the first one takes the counter (16 bits),
-the game-key (20 bits) and the sequence-key (16 bits) and output a middle result (16 bits) which will act as another key
+the game-key (>=22 bits) and the sequence-key (16 bits) and output a middle result (16 bits) which will act as another key
 for the second one. The second FN will take the encrypted word (16 bits), the game-key, the sequence-key and the result
 from the first FN and will output the decrypted word (16 bits).
 
@@ -1169,10 +1169,11 @@ The underlying block cipher has the same structure than the one used by the CPS-
 indeed, some of the used sboxes are exactly the same and appear in the same FN/round in both systems (this is not evident,
 as you need to apply a bitswapping and some XORs to the input & output of the sboxes to get the same values due). However,
 the key scheduling used by this implementation is much weaker than the CPS-2's one. Many s-boxes inputs are XORed with any
-key bit and, indeed, the cart-specific key is just 20-bits long.
+key bit.
 
 Due to the small key-length, no sophisticated attacks are needed to recover the keys; a brute-force attack knowing just
-one or two (encrypted word-decrypted word) pairs suffice.
+some (encrypted word-decrypted word) pairs suffice. However, due to the weak key scheduling, it should be noted that some
+related keys can produce the same output bytes for some (short) input sequences.
 
 The only difference in the decryption process between M2 and M3 is the initialization of the counter. In M3, the counter is
 always set to 0 at the beginning of the decryption while, in M2, the bits #1-#16 of the ciphertext's address are used
@@ -1183,11 +1184,12 @@ you could apply a fixed bitswapping and XOR to the keys and the decryption would
 accordingly the s-boxes' definitions. So the order of the bits in the keys is arbitrary, and the s-boxes values have been
 chosen so as to make the key for CAPSNK equal to 0.
 
-It can be observed that some sboxes have incomplete tables (a 255 value indicate an unknown value). In most of the cases,
-they are apparently unused by the cipher (due to the weak key scheduling mentioned above). As of february/2010, the only
-s-box which have a incomplete table which could be begin used is the 4th s-box of the 1st round of the 2nd FN. It's
-incomplete because we haven't located any game using that part of the s-box till now, but definitively it could be being
-used by some still-not-analyzed carts.
+It can be observed that some sboxes have incomplete tables (a 255 value indicate an unknown value). It's unclear whether or
+not they are used by the cipher, as the bits of the recovered keys as of november/2010 show small randomness and big correlations,
+making possible that some unseen bits could make the decryption need those incomplete parts. Even if not, as of november/2010, there are two
+s-boxes which have an incomplete table which definitely could be being used by some carts: the 1st s-box of the 1st round of the 1st FN and
+the 4th s-box of the 1st round of the 2nd FN. They are incomplete because we haven't located any game using that part of the s-box
+till now, but definitively they could be being used by some still-not-analyzed carts.
 
 When bit #1 of the heading control bits is set to 1, an additional decompression step seems to be carried out. As of
 february/2010, Deunan Knute has put some work on analyzing the decompression algorithm, but probably much more work will
@@ -1218,8 +1220,9 @@ static const struct sbox fn1_sboxes[4][4] =
         {
             {
                 0,3,2,2,1,3,1,2,3,2,1,2,1,2,3,1,3,2,2,0,2,1,3,0,0,3,2,3,2,1,2,0,
-                // unused
-                255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
+                2,3,1,1,2,2,1,1,1,0,2,3,3,0,2,1,
+                // potentially used, but we haven't located any game using it
+                255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
             },
             {3,4,5,7,-1,-1},
             {0,4}
@@ -1265,7 +1268,7 @@ static const struct sbox fn1_sboxes[4][4] =
         {
             {
                 2,0,1,0,0,3,2,0,3,3,1,2,1,3,0,2,0,2,0,0,0,2,3,1,3,1,1,2,3,0,3,0,
-                // unused
+                // unused?
                 255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
             },
             {0,1,3,4,6,-1},
@@ -1312,7 +1315,7 @@ static const struct sbox fn1_sboxes[4][4] =
         {
             {
                 0,3,0,2,1,2,0,0,1,1,0,0,3,1,1,0,0,3,0,0,2,3,3,2,3,1,2,0,0,2,3,0,
-                // unused
+                // unused?
                 255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
             },
             {0,2,4,6,7,-1},
@@ -1392,8 +1395,7 @@ static const struct sbox fn2_sboxes[4][4] =
         {
             {
                 0,2,2,1,0,1,2,1,2,0,1,2,3,3,0,1,3,1,1,2,1,2,1,3,3,2,3,3,2,1,0,1,
-                // unused
-                255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
+                0,1,0,2,0,1,1,3,2,0,3,2,1,1,1,3,2,3,0,2,3,0,2,2,1,3,0,1,1,2,2,2,
             },
             {0,2,3,4,7,-1},
             {3,4}
@@ -1469,7 +1471,7 @@ static const struct sbox fn2_sboxes[4][4] =
         {
             {
                 2,2,3,2,0,3,2,3,1,1,2,0,2,3,1,3,0,0,0,3,2,0,1,0,1,3,2,3,3,3,1,0,
-                // unused
+                // unused?
                 255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
             },
             {1,2,4,7,-1,-1},
@@ -1524,20 +1526,21 @@ static const struct sbox fn2_sboxes[4][4] =
     },
 };
 
-static const int fn1_game_key_scheduling[30][2] =
+static const int fn1_game_key_scheduling[34][2] =
 {
-    {1,29},  {1,71},  {1,81},  {2,4},   {2,54},  {3,8},   {4,56},  {4,73},
-    {5,11},  {6,51},  {7,92},  {8,89},  {9,9},   {9,10},  {9,39},  {9,41},
-    {9,58},  {9,59},  {9,86},  {10,90}, {11,6},  {12,64}, {13,49}, {14,44},
-    {15,40}, {16,69}, {17,15}, {18,23}, {18,43}, {19,82},
+    {1,29},  {1,71},  {2,4},   {2,54},  {3,8},   {4,56},  {4,73},  {5,11},
+    {6,51},  {7,92},  {8,89},  {9,9},   {9,10},  {9,39},  {9,41},  {9,58},
+    {9,59},  {9,86},  {10,90}, {11,6},  {12,64}, {13,49}, {14,44}, {15,40},
+    {16,69}, {17,15}, {18,23}, {18,43}, {19,82}, {20,81}, {21,5},  {21,32},
+    {21,61}, {21,66}
 };
 
-static const int fn2_game_key_scheduling[27][2] =
+static const int fn2_game_key_scheduling[32][2] =
 {
-    {0,0},   {1,3},   {1,35},  {2,11},  {3,20},  {4,22},  {5,23},  {6,29},
-    {7,38},  {8,39},  {9,47},  {9,55},  {9,86},  {9,87},  {9,90},  {10,50},
-    {10,53}, {11,57}, {12,59}, {13,61}, {13,64}, {14,63}, {15,67}, {16,72},
-    {17,83}, {18,88}, {19,94},
+    {0,0},   {1,3},   {2,11},  {3,20},  {4,22},  {5,23},  {6,29},  {7,38},
+    {8,39},  {9,47},  {9,55},  {9,86},  {9,87},  {9,90},  {10,50}, {10,53},
+    {11,57}, {12,59}, {13,61}, {13,64}, {14,63}, {15,67}, {16,72}, {17,83},
+    {18,88}, {19,94}, {20,35}, {21,6},  {21,11}, {21,17}, {21,85}, {21,92}
 };
 
 static const int fn1_sequence_key_scheduling[20][2] =
@@ -1601,7 +1604,7 @@ static UINT16 block_decrypt(UINT32 game_key, UINT16 sequence_key, UINT16 counter
     memset(fn1_subkeys,0,sizeof(UINT32)*4);
     memset(fn2_subkeys,0,sizeof(UINT32)*4);
 
-    for (j=0; j<30; ++j)
+    for (j=0; j<34; ++j)
     {
         if (BIT(game_key, fn1_game_key_scheduling[j][0])!=0)
         {
@@ -1611,7 +1614,7 @@ static UINT16 block_decrypt(UINT32 game_key, UINT16 sequence_key, UINT16 counter
         }
     }
 
-    for (j=0; j<27; ++j)
+    for (j=0; j<32; ++j)
     {
         if (BIT(game_key, fn2_game_key_scheduling[j][0])!=0)
         {
