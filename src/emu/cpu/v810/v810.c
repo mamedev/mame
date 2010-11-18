@@ -28,14 +28,15 @@ struct _v810_state
 {
 	UINT32 reg[65];
 	UINT8 irq_line;
+	UINT8 irq_state;
 	UINT8 nmi_line;
-	device_irq_callback irq_cb;
+	device_irq_callback irq_callback;
 	legacy_cpu_device *device;
 	address_space *program;
 	direct_read_data *direct;
 	address_space *io;
 	UINT32 PPC;
-	int icount;
+	int icount;	
 };
 
 INLINE v810_state *get_safe_token(running_device *device)
@@ -542,6 +543,24 @@ static UINT32 opDI(v810_state *cpustate,UINT32 op)
 	return clkIF;
 }
 
+static UINT32 opTRAP(v810_state *cpustate,UINT32 op)
+{
+	logerror("V810: TRAP @ %X\n",cpustate->PC-2);
+	return clkIF;
+}
+
+static UINT32 opRETI(v810_state *cpustate,UINT32 op)
+{
+	if(GET_NP) {
+		cpustate->PC = cpustate->FEPC;
+		cpustate->PSW = cpustate->FEPSW;
+	} else {
+		cpustate->PC = cpustate->EIPC;
+		cpustate->PSW = cpustate->EIPSW;
+	}
+	return clkIF;
+}
+
 static UINT32 opHALT(v810_state *cpustate,UINT32 op)
 {
 	logerror("V810: HALT @ %X",cpustate->PC-2);
@@ -952,8 +971,8 @@ static UINT32 (*const OpCodeTable[64])(v810_state *cpustate,UINT32 op) =
 	/* 0x15 */ opSHRi,  	// shr imm5,r2          2
 	/* 0x16 */ opEI,    	// ei               2
 	/* 0x17 */ opSARi,  	// sar imm5,r2          2
-	/* 0x18 */ opUNDEF,
-	/* 0x19 */ opUNDEF,
+	/* 0x18 */ opTRAP,
+	/* 0x19 */ opRETI,
 	/* 0x1a */ opHALT,  	// halt             2
 	/* 0x1b */ opUNDEF,
 	/* 0x1c */ opLDSR,  	// ldsr reg2,regID          2
@@ -1000,7 +1019,7 @@ static CPU_INIT( v810 )
 
 	cpustate->irq_line = CLEAR_LINE;
 	cpustate->nmi_line = CLEAR_LINE;
-	cpustate->irq_cb = irqcallback;
+	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
 	cpustate->program = device->space(AS_PROGRAM);
 	cpustate->direct = &cpustate->program->direct();
@@ -1023,6 +1042,20 @@ static CPU_RESET( v810 )
 	cpustate->ECR	= 0x0000fff0;
 }
 
+static void take_interrupt(v810_state *cpustate)
+{
+	cpustate->EIPC = cpustate->PC;
+	cpustate->EIPSW = cpustate->PSW;
+	
+	cpustate->PC = 0xfffffe00 | (cpustate->irq_line << 4);
+	SET_EP(1);
+    SET_ID(1);
+    UINT8 num = cpustate->irq_line + 1;
+	if (num==0x10) num=0x0f;
+	cpustate->PSW &= 0xffff;
+	cpustate->PSW |= num << 16;
+}
+
 static CPU_EXECUTE( v810 )
 {
 	v810_state *cpustate = get_safe_token(device);
@@ -1030,7 +1063,13 @@ static CPU_EXECUTE( v810 )
 	while(cpustate->icount>0)
 	{
 		UINT32 op;
-
+		if (cpustate->irq_state != CLEAR_LINE) {
+			if (!(GET_NP | GET_EP | GET_ID)) {
+				if (cpustate->irq_line >=((cpustate->PSW & 0xF0000) >> 16)) {
+					take_interrupt(cpustate);						
+				}
+			}
+		}
 		cpustate->PPC=cpustate->PC;
 		debugger_instruction_hook(device, cpustate->PC);
 		op=R_OP(cpustate,cpustate->PC);
@@ -1042,6 +1081,8 @@ static CPU_EXECUTE( v810 )
 
 static void set_irq_line(v810_state *cpustate, int irqline, int state)
 {
+	cpustate->irq_state = state;
+	cpustate->irq_line = irqline;
 }
 
 /**************************************************************************
