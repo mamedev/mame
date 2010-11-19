@@ -8576,6 +8576,10 @@ Other Sun games
 	DRIVER( killbldp )
 	DRIVER( happy6 )
 	DRIVER( svg )
+	DRIVER( ket )
+	DRIVER( keta )
+	DRIVER( ketb )
+	DRIVER( ddp3 )
 
 	/* Spirit Tech. Corp. */
 	DRIVER( dunhuang )	/* (c) 1995 */
