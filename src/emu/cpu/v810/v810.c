@@ -97,19 +97,19 @@ INLINE v810_state *get_safe_token(running_device *device)
 #define GET_S					((cpustate->PSW & 0x00000002)>>1)
 #define GET_OV					((cpustate->PSW & 0x00000004)>>2)
 #define GET_CY					((cpustate->PSW & 0x00000008)>>3)
-#define GET_ID					((cpustate->PSW & 0x00008000)>>15)
-#define GET_EP					((cpustate->PSW & 0x00010000)>>16)
-#define GET_NP					((cpustate->PSW & 0x00020000)>>17)
-#define GET_AE					((cpustate->PSW & 0x00040000)>>18)
+#define GET_ID					((cpustate->PSW & 0x00001000)>>12)
+#define GET_AE					((cpustate->PSW & 0x00002000)>>13)
+#define GET_EP					((cpustate->PSW & 0x00004000)>>14)
+#define GET_NP					((cpustate->PSW & 0x00008000)>>15)
 
 #define SET_Z(val)				(cpustate->PSW = (cpustate->PSW & ~0x00000001) | (val))
 #define SET_S(val)				(cpustate->PSW = (cpustate->PSW & ~0x00000002) | ((val) << 1))
 #define SET_OV(val)				(cpustate->PSW = (cpustate->PSW & ~0x00000004) | ((val) << 2))
 #define SET_CY(val)				(cpustate->PSW = (cpustate->PSW & ~0x00000008) | ((val) << 3))
-#define SET_ID(val)				(cpustate->PSW = (cpustate->PSW & ~0x00008000) | ((val) << 15))
-#define SET_EP(val)				(cpustate->PSW = (cpustate->PSW & ~0x00010000) | ((val) << 16))
-#define SET_NP(val)				(cpustate->PSW = (cpustate->PSW & ~0x00020000) | ((val) << 17))
-#define SET_AE(val)				(cpustate->PSW = (cpustate->PSW & ~0x00040000) | ((val) << 18))
+#define SET_ID(val)				(cpustate->PSW = (cpustate->PSW & ~0x00001000) | ((val) << 12))
+#define SET_AE(val)				(cpustate->PSW = (cpustate->PSW & ~0x00002000) | ((val) << 13))
+#define SET_EP(val)				(cpustate->PSW = (cpustate->PSW & ~0x00004000) | ((val) << 14))
+#define SET_NP(val)				(cpustate->PSW = (cpustate->PSW & ~0x00008000) | ((val) << 15))
 
 #define R_B(cs, addr) ((cs)->program->read_byte(addr))
 #define R_H(cs, addr) ((cs)->program->read_word(addr))
@@ -1017,7 +1017,8 @@ static CPU_INIT( v810 )
 {
 	v810_state *cpustate = get_safe_token(device);
 
-	cpustate->irq_line = CLEAR_LINE;
+	cpustate->irq_state = CLEAR_LINE;
+	cpustate->irq_line = 0;
 	cpustate->nmi_line = CLEAR_LINE;
 	cpustate->irq_callback = irqcallback;
 	cpustate->device = device;
@@ -1027,6 +1028,7 @@ static CPU_INIT( v810 )
 
 	state_save_register_device_item_array(device, 0, cpustate->reg);
 	state_save_register_device_item(device, 0, cpustate->irq_line);
+	state_save_register_device_item(device, 0, cpustate->irq_state);
 	state_save_register_device_item(device, 0, cpustate->nmi_line);
 	state_save_register_device_item(device, 0, cpustate->PPC);
 
@@ -1038,7 +1040,7 @@ static CPU_RESET( v810 )
 	int i;
 	for(i=0;i<64;i++)	cpustate->reg[i]=0;
 	cpustate->PC = 0xfffffff0;
-	cpustate->PSW = 0x8000;
+	cpustate->PSW = 0x1000;
 	cpustate->ECR	= 0x0000fff0;
 }
 
@@ -1048,28 +1050,34 @@ static void take_interrupt(v810_state *cpustate)
 	cpustate->EIPSW = cpustate->PSW;
 	
 	cpustate->PC = 0xfffffe00 | (cpustate->irq_line << 4);
-	SET_EP(1);
-    SET_ID(1);
-    UINT8 num = cpustate->irq_line + 1;
+	cpustate->ECR = 0xfe00 | (cpustate->irq_line << 4);
+    
+	UINT8 num = cpustate->irq_line + 1;
 	if (num==0x10) num=0x0f;
-	cpustate->PSW &= 0xffff;
+	
+	cpustate->PSW &= 0xfff0ffff; // clear interrupt level
+	SET_EP(1);
+    SET_ID(1);	
 	cpustate->PSW |= num << 16;
+	
+	cpustate->icount-= clkIF;
 }
 
 static CPU_EXECUTE( v810 )
 {
 	v810_state *cpustate = get_safe_token(device);
 
+	if (cpustate->irq_state != CLEAR_LINE) {
+		if (!(GET_NP | GET_EP | GET_ID)) {
+			if (cpustate->irq_line >=((cpustate->PSW & 0xF0000) >> 16)) {
+				take_interrupt(cpustate);
+			}
+		}
+	}
 	while(cpustate->icount>0)
 	{
 		UINT32 op;
-		if (cpustate->irq_state != CLEAR_LINE) {
-			if (!(GET_NP | GET_EP | GET_ID)) {
-				if (cpustate->irq_line >=((cpustate->PSW & 0xF0000) >> 16)) {
-					take_interrupt(cpustate);						
-				}
-			}
-		}
+
 		cpustate->PPC=cpustate->PC;
 		debugger_instruction_hook(device, cpustate->PC);
 		op=R_OP(cpustate,cpustate->PC);
@@ -1193,15 +1201,15 @@ CPU_GET_INFO( v810 )
 			break;
 
 		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(v810_state);			break;
-		case CPUINFO_INT_INPUT_LINES:					info->i = 9;							break;
+		case CPUINFO_INT_INPUT_LINES:					info->i = 16;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0;							break;
 		case DEVINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;			break;
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 2;							break;
 		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:			info->i = 4;							break;
-		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;							break;
-		case CPUINFO_INT_MAX_CYCLES:					info->i = 1;							break;
+		case CPUINFO_INT_MIN_CYCLES:					info->i = 3;							break;
+		case CPUINFO_INT_MAX_CYCLES:					info->i = 6;							break;
 
 		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 32;					break;
 		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_PROGRAM: info->i = 32;					break;
@@ -1213,7 +1221,22 @@ CPU_GET_INFO( v810 )
 		case DEVINFO_INT_ADDRBUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 32;					break;
 		case DEVINFO_INT_ADDRBUS_SHIFT + ADDRESS_SPACE_IO:		info->i = 0;					break;
 
-		case CPUINFO_INT_INPUT_STATE + 0:				info->i = cpustate->irq_line;			break;
+		case CPUINFO_INT_INPUT_STATE + 0:				info->i = (cpustate->irq_line == 0) ? cpustate->irq_state : CLEAR_LINE;			break;
+		case CPUINFO_INT_INPUT_STATE + 1:				info->i = (cpustate->irq_line == 1) ? cpustate->irq_state : CLEAR_LINE;			break;
+		case CPUINFO_INT_INPUT_STATE + 2:				info->i = (cpustate->irq_line == 2) ? cpustate->irq_state : CLEAR_LINE;			break;
+		case CPUINFO_INT_INPUT_STATE + 3:				info->i = (cpustate->irq_line == 3) ? cpustate->irq_state : CLEAR_LINE;			break;
+		case CPUINFO_INT_INPUT_STATE + 4:				info->i = (cpustate->irq_line == 4) ? cpustate->irq_state : CLEAR_LINE;			break;
+		case CPUINFO_INT_INPUT_STATE + 5:				info->i = (cpustate->irq_line == 5) ? cpustate->irq_state : CLEAR_LINE;			break;
+		case CPUINFO_INT_INPUT_STATE + 6:				info->i = (cpustate->irq_line == 6) ? cpustate->irq_state : CLEAR_LINE;			break;
+		case CPUINFO_INT_INPUT_STATE + 7:				info->i = (cpustate->irq_line == 7) ? cpustate->irq_state : CLEAR_LINE;			break;
+		case CPUINFO_INT_INPUT_STATE + 8:				info->i = (cpustate->irq_line == 8) ? cpustate->irq_state : CLEAR_LINE;			break;
+		case CPUINFO_INT_INPUT_STATE + 9:				info->i = (cpustate->irq_line == 9) ? cpustate->irq_state : CLEAR_LINE;			break;
+		case CPUINFO_INT_INPUT_STATE + 10:				info->i = (cpustate->irq_line == 10) ? cpustate->irq_state : CLEAR_LINE;			break;
+		case CPUINFO_INT_INPUT_STATE + 11:				info->i = (cpustate->irq_line == 11) ? cpustate->irq_state : CLEAR_LINE;			break;
+		case CPUINFO_INT_INPUT_STATE + 12:				info->i = (cpustate->irq_line == 12) ? cpustate->irq_state : CLEAR_LINE;			break;
+		case CPUINFO_INT_INPUT_STATE + 13:				info->i = (cpustate->irq_line == 13) ? cpustate->irq_state : CLEAR_LINE;			break;
+		case CPUINFO_INT_INPUT_STATE + 14:				info->i = (cpustate->irq_line == 14) ? cpustate->irq_state : CLEAR_LINE;			break;
+		case CPUINFO_INT_INPUT_STATE + 15:				info->i = (cpustate->irq_line == 15) ? cpustate->irq_state : CLEAR_LINE;			break;
 		case CPUINFO_INT_INPUT_STATE + INPUT_LINE_NMI:	info->i = cpustate->nmi_line;			break;
 
 		case CPUINFO_INT_PREVIOUSPC:					info->i = cpustate->PPC;				break;
