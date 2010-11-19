@@ -3996,6 +3996,32 @@ ROM_START( ketb )
 	ROM_LOAD( "music-1.u17",    0x400000, 0x400000, CRC(b46e22d1) SHA1(670853dc485942fb96380568494bdf3235f446ee) )
 ROM_END
 
+ROM_START( espgal )
+	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
+	/* doesn't use a separate BIOS rom */
+	ROM_LOAD16_WORD_SWAP( "espgaluda_v100.bin", 0x000000, 0x200000, CRC(08ecec34) SHA1(bce2e7fb9105ed51603d09cbd3a9eeb5b8f47ee2) )
+
+	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_LOAD( "espgal_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
+
+	ROM_REGION32_LE( 0x400000, "user1", ROMREGION_ERASE00 )
+	/* no external protection rom */
+	
+	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // same as standard PGM text bios - surface scratched to remove details
+	ROM_LOAD( "text-1.u19",   0x400000, 0x800000, NO_DUMP )
+
+	ROM_REGION( 0x1000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_LOAD( "image-1.u7",    0x0000000, 0x0800000, NO_DUMP )
+	ROM_LOAD( "image-2.u8",    0x0800000, 0x0800000, NO_DUMP )
+
+	ROM_REGION( 0x0800000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_LOAD( "bitmap-1.u1",    0x0000000, 0x0800000, NO_DUMP ) 
+
+	ROM_REGION( 0x800000, "ics", ROMREGION_ERASE00 ) /* Samples - (8 bit mono 11025Hz) - */
+	/* there is a position for the PGM audio bios rom, but it's unpopulated, and the M of PGM has been scratched off the PCB */
+	ROM_LOAD( "music-1.u17",    0x400000, 0x400000, NO_DUMP )
+ROM_END
 
 ROM_START( ddp3 )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
@@ -5396,6 +5422,8 @@ GAME( 2005, svg,          pgm,       svg,     sango,    svg,        ROT0,   "IGS
 GAME( 2002, ket,          0,         kov2,    ddp2,     ddp2,       ROT270, "Cave", "Ketsui", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 GAME( 2002, keta,         ket,       kov2,    ddp2,     ddp2,       ROT270, "Cave", "Ketsui (older)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 GAME( 2002, ketb,         ket,       kov2,    ddp2,     ddp2,       ROT270, "Cave", "Ketsui (first revision)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+
+GAME( 2002, espgal,       0,         kov2,    ddp2,     ddp2,       ROT270, "Cave", "EspGaluda", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 
 GAME( 2002, ddp3,         0,         kov2,    ddp2,     ddp2,       ROT270, "Cave", "DoDonPachi Dai-Ou-Jou", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 

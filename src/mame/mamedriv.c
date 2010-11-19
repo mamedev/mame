@@ -8580,6 +8580,7 @@ Other Sun games
 	DRIVER( keta )
 	DRIVER( ketb )
 	DRIVER( ddp3 )
+	DRIVER( espgal )
 
 	/* Spirit Tech. Corp. */
 	DRIVER( dunhuang )	/* (c) 1995 */
