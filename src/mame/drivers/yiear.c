@@ -45,6 +45,44 @@ The 6809 NMI is used for sound timing.
 8000-ffff   R   ROM
 
 
+Additional Information
+----------------------
+
+While the arcade game itself never had them, nor are they really
+mentioned in the manual, the board supports a third button for both
+players.  This button enhances jump height on straight up jumps among
+other different stances in combination with movements.  It is now in
+the emulation, but default mapping is "n/a" and must be manually mapped
+to be used.
+
+This is a chart for the edge connector showing the location of pins for
+"Button 3" for each player.  The manual shows these without a function
+or not used.
+
+(Posted by Matt Osborne @ KLOV Forums)
+
+             Solder Side | Parts Side
+_________________________|___________________________
+ NC                  | A | 1 |   +12V
+ Speaker             | B | 2 |   Speaker
+ 2P Button 2 (Punch) | C | 3 |   2P Button 1 (Kick)
+ 2P Left             | D | 4 |   2P Right
+ 1P Start            | E | 5 |   2P Start
+ 1P Button 1 (Kick)  | F | 6 |   2P Up
+ 1P Button 2 (Punch) | H | 7 |   Service
+ 1P Right            | J | 8 |   1P Left
+ 1P Up               | K | 9 |   2P Down
+ Coin 1              | L | 10|   Coin 2
+ 1P Down             | M | 11|   Coin Counter 1
+ 1P Button 3 (Boost?)| N | 12|   Coin Counter 2
+ Video Green         | P | 13|   Video Blue
+ Video Red           | R | 14|   Video Sync
+ NC                  | S | 15|   2P Button 3 (Boost?)
+ GND                 | T | 16|   GND
+ GND                 | U | 17|   GND
+ +5V                 | V | 18|   +5V
+
+
 ***************************************************************************/
 
 #include "emu.h"
@@ -115,10 +153,24 @@ static INPUT_PORTS_START( yiear )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("P1")
-	KONAMI8_MONO_B12_UNK
-
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(1)
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_CODE("NONE")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
+        
 	PORT_START("P2")
-	KONAMI8_COCKTAIL_B12_UNK
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL PORT_CODE("NONE")
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) )
