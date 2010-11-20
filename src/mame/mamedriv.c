@@ -7082,6 +7082,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( mkr4 )		/* (c) 1992 Midway */
 	DRIVER( mktturbo )	/* hack */
 	DRIVER( mkyturbo )	/* hack */
+	DRIVER( mkprot4 )   /* (c) 1992 Midway */
 	DRIVER( mkprot8 )	/* (c) 1992 Midway */
 	DRIVER( mkprot9 )	/* (c) 1992 Midway */
 	DRIVER( mkla1 )		/* (c) 1992 Midway */
