@@ -2736,7 +2736,8 @@ V-V                           TP-027
 	DRIVER( 3wondersu )	/* 20/05/1991 (c) 1991 (US)    */
 	DRIVER( wonder3 )	/* 20/05/1991 (c) 1991 (Japan) */
 	DRIVER( 3wondersh )	/* hack */
-	DRIVER( kod )		/* 11/07/1991 (c) 1991 (World) */
+	DRIVER( kod )		/* 05/08/1991 (c) 1991 (World) */
+	DRIVER( kodr1 )		/* 11/07/1991 (c) 1991 (World) */
 	DRIVER( kodu )		/* 10/09/1991 (c) 1991 (US)    */
 	DRIVER( kodj )		/* 05/08/1991 (c) 1991 (Japan) */
 	DRIVER( kodja )		/* 05/08/1991 (c) 1991 (Japan) */

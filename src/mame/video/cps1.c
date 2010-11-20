@@ -21,9 +21,9 @@ Known A-board revisions:
 
 NAME                                                     Year  B-board #       B-board PALs      C-board #            CPS-B #          C-board PALs
 -------------------------------------------------------  ----  ---------  ---------------------  -----------  -----------------------  ------------
-Forgotten Worlds (World, B-Board 88621B-2)               1988  88621B-2   LW621            LWIO  None         CPS-B-01  DL-0411-10001  N/A
-Forgotten Worlds (USA, B-Board 88621B-2)                       88621B-2   LW621            LWIO  None         CPS-B-01  DL-0411-10001  N/A
+Forgotten Worlds (World)                                 1988  88621B-2   LW621            LWIO  None         CPS-B-01  DL-0411-10001  N/A
 Forgotten Worlds (USA, B-Board 88618B-?)                       88618B-?   LWCHR            LWIO  None         CPS-B-01  DL-0411-10001  N/A
+Forgotten Worlds (USA, B-Board 88621B-2)                       88621B-2   LW621            LWIO  None         CPS-B-01  DL-0411-10001  N/A
 Lost Worlds (Japan Old Ver.)                                   88618B-2   LWCHR            LWIO  None         CPS-B-01  DL-0411-10001  N/A
 Lost Worlds (Japan)                                            88618B-2   LWCHR            LWIO  None         CPS-B-01  DL-0411-10001  N/A
 
@@ -99,6 +99,7 @@ Three Wonders* (USA 910520)                                    89624B-3   RT24B 
 Wonder 3* (Japan 910520)                                       89625B-1   RT22B            IOB1  90630C-4     CPS-B-21  DL-0921-10014          IOC1
 
 The King of Dragons* (World 910711)                      1991  90629B-3   KD29B            IOB1  90631C-5     CPS-B-21  DL-0921-10014  C632    IOC1
+The King of Dragons* (World 910805)                            90629B-3   KD29B            IOB1  90631C-5     CPS-B-21  DL-0921-10014  C632    IOC1
 The King of Dragons* (USA 910910)                              90629B-3   KD29B            IOB1  90631C-5     CPS-B-21  DL-0921-10014  C632    IOC1
 The King of Dragons* (Japan 910805, B-Board 89625B-1)          89625B-1   KD22B            IOB1  90631C-5     CPS-B-21  DL-0921-10014  C632    IOC1
 The King of Dragons* (Japan 910805, B-Board 90629B-3)          90629B-3   KD29B            IOB1  90631C-5     CPS-B-21  DL-0921-10014  C632    IOC1
@@ -1325,6 +1326,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"wonder3",     CPS_B_21_BT1, mapper_RT22B },	// equivalent to RT24B
 	{"3wondersh",   CPS_B_02    , mapper_RT24B },	/* Not 100% sure of the CPS B-ID */
 	{"kod",         CPS_B_21_BT2, mapper_KD29B,  0x36, 0, 0x34 },
+	{"kodr1",       CPS_B_21_BT2, mapper_KD29B,  0x36, 0, 0x34 },
 	{"kodu",        CPS_B_21_BT2, mapper_KD29B,  0x36, 0, 0x34 },
 	{"kodj",        CPS_B_21_BT2, mapper_KD29B,  0x36, 0, 0x34 },
 	{"kodja",       CPS_B_21_BT2, mapper_KD29B,  0x36, 0, 0x34 },	// wrong, this set uses KD22B, still non dumped
