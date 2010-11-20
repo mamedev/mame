@@ -303,7 +303,7 @@ Donkey Kong Junior Notes
     This is a DKong/Hack combo using a Braze Technologies High Score Save pcb.
     This pcb will be placed in the cpu socket and the Z80 together with an
     additional 64K rom, a 74LS245, an eeprom and a pal/gal. It looks like the
-    "encryption" was a conincidence resulting from an easy pcb layout.
+    "encryption" was a coincidence resulting from an easy pcb layout.
     The pal is also used to switch A15 on and off. This is done in locations
     6800 and E800.
 

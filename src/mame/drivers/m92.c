@@ -56,7 +56,7 @@ Glitch list!
           be removed from the ROM definition.
 
     Perfect Soliders:
-        Shortly into the fight, the sound CPU enters a tight loop, conitnuously
+        Shortly into the fight, the sound CPU enters a tight loop, continuously
         writing to the status port and with interrupts disabled. I don't see how
         it is supposed to get out of that loop. Maybe it's not supposed to enter
         it at all?

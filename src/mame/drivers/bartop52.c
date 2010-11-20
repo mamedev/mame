@@ -4,7 +4,7 @@
 	Driver by Mariusz Wojcieszek
     Based on Atari 400/800 MESS Driver by Juergen Buchmueller
 
-	Hardware was based on Atari 5200 game console with additional coni and timer hardware.
+	Hardware was based on Atari 5200 game console with additional coin and timer hardware.
 	System was intented to run in barroms and taverns. Software was based on Atari 5200
 	Realsports cartridges.
 
