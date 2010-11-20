@@ -977,6 +977,43 @@ ROM_START( mk2r14 )
 	ROM_LOAD( "uj22-vid", 0xb00000, 0x100000, CRC(8891d785) SHA1(fd460df1ef8f4306ea42f7dc41488a80fd2c8f53) )
 ROM_END
 
+ROM_START( mk2r11 )
+	ROM_REGION16_LE( 0xc00000, "dcs", ROMREGION_ERASEFF )	/* sound data */
+	ROM_LOAD16_BYTE( "su2.l1", 0x000000, 0x80000, CRC(5f23d71d) SHA1(54c2afef243759e0f3dbe2907edbc4302f5c8bad) )
+	ROM_RELOAD(	               0x100000, 0x80000 )
+	ROM_LOAD16_BYTE( "su3.l1", 0x200000, 0x80000, CRC(d6d92bf9) SHA1(397351c6b707f2595e36360471015f9fa494e894) )
+	ROM_RELOAD(	               0x300000, 0x80000 )
+	ROM_LOAD16_BYTE( "su4.l1", 0x400000, 0x80000, CRC(eebc8e0f) SHA1(705ab63ff7672a4857d546afda6dca4973cce1ad) )
+	ROM_RELOAD(	               0x500000, 0x80000 )
+	ROM_LOAD16_BYTE( "su5.l1", 0x600000, 0x80000, CRC(2b0b7961) SHA1(1cdc64aab74d14afbd8c3531e3d0bd49271a281f) )
+	ROM_RELOAD(	               0x700000, 0x80000 )
+	ROM_LOAD16_BYTE( "su6.l1", 0x800000, 0x80000, CRC(f694b27f) SHA1(d43e38a124665f49ebb4ffc5a55e8f19a1a64686) )
+	ROM_RELOAD(	               0x900000, 0x80000 )
+	ROM_LOAD16_BYTE( "su7.l1", 0xa00000, 0x80000, CRC(20387e0a) SHA1(505d05173b2a1f1ee3ebc2898ccd3a95c98dd04a) )
+	ROM_RELOAD(	               0xb00000, 0x80000 )
+	/* su8 and su9 are unpopulated */
+
+	ROM_REGION16_LE( 0x100000, "user1", 0 )	/* 34010 code */
+	ROM_LOAD16_BYTE( "uj12.l11", 0x00000, 0x80000, CRC(01daff19) SHA1(8b14bf823ecb60c391688c106a52f141f1d291b5) )
+	ROM_LOAD16_BYTE( "ug12.l11", 0x00001, 0x80000, CRC(54042eb7) SHA1(cda2f940b9c74989450611e6319e7cdadc05c627) )
+
+	ROM_REGION( 0xc00000, "gfx1", 0 )
+	ROM_LOAD( "ug14-vid", 0x000000, 0x100000, CRC(01e73af6) SHA1(6598cfd704cc92a7f358a0e1f1c973ab79dcc493) )
+	ROM_LOAD( "ug16-vid", 0x100000, 0x100000, CRC(8ba6ae18) SHA1(465fe907de4a1e502180c4e41642998dd3abc8e6) )
+	ROM_LOAD( "ug17-vid", 0x200000, 0x100000, CRC(937d8620) SHA1(8b9f80a460b124a747a6d1495b53f01f580e28f1) )
+
+	ROM_LOAD( "uj14-vid", 0x300000, 0x100000, CRC(d4985cbb) SHA1(367865da7efae38d83de3c0868d02a705177ae63) )
+	ROM_LOAD( "uj16-vid", 0x400000, 0x100000, CRC(39d885b4) SHA1(2251826d247c3c6df421124718401fb35a672f83) )
+	ROM_LOAD( "uj17-vid", 0x500000, 0x100000, CRC(218de160) SHA1(87aea173720d2a33d8183903f4fe8ba1d47e3348) )
+
+	ROM_LOAD( "ug19-vid", 0x600000, 0x100000, CRC(fec137be) SHA1(f11ecb8a7993f5c4f4449564b4911f69bd6e9bf8) )
+	ROM_LOAD( "ug20-vid", 0x700000, 0x100000, CRC(809118c1) SHA1(86153e648834c749e34573151cd4fee403a81962) )
+	ROM_LOAD( "ug22-vid", 0x800000, 0x100000, CRC(154d53b1) SHA1(58ff0aa59101f40a9a3b5fbae1c904d0b0b31612) )
+
+	ROM_LOAD( "uj19-vid", 0x900000, 0x100000, CRC(2d763156) SHA1(06536006da49ab5fb6b75b25f801b83fad000ff5) )
+	ROM_LOAD( "uj20-vid", 0xa00000, 0x100000, CRC(b96824f0) SHA1(d42b122f9a57da330192abc7e5f97abc4065d718) )
+	ROM_LOAD( "uj22-vid", 0xb00000, 0x100000, CRC(8891d785) SHA1(fd460df1ef8f4306ea42f7dc41488a80fd2c8f53) )
+ROM_END
 
 ROM_START( mk2r42 )
 	ROM_REGION16_LE( 0xc00000, "dcs", ROMREGION_ERASEFF )	/* sound data */
@@ -1397,6 +1434,7 @@ GAME( 1993, mk2r32,   mk2,     tunit_dcs,   mk2,      mk2,      ROT0, "Midway", 
 GAME( 1993, mk2r30,   mk2,     tunit_dcs,   mk2,      mk2,      ROT0, "Midway",   "Mortal Kombat II (rev L3.0)", GAME_SUPPORTS_SAVE )
 GAME( 1993, mk2r21,   mk2,     tunit_dcs,   mk2,      mk2,      ROT0, "Midway",   "Mortal Kombat II (rev L2.1)", GAME_SUPPORTS_SAVE )
 GAME( 1993, mk2r14,   mk2,     tunit_dcs,   mk2,      mk2,      ROT0, "Midway",   "Mortal Kombat II (rev L1.4)", GAME_SUPPORTS_SAVE )
+GAME( 1993, mk2r11,   mk2,     tunit_dcs,   mk2,      mk2,      ROT0, "Midway",   "Mortal Kombat II (rev L1.1)", GAME_SUPPORTS_SAVE )
 GAME( 1993, mk2r42,   mk2,     tunit_dcs,   mk2,      mk2,      ROT0, "hack",     "Mortal Kombat II (rev L4.2, hack)", GAME_SUPPORTS_SAVE )
 GAME( 1993, mk2r91,   mk2,     tunit_dcs,   mk2,      mk2,      ROT0, "hack",     "Mortal Kombat II (rev L9.1, hack)", GAME_SUPPORTS_SAVE )
 GAME( 1993, mk2chal,  mk2,     tunit_dcs,   mk2,      mk2,      ROT0, "hack",     "Mortal Kombat II Challenger (hack)", GAME_SUPPORTS_SAVE )
