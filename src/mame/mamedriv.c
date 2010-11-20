@@ -9265,6 +9265,7 @@ Other Sun games
 	DRIVER( megat4 )	/* (c) 1996 Merit */
 	DRIVER( megat4a )	/* (c) 1996 Merit */
 	DRIVER( megat4b )	/* (c) 1996 Merit */
+	DRIVER( megat4s )	/* (c) 1996 Merit */
 	DRIVER( megat4sn )	/* (c) 1996 Merit */
 	DRIVER( megat4te )	/* (c) 1996 Merit */
 	DRIVER( megat4tea )	/* (c) 1996 Merit */
