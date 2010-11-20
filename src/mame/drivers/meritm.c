@@ -1521,12 +1521,12 @@ ROM_END
 
 ROM_START( megat4s ) /* Dallas DS1204V security key at U5 labeled 9255-40-01 U5-B-RO1 C1996 MII */
 	ROM_REGION( 0x400000, "maincpu", 0 )
-	ROM_LOAD( "9255-41-01-ro.u32",  0x000000, 0x100000, CRC(f51ae565) SHA1(99c58063bfa24b4383c8b37a1eab670fa6e4c62c) ) /* Location U32 */
+	ROM_LOAD( "9255-41-01_u32-r0",  0x000000, 0x100000, CRC(f51ae565) SHA1(99c58063bfa24b4383c8b37a1eab670fa6e4c62c) ) /* Location U32 */
 	ROM_LOAD( "qs9255-02_u36-r0",   0x100000, 0x80000,  CRC(57322328) SHA1(12bc604c9d34cde431ef7cd2aa33c7b12ac01833) ) /* Location U36 */
 	ROM_RELOAD(                     0x180000, 0x80000)
 	ROM_LOAD( "qs9255-02_u37-r0",   0x200000, 0x80000,  CRC(f2e8bb4e) SHA1(5c5475b3c176a6aca9b2c6aa4aee422675d20bd1) ) /* Location U37 */
 	ROM_RELOAD(                     0x280000, 0x80000)
-	ROM_LOAD( "9255-41-01-rog.u38", 0x300000, 0x80000,  CRC(9c0a515a) SHA1(01b9761a8ddf95e32498ac204844144d9dc32012) ) /* Location U38, 12/10/1996  17:08:08 - Standard version */
+	ROM_LOAD( "9255-41-01_u38-r0g", 0x300000, 0x80000,  CRC(9c0a515a) SHA1(01b9761a8ddf95e32498ac204844144d9dc32012) ) /* Location U38, 12/10/1996  17:08:08 - Standard version */
 	ROM_RELOAD(                     0x380000, 0x80000)
 
 	ROM_REGION( 0x1000, "user2", 0 ) // PALs
