@@ -4656,7 +4656,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( pstone2 )	/* 2000.04 Power Stone 2 */
 	DRIVER( qmegamis )	/* 2000.05 Quiz Ah Megamisama */
 	DRIVER( vonot )		/* 2000.06 Virtual-on Oratorio Tangram M.S.B.S. ver.5.66 2000 edition */
-						/* 2000.06 Derby Owners Club 2000 */
+	DRIVER( derbyo2k )	/* 2000.06 Derby Owners Club 2000 */
 	DRIVER( ggx )		/* 2000.07 Guilty Gear X */
 	DRIVER( slasho )	/* 2000.07 Slashout */
 	DRIVER( slashout )
@@ -4674,7 +4674,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2000.11 Shakatto Tambourine */
 	DRIVER( wwfroyal )	/* 2000.11 WWF Royal Rumble */
 	DRIVER( pjustic )	/* 2000.12 Moero Justice Gakuen */
-						/* 2000.12 Samba de Amigo ver.2000 */
+	DRIVER( samba2k ) 	/* 2000.12 Samba de Amigo ver.2000 */
 	DRIVER( sprtjam )	/* 2000.12 Sports Jam */
 						/* 2000.12 Derby Owners Club 2000 ver.2 */
 						/* 2000.?? World Kicks New ver. */
@@ -4730,6 +4730,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( puyofev )	/* 2003.11 Puyopuyo Fever */
 	DRIVER( shootopl )	/* Shootout Pool */
 	DRIVER( shootpl )	/* 2003.xx Shootout Pool / Shootout Pool Prize */
+	DRIVER( shootplm )  /* Shootout Pool Medal */
 	DRIVER( kick4csh )	/* 2004.xx Kick '4' Cash */
 	DRIVER( tetkiwam )	/* 2004.06 Tetris Kiwamemichi (Arcade TV Game List - P.88, Right, 11 from bottom) */
 	DRIVER( cfield )	/* 2004.06 Chaos Field */

@@ -263,6 +263,7 @@ static const naomibd_config_table naomibd_translate_tbl[] =
 	{ "puyoda", 0, 0x0acd40, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
 	{ "ringout", 0, 0x0b1e40, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
 	{ "samba", 0, 0x0a8b5d, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "samba2k", 0, 0x1702cf, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
 	{ "slasho", 0, 0x1a66ca, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
 	{ "smlg99", 0, 0x048a01, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
 	{ "spawn", 0, 0x078d01, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
