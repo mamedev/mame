@@ -2702,8 +2702,8 @@ V-V                           TP-027
 	DRIVER( 1941 )		/*  2/1990 (c) 1990 (World) */
 	DRIVER( 1941j )		/*  2/1990 (c) 1990 (Japan) */
 	DRIVER( mercs )		/* 02/03/1990 (c) 1990 (World) */
-	DRIVER( mercsu )	/* 02/03/1990 (c) 1990 (US)    */
-	DRIVER( mercsua )	/* 08/06/1990 (c) 1990 (US)    */
+	DRIVER( mercsu )	/* 08/06/1990 (c) 1990 (US)    */
+	DRIVER( mercsur1 )	/* 02/03/1990 (c) 1990 (US)    */
 	DRIVER( mercsj )	/* 02/03/1990 (c) 1990 (Japan) */
 	DRIVER( mtwins )	/* 19/06/1990 (c) 1990 (World) */
 	DRIVER( chikij )	/* 19/06/1990 (c) 1990 (Japan) */
@@ -2815,7 +2815,8 @@ V-V                           TP-027
 	DRIVER( pang3 )		/* 01/06/1995 (c) 1995 Mitchell (Euro) not listed on Capcom's site */
 	DRIVER( pang3n )	/* 11/05/1995 (c) 1995 Mitchell (Euro) not listed on Capcom's site */
 	DRIVER( pang3j )	/* 11/05/1995 (c) 1995 Mitchell (Japan) not listed on Capcom's site */
-	DRIVER( megaman )	/* 06/10/1995 (c) 1995 (Asia)  */
+	DRIVER( megaman )	/* 06/10/1995 (c) 1995 (US)  */
+	DRIVER( megamana )	/* 06/10/1995 (c) 1995 (Asia)  */
 	DRIVER( rockmanj )	/* 22/09/1995 (c) 1995 (Japan) */
 
 	DRIVER( fcrash )	/* bootleg of Final Fight */
