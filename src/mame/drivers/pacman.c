@@ -3746,6 +3746,31 @@ ROM_START( pacheart )
 	ROM_LOAD( "82s126.3m",    0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )  /* timing - not used */
 ROM_END
 
+ROM_START( bucaner )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "1.6e", 0x0000, 0x0800, CRC(2c0fa0ab) SHA1(37680e4502771ae69d51d07ce43f65b9b2dd2a49) )
+	ROM_LOAD( "5.6k", 0x0800, 0x0800, CRC(afeca2f1) SHA1(1e6d6c75eeb3a354ce2dc88da62caf9e7d53d0cb) )
+	ROM_LOAD( "2.6f", 0x1000, 0x0800, CRC(6b53ada9) SHA1(a905688b389bfbc6792965d8f3d5bb1b9f0f4ec6) )
+	ROM_LOAD( "6.6m", 0x1800, 0x0800, CRC(35f3ca84) SHA1(3da7336caa0742ea79f1e0e8f6b80f8560507a33) )
+	ROM_LOAD( "3.6h", 0x2000, 0x0800, CRC(9045a44c) SHA1(a97d7016effbd2ace9a7d92ceb04a6ce18fb42f9) )
+	ROM_LOAD( "7.6n", 0x2800, 0x0800, CRC(888f3c3e) SHA1(c2b5917bf13071131dd53ea76f0da86706db2d80) )
+	ROM_LOAD( "4.6j", 0x3000, 0x0800, CRC(292de161) SHA1(09b439c301d7bedb76c1590e937e9d8d5e24a048) )
+	ROM_LOAD( "8.6p", 0x3800, 0x0800, CRC(884af858) SHA1(bad8b0dfdaf221dff0f84928f20873b01a168be5) )
+
+	ROM_REGION( 0x2000, "gfx1", 0 )
+	ROM_LOAD( "9.5e",  0x0000, 0x0800, CRC(4060c077) SHA1(78d4aa5243246f73533fc0886438dc1fa6f7ebe5) )
+	ROM_LOAD( "11.5h", 0x0800, 0x0800, CRC(e3861283) SHA1(61cf8ed24902910e98438d9e2e2745f226ad2a13) )
+	ROM_LOAD( "10.5f", 0x1000, 0x0800, CRC(09f66dec) SHA1(2d3649341fed19bac15ec274f7d747de46a3edb2) )
+	ROM_LOAD( "12.5j", 0x1800, 0x0800, CRC(653314e7) SHA1(c466a421917b3502e9115ebda1b2d11f7f586de8) )
+
+	ROM_REGION( 0x0120, "proms", 0 )
+	ROM_LOAD( "82s123.7f",    0x0000, 0x0020, CRC(2fc650bd) SHA1(8d0268dee78e47c712202b0ec4f1f51109b1f2a5) )
+	ROM_LOAD( "82s126.4a",    0x0020, 0x0100, CRC(3eb3a8e4) SHA1(19097b5f60d1030f8b82d9f1d3a241f93e5c75d6) )
+
+	ROM_REGION( 0x0200, "namco", 0 )	/* sound PROMs */
+	ROM_LOAD( "82s126.1m",    0x0000, 0x0100, CRC(a9cc86bf) SHA1(bbcec0570aeceb582ff8238a4bc8546a23430081) )
+	ROM_LOAD( "82s126.3m",    0x0100, 0x0100, CRC(77245b66) SHA1(0c4d0bee858b97632411c440bea6948a74759746) )  /* timing - not used */
+ROM_END
 
 ROM_START( joyman )
 	ROM_REGION( 0x10000, "maincpu", 0 )
@@ -5746,6 +5771,7 @@ GAME( 1980, newpuc2,  puckman,  pacman,   pacman,   0,        ROT90,  "hack", "N
 GAME( 1980, newpuc2b, puckman,  pacman,   pacman,   0,        ROT90,  "hack", "Newpuc2 (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1980, newpuckx, puckman,  pacman,   pacman,   0,        ROT90,  "hack", "New Puck-X", GAME_SUPPORTS_SAVE )
 GAME( 1981, pacheart, puckman,  pacman,   pacman,   0,        ROT90,  "hack", "Pac-Man (Hearts)", GAME_SUPPORTS_SAVE )
+GAME( 19??, bucaner,  puckman,  pacman,   pacman,   0,        ROT90,  "hack", "Buccaneer", GAME_SUPPORTS_SAVE )
 GAME( 1981, hangly,   puckman,  pacman,   pacman,   0,        ROT90,  "hack", "Hangly-Man (set 1)", GAME_SUPPORTS_SAVE )
 GAME( 1981, hangly2,  puckman,  pacman,   pacman,   0,        ROT90,  "hack", "Hangly-Man (set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1981, hangly3,  puckman,  pacman,   pacman,   0,        ROT90,  "hack", "Hangly-Man (set 3)", GAME_SUPPORTS_SAVE )

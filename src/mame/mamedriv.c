@@ -49,6 +49,7 @@ const game_driver * const drivers[] =
 	DRIVER( newpuc2b )	/* hack */
 	DRIVER( newpuckx )	/* hack */
 	DRIVER( pacheart )	/* hack */
+	DRIVER( bucaner )   /* hack */
 	DRIVER( hangly )	/* hack */
 	DRIVER( hangly2 )	/* hack */
 	DRIVER( hangly3 )	/* hack */
