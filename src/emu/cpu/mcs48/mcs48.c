@@ -221,7 +221,9 @@ static int check_irqs(mcs48_state *cpustate);
 INLINE mcs48_state *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == I8035 ||
+	assert(device->type() == I8021 ||
+		   device->type() == I8022 ||
+		   device->type() == I8035 ||
 		   device->type() == I8048 ||
 		   device->type() == I8648 ||
 		   device->type() == I8748 ||
