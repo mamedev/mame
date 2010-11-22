@@ -685,19 +685,14 @@ static ADDRESS_MAP_START( kov2_mem, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0xd10000, 0xd10001) AM_READWRITE(arm7_latch_68k_r, arm7_latch_68k_w) /* ARM7 Latch */
 ADDRESS_MAP_END
 
-#if 0
+
 static ADDRESS_MAP_START( cavepgm_mem, ADDRESS_SPACE_PROGRAM, 16)
-	AM_RANGE(0x000000, 0x07ffff) AM_ROM   /* larger BIOS ROM */
-	AM_RANGE(0xfffffe, 0xffffff) AM_ROMBANK("bank1") /* Game ROM (unmapped for now, might not even have it) */
-	AM_RANGE(0x400000, 0x4fffff) AM_RAM AM_BASE_MEMBER(pgm_state, sharedprotram) // Shared with protection device
+	AM_RANGE(0x000000, 0x3fffff) AM_ROM
 
 	AM_RANGE(0x700006, 0x700007) AM_WRITENOP // Watchdog?
 
 	AM_RANGE(0x800000, 0x81ffff) AM_RAM AM_MIRROR(0x0e0000) AM_BASE(&pgm_mainram) AM_SHARE("sram") /* Main Ram */
 
-//  AM_RANGE(0x900000, 0x903fff) AM_RAM_WRITE(pgm_bg_videoram_w) AM_BASE_MEMBER(pgm_state, bg_videoram) /* Backgrounds */
-//  AM_RANGE(0x904000, 0x905fff) AM_RAM_WRITE(pgm_tx_videoram_w) AM_BASE_MEMBER(pgm_state, tx_videoram) /* Text Layer */
-//  AM_RANGE(0x907000, 0x9077ff) AM_RAM AM_BASE_MEMBER(pgm_state, rowscrollram)
 	AM_RANGE(0x900000, 0x907fff) AM_MIRROR(0x0f8000) AM_RAM_WRITE(pgm_videoram_w) AM_BASE_MEMBER(pgm_state, videoram) /* IGS023 VIDEO CHIP */
 	AM_RANGE(0xa00000, 0xa011ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xb00000, 0xb0ffff) AM_RAM AM_BASE_MEMBER(pgm_state, videoregs) /* Video Regs inc. Zoom Table */
@@ -716,7 +711,6 @@ static ADDRESS_MAP_START( cavepgm_mem, ADDRESS_SPACE_PROGRAM, 16)
 
 	AM_RANGE(0xc10000, 0xc1ffff) AM_READWRITE(z80_ram_r, z80_ram_w) /* Z80 Program */
 ADDRESS_MAP_END
-#endif
 
 static ADDRESS_MAP_START( z80_mem, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xffff) AM_RAM AM_BASE_MEMBER(pgm_state, z80_mainram)
@@ -1473,17 +1467,14 @@ static MACHINE_CONFIG_DERIVED( svg, pgm )
 	MDRV_CPU_PROGRAM_MAP(svg_arm7_map)
 MACHINE_CONFIG_END
 
-#if 0
+
 static MACHINE_CONFIG_DERIVED( cavepgm, pgm )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(cavepgm_mem)
 
-	/* protection CPU */
-//  MDRV_CPU_ADD("prot", ARM7, 20000000)    // ???
-//  MDRV_CPU_PROGRAM_MAP(arm7_map)
 MACHINE_CONFIG_END
-#endif
+
 
 
 /*** Rom Loading *************************************************************/
@@ -3260,7 +3251,62 @@ Some logic IC's, resistors, caps etc.
 
 */
 
+
 ROM_START( ddp2 )
+	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
+	PGM_68K_BIOS
+	ROM_LOAD16_WORD_SWAP( "v102.u8", 0x100000, 0x200000, CRC(5a9ea040) SHA1(51eaec46c368f7cfc5245e64896092f52b1193e0) )
+
+	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_LOAD( "ddp2_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
+
+	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* Protection Data (encrypted external ARM data, internal missing) */
+	ROM_LOAD( "v100.u23", 0x000000, 0x20000, CRC(06c3dd29) SHA1(20c9479f158467fc2037dcf162b6c6be18c91d46) )
+
+	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	PGM_VIDEO_BIOS
+	ROM_LOAD( "t1300.u21",    0x400000, 0x800000, CRC(e748f0cb) SHA1(5843bee3a17c33648ce904af2b98c6a90aff7393) )
+
+	ROM_REGION( 0x1000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_LOAD( "a1300.u1",    0x0000000, 0x0800000, CRC(fc87a405) SHA1(115c21ecc56997652e527c92654076870bc9fa51) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
+	ROM_LOAD( "a1301.u2",    0x0800000, 0x0800000, CRC(0c8520da) SHA1(390317857ae5baa94a4cc042874b00a811f06a63) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
+
+	ROM_REGION( 0x0800000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_LOAD( "b1300.u7",    0x0000000, 0x0800000,  CRC(ef646604) SHA1(d737ff513792962f18df88c2caa9dd71de449079) )
+
+	ROM_REGION( 0x800000, "ics", ROMREGION_ERASE00 ) /* Samples - (8 bit mono 11025Hz) - */
+	PGM_AUDIO_BIOS
+	ROM_LOAD( "m1300.u5",    0x400000, 0x400000, CRC(82d4015d) SHA1(d4cdc1aec1c97cf23ff7a20ccaad822962e66ffa) )
+ROM_END
+
+ROM_START( ddp2101 )
+	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
+	PGM_68K_BIOS
+	ROM_LOAD16_WORD_SWAP( "v101_16m.u8", 0x100000, 0x200000, CRC(5e5786fd) SHA1(c6fc2956b5dc6a97c0d7d808a8c58aa21fa023b9) )
+
+	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_LOAD( "ddp2_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
+
+	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* Protection Data (encrypted external ARM data, internal missing) */
+	ROM_LOAD( "v100.u23", 0x000000, 0x20000, CRC(06c3dd29) SHA1(20c9479f158467fc2037dcf162b6c6be18c91d46) )
+
+	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	PGM_VIDEO_BIOS
+	ROM_LOAD( "t1300.u21",    0x400000, 0x800000, CRC(e748f0cb) SHA1(5843bee3a17c33648ce904af2b98c6a90aff7393) )
+
+	ROM_REGION( 0x1000000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_LOAD( "a1300.u1",    0x0000000, 0x0800000, CRC(fc87a405) SHA1(115c21ecc56997652e527c92654076870bc9fa51) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
+	ROM_LOAD( "a1301.u2",    0x0800000, 0x0800000, CRC(0c8520da) SHA1(390317857ae5baa94a4cc042874b00a811f06a63) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
+
+	ROM_REGION( 0x0800000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_LOAD( "b1300.u7",    0x0000000, 0x0800000,  CRC(ef646604) SHA1(d737ff513792962f18df88c2caa9dd71de449079) )
+
+	ROM_REGION( 0x800000, "ics", ROMREGION_ERASE00 ) /* Samples - (8 bit mono 11025Hz) - */
+	PGM_AUDIO_BIOS
+	ROM_LOAD( "m1300.u5",    0x400000, 0x400000, CRC(82d4015d) SHA1(d4cdc1aec1c97cf23ff7a20ccaad822962e66ffa) )
+ROM_END
+
+ROM_START( ddp2100 )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
 	PGM_68K_BIOS
 	ROM_LOAD16_WORD_SWAP( "v100.u8", 0x100000, 0x200000, CRC(0c8aa8ea) SHA1(57e33224622607a1df8daabf26ba063cf8a6d3fc) )
@@ -3287,32 +3333,6 @@ ROM_START( ddp2 )
 	ROM_LOAD( "m1300.u5",    0x400000, 0x400000, CRC(82d4015d) SHA1(d4cdc1aec1c97cf23ff7a20ccaad822962e66ffa) )
 ROM_END
 
-ROM_START( ddp2a )
-	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
-	PGM_68K_BIOS
-	ROM_LOAD16_WORD_SWAP( "v102.u8", 0x100000, 0x200000, CRC(5a9ea040) SHA1(51eaec46c368f7cfc5245e64896092f52b1193e0) )
-
-	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
-	ROM_LOAD( "ddp2_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
-
-	ROM_REGION32_LE( 0x400000, "user1", 0 ) /* Protection Data (encrypted external ARM data, internal missing) */
-	ROM_LOAD( "v100.u23", 0x000000, 0x20000, CRC(06c3dd29) SHA1(20c9479f158467fc2037dcf162b6c6be18c91d46) )
-
-	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
-	PGM_VIDEO_BIOS
-	ROM_LOAD( "t1300.u21",    0x400000, 0x800000, CRC(e748f0cb) SHA1(5843bee3a17c33648ce904af2b98c6a90aff7393) )
-
-	ROM_REGION( 0x1000000, "sprcol", 0 ) /* Sprite Colour Data */
-	ROM_LOAD( "a1300.u1",    0x0000000, 0x0800000, CRC(fc87a405) SHA1(115c21ecc56997652e527c92654076870bc9fa51) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
-	ROM_LOAD( "a1301.u2",    0x0800000, 0x0800000, CRC(0c8520da) SHA1(390317857ae5baa94a4cc042874b00a811f06a63) ) // FIXED BITS (xxxxxxxx1xxxxxxx)
-
-	ROM_REGION( 0x0800000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
-	ROM_LOAD( "b1300.u7",    0x0000000, 0x0800000,  CRC(ef646604) SHA1(d737ff513792962f18df88c2caa9dd71de449079) )
-
-	ROM_REGION( 0x800000, "ics", ROMREGION_ERASE00 ) /* Samples - (8 bit mono 11025Hz) - */
-	PGM_AUDIO_BIOS
-	ROM_LOAD( "m1300.u5",    0x400000, 0x400000, CRC(82d4015d) SHA1(d4cdc1aec1c97cf23ff7a20ccaad822962e66ffa) )
-ROM_END
 
 /*
 
@@ -3688,7 +3708,9 @@ ROM_START( dmnfrnta )
 	ROM_LOAD( "dmnfrnt_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
 	ROM_REGION( 0x800000, "user1", 0 ) /* Protection Data (encrypted external ARM data, internal missing) */
-	ROM_LOAD( "v105_32m.u26", 0x000000, 0x400000,  CRC(d200ee63) SHA1(3128c27c5f5a4361d31e7b4bb006de631b3a228c) )
+	/* one of these is probably a bad dump, it should be obvious once progress is made because the external rom is checksummed by the internal one */
+	ROM_LOAD( "v105_32m.u26",     0x000000, 0x400000,  CRC(d200ee63) SHA1(3128c27c5f5a4361d31e7b4bb006de631b3a228c) )
+	ROM_LOAD( "chinese-v105.u62", 0x000000, 0x400000,  CRC(c798c2ef) SHA1(91e364c33b935293fa765ca521cdb67ac45ec70f) )
 
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	PGM_VIDEO_BIOS
@@ -3920,6 +3942,7 @@ ROM_START( ket )
 	/* doesn't use a separate BIOS rom */
 	ROM_LOAD16_WORD_SWAP( "ketsui_v100.u38", 0x000000, 0x200000, CRC(dfe62f3b) SHA1(baa58d1ce47a707f84f65779ac0689894793e9d9) )
 
+
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "ket_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
 
@@ -4076,6 +4099,31 @@ ROM_START( ddp3blk )
 	ROM_REGION( 0x1000000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
 	ROM_LOAD( "pgm_m01s.rom", 0x000000, 0x200000, CRC(45ae7159) SHA1(d3ed3ff3464557fd0df6b069b2e431528b0ebfa8) ) // same as standard PGM bios
 	ROM_LOAD( "m04401b032.u17",  0x400000, 0x400000, CRC(a118560c) SHA1(3e99bb2adbc9d464d79aa8723f0d40305ea821ca) )
+
+	ROM_REGION( 0x20000, "sram", 0 ) /* NVRAM with factory programmed values - needed to boot */
+	ROM_LOAD( "ddp3blk.nv",  0x0000000, 0x020000, CRC(b9ce04e8) SHA1(adb6f026c68648f2f7418e6d693a6eda6d89d69d) )
+ROM_END
+
+/* this is on PGM2, the main board contains 2 custom ASICs, no roms or other kind of bios, I don't know how compatible the
+   hardware is otherwise, but I imagine it's well protected */
+ROM_START( orleg2 )
+	ROM_REGION( 0x800000, "maincpu", 0 ) /* 68000 Code */
+	ROM_LOAD16_WORD_SWAP( "xyj2_v104cn.u7",  0x000000, 0x800000, CRC(7c24a4f5) SHA1(3cd9f9264ef2aad0869afdf096e88eb8d74b2570) )
+	
+	ROM_REGION( 0xc00000, "tiles", ROMREGION_ERASEFF ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_REGION( 0x1c00000, "sprcol", ROMREGION_ERASEFF ) /* Sprite Colour Data */
+	ROM_REGION( 0x1000000, "sprmask", ROMREGION_ERASEFF ) /* Sprite Masks + Colour Indexes */
+	ROM_REGION( 0x1000000, "ics", ROMREGION_ERASEFF ) /* Samples - (8 bit mono 11025Hz) - */
+
+	ROM_REGION( 0x2000000, "others", 0 )
+	ROM_LOAD16_WORD_SWAP( "ig-a.u26",  0x000000, 0x2000000, CRC(7051d020) SHA1(3d9b24c6fda4c9699bb9f00742e0888059b623e1) )
+	ROM_LOAD16_WORD_SWAP( "ig-a.u35",  0x000000, 0x0800000, CRC(083a8315) SHA1(0dba25e132fbb12faa59ced648c27b881dc73478) )
+	ROM_LOAD16_WORD_SWAP( "ig-a.u36",  0x000000, 0x0800000, CRC(e197221d) SHA1(5574b1e3da4b202db725be906dd868edc2fd4634) )
+	ROM_LOAD16_WORD_SWAP( "ig-a.u2",   0x000000, 0x1000000, CRC(8250688c) SHA1(d2488477afc528aeee96826065deba2bce4f0a7d) )
+	ROM_LOAD16_WORD_SWAP( "ig-a.u4",   0x000000, 0x0200000, CRC(fa444c32) SHA1(31e5e3efa92d52bf9ab97a0ece51e3b77f52ce8a) )
+	ROM_LOAD16_WORD_SWAP( "ig-a.u12",  0x000000, 0x1000000, CRC(113a331c) SHA1(ee6b31bb2b052cc8799573de0d2f0a83f0ab4f6a) )
+	ROM_LOAD16_WORD_SWAP( "ig-a.u16",  0x000000, 0x1000000, CRC(fbf411c8) SHA1(5089b5cc9bbf6496ef1367c6255e63e9ab895117) )
+	ROM_LOAD16_WORD_SWAP( "ig-a.u18",  0x000000, 0x2000000, CRC(43501fa6) SHA1(58ccce6d393964b771fec3f5c583e3ede57482a3) )
 ROM_END
 
 /*** Init Stuff **************************************************************/
@@ -4152,11 +4200,10 @@ static void expand_colourdata( running_machine *machine )
 	}
 }
 
-static void pgm_basic_init( running_machine *machine )
+
+static void pgm_basic_init_nobank( running_machine *machine )
 {
 	pgm_state *state = machine->driver_data<pgm_state>();
-	UINT8 *ROM = memory_region(machine, "maincpu");
-	memory_set_bankptr(machine, "bank1", &ROM[0x100000]);
 
 	expand_32x32x5bpp(machine);
 	expand_colourdata(machine);
@@ -4164,6 +4211,16 @@ static void pgm_basic_init( running_machine *machine )
 	state->bg_videoram = &state->videoram[0];
 	state->tx_videoram = &state->videoram[0x4000/2];
 	state->rowscrollram = &state->videoram[0x7000/2];
+}
+
+
+static void pgm_basic_init( running_machine *machine )
+{
+	UINT8 *ROM = memory_region(machine, "maincpu");
+	memory_set_bankptr(machine, "bank1", &ROM[0x100000]);
+
+	pgm_basic_init_nobank(machine);
+
 }
 
 static DRIVER_INIT( pgm )
@@ -5338,6 +5395,295 @@ static DRIVER_INIT( kovqhsgs )
 }
 
 
+
+
+
+static WRITE16_HANDLER( ddp3_asic_w )
+{
+	int pc = cpu_get_pc(space->cpu);
+	UINT32 address = offset*2 + 0x500000;
+
+	logerror("protection write pc: %5.5x %5.5x %4.4x\n", pc, address, data);
+	
+
+	switch (address)
+	{
+		case 0x500000:
+			//
+		return;
+
+		case 0x500002:
+			// 
+		return;
+
+		case 0x500004:
+			// if (data == 0) should probably do something... IRQ?
+		return;
+	}
+
+	data = data; // kill warnings
+}
+
+static READ16_HANDLER( ddp3_asic_r )
+{
+	int pc = cpu_get_pc(space->cpu);
+	unsigned int retdata = 0;
+
+	//printf("pc %08x\n", pc);
+
+/*
+	pc 1466a8 and 146686 should probably be returning something
+*/
+	UINT32 address = offset*2 + 0x500000;
+
+	switch (address)
+	{
+		case 0x500000:
+		{
+			switch (pc)
+			{
+				case 0x1465ee:
+				case 0x146B00: // black label
+				case 0x24704c: // black label
+					retdata = 0x028b; // boot
+				break;
+
+				case 0x1466a8:
+				case 0x146BBA: // black label
+					retdata = 0x0000; // data
+				break;
+			}
+		}
+		break;
+
+		case 0x500002:
+		{
+			switch (pc)
+			{
+				case 0x1465a2: // 0xff00
+				case 0x1465cc: // 0x0077
+				case 0x146ab4: // 0xff00 - black label
+				case 0x146ADE: // 0x0077 - black label
+				case 0x247000: // 0xff00 - black label
+				case 0x24702a: // 0x0077 - black label
+					retdata = 0xff77; // boot
+				break;
+
+				case 0x146686:
+				case 0x146B98: // black label
+					retdata = 0x0000; // data
+				break;
+
+				case 0x146716: // protection
+				case 0x14665c: // protection
+				case 0x146C28: // protection- black label
+				case 0x146B6E: // protection- black label
+				case 0x247174: // protection- black label
+				case 0x2470ba: // protection- black label
+					retdata = cpu_get_reg(space->cpu, M68K_D5) << 8;
+				break;
+
+				case 0x146740: // protection
+				case 0x146C52: // protection - black label
+				case 0x24719e: // protection - black label
+					retdata = cpu_get_reg(space->cpu, M68K_D5) ^ 0x0088;
+				break;
+			}
+		}
+		break;
+	}
+
+	//if (pc != 0x1465ee && pc != 0x1465a2 && pc != 0x1465cc && pc != 0x146716 && pc != 0x146740 && pc != 0x14665c && pc != 0x1466a8 && pc != 0x146686) {
+		logerror ("protection read pc: %5.5x %5.5x, ret %4.4x\n", pc, address, retdata);
+	//}
+
+	return retdata;
+}
+
+void install_asic27a_ddp3(running_machine* machine)
+{
+	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x500000, 0x500005, 0, 0, ddp3_asic_r, ddp3_asic_w);
+}
+
+
+
+
+
+static WRITE16_HANDLER( ket_asic_w )
+{
+	int pc = cpu_get_pc(space->cpu);
+	UINT32 address = offset*2 + 0x500000;
+
+	logerror("protection write pc: %5.5x %5.5x %4.4x\n", pc, address, data);
+
+	switch (address)
+	{
+		case 0x400000:
+		return;
+
+		case 0x400002:
+		return;
+
+		case 0x400004:
+			// if (data == 0) should probably do something... IRQ?
+		return;
+	}
+
+	data = data; // kill warnings
+}
+
+static READ16_HANDLER( ket_asic_r )
+{
+	int pc = cpu_get_pc(space->cpu);
+
+	//printf("pc %08x\n", pc);
+
+	UINT32 address = offset*2 + 0x400000;
+
+
+	unsigned int retdata = 0;
+
+	switch (address)
+	{
+		case 0x400000:
+		{
+			switch (pc)
+			{
+				case 0xb2bc0:
+					retdata = 0xffff; // must be > 0x200?
+				break;
+
+				case 0xb2c7a:
+					retdata = 0;//xffff; // revisions want values from here...
+				break;
+			}
+		}
+		break;
+
+		case 0x400002:
+		{
+
+			switch (pc)
+			{
+				case 0xb2b74: // 0xff00
+				case 0xb2b9e: // 0x0077
+					retdata = 0xff77;
+				break;
+
+				case 0xb2c2e:
+				case 0xb2ce8:
+					retdata =  cpu_get_reg(space->cpu, M68K_D5) << 8;
+				break;
+
+				case 0xb2d12:
+					retdata =  cpu_get_reg(space->cpu, M68K_D5) ^ 0x0088;
+				break;
+
+				case 0xb2c58:
+					retdata = 0;//xffff; // revisions want values from here...
+				break;
+			}
+		}
+		break;
+	}
+
+	//if (pc != 0xb2ce8 && pc != 0xb2c2e && pc != 0xb2d12) {
+	//	logerror ("protection read pc: %5.5x %5.5x, ret %4.4x kovret %4.4x\n"), pc, address, retdata, kovret);
+	//}
+
+	return retdata;
+}
+
+void install_asic27a_ket(running_machine* machine)
+{
+	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400000, 0x400005, 0, 0, ket_asic_r, ket_asic_w);
+}
+
+static READ16_HANDLER( espgal_asic_r )
+{
+	int pc = cpu_get_pc(space->cpu);
+
+	//printf("pc %08x\n", pc);
+
+	UINT32 address = offset*2 + 0x400000;
+
+
+	unsigned int retdata = 0;
+	switch (address)
+	{
+		case 0x400000:
+		{
+			switch (pc)
+			{
+				case 0x11fe28:
+					retdata = 0x0000; // boot - seems ok with 0??
+				break;
+
+				case 0x11fee2:
+					retdata = 0x0000; // data
+				break;
+			}
+		}
+		break;
+
+		case 0x400002:
+		{
+			switch (pc)
+			{
+				case 0x11fddc: // 0xff00
+				case 0x11fe06: // 0x0077
+					retdata = 0xff77; // boot
+				break;
+
+				case 0x11fec0:
+					retdata = 0x0000; // data
+				break;
+
+				case 0x11fe96: // protection
+				case 0x11ff50: // protection
+					retdata = cpu_get_reg(space->cpu, M68K_D2) << 8;
+				break;
+
+				case 0x11ff7a: // protection
+					retdata = cpu_get_reg(space->cpu, M68K_D5) ^ 0x0088;
+				break;
+			}
+		}
+		break;
+	}
+
+	return retdata;
+}
+
+void install_asic27a_espgal(running_machine* machine)
+{
+	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400000, 0x400005, 0, 0, espgal_asic_r, ket_asic_w);
+}
+
+
+
+static DRIVER_INIT( ddp3 )
+{
+	pgm_basic_init_nobank(machine);
+	pgm_py2k2_decrypt(machine); // yes, it's the same as photo y2k2
+	install_asic27a_ddp3(machine);
+}
+
+static DRIVER_INIT( ket )
+{
+	pgm_basic_init_nobank(machine);
+	pgm_ket_decrypt(machine);
+	install_asic27a_ket(machine);
+}
+
+static DRIVER_INIT( espgal )
+{
+	pgm_basic_init_nobank(machine);
+	pgm_espgal_decrypt(machine);
+	install_asic27a_espgal(machine);
+}
+
+
 /*** GAME ********************************************************************/
 
 GAME( 1997, pgm,          0,         pgm,     pgm,      pgm,        ROT0,   "IGS", "PGM (Polygame Master) System BIOS", GAME_IS_BIOS_ROOT )
@@ -5420,8 +5766,9 @@ GAME( 2001, py2k2,        pgm,       kov_disabled_arm,     photoy2k, py2k2,     
 GAME( 2001, kov2p,        pgm,       kov2,    sango,    kov2p,      ROT0,   "IGS", "Knights of Valour 2 Plus - Nine Dragons / Sangoku Senki 2 Plus - Nine Dragons (ver. M204XX)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 GAME( 2001, kov2p205,     kov2p,     kov2,    sango,    kov2p,      ROT0,   "IGS", "Knights of Valour 2 Plus - Nine Dragons / Sangoku Senki 2 Plus - Nine Dragons (ver. M205XX)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 
-GAME( 2001, ddp2,         pgm,       kov2,    ddp2,     ddp2,       ROT270, "IGS", "Bee Storm - DoDonPachi II (ver. 100)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
-GAME( 2001, ddp2a,        ddp2,      kov2,    ddp2,     ddp2,       ROT270, "IGS", "Bee Storm - DoDonPachi II (ver. 102)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+GAME( 2001, ddp2,         pgm,       kov2,    ddp2,     ddp2,       ROT270, "IGS", "Bee Storm - DoDonPachi II (ver. 102)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+GAME( 2001, ddp2101,      ddp2,      kov2,    ddp2,     ddp2,       ROT270, "IGS", "Bee Storm - DoDonPachi II (ver. 101)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+GAME( 2001, ddp2100,      ddp2,      kov2,    ddp2,     ddp2,       ROT270, "IGS", "Bee Storm - DoDonPachi II (ver. 100)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 
 GAME( 2001, dw2001,       pgm,       kov_disabled_arm,     sango,    dw2001,    ROT0,   "IGS", "Dragon World 2001", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // V0000 02/21/01 16:05:16
 
@@ -5446,14 +5793,15 @@ GAME( 2004, happy6,       pgm,       svg,     sango,    svg,        ROT0,   "IGS
 GAME( 2005, svg,          pgm,       svg,     sango,    svg,        ROT0,   "IGS", "S.V.G. - Spectral vs Generation (ver. 200)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 
 /* these don't use an External ARM rom, and don't have any weak internal functions which would allow the internal ROM to be read out */
-GAME( 2002, ket,          0,         kov_disabled_arm,    ddp2,     ddp2,       ROT270, "Cave", "Ketsui", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
-GAME( 2002, keta,         ket,       kov_disabled_arm,    ddp2,     ddp2,       ROT270, "Cave", "Ketsui (older)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
-GAME( 2002, ketb,         ket,       kov_disabled_arm,    ddp2,     ddp2,       ROT270, "Cave", "Ketsui (first revision)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+GAME( 2002, ddp3,         0,         cavepgm,    ddp2,     ddp3,       ROT270, "Cave", "DoDonPachi Dai-Ou-Jou", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 2002, ddp3blk,      ddp3,      cavepgm,    ddp2,     ddp3,       ROT270, "Cave", "DoDonPachi Dai-Ou-Jou (Black Label)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 
-GAME( 2002, espgal,       0,         kov_disabled_arm,    ddp2,     ddp2,       ROT270, "Cave", "EspGaluda", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+// the exact text of the 'version' shows which revision of the game it is; the newest has 2 '.' symbols in the string, the oldest, none.
+GAME( 2002, ket,          0,         cavepgm,    ddp2,     ket,       ROT270, "Cave", "Ketsui",                  GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // Displays 2003/01/01. Master Ver.
+GAME( 2002, keta,         ket,       cavepgm,    ddp2,     ket,       ROT270, "Cave", "Ketsui (older)",          GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // Displays 2003/01/01 Master Ver.
+GAME( 2002, ketb,         ket,       cavepgm,    ddp2,     ket,       ROT270, "Cave", "Ketsui (first revision)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // Displays 2003/01/01 Master Ver
 
-GAME( 2002, ddp3,         0,         kov_disabled_arm,    ddp2,     ddp2,       ROT270, "Cave", "DoDonPachi Dai-Ou-Jou", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
-GAME( 2002, ddp3blk,      ddp3,      kov_disabled_arm,    ddp2,     ddp2,       ROT270, "Cave", "DoDonPachi Dai-Ou-Jou (Black Label)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
+GAME( 2002, espgal,       0,         cavepgm,    ddp2,     espgal,       ROT270, "Cave", "EspGaluda", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 
-
-
+/* PGM2 */
+GAME( 2007, orleg2,       0,         pgm,    pgm,     0,       ROT0, "IGS", "Oriental Legend 2", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )

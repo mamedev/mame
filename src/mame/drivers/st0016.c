@@ -518,6 +518,18 @@ ROM_START( nratechu )
 	ROM_COPY( "maincpu",  0x10000, 0x00000, 0x08000 )
 ROM_END
 
+/* PCB E51-00001 (almost identical to above) */
+
+ROM_START( dcrown )
+	ROM_REGION( 0x290000, "maincpu", 0 )
+	ROM_LOAD( "dc1.u31",0x010000, 0x80000, CRC(e55200b8) SHA1(20a968dc895bb636b064c29b4b53c6ffa49fea36) )
+	ROM_LOAD( "dc2.u32",0x090000, 0x80000, CRC(05b6192f) SHA1(6af6e7b2c681f2791a7f89a528a95eb976c8ba84) )
+	ROM_LOAD( "dc3.u33",0x110000, 0x80000, CRC(f23c1975) SHA1(118d6054922a733d23363c53bb331d84c78e50ad) )
+	ROM_LOAD( "dc4.u34",0x190000, 0x80000, CRC(0d1c2c61) SHA1(7e4dc20ab683ce0f61dd939cfd9b17714ba2343a) )
+
+	ROM_COPY( "maincpu",   0x010000, 0x000000, 0x08000 )
+ROM_END
+
 /*
 Koi Koi Shimasho
 Visco
@@ -679,3 +691,4 @@ GAME(  1994, mayjisn2,	0,	  mayjinsn, mayjisn2, mayjisn2, ROT0, "Seta",  "Mayjin
 GAME(  1995, koikois,	 0,	  st0016, koikois, renju, ROT0, "Visco",  "Koi Koi Shimasho", GAME_IMPERFECT_GRAPHICS)
 /* Not working */
 GAME( 1994, mayjinsn,	0,	  mayjinsn, st0016,   mayjinsn, ROT0, "Seta",  "Mayjinsen",GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING)
+GAME( 199?, dcrown,	0,	  st0016,   renju,    renju,    ROT0, "unknown", "Dream Crown", GAME_NOT_WORKING)

@@ -1734,6 +1734,7 @@ const game_driver * const drivers[] =
 	DRIVER( jungleh )	/* KN  (c) 1982 Taito America Corporation */
 	DRIVER( junglehbr )	/* KN  (c) 1982 Taito do Brasil */
 	DRIVER( piratpet )	/* KN  (c) 1982 Taito America Corporation */
+	DRIVER( jungleby )	/* bootleg */
 	DRIVER( alpine )	/* RH  (c) 1982 Taito Corporation */
 	DRIVER( alpinea )	/* RH  (c) 1982 Taito Corporation */
 	DRIVER( timetunl )	/* UN  (c) 1982 Taito Corporation */
@@ -7978,14 +7979,15 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	/* ST-0016 based games (ST-0016 is a z80 / gfx / sound all in one) */
 	/* plain ST-0016 */
 	DRIVER( renju )		/* (c) 1994 Visco */
+	DRIVER( koikois )	/* (c) 1995 Seta */
 	DRIVER( nratechu )	/* (c) 1996 Seta */
+	DRIVER( dcrown )	/* 199? unknown */
 	/* R3000 + ST-0016 */
 	DRIVER( srmp5 )		/* (c) 199? Seta */
 	DRIVER( speglsht )	/* (c) 1994 Seta */
 	/* V810 + ST-0016 */
 	DRIVER( mayjinsn )	/* (c) 1994 Seta */
 	DRIVER( mayjisn2 )	/* (c) 1994 Seta */
-	DRIVER( koikois )	/* (c) 1995 Seta */
 
 	/* Seta System S12 */
 	DRIVER( srmp6 )		/* (c) 1996 Seta (Japan) */
@@ -8566,7 +8568,8 @@ Other Sun games
 	DRIVER( kov2p )			/* (c) 2000 */
 	DRIVER( kov2p205 )		/* (c) 2000 */
 	DRIVER( ddp2 )			/* (c) 2001 */
-	DRIVER( ddp2a )			/* (c) 2001 */
+	DRIVER( ddp2100 )		/* (c) 2001 */
+	DRIVER( ddp2101 )		/* (c) 2001 */
 	DRIVER( puzzli2 )		/* (c) 2001 */
 	DRIVER( martmast )		/* (c) 2001 */
 	DRIVER( martmastc )		/* (c) 2001 */
@@ -8588,6 +8591,7 @@ Other Sun games
 	DRIVER( ddp3 )
 	DRIVER( ddp3blk )
 	DRIVER( espgal )
+	DRIVER( orleg2 )		/* (c) 2007 */
 
 	/* Spirit Tech. Corp. */
 	DRIVER( dunhuang )	/* (c) 1995 */
