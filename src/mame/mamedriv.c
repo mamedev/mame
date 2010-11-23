@@ -10499,6 +10499,9 @@ Other Sun games
 	/* Interactive Light */
 	DRIVER( savquest )
 
+	/* Jamie System Development */
+	DRIVER( xtom3d )
+
 	/* Jubilee */
 	DRIVER( jubileep )
 

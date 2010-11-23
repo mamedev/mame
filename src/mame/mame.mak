@@ -1674,6 +1674,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/vpoker.o \
 	$(DRIVERS)/vroulet.o \
 	$(DRIVERS)/wldarrow.o \
+	$(DRIVERS)/xtom3d.o \
 	$(DRIVERS)/xyonix.o $(VIDEO)/xyonix.o \
 
 
