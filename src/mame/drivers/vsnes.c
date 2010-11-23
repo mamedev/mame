@@ -2128,14 +2128,14 @@ ROM_END
 
 ROM_START( smgolfb )
 	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
-	ROM_LOAD( "gf4-2.1df",	0x8000, 0x2000, CRC(4a723087) SHA1(87dc063d295f55871598a1e1eb4e62ce298b2f0c) )
-	ROM_LOAD( "gf4-2.1cf",  0xa000, 0x2000, CRC(2debda63) SHA1(33b42eb5641ec947b2f2dcbc632ee6c81fa2ffe3) )
-	ROM_LOAD( "gf4-2.1bf",  0xc000, 0x2000, CRC(6783652f) SHA1(7165ee59d3787cb56eed4791351da07f4bcc68ed) )
-	ROM_LOAD( "gf4-2.1af",  0xe000, 0x2000, CRC(ce788209) SHA1(b62f1a6567cd94e5443afdbc5df33dd1b8ad039d) )
+	ROM_LOAD( "mds-gf4-2_1d_or_6d_f",  0x8000, 0x2000, CRC(4a723087) SHA1(87dc063d295f55871598a1e1eb4e62ce298b2f0c) )
+	ROM_LOAD( "mds-gf4-2_1c_or_6c_f",  0xa000, 0x2000, CRC(2debda63) SHA1(33b42eb5641ec947b2f2dcbc632ee6c81fa2ffe3) )
+	ROM_LOAD( "mds-gf4-2_1b_or_6b_f",  0xc000, 0x2000, CRC(6783652f) SHA1(7165ee59d3787cb56eed4791351da07f4bcc68ed) )
+	ROM_LOAD( "mds-gf4-2_1a_or_6a_f",  0xe000, 0x2000, CRC(bfc17263) SHA1(9e3b46fe08be893935138247ed3168d19d55312e) )
 
 	ROM_REGION( 0x4000, "gfx1", 0 ) /* PPU memory */
-	ROM_LOAD( "gf4-2.2bf",  0x0000, 0x2000, NO_DUMP )
-	ROM_LOAD( "gf4-2.2af",  0x2000, 0x2000, CRC(47e9b8c6) SHA1(2eee6eaf7d15e215816363c7bb7142a2bdc2d530) )
+	ROM_LOAD( "mds-gf4-2_2b_or_8b_f",  0x0000, 0x2000, CRC(2782a3e5) SHA1(4e57aab58fb250da951a9aecd21d6aa79e697bcb) )
+	ROM_LOAD( "mds-gf4-2_2a_or_8a_f",  0x2000, 0x2000, CRC(6e93fdef) SHA1(44f46421adabbc40135c681592cb5226b7c9012a) )
 
 	PALETTE_2C04_0002
 ROM_END
@@ -2637,6 +2637,7 @@ GAME( 1988, skatekds, suprmrio, vsnes,   suprmrio, vsnormal, ROT0, "hack",      
 GAME( 1985, vsskykid, 0,        vsnes,   vsskykid, MMC3,     ROT0, "Namco",     "Vs. Super SkyKid" , 0 )
 GAME( 1987, tkoboxng, 0,        vsnes,   tkoboxng, tkoboxng, ROT0, "Namco / Data East USA","Vs. T.K.O. Boxing", 0 )
 GAME( 1984, smgolf,   0,        vsnes,   golf4s,   vsnormal, ROT0, "Nintendo",  "Vs. Stroke & Match Golf (Men Version, set 1)", 0 )
+GAME( 1984, smgolfb,  smgolf,   vsnes,   golf,     vsnormal, ROT0, "Nintendo",	"Vs. Stroke & Match Golf (Men Version, set 2)", 0 )
 GAME( 1984, smgolfj,  smgolf,   vsnes,   golf,     vsnormal, ROT0, "Nintendo",  "Vs. Stroke & Match Golf (Men Version) (Japan)", 0 )
 GAME( 1984, ladygolf, smgolf,   vsnes,   golf,     vsnormal, ROT0, "Nintendo",  "Vs. Stroke & Match Golf (Ladies Version)", 0 )
 GAME( 1984, vspinbal, 0,        vsnes,   vspinbal, vsnormal, ROT0, "Nintendo",  "Vs. Pinball", 0 )
@@ -2666,6 +2667,3 @@ GAME( 1984, vsbballj, vsbball,  vsdual,  vsbballj, vsdual,   ROT0, "Nintendo",  
 GAME( 1984, vsbballja,vsbball,  vsdual,  vsbballj, vsdual,   ROT0, "Nintendo",  "Vs. BaseBall (Japan set 2)", 0 )
 GAME( 1984, vsbballjb,vsbball,  vsdual,  vsbballj, vsdual,   ROT0, "Nintendo",  "Vs. BaseBall (Japan set 3)", 0 )
 GAME( 1984, iceclmrj, 0,        vsdual,  iceclmrj, vsdual,   ROT0, "Nintendo",  "Vs. Ice Climber Dual (Japan)" , 0 )
-
-/* Not Working (bad dumps) */
-GAME( 1985, smgolfb,  smgolf,   vsnes,   golf,     vsnormal, ROT0, "Nintendo",	"Vs. Stroke & Match Golf (Men Version, set 2)", GAME_NOT_WORKING )
