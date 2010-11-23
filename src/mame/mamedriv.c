@@ -5671,6 +5671,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( ssridersadd )	/* GX064 (c) 1991 (Asia) */
 	DRIVER( ssridersjbd )	/* GX064 (c) 1991 (Japan) */
 	DRIVER( ssridersb )	/* bootleg */
+	DRIVER( ssriders2 ) /* bootleg */
 	DRIVER( xmen )		/* GX065 (c) 1992 (US) */
 	DRIVER( xmenj )		/* GX065 (c) 1992 (Japan) */
 	DRIVER( xmene )		/* GX065 (c) 1992 (Europe) */
