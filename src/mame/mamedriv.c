@@ -3578,6 +3578,7 @@ V-V                           TP-027
 	DRIVER( neckneck )	/* (c) 1992 Bundra Games/Incredible Technologies */
 	DRIVER( timekill )	/* (c) 1992 Strata/Incredible Technologies */
 	DRIVER( timekill131 )	/* (c) 1992 Strata/Incredible Technologies */
+	DRIVER( timekill121 )	/* (c) 1992 Strata/Incredible Technologies */
 	DRIVER( hardyard )	/* (c) 1993 Strata/Incredible Technologies */
 	DRIVER( hardyard10 )	/* (c) 1993 Strata/Incredible Technologies */
 	DRIVER( bloodstm )	/* (c) 1994 Strata/Incredible Technologies */

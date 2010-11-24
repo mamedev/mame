@@ -1860,6 +1860,30 @@ ROM_START( timekill131 )
 	ROM_LOAD16_BYTE( "tksrom02.u26", 0x200000, 0x80000, CRC(051ced3e) SHA1(6b63c4837e709806ffea9a37d93933635d356a6e) )
 ROM_END
 
+ROM_START( timekill121 )
+	ROM_REGION16_BE( 0x80000, "user1", 0 )
+	ROM_LOAD16_BYTE( "tk00v121.u54", 0x00000, 0x40000, CRC(4938a940) SHA1(c42c5067ba0536ab22071c80a50434905acd93c2) )
+	ROM_LOAD16_BYTE( "tk01v121.u53", 0x00001, 0x40000, CRC(0bb75c40) SHA1(99829ecb0692ea8b313bd8c2e982258c97599b06) )
+
+	ROM_REGION( 0x28000, "soundcpu", 0 )
+	ROM_LOAD( "tksnd.u17", 0x10000, 0x18000, CRC(ab1684c3) SHA1(cc7e591fd160b259f8aecddb2c5a3c36e4e37b2f) )
+	ROM_CONTINUE(          0x08000, 0x08000 )
+
+	ROM_REGION( 0x880000, "gfx1", 0 )
+	ROM_LOAD32_BYTE( "tk0_rom.1", 0x000000, 0x200000, CRC(94cbf6f8) SHA1(dac5c4d9c8e42336c236ecc3c72b3b1f8282dc2f) )
+	ROM_LOAD32_BYTE( "tk1_rom.2", 0x000001, 0x200000, CRC(c07dea98) SHA1(dd8b88beb9781579eb0a17231ad2a274b70ae1bc) )
+	ROM_LOAD32_BYTE( "tk2_rom.3", 0x000002, 0x200000, CRC(183eed2a) SHA1(3905268fe45ecc47cd4d349666b4d33efda2140b) )
+	ROM_LOAD32_BYTE( "tk3_rom.4", 0x000003, 0x200000, CRC(b1da1058) SHA1(a1d483701c661d69cecc9d073b23683b119f5ef1) )
+	ROM_LOAD32_BYTE( "tkgrom.01", 0x800000, 0x020000, CRC(b030c3d9) SHA1(f5c21285ec8ff4f74205e0cf18da67e733e31183) )
+	ROM_LOAD32_BYTE( "tkgrom.02", 0x800001, 0x020000, CRC(e98492a4) SHA1(fe8fb4bd3900109f3872f2930e8ddc9d19f599fd) )
+	ROM_LOAD32_BYTE( "tkgrom.03", 0x800002, 0x020000, CRC(6088fa64) SHA1(a3eee10bdef48fefec3836f551172dbe0819acf6) )
+	ROM_LOAD32_BYTE( "tkgrom.04", 0x800003, 0x020000, CRC(95be2318) SHA1(60580c87d63a114df44e2580e138128388ff447b) )
+
+	ROM_REGION16_BE( 0x400000, "ensoniq.2", ROMREGION_ERASE00 )
+	ROM_LOAD16_BYTE( "tksrom00.u18", 0x000000, 0x80000, CRC(79d8b83a) SHA1(78934b4d0ccca8fefcf8277e4296eb1d59cd575b) )
+	ROM_LOAD16_BYTE( "tksrom01.u20", 0x100000, 0x80000, CRC(ec01648c) SHA1(b83c66cf22db5d89b9ed79b79861b79429d8380c) )
+	ROM_LOAD16_BYTE( "tksrom02.u26", 0x200000, 0x80000, CRC(051ced3e) SHA1(6b63c4837e709806ffea9a37d93933635d356a6e) )
+ROM_END
 
 ROM_START( bloodstm )
 	ROM_REGION16_BE( 0x80000, "user1", 0 )
@@ -4154,6 +4178,7 @@ Label1  bne.s       Label1          ; Infinite loop if result isn't 0x80
 
 GAME( 1992, timekill,    0,        timekill, timekill, timekill, ROT0, "Strata/Incredible Technologies",   "Time Killers (v1.32)", 0 )
 GAME( 1992, timekill131, timekill, timekill, timekill, timekill, ROT0, "Strata/Incredible Technologies",   "Time Killers (v1.31)", 0 )
+GAME( 1992, timekill121, timekill, timekill, timekill, timekill, ROT0, "Strata/Incredible Technologies",   "Time Killers (v1.21)", 0 )
 GAME( 1993, hardyard,    0,        bloodstm, hardyard, hardyard, ROT0, "Strata/Incredible Technologies",   "Hard Yardage (v1.20)", 0 )
 GAME( 1993, hardyard10,  hardyard, bloodstm, hardyard, hardyard, ROT0, "Strata/Incredible Technologies",   "Hard Yardage (v1.00)", 0 )
 GAME( 1994, bloodstm,    0,        bloodstm, bloodstm, bloodstm, ROT0, "Strata/Incredible Technologies",   "Blood Storm (v2.22)", 0 )
