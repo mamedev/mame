@@ -1458,6 +1458,42 @@ ROM_START( buckrogn )
 	ROM_LOAD( "pr-5199.cpu-ic95", 0x0700, 0x0400, CRC(45e997a8) SHA1(023703b90b503310351b12157b1e732e61430fa5) )  /* sprite color table */
 ROM_END
 
+ROM_START( buckrogn2 )
+	ROM_REGION( 0xc000, "maincpu", 0 )
+	ROM_LOAD( "epr-5204", 0x0000, 0x4000, CRC(c2d43741) SHA1(ad435278de101b32e931a2a1a6cdba9be7b7da73) )
+	ROM_LOAD( "epr-5205", 0x4000, 0x4000, CRC(648f3546) SHA1(2eefdab44aea5fe6fa8e302032c725615b9fdb8a) )
+
+	ROM_REGION( 0x2000, "sub", 0 )
+	ROM_LOAD( "epr-5200.cpu-ic66", 0x0000, 0x1000, CRC(0d58b154) SHA1(9f3951eb7ea1fa9ff914738462e4b4f755d60802) )
+
+	ROM_REGION( 0x40000, "gfx1", 0 ) /* sprite data */
+	ROM_LOAD( "epr-5216.prom-ic100",  0x00000, 0x2000, CRC(8155bd73) SHA1(b6814f03eafe16457655598685b4827456b86335) )	/* level 0 */
+	ROM_LOAD( "epr-5213.prom-ic84",   0x08000, 0x2000, CRC(fd78dda4) SHA1(4328b5782cbe692765eac43a8eba40bdf2e41921) )	/* level 1 */
+	ROM_LOAD( "epr-5210",             0x10000, 0x4000, CRC(c25b7b9e) SHA1(4418ed056d3240279ce83a872d5887cce374c24e) )	/* level 2 */
+	ROM_LOAD( "epr-5235",             0x18000, 0x4000, CRC(0ba5dac1) SHA1(3a9ab6d3ad1e4bff216412c161e0dc8079c7167e) )	/* level 3 */
+	ROM_LOAD( "epr-5234",             0x20000, 0x4000, CRC(6b773a81) SHA1(5ebcdf8466e634e01e1dbb339c60387ffd471b1d) )	/* level 4 */
+	ROM_LOAD( "epr-5236",             0x28000, 0x4000, CRC(d11ce162) SHA1(c0c7645b2886e133506a203c3feb773d7dba5f2b) )	/* level 5 */
+	ROM_LOAD( "epr-5208.prom-ic58",   0x2c000, 0x2000, CRC(d181fed2) SHA1(fd46e609b7e04d0661c84ad0faa616d75b8ba89f) )
+	ROM_LOAD( "epr-5212",             0x30000, 0x4000, CRC(9359ec4f) SHA1(4783527b9961df259e7fbbf8db0b599882dd1207) )	/* level 6 */
+	ROM_LOAD( "epr-5239.prom-ic74",   0x34000, 0x2000, CRC(c34e9b82) SHA1(9e69fe9dcc631783e43abe356657f3c6a6a533d8) )
+	ROM_LOAD( "epr-5215",             0x38000, 0x4000, CRC(f5dacc53) SHA1(fe536d16ccb249c26a046f60dc804f5d3be430dc) )	/* level 7 */
+	ROM_LOAD( "epr-5238.prom-ic90",   0x3c000, 0x2000, CRC(7aff0886) SHA1(09ed9fa973257bb23b488e02ef9e02d867e4c366) )
+
+	ROM_REGION( 0x01000, "gfx2", 0 )	/* foreground data */
+	ROM_LOAD( "epr-5201.cpu-ic102",  0x0000, 0x0800, CRC(7f21b0a4) SHA1(b6d784031ffecb36863ae1d81eeaaf8f76ab83df) )
+	ROM_LOAD( "epr-5202.cpu-ic103",  0x0800, 0x0800, CRC(43f3e5a7) SHA1(2714943b6720311c5d226db3b6fe95d072677793) )
+
+	ROM_REGION( 0x2000, "gfx3", 0 )	/* background color data */
+	ROM_LOAD( "epr-5203.cpu-ic91", 0x0000, 0x2000, CRC(631f5b65) SHA1(ce8b23cf97f7e08a13f426964ef140a20a884335) )
+
+	ROM_REGION( 0x0b00, "proms", 0 )	/* various PROMs */
+	ROM_LOAD( "pr-5194.cpu-ic39", 0x0000, 0x0020, CRC(bc88cced) SHA1(5055362710c0f58823c05fb4c0e0eec638b91e3d) )  /* char layer X shift */
+	ROM_LOAD( "pr-5195.cpu-ic53", 0x0020, 0x0020, CRC(181c6d23) SHA1(4749b205cbaa513ee65a644946235d2cfe275648) )  /* sprite state machine */
+	ROM_LOAD( "pr-5196.cpu-ic10", 0x0100, 0x0200, CRC(04204bcf) SHA1(5636eb184463ac58fcfd20012d13d14fb0769124) )  /* sprite Y scaling */
+	ROM_LOAD( "pr-5197.cpu-ic78", 0x0300, 0x0200, CRC(a42674af) SHA1(db3590dd0d0f8a85d4ba32ac4ee33f2f4ee4c348) )  /* video timing */
+	ROM_LOAD( "pr-5198.cpu-ic93", 0x0500, 0x0200, CRC(32e74bc8) SHA1(dd2c812efd7b8f6b31a45e698d6453ea6bec132e) )  /* char color table */
+	ROM_LOAD( "pr-5233",          0x0700, 0x0400, CRC(1cd08c4e) SHA1(fb3081548f157d705211a5f07261cf4ad1ebb453) )  /* sprite color table */
+ROM_END
 
 /*
 Buck Rogers Zoom 909 (early version of Buck Rogers Planet of Zoom)
@@ -1771,4 +1807,5 @@ GAMEL( 1981, turbob,   turbo,   turbo,    turbo,    turbo_enc,   ROT270,        
 GAMEL( 1982, subroc3d, 0,       subroc3d, subroc3d, 0,           ORIENTATION_FLIP_X, "Sega", "Subroc-3D", GAME_IMPERFECT_SOUND , layout_subroc3d )
 GAMEL( 1982, buckrog,  0,       buckrog,  buckrog,  buckrog_enc, ROT0,               "Sega", "Buck Rogers: Planet of Zoom", GAME_IMPERFECT_SOUND , layout_buckrog )
 GAMEL( 1982, zoom909,  buckrog, buckrog,  buckrog,  buckrog_enc, ROT0,               "Sega", "Zoom 909", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_COLORS, layout_buckrog ) // bad PROM
-GAMEL( 1982, buckrogn, buckrog, buckrog,  buckrog,  0,           ROT0,               "Sega", "Buck Rogers: Planet of Zoom (not encrypted)", GAME_IMPERFECT_SOUND , layout_buckrog )
+GAMEL( 1982, buckrogn, buckrog, buckrog,  buckrog,  0,           ROT0,               "Sega", "Buck Rogers: Planet of Zoom (not encrypted, set 1)", GAME_IMPERFECT_SOUND , layout_buckrog )
+GAMEL( 1982, buckrogn2,buckrog, buckrog,  buckrog,  0,           ROT0,               "Sega", "Buck Rogers: Planet of Zoom (not encrypted, set 2)", GAME_IMPERFECT_SOUND , layout_buckrog )
