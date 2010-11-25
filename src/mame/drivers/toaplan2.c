@@ -2662,6 +2662,25 @@ static INPUT_PORTS_START( dogyuunk )
 	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* Sound ready */
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( dogyuunt )
+	PORT_INCLUDE( dogyuun )
+
+	PORT_MODIFY("JMPR")
+	PORT_DIPNAME( 0x000f,	0x0000, "Territory" )
+	PORT_DIPSETTING(		0x0000, DEF_STR( Japan ) )
+	PORT_DIPSETTING(		0x0001, DEF_STR( USA ) )
+	PORT_DIPSETTING(		0x0002, DEF_STR( Europe ) )
+	PORT_DIPSETTING(		0x0003, "Hong Kong" )
+	PORT_DIPSETTING(		0x0004, "Korea" )
+	PORT_DIPSETTING(		0x0005, "Taiwan" )
+	PORT_DIPSETTING(		0x0006, "South East Asia (Charterfield license)" )
+	PORT_DIPSETTING(		0x0007, "USA (Romstar license)" )
+	PORT_DIPSETTING(		0x0008, "Hong Kong and China (Honest Trading Co. license)" )
+	PORT_DIPSETTING(		0x0009, "Korea (JC Trading Corp. license)" )
+	PORT_DIPSETTING(		0x000a, "USA (Fabtek license)" )
+	PORT_DIPSETTING(		0x000f, "Japan (Taito Corp license)" )
+	PORT_BIT( 0x0010, IP_ACTIVE_HIGH, IPT_UNKNOWN )	/* Sound ready */
+INPUT_PORTS_END
 
 static INPUT_PORTS_START( kbash )
 	PORT_INCLUDE( toaplan2 )
@@ -4863,6 +4882,24 @@ ROM_START( dogyuunk )
 	ROM_LOAD( "tp022_2.w30", 0x00000, 0x40000, CRC(043271b3) SHA1(c7eaa929e55dd956579b824ea9d20a1d0129a925) )
 ROM_END
 
+ROM_START( dogyuunt )
+	ROM_REGION( 0x080000, "maincpu", 0 )			/* Main 68K code */
+	ROM_LOAD16_WORD_SWAP( "sample10.9.u64.bin", 0x000000, 0x080000, CRC(585f5016) SHA1(18d57843f33a560a3bb4b6aef176f7ef795b742d) )
+
+	/* Secondary CPU is a Toaplan marked chip, (TS-002-MACH  TOA PLAN) */
+	/* It's some kind of NEC V25+ (PLCC94). - (encrypted program uploaded by main CPU) */
+
+	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_LOAD16_WORD_SWAP( "tp022_3.w92", 0x000000, 0x100000, CRC(191b595f) SHA1(89344946daa18087cc83f92027cf5da659b1c7a5) )
+	ROM_LOAD16_WORD_SWAP( "tp022_4.w93", 0x100000, 0x100000, CRC(d58d29ca) SHA1(90d142fef37764ef817347a2bed77892a288a077) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 )
+	ROM_LOAD16_WORD_SWAP( "tp022_5.w16", 0x000000, 0x200000, CRC(d4c1db45) SHA1(f5655467149ba737128c2f54c9c6cdaca6e4c35c) )
+	ROM_LOAD16_WORD_SWAP( "tp022_6.w17", 0x200000, 0x200000, CRC(d48dc74f) SHA1(081b5a00a2ff2bd82b98b30aab3cb5b6ae1014d5) )
+
+	ROM_REGION( 0x40000, "oki", 0 )		/* ADPCM Samples */
+	ROM_LOAD( "tp022_2.w30", 0x00000, 0x40000, CRC(043271b3) SHA1(c7eaa929e55dd956579b824ea9d20a1d0129a925) )
+ROM_END
 
 ROM_START( kbash )
 	ROM_REGION( 0x080000, "maincpu", 0 )			/* Main 68K code */
@@ -5848,6 +5885,7 @@ GAME( 1991, ghoxj,    ghox,     ghox,     ghox,     T2_Z180,  ROT270, "Toaplan",
 
 GAME( 1992, dogyuun,  0,        dogyuun,  dogyuun,  T2_V25,   ROT270, "Toaplan", "Dogyuun", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1992, dogyuunk, dogyuun,  dogyuun,  dogyuunk, T2_V25,   ROT270, "Toaplan", "Dogyuun (Unite Trading license)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1992, dogyuunt, dogyuun,  dogyuun,  dogyuunt, T2_V25,   ROT270, "Toaplan", "Dogyuun (test location version)", GAME_NO_SOUND | GAME_SUPPORTS_SAVE )
 
 GAME( 1993, kbash,    0,        kbash,    kbash,    T2_V25,   ROT0,   "Toaplan", "Knuckle Bash", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 
