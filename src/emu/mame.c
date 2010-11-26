@@ -566,6 +566,11 @@ static int parse_ini_file(core_options *options, const char *name, int priority)
 	file_error filerr;
 	mame_file *file;
 
+	/* update game name so depending callback options could be added */
+	if (priority==OPTION_PRIORITY_DRIVER_INI) {
+		options_force_option_callback(options, OPTION_GAMENAME, name, priority);
+	}
+
 	/* don't parse if it has been disabled */
 	if (!options_get_bool(options, OPTION_READCONFIG))
 		return FALSE;
@@ -575,11 +580,6 @@ static int parse_ini_file(core_options *options, const char *name, int priority)
 	filerr = mame_fopen_options(options, SEARCHPATH_INI, fname, OPEN_FLAG_READ, &file);
 	if (filerr != FILERR_NONE)
 		return FALSE;
-
-	/* update game name so depending callback options could be added */
-	if (priority==OPTION_PRIORITY_DRIVER_INI) {
-		options_force_option_callback(options, OPTION_GAMENAME, name, priority);
-	}
 
 	/* parse the file and close it */
 	mame_printf_verbose("Parsing %s.ini\n", name);

@@ -528,6 +528,7 @@ void legacy_image_device_base::clear()
     m_year.reset();
     m_playable.reset();
     m_extrainfo.reset();
+	m_basename.reset();
     m_basename_noext.reset();
 	m_filetype.reset();
 
