@@ -1363,6 +1363,18 @@ ROM_START( megat2 ) /* Dallas DS1204U-3 security key labeled 9255-10-01-U5-R0 */
 	ROM_RELOAD(                        0x180000, 0x080000)
 	ROM_LOAD( "qs9235-01_u7oru37-r0",  0x200000, 0x080000, CRC(16643f83) SHA1(347af99f535a8b473c8780067d5132add7fa0d8c) ) /* Location U37 */
 	ROM_RELOAD(                        0x280000, 0x080000)
+	ROM_LOAD( "9255-10-01_u38-r0e",    0x300000, 0x080000, CRC(797fbbaf) SHA1(8d093374f109831e469133aaebc3f7c2a5ed0623) ) /* Location U38, 11/29/1994 10:51:00 - Standard version */
+	ROM_RELOAD(                        0x380000, 0x080000)
+ROM_END
+
+ROM_START( megat2ca ) /* Dallas DS1204U-3 security key labeled 9255-10-01-U5-R0 */
+	ROM_REGION( 0x400000, "maincpu", 0 )
+	ROM_LOAD( "qs9235-01_u5oru32-r0b", 0x000000, 0x080000, CRC(f7ecd49b) SHA1(34c1293da7304e8a46a96f1dbd7add3291afe3fc) ) /* Location U32 */
+	ROM_RELOAD(                        0x080000, 0x080000)
+	ROM_LOAD( "qs9235-01_u6oru36-r0",  0x100000, 0x080000, CRC(0a358743) SHA1(cc7c1b75e391204a7bdae2e1cecd9b55b572f8d5) ) /* Location U36 */
+	ROM_RELOAD(                        0x180000, 0x080000)
+	ROM_LOAD( "qs9235-01_u7oru37-r0",  0x200000, 0x080000, CRC(16643f83) SHA1(347af99f535a8b473c8780067d5132add7fa0d8c) ) /* Location U37 */
+	ROM_RELOAD(                        0x280000, 0x080000)
 	ROM_LOAD( "9255-10-06_u38-r0g",    0x300000, 0x080000, CRC(51b8160a) SHA1(f2dd44ff3bd62c86c385b5e1438c560947f6c253) ) /* Location U38, 02/10/1995 10:03:52 - California version */
 	ROM_RELOAD(                        0x380000, 0x080000)
 ROM_END
@@ -1868,7 +1880,8 @@ GAME( 1994, pitbossm,  0,         meritm_crt250_questions, pitbossm, pitbossm, R
 GAME( 1994, pitbossma, pitbossm,  meritm_crt250_questions, pitbossa, 0,        ROT0, "Merit", "Pit Boss Megastar (9243-00-01)", GAME_IMPERFECT_GRAPHICS )
 
 /* CRT 260 */
-GAME( 1994, megat2,    0,      meritm_crt260, meritm_crt260, megat2,   ROT0, "Merit", "Pit Boss Megatouch II (9255-10-06 ROG, California version)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1994, megat2,    0,      meritm_crt260, meritm_crt260, megat2,   ROT0, "Merit", "Pit Boss Megatouch II (9255-10-01 ROE, Standard version)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1994, megat2ca,  megat2, meritm_crt260, meritm_crt260, megat2,   ROT0, "Merit", "Pit Boss Megatouch II (9255-10-06 ROG, California version)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, megat3,    0,      meritm_crt260, meritm_crt260, megat3,   ROT0, "Merit", "Megatouch III (9255-20-01 RON, Standard version)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1995, megat3a,   megat3, meritm_crt260, meritm_crt260, megat3,   ROT0, "Merit", "Megatouch III (9255-20-01 ROF, Standard version)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1996, megat3ca,  megat3, meritm_crt260, meritm_crt260, megat3,   ROT0, "Merit", "Megatouch III (9255-20-06 RON, California version)", GAME_IMPERFECT_GRAPHICS )
