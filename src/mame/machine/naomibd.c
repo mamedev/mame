@@ -1159,7 +1159,7 @@ internal block-cipher. So, at a given step, the internal block cipher will outpu
 given plaintext word, and the remaining 2 to the next plaintext word.
 
 The underlying block cipher consists of two 4-round Feistel Networks (FN): the first one takes the counter (16 bits),
-the game-key (>=22 bits) and the sequence-key (16 bits) and output a middle result (16 bits) which will act as another key
+the game-key (>=25 bits) and the sequence-key (16 bits) and output a middle result (16 bits) which will act as another key
 for the second one. The second FN will take the encrypted word (16 bits), the game-key, the sequence-key and the result
 from the first FN and will output the decrypted word (16 bits).
 
@@ -1527,21 +1527,22 @@ static const struct sbox fn2_sboxes[4][4] =
     },
 };
 
-static const int fn1_game_key_scheduling[34][2] =
+static const int fn1_game_key_scheduling[36][2] =
 {
     {1,29},  {1,71},  {2,4},   {2,54},  {3,8},   {4,56},  {4,73},  {5,11},
     {6,51},  {7,92},  {8,89},  {9,9},   {9,10},  {9,39},  {9,41},  {9,58},
     {9,59},  {9,86},  {10,90}, {11,6},  {12,64}, {13,49}, {14,44}, {15,40},
-    {16,69}, {17,15}, {18,23}, {18,43}, {19,82}, {20,81}, {21,5},  {21,32},
-    {21,61}, {21,66}
+    {16,69}, {17,15}, {18,23}, {18,43}, {19,82}, {20,81}, {21,32}, {21,61},
+    {22,5},  {23,66}, {24,13}, {24,45}
 };
 
-static const int fn2_game_key_scheduling[32][2] =
+static const int fn2_game_key_scheduling[33][2] =
 {
     {0,0},   {1,3},   {2,11},  {3,20},  {4,22},  {5,23},  {6,29},  {7,38},
     {8,39},  {9,47},  {9,55},  {9,86},  {9,87},  {9,90},  {10,50}, {10,53},
     {11,57}, {12,59}, {13,61}, {13,64}, {14,63}, {15,67}, {16,72}, {17,83},
-    {18,88}, {19,94}, {20,35}, {21,6},  {21,11}, {21,17}, {21,85}, {21,92}
+    {18,88}, {19,94}, {20,35}, {21,17}, {21,92}, {22,6},  {22,11}, {23,85},
+    {24,16}
 };
 
 static const int fn1_sequence_key_scheduling[20][2] =
@@ -1605,7 +1606,7 @@ static UINT16 block_decrypt(UINT32 game_key, UINT16 sequence_key, UINT16 counter
     memset(fn1_subkeys,0,sizeof(UINT32)*4);
     memset(fn2_subkeys,0,sizeof(UINT32)*4);
 
-    for (j=0; j<34; ++j)
+    for (j=0; j<36; ++j)
     {
         if (BIT(game_key, fn1_game_key_scheduling[j][0])!=0)
         {
@@ -1615,7 +1616,7 @@ static UINT16 block_decrypt(UINT32 game_key, UINT16 sequence_key, UINT16 counter
         }
     }
 
-    for (j=0; j<32; ++j)
+    for (j=0; j<33; ++j)
     {
         if (BIT(game_key, fn2_game_key_scheduling[j][0])!=0)
         {
