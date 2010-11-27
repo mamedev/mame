@@ -103,7 +103,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
 
 3) 'rougien'
 
-  - Player 2 AWLAYS uses 2nd set of inputs regardless of "Cabinet" Dip Switch.
+  - Player 2 ALWAYS uses 2nd set of inputs regardless of "Cabinet" Dip Switch.
   - Continue Play is always possible provided that you insert a coin when the
     message is displayed on the screen (there is a 6 "seconds" timer to do so).
   - Setting BOTH DSW bits 2 and 3 to ON gives you infinite credits and lives.
@@ -116,6 +116,7 @@ Stephh's notes (based on the games Z80 code and some tests) :
 #include "emu.h"
 #include "cpu/z80/z80.h"
 #include "sound/ay8910.h"
+#include "sound/msm5205.h"
 #include "includes/mermaid.h"
 
 /* Read/Write Handlers */
@@ -134,7 +135,6 @@ static WRITE8_HANDLER( mermaid_ay8910_control_port_w )
 	if (state->ay8910_enable[1]) ay8910_address_w(state->ay2, offset, data);
 }
 
-
 /* Memory Map */
 
 static ADDRESS_MAP_START( mermaid_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -148,9 +148,7 @@ static ADDRESS_MAP_START( mermaid_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xdc00, 0xdfff) AM_RAM_WRITE(mermaid_colorram_w) AM_BASE_MEMBER(mermaid_state, colorram)
 	AM_RANGE(0xe000, 0xe000) AM_READ_PORT("DSW")
 	AM_RANGE(0xe000, 0xe001) AM_RAM AM_BASE_MEMBER(mermaid_state, ay8910_enable)
-	AM_RANGE(0xe002, 0xe002) AM_WRITENOP	// ???
-	AM_RANGE(0xe003, 0xe003) AM_WRITENOP	// ???
-	AM_RANGE(0xe004, 0xe004) AM_WRITENOP	// ???
+	AM_RANGE(0xe002, 0xe004) AM_WRITENOP // ???
 	AM_RANGE(0xe005, 0xe005) AM_WRITE(mermaid_flip_screen_x_w)
 	AM_RANGE(0xe006, 0xe006) AM_WRITE(mermaid_flip_screen_y_w)
 	AM_RANGE(0xe007, 0xe007) AM_WRITE(interrupt_enable_w)
@@ -354,7 +352,46 @@ static MACHINE_RESET( mermaid )
 	state->coll_bit6 = 0;
 	state->rougien_gfxbank1 = 0;
 	state->rougien_gfxbank2 = 0;
+
+	state->adpcm_idle = 1;
 }
+
+/* Similar to Jantotsu, apparently the HW has three ports that controls what kind of sample should be played. Every sample size is 0x1000. */
+static void rougien_adpcm_int( running_device *device )
+{
+	mermaid_state *state = device->machine->driver_data<mermaid_state>();
+
+//	popmessage("%08x",state->adpcm_pos);
+
+	if (state->adpcm_pos >= state->adpcm_end || state->adpcm_idle)
+	{
+		//state->adpcm_idle = 1;
+		msm5205_reset_w(device, 1);
+		state->adpcm_trigger = 0;
+	}
+	else
+	{
+		UINT8 *ROM = memory_region(device->machine, "adpcm");
+
+		state->adpcm_data = ((state->adpcm_trigger ? (ROM[state->adpcm_pos] & 0x0f) : (ROM[state->adpcm_pos] & 0xf0) >> 4));
+		msm5205_data_w(device, state->adpcm_data & 0xf);
+		state->adpcm_trigger ^= 1;
+		if (state->adpcm_trigger == 0)
+		{
+			state->adpcm_pos++;
+			//if ((ROM[state->adpcm_pos] & 0xff) == 0x70)
+			//	state->adpcm_idle = 1;
+		}
+	}
+}
+
+
+static const msm5205_interface msm5205_config =
+{
+	rougien_adpcm_int,	/* interrupt function */
+	MSM5205_S64_4B	/* 6 KHz */
+};
+
 
 static MACHINE_CONFIG_START( mermaid, mermaid_state )
 
@@ -392,6 +429,13 @@ static MACHINE_CONFIG_START( mermaid, mermaid_state )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( rougien, mermaid )
+
+	MDRV_SOUND_ADD("adpcm", MSM5205, 384000)
+	MDRV_SOUND_CONFIG(msm5205_config)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+MACHINE_CONFIG_END
+
 /* ROMs */
 
 ROM_START( mermaid )
@@ -420,7 +464,7 @@ ROM_START( mermaid )
 	ROM_LOAD( "col_a.96",	    0x0000, 0x0020, CRC(ef87bcd6) SHA1(00a5888ad028fabeb7369eed33be5cd49b6b7bb0) )
 	ROM_LOAD( "col_b.95",	    0x0020, 0x0020, CRC(ca48abdd) SHA1(a864612c2c33acddfa9993ed10a1d63d2e3f145d) )
 
-	ROM_REGION( 0x1000, "user1", 0 )	// unknown
+	ROM_REGION( 0x1000, "user1", 0 )	// unknown, ADPCM?
 	ROM_LOAD( "g960_42.39",	0x0000, 0x1000, CRC(287840bb) SHA1(9a1836f39f328b0c9672976d95a9ece45bb9e89f) )
 ROM_END
 
@@ -458,7 +502,7 @@ ROM_START( rougien )
 	ROM_LOAD( "prom_a.bin", 0x0000, 0x0020, CRC(49f619b9) SHA1(c936aaf79822628a2ffff169d236389bc2eef6a5) )
 	ROM_LOAD( "prom_b.bin", 0x0020, 0x0020, CRC(41ad4fc8) SHA1(a9d24586130f00cd350459635de5f4f7629e00b4) )
 
-	ROM_REGION( 0x3000, "user1", 0 )	// unknown
+	ROM_REGION( 0x10000, "adpcm", 0 )	// ADPCM data
 	ROM_LOAD( "rou-40.bin", 0x0000, 0x1000, CRC(ab38b942) SHA1(9575f67e002c68d384122e05a12c6c0f21335825) )
 	ROM_LOAD( "rou-41.bin", 0x1000, 0x1000, CRC(59ed0d88) SHA1(7faf6ab01fa3c1c04c38d2ea27b27c47450876de) )
 	ROM_LOAD( "rou-42.bin", 0x2000, 0x1000, CRC(5ce13444) SHA1(e6da83190b26b094159a3a97deffd31d0d20a061) )
@@ -490,7 +534,7 @@ ROM_START( yachtmn )
 	ROM_LOAD( "col_a.96",	    0x0000, 0x0020, CRC(ef87bcd6) SHA1(00a5888ad028fabeb7369eed33be5cd49b6b7bb0) ) // col_a.96
 	ROM_LOAD( "col_b.95",	    0x0020, 0x0020, CRC(ca48abdd) SHA1(a864612c2c33acddfa9993ed10a1d63d2e3f145d) ) // col_b.95
 
-	ROM_REGION( 0x1000, "user1", 0 )	// unknown
+	ROM_REGION( 0x1000, "user1", 0 )	// unknown, ADPCM?
 	ROM_LOAD( "g960_42.39",	0x0000, 0x1000, CRC(287840bb) SHA1(9a1836f39f328b0c9672976d95a9ece45bb9e89f) ) // mervce.39
 ROM_END
 
@@ -499,4 +543,4 @@ ROM_END
 
 GAME( 1982, mermaid,  0,        mermaid,  mermaid,  0, ROT0, "Sanritsu / Rock-Ola", "Mermaid", GAME_SUPPORTS_SAVE )
 GAME( 1982, yachtmn,  mermaid,  mermaid,  yachtmn,  0, ROT0, "Sanritsu / Esco", "Yachtsman", GAME_SUPPORTS_SAVE )
-GAME( 1982, rougien,  0,        mermaid,  rougien,  0, ROT0, "Sanritsu", "Rougien", GAME_SUPPORTS_SAVE )
+GAME( 1982, rougien,  0,        rougien,  rougien,  0, ROT0, "Sanritsu", "Rougien", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
