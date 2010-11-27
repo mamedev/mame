@@ -1472,6 +1472,7 @@ static MACHINE_CONFIG_DERIVED( cavepgm, pgm )
 
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(cavepgm_mem)
+	MDRV_CPU_VBLANK_INT_HACK(drgw_interrupt,2)
 
 MACHINE_CONFIG_END
 
@@ -4360,6 +4361,7 @@ static DRIVER_INIT( pstar )
 	state_save_register_global(machine, state->pstar_b1);
 	state_save_register_global(machine, state->pstar_ce);
 	state_save_register_global_array(machine, state->pstar_ram);
+	
 }
 
 static DRIVER_INIT( photoy2k )
@@ -5394,110 +5396,88 @@ static DRIVER_INIT( kovqhsgs )
 	kovsh_latch_init(machine);
 }
 
+/* this is based on the puzzle star simulation,
+ at least for how it communicates with the device..
 
+ please don't driver_data this, it's temporary code, and just
+ becomes and absolute pain to work with if bits of it end
+ up all over the place, and near impossible to read with state->
+ before everything.  
 
-
+*/
+static UINT16 value0, value1, valuekey;
+static UINT32 valueresponse;
 
 static WRITE16_HANDLER( ddp3_asic_w )
 {
-	int pc = cpu_get_pc(space->cpu);
-	UINT32 address = offset*2 + 0x500000;
 
-	logerror("protection write pc: %5.5x %5.5x %4.4x\n", pc, address, data);
-	
-
-	switch (address)
+	if (offset == 0)
 	{
-		case 0x500000:
-			//
-		return;
-
-		case 0x500002:
-			// 
-		return;
-
-		case 0x500004:
-			// if (data == 0) should probably do something... IRQ?
+		value0 = data;
 		return;
 	}
+	else if (offset == 1)
+	{
+		UINT16 realkey;
+		if ((data >> 8) == 0xff)
+			valuekey = 0xff00;
+		realkey = valuekey >> 8;
+		realkey |= valuekey;
+		{
+			valuekey += 0x0100;
+			valuekey &= 0xff00;
+			if (valuekey == 0xff00)
+				valuekey =  0x0100;
+		}
+		data ^= realkey;
+		value1 = data;
+		value0 ^= realkey;
 
-	data = data; // kill warnings
+		int command = value1 & 0xff;
+
+		switch (command)
+		{
+			default:
+				printf("command %02x\n", command);
+				valueresponse = 0x880000;
+				break;
+
+			case 0x99: // reset?
+				valuekey = 0x100;
+				valueresponse = 0x00880000;
+				break;
+
+		}
+	}
+	else if (offset==2)
+	{
+
+	}
+
 }
 
 static READ16_HANDLER( ddp3_asic_r )
 {
-	int pc = cpu_get_pc(space->cpu);
-	unsigned int retdata = 0;
 
-	//printf("pc %08x\n", pc);
-
-/*
-	pc 1466a8 and 146686 should probably be returning something
-*/
-	UINT32 address = offset*2 + 0x500000;
-
-	switch (address)
+	if (offset == 0)
 	{
-		case 0x500000:
-		{
-			switch (pc)
-			{
-				case 0x1465ee:
-				case 0x146B00: // black label
-				case 0x24704c: // black label
-					retdata = 0x028b; // boot
-				break;
+		UINT16 d = valueresponse & 0xffff;
+		UINT16 realkey = valuekey >> 8;
+		realkey |= valuekey;
+		d ^= realkey;
 
-				case 0x1466a8:
-				case 0x146BBA: // black label
-					retdata = 0x0000; // data
-				break;
-			}
-		}
-		break;
-
-		case 0x500002:
-		{
-			switch (pc)
-			{
-				case 0x1465a2: // 0xff00
-				case 0x1465cc: // 0x0077
-				case 0x146ab4: // 0xff00 - black label
-				case 0x146ADE: // 0x0077 - black label
-				case 0x247000: // 0xff00 - black label
-				case 0x24702a: // 0x0077 - black label
-					retdata = 0xff77; // boot
-				break;
-
-				case 0x146686:
-				case 0x146B98: // black label
-					retdata = 0x0000; // data
-				break;
-
-				case 0x146716: // protection
-				case 0x14665c: // protection
-				case 0x146C28: // protection- black label
-				case 0x146B6E: // protection- black label
-				case 0x247174: // protection- black label
-				case 0x2470ba: // protection- black label
-					retdata = cpu_get_reg(space->cpu, M68K_D5) << 8;
-				break;
-
-				case 0x146740: // protection
-				case 0x146C52: // protection - black label
-				case 0x24719e: // protection - black label
-					retdata = cpu_get_reg(space->cpu, M68K_D5) ^ 0x0088;
-				break;
-			}
-		}
-		break;
+		return d;
 	}
+	else if (offset == 1)
+	{
+		UINT16 d = valueresponse >> 16;
+		UINT16 realkey = valuekey >> 8;
+		realkey |= valuekey;
+		d ^= realkey;
+		return d;
 
-	//if (pc != 0x1465ee && pc != 0x1465a2 && pc != 0x1465cc && pc != 0x146716 && pc != 0x146740 && pc != 0x14665c && pc != 0x1466a8 && pc != 0x146686) {
-		logerror ("protection read pc: %5.5x %5.5x, ret %4.4x\n", pc, address, retdata);
-	//}
-
-	return retdata;
+	}
+	return 0xffff;
 }
 
 void install_asic27a_ddp3(running_machine* machine)
@@ -5505,159 +5485,14 @@ void install_asic27a_ddp3(running_machine* machine)
 	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x500000, 0x500005, 0, 0, ddp3_asic_r, ddp3_asic_w);
 }
 
-
-
-
-
-static WRITE16_HANDLER( ket_asic_w )
-{
-	int pc = cpu_get_pc(space->cpu);
-	UINT32 address = offset*2 + 0x500000;
-
-	logerror("protection write pc: %5.5x %5.5x %4.4x\n", pc, address, data);
-
-	switch (address)
-	{
-		case 0x400000:
-		return;
-
-		case 0x400002:
-		return;
-
-		case 0x400004:
-			// if (data == 0) should probably do something... IRQ?
-		return;
-	}
-
-	data = data; // kill warnings
-}
-
-static READ16_HANDLER( ket_asic_r )
-{
-	int pc = cpu_get_pc(space->cpu);
-
-	//printf("pc %08x\n", pc);
-
-	UINT32 address = offset*2 + 0x400000;
-
-
-	unsigned int retdata = 0;
-
-	switch (address)
-	{
-		case 0x400000:
-		{
-			switch (pc)
-			{
-				case 0xb2bc0:
-					retdata = 0xffff; // must be > 0x200?
-				break;
-
-				case 0xb2c7a:
-					retdata = 0;//xffff; // revisions want values from here...
-				break;
-			}
-		}
-		break;
-
-		case 0x400002:
-		{
-
-			switch (pc)
-			{
-				case 0xb2b74: // 0xff00
-				case 0xb2b9e: // 0x0077
-					retdata = 0xff77;
-				break;
-
-				case 0xb2c2e:
-				case 0xb2ce8:
-					retdata =  cpu_get_reg(space->cpu, M68K_D5) << 8;
-				break;
-
-				case 0xb2d12:
-					retdata =  cpu_get_reg(space->cpu, M68K_D5) ^ 0x0088;
-				break;
-
-				case 0xb2c58:
-					retdata = 0;//xffff; // revisions want values from here...
-				break;
-			}
-		}
-		break;
-	}
-
-	//if (pc != 0xb2ce8 && pc != 0xb2c2e && pc != 0xb2d12) {
-	//	logerror ("protection read pc: %5.5x %5.5x, ret %4.4x kovret %4.4x\n"), pc, address, retdata, kovret);
-	//}
-
-	return retdata;
-}
-
 void install_asic27a_ket(running_machine* machine)
 {
-	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400000, 0x400005, 0, 0, ket_asic_r, ket_asic_w);
-}
-
-static READ16_HANDLER( espgal_asic_r )
-{
-	int pc = cpu_get_pc(space->cpu);
-
-	//printf("pc %08x\n", pc);
-
-	UINT32 address = offset*2 + 0x400000;
-
-
-	unsigned int retdata = 0;
-	switch (address)
-	{
-		case 0x400000:
-		{
-			switch (pc)
-			{
-				case 0x11fe28:
-					retdata = 0x0000; // boot - seems ok with 0??
-				break;
-
-				case 0x11fee2:
-					retdata = 0x0000; // data
-				break;
-			}
-		}
-		break;
-
-		case 0x400002:
-		{
-			switch (pc)
-			{
-				case 0x11fddc: // 0xff00
-				case 0x11fe06: // 0x0077
-					retdata = 0xff77; // boot
-				break;
-
-				case 0x11fec0:
-					retdata = 0x0000; // data
-				break;
-
-				case 0x11fe96: // protection
-				case 0x11ff50: // protection
-					retdata = cpu_get_reg(space->cpu, M68K_D2) << 8;
-				break;
-
-				case 0x11ff7a: // protection
-					retdata = cpu_get_reg(space->cpu, M68K_D5) ^ 0x0088;
-				break;
-			}
-		}
-		break;
-	}
-
-	return retdata;
+	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400000, 0x400005, 0, 0, ddp3_asic_r, ddp3_asic_w);
 }
 
 void install_asic27a_espgal(running_machine* machine)
 {
-	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400000, 0x400005, 0, 0, espgal_asic_r, ket_asic_w);
+	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400000, 0x400005, 0, 0, ddp3_asic_r, ddp3_asic_w);
 }
 
 
