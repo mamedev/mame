@@ -1313,7 +1313,10 @@ GFXDECODE_END
 static INTERRUPT_GEN( drgw_interrupt )
 {
 	if (cpu_getiloops(device) == 0)
+	{
+		//printf("vbl\n");	
 		cpu_set_input_line(device, 6, HOLD_LINE);
+	}
 	else
 		cpu_set_input_line(device, 4, HOLD_LINE);
 }
@@ -5405,7 +5408,7 @@ static DRIVER_INIT( kovqhsgs )
  before everything.  
 
 */
-static UINT16 value0, value1, valuekey;
+static UINT16 value0, value1, valuekey, ddp3lastcommand;
 static UINT32 valueresponse;
 
 static WRITE16_HANDLER( ddp3_asic_w )
@@ -5433,12 +5436,30 @@ static WRITE16_HANDLER( ddp3_asic_w )
 		value1 = data;
 		value0 ^= realkey;
 
-		int command = value1 & 0xff;
+		ddp3lastcommand = value1 & 0xff;
 
-		switch (command)
+		/* typical frame (ddp3) (all 3 games use only these commands? for the most part of levels espgal just issues 8e)
+			vbl
+			145f28 command 67
+			145f70 command e5
+			145f28 command 67
+			145f70 command e5
+			1460c6 command 40
+			145ec0 command 8e
+			*/
+
+		switch (ddp3lastcommand)
 		{
 			default:
-				printf("command %02x\n", command);
+				printf("%06x command %02x | %04x\n", cpu_get_pc(space->cpu), ddp3lastcommand, value0);
+				valueresponse = 0x880000;
+				break;
+
+			case 0x40:
+			case 0x67:
+			case 0x8e:
+			case 0xe5:
+				printf("%06x command %02x | %04x\n", cpu_get_pc(space->cpu), ddp3lastcommand, value0);
 				valueresponse = 0x880000;
 				break;
 
@@ -5466,7 +5487,9 @@ static READ16_HANDLER( ddp3_asic_r )
 		realkey |= valuekey;
 		d ^= realkey;
 
-		return d;
+//		return d;
+		return d & 0xff; // hack, keeps it going a bit longer
+
 	}
 	else if (offset == 1)
 	{
