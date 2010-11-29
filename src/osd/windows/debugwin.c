@@ -2252,7 +2252,7 @@ static int disasm_handle_command(debugwin_info *info, WPARAM wparam, LPARAM lpar
 					if (dasmview->cursor_visible() && debug_cpu_get_visible_cpu(info->machine) == dasmview->source()->device())
 					{
 						offs_t address = dasmview->selected_address();
-						sprintf(command, "go %X", address);
+						sprintf(command, "go 0x%X", address);
 						debug_console_execute_command(info->machine, command, 1);
 					}
 					return 1;

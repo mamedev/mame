@@ -1126,7 +1126,7 @@ void on_run_to_cursor_activate(GtkWidget *win)
 		if (debug_cpu_get_visible_cpu(info->machine) == disasm->view->source()->device())
 		{
 			offs_t address = downcast<debug_view_disasm *>(disasm->view)->selected_address();
-			command.printf("go %X", address);
+			command.printf("go 0x%X", address);
 			debug_console_execute_command(info->machine, command, 1);
 		}
 	}
