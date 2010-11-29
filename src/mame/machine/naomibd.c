@@ -1187,10 +1187,10 @@ chosen so as to make the key for CAPSNK equal to 0.
 
 It can be observed that some sboxes have incomplete tables (a 255 value indicate an unknown value). It's unclear whether or
 not they are used by the cipher, as the bits of the recovered keys as of november/2010 show small randomness and big correlations,
-making possible that some unseen bits could make the decryption need those incomplete parts. Even if not, as of november/2010, there are two
-s-boxes which have an incomplete table which definitely could be being used by some carts: the 1st s-box of the 1st round of the 1st FN and
-the 4th s-box of the 1st round of the 2nd FN. They are incomplete because we haven't located any game using that part of the s-box
-till now, but definitively they could be being used by some still-not-analyzed carts.
+making possible that some unseen bits could make the decryption need those incomplete parts. Even if not, as of november/2010, there are one
+s-box which have an incomplete table which definitely could be being used by some carts: the 1st s-box of the 1st round of the 1st FN.
+It is incomplete because we haven't located any game using that part of the s-box
+till now, but definitively it could be being used by some still-not-analyzed carts.
 
 When bit #1 of the heading control bits is set to 1, an additional decompression step seems to be carried out. As of
 february/2010, Deunan Knute has put some work on analyzing the decompression algorithm, but probably much more work will
@@ -1405,9 +1405,7 @@ static const struct sbox fn2_sboxes[4][4] =
         {
             {
                 2,3,1,3,2,0,1,2,0,0,3,3,3,3,3,1,2,0,2,1,2,3,0,2,0,1,0,3,0,2,1,0,
-                2,3,0,1,3,0,3,2,3,1,2,0,3,1,1,2,
-                // potentially used, but we haven't located any game using it
-                255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
+                2,3,0,1,3,0,3,2,3,1,2,0,3,1,1,2,0,3,0,0,2,0,2,1,2,2,3,2,1,2,3,1,
             },
             {1,2,5,6,-1,-1},
             {5,6}
