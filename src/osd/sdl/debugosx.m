@@ -1144,7 +1144,7 @@ void console_create_window(running_machine *machine)
 		if (debug_cpu_get_visible_cpu(machine) == space->cpu) {
 			offs_t address = downcast<debug_view_disasm *>(view)->selected_address();
 			if (useConsole) {
-				NSString *command = [NSString stringWithFormat:@"go %lX", (unsigned long)address];
+				NSString *command = [NSString stringWithFormat:@"go 0x%lX", (unsigned long)address];
 				debug_console_execute_command(machine, [command UTF8String], 1);
 			} else {
 				debug_cpu_get_visible_cpu(machine)->debug()->go(address);
