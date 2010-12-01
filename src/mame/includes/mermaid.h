@@ -33,6 +33,8 @@ public:
 	UINT8    adpcm_idle;
 	int      adpcm_data;
 	UINT8    adpcm_trigger;
+	UINT8    adpcm_rom_sel;
+	UINT8    adpcm_play_reg;
 
 	/* devices */
 	running_device *maincpu;

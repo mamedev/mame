@@ -10,8 +10,9 @@
         * Rougien
 
     Known issues:
-        * Are the stars really supposed to go up in Rougien?
-
+        * stars playfield colors and scrolling is wrong in Rougien;
+        * Dunno where the "alien whistle" sample is supposed to play in Rougien;
+        * Mermaid has a ROM for sample playback, identify and hook it up;
 
 Yachtsman
 Esco/Sanritsu, 1982
@@ -166,6 +167,41 @@ static ADDRESS_MAP_START( mermaid_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf807, 0xf807) AM_WRITE(mermaid_ay8910_control_port_w)
 ADDRESS_MAP_END
 
+static WRITE8_HANDLER( rougien_sample_rom_lo_w )
+{
+	mermaid_state *state = space->machine->driver_data<mermaid_state>();
+
+	state->adpcm_rom_sel = (data & 1) | (state->adpcm_rom_sel & 2);
+}
+
+static WRITE8_HANDLER( rougien_sample_rom_hi_w )
+{
+	mermaid_state *state = space->machine->driver_data<mermaid_state>();
+
+	state->adpcm_rom_sel = ((data & 1)<<1) | (state->adpcm_rom_sel & 1);
+}
+
+static WRITE8_HANDLER( rougien_sample_playback_w )
+{
+	mermaid_state *state = space->machine->driver_data<mermaid_state>();
+
+	if((state->adpcm_play_reg & 1) && ((data & 1) == 0))
+	{
+		state->adpcm_pos = state->adpcm_rom_sel*0x1000;
+		state->adpcm_end = state->adpcm_pos+0x1000;
+		state->adpcm_idle = 0;
+		msm5205_reset_w(space->machine->device("adpcm"), 0);
+	}
+
+	state->adpcm_play_reg = data & 1;
+}
+
+static ADDRESS_MAP_START( rougien_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0xe002, 0xe002) AM_WRITE(rougien_sample_playback_w)
+	AM_RANGE(0xe802, 0xe802) AM_WRITE(rougien_sample_rom_hi_w)
+	AM_RANGE(0xe803, 0xe803) AM_WRITE(rougien_sample_rom_lo_w)
+	AM_IMPORT_FROM( mermaid_map )
+ADDRESS_MAP_END
 
 /* Input Ports */
 
@@ -339,6 +375,14 @@ static MACHINE_START( mermaid )
 	state_save_register_global(machine, state->coll_bit6);
 	state_save_register_global(machine, state->rougien_gfxbank1);
 	state_save_register_global(machine, state->rougien_gfxbank2);
+
+	state_save_register_global(machine, state->adpcm_pos);
+	state_save_register_global(machine, state->adpcm_end);
+	state_save_register_global(machine, state->adpcm_idle);
+	state_save_register_global(machine, state->adpcm_data);
+	state_save_register_global(machine, state->adpcm_trigger);
+	state_save_register_global(machine, state->adpcm_rom_sel);
+	state_save_register_global(machine, state->adpcm_play_reg);
 }
 
 static MACHINE_RESET( mermaid )
@@ -354,6 +398,8 @@ static MACHINE_RESET( mermaid )
 	state->rougien_gfxbank2 = 0;
 
 	state->adpcm_idle = 1;
+	state->adpcm_rom_sel = 0;
+	state->adpcm_play_reg = 0;
 }
 
 /* Similar to Jantotsu, apparently the HW has three ports that controls what kind of sample should be played. Every sample size is 0x1000. */
@@ -389,7 +435,7 @@ static void rougien_adpcm_int( running_device *device )
 static const msm5205_interface msm5205_config =
 {
 	rougien_adpcm_int,	/* interrupt function */
-	MSM5205_S64_4B	/* 6 KHz */
+	MSM5205_S96_4B
 };
 
 
@@ -427,9 +473,13 @@ static MACHINE_CONFIG_START( mermaid, mermaid_state )
 
 	MDRV_SOUND_ADD("ay2", AY8910, 1500000)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( rougien, mermaid )
+
+	MDRV_DEVICE_MODIFY("maincpu")
+	MDRV_CPU_PROGRAM_MAP(rougien_map)
 
 	MDRV_SOUND_ADD("adpcm", MSM5205, 384000)
 	MDRV_SOUND_CONFIG(msm5205_config)
@@ -464,7 +514,7 @@ ROM_START( mermaid )
 	ROM_LOAD( "col_a.96",	    0x0000, 0x0020, CRC(ef87bcd6) SHA1(00a5888ad028fabeb7369eed33be5cd49b6b7bb0) )
 	ROM_LOAD( "col_b.95",	    0x0020, 0x0020, CRC(ca48abdd) SHA1(a864612c2c33acddfa9993ed10a1d63d2e3f145d) )
 
-	ROM_REGION( 0x1000, "user1", 0 )	// unknown, ADPCM?
+	ROM_REGION( 0x1000, "adpcm", 0 )	// unknown, ADPCM?
 	ROM_LOAD( "g960_42.39",	0x0000, 0x1000, CRC(287840bb) SHA1(9a1836f39f328b0c9672976d95a9ece45bb9e89f) )
 ROM_END
 
@@ -503,9 +553,9 @@ ROM_START( rougien )
 	ROM_LOAD( "prom_b.bin", 0x0020, 0x0020, CRC(41ad4fc8) SHA1(a9d24586130f00cd350459635de5f4f7629e00b4) )
 
 	ROM_REGION( 0x10000, "adpcm", 0 )	// ADPCM data
-	ROM_LOAD( "rou-40.bin", 0x0000, 0x1000, CRC(ab38b942) SHA1(9575f67e002c68d384122e05a12c6c0f21335825) )
-	ROM_LOAD( "rou-41.bin", 0x1000, 0x1000, CRC(59ed0d88) SHA1(7faf6ab01fa3c1c04c38d2ea27b27c47450876de) )
-	ROM_LOAD( "rou-42.bin", 0x2000, 0x1000, CRC(5ce13444) SHA1(e6da83190b26b094159a3a97deffd31d0d20a061) )
+	ROM_LOAD( "rou-42.bin", 0x0000, 0x1000, CRC(5ce13444) SHA1(e6da83190b26b094159a3a97deffd31d0d20a061) ) // "rougien" speech
+	ROM_LOAD( "rou-41.bin", 0x1000, 0x1000, CRC(59ed0d88) SHA1(7faf6ab01fa3c1c04c38d2ea27b27c47450876de) ) // laugh
+	ROM_LOAD( "rou-40.bin", 0x2000, 0x1000, CRC(ab38b942) SHA1(9575f67e002c68d384122e05a12c6c0f21335825) ) // alien whistle
 ROM_END
 
 ROM_START( yachtmn )
@@ -534,13 +584,13 @@ ROM_START( yachtmn )
 	ROM_LOAD( "col_a.96",	    0x0000, 0x0020, CRC(ef87bcd6) SHA1(00a5888ad028fabeb7369eed33be5cd49b6b7bb0) ) // col_a.96
 	ROM_LOAD( "col_b.95",	    0x0020, 0x0020, CRC(ca48abdd) SHA1(a864612c2c33acddfa9993ed10a1d63d2e3f145d) ) // col_b.95
 
-	ROM_REGION( 0x1000, "user1", 0 )	// unknown, ADPCM?
+	ROM_REGION( 0x1000, "adpcm", 0 )	// unknown, ADPCM?
 	ROM_LOAD( "g960_42.39",	0x0000, 0x1000, CRC(287840bb) SHA1(9a1836f39f328b0c9672976d95a9ece45bb9e89f) ) // mervce.39
 ROM_END
 
 
 /* Game Drivers */
 
-GAME( 1982, mermaid,  0,        mermaid,  mermaid,  0, ROT0, "Sanritsu / Rock-Ola", "Mermaid", GAME_SUPPORTS_SAVE )
-GAME( 1982, yachtmn,  mermaid,  mermaid,  yachtmn,  0, ROT0, "Sanritsu / Esco", "Yachtsman", GAME_SUPPORTS_SAVE )
-GAME( 1982, rougien,  0,        rougien,  rougien,  0, ROT0, "Sanritsu", "Rougien", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
+GAME( 1982, mermaid,  0,        mermaid,  mermaid,  0, ROT0, "Sanritsu / Rock-Ola", "Mermaid", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
+GAME( 1982, yachtmn,  mermaid,  mermaid,  yachtmn,  0, ROT0, "Sanritsu / Esco", "Yachtsman", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_SOUND )
+GAME( 1982, rougien,  0,        rougien,  rougien,  0, ROT0, "Sanritsu", "Rougien", GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
