@@ -22,7 +22,7 @@ Known A-board revisions:
 NAME                                                     Year  B-board #       B-board PALs      C-board #            CPS-B #          C-board PALs
 -------------------------------------------------------  ----  ---------  ---------------------  -----------  -----------------------  ------------
 Forgotten Worlds (World)                                 1988  88621B-2   LW621            LWIO  None         CPS-B-01  DL-0411-10001  N/A
-Forgotten Worlds (USA, B-Board 88618B-?)                       88618B-?   LWCHR            LWIO  None         CPS-B-01  DL-0411-10001  N/A
+Forgotten Worlds (USA, B-Board 88618B-2)                       88618B-2   LWCHR            LWIO  None         CPS-B-01  DL-0411-10001  N/A
 Forgotten Worlds (USA, B-Board 88621B-2)                       88621B-2   LW621            LWIO  None         CPS-B-01  DL-0411-10001  N/A
 Lost Worlds (Japan Old Ver.)                                   88618B-2   LWCHR            LWIO  None         CPS-B-01  DL-0411-10001  N/A
 Lost Worlds (Japan)                                            88618B-2   LWCHR            LWIO  None         CPS-B-01  DL-0411-10001  N/A
@@ -42,7 +42,7 @@ Dynasty Wars (USA, B-Board 89624B-?)                           89624B-?   TK24B1
 Tenchi wo Kurau (Japan)                                        88622B-3   TK22B            LWIO  88622-C-2    CPS-B-02  DL-0411-10002  None
 
 Willow (USA)                                             1989  89624B-3   WL24B            LWIO  88622-C-4    CPS-B-03  DL-0411-10003  None
-Willow (Japan, English)                                        89624B-?   WL24B            LWIO  ?            CPS-B-03  DL-0411-10003
+Willow (Japan, English)                                        89624B-3   WL24B            LWIO  88622-C-2    CPS-B-03  DL-0411-10003  None
 Willow (Japan, Japanese)                                       88622B-3   WL22B            LWIO  88622-C-2    CPS-B-03  DL-0411-10003  None
 
 U.N. Squadron (USA)                                      1989  89624B-3   AR24B            LWIO  88622-C-4    CPS-B-11  DL-0411-10004  None
@@ -75,13 +75,14 @@ Magic Sword: Heroic Fantasy (Japan 900623)                     89625B-1   MS22B 
 
 Carrier Air Wing (World 901009)                          1990  89624B-3   CA24B            IOB1  88622-C-5    CPS-B-16  DL-0411-10011  None
 Carrier Air Wing (World 901012)                                89624B-3   CA24B            IOB1  88622-C-5    CPS-B-16  DL-0411-10011  None
-Carrier Air Wing (USA 901012)                                  89624B-?   CA24B            IOB1  ?            CPS-B-16  DL-0411-10011
+Carrier Air Wing (USA 901012)                                  89624B-3   CA24B            IOB1  88622-C-5    CPS-B-16  DL-0411-10011  None
 U.S. Navy (Japan 901012)                                       89625B-1   CA22B            IOB1  88622-C-5    CPS-B-16  DL-0411-10011  None
 
 Nemo (World 901130)                                      1990  89624B-3   NM24B            IOB1  88622-C-5    CPS-B-15  DL-0411-10010  None
 Nemo (Japan 901120)                                            89625B-1   NM22B            ?     ?            CPS-B-15  DL-0411-10010
 
 Street Fighter II: The World Warrior (World 910214)      1991  90629B-2   STF29            IOB1  90632C-1     CPS-B-17  DL-0411-10012  C632
+Street Fighter II: The World Warrior (World 910228)            90629B-3   STF29            IOB2  90632C-1     CPS-B-18  DL-0411-10013  C632B
 Street Fighter II: The World Warrior (World 910522)            90629B-3   STF29            IOB1  90632C-1     CPS-B-11  DL-0411-10004  C632
 Street Fighter II: The World Warrior (USA 910206)              90629B-2   STF29            IOB1  90632C-1     CPS-B-17  DL-0411-10012  C632
 Street Fighter II: The World Warrior (USA 910214)              90629B-3   STF29            IOB1  90632C-1     CPS-B-17  DL-0411-10012  C632
@@ -1306,6 +1307,7 @@ static const struct CPS1config cps1_config_table[]=
 	{"cawingj",     CPS_B_16,     mapper_CA22B },	// equivalent to CA24B
 	{"sf2",         CPS_B_11,     mapper_STF29,  0x36 },
 	{"sf2eb",       CPS_B_17,     mapper_STF29,  0x36 },
+	{"sf2ee",       CPS_B_18,     mapper_STF29,  0x3c },
 	{"sf2ebbl",     CPS_B_17,     mapper_STF29,  0x36, 0, 0, 1  },
 	{"sf2ua",       CPS_B_17,     mapper_STF29,  0x36 },
 	{"sf2ub",       CPS_B_17,     mapper_STF29,  0x36 },
@@ -1983,7 +1985,7 @@ static TILE_GET_INFO( get_tile0_info )
 	code = gfxrom_bank_mapper(machine, GFXTYPE_SCROLL1, code);
 
 	/* allows us to reproduce a problem seen with a ffight board where USA and Japanese
-         roms have been mixed to be reproduced (ffightua) -- it looks like each column
+         roms have been mixed to be reproduced (ffightub) -- it looks like each column
          should alternate between the left and right side of the 16x16 tiles */
 	gfxset = (tile_index & 0x20) >> 5;
 
