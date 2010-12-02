@@ -379,7 +379,7 @@ static TIMER_CALLBACK( sound_update )
 		speaker->mix(leftmix, rightmix, samples_this_update, !global->enabled);
 
 	/* now downmix the final result */
-	finalmix_step = video_get_speed_factor();
+	finalmix_step = machine->video().speed_factor();
 	finalmix_offset = 0;
 	for (sample = global->finalmix_leftover; sample < samples_this_update * 100; sample += finalmix_step)
 	{
@@ -409,7 +409,7 @@ static TIMER_CALLBACK( sound_update )
 	{
 		if (!global->nosound_mode)
 			machine->osd().update_audio_stream(finalmix, finalmix_offset / 2);
-		video_avi_add_sound(machine, finalmix, finalmix_offset / 2);
+		machine->video().add_sound_to_recording(finalmix, finalmix_offset / 2);
 		if (global->wavfile != NULL)
 			wav_add_data_16(global->wavfile, finalmix, finalmix_offset);
 	}

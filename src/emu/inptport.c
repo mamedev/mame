@@ -4667,7 +4667,7 @@ static void record_frame(running_machine *machine, attotime curtime)
 		record_write_uint64(machine, curtime.attoseconds);
 
 		/* then the current speed */
-		record_write_uint32(machine, video_get_speed_percent(machine) * (double)(1 << 20));
+		record_write_uint32(machine, machine->video().speed_percent() * (double)(1 << 20));
 	}
 }
 

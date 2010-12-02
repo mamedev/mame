@@ -104,7 +104,7 @@ void debugger_init(running_machine *machine)
 
 void debugger_refresh_display(running_machine *machine)
 {
-	video_frame_update(machine, TRUE);
+	machine->video().frame_update(true);
 }
 
 

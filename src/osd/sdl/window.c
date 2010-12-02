@@ -1017,7 +1017,7 @@ static void set_starting_view(running_machine *machine, int index, sdl_window_in
 		view = defview;
 
 	// query the video system to help us pick a view
-	viewindex = video_get_view_for_target(machine, window->target, view, index, video_config.numscreens);
+	viewindex = window->target->configured_view(view, index, video_config.numscreens);
 
 	// set the view
 	window->target->set_view(viewindex);

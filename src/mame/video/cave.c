@@ -1743,7 +1743,7 @@ void cave_get_sprite_info( running_machine *machine )
 	cave_state *state = machine->driver_data<cave_state>();
 	if (state->kludge == 3)	/* mazinger metmqstr */
 	{
-		if (video_skip_this_frame() == 0)
+		if (machine->video().skip_this_frame() == 0)
 		{
 			state->spriteram_bank = state->spriteram_bank_delay;
 			(*state->get_sprite_info)(machine);
@@ -1752,7 +1752,7 @@ void cave_get_sprite_info( running_machine *machine )
 	}
 	else
 	{
-		if (video_skip_this_frame() == 0)
+		if (machine->video().skip_this_frame() == 0)
 		{
 			state->spriteram_bank = state->videoregs[4] & 1;
 			(*state->get_sprite_info)(machine);

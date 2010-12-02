@@ -101,6 +101,17 @@ machine_config::~machine_config()
 
 
 //-------------------------------------------------
+//  first_screen - return a pointer to the first
+//  screen device
+//-------------------------------------------------
+
+screen_device_config *machine_config::first_screen() const
+{
+	return downcast<screen_device_config *>(m_devicelist.first(SCREEN));
+}
+
+
+//-------------------------------------------------
 //  device_add - configuration helper to add a
 //  new device
 //-------------------------------------------------

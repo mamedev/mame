@@ -115,8 +115,8 @@ void atarigen_init(running_machine *machine)
 	int i;
 
 	/* allocate timers for all screens */
-	assert(screen_count(*machine) <= ARRAY_LENGTH(state->screen_timer));
-	for (i = 0, screen = screen_first(*machine); screen != NULL; i++, screen = screen_next(screen))
+	assert(machine->m_devicelist.count(SCREEN) <= ARRAY_LENGTH(state->screen_timer));
+	for (i = 0, screen = machine->first_screen(); screen != NULL; i++, screen = screen->next_screen())
 	{
 		state->screen_timer[i].screen = screen;
 		state->screen_timer[i].scanline_interrupt_timer = timer_alloc(machine, scanline_interrupt_callback, (void *)screen);

@@ -56,6 +56,21 @@ typedef enum _state_save_error state_save_error;
 #define STATE_POSTLOAD(name) void name(running_machine *machine, void *param)
 
 
+template<class T, void (T::*func)()>
+void state_presave_stub(running_machine *machine, void *param)
+{
+	T *target = reinterpret_cast<T *>(param);
+	(target->*func)();
+}
+
+template<class T, void (T::*func)()>
+void state_postload_stub(running_machine *machine, void *param)
+{
+	T *target = reinterpret_cast<T *>(param);
+	(target->*func)();
+}
+
+
 #ifdef __GNUC__
 #define IS_VALID_SAVE_TYPE(_var) \
 	(std::tr1::is_arithmetic<typeof(_var)>::value || std::tr1::is_enum<typeof(_var)>::value || \

@@ -627,6 +627,9 @@ public:
 	void set_screen_overlay_enabled(bool enable) { m_layerconfig.set_screen_overlay_enabled(enable); update_layer_config(); }
 	void set_zoom_to_screen(bool zoom) { m_layerconfig.set_zoom_to_screen(zoom); update_layer_config(); }
 
+	// view configuration helper
+	int configured_view(const char *viewname, int targetindex, int numtargets);
+
 	// view information
 	const char *view_name(int viewindex);
 	const render_screen_list &view_screens(int viewindex);

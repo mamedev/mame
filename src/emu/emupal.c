@@ -97,7 +97,7 @@ static void configure_rgb_shadows(running_machine *machine, int mode, float fact
 void palette_init(running_machine *machine)
 {
 	palette_private *palette = auto_alloc_clear(machine, palette_private);
-	screen_device *device = screen_first(*machine);
+	screen_device *device = machine->first_screen();
 
 	/* get the format from the first screen, or use BITMAP_FORMAT_INVALID, if screenless */
 	bitmap_format format = (device != NULL) ? device->format() : BITMAP_FORMAT_INVALID;

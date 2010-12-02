@@ -404,7 +404,7 @@ WRITE32_HANDLER( gaelco3d_render_w )
 		fatalerror("Out of polygon buffer space!");
 
 	/* if we've accumulated a completed poly set of data, queue it */
-	if (!video_skip_this_frame())
+	if (!space->machine->video().skip_this_frame())
 	{
 		if (polydata_count >= 18 && (polydata_count % 2) == 1 && IS_POLYEND(polydata_buffer[polydata_count - 2]))
 		{

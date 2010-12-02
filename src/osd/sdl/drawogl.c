@@ -1207,7 +1207,7 @@ static int drawogl_window_draw(sdl_window_info *window, UINT32 dc, int update)
 
 	// figure out if we're vector
 	scrnum = is_vector = 0;
-	for (screen = screen_first(*window->machine->config); screen != NULL; screen = screen_next(screen))
+	for (screen = window->machine->config->first_screen(); screen != NULL; screen = screen->next_screen())
 	{
 		if (scrnum == window->index)
 		{
@@ -2944,7 +2944,7 @@ static void texture_shader_update(sdl_window_info *window, texture_info *texture
 
 		scrnum = 0;
 		container = (render_container *)NULL;
-		for (screen_device *screen = screen_first(*window->machine); screen != NULL; screen = screen_next(screen))
+		for (screen_device *screen = window->machine->first_screen(); screen != NULL; screen = screen->next_screen())
 		{
 			if (scrnum == window->start_viewscreen)
 			{

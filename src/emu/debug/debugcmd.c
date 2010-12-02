@@ -2418,7 +2418,7 @@ static void execute_snap(running_machine *machine, int ref, int params, const ch
 	/* if no params, use the default behavior */
 	if (params == 0)
 	{
-		video_save_active_screen_snapshots(machine);
+		machine->video().save_active_screen_snapshots();
 		debug_console_printf(machine, "Saved snapshot\n");
 	}
 
@@ -2449,7 +2449,7 @@ static void execute_snap(running_machine *machine, int ref, int params, const ch
 			return;
 		}
 
-		screen_save_snapshot(screen->machine, screen, fp);
+		screen->machine->video().save_snapshot(screen, *fp);
 		mame_fclose(fp);
 		debug_console_printf(machine, "Saved screen #%d snapshot as '%s'\n", scrnum, filename);
 	}

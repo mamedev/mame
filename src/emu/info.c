@@ -726,7 +726,7 @@ static void print_game_display(FILE *out, const game_driver *game, const machine
 	const screen_device_config *devconfig;
 
 	/* iterate over screens */
-	for (devconfig = screen_first(config); devconfig != NULL; devconfig = screen_next(devconfig))
+	for (devconfig = config.first_screen(); devconfig != NULL; devconfig = devconfig->next_screen())
 	{
 		fprintf(out, "\t\t<display");
 

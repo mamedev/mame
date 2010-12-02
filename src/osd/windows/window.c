@@ -753,7 +753,7 @@ void winwindow_video_window_update(win_window_info *window)
 		mtlog_add("winwindow_video_window_update: try lock");
 
 		// only block if we're throttled
-		if (video_get_throttle() || timeGetTime() - last_update_time > 250)
+		if (window->machine->video().throttled() || timeGetTime() - last_update_time > 250)
 			osd_lock_acquire(window->render_lock);
 		else
 			got_lock = osd_lock_try(window->render_lock);
@@ -868,7 +868,7 @@ static void set_starting_view(int index, win_window_info *window, const char *vi
 		view = defview;
 
 	// query the video system to help us pick a view
-	viewindex = video_get_view_for_target(window->machine, window->target, view, index, video_config.numscreens);
+	viewindex = window->target->configured_view(view, index, video_config.numscreens);
 
 	// set the view
 	window->target->set_view(viewindex);

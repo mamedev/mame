@@ -121,6 +121,7 @@ typedef device_config * (*machine_config_constructor)(machine_config &config, de
 #include "drawgfx.h"
 #include "tilemap.h"
 #include "emupal.h"
+#include "screen.h"
 #include "video.h"
 
 // sound-related

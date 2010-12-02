@@ -268,7 +268,7 @@ void cyberbal_scanline_update(screen_device &screen, int scanline)
 	screen_device *update_screen;
 
 	/* loop over screens */
-	for (i = 0, update_screen = screen_first(*screen.machine); update_screen != NULL; i++, update_screen = screen_next(update_screen))
+	for (i = 0, update_screen = screen.machine->first_screen(); update_screen != NULL; i++, update_screen = update_screen->next_screen())
 	{
 		UINT16 *vram = i ? state->alpha2 : state->alpha;
 		UINT16 *base = &vram[((scanline - 8) / 8) * 64 + 47];

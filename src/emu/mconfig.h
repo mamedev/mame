@@ -105,6 +105,7 @@
 // forward references
 struct gfx_decode_entry;
 class driver_device;
+class screen_device_config;
 
 
 
@@ -124,11 +125,15 @@ class machine_config
 	friend class running_machine;
 
 public:
+	// construction/destruction
 	machine_config(const game_driver &gamedrv);
 	~machine_config();
 
+	// getters
 	const game_driver &gamedrv() const { return m_gamedrv; }
+	screen_device_config *first_screen() const;
 
+	// public state
 	attotime				m_minimum_quantum;			// minimum scheduling quantum
 	const char *			m_perfect_cpu_quantum;		// tag of CPU to use for "perfect" scheduling
 	INT32					m_watchdog_vblank_count;	// number of VBLANKs until the watchdog kills us

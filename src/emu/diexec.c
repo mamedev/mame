@@ -219,7 +219,7 @@ bool device_config_execute_interface::interface_validity_check(const game_driver
 	/* validate the interrupts */
 	if (m_vblank_interrupt != NULL)
 	{
-		if (screen_count(m_machine_config) == 0)
+		if (m_machine_config.m_devicelist.count(SCREEN) == 0)
 		{
 			mame_printf_error("%s: %s device '%s' has a VBLANK interrupt, but the driver is screenless!\n", driver.source_file, driver.name, devconfig->tag());
 			error = true;
@@ -629,7 +629,7 @@ void device_execute_interface::interface_post_reset()
 
 		// old style 'hack' setup - use screen #0
 		else
-			screen = screen_first(m_machine);
+			screen = m_machine.first_screen();
 
 		assert(screen != NULL);
 		screen->register_vblank_callback(static_on_vblank, NULL);

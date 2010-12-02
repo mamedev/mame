@@ -1152,6 +1152,78 @@ void render_target::set_max_texture_size(int maxwidth, int maxheight)
 
 
 //-------------------------------------------------
+//  configured_view - select a view for this
+//  target based on the configuration parameters
+//-------------------------------------------------
+
+int render_target::configured_view(const char *viewname, int targetindex, int numtargets)
+{
+	layout_view *view = NULL;
+	int viewindex;
+
+	// auto view just selects the nth view
+	if (strcmp(viewname, "auto") != 0)
+	{
+		// scan for a matching view name
+		for (view = view_by_index(viewindex = 0); view != NULL; view = view_by_index(++viewindex))
+			if (mame_strnicmp(view->name(), viewname, strlen(viewname)) == 0)
+				break;
+	}
+
+	// if we don't have a match, default to the nth view
+	int scrcount = m_manager.machine().m_devicelist.count(SCREEN);
+	if (view == NULL && scrcount > 0)
+	{
+		// if we have enough targets to be one per screen, assign in order
+		if (numtargets >= scrcount)
+		{
+			int ourindex = index() % scrcount;
+			screen_device *screen;
+			for (screen = m_manager.machine().first_screen(); screen != NULL; screen = screen->next_screen())
+				if (ourindex-- == 0)
+					break;
+
+			// find the first view with this screen and this screen only
+			for (view = view_by_index(viewindex = 0); view != NULL; view = view_by_index(++viewindex))
+			{
+				const render_screen_list &viewscreens = view->screens();
+				if (viewscreens.count() == 1 && viewscreens.contains(*screen))
+					break;
+				if (viewscreens.count() == 0)
+				{
+					view = NULL;
+					break;
+				}
+			}
+		}
+
+		// otherwise, find the first view that has all the screens
+		if (view == NULL)
+		{
+			for (view = view_by_index(viewindex = 0); view != NULL; view = view_by_index(++viewindex))
+			{
+				const render_screen_list &viewscreens = view->screens();
+				if (viewscreens.count() == 0)
+					break;
+				if (viewscreens.count() >= scrcount)
+				{
+					screen_device *screen;
+					for (screen = m_manager.machine().first_screen(); screen != NULL; screen = screen->next_screen())
+						if (!viewscreens.contains(*screen))
+							break;
+					if (screen == NULL)
+						break;
+				}
+			}
+		}
+	}
+
+	// make sure it's a valid view
+	return (view != NULL) ? view_index(*view) : 0;
+}
+
+
+//-------------------------------------------------
 //  view_name - return the name of the given view
 //-------------------------------------------------
 
@@ -1548,7 +1620,7 @@ void render_target::load_layout_files(const char *layoutfile, bool singlefile)
 			load_layout_file(cloneof->name, "default");
 
 	// now do the built-in layouts for single-screen games
-	if (screen_count(m_manager.machine().m_config) == 1)
+	if (m_manager.machine().m_devicelist.count(SCREEN) == 1)
 	{
 		if (gamedrv->flags & ORIENTATION_SWAP_XY)
 			load_layout_file(NULL, layout_vertical);
@@ -2366,7 +2438,7 @@ render_manager::render_manager(running_machine &machine)
 	config_register(&machine, "video", config_load_static, config_save_static);
 
 	// create one container per screen
-	for (screen_device *screen = screen_first(machine); screen != NULL; screen = screen_next(screen))
+	for (screen_device *screen = machine.first_screen(); screen != NULL; screen = screen->next_screen())
 		screen->set_container(*container_alloc(screen));
 }
 

@@ -89,6 +89,7 @@ EMUOBJS = \
 	$(EMUOBJ)/rendutil.o \
 	$(EMUOBJ)/romload.o \
 	$(EMUOBJ)/schedule.o \
+	$(EMUOBJ)/screen.o \
 	$(EMUOBJ)/softlist.o \
 	$(EMUOBJ)/sound.o \
 	$(EMUOBJ)/state.o \

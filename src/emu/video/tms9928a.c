@@ -435,7 +435,7 @@ int TMS9928A_interrupt(running_machine *machine) {
     int b;
 
     /* when skipping frames, calculate sprite collision */
-    if (video_skip_this_frame() ) {
+    if (machine->video().skip_this_frame()) {
 		if (TMS_SPRITES_ENABLED) {
 			draw_sprites (machine->primary_screen, NULL, NULL);
 		}

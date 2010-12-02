@@ -130,13 +130,13 @@ static void sdl_cleanup_audio(running_machine &machine)
 //============================================================
 //  lock_buffer
 //============================================================
-static int lock_buffer(long offset, long size, void **buffer1, long *length1, void **buffer2, long *length2)
+static int lock_buffer(running_machine &machine, long offset, long size, void **buffer1, long *length1, void **buffer2, long *length2)
 {
 	volatile long pstart, pend, lstart, lend;
 
 	if (!buf_locked)
 	{
-		if (video_get_throttle())
+		if (machine.video().throttled())
 		{
 			pstart = stream_playpos;
 			pend = (pstart + sdl_xfer_samples);
@@ -213,14 +213,14 @@ static void att_memcpy(void *dest, const INT16 *data, int bytes_to_copy)
 //  copy_sample_data
 //============================================================
 
-static void copy_sample_data(const INT16 *data, int bytes_to_copy)
+static void copy_sample_data(running_machine &machine, const INT16 *data, int bytes_to_copy)
 {
 	void *buffer1, *buffer2 = (void *)NULL;
 	long length1, length2;
 	int cur_bytes;
 
 	// attempt to lock the stream buffer
-	if (lock_buffer(stream_buffer_in, bytes_to_copy, &buffer1, &length1, &buffer2, &length2) < 0)
+	if (lock_buffer(machine, stream_buffer_in, bytes_to_copy, &buffer1, &length1, &buffer2, &length2) < 0)
 	{
 		buffer_underflows++;
 		return;
@@ -333,7 +333,7 @@ void sdl_osd_interface::update_audio_stream(const INT16 *buffer, int samples_thi
 
 		// now we know where to copy; let's do it
 		stream_buffer_in = stream_in;
-		copy_sample_data(buffer, bytes_this_frame);
+		copy_sample_data(machine(), buffer, bytes_this_frame);
 	}
 }
 

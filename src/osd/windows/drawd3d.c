@@ -1283,7 +1283,7 @@ static void pick_best_mode(win_window_info *window)
 	int modenum;
 
 	// determine the refresh rate of the primary screen
-	const screen_device_config *primary_screen = screen_first(*window->machine->config);
+	const screen_device_config *primary_screen = window->machine->config->first_screen();
 	if (primary_screen != NULL)
 		target_refresh = ATTOSECONDS_TO_HZ(primary_screen->refresh());
 

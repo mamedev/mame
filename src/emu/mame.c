@@ -529,7 +529,7 @@ void mame_parse_ini_files(core_options *options, const game_driver *driver)
 		/* parse "vector.ini" for vector games */
 		{
 			machine_config config(*driver);
-			for (const screen_device_config *devconfig = screen_first(config); devconfig != NULL; devconfig = screen_next(devconfig))
+			for (const screen_device_config *devconfig = config.first_screen(); devconfig != NULL; devconfig = devconfig->next_screen())
 				if (devconfig->screen_type() == SCREEN_TYPE_VECTOR)
 				{
 					parse_ini_file(options, "vector", OPTION_PRIORITY_VECTOR_INI);

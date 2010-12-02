@@ -182,6 +182,7 @@ class gfx_element;
 class colortable_t;
 class cheat_manager;
 class render_manager;
+class video_manager;
 class debug_view_manager;
 class osd_interface;
 
@@ -362,6 +363,7 @@ public:
 	const char *new_driver_name() const { return m_new_driver_pending->name; }
 	device_scheduler &scheduler() { return m_scheduler; }
 	osd_interface &osd() const { return m_osd; }
+	screen_device *first_screen() const { return primary_screen; }
 
 	// immediate operations
 	int run(bool firstrun);
@@ -390,6 +392,7 @@ public:
 	// managers
 	cheat_manager &cheat() const { assert(m_cheat != NULL); return *m_cheat; }
 	render_manager &render() const { assert(m_render != NULL); return *m_render; }
+	video_manager &video() const { assert(m_video != NULL); return *m_video; }
 	debug_view_manager &debug_view() const { assert(m_debug_view != NULL); return *m_debug_view; }
 
 	// misc
@@ -530,6 +533,7 @@ private:
 	driver_device *			m_driver_device;
 	cheat_manager *			m_cheat;			// internal data from cheat.c
 	render_manager *		m_render;			// internal data from render.c
+	video_manager *			m_video;			// internal data from video.c
 	debug_view_manager *	m_debug_view;		// internal data from debugvw.c
 };
 

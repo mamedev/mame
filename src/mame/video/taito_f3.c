@@ -581,7 +581,7 @@ VIDEO_EOF( f3 )
 {
 	if (sprite_lag==2)
 	{
-		if (video_skip_this_frame() == 0)
+		if (machine->video().skip_this_frame() == 0)
 		{
 			get_sprite_info(machine, spriteram32_buffered);
 		}
@@ -589,7 +589,7 @@ VIDEO_EOF( f3 )
 	}
 	else if (sprite_lag==1)
 	{
-		if (video_skip_this_frame() == 0)
+		if (machine->video().skip_this_frame() == 0)
 		{
 			get_sprite_info(machine, machine->generic.spriteram.u32);
 		}

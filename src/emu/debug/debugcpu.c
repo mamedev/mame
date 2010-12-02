@@ -142,7 +142,7 @@ static UINT64 get_frame(symbol_table &table, void *ref);
 
 void debug_cpu_init(running_machine *machine)
 {
-	screen_device *first_screen = screen_first(*machine);
+	screen_device *first_screen = machine->first_screen();
 	debugcpu_private *global;
 	int regnum;
 
