@@ -1598,6 +1598,7 @@ $(MAMEOBJ)/misc.a: \
 	$(DRIVERS)/multfish.o \
 	$(DRIVERS)/murogem.o \
 	$(DRIVERS)/murogmbl.o \
+	$(DRIVERS)/neoprint.o \
 	$(DRIVERS)/neptunp2.o \
 	$(DRIVERS)/news.o $(VIDEO)/news.o \
 	$(DRIVERS)/norautp.o  $(AUDIO)/norautp.o \

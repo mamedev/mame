@@ -7285,59 +7285,6 @@ ROM_START( diggerma ) /* Unlicensed Prototype, no official game ID # */
 ROM_END
 
 
-	/* NeoPrint */
-
-/*
-    Very little is known about the NeoPrint system at this time.
-
-    The cartridges fit in a normal Neo Geo unit but they do not work.  They appear to be designed to work with a
-    different motherboard (and different bios rom)
-
-    98best44 is the only NeoPrint cart we've seen with a program rom.
-    Many of the others only contain graphic roms.  I'm speculating that the NeoPrint was a multi-slot system and
-    had a concept of Master and Slave cartridges, and the slave ones simply added new graphic themes.
-
-    If anybody has any actual factual information on the NeoPrint system, please contribute it.
-*/
-
-
-ROM_START( 98best44 )
-	/* logo: Neo Print
-    small text: Cassette supporting Neo Print and Neo Print Multi
-    (cassette=cartridge)
-    title: '98 NeoPri Best 44 version */
-	ROM_REGION( 0x100000, "maincpu", 0 )
-	ROM_LOAD16_WORD_SWAP( "p060-ep1", 0x000000, 0x080000, CRC(d42e505d) SHA1(0ad6b0288f36c339832730a03e53cbc07dab4f82))
-
-	ROM_REGION16_BE( 0x80000, "mainbios", 0 )
-	ROM_LOAD16_WORD_SWAP( "neoprint.bios",    0x00000, 0x020000, NO_DUMP ) // should be different
-	ROM_COPY( "maincpu", 0x00000, 0x00000, 0x80000 ) // just copy the program rom to stop it crashing
-
-	ROM_REGION( 0x20000, "fixedbios", 0 )
-	ROM_LOAD( "sfix.sfix", 0x000000, 0x20000, CRC(c2ea0cfd) SHA1(fd4a618cdcdbf849374f0a50dd8efe9dbab706c3) ) // maybe
-
-	ROM_Y_ZOOM // maybe
-
-	ROM_REGION( 0x20000, "audiobios", 0 )
-	ROM_LOAD( "sm1.sm1", 0x00000, 0x20000, CRC(94416d67) SHA1(42f9d7ddd6c0931fd64226a60dc73602b2819dcf) ) // maybe
-
-	ROM_REGION( 0x20000, "fixed", ROMREGION_ERASE00 )
-	/* no S1 rom */
-
-	ROM_REGION( 0x30000, "audiocpu", 0 )
-	ROM_LOAD( "pt004-m1",	 0x00000, 0x20000, CRC(6d77cdaa) SHA1(f88a93b3085b18b6663b4e51fccaa41958aafae1) )
-	ROM_RELOAD(          0x10000, 0x20000 )
-
-	ROM_REGION( 0x200000, "ymsnd", 0 )
-	ROM_LOAD( "pt004-v1", 0x000000, 0x200000, CRC(118a84fd) SHA1(9059297a42a329eca47a82327c301853219013bd) )
-
-	NO_DELTAT_REGION
-
-	ROM_REGION( 0x400000, "sprites", 0 )
-	ROM_LOAD16_BYTE( "pt060-c1", 0x000000, 0x100000, CRC(22a23090) SHA1(0e219fcfea6ca2ddf4b7b4197aac8bc55a29d5cf) ) /* Plane 0,1 */
-	ROM_LOAD16_BYTE( "pt060-c2", 0x000001, 0x100000, CRC(66a8e56a) SHA1(adfd1e52d52806a785f1e9b1ae2ac969b6ed60af) ) /* Plane 2,3 */
-ROM_END
-
 
 /****************************************************************************/
 
@@ -8549,6 +8496,3 @@ GAME( 2001, vlinero,   vliner,   neogeo,   vliner,   vliner,   ROT0, "Dyna / Bre
 
 /* Kyle Hodgetts */
 GAME( 2000, diggerma,  neogeo,   neogeo,   neogeo,   neogeo,   ROT0, "Kyle Hodgetts", "Digger Man (prototype)", GAME_SUPPORTS_SAVE )
-
-/* Neo Print */
-GAME( 1998, 98best44,  0,        neogeo,   neogeo,   neogeo,   ROT0, "SNK", "'98 NeoPri Best 44 (Neo Print)", GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
