@@ -6783,9 +6783,6 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	/* Nor does Digger Man */
 	DRIVER( diggerma )  /* No Game ID (unlicensed), (c) 2000 Kyle Hodgetts, prototype */
 
-	/* Neo Print */
-	DRIVER( 98best44 )
-
 	/* Hyper NeoGeo 64 uses a 3 digit rom code? */
 
 	DRIVER( hng64 )
@@ -6796,6 +6793,10 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( sams64_2 )	/* 005 1998/10/16 Samurai Shodown: Warrior's Rage / Samurai Spirits: Asura Zanmaden */
 	DRIVER( fatfurwa )	/* 006 1999/01/28 Fatal Fury: Wild Ambition / Garou Densetsu: Wild Ambition */
 	DRIVER( buriki )	/* 007 1999/05/21 Buriki One */
+
+	/* Neo Print */
+	DRIVER( npcartv1 )
+	DRIVER( 98best44 )
 
 	/* Alpha Denshi games */
 	DRIVER( shougi )	/* (c) 1982 (Arcade TV Game List - P.80, Left, 9 from top) */
