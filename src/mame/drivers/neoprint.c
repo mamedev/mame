@@ -20,19 +20,34 @@ static READ16_HANDLER( np_rnd_read2 )
 	return 0x0000;// mame_rand(space->machine);
 }
 
+static READ16_HANDLER( np_rnd_read3 )
+{
+	if(input_code_pressed(space->machine, KEYCODE_Z))
+		return 0x0000;
+
+	return 0x8000;// mame_rand(space->machine);
+}
+
+static READ16_HANDLER( np_rnd_read4 )
+{
+	return 0x0100;// mame_rand(space->machine);
+}
+
 static ADDRESS_MAP_START( neoprint_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
+/*  AM_RANGE(0x100000, 0x17ffff) multi-cart or banking, some writes points here if anything lies there */
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM
 	AM_RANGE(0x400000, 0x43ffff) AM_RAM AM_BASE(&npvidram)
 	AM_RANGE(0x500000, 0x51ffff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x600002, 0x600003) AM_READ(np_rnd_read2) AM_WRITENOP
-	AM_RANGE(0x600006, 0x600007) AM_READ(np_rnd_read) 
-	AM_RANGE(0x600008, 0x600009) AM_READ(np_rnd_read) 
-	AM_RANGE(0x60000a, 0x60000b) AM_READ(np_rnd_read2) 
-	AM_RANGE(0x60000c, 0x60000d) AM_READ(np_rnd_read2) 
+	AM_RANGE(0x600000, 0x600001) AM_READ(np_rnd_read4)
+	AM_RANGE(0x600002, 0x600003) AM_READ(np_rnd_read3) AM_WRITENOP
+	AM_RANGE(0x600006, 0x600007) AM_READ(np_rnd_read) // input
+	AM_RANGE(0x600008, 0x600009) AM_READ(np_rnd_read) // input
+	AM_RANGE(0x60000a, 0x60000b) AM_READ(np_rnd_read2)
+	AM_RANGE(0x60000c, 0x60000d) AM_READ(np_rnd_read) // input
 
-	AM_RANGE(0x70001e, 0x70001f) AM_WRITENOP
+	AM_RANGE(0x70001e, 0x70001f) AM_WRITENOP //watchdog
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( neoprint )
@@ -52,7 +67,7 @@ static const gfx_layout neoprint_layout =
 };
 
 static GFXDECODE_START( neoprint )
-	GFXDECODE_ENTRY( "gfx1", 0, neoprint_layout,   0x0, 2  )
+	GFXDECODE_ENTRY( "gfx1", 0, neoprint_layout,   0x0, 0x1000 )
 GFXDECODE_END
 
 VIDEO_START(neoprint)
@@ -62,12 +77,14 @@ VIDEO_START(neoprint)
 
 VIDEO_UPDATE(neoprint)
 {
+//	static UINT32 test = 0;
 	bitmap_fill(bitmap, cliprect, 0);
 
 	{
 		int i, y, x;
-		i = 0;
 		const gfx_element *gfx = screen->machine->gfx[0];
+
+		i = 0x400; // FIXME: map base register
 
 		for (y=0;y<32;y++)
 		{
@@ -119,8 +136,9 @@ MACHINE_CONFIG_END
 
 
 ROM_START( npcartv1 )
-	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */
-	ROM_LOAD16_WORD_SWAP( "ep1.bin", 0x00000, 0x80000, CRC(18606198) SHA1(d968e09131c22769e22c7310aca1f02e739f38f1) )
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
+	ROM_LOAD16_WORD_SWAP( "ep1.bin", 0x000000, 0x80000, CRC(18606198) SHA1(d968e09131c22769e22c7310aca1f02e739f38f1) )
+//	ROM_RELOAD(						 0x100000, 0x80000 ) /* checks the same string from above to be present there? Why? */
 
 	ROM_REGION( 0x20000, "z80", 0 ) /* Z80 program */
 	ROM_LOAD( "m1.bin", 0x00000, 0x20000, CRC(b2d38e12) SHA1(ab96c5d3d22eb71ed6e0a03f3ff5d4b23e72fad8) )
@@ -139,8 +157,9 @@ ROM_END
     title: '98 NeoPri Best 44 version */
 
 ROM_START( 98best44 )
-	ROM_REGION( 0x80000, "maincpu", 0 ) /* 68000 Code */
+	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "p060-ep1", 0x000000, 0x080000, CRC(d42e505d) SHA1(0ad6b0288f36c339832730a03e53cbc07dab4f82))
+//	ROM_RELOAD(						 0x100000, 0x80000 ) /* checks the same string from above to be present there? Why? */
 
 	ROM_REGION( 0x20000, "z80", 0 ) /* Z80 program */
 	ROM_LOAD( "pt004-m1",	 0x00000, 0x20000, CRC(6d77cdaa) SHA1(f88a93b3085b18b6663b4e51fccaa41958aafae1) )
@@ -155,4 +174,4 @@ ROM_END
 
 
 GAME( 199?, npcartv1,    0,        neoprint,    neoprint,   0, ROT0, "SNK", "Neo Print V1", GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME( 1998, 98best44,    0,        neoprint,    neoprint,   0, ROT0, "SNK", "'98 NeoPri Best 44 (Neo Print)", GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 1998, 98best44,    0,        neoprint,    neoprint,   0, ROT0, "SNK", "'98 NeoPri Best 44 (Japan)", GAME_NO_SOUND | GAME_NOT_WORKING )
