@@ -1,12 +1,26 @@
-/*
-Neo Print
-doesn't seem to have anything in common with a standard NeoGeo apart from how the carts look.
+/*******************************************************************************************
 
+	Neo Print (c) 1996 SNK
 
-*/
+	preliminary driver by David Haywood & Angelo Salese
+
+	npcartv1 bp 1260 pc += 2
+	98best44 bp 1312 pc += 2
+
+	TODO:
+	- EEPROM hook-up;
+	- sound interface;
+	- implement remaining video features, namely scrolling feature;
+	- inputs are bare bones and needs extra work, they doesn't work on attract mode?
+	- printer device;
+	- camera device;
+	- lamps;
+
+*******************************************************************************************/
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "machine/eeprom.h"
 
 static UINT16* npvidram;
 static UINT16* npvidregs;
@@ -20,11 +34,18 @@ VIDEO_UPDATE(neoprint)
 {
 	bitmap_fill(bitmap, cliprect, 0);
 
+	/* layer 1 */
 	{
 		int i, y, x;
 		const gfx_element *gfx = screen->machine->gfx[0];
+		INT16 scrollx, scrolly;
 
-		i = (npvidregs[0x6/2] & 1) * 0x400;
+		i = (npvidregs[0x0e/2] & 3) * 0x400; //0x16 is identical?
+		scrollx = 0;//((npvidregs[0x08/2] - 0xd8) & 0xffff);
+		scrolly = 0;//((npvidregs[0x0a/2] - 0xffeb) & 0xffff);
+
+		scrollx/=2;
+		scrolly/=2;
 
 		for (y=0;y<32;y++)
 		{
@@ -35,18 +56,89 @@ VIDEO_UPDATE(neoprint)
 				UINT8 fx = (npvidram[i*2+1] & 0x0040);
 				UINT8 fy = (npvidram[i*2+1] & 0x0080);
 
-				drawgfx_transpen(bitmap,cliprect,gfx,dat,color,fx,fy,x*16,y*16,0);
+				drawgfx_transpen(bitmap,cliprect,gfx,dat,color,fx,fy,x*16+scrollx,y*16-scrolly,0);
+				drawgfx_transpen(bitmap,cliprect,gfx,dat,color,fx,fy,x*16+scrollx-512,y*16-scrolly,0);
+				drawgfx_transpen(bitmap,cliprect,gfx,dat,color,fx,fy,x*16+scrollx,y*16-scrolly-512,0);
+				drawgfx_transpen(bitmap,cliprect,gfx,dat,color,fx,fy,x*16+scrollx-512,y*16-scrolly-512,0);
 
 				i++;
 			}
-
 		}
+	}
 
+	/* layer 0 */
+	{
+		int i, y, x;
+		const gfx_element *gfx = screen->machine->gfx[0];
+		INT16 scrollx, scrolly;
+
+		i = (npvidregs[0x06/2] & 3) * 0x400;
+		scrollx = 0;//((npvidregs[0x00/2] - 0xd8) & 0xffff);
+		scrolly = 0;//((npvidregs[0x02/2] - 0xffeb) & 0xffff);
+
+		scrollx/=2;
+		scrolly/=2;
+
+		for (y=0;y<32;y++)
+		{
+			for (x=0;x<32;x++)
+			{
+				UINT16 dat = npvidram[i*2]>>2;
+				UINT16 color = ((npvidram[i*2+1] & 0xff00) >> 8)*4;
+				UINT8 fx = (npvidram[i*2+1] & 0x0040);
+				UINT8 fy = (npvidram[i*2+1] & 0x0080);
+
+				drawgfx_transpen(bitmap,cliprect,gfx,dat,color,fx,fy,x*16+scrollx,y*16-scrolly,0);
+				drawgfx_transpen(bitmap,cliprect,gfx,dat,color,fx,fy,x*16+scrollx-512,y*16-scrolly,0);
+				drawgfx_transpen(bitmap,cliprect,gfx,dat,color,fx,fy,x*16+scrollx,y*16-scrolly-512,0);
+				drawgfx_transpen(bitmap,cliprect,gfx,dat,color,fx,fy,x*16+scrollx-512,y*16-scrolly-512,0);
+
+				i++;
+				//i&=0x3ff;
+			}
+		}
 	}
 
 	return 0;
 }
 
+
+static READ8_HANDLER( neoprint_eeprom_r )
+{
+	return (eeprom_read_bit(space->machine->device("eeprom")) & 1) << 7;
+}
+
+static WRITE8_HANDLER( neoprint_eeprom_w )
+{
+	eeprom_set_clock_line(space->machine->device("eeprom"), (data & 2) ? ASSERT_LINE : CLEAR_LINE );
+	eeprom_set_cs_line(space->machine->device("eeprom"), (data & 4) ? CLEAR_LINE : ASSERT_LINE );
+	eeprom_write_bit(space->machine->device("eeprom"), data & 1);
+
+	//printf("%08x\n",cpu_get_pc(space->cpu));
+
+}
+
+static READ8_HANDLER( neoprint_unk_r )
+{
+	static UINT8 vblank;
+
+	/* ---x ---- tested in irq routine, odd/even field number? */
+	/* ---- xx-- one of these two must be high */
+	/* ---- --xx checked right before entering into attract mode, presumably printer/camera related */
+
+	vblank = (space->machine->primary_screen->frame_number() & 0x1) ? 0x10 : 0x00;
+
+	//if(cpu_get_pc(space->cpu) != 0x1504 && cpu_get_pc(space->cpu) != 0x5f86 && cpu_get_pc(space->cpu) != 0x5f90)
+	//	printf("%08x\n",cpu_get_pc(space->cpu));
+
+	return vblank| 4 | 3;
+}
+
+static READ8_HANDLER( neoprint_unk2_r )
+{
+	/* ---- ---x  checked by 98best44 at start-up */
+	return 0x01;
+}
 
 static ADDRESS_MAP_START( neoprint_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
@@ -55,56 +147,26 @@ static ADDRESS_MAP_START( neoprint_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM
 	AM_RANGE(0x400000, 0x43ffff) AM_RAM AM_BASE(&npvidram)
 	AM_RANGE(0x500000, 0x51ffff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x600000, 0x600001) AM_READ_PORT("SYSTEM")
-	AM_RANGE(0x600002, 0x600003) AM_READ_PORT("SYSA") AM_WRITENOP
+	AM_RANGE(0x600000, 0x600001) AM_READ8(neoprint_unk2_r,0xff00)
+	AM_RANGE(0x600002, 0x600003) AM_READWRITE8(neoprint_eeprom_r,neoprint_eeprom_w,0xff00)
+	AM_RANGE(0x600004, 0x600005) AM_READ_PORT("SYSTEM") AM_WRITENOP
 	AM_RANGE(0x600006, 0x600007) AM_READ_PORT("IN")
 	AM_RANGE(0x600008, 0x600009) AM_READ_PORT("DSW1")
-	AM_RANGE(0x60000a, 0x60000b) AM_READ_PORT("SYSB")
+	AM_RANGE(0x60000a, 0x60000b) AM_READ8(neoprint_unk_r,0xff00)
 	AM_RANGE(0x60000c, 0x60000d) AM_READ_PORT("DSW2")
 
-	AM_RANGE(0x700000, 0x700017) AM_RAM AM_BASE(&npvidregs)
+	AM_RANGE(0x700000, 0x70001b) AM_RAM AM_BASE(&npvidregs)
 
 	AM_RANGE(0x70001e, 0x70001f) AM_WRITENOP //watchdog
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( neoprint )
-	PORT_START("SYSA")
-	PORT_DIPNAME( 0x01, 0x01, "SYSA" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0100, 0x0100, "SYS" )
-	PORT_DIPSETTING(    0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_START("SYSTEM")
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_SERVICE_NO_TOGGLE( 0x0800, IP_ACTIVE_LOW )
 	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(    0x1000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
@@ -118,106 +180,8 @@ static INPUT_PORTS_START( neoprint )
 	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
 
-	PORT_START("SYSB")
-	PORT_DIPNAME( 0x01, 0x01, "SYSB" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0100, 0x0100, "SYS" )
-	PORT_DIPSETTING(    0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_START("SYSTEM")
-	PORT_DIPNAME( 0x01, 0x01, "SYSTEM" )
-	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x40, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0100, 0x0100, "SYS" )
-	PORT_DIPSETTING(    0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
 	PORT_START("IN")
-	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x0100, 0x0100, "IN0" )
 	PORT_DIPSETTING(    0x0100, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
@@ -235,7 +199,7 @@ static INPUT_PORTS_START( neoprint )
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON1) PORT_NAME("Green Button") PORT_CODE(KEYCODE_X)
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_BUTTON2) PORT_NAME("Red Button") PORT_CODE(KEYCODE_Z)
 	PORT_START("DSW1")
-	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x0100, 0x0100, "DSW1" )
 	PORT_DIPSETTING(    0x0100, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
@@ -261,7 +225,7 @@ static INPUT_PORTS_START( neoprint )
 	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
 	PORT_START("DSW2")
-	PORT_BIT( 0x00ff, IP_ACTIVE_HIGH, IPT_UNUSED )
+	PORT_BIT( 0x00ff, IP_ACTIVE_LOW, IPT_UNUSED )
 	PORT_DIPNAME( 0x0100, 0x0100, "DSW2" )
 	PORT_DIPSETTING(    0x0100, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
@@ -313,10 +277,12 @@ public:
 
 
 static MACHINE_CONFIG_START( neoprint, neoprint_state )
-
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(neoprint_map)
 	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold) // lv1,2,3 valid?
+
+	MDRV_EEPROM_93C46_ADD("eeprom")
+
 
 	MDRV_GFXDECODE(neoprint)
 
@@ -372,5 +338,23 @@ ROM_START( 98best44 )
 ROM_END
 
 
-GAME( 199?, npcartv1,    0,        neoprint,    neoprint,   0, ROT0, "SNK", "Neo Print V1", GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME( 1998, 98best44,    0,        neoprint,    neoprint,   0, ROT0, "SNK", "'98 NeoPri Best 44 (Japan)", GAME_NO_SOUND | GAME_NOT_WORKING )
+/* FIXME: get rid of these two, probably something to do with the unemulated irq and camera / printer devices */
+static DRIVER_INIT( npcartv1 )
+{
+	UINT16 *ROM = (UINT16 *)memory_region( machine, "maincpu" );
+
+	ROM[0x1260/2] = 0x4e71;
+
+	ROM[0x43c8/2] = 0x4e71; //ROM checksum
+}
+
+
+static DRIVER_INIT( 98best44 )
+{
+	UINT16 *ROM = (UINT16 *)memory_region( machine, "maincpu" );
+
+	ROM[0x1312/2] = 0x4e71;
+}
+
+GAME( 1996, npcartv1,    0,        neoprint,    neoprint,   npcartv1, ROT0, "SNK", "Neo Print V1", GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 1998, 98best44,    0,        neoprint,    neoprint,   98best44, ROT0, "SNK", "'98 NeoPri Best 44 (Japan)", GAME_NO_SOUND | GAME_NOT_WORKING )
