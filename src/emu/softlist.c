@@ -513,7 +513,7 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 				{
 					if ( swlist->softinfo )
 					{
-						UINT32 length = strtol( str_size, NULL, 10 );
+						UINT32 length = strtol( str_size, NULL, 0 );
 						char *s = (char *)pool_malloc_lib(swlist->pool, ( strlen( str_name ) + 1 ) * sizeof(char) );
 
 						if ( !s )
@@ -607,8 +607,8 @@ static void start_handler(void *data, const char *tagname, const char **attribut
 				{
 					if ( str_size && str_offset )
 					{
-						UINT32 length = strtol( str_size, NULL, 10 );
-						UINT32 offset = strtol( str_offset, NULL, 16 );
+						UINT32 length = strtol( str_size, NULL, 0 );
+						UINT32 offset = strtol( str_offset, NULL, 0 );
 
 						if ( str_loadflag && !strcmp(str_loadflag, "reload") )
 						{
