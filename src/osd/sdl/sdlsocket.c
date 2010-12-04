@@ -13,12 +13,14 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <fcntl.h>
+#ifndef SDLMAME_WIN32
 #include <sys/select.h>
 #include <netinet/in.h>
 #include <netinet/tcp.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <netdb.h>
+#endif
 #include <errno.h>
 
 #include "emu.h"
@@ -28,6 +30,7 @@ const char *sdlfile_socket_identifier  = "/dev/socket";
 
 file_error sdl_open_socket(const char *path, UINT32 openflags, osd_file **file, UINT64 *filesize)
 {
+#ifndef SDLMAME_WIN32
 	char hostname[256];
 	struct hostent *localhost;
 	struct sockaddr_in sai;
@@ -61,12 +64,13 @@ file_error sdl_open_socket(const char *path, UINT32 openflags, osd_file **file, 
 	}
    
 	*filesize = 0;
-  
+#endif  
 	return FILERR_NONE;
 }
 
 file_error sdl_read_socket(osd_file *file, void *buffer, UINT64 offset, UINT32 count, UINT32 *actual)
 {
+#ifndef SDLMAME_WIN32
 	ssize_t result;
 	char line[80];
 	struct timeval timeout;
@@ -100,12 +104,13 @@ file_error sdl_read_socket(osd_file *file, void *buffer, UINT64 offset, UINT32 c
 	{
 		*actual = result;
 	}
-
+#endif
 	return FILERR_NONE;
 }
 
 file_error sdl_write_socket(osd_file *file, const void *buffer, UINT64 offset, UINT32 count, UINT32 *actual)
 {
+#ifndef SDLMAME_WIN32
 	UINT32 result;  
 
 	result = write(file->handle, buffer, count);
@@ -119,13 +124,15 @@ file_error sdl_write_socket(osd_file *file, const void *buffer, UINT64 offset, U
 	{
 		*actual = result;
 	}
-
+#endif
 	return FILERR_NONE;
 }
 
 file_error sdl_close_socket(osd_file *file)
 {
+#ifndef SDLMAME_WIN32
 	close(file->handle);
 	osd_free(file);
+#endif	
 	return FILERR_NONE;
 }
