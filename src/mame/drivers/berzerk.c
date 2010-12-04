@@ -537,7 +537,7 @@ static READ8_HANDLER( berzerk_audio_r )
 		return 0;
 	/* everything else reads from the 6840 */
 	default:
-		return exidy_sh6840_r(space->machine->device(""), offset);
+		return exidy_sh6840_r(space->machine->device("exidy"), offset);
 	}
 }
 

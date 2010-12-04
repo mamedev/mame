@@ -113,13 +113,9 @@ static void get_pens(running_machine *machine, pen_t *pens)
 	/* the bitmap layer colors are directly mapped */
 	for (offs = 0; offs < NUM_BITMAP_PENS; offs++)
 	{
-		UINT8 r_bit = (offs >> 2) & 0x01;
-		UINT8 g_bit = (offs >> 1) & 0x01;
-		UINT8 b_bit = (offs >> 0) & 0x01;
-
-		UINT8 r = bitmap_weight[r_bit];
-		UINT8 g = bitmap_weight[g_bit];
-		UINT8 b = bitmap_weight[b_bit];
+		UINT8 r = bitmap_weight[(offs >> 2) & 0x01];
+		UINT8 g = bitmap_weight[(offs >> 1) & 0x01];
+		UINT8 b = bitmap_weight[(offs >> 0) & 0x01];
 
 		pens[NUM_CHARMAP_PENS + offs] = MAKE_RGB(r, g, b);
 	}
@@ -140,7 +136,7 @@ static void get_panther_pens(running_machine *machine, pen_t *pens)
 
 	offs_t offs;
 	double scaler;
-	double bitmap_weight[1];
+	double bitmap_weight[2];
 	double charmap_rg_weights[3];
 	double charmap_b_weights[2];
 	double back_r_weight[1];
@@ -162,13 +158,9 @@ static void get_panther_pens(running_machine *machine, pen_t *pens)
 	{
 		UINT8 data = prom[offs];
 
-		UINT8 r_bit = (~data >> 2) & 0x01;
-		UINT8 g_bit = (~data >> 1) & 0x01;
-		UINT8 b_bit = (~data >> 0) & 0x01;
-
-		UINT8 r = bitmap_weight[r_bit];
-		UINT8 g = bitmap_weight[g_bit];
-		UINT8 b = bitmap_weight[b_bit];
+		UINT8 r = bitmap_weight[(~data >> 2) & 0x01];
+		UINT8 g = bitmap_weight[(~data >> 1) & 0x01];
+		UINT8 b = bitmap_weight[(~data >> 0) & 0x01];
 
 		pens[offs] = MAKE_RGB(r, g, b);
 	}
@@ -176,13 +168,9 @@ static void get_panther_pens(running_machine *machine, pen_t *pens)
 	/* the bitmap layer colors are directly mapped */
 	for (offs = 0; offs < NUM_BITMAP_PENS; offs++)
 	{
-		UINT8 r_bit = (offs >> 2) & 0x01;
-		UINT8 g_bit = (offs >> 1) & 0x01;
-		UINT8 b_bit = (offs >> 0) & 0x01;
-
-		UINT8 r = bitmap_weight[r_bit];
-		UINT8 g = bitmap_weight[g_bit];
-		UINT8 b = bitmap_weight[b_bit];
+		UINT8 r = bitmap_weight[(offs >> 2) & 0x01];
+		UINT8 g = bitmap_weight[(offs >> 1) & 0x01];
+		UINT8 b = bitmap_weight[(offs >> 0) & 0x01];
 
 		pens[NUM_CHARMAP_PENS + offs] = MAKE_RGB(r, g, b);
 	}
