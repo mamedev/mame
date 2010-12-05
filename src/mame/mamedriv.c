@@ -4658,7 +4658,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( virnbao )
 	DRIVER( mvsc2 )		/* 2000.03 Marvel vs. Capcom 2 */
 	DRIVER( smarinef )	/* 2000.03 Sega Marine Fishing */
-						/* 2000.03 World Kicks */
+	DRIVER( wldkicks )	/* 2000.03 World Kicks */
 						/* 2000.04 Shin Nippon Pro-wres Toukon Retsuden 4 */
 	DRIVER( pstone2 )	/* 2000.04 Power Stone 2 */
 	DRIVER( qmegamis )	/* 2000.05 Quiz Ah Megamisama */
