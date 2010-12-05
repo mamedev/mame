@@ -9753,9 +9753,10 @@ Other Sun games
 	DRIVER( cfever1k )	/* (c) 2000 High Video */
 	DRIVER( girotutt )	/* (c) 2000 High Video */
 
-	/* M68k-based gambling games */
+	/* 68000+MCU+blitter gambling games */
 	DRIVER( steaser )	/* (c) 1993 unknown */
 	DRIVER( ilpag )		/* (c) 199? unknown */
+	DRIVER( cjffruit )	/* (c) 1998 Cadillac Jack */
 
 	/* Sure games */
 	DRIVER( mil4000 )	/* (c) 2000 Sure Milano */
