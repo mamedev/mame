@@ -8,25 +8,24 @@
 	98best44 bp 1312 pc += 2
 
 	TODO:
-	- EEPROM hook-up;
-	- sound interface;
 	- implement remaining video features;
-	- inputs are bare bones and needs extra work, they doesn't work on attract mode?
-	- printer device;
-	- camera device;
+	- sound interface, needs full Neo-Geo conversion;
+	- inputs are bare bones and needs extra work;
+	- printer/camera devices;
 	- lamps;
+	- upd4990a returns 4 years less than expected?
 
 *******************************************************************************************/
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/z80/z80.h"
-#include "machine/eeprom.h"
+#include "machine/nvram.h"
 #include "sound/2610intf.h"
+#include "machine/pd4990a.h"
 
 static UINT16* npvidram;
 static UINT16* npvidregs;
-
 static UINT8 audio_result;
 
 VIDEO_START(neoprint)
@@ -107,22 +106,17 @@ VIDEO_UPDATE(neoprint)
 }
 
 
-static READ8_HANDLER( neoprint_eeprom_r )
+static READ16_HANDLER( neoprint_calendar_r )
 {
 	//if(cpu_get_pc(space->cpu) != 0x4b38 )//&& cpu_get_pc(space->cpu) != 0x5f86 && cpu_get_pc(space->cpu) != 0x5f90)
 	//	printf("%08x\n",cpu_get_pc(space->cpu));
 
-	return (eeprom_read_bit(space->machine->device("eeprom")) & 1) << 7;
+	return (upd4990a_databit_r(space->machine->device("upd4990a"), 0) << 15);
 }
 
-static WRITE8_HANDLER( neoprint_eeprom_w )
+static WRITE16_HANDLER( neoprint_calendar_w )
 {
-	eeprom_set_clock_line(space->machine->device("eeprom"), (data & 2) ? ASSERT_LINE : CLEAR_LINE );
-	eeprom_set_cs_line(space->machine->device("eeprom"), (data & 4) ? CLEAR_LINE : ASSERT_LINE );
-	eeprom_write_bit(space->machine->device("eeprom"), data & 1);
-
-	//printf("%08x\n",cpu_get_pc(space->cpu));
-
+	 upd4990a_control_16_w(space->machine->device("upd4990a"), 0, ((data >> 8) & 7), mem_mask);
 }
 
 static READ8_HANDLER( neoprint_unk_r )
@@ -201,11 +195,11 @@ static ADDRESS_MAP_START( neoprint_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 /*  AM_RANGE(0x100000, 0x17ffff) multi-cart or banking, some writes points here if anything lies there too */
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM
-	AM_RANGE(0x300000, 0x30ffff) AM_RAM
+	AM_RANGE(0x300000, 0x30ffff) AM_RAM AM_SHARE("nvram")
 	AM_RANGE(0x400000, 0x43ffff) AM_RAM AM_BASE(&npvidram)
 	AM_RANGE(0x500000, 0x51ffff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x600000, 0x600001) AM_READWRITE(neoprint_audio_result_r,audio_command_w)
-	AM_RANGE(0x600002, 0x600003) AM_READWRITE8(neoprint_eeprom_r,neoprint_eeprom_w,0xff00)
+	AM_RANGE(0x600002, 0x600003) AM_READWRITE(neoprint_calendar_r,neoprint_calendar_w)
 	AM_RANGE(0x600004, 0x600005) AM_READ_PORT("SYSTEM") AM_WRITENOP
 	AM_RANGE(0x600006, 0x600007) AM_READ_PORT("IN") AM_WRITENOP
 	AM_RANGE(0x600008, 0x600009) AM_READ_PORT("DSW1")
@@ -243,7 +237,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( neoprint_audio_io_map, ADDRESS_SPACE_IO, 8 )
   /*AM_RANGE(0x00, 0x00) AM_MIRROR(0xff00) AM_READWRITE(audio_command_r, audio_cpu_clear_nmi_w);*/  /* may not and NMI clear */
-	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff00) AM_READ(audio_command_r)
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff00) AM_READ(audio_command_r) AM_WRITENOP
 	AM_RANGE(0x04, 0x07) AM_MIRROR(0xff00) AM_DEVREADWRITE("ymsnd", ym2610_r, ym2610_w)
 //	AM_RANGE(0x08, 0x08) AM_MIRROR(0xff00) /* write - NMI enable / acknowledge? (the data written doesn't matter) */
 //	AM_RANGE(0x08, 0x08) AM_MIRROR(0xfff0) AM_MASK(0xfff0) AM_READ(audio_cpu_bank_select_f000_f7ff_r)
@@ -383,13 +377,15 @@ static const ym2610_interface ym2610_config =
 static MACHINE_CONFIG_START( neoprint, neoprint_state )
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(neoprint_map)
+	MDRV_CPU_PERIODIC_INT(irq3_line_hold,45) /* camera / printer irq, unknown timing */
 	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold) // lv1,2,3 valid?
 
 	MDRV_CPU_ADD("audiocpu", Z80, 4000000)
 	MDRV_CPU_PROGRAM_MAP(neoprint_audio_map)
 	MDRV_CPU_IO_MAP(neoprint_audio_io_map)
 
-	MDRV_EEPROM_93C46_ADD("eeprom")
+	MDRV_UPD4990A_ADD("upd4990a")
+	MDRV_NVRAM_ADD_0FILL("nvram")
 
 	MDRV_GFXDECODE(neoprint)
 
@@ -454,7 +450,7 @@ ROM_START( 98best44 )
 ROM_END
 
 
-/* FIXME: get rid of these two, probably something to do with the unemulated irq and camera / printer devices */
+/* FIXME: get rid of these two, probably something to do with irq3 and camera / printer devices */
 static DRIVER_INIT( npcartv1 )
 {
 	UINT16 *ROM = (UINT16 *)memory_region( machine, "maincpu" );
@@ -472,5 +468,5 @@ static DRIVER_INIT( 98best44 )
 	ROM[0x1312/2] = 0x4e71;
 }
 
-GAME( 1996, npcartv1,    0,        neoprint,    neoprint,   npcartv1, ROT0, "SNK", "Neo Print V1 (World)", GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME( 1998, 98best44,    0,        neoprint,    neoprint,   98best44, ROT0, "SNK", "Neo Print - '98 NeoPri Best 44 (Japan)", GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 1996, npcartv1,    0,        neoprint,    neoprint,   npcartv1, ROT0, "SNK", "Neo Print V1 (World)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
+GAME( 1998, 98best44,    0,        neoprint,    neoprint,   98best44, ROT0, "SNK", "Neo Print - '98 NeoPri Best 44 (Japan)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS |  GAME_NOT_WORKING )
