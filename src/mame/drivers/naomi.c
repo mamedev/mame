@@ -4063,6 +4063,22 @@ ROM_START( smarinef )
 	ROM_LOAD("mpr-22219.ic12",0x6000000, 0x0800000, CRC(b3b45811) SHA1(045e7236b814f848d4c9767618ddcd4344d880ec) )
 ROM_END
 
+ROM_START( wldkicks )
+	ROM_REGION( 0x200000, "maincpu", 0)
+	NAOMI_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	ROM_REGION( 0x8000000, "user1", ROMREGION_ERASEFF)
+        ROM_LOAD( "837-14695.u1",  0x0000000, 0x1000000, CRC(a91d2fcb) SHA1(8414386c09ba36ea581c8161f6cf2a13cc5ae516) ) 
+        ROM_LOAD( "837-14695.u2",  0x1000000, 0x1000000, CRC(4d82152f) SHA1(a448983d4e81eb6485b62f23a6c99d1112a20c21) ) 
+        ROM_LOAD( "837-14695.u3",  0x2000000, 0x1000000, CRC(9fdd7d07) SHA1(56d580dda116823ea5dc5e1bd5154463a476866a) ) 
+        ROM_LOAD( "837-14695.u4",  0x3000000, 0x1000000, CRC(3342f237) SHA1(e617b0e1f8d8da9783c58ab98eb91de2363ec36f) ) 
+        ROM_LOAD( "837-14695.u14", 0x4000000, 0x1000000, CRC(55470242) SHA1(789036189ae5488a9da565774bdf91b49cd8264e) ) 
+        ROM_LOAD( "837-14695.u15", 0x5000000, 0x1000000, CRC(d239a549) SHA1(71f3c1c2ae2a9b6f09f30e7be3bb11ba111276ae) ) 
+        ROM_LOAD( "837-14695.u16", 0x6000000, 0x1000000, CRC(730180a4) SHA1(017b82e2d2744695e3e521d35a8511ecc1c8ab43) ) 
+        ROM_LOAD( "837-14695.u17", 0x7000000, 0x1000000, CRC(16bb5992) SHA1(18772587272aba1d50a48d384f472276c3b48d96) ) 
+ROM_END
+
 /*
 
 SYSTEMID: NAOMI
@@ -4778,7 +4794,7 @@ time to go to sleep
 #ifdef UNUSED_FUNCTION
 // rather crude function to write out a key file
 void naomi_write_keyfile(void)
-q{
+{
 	// default key structure
 	UINT8 response[10][8] = {
 	{ ':', 0x70, 0x1f, 0x71, 0x1f, 0x00, 0x00, 0x00 }, // response to kayjyo!?
@@ -4888,6 +4904,7 @@ GAME( 1998, naomi,    0,        naomi,    naomi,    naomi, ROT0, "Sega",        
 /* 0021C */ GAME( 2000, virnbao,  virnba,   naomi,    naomi,    naomi,    ROT0, "Sega",  "Virtua NBA (JPN, USA, EXP, KOR, AUS) (original)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0026C */ GAME( 2000, totd,     naomi,    naomi,    naomi,    naomi,    ROT0, "Sega",  "The Typing of the Dead (JPN, USA, EXP, KOR, AUS) (Rev A)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 0027C */ GAME( 2000, smarinef, naomi,    naomi,    naomi,    naomi,    ROT0, "Sega",  "Sega Marine Fishing", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
+/* 00??C */ GAME( 2000, wldkicks, naomi,    naomi,    naomi,    naomi,    ROT0, "Sega",  "World Kicks", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING ) 
 /* 0030C */ GAME( 2000, qmegamis, naomi,    naomi,    naomi,    qmegamis, ROT0, "Sega",  "Quiz Ah Megamisama (JPN, USA, EXP, KOR, AUS)", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 /* 003?C */ GAME( 2000, vonot,    naomi,    naomi,    naomi,    naomi,    ROT0, "Sega",  "Virtual On Oratorio Tangram M.S.B.S. ver5.66 2000 Edition", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING ) 
 /* 003?C */ GAME( 2000, derbyo2k, naomi,    naomi,    naomi,    naomi,    ROT0, "Sega",  "Derby Owners Club 2000", GAME_UNEMULATED_PROTECTION|GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING ) 
@@ -5688,6 +5705,36 @@ ROM_START( confmiss )
 	ROM_LOAD("317-0298-com.pic", 0x00, 0x4000, CRC(15971bf6) SHA1(815152ab05edb1789a26898cfd66b5a7c4a1f765) )
 ROM_END
 
+/*
+Title   SHAKATTO TAMBOURINE 2K1AUT
+Media ID        DED1
+Media Config    GD-ROM1/1
+Regions J
+Peripheral String       0000000
+Product Number  GDS-0016
+Version V1.000
+Release Date    20011017
+Manufacturer ID 
+TOC     DISC
+Track   Start Sector    End Sector      Track Size
+track01.bin     150     626     1121904
+track02.raw     777     2909    5016816
+track03.bin     45150   549299  1185760800
+ 
+*/ 
+
+ROM_START( shaktamb )
+	NAOMIGD_BIOS
+	NAOMI_DEFAULT_EEPROM
+
+	DISK_REGION( "gdrom" )
+	DISK_IMAGE_READONLY( "gds-0016", 0, SHA1(59bac62db4a536c63fec3464c665e00633fcf1a3) )
+
+	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
+
+	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)
+	ROM_LOAD( "317-0321-com.pic", 0x000000, 0x004000, CRC(81519e71) SHA1(a30d25f81c77384ed26faa67c942802f2f3d7817) ) 
+ROM_END
 
 ROM_START( sprtjam )
 	NAOMIGD_BIOS
@@ -6127,7 +6174,7 @@ GAME( 2001, vtennisg,  naomigd,  naomigd,  naomi,    naomi,  ROT0, "Sega",      
 //GDS-0014 Beach Spikers (NAOMI 2)
 //GDS-0015 Virtua Tennis 2 / Power Smash 2
 GAME( 2001, vtennis2,  naomigd,  naomigd,  naomi,    naomi,  ROT0, "Sega",          "Virtua Tennis 2 (Rev A) (GDS-0015A)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
-//GDS-0016 Shakatto Tambourine Cho Powerup Chu
+GAME( 2001, shaktamb,  naomigd,  naomigd,  naomi,    naomi,  ROT0, "Sega",          "Shakatto Tambourine Cho Powerup Chu (GDS-0016)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2001, keyboard,  naomigd,  naomigd,  naomi,    naomi,  ROT0, "Sega",          "La Keyboardxyu (GDS-0017)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2001, lupinsho,  naomigd,  naomigd,  naomi,    naomi,  ROT0, "Sega",          "Lupin The Third - The Shooting (GDS-0018)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2002, vathlete,  naomigd,  naomigd,  naomi,    naomi,  ROT0, "Sega",          "Virtua Athletics / Virtua Athlete (GDS-0019)", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
@@ -6710,6 +6757,7 @@ static const UINT32 salmankt_key = 0x34b74;
 static const UINT32 maxspeed_key = 0x28dd6;
 static const UINT32 ftspeed_key  = 0x0762f;
 static const UINT32 kofxi_key    = 0xa4be3;
+static const UINT32 dirtypig_key = 0xc194f;
 
 static DRIVER_INIT( atomiswave )
 {
@@ -6758,6 +6806,7 @@ AW_DRIVER_INIT(vfurlong)
 AW_DRIVER_INIT(salmankt)
 AW_DRIVER_INIT(maxspeed)
 AW_DRIVER_INIT(ftspeed)
+AW_DRIVER_INIT(dirtypig)
 
 ROM_START( fotns )
 	ROM_REGION( 0x200000, "awflash", 0)
@@ -7022,6 +7071,21 @@ ROM_START( kofxi )
         ROM_LOAD( "ax3207m01.mrom7", 0xd000000, 0x2000000, CRC(164f6329) SHA1(a72c8cbe4ac7b98edda3d4434f6c81a370b8c39b) )
 ROM_END
 
+ROM_START( dirtypig )
+	ROM_REGION( 0x200000, "awflash", 0)
+	AW_BIOS
+
+	ROM_REGION( 0x8000000, "user1", ROMREGION_ERASE)
+        ROM_LOAD( "837-14695.u3",  0x0000000, 0x1000000, CRC(9fdd7d07) SHA1(56d580dda116823ea5dc5e1bd5154463a476866a) ) 
+        ROM_LOAD( "837-14695.u1",  0x1000000, 0x1000000, CRC(a91d2fcb) SHA1(8414386c09ba36ea581c8161f6cf2a13cc5ae516) ) 
+        ROM_LOAD( "837-14695.u2",  0x2000000, 0x1000000, CRC(4d82152f) SHA1(a448983d4e81eb6485b62f23a6c99d1112a20c21) ) 
+        ROM_LOAD( "837-14695.u4",  0x3000000, 0x1000000, CRC(3342f237) SHA1(e617b0e1f8d8da9783c58ab98eb91de2363ec36f) ) 
+        ROM_LOAD( "837-14695.u14", 0x4000000, 0x1000000, CRC(55470242) SHA1(789036189ae5488a9da565774bdf91b49cd8264e) ) 
+        ROM_LOAD( "837-14695.u15", 0x5000000, 0x1000000, CRC(d239a549) SHA1(71f3c1c2ae2a9b6f09f30e7be3bb11ba111276ae) ) 
+        ROM_LOAD( "837-14695.u16", 0x6000000, 0x1000000, CRC(730180a4) SHA1(017b82e2d2744695e3e521d35a8511ecc1c8ab43) ) 
+        ROM_LOAD( "837-14695.u17", 0x7000000, 0x1000000, CRC(16bb5992) SHA1(18772587272aba1d50a48d384f472276c3b48d96) ) 
+ROM_END
+
 /* Atomiswave */
 GAME( 2001, awbios,   0,        aw,    aw,    atomiswave, ROT0, "Sammy",                           "Atomiswave Bios", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING|GAME_IS_BIOS_ROOT )
 
@@ -7030,6 +7094,7 @@ GAME( 2002, sprtshot, awbios,   aw,    aw,    sprtshot, ROT0, "Sammy USA",      
 GAME( 2003, demofist, awbios,   aw,    aw,    demofist, ROT0, "Polygon Magic / Dimps",           "Demolish Fist", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2003, dolphin,  awbios,   aw,    aw,    dolphin,  ROT0, "Sammy",                           "Dolphin Blue", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 GAME( 2003, ggisuka,  awbios,   aw,    aw,    ggisuka,  ROT0, "Sammy / Arc System Works",        "Guilty Gear Isuka", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
+GAME( 2004, dirtypig, awbios,   aw,    aw,    dirtypig, ROT0, "Sammy",                   "Dirty Pigskin Football", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 GAME( 2004, rumblef,  awbios,   aw,    aw,    rumblef,  ROT0, "Sammy / Dimps",                   "The Rumble Fish", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND )
 GAME( 2004, rangrmsn, awbios,   aw,    aw,    rangrmsn, ROT0, "Sammy",                           "Ranger Mission", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )
 GAME( 2004, salmankt, awbios,   aw,    aw,    salmankt, ROT0, "Sammy",                           "Salary Man Kintarou", GAME_IMPERFECT_GRAPHICS|GAME_IMPERFECT_SOUND|GAME_NOT_WORKING )

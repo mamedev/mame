@@ -4656,7 +4656,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( virnbao )
 	DRIVER( mvsc2 )		/* 2000.03 Marvel vs. Capcom 2 */
 	DRIVER( smarinef )	/* 2000.03 Sega Marine Fishing */
-						/* 2000.03 World Kicks */
+	DRIVER( wldkicks )	/* 2000.03 World Kicks */
 						/* 2000.04 Shin Nippon Pro-wres Toukon Retsuden 4 */
 	DRIVER( pstone2 )	/* 2000.04 Power Stone 2 */
 	DRIVER( qmegamis )	/* 2000.05 Quiz Ah Megamisama */
@@ -4676,7 +4676,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( deathcox )	/* 2000.10 Death Crimson OX */
 						/* 2000.11 Ninja Assault */
 	DRIVER( confmiss )	/* 2000.11 Confidential Mission */											/* First GD-ROM game? */
-						/* 2000.11 Shakatto Tambourine */
+	DRIVER( shaktamb )	/* 2000.11 Shakatto Tambourine */
 	DRIVER( wwfroyal )	/* 2000.11 WWF Royal Rumble */
 	DRIVER( pjustic )	/* 2000.12 Moero Justice Gakuen */
 	DRIVER( samba2k ) 	/* 2000.12 Samba de Amigo ver.2000 */
@@ -4850,7 +4850,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( kofnw )		/* 2004.07 The King of Fighters Neo Wave */
 	DRIVER( kofnwj )    	/* 2004.07 The King of Fighters Neo Wave (Japan) */
 	DRIVER( xtrmhunt )	/* 2004.09 Extreme Hunting */
-						/* 2004.09 Dirty Pig Skin Football */
+	DRIVER( dirtypig )	/* 2004.09 Dirty Pig Skin Football */
 	DRIVER( ftspeed )	/* 2004.09 Faster than Speed */
 	DRIVER( kov7sprt )	/* 2004.?? Knights of Valour - The Seven Sprits */
 	DRIVER( vfurlong )	/* 2005.03 Net Select Keiba Victory Furlong */
