@@ -10,7 +10,7 @@
 	TODO:
 	- EEPROM hook-up;
 	- sound interface;
-	- implement remaining video features, namely scrolling feature;
+	- implement remaining video features;
 	- inputs are bare bones and needs extra work, they doesn't work on attract mode?
 	- printer device;
 	- camera device;
@@ -45,8 +45,8 @@ VIDEO_UPDATE(neoprint)
 		INT16 scrollx, scrolly;
 
 		i = (npvidregs[0x0e/2] & 3) * 0x400; //0x16 is identical?
-		scrollx = 0;//((npvidregs[0x08/2] - 0xd8) & 0xffff);
-		scrolly = 0;//((npvidregs[0x0a/2] - 0xffeb) & 0xffff);
+		scrollx = ((npvidregs[0x08/2] - 0xd8) & 0x03ff);
+		scrolly = ((npvidregs[0x0a/2] - 0xffeb) & 0x03ff);
 
 		scrollx/=2;
 		scrolly/=2;
@@ -77,8 +77,8 @@ VIDEO_UPDATE(neoprint)
 		INT16 scrollx, scrolly;
 
 		i = (npvidregs[0x06/2] & 3) * 0x400;
-		scrollx = 0;//((npvidregs[0x00/2] - 0xd8) & 0xffff);
-		scrolly = 0;//((npvidregs[0x02/2] - 0xffeb) & 0xffff);
+		scrollx = ((npvidregs[0x00/2] - 0xd8) & 0x03ff);
+		scrolly = ((npvidregs[0x02/2] - 0xffeb) & 0x03ff);
 
 		scrollx/=2;
 		scrolly/=2;
@@ -472,5 +472,5 @@ static DRIVER_INIT( 98best44 )
 	ROM[0x1312/2] = 0x4e71;
 }
 
-GAME( 1996, npcartv1,    0,        neoprint,    neoprint,   npcartv1, ROT0, "SNK", "Neo Print V1", GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 1996, npcartv1,    0,        neoprint,    neoprint,   npcartv1, ROT0, "SNK", "Neo Print V1 (World)", GAME_NO_SOUND | GAME_NOT_WORKING )
 GAME( 1998, 98best44,    0,        neoprint,    neoprint,   98best44, ROT0, "SNK", "Neo Print - '98 NeoPri Best 44 (Japan)", GAME_NO_SOUND | GAME_NOT_WORKING )
