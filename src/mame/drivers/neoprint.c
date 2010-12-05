@@ -20,10 +20,14 @@
 
 #include "emu.h"
 #include "cpu/m68000/m68000.h"
+#include "cpu/z80/z80.h"
 #include "machine/eeprom.h"
+#include "sound/2610intf.h"
 
 static UINT16* npvidram;
 static UINT16* npvidregs;
+
+static UINT8 audio_result;
 
 VIDEO_START(neoprint)
 {
@@ -105,6 +109,9 @@ VIDEO_UPDATE(neoprint)
 
 static READ8_HANDLER( neoprint_eeprom_r )
 {
+	//if(cpu_get_pc(space->cpu) != 0x4b38 )//&& cpu_get_pc(space->cpu) != 0x5f86 && cpu_get_pc(space->cpu) != 0x5f90)
+	//	printf("%08x\n",cpu_get_pc(space->cpu));
+
 	return (eeprom_read_bit(space->machine->device("eeprom")) & 1) << 7;
 }
 
@@ -134,10 +141,60 @@ static READ8_HANDLER( neoprint_unk_r )
 	return vblank| 4 | 3;
 }
 
-static READ8_HANDLER( neoprint_unk2_r )
+static READ16_HANDLER( neoprint_audio_result_r )
 {
-	/* ---- ---x  checked by 98best44 at start-up */
-	return 0x01;
+	return (audio_result << 8) | 0x00;
+}
+
+static void audio_cpu_assert_nmi(running_machine *machine)
+{
+	cputag_set_input_line(machine, "audiocpu", INPUT_LINE_NMI, ASSERT_LINE);
+}
+
+
+static WRITE8_HANDLER( audio_cpu_clear_nmi_w )
+{
+	cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, CLEAR_LINE);
+}
+
+static WRITE16_HANDLER( audio_command_w )
+{
+	/* accessing the LSB only is not mapped */
+	if (mem_mask != 0x00ff)
+	{
+		soundlatch_w(space, 0, data >> 8);
+
+		audio_cpu_assert_nmi(space->machine);
+
+		/* boost the interleave to let the audio CPU read the command */
+		cpuexec_boost_interleave(space->machine, attotime_zero, ATTOTIME_IN_USEC(50));
+
+		//if (LOG_CPU_COMM) logerror("MAIN CPU PC %06x: audio_command_w %04x - %04x\n", cpu_get_pc(space->cpu), data, mem_mask);
+	}
+}
+
+
+static READ8_HANDLER( audio_command_r )
+{
+	UINT8 ret = soundlatch_r(space, 0);
+
+	//if (LOG_CPU_COMM) logerror(" AUD CPU PC   %04x: audio_command_r %02x\n", cpu_get_pc(space->cpu), ret);
+
+	/* this is a guess */
+	audio_cpu_clear_nmi_w(space, 0, 0);
+
+	return ret;
+}
+
+
+
+static WRITE8_HANDLER( audio_result_w )
+{
+	//neogeo_state *state = space->machine->driver_data<neogeo_state>();
+
+	//if (LOG_CPU_COMM && (state->audio_result != data)) logerror(" AUD CPU PC   %04x: audio_result_w %02x\n", cpu_get_pc(space->cpu), data);
+
+	audio_result = data;
 }
 
 static ADDRESS_MAP_START( neoprint_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -147,17 +204,54 @@ static ADDRESS_MAP_START( neoprint_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x300000, 0x30ffff) AM_RAM
 	AM_RANGE(0x400000, 0x43ffff) AM_RAM AM_BASE(&npvidram)
 	AM_RANGE(0x500000, 0x51ffff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x600000, 0x600001) AM_READ8(neoprint_unk2_r,0xff00)
+	AM_RANGE(0x600000, 0x600001) AM_READWRITE(neoprint_audio_result_r,audio_command_w)
 	AM_RANGE(0x600002, 0x600003) AM_READWRITE8(neoprint_eeprom_r,neoprint_eeprom_w,0xff00)
 	AM_RANGE(0x600004, 0x600005) AM_READ_PORT("SYSTEM") AM_WRITENOP
-	AM_RANGE(0x600006, 0x600007) AM_READ_PORT("IN")
+	AM_RANGE(0x600006, 0x600007) AM_READ_PORT("IN") AM_WRITENOP
 	AM_RANGE(0x600008, 0x600009) AM_READ_PORT("DSW1")
 	AM_RANGE(0x60000a, 0x60000b) AM_READ8(neoprint_unk_r,0xff00)
 	AM_RANGE(0x60000c, 0x60000d) AM_READ_PORT("DSW2")
+	AM_RANGE(0x60000e, 0x60000f) AM_WRITENOP
 
 	AM_RANGE(0x700000, 0x70001b) AM_RAM AM_BASE(&npvidregs)
 
 	AM_RANGE(0x70001e, 0x70001f) AM_WRITENOP //watchdog
+ADDRESS_MAP_END
+
+/*************************************
+ *
+ *  Audio CPU memory handlers
+ *
+ *************************************/
+
+static ADDRESS_MAP_START( neoprint_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM//AM_ROMBANK(NEOGEO_BANK_AUDIO_CPU_MAIN_BANK)
+//	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(NEOGEO_BANK_AUDIO_CPU_CART_BANK + 3)
+//	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK(NEOGEO_BANK_AUDIO_CPU_CART_BANK + 2)
+//	AM_RANGE(0xe000, 0xefff) AM_ROMBANK(NEOGEO_BANK_AUDIO_CPU_CART_BANK + 1)
+//	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK(NEOGEO_BANK_AUDIO_CPU_CART_BANK + 0)
+	AM_RANGE(0xf800, 0xffff) AM_RAM
+ADDRESS_MAP_END
+
+
+
+/*************************************
+ *
+ *  Audio CPU port handlers
+ *
+ *************************************/
+
+static ADDRESS_MAP_START( neoprint_audio_io_map, ADDRESS_SPACE_IO, 8 )
+  /*AM_RANGE(0x00, 0x00) AM_MIRROR(0xff00) AM_READWRITE(audio_command_r, audio_cpu_clear_nmi_w);*/  /* may not and NMI clear */
+	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff00) AM_READ(audio_command_r)
+	AM_RANGE(0x04, 0x07) AM_MIRROR(0xff00) AM_DEVREADWRITE("ymsnd", ym2610_r, ym2610_w)
+//	AM_RANGE(0x08, 0x08) AM_MIRROR(0xff00) /* write - NMI enable / acknowledge? (the data written doesn't matter) */
+//	AM_RANGE(0x08, 0x08) AM_MIRROR(0xfff0) AM_MASK(0xfff0) AM_READ(audio_cpu_bank_select_f000_f7ff_r)
+//	AM_RANGE(0x09, 0x09) AM_MIRROR(0xfff0) AM_MASK(0xfff0) AM_READ(audio_cpu_bank_select_e000_efff_r)
+//	AM_RANGE(0x0a, 0x0a) AM_MIRROR(0xfff0) AM_MASK(0xfff0) AM_READ(audio_cpu_bank_select_c000_dfff_r)
+//	AM_RANGE(0x0b, 0x0b) AM_MIRROR(0xfff0) AM_MASK(0xfff0) AM_READ(audio_cpu_bank_select_8000_bfff_r)
+	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0xff00) AM_WRITE(audio_result_w)
+//	AM_RANGE(0x18, 0x18) AM_MIRROR(0xff00) /* write - NMI disable? (the data written doesn't matter) */
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( neoprint )
@@ -275,14 +369,27 @@ public:
 		: driver_device(machine, config) { }
 };
 
+static void audio_cpu_irq(running_device *device, int assert)
+{
+	cputag_set_input_line(device->machine, "audiocpu", 0, assert ? ASSERT_LINE : CLEAR_LINE);
+}
+
+static const ym2610_interface ym2610_config =
+{
+	audio_cpu_irq
+};
+
 
 static MACHINE_CONFIG_START( neoprint, neoprint_state )
 	MDRV_CPU_ADD("maincpu", M68000, 12000000)
 	MDRV_CPU_PROGRAM_MAP(neoprint_map)
 	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold) // lv1,2,3 valid?
 
-	MDRV_EEPROM_93C46_ADD("eeprom")
+	MDRV_CPU_ADD("audiocpu", Z80, 4000000)
+	MDRV_CPU_PROGRAM_MAP(neoprint_audio_map)
+	MDRV_CPU_IO_MAP(neoprint_audio_io_map)
 
+	MDRV_EEPROM_93C46_ADD("eeprom")
 
 	MDRV_GFXDECODE(neoprint)
 
@@ -297,6 +404,15 @@ static MACHINE_CONFIG_START( neoprint, neoprint_state )
 
 	MDRV_VIDEO_START(neoprint)
 	MDRV_VIDEO_UPDATE(neoprint)
+
+	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MDRV_SOUND_ADD("ymsnd", YM2610, 24000000 / 3)
+	MDRV_SOUND_CONFIG(ym2610_config)
+	MDRV_SOUND_ROUTE(0, "lspeaker",  0.60)
+	MDRV_SOUND_ROUTE(0, "rspeaker", 0.60)
+	MDRV_SOUND_ROUTE(1, "lspeaker",  1.0)
+	MDRV_SOUND_ROUTE(2, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -305,10 +421,10 @@ ROM_START( npcartv1 )
 	ROM_LOAD16_WORD_SWAP( "ep1.bin", 0x000000, 0x80000, CRC(18606198) SHA1(d968e09131c22769e22c7310aca1f02e739f38f1) )
 //	ROM_RELOAD(						 0x100000, 0x80000 ) /* checks the same string from above to be present there? Why? */
 
-	ROM_REGION( 0x20000, "z80", 0 ) /* Z80 program */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Z80 program */
 	ROM_LOAD( "m1.bin", 0x00000, 0x20000, CRC(b2d38e12) SHA1(ab96c5d3d22eb71ed6e0a03f3ff5d4b23e72fad8) )
 
-	ROM_REGION( 0x080000, "snd", 0 ) /* Samples */
+	ROM_REGION( 0x080000, "ymsnd", 0 ) /* Samples */
 	ROM_LOAD( "v1.bin", 0x00000, 0x80000, CRC(2d6608f9) SHA1(7dbde1c305ab3438b7fe7417816427c682371bd4) )
 
 	ROM_REGION( 0x100000, "gfx1", 0 )
@@ -326,10 +442,10 @@ ROM_START( 98best44 )
 	ROM_LOAD16_WORD_SWAP( "p060-ep1", 0x000000, 0x080000, CRC(d42e505d) SHA1(0ad6b0288f36c339832730a03e53cbc07dab4f82))
 //	ROM_RELOAD(						 0x100000, 0x80000 ) /* checks the same string from above to be present there? Why? */
 
-	ROM_REGION( 0x20000, "z80", 0 ) /* Z80 program */
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Z80 program */
 	ROM_LOAD( "pt004-m1",	 0x00000, 0x20000, CRC(6d77cdaa) SHA1(f88a93b3085b18b6663b4e51fccaa41958aafae1) )
 
-	ROM_REGION( 0x200000, "snd", 0 ) /* Samples */
+	ROM_REGION( 0x200000, "ymsnd", 0 ) /* Samples */
 	ROM_LOAD( "pt004-v1", 0x000000, 0x200000, CRC(118a84fd) SHA1(9059297a42a329eca47a82327c301853219013bd) )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )
@@ -357,4 +473,4 @@ static DRIVER_INIT( 98best44 )
 }
 
 GAME( 1996, npcartv1,    0,        neoprint,    neoprint,   npcartv1, ROT0, "SNK", "Neo Print V1", GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME( 1998, 98best44,    0,        neoprint,    neoprint,   98best44, ROT0, "SNK", "'98 NeoPri Best 44 (Japan)", GAME_NO_SOUND | GAME_NOT_WORKING )
+GAME( 1998, 98best44,    0,        neoprint,    neoprint,   98best44, ROT0, "SNK", "Neo Print - '98 NeoPri Best 44 (Japan)", GAME_NO_SOUND | GAME_NOT_WORKING )
