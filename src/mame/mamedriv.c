@@ -968,8 +968,10 @@ const game_driver * const drivers[] =
 
 	/* Namco System 246 */
 	DRIVER( sys246 )
+	DRIVER( rrvac )
 	DRIVER( dragchrn )
 	DRIVER( netchu02 )
+	DRIVER( scptour )
 	DRIVER( soulclb2 )
 	DRIVER( soulcl2a )
 	DRIVER( soulcl2b )
