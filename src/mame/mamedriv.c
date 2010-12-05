@@ -4900,7 +4900,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	/* Chihiro (X-Box based) */
 	DRIVER( chihiro )
 	DRIVER( hotd3 )		/* 2002.12 The House of the Dead III */
-						/* 2003.03 Crazy Taxi High Roller */
+	DRIVER( crtaxihr )	/* 2003.03 Crazy Taxi High Roller */
 	DRIVER( vcop3 )		/* 2003.04 Virtua Cop 3 */
 	DRIVER( outr2 )		/* 2003.12 Outrun 2 */
 						/* 2004.03 Sega Network Taisen Mahjong MJ 2 */
@@ -4912,7 +4912,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 						/* 2004.11 Sega Golf Club Network Pro Tour */
 						/* 2004.12 Sega Network Taisen Mahjong MJ 2 ver.D */
 						/* 2004.12 Quest of D ver.1.02 */
-						/* 2004.12 Outrun 2 Special Tours */
+	DRIVER( outr2st )	/* 2004.12 Outrun 2 Special Tours */
 						/* 2004.12 Quest of D ver.1.10 */
 	DRIVER( ghostsqu )	/* 2004.12 Ghost Squad */
 						/* 2004.12 Quest of D ver.1.10a */
