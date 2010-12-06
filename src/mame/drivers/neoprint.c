@@ -33,74 +33,54 @@ VIDEO_START(neoprint)
 
 }
 
+/*
+video registers:
+xxxx xxxx xxxx xxxx [0] scroll X, signed
+xxxx xxxx xxxx xxxx [2] scroll Y, signed
+---- ---x ---- ---- [6] enabled on layer 2 only, priority?
+---- ---- -x-- ---- [6] layer enable?
+---- ---- --?? ??xx [6] map register
+*/
+
+static void draw_layer(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int layer)
+{
+	int i, y, x;
+	const gfx_element *gfx = machine->gfx[0];
+	INT16 scrollx, scrolly;
+
+	i = (npvidregs[((layer*8)+0x06)/2] & 3) * 0x1000/4;
+	scrollx = ((npvidregs[((layer*8)+0x00)/2] - 0xd8) & 0x03ff);
+	scrolly = ((npvidregs[((layer*8)+0x02)/2] - 0xffeb) & 0x03ff);
+
+	scrollx/=2;
+	scrolly/=2;
+
+	for (y=0;y<32;y++)
+	{
+		for (x=0;x<32;x++)
+		{
+			UINT16 dat = npvidram[i*2]>>2;
+			UINT16 color = ((npvidram[i*2+1] & 0xff00) >> 8)*4;
+			UINT8 fx = (npvidram[i*2+1] & 0x0040);
+			UINT8 fy = (npvidram[i*2+1] & 0x0080);
+
+			drawgfx_transpen(bitmap,cliprect,gfx,dat,color,fx,fy,x*16+scrollx,y*16-scrolly,0);
+			drawgfx_transpen(bitmap,cliprect,gfx,dat,color,fx,fy,x*16+scrollx-512,y*16-scrolly,0);
+			drawgfx_transpen(bitmap,cliprect,gfx,dat,color,fx,fy,x*16+scrollx,y*16-scrolly-512,0);
+			drawgfx_transpen(bitmap,cliprect,gfx,dat,color,fx,fy,x*16+scrollx-512,y*16-scrolly-512,0);
+
+			i++;
+			//i&=0x3ff;
+		}
+	}
+}
+
 VIDEO_UPDATE(neoprint)
 {
 	bitmap_fill(bitmap, cliprect, 0);
 
-	/* layer 1 */
-	{
-		int i, y, x;
-		const gfx_element *gfx = screen->machine->gfx[0];
-		INT16 scrollx, scrolly;
-
-		i = (npvidregs[0x0e/2] & 3) * 0x400; //0x16 is identical?
-		scrollx = ((npvidregs[0x08/2] - 0xd8) & 0x03ff);
-		scrolly = ((npvidregs[0x0a/2] - 0xffeb) & 0x03ff);
-
-		scrollx/=2;
-		scrolly/=2;
-
-		for (y=0;y<32;y++)
-		{
-			for (x=0;x<32;x++)
-			{
-				UINT16 dat = npvidram[i*2]>>2;
-				UINT16 color = ((npvidram[i*2+1] & 0xff00) >> 8)*4;
-				UINT8 fx = (npvidram[i*2+1] & 0x0040);
-				UINT8 fy = (npvidram[i*2+1] & 0x0080);
-
-				drawgfx_transpen(bitmap,cliprect,gfx,dat,color,fx,fy,x*16+scrollx,y*16-scrolly,0);
-				drawgfx_transpen(bitmap,cliprect,gfx,dat,color,fx,fy,x*16+scrollx-512,y*16-scrolly,0);
-				drawgfx_transpen(bitmap,cliprect,gfx,dat,color,fx,fy,x*16+scrollx,y*16-scrolly-512,0);
-				drawgfx_transpen(bitmap,cliprect,gfx,dat,color,fx,fy,x*16+scrollx-512,y*16-scrolly-512,0);
-
-				i++;
-			}
-		}
-	}
-
-	/* layer 0 */
-	{
-		int i, y, x;
-		const gfx_element *gfx = screen->machine->gfx[0];
-		INT16 scrollx, scrolly;
-
-		i = (npvidregs[0x06/2] & 3) * 0x400;
-		scrollx = ((npvidregs[0x00/2] - 0xd8) & 0x03ff);
-		scrolly = ((npvidregs[0x02/2] - 0xffeb) & 0x03ff);
-
-		scrollx/=2;
-		scrolly/=2;
-
-		for (y=0;y<32;y++)
-		{
-			for (x=0;x<32;x++)
-			{
-				UINT16 dat = npvidram[i*2]>>2;
-				UINT16 color = ((npvidram[i*2+1] & 0xff00) >> 8)*4;
-				UINT8 fx = (npvidram[i*2+1] & 0x0040);
-				UINT8 fy = (npvidram[i*2+1] & 0x0080);
-
-				drawgfx_transpen(bitmap,cliprect,gfx,dat,color,fx,fy,x*16+scrollx,y*16-scrolly,0);
-				drawgfx_transpen(bitmap,cliprect,gfx,dat,color,fx,fy,x*16+scrollx-512,y*16-scrolly,0);
-				drawgfx_transpen(bitmap,cliprect,gfx,dat,color,fx,fy,x*16+scrollx,y*16-scrolly-512,0);
-				drawgfx_transpen(bitmap,cliprect,gfx,dat,color,fx,fy,x*16+scrollx-512,y*16-scrolly-512,0);
-
-				i++;
-				//i&=0x3ff;
-			}
-		}
-	}
+	draw_layer(screen->machine,bitmap,cliprect,1);
+	draw_layer(screen->machine,bitmap,cliprect,0);
 
 	return 0;
 }
