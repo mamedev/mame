@@ -235,6 +235,28 @@ void generic_video_init(running_machine *machine)
 
 	state_save_register_item(machine, "video", NULL, 0, state->flip_screen_x);
 	state_save_register_item(machine, "video", NULL, 0, state->flip_screen_y);
+
+	// create spriteram buffers if necessary
+	if (machine->config->m_video_attributes & VIDEO_BUFFERS_SPRITERAM)
+	{
+		assert_always(machine->generic.spriteram_size != 0, "Video buffers spriteram but spriteram size is 0");
+
+		// allocate memory for the back buffer
+		machine->generic.buffered_spriteram.u8 = auto_alloc_array(machine, UINT8, machine->generic.spriteram_size);
+
+		// register for saving it
+		state_save_register_global_pointer(machine, machine->generic.buffered_spriteram.u8, machine->generic.spriteram_size);
+
+		// do the same for the second back buffer, if present
+		if (machine->generic.spriteram2_size)
+		{
+			// allocate memory
+			machine->generic.buffered_spriteram2.u8 = auto_alloc_array(machine, UINT8, machine->generic.spriteram2_size);
+
+			// register for saving it
+			state_save_register_global_pointer(machine, machine->generic.buffered_spriteram2.u8, machine->generic.spriteram2_size);
+		}
+	}
 }
 
 

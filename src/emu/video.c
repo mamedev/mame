@@ -141,10 +141,6 @@ video_manager::video_manager(running_machine &machine)
 	// extract initial execution state from global configuration settings
 	update_refresh_speed();
 
-	// create spriteram buffers if necessary
-	if (machine.config->m_video_attributes & VIDEO_BUFFERS_SPRITERAM)
-		init_buffered_spriteram();
-
 	// create a render target for snapshots
 	const char *viewname = options_get_string(machine.options(), OPTION_SNAPVIEW);
 	m_snap_native = (machine.primary_screen != NULL && (viewname[0] == 0 || strcmp(viewname, "native") == 0));
@@ -525,33 +521,6 @@ void video_manager::add_sound_to_recording(const INT16 *sound, int numsamples)
 	}
 }
 
-
-
-//-------------------------------------------------
-//  init_buffered_spriteram - initialize the
-//  double-buffered spriteram
-//-------------------------------------------------
-
-void video_manager::init_buffered_spriteram()
-{
-	assert_always(m_machine.generic.spriteram_size != 0, "Video buffers spriteram but spriteram size is 0");
-
-	// allocate memory for the back buffer
-	m_machine.generic.buffered_spriteram.u8 = auto_alloc_array(&m_machine, UINT8, m_machine.generic.spriteram_size);
-
-	// register for saving it
-	state_save_register_global_pointer(&m_machine, m_machine.generic.buffered_spriteram.u8, m_machine.generic.spriteram_size);
-
-	// do the same for the second back buffer, if present
-	if (m_machine.generic.spriteram2_size)
-	{
-		// allocate memory
-		m_machine.generic.buffered_spriteram2.u8 = auto_alloc_array(&m_machine, UINT8, m_machine.generic.spriteram2_size);
-
-		// register for saving it
-		state_save_register_global_pointer(&m_machine, m_machine.generic.buffered_spriteram2.u8, m_machine.generic.spriteram2_size);
-	}
-}
 
 
 //-------------------------------------------------

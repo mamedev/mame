@@ -117,7 +117,6 @@ public:
 
 private:
 	// internal helpers
-	void init_buffered_spriteram();
 	static void exit_static(running_machine &machine);
 	void exit();
 	static TIMER_CALLBACK( screenless_update_callback );
