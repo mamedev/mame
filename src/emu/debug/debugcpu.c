@@ -51,7 +51,9 @@
 #include "xmlfile.h"
 #include <ctype.h>
 #include <zlib.h>
-
+#ifdef SDLMAME_FREEBSD
+# undef tolower
+#endif
 
 
 /***************************************************************************

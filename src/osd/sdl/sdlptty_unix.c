@@ -14,7 +14,17 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <errno.h>
-#include <pty.h>
+#if defined(SDLMAME_FREEBSD) || defined(SDLMAME_DRAGONFLY)
+# include <termios.h>
+# include <libutil.h>
+#elif defined(SDLMAME_NETBSD)
+# include <util.h>
+#elif defined(SDLMAME_OPENBSD)
+# include <termios.h>
+# include <util.h>
+#elif defined(SDLMAME_LINUX)
+# include <pty.h>
+#endif
 
 #include "sdlfile.h"
 

@@ -140,6 +140,7 @@ ifeq ($(TARGETOS),freebsd)
 BASE_TARGETOS = unix
 SYNC_IMPLEMENTATION = tc
 DEFS += -DNO_AFFINITY_NP
+LIBS += -lutil
 # /usr/local/include is not considered a system include directory
 # on FreeBSD. GL.h resides there and throws warnings
 CCOMFLAGS += -isystem /usr/local/include
@@ -151,6 +152,13 @@ endif
 ifeq ($(TARGETOS),openbsd)
 BASE_TARGETOS = unix
 SYNC_IMPLEMENTATION = ntc
+LIBS += -lutil
+endif
+
+ifeq ($(TARGETOS),netbsd)
+BASE_TARGETOS = unix
+SYNC_IMPLEMENTATION = ntc
+LIBS += -lutil
 endif
 
 ifeq ($(TARGETOS),solaris)
