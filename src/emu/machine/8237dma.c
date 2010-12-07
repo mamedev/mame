@@ -103,7 +103,6 @@ i8237_device::i8237_device(running_machine &_machine, const i8237_device_config 
     : device_t(_machine, config),
       m_config(config)
 {
-
 }
 
 //-------------------------------------------------
@@ -141,6 +140,7 @@ void i8237_device::device_reset()
 	m_last_service_channel = 3;
 
 	m_command = 0;
+	m_drq = 0;
 	m_mask = 0x00;
 	m_status = 0x0F;
 	m_hrq = 0;
@@ -312,6 +312,12 @@ void i8237_device::i8237_timerproc()
 
 			timer_enable( m_timer, 1 );
 		}
+		else if (m_command == 3 && (m_drq & 1))
+		{
+			/* Memory-to-memory transfers */
+			m_hlda = 1;
+			m_state = DMA8237_S0;
+		}
 		else
 		{
 			timer_enable( m_timer, 0 );
@@ -440,7 +446,35 @@ void i8237_device::i8237_timerproc()
 		i8327_set_dack(-1);
 		break;
 
-	case DMA8237_S11:	/* Output A8-A15 */
+	case DMA8237_S11: /* Output A8-A15 */
+
+//		logerror("###### dma8237_timerproc %s: from %04x count=%x to %04x count=%x\n", tag(),
+//				m_chan[0].m_address, m_chan[0].m_count,
+//				m_chan[1].m_address, m_chan[1].m_count);
+
+		// FIXME: this will copy bytes correct, but not 16 bit words
+		m_temporary_data = devcb_call_read8(&m_in_memr_func, m_chan[0].m_address);
+		devcb_call_write8(&m_out_memw_func, m_chan[1].m_address, m_temporary_data);
+
+		m_service_channel = 0;
+
+		/* Advance */
+		i8237_advance();
+
+		// advance destination channel as well
+		m_chan[1].m_count--;
+		m_chan[1].m_address++;
+
+		if (m_chan[0].m_count == 0xFFFF || m_chan[1].m_count == 0xFFFF) {
+			m_hrq = 0;
+			m_hlda = 0;
+			devcb_call_write_line(&m_out_hrq_func, m_hrq);
+			m_state = DMA8237_SI;
+			m_status |= 3; // set TC for channel 0 and 1
+			m_drq &= ~3; // clear drq for channel 0 and 1
+
+		//	logerror("!!! dma8237_timerproc DMA8237_S11 %s: m_drq=%x m_command=%x\n", tag(), m_drq, m_command);
+		}
 		break;
 	}
 }
@@ -506,7 +540,7 @@ WRITE8_DEVICE_HANDLER_TRAMPOLINE(i8237, i8237_w)
 {
 	offset &= 0x0F;
 
-	logerror("i8237_w: offset = %02x, data = %02x\n", offset, data );
+//	logerror("i8237_w: offset = %02x, data = %02x\n", offset, data );
 
 	switch(offset) {
 	case 0:
@@ -611,6 +645,7 @@ WRITE8_DEVICE_HANDLER_TRAMPOLINE(i8237, i8237_w)
 		m_mask = 0x0f;
 		m_state = DMA8237_SI;
 		m_status &= 0xF0;
+		m_temp = 0;
 		break;
 
 	case 14:
@@ -639,6 +674,7 @@ void i8237_device::i8237_drq_write(int channel, int state)
 	}
 
 	timer_enable( m_timer, ( m_command & 0x04 ) ? 0 : 1 );
+
 }
 
 

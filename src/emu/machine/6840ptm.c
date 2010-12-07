@@ -103,7 +103,6 @@ ptm6840_device::ptm6840_device(running_machine &_machine, const ptm6840_device_c
     : device_t(_machine, config),
       m_config(config)
 {
-
 }
 
 
@@ -114,7 +113,6 @@ ptm6840_device::ptm6840_device(running_machine &_machine, const ptm6840_device_c
 void ptm6840_device::device_start()
 {
 	m_internal_clock = m_config.m_internal_clock;
-
 	/* resolve callbacks */
 	for (int i = 0; i < 3; i++)
 	{
@@ -181,7 +179,6 @@ void ptm6840_device::device_reset()
 	m_t3_divisor			 = 1;
 	m_status_read_since_int = 0;
 	m_IRQ                   = 0;
-
 	for (int i = 0; i < 3; i++)
 	{
 		m_counter[i] = 0xffff;
@@ -676,6 +673,10 @@ void ptm6840_device::ptm6840_timeout(int idx)
 
 				/* No changes in output until reinit */
 				m_fired[idx] = 1;
+
+				m_status_reg |= (1 << idx);
+				m_status_read_since_int &= ~(1 << idx);
+				update_interrupts();
 			}
 		}
 	}

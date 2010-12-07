@@ -48,7 +48,8 @@ public:
 	{
 		MC146818_STANDARD,
 		MC146818_IGNORE_CENTURY, // century is NOT set, for systems having other usage of this byte
-		MC146818_ENHANCED
+		MC146818_ENHANCED,
+		MC146818_UTC
 	};
 
 	// allocators

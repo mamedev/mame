@@ -8,7 +8,7 @@
 #include "emu.h"
 #include "68681.h"
 
-#define VERBOSE 1
+#define VERBOSE 0
 #define LOG(x)	do { if (VERBOSE) logerror x; } while (0)
 
 static const char *const duart68681_reg_read_names[0x10] =
@@ -242,6 +242,13 @@ static TIMER_CALLBACK( duart_timer_callback )
 
 	duart68681->ISR |= INT_COUNTER_READY;
 	duart68681_update_interrupts(duart68681);
+
+//	if ((duart68681->OPCR & 0x0c)== 0x04) {
+//		duart68681->OPR ^= 0x08;
+//		if (duart68681->duart_config->output_port_write)
+//			duart68681->duart_config->output_port_write(duart68681->device, duart68681->OPR ^ 0xff);
+//
+//	}
 };
 
 static void duart68681_write_MR(duart68681_state *duart68681, int ch, UINT8 data)
@@ -305,30 +312,6 @@ static void duart68681_write_CSR(duart68681_state *duart68681, int ch, UINT8 dat
 static void duart68681_write_CR(duart68681_state *duart68681, int ch, UINT8 data)
 {
 	duart68681->channel[ch].CR = data;
-	if ( BIT(data,0) )
-	{
-		duart68681->channel[ch].rx_enabled = 1;
-	}
-	if ( BIT(data,1) )
-	{
-		duart68681->channel[ch].rx_enabled = 0;
-		duart68681->channel[ch].SR &= ~STATUS_RECEIVER_READY; // datasheet explicitly says disabling rx does not affect the reciever ready line, which just indicates if the fifo has anything in it at all.
-	}
-
-	if ( BIT(data,2) )
-	{
-		duart68681->channel[ch].tx_enabled = 1;
-		duart68681->channel[ch].tx_ready = 1;
-		duart68681->channel[ch].SR |= STATUS_TRANSMITTER_READY;
-		duart68681->channel[ch].SR |= STATUS_TRANSMITTER_EMPTY;
-	}
-	if ( BIT(data,3) )
-	{
-		duart68681->channel[ch].tx_enabled = 0;
-		duart68681->channel[ch].tx_ready = 0;
-		duart68681->channel[ch].SR &= ~STATUS_TRANSMITTER_READY;
-		duart68681->channel[ch].SR &= ~STATUS_TRANSMITTER_EMPTY;
-	}
 
 	switch( (data >> 4) & 0x07 )
 	{
@@ -348,6 +331,10 @@ static void duart68681_write_CR(duart68681_state *duart68681, int ch, UINT8 data
 		case 3: /* Reset channel A transmitter */
 			duart68681->channel[ch].tx_enabled = 0;
 			duart68681->channel[ch].SR &= ~STATUS_TRANSMITTER_READY;
+			if (ch == 0)
+				duart68681->ISR &= ~INT_TXRDYA;
+			else
+				duart68681->ISR &= ~INT_TXRDYB;
 			timer_adjust_oneshot(duart68681->channel[ch].tx_timer, attotime_never, ch);
 			break;
 		case 4: /* Reset Error Status */
@@ -369,6 +356,34 @@ static void duart68681_write_CR(duart68681_state *duart68681, int ch, UINT8 data
 			break;
 	}
 	duart68681_update_interrupts(duart68681);
+
+	if (BIT(data, 0)) {
+		duart68681->channel[ch].rx_enabled = 1;
+	}
+	if (BIT(data, 1)) {
+		duart68681->channel[ch].rx_enabled = 0;
+		duart68681->channel[ch].SR &= ~STATUS_RECEIVER_READY;
+	}
+
+	if (BIT(data, 2)) {
+		duart68681->channel[ch].tx_enabled = 1;
+		duart68681->channel[ch].tx_ready = 1;
+		duart68681->channel[ch].SR |= STATUS_TRANSMITTER_READY;
+		if (ch == 0)
+			duart68681->ISR |= INT_TXRDYA;
+		else
+			duart68681->ISR |= INT_TXRDYB;
+	}
+	if (BIT(data, 3)) {
+		duart68681->channel[ch].tx_enabled = 0;
+		duart68681->channel[ch].tx_ready = 0;
+		duart68681->channel[ch].SR &= ~STATUS_TRANSMITTER_READY;
+		if (ch == 0)
+			duart68681->ISR &= ~INT_TXRDYA;
+		else
+			duart68681->ISR &= ~INT_TXRDYB;
+	}
+
 };
 
 static UINT8 duart68681_read_rx_fifo(duart68681_state *duart68681, int ch)
@@ -422,8 +437,11 @@ static void duart68681_write_TX(duart68681_state* duart68681, int ch, UINT8 data
 
 	duart68681->channel[ch].tx_data = data;
 
-	duart68681->channel[ch].tx_ready = 0;
-	duart68681->channel[ch].SR &= ~STATUS_TRANSMITTER_READY;
+	// tx_ready will stay on in local loopback mode
+	if ((duart68681->channel[ch].MR2 & 0xc0) != 0x80) {
+		duart68681->channel[ch].tx_ready = 0;
+		duart68681->channel[ch].SR &= ~STATUS_TRANSMITTER_READY;
+	}
 
 	if (ch == 0)
 		duart68681->ISR &= ~INT_TXRDYA;

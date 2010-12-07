@@ -88,9 +88,11 @@
 //  MACROS
 //**************************************************************************
 
+#define USE_UTC		1
+
 #define HOURS_24	(m_data[0xb]&2)
 #define BCD_MODE	!(m_data[0xb]&4) // book has other description!
-#define CENTURY		m_data[50]
+#define CENTURY		m_data[100]
 #define YEAR		m_data[9]
 #define MONTH		m_data[8]
 #define DAY			m_data[7]
@@ -183,7 +185,12 @@ void mc146818_device::device_start()
 {
 	m_last_refresh = timer_get_time(&m_machine);
 	emu_timer *timer = device_timer_alloc(*this);
-	timer_adjust_periodic(timer, ATTOTIME_IN_HZ(1), 0, ATTOTIME_IN_HZ(1));
+	if (m_config.m_type == mc146818_device_config::MC146818_UTC) {
+		// hack: for apollo we increase the update frequency to stay in sync with real time
+		timer_adjust_periodic(timer, ATTOTIME_IN_HZ(2), 0, ATTOTIME_IN_HZ(2));
+	} else {
+		timer_adjust_periodic(timer, ATTOTIME_IN_HZ(1), 0, ATTOTIME_IN_HZ(1));
+	}
 	set_base_datetime();
 }
 
@@ -196,9 +203,32 @@ void mc146818_device::device_timer(emu_timer &timer, device_timer_id id, int par
 {
 	int year/*, month*/;
 
+	if (m_config.m_type == mc146818_device_config::MC146818_UTC) {
+		// hack: set correct real time even for overloaded emulation
+		// (at least for apollo)
+		static osd_ticks_t t0 = 0;
+		osd_ticks_t t1 = osd_ticks();
+		int n_seconds;
+
+		if (t0 == 0) {
+			t0 = t1;
+		}
+
+		n_seconds =  (t1 - t0) / osd_ticks_per_second();
+		t0 = t1 - (t1 - t0) % osd_ticks_per_second();
+		if (n_seconds <= 0) {
+			// we were called to early
+			return;
+		}
+
+		m_data[0] += n_seconds;
+	} else {
+		m_data[0] += 1;
+	}
+
 	if (BCD_MODE)
 	{
-		m_data[0]=bcd_adjust(m_data[0]+1);
+		m_data[0]=bcd_adjust(m_data[0]/*+1*/);
 		if (m_data[0]>=0x60)
 		{
 			m_data[0]=0;
@@ -241,10 +271,10 @@ void mc146818_device::device_timer(emu_timer &timer, device_timer_id id, int par
 	}
 	else
 	{
-		m_data[0]=m_data[0]+1;
+		/*m_data[0]=m_data[0]+1;*/
 		if (m_data[0]>=60)
 		{
-			m_data[0]=0;
+			m_data[0] -= 60;
 			m_data[2]=m_data[2]+1;
 			if (m_data[2]>=60) {
 				m_data[2]=0;
@@ -272,6 +302,30 @@ void mc146818_device::device_timer(emu_timer &timer, device_timer_id id, int par
 			}
 		}
 	}
+
+	if (m_data[1] == m_data[0] && //
+		m_data[3] == m_data[2] && //
+		m_data[5] == m_data[4]) {
+		// set the alarm interrupt flag AF
+		m_data[0x0c] |= 0x20;
+	} else {
+		// clear the alarm interrupt flag AF
+		m_data[0x0c] &= ~0x20;
+		if ((m_data[0x0c] & 0x70) == 0) {
+			// clear IRQF
+			m_data[0x0c] &= ~0x80;
+		}
+	}
+
+	// set the update-ended interrupt Flag UF
+	m_data[0x0c] |=  0x10;
+
+	// set the interrupt request flag IRQF
+	// FIXME: should throw IRQ line as well
+	if ((m_data[0x0b] & m_data[0x0c] & 0x70) != 0) {
+		m_data[0x0c] |=  0x80;
+	}
+
 	m_updated = true;  /* clock has been updated */
 	m_last_refresh = timer_get_time(&m_machine);
 }
@@ -297,6 +351,7 @@ void mc146818_device::nvram_default()
 void mc146818_device::nvram_read(mame_file &file)
 {
 	mame_fread(&file, m_data, sizeof(m_data));
+	set_base_datetime();
 }
 
 
@@ -330,25 +385,35 @@ inline int mc146818_device::dec_2_local(int a)
 void mc146818_device::set_base_datetime()
 {
 	system_time systime;
+	system_time::full_time current_time;
 
 	m_machine.base_datetime(systime);
 
-	if (HOURS_24 || (systime.local_time.hour < 12))
-		m_data[4] = dec_2_local(systime.local_time.hour);
+	current_time = m_config.m_type == mc146818_device_config::MC146818_UTC ? systime.utc_time: systime.local_time;
+
+	// temporary hack to go back 20 year (e.g. from 2010 -> 1990)
+	// current_time.year -= 20;
+
+//	logerror("mc146818_set_base_datetime %02d/%02d/%02d %02d:%02d:%02d\n",
+//			current_time.year % 100, current_time.month + 1, current_time.mday,
+//			current_time.hour,current_time.minute, current_time.second);
+
+	if (HOURS_24 || (current_time.hour < 12))
+		m_data[4] = dec_2_local(current_time.hour);
 	else
-		m_data[4] = dec_2_local(systime.local_time.hour - 12) | 0x80;
+		m_data[4] = dec_2_local(current_time.hour - 12) | 0x80;
 
 	if (m_config.m_type != mc146818_device_config::MC146818_IGNORE_CENTURY)
-		CENTURY = dec_2_local(systime.local_time.year /100);
+		CENTURY = dec_2_local(current_time.year /100);
 
-	m_data[0]	= dec_2_local(systime.local_time.second);
-	m_data[2]	= dec_2_local(systime.local_time.minute);
-	DAY					= dec_2_local(systime.local_time.day);
-	MONTH				= dec_2_local(systime.local_time.month + 1);
-	YEAR				= dec_2_local(systime.local_time.year % 100);
+	m_data[0]	= dec_2_local(current_time.second);
+	m_data[2]	= dec_2_local(current_time.minute);
+	DAY					= dec_2_local(current_time.mday);
+	MONTH				= dec_2_local(current_time.month + 1);
+	YEAR				= dec_2_local(current_time.year % 100);
 
-	WEEK_DAY = systime.local_time.weekday;
-	if (systime.local_time.is_dst)
+	WEEK_DAY = current_time.weekday;
+	if (current_time.is_dst)
 		m_data[0xb] |= 1;
 	else
 		m_data[0xb] &= ~1;
@@ -380,10 +445,14 @@ READ8_MEMBER( mc146818_device::read )
 			break;
 
 		case 0xc:
-			if (m_updated) /* the clock has been updated */
-				data = 0x10;
-			else
-				data = 0x00;
+// 			if(m_updated) /* the clock has been updated */
+//				data = 0x10;
+// 			else
+// 				data = 0x00;
+			// the unused bits b0 ... b3 are always read as 0
+			data = m_data[m_index % MC146818_DATA_SIZE] & 0xf0;
+			// read 0x0c will clear all IRQ flags in register 0x0c
+			m_data[m_index % MC146818_DATA_SIZE] &= 0x0f;
 			break;
 		case 0xd:
 			/* battery ok */
@@ -424,6 +493,9 @@ WRITE8_MEMBER( mc146818_device::write )
 			if(data & 0x80)
 				m_updated = false;
 			m_data[m_index % MC146818_DATA_SIZE] = data;
+			break;
+		case 0x0c:
+			// register 0x0c is readonly
 			break;
 		default:
 			m_data[m_index % MC146818_DATA_SIZE] = data;

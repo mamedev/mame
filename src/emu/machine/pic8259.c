@@ -18,7 +18,7 @@
 
 #define LOG_ICW		0
 #define LOG_OCW		0
-#define LOG_GENERAL	0
+#define LOG_GENERAL	 0
 
 typedef enum
 {
@@ -174,6 +174,8 @@ int pic8259_acknowledge(running_device *device)
 				logerror("pic8259_acknowledge(): PIC acknowledge IRQ #%d\n", irq);
 			pic8259->irr &= ~mask;
 			pic8259->esr &= ~mask;
+			pic8259->irq_lines &= ~mask;
+
 			if (!pic8259->auto_eoi)
 				pic8259->isr |= mask;
 			pic8259_set_timer(pic8259);
@@ -205,14 +207,14 @@ READ8_DEVICE_HANDLER( pic8259_r )
 			{
 				/* Polling mode */
 				if ( pic8259->isr & ~pic8259->imr )
-				{
-					int irq;
-
 					pic8259_acknowledge( device );
 
+				if ( pic8259->irr & ~pic8259->imr )
+				{
+					int irq;
 					for ( irq = 0; irq < IRQ_COUNT; irq++ )
 					{
-						if ( ( 1 << irq ) & pic8259->isr & ~pic8259->imr )
+						if ( ( 1 << irq ) & pic8259->irr & ~pic8259->imr )
 						{
 							data = 0x80 | irq;
 							break;
@@ -269,6 +271,7 @@ WRITE8_DEVICE_HANDLER( pic8259_w )
 				pic8259->icw4_needed		= (data & 0x01) ? 1 : 0;
 				pic8259->vector_addr_low	= (data & 0xe0);
 				pic8259->state			= STATE_ICW2;
+				pic8259->irq_lines          = 0x00;
 			}
 			else if (pic8259->state == STATE_READY)
 			{
