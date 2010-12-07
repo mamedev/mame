@@ -894,7 +894,7 @@ M68KMAKE_OP(1111, 0, ., .)
 
 M68KMAKE_OP(040fpu0, 32, ., .)
 {
-	if(CPU_TYPE_IS_030_PLUS(m68k->cpu_type))
+	if(m68k->has_fpu)
 	{
 		m68040_fpu_op0(m68k);
 		return;
@@ -905,7 +905,7 @@ M68KMAKE_OP(040fpu0, 32, ., .)
 
 M68KMAKE_OP(040fpu1, 32, ., .)
 {
-	if(CPU_TYPE_IS_030_PLUS(m68k->cpu_type))
+	if(m68k->has_fpu)
 	{
 		m68040_fpu_op1(m68k);
 		return;
@@ -8790,6 +8790,58 @@ rte_loop:
 				new_pc = m68ki_pull_32(m68k);
 				m68ki_fake_pull_16(m68k);	/* format word */
 				m68ki_fake_pull_32(m68k);	/* address */
+				m68ki_jump(m68k, new_pc);
+				m68ki_set_sr(m68k, new_sr);
+				m68k->instr_mode = INSTRUCTION_YES;
+				m68k->run_mode = RUN_MODE_NORMAL;
+				return;
+			case 0x0a: /* Bus Error at instruction boundary */
+				new_sr = m68ki_pull_16(m68k);
+				new_pc = m68ki_pull_32(m68k);
+				m68ki_fake_pull_16(m68k);	/* $06: format word */
+				m68ki_fake_pull_16(m68k);	/* $08: internal register */
+				m68ki_fake_pull_16(m68k);	/* $0a: special status word */
+				m68ki_fake_pull_16(m68k);	/* $0c: instruction pipe stage c */
+				m68ki_fake_pull_16(m68k);	/* $0e: instruction pipe stage b */
+				m68ki_fake_pull_32(m68k);	/* $10: data fault address */
+				m68ki_fake_pull_32(m68k);	/* $14: internal registers */
+				m68ki_fake_pull_32(m68k);	/* $18: data output buffer */
+				m68ki_fake_pull_32(m68k);	/* $1c: internal registers */
+
+				m68ki_jump(m68k, new_pc);
+				m68ki_set_sr(m68k, new_sr);
+				m68k->instr_mode = INSTRUCTION_YES;
+				m68k->run_mode = RUN_MODE_NORMAL;
+				return;
+			case 0x0b: /* Bus Error - Instruction Execution in Progress */
+				new_sr = m68ki_pull_16(m68k);
+				new_pc = m68ki_pull_32(m68k);
+				m68ki_fake_pull_16(m68k);	/* $06: format word */
+				m68ki_fake_pull_16(m68k);	/* $08: internal register */
+				m68ki_fake_pull_16(m68k);	/* $0a: special status word */
+				m68ki_fake_pull_16(m68k);	/* $0c: instruction pipe stage c */
+				m68ki_fake_pull_16(m68k);	/* $0e: instruction pipe stage b */
+				m68ki_fake_pull_32(m68k);	/* $10: data fault address */
+				m68ki_fake_pull_32(m68k);	/* $14: internal registers */
+				m68ki_fake_pull_32(m68k);	/* $18: data output buffer */
+				m68ki_fake_pull_32(m68k);	/* $1c: internal registers */
+				m68ki_fake_pull_32(m68k);	/* $20:  */
+				m68ki_fake_pull_32(m68k);	/* $24: stage B address */
+				m68ki_fake_pull_32(m68k);	/* $28:  */
+				m68ki_fake_pull_32(m68k);	/* $2c: data input buffer */
+				m68ki_fake_pull_32(m68k);	/* $30:  */
+				m68ki_fake_pull_16(m68k);	/* $34:  */
+				m68ki_fake_pull_16(m68k);	/* $36: version #, internal information */
+				m68ki_fake_pull_32(m68k);	/* $38:  */
+				m68ki_fake_pull_32(m68k);	/* $3c:  */
+				m68ki_fake_pull_32(m68k);	/* $40:  */
+				m68ki_fake_pull_32(m68k);	/* $44:  */
+				m68ki_fake_pull_32(m68k);	/* $48:  */
+				m68ki_fake_pull_32(m68k);	/* $4c:  */
+				m68ki_fake_pull_32(m68k);	/* $50:  */
+				m68ki_fake_pull_32(m68k);	/* $54:  */
+				m68ki_fake_pull_32(m68k);	/* $58:  */
+
 				m68ki_jump(m68k, new_pc);
 				m68ki_set_sr(m68k, new_sr);
 				m68k->instr_mode = INSTRUCTION_YES;

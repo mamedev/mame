@@ -5,7 +5,7 @@
 #if 0
 static const char copyright_notice[] =
 "MUSASHI\n"
-"Version 4.60 (2010-03-12)\n"
+"Version 4.70 (2010-11-06)\n"
 "A portable Motorola M680x0 processor emulation engine.\n"
 "Copyright Karl Stenerud.  All rights reserved.\n"
 "\n"
@@ -565,7 +565,18 @@ static CPU_TRANSLATE( m68k )
 	{
 		if ((space == ADDRESS_SPACE_PROGRAM) && (m68k->pmmu_enabled))
 		{
-			*address = pmmu_translate_addr(m68k, *address);
+			// FIXME: mmu_tmp_sr will be overwritten in pmmu_translate_addr_with_fc
+			UINT16 mmu_tmp_sr = m68k->mmu_tmp_sr;
+//			UINT32 va=*address;
+
+			*address = pmmu_translate_addr_with_fc(m68k, *address, 4, 1);
+
+			if ((m68k->mmu_tmp_sr & M68K_MMU_SR_INVALID) != 0) {
+//				logerror("cpu_translate_m68k failed with mmu_sr=%04x va=%08x pa=%08x\n",m68k->mmu_tmp_sr,va ,*address);
+				*address = 0;
+			}
+
+			m68k->mmu_tmp_sr= mmu_tmp_sr;
 		}
 	}
 	return TRUE;
@@ -621,13 +632,91 @@ static CPU_EXECUTE( m68k )
 			/* Call external hook to peek at CPU */
 			debugger_instruction_hook(device, REG_PC);
 
+			// FIXME: remove this
+//			void apollo_debug_instruction(running_device *device);
+//			apollo_debug_instruction(device);
+
 			/* Record previous program counter */
 			REG_PPC = REG_PC;
 
-			/* Read an instruction and call its handler */
-			m68k->ir = m68ki_read_imm_16(m68k);
-			m68ki_instruction_jump_table[m68k->ir](m68k);
-			m68k->remaining_cycles -= m68k->cyc_instruction[m68k->ir];
+			if (!m68k->pmmu_enabled)
+			{
+				/* Read an instruction and call its handler */
+				m68k->ir = m68ki_read_imm_16(m68k);
+				m68ki_instruction_jump_table[m68k->ir](m68k);
+				m68k->remaining_cycles -= m68k->cyc_instruction[m68k->ir];
+			}
+			else
+			{
+				// save CPU address registers values at start of instruction
+				int i;
+				UINT32 tmp_dar[16];
+
+				for (i = 15; i >= 0; i--)
+				{
+					tmp_dar[i] = REG_DA[i];
+				}
+
+				m68k->mmu_tmp_buserror_occurred = 0;
+
+				/* Read an instruction and call its handler */
+				m68k->ir = m68ki_read_imm_16(m68k);
+
+				if (!m68k->mmu_tmp_buserror_occurred)
+				{
+					m68ki_instruction_jump_table[m68k->ir](m68k);
+					m68k->remaining_cycles -= m68k->cyc_instruction[m68k->ir];
+				}
+
+				if (m68k->mmu_tmp_buserror_occurred)
+				{
+					UINT32 sr;
+
+//					const char * disassemble(m68ki_cpu_core *m68k, offs_t pc);
+//					logerror(
+//							"PMMU: pc=%08x sp=%08x va=%08x bus error: %s\n",
+//							REG_PPC, REG_A[7], m68k->mmu_tmp_buserror_address,
+//							(m68k->mmu_tmp_buserror_address == REG_PPC) ? "-"
+//									: disassemble(m68k, REG_PPC));
+
+					m68k->mmu_tmp_buserror_occurred = 0;
+
+					// restore cpu address registers to value at start of instruction
+					for (i = 15; i >= 0; i--)
+					{
+						if (REG_DA[i] != tmp_dar[i])
+						{
+//							logerror("PMMU: pc=%08x sp=%08x bus error: fixed %s[%d]: %08x -> %08x\n",
+//									REG_PPC, REG_A[7], i < 8 ? "D" : "A", i & 7, REG_DA[i], tmp_dar[i]);
+							REG_DA[i] = tmp_dar[i];
+						}
+					}
+
+					sr = m68ki_init_exception(m68k);
+
+					m68k->run_mode = RUN_MODE_BERR_AERR_RESET;
+
+					if (!CPU_TYPE_IS_020_PLUS(m68k->cpu_type))
+					{
+						/* Note: This is implemented for 68000 only! */
+						m68ki_stack_frame_buserr(m68k, sr);
+					} 
+					else if (m68k->mmu_tmp_buserror_address == REG_PPC)
+					{
+						m68ki_stack_frame_1010(m68k, sr, EXCEPTION_BUS_ERROR, REG_PPC, m68k->mmu_tmp_buserror_address);
+					} 
+					else
+					{
+						m68ki_stack_frame_1011(m68k, sr, EXCEPTION_BUS_ERROR, REG_PPC, m68k->mmu_tmp_buserror_address);
+					}
+
+					m68ki_jump_vector(m68k, EXCEPTION_BUS_ERROR);
+
+					// TODO:
+					/* Use up some clock cycles and undo the instruction's cycles */
+					// m68k->remaining_cycles -= m68k->cyc_exception[EXCEPTION_BUS_ERROR] - m68k->cyc_instruction[m68k->ir];
+				}
+			}
 
 			/* Trace m68k_exception, if necessary */
 			m68ki_exception_if_trace(); /* auto-disable (see m68kcpu.h) */
@@ -692,6 +781,10 @@ static CPU_RESET( m68k )
 	/* Disable the PMMU/HMMU on reset, if any */
 	m68k->pmmu_enabled = 0;
 	m68k->hmmu_enabled = 0;
+
+	m68k->mmu_tc = 0;
+	m68k->mmu_tt0 = 0;
+	m68k->mmu_tt1 = 0;
 
 	/* Clear all stop levels and eat up all remaining cycles */
 	m68k->stopped = 0;
@@ -952,7 +1045,7 @@ static CPU_GET_INFO( m68k )
 		case DEVINFO_STR_FAMILY:					strcpy(info->s, "Motorola 68K");		break;
 		case DEVINFO_STR_VERSION:					strcpy(info->s, "4.60");				break;
 		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);				break;
-		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Karl Stenerud. All rights reserved. (2.1 fixes HJB, FPU+MMU by RB)"); break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Copyright Karl Stenerud. All rights reserved. (2.1 fixes HJB, FPU+MMU by RB+HO)"); break;
 	}
 }
 
@@ -1055,6 +1148,9 @@ UINT8 m68k_memory_interface::read_byte_32_mmu(offs_t address)
 	if (m_cpustate->pmmu_enabled)
 	{
 		address = pmmu_translate_addr(m_cpustate, address);
+		if (m_cpustate->mmu_tmp_buserror_occurred) {
+			return ~0;
+		}
 	}
 
 	return m_space->read_byte(address);
@@ -1065,6 +1161,9 @@ void m68k_memory_interface::write_byte_32_mmu(offs_t address, UINT8 data)
 	if (m_cpustate->pmmu_enabled)
 	{
 		address = pmmu_translate_addr(m_cpustate, address);
+		if (m_cpustate->mmu_tmp_buserror_occurred) {
+			return;
+		}
 	}
 
 	m_space->write_byte(address, data);
@@ -1075,6 +1174,9 @@ UINT16 m68k_memory_interface::read_immediate_16_mmu(offs_t address)
 	if (m_cpustate->pmmu_enabled)
 	{
 		address = pmmu_translate_addr(m_cpustate, address);
+		if (m_cpustate->mmu_tmp_buserror_occurred) {
+			return ~0;
+		}
 	}
 
 	return m_direct->read_decrypted_word((address) ^ m_cpustate->memory.opcode_xor);
@@ -1087,7 +1189,20 @@ UINT16 m68k_memory_interface::readword_d32_mmu(offs_t address)
 
 	if (m_cpustate->pmmu_enabled)
 	{
-		address = pmmu_translate_addr(m_cpustate, address);
+		UINT32 address0 = pmmu_translate_addr(m_cpustate, address);
+		if (m_cpustate->mmu_tmp_buserror_occurred) {
+			return ~0;
+		} else if (!(address & 1)) {
+			return m_space->read_word(address0);
+		} else {
+			UINT32 address1 = pmmu_translate_addr(m_cpustate, address + 1);
+			if (m_cpustate->mmu_tmp_buserror_occurred) {
+				return ~0;
+			} else {
+				result = m_space->read_byte(address0) << 8;
+				return result | m_space->read_byte(address1);
+			}
+		}
 	}
 
 	if (!(address & 1))
@@ -1101,7 +1216,22 @@ void m68k_memory_interface::writeword_d32_mmu(offs_t address, UINT16 data)
 {
 	if (m_cpustate->pmmu_enabled)
 	{
-		address = pmmu_translate_addr(m_cpustate, address);
+		UINT32 address0 = pmmu_translate_addr(m_cpustate, address);
+		if (m_cpustate->mmu_tmp_buserror_occurred) {
+			return;
+		} else if (!(address & 1)) {
+			m_space->write_word(address0, data);
+			return;
+		} else {
+			UINT32 address1 = pmmu_translate_addr(m_cpustate, address + 1);
+			if (m_cpustate->mmu_tmp_buserror_occurred) {
+				return;
+			} else {
+				m_space->write_byte(address0, data >> 8);
+				m_space->write_byte(address1, data);
+				return;
+			}
+		}
 	}
 
 	if (!(address & 1))
@@ -1120,7 +1250,33 @@ UINT32 m68k_memory_interface::readlong_d32_mmu(offs_t address)
 
 	if (m_cpustate->pmmu_enabled)
 	{
-		address = pmmu_translate_addr(m_cpustate, address);
+		UINT32 address0 = pmmu_translate_addr(m_cpustate, address);
+		if (m_cpustate->mmu_tmp_buserror_occurred) {
+			return ~0;
+		} else if ((address +3) & 0xfc) {
+			// not at page boundary; use default code
+			address = address0;
+		} else if (!(address & 3)) { // 0
+			return m_space->read_dword(address0);
+		} else {
+			UINT32 address2 = pmmu_translate_addr(m_cpustate, address+2);
+			if (m_cpustate->mmu_tmp_buserror_occurred) {
+				return ~0;
+			} else if (!(address & 1)) { // 2
+				result = m_space->read_word(address0) << 16;
+				return result | m_space->read_word(address2);
+			} else {
+				UINT32 address1 = pmmu_translate_addr(m_cpustate, address+1);
+				UINT32 address3 = pmmu_translate_addr(m_cpustate, address+3);
+				if (m_cpustate->mmu_tmp_buserror_occurred) {
+					return ~0;
+				} else {
+					result = m_space->read_byte(address0) << 24;
+					result |= m_space->read_word(address1) << 8;
+					return result | m_space->read_byte(address3);
+				}
+			}
+		}
 	}
 
 	if (!(address & 3))
@@ -1140,7 +1296,36 @@ void m68k_memory_interface::writelong_d32_mmu(offs_t address, UINT32 data)
 {
 	if (m_cpustate->pmmu_enabled)
 	{
-		address = pmmu_translate_addr(m_cpustate, address);
+		UINT32 address0 = pmmu_translate_addr(m_cpustate, address);
+		if (m_cpustate->mmu_tmp_buserror_occurred) {
+			return;
+		} else if ((address +3) & 0xfc) {
+			// not at page boundary; use default code
+			address = address0;
+		} else if (!(address & 3)) { // 0
+			m_space->write_dword(address0, data);
+			return;
+		} else {
+			UINT32 address2 = pmmu_translate_addr(m_cpustate, address+2);
+			if (m_cpustate->mmu_tmp_buserror_occurred) {
+				return;
+			} else if (!(address & 1)) { // 2
+				m_space->write_word(address0, data >> 16);
+				m_space->write_word(address2, data);
+				return;
+			} else {
+				UINT32 address1 = pmmu_translate_addr(m_cpustate, address+1);
+				UINT32 address3 = pmmu_translate_addr(m_cpustate, address+3);
+				if (m_cpustate->mmu_tmp_buserror_occurred) {
+					return;
+				} else {
+					m_space->write_byte(address0, data >> 24);
+					m_space->write_word(address1, data >> 8);
+					m_space->write_byte(address3, data);
+					return;
+				}
+			}
+		}
 	}
 
 	if (!(address & 3))
@@ -1413,6 +1598,7 @@ static CPU_INIT( m68000 )
 	m68k->cyc_reset        = 132;
 	m68k->has_pmmu	       = 0;
 	m68k->has_hmmu	       = 0;
+	m68k->has_fpu	       = 0;
 
 	define_state(device);
 }
@@ -1462,6 +1648,7 @@ static CPU_INIT( m68008 )
 	m68k->cyc_shift        = 1;
 	m68k->cyc_reset        = 132;
 	m68k->has_pmmu	       = 0;
+	m68k->has_fpu	       = 0;
 
 	define_state(device);
 }
@@ -1515,6 +1702,7 @@ static CPU_INIT( m68010 )
 	m68k->cyc_shift        = 1;
 	m68k->cyc_reset        = 130;
 	m68k->has_pmmu	       = 0;
+	m68k->has_fpu	       = 0;
 
 	define_state(device);
 }
@@ -1597,6 +1785,8 @@ static CPU_INIT( m68020pmmu )
 	CPU_INIT_CALL(m68020);
 
 	m68k->has_pmmu	       = 1;
+	m68k->has_fpu	       = 1;
+
 // hack alert: we use placement new to ensure we are properly initialized
 // because we live in the device state which is allocated as bytes
 // remove me when we have a real C++ device
@@ -1678,6 +1868,7 @@ static CPU_INIT( m68ec020 )
 	m68k->cyc_shift        = 0;
 	m68k->cyc_reset        = 518;
 	m68k->has_pmmu	       = 0;
+	m68k->has_fpu	       = 0;
 
 	define_state(device);
 }
@@ -1729,6 +1920,7 @@ static CPU_INIT( m68030 )
 	m68k->cyc_shift        = 0;
 	m68k->cyc_reset        = 518;
 	m68k->has_pmmu	       = 1;
+	m68k->has_fpu	       = 1;
 
 	define_state(device);
 }
@@ -1786,6 +1978,7 @@ static CPU_INIT( m68ec030 )
 	m68k->cyc_shift        = 0;
 	m68k->cyc_reset        = 518;
 	m68k->has_pmmu	       = 0;		/* EC030 lacks the PMMU and is effectively a die-shrink 68020 */
+	m68k->has_fpu	       = 1;
 
 	define_state(device);
 }
@@ -1834,6 +2027,7 @@ static CPU_INIT( m68040 )
 	m68k->cyc_shift        = 0;
 	m68k->cyc_reset        = 518;
 	m68k->has_pmmu	       = 1;
+	m68k->has_fpu	       = 1;
 
 	define_state(device);
 }
@@ -1890,6 +2084,7 @@ static CPU_INIT( m68ec040 )
 	m68k->cyc_shift        = 0;
 	m68k->cyc_reset        = 518;
 	m68k->has_pmmu	       = 0;
+	m68k->has_fpu	       = 0;
 
 	define_state(device);
 }
@@ -1938,6 +2133,7 @@ static CPU_INIT( m68lc040 )
 	m68k->cyc_shift        = 0;
 	m68k->cyc_reset        = 518;
 	m68k->has_pmmu	       = 1;
+	m68k->has_fpu	       = 0;
 
 	define_state(device);
 }

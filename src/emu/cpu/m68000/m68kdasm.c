@@ -1719,7 +1719,7 @@ static void d68040_fpu(void)
 
 	char mnemonic[40];
 	UINT32 w2, src, dst_reg;
-	LIMIT_CPU_TYPES(M68030_PLUS);
+	LIMIT_CPU_TYPES(M68020_PLUS);
 	w2 = read_imm_16();
 
 	src = (w2 >> 10) & 0x7;

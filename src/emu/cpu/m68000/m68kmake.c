@@ -3,7 +3,7 @@
 /* ======================================================================== */
 /*
  *                                  MUSASHI
- *                                Version 4.60
+ *                                Version 4.70
  *
  * A portable Motorola M680x0 processor emulation engine.
  * Copyright Karl Stenerud.  All rights reserved.
@@ -24,8 +24,8 @@
  * Modified For OpenVMS By:  Robert Alan Byer
  *                           byer@mail.ourservers.net
  *
- * 68030 and PMMU by R. Belmont
- * 68040 and FPU by Ville Linde
+ * 68030 and PMMU by R. Belmont and Hans Ostermeyer
+ * 68040 and FPU by Ville Linde, R. Belmont, and Hans Ostermeyer
  */
 
 
@@ -56,7 +56,7 @@
  */
 
 
-static const char g_version[] = "4.60";
+static const char g_version[] = "4.70";
 
 /* ======================================================================== */
 /* =============================== INCLUDES =============================== */
