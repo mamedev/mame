@@ -11,6 +11,7 @@
     * Golden Poker Double Up (Big Boy).         1981, Bonanza Enterprises, Ltd.
     * Golden Poker Double Up (Mini Boy).        1981, Bonanza Enterprises, Ltd.
     * PlayMan Poker (german).                   1981, PlayMan.
+    * Super Double (french).                    198?, Karateco.
     * Jack Potten's Poker (set 1).              198?, Bootleg.
     * Jack Potten's Poker (set 2).              198?, Bootleg in Coinmaster H/W.
     * Jack Potten's Poker (set 3).              198?, Bootleg.
@@ -622,12 +623,18 @@
     - Added more technical notes.
 
 
+    [2010-11-18]
+
+    - Added Karateco Super Double (french)
+    - Extended ROM space for goldnpkr game to include the 0x2000..0x3fff range
+
     TODO:
 
     - Missing PIA connections.
     - Identify and hook the unknown device mapped at $2108-$210b in Witch Card (Video Klein).
     - Code analysis, Inputs & lamps for Royale.
     - Final cleanup and split the driver.
+    - Check if calomega.c can be merged with this driver because hardware is compatible
 
 
 *******************************************************************************/
@@ -948,7 +955,7 @@ static ADDRESS_MAP_START( goldnpkr_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0848, 0x084b) AM_DEVREADWRITE("pia1", pia6821_r, pia6821_w)
 	AM_RANGE(0x1000, 0x13ff) AM_RAM_WRITE(goldnpkr_videoram_w) AM_BASE(&videoram)
 	AM_RANGE(0x1800, 0x1bff) AM_RAM_WRITE(goldnpkr_colorram_w) AM_BASE(&colorram)
-	AM_RANGE(0x4000, 0x7fff) AM_ROM
+	AM_RANGE(0x2000, 0x7fff) AM_ROM /* superdbl uses 0x2000..0x3fff address space */
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( pottnpkr_map, ADDRESS_SPACE_PROGRAM, 8 )
@@ -3854,6 +3861,37 @@ ROM_START( genie )
 	ROM_LOAD( "n82s129.9c",	0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
 ROM_END
 
+/****************************************************
+
+  Super Double (Karateco)
+
+  French text with some intentional typos to fit size.
+  Uses both 0x2000..0x3fff and 0x7000..0x7fff ROM range.
+
+  This is either the game advertised as "The Double",
+  or a successor thereof.
+
+*****************************************************/
+  
+ROM_START( superdbl )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "sd6",	0x7000, 0x1000, CRC(3cf1ccb8) SHA1(c589ddf2e97abb9d95375d0964fd0aa6f7e2e468) )
+	ROM_LOAD( "sd7",  0x2000, 0x1000, CRC(f5136f82) SHA1(f086cd5495097ede037ea6cae584e95bfcd7b239) )
+	ROM_LOAD( "8",	  0x3000, 0x1000, CRC(157332c2) SHA1(3c66200c49641b9d876c5fa134dd2f0e80136beb) )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_FILL(				  0x0000, 0x1000, 0 ) /* filling the R-G bitplanes */
+	ROM_LOAD( "4",	  0x1000, 0x0800, CRC(1e1d4e33) SHA1(22831984489fdf712ca616c1af3c874a5b12b522) )    /* text layer */
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "1",	  0x0000, 0x0800, CRC(f2f94661) SHA1(f37f7c0dff680fd02897dae64e13e297d0fdb3e7) )    /* cards deck gfx, bitplane1 */
+	ROM_LOAD( "2",	  0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )    /* cards deck gfx, bitplane2 */
+	ROM_LOAD( "3",	  0x1000, 0x0800, CRC(6e3e9b1d) SHA1(14eb8d14ce16719a6ad7d13db01e47c8f05955f0) )    /* cards deck gfx, bitplane3 */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "tbp24sa10n.7d",		0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
+ROM_END
+
 
 /*********************************************
 *                Driver Init                 *
@@ -4009,4 +4047,4 @@ GAME(  198?, maverik,  0,        witchcrd, bsuerte,  0,        ROT0,   "<unknown
 GAMEL( 1989, brasil89, 0,        witchcrd, bsuerte,  0,        ROT0,   "<unknown>",                "Brasil 89",                               0,                layout_goldnpkr )
 GAME(  1991, poker91,  0,        witchcrd, poker91,  0,        ROT0,   "<unknown>",                "Poker 91",                                0 )
 GAME(  198?, genie,    0,        genie,    genie,    0,        ROT0,   "Video Fun Games Ltd.",     "Genie",                                   0 )
-
+GAMEL( 198?, superdbl, goldnpkr, goldnpkr, goldnpkr, 0,        ROT0,   "Karateco",                 "Super Double (French)",                   0,                layout_goldnpkr )

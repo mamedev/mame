@@ -9557,6 +9557,7 @@ Other Sun games
 	DRIVER( brasil89 )	/* 1989, Unknown */
 	DRIVER( poker91 )	/* 1991, Unknown */
 	DRIVER( genie )		/* (c) 198? Video Fun Games Ltd. */
+	DRIVER( superdbl )	/* 198? Karateco */
 
 	/* Cal Omega */
 	DRIVER( comg074 )	/* (c) 1981 Cal Omega Inc. */
