@@ -208,6 +208,7 @@ const game_driver * const drivers[] =
 	DRIVER( fantazia )	/* bootleg */
 	DRIVER( moonqsr )	/* (c) 1980 Nichibutsu */
 	DRIVER( mshuttle )	/* (c) 1981 Nichibutsu */
+	DRIVER( mshuttle2 )	/* (c) 1981 Nichibutsu */
 	DRIVER( mshuttlej )	/* (c) 1981 Nichibutsu */
 	DRIVER( mshuttlej2 )/* (c) 1981 Nichibutsu */
 	DRIVER( moonal2 )	/* [1980] Nichibutsu */
