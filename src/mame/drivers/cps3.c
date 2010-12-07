@@ -2590,7 +2590,7 @@ MACHINE_CONFIG_DERIVED( sfiii3, cps3 )
 	MDRV_FRAGMENT_ADD(simm6_128mbit)
 MACHINE_CONFIG_END
 
-MACHINE_CONFIG_DERIVED( warzard, cps3 )
+MACHINE_CONFIG_DERIVED( redearth, cps3 )
 	MDRV_FRAGMENT_ADD(simm1_64mbit)
 	MDRV_FRAGMENT_ADD(simm3_128mbit)
 	MDRV_FRAGMENT_ADD(simm4_128mbit)
@@ -2598,6 +2598,7 @@ MACHINE_CONFIG_DERIVED( warzard, cps3 )
 MACHINE_CONFIG_END
 
 
+/* CD sets - use CD BIOS roms */
 
 ROM_START( sfiii )
 	ROM_REGION32_BE( 0x080000, "user1", 0 ) /* bios region */
@@ -2649,7 +2650,7 @@ ROM_END
 
 ROM_START( redearth )
 	ROM_REGION32_BE( 0x080000, "user1", 0 ) /* bios region */
-	ROM_LOAD( "warzard_euro.29f400.u2", 0x000000, 0x080000, CRC(02e0f336) SHA1(acc37e830dfeb9674f5a0fb24f4cc23217ae4ff5) )
+	ROM_LOAD( "redearth_euro.29f400.u2", 0x000000, 0x080000, CRC(02e0f336) SHA1(acc37e830dfeb9674f5a0fb24f4cc23217ae4ff5) )
 
 	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "wzd000", 0, SHA1(e5676752b08283dc4a98c3d7b759e8aa6dcd0679) )
@@ -2665,13 +2666,29 @@ ROM_END
 
 ROM_START( jojo )
 	ROM_REGION32_BE( 0x080000, "user1", 0 ) /* bios region */
-	ROM_LOAD( "jojo_japan.29f400.u2", 0x000000, 0x080000, CRC(02778f60) SHA1(a167f9ebe030592a0cdb0c6a3c75835c6a43be4c) )
+	ROM_LOAD( "jojo_usa.29f400.u2", 0x000000, 0x080000, CRC(8d40f7be) SHA1(2a4bd83db2f959c33b071e517941aa55a0f919c0) )
 
 	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "cap-jjk-160", 0, SHA1(0f5c09171409213e191a607ee89ca3a91fe9c96a) )
 ROM_END
 
 ROM_START( jojoa )
+	ROM_REGION32_BE( 0x080000, "user1", 0 ) /* bios region */
+	ROM_LOAD( "jojo_usa.29f400.u2", 0x000000, 0x080000, CRC(8d40f7be) SHA1(2a4bd83db2f959c33b071e517941aa55a0f919c0) )
+
+	DISK_REGION( "cdrom" )
+	DISK_IMAGE_READONLY( "jjk000", 0, SHA1(09869f6d8c032b527e02d815749dc8fab1289e86) )
+ROM_END
+
+ROM_START( jojoj )
+	ROM_REGION32_BE( 0x080000, "user1", 0 ) /* bios region */
+	ROM_LOAD( "jojo_japan.29f400.u2", 0x000000, 0x080000, CRC(02778f60) SHA1(a167f9ebe030592a0cdb0c6a3c75835c6a43be4c) )
+
+	DISK_REGION( "cdrom" )
+	DISK_IMAGE_READONLY( "cap-jjk-160", 0, SHA1(0f5c09171409213e191a607ee89ca3a91fe9c96a) )
+ROM_END
+
+ROM_START( jojoaj )
 	ROM_REGION32_BE( 0x080000, "user1", 0 ) /* bios region */
 	ROM_LOAD( "jojo_japan.29f400.u2", 0x000000, 0x080000, CRC(02778f60) SHA1(a167f9ebe030592a0cdb0c6a3c75835c6a43be4c) )
 
@@ -2681,7 +2698,7 @@ ROM_END
 
 ROM_START( jojoba )
 	ROM_REGION32_BE( 0x080000, "user1", 0 ) /* bios region */
-	ROM_LOAD( "jojoba_japan.29f400.u2",  0x000000, 0x080000,  CRC(3085478c) SHA1(055eab1fc42816f370a44b17fd7e87ffcb10e8b7) )
+	ROM_LOAD( "jojoba_japan.29f400.u2", 0x000000, 0x080000, CRC(3085478c) SHA1(055eab1fc42816f370a44b17fd7e87ffcb10e8b7) )
 
 	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "jjm000", 0, SHA1(0678a0baeb853dcff1d230c14f0873cc9f143d7b) )
@@ -3199,7 +3216,7 @@ ROM_END
 
 ROM_START( jojobane )
 	ROM_REGION32_BE( 0x080000, "user1", 0 ) /* bios region */
-	ROM_LOAD( "jojoba_euro_nocd.29f400.u2", 0x000000, 0x080000,  CRC(1ee2d679) SHA1(9e129b454a376606b3f7e8aec64de425cf9c635c) )
+	ROM_LOAD( "jojoba_euro_nocd.29f400.u2", 0x000000, 0x080000, CRC(1ee2d679) SHA1(9e129b454a376606b3f7e8aec64de425cf9c635c) )
 
 	ROM_REGION( 0x200000, "simm1.0", 0 )
 	ROM_LOAD( "jojoban-simm1.0", 0x00000, 0x200000, CRC(76976231) SHA1(90adde7e5983ec6a4e02789d5cefe9e85c9c52d5) )
@@ -3270,7 +3287,6 @@ ROM_START( jojobane )
 	ROM_REGION( 0x200000, "simm5.7", 0 )
 	ROM_LOAD( "jojoban-simm5.7", 0x00000, 0x200000, CRC(8c8be520) SHA1(c461f3f76a83592b36b29afb316679a7c8972404) )
 ROM_END
-
 
 ROM_START( redeartn )
 	ROM_REGION32_BE( 0x080000, "user1", 0 ) /* bios region */
@@ -3468,40 +3484,31 @@ ROM_END
 *****************************************************************************************/
 
 
+/* todo: use BIOS for the bios roms, having clones only for CD / NO CD */
 
-/* todo: use BIOS for the bios roms, having clones only for CD / No CD */
+GAME( 1996, redearth, 0,        redearth, cps3, redearth, ROT0, "Capcom", "Red Earth (Euro 961121)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1996, warzard,  redearth, redearth, cps3, redearth, ROT0, "Capcom", "Warzard (Japan 961121)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1997, sfiii,    0,        sfiii,    cps3, sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (USA 970204)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1997, sfiiij,   sfiii,    sfiii,    cps3, sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (Japan 970204)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1997, sfiii2,   0,        sfiii2,   cps3, sfiii2,   ROT0, "Capcom", "Street Fighter III 2nd Impact: Giant Attack (USA 970930)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1997, sfiii2j,  sfiii2,   sfiii2,   cps3, sfiii2,   ROT0, "Capcom", "Street Fighter III 2nd Impact: Giant Attack (Japan 970930)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1998, jojo,     0,        jojo,     cps3, jojo,     ROT0, "Capcom", "JoJo's Venture (USA 990108)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1998, jojoa,    jojo,     jojo,     cps3, jojo,     ROT0, "Capcom", "JoJo's Venture (USA 981202)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1998, jojoj,    jojo,     jojo,     cps3, jojo,     ROT0, "Capcom", "JoJo no Kimyouna Bouken (Japan 990108)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1998, jojoaj,   jojo,     jojo,     cps3, jojo,     ROT0, "Capcom", "JoJo no Kimyouna Bouken (Japan 981202)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1999, sfiii3,   0,        sfiii3,   cps3, sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (USA 990608)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1999, sfiii3a,  sfiii3,   sfiii3,   cps3, sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (USA 990512)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1999, jojoba,   0,        jojoba,   cps3, jojoba,   ROT0, "Capcom", "JoJo no Kimyouna Bouken: Miraie no Isan (Japan 990913)", GAME_IMPERFECT_GRAPHICS )
 
-GAME( 1997, sfiii,   0,        sfiii,   cps3, sfiii,  ROT0,   "Capcom", "Street Fighter III: New Generation (USA, 970204)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1997, sfiiij,  sfiii,    sfiii,   cps3, sfiii,  ROT0,   "Capcom", "Street Fighter III: New Generation (Japan, 970204)", GAME_IMPERFECT_GRAPHICS )
+/* NO CD sets */
 
-GAME( 1997, sfiii2,  0,        sfiii2,  cps3, sfiii2, ROT0,   "Capcom", "Street Fighter III 2nd Impact: Giant Attack (USA, 970930)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1997, sfiii2j, sfiii2,   sfiii2,  cps3, sfiii2, ROT0,   "Capcom", "Street Fighter III 2nd Impact: Giant Attack (Japan, 970930)", GAME_IMPERFECT_GRAPHICS )
-
-GAME( 1999, sfiii3,  0,        sfiii3,  cps3, sfiii3, ROT0,   "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (USA, 990608)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1999, sfiii3a, sfiii3,   sfiii3,  cps3, sfiii3, ROT0,   "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (USA, 990512)", GAME_IMPERFECT_GRAPHICS )
-
-GAME( 1998, jojo,    0,        jojo,    cps3, jojo, ROT0,   "Capcom", "JoJo's Venture / JoJo no Kimyouna Bouken (Japan, 990108)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1998, jojoa,   jojo,     jojo,    cps3, jojo, ROT0,   "Capcom", "JoJo's Venture / JoJo no Kimyouna Bouken (Japan, 981202)", GAME_IMPERFECT_GRAPHICS )
-
-GAME( 1999, jojoba,  0,        jojoba,  cps3, jojoba, ROT0,   "Capcom", "JoJo's Bizarre Adventure: Heritage for the Future / JoJo no Kimyouna Bouken: Miraie no Isan (Japan, 990913)", GAME_IMPERFECT_GRAPHICS )
-
-GAME( 1996, redearth,0,        warzard, cps3, redearth, ROT0,   "Capcom", "Red Earth (Euro, 961121)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1996, warzard, redearth, warzard, cps3, redearth, ROT0,   "Capcom", "Warzard (Japan, 961121)", GAME_IMPERFECT_GRAPHICS )
-
-/* NO-CD sets */
-
-GAME( 1997, sfiiin,  sfiii,    sfiii,   cps3, sfiii, ROT0,   "Capcom", "Street Fighter III: New Generation (Asia, 970204, NO CD)", GAME_IMPERFECT_GRAPHICS )
-
-GAME( 1997, sfiii2n, sfiii2,   sfiii2,  cps3, sfiii2, ROT0,   "Capcom", "Street Fighter III 2nd Impact: Giant Attack (Asia, 970930, NO CD)", GAME_IMPERFECT_GRAPHICS )
-
-GAME( 1999, sfiii3n, sfiii3,   sfiii3,  cps3, sfiii3, ROT0,   "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (Japan, 990608, NO CD)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1999, sfiii3an,sfiii3,   sfiii3,  cps3, sfiii3, ROT0,   "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (Japan, 990512, NO CD)", GAME_IMPERFECT_GRAPHICS )
-
-GAME( 1998, jojon,   jojo,     jojo,    cps3, jojo, ROT0,   "Capcom", "JoJo's Venture / JoJo no Kimyouna Bouken (Asia, 990108, NO CD)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1998, jojoan,  jojo,     jojo,    cps3, jojo, ROT0,   "Capcom", "JoJo's Venture / JoJo no Kimyouna Bouken (Asia, 981202, NO CD)", GAME_IMPERFECT_GRAPHICS )
-
-GAME( 1999, jojoban, jojoba,   jojoba,  cps3, jojoba, ROT0,   "Capcom", "JoJo's Bizarre Adventure: Heritage for the Future / JoJo no Kimyouna Bouken: Miraie no Isan (Japan, 990913, NO CD)", GAME_IMPERFECT_GRAPHICS )
-GAME( 1999, jojobane,jojoba,   jojoba,  cps3, jojoba, ROT0,   "Capcom", "JoJo's Bizarre Adventure: Heritage for the Future / JoJo no Kimyouna Bouken: Miraie no Isan (Euro, 990913, NO CD)", GAME_IMPERFECT_GRAPHICS )
-
-// We don't have any actual warzard / red earth no cd bios sets, but keep this here anyway
-GAME( 1996, redeartn,redearth, warzard, cps3, redearth, ROT0,   "Capcom", "Red Earth (961121, NO CD)", GAME_NOT_WORKING )
+// We don't have any actual red earth / warzard NO CD bios sets, but keep this here anyway
+GAME( 1996, redeartn, redearth, redearth, cps3, redearth, ROT0, "Capcom", "Red Earth (961121, NO CD)", GAME_NOT_WORKING )
+GAME( 1997, sfiiin,   sfiii,    sfiii,    cps3, sfiii,    ROT0, "Capcom", "Street Fighter III: New Generation (Asia 970204, NO CD)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1997, sfiii2n,  sfiii2,   sfiii2,   cps3, sfiii2,   ROT0, "Capcom", "Street Fighter III 2nd Impact: Giant Attack (Asia 970930, NO CD)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1998, jojon,    jojo,     jojo,     cps3, jojo,     ROT0, "Capcom", "JoJo's Venture (Asia 990108, NO CD)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1998, jojoan,   jojo,     jojo,     cps3, jojo,     ROT0, "Capcom", "JoJo's Venture (Asia 981202, NO CD)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1999, sfiii3n,  sfiii3,   sfiii3,   cps3, sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (Japan 990608, NO CD)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1999, sfiii3an, sfiii3,   sfiii3,   cps3, sfiii3,   ROT0, "Capcom", "Street Fighter III 3rd Strike: Fight for the Future (Japan 990512, NO CD)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1999, jojoban,  jojoba,   jojoba,   cps3, jojoba,   ROT0, "Capcom", "JoJo no Kimyouna Bouken: Miraie no Isan (Japan 990913, NO CD)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1999, jojobane, jojoba,   jojoba,   cps3, jojoba,   ROT0, "Capcom", "JoJo's Bizarre Adventure (Euro 990913, NO CD)", GAME_IMPERFECT_GRAPHICS )

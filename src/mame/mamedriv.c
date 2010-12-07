@@ -2675,97 +2675,97 @@ V-V                           TP-027
 
 	/* Capcom CPS1 games */
 	DRIVER( forgottn )	/*  7/1988 (c) 1988 (World) */
-	DRIVER( forgottnu )	/*  7/1988 (c) 1988 (US) */
-	DRIVER( forgottnua )	/*  7/1988 (c) 1988 (US) */
+	DRIVER( forgottnu )	/*  7/1988 (c) 1988 (USA) */
+	DRIVER( forgottnua )	/*  7/1988 (c) 1988 (USA) */
 	DRIVER( lostwrld )	/*  7/1988 (c) 1988 (Japan) */
 	DRIVER( lostwrldo )	/*  7/1988 (c) 1988 (Japan) */
 	DRIVER( ghouls )	/* 12/1988 (c) 1988 (World) */
-	DRIVER( ghoulsu )	/* 12/1988 (c) 1988 (US) */
+	DRIVER( ghoulsu )	/* 12/1988 (c) 1988 (USA) */
 	DRIVER( daimakai )	/* 12/1988 (c) 1988 (Japan) */
 	DRIVER( daimakair )	/* 12/1988 (c) 1988 (Japan) */
-	DRIVER( strider )	/*  3/1989 (c) 1989 (not explicitly stated but should be US) */
-	DRIVER( striderua )	/*  3/1989 (c) 1989 (not explicitly stated but should be US) */
-	DRIVER( striderj )	/*  3/1989 (c) 1989 */
-	DRIVER( striderjr )	/*  3/1989 (c) 1989 */
-	DRIVER( dynwar )	/*  4/1989 (c) 1989 (US) */
-	DRIVER( dynwara )	/*  4/1989 (c) 1989 (US) */
+	DRIVER( strider )	/*  3/1989 (c) 1989 (not explicitly stated but should be USA) */
+	DRIVER( striderua )	/*  3/1989 (c) 1989 (not explicitly stated but should be USA) */
+	DRIVER( striderj )	/*  3/1989 (c) 1989 (Japan) */
+	DRIVER( striderjr )	/*  3/1989 (c) 1989 (Japan) */
+	DRIVER( dynwar )	/*  4/1989 (c) 1989 (USA) */
+	DRIVER( dynwara )	/*  4/1989 (c) 1989 (USA) */
 	DRIVER( dynwarj )	/*  4/1989 (c) 1989 (Japan) */
-	DRIVER( willow )	/*  6/1989 (c) 1989 (US) */
+	DRIVER( willow )	/*  6/1989 (c) 1989 (USA) */
 	DRIVER( willowj )	/*  6/1989 (c) 1989 (Japan) */
 	DRIVER( willowje )	/*  6/1989 (c) 1989 (Japan) */
-	DRIVER( unsquad )	/*  8/1989 (c) 1989 */
-	DRIVER( area88 )	/*  8/1989 (c) 1989 */
-	DRIVER( area88r )	/*  8/1989 (c) 1989 */
-	DRIVER( ffight )	/* 12/1989 (c) (World) */
-	DRIVER( ffightu )	/* 12/1989 (c) (US)    */
-	DRIVER( ffightua )	/* 12/1989 (c) (US)    */
-	DRIVER( ffightub )	/* 12/1989 (c) (US)    */
-	DRIVER( ffightj )	/* 12/1989 (c) (Japan) */
-	DRIVER( ffightj1 )	/* 12/1989 (c) (Japan) */
-	DRIVER( ffightj2 )	/* 12/1989 (c) (Japan) */
+	DRIVER( unsquad )	/*  8/1989 (c) 1989 (USA) */
+	DRIVER( area88 )	/*  8/1989 (c) 1989 (Japan) */
+	DRIVER( area88r )	/*  8/1989 (c) 1989 (Japan) */
+	DRIVER( ffight )	/* 12/1989 (c) 1989 (World) */
+	DRIVER( ffightu )	/* 12/1989 (c) 1989 (USA) */
+	DRIVER( ffightua )	/* 12/01/1990 (c) 1989 (USA) */
+	DRIVER( ffightub )	/* 13/06/1990 (c) 1989 (USA) */
+	DRIVER( ffightj )	/* 12/1989 (c) 1989 (Japan) */
+	DRIVER( ffightj1 )	/* 12/01/1990 (c) 1989 (Japan) */
+	DRIVER( ffightj2 )	/* 05/03/1990 (c) 1989 (Japan) */
 	DRIVER( ffightjh )	/* hack */
-	DRIVER( 1941 )		/*  2/1990 (c) 1990 (World) */
-	DRIVER( 1941j )		/*  2/1990 (c) 1990 (Japan) */
-	DRIVER( mercs )		/* 02/03/1990 (c) 1990 (World) */
-	DRIVER( mercsu )	/* 08/06/1990 (c) 1990 (US)    */
-	DRIVER( mercsur1 )	/* 02/03/1990 (c) 1990 (US)    */
+	DRIVER( 1941 )	/*  2/1990 (c) 1990 (World) */
+	DRIVER( 1941j )	/*  2/1990 (c) 1990 (Japan) */
+	DRIVER( mercs )	/* 02/03/1990 (c) 1990 (World) */
+	DRIVER( mercsu )	/* 08/06/1990 (c) 1990 (USA) */
+	DRIVER( mercsur1 )	/* 02/03/1990 (c) 1990 (USA) */
 	DRIVER( mercsj )	/* 02/03/1990 (c) 1990 (Japan) */
 	DRIVER( mtwins )	/* 19/06/1990 (c) 1990 (World) */
 	DRIVER( chikij )	/* 19/06/1990 (c) 1990 (Japan) */
 	DRIVER( msword )	/* 25/07/1990 (c) 1990 (World) */
 	DRIVER( mswordr1 )	/* 23/06/1990 (c) 1990 (World) */
-	DRIVER( mswordu )	/* 25/07/1990 (c) 1990 (US)    */
+	DRIVER( mswordu )	/* 25/07/1990 (c) 1990 (USA) */
 	DRIVER( mswordj )	/* 23/06/1990 (c) 1990 (Japan) */
 	DRIVER( cawing )	/* 12/10/1990 (c) 1990 (World) */
 	DRIVER( cawingr1 )	/* 09/10/1990 (c) 1990 (World) */
-	DRIVER( cawingu )	/* 12/10/1990 (c) 1990 (US) */
+	DRIVER( cawingu )	/* 12/10/1990 (c) 1990 (USA) */
 	DRIVER( cawingj )	/* 12/10/1990 (c) 1990 (Japan) */
-	DRIVER( nemo )		/* 30/11/1990 (c) 1990 (World) */
-	DRIVER( nemoj )		/* 20/11/1990 (c) 1990 (Japan) */
-	DRIVER( sf2 )		/* 22/05/1991 (c) 1991 (World) */
-	DRIVER( sf2eb )		/* 14/02/1991 (c) 1991 (World) */
-	DRIVER( sf2ee )		/* 28/02/1991 (c) 1991 (World) */
+	DRIVER( nemo )	/* 30/11/1990 (c) 1990 (World) */
+	DRIVER( nemoj )	/* 20/11/1990 (c) 1990 (Japan) */
+	DRIVER( sf2 )	/* 22/05/1991 (c) 1991 (World) */
+	DRIVER( sf2eb )	/* 14/02/1991 (c) 1991 (World) */
+	DRIVER( sf2ee )	/* 28/02/1991 (c) 1991 (World) */
 	DRIVER( sf2ebbl )	/* 14/02/1991 (c) 1991 (World, bootleg) */
-	DRIVER( sf2ua )		/* 06/02/1991 (c) 1991 (US)    */
-	DRIVER( sf2ub )		/* 14/02/1991 (c) 1991 (US)    */
-	DRIVER( sf2ud )		/* 18/03/1991 (c) 1991 (US)    */
-	DRIVER( sf2ue )		/* 28/02/1991 (c) 1991 (US)    */
-	DRIVER( sf2uf )		/* 11/04/1991 (c) 1991 (US)    */
-	DRIVER( sf2ui )		/* 22/05/1991 (c) 1991 (US)    */
-	DRIVER( sf2uk )		/* 01/11/1991 (c) 1991 (US)    */
-	DRIVER( sf2j )		/* 10/12/1991 (c) 1991 (Japan) */
-	DRIVER( sf2ja )		/* 14/02/1991 (c) 1991 (Japan) */
-	DRIVER( sf2jc )		/* 06/03/1991 (c) 1991 (Japan) */
+	DRIVER( sf2ua )	/* 06/02/1991 (c) 1991 (USA) */
+	DRIVER( sf2ub )	/* 14/02/1991 (c) 1991 (USA) */
+	DRIVER( sf2ud )	/* 18/03/1991 (c) 1991 (USA) */
+	DRIVER( sf2ue )	/* 28/02/1991 (c) 1991 (USA) */
+	DRIVER( sf2uf )	/* 11/04/1991 (c) 1991 (USA) */
+	DRIVER( sf2ui )	/* 22/05/1991 (c) 1991 (USA) */
+	DRIVER( sf2uk )	/* 01/11/1991 (c) 1991 (USA) */
+	DRIVER( sf2j )	/* 10/12/1991 (c) 1991 (Japan) */
+	DRIVER( sf2ja )	/* 14/02/1991 (c) 1991 (Japan) */
+	DRIVER( sf2jc )	/* 06/03/1991 (c) 1991 (Japan) */
 	DRIVER( sf2qp1 )	/* hack */
 	DRIVER( sf2thndr )	/* hack */
 	DRIVER( 3wonders )	/* 20/05/1991 (c) 1991 (World) */
-	DRIVER( 3wondersu )	/* 20/05/1991 (c) 1991 (US)    */
+	DRIVER( 3wondersu )	/* 20/05/1991 (c) 1991 (USA) */
 	DRIVER( wonder3 )	/* 20/05/1991 (c) 1991 (Japan) */
 	DRIVER( 3wondersh )	/* hack */
-	DRIVER( kod )		/* 05/08/1991 (c) 1991 (World) */
-	DRIVER( kodr1 )		/* 11/07/1991 (c) 1991 (World) */
-	DRIVER( kodu )		/* 10/09/1991 (c) 1991 (US)    */
-	DRIVER( kodj )		/* 05/08/1991 (c) 1991 (Japan) */
-	DRIVER( kodja )		/* 05/08/1991 (c) 1991 (Japan) */
-	DRIVER( kodb )		/* bootleg */
+	DRIVER( kod )	/* 05/08/1991 (c) 1991 (World) */
+	DRIVER( kodr1 )	/* 11/07/1991 (c) 1991 (World) */
+	DRIVER( kodu )	/* 10/09/1991 (c) 1991 (USA) */
+	DRIVER( kodj )	/* 05/08/1991 (c) 1991 (Japan) */
+	DRIVER( kodja )	/* 05/08/1991 (c) 1991 (Japan) */
+	DRIVER( kodb )	/* bootleg */
 	DRIVER( captcomm )	/* 02/12/1991 (c) 1991 (World) */
 	DRIVER( captcommr1 )	/* 14/10/1991 (c) 1991 (World) */
-	DRIVER( captcommu )	/* 28/ 9/1991 (c) 1991 (US)    */
+	DRIVER( captcommu )	/* 28/09/1991 (c) 1991 (USA) */
 	DRIVER( captcommj )	/* 02/12/1991 (c) 1991 (Japan) */
-	DRIVER( captcommjr1 )	/* 28/ 9/1991 (c) 1991 (Japan) */
+	DRIVER( captcommjr1 )	/* 28/09/1991 (c) 1991 (Japan) */
 	DRIVER( captcommb )	/* bootleg */
 	DRIVER( knights )	/* 27/11/1991 (c) 1991 (World) */
-	DRIVER( knightsu )	/* 27/11/1991 (c) 1991 (US)    */
+	DRIVER( knightsu )	/* 27/11/1991 (c) 1991 (USA) */
 	DRIVER( knightsj )	/* 27/11/1991 (c) 1991 (Japan) */
 	DRIVER( knightsja )	/* 27/11/1991 (c) 1991 (Japan) */
 	DRIVER( knightsb )	/* bootleg */
-	DRIVER( sf2ce )		/* 13/05/1992 (c) 1992 (World) */
+	DRIVER( sf2ce )	/* 13/05/1992 (c) 1992 (World) */
 	DRIVER( sf2ceea )	/* 13/03/1992 (c) 1992 (World) */
-	DRIVER( sf2ceua )	/* 13/03/1992 (c) 1992 (US)    */
-	DRIVER( sf2ceub )	/* 13/05/1992 (c) 1992 (US)    */
-	DRIVER( sf2ceuc )	/* 03/08/1992 (c) 1992 (US)    */
+	DRIVER( sf2ceua )	/* 13/03/1992 (c) 1992 (USA) */
+	DRIVER( sf2ceub )	/* 13/05/1992 (c) 1992 (USA) */
+	DRIVER( sf2ceuc )	/* 03/08/1992 (c) 1992 (USA) */
 	DRIVER( sf2cej )	/* 13/05/1992 (c) 1992 (Japan) */
-	DRIVER( sf2rb )		/* hack */
+	DRIVER( sf2rb )	/* hack */
 	DRIVER( sf2rb2 )	/* hack */
 	DRIVER( sf2rb3 )	/* hack */
 	DRIVER( sf2red )	/* hack */
@@ -2773,56 +2773,57 @@ V-V                           TP-027
 	DRIVER( sf2acc )	/* hack */
 	DRIVER( sf2accp2 )	/* hack */
 	DRIVER( sf2dkot2 )	/* hack */
-	DRIVER( sf2m1 )		/* hack */
-	DRIVER( sf2m2 )		/* hack */
-	DRIVER( sf2m3 )		/* hack */
-	DRIVER( sf2m4 )		/* hack */
-	DRIVER( sf2m5 )		/* hack */
-	DRIVER( sf2m6 )		/* hack */
-	DRIVER( sf2m7 )		/* hack */
+	DRIVER( sf2m1 )	/* hack */
+	DRIVER( sf2m2 )	/* hack */
+	DRIVER( sf2m3 )	/* hack */
+	DRIVER( sf2m4 )	/* hack */
+	DRIVER( sf2m5 )	/* hack */
+	DRIVER( sf2m6 )	/* hack */
+	DRIVER( sf2m7 )	/* hack */
 	DRIVER( sf2yyc )	/* hack */
 	DRIVER( sf2koryu )	/* hack */
 	DRIVER( sf2mdt )	/* bootleg */
-	DRIVER( varth )		/* 14/07/1992 (c) 1992 (World) */
+	DRIVER( cworld2j )	/* 11/06/1992 (c) 1992 (Japan) */
+	DRIVER( varth )	/* 14/07/1992 (c) 1992 (World) */
 	DRIVER( varthr1 )	/* 12/06/1992 (c) 1992 (World) */
-	DRIVER( varthu )	/* 12/06/1992 (c) 1992 (US) */
+	DRIVER( varthu )	/* 12/06/1992 (c) 1992 (USA) */
 	DRIVER( varthj )	/* 14/07/1992 (c) 1992 (Japan) */
-	DRIVER( cworld2j )	/* 11/06/1992 (QUIZ 5) (c) 1992 (Japan) */
-	DRIVER( wof )		/* 02/10/1992 (c) 1992 (World) (CPS1 + QSound) */
-	DRIVER( wofa )		/* 05/10/1992 (c) 1992 (Asia)  (CPS1 + QSound) */
-	DRIVER( wofu )		/* 31/10/1992 (c) 1992 (US) (CPS1 + QSound) */
-	DRIVER( wofj )		/* 31/10/1992 (c) 1992 (Japan) (CPS1 + QSound) */
+	DRIVER( qad )	/* 01/07/1992 (c) 1992 (USA) */
+	DRIVER( qadj )	/* 21/09/1994 (c) 1994 (Japan) */
+	DRIVER( wof )	/* 02/10/1992 (c) 1992 (World) (CPS1 + QSound) */
+	DRIVER( wofu )	/* 31/10/1992 (c) 1992 (USA) (CPS1 + QSound) */
+	DRIVER( wofa )	/* 05/10/1992 (c) 1992 (Asia)  (CPS1 + QSound) */
+	DRIVER( wofj )	/* 31/10/1992 (c) 1992 (Japan) (CPS1 + QSound) */
 	DRIVER( wofhfh )	/* bootleg */
-	DRIVER( sf2hf )		/* 09/12/1992 (c) 1992 (World) */
-	DRIVER( sf2hfu )	/* 09/12/1992 (c) 1992 (US)    */
+	DRIVER( sf2hf )	/* 09/12/1992 (c) 1992 (World) */
+	DRIVER( sf2hfu )	/* 09/12/1992 (c) 1992 (USA) */
 	DRIVER( sf2hfj )	/* 09/12/1992 (c) 1992 (Japan) */
-	DRIVER( dino )		/* 01/02/1993 (c) 1993 (World) (CPS1 + QSound) */
-	DRIVER( dinou )		/* 01/02/1993 (c) 1993 (US)    (CPS1 + QSound) */
-	DRIVER( dinoj )		/* 01/02/1993 (c) 1993 (Japan) (CPS1 + QSound) */
+	DRIVER( dino )	/* 01/02/1993 (c) 1993 (World) (CPS1 + QSound) */
+	DRIVER( dinou )	/* 01/02/1993 (c) 1993 (USA) (CPS1 + QSound) */
+	DRIVER( dinoj )	/* 01/02/1993 (c) 1993 (Japan) (CPS1 + QSound) */
 	DRIVER( dinopic )	/* bootleg */
 	DRIVER( dinopic2 )	/* bootleg */
 	DRIVER( dinohunt )	/* bootleg */
 	DRIVER( punisher )	/* 22/04/1993 (c) 1993 (World) (CPS1 + QSound) */
-	DRIVER( punisheru )	/* 22/04/1993 (c) 1993 (US)    (CPS1 + QSound) */
+	DRIVER( punisheru )	/* 22/04/1993 (c) 1993 (USA) (CPS1 + QSound) */
 	DRIVER( punisherj )	/* 22/04/1993 (c) 1993 (Japan) (CPS1 + QSound) */
 	DRIVER( punipic )	/* bootleg */
 	DRIVER( punipic2 )	/* bootleg */
 	DRIVER( punipic3 )	/* bootleg */
 	DRIVER( punisherbz )	/* bootleg */
 	DRIVER( slammast )	/* 13/07/1993 (c) 1993 (World) (CPS1 + QSound) */
-	DRIVER( slammastu )	/* 13/07/1993 (c) 1993 (US)    (CPS1 + QSound) */
+	DRIVER( slammastu )	/* 13/07/1993 (c) 1993 (USA) (CPS1 + QSound) */
 	DRIVER( mbomberj )	/* 13/07/1993 (c) 1993 (Japan) (CPS1 + QSound) */
 	DRIVER( mbombrd )	/* 06/12/1993 (c) 1993 (World) (CPS1 + QSound) */
 	DRIVER( mbombrdj )	/* 06/12/1993 (c) 1993 (Japan) (CPS1 + QSound) */
+						/* 1994 Ken Sei Mogura (not listed on Capcom's site) */
 	DRIVER( pnickj )	/* 08/06/1994 (c) 1994 Compile + Capcom license (Japan) not listed on Capcom's site */
-	DRIVER( qad )		/* 01/07/1992 (c) 1992 (US)    */
-	DRIVER( qadj )		/* 21/09/1994 (c) 1994 (Japan) */
 	DRIVER( qtono2j )	/* 23/01/1995 (c) 1995 (Japan) */
-	DRIVER( pang3 )		/* 01/06/1995 (c) 1995 Mitchell (Euro) not listed on Capcom's site */
+	DRIVER( pang3 )	/* 01/06/1995 (c) 1995 Mitchell (Euro) not listed on Capcom's site */
 	DRIVER( pang3n )	/* 11/05/1995 (c) 1995 Mitchell (Euro) not listed on Capcom's site */
 	DRIVER( pang3j )	/* 11/05/1995 (c) 1995 Mitchell (Japan) not listed on Capcom's site */
-	DRIVER( megaman )	/* 06/10/1995 (c) 1995 (US)  */
-	DRIVER( megamana )	/* 06/10/1995 (c) 1995 (Asia)  */
+	DRIVER( megaman )	/* 06/10/1995 (c) 1995 (USA) */
+	DRIVER( megamana )	/* 06/10/1995 (c) 1995 (Asia) */
 	DRIVER( rockmanj )	/* 22/09/1995 (c) 1995 (Japan) */
 
 	DRIVER( fcrash )	/* bootleg of Final Fight */
@@ -2830,27 +2831,27 @@ V-V                           TP-027
 	/* Capcom CPS2 games */
 	/* list completed by CPS2Shock */
 	/* http://cps2shock.retrogames.com */
-	DRIVER( ssf2 )		/* 11/09/1993 (c) 1993 (World) */
-	DRIVER( ssf2u )		/* 11/09/1993 (c) 1993 (US) */
-	DRIVER( ssf2a )		/* 05/10/1993 (c) 1993 (Asia) */
+	DRIVER( ssf2 )	/* 11/09/1993 (c) 1993 (World) */
+	DRIVER( ssf2u )	/* 11/09/1993 (c) 1993 (USA) */
+	DRIVER( ssf2a )	/* 05/10/1993 (c) 1993 (Asia) */
 	DRIVER( ssf2ar1 )	/* 14/09/1993 (c) 1993 (Asia) */
-	DRIVER( ssf2j )		/* 05/10/1993 (c) 1993 (Japan) */
+	DRIVER( ssf2j )	/* 05/10/1993 (c) 1993 (Japan) */
 	DRIVER( ssf2jr1 )	/* 11/09/1993 (c) 1993 (Japan) */
 	DRIVER( ssf2jr2 )	/* 10/09/1993 (c) 1993 (Japan) */
-	DRIVER( ssf2h )		/* 11/09/1993 (c) 1993 (Hispanic) */
+	DRIVER( ssf2h )	/* 11/09/1993 (c) 1993 (Hispanic) */
 	DRIVER( ssf2tb )	/* 11/19/1993 (c) 1993 (World) */
 	DRIVER( ssf2tbr1 )	/* 11/09/1993 (c) 1993 (World) */
 	DRIVER( ssf2tbj )	/* 11/09/1993 (c) 1993 (Japan) */
-	DRIVER( ecofghtr )	/* 03/12/1993 (c) 1993 (World) */
-	DRIVER( ecofghtru )	/* 15/02/1994 (c) 1993 (US) */
-	DRIVER( ecofghtru1 )/* 03/12/1993 (c) 1993 (US) */
-	DRIVER( ecofghtra )	/* 03/12/1993 (c) 1993 (Asia) */
-	DRIVER( ecofghtrh )	/* 03/12/1993 (c) 1993 (Hispanic) */
-	DRIVER( uecology )	/* 03/12/1993 (c) 1993 (Japan) */
-	DRIVER( ddtod )		/* 12/04/1994 (c) 1993 (Euro) */
+	DRIVER( ecofghtr )	/* 03/12/1993 (c) 1994 (World) */
+	DRIVER( ecofghtru )	/* 15/02/1994 (c) 1994 (USA) */
+	DRIVER( ecofghtru1 )	/* 03/12/1993 (c) 1994 (USA) */
+	DRIVER( ecofghtra )	/* 03/12/1993 (c) 1994 (Asia) */
+	DRIVER( ecofghtrh )	/* 03/12/1993 (c) 1994 (Hispanic) */
+	DRIVER( uecology )	/* 03/12/1993 (c) 1994 (Japan) */
+	DRIVER( ddtod )	/* 12/04/1994 (c) 1993 (Euro) */
 	DRIVER( ddtodr1 )	/* 13/01/1994 (c) 1993 (Euro) */
-	DRIVER( ddtodu )	/* 25/01/1994 (c) 1993 (US) */
-	DRIVER( ddtodur1 )	/* 13/01/1994 (c) 1993 (US) */
+	DRIVER( ddtodu )	/* 25/01/1994 (c) 1993 (USA) */
+	DRIVER( ddtodur1 )	/* 13/01/1994 (c) 1993 (USA) */
 	DRIVER( ddtodj )	/* 12/04/1994 (c) 1993 (Japan) */
 	DRIVER( ddtodjr1 )	/* 25/01/1994 (c) 1993 (Japan) */
 	DRIVER( ddtodjr2 )	/* 13/01/1994 (c) 1993 (Japan) */
@@ -2858,23 +2859,23 @@ V-V                           TP-027
 	DRIVER( ddtodh )	/* 12/04/1994 (c) 1993 (Hispanic) */
 	DRIVER( ddtodhr1 )	/* 25/01/1994 (c) 1993 (Hispanic) */
 	DRIVER( ddtodhr2 )	/* 13/01/1994 (c) 1993 (Hispanic) */
-	DRIVER( ssf2t )		/* 23/02/1994 (c) 1994 (World) */
-	DRIVER( ssf2tu )	/* 23/03/1994 (c) 1994 (US) */
-	DRIVER( ssf2tur1 )	/* 23/02/1994 (c) 1994 (US) */
+	DRIVER( ssf2t )	/* 23/02/1994 (c) 1994 (World) */
+	DRIVER( ssf2tu )	/* 23/03/1994 (c) 1994 (USA) */
+	DRIVER( ssf2tur1 )	/* 23/02/1994 (c) 1994 (USA) */
 	DRIVER( ssf2ta )	/* 23/02/1994 (c) 1994 (Asia) */
 	DRIVER( ssf2xj )	/* 23/02/1994 (c) 1994 (Japan) */
-	DRIVER( avsp )		/* 20/05/1994 (c) 1994 (Euro) */
-	DRIVER( avspu )		/* 20/05/1994 (c) 1994 (US) */
-	DRIVER( avspj )		/* 20/05/1994 (c) 1994 (Japan) */
-	DRIVER( avspa )		/* 20/05/1994 (c) 1994 (Asia) */
-	DRIVER( avsph )		/* 20/05/1994 (c) 1994 (Hispanic) */
-						/*    06/1994? Galum Pa! (not listed on Capcom's site) */
-	DRIVER( dstlk )		/* 05/07/1994 (c) 1994 (Euro) */
-	DRIVER( dstlku )	/* 18/08/1994 (c) 1994 (US) */
-	DRIVER( dstlkur1 )	/* 05/07/1994 (c) 1994 (US) */
+	DRIVER( avsp )	/* 20/05/1994 (c) 1994 (Euro) */
+	DRIVER( avspu )	/* 20/05/1994 (c) 1994 (USA) */
+	DRIVER( avspj )	/* 20/05/1994 (c) 1994 (Japan) */
+	DRIVER( avspa )	/* 20/05/1994 (c) 1994 (Asia) */
+	DRIVER( avsph )	/* 20/05/1994 (c) 1994 (Hispanic) */
+						/* 06/1994? Galum Pa! (not listed on Capcom's site) */
+	DRIVER( dstlk )	/* 05/07/1994 (c) 1994 (Euro) */
+	DRIVER( dstlku )	/* 18/08/1994 (c) 1994 (USA) */
+	DRIVER( dstlkur1 )	/* 05/07/1994 (c) 1994 (USA) */
 	DRIVER( dstlka )	/* 05/07/1994 (c) 1994 (Asia) */
 	DRIVER( dstlkh )	/* 18/08/1994 (c) 1994 (Hispanic) */
-	DRIVER( vampj )		/* 05/07/1994 (c) 1994 (Japan) */
+	DRIVER( vampj )	/* 05/07/1994 (c) 1994 (Japan) */
 	DRIVER( vampja )	/* 05/07/1994 (c) 1994 (Japan) */
 	DRIVER( vampjr1 )	/* 30/06/1994 (c) 1994 (Japan) */
 	DRIVER( ringdest )	/* 02/09/1994 (c) 1994 (Euro) */
@@ -2882,13 +2883,13 @@ V-V                           TP-027
 	DRIVER( smbombr1 )	/* 08/08/1994 (c) 1994 (Japan) */
 	DRIVER( armwar )	/* 24/10/1994 (c) 1994 (Euro) */
 	DRIVER( armwarr1 )	/* 11/10/1994 (c) 1994 (Euro) */
-	DRIVER( armwaru )	/* 24/10/1994 (c) 1994 (US) */
-	DRIVER( armwaru1 )	/* 20/09/1994 (c) 1994 (US) */
-	DRIVER( pgear )		/* 24/10/1994 (c) 1994 (Japan) */
+	DRIVER( armwaru )	/* 24/10/1994 (c) 1994 (USA) */
+	DRIVER( armwaru1 )	/* 20/09/1994 (c) 1994 (USA) */
+	DRIVER( pgear )	/* 24/10/1994 (c) 1994 (Japan) */
 	DRIVER( pgearr1 )	/* 16/09/1994 (c) 1994 (Japan) */
 	DRIVER( armwara )	/* 20/09/1994 (c) 1994 (Asia) */
 	DRIVER( xmcota )	/* 05/01/1995 (c) 1994 (Euro) */
-	DRIVER( xmcotau )	/* 05/01/1995 (c) 1994 (US) */
+	DRIVER( xmcotau )	/* 05/01/1995 (c) 1994 (USA) */
 	DRIVER( xmcotah )	/* 31/03/1995 (c) 1994 (Hispanic) */
 	DRIVER( xmcotahr1 )	/* 05/01/1995 (c) 1994 (Hispanic) */
 	DRIVER( xmcotaj )	/* 05/01/1995 (c) 1994 (Japan) */
@@ -2898,8 +2899,8 @@ V-V                           TP-027
 	DRIVER( xmcotaa )	/* 05/01/1995 (c) 1994 (Asia) */
 	DRIVER( xmcotaar1 )	/* 17/12/1994 (c) 1994 (Asia) */
 	DRIVER( xmcotajr )	/* 08/12/1994 (c) 1994 (Japan Rent) */
-	DRIVER( nwarr )		/* 16/03/1995 (c) 1995 (Euro) */
-	DRIVER( nwarru )	/* 06/04/1995 (c) 1995 (US) */
+	DRIVER( nwarr )	/* 16/03/1995 (c) 1995 (Euro) */
+	DRIVER( nwarru )	/* 06/04/1995 (c) 1995 (USA) */
 	DRIVER( nwarrh )	/* 03/04/1995 (c) 1995 (Hispanic) */
 	DRIVER( nwarrb )	/* 03/04/1995 (c) 1995 (Brazil) */
 	DRIVER( nwarra )	/* 02/03/1995 (c) 1995 (Asia) */
@@ -2907,61 +2908,60 @@ V-V                           TP-027
 	DRIVER( vhuntjr1 )	/* 07/03/1995 (c) 1995 (Japan) */
 	DRIVER( vhuntjr2 )	/* 02/03/1995 (c) 1995 (Japan) */
 	DRIVER( cybots )	/* 24/04/1995 (c) 1995 (Euro) */
-	DRIVER( cybotsu )	/* 24/04/1995 (c) 1995 (US) */
+	DRIVER( cybotsu )	/* 24/04/1995 (c) 1995 (USA) */
 	DRIVER( cybotsj )	/* 20/04/1995 (c) 1995 (Japan) */
-	DRIVER( sfa )		/* 27/07/1995 (c) 1995 (Euro) */
-	DRIVER( sfar1 )		/* 18/07/1995 (c) 1995 (Euro) */
-	DRIVER( sfar2 )		/* 27/06/1995 (c) 1995 (Euro) */
-	DRIVER( sfar3 )		/* 05/06/1995 (c) 1995 (Euro) */
-	DRIVER( sfau )		/* 27/06/1995 (c) 1995 (US) */
-	DRIVER( sfza )		/* 27/06/1995 (c) 1995 (Asia) */
-	DRIVER( sfzj )		/* 27/07/1995 (c) 1995 (Japan) */
+	DRIVER( sfa )	/* 27/07/1995 (c) 1995 (Euro) */
+	DRIVER( sfar1 )	/* 18/07/1995 (c) 1995 (Euro) */
+	DRIVER( sfar2 )	/* 27/06/1995 (c) 1995 (Euro) */
+	DRIVER( sfar3 )	/* 05/06/1995 (c) 1995 (Euro) */
+	DRIVER( sfau )	/* 27/06/1995 (c) 1995 (USA) */
+	DRIVER( sfza )	/* 27/06/1995 (c) 1995 (Asia) */
+	DRIVER( sfzj )	/* 27/07/1995 (c) 1995 (Japan) */
 	DRIVER( sfzjr1 )	/* 27/06/1995 (c) 1995 (Japan) */
 	DRIVER( sfzjr2 )	/* 05/06/1995 (c) 1995 (Japan) */
-	DRIVER( sfzh )		/* 18/07/1995 (c) 1995 (Hispanic) */
+	DRIVER( sfzh )	/* 18/07/1995 (c) 1995 (Hispanic) */
 	DRIVER( sfzhr1 )	/* 27/06/1995 (c) 1995 (Hispanic) */
-	DRIVER( sfzb )		/* 09/11/1995 (c) 1995 (Brazil) */
+	DRIVER( sfzb )	/* 09/11/1995 (c) 1995 (Brazil) */
 	DRIVER( sfzbr1 )	/* 27/07/1995 (c) 1995 (Brazil) */
 	DRIVER( mmancp2u )	/* 06/10/1995 (c) 1995 (Japan) */
 	DRIVER( rmancp2j )	/* 22/09/1995 (c) 1995 (Japan) */
-	DRIVER( msh )		/* 24/10/1995 (c) 1995 (Euro) */
-	DRIVER( mshu )		/* 24/10/1995 (c) 1995 (US) */
-	DRIVER( mshj )		/* 17/11/1995 (c) 1995 (Japan) */
+	DRIVER( msh )	/* 24/10/1995 (c) 1995 (Euro) */
+	DRIVER( mshu )	/* 24/10/1995 (c) 1995 (USA) */
+	DRIVER( mshj )	/* 17/11/1995 (c) 1995 (Japan) */
 	DRIVER( mshjr1 )	/* 24/10/1995 (c) 1995 (Japan) */
-	DRIVER( msha )		/* 24/10/1995 (c) 1995 (Asia) */
-	DRIVER( mshh )		/* 17/11/1995 (c) 1996 (Hispanic) */
-	DRIVER( mshb )		/* 17/11/1995 (c) 1996 (Brazil) */
-	DRIVER( 19xx )		/* 07/12/1995 (c) 1996 (US) */
-	DRIVER( 19xxj )		/* 25/12/1995 (c) 1996 (Japan) */
+	DRIVER( msha )	/* 24/10/1995 (c) 1995 (Asia) */
+	DRIVER( mshh )	/* 17/11/1995 (c) 1995 (Hispanic) */
+	DRIVER( mshb )	/* 17/11/1995 (c) 1995 (Brazil) */
+	DRIVER( 19xx )	/* 07/12/1995 (c) 1996 (USA) */
+	DRIVER( 19xxj )	/* 25/12/1995 (c) 1996 (Japan) */
 	DRIVER( 19xxjr1 )	/* 07/12/1995 (c) 1996 (Japan) */
-	DRIVER( 19xxa )		/* 07/12/1995 (c) 1996 (Asia) */
-	DRIVER( 19xxh )		/* 18/12/1995 (c) 1996 (Hispanic) */
-	DRIVER( 19xxb )		/* 18/12/1995 (c) 1996 (Brazil) */
-	DRIVER( ddsom )		/* 19/06/1996 (c) 1996 (Euro) */
+	DRIVER( 19xxa )	/* 07/12/1995 (c) 1996 (Asia) */
+	DRIVER( 19xxh )	/* 18/12/1995 (c) 1996 (Hispanic) */
+	DRIVER( 19xxb )	/* 18/12/1995 (c) 1996 (Brazil) */
+	DRIVER( ddsom )	/* 19/06/1996 (c) 1996 (Euro) */
 	DRIVER( ddsomr1 )	/* 23/02/1996 (c) 1996 (Euro) */
 	DRIVER( ddsomr2 )	/* 09/02/1996 (c) 1996 (Euro) */
 	DRIVER( ddsomr3 )	/* 08/02/1996 (c) 1996 (Euro) */
-	DRIVER( ddsomu )	/* 19/06/1996 (c) 1996 (US) */
-	DRIVER( ddsomur1 )	/* 09/02/1996 (c) 1996 (US) */
+	DRIVER( ddsomu )	/* 19/06/1996 (c) 1996 (USA) */
+	DRIVER( ddsomur1 )	/* 09/02/1996 (c) 1996 (USA) */
 	DRIVER( ddsomjr1 )	/* 06/02/1996 (c) 1996 (Japan) */
 	DRIVER( ddsomj )	/* 19/06/1996 (c) 1996 (Japan) */
 	DRIVER( ddsoma )	/* 19/06/1996 (c) 1996 (Asia) */
 	DRIVER( ddsomh )	/* 23/02/1996 (c) 1996 (Hispanic) */
 	DRIVER( ddsomb )	/* 23/02/1996 (c) 1996 (Brazil) */
-	DRIVER( sfa2 )		/* 06/03/1996 (c) 1996 (Euro) */
-	DRIVER( sfa2u )		/* 06/03/1996 (c) 1996 (US) */
-	DRIVER( sfz2j )		/* 27/02/1996 (c) 1996 (Japan) */
-	DRIVER( sfz2a )		/* 27/02/1996 (c) 1996 (Asia) */
-	DRIVER( sfz2b )		/* 31/05/1996 (c) 1996 (Brazil) */
+	DRIVER( sfa2 )	/* 06/03/1996 (c) 1996 (Euro) */
+	DRIVER( sfa2u )	/* 06/03/1996 (c) 1996 (USA) */
+	DRIVER( sfz2j )	/* 27/02/1996 (c) 1996 (Japan) */
+	DRIVER( sfz2a )	/* 27/02/1996 (c) 1996 (Asia) */
+	DRIVER( sfz2b )	/* 31/05/1996 (c) 1996 (Brazil) */
 	DRIVER( sfz2br1 )	/* 04/03/1996 (c) 1996 (Brazil) */
-	DRIVER( sfz2h )		/* 04/03/1996 (c) 1996 (Hispanic) */
-	DRIVER( sfz2n )		/* 29/02/1996 (c) 1996 (Oceania) */
-	DRIVER( spf2t )		/* 20/06/1996 (c) 1996 (US) */
+	DRIVER( sfz2h )	/* 04/03/1996 (c) 1996 (Hispanic) */
+	DRIVER( sfz2n )	/* 29/02/1996 (c) 1996 (Oceania) */
+	DRIVER( spf2t )	/* 20/06/1996 (c) 1996 (USA) */
 	DRIVER( spf2xj )	/* 31/05/1996 (c) 1996 (Japan) */
 	DRIVER( spf2ta )	/* 29/05/1996 (c) 1996 (Asia) */
 	DRIVER( spf2th )	/* 31/05/1996 (c) 1996 (Hispanic) */
-	DRIVER( qndream )	/* 26/06/1996 (c) 1996 (Japan) */
-	DRIVER( megaman2 )	/* 08/07/1996 (c) 1996 (US) */
+	DRIVER( megaman2 )	/* 08/07/1996 (c) 1996 (USA) */
 	DRIVER( megaman2a )	/* 08/07/1996 (c) 1996 (Asia) */
 	DRIVER( rockman2j )	/* 08/07/1996 (c) 1996 (Japan) */
 	DRIVER( megaman2h )	/* 12/07/1996 (c) 1996 (Hispanic) */
@@ -2970,10 +2970,11 @@ V-V                           TP-027
 	DRIVER( sfz2alj )	/* 05/08/1996 (c) 1996 (Japan) */
 	DRIVER( sfz2alh )	/* 13/08/1996 (c) 1996 (Hispanic) */
 	DRIVER( sfz2alb )	/* 13/08/1996 (c) 1996 (Brazil) */
-	DRIVER( xmvsf )		/* 04/10/1996 (c) 1996 (Euro) */
+	DRIVER( qndream )	/* 26/08/1996 (c) 1996 (Japan) */
+	DRIVER( xmvsf )	/* 04/10/1996 (c) 1996 (Euro) */
 	DRIVER( xmvsfr1 )	/* 10/09/1996 (c) 1996 (Euro) */
-	DRIVER( xmvsfu )	/* 23/10/1996 (c) 1996 (US) */
-	DRIVER( xmvsfur1 )	/* 04/10/1996 (c) 1996 (US) */
+	DRIVER( xmvsfu )	/* 23/10/1996 (c) 1996 (USA) */
+	DRIVER( xmvsfur1 )	/* 04/10/1996 (c) 1996 (USA) */
 	DRIVER( xmvsfj )	/* 04/10/1996 (c) 1996 (Japan) */
 	DRIVER( xmvsfjr1 )	/* 10/09/1996 (c) 1996 (Japan) */
 	DRIVER( xmvsfjr2 )	/* 09/09/1996 (c) 1996 (Japan) */
@@ -2985,14 +2986,14 @@ V-V                           TP-027
 	DRIVER( batcir )	/* 19/03/1997 (c) 1997 (Euro) */
 	DRIVER( batcirj )	/* 19/03/1997 (c) 1997 (Japan) */
 	DRIVER( batcira )	/* 19/03/1997 (c) 1997 (Asia) */
-	DRIVER( vsav )		/* 19/05/1997 (c) 1997 (Euro) */
-	DRIVER( vsavu )		/* 19/05/1997 (c) 1997 (US) */
-	DRIVER( vsavj )		/* 19/05/1997 (c) 1997 (Japan) */
-	DRIVER( vsava )		/* 19/05/1997 (c) 1997 (Asia) */
-	DRIVER( vsavh )		/* 19/05/1997 (c) 1997 (Hispanic) */
+	DRIVER( vsav )	/* 19/05/1997 (c) 1997 (Euro) */
+	DRIVER( vsavu )	/* 19/05/1997 (c) 1997 (USA) */
+	DRIVER( vsavj )	/* 19/05/1997 (c) 1997 (Japan) */
+	DRIVER( vsava )	/* 19/05/1997 (c) 1997 (Asia) */
+	DRIVER( vsavh )	/* 19/05/1997 (c) 1997 (Hispanic) */
 	DRIVER( mshvsf )	/* 25/06/1997 (c) 1997 (Euro) */
-	DRIVER( mshvsfu )	/* 27/08/1997 (c) 1997 (US) */
-	DRIVER( mshvsfu1 )	/* 25/06/1997 (c) 1997 (US) */
+	DRIVER( mshvsfu )	/* 27/08/1997 (c) 1997 (USA) */
+	DRIVER( mshvsfu1 )	/* 25/06/1997 (c) 1997 (USA) */
 	DRIVER( mshvsfj )	/* 07/07/1997 (c) 1997 (Japan) */
 	DRIVER( mshvsfj1 )	/* 02/07/1997 (c) 1997 (Japan) */
 	DRIVER( mshvsfj2 )	/* 25/06/1997 (c) 1997 (Japan) */
@@ -3006,59 +3007,59 @@ V-V                           TP-027
 	DRIVER( csclubj )	/* 22/07/1997 (c) 1997 (Japan) */
 	DRIVER( cscluba )	/* 22/07/1997 (c) 1997 (Asia) */
 	DRIVER( csclubh )	/* 22/07/1997 (c) 1997 (Hispanic) */
-	DRIVER( sgemf )		/* 04/09/1997 (c) 1997 (US) */
+	DRIVER( sgemf )	/* 04/09/1997 (c) 1997 (USA) */
 	DRIVER( pfghtj )	/* 04/09/1997 (c) 1997 (Japan) */
 	DRIVER( sgemfa )	/* 04/09/1997 (c) 1997 (Asia) */
 	DRIVER( sgemfh )	/* 04/09/1997 (c) 1997 (Hispanic) */
 	DRIVER( vhunt2r1 )	/* 13/09/1997 (c) 1997 (Japan) */
 	DRIVER( vhunt2 )	/* 29/09/1997 (c) 1997 (Japan) */
-	DRIVER( vsav2 )		/* 13/09/1997 (c) 1997 (Japan) */
-	DRIVER( mvsc )		/* 23/01/1998 (c) 1998 (Euro) */
+	DRIVER( vsav2 )	/* 13/09/1997 (c) 1997 (Japan) */
+	DRIVER( mvsc )	/* 23/01/1998 (c) 1998 (Euro) */
 	DRIVER( mvscr1 )	/* 12/01/1998 (c) 1998 (Euro) */
-	DRIVER( mvscu )		/* 23/01/1998 (c) 1998 (US) */
-	DRIVER( mvscur1 )	/* 23/01/1998 (c) 1998 (US) */
-	DRIVER( mvscj )		/* 23/01/1998 (c) 1998 (Japan) */
+	DRIVER( mvscu )	/* 23/01/1998 (c) 1998 (USA) */
+	DRIVER( mvscur1 )	/* 23/01/1998 (c) 1998 (USA) */
+	DRIVER( mvscj )	/* 23/01/1998 (c) 1998 (Japan) */
 	DRIVER( mvscjr1 )	/* 12/01/1998 (c) 1998 (Japan) */
-	DRIVER( mvsca )		/* 23/01/1998 (c) 1998 (Asia) */
+	DRIVER( mvsca )	/* 23/01/1998 (c) 1998 (Asia) */
 	DRIVER( mvscar1 )	/* 12/01/1998 (c) 1998 (Asia) */
-	DRIVER( mvsch )		/* 23/01/1998 (c) 1998 (Hispanic) */
-	DRIVER( mvscb )		/* 23/01/1998 (c) 1998 (Brazil) */
-	DRIVER( sfa3 )		/* 04/09/1998 (c) 1998 (US) */
-	DRIVER( sfa3u )		/* 04/09/1998 (c) 1998 (US) */
-	DRIVER( sfa3ur1 )	/* 29/06/1998 (c) 1998 (US) */
-	DRIVER( sfa3h )		/* 29/06/1998 (c) 1998 (Hispanic) */
-	DRIVER( sfa3b )		/* 29/06/1998 (c) 1998 (Brazil) */
-	DRIVER( sfz3j )		/* 04/09/1998 (c) 1998 (Japan) */
+	DRIVER( mvsch )	/* 23/01/1998 (c) 1998 (Hispanic) */
+	DRIVER( mvscb )	/* 23/01/1998 (c) 1998 (Brazil) */
+	DRIVER( sfa3 )	/* 04/09/1998 (c) 1998 (USA) */
+	DRIVER( sfa3u )	/* 04/09/1998 (c) 1998 (USA) */
+	DRIVER( sfa3ur1 )	/* 29/06/1998 (c) 1998 (USA) */
+	DRIVER( sfa3h )	/* 29/06/1998 (c) 1998 (Hispanic) */
+	DRIVER( sfa3b )	/* 29/06/1998 (c) 1998 (Brazil) */
+	DRIVER( sfz3j )	/* 04/09/1998 (c) 1998 (Japan) */
 	DRIVER( sfz3jr1 )	/* 27/07/1998 (c) 1998 (Japan) */
 	DRIVER( sfz3jr2 )	/* 29/06/1998 (c) 1998 (Japan) */
-	DRIVER( sfz3a )		/* 04/09/1998 (c) 1998 (Asia) */
+	DRIVER( sfz3a )	/* 04/09/1998 (c) 1998 (Asia) */
 	DRIVER( sfz3ar1 )	/* 01/07/1998 (c) 1998 (Asia) */
-	DRIVER( gigawing )	/* 22/02/1999 (c) 1999 Takumi (US) */
+	DRIVER( gigawing )	/* 22/02/1999 (c) 1999 Takumi (USA) */
 	DRIVER( gigawingj )	/* 23/02/1999 (c) 1999 Takumi (Japan) */
 	DRIVER( gigawinga )	/* 22/02/1999 (c) 1999 Takumi (Asia) */
 	DRIVER( gigawingh )	/* 22/02/1999 (c) 1999 Takumi (Hispanic) */
 	DRIVER( gigawingb )	/* 22/02/1999 (c) 1999 Takumi (Brazil) */
 	DRIVER( jyangoku )	/* 27/05/1999 (c) 1999 (Japan) */
-	DRIVER( dimahoo )	/* 21/01/2000 (c) 2000 Eighting/Raizing (US) */
-	DRIVER( dimahoou )	/* 21/01/2000 (c) 2000 Eighting/Raizing (US) */
+	DRIVER( dimahoo )	/* 21/01/2000 (c) 2000 Eighting/Raizing (USA) */
+	DRIVER( dimahoou )	/* 21/01/2000 (c) 2000 Eighting/Raizing (USA) */
 	DRIVER( gmahou )	/* 21/01/2000 (c) 2000 Eighting/Raizing (Japan) */
-	DRIVER( mmatrix )	/* 12/04/2000 (c) 2000 Takumi (US) */
+	DRIVER( mmatrix )	/* 12/04/2000 (c) 2000 Takumi (USA) */
 	DRIVER( mmatrixj )	/* 12/04/2000 (c) 2000 Takumi (Japan) */
-	DRIVER( 1944 )		/* 20/06/2000 (c) 2000 Eighting/Raizing (US) */
-	DRIVER( 1944j )		/* 20/06/2000 (c) 2000 Eighting/Raizing (Japan) */
-	DRIVER( mpang )		/* 10/10/2000 (c) 2000 Mitchell (Euro) */
+	DRIVER( 1944 )	/* 20/06/2000 (c) 2000 Eighting/Raizing (USA) */
+	DRIVER( 1944j )	/* 20/06/2000 (c) 2000 Eighting/Raizing (Japan) */
+	DRIVER( mpang )	/* 10/10/2000 (c) 2000 Mitchell (Euro) */
 	DRIVER( mpangr1 )	/* 25/09/2000 (c) 2000 Mitchell (Euro) */
-	DRIVER( mpangu )	/* 10/10/2000 (c) 2000 Mitchell (US) */
+	DRIVER( mpangu )	/* 10/10/2000 (c) 2000 Mitchell (USA) */
 	DRIVER( mpangj )	/* 11/10/2000 (c) 2000 Mitchell (Japan) */
-	DRIVER( progear )	/* 17/01/2001 (c) 2001 Cave (US) */
+	DRIVER( progear )	/* 17/01/2001 (c) 2001 Cave (USA) */
 	DRIVER( progearj )	/* 17/01/2001 (c) 2001 Cave (Japan) */
 	DRIVER( progeara )	/* 17/01/2001 (c) 2001 Cave (Asia) */
 	DRIVER( pzloop2 )	/* 02/03/2001 (c) 2001 Mitchell (Euro) */
 	DRIVER( pzloop2j )	/* 05/02/2001 (c) 2001 Mitchell (Japan) */
-	DRIVER( choko )		/* 20/08/2001 (c) 2001 Mitchell (Japan) */
-	DRIVER( hsf2 )		/* 02/02/2004 (c) 2004 Hyper Street Fighter 2 (USA) */
-	DRIVER( hsf2j )		/* 22/12/2003 (c) 2003 Hyper Street Fighter 2 (Japan) */
-	DRIVER( hsf2a )		/* 02/02/2004 (c) 2004 Hyper Street Fighter 2 (Asia) */
+	DRIVER( choko )	/* 20/08/2001 (c) 2001 Mitchell (Japan) */
+	DRIVER( hsf2 )	/* 02/02/2004 (c) 2003, 2004 (USA) */
+	DRIVER( hsf2j )	/* 22/12/2003 (c) 2003, 2004 (Japan) */
+	DRIVER( hsf2a )	/* 02/02/2004 (c) 2003, 2004 (Asia) */
 
 	/* CPS2 'Phoenix' bootlegs */
 	DRIVER( ssf2ud )
@@ -3104,28 +3105,30 @@ V-V                           TP-027
 	DRIVER( mshvsfu1d )
 	DRIVER( sfz3jr2d )
 
-	 /* Capcom CPS3 games */
-	DRIVER( sfiii )		/* 04/02/1997 (c) 1997 Capcom */
-	DRIVER( sfiiij )	/* 04/02/1997 (c) 1997 Capcom */
-	DRIVER( sfiii2 )	/* 30/09/1997 (c) 1997 Capcom */
-	DRIVER( sfiii2j )	/* 30/09/1997 (c) 1997 Capcom */
-	DRIVER( sfiii3 )	/* 08/06/1999 (c) 1999 Capcom */
-	DRIVER( sfiii3a )	/* 12/05/1999 (c) 1999 Capcom */
-	DRIVER( jojo )		/* 08/01/1999 (c) 1998 Capcom */
-	DRIVER( jojoa )		/* 02/12/1998 (c) 1998 Capcom */
-	DRIVER( jojoba )	/* 13/09/1999 (c) 1999 Capcom */
-	DRIVER( redearth )	/* 21/11/1996 (c) 1996 Capcom */
-	DRIVER( warzard )	/* 21/11/1996 (c) 1996 Capcom */
+	/* Capcom CPS3 games */
+	DRIVER( redearth )	/* 21/11/1996 (c) 1996 (Euro) */
+	DRIVER( warzard )	/* 21/11/1996 (c) 1996 (Japan) */
+	DRIVER( sfiii )	/* 04/02/1997 (c) 1997 (USA) */
+	DRIVER( sfiiij )	/* 04/02/1997 (c) 1997 (Japan) */
+	DRIVER( sfiii2 )	/* 30/09/1997 (c) 1997 (USA) */
+	DRIVER( sfiii2j )	/* 30/09/1997 (c) 1997 (Japan) */
+	DRIVER( jojo )	/* 08/01/1999 (c) 1998 (USA) */
+	DRIVER( jojoa )	/* 02/12/1998 (c) 1998 (USA) */
+	DRIVER( jojoj )	/* 08/01/1999 (c) 1998 (Japan) */
+	DRIVER( jojoaj )	/* 02/12/1998 (c) 1998 (Japan) */
+	DRIVER( sfiii3 )	/* 08/06/1999 (c) 1999 (USA) */
+	DRIVER( sfiii3a )	/* 12/05/1999 (c) 1999 (USA) */
+	DRIVER( jojoba )	/* 13/09/1999 (c) 1999 (Japan) */
 
-	DRIVER( sfiiin )	/* 04/02/1997 (c) 1997 Capcom */
-	DRIVER( sfiii2n )	/* 30/09/1997 (c) 1997 Capcom */
-	DRIVER( sfiii3n )	/* 08/06/1999 (c) 1999 Capcom */
-	DRIVER( sfiii3an )	/* 12/05/1999 (c) 1999 Capcom */
-	DRIVER( jojon )		/* 08/01/1999 (c) 1998 Capcom */
-	DRIVER( jojoan )	/* 02/12/1998 (c) 1998 Capcom */
-	DRIVER( jojoban )	/* 13/09/1999 (c) 1999 Capcom */
-	DRIVER( jojobane )	/* 13/09/1999 (c) 1999 Capcom */
-	DRIVER( redeartn )	/* 21/11/1996 (c) 1996 Capcom */
+	DRIVER( redeartn )	/* 21/11/1996 (c) 1996 (?) */
+	DRIVER( sfiiin )	/* 04/02/1997 (c) 1997 (Asia) */
+	DRIVER( sfiii2n )	/* 30/09/1997 (c) 1997 (Asia) */
+	DRIVER( jojon )	/* 08/01/1999 (c) 1998 (Asia) */
+	DRIVER( jojoan )	/* 02/12/1998 (c) 1998 (Asia) */
+	DRIVER( sfiii3n )	/* 08/06/1999 (c) 1999 (Japan) */
+	DRIVER( sfiii3an )	/* 12/05/1999 (c) 1999 (Japan) */
+	DRIVER( jojoban )	/* 13/09/1999 (c) 1999 (Japan) */
+	DRIVER( jojobane )	/* 13/09/1999 (c) 1999 (Euro) */
 
 	/* Capcom ZN1 */
 	DRIVER( cpzn1 )
