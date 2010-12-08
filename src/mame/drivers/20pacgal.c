@@ -186,6 +186,24 @@ static STATE_POSTLOAD( postload_20pacgal )
  *
  *************************************/
 
+static WRITE8_HANDLER( sprite_gfx_w )
+{
+	_20pacgal_state *state = space->machine->driver_data<_20pacgal_state>();
+	state->sprite_gfx_ram[offset] = data;
+}
+
+static WRITE8_HANDLER( sprite_ram_w )
+{
+	_20pacgal_state *state = space->machine->driver_data<_20pacgal_state>();
+	state->sprite_ram[offset] = data;
+}
+
+static WRITE8_HANDLER( sprite_lookup_w )
+{
+	_20pacgal_state *state = space->machine->driver_data<_20pacgal_state>();
+	state->sprite_color_lookup[offset] = data;
+}
+
 static ADDRESS_MAP_START( 20pacgal_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x00000, 0x03fff) AM_ROM
 	AM_RANGE(0x04000, 0x07fff) AM_ROM
@@ -199,10 +217,10 @@ static ADDRESS_MAP_START( 20pacgal_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x46000, 0x46fff) AM_WRITEONLY AM_BASE_MEMBER(_20pacgal_state, char_gfx_ram)
 	AM_RANGE(0x47100, 0x47100) AM_RAM	/* leftover from original Galaga code */
 	AM_RANGE(0x48000, 0x49fff) AM_READ_BANK("bank1") AM_WRITE(ram_48000_w)	/* this should be a mirror of 08000-09ffff */
-	AM_RANGE(0x4c000, 0x4dfff) AM_WRITEONLY AM_BASE_MEMBER(_20pacgal_state, sprite_gfx_ram)
-	AM_RANGE(0x4e000, 0x4e17f) AM_WRITEONLY AM_BASE_MEMBER(_20pacgal_state, sprite_ram)
-	AM_RANGE(0x4e180, 0x4feff) AM_NOP
-	AM_RANGE(0x4ff00, 0x4ffff) AM_WRITEONLY AM_BASE_MEMBER(_20pacgal_state, sprite_color_lookup)
+	AM_RANGE(0x4c000, 0x4dfff) AM_WRITE(sprite_gfx_w)
+	AM_RANGE(0x4e000, 0x4e17f) AM_WRITE(sprite_ram_w)
+	AM_RANGE(0x4e180, 0x4feff) AM_WRITENOP
+	AM_RANGE(0x4ff00, 0x4ffff) AM_WRITE(sprite_lookup_w)
 ADDRESS_MAP_END
 
 
