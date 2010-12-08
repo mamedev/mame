@@ -345,9 +345,9 @@ VIDEO_START( pgm )
 	state->tx_tilemap = tilemap_create(machine, get_pgm_tx_tilemap_tile_info, tilemap_scan_rows, 8, 8, 64, 32);
 	tilemap_set_transparent_pen(state->tx_tilemap, 15);
 
-	state->bg_tilemap = tilemap_create(machine, get_pgm_bg_tilemap_tile_info, tilemap_scan_rows, 32, 32, 64, 64);
+	state->bg_tilemap = tilemap_create(machine, get_pgm_bg_tilemap_tile_info, tilemap_scan_rows, 32, 32, 64, 16);
 	tilemap_set_transparent_pen(state->bg_tilemap, 31);
-	tilemap_set_scroll_rows(state->bg_tilemap, 64 * 32);
+	tilemap_set_scroll_rows(state->bg_tilemap, 16 * 32);
 
 	state->tmppgmbitmap = auto_bitmap_alloc(machine, 448, 224, BITMAP_FORMAT_RGB32);
 
@@ -378,7 +378,7 @@ VIDEO_UPDATE( pgm )
 	tilemap_set_scrolly(state->bg_tilemap,0, state->videoregs[0x2000/2]);
 
 	for (y = 0; y < 224; y++)
-		tilemap_set_scrollx(state->bg_tilemap, (y + state->videoregs[0x2000 / 2]) & 0x7ff, state->videoregs[0x3000 / 2] + state->rowscrollram[y]);
+		tilemap_set_scrollx(state->bg_tilemap, (y + state->videoregs[0x2000 / 2]) & 0x1ff, state->videoregs[0x3000 / 2] + state->rowscrollram[y]);
 
 	{
 		int y, x;
