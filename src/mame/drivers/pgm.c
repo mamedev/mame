@@ -691,7 +691,10 @@ static ADDRESS_MAP_START( cavepgm_mem, ADDRESS_SPACE_PROGRAM, 16)
 
 	AM_RANGE(0x700006, 0x700007) AM_WRITENOP // Watchdog?
 
-	AM_RANGE(0x800000, 0x81ffff) AM_RAM AM_MIRROR(0x0e0000) AM_BASE(&pgm_mainram) AM_SHARE("sram") /* Main Ram */
+//	AM_RANGE(0x800000, 0x81ffff) AM_RAM AM_MIRROR(0x0e0000) AM_BASE(&pgm_mainram) AM_SHARE("sram") /* Main Ram */
+	AM_RANGE(0x800000, 0x81ffff) AM_RAM AM_BASE(&pgm_mainram) AM_SHARE("sram") /* Main Ram */
+	/* 0x880000 - 0x89ffff seems to be protection related, maybe they just happen to access protection results
+	   via a mirror tho. */
 
 	AM_RANGE(0x900000, 0x907fff) AM_MIRROR(0x0f8000) AM_RAM_WRITE(pgm_videoram_w) AM_BASE_MEMBER(pgm_state, videoram) /* IGS023 VIDEO CHIP */
 	AM_RANGE(0xa00000, 0xa011ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
@@ -1837,6 +1840,24 @@ ROM_START( drgw2 )
 	PGM_AUDIO_BIOS
 ROM_END
 
+ROM_START( dw2v100x )
+	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code  */
+	PGM_68K_BIOS
+	ROM_LOAD16_WORD_SWAP( "dragonv100x.bin",    0x100000, 0x080000,  CRC(5e71851d) SHA1(62052469f69daec88efd26652c1b893d6f981912) )
+
+	ROM_REGION( 0x800000, "tiles",  0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	PGM_VIDEO_BIOS
+	ROM_LOAD( "pgmt0200.u7",    0x400000, 0x400000, CRC(b0f6534d) SHA1(174cacd81169a0e0d14790ac06d03caed737e05d) )
+
+	ROM_REGION( 0x400000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_LOAD( "pgma0200.u5",    0x0000000, 0x400000, CRC(13b95069) SHA1(4888b06002afb18eab81c010e9362629045767af) )
+
+	ROM_REGION( 0x400000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_LOAD( "pgmb0200.u9",    0x0000000, 0x400000, CRC(932d0f13) SHA1(4b8e008f9c617cb2b95effeb81abc065b30e5c86) )
+
+	ROM_REGION( 0x400000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
+	PGM_AUDIO_BIOS
+ROM_END
 
 ROM_START( drgw2c )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code  */
@@ -4288,6 +4309,16 @@ static DRIVER_INIT( drgw2 )
 	mem16[0x1311ce / 2] = 0x4e93;
 }
 
+static DRIVER_INIT( dw2v100x )
+{	
+	UINT16 *mem16 = (UINT16 *)memory_region(machine, "maincpu");
+	drgwld2_common_init(machine);
+
+	mem16[0x131084 / 2] = 0x4e93;
+	mem16[(0x131084+0xa6) / 2] = 0x4e93;
+	mem16[(0x131084+0x136) / 2] = 0x4e93;
+}
+
 static DRIVER_INIT( drgw2c )
 {
 	UINT16 *mem16 = (UINT16 *)memory_region(machine, "maincpu");
@@ -5487,8 +5518,7 @@ static READ16_HANDLER( ddp3_asic_r )
 		realkey |= valuekey;
 		d ^= realkey;
 
-//		return d;
-		return d & 0xff; // hack, keeps it going a bit longer
+		return d;
 
 	}
 	else if (offset == 1)
@@ -5503,19 +5533,32 @@ static READ16_HANDLER( ddp3_asic_r )
 	return 0xffff;
 }
 
+static READ16_HANDLER( ddp3_ram_mirror_r )
+{
+	// HACK!
+	// this should be a mirror of main ram, at least according to the standard PGM map.
+	// returning 0x0000 for all values read from here allows the games to run for a bit longer tho
+	printf("%06x ddp3_ram_mirror_r would return %04x returning 0x0000 instead\n", cpu_get_pc(space->cpu), pgm_mainram[offset]);
+	return 0x0000;
+	//return pgm_mainram[offset];
+}
+
 void install_asic27a_ddp3(running_machine* machine)
 {
 	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x500000, 0x500005, 0, 0, ddp3_asic_r, ddp3_asic_w);
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x880000, 0x89ffff, 0, 0, ddp3_ram_mirror_r);
 }
 
 void install_asic27a_ket(running_machine* machine)
 {
 	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400000, 0x400005, 0, 0, ddp3_asic_r, ddp3_asic_w);
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x880000, 0x89ffff, 0, 0, ddp3_ram_mirror_r);
 }
 
 void install_asic27a_espgal(running_machine* machine)
 {
 	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400000, 0x400005, 0, 0, ddp3_asic_r, ddp3_asic_w);
+	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x880000, 0x89ffff, 0, 0, ddp3_ram_mirror_r);
 }
 
 
@@ -5559,6 +5602,7 @@ GAME( 1997, orlegend111c, orlegend,  pgm,     pgm,      orlegend,   ROT0,   "IGS
 GAME( 1997, orlegend105k, orlegend,  pgm,     orld105k, orlegend,   ROT0,   "IGS", "Oriental Legend / Xi You Shi E Zhuan (ver. 105, Korean Board)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )  // V0000 no date!          - runs as Korea
 
 GAME( 1997, drgw2,        pgm,       drgw2,   pgm,      drgw2,      ROT0,   "IGS", "Dragon World II (ver. 110X, Export)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // This set still has protection issues!
+GAME( 1997, dw2v100x,     drgw2,     drgw2,   pgm,      dw2v100x,   ROT0,   "IGS", "Dragon World II (ver. 100X, Export)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // This set still has protection issues!
 GAME( 1997, drgw2j,       drgw2,     drgw2,   pgm,      drgw2j,     ROT0,   "IGS", "Chuugokuryuu II (ver. 100J, Japan)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // This set still has protection issues!
 GAME( 1997, drgw2c,       drgw2,     drgw2,   pgm,      drgw2c,     ROT0,   "IGS", "Zhong Guo Long II (ver. 100C, China)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 

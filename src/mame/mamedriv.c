@@ -8546,6 +8546,7 @@ Other Sun games
 	DRIVER( orlegend111c )	/* (c) 1997 */
 	DRIVER( orlegend105k )	/* (c) 1997 */
 	DRIVER( drgw2 )			/* (c) 1997 */
+	DRIVER( dw2v100x )		/* (c) 1997 */
 	DRIVER( drgw2c )		/* (c) 1997 */
 	DRIVER( drgw2j )		/* (c) 1997 */
 	DRIVER( drgw3 )			/* (c) 1998 */
