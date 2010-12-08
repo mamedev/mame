@@ -137,7 +137,7 @@ file_error osd_open(const char *path, UINT32 openflags, osd_file **file, UINT64 
 	}
 
 	(*file)->type = SDLFILE_FILE;
-            
+
 	// convert the path into something compatible
 	dst = (*file)->filename;
 	for (src = path; *src != 0; src++)
@@ -275,7 +275,7 @@ error:
 file_error osd_read(osd_file *file, void *buffer, UINT64 offset, UINT32 count, UINT32 *actual)
 {
 	ssize_t result;
-   
+
    switch (file->type)
    {
       case SDLFILE_FILE:
@@ -299,15 +299,15 @@ file_error osd_read(osd_file *file, void *buffer, UINT64 offset, UINT32 count, U
 
          return FILERR_NONE;
          break;
-         
+
       case SDLFILE_SOCKET:
          return sdl_read_socket(file, buffer, offset, count, actual);
          break;
-         
+
       case SDLFILE_PTTY:
          return sdl_read_ptty(file, buffer, offset, count, actual);
          break;
-      
+
       default:
          return FILERR_FAILURE;
     }
@@ -338,21 +338,21 @@ file_error osd_write(osd_file *file, const void *buffer, UINT64 offset, UINT32 c
 #else
 #error Unknown SDL SUBARCH!
 #endif
-   		return error_to_file_error(errno);
+		return error_to_file_error(errno);
 
          if (actual != NULL)
             *actual = result;
          return FILERR_NONE;
          break;
-         
+
       case SDLFILE_SOCKET:
          return sdl_write_socket(file, buffer, offset, count, actual);
          break;
-         
+
       case SDLFILE_PTTY:
          return sdl_write_ptty(file, buffer, offset, count, actual);
          break;
-      
+
       default:
          return FILERR_FAILURE;
     }
@@ -377,11 +377,11 @@ file_error osd_close(osd_file *file)
       case SDLFILE_SOCKET:
          return sdl_close_socket(file);
          break;
-         
+
       case SDLFILE_PTTY:
          return sdl_close_ptty(file);
          break;
-      
+
       default:
          return FILERR_FAILURE;
     }

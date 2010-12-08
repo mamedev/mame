@@ -110,10 +110,10 @@ void pmmu_atc_add(m68ki_cpu_core *m68k, UINT32 logical, UINT32 physical, int fc)
 {
 	int i, found;
 
-  	// get page size (i.e. # of bits to ignore); is 10 for Apollo
- 	int ps = (m68k->mmu_tc >> 20) & 0xf;
- 	// Note: exact emulation would use (logical >> ps) << (ps-8)
- 	UINT32 atc_tag = M68K_MMU_ATC_VALID | ((fc &7) << 24)| logical >> ps;
+	// get page size (i.e. # of bits to ignore); is 10 for Apollo
+	int ps = (m68k->mmu_tc >> 20) & 0xf;
+	// Note: exact emulation would use (logical >> ps) << (ps-8)
+	UINT32 atc_tag = M68K_MMU_ATC_VALID | ((fc &7) << 24)| logical >> ps;
 
 	// first see if this is already in the cache
 	for (i = 0; i < MMU_ATC_ENTRIES; i++)
@@ -191,7 +191,7 @@ INLINE UINT32 get_dt2_table_entry(m68ki_cpu_core *m68k, UINT32 tptr, UINT8 ptest
 			// set used and modified
 			m68k->program->write_dword( tptr, tbl_entry | M68K_MMU_DF_USED | M68K_MMU_DF_MODIFIED);
 		}
-		else if (!(tbl_entry & M68K_MMU_DF_USED)) 
+		else if (!(tbl_entry & M68K_MMU_DF_USED))
 		{
 			m68k->program->write_dword( tptr, tbl_entry | M68K_MMU_DF_USED);
 		}
@@ -214,7 +214,7 @@ INLINE UINT32 get_dt3_table_entry(m68ki_cpu_core *m68k, UINT32 tptr, UINT8 ptest
 		{
 			// set modified
 			m68k->program->write_dword( tptr, tbl_entry2 | M68K_MMU_DF_USED | M68K_MMU_DF_MODIFIED);
-		} 
+		}
 		else if (!(tbl_entry2 & M68K_MMU_DF_USED))
 		{
 			m68k->program->write_dword( tptr, tbl_entry2 | M68K_MMU_DF_USED);
@@ -236,8 +236,8 @@ INLINE UINT32 get_dt3_table_entry(m68ki_cpu_core *m68k, UINT32 tptr, UINT8 ptest
 	UINT32 atc_tag;
 //  int verbose = 0;
 
-//	static UINT32 pmmu_access_count = 0;
-//	static UINT32 pmmu_atc_count = 0;
+//  static UINT32 pmmu_access_count = 0;
+//  static UINT32 pmmu_atc_count = 0;
 
 	resolved = 0;
 	addr_out = addr_in;
@@ -255,19 +255,19 @@ INLINE UINT32 get_dt3_table_entry(m68ki_cpu_core *m68k, UINT32 tptr, UINT8 ptest
 		UINT32 address_mask = ((m68k->mmu_tt0 << 8) & 0xff000000) ^ 0xff000000;
 		if ((addr_in & address_mask) == address_base)
 		{
-//			logerror("PMMU: pc=%x TT0 fc=%x addr_in=%08x address_mask=%08x address_base=%08x\n", m68k->ppc, fc, addr_in, address_mask, address_base);
+//          logerror("PMMU: pc=%x TT0 fc=%x addr_in=%08x address_mask=%08x address_base=%08x\n", m68k->ppc, fc, addr_in, address_mask, address_base);
 			return addr_in;
 		}
 	}
 
-//	if ((++pmmu_access_count % 10000000) == 0) {
-//		logerror("pmmu_translate_addr_with_fc: atc usage = %d%%\n", pmmu_atc_count*100/pmmu_access_count);
-//		pmmu_atc_count = pmmu_access_count = 0;
-//	}
+//  if ((++pmmu_access_count % 10000000) == 0) {
+//      logerror("pmmu_translate_addr_with_fc: atc usage = %d%%\n", pmmu_atc_count*100/pmmu_access_count);
+//      pmmu_atc_count = pmmu_access_count = 0;
+//  }
 
-  	// get page size (i.e. # of bits to ignore); ps is 10 or 12 for Apollo, 8 otherwise
- 	ps = (m68k->mmu_tc >> 20) & 0xf;
- 	atc_tag = M68K_MMU_ATC_VALID | ((fc &7) << 24) | addr_in >> ps;
+	// get page size (i.e. # of bits to ignore); ps is 10 or 12 for Apollo, 8 otherwise
+	ps = (m68k->mmu_tc >> 20) & 0xf;
+	atc_tag = M68K_MMU_ATC_VALID | ((fc &7) << 24) | addr_in >> ps;
 
 	// first see if this is already in the ATC
 	for (i = 0; i < MMU_ATC_ENTRIES; i++)
@@ -290,7 +290,7 @@ INLINE UINT32 get_dt3_table_entry(m68ki_cpu_core *m68k, UINT32 tptr, UINT8 ptest
 				 }
 				addr_out = (m68k->mmu_atc_data[i]<<8) | (addr_in & ~(~0 << ps));
 //              logerror("ATC[%2d] hit: log %08x -> phys %08x  pc=%08x fc=%d\n", i, addr_in, addr_out, REG_PPC, fc);
-//				pmmu_atc_count++;
+//              pmmu_atc_count++;
 				return addr_out;
 			 }
 		}
@@ -308,14 +308,14 @@ INLINE UINT32 get_dt3_table_entry(m68ki_cpu_core *m68k, UINT32 tptr, UINT8 ptest
 		root_limit = m68k->mmu_crp_limit;
 	}
 
-  	// get initial shift (# of top bits to ignore)
- 	is = (m68k->mmu_tc >> 16) & 0xf;
- 	ps = (m68k->mmu_tc >> 20) & 0xf;
- 	abits = (m68k->mmu_tc >> 12) & 0xf;
- 	bbits = (m68k->mmu_tc >> 8) & 0xf;
- 	cbits = (m68k->mmu_tc >> 4) & 0xf;
+	// get initial shift (# of top bits to ignore)
+	is = (m68k->mmu_tc >> 16) & 0xf;
+	ps = (m68k->mmu_tc >> 20) & 0xf;
+	abits = (m68k->mmu_tc >> 12) & 0xf;
+	bbits = (m68k->mmu_tc >> 8) & 0xf;
+	cbits = (m68k->mmu_tc >> 4) & 0xf;
 
-//	logerror("PMMU: tcr %08x limit %08x aptr %08x is %x abits %d bbits %d cbits %d\n", m68k->mmu_tc, root_limit, root_aptr, is, abits, bbits, cbits);
+//  logerror("PMMU: tcr %08x limit %08x aptr %08x is %x abits %d bbits %d cbits %d\n", m68k->mmu_tc, root_limit, root_aptr, is, abits, bbits, cbits);
 
 	// get table A offset
 	tofs = (addr_in<<is)>>(32-abits);
@@ -330,7 +330,7 @@ INLINE UINT32 get_dt3_table_entry(m68ki_cpu_core *m68k, UINT32 tptr, UINT8 ptest
 
 		case M68K_MMU_DF_DT1:	// page descriptor, will cause direct mapping
 			addr_out = tptr + addr_in;
-//			logerror("PMMU: PC=%x root mode %d (addr_in %08x -> %08x)\n", m68k->ppc, M68K_MMU_DF_DT1, addr_in, addr_out);
+//          logerror("PMMU: PC=%x root mode %d (addr_in %08x -> %08x)\n", m68k->ppc, M68K_MMU_DF_DT1, addr_in, addr_out);
 			return addr_out;
 
 		case M68K_MMU_DF_DT2:	// valid 4 byte descriptors
@@ -504,11 +504,11 @@ INLINE UINT32 get_dt3_table_entry(m68ki_cpu_core *m68k, UINT32 tptr, UINT8 ptest
 {
 	UINT32 addr_out = pmmu_translate_addr_with_fc(m68k, addr_in, m68k->mmu_tmp_fc, 0);
 
-//	if (m68k->mmu_tmp_buserror_occurred > 0) {
-//		logerror("PMMU: pc=%08x sp=%08x va=%08x pa=%08x - invalid Table mode for level=%d (buserror %d)\n",
-//				REG_PPC, REG_A[7], addr_in, addr_out, m68k->mmu_tmp_sr & M68K_MMU_SR_LEVEL_3,
-//				m68k->mmu_tmp_buserror_occurred);
-//	}
+//  if (m68k->mmu_tmp_buserror_occurred > 0) {
+//      logerror("PMMU: pc=%08x sp=%08x va=%08x pa=%08x - invalid Table mode for level=%d (buserror %d)\n",
+//              REG_PPC, REG_A[7], addr_in, addr_out, m68k->mmu_tmp_sr & M68K_MMU_SR_LEVEL_3,
+//              m68k->mmu_tmp_buserror_occurred);
+//  }
 
 	return addr_out;
 }
@@ -599,8 +599,8 @@ void m68881_mmu_ops(m68ki_cpu_core *m68k)
 					p_addr = pmmu_translate_addr_with_fc(m68k, v_addr, fc, 1);
 					m68k->mmu_sr = m68k->mmu_tmp_sr;
 
-//					logerror("PMMU: pc=%08x sp=%08x va=%08x pa=%08x PTEST fc=%x level=%x mmu_sr=%04x\n",
-//							m68k->ppc, REG_A[7], v_addr, p_addr, fc, (modes >> 10) & 0x07, m68k->mmu_sr);
+//                  logerror("PMMU: pc=%08x sp=%08x va=%08x pa=%08x PTEST fc=%x level=%x mmu_sr=%04x\n",
+//                          m68k->ppc, REG_A[7], v_addr, p_addr, fc, (modes >> 10) & 0x07, m68k->mmu_sr);
 
 					if (modes & 0x100)
 					{
@@ -621,25 +621,25 @@ void m68881_mmu_ops(m68ki_cpu_core *m68k)
 									{
 										case 0x02: // transparent translation register 0
 											WRITE_EA_32(m68k, ea, m68k->mmu_tt0);
-//											logerror("PMMU: pc=%x PMOVE from mmu_tt0=%08x\n", m68k->ppc, m68k->mmu_tt0);
+//                                          logerror("PMMU: pc=%x PMOVE from mmu_tt0=%08x\n", m68k->ppc, m68k->mmu_tt0);
 											break;
 										case 0x03: // transparent translation register 1
 											WRITE_EA_32(m68k, ea, m68k->mmu_tt1);
-//											logerror("PMMU: pc=%x PMOVE from mmu_tt1=%08x\n", m68k->ppc, m68k->mmu_tt1);
+//                                          logerror("PMMU: pc=%x PMOVE from mmu_tt1=%08x\n", m68k->ppc, m68k->mmu_tt1);
 											break;
 										case 0x10:	// translation control register
 											WRITE_EA_32(m68k, ea, m68k->mmu_tc);
-//											logerror("PMMU: pc=%x PMOVE from mmu_tc=%08x\n", m68k->ppc, m68k->mmu_tc);
+//                                          logerror("PMMU: pc=%x PMOVE from mmu_tc=%08x\n", m68k->ppc, m68k->mmu_tc);
 											break;
 
 										case 0x12: // supervisor root pointer
 											WRITE_EA_64(m68k, ea, (UINT64)m68k->mmu_srp_limit<<32 | (UINT64)m68k->mmu_srp_aptr);
-//											logerror("PMMU: pc=%x PMOVE from SRP limit = %08x, aptr = %08x\n", REG_PPC, m68k->mmu_srp_limit, m68k->mmu_srp_aptr);
+//                                          logerror("PMMU: pc=%x PMOVE from SRP limit = %08x, aptr = %08x\n", REG_PPC, m68k->mmu_srp_limit, m68k->mmu_srp_aptr);
 											break;
 
 										case 0x13: // CPU root pointer
 											WRITE_EA_64(m68k, ea, (UINT64)m68k->mmu_crp_limit<<32 | (UINT64)m68k->mmu_crp_aptr);
-//											logerror("PMMU: pc=%x PMOVE from CRP limit = %08x, aptr = %08x\n", REG_PPC, m68k->mmu_crp_limit, m68k->mmu_crp_aptr);
+//                                          logerror("PMMU: pc=%x PMOVE from CRP limit = %08x, aptr = %08x\n", REG_PPC, m68k->mmu_crp_limit, m68k->mmu_crp_aptr);
 											break;
 
 										default:
@@ -699,7 +699,7 @@ void m68881_mmu_ops(m68ki_cpu_core *m68k)
 												temp64 = READ_EA_64(m68k, ea);
 												m68k->mmu_srp_limit = (temp64>>32) & 0xffffffff;
 												m68k->mmu_srp_aptr = temp64 & 0xffffffff;
-//												logerror("PMMU: SRP limit = %08x aptr = %08x\n", m68k->mmu_srp_limit, m68k->mmu_srp_aptr);
+//                                              logerror("PMMU: SRP limit = %08x aptr = %08x\n", m68k->mmu_srp_limit, m68k->mmu_srp_aptr);
 												if (!(modes & 0x100))
 												{
 													pmmu_atc_flush(m68k);
@@ -710,7 +710,7 @@ void m68881_mmu_ops(m68ki_cpu_core *m68k)
 												temp64 = READ_EA_64(m68k, ea);
 												m68k->mmu_crp_limit = (temp64>>32) & 0xffffffff;
 												m68k->mmu_crp_aptr = temp64 & 0xffffffff;
-//												logerror("PMMU: CRP limit = %08x aptr = %08x\n", m68k->mmu_crp_limit, m68k->mmu_crp_aptr);
+//                                              logerror("PMMU: CRP limit = %08x aptr = %08x\n", m68k->mmu_crp_limit, m68k->mmu_crp_aptr);
 												if (!(modes & 0x100))
 												{
 													pmmu_atc_flush(m68k);

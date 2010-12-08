@@ -7,7 +7,7 @@ Major components are....
 
 MAIN BOARD
 ----------
-    CPU: Intel Celeron (socket 370) 333MHz 
+    CPU: Intel Celeron (socket 370) 333MHz
 Chipset: Intel AGPset FW822443ZX, PCIset FW82371EB
     RAM: Samsung KMM366S823CTS 8M x 64-bit SDRAM DIMM
   Video: 3DFX 500-0013-04 PCB-mounted BGA
@@ -16,7 +16,7 @@ Chipset: Intel AGPset FW822443ZX, PCIset FW82371EB
    BIOS: Atmel 29C010 flash ROM
   Other: Holtek HT6542B i8042-based keyboard controller
          3V coin battery
-         
+
 SOUND BOARD
 -----------
 A40MX04 QFP84 CPLD

@@ -73,7 +73,7 @@ typedef struct _avi_file avi_file;
 class video_manager
 {
 	friend class screen_device;
-	
+
 public:
 	// movie format options
 	enum movie_format
@@ -84,7 +84,7 @@ public:
 
 	// construction/destruction
 	video_manager(running_machine &machine);
-	
+
 	// getters
 	bool skip_this_frame() const { return m_skipping_this_frame; }
 	int speed_factor() const { return m_speed; }
@@ -99,17 +99,17 @@ public:
 	void set_throttled(bool throttled = true) { m_throttle = throttled; }
 	void set_fastforward(bool ffwd = true) { m_fastforward = ffwd; }
 
-	// render a frame	
+	// render a frame
 	void frame_update(bool debug = false);
-	
+
 	// current speed helpers
 	astring &speed_text(astring &string);
 	double speed_percent() const { return m_speed_percent; }
 
-	// snapshots	
+	// snapshots
 	void save_snapshot(screen_device *screen, mame_file &file);
 	void save_active_screen_snapshots();
-	
+
 	// movies
 	void begin_recording(const char *name, movie_format format = MF_AVI);
 	void end_recording();
@@ -121,12 +121,12 @@ private:
 	void exit();
 	static TIMER_CALLBACK( screenless_update_callback );
 	void postload();
-	
+
 	// effective value helpers
 	int effective_autoframeskip() const;
 	int effective_frameskip() const;
 	bool effective_throttle() const;
-	
+
 	// speed and throttling helpers
 	int original_speed_setting() const;
 	bool finish_screen_updates();
@@ -143,7 +143,7 @@ private:
 
 	// internal state
 	running_machine &	m_machine;					// reference to our machine
-	
+
 	// screenless systems
 	emu_timer *			m_screenless_frame_timer;	// timer to signal VBLANK start
 
@@ -192,7 +192,7 @@ private:
 	attotime			m_movie_frame_period;		// period of a single movie frame
 	attotime			m_movie_next_frame_time;	// time of next frame
 	UINT32				m_movie_frame;				// current movie frame number
-	
+
 	static const UINT8		s_skiptable[FRAMESKIP_LEVELS][FRAMESKIP_LEVELS];
 
 	static const attoseconds_t SUBSECONDS_PER_SPEED_UPDATE = ATTOSECONDS_PER_SECOND / 4;

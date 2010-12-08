@@ -454,7 +454,7 @@ UINT16 *cjffruit_leds1, *cjffruit_leds2, *cjffruit_leds3;
 static void show_leds()
 {
 #ifdef MAME_DEBUG
-//	popmessage("led %02X %02x %02x", cjffruit_leds1[0]>>8, cjffruit_leds2[0]>>8, cjffruit_leds3[0]>>8);
+//  popmessage("led %02X %02x %02x", cjffruit_leds1[0]>>8, cjffruit_leds2[0]>>8, cjffruit_leds3[0]>>8);
 #endif
 }
 
@@ -465,7 +465,7 @@ static WRITE16_HANDLER( cjffruit_leds1_w )
 	{
 		coin_counter_w(space->machine, 0, data & 0x0100);	// coin in
 		set_led_status(space->machine, 0, data & 0x0200);	// win???
-//		                               1  data & 0x0400		// win???
+//                                     1  data & 0x0400     // win???
 		set_led_status(space->machine, 2, data & 0x0800);	// small
 		set_led_status(space->machine, 3, data & 0x1000);	// big
 		set_led_status(space->machine, 4, data & 0x2000);	// take

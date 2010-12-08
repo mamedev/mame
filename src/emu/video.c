@@ -210,8 +210,8 @@ void video_manager::set_frameskip(int frameskip)
 
 
 //-------------------------------------------------
-//  frame_update - handle frameskipping and UI, 
-//  plus updating the screen during normal 
+//  frame_update - handle frameskipping and UI,
+//  plus updating the screen during normal
 //  operations
 //-------------------------------------------------
 
@@ -280,7 +280,7 @@ void video_manager::frame_update(bool debug)
 
 
 //-------------------------------------------------
-//  speed_text - print the text to be displayed 
+//  speed_text - print the text to be displayed
 //  into a string buffer
 //-------------------------------------------------
 
@@ -449,7 +449,7 @@ void video_manager::begin_recording(const char *name, movie_format format)
 				mame_printf_error("Error creating AVI: %s\n", avi_error_string(avierr));
 		}
 	}
-	
+
 	// start up a MNG recording
 	else if (format == MF_MNG)
 	{

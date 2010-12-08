@@ -643,7 +643,7 @@ osd_font sdl_osd_interface::font_open(const char *_name, int &height)
 	CTFontRef ct_font = NULL;
 	CTFontDescriptorRef font_descriptor;
 	CGAffineTransform affine_transform = CGAffineTransformIdentity;
-	
+
 	astring name(_name);
 
 	if (name == "default")
@@ -652,19 +652,19 @@ osd_font sdl_osd_interface::font_open(const char *_name, int &height)
 	}
 
 	font_name = CFStringCreateWithCString( NULL, _name, kCFStringEncodingUTF8 );
-	
+
 	if( font_name != NULL )
 	{
       font_descriptor = CTFontDescriptorCreateWithNameAndSize( font_name, POINT_SIZE );
-      
+
       if( font_descriptor != NULL )
       {
          ct_font = CTFontCreateWithFontDescriptor( font_descriptor, POINT_SIZE, &affine_transform );
-                  
+
          CFRelease( font_descriptor );
       }
    }
-   
+
    CFRelease( font_name );
 
    if (!ct_font)
@@ -678,7 +678,7 @@ osd_font sdl_osd_interface::font_open(const char *_name, int &height)
    CFStringGetCString ( real_name, real_name_c_string, 255, kCFStringEncodingUTF8 );
    mame_printf_verbose("Matching font: %s\n", real_name_c_string);
    CFRelease( real_name );
-   
+
    CGFloat line_height = 0.0;
    line_height += CTFontGetAscent(ct_font);
    line_height += CTFontGetDescent(ct_font);
@@ -696,7 +696,7 @@ osd_font sdl_osd_interface::font_open(const char *_name, int &height)
 void sdl_osd_interface::font_close(osd_font font)
 {
    CTFontRef ct_font = (CTFontRef)font;
-   
+
    if( ct_font != NULL )
    {
       CFRelease( ct_font );
@@ -720,7 +720,7 @@ bitmap_t *sdl_osd_interface::font_get_bitmap(osd_font font, unicode_char chnum, 
    const CFIndex count = 1;
    CGRect bounding_rect, success_rect;
    CGContextRef context_ref;
-   
+
    if( chnum == ' ' )
    {
       uni_char = 'n';
@@ -743,7 +743,7 @@ bitmap_t *sdl_osd_interface::font_get_bitmap(osd_font font, unicode_char chnum, 
 
       bitmap_width = ceilf(bounding_rect.size.width * EXTRA_WIDTH);
       bitmap_width = bitmap_width == 0 ? 1 : bitmap_width;
-      
+
       bitmap_height = ceilf( (CTFontGetAscent(ct_font) + CTFontGetDescent(ct_font) + CTFontGetLeading(ct_font)) * EXTRA_HEIGHT);
 
       xoffs = yoffs = 0;
@@ -752,14 +752,14 @@ bitmap_t *sdl_osd_interface::font_get_bitmap(osd_font font, unicode_char chnum, 
       size_t bits_per_component;
       CGColorSpaceRef color_space;
       CGBitmapInfo bitmap_info = kCGBitmapByteOrder32Host | kCGImageAlphaPremultipliedFirst;
-      
+
       color_space = CGColorSpaceCreateDeviceRGB();
       bits_per_component = 8;
 
       bitmap = auto_alloc(&machine(), bitmap_t(bitmap_width, bitmap_height, BITMAP_FORMAT_ARGB32));
-      
+
       context_ref = CGBitmapContextCreate( bitmap->base, bitmap_width, bitmap_height, bits_per_component, bitmap->rowpixels*4, color_space, bitmap_info );
-      
+
       if( context_ref != NULL )
       {
          CGFontRef font_ref;
@@ -821,7 +821,7 @@ osd_font sdl_osd_interface::font_open(const char *_name, int &height)
 		config = FcConfigGetCurrent();
 		pat = FcPatternCreate();
 		os = FcObjectSetCreate();
-		FcPatternAddString(pat, FC_FAMILY, (const FcChar8 *)name.cstr()); 
+		FcPatternAddString(pat, FC_FAMILY, (const FcChar8 *)name.cstr());
 
 		// try and get a font with the requested styles baked-in
 		if (bold)
@@ -869,7 +869,7 @@ osd_font sdl_osd_interface::font_open(const char *_name, int &height)
 				bakedstyles = true;
 				break;
 			}
-		}	
+		}
 
 		// didn't get a font above?  try again with no baked-in styles
 		if (!font)
@@ -878,7 +878,7 @@ osd_font sdl_osd_interface::font_open(const char *_name, int &height)
 			FcFontSetDestroy(fontset);
 
 			pat = FcPatternCreate();
-			FcPatternAddString(pat, FC_FAMILY, (const FcChar8 *)name.cstr()); 
+			FcPatternAddString(pat, FC_FAMILY, (const FcChar8 *)name.cstr());
 			FcPatternAddString(pat, FC_STYLE, (const FcChar8 *)"Regular");
 			FcPatternAddString(pat, FC_FONTFORMAT, (const FcChar8 *)"TrueType");
 			fontset = FcFontList(config, pat, os);
@@ -966,7 +966,7 @@ bitmap_t *sdl_osd_interface::font_get_bitmap(osd_font font, unicode_char chnum, 
 	UINT16 ustr[16];
 
 	ttffont = (TTF_Font *)font;
-	
+
 	memset(ustr,0,sizeof(ustr));
 	ustr[0] = (UINT16)chnum;
 	drawsurf = TTF_RenderUNICODE_Solid(ttffont, ustr, fcol);
@@ -982,7 +982,7 @@ bitmap_t *sdl_osd_interface::font_get_bitmap(osd_font font, unicode_char chnum, 
 		{
 			UINT32 *dstrow = BITMAP_ADDR32(bitmap, y, 0);
 			UINT8 *srcrow = (UINT8 *)drawsurf->pixels;
-		
+
 			srcrow += (y * drawsurf->pitch);
 
 			for (int x = 0; x < drawsurf->w; x++)

@@ -704,10 +704,10 @@ static ADDRESS_MAP_START( cavepgm_mem, ADDRESS_SPACE_PROGRAM, 16)
 
 	AM_RANGE(0x700006, 0x700007) AM_WRITENOP // Watchdog?
 
-//	AM_RANGE(0x800000, 0x81ffff) AM_RAM AM_MIRROR(0x0e0000) AM_BASE(&pgm_mainram) AM_SHARE("sram") /* Main Ram */
+//  AM_RANGE(0x800000, 0x81ffff) AM_RAM AM_MIRROR(0x0e0000) AM_BASE(&pgm_mainram) AM_SHARE("sram") /* Main Ram */
 	AM_RANGE(0x800000, 0x81ffff) AM_RAM AM_BASE(&pgm_mainram) AM_SHARE("sram") /* Main Ram */
 	/* 0x880000 - 0x89ffff seems to be protection related, maybe they just happen to access protection results
-	   via a mirror tho. */
+       via a mirror tho. */
 
 	AM_RANGE(0x900000, 0x907fff) AM_MIRROR(0x0f8000) AM_READWRITE(pgm_videoram_r, pgm_videoram_w) AM_BASE_MEMBER(pgm_state, videoram) /* IGS023 VIDEO CHIP */
 	AM_RANGE(0xa00000, 0xa011ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
@@ -1330,7 +1330,7 @@ static INTERRUPT_GEN( drgw_interrupt )
 {
 	if (cpu_getiloops(device) == 0)
 	{
-		//printf("vbl\n");	
+		//printf("vbl\n");
 		cpu_set_input_line(device, 6, HOLD_LINE);
 	}
 	else
@@ -3986,7 +3986,7 @@ ROM_START( ket )
 
 	ROM_REGION32_LE( 0x400000, "user1", ROMREGION_ERASE00 )
 	/* no external protection rom */
-	
+
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // same as standard PGM text bios - surface scratched to remove details
 	ROM_LOAD( "text-1.u19",   0x400000, 0x800000, CRC(2665b041) SHA1(fb1107778b66f2af0de77ac82e1ee2902f53a959) )
@@ -4013,7 +4013,7 @@ ROM_START( keta )
 
 	ROM_REGION32_LE( 0x400000, "user1", ROMREGION_ERASE00 )
 	/* no external protection rom */
-	
+
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // same as standard PGM text bios - surface scratched to remove details
 	ROM_LOAD( "text-1.u19",   0x400000, 0x800000, CRC(2665b041) SHA1(fb1107778b66f2af0de77ac82e1ee2902f53a959) )
@@ -4040,7 +4040,7 @@ ROM_START( ketb )
 
 	ROM_REGION32_LE( 0x400000, "user1", ROMREGION_ERASE00 )
 	/* no external protection rom */
-	
+
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // same as standard PGM text bios - surface scratched to remove details
 	ROM_LOAD( "text-1.u19",   0x400000, 0x800000, CRC(2665b041) SHA1(fb1107778b66f2af0de77ac82e1ee2902f53a959) )
@@ -4067,7 +4067,7 @@ ROM_START( espgal )
 
 	ROM_REGION32_LE( 0x400000, "user1", ROMREGION_ERASE00 )
 	/* no external protection rom */
-	
+
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // same as standard PGM text bios - surface scratched to remove details
 	ROM_LOAD( "text-1.u19",   0x400000, 0x800000, NO_DUMP )
@@ -4077,7 +4077,7 @@ ROM_START( espgal )
 	ROM_LOAD( "image-2.u8",    0x0800000, 0x0800000, NO_DUMP )
 
 	ROM_REGION( 0x0800000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
-	ROM_LOAD( "bitmap-1.u1",    0x0000000, 0x0800000, NO_DUMP ) 
+	ROM_LOAD( "bitmap-1.u1",    0x0000000, 0x0800000, NO_DUMP )
 
 	ROM_REGION( 0x800000, "ics", ROMREGION_ERASE00 ) /* Samples - (8 bit mono 11025Hz) - */
 	/* there is a position for the PGM audio bios rom, but it's unpopulated, and the M of PGM has been scratched off the PCB */
@@ -4094,7 +4094,7 @@ ROM_START( ddp3 )
 
 	ROM_REGION32_LE( 0x400000, "user1", ROMREGION_ERASE00 )
 	/* no external protection rom */
-	
+
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // same as standard PGM bios
 	ROM_LOAD( "t04401w064.u19",0x400000, 0x800000, CRC(3a95f19c) SHA1(fd3c47cf0b8b1e20c6bec4be68a089fc8bbf4dbe) )
@@ -4122,7 +4122,7 @@ ROM_START( ddp3blk )
 
 	ROM_REGION32_LE( 0x400000, "user1", ROMREGION_ERASE00 )
 	/* no external protection rom */
-	
+
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // same as standard PGM bios
 	ROM_LOAD( "t04401w064.u19",0x400000, 0x800000, CRC(3a95f19c) SHA1(fd3c47cf0b8b1e20c6bec4be68a089fc8bbf4dbe) )
@@ -4147,7 +4147,7 @@ ROM_END
 ROM_START( orleg2 )
 	ROM_REGION( 0x800000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_WORD_SWAP( "xyj2_v104cn.u7",  0x000000, 0x800000, CRC(7c24a4f5) SHA1(3cd9f9264ef2aad0869afdf096e88eb8d74b2570) )
-	
+
 	ROM_REGION( 0xc00000, "tiles", ROMREGION_ERASEFF ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_REGION( 0x1c00000, "sprcol", ROMREGION_ERASEFF ) /* Sprite Colour Data */
 	ROM_REGION( 0x1000000, "sprmask", ROMREGION_ERASEFF ) /* Sprite Masks + Colour Indexes */
@@ -4323,7 +4323,7 @@ static DRIVER_INIT( drgw2 )
 }
 
 static DRIVER_INIT( dw2v100x )
-{	
+{
 	UINT16 *mem16 = (UINT16 *)memory_region(machine, "maincpu");
 	drgwld2_common_init(machine);
 
@@ -4408,7 +4408,7 @@ static DRIVER_INIT( pstar )
 	state_save_register_global(machine, state->pstar_b1);
 	state_save_register_global(machine, state->pstar_ce);
 	state_save_register_global_array(machine, state->pstar_ram);
-	
+
 }
 
 static DRIVER_INIT( photoy2k )
@@ -5449,7 +5449,7 @@ static DRIVER_INIT( kovqhsgs )
  please don't driver_data this, it's temporary code, and just
  becomes and absolute pain to work with if bits of it end
  up all over the place, and near impossible to read with state->
- before everything.  
+ before everything.
 
 */
 static UINT16 value0, value1, valuekey, ddp3lastcommand;
@@ -5483,14 +5483,14 @@ static WRITE16_HANDLER( ddp3_asic_w )
 		ddp3lastcommand = value1 & 0xff;
 
 		/* typical frame (ddp3) (all 3 games use only these commands? for the most part of levels espgal just issues 8e)
-			vbl
-			145f28 command 67
-			145f70 command e5
-			145f28 command 67
-			145f70 command e5
-			1460c6 command 40
-			145ec0 command 8e
-			*/
+            vbl
+            145f28 command 67
+            145f70 command e5
+            145f28 command 67
+            145f70 command e5
+            1460c6 command 40
+            145ec0 command 8e
+            */
 
 		switch (ddp3lastcommand)
 		{

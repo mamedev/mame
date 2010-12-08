@@ -407,7 +407,7 @@ static void rougien_adpcm_int( running_device *device )
 {
 	mermaid_state *state = device->machine->driver_data<mermaid_state>();
 
-//	popmessage("%08x",state->adpcm_pos);
+//  popmessage("%08x",state->adpcm_pos);
 
 	if (state->adpcm_pos >= state->adpcm_end || state->adpcm_idle)
 	{
@@ -426,7 +426,7 @@ static void rougien_adpcm_int( running_device *device )
 		{
 			state->adpcm_pos++;
 			//if ((ROM[state->adpcm_pos] & 0xff) == 0x70)
-			//	state->adpcm_idle = 1;
+			//  state->adpcm_idle = 1;
 		}
 	}
 }

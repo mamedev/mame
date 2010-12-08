@@ -36,11 +36,11 @@ file_error sdl_open_socket(const char *path, UINT32 openflags, osd_file **file, 
 	struct sockaddr_in sai;
 	int flag = 1;
 	int port;
-   
+
 	sscanf( path+strlen(sdlfile_socket_identifier), ":%255[^:]:%d", hostname, &port );
-      
+
 	printf("Connecting to server '%s' on port '%d'\n", hostname, port);
-   
+
 	if (((*file)->handle = socket(AF_INET, SOCK_STREAM, 0)) == -1)
 	{
 		return FILERR_ACCESS_DENIED;
@@ -62,9 +62,9 @@ file_error sdl_open_socket(const char *path, UINT32 openflags, osd_file **file, 
 	{
 		return FILERR_ACCESS_DENIED;
 	}
-   
+
 	*filesize = 0;
-#endif  
+#endif
 	return FILERR_NONE;
 }
 
@@ -111,7 +111,7 @@ file_error sdl_read_socket(osd_file *file, void *buffer, UINT64 offset, UINT32 c
 file_error sdl_write_socket(osd_file *file, const void *buffer, UINT64 offset, UINT32 count, UINT32 *actual)
 {
 #ifndef SDLMAME_WIN32
-	UINT32 result;  
+	UINT32 result;
 
 	result = write(file->handle, buffer, count);
 
@@ -133,6 +133,6 @@ file_error sdl_close_socket(osd_file *file)
 #ifndef SDLMAME_WIN32
 	close(file->handle);
 	osd_free(file);
-#endif	
+#endif
 	return FILERR_NONE;
 }

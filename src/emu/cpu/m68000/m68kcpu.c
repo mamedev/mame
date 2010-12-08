@@ -567,12 +567,12 @@ static CPU_TRANSLATE( m68k )
 		{
 			// FIXME: mmu_tmp_sr will be overwritten in pmmu_translate_addr_with_fc
 			UINT16 mmu_tmp_sr = m68k->mmu_tmp_sr;
-//			UINT32 va=*address;
+//          UINT32 va=*address;
 
 			*address = pmmu_translate_addr_with_fc(m68k, *address, 4, 1);
 
 			if ((m68k->mmu_tmp_sr & M68K_MMU_SR_INVALID) != 0) {
-//				logerror("cpu_translate_m68k failed with mmu_sr=%04x va=%08x pa=%08x\n",m68k->mmu_tmp_sr,va ,*address);
+//              logerror("cpu_translate_m68k failed with mmu_sr=%04x va=%08x pa=%08x\n",m68k->mmu_tmp_sr,va ,*address);
 				*address = 0;
 			}
 
@@ -633,8 +633,8 @@ static CPU_EXECUTE( m68k )
 			debugger_instruction_hook(device, REG_PC);
 
 			// FIXME: remove this
-//			void apollo_debug_instruction(running_device *device);
-//			apollo_debug_instruction(device);
+//          void apollo_debug_instruction(running_device *device);
+//          apollo_debug_instruction(device);
 
 			/* Record previous program counter */
 			REG_PPC = REG_PC;
@@ -672,12 +672,12 @@ static CPU_EXECUTE( m68k )
 				{
 					UINT32 sr;
 
-//					const char * disassemble(m68ki_cpu_core *m68k, offs_t pc);
-//					logerror(
-//							"PMMU: pc=%08x sp=%08x va=%08x bus error: %s\n",
-//							REG_PPC, REG_A[7], m68k->mmu_tmp_buserror_address,
-//							(m68k->mmu_tmp_buserror_address == REG_PPC) ? "-"
-//									: disassemble(m68k, REG_PPC));
+//                  const char * disassemble(m68ki_cpu_core *m68k, offs_t pc);
+//                  logerror(
+//                          "PMMU: pc=%08x sp=%08x va=%08x bus error: %s\n",
+//                          REG_PPC, REG_A[7], m68k->mmu_tmp_buserror_address,
+//                          (m68k->mmu_tmp_buserror_address == REG_PPC) ? "-"
+//                                  : disassemble(m68k, REG_PPC));
 
 					m68k->mmu_tmp_buserror_occurred = 0;
 
@@ -686,8 +686,8 @@ static CPU_EXECUTE( m68k )
 					{
 						if (REG_DA[i] != tmp_dar[i])
 						{
-//							logerror("PMMU: pc=%08x sp=%08x bus error: fixed %s[%d]: %08x -> %08x\n",
-//									REG_PPC, REG_A[7], i < 8 ? "D" : "A", i & 7, REG_DA[i], tmp_dar[i]);
+//                          logerror("PMMU: pc=%08x sp=%08x bus error: fixed %s[%d]: %08x -> %08x\n",
+//                                  REG_PPC, REG_A[7], i < 8 ? "D" : "A", i & 7, REG_DA[i], tmp_dar[i]);
 							REG_DA[i] = tmp_dar[i];
 						}
 					}
@@ -700,11 +700,11 @@ static CPU_EXECUTE( m68k )
 					{
 						/* Note: This is implemented for 68000 only! */
 						m68ki_stack_frame_buserr(m68k, sr);
-					} 
+					}
 					else if (m68k->mmu_tmp_buserror_address == REG_PPC)
 					{
 						m68ki_stack_frame_1010(m68k, sr, EXCEPTION_BUS_ERROR, REG_PPC, m68k->mmu_tmp_buserror_address);
-					} 
+					}
 					else
 					{
 						m68ki_stack_frame_1011(m68k, sr, EXCEPTION_BUS_ERROR, REG_PPC, m68k->mmu_tmp_buserror_address);

@@ -36,7 +36,7 @@ struct _v810_state
 	direct_read_data *direct;
 	address_space *io;
 	UINT32 PPC;
-	int icount;	
+	int icount;
 };
 
 INLINE v810_state *get_safe_token(running_device *device)
@@ -1048,18 +1048,18 @@ static void take_interrupt(v810_state *cpustate)
 {
 	cpustate->EIPC = cpustate->PC;
 	cpustate->EIPSW = cpustate->PSW;
-	
+
 	cpustate->PC = 0xfffffe00 | (cpustate->irq_line << 4);
 	cpustate->ECR = 0xfe00 | (cpustate->irq_line << 4);
-    
+
 	UINT8 num = cpustate->irq_line + 1;
 	if (num==0x10) num=0x0f;
-	
+
 	cpustate->PSW &= 0xfff0ffff; // clear interrupt level
 	SET_EP(1);
-    SET_ID(1);	
+    SET_ID(1);
 	cpustate->PSW |= num << 16;
-	
+
 	cpustate->icount-= clkIF;
 }
 

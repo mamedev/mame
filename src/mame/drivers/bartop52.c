@@ -1,18 +1,18 @@
 /*
     Atari Bartop 5200 prototype system
 
-	Driver by Mariusz Wojcieszek
+    Driver by Mariusz Wojcieszek
     Based on Atari 400/800 MESS Driver by Juergen Buchmueller
 
-	Hardware was based on Atari 5200 game console with additional coin and timer hardware.
-	System was intented to run in barroms and taverns. Software was based on Atari 5200
-	Realsports cartridges.
+    Hardware was based on Atari 5200 game console with additional coin and timer hardware.
+    System was intented to run in barroms and taverns. Software was based on Atari 5200
+    Realsports cartridges.
 
-	Barrom Baseball is modified version of Realsports Baseball.
+    Barrom Baseball is modified version of Realsports Baseball.
 
-	Coins and timer were handled by Bartop system bios. Since bios dump is not available, 
-	regular Atari 5200 bios is used and game is marked as not working. Game cart is also 
-	marked as bad dump as it is done in "console style", i.e. one file for all game data.
+    Coins and timer were handled by Bartop system bios. Since bios dump is not available,
+    regular Atari 5200 bios is used and game is marked as not working. Game cart is also
+    marked as bad dump as it is done in "console style", i.e. one file for all game data.
 */
 
 #include "emu.h"

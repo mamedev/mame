@@ -243,12 +243,12 @@ static TIMER_CALLBACK( duart_timer_callback )
 	duart68681->ISR |= INT_COUNTER_READY;
 	duart68681_update_interrupts(duart68681);
 
-//	if ((duart68681->OPCR & 0x0c)== 0x04) {
-//		duart68681->OPR ^= 0x08;
-//		if (duart68681->duart_config->output_port_write)
-//			duart68681->duart_config->output_port_write(duart68681->device, duart68681->OPR ^ 0xff);
+//  if ((duart68681->OPCR & 0x0c)== 0x04) {
+//      duart68681->OPR ^= 0x08;
+//      if (duart68681->duart_config->output_port_write)
+//          duart68681->duart_config->output_port_write(duart68681->device, duart68681->OPR ^ 0xff);
 //
-//	}
+//  }
 };
 
 static void duart68681_write_MR(duart68681_state *duart68681, int ch, UINT8 data)

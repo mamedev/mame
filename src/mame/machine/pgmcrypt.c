@@ -1033,7 +1033,7 @@ void pgm_py2k2_decrypt(running_machine *machine) // and ddpdoj/ddpdojbl
 	for(i=0; i<rom_size/2; i++)
 	{
 		UINT16 x = src[i];
-		
+
 		if ((i & 0x040480) != 0x000080) x ^= 0x0001;
 		if ((i & 0x084008) == 0x084008) x ^= 0x0002;
 		if ((i & 0x000030) == 0x000010 && (i & 0x180000) != 0x080000) x ^= 0x0004;

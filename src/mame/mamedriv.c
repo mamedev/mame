@@ -4685,7 +4685,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( shaktamb )	/* 2000.11 Shakatto Tambourine */
 	DRIVER( wwfroyal )	/* 2000.11 WWF Royal Rumble */
 	DRIVER( pjustic )	/* 2000.12 Moero Justice Gakuen */
-	DRIVER( samba2k ) 	/* 2000.12 Samba de Amigo ver.2000 */
+	DRIVER( samba2k )	/* 2000.12 Samba de Amigo ver.2000 */
 	DRIVER( sprtjam )	/* 2000.12 Sports Jam */
 						/* 2000.12 Derby Owners Club 2000 ver.2 */
 						/* 2000.?? World Kicks New ver. */

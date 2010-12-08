@@ -3872,7 +3872,7 @@ ROM_END
   or a successor thereof.
 
 *****************************************************/
-  
+
 ROM_START( superdbl )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "sd6",	0x7000, 0x1000, CRC(3cf1ccb8) SHA1(c589ddf2e97abb9d95375d0964fd0aa6f7e2e468) )

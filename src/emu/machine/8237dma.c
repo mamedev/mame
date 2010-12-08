@@ -448,9 +448,9 @@ void i8237_device::i8237_timerproc()
 
 	case DMA8237_S11: /* Output A8-A15 */
 
-//		logerror("###### dma8237_timerproc %s: from %04x count=%x to %04x count=%x\n", tag(),
-//				m_chan[0].m_address, m_chan[0].m_count,
-//				m_chan[1].m_address, m_chan[1].m_count);
+//      logerror("###### dma8237_timerproc %s: from %04x count=%x to %04x count=%x\n", tag(),
+//              m_chan[0].m_address, m_chan[0].m_count,
+//              m_chan[1].m_address, m_chan[1].m_count);
 
 		// FIXME: this will copy bytes correct, but not 16 bit words
 		m_temporary_data = devcb_call_read8(&m_in_memr_func, m_chan[0].m_address);
@@ -473,7 +473,7 @@ void i8237_device::i8237_timerproc()
 			m_status |= 3; // set TC for channel 0 and 1
 			m_drq &= ~3; // clear drq for channel 0 and 1
 
-		//	logerror("!!! dma8237_timerproc DMA8237_S11 %s: m_drq=%x m_command=%x\n", tag(), m_drq, m_command);
+		//  logerror("!!! dma8237_timerproc DMA8237_S11 %s: m_drq=%x m_command=%x\n", tag(), m_drq, m_command);
 		}
 		break;
 	}
@@ -540,7 +540,7 @@ WRITE8_DEVICE_HANDLER_TRAMPOLINE(i8237, i8237_w)
 {
 	offset &= 0x0F;
 
-//	logerror("i8237_w: offset = %02x, data = %02x\n", offset, data );
+//  logerror("i8237_w: offset = %02x, data = %02x\n", offset, data );
 
 	switch(offset) {
 	case 0:

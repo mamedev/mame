@@ -1,19 +1,19 @@
 /*******************************************************************************************
 
-	Neo Print (c) 1996 SNK
+    Neo Print (c) 1996 SNK
 
-	preliminary driver by David Haywood & Angelo Salese
+    preliminary driver by David Haywood & Angelo Salese
 
-	npcartv1 bp 1260 pc += 2
-	98best44 bp 1312 pc += 2
+    npcartv1 bp 1260 pc += 2
+    98best44 bp 1312 pc += 2
 
-	TODO:
-	- implement remaining video features;
-	- sound interface, needs full Neo-Geo conversion;
-	- inputs are bare bones and needs extra work;
-	- printer/camera devices;
-	- lamps;
-	- upd4990a returns 4 years less than expected?
+    TODO:
+    - implement remaining video features;
+    - sound interface, needs full Neo-Geo conversion;
+    - inputs are bare bones and needs extra work;
+    - printer/camera devices;
+    - lamps;
+    - upd4990a returns 4 years less than expected?
 
 *******************************************************************************************/
 
@@ -89,7 +89,7 @@ VIDEO_UPDATE(neoprint)
 static READ16_HANDLER( neoprint_calendar_r )
 {
 	//if(cpu_get_pc(space->cpu) != 0x4b38 )//&& cpu_get_pc(space->cpu) != 0x5f86 && cpu_get_pc(space->cpu) != 0x5f90)
-	//	printf("%08x\n",cpu_get_pc(space->cpu));
+	//  printf("%08x\n",cpu_get_pc(space->cpu));
 
 	return (upd4990a_databit_r(space->machine->device("upd4990a"), 0) << 15);
 }
@@ -110,7 +110,7 @@ static READ8_HANDLER( neoprint_unk_r )
 	vblank = (space->machine->primary_screen->frame_number() & 0x1) ? 0x10 : 0x00;
 
 	//if(cpu_get_pc(space->cpu) != 0x1504 && cpu_get_pc(space->cpu) != 0x5f86 && cpu_get_pc(space->cpu) != 0x5f90)
-	//	printf("%08x\n",cpu_get_pc(space->cpu));
+	//  printf("%08x\n",cpu_get_pc(space->cpu));
 
 	return vblank| 4 | 3;
 }
@@ -200,10 +200,10 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( neoprint_audio_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM//AM_ROMBANK(NEOGEO_BANK_AUDIO_CPU_MAIN_BANK)
-//	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(NEOGEO_BANK_AUDIO_CPU_CART_BANK + 3)
-//	AM_RANGE(0xc000, 0xdfff) AM_ROMBANK(NEOGEO_BANK_AUDIO_CPU_CART_BANK + 2)
-//	AM_RANGE(0xe000, 0xefff) AM_ROMBANK(NEOGEO_BANK_AUDIO_CPU_CART_BANK + 1)
-//	AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK(NEOGEO_BANK_AUDIO_CPU_CART_BANK + 0)
+//  AM_RANGE(0x8000, 0xbfff) AM_ROMBANK(NEOGEO_BANK_AUDIO_CPU_CART_BANK + 3)
+//  AM_RANGE(0xc000, 0xdfff) AM_ROMBANK(NEOGEO_BANK_AUDIO_CPU_CART_BANK + 2)
+//  AM_RANGE(0xe000, 0xefff) AM_ROMBANK(NEOGEO_BANK_AUDIO_CPU_CART_BANK + 1)
+//  AM_RANGE(0xf000, 0xf7ff) AM_ROMBANK(NEOGEO_BANK_AUDIO_CPU_CART_BANK + 0)
 	AM_RANGE(0xf800, 0xffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -219,13 +219,13 @@ static ADDRESS_MAP_START( neoprint_audio_io_map, ADDRESS_SPACE_IO, 8 )
   /*AM_RANGE(0x00, 0x00) AM_MIRROR(0xff00) AM_READWRITE(audio_command_r, audio_cpu_clear_nmi_w);*/  /* may not and NMI clear */
 	AM_RANGE(0x00, 0x00) AM_MIRROR(0xff00) AM_READ(audio_command_r) AM_WRITENOP
 	AM_RANGE(0x04, 0x07) AM_MIRROR(0xff00) AM_DEVREADWRITE("ymsnd", ym2610_r, ym2610_w)
-//	AM_RANGE(0x08, 0x08) AM_MIRROR(0xff00) /* write - NMI enable / acknowledge? (the data written doesn't matter) */
-//	AM_RANGE(0x08, 0x08) AM_MIRROR(0xfff0) AM_MASK(0xfff0) AM_READ(audio_cpu_bank_select_f000_f7ff_r)
-//	AM_RANGE(0x09, 0x09) AM_MIRROR(0xfff0) AM_MASK(0xfff0) AM_READ(audio_cpu_bank_select_e000_efff_r)
-//	AM_RANGE(0x0a, 0x0a) AM_MIRROR(0xfff0) AM_MASK(0xfff0) AM_READ(audio_cpu_bank_select_c000_dfff_r)
-//	AM_RANGE(0x0b, 0x0b) AM_MIRROR(0xfff0) AM_MASK(0xfff0) AM_READ(audio_cpu_bank_select_8000_bfff_r)
+//  AM_RANGE(0x08, 0x08) AM_MIRROR(0xff00) /* write - NMI enable / acknowledge? (the data written doesn't matter) */
+//  AM_RANGE(0x08, 0x08) AM_MIRROR(0xfff0) AM_MASK(0xfff0) AM_READ(audio_cpu_bank_select_f000_f7ff_r)
+//  AM_RANGE(0x09, 0x09) AM_MIRROR(0xfff0) AM_MASK(0xfff0) AM_READ(audio_cpu_bank_select_e000_efff_r)
+//  AM_RANGE(0x0a, 0x0a) AM_MIRROR(0xfff0) AM_MASK(0xfff0) AM_READ(audio_cpu_bank_select_c000_dfff_r)
+//  AM_RANGE(0x0b, 0x0b) AM_MIRROR(0xfff0) AM_MASK(0xfff0) AM_READ(audio_cpu_bank_select_8000_bfff_r)
 	AM_RANGE(0x0c, 0x0c) AM_MIRROR(0xff00) AM_WRITE(audio_result_w)
-//	AM_RANGE(0x18, 0x18) AM_MIRROR(0xff00) /* write - NMI disable? (the data written doesn't matter) */
+//  AM_RANGE(0x18, 0x18) AM_MIRROR(0xff00) /* write - NMI disable? (the data written doesn't matter) */
 ADDRESS_MAP_END
 
 static INPUT_PORTS_START( neoprint )
@@ -395,7 +395,7 @@ MACHINE_CONFIG_END
 ROM_START( npcartv1 )
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "ep1.bin", 0x000000, 0x80000, CRC(18606198) SHA1(d968e09131c22769e22c7310aca1f02e739f38f1) )
-//	ROM_RELOAD(						 0x100000, 0x80000 ) /* checks the same string from above to be present there? Why? */
+//  ROM_RELOAD(                      0x100000, 0x80000 ) /* checks the same string from above to be present there? Why? */
 
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Z80 program */
 	ROM_LOAD( "m1.bin", 0x00000, 0x20000, CRC(b2d38e12) SHA1(ab96c5d3d22eb71ed6e0a03f3ff5d4b23e72fad8) )
@@ -416,7 +416,7 @@ ROM_END
 ROM_START( 98best44 )
 	ROM_REGION( 0x200000, "maincpu", ROMREGION_ERASEFF )
 	ROM_LOAD16_WORD_SWAP( "p060-ep1", 0x000000, 0x080000, CRC(d42e505d) SHA1(0ad6b0288f36c339832730a03e53cbc07dab4f82))
-//	ROM_RELOAD(						 0x100000, 0x80000 ) /* checks the same string from above to be present there? Why? */
+//  ROM_RELOAD(                      0x100000, 0x80000 ) /* checks the same string from above to be present there? Why? */
 
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* Z80 program */
 	ROM_LOAD( "pt004-m1",	 0x00000, 0x20000, CRC(6d77cdaa) SHA1(f88a93b3085b18b6663b4e51fccaa41958aafae1) )

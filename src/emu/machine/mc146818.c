@@ -394,9 +394,9 @@ void mc146818_device::set_base_datetime()
 	// temporary hack to go back 20 year (e.g. from 2010 -> 1990)
 	// current_time.year -= 20;
 
-//	logerror("mc146818_set_base_datetime %02d/%02d/%02d %02d:%02d:%02d\n",
-//			current_time.year % 100, current_time.month + 1, current_time.mday,
-//			current_time.hour,current_time.minute, current_time.second);
+//  logerror("mc146818_set_base_datetime %02d/%02d/%02d %02d:%02d:%02d\n",
+//          current_time.year % 100, current_time.month + 1, current_time.mday,
+//          current_time.hour,current_time.minute, current_time.second);
 
 	if (HOURS_24 || (current_time.hour < 12))
 		m_data[4] = dec_2_local(current_time.hour);
@@ -445,10 +445,10 @@ READ8_MEMBER( mc146818_device::read )
 			break;
 
 		case 0xc:
-// 			if(m_updated) /* the clock has been updated */
-//				data = 0x10;
-// 			else
-// 				data = 0x00;
+//          if(m_updated) /* the clock has been updated */
+//              data = 0x10;
+//          else
+//              data = 0x00;
 			// the unused bits b0 ... b3 are always read as 0
 			data = m_data[m_index % MC146818_DATA_SIZE] & 0xf0;
 			// read 0x0c will clear all IRQ flags in register 0x0c

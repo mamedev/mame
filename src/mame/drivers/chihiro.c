@@ -527,7 +527,7 @@ ROM_START( outr2st )
 	ROM_REGION( 0x50, "picreturn", ROMREGION_ERASE)
 
 	ROM_REGION( 0x4000, "pic", ROMREGION_ERASEFF)	// number was not readable on pic, please fix if known
-	ROM_LOAD( "317-0xxx-com.pic", 0x000000, 0x004000, CRC(f94cf26f) SHA1(dd4af2b52935c7b2d8cd196ec1a30c0ef0993322) ) 
+	ROM_LOAD( "317-0xxx-com.pic", 0x000000, 0x004000, CRC(f94cf26f) SHA1(dd4af2b52935c7b2d8cd196ec1a30c0ef0993322) )
 ROM_END
 
 ROM_START( crtaxihr )
