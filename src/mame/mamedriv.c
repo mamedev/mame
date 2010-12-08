@@ -3603,6 +3603,7 @@ V-V                           TP-027
 	DRIVER( wcbowl16 )	/* (c) 1995 Incredible Technologies */
 	DRIVER( wcbowl140 )	/* (c) 1995 Incredible Technologies */
 	DRIVER( wcbowl15 )	/* (c) 1995 Incredible Technologies */
+	DRIVER( wcbowl14 )	/* (c) 1995 Incredible Technologies */
 	DRIVER( wcbowl13 )	/* (c) 1995 Incredible Technologies */
 	DRIVER( wcbowl12 )	/* (c) 1995 Incredible Technologies */
 	DRIVER( sftm )		/* (c) 1995 Capcom/Incredible Technologies */

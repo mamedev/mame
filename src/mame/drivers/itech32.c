@@ -7,12 +7,12 @@
     Golden Tee variants & World Class Bowling Deluxe additions by Brian A. Troha
 
     Games supported:
-        * Time Killers (2 sets)
+        * Time Killers (3 sets)
         * Bloodstorm (4 sets)
         * Hard Yardage (2 sets)
         * Pairs (3 sets)
         * Driver's Edge (1 set)
-        * World Class Bowling (9 sets)
+        * World Class Bowling (10 sets)
         * Street Fighter: The Movie (4 sets)
         * Shuffleshot (3 sets)
         * Golden Tee 3D Golf (11 sets)
@@ -2416,6 +2416,41 @@ ROM_START( wcbowl15 )	/* Version 1.5 (3-tier board set: P/N 1059 Rev 3, P/N 1079
 ROM_END
 
 
+ROM_START( wcbowl14 )	/* Version 1.4 (3-tier board set: P/N 1059 Rev 3, P/N 1079 Rev 1 & P/N 1060 Rev 0) */
+	ROM_REGION16_BE( 0x80000, "user1", 0 )
+	ROM_LOAD16_BYTE( "wcb_v14.u83", 0x00000, 0x20000, CRC(7086131f) SHA1(86fe6f725785a5b1a0fc13ca60823f30713253bc) ) /* Labeled as "WCB V1.4 (U83)" */
+	ROM_LOAD16_BYTE( "wcb_v14.u88", 0x00001, 0x20000, CRC(0225aac1) SHA1(dd37ff8405e98c61acd042d23be93de24af37884) ) /* Labeled as "WCB V1.4 (U88)" */
+
+	ROM_REGION( 0x28000, "soundcpu", 0 )
+	ROM_LOAD( "wcb_snd2.u17", 0x10000, 0x18000, CRC(c14907ba) SHA1(e52fb87c1f9b5847efc0ef15eb7e6c04dcf38110) ) /* Labeled as "WCB SND V2.0" */
+	ROM_CONTINUE(             0x08000, 0x08000 )
+
+	ROM_REGION( 0x880000, "gfx1", 0 )
+	/* No known set specificly checks for this, however the GROM data may be in the form of four 8 Meg roms:
+    ROM_LOAD32_BYTE( "wcb8grom.0_0", 0x000000, 0x100000, CRC(40837737) SHA1(f073943ec6f84285a8559553fb292ec1f8a629d0) ) Labeled as "WCB GROM0_0 *" ect
+    ROM_LOAD32_BYTE( "wcb8grom.0_1", 0x000001, 0x100000, CRC(1615aee8) SHA1(6184919371a894b1d6f2e06a2b328cb55abed4a9) )
+    ROM_LOAD32_BYTE( "wcb8grom.0_2", 0x000002, 0x100000, CRC(d8e0b06e) SHA1(4981c0cf16df68a1b4da7ebf65ca587c21292478) )
+    ROM_LOAD32_BYTE( "wcb8grom.0_3", 0x000003, 0x100000, CRC(0348a7f0) SHA1(462f77514c0e9a28da63732a4f31e9483d4c483e) )
+    */
+	ROM_LOAD32_BYTE( "wcb_grm0.0", 0x000000, 0x080000, CRC(5d79aaae) SHA1(e1bf5c46843f69b8bac41dde73d89ba59b4c8b7f) )
+	ROM_LOAD32_BYTE( "wcb_grm0.1", 0x000001, 0x080000, CRC(e26dcedb) SHA1(15441b97dd3d50d28007062fe28841fa3f762ec9) )
+	ROM_LOAD32_BYTE( "wcb_grm0.2", 0x000002, 0x080000, CRC(32735875) SHA1(4017a8577d8efa8c5b95bd30723ebbf6ecaeba2b) )
+	ROM_LOAD32_BYTE( "wcb_grm0.3", 0x000003, 0x080000, CRC(019d0ab8) SHA1(3281eada296ad746da80ef6e5909c50b03b90d08) )
+	ROM_LOAD32_BYTE( "wcb_grm1.0", 0x200000, 0x080000, CRC(8bd31762) SHA1(a7274c8173b4fb04a6aed0b6a622b52a811a8c83) )
+	ROM_LOAD32_BYTE( "wcb_grm1.1", 0x200001, 0x080000, CRC(b3f761fc) SHA1(5880ca1423cea9a7ca3d0875c8db33787f4056d4) )
+	ROM_LOAD32_BYTE( "wcb_grm1.2", 0x200002, 0x080000, CRC(c22f44ad) SHA1(b25b11346ee1812b2be79105faf64faa0302c105) )
+	ROM_LOAD32_BYTE( "wcb_grm1.3", 0x200003, 0x080000, CRC(036084c4) SHA1(6d2e402d2f4565e037a2676ba676e4b1da2b5dfe) )
+	ROM_FILL(                      0x400000, 0x480000, 0xff )
+
+	ROM_REGION16_BE( 0x400000, "ensoniq.0", ROMREGION_ERASE00 )
+	ROM_LOAD16_BYTE( "ensoniq.2mx", 0x000000, 0x200000, CRC(0814ab80) SHA1(e92525f7cf58cf480510c278fea705f67225e58f) ) /* Ensoniq 2MX16U 1350901801 */
+
+	ROM_REGION16_BE( 0x400000, "ensoniq.2", ROMREGION_ERASE00 )
+	ROM_LOAD16_BYTE( "wcb_srm.0",  0x000000, 0x080000, CRC(115bcd1f) SHA1(c321bf3145c11de1351c8f9cd554ab3d6600e854) )
+	ROM_LOAD16_BYTE( "wcb_srm.1",  0x100000, 0x080000, CRC(87a4a4d8) SHA1(60db2f466686481857eb39b90ac7a19d0a96adac) )
+ROM_END
+
+
 ROM_START( wcbowl13 )	/* Version 1.3 (3-tier board set: P/N 1059 Rev 3, P/N 1079 Rev 1 & P/N 1060 Rev 0) */
 	ROM_REGION16_BE( 0x80000, "user1", 0 )
 	ROM_LOAD16_BYTE( "wcb_v13.u83", 0x00000, 0x20000, CRC(2b6d284e) SHA1(339951661509d07b69c670b7249f30a616872bdf) ) /* Labeled as "WCB V1.3 (U83)" */
@@ -4194,6 +4229,7 @@ GAME( 1995, wcbowl165,   wcbowl,   sftm,     shufbowl, wcbowln,  ROT0, "Incredib
 GAME( 1995, wcbowl161,   wcbowl,   sftm,     shufbowl, wcbowln,  ROT0, "Incredible Technologies",          "World Class Bowling (v1.61)" , 0) /* PIC 16C54 labeled as ITBWL-3 */
 GAME( 1995, wcbowl16,    wcbowl,   sftm,     shufbowl, wcbowln,  ROT0, "Incredible Technologies",          "World Class Bowling (v1.6)" , 0) /* PIC 16C54 labeled as ITBWL-3 */
 GAME( 1995, wcbowl15,    wcbowl,   bloodstm, wcbowl,   wcbowl,   ROT0, "Incredible Technologies",          "World Class Bowling (v1.5)" , 0) /* PIC 16C54 labeled as ITBWL-1 */
+GAME( 1995, wcbowl14,    wcbowl,   bloodstm, wcbowl,   wcbowl,   ROT0, "Incredible Technologies",          "World Class Bowling (v1.4)" , 0) /* PIC 16C54 labeled as ITBWL-1 */
 GAME( 1995, wcbowl13,    wcbowl,   bloodstm, wcbowl,   wcbowl,   ROT0, "Incredible Technologies",          "World Class Bowling (v1.3)" , 0) /* PIC 16C54 labeled as ITBWL-1 */
 GAME( 1995, wcbowl12,    wcbowl,   bloodstm, wcbowl,   wcbowl,   ROT0, "Incredible Technologies",          "World Class Bowling (v1.2)" , 0) /* PIC 16C54 labeled as ITBWL-1 */
 GAME( 1995, sftm,        0,        sftm,     sftm,     sftm,     ROT0, "Capcom / Incredible Technologies", "Street Fighter: The Movie (v1.12)" , 0) /* PIC 16C54 labeled as ITSF-1 */
