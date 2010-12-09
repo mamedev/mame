@@ -3678,6 +3678,7 @@ V-V                           TP-027
 	DRIVER( pigouta )	/* (c) 1990 Leland */
 	DRIVER( ataxx )		/* (c) 1990 Leland */
 	DRIVER( ataxxa )	/* (c) 1990 Leland */
+	DRIVER( ataxxe )	/* (c) 1990 Leland */
 	DRIVER( ataxxj )	/* (c) 1990 Leland */
 	DRIVER( wsf )		/* (c) 1990 Leland */
 	DRIVER( indyheat )	/* (c) 1991 Leland */

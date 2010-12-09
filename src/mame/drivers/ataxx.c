@@ -427,6 +427,39 @@ ROM_START( ataxxa )
 	ROM_LOAD16_WORD( "eeprom-ataxx.bin", 0x0000, 0x0100, CRC(989cdb8c) SHA1(13b30a328e71a195960e98e50d1657a8b6860dcf) )
 ROM_END
 
+ROM_START( ataxxe )
+	ROM_REGION( 0x30000, "master", 0 )
+	ROM_LOAD( "euro_ataxx_u38_3079.bin", 0x00000, 0x20000, CRC(16aef3b7) SHA1(b2de1e3fd032ab8cc5ed995522f528f0b3283d8a) )
+	ROM_RELOAD(             0x10000, 0x20000 )
+
+	ROM_REGION( 0x60000, "slave", 0 )
+	ROM_LOAD( "e-302-31012-01.u111",  0x00000, 0x20000, CRC(9a3297cc) SHA1(1dfa0bacd2f2b18d44bfc2d55c40291c1b142f8f) )
+	ROM_LOAD( "e-302-31013-01.u112",  0x20000, 0x20000, CRC(7e7c3e2f) SHA1(a7e31e1f1b09414c40ab9ace5e9bffbdbaee8704) )
+	ROM_LOAD( "e-302-31014-01.u113",  0x40000, 0x20000, CRC(8cf3e101) SHA1(672a3a0ca0f5334cf614bc49cbc1ae5ccea54cbe) )
+
+	ROM_REGION( 0x100000, "audiocpu", 0 )
+	ROM_LOAD16_BYTE( "302-38003-01.u15", 0x20001, 0x20000, CRC(db266d3f) SHA1(31c9baf4548b23e1e1939069620a937ee98a7b09) )
+	ROM_LOAD16_BYTE( "302-38001-01.u1",  0x20000, 0x20000, CRC(d6db2724) SHA1(d3c7b45b165eb7c9a6369863b273ecac5c31ca65) )
+	ROM_LOAD16_BYTE( "302-38004-01.u16", 0x60001, 0x20000, CRC(2b127f56) SHA1(909fed387ad6bb1d83f9cee271e6dc851ac50525) )
+	ROM_RELOAD(                    0xc0001, 0x20000 )
+	ROM_LOAD16_BYTE( "302-38002-01.u2",  0x60000, 0x20000, CRC(1b63b882) SHA1(cb04e641fc173f787a0f48c98f5198db265c26d8) )
+	ROM_RELOAD(                    0xc0000, 0x20000 )
+
+	ROM_REGION( 0xc0000, "gfx1", 0 )
+	ROM_LOAD( "e-302-31006-01.u98",  0x00000, 0x20000, CRC(59d0f2ae) SHA1(8da5dc006e192af98458227e79421b6a07ac1cdc) )
+	ROM_LOAD( "e-302-31007-01.u99",  0x20000, 0x20000, CRC(6ab7db25) SHA1(25c2fa23b99ac4bab5a9b851c2087de44512a5c2) )
+	ROM_LOAD( "e-302-31008-01.u100",  0x40000, 0x20000, CRC(2352849e) SHA1(f49394b6efb6a87d86516ec0a5ddd582f96f7e5d) )
+	ROM_LOAD( "e-302-31009-01.u101",  0x60000, 0x20000, CRC(4c31e02b) SHA1(2d8dd97a2a737bafb44dced7ce3eef22d7d14cbe) )
+	ROM_LOAD( "e-302-31010-01.u102",  0x80000, 0x20000, CRC(a951228c) SHA1(7ec5cf4d0aa3702be9236d155bea373a06c0be03) )
+	ROM_LOAD( "e-302-31011-01.u103",  0xa0000, 0x20000, CRC(ed326164) SHA1(8706192f525ece200587cee7e7beb4a1975bf63e) )
+
+	ROM_REGION( 0x00001, "user1", ROMREGION_ERASEFF ) /* X-ROM (data used by main processor) */
+    /* Empty / not used */
+
+	ROM_REGION16_BE( 0x100, "eeprom", 0 )
+	ROM_LOAD16_WORD( "eeprom-ataxxe.bin", 0x0000, 0x0100, CRC(8df1dee1) SHA1(876c5d5d506c31fdf4c3e611a1869b50ceadc6fd) )
+ROM_END
+
 
 ROM_START( ataxxj )
 	ROM_REGION( 0x30000, "master", 0 )
@@ -439,11 +472,11 @@ ROM_START( ataxxj )
 	ROM_LOAD( "e-302-31014-01.u113",  0x40000, 0x20000, CRC(8cf3e101) SHA1(672a3a0ca0f5334cf614bc49cbc1ae5ccea54cbe) )
 
 	ROM_REGION( 0x100000, "audiocpu", 0 )
-	ROM_LOAD16_BYTE( "ataxxj.u15", 0x20001, 0x20000, CRC(db266d3f) SHA1(31c9baf4548b23e1e1939069620a937ee98a7b09) )
-	ROM_LOAD16_BYTE( "ataxxj.u1", 0x20000, 0x20000, CRC(d6db2724) SHA1(d3c7b45b165eb7c9a6369863b273ecac5c31ca65) )
-	ROM_LOAD16_BYTE( "ataxxj.u16", 0x60001, 0x20000, CRC(2b127f56) SHA1(909fed387ad6bb1d83f9cee271e6dc851ac50525) )
+	ROM_LOAD16_BYTE( "302-38003-01.u15", 0x20001, 0x20000, CRC(db266d3f) SHA1(31c9baf4548b23e1e1939069620a937ee98a7b09) )
+	ROM_LOAD16_BYTE( "302-38001-01.u1",  0x20000, 0x20000, CRC(d6db2724) SHA1(d3c7b45b165eb7c9a6369863b273ecac5c31ca65) )
+	ROM_LOAD16_BYTE( "302-38004-01.u16", 0x60001, 0x20000, CRC(2b127f56) SHA1(909fed387ad6bb1d83f9cee271e6dc851ac50525) )
 	ROM_RELOAD(                    0xc0001, 0x20000 )
-	ROM_LOAD16_BYTE( "ataxxj.u2", 0x60000, 0x20000, CRC(1b63b882) SHA1(cb04e641fc173f787a0f48c98f5198db265c26d8) )
+	ROM_LOAD16_BYTE( "302-38002-01.u2",  0x60000, 0x20000, CRC(1b63b882) SHA1(cb04e641fc173f787a0f48c98f5198db265c26d8) )
 	ROM_RELOAD(                    0xc0000, 0x20000 )
 
 	ROM_REGION( 0xc0000, "gfx1", 0 )
@@ -757,6 +790,7 @@ static DRIVER_INIT( asylum )
 
 GAME( 1990, ataxx,    0,      ataxx,   ataxx,    ataxx,    ROT0,   "Leland Corp.", "Ataxx (set 1)", 0 )
 GAME( 1990, ataxxa,   ataxx,  ataxx,   ataxx,    ataxx,    ROT0,   "Leland Corp.", "Ataxx (set 2)", 0 )
+GAME( 1990, ataxxe,   ataxx,  ataxx,   ataxx,    ataxx,    ROT0,   "Leland Corp.", "Ataxx (Europe)", 0 )
 GAME( 1990, ataxxj,   ataxx,  ataxx,   ataxx,    ataxxj,   ROT0,   "Leland Corp.", "Ataxx (Japan)", 0 )
 GAME( 1990, wsf,      0,      wsf,     wsf,      wsf,      ROT0,   "Leland Corp.", "World Soccer Finals", 0 )
 GAME( 1991, indyheat, 0,      wsf,     indyheat, indyheat, ROT0,   "Leland Corp.", "Danny Sullivan's Indy Heat", 0 )
