@@ -701,7 +701,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cavepgm_mem, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM
-
+         
 	AM_RANGE(0x700006, 0x700007) AM_WRITENOP // Watchdog?
 
 //  AM_RANGE(0x800000, 0x81ffff) AM_RAM AM_MIRROR(0x0e0000) AM_BASE(&pgm_mainram) AM_SHARE("sram") /* Main Ram */
@@ -5454,6 +5454,8 @@ static DRIVER_INIT( kovqhsgs )
 */
 static UINT16 value0, value1, valuekey, ddp3lastcommand;
 static UINT32 valueresponse;
+int ddp3internal_slot = 0;
+UINT32 ddp3slots[0xff];
 
 static WRITE16_HANDLER( ddp3_asic_w )
 {
@@ -5500,12 +5502,31 @@ static WRITE16_HANDLER( ddp3_asic_w )
 				break;
 
 			case 0x40:
-			case 0x67:
-			case 0x8e:
-			case 0xe5:
+			
+				// what is it?
 				printf("%06x command %02x | %04x\n", cpu_get_pc(space->cpu), ddp3lastcommand, value0);
 				valueresponse = 0x880000;
 				break;
+
+			case 0x67:
+				printf("%06x command %02x | %04x\n", cpu_get_pc(space->cpu), ddp3lastcommand, value0);
+				valueresponse = 0x880000;
+				ddp3internal_slot = (value0 & 0xff00)>>8;
+				ddp3slots[ddp3internal_slot] = (value0 & 0x00ff) << 16;
+				break;
+		
+			case 0xe5:
+				printf("%06x command %02x | %04x\n", cpu_get_pc(space->cpu), ddp3lastcommand, value0);
+				valueresponse = 0x880000;
+				ddp3slots[ddp3internal_slot] |= (value0 & 0xffff);
+				break;
+
+	
+			case 0x8e:
+				printf("%06x command %02x | %04x\n", cpu_get_pc(space->cpu), ddp3lastcommand, value0);
+				valueresponse = ddp3slots[value0&0xff];
+				break;
+			
 
 			case 0x99: // reset?
 				valuekey = 0x100;
@@ -5551,7 +5572,7 @@ static READ16_HANDLER( ddp3_ram_mirror_r )
 	// HACK!
 	// this should be a mirror of main ram, at least according to the standard PGM map.
 	// returning 0x0000 for all values read from here allows the games to run for a bit longer tho
-	printf("%06x ddp3_ram_mirror_r would return %04x returning 0x0000 instead\n", cpu_get_pc(space->cpu), pgm_mainram[offset]);
+	//printf("%06x ddp3_ram_mirror_r would return %04x returning 0x0000 instead\n", cpu_get_pc(space->cpu), pgm_mainram[offset]);
 	return 0x0000;
 	//return pgm_mainram[offset];
 }
