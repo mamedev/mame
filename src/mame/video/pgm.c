@@ -261,7 +261,7 @@ static void draw_sprites( running_machine *machine, bitmap_t* spritebitmap, UINT
 		if (xpos > 0x3ff) xpos -=0x800;
 		if (ypos > 0x1ff) ypos -=0x400;
 
-		if (high == 0) break; /* is this right? */
+		if (!sprite_source[4]) break; /* is this right? */
 
 		//if ((priority == 1) && (pri == 0)) break;
 
