@@ -729,6 +729,22 @@ void acia6850_device::rx_clock_in()
 
 
 /*-------------------------------------------------
+    set_rx_clock - set receiver clock 
+-------------------------------------------------*/
+
+void acia6850_device::set_rx_clock(int clock)
+{
+	m_rx_clock = clock;
+
+	if (m_rx_clock)
+	{
+		attotime rx_period = attotime_mul(ATTOTIME_IN_HZ(m_rx_clock), m_divide);
+		timer_adjust_periodic(m_rx_timer, rx_period, 0, rx_period);
+	}
+}
+
+
+/*-------------------------------------------------
     acia6850_set_rx_clock - Set clock frequencies
     dynamically
 -------------------------------------------------*/
@@ -736,6 +752,22 @@ void acia6850_device::rx_clock_in()
 void acia6850_set_rx_clock(running_device *device, int clock)
 {
 	downcast<acia6850_device*>(device)->set_rx_clock(clock);
+}
+
+
+/*-------------------------------------------------
+    set_tx_clock - set receiver clock 
+-------------------------------------------------*/
+
+void acia6850_device::set_tx_clock(int clock)
+{
+	m_tx_clock = clock;
+
+	if (m_tx_clock)
+	{
+		attotime tx_period = attotime_mul(ATTOTIME_IN_HZ(m_tx_clock), m_divide);
+		timer_adjust_periodic(m_tx_timer, tx_period, 0, tx_period);
+	}
 }
 
 

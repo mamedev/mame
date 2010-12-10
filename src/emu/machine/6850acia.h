@@ -113,8 +113,8 @@ public:
 	void tx_clock_in();
 	void rx_clock_in();
 
-	void set_rx_clock(int clock) { m_rx_clock = clock; }
-	void set_tx_clock(int clock) { m_tx_clock = clock; }
+	void set_rx_clock(int clock);
+	void set_tx_clock(int clock);
 
 protected:
     // device-level overrides
