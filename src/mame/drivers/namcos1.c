@@ -1510,8 +1510,8 @@ ROM_END
 /* Pac-Mania */
 ROM_START( pacmania )
 	ROM_REGION( 0x2c000, "audiocpu", 0 )       /* 176k for the sound cpu */
-	ROM_LOAD( "pnx_s0.bin",         0x0c000, 0x10000, CRC(c10370fa) SHA1(f819a31075d3c8df5deee2919cd446b9e678c47d) )
-	ROM_LOAD( "pnx_s1.bin",         0x1c000, 0x10000, CRC(f761ed5a) SHA1(1487932c86a6094ed01d5032904fd7ae3435d09c) )
+	ROM_LOAD( "pn2_s0.bin",         0x0c000, 0x10000, CRC(c10370fa) SHA1(f819a31075d3c8df5deee2919cd446b9e678c47d) )
+	ROM_LOAD( "pn2_s1.bin",         0x1c000, 0x10000, CRC(f761ed5a) SHA1(1487932c86a6094ed01d5032904fd7ae3435d09c) )
 
 	ROM_REGION( 0x400000, "user1", 0 ) /* 4M for ROMs */
 	/* 000000-07ffff empty */
@@ -1521,14 +1521,14 @@ ROM_START( pacmania )
 	/* 200000-27ffff empty */
 	/* 280000-2fffff empty */
 	ROM_LOAD_1024( "pn_prg-6.bin",    0x300000, CRC(fe94900c) SHA1(5ce726baafc5ed24ea4cae33232c97637afb486b) )
-	ROM_LOAD_512 ( "pnx_p7.bin",      0x380000, CRC(462fa4fd) SHA1(b27bee1ac64ac204c85703c3822de7dbda11b75e) )
+	ROM_LOAD_512 ( "pn2_p7.bin",      0x380000, CRC(462fa4fd) SHA1(b27bee1ac64ac204c85703c3822de7dbda11b75e) )
 
 	ROM_REGION( 0xd0000, "mcu", 0 )       /* the MCU & voice */
 	ROM_LOAD( "cus64-64a1.mcu",     0x0f000, 0x01000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
-	ROM_LOAD_HS( "pnx_v0.bin",      0x10000, 0x10000, CRC(1ad5788f) SHA1(f6b1ccdcc3db11c0ab83e3ff24e772cd2b491468) )
+	ROM_LOAD_HS( "pn2_v0.bin",      0x10000, 0x10000, CRC(1ad5788f) SHA1(f6b1ccdcc3db11c0ab83e3ff24e772cd2b491468) )
 
 	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
-	ROM_LOAD( "pn1_c8.bin",         0x00000, 0x10000, CRC(f3afd65d) SHA1(51daefd8685b49c464130b9e7d93e31cfdda724e) )
+	ROM_LOAD( "pn2_c8.bin",         0x00000, 0x10000, CRC(f3afd65d) SHA1(51daefd8685b49c464130b9e7d93e31cfdda724e) )
 
 	ROM_REGION( 0x100000, "gfx2", 0 ) /* characters */
 	ROM_LOAD( "pn_chr-0.bin",       0x00000, 0x20000, CRC(7c57644c) SHA1(77d9cc9ffbed47a941e4c5e5645d7d1126f6c302) )

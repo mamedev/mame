@@ -1998,11 +1998,11 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( kyros, alpha68k_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 6000000) /* 24MHz/4? */
+	MDRV_CPU_ADD("maincpu", M68000, XTAL_24MHz/4)	/* Verified on bootleg PCB */
 	MDRV_CPU_PROGRAM_MAP(kyros_map)
 	MDRV_CPU_VBLANK_INT_HACK(alpha68k_interrupt,2)
 
-	MDRV_CPU_ADD("audiocpu", Z80, 3579545)
+	MDRV_CPU_ADD("audiocpu", Z80, XTAL_24MHz/6)	/* Verified on bootleg PCB */
 	MDRV_CPU_PROGRAM_MAP(kyros_sound_map)
 	MDRV_CPU_IO_MAP(kyros_sound_portmap)
 //AT
@@ -2030,13 +2030,13 @@ static MACHINE_CONFIG_START( kyros, alpha68k_state )
 //AT
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym1", YM2203, 3000000)
+	MDRV_SOUND_ADD("ym1", YM2203, XTAL_24MHz/12)	/* Verified on bootleg PCB */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 
-	MDRV_SOUND_ADD("ym2", YM2203, 3000000)
+	MDRV_SOUND_ADD("ym2", YM2203, XTAL_24MHz/12)	/* Verified on bootleg PCB */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 
-	MDRV_SOUND_ADD("ym3", YM2203, 3000000)
+	MDRV_SOUND_ADD("ym3", YM2203, XTAL_24MHz/12)	/* Verified on bootleg PCB */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 
 	MDRV_SOUND_ADD("dac", DAC, 0)

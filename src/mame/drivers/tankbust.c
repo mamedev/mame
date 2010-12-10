@@ -325,11 +325,13 @@ static MACHINE_RESET( tankbust )
 static MACHINE_CONFIG_START( tankbust, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 4000000)		/* 4 MHz ? */
+	MDRV_CPU_ADD("maincpu", Z80, XTAL_14_31818MHz/2)	/* Verified on PCB */
 	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("sub", Z80, 4000000)		/* 3.072 MHz ? */
+	MDRV_CPU_ADD("sub", Z80, XTAL_14_31818MHz/4)		/* Verified on PCB */
+//	MDRV_CPU_ADD("sub", Z80, XTAL_14_31818MHz/3)		/* Accurate to audio recording, but apparently incorrect clock */
+
 	MDRV_CPU_PROGRAM_MAP(map_cpu2)
 	MDRV_CPU_IO_MAP(port_map_cpu2)
 
@@ -357,11 +359,11 @@ static MACHINE_CONFIG_START( tankbust, driver_device )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay1", AY8910, 2000000)
+	MDRV_SOUND_ADD("ay1", AY8910, XTAL_14_31818MHz/16)	/* Verified on PCB */
 	MDRV_SOUND_CONFIG(ay8910_config)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MDRV_SOUND_ADD("ay2", AY8910, 2000000)
+	MDRV_SOUND_ADD("ay2", AY8910, XTAL_14_31818MHz/16)	/* Verified on PCB */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
 

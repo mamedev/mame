@@ -10,7 +10,6 @@
 #include "sound/ay8910.h"
 #include "includes/chaknpop.h"
 
-
 /***************************************************************************
 
   Memory Handler(s)
@@ -274,10 +273,7 @@ static MACHINE_RESET( chaknpop )
 static MACHINE_CONFIG_START( chaknpop, chaknpop_state )
 
 	/* basic machine hardware */
-	/* the real board is 3.072MHz, but it is faster for MAME */
-	//MDRV_CPU_ADD("maincpu", Z80, 18432000 / 6)   /* 3.072 MHz */
-	MDRV_CPU_ADD("maincpu", Z80, 2350000)
-	//MDRV_CPU_ADD("maincpu", Z80, 2760000)
+	MDRV_CPU_ADD("maincpu", Z80, XTAL_18MHz / 6)	/* Verified on PCB */
 	MDRV_CPU_PROGRAM_MAP(chaknpop_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
@@ -302,11 +298,11 @@ static MACHINE_CONFIG_START( chaknpop, chaknpop_state )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay1", AY8910, 18432000 / 12)
+	MDRV_SOUND_ADD("ay1", AY8910, XTAL_18MHz / 12)	/* Verified on PCB */
 	MDRV_SOUND_CONFIG(ay8910_interface_1)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MDRV_SOUND_ADD("ay2", AY8910, 18432000 / 12)
+	MDRV_SOUND_ADD("ay2", AY8910, XTAL_18MHz / 12)	/* Verified on PCB */
 	MDRV_SOUND_CONFIG(ay8910_interface_2)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
