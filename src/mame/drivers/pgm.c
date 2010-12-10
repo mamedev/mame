@@ -5451,8 +5451,9 @@ static DRIVER_INIT( kovqhsgs )
 */
 static UINT16 value0, value1, valuekey, ddp3lastcommand;
 static UINT32 valueresponse;
-int ddp3internal_slot = 0;
-UINT32 ddp3slots[0xff];
+static int ddp3internal_slot = 0;
+static UINT32 ddp3slots[0x100];
+static int ddp3thrustkludge;
 
 static WRITE16_HANDLER( ddp3_asic_w )
 {
@@ -5503,10 +5504,20 @@ static WRITE16_HANDLER( ddp3_asic_w )
 				// what is it? - it's definitely subtract for the blades in ketsui
 				// however in ddp3 the raw value won't put the thrusters in the right place, and an 'invalid' looking 0x40 command
 				// is issued at the start / when you die, which I'm guessing has some influence on it.
-				printf("%06x command %02x | %04x\n", cpu_get_pc(space->cpu), ddp3lastcommand, value0);
+				//printf("%06x command %02x | %04x\n", cpu_get_pc(space->cpu), ddp3lastcommand, value0);
 				valueresponse = 0x880000;
-				if (value0==0x420) ddp3slots[ddp3internal_slot]-=value0;
-				else printf("ignoring 0x40 - %04x %04x %04x\n", ddp3internal_slot, value0, ddp3slots[ddp3internal_slot]);
+				if (value0==0x420)
+				{
+					if (!ddp3thrustkludge) ddp3slots[ddp3internal_slot]-=value0;
+					else ddp3slots[ddp3internal_slot]-=0x780;
+				}
+				else
+				{
+					// ddp3 sends this command with a value of 0x1083 (which if shifted left by 2 is 420C)
+					// ddp3 also expects a different offset for the thrusters, even when sending 0x420 later.. so kludge it
+					//printf("ignoring 0x40 - %04x %04x %04x\n", ddp3internal_slot, value0, ddp3slots[ddp3internal_slot]);
+					ddp3thrustkludge = 1;
+				}
 				break;
 
 			case 0x67:
@@ -5532,6 +5543,7 @@ static WRITE16_HANDLER( ddp3_asic_w )
 			case 0x99: // reset?
 				valuekey = 0x100;
 				valueresponse = 0x00880000;
+				ddp3thrustkludge = 0;
 				break;
 
 		}
@@ -5718,13 +5730,15 @@ GAME( 2004, happy6,       pgm,       svg,     sango,    svg,        ROT0,   "IGS
 GAME( 2005, svg,          pgm,       svg,     sango,    svg,        ROT0,   "IGS", "S.V.G. - Spectral vs Generation (ver. 200)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) /* need internal rom of IGS027A */
 
 /* these don't use an External ARM rom, and don't have any weak internal functions which would allow the internal ROM to be read out */
-GAME( 2002, ddp3,         0,         cavepgm,    ddp2,     ddp3,       ROT270, "Cave", "DoDonPachi Dai-Ou-Jou", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
-GAME( 2002, ddp3blk,      ddp3,      cavepgm,    ddp2,     ddp3,       ROT270, "Cave", "DoDonPachi Dai-Ou-Jou (Black Label)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+
+// I'd be surprised if there wasn't also an older release displaying "2002.04.05 Master Ver" (no period after 05)
+GAME( 2002, ddp3,         0,         cavepgm,    ddp2,     ddp3,       ROT270, "Cave", "DoDonPachi Dai-Ou-Jou", GAME_IMPERFECT_SOUND ) // Displays "2002.04.05.Master Ver"
+GAME( 2002, ddp3blk,      ddp3,      cavepgm,    ddp2,     ddp3,       ROT270, "Cave", "DoDonPachi Dai-Ou-Jou (Black Label)", GAME_IMPERFECT_SOUND ) // Displays "2002.04.05.Master Ver" (old) or "2002.10.07 Black Ver" (new)
 
 // the exact text of the 'version' shows which revision of the game it is; the newest has 2 '.' symbols in the string, the oldest, none.
-GAME( 2002, ket,          0,         cavepgm,    ddp2,     ket,       ROT270, "Cave", "Ketsui",                  GAME_IMPERFECT_SOUND ) // Displays 2003/01/01. Master Ver.
-GAME( 2002, keta,         ket,       cavepgm,    ddp2,     ket,       ROT270, "Cave", "Ketsui (older)",          GAME_IMPERFECT_SOUND ) // Displays 2003/01/01 Master Ver.
-GAME( 2002, ketb,         ket,       cavepgm,    ddp2,     ket,       ROT270, "Cave", "Ketsui (first revision)", GAME_IMPERFECT_SOUND ) // Displays 2003/01/01 Master Ver
+GAME( 2002, ket,          0,         cavepgm,    ddp2,     ket,       ROT270, "Cave", "Ketsui",                  GAME_IMPERFECT_SOUND ) // Displays "2003/01/01. Master Ver."
+GAME( 2002, keta,         ket,       cavepgm,    ddp2,     ket,       ROT270, "Cave", "Ketsui (older)",          GAME_IMPERFECT_SOUND ) // Displays "2003/01/01 Master Ver."
+GAME( 2002, ketb,         ket,       cavepgm,    ddp2,     ket,       ROT270, "Cave", "Ketsui (first revision)", GAME_IMPERFECT_SOUND ) // Displays "2003/01/01 Master Ver"
 
 GAME( 2002, espgal,       0,         cavepgm,    ddp2,     espgal,       ROT270, "Cave", "EspGaluda", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 
