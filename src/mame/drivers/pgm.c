@@ -704,10 +704,7 @@ static ADDRESS_MAP_START( cavepgm_mem, ADDRESS_SPACE_PROGRAM, 16)
          
 	AM_RANGE(0x700006, 0x700007) AM_WRITENOP // Watchdog?
 
-//  AM_RANGE(0x800000, 0x81ffff) AM_RAM AM_MIRROR(0x0e0000) AM_BASE(&pgm_mainram) AM_SHARE("sram") /* Main Ram */
-	AM_RANGE(0x800000, 0x81ffff) AM_RAM AM_BASE(&pgm_mainram) AM_SHARE("sram") /* Main Ram */
-	/* 0x880000 - 0x89ffff seems to be protection related, maybe they just happen to access protection results
-       via a mirror tho. */
+	AM_RANGE(0x800000, 0x81ffff) AM_RAM AM_MIRROR(0x0e0000) AM_BASE(&pgm_mainram) AM_SHARE("sram") /* Main Ram */
 
 	AM_RANGE(0x900000, 0x907fff) AM_MIRROR(0x0f8000) AM_READWRITE(pgm_videoram_r, pgm_videoram_w) AM_BASE_MEMBER(pgm_state, videoram) /* IGS023 VIDEO CHIP */
 	AM_RANGE(0xa00000, 0xa011ff) AM_RAM_WRITE(paletteram16_xRRRRRGGGGGBBBBB_word_w) AM_BASE_GENERIC(paletteram)
@@ -5503,27 +5500,31 @@ static WRITE16_HANDLER( ddp3_asic_w )
 
 			case 0x40:
 			
-				// what is it?
+				// what is it? - it's definitely subtract for the blades in ketsui
+				// however in ddp3 the raw value won't put the thrusters in the right place, and an 'invalid' looking 0x40 command
+				// is issued at the start / when you die, which I'm guessing has some influence on it.
 				printf("%06x command %02x | %04x\n", cpu_get_pc(space->cpu), ddp3lastcommand, value0);
 				valueresponse = 0x880000;
+				if (value0==0x420) ddp3slots[ddp3internal_slot]-=value0;
+				else printf("ignoring 0x40 - %04x %04x %04x\n", ddp3internal_slot, value0, ddp3slots[ddp3internal_slot]);
 				break;
 
 			case 0x67:
-				printf("%06x command %02x | %04x\n", cpu_get_pc(space->cpu), ddp3lastcommand, value0);
+		//		printf("%06x command %02x | %04x\n", cpu_get_pc(space->cpu), ddp3lastcommand, value0);
 				valueresponse = 0x880000;
 				ddp3internal_slot = (value0 & 0xff00)>>8;
 				ddp3slots[ddp3internal_slot] = (value0 & 0x00ff) << 16;
 				break;
 		
 			case 0xe5:
-				printf("%06x command %02x | %04x\n", cpu_get_pc(space->cpu), ddp3lastcommand, value0);
+			//	printf("%06x command %02x | %04x\n", cpu_get_pc(space->cpu), ddp3lastcommand, value0);
 				valueresponse = 0x880000;
 				ddp3slots[ddp3internal_slot] |= (value0 & 0xffff);
 				break;
 
 	
 			case 0x8e:
-				printf("%06x command %02x | %04x\n", cpu_get_pc(space->cpu), ddp3lastcommand, value0);
+		//		printf("%06x command %02x | %04x\n", cpu_get_pc(space->cpu), ddp3lastcommand, value0);
 				valueresponse = ddp3slots[value0&0xff];
 				break;
 			
@@ -5567,32 +5568,20 @@ static READ16_HANDLER( ddp3_asic_r )
 	return 0xffff;
 }
 
-static READ16_HANDLER( ddp3_ram_mirror_r )
-{
-	// HACK!
-	// this should be a mirror of main ram, at least according to the standard PGM map.
-	// returning 0x0000 for all values read from here allows the games to run for a bit longer tho
-	//printf("%06x ddp3_ram_mirror_r would return %04x returning 0x0000 instead\n", cpu_get_pc(space->cpu), pgm_mainram[offset]);
-	return 0x0000;
-	//return pgm_mainram[offset];
-}
 
 void install_asic27a_ddp3(running_machine* machine)
 {
 	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x500000, 0x500005, 0, 0, ddp3_asic_r, ddp3_asic_w);
-	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x880000, 0x89ffff, 0, 0, ddp3_ram_mirror_r);
 }
 
 void install_asic27a_ket(running_machine* machine)
 {
 	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400000, 0x400005, 0, 0, ddp3_asic_r, ddp3_asic_w);
-	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x880000, 0x89ffff, 0, 0, ddp3_ram_mirror_r);
 }
 
 void install_asic27a_espgal(running_machine* machine)
 {
 	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x400000, 0x400005, 0, 0, ddp3_asic_r, ddp3_asic_w);
-	memory_install_read16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x880000, 0x89ffff, 0, 0, ddp3_ram_mirror_r);
 }
 
 
@@ -5733,9 +5722,9 @@ GAME( 2002, ddp3,         0,         cavepgm,    ddp2,     ddp3,       ROT270, "
 GAME( 2002, ddp3blk,      ddp3,      cavepgm,    ddp2,     ddp3,       ROT270, "Cave", "DoDonPachi Dai-Ou-Jou (Black Label)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 
 // the exact text of the 'version' shows which revision of the game it is; the newest has 2 '.' symbols in the string, the oldest, none.
-GAME( 2002, ket,          0,         cavepgm,    ddp2,     ket,       ROT270, "Cave", "Ketsui",                  GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // Displays 2003/01/01. Master Ver.
-GAME( 2002, keta,         ket,       cavepgm,    ddp2,     ket,       ROT270, "Cave", "Ketsui (older)",          GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // Displays 2003/01/01 Master Ver.
-GAME( 2002, ketb,         ket,       cavepgm,    ddp2,     ket,       ROT270, "Cave", "Ketsui (first revision)", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE ) // Displays 2003/01/01 Master Ver
+GAME( 2002, ket,          0,         cavepgm,    ddp2,     ket,       ROT270, "Cave", "Ketsui",                  GAME_IMPERFECT_SOUND ) // Displays 2003/01/01. Master Ver.
+GAME( 2002, keta,         ket,       cavepgm,    ddp2,     ket,       ROT270, "Cave", "Ketsui (older)",          GAME_IMPERFECT_SOUND ) // Displays 2003/01/01 Master Ver.
+GAME( 2002, ketb,         ket,       cavepgm,    ddp2,     ket,       ROT270, "Cave", "Ketsui (first revision)", GAME_IMPERFECT_SOUND ) // Displays 2003/01/01 Master Ver
 
 GAME( 2002, espgal,       0,         cavepgm,    ddp2,     espgal,       ROT270, "Cave", "EspGaluda", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 
