@@ -271,6 +271,7 @@ static const naomibd_config_table naomibd_translate_tbl[] =
 	{ "sstrkfgt", 0, 0x132303, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
 	{ "suchie3", 0, 0x0368e1, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
 	{ "toyfight", 0, 0x02ca85, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
+	{ "vf4cart", 0, 0x2ef2f96, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
 	{ "vtennis", 0, 0x03eb15, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
 	{ "vonot", 0, 0x010715, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
 	{ "wldkicks", 0, 0xae2901, { 0, 0, 0, 0xffffffff, 0xffffffff, 0xffffffff } },
