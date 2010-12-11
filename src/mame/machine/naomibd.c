@@ -1187,12 +1187,9 @@ you could apply a fixed bitswapping and XOR to the keys and the decryption would
 accordingly the s-boxes' definitions. So the order of the bits in the keys is arbitrary, and the s-boxes values have been
 chosen so as to make the key for CAPSNK equal to 0.
 
-It can be observed that some sboxes have incomplete tables (a 255 value indicate an unknown value). It's unclear whether or
-not they are used by the cipher, as the bits of the recovered keys as of november/2010 show small randomness and big correlations,
-making possible that some unseen bits could make the decryption need those incomplete parts. Even if not, as of november/2010, there are one
-s-box which have an incomplete table which definitely could be being used by some carts: the 1st s-box of the 1st round of the 1st FN.
-It is incomplete because we haven't located any game using that part of the s-box
-till now, but definitively it could be being used by some still-not-analyzed carts.
+It can be observed that a couple of sboxes have incomplete tables (a 255 value indicate an unknown value). The recovered keys
+as of december/2010 show small randomness and big correlations, making possible that some unseen bits could make the
+decryption need those incomplete parts.
 
 When bit #1 of the heading control bits is set to 1, an additional decompression step seems to be carried out. As of
 february/2010, Deunan Knute has put some work on analyzing the decompression algorithm, but probably much more work will
@@ -1223,9 +1220,7 @@ static const struct sbox fn1_sboxes[4][4] =
         {
             {
                 0,3,2,2,1,3,1,2,3,2,1,2,1,2,3,1,3,2,2,0,2,1,3,0,0,3,2,3,2,1,2,0,
-                2,3,1,1,2,2,1,1,1,0,2,3,3,0,2,1,
-                // potentially used, but we haven't located any game using it
-                255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
+                2,3,1,1,2,2,1,1,1,0,2,3,3,0,2,1,1,1,1,1,3,0,3,2,1,0,1,2,0,3,1,3,
             },
             {3,4,5,7,-1,-1},
             {0,4}
@@ -1271,8 +1266,7 @@ static const struct sbox fn1_sboxes[4][4] =
         {
             {
                 2,0,1,0,0,3,2,0,3,3,1,2,1,3,0,2,0,2,0,0,0,2,3,1,3,1,1,2,3,0,3,0,
-                // unused?
-                255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,
+                3,0,2,0,0,2,2,1,0,2,3,3,1,3,1,0,1,3,3,0,0,1,3,1,0,2,0,3,2,1,0,1,
             },
             {0,1,3,4,6,-1},
             {1,5}
@@ -1527,22 +1521,22 @@ static const struct sbox fn2_sboxes[4][4] =
     },
 };
 
-static const int fn1_game_key_scheduling[36][2] =
+static const int fn1_game_key_scheduling[38][2] =
 {
     {1,29},  {1,71},  {2,4},   {2,54},  {3,8},   {4,56},  {4,73},  {5,11},
     {6,51},  {7,92},  {8,89},  {9,9},   {9,10},  {9,39},  {9,41},  {9,58},
     {9,59},  {9,86},  {10,90}, {11,6},  {12,64}, {13,49}, {14,44}, {15,40},
     {16,69}, {17,15}, {18,23}, {18,43}, {19,82}, {20,81}, {21,32}, {21,61},
-    {22,5},  {23,66}, {24,13}, {24,45}
+    {22,5},  {23,66}, {24,13}, {24,45}, {25,12}, {25,35}
 };
 
-static const int fn2_game_key_scheduling[33][2] =
+static const int fn2_game_key_scheduling[34][2] =
 {
     {0,0},   {1,3},   {2,11},  {3,20},  {4,22},  {5,23},  {6,29},  {7,38},
     {8,39},  {9,47},  {9,55},  {9,86},  {9,87},  {9,90},  {10,50}, {10,53},
     {11,57}, {12,59}, {13,61}, {13,64}, {14,63}, {15,67}, {16,72}, {17,83},
     {18,88}, {19,94}, {20,35}, {21,17}, {21,92}, {22,6},  {22,11}, {23,85},
-    {24,16}
+    {24,16}, {25,25}
 };
 
 static const int fn1_sequence_key_scheduling[20][2] =
@@ -1606,7 +1600,7 @@ static UINT16 block_decrypt(UINT32 game_key, UINT16 sequence_key, UINT16 counter
     memset(fn1_subkeys,0,sizeof(UINT32)*4);
     memset(fn2_subkeys,0,sizeof(UINT32)*4);
 
-    for (j=0; j<36; ++j)
+    for (j=0; j<38; ++j)
     {
         if (BIT(game_key, fn1_game_key_scheduling[j][0])!=0)
         {
@@ -1616,7 +1610,7 @@ static UINT16 block_decrypt(UINT32 game_key, UINT16 sequence_key, UINT16 counter
         }
     }
 
-    for (j=0; j<33; ++j)
+    for (j=0; j<34; ++j)
     {
         if (BIT(game_key, fn2_game_key_scheduling[j][0])!=0)
         {
