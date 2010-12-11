@@ -1369,7 +1369,7 @@ static MACHINE_CONFIG_START( pgm, pgm_state )
 	MDRV_CPU_PROGRAM_MAP(pgm_mem)
 	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
 
-	MDRV_CPU_ADD("soundcpu", Z80, 8468000)
+	MDRV_CPU_ADD("soundcpu", Z80, 33868800/4)
 	MDRV_CPU_PROGRAM_MAP(z80_mem)
 	MDRV_CPU_IO_MAP(z80_io)
 
@@ -1483,16 +1483,73 @@ static MACHINE_CONFIG_DERIVED( svg, pgm )
 	MDRV_CPU_PROGRAM_MAP(svg_arm7_map)
 MACHINE_CONFIG_END
 
+class cavepgm_state : public pgm_state
+{
+public:
+	cavepgm_state(running_machine &machine, const driver_device_config_base &config)
+		: pgm_state(machine, config) {
+	
+		ddp3internal_slot = 0;
+	}
 
-static MACHINE_CONFIG_DERIVED( cavepgm, pgm )
+	UINT16 value0, value1, valuekey, ddp3lastcommand;
+	UINT32 valueresponse;
+	int ddp3internal_slot;
+	UINT32 ddp3slots[0x100];
+	INT16 ddp3thrust;
+};
 
-	MDRV_CPU_MODIFY("maincpu")
+static MACHINE_START( cavepgm )
+{
+	MACHINE_START_CALL(pgm);
+		
+	cavepgm_state *state = machine->driver_data<cavepgm_state>();
+
+	state_save_register_global(machine, state->value0);
+	state_save_register_global(machine, state->value1);
+	state_save_register_global(machine, state->valuekey);
+	state_save_register_global(machine, state->valueresponse);
+	state_save_register_global(machine, state->ddp3internal_slot);
+	state_save_register_global_array(machine, state->ddp3slots);
+}
+
+static MACHINE_CONFIG_START( cavepgm, cavepgm_state )
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD("maincpu", M68000, 20000000)
+	                                
 	MDRV_CPU_PROGRAM_MAP(cavepgm_mem)
 	MDRV_CPU_VBLANK_INT_HACK(drgw_interrupt,2)
 
+	MDRV_CPU_ADD("soundcpu", Z80, 33868800/4)
+	MDRV_CPU_PROGRAM_MAP(z80_mem)
+	MDRV_CPU_IO_MAP(z80_io)
+
+	MDRV_MACHINE_START( cavepgm )
+	MDRV_MACHINE_RESET( pgm )
+	MDRV_NVRAM_ADD_0FILL("sram")
+
+	/* video hardware */
+	MDRV_SCREEN_ADD("screen", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(64*8, 64*8)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 56*8-1, 0*8, 28*8-1)
+
+	MDRV_GFXDECODE(pgm)
+	MDRV_PALETTE_LENGTH(0x1200/2)
+
+	MDRV_VIDEO_START(pgm)
+	MDRV_VIDEO_EOF(pgm)
+	MDRV_VIDEO_UPDATE(pgm)
+
+	/*sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MDRV_SOUND_ADD("ics", ICS2115, 0)
+	MDRV_SOUND_CONFIG(pgm_ics2115_interface)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 5.0)
 MACHINE_CONFIG_END
-
-
 
 /*** Rom Loading *************************************************************/
 
@@ -5440,49 +5497,44 @@ static DRIVER_INIT( kovqhsgs )
 	kovsh_latch_init(machine);
 }
 
-/* this is based on the puzzle star simulation,
- at least for how it communicates with the device..
+/*
+ in Ketsui (ket) @ 000A719C (move.w)
 
- please don't driver_data this, it's temporary code, and just
- becomes and absolute pain to work with if bits of it end
- up all over the place, and near impossible to read with state->
- before everything.
+ if you change D0 to 0x12
+ the game will runs to "Asic27 Test" mode
 
+ bp A71A0,1,{d0=0x12;g}
 */
-static UINT16 value0, value1, valuekey, ddp3lastcommand;
-static UINT32 valueresponse;
-static int ddp3internal_slot = 0;
-static UINT32 ddp3slots[0x100];
-static int ddp3thrustkludge;
 
 static WRITE16_HANDLER( ddp3_asic_w )
 {
+	cavepgm_state *state = space->machine->driver_data<cavepgm_state>();
 
 	if (offset == 0)
 	{
-		value0 = data;
+		state->value0 = data;
 		return;
 	}
 	else if (offset == 1)
 	{
 		UINT16 realkey;
 		if ((data >> 8) == 0xff)
-			valuekey = 0xff00;
-		realkey = valuekey >> 8;
-		realkey |= valuekey;
+			state->valuekey = 0xff00;
+		realkey = state->valuekey >> 8;
+		realkey |= state->valuekey;
 		{
-			valuekey += 0x0100;
-			valuekey &= 0xff00;
-			if (valuekey == 0xff00)
-				valuekey =  0x0100;
+			state->valuekey += 0x0100;
+			state->valuekey &= 0xff00;
+			if (state->valuekey == 0xff00)
+				state->valuekey =  0x0100;
 		}
 		data ^= realkey;
-		value1 = data;
-		value0 ^= realkey;
+		state->value1 = data;
+		state->value0 ^= realkey;
 
-		ddp3lastcommand = value1 & 0xff;
+		state->ddp3lastcommand = state->value1 & 0xff;
 
-		/* typical frame (ddp3) (all 3 games use only these commands? for the most part of levels espgal just issues 8e)
+		/* typical frame (state->ddp3) (all 3 games use only these commands? for the most part of levels espgal just issues 8e)
             vbl
             145f28 command 67
             145f70 command e5
@@ -5492,58 +5544,43 @@ static WRITE16_HANDLER( ddp3_asic_w )
             145ec0 command 8e
             */
 
-		switch (ddp3lastcommand)
+		switch (state->ddp3lastcommand)
 		{
 			default:
-				printf("%06x command %02x | %04x\n", cpu_get_pc(space->cpu), ddp3lastcommand, value0);
-				valueresponse = 0x880000;
+				printf("%06x command %02x | %04x\n", cpu_get_pc(space->cpu), state->ddp3lastcommand, state->value0);
+				state->valueresponse = 0x880000;
 				break;
 
 			case 0x40:
-			
-				// what is it? - it's definitely subtract for the blades in ketsui
-				// however in ddp3 the raw value won't put the thrusters in the right place, and an 'invalid' looking 0x40 command
-				// is issued at the start / when you die, which I'm guessing has some influence on it.
-				//printf("%06x command %02x | %04x\n", cpu_get_pc(space->cpu), ddp3lastcommand, value0);
-				valueresponse = 0x880000;
-				if (value0==0x420)
-				{
-					if (!ddp3thrustkludge) ddp3slots[ddp3internal_slot]-=value0;
-					else ddp3slots[ddp3internal_slot]-=0x780;
-				}
-				else
-				{
-					// ddp3 sends this command with a value of 0x1083 (which if shifted left by 2 is 420C)
-					// ddp3 also expects a different offset for the thrusters, even when sending 0x420 later.. so kludge it
-					//printf("ignoring 0x40 - %04x %04x %04x\n", ddp3internal_slot, value0, ddp3slots[ddp3internal_slot]);
-					ddp3thrustkludge = 1;
-				}
+				state->valueresponse = 0x880000;
+			    state->ddp3slots[(state->value0>>10)&0x1F]=
+					(state->ddp3slots[(state->value0>>5)&0x1F]+
+					 state->ddp3slots[(state->value0>>0)&0x1F])&0xffffff;
 				break;
 
-			case 0x67:
-		//		printf("%06x command %02x | %04x\n", cpu_get_pc(space->cpu), ddp3lastcommand, value0);
-				valueresponse = 0x880000;
-				ddp3internal_slot = (value0 & 0xff00)>>8;
-				ddp3slots[ddp3internal_slot] = (value0 & 0x00ff) << 16;
+			case 0x67: // set high bits
+		//		printf("%06x command %02x | %04x\n", cpu_get_pc(space->cpu), state->ddp3lastcommand, state->value0);
+				state->valueresponse = 0x880000;
+				state->ddp3internal_slot = (state->value0 & 0xff00)>>8;
+				state->ddp3slots[state->ddp3internal_slot] = (state->value0 & 0x00ff) << 16;
 				break;
 		
-			case 0xe5:
-			//	printf("%06x command %02x | %04x\n", cpu_get_pc(space->cpu), ddp3lastcommand, value0);
-				valueresponse = 0x880000;
-				ddp3slots[ddp3internal_slot] |= (value0 & 0xffff);
+			case 0xe5: // set low bits for operation?
+			//	printf("%06x command %02x | %04x\n", cpu_get_pc(space->cpu), state->ddp3lastcommand, state->value0);
+				state->valueresponse = 0x880000;
+				state->ddp3slots[state->ddp3internal_slot] |= (state->value0 & 0xffff);
 				break;
 
 	
-			case 0x8e:
-		//		printf("%06x command %02x | %04x\n", cpu_get_pc(space->cpu), ddp3lastcommand, value0);
-				valueresponse = ddp3slots[value0&0xff];
+			case 0x8e: // read back result of operations
+		//		printf("%06x command %02x | %04x\n", cpu_get_pc(space->cpu), state->ddp3lastcommand, state->value0);
+				state->valueresponse = state->ddp3slots[state->value0&0xff];
 				break;
 			
 
 			case 0x99: // reset?
-				valuekey = 0x100;
-				valueresponse = 0x00880000;
-				ddp3thrustkludge = 0;
+				state->valuekey = 0x100;
+				state->valueresponse = 0x00880000;
 				break;
 
 		}
@@ -5557,12 +5594,13 @@ static WRITE16_HANDLER( ddp3_asic_w )
 
 static READ16_HANDLER( ddp3_asic_r )
 {
+	cavepgm_state *state = space->machine->driver_data<cavepgm_state>();
 
 	if (offset == 0)
 	{
-		UINT16 d = valueresponse & 0xffff;
-		UINT16 realkey = valuekey >> 8;
-		realkey |= valuekey;
+		UINT16 d = state->valueresponse & 0xffff;
+		UINT16 realkey = state->valuekey >> 8;
+		realkey |= state->valuekey;
 		d ^= realkey;
 
 		return d;
@@ -5570,9 +5608,9 @@ static READ16_HANDLER( ddp3_asic_r )
 	}
 	else if (offset == 1)
 	{
-		UINT16 d = valueresponse >> 16;
-		UINT16 realkey = valuekey >> 8;
-		realkey |= valuekey;
+		UINT16 d = state->valueresponse >> 16;
+		UINT16 realkey = state->valuekey >> 8;
+		realkey |= state->valuekey;
 		d ^= realkey;
 		return d;
 
@@ -5732,13 +5770,13 @@ GAME( 2005, svg,          pgm,       svg,     sango,    svg,        ROT0,   "IGS
 /* these don't use an External ARM rom, and don't have any weak internal functions which would allow the internal ROM to be read out */
 
 // I'd be surprised if there wasn't also an older release displaying "2002.04.05 Master Ver" (no period after 05)
-GAME( 2002, ddp3,         0,         cavepgm,    ddp2,     ddp3,       ROT270, "Cave", "DoDonPachi Dai-Ou-Jou", GAME_IMPERFECT_SOUND ) // Displays "2002.04.05.Master Ver"
-GAME( 2002, ddp3blk,      ddp3,      cavepgm,    ddp2,     ddp3,       ROT270, "Cave", "DoDonPachi Dai-Ou-Jou (Black Label)", GAME_IMPERFECT_SOUND ) // Displays "2002.04.05.Master Ver" (old) or "2002.10.07 Black Ver" (new)
+GAME( 2002, ddp3,         0,         cavepgm,    ddp2,     ddp3,       ROT270, "Cave", "DoDonPachi Dai-Ou-Jou", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // Displays "2002.04.05.Master Ver"
+GAME( 2002, ddp3blk,      ddp3,      cavepgm,    ddp2,     ddp3,       ROT270, "Cave", "DoDonPachi Dai-Ou-Jou (Black Label)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // Displays "2002.04.05.Master Ver" (old) or "2002.10.07 Black Ver" (new)
 
 // the exact text of the 'version' shows which revision of the game it is; the newest has 2 '.' symbols in the string, the oldest, none.
-GAME( 2002, ket,          0,         cavepgm,    ddp2,     ket,       ROT270, "Cave", "Ketsui",                  GAME_IMPERFECT_SOUND ) // Displays "2003/01/01. Master Ver."
-GAME( 2002, keta,         ket,       cavepgm,    ddp2,     ket,       ROT270, "Cave", "Ketsui (older)",          GAME_IMPERFECT_SOUND ) // Displays "2003/01/01 Master Ver."
-GAME( 2002, ketb,         ket,       cavepgm,    ddp2,     ket,       ROT270, "Cave", "Ketsui (first revision)", GAME_IMPERFECT_SOUND ) // Displays "2003/01/01 Master Ver"
+GAME( 2002, ket,          0,         cavepgm,    ddp2,     ket,       ROT270, "Cave", "Ketsui",                  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // Displays "2003/01/01. Master Ver."
+GAME( 2002, keta,         ket,       cavepgm,    ddp2,     ket,       ROT270, "Cave", "Ketsui (older)",          GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE) // Displays "2003/01/01 Master Ver."
+GAME( 2002, ketb,         ket,       cavepgm,    ddp2,     ket,       ROT270, "Cave", "Ketsui (first revision)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE) // Displays "2003/01/01 Master Ver"
 
 GAME( 2002, espgal,       0,         cavepgm,    ddp2,     espgal,       ROT270, "Cave", "EspGaluda", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 
