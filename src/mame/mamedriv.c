@@ -5437,6 +5437,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( pandoras )	/* GX328 (c) 1984 + Interlogic */
 	DRIVER( gyruss )	/* GX347 (c) 1983 */
 	DRIVER( gyrussce )	/* GX347 (c) 1983 + Centuri license */
+	DRIVER( gyrussb )	/* bootleg or actual Taito NZ license? */
 	DRIVER( venus )		/* bootleg */
 	DRIVER( trackfld )	/* GX361 (c) 1983 */
 	DRIVER( trackfldc )	/* GX361 (c) 1983 + Centuri license */
