@@ -380,6 +380,20 @@ static INPUT_PORTS_START( threeds )
 INPUT_PORTS_END
 
 
+
+static INPUT_PORTS_START( galds )
+	PORT_INCLUDE(threeds)
+
+	PORT_MODIFY("SYSTEM")
+	// this increases the tip? (has this feature been ripped out of the parent set? there is strange corruption of the line under the 'tip' display)
+    PORT_DIPNAME( 0x01,   0x01, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x01, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x02,   0x02, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x02, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x00, DEF_STR( On ) )	
+INPUT_PORTS_END
+
 static const ay8910_interface ay8910_config =
 {
 	AY8910_LEGACY_OUTPUT,
@@ -533,6 +547,31 @@ ROM_START( 3ds )
 	ROM_LOAD( "mb7112e.7j", 0x0020, 0x0020, CRC(181f2a88) SHA1(a75ea981127fc667bb6b9f2ae2766aa2147ff04a) )
 ROM_END
 
+// might be a bootleg (or licensed) board? had a sub-board (containing only logic) marked "Sky Dragon" and there were no Nichibutsu markings on any of the PCBs or chips
+ROM_START( galds )
+	ROM_REGION( 0x10000, "maincpu", 0 ) /* program */
+	ROM_LOAD( "dg8.ic3",  0x00000, 0x04000, CRC(06c6a98f) SHA1(828deef4e725cafef5088fc2dfab63b62ae0feb0) )
+	ROM_LOAD( "dg9.ic2",  0x04000, 0x04000, CRC(a53eca09) SHA1(001ebb04378e6d7dd5ad15b272e1346655b91eee))
+	ROM_LOAD( "dg10.ic1", 0x08000, 0x04000, CRC(6c380c64) SHA1(3f6b037a8a40fd5c4bc3b469ee3c9f1e1bd302a0) )
 
-GAME( 1985, pastelg, 0, pastelg, pastelg, pastelg, ROT0, "Nichibutsu", "Pastel Gal (Japan 851224)", 0 )
-GAME( 1985, 3ds,     0, threeds, threeds, pastelg, ROT0, "Nichibutsu", "Three Ds - Three Dealers Casino House", 0 )
+	ROM_REGION( 0x08000, "voice", ROMREGION_ERASE00 ) /* voice */
+
+	ROM_REGION( 0x38000, "gfx1", 0 ) /* gfx - the same as 3ds */
+	ROM_LOAD( "dg1.ic11",  0x00000, 0x08000, CRC(5734ca7d) SHA1(d22b9e604cc4e2c0bb4eb32ded06bb5fa519965f) )
+	ROM_LOAD( "dg2.ic10",  0x08000, 0x08000, CRC(c7f21718) SHA1(4b2956d499e4db63e7f2329420e3d0313e6360ed) )
+	ROM_LOAD( "dg3.ic9",   0x10000, 0x08000, CRC(87bd0a9e) SHA1(a0443017ef4c19f0135c4f764a96457f02cda743) )
+	ROM_LOAD( "dg4.ic8",   0x18000, 0x08000, CRC(b75ecf2b) SHA1(50b8f27988dd24ff475a500d361db3c7a7051f40) )
+	ROM_LOAD( "dg5.ic7",   0x20000, 0x08000, CRC(22ee5cf6) SHA1(09725a73f5f107e6fcb1994d94a50748726318b0) )
+	ROM_LOAD( "dg6.ic6",   0x28000, 0x08000, CRC(d86ebe8d) SHA1(2ede43899501ae27db26b48f53f010a4f0df0307) )
+	ROM_LOAD( "dg7.ic5",   0x30000, 0x08000, CRC(6704950a) SHA1(fd60ff2351deb87f19e517cfaedc7ac3dd4aac8d) )
+
+	ROM_REGION( 0x0040, "proms", 0 ) /* color */
+	ROM_LOAD( "mb7112e.7h", 0x0000, 0x0020, CRC(2c4f7343) SHA1(7b069c4a4d68ef308d1c1f773ece4b124428da3f) )
+	ROM_LOAD( "mb7112e.7j", 0x0020, 0x0020, CRC(181f2a88) SHA1(a75ea981127fc667bb6b9f2ae2766aa2147ff04a) )
+ROM_END
+
+
+
+GAME( 1985, pastelg, 0,   pastelg, pastelg, pastelg, ROT0, "Nichibutsu", "Pastel Gal (Japan 851224)", 0 )
+GAME( 1985, 3ds,     0,   threeds, threeds, pastelg, ROT0, "Nichibutsu", "Three Ds - Three Dealers Casino House", 0 )
+GAME( 1985, galds,   3ds, threeds, galds,   pastelg, ROT0, "Nihon System Corp.", "Gals Ds - Three Dealers Casino House (bootleg?)", 0 )

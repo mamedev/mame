@@ -465,6 +465,7 @@ const game_driver * const drivers[] =
 
 	DRIVER( pastelg )	/* (c) 1985 */
 	DRIVER( 3ds )		/* (c) 1985 */
+	DRIVER( galds )		/* (c) 1985 */
 
 	DRIVER( crystalg )	/* (c) 1986 */
 	DRIVER( crystal2 )	/* (c) 1986 */
