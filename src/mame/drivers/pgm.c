@@ -701,7 +701,7 @@ ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( cavepgm_mem, ADDRESS_SPACE_PROGRAM, 16)
 	AM_RANGE(0x000000, 0x3fffff) AM_ROM
-         
+
 	AM_RANGE(0x700006, 0x700007) AM_WRITENOP // Watchdog?
 
 	AM_RANGE(0x800000, 0x81ffff) AM_RAM AM_MIRROR(0x0e0000) AM_BASE(&pgm_mainram) AM_SHARE("sram") /* Main Ram */
@@ -1379,7 +1379,7 @@ static MACHINE_CONFIG_START( pgm, pgm_state )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_REFRESH_RATE(59.17) // verified on pcb
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 64*8)
@@ -1488,7 +1488,7 @@ class cavepgm_state : public pgm_state
 public:
 	cavepgm_state(running_machine &machine, const driver_device_config_base &config)
 		: pgm_state(machine, config) {
-	
+
 		ddp3internal_slot = 0;
 	}
 
@@ -1502,7 +1502,7 @@ public:
 static MACHINE_START( cavepgm )
 {
 	MACHINE_START_CALL(pgm);
-		
+
 	cavepgm_state *state = machine->driver_data<cavepgm_state>();
 
 	state_save_register_global(machine, state->value0);
@@ -1517,7 +1517,7 @@ static MACHINE_CONFIG_START( cavepgm, cavepgm_state )
 
 	/* basic machine hardware */
 	MDRV_CPU_ADD("maincpu", M68000, 20000000)
-	                                
+
 	MDRV_CPU_PROGRAM_MAP(cavepgm_mem)
 	MDRV_CPU_VBLANK_INT_HACK(drgw_interrupt,2)
 
@@ -1531,7 +1531,7 @@ static MACHINE_CONFIG_START( cavepgm, cavepgm_state )
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_REFRESH_RATE(59.17) // verified on pcb
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 64*8)
@@ -5564,19 +5564,19 @@ static WRITE16_HANDLER( ddp3_asic_w )
 				state->ddp3internal_slot = (state->value0 & 0xff00)>>8;
 				state->ddp3slots[state->ddp3internal_slot] = (state->value0 & 0x00ff) << 16;
 				break;
-		
+
 			case 0xe5: // set low bits for operation?
 			//	printf("%06x command %02x | %04x\n", cpu_get_pc(space->cpu), state->ddp3lastcommand, state->value0);
 				state->valueresponse = 0x880000;
 				state->ddp3slots[state->ddp3internal_slot] |= (state->value0 & 0xffff);
 				break;
 
-	
+
 			case 0x8e: // read back result of operations
 		//		printf("%06x command %02x | %04x\n", cpu_get_pc(space->cpu), state->ddp3lastcommand, state->value0);
 				state->valueresponse = state->ddp3slots[state->value0&0xff];
 				break;
-			
+
 
 			case 0x99: // reset?
 				state->valuekey = 0x100;
