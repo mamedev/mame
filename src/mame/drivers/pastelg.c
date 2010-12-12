@@ -391,7 +391,7 @@ static INPUT_PORTS_START( galds )
     PORT_DIPSETTING(      0x00, DEF_STR( On ) )
     PORT_DIPNAME( 0x02,   0x02, DEF_STR( Unknown ) )
     PORT_DIPSETTING(      0x02, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( On ) )	
+    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
 static const ay8910_interface ay8910_config =
@@ -408,7 +408,7 @@ static const ay8910_interface ay8910_config =
 static MACHINE_CONFIG_START( pastelg, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 19968000/8)	/* 2.496 MHz ? */
+	MDRV_CPU_ADD("maincpu", Z80, 19968000/4)	/* unknown divider, galds definitely relies on this for correct voice pitch */
 	MDRV_CPU_PROGRAM_MAP(pastelg_map)
 	MDRV_CPU_IO_MAP(pastelg_io_map)
 //  MDRV_CPU_VBLANK_INT_HACK(nb1413m3_interrupt,96)  // nmiclock not written, chip is 1411M1 instead of 1413M3
@@ -468,7 +468,7 @@ Note
 static MACHINE_CONFIG_START( threeds, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 19968000/8)	/* 2.496 MHz ? */
+	MDRV_CPU_ADD("maincpu", Z80, 19968000/4)	/* unknown divider, galds definitely relies on this for correct voice pitch */
 	MDRV_CPU_PROGRAM_MAP(pastelg_map)
 	MDRV_CPU_IO_MAP(threeds_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
