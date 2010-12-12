@@ -5575,6 +5575,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( suratka )	/* GX911 (c) 1990 (Asia) */
 	DRIVER( suratkj )	/* GX911 (c) 1990 (Japan) */
 	DRIVER( parodius )	/* GX955 (c) 1990 (World) */
+	DRIVER( parodiusa )	/* GX955 (c) 1990 (World) */
 	DRIVER( parodiusj )	/* GX955 (c) 1990 (Japan) */
 	DRIVER( rollerg )	/* GX999 (c) 1991 (US) */
 	DRIVER( rollergj )	/* GX999 (c) 1991 (Japan) */

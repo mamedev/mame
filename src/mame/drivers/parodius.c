@@ -367,6 +367,27 @@ ROM_START( parodius )
 	ROM_LOAD( "955d04.bin", 0x00000, 0x80000, CRC(e671491a) SHA1(79e71cb5212eb7d14d3479b0734ea0270473a66d) )
 ROM_END
 
+ROM_START( parodiusa ) /* Earlier version? */
+	ROM_REGION( 0x48000, "maincpu", 0 ) /* code + banked roms + palette RAM */
+	ROM_LOAD( "2.f5", 0x10000, 0x20000, CRC(26a6410b) SHA1(06de782f593ab0da6d65376b66e273d6410c6c56) )
+	ROM_LOAD( "3.h5", 0x30000, 0x18000, CRC(9410dbf2) SHA1(1c4d9317f83c33bace929a841ff4093d7178c428) )
+	ROM_CONTINUE(     0x08000, 0x08000 )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 ) /* 64k for the sound CPU */
+	ROM_LOAD( "955e03.bin", 0x0000, 0x10000, CRC(940aa356) SHA1(e7466f049be48861fd2d929eed786bd48782b5bb) )
+
+	ROM_REGION( 0x100000, "gfx1", 0 ) /* graphics ( don't dispose as the program can read them, 0 ) */
+	ROM_LOAD( "955d07.bin", 0x000000, 0x080000, CRC(89473fec) SHA1(0da18c4b078c3a30233a6f5c2b90032168136f58) ) /* characters */
+	ROM_LOAD( "955d08.bin", 0x080000, 0x080000, CRC(43d5cda1) SHA1(2c51bad4857d1d31456c6dc1e7d41326ea35468b) ) /* characters */
+
+	ROM_REGION( 0x100000, "gfx2", 0 ) /* graphics ( don't dispose as the program can read them, 0 ) */
+	ROM_LOAD( "955d05.bin", 0x000000, 0x080000, CRC(7a1e55e0) SHA1(7a0e04ebde28d1e7b60aef3de926dc0e78662b1e) )	/* sprites */
+	ROM_LOAD( "955d06.bin", 0x080000, 0x080000, CRC(f4252875) SHA1(490f2e19b30cf8724e4b03b8d9f089c470ec13bd) )	/* sprites */
+
+	ROM_REGION( 0x80000, "k053260", 0 ) /* 053260 samples */
+	ROM_LOAD( "955d04.bin", 0x00000, 0x80000, CRC(e671491a) SHA1(79e71cb5212eb7d14d3479b0734ea0270473a66d) )
+ROM_END
+
 ROM_START( parodiusj )
 	ROM_REGION( 0x48000, "maincpu", 0 ) /* code + banked roms + palette RAM */
 	ROM_LOAD( "955e01.bin", 0x10000, 0x20000, CRC(49baa334) SHA1(8902fbb2228111b15de6537bd168241933df134d) )
@@ -402,5 +423,6 @@ static KONAMI_SETLINES_CALLBACK( parodius_banking )
 	memory_set_bank(device->machine,  "bank1", (lines & 0x0f) ^ 0x0f);
 }
 
-GAME( 1990, parodius,  0,        parodius, parodius, 0, ROT0, "Konami", "Parodius DA! (World)", GAME_SUPPORTS_SAVE )
+GAME( 1990, parodius,  0,        parodius, parodius, 0, ROT0, "Konami", "Parodius DA! (World, set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1990, parodiusa, parodius, parodius, parodius, 0, ROT0, "Konami", "Parodius DA! (World, set 2)", GAME_SUPPORTS_SAVE )
 GAME( 1990, parodiusj, parodius, parodius, parodius, 0, ROT0, "Konami", "Parodius DA! (Japan)", GAME_SUPPORTS_SAVE )
