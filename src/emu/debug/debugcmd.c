@@ -2541,12 +2541,12 @@ static void execute_symlist(running_machine *machine, int ref, int params, const
 	symbol_table *symtable;
 	int symnum, count = 0;
 
-	/* validate parameters */
-	if (!debug_command_parameter_cpu(machine, param[0], &cpu))
-		return;
 
-	if (cpu != NULL)
+	if (param[0] != NULL)
 	{
+		/* validate parameters */
+		if (!debug_command_parameter_cpu(machine, param[0], &cpu))
+			return;
 		symtable = &cpu->debug()->symtable();
 		debug_console_printf(machine, "CPU '%s' symbols:\n", cpu->tag());
 	}
