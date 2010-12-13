@@ -139,7 +139,8 @@ public:
 
 	/* misc */
 	int           read_latch;
-	UINT8		  mcu_enabled;
+	UINT8		  mcu_input_snippet;
+	UINT8		  mcu_jsr_snippet;
 };
 
 
@@ -335,7 +336,8 @@ static WRITE16_HANDLER( sharedram_w )
 	switch(offset)
 	{
 		case 0x40/2:
-			state->mcu_enabled = (data == 0x100); // state machine value, a 3 controls something regarding the gameplay, TODO
+			state->mcu_input_snippet = (data == 0x100);
+			state->mcu_jsr_snippet = (data == 0x300);
 			break;
 	}
 }
@@ -344,11 +346,11 @@ static READ16_HANDLER(sharedram_r)
 {
 	bigfghtr_state *state = space->machine->driver_data<bigfghtr_state>();
 
-	if(state->mcu_enabled)
+	if(state->mcu_input_snippet)
 	{
-		switch(offset)
+		switch(offset+0x600/2)
 		{
-			case 0x40/2:
+			case 0x640/2:
 				if(state->read_latch)
 				{
 					state->read_latch = 0;
@@ -356,17 +358,115 @@ static READ16_HANDLER(sharedram_r)
 				}
 				break;
 
-			case 0x42/2:
+			case 0x642/2:
 				return (input_port_read(space->machine, "DSW0") & 0xffff) ^ 0xffff;
 
-			case 0x44/2:
+			case 0x644/2:
 				return (input_port_read(space->machine, "DSW1") & 0xffff) ^ 0xffff;
 
-			case 0x46/2:
+			case 0x646/2:
 				return (input_port_read(space->machine, "P1") & 0xffff) ^ 0xffff;
 
-			case 0x48/2:
+			case 0x648/2:
 				return (input_port_read(space->machine, "P2") & 0xffff) ^ 0xffff;
+		}
+	}
+
+	if(state->mcu_jsr_snippet)
+	{
+		switch(offset+0x600/2)
+		{
+			case 0x640/2:
+				if(state->read_latch)
+				{
+					state->read_latch = 0;
+					return mame_rand(space->machine); // TODO
+				}
+				break;
+			case 0x642/2:
+				return (input_port_read(space->machine, "DSW0") & 0xffff) ^ 0xffff;
+
+			case 0x644/2:
+				return (input_port_read(space->machine, "DSW1") & 0xffff) ^ 0xffff;
+
+			case 0x646/2:
+				return (input_port_read(space->machine, "P1") & 0xffff) ^ 0xffff;
+
+			case 0x648/2:
+				return (input_port_read(space->machine, "P2") & 0xffff) ^ 0xffff;
+
+			/*
+			protection controls where the program code should jump to.
+
+			example snippet:
+			00DB2A: 41FA FE86                  lea     (-$17a,PC), A0; ($d9b2) ;base program vector
+			00DB2E: 4DF9 0008 0E2A             lea     $80e2a.l, A6 ;base RAM vector, used by the i8751 to send the value, this value is added to the above A0
+			00DB34: 3039 0008 0E62             move.w  $80e62.l, D0 ;number of snippets to execute
+			00DB3A: 6100 00F0                  bsr     $dc2c
+			*/
+
+			/* bp daee, A0 = 0xdd02, A6 = 0x808ca, D0 = 0x80902 */
+			//case 0x902/2:
+			//	return 0x0001;
+			//case (0x90a+0x24)/2:
+			//	return 0x0001;
+			//case (0x902+8)/2:
+			//	return 0x0004; // 0xf86a
+
+			/* bp db02, A0 = 0xdc2e, A6 = 0x80912, D0 = 0x8094a */
+			//case 0x94a/2:
+			//	return 1;
+			//case (0x94a+8)/2:
+			//	return 0x00dc; // 0xd62e
+
+			/* bp db16, A0 = 0xda86, A6 = 0x80c22, D0 = 0x80c5a */
+			//case 0xc5a/2:
+			//	return 1;
+			//case (0xc5a+8)/2:
+			//	return 0x0288; // 0x345f4
+
+			/* bp db2a, A0 = 0xd9b2, A6 = 0x80e2a, D0 = 0x80e62 */
+
+			/* bp db3e, A0 = 0xd8da, A6 = 0x81132, D0 = 0x8116a */
+
+			/* bp db52, A0 = 0xd806, A6 = 0x8133a, D0 = 0x81372 */
+
+			/* bp db66, A0 = 0xd7aa, A6 = 0x81742, D0 = 0x8177a */
+
+			/* bp db7a, A0 = 0xd746, A6 = 0x81b4a, D0 = 0x81b82 */
+
+			/* bp db8e, A0 = 0xd672, A6 = 0x81f52, D0 = 0x81f8a */
+
+			/* bp dba4, A0 = 0xd5ae, A6 = 0x8205a, D0 = 0x82092 */
+
+			/* bp dbba, A0 = 0xd5be, A6 = 0x82862, D0 = 0x8289a */
+
+			/* bp dbd0, A0 = 0xd512, A6 = 0x8296a, D0 = 0x829a2 */
+
+			/* bp dbe6, A0 = 0xd466, A6 = 0x82d72, D0 = 0x82daa */
+
+			/* bp dbfc, A0 = 0xd43e, A6 = 0x8357a, D0 = 0x835b2 */
+
+			/* following is separated from the others, dunno why ... */
+			/* bp dc14, A0 = 0xd3aa, A6 = 0x835a2, D0 = 0x835b2 */
+
+
+			/*case 0x
+			case 0x94a/2:
+				return 0x0002*4;
+			case (0x90a+2*0x40)/2:
+			case (0x90a+3*0x40)/2:
+				return 0x0003*4;
+			case (0x90a+4*0x40)/2:
+				return 0x000c*4; // 0x13d74
+			case (0x90a+5*0x40)/2:
+				return 0x000d*4; // 0x130f6
+			case (0x90a+6*0x40)/2:
+				return 0x000e*4; // 0x1817e
+			case (0x90a+7*0x40)/2:
+				return 0x0010*4; // 0x15924
+			//case (0x90a+0x25)/2:
+			//	return 2;*/
 		}
 	}
 
@@ -384,8 +484,8 @@ static READ16_HANDLER( latch_r )
 static ADDRESS_MAP_START( mainmem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x07ffff) AM_ROM
 	AM_RANGE(0x080000, 0x0805ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0x080600, 0x080fff) AM_READWRITE(sharedram_r, sharedram_w) AM_BASE_MEMBER(bigfghtr_state, sharedram)
-	AM_RANGE(0x081000, 0x085fff) AM_RAM //??
+	AM_RANGE(0x080600, 0x083fff) AM_READWRITE(sharedram_r, sharedram_w) AM_BASE_MEMBER(bigfghtr_state, sharedram)
+	AM_RANGE(0x084000, 0x085fff) AM_RAM //??
 	AM_RANGE(0x086000, 0x086fff) AM_RAM_WRITE(bg_videoram_w) AM_BASE_MEMBER(bigfghtr_state, bg_videoram)
 	AM_RANGE(0x087000, 0x087fff) AM_RAM_WRITE(fg_videoram_w) AM_BASE_MEMBER(bigfghtr_state, fg_videoram)
 	AM_RANGE(0x088000, 0x089fff) AM_RAM_WRITE(text_videoram_w) AM_BASE_MEMBER(bigfghtr_state, text_videoram)
