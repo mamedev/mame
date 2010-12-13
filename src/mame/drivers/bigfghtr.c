@@ -139,6 +139,7 @@ public:
 
 	/* misc */
 	int           read_latch;
+	UINT8		  mcu_enabled;
 };
 
 
@@ -325,48 +326,59 @@ static WRITE16_HANDLER( io_w )
 	flip_screen_set(space->machine, state->vreg & 0x1000);
 }
 
+
+static WRITE16_HANDLER( sharedram_w )
+{
+	bigfghtr_state *state = space->machine->driver_data<bigfghtr_state>();
+	COMBINE_DATA(&state->sharedram[offset]);
+
+	switch(offset)
+	{
+		case 0x40/2:
+			state->mcu_enabled = (data == 0x100); // state machine value, a 3 controls something regarding the gameplay, TODO
+			break;
+	}
+}
+
+static READ16_HANDLER(sharedram_r)
+{
+	bigfghtr_state *state = space->machine->driver_data<bigfghtr_state>();
+
+	if(state->mcu_enabled)
+	{
+		switch(offset)
+		{
+			case 0x40/2:
+				if(state->read_latch)
+				{
+					state->read_latch = 0;
+					return mame_rand(space->machine); // TODO
+				}
+				break;
+
+			case 0x42/2:
+				return (input_port_read(space->machine, "DSW0") & 0xffff) ^ 0xffff;
+
+			case 0x44/2:
+				return (input_port_read(space->machine, "DSW1") & 0xffff) ^ 0xffff;
+
+			case 0x46/2:
+				return (input_port_read(space->machine, "P1") & 0xffff) ^ 0xffff;
+
+			case 0x48/2:
+				return (input_port_read(space->machine, "P2") & 0xffff) ^ 0xffff;
+		}
+	}
+
+	return state->sharedram[offset];
+}
+
 static READ16_HANDLER( latch_r )
 {
 	bigfghtr_state *state = space->machine->driver_data<bigfghtr_state>();
 
 	state->read_latch = 1;
 	return 0;
-}
-
-
-static WRITE16_HANDLER( sharedram_w )
-{
-	bigfghtr_state *state = space->machine->driver_data<bigfghtr_state>();
-	COMBINE_DATA(&state->sharedram[offset]);
-}
-
-static READ16_HANDLER(sharedram_r)
-{
-	bigfghtr_state *state = space->machine->driver_data<bigfghtr_state>();
-	switch(offset)
-	{
-	case 0x40/2:
-		if(state->read_latch)
-		{
-			state->read_latch = 0;
-			return mame_rand(space->machine);
-		}
-		break;
-
-	case 0x42/2:
-		return (input_port_read(space->machine, "DSW0") & 0xffff) ^ 0xffff;
-
-	case 0x44/2:
-		return (input_port_read(space->machine, "DSW1") & 0xffff) ^ 0xffff;
-
-	case 0x46/2:
-		return (input_port_read(space->machine, "P1") & 0xffff) ^ 0xffff;
-
-	case 0x48/2:
-		return (input_port_read(space->machine, "P2") & 0xffff) ^ 0xffff;
-
-	}
-	return state->sharedram[offset];
 }
 
 static ADDRESS_MAP_START( mainmem, ADDRESS_SPACE_PROGRAM, 16 )
@@ -675,25 +687,5 @@ ROM_START( bigfghtr )
 	ROM_LOAD( "tf.13h", 0x0000, 0x0100, CRC(81244757) SHA1(6324f63e571f0f7a0bb9eb97f9994809db79493f) ) /* Prom is a N82S129AN type */
 ROM_END
 
-
-static DRIVER_INIT( skyrobo )
-{
-	//RAM TESTS
-	UINT16 *RAM = (UINT16 *)memory_region(machine, "maincpu");
-	RAM[0x2e822 / 2] = 0x4ef9;
-	RAM[0x2e824 / 2] = 0x0002;
-	RAM[0x2e826 / 2] = 0xe9ae;
-}
-
-
-static DRIVER_INIT( bigfghtr )
-{
-	//RAM TESTS
-	UINT16 *RAM = (UINT16 *)memory_region(machine, "maincpu");
-	RAM[0x2e8cc / 2] = 0x4ef9;
-	RAM[0x2e8ce / 2] = 0x0002;
-	RAM[0x2e8d0 / 2] = 0xea58;
-}
-
-GAME( 1989, skyrobo,        0, bigfghtr, bigfghtr, skyrobo,  ROT0, "Nichibutsu", "Sky Robo", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
-GAME( 1989, bigfghtr, skyrobo, bigfghtr, bigfghtr, bigfghtr, ROT0, "Nichibutsu", "Tatakae! Big Fighter (Japan)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
+GAME( 1989, skyrobo,        0, bigfghtr, bigfghtr, 0,  ROT0, "Nichibutsu", "Sky Robo", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
+GAME( 1989, bigfghtr, skyrobo, bigfghtr, bigfghtr, 0,  ROT0, "Nichibutsu", "Tatakae! Big Fighter (Japan)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
