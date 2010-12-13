@@ -353,8 +353,17 @@ static READ16_HANDLER(sharedram_r)
 		}
 		break;
 
+	case 0x42/2:
+		return (input_port_read(space->machine, "DSW0") & 0xffff) ^ 0xffff;
+
+	case 0x44/2:
+		return (input_port_read(space->machine, "DSW1") & 0xffff) ^ 0xffff;
+
 	case 0x46/2:
 		return (input_port_read(space->machine, "P1") & 0xffff) ^ 0xffff;
+
+	case 0x48/2:
+		return (input_port_read(space->machine, "P2") & 0xffff) ^ 0xffff;
 
 	}
 	return state->sharedram[offset];
@@ -434,7 +443,7 @@ static INPUT_PORTS_START( bigfghtr )
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_SERVICE1 )
-	PORT_SERVICE( 0x0200, IP_ACTIVE_LOW )
+	PORT_SERVICE_NO_TOGGLE( 0x0200, IP_ACTIVE_LOW )
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_TILT )
 	PORT_BIT( 0xf800, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -687,4 +696,4 @@ static DRIVER_INIT( bigfghtr )
 }
 
 GAME( 1989, skyrobo,        0, bigfghtr, bigfghtr, skyrobo,  ROT0, "Nichibutsu", "Sky Robo", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
-GAME( 1989, bigfghtr, skyrobo, bigfghtr, bigfghtr, bigfghtr, ROT0, "Nichibutsu", "Tatakae! Big Fighter", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
+GAME( 1989, bigfghtr, skyrobo, bigfghtr, bigfghtr, bigfghtr, ROT0, "Nichibutsu", "Tatakae! Big Fighter (Japan)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_SUPPORTS_SAVE )
