@@ -4172,6 +4172,33 @@ ROM_START( ddp3 )
 	ROM_LOAD( "m04401b032.u17",  0x400000, 0x400000, CRC(a118560c) SHA1(3e99bb2adbc9d464d79aa8723f0d40305ea821ca) )
 ROM_END
 
+ROM_START( ddp3a )
+	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
+	ROM_LOAD16_WORD_SWAP( "ddp3_bios.u37",    0x00000, 0x080000, CRC(b3cc5c8f) SHA1(02d9511cf71e4a0d6ca8fd9a1ef2c79b0d001824) ) // uses a standard PGM bios with the startup logos hacked out
+	ROM_LOAD16_WORD_SWAP( "dd v100.bin",  0x100000, 0x200000, CRC(7da0c1e4) SHA1(aca2fe35ba0ab3628900fa2aba2d22fc4fd7046d) )
+
+	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_LOAD( "ddp3_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
+
+	ROM_REGION32_LE( 0x400000, "user1", ROMREGION_ERASE00 )
+	/* no external protection rom */
+
+	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // same as standard PGM bios
+	ROM_LOAD( "t04401w064.u19",0x400000, 0x800000, CRC(3a95f19c) SHA1(fd3c47cf0b8b1e20c6bec4be68a089fc8bbf4dbe) )
+
+	ROM_REGION( 0x1c00000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_LOAD( "a04401w064.u7",  0x0000000, 0x0800000, CRC(ed229794) SHA1(1cf1863495a18c7c7d277a9be43ec116b00960b0) )
+	ROM_LOAD( "a04402w064.u8",  0x0800000, 0x0800000, CRC(f7816273) SHA1(dfa76e29cfe4fc03a9c0e1d932b244581f3bb9c4) )
+
+	ROM_REGION( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_LOAD( "b04401w064.u1",  0x0000000, 0x0800000, CRC(830aab7d) SHA1(1829197457b401b203360a76ee345108df9c4b24) )
+
+	ROM_REGION( 0x1000000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
+	ROM_LOAD( "pgm_m01s.rom", 0x000000, 0x200000, CRC(45ae7159) SHA1(d3ed3ff3464557fd0df6b069b2e431528b0ebfa8) ) // same as standard PGM bios
+	ROM_LOAD( "m04401b032.u17",  0x400000, 0x400000, CRC(a118560c) SHA1(3e99bb2adbc9d464d79aa8723f0d40305ea821ca) )
+ROM_END
+
 /* this expects Magic values in NVRAM to boot */
 ROM_START( ddp3blk )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
@@ -4550,7 +4577,7 @@ static WRITE16_HANDLER ( ddp2_asic27_0xd10000_w )
 	//int pc = cpu_get_pc(space->cpu);
 
 	//logerror("%06x: ddp2_asic27_0xd10000_w %04x, %04x\n", pc, offset*2,data);
-	
+
 	ddp2_asic27_0xd10000=data;
 }
 
@@ -4560,7 +4587,7 @@ static READ16_HANDLER ( ddp2_asic27_0xd10000_r )
 	//int pc = cpu_get_pc(space->cpu);
 
 	//logerror("%06x: d100000_prot_r %04x, %04x\n", pc, offset*2,ddp2_asic27_0xd10000);
-	
+
 	ddp2_asic27_0xd10000++;
 	ddp2_asic27_0xd10000&=0x7f;
 	return ddp2_asic27_0xd10000;
@@ -4586,7 +4613,7 @@ static WRITE16_HANDLER(ddp2_protram_w)
 	//int pc = cpu_get_pc(space->cpu);
 
 	//logerror("%06x: prot_w %04x, %02x\n", pc, offset*2,data);
-	
+
 	COMBINE_DATA(&ddp2_protram[offset]);
 
 	ddp2_protram[0x10/2] = 0;
@@ -4598,7 +4625,7 @@ static DRIVER_INIT( ddp2 )
 	pgm_basic_init(machine);
 	pgm_ddp2_decrypt(machine);
 	//kov2_latch_init(machine);
-	
+
 	// should actually be kov2-like, but keep this simulation for now just to demonstrate it.  It will need the internal ARM rom to work properly.
 	ddp2_protram = auto_alloc_array(machine, UINT16, 0x10000);
 	memory_install_readwrite16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xd00000, 0xd0ffff, 0, 0, ddp2_protram_r, ddp2_protram_w);
@@ -5835,16 +5862,16 @@ GAME( 2005, svg,          pgm,       svg,     sango,    svg,        ROT0,   "IGS
 
 /* these don't use an External ARM rom, and don't have any weak internal functions which would allow the internal ROM to be read out */
 
-// I'd be surprised if there wasn't also an older release displaying "2002.04.05 Master Ver" (no period after 05)
-GAME( 2002, ddp3,         0,         cavepgm,    pgm,     ddp3,       ROT270, "Cave", "DoDonPachi Dai-Ou-Jou", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // Displays "2002.04.05.Master Ver"
-GAME( 2002, ddp3blk,      ddp3,      cavepgm,    pgm,     ddp3,       ROT270, "Cave", "DoDonPachi Dai-Ou-Jou (Black Label)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // Displays "2002.04.05.Master Ver" (old) or "2002.10.07 Black Ver" (new)
+GAME( 2002, ddp3,         0,         cavepgm,    pgm,     ddp3,       ROT270, "Cave", "DoDonPachi Dai-Ou-Jou",                  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // Displays "2002.04.05.Master Ver"
+GAME( 2002, ddp3a,        ddp3,      cavepgm,    pgm,     ddp3,       ROT270, "Cave", "DoDonPachi Dai-Ou-Jou (first revision)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // Displays "2002.04.05 Master Ver"
+GAME( 2002, ddp3blk,      ddp3,      cavepgm,    pgm,     ddp3,       ROT270, "Cave", "DoDonPachi Dai-Ou-Jou (Black Label)",    GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // Displays "2002.04.05.Master Ver" (old) or "2002.10.07 Black Ver" (new)
 
 // the exact text of the 'version' shows which revision of the game it is; the newest has 2 '.' symbols in the string, the oldest, none.
-GAME( 2002, ket,          0,         cavepgm,    pgm,     ket,       ROT270, "Cave", "Ketsui",                  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // Displays "2003/01/01. Master Ver."
-GAME( 2002, keta,         ket,       cavepgm,    pgm,     ket,       ROT270, "Cave", "Ketsui (older)",          GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE) // Displays "2003/01/01 Master Ver."
-GAME( 2002, ketb,         ket,       cavepgm,    pgm,     ket,       ROT270, "Cave", "Ketsui (first revision)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE) // Displays "2003/01/01 Master Ver"
+GAME( 2002, ket,          0,         cavepgm,    pgm,     ket,       ROT270, "Cave", "Ketsui: Kizuna Jigoku Tachi",                  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // Displays "2003/01/01. Master Ver."
+GAME( 2002, keta,         ket,       cavepgm,    pgm,     ket,       ROT270, "Cave", "Ketsui: Kizuna Jigoku Tachi (older)",          GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE) // Displays "2003/01/01 Master Ver."
+GAME( 2002, ketb,         ket,       cavepgm,    pgm,     ket,       ROT270, "Cave", "Ketsui: Kizuna Jigoku Tachi (first revision)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE) // Displays "2003/01/01 Master Ver"
 
-GAME( 2002, espgal,       0,         cavepgm,    pgm,     espgal,       ROT270, "Cave", "EspGaluda", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 2003, espgal,       0,         cavepgm,    pgm,     espgal,       ROT270, "Cave", "EspGaluda", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 
 /* PGM2 */
 GAME( 2007, orleg2,       0,         pgm,    pgm,     0,       ROT0, "IGS", "Oriental Legend 2", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )

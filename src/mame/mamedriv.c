@@ -8607,6 +8607,7 @@ Other Sun games
 	DRIVER( keta )
 	DRIVER( ketb )
 	DRIVER( ddp3 )
+	DRIVER( ddp3a )
 	DRIVER( ddp3blk )
 	DRIVER( espgal )
 	DRIVER( orleg2 )		/* (c) 2007 */
