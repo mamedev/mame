@@ -72,6 +72,8 @@ VIDEO_START( flstory );
 VIDEO_UPDATE( flstory );
 VIDEO_START( victnine );
 VIDEO_UPDATE( victnine );
+VIDEO_START( rumba );
+VIDEO_UPDATE( rumba );
 
 WRITE8_HANDLER( flstory_videoram_w );
 READ8_HANDLER( flstory_palette_r );

@@ -158,6 +158,33 @@ static ADDRESS_MAP_START( victnine_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE_MEMBER(flstory_state, workram) /* work RAM */
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( rumba_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0xbfff) AM_ROM
+	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(flstory_videoram_w) AM_BASE_SIZE_MEMBER(flstory_state, videoram, videoram_size)
+//	AM_RANGE(0xc800, 0xcfff) AM_RAM	/* unknown */
+//	AM_RANGE(0xd000, 0xd000) AM_READWRITE(victnine_mcu_r, victnine_mcu_w)
+//	AM_RANGE(0xd001, 0xd001) AM_WRITENOP	/* watchdog? */
+//	AM_RANGE(0xd002, 0xd002) AM_NOP	/* unknown read & coin lock out? */
+	AM_RANGE(0xd400, 0xd400) AM_READWRITE(from_snd_r, sound_command_w)
+	AM_RANGE(0xd401, 0xd401) AM_READ(snd_flag_r)
+//	AM_RANGE(0xd403, 0xd403) AM_READNOP /* unknown */
+	AM_RANGE(0xd800, 0xd800) AM_READ_PORT("DSW0")
+	AM_RANGE(0xd801, 0xd801) AM_READ_PORT("DSW1")
+	AM_RANGE(0xd802, 0xd802) AM_READ_PORT("DSW2")
+	AM_RANGE(0xd803, 0xd803) AM_READ_PORT("SYSTEM")
+	AM_RANGE(0xd804, 0xd804) AM_READ_PORT("P1")
+	AM_RANGE(0xd805, 0xd805) AM_READ_PORT("EXTRA_P1")	/* also mcu */
+	AM_RANGE(0xd806, 0xd806) AM_READ_PORT("P2")
+	AM_RANGE(0xd807, 0xd807) AM_READ_PORT("EXTRA_P2")
+//  AM_RANGE(0xda00, 0xda00) AM_WRITEONLY
+	AM_RANGE(0xdc00, 0xdc9f) AM_RAM AM_BASE_SIZE_MEMBER(flstory_state, spriteram, spriteram_size)
+	AM_RANGE(0xdca0, 0xdcbf) AM_RAM_WRITE(flstory_scrlram_w) AM_BASE_MEMBER(flstory_state, scrlram)
+//	AM_RANGE(0xdce0, 0xdce0) AM_READWRITE(victnine_gfxctrl_r, victnine_gfxctrl_w)
+//	AM_RANGE(0xdce1, 0xdce1) AM_WRITENOP	/* unknown */
+	AM_RANGE(0xdd00, 0xdeff) AM_READWRITE(flstory_palette_r, flstory_palette_w)
+	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE_MEMBER(flstory_state, workram) /* work RAM */
+ADDRESS_MAP_END
+
 
 static MACHINE_RESET( ta7630 )
 {
@@ -608,6 +635,150 @@ static INPUT_PORTS_START( victnine )
 INPUT_PORTS_END
 
 
+
+static INPUT_PORTS_START( rumba )
+	PORT_START("DSW0")      /* D800 */
+	PORT_DIPNAME( 0x03, 0x00, DEF_STR( Bonus_Life ) )
+	PORT_DIPSETTING(    0x00, "20000 50000" )
+	PORT_DIPSETTING(    0x01, "10000 60000" )
+	PORT_DIPSETTING(    0x02, "10000 40000" )
+	PORT_DIPSETTING(    0x03, "10000 20000" )
+	PORT_DIPNAME(0x04, 0x04, DEF_STR( Free_Play ) )
+	PORT_DIPSETTING(   0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(   0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x08,   0x08, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x08, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x10,   0x10, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x10, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x20,   0x20, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x20, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x40,   0x40, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x40, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x80,   0x80, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x80, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+
+
+	PORT_START("DSW1")      /* D801 */
+	PORT_DIPNAME(0x0f, 0x00, DEF_STR( Coin_A ) )
+	PORT_DIPSETTING(   0x0f, DEF_STR( 9C_1C ) )
+	PORT_DIPSETTING(   0x0e, DEF_STR( 8C_1C ) )
+	PORT_DIPSETTING(   0x0d, DEF_STR( 7C_1C ) )
+	PORT_DIPSETTING(   0x0c, DEF_STR( 6C_1C ) )
+	PORT_DIPSETTING(   0x0b, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(   0x0a, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(   0x09, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(   0x08, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(   0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(   0x01, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(   0x02, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(   0x03, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(   0x04, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(   0x05, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(   0x06, DEF_STR( 1C_7C ) )
+	PORT_DIPSETTING(   0x07, DEF_STR( 1C_8C ) )
+	PORT_DIPNAME(0xf0, 0x00, DEF_STR( Coin_B ) )
+	PORT_DIPSETTING(   0xf0, DEF_STR( 9C_1C ) )
+	PORT_DIPSETTING(   0xe0, DEF_STR( 8C_1C ) )
+	PORT_DIPSETTING(   0xd0, DEF_STR( 7C_1C ) )
+	PORT_DIPSETTING(   0xc0, DEF_STR( 6C_1C ) )
+	PORT_DIPSETTING(   0xb0, DEF_STR( 5C_1C ) )
+	PORT_DIPSETTING(   0xa0, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(   0x90, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(   0x80, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(   0x00, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(   0x10, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(   0x20, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(   0x30, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(   0x40, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(   0x50, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(   0x60, DEF_STR( 1C_7C ) )
+	PORT_DIPSETTING(   0x70, DEF_STR( 1C_8C ) )
+
+	PORT_START("DSW2")      /* D802 */
+    PORT_DIPNAME( 0x01,   0x01, "Training Stage" )
+    PORT_DIPSETTING(      0x00, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x01, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02,   0x02, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x02, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x04,   0x00, DEF_STR( Language ) )
+    PORT_DIPSETTING(      0x04, DEF_STR( Japanese ) )
+    PORT_DIPSETTING(      0x00, DEF_STR( English ) )
+    PORT_DIPNAME( 0x08,   0x08, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x08, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x10,   0x10, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x10, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x20,   0x20, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x20, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x40,   0x40, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x40, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+    PORT_DIPNAME( 0x80,   0x80, DEF_STR( Unknown ) )
+    PORT_DIPSETTING(      0x80, DEF_STR( Off ) )
+    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+
+	PORT_START("SYSTEM")      /* D803 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_TILT )
+	PORT_BIT( 0x10, IP_ACTIVE_HIGH, IPT_COIN1 )
+	PORT_BIT( 0x20, IP_ACTIVE_HIGH, IPT_COIN2 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P1")      /* D804 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 )	// A
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 )	// C
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("EXTRA_P1")      /* D805 */
+	/* bits 0,1 are MCU related:
+        - bit 0: mcu is ready to receive data from main cpu
+        - bit 1: mcu has sent data to the main cpu       */
+	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(victnine_mcu_status_bit01_r, NULL)
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 )
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("P2")      /* D806 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_COCKTAIL	// A
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL	// C
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+
+	PORT_START("EXTRA_P2")      /* D807 */
+	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_COCKTAIL
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_COCKTAIL
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_COCKTAIL
+	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
+INPUT_PORTS_END
+
+
 static const gfx_layout charlayout =
 {
 	8,8,
@@ -635,6 +806,11 @@ static const gfx_layout spritelayout =
 static GFXDECODE_START( flstory )
 	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 16 )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 256, 16 )
+GFXDECODE_END
+
+static GFXDECODE_START( rumba )
+	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,   0, 16 )
 GFXDECODE_END
 
 
@@ -907,6 +1083,65 @@ static MACHINE_CONFIG_START( victnine, flstory_state )
 MACHINE_CONFIG_END
 
 
+static MACHINE_CONFIG_START( rumba, flstory_state )
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD("maincpu", Z80,8000000/2)		/* 4 MHz */
+	MDRV_CPU_PROGRAM_MAP(rumba_map)
+	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+
+	MDRV_CPU_ADD("audiocpu", Z80,8000000/2)		/* 4 MHz */
+	MDRV_CPU_PROGRAM_MAP(sound_map)
+	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)	/* IRQ generated by ??? */
+						/* NMI generated by the main CPU */
+//  MDRV_CPU_ADD("mcu", M68705,18432000/6)  /* ??? */
+
+//  MDRV_CPU_PROGRAM_MAP(m68705_map)
+
+	MDRV_QUANTUM_TIME(HZ(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
+							/* synchronization of the CPUs */
+	MDRV_MACHINE_START(flstory)
+	MDRV_MACHINE_RESET(flstory)
+
+	/* video hardware */
+	MDRV_SCREEN_ADD("screen", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(32*8, 32*8)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+
+	MDRV_GFXDECODE(rumba)
+	MDRV_PALETTE_LENGTH(512)
+
+	MDRV_VIDEO_START(rumba)
+	MDRV_VIDEO_UPDATE(rumba)
+
+	/* sound hardware */
+	MDRV_SPEAKER_STANDARD_MONO("mono")
+
+	MDRV_SOUND_ADD("aysnd", AY8910, 8000000/4)
+	MDRV_SOUND_CONFIG(ay8910_config)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+
+	MDRV_SOUND_ADD("msm", MSM5232, 2000000)
+	MDRV_SOUND_CONFIG(msm5232_config)
+	MDRV_SOUND_ROUTE(0, "mono", 1.0)	// pin 28  2'-1
+	MDRV_SOUND_ROUTE(1, "mono", 1.0)	// pin 29  4'-1
+	MDRV_SOUND_ROUTE(2, "mono", 1.0)	// pin 30  8'-1
+	MDRV_SOUND_ROUTE(3, "mono", 1.0)	// pin 31 16'-1
+	MDRV_SOUND_ROUTE(4, "mono", 1.0)	// pin 36  2'-2
+	MDRV_SOUND_ROUTE(5, "mono", 1.0)	// pin 35  4'-2
+	MDRV_SOUND_ROUTE(6, "mono", 1.0)	// pin 34  8'-2
+	MDRV_SOUND_ROUTE(7, "mono", 1.0)	// pin 33 16'-2
+	// pin 1 SOLO  8'       not mapped
+	// pin 2 SOLO 16'       not mapped
+	// pin 22 Noise Output  not mapped
+
+	MDRV_SOUND_ADD("dac", DAC, 0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+MACHINE_CONFIG_END
+
 /***************************************************************************
 
   Game driver(s)
@@ -1131,8 +1366,97 @@ ROM_START( victnine )
 ROM_END
 
 
+/*
+
+RUMBA LUMBER by TAITO (1984)
+
+Hardware similar to Fairyland Story except for the video board.
+Wiring is the classic Taito one.
+All clocks has been verified using a frequency counter.
+Hardware is capable of playing samples (TTL circuit)
+
+
+SOUND BOARD J1100022A / K1100066A
+
+Xtal: 8mhz
+Z80 NEC D780C-1 running at 8/2 = 4mhz
+YM2149 running at 8/4 = 2mhz  pin 26 high
+OKI M5232 running at 8/4 = 2mhz
+2764 EPROM A23-08-1
+2764 EPROM A23-09
+2764 EPROM A23-10
+
+CPU BOARD J1100024A / K1100065A
+
+Xtal 8mhz
+Z80 NEC D780C-1 running at 8/2 = 4mhz
+MCU A23-11 MC68705P5S running at 18.432/6 = 3.072mhz
+27128 EPROM A23-01-1
+27128 EPROM A23-02-1
+27128 EPROM A23-03-1
+
+VIDEO BOARD J1100023A / K1100064A
+
+xtal: 18.432mhz
+2764 EPROM A23-04
+2764 EPROM A23-05
+2764 EPROM A23-06 (I cannot get a constant read,a couple of bytes differ everytime)
+2764 EPROM A23-07
+
+VSYNC = 60.55hz
+
+Dumped by Corrado Tomaselli on 9/12/2010
+
+*/
+
+ROM_START( rumba )
+	ROM_REGION( 0x10000, "maincpu", 0 )	/* 64k for the first CPU */
+	ROM_LOAD( "a23_01-1.bin",   0x0000, 0x4000, CRC(4bea6e18) SHA1(b9a85e65105773b5f93dcc5fc1e7c588b2d25056) )
+	ROM_LOAD( "a23_02-1.bin",   0x4000, 0x4000, CRC(08f98c6f) SHA1(f2a850b1138cfefab6ff1d1adcda9e084f52e9c2) )
+	ROM_LOAD( "a23_03-1.bin",   0x8000, 0x4000, CRC(ab595427) SHA1(1ff51740e1c7915e1f79a55801d11c8fdce764c8) )
+
+	ROM_REGION( 0x10000, "audiocpu", 0 )	/* 64k for the second CPU */
+	ROM_LOAD( "a23_08-1.bin",     0x0000, 0x2000, CRC(a18eae00) SHA1(6ac1ad07bb5a97c6edaaf0e1fb842e1741f4cf1e) )
+	ROM_LOAD( "a23_09.bin",       0x2000, 0x2000, CRC(d0a101d3) SHA1(c92bb1ce67bec394fd8ce303d9e61eac12493b5d) )
+	ROM_LOAD( "a23_10.bin",       0x4000, 0x2000, CRC(f9447bd4) SHA1(68c02249ca0e5b923cddb4bff8d090963b9c78e4) )
+
+	ROM_REGION( 0x0800, "mcu", 0 )	/* 2k for the microcontroller */
+	ROM_LOAD( "a23-11.mc68705p5s", 0x0000, 0x0800, NO_DUMP )
+
+	ROM_REGION( 0x8000, "gfx1", ROMREGION_INVERT )
+	ROM_LOAD( "a23_07.bin",   0x02000, 0x2000, CRC(c98fbea6) SHA1(edd1e0b2551f726018ca6e0b2cf629046a482711) )
+	ROM_LOAD( "a23_06.bin",   0x00000, 0x2000, CRC(bf1e3a7f) SHA1(1258be10739cee6e6a8b2ce4d39f89bff1ea7f16) ) // should be a good read
+	ROM_LOAD( "a23_05.bin",   0x06000, 0x2000, CRC(b40db231) SHA1(85204efc05e95334576807e4dab866f4f40081e6) )
+	ROM_LOAD( "a23_04.bin",   0x04000, 0x2000, CRC(1d4f001f) SHA1(c3245650e57138ed89e7de8289fe37c5d933ddca) )
+ROM_END
+
+DRIVER_INIT( rumba )
+{
+	/* the protection on this seems to control _at least_ the movement of the bird, at the moment it flies off the screen
+       you have infinite lives (and the lives display corrupts the tutorial text - probably protected)
+
+	   your character also vanishes after 'rolling' one of the wheels
+	   there are incorrect colours on some tiles (could be video issue)
+
+
+	*/
+
+	UINT8* mem = memory_region(machine,"maincpu");
+
+	// mcu checksum test
+	mem[0xbdfc] = 0x00;
+	mem[0xbdfd] = 0x00;
+	mem[0xbdfe] = 0x00;
+	// rom checksum
+	mem[0xbf88] = 0x00;
+	mem[0xbf89] = 0x00;
+
+}
+
+
 GAME( 1985, flstory,   0,        flstory,  flstory,  0, ROT180, "Taito", "The FairyLand Story", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1985, flstoryj,  flstory,  flstory,  flstory,  0, ROT180, "Taito", "The FairyLand Story (Japan)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1985, onna34ro,  0,        onna34ro, onna34ro, 0, ROT0,   "Taito", "Onna Sansirou - Typhoon Gal (set 1)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1985, onna34roa, onna34ro, onna34ro, onna34ro, 0, ROT0,   "Taito", "Onna Sansirou - Typhoon Gal (set 2)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1984, victnine,  0,        victnine, victnine, 0, ROT0,   "Taito", "Victorious Nine", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
+GAME( 1984, rumba,     0,        rumba,    rumba,  rumba, ROT270, "Taito", "Rumba Lumber", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )

@@ -40,11 +40,42 @@ static TILE_GET_INFO( victnine_get_tile_info )
 			flags);
 }
 
+static TILE_GET_INFO( get_rumba_tile_info )
+{
+	flstory_state *state = machine->driver_data<flstory_state>();
+	int code = state->videoram[tile_index * 2];
+	int attr = state->videoram[tile_index * 2 + 1];
+	int tile_number = code + ((attr & 0xc0) << 2) + 0x400 + 0x800 * state->char_bank;
+	int col = (attr & 0x0f);
+
+	tileinfo->category = (attr & 0x20) >> 5;
+	tileinfo->group = (attr & 0x20) >> 5;
+	SET_TILE_INFO(
+			0,
+			tile_number,
+			col,
+			0);
+}
 
 VIDEO_START( flstory )
 {
 	flstory_state *state = machine->driver_data<flstory_state>();
 	state->bg_tilemap = tilemap_create(machine, get_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
+//  tilemap_set_transparent_pen(state->bg_tilemap, 15);
+	tilemap_set_transmask(state->bg_tilemap, 0, 0x3fff, 0xc000); /* split type 0 has pens 0-13 transparent in front half */
+	tilemap_set_transmask(state->bg_tilemap, 1, 0x8000, 0x7fff); /* split type 1 has pen 15 transparent in front half */
+	tilemap_set_scroll_cols(state->bg_tilemap, 32);
+
+	machine->generic.paletteram.u8 = auto_alloc_array(machine, UINT8, 0x200);
+	machine->generic.paletteram2.u8 = auto_alloc_array(machine, UINT8, 0x200);
+	state_save_register_global_pointer(machine, machine->generic.paletteram.u8, 0x200);
+	state_save_register_global_pointer(machine, machine->generic.paletteram2.u8, 0x200);
+}
+
+VIDEO_START( rumba )
+{
+	flstory_state *state = machine->driver_data<flstory_state>();
+	state->bg_tilemap = tilemap_create(machine, get_rumba_tile_info, tilemap_scan_rows, 8, 8, 32, 32);
 //  tilemap_set_transparent_pen(state->bg_tilemap, 15);
 	tilemap_set_transmask(state->bg_tilemap, 0, 0x3fff, 0xc000); /* split type 0 has pens 0-13 transparent in front half */
 	tilemap_set_transmask(state->bg_tilemap, 1, 0x8000, 0x7fff); /* split type 1 has pen 15 transparent in front half */
@@ -254,5 +285,17 @@ VIDEO_UPDATE( victnine )
 	flstory_state *state = screen->machine->driver_data<flstory_state>();
 	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	victnine_draw_sprites(screen->machine, bitmap, cliprect);
+	return 0;
+}
+
+VIDEO_UPDATE( rumba )
+{
+	flstory_state *state = screen->machine->driver_data<flstory_state>();
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0 | TILEMAP_DRAW_LAYER1, 0);
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 1 | TILEMAP_DRAW_LAYER1, 0);
+	victnine_draw_sprites(screen->machine, bitmap, cliprect);
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0 | TILEMAP_DRAW_LAYER0, 0);
+	victnine_draw_sprites(screen->machine, bitmap, cliprect);
+	tilemap_draw(bitmap, cliprect, state->bg_tilemap, 1 | TILEMAP_DRAW_LAYER0, 0);
 	return 0;
 }
