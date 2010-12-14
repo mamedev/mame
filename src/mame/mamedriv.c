@@ -8609,6 +8609,7 @@ Other Sun games
 	DRIVER( ketb )
 	DRIVER( ddp3 )
 	DRIVER( ddp3a )
+	DRIVER( ddp3b )
 	DRIVER( ddp3blk )
 	DRIVER( espgal )
 	DRIVER( orleg2 )		/* (c) 2007 */

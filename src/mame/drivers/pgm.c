@@ -4033,14 +4033,12 @@ ROM_END
 
 
 
-
-/* all revisions of ketsui have roms marked v100, even when the actual game revision is upgraded */
+/* all known revisions of ketsui have roms marked v100, even when the actual game revision is upgraded */
 
 ROM_START( ket )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
 	/* doesn't use a separate BIOS rom */
 	ROM_LOAD16_WORD_SWAP( "ketsui_v100.u38", 0x000000, 0x200000, CRC(dfe62f3b) SHA1(baa58d1ce47a707f84f65779ac0689894793e9d9) )
-
 
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "ket_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
@@ -4050,18 +4048,18 @@ ROM_START( ket )
 
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // same as standard PGM text bios - surface scratched to remove details
-	ROM_LOAD( "text-1.u19",   0x400000, 0x800000, CRC(2665b041) SHA1(fb1107778b66f2af0de77ac82e1ee2902f53a959) )
+	ROM_LOAD( "t04701w064.u19",   0x400000, 0x800000, CRC(2665b041) SHA1(fb1107778b66f2af0de77ac82e1ee2902f53a959) )
 
 	ROM_REGION( 0x1000000, "sprcol", 0 ) /* Sprite Colour Data */
-	ROM_LOAD( "image-1.u7",    0x0000000, 0x0800000, CRC(5ef1b94b) SHA1(f10dfa46e0a4d297c3a856aea5b49d648f98935c) )
-	ROM_LOAD( "image-2.u8",    0x0800000, 0x0800000, CRC(26d6da7f) SHA1(f20e07a7994f41b5ed917f8b0119dc5542f3541c) )
+	ROM_LOAD( "a04701w064.u7",    0x0000000, 0x0800000, CRC(5ef1b94b) SHA1(f10dfa46e0a4d297c3a856aea5b49d648f98935c) )
+	ROM_LOAD( "a04702w064.u8",    0x0800000, 0x0800000, CRC(26d6da7f) SHA1(f20e07a7994f41b5ed917f8b0119dc5542f3541c) )
 
 	ROM_REGION( 0x0800000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
-	ROM_LOAD( "bitmap-1.u1",    0x0000000, 0x0800000, CRC(b73634f4) SHA1(43b7442139ee6bce1ff2b774e3bbd272d1cb6d1f) )
+	ROM_LOAD( "b04701w064.u1",    0x0000000, 0x0800000, CRC(b73634f4) SHA1(43b7442139ee6bce1ff2b774e3bbd272d1cb6d1f) )
 
 	ROM_REGION( 0x800000, "ics", ROMREGION_ERASE00 ) /* Samples - (8 bit mono 11025Hz) - */
 	/* there is a position for the PGM audio bios rom, but it's unpopulated, and the M of PGM has been scratched off the PCB */
-	ROM_LOAD( "music-1.u17",    0x400000, 0x400000, CRC(b46e22d1) SHA1(670853dc485942fb96380568494bdf3235f446ee) )
+	ROM_LOAD( "m04701b032.u17",    0x400000, 0x400000, CRC(b46e22d1) SHA1(670853dc485942fb96380568494bdf3235f446ee) )
 ROM_END
 
 ROM_START( keta )
@@ -4077,18 +4075,18 @@ ROM_START( keta )
 
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // same as standard PGM text bios - surface scratched to remove details
-	ROM_LOAD( "text-1.u19",   0x400000, 0x800000, CRC(2665b041) SHA1(fb1107778b66f2af0de77ac82e1ee2902f53a959) )
+	ROM_LOAD( "t04701w064.u19",   0x400000, 0x800000, CRC(2665b041) SHA1(fb1107778b66f2af0de77ac82e1ee2902f53a959) )
 
 	ROM_REGION( 0x1000000, "sprcol", 0 ) /* Sprite Colour Data */
-	ROM_LOAD( "image-1.u7",    0x0000000, 0x0800000, CRC(5ef1b94b) SHA1(f10dfa46e0a4d297c3a856aea5b49d648f98935c) )
-	ROM_LOAD( "image-2.u8",    0x0800000, 0x0800000, CRC(26d6da7f) SHA1(f20e07a7994f41b5ed917f8b0119dc5542f3541c) )
+	ROM_LOAD( "a04701w064.u7",    0x0000000, 0x0800000, CRC(5ef1b94b) SHA1(f10dfa46e0a4d297c3a856aea5b49d648f98935c) )
+	ROM_LOAD( "a04702w064.u8",    0x0800000, 0x0800000, CRC(26d6da7f) SHA1(f20e07a7994f41b5ed917f8b0119dc5542f3541c) )
 
 	ROM_REGION( 0x0800000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
-	ROM_LOAD( "bitmap-1.u1",    0x0000000, 0x0800000, CRC(b73634f4) SHA1(43b7442139ee6bce1ff2b774e3bbd272d1cb6d1f) )
+	ROM_LOAD( "b04701w064.u1",    0x0000000, 0x0800000, CRC(b73634f4) SHA1(43b7442139ee6bce1ff2b774e3bbd272d1cb6d1f) )
 
 	ROM_REGION( 0x800000, "ics", ROMREGION_ERASE00 ) /* Samples - (8 bit mono 11025Hz) - */
 	/* there is a position for the PGM audio bios rom, but it's unpopulated, and the M of PGM has been scratched off the PCB */
-	ROM_LOAD( "music-1.u17",    0x400000, 0x400000, CRC(b46e22d1) SHA1(670853dc485942fb96380568494bdf3235f446ee) )
+	ROM_LOAD( "m04701b032.u17",    0x400000, 0x400000, CRC(b46e22d1) SHA1(670853dc485942fb96380568494bdf3235f446ee) )
 ROM_END
 
 ROM_START( ketb )
@@ -4104,18 +4102,18 @@ ROM_START( ketb )
 
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // same as standard PGM text bios - surface scratched to remove details
-	ROM_LOAD( "text-1.u19",   0x400000, 0x800000, CRC(2665b041) SHA1(fb1107778b66f2af0de77ac82e1ee2902f53a959) )
+	ROM_LOAD( "t04701w064.u19",   0x400000, 0x800000, CRC(2665b041) SHA1(fb1107778b66f2af0de77ac82e1ee2902f53a959) )
 
 	ROM_REGION( 0x1000000, "sprcol", 0 ) /* Sprite Colour Data */
-	ROM_LOAD( "image-1.u7",    0x0000000, 0x0800000, CRC(5ef1b94b) SHA1(f10dfa46e0a4d297c3a856aea5b49d648f98935c) )
-	ROM_LOAD( "image-2.u8",    0x0800000, 0x0800000, CRC(26d6da7f) SHA1(f20e07a7994f41b5ed917f8b0119dc5542f3541c) )
+	ROM_LOAD( "a04701w064.u7",    0x0000000, 0x0800000, CRC(5ef1b94b) SHA1(f10dfa46e0a4d297c3a856aea5b49d648f98935c) )
+	ROM_LOAD( "a04702w064.u8",    0x0800000, 0x0800000, CRC(26d6da7f) SHA1(f20e07a7994f41b5ed917f8b0119dc5542f3541c) )
 
 	ROM_REGION( 0x0800000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
-	ROM_LOAD( "bitmap-1.u1",    0x0000000, 0x0800000, CRC(b73634f4) SHA1(43b7442139ee6bce1ff2b774e3bbd272d1cb6d1f) )
+	ROM_LOAD( "b04701w064.u1",    0x0000000, 0x0800000, CRC(b73634f4) SHA1(43b7442139ee6bce1ff2b774e3bbd272d1cb6d1f) )
 
 	ROM_REGION( 0x800000, "ics", ROMREGION_ERASE00 ) /* Samples - (8 bit mono 11025Hz) - */
 	/* there is a position for the PGM audio bios rom, but it's unpopulated, and the M of PGM has been scratched off the PCB */
-	ROM_LOAD( "music-1.u17",    0x400000, 0x400000, CRC(b46e22d1) SHA1(670853dc485942fb96380568494bdf3235f446ee) )
+	ROM_LOAD( "m04701b032.u17",    0x400000, 0x400000, CRC(b46e22d1) SHA1(670853dc485942fb96380568494bdf3235f446ee) )
 ROM_END
 
 ROM_START( espgal )
@@ -4145,10 +4143,12 @@ ROM_START( espgal )
 	ROM_LOAD( "music-1.u17",    0x400000, 0x400000, NO_DUMP )
 ROM_END
 
+
+
 ROM_START( ddp3 )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_WORD_SWAP( "ddp3_bios.u37",    0x00000, 0x080000, CRC(b3cc5c8f) SHA1(02d9511cf71e4a0d6ca8fd9a1ef2c79b0d001824) ) // uses a standard PGM bios with the startup logos hacked out
-	ROM_LOAD16_WORD_SWAP( "ddp3_d_d_1_0.u36",  0x100000, 0x200000, CRC(5d3f85ba) SHA1(4c24ea206140863d456179750366921442e1d2b8) )
+	ROM_LOAD16_WORD_SWAP( "ddp3_v101.u36",  0x100000, 0x200000, CRC(195b5c1e) SHA1(f18d791c034b0a3d85888a92fb5d326ee3deb04f) ) // yes this one was actually marked v101 which goes against the standard Cave marking system
 
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "ddp3_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
@@ -4172,10 +4172,38 @@ ROM_START( ddp3 )
 	ROM_LOAD( "m04401b032.u17",  0x400000, 0x400000, CRC(a118560c) SHA1(3e99bb2adbc9d464d79aa8723f0d40305ea821ca) )
 ROM_END
 
+
 ROM_START( ddp3a )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
 	ROM_LOAD16_WORD_SWAP( "ddp3_bios.u37",    0x00000, 0x080000, CRC(b3cc5c8f) SHA1(02d9511cf71e4a0d6ca8fd9a1ef2c79b0d001824) ) // uses a standard PGM bios with the startup logos hacked out
-	ROM_LOAD16_WORD_SWAP( "dd v100.bin",  0x100000, 0x200000, CRC(7da0c1e4) SHA1(aca2fe35ba0ab3628900fa2aba2d22fc4fd7046d) )
+	ROM_LOAD16_WORD_SWAP( "ddp3_d_d_1_0.u36",  0x100000, 0x200000, CRC(5d3f85ba) SHA1(4c24ea206140863d456179750366921442e1d2b8) ) // marked v100
+
+	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
+	ROM_LOAD( "ddp3_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
+
+	ROM_REGION32_LE( 0x400000, "user1", ROMREGION_ERASE00 )
+	/* no external protection rom */
+
+	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
+	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // same as standard PGM bios
+	ROM_LOAD( "t04401w064.u19",0x400000, 0x800000, CRC(3a95f19c) SHA1(fd3c47cf0b8b1e20c6bec4be68a089fc8bbf4dbe) )
+
+	ROM_REGION( 0x1c00000, "sprcol", 0 ) /* Sprite Colour Data */
+	ROM_LOAD( "a04401w064.u7",  0x0000000, 0x0800000, CRC(ed229794) SHA1(1cf1863495a18c7c7d277a9be43ec116b00960b0) )
+	ROM_LOAD( "a04402w064.u8",  0x0800000, 0x0800000, CRC(f7816273) SHA1(dfa76e29cfe4fc03a9c0e1d932b244581f3bb9c4) )
+
+	ROM_REGION( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
+	ROM_LOAD( "b04401w064.u1",  0x0000000, 0x0800000, CRC(830aab7d) SHA1(1829197457b401b203360a76ee345108df9c4b24) )
+
+	ROM_REGION( 0x1000000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
+	ROM_LOAD( "pgm_m01s.rom", 0x000000, 0x200000, CRC(45ae7159) SHA1(d3ed3ff3464557fd0df6b069b2e431528b0ebfa8) ) // same as standard PGM bios
+	ROM_LOAD( "m04401b032.u17",  0x400000, 0x400000, CRC(a118560c) SHA1(3e99bb2adbc9d464d79aa8723f0d40305ea821ca) )
+ROM_END
+
+ROM_START( ddp3b )
+	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
+	ROM_LOAD16_WORD_SWAP( "ddp3_bios.u37",    0x00000, 0x080000, CRC(b3cc5c8f) SHA1(02d9511cf71e4a0d6ca8fd9a1ef2c79b0d001824) ) // uses a standard PGM bios with the startup logos hacked out
+	ROM_LOAD16_WORD_SWAP( "dd v100.bin",  0x100000, 0x200000, CRC(7da0c1e4) SHA1(aca2fe35ba0ab3628900fa2aba2d22fc4fd7046d) ) // marked v100
 
 	ROM_REGION( 0x4000, "prot", 0 ) /* ARM protection ASIC - internal rom */
 	ROM_LOAD( "ddp3_igs027a.bin", 0x000000, 0x04000, NO_DUMP )
@@ -5862,14 +5890,16 @@ GAME( 2005, svg,          pgm,       svg,     sango,    svg,        ROT0,   "IGS
 
 /* these don't use an External ARM rom, and don't have any weak internal functions which would allow the internal ROM to be read out */
 
-GAME( 2002, ddp3,         0,         cavepgm,    pgm,     ddp3,       ROT270, "Cave", "DoDonPachi Dai-Ou-Jou",                  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // Displays "2002.04.05.Master Ver"
-GAME( 2002, ddp3a,        ddp3,      cavepgm,    pgm,     ddp3,       ROT270, "Cave", "DoDonPachi Dai-Ou-Jou (first revision)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // Displays "2002.04.05 Master Ver"
-GAME( 2002, ddp3blk,      ddp3,      cavepgm,    pgm,     ddp3,       ROT270, "Cave", "DoDonPachi Dai-Ou-Jou (Black Label)",    GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // Displays "2002.04.05.Master Ver" (old) or "2002.10.07 Black Ver" (new)
+GAME( 2002, ddp3,         0,         cavepgm,    pgm,     ddp3,       ROT270, "Cave", "DoDonPachi Dai-Ou-Jou (V101)",                   GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // Displays "2002.04.05.Master Ver"
+// is there a v101 without the . after 05?
+GAME( 2002, ddp3a,        ddp3,      cavepgm,    pgm,     ddp3,       ROT270, "Cave", "DoDonPachi Dai-Ou-Jou (V100, second revision)",  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // Displays "2002.04.05.Master Ver"
+GAME( 2002, ddp3b,        ddp3,      cavepgm,    pgm,     ddp3,       ROT270, "Cave", "DoDonPachi Dai-Ou-Jou (V100, first revision)",   GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // Displays "2002.04.05 Master Ver"
+GAME( 2002, ddp3blk,      ddp3,      cavepgm,    pgm,     ddp3,       ROT270, "Cave", "DoDonPachi Dai-Ou-Jou (Black Label)",            GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // Displays "2002.04.05.Master Ver" (old) or "2002.10.07 Black Ver" (new)
 
 // the exact text of the 'version' shows which revision of the game it is; the newest has 2 '.' symbols in the string, the oldest, none.
-GAME( 2002, ket,          0,         cavepgm,    pgm,     ket,       ROT270, "Cave", "Ketsui: Kizuna Jigoku Tachi",                  GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // Displays "2003/01/01. Master Ver."
-GAME( 2002, keta,         ket,       cavepgm,    pgm,     ket,       ROT270, "Cave", "Ketsui: Kizuna Jigoku Tachi (older)",          GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE) // Displays "2003/01/01 Master Ver."
-GAME( 2002, ketb,         ket,       cavepgm,    pgm,     ket,       ROT270, "Cave", "Ketsui: Kizuna Jigoku Tachi (first revision)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE) // Displays "2003/01/01 Master Ver"
+GAME( 2002, ket,          0,         cavepgm,    pgm,     ket,       ROT270, "Cave", "Ketsui: Kizuna Jigoku Tachi (V100, third revision)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // Displays "2003/01/01. Master Ver."
+GAME( 2002, keta,         ket,       cavepgm,    pgm,     ket,       ROT270, "Cave", "Ketsui: Kizuna Jigoku Tachi (V100, second revision)",GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE) // Displays "2003/01/01 Master Ver."
+GAME( 2002, ketb,         ket,       cavepgm,    pgm,     ket,       ROT270, "Cave", "Ketsui: Kizuna Jigoku Tachi (V100, first revision)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE) // Displays "2003/01/01 Master Ver"
 
 GAME( 2003, espgal,       0,         cavepgm,    pgm,     espgal,       ROT270, "Cave", "EspGaluda", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
 
