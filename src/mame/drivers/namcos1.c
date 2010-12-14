@@ -1507,6 +1507,36 @@ ROM_START( quester )
 	ROM_LOAD( "qs1_o1.bin",         0x20000, 0x10000, CRC(e4aab0ca) SHA1(e4765dd369b02492dbb9955cc082f24665a01635) )
 ROM_END
 
+ROM_START( questers )
+	ROM_REGION( 0x2c000, "audiocpu", 0 )       /* 176k for the sound cpu */
+	ROM_LOAD( "qs1_s0.bin",         0x0c000, 0x10000, CRC(c2ef3af9) SHA1(aa0766aad450660e216d817e41e030141e8d1f48) )
+
+	ROM_REGION( 0x400000, "user1", 0 ) /* 4M for ROMs */
+	/* 000000-07ffff empty */
+	/* 080000-0fffff empty */
+	/* 100000-17ffff empty */
+	/* 180000-1fffff empty */
+	/* 200000-27ffff empty */
+	ROM_LOAD_512( "qs2_p5.bin",      0x280000, CRC(15661fe7) SHA1(e3071981231dd84407d1cc90f3b248d2989406b3) )
+	ROM_LOAD_512( "qs2_p6.bin",      0x300000, CRC(19e0fc20) SHA1(bc824dd7f88ccfa2e97ae05897e6535cf6876fab) )
+	ROM_LOAD_512( "qs2_p7.bin",      0x380000, CRC(4f6ad716) SHA1(759b4eee1a24029efc2e813a648f6fbc22a17fab) )
+
+	ROM_REGION( 0xd0000, "mcu", 0 )       /* the MCU & voice */
+	ROM_LOAD( "cus64-64a1.mcu",     0x0f000, 0x01000, CRC(ffb5c0bd) SHA1(7a38c0cc2553c627f4ec507fb6e807cf7d537c02) ) /* internal 63701 MCU code */
+	ROM_LOAD_HS( "qs1_v0.bin",      0x10000, 0x10000, CRC(6a2f3038) SHA1(00870da9b7f65536ff052c32da2d553f8c6b994b) )
+
+	ROM_REGION( 0x20000, "gfx1", 0 )  /* character mask */
+	ROM_LOAD( "qs1_c8.bin",         0x00000, 0x10000, CRC(06730d54) SHA1(53d79c27e2f1b192b1de781b6b5024eb1e8126ad) )
+
+	ROM_REGION( 0x100000, "gfx2", 0 ) /* characters */
+	ROM_LOAD( "qs1_c0.bin",         0x00000, 0x20000, CRC(ca69bd7a) SHA1(98130f06e3d7b480b76bf28a4e252b4aaa1e1b3e) )
+	ROM_LOAD( "qs1_c1.bin",         0x20000, 0x20000, CRC(d660ba71) SHA1(738d225c0e2b91c785fde0c33a0520a672933659) )
+	ROM_LOAD( "qs1_c2.bin",         0x40000, 0x20000, CRC(4686f656) SHA1(8628a18bf7154b8edaf7cfbee2d8881a28690bff) )
+
+	ROM_REGION( 0x100000, "gfx3", 0 ) /* sprites */
+	ROM_LOAD( "qs1_o0.bin",         0x00000, 0x10000, CRC(e24f0bf1) SHA1(31f37f853fe27c24cfeaa059f8959dfea37911cb) )
+	ROM_LOAD( "qs1_o1.bin",         0x20000, 0x10000, CRC(e4aab0ca) SHA1(e4765dd369b02492dbb9955cc082f24665a01635) )
+ROM_END
 /* Pac-Mania */
 ROM_START( pacmania )
 	ROM_REGION( 0x2c000, "audiocpu", 0 )       /* 176k for the sound cpu */
@@ -2683,6 +2713,7 @@ GAME( 1987, dspirito, dspirit,  ns1,     dspirit,  dspirit,  ROT90,  "Namco", "D
 GAME( 1987, dspirita, dspirit,  ns1,     dspirit,  dspirit,  ROT90,  "Namco (Atari license)", "Dragon Spirit (Atari license)", 0 )
 GAME( 1987, blazer,   0,        ns1,     ns1,      blazer,   ROT90,  "Namco", "Blazer (Japan)", 0 )
 GAME( 1987, quester,  0,        ns1,     quester,  quester,  ROT90,  "Namco", "Quester (Japan)", 0 )
+GAME( 1987, questers, quester,  ns1,     quester,  quester,  ROT90,  "Namco", "Quester Special Edition (Japan)", 0 )
 GAME( 1987, pacmania, 0,        ns1,     pacmania, pacmania, ROT270, "Namco", "Pac-Mania", 0 )
 GAME( 1987, pacmaniaj,pacmania, ns1,     pacmania, pacmania, ROT90,  "Namco", "Pac-Mania (Japan)", 0 )
 GAME( 1987, galaga88, 0,        ns1,     galaga88, galaga88, ROT270, "Namco", "Galaga '88", 0 )

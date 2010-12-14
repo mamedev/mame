@@ -4224,8 +4224,8 @@ ROM_START( bullet )
 	ROM_LOAD16_BYTE( "epr-11012.a6",  0x020000, 0x08000, CRC(3992f159) SHA1(50686b394693ab01cbd159ae661f326c8eee50b8) )
 	ROM_LOAD16_BYTE( "epr-11009.a3",  0x020001, 0x08000, CRC(df199999) SHA1(2669e923aa4f1bedc788401f44ad19c318658f00) )
 
-	ROM_REGION( 0x2000, "user1", 0 ) /* decryption key -- still WIP */
-	ROM_LOAD( "317-0041.key", 0x0000, 0x2000, BAD_DUMP CRC(a30ae46c) SHA1(5e7361ab1f1d30c59d7f29152bc6f7175a0aa102) )
+	ROM_REGION( 0x2000, "user1", 0 ) /* decryption key */
+	ROM_LOAD( "317-0041.key", 0x0000, 0x2000, CRC(4cd4861a) SHA1(7578cfbd3efa28fa5eda0c007750b23060a305eb) )
 
 	ROM_REGION( 0x30000, "gfx1", 0 ) /* tiles */
 	ROM_LOAD( "epr-10994.b9",  0x00000, 0x10000, CRC(3035468a) SHA1(778366815a2a74188d72d64c5e1e95215bc4ca81) )
@@ -6594,7 +6594,7 @@ GAME( 1989, bayroute,   0,        system16b,      bayroute, generic_5704,       
 GAME( 1989, bayroutej,  bayroute, system16b,      bayroute, generic_5704,       ROT0,   "Sunsoft / Sega", "Bay Route (set 2, Japan, FD1094 317-0115)", 0 )
 GAME( 1989, bayroute1,  bayroute, system16b,      bayroute, generic_5358,       ROT0,   "Sunsoft / Sega", "Bay Route (set 1, US, unprotected)", 0 )
 
-GAME( 1987, bullet,     0,        system16b,      bullet,   generic_5358_small, ROT0,   "Sega",           "Bullet (FD1094 317-0041)", GAME_UNEMULATED_PROTECTION )
+GAME( 1987, bullet,     0,        system16b,      bullet,   generic_5358_small, ROT0,   "Sega",           "Bullet (FD1094 317-0041)", 0 )
 /* Charon */
 GAME( 1991, cotton,     0,        system16b,      cotton,   generic_5704,       ROT0,   "Sega / Success", "Cotton (set 3, World, FD1094 317-0181a)", 0 )
 GAME( 1991, cottonu,    cotton,   system16b,      cotton,   generic_5704,       ROT0,   "Sega / Success", "Cotton (set 2, US, FD1094 317-0180)", 0 )

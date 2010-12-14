@@ -771,6 +771,7 @@ const game_driver * const drivers[] =
 	DRIVER( dspirita )	/* (c) 1987 (Atari license) */
 	DRIVER( blazer )	/* (c) 1987 (Japan) */
 	DRIVER( quester )	/* (c) 1987 (Japan) */
+	DRIVER( questers )	/* (c) 1987 (Japan) */
 	DRIVER( pacmania )	/* (c) 1987 */
 	DRIVER( pacmaniaj )	/* (c) 1987 (Japan) */
 	DRIVER( galaga88 )	/* (c) 1987 */
