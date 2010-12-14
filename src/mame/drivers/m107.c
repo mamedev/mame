@@ -159,6 +159,11 @@ static WRITE16_HANDLER( m107_sound_status_w )
 	cputag_set_input_line_and_vector(space->machine, "maincpu", 0, HOLD_LINE, M107_IRQ_3);
 }
 
+static WRITE16_HANDLER( m107_sound_reset_w )
+{
+	cputag_set_input_line(space->machine, "soundcpu", INPUT_LINE_RESET, (data) ? CLEAR_LINE : ASSERT_LINE);
+}
+
 /*****************************************************************************/
 
 static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 16 )
@@ -185,6 +190,7 @@ static ADDRESS_MAP_START( main_portmap, ADDRESS_SPACE_IO, 16 )
 	AM_RANGE(0xa0, 0xaf) AM_WRITENOP /* Written with 0's in interrupt */
 	AM_RANGE(0xb0, 0xb1) AM_WRITE(m107_spritebuffer_w)
 	AM_RANGE(0xc0, 0xc3) AM_READNOP /* Only wpksoc: ticket related? */
+	AM_RANGE(0xc0, 0xc1) AM_WRITE(m107_sound_reset_w)
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -669,7 +675,7 @@ static DRIVER_INIT( wpksoc )
 
 /***************************************************************************/
 
-GAME( 1993, firebarr,      0, firebarr, firebarr, firebarr, ROT270, "Irem", "Fire Barrel (Japan)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, firebarr,      0, firebarr, firebarr, firebarr, ROT270, "Irem", "Fire Barrel (Japan)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1994, dsoccr94,      0, dsoccr94, dsoccr94, dsoccr94, ROT0,   "Irem (Data East Corporation license)", "Dream Soccer '94", 0 )
 GAME( 1995, wpksoc,        0, wpksoc,   wpksoc,   wpksoc,   ROT0,   "Jaleco", "World PK Soccer", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
 GAME( 1994, kftgoal,  wpksoc, wpksoc,   wpksoc,   wpksoc,   ROT0,   "Jaleco", "Kick for the Goal", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
