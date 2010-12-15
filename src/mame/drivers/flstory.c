@@ -774,21 +774,20 @@ static INPUT_PORTS_START( rumba )
 	PORT_DIPNAME(0x04, 0x04, DEF_STR( Free_Play ) )
 	PORT_DIPSETTING(   0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(   0x00, DEF_STR( On ) )
-    PORT_DIPNAME( 0x08,   0x08, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x08, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-    PORT_DIPNAME( 0x10,   0x10, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x10, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x18, 0x08, DEF_STR( Lives ) )
+	PORT_DIPSETTING(    0x18, "2" )
+	PORT_DIPSETTING(    0x10, "3" )
+	PORT_DIPSETTING(    0x08, "4" )
+	PORT_DIPSETTING(    0x00, "5")
     PORT_DIPNAME( 0x20,   0x20, DEF_STR( Unknown ) )
     PORT_DIPSETTING(      0x20, DEF_STR( Off ) )
     PORT_DIPSETTING(      0x00, DEF_STR( On ) )
     PORT_DIPNAME( 0x40,   0x40, DEF_STR( Unknown ) )
     PORT_DIPSETTING(      0x40, DEF_STR( Off ) )
     PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-    PORT_DIPNAME( 0x80,   0x80, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x80, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
+	PORT_DIPNAME(0x80, 0x80, DEF_STR( Cabinet ) )
+	PORT_DIPSETTING(   0x00, DEF_STR( Upright ) )
+	PORT_DIPSETTING(   0x80, DEF_STR( Cocktail ) )
 
 
 	PORT_START("DSW1")      /* D801 */
@@ -843,10 +842,10 @@ static INPUT_PORTS_START( rumba )
     PORT_DIPNAME( 0x10,   0x10, DEF_STR( Unknown ) )
     PORT_DIPSETTING(      0x10, DEF_STR( Off ) )
     PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-    PORT_DIPNAME( 0x20,   0x20, DEF_STR( Unknown ) )
-    PORT_DIPSETTING(      0x20, DEF_STR( Off ) )
-    PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-    PORT_DIPNAME( 0x40,   0x00, DEF_STR( Unknown ) ) //???
+    PORT_DIPNAME( 0x20,   0x20, "Copyright String" )
+    PORT_DIPSETTING(      0x20, "Taito Corp. MCMLXXXIV" )
+    PORT_DIPSETTING(      0x00, "Taito Corporation" )
+    PORT_DIPNAME( 0x40,   0x40, "Infinite Lives" ) //???
     PORT_DIPSETTING(      0x40, DEF_STR( Off ) )
     PORT_DIPSETTING(      0x00, DEF_STR( On ) )
     PORT_DIPNAME( 0x80,   0x80, DEF_STR( Unknown ) )
@@ -878,10 +877,10 @@ static INPUT_PORTS_START( rumba )
         - bit 0: mcu is ready to receive data from main cpu
         - bit 1: mcu has sent data to the main cpu       */
 	PORT_BIT( 0x03, IP_ACTIVE_HIGH, IPT_SPECIAL ) PORT_CUSTOM(victnine_mcu_status_bit01_r, NULL)
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 )
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 )
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 )
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 )
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
@@ -898,10 +897,10 @@ static INPUT_PORTS_START( rumba )
 	PORT_START("EXTRA_P2")      /* D807 */
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x02, IP_ACTIVE_LOW, IPT_UNKNOWN )
-	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_COCKTAIL
-	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_COCKTAIL
-	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_COCKTAIL
-	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_COCKTAIL
+	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x08, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_UNKNOWN )
+	PORT_BIT( 0x20, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x40, IP_ACTIVE_LOW, IPT_UNKNOWN )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 INPUT_PORTS_END
@@ -1558,33 +1557,10 @@ ROM_START( rumba )
 	ROM_LOAD( "a23_04.bin",   0x04000, 0x2000, CRC(1d4f001f) SHA1(c3245650e57138ed89e7de8289fe37c5d933ddca) )
 ROM_END
 
-DRIVER_INIT( rumba )
-{
-	/* the protection on this seems to control _at least_ the movement of the bird, at the moment it flies off the screen
-       you have infinite lives (and the lives display corrupts the tutorial text - probably protected)
-
-	   your character also vanishes after 'rolling' one of the wheels
-	   there are incorrect colours on some tiles (could be video issue)
-
-
-	*/
-
-//	UINT8* mem = memory_region(machine,"maincpu");
-
-	// mcu checksum test
-//	mem[0xbdfc] = 0x00;
-//	mem[0xbdfd] = 0x00;
-//	mem[0xbdfe] = 0x00;
-	// rom checksum
-//	mem[0xbf88] = 0x00;
-//	mem[0xbf89] = 0x00;
-
-}
-
 
 GAME( 1985, flstory,   0,        flstory,  flstory,  0, ROT180, "Taito", "The FairyLand Story", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1985, flstoryj,  flstory,  flstory,  flstory,  0, ROT180, "Taito", "The FairyLand Story (Japan)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1985, onna34ro,  0,        onna34ro, onna34ro, 0, ROT0,   "Taito", "Onna Sansirou - Typhoon Gal (set 1)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1985, onna34roa, onna34ro, onna34ro, onna34ro, 0, ROT0,   "Taito", "Onna Sansirou - Typhoon Gal (set 2)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1984, victnine,  0,        victnine, victnine, 0, ROT0,   "Taito", "Victorious Nine", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1984, rumba,     0,        rumba,    rumba,  rumba, ROT270, "Taito", "Rumba Lumber", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
+GAME( 1984, rumba,     0,        rumba,    rumba,    0, ROT270, "Taito", "Rumba Lumber", GAME_IMPERFECT_SOUND )
