@@ -158,8 +158,8 @@ static ADDRESS_MAP_START( victnine_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE_MEMBER(flstory_state, workram) /* work RAM */
 ADDRESS_MAP_END
 
-static UINT8 mcu_cmd;
-static UINT8 mcu_b2_res;
+static UINT8 mcu_cmd,mcu_counter;
+static UINT8 mcu_b2_res,mcu_b1_res;
 
 static READ8_HANDLER( rumba_mcu_r )
 {
@@ -171,6 +171,7 @@ static READ8_HANDLER( rumba_mcu_r )
 		case 0x02: return 0; //
 		case 0x73: return 0xa4; //initial MCU check
 		case 0x33: return mcu_b2_res; //0xb2 result
+		case 0x31: return mcu_b1_res; //0xb1 result
 		case 0x04:
 		case 0x3b: return 0; // TODO
 		case 0x05:
@@ -185,6 +186,24 @@ static READ8_HANDLER( rumba_mcu_r )
 static WRITE8_HANDLER( rumba_mcu_w )
 {
 	printf("PC=%04x W %02x\n",cpu_get_pc(space->cpu),data);
+
+	if(mcu_cmd == 0xb0) // counter, used by command 0xb1 (and something else?
+	{
+		mcu_counter = data;
+	}
+
+	if(mcu_cmd == 0xb1) // player death sequence, controls X position
+	{
+		mcu_b1_res = data;
+
+		/* TODO: this is pretty hard to simulate ... */
+		if(mcu_counter >= 0x10)
+			mcu_b1_res++;
+		else if(mcu_counter >= 0x08)
+			mcu_b1_res--;
+		else
+			mcu_b1_res++;
+	}
 
 	if(mcu_cmd == 0xb2) // player sprite hook-up param when he throws the wheel
 	{
