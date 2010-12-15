@@ -182,10 +182,10 @@ static READ8_HANDLER( rumba_mcu_r )
 
 		case 0x3b: return mcu_bb_res; //0xbb result
 		case 0x40:
-		case 0x41: return 0;
+		case 0x41:
 		case 0x42:
 		{
-			/* TODO: hack, subtle behaviour for transitioning from level 16 to level 17. Command is:
+			/* TODO: hack, subtle behaviour for transitioning from level 16 to level 1 (loop clear?). Command is:
 			0xc0 -> param -> 0xc1 -> param -> ... 0xc7 -> param -> 0x0e (end of packet) then reads at 0x40 -> 0x41 and 0x42
 
 			Params written doesn't make any sense, they are copies from RAM addresses at 0xe450-7 and they looks like ... garbage.
