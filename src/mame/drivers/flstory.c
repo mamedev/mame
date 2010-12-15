@@ -181,25 +181,25 @@ static READ8_HANDLER( rumba_mcu_r )
 		case 0x38: return mcu_b6_res; //x value
 
 		case 0x3b: return mcu_bb_res; //0xbb result
-		case 0x40:
-		case 0x41:
+		case 0x40: return 0;
+		case 0x41: return 0;
 		case 0x42:
 		{
-			/* TODO: hack, subtle behaviour for transitioning from level 16 to level 1 (loop clear?). Command is:
+			/* TODO: subtle behaviour for transitioning from level 16 to level 1 (loop clear?). Command is:
 			0xc0 -> param -> 0xc1 -> param -> ... 0xc7 -> param -> 0x0e (end of packet) then reads at 0x40 -> 0x41 and 0x42
 
 			Params written doesn't make any sense, they are copies from RAM addresses at 0xe450-7 and they looks like ... garbage.
 			It's possible that all of this it just increments by one an internal RAM address in the MCU and then it sends a six when this counter
 			has bits 0-3 == 0 (BCD operation?), but then the question is ... how it determines game over?
 			*/
-			static UINT8 level_val;
+			//static UINT8 level_val;
 
-			level_val = space->read_byte(0xe247);
+			//level_val = space->read_byte(0xe247);
 
 			//popmessage("%02x",level_val);
 
-			if((level_val & 0x0f) == 0x00)
-				return 6;
+			//if((level_val & 0x0f) == 0x00)
+			//	return 0; //6
 
 			return 0;
 		}
