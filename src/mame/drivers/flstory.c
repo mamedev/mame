@@ -252,9 +252,9 @@ static WRITE8_HANDLER( rumba_mcu_w )
 		switch(data)
 		{
 			case 1: break; // from up to down
-			case 2: break; // from right to left
+			case 2: break; // from left to right
+			case 3: break; // from right to left
 			case 4: break; // from down to up
-			case 8: break; // from left to right
 		}
 		#endif
 	}
@@ -264,57 +264,24 @@ static WRITE8_HANDLER( rumba_mcu_w )
 		/* TODO: values might be off by one */
 		mcu_b5_res = data;
 
-		if(mcu_b4_cmd & 2) // from right to left
-		{
+		if(mcu_b4_cmd == 3) // from right to left
 			mcu_b5_res = 0x0d;
-			mcu_b4_cmd = 0; // note: 0xb5 seems to have priority over 0xb6? It sometimes triggers this with bit 0 enabled too?
-		}
 
-		if(mcu_b4_cmd & 8) // from left to right
-		{
+		if(mcu_b4_cmd == 2) // from left to right
 			mcu_b5_res = 0xe4;
-			mcu_b4_cmd = 0; // note: 0xb5 seems to have priority over 0xb6?
-		}
+
 	}
 
 	if(mcu_cmd == 0xb6) // bird Y coord
 	{
 		mcu_b6_res = data;
 
-		if(mcu_b4_cmd & 1) // from up to down
+		if(mcu_b4_cmd == 1) // from up to down
 			mcu_b6_res = 0x04;
 
-		if(mcu_b4_cmd & 4) // from down to up
+		if(mcu_b4_cmd == 4) // from down to up
 			mcu_b6_res = 0xdc;
 	}
-
-	if(mcu_cmd == 0xb3)
-		printf("PC=%04x W %02x -> %02x\n",cpu_get_pc(space->cpu),mcu_cmd,data);
-
-	if(mcu_cmd == 0xb7)
-		printf("PC=%04x W %02x -> %02x\n",cpu_get_pc(space->cpu),mcu_cmd,data);
-
-	if(mcu_cmd == 0xb8)
-		printf("PC=%04x W %02x -> %02x\n",cpu_get_pc(space->cpu),mcu_cmd,data);
-
-	if(mcu_cmd == 0xb9)
-		printf("PC=%04x W %02x -> %02x\n",cpu_get_pc(space->cpu),mcu_cmd,data);
-
-	if(mcu_cmd == 0xba)
-		printf("PC=%04x W %02x -> %02x\n",cpu_get_pc(space->cpu),mcu_cmd,data);
-
-	if(mcu_cmd == 0xbc)
-		printf("PC=%04x W %02x -> %02x\n",cpu_get_pc(space->cpu),mcu_cmd,data);
-
-	if(mcu_cmd == 0xbd)
-		printf("PC=%04x W %02x -> %02x\n",cpu_get_pc(space->cpu),mcu_cmd,data);
-
-	if(mcu_cmd == 0xbe)
-		printf("PC=%04x W %02x -> %02x\n",cpu_get_pc(space->cpu),mcu_cmd,data);
-
-	if(mcu_cmd == 0xbf)
-		printf("PC=%04x W %02x -> %02x\n",cpu_get_pc(space->cpu),mcu_cmd,data);
-
 
 	mcu_cmd = data;
 }
