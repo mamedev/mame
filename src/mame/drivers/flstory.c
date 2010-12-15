@@ -159,13 +159,24 @@ static ADDRESS_MAP_START( victnine_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static UINT8 mcu_cmd;
+static UINT8 mcu_b2_res;
 
 static READ8_HANDLER( rumba_mcu_r )
 {
+	printf("PC=%04x R %02x\n",cpu_get_pc(space->cpu),mcu_cmd);
+
 	switch(mcu_cmd)
 	{
-		case 0: return 0;
-		case 0x73: return 0xa4;
+		case 0x00: return 0;
+		case 0x02: return 0; //
+		case 0x73: return 0xa4; //initial MCU check
+		case 0x33: return mcu_b2_res; //0xb2 result
+		case 0x04:
+		case 0x3b: return 0; // TODO
+		case 0x05:
+		case 0x37:
+		case 0x38: return 0; // TODO, bird related?
+		//default: 	printf("PC=%04x R %02x\n",cpu_get_pc(space->cpu),mcu_cmd); break;
 	}
 
 	return 0;
@@ -173,6 +184,23 @@ static READ8_HANDLER( rumba_mcu_r )
 
 static WRITE8_HANDLER( rumba_mcu_w )
 {
+	printf("PC=%04x W %02x\n",cpu_get_pc(space->cpu),data);
+
+	if(mcu_cmd == 0xb2) // player sprite hook-up param when he throws the wheel
+	{
+		/*
+		sends 0xb2 -> param -> 0x02 (end of cmd packet?) then 0x33 for reply
+		*/
+
+		switch(data)
+		{
+			case 1: mcu_b2_res = 0xaa; break; //left
+			case 2: mcu_b2_res = 0xaa; break; //right
+			case 4: mcu_b2_res = 0xab; break; //down
+			case 8: mcu_b2_res = 0xa9; break; //up
+		}
+	}
+
 	mcu_cmd = data;
 }
 
@@ -736,7 +764,7 @@ static INPUT_PORTS_START( rumba )
     PORT_DIPNAME( 0x20,   0x20, DEF_STR( Unknown ) )
     PORT_DIPSETTING(      0x20, DEF_STR( Off ) )
     PORT_DIPSETTING(      0x00, DEF_STR( On ) )
-    PORT_DIPNAME( 0x40,   0x40, DEF_STR( Unknown ) )
+    PORT_DIPNAME( 0x40,   0x00, DEF_STR( Unknown ) ) //???
     PORT_DIPSETTING(      0x40, DEF_STR( Off ) )
     PORT_DIPSETTING(      0x00, DEF_STR( On ) )
     PORT_DIPNAME( 0x80,   0x80, DEF_STR( Unknown ) )
@@ -1477,4 +1505,4 @@ GAME( 1985, flstoryj,  flstory,  flstory,  flstory,  0, ROT180, "Taito", "The Fa
 GAME( 1985, onna34ro,  0,        onna34ro, onna34ro, 0, ROT0,   "Taito", "Onna Sansirou - Typhoon Gal (set 1)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1985, onna34roa, onna34ro, onna34ro, onna34ro, 0, ROT0,   "Taito", "Onna Sansirou - Typhoon Gal (set 2)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1984, victnine,  0,        victnine, victnine, 0, ROT0,   "Taito", "Victorious Nine", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1984, rumba,     0,        rumba,    rumba,  rumba, ROT270, "Taito", "Rumba Lumber", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1984, rumba,     0,        rumba,    rumba,  rumba, ROT270, "Taito", "Rumba Lumber", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
