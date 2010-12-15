@@ -158,25 +158,27 @@ static ADDRESS_MAP_START( victnine_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE_MEMBER(flstory_state, workram) /* work RAM */
 ADDRESS_MAP_END
 
-static UINT8 mcu_cmd,mcu_counter;
-static UINT8 mcu_b2_res,mcu_b1_res,mcu_bb_res;
+static UINT8 mcu_cmd,mcu_counter,mcu_b4_cmd;
+static UINT8 mcu_b2_res,mcu_b1_res,mcu_bb_res,mcu_b5_res,mcu_b6_res;
 
 static READ8_HANDLER( rumba_mcu_r )
 {
-	printf("PC=%04x R %02x\n",cpu_get_pc(space->cpu),mcu_cmd);
+	//printf("PC=%04x R %02x\n",cpu_get_pc(space->cpu),mcu_cmd);
+
+	if((mcu_cmd & 0xf0) == 0x00) // end packet cmd, value returned is meaningless (probably used for main <-> mcu comms syncronization)
+		return 0;
 
 	switch(mcu_cmd)
 	{
-		case 0x00: return 0;
-		case 0x02: return 0; //
 		case 0x73: return 0xa4; //initial MCU check
 		case 0x33: return mcu_b2_res; //0xb2 result
 		case 0x31: return mcu_b1_res; //0xb1 result
-		case 0x04:
-		case 0x05: return 0;
 
-		case 0x37:
-		case 0x38: return 1; //0xbb result, is 1 enough for these two?
+		case 0x35: mcu_b5_res = 1; mcu_b6_res = 1; return 0;
+		case 0x36: return mcu_b4_cmd; //0xb4 command, extra protection for lives (first play only), otherwise game gives one extra life at start-up (!)
+		case 0x37: return mcu_b5_res; //0xb4 / 0xb5 / 0xb6 result y value
+		case 0x38: return mcu_b6_res; //x value
+
 		case 0x3b: return mcu_bb_res; //0xbb result
 		//default: 	printf("PC=%04x R %02x\n",cpu_get_pc(space->cpu),mcu_cmd); break;
 	}
@@ -186,8 +188,8 @@ static READ8_HANDLER( rumba_mcu_r )
 
 static WRITE8_HANDLER( rumba_mcu_w )
 {
-	printf("PC=%04x W %02x\n",cpu_get_pc(space->cpu),data);
-
+	//if((mcu_cmd & 0xf0) == 0xb0)
+	//printf("PC=%04x W %02x %02x\n",cpu_get_pc(space->cpu),mcu_cmd,data);
 
 	if(mcu_cmd == 0xb0) // counter, used by command 0xb1 (and something else?
 	{
@@ -228,13 +230,63 @@ static WRITE8_HANDLER( rumba_mcu_w )
 
 	if(mcu_cmd == 0xbb) // when you start a level, lives
 	{
+		/*
+		sends 0xbb -> param -> 0x04 (end of cmd packet?) then 0x3b for reply
+		*/
+
 		mcu_bb_res = data;
 		//printf("PC=%04x W %02x -> %02x\n",cpu_get_pc(space->cpu),mcu_cmd,data);
 	}
 
-//	if(mcu_cmd == 0xb4) // when the bird touches the top / bottom / left / right of the screen
-//	if(mcu_cmd == 0xb5)
-//	if(mcu_cmd == 0xb6)
+	if(mcu_cmd == 0xb4) // when the bird touches the top / bottom / left / right of the screen, for correct repositioning
+	{
+		mcu_b4_cmd = data;
+
+		//popmessage("%02x",mcu_b4_cmd);
+
+		/*
+		sends 0xb4 -> param -> 0xb5 -> param (bird X coord) -> 0xb6 -> param (bird Y coord) ->
+		*/
+
+		#if 0
+		switch(data)
+		{
+			case 1: break; // from up to down
+			case 2: break; // from right to left
+			case 4: break; // from down to up
+			case 8: break; // from left to right
+		}
+		#endif
+	}
+
+	if(mcu_cmd == 0xb5) // bird X coord
+	{
+		/* TODO: values might be off by one */
+		mcu_b5_res = data;
+
+		if(mcu_b4_cmd & 2) // from right to left
+		{
+			mcu_b5_res = 0x0d;
+			mcu_b4_cmd = 0; // note: 0xb5 seems to have priority over 0xb6? It sometimes triggers this with bit 0 enabled too?
+		}
+
+		if(mcu_b4_cmd & 8) // from left to right
+		{
+			mcu_b5_res = 0xe4;
+			mcu_b4_cmd = 0; // note: 0xb5 seems to have priority over 0xb6?
+		}
+	}
+
+	if(mcu_cmd == 0xb6) // bird Y coord
+	{
+		mcu_b6_res = data;
+
+		if(mcu_b4_cmd & 1) // from up to down
+			mcu_b6_res = 0x04;
+
+		if(mcu_b4_cmd & 4) // from down to up
+			mcu_b6_res = 0xdc;
+	}
 
 	if(mcu_cmd == 0xb3)
 		printf("PC=%04x W %02x -> %02x\n",cpu_get_pc(space->cpu),mcu_cmd,data);
