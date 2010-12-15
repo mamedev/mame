@@ -158,12 +158,30 @@ static ADDRESS_MAP_START( victnine_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE_MEMBER(flstory_state, workram) /* work RAM */
 ADDRESS_MAP_END
 
+static UINT8 mcu_cmd;
+
+static READ8_HANDLER( rumba_mcu_r )
+{
+	switch(mcu_cmd)
+	{
+		case 0: return 0;
+		case 0x73: return 0xa4;
+	}
+
+	return 0;
+}
+
+static WRITE8_HANDLER( rumba_mcu_w )
+{
+	mcu_cmd = data;
+}
+
 static ADDRESS_MAP_START( rumba_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(flstory_videoram_w) AM_BASE_SIZE_MEMBER(flstory_state, videoram, videoram_size)
 //	AM_RANGE(0xc800, 0xcfff) AM_RAM	/* unknown */
-//	AM_RANGE(0xd000, 0xd000) AM_READWRITE(victnine_mcu_r, victnine_mcu_w)
-//	AM_RANGE(0xd001, 0xd001) AM_WRITENOP	/* watchdog? */
+	AM_RANGE(0xd000, 0xd000) AM_READWRITE(rumba_mcu_r, rumba_mcu_w)
+	AM_RANGE(0xd001, 0xd001) AM_WRITENOP	/* watchdog? */
 //	AM_RANGE(0xd002, 0xd002) AM_NOP	/* unknown read & coin lock out? */
 	AM_RANGE(0xd400, 0xd400) AM_READWRITE(from_snd_r, sound_command_w)
 	AM_RANGE(0xd401, 0xd401) AM_READ(snd_flag_r)
@@ -179,7 +197,7 @@ static ADDRESS_MAP_START( rumba_map, ADDRESS_SPACE_PROGRAM, 8 )
 //  AM_RANGE(0xda00, 0xda00) AM_WRITEONLY
 	AM_RANGE(0xdc00, 0xdc9f) AM_RAM AM_BASE_SIZE_MEMBER(flstory_state, spriteram, spriteram_size)
 	AM_RANGE(0xdca0, 0xdcbf) AM_RAM_WRITE(flstory_scrlram_w) AM_BASE_MEMBER(flstory_state, scrlram)
-//	AM_RANGE(0xdce0, 0xdce0) AM_READWRITE(victnine_gfxctrl_r, victnine_gfxctrl_w)
+	AM_RANGE(0xdce0, 0xdce0) AM_READWRITE(victnine_gfxctrl_r, victnine_gfxctrl_w)
 //	AM_RANGE(0xdce1, 0xdce1) AM_WRITENOP	/* unknown */
 	AM_RANGE(0xdd00, 0xdeff) AM_READWRITE(flstory_palette_r, flstory_palette_w)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE_MEMBER(flstory_state, workram) /* work RAM */
@@ -808,11 +826,6 @@ static GFXDECODE_START( flstory )
 	GFXDECODE_ENTRY( "gfx1", 0, spritelayout, 256, 16 )
 GFXDECODE_END
 
-static GFXDECODE_START( rumba )
-	GFXDECODE_ENTRY( "gfx1", 0, charlayout,     0, 16 )
-	GFXDECODE_ENTRY( "gfx1", 0, spritelayout,   0, 16 )
-GFXDECODE_END
-
 
 static const ay8910_interface ay8910_config =
 {
@@ -1082,6 +1095,11 @@ static MACHINE_CONFIG_START( victnine, flstory_state )
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
+static MACHINE_RESET( rumba )
+{
+	MACHINE_RESET_CALL(flstory);
+	mcu_cmd = 0;
+}
 
 static MACHINE_CONFIG_START( rumba, flstory_state )
 
@@ -1101,7 +1119,7 @@ static MACHINE_CONFIG_START( rumba, flstory_state )
 	MDRV_QUANTUM_TIME(HZ(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 	MDRV_MACHINE_START(flstory)
-	MDRV_MACHINE_RESET(flstory)
+	MDRV_MACHINE_RESET(rumba)
 
 	/* video hardware */
 	MDRV_SCREEN_ADD("screen", RASTER)
@@ -1111,7 +1129,7 @@ static MACHINE_CONFIG_START( rumba, flstory_state )
 	MDRV_SCREEN_SIZE(32*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(rumba)
+	MDRV_GFXDECODE(flstory)
 	MDRV_PALETTE_LENGTH(512)
 
 	MDRV_VIDEO_START(rumba)
@@ -1441,15 +1459,15 @@ DRIVER_INIT( rumba )
 
 	*/
 
-	UINT8* mem = memory_region(machine,"maincpu");
+//	UINT8* mem = memory_region(machine,"maincpu");
 
 	// mcu checksum test
-	mem[0xbdfc] = 0x00;
-	mem[0xbdfd] = 0x00;
-	mem[0xbdfe] = 0x00;
+//	mem[0xbdfc] = 0x00;
+//	mem[0xbdfd] = 0x00;
+//	mem[0xbdfe] = 0x00;
 	// rom checksum
-	mem[0xbf88] = 0x00;
-	mem[0xbf89] = 0x00;
+//	mem[0xbf88] = 0x00;
+//	mem[0xbf89] = 0x00;
 
 }
 
