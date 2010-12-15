@@ -159,7 +159,7 @@ static ADDRESS_MAP_START( victnine_map, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static UINT8 mcu_cmd,mcu_counter;
-static UINT8 mcu_b2_res,mcu_b1_res;
+static UINT8 mcu_b2_res,mcu_b1_res,mcu_bb_res;
 
 static READ8_HANDLER( rumba_mcu_r )
 {
@@ -173,10 +173,11 @@ static READ8_HANDLER( rumba_mcu_r )
 		case 0x33: return mcu_b2_res; //0xb2 result
 		case 0x31: return mcu_b1_res; //0xb1 result
 		case 0x04:
-		case 0x3b: return 0; // TODO
-		case 0x05:
+		case 0x05: return 0;
+
 		case 0x37:
-		case 0x38: return 0; // TODO, bird related?
+		case 0x38: return 1; //0xbb result, is 1 enough for these two?
+		case 0x3b: return mcu_bb_res; //0xbb result
 		//default: 	printf("PC=%04x R %02x\n",cpu_get_pc(space->cpu),mcu_cmd); break;
 	}
 
@@ -187,8 +188,13 @@ static WRITE8_HANDLER( rumba_mcu_w )
 {
 	printf("PC=%04x W %02x\n",cpu_get_pc(space->cpu),data);
 
+
 	if(mcu_cmd == 0xb0) // counter, used by command 0xb1 (and something else?
 	{
+		/*
+		sends 0xb0 -> param then 0xb1 -> param -> 0x01 (end of cmd packet?) finally 0x31 for reply
+		*/
+
 		mcu_counter = data;
 	}
 
@@ -219,6 +225,44 @@ static WRITE8_HANDLER( rumba_mcu_w )
 			case 8: mcu_b2_res = 0xa9; break; //up
 		}
 	}
+
+	if(mcu_cmd == 0xbb) // when you start a level, lives
+	{
+		mcu_bb_res = data;
+		//printf("PC=%04x W %02x -> %02x\n",cpu_get_pc(space->cpu),mcu_cmd,data);
+	}
+
+//	if(mcu_cmd == 0xb4) // when the bird touches the top / bottom / left / right of the screen
+//	if(mcu_cmd == 0xb5)
+//	if(mcu_cmd == 0xb6)
+
+	if(mcu_cmd == 0xb3)
+		printf("PC=%04x W %02x -> %02x\n",cpu_get_pc(space->cpu),mcu_cmd,data);
+
+	if(mcu_cmd == 0xb7)
+		printf("PC=%04x W %02x -> %02x\n",cpu_get_pc(space->cpu),mcu_cmd,data);
+
+	if(mcu_cmd == 0xb8)
+		printf("PC=%04x W %02x -> %02x\n",cpu_get_pc(space->cpu),mcu_cmd,data);
+
+	if(mcu_cmd == 0xb9)
+		printf("PC=%04x W %02x -> %02x\n",cpu_get_pc(space->cpu),mcu_cmd,data);
+
+	if(mcu_cmd == 0xba)
+		printf("PC=%04x W %02x -> %02x\n",cpu_get_pc(space->cpu),mcu_cmd,data);
+
+	if(mcu_cmd == 0xbc)
+		printf("PC=%04x W %02x -> %02x\n",cpu_get_pc(space->cpu),mcu_cmd,data);
+
+	if(mcu_cmd == 0xbd)
+		printf("PC=%04x W %02x -> %02x\n",cpu_get_pc(space->cpu),mcu_cmd,data);
+
+	if(mcu_cmd == 0xbe)
+		printf("PC=%04x W %02x -> %02x\n",cpu_get_pc(space->cpu),mcu_cmd,data);
+
+	if(mcu_cmd == 0xbf)
+		printf("PC=%04x W %02x -> %02x\n",cpu_get_pc(space->cpu),mcu_cmd,data);
+
 
 	mcu_cmd = data;
 }
