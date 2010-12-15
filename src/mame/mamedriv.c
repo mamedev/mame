@@ -968,6 +968,7 @@ const game_driver * const drivers[] =
 				/* Guitar Jam - July 1999 */
 	DRIVER( crszone )	/* Crisis Zone - December 1999 */
 	DRIVER( crszonea )	/* Crisis Zone - December 1999 */
+	DRIVER( crszoneb )	/* Crisis Zone - December 1999 */
 
 	/* Namco System 246 */
 	DRIVER( sys246 )
