@@ -198,11 +198,11 @@ static WRITE8_HANDLER( rumba_mcu_w )
 
 		/* TODO: this is pretty hard to simulate ... */
 		if(mcu_counter >= 0x10)
-			mcu_b1_res++;
+			mcu_b1_res++; // left
 		else if(mcu_counter >= 0x08)
-			mcu_b1_res--;
+			mcu_b1_res--; // right
 		else
-			mcu_b1_res++;
+			mcu_b1_res++; // left again
 	}
 
 	if(mcu_cmd == 0xb2) // player sprite hook-up param when he throws the wheel
