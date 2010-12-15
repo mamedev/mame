@@ -185,12 +185,15 @@ static READ8_HANDLER( rumba_mcu_r )
 		case 0x41: return 0;
 		case 0x42:
 		{
-			/* TODO: subtle behaviour for transitioning from level 16 to level 1 (loop clear?). Command is:
+			/* TODO: subtle behaviour for transitioning from level 16 to level 17 (loop clear?). Command is:
 			0xc0 -> param -> 0xc1 -> param -> ... 0xc7 -> param -> 0x0e (end of packet) then reads at 0x40 -> 0x41 and 0x42
 
 			Params written doesn't make any sense, they are copies from RAM addresses at 0xe450-7 and they looks like ... garbage.
 			It's possible that all of this it just increments by one an internal RAM address in the MCU and then it sends a six when this counter
 			has bits 0-3 == 0 (BCD operation?), but then the question is ... how it determines game over?
+
+			According to a PCB test, game should roll back to level 1 layout but level counter should say "17" instead of current "11". Some of these ports also appears to control
+			game-play speed and who is playing between player 1 and 2.
 			*/
 			//static UINT8 level_val;
 
@@ -1615,4 +1618,4 @@ GAME( 1985, flstoryj,  flstory,  flstory,  flstory,  0, ROT180, "Taito", "The Fa
 GAME( 1985, onna34ro,  0,        onna34ro, onna34ro, 0, ROT0,   "Taito", "Onna Sansirou - Typhoon Gal (set 1)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1985, onna34roa, onna34ro, onna34ro, onna34ro, 0, ROT0,   "Taito", "Onna Sansirou - Typhoon Gal (set 2)", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
 GAME( 1984, victnine,  0,        victnine, victnine, 0, ROT0,   "Taito", "Victorious Nine", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE )
-GAME( 1984, rumba,     0,        rumba,    rumba,    0, ROT270, "Taito", "Rumba Lumber", GAME_IMPERFECT_SOUND )
+GAME( 1984, rumba,     0,        rumba,    rumba,    0, ROT270, "Taito", "Rumba Lumber", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION )
