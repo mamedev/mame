@@ -97,12 +97,12 @@ WRITE16_HANDLER( m107_control_w )
 
 	COMBINE_DATA(&m107_control[offset]);
 
-	switch (offset)
+	switch (offset*2)
 	{
-		case 0x08: /* Playfield 1 (top layer) */
-		case 0x09: /* Playfield 2 */
-		case 0x0a: /* Playfield 3 */
-		case 0x0b: /* Playfield 4 (bottom layer) */
+		case 0x10: /* Playfield 1 (top layer) */
+		case 0x12: /* Playfield 2 */
+		case 0x14: /* Playfield 3 */
+		case 0x16: /* Playfield 4 (bottom layer) */
 			layer = &pf_layer[offset - 0x08];
 
 			/* update VRAM base (bits 8-11) */
@@ -114,9 +114,17 @@ WRITE16_HANDLER( m107_control_w )
 			/* mark everything dirty of the VRAM base changes */
 			if ((old ^ m107_control[offset]) & 0x0f00)
 				tilemap_mark_all_tiles_dirty(layer->tmap);
+
+			printf("%04x %02x\n",m107_control[offset],offset*2);
+
 			break;
 
-		case 0x0f:
+		case 0x18:
+		case 0x1a:
+		case 0x1c:
+			break;
+
+		case 0x1e:
 			m107_raster_irq_position = m107_control[offset] - 128;
 			break;
 	}
@@ -244,6 +252,13 @@ static void m107_update_scroll_positions(void)
         Playfield 3 rowscroll data is 0xdf800 - 0xdfbff
         Playfield 2 rowscroll data is 0xdf400 - 0xdf7ff
         Playfield 1 rowscroll data is 0xde800 - 0xdebff     ??
+
+     	alt rowscrolling is at 0xde000 - 0xde7ff, every layer uses 0x200 bytes out of this, so it should be:
+     	0xde000 - 0xde1ff layer 0
+     	0xde200 - 0xde3ff layer 1
+     	0xde400 - 0xde5ff layer 2
+     	0xde600 - 0xde7ff layer 3
+     	The question is: why it uses 256 values for 512 rows? Is my hook-up correct?
     */
 
     for (laynum = 0; laynum < 4; laynum++)
@@ -257,6 +272,14 @@ static void m107_update_scroll_positions(void)
 			tilemap_set_scroll_rows(layer->tmap, 512);
 			for (i = 0; i < 512; i++)
 				tilemap_set_scrollx(layer->tmap, i, scrolldata[i] + m107_control[1 + 2 * laynum]);
+		}
+		else if (m107_control[0x08 + laynum] & 0x01) //used by World PK Soccer goal scrolling and Fire Barrel sea wave effect (stage 2) / canyon parallax effect (stage 6)
+		{
+			const UINT16 *scrolldata = m107_vram_data + (0xe000 + 0x200 * laynum) / 2;
+
+			tilemap_set_scroll_rows(layer->tmap, 512);
+			for (i = 0; i < 512; i++)
+				tilemap_set_scrollx(layer->tmap, i, scrolldata[i/2] + m107_control[1 + 2 * laynum]);
 		}
 		else
 		{
