@@ -959,7 +959,7 @@ const game_driver * const drivers[] =
 	DRIVER( timecrs2b )	/* April 1998 */
 	DRIVER( timecrs2c )	/* April 1998 */
 	DRIVER( panicprk )	/* May 1998 */
-				/* Race On - September 1998 */
+	DRIVER( raceon )	/* Race On - September 1998 */
 	DRIVER( gunwars )	/* September 1998 */
 				/* Angler King - March 1999 */
 	DRIVER( 500gp )		/* March 1999 */

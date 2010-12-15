@@ -83,10 +83,10 @@
 
 /*
 
-Namco System 23 and Super System 23 Hardware Overview (last updated 7th March, 2010 at 12.53am)
+Namco System 23 and Super System 23 Hardware Overview (last updated 12th December 2010 at 2.56pm)
 Namco, 1997 - 2000
 
-Note! This document is a Work-In-Progress and will be updated from time to time when more dumps are available.
+Note! This document is a Work-In-Progress and will be updated from time to time when more games are available.
 
 This document covers all the known Namco Gorgon / System 23 / Super System 23 games, including....
 Final Furlong     Namco, 1997    System 22.5/Gorgon
@@ -97,21 +97,25 @@ Downhill Bikers   Namco, 1997    System 23
 Panic Park        Namco, 1998    System 23
 *Angler King      Namco, 1999    System 23
 Gunmen Wars       Namco, 1998    Super System 23
-*Race On!         Namco, 1998    Super System 23
+Race On!          Namco, 1998    Super System 23
 500 GP            Namco, 1998    Super System 23
 Final Furlong 2   Namco, 1999    Super System 23
 *Guitar Jam       Namco, 1999    Super System 23
 Crisis Zone       Namco, 2000    System 23 Evolution 2
 
-* - denotes not dumped yet (and hardware type not confirmed, they might not be System 23 hardware).
+* - denotes not dumped yet (and hardware type not confirmed, they might not be on System 23 hardware).
 If you can help with the remaining undumped S22.5/S23/SS23 games, please contact me at http://guru.mameworld.info/
 
-The system comprises the following main boards....
-- EMI PCB                          Small PCB with some connectors, including power in, video out, network in/out, sound out (to AMP PCB)
+A System 23 unit is comprised of some of the following pieces....
+- V185B EMI PCB                    Small PCB bolted to the metal box with several connectors including power in, video out, network in/out, sound out 
+                                   (to AMP PCB) used with most of the S23/SS23 games that use a single main PCB and no other control PCBs.
+- V198 EMI PCB                     Small PCB bolted to the metal box with several connectors (power/video/sound etc) plus a couple of extra 
+                                   ones for the CCD camera and feedback board. It is connected to the main and GMEN boards on the other side via 
+                                   2 multi-pin connectors (used only with games that use the GMEN board)
 - BASS AMP PCB                     Power AMP PCB for general sounds and bass
 - SYSTEM23 MAIN PCB                Main PCB for System 23               \
-  or SystemSuper23 MAIN(1) PCB     Main PCB for Super System 23         /
-  or System23Evolution2 PCB        Main PCB for System 23 Evolution 2  /  Note the 3 main boards are similar, but not exactly the same.
+  or SystemSuper23 MAIN(1) PCB     Main PCB for Super System 23         / Note the 3 main boards are similar, but not exactly the same.
+  or System23Evolution2 PCB        Main PCB for System 23 Evolution 2  /  
 - MSPM(FR*) PCB                    A small plug-in daughterboard that holds FLASHROMs containing Main CPU and Sound CPU programs
 - FCA PCB                          Controls & I/O interface board used with a few Super System 23 games only. Contains mostly transistors,
                                    caps, resistors, several connectors, an MCU and a PIC16F84.
@@ -125,9 +129,12 @@ The system comprises the following main boards....
                                    Note that in Super System23, the MEM(M) PCB is re-used from System23.
                                    On Super System23, there is a sticker over the System23 part labelled 'SystemSuper23' and one
                                    PAL is not populated.
-- GMEN PCB                         A large board that sits on top of the main board and the ROM board sits on top of it, containing
-                                   a SH2 CPU, some RAM and a few CPLDs/FPGAs. This controls the camera in Gunmen Wars.
-
+- GMEN PCB                         A large board that sits on top of the main board containing a SH2 CPU, some RAM and a few CPLDs/FPGAs. 
+                                   This controls the video overlay from the CCD camera in Gunmen Wars, Race On! and Final Furlong 2.
+                                   The ROM board plugs in on top of this board.
+- V194 STR PCB                     Used with Race On! to control the steering feed-back. An identical re-labelled PCB (V257) with  
+                                   different SOP44 ROMs is used with Wangan Midnight (Chihiro) and Ridge Racer V (System 246)
+                                   
 The metal box housing these PCB's is approximately the same size as Super System 22. However, the box is mostly
 empty. All of the CPU/Video/DSP hardware is located on the main PCB which is the same size as the
 Super System 22 CPU board. The ROM PCB is half the size of the Super System22 ROM PCB. The ROM positions on it
@@ -162,9 +169,9 @@ On bootup, the following happens (on GP500)...
 
 When the SUB-CPU connects there are numerous POST screens that test almost all of the main components.
 
-On System23, the bootup sequence is shorter. The screen remains blank while the SDRAM is being checked. LEDS 1-8 turn off in sequence 8-1
-The bank of 8 LEDs on the main board cycles from left to right to left repeatedly (almost all S23/SS23 games seem to do this in fact).
-After that, the bootup sequence is mostly the same as SS23.
+On System23, the bootup sequence is shorter. The screen remains blank while the SDRAM is being checked (i.e. 1st screen mentioned above is not shown). 
+LEDS 1-8 turn off in sequence 8-1. The bank of 8 LEDs on the main board cycles from left to right to left repeatedly (almost all S23/SS23 games seem 
+to do this in fact). After that, the bootup sequence is mostly the same as SS23.
 When the game is running some games just cycle the 8 LEDs left/right/left etc. Others cycle the LEDs in pairs just one LED position
 left/right/left etc. Those crazy Namco guys *really* like LEDs.
 
@@ -559,11 +566,12 @@ Sticker: Gmen (GTR) PCB
 | |-------|    LT1180                               LED1    LED5-12          |
 |----------------------------------------------------------------------------|
 Notes:
-      This board is used only on Gunmen Wars to control the CCD camera. The main board does it's usual POST
-      then the board fires up, LED1 lights red and the LEDs 5-12 go crazy pulsing left to right from the middle outwards.
-      The main board uploads a loader program, then the Main SH2 program. After completion LED 3 lights green and then.....
-      it doesn't work. LED 2 lights orange for a second then extinguishes, then the main board resets :-/
-
+      This board controls the video overlay from the CCD camera in Gunmen Wars, Race ON! and Final Furlong 2.
+      The main board does it's usual POST then the board fires up, LED1 lights red and the LEDs 5-12 go crazy pulsing left to right from 
+      the middle outwards. The main board uploads a loader program, then the Main SH2 program. After completion LED 3 lights green and then
+      LED 2 lights orange for a second then extinguishes then the main board resets :-/
+      It doesn't boot up for unknown reasons but likely another PCB is missing from somewhere in the cabinet or the GMEN PCB is faulty.
+      
       SH2        - Hitachi HD6417604 SH2 CPU (QFP144, clock input 28.7MHz)
       N341024    - NKK 128k x8 SRAM (x4, SOP32)
       N341256    - NKK 32k x8 SRAM (x2, SOP28)
@@ -571,7 +579,7 @@ Notes:
       HM5118165  - Hitachi 16MBit SDRAM (x2, TSSOP44/50)
       C446       - Namco Custom IC (QFP160)
       TSOP48     - Not-populated position for a 29F400 512k x8 TSOP48 flash ROM
-      3771       - Fujitsu MB3771 System Reset IC (SOIC4)
+      3771       - Fujitsu MB3771 System Reset IC (SOIC8)
       MD8402     - Fuji MD8402A IEEE 1394 'Firewire' Physical Channel Interface IC (TQFP100)
       MD8412     - Fuji MD8412A IEEE 1394 'Firewire' Link Layer Controller IC (TQFP100)
       VXP3220A   - Micronis Intermetall VXP3220A Video Pixel Decoder IC (PLCC44)
@@ -615,12 +623,13 @@ Notes:
 
       Game             Code and revision
       ----------------------------------
-      Time Crisis 2    TSS2 Ver.B
-      Time Crisis 2    TSS3 Ver.B
-      Gunmen Wars      GM1 Ver.A
-      Downhill Bikers  DH3 Ver.A
-      Motocross Go!    MG3 Ver.A
-      Panic Park       PNP2 Ver.A
+      Time Crisis 2    TSS2 Ver.B (for System 23)
+      Time Crisis 2    TSS3 Ver.B (for System 23)
+      Gunmen Wars      GM1  Ver.A (for Super System 23)
+      Downhill Bikers  DH3  Ver.A (for System 23)
+      Motocross Go!    MG3  Ver.A (for System 23)
+      Panic Park       PNP2 Ver.A (for System 23)
+      Race On!         RO2  Ver.A (for Super System 23)
 
 Type 2:
 MSPM(FRA) PCB 8699017501 (8699017401)
@@ -644,8 +653,8 @@ Notes:
       ----------------------------------
       GP500            5GP3 Ver.C (for Super System 23)
       Time Crisis 2    TSS4 Ver.A (for Super System 23)
-      Final Furlong 2  FFS1 Ver.?
-      Final Furlong 2  FFS2 Ver.?
+      Final Furlong 2  FFS1 Ver.? (for Super System 23)
+      Final Furlong 2  FFS2 Ver.? (for Super System 23)
 
 Type 3:
 MSPM(FRC) PCB 8699019800 (8699019700)
@@ -668,6 +677,7 @@ Notes:
 
       Game             Code and revision    Notes
       -----------------------------------------------------------------------
+      Crisis Zone      CSZO4 Ver.B          Serialsed ROMs, IC2 not populated
       Crisis Zone      CSZO3 Ver.B          Serialsed ROMs, IC2 not populated
       Crisis Zone      CSZO2 Ver.A          Serialsed ROMs, IC2 not populated
 
@@ -679,6 +689,7 @@ Printed on the PCB        - 8660960601 (8660970601) SYSTEM23 MEM(M) PCB
 Sticker (500GP)           - 8672961100
 Sticker (Time Crisis 2)   - 8660962302
 Sticker (Crisis Zone)     - 8672961100 .... same as 500GP
+Sticker (Race On!)        - 8672961100 .... same as 500GP
 |----------------------------------------------------------------------------|
 | KEYCUS    MTBH.2M      CGLL.4M        CGLL.5M         CCRL.7M       PAL(3) |
 |                                                                            |
@@ -741,13 +752,14 @@ Notes:
             Gunmen Wars     GM1      KC018     3A, 3C, 4A, 4C, 2A, 2F and 2M not populated.
             Motocross Go!   MG1      KC???     3A, 3C, 4A, 4C, 4F and 7F not populated.
             Panic Park      PNP1     KC015     3A, 3C, 4A, 4C, 2M and 2F not populated.
+            Race On!        RO1      KC017     2M and 2F not populated.
             Time Crisis 2   TSS1     KC010     3A and 3C not populated.
 
 I/O PCBs
 --------
 
 FCA PCB  8662969102 (8662979102)
-(Used with 500 GP so far. Another identical board is secured for a different but unknown game)
+(Used with 500GP so far. Another identical board is used with Ridge Racer V on System 246)
 |---------------------------------------------------|
 | J101                J106                          |
 |            4.9152MHz                              |
@@ -768,11 +780,11 @@ Notes:
       JP1      - 3 pin jumper, set to 'NORM'. Alt setting 'WR'
       3771     - Fujitsu MB3771 System Reset IC (SOIC8)
       PIC16F84 - Microchip PIC16F84 PIC (SOIC20)
-                  - For 500 GP stamped 'CAP10'
-                  - For unknown stamped 'CAP11'
+                  - For 500GP stamped 'CAP10'
+                  - For Ridge Racer V (on System 246) stamped 'CAP11'
       MCU      - Fujitsu MB90F574 Microcontroller (QFP120)
                   - For 500 GP stamped 'FCAF10'
-                  - For unknown stamped 'FCAF11'
+                  - For Ridge Racer V (on System 246) stamped 'FCAF11'
       ADM485   - Analog Devices ADM485 +5V Low Power EIA RS-485 Transceiver (SOIC8)
 
 
@@ -805,11 +817,13 @@ Notes:
       27C1001  - 128k x8 EPROM (DIP32)
                   - For Downhill Bikers labelled 'ASC3 IO-C'
                   - For Panic Park labelled 'ASC3 IO-C'
+                  - For Race On! labelled 'ASC5 IO-A'
                   - For Gunmen Wars labelled 'ASC5 IO-A'
       62256    - 32k x8 SRAM (SOP28)
       EPM7096  - Altera EPM7096 CPLD with sticker 'ASCA,DR1' (PLCC68)
       ADM485   - Analog Devices ADM485 +5V Low Power EIA RS-485 Transceiver (SOIC8)
-      J102/J103- Standard USB A and B connectors. These are not populated on most games, but are populated for use with Motocross Go!
+      J102/J103- Standard USB A and B connectors. These are not populated on most games, but are populated for 
+                 use with Motocross Go! on the ASCA-3A PCB.
 
 
 I/O Boards for gun games
@@ -848,7 +862,7 @@ Notes:
 
 This board is used only on Time Crisis II.
 Note the gun is a standard light gun.
---------------
+
 
 Type 2:
 
@@ -899,258 +913,65 @@ Notes:
 
 This board is used on Crisis Zone (System 23 Evolution2) and Time Crisis 3 (System 246)
 Note both games use a CCD camera for the gun sensor.
---------------
 
 
-Namco Gorgon-based games
-------------------------
+Drive/Feedback PCB
+------------------
 
-Rapid River, Final Furlong (both Namco, 1997)
-
-These games run on hardware called "GORGON". It appears to have similar
-capabilities to System 23 but like Super System 22 has sprites also.
-(System 23 doesn't have sprites). The PCBs are about two times larger
-than System 23.
-
-The system comprises Main PCB, ROM PCB and I/O PCB all located inside
-a metal box with 3 separate power supplies for 5V, 12V and 3.3V. Main
-input power is 115V.
-Rapid River is controlled by rotating a paddle (for thrust) and turning it
-sideways (moves left/right).
-The rotation action is done with a 5K potentiometer whereby the thrust
-is achieved by moving the pot from full left to full right continuously.
-The left/right turning movement is just another 5K potentiometer connected
-to the column of the paddle center shaft.
-There are also some buttons just for test mode, including SELECT, UP & DOWN
-The player's seat has movement controlled by a compressor and several
-potentiometers. On bootup, the system tests the seat movement and displays
-a warning if it's not working. Pressing START allows the game to continue
-and function normally without the seat movement.
-
-The other game on this system (Final Furlong) and is a horse racing game.
-To control the horse you rock it forwards and backwards continually (it's very tiring
-to play this game).
-This would activate possibly one or two 5K potentiometers inside the horse body.
-Just like a real horse you need to control the speed so your horse lasts the entire race.
-If you rock too much, a message on screen says 'Too Fast'. To steer the horse turn the
-head sideways using the reins. There would be another 5K potentiometer in the head
-to activate the turning direction.
-
-
-Main PCB
---------
-
-8664960102 (8664970102) GORGON MAIN PCB
-|------------------------------------------------------------------------------------------------------|
-|                                   J4                       J5                         J6             |
-|                              |---------|           |---------| |------| |---------|                  |
-|         |---------| |------| |         |           |         | |C401  | |         |HM534251 HM534251 |
-| CXD1178Q|         | |C381  | |  C374   |  |------| |  C417   | |      | |  304    |HM534251 HM534251 |
-|         |  C404   | |      | |         |  |C435  | |         | |------| |         |HM534251 HM534251 |
-|         |         | |------| |         |  |      | |         | |------| |         |                  |
-|         |         |          |---------|  |------| |---------| |C400  | |---------|                  |
-|         |---------|     |---------|       |------|             |      | |---------|                  |
-|                         |         |       |C435  |    341256   |------| |         |HM534251 HM534251 |
-|                         |  C397   |       |      |             |------| |  304    |HM534251 HM534251 |
-|  341256 341256  341256  |         |       |------|    341256   |C401  | |         |HM534251 HM534251 |
-|  M5M51008       341256  |         |     |---------|            |      | |         |                  |
-|                         |---------|     |         | |------|   |------| |---------|                  |
-|  M5M51008       341256         |------| |  C403   | |C406  |   |------| |---------|                  |
-|ADM485              |---------| |C379  | |         | |      |   |C400  | |         |HM534251 HM534251 |
-|                    |         | |      | |         | |------|   |      | |  304    |HM534251 HM534251 |
-|    M5M51008        |  C300   | |------| |---------|            |------| |         |HM534251 HM534251 |
-|                    |         | LH540204  LH540204              |------| |         |                  |
-|    M5M51008        |         |341256                 |------|  |C401  | |---------|                  |
-|J1   HCPL0611       |---------|341256                 |C407  |  |      | |---------|                  |
-|         DS8921                  PST575  PST575       |      |  |------| |         |                  |
-|  DS8921                                              |------|  |------| |  304    |HM534251 HM534251 |
-|                 M5M51008                                       |C400  | |         |HM534251 HM534251 |
-|       CY7C128             CY2291S                              |      | |         |                  |
-|         |------|M5M51008  14.31818MHz                          |------| |---------|                  |
-|         |C422  |          J9           M5M5256                 |------| |---------|         3V_BATT  |
-|         |      |341256                                         |C400  | |         |                  |
-|         |------|341256                                         |      | |  C399   |341256  LEDS(8)   |
-|                                   |------|      |--------|     |------| |         |341256            |
-|                                   |C352  |      |ALTERA  |     |------| |         |                  |
-|  ADM485        DSW1(2)   |------| |      |      |EPM7128 |     |C401  | |---------| DSW3(2)   DSW5(8)|
-|    2061ASC               |C416  | |------|      |        |     |      |     |---------| |---------|  |
-|      14.7456MHz          |      |               |--------|     |------|     |         | |NKK      |  |
-|PAL             |-----|   |------|    |------|                   D4516161    |  C413   | |NR4650   |  |
-|                |H8/  |               |C361  |                   D4516161    |         | |LQF-13B  |  |
-|                |3002 |               |      |LC321664                       |         | |         |  |
-|  J10           |-----|               |------|    J8                         |---------| |---------|  |
-|------------------------------------------------------------------------------------------------------|
+V194 STR PCB
+2487960102 (2487970102)
+|----------------------------------------------------------|
+|         RO1_STR-0A.IC16      TRANSFORMER        J105     |
+| DIP42                                                    |
+|    LED  N341256                  FUSE                    |
+|    LED                           FUSE            BF150G8E|
+|         N341256                                          |
+|                                                          |
+|RESET_SW      32MHz             7815                 K2682|
+|   MB3771                                                 |
+|J101                   DSW2(4, all off)                   |
+|            MB90242A                                      |
+|                       LED  MB3773    HP3150              |
+|                       LED                           K2682|
+|                                      HP3150              |
+|            EPM7064                                       |
+|J104  MAX232                          LM393               |
+|       LED   JP1 O O-O                                    |
+|       LED                            HP3150         K2682|
+|                                                          |
+|                                      HP3150              |
+|                                                          |
+|J103                                                      |
+|                UPC358  LM393   UPC358               K2682|
+|            J102                            J106          |
+|----------------------------------------------------------|
 Notes:
-      NKK NR4650 - R4600-based 64bit RISC CPU (Main CPU, QFP208, clock input source = CY2291S)
-      H8/3002  - Hitachi H8/3002 HD6413002F17 (Sound CPU, QFP100, running at 14.7456MHz)
-      EPM7128  - Altera EPM7128 FPGA labelled 'GOR-M1' (PLCC84)
-      PAL      - PALCE16V8H stamped 'GOR-M3' (PLCC20)
-      HM534251 - Hitachi HM534251 256k x4 Dynamic Video RAM (SOJ28)
-      N341256  - NKK 32k x8 SRAM (SOJ28)
-      M5M5256  - Mitsubishi 32k x8 SRAM (SOP28)
-      D4516161 - NEC uPD4516161AG5-A80 1M x16 (16MBit) SDRAM (SSOP50)
-      LC321664 - Sanyo 64k x16 EDO DRAM (SOJ40)
-      M5M51008 - Mitsubishi 128k x8 SRAM (SOP32)
-      CY7C128  - Cypress 2k x8 SRAM (SOJ28)
-      LH540204 - Sharp CMOS 4096 x 9 Asynchronous FIFO (PLCC32)
-      2061ASC-1- IC Designs 2061ASC-1 programmable clock generator (SOIC16)
-      DS8921   - Dallas Semiconductor DS8921 RS-422/423 Differential Line Driver and Receiver Pair (SOIC8)
-      HCPL0611 - Fairchild HCPL0611 High Speed 10MBits/sec Logic Gate Optocoupler (SOIC8)
-      ADM485   - Analog Devices ADM485 5V Low Power EIA RS-485 Transceiver (SOIC8)
-      PST575   - System Reset IC (SOIC8)
-      CXD1178Q - Sony CXD1178Q 8-bit RGB 3-channel D/A converter (QFP48)
-      J1       - 64 pin connector for connection of I/O board
-      J4/J5/J6 \
-      J8/J9    / Custom NAMCO connectors for connection of MEM(M1) PCB
-      J10      - Custom NAMCO connector for MSPM(FR) PCB
-
-
-      Namco Custom ICs
-      ----------------
-      C300 (QFP160)
-      304  (x4, QFP120)
-      C352 (QFP100)
-      C361 (QFP120)
-      C374 (QFP160)
-      C379 (QFP64)
-      C381 (QFP144)
-      C397 (QFP160)
-      C399 (QFP160)
-      C400 (QFP100)
-      C401 (x4, QFP64)
-      C403 (QFP136)
-      C404 (QFP208)
-      C406 (QFP120)
-      C407 (QFP64)
-      C413 (QFP208)
-      C416 (QFP176)
-      C417 (QFP208)
-      C422 (QFP64)
-      C435 (x2, TQFP144)
-
-
-Program ROM PCB
----------------
-
-MSPM(FR) PCB 8699015200 (8699015100)
-|--------------------------|
-|            J1            |
-|                          |
-|  IC3               IC1   |
-|                          |
-|                          |
-|                    IC2   |
-|--------------------------|
-Notes:
-      J1 -  Connector to plug into Main PCB
-      IC1 \
-      IC2 / Main Program  (Fujitsu 29F016 16MBit FlashROM, TSOP48)
-      IC3 - Sound Program (Fujitsu 29F400T 4MBit FlashROM, TSOP48)
-
-      Games that use this PCB include...
-
-      Game           Code and revision
-      --------------------------------
-      Rapid River    RD2 Ver.C
-      Rapid River    RD3 Ver.C
-      Final Furlong  FF2 Ver.A
-
-ROM PCB
--------
-
-MEM(M1) PCB
-8664960202 (8664970202)
-|--------------------------------------------------------|
-|    J2(TEXTURE)        J3(POINT)           J5(SPRITE)   |
-| PAL1                                                   |
-|                                                        |
-|                                                        |
-|                                                        |
-| CCRL.11A                                               |
-|      CCRL.11E  PT3L.12J PT3H.12L  SPRLL.12P SPRLL.12T  |
-| CCRH.11B                                               |
-|      CCRH.11F                                          |
-|                PT2L.11J PT2H.11L  SPRLM.11P SPRLM.11T  |
-|                                                        |
-|                                                        |
-|                PT1L.10J PT1H.10L  SPRUM.10P SPRUM.10T  |
-|   PAL2        PAL3                                     |
-|                                                        |
-|                PT0L.9J  PT0H.9L   SPRUU.9P  SPRUU.9T   |
-|                                   JP7       JP9        |
-|                                   JP6       JP8        |
-| CGLL.8B     CGLL.8F                                    |
-|                                                        |
-|                                                        |
-| CGLM.7B     CGLM.7F                                    |
-|      JP2    JP4                                        |
-|      JP1    JP3                                        |
-| CGUM.6B     CGUM.6F                                    |
-|                                          J1(WAVE)      |
-|                                                        |
-| CGUU.5B     CGUU.5F                      WAVEH.3S      |
-|                                                        |
-|                    MTBH.5J               WAVEL.2S      |
-|                    MTAH.3J                      JP5    |
-|                    MTBL.2J                             |
-|                    MTAL.1J    KEYCUS                   |
-|                                                        |
-|                    J4(MOTION)                          |
-|--------------------------------------------------------|
-Notes:
-      PAL1 - PALCE16V8H stamped 'SS22M1' (PLCC20)
-      PAL2 - PALCE20V8H stamped 'SS22M2' (PLCC32)
-      PAL3 - PALCE20V8H stamped 'SS22M2' (PLCC32)
-      KEYCUS - for Rapid River: MACH211 CPLD stamped 'KC012' (PLCC44)
-      KEYCUS - for Final Furlong: MACH211 CPLD stamped 'KC011' (PLCC44)
-      J1->J5 - Custom NAMCO connectors for joining ROM PCB to Main PCB
-      JP1/JP2 \
-      JP3/JP4 |
-      JP5     | Jumpers to set ROM sizes (32M/64M)
-      JP6/JP7 |
-      JP8/JP9 /
-
-      ROMs
-      ----
-           PT*  - Point ROMs, sizes configurable to either 16M or 32M (SOP44)
-           MT*  - Motion ROMs, sizes configurable to either 32M or 64M (SOP44)
-           CG*  - Texture ROMs, sizes configurable to either 32M or 64M (SOP44)
-           CCR* - Texture Tilemap ROMs, sizes fixed at 16M (SOP44)
-           SPR* - Sprite ROMs, sizes configurable to either 32M or 64M (SOP44)
-           WAVE*- Wave ROMs, sizes configurable to either 32M or 64M (SOP44)
-
-I/O PCB
--------
-
-V187 ASCA-2A PCB
-2477960102 (2477970102)
-|--------------------------------------------------------|
-|                   J105                                 |
-|                           |-------|        14.7456MHz  |
-|   J104                    |ALTERA |    ADM485   PST592 |
-|                           |EPM7064|     |-------|      |
-|                           |       |     |       |      |
-|                           |-------|     | C78   |      |
-|     LC78815                             |       |      |
-|                                         |-------|      |
-|     MB87078                              |---|         |
-| LA4705                                   |IC1| 62256   |
-|                                          |---|         |
-|         J101                J102                       |
-|--------------------------------------------------------|
-Notes:
-      IC1  - Atmel AT29C020 2MBit EEPROM labelled 'ASCA1 I/O-A' (PLCC32)
-      C78  - Namco Custom MCU, positively identified as a Hitachi H8/3334 (PLCC84)
-      EPM7064 - Altera EPM7064LC68-15 PLD, labelled 'ASCA DR0' (PLCC68)
-      PST592 - System Reset IC (SOIC4)
-      ADM485 - Analog Devices +ADM485 5V Low Power EIA RS-485 Transceiver (SOIC8)
-      MB87078 - Fujitsu MB87078 Electronic Volume Control IC (SOIC24)
-      LC78815 - Sanyo LM78815 2-Channel 16-Bit D/A Converter (SOIC20)
-      J101 - 34 pin flat cable connector for filter board
-      J102 - 50 pin flat cable connector for filter board
-      J104 - 8 pin power connector (+5V, +12V, +3.3V)
-      J105 - 64 pin connector for connection of Main PCB
-
+      This board is used with Race On! (and Wangan Midnight on Chihiro and Ridge Racer V on System 246) to control the 
+      steering feed-back motor. It may be used with other System 23/Super System 23 driving/racing games too but no 
+      other games are confirmed at the moment.
+      
+      RO1_STR-0A.IC16 - Fujitsu MB29F400TC 512k x8 flash ROM (SOP44)
+                        - Labelled 'RO1 STR-0A' for Race On! 
+                        - Labelled 'RR3 STR-0A' for Ridge Racer V (on System 246) 
+      EPM7064         - Altera EPM7064 CPLD labelled 'STR-DR1' (PLCC44)
+      N341256         - NKK 32k x8 SRAM (SOP28)
+      K2682           - 2SK2682 N-Channel Silicon MOSFET
+      BF150G8E        - Large power transistor(?) connected to the transformer
+      UPC358          - NEC uPC358 Dual operational amplifier (SOIC8)
+      LM393           - National LM393 Low Power Low Offset Voltage Dual Comparator (SOIC8)
+      MAX232          - Maxim MAX232 dual serial to TTL logic level driver/receiver (SOIC16)
+      HP3150          - ? (DIP8)
+      MB3773          - Fujitsu MB3773 Power Supply Monitor with Watch Dog Timer and Reset (SOIC8)
+      MB3771          - Fujitsu MB3771 System Reset IC (SOIC8)
+      DIP42           - Unpopulated DIP42 socket for 27C4096 EPROM
+      MB90242A        - Fujitsu MB90242A 16-Bit CISC ROM-less F2MC-16F Family Microcontroller optimized for mechatronics control applications (TQFP80)
+      J101            - 8 pin connector (purpose unknown)
+      J102            - 3 pin connector input from potentiometer connected to the steering wheel mechanism
+      J103            - Power input connector (5v/GND/12v)
+      J104            - 6 pin connector joined with a cable to J6 on the V198 EMI PCB. This cable is the I/O connection to/from the main board.
+      J105            - 110VAC power input
+      J106            - DC variable power output to feed-back motor
+     
 */
 
 #include "emu.h"
@@ -2837,6 +2658,7 @@ static DRIVER_INIT(ss23)
 	    (!strcmp(machine->gamedrv->name, "downhill")) ||
 	    (!strcmp(machine->gamedrv->name, "finfurl2")) ||
 	    (!strcmp(machine->gamedrv->name, "finfurl2j")) ||
+	    (!strcmp(machine->gamedrv->name, "raceon")) ||
 	    (!strcmp(machine->gamedrv->name, "crszone")) ||
 	    (!strcmp(machine->gamedrv->name, "crszone2")) ||
 	    (!strcmp(machine->gamedrv->name, "timecrs2b")) ||
@@ -3437,6 +3259,59 @@ ROM_START( 500gp )
 	ROM_LOAD( "5gp1waveh.2a", 0x800000, 0x800000, CRC(1e3523e8) SHA1(cb3d0d389fcbfb728fad29cfc36ef654d28d553a) )
 ROM_END
 
+ROM_START( raceon )
+	ROM_REGION32_BE( 0x400000, "user1", 0 ) /* 4 megs for main R4650 code */
+	ROM_LOAD16_BYTE( "ro2vera.ic2",  0x000000, 0x200000, CRC(08b94548) SHA1(6363f1724540c2671555bc5bb11e22611614baf5) ) 
+	ROM_LOAD16_BYTE( "ro2vera.ic1",  0x000001, 0x200000, CRC(4270884b) SHA1(82e4d4376907ee5dbabe047b9d2279f08cff5f71) ) 
+	
+	ROM_REGION( 0x80000, "audiocpu", 0 )	/* Hitachi H8/3002 MCU code */
+	ROM_LOAD16_WORD_SWAP( "ro2vera.ic3",  0x000000, 0x080000, CRC(a763ecb7) SHA1(6b1ab63bb56342abbf7ddd7d17d413779fbafce1) ) 
+	
+	ROM_REGION( 0x40000, "ioboard", 0 )	/* I/O board HD643334 H8/3334 MCU code */
+	ROM_LOAD( "asca-3a.ic14", 0x000000, 0x040000, CRC(8e9266e5) SHA1(ffa8782ca641d71d57df23ed1c5911db05d3df97) )
+
+	ROM_REGION( 0x80000, "ffb", 0 )	/* STR steering force-feedback board code */
+	ROM_LOAD( "ro1_str-0a.ic16", 0x000000, 0x080000, CRC(27d39e1f) SHA1(6161cbb27c964ffab1db3b3c1f073ec514876e61) ) 
+
+	ROM_REGION32_BE( 0x2000000, "data", 0 )	/* data roms */
+	ROM_LOAD16_BYTE( "ro1mtah.2j",   0x000000, 0x800000, CRC(216abfb1) SHA1(8db7b17dc6441adc7a4ec8b941d5a84d73c735d6) ) 
+	ROM_LOAD16_BYTE( "ro1mtal.2h",   0x000001, 0x800000, CRC(17646306) SHA1(8d1af777f8e884b650efee8e4c26e032e1c088b7) ) 
+
+	ROM_REGION( 0x2000000, "textile", 0 )	/* texture tiles */
+	ROM_LOAD( "ro1cgll.4m",   0x0000000, 0x800000, CRC(12c64936) SHA1(14a0d3d336f2fbe7992eedb3900748763368bc6b) ) 
+	ROM_LOAD( "ro1cglm.4k",   0x0800000, 0x800000, CRC(7e8bb4fc) SHA1(46a7940989576239a720fde8ec4e4b623b0b6fe6) ) 
+	ROM_LOAD( "ro1cgum.4j",   0x1000000, 0x800000, CRC(b9767735) SHA1(87fec452998a782db2cf00d369149b200a00d163) ) 
+	ROM_LOAD( "ro1cguu.4f",   0x1800000, 0x800000, CRC(8fef8bd4) SHA1(6870590f585dc8d87ebe5181da870715c9c4fee3) ) 
+
+	ROM_REGION16_LE( 0x400000, "textilemapl", 0 )	/* texture tilemap 0-15*/
+	ROM_LOAD( "ro1ccrl.7f",   0x000000, 0x400000, CRC(fe50e424) SHA1(8317c998db687e1c40398e0005a037dcded19c25) ) 
+
+	ROM_REGION( 0x200000, "textilemaph", 0 )		/* texture tilemap 16-17 + attr */
+	ROM_LOAD( "ro1ccrh.7e",   0x000000, 0x200000, CRC(1c958de2) SHA1(4893350999d5d377e68b9577187828de7a4c77c2) ) 
+
+	ROM_REGION32_LE( 0x2000000, "pointrom", 0 )	/* 3D model data */
+	ROM_LOAD32_WORD_SWAP( "ro1pt0h.7a",   0x0000000, 0x400000, CRC(6ef742ab) SHA1(500ce413b2463a555237de7bcc9627d1082c9b52) ) 
+	ROM_LOAD32_WORD_SWAP( "ro1pt0l.7c",   0x0000002, 0x400000, CRC(f4b88bd0) SHA1(cc642d959645730b03ef01e6dbb5d0077bce7163) ) 
+	ROM_LOAD32_WORD_SWAP( "ro1pt1h.5a",   0x0800000, 0x400000, CRC(428bf573) SHA1(6be159e1cf7ef38639610c347fd2322ab9911a70) ) 
+	ROM_LOAD32_WORD_SWAP( "ro1pt1l.5c",   0x0800002, 0x400000, CRC(f3df1d13) SHA1(9f96c99bd3537940a532d3dccb69a1c7d8c6be63) ) 
+	ROM_LOAD32_WORD_SWAP( "ro1pt2h.4a",   0x1000000, 0x400000, CRC(e1abdbc9) SHA1(91827af01cb83f4422d7329c8eea52bb57d7d57e) ) 
+	ROM_LOAD32_WORD_SWAP( "ro1pt2l.4c",   0x1000002, 0x400000, CRC(c64f5cdc) SHA1(e7261f3a56718f304127cc85c08d0b32525dc1cd) ) 
+	ROM_LOAD32_WORD_SWAP( "ro1pt3h.3a",   0x1800000, 0x400000, CRC(ef4685f6) SHA1(930037cac4aae9892278aa322844d03c773c70f7) ) 
+	ROM_LOAD32_WORD_SWAP( "ro1pt3l.3c",   0x1800002, 0x400000, CRC(07d27009) SHA1(770001bee9d7ace337db8a42bf377678b2b5d5fb) ) 
+
+	ROM_REGION( 0x1000000, "c352", 0 ) /* C352 PCM samples */
+	ROM_LOAD( "ro1wavel.2c",  0x000000, 0x800000, CRC(c6aca840) SHA1(09a021459b6326fe161ffcee36376648a5bf0e00) ) 
+	ROM_LOAD( "ro2waveh.2a",  0x800000, 0x800000, CRC(ceecbf0d) SHA1(f0a5e57c04b661685833b209bd5e072666068391) ) 
+
+	ROM_REGION( 0x800000, "spares", 0 )	/* duplicate ROMs for the second texel pipeline on the PCB, not used for emulation */
+	ROM_LOAD( "ro1ccrl.7m",   0x000000, 0x400000, CRC(fe50e424) SHA1(8317c998db687e1c40398e0005a037dcded19c25) ) 
+	ROM_LOAD( "ro1ccrh.7k",   0x000000, 0x200000, CRC(1c958de2) SHA1(4893350999d5d377e68b9577187828de7a4c77c2) ) 
+	ROM_LOAD( "ro1cgll.5m",   0x000000, 0x800000, CRC(12c64936) SHA1(14a0d3d336f2fbe7992eedb3900748763368bc6b) ) 
+	ROM_LOAD( "ro1cglm.5k",   0x000000, 0x800000, CRC(7e8bb4fc) SHA1(46a7940989576239a720fde8ec4e4b623b0b6fe6) ) 
+	ROM_LOAD( "ro1cgum.5j",   0x000000, 0x800000, CRC(b9767735) SHA1(87fec452998a782db2cf00d369149b200a00d163) ) 
+	ROM_LOAD( "ro1cguu.5f",   0x000000, 0x800000, CRC(8fef8bd4) SHA1(6870590f585dc8d87ebe5181da870715c9c4fee3) ) 
+ROM_END
+
 ROM_START( finfurl2 )
 	ROM_REGION32_BE( 0x400000, "user1", 0 ) /* 4 megs for main R4650 code */
 	ROM_LOAD16_BYTE( "29f016.ic2",   0x000000, 0x200000, CRC(13cbc545) SHA1(3e67a7bfbb1c1374e8e3996a0c09e4861b0dca14) )
@@ -3779,6 +3654,7 @@ GAME( 1997, timecrs2b,timecrs2,  s23,    s23, ss23, ROT0, "Namco", "Time Crisis 
 GAME( 1997, timecrs2c,timecrs2, ss23io, ss23, ss23, ROT0, "Namco", "Time Crisis 2 (TSS4 Ver. A)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
 GAME( 1998, panicprk, 0,         s23,    s23, ss23, ROT0, "Namco", "Panic Park (PNP2 Ver. A)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
 GAME( 1998, gunwars,  0,        gmen,   ss23, ss23, ROT0, "Namco", "Gunmen Wars (GM1 Ver. A)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
+GAME( 1998, raceon,   0,        gmen,   ss23, ss23, ROT0, "Namco", "Race On! (RO2 Ver. A)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
 GAME( 1998, 500gp,    0,        ss23,   ss23, ss23, ROT0, "Namco", "500 GP (5GP3 Ver. C)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
 GAME( 1999, finfurl2, 0,        gmen,   ss23, ss23, ROT0, "Namco", "Final Furlong 2 (World)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
 GAME( 1999, finfurl2j,finfurl2, gmen,   ss23, ss23, ROT0, "Namco", "Final Furlong 2 (Japan)", GAME_NOT_WORKING | GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND )
