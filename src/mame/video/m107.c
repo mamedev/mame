@@ -290,7 +290,7 @@ static void m107_update_scroll_positions(void)
 
 /*****************************************************************************/
 
-static void m107_tilemap_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int laynum, int category)
+static void m107_tilemap_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int laynum, int category,int opaque)
 {
 	int line;
 	rectangle clip;
@@ -311,11 +311,11 @@ static void m107_tilemap_draw(running_machine *machine, bitmap_t *bitmap, const 
 			tilemap_set_scrollx(pf_layer[laynum].tmap,0,  m107_control[1 + 2 * laynum]);
 			tilemap_set_scrolly(pf_layer[laynum].tmap,0,  (m107_control[0 + 2 * laynum] + scrolldata[line]));
 
-			tilemap_draw(bitmap, &clip, pf_layer[laynum].tmap, category, 0);
+			tilemap_draw(bitmap, &clip, pf_layer[laynum].tmap, category | opaque, 0);
 		}
 	}
 	else
-		tilemap_draw(bitmap, cliprect, pf_layer[laynum].tmap, category, 0);
+		tilemap_draw(bitmap, cliprect, pf_layer[laynum].tmap, category | opaque, 0);
 }
 
 
@@ -323,21 +323,22 @@ static void m107_screenrefresh(running_machine *machine, bitmap_t *bitmap, const
 {
 	if ((~m107_control[0x0b] >> 7) & 1)
 	{
-		m107_tilemap_draw(machine, bitmap, cliprect, 3, 0);
-		m107_tilemap_draw(machine, bitmap, cliprect, 3, 1);
+		m107_tilemap_draw(machine, bitmap, cliprect, 3, 0,0);
+		m107_tilemap_draw(machine, bitmap, cliprect, 3, 1,0);
 	}
 	else
 		bitmap_fill(bitmap, cliprect, 0);
 
-	m107_tilemap_draw(machine, bitmap, cliprect, 2, 0);
-	m107_tilemap_draw(machine, bitmap, cliprect, 1, 0);
-	m107_tilemap_draw(machine, bitmap, cliprect, 0, 0);
+	/* note: the opaque flag is used if layer 3 is disabled, noticeable in World PK Soccer title and gameplay screens*/
+	m107_tilemap_draw(machine, bitmap, cliprect, 2, 0,(((m107_control[0x0b] >> 7) & 1) ? TILEMAP_DRAW_OPAQUE : 0));
+	m107_tilemap_draw(machine, bitmap, cliprect, 1, 0,0);
+	m107_tilemap_draw(machine, bitmap, cliprect, 0, 0,0);
 
 	draw_sprites(machine, bitmap, cliprect, 0);
 
-	m107_tilemap_draw(machine, bitmap, cliprect, 2, 1);
-	m107_tilemap_draw(machine, bitmap, cliprect, 1, 1);
-	m107_tilemap_draw(machine, bitmap, cliprect, 0, 1);
+	m107_tilemap_draw(machine, bitmap, cliprect, 2, 1,0);
+	m107_tilemap_draw(machine, bitmap, cliprect, 1, 1,0);
+	m107_tilemap_draw(machine, bitmap, cliprect, 0, 1,0);
 
 	draw_sprites(machine, bitmap, cliprect, 1);
 
