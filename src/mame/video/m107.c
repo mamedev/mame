@@ -187,8 +187,8 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 		y = 384 - 16 - y;
 
 		colour=m107_spriteram[offs+2]&0x7f;
-		fx=m107_spriteram[offs+2]&0x100;
-		fy=m107_spriteram[offs+2]&0x200;
+		fx=(m107_spriteram[offs+2]>>8)&0x1;
+		fy=(m107_spriteram[offs+2]>>8)&0x2;
 		y_multi=(m107_spriteram[offs+0]>>11)&0x3;
 
 		if (m107_spritesystem == 0)
