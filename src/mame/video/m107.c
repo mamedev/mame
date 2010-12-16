@@ -265,6 +265,7 @@ static void m107_update_scroll_positions(void)
     {
     	pf_layer_info *layer = &pf_layer[laynum];
 
+		#if 0
 		if (m107_control[0x08 + laynum] & 0x02)
 		{
 			const UINT16 *scrolldata = m107_vram_data + (0xe800 + 0x400 * laynum) / 2;
@@ -273,7 +274,8 @@ static void m107_update_scroll_positions(void)
 			for (i = 0; i < 512; i++)
 				tilemap_set_scrollx(layer->tmap, i, scrolldata[i] + m107_control[1 + 2 * laynum]);
 		}
-		else if (m107_control[0x08 + laynum] & 0x01) //used by World PK Soccer goal scrolling and Fire Barrel sea wave effect (stage 2) / canyon parallax effect (stage 6)
+		#endif
+		if (m107_control[0x08 + laynum] & 0x01) //used by World PK Soccer goal scrolling and Fire Barrel sea wave effect (stage 2) / canyon parallax effect (stage 6)
 		{
 			const UINT16 *scrolldata = m107_vram_data + (0xe000 + 0x200 * laynum) / 2;
 
@@ -295,6 +297,14 @@ static void m107_update_scroll_positions(void)
 
 static void m107_screenrefresh(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	int line;
+	rectangle clip;
+	const rectangle &visarea = machine->primary_screen->visible_area();
+	clip.min_x = visarea.min_x;
+	clip.max_x = visarea.max_x;
+	clip.min_y = visarea.min_y;
+	clip.max_y = visarea.max_y;
+
 	if ((~m107_control[0x0b] >> 7) & 1)
 	{
 		tilemap_draw(bitmap, cliprect, pf_layer[3].tmap, 0, 0);
@@ -307,11 +317,41 @@ static void m107_screenrefresh(running_machine *machine, bitmap_t *bitmap, const
 	tilemap_draw(bitmap, cliprect, pf_layer[2].tmap, 1, 0);
 
 	tilemap_draw(bitmap, cliprect, pf_layer[1].tmap, 0, 0);
-	tilemap_draw(bitmap, cliprect, pf_layer[0].tmap, 0, 0);
+	if (m107_control[0x08 + 0] & 0x02)
+	{
+		for (line = cliprect->min_y; line < cliprect->max_y;line++)
+		{
+			const UINT16 *scrolldata = m107_vram_data + (0xe800 + 0x400 * 0) / 2;
+			clip.min_y = clip.max_y = line;
+
+			tilemap_set_scrollx(pf_layer[0].tmap,0,  m107_control[1 + 2 * 0] + scrolldata[line]);
+			tilemap_set_scrolly(pf_layer[0].tmap,0,  m107_control[0 + 2 * 0] + scrolldata[line]);
+
+			tilemap_draw(bitmap, &clip, pf_layer[0].tmap, 0, 0);
+			
+		}
+
+	}
+	else
+		tilemap_draw(bitmap, cliprect, pf_layer[0].tmap, 0, 0);
 
 	draw_sprites(machine, bitmap, cliprect, 0);
 	tilemap_draw(bitmap, cliprect, pf_layer[1].tmap, 1, 0);
-	tilemap_draw(bitmap, cliprect, pf_layer[0].tmap, 1, 0);
+	if (m107_control[0x08 + 0] & 0x02)
+	{
+		for (line = cliprect->min_y; line < cliprect->max_y;line++)
+		{
+			const UINT16 *scrolldata = m107_vram_data + (0xe800 + 0x400 * 0) / 2;
+			clip.min_y = clip.max_y = line;
+
+			tilemap_set_scrollx(pf_layer[0].tmap,0,  m107_control[1 + 2 * 0] + scrolldata[line]);
+			tilemap_set_scrolly(pf_layer[0].tmap,0,  m107_control[0 + 2 * 0] + scrolldata[line]);
+
+			tilemap_draw(bitmap, &clip, pf_layer[0].tmap, 1, 0);
+		}
+	}
+	else
+		tilemap_draw(bitmap, cliprect, pf_layer[0].tmap, 1, 0);
 
 	draw_sprites(machine, bitmap, cliprect, 1);
 
