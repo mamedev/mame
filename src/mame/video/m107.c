@@ -295,7 +295,7 @@ static void m107_update_scroll_positions(void)
 
 /*****************************************************************************/
 
-static void m107_screenrefresh(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+static void m107_tilemap_draw(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int laynum, int category)
 {
 	int line;
 	rectangle clip;
@@ -305,53 +305,44 @@ static void m107_screenrefresh(running_machine *machine, bitmap_t *bitmap, const
 	clip.min_y = visarea.min_y;
 	clip.max_y = visarea.max_y;
 
+	if (m107_control[0x08 + laynum] & 0x02)
+	{
+		for (line = cliprect->min_y; line < cliprect->max_y;line++)
+		{
+			const UINT16 *scrolldata = m107_vram_data + (0xe800 + 0x200 * laynum) / 2;
+			clip.min_y = clip.max_y = line;
+
+			//FIXME: right side (bottom of the screen actually) gets corrupted lines?
+			tilemap_set_scrollx(pf_layer[laynum].tmap,0,  m107_control[1 + 2 * laynum]);
+			tilemap_set_scrolly(pf_layer[laynum].tmap,0,  (m107_control[0 + 2 * laynum] + scrolldata[line]));
+
+			tilemap_draw(bitmap, &clip, pf_layer[laynum].tmap, category, 0);
+		}
+	}
+	else
+		tilemap_draw(bitmap, cliprect, pf_layer[laynum].tmap, category, 0);
+}
+
+
+static void m107_screenrefresh(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
+{
 	if ((~m107_control[0x0b] >> 7) & 1)
 	{
-		tilemap_draw(bitmap, cliprect, pf_layer[3].tmap, 0, 0);
-		tilemap_draw(bitmap, cliprect, pf_layer[3].tmap, 1, 0);
+		m107_tilemap_draw(machine, bitmap, cliprect, 3, 0);
+		m107_tilemap_draw(machine, bitmap, cliprect, 3, 1);
 	}
 	else
 		bitmap_fill(bitmap, cliprect, 0);
 
-	tilemap_draw(bitmap, cliprect, pf_layer[2].tmap, 0, 0);
-	tilemap_draw(bitmap, cliprect, pf_layer[2].tmap, 1, 0);
+	m107_tilemap_draw(machine, bitmap, cliprect, 2, 0);
+	m107_tilemap_draw(machine, bitmap, cliprect, 2, 1);
 
-	tilemap_draw(bitmap, cliprect, pf_layer[1].tmap, 0, 0);
-	if (m107_control[0x08 + 0] & 0x02)
-	{
-		for (line = cliprect->min_y; line < cliprect->max_y;line++)
-		{
-			const UINT16 *scrolldata = m107_vram_data + (0xe800 + 0x400 * 0) / 2;
-			clip.min_y = clip.max_y = line;
-
-			tilemap_set_scrollx(pf_layer[0].tmap,0,  m107_control[1 + 2 * 0] + scrolldata[line]);
-			tilemap_set_scrolly(pf_layer[0].tmap,0,  m107_control[0 + 2 * 0] + scrolldata[line]);
-
-			tilemap_draw(bitmap, &clip, pf_layer[0].tmap, 0, 0);
-			
-		}
-
-	}
-	else
-		tilemap_draw(bitmap, cliprect, pf_layer[0].tmap, 0, 0);
+	m107_tilemap_draw(machine, bitmap, cliprect, 1, 0);
+	m107_tilemap_draw(machine, bitmap, cliprect, 0, 0);
 
 	draw_sprites(machine, bitmap, cliprect, 0);
-	tilemap_draw(bitmap, cliprect, pf_layer[1].tmap, 1, 0);
-	if (m107_control[0x08 + 0] & 0x02)
-	{
-		for (line = cliprect->min_y; line < cliprect->max_y;line++)
-		{
-			const UINT16 *scrolldata = m107_vram_data + (0xe800 + 0x400 * 0) / 2;
-			clip.min_y = clip.max_y = line;
-
-			tilemap_set_scrollx(pf_layer[0].tmap,0,  m107_control[1 + 2 * 0] + scrolldata[line]);
-			tilemap_set_scrolly(pf_layer[0].tmap,0,  m107_control[0 + 2 * 0] + scrolldata[line]);
-
-			tilemap_draw(bitmap, &clip, pf_layer[0].tmap, 1, 0);
-		}
-	}
-	else
-		tilemap_draw(bitmap, cliprect, pf_layer[0].tmap, 1, 0);
+	m107_tilemap_draw(machine, bitmap, cliprect, 1, 1);
+	m107_tilemap_draw(machine, bitmap, cliprect, 0, 1);
 
 	draw_sprites(machine, bitmap, cliprect, 1);
 
