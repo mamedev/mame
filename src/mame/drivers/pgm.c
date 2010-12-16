@@ -4062,7 +4062,7 @@ ROM_START( ket )
 	ROM_LOAD( "m04701b032.u17",    0x400000, 0x400000, CRC(b46e22d1) SHA1(670853dc485942fb96380568494bdf3235f446ee) )
 
 	ROM_REGION( 0x20000, "sram", 0 ) /* default settings */
-	ROM_LOAD( "ket_defaults.nv",  0x0000000, 0x020000, CRC(3ca892d8) SHA1(67430df5217e453ae8140c5653deeadfad8fa684) )	
+	ROM_LOAD( "ket_defaults.nv",  0x0000000, 0x020000, CRC(3ca892d8) SHA1(67430df5217e453ae8140c5653deeadfad8fa684) )
 ROM_END
 
 ROM_START( keta )
@@ -4092,7 +4092,7 @@ ROM_START( keta )
 	ROM_LOAD( "m04701b032.u17",    0x400000, 0x400000, CRC(b46e22d1) SHA1(670853dc485942fb96380568494bdf3235f446ee) )
 
 	ROM_REGION( 0x20000, "sram", 0 ) /* default settings */
-	ROM_LOAD( "ket_defaults.nv",  0x0000000, 0x020000, CRC(3ca892d8) SHA1(67430df5217e453ae8140c5653deeadfad8fa684) )	
+	ROM_LOAD( "ket_defaults.nv",  0x0000000, 0x020000, CRC(3ca892d8) SHA1(67430df5217e453ae8140c5653deeadfad8fa684) )
 ROM_END
 
 ROM_START( ketb )
@@ -4122,7 +4122,7 @@ ROM_START( ketb )
 	ROM_LOAD( "m04701b032.u17",    0x400000, 0x400000, CRC(b46e22d1) SHA1(670853dc485942fb96380568494bdf3235f446ee) )
 
 	ROM_REGION( 0x20000, "sram", 0 ) /* default settings */
-	ROM_LOAD( "ket_defaults.nv",  0x0000000, 0x020000, CRC(3ca892d8) SHA1(67430df5217e453ae8140c5653deeadfad8fa684) )	
+	ROM_LOAD( "ket_defaults.nv",  0x0000000, 0x020000, CRC(3ca892d8) SHA1(67430df5217e453ae8140c5653deeadfad8fa684) )
 ROM_END
 
 ROM_START( espgal )
@@ -4137,22 +4137,20 @@ ROM_START( espgal )
 	/* no external protection rom */
 
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
-	ROM_LOAD( "pgm_t01s.rom", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // same as standard PGM text bios - surface scratched to remove details
-	ROM_LOAD( "text-1.u19",   0x400000, 0x800000, NO_DUMP )
+	ROM_LOAD( "t01s.u18", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // same as standard PGM text bios - surface scratched to remove details
+	ROM_LOAD( "text-1.u19",   0x400000, 0x800000, BAD_DUMP CRC(f9a2d35d) SHA1(31813c121a25b7a15ee24067a237192ef0f7ef6d) ) // it has bitrot, check disclaimer screen
 
 	ROM_REGION( 0x1000000, "sprcol", 0 ) /* Sprite Colour Data */
-	ROM_LOAD( "image-1.u7",    0x0000000, 0x0800000, NO_DUMP )
-	ROM_LOAD( "image-2.u8",    0x0800000, 0x0800000, NO_DUMP )
+	ROM_LOAD( "image-1.u7",    0x0000000, 0x0800000, CRC(d4afaa72) SHA1(8fee09e4f1c9531c34a29d4492b7eddfd4f6500a) )
+	ROM_LOAD( "image-2.u8",    0x0800000, 0x0800000, CRC(dfdcc7e6) SHA1(6afec9d285c5fc5251f2f7721f5a05e5bf00b114) )
 
 	ROM_REGION( 0x0800000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
-	ROM_LOAD( "bitmap-1.u1",    0x0000000, 0x0800000, NO_DUMP )
+	ROM_LOAD( "bitmap-1.u1",    0x0000000, 0x0800000,  CRC(3b4d0d32) SHA1(a879b383acb2c298373ad433b86a5cc87f221ed8) )
 
 	ROM_REGION( 0x800000, "ics", ROMREGION_ERASE00 ) /* Samples - (8 bit mono 11025Hz) - */
 	/* there is a position for the PGM audio bios rom, but it's unpopulated, and the M of PGM has been scratched off the PCB */
-	ROM_LOAD( "music-1.u17",    0x400000, 0x400000, NO_DUMP )
+	ROM_LOAD( "music-1.u17",    0x400000, 0x400000,   CRC(60298536) SHA1(6b7333f16cce778c5725dbdf75a5446f0906397a) )
 ROM_END
-
-
 
 ROM_START( ddp3 )
 	ROM_REGION( 0x600000, "maincpu", 0 ) /* 68000 Code */
@@ -5919,7 +5917,7 @@ GAME( 2002, ket,          0,         cavepgm,    pgm,     ket,       ROT270, "Ca
 GAME( 2002, keta,         ket,       cavepgm,    pgm,     ket,       ROT270, "Cave", "Ketsui: Kizuna Jigoku Tachi (V100, second revision)",GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE) // Displays "2003/01/01 Master Ver."
 GAME( 2002, ketb,         ket,       cavepgm,    pgm,     ket,       ROT270, "Cave", "Ketsui: Kizuna Jigoku Tachi (V100, first revision)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE) // Displays "2003/01/01 Master Ver"
 
-GAME( 2003, espgal,       0,         cavepgm,    pgm,     espgal,       ROT270, "Cave", "EspGaluda", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
+GAME( 2003, espgal,       0,         cavepgm,    pgm,     espgal,       ROT270, "Cave", "EspGaluda (V100, first revision)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE ) // Displays "2003/10/15 Master Ver"
 
 /* PGM2 */
 GAME( 2007, orleg2,       0,         pgm,    pgm,     0,       ROT0, "IGS", "Oriental Legend 2", GAME_IMPERFECT_SOUND | GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING | GAME_SUPPORTS_SAVE )
