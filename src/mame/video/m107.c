@@ -30,7 +30,8 @@
     Playfield control:
         Bit  0x0f00:    Playfield location in VRAM (in steps of 0x1000)
         Bit  0x0080:    0 = Playfield enable, 1 = disable
-        Bit  0x0002:    1 = Rowscroll enable, 0 = disable
+        Bit  0x0002:    1 = Rowselect enable, 0 = disable
+        Bit  0x0001:    1 = Rowscroll enable, 0 = disable
 
 *****************************************************************************/
 
@@ -115,7 +116,8 @@ WRITE16_HANDLER( m107_control_w )
 			if ((old ^ m107_control[offset]) & 0x0f00)
 				tilemap_mark_all_tiles_dirty(layer->tmap);
 
-			printf("%04x %02x\n",m107_control[offset],offset*2);
+			if(m107_control[offset] & 0xf07c)
+				printf("%04x %02x\n",m107_control[offset],offset*2);
 
 			break;
 
@@ -248,17 +250,10 @@ static void m107_update_scroll_positions(void)
 	int laynum;
 	int i;
 
-	/*  Playfield 4 rowscroll data is 0xde800 - 0xdebff???
-        Playfield 3 rowscroll data is 0xdf800 - 0xdfbff
-        Playfield 2 rowscroll data is 0xdf400 - 0xdf7ff
-        Playfield 1 rowscroll data is 0xde800 - 0xdebff     ??
-
-     	alt rowscrolling is at 0xde000 - 0xde7ff, every layer uses 0x200 bytes out of this, so it should be:
-     	0xde000 - 0xde1ff layer 0
-     	0xde200 - 0xde3ff layer 1
-     	0xde400 - 0xde5ff layer 2
-     	0xde600 - 0xde7ff layer 3
-     	The question is: why it uses 256 values for 512 rows? Is my hook-up correct?
+	/*
+     	rowscroll is at 0xde000 - 0xde7ff, every layer has dedicated 0x200 bytes inside this area, enabled with bit 0 of the layer video register
+     	rowselect is at 0xde800 - 0xdefff, every layer has dedicated 0x200 bytes inside this area, enabled with bit 1 of the layer video register
+     	Perhaps 0xdf000 - 0xdffff and bit 2-3 are respectively colscroll and colselect?
     */
 
     for (laynum = 0; laynum < 4; laynum++)
@@ -335,12 +330,12 @@ static void m107_screenrefresh(running_machine *machine, bitmap_t *bitmap, const
 		bitmap_fill(bitmap, cliprect, 0);
 
 	m107_tilemap_draw(machine, bitmap, cliprect, 2, 0);
-	m107_tilemap_draw(machine, bitmap, cliprect, 2, 1);
-
 	m107_tilemap_draw(machine, bitmap, cliprect, 1, 0);
 	m107_tilemap_draw(machine, bitmap, cliprect, 0, 0);
 
 	draw_sprites(machine, bitmap, cliprect, 0);
+
+	m107_tilemap_draw(machine, bitmap, cliprect, 2, 1);
 	m107_tilemap_draw(machine, bitmap, cliprect, 1, 1);
 	m107_tilemap_draw(machine, bitmap, cliprect, 0, 1);
 
