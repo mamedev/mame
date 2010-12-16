@@ -94,6 +94,11 @@ static const TMS9928a_interface tms9928a_interface =
 	vdp_interrupt
 };
 
+static STATE_POSTLOAD ( forte2 )
+{
+	TMS9928A_post_load(machine);
+}
+
 static MACHINE_START( forte2 )
 {
 	TMS9928A_configure(&tms9928a_interface);
@@ -102,6 +107,7 @@ static MACHINE_START( forte2 )
 
 	/* register for save states */
 	state_save_register_global(machine, forte2_input_mask);
+	state_save_register_postload(machine, forte2, NULL);
 }
 
 static MACHINE_RESET( forte2 )
