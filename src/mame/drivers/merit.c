@@ -1697,6 +1697,29 @@ ROM_START( tictac )
 	ROM_LOAD( "merit.pba",    0x98000, 0x8000, CRC(6eda81f4) SHA1(6d64344691e3e52035a7d30fb3e762f0bd397db7) )
 ROM_END
 
+ROM_START( tictacv )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "6221-22_u5-0.u5",  0x00000, 0x8000,  CRC(c3acd686) SHA1(0c652e88675e2098be2f26e8f1acefc9e69d630f) )
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_LOAD( "ttts_u-39.u39",    0x00000, 0x2000, CRC(20103ed6) SHA1(52741ba8e3b57a32446d3bf4d6f6d8368954fd54) )
+	ROM_LOAD( "ttts_u-38.u38",    0x02000, 0x2000, CRC(32e791b9) SHA1(f206aef25b3a9b7042d804e628c356f7d8d3cdbe) )
+	ROM_LOAD( "ttts_u-37.u37",    0x04000, 0x2000, CRC(adf19f83) SHA1(af2c0b9782f8e93a7c5e2a5ecc937694773d8ad0) )
+
+	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_LOAD( "ttts_u-40.u40",    0x00000, 0x2000, CRC(c7071c98) SHA1(88e1b26f198cfbbd86b492356f60fc1b81b38d97) )
+
+	ROM_REGION( 0xa0000, "user1", ROMREGION_ERASEFF ) /* questions */
+	ROM_LOAD( "gen-004_01a.7",    0x08000, 0x8000, CRC(d1584173) SHA1(7a2190203f478f446cc70c473c345e7cc332e049) ) /* Trivia catagories are: */
+	ROM_LOAD( "gen-004_02a.8",    0x18000, 0x8000, CRC(d00ab1fd) SHA1(c94269c8a478e88f71aeca94c6f20fc05a9c62bd) ) /* General Interest, Sports, Entertainment & Sex Trivia III */
+	ROM_LOAD( "spo-004_01a.1",    0x28000, 0x8000, CRC(71b398a9) SHA1(5ea07c409afd52c7d08592b30ff0ff3b72c3f8c3) )
+	ROM_LOAD( "spo-004_02a.2",    0x38000, 0x8000, CRC(eb34672f) SHA1(c472fc4445fc434029a2740dfc1d9ab9b1ef9f87) )
+	ROM_LOAD( "spo-004_03a.3",    0x48000, 0x8000, CRC(8eea30b9) SHA1(fe1d0332106631f56bc6c57a888da9e4e63fa52f) )
+	ROM_LOAD( "ent-004_01.4",     0x58000, 0x8000, CRC(3f45064d) SHA1(de109ac0b19fd1cd7f0020cc174c2da21708108c) )
+	ROM_LOAD( "ent-004_02a.5",    0x68000, 0x8000, CRC(f1c446cd) SHA1(9a6f18defbb64e202ae12e1a59502b8f2d6a58a6) )
+	ROM_LOAD( "ent-004_03.6",     0x78000, 0x8000, CRC(206cfc0d) SHA1(78f6b684713459a617096aa3ffe6e9e62583938c) )
+ROM_END
+
 ROM_START( phrcraze )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "phrz.11",      0x00000, 0x8000, CRC(ccd33a0c) SHA1(869b66af4369f3b4bc19336ca2b8104c7f652de7) )
@@ -1962,7 +1985,8 @@ GAME( 1985, trvwz3v,  trvwz3h, trvwhiz,  trivia,   key_0,  ROT90, "Merit", "Triv
 GAME( 1985, trvwz4,   0,       trvwhziv, trvwhziv, key_5,  ROT90, "Merit", "Trivia ? Whiz (Edition 4) (question set 1)",  GAME_SUPPORTS_SAVE )
 GAME( 1985, trvwz4a,  trvwz4,  trvwhziv, trvwhziv, key_5,  ROT90, "Merit", "Trivia ? Whiz (Edition 4) (question set 2)",  GAME_SUPPORTS_SAVE )
 
-GAME( 1985, tictac,   0,       tictac,   tictac,   key_4,  ROT0,  "Merit", "Tic Tac Trivia",                              GAME_SUPPORTS_SAVE )
+GAME( 1985, tictac,   0,       tictac,   tictac,   key_4,  ROT0,  "Merit", "Tic Tac Trivia (Horizontal",                  GAME_SUPPORTS_SAVE )
+GAME( 1985, tictacv,  tictac,  tictac,   tictac,   key_4,  ROT90, "Merit", "Tic Tac Trivia (Vertical)",                   GAME_SUPPORTS_SAVE )
 
 GAME( 1986, phrcraze, 0,       phrcraze, phrcraze, key_7,  ROT0,  "Merit", "Phraze Craze (set 1)",                        GAME_SUPPORTS_SAVE )
 GAME( 1986, phrcrazea,phrcraze,phrcraze, phrcraze, key_7,  ROT0,  "Merit", "Phraze Craze (set 2)",                        GAME_SUPPORTS_SAVE )
