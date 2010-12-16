@@ -4138,18 +4138,18 @@ ROM_START( espgal )
 
 	ROM_REGION( 0xc00000, "tiles", 0 ) /* 8x8 Text Tiles + 32x32 BG Tiles */
 	ROM_LOAD( "t01s.u18", 0x000000, 0x200000, CRC(1a7123a0) SHA1(cc567f577bfbf45427b54d6695b11b74f2578af3) ) // same as standard PGM text bios - surface scratched to remove details
-	ROM_LOAD( "text-1.u19",   0x400000, 0x800000, BAD_DUMP CRC(f9a2d35d) SHA1(31813c121a25b7a15ee24067a237192ef0f7ef6d) ) // it has bitrot, check disclaimer screen
+	ROM_LOAD( "text-1.u19",   0x400000, 0x800000, BAD_DUMP CRC(f9a2d35d) SHA1(31813c121a25b7a15ee24067a237192ef0f7ef6d) ) // it has bad random bits over the place, probably caused by bad/dirty connections, check disclaimer screen
 
 	ROM_REGION( 0x1000000, "sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "image-1.u7",    0x0000000, 0x0800000, CRC(d4afaa72) SHA1(8fee09e4f1c9531c34a29d4492b7eddfd4f6500a) )
 	ROM_LOAD( "image-2.u8",    0x0800000, 0x0800000, CRC(dfdcc7e6) SHA1(6afec9d285c5fc5251f2f7721f5a05e5bf00b114) )
 
 	ROM_REGION( 0x0800000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
-	ROM_LOAD( "bitmap-1.u1",    0x0000000, 0x0800000,  CRC(3b4d0d32) SHA1(a879b383acb2c298373ad433b86a5cc87f221ed8) )
+	ROM_LOAD( "bitmap-1.u1",    0x0000000, 0x0800000, BAD_DUMP CRC(3b4d0d32) SHA1(a879b383acb2c298373ad433b86a5cc87f221ed8) ) // it has bad random bits over the place
 
 	ROM_REGION( 0x800000, "ics", ROMREGION_ERASE00 ) /* Samples - (8 bit mono 11025Hz) - */
 	/* there is a position for the PGM audio bios rom, but it's unpopulated, and the M of PGM has been scratched off the PCB */
-	ROM_LOAD( "music-1.u17",    0x400000, 0x400000,   CRC(60298536) SHA1(6b7333f16cce778c5725dbdf75a5446f0906397a) )
+	ROM_LOAD( "music-1.u17",    0x400000, 0x400000, CRC(60298536) SHA1(6b7333f16cce778c5725dbdf75a5446f0906397a) )
 ROM_END
 
 ROM_START( ddp3 )
