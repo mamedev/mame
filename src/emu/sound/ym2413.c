@@ -164,7 +164,8 @@ static FILE * cymfile = NULL;
 
 
 
-typedef struct{
+typedef struct
+{
 	UINT32	ar;			/* attack rate: AR<<2           */
 	UINT32	dr;			/* decay rate:  DR<<2           */
 	UINT32	rr;			/* release rate:RR<<2           */
@@ -208,7 +209,8 @@ typedef struct{
 	unsigned int wavetable;
 } OPLL_SLOT;
 
-typedef struct{
+typedef struct
+{
 	OPLL_SLOT SLOT[2];
 	/* phase generator state */
 	UINT32  block_fnum;	/* block+fnum                   */
@@ -219,7 +221,8 @@ typedef struct{
 } OPLL_CH;
 
 /* chip state */
-typedef struct {
+typedef struct
+{
 	OPLL_CH	P_CH[9];				/* OPLL chips have 9 channels*/
 	UINT8	instvol_r[9];			/* instrument/volume (or volume/volume in percussive mode)*/
 
@@ -231,6 +234,8 @@ typedef struct {
 	UINT8	rhythm;					/* Rhythm mode                  */
 
 	/* LFO */
+	UINT32	LFO_AM;
+	INT32	LFO_PM;
 	UINT32	lfo_am_cnt;
 	UINT32	lfo_am_inc;
 	UINT32	lfo_pm_cnt;
@@ -263,6 +268,10 @@ typedef struct {
 	int rate;						/* sampling rate (Hz)           */
 	double freqbase;				/* frequency base               */
 	running_device *device;
+
+	signed int output[2];
+	signed int outchan;
+
 } YM2413;
 
 /* key scale level */
@@ -609,17 +618,14 @@ static const unsigned char table[19][8] = {
 static int num_lock = 0;
 
 /* work table */
-static void *cur_chip = NULL;	/* current chip pointer */
-static OPLL_SLOT *SLOT7_1,*SLOT7_2,*SLOT8_1,*SLOT8_2;
-
-static signed int output[2];
-static signed int outchan;
-
-static UINT32	LFO_AM;
-static INT32	LFO_PM;
+#define SLOT7_1 (&chip->P_CH[7].SLOT[SLOT1])
+#define SLOT7_2 (&chip->P_CH[7].SLOT[SLOT2])
+#define SLOT8_1 (&chip->P_CH[8].SLOT[SLOT1])
+#define SLOT8_2 (&chip->P_CH[8].SLOT[SLOT2])
 
 
-INLINE int limit( int val, int max, int min ) {
+INLINE int limit( int val, int max, int min )
+{
 	if ( val > max )
 		val = max;
 	else if ( val < min )
@@ -637,10 +643,10 @@ INLINE void advance_lfo(YM2413 *chip)
 	if (chip->lfo_am_cnt >= ((UINT32)LFO_AM_TAB_ELEMENTS<<LFO_SH) )	/* lfo_am_table is 210 elements long */
 		chip->lfo_am_cnt -= ((UINT32)LFO_AM_TAB_ELEMENTS<<LFO_SH);
 
-	LFO_AM = lfo_am_table[ chip->lfo_am_cnt >> LFO_SH ] >> 1;
+	chip->LFO_AM = lfo_am_table[ chip->lfo_am_cnt >> LFO_SH ] >> 1;
 
 	chip->lfo_pm_cnt += chip->lfo_pm_inc;
-	LFO_PM = (chip->lfo_pm_cnt>>LFO_SH) & 7;
+	chip->LFO_PM = (chip->lfo_pm_cnt>>LFO_SH) & 7;
 }
 
 /* advance to next sample */
@@ -817,7 +823,7 @@ INLINE void advance(YM2413 *chip)
 
 			unsigned int fnum_lfo   = 8*((CH->block_fnum&0x01c0) >> 6);
 			unsigned int block_fnum = CH->block_fnum * 2;
-			signed int lfo_fn_table_index_offset = lfo_pm_table[LFO_PM + fnum_lfo ];
+			signed int lfo_fn_table_index_offset = lfo_pm_table[chip->LFO_PM + fnum_lfo ];
 
 			if (lfo_fn_table_index_offset)	/* LFO phase modulation active */
 			{
@@ -904,10 +910,10 @@ INLINE signed int op_calc1(UINT32 phase, unsigned int env, signed int pm, unsign
 }
 
 
-#define volume_calc(OP) ((OP)->TLL + ((UINT32)(OP)->volume) + (LFO_AM & (OP)->AMmask))
+#define volume_calc(OP) ((OP)->TLL + ((UINT32)(OP)->volume) + (chip->LFO_AM & (OP)->AMmask))
 
 /* calculate output */
-INLINE void chan_calc( OPLL_CH *CH )
+INLINE void chan_calc( YM2413 *chip, OPLL_CH *CH )
 {
 	OPLL_SLOT *SLOT;
 	unsigned int env;
@@ -934,16 +940,16 @@ INLINE void chan_calc( OPLL_CH *CH )
 
 	/* SLOT 2 */
 
-outchan=0;
+	chip->outchan=0;
 
 	SLOT++;
 	env = volume_calc(SLOT);
 	if( env < ENV_QUIET )
 	{
 		signed int outp = op_calc(SLOT->phase, env, phase_modulation, SLOT->wavetable);
-		output[0] += outp;
-		outchan = outp;
-		//output[0] += op_calc(SLOT->phase, env, phase_modulation, SLOT->wavetable);
+		chip->output[0] += outp;
+		chip->outchan = outp;
+		//chip->output[0] += op_calc(SLOT->phase, env, phase_modulation, SLOT->wavetable);
 	}
 }
 
@@ -984,7 +990,7 @@ number   number    BLK/FNUM2 FNUM    Drum  Hat   Drum  Tom  Cymbal
 
 /* calculate rhythm */
 
-INLINE void rhythm_calc( OPLL_CH *CH, unsigned int noise )
+INLINE void rhythm_calc( YM2413 *chip, OPLL_CH *CH, unsigned int noise )
 {
 	OPLL_SLOT *SLOT;
 	signed int out;
@@ -1021,7 +1027,7 @@ INLINE void rhythm_calc( OPLL_CH *CH, unsigned int noise )
 	SLOT++;
 	env = volume_calc(SLOT);
 	if( env < ENV_QUIET )
-		output[1] += op_calc(SLOT->phase, env, phase_modulation, SLOT->wavetable) * 2;
+		chip->output[1] += op_calc(SLOT->phase, env, phase_modulation, SLOT->wavetable) * 2;
 
 
 	/* Phase generation is based on: */
@@ -1089,7 +1095,7 @@ INLINE void rhythm_calc( OPLL_CH *CH, unsigned int noise )
 				phase = 0xd0>>2;
 		}
 
-		output[1] += op_calc(phase<<FREQ_SH, env, 0, SLOT7_1->wavetable) * 2;
+		chip->output[1] += op_calc(phase<<FREQ_SH, env, 0, SLOT7_1->wavetable) * 2;
 	}
 
 	/* Snare Drum (verified on real YM3812) */
@@ -1110,13 +1116,13 @@ INLINE void rhythm_calc( OPLL_CH *CH, unsigned int noise )
 		if (noise)
 			phase ^= 0x100;
 
-		output[1] += op_calc(phase<<FREQ_SH, env, 0, SLOT7_2->wavetable) * 2;
+		chip->output[1] += op_calc(phase<<FREQ_SH, env, 0, SLOT7_2->wavetable) * 2;
 	}
 
 	/* Tom Tom (verified on real YM3812) */
 	env = volume_calc(SLOT8_1);
 	if( env < ENV_QUIET )
-		output[1] += op_calc(SLOT8_1->phase, env, 0, SLOT8_1->wavetable) * 2;
+		chip->output[1] += op_calc(SLOT8_1->phase, env, 0, SLOT8_1->wavetable) * 2;
 
 	/* Top Cymbal (verified on real YM2413) */
 	env = volume_calc(SLOT8_2);
@@ -1143,7 +1149,7 @@ INLINE void rhythm_calc( OPLL_CH *CH, unsigned int noise )
 		if (res2)
 			phase = 0x300;
 
-		output[1] += op_calc(phase<<FREQ_SH, env, 0, SLOT8_2->wavetable) * 2;
+		chip->output[1] += op_calc(phase<<FREQ_SH, env, 0, SLOT8_2->wavetable) * 2;
 	}
 
 }
@@ -1923,7 +1929,6 @@ static int OPLL_LockTable(running_device *device)
 
 	/* first time */
 
-	cur_chip = NULL;
 	/* allocate total level table (128kb space) */
 	if( !init_tables() )
 	{
@@ -1950,7 +1955,6 @@ static void OPLL_UnLockTable(void)
 
 	/* last time */
 
-	cur_chip = NULL;
 	OPLCloseTable();
 
 	if (cymfile)
@@ -2119,47 +2123,37 @@ void ym2413_update_one(void *_chip, SAMP **buffers, int length)
 
 	int i;
 
-	if( (void *)chip != cur_chip ){
-		cur_chip = (void *)chip;
-		/* rhythm slots */
-		SLOT7_1 = &chip->P_CH[7].SLOT[SLOT1];
-		SLOT7_2 = &chip->P_CH[7].SLOT[SLOT2];
-		SLOT8_1 = &chip->P_CH[8].SLOT[SLOT1];
-		SLOT8_2 = &chip->P_CH[8].SLOT[SLOT2];
-	}
-
-
 	for( i=0; i < length ; i++ )
 	{
 		int mo,ro;
 
-		output[0] = 0;
-		output[1] = 0;
+		chip->output[0] = 0;
+		chip->output[1] = 0;
 
 		advance_lfo(chip);
 
 		/* FM part */
-		chan_calc(&chip->P_CH[0]);
+		chan_calc(chip, &chip->P_CH[0]);
 //SAVE_SEPARATE_CHANNEL(0);
-		chan_calc(&chip->P_CH[1]);
-		chan_calc(&chip->P_CH[2]);
-		chan_calc(&chip->P_CH[3]);
-		chan_calc(&chip->P_CH[4]);
-		chan_calc(&chip->P_CH[5]);
+		chan_calc(chip, &chip->P_CH[1]);
+		chan_calc(chip, &chip->P_CH[2]);
+		chan_calc(chip, &chip->P_CH[3]);
+		chan_calc(chip, &chip->P_CH[4]);
+		chan_calc(chip, &chip->P_CH[5]);
 
 		if(!rhythm)
 		{
-			chan_calc(&chip->P_CH[6]);
-			chan_calc(&chip->P_CH[7]);
-			chan_calc(&chip->P_CH[8]);
+			chan_calc(chip, &chip->P_CH[6]);
+			chan_calc(chip, &chip->P_CH[7]);
+			chan_calc(chip, &chip->P_CH[8]);
 		}
 		else		/* Rhythm part */
 		{
-			rhythm_calc(&chip->P_CH[0], (chip->noise_rng>>0)&1 );
+			rhythm_calc(chip, &chip->P_CH[0], (chip->noise_rng>>0)&1 );
 		}
 
-		mo = output[0];
-		ro = output[1];
+		mo = chip->output[0];
+		ro = chip->output[1];
 
 		mo >>= FINAL_SH;
 		ro >>= FINAL_SH;

@@ -122,7 +122,6 @@ static const int pcm_tab[] = { 0, 4, 8, -1, 12, 16, 20, -1, 24, 28, 32, -1, 36, 
 static INT16 *wavetable[8];
 static double plfo_table[4][8][LFO_LENGTH];
 static int alfo_table[4][LFO_LENGTH];
-static INT32 *mix;
 
 #define ENV_ATTACK		0
 #define ENV_DECAY1		1
@@ -709,6 +708,7 @@ static STREAM_UPDATE( ymf271_update )
 	int i, j;
 	int op;
 	INT32 *mixp;
+	INT32 mix[48000*2];
 	YMF271Chip *chip = (YMF271Chip *)param;
 
 	memset(mix, 0, sizeof(mix[0])*samples*2);
@@ -1403,9 +1403,12 @@ static TIMER_CALLBACK( ymf271_timer_b_tick )
 
 static UINT8 ymf271_read_ext_memory(YMF271Chip *chip, UINT32 address)
 {
-	if( chip->ext_mem_read.read ) {
+	if( chip->ext_mem_read.read )
+	{
 		return devcb_call_read8(&chip->ext_mem_read, address);
-	} else {
+	}
+	else
+	{
 		if( address < 0x800000)
 			return chip->rom[address];
 	}
@@ -1671,8 +1674,6 @@ static void init_tables(running_machine *machine)
 		tri_wave = ((i % (LFO_LENGTH/2)) * ALFO_MAX) / (LFO_LENGTH/2);
 		alfo_table[3][i] = (i < (LFO_LENGTH/2)) ? ALFO_MAX-tri_wave : tri_wave;
 	}
-
-	mix = auto_alloc_array(machine, INT32, 48000*2);
 }
 
 static void init_state(YMF271Chip *chip, running_device *device)

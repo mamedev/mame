@@ -136,8 +136,6 @@ INLINE YMF278BChip *get_safe_token(running_device *device)
 	return (YMF278BChip *)downcast<legacy_device_base *>(device)->token();
 }
 
-static INT32 *mix;
-
 static int ymf278b_compute_rate(YMF278BSlot *slot, int val)
 {
 	int res, oct;
@@ -269,6 +267,7 @@ static STREAM_UPDATE( ymf278b_pcm_update )
 	const UINT8 *rombase;
 	INT32 *mixp;
 	INT32 vl, vr;
+	INT32 mix[44100*2];
 
 	memset(mix, 0, sizeof(mix[0])*samples*2);
 
@@ -672,8 +671,6 @@ static void ymf278b_init(running_device *device, YMF278BChip *chip, void (*cb)(r
 	chip->timer_b = timer_alloc(device->machine, ymf278b_timer_b_tick, chip);
 	chip->irq_line = CLEAR_LINE;
 	chip->clock = device->clock();
-
-	mix = auto_alloc_array(device->machine, INT32, 44100*2);
 }
 
 static void ymf278b_register_save_state(running_device *device, YMF278BChip *chip)
