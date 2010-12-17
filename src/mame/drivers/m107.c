@@ -681,7 +681,7 @@ static DRIVER_INIT( wpksoc )
 
 /***************************************************************************/
 
-GAME( 1993, firebarr,      0, firebarr, firebarr, firebarr, ROT270, "Irem", "Fire Barrel (Japan)", GAME_IMPERFECT_GRAPHICS )
+GAME( 1993, firebarr,      0, firebarr, firebarr, firebarr, ROT270, "Irem", "Fire Barrel (Japan)", 0 )
 // Air Assault : World version of Fire Barrel, seen on location at the London Trocadero
 GAME( 1994, dsoccr94,      0, dsoccr94, dsoccr94, dsoccr94, ROT0,   "Irem (Data East Corporation license)", "Dream Soccer '94 (M107 Hardware)", 0 )
 GAME( 1995, wpksoc,        0, wpksoc,   wpksoc,   wpksoc,   ROT0,   "Jaleco", "World PK Soccer", GAME_NOT_WORKING | GAME_IMPERFECT_GRAPHICS )
