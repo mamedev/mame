@@ -577,12 +577,12 @@ static INTERRUPT_GEN( galpani2_interrupt2 )
 static MACHINE_CONFIG_START( galpani2, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz)
+	MDRV_CPU_ADD("maincpu", M68000, XTAL_27MHz/2)		/* Confirmed on galpani2i PCB */
 	MDRV_CPU_PROGRAM_MAP(galpani2_mem1)
 	MDRV_CPU_VBLANK_INT_HACK(galpani2_interrupt1,GALPANI2_INTERRUPTS_NUM)
 	//MDRV_QUANTUM_PERFECT_CPU("maincpu")
 
-	MDRV_CPU_ADD("sub", M68000, XTAL_16MHz)
+	MDRV_CPU_ADD("sub", M68000, XTAL_27MHz/2)			/* Confirmed on galpani2i PCB */
 	MDRV_CPU_PROGRAM_MAP(galpani2_mem2)
 	MDRV_CPU_VBLANK_INT_HACK(galpani2_interrupt2,GALPANI2_INTERRUPTS_NUM2)
 
@@ -607,10 +607,10 @@ static MACHINE_CONFIG_START( galpani2, driver_device )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_OKIM6295_ADD("oki1", XTAL_16MHz/8, OKIM6295_PIN7_LOW) // clock frequency & pin 7 not verified
+	MDRV_OKIM6295_ADD("oki1", XTAL_20MHz/10, OKIM6295_PIN7_HIGH)	/* Confirmed on galpani2i PCB */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 
-	MDRV_OKIM6295_ADD("oki2", XTAL_16MHz/8, OKIM6295_PIN7_LOW) // clock frequency & pin 7 not verified
+	MDRV_OKIM6295_ADD("oki2", XTAL_20MHz/10, OKIM6295_PIN7_HIGH)	/* Confirmed on galpani2i PCB */	
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
@@ -626,9 +626,10 @@ MACHINE_CONFIG_END
 //POST's displayed checksums (ROM $0-$FFFFF) or (ROM $0-$FFFFF even)/(ROM $1-$FFFFF odd)
 //
 //galpani2 = 6A6C                bkg layer offset
-//galpan2g = 15A3                bkg layer offset
-//galpan2t = 18A3                bkg layer offset
-//galpan2j = 08E1 / A582         bkg layer OK          has demo
+//galpani2g= 15A3                bkg layer offset
+//galpani2i= 54FC                bkg layer offset
+//galpani2t= 18A3                bkg layer offset
+//galpani2j= 08E1 / A582         bkg layer OK          has demo
 //gp2quiz  = 78D6 / 84A0         bkg layer OK          has demo
 //gp2se    = 6D8C / FCE4 (Japan) bkg layer unknown
 
