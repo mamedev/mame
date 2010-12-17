@@ -54,6 +54,7 @@ static UINT16 *m107_spriteram;
 UINT16 *m107_vram_data;
 UINT16 m107_raster_irq_position;
 UINT8 m107_spritesystem;
+UINT8 m107_sprite_display;
 
 
 /*****************************************************************************/
@@ -162,17 +163,16 @@ VIDEO_START( m107 )
 
 /*****************************************************************************/
 
-static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect, int pri)
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
 	int offs;
 	UINT8 *rom = memory_region(machine, "user1");
 
-	for (offs = 0x800-4;offs >= 0;offs -= 4)
+	for (offs = 0;offs < 0x800;offs += 4)
 	{
-		int x,y,sprite,colour,fx,fy,y_multi,i,s_ptr;
+		int x,y,sprite,colour,fx,fy,y_multi,i,s_ptr,pri_mask;
 
-		if (((m107_spriteram[offs+2]&0x80)==0x80) && pri==0) continue;
-		if (((m107_spriteram[offs+2]&0x80)==0x00) && pri==1) continue;
+		pri_mask = (!(m107_spriteram[offs+2]&0x80)) ? 2 : 0;
 
 		y=m107_spriteram[offs+0];
 		x=m107_spriteram[offs+3];
@@ -200,18 +200,20 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 
 			for (i=0; i<y_multi; i++)
 			{
-				drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
+				pdrawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 						sprite + s_ptr,
 						colour,
 						fx,fy,
-						x,y-i*16,0);
+						x,y-i*16,
+						machine->priority_bitmap,pri_mask,0);
 
 				/* wrap-around y */
-				drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
+				pdrawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 						sprite + s_ptr,
 						colour,
 						fx,fy,
-						x,(y-i*16) - 0x200,0);
+						x,(y-i*16) - 0x200,
+						machine->priority_bitmap,pri_mask,0);
 
 				if (fy) s_ptr++; else s_ptr--;
 			}
@@ -255,18 +257,20 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 					if (!ffy) sprite+=y_multi-1;
 					for (i=0; i<y_multi; i++)
 					{
-						drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
+						pdrawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 								sprite+(ffy?i:-i),
 								colour,
 								ffx,ffy,
-								(x+xdisp)&0x1ff,(y-ydisp-16*i)&0x1ff,0);
+								(x+xdisp)&0x1ff,(y-ydisp-16*i)&0x1ff,
+								machine->priority_bitmap,pri_mask,0);
 
 						/* wrap-around y */
-						drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
+						pdrawgfx_transpen(bitmap,cliprect,machine->gfx[1],
 								sprite+(ffy?i:-i),
 								colour,
 								ffx,ffy,
-								(x+xdisp)&0x1ff,((y-ydisp-16*i)&0x1ff)-0x200,0);
+								(x+xdisp)&0x1ff,((y-ydisp-16*i)&0x1ff)-0x200,
+								machine->priority_bitmap,pri_mask,0);
 					}
 
 					if (rom[rom_offs+1]&0x80) break;	/* end of block */
@@ -339,16 +343,18 @@ static void m107_tilemap_draw(running_machine *machine, bitmap_t *bitmap, const 
 			tilemap_set_scrollx(pf_layer[laynum].tmap,0,  m107_control[1 + 2 * laynum]);
 			tilemap_set_scrolly(pf_layer[laynum].tmap,0,  (m107_control[0 + 2 * laynum] + scrolldata[line]));
 
-			tilemap_draw(bitmap, &clip, pf_layer[laynum].tmap, category | opaque, 0);
+			tilemap_draw(bitmap, &clip, pf_layer[laynum].tmap, category | opaque, category);
 		}
 	}
 	else
-		tilemap_draw(bitmap, cliprect, pf_layer[laynum].tmap, category | opaque, 0);
+		tilemap_draw(bitmap, cliprect, pf_layer[laynum].tmap, category | opaque, category);
 }
 
 
 static void m107_screenrefresh(running_machine *machine, bitmap_t *bitmap, const rectangle *cliprect)
 {
+	bitmap_fill(machine->priority_bitmap, cliprect, 0);
+
 	if ((~m107_control[0x0b] >> 7) & 1)
 	{
 		m107_tilemap_draw(machine, bitmap, cliprect, 3, 0,0);
@@ -361,14 +367,12 @@ static void m107_screenrefresh(running_machine *machine, bitmap_t *bitmap, const
 	m107_tilemap_draw(machine, bitmap, cliprect, 2, 0,(((m107_control[0x0b] >> 7) & 1) ? TILEMAP_DRAW_OPAQUE : 0));
 	m107_tilemap_draw(machine, bitmap, cliprect, 1, 0,0);
 	m107_tilemap_draw(machine, bitmap, cliprect, 0, 0,0);
-
-	draw_sprites(machine, bitmap, cliprect, 0);
-
 	m107_tilemap_draw(machine, bitmap, cliprect, 2, 1,0);
 	m107_tilemap_draw(machine, bitmap, cliprect, 1, 1,0);
 	m107_tilemap_draw(machine, bitmap, cliprect, 0, 1,0);
 
-	draw_sprites(machine, bitmap, cliprect, 1);
+	if(m107_sprite_display)
+		draw_sprites(machine, bitmap, cliprect);
 
 	/* This hardware probably has more priority values - but I haven't found
         any used yet */
@@ -379,7 +383,12 @@ static void m107_screenrefresh(running_machine *machine, bitmap_t *bitmap, const
 WRITE16_HANDLER( m107_spritebuffer_w )
 {
 	if (ACCESSING_BITS_0_7) {
+		/*
+		TODO: this register looks a lot more complex than how the game uses it. All of them seems to test various bit combinations during POST.
+		*/
 //      logerror("%04x: buffered spriteram\n",cpu_get_pc(space->cpu));
+		m107_sprite_display	= (!(data & 0x1000));
+
 		memcpy(m107_spriteram,space->machine->generic.spriteram.u16,0x1000);
 	}
 }
