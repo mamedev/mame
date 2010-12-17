@@ -260,31 +260,25 @@ static void m107_update_scroll_positions(void)
     {
     	pf_layer_info *layer = &pf_layer[laynum];
 
-		#if 0
-		if (m107_control[0x08 + laynum] & 0x02)
-		{
-			const UINT16 *scrolldata = m107_vram_data + (0xe800 + 0x400 * laynum) / 2;
+		int scrolly = m107_control[0 + 2 * laynum];
+		int scrollx = m107_control[1 + 2 * laynum];
 
-			tilemap_set_scroll_rows(layer->tmap, 512);
-			for (i = 0; i < 512; i++)
-				tilemap_set_scrollx(layer->tmap, i, scrolldata[i] + m107_control[1 + 2 * laynum]);
-		}
-		#endif
 		if (m107_control[0x08 + laynum] & 0x01) //used by World PK Soccer goal scrolling and Fire Barrel sea wave effect (stage 2) / canyon parallax effect (stage 6)
 		{
 			const UINT16 *scrolldata = m107_vram_data + (0xe000 + 0x200 * laynum) / 2;
 
 			tilemap_set_scroll_rows(layer->tmap, 512);
 			for (i = 0; i < 512; i++)
-				tilemap_set_scrollx(layer->tmap, i, scrolldata[i/2] + m107_control[1 + 2 * laynum]);
+				tilemap_set_scrollx(layer->tmap, i, scrolldata[((i+0xff80)-(scrolly))&0x1ff] + scrollx);
+
 		}
 		else
 		{
 			tilemap_set_scroll_rows(layer->tmap, 1);
-			tilemap_set_scrollx(layer->tmap, 0, m107_control[1 + 2 * laynum]);
+			tilemap_set_scrollx(layer->tmap, 0, scrollx);
 		}
 
-		tilemap_set_scrolly(layer->tmap, 0, m107_control[0 + 2 * laynum]);
+		tilemap_set_scrolly(layer->tmap, 0,scrolly);
 	}
 }
 
