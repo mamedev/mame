@@ -205,6 +205,14 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 						colour,
 						fx,fy,
 						x,y-i*16,0);
+
+				/* wrap-around y */
+				drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
+						sprite + s_ptr,
+						colour,
+						fx,fy,
+						x,(y-i*16) - 0x200,0);
+
 				if (fy) s_ptr++; else s_ptr--;
 			}
 		}
@@ -232,6 +240,13 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 								colour,
 								ffx,ffy,
 								(x+xdisp)&0x1ff,(y-ydisp-16*i)&0x1ff,0);
+
+						/* wrap-around y */
+						drawgfx_transpen(bitmap,cliprect,machine->gfx[1],
+								sprite+(ffy?i:-i),
+								colour,
+								ffx,ffy,
+								(x+xdisp)&0x1ff,((y-ydisp-16*i)&0x1ff)-0x200,0);
 					}
 
 					if (rom[rom_offs+1]&0x80) break;	/* end of block */
