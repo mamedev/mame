@@ -3225,7 +3225,7 @@ static void drawogl_window_clear(sdl_window_info *window)
 	sdl_info *sdl = (sdl_info *) window->dxdata;
 
 	//FIXME: Handled in drawogl_window_draw as well
-	sdl->blittimer = 2;
+	sdl->blittimer = 3;
 }
 
 
