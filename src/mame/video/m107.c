@@ -296,12 +296,11 @@ static void m107_tilemap_draw(running_machine *machine, bitmap_t *bitmap, const 
 
 	if (m107_control[0x08 + laynum] & 0x02)
 	{
-		for (line = cliprect->min_y; line < cliprect->max_y;line++)
+		for (line = cliprect->min_y; line <= cliprect->max_y;line++)
 		{
 			const UINT16 *scrolldata = m107_vram_data + (0xe800 + 0x200 * laynum) / 2;
 			clip.min_y = clip.max_y = line;
 
-			//FIXME: right side (bottom of the screen actually) gets corrupted lines?
 			tilemap_set_scrollx(pf_layer[laynum].tmap,0,  m107_control[1 + 2 * laynum]);
 			tilemap_set_scrolly(pf_layer[laynum].tmap,0,  (m107_control[0 + 2 * laynum] + scrolldata[line]));
 
@@ -323,7 +322,7 @@ static void m107_screenrefresh(running_machine *machine, bitmap_t *bitmap, const
 	else
 		bitmap_fill(bitmap, cliprect, 0);
 
-	/* note: the opaque flag is used if layer 3 is disabled, noticeable in World PK Soccer title and gameplay screens*/
+	/* note: the opaque flag is used if layer 3 is disabled, noticeable in World PK Soccer title and gameplay screens */
 	m107_tilemap_draw(machine, bitmap, cliprect, 2, 0,(((m107_control[0x0b] >> 7) & 1) ? TILEMAP_DRAW_OPAQUE : 0));
 	m107_tilemap_draw(machine, bitmap, cliprect, 1, 0,0);
 	m107_tilemap_draw(machine, bitmap, cliprect, 0, 0,0);

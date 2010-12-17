@@ -303,8 +303,6 @@ static TILE_GET_INFO( get_pgm_tx_tilemap_tile_info )
 	colour = (state->tx_videoram[tile_index * 2 + 1] & 0x3e) >> 1;
 	flipyx = (state->tx_videoram[tile_index * 2 + 1] & 0xc0) >> 6;
 
-	if (tileno > 0xbfff) { tileno -= 0xc000 ; tileno += 0x20000; } /* not sure about this */
-
 	SET_TILE_INFO(0,tileno,colour,TILE_FLIPYX(flipyx));
 }
 
@@ -325,8 +323,7 @@ static TILE_GET_INFO( get_pgm_bg_tilemap_tile_info )
 	int tileno, colour, flipyx;
 
 	tileno = state->bg_videoram[tile_index *2] & 0xffff;
-	if (tileno > 0x7ff)
-		tileno += 0x1000; /* Tiles 0x800+ come from the GAME Roms */
+
 	colour = (state->bg_videoram[tile_index * 2 + 1] & 0x3e) >> 1;
 	flipyx = (state->bg_videoram[tile_index * 2 + 1] & 0xc0) >> 6;
 
