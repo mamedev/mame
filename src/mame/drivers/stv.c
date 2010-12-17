@@ -4053,7 +4053,7 @@ GAME( 1995, ejihon,    stvbios, stv, stv,		stv,    	ROT0,   "Sega", 						"Ejiho
 GAME( 1995, fhboxers,  stvbios, stv, stv,		fhboxers,	ROT0,   "Sega", 						"Funky Head Boxers (JUETBKAL 951218 V1.000)", GAME_NO_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1994, gaxeduel,  stvbios, stv, stv,		gaxeduel,	ROT0,   "Sega", 	    				"Golden Axe - The Duel (JUETL 950117 V1.000)", GAME_IMPERFECT_SOUND )
 GAME( 1998, grdforce,  stvbios, stv, stv,		grdforce,	ROT0,   "Success",  					"Guardian Force (JUET 980318 V0.105)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
-GAME( 1998, groovef,   stvbios, stv, stv,		groovef,	ROT0,   "Atlus",    					"Power Instinct 3 - Groove On Fight (J 970416 V1.001)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
+GAME( 1998, groovef,   stvbios, stv, stv,		groovef,	ROT0,   "Atlus",    					"Groove on Fight - Gouketsuji Ichizoku 3 (J 970416 V1.001)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1997, hanagumi,  stvbios, stv, stv,		hanagumi,	ROT0,   "Sega",     					"Hanagumi Taisen Columns - Sakura Wars (J 971007 V1.010)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND )
 GAME( 1996, introdon,  stvbios, stv, stv,		stv,    	ROT0,   "Sunsoft / Success",			"Karaoke Quiz Intro Don Don! (J 960213 V1.000)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )
 GAME( 1995, kiwames,   stvbios, stv, stvmp,		stv,    	ROT0,   "Athena",   					"Pro Mahjong Kiwame S (J 951020 V1.208)", GAME_IMPERFECT_SOUND | GAME_IMPERFECT_GRAPHICS )

@@ -19,8 +19,8 @@ Other        :  93C46 EEPROM
 Year + Game           License       PCB         Tilemaps        Sprites         Other
 -----------------------------------------------------------------------------------------
 94 Mazinger Z         Banpresto     ?           038 9335EX706   013 9341E7009   Z80
-94 PowerInstinct 2    Atlus         ATG02?      038 9429WX709   013             Z80 NMK 112
-95 P.I. Legends       Atlus         AT047G2-B   038 9429WX709   013 9341E7009   Z80 NMK 112
+94 Power Instinct 2   Atlus         ATG02?      038 9429WX709   013             Z80 NMK 112
+95 Gogetsuji Legends  Atlus         AT047G2-B   038 9429WX709   013 9341E7009   Z80 NMK 112
 95 Metamoqester       Banpresto     BP947A      038 9437WX711   013 9346E7002   Z80
 95 Sailor Moon        Banpresto     BP945A      038 9437WX711   013 9346E7002   Z80
 95 Donpachi           Atlus         AT-C01DP-2  038 9429WX727   013 8647-01     NMK 112
@@ -4657,8 +4657,8 @@ GAME( 1995, donpachihk, donpachi, donpachi, cave,     donpachi, ROT270, "Cave (A
 GAME( 1995, metmqstr,   0,        metmqstr, metmqstr, metmqstr, ROT0,   "Banpresto / Pandorabox",                 "Metamoqester (International)",                           0 )
 GAME( 1995, nmaster,    metmqstr, metmqstr, metmqstr, metmqstr, ROT0,   "Banpresto / Pandorabox",                 "Oni - The Ninja Master (Japan)",                         0 )
 
-GAME( 1995, plegends,   0,        pwrinst2, metmqstr, pwrinst2j,ROT0,   "Atlus",                                  "Power Instinct Legends (US, Ver. 95/06/20)",             0 )
-GAME( 1995, plegendsj,  plegends, pwrinst2, metmqstr, pwrinst2j,ROT0,   "Atlus",                                  "Gouketsuji Ichizoku Saikyou Densetsu (Japan, Ver. 95/06/20)", 0 )
+GAME( 1995, plegends,   0,        pwrinst2, metmqstr, pwrinst2j,ROT0,   "Atlus",                                  "Gogetsuji Legends (US, Ver. 95/06/20)",                  0 )
+GAME( 1995, plegendsj,  plegends, pwrinst2, metmqstr, pwrinst2j,ROT0,   "Atlus",                                  "Gouketsuji Gaiden -  Saikyou Densetsu (Japan, Ver. 95/06/20)", 0 )
 
 // The EEPROM determines the region, program roms are the same between sets
 GAME( 1995, sailormn,   0,        sailormn, cave,     sailormn, ROT0,   "Banpresto",                              "Pretty Soldier Sailor Moon (Ver. 95/03/22B, Europe)",    0 )
