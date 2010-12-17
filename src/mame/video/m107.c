@@ -224,13 +224,33 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 			{
 				while (rom_offs < 0x40000)	/* safety check */
 				{
+					/*
+					[1]
+					x--- ---- end of block marker
+					---- --x- Flip Y
+					---- ---x Flip X
+					[2]
+					xxxx xxxx Y offs lo byte
+					[3]
+					---- xxx- height (1/2/4/8)
+					---- ---x Y offs hi byte
+					[4]
+					xxxx xxxx sprite number lo byte
+					[5]
+					xxxx xxxx sprite number hi byte
+					[6]
+					xxxx xxxx X offs lo byte
+					[7]
+					---- ---x X offs hi byte
+					*/
+
 					int xdisp = rom[rom_offs+6]+256*rom[rom_offs+7];
 					int ydisp = rom[rom_offs+2]+256*rom[rom_offs+3];
 					int ffx=fx^(rom[rom_offs+1]&1);
 					int ffy=fy^(rom[rom_offs+1]&2);
 					sprite=rom[rom_offs+4]+256*rom[rom_offs+5];
 					y_multi=1<<((rom[rom_offs+3]>>1)&0x3);
-					if (fx) xdisp = -xdisp;
+					if (fx) xdisp = -xdisp-16;
 					if (fy) ydisp = -ydisp - (16*y_multi-1);
 					if (!ffy) sprite+=y_multi-1;
 					for (i=0; i<y_multi; i++)
