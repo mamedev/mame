@@ -4169,14 +4169,14 @@ ROM_START( ddp3 )
 
 	ROM_REGION( 0x1c00000, "sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "a04401w064.u7",  0x0000000, 0x0800000, CRC(ed229794) SHA1(1cf1863495a18c7c7d277a9be43ec116b00960b0) ) //image-1
-	ROM_LOAD( "a04402w064.u8",  0x0800000, 0x0800000, CRC(f7816273) SHA1(dfa76e29cfe4fc03a9c0e1d932b244581f3bb9c4) ) //image-2
+	ROM_LOAD( "a04402w064.u8",  0x0800000, 0x0800000, BAD_DUMP CRC(f7816273) SHA1(dfa76e29cfe4fc03a9c0e1d932b244581f3bb9c4) ) //image-2 - bad dump: checksum does not match rom label
 
 	ROM_REGION( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
-	ROM_LOAD( "b04401w064.u1",  0x0000000, 0x0800000, CRC(830aab7d) SHA1(1829197457b401b203360a76ee345108df9c4b24) ) //bitmap-1
+	ROM_LOAD( "b04401w064.u1",  0x0000000, 0x0800000, BAD_DUMP CRC(830aab7d) SHA1(1829197457b401b203360a76ee345108df9c4b24) ) //bitmap-1 - bad dump: checksum does not match rom label
 
 	ROM_REGION( 0x1000000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
 	ROM_LOAD( "pgm_m01s.rom", 0x000000, 0x200000, CRC(45ae7159) SHA1(d3ed3ff3464557fd0df6b069b2e431528b0ebfa8) ) // same as standard PGM bios
-	ROM_LOAD( "m04401b032.u17",  0x400000, 0x400000, CRC(a118560c) SHA1(3e99bb2adbc9d464d79aa8723f0d40305ea821ca) ) //music-1
+	ROM_LOAD( "m04401b032.u17",  0x400000, 0x400000, BAD_DUMP CRC(a118560c) SHA1(3e99bb2adbc9d464d79aa8723f0d40305ea821ca) ) //music-1 - bad dump: checksum does not match rom label
 
 	ROM_REGION( 0x20000, "sram", 0 ) /* default settings */
 	ROM_LOAD( "ddp3_defaults.nv",  0x0000000, 0x020000, CRC(571e96c0) SHA1(348940c77ca348213331b85b9b1d3aabb96a528a) )
@@ -4200,14 +4200,14 @@ ROM_START( ddp3a )
 
 	ROM_REGION( 0x1c00000, "sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "a04401w064.u7",  0x0000000, 0x0800000, CRC(ed229794) SHA1(1cf1863495a18c7c7d277a9be43ec116b00960b0) ) //image-1
-	ROM_LOAD( "a04402w064.u8",  0x0800000, 0x0800000, CRC(f7816273) SHA1(dfa76e29cfe4fc03a9c0e1d932b244581f3bb9c4) ) //image-2
+	ROM_LOAD( "a04402w064.u8",  0x0800000, 0x0800000, BAD_DUMP CRC(f7816273) SHA1(dfa76e29cfe4fc03a9c0e1d932b244581f3bb9c4) ) //image-2 - bad dump: checksum does not match rom label
 
 	ROM_REGION( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
-	ROM_LOAD( "b04401w064.u1",  0x0000000, 0x0800000, CRC(830aab7d) SHA1(1829197457b401b203360a76ee345108df9c4b24) ) //bitmap-1
+	ROM_LOAD( "b04401w064.u1",  0x0000000, 0x0800000, BAD_DUMP CRC(830aab7d) SHA1(1829197457b401b203360a76ee345108df9c4b24) ) //bitmap-1 - bad dump: checksum does not match rom label
 
 	ROM_REGION( 0x1000000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
 	ROM_LOAD( "pgm_m01s.rom", 0x000000, 0x200000, CRC(45ae7159) SHA1(d3ed3ff3464557fd0df6b069b2e431528b0ebfa8) ) // same as standard PGM bios
-	ROM_LOAD( "m04401b032.u17",  0x400000, 0x400000, CRC(a118560c) SHA1(3e99bb2adbc9d464d79aa8723f0d40305ea821ca) ) //music-1
+	ROM_LOAD( "m04401b032.u17",  0x400000, 0x400000, BAD_DUMP CRC(a118560c) SHA1(3e99bb2adbc9d464d79aa8723f0d40305ea821ca) ) //music-1 - bad dump: checksum does not match rom label
 
 	ROM_REGION( 0x20000, "sram", 0 ) /* default settings */
 	ROM_LOAD( "ddp3_defaults.nv",  0x0000000, 0x020000, CRC(571e96c0) SHA1(348940c77ca348213331b85b9b1d3aabb96a528a) )
@@ -4230,14 +4230,14 @@ ROM_START( ddp3b )
 
 	ROM_REGION( 0x1c00000, "sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "a04401w064.u7",  0x0000000, 0x0800000, CRC(ed229794) SHA1(1cf1863495a18c7c7d277a9be43ec116b00960b0) ) //image-1
-	ROM_LOAD( "a04402w064.u8",  0x0800000, 0x0800000, CRC(f7816273) SHA1(dfa76e29cfe4fc03a9c0e1d932b244581f3bb9c4) ) //image-2
+	ROM_LOAD( "a04402w064.u8",  0x0800000, 0x0800000, BAD_DUMP CRC(f7816273) SHA1(dfa76e29cfe4fc03a9c0e1d932b244581f3bb9c4) ) //image-2 - bad dump: checksum does not match rom label
 
 	ROM_REGION( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
-	ROM_LOAD( "b04401w064.u1",  0x0000000, 0x0800000, CRC(830aab7d) SHA1(1829197457b401b203360a76ee345108df9c4b24) ) //bitmap-1
+	ROM_LOAD( "b04401w064.u1",  0x0000000, 0x0800000, BAD_DUMP CRC(830aab7d) SHA1(1829197457b401b203360a76ee345108df9c4b24) ) //bitmap-1 - bad dump: checksum does not match rom label
 
 	ROM_REGION( 0x1000000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
 	ROM_LOAD( "pgm_m01s.rom", 0x000000, 0x200000, CRC(45ae7159) SHA1(d3ed3ff3464557fd0df6b069b2e431528b0ebfa8) ) // same as standard PGM bios
-	ROM_LOAD( "m04401b032.u17",  0x400000, 0x400000, CRC(a118560c) SHA1(3e99bb2adbc9d464d79aa8723f0d40305ea821ca) ) //music-1
+	ROM_LOAD( "m04401b032.u17",  0x400000, 0x400000, BAD_DUMP CRC(a118560c) SHA1(3e99bb2adbc9d464d79aa8723f0d40305ea821ca) ) //music-1 - bad dump: checksum does not match rom label
 
 	ROM_REGION( 0x20000, "sram", 0 ) /* default settings */
 	ROM_LOAD( "ddp3_defaults.nv",  0x0000000, 0x020000, CRC(571e96c0) SHA1(348940c77ca348213331b85b9b1d3aabb96a528a) )
@@ -4261,14 +4261,14 @@ ROM_START( ddp3blk )
 
 	ROM_REGION( 0x1c00000, "sprcol", 0 ) /* Sprite Colour Data */
 	ROM_LOAD( "a04401w064.u7",  0x0000000, 0x0800000, CRC(ed229794) SHA1(1cf1863495a18c7c7d277a9be43ec116b00960b0) ) //image-1
-	ROM_LOAD( "a04402w064.u8",  0x0800000, 0x0800000, CRC(f7816273) SHA1(dfa76e29cfe4fc03a9c0e1d932b244581f3bb9c4) ) //image-2
+	ROM_LOAD( "a04402w064.u8",  0x0800000, 0x0800000, BAD_DUMP CRC(f7816273) SHA1(dfa76e29cfe4fc03a9c0e1d932b244581f3bb9c4) ) //image-2 - bad dump: checksum does not match rom label
 
 	ROM_REGION( 0x1000000, "sprmask", 0 ) /* Sprite Masks + Colour Indexes */
-	ROM_LOAD( "b04401w064.u1",  0x0000000, 0x0800000, CRC(830aab7d) SHA1(1829197457b401b203360a76ee345108df9c4b24) ) //bitmap-1
+	ROM_LOAD( "b04401w064.u1",  0x0000000, 0x0800000, BAD_DUMP CRC(830aab7d) SHA1(1829197457b401b203360a76ee345108df9c4b24) ) //bitmap-1 - bad dump: checksum does not match rom label
 
 	ROM_REGION( 0x1000000, "ics", 0 ) /* Samples - (8 bit mono 11025Hz) - */
 	ROM_LOAD( "pgm_m01s.rom", 0x000000, 0x200000, CRC(45ae7159) SHA1(d3ed3ff3464557fd0df6b069b2e431528b0ebfa8) ) // same as standard PGM bios
-	ROM_LOAD( "m04401b032.u17",  0x400000, 0x400000, CRC(a118560c) SHA1(3e99bb2adbc9d464d79aa8723f0d40305ea821ca) ) //music-1
+	ROM_LOAD( "m04401b032.u17",  0x400000, 0x400000, BAD_DUMP CRC(a118560c) SHA1(3e99bb2adbc9d464d79aa8723f0d40305ea821ca) ) //music-1 - bad dump: checksum does not match rom label
 
 	ROM_REGION( 0x20000, "sram", 0 ) /* NVRAM with factory programmed values - needed to boot */
 	ROM_LOAD( "ddp3blk_defaults.nv",  0x0000000, 0x020000, CRC(a1651904) SHA1(5b80d3c4c764895c40953a66161d4dd84f742604) )
