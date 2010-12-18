@@ -478,6 +478,22 @@ static ADDRESS_MAP_START( trvwhziv_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(palette_r, palette_w)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( dtrvwz5_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x7fff) AM_ROM
+	AM_RANGE(0x8000, 0x9fff) AM_RAM AM_SHARE("nvram")
+	AM_RANGE(0xb000, 0xb0ff) AM_ROM /* protection? code jumps here */
+	AM_RANGE(0xc004, 0xc007) AM_MIRROR(0x1df0) AM_DEVREADWRITE("ppi8255_0", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xc008, 0xc00b) AM_MIRROR(0x1df0) AM_DEVREADWRITE("ppi8255_1", ppi8255_r, ppi8255_w)
+	AM_RANGE(0xce00, 0xceff) AM_READWRITE(questions_r, high_offset_w)
+	AM_RANGE(0xd600, 0xd6ff) AM_WRITE(low_offset_w)
+	AM_RANGE(0xda00, 0xdaff) AM_WRITE(med_offset_w)
+	AM_RANGE(0xe000, 0xe000) AM_MIRROR(0x05f0) AM_DEVWRITE("crtc", mc6845_address_w)
+	AM_RANGE(0xe001, 0xe001) AM_MIRROR(0x05f0) AM_DEVWRITE("crtc", mc6845_register_w)
+	AM_RANGE(0xe800, 0xefff) AM_RAM AM_BASE(&ram_attr)
+	AM_RANGE(0xf000, 0xf7ff) AM_RAM AM_BASE(&ram_video)
+	AM_RANGE(0xf800, 0xfbff) AM_READWRITE(palette_r, palette_w)
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( couple_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x7fff) AM_ROM
 	AM_RANGE(0x8000, 0x9fff) AM_ROMBANK("bank1")
@@ -789,6 +805,33 @@ static INPUT_PORTS_START( trvwhziv )
 	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unknown ) )	/* no coinage DSW */
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( dtrvwh5 )
+	PORT_INCLUDE( trivia )
+
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x01, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x02, 0x02, "Answers Shown" )
+	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x08, 0x08, "Hi Scores Retained" )
+	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x10, 0x10, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x10, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x20, 0x20, DEF_STR( Unused ) )
+	PORT_DIPSETTING(    0x20, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+	PORT_DIPNAME( 0x80, 0x80, "Coctail Type" )
+	PORT_DIPSETTING(    0x80, "Regular Coctail" )
+	PORT_DIPSETTING(    0x00, "Single Side Coctail" )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( pitboss )
@@ -1243,6 +1286,13 @@ static MACHINE_CONFIG_DERIVED( trvwhiz, pitboss )
 	MDRV_CPU_IO_MAP(trvwhiz_io_map)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( dtrvwz5, pitboss )
+
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_PROGRAM_MAP(dtrvwz5_map)
+	MDRV_CPU_IO_MAP(tictac_io_map)
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_DERIVED( phrcraze, pitboss )
 
 	MDRV_CPU_MODIFY("maincpu")
@@ -1649,6 +1699,31 @@ ROM_START( trvwz4a )
 	ROM_LOAD( "merit2_5.0",  0x08000, 0x8000, CRC(e07d139f) SHA1(e364dcc628719c1bcdc119bdb2f3c98b5538c411) ) // sex trivia III
 ROM_END
 
+ROM_START( dtrvwz5 )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "6221-70_u5-0a.u5", 0x0000, 0x8000, CRC(e5917a71) SHA1(2acebe337600cd490da1c6fb2d83e2e378e584f1) )
+
+	ROM_REGION( 0x6000, "gfx1", 0 )
+	ROM_LOAD( "trv3.u39", 0x0000, 0x2000, CRC(81a34357) SHA1(87ae9db78f043dbdcd1d50473fc09284eceaf884) )
+	ROM_LOAD( "trv3.u38", 0x2000, 0x2000, CRC(c4082020) SHA1(744dc8745f3d54754184571b64664ee5c1497fb4) )
+	ROM_LOAD( "trv3.u37", 0x4000, 0x2000, CRC(5e5e6fb3) SHA1(c182233367de6c9cda0e49a5958bb07460a5f300) )
+
+	ROM_REGION( 0x2000, "gfx2", 0 )
+	ROM_LOAD( "trv3.u40", 0x0000, 0x2000, CRC(a2c934f2) SHA1(214cc1f47c11618457a7885712585c977107cab7) )
+
+	ROM_REGION( 0xa0000, "user1", ROMREGION_ERASEFF ) /* questions */
+	ROM_LOAD( "tw5-06_fif-1.1",  0x08000, 0x8000, CRC(300f245c) SHA1(9c380000ba5a6c826025e32f0e46932e234b46bc) )
+	ROM_LOAD( "tw5-06_fif-2.2",  0x18000, 0x8000, CRC(99ee9cbe) SHA1(d6a4a604a070436b0acb1c774687f6c2266c8807) )
+	ROM_LOAD( "tw5-06_six-1.3",  0x28000, 0x8000, CRC(87354939) SHA1(6e3de6df944da75e28d36dce3cca9b45a8936bf4) )
+	ROM_LOAD( "tw5-06_six-2.4",  0x38000, 0x8000, CRC(ea8ed7ae) SHA1(2c084a88773e6f611a6cc6d847b9d74f5c8bfc77) )
+	ROM_LOAD( "tw5-06_sev-1.5",  0x48000, 0x8000, CRC(fd5099aa) SHA1(81e978597aa348c77001f72763744491cfdad1d1) )
+	ROM_LOAD( "tw5-06_sev-2.6",  0x58000, 0x8000, CRC(523520c8) SHA1(7dff9cda1ade5d3b4e573e77b7ec93ee8ae13c86) )
+	ROM_LOAD( "tw5-06_eig-1.7",  0x68000, 0x8000, CRC(3a2a4562) SHA1(45565622d7057047b02050dcd34ff6f02663507d) )
+	ROM_LOAD( "tw5-06_eig-2.8",  0x78000, 0x8000, CRC(cb7e9035) SHA1(d3344fb318f2241c07933c4b8e3525c219ea3aa6) )
+	ROM_LOAD( "tw5-06_sx5-1.9",  0x88000, 0x8000, CRC(6ae2a208) SHA1(3cc935e616c247c6885319acc6a6ca92ee6fc3c0) )
+	ROM_LOAD( "tw5-06_sx5-2.10", 0x98000, 0x8000, CRC(790184fc) SHA1(9c8b56852b31d3312f26a5901487f6b31d9e9b4f) )
+ROM_END
+
 /*
 
 crt200 rev e-1
@@ -1962,6 +2037,34 @@ static DRIVER_INIT( couple )
 	memory_set_bankptr(machine, "bank1",ROM + 0x10000 + (0x2000 * 2));
 }
 
+static DRIVER_INIT( dtrvwz5 )
+{
+	int i;
+	UINT8 *ROM = memory_region(machine, "maincpu");
+	/* fill b000 - b0ff with ret 0xc9 */
+	for ( i = 0xb000; i < 0xb100; i++ )
+		ROM[i] = 0xc9;
+
+	ROM[0xb000] = 0xc9; /* ret */
+
+	/* called by subroutine which reads inputs */
+	ROM[0xb001] = 0x7a; /* ld   a,d */
+	ROM[0xb002] = 0xa4; /* and  h */
+	ROM[0xb003] = 0x47; /* ld   b,a */
+	ROM[0xb004] = 0x7b; /* ld   a,e */
+	ROM[0xb005] = 0xa5; /* and  l */
+	ROM[0xb006] = 0x4f; /* ld   c,a */
+	ROM[0xb007] = 0x7a; /* ld   a,d */
+	ROM[0xb008] = 0xb4; /* or   h */
+	ROM[0xb009] = 0x57; /* ld   d,a */
+	ROM[0xb00a] = 0x7b; /* ld   a,e */
+	ROM[0xb00b] = 0xb5; /* or   l */
+	ROM[0xb00c] = 0x5f; /* ld   e,a */
+	ROM[0xb00a] = 0xc9; /* ret */
+
+	decryption_key = 6;
+}
+
 GAME( 1983, pitboss,  0,       pitboss,  pitboss,  0,      ROT0,  "Merit", "The Pit Boss (Set 1)",                        GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
 GAME( 1983, pitbossa, pitboss, pitboss,  pitboss,  0,      ROT0,  "Merit", "The Pit Boss (Set 2)",                        GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
 GAME( 1983, pitbossb, pitboss, pitboss,  pitboss,  0,      ROT0,  "Merit", "The Pit Boss (Set 3)",                        GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS )
@@ -1985,7 +2088,7 @@ GAME( 1985, trvwz3v,  trvwz3h, trvwhiz,  trivia,   key_0,  ROT90, "Merit", "Triv
 GAME( 1985, trvwz4,   0,       trvwhziv, trvwhziv, key_5,  ROT90, "Merit", "Trivia ? Whiz (Edition 4) (question set 1)",  GAME_SUPPORTS_SAVE )
 GAME( 1985, trvwz4a,  trvwz4,  trvwhziv, trvwhziv, key_5,  ROT90, "Merit", "Trivia ? Whiz (Edition 4) (question set 2)",  GAME_SUPPORTS_SAVE )
 
-GAME( 1985, tictac,   0,       tictac,   tictac,   key_4,  ROT0,  "Merit", "Tic Tac Trivia (Horizontal",                  GAME_SUPPORTS_SAVE )
+GAME( 1985, tictac,   0,       tictac,   tictac,   key_4,  ROT0,  "Merit", "Tic Tac Trivia (Horizontal)",                 GAME_SUPPORTS_SAVE )
 GAME( 1985, tictacv,  tictac,  tictac,   tictac,   key_4,  ROT90, "Merit", "Tic Tac Trivia (Vertical)",                   GAME_SUPPORTS_SAVE )
 
 GAME( 1986, phrcraze, 0,       phrcraze, phrcraze, key_7,  ROT0,  "Merit", "Phraze Craze (set 1)",                        GAME_SUPPORTS_SAVE )
@@ -1997,6 +2100,8 @@ GAME( 1986, phrcrazev,phrcraze,phrcraze, phrcrazs, key_7,  ROT90, "Merit", "Phra
 GAME( 1986, bigappg,  0,       bigappg,  bigappg,  0,      ROT0,  "Merit", "Big Apple Games",                             GAME_SUPPORTS_SAVE )
 
 GAME( 1986, dodge,    0,       dodge,    couple,   0,      ROT0,  "Merit", "Dodge City",                                  GAME_SUPPORTS_SAVE | GAME_IMPERFECT_GRAPHICS | GAME_NOT_WORKING )
+
+GAME( 1987, dtrvwz5,  0,       dtrvwz5,  dtrvwh5,  dtrvwz5,ROT0,  "Merit", "Deluxe Trivia ? Whiz (Edition 5)",  GAME_SUPPORTS_SAVE )
 
 GAME( 1988, couple,   0,       couple,   couple,   couple, ROT0,  "Merit", "The Couples (Set 1)",                         GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )
 GAME( 1988, couplep,  couple,  couple,   couplep,  couple, ROT0,  "Merit", "The Couples (Set 2)",                         GAME_IMPERFECT_GRAPHICS | GAME_UNEMULATED_PROTECTION )

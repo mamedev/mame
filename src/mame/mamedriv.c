@@ -9272,6 +9272,7 @@ Other Sun games
 	DRIVER( trvwz3v )	/* (c) 1985 Merit */
 	DRIVER( trvwz4 )	/* (c) 1985 Merit */
 	DRIVER( trvwz4a )	/* (c) 1985 Merit */
+	DRIVER( dtrvwz5 )	/* (c) 1987 Merit */
 	DRIVER( tictac )	/* (c) 1985 Merit */
 	DRIVER( tictacv )   /* (c) 1985 Merit */
 	DRIVER( phrcraze )	/* (c) 1986 Merit */
