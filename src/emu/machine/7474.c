@@ -327,4 +327,5 @@ void ttl7474_device::init()
     m_output = -1;
     m_last_clock = 1;
     m_last_output = -1;
+    m_last_output_comp = -1;
 }
