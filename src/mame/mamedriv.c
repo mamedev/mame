@@ -10321,6 +10321,10 @@ Other Sun games
 
 	/* Gnome */
 	DRIVER( gnome )		/* (c) 2007 */
+	DRIVER( gnome_2 )	/* (c) 2007 */
+
+	/* Sweet Life 2 */
+	DRIVER( sweetl2 )	/* (c) 2007 */
 
 	/* Igrosoft bootleg sets */
 
@@ -10415,6 +10419,8 @@ Other Sun games
 	DRIVER( gnomec )	/* bootleg */
 	DRIVER( gnomed )	/* bootleg */
 	DRIVER( gnomee )	/* bootleg */
+	DRIVER( gnome_2a )	/* bootleg */
+
 	/* Disney */
 	DRIVER( cdi )		/* Base unit */
 	DRIVER( quizard )	/* (c) Disney 1996 */

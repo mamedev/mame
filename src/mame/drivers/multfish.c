@@ -2289,6 +2289,41 @@ ROM_START( gnome ) // 070906
 	ROM_LOAD( "8_070906", 0x380000, 0x80000, CRC(c86a1586) SHA1(e622bca8dc618ca8edc1a7daa9c8286383caebef) )
 ROM_END
 
+ROM_START( gnome_2 ) // 071115
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "gn071115.rom", 0x00000, 0x40000, CRC(2fb768b8) SHA1(b0aadf057bd8a5b6cdcef5baed190c3d222256ca) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "1_070906", 0x000000, 0x80000, CRC(6ed866d7) SHA1(68d75d24d98e6d533cb26ceac0a680203cb26069) )
+	ROM_LOAD( "2_070906", 0x100000, 0x80000, CRC(f6e5e6f0) SHA1(9751e8df87f14a252595547d24b8dd865ee4f08d) )
+	ROM_LOAD( "3_070906", 0x200000, 0x80000, CRC(f8beb972) SHA1(3afbca8ce7e69d2dadae05f69205a6fd9036cf6a) )
+	ROM_LOAD( "4_070906", 0x300000, 0x80000, CRC(83357c38) SHA1(45cd31c4f02f9d7b1888701c2146d1e7229b6cb5) )
+	ROM_LOAD( "5_070906", 0x080000, 0x80000, CRC(687ad3e3) SHA1(23941a4f40c45029b9a43451f78b04c03c3cd7da) )
+	ROM_LOAD( "6_070906", 0x180000, 0x80000, CRC(7ef2b88a) SHA1(7e7de60fc6791731d7cfd6a50e2bc5af1bf5e4b2) )
+	ROM_LOAD( "7_070906", 0x280000, 0x80000, CRC(71976bdf) SHA1(c44dbfa75a0f12893b3177907fc93b3d5e8ad390) )
+	ROM_LOAD( "8_070906", 0x380000, 0x80000, CRC(c86a1586) SHA1(e622bca8dc618ca8edc1a7daa9c8286383caebef) )
+ROM_END
+
+
+/*********************************************************
+   Sweet Life 2
+**********************************************************/
+
+ROM_START( sweetl2 ) // 071217
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "sl2_071217.rom", 0x00000, 0x40000, CRC(b6299b02) SHA1(7051f9034bf3181d6f3dc66c0048c4a57685d2a8) )
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "1_071217", 0x000000, 0x80000, CRC(b1e6157c) SHA1(e042aaaf85b13865d56d1709be280f5a3d5c95e3) )
+	ROM_LOAD( "2_071217", 0x100000, 0x80000, CRC(8bc54047) SHA1(9179cf02376fec77ae50b5603de66754237698f8) )
+	ROM_LOAD( "3_071217", 0x200000, 0x80000, CRC(709c5d34) SHA1(d702576d70ebef667c77376effecc02abbaaa8cd) )
+	ROM_LOAD( "4_071217", 0x300000, 0x80000, CRC(7bcfa2ce) SHA1(8df894e9b7afa52e47e4dabd1802e878bbbeaa80) )
+	ROM_LOAD( "5_071217", 0x080000, 0x80000, CRC(5c385d43) SHA1(ddb362e5894d146ce90acbaafe9dd7aad2a7c242) )
+	ROM_LOAD( "6_071217", 0x180000, 0x80000, CRC(868fe1cb) SHA1(692679f8242950e009c30cc084c4ddc5d1963502) )
+	ROM_LOAD( "7_071217", 0x280000, 0x80000, CRC(6ce87282) SHA1(586e08994db4ca2b967d47b16ba5b458e240d30f) )
+	ROM_LOAD( "8_071217", 0x380000, 0x80000, CRC(c2ad2b74) SHA1(c78e3ca5d15acb17ee671d2205405f287ad9c464) )
+ROM_END
+
 
 /*********************************************************
    Fruit Cocktail 2
@@ -2470,7 +2505,10 @@ Most games had a revision in early 2007 to meet the standards of the "Government
 
 #define gnome_parent gnome
   GAME( 2007, gnome,       0,               multfish, multfish,  igrosoft, ROT0, "Igrosoft", "Gnome (070906 Russia)",  0 ) /* Russia */
+  GAME( 2007, gnome_2,     gnome_parent,    multfish, multfish,  igrosoft, ROT0, "Igrosoft", "Gnome (071115 Russia)",  0 ) /* Russia */
 
+#define sweetl2_parent sweetl2
+  GAME( 2007, sweetl2,     0,               multfish, multfish,  igrosoft, ROT0, "Igrosoft", "Sweet Life 2 (071217 Russia)",  0 ) /* Russia */
 
 /*************************************************************************************************************************************************************/
 /*************************************************************************************************************************************************************/
@@ -3874,6 +3912,22 @@ ROM_START( gnomee ) // 070906 custom alteras, modified graphics, bank F9, many t
 	ROM_LOAD( "bootleg_8a", 0x380000, 0x80000, CRC(658becb6) SHA1(7280ce53796326a48da8e461de8f78ea78a2f8c2) )
 ROM_END
 
+ROM_START( gnome_2a ) // 071115 bank F9
+	ROM_REGION( 0x40000, "maincpu", 0 ) // z80 code, banked
+	ROM_LOAD( "gn071115a.rom", 0x00000, 0x40000, CRC(97e74228) SHA1(6b4d108c6c59ec335c14f0e5ab990cc8782ed236) ) /* Not officially listed on Igrosoft's web site hash page */
+
+	ROM_REGION( 0x400000, "gfx", 0 )
+	ROM_LOAD( "1_070906", 0x000000, 0x80000, CRC(6ed866d7) SHA1(68d75d24d98e6d533cb26ceac0a680203cb26069) )
+	ROM_LOAD( "2_070906", 0x100000, 0x80000, CRC(f6e5e6f0) SHA1(9751e8df87f14a252595547d24b8dd865ee4f08d) )
+	ROM_LOAD( "3_070906", 0x200000, 0x80000, CRC(f8beb972) SHA1(3afbca8ce7e69d2dadae05f69205a6fd9036cf6a) )
+	ROM_LOAD( "4_070906", 0x300000, 0x80000, CRC(83357c38) SHA1(45cd31c4f02f9d7b1888701c2146d1e7229b6cb5) )
+	ROM_LOAD( "5_070906", 0x080000, 0x80000, CRC(687ad3e3) SHA1(23941a4f40c45029b9a43451f78b04c03c3cd7da) )
+	ROM_LOAD( "6_070906", 0x180000, 0x80000, CRC(7ef2b88a) SHA1(7e7de60fc6791731d7cfd6a50e2bc5af1bf5e4b2) )
+	ROM_LOAD( "7_070906", 0x280000, 0x80000, CRC(71976bdf) SHA1(c44dbfa75a0f12893b3177907fc93b3d5e8ad390) )
+	ROM_LOAD( "8_070906", 0x380000, 0x80000, CRC(c86a1586) SHA1(e622bca8dc618ca8edc1a7daa9c8286383caebef) )
+ROM_END
+
+
 GAME( 2002, mfish_3a,    mfish_parent,    multfish, multfish,  igrosoft,      ROT0,  "bootleg", "Multi Fish (bootleg, 021124, banking address hack)",  0 ) // bank F9
 GAME( 2002, mfish_12a,   mfish_parent,    multfish, multfish,  igrosoft,      ROT0,  "bootleg", "Multi Fish (bootleg, 040308, banking address hack)",  0 ) // bank F9
 
@@ -3977,3 +4031,5 @@ GAME( 2007, gnomeb,      gnome_parent,    multfish, multfish,  igrosoft,      RO
 GAME( 2007, gnomec,      gnome_parent,    multfish, multfish,  igrosoft,      ROT0, "bootleg",  "Gnome (bootleg, 070906, banking address hack set 3)",  0 ) // bank F9
 GAME( 2007, gnomed,      gnome_parent,    multfish, multfish,  custom_altera, ROT0, "bootleg",  "Gnome (bootleg, 070906, VIDEO GAME-1 GN01)",  0 ) // custom alteras, modified graphics, many texts changed, changed version text to "VIDEO GAME-1 GN01"
 GAME( 2007, gnomee,      gnome_parent,    multfish, multfish,  custom_altera, ROT0, "bootleg",  "Gnome (bootleg, 070906, LOTOS GN01)",  0 ) // custom alteras, modified graphics, bank F9, many texts changed, changed version text to "LOTOS GN01"
+GAME( 2007, gnome_2a,    gnome_parent,    multfish, multfish,  igrosoft,      ROT0, "bootleg",  "Gnome (bootleg, 071115, banking address hack)",  0 ) // bank F9
+
