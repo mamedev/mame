@@ -874,7 +874,7 @@ WRITE8_HANDLER( schaser_sh_port_2_w )
 	state->schaser_background_disable = (data >> 3) & 0x01;
 	state->schaser_background_select = (data >> 4) & 0x01;
 
-	state->c8080bw_flip_screen = data & 0x20;
+	state->c8080bw_flip_screen = (data & 0x20) && (input_port_read(space->machine, CABINET_PORT_TAG) & 0x01);
 
 	state->port_2_last_extra = data;
 }
