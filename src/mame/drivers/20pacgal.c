@@ -37,7 +37,7 @@
 
     Note: The "correct" size of the roms are 27C020 for the program rom and 27C256 for the
           graphics rom.  However genuine boards have been found with larger roms containing
-          the same data with the extra rom space banked out.
+          the same data with the extra rom space blanked out.
 
     Known issues/to-do's:
         * Starfield is not 100% accurate
