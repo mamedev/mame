@@ -53,6 +53,7 @@ VIDEO_START( vb )
 	bg_tilemap = tilemap_create(machine, get_bg_tile_info,background_scan, 8, 8,64,64);
 
 	tilemap_set_scroll_rows(bg_tilemap,32);
+	vball_gfxset=0;
 	vb_bgprombank=0xff;
 	vb_spprombank=0xff;
 }
