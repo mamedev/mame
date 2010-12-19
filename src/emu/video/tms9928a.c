@@ -281,13 +281,14 @@ WRITE8_HANDLER (TMS9928A_register_w) {
 	int reg;
 
 	if (tms.latch) {
+		/* set high part of read/write address */
+		tms.Addr = ((UINT16)data << 8 | (tms.Addr & 0xff)) & (tms.vramsize - 1);
+
 		if (data & 0x80) {
 			/* register write */
 			reg = data & 7;
 			change_register (space->machine, reg, tms.Addr & 0xff);
 		} else {
-			/* set high part of read/write address */
-			tms.Addr = ((UINT16)data << 8 | (tms.Addr & 0xff)) & (tms.vramsize - 1);
 			if ( !(data & 0x40) ) {
 				/* read ahead */
 				TMS9928A_vram_r	(space,0);
