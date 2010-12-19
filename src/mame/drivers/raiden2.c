@@ -274,6 +274,16 @@ READ16_MEMBER(raiden2_state::cop_status_r)
 	return cop_status;
 }
 
+READ16_MEMBER(raiden2_state::cop_angle_r)
+{
+	return cop_angle;
+}
+
+READ16_MEMBER(raiden2_state::cop_dist_r)
+{
+	return cop_dist;
+}
+
 WRITE16_MEMBER(raiden2_state::cop_scale_w)
 {
 	COMBINE_DATA(&cop_scale);
@@ -308,24 +318,31 @@ WRITE16_MEMBER(raiden2_state::cop_cmd_w)
 		space.write_dword(cop_regs[0] + 4 + offset*4, space.read_dword(cop_regs[0] + 4 + offset*4) + space.read_dword(cop_regs[0] + 16 + offset*4));
 		break;
 
+	case 0x130e:
 	case 0x138e: { // 130e 0005 bf7f 0010 - 0984 0aa4 0d82 0aa2 039b 0b9a 0b9a 0a9a
 		int dx = space.read_dword(cop_regs[1]+4) - space.read_dword(cop_regs[0]+4);
 		int dy = space.read_dword(cop_regs[1]+8) - space.read_dword(cop_regs[0]+8);
-		if(!dy)
+		if(!dy) {
 			cop_status |= 0x8000;
-		else {
-			UINT8 angle = atan(double(dx)/double(dy)) * 128 / M_PI;
-			if(dx<0)
-				angle += 0x80;
-			space.write_byte(cop_regs[0]+0x34, angle);
+			cop_angle = 0;
+		} else {
+			cop_angle = atan(double(dx)/double(dy)) * 128 / M_PI;
+			if(dy<0)
+				cop_angle += 0x80;
+		}
+		dx = dx >> 16;
+		dy = dy >> 16;
+		cop_dist = sqrt((double)(dx*dx+dy*dy));
+
+		if(data & 0x0080) {
+			space.write_byte(cop_regs[0]+0x34, cop_angle);
+			space.write_word(cop_regs[0]+0x38, cop_dist);
 		}
 		break;
 	}
 
 	case 0x3bb0: { // 3bb0 0004 007f 0038 - 0f9c 0b9c 0b9c 0b9c 0b9c 0b9c 0b9c 099c
-		int dx = (space.read_dword(cop_regs[1]+4) - space.read_dword(cop_regs[0]+4)) >> 16;
-		int dy = (space.read_dword(cop_regs[1]+8) - space.read_dword(cop_regs[0]+8)) >> 16;
-		space.write_word(cop_regs[0]+0x38, sqrt((double)(dx*dx+dy*dy)));
+		// called systematically after 130e/138e, no results expected it seems
 		break;
 	}
 
@@ -806,6 +823,8 @@ static ADDRESS_MAP_START( raiden2_mem, ADDRESS_SPACE_PROGRAM, 16, raiden2_state 
 	AM_RANGE(0x00500, 0x00503) AM_WRITE(cop_cmd_w)
 	AM_RANGE(0x00590, 0x00599) AM_READ(cop_itoa_digits_r)
 	AM_RANGE(0x005b0, 0x005b1) AM_READ(cop_status_r)
+	AM_RANGE(0x005b2, 0x005b3) AM_READ(cop_dist_r)
+	AM_RANGE(0x005b4, 0x005b5) AM_READ(cop_angle_r)
 
 	AM_RANGE(0x00620, 0x0062b) AM_WRITE(tile_scroll_w)
 	AM_RANGE(0x006a0, 0x006a3) AM_WRITE(sprcpt_val_1_w)

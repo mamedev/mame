@@ -26,14 +26,16 @@ public:
 	DECLARE_WRITE16_MEMBER( cop_cmd_w );
 	DECLARE_READ16_MEMBER ( cop_itoa_digits_r );
 	DECLARE_READ16_MEMBER ( cop_status_r );
+	DECLARE_READ16_MEMBER ( cop_dist_r );
+	DECLARE_READ16_MEMBER ( cop_angle_r );
 	DECLARE_WRITE16_MEMBER ( cop_dma_trigger_w );
 	DECLARE_WRITE16_MEMBER ( cop_tile_bank_2_w );
 	DECLARE_WRITE16_MEMBER ( tile_scroll_w );
 	DECLARE_WRITE16_MEMBER ( tile_bank_01_w );
 	DECLARE_WRITE16_MEMBER ( raiden2_background_w );
 	DECLARE_WRITE16_MEMBER ( raiden2_foreground_w );
-    DECLARE_WRITE16_MEMBER ( raiden2_midground_w );
-    DECLARE_WRITE16_MEMBER ( raiden2_text_w );
+	DECLARE_WRITE16_MEMBER ( raiden2_midground_w );
+	DECLARE_WRITE16_MEMBER ( raiden2_text_w );
 
 	DECLARE_WRITE16_MEMBER( sprcpt_val_1_w );
 	DECLARE_WRITE16_MEMBER( sprcpt_val_2_w );
@@ -62,7 +64,7 @@ public:
 
 	UINT16 scrollvals[6];
 	UINT32 cop_regs[4], cop_itoa;
-	UINT16 cop_status, cop_scale, cop_itoa_digit_count;
+	UINT16 cop_status, cop_scale, cop_itoa_digit_count, cop_angle, cop_dist;
 	UINT8 cop_itoa_digits[10];
 	UINT16 cop_dma_mode, cop_dma_adr, cop_dma_size, cop_dma_v1, cop_dma_v2, cop_dma_v3;
 	UINT16 sprites[0x800], sprites_cur_start;
