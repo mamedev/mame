@@ -299,7 +299,8 @@ static void update_irq_lines(running_machine *machine, int param)
 
 WRITE8_HANDLER( seibu_irq_clear_w )
 {
-	update_irq_lines(space->machine, VECTOR_INIT);
+	/* Denjin Makai and SD Gundam doesn't like this, it's tied to the rst18 ack ONLY so it could be related to it. */
+	//update_irq_lines(space->machine, VECTOR_INIT);
 }
 
 WRITE8_HANDLER( seibu_rst10_ack_w )
@@ -409,8 +410,6 @@ WRITE16_HANDLER( seibu_main_word_w )
 				main2sub[offset] = data;
 				break;
 			case 4:
-				if (strcmp(space->machine->gamedrv->name, "sdgndmps") == 0 || strcmp(space->machine->gamedrv->name, "denjinmk") == 0)
-					update_irq_lines(space->machine, RST10_ASSERT);
 				update_irq_lines(space->machine, RST18_ASSERT);
 				break;
 			case 2: //Sengoku Mahjong writes here
