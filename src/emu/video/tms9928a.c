@@ -135,7 +135,7 @@ static void (*const ModeHandlers[])(running_device *screen, bitmap_t *bitmap, co
 
 typedef struct {
     /* TMS9928A internal settings */
-    UINT8 ReadAhead,Regs[8],StatusReg,FirstByte,latch,INT;
+    UINT8 ReadAhead,Regs[8],StatusReg,latch,INT;
     INT32 Addr;
     int colour,pattern,nametbl,spriteattribute,spritepattern;
     int colourmask,patternmask;
@@ -173,7 +173,6 @@ void TMS9928A_reset () {
     tms.spritepattern = tms.spriteattribute = 0;
     tms.colourmask = tms.patternmask = 0;
     tms.Addr = tms.ReadAhead = tms.INT = 0;
-    tms.FirstByte = 0;
 	tms.latch = 0;
 }
 
@@ -222,7 +221,6 @@ static void TMS9928A_start (running_machine *machine, const TMS9928a_interface *
 	state_save_register_item(machine, "tms9928a", NULL, 0, tms.Regs[7]);
 	state_save_register_item(machine, "tms9928a", NULL, 0, tms.StatusReg);
 	state_save_register_item(machine, "tms9928a", NULL, 0, tms.ReadAhead);
-	state_save_register_item(machine, "tms9928a", NULL, 0, tms.FirstByte);
 	state_save_register_item(machine, "tms9928a", NULL, 0, tms.latch);
 	state_save_register_item(machine, "tms9928a", NULL, 0, tms.Addr);
 	state_save_register_item(machine, "tms9928a", NULL, 0, tms.INT);
@@ -282,25 +280,25 @@ READ8_HANDLER (TMS9928A_register_r) {
 WRITE8_HANDLER (TMS9928A_register_w) {
 	int reg;
 
-    if (tms.latch) {
-        if (data & 0x80) {
-            /* register write */
+	if (tms.latch) {
+		if (data & 0x80) {
+			/* register write */
 			reg = data & 7;
-			/*if (tms.FirstByte != tms.Regs[reg])*/ /* Removed to fix ColecoVision MESS Driver*/
-	            change_register (space->machine, reg, tms.FirstByte);
-        } else {
-            /* set read/write address */
-            tms.Addr = ((UINT16)data << 8 | tms.FirstByte) & (tms.vramsize - 1);
-            if ( !(data & 0x40) ) {
+			change_register (space->machine, reg, tms.Addr & 0xff);
+		} else {
+			/* set high part of read/write address */
+			tms.Addr = ((UINT16)data << 8 | (tms.Addr & 0xff)) & (tms.vramsize - 1);
+			if ( !(data & 0x40) ) {
 				/* read ahead */
 				TMS9928A_vram_r	(space,0);
-            }
-        }
-        tms.latch = 0;
-    } else {
-        tms.FirstByte = data;
+			}
+		}
+		tms.latch = 0;
+	} else {
+		/* set low part of read/write address */
+		tms.Addr = ((tms.Addr & 0xff00) | data) & (tms.vramsize - 1);
 		tms.latch = 1;
-    }
+	}
 }
 
 static void change_register (running_machine *machine, int reg, UINT8 val) {
