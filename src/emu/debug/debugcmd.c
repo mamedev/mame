@@ -1834,7 +1834,8 @@ static void execute_cheatnext(running_machine *machine, int ref, int params, con
 		CHEAT_DECREASEOF,
 		CHEAT_INCREASEOF,
 		CHEAT_SMALLEROF,
-		CHEAT_GREATEROF
+		CHEAT_GREATEROF,
+		CHEAT_CHANGEDBY
 	};
 
 	if (cheat.cpu == 0)
@@ -1869,6 +1870,8 @@ static void execute_cheatnext(running_machine *machine, int ref, int params, con
 		condition = CHEAT_SMALLEROF;
 	else if (!strcmp(param[0], "greaterof") || !strcmp(param[0], "gt") || !strcmp(param[0], ">"))
 		condition = CHEAT_GREATEROF;
+	else if (!strcmp(param[0], "changedby") || !strcmp(param[0], "ch") || !strcmp(param[0], "~"))
+		condition = CHEAT_CHANGEDBY;
 	else
 	{
 		debug_console_printf(machine, "Invalid condition type\n");
@@ -1954,6 +1957,12 @@ static void execute_cheatnext(running_machine *machine, int ref, int params, con
 						disable_byte = ((INT64)cheat_value <= (INT64)comp_value);
 					else
 						disable_byte = ((UINT64)cheat_value <= (UINT64)comp_value);
+					break;
+				case CHEAT_CHANGEDBY:
+					if (cheat_value > comp_byte)
+						disable_byte = (cheat_value != comp_byte + comp_value);
+					else
+						disable_byte = (cheat_value != comp_byte - comp_value);
 					break;
 			}
 
