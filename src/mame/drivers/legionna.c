@@ -19,8 +19,6 @@ TODO
 
 Unemulated protection messes up both games.
 
-Sound System isn't working properly, hangs / denjinmk isn't happy with status without a hack
-
 
 Legionnaire
 -----------
@@ -35,11 +33,15 @@ The 0x104000 area appears to be extra paletteram?
 Denjin Makai
 ------------
 
-Palette Ram format correct,but color offset wrong?
-Probably protection related,game updates paletteram with rom data (or bad program rom?)..
+- Palette Ram format correct,but color offset wrong? Probably protection related,game updates paletteram with rom data (or bad program rom?)..
 
-Need a sound kludge to start.
+- Needs to patch a sound-related comm to make this to work, same as SD Gundam Psycho Salamander No Kyoui (68k never writes to port 6 for whatever reason).
 
+- There are a bunch of unemulated registers, one of them seems to be a brightness control of some sort. Needs a PCB side-by-side test.
+
+- backdrop color is ugly, especially noticeable in the port harbour stage (level 4). It should be dark blue or black but it's currently grey.
+
+- there are some ROM writes from time to time, could be a coding bug or something related to the protection.
 
 Godzilla
 --------
@@ -668,7 +670,9 @@ static INPUT_PORTS_START( grainbow )
 INPUT_PORTS_END
 
 static INPUT_PORTS_START( denjinmk )
-	SEIBU_COIN_INPUTS	/* coin inputs read through sound cpu */
+	PORT_START("COIN")		/* coin inputs read through sound cpu, an impulse of 4 frame is too much for this game, especially for coin 2 */
+	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_COIN1 ) PORT_IMPULSE(2)
+	PORT_BIT( 0x02, IP_ACTIVE_HIGH, IPT_COIN2 ) PORT_IMPULSE(2)
 
 	PORT_START("DSW1")
 	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
@@ -686,50 +690,48 @@ static INPUT_PORTS_START( denjinmk )
 	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Service_Mode ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Demo_Sounds ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( On ) )
+	PORT_SERVICE( 0x0040, IP_ACTIVE_LOW )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Language ) ) //it actually skips the story entirely, so just remain JP as default
+	PORT_DIPSETTING(      0x0080, DEF_STR( Japanese ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( English ) )
 
 	PORT_DIPNAME( 0x0f00, 0x0f00, DEF_STR( Coin_A ) )
 	PORT_DIPSETTING(      0x0200, DEF_STR( 4C_1C ) )
 	PORT_DIPSETTING(      0x0500, DEF_STR( 3C_1C ) )
 	PORT_DIPSETTING(      0x0800, DEF_STR( 2C_1C ) )
-	PORT_DIPSETTING(      0x0600, "3c 5c" )
+	PORT_DIPSETTING(      0x0600, "3 Coins / 5 Credits" )
 	PORT_DIPSETTING(      0x0400, DEF_STR( 3C_2C ) )
 	PORT_DIPSETTING(      0x0100, DEF_STR( 4C_3C ) )
-	PORT_DIPSETTING(      0x0f00, DEF_STR( 1C_1C ))
+	PORT_DIPSETTING(      0x0f00, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(      0x0300, DEF_STR( 3C_4C ) )
 	PORT_DIPSETTING(      0x0700, DEF_STR( 2C_3C ) )
-	PORT_DIPSETTING(      0x0e00, DEF_STR( 1C_2C ))
-	PORT_DIPSETTING(      0x0d00, DEF_STR( 1C_3C ))
-	PORT_DIPSETTING(      0x0c00, DEF_STR( 1C_4C ))
-	PORT_DIPSETTING(      0x0b00, DEF_STR( 1C_5C ))
-	PORT_DIPSETTING(      0x0a00, DEF_STR( 1C_6C ))
-	PORT_DIPSETTING(      0x0900, DEF_STR( 1C_7C ))
+	PORT_DIPSETTING(      0x0e00, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0x0d00, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(      0x0c00, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(      0x0b00, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(      0x0a00, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(      0x0900, DEF_STR( 1C_7C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
 	PORT_DIPNAME( 0xf000, 0xf000, DEF_STR( Coin_B ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( 4C_1C ) )
+	PORT_DIPSETTING(      0x5000, DEF_STR( 3C_1C ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( 2C_1C ) )
+	PORT_DIPSETTING(      0x6000, "3 Coins / 5 Credits" )
+	PORT_DIPSETTING(      0x4000, DEF_STR( 3C_2C ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( 4C_3C ) )
+	PORT_DIPSETTING(      0xf000, DEF_STR( 1C_1C ) )
+	PORT_DIPSETTING(      0x3000, DEF_STR( 3C_4C ) )
+	PORT_DIPSETTING(      0x7000, DEF_STR( 2C_3C ) )
+	PORT_DIPSETTING(      0xe000, DEF_STR( 1C_2C ) )
+	PORT_DIPSETTING(      0xd000, DEF_STR( 1C_3C ) )
+	PORT_DIPSETTING(      0xc000, DEF_STR( 1C_4C ) )
+	PORT_DIPSETTING(      0xb000, DEF_STR( 1C_5C ) )
+	PORT_DIPSETTING(      0xa000, DEF_STR( 1C_6C ) )
+	PORT_DIPSETTING(      0x9000, DEF_STR( 1C_7C ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( Free_Play ) )
-	PORT_DIPSETTING(      0x1000, "1" )
-	PORT_DIPSETTING(      0x2000, "2" )
-	PORT_DIPSETTING(      0x3000, "3" )
-	PORT_DIPSETTING(      0x4000, "4" )
-	PORT_DIPSETTING(      0x5000, "5" )
-	PORT_DIPSETTING(      0x6000, "6" )
-	PORT_DIPSETTING(      0x7000, "7" )
-	PORT_DIPSETTING(      0x8000, "8" )
-	PORT_DIPSETTING(      0x9000, "9" )
-	PORT_DIPSETTING(      0xa000, "a" )
-	PORT_DIPSETTING(      0xb000, "b" )
-	PORT_DIPSETTING(      0xc000, "c" )
-	PORT_DIPSETTING(      0xd000, "d" )
-	PORT_DIPSETTING(      0xe000, "e" )
-	PORT_DIPSETTING(      0xf000, "f" )
 
 	PORT_START("PLAYERS12")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW,  IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
@@ -779,54 +781,7 @@ static INPUT_PORTS_START( denjinmk )
 	PORT_BIT( 0x8000, IP_ACTIVE_LOW,  IPT_UNKNOWN )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0xffff, IP_ACTIVE_LOW, IPT_UNUSED ) //unused according to the test mode
 INPUT_PORTS_END
 
 
@@ -2174,7 +2129,7 @@ GAME( 1992, heatbrlu, heatbrl,  heatbrl,  heatbrl,  0,         ROT0, "TAD Corpor
 
 GAME( 1993, godzilla, 0,        godzilla, godzilla, 0,         ROT0, "Banpresto", "Godzilla", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 1993, grainbow, 0,        grainbow, grainbow, 0,		   ROT0, "Banpresto", "SD Gundam Sangokushi Rainbow Tairiku Senki", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1993, denjinmk, 0,        denjinmk, denjinmk, denjinmk,  ROT0, "Banpresto", "Denjin Makai", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1993, denjinmk, 0,        denjinmk, denjinmk, denjinmk,  ROT0, "Banpresto", "Denjin Makai", GAME_IMPERFECT_GRAPHICS )
 
 GAME( 1992, cupsoc,   0,        cupsoc,   cupsoc,   0,         ROT0, "Seibu Kaihatsu", "Seibu Cup Soccer (set 1)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 1992, cupsoca,  cupsoc,   cupsoc,   cupsoc,   0,         ROT0, "Seibu Kaihatsu", "Seibu Cup Soccer (set 2)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
