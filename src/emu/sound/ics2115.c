@@ -177,9 +177,14 @@ static TIMER_CALLBACK( timer_cb_1 )
 
 static void recalc_timer(ics2115_state *chip, int timer)
 {
-	UINT64 period = 1000000000 * chip->timer[timer].scale*chip->timer[timer].preset / 33868800;
-	if (period)
-		period = 1000000000/62.8206;
+	UINT64 period;
+
+	if(chip->timer[timer].scale) {
+		int sc = chip->timer[timer].scale;
+		UINT64 counter = UINT64(((sc & 31)+1) * (chip->timer[timer].preset+1)) << (4+(sc >> 5));
+		period = 1000000000 * counter / 33868800;
+	} else
+		period = 0;
 
 	if (period)
 	{
