@@ -1212,6 +1212,13 @@ ROM_START( anteatgb )
 	ROM_LOAD( "colr6f.cpu",   0x0000, 0x0020, CRC(fce333c7) SHA1(f63a214dc47c5e7c80db000b0b6a261ca8da6629) )
 ROM_END
 
+/*
+    Rescue
+
+    CPU/Video Board: A969 (Has various wire mods)
+    Sound Board:     ?
+*/
+
 ROM_START( rescue )
 	ROM_REGION( 0x10000, "maincpu", 0 )
 	ROM_LOAD( "rb15acpu.bin", 0x0000, 0x1000, CRC(d7e654ba) SHA1(6bcf7a6d86bc2de9a304f0aa9542fdcb58ca73dd) )

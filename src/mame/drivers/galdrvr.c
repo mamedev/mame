@@ -2306,10 +2306,10 @@ static INPUT_PORTS_START( scobra )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
 	PORT_START("IN1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Allow_Continue ) )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("H2:2")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x01, "4 Times" )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Lives ) ) PORT_DIPLOCATION("H2:1")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x02, "4" )
 	PORT_BIT( 0x04, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_COCKTAIL
@@ -2321,12 +2321,12 @@ static INPUT_PORTS_START( scobra )
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN )  PORT_8WAY PORT_COCKTAIL
-	PORT_DIPNAME( 0x06, 0x02, DEF_STR( Coinage ) )                    /* see notes */
+	PORT_DIPNAME( 0x06, 0x02, DEF_STR( Coinage ) ) PORT_DIPLOCATION("H2:4,5") /* see notes */
 	PORT_DIPSETTING(    0x04, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x06, DEF_STR( 4C_3C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x00, "99 Credits" )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Cabinet ) ) PORT_DIPLOCATION("H2:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x08, DEF_STR( Cocktail ) )
 	PORT_BIT( 0x10, IP_ACTIVE_LOW, IPT_JOYSTICK_UP )    PORT_8WAY
@@ -2343,10 +2343,10 @@ static INPUT_PORTS_START( scobras )
 	PORT_INCLUDE(scobra)
 
 	PORT_MODIFY("IN1")
-	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Allow_Continue ) )
+	PORT_DIPNAME( 0x01, 0x01, DEF_STR( Allow_Continue ) ) PORT_DIPLOCATION("H2:2")
 	PORT_DIPSETTING(    0x00, DEF_STR( No ) )
 	PORT_DIPSETTING(    0x01, "255 Times" )
-	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x02, 0x00, DEF_STR( Lives ) ) PORT_DIPLOCATION("H2:1")
 	PORT_DIPSETTING(    0x00, "3" )
 	PORT_DIPSETTING(    0x02, "5" )
 INPUT_PORTS_END
@@ -2652,7 +2652,7 @@ static INPUT_PORTS_START( losttomb )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_COIN1 )
 
 	PORT_START("IN1")
-	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x03, 0x01, DEF_STR( Lives ) ) PORT_DIPLOCATION("H2:1,2")
 	PORT_DIPSETTING(    0x01, "3" )
 	PORT_DIPSETTING(    0x02, "5" )
 	PORT_DIPSETTING(    0x03, DEF_STR( Free_Play ) )                  /* see notes */
@@ -2666,12 +2666,12 @@ static INPUT_PORTS_START( losttomb )
 
 	PORT_START("IN2")
 	PORT_BIT( 0x01, IP_ACTIVE_LOW, IPT_UNUSED )
-	PORT_DIPNAME( 0x06, 0x02, DEF_STR( Coinage ) )
+	PORT_DIPNAME( 0x06, 0x02, DEF_STR( Coinage ) ) PORT_DIPLOCATION("H2:4,5")
 	PORT_DIPSETTING(    0x02, "A 1/1  B 1/1" )
 	PORT_DIPSETTING(    0x00, "A 1/2  B 2/1" )
 	PORT_DIPSETTING(    0x04, "A 1/3  B 3/1" )
 	PORT_DIPSETTING(    0x06, "A 1/4  B 4/1" )
-	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) )                /* see notes */
+	PORT_DIPNAME( 0x08, 0x00, DEF_STR( Demo_Sounds ) ) PORT_DIPLOCATION("H2:3") /* see notes */
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 	PORT_BIT( 0xf0, IP_ACTIVE_LOW, IPT_UNUSED )
@@ -6140,7 +6140,12 @@ GAME( 1983, skelagon, sfx,      sfx,      sfx,      sfx,      ORIENTATION_FLIP_X
 GAME( 1982, monsterz, 0,        sfx,      sfx,      sfx,      ORIENTATION_FLIP_X, "Nihon Game", "Monster Zero", GAME_UNEMULATED_PROTECTION | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING )
 
 
-/* scobra */
+/*
+    Super Cobra
+
+    CPU/Video Board: A969
+    Sound Board:     A970
+*/
 GAME( 1981, scobra,    0,        scobra,   scobra,    scobra,   ROT90,  "Konami", "Super Cobra", GAME_SUPPORTS_SAVE )
 GAME( 1981, scobrase,  scobra,   scobra,   scobra,    scobra,   ROT90,  "Konami (Sega license)", "Super Cobra (Sega)", GAME_SUPPORTS_SAVE )
 GAME( 1981, scobras,   scobra,   scobra,   scobras,   scobra,   ROT90,  "Konami (Stern Electronics license)", "Super Cobra (Stern Electronics)", GAME_SUPPORTS_SAVE )
@@ -6155,10 +6160,22 @@ GAME( 1981, armorcar2, armorcar, scobra,   armorcar2, scobra,   ROT90,  "Stern E
 
 GAME( 1982, tazmania,  0,        scobra,   tazmania,  scobra,   ROT90,  "Stern Electronics", "Tazz-Mania (set 1)", GAME_SUPPORTS_SAVE )
 
+/*
+    Anteater
+
+    CPU/Video Board: A969 (Has various wire mods)
+    Sound Board:     A970
+*/
 GAME( 1982, anteater,  0,        anteater, anteater,  anteater, ROT90,  "Stern Electronics (Tago license)", "Anteater", GAME_SUPPORTS_SAVE )
 
 GAME( 1982, calipso,   0,        scobra,   calipso,   calipso,  ROT90,  "Stern Electronics (Tago license)", "Calipso", GAME_SUPPORTS_SAVE )
 
+/*
+    Lost Tomb
+
+    CPU/Video Board: A969 (Has various wire mods)
+    Sound Board:     A2048
+*/
 GAME( 1982, losttomb,  0,        scobra,   losttomb,  losttomb, ROT90,  "Stern Electronics", "Lost Tomb (easy)", GAME_SUPPORTS_SAVE )
 GAME( 1982, losttombh, losttomb, scobra,   losttomb,  losttomb, ROT90,  "Stern Electronics", "Lost Tomb (hard)", GAME_SUPPORTS_SAVE )
 
