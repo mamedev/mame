@@ -376,7 +376,7 @@ static MACHINE_CONFIG_START( pachifev, pachifev_state )
     MDRV_FRAGMENT_ADD(tms9928a)
     MDRV_SCREEN_MODIFY("screen")
     MDRV_SCREEN_REFRESH_RATE((float)XTAL_10_738635MHz/2/342/262)
-    MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+    MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(4395)) /* 69 lines */
 
     /* sound hardware */
     MDRV_SPEAKER_STANDARD_MONO("mono")
