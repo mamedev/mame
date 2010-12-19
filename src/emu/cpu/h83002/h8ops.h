@@ -64,6 +64,8 @@ static UINT8 h8_rotxl8(h83xx_state *h8, UINT8 src);
 static UINT16 h8_rotxl16(h83xx_state *h8, UINT16 src);
 static UINT32 h8_rotxl32(h83xx_state *h8, UINT32 src);
 
+static UINT16 h8_rotr16(h83xx_state *h8, UINT16 src);
+
 static UINT8 h8_rotxr8(h83xx_state *h8, UINT8 src);
 static UINT16 h8_rotxr16(h83xx_state *h8, UINT16 src);
 
@@ -520,7 +522,11 @@ static void h8_group0(h83xx_state *h8, UINT16 opcode)
 		h8_set_ccr(h8, udata8);
 		H8_IFETCH_TIMING(1)
 		break;
+	case 0x7:
 		// ldc
+		h8_set_ccr(h8, opcode & 0xff);
+		H8_IFETCH_TIMING(1)
+		break;
 	case 0x8:
 		// add.b rx, ry
 		dstreg = opcode & 0xf;
@@ -881,6 +887,13 @@ static void h8_group1(h83xx_state *h8, UINT16 opcode)
 			// rotxr.w Rx
 			udata16 = h8_getreg16(h8, opcode & 0xf);
 			udata16 = h8_rotxr16(h8, udata16);
+			h8_setreg16(h8, opcode & 0xf, udata16);
+			H8_IFETCH_TIMING(1);
+			break;
+		case 0x9:
+			// rotr.w Rx
+			udata16 = h8_getreg16(h8, opcode & 0xf);
+			udata16 = h8_rotr16(h8, udata16);
 			h8_setreg16(h8, opcode & 0xf, udata16);
 			H8_IFETCH_TIMING(1);
 			break;
@@ -2811,6 +2824,32 @@ static UINT8 h8_rotxr8(h83xx_state *h8, UINT8 src)
 
 	// N and Z modified
 	h8->h8nflag = (res>>7) & 1;
+	h8->h8vflag = 0;
+
+	// zflag
+	if(res==0)
+	{
+		h8->h8zflag = 1;
+	}
+	else
+	{
+		h8->h8zflag = 0;
+	}
+
+	return res;
+}
+
+static UINT16 h8_rotr16(h83xx_state *h8, UINT16 src)
+{
+	UINT16 res;
+
+	// rotate right, not through carry
+	res = src>>1;
+	if (src & 1) res |= 0x8000; // put cflag in upper bit
+	h8->h8cflag = src & 1;
+
+	// N and Z modified
+	h8->h8nflag = (res>>15) & 1;
 	h8->h8vflag = 0;
 
 	// zflag
