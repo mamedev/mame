@@ -108,7 +108,7 @@ ADDRESS_MAP_END
 #if USE_H8
 static READ16_HANDLER( test_r )
 {
-	return 0;//mame_rand(space->machine);
+	return mame_rand(space->machine);
 }
 
 static ADDRESS_MAP_START( csplayh5_sub_map, ADDRESS_SPACE_PROGRAM, 16 )
