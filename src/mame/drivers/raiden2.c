@@ -795,6 +795,28 @@ static MACHINE_RESET(raiden2)
 	//cop_init();
 }
 
+READ16_MEMBER(raiden2_state::raiden2_sound_comms_r)
+{
+	switch(offset)
+	{
+		case (0x008/2):	return seibu_main_word_r(&space,2,0xffff);
+		case (0x00c/2):	return seibu_main_word_r(&space,3,0xffff);
+		case (0x014/2): return seibu_main_word_r(&space,5,0xffff);
+	}
+
+	return 0xffff;
+}
+
+WRITE16_MEMBER(raiden2_state::raiden2_sound_comms_w)
+{
+	switch(offset)
+	{
+		case (0x000/2):	{ seibu_main_word_w(&space,0,data,0x00ff); break; }
+		case (0x004/2):	{ seibu_main_word_w(&space,1,data,0x00ff); break; }
+		case (0x010/2):	{ seibu_main_word_w(&space,4,data,0x00ff); break; }
+		case (0x018/2):	{ seibu_main_word_w(&space,6,data,0x00ff); break; }
+	}
+}
 
 
 /* MEMORY MAPS */
@@ -838,6 +860,8 @@ static ADDRESS_MAP_START( raiden2_mem, ADDRESS_SPACE_PROGRAM, 16, raiden2_state 
 	AM_RANGE(0x006cc, 0x006cd) AM_WRITE(tile_bank_01_w)
 	AM_RANGE(0x006ce, 0x006cf) AM_WRITE(sprcpt_flags_2_w)
 	AM_RANGE(0x006fc, 0x006fd) AM_WRITE(cop_dma_trigger_w)
+
+	AM_RANGE(0x00700, 0x0071f) AM_READWRITE(raiden2_sound_comms_r,raiden2_sound_comms_w)
 
 	AM_RANGE(0x00740, 0x00741) AM_READ_PORT("DSW")
 	AM_RANGE(0x00744, 0x00745) AM_READ_PORT("CONTROLS")

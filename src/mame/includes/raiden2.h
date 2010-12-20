@@ -56,6 +56,9 @@ public:
 	DECLARE_READ16_MEMBER( rdx_v33_unknown2_r );
 	DECLARE_READ16_MEMBER( nzerotea_unknown_r );
 
+	DECLARE_READ16_MEMBER( raiden2_sound_comms_r );
+	DECLARE_WRITE16_MEMBER( raiden2_sound_comms_w );
+
 	void common_reset();
 
 	tilemap_t *background_layer,*midground_layer,*foreground_layer,*text_layer;
