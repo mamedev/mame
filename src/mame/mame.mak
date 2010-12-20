@@ -1187,6 +1187,7 @@ $(MAMEOBJ)/seibu.a: \
 	$(DRIVERS)/panicr.o \
 	$(DRIVERS)/raiden.o $(VIDEO)/raiden.o \
 	$(DRIVERS)/raiden2.o $(MACHINE)/r2crypt.o \
+	$(DRIVERS)/r2dx_v33.o \
 	$(DRIVERS)/seibuspi.o $(MACHINE)/seibuspi.o $(VIDEO)/seibuspi.o \
 	$(VIDEO)/sei_crtc.o \
 	$(DRIVERS)/sengokmj.o \
