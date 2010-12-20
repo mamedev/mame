@@ -1082,5 +1082,8 @@ void ADDRESS_MAP_NAME(_name)(address_map &map, const device_config &devconfig) \
 // use this to refer to the owning device when providing a device tag
 static const char DEVICE_SELF[] = "";
 
+// use this to refer to the owning device's owner when providing a device tag
+static const char DEVICE_SELF_OWNER[] = "^";
+
 
 #endif	/* __ADDRMAP_H__ */

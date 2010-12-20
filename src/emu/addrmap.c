@@ -54,6 +54,11 @@ inline void map_handler_data::set_tag(const device_config &devconfig, const char
 		m_tag = NULL;
 	else if (strcmp(tag, DEVICE_SELF) == 0)
 		m_tag = devconfig.tag();
+	else if (strcmp(tag, DEVICE_SELF_OWNER) == 0)
+	{
+		assert(devconfig.owner() != NULL);
+		m_tag = devconfig.owner()->tag();
+	}
 	else
 		m_tag = devconfig.siblingtag(m_derived_tag, tag);
 }
