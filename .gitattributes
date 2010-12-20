@@ -1941,6 +1941,7 @@ src/mame/drivers/mgolf.c svneol=native#text/plain
 src/mame/drivers/mhavoc.c svneol=native#text/plain
 src/mame/drivers/micro3d.c svneol=native#text/plain
 src/mame/drivers/midas.c svneol=native#text/plain
+src/mame/drivers/midqslvr.c svneol=native#text/plain
 src/mame/drivers/midtunit.c svneol=native#text/plain
 src/mame/drivers/midvunit.c svneol=native#text/plain
 src/mame/drivers/midwunit.c svneol=native#text/plain

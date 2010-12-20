@@ -898,6 +898,7 @@ $(MAMEOBJ)/midway.a: \
 	$(DRIVERS)/mcr.o $(MACHINE)/mcr.o $(AUDIO)/mcr.o $(VIDEO)/mcr.o \
 	$(DRIVERS)/mcr3.o $(VIDEO)/mcr3.o \
 	$(DRIVERS)/mcr68.o $(MACHINE)/mcr68.o $(VIDEO)/mcr68.o \
+	$(DRIVERS)/midqslvr.o \
 	$(DRIVERS)/midtunit.o $(MACHINE)/midtunit.o $(VIDEO)/midtunit.o \
 	$(DRIVERS)/midvunit.o $(VIDEO)/midvunit.o \
 	$(DRIVERS)/midwunit.o $(MACHINE)/midwunit.o \

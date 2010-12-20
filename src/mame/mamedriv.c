@@ -7215,6 +7215,10 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( gauntdl24 )	/* (c) 1999 Midway Games */
 	DRIVER( cartfury )	/* (c) 2000 Midway Games */
 
+	/* Midway Quicksilver */
+	DRIVER( hydrthnd )  /* (c) 1999 Midway Games */
+	DRIVER( offrthnd )  /* (c) 2000 Midway Games */
+
 	/* Midway Touchmaster / Galaxy Games */
 	DRIVER( tm )		/* (c) 1996 Midway Games */
 	DRIVER( tmdo )		/* (c) 1996 Midway Games */
