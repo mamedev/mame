@@ -982,7 +982,7 @@ static void init_808x_common(legacy_cpu_device *device, device_irq_callback irqc
 		state->state_add(I8085_SP,     "SP",     cpustate->SP.w.l);
 		state->state_add(STATE_GENSP,  "GENSP",  cpustate->SP.w.l).noshow();
 		state->state_add(STATE_GENFLAGS, "GENFLAGS", cpustate->AF.b.l).noshow().formatstr("%8s");
-		state->state_add(I8085_A,      "A",      cpustate->AF.b.l).noshow();
+		state->state_add(I8085_A,      "A",      cpustate->AF.b.h).noshow();
 		state->state_add(I8085_B,      "B",      cpustate->BC.b.h).noshow();
 		state->state_add(I8085_C,      "C",      cpustate->BC.b.l).noshow();
 		state->state_add(I8085_D,      "D",      cpustate->DE.b.h).noshow();
