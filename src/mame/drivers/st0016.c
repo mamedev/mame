@@ -691,4 +691,4 @@ GAME(  1994, mayjisn2,	0,	  mayjinsn, mayjisn2, mayjisn2, ROT0, "Seta",  "Mayjin
 GAME(  1995, koikois,	 0,	  st0016, koikois, renju, ROT0, "Visco",  "Koi Koi Shimasho", GAME_IMPERFECT_GRAPHICS)
 /* Not working */
 GAME( 1994, mayjinsn,	0,	  mayjinsn, st0016,   mayjinsn, ROT0, "Seta",  "Mayjinsen",GAME_IMPERFECT_GRAPHICS|GAME_NOT_WORKING)
-GAME( 199?, dcrown,	0,	  st0016,   renju,    renju,    ROT0, "unknown", "Dream Crown", GAME_NOT_WORKING)
+GAME( 199?, dcrown,	0,	  st0016,   renju,    renju,    ROT0, "<unknown>", "Dream Crown", GAME_NOT_WORKING)

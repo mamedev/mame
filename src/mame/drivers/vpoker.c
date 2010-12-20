@@ -723,4 +723,4 @@ ROM_END
 
 
 GAME( 198?, vpoker,   0,     vpoker,  vpoker,   0,  ROT0, "Videotronics", "Videotronics Poker", GAME_NOT_WORKING | GAME_NO_SOUND )
-GAME( 198?, 5acespkr, 0,     vpoker,  5acespkr, 0,  ROT0, "Unknown",      "5-Aces Poker",       GAME_NOT_WORKING | GAME_NO_SOUND )
+GAME( 198?, 5acespkr, 0,     vpoker,  5acespkr, 0,  ROT0, "<unknown>",    "5-Aces Poker",       GAME_NOT_WORKING | GAME_NO_SOUND )
