@@ -4,6 +4,9 @@ Raiden 2 DX V33 Version
 
 Temporary split from raiden2.c, it'll be re-merged at some point.
 
+Note:
+Please don't do any state machine refactoring of this.
+
 */
 
 #include "emu.h"
@@ -14,13 +17,33 @@ Temporary split from raiden2.c, it'll be re-merged at some point.
 #include "sound/okim6295.h"
 #include "includes/raiden2.h"
 
+static UINT16 *seibu_crtc_regs;
+static UINT16 *tx_vram;
+static tilemap_t *tx_tilemap;
+
+static TILE_GET_INFO( get_tx_tile_info )
+{
+	int tile = tx_vram[tile_index];
+	int color = (tile>>12)&0xf;
+
+	tile &= 0xfff;
+
+	SET_TILE_INFO(4,tile,color,0);
+}
+
 static VIDEO_START( rdx_v33 )
 {
+	tx_tilemap       = tilemap_create(machine, get_tx_tile_info, tilemap_scan_rows,  8, 8, 64,32 );
 
+	tilemap_set_transparent_pen(tx_tilemap, 15);
 }
 
 static VIDEO_UPDATE( rdx_v33 )
 {
+	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+
+	tilemap_draw(bitmap, cliprect, tx_tilemap, 0, 0);
+
 	return 0;
 }
 
@@ -43,7 +66,7 @@ WRITE16_DEVICE_HANDLER( rdx_v33_eeprom_w )
 /* new zero team uses the copd3 protection... and uploads a 0x400 byte table, probably the mcu code, encrypted */
 
 
-static UINT16 mcu_prog[0x400];
+static UINT16 mcu_prog[0x800];
 static int mcu_prog_offs = 0;
 
 WRITE16_HANDLER( mcu_prog_w )
@@ -77,6 +100,12 @@ WRITE16_HANDLER( mcu_prog_offs_w )
 	mcu_prog_offs = data;
 }
 
+static WRITE16_HANDLER( rdx_tx_vram_w )
+{
+	COMBINE_DATA(&tx_vram[offset]);
+	tilemap_mark_tile_dirty(tx_tilemap, offset);
+}
+
 static ADDRESS_MAP_START( rdx_v33_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM // vectors copied here
 
@@ -86,27 +115,21 @@ static ADDRESS_MAP_START( rdx_v33_map, ADDRESS_SPACE_PROGRAM, 16 )
 //	AM_RANGE(0x00434, 0x00435) AM_READ(rdx_v33_unknown_r)
 //	AM_RANGE(0x00436, 0x00437) AM_READ(rdx_v33_unknown_r)
 
-//  AM_RANGE(0x00620, 0x00621) AM_WRITE(scroll_w) // scroll1
-//  AM_RANGE(0x00622, 0x00623) AM_WRITE(scroll_w) // scroll1
-
-//  AM_RANGE(0x00624, 0x00625) AM_WRITE(scroll_w) // scroll2
-//  AM_RANGE(0x00626, 0x00627) AM_WRITE(scroll_w) // scroll2
-
-//  AM_RANGE(0x00628, 0x00629) AM_WRITE(scroll_w) // scroll3
-//  AM_RANGE(0x0062a, 0x0062b) AM_WRITE(scroll_w) // scroll3
+	AM_RANGE(0x00600, 0x0064f) AM_RAM AM_BASE(&seibu_crtc_regs)
 
 	AM_RANGE(0x006b0, 0x006b1) AM_WRITE(mcu_prog_w)
 	AM_RANGE(0x006b2, 0x006b3) AM_WRITE(mcu_prog_w2)
 //	AM_RANGE(0x006b4, 0x006b5) AM_WRITENOP
 //	AM_RANGE(0x006b6, 0x006b7) AM_WRITENOP
 	AM_RANGE(0x006bc, 0x006bd) AM_WRITE(mcu_prog_offs_w)
+	AM_RANGE(0x006be, 0x006bf) AM_WRITENOP // MCU program related
 //  AM_RANGE(0x006d8, 0x006d9) AM_WRITE(bbbbll_w) // scroll?
 //	AM_RANGE(0x006dc, 0x006dd) AM_READ(rdx_v33_unknown2_r)
 //  AM_RANGE(0x006de, 0x006df) AM_WRITE(mcu_unkaa_w) // mcu command related?
-//	AM_RANGE(0x00700, 0x00701) AM_DEVWRITE_LEGACY("eeprom", rdx_v33_eeprom_w)
+	AM_RANGE(0x00700, 0x00701) AM_DEVWRITE("eeprom", rdx_v33_eeprom_w)
 //	AM_RANGE(0x00740, 0x00741) AM_READ(rdx_v33_unknown2_r)
-//	AM_RANGE(0x00744, 0x00745) AM_READ(r2_playerin_r)
-//	AM_RANGE(0x0074c, 0x0074d) AM_READ(rdx_v33_system_r)
+	AM_RANGE(0x00744, 0x00745) AM_READ_PORT("INPUT")
+	AM_RANGE(0x0074c, 0x0074d) AM_READ_PORT("SYSTEM")
 //	AM_RANGE(0x00762, 0x00763) AM_READ(rdx_v33_unknown2_r)
 
 	AM_RANGE(0x00780, 0x00781) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff) // single OKI chip on this version
@@ -114,34 +137,23 @@ static ADDRESS_MAP_START( rdx_v33_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00800, 0x0087f) AM_RAM // copies eeprom here?
 	AM_RANGE(0x00880, 0x0bfff) AM_RAM
 
-	AM_RANGE(0x0c000, 0x0cfff) AM_RAM// AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM//_WRITE(raiden2_background_w) AM_BASE(back_data)
-	AM_RANGE(0x0d800, 0x0dfff) AM_RAM//_WRITE(raiden2_foreground_w) AM_BASE(fore_data)
-	AM_RANGE(0x0e000, 0x0e7ff) AM_RAM//_WRITE(raiden2_midground_w)  AM_BASE(mid_data)
-	AM_RANGE(0x0e800, 0x0f7ff) AM_RAM//_WRITE(raiden2_text_w) AM_BASE(text_data)
+	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM// AM_BASE_GENERIC(spriteram)
+	AM_RANGE(0x0c800, 0x0cfff) AM_RAM
+	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM//_WRITE(seibucrtc_sc0vram_w) AM_BASE(&seibucrtc_sc0vram)
+	AM_RANGE(0x0d800, 0x0dfff) AM_RAM//_WRITE(seibucrtc_sc1vram_w) AM_BASE(&seibucrtc_sc1vram)
+	AM_RANGE(0x0e000, 0x0e7ff) AM_RAM//_WRITE(seibucrtc_sc2vram_w) AM_BASE(&seibucrtc_sc2vram)
+	AM_RANGE(0x0e800, 0x0f7ff) AM_RAM_WRITE(rdx_tx_vram_w) AM_BASE(&tx_vram)
 	AM_RANGE(0x0f800, 0x0ffff) AM_RAM /* Stack area */
 	AM_RANGE(0x10000, 0x1efff) AM_RAM
-	AM_RANGE(0x1f000, 0x1ffff) AM_RAM// AM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x1f000, 0x1ffff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 
-	/* not sure of bank sizes etc. */
-	AM_RANGE(0x20000, 0x2ffff) AM_ROMBANK("bank1")
-	AM_RANGE(0x30000, 0x3ffff) AM_ROMBANK("bank2")
-	AM_RANGE(0x40000, 0x4ffff) AM_ROMBANK("bank3")
-	AM_RANGE(0x50000, 0x5ffff) AM_ROMBANK("bank4")
-	AM_RANGE(0x60000, 0x6ffff) AM_ROMBANK("bank5")
-	AM_RANGE(0x70000, 0x7ffff) AM_ROMBANK("bank6")
-	AM_RANGE(0x80000, 0x8ffff) AM_ROMBANK("bank7")
-	AM_RANGE(0x90000, 0x9ffff) AM_ROMBANK("bank8")
-	AM_RANGE(0xa0000, 0xaffff) AM_ROMBANK("bank9")
-	AM_RANGE(0xb0000, 0xbffff) AM_ROMBANK("bank10")
-	AM_RANGE(0xc0000, 0xcffff) AM_ROMBANK("bank11")
-	AM_RANGE(0xd0000, 0xdffff) AM_ROMBANK("bank12")
-	AM_RANGE(0xe0000, 0xeffff) AM_ROMBANK("bank13")
-	AM_RANGE(0xf0000, 0xfffff) AM_ROMBANK("bank14")
+	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("bank1")
+	AM_RANGE(0x40000, 0xfffff) AM_ROM AM_REGION("mainprg", 0x40000 )
 ADDRESS_MAP_END
 
+
 static ADDRESS_MAP_START( nzerotea_map, ADDRESS_SPACE_PROGRAM, 16 )
-//  AM_RANGE(0x00400, 0x007ff) AM_READWRITE(raiden2_mcu_r, raiden2_mcu_w) AM_BASE(&cop_mcu_ram)
+	AM_RANGE(0x00000, 0x003ff) AM_RAM //stack area
 
 	/* results from cop? */
 //	AM_RANGE(0x00430, 0x00431) AM_READ(nzerotea_unknown_r)
@@ -157,28 +169,27 @@ static ADDRESS_MAP_START( nzerotea_map, ADDRESS_SPACE_PROGRAM, 16 )
 //	AM_RANGE(0x006dc, 0x006dd) AM_READ(nzerotea_unknown_r)
 //  AM_RANGE(0x006de, 0x006df) AM_WRITE(mcu_unkaa_w) // mcu command related?
 	//AM_RANGE(0x00700, 0x00701) AM_DEVWRITE("eeprom", rdx_v33_eeprom_w)
-//	AM_RANGE(0x00740, 0x00741) AM_READ(nzerotea_unknown_r)
-//	AM_RANGE(0x00744, 0x00745) AM_READ(r2_playerin_r)
-//	AM_RANGE(0x0074c, 0x0074d) AM_READ(rdx_v33_system_r)
+	AM_RANGE(0x00740, 0x00741) AM_READ_PORT("DSW")
+	AM_RANGE(0x00744, 0x00745) AM_READ_PORT("INPUT")
+	AM_RANGE(0x0074c, 0x0074d) AM_READ_PORT("SYSTEM")
 //	AM_RANGE(0x00762, 0x00763) AM_READ(nzerotea_unknown_r)
 
-//	AM_RANGE(0x00788, 0x00789) AM_READ(nzerotea_unknown_r)
-//	AM_RANGE(0x00794, 0x00795) AM_READ(nzerotea_unknown_r)
+	AM_RANGE(0x00780, 0x0079f) AM_READWRITE(seibu_main_word_r,seibu_main_word_w)
 
-	AM_RANGE(0x00000, 0x0bfff) AM_RAM
+	AM_RANGE(0x00800, 0x0bfff) AM_RAM
 //  AM_RANGE(0x00000, 0x003ff) AM_RAM
 
-	AM_RANGE(0x0c000, 0x0cfff) AM_RAM// AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM//_WRITE(raiden2_background_w) AM_BASE(back_data)
-	AM_RANGE(0x0d800, 0x0dfff) AM_RAM//_WRITE(raiden2_foreground_w) AM_BASE(fore_data)
-    AM_RANGE(0x0e000, 0x0e7ff) AM_RAM//_WRITE(raiden2_midground_w)  AM_BASE(mid_data)
-    AM_RANGE(0x0e800, 0x0f7ff) AM_RAM//_WRITE(raiden2_text_w) AM_BASE(text_data)
+	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM// AM_BASE_GENERIC(spriteram)
+	AM_RANGE(0x0c800, 0x0cfff) AM_RAM
+	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM//_WRITE(seibucrtc_sc0vram_w) AM_BASE(&seibucrtc_sc0vram)
+	AM_RANGE(0x0d800, 0x0dfff) AM_RAM//_WRITE(seibucrtc_sc1vram_w) AM_BASE(&seibucrtc_sc1vram)
+	AM_RANGE(0x0e000, 0x0e7ff) AM_RAM//_WRITE(seibucrtc_sc2vram_w) AM_BASE(&seibucrtc_sc2vram)
+	AM_RANGE(0x0e800, 0x0f7ff) AM_RAM_WRITE(rdx_tx_vram_w) AM_BASE(&tx_vram)
 	AM_RANGE(0x0f800, 0x0ffff) AM_RAM /* Stack area */
-
 	AM_RANGE(0x10000, 0x1efff) AM_RAM
-	AM_RANGE(0x1f000, 0x1ffff) AM_RAM// AM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x1f000, 0x1ffff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 
-	AM_RANGE(0x20000, 0x3ffff) AM_ROM AM_REGION("mainprg", 0x20000 )
+	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("bank1")
 	AM_RANGE(0x40000, 0xfffff) AM_ROM AM_REGION("mainprg", 0x40000 )
 ADDRESS_MAP_END
 
@@ -227,9 +238,11 @@ static const gfx_layout rdx_v33_spritelayout =
 };
 
 static GFXDECODE_START( rdx_v33 )
-	GFXDECODE_ENTRY( "gfx1", 0x00000, rdx_v33_charlayout,   0x700, 128 )
-	GFXDECODE_ENTRY( "gfx2", 0x00000, rdx_v33_tilelayout,   0x400, 128 )
-	GFXDECODE_ENTRY( "gfx3", 0x00000, rdx_v33_spritelayout, 0x000, 128 )
+	GFXDECODE_ENTRY( "gfx3", 0x00000, rdx_v33_spritelayout, 0x000, 0x40 )
+	GFXDECODE_ENTRY( "gfx2",    0x00000, rdx_v33_tilelayout,   0x400, 0x10 )
+	GFXDECODE_ENTRY( "gfx2",    0x00000, rdx_v33_tilelayout,   0x500, 0x10 )
+	GFXDECODE_ENTRY( "gfx2",    0x00000, rdx_v33_tilelayout,   0x600, 0x10 )
+	GFXDECODE_ENTRY( "gfx1",    0x00000, rdx_v33_charlayout,   0x700, 0x10 )
 GFXDECODE_END
 
 static INPUT_PORTS_START( rdx_v33 )
@@ -252,7 +265,7 @@ static INPUT_PORTS_START( rdx_v33 )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
 	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -262,7 +275,7 @@ static INPUT_PORTS_START( rdx_v33 )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
 	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -292,7 +305,7 @@ static INPUT_PORTS_START( nzerotea )
 	PORT_BIT( 0x0008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(1)
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
 	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -302,7 +315,57 @@ static INPUT_PORTS_START( nzerotea )
 	PORT_BIT( 0x0800, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+
+	PORT_START("DSW")
+	PORT_DIPNAME( 0x0001, 0x0001, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Service_Mode ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0100, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
 	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
 	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
@@ -326,7 +389,7 @@ static MACHINE_CONFIG_START( rdx_v33, driver_device )
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 64*8)
-	MDRV_SCREEN_VISIBLE_AREA(5*8, 43*8-1, 1, 30*8)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1)
 
 	MDRV_GFXDECODE(rdx_v33)
 	MDRV_PALETTE_LENGTH(2048)
@@ -338,7 +401,7 @@ static MACHINE_CONFIG_START( rdx_v33, driver_device )
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
 	MDRV_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( nzerotea, driver_device )
@@ -348,7 +411,7 @@ static MACHINE_CONFIG_START( nzerotea, driver_device )
 	MDRV_CPU_PROGRAM_MAP(nzerotea_map)
 	MDRV_CPU_VBLANK_INT("screen", rdx_v33_interrupt)
 
-//	MDRV_MACHINE_RESET(rdx_v33)
+	MDRV_MACHINE_RESET(seibu_sound)
 
 	SEIBU2_RAIDEN2_SOUND_SYSTEM_CPU(14318180/4)
 
@@ -375,30 +438,21 @@ MACHINE_CONFIG_END
 
 static DRIVER_INIT(rdx_v33)
 {
-	UINT8 *prg = memory_region(machine, "maincpu");
-
-	/* TODO: remove this */
-	memory_set_bankptr(machine, "bank1",&prg[0x020000]);
-	memory_set_bankptr(machine, "bank2",&prg[0x030000]);
-	memory_set_bankptr(machine, "bank3",&prg[0x040000]);
-	memory_set_bankptr(machine, "bank4",&prg[0x050000]);
-	memory_set_bankptr(machine, "bank5",&prg[0x060000]);
-	memory_set_bankptr(machine, "bank6",&prg[0x070000]);
-	memory_set_bankptr(machine, "bank7",&prg[0x080000]);
-	memory_set_bankptr(machine, "bank8",&prg[0x090000]);
-	memory_set_bankptr(machine, "bank9",&prg[0x0a0000]);
-	memory_set_bankptr(machine, "bank10",&prg[0x0b0000]);
-	memory_set_bankptr(machine, "bank11",&prg[0x0c0000]);
-	memory_set_bankptr(machine, "bank12",&prg[0x0d0000]);
-	memory_set_bankptr(machine, "bank13",&prg[0x0e0000]);
-	memory_set_bankptr(machine, "bank14",&prg[0x0f0000]);
+	memory_configure_bank(machine, "bank1", 0, 0x20, memory_region(machine, "mainprg"), 0x20000);
 
 	raiden2_decrypt_sprites(machine);
+
+	memory_set_bank(machine, "bank1", 0);
 }
 
 static DRIVER_INIT(nzerotea)
 {
+	memory_configure_bank(machine, "bank1", 0, 2, memory_region(machine, "mainprg"), 0x20000);
+
 	raiden2_decrypt_sprites(machine);
+
+	memory_set_bank(machine, "bank1", 0);
+
 }
 
 /*
@@ -467,10 +521,12 @@ Notes
 
 
 ROM_START( r2dx_v33 )
-	ROM_REGION( 0x400000, "maincpu", 0 ) /* v33 main cpu */
+	ROM_REGION( 0x400000, "mainprg", 0 ) /* v33 main cpu */
 	ROM_LOAD("prg.223",   0x000000, 0x400000, CRC(b3dbcf98) SHA1(30d6ec2090531c8c579dff74c4898889902d7d87) )
 
-	ROM_REGION( 0x20000, "cpu1", ROMREGION_ERASE00 ) /* 64k code for sound Z80 */
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF ) /* v33 main cpu */
+
+//	ROM_REGION( 0x20000, "cpu1", ROMREGION_ERASE00 ) /* 64k code for sound Z80 */
 	/* nothing?  no z80*/
 
 	ROM_REGION( 0x040000, "gfx1", 0 ) /* chars */
@@ -499,6 +555,8 @@ ROM_START( nzerotea )
 	ROM_LOAD16_BYTE("prg1",   0x000000, 0x80000, CRC(3c7d9410) SHA1(25f2121b6c2be73f11263934266901ed5d64d2ee) )
 	ROM_LOAD16_BYTE("prg2",   0x000001, 0x80000, CRC(6cba032d) SHA1(bf5d488cd578fff09e62e3650efdee7658033e3f) )
 
+	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF ) /* v33 main cpu */
+
 	ROM_REGION( 0x40000, "user2", 0 )	/* COPX */
 	/* not from this set, assumed to be the same */
 	ROM_LOAD( "copx-d3.bin",   0x00000, 0x20000, BAD_DUMP CRC(fa2cf3ad) SHA1(13eee40704d3333874b6e3da9ee7d969c6dc662a) )
@@ -524,9 +582,8 @@ ROM_START( nzerotea )
 	ROM_REGION( 0x100000, "oki2", ROMREGION_ERASEFF )	/* ADPCM samples */
 ROM_END
 
-// 'V33 system type_b' - uses V33 CPU, COPX-D3 external protection rom, but still has the proper sound system
-GAME( 1993, nzerotea, zeroteam,  nzerotea, nzerotea,  nzerotea,  ROT0,   "Seibu Kaihatsu", "New Zero Team", GAME_NOT_WORKING|GAME_NO_SOUND) // this uses a v33 and COPD3
-
 // newer PCB, with V33 CPU and COPD3 protection, but weak sound hardware. - was marked as Raiden DX New in the rom dump, but boots as Raiden 2 New version, is it switchable?
 GAME( 1996, r2dx_v33, 0, 		 rdx_v33,  rdx_v33, rdx_v33,  ROT270, "Seibu Kaihatsu", "Raiden II / DX (newer V33 PCB)", GAME_NOT_WORKING|GAME_NO_SOUND)
 
+// 'V33 system type_b' - uses V33 CPU, COPX-D3 external protection rom, but still has the proper sound system
+GAME( 1997, nzerotea, zeroteam,  nzerotea, nzerotea,  nzerotea,  ROT0,   "Seibu Kaihatsu", "New Zero Team", GAME_NOT_WORKING|GAME_NO_SOUND) // this uses a v33 and COPD3
