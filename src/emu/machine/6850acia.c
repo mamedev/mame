@@ -15,6 +15,8 @@
     MACROS
 ***************************************************************************/
 
+#define LOG 0
+
 #define CR1_0	0x03
 #define CR4_2	0x1C
 #define CR6_5	0x60
@@ -217,12 +219,11 @@ READ8_DEVICE_HANDLER_TRAMPOLINE(acia6850, acia6850_stat_r)
 
 WRITE8_DEVICE_HANDLER_TRAMPOLINE(acia6850, acia6850_ctrl_w )
 {
-	int wordsel;
-	int divide;
+	if (LOG) logerror("MC6850 '%s' Control: %02x\n", tag(), data);
 
 	// Counter Divide Select Bits
 
-	divide = data & CR1_0;
+	int divide = data & CR1_0;
 
 	if (divide == 3)
 	{
@@ -237,7 +238,7 @@ WRITE8_DEVICE_HANDLER_TRAMPOLINE(acia6850, acia6850_ctrl_w )
 
 	// Word Select Bits
 
-	wordsel = (data & CR4_2) >> 2;
+	int wordsel = (data & CR4_2) >> 2;
 
 	m_bits = ACIA6850_WORD[wordsel][0];
 	m_parity = (parity_type)ACIA6850_WORD[wordsel][1];
@@ -338,6 +339,8 @@ void acia6850_device::check_interrupts()
 
 WRITE8_DEVICE_HANDLER_TRAMPOLINE(acia6850, acia6850_data_w)
 {
+	if (LOG) logerror("MC6850 '%s' Data: %02x\n", tag(), data);
+
 	if (!m_reset)
 	{
 		m_tdr = data;
@@ -424,8 +427,8 @@ void acia6850_device::tx_tick()
 				{
 					// transmit character
 
-					//logerror("ACIA6850 #%u: TX DATA %x\n", which, m_tdr);
-					//logerror("ACIA6850 #%u: TX START BIT\n", which);
+					if (LOG) logerror("MC6850 '%s': TX DATA %x\n", tag(), m_tdr);
+					if (LOG) logerror("MC6850 '%s': TX START BIT\n", tag());
 
 					TXD(0);
 
@@ -440,7 +443,7 @@ void acia6850_device::tx_tick()
 		case DATA:
 		{
 			int val = m_tx_shift & 1;
-			//logerror("ACIA6850 #%u: TX DATA BIT %x\n", which, val);
+			if (LOG) logerror("MC6850 '%s': TX DATA BIT %x\n", tag(), val);
 
 			TXD(val);
 			m_tx_parity ^= val;
@@ -455,22 +458,26 @@ void acia6850_device::tx_tick()
 		}
 		case PARITY:
 		{
+			int parity = 0;
+
 			if (m_parity == EVEN)
 			{
-				TXD((m_tx_parity & 1) ? 1 : 0);
+				parity = (m_tx_parity & 1) ? 1 : 0;
 			}
 			else
 			{
-				TXD((m_tx_parity & 1) ? 0 : 1);
+				parity = (m_tx_parity & 1) ? 0 : 1;
 			}
 
-			//logerror("ACIA6850 #%u: TX PARITY BIT %x\n", which, *m_tx_pin);
+			TXD(parity);
+
+			if (LOG) logerror("MC6850 '%s': TX PARITY BIT %x\n", tag(), parity);
 			m_tx_state = STOP;
 			break;
 		}
 		case STOP:
 		{
-			//logerror("ACIA6850 #%u: TX STOP BIT\n", which);
+			if (LOG) logerror("MC6850 '%s': TX STOP BIT\n", tag());
 			TXD(1);
 
 			if (m_stopbits == 1)
@@ -486,7 +493,7 @@ void acia6850_device::tx_tick()
 		}
 		case STOP2:
 		{
-			//logerror("ACIA6850 #%u: TX STOP BIT\n", which);
+			if (LOG) logerror("MC6850 '%s': TX STOP BIT\n", tag());
 			TXD(1);
 			m_tx_state = START;
 			m_status |= ACIA6850_STATUS_TDRE;
@@ -571,7 +578,7 @@ void acia6850_device::rx_tick()
 			{
 				if (rxd == 0)
 				{
-					//logerror("ACIA6850 #%u: RX START BIT\n", which);
+					if (LOG) logerror("MC6850 '%s': RX START BIT\n", tag());
 					m_rx_shift = 0;
 					m_rx_parity = 0;
 					m_rx_bits = m_bits;
@@ -581,7 +588,7 @@ void acia6850_device::rx_tick()
 			}
 			case DATA:
 			{
-				//logerror("ACIA6850 #%u: RX DATA BIT %x\n", which, rxd);
+				if (LOG) logerror("MC6850 '%s': RX DATA BIT %x\n", tag(), rxd);
 				m_rx_shift |= rxd ? 0x80 : 0;
 				m_rx_parity ^= rxd;
 
@@ -603,7 +610,7 @@ void acia6850_device::rx_tick()
 			}
 			case PARITY:
 			{
-				//logerror("ACIA6850 #%u: RX PARITY BIT %x\n", which, rxd);
+				if (LOG) logerror("MC6850 '%s': RX PARITY BIT %x\n", tag(), rxd);
 				m_rx_parity ^= rxd;
 
 				if (m_parity == EVEN)
@@ -628,14 +635,14 @@ void acia6850_device::rx_tick()
 			{
 				if (rxd == 1)
 				{
-					//logerror("ACIA6850 #%u: RX STOP BIT\n", which);
+					if (LOG) logerror("MC6850 '%s': RX STOP BIT\n", tag());
 					if (m_stopbits == 1)
 					{
 						m_status &= ~ACIA6850_STATUS_FE;
 
 						if (!(m_status & ACIA6850_STATUS_RDRF))
 						{
-							//logerror("ACIA6850 #%u: RX DATA %x\n", which, m_rx_shift);
+							if (LOG) logerror("MC6850 '%s': RX DATA %x\n", tag(), m_rx_shift);
 							m_rdr = m_rx_shift;
 							m_status |= ACIA6850_STATUS_RDRF;
 							check_interrupts();
@@ -659,12 +666,12 @@ void acia6850_device::rx_tick()
 			{
 				if (rxd == 1)
 				{
-					//logerror("ACIA6850 #%u: RX STOP BIT\n", which);
+					if (LOG) logerror("MC6850 '%s': RX STOP BIT\n", tag());
 					m_status &= ~ACIA6850_STATUS_FE;
 
 					if (!(m_status & ACIA6850_STATUS_RDRF))
 					{
-						//logerror("ACIA6850 #%u: RX DATA %x\n", which, m_rx_shift);
+						if (LOG) logerror("MC6850 '%s': RX DATA %x\n", tag(), m_rx_shift);
 						m_rdr = m_rx_shift;
 						m_status |= ACIA6850_STATUS_RDRF;
 						check_interrupts();
@@ -779,4 +786,26 @@ void acia6850_device::set_tx_clock(int clock)
 void acia6850_set_tx_clock(running_device *device, int clock)
 {
 	downcast<acia6850_device*>(device)->set_tx_clock(clock);
+}
+
+
+/*-------------------------------------------------
+    receive_data - receive data byte
+-------------------------------------------------*/
+
+void acia6850_device::receive_data(UINT8 data)
+{
+	m_rdr = data;
+	m_status |= ACIA6850_STATUS_RDRF;
+	check_interrupts();
+}
+
+
+/*-------------------------------------------------
+    acia6850_receive_data - Receive data byte
+-------------------------------------------------*/
+
+void acia6850_receive_data(running_device *device, UINT8 data)
+{
+	downcast<acia6850_device*>(device)->receive_data(data);
 }
