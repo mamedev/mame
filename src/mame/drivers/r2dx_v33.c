@@ -291,7 +291,7 @@ static WRITE16_HANDLER( nzerotea_sound_comms_w )
 	{
 		case (0x780/2): { seibu_main_word_w(space,0,data,0x00ff); break; }
 		case (0x784/2): { seibu_main_word_w(space,1,data,0x00ff); break; }
-		case (0x790/2): { seibu_main_word_w(space,4,data,0x00ff); break; }
+		//case (0x790/2): { seibu_main_word_w(space,4,data,0x00ff); break; }
 		case (0x794/2): { seibu_main_word_w(space,4,data,0x00ff); break; }
 		case (0x798/2): { seibu_main_word_w(space,6,data,0x00ff); break; }
 	}
@@ -560,7 +560,9 @@ static MACHINE_CONFIG_START( nzerotea, driver_device )
 
 	MDRV_MACHINE_RESET(seibu_sound)
 
-	SEIBU2_RAIDEN2_SOUND_SYSTEM_CPU(14318180/4)
+//	SEIBU2_RAIDEN2_SOUND_SYSTEM_CPU(14318180/4)
+	SEIBU_SOUND_SYSTEM_CPU(14318180/4)
+
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
@@ -578,7 +580,8 @@ static MACHINE_CONFIG_START( nzerotea, driver_device )
 	MDRV_VIDEO_UPDATE(rdx_v33)
 
 	/* sound hardware */
-	SEIBU_SOUND_SYSTEM_YM2151_RAIDEN2_INTERFACE(28636360/8,28636360/28,1,2)
+//	SEIBU_SOUND_SYSTEM_YM2151_RAIDEN2_INTERFACE(28636360/8,28636360/28,1,2)
+	SEIBU_SOUND_SYSTEM_YM3812_INTERFACE(14318180/4,1320000)
 
 MACHINE_CONFIG_END
 
@@ -725,10 +728,8 @@ ROM_START( nzerotea )
 	ROM_LOAD32_WORD( "obj-1",  0x000000, 0x200000, CRC(45be8029) SHA1(adc164f9dede9a86b96a4d709e9cba7d2ad0e564) )
 	ROM_LOAD32_WORD( "obj-2",  0x000002, 0x200000, CRC(cb61c19d) SHA1(151a2ce9c32f3321a974819e9b165dddc31c8153) )
 
-	ROM_REGION( 0x100000, "oki1", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x100000, "oki", 0 )	/* ADPCM samples */
 	ROM_LOAD( "6.pcm", 0x00000, 0x40000,  CRC(48be32b1) SHA1(969d2191a3c46871ee8bf93088b3cecce3eccf0c) )
-
-	ROM_REGION( 0x100000, "oki2", ROMREGION_ERASEFF )	/* ADPCM samples */
 ROM_END
 
 // newer PCB, with V33 CPU and COPD3 protection, but weak sound hardware. - was marked as Raiden DX New in the rom dump, but boots as Raiden 2 New version, is it switchable?
