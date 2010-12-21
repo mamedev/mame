@@ -21,8 +21,28 @@ Please don't do any state machine refactoring of this.
 #include "includes/raiden2.h"
 
 static UINT16 *seibu_crtc_regs;
-static UINT16 *tx_vram,*fg_vram;
-static tilemap_t *tx_tilemap,*fg_tilemap;
+static UINT16 *bg_vram,*md_vram,*fg_vram,*tx_vram;
+static tilemap_t *bg_tilemap,*md_tilemap,*fg_tilemap,*tx_tilemap;
+
+static TILE_GET_INFO( get_bg_tile_info )
+{
+	int tile = bg_vram[tile_index];
+	int color = (tile>>12)&0xf;
+
+	tile &= 0xfff;
+
+	SET_TILE_INFO(1,tile + 0x0000,color,0);
+}
+
+static TILE_GET_INFO( get_md_tile_info )
+{
+	int tile = md_vram[tile_index];
+	int color = (tile>>12)&0xf;
+
+	tile &= 0xfff;
+
+	SET_TILE_INFO(2,tile + 0x2000,color,0);
+}
 
 static TILE_GET_INFO( get_fg_tile_info )
 {
@@ -132,9 +152,13 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 
 static VIDEO_START( rdx_v33 )
 {
+	bg_tilemap = tilemap_create(machine, get_bg_tile_info, tilemap_scan_rows,16,16,32,32);
+	md_tilemap = tilemap_create(machine, get_md_tile_info, tilemap_scan_rows,16,16,32,32);
 	fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,16,16,32,32);
-	tx_tilemap = tilemap_create(machine, get_tx_tile_info, tilemap_scan_rows,  8, 8, 64,32 );
+	tx_tilemap = tilemap_create(machine, get_tx_tile_info, tilemap_scan_rows,8, 8, 64,32);
 
+	tilemap_set_transparent_pen(bg_tilemap, 15);
+	tilemap_set_transparent_pen(md_tilemap, 15);
 	tilemap_set_transparent_pen(fg_tilemap, 15);
 	tilemap_set_transparent_pen(tx_tilemap, 15);
 }
@@ -143,12 +167,51 @@ static VIDEO_UPDATE( rdx_v33 )
 {
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
+	tilemap_draw(bitmap, cliprect, bg_tilemap, 0, 0);
+	tilemap_draw(bitmap, cliprect, md_tilemap, 0, 0);
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 
 	draw_sprites(screen->machine,bitmap,cliprect,0);
 
 	tilemap_draw(bitmap, cliprect, tx_tilemap, 0, 0);
 
+	/* debug DMA processing */
+	if(0)
+	{
+		static UINT32 src_addr = 0x100000;
+		static int frame;
+		address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+
+		//if(input_code_pressed_once(screen->machine,KEYCODE_A))
+		//	src_addr+=0x800;
+
+		//if(input_code_pressed_once(screen->machine,KEYCODE_S))
+		//	src_addr-=0x800;
+
+		frame++;
+
+		popmessage("%08x 0",src_addr);
+
+		//if(input_code_pressed_once(screen->machine,KEYCODE_Z))
+		if(frame == 5)
+		{
+			int i,data;
+			static UINT8 *rom = memory_region(space->machine,"mainprg");
+
+			for(i=0;i<0x800;i+=2)
+			{
+				data = rom[src_addr+i+0];
+				space->write_byte(i+0xd000+0, data);
+				data = rom[src_addr+i+1];
+				space->write_byte(i+0xd000+1, data);
+			}
+
+			popmessage("%08x 1",src_addr);
+			tilemap_mark_all_tiles_dirty(bg_tilemap);
+			frame = 0;
+			src_addr+=0x800;
+		}
+	}
 	return 0;
 }
 
@@ -205,10 +268,16 @@ WRITE16_HANDLER( mcu_prog_offs_w )
 	mcu_prog_offs = data;
 }
 
-static WRITE16_HANDLER( rdx_tx_vram_w )
+static WRITE16_HANDLER( rdx_bg_vram_w )
 {
-	COMBINE_DATA(&tx_vram[offset]);
-	tilemap_mark_tile_dirty(tx_tilemap, offset);
+	COMBINE_DATA(&bg_vram[offset]);
+	tilemap_mark_tile_dirty(bg_tilemap, offset);
+}
+
+static WRITE16_HANDLER( rdx_md_vram_w )
+{
+	COMBINE_DATA(&md_vram[offset]);
+	tilemap_mark_tile_dirty(md_tilemap, offset);
 }
 
 static WRITE16_HANDLER( rdx_fg_vram_w )
@@ -217,12 +286,17 @@ static WRITE16_HANDLER( rdx_fg_vram_w )
 	tilemap_mark_tile_dirty(fg_tilemap, offset);
 }
 
-#if 0
+static WRITE16_HANDLER( rdx_tx_vram_w )
+{
+	COMBINE_DATA(&tx_vram[offset]);
+	tilemap_mark_tile_dirty(tx_tilemap, offset);
+}
+
 static READ16_HANDLER( rdx_v33_unknown_r )
 {
-	return 0xffff;//mame_rand(space->machine);
+	return mame_rand(space->machine);
 }
-#endif
+
 
 static UINT16 mcu_xval,mcu_yval;
 
@@ -239,21 +313,21 @@ static WRITE16_HANDLER( mcu_yval_w )
 	//popmessage("%04x %04x",mcu_xval,mcu_yval);
 }
 
-static UINT16 mcu_data[8];
+static UINT16 mcu_data[9];
 
 /* 0x400-0x407 seems some DMA hook-up, 0x420-0x427 looks like some x/y sprite calculation routine */
 static WRITE16_HANDLER( mcu_table_w )
 {
 	mcu_data[offset] = data;
 
-	popmessage("%04x %04x %04x %04x | %04x %04x %04x %04x",mcu_data[0/2],mcu_data[2/2],mcu_data[4/2],mcu_data[6/2],mcu_data[8/2],mcu_data[0xa/2],mcu_data[0xc/2],mcu_data[0xe/2]);
+	//popmessage("%04x %04x %04x %04x | %04x %04x %04x %04x",mcu_data[0/2],mcu_data[2/2],mcu_data[4/2],mcu_data[6/2],mcu_data[8/2],mcu_data[0xa/2],mcu_data[0xc/2],mcu_data[0xe/2]);
 }
 
 static WRITE16_HANDLER( mcu_table2_w )
 {
 	mcu_data[offset+4] = data;
 
-	popmessage("%04x %04x %04x %04x | %04x %04x %04x %04x",mcu_data[0/2],mcu_data[2/2],mcu_data[4/2],mcu_data[6/2],mcu_data[8/2],mcu_data[0xa/2],mcu_data[0xc/2],mcu_data[0xe/2]);
+	//popmessage("%04x %04x %04x %04x | %04x %04x %04x %04x",mcu_data[0/2],mcu_data[2/2],mcu_data[4/2],mcu_data[6/2],mcu_data[8/2],mcu_data[0xa/2],mcu_data[0xc/2],mcu_data[0xe/2]);
 }
 
 
@@ -261,15 +335,16 @@ static ADDRESS_MAP_START( rdx_v33_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM // vectors copied here
 
 	AM_RANGE(0x00400, 0x00407) AM_WRITE(mcu_table_w)
-	AM_RANGE(0x00420, 0x00427) AM_WRITE(mcu_table2_w)
+	AM_RANGE(0x00420, 0x00429) AM_WRITE(mcu_table2_w)
 
 	/* results from cop? */
-//	AM_RANGE(0x00430, 0x00431) AM_READ(rdx_v33_unknown_r)
-//	AM_RANGE(0x00432, 0x00433) AM_READ(rdx_v33_unknown_r)
-//	AM_RANGE(0x00434, 0x00435) AM_READ(rdx_v33_unknown_r)
-//	AM_RANGE(0x00436, 0x00437) AM_READ(rdx_v33_unknown_r)
+	AM_RANGE(0x00430, 0x00431) AM_READ(rdx_v33_unknown_r)
+	AM_RANGE(0x00432, 0x00433) AM_READ(rdx_v33_unknown_r)
+	AM_RANGE(0x00434, 0x00435) AM_READ(rdx_v33_unknown_r)
+	AM_RANGE(0x00436, 0x00437) AM_READ(rdx_v33_unknown_r)
 
 	AM_RANGE(0x00600, 0x0064f) AM_RAM AM_BASE(&seibu_crtc_regs)
+	AM_RANGE(0x00650, 0x0068f) AM_RAM //???
 
 	AM_RANGE(0x0068e, 0x0068f) AM_WRITENOP // synch for the MCU?
 	AM_RANGE(0x006b0, 0x006b1) AM_WRITE(mcu_prog_w)
@@ -295,8 +370,8 @@ static ADDRESS_MAP_START( rdx_v33_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0x0c800, 0x0cfff) AM_RAM
-	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM//_WRITE(seibucrtc_sc0vram_w) AM_BASE(&seibucrtc_sc0vram)
-	AM_RANGE(0x0d800, 0x0dfff) AM_RAM//_WRITE(seibucrtc_sc1vram_w) AM_BASE(&seibucrtc_sc1vram)
+	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM_WRITE(rdx_bg_vram_w) AM_BASE(&bg_vram)
+	AM_RANGE(0x0d800, 0x0dfff) AM_RAM_WRITE(rdx_md_vram_w) AM_BASE(&md_vram)
 	AM_RANGE(0x0e000, 0x0e7ff) AM_RAM_WRITE(rdx_fg_vram_w) AM_BASE(&fg_vram)
 	AM_RANGE(0x0e800, 0x0f7ff) AM_RAM_WRITE(rdx_tx_vram_w) AM_BASE(&tx_vram)
 	AM_RANGE(0x0f800, 0x0ffff) AM_RAM /* Stack area */
@@ -336,16 +411,17 @@ static ADDRESS_MAP_START( nzerotea_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM //stack area
 
 	/* results from cop? */
-//	AM_RANGE(0x00430, 0x00431) AM_READ(nzerotea_unknown_r)
-//	AM_RANGE(0x00432, 0x00433) AM_READ(nzerotea_unknown_r)
-//	AM_RANGE(0x00434, 0x00435) AM_READ(nzerotea_unknown_r)
-//	AM_RANGE(0x00436, 0x00437) AM_READ(nzerotea_unknown_r)
+	AM_RANGE(0x00430, 0x00431) AM_READ(rdx_v33_unknown_r)
+	AM_RANGE(0x00432, 0x00433) AM_READ(rdx_v33_unknown_r)
+	AM_RANGE(0x00434, 0x00435) AM_READ(rdx_v33_unknown_r)
+	AM_RANGE(0x00436, 0x00437) AM_READ(rdx_v33_unknown_r)
 
 	AM_RANGE(0x00400, 0x00407) AM_WRITE(mcu_table_w)
 	AM_RANGE(0x00420, 0x00427) AM_WRITE(mcu_table2_w)
 
 	AM_RANGE(0x00600, 0x0064f) AM_RAM AM_BASE(&seibu_crtc_regs)
 
+	AM_RANGE(0x0068e, 0x0068f) AM_WRITENOP // synch for the MCU?
 	AM_RANGE(0x006b0, 0x006b1) AM_WRITE(mcu_prog_w)
 	AM_RANGE(0x006b2, 0x006b3) AM_WRITE(mcu_prog_w2)
 //	AM_RANGE(0x006b4, 0x006b5) AM_WRITENOP
@@ -367,8 +443,8 @@ static ADDRESS_MAP_START( nzerotea_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0x0c800, 0x0cfff) AM_RAM
-	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM//_WRITE(seibucrtc_sc0vram_w) AM_BASE(&seibucrtc_sc0vram)
-	AM_RANGE(0x0d800, 0x0dfff) AM_RAM//_WRITE(seibucrtc_sc1vram_w) AM_BASE(&seibucrtc_sc1vram)
+	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM_WRITE(rdx_bg_vram_w) AM_BASE(&bg_vram)
+	AM_RANGE(0x0d800, 0x0dfff) AM_RAM_WRITE(rdx_md_vram_w) AM_BASE(&md_vram)
 	AM_RANGE(0x0e000, 0x0e7ff) AM_RAM_WRITE(rdx_fg_vram_w) AM_BASE(&fg_vram)
 	AM_RANGE(0x0e800, 0x0f7ff) AM_RAM_WRITE(rdx_tx_vram_w) AM_BASE(&tx_vram)
 	AM_RANGE(0x0f800, 0x0ffff) AM_RAM /* Stack area */
