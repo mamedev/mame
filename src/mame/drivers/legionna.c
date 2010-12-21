@@ -198,13 +198,13 @@ static ADDRESS_MAP_START( cupsocbl_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x101800, 0x101fff) AM_RAM_WRITE(legionna_midground_w) AM_BASE(&legionna_mid_data)
 	AM_RANGE(0x102000, 0x102fff) AM_RAM_WRITE(legionna_text_w) AM_BASE(&legionna_textram)
 	AM_RANGE(0x103000, 0x103fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x104000, 0x104fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) /*<according to the debug mode,there is a DMA that copies from here to the paletteram>*/
+	AM_RANGE(0x104000, 0x104fff) AM_RAM
 	AM_RANGE(0x105000, 0x106fff) AM_RAM
 	AM_RANGE(0x107000, 0x1077ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x107800, 0x107fff) AM_RAM /*Ani Dsp(?) Ram*/
 	AM_RANGE(0x108000, 0x10ffff) AM_RAM
 	AM_RANGE(0x110000, 0x119fff) AM_RAM
-	AM_RANGE(0x11a000, 0x11dfff) AM_RAM//AM_READWRITE(copdxbl_1_r,copdxbl_1_w) AM_BASE(&work_ram)/*shared with the COP MCU too!*/
+	AM_RANGE(0x11a000, 0x11dfff) AM_RAM
 	AM_RANGE(0x11e000, 0x11ffff) AM_RAM /*Stack Ram*/
 ADDRESS_MAP_END
 
