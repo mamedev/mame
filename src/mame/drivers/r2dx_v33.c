@@ -561,7 +561,7 @@ static MACHINE_CONFIG_START( nzerotea, driver_device )
 	MDRV_MACHINE_RESET(seibu_sound)
 
 //	SEIBU2_RAIDEN2_SOUND_SYSTEM_CPU(14318180/4)
-	SEIBU_SOUND_SYSTEM_CPU(14318180/4)
+	SEIBU_NEWZEROTEAM_SOUND_SYSTEM_CPU(14318180/4)
 
 
 	/* video hardware */
@@ -601,7 +601,7 @@ static DRIVER_INIT(nzerotea)
 
 	raiden2_decrypt_sprites(machine);
 
-	memory_set_bank(machine, "bank1", 0);
+	memory_set_bank(machine, "bank1", 1);
 
 }
 

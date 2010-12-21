@@ -527,6 +527,23 @@ ADDRESS_MAP_START( seibu2_raiden2_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x401a, 0x401a) AM_NOP
 ADDRESS_MAP_END
 
+ADDRESS_MAP_START( seibu_newzeroteam_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+	AM_RANGE(0x2000, 0x27ff) AM_RAM
+	AM_RANGE(0x4000, 0x4000) AM_WRITE(seibu_pending_w)
+	AM_RANGE(0x4001, 0x4001) AM_WRITE(seibu_irq_clear_w)
+	AM_RANGE(0x4002, 0x4002) AM_WRITE(seibu_rst10_ack_w)
+	AM_RANGE(0x4003, 0x4003) AM_WRITE(seibu_rst18_ack_w)
+	AM_RANGE(0x4008, 0x4009) AM_DEVREADWRITE("ymsnd", ym3812_r, ym3812_w)
+	AM_RANGE(0x4010, 0x4011) AM_READ(seibu_soundlatch_r)
+	AM_RANGE(0x4012, 0x4012) AM_READ(seibu_main_data_pending_r)
+	AM_RANGE(0x4013, 0x4013) AM_READ_PORT("COIN")
+	AM_RANGE(0x4018, 0x4019) AM_WRITE(seibu_main_data_w)
+	AM_RANGE(0x401a, 0x401a) AM_WRITE(seibu_bank_w)
+	AM_RANGE(0x401b, 0x401b) AM_WRITE(seibu_coin_w)
+	AM_RANGE(0x6000, 0x6000) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
+	AM_RANGE(0x8000, 0xffff) AM_ROMBANK("bank1")
+ADDRESS_MAP_END
 
 ADDRESS_MAP_START( seibu3_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0x1fff) AM_ROM

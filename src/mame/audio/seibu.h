@@ -33,6 +33,7 @@
 ADDRESS_MAP_EXTERN(seibu_sound_map, 8);
 ADDRESS_MAP_EXTERN(seibu2_sound_map, 8);
 ADDRESS_MAP_EXTERN(seibu2_raiden2_sound_map, 8);
+ADDRESS_MAP_EXTERN(seibu_newzeroteam_sound_map, 8);
 ADDRESS_MAP_EXTERN(seibu3_sound_map, 8);
 ADDRESS_MAP_EXTERN(seibu3_adpcm_sound_map, 8);
 
@@ -86,6 +87,10 @@ extern const ym2203_interface seibu_ym2203_interface;
 #define SEIBU2_RAIDEN2_SOUND_SYSTEM_CPU(freq)						\
 	MDRV_CPU_ADD("audiocpu",  Z80, freq)								\
 	MDRV_CPU_PROGRAM_MAP(seibu2_raiden2_sound_map)				\
+
+#define SEIBU_NEWZEROTEAM_SOUND_SYSTEM_CPU(freq)					\
+	MDRV_CPU_ADD("audiocpu", Z80, freq)								\
+	MDRV_CPU_PROGRAM_MAP(seibu_newzeroteam_sound_map)				\
 
 #define SEIBU3_SOUND_SYSTEM_CPU(freq)								\
 	MDRV_CPU_ADD("audiocpu", Z80, freq)								\
