@@ -54,135 +54,12 @@ Hopper, Ticket Counter, Prize System (Option)
 #include "emu.h"
 #include "cpu/arm7/arm7.h"
 #include "cpu/arm7/arm7core.h"
+#include "machine/s3c2410.h"
+//#include "machine/smartmed.h"
+#include "machine/i2cmem.h"
 
 static UINT32 *system_memory;
-static UINT32 *flash_regs;
-static UINT32 *lcd_control;
-static UINT32 *io_port;
-
-//static UINT32 fifoh[16];
-//static UINT32 fifol[12];
-
-static struct lcd_config
-{
-	int screen_type;
-	int bpp_mode;
-	int lcd_bank;
-	int lcd_base_u;
-	int lcd_base_sel;
-	int line_val;
-	int hoz_val;
-	int off_size;
-	int page_width;
-} lcd;
-
-static READ32_HANDLER( r1 )
-{
-//  int pc = cpu_get_pc(space->cpu);
-//  if(pc != 0x9a0 && pc != 0x7b4) printf("r1 @ %X\n",pc);
-
-	return 1;
-}
-
-static READ32_HANDLER( r2 )
-{
-//  int pc = cpu_get_pc(space->cpu);
-//  if(pc != 0xd64 && pc != 0xd3c )printf("r2 @ %X\n",pc);
-
-	return 2;
-}
-
-static UINT32 flash_addr = 0;
-static int flash_addr_step = 0;
-
-#define ADDR_STEP_CONFIG 4
-
-static WRITE32_HANDLER( flash_reg_w )
-{
-	COMBINE_DATA(&flash_regs[offset]);
-
-	switch(offset)
-	{
-	case 0:
-		//if((flash_regs[offset] & 0xff) != 0x60)
-		//  printf("%08x\n",flash_regs[offset]);
-		break;
-	case 1:
-		break;
-	case 2:
-
-		switch(flash_addr_step)
-		{
-			case 0: flash_addr  = data <<  0; break;
-			case 1: flash_addr |= data <<  8; break;
-			case 2: flash_addr |= data << 16; break;
-			case 3: flash_addr |= data << 24; break;
-		}
-
-		if(flash_addr_step == (ADDR_STEP_CONFIG - 1))
-		{
-			flash_addr <<=1;
-		}
-
-		flash_addr_step = (flash_addr_step + 1) % ADDR_STEP_CONFIG;
-
-		break;
-	}
-}
-
-static READ32_HANDLER( flash_reg_r )
-{
-	// always read back what it's written?
-	return flash_regs[offset];
-}
-
-static READ32_HANDLER( flash_r )
-{
-	UINT8 *flash = (UINT8 *)memory_region(space->machine, "user1");
-	UINT8 value = flash[flash_addr];
-	flash_addr = (flash_addr + 1) % memory_region_length(space->machine, "user1");
-	return value;
-}
-
-static READ32_HANDLER( flash_ecc_r )
-{
-	//TODO
-
-	if((flash_addr & 0x0fff) == 0)
-	{
-		//printf("%08x\n",flash_addr);
-		return 1;
-	}
-
-	return 0;
-}
-
-static WRITE32_HANDLER( debug_w )
-{
-#if 1
-	mame_printf_debug("%c",data & 0xff); //debug texts
-#endif
-}
-
-/*
-a) cpu #0 (PC=000007D0): unmapped program memory dword read from 4E000014 & 000000FF
-b) cpu #0 (PC=000007D8): unmapped program memory dword read from 4E000014 & 0000FF00
-c) cpu #0 (PC=000007E0): unmapped program memory dword read from 4E000014 & 00FF0000
-1) read flash @ 0812
-2) read flash @ 0813
-3) read flash @ 0814
-4) read flash @ 0815
-5) read flash @ 0816
-6) read flash @ 0817
-
-a == 1
-b == 2
-c == 3
-6 == 0xff
-
-*/
-
-// PC: 574 check -> jumps to execute code from ram
+static UINT32 *steppingstone;
 
 /*
 Power management:
@@ -206,308 +83,338 @@ NAND Flash Controller (4KB internal buffer)
 24-ch external interrupts Controller (Wake-up source 16-ch)
 */
 
-static READ32_HANDLER( lcd_control_r )
+static int security_count = 0;
+static const UINT8 security_data[] = { 0x01, 0xC4, 0xFF, 0x22 };
+
+static UINT32 bballoon_port[20];
+
+enum nand_mode_t
 {
-	switch(offset)
+	NAND_M_INIT,		// initial state
+	NAND_M_READ,		// read page data
+};
+
+struct nand_t
+{
+	nand_mode_t mode;
+	int page_addr;
+	int byte_addr;
+	int addr_load_ptr;
+};
+
+static struct nand_t nand;
+
+static UINT32 s3c2410_gpio_port_r( running_device *device, int port)
+{
+	UINT32 data = bballoon_port[port];
+	switch (port)
 	{
-		case 0x00/4:
+		case S3C2410_GPIO_PORT_F :
 		{
-			int line_val = space->machine->primary_screen->vpos() & 0x3ff;
-			return (lcd_control[offset] & ~(0x3ff << 18)) | ((lcd.line_val - line_val) << 18);
+			data = (data & ~0xFF) | security_data[security_count]; // bballoon security @ 0x3001BD68
 		}
-
-		case 0x10/4:
+		break;
+		case S3C2410_GPIO_PORT_G :
 		{
-			//TODO: VSTATUS, HSTATUS
-
-			static int VSTATUS = 0;
-			VSTATUS ^= 0x18000;
-
-			return (lcd_control[offset] & ~0x18000) | VSTATUS;
+			data = data ^ 0x20;
+			bballoon_port[port] = data;
 		}
-
-		default:
-		{
-			return lcd_control[offset];
-		}
+		break;
 	}
+	return data;
 }
 
-static WRITE32_HANDLER( lcd_control_w )
+static void s3c2410_gpio_port_w( running_device *device, int port, UINT32 data)
 {
-	COMBINE_DATA(&lcd_control[offset]);
-
-	switch(offset)
+	UINT32 old_value = bballoon_port[port];
+	bballoon_port[port] = data;
+	switch (port)
 	{
-		case 0x00/4:
+		case S3C2410_GPIO_PORT_F :
 		{
-			int line_val = space->machine->primary_screen->vpos() & 0x3ff;
-			int bpp_mode = (lcd_control[offset] & 0x1e) >> 1;
-			int screen_type = (lcd_control[offset] & 0x60) >> 5;
-
-			lcd.screen_type = screen_type;
-			lcd.bpp_mode = bpp_mode;
-
-			if(bpp_mode != 12)
-				printf("bpp mode= %d\n",bpp_mode);
-
-			lcd_control[offset] = (lcd_control[offset] & ~(0x3ff << 18)) | ((lcd.line_val - line_val) << 18);
-
-			break;
-		}
-
-		case 0x04/4:
-		{
-			int line_val = (lcd_control[offset] >> 14) & 0x3ff;
-
-			lcd.line_val = line_val;
-
-			break;
-		}
-
-		case 0x08/4:
-		{
-			int hoz_val = (lcd_control[offset] >> 8) & 0x3ff;
-
-			lcd.hoz_val = hoz_val;
-
-			break;
-		}
-
-		case 0x10/4:
-		{
-			/*
-            int frm565 = (lcd_control[offset] >> 11) & 1;
-            int inv_vd = (lcd_control[offset] >> 7) & 1;
-            int bs_swp = (lcd_control[offset] >> 1) & 1;
-            int hw_swp = (lcd_control[offset] >> 0) & 1;
-            */
-
-			break;
-		}
-
-		case 0x14/4:
-		{
-			UINT32 lcd_bank = (lcd_control[offset] >> 21) & 0x1ff;
-			UINT32 lcd_base_u = (lcd_control[offset] >> 0) & 0x1fffff;
-
-			lcd.lcd_bank = lcd_bank;
-			lcd.lcd_base_u = lcd_base_u;
-
-			break;
-		}
-
-		case 0x18/4:
-		{
-			UINT32 lcd_base_sel = (lcd_control[offset] >> 0) & 0x1fffff;
-
-			lcd.lcd_base_sel = lcd_base_sel;
-
-			//popmessage("%08x",lcd.lcd_base_sel);
-
-			break;
-		}
-
-		case 0x1c/4:
-		{
-			int off_size = (lcd_control[offset] >> 11) & 0x7ff;
-			int page_width = (lcd_control[offset] >> 0) & 0x7ff;
-
-			lcd.off_size = off_size;
-			lcd.page_width = page_width;
-
-			break;
-		}
-	}
-}
-
-
-static READ32_HANDLER( io_port_r )
-{
-//  printf("%08x\n",offset*4);
-
-	switch(offset)
-	{
-
-		case 0x64/4:
-		{
-			static int input = 0;
-			input ^= 0x20;
-
-			// bits from 15-0 can be configured as input/output/...
-			//return input;
-
-			return (io_port[offset] & ~0x20) | input;
-		}
-
-		default:
-		{
-			return io_port[offset];
-		}
-	}
-}
-
-static WRITE32_HANDLER( io_port_w )
-{
-	COMBINE_DATA(&io_port[offset]);
-//  printf("[%08x] <- %08x\n",offset*4,data);
-}
-
-
-static ADDRESS_MAP_START( bballoon_map, ADDRESS_SPACE_PROGRAM, 32 )
-	AM_RANGE(0x00000000, 0x00000fff) AM_ROM AM_REGION("user1", 0)
-	AM_RANGE(0x30000000, 0x31ffffff) AM_RAM AM_BASE(&system_memory)
-	AM_RANGE(0x40000000, 0x40000fff) AM_ROM AM_REGION("user1", 0) // mirror? seems so
-	AM_RANGE(0x48000000, 0x48000033) AM_RAM // memory controller
-
-	AM_RANGE(0x4d000000, 0x4d00001f) AM_READWRITE(lcd_control_r,lcd_control_w) AM_BASE(&lcd_control)
-
-	AM_RANGE(0x4e000000, 0x4e00000b) AM_READWRITE(flash_reg_r, flash_reg_w) AM_BASE(&flash_regs)
-	AM_RANGE(0x4e00000c, 0x4e00000f) AM_READ(flash_r)
-	AM_RANGE(0x4e000010, 0x4e000013) AM_READ(r1)
-	AM_RANGE(0x4e000014, 0x4e000017) AM_READ(flash_ecc_r)
-
-	AM_RANGE(0x50000010, 0x50000013) AM_READ(r2)
-
-	AM_RANGE(0x50000020, 0x50000023) AM_WRITE(debug_w)
-	//AM_RANGE(0x51000040, 0x51000043) AM_READ() // a timer...
-
-	AM_RANGE(0x56000000, 0x56000093) AM_READWRITE(io_port_r, io_port_w) AM_BASE(&io_port)
-
-ADDRESS_MAP_END
-
-static INPUT_PORTS_START( bballoon )
-INPUT_PORTS_END
-
-static int irq_en = 0;
-
-static VIDEO_START( bballoon )
-{
-
-}
-static int b=0;
-static VIDEO_UPDATE( bballoon )
-{
-	if(input_code_pressed_once(screen->machine, KEYCODE_Q))
-	{
-		irq_en ^= 1;
-		printf("en = %d\n",irq_en);
-	}
-
-	if(input_code_pressed(screen->machine, KEYCODE_W))
-	{
-
-		printf("b = %d\n",++b);
-	}
-
-	if(input_code_pressed(screen->machine, KEYCODE_E))
-	{
-
-		printf("b = %d\n",--b);
-	}
-
-	if(lcd_control[0] & 1)
-	{
-		// output enabled
-
-		//bballoon setup
-		//TFT 16bpp
-		//5:6:5 format
-		//normal
-		//bs swap disabled
-		//hw swap enabled
-
-		int start_addr = (lcd.lcd_bank << 22) - 0x30000000;
-
-		//popmessage("%08x %08x %08x",lcd.lcd_bank,lcd.lcd_base_sel,lcd.lcd_base_u);
-
-		if(start_addr > 0x1ffffff)
-			printf("max = %X\n",start_addr);
-		else
-		{
-			UINT32* videoram = system_memory + start_addr/4 + lcd.lcd_base_u/4;
-			int x,y,count;
-
-			//popmessage("%08x %08x %d",lcd.lcd_base_u,lcd.lcd_base_sel,test);
-
-			/*temp until I understand...*/
-			switch(lcd.lcd_base_sel)
+			switch (data)
 			{
-				case 0x1aac00: count = -81920; break;
-				case 0x192c00: count = -57344; break;
-				default: count = 0;
+				case 0x04 : security_count = 0; break;
+				case 0x44 : security_count = 2; break;
 			}
-			//count = test;//lcd.lcd_base_sel/4;
-
-			for (y=0;y <= 600;y++)
+		}
+		break;
+		case S3C2410_GPIO_PORT_G :
+		{
+			// 0 -> 1
+			if (((data & 0x10) != 0) && ((old_value & 0x10) == 0))
 			{
-				for (x=0;x < 400;x++)
+				logerror( "security_count %d -> %d\n", security_count, security_count + 1);
+				security_count++;
+				if (security_count > 7) security_count = 0;
+			}
+		}
+		break;
+	}
+}
+
+static WRITE8_DEVICE_HANDLER( s3c2410_nand_command_w )
+{
+//	running_device *nand = device->machine->device( "nand");
+	logerror( "s3c2410_nand_command_w %02X\n", data);
+	switch (data)
+	{
+		case 0xFF :
+		{
+			nand.mode = NAND_M_INIT;
+			s3c2410_pin_frnb_w( device, 1);
+		}
+		break;
+		case 0x00 :
+		{
+			nand.mode = NAND_M_READ;
+			nand.page_addr = 0;
+			nand.addr_load_ptr = 0;
+		}
+		break;
+	}
+}
+
+static WRITE8_DEVICE_HANDLER( s3c2410_nand_address_w )
+{
+//	running_device *nand = device->machine->device( "nand");
+	logerror( "s3c2410_nand_address_w %02X\n", data);
+	switch (nand.mode)
+	{
+		case NAND_M_INIT :
+		{
+			logerror( "nand: unexpected address port write\n");
+		}
+		break;
+		case NAND_M_READ :
+		{
+			if (nand.addr_load_ptr == 0)
+			{
+				nand.byte_addr = data;
+			}
+			else
+			{
+				nand.page_addr = (nand.page_addr & ~(0xFF << ((nand.addr_load_ptr - 1) * 8))) | (data << ((nand.addr_load_ptr - 1) * 8));
+			}
+			nand.addr_load_ptr++;
+			if ((nand.mode == NAND_M_READ) && (nand.addr_load_ptr == 4))
+			{
+				s3c2410_pin_frnb_w( device, 0);
+				s3c2410_pin_frnb_w( device, 1);
+			}
+		}
+		break;
+	}
+}
+
+static READ8_DEVICE_HANDLER( s3c2410_nand_data_r )
+{
+//	running_device *nand = device->machine->device( "nand");
+	UINT8 data = 0;
+	switch (nand.mode)
+	{
+		case NAND_M_INIT :
+		{
+			logerror( "nand: unexpected address port read\n");
+		}
+		break;
+		case NAND_M_READ :
+		{
+			UINT8 *flash = (UINT8 *)memory_region( device->machine, "user1");
+			if (nand.byte_addr < 0x200)
+			{
+				data = *(flash + nand.page_addr * 0x200 + nand.byte_addr);
+			}
+			else
+			{
+				if ((nand.byte_addr >= 0x200) && (nand.byte_addr < 0x204))
 				{
-					UINT32 color;
-					UINT32 b;
-					UINT32 g;
-					UINT32 r;
-
-					color = (videoram[count] >> 16) & 0xffff;
-
-					b = (color & 0x001f) << 3;
-					g = (color & 0x07e0) >> 3;
-					r = (color & 0xf800) >> 8;
-					if(((x*2)+1)<cliprect->max_x && y<cliprect->max_y)
-					*BITMAP_ADDR32(bitmap, y, x*2+1) = b | (g<<8) | (r<<16);
-
-					color = videoram[count] & 0xffff;
-
-					b = (color & 0x001f) << 3;
-					g = (color & 0x07e0) >> 3;
-					r = (color & 0xf800) >> 8;
-					if(((x*2)+0)<cliprect->max_x && y<cliprect->max_y)
-					*BITMAP_ADDR32(bitmap, y, x*2+0) = b | (g<<8) | (r<<16);
-
-					count++;
+					UINT8 mecc[4];
+					s3c2410_nand_calculate_mecc( flash + nand.page_addr * 0x200, 0x200, mecc);
+					data = mecc[nand.byte_addr-0x200];
+				}
+				else
+				{
+					data = 0xFF;
 				}
 			}
+			nand.byte_addr++;
+			if (nand.byte_addr == 0x210)
+			{
+				nand.byte_addr = 0;
+				nand.page_addr++;
+				if (nand.page_addr == 0x10000) nand.page_addr = 0;
+			}
 		}
+		break;
+	}
+	logerror( "s3c2410_nand_data_r %02X\n", data);
+	return data;
+}
 
+static WRITE8_DEVICE_HANDLER( s3c2410_nand_data_w )
+{
+//	running_device *nand = device->machine->device( "nand");
+	logerror( "s3c2410_nand_data_w %02X\n", data);
+}
+
+static WRITE_LINE_DEVICE_HANDLER( s3c2410_i2c_scl_w )
+{
+	running_device *i2cmem = device->machine->device( "i2cmem");
+//	logerror( "s3c2410_i2c_scl_w %d\n", state ? 1 : 0);
+	i2cmem_scl_write( i2cmem, state);
+}
+
+static READ_LINE_DEVICE_HANDLER( s3c2410_i2c_sda_r )
+{
+	running_device *i2cmem = device->machine->device( "i2cmem");
+	int state;
+	state = i2cmem_sda_read( i2cmem);
+//	logerror( "s3c2410_i2c_sda_r %d\n", state ? 1 : 0);
+	return state;
+}
+
+static WRITE_LINE_DEVICE_HANDLER( s3c2410_i2c_sda_w )
+{
+	running_device *i2cmem = device->machine->device( "i2cmem");
+//	logerror( "s3c2410_i2c_sda_w %d\n", state ? 1 : 0);
+	i2cmem_sda_write( i2cmem, state);
+}
+
+static WRITE32_HANDLER( sound_w )
+{
+	if ((data >= 0x20) && (data <= 0x7F))
+	{
+		logerror( "sound_w: music %d\n", data - 0x20);
+	}
+	else if ((data >= 0x80) && (data <= 0xFF))
+	{
+		logerror( "sound_w: effect %d\n", data - 0x80);
 	}
 	else
 	{
-		// output disabled
+		logerror( "sound_w: unknown (%d)\n", data);
 	}
-
-	return 0;
 }
 
-static INTERRUPT_GEN( bballoon_interrupt )
+static ADDRESS_MAP_START( bballoon_map, ADDRESS_SPACE_PROGRAM, 32 )
+	AM_RANGE(0x00000000, 0x00000fff) AM_RAM AM_BASE(&steppingstone) AM_MIRROR(0x40000000)
+	AM_RANGE(0x10000000, 0x10000003) AM_READ_PORT("10000000")
+	AM_RANGE(0x10100000, 0x10100003) AM_READ_PORT("10100000")
+	AM_RANGE(0x10200000, 0x10200003) AM_READ_PORT("10200000")
+	AM_RANGE(0x10300000, 0x10300003) AM_WRITE(sound_w)
+	AM_RANGE(0x30000000, 0x31ffffff) AM_RAM AM_BASE(&system_memory) AM_MIRROR(0x02000000)
+ADDRESS_MAP_END
+
+/*
+static INPUT_PORTS_START( bballoon )
+	PORT_START("10000000")
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0xFFFFFFC0, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+	PORT_START("10100000")
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0xFFFFFFC0, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+	PORT_START("10200000")
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_START3 )
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_SERVICE1 ) // "test button"
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_START4 )
+	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_SERVICE2 ) // "service button"
+	PORT_BIT( 0xFFFFFF00, IP_ACTIVE_LOW, IPT_START5 )
+INPUT_PORTS_END
+*/
+
+static INPUT_PORTS_START( bballoon )
+	PORT_START("10000000")
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+	PORT_BIT( 0xFFFFFFC0, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("10100000")
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+	PORT_BIT( 0xFFFFFFC0, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_START("10200000")
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_COIN1 )
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_COIN2 )
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_START1 )
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_START2 )
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_SERVICE1 )
+	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_SERVICE2 )
+	PORT_BIT( 0xFFFFFF50, IP_ACTIVE_LOW, IPT_UNUSED )
+INPUT_PORTS_END
+
+/*
+static NAND_INTERFACE( bballoon_nand_intf )
 {
-	if(irq_en)
-	cpu_set_input_line(device, ARM7_IRQ_LINE, HOLD_LINE);
-	//cpu_set_input_line(device, ARM7_FIRQ_LINE, HOLD_LINE);
+	DEVCB_DEVICE_LINE("s3c2410", s3c2410_pin_frnb_w)
+};
+*/
 
-//  irq_en = 0;
-}
+static const s3c2410_interface bballoon_s3c2410_intf =
+{
+	// GPIO (port read / port write)
+	{ s3c2410_gpio_port_r, s3c2410_gpio_port_w },
+	// I2C (scl write / sda read / sda write)
+	{ s3c2410_i2c_scl_w, s3c2410_i2c_sda_r, s3c2410_i2c_sda_w }, 
+	// ADC (data read)
+	{ NULL },
+	// I2S (data write)
+	{ NULL },
+	// NAND (command write, address write, data read, data write)
+	{ s3c2410_nand_command_w, s3c2410_nand_address_w, s3c2410_nand_data_r, s3c2410_nand_data_w }
+};
+
+static const i2cmem_interface i2cmem_interface =
+{
+	I2CMEM_SLAVE_ADDRESS, 0, 256
+};
 
 static MACHINE_CONFIG_START( bballoon, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", ARM7, 24000000)
+	MDRV_CPU_ADD("maincpu", ARM9, 200000000)
 	MDRV_CPU_PROGRAM_MAP(bballoon_map)
-	MDRV_CPU_VBLANK_INT("screen", bballoon_interrupt)
-
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(320, 256)
+	MDRV_SCREEN_SIZE(455, 262)
 	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-1)
-//  MDRV_SCREEN_SIZE(1024, 1024)
-//  MDRV_SCREEN_VISIBLE_AREA(0, 1023, 0, 1023)
 
 	MDRV_PALETTE_LENGTH(256)
 
-	MDRV_VIDEO_START(bballoon)
-	MDRV_VIDEO_UPDATE(bballoon)
+	MDRV_VIDEO_START(s3c2410)
+	MDRV_VIDEO_UPDATE(s3c2410)
+
+	MDRV_S3C2410_ADD("s3c2410", 12000000, bballoon_s3c2410_intf)
+
+//	MDRV_NAND_ADD("nand", 0xEC, 0x75)
+//	MDRV_DEVICE_CONFIG(bballoon_nand_intf)
+
+//	MDRV_I2CMEM_ADD("i2cmem", 0xA0, 0, 0x100, NULL)
+	MDRV_I2CMEM_ADD("i2cmem", i2cmem_interface)
 
 	/* sound hardware */
 MACHINE_CONFIG_END
@@ -556,9 +463,10 @@ Notes:
                   see eolith.c and vegaeo.c drivers
 */
 
+// The NAND dumps are missing the ECC data.  We calculate it on the fly, because the games require it, but really it should be dumped hence the 'BAD DUMP' flags
 ROM_START( bballoon )
 	ROM_REGION( 0x2000000, "user1", 0 ) /* ARM 32 bit code */
-	ROM_LOAD( "flash.u1",     0x000000, 0x2000000, CRC(73285634) SHA1(4d0210c1bebdf3113a99978ffbcd77d6ee854168) )
+	ROM_LOAD( "flash.u1",     0x000000, 0x2000000, BAD_DUMP CRC(73285634) SHA1(4d0210c1bebdf3113a99978ffbcd77d6ee854168) ) // missing ECC data
 
 	// banked every 0x10000 bytes ?
 	ROM_REGION( 0x080000, "user2", 0 )
@@ -573,7 +481,7 @@ ROM_END
 
 ROM_START( hapytour ) /* Same hardware: GHOST Ver1.1 2003.03.28 */
 	ROM_REGION( 0x2000000, "user1", 0 ) /* ARM 32 bit code */
-	ROM_LOAD( "flash.u1",     0x000000, 0x2000000, CRC(49deb7f9) SHA1(708a27d7177cf6261a49ded975c2bbb6c2427742) )
+	ROM_LOAD( "flash.u1",     0x000000, 0x2000000, BAD_DUMP CRC(49deb7f9) SHA1(708a27d7177cf6261a49ded975c2bbb6c2427742) ) // missing ECC data
 
 	// banked every 0x10000 bytes ?
 	ROM_REGION( 0x080000, "user2", 0 )
@@ -588,30 +496,8 @@ ROM_END
 
 static DRIVER_INIT( bballoon )
 {
-	UINT8 *flash = (UINT8 *)memory_region(machine, "user1");
-
-	// nop flash ECC checks
-
-	flash[0x844+0] = 0x00;
-	flash[0x844+1] = 0x00;
-	flash[0x844+2] = 0xA0;
-	flash[0x844+3] = 0xE1;
-
-	flash[0x850+0] = 0x00;
-	flash[0x850+1] = 0x00;
-	flash[0x850+2] = 0xA0;
-	flash[0x850+3] = 0xE1;
-
-	flash[0x860+0] = 0x00;
-	flash[0x860+1] = 0x00;
-	flash[0x860+2] = 0xA0;
-	flash[0x860+3] = 0xE1;
-
-	flash[0x86c+0] = 0x00;
-	flash[0x86c+1] = 0x00;
-	flash[0x86c+2] = 0xA0;
-	flash[0x86c+3] = 0xE1;
+	memcpy( steppingstone, memory_region( machine, "user1"), 4 * 1024);
 }
 
-GAME( 2003, bballoon, 0, bballoon, bballoon, bballoon, ROT0, "Eolith", "Balloon & Balloon", GAME_NO_SOUND | GAME_NOT_WORKING )
-GAME( 2005, hapytour, 0, bballoon, bballoon, 0,        ROT0, "GAV Company", "Happy Tour", GAME_NO_SOUND | GAME_NOT_WORKING ) /* Likely will need simular flash ECC check patches */
+GAME( 2003, bballoon, 0, bballoon, bballoon, bballoon, ROT0, "Eolith", "Balloon & Balloon", GAME_NO_SOUND )
+GAME( 2005, hapytour, 0, bballoon, bballoon, bballoon, ROT0, "GAV Company", "Happy Tour", GAME_NO_SOUND )
