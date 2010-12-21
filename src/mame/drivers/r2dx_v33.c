@@ -10,6 +10,10 @@ Please don't do any state machine refactoring of this.
 0x430-0x433
 1) appears to control where the first enemies turns, if clockwise or anticlockwise
 2) ...
+
+Raiden 2 / DX checks if there's the string "RAIDEN" at start-up inside the eeprom, otherwise it dies.
+Then it puts settings at 0x9e08 and 0x9e0a (bp 91acb)
+
 */
 
 #include "emu.h"
@@ -357,6 +361,7 @@ static ADDRESS_MAP_START( rdx_v33_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x006da, 0x006db) AM_WRITE(mcu_yval_w)
 //	AM_RANGE(0x006dc, 0x006dd) AM_READ(rdx_v33_unknown2_r)
 //  AM_RANGE(0x006de, 0x006df) AM_WRITE(mcu_unkaa_w) // mcu command related?
+
 	AM_RANGE(0x00700, 0x00701) AM_DEVWRITE("eeprom", rdx_v33_eeprom_w)
 //	AM_RANGE(0x00740, 0x00741) AM_READ(rdx_v33_unknown2_r)
 	AM_RANGE(0x00744, 0x00745) AM_READ_PORT("INPUT")
@@ -463,7 +468,7 @@ static INTERRUPT_GEN( rdx_v33_interrupt )
 static const gfx_layout rdx_v33_charlayout =
 {
 	8,8,
-	4096,
+	RGN_FRAC(1,1),
 	4,
 	{ 8,12,0,4 },
 	{ 3,2,1,0,19,18,17,16 },
@@ -475,7 +480,7 @@ static const gfx_layout rdx_v33_charlayout =
 static const gfx_layout rdx_v33_tilelayout =
 {
 	16,16,
-	0x8000,
+	RGN_FRAC(1,1),
 	4,
 	{ 8,12,0,4 },
 	{
@@ -491,7 +496,7 @@ static const gfx_layout rdx_v33_tilelayout =
 static const gfx_layout rdx_v33_spritelayout =
 {
 	16, 16,
-	0x10000,
+	RGN_FRAC(1,1),
 	4,
 	{ STEP4(0,1) },
 	{ 4, 0, 12, 8, 20, 16, 28, 24, 36, 32, 44, 40, 52, 48, 60, 56 },
@@ -505,6 +510,7 @@ static GFXDECODE_START( rdx_v33 )
 	GFXDECODE_ENTRY( "gfx2", 0x00000, rdx_v33_tilelayout,   0x500, 0x10 )
 	GFXDECODE_ENTRY( "gfx2", 0x00000, rdx_v33_tilelayout,   0x600, 0x10 )
 	GFXDECODE_ENTRY( "gfx1", 0x00000, rdx_v33_charlayout,   0x700, 0x10 )
+	GFXDECODE_ENTRY( "gfx1", 0x00000, rdx_v33_tilelayout,   0x700, 0x10 ) // debugging, to be removed
 GFXDECODE_END
 
 static INPUT_PORTS_START( rdx_v33 )
