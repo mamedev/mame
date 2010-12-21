@@ -10251,7 +10251,7 @@ Other Sun games
 	/* Fruit Cocktail */
 	//DRIVER( fcockt )  /* (c) 2003 */
 	//DRIVER( fcockt_2 )    /* (c) 2003 */
-	//DRIVER( fcockt_3 )    /* (c) 2003 */
+	DRIVER( fcockt_3 )    /* (c) 2003 */
 	//DRIVER( fcockt_4 )    /* (c) 2003 */
 	DRIVER( fcockt_5 )	/* (c) 2003 */
 	DRIVER( fcockt_6 )	/* (c) 2003 */
@@ -10264,7 +10264,7 @@ Other Sun games
 
 	/* Lucky Haunter */
 	//DRIVER( lhaunt )  /* (c) 2003 */
-	//DRIVER( lhaunt_2 )    /* (c) 2003 */
+	DRIVER( lhaunt_2 )	/* (c) 2003 */
 	//DRIVER( lhaunt_3 )    /* (c) 2003 */
 	DRIVER( lhaunt_4 )	/* (c) 2003 */
 	DRIVER( lhaunt_5 )	/* (c) 2003 */
@@ -10297,7 +10297,7 @@ Other Sun games
 	DRIVER( sweetl_2 )	/* (c) 2004 */
 
 	/* Resident */
-	//DRIVER( resdnt )  /* (c) 2004 */
+	DRIVER( resdnt )  	/* (c) 2004 */
 	DRIVER( resdnt_2 )	/* (c) 2004 */
 	DRIVER( resdnt_3 )	/* (c) 2004 */
 
