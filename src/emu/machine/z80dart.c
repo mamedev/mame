@@ -353,7 +353,7 @@ int z80dart_device::z80daisy_irq_state()
 	int state = 0;
 	int i;
 
-	LOG(("Z80DART \"%s\" : Interrupt State B:%d%d%d%d A:%d%d%d%d\n", tag(),
+	LOG(("Z80DART \"%s\" : Interrupt State A:%d%d%d%d B:%d%d%d%d\n", tag(),
 				m_int_state[0], m_int_state[1], m_int_state[2], m_int_state[3],
 				m_int_state[4], m_int_state[5], m_int_state[6], m_int_state[7]));
 
@@ -561,7 +561,7 @@ void z80dart_device::dart_channel::start(z80dart_device *device, int index, cons
 
 void z80dart_device::dart_channel::take_interrupt(int level)
 {
-	UINT8 vector = m_wr[2];
+	UINT8 vector = m_device->m_channel[CHANNEL_B].m_wr[2];
 	int priority = (m_index << 2) | level;
 
 	LOG(("Z80DART \"%s\" Channel %c : Interrupt Request %u\n", m_device->tag(), 'A' + m_index, level));
@@ -573,7 +573,7 @@ void z80dart_device::dart_channel::take_interrupt(int level)
 	}
 
 	// update vector register
-	m_rr[2] = vector;
+	m_device->m_channel[CHANNEL_B].m_rr[2] = vector;
 
 	// trigger interrupt
 	m_device->take_interrupt(priority);
@@ -935,7 +935,7 @@ void z80dart_device::dart_channel::transmit()
 		m_tx_shift >>= 1;
 		m_tx_bits++;
 
-		if (m_rx_bits == word_length)
+		if (m_tx_bits == word_length)
 		{
 			if (m_wr[4] & WR4_PARITY_ENABLE)
 				m_tx_state = STATE_PARITY;
@@ -1098,6 +1098,8 @@ void z80dart_device::dart_channel::control_write(UINT8 data)
 		LOG(("Z80DART \"%s\" Channel %c : Transmit Interrupt Enable %u\n", m_device->tag(), 'A' + m_index, (data & WR1_TX_INT_ENABLE) ? 1 : 0));
 		LOG(("Z80DART \"%s\" Channel %c : Status Affects Vector %u\n", m_device->tag(), 'A' + m_index, (data & WR1_STATUS_VECTOR) ? 1 : 0));
 		LOG(("Z80DART \"%s\" Channel %c : Wait/Ready Enable %u\n", m_device->tag(), 'A' + m_index, (data & WR1_WRDY_ENABLE) ? 1 : 0));
+		LOG(("Z80DART \"%s\" Channel %c : Wait/Ready Function %s\n", m_device->tag(), 'A' + m_index, (data & WR1_WRDY_FUNCTION) ? "Ready" : "Wait"));
+		LOG(("Z80DART \"%s\" Channel %c : Wait/Ready on %s\n", m_device->tag(), 'A' + m_index, (data & WR1_WRDY_ON_RX_TX) ? "Receive" : "Transmit"));
 
 		switch (data & WR1_RX_INT_MODE_MASK)
 		{
