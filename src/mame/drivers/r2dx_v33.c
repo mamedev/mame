@@ -1,12 +1,15 @@
 /*
 
-Raiden 2 DX V33 Version
+Raiden 2 / DX V33 Version
 
 Temporary split from raiden2.c, it'll be re-merged at some point.
 
 Note:
 Please don't do any state machine refactoring of this.
 
+0x430-0x433
+1) appears to control where the first enemies turns, if clockwise or anticlockwise
+2) ...
 */
 
 #include "emu.h"
@@ -45,47 +48,38 @@ static TILE_GET_INFO( get_tx_tile_info )
 static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int pri)
 {
 	UINT16 *spriteram16 = machine->generic.spriteram.u16;
-	int offs,fx,fy,x,y,color,sprite,cur_pri;
+	int offs,fx,fy,x,y,color,sprite;
+//	int cur_pri;
 	int dx,dy,ax,ay;
 
 	for (offs = 0x400-4;offs >= 0;offs -= 4)
 	{
 		UINT16 data = spriteram16[offs];
-		if (!(data &0x8000)) continue;
+		//if (!(data &0x8000)) continue;
 
-		cur_pri = (spriteram16[offs+1] & 0xc000) >> 14;
-		if (cur_pri!=pri) continue;
+		//cur_pri = (spriteram16[offs+1] & 0xc000) >> 14;
+		//if (cur_pri!=pri) continue;
 
 		sprite = spriteram16[offs+1];
 
-		sprite &= 0x3fff;
-		if(data & 0x0040) sprite |= 0x4000;//tile banking,used in Denjin Makai
-		if(spriteram16[offs+3] & 0x8000) sprite |= 0x8000;//tile banking?,used in Denjin Makai
+		//sprite &= 0x7fff;
+		//if(data & 0x8000) sprite |= 0x4000;
+		//if(spriteram16[offs+3] & 0x8000) sprite |= 0x8000;//tile banking?,used in Denjin Makai
 
 		y = spriteram16[offs+3];
 		x = spriteram16[offs+2];
 
-		/* heated barrel hardware seems to need 0x1ff with 0x100 sign bit for sprite warp,
-           this doesn't work on denjin makai as the visible area is larger */
-		/*
-        x&=0x1ff;
-        y&=0xfff;
-
-        if (x&0x100) x-=0x200;
-        if (y&0x800) y-=0x1000;
-        */
-
 		x&=0xfff;
 		y&=0xfff;
 
-		if (x&0x800) x-=0x1000;
-		if (y&0x800) y-=0x1000;
+		if (x&0x8000) x-=0x10000;
+		if (y&0x8000) y-=0x10000;
 
-		color = (data &0x3f) + 0x40;
-		fx =  (data &0x4000) >> 14;
-		fy =  (data &0x2000) >> 13;
-		dy = ((data &0x0380) >> 7)  + 1;
-		dx = ((data &0x1c00) >> 10) + 1;
+		color = (data &0x3f);
+		fx =  (data &0x8000) >> 15;
+		fy =  (data &0x0800) >> 11;
+		dx = ((data &0x0700) >> 8)  + 1;
+		dy = ((data &0x7000) >> 12) + 1;
 
 		if (!fx)
 		{
@@ -149,13 +143,9 @@ static VIDEO_UPDATE( rdx_v33 )
 {
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
-
 	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
 
-	draw_sprites(screen->machine,bitmap,cliprect,2);
-	draw_sprites(screen->machine,bitmap,cliprect,1);
 	draw_sprites(screen->machine,bitmap,cliprect,0);
-	draw_sprites(screen->machine,bitmap,cliprect,3);
 
 	tilemap_draw(bitmap, cliprect, tx_tilemap, 0, 0);
 
@@ -227,8 +217,51 @@ static WRITE16_HANDLER( rdx_fg_vram_w )
 	tilemap_mark_tile_dirty(fg_tilemap, offset);
 }
 
+#if 0
+static READ16_HANDLER( rdx_v33_unknown_r )
+{
+	return 0xffff;//mame_rand(space->machine);
+}
+#endif
+
+static UINT16 mcu_xval,mcu_yval;
+
+/* something sent to the MCU for X/Y global screen calculating ... */
+static WRITE16_HANDLER( mcu_xval_w )
+{
+	mcu_xval = data;
+	//popmessage("%04x %04x",mcu_xval,mcu_yval);
+}
+
+static WRITE16_HANDLER( mcu_yval_w )
+{
+	mcu_yval = data;
+	//popmessage("%04x %04x",mcu_xval,mcu_yval);
+}
+
+static UINT16 mcu_data[8];
+
+/* 0x400-0x407 seems some DMA hook-up, 0x420-0x427 looks like some x/y sprite calculation routine */
+static WRITE16_HANDLER( mcu_table_w )
+{
+	mcu_data[offset] = data;
+
+	popmessage("%04x %04x %04x %04x | %04x %04x %04x %04x",mcu_data[0/2],mcu_data[2/2],mcu_data[4/2],mcu_data[6/2],mcu_data[8/2],mcu_data[0xa/2],mcu_data[0xc/2],mcu_data[0xe/2]);
+}
+
+static WRITE16_HANDLER( mcu_table2_w )
+{
+	mcu_data[offset+4] = data;
+
+	popmessage("%04x %04x %04x %04x | %04x %04x %04x %04x",mcu_data[0/2],mcu_data[2/2],mcu_data[4/2],mcu_data[6/2],mcu_data[8/2],mcu_data[0xa/2],mcu_data[0xc/2],mcu_data[0xe/2]);
+}
+
+
 static ADDRESS_MAP_START( rdx_v33_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM // vectors copied here
+
+	AM_RANGE(0x00400, 0x00407) AM_WRITE(mcu_table_w)
+	AM_RANGE(0x00420, 0x00427) AM_WRITE(mcu_table2_w)
 
 	/* results from cop? */
 //	AM_RANGE(0x00430, 0x00431) AM_READ(rdx_v33_unknown_r)
@@ -238,25 +271,27 @@ static ADDRESS_MAP_START( rdx_v33_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x00600, 0x0064f) AM_RAM AM_BASE(&seibu_crtc_regs)
 
+	AM_RANGE(0x0068e, 0x0068f) AM_WRITENOP // synch for the MCU?
 	AM_RANGE(0x006b0, 0x006b1) AM_WRITE(mcu_prog_w)
 	AM_RANGE(0x006b2, 0x006b3) AM_WRITE(mcu_prog_w2)
 //	AM_RANGE(0x006b4, 0x006b5) AM_WRITENOP
 //	AM_RANGE(0x006b6, 0x006b7) AM_WRITENOP
 	AM_RANGE(0x006bc, 0x006bd) AM_WRITE(mcu_prog_offs_w)
 	AM_RANGE(0x006be, 0x006bf) AM_WRITENOP // MCU program related
-//  AM_RANGE(0x006d8, 0x006d9) AM_WRITE(bbbbll_w) // scroll?
+	AM_RANGE(0x006d8, 0x006d9) AM_WRITE(mcu_xval_w)
+	AM_RANGE(0x006da, 0x006db) AM_WRITE(mcu_yval_w)
 //	AM_RANGE(0x006dc, 0x006dd) AM_READ(rdx_v33_unknown2_r)
 //  AM_RANGE(0x006de, 0x006df) AM_WRITE(mcu_unkaa_w) // mcu command related?
 	AM_RANGE(0x00700, 0x00701) AM_DEVWRITE("eeprom", rdx_v33_eeprom_w)
 //	AM_RANGE(0x00740, 0x00741) AM_READ(rdx_v33_unknown2_r)
 	AM_RANGE(0x00744, 0x00745) AM_READ_PORT("INPUT")
 	AM_RANGE(0x0074c, 0x0074d) AM_READ_PORT("SYSTEM")
-//	AM_RANGE(0x00762, 0x00763) AM_READ(rdx_v33_unknown2_r)
+	AM_RANGE(0x00762, 0x00763) AM_READNOP
 
 	AM_RANGE(0x00780, 0x00781) AM_DEVREADWRITE8_MODERN("oki", okim6295_device, read, write, 0x00ff) // single OKI chip on this version
 
-	AM_RANGE(0x00800, 0x0087f) AM_RAM // copies eeprom here?
-	AM_RANGE(0x00880, 0x0bfff) AM_RAM
+	AM_RANGE(0x00800, 0x00fff) AM_RAM // copies eeprom here?
+	AM_RANGE(0x01000, 0x0bfff) AM_RAM
 
 	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0x0c800, 0x0cfff) AM_RAM
@@ -306,6 +341,9 @@ static ADDRESS_MAP_START( nzerotea_map, ADDRESS_SPACE_PROGRAM, 16 )
 //	AM_RANGE(0x00434, 0x00435) AM_READ(nzerotea_unknown_r)
 //	AM_RANGE(0x00436, 0x00437) AM_READ(nzerotea_unknown_r)
 
+	AM_RANGE(0x00400, 0x00407) AM_WRITE(mcu_table_w)
+	AM_RANGE(0x00420, 0x00427) AM_WRITE(mcu_table2_w)
+
 	AM_RANGE(0x00600, 0x0064f) AM_RAM AM_BASE(&seibu_crtc_regs)
 
 	AM_RANGE(0x006b0, 0x006b1) AM_WRITE(mcu_prog_w)
@@ -324,7 +362,8 @@ static ADDRESS_MAP_START( nzerotea_map, ADDRESS_SPACE_PROGRAM, 16 )
 
 	AM_RANGE(0x00780, 0x0079f) AM_READWRITE(nzerotea_sound_comms_r,nzerotea_sound_comms_w)
 
-	AM_RANGE(0x00800, 0x0bfff) AM_RAM
+	AM_RANGE(0x00800, 0x00fff) AM_RAM
+	AM_RANGE(0x01000, 0x0bfff) AM_RAM
 
 	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0x0c800, 0x0cfff) AM_RAM
@@ -403,7 +442,10 @@ static INPUT_PORTS_START( rdx_v33 )
 	PORT_DIPNAME( 0x0040, 0x0040, "Test Mode" )
 	PORT_DIPSETTING(      0x0040, DEF_STR( Off ) )
 	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
-	PORT_BIT( 0xff80, IP_ACTIVE_LOW, IPT_UNUSED )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0xff00, IP_ACTIVE_LOW, IPT_UNUSED )
 
 	PORT_START("INPUT")
 	PORT_BIT( 0x0001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(1)
@@ -413,9 +455,7 @@ static INPUT_PORTS_START( rdx_v33 )
 	PORT_BIT( 0x0010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
 	PORT_BIT( 0x0040, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x0080, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x0080, IP_ACTIVE_LOW, IPT_COIN1 )
 	PORT_BIT( 0x0100, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0200, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_8WAY PORT_PLAYER(2)
 	PORT_BIT( 0x0400, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_8WAY PORT_PLAYER(2)
@@ -423,9 +463,7 @@ static INPUT_PORTS_START( rdx_v33 )
 	PORT_BIT( 0x1000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
 	PORT_BIT( 0x2000, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
 	PORT_BIT( 0x4000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
-	PORT_DIPSETTING(      0x8000, DEF_STR( Off ) )
-	PORT_DIPSETTING(      0x0000, DEF_STR( On ) )
+	PORT_BIT( 0x8000, IP_ACTIVE_LOW, IPT_COIN2 )
 INPUT_PORTS_END
 
 
@@ -562,7 +600,6 @@ static MACHINE_CONFIG_START( nzerotea, driver_device )
 
 //	SEIBU2_RAIDEN2_SOUND_SYSTEM_CPU(14318180/4)
 	SEIBU_NEWZEROTEAM_SOUND_SYSTEM_CPU(14318180/4)
-
 
 	/* video hardware */
 	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
