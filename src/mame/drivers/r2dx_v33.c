@@ -18,8 +18,18 @@ Please don't do any state machine refactoring of this.
 #include "includes/raiden2.h"
 
 static UINT16 *seibu_crtc_regs;
-static UINT16 *tx_vram;
-static tilemap_t *tx_tilemap;
+static UINT16 *tx_vram,*fg_vram;
+static tilemap_t *tx_tilemap,*fg_tilemap;
+
+static TILE_GET_INFO( get_fg_tile_info )
+{
+	int tile = fg_vram[tile_index];
+	int color = (tile>>12)&0xf;
+
+	tile &= 0xfff;
+
+	SET_TILE_INFO(3,tile + 0x1000,color,0);
+}
 
 static TILE_GET_INFO( get_tx_tile_info )
 {
@@ -31,16 +41,121 @@ static TILE_GET_INFO( get_tx_tile_info )
 	SET_TILE_INFO(4,tile,color,0);
 }
 
+/* copied from Legionnaire */
+static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectangle *cliprect,int pri)
+{
+	UINT16 *spriteram16 = machine->generic.spriteram.u16;
+	int offs,fx,fy,x,y,color,sprite,cur_pri;
+	int dx,dy,ax,ay;
+
+	for (offs = 0x400-4;offs >= 0;offs -= 4)
+	{
+		UINT16 data = spriteram16[offs];
+		if (!(data &0x8000)) continue;
+
+		cur_pri = (spriteram16[offs+1] & 0xc000) >> 14;
+		if (cur_pri!=pri) continue;
+
+		sprite = spriteram16[offs+1];
+
+		sprite &= 0x3fff;
+		if(data & 0x0040) sprite |= 0x4000;//tile banking,used in Denjin Makai
+		if(spriteram16[offs+3] & 0x8000) sprite |= 0x8000;//tile banking?,used in Denjin Makai
+
+		y = spriteram16[offs+3];
+		x = spriteram16[offs+2];
+
+		/* heated barrel hardware seems to need 0x1ff with 0x100 sign bit for sprite warp,
+           this doesn't work on denjin makai as the visible area is larger */
+		/*
+        x&=0x1ff;
+        y&=0xfff;
+
+        if (x&0x100) x-=0x200;
+        if (y&0x800) y-=0x1000;
+        */
+
+		x&=0xfff;
+		y&=0xfff;
+
+		if (x&0x800) x-=0x1000;
+		if (y&0x800) y-=0x1000;
+
+		color = (data &0x3f) + 0x40;
+		fx =  (data &0x4000) >> 14;
+		fy =  (data &0x2000) >> 13;
+		dy = ((data &0x0380) >> 7)  + 1;
+		dx = ((data &0x1c00) >> 10) + 1;
+
+		if (!fx)
+		{
+			if(!fy)
+			{
+				for (ax=0; ax<dx; ax++)
+					for (ay=0; ay<dy; ay++)
+					{
+						drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
+						sprite++,
+						color,fx,fy,x+ax*16,y+ay*16,15);
+					}
+			}
+			else
+			{
+				for (ax=0; ax<dx; ax++)
+					for (ay=0; ay<dy; ay++)
+					{
+						drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
+						sprite++,
+						color,fx,fy,x+ax*16,y+(dy-ay-1)*16,15);
+					}
+			}
+		}
+		else
+		{
+			if(!fy)
+			{
+				for (ax=0; ax<dx; ax++)
+					for (ay=0; ay<dy; ay++)
+					{
+						drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
+						sprite++,
+						color,fx,fy,x+(dx-ax-1)*16,y+ay*16,15);
+					}
+			}
+			else
+			{
+				for (ax=0; ax<dx; ax++)
+					for (ay=0; ay<dy; ay++)
+					{
+						drawgfx_transpen(bitmap,cliprect,machine->gfx[0],
+						sprite++,
+						color,fx,fy,x+(dx-ax-1)*16,y+(dy-ay-1)*16,15);
+					}
+			}
+		}
+	}
+}
+
 static VIDEO_START( rdx_v33 )
 {
-	tx_tilemap       = tilemap_create(machine, get_tx_tile_info, tilemap_scan_rows,  8, 8, 64,32 );
+	fg_tilemap = tilemap_create(machine, get_fg_tile_info, tilemap_scan_rows,16,16,32,32);
+	tx_tilemap = tilemap_create(machine, get_tx_tile_info, tilemap_scan_rows,  8, 8, 64,32 );
 
+	tilemap_set_transparent_pen(fg_tilemap, 15);
 	tilemap_set_transparent_pen(tx_tilemap, 15);
 }
 
 static VIDEO_UPDATE( rdx_v33 )
 {
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+
+
+	tilemap_draw(bitmap, cliprect, fg_tilemap, 0, 0);
+
+	draw_sprites(screen->machine,bitmap,cliprect,2);
+	draw_sprites(screen->machine,bitmap,cliprect,1);
+	draw_sprites(screen->machine,bitmap,cliprect,0);
+	draw_sprites(screen->machine,bitmap,cliprect,3);
 
 	tilemap_draw(bitmap, cliprect, tx_tilemap, 0, 0);
 
@@ -106,6 +221,12 @@ static WRITE16_HANDLER( rdx_tx_vram_w )
 	tilemap_mark_tile_dirty(tx_tilemap, offset);
 }
 
+static WRITE16_HANDLER( rdx_fg_vram_w )
+{
+	COMBINE_DATA(&fg_vram[offset]);
+	tilemap_mark_tile_dirty(fg_tilemap, offset);
+}
+
 static ADDRESS_MAP_START( rdx_v33_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM // vectors copied here
 
@@ -137,11 +258,11 @@ static ADDRESS_MAP_START( rdx_v33_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00800, 0x0087f) AM_RAM // copies eeprom here?
 	AM_RANGE(0x00880, 0x0bfff) AM_RAM
 
-	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM// AM_BASE_GENERIC(spriteram)
+	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0x0c800, 0x0cfff) AM_RAM
 	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM//_WRITE(seibucrtc_sc0vram_w) AM_BASE(&seibucrtc_sc0vram)
 	AM_RANGE(0x0d800, 0x0dfff) AM_RAM//_WRITE(seibucrtc_sc1vram_w) AM_BASE(&seibucrtc_sc1vram)
-	AM_RANGE(0x0e000, 0x0e7ff) AM_RAM//_WRITE(seibucrtc_sc2vram_w) AM_BASE(&seibucrtc_sc2vram)
+	AM_RANGE(0x0e000, 0x0e7ff) AM_RAM_WRITE(rdx_fg_vram_w) AM_BASE(&fg_vram)
 	AM_RANGE(0x0e800, 0x0f7ff) AM_RAM_WRITE(rdx_tx_vram_w) AM_BASE(&tx_vram)
 	AM_RANGE(0x0f800, 0x0ffff) AM_RAM /* Stack area */
 	AM_RANGE(0x10000, 0x1efff) AM_RAM
@@ -151,6 +272,30 @@ static ADDRESS_MAP_START( rdx_v33_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x40000, 0xfffff) AM_ROM AM_REGION("mainprg", 0x40000 )
 ADDRESS_MAP_END
 
+static READ16_HANDLER( nzerotea_sound_comms_r )
+{
+	switch(offset+0x780)
+	{
+		case (0x788/2):	return seibu_main_word_r(space,2,0xffff);
+		case (0x78c/2):	return seibu_main_word_r(space,3,0xffff);
+		case (0x794/2): return seibu_main_word_r(space,5,0xffff);
+	}
+
+	return 0xffff;
+}
+
+
+static WRITE16_HANDLER( nzerotea_sound_comms_w )
+{
+	switch(offset+0x780)
+	{
+		case (0x780/2): { seibu_main_word_w(space,0,data,0x00ff); break; }
+		case (0x784/2): { seibu_main_word_w(space,1,data,0x00ff); break; }
+		case (0x790/2): { seibu_main_word_w(space,4,data,0x00ff); break; }
+		case (0x794/2): { seibu_main_word_w(space,4,data,0x00ff); break; }
+		case (0x798/2): { seibu_main_word_w(space,6,data,0x00ff); break; }
+	}
+}
 
 static ADDRESS_MAP_START( nzerotea_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM //stack area
@@ -160,6 +305,9 @@ static ADDRESS_MAP_START( nzerotea_map, ADDRESS_SPACE_PROGRAM, 16 )
 //	AM_RANGE(0x00432, 0x00433) AM_READ(nzerotea_unknown_r)
 //	AM_RANGE(0x00434, 0x00435) AM_READ(nzerotea_unknown_r)
 //	AM_RANGE(0x00436, 0x00437) AM_READ(nzerotea_unknown_r)
+
+	AM_RANGE(0x00600, 0x0064f) AM_RAM AM_BASE(&seibu_crtc_regs)
+
 	AM_RANGE(0x006b0, 0x006b1) AM_WRITE(mcu_prog_w)
 	AM_RANGE(0x006b2, 0x006b3) AM_WRITE(mcu_prog_w2)
 //	AM_RANGE(0x006b4, 0x006b5) AM_WRITENOP
@@ -174,16 +322,15 @@ static ADDRESS_MAP_START( nzerotea_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0074c, 0x0074d) AM_READ_PORT("SYSTEM")
 //	AM_RANGE(0x00762, 0x00763) AM_READ(nzerotea_unknown_r)
 
-	AM_RANGE(0x00780, 0x0079f) AM_READWRITE(seibu_main_word_r,seibu_main_word_w)
+	AM_RANGE(0x00780, 0x0079f) AM_READWRITE(nzerotea_sound_comms_r,nzerotea_sound_comms_w)
 
 	AM_RANGE(0x00800, 0x0bfff) AM_RAM
-//  AM_RANGE(0x00000, 0x003ff) AM_RAM
 
-	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM// AM_BASE_GENERIC(spriteram)
+	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM AM_BASE_GENERIC(spriteram)
 	AM_RANGE(0x0c800, 0x0cfff) AM_RAM
 	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM//_WRITE(seibucrtc_sc0vram_w) AM_BASE(&seibucrtc_sc0vram)
 	AM_RANGE(0x0d800, 0x0dfff) AM_RAM//_WRITE(seibucrtc_sc1vram_w) AM_BASE(&seibucrtc_sc1vram)
-	AM_RANGE(0x0e000, 0x0e7ff) AM_RAM//_WRITE(seibucrtc_sc2vram_w) AM_BASE(&seibucrtc_sc2vram)
+	AM_RANGE(0x0e000, 0x0e7ff) AM_RAM_WRITE(rdx_fg_vram_w) AM_BASE(&fg_vram)
 	AM_RANGE(0x0e800, 0x0f7ff) AM_RAM_WRITE(rdx_tx_vram_w) AM_BASE(&tx_vram)
 	AM_RANGE(0x0f800, 0x0ffff) AM_RAM /* Stack area */
 	AM_RANGE(0x10000, 0x1efff) AM_RAM
@@ -239,10 +386,10 @@ static const gfx_layout rdx_v33_spritelayout =
 
 static GFXDECODE_START( rdx_v33 )
 	GFXDECODE_ENTRY( "gfx3", 0x00000, rdx_v33_spritelayout, 0x000, 0x40 )
-	GFXDECODE_ENTRY( "gfx2",    0x00000, rdx_v33_tilelayout,   0x400, 0x10 )
-	GFXDECODE_ENTRY( "gfx2",    0x00000, rdx_v33_tilelayout,   0x500, 0x10 )
-	GFXDECODE_ENTRY( "gfx2",    0x00000, rdx_v33_tilelayout,   0x600, 0x10 )
-	GFXDECODE_ENTRY( "gfx1",    0x00000, rdx_v33_charlayout,   0x700, 0x10 )
+	GFXDECODE_ENTRY( "gfx2", 0x00000, rdx_v33_tilelayout,   0x400, 0x10 )
+	GFXDECODE_ENTRY( "gfx2", 0x00000, rdx_v33_tilelayout,   0x500, 0x10 )
+	GFXDECODE_ENTRY( "gfx2", 0x00000, rdx_v33_tilelayout,   0x600, 0x10 )
+	GFXDECODE_ENTRY( "gfx1", 0x00000, rdx_v33_charlayout,   0x700, 0x10 )
 GFXDECODE_END
 
 static INPUT_PORTS_START( rdx_v33 )
@@ -423,7 +570,7 @@ static MACHINE_CONFIG_START( nzerotea, driver_device )
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate *//2)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_SIZE(64*8, 64*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0, 30*8-1)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0, 32*8-1)
 	MDRV_GFXDECODE(rdx_v33)
 	MDRV_PALETTE_LENGTH(2048)
 
@@ -442,7 +589,7 @@ static DRIVER_INIT(rdx_v33)
 
 	raiden2_decrypt_sprites(machine);
 
-	memory_set_bank(machine, "bank1", 0);
+	memory_set_bank(machine, "bank1", 1);
 }
 
 static DRIVER_INIT(nzerotea)
@@ -562,7 +709,9 @@ ROM_START( nzerotea )
 	ROM_LOAD( "copx-d3.bin",   0x00000, 0x20000, BAD_DUMP CRC(fa2cf3ad) SHA1(13eee40704d3333874b6e3da9ee7d969c6dc662a) )
 
 	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
-	ROM_LOAD( "sound",  0x000000, 0x10000, CRC(7ec1fbc3) SHA1(48299d6530f641b18764cc49e283c347d0918a47) )
+	ROM_LOAD( "sound",  0x000000, 0x08000, CRC(7ec1fbc3) SHA1(48299d6530f641b18764cc49e283c347d0918a47) )
+	ROM_CONTINUE(			  0x010000, 0x08000 )	/* banked stuff */
+	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
 	ROM_LOAD16_BYTE( "fix1",	0x000000,	0x010000,	CRC(0c4895b0) SHA1(f595dbe5a19edb8a06ea60105ee26b95db4a2619) )
