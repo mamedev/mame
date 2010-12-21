@@ -1790,30 +1790,30 @@ MACHINE_CONFIG_END
     1B or 6B e
 */
 
-ROM_START( suprmrio )
+ROM_START( suprmrio ) /* Vs. Super Mario Bros. (Set ?) */
 	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
-	ROM_LOAD( "mds-sm4.1d",  0x8000, 0x2000, CRC(be4d5436) SHA1(08162a7c987f1939d09bebdb676f596c86abf465) )
-	ROM_LOAD( "mds-sm4.1c",  0xa000, 0x2000, CRC(0011fc5a) SHA1(5c2c49938a12affc03e64e5bdab307998be20020) )
-	ROM_LOAD( "mds-sm4.1b",  0xc000, 0x2000, CRC(b1b87893) SHA1(8563ceaca664cf4495ef1020c07179ca7e4af9f3) )
-	ROM_LOAD( "mds-sm4.1a",  0xe000, 0x2000, CRC(1abf053c) SHA1(f17db88ce0c9bf1ed88dc16b9650f11d10835cec) )
+	ROM_LOAD( "mds-sm4.1d or 6d", 0x8000, 0x2000, CRC(be4d5436) SHA1(08162a7c987f1939d09bebdb676f596c86abf465) )
+	ROM_LOAD( "mds-sm4.1c or 6c", 0xa000, 0x2000, CRC(0011fc5a) SHA1(5c2c49938a12affc03e64e5bdab307998be20020) )
+	ROM_LOAD( "mds-sm4.1b or 6b", 0xc000, 0x2000, CRC(b1b87893) SHA1(8563ceaca664cf4495ef1020c07179ca7e4af9f3) )
+	ROM_LOAD( "mds-sm4.1a or 6a", 0xe000, 0x2000, CRC(1abf053c) SHA1(f17db88ce0c9bf1ed88dc16b9650f11d10835cec) )
 
 	ROM_REGION( 0x4000,"gfx1", 0  ) /* PPU memory */
-	ROM_LOAD( "mds-sm4.2b",  0x0000, 0x2000, CRC(42418d40) SHA1(22ab61589742cfa4cc6856f7205d7b4b8310bc4d) )
-	ROM_LOAD( "mds-sm4.2a",  0x2000, 0x2000, CRC(15506b86) SHA1(69ecf7a3cc8bf719c1581ec7c0d68798817d416f) )
+	ROM_LOAD( "mds-sm4.2b or 8b", 0x0000, 0x2000, CRC(42418d40) SHA1(22ab61589742cfa4cc6856f7205d7b4b8310bc4d) )
+	ROM_LOAD( "mds-sm4.2a or 8a", 0x2000, 0x2000, CRC(15506b86) SHA1(69ecf7a3cc8bf719c1581ec7c0d68798817d416f) )
 
 	PALETTE_2C04_0004
 ROM_END
 
-ROM_START( suprmrioa )
+ROM_START( suprmrioa ) /* Vs. Super Mario Bros. (Set E) */
 	ROM_REGION( 0x10000,"maincpu", 0 ) /* 6502 memory */
-	ROM_LOAD( "mds-sm4.1d",  0x8000, 0x2000, CRC(be4d5436) SHA1(08162a7c987f1939d09bebdb676f596c86abf465) )
-	ROM_LOAD( "mds-sm4.1c",  0xa000, 0x2000, CRC(5e3fb550) SHA1(de4494e4dd52f7f7b04cf1d9019fd89fb90eaca9) ) /* this rom differs by TWO BYTES from the other version in suprmrio. this version has been dumped/observed on two known boards and one anonymous board */
-	ROM_LOAD( "mds-sm4.1b",  0xc000, 0x2000, CRC(b1b87893) SHA1(8563ceaca664cf4495ef1020c07179ca7e4af9f3) )
-	ROM_LOAD( "mds-sm4.1a",  0xe000, 0x2000, CRC(1abf053c) SHA1(f17db88ce0c9bf1ed88dc16b9650f11d10835cec) )
+	ROM_LOAD( "mds-sm4-4 e.1d or 6d", 0x8000, 0x2000, CRC(be4d5436) SHA1(08162a7c987f1939d09bebdb676f596c86abf465) )
+	ROM_LOAD( "mds-sm4-4 e.1c or 6c", 0xa000, 0x2000, CRC(5e3fb550) SHA1(de4494e4dd52f7f7b04cf1d9019fd89fb90eaca9) ) /* this rom differs by TWO BYTES from the other version in suprmrio. this version has been dumped/observed on two known boards and one anonymous board */
+	ROM_LOAD( "mds-sm4-4 e.1b or 6b", 0xc000, 0x2000, CRC(b1b87893) SHA1(8563ceaca664cf4495ef1020c07179ca7e4af9f3) )
+	ROM_LOAD( "mds-sm4-4 e.1a or 6a", 0xe000, 0x2000, CRC(1abf053c) SHA1(f17db88ce0c9bf1ed88dc16b9650f11d10835cec) )
 
 	ROM_REGION( 0x4000,"gfx1", 0  ) /* PPU memory */
-	ROM_LOAD( "mds-sm4.2b",  0x0000, 0x2000, CRC(42418d40) SHA1(22ab61589742cfa4cc6856f7205d7b4b8310bc4d) )
-	ROM_LOAD( "mds-sm4.2a",  0x2000, 0x2000, CRC(15506b86) SHA1(69ecf7a3cc8bf719c1581ec7c0d68798817d416f) )
+	ROM_LOAD( "mds-sm4-4 e.2b or 8b", 0x0000, 0x2000, CRC(42418d40) SHA1(22ab61589742cfa4cc6856f7205d7b4b8310bc4d) )
+	ROM_LOAD( "mds-sm4-4 e.2a or 8a", 0x2000, 0x2000, CRC(15506b86) SHA1(69ecf7a3cc8bf719c1581ec7c0d68798817d416f) )
 
 	PALETTE_2C04_0004
 ROM_END
@@ -2249,7 +2249,7 @@ ROM_END
 
 ROM_START( cstlevna )
 	ROM_REGION( 0x30000,"maincpu", 0 ) /* 6502 memory */
-	ROM_LOAD( "mds-cv.prg",  0x10000, 0x20000, CRC(ffbef374) SHA1(9eb3b75e7b45df51b8bcd29df84689a7e8557f4f) )
+	ROM_LOAD( "mds-cv.u7",  0x10000, 0x20000, CRC(ffbef374) SHA1(9eb3b75e7b45df51b8bcd29df84689a7e8557f4f) )
 
 	/* No cart gfx - uses vram */
 
@@ -2629,8 +2629,8 @@ GAME( 1985, machridr, 0,        vsnes,   machridr, vsnormal, ROT0, "Nintendo",  
 GAME( 1985, machridrj,machridr, vsnes,   machridj, vsnormal, ROT0, "Nintendo",  "Vs. Mach Rider (Japan, Fighting Course Version)", GAME_IMPERFECT_GRAPHICS )
 GAME( 1986, rbibb,    0,        vsnes,   rbibb,    rbibb,    ROT0, "Namco",     "Vs. Atari R.B.I. Baseball (set 1)", 0 )
 GAME( 1986, rbibba,   rbibb,    vsnes,   rbibb,    rbibb,    ROT0, "Namco",     "Vs. Atari R.B.I. Baseball (set 2)", 0 )
-GAME( 1986, suprmrio, 0,        vsnes,   suprmrio, vsnormal, ROT0, "Nintendo",  "Vs. Super Mario Bros.", 0 )
-GAME( 1986, suprmrioa,suprmrio, vsnes,   suprmrio, vsnormal, ROT0, "Nintendo",  "Vs. Super Mario Bros. (alt)", 0 )
+GAME( 1986, suprmrio, 0,        vsnes,   suprmrio, vsnormal, ROT0, "Nintendo",  "Vs. Super Mario Bros. (Set ?)", 0 )
+GAME( 1986, suprmrioa,suprmrio, vsnes,   suprmrio, vsnormal, ROT0, "Nintendo",  "Vs. Super Mario Bros. (Set E)", 0 )
 GAME( 1986, suprmriobl,suprmrio,vsnes,   suprmrio, vsnormal, ROT0, "bootleg",   "Vs. Super Mario Bros. (bootleg with Z80, set 1)", GAME_NOT_WORKING )
 GAME( 1986, suprmriobl2,suprmrio,vsnes,  suprmrio, vsnormal, ROT0, "bootleg",   "Vs. Super Mario Bros. (bootleg with Z80, set 2)", GAME_NOT_WORKING )
 GAME( 1988, skatekds, suprmrio, vsnes,   suprmrio, vsnormal, ROT0, "hack",      "Vs. Skate Kids. (Graphic hack of Super Mario Bros.)", 0 )
