@@ -7,6 +7,8 @@ READ16_HANDLER( heatbrl_mcu_r );
 WRITE16_HANDLER( heatbrl_mcu_w );
 READ16_HANDLER( cupsoc_mcu_r );
 WRITE16_HANDLER( cupsoc_mcu_w );
+READ16_HANDLER( cupsocs_mcu_r );
+WRITE16_HANDLER( cupsocs_mcu_w );
 READ16_HANDLER( godzilla_mcu_r );
 WRITE16_HANDLER( godzilla_mcu_w );
 READ16_HANDLER( denjinmk_mcu_r );

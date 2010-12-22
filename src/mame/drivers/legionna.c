@@ -184,6 +184,25 @@ static ADDRESS_MAP_START( cupsoc_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x11e000, 0x11ffff) AM_RAM /*Stack Ram*/
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( cupsocs_mem, ADDRESS_SPACE_PROGRAM, 16 )
+	AM_RANGE(0x000000, 0x0fffff) AM_ROM
+	AM_RANGE(0x100000, 0x1003ff) AM_RAM
+	AM_RANGE(0x100400, 0x1007ff) AM_READWRITE(cupsocs_mcu_r,cupsocs_mcu_w) AM_BASE(&cop_mcu_ram)
+	AM_RANGE(0x100800, 0x100fff) AM_RAM_WRITE(legionna_background_w) AM_BASE(&legionna_back_data)
+	AM_RANGE(0x101000, 0x1017ff) AM_RAM_WRITE(legionna_foreground_w) AM_BASE(&legionna_fore_data)
+	AM_RANGE(0x101800, 0x101fff) AM_RAM_WRITE(legionna_midground_w) AM_BASE(&legionna_mid_data)
+	AM_RANGE(0x102000, 0x102fff) AM_RAM_WRITE(legionna_text_w) AM_BASE(&legionna_textram)
+	AM_RANGE(0x103000, 0x103fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x104000, 0x104fff) AM_RAM
+	AM_RANGE(0x105000, 0x106fff) AM_RAM
+	AM_RANGE(0x107000, 0x1077ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
+	AM_RANGE(0x107800, 0x107fff) AM_RAM /*Ani Dsp(?) Ram*/
+	AM_RANGE(0x108000, 0x10ffff) AM_RAM
+	AM_RANGE(0x110000, 0x119fff) AM_RAM
+	AM_RANGE(0x11a000, 0x11dfff) AM_RAM
+	AM_RANGE(0x11e000, 0x11ffff) AM_RAM /*Stack Ram*/
+ADDRESS_MAP_END
+
 static ADDRESS_MAP_START( cupsocbl_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x0fffff) AM_ROM
 	//AM_RANGE(0x100000, 0x1003ff) AM_RAM
@@ -1236,6 +1255,10 @@ static MACHINE_CONFIG_START( cupsoc, driver_device )
 	SEIBU_SOUND_SYSTEM_YM3812_INTERFACE(14318180/4,1320000)
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( cupsocs, cupsoc )
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_PROGRAM_MAP(cupsocs_mem)
+MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( cupsocbl, driver_device )
 
@@ -2196,8 +2219,8 @@ GAME( 1993, denjinmk, 0,        denjinmk, denjinmk, denjinmk,  ROT0, "Banpresto"
 
 GAME( 1992, cupsoc,   0,        cupsoc,   cupsoc,   0,         ROT0, "Seibu Kaihatsu", "Seibu Cup Soccer (set 1)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 1992, cupsoca,  cupsoc,   cupsoc,   cupsoc,   0,         ROT0, "Seibu Kaihatsu", "Seibu Cup Soccer (set 2)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1992, cupsocs,  cupsoc,   cupsoc,   cupsoc,   0,         ROT0, "Seibu Kaihatsu", "Seibu Cup Soccer :Selection: (set 1)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1992, cupsocs2, cupsoc,   cupsoc,   cupsoc,   0,         ROT0, "Seibu Kaihatsu", "Seibu Cup Soccer :Selection: (set 2)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1992, cupsocs,  cupsoc,   cupsocs,  cupsoc,   0,         ROT0, "Seibu Kaihatsu", "Seibu Cup Soccer :Selection: (set 1)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1992, cupsocs2, cupsoc,   cupsocs,  cupsoc,   0,         ROT0, "Seibu Kaihatsu", "Seibu Cup Soccer :Selection: (set 2)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 1992, cupsocsb, cupsoc,   cupsocbl, cupsoc,   cupsoc,    ROT0, "bootleg", "Seibu Cup Soccer :Selection: (bootleg, set 1)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 1992, cupsocsb2,cupsoc,   cupsocbl, cupsoc,   cupsoc,    ROT0, "bootleg", "Seibu Cup Soccer :Selection: (bootleg, set 2)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1992, olysoc92, cupsoc,   cupsoc,   cupsoc,   0,         ROT0, "Seibu Kaihatsu", "Olympic Soccer '92", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1992, olysoc92, cupsoc,   cupsoc,  cupsoc,   0,         ROT0, "Seibu Kaihatsu", "Olympic Soccer '92", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
