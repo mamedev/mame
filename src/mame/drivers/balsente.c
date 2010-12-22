@@ -2227,8 +2227,8 @@ GAME( 1986, sfootbal, 0,        balsente, sfootbal, sfootbal, ROT0, "Bally/Sente
 GAME( 1986, spiker,   0,        balsente, spiker,   spiker,   ROT0, "Bally/Sente",  "Spiker", GAME_SUPPORTS_SAVE )
 
 /* Board: Unknown */
+GAME( 1986, shrike,   0,        shrike,   shrike,   shrike,   ROT0, "Bally/Sente",  "Shrike Avenger (prototype)", GAME_SUPPORTS_SAVE )
 GAME( 1986, stompin,  0,        balsente, stompin,  stompin,  ROT0, "Bally/Sente",  "Stompin'", GAME_SUPPORTS_SAVE )
 GAME( 1987, rescraid, 0,        balsente, rescraid, rescraid, ROT0, "Bally Midway", "Rescue Raider", GAME_SUPPORTS_SAVE )
 GAME( 1987, rescraida,rescraid, balsente, rescraid, rescraid, ROT0, "Bally Midway", "Rescue Raider (stand-alone)", GAME_SUPPORTS_SAVE )
 GAME( 198?, grudge,   0,        balsente, grudge,   grudge,   ROT0, "Bally Midway", "Grudge Match (prototype)", GAME_SUPPORTS_SAVE )
-GAME( 198?, shrike,   0,        shrike,   shrike,   shrike,   ROT0, "Bally/Sente",  "Shrike Avenger (prototype)", GAME_SUPPORTS_SAVE )
