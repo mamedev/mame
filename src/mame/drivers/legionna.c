@@ -17,17 +17,15 @@ different tiles available for use in the foreground layer.
 TODO
 ----
 
-Unemulated protection messes up both games.
+Check work RAM boundaries, they are likely to be too generous right now
 
 
 Legionnaire
 -----------
 
-Foreground tiles screwy (screen after character selection screen).
+Foreground tiles screwy (screen after character selection screen). Presumably non-protection related
 
 Need 16 px off top of vis area?
-
-The 0x104000 area appears to be extra paletteram?
 
 
 Denjin Makai
@@ -91,10 +89,9 @@ static ADDRESS_MAP_START( legionna_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x101800, 0x101fff) AM_RAM_WRITE(legionna_foreground_w) AM_BASE(&legionna_fore_data)
 	AM_RANGE(0x102000, 0x1027ff) AM_RAM_WRITE(legionna_midground_w) AM_BASE(&legionna_mid_data)
 	AM_RANGE(0x102800, 0x1037ff) AM_RAM_WRITE(legionna_text_w) AM_BASE(&legionna_textram)
-	AM_RANGE(0x104000, 0x104fff) AM_RAM /* The 4000-4fff area contains PALETTE words and may be extra paletteram? */
+	AM_RANGE(0x104000, 0x104fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)	/* palette xRRRRxGGGGxBBBBx ? */
 	AM_RANGE(0x105000, 0x105fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
-	AM_RANGE(0x106000, 0x106fff) AM_RAM /* is this used outside inits ?? */
-	AM_RANGE(0x107000, 0x107fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)	/* palette xRRRRxGGGGxBBBBx ? */
+	AM_RANGE(0x106000, 0x107fff) AM_RAM
 	AM_RANGE(0x108000, 0x11ffff) AM_RAM /* main ram */
 ADDRESS_MAP_END
 
@@ -146,11 +143,11 @@ static ADDRESS_MAP_START( denjinmk_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x101800, 0x101fff) AM_RAM_WRITE(legionna_foreground_w) AM_BASE(&legionna_fore_data)
 	AM_RANGE(0x102000, 0x1027ff) AM_RAM_WRITE(legionna_midground_w) AM_BASE(&legionna_mid_data)
 	AM_RANGE(0x102800, 0x103fff) AM_RAM_WRITE(legionna_text_w) AM_BASE(&legionna_textram)
-	AM_RANGE(0x104000, 0x104fff) AM_RAM
+	AM_RANGE(0x104000, 0x104fff) AM_RAM_WRITE(denjin_paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x105000, 0x105fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x106000, 0x107fff) AM_RAM
 	AM_RANGE(0x108000, 0x11dfff) AM_RAM
-	AM_RANGE(0x11e000, 0x11efff) AM_RAM_WRITE(denjin_paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x11e000, 0x11efff) AM_RAM
 	AM_RANGE(0x11f000, 0x11ffff) AM_RAM
 ADDRESS_MAP_END
 
@@ -179,13 +176,13 @@ static ADDRESS_MAP_START( cupsoc_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x101800, 0x101fff) AM_RAM_WRITE(legionna_midground_w) AM_BASE(&legionna_mid_data)
 	AM_RANGE(0x102000, 0x102fff) AM_RAM_WRITE(legionna_text_w) AM_BASE(&legionna_textram)
 	AM_RANGE(0x103000, 0x103fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x104000, 0x104fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) /*<according to the debug mode,there is a DMA that copies from here to the paletteram>*/
+	AM_RANGE(0x104000, 0x104fff) AM_RAM
 	AM_RANGE(0x105000, 0x106fff) AM_RAM
 	AM_RANGE(0x107000, 0x1077ff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
 	AM_RANGE(0x107800, 0x107fff) AM_RAM /*Ani Dsp(?) Ram*/
 	AM_RANGE(0x108000, 0x10ffff) AM_RAM
 	AM_RANGE(0x110000, 0x119fff) AM_RAM
-	AM_RANGE(0x11a000, 0x11dfff) AM_RAM//AM_READWRITE(copdxbl_1_r,copdxbl_1_w) AM_BASE(&work_ram)/*shared with the COP MCU too!*/
+	AM_RANGE(0x11a000, 0x11dfff) AM_RAM
 	AM_RANGE(0x11e000, 0x11ffff) AM_RAM /*Stack Ram*/
 ADDRESS_MAP_END
 
@@ -2053,7 +2050,7 @@ ROM_START( cupsocsb )
 
 	ROM_REGION( 0x080000, "gfx6", ROMREGION_INVERT )	/* LBK tiles */
 	ROM_COPY( "gfx5", 0x00000, 0x00000, 0x080000 )
-	
+
 	ROM_REGION( 0x100000, "adpcm", ROMREGION_ERASEFF )	/* ADPCM samples */
 	ROM_LOAD( "sc_02.bin",    0x000000, 0x020000, CRC(a70d4f03) SHA1(c2482e624c8a828a94206a36d10c1021ad8ca1d0) )
 	ROM_LOAD( "sc_03.bin",    0x080000, 0x080000, CRC(6e254d12) SHA1(857779dbd276b688201a8ea3afd5817e38acad2e) )
@@ -2070,16 +2067,16 @@ ROM_START( cupsocsb )
 	ROM_COPY( "adpcm", 0x00000, 0x1c0000, 0x20000 ) //bank 7
 	ROM_COPY( "adpcm", 0xe0000, 0x1e0000, 0x20000 )
 
-	
+
 	/* what are these, they're not gfx... */
 	ROM_REGION( 0x500000, "unknown0", 0 )
 	ROM_LOAD16_BYTE( "sc_13.bin", 0x00000, 0x010000, CRC(229bddd8) SHA1(0924bf29db9c5a970546f154e7752697fdce6a58) )
 	ROM_LOAD16_BYTE( "sc_12.bin", 0x00001, 0x010000, CRC(dabfa826) SHA1(0db587c846755491b169ef7751ba8e7cdc2607e6) )
-	
+
 	/* what are these, they're not gfx... */
 	ROM_REGION( 0x500000, "unknown1", 0 )
 	ROM_LOAD16_BYTE( "sc_15.bin", 0x00000, 0x080000, CRC(8fd87e65) SHA1(acc9fd0289fa9ab60bec16d3e642039380e5180a) )
-	ROM_LOAD16_BYTE( "sc_14.bin", 0x00001, 0x080000, CRC(566086c2) SHA1(b7d09ce978f99ecc0d1975b31330ed49317701d5) )	
+	ROM_LOAD16_BYTE( "sc_14.bin", 0x00001, 0x080000, CRC(566086c2) SHA1(b7d09ce978f99ecc0d1975b31330ed49317701d5) )
 ROM_END
 
 /* slight changes in the program roms compared to above set, all remaining roms were the same */
@@ -2118,7 +2115,7 @@ ROM_START( cupsocsb2 )
 
 	ROM_REGION( 0x080000, "gfx6", ROMREGION_INVERT )	/* LBK tiles */
 	ROM_COPY( "gfx5", 0x00000, 0x00000, 0x080000 )
-	
+
 	ROM_REGION( 0x100000, "adpcm", ROMREGION_ERASEFF )	/* ADPCM samples */
 	ROM_LOAD( "sc_02.bin",    0x000000, 0x020000, CRC(a70d4f03) SHA1(c2482e624c8a828a94206a36d10c1021ad8ca1d0) )
 	ROM_LOAD( "sc_03.bin",    0x080000, 0x080000, CRC(6e254d12) SHA1(857779dbd276b688201a8ea3afd5817e38acad2e) )
@@ -2135,16 +2132,16 @@ ROM_START( cupsocsb2 )
 	ROM_COPY( "adpcm", 0x00000, 0x1c0000, 0x20000 ) //bank 7
 	ROM_COPY( "adpcm", 0xe0000, 0x1e0000, 0x20000 )
 
-	
+
 	/* what are these, they're not gfx... */
 	ROM_REGION( 0x500000, "unknown0", 0 )
 	ROM_LOAD16_BYTE( "sc_13.bin", 0x00000, 0x010000, CRC(229bddd8) SHA1(0924bf29db9c5a970546f154e7752697fdce6a58) )
 	ROM_LOAD16_BYTE( "sc_12.bin", 0x00001, 0x010000, CRC(dabfa826) SHA1(0db587c846755491b169ef7751ba8e7cdc2607e6) )
-	
+
 	/* what are these, they're not gfx... */
 	ROM_REGION( 0x500000, "unknown1", 0 )
 	ROM_LOAD16_BYTE( "sc_15.bin", 0x00000, 0x080000, CRC(8fd87e65) SHA1(acc9fd0289fa9ab60bec16d3e642039380e5180a) )
-	ROM_LOAD16_BYTE( "sc_14.bin", 0x00001, 0x080000, CRC(566086c2) SHA1(b7d09ce978f99ecc0d1975b31330ed49317701d5) )	
+	ROM_LOAD16_BYTE( "sc_14.bin", 0x00001, 0x080000, CRC(566086c2) SHA1(b7d09ce978f99ecc0d1975b31330ed49317701d5) )
 ROM_END
 
 #define CUPSOC_DEBUG_MODE 1

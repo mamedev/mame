@@ -2431,6 +2431,7 @@ static READ16_HANDLER( generic_cop_r )
 static WRITE16_HANDLER( generic_cop_w )
 {
 	static UINT32 temp32;
+	static UINT32 dma_src,dma_dst,dma_size,dma_trigger,dma_src_param;
 
 	switch (offset)
 	{
@@ -2464,10 +2465,15 @@ static WRITE16_HANDLER( generic_cop_w )
 		case (0x03a/2):	{ cop_43a = data; break; }
 		case (0x03c/2): { cop_43c = data; break; }
 
-		/* Layer Clearing */
+		/* DMA / layer clearing */
+		case (0x076/2):
+			dma_src_param = data * 0x400;
+			break;
+
 		case (0x078/2): /* clear address */
 		{
 			cop_clearfill_address[cop_clearfill_lasttrigger] = data; // << 6 to get actual address
+			dma_src = data << 6;
 			seibu_cop_log("%06x: COPX set layer clear address to %04x (actual %08x)\n", cpu_get_pc(space->cpu), data, data<<6);
 			break;
 		}
@@ -2476,7 +2482,7 @@ static WRITE16_HANDLER( generic_cop_w )
 		{
 			cop_clearfill_length[cop_clearfill_lasttrigger] = data;
 			seibu_cop_log("%06x: COPX set layer clear length to %04x (actual %08x)\n", cpu_get_pc(space->cpu), data, data<<5);
-
+			dma_size = data << 5;
 			break;
 		}
 
@@ -2484,6 +2490,7 @@ static WRITE16_HANDLER( generic_cop_w )
 		{
 			cop_clearfill_value[cop_clearfill_lasttrigger] = data;
 			seibu_cop_log("%06x: COPX set layer clear value to %04x (actual %08x)\n", cpu_get_pc(space->cpu), data, data<<6);
+			dma_dst = data << 6;
 			break;
 		}
 
@@ -2497,6 +2504,8 @@ static WRITE16_HANDLER( generic_cop_w )
 				seibu_cop_log("invalid!, >0x1ff\n");
 				cop_clearfill_lasttrigger = 0;
 			}
+
+			dma_trigger = data;
 
 			break;
 		}
@@ -2564,8 +2573,38 @@ static WRITE16_HANDLER( generic_cop_w )
 		{
 			seibu_cop_log("%06x: COPX execute current layer clear??? %04x\n", cpu_get_pc(space->cpu), data);
 
+			if (dma_trigger & 0x80)
+			{
+				static UINT32 src,dst,size,i;
+
+				/* TODO: understand all the differences between triggers!
+				0x80 is used by Legionnaire (plain DMA)
+				0x81 is used by SD Gundam and Godzilla (unknown purpose)
+				0x86 is used by Seibu Cup Soccer (doesn't yet work)
+				0x87 is used by Denjin Makai (DMA with inverted word endianess)
+				*/
+
+				if(dma_trigger != 0x87)
+					printf("SRC: %08x %08x DST:%08x SIZE:%08x TRIGGER: %08x\n",dma_src,dma_src_param,dma_dst,dma_size,dma_trigger);
+
+				if(dma_trigger == 0x81)
+					return;
+
+				src = dma_src + dma_src_param;
+				dst = dma_dst;
+				size = (dma_size - dma_dst + 0x20)/2;
+
+				for(i = 0;i < size;i++)
+				{
+					space->write_word(dst, space->read_word(src));
+					src+=2;
+					dst+=2;
+				}
+			}
+
 			// I think the value it writes here must match the other value for anything to happen.. maybe */
 			//if (data!=cop_clearfill_value[cop_clearfill_lasttrigger]) break;
+
 			if ((cop_clearfill_lasttrigger==0x14) || (cop_clearfill_lasttrigger==0x15)) return;
 
 			/* do the fill  */
@@ -2581,6 +2620,7 @@ static WRITE16_HANDLER( generic_cop_w )
 					space->write_word(i, 0x0000);
 				}
 			}
+
 			break;
 		}
 	}
