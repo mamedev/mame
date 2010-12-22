@@ -2584,8 +2584,8 @@ static WRITE16_HANDLER( generic_cop_w )
 				0x87 is used by Denjin Makai (DMA with inverted word endianess)
 				*/
 
-				if(dma_trigger != 0x87)
-					printf("SRC: %08x %08x DST:%08x SIZE:%08x TRIGGER: %08x\n",dma_src,dma_src_param,dma_dst,dma_size,dma_trigger);
+				//if(dma_trigger != 0x87)
+				//	printf("SRC: %08x %08x DST:%08x SIZE:%08x TRIGGER: %08x\n",dma_src,dma_src_param,dma_dst,dma_size,dma_trigger);
 
 				if(dma_trigger == 0x81)
 					return;
@@ -2600,12 +2600,46 @@ static WRITE16_HANDLER( generic_cop_w )
 					src+=2;
 					dst+=2;
 				}
+
+				return;
+			}
+
+			/* Seibu Cup Soccer trigger this*/
+			if (dma_trigger == 0x0e)
+			{
+				static UINT32 src,dst,size,i;
+				printf("SRC: %08x DST:%08x SIZE:%08x TRIGGER: %08x\n",dma_src,dma_dst,dma_size,dma_trigger);
+
+				src = dma_src;
+				dst = dma_dst;
+				size = ((dma_size - dma_dst) / 0x20) + 1;
+
+				for(i=0;i<size;i++)
+				{
+					space->write_dword(dst+0x00, space->read_dword(src+0x00));
+					space->write_dword(dst+0x04, space->read_dword(src+0x04));
+					space->write_dword(dst+0x08, space->read_dword(src+0x08));
+					space->write_dword(dst+0x0c, space->read_dword(src+0x0c));
+					space->write_dword(dst+0x10, space->read_dword(src+0x10));
+					space->write_dword(dst+0x14, space->read_dword(src+0x14));
+					space->write_dword(dst+0x18, space->read_dword(src+0x18));
+					space->write_dword(dst+0x1c, space->read_dword(src+0x1c));
+
+					//printf("%08x %08x\n",src,dst);
+
+					dst+=0x20;
+					src+=0x20;
+				}
+
+				return;
 			}
 
 			// I think the value it writes here must match the other value for anything to happen.. maybe */
 			//if (data!=cop_clearfill_value[cop_clearfill_lasttrigger]) break;
 
 			if ((cop_clearfill_lasttrigger==0x14) || (cop_clearfill_lasttrigger==0x15)) return;
+
+			//printf("SRC: %08x DST:%08x SIZE:%08x TRIGGER: %08x\n",dma_src,dma_dst,dma_size,dma_trigger);
 
 			/* do the fill  */
 			if (cop_clearfill_value[cop_clearfill_lasttrigger]==0x0000)
