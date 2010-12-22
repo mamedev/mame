@@ -376,7 +376,7 @@ static const s3c2410_interface bballoon_s3c2410_intf =
 	// GPIO (port read / port write)
 	{ s3c2410_gpio_port_r, s3c2410_gpio_port_w },
 	// I2C (scl write / sda read / sda write)
-	{ s3c2410_i2c_scl_w, s3c2410_i2c_sda_r, s3c2410_i2c_sda_w }, 
+	{ s3c2410_i2c_scl_w, s3c2410_i2c_sda_r, s3c2410_i2c_sda_w },
 	// ADC (data read)
 	{ NULL },
 	// I2S (data write)
@@ -499,5 +499,5 @@ static DRIVER_INIT( bballoon )
 	memcpy( steppingstone, memory_region( machine, "user1"), 4 * 1024);
 }
 
-GAME( 2003, bballoon, 0, bballoon, bballoon, bballoon, ROT0, "Eolith", "Balloon & Balloon", GAME_NO_SOUND )
+GAME( 2003, bballoon, 0, bballoon, bballoon, bballoon, ROT0, "Eolith", "BnB Arcade", GAME_NO_SOUND )
 GAME( 2005, hapytour, 0, bballoon, bballoon, bballoon, ROT0, "GAV Company", "Happy Tour", GAME_NO_SOUND )
