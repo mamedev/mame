@@ -4695,7 +4695,8 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( sprtjam )	/* 2000.12 Sports Jam */
 						/* 2000.12 Derby Owners Club 2000 ver.2 */
 						/* 2000.?? World Kicks New ver. */
-	DRIVER( derbyocw )	/* 2001.?? Derby Owners Club World Edition (Rev. C) */
+	DRIVER( derbyocw )	/* 2001.?? Derby Owners Club World Edition (Rev. D) */
+	DRIVER( drbyocwc )	/* 2001.?? Derby Owners Club World Edition (Rev. C) */
 	DRIVER( f355twn2 )	/* 2001.01 F355 Challenge 2 */
 	DRIVER( gwing2 )	/* 2001.01 Giga Wing 2 */
 	DRIVER( csmash )	/* 2001.01 Cosmic Smash */
