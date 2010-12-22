@@ -342,7 +342,7 @@ static CPU_EXECUTE( i8086 )
 
 static CPU_DISASSEMBLE( i8086 )
 {
-	return i386_dasm_one(buffer, pc, oprom, 16);
+	return i386_dasm_one(buffer, pc, oprom, 1);
 }
 
 
@@ -557,7 +557,7 @@ CPU_GET_INFO( i8086 )
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 1;							break;
-		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:			info->i = 16;							break;
+		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:			info->i = 8;							break;
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;							break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 50;							break;
 

@@ -1092,6 +1092,7 @@ static const char *const i386_sreg[8] = {"es", "cs", "ss", "ds", "fs", "gs", "??
 
 static int address_size;
 static int operand_size;
+static int max_length;
 static UINT64 pc;
 static UINT8 modrm;
 static UINT32 segment;
@@ -1106,7 +1107,7 @@ static UINT8 curmode;
 
 INLINE UINT8 FETCH(void)
 {
-	if ((opcode_ptr - opcode_ptr_base) + 1 > 15)
+	if ((opcode_ptr - opcode_ptr_base) + 1 > max_length)
 		return 0xff;
 	pc++;
 	return *opcode_ptr++;
@@ -1115,7 +1116,7 @@ INLINE UINT8 FETCH(void)
 INLINE UINT16 FETCH16(void)
 {
 	UINT16 d;
-	if ((opcode_ptr - opcode_ptr_base) + 2 > 15)
+	if ((opcode_ptr - opcode_ptr_base) + 2 > max_length)
 		return 0xffff;
 	d = opcode_ptr[0] | (opcode_ptr[1] << 8);
 	opcode_ptr += 2;
@@ -1126,7 +1127,7 @@ INLINE UINT16 FETCH16(void)
 INLINE UINT32 FETCH32(void)
 {
 	UINT32 d;
-	if ((opcode_ptr - opcode_ptr_base) + 4 > 15)
+	if ((opcode_ptr - opcode_ptr_base) + 4 > max_length)
 		return 0xffffffff;
 	d = opcode_ptr[0] | (opcode_ptr[1] << 8) | (opcode_ptr[2] << 16) | (opcode_ptr[3] << 24);
 	opcode_ptr += 4;
@@ -1136,7 +1137,7 @@ INLINE UINT32 FETCH32(void)
 
 INLINE UINT8 FETCHD(void)
 {
-	if ((opcode_ptr - opcode_ptr_base) + 1 > 15)
+	if ((opcode_ptr - opcode_ptr_base) + 1 > max_length)
 		return 0xff;
 	pc++;
 	return *opcode_ptr++;
@@ -1145,7 +1146,7 @@ INLINE UINT8 FETCHD(void)
 INLINE UINT16 FETCHD16(void)
 {
 	UINT16 d;
-	if ((opcode_ptr - opcode_ptr_base) + 2 > 15)
+	if ((opcode_ptr - opcode_ptr_base) + 2 > max_length)
 		return 0xffff;
 	d = opcode_ptr[0] | (opcode_ptr[1] << 8);
 	opcode_ptr += 2;
@@ -1156,7 +1157,7 @@ INLINE UINT16 FETCHD16(void)
 INLINE UINT32 FETCHD32(void)
 {
 	UINT32 d;
-	if ((opcode_ptr - opcode_ptr_base) + 4 > 15)
+	if ((opcode_ptr - opcode_ptr_base) + 4 > max_length)
 		return 0xffffffff;
 	d = opcode_ptr[0] | (opcode_ptr[1] << 8) | (opcode_ptr[2] << 16) | (opcode_ptr[3] << 24);
 	opcode_ptr += 4;
@@ -2128,8 +2129,34 @@ int i386_dasm_one_ex(char *buffer, UINT64 eip, const UINT8 *oprom, int mode)
 	UINT8 op;
 
 	opcode_ptr = opcode_ptr_base = oprom;
-	address_size = (mode == 16) ? 0 : (mode == 32) ? 1 : 2;
-	operand_size = (mode == 16) ? 0 : 1;
+	switch(mode)
+	{
+		case 1: /* 8086/8088/80186/80188 */
+			address_size = 0;
+			operand_size = 0;
+			max_length = 8;	/* maximum without redundant prefixes - not enforced by chip */
+			break;
+		case 2: /* 80286 */
+			address_size = 0;
+			operand_size = 0;
+			max_length = 10;
+			break;
+		case 16: /* 80386+ 16-bit code segment */
+			address_size = 0;
+			operand_size = 0;
+			max_length = 15;
+			break;
+		case 32: /* 80386+ 32-bit code segment */
+			address_size = 1;
+			operand_size = 1;
+			max_length = 15;
+			break;
+		case 64: /* x86_64 */
+			address_size = 2;
+			operand_size = 1;
+			max_length = 15;
+			break;
+	}
 	pc = eip;
 	dasm_flags = 0;
 	segment = 0;

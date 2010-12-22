@@ -246,7 +246,7 @@ extern int i386_dasm_one(char *buffer, UINT32 eip, const UINT8 *oprom, int mode)
 
 static CPU_DISASSEMBLE( i80286 )
 {
-	return i386_dasm_one(buffer, pc, oprom, 16);
+	return i386_dasm_one(buffer, pc, oprom, 2);
 }
 
 static CPU_INIT( i80286 )
@@ -401,7 +401,7 @@ CPU_GET_INFO( i80286 )
 		case CPUINFO_INT_CLOCK_MULTIPLIER:				info->i = 1;							break;
 		case CPUINFO_INT_CLOCK_DIVIDER:					info->i = 1;							break;
 		case CPUINFO_INT_MIN_INSTRUCTION_BYTES:			info->i = 1;							break;
-		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:			info->i = 15;							break;
+		case CPUINFO_INT_MAX_INSTRUCTION_BYTES:			info->i = 10;							break;
 		case CPUINFO_INT_MIN_CYCLES:					info->i = 1;							break;
 		case CPUINFO_INT_MAX_CYCLES:					info->i = 50;							break;
 
