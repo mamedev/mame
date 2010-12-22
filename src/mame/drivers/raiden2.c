@@ -223,6 +223,9 @@ WRITE16_MEMBER(raiden2_state::cop_dma_trigger_w)
 {
 	//  logerror("COP DMA mode=%x adr=%x size=%x vals=%x %x %x\n", cop_dma_mode, cop_dma_adr, cop_dma_size, cop_dma_v1, cop_dma_v2, cop_dma_v3);
 
+	//if(cop_dma_mode != 0x14 && cop_dma_mode != 0x15)
+	//	printf("%02x\n",cop_dma_mode);
+
 	switch(cop_dma_mode) {
 	case 0x14: {
 		int rsize = 32*(0x7f-cop_dma_size);
@@ -525,6 +528,11 @@ WRITE16_MEMBER(raiden2_state::raiden2_text_w)
 	tilemap_mark_tile_dirty(text_layer, offset);
 }
 
+WRITE16_MEMBER(raiden2_state::tilemap_enable_w)
+{
+	COMBINE_DATA(&raiden2_tilemap_enable);
+}
+
 WRITE16_MEMBER(raiden2_state::tile_scroll_w)
 {
 	COMBINE_DATA(scrollvals + offset);
@@ -640,17 +648,34 @@ static VIDEO_UPDATE ( raiden2 )
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
 
 	if (!input_code_pressed(screen->machine, KEYCODE_Q))
-		tilemap_draw(bitmap, cliprect, state->background_layer, 0, 0);
+	{
+		if (!(state->raiden2_tilemap_enable & 1))
+			tilemap_draw(bitmap, cliprect, state->background_layer, 0, 0);
+	}
+
 	if (!input_code_pressed(screen->machine, KEYCODE_W))
-		tilemap_draw(bitmap, cliprect, state->midground_layer, 0, 0);
+	{
+		if (!(state->raiden2_tilemap_enable & 2))
+			tilemap_draw(bitmap, cliprect, state->midground_layer, 0, 0);
+	}
+
 	if (!input_code_pressed(screen->machine, KEYCODE_E))
-		tilemap_draw(bitmap, cliprect, state->foreground_layer, 0, 0);
+	{
+		if (!(state->raiden2_tilemap_enable & 4))
+			tilemap_draw(bitmap, cliprect, state->foreground_layer, 0, 0);
+	}
 
 	if (!input_code_pressed(screen->machine, KEYCODE_S))
-		state->draw_sprites(screen->machine, bitmap, cliprect, 0);
+	{
+		//if (!(raiden2_tilemap_enable & 0x10))
+			state->draw_sprites(screen->machine, bitmap, cliprect, 0);
+	}
 
 	if (!input_code_pressed(screen->machine, KEYCODE_A))
-		tilemap_draw(bitmap, cliprect, state->text_layer, 0, 0);
+	{
+		if (!(state->raiden2_tilemap_enable & 8))
+			tilemap_draw(bitmap, cliprect, state->text_layer, 0, 0);
+	}
 
 	return 0;
 }
@@ -848,6 +873,7 @@ static ADDRESS_MAP_START( raiden2_mem, ADDRESS_SPACE_PROGRAM, 16, raiden2_state 
 	AM_RANGE(0x005b2, 0x005b3) AM_READ(cop_dist_r)
 	AM_RANGE(0x005b4, 0x005b5) AM_READ(cop_angle_r)
 
+	AM_RANGE(0x0061c, 0x0061d) AM_WRITE(tilemap_enable_w)
 	AM_RANGE(0x00620, 0x0062b) AM_WRITE(tile_scroll_w)
 	AM_RANGE(0x006a0, 0x006a3) AM_WRITE(sprcpt_val_1_w)
 	AM_RANGE(0x006a4, 0x006a7) AM_WRITE(sprcpt_data_3_w)
@@ -867,7 +893,7 @@ static ADDRESS_MAP_START( raiden2_mem, ADDRESS_SPACE_PROGRAM, 16, raiden2_state 
 	AM_RANGE(0x00744, 0x00745) AM_READ_PORT("CONTROLS")
 	AM_RANGE(0x0074c, 0x0074d) AM_READ_PORT("SYSTEM")
 
-	AM_RANGE(0x00700, 0x0cfff) AM_RAM
+	AM_RANGE(0x00800, 0x0cfff) AM_RAM
 
 	AM_RANGE(0x0d000, 0x0d7ff) AM_RAM_WRITE(raiden2_background_w) AM_BASE(back_data)
 	AM_RANGE(0x0d800, 0x0dfff) AM_RAM_WRITE(raiden2_foreground_w) AM_BASE(fore_data)
@@ -882,6 +908,35 @@ static ADDRESS_MAP_START( raiden2_mem, ADDRESS_SPACE_PROGRAM, 16, raiden2_state 
 	AM_RANGE(0x40000, 0xfffff) AM_ROM AM_REGION("mainprg", 0x40000)
 ADDRESS_MAP_END
 
+static ADDRESS_MAP_START( zeroteam_mem, ADDRESS_SPACE_PROGRAM, 16, raiden2_state )
+
+	AM_RANGE(0x0c800, 0x0cfff) AM_RAM_WRITE(raiden2_midground_w) AM_BASE(mid_data)
+    AM_RANGE(0x0d000, 0x0dfff) AM_RAM_WRITE(raiden2_text_w) AM_BASE(text_data)
+	AM_RANGE(0x0e000, 0x0efff) AM_RAM AM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
+
+	/* unknown ranges of the following two! (we can't test enough of this so far) */
+	AM_RANGE(0x0b800, 0x0bfff) AM_RAM_WRITE(raiden2_foreground_w) AM_BASE(fore_data)
+	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM_WRITE(raiden2_background_w) AM_BASE(back_data)
+
+	AM_RANGE(0x00800, 0x0ffff) AM_RAM
+	AM_RANGE(0x10000, 0x1ffff) AM_RAM
+	AM_IMPORT_FROM( raiden2_mem )
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( xsedae_mem, ADDRESS_SPACE_PROGRAM, 16, raiden2_state )
+
+	AM_RANGE(0x0c800, 0x0cfff) AM_RAM_WRITE(raiden2_midground_w) AM_BASE(mid_data)
+    AM_RANGE(0x0d000, 0x0dfff) AM_RAM_WRITE(raiden2_text_w) AM_BASE(text_data)
+	AM_RANGE(0x0e000, 0x0efff) AM_RAM AM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
+
+	/* unknown ranges of the following two! (we can't test enough of this so far) */
+	AM_RANGE(0x0b800, 0x0bfff) AM_RAM_WRITE(raiden2_foreground_w) AM_BASE(fore_data)
+	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM_WRITE(raiden2_background_w) AM_BASE(back_data)
+
+	AM_RANGE(0x00800, 0x0ffff) AM_RAM
+	AM_RANGE(0x10000, 0x1ffff) AM_RAM
+	AM_IMPORT_FROM( raiden2_mem )
+ADDRESS_MAP_END
 
 
 READ16_MEMBER(raiden2_state::rdx_v33_system_r )
@@ -1066,7 +1121,59 @@ static INPUT_PORTS_START( raidendx )
 	PORT_BIT( 0xfff0, IP_ACTIVE_LOW, IPT_UNUSED )
 INPUT_PORTS_END
 
+static INPUT_PORTS_START( zeroteam )
+	PORT_INCLUDE( raiden2 )
 
+	PORT_MODIFY("DSW")
+	PORT_DIPNAME( 0x0001, 0x0001, "DSW0" )
+	PORT_DIPSETTING(    0x0001, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0002, 0x0002, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0002, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0004, 0x0004, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0004, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0008, 0x0008, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0008, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0010, 0x0010, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0010, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0020, 0x0020, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0020, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0040, 0x0040, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0040, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0080, 0x0080, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0080, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0100, 0x0100, "DSW1" )
+	PORT_DIPSETTING(    0x0100, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0200, 0x0200, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0200, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0400, 0x0400, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0400, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x0800, 0x0800, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x0800, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x1000, 0x1000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x1000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x2000, 0x2000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x2000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x4000, 0x4000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x4000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+	PORT_DIPNAME( 0x8000, 0x8000, DEF_STR( Unknown ) )
+	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
+	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
+INPUT_PORTS_END
 
 /*************************************
  *
@@ -1158,6 +1265,42 @@ static MACHINE_CONFIG_START( raiden2, raiden2_state )
 
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( xsedae, raiden2 )
+	MDRV_CPU_MODIFY("maincpu")
+	MDRV_CPU_PROGRAM_MAP(xsedae_mem)
+
+MACHINE_CONFIG_END
+
+static MACHINE_CONFIG_START( zeroteam, raiden2_state )
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD("maincpu", V30,XTAL_32MHz/2) /* verified on pcb */
+	MDRV_CPU_PROGRAM_MAP(zeroteam_mem)
+	MDRV_CPU_VBLANK_INT("screen", raiden2_interrupt)
+
+	MDRV_MACHINE_RESET(raiden2)
+
+	SEIBU_NEWZEROTEAM_SOUND_SYSTEM_CPU(14318180/4)
+
+
+	/* video hardware */
+	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK)
+
+	MDRV_SCREEN_ADD("screen", RASTER)
+	MDRV_SCREEN_REFRESH_RATE(55.47)    /* verified on pcb */
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate *//2)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MDRV_SCREEN_SIZE(64*8, 64*8)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0, 32*8-1)
+	MDRV_GFXDECODE(raiden2)
+	MDRV_PALETTE_LENGTH(2048)
+
+	MDRV_VIDEO_START(raiden2)
+	MDRV_VIDEO_UPDATE(raiden2)
+
+	/* sound hardware */
+	SEIBU_SOUND_SYSTEM_YM3812_INTERFACE(14318180/4,1320000)
+MACHINE_CONFIG_END
 
 /* ROM LOADING */
 
@@ -1744,10 +1887,8 @@ ROM_START( zeroteam )
 	ROM_LOAD32_WORD( "obj-1",  0x000000, 0x200000, CRC(45be8029) SHA1(adc164f9dede9a86b96a4d709e9cba7d2ad0e564) )
 	ROM_LOAD32_WORD( "obj-2",  0x000002, 0x200000, CRC(cb61c19d) SHA1(151a2ce9c32f3321a974819e9b165dddc31c8153) )
 
-	ROM_REGION( 0x100000, "oki1", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x100000, "oki", 0 )	/* ADPCM samples */
 	ROM_LOAD( "6.pcm", 0x00000, 0x40000,  CRC(48be32b1) SHA1(969d2191a3c46871ee8bf93088b3cecce3eccf0c) ) // 6.4a
-
-	ROM_REGION( 0x100000, "oki2", ROMREGION_ERASEFF )	/* ADPCM samples */
 ROM_END
 
 ROM_START( zeroteama )
@@ -1777,10 +1918,8 @@ ROM_START( zeroteama )
 	ROM_LOAD32_WORD( "obj-1",  0x000000, 0x200000, CRC(45be8029) SHA1(adc164f9dede9a86b96a4d709e9cba7d2ad0e564) )
 	ROM_LOAD32_WORD( "obj-2",  0x000002, 0x200000, CRC(cb61c19d) SHA1(151a2ce9c32f3321a974819e9b165dddc31c8153) )
 
-	ROM_REGION( 0x100000, "oki1", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x100000, "oki", 0 )	/* ADPCM samples */
 	ROM_LOAD( "6.pcm", 0x00000, 0x40000,  CRC(48be32b1) SHA1(969d2191a3c46871ee8bf93088b3cecce3eccf0c) ) // 6.bin
-
-	ROM_REGION( 0x100000, "oki2", ROMREGION_ERASEFF )	/* ADPCM samples */
 ROM_END
 
 ROM_START( zeroteams )
@@ -1810,10 +1949,8 @@ ROM_START( zeroteams )
 	ROM_LOAD32_WORD( "obj-1",  0x000000, 0x200000, CRC(45be8029) SHA1(adc164f9dede9a86b96a4d709e9cba7d2ad0e564) )
 	ROM_LOAD32_WORD( "obj-2",  0x000002, 0x200000, CRC(cb61c19d) SHA1(151a2ce9c32f3321a974819e9b165dddc31c8153) )
 
-	ROM_REGION( 0x100000, "oki1", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x100000, "oki", 0 )	/* ADPCM samples */
 	ROM_LOAD( "6.pcm", 0x00000, 0x40000,  CRC(48be32b1) SHA1(969d2191a3c46871ee8bf93088b3cecce3eccf0c) ) // 6.bin
-
-	ROM_REGION( 0x100000, "oki2", ROMREGION_ERASEFF )	/* ADPCM samples */
 ROM_END
 
 /* set contained only program roms, was marked as 'non-encrytped' but program isn't encrypted anyway?! */
@@ -1844,10 +1981,8 @@ ROM_START( zeroteamb )
 	ROM_LOAD32_WORD( "obj-1",  0x000000, 0x200000, CRC(45be8029) SHA1(adc164f9dede9a86b96a4d709e9cba7d2ad0e564) )
 	ROM_LOAD32_WORD( "obj-2",  0x000002, 0x200000, CRC(cb61c19d) SHA1(151a2ce9c32f3321a974819e9b165dddc31c8153) )
 
-	ROM_REGION( 0x100000, "oki1", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x100000, "oki", 0 )	/* ADPCM samples */
 	ROM_LOAD( "6.pcm", 0x00000, 0x40000,  CRC(48be32b1) SHA1(969d2191a3c46871ee8bf93088b3cecce3eccf0c) ) // 6.4a
-
-	ROM_REGION( 0x100000, "oki2", ROMREGION_ERASEFF )	/* ADPCM samples */
 ROM_END
 
 ROM_START( zeroteamc )
@@ -1877,10 +2012,8 @@ ROM_START( zeroteamc )
 	ROM_LOAD32_WORD( "obj-1",  0x000000, 0x200000, CRC(45be8029) SHA1(adc164f9dede9a86b96a4d709e9cba7d2ad0e564) )
 	ROM_LOAD32_WORD( "obj-2",  0x000002, 0x200000, CRC(cb61c19d) SHA1(151a2ce9c32f3321a974819e9b165dddc31c8153) )
 
-	ROM_REGION( 0x100000, "oki1", 0 )	/* ADPCM samples */
+	ROM_REGION( 0x100000, "oki", 0 )	/* ADPCM samples */
 	ROM_LOAD( "6.105", 0x00000, 0x40000,  CRC(b4a6e899) SHA1(175ab656db3c3258ff10eede89890f62435d2298) )
-
-	ROM_REGION( 0x100000, "oki2", ROMREGION_ERASEFF )	/* ADPCM samples */
 ROM_END
 
 /*
@@ -1983,10 +2116,10 @@ GAME( 1994, raidndxj, raidndx, raiden2,  raidendx, raiden2,  ROT270, "Seibu Kaih
 GAME( 1994, raidndxu, raidndx, raiden2,  raidendx, raiden2,  ROT270, "Seibu Kaihatsu (Fabtek license)",        "Raiden DX (US)",                   GAME_NOT_WORKING|GAME_NO_SOUND)
 GAME( 1994, raidndxg, raidndx, raiden2,  raidendx, raiden2,  ROT270, "Seibu Kaihatsu (Tuning license)",        "Raiden DX (Germany)",              GAME_NOT_WORKING|GAME_NO_SOUND)
 
-GAME( 1993, zeroteam, 0,       raiden2,  raiden2,  raiden2,  ROT0,   "Seibu Kaihatsu", "Zero Team (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND)
-GAME( 1993, zeroteama,zeroteam,raiden2,  raiden2,  raiden2,  ROT0,   "Seibu Kaihatsu", "Zero Team (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND)
-GAME( 1993, zeroteamb,zeroteam,raiden2,  raiden2,  raiden2,  ROT0,   "Seibu Kaihatsu", "Zero Team (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND)
-GAME( 1993, zeroteamc,zeroteam,raiden2,  raiden2,  raiden2,  ROT0,   "Seibu Kaihatsu", "Zero Team (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND)
-GAME( 1993, zeroteams,zeroteam,raiden2,  raiden2,  raiden2,  ROT0,   "Seibu Kaihatsu", "Zero Team Selection", GAME_NOT_WORKING|GAME_NO_SOUND)
+GAME( 1993, zeroteam, 0,       zeroteam, zeroteam,  raiden2,  ROT0,   "Seibu Kaihatsu", "Zero Team (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND)
+GAME( 1993, zeroteama,zeroteam,zeroteam, zeroteam,  raiden2,  ROT0,   "Seibu Kaihatsu", "Zero Team (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND)
+GAME( 1993, zeroteamb,zeroteam,zeroteam, zeroteam,  raiden2,  ROT0,   "Seibu Kaihatsu", "Zero Team (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND)
+GAME( 1993, zeroteamc,zeroteam,zeroteam, zeroteam,  raiden2,  ROT0,   "Seibu Kaihatsu", "Zero Team (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND)
+GAME( 1993, zeroteams,zeroteam,zeroteam, zeroteam,  raiden2,  ROT0,   "Seibu Kaihatsu", "Zero Team Selection", GAME_NOT_WORKING|GAME_NO_SOUND)
 
-GAME( 1995, xsedae,   0,       raiden2,  raiden2,  xsedae,   ROT0,   "Dream Island",   "X Se Dae Quiz", GAME_NOT_WORKING|GAME_NO_SOUND)
+GAME( 1995, xsedae,   0,       xsedae,   raiden2,  xsedae,   ROT0,   "Dream Island",   "X Se Dae Quiz", GAME_NOT_WORKING|GAME_NO_SOUND)
