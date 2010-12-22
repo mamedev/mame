@@ -10304,6 +10304,7 @@ Other Sun games
 
 	/* Island */
 	DRIVER( island )	/* (c) 2005 */
+	DRIVER( island_2 )	/* (c) 2005 */
 
 	/* Pirate */
 	//DRIVER( pirate )  /* (c) 2005 */

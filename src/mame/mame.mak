@@ -1254,6 +1254,7 @@ $(MAMEOBJ)/subsino.a: \
 
 $(MAMEOBJ)/sun.a: \
 	$(DRIVERS)/arabian.o $(VIDEO)/arabian.o \
+	$(DRIVERS)/dai3wksi.o \
 	$(DRIVERS)/ikki.o $(VIDEO)/ikki.o \
 	$(DRIVERS)/kangaroo.o $(VIDEO)/kangaroo.o \
 	$(DRIVERS)/markham.o $(VIDEO)/markham.o \
