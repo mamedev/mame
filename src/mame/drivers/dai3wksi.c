@@ -382,13 +382,13 @@ static MACHINE_RESET( dai3wksi )
 static MACHINE_CONFIG_START( dai3wksi, dai3wksi_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 2520000)	/* 2.52 MHz */
+	MDRV_CPU_ADD("maincpu", Z80, XTAL_10MHz/4 )	/* Confirmed on PCB */
 	MDRV_CPU_PROGRAM_MAP(main_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_MACHINE_START(dai3wksi)
 	MDRV_MACHINE_RESET(dai3wksi)
-
+ 
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(dai3wksi)
 
