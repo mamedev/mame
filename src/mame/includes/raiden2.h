@@ -30,6 +30,7 @@ public:
 	DECLARE_READ16_MEMBER ( cop_angle_r );
 	DECLARE_WRITE16_MEMBER ( cop_dma_trigger_w );
 	DECLARE_WRITE16_MEMBER ( cop_tile_bank_2_w );
+	DECLARE_WRITE16_MEMBER ( tilemap_enable_w );
 	DECLARE_WRITE16_MEMBER ( tile_scroll_w );
 	DECLARE_WRITE16_MEMBER ( tile_bank_01_w );
 	DECLARE_WRITE16_MEMBER ( raiden2_background_w );
@@ -64,6 +65,7 @@ public:
 	tilemap_t *background_layer,*midground_layer,*foreground_layer,*text_layer;
 	UINT16 *back_data,*fore_data,*mid_data, *text_data;
 	int bg_bank, fg_bank, mid_bank;
+	UINT16 raiden2_tilemap_enable;
 
 	UINT16 scrollvals[6];
 	UINT32 cop_regs[4], cop_itoa;
