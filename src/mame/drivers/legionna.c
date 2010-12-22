@@ -23,8 +23,6 @@ Check work RAM boundaries, they are likely to be too generous right now
 Legionnaire
 -----------
 
-Foreground tiles screwy (screen after character selection screen). Presumably non-protection related
-
 Need 16 px off top of vis area?
 
 
@@ -949,6 +947,19 @@ static const gfx_layout legionna_tilelayout =
 	128*8
 };
 
+static const gfx_layout legionna_tilelayout2 =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	4,
+	{ 0*4, 1*4, 2*4, 3*4 },
+	{ 3, 2, 1, 0, 16+3, 16+2, 16+1, 16+0,
+	  64*8+3, 64*8+2, 64*8+1, 64*8+0, 64*8+16+3, 64*8+16+2, 64*8+16+1, 64*8+16+0 },
+	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32,
+	  8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
+	128*8
+};
+
 static const gfx_layout legionna_spritelayout =
 {
 	16,16,
@@ -963,11 +974,11 @@ static const gfx_layout legionna_spritelayout =
 };
 
 static GFXDECODE_START( legionna )
-	GFXDECODE_ENTRY( "gfx1", 0, legionna_new_charlayout,   48*16, 16 )
-	GFXDECODE_ENTRY( "gfx3", 0, legionna_tilelayout,    0*16, 16 )
-	GFXDECODE_ENTRY( "gfx4", 0, legionna_tilelayout,   32*16, 16 )
-	GFXDECODE_ENTRY( "gfx2", 0, legionna_spritelayout,  0*16, 8*16 )
-	GFXDECODE_ENTRY( "gfx5", 0, legionna_tilelayout,   32*16, 16 )
+	GFXDECODE_ENTRY( "gfx1", 0, legionna_new_charlayout, 48*16, 16 )
+	GFXDECODE_ENTRY( "gfx3", 0, legionna_tilelayout,      0*16, 16 )
+	GFXDECODE_ENTRY( "gfx4", 0, legionna_tilelayout,     32*16, 16 )
+	GFXDECODE_ENTRY( "gfx2", 0, legionna_spritelayout,    0*16, 8*16 )
+	GFXDECODE_ENTRY( "gfx5", 0, legionna_tilelayout2,   32*16, 16 )
 	GFXDECODE_ENTRY( "gfx6", 0, legionna_tilelayout,   16*16, 16 )
 GFXDECODE_END
 
