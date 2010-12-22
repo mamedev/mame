@@ -983,13 +983,59 @@ static GFXDECODE_START( heatbrl )
 	GFXDECODE_ENTRY( "gfx6", 0, legionna_tilelayout,   16*16, 16 )
 GFXDECODE_END
 
+
+static const gfx_layout cupsocsb_spritelayout =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	4,
+	{ 0,1,2,3 },
+	{ 4,0,12,8,20,16,28,24, 512+4, 512+0, 512+12, 512+8, 512+20, 512+16, 512+28, 512+24 },
+	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32, 8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
+	32*32
+};
+
+static const gfx_layout cupsocsb_8x8_tilelayout =
+{
+	8,8,
+	RGN_FRAC(1,1),
+	4,
+	{ 8,12,0,4 },
+	{ 0,3,2,1,16,19,18,17 },
+	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32 },
+	8*32
+};
+
+
+static const gfx_layout cupsocsb_tilelayout =
+{
+	16,16,
+	RGN_FRAC(1,1),
+	4,
+	{ 8,12,0,4 },
+	{ 0,3,2,1,16,19,18,17,  512+0,512+3,512+2,512+1,512+16,512+19,512+18,512+17 },
+	{ 0*32, 1*32, 2*32, 3*32, 4*32, 5*32, 6*32, 7*32, 8*32, 9*32, 10*32, 11*32, 12*32, 13*32, 14*32, 15*32 },
+	32*32
+};
+
+
+static GFXDECODE_START( heatbrl_csb )
+	GFXDECODE_ENTRY( "gfx1", 0, cupsocsb_8x8_tilelayout,    48*16, 16 )
+	GFXDECODE_ENTRY( "gfx3", 0, cupsocsb_tilelayout,        0*16, 16 )
+	GFXDECODE_ENTRY( "gfx4", 0, cupsocsb_tilelayout,        32*16, 16 ) /* unused */
+	GFXDECODE_ENTRY( "gfx2", 0, cupsocsb_spritelayout,      0*16, 8*16 )
+	GFXDECODE_ENTRY( "gfx5", 0, cupsocsb_tilelayout,        32*16, 16 )
+	GFXDECODE_ENTRY( "gfx6", 0, cupsocsb_tilelayout,        16*16, 16 )
+GFXDECODE_END
+
+
 static GFXDECODE_START( grainbow )
 	GFXDECODE_ENTRY( "gfx1", 0, legionna_new_charlayout,    48*16, 16 )
-	GFXDECODE_ENTRY( "gfx3", 0, legionna_tilelayout,    0*16, 16 )
-	GFXDECODE_ENTRY( "gfx4", 0, legionna_tilelayout,  32*16, 16 )	/* unused */
-	GFXDECODE_ENTRY( "gfx2", 0, legionna_spritelayout,  0*16, 8*16 )
-	GFXDECODE_ENTRY( "gfx5", 0, legionna_tilelayout,   32*16, 16 )
-	GFXDECODE_ENTRY( "gfx6", 0, legionna_tilelayout,   16*16, 16 )
+	GFXDECODE_ENTRY( "gfx3", 0, legionna_tilelayout,        0*16, 16 )
+	GFXDECODE_ENTRY( "gfx4", 0, legionna_tilelayout,        32*16, 16 )	/* unused */
+	GFXDECODE_ENTRY( "gfx2", 0, legionna_spritelayout,      0*16, 8*16 )
+	GFXDECODE_ENTRY( "gfx5", 0, legionna_tilelayout,        32*16, 16 )
+	GFXDECODE_ENTRY( "gfx6", 0, legionna_tilelayout,        16*16, 16 )
 GFXDECODE_END
 
 /*****************************************************************************/
@@ -1208,7 +1254,7 @@ static MACHINE_CONFIG_START( cupsocbl, driver_device )
 	MDRV_SCREEN_SIZE(40*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 32*8-1)
 
-	MDRV_GFXDECODE(heatbrl)
+	MDRV_GFXDECODE(heatbrl_csb)
 	MDRV_PALETTE_LENGTH(128*16)
 
 	MDRV_VIDEO_START(cupsoc)
@@ -1978,43 +2024,36 @@ ROM_START( cupsocsb )
 	ROM_LOAD16_BYTE( "sc_05.bin", 0x00000, 0x80000, CRC(2f977dff) SHA1(4d8d6e7d06ce17bb7292072965911f8b1f1067e2) )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Z80 code */
-	/*First part is full of $FF,a bad dump?*/
 	ROM_LOAD( "sc_01.bin",    0x000000, 0x08000, CRC(cea39d6d) SHA1(f0b79c03ffafdd1e57673d6d4836becbe415110b) )
 	ROM_CONTINUE(			  0x000000, 0x08000 )
 
-	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "seibu6.7x",    0x000000, 0x010000, CRC(21c1e1b8) SHA1(30928c8ef98bf32ba0bf795ddadba1c95fcffe9d) )
-	ROM_LOAD16_BYTE( "seibu5.7y",    0x000001, 0x010000, CRC(955d9fd7) SHA1(782451e8e85f7ba285d6cacd9d3fdcf48bde60bc) )
-
-	ROM_REGION( 0x200000, "gfx2", 0 )
-	ROM_LOAD( "obj.8c",       0x000000, 0x100000, CRC(e2377895) SHA1(1d1c7f31a08a464139cdaf383a5e1ade0717dc9f) )
-	ROM_RELOAD(               0x100000, 0x100000 )
-
-	ROM_REGION( 0x100000, "gfx3", 0 )	/* MBK tiles */
-	ROM_LOAD( "back-1.4y",    0x000000, 0x100000, CRC(3dfea0ec) SHA1(8f41d267e488e07831946ef898d593897f10bfe2) )
-
-	ROM_REGION( 0x100000, "gfx4", 0 )	/* not used */
-	ROM_COPY("gfx3",0x00000,0x00000,0x100000)
-
-	ROM_REGION( 0x080000, "gfx5", 0 )	/* BK3 tiles */
-	ROM_LOAD( "back-2.6y",    0x000000, 0x080000, CRC(e07712af) SHA1(2a0285d6a1e0141838e898252b8d922a6263b05f) )
-
-	ROM_REGION( 0x080000, "gfx6", 0 )	/* LBK tiles */
-	ROM_COPY( "gfx5", 0x00000, 0x00000, 0x080000 )
-
-	/*bootleg GFX roms,for now load the original roms*/
-	ROM_REGION( 0x500000, "user2", 0 )
+	ROM_REGION( 0x200000, "gfx2", ROMREGION_INVERT ) /* bootleg sprite gfx */
 	ROM_LOAD( "sc_07.bin", 0x000000, 0x080000, CRC(dcb29d01) SHA1(72b4234622605f0ab03f21fdb6a61c6dac36000d) )
 	ROM_LOAD( "sc_06.bin", 0x080000, 0x080000, CRC(2dc70e05) SHA1(f1d0beb8428a7e1d7c7818e6719abdc543b2fa80) )
-	ROM_LOAD( "sc_13.bin", 0x100000, 0x010000, CRC(229bddd8) SHA1(0924bf29db9c5a970546f154e7752697fdce6a58) )
-	ROM_LOAD( "sc_12.bin", 0x110000, 0x010000, CRC(dabfa826) SHA1(0db587c846755491b169ef7751ba8e7cdc2607e6) )
-	ROM_LOAD( "sc_08.bin", 0x200000, 0x080000, CRC(637120f3) SHA1(b4b2ad192e46ff80d4cb440d7fb6dac215a353ed) )
-	ROM_LOAD( "sc_09.bin", 0x280000, 0x080000, CRC(695b6342) SHA1(dfccb43789021ba2568b9284ae61e64f7f89b152) )
-	ROM_LOAD( "sc_14.bin", 0x300000, 0x080000, CRC(566086c2) SHA1(b7d09ce978f99ecc0d1975b31330ed49317701d5) )
-	ROM_LOAD( "sc_15.bin", 0x380000, 0x080000, CRC(8fd87e65) SHA1(acc9fd0289fa9ab60bec16d3e642039380e5180a) )
-	ROM_LOAD( "sc_10.bin", 0x400000, 0x080000, CRC(27e172b8) SHA1(ed86db2f42c8061607d46f2407b0130aaf692a02) )
-	ROM_LOAD( "sc_11.bin", 0x480000, 0x080000, CRC(0cd5ca5e) SHA1(a59665e543e9383355de2576e6693348ec356591) )
+	ROM_COPY( "gfx2", 0x00000, 0x100000, 0x100000 )
 
+	ROM_REGION( 0x200000, "test1", 0 ) /* bootleg tile gfx */
+	ROM_LOAD16_BYTE( "sc_09.bin", 0x000000, 0x080000, CRC(695b6342) SHA1(dfccb43789021ba2568b9284ae61e64f7f89b152) )
+	ROM_LOAD16_BYTE( "sc_10.bin", 0x000001, 0x080000, CRC(27e172b8) SHA1(ed86db2f42c8061607d46f2407b0130aaf692a02) )
+	ROM_LOAD16_BYTE( "sc_08.bin", 0x100000, 0x080000, CRC(637120f3) SHA1(b4b2ad192e46ff80d4cb440d7fb6dac215a353ed) )
+	ROM_LOAD16_BYTE( "sc_11.bin", 0x100001, 0x080000, CRC(0cd5ca5e) SHA1(a59665e543e9383355de2576e6693348ec356591) )
+
+	ROM_REGION( 0x020000, "gfx1", ROMREGION_INVERT )
+	ROM_COPY( "test1", 0x080000, 0x00000, 0x020000 )
+
+	ROM_REGION( 0x100000, "gfx3", ROMREGION_INVERT )	/* MBK tiles */
+	ROM_COPY( "test1", 0x000000, 0x00000, 0x080000 )
+	ROM_COPY( "test1", 0x100000, 0x80000, 0x080000 )
+
+	ROM_REGION( 0x100000, "gfx4", ROMREGION_INVERT )	/* not used */
+	ROM_COPY("gfx3",0x00000,0x00000,0x100000)
+
+	ROM_REGION( 0x080000, "gfx5", ROMREGION_INVERT )	/* BK3 tiles */
+	ROM_COPY( "test1", 0x180000, 0x00000, 0x080000 )
+
+	ROM_REGION( 0x080000, "gfx6", ROMREGION_INVERT )	/* LBK tiles */
+	ROM_COPY( "gfx5", 0x00000, 0x00000, 0x080000 )
+	
 	ROM_REGION( 0x100000, "adpcm", ROMREGION_ERASEFF )	/* ADPCM samples */
 	ROM_LOAD( "sc_02.bin",    0x000000, 0x020000, CRC(a70d4f03) SHA1(c2482e624c8a828a94206a36d10c1021ad8ca1d0) )
 	ROM_LOAD( "sc_03.bin",    0x080000, 0x080000, CRC(6e254d12) SHA1(857779dbd276b688201a8ea3afd5817e38acad2e) )
@@ -2030,6 +2069,17 @@ ROM_START( cupsocsb )
 	ROM_COPY( "adpcm", 0xc0000, 0x1a0000, 0x20000 )
 	ROM_COPY( "adpcm", 0x00000, 0x1c0000, 0x20000 ) //bank 7
 	ROM_COPY( "adpcm", 0xe0000, 0x1e0000, 0x20000 )
+
+	
+	/* what are these, they're not gfx... */
+	ROM_REGION( 0x500000, "unknown0", 0 )
+	ROM_LOAD16_BYTE( "sc_13.bin", 0x00000, 0x010000, CRC(229bddd8) SHA1(0924bf29db9c5a970546f154e7752697fdce6a58) )
+	ROM_LOAD16_BYTE( "sc_12.bin", 0x00001, 0x010000, CRC(dabfa826) SHA1(0db587c846755491b169ef7751ba8e7cdc2607e6) )
+	
+	/* what are these, they're not gfx... */
+	ROM_REGION( 0x500000, "unknown1", 0 )
+	ROM_LOAD16_BYTE( "sc_15.bin", 0x00000, 0x080000, CRC(8fd87e65) SHA1(acc9fd0289fa9ab60bec16d3e642039380e5180a) )
+	ROM_LOAD16_BYTE( "sc_14.bin", 0x00001, 0x080000, CRC(566086c2) SHA1(b7d09ce978f99ecc0d1975b31330ed49317701d5) )	
 ROM_END
 
 /* slight changes in the program roms compared to above set, all remaining roms were the same */
@@ -2042,39 +2092,33 @@ ROM_START( cupsocsb2 )
 	ROM_LOAD( "sc_01.bin",    0x000000, 0x08000, CRC(cea39d6d) SHA1(f0b79c03ffafdd1e57673d6d4836becbe415110b) )
 	ROM_CONTINUE(			  0x000000, 0x08000 )
 
-	ROM_REGION( 0x020000, "gfx1", 0 )
-	ROM_LOAD16_BYTE( "seibu6.7x",    0x000000, 0x010000, CRC(21c1e1b8) SHA1(30928c8ef98bf32ba0bf795ddadba1c95fcffe9d) )
-	ROM_LOAD16_BYTE( "seibu5.7y",    0x000001, 0x010000, CRC(955d9fd7) SHA1(782451e8e85f7ba285d6cacd9d3fdcf48bde60bc) )
-
-	ROM_REGION( 0x200000, "gfx2", 0 )
-	ROM_LOAD( "obj.8c",       0x000000, 0x100000, CRC(e2377895) SHA1(1d1c7f31a08a464139cdaf383a5e1ade0717dc9f) )
-	ROM_RELOAD(               0x100000, 0x100000 )
-
-	ROM_REGION( 0x100000, "gfx3", 0 )	/* MBK tiles */
-	ROM_LOAD( "back-1.4y",    0x000000, 0x100000, CRC(3dfea0ec) SHA1(8f41d267e488e07831946ef898d593897f10bfe2) )
-
-	ROM_REGION( 0x100000, "gfx4", 0 )	/* not used */
-	ROM_COPY("gfx3",0x00000,0x00000,0x100000)
-
-	ROM_REGION( 0x080000, "gfx5", 0 )	/* BK3 tiles */
-	ROM_LOAD( "back-2.6y",    0x000000, 0x080000, CRC(e07712af) SHA1(2a0285d6a1e0141838e898252b8d922a6263b05f) )
-
-	ROM_REGION( 0x080000, "gfx6", 0 )	/* LBK tiles */
-	ROM_COPY( "gfx5", 0x00000, 0x00000, 0x080000 )
-
-	/*bootleg GFX roms,for now load the original roms*/
-	ROM_REGION( 0x500000, "user2", 0 )
+	ROM_REGION( 0x200000, "gfx2", ROMREGION_INVERT ) /* bootleg sprite gfx */
 	ROM_LOAD( "sc_07.bin", 0x000000, 0x080000, CRC(dcb29d01) SHA1(72b4234622605f0ab03f21fdb6a61c6dac36000d) )
 	ROM_LOAD( "sc_06.bin", 0x080000, 0x080000, CRC(2dc70e05) SHA1(f1d0beb8428a7e1d7c7818e6719abdc543b2fa80) )
-	ROM_LOAD( "sc_13.bin", 0x100000, 0x010000, CRC(229bddd8) SHA1(0924bf29db9c5a970546f154e7752697fdce6a58) )
-	ROM_LOAD( "sc_12.bin", 0x110000, 0x010000, CRC(dabfa826) SHA1(0db587c846755491b169ef7751ba8e7cdc2607e6) )
-	ROM_LOAD( "sc_08.bin", 0x200000, 0x080000, CRC(637120f3) SHA1(b4b2ad192e46ff80d4cb440d7fb6dac215a353ed) )
-	ROM_LOAD( "sc_09.bin", 0x280000, 0x080000, CRC(695b6342) SHA1(dfccb43789021ba2568b9284ae61e64f7f89b152) )
-	ROM_LOAD( "sc_14.bin", 0x300000, 0x080000, CRC(566086c2) SHA1(b7d09ce978f99ecc0d1975b31330ed49317701d5) )
-	ROM_LOAD( "sc_15.bin", 0x380000, 0x080000, CRC(8fd87e65) SHA1(acc9fd0289fa9ab60bec16d3e642039380e5180a) )
-	ROM_LOAD( "sc_10.bin", 0x400000, 0x080000, CRC(27e172b8) SHA1(ed86db2f42c8061607d46f2407b0130aaf692a02) )
-	ROM_LOAD( "sc_11.bin", 0x480000, 0x080000, CRC(0cd5ca5e) SHA1(a59665e543e9383355de2576e6693348ec356591) )
+	ROM_COPY( "gfx2", 0x00000, 0x100000, 0x100000 )
 
+	ROM_REGION( 0x200000, "test1", 0 ) /* bootleg tile gfx */
+	ROM_LOAD16_BYTE( "sc_09.bin", 0x000000, 0x080000, CRC(695b6342) SHA1(dfccb43789021ba2568b9284ae61e64f7f89b152) )
+	ROM_LOAD16_BYTE( "sc_10.bin", 0x000001, 0x080000, CRC(27e172b8) SHA1(ed86db2f42c8061607d46f2407b0130aaf692a02) )
+	ROM_LOAD16_BYTE( "sc_08.bin", 0x100000, 0x080000, CRC(637120f3) SHA1(b4b2ad192e46ff80d4cb440d7fb6dac215a353ed) )
+	ROM_LOAD16_BYTE( "sc_11.bin", 0x100001, 0x080000, CRC(0cd5ca5e) SHA1(a59665e543e9383355de2576e6693348ec356591) )
+
+	ROM_REGION( 0x020000, "gfx1", ROMREGION_INVERT )
+	ROM_COPY( "test1", 0x080000, 0x00000, 0x020000 )
+
+	ROM_REGION( 0x100000, "gfx3", ROMREGION_INVERT )	/* MBK tiles */
+	ROM_COPY( "test1", 0x000000, 0x00000, 0x080000 )
+	ROM_COPY( "test1", 0x100000, 0x80000, 0x080000 )
+
+	ROM_REGION( 0x100000, "gfx4", ROMREGION_INVERT )	/* not used */
+	ROM_COPY("gfx3",0x00000,0x00000,0x100000)
+
+	ROM_REGION( 0x080000, "gfx5", ROMREGION_INVERT )	/* BK3 tiles */
+	ROM_COPY( "test1", 0x180000, 0x00000, 0x080000 )
+
+	ROM_REGION( 0x080000, "gfx6", ROMREGION_INVERT )	/* LBK tiles */
+	ROM_COPY( "gfx5", 0x00000, 0x00000, 0x080000 )
+	
 	ROM_REGION( 0x100000, "adpcm", ROMREGION_ERASEFF )	/* ADPCM samples */
 	ROM_LOAD( "sc_02.bin",    0x000000, 0x020000, CRC(a70d4f03) SHA1(c2482e624c8a828a94206a36d10c1021ad8ca1d0) )
 	ROM_LOAD( "sc_03.bin",    0x080000, 0x080000, CRC(6e254d12) SHA1(857779dbd276b688201a8ea3afd5817e38acad2e) )
@@ -2090,6 +2134,17 @@ ROM_START( cupsocsb2 )
 	ROM_COPY( "adpcm", 0xc0000, 0x1a0000, 0x20000 )
 	ROM_COPY( "adpcm", 0x00000, 0x1c0000, 0x20000 ) //bank 7
 	ROM_COPY( "adpcm", 0xe0000, 0x1e0000, 0x20000 )
+
+	
+	/* what are these, they're not gfx... */
+	ROM_REGION( 0x500000, "unknown0", 0 )
+	ROM_LOAD16_BYTE( "sc_13.bin", 0x00000, 0x010000, CRC(229bddd8) SHA1(0924bf29db9c5a970546f154e7752697fdce6a58) )
+	ROM_LOAD16_BYTE( "sc_12.bin", 0x00001, 0x010000, CRC(dabfa826) SHA1(0db587c846755491b169ef7751ba8e7cdc2607e6) )
+	
+	/* what are these, they're not gfx... */
+	ROM_REGION( 0x500000, "unknown1", 0 )
+	ROM_LOAD16_BYTE( "sc_15.bin", 0x00000, 0x080000, CRC(8fd87e65) SHA1(acc9fd0289fa9ab60bec16d3e642039380e5180a) )
+	ROM_LOAD16_BYTE( "sc_14.bin", 0x00001, 0x080000, CRC(566086c2) SHA1(b7d09ce978f99ecc0d1975b31330ed49317701d5) )	
 ROM_END
 
 #define CUPSOC_DEBUG_MODE 1
