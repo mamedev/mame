@@ -14,9 +14,9 @@
     MACROS & CONSTANTS
 *******************************************************************************/
 
-#define UART_PRINTF
+//#define UART_PRINTF
 
-#define CLOCK_MULTIPLIER 0.2
+#define CLOCK_MULTIPLIER 1
 
 #define BIT(x,n) (((x)>>(n))&1)
 #define BITS(x,m,n) (((x)>>(n))&(((UINT32)1<<((m)-(n)+1))-1))
@@ -1027,7 +1027,7 @@ static void s3c24xx_check_pending_irq( running_device *device)
 static void s3c24xx_request_irq( running_device *device, UINT32 int_type)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
-	verboselog( device->machine, /*5*/0, "request irq %d\n", int_type);
+	verboselog( device->machine, 5, "request irq %d\n", int_type);
 	s3c24xx->irq.regs.srcpnd |= (1 << int_type);
 	s3c24xx_check_pending_irq( device);
 }
@@ -1102,7 +1102,7 @@ static READ32_DEVICE_HANDLER( s3c24xx_irq_r )
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	UINT32 data = ((UINT32*)&s3c24xx->irq.regs)[offset];
-	verboselog( device->machine, /*9*/0, "(IRQ) %08X -> %08X\n", S3C24XX_BASE_INT + (offset << 2), data);
+	verboselog( device->machine, 9, "(IRQ) %08X -> %08X\n", S3C24XX_BASE_INT + (offset << 2), data);
 	return data;
 }
 
@@ -1110,7 +1110,7 @@ static WRITE32_DEVICE_HANDLER( s3c24xx_irq_w )
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	UINT32 old_value = ((UINT32*)&s3c24xx->irq.regs)[offset];
-	verboselog( device->machine, /*9*/0, "(IRQ) %08X <- %08X\n", S3C24XX_BASE_INT + (offset << 2), data);
+	verboselog( device->machine, 9, "(IRQ) %08X <- %08X\n", S3C24XX_BASE_INT + (offset << 2), data);
 	COMBINE_DATA(&((UINT32*)&s3c24xx->irq.regs)[offset]);
 	switch (offset)
 	{
@@ -1195,7 +1195,7 @@ static READ32_DEVICE_HANDLER( s3c24xx_pwm_r )
 		}
 		break;
 	}
-	verboselog( device->machine, /*9*/0, "(PWM) %08X -> %08X\n", S3C24XX_BASE_PWM + (offset << 2), data);
+	verboselog( device->machine, 9, "(PWM) %08X -> %08X\n", S3C24XX_BASE_PWM + (offset << 2), data);
 	return data;
 }
 
@@ -1207,7 +1207,7 @@ static void s3c24xx_pwm_start( running_device *device, int timer)
 	const int mux_shift[] = { 0, 4, 8, 12, 16};
 	UINT32 pclk, prescaler, mux, cnt, cmp, auto_reload;
 	double freq, hz;
-	verboselog( device->machine, /*1*/0, "PWM %d start\n", timer);
+	verboselog( device->machine, 1, "PWM %d start\n", timer);
 	pclk = s3c24xx_get_pclk( device);
 	prescaler = (s3c24xx->pwm.regs.tcfg0 >> prescaler_shift[timer]) & 0xFF;
 	mux = (s3c24xx->pwm.regs.tcfg1 >> mux_shift[timer]) & 0x0F;
@@ -1272,7 +1272,7 @@ static void s3c24xx_pwm_start( running_device *device, int timer)
 	{
 		hz = freq / cnt;
 	}
-	verboselog( device->machine, /*5*/0, "PWM %d - pclk=%d prescaler=%d div=%d freq=%f cnt=%d cmp=%d auto_reload=%d hz=%f\n", timer, pclk, prescaler, mux_table[mux], freq, cnt, cmp, auto_reload, hz);
+	verboselog( device->machine, 5, "PWM %d - pclk=%d prescaler=%d div=%d freq=%f cnt=%d cmp=%d auto_reload=%d hz=%f\n", timer, pclk, prescaler, mux_table[mux], freq, cnt, cmp, auto_reload, hz);
 	s3c24xx->pwm.cnt[timer] = cnt;
 	s3c24xx->pwm.cmp[timer] = cmp;
 	s3c24xx->pwm.freq[timer] = freq;
@@ -1289,7 +1289,7 @@ static void s3c24xx_pwm_start( running_device *device, int timer)
 static void s3c24xx_pwm_stop( running_device *device, int timer)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
-	verboselog( device->machine, /*1*/0, "PWM %d stop\n", timer);
+	verboselog( device->machine, 1, "PWM %d stop\n", timer);
 	timer_adjust_oneshot( s3c24xx->pwm.timer[timer], attotime_never, 0);
 }
 
@@ -1311,7 +1311,7 @@ static WRITE32_DEVICE_HANDLER( s3c24xx_pwm_w )
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	UINT32 old_value = ((UINT32*)&s3c24xx->pwm.regs)[offset];
-	verboselog( device->machine, /*9*/0, "(PWM) %08X <- %08X\n", S3C24XX_BASE_PWM + (offset << 2), data);
+	verboselog( device->machine, 9, "(PWM) %08X <- %08X\n", S3C24XX_BASE_PWM + (offset << 2), data);
 	COMBINE_DATA(&((UINT32*)&s3c24xx->pwm.regs)[offset]);
 	switch (offset)
 	{
@@ -1348,7 +1348,7 @@ static TIMER_CALLBACK( s3c24xx_pwm_timer_exp )
 	s3c24xx_t *s3c24xx = get_token( device);
 	int ch = param;
 	const int ch_int[] = { S3C24XX_INT_TIMER0, S3C24XX_INT_TIMER1, S3C24XX_INT_TIMER2, S3C24XX_INT_TIMER3, S3C24XX_INT_TIMER4 };
-	verboselog( machine, /*2*/0, "PWM %d timer callback\n", ch);
+	verboselog( machine, 2, "PWM %d timer callback\n", ch);
 	if (BITS( s3c24xx->pwm.regs.tcfg1, 23, 20) == (ch + 1))
 	{
 		s3c24xx_dma_request_pwm( device);
@@ -1682,7 +1682,7 @@ static READ32_DEVICE_HANDLER( s3c24xx_gpio_r )
 		break;
 #endif
 	}
-	verboselog( device->machine, /*9*/0, "(GPIO) %08X -> %08X\n", S3C24XX_BASE_GPIO + (offset << 2), data);
+	verboselog( device->machine, 9, "(GPIO) %08X -> %08X\n", S3C24XX_BASE_GPIO + (offset << 2), data);
 	return data;
 }
 
@@ -1692,7 +1692,7 @@ static WRITE32_DEVICE_HANDLER( s3c24xx_gpio_w )
 #if defined(DEVICE_S3C2410) || defined(DEVICE_S3C2440)
 	UINT32 old_value = ((UINT32*)&s3c24xx->gpio.regs)[offset];
 #endif
-	verboselog( device->machine, /*9*/0, "(GPIO) %08X <- %08X\n", S3C24XX_BASE_GPIO + (offset << 2), data);
+	verboselog( device->machine, 9, "(GPIO) %08X <- %08X\n", S3C24XX_BASE_GPIO + (offset << 2), data);
 	COMBINE_DATA(&((UINT32*)&s3c24xx->gpio.regs)[offset]);
 	switch (offset)
 	{
@@ -1765,14 +1765,14 @@ static READ32_DEVICE_HANDLER( s3c24xx_memcon_r )
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	UINT32 data = s3c24xx->memcon.regs.data[offset];
-	verboselog( device->machine, /*9*/0, "(MEMCON) %08X -> %08X\n", S3C24XX_BASE_MEMCON + (offset << 2), data);
+	verboselog( device->machine, 9, "(MEMCON) %08X -> %08X\n", S3C24XX_BASE_MEMCON + (offset << 2), data);
 	return data;
 }
 
 static WRITE32_DEVICE_HANDLER( s3c24xx_memcon_w )
 {
 	s3c24xx_t *s3c24xx = get_token( device);
-	verboselog( device->machine, /*9*/0, "(MEMCON) %08X <- %08X\n", S3C24XX_BASE_MEMCON + (offset << 2), data);
+	verboselog( device->machine, 9, "(MEMCON) %08X <- %08X\n", S3C24XX_BASE_MEMCON + (offset << 2), data);
 	COMBINE_DATA(&s3c24xx->memcon.regs.data[offset]);
 }
 
@@ -1893,7 +1893,7 @@ static WRITE32_DEVICE_HANDLER( s3c24xx_uart_2_w )
 
 static void s3c24xx_uart_fifo_w( running_device *device, int uart, UINT8 data)
 {
-	printf( "s3c24xx_uart_fifo_w (%c)\n", data);
+//	printf( "s3c24xx_uart_fifo_w (%c)\n", data);
 	s3c24xx_t *s3c24xx = get_token( device);
 	s3c24xx->uart[uart].regs.urxh = data;
 	s3c24xx->uart[uart].regs.utrstat |= 1; // [bit 0] Receive buffer data ready
@@ -2306,7 +2306,7 @@ static READ32_DEVICE_HANDLER( s3c24xx_iis_r )
 		break;
 	}
 #endif
-	verboselog( device->machine, /*9*/0, "(IIS) %08X -> %08X\n", S3C24XX_BASE_IIS + (offset << 2), data);
+	verboselog( device->machine, 9, "(IIS) %08X -> %08X\n", S3C24XX_BASE_IIS + (offset << 2), data);
 	return data;
 }
 
@@ -2314,7 +2314,7 @@ static WRITE32_DEVICE_HANDLER( s3c24xx_iis_w )
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	UINT32 old_value = ((UINT32*)&s3c24xx->iis.regs)[offset];
-	verboselog( device->machine, /*9*/0, "(IIS) %08X <- %08X\n", S3C24XX_BASE_IIS + (offset << 2), data);
+	verboselog( device->machine, 9, "(IIS) %08X <- %08X\n", S3C24XX_BASE_IIS + (offset << 2), data);
 	COMBINE_DATA(&((UINT32*)&s3c24xx->iis.regs)[offset]);
 	switch (offset)
 	{
@@ -2789,7 +2789,7 @@ static void s3c24xx_nand_update_ecc( running_device *device, UINT8 data)
 	temp[1] = s3c24xx->nand.mecc[1];
 	temp[2] = s3c24xx->nand.mecc[2];
 	nand_update_mecc( s3c24xx->nand.mecc, s3c24xx->nand.pos++, data);
-	verboselog( device->machine, /*5*/10, "NAND - MECC %03X - %02X %02X %02X ->  %02X %02X %02X\n", s3c24xx->nand.pos - 1, temp[0], temp[1], temp[2], s3c24xx->nand.mecc[0], s3c24xx->nand.mecc[1], s3c24xx->nand.mecc[2]);
+	verboselog( device->machine, 5, "NAND - MECC %03X - %02X %02X %02X ->  %02X %02X %02X\n", s3c24xx->nand.pos - 1, temp[0], temp[1], temp[2], s3c24xx->nand.mecc[0], s3c24xx->nand.mecc[1], s3c24xx->nand.mecc[2]);
 	if (s3c24xx->nand.pos == 512) s3c24xx->nand.pos = 0;
 #else
 	if ((s3c24xx->nand.regs.nfcont & (1 << 5)) == 0)
@@ -2799,7 +2799,7 @@ static void s3c24xx_nand_update_ecc( running_device *device, UINT8 data)
 		temp[2] = s3c24xx->nand.mecc[2];
 		temp[3] = s3c24xx->nand.mecc[3];
 		nand_update_mecc( s3c24xx->nand.mecc, s3c24xx->nand.pos++, data);
-		verboselog( device->machine, /*5*/10, "NAND - MECC %03X - %02X %02X %02X %02X ->  %02X %02X %02X %02X\n", s3c24xx->nand.pos - 1, temp[0], temp[1], temp[2], temp[3], s3c24xx->nand.mecc[0], s3c24xx->nand.mecc[1], s3c24xx->nand.mecc[2], s3c24xx->nand.mecc[3]);
+		verboselog( device->machine, 5, "NAND - MECC %03X - %02X %02X %02X %02X ->  %02X %02X %02X %02X\n", s3c24xx->nand.pos - 1, temp[0], temp[1], temp[2], temp[3], s3c24xx->nand.mecc[0], s3c24xx->nand.mecc[1], s3c24xx->nand.mecc[2], s3c24xx->nand.mecc[3]);
 		if (s3c24xx->nand.pos == 2048) s3c24xx->nand.pos = 0;
 	}
 	if ((s3c24xx->nand.regs.nfcont & (1 << 6)) == 0)
@@ -2807,7 +2807,7 @@ static void s3c24xx_nand_update_ecc( running_device *device, UINT8 data)
 		temp[0] = s3c24xx->nand.secc[0];
 		temp[1] = s3c24xx->nand.secc[1];
 		nand_update_secc( s3c24xx->nand.secc, s3c24xx->nand.pos++, data);
-		verboselog( device->machine, /*5*/10, "NAND - SECC %02X - %02X %02X ->  %02X %02X\n", s3c24xx->nand.pos - 1, temp[0], temp[1], s3c24xx->nand.secc[0], s3c24xx->nand.secc[1]);
+		verboselog( device->machine, 5, "NAND - SECC %02X - %02X %02X ->  %02X %02X\n", s3c24xx->nand.pos - 1, temp[0], temp[1], s3c24xx->nand.secc[0], s3c24xx->nand.secc[1]);
 		if (s3c24xx->nand.pos == 16) s3c24xx->nand.pos = 0;
 	}
 #endif
@@ -2815,27 +2815,27 @@ static void s3c24xx_nand_update_ecc( running_device *device, UINT8 data)
 
 static void s3c24xx_nand_command_w( running_device *device, UINT8 data)
 {
-	verboselog( device->machine, /*5*/10, "NAND write command %02X\n", data);
+	verboselog( device->machine, 5, "NAND write command %02X\n", data);
 	iface_nand_command_w( device, data);
 }
 
 static void s3c24xx_nand_address_w( running_device *device, UINT8 data)
 {
-	verboselog( device->machine, /*5*/10, "NAND write address %02X\n", data);
+	verboselog( device->machine, 5, "NAND write address %02X\n", data);
 	iface_nand_address_w( device, data);
 }
 
 static UINT8 s3c24xx_nand_data_r( running_device *device)
 {
 	UINT8 data = iface_nand_data_r( device);
-	verboselog( device->machine, /*5*/10, "NAND data read %02X\n", data);
+	verboselog( device->machine, 5, "NAND data read %02X\n", data);
 	s3c24xx_nand_update_ecc( device, data);
 	return data;
 }
 
 static void s3c24xx_nand_data_w( running_device *device, UINT8 data)
 {
-	verboselog( device->machine, /*5*/10, "NAND write data %02X\n", data);
+	verboselog( device->machine, 5, "NAND write data %02X\n", data);
 	iface_nand_data_w( device, data);
 	s3c24xx_nand_update_ecc( device, data);
 }
@@ -2887,14 +2887,14 @@ static READ32_DEVICE_HANDLER( s3c24xx_nand_r )
 		break;
 #endif
 	}
-	verboselog( device->machine, /*9*/10, "(NAND) %08X -> %08X (%08X)\n", S3C24XX_BASE_NAND + (offset << 2), data, mem_mask);
+	verboselog( device->machine, 9, "(NAND) %08X -> %08X (%08X)\n", S3C24XX_BASE_NAND + (offset << 2), data, mem_mask);
 	return data;
 }
 
 static void s3c24xx_nand_init_ecc( running_device *device)
 {
 	s3c24xx_t *s3c24xx = get_token( device);
-	verboselog( device->machine, /*5*/10, "NAND - init ecc\n");
+	verboselog( device->machine, 5, "NAND - init ecc\n");
 #if defined(DEVICE_S3C2410)
 	s3c24xx->nand.mecc[0] = 0;
 	s3c24xx->nand.mecc[1] = 0;
@@ -2914,7 +2914,7 @@ static WRITE32_DEVICE_HANDLER( s3c24xx_nand_w )
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	UINT32 old_value = ((UINT32*)&s3c24xx->nand.regs)[offset];
-	verboselog( device->machine, /*9*/10, "(NAND) %08X <- %08X\n", S3C24XX_BASE_NAND + (offset << 2), data);
+	verboselog( device->machine, 9, "(NAND) %08X <- %08X\n", S3C24XX_BASE_NAND + (offset << 2), data);
 	COMBINE_DATA(&((UINT32*)&s3c24xx->nand.regs)[offset]);
 	switch (offset)
 	{
