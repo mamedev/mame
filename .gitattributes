@@ -1602,6 +1602,7 @@ src/mame/drivers/cybertnk.c svneol=native#text/plain
 src/mame/drivers/cyclemb.c svneol=native#text/plain
 src/mame/drivers/d9final.c svneol=native#text/plain
 src/mame/drivers/dacholer.c svneol=native#text/plain
+src/mame/drivers/dai3wksi.c svneol=native#text/plain
 src/mame/drivers/dambustr.c svneol=native#text/plain
 src/mame/drivers/darius.c svneol=native#text/plain
 src/mame/drivers/darkhors.c svneol=native#text/plain

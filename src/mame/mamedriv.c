@@ -8044,6 +8044,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( watrball )	/* (c) 1996 ABM */
 
 	/* Sun Electronics / SunSoft games */
+	DRIVER( dai3wksi )	/* 1979.09 Dai San Wakusei (The Third Planet) */
 	DRIVER( speakres )	/* [Sun Electronics] */
 	DRIVER( stratvox )	/* [1980 Sun Electronics] Taito */
 	DRIVER( stratvoxb )	/* bootleg */
@@ -8079,7 +8080,6 @@ Other Sun games
 1978.12 (GT)Block Challenger
 1979.04 Galaxy Force
 1979.07 Run Away
-1979.09 Dai San Wakusei (The Third Planet)
 1979.12 Warp 1
 1980.10 Cosmo Police (Cosmopolis?)
 */
