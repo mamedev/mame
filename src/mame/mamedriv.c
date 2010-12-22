@@ -10149,8 +10149,6 @@ Other Sun games
 	DRIVER( moneymacv1 )/* (c) 200? Amcoe */
 	DRIVER( moneymacd2 )/* (c) 200? Amcoe */
 	DRIVER( moneymacv2 )/* (c) 200? Amcoe */
-	//DRIVER( atworld ) /* (c) 2007 Amcoe - Around The World (year listed on Amcoe web site) */
-	//DRIVER( atworldd1 )   /* (c) 2007 Amcoe (year listed on Amcoe web site) */
 
 
 	DRIVER( chsuper3 )	/* unknown */
