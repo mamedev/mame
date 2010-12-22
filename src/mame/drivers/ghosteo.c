@@ -390,6 +390,39 @@ static const i2cmem_interface i2cmem_interface =
 	I2CMEM_SLAVE_ADDRESS, 0, 256
 };
 
+
+running_device* s3c2410;
+
+static READ32_HANDLER( bballoon_speedup_r )
+{
+	UINT32 ret = s3c24xx_lcd_r(s3c2410, offset+0x10/4, mem_mask);
+
+
+	int pc = cpu_get_pc(space->cpu);
+	
+	// these are vblank waits
+	if (pc == 0x3001c0e4 || pc == 0x3001c0d8)
+	{
+		// BnB Arcade
+		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(20));
+	}
+	else if (pc == 0x3002b580 || pc == 0x3002b550)
+	{
+		// Happy Tour
+		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(20));
+	}
+	//else
+	//	printf("speedup %08x %08x\n", pc, ret);
+
+	return ret;
+}
+
+static MACHINE_RESET( bballoon )
+{
+	memory_install_read32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x4d000010, 0x4d000013, 0, 0, bballoon_speedup_r);
+	s3c2410 = machine->device("s3c2410");
+}
+
 static MACHINE_CONFIG_START( bballoon, driver_device )
 
 	/* basic machine hardware */
@@ -404,6 +437,8 @@ static MACHINE_CONFIG_START( bballoon, driver_device )
 	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-1)
 
 	MDRV_PALETTE_LENGTH(256)
+
+	MDRV_MACHINE_RESET( bballoon )
 
 	MDRV_VIDEO_START(s3c2410)
 	MDRV_VIDEO_UPDATE(s3c2410)

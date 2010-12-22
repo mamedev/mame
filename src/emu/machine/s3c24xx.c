@@ -734,7 +734,7 @@ static UINT32 s3c24xx_video_update( running_device *device, screen_device *scree
 	return 0;
 }
 
-static READ32_DEVICE_HANDLER( s3c24xx_lcd_r )
+READ32_DEVICE_HANDLER( s3c24xx_lcd_r )
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	UINT32 data = ((UINT32*)&s3c24xx->lcd.regs)[offset];
