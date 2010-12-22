@@ -2573,7 +2573,7 @@ static WRITE16_HANDLER( generic_cop_w )
 		{
 			seibu_cop_log("%06x: COPX execute current layer clear??? %04x\n", cpu_get_pc(space->cpu), data);
 
-			printf("SRC: %08x DST:%08x SIZE:%08x TRIGGER: %08x\n",dma_src,dma_dst,dma_size,dma_trigger);
+			//printf("SRC: %08x DST:%08x SIZE:%08x TRIGGER: %08x\n",dma_src,dma_dst,dma_size,dma_trigger);
 
 			if (dma_trigger & 0x80)
 			{
@@ -2912,16 +2912,16 @@ WRITE16_HANDLER( cupsoc_mcu_w )
 			}
 			break;
 		}
-		/*TODO: what's going on here,some scroll values aren't sent in these locations
-                but somewhere else?*/
-		case (0x22c/2): { legionna_scrollram16[0] = cop_mcu_ram[offset]; break; }
-		case (0x22e/2): { legionna_scrollram16[1] = cop_mcu_ram[offset]; break; }
-		case (0x230/2): { legionna_scrollram16[2] = cop_mcu_ram[offset]; break; }
-		case (0x232/2): { legionna_scrollram16[3] = cop_mcu_ram[offset]; break; }
-		case (0x234/2): { legionna_scrollram16[4] = cop_mcu_ram[offset]; break; }
-		case (0x236/2): { legionna_scrollram16[5] = cop_mcu_ram[offset]; break; }
-		case (0x238/2): { legionna_scrollram16[6] = cop_mcu_ram[offset]; break; }
-		case (0x23a/2): { legionna_scrollram16[7] = cop_mcu_ram[offset]; break; }
+
+		case (0x21c/2): { grainbow_pri_n = cop_mcu_ram[offset]; break; }
+		case (0x220/2): { legionna_scrollram16[0] = cop_mcu_ram[offset]; break; }
+		case (0x222/2): { legionna_scrollram16[1] = cop_mcu_ram[offset]; break; }
+		case (0x224/2): { legionna_scrollram16[2] = cop_mcu_ram[offset]; break; }
+		case (0x226/2): { legionna_scrollram16[3] = cop_mcu_ram[offset]; break; }
+		case (0x228/2): { legionna_scrollram16[4] = cop_mcu_ram[offset]; break; }
+		case (0x22a/2): { legionna_scrollram16[5] = cop_mcu_ram[offset]; break; }
+		//case (0x238/2): { legionna_scrollram16[6] = cop_mcu_ram[offset]; break; }
+		//case (0x23a/2): { legionna_scrollram16[7] = cop_mcu_ram[offset]; break; }
 
 		case (0x300/2):	{ seibu_main_word_w(space,0,cop_mcu_ram[offset],0x00ff); break; }
 		case (0x304/2):	{ seibu_main_word_w(space,1,cop_mcu_ram[offset],0x00ff); break; }
@@ -3059,16 +3059,16 @@ WRITE16_HANDLER( cupsocs_mcu_w )
 			}
 			break;
 		}
-		/*TODO: what's going on here,some scroll values aren't sent in these locations
-                but somewhere else?*/
-		case (0x22c/2): { legionna_scrollram16[0] = cop_mcu_ram[offset]; break; }
-		case (0x22e/2): { legionna_scrollram16[1] = cop_mcu_ram[offset]; break; }
-		case (0x230/2): { legionna_scrollram16[2] = cop_mcu_ram[offset]; break; }
-		case (0x232/2): { legionna_scrollram16[3] = cop_mcu_ram[offset]; break; }
-		case (0x234/2): { legionna_scrollram16[4] = cop_mcu_ram[offset]; break; }
-		case (0x236/2): { legionna_scrollram16[5] = cop_mcu_ram[offset]; break; }
-		case (0x238/2): { legionna_scrollram16[6] = cop_mcu_ram[offset]; break; }
-		case (0x23a/2): { legionna_scrollram16[7] = cop_mcu_ram[offset]; break; }
+
+		case (0x25c/2): { grainbow_pri_n = cop_mcu_ram[offset]; break; }
+		case (0x260/2): { legionna_scrollram16[0] = cop_mcu_ram[offset]; break; }
+		case (0x262/2): { legionna_scrollram16[1] = cop_mcu_ram[offset]; break; }
+		case (0x264/2): { legionna_scrollram16[2] = cop_mcu_ram[offset]; break; }
+		case (0x266/2): { legionna_scrollram16[3] = cop_mcu_ram[offset]; break; }
+		case (0x268/2): { legionna_scrollram16[4] = cop_mcu_ram[offset]; break; }
+		case (0x26a/2): { legionna_scrollram16[5] = cop_mcu_ram[offset]; break; }
+		//case (0x238/2): { legionna_scrollram16[6] = cop_mcu_ram[offset]; break; }
+		//case (0x23a/2): { legionna_scrollram16[7] = cop_mcu_ram[offset]; break; }
 
 		case (0x340/2):	{ seibu_main_word_w(space,0,cop_mcu_ram[offset],0x00ff); break; }
 		case (0x344/2):	{ seibu_main_word_w(space,1,cop_mcu_ram[offset],0x00ff); break; }
