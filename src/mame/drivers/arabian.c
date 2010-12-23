@@ -8,7 +8,8 @@
         * Arabian [2 sets]
 
     Known bugs:
-        * none at this time
+        * The large blue bird is missing (see MT 03916).
+        * The game doesn't work properly when the MCU is emulated. Bad ROM?
 
 ****************************************************************************
 
@@ -68,11 +69,13 @@
 
 #include "emu.h"
 #include "cpu/z80/z80.h"
+#include "cpu/mb88xx/mb88xx.h"
 #include "includes/arabian.h"
 #include "sound/ay8910.h"
 
 /* constants */
 #define MAIN_OSC		XTAL_12MHz
+#define SIMULATE_MCU	1
 
 
 /*************************************
@@ -110,6 +113,11 @@ static WRITE8_DEVICE_HANDLER( ay8910_portb_w )
 	/* track the custom CPU reset */
 	state->custom_cpu_reset = ~data & 0x10;
 
+#if !SIMULATE_MCU
+	cputag_set_input_line(device->machine, "mcu", MB88_IRQ_LINE, data & 0x20 ? CLEAR_LINE : ASSERT_LINE);
+	cputag_set_input_line(device->machine, "mcu", INPUT_LINE_RESET, data & 0x10 ? CLEAR_LINE : ASSERT_LINE);
+#endif
+
 	/* clock the coin counters */
 	coin_counter_w(device->machine, 1, ~data & 0x02);
 	coin_counter_w(device->machine, 0, ~data & 0x01);
@@ -122,7 +130,7 @@ static WRITE8_DEVICE_HANDLER( ay8910_portb_w )
  *  Custom CPU RAM snooping
  *
  *************************************/
-
+#if SIMULATE_MCU
 static READ8_HANDLER( custom_cpu_r )
 {
 	arabian_state *state = space->machine->driver_data<arabian_state>();
@@ -213,7 +221,83 @@ static WRITE8_HANDLER( custom_cocktail_w )
 	state->custom_cpu_ram[0x400 + offset] = data;
 	update_flip_state(space->machine);
 }
+#else
+static READ8_HANDLER( mcu_port_r_r )
+{
+	arabian_state *state = space->machine->driver_data<arabian_state>();
 
+	UINT8 val = state->mcu_port_r[offset];
+
+	/* RAM mode is enabled */
+	if (offset == 0)
+		val |= 4;
+
+	return val;
+}
+
+static WRITE8_HANDLER( mcu_port_r_w )
+{
+	arabian_state *state = space->machine->driver_data<arabian_state>();
+
+	if (offset == 0)
+	{
+		UINT32 ram_addr = ((state->mcu_port_p & 7) << 8) | state->mcu_port_o;
+
+		if (~data & 2)
+			state->custom_cpu_ram[ram_addr] = 0xf0 | state->mcu_port_r[3];
+
+		state->flip_screen = data & 8;
+	}
+
+	state->mcu_port_r[offset] = data & 0x0f;
+}
+
+static READ8_HANDLER( mcu_portk_r )
+{
+	arabian_state *state = space->machine->driver_data<arabian_state>();
+	UINT8 val = 0xf;
+
+	if (~state->mcu_port_r[0] & 1)
+	{
+		UINT32 ram_addr = ((state->mcu_port_p & 7) << 8) | state->mcu_port_o;
+		val = state->custom_cpu_ram[ram_addr];
+	}
+	else
+	{
+		static const char *const comnames[] = { "COM0", "COM1", "COM2", "COM3", "COM4", "COM5" };
+		UINT8 sel = ((state->mcu_port_r[2] << 4) | state->mcu_port_r[1]) & 0x3f;
+		int i;
+
+		for (i = 0; i < 6; ++i)
+		{
+			if (~sel & (1 << i))
+			{
+				val = input_port_read(space->machine, comnames[i]);
+				break;
+			}
+		}
+	}
+
+	return val & 0x0f;
+}
+
+static WRITE8_HANDLER( mcu_port_o_w )
+{
+	arabian_state *state = space->machine->driver_data<arabian_state>();
+	UINT8 out = data & 0x0f;
+
+	if (data & 0x10)
+		state->mcu_port_o = (state->mcu_port_o & 0x0f) | (out << 4);
+	else
+		state->mcu_port_o = (state->mcu_port_o & 0xf0) | out;
+}
+
+static WRITE8_HANDLER( mcu_port_p_w )
+{
+	arabian_state *state = space->machine->driver_data<arabian_state>();
+	state->mcu_port_p = data & 0x0f;
+}
+#endif
 
 
 /*************************************
@@ -227,8 +311,12 @@ static ADDRESS_MAP_START( main_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xbfff) AM_WRITE(arabian_videoram_w)
 	AM_RANGE(0xc000, 0xc000) AM_MIRROR(0x01ff) AM_READ_PORT("IN0")
 	AM_RANGE(0xc200, 0xc200) AM_MIRROR(0x01ff) AM_READ_PORT("DSW1")
+#if SIMULATE_MCU
 	AM_RANGE(0xd000, 0xd7ef) AM_RAM AM_BASE_MEMBER(arabian_state, custom_cpu_ram)
 	AM_RANGE(0xd7f0, 0xd7ff) AM_READWRITE(custom_cpu_r, custom_cpu_w)
+#else
+	AM_RANGE(0xd000, 0xd7ff) AM_MIRROR(0x0800) AM_RAM AM_BASE_MEMBER(arabian_state, custom_cpu_ram)
+#endif
 	AM_RANGE(0xe000, 0xe007) AM_MIRROR(0x0ff8) AM_WRITE(arabian_blitter_w) AM_BASE_MEMBER(arabian_state, blitter)
 ADDRESS_MAP_END
 
@@ -245,6 +333,21 @@ static ADDRESS_MAP_START( main_io_map, ADDRESS_SPACE_IO, 8 )
 	AM_RANGE(0xca00, 0xca00) AM_MIRROR(0x01ff) AM_DEVWRITE("aysnd", ay8910_data_w)
 ADDRESS_MAP_END
 
+
+
+/*************************************
+ *
+ *  MCU port handlers
+ *
+ *************************************/
+#if !SIMULATE_MCU
+static ADDRESS_MAP_START( mcu_io_map, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(MB88_PORTK,  MB88_PORTK ) AM_READ(mcu_portk_r)
+	AM_RANGE(MB88_PORTO,  MB88_PORTO ) AM_WRITE(mcu_port_o_w)
+	AM_RANGE(MB88_PORTP,  MB88_PORTP ) AM_WRITE(mcu_port_p_w)
+	AM_RANGE(MB88_PORTR0, MB88_PORTR3) AM_READWRITE(mcu_port_r_r, mcu_port_r_w)
+ADDRESS_MAP_END
+#endif
 
 
 /*************************************
@@ -398,6 +501,11 @@ static MACHINE_CONFIG_START( arabian, arabian_state )
 	MDRV_CPU_IO_MAP(main_io_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
+#if !SIMULATE_MCU
+    MDRV_CPU_ADD("mcu", MB8841, MAIN_OSC/3/2)
+    MDRV_CPU_IO_MAP(mcu_io_map)
+#endif
+
 	MDRV_MACHINE_START(arabian)
 	MDRV_MACHINE_RESET(arabian)
 
@@ -442,6 +550,9 @@ ROM_START( arabian )
 	ROM_LOAD( "tvg-92.ic85", 0x2000, 0x2000, CRC(f7c6866d) SHA1(34f545c5f7c152cd59f7be0a72105f739852cd6a) )
 	ROM_LOAD( "tvg-93.ic86", 0x4000, 0x2000, CRC(71acd48d) SHA1(cd0bffed351b14c9aebbfc1d3d4d232a5b91a68f) )
 	ROM_LOAD( "tvg-94.ic87", 0x6000, 0x2000, CRC(82160b9a) SHA1(03511f6ebcf22ba709a80a565e71acf5bdecbabb) )
+
+	ROM_REGION( 0x800, "mcu", 0 )
+	ROM_LOAD( "sun-8212.ic3", 0x000, 0x800, BAD_DUMP CRC(8869611e) SHA1(c6443f3bcb0cdb4d7b1b19afcbfe339c300f36aa) )
 ROM_END
 
 
@@ -457,6 +568,9 @@ ROM_START( arabiana )
 	ROM_LOAD( "tvg-92.ic85", 0x2000, 0x2000, CRC(f7c6866d) SHA1(34f545c5f7c152cd59f7be0a72105f739852cd6a) )
 	ROM_LOAD( "tvg-93.ic86", 0x4000, 0x2000, CRC(71acd48d) SHA1(cd0bffed351b14c9aebbfc1d3d4d232a5b91a68f) )
 	ROM_LOAD( "tvg-94.ic87", 0x6000, 0x2000, CRC(82160b9a) SHA1(03511f6ebcf22ba709a80a565e71acf5bdecbabb) )
+
+	ROM_REGION( 0x800, "mcu", 0 )
+	ROM_LOAD( "sun-8212.ic3", 0x000, 0x800, BAD_DUMP CRC(8869611e) SHA1(c6443f3bcb0cdb4d7b1b19afcbfe339c300f36aa) )
 ROM_END
 
 
@@ -469,8 +583,12 @@ ROM_END
 
 static DRIVER_INIT( arabian )
 {
+#if SIMULATE_MCU
 	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xd34b, 0xd34b, 0, 0, custom_flip_w);
 	memory_install_write8_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0xd400, 0xd401, 0, 0, custom_cocktail_w);
+#else
+	cputag_set_input_line(machine, "mcu", INPUT_LINE_RESET, ASSERT_LINE);
+#endif
 }
 
 
