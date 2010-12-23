@@ -207,7 +207,7 @@ static WRITE8_HANDLER( dai3wksi_audio_1_w )
 		if (data & 0x04)
 			sample_start(samples, CHANNEL_SOUND5, SAMPLE_SOUND5, 0);
 		else
-			sample_start(samples, CHANNEL_SOUND5, SAMPLE_SOUND5, 0);
+			sample_start(samples, CHANNEL_SOUND5, SAMPLE_SOUND5, 1);
 	}
 	if (!(data & 0x20) && (state->port_last1 & 0x20))
 		sample_stop(samples, CHANNEL_SOUND5);
