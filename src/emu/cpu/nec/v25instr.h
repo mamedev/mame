@@ -13,7 +13,8 @@ static void i_or_r16w(nec_state_t *nec_state);
 static void i_or_ald8(nec_state_t *nec_state);
 static void i_or_axd16(nec_state_t *nec_state);
 static void i_push_cs(nec_state_t *nec_state);
-static void i_pre_nec(nec_state_t *nec_state);
+ATTR_UNUSED static void i_pre_nec(nec_state_t *nec_state);
+static void i_pre_v25(nec_state_t *nec_state);
 static void i_adc_br8(nec_state_t *nec_state);
 static void i_adc_wr16(nec_state_t *nec_state);
 static void i_adc_r8b(nec_state_t *nec_state);
@@ -97,6 +98,7 @@ static void i_pop_di(nec_state_t *nec_state);
 static void i_pusha(nec_state_t *nec_state);
 static void i_popa(nec_state_t *nec_state);
 static void i_chkind(nec_state_t *nec_state);
+static void i_brkn(nec_state_t *nec_state);
 static void i_repnc(nec_state_t *nec_state);
 static void i_repc(nec_state_t *nec_state);
 static void i_push_d16(nec_state_t *nec_state);
@@ -229,6 +231,7 @@ static void i_inaxdx(nec_state_t *nec_state);
 static void i_outdxal(nec_state_t *nec_state);
 static void i_outdxax(nec_state_t *nec_state);
 static void i_lock(nec_state_t *nec_state);
+static void i_brks(nec_state_t *nec_state);
 static void i_repne(nec_state_t *nec_state);
 static void i_repe(nec_state_t *nec_state);
 static void i_hlt(nec_state_t *nec_state);
@@ -263,7 +266,7 @@ static void (*const nec_instruction[256])(nec_state_t *nec_state) =
 	i_or_ald8,		/* 0x0c */
 	i_or_axd16,		/* 0x0d */
 	i_push_cs,		/* 0x0e */
-	i_pre_nec,		/* 0x0f */
+	i_pre_v25,		/* 0x0f */
 	i_adc_br8,		/* 0x10 */
 	i_adc_wr16,		/* 0x11 */
 	i_adc_r8b,		/* 0x12 */
@@ -347,7 +350,7 @@ static void (*const nec_instruction[256])(nec_state_t *nec_state) =
 	i_pusha,		/* 0x60 */
 	i_popa,			/* 0x61 */
 	i_chkind,		/* 0x62 */
-	i_invalid,		/* 0x63 */
+	i_brkn,			/* 0x63 - V25S/V35S only */
 	i_repnc,		/* 0x64 */
 	i_repc,			/* 0x65 */
 	i_invalid,		/* 0x66 */
@@ -489,7 +492,7 @@ static void (*const nec_instruction[256])(nec_state_t *nec_state) =
 	i_outdxal,		/* 0xee */
 	i_outdxax,		/* 0xef */
 	i_lock,			/* 0xf0 */
-	i_invalid,		/* 0xf1 */
+	i_brks,			/* 0xf1 */
 	i_repne,		/* 0xf2 */
 	i_repe,			/* 0xf3 */
 	i_hlt,			/* 0xf4 */

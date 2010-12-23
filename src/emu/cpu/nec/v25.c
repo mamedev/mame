@@ -1,105 +1,20 @@
 /****************************************************************************
 
-    NEC V20/V30/V33 emulator
+    NEC V25/V35 emulator
 
     ---------------------------------------------
 
-    V20 = uPD70108 = 8-bit data bus @ 5MHz or 8MHz
-    V20HL = uPD70108H = V20 with EMS support (24-bit address bus)
+    TODO:
 
-    V25 = uPD70320 = V20 with on-chip features:
-            - 256 bytes on-chip RAM
-            - 8 register banks
-            - 4-bit input port
-            - 20-bit I/O port
-            - 2 channel serial interface
-            - interrupt controller
-            - 2 channel DMA controller
-            - 2 channel 16-bit timer
-            - new instructions: BTCLR, RETRBI, STOP, BRKCS, TSKSW,
-                                MOVSPA, MOVSPB
+    Using V20/V30 cycle counts for now. Cycle counts change
+    depending on whether the internal RAM access is enabled.
+    Also, the clock divider can be changed to 1/2, 1/4 or 1/8.
 
-    V25+ = uPD70325 = V25 @ 8MHz or 10MHz plus changes:
-            - faster DMA
-            - improved serial interface
+    IBRK flag (trap I/O instructions) included but not implemented.
 
-    ---------------------------------------------
+    Most special function registers not implemented yet.
 
-    V30 = uPD70116 = 16-bit data bus version of V20
-    V30HL = uPD70116H = 16-bit data bus version of V20HL
-    V30MX = V30HL with separate address and data busses
-
-    V35 = uPD70330 = 16-bit data bus version of V25
-
-    V35+ = uPD70335 = 16-bit data bus version of V25+
-
-    ---------------------------------------------
-
-    V40 = uPD70208 = 8-bit data bus @ 10MHz
-    V40HL = uPD70208H = V40 with support up to 20Mhz
-
-    ---------------------------------------------
-
-    V50 = uPD70216 = 16-bit data bus version of V40
-    V50HL = uPD70216H = 16-bit data bus version of V40HL
-
-    ---------------------------------------------
-
-    V41 = uPD70270
-
-    V51 = uPD70280
-
-
-
-    V33A = uPD70136A
-
-    V53A = uPD70236A
-
-
-
-    Instruction differences:
-        V20, V30, V40, V50 have dedicated emulation instructions
-            (BRKEM, RETEM, CALLN)
-
-        V33A, V53A has dedicated address mode instructions
-            (BRKXA, RETXA)
-
-
-
-    (Re)Written June-September 2000 by Bryan McPhail (mish@tendril.co.uk) based
-    on code by Oliver Bergmann (Raul_Bloodworth@hotmail.com) who based code
-    on the i286 emulator by Fabrice Frances which had initial work based on
-    David Hedley's pcemu(!).
-
-    This new core features 99% accurate cycle counts for each processor,
-    there are still some complex situations where cycle counts are wrong,
-    typically where a few instructions have differing counts for odd/even
-    source and odd/even destination memory operands.
-
-    Flag settings are also correct for the NEC processors rather than the
-    I86 versions.
-
-    Changelist:
-
-    22/02/2003:
-        Removed cycle counts from memory accesses - they are certainly wrong,
-        and there is already a memory access cycle penalty in the opcodes
-        using them.
-
-        Fixed save states.
-
-        Fixed ADJBA/ADJBS/ADJ4A/ADJ4S flags/return values for all situations.
-        (Fixes bugs in Geostorm and Thunderblaster)
-
-        Fixed carry flag on NEG (I thought this had been fixed circa Mame 0.58,
-        but it seems I never actually submitted the fix).
-
-        Fixed many cycle counts in instructions and bug in cycle count
-        macros (odd word cases were testing for odd instruction word address
-        not data address).
-
-    Todo!
-        Double check cycle timing is 100%.
+    It would be nice if the internal ram area was viewable in the debugger.
 
 ****************************************************************************/
 
@@ -112,19 +27,21 @@ typedef UINT16 WORD;
 typedef UINT32 DWORD;
 
 #include "nec.h"
-#include "necpriv.h"
+#include "v25priv.h"
 
-#define PC(n)		((Sreg(PS)<<4)+(n)->ip)
+/* default configuration */
+static const nec_config default_config =
+{
+	NULL
+};
 
 extern int necv_dasm_one(char *buffer, UINT32 eip, const UINT8 *oprom, const nec_config *config);
 
-INLINE nec_state_t *get_safe_token(running_device *device)
+INLINE v25_state_t *get_safe_token(running_device *device)
 {
 	assert(device != NULL);
-	assert(device->type() == V20 ||
-		   device->type() == V30 ||
-		   device->type() == V33);
-	return (nec_state_t *)downcast<legacy_cpu_device *>(device)->token();
+	assert(device->type() == V25 || device->type() == V35);
+	return (v25_state_t *)downcast<legacy_cpu_device *>(device)->token();
 }
 
 /* The interrupt number of a pending external interrupt pending NMI is 2.   */
@@ -133,12 +50,12 @@ INLINE nec_state_t *get_safe_token(running_device *device)
 #define INT_IRQ 0x01
 #define NMI_IRQ 0x02
 
-INLINE void prefetch(nec_state_t *nec_state)
+INLINE void prefetch(v25_state_t *nec_state)
 {
 	nec_state->prefetch_count--;
 }
 
-static void do_prefetch(nec_state_t *nec_state, int previous_ICount)
+static void do_prefetch(v25_state_t *nec_state, int previous_ICount)
 {
 	int diff = previous_ICount - (int) nec_state->icount;
 
@@ -172,61 +89,79 @@ static void do_prefetch(nec_state_t *nec_state, int previous_ICount)
 
 }
 
-INLINE UINT8 fetch(nec_state_t *nec_state)
+INLINE UINT8 fetch(v25_state_t *nec_state)
 {
 	prefetch(nec_state);
 	return nec_state->direct->read_raw_byte(FETCH_XOR((Sreg(PS)<<4)+nec_state->ip++));
 }
 
-INLINE UINT16 fetchword(nec_state_t *nec_state)
+INLINE UINT16 fetchword(v25_state_t *nec_state)
 {
 	UINT16 r = FETCH();
 	r |= (FETCH()<<8);
 	return r;
 }
 
-#include "necinstr.h"
+#define nec_state_t v25_state_t
+
+#include "v25instr.h"
 #include "necea.h"
 #include "necmodrm.h"
 
 static UINT8 parity_table[256];
 
-static UINT8 fetchop(nec_state_t *nec_state)
+static UINT8 fetchop(v25_state_t *nec_state)
 {
+	UINT8 ret;
+
 	prefetch(nec_state);
-	return nec_state->direct->read_decrypted_byte(FETCH_XOR( ( Sreg(PS)<<4)+nec_state->ip++));
+	ret = nec_state->direct->read_decrypted_byte(FETCH_XOR( ( Sreg(PS)<<4)+nec_state->ip++));
+
+	if (nec_state->MF == 0)
+		if (nec_state->config->v25v35_decryptiontable)
+		{
+			ret = nec_state->config->v25v35_decryptiontable[ret];
+		}
+	return ret;
 }
 
 
 
 /***************************************************************************/
 
-static CPU_RESET( nec )
+static CPU_RESET( v25 )
 {
-	nec_state_t *nec_state = get_safe_token(device);
+	v25_state_t *nec_state = get_safe_token(device);
 	unsigned int i,j,c;
-    static const BREGS reg_name[8]={ AL, CL, DL, BL, AH, CH, DH, BH };
 
-	memset( &nec_state->regs.w, 0, sizeof(nec_state->regs.w));
-	memset( &nec_state->sregs, 0, sizeof(nec_state->sregs));
+	static const WREGS wreg_name[8]={ AW, CW, DW, BW, SP, BP, IX, IY };
+	static const BREGS breg_name[8]={ AL, CL, DL, BL, AH, CH, DH, BH };
+
+	memset( &nec_state->ram.w, 0, sizeof(nec_state->ram.w));
 
 	nec_state->ip = 0;
+	nec_state->IBRK = 1;
+	nec_state->F0 = 0;
+	nec_state->F1 = 0;
 	nec_state->TF = 0;
 	nec_state->IF = 0;
 	nec_state->DF = 0;
-	nec_state->MF = 1;
+	nec_state->RB = 7;
 	nec_state->SignVal = 0;
 	nec_state->int_vector = 0;
 	nec_state->pending_irq = 0;
 	nec_state->nmi_state = 0;
 	nec_state->irq_state = 0;
 	nec_state->poll_state = 0;
+	nec_state->mode_state = nec_state->MF = (nec_state->config->v25v35_decryptiontable) ? 0 : 1;
 	nec_state->AuxVal = 0;
 	nec_state->OverVal = 0;
 	nec_state->ZeroVal = 0;
 	nec_state->CarryVal = 0;
 	nec_state->ParityVal = 0;
 
+	nec_state->PRC = 0x4E;
+	nec_state->IDB = 0xFF;
 
 	Sreg(PS) = 0xffff;
 
@@ -243,30 +178,45 @@ static CPU_RESET( nec )
 
     for (i = 0; i < 256; i++)
     {
-		Mod_RM.reg.b[i] = reg_name[(i & 0x38) >> 3];
-		Mod_RM.reg.w[i] = (WREGS) ( (i & 0x38) >> 3) ;
+		Mod_RM.reg.b[i] = breg_name[(i & 0x38) >> 3];
+		Mod_RM.reg.w[i] = wreg_name[(i & 0x38) >> 3];
     }
 
     for (i = 0xc0; i < 0x100; i++)
     {
-		Mod_RM.RM.w[i] = (WREGS)( i & 7 );
-		Mod_RM.RM.b[i] = (BREGS)reg_name[i & 7];
+		Mod_RM.RM.w[i] = wreg_name[i & 7];
+		Mod_RM.RM.b[i] = breg_name[i & 7];
     }
 
 	nec_state->poll_state = 1;
 }
 
-static CPU_EXIT( nec )
+static CPU_EXIT( v25 )
 {
 
 }
 
-static void nec_interrupt(nec_state_t *nec_state, unsigned int_num, ATTR_UNUSED unsigned mode)
+static void nec_interrupt(v25_state_t *nec_state, unsigned int_num, unsigned mode)
 {
     UINT32 dest_seg, dest_off;
 
     i_pushf(nec_state);
 	nec_state->TF = nec_state->IF = 0;
+
+	switch(mode)
+	{
+		case 0:
+			nec_state->MF = nec_state->mode_state;
+			break;
+		case 1:	/* BRKN: force native mode */
+			nec_state->MF = 1;
+			break;
+		case 2:	/* BRKS: force secure mode */
+			if (nec_state->config->v25v35_decryptiontable)
+				nec_state->MF = 0;
+			else
+				logerror("%06x: BRKS executed with no decryption table\n",PC(nec_state));
+	}
 
 	if (int_num == -1)
 	{
@@ -286,13 +236,13 @@ static void nec_interrupt(nec_state_t *nec_state, unsigned int_num, ATTR_UNUSED 
 	CHANGE_PC;
 }
 
-static void nec_trap(nec_state_t *nec_state)
+static void nec_trap(v25_state_t *nec_state)
 {
 	nec_instruction[fetchop(nec_state)](nec_state);
 	nec_interrupt(nec_state, 1,0);
 }
 
-static void external_int(nec_state_t *nec_state)
+static void external_int(v25_state_t *nec_state)
 {
 	if( nec_state->pending_irq & NMI_IRQ )
 	{
@@ -312,10 +262,11 @@ static void external_int(nec_state_t *nec_state)
 /****************************************************************************/
 
 #include "necinstr.c"
+#include "v25instr.c"
 
 /*****************************************************************************/
 
-static void set_irq_line(nec_state_t *nec_state, int irqline, int state)
+static void set_irq_line(v25_state_t *nec_state, int irqline, int state)
 {
 	if (irqline == INPUT_LINE_NMI)
 	{
@@ -342,34 +293,46 @@ static void set_irq_line(nec_state_t *nec_state, int irqline, int state)
 	}
 }
 
-static void set_poll_line(nec_state_t *nec_state, int state)
+static void set_poll_line(v25_state_t *nec_state, int state)
 {
 	nec_state->poll_state = state;
 }
 
-static CPU_DISASSEMBLE( nec )
+static CPU_DISASSEMBLE( v25 )
 {
-	return necv_dasm_one(buffer, pc, oprom, NULL);
+	v25_state_t *nec_state = get_safe_token(device);
+
+	return necv_dasm_one(buffer, pc, oprom, nec_state->config);
 }
 
-static void nec_init(legacy_cpu_device *device, device_irq_callback irqcallback, int type)
+static void v25_init(legacy_cpu_device *device, device_irq_callback irqcallback, int type)
 {
-	nec_state_t *nec_state = get_safe_token(device);
+	const nec_config *config = device->baseconfig().static_config() ? (const nec_config *)device->baseconfig().static_config() : &default_config;
+	v25_state_t *nec_state = get_safe_token(device);
 
-	state_save_register_device_item_array(device, 0, nec_state->regs.w);
-	state_save_register_device_item_array(device, 0, nec_state->sregs);
+	nec_state->config = config;
+
+
+	state_save_register_device_item_array(device, 0, nec_state->ram.w);
 
 	state_save_register_device_item(device, 0, nec_state->ip);
+	state_save_register_device_item(device, 0, nec_state->IBRK);
+	state_save_register_device_item(device, 0, nec_state->F0);
+	state_save_register_device_item(device, 0, nec_state->F1);
 	state_save_register_device_item(device, 0, nec_state->TF);
 	state_save_register_device_item(device, 0, nec_state->IF);
 	state_save_register_device_item(device, 0, nec_state->DF);
 	state_save_register_device_item(device, 0, nec_state->MF);
+	state_save_register_device_item(device, 0, nec_state->RB);
+	state_save_register_device_item(device, 0, nec_state->PRC);
+	state_save_register_device_item(device, 0, nec_state->IDB);
 	state_save_register_device_item(device, 0, nec_state->SignVal);
 	state_save_register_device_item(device, 0, nec_state->int_vector);
 	state_save_register_device_item(device, 0, nec_state->pending_irq);
 	state_save_register_device_item(device, 0, nec_state->nmi_state);
 	state_save_register_device_item(device, 0, nec_state->irq_state);
 	state_save_register_device_item(device, 0, nec_state->poll_state);
+	state_save_register_device_item(device, 0, nec_state->mode_state);
 	state_save_register_device_item(device, 0, nec_state->AuxVal);
 	state_save_register_device_item(device, 0, nec_state->OverVal);
 	state_save_register_device_item(device, 0, nec_state->ZeroVal);
@@ -385,9 +348,9 @@ static void nec_init(legacy_cpu_device *device, device_irq_callback irqcallback,
 
 
 
-static CPU_EXECUTE( necv )
+static CPU_EXECUTE( v25 )
 {
-	nec_state_t *nec_state = get_safe_token(device);
+	v25_state_t *nec_state = get_safe_token(device);
 	int prev_ICount;
 
 	while(nec_state->icount>0) {
@@ -412,42 +375,27 @@ static CPU_EXECUTE( necv )
 }
 
 /* Wrappers for the different CPU types */
-static CPU_INIT( v20 )
+static CPU_INIT( v25 )
 {
-	nec_state_t *nec_state = get_safe_token(device);
+	v25_state_t *nec_state = get_safe_token(device);
 
-	nec_init(device, irqcallback, 0);
+	v25_init(device, irqcallback, 0);
 	nec_state->fetch_xor = 0;
 	nec_state->chip_type=V20_TYPE;
 	nec_state->prefetch_size = 4;		/* 3 words */
 	nec_state->prefetch_cycles = 4;		/* four cycles per byte */
 }
 
-static CPU_INIT( v30 )
+static CPU_INIT( v35 )
 {
-	nec_state_t *nec_state = get_safe_token(device);
+	v25_state_t *nec_state = get_safe_token(device);
 
-	nec_init(device, irqcallback, 1);
+	v25_init(device, irqcallback, 1);
 	nec_state->fetch_xor = BYTE_XOR_LE(0);
 	nec_state->chip_type=V30_TYPE;
 	nec_state->prefetch_size = 6;		/* 3 words */
 	nec_state->prefetch_cycles = 2;		/* two cycles per byte / four per word */
 
-}
-
-static CPU_INIT( v33 )
-{
-	nec_state_t *nec_state = get_safe_token(device);
-
-	nec_init(device, irqcallback, 2);
-	nec_state->chip_type=V33_TYPE;
-	nec_state->prefetch_size = 6;
-	/* FIXME: Need information about prefetch size and cycles for V33.
-     * complete guess below, nbbatman will not work
-     * properly without. */
-	nec_state->prefetch_cycles = 1;		/* two cycles per byte / four per word */
-
-	nec_state->fetch_xor = BYTE_XOR_LE(0);
 }
 
 
@@ -456,9 +404,9 @@ static CPU_INIT( v33 )
  * Generic set_info
  **************************************************************************/
 
-static CPU_SET_INFO( nec )
+static CPU_SET_INFO( v25 )
 {
-	nec_state_t *nec_state = get_safe_token(device);
+	v25_state_t *nec_state = get_safe_token(device);
 
 	switch (state)
 	{
@@ -514,15 +462,15 @@ static CPU_SET_INFO( nec )
  * Generic get_info
  **************************************************************************/
 
-static CPU_GET_INFO( nec )
+static CPU_GET_INFO( v25v35 )
 {
-	nec_state_t *nec_state = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
+	v25_state_t *nec_state = (device != NULL && device->token() != NULL) ? get_safe_token(device) : NULL;
 	int flags;
 
 	switch (state)
 	{
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
-		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(nec_state_t);					break;
+		case CPUINFO_INT_CONTEXT_SIZE:					info->i = sizeof(v25_state_t);					break;
 		case CPUINFO_INT_INPUT_LINES:					info->i = 1;							break;
 		case CPUINFO_INT_DEFAULT_IRQ_VECTOR:			info->i = 0xff;							break;
 		case DEVINFO_INT_ENDIANNESS:					info->i = ENDIANNESS_LITTLE;					break;
@@ -570,40 +518,38 @@ static CPU_GET_INFO( nec )
 		case CPUINFO_INT_REGISTER + NEC_PENDING:		info->i = nec_state->pending_irq;				break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(nec);			break;
+		case CPUINFO_FCT_SET_INFO:						info->setinfo = CPU_SET_INFO_NAME(v25);			break;
 		case CPUINFO_FCT_INIT:							/* set per-CPU */						break;
-		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(nec);				break;
-		case CPUINFO_FCT_EXIT:							info->exit = CPU_EXIT_NAME(nec);					break;
-		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(necv);			break;
+		case CPUINFO_FCT_RESET:							info->reset = CPU_RESET_NAME(v25);				break;
+		case CPUINFO_FCT_EXIT:							info->exit = CPU_EXIT_NAME(v25);					break;
+		case CPUINFO_FCT_EXECUTE:						info->execute = CPU_EXECUTE_NAME(v25);			break;
 		case CPUINFO_FCT_BURN:							info->burn = NULL;						break;
-		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(nec);			break;
+		case CPUINFO_FCT_DISASSEMBLE:					info->disassemble = CPU_DISASSEMBLE_NAME(v25);			break;
 		case CPUINFO_PTR_INSTRUCTION_COUNTER:			info->icount = &nec_state->icount;				break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
 		case DEVINFO_STR_NAME:							strcpy(info->s, "NEC");					break;
 		case DEVINFO_STR_FAMILY:					strcpy(info->s, "NEC V-Series");		break;
-		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.5");					break;
+		case DEVINFO_STR_VERSION:					strcpy(info->s, "1.0");					break;
 		case DEVINFO_STR_SOURCE_FILE:						strcpy(info->s, __FILE__);				break;
-		case DEVINFO_STR_CREDITS:					strcpy(info->s, "NEC emulator v1.5 by Bryan McPhail"); break;
+		case DEVINFO_STR_CREDITS:					strcpy(info->s, "Alex W. Jackson, based on NEC V emulator by Bryan McPhail"); break;
 
 		case CPUINFO_STR_FLAGS:
             flags = CompressFlags();
-            sprintf(info->s, "%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c%c",
-                flags & 0x8000 ? 'N':'E',
-                flags & 0x4000 ? '?':'.',
-                flags & 0x2000 ? '?':'.',
-                flags & 0x1000 ? '?':'.',
+            sprintf(info->s, "%c %d %c%c%c%c%c%c%c%c%c%c%c%c",
+                flags & 0x8000 ? 'N':'S',
+                (flags & 0x7000) >> 12,
                 flags & 0x0800 ? 'O':'.',
                 flags & 0x0400 ? 'D':'.',
                 flags & 0x0200 ? 'I':'.',
                 flags & 0x0100 ? 'T':'.',
                 flags & 0x0080 ? 'S':'.',
                 flags & 0x0040 ? 'Z':'.',
-                flags & 0x0020 ? '?':'.',
+                flags & 0x0020 ? '1':'.',
                 flags & 0x0010 ? 'A':'.',
-                flags & 0x0008 ? '?':'.',
+                flags & 0x0008 ? '0':'.',
                 flags & 0x0004 ? 'P':'.',
-                flags & 0x0002 ? '.':'?',
+                flags & 0x0002 ? '.':'I',
                 flags & 0x0001 ? 'C':'.');
             break;
 
@@ -631,7 +577,7 @@ static CPU_GET_INFO( nec )
  * CPU-specific set_info
  **************************************************************************/
 
-CPU_GET_INFO( v20 )
+CPU_GET_INFO( v25 )
 {
 	switch (state)
 	{
@@ -640,12 +586,12 @@ CPU_GET_INFO( v20 )
 		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 8;					break;
 
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(v20);					break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(v25);					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "V20");					break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "V25");					break;
 
-		default:										CPU_GET_INFO_CALL(nec);				break;
+		default:										CPU_GET_INFO_CALL(v25v35);				break;
 	}
 }
 
@@ -654,39 +600,23 @@ CPU_GET_INFO( v20 )
  * CPU-specific set_info
  **************************************************************************/
 
-CPU_GET_INFO( v30 )
+CPU_GET_INFO( v35 )
 {
 	switch (state)
 	{
+		/* --- the following bits of info are returned as 64-bit signed integers --- */
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_PROGRAM:	info->i = 16;					break;
+		case DEVINFO_INT_DATABUS_WIDTH + ADDRESS_SPACE_IO:		info->i = 16;					break;
+
 		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(v30);					break;
+		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(v35);					break;
 
 		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "V30");					break;
+		case DEVINFO_STR_NAME:							strcpy(info->s, "V35");					break;
 
-		default:										CPU_GET_INFO_CALL(nec);				break;
+		default:										CPU_GET_INFO_CALL(v25v35);				break;
 	}
 }
 
-
-/**************************************************************************
- * CPU-specific set_info
- **************************************************************************/
-
-CPU_GET_INFO( v33 )
-{
-	switch (state)
-	{
-		/* --- the following bits of info are returned as pointers to data or functions --- */
-		case CPUINFO_FCT_INIT:							info->init = CPU_INIT_NAME(v33);					break;
-
-		/* --- the following bits of info are returned as NULL-terminated strings --- */
-		case DEVINFO_STR_NAME:							strcpy(info->s, "V33");					break;
-
-		default:										CPU_GET_INFO_CALL(nec);				break;
-	}
-}
-
-DEFINE_LEGACY_CPU_DEVICE(V20, v20);
-DEFINE_LEGACY_CPU_DEVICE(V30, v30);
-DEFINE_LEGACY_CPU_DEVICE(V33, v33);
+DEFINE_LEGACY_CPU_DEVICE(V25, v25);
+DEFINE_LEGACY_CPU_DEVICE(V35, v35);

@@ -10,31 +10,35 @@
 #define TRUE 1
 #endif
 
-/* NEC registers */
+/* internal RAM and register banks */
 typedef union
-{                   /* eight general registers */
-    UINT16 w[8];    /* viewed as 16 bits registers */
-    UINT8  b[16];   /* or as 8 bit registers */
-} necbasicregs;
-
-typedef struct _nec_state_t nec_state_t;
-struct _nec_state_t
 {
-	necbasicregs regs;
+	UINT16 w[128];
+	UINT8  b[256];
+} internalram;
+
+typedef struct _v25_state_t v25_state_t;
+struct _v25_state_t
+{
+	internalram ram;
 	offs_t	fetch_xor;
-	UINT16	sregs[4];
 
 	UINT16	ip;
 
 	INT32	SignVal;
 	UINT32	AuxVal, OverVal, ZeroVal, CarryVal, ParityVal;	/* 0 or non-0 valued flags */
-	UINT8	TF, IF, DF, MF;	/* 0 or 1 valued flags */
+	UINT8	IBRK, F0, F1, TF, IF, DF, MF;	/* 0 or 1 valued flags */
+	UINT8	RB;	/* current register bank */
 	UINT32	int_vector;
 	UINT32	pending_irq;
 	UINT32	nmi_state;
 	UINT32	irq_state;
 	UINT32	poll_state;
+	UINT32	mode_state;
 	UINT8	no_interrupt;
+
+	/* special function registers */
+	UINT8	PRC, IDB;
 
 	device_irq_callback irq_callback;
 	legacy_cpu_device *device;
@@ -42,6 +46,8 @@ struct _nec_state_t
 	direct_read_data *direct;
 	address_space *io;
 	int		icount;
+
+	const nec_config *config;
 
 	UINT8	prefetch_size;
 	UINT8	prefetch_cycles;
@@ -53,22 +59,40 @@ struct _nec_state_t
 	UINT8	seg_prefix;		/* prefix segment indicator */
 };
 
-typedef enum { DS1, PS, SS, DS0 } SREGS;
-typedef enum { AW, CW, DW, BW, SP, BP, IX, IY } WREGS;
 typedef enum {
-   AL = NATIVE_ENDIAN_VALUE_LE_BE(0x0, 0x1),
-   AH = NATIVE_ENDIAN_VALUE_LE_BE(0x1, 0x0),
-   CL = NATIVE_ENDIAN_VALUE_LE_BE(0x2, 0x3),
-   CH = NATIVE_ENDIAN_VALUE_LE_BE(0x3, 0x2),
-   DL = NATIVE_ENDIAN_VALUE_LE_BE(0x4, 0x5),
-   DH = NATIVE_ENDIAN_VALUE_LE_BE(0x5, 0x4),
-   BL = NATIVE_ENDIAN_VALUE_LE_BE(0x6, 0x7),
-   BH = NATIVE_ENDIAN_VALUE_LE_BE(0x7, 0x6),
+	DS1 = 0x0E/2,
+	PS  = 0x0C/2,
+	SS  = 0x0A/2,
+	DS0 = 0x08/2,
+} SREGS;
+
+typedef enum {
+	AW = 0x1E/2,
+	CW = 0x1C/2,
+	DW = 0x1A/2,
+	BW = 0x18/2,
+	SP = 0x16/2,
+	BP = 0x14/2,
+	IX = 0x12/2,
+	IY = 0x10/2,
+} WREGS;
+
+typedef enum {
+   AL = NATIVE_ENDIAN_VALUE_LE_BE(0x1E, 0x1F),
+   AH = NATIVE_ENDIAN_VALUE_LE_BE(0x1F, 0x1E),
+   CL = NATIVE_ENDIAN_VALUE_LE_BE(0x1C, 0x1D),
+   CH = NATIVE_ENDIAN_VALUE_LE_BE(0x1D, 0x1C),
+   DL = NATIVE_ENDIAN_VALUE_LE_BE(0x1A, 0x1B),
+   DH = NATIVE_ENDIAN_VALUE_LE_BE(0x1B, 0x1A),
+   BL = NATIVE_ENDIAN_VALUE_LE_BE(0x18, 0x19),
+   BH = NATIVE_ENDIAN_VALUE_LE_BE(0x19, 0x18),
 } BREGS;
 
-#define Sreg(x)			nec_state->sregs[x]
-#define Wreg(x)			nec_state->regs.w[x]
-#define Breg(x)			nec_state->regs.b[x]
+#define Sreg(x)			nec_state->ram.w[(nec_state->RB << 4) + (x)]
+#define Wreg(x)			nec_state->ram.w[(nec_state->RB << 4) + (x)]
+#define Breg(x)			nec_state->ram.b[(nec_state->RB << 5) + (x)]
+
+#define PC(n)		((Sreg(PS)<<4)+(n)->ip)
 
 /* parameter x = result, y = source 1, z = source 2 */
 
@@ -116,10 +140,15 @@ typedef enum {
 
 /************************************************************************/
 
-#define read_mem_byte(a)			nec_state->program->read_byte(a)
-#define read_mem_word(a)			nec_state->program->read_word_unaligned(a)
-#define write_mem_byte(a,d)			nec_state->program->write_byte((a),(d))
-#define write_mem_word(a,d)			nec_state->program->write_word_unaligned((a),(d))
+int v25_read_byte(v25_state_t *nec_state, unsigned a);
+int v25_read_word(v25_state_t *nec_state, unsigned a);
+void v25_write_byte(v25_state_t *nec_state, unsigned a, unsigned d);
+void v25_write_word(v25_state_t *nec_state, unsigned a, unsigned d);
+
+#define read_mem_byte(a)			v25_read_byte(nec_state,(a))
+#define read_mem_word(a)			v25_read_word(nec_state,(a))
+#define write_mem_byte(a,d)			v25_write_byte(nec_state,(a),(d))
+#define write_mem_word(a,d)			v25_write_word(nec_state,(a),(d))
 
 #define read_port_byte(a)		nec_state->io->read_byte(a)
 #define read_port_word(a)		nec_state->io->read_word_unaligned(a)
@@ -172,21 +201,25 @@ typedef enum {
 #define CLKR(v20o,v30o,v33o,v20e,v30e,v33e,vall,addr) { const UINT32 ocount=(v20o<<16)|(v30o<<8)|v33o, ecount=(v20e<<16)|(v30e<<8)|v33e; if (ModRM >=0xc0) nec_state->icount-=vall; else nec_state->icount-=(addr&1)?((ocount>>nec_state->chip_type)&0x7f):((ecount>>nec_state->chip_type)&0x7f); }
 
 /************************************************************************/
-#define CompressFlags() (WORD)(CF | 0x02 | (PF << 2) | (AF << 4) | (ZF << 6) \
-				| (SF << 7) | (nec_state->TF << 8) | (nec_state->IF << 9) \
-				| (nec_state->DF << 10) | (OF << 11) | (nec_state->MF << 15))
+#define CompressFlags() (WORD)(CF | (nec_state->IBRK << 1) | (PF << 2) | (nec_state->F0 << 3) | (AF << 4) \
+				| (nec_state->F1 << 5) | (ZF << 6) | (SF << 7) | (nec_state->TF << 8) | (nec_state->IF << 9) \
+				| (nec_state->DF << 10) | (OF << 11) | (nec_state->RB << 12) | (nec_state->MF << 15))
 
 #define ExpandFlags(f) \
 { \
 	nec_state->CarryVal = (f) & 0x0001; \
+	nec_state->IBRK = ((f) & 0x0002) == 0x0002; \
 	nec_state->ParityVal = !((f) & 0x0004); \
+	nec_state->F0 = ((f) & 0x0008) == 0x0008; \
 	nec_state->AuxVal = (f) & 0x0010; \
+	nec_state->F1 = ((f) & 0x0020) == 0x0020; \
 	nec_state->ZeroVal = !((f) & 0x0040); \
 	nec_state->SignVal = (f) & 0x0080 ? -1 : 0; \
 	nec_state->TF = ((f) & 0x0100) == 0x0100; \
 	nec_state->IF = ((f) & 0x0200) == 0x0200; \
 	nec_state->DF = ((f) & 0x0400) == 0x0400; \
 	nec_state->OverVal = (f) & 0x0800; \
+	/* RB only changes on interrupts, so skip it */ \
 	nec_state->MF = ((f) & 0x8000) == 0x8000; \
 }
 

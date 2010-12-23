@@ -2318,7 +2318,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( cosmccop, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", V30,MASTER_CLOCK/2/2)
+	MDRV_CPU_ADD("maincpu", V35,MASTER_CLOCK/2/2)
 	MDRV_CPU_PROGRAM_MAP(kengo_map)
 	MDRV_CPU_IO_MAP(kengo_portmap)
 

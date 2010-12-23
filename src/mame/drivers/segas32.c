@@ -2232,11 +2232,14 @@ static MACHINE_CONFIG_START( system32, driver_device )
 MACHINE_CONFIG_END
 
 
+static const nec_config ga2_v25_config ={ ga2_v25_opcode_table, };
+
 static MACHINE_CONFIG_DERIVED( system32_v25, system32 )
 
 	/* add a V25 for protection */
 	MDRV_CPU_ADD("mcu", V25, 10000000)
 	MDRV_CPU_PROGRAM_MAP(ga2_v25_map)
+	MDRV_CPU_CONFIG(ga2_v25_config)
 MACHINE_CONFIG_END
 
 
@@ -2475,7 +2478,7 @@ ROM_END
  **************************************************************************************************************************
  **************************************************************************************************************************
     Arabian Fight
-    protected via a custom V20 with encrypted code
+    protected via a custom V25 with encrypted code
 */
 
 ROM_START( arabfgt )
@@ -2542,7 +2545,7 @@ ROM_END
 
 /**************************************************************************************************************************
     Arabian Fight (Japan)
-    protected via a custom V20 with encrypted code
+    protected via a custom V25 with encrypted code
 */
 ROM_START( arabfgtj )
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* v60 code + data */
@@ -2818,7 +2821,7 @@ ROM_END
  **************************************************************************************************************************
  **************************************************************************************************************************
     Golden Axe: The Return of Death Adder
-    protected via a custom V20 with encrypted code
+    protected via a custom V25 with encrypted code
 */
 ROM_START( ga2 )
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* v60 code + data */
@@ -2853,7 +2856,7 @@ ROM_END
 
 /**************************************************************************************************************************
     Golden Axe: The Return of Death Adder (U.S.)
-    protected via a custom V20 with encrypted code
+    protected via a custom V25 with encrypted code
     Sega Game ID codes:
      Game: 833-8932-02 GOLDEN AXE II AC USA
 Rom board: 833-8933-01
@@ -2893,7 +2896,7 @@ ROM_END
 
 /**************************************************************************************************************************
     Golden Axe: The Return of Death Adder (Japan)
-    protected via a custom V20 with encrypted code
+    protected via a custom V25 with encrypted code
 */
 ROM_START( ga2j )
 	ROM_REGION( 0x200000, "maincpu", 0 ) /* v60 code + data */

@@ -9,15 +9,15 @@ static struct {
 	} RM;
 } Mod_RM;
 
-#define RegWord(ModRM) nec_state->regs.w[Mod_RM.reg.w[ModRM]]
-#define RegByte(ModRM) nec_state->regs.b[Mod_RM.reg.b[ModRM]]
+#define RegWord(ModRM) Wreg(Mod_RM.reg.w[ModRM])
+#define RegByte(ModRM) Breg(Mod_RM.reg.b[ModRM])
 
 #define GetRMWord(ModRM) \
-	((ModRM) >= 0xc0 ? nec_state->regs.w[Mod_RM.RM.w[ModRM]] : ( (*GetEA[ModRM])(nec_state), read_mem_word( EA ) ))
+	((ModRM) >= 0xc0 ? Wreg(Mod_RM.RM.w[ModRM]) : ( (*GetEA[ModRM])(nec_state), read_mem_word( EA ) ))
 
 #define PutbackRMWord(ModRM,val)			     \
 {							     \
-	if (ModRM >= 0xc0) nec_state->regs.w[Mod_RM.RM.w[ModRM]]=val; \
+	if (ModRM >= 0xc0) Wreg(Mod_RM.RM.w[ModRM])=val; \
     else write_mem_word(EA,val);  \
 }
 
@@ -26,7 +26,7 @@ static struct {
 #define PutRMWord(ModRM,val)				\
 {							\
 	if (ModRM >= 0xc0)				\
-		nec_state->regs.w[Mod_RM.RM.w[ModRM]]=val;	\
+		Wreg(Mod_RM.RM.w[ModRM])=val;	\
 	else {						\
 		(*GetEA[ModRM])(nec_state);			\
 		write_mem_word( EA ,val);			\
@@ -37,7 +37,7 @@ static struct {
 {							\
 	WORD val;					\
 	if (ModRM >= 0xc0)				\
-		nec_state->regs.w[Mod_RM.RM.w[ModRM]] = FETCHWORD(); \
+		Wreg(Mod_RM.RM.w[ModRM]) = FETCHWORD(); \
 	else {						\
 		(*GetEA[ModRM])(nec_state);			\
 		val = FETCHWORD();				\
@@ -46,12 +46,12 @@ static struct {
 }
 
 #define GetRMByte(ModRM) \
-	((ModRM) >= 0xc0 ? nec_state->regs.b[Mod_RM.RM.b[ModRM]] : read_mem_byte( (*GetEA[ModRM])(nec_state) ))
+	((ModRM) >= 0xc0 ? Breg(Mod_RM.RM.b[ModRM]) : read_mem_byte( (*GetEA[ModRM])(nec_state) ))
 
 #define PutRMByte(ModRM,val)				\
 {							\
 	if (ModRM >= 0xc0)				\
-		nec_state->regs.b[Mod_RM.RM.b[ModRM]]=val;	\
+		Breg(Mod_RM.RM.b[ModRM])=val;	\
 	else						\
 		write_mem_byte( (*GetEA[ModRM])(nec_state) ,val);	\
 }
@@ -59,7 +59,7 @@ static struct {
 #define PutImmRMByte(ModRM) 				\
 {							\
 	if (ModRM >= 0xc0)				\
-		nec_state->regs.b[Mod_RM.RM.b[ModRM]]=FETCH();	\
+		Breg(Mod_RM.RM.b[ModRM])=FETCH();	\
 	else {						\
 		(*GetEA[ModRM])(nec_state);			\
 		write_mem_byte( EA , FETCH() );		\
@@ -69,7 +69,7 @@ static struct {
 #define PutbackRMByte(ModRM,val)			\
 {							\
 	if (ModRM >= 0xc0)				\
-		nec_state->regs.b[Mod_RM.RM.b[ModRM]]=val;	\
+		Breg(Mod_RM.RM.b[ModRM])=val;	\
 	else						\
 		write_mem_byte(EA,val);			\
 }
@@ -96,9 +96,9 @@ static struct {
 
 #define DEF_ald8						\
 	UINT32 src = FETCH();					\
-	UINT32 dst = nec_state->regs.b[AL]
+	UINT32 dst = Breg(AL)
 
 #define DEF_axd16						\
 	UINT32 src = FETCH();				\
-	UINT32 dst = nec_state->regs.w[AW];			\
+	UINT32 dst = Wreg(AW);			\
     src += (FETCH() << 8)
