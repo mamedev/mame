@@ -860,6 +860,18 @@ static MACHINE_RESET(raiden2)
 	//cop_init();
 }
 
+static MACHINE_RESET(zeroteam)
+{
+	raiden2_state *state = machine->driver_data<raiden2_state>();
+	state->bg_bank = 0;
+	state->fg_bank = 2;
+	state->mid_bank = 1;
+	sprcpt_init();
+	MACHINE_RESET_CALL(seibu_sound);
+
+	//cop_init();
+}
+
 READ16_MEMBER(raiden2_state::raiden2_sound_comms_r)
 {
 	switch(offset)
@@ -956,6 +968,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( zeroteam_mem, ADDRESS_SPACE_PROGRAM, 16, raiden2_state )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM
 
+	AM_RANGE(0x00470, 0x00471) AM_WRITENOP
+	AM_RANGE(0x006cc, 0x006cd) AM_WRITENOP
+
 	AM_IMPORT_FROM( raiden2_cop_mem )
 
 	AM_RANGE(0x00700, 0x0071f) AM_READWRITE(raiden2_sound_comms_r,raiden2_sound_comms_w)
@@ -964,10 +979,8 @@ static ADDRESS_MAP_START( zeroteam_mem, ADDRESS_SPACE_PROGRAM, 16, raiden2_state
 	AM_RANGE(0x00744, 0x00745) AM_READ_PORT("CONTROLS")
 	AM_RANGE(0x0074c, 0x0074d) AM_READ_PORT("SYSTEM")
 
-	/* unknown ranges of the following two! (we can't test enough of this so far) */
-	AM_RANGE(0x0b800, 0x0bfff) AM_RAM_WRITE(raiden2_foreground_w) AM_BASE(fore_data)
-	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM_WRITE(raiden2_background_w) AM_BASE(back_data)
-
+	AM_RANGE(0x0b800, 0x0bfff) AM_RAM_WRITE(raiden2_background_w) AM_BASE(back_data)
+	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM_WRITE(raiden2_foreground_w) AM_BASE(fore_data)
 	AM_RANGE(0x0c800, 0x0cfff) AM_RAM_WRITE(raiden2_midground_w) AM_BASE(mid_data)
     AM_RANGE(0x0d000, 0x0dfff) AM_RAM_WRITE(raiden2_text_w) AM_BASE(text_data)
 	AM_RANGE(0x0e000, 0x0efff) AM_RAM AM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
@@ -982,6 +995,9 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( xsedae_mem, ADDRESS_SPACE_PROGRAM, 16, raiden2_state )
 	AM_RANGE(0x00000, 0x003ff) AM_RAM
 
+	AM_RANGE(0x00470, 0x00471) AM_WRITENOP
+	AM_RANGE(0x006cc, 0x006cd) AM_WRITENOP
+
 	AM_IMPORT_FROM( raiden2_cop_mem )
 
 	AM_RANGE(0x00700, 0x0071f) AM_READWRITE(raiden2_sound_comms_r,raiden2_sound_comms_w)
@@ -990,10 +1006,8 @@ static ADDRESS_MAP_START( xsedae_mem, ADDRESS_SPACE_PROGRAM, 16, raiden2_state )
 	AM_RANGE(0x00744, 0x00745) AM_READ_PORT("CONTROLS")
 	AM_RANGE(0x0074c, 0x0074d) AM_READ_PORT("SYSTEM")
 
-	/* unknown ranges of the following two! (we can't test enough of this so far) */
-	AM_RANGE(0x0b800, 0x0bfff) AM_RAM_WRITE(raiden2_foreground_w) AM_BASE(fore_data)
-	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM_WRITE(raiden2_background_w) AM_BASE(back_data)
-
+	AM_RANGE(0x0b800, 0x0bfff) AM_RAM_WRITE(raiden2_background_w) AM_BASE(back_data)
+	AM_RANGE(0x0c000, 0x0c7ff) AM_RAM_WRITE(raiden2_foreground_w) AM_BASE(fore_data)
 	AM_RANGE(0x0c800, 0x0cfff) AM_RAM_WRITE(raiden2_midground_w) AM_BASE(mid_data)
     AM_RANGE(0x0d000, 0x0dfff) AM_RAM_WRITE(raiden2_text_w) AM_BASE(text_data)
 	AM_RANGE(0x0e000, 0x0efff) AM_RAM AM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
@@ -1390,6 +1404,8 @@ static MACHINE_CONFIG_DERIVED( xsedae, raiden2 )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(xsedae_mem)
 
+	MDRV_MACHINE_RESET(zeroteam)
+
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0, 32*8-1)
 
@@ -1402,7 +1418,7 @@ static MACHINE_CONFIG_START( zeroteam, raiden2_state )
 	MDRV_CPU_PROGRAM_MAP(zeroteam_mem)
 	MDRV_CPU_VBLANK_INT("screen", raiden2_interrupt)
 
-	MDRV_MACHINE_RESET(raiden2)
+	MDRV_MACHINE_RESET(zeroteam)
 
 	SEIBU_NEWZEROTEAM_SOUND_SYSTEM_CPU(14318180/4)
 
