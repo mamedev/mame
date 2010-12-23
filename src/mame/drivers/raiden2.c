@@ -6,6 +6,13 @@
   value of 0x80 puts 0x00000-0x1ffff at 0x20000 - 0x3ffff
   value of 0x00 puts 0x20000-0x3ffff at 0x20000 - 0x3ffff
 
+ TODO (xsedae):
+ - sprite DMA params doesn't quite work well with this and zeroteam (hardcode src to 0xf000 and size to 0x800).
+ - sprite ROMs are badly dumped (half size);
+ - sprite X kludge needs to be removed somehow;
+ - apparently the only real usage of the sprite protection in xsedae is on the field map (sprite goes in the wrong direction);
+ - text tilemap has color issues;
+
 */
 
 /*
@@ -93,6 +100,7 @@ Games on this PCB / Similar PCBs
  Raiden 2
  Raiden DX
  Zero Team
+ X Se Dae Quiz
 
  + varients
 
@@ -123,15 +131,10 @@ Current Problem(s) - in order of priority
  Sprite Encryption - this is 99% complete for Raiden 2 / DX, just a few bad
  bits remain.  No decryption support for Zero Team yet.
 
- Sound - the main sets should use a variant of the Seibu Sound System, with
- an extra OKI6295, currently no sound is hooked up in these sets.  The V33
- set uses weaker sound hardware which is emulated.
-
  Video emulation - used to be more complete than it is now, tile banking is
  currently broken.
 
  Low Priority
-
 
 */
 
@@ -1015,8 +1018,7 @@ static ADDRESS_MAP_START( xsedae_mem, ADDRESS_SPACE_PROGRAM, 16, raiden2_state )
 	AM_RANGE(0x00800, 0x0ffff) AM_RAM
 	AM_RANGE(0x10000, 0x1ffff) AM_RAM
 
-	AM_RANGE(0x20000, 0x3ffff) AM_ROMBANK("mainbank")
-	AM_RANGE(0x40000, 0xfffff) AM_ROM AM_REGION("mainprg", 0x40000)
+	AM_RANGE(0x20000, 0xfffff) AM_ROM AM_REGION("mainprg", 0x20000)
 ADDRESS_MAP_END
 
 
@@ -2218,8 +2220,8 @@ ROM_START( xsedae )
 	ROM_LOAD( "7.u0714",     0x100000, 0x080000, CRC(296105dc) SHA1(c2b80d681646f504b03c2dde13e37b1d820f82d2) )
 
 	ROM_REGION( 0x800000, "gfx3", 0 ) /* sprite gfx (not encrypted) */
-	ROM_LOAD32_WORD( "obj-1.u0811",  0x000000, 0x100000, CRC(e65f1b4e) SHA1(b04be9af41ce868e64071715252c4ff228891cf0) )
-	ROM_LOAD32_WORD( "obj-2.u082",   0x000002, 0x100000, CRC(e753e7ad) SHA1(643ab39ac1b7df686a16b1ed6fdcb686720ca8e8) )
+	ROM_LOAD32_WORD( "obj-1.u0811",  0x000000, 0x100000, BAD_DUMP CRC(e65f1b4e) SHA1(b04be9af41ce868e64071715252c4ff228891cf0) ) //half size
+	ROM_LOAD32_WORD( "obj-2.u082",   0x000002, 0x100000, BAD_DUMP CRC(e753e7ad) SHA1(643ab39ac1b7df686a16b1ed6fdcb686720ca8e8) ) //half size
 
 	ROM_REGION( 0x100000, "oki1", 0 )	/* ADPCM samples */
 	ROM_LOAD( "9.u105", 0x00000, 0x40000, CRC(a7a0c5f9) SHA1(7882681ac152642aa4f859071f195842068b214b) )
@@ -2235,7 +2237,8 @@ static DRIVER_INIT (raiden2)
 
 static DRIVER_INIT (xsedae)
 {
-	memory_configure_bank(machine, "mainbank", 0, 2, memory_region(machine, "mainprg"), 0x20000);
+	/* doesn't have banking */
+	//memory_configure_bank(machine, "mainbank", 0, 2, memory_region(machine, "mainprg"), 0x20000);
 }
 
 /* GAME DRIVERS */
@@ -2256,10 +2259,10 @@ GAME( 1994, raidndxj, raidndx, raiden2,  raidendx, raiden2,  ROT270, "Seibu Kaih
 GAME( 1994, raidndxu, raidndx, raiden2,  raidendx, raiden2,  ROT270, "Seibu Kaihatsu (Fabtek license)",        "Raiden DX (US)",                   GAME_NOT_WORKING|GAME_NO_SOUND)
 GAME( 1994, raidndxg, raidndx, raiden2,  raidendx, raiden2,  ROT270, "Seibu Kaihatsu (Tuning license)",        "Raiden DX (Germany)",              GAME_NOT_WORKING|GAME_NO_SOUND)
 
-GAME( 1993, zeroteam, 0,       zeroteam, zeroteam,  raiden2,  ROT0,   "Seibu Kaihatsu", "Zero Team (set 1)", GAME_NOT_WORKING|GAME_NO_SOUND)
-GAME( 1993, zeroteama,zeroteam,zeroteam, zeroteam,  raiden2,  ROT0,   "Seibu Kaihatsu", "Zero Team (set 2)", GAME_NOT_WORKING|GAME_NO_SOUND)
-GAME( 1993, zeroteamb,zeroteam,zeroteam, zeroteam,  raiden2,  ROT0,   "Seibu Kaihatsu", "Zero Team (set 3)", GAME_NOT_WORKING|GAME_NO_SOUND)
-GAME( 1993, zeroteamc,zeroteam,zeroteam, zeroteam,  raiden2,  ROT0,   "Seibu Kaihatsu", "Zero Team (set 4)", GAME_NOT_WORKING|GAME_NO_SOUND)
-GAME( 1993, zeroteams,zeroteam,zeroteam, zeroteam,  raiden2,  ROT0,   "Seibu Kaihatsu", "Zero Team Selection", GAME_NOT_WORKING|GAME_NO_SOUND)
+GAME( 1993, zeroteam, 0,       zeroteam, zeroteam,  raiden2,  ROT0,   "Seibu Kaihatsu", "Zero Team (set 1)", GAME_NOT_WORKING)
+GAME( 1993, zeroteama,zeroteam,zeroteam, zeroteam,  raiden2,  ROT0,   "Seibu Kaihatsu", "Zero Team (set 2)", GAME_NOT_WORKING)
+GAME( 1993, zeroteamb,zeroteam,zeroteam, zeroteam,  raiden2,  ROT0,   "Seibu Kaihatsu", "Zero Team (set 3)", GAME_NOT_WORKING)
+GAME( 1993, zeroteamc,zeroteam,zeroteam, zeroteam,  raiden2,  ROT0,   "Seibu Kaihatsu", "Zero Team (set 4)", GAME_NOT_WORKING)
+GAME( 1993, zeroteams,zeroteam,zeroteam, zeroteam,  raiden2,  ROT0,   "Seibu Kaihatsu", "Zero Team Selection", GAME_NOT_WORKING)
 
-GAME( 1995, xsedae,   0,       xsedae,   xsedae,  xsedae,   ROT0,   "Dream Island",   "X Se Dae Quiz", GAME_NOT_WORKING|GAME_NO_SOUND)
+GAME( 1995, xsedae,   0,       xsedae,   xsedae,  xsedae,   ROT0,   "Dream Island",   "X Se Dae Quiz", GAME_NOT_WORKING)
