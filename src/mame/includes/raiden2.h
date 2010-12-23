@@ -10,6 +10,7 @@ public:
 	DECLARE_WRITE16_MEMBER( cop_dma_v1_w );
 	DECLARE_WRITE16_MEMBER( cop_dma_v2_w );
 	DECLARE_WRITE16_MEMBER( cop_scale_w );
+	DECLARE_WRITE16_MEMBER( cop_dma_adr_rel_w );
 	DECLARE_WRITE16_MEMBER( cop_dma_adr_w );
 	DECLARE_WRITE16_MEMBER( cop_dma_size_w );
 	DECLARE_WRITE16_MEMBER( cop_dma_v3_w );
@@ -71,7 +72,7 @@ public:
 	UINT32 cop_regs[4], cop_itoa;
 	UINT16 cop_status, cop_scale, cop_itoa_digit_count, cop_angle, cop_dist;
 	UINT8 cop_itoa_digits[10];
-	UINT16 cop_dma_mode, cop_dma_adr, cop_dma_size, cop_dma_v1, cop_dma_v2, cop_dma_v3;
+	UINT16 cop_dma_mode, cop_dma_adr, cop_dma_size, cop_dma_v1, cop_dma_v2, cop_dma_v3,cop_dma_adr_rel;
 	UINT16 sprites[0x800], sprites_cur_start;
 
 	UINT16 cop_func_trigger[0x100/8];		/* function trigger */

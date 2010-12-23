@@ -189,6 +189,11 @@ WRITE16_MEMBER(raiden2_state::cop_pgm_trigger_w)
 	cop_latch_trigger = data;
 }
 
+WRITE16_MEMBER(raiden2_state::cop_dma_adr_rel_w)
+{
+	COMBINE_DATA(&cop_dma_adr_rel);
+}
+
 WRITE16_MEMBER(raiden2_state::cop_dma_v1_w)
 {
 	COMBINE_DATA(&cop_dma_v1);
@@ -223,9 +228,6 @@ WRITE16_MEMBER(raiden2_state::cop_dma_trigger_w)
 {
 	//  logerror("COP DMA mode=%x adr=%x size=%x vals=%x %x %x\n", cop_dma_mode, cop_dma_adr, cop_dma_size, cop_dma_v1, cop_dma_v2, cop_dma_v3);
 
-	//if(cop_dma_mode != 0x14 && cop_dma_mode != 0x15)
-	//	printf("%02x\n",cop_dma_mode);
-
 	switch(cop_dma_mode) {
 	case 0x14: {
 		int rsize = 32*(0x7f-cop_dma_size);
@@ -233,6 +235,44 @@ WRITE16_MEMBER(raiden2_state::cop_dma_trigger_w)
 		for(int i=0; i<rsize; i+=2)
 			sprites[i/2] = space.read_word(radr+i);
 		sprites_cur_start = rsize;
+		break;
+	}
+	case 0x82: {
+		UINT32 src,dst,size;
+		int i;
+
+		src = (cop_dma_adr << 6) + (cop_dma_adr_rel * 0x400);
+		dst = (cop_dma_v3 << 6);
+		size = ((cop_dma_size << 5) - (cop_dma_v3 << 6) + 0x20)/2;
+
+		//printf("%08x %08x %08x\n",src,dst,size);
+
+		for(i = 0;i < size;i++)
+		{
+			space.write_word(dst, space.read_word(src));
+			src+=2;
+			dst+=2;
+		}
+
+		break;
+	}
+	case 0x09: {
+		UINT32 src,dst,size;
+		int i;
+
+		src = (cop_dma_adr << 6);
+		dst = (cop_dma_v3 << 6);
+		size = ((cop_dma_size << 5) - (cop_dma_v3 << 6) + 0x20)/2;
+
+//		printf("%08x %08x %08x\n",src,dst,size);
+
+		for(i = 0;i < size;i++)
+		{
+			space.write_word(dst, space.read_word(src));
+			src+=2;
+			dst+=2;
+		}
+
 		break;
 	}
 	}
@@ -858,6 +898,8 @@ static ADDRESS_MAP_START( raiden2_cop_mem, ADDRESS_SPACE_PROGRAM, 16, raiden2_st
 	AM_RANGE(0x0043c, 0x0043d) AM_WRITE(cop_pgm_trigger_w)
 	AM_RANGE(0x00444, 0x00445) AM_WRITE(cop_scale_w)
 	AM_RANGE(0x00470, 0x00471) AM_WRITE(cop_tile_bank_2_w)
+
+	AM_RANGE(0x00476, 0x00477) AM_WRITE(cop_dma_adr_rel_w)
 	AM_RANGE(0x00478, 0x00479) AM_WRITE(cop_dma_adr_w)
 	AM_RANGE(0x0047a, 0x0047b) AM_WRITE(cop_dma_size_w)
 	AM_RANGE(0x0047c, 0x0047d) AM_WRITE(cop_dma_v3_w)
@@ -954,8 +996,7 @@ static ADDRESS_MAP_START( xsedae_mem, ADDRESS_SPACE_PROGRAM, 16, raiden2_state )
 
 	AM_RANGE(0x0c800, 0x0cfff) AM_RAM_WRITE(raiden2_midground_w) AM_BASE(mid_data)
     AM_RANGE(0x0d000, 0x0dfff) AM_RAM_WRITE(raiden2_text_w) AM_BASE(text_data)
-	/* TODO: probably needs a DMA */
-	AM_RANGE(0x14800, 0x157ff) AM_RAM AM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
+	AM_RANGE(0x0e000, 0x0efff) AM_RAM AM_WRITE_LEGACY(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 
 	AM_RANGE(0x00800, 0x0ffff) AM_RAM
 	AM_RANGE(0x10000, 0x1ffff) AM_RAM
