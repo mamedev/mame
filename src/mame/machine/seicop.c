@@ -1344,7 +1344,7 @@ hardware!.  These don't currently make much sense because the hardware specifies
 contain nothing.  It's possible the original hardware has mirroring which this function relies on.
 
 the DMA to private buffer operations are currently ignored due to
-if ((cop_clearfill_lasttrigger==0x14) || (cop_clearfill_lasttrigger==0x15)) return;
+if ((cop_dma_trigger==0x14) || (cop_dma_trigger==0x15)) return;
 
 ----
 
@@ -1376,10 +1376,11 @@ static UINT16 cop_438;
 static UINT16 cop_43a;
 static UINT16 cop_43c;
 
-static UINT16 cop_clearfill_address[0x200];
-static UINT16 cop_clearfill_length[0x200];
-static UINT16 cop_clearfill_value[0x200];
-static UINT16 cop_clearfill_lasttrigger = 0;
+static UINT16 cop_dma_src[0x200];
+static UINT16 cop_dma_size[0x200];
+static UINT16 cop_dma_dst[0x200];
+static UINT16 cop_dma_src_param[0x200];
+static UINT16 cop_dma_trigger = 0;
 
 
 static UINT16 copd2_offs = 0;
@@ -2431,7 +2432,6 @@ static READ16_HANDLER( generic_cop_r )
 static WRITE16_HANDLER( generic_cop_w )
 {
 	static UINT32 temp32;
-	static UINT32 dma_src,dma_dst,dma_size,dma_trigger,dma_src_param;
 
 	switch (offset)
 	{
@@ -2467,45 +2467,40 @@ static WRITE16_HANDLER( generic_cop_w )
 
 		/* DMA / layer clearing */
 		case (0x076/2):
-			dma_src_param = data * 0x400;
+			cop_dma_src_param[cop_dma_trigger] = data;
 			break;
 
 		case (0x078/2): /* clear address */
 		{
-			cop_clearfill_address[cop_clearfill_lasttrigger] = data; // << 6 to get actual address
-			dma_src = data << 6;
+			cop_dma_src[cop_dma_trigger] = data; // << 6 to get actual address
 			seibu_cop_log("%06x: COPX set layer clear address to %04x (actual %08x)\n", cpu_get_pc(space->cpu), data, data<<6);
 			break;
 		}
 
 		case (0x07a/2): /* clear length */
 		{
-			cop_clearfill_length[cop_clearfill_lasttrigger] = data;
+			cop_dma_size[cop_dma_trigger] = data;
 			seibu_cop_log("%06x: COPX set layer clear length to %04x (actual %08x)\n", cpu_get_pc(space->cpu), data, data<<5);
-			dma_size = data << 5;
 			break;
 		}
 
 		case (0x07c/2): /* clear value? */
 		{
-			cop_clearfill_value[cop_clearfill_lasttrigger] = data;
+			cop_dma_dst[cop_dma_trigger] = data;
 			seibu_cop_log("%06x: COPX set layer clear value to %04x (actual %08x)\n", cpu_get_pc(space->cpu), data, data<<6);
-			dma_dst = data << 6;
 			break;
 		}
 
 		/* unknown, related to clears? / DMA? */
 		case (0x07e/2):
 		{
-			cop_clearfill_lasttrigger = data;
+			cop_dma_trigger = data;
 			seibu_cop_log("%06x: COPX set layer clear trigger? to %04x\n", cpu_get_pc(space->cpu), data);
 			if (data>=0x1ff)
 			{
 				seibu_cop_log("invalid!, >0x1ff\n");
-				cop_clearfill_lasttrigger = 0;
+				cop_dma_trigger = 0;
 			}
-
-			dma_trigger = data; //dmach according to Olympic Soccer '92
 
 			break;
 		}
@@ -2573,28 +2568,27 @@ static WRITE16_HANDLER( generic_cop_w )
 		{
 			seibu_cop_log("%06x: COPX execute current layer clear??? %04x\n", cpu_get_pc(space->cpu), data);
 
-			//printf("SRC: %08x DST:%08x SIZE:%08x TRIGGER: %08x\n",dma_src,dma_dst,dma_size,dma_trigger);
-
-			if (dma_trigger & 0x80)
+			if (cop_dma_trigger >= 0x80 && cop_dma_trigger <= 0x87)
 			{
 				static UINT32 src,dst,size,i;
 
 				/* TODO: understand all the differences between triggers!
                 0x80 is used by Legionnaire (plain DMA)
                 0x81 is used by SD Gundam and Godzilla (unknown purpose)
-                0x86 is used by Seibu Cup Soccer (doesn't yet work)
+                0x86 is used by Seibu Cup Soccer (DMA with a table, doesn't yet work)
                 0x87 is used by Denjin Makai (DMA with inverted word endianess)
                 */
 
 				//if(dma_trigger != 0x87)
-				//  printf("SRC: %08x %08x DST:%08x SIZE:%08x TRIGGER: %08x\n",dma_src,dma_src_param,dma_dst,dma_size,dma_trigger);
+				//  printf("SRC: %08x %08x DST:%08x SIZE:%08x TRIGGER: %08x\n",dma_src,cop_dma_src_param,dma_dst,dma_size,dma_trigger);
 
-				if(dma_trigger == 0x81)
-					return;
+				if(cop_dma_trigger == 0x81)
+					src = (cop_dma_src[cop_dma_trigger] << 6); //FIXME: SD Gundam doesn't like the extra param, maybe it has a different flag?
+				else
+					src = (cop_dma_src[cop_dma_trigger] << 6) + (cop_dma_src_param[cop_dma_trigger] * 0x400);
 
-				src = dma_src + dma_src_param;
-				dst = dma_dst;
-				size = (dma_size - dma_dst + 0x20)/2;
+				dst = (cop_dma_dst[cop_dma_trigger] << 6);
+				size = ((cop_dma_size[cop_dma_trigger] << 5) - (cop_dma_dst[cop_dma_trigger] << 6) + 0x20)/2;
 
 				for(i = 0;i < size;i++)
 				{
@@ -2607,54 +2601,48 @@ static WRITE16_HANDLER( generic_cop_w )
 			}
 
 			/* Seibu Cup Soccer trigger this*/
-			if (dma_trigger == 0x0e)
+			if (cop_dma_trigger == 0x0e)
 			{
 				static UINT32 src,dst,size,i;
 
-				src = dma_src;
-				dst = dma_dst;
-				size = ((dma_size - dma_dst) / 0x20) + 1;
+				src = (cop_dma_src[cop_dma_trigger] << 6);
+				dst = (cop_dma_dst[cop_dma_trigger] << 6);
+				size = ((cop_dma_size[cop_dma_trigger] << 5) - (cop_dma_dst[cop_dma_trigger] << 6) + 0x20)/2;
 
-				for(i=0;i<size;i++)
+				for(i = 0;i < size;i++)
 				{
-					space->write_dword(dst+0x00, space->read_dword(src+0x00));
-					space->write_dword(dst+0x04, space->read_dword(src+0x04));
-					space->write_dword(dst+0x08, space->read_dword(src+0x08));
-					space->write_dword(dst+0x0c, space->read_dword(src+0x0c));
-					space->write_dword(dst+0x10, space->read_dword(src+0x10));
-					space->write_dword(dst+0x14, space->read_dword(src+0x14));
-					space->write_dword(dst+0x18, space->read_dword(src+0x18));
-					space->write_dword(dst+0x1c, space->read_dword(src+0x1c));
-
-					//printf("%08x %08x\n",src,dst);
-
-					dst+=0x20;
-					src+=0x20;
+					space->write_word(dst, space->read_word(src));
+					src+=2;
+					dst+=2;
 				}
 
 				return;
 			}
 
-			// I think the value it writes here must match the other value for anything to happen.. maybe */
-			//if (data!=cop_clearfill_value[cop_clearfill_lasttrigger]) break;
-
-			if ((cop_clearfill_lasttrigger==0x14) || (cop_clearfill_lasttrigger==0x15)) return;
-
-			//printf("SRC: %08x DST:%08x SIZE:%08x TRIGGER: %08x\n",dma_src,dma_dst,dma_size,dma_trigger);
-
 			/* do the fill  */
-			if (cop_clearfill_value[cop_clearfill_lasttrigger]==0x0000)
+			if (cop_dma_trigger >= 0x118 && cop_dma_trigger <= 0x11f)
 			{
 				UINT32 length, address;
 				int i;
-				address = cop_clearfill_address[cop_clearfill_lasttrigger] << 6;
-				length = (cop_clearfill_length[cop_clearfill_lasttrigger]+1) << 5;
+				if(cop_dma_dst[cop_dma_trigger] != 0x0000) // Invalid?
+					return;
+
+				address = cop_dma_src[cop_dma_trigger] << 6;
+				length = (cop_dma_size[cop_dma_trigger]+1) << 5;
+
 
 				for (i=address;i<address+length;i+=2)
 				{
-					space->write_word(i, 0x0000);
+					space->write_word(i, 0x0000); //FIXME: 0x428 has the fixed value to copy
 				}
+
+				return;
 			}
+
+			/* private buffer copies */
+			if ((cop_dma_trigger==0x14) || (cop_dma_trigger==0x15)) return;
+
+			//printf("SRC: %08x DST:%08x SIZE:%08x TRIGGER: %08x\n",dma_src,dma_dst,dma_size,dma_trigger);
 
 			break;
 		}

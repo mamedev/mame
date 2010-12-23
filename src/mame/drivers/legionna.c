@@ -158,7 +158,7 @@ static ADDRESS_MAP_START( grainbow_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x101800, 0x101fff) AM_RAM_WRITE(legionna_midground_w) AM_BASE(&legionna_mid_data)
 	AM_RANGE(0x102000, 0x102fff) AM_RAM_WRITE(legionna_text_w) AM_BASE(&legionna_textram)
 	AM_RANGE(0x103000, 0x103fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
-	AM_RANGE(0x104000, 0x104fff) AM_RAM_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w)
+	AM_RANGE(0x104000, 0x104fff) AM_RAM//_WRITE(paletteram16_xBBBBBGGGGGRRRRR_word_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0x105000, 0x105fff) AM_RAM
 	AM_RANGE(0x106000, 0x106fff) AM_RAM
 	AM_RANGE(0x107000, 0x107fff) AM_RAM AM_BASE_SIZE_GENERIC(spriteram)
