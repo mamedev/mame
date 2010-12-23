@@ -73,7 +73,7 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap,const rectan
 {
 	UINT16 *spriteram16 = machine->generic.spriteram.u16;
 	int offs,fx,fy,x,y,color,sprite;
-//	int cur_pri;
+//  int cur_pri;
 	int dx,dy,ax,ay;
 
 	for (offs = 0x400-4;offs >= 0;offs -= 4)
@@ -187,10 +187,10 @@ static VIDEO_UPDATE( rdx_v33 )
 		address_space *space = cputag_get_address_space(screen->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
 
 		//if(input_code_pressed_once(screen->machine,KEYCODE_A))
-		//	src_addr+=0x800;
+		//  src_addr+=0x800;
 
 		//if(input_code_pressed_once(screen->machine,KEYCODE_S))
-		//	src_addr-=0x800;
+		//  src_addr-=0x800;
 
 		frame++;
 
@@ -353,17 +353,17 @@ static ADDRESS_MAP_START( rdx_v33_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0068e, 0x0068f) AM_WRITENOP // synch for the MCU?
 	AM_RANGE(0x006b0, 0x006b1) AM_WRITE(mcu_prog_w)
 	AM_RANGE(0x006b2, 0x006b3) AM_WRITE(mcu_prog_w2)
-//	AM_RANGE(0x006b4, 0x006b5) AM_WRITENOP
-//	AM_RANGE(0x006b6, 0x006b7) AM_WRITENOP
+//  AM_RANGE(0x006b4, 0x006b5) AM_WRITENOP
+//  AM_RANGE(0x006b6, 0x006b7) AM_WRITENOP
 	AM_RANGE(0x006bc, 0x006bd) AM_WRITE(mcu_prog_offs_w)
 	AM_RANGE(0x006be, 0x006bf) AM_WRITENOP // MCU program related
 	AM_RANGE(0x006d8, 0x006d9) AM_WRITE(mcu_xval_w)
 	AM_RANGE(0x006da, 0x006db) AM_WRITE(mcu_yval_w)
-//	AM_RANGE(0x006dc, 0x006dd) AM_READ(rdx_v33_unknown2_r)
+//  AM_RANGE(0x006dc, 0x006dd) AM_READ(rdx_v33_unknown2_r)
 //  AM_RANGE(0x006de, 0x006df) AM_WRITE(mcu_unkaa_w) // mcu command related?
 
 	AM_RANGE(0x00700, 0x00701) AM_DEVWRITE("eeprom", rdx_v33_eeprom_w)
-//	AM_RANGE(0x00740, 0x00741) AM_READ(rdx_v33_unknown2_r)
+//  AM_RANGE(0x00740, 0x00741) AM_READ(rdx_v33_unknown2_r)
 	AM_RANGE(0x00744, 0x00745) AM_READ_PORT("INPUT")
 	AM_RANGE(0x0074c, 0x0074d) AM_READ_PORT("SYSTEM")
 	AM_RANGE(0x00762, 0x00763) AM_READNOP
@@ -429,17 +429,17 @@ static ADDRESS_MAP_START( nzerotea_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x0068e, 0x0068f) AM_WRITENOP // synch for the MCU?
 	AM_RANGE(0x006b0, 0x006b1) AM_WRITE(mcu_prog_w)
 	AM_RANGE(0x006b2, 0x006b3) AM_WRITE(mcu_prog_w2)
-//	AM_RANGE(0x006b4, 0x006b5) AM_WRITENOP
-//	AM_RANGE(0x006b6, 0x006b7) AM_WRITENOP
+//  AM_RANGE(0x006b4, 0x006b5) AM_WRITENOP
+//  AM_RANGE(0x006b6, 0x006b7) AM_WRITENOP
 	AM_RANGE(0x006bc, 0x006bd) AM_WRITE(mcu_prog_offs_w)
 //  AM_RANGE(0x006d8, 0x006d9) AM_WRITE(bbbbll_w) // scroll?
-//	AM_RANGE(0x006dc, 0x006dd) AM_READ(nzerotea_unknown_r)
+//  AM_RANGE(0x006dc, 0x006dd) AM_READ(nzerotea_unknown_r)
 //  AM_RANGE(0x006de, 0x006df) AM_WRITE(mcu_unkaa_w) // mcu command related?
 	//AM_RANGE(0x00700, 0x00701) AM_DEVWRITE("eeprom", rdx_v33_eeprom_w)
 	AM_RANGE(0x00740, 0x00741) AM_READ_PORT("DSW")
 	AM_RANGE(0x00744, 0x00745) AM_READ_PORT("INPUT")
 	AM_RANGE(0x0074c, 0x0074d) AM_READ_PORT("SYSTEM")
-//	AM_RANGE(0x00762, 0x00763) AM_READ(nzerotea_unknown_r)
+//  AM_RANGE(0x00762, 0x00763) AM_READ(nzerotea_unknown_r)
 
 	AM_RANGE(0x00780, 0x0079f) AM_READWRITE(nzerotea_sound_comms_r,nzerotea_sound_comms_w)
 
@@ -680,7 +680,7 @@ static MACHINE_CONFIG_START( nzerotea, driver_device )
 
 	MDRV_MACHINE_RESET(seibu_sound)
 
-//	SEIBU2_RAIDEN2_SOUND_SYSTEM_CPU(14318180/4)
+//  SEIBU2_RAIDEN2_SOUND_SYSTEM_CPU(14318180/4)
 	SEIBU_NEWZEROTEAM_SOUND_SYSTEM_CPU(14318180/4)
 
 	/* video hardware */
@@ -699,7 +699,7 @@ static MACHINE_CONFIG_START( nzerotea, driver_device )
 	MDRV_VIDEO_UPDATE(rdx_v33)
 
 	/* sound hardware */
-//	SEIBU_SOUND_SYSTEM_YM2151_RAIDEN2_INTERFACE(28636360/8,28636360/28,1,2)
+//  SEIBU_SOUND_SYSTEM_YM2151_RAIDEN2_INTERFACE(28636360/8,28636360/28,1,2)
 	SEIBU_SOUND_SYSTEM_YM3812_INTERFACE(14318180/4,1320000)
 
 MACHINE_CONFIG_END
@@ -795,7 +795,7 @@ ROM_START( r2dx_v33 )
 
 	ROM_REGION( 0x400000, "maincpu", ROMREGION_ERASEFF ) /* v33 main cpu */
 
-//	ROM_REGION( 0x20000, "cpu1", ROMREGION_ERASE00 ) /* 64k code for sound Z80 */
+//  ROM_REGION( 0x20000, "cpu1", ROMREGION_ERASE00 ) /* 64k code for sound Z80 */
 	/* nothing?  no z80*/
 
 	ROM_REGION( 0x040000, "gfx1", 0 ) /* chars */
@@ -852,7 +852,7 @@ ROM_START( nzerotea )
 ROM_END
 
 // newer PCB, with V33 CPU and COPD3 protection, but weak sound hardware. - was marked as Raiden DX New in the rom dump, but boots as Raiden 2 New version, is it switchable?
-GAME( 1996, r2dx_v33, 0, 		 rdx_v33,  rdx_v33, rdx_v33,  ROT270, "Seibu Kaihatsu", "Raiden II / DX (newer V33 PCB)", GAME_NOT_WORKING|GAME_NO_SOUND)
+GAME( 1996, r2dx_v33, 0,		 rdx_v33,  rdx_v33, rdx_v33,  ROT270, "Seibu Kaihatsu", "Raiden II / DX (newer V33 PCB)", GAME_NOT_WORKING|GAME_NO_SOUND)
 
 // 'V33 system type_b' - uses V33 CPU, COPX-D3 external protection rom, but still has the proper sound system
 GAME( 1997, nzerotea, zeroteam,  nzerotea, nzerotea,  nzerotea,  ROT0,   "Seibu Kaihatsu", "New Zero Team", GAME_NOT_WORKING|GAME_NO_SOUND) // this uses a v33 and COPD3

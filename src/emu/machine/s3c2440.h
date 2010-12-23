@@ -557,22 +557,22 @@ typedef struct
 
 typedef struct
 {
-	UINT32 nfconf;    
-	UINT32 nfcont;    
-	UINT32 nfcmd;     
-	UINT32 nfaddr;    
-	UINT32 nfdata;    
-	UINT32 nfmeccd0;  
-	UINT32 nfmeccd1;  
-	UINT32 nfseccd;   
-	UINT32 nfstat;    
-	UINT32 nfestat0;  
-	UINT32 nfestat1;  
-	UINT32 nfmecc0;   
-	UINT32 nfmecc1;   
-	UINT32 nfsecc;    
-	UINT32 nfsblk;    
-	UINT32 nfeblk;    
+	UINT32 nfconf;
+	UINT32 nfcont;
+	UINT32 nfcmd;
+	UINT32 nfaddr;
+	UINT32 nfdata;
+	UINT32 nfmeccd0;
+	UINT32 nfmeccd1;
+	UINT32 nfseccd;
+	UINT32 nfstat;
+	UINT32 nfestat0;
+	UINT32 nfestat1;
+	UINT32 nfmecc0;
+	UINT32 nfmecc1;
+	UINT32 nfsecc;
+	UINT32 nfsblk;
+	UINT32 nfeblk;
 } s3c24xx_nand_regs_t;
 
 typedef struct

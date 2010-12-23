@@ -266,7 +266,7 @@ WRITE16_MEMBER(raiden2_state::cop_dma_trigger_w)
 		dst = (cop_dma_v3 << 6);
 		size = ((cop_dma_size << 5) - (cop_dma_v3 << 6) + 0x20)/2;
 
-//		printf("%08x %08x %08x\n",src,dst,size);
+//      printf("%08x %08x %08x\n",src,dst,size);
 
 		for(i = 0;i < size;i++)
 		{

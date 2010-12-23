@@ -155,7 +155,7 @@ static void s3c2410_gpio_port_w( running_device *device, int port, UINT32 data)
 
 static WRITE8_DEVICE_HANDLER( s3c2410_nand_command_w )
 {
-//	running_device *nand = device->machine->device( "nand");
+//  running_device *nand = device->machine->device( "nand");
 	logerror( "s3c2410_nand_command_w %02X\n", data);
 	switch (data)
 	{
@@ -177,7 +177,7 @@ static WRITE8_DEVICE_HANDLER( s3c2410_nand_command_w )
 
 static WRITE8_DEVICE_HANDLER( s3c2410_nand_address_w )
 {
-//	running_device *nand = device->machine->device( "nand");
+//  running_device *nand = device->machine->device( "nand");
 	logerror( "s3c2410_nand_address_w %02X\n", data);
 	switch (nand.mode)
 	{
@@ -209,7 +209,7 @@ static WRITE8_DEVICE_HANDLER( s3c2410_nand_address_w )
 
 static READ8_DEVICE_HANDLER( s3c2410_nand_data_r )
 {
-//	running_device *nand = device->machine->device( "nand");
+//  running_device *nand = device->machine->device( "nand");
 	UINT8 data = 0;
 	switch (nand.mode)
 	{
@@ -254,14 +254,14 @@ static READ8_DEVICE_HANDLER( s3c2410_nand_data_r )
 
 static WRITE8_DEVICE_HANDLER( s3c2410_nand_data_w )
 {
-//	running_device *nand = device->machine->device( "nand");
+//  running_device *nand = device->machine->device( "nand");
 	logerror( "s3c2410_nand_data_w %02X\n", data);
 }
 
 static WRITE_LINE_DEVICE_HANDLER( s3c2410_i2c_scl_w )
 {
 	running_device *i2cmem = device->machine->device( "i2cmem");
-//	logerror( "s3c2410_i2c_scl_w %d\n", state ? 1 : 0);
+//  logerror( "s3c2410_i2c_scl_w %d\n", state ? 1 : 0);
 	i2cmem_scl_write( i2cmem, state);
 }
 
@@ -270,14 +270,14 @@ static READ_LINE_DEVICE_HANDLER( s3c2410_i2c_sda_r )
 	running_device *i2cmem = device->machine->device( "i2cmem");
 	int state;
 	state = i2cmem_sda_read( i2cmem);
-//	logerror( "s3c2410_i2c_sda_r %d\n", state ? 1 : 0);
+//  logerror( "s3c2410_i2c_sda_r %d\n", state ? 1 : 0);
 	return state;
 }
 
 static WRITE_LINE_DEVICE_HANDLER( s3c2410_i2c_sda_w )
 {
 	running_device *i2cmem = device->machine->device( "i2cmem");
-//	logerror( "s3c2410_i2c_sda_w %d\n", state ? 1 : 0);
+//  logerror( "s3c2410_i2c_sda_w %d\n", state ? 1 : 0);
 	i2cmem_sda_write( i2cmem, state);
 }
 
@@ -308,32 +308,32 @@ ADDRESS_MAP_END
 
 /*
 static INPUT_PORTS_START( bballoon )
-	PORT_START("10000000")
-	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
-	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
-	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
-	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
-	PORT_BIT( 0xFFFFFFC0, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
-	PORT_START("10100000")
-	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
-	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
-	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
-	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
-	PORT_BIT( 0xFFFFFFC0, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
-	PORT_START("10200000")
-	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_COIN1 )
-	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_COIN2 )
-	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_START1 )
-	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_START2 )
-	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_START3 )
-	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_SERVICE1 ) // "test button"
-	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_START4 )
-	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_SERVICE2 ) // "service button"
-	PORT_BIT( 0xFFFFFF00, IP_ACTIVE_LOW, IPT_START5 )
+    PORT_START("10000000")
+    PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(1)
+    PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(1)
+    PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(1)
+    PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(1)
+    PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1)
+    PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1)
+    PORT_BIT( 0xFFFFFFC0, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1)
+    PORT_START("10100000")
+    PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_JOYSTICK_UP ) PORT_PLAYER(2)
+    PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_JOYSTICK_DOWN ) PORT_PLAYER(2)
+    PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_JOYSTICK_LEFT ) PORT_PLAYER(2)
+    PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_JOYSTICK_RIGHT ) PORT_PLAYER(2)
+    PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(2)
+    PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(2)
+    PORT_BIT( 0xFFFFFFC0, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(2)
+    PORT_START("10200000")
+    PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_COIN1 )
+    PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_COIN2 )
+    PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_START1 )
+    PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_START2 )
+    PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_START3 )
+    PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_SERVICE1 ) // "test button"
+    PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_START4 )
+    PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_SERVICE2 ) // "service button"
+    PORT_BIT( 0xFFFFFF00, IP_ACTIVE_LOW, IPT_START5 )
 INPUT_PORTS_END
 */
 
@@ -367,7 +367,7 @@ INPUT_PORTS_END
 /*
 static NAND_INTERFACE( bballoon_nand_intf )
 {
-	DEVCB_DEVICE_LINE("s3c2410", s3c2410_pin_frnb_w)
+    DEVCB_DEVICE_LINE("s3c2410", s3c2410_pin_frnb_w)
 };
 */
 
@@ -399,7 +399,7 @@ static READ32_HANDLER( bballoon_speedup_r )
 
 
 	int pc = cpu_get_pc(space->cpu);
-	
+
 	// these are vblank waits
 	if (pc == 0x3001c0e4 || pc == 0x3001c0d8)
 	{
@@ -412,7 +412,7 @@ static READ32_HANDLER( bballoon_speedup_r )
 		cpu_spinuntil_time(space->cpu, ATTOTIME_IN_USEC(20));
 	}
 	//else
-	//	printf("speedup %08x %08x\n", pc, ret);
+	//  printf("speedup %08x %08x\n", pc, ret);
 
 	return ret;
 }
@@ -445,10 +445,10 @@ static MACHINE_CONFIG_START( bballoon, driver_device )
 
 	MDRV_S3C2410_ADD("s3c2410", 12000000, bballoon_s3c2410_intf)
 
-//	MDRV_NAND_ADD("nand", 0xEC, 0x75)
-//	MDRV_DEVICE_CONFIG(bballoon_nand_intf)
+//  MDRV_NAND_ADD("nand", 0xEC, 0x75)
+//  MDRV_DEVICE_CONFIG(bballoon_nand_intf)
 
-//	MDRV_I2CMEM_ADD("i2cmem", 0xA0, 0, 0x100, NULL)
+//  MDRV_I2CMEM_ADD("i2cmem", 0xA0, 0, 0x100, NULL)
 	MDRV_I2CMEM_ADD("i2cmem", i2cmem_interface)
 
 	/* sound hardware */

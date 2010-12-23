@@ -2580,14 +2580,14 @@ static WRITE16_HANDLER( generic_cop_w )
 				static UINT32 src,dst,size,i;
 
 				/* TODO: understand all the differences between triggers!
-				0x80 is used by Legionnaire (plain DMA)
-				0x81 is used by SD Gundam and Godzilla (unknown purpose)
-				0x86 is used by Seibu Cup Soccer (doesn't yet work)
-				0x87 is used by Denjin Makai (DMA with inverted word endianess)
-				*/
+                0x80 is used by Legionnaire (plain DMA)
+                0x81 is used by SD Gundam and Godzilla (unknown purpose)
+                0x86 is used by Seibu Cup Soccer (doesn't yet work)
+                0x87 is used by Denjin Makai (DMA with inverted word endianess)
+                */
 
 				//if(dma_trigger != 0x87)
-				//	printf("SRC: %08x %08x DST:%08x SIZE:%08x TRIGGER: %08x\n",dma_src,dma_src_param,dma_dst,dma_size,dma_trigger);
+				//  printf("SRC: %08x %08x DST:%08x SIZE:%08x TRIGGER: %08x\n",dma_src,dma_src_param,dma_dst,dma_size,dma_trigger);
 
 				if(dma_trigger == 0x81)
 					return;

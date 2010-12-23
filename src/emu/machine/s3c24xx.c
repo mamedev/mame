@@ -246,45 +246,45 @@ static void s3c24xx_lcd_dma_init( running_device *device)
 /*
 static UINT32 s3c24xx_lcd_dma_read( running_device *device)
 {
-	s3c24xx_t *s3c24xx = get_token( device);
-	address_space* space = cputag_get_address_space( device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
-	UINT8 *vram, data[4];
-	vram = (UINT8 *)space->get_read_ptr( s3c24xx->lcd.vramaddr_cur);
-	for (int i = 0; i < 2; i++)
-	{
-		data[i*2+0] = *vram++;
-		data[i*2+1] = *vram++;
-		s3c24xx->lcd.vramaddr_cur += 2;
-		s3c24xx->lcd.pagewidth_cur++;
-		if (s3c24xx->lcd.pagewidth_cur >= s3c24xx->lcd.pagewidth_max)
-		{
-			s3c24xx->lcd.vramaddr_cur += s3c24xx->lcd.offsize << 1;
-			s3c24xx->lcd.pagewidth_cur = 0;
-			vram = (UINT8 *)space->get_read_ptr( s3c24xx->lcd.vramaddr_cur);
-		}
-	}
-	if (s3c24xx->lcd.hwswp == 0)
-	{
-		if (s3c24xx->lcd.bswp == 0)
-		{
-			return (data[3] << 24) | (data[2] << 16) | (data[1] << 8) | (data[0] << 0);
-		}
-		else
-		{
-			return (data[0] << 24) | (data[1] << 16) | (data[2] << 8) | (data[3] << 0);
-		}
-	}
-	else
-	{
-		if (s3c24xx->lcd.bswp == 0)
-		{
-			return (data[1] << 24) | (data[0] << 16) | (data[3] << 8) | (data[2] << 0);
-		}
-		else
-		{
-			return (data[2] << 24) | (data[3] << 16) | (data[0] << 8) | (data[1] << 0);
-		}
-	}
+    s3c24xx_t *s3c24xx = get_token( device);
+    address_space* space = cputag_get_address_space( device->machine, "maincpu", ADDRESS_SPACE_PROGRAM);
+    UINT8 *vram, data[4];
+    vram = (UINT8 *)space->get_read_ptr( s3c24xx->lcd.vramaddr_cur);
+    for (int i = 0; i < 2; i++)
+    {
+        data[i*2+0] = *vram++;
+        data[i*2+1] = *vram++;
+        s3c24xx->lcd.vramaddr_cur += 2;
+        s3c24xx->lcd.pagewidth_cur++;
+        if (s3c24xx->lcd.pagewidth_cur >= s3c24xx->lcd.pagewidth_max)
+        {
+            s3c24xx->lcd.vramaddr_cur += s3c24xx->lcd.offsize << 1;
+            s3c24xx->lcd.pagewidth_cur = 0;
+            vram = (UINT8 *)space->get_read_ptr( s3c24xx->lcd.vramaddr_cur);
+        }
+    }
+    if (s3c24xx->lcd.hwswp == 0)
+    {
+        if (s3c24xx->lcd.bswp == 0)
+        {
+            return (data[3] << 24) | (data[2] << 16) | (data[1] << 8) | (data[0] << 0);
+        }
+        else
+        {
+            return (data[0] << 24) | (data[1] << 16) | (data[2] << 8) | (data[3] << 0);
+        }
+    }
+    else
+    {
+        if (s3c24xx->lcd.bswp == 0)
+        {
+            return (data[1] << 24) | (data[0] << 16) | (data[3] << 8) | (data[2] << 0);
+        }
+        else
+        {
+            return (data[2] << 24) | (data[3] << 16) | (data[0] << 8) | (data[1] << 0);
+        }
+    }
 }
 */
 
@@ -1154,12 +1154,12 @@ static UINT16 s3c24xx_pwm_calc_observation( running_device *device, int ch)
 	double timeleft, x1, x2;
 	UINT32 cnto;
 	timeleft = attotime_to_double( timer_timeleft( s3c24xx->pwm.timer[ch]));
-//	printf( "timeleft %f freq %d cntb %d cmpb %d\n", timeleft, s3c24xx->pwm.freq[ch], s3c24xx->pwm.cnt[ch], s3c24xx->pwm.cmp[ch]);
+//  printf( "timeleft %f freq %d cntb %d cmpb %d\n", timeleft, s3c24xx->pwm.freq[ch], s3c24xx->pwm.cnt[ch], s3c24xx->pwm.cmp[ch]);
 	x1 = 1 / ((double)s3c24xx->pwm.freq[ch] / (s3c24xx->pwm.cnt[ch]- s3c24xx->pwm.cmp[ch] + 1));
 	x2 = x1 / timeleft;
-//	printf( "x1 %f\n", x1);
+//  printf( "x1 %f\n", x1);
 	cnto = s3c24xx->pwm.cmp[ch] + ((s3c24xx->pwm.cnt[ch]- s3c24xx->pwm.cmp[ch]) / x2);
-//	printf( "cnto %d\n", cnto);
+//  printf( "cnto %d\n", cnto);
 	return cnto;
 }
 
@@ -1219,7 +1219,7 @@ static void s3c24xx_pwm_start( running_device *device, int timer)
 	{
 		// todo
 		freq = (double)pclk / (prescaler + 1) / 1;
-	}	
+	}
 	switch (timer)
 	{
 		case 0 :
@@ -1263,7 +1263,7 @@ static void s3c24xx_pwm_start( running_device *device, int timer)
 		}
 		break;
 	}
-//	hz = freq / (cnt - cmp + 1);
+//  hz = freq / (cnt - cmp + 1);
 	if (cnt < 2)
 	{
 		hz = freq;
@@ -1384,7 +1384,7 @@ static void s3c24xx_dma_trigger( running_device *device, int ch)
 	curr_src = S3C24XX_DCSRC_GET_CURR_SRC( regs->dcsrc);
 	curr_dst = S3C24XX_DCDST_GET_CURR_DST( regs->dcdst);
 	servmode = S3C24XX_DCON_GET_SERVMODE( regs->dcon);
-	tsz = S3C24XX_DCON_GET_TSZ( regs->dcon);		
+	tsz = S3C24XX_DCON_GET_TSZ( regs->dcon);
 #if defined(DEVICE_S3C2400)
 	inc_src = BIT( regs->disrc, 29);
 	inc_dst = BIT( regs->didst, 29);
@@ -1525,12 +1525,12 @@ static void s3c24xx_dma_w( running_device *device, UINT32 ch, UINT32 offset, UIN
 		case S3C24XX_DCON :
 		{
 			/* --- is this code necessary ???
-			if ((data & (1 << 22)) != 0) // reload
-			{
-				s3c24xx_dma_regs_t *regs = &s3c24xx->dma[ch].regs;
-				regs->dmasktrig &= ~(1 << 1); // clear on/off
-			}
-			*/
+            if ((data & (1 << 22)) != 0) // reload
+            {
+                s3c24xx_dma_regs_t *regs = &s3c24xx->dma[ch].regs;
+                regs->dmasktrig &= ~(1 << 1); // clear on/off
+            }
+            */
 		}
 		break;
 		case S3C24XX_DMASKTRIG :
@@ -1847,14 +1847,14 @@ static void s3c24xx_uart_w( running_device *device, UINT32 ch, UINT32 offset, UI
 static READ32_DEVICE_HANDLER( s3c24xx_uart_0_r )
 {
 	UINT32 data = s3c24xx_uart_r( device, 0, offset);
-//	verboselog( device->machine, 9, "(UART 0) %08X -> %08X\n", S3C24XX_BASE_UART_0 + (offset << 2), data);
+//  verboselog( device->machine, 9, "(UART 0) %08X -> %08X\n", S3C24XX_BASE_UART_0 + (offset << 2), data);
 	return data;
 }
 
 static READ32_DEVICE_HANDLER( s3c24xx_uart_1_r )
 {
 	UINT32 data = s3c24xx_uart_r( device, 1, offset);
-//	verboselog( device->machine, 9, "(UART 1) %08X -> %08X\n", S3C24XX_BASE_UART_1 + (offset << 2), data);
+//  verboselog( device->machine, 9, "(UART 1) %08X -> %08X\n", S3C24XX_BASE_UART_1 + (offset << 2), data);
 	return data;
 }
 
@@ -1863,7 +1863,7 @@ static READ32_DEVICE_HANDLER( s3c24xx_uart_1_r )
 static READ32_DEVICE_HANDLER( s3c24xx_uart_2_r )
 {
 	UINT32 data = s3c24xx_uart_r( device, 2, offset);
-//	verboselog( device->machine, 9, "(UART 2) %08X -> %08X\n", S3C24XX_BASE_UART_2 + (offset << 2), data);
+//  verboselog( device->machine, 9, "(UART 2) %08X -> %08X\n", S3C24XX_BASE_UART_2 + (offset << 2), data);
 	return data;
 }
 
@@ -1871,13 +1871,13 @@ static READ32_DEVICE_HANDLER( s3c24xx_uart_2_r )
 
 static WRITE32_DEVICE_HANDLER( s3c24xx_uart_0_w )
 {
-//	verboselog( device->machine, 9, "(UART 0) %08X <- %08X\n", S3C24XX_BASE_UART_0 + (offset << 2), data);
+//  verboselog( device->machine, 9, "(UART 0) %08X <- %08X\n", S3C24XX_BASE_UART_0 + (offset << 2), data);
 	s3c24xx_uart_w( device, 0, offset, data, mem_mask);
 }
 
 static WRITE32_DEVICE_HANDLER( s3c24xx_uart_1_w )
 {
-//	verboselog( device->machine, 9, "(UART 1) %08X <- %08X\n", S3C24XX_BASE_UART_1 + (offset << 2), data);
+//  verboselog( device->machine, 9, "(UART 1) %08X <- %08X\n", S3C24XX_BASE_UART_1 + (offset << 2), data);
 	s3c24xx_uart_w( device, 1, offset, data, mem_mask);
 }
 
@@ -1885,7 +1885,7 @@ static WRITE32_DEVICE_HANDLER( s3c24xx_uart_1_w )
 
 static WRITE32_DEVICE_HANDLER( s3c24xx_uart_2_w )
 {
-//	verboselog( device->machine, 9, "(UART 2) %08X <- %08X\n", S3C24XX_BASE_UART_2 + (offset << 2), data);
+//  verboselog( device->machine, 9, "(UART 2) %08X <- %08X\n", S3C24XX_BASE_UART_2 + (offset << 2), data);
 	s3c24xx_uart_w( device, 2, offset, data, mem_mask);
 }
 
@@ -1893,7 +1893,7 @@ static WRITE32_DEVICE_HANDLER( s3c24xx_uart_2_w )
 
 static void s3c24xx_uart_fifo_w( running_device *device, int uart, UINT8 data)
 {
-//	printf( "s3c24xx_uart_fifo_w (%c)\n", data);
+//  printf( "s3c24xx_uart_fifo_w (%c)\n", data);
 	s3c24xx_t *s3c24xx = get_token( device);
 	s3c24xx->uart[uart].regs.urxh = data;
 	s3c24xx->uart[uart].regs.utrstat |= 1; // [bit 0] Receive buffer data ready
@@ -2183,7 +2183,7 @@ static WRITE32_DEVICE_HANDLER( s3c24xx_iic_w )
 						if (s3c24xx->iic.count == 0)
 						{
 							iic_start( device);
-							
+
 						}
 						else
 						{
@@ -2212,7 +2212,7 @@ static WRITE32_DEVICE_HANDLER( s3c24xx_iic_w )
 					if (s3c24xx->iic.count == 0)
 					{
 						iic_start( device);
-						
+
 					}
 					else
 					{
@@ -2385,7 +2385,7 @@ static void s3c24xx_rtc_recalc( running_device *device)
 		double freq;
 		ttc = BITS( s3c24xx->rtc.regs.ticnt, 6, 0);
 		freq = 128 / (ttc + 1);
-//		printf( "ttc %d freq %f\n", ttc, freq);
+//      printf( "ttc %d freq %f\n", ttc, freq);
 		timer_adjust_periodic( s3c24xx->rtc.timer_tick_count, ATTOTIME_IN_HZ( freq), 0, ATTOTIME_IN_HZ( freq));
 	}
 	else
@@ -2866,7 +2866,7 @@ static READ32_DEVICE_HANDLER( s3c24xx_nand_r )
 #if defined(DEVICE_S3C2440)
 		case S3C24XX_NFMECC0 :
 		{
-			
+
 			data = (s3c24xx->nand.mecc[3] << 24) | (s3c24xx->nand.mecc[2] << 16) | (s3c24xx->nand.mecc[1] << 8) | (s3c24xx->nand.mecc[0] << 0);
 		}
 		break;
@@ -3043,7 +3043,7 @@ static DEVICE_RESET( s3c24xx )
 {
 	s3c24xx_t *s3c24xx = get_token( device);
 	s3c24xx->iis.fifo_index = 0;
-//	s3c24xx->iic.data_index = 0;
+//  s3c24xx->iic.data_index = 0;
 }
 
 static DEVICE_START( s3c24xx )
@@ -3069,7 +3069,7 @@ static DEVICE_GET_INFO( s3c24xx )
 		/* --- the following bits of info are returned as 64-bit signed integers --- */
 		case DEVINFO_INT_TOKEN_BYTES:           info->i = sizeof(s3c24xx_t);                    break;
 		case DEVINFO_INT_INLINE_CONFIG_BYTES:   info->i = 0;                                    break;
-//		case DEVINFO_INT_CLASS:                 info->i = DEVICE_CLASS_PERIPHERAL;              break;
+//      case DEVINFO_INT_CLASS:                 info->i = DEVICE_CLASS_PERIPHERAL;              break;
 		/* --- the following bits of info are returned as pointers to data or functions --- */
 		case DEVINFO_FCT_START:                 info->start = DEVICE_START_NAME(s3c24xx);       break;
 		case DEVINFO_FCT_RESET:                 info->reset = DEVICE_RESET_NAME(s3c24xx);       break;

@@ -527,12 +527,12 @@ typedef struct
 
 typedef struct
 {
-	UINT32 nfconf;      
-	UINT32 nfcmd;       
-	UINT32 nfaddr;      
-	UINT32 nfdata;      
-	UINT32 nfstat;      
-	UINT32 nfecc;       
+	UINT32 nfconf;
+	UINT32 nfcmd;
+	UINT32 nfaddr;
+	UINT32 nfdata;
+	UINT32 nfstat;
+	UINT32 nfecc;
 } s3c24xx_nand_regs_t;
 
 typedef struct

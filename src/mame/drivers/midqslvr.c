@@ -1,12 +1,12 @@
 /***************************************************************************
 
-	Midway Quicksilver skeleton driver
+    Midway Quicksilver skeleton driver
 
-	Main CPU : Intel Celeron 333/366MHz
-	Motherboard : Intel SE44BX-2
-	RAM : 64MB
-	Graphics Chips : Quantum Obsidian 3DFX
-	Storage : Hard Drive 
+    Main CPU : Intel Celeron 333/366MHz
+    Motherboard : Intel SE44BX-2
+    RAM : 64MB
+    Graphics Chips : Quantum Obsidian 3DFX
+    Storage : Hard Drive
 ***************************************************************************/
 
 #include "emu.h"

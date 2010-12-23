@@ -610,7 +610,7 @@ static MACHINE_CONFIG_START( galpani2, driver_device )
 	MDRV_OKIM6295_ADD("oki1", XTAL_20MHz/10, OKIM6295_PIN7_HIGH)	/* Confirmed on galpani2i PCB */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 
-	MDRV_OKIM6295_ADD("oki2", XTAL_20MHz/10, OKIM6295_PIN7_HIGH)	/* Confirmed on galpani2i PCB */	
+	MDRV_OKIM6295_ADD("oki2", XTAL_20MHz/10, OKIM6295_PIN7_HIGH)	/* Confirmed on galpani2i PCB */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 

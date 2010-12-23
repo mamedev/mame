@@ -330,7 +330,7 @@ static MACHINE_CONFIG_START( tankbust, driver_device )
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	MDRV_CPU_ADD("sub", Z80, XTAL_14_31818MHz/4)		/* Verified on PCB */
-//	MDRV_CPU_ADD("sub", Z80, XTAL_14_31818MHz/3)		/* Accurate to audio recording, but apparently incorrect clock */
+//  MDRV_CPU_ADD("sub", Z80, XTAL_14_31818MHz/3)        /* Accurate to audio recording, but apparently incorrect clock */
 
 	MDRV_CPU_PROGRAM_MAP(map_cpu2)
 	MDRV_CPU_IO_MAP(port_map_cpu2)

@@ -10296,7 +10296,7 @@ Other Sun games
 	DRIVER( sweetl_2 )	/* (c) 2004 */
 
 	/* Resident */
-	DRIVER( resdnt )  	/* (c) 2004 */
+	DRIVER( resdnt )	/* (c) 2004 */
 	DRIVER( resdnt_2 )	/* (c) 2004 */
 	DRIVER( resdnt_3 )	/* (c) 2004 */
 

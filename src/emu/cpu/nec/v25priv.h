@@ -312,7 +312,7 @@ void v25_write_word(v25_state_t *nec_state, unsigned a, unsigned d);
 #define XchgAWReg(Reg)						\
     WORD tmp;								\
 	tmp = Wreg(Reg);					\
-	Wreg(Reg) = Wreg(AW); 			\
+	Wreg(Reg) = Wreg(AW);			\
 	Wreg(AW) = tmp
 
 #define ROL_BYTE nec_state->CarryVal = dst & 0x80; dst = (dst << 1)+CF

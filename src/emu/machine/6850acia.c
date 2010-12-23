@@ -736,7 +736,7 @@ void acia6850_device::rx_clock_in()
 
 
 /*-------------------------------------------------
-    set_rx_clock - set receiver clock 
+    set_rx_clock - set receiver clock
 -------------------------------------------------*/
 
 void acia6850_device::set_rx_clock(int clock)
@@ -763,7 +763,7 @@ void acia6850_set_rx_clock(running_device *device, int clock)
 
 
 /*-------------------------------------------------
-    set_tx_clock - set receiver clock 
+    set_tx_clock - set receiver clock
 -------------------------------------------------*/
 
 void acia6850_device::set_tx_clock(int clock)

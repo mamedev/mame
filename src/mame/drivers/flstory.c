@@ -186,15 +186,15 @@ static READ8_HANDLER( rumba_mcu_r )
 		case 0x42:
 		{
 			/* TODO: subtle behaviour for transitioning from level 16 to level 17 (loop clear?). Command is:
-			0xc0 -> param -> 0xc1 -> param -> ... 0xc7 -> param -> 0x0e (end of packet) then reads at 0x40 -> 0x41 and 0x42
+            0xc0 -> param -> 0xc1 -> param -> ... 0xc7 -> param -> 0x0e (end of packet) then reads at 0x40 -> 0x41 and 0x42
 
-			Params written doesn't make any sense, they are copies from RAM addresses at 0xe450-7 and they looks like ... garbage.
-			It's possible that all of this it just increments by one an internal RAM address in the MCU and then it sends a six when this counter
-			has bits 0-3 == 0 (BCD operation?), but then the question is ... how it determines game over?
+            Params written doesn't make any sense, they are copies from RAM addresses at 0xe450-7 and they looks like ... garbage.
+            It's possible that all of this it just increments by one an internal RAM address in the MCU and then it sends a six when this counter
+            has bits 0-3 == 0 (BCD operation?), but then the question is ... how it determines game over?
 
-			According to a PCB test, game should roll back to level 1 layout but level counter should say "17" instead of current "11". Some of these ports also appears to control
-			game-play speed and who is playing between player 1 and 2.
-			*/
+            According to a PCB test, game should roll back to level 1 layout but level counter should say "17" instead of current "11". Some of these ports also appears to control
+            game-play speed and who is playing between player 1 and 2.
+            */
 			//static UINT8 level_val;
 
 			//level_val = space->read_byte(0xe247);
@@ -202,12 +202,12 @@ static READ8_HANDLER( rumba_mcu_r )
 			//popmessage("%02x",level_val);
 
 			//if((level_val & 0x0f) == 0x00)
-			//	return 0; //6
+			//  return 0; //6
 
 			return 0;
 		}
 		//case 0x42: return 0x06;
-		//default: 	printf("PC=%04x R %02x\n",cpu_get_pc(space->cpu),mcu_cmd); break;
+		//default:  printf("PC=%04x R %02x\n",cpu_get_pc(space->cpu),mcu_cmd); break;
 	}
 
 	return 0;
@@ -216,10 +216,10 @@ static READ8_HANDLER( rumba_mcu_r )
 static WRITE8_HANDLER( rumba_mcu_w )
 {
 	//if((mcu_cmd & 0xf0) == 0xc0)
-	//	printf("%02x ",data);
+	//  printf("%02x ",data);
 
 	//if(mcu_cmd == 0x42)
-	//	printf("\n");
+	//  printf("\n");
 
 	if(mcu_param)
 	{
@@ -232,8 +232,8 @@ static WRITE8_HANDLER( rumba_mcu_w )
 			case 0xb0: // counter, used by command 0xb1 (and something else?
 			{
 				/*
-				sends 0xb0 -> param then 0xb1 -> param -> 0x01 (end of cmd packet?) finally 0x31 for reply
-				*/
+                sends 0xb0 -> param then 0xb1 -> param -> 0x01 (end of cmd packet?) finally 0x31 for reply
+                */
 
 				mcu_counter = data;
 
@@ -256,8 +256,8 @@ static WRITE8_HANDLER( rumba_mcu_w )
 			case 0xb2: // player sprite hook-up param when he throws the wheel
 			{
 				/*
-				sends 0xb2 -> param -> 0x02 (end of cmd packet?) then 0x33 for reply
-				*/
+                sends 0xb2 -> param -> 0x02 (end of cmd packet?) then 0x33 for reply
+                */
 
 				switch(data)
 				{
@@ -271,8 +271,8 @@ static WRITE8_HANDLER( rumba_mcu_w )
 			case 0xbb: // when you start a level, lives
 			{
 				/*
-				sends 0xbb -> param -> 0x04 (end of cmd packet?) then 0x3b for reply
-				*/
+                sends 0xbb -> param -> 0x04 (end of cmd packet?) then 0x3b for reply
+                */
 
 				mcu_bb_res = data;
 				//printf("PC=%04x W %02x -> %02x\n",cpu_get_pc(space->cpu),mcu_cmd,data);
@@ -285,8 +285,8 @@ static WRITE8_HANDLER( rumba_mcu_w )
 				//popmessage("%02x",mcu_b4_cmd);
 
 				/*
-				sends 0xb4 -> param -> 0xb5 -> param (bird X coord) -> 0xb6 -> param (bird Y coord) ->
-				*/
+                sends 0xb4 -> param -> 0xb5 -> param (bird X coord) -> 0xb6 -> param (bird Y coord) ->
+                */
 
 				#if 0
 				switch(data)
@@ -327,10 +327,10 @@ static WRITE8_HANDLER( rumba_mcu_w )
 		}
 
 		//if((mcu_cmd & 0xf0) == 0xc0)
-		//	printf("%02x ",data);
+		//  printf("%02x ",data);
 
 		//if(mcu_cmd == 0xc7)
-		//	printf("\n");
+		//  printf("\n");
 
 		return;
 	}
@@ -344,13 +344,13 @@ static WRITE8_HANDLER( rumba_mcu_w )
 static ADDRESS_MAP_START( rumba_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x0000, 0xbfff) AM_ROM
 	AM_RANGE(0xc000, 0xc7ff) AM_RAM_WRITE(flstory_videoram_w) AM_BASE_SIZE_MEMBER(flstory_state, videoram, videoram_size)
-//	AM_RANGE(0xc800, 0xcfff) AM_RAM	/* unknown */
+//  AM_RANGE(0xc800, 0xcfff) AM_RAM /* unknown */
 	AM_RANGE(0xd000, 0xd000) AM_READWRITE(rumba_mcu_r, rumba_mcu_w)
 	AM_RANGE(0xd001, 0xd001) AM_WRITENOP	/* watchdog? */
-//	AM_RANGE(0xd002, 0xd002) AM_NOP	/* unknown read & coin lock out? */
+//  AM_RANGE(0xd002, 0xd002) AM_NOP /* unknown read & coin lock out? */
 	AM_RANGE(0xd400, 0xd400) AM_READWRITE(from_snd_r, sound_command_w)
 	AM_RANGE(0xd401, 0xd401) AM_READ(snd_flag_r)
-//	AM_RANGE(0xd403, 0xd403) AM_READNOP /* unknown */
+//  AM_RANGE(0xd403, 0xd403) AM_READNOP /* unknown */
 	AM_RANGE(0xd800, 0xd800) AM_READ_PORT("DSW0")
 	AM_RANGE(0xd801, 0xd801) AM_READ_PORT("DSW1")
 	AM_RANGE(0xd802, 0xd802) AM_READ_PORT("DSW2")
@@ -363,7 +363,7 @@ static ADDRESS_MAP_START( rumba_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xdc00, 0xdc9f) AM_RAM AM_BASE_SIZE_MEMBER(flstory_state, spriteram, spriteram_size)
 	AM_RANGE(0xdca0, 0xdcbf) AM_RAM_WRITE(flstory_scrlram_w) AM_BASE_MEMBER(flstory_state, scrlram)
 	AM_RANGE(0xdce0, 0xdce0) AM_READWRITE(victnine_gfxctrl_r, victnine_gfxctrl_w)
-//	AM_RANGE(0xdce1, 0xdce1) AM_WRITENOP	/* unknown */
+//  AM_RANGE(0xdce1, 0xdce1) AM_WRITENOP    /* unknown */
 	AM_RANGE(0xdd00, 0xdeff) AM_READWRITE(flstory_palette_r, flstory_palette_w)
 	AM_RANGE(0xe000, 0xe7ff) AM_RAM AM_BASE_MEMBER(flstory_state, workram) /* work RAM */
 ADDRESS_MAP_END

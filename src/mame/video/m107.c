@@ -227,24 +227,24 @@ static void draw_sprites(running_machine *machine, bitmap_t *bitmap, const recta
 				while (rom_offs < 0x40000)	/* safety check */
 				{
 					/*
-					[1]
-					x--- ---- end of block marker
-					---- --x- Flip Y
-					---- ---x Flip X
-					[2]
-					xxxx xxxx Y offs lo byte
-					[3]
-					---- xxx- height (1/2/4/8)
-					---- ---x Y offs hi byte
-					[4]
-					xxxx xxxx sprite number lo byte
-					[5]
-					xxxx xxxx sprite number hi byte
-					[6]
-					xxxx xxxx X offs lo byte
-					[7]
-					---- ---x X offs hi byte
-					*/
+                    [1]
+                    x--- ---- end of block marker
+                    ---- --x- Flip Y
+                    ---- ---x Flip X
+                    [2]
+                    xxxx xxxx Y offs lo byte
+                    [3]
+                    ---- xxx- height (1/2/4/8)
+                    ---- ---x Y offs hi byte
+                    [4]
+                    xxxx xxxx sprite number lo byte
+                    [5]
+                    xxxx xxxx sprite number hi byte
+                    [6]
+                    xxxx xxxx X offs lo byte
+                    [7]
+                    ---- ---x X offs hi byte
+                    */
 
 					int xdisp = rom[rom_offs+6]+256*rom[rom_offs+7];
 					int ydisp = rom[rom_offs+2]+256*rom[rom_offs+3];
@@ -290,9 +290,9 @@ static void m107_update_scroll_positions(void)
 	int i;
 
 	/*
-     	rowscroll is at 0xde000 - 0xde7ff, every layer has dedicated 0x200 bytes inside this area, enabled with bit 0 of the layer video register
-     	rowselect is at 0xde800 - 0xdefff, every layer has dedicated 0x200 bytes inside this area, enabled with bit 1 of the layer video register
-     	Perhaps 0xdf000 - 0xdffff and bit 2-3 are respectively colscroll and colselect?
+        rowscroll is at 0xde000 - 0xde7ff, every layer has dedicated 0x200 bytes inside this area, enabled with bit 0 of the layer video register
+        rowselect is at 0xde800 - 0xdefff, every layer has dedicated 0x200 bytes inside this area, enabled with bit 1 of the layer video register
+        Perhaps 0xdf000 - 0xdffff and bit 2-3 are respectively colscroll and colselect?
     */
 
     for (laynum = 0; laynum < 4; laynum++)
@@ -384,8 +384,8 @@ WRITE16_HANDLER( m107_spritebuffer_w )
 {
 	if (ACCESSING_BITS_0_7) {
 		/*
-		TODO: this register looks a lot more complex than how the game uses it. All of them seems to test various bit combinations during POST.
-		*/
+        TODO: this register looks a lot more complex than how the game uses it. All of them seems to test various bit combinations during POST.
+        */
 //      logerror("%04x: buffered spriteram\n",cpu_get_pc(space->cpu));
 		m107_sprite_display	= (!(data & 0x1000));
 

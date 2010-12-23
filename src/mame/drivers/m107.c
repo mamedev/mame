@@ -197,9 +197,9 @@ ADDRESS_MAP_END
 static WRITE16_HANDLER( wpksoc_output_w )
 {
 	/*
-	x--- ---- ?
-	---- --xx lamps
-	*/
+    x--- ---- ?
+    ---- --xx lamps
+    */
 	if(data & 0x7c)
 		popmessage("%04x",data);
 }

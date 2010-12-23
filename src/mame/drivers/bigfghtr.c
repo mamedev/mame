@@ -396,34 +396,34 @@ static READ16_HANDLER(sharedram_r)
 				return (input_port_read(space->machine, "P2") & 0xffff) ^ 0xffff;
 
 			/*
-			protection controls where the program code should jump to.
+            protection controls where the program code should jump to.
 
-			example snippet:
-			00DB2A: 41FA FE86                  lea     (-$17a,PC), A0; ($d9b2) ;base program vector
-			00DB2E: 4DF9 0008 0E2A             lea     $80e2a.l, A6 ;base RAM vector, used by the i8751 to send the value, this value is added to the above A0
-			00DB34: 3039 0008 0E62             move.w  $80e62.l, D0 ;number of snippets to execute
-			00DB3A: 6100 00F0                  bsr     $dc2c
-			*/
+            example snippet:
+            00DB2A: 41FA FE86                  lea     (-$17a,PC), A0; ($d9b2) ;base program vector
+            00DB2E: 4DF9 0008 0E2A             lea     $80e2a.l, A6 ;base RAM vector, used by the i8751 to send the value, this value is added to the above A0
+            00DB34: 3039 0008 0E62             move.w  $80e62.l, D0 ;number of snippets to execute
+            00DB3A: 6100 00F0                  bsr     $dc2c
+            */
 
 			/* bp daee, A0 = 0xdd02, A6 = 0x808ca, D0 = 0x80902 */
 			//case 0x902/2:
-			//	return 0x0001;
+			//  return 0x0001;
 			//case (0x90a+0x24)/2:
-			//	return 0x0001;
+			//  return 0x0001;
 			//case (0x902+8)/2:
-			//	return 0x0004; // 0xf86a
+			//  return 0x0004; // 0xf86a
 
 			/* bp db02, A0 = 0xdc2e, A6 = 0x80912, D0 = 0x8094a */
 			//case 0x94a/2:
-			//	return 1;
+			//  return 1;
 			//case (0x94a+8)/2:
-			//	return 0x00dc; // 0xd62e
+			//  return 0x00dc; // 0xd62e
 
 			/* bp db16, A0 = 0xda86, A6 = 0x80c22, D0 = 0x80c5a */
 			//case 0xc5a/2:
-			//	return 1;
+			//  return 1;
 			//case (0xc5a+8)/2:
-			//	return 0x0288; // 0x345f4
+			//  return 0x0288; // 0x345f4
 
 			/* bp db2a, A0 = 0xd9b2, A6 = 0x80e2a, D0 = 0x80e62 */
 
@@ -452,21 +452,21 @@ static READ16_HANDLER(sharedram_r)
 
 
 			/*case 0x
-			case 0x94a/2:
-				return 0x0002*4;
-			case (0x90a+2*0x40)/2:
-			case (0x90a+3*0x40)/2:
-				return 0x0003*4;
-			case (0x90a+4*0x40)/2:
-				return 0x000c*4; // 0x13d74
-			case (0x90a+5*0x40)/2:
-				return 0x000d*4; // 0x130f6
-			case (0x90a+6*0x40)/2:
-				return 0x000e*4; // 0x1817e
-			case (0x90a+7*0x40)/2:
-				return 0x0010*4; // 0x15924
-			//case (0x90a+0x25)/2:
-			//	return 2;*/
+            case 0x94a/2:
+                return 0x0002*4;
+            case (0x90a+2*0x40)/2:
+            case (0x90a+3*0x40)/2:
+                return 0x0003*4;
+            case (0x90a+4*0x40)/2:
+                return 0x000c*4; // 0x13d74
+            case (0x90a+5*0x40)/2:
+                return 0x000d*4; // 0x130f6
+            case (0x90a+6*0x40)/2:
+                return 0x000e*4; // 0x1817e
+            case (0x90a+7*0x40)/2:
+                return 0x0010*4; // 0x15924
+            //case (0x90a+0x25)/2:
+            //  return 2;*/
 		}
 	}
 

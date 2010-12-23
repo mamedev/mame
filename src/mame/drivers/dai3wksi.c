@@ -388,7 +388,7 @@ static MACHINE_CONFIG_START( dai3wksi, dai3wksi_state )
 
 	MDRV_MACHINE_START(dai3wksi)
 	MDRV_MACHINE_RESET(dai3wksi)
- 
+
 	/* video hardware */
 	MDRV_VIDEO_UPDATE(dai3wksi)
 

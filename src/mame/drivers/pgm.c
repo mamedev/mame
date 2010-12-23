@@ -5696,21 +5696,21 @@ static WRITE16_HANDLER( ddp3_asic_w )
 				break;
 
 			case 0x67: // set high bits
-		//		printf("%06x command %02x | %04x\n", cpu_get_pc(space->cpu), state->ddp3lastcommand, state->value0);
+		//      printf("%06x command %02x | %04x\n", cpu_get_pc(space->cpu), state->ddp3lastcommand, state->value0);
 				state->valueresponse = 0x880000;
 				state->ddp3internal_slot = (state->value0 & 0xff00)>>8;
 				state->ddp3slots[state->ddp3internal_slot] = (state->value0 & 0x00ff) << 16;
 				break;
 
 			case 0xe5: // set low bits for operation?
-			//	printf("%06x command %02x | %04x\n", cpu_get_pc(space->cpu), state->ddp3lastcommand, state->value0);
+			//  printf("%06x command %02x | %04x\n", cpu_get_pc(space->cpu), state->ddp3lastcommand, state->value0);
 				state->valueresponse = 0x880000;
 				state->ddp3slots[state->ddp3internal_slot] |= (state->value0 & 0xffff);
 				break;
 
 
 			case 0x8e: // read back result of operations
-		//		printf("%06x command %02x | %04x\n", cpu_get_pc(space->cpu), state->ddp3lastcommand, state->value0);
+		//      printf("%06x command %02x | %04x\n", cpu_get_pc(space->cpu), state->ddp3lastcommand, state->value0);
 				state->valueresponse = state->ddp3slots[state->value0&0xff];
 				break;
 

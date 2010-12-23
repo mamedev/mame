@@ -54,7 +54,7 @@ enum
 #define MODE_DISPLAY_ENABLE_SKEW(d)		(((d)->mode_control & 0x10) != 0)
 #define MODE_ROW_COLUMN_ADDRESSING(d)	(((d)->mode_control & 0x04) != 0)
 
-/* capabilities */                                     /* MC6845    MC6845-1    C6545-1    R6545-1    H46505    HD6845    SY6545-1	  SY6845E */
+/* capabilities */                                     /* MC6845    MC6845-1    C6545-1    R6545-1    H46505    HD6845    SY6545-1    SY6845E */
 static const int supports_disp_start_addr_r[NUM_TYPES] = {  TRUE,       TRUE,     FALSE,     FALSE,    FALSE,    FALSE,      FALSE,		FALSE };
 static const int supports_vert_sync_width[NUM_TYPES]   = { FALSE,       TRUE,      TRUE,      TRUE,    FALSE,     TRUE,       TRUE,		 TRUE };
 static const int supports_status_reg_d5[NUM_TYPES]     = { FALSE,      FALSE,      TRUE,      TRUE,    FALSE,    FALSE,       TRUE,		 TRUE };

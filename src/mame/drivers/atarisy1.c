@@ -175,13 +175,13 @@ and clears the EEROM accordingly.
 
 Here is the list, which includes confirmed (*) and unconfirmed values:
 
-Diagnostic Cartridge:			255
-Peter Packrat:					000*
-Marble Madness:					001*
-Indiana Jones - Temple of Doom:	002*
-Road Runner:					003*
-Relief Pitcher (unreleased):	004
-Off-Road (unreleased):			004
+Diagnostic Cartridge:           255
+Peter Packrat:                  000*
+Marble Madness:                 001*
+Indiana Jones - Temple of Doom: 002*
+Road Runner:                    003*
+Relief Pitcher (unreleased):    004
+Off-Road (unreleased):          004
 RoadBlasters (aka Future Vette):005*
 
 

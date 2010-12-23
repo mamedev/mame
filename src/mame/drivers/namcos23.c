@@ -107,15 +107,15 @@ Crisis Zone       Namco, 2000    System 23 Evolution 2
 If you can help with the remaining undumped S22.5/S23/SS23 games, please contact me at http://guru.mameworld.info/
 
 A System 23 unit is comprised of some of the following pieces....
-- V185B EMI PCB                    Small PCB bolted to the metal box with several connectors including power in, video out, network in/out, sound out 
+- V185B EMI PCB                    Small PCB bolted to the metal box with several connectors including power in, video out, network in/out, sound out
                                    (to AMP PCB) used with most of the S23/SS23 games that use a single main PCB and no other control PCBs.
-- V198 EMI PCB                     Small PCB bolted to the metal box with several connectors (power/video/sound etc) plus a couple of extra 
-                                   ones for the CCD camera and feedback board. It is connected to the main and GMEN boards on the other side via 
+- V198 EMI PCB                     Small PCB bolted to the metal box with several connectors (power/video/sound etc) plus a couple of extra
+                                   ones for the CCD camera and feedback board. It is connected to the main and GMEN boards on the other side via
                                    2 multi-pin connectors (used only with games that use the GMEN board)
 - BASS AMP PCB                     Power AMP PCB for general sounds and bass
 - SYSTEM23 MAIN PCB                Main PCB for System 23               \
   or SystemSuper23 MAIN(1) PCB     Main PCB for Super System 23         / Note the 3 main boards are similar, but not exactly the same.
-  or System23Evolution2 PCB        Main PCB for System 23 Evolution 2  /  
+  or System23Evolution2 PCB        Main PCB for System 23 Evolution 2  /
 - MSPM(FR*) PCB                    A small plug-in daughterboard that holds FLASHROMs containing Main CPU and Sound CPU programs
 - FCA PCB                          Controls & I/O interface board used with a few Super System 23 games only. Contains mostly transistors,
                                    caps, resistors, several connectors, an MCU and a PIC16F84.
@@ -129,12 +129,12 @@ A System 23 unit is comprised of some of the following pieces....
                                    Note that in Super System23, the MEM(M) PCB is re-used from System23.
                                    On Super System23, there is a sticker over the System23 part labelled 'SystemSuper23' and one
                                    PAL is not populated.
-- GMEN PCB                         A large board that sits on top of the main board containing a SH2 CPU, some RAM and a few CPLDs/FPGAs. 
+- GMEN PCB                         A large board that sits on top of the main board containing a SH2 CPU, some RAM and a few CPLDs/FPGAs.
                                    This controls the video overlay from the CCD camera in Gunmen Wars, Race On! and Final Furlong 2.
                                    The ROM board plugs in on top of this board.
-- V194 STR PCB                     Used with Race On! to control the steering feed-back. An identical re-labelled PCB (V257) with  
+- V194 STR PCB                     Used with Race On! to control the steering feed-back. An identical re-labelled PCB (V257) with
                                    different SOP44 ROMs is used with Wangan Midnight (Chihiro) and Ridge Racer V (System 246)
-                                   
+
 The metal box housing these PCB's is approximately the same size as Super System 22. However, the box is mostly
 empty. All of the CPU/Video/DSP hardware is located on the main PCB which is the same size as the
 Super System 22 CPU board. The ROM PCB is half the size of the Super System22 ROM PCB. The ROM positions on it
@@ -169,8 +169,8 @@ On bootup, the following happens (on GP500)...
 
 When the SUB-CPU connects there are numerous POST screens that test almost all of the main components.
 
-On System23, the bootup sequence is shorter. The screen remains blank while the SDRAM is being checked (i.e. 1st screen mentioned above is not shown). 
-LEDS 1-8 turn off in sequence 8-1. The bank of 8 LEDs on the main board cycles from left to right to left repeatedly (almost all S23/SS23 games seem 
+On System23, the bootup sequence is shorter. The screen remains blank while the SDRAM is being checked (i.e. 1st screen mentioned above is not shown).
+LEDS 1-8 turn off in sequence 8-1. The bank of 8 LEDs on the main board cycles from left to right to left repeatedly (almost all S23/SS23 games seem
 to do this in fact). After that, the bootup sequence is mostly the same as SS23.
 When the game is running some games just cycle the 8 LEDs left/right/left etc. Others cycle the LEDs in pairs just one LED position
 left/right/left etc. Those crazy Namco guys *really* like LEDs.
@@ -567,11 +567,11 @@ Sticker: Gmen (GTR) PCB
 |----------------------------------------------------------------------------|
 Notes:
       This board controls the video overlay from the CCD camera in Gunmen Wars, Race ON! and Final Furlong 2.
-      The main board does it's usual POST then the board fires up, LED1 lights red and the LEDs 5-12 go crazy pulsing left to right from 
+      The main board does it's usual POST then the board fires up, LED1 lights red and the LEDs 5-12 go crazy pulsing left to right from
       the middle outwards. The main board uploads a loader program, then the Main SH2 program. After completion LED 3 lights green and then
       LED 2 lights orange for a second then extinguishes then the main board resets :-/
       It doesn't boot up for unknown reasons but likely another PCB is missing from somewhere in the cabinet or the GMEN PCB is faulty.
-      
+
       SH2        - Hitachi HD6417604 SH2 CPU (QFP144, clock input 28.7MHz)
       N341024    - NKK 128k x8 SRAM (x4, SOP32)
       N341256    - NKK 32k x8 SRAM (x2, SOP28)
@@ -822,7 +822,7 @@ Notes:
       62256    - 32k x8 SRAM (SOP28)
       EPM7096  - Altera EPM7096 CPLD with sticker 'ASCA,DR1' (PLCC68)
       ADM485   - Analog Devices ADM485 +5V Low Power EIA RS-485 Transceiver (SOIC8)
-      J102/J103- Standard USB A and B connectors. These are not populated on most games, but are populated for 
+      J102/J103- Standard USB A and B connectors. These are not populated on most games, but are populated for
                  use with Motocross Go! on the ASCA-3A PCB.
 
 
@@ -946,13 +946,13 @@ V194 STR PCB
 |            J102                            J106          |
 |----------------------------------------------------------|
 Notes:
-      This board is used with Race On! (and Wangan Midnight on Chihiro and Ridge Racer V on System 246) to control the 
-      steering feed-back motor. It may be used with other System 23/Super System 23 driving/racing games too but no 
+      This board is used with Race On! (and Wangan Midnight on Chihiro and Ridge Racer V on System 246) to control the
+      steering feed-back motor. It may be used with other System 23/Super System 23 driving/racing games too but no
       other games are confirmed at the moment.
-      
+
       RO1_STR-0A.IC16 - Fujitsu MB29F400TC 512k x8 flash ROM (SOP44)
-                        - Labelled 'RO1 STR-0A' for Race On! 
-                        - Labelled 'RR3 STR-0A' for Ridge Racer V (on System 246) 
+                        - Labelled 'RO1 STR-0A' for Race On!
+                        - Labelled 'RR3 STR-0A' for Ridge Racer V (on System 246)
       EPM7064         - Altera EPM7064 CPLD labelled 'STR-DR1' (PLCC44)
       N341256         - NKK 32k x8 SRAM (SOP28)
       K2682           - 2SK2682 N-Channel Silicon MOSFET
@@ -971,7 +971,7 @@ Notes:
       J104            - 6 pin connector joined with a cable to J6 on the V198 EMI PCB. This cable is the I/O connection to/from the main board.
       J105            - 110VAC power input
       J106            - DC variable power output to feed-back motor
-     
+
 */
 
 #include "emu.h"
@@ -3262,55 +3262,55 @@ ROM_END
 
 ROM_START( raceon )
 	ROM_REGION32_BE( 0x400000, "user1", 0 ) /* 4 megs for main R4650 code */
-	ROM_LOAD16_BYTE( "ro2vera.ic2",  0x000000, 0x200000, CRC(08b94548) SHA1(6363f1724540c2671555bc5bb11e22611614baf5) ) 
-	ROM_LOAD16_BYTE( "ro2vera.ic1",  0x000001, 0x200000, CRC(4270884b) SHA1(82e4d4376907ee5dbabe047b9d2279f08cff5f71) ) 
-	
+	ROM_LOAD16_BYTE( "ro2vera.ic2",  0x000000, 0x200000, CRC(08b94548) SHA1(6363f1724540c2671555bc5bb11e22611614baf5) )
+	ROM_LOAD16_BYTE( "ro2vera.ic1",  0x000001, 0x200000, CRC(4270884b) SHA1(82e4d4376907ee5dbabe047b9d2279f08cff5f71) )
+
 	ROM_REGION( 0x80000, "audiocpu", 0 )	/* Hitachi H8/3002 MCU code */
-	ROM_LOAD16_WORD_SWAP( "ro2vera.ic3",  0x000000, 0x080000, CRC(a763ecb7) SHA1(6b1ab63bb56342abbf7ddd7d17d413779fbafce1) ) 
-	
+	ROM_LOAD16_WORD_SWAP( "ro2vera.ic3",  0x000000, 0x080000, CRC(a763ecb7) SHA1(6b1ab63bb56342abbf7ddd7d17d413779fbafce1) )
+
 	ROM_REGION( 0x40000, "ioboard", 0 )	/* I/O board HD643334 H8/3334 MCU code */
 	ROM_LOAD( "asc5_io-a.ic14", 0x000000, 0x020000, CRC(5964767f) SHA1(320db5e78ae23c5f94e368432d51573b409995db) )
 
 	ROM_REGION( 0x80000, "ffb", 0 )	/* STR steering force-feedback board code */
-	ROM_LOAD( "ro1_str-0a.ic16", 0x000000, 0x080000, CRC(27d39e1f) SHA1(6161cbb27c964ffab1db3b3c1f073ec514876e61) ) 
+	ROM_LOAD( "ro1_str-0a.ic16", 0x000000, 0x080000, CRC(27d39e1f) SHA1(6161cbb27c964ffab1db3b3c1f073ec514876e61) )
 
 	ROM_REGION32_BE( 0x2000000, "data", 0 )	/* data roms */
-	ROM_LOAD16_BYTE( "ro1mtah.2j",   0x000000, 0x800000, CRC(216abfb1) SHA1(8db7b17dc6441adc7a4ec8b941d5a84d73c735d6) ) 
-	ROM_LOAD16_BYTE( "ro1mtal.2h",   0x000001, 0x800000, CRC(17646306) SHA1(8d1af777f8e884b650efee8e4c26e032e1c088b7) ) 
+	ROM_LOAD16_BYTE( "ro1mtah.2j",   0x000000, 0x800000, CRC(216abfb1) SHA1(8db7b17dc6441adc7a4ec8b941d5a84d73c735d6) )
+	ROM_LOAD16_BYTE( "ro1mtal.2h",   0x000001, 0x800000, CRC(17646306) SHA1(8d1af777f8e884b650efee8e4c26e032e1c088b7) )
 
 	ROM_REGION( 0x2000000, "textile", 0 )	/* texture tiles */
-	ROM_LOAD( "ro1cgll.4m",   0x0000000, 0x800000, CRC(12c64936) SHA1(14a0d3d336f2fbe7992eedb3900748763368bc6b) ) 
-	ROM_LOAD( "ro1cglm.4k",   0x0800000, 0x800000, CRC(7e8bb4fc) SHA1(46a7940989576239a720fde8ec4e4b623b0b6fe6) ) 
-	ROM_LOAD( "ro1cgum.4j",   0x1000000, 0x800000, CRC(b9767735) SHA1(87fec452998a782db2cf00d369149b200a00d163) ) 
-	ROM_LOAD( "ro1cguu.4f",   0x1800000, 0x800000, CRC(8fef8bd4) SHA1(6870590f585dc8d87ebe5181da870715c9c4fee3) ) 
+	ROM_LOAD( "ro1cgll.4m",   0x0000000, 0x800000, CRC(12c64936) SHA1(14a0d3d336f2fbe7992eedb3900748763368bc6b) )
+	ROM_LOAD( "ro1cglm.4k",   0x0800000, 0x800000, CRC(7e8bb4fc) SHA1(46a7940989576239a720fde8ec4e4b623b0b6fe6) )
+	ROM_LOAD( "ro1cgum.4j",   0x1000000, 0x800000, CRC(b9767735) SHA1(87fec452998a782db2cf00d369149b200a00d163) )
+	ROM_LOAD( "ro1cguu.4f",   0x1800000, 0x800000, CRC(8fef8bd4) SHA1(6870590f585dc8d87ebe5181da870715c9c4fee3) )
 
 	ROM_REGION16_LE( 0x400000, "textilemapl", 0 )	/* texture tilemap 0-15*/
-	ROM_LOAD( "ro1ccrl.7f",   0x000000, 0x400000, CRC(fe50e424) SHA1(8317c998db687e1c40398e0005a037dcded19c25) ) 
+	ROM_LOAD( "ro1ccrl.7f",   0x000000, 0x400000, CRC(fe50e424) SHA1(8317c998db687e1c40398e0005a037dcded19c25) )
 
 	ROM_REGION( 0x200000, "textilemaph", 0 )		/* texture tilemap 16-17 + attr */
-	ROM_LOAD( "ro1ccrh.7e",   0x000000, 0x200000, CRC(1c958de2) SHA1(4893350999d5d377e68b9577187828de7a4c77c2) ) 
+	ROM_LOAD( "ro1ccrh.7e",   0x000000, 0x200000, CRC(1c958de2) SHA1(4893350999d5d377e68b9577187828de7a4c77c2) )
 
 	ROM_REGION32_LE( 0x2000000, "pointrom", 0 )	/* 3D model data */
-	ROM_LOAD32_WORD_SWAP( "ro1pt0h.7a",   0x0000000, 0x400000, CRC(6ef742ab) SHA1(500ce413b2463a555237de7bcc9627d1082c9b52) ) 
-	ROM_LOAD32_WORD_SWAP( "ro1pt0l.7c",   0x0000002, 0x400000, CRC(f4b88bd0) SHA1(cc642d959645730b03ef01e6dbb5d0077bce7163) ) 
-	ROM_LOAD32_WORD_SWAP( "ro1pt1h.5a",   0x0800000, 0x400000, CRC(428bf573) SHA1(6be159e1cf7ef38639610c347fd2322ab9911a70) ) 
-	ROM_LOAD32_WORD_SWAP( "ro1pt1l.5c",   0x0800002, 0x400000, CRC(f3df1d13) SHA1(9f96c99bd3537940a532d3dccb69a1c7d8c6be63) ) 
-	ROM_LOAD32_WORD_SWAP( "ro1pt2h.4a",   0x1000000, 0x400000, CRC(e1abdbc9) SHA1(91827af01cb83f4422d7329c8eea52bb57d7d57e) ) 
-	ROM_LOAD32_WORD_SWAP( "ro1pt2l.4c",   0x1000002, 0x400000, CRC(c64f5cdc) SHA1(e7261f3a56718f304127cc85c08d0b32525dc1cd) ) 
-	ROM_LOAD32_WORD_SWAP( "ro1pt3h.3a",   0x1800000, 0x400000, CRC(ef4685f6) SHA1(930037cac4aae9892278aa322844d03c773c70f7) ) 
-	ROM_LOAD32_WORD_SWAP( "ro1pt3l.3c",   0x1800002, 0x400000, CRC(07d27009) SHA1(770001bee9d7ace337db8a42bf377678b2b5d5fb) ) 
+	ROM_LOAD32_WORD_SWAP( "ro1pt0h.7a",   0x0000000, 0x400000, CRC(6ef742ab) SHA1(500ce413b2463a555237de7bcc9627d1082c9b52) )
+	ROM_LOAD32_WORD_SWAP( "ro1pt0l.7c",   0x0000002, 0x400000, CRC(f4b88bd0) SHA1(cc642d959645730b03ef01e6dbb5d0077bce7163) )
+	ROM_LOAD32_WORD_SWAP( "ro1pt1h.5a",   0x0800000, 0x400000, CRC(428bf573) SHA1(6be159e1cf7ef38639610c347fd2322ab9911a70) )
+	ROM_LOAD32_WORD_SWAP( "ro1pt1l.5c",   0x0800002, 0x400000, CRC(f3df1d13) SHA1(9f96c99bd3537940a532d3dccb69a1c7d8c6be63) )
+	ROM_LOAD32_WORD_SWAP( "ro1pt2h.4a",   0x1000000, 0x400000, CRC(e1abdbc9) SHA1(91827af01cb83f4422d7329c8eea52bb57d7d57e) )
+	ROM_LOAD32_WORD_SWAP( "ro1pt2l.4c",   0x1000002, 0x400000, CRC(c64f5cdc) SHA1(e7261f3a56718f304127cc85c08d0b32525dc1cd) )
+	ROM_LOAD32_WORD_SWAP( "ro1pt3h.3a",   0x1800000, 0x400000, CRC(ef4685f6) SHA1(930037cac4aae9892278aa322844d03c773c70f7) )
+	ROM_LOAD32_WORD_SWAP( "ro1pt3l.3c",   0x1800002, 0x400000, CRC(07d27009) SHA1(770001bee9d7ace337db8a42bf377678b2b5d5fb) )
 
 	ROM_REGION( 0x1000000, "c352", 0 ) /* C352 PCM samples */
-	ROM_LOAD( "ro1wavel.2c",  0x000000, 0x800000, CRC(c6aca840) SHA1(09a021459b6326fe161ffcee36376648a5bf0e00) ) 
-	ROM_LOAD( "ro2waveh.2a",  0x800000, 0x800000, CRC(ceecbf0d) SHA1(f0a5e57c04b661685833b209bd5e072666068391) ) 
+	ROM_LOAD( "ro1wavel.2c",  0x000000, 0x800000, CRC(c6aca840) SHA1(09a021459b6326fe161ffcee36376648a5bf0e00) )
+	ROM_LOAD( "ro2waveh.2a",  0x800000, 0x800000, CRC(ceecbf0d) SHA1(f0a5e57c04b661685833b209bd5e072666068391) )
 
 	ROM_REGION( 0x800000, "spares", 0 )	/* duplicate ROMs for the second texel pipeline on the PCB, not used for emulation */
-	ROM_LOAD( "ro1ccrl.7m",   0x000000, 0x400000, CRC(fe50e424) SHA1(8317c998db687e1c40398e0005a037dcded19c25) ) 
-	ROM_LOAD( "ro1ccrh.7k",   0x000000, 0x200000, CRC(1c958de2) SHA1(4893350999d5d377e68b9577187828de7a4c77c2) ) 
-	ROM_LOAD( "ro1cgll.5m",   0x000000, 0x800000, CRC(12c64936) SHA1(14a0d3d336f2fbe7992eedb3900748763368bc6b) ) 
-	ROM_LOAD( "ro1cglm.5k",   0x000000, 0x800000, CRC(7e8bb4fc) SHA1(46a7940989576239a720fde8ec4e4b623b0b6fe6) ) 
-	ROM_LOAD( "ro1cgum.5j",   0x000000, 0x800000, CRC(b9767735) SHA1(87fec452998a782db2cf00d369149b200a00d163) ) 
-	ROM_LOAD( "ro1cguu.5f",   0x000000, 0x800000, CRC(8fef8bd4) SHA1(6870590f585dc8d87ebe5181da870715c9c4fee3) ) 
+	ROM_LOAD( "ro1ccrl.7m",   0x000000, 0x400000, CRC(fe50e424) SHA1(8317c998db687e1c40398e0005a037dcded19c25) )
+	ROM_LOAD( "ro1ccrh.7k",   0x000000, 0x200000, CRC(1c958de2) SHA1(4893350999d5d377e68b9577187828de7a4c77c2) )
+	ROM_LOAD( "ro1cgll.5m",   0x000000, 0x800000, CRC(12c64936) SHA1(14a0d3d336f2fbe7992eedb3900748763368bc6b) )
+	ROM_LOAD( "ro1cglm.5k",   0x000000, 0x800000, CRC(7e8bb4fc) SHA1(46a7940989576239a720fde8ec4e4b623b0b6fe6) )
+	ROM_LOAD( "ro1cgum.5j",   0x000000, 0x800000, CRC(b9767735) SHA1(87fec452998a782db2cf00d369149b200a00d163) )
+	ROM_LOAD( "ro1cguu.5f",   0x000000, 0x800000, CRC(8fef8bd4) SHA1(6870590f585dc8d87ebe5181da870715c9c4fee3) )
 ROM_END
 
 ROM_START( finfurl2 )
@@ -3594,7 +3594,7 @@ ROM_END
 
 ROM_START( crszoneb )
 	ROM_REGION32_BE( 0x800000, "user1", 0 ) /* 4 megs for main R4650 code */
-	ROM_LOAD16_WORD_SWAP( "cszo4verb.ic4", 0x400000, 0x400000, CRC(6192533d) SHA1(d102b91fe193bf255ea4e57a2bd964aa1cdfd21d) ) 
+	ROM_LOAD16_WORD_SWAP( "cszo4verb.ic4", 0x400000, 0x400000, CRC(6192533d) SHA1(d102b91fe193bf255ea4e57a2bd964aa1cdfd21d) )
 	ROM_CONTINUE( 0x000000, 0x400000 )
 
 	ROM_REGION( 0x80000, "audiocpu", 0 )	/* Hitachi H8/3002 MCU code */
