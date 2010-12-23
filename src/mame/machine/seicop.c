@@ -1381,6 +1381,7 @@ static UINT16 cop_dma_size[0x200];
 static UINT16 cop_dma_dst[0x200];
 static UINT16 cop_dma_src_param[0x200];
 static UINT16 cop_dma_trigger = 0;
+static UINT16 cop_scale;
 
 
 static UINT16 copd2_offs = 0;
@@ -1502,88 +1503,9 @@ static UINT8 xy_check;
 	flip_screen_set(space->machine, _flip_); \
 	} \
 
-/*TODO: -move x-axis limits,to calculate basing on the screen xy-axis values*/
-/*      -the second value should be end of calculation (in other words,check everything between the two values) */
-#define PLAYER 0
-#define ENEMY 1
-static void protection_move_jsr(address_space *space,UINT32 work_ram,UINT8 k)
-{
-	static UINT32 move_data,x_data,y_data;
-	/*Read the movement data to execute*/
-	move_data = ((space->read_word(work_ram+0x34)<<16) & 0xffff0000) |
-	             (space->read_word(work_ram+0x36) & 0xffff);
-
-	/*Read the x/y axis of the sprite to change*/
-	x_data = (space->read_word(work_ram+0x8));
-	y_data = (space->read_word(work_ram+0x4));
-	/*it's bit sensitive AFAIK*/
-	/*move_data hi-word on player
-      $17 = walk floor
-      $1b = jump
-      $30 = ?
-    */
-	/*Check the kind of movement that we need to execute*/
-	switch(k & 1)
-	{
-		case PLAYER:
-			switch(move_data & 0xffff)
-			{
-				case 0x0000: x_data++; break; //right
-				case 0x0040: y_data++; break; //down
-				case 0x00c0: y_data--; break; //up
-				case 0x0080: x_data--; break; //left
-				case 0x00a0: y_data--; x_data--; break; //up-left
-				case 0x0060: y_data++; x_data--; break; //down-left
-				case 0x0020: y_data++; x_data++; break; //down-right
-				case 0x00e0: y_data--; x_data++; break; //up-right
-			}
-			break;
-		/*wrong...*/
-		case ENEMY:
-			switch(move_data & 0xffff)
-			{
-				case 0x0000: x_data++; break; //right
-				case 0x0040: y_data++; break; //down
-				case 0x00c0: y_data--; break; //up
-				case 0x0080: x_data--; break; //left
-				case 0x00a0: y_data--; x_data--; break; //up-left
-				case 0x0060: y_data++; x_data--; break; //down-left
-				case 0x0020: y_data++; x_data++; break; //down-right
-				case 0x00e0: y_data--; x_data++; break; //up-right
-				default:
-					popmessage("%08x",move_data);
-				break;
-			}
-			break;
-	}
-	/*Write the new values to the sprite x/y data*/
-	space->write_word(work_ram+0x8,x_data);
-	space->write_word(work_ram+0x4,y_data);
-}
 
 
 static UINT16 hit_check;
-
-static void protection_hit_jsr(address_space *space,UINT32 work_ram1,UINT32 work_ram2)
-{
-	int x1,y1,x2,y2/*,hit1,hit2*/;
-	x1 = (space->read_word(work_ram1+0x8));
-	y1 = (space->read_word(work_ram1+0x4));
-	//hit1 = (space->read_word(work_ram1-));//this sprite is attacking
-	x2 = (space->read_word(work_ram2+0x8));
-	y2 = (space->read_word(work_ram2+0x4));
-	//hit2 = (space));
-
-	popmessage("%08x:x=%04x y=%04x %08x:x=%04x y=%04x",work_ram1,x1,y1,work_ram2,x2,y2);
-
-	if((x1 >= (x2-0x80)) &&
-	   (x1 <= (x2+0x80)) &&
-	   (y1 >= (y2-3))  &&
-	   (y1 <= (y2+3)))
-		hit_check = 0;
-	else
-		hit_check = 0xffff;
-}
 
 /*directional movement protection*/
 static void moveprot_jsr(address_space *space)
@@ -1885,161 +1807,6 @@ static UINT16 hit_check_jsr(address_space *space)
 	else
 		return 3;//sprites do not collide
 }
-
-#define UP			0xc0
-#define UP_RIGHT    0xe0
-#define RIGHT       0x00
-#define DOWN_RIGHT	0x20
-#define DOWN		0x40
-#define DOWN_LEFT	0x60
-#define LEFT		0x80
-#define UP_LEFT		0xa0
-
-/*Heated Barrel*/
-/*command 0x8100 will check for the direction of the sprite*/
-/*command 0x8900 will check the "point" movement*/
-static void cop2_move3_prot(address_space *space)
-{
-	static INT16 x_pl,x_en;
-	static INT16 y_pl,y_en;
-	static INT16 x_dis,y_dis;
-	static INT16 dir,dis;
-	x_pl = space->read_word(cop_register[1]+0x8);
-	x_en = space->read_word(cop_register[0]+0x8);
-	dis = ((space->read_word(cop_register[0]+0x34) & 0xf0) >> 4);
-	y_pl = space->read_word(cop_register[1]+0x4);
-	y_en = space->read_word(cop_register[0]+0x4);
-
-	/*
-    xxxx ---- select the direction of the enemy sprite
-
-                        0xc0 up
-          up-left   0xa0  |  0xe0 up-right
-         left    0x80   <-o->  0x00 right
-        down-left   0x60  |  0x20 down-right
-                        0x40 down
-    */
-
-	if(x_en >= x_pl)
-	{
-		if((y_en >= (y_pl-0x10)) && (y_en <= (y_pl+0x10)))
-			dir = LEFT;
-		else if(y_en < (y_pl-0x10))
-			dir = DOWN_LEFT;
-		else if(y_en > (y_pl+0x10))
-			dir = UP_LEFT;
-	}
-	else if(x_en < x_pl)
-	{
-		if((y_en >= (y_pl-0x10)) && (y_en <= (y_pl+0x10)))
-			dir = RIGHT;
-		else if(y_en < (y_pl-0x10))
-			dir = DOWN_RIGHT;
-		else if(y_en > (y_pl+0x10))
-			dir = UP_RIGHT;
-	}
-	/*UP DOWN cases*/
-	if((x_en >= (x_pl-0x10)) && (x_en <= (x_pl+0x10)))
-	{
-		if(y_en >= y_pl)
-			dir = UP;
-		else if(y_en < y_pl)
-			dir = DOWN;
-	}
-
-	space->write_word(cop_register[0]+0x36,dir);
-
-	/*TODO*/
-	x_dis = (x_pl-x_en);
-	y_dis = (y_pl-y_en);
-
-	if(x_dis > 4)
-		x_dis = 4;
-
-	if(x_dis < -4)
-		x_dis = -4;
-
-	if(y_dis > 4)
-		y_dis = 4;
-
-	if(y_dis < -4)
-		y_dis = -4;
-
-	//if(y_en > y_pl)
-	//  y_dis^=0xffff;
-
-	//if(x_en > x_pl)
-	//  x_dis^=0xffff;
-
-	space->write_word(cop_register[0]+0x10,y_dis);
-	space->write_word(cop_register[0]+0x14,x_dis);
-}
-
-/**/
-static UINT16 cop2_hit_prot(address_space *space)
-{
-	static INT16 xsrc,xdst;
-	static INT16 ysrc,ydst;
-	static INT16 xp,yp;
-	static INT16 param1,param2;
-	static INT16 val;
-
-	param1 = space->read_word(cop_register[2]);
-	param2 = space->read_word(cop_register[3]);
-
-	xsrc = space->read_word(cop_register[0]+0x8) + space->read_word(cop_register[0]+0x14);
-	ysrc = space->read_word(cop_register[0]+0x4) + space->read_word(cop_register[0]+0x10);
-	xdst = space->read_word(cop_register[1]+0x8) + space->read_word(cop_register[1]+0x14);
-	ydst = space->read_word(cop_register[1]+0x4) + space->read_word(cop_register[1]+0x10);
-
-//  xp = (param1 & 0x00f0) >> 4;
-//  yp = (param1 & 0x0f00) >> 8;
-
-//  popmessage("%04x %04x",param1,param2);
-
-	xp = 0;
-	yp = 0;
-	for(val = ((param1 & 0xff0) >> 4); val > 0; val-=5)
-		xp++;
-
-	for(val = ((param1 & 0xff0) >> 4); val > 0; val-=3)
-		yp++;
-
-	/*TODO*/
-//  xp+=4;
-//  yp+=4;
-
-	if(xsrc >= xdst && xsrc <= xdst+xp && ysrc >= xdst && ysrc <= ydst+yp)
-		return 0;
-	else
-		return 3;
-}
-
-static void cop2_move2_prot(address_space *space)
-{
-	static INT16 xsrc,ysrc;
-	static INT16 param2;
-
-	xsrc = space->read_word(cop_register[0]+0x14);
-	ysrc = space->read_word(cop_register[0]+0x10);
-	param2 = space->read_word(cop_register[3]);
-
-	switch(param2)
-	{
-		case 0x10:	xsrc++; break; //right
-		case 0x30:	xsrc--; break; //left
-		case 0x40:  ysrc--; break; //up
-		case 0x60:	ysrc++; break; //down
-		case 0x08:  ysrc--; xsrc++; break; //up-right
-		case 0x38:	ysrc--; xsrc--; break; //up-left
-		case 0x28:	ysrc++; xsrc--; break; //down-left
-		case 0x18:  ysrc++; xsrc++; break; //down-right
-	}
-
-	space->write_word(cop_register[0]+0x14,xsrc);
-	space->write_word(cop_register[0]+0x10,ysrc);
-}
-
 
 
 
@@ -2429,6 +2196,13 @@ static READ16_HANDLER( generic_cop_r )
 	}
 }
 
+static UINT16 u1,u2;
+
+#define COP_CMD(_1_,_2_,_3_,_4_,_5_,_6_,_7_,_8_,_u1_,_u2_) \
+	(copd2_table[command+0] == _1_ && copd2_table[command+1] == _2_ && copd2_table[command+2] == _3_ && copd2_table[command+3] == _4_ && \
+	copd2_table[command+4] == _5_ && copd2_table[command+5] == _6_ && copd2_table[command+6] == _7_ && copd2_table[command+7] == _8_ && \
+	u1 == _u1_ && u2 == _u2_) \
+
 static WRITE16_HANDLER( generic_cop_w )
 {
 	static UINT32 temp32;
@@ -2505,6 +2279,12 @@ static WRITE16_HANDLER( generic_cop_w )
 			break;
 		}
 
+		case (0x044/2):
+		{
+			cop_scale = data;
+			break;
+		}
+
 		/* Registers */
 		case (0x0a0/2): { cop_register[0] = (cop_register[0]&0x0000ffff)|(cop_mcu_ram[offset]<<16); break; }
 		case (0x0c0/2): { cop_register[0] = (cop_register[0]&0xffff0000)|(cop_mcu_ram[offset]<<0);  break; }
@@ -2523,6 +2303,8 @@ static WRITE16_HANDLER( generic_cop_w )
 		case (0x0c8/2): { cop_register[4] = (cop_register[4]&0xffff0000)|(cop_mcu_ram[offset]<<0);   break; }
 
 		case (0x100/2):
+		case (0x102/2):
+		case (0x104/2):
 		{
 			int i;
 			int command;
@@ -2537,6 +2319,9 @@ static WRITE16_HANDLER( generic_cop_w )
 				if (cop_mcu_ram[offset]==copd2_table_4[i])
 				{
 					seibu_cop_log("    Cop Command %04x found in slot %02x with other params %04x %04x\n", cop_mcu_ram[offset], i, copd2_table_2[i], copd2_table_3[i]);
+
+					u1 = copd2_table_2[i] & 0x000f;
+					u2 = copd2_table_3[i] & 0xffff;
 					command = i;
 				}
 			}
@@ -2556,6 +2341,40 @@ static WRITE16_HANDLER( generic_cop_w )
 					seibu_cop_log("%04x ", copd2_table[command+j]);
 				}
 				seibu_cop_log("\n");
+			}
+
+			//printf("%04x %04x %04x\n",cop_mcu_ram[offset],u1,u2);
+
+			/* "automatic" movement */
+			if(COP_CMD(0x188,0x282,0x082,0xb8e,0x98e,0x000,0x000,0x000,6,0xffeb))
+			{
+				static UINT8 offs;
+
+				offs = (offset & 3) * 4;
+
+				space->write_dword(cop_register[0] + 4 + offs, space->read_dword(cop_register[0] + 4 + offs) + space->read_dword(cop_register[0] + 16 + offs));
+				return;
+			}
+
+			/* SINE math - WRONG */
+			if(COP_CMD(0xb9a,0xb88,0x888,0x000,0x000,0x000,0x000,0x000,7,0xfdfb))
+			{
+				double angle = (space->read_word(cop_register[0]+0x34) & 0xff) * M_PI / 128;
+				double amp = 65536*(space->read_word(cop_register[0]+0x36) & 0xff);
+
+				space->write_dword(cop_register[0] + 16, int(amp*sin(angle)) >> (5-cop_scale));
+				return;
+			}
+
+			/* COSINE math - WRONG */
+			if(COP_CMD(0xb9a,0xb8a,0x88a,0x000,0x000,0x000,0x000,0x000,7,0xfdfb))
+			{
+				double angle = (space->read_word(cop_register[0]+0x34) & 0xff) * M_PI / 128;
+				double amp = 65536*(space->read_word(cop_register[0]+0x36) & 0xff);
+
+				space->write_dword(cop_register[0] + 20, int(amp*cos(angle)) >> (5-cop_scale));
+
+				return;
 			}
 
 
@@ -2664,9 +2483,10 @@ READ16_HANDLER( heatbrl_mcu_r )
         400-5ff -  Protection reads
         *********************************************************************/
 
-		case (0x180/2):	{ return xy_check; } /*hit protection*/
-		case (0x182/2):	{ if(input_code_pressed(space->machine, KEYCODE_X)) { return 0; } else { return 3; } } /*---- ---- ---- --xx used bits*/
-		case (0x184/2):	{ if(input_code_pressed(space->machine, KEYCODE_C)) { return 0; } else { return 3; } } /*---- ---- ---- --xx used bits*/
+		case (0x180/2):	//{ return xy_check; } /*hit protection*/
+		case (0x182/2):	//{ if(input_code_pressed(space->machine, KEYCODE_X)) { return 0; } else { return 3; } } /*---- ---- ---- --xx used bits*/
+		case (0x184/2):	//{ if(input_code_pressed(space->machine, KEYCODE_C)) { return 0; } else { return 3; } } /*---- ---- ---- --xx used bits*/
+			return 0xffff;
 
 	    case (0x1b0/2): return (0xffff); /* bit 15 is branched on a few times in the $1938 area */
 		case (0x1b4/2):	return (0xffff); /* read at $1932 and stored in ram before +0x5b0 bit 15 tested */
@@ -2705,7 +2525,7 @@ WRITE16_HANDLER( heatbrl_mcu_w )
 		/* Odd, this is a video register */
 		case (0x070/2): { heatbrl_setgfxbank( cop_mcu_ram[offset] ); break; }
 
-#if 1 // turn off to get the generic sequence logging
+#if 0 // turn off to get the generic sequence logging
 		/* Macros Command Trigger */
 		case (0x100/2):
 		{
@@ -3436,27 +3256,6 @@ WRITE16_HANDLER( legionna_mcu_w )
 			generic_cop_w(space, offset, data, mem_mask);
 			break;
 
-		/* Execute Macro command from table */
-		case (0x100/2):
-		{
-			/*Movement protection*/
-			if(cop_mcu_ram[offset] == 0x8900 || cop_mcu_ram[offset] == 0x0205)
-			{
-				static UINT16 xy_data[2];
-				static UINT8 k;
-				xy_data[0] = space->read_word(cop_register[2]);
-				xy_data[1] = space->read_word(cop_register[3]);
-				k = (cop_mcu_ram[offset] == 0x0205) ? ENEMY : PLAYER;
-				protection_move_jsr(space,cop_register[0],k);
-				//protection_move_jsr(space,cop_register[1]); //???
-				//popmessage("%08x %08x %04x %04x",cop_register[0],cop_register[1],xy_data[0],xy_data[1]);
-			}
-			else if(cop_mcu_ram[offset] == 0x3bb0 || cop_mcu_ram[offset] == 0x138e)
-			{
-				protection_hit_jsr(space,cop_register[0],cop_register[1]);
-			}
-			break;
-		}
 
 		/*********************************************************************
         600-6ff - Video Registers
