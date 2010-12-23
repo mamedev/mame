@@ -11,7 +11,6 @@
  - sprite ROMs are badly dumped (half size);
  - sprite X kludge needs to be removed somehow;
  - apparently the only real usage of the sprite protection in xsedae is on the field map (sprite goes in the wrong direction);
- - text tilemap has color issues;
 
 */
 
@@ -2212,8 +2211,8 @@ ROM_START( xsedae )
 	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
 
 	ROM_REGION( 0x020000, "gfx1", 0 ) /* chars */
-	ROM_LOAD16_BYTE( "5.u077",	0x000000,	0x010000, CRC(478deced) SHA1(88cd72cb76bbc1c4255c3dfae4b9a10af9b050b2) )
-	ROM_LOAD16_BYTE( "6.u072",	0x000001,	0x010000, CRC(a788402d) SHA1(8a1ac4760cf75cd2e32c1d15f36ad15cce3d411b) )
+	ROM_LOAD16_BYTE( "5.u077",	0x000001,	0x010000, CRC(478deced) SHA1(88cd72cb76bbc1c4255c3dfae4b9a10af9b050b2) )
+	ROM_LOAD16_BYTE( "6.u072",	0x000000,	0x010000, CRC(a788402d) SHA1(8a1ac4760cf75cd2e32c1d15f36ad15cce3d411b) )
 
 	ROM_REGION( 0x400000, "gfx2", 0 ) /* background gfx */
 	ROM_LOAD( "bg-1.u075",   0x000000, 0x100000, CRC(ac087560) SHA1(b6473b20c55ec090961cfc46a024b3c5b707ec25) )
