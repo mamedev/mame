@@ -2182,6 +2182,8 @@ READ16_HANDLER( raiden2_cop2_r )
      which seems common to all the agmes
 */
 
+static UINT16 cop_status,cop_dist,cop_angle;
+
 static READ16_HANDLER( generic_cop_r )
 {
 	UINT16 retvalue;
@@ -2190,6 +2192,15 @@ static READ16_HANDLER( generic_cop_r )
 
 	switch (offset)
 	{
+		case 0x1b0/2:
+			return cop_status;
+
+		case 0x1b2/2:
+			return cop_dist;
+
+		case 0x1b4/2:
+			return cop_angle;
+
 		default:
 			seibu_cop_log("%06x: COPX unhandled read returning %04x from offset %04x\n", cpu_get_pc(space->cpu), retvalue, offset*2);
 			return retvalue;
@@ -2197,6 +2208,8 @@ static READ16_HANDLER( generic_cop_r )
 }
 
 static UINT16 u1,u2;
+
+static UINT16 test;
 
 #define COP_CMD(_1_,_2_,_3_,_4_,_5_,_6_,_7_,_8_,_u1_,_u2_) \
 	(copd2_table[command+0] == _1_ && copd2_table[command+1] == _2_ && copd2_table[command+2] == _3_ && copd2_table[command+3] == _4_ && \
@@ -2238,6 +2251,12 @@ static WRITE16_HANDLER( generic_cop_w )
 		case (0x038/2):	{ cop_438 = data; break; }
 		case (0x03a/2):	{ cop_43a = data; break; }
 		case (0x03c/2): { cop_43c = data; break; }
+
+		case (0x040/2):
+		{
+			test = data;
+			break;
+		}
 
 		/* DMA / layer clearing */
 		case (0x076/2):
@@ -2345,6 +2364,15 @@ static WRITE16_HANDLER( generic_cop_w )
 
 			//printf("%04x %04x %04x\n",cop_mcu_ram[offset],u1,u2);
 
+			cop_status &= 0x7fff;
+
+			/*
+			endianess changes:
+			dword no change
+			word Add / Subtract two
+			byte ?
+			*/
+
 			/* "automatic" movement */
 			if(COP_CMD(0x188,0x282,0x082,0xb8e,0x98e,0x000,0x000,0x000,6,0xffeb))
 			{
@@ -2356,27 +2384,105 @@ static WRITE16_HANDLER( generic_cop_w )
 				return;
 			}
 
-			/* SINE math - WRONG */
+			/* SINE math - 0x8100 */
 			if(COP_CMD(0xb9a,0xb88,0x888,0x000,0x000,0x000,0x000,0x000,7,0xfdfb))
 			{
-				double angle = (space->read_word(cop_register[0]+0x34) & 0xff) * M_PI / 128;
-				double amp = 65536*(space->read_word(cop_register[0]+0x36) & 0xff);
+				double angle = (space->read_word(cop_register[0]+(0x34^2)) & 0xff) * M_PI / 128;
+				double amp = 65536*(space->read_word(cop_register[0]+(0x36^2)) & 0xff);
 
 				space->write_dword(cop_register[0] + 16, int(amp*sin(angle)) >> (5-cop_scale));
 				return;
 			}
 
-			/* COSINE math - WRONG */
+			/* COSINE math - 0x8900 */
 			if(COP_CMD(0xb9a,0xb8a,0x88a,0x000,0x000,0x000,0x000,0x000,7,0xfdfb))
 			{
-				double angle = (space->read_word(cop_register[0]+0x34) & 0xff) * M_PI / 128;
-				double amp = 65536*(space->read_word(cop_register[0]+0x36) & 0xff);
+				double angle = (space->read_word(cop_register[0]+(0x34^2)) & 0xff) * M_PI / 128;
+				double amp = 65536*(space->read_word(cop_register[0]+(0x36^2)) & 0xff);
 
 				space->write_dword(cop_register[0] + 20, int(amp*cos(angle)) >> (5-cop_scale));
-
 				return;
 			}
 
+			/* 0x130e / 0x138e */
+			if(COP_CMD(0x984,0xaa4,0xd82,0xaa2,0x39b,0xb9a,0xb9a,0xa9a,5,0xbf7f))
+			{
+				int dx = space->read_dword(cop_register[1]+4) - space->read_dword(cop_register[0]+4);
+				int dy = space->read_dword(cop_register[1]+8) - space->read_dword(cop_register[0]+8);
+				if(!dy) {
+					cop_status |= 0x8000;
+					cop_angle = 0;
+				} else {
+					cop_angle = atan(double(dx)/double(dy)) * 128 / M_PI;
+					if(dy<0)
+						cop_angle += 0x80;
+				}
+				dx = dx >> 16;
+				dy = dy >> 16;
+				cop_dist = sqrt((double)(dx*dx+dy*dy));
+
+				space->write_byte(cop_register[0]+(0x34^3), cop_angle);
+				space->write_word(cop_register[0]+(0x38^2), cop_dist);
+				return;
+			}
+
+			//(heatbrl)  | 5 | bf7f | 138e | 984 aa4 d82 aa2 39b b9a b9a b9a
+			if(COP_CMD(0x984,0xaa4,0xd82,0xaa2,0x39b,0xb9a,0xb9a,0xb9a,5,0xbf7f))
+			{
+				int dx = space->read_dword(cop_register[1]+4) - space->read_dword(cop_register[0]+4);
+				int dy = space->read_dword(cop_register[1]+8) - space->read_dword(cop_register[0]+8);
+				if(!dy) {
+					cop_status |= 0x8000;
+					cop_angle = 0;
+				} else {
+					cop_angle = atan(double(dx)/double(dy)) * 128 / M_PI;
+					if(dy<0)
+						cop_angle += 0x80;
+				}
+				dx = dx >> 16;
+				dy = dy >> 16;
+				cop_dist = sqrt((double)(dx*dx+dy*dy));
+
+
+				/* is this the only difference? */
+				if(0)
+				{
+					space->write_byte(cop_register[0]+(0x34^3), cop_angle);
+					space->write_word(cop_register[0]+(0x38^2), cop_dist);
+				}
+				return;
+			}
+
+			/* Division - 0x42c2 - */
+			if(COP_CMD(0xf9a,0xb9a,0xb9c,0xb9c,0xb9c,0x29c,0x000,0x000,5,0xfcdd))
+			{
+				int div = space->read_word(cop_register[0]+(0x36^2));
+				if(!div)
+					div = 1;
+
+				space->write_word(cop_register[0]+(0x38^2), (space->read_word(cop_register[0]+(0x38^2)) << (5-cop_scale)) / div);
+				return;
+			}
+
+			if(0)
+			if(COP_CMD(0x194,0x288,0x088,0x000,0x000,0x000,0x000,0x000,6,0xfbfb))
+			{
+
+			}
+
+			if(cop_mcu_ram[offset] == 0xa100)
+				return;
+
+			if(cop_mcu_ram[offset] == 0xb080)
+				return;
+
+			if(cop_mcu_ram[offset] == 0xa900)
+				return;
+
+			if(cop_mcu_ram[offset] == 0xb880)
+				return;
+
+			//printf("%04x\n",cop_mcu_ram[offset]);
 
 			break;
 		}
@@ -2487,9 +2593,6 @@ READ16_HANDLER( heatbrl_mcu_r )
 		case (0x182/2):	//{ if(input_code_pressed(space->machine, KEYCODE_X)) { return 0; } else { return 3; } } /*---- ---- ---- --xx used bits*/
 		case (0x184/2):	//{ if(input_code_pressed(space->machine, KEYCODE_C)) { return 0; } else { return 3; } } /*---- ---- ---- --xx used bits*/
 			return 0xffff;
-
-	    case (0x1b0/2): return (0xffff); /* bit 15 is branched on a few times in the $1938 area */
-		case (0x1b4/2):	return (0xffff); /* read at $1932 and stored in ram before +0x5b0 bit 15 tested */
 
 		/*********************************************************************
         700-7ff - Non-protection reads
@@ -2632,62 +2735,6 @@ WRITE16_HANDLER( cupsoc_mcu_w )
         400-5ff -  Protection writes
         *********************************************************************/
 
-		#if 0
-		/* Trigger Macro Command */
-		case (0x100/2):
-		{
-			switch(cop_mcu_ram[offset])
-			{
-				/*???*/
-				case 0x8100:
-				{
-					UINT32 src = cop_register[0];
-					space->write_word(src+0x36,0xffc0);
-					break;
-				}
-				case 0x8900:
-				{
-					UINT32 src = cop_register[0];
-					space->write_word(src+0x36,0xff80);
-					break;
-				}
-				/*Right*/
-				case 0x0205:
-				{
-					UINT32 src = cop_register[0];
-					INT16 y = space->read_word(src+0x4);
-					INT16 x = space->read_word(src+0x8);
-					INT16 y_rel = space->read_word(src+0x10);
-					INT16 x_rel = space->read_word(src+0x14);
-					space->write_word(src+0x4,(y+y_rel));
-					space->write_word(src+0x8,(x+x_rel));
-					/*logerror("%08x %08x %08x %08x %08x\n",cop_register[0],
-                                                   space->read_word(cop_reg[0]+0x4),
-                                                   space->read_word(cop_reg[0]+0x8),
-                                                   space->read_word(cop_reg[0]+0x10),
-                                                   space->read_word(cop_reg[0]+0x14));*/
-					break;
-				}
-				/*???*/
-				case 0x3bb0:
-				{
-					//UINT32 dst = cop_register[0];
-					//UINT32 dst = cop_register[1];
-					//space->write_word(dst,  mame_rand(space->machine)/*space->read_word(src)*/);
-					//space->write_word(dst+2,mame_rand(space->machine)/*space->read_word(src+2)*/);
-					//space->write_word(dst+4,mame_rand(space->machine)/*space->read_word(src+4)*/);
-					//space->write_word(dst+6,mame_rand(space->machine)/*space->read_word(src+6)*/);
-					//logerror("%04x\n",cop_register[0]);
-					break;
-				}
-				default:
-					//logerror("%04x\n",data);
-					break;
-			}
-			break;
-		}
-		#endif
-
 		/* Video Regs */
 		case (0x204/2):
 		{
@@ -2778,62 +2825,6 @@ WRITE16_HANDLER( cupsocs_mcu_w )
 		/*********************************************************************
         400-5ff -  Protection writes
         *********************************************************************/
-
-		#if 0
-		/* Trigger Macro Command */
-		case (0x100/2):
-		{
-			switch(cop_mcu_ram[offset])
-			{
-				/*???*/
-				case 0x8100:
-				{
-					UINT32 src = cop_register[0];
-					space->write_word(src+0x36,0xffc0);
-					break;
-				}
-				case 0x8900:
-				{
-					UINT32 src = cop_register[0];
-					space->write_word(src+0x36,0xff80);
-					break;
-				}
-				/*Right*/
-				case 0x0205:
-				{
-					UINT32 src = cop_register[0];
-					INT16 y = space->read_word(src+0x4);
-					INT16 x = space->read_word(src+0x8);
-					INT16 y_rel = space->read_word(src+0x10);
-					INT16 x_rel = space->read_word(src+0x14);
-					space->write_word(src+0x4,(y+y_rel));
-					space->write_word(src+0x8,(x+x_rel));
-					/*logerror("%08x %08x %08x %08x %08x\n",cop_register[0],
-                                                   space->read_word(cop_reg[0]+0x4),
-                                                   space->read_word(cop_reg[0]+0x8),
-                                                   space->read_word(cop_reg[0]+0x10),
-                                                   space->read_word(cop_reg[0]+0x14));*/
-					break;
-				}
-				/*???*/
-				case 0x3bb0:
-				{
-					//UINT32 dst = cop_register[0];
-					//UINT32 dst = cop_register[1];
-					//space->write_word(dst,  mame_rand(space->machine)/*space->read_word(src)*/);
-					//space->write_word(dst+2,mame_rand(space->machine)/*space->read_word(src+2)*/);
-					//space->write_word(dst+4,mame_rand(space->machine)/*space->read_word(src+4)*/);
-					//space->write_word(dst+6,mame_rand(space->machine)/*space->read_word(src+6)*/);
-					//logerror("%04x\n",cop_register[0]);
-					break;
-				}
-				default:
-					//logerror("%04x\n",data);
-					break;
-			}
-			break;
-		}
-		#endif
 
 		/* Video Regs */
 		case (0x204/2):
@@ -3112,6 +3103,7 @@ WRITE16_HANDLER( grainbow_mcu_w )
 		{
 			if(cop_mcu_ram[offset] == 0xc480)
 			{
+				if(0)
 				dma_transfer(space);
 				s_i--;
 				if(s_i == 0)
