@@ -57,7 +57,7 @@ DEVICE_START( s3c2400 )
 	memory_install_readwrite32_device_handler( space, device, 0x14600040, 0x1460005b, 0, 0, s3c24xx_dma_2_r, s3c24xx_dma_2_w);
 	memory_install_readwrite32_device_handler( space, device, 0x14600060, 0x1460007b, 0, 0, s3c24xx_dma_3_r, s3c24xx_dma_3_w);
 	memory_install_readwrite32_device_handler( space, device, 0x14800000, 0x14800017, 0, 0, s3c24xx_clkpow_r, s3c24xx_clkpow_w);
-	memory_install_readwrite32_device_handler( space, device, 0x14a00000, 0x14a003ff, 0, 0, s3c24xx_lcd_r, s3c24xx_lcd_w);
+	memory_install_readwrite32_device_handler( space, device, 0x14a00000, 0x14a003ff, 0, 0, s3c2400_lcd_r, s3c24xx_lcd_w);
 	memory_install_readwrite32_device_handler( space, device, 0x14a00400, 0x14a007ff, 0, 0, s3c24xx_lcd_palette_r, s3c24xx_lcd_palette_w);
 	memory_install_readwrite32_device_handler( space, device, 0x15000000, 0x1500002b, 0, 0, s3c24xx_uart_0_r, s3c24xx_uart_0_w);
 	memory_install_readwrite32_device_handler( space, device, 0x15004000, 0x1500402b, 0, 0, s3c24xx_uart_1_r, s3c24xx_uart_1_w);

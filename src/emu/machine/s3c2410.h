@@ -36,7 +36,7 @@ enum
 
 DECLARE_LEGACY_DEVICE(S3C2410, s3c2410);
 
-READ32_DEVICE_HANDLER( s3c24xx_lcd_r );
+READ32_DEVICE_HANDLER( s3c2410_lcd_r );
 
 /*******************************************************************************
     TYPE DEFINITIONS

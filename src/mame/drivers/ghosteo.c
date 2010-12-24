@@ -395,7 +395,7 @@ running_device* s3c2410;
 
 static READ32_HANDLER( bballoon_speedup_r )
 {
-	UINT32 ret = s3c24xx_lcd_r(s3c2410, offset+0x10/4, mem_mask);
+	UINT32 ret = s3c2410_lcd_r(s3c2410, offset+0x10/4, mem_mask);
 
 
 	int pc = cpu_get_pc(space->cpu);
