@@ -1010,6 +1010,15 @@ static GFXDECODE_START( heatbrl )
 	GFXDECODE_ENTRY( "gfx6", 0, legionna_tilelayout,   16*16, 16 )
 GFXDECODE_END
 
+static GFXDECODE_START( cupsoc )
+	GFXDECODE_ENTRY( "gfx1", 0, legionna_new_charlayout,    48*16, 16 )
+	GFXDECODE_ENTRY( "gfx3", 0, legionna_tilelayout,   16*16, 16 )
+	GFXDECODE_ENTRY( "gfx4", 0, legionna_tilelayout,   32*16, 16 ) /* unused */
+	GFXDECODE_ENTRY( "gfx2", 0, legionna_spritelayout,  0*16, 8*16 )
+	GFXDECODE_ENTRY( "gfx5", 0, legionna_tilelayout,   32*16, 16 )
+	GFXDECODE_ENTRY( "gfx6", 0, legionna_tilelayout,   16*16, 16 )
+GFXDECODE_END
+
 
 static const gfx_layout cupsocsb_spritelayout =
 {
@@ -1245,7 +1254,7 @@ static MACHINE_CONFIG_START( cupsoc, driver_device )
 	MDRV_SCREEN_SIZE(40*8, 32*8)
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(heatbrl)
+	MDRV_GFXDECODE(cupsoc)
 	MDRV_PALETTE_LENGTH(128*16)
 
 	MDRV_VIDEO_START(cupsoc)
@@ -2223,4 +2232,4 @@ GAME( 1992, cupsocs,  cupsoc,   cupsocs,  cupsoc,   0,         ROT0, "Seibu Kaih
 GAME( 1992, cupsocs2, cupsoc,   cupsocs,  cupsoc,   0,         ROT0, "Seibu Kaihatsu", "Seibu Cup Soccer :Selection: (set 2)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 1992, cupsocsb, cupsoc,   cupsocbl, cupsoc,   cupsoc,    ROT0, "bootleg", "Seibu Cup Soccer :Selection: (bootleg, set 1)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 1992, cupsocsb2,cupsoc,   cupsocbl, cupsoc,   cupsoc,    ROT0, "bootleg", "Seibu Cup Soccer :Selection: (bootleg, set 2)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
-GAME( 1992, olysoc92, cupsoc,   cupsoc,  cupsoc,   0,         ROT0, "Seibu Kaihatsu", "Olympic Soccer '92", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1992, olysoc92, cupsoc,   cupsoc,   cupsoc,   0,         ROT0, "Seibu Kaihatsu", "Olympic Soccer '92", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
