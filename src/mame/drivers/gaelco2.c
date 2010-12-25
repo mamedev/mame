@@ -1429,6 +1429,22 @@ ROM_START( grtesoro )
 	ROM_LOAD( "palce16v8h.u29",  0x0000, 0x0117, BAD_DUMP CRC(4a0a6f39) SHA1(57351e471649391c9abf110828fe2f128fe84eee) )
 ROM_END
 
+ROM_START( grtesoro4 ) /* there are version 4.0 and version 1.0 strings in this, go with the higher one */
+	ROM_REGION( 0x100000, "maincpu", 0 )	/* 68000 code */
+	ROM_LOAD16_BYTE( "2.u39_v4",	0x000000, 0x020000, CRC(fff16141) SHA1(8493c3e58a231c03b152b336f43422a9a2d2618c) )
+	ROM_LOAD16_BYTE( "1.u40_v4",	0x000001, 0x020000, CRC(39f9d58e) SHA1(1cbdae2adc570f2a2e10a707075312ef717e2643) )
+
+	ROM_REGION( 0x0300000, "gfx1", 0 ) /* GFX + Sound */
+	ROM_LOAD( "3.u54", 0x0000000, 0x0080000, CRC(085008ed) SHA1(06eb4f972d79eab13b1b3b6829ef280e079abdb6) )
+	ROM_LOAD( "4.u53", 0x0080000, 0x0080000, CRC(94dc37a7) SHA1(28f9832b61541b292682a6e2d2264abccd138a2e) )
+	ROM_LOAD( "5.u52", 0x0100000, 0x0080000, CRC(19b939f4) SHA1(7281709aa3ab1decb84bf7ab10492fb6ec197c80) )
+	ROM_LOAD( "6.u51", 0x0180000, 0x0100000, CRC(6dafc11c) SHA1(2aa3d6318418578433b3060bda6e27adf794dea4) )
+	ROM_LOAD( "7.u50", 0x0280000, 0x0080000, CRC(e80c6d39) SHA1(b3ae5d66c48c2ba6665a181e311b0c834384258a) )
+
+	ROM_REGION( 0x0600, "plds", 0 )
+	ROM_LOAD( "palce16v8h.u29",  0x0000, 0x0117, BAD_DUMP CRC(4a0a6f39) SHA1(57351e471649391c9abf110828fe2f128fe84eee) )
+ROM_END
+
 GAME( 1994, aligator,  0,       alighunt, alighunt, alighunt, ROT0, "Gaelco", "Alligator Hunt", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 1994, aligatorun,aligator,alighunt, alighunt, alighunt, ROT0, "Gaelco", "Alligator Hunt (unprotected)", 0 )
 GAME( 1995, touchgo,  0,        touchgo,  touchgo,  touchgo,  ROT0, "Gaelco", "Touch & Go (World)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
@@ -1440,4 +1456,5 @@ GAME( 1996, snowboar, 0,        snowboar, snowboar, 0,        ROT0, "Gaelco", "S
 GAME( 1996, snowboara,snowboar, snowboar, snowboar, snowboar, ROT0, "Gaelco", "Snow Board Championship (Version 2.0)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
 GAME( 1998, bang,     0,        bang,     bang,     bang,     ROT0, "Gaelco", "Bang!", 0 )
 GAME( 1998, bangj,    bang,     bang,     bang,     bang,     ROT0, "Gaelco", "Gun Gabacho (Japan)", 0 )
-GAME( 1999, grtesoro, 0,        maniacsq, maniacsq, 0,        ROT0, "Nova Desitec", "Gran Tesoro? / Play 2000 (v5.01) (Italy)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1999, grtesoro,  0,       maniacsq, maniacsq, 0,        ROT0, "Nova Desitec", "Gran Tesoro? / Play 2000 (v5.01) (Italy)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
+GAME( 1999, grtesoro4, grtesoro,maniacsq, maniacsq, 0,        ROT0, "Nova Desitec", "Gran Tesoro? / Play 2000 (v4.0) (Italy)", GAME_UNEMULATED_PROTECTION | GAME_NOT_WORKING )
