@@ -3568,6 +3568,7 @@ V-V                           TP-027
 	DRIVER( sstrike )	/* (c) 1990 Strata/Incredible Technologies */
 	DRIVER( gtg )		/* (c) 1990 Strata/Incredible Technologies */
 	DRIVER( gtgt )		/* (c) 1990 Strata/Incredible Technologies */
+	DRIVER( gtgt1 )		/* (c) 1990 Strata/Incredible Technologies */
 	DRIVER( hstennis )	/* (c) 1990 Strata/Incredible Technologies */
 	DRIVER( hstennis10 )/* (c) 1990 Strata/Incredible Technologies */
 	DRIVER( slikshot )	/* (c) 1990 Grand Products/Incredible Technologies */
@@ -6381,6 +6382,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( guardian )	/* 136092           (c) 1992 */
 	DRIVER( relief )	/* 136093           (c) 1992 */
 	DRIVER( relief2 )	/* 136093           (c) 1992 */
+	DRIVER( relief3 )	/* 136093           (c) 1992 */
 	DRIVER( arcadecl )	/* (proto)          (c) 1992 */
 	DRIVER( sparkz )	/* (proto)          (c) 1992 */
 	DRIVER( motofren )	/* 136094           (c) 1992 */

@@ -2101,8 +2101,28 @@ ROM_START( gtg )
 	ROM_LOAD( "srom0.bin", 0x00000, 0x20000, CRC(1cccbfdf) SHA1(546059fea2e7cd5627a666d80b1fc3ed8fcc0762) )
 ROM_END
 
-
 ROM_START( gtgt )
+	ROM_REGION( 0x1c000, "maincpu", 0 )
+	ROM_LOAD( "gtg.bim_2.0.u5",     0x4000, 0x4000, CRC(4c907166) SHA1(338a599645fa49c9fcbfbe5ba3431dafffddacc7) )
+	ROM_CONTINUE(       0x10000, 0xc000 )
+	ROM_COPY( "maincpu", 0x14000, 0x8000, 0x8000 )
+
+	ROM_REGION( 0x10000, "soundcpu", 0 )
+	ROM_LOAD( "golf-snd.u27", 0x08000, 0x8000, CRC(f6a7429b) SHA1(0fb378606c12c3543aa1ff603101e262acb9c692) )
+
+	ROM_REGION( 0xc0000, "grom", 0 )
+	ROM_LOAD( "grom0.bin", 0x00000, 0x20000, CRC(a29c688a) SHA1(32dbb996a5e4c23cfd44b79312ac4a767658f20a) )
+	ROM_LOAD( "grom1.bin", 0x20000, 0x20000, CRC(b52a23f6) SHA1(092961acf47875179b44342e2dd8955670e67ea2) )
+	ROM_LOAD( "grom2.bin", 0x40000, 0x20000, CRC(9b8e3a61) SHA1(1b5682b1328d6c97b604fb71512e8f72322a688f) )
+	ROM_LOAD( "grom3.bin", 0x60000, 0x20000, CRC(b6e9fb15) SHA1(c1b28ea911696cb4ed56bfba212848693530b59f) )
+	ROM_LOAD( "grom4.bin", 0x80000, 0x20000, CRC(faa16729) SHA1(5d46cddda66b6d23c9ebdf2fb4cebce15586b4ad) )
+	ROM_LOAD( "golf-grom5", 0xa0000, 0x10000, CRC(62a523d2) SHA1(431f89fa044bf0ed3c197745d9c1a61f666da658) )
+
+	ROM_REGION( 0x40000, "oki", 0 )
+	ROM_LOAD( "srom0.bin", 0x00000, 0x20000, CRC(1cccbfdf) SHA1(546059fea2e7cd5627a666d80b1fc3ed8fcc0762) )
+ROM_END
+
+ROM_START( gtgt1 )
 	ROM_REGION( 0x1c000, "maincpu", 0 )
 	ROM_LOAD( "pgm-u5.512", 0x04000, 0x4000, CRC(ec70b510) SHA1(318984d77eb1df6258b855781ae1c9a09aa74f15) )
 	ROM_CONTINUE(       0x10000, 0xc000 )
@@ -2148,6 +2168,7 @@ ROM_START( gtg2t )
 	ROM_REGION( 0x0200, "plds", 0 )
 	ROM_LOAD( "tibpal16l8.u11", 0x0000, 0x0104, CRC(9bf5a75f) SHA1(79786f7ce656f30a33a92887a290b767a7cbbf31) )
 ROM_END
+
 
 
 ROM_START( gtg2j )
@@ -2706,7 +2727,8 @@ GAME( 1989, grmatch,  0,        grmatch,           grmatch,  grmatch,  ROT0,   "
 GAME( 1990, stratab,  0,        stratab_hi,        stratab,  0,        ROT270, "Strata/Incredible Technologies", "Strata Bowling (V3)", 0 )
 GAME( 1990, stratab1, stratab,  stratab_hi,        stratab,  0,        ROT270, "Strata/Incredible Technologies", "Strata Bowling (V1)", 0 )
 GAME( 1990, gtg,      0,        stratab_hi,        gtg,      0,        ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf (Joystick, v3.1)", 0 )
-GAME( 1989, gtgt,     gtg,      stratab_hi,        gtgt,     0,        ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf (Trackball, v1.0)", 0 )
+GAME( 1989, gtgt,     gtg,      stratab_hi,        gtgt,     0,        ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf (Trackball, v2.0)", 0 )
+GAME( 1989, gtgt1,    gtg,      stratab_hi,        gtgt,     0,        ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf (Trackball, v1.0)", 0 )
 GAME( 1989, gtg2t,    gtg2,     stratab_hi,        gtg2t,    0,        ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf II (Trackball, V1.1)", 0 )
 GAME( 1991, gtg2j,    gtg2,     stratab_lo,        gtg,      0,        ROT0,   "Strata/Incredible Technologies", "Golden Tee Golf II (Joystick, V1.0)", 0 )
 

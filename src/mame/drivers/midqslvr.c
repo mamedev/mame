@@ -74,8 +74,9 @@ ROM_START( hydrthnd )
 	ROM_LOAD( "lh28f004sct.u8b1", 0x000000, 0x080000, CRC(ab04a343) SHA1(ba77933400fe470f45ab187bc0d315922caadb12) )
 
 	DISK_REGION( "disk" )
-	DISK_IMAGE( "hydro", 0, SHA1(3e9956dd4a62f540ea2900f857611ff9f035b76a) )
+	DISK_IMAGE( "hydro", 0,  SHA1(d481d178782943c066b41764628a419cd55f676d) )
 ROM_END
 
+// there are almost certainly multiple versions of these; updates were offered on floppy disk.  The version numbers for the existing CHDs are unknown.
 GAME(1999, hydrthnd, 0, midqslvr, midqslvr, 0, ROT0, "Midway Games", "Hydro Thunder", GAME_NO_SOUND|GAME_NOT_WORKING)
 GAME(2000, offrthnd, 0, midqslvr, midqslvr, 0, ROT0, "Midway Games", "Offroad Thunder", GAME_NO_SOUND|GAME_NOT_WORKING)
