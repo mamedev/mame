@@ -1611,10 +1611,10 @@ ROM_START( godzilla )
 	ROM_LOAD16_BYTE( "10.615",       0x000001, 0x010000, CRC(9c22bc13) SHA1(a94d9ed63ee1f5e358ebcaf517e6a1c986fa5d96) )
 
 	ROM_REGION( 0x800000, "gfx2", ROMREGION_ERASE00 )
-	ROM_LOAD( "obj3.743",     0x100000, 0x100000, CRC(5af0114e) SHA1(9362de9ade6db67ab0e3a2dfea580e688bbf7729) ) // unconfirmed
-	ROM_LOAD( "obj2.756",     0x200000, 0x100000, CRC(91c2a6a5) SHA1(0e9d9d94c3d99a54c6f9f99270e65682eb0a8b6a) ) // good
-	ROM_LOAD( "obj1.748",     0x300000, 0x100000, CRC(146bacb0) SHA1(1331f04f3d9e6236cec7524e9da1782ed1916ff7) ) // unconfirmed, this might be half size like denjinmk, same pcb..
-	ROM_LOAD( "obj4.757",     0x500000, 0x100000, CRC(7448b054) SHA1(5c08319329eb8c90b63e5393c0011bc39911ebbb) ) // good
+	ROM_LOAD( "obj1.748",     0x000000, 0x100000, BAD_DUMP CRC(146bacb0) SHA1(1331f04f3d9e6236cec7524e9da1782ed1916ff7) ) // unconfirmed, this is half size like it was denjinmk, same pcb..
+	ROM_LOAD( "obj2.756",     0x200000, 0x100000, BAD_DUMP CRC(91c2a6a5) SHA1(0e9d9d94c3d99a54c6f9f99270e65682eb0a8b6a) ) // unconfirmed, probably bad according to the next offset
+	ROM_LOAD( "obj3.743",     0x400000, 0x100000, BAD_DUMP CRC(5af0114e) SHA1(9362de9ade6db67ab0e3a2dfea580e688bbf7729) ) // unconfirmed, probably good
+	ROM_LOAD( "obj4.757",     0x500000, 0x100000, BAD_DUMP CRC(7448b054) SHA1(5c08319329eb8c90b63e5393c0011bc39911ebbb) ) // unconfirmed, probably good
 
 	ROM_REGION( 0x100000, "gfx3", 0 )	/* MBK tiles */
 	ROM_LOAD( "bg1.618",      0x000000, 0x100000, CRC(78fbbb84) SHA1(b1f5d4041bb88c5b2a561949239b11c3fd7c5fbc) )
