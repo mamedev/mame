@@ -489,10 +489,10 @@ static void sound_irq( running_device *device, int level )
 	cpu_set_input_line(state->soundcpu, 0, level);
 }
 
-static const ics2115_interface pgm_ics2115_interface =
+/*static const ics2115_interface pgm_ics2115_interface =
 {
 	sound_irq
-};
+};*/
 
 
 /* Calendar Emulation */
@@ -730,7 +730,7 @@ static ADDRESS_MAP_START( z80_mem, ADDRESS_SPACE_PROGRAM, 8 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( z80_io, ADDRESS_SPACE_IO, 8 )
-	AM_RANGE(0x8000, 0x8003) AM_DEVREADWRITE("ics", ics2115_r, ics2115_w)
+	AM_RANGE(0x8000, 0x8003) AM_DEVREADWRITE("ics", ics2115_device::read, ics2115_device::write)
 	AM_RANGE(0x8100, 0x81ff) AM_READWRITE(soundlatch3_r, z80_l3_w)
 	AM_RANGE(0x8200, 0x82ff) AM_READWRITE(soundlatch_r, soundlatch_w)
 	AM_RANGE(0x8400, 0x84ff) AM_READWRITE(soundlatch2_r, soundlatch2_w)
@@ -1401,8 +1401,9 @@ static MACHINE_CONFIG_START( pgm, pgm_state )
 
 	/*sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("ics", ICS2115, 0)
-	MDRV_SOUND_CONFIG(pgm_ics2115_interface)
+    MDRV_ICS2115_ADD("ics", 0, sound_irq)
+//	MDRV_SOUND_ADD("ics", ICS2115, 0)
+//	MDRV_SOUND_CONFIG(pgm_ics2115_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 5.0)
 MACHINE_CONFIG_END
 
@@ -1553,8 +1554,9 @@ static MACHINE_CONFIG_START( cavepgm, cavepgm_state )
 
 	/*sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("ics", ICS2115, 0)
-	MDRV_SOUND_CONFIG(pgm_ics2115_interface)
+    MDRV_ICS2115_ADD("ics", 0, sound_irq)
+    //MDRV_SOUND_ADD("ics", ICS2115, 0)
+	//MDRV_SOUND_CONFIG(pgm_ics2115_interface)
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 5.0)
 MACHINE_CONFIG_END
 
