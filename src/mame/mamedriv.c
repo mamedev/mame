@@ -8974,6 +8974,8 @@ Other Sun games
 	DRIVER( spaceint )	/* [1980] Shoei */
 	DRIVER( spaceintj )	/* [1980] Shoei */
 	DRIVER( spacefb )	/* (c) [1980?] Nintendo */
+	DRIVER( spacefbu )	/* (c) [1980?] Nintendo */
+	DRIVER( spacefbe )	/* (c) [1980?] Nintendo */
 	DRIVER( spacefbg )	/* 834-0031 (c) 1980 Gremlin */
 	DRIVER( spacefbb )	/* bootleg */
 	DRIVER( spacebrd )	/* bootleg */
