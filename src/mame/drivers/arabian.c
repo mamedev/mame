@@ -444,22 +444,9 @@ ROM_END
 
 /*************************************
  *
- *  Driver initialization
- *
- *************************************/
-
-static DRIVER_INIT( arabian )
-{
-	cputag_set_input_line(machine, "mcu", INPUT_LINE_RESET, ASSERT_LINE);
-}
-
-
-
-/*************************************
- *
  *  Game drivers
  *
  *************************************/
 
-GAME( 1983, arabian,  0,        arabian,  arabian,  arabian,  ROT270, "Sun Electronics",                 "Arabian",         GAME_SUPPORTS_SAVE )
-GAME( 1983, arabiana, arabian,  arabian,  arabiana, arabian,  ROT270, "Sun Electronics (Atari license)", "Arabian (Atari)", GAME_SUPPORTS_SAVE )
+GAME( 1983, arabian,  0,       arabian, arabian,  0, ROT270, "Sun Electronics",                 "Arabian",         GAME_SUPPORTS_SAVE )
+GAME( 1983, arabiana, arabian, arabian, arabiana, 0, ROT270, "Sun Electronics (Atari license)", "Arabian (Atari)", GAME_SUPPORTS_SAVE )
