@@ -246,11 +246,11 @@ static MACHINE_RESET( goindol )
 static MACHINE_CONFIG_START( goindol, goindol_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 6000000)        /* 6 MHz (?) */
+	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)	/* XTAL confirmed, divisor is not */
 	MDRV_CPU_PROGRAM_MAP(goindol_map)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audiocpu", Z80, 4000000)
+	MDRV_CPU_ADD("audiocpu", Z80, XTAL_12MHz/2)	/* XTAL confirmed, divisor is not */
 	MDRV_CPU_PROGRAM_MAP(sound_map)
 	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
 
@@ -275,7 +275,7 @@ static MACHINE_CONFIG_START( goindol, goindol_state )
 	/* sound hardware */
 	MDRV_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, 2000000)
+	MDRV_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/8)	/* Confirmed pitch from recording */
 	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
