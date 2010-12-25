@@ -851,6 +851,30 @@ ROM_START( mchampdxa )
 	ROM_LOAD( "esd4.su10", 0x00000, 0x40000, CRC(2fbe94ab) SHA1(1bc4a33ec93a80fb598722d2b50bdf3ccaaa984a) )
 ROM_END
 
+ROM_START( mchampdxb )
+	ROM_REGION( 0x080000, "maincpu", 0 )		/* 68000 Code */
+	ROM_LOAD16_BYTE( "esd2.cu02", 0x000000, 0x040000, CRC(d17b2616) SHA1(2c50c2bf928036678b92b8862d191552e46d9faa) )
+	ROM_LOAD16_BYTE( "esd1.cu03", 0x000001, 0x040000, CRC(11ff2e94) SHA1(30044bedfff514ae0a855cffa756e5c315fe2124) )
+
+	ROM_REGION( 0x44000, "audiocpu", 0 )		/* Z80 Code */
+	ROM_LOAD( "esd3.su06", 0x00000, 0x0c000, CRC(b87a1e85) SHA1(2fcdd7e8b301e3d20e6500a03dc293403b23b471) )
+	ROM_CONTINUE(          0x10000, 0x34000)
+
+	ROM_REGION( 0x600000, "gfx1", 0 )	/* Sprites, 16x16x5 */
+	ROM_LOAD( "ju01_ver1114", 0x200000, 0x200000, NO_DUMP )  // SMT Flash MX chips
+	ROM_LOAD( "ju02_ver1114", 0x000000, 0x200000, NO_DUMP )
+	/* expand this to take up 0x200000 bytes too so we can decode it */
+	ROM_LOAD16_BYTE( "esd5.ju07", 0x400000, 0x040000,  CRC(8175939f) SHA1(cd0132ae0d2e35dc656434989b1f0f255ad562ab) )
+	ROM_FILL(                             0x500000, 0x100000, 0 )
+
+	ROM_REGION( 0x400000, "gfx2", 0 )	/* Layers, 16x16x8 */
+	ROM_LOAD16_BYTE( "fu35_ver1114", 0x000000, 0x200000, NO_DUMP ) // SMT Flash MX chips
+	ROM_LOAD16_BYTE( "fu34_ver1114", 0x000001, 0x200000, NO_DUMP )
+
+	ROM_REGION( 0x40000, "oki", 0 )	/* Samples */
+	ROM_LOAD( "esd4.su10", 0x00000, 0x40000, CRC(2fbe94ab) SHA1(1bc4a33ec93a80fb598722d2b50bdf3ccaaa984a) )
+ROM_END
+
 /***************************************************************************
 
 PCB Layout (Head Panic)
@@ -1150,6 +1174,7 @@ GAME( 1998, multchmpk,multchmp, multchmp, multchmp, 0, ROT0, "ESD",         "Mul
 /* ESD 08-26-1999 */
 GAME( 2000, mchampdx, 0,        mchampdx, hedpanic, 0, ROT0, "ESD",         "Multi Champ Deluxe (ver. 0106, 06/01/2000)", GAME_SUPPORTS_SAVE ) // 06/01/2000 ?
 GAME( 1999, mchampdxa,mchampdx, mchampdx, hedpanic, 0, ROT0, "ESD",         "Multi Champ Deluxe (ver. 1126, 26/11/1999)", GAME_SUPPORTS_SAVE ) // 26/11/1999 ?
+GAME( 1999, mchampdxb,mchampdx, mchampdx, hedpanic, 0, ROT0, "ESD",         "Multi Champ Deluxe (ver. 1114, 14/11/1999)", GAME_SUPPORTS_SAVE | GAME_NOT_WORKING ) // 14/11/1999 ? needs correct GFX roms
 GAME( 2000, hedpanic, 0,        hedpanic, hedpanic, 0, ROT0, "ESD",         "Head Panic (ver. 0117, 17/01/2000)", GAME_SUPPORTS_SAVE ) // 17/01/2000 ?
 GAME( 2000, hedpanicf,hedpanic, hedpanic, hedpanic, 0, ROT0, "ESD / Fuuki", "Head Panic (ver. 0315, 15/03/2000)", GAME_SUPPORTS_SAVE ) // 15/03/2000 ?
 GAME( 1999, hedpanico,hedpanic, hedpanio, hedpanic, 0, ROT0, "ESD",         "Head Panic (ver. 0615, 15/06/1999)", GAME_SUPPORTS_SAVE ) // 15/06/1999 ?
