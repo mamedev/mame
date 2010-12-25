@@ -478,6 +478,39 @@ ROM_START( raidenu )
 	ROM_LOAD( "7.x10", 0x00000, 0x10000, CRC(2051263e) SHA1(dff96caa11adf619360d88704e3af8427ddfe524) )
 ROM_END
 
+/* from a board with 2 daughter cards, no official board #s? */
+ROM_START( raidenua )
+	ROM_REGION( 0x100000, "maincpu", 0 ) /* v30 main cpu */
+	ROM_LOAD16_BYTE( "1.uo253",     0x0a0000, 0x10000, CRC(a4b12785) SHA1(446314e82ce01315cb3e3d1f323eaa2ad6fb48dd) )
+	ROM_LOAD16_BYTE( "2.uo252",     0x0a0001, 0x10000, CRC(17640bd5) SHA1(5bbc99900426b1a072b52537ae9a50220c378a0d) )
+	ROM_LOAD16_BYTE( "3a.uo22",     0x0c0000, 0x20000, CRC(a8fadbdd) SHA1(a23729a51c45c1dba4e625503a37d111ae72ced0) )
+	ROM_LOAD16_BYTE( "4a.uo23",     0x0c0001, 0x20000, CRC(bafb268d) SHA1(132d3ebf9d9d5fffa3040338106fad428c54dbaa) )
+
+	ROM_REGION( 0x100000, "sub", 0 ) /* v30 sub cpu */
+	ROM_LOAD16_BYTE( "5.uo42",   0x0c0000, 0x20000, CRC(ed03562e) SHA1(bf6b44fb53fa2321cd52c00fcb43b8ceb6ceffff) )
+	ROM_LOAD16_BYTE( "6.uo43",   0x0c0001, 0x20000, CRC(a19d5b5d) SHA1(aa5e5be60b737913e5677f88ebc218302245e5af) )
+
+	ROM_REGION( 0x20000, "audiocpu", 0 ) /* 64k code for sound Z80 */
+	ROM_LOAD( "8.u214",   0x000000, 0x08000, CRC(cbe055c7) SHA1(34a06a541d059c621d87fdf41546c9d052a61963) ) // same as taiwan set
+	ROM_CONTINUE(             0x010000, 0x08000 )
+	ROM_COPY( "audiocpu", 0, 0x018000, 0x08000 )
+
+	ROM_REGION( 0x010000, "gfx1", 0 )
+	ROM_LOAD( "rai9.bin",     0x00000, 0x08000, CRC(1922b25e) SHA1(da27122dd1c43770e7385ad602ef397c64d2f754) ) /* chars */
+	ROM_LOAD( "rai10.bin",    0x08000, 0x08000, CRC(5f90786a) SHA1(4f63b07c6afbcf5196a433f3356bef984fe303ef) )
+
+	ROM_REGION( 0x080000, "gfx2", 0 )
+	ROM_LOAD( "raiu0919.bin", 0x00000, 0x80000, CRC(da151f0b) SHA1(02682497caf5f058331f18c652471829fa08d54f) ) /* tiles */
+
+	ROM_REGION( 0x080000, "gfx3", 0 )
+	ROM_LOAD( "raiu0920.bin", 0x00000, 0x80000, CRC(ac1f57ac) SHA1(1de926a0db73b99904ef119ac816c53d1551156a) ) /* tiles */
+
+	ROM_REGION( 0x090000, "gfx4", 0 )
+	ROM_LOAD( "raiu165.bin",  0x00000, 0x80000, CRC(946d7bde) SHA1(30e8755c2b1ca8bff6278710b8422b51f75eec10) ) /* sprites */
+
+	ROM_REGION( 0x40000, "oki", 0 )	 /* ADPCM samples */
+	ROM_LOAD( "7.u203", 0x00000, 0x10000, CRC(8f927822) SHA1(592f2719f2c448c3b4b239eeaec078b411e12dbb) )
+ROM_END
 
 /***************************************************************************/
 
@@ -565,7 +598,8 @@ static DRIVER_INIT( raidena )
 /***************************************************************************/
 
 GAME( 1990, raiden,  0,      raiden,  raiden, raiden,  ROT270, "Seibu Kaihatsu", "Raiden", 0 ) // main/sub/sound not encrypted
-GAME( 1990, raidenu, raiden, raidenu, raiden, raidenu, ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden (US, SEI8904 + SEI9008 PCBs)", 0 ) // main/sub not encrypted
+GAME( 1990, raidenu, raiden, raidenu, raiden, raidenu, ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden (US, set 1, SEI8904 + SEI9008 PCBs)", 0 ) // main/sub not encrypted
+GAME( 1990, raidenua,raiden, raidena, raiden, raidena, ROT270, "Seibu Kaihatsu (Fabtek license)", "Raiden (US, set 2)", 0 )
 GAME( 1990, raidena, raiden, raidena, raiden, raidena, ROT270, "Seibu Kaihatsu", "Raiden (Alternate Hardware)", 0 )
 GAME( 1990, raidenk, raiden, raidena, raiden, raidenk, ROT270, "Seibu Kaihatsu (IBL Corporation license)", "Raiden (Korea)", 0 ) // sound not encrypted
 GAME( 1990, raident, raiden, raidena, raiden, raidena, ROT270, "Seibu Kaihatsu (Liang HWA Electronics license)", "Raiden (Taiwan)", 0 )

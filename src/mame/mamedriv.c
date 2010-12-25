@@ -7377,6 +7377,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( raidenk )	/* (c) 1990 Seibu Kaihatsu + IBL Corporation license */
 	DRIVER( raident )	/* (c) 1990 Seibu Kaihatsu + Liang HWA Electronics license */
 	DRIVER( raidenu )	/* (c) 1990 Seibu Kaihatsu + Fabtek license */
+	DRIVER( raidenua )	/* (c) 1990 Seibu Kaihatsu + Fabtek license */
 	DRIVER( sdgndmps )	/* (c) Banpresto / Bandai (Japan) */
 	DRIVER( dcon )		/* (c) 1992 Success */
 	DRIVER( sengokmj )	/* (c) 1991 Sigma */
@@ -7782,6 +7783,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 	DRIVER( bang )		/* (c) 1998 - Ref ??? */
 	DRIVER( bangj )		/* (c) 1999 - Ref ??? */
 	DRIVER( grtesoro )	/* (c) 1999 - Ref ??? */
+	DRIVER( grtesoro4 )	/* (c) 1999 - Ref ??? */
 
 	/* Gaelco 3D games */
 	DRIVER( speedup )	/* (c) 1996 - Ref ??? */
@@ -8324,6 +8326,7 @@ Other Sun games
 	DRIVER( multchmpk )	/* (c) 1998 (Korea) */
 	DRIVER( mchampdx )	/* (c) 1999 ESD */
 	DRIVER( mchampdxa )	/* (c) 1999 ESD */
+	DRIVER( mchampdxb )	/* (c) 1999 ESD */
 	DRIVER( hedpanic )	/* (c) 2000 ESD */
 	DRIVER( hedpanicf )	/* (c) 2000 ESD + Fuuki, Co. Ltd. */
 	DRIVER( hedpanico )	/* (c) 1999 ESD */
