@@ -2016,6 +2016,8 @@ static READ16_HANDLER( generic_cop_r )
 	}
 }
 
+static UINT32 cop_sort_lookup,cop_sort_ram_addr,cop_sort_param;
+
 static UINT16 u1,u2;
 
 #define COP_CMD(_1_,_2_,_3_,_4_,_5_,_6_,_7_,_8_,_u1_,_u2_) \
@@ -2439,6 +2441,61 @@ static WRITE16_HANDLER( generic_cop_w )
 			printf("SRC: %08x %08x DST:%08x SIZE:%08x TRIGGER: %08x\n",cop_dma_src[cop_dma_trigger] << 6,cop_dma_src_param[cop_dma_trigger] * 0x400,cop_dma_dst[cop_dma_trigger] << 6,cop_dma_size[cop_dma_trigger] << 5,cop_dma_trigger);
 
 			//printf("SRC: %08x DST:%08x SIZE:%08x TRIGGER: %08x\n",dma_src,dma_dst,dma_size,dma_trigger);
+
+			break;
+		}
+
+		/* sort-DMA, oh my ... */
+		case (0x054/2): { cop_sort_lookup = (cop_sort_lookup&0x0000ffff)|(cop_mcu_ram[offset]<<16); break; }
+		case (0x056/2): { cop_sort_lookup = (cop_sort_lookup&0xffff0000)|(cop_mcu_ram[offset]<<0);  break; }
+		case (0x050/2): { cop_sort_ram_addr = (cop_sort_ram_addr&0x0000ffff)|(cop_mcu_ram[offset]<<16); break; }
+		case (0x052/2): { cop_sort_ram_addr = (cop_sort_ram_addr&0xffff0000)|(cop_mcu_ram[offset]<<0);  break; }
+		case (0x058/2): { cop_sort_param = cop_mcu_ram[offset]; break; }
+
+		case (0x2fe/2):
+		{
+			static UINT16 sort_size;
+
+			sort_size = cop_mcu_ram[offset];
+
+			{
+				static int i,j;
+				static UINT8 xchg_flag;
+				static UINT32 addri,addrj;
+				static UINT16 vali,valj;
+
+				/* TODO: use a better algorythm than bubble sort! */
+				for(i=2;i<sort_size;i+=2)
+				{
+					for(j=i-2;j<sort_size;j+=2)
+					{
+						addri = cop_sort_ram_addr+space->read_word(cop_sort_lookup+i);
+						addrj = cop_sort_ram_addr+space->read_word(cop_sort_lookup+j);
+
+						vali = space->read_word(addri);
+						valj = space->read_word(addrj);
+
+						//printf("%08x %08x %04x %04x\n",addri,addrj,vali,valj);
+
+						switch(cop_sort_param)
+						{
+							case 2:	xchg_flag = (vali > valj); break;
+							case 1: xchg_flag = (vali < valj); break;
+							default: xchg_flag = 0; printf("Warning: sort-DMA used with param %02x\n",cop_sort_param); break;
+						}
+
+						if(xchg_flag)
+						{
+							static UINT16 xch_val;
+
+							xch_val = space->read_word(cop_sort_lookup+i);
+							space->write_word(cop_sort_lookup+i,space->read_word(cop_sort_lookup+j));
+							space->write_word(cop_sort_lookup+j,xch_val);
+						}
+					}
+				}
+			}
+			//else
 
 			break;
 		}
