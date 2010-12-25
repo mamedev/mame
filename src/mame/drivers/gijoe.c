@@ -367,6 +367,39 @@ ROM_START( gijoe )
 	ROM_LOAD( "gijoe.nv", 0x0000, 0x080, CRC(a0d50a79) SHA1(972533ea45a0e84d9dd14c55f58cd7247926792e) )
 ROM_END
 
+// this set is strange, instead of showing program OK it shows the location and checksums of the ROMs
+// this doesn't indicate failure, as if you hack the parent set it will show the checksum and the word 'BAD' and refuse to boot
+// It will boot as whatever version string is in the EEPROM.  If no version string is in the EEPROM it just shows a blank string
+// If you factory default it you get the string 'EB8'
+// the roms had no proper labels
+// maybe it's some interim / test revision
+ROM_START( gijoea )
+	ROM_REGION( 0x100000, "maincpu", 0 )
+	ROM_LOAD16_BYTE( "rom3", 0x000000,  0x40000, CRC(0a11f63a) SHA1(06174682907e718017146665b8636be20843b119) )
+	ROM_LOAD16_BYTE( "rom2", 0x000001,  0x40000, CRC(8313c559) SHA1(00ae945c65439d4092eaa1780a182dbe3753bb02) )
+	ROM_LOAD16_BYTE( "069a12",       0x080000,  0x40000, CRC(75a7585c) SHA1(443d6dee99edbe81ab1b7289e6cad403fe01cc0d) )
+	ROM_LOAD16_BYTE( "069a11",       0x080001,  0x40000, CRC(3153e788) SHA1(fde4543eac707ef24b431e64011cf0f923d4d3ac) )
+
+	ROM_REGION( 0x010000, "audiocpu", 0 )
+	ROM_LOAD( "069a01", 0x000000, 0x010000, CRC(74172b99) SHA1(f5e0e0d43317454fdacd3df7cd3035fcae4aef68) )
+
+	ROM_REGION( 0x200000, "gfx1", 0 )
+	ROM_LOAD( "069a10", 0x000000, 0x100000, CRC(4c6743ee) SHA1(fa94fbfb55955fdb40705e79b49103676961d919) )
+	ROM_LOAD( "069a09", 0x100000, 0x100000, CRC(e6e36b05) SHA1(fecad503f2c285b2b0312e888c06dd6e87f95a07) )
+
+	ROM_REGION( 0x400000, "gfx2", 0 )
+	ROM_LOAD( "069a08", 0x000000, 0x100000, CRC(325477d4) SHA1(140c57b0ac9e5cf702d788f416408a5eeb5d6d3c) )
+	ROM_LOAD( "069a05", 0x100000, 0x100000, CRC(c4ab07ed) SHA1(dc806eff00937d9465b1726fae8fdc3022464a28) )
+	ROM_LOAD( "069a07", 0x200000, 0x100000, CRC(ccaa3971) SHA1(16989cbbd65fe1b41c4a85fea02ba1e9880818a9) )
+	ROM_LOAD( "069a06", 0x300000, 0x100000, CRC(63eba8e1) SHA1(aa318d356c2580765452106ea0d2228273a90523) )
+
+	ROM_REGION( 0x200000, "k054539", 0 )
+	ROM_LOAD( "069a04", 0x000000, 0x200000, CRC(11d6dcd6) SHA1(04cbff9f61cd8641db538db809ddf20da29fd5ac) )
+
+	ROM_REGION( 0x80, "eeprom", 0 ) // default eeprom
+	ROM_LOAD( "gijoea.nv", 0x0000, 0x080, CRC(64f5c87b) SHA1(af81abc54eb59ef7d2250b5ab6cc9642fbd9bfb2) )
+ROM_END
+
 ROM_START( gijoeu )
 	ROM_REGION( 0x100000, "maincpu", 0 )
 	ROM_LOAD16_BYTE("069uab03", 0x000000,  0x40000, CRC(25ff77d2) SHA1(bea2ae975718806698fd35ef1217bd842b2b69ec) )
@@ -422,6 +455,7 @@ ROM_START( gijoej )
 ROM_END
 
 
-GAME( 1992, gijoe,  0,     gijoe, gijoe, 0, ROT0, "Konami", "G.I. Joe (World)", GAME_SUPPORTS_SAVE )
-GAME( 1992, gijoeu, gijoe, gijoe, gijoe, 0, ROT0, "Konami", "G.I. Joe (US)", GAME_SUPPORTS_SAVE )
-GAME( 1992, gijoej, gijoe, gijoe, gijoe, 0, ROT0, "Konami", "G.I. Joe (Japan)", GAME_SUPPORTS_SAVE )
+GAME( 1992, gijoe,  0,     gijoe, gijoe, 0, ROT0, "Konami", "G.I. Joe (World, EAB, set 1)", GAME_SUPPORTS_SAVE )
+GAME( 1992, gijoea, gijoe, gijoe, gijoe, 0, ROT0, "Konami", "G.I. Joe (World, EB8, prototype?)", GAME_SUPPORTS_SAVE )
+GAME( 1992, gijoeu, gijoe, gijoe, gijoe, 0, ROT0, "Konami", "G.I. Joe (US, UAB)", GAME_SUPPORTS_SAVE )
+GAME( 1992, gijoej, gijoe, gijoe, gijoe, 0, ROT0, "Konami", "G.I. Joe (Japan, JAA)", GAME_SUPPORTS_SAVE )
