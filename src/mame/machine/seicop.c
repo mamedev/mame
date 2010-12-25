@@ -1480,16 +1480,6 @@ static void copd2_set_tabledata(running_machine *machine, UINT16 data)
 
 /*Movement protection*//*Legionnaire,Heated Barrel*/
 static UINT32 cop_register[6];
-/*Sprite DMA protection*//*SD Gundam*/
-static UINT8 dma_status;
-static UINT32 dma_src;
-static UINT16 prot_data[2],dma_size;
-/*Number protection*//*Heated Barrel,SD Gundam,Godzilla,Denjin Makai*/
-//static UINT32 prot_bcd[4];
-/*Hit check protection*//*Legionnaire,Heated Barrel,SD Gundam*/
-static UINT8 xy_check;
-
-
 
 
 #define CRT_MODE(_x_,_y_,_flip_) \
@@ -1502,130 +1492,6 @@ static UINT8 xy_check;
 	space->machine->primary_screen->configure(_x_, _y_, visarea, space->machine->primary_screen->frame_period().attoseconds ); \
 	flip_screen_set(space->machine, _flip_); \
 	} \
-
-
-
-static UINT16 hit_check;
-
-/*directional movement protection*/
-static void moveprot_jsr(address_space *space)
-{
-	static INT16 x_axis,y_axis;
-	static UINT16 move_data,distance,move_type;
-	move_data = space->read_word(cop_register[0]+0x36);
-	x_axis = space->read_word(cop_register[0]+0x08);
-	y_axis = space->read_word(cop_register[0]+0x04);
-
-	distance = (move_data & 0xf);
-	move_type = (move_data & 0xf0)>>4;
-	switch(move_type)
-	{
-		case 0x0f://right
-			space->write_word(cop_register[0]+0x08,x_axis+distance);
-			//space->write_word(0x110004,);
-			break;
-		case 0x0b://up
-			space->write_word(cop_register[0]+0x04,y_axis-distance);
-			break;
-		case 0x07://left
-			space->write_word(cop_register[0]+0x08,x_axis-distance);
-			break;
-		case 0x03://down
-			space->write_word(cop_register[0]+0x04,y_axis+distance);
-			break;
-		case 0x0d://up-right
-			space->write_word(cop_register[0]+0x08,x_axis+distance);
-			space->write_word(cop_register[0]+0x04,y_axis-distance);
-			break;
-		case 0x09://up-left
-			space->write_word(cop_register[0]+0x04,y_axis-distance);
-			space->write_word(cop_register[0]+0x08,x_axis-distance);
-			break;
-		case 0x01://down-right
-			space->write_word(cop_register[0]+0x04,y_axis+distance);
-			space->write_word(cop_register[0]+0x08,x_axis+distance);
-			break;
-		case 0x05://down-left
-			space->write_word(cop_register[0]+0x04,y_axis+distance);
-			space->write_word(cop_register[0]+0x08,x_axis-distance);
-			break;
-		default:
-			logerror("Warning: \"0x205\" command called with move_type parameter = %02x\n",move_type);
-
-			//down-right
-			//down-left
-	}
-	//space->write_word(0x110008,x_axis+tmp);
-	//space->write_word(0x110004,y_axis+tmp);
-
-	//space->write_word(0x110008,x_axis);
-	//space->write_word(0x110004,y_axis);
-}
-
-/*
-00454E: 3028 0008                move.w  ($8,A0), D0 ;player
-004552: 3228 000C                move.w  ($c,A0), D1
-004556: 342B 0008                move.w  ($8,A3), D2 ;enemy
-00455A: 362B 000C                move.w  ($c,A3), D3
-00455E: 33C0 0011 0048           move.w  D0, $110048.l ;player x
-004564: 33C1 0011 0044           move.w  D1, $110044.l ;player y
-00456A: 33C2 0011 0008           move.w  D2, $110008.l ;enemy x
-004570: 33C3 0011 0004           move.w  D3, $110004.l ;enemy y
-
-*/
-/*sprite "look" protection*/
-static void move2prot_jsr(address_space *space)
-{
-	static INT16 x_pl,y_pl,x_en,y_en,res;
-	x_pl = space->read_word(cop_register[1]+0x8);
-	y_pl = space->read_word(cop_register[1]+0x4);
-	x_en = space->read_word(cop_register[0]+0x8);
-	y_en = space->read_word(cop_register[0]+0x4);
-
-	res = 0;
-	if(x_en > x_pl)
-		res|=0x80;
-
-	if((x_en > x_pl-0x20) && (x_en < x_pl+0x20))
-		res|=0x40;
-//...
-	//if(y_en > y_pl)
-	//  res|=0x40;
-
-	space->write_word(cop_register[0]+0x36,res);
-}
-
-#ifdef UNUSED_FUNCTION
-/*"To point" movement protection*/
-static void move3x_prot_jsr(address_space *space)
-{
-	static INT16 x_pl,x_en,x_dis;
-	x_pl = space->read_word(cop_register[1]+0x8);
-	x_en = space->read_word(cop_register[0]+0x8);
-	x_dis = ((space->read_word(cop_register[0]+0x34) & 0xf0) >> 4);
-
-	if(x_en > x_pl)
-		x_dis^=0xffff;
-
-	space->write_word(cop_register[0]+0x36,-0x40);/*enable command*/
-	space->write_word(cop_register[0]+0x14,x_dis);
-}
-
-static void move3y_prot_jsr(address_space *space)
-{
-	static INT16 y_pl,y_en,y_dis;
-	y_pl = space->read_word(cop_register[1]+0x4);
-	y_en = space->read_word(cop_register[0]+0x4);
-	y_dis = (space->read_word(cop_register[0]+0x34) & 0xf);
-
-	if(y_en > y_pl)
-		y_dis^=0xffff;
-
-	space->write_word(cop_register[0]+0x36,-0x80);/*enable command*/
-	space->write_word(cop_register[0]+0x10,y_dis);
-}
-#endif
-
 
 
 
@@ -1725,6 +1591,7 @@ x/y check [2]
 
 */
 
+#ifdef UNUSED_FUNCTION
 static UINT16 s_i;
 
 static void dma_transfer(address_space *space)
@@ -1754,60 +1621,7 @@ static void dma_transfer(address_space *space)
 		dma_src+=6;
 	}
 }
-
-
-/*
-    switch(space->read_word(cop_register[2]))
-    {
-        case 0xb4: xparam = 0x0c/2; break;
-        case 0xb8: xparam = 0x10/2; break;
-        case 0xbc: xparam = 0x14/2; break;
-        case 0xc0: xparam = 0x18/2; break;
-        case 0xc4: xparam = 0x1c/2; break;
-        case 0xd4: xparam = 0x20/2; break;
-        ...
-        case 0xb0: xparam = 0x08/2;
-        case 0xac: xparam = 0x04/2;
-    }
-*/
-static UINT16 check_calc(UINT16 param)
-{
-	UINT16 num,i;
-
-	i = param;
-	i-=0xac;
-	i/=4;
-	num = (0x4/2);
-	for(;i>0;i--)
-		num+=(0x4/2);
-
-	return num;
-}
-
-static UINT16 hit_check_jsr(address_space *space)
-{
-	static INT16 xsrc,xdst,ysrc,ydst,xparam,yparam;
-	xsrc = (space->read_word(0x110008));
-	ysrc = (space->read_word(0x110004));
-	xdst = (space->read_word(0x110048));
-	ydst = (space->read_word(0x110044));
-
-	/*Here we check the destination sprite width*/
-	/*0x4a4/0x4c4*/
-	xparam = check_calc(space->read_word(cop_register[2]));
-	/*Here we check the destination sprite height*/
-	/*0x4a6/0x4c6*/
-	yparam = check_calc(space->read_word(cop_register[3]));
-
-	if(!xparam || !yparam)
-		popmessage("SRC:%04x %04x DST:%04x %04x V:%08x %08x",xsrc,ysrc,xdst,ydst,space->read_word(cop_register[2]),space->read_word(cop_register[3]));
-	if(xdst >= (xsrc-xparam) && ydst >= (ysrc-yparam) &&
-	   xdst <= (xsrc+xparam) && ydst <= (ysrc+yparam))
-		return 0;//sprites collide
-	else
-		return 3;//sprites do not collide
-}
-
+#endif
 
 
 /********************************************************************************************
@@ -1859,7 +1673,7 @@ WRITE16_HANDLER( copdxbl_0_w )
         400-5ff -  Protection writes
         *********************************************************************/
 
-
+		#if 0
 		case (0x4a0/2):
 		case (0x4a2/2):
 		case (0x4a4/2):
@@ -1896,6 +1710,7 @@ WRITE16_HANDLER( copdxbl_0_w )
 			//cop_run();
 			break;
 		}
+		#endif
 		case (0x604/2):
 		{
 			//C.R.T. Controller
@@ -1943,23 +1758,6 @@ WRITE16_HANDLER( copdxbl_0_w )
 			cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE );
 			break;
 		}
-		/*video regs (not scrollram,something else)*/
-		//case (0x660/2):
-		//case (0x662/2):
-		//case (0x664/2):
-		//case (0x666/2):
-		//case (0x668/2):
-		//case (0x66a/2):
-		//case (0x66c/2):
-		//case (0x66e/2):
-		//  break;
-		/*bootleg sound HW*/
-		/*case (0x740/2):
-        {
-            soundlatch_w(space, 1, data & 0x00ff);
-            cputag_set_input_line(space->machine, "audiocpu", INPUT_LINE_NMI, PULSE_LINE );
-            break;
-        }*/
 	}
 }
 
@@ -2183,6 +1981,8 @@ READ16_HANDLER( raiden2_cop2_r )
 */
 
 static UINT16 cop_status,cop_dist,cop_angle;
+static UINT16 cop_hit_status,cop_hit_internal_status;
+static UINT32 cop_hit_val;
 
 static READ16_HANDLER( generic_cop_r )
 {
@@ -2192,6 +1992,15 @@ static READ16_HANDLER( generic_cop_r )
 
 	switch (offset)
 	{
+		case 0x180/2:
+			return cop_hit_status;
+
+		case 0x182/2:
+			return (cop_hit_val & 0xffff0000) >> 16;
+
+		case 0x184/2:
+			return cop_hit_val & 0xffff;
+
 		case 0x1b0/2:
 			return cop_status;
 
@@ -2208,8 +2017,6 @@ static READ16_HANDLER( generic_cop_r )
 }
 
 static UINT16 u1,u2;
-
-static UINT16 test;
 
 #define COP_CMD(_1_,_2_,_3_,_4_,_5_,_6_,_7_,_8_,_u1_,_u2_) \
 	(copd2_table[command+0] == _1_ && copd2_table[command+1] == _2_ && copd2_table[command+2] == _3_ && copd2_table[command+3] == _4_ && \
@@ -2251,12 +2058,6 @@ static WRITE16_HANDLER( generic_cop_w )
 		case (0x038/2):	{ cop_438 = data; break; }
 		case (0x03a/2):	{ cop_43a = data; break; }
 		case (0x03c/2): { cop_43c = data; break; }
-
-		case (0x040/2):
-		{
-			test = data;
-			break;
-		}
 
 		/* DMA / layer clearing */
 		case (0x076/2):
@@ -2464,23 +2265,91 @@ static WRITE16_HANDLER( generic_cop_w )
 				return;
 			}
 
-			if(0)
+			#if 0
 			if(COP_CMD(0x194,0x288,0x088,0x000,0x000,0x000,0x000,0x000,6,0xfbfb))
 			{
 
 			}
+			#endif
 
-			if(cop_mcu_ram[offset] == 0xa100)
-				return;
+			/*
+				collision detection:
 
-			if(cop_mcu_ram[offset] == 0xb080)
-				return;
+				int dy_0 = space->read_dword(cop_register[0]+4);
+				int dx_0 = space->read_dword(cop_register[0]+8);
+				int dy_1 = space->read_dword(cop_register[1]+4);
+				int dx_1 = space->read_dword(cop_register[1]+8);
+				int hitbox_param1 = space->read_dword(cop_register[2]);
+				int hitbox_param2 = space->read_dword(cop_register[3]);
 
-			if(cop_mcu_ram[offset] == 0xa900)
-				return;
 
-			if(cop_mcu_ram[offset] == 0xb880)
+			*/
+
+			/* note: these four are bad! */
+			if(COP_CMD(0xb80,0xb82,0xb84,0xb86,0x000,0x000,0x000,0x000,0,0xffff))
+			{
+				int dy = space->read_dword(cop_register[1]+4) - space->read_dword(cop_register[0]+4);
+				int hb = space->read_dword(cop_register[3]) - space->read_dword(cop_register[2]);
+
+				if(dy <= (hb))
+					cop_hit_internal_status &= ~1;
+				else
+					cop_hit_internal_status |= 1;
+
+				cop_hit_status = ((cop_hit_internal_status & 0xf)) ? 1 : 0;
+
 				return;
+			}
+
+			//(heatbrl)  | 9 | ffff | b080 | b40 bc0 bc2
+			if(COP_CMD(0xb40,0xbc0,0xbc2,0x000,0x000,0x000,0x000,0x000,9,0xffff))
+			{
+				int dy = space->read_dword(cop_register[1]+4) - space->read_dword(cop_register[0]+4);
+
+				if(dy >= 0)
+					cop_hit_internal_status &= ~2;
+				else
+					cop_hit_internal_status |= 2;
+
+				cop_hit_status = ((cop_hit_internal_status & 0xf)) ? 1 : 0;
+
+				return;
+			}
+
+			if(COP_CMD(0xba0,0xba2,0xba4,0xba6,0x000,0x000,0x000,0x000,15,0xffff))
+			{
+				int dx = space->read_dword(cop_register[1]+8) - space->read_dword(cop_register[0]+8);
+				int hb = space->read_dword(cop_register[3]) - space->read_dword(cop_register[2]);
+
+				if(dx <= (hb))
+					cop_hit_internal_status &= ~4;
+				else
+					cop_hit_internal_status |= 4;
+
+				cop_hit_status = ((cop_hit_internal_status & 0xf)) ? 1 : 0;
+
+				return;
+			}
+
+			//(heatbrl)  | 6 | ffff | b880 | b60 be0 be2
+			if(COP_CMD(0xb60,0xbe0,0xbe2,0x000,0x000,0x000,0x000,0x000,6,0xffff))
+			{
+				int dx = space->read_dword(cop_register[1]+8) - space->read_dword(cop_register[0]+8);
+
+				//printf("4: %08x %08x\n",dx_0,dx_1);
+
+				//if((space->read_word(cop_register[3]) & 0xff00) == 0x0600)
+				//popmessage("%04x %04x %04x %04x %04x %04x %08x %08x\n",space->read_word(cop_register[0]+4),space->read_word(cop_register[0]+8),space->read_word(cop_register[1]+4),space->read_word(cop_register[1]+8),space->read_word(cop_register[2]),space->read_word(cop_register[3]),cop_register[2],cop_register[3]);
+
+				if(dx >= 0)
+					cop_hit_internal_status &= ~8;
+				else
+					cop_hit_internal_status |= 8;
+
+				cop_hit_status = ((cop_hit_internal_status & 0xf)) ? 1 : 0;
+
+				return;
+			}
 
 			//printf("%04x\n",cop_mcu_ram[offset]);
 
@@ -2567,6 +2436,8 @@ static WRITE16_HANDLER( generic_cop_w )
 			/* private buffer copies */
 			if ((cop_dma_trigger==0x14) || (cop_dma_trigger==0x15)) return;
 
+			printf("SRC: %08x %08x DST:%08x SIZE:%08x TRIGGER: %08x\n",cop_dma_src[cop_dma_trigger] << 6,cop_dma_src_param[cop_dma_trigger] * 0x400,cop_dma_dst[cop_dma_trigger] << 6,cop_dma_size[cop_dma_trigger] << 5,cop_dma_trigger);
+
 			//printf("SRC: %08x DST:%08x SIZE:%08x TRIGGER: %08x\n",dma_src,dma_dst,dma_size,dma_trigger);
 
 			break;
@@ -2584,15 +2455,6 @@ READ16_HANDLER( heatbrl_mcu_r )
 	{
 		default:
 			return generic_cop_r(space, offset, mem_mask);
-
-	    /*********************************************************************
-        400-5ff -  Protection reads
-        *********************************************************************/
-
-		case (0x180/2):	//{ return xy_check; } /*hit protection*/
-		case (0x182/2):	//{ if(input_code_pressed(space->machine, KEYCODE_X)) { return 0; } else { return 3; } } /*---- ---- ---- --xx used bits*/
-		case (0x184/2):	//{ if(input_code_pressed(space->machine, KEYCODE_C)) { return 0; } else { return 3; } } /*---- ---- ---- --xx used bits*/
-			return 0xffff;
 
 		/*********************************************************************
         700-7ff - Non-protection reads
@@ -2995,9 +2857,7 @@ READ16_HANDLER( grainbow_mcu_r )
 		default:
 			return generic_cop_r(space, offset, mem_mask);
 
-		/*hit protection*/
-		case (0x180/2): { return xy_check; }
-
+		#if 0
 		case (0x1b0/2):
 			return 2;
 			// FIXME: this code is never reached
@@ -3008,6 +2868,7 @@ READ16_HANDLER( grainbow_mcu_r )
 				return 2;
 			}
 			return cop_mcu_ram[offset];
+		#endif
 
 		/* Non-protection reads */
 		case (0x308/2): return seibu_main_word_r(space,2,0xffff);
@@ -3038,79 +2899,12 @@ WRITE16_HANDLER( grainbow_mcu_w )
         400-5ff -  Protection writes
         *********************************************************************/
 
+		#if 0
 		case (0x00c/2): { dma_size = cop_mcu_ram[offset]; break; }
-
 		/*DMA source address*/
 		case (0x012/2): { prot_data[1] = cop_mcu_ram[offset]; dma_src = (prot_data[0]&0xffff)|((prot_data[1]&0xffff)<<16); break; }
 		case (0x014/2): { prot_data[0] = cop_mcu_ram[offset]; dma_src = (prot_data[0]&0xffff)|((prot_data[1]&0xffff)<<16); break; }
-
-		/* Execute Macro Command */
-		case (0x100/2):
-		{
-			switch(cop_mcu_ram[offset])
-			{
-				case 0xa180:/*do the job [1]*/
-				{
-					//popmessage("%08x %08x %04x",dma_src,cop_register[5]+4,dma_size);
-					/*fix the offset for easier reading*/
-					dma_src+=4;
-					//cop_register[5]+=4;
-					s_i = dma_size;
-					//cop_register[5]+=((space->read_word(0x110000) & 0x000f) * 8);
-					//space->write_word(0x1004c8,cop_register[5] & 0xffff);
-					//dma_status = 1;
-					break;
-				}
-				case 0xb100:
-					break;
-				case 0xa980:
-					break;
-				case 0xb900:
-				{
-					xy_check = hit_check_jsr(space);
-					break;
-				}
-				/*bullet movement protection,conflicts with [3],will be worked out*/
-				case 0x8100:
-				{
-					//move3x_prot_jsr(space);
-					break;
-				}
-				case 0x8900:
-				{
-					//move3y_prot_jsr(space);
-					break;
-				}
-				case 0x0205:/*do the job [3]*/
-				{
-					moveprot_jsr(space);
-					break;
-				}
-				case 0x138e:/*do the job [4]*/
-					break;
-				case 0x3bb0:
-				{
-					move2prot_jsr(space);
-					break;
-				}
-				default:
-					seibu_cop_log("DMA CMD 0x500 with parameter = %04x PC = %08x\n",cop_mcu_ram[offset],cpu_get_previouspc(space->cpu));
-			}
-			break;
-		}
-
-		case (0x102/2):
-		{
-			if(cop_mcu_ram[offset] == 0xc480)
-			{
-				if(0)
-				dma_transfer(space);
-				s_i--;
-				if(s_i == 0)
-					dma_status = 1;
-			}
-			break;
-		}
+		#endif
 
 		/*Layer Enable,bit wise active low*/
 		case (0x21c/2):
@@ -3206,15 +3000,6 @@ READ16_HANDLER( legionna_mcu_r )
 		/*********************************************************************
         400-5ff -  Protection reads
         *********************************************************************/
-
-		case (0x070/2):	return (mame_rand(space->machine) &0xffff); /* read PC $110a, could be some sort of control word:  sometimes a bit is changed then it's poked back in... */
-		case (0x182/2):	return (0); /* read PC $3594 */
-		case (0x184/2):	return (0); /* read PC $3588 */
-		case (0x186/2):	return (0); /* read PC $35a0 */
-		case (0x188/2):	return hit_check; /* read PC $3580 */
-		case (0x1b0/2):	return (0); /* bit 15 is branched on a few times in the $3300 area */
-		case (0x1b4/2):	return (0); /* read and stored in ram before +0x5b0 bit 15 tested */
-
 
 		/*********************************************************************
         700-7ff - Non-protection reads
