@@ -6795,6 +6795,7 @@ BOMULEUL CHAJARA SEGA ST-V  1997/04/11
 
 	/* The BrezzaSoft games don't have proper ID codes */
 	DRIVER( jockeygp )
+	DRIVER( jockeygpa )
 	DRIVER( vliner )
 	DRIVER( vlinero )
 
