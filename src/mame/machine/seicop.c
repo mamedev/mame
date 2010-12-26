@@ -1477,24 +1477,25 @@ static void copd2_set_tabledata(running_machine *machine, UINT16 data)
 #endif
 }
 
-
-/*Movement protection*//*Legionnaire,Heated Barrel*/
 static UINT32 cop_register[6];
+static UINT16 seibu_vregs[0x50/2];
 
+static WRITE16_HANDLER( seibu_common_video_regs_w )
+{
+	COMBINE_DATA(&seibu_vregs[offset]);
 
-#define CRT_MODE(_x_,_y_,_flip_) \
-	{ \
-	rectangle visarea; \
-	visarea.min_x = 0; \
-	visarea.max_x = _x_-1; \
-	visarea.min_y = 0; \
-	visarea.max_y = _y_-1; \
-	space->machine->primary_screen->configure(_x_, _y_, visarea, space->machine->primary_screen->frame_period().attoseconds ); \
-	flip_screen_set(space->machine, _flip_); \
-	} \
-
-
-
+	switch(offset)
+	{
+		case (0x01a/2): { flip_screen_set(space->machine, seibu_vregs[offset] & 0x01); break; }
+		case (0x01c/2): { legionna_layer_disable =  seibu_vregs[offset]; break; }
+		case (0x020/2): { legionna_scrollram16[0] = seibu_vregs[offset]; break; }
+		case (0x022/2): { legionna_scrollram16[1] = seibu_vregs[offset]; break; }
+		case (0x024/2): { legionna_scrollram16[2] = seibu_vregs[offset]; break; }
+		case (0x026/2): { legionna_scrollram16[3] = seibu_vregs[offset]; break; }
+		case (0x028/2): { legionna_scrollram16[4] = seibu_vregs[offset]; break; }
+		case (0x02a/2): { legionna_scrollram16[5] = seibu_vregs[offset]; break; }
+	}
+}
 
 
 /*
@@ -1711,37 +1712,7 @@ WRITE16_HANDLER( copdxbl_0_w )
 			break;
 		}
 		#endif
-		case (0x604/2):
-		{
-			//C.R.T. Controller
-			/*
-            data = setting
-            0x01e = 320x256         ---- ---x xxx-
-            0x0e1 = 320x256 REVERSE ---- xxx- ---x
-            0x016 = 320x240         ---- ---x -xx-
-            0x0e9 = 320x240 REVERSE ---- xxx- x--x
-            0x004 = 320x224         ---- ---- -x--
-            0x10b = 320x224 REVERSE ---x ---- x-xx
-            For now we use this by cases and not per bits.
-            */
 
-			switch(data)
-			{
-				case 0x0000:
-				case 0x001e: CRT_MODE(320,256,0); break;
-				case 0x00e1: CRT_MODE(320,256,1); break;
-				case 0x0016: CRT_MODE(320,240,0); break;
-				case 0x00e9: CRT_MODE(320,240,1); break;
-				case 0x0004: CRT_MODE(320,224,0); break;
-				case 0x010b: CRT_MODE(320,224,1); break;
-				default:
-				#ifdef MAME_DEBUG
-				popmessage("Warning: Undefined CRT Mode %04x",data);
-				#endif
-				CRT_MODE(320,256,0);
-			}
-			break;
-		}
 		/*TODO: kludge on x-axis.*/
 		case (0x660/2): { legionna_scrollram16[0] = cop_mcu_ram[offset] - 0x1f0; break; }
 		case (0x662/2): { legionna_scrollram16[1] = cop_mcu_ram[offset]; break; }
@@ -1983,6 +1954,15 @@ READ16_HANDLER( raiden2_cop2_r )
 static UINT16 cop_status,cop_dist,cop_angle;
 static UINT16 cop_hit_status,cop_hit_internal_status;
 static UINT32 cop_hit_val;
+static UINT32 cop_sort_lookup,cop_sort_ram_addr,cop_sort_param;
+
+static UINT16 u1,u2;
+
+#define COP_CMD(_1_,_2_,_3_,_4_,_5_,_6_,_7_,_8_,_u1_,_u2_) \
+	(copd2_table[command+0] == _1_ && copd2_table[command+1] == _2_ && copd2_table[command+2] == _3_ && copd2_table[command+3] == _4_ && \
+	copd2_table[command+4] == _5_ && copd2_table[command+5] == _6_ && copd2_table[command+6] == _7_ && copd2_table[command+7] == _8_ && \
+	u1 == _u1_ && u2 == _u2_) \
+
 
 static READ16_HANDLER( generic_cop_r )
 {
@@ -2015,15 +1995,6 @@ static READ16_HANDLER( generic_cop_r )
 			return retvalue;
 	}
 }
-
-static UINT32 cop_sort_lookup,cop_sort_ram_addr,cop_sort_param;
-
-static UINT16 u1,u2;
-
-#define COP_CMD(_1_,_2_,_3_,_4_,_5_,_6_,_7_,_8_,_u1_,_u2_) \
-	(copd2_table[command+0] == _1_ && copd2_table[command+1] == _2_ && copd2_table[command+2] == _3_ && copd2_table[command+3] == _4_ && \
-	copd2_table[command+4] == _5_ && copd2_table[command+5] == _6_ && copd2_table[command+6] == _7_ && copd2_table[command+7] == _8_ && \
-	u1 == _u1_ && u2 == _u2_) \
 
 static WRITE16_HANDLER( generic_cop_w )
 {
@@ -2069,21 +2040,21 @@ static WRITE16_HANDLER( generic_cop_w )
 		case (0x078/2): /* clear address */
 		{
 			cop_dma_src[cop_dma_trigger] = data; // << 6 to get actual address
-			seibu_cop_log("%06x: COPX set layer clear address to %04x (actual %08x)\n", cpu_get_pc(space->cpu), data, data<<6);
+			//seibu_cop_log("%06x: COPX set layer clear address to %04x (actual %08x)\n", cpu_get_pc(space->cpu), data, data<<6);
 			break;
 		}
 
 		case (0x07a/2): /* clear length */
 		{
 			cop_dma_size[cop_dma_trigger] = data;
-			seibu_cop_log("%06x: COPX set layer clear length to %04x (actual %08x)\n", cpu_get_pc(space->cpu), data, data<<5);
+			//seibu_cop_log("%06x: COPX set layer clear length to %04x (actual %08x)\n", cpu_get_pc(space->cpu), data, data<<5);
 			break;
 		}
 
 		case (0x07c/2): /* clear value? */
 		{
 			cop_dma_dst[cop_dma_trigger] = data;
-			seibu_cop_log("%06x: COPX set layer clear value to %04x (actual %08x)\n", cpu_get_pc(space->cpu), data, data<<6);
+			//seibu_cop_log("%06x: COPX set layer clear value to %04x (actual %08x)\n", cpu_get_pc(space->cpu), data, data<<6);
 			break;
 		}
 
@@ -2091,10 +2062,10 @@ static WRITE16_HANDLER( generic_cop_w )
 		case (0x07e/2):
 		{
 			cop_dma_trigger = data;
-			seibu_cop_log("%06x: COPX set layer clear trigger? to %04x\n", cpu_get_pc(space->cpu), data);
+			//seibu_cop_log("%06x: COPX set layer clear trigger? to %04x\n", cpu_get_pc(space->cpu), data);
 			if (data>=0x1ff)
 			{
-				seibu_cop_log("invalid!, >0x1ff\n");
+				seibu_cop_log("invalid DMA trigger!, >0x1ff\n");
 				cop_dma_trigger = 0;
 			}
 
@@ -2341,7 +2312,7 @@ static WRITE16_HANDLER( generic_cop_w )
 				//printf("4: %08x %08x\n",dx_0,dx_1);
 
 				//if((space->read_word(cop_register[3]) & 0xff00) == 0x0600)
-				//popmessage("%04x %04x %04x %04x %04x %04x %08x %08x\n",space->read_word(cop_register[0]+4),space->read_word(cop_register[0]+8),space->read_word(cop_register[1]+4),space->read_word(cop_register[1]+8),space->read_word(cop_register[2]),space->read_word(cop_register[3]),cop_register[2],cop_register[3]);
+				popmessage("%04x %04x %04x %04x %04x %04x %08x %08x\n",space->read_word(cop_register[0]+4),space->read_word(cop_register[0]+8),space->read_word(cop_register[1]+4),space->read_word(cop_register[1]+8),space->read_word(cop_register[2]),space->read_word(cop_register[3]),cop_register[2],cop_register[3]);
 
 				if(dx >= 0)
 					cop_hit_internal_status &= ~8;
@@ -2362,7 +2333,7 @@ static WRITE16_HANDLER( generic_cop_w )
 		/* hmm, this would be strange the 6xx range should be video regs?? */
 		case (0x2fc/2):
 		{
-			seibu_cop_log("%06x: COPX execute current layer clear??? %04x\n", cpu_get_pc(space->cpu), data);
+			//seibu_cop_log("%06x: COPX execute current layer clear??? %04x\n", cpu_get_pc(space->cpu), data);
 
 			if (cop_dma_trigger >= 0x80 && cop_dma_trigger <= 0x87)
 			{
@@ -2534,6 +2505,12 @@ WRITE16_HANDLER( heatbrl_mcu_w )
 {
 	COMBINE_DATA(&cop_mcu_ram[offset]);
 
+	if(offset >= 0x240/2 && offset <= 0x28f/2)
+	{
+		seibu_common_video_regs_w(space,offset-0x240/2,cop_mcu_ram[offset],mem_mask);
+		return;
+	}
+
 	switch (offset)
 	{
 		default:
@@ -2546,56 +2523,6 @@ WRITE16_HANDLER( heatbrl_mcu_w )
 
 		/* Odd, this is a video register */
 		case (0x070/2): { heatbrl_setgfxbank( cop_mcu_ram[offset] ); break; }
-
-#if 0 // turn off to get the generic sequence logging
-		/* Macros Command Trigger */
-		case (0x100/2):
-		{
-			switch(cop_mcu_ram[offset])
-			{
-				case 0x8100:
-					break;
-				case 0x8900:
-				{
-					cop2_move3_prot(space);
-					break;
-				}
-				case 0x205:
-				{
-					cop2_move2_prot(space);
-					break;
-				}
-				case 0xa100:
-					break;
-				case 0xb080:
-					break;
-				case 0xa900:
-					break;
-				case 0xb880:
-				{
-					xy_check = cop2_hit_prot(space);
-					break;
-				}
-				default:
-					seibu_cop_log("DMA CMD 0x500 with parameter = %04x PC = %08x\n",cop_mcu_ram[offset],cpu_get_previouspc(space->cpu));
-			}
-			break;
-		}
-#endif
-
-		/*********************************************************************
-        600-6ff - Video Registers
-        *********************************************************************/
-
-		// 65a bit 0 is flipscreen
-		case (0x25c/2): { legionna_layer_disable = cop_mcu_ram[offset]; break; } // 65c probably layer disables, like Dcon? Used on screen when you press P1-4 start (values 13, 11, 0 seen)
-		// 660 - 66a scroll control;  is there a layer priority switch...?
-		case (0x260/2): { legionna_scrollram16[0] = cop_mcu_ram[offset]; break; }
-		case (0x262/2): { legionna_scrollram16[1] = cop_mcu_ram[offset]; break; }
-		case (0x264/2): { legionna_scrollram16[2] = cop_mcu_ram[offset]; break; }
-		case (0x266/2): { legionna_scrollram16[3] = cop_mcu_ram[offset]; break; }
-		case (0x268/2): { legionna_scrollram16[4] = cop_mcu_ram[offset]; break; }
-		case (0x26a/2): { legionna_scrollram16[5] = cop_mcu_ram[offset]; break; }
 
 		/*********************************************************************
         700-7ff - Output (Seibu Sound System)
@@ -2642,7 +2569,11 @@ WRITE16_HANDLER( cupsoc_mcu_w )
 {
 	COMBINE_DATA(&cop_mcu_ram[offset]);
 
-	seibu_cop_log("%06x: Legionna write data %04x at offset %04x\n", cpu_get_pc(space->cpu), data, offset*2);
+	if(offset >= 0x200/2 && offset <= 0x24f/2)
+	{
+		seibu_common_video_regs_w(space,offset-0x200/2,cop_mcu_ram[offset],mem_mask);
+		return;
+	}
 
 	switch (offset)
 	{
@@ -2653,49 +2584,6 @@ WRITE16_HANDLER( cupsoc_mcu_w )
 		/*********************************************************************
         400-5ff -  Protection writes
         *********************************************************************/
-
-		/* Video Regs */
-		case (0x204/2):
-		{
-			//C.R.T. Controller
-			/*
-            data = setting
-            0x01e = 320x256         ---- ---x xxx-
-            0x0e1 = 320x256 REVERSE ---- xxx- ---x
-            0x016 = 320x240         ---- ---x -xx-
-            0x0e9 = 320x240 REVERSE ---- xxx- x--x
-            0x004 = 320x224         ---- ---- -x--
-            0x10b = 320x224 REVERSE ---x ---- x-xx
-            For now we use this by cases and not per bits.
-            */
-
-			switch(data)
-			{
-				case 0x0000:
-				case 0x001e: CRT_MODE(320,256,0); break;
-				case 0x00e1: CRT_MODE(320,256,1); break;
-				case 0x0016: CRT_MODE(320,240,0); break;
-				case 0x00e9: CRT_MODE(320,240,1); break;
-				case 0x0004: CRT_MODE(320,224,0); break;
-				case 0x010b: CRT_MODE(320,224,1); break;
-				default:
-				#ifdef MAME_DEBUG
-				popmessage("Warning: Undefined CRT Mode %04x",data);
-				#endif
-				CRT_MODE(320,256,0);
-			}
-			break;
-		}
-
-		case (0x21c/2): { grainbow_pri_n = cop_mcu_ram[offset]; break; }
-		case (0x220/2): { legionna_scrollram16[0] = cop_mcu_ram[offset]; break; }
-		case (0x222/2): { legionna_scrollram16[1] = cop_mcu_ram[offset]; break; }
-		case (0x224/2): { legionna_scrollram16[2] = cop_mcu_ram[offset]; break; }
-		case (0x226/2): { legionna_scrollram16[3] = cop_mcu_ram[offset]; break; }
-		case (0x228/2): { legionna_scrollram16[4] = cop_mcu_ram[offset]; break; }
-		case (0x22a/2): { legionna_scrollram16[5] = cop_mcu_ram[offset]; break; }
-		//case (0x238/2): { legionna_scrollram16[6] = cop_mcu_ram[offset]; break; }
-		//case (0x23a/2): { legionna_scrollram16[7] = cop_mcu_ram[offset]; break; }
 
 		case (0x300/2):	{ seibu_main_word_w(space,0,cop_mcu_ram[offset],0x00ff); break; }
 		case (0x304/2):	{ seibu_main_word_w(space,1,cop_mcu_ram[offset],0x00ff); break; }
@@ -2733,7 +2621,11 @@ WRITE16_HANDLER( cupsocs_mcu_w )
 {
 	COMBINE_DATA(&cop_mcu_ram[offset]);
 
-	seibu_cop_log("%06x: Legionna write data %04x at offset %04x\n", cpu_get_pc(space->cpu), data, offset*2);
+	if(offset >= 0x240/2 && offset <= 0x28f/2)
+	{
+		seibu_common_video_regs_w(space,offset-0x240/2,cop_mcu_ram[offset],mem_mask);
+		return;
+	}
 
 	switch (offset)
 	{
@@ -2744,49 +2636,6 @@ WRITE16_HANDLER( cupsocs_mcu_w )
 		/*********************************************************************
         400-5ff -  Protection writes
         *********************************************************************/
-
-		/* Video Regs */
-		case (0x204/2):
-		{
-			//C.R.T. Controller
-			/*
-            data = setting
-            0x01e = 320x256         ---- ---x xxx-
-            0x0e1 = 320x256 REVERSE ---- xxx- ---x
-            0x016 = 320x240         ---- ---x -xx-
-            0x0e9 = 320x240 REVERSE ---- xxx- x--x
-            0x004 = 320x224         ---- ---- -x--
-            0x10b = 320x224 REVERSE ---x ---- x-xx
-            For now we use this by cases and not per bits.
-            */
-
-			switch(data)
-			{
-				case 0x0000:
-				case 0x001e: CRT_MODE(320,256,0); break;
-				case 0x00e1: CRT_MODE(320,256,1); break;
-				case 0x0016: CRT_MODE(320,240,0); break;
-				case 0x00e9: CRT_MODE(320,240,1); break;
-				case 0x0004: CRT_MODE(320,224,0); break;
-				case 0x010b: CRT_MODE(320,224,1); break;
-				default:
-				#ifdef MAME_DEBUG
-				popmessage("Warning: Undefined CRT Mode %04x",data);
-				#endif
-				CRT_MODE(320,256,0);
-			}
-			break;
-		}
-
-		case (0x25c/2): { grainbow_pri_n = cop_mcu_ram[offset]; break; }
-		case (0x260/2): { legionna_scrollram16[0] = cop_mcu_ram[offset]; break; }
-		case (0x262/2): { legionna_scrollram16[1] = cop_mcu_ram[offset]; break; }
-		case (0x264/2): { legionna_scrollram16[2] = cop_mcu_ram[offset]; break; }
-		case (0x266/2): { legionna_scrollram16[3] = cop_mcu_ram[offset]; break; }
-		case (0x268/2): { legionna_scrollram16[4] = cop_mcu_ram[offset]; break; }
-		case (0x26a/2): { legionna_scrollram16[5] = cop_mcu_ram[offset]; break; }
-		//case (0x238/2): { legionna_scrollram16[6] = cop_mcu_ram[offset]; break; }
-		//case (0x23a/2): { legionna_scrollram16[7] = cop_mcu_ram[offset]; break; }
 
 		case (0x340/2):	{ seibu_main_word_w(space,0,cop_mcu_ram[offset],0x00ff); break; }
 		case (0x344/2):	{ seibu_main_word_w(space,1,cop_mcu_ram[offset],0x00ff); break; }
@@ -2823,19 +2672,17 @@ WRITE16_HANDLER( godzilla_mcu_w )
 {
 	COMBINE_DATA(&cop_mcu_ram[offset]);
 
+	if(offset >= 0x200/2 && offset <= 0x24f/2)
+	{
+		seibu_common_video_regs_w(space,offset-0x200/2,cop_mcu_ram[offset],mem_mask);
+		return;
+	}
+
 	switch (offset)
 	{
 		default:
 			generic_cop_w(space, offset, data, mem_mask);
 			break;
-
-
-		case (0x220/2): { legionna_scrollram16[0] = cop_mcu_ram[offset]; break; }
-		case (0x222/2): { legionna_scrollram16[1] = cop_mcu_ram[offset]; break; }
-		case (0x224/2): { legionna_scrollram16[2] = cop_mcu_ram[offset]; break; }
-		case (0x226/2): { legionna_scrollram16[3] = cop_mcu_ram[offset]; break; }
-		case (0x228/2): { legionna_scrollram16[4] = cop_mcu_ram[offset]; break; }
-		case (0x22a/2): { legionna_scrollram16[5] = cop_mcu_ram[offset]; break; }
 
 		case (0x300/2):	{ seibu_main_word_w(space,0,cop_mcu_ram[offset],0x00ff); break; }
 		case (0x304/2):	{ seibu_main_word_w(space,1,cop_mcu_ram[offset],0x00ff); break; }
@@ -2874,6 +2721,12 @@ WRITE16_HANDLER( denjinmk_mcu_w )
 {
 	COMBINE_DATA(&cop_mcu_ram[offset]);
 
+	if(offset >= 0x200/2 && offset <= 0x24f/2)
+	{
+		seibu_common_video_regs_w(space,offset-0x200/2,cop_mcu_ram[offset],mem_mask);
+		return;
+	}
+
 	switch (offset)
 	{
 		default:
@@ -2882,16 +2735,6 @@ WRITE16_HANDLER( denjinmk_mcu_w )
 
 		//case (0x05a/2): { /* brightness?? */ break; }
 		case (0x070/2): { denjinmk_setgfxbank(cop_mcu_ram[offset]); break; }
-
-		case (0x21c/2): { legionna_layer_disable = cop_mcu_ram[offset]; break; }
-
-		case (0x220/2): { legionna_scrollram16[0] = cop_mcu_ram[offset]; break; }
-		case (0x222/2): { legionna_scrollram16[1] = cop_mcu_ram[offset]; break; }
-		case (0x224/2): { legionna_scrollram16[2] = cop_mcu_ram[offset]; break; }
-		case (0x226/2): { legionna_scrollram16[3] = cop_mcu_ram[offset]; break; }
-		case (0x228/2): { legionna_scrollram16[4] = cop_mcu_ram[offset]; break; }
-		case (0x22a/2): { legionna_scrollram16[5] = cop_mcu_ram[offset]; break; }
-
 
 		//case (0x280/2): { /* trigger.. something */ break; }
 
@@ -2917,7 +2760,6 @@ READ16_HANDLER( grainbow_mcu_r )
 		#if 0
 		case (0x1b0/2):
 			return 2;
-			// FIXME: this code is never reached
 			/*check if the DMA has been finished*/
 			if(dma_status == 1)
 			{
@@ -2946,6 +2788,12 @@ WRITE16_HANDLER( grainbow_mcu_w )
 {
 	COMBINE_DATA(&cop_mcu_ram[offset]);
 
+	if(offset >= 0x200/2 && offset <= 0x24f/2)
+	{
+		seibu_common_video_regs_w(space,offset-0x200/2,cop_mcu_ram[offset],mem_mask);
+		return;
+	}
+
 	switch (offset)
 	{
 		default:
@@ -2962,78 +2810,6 @@ WRITE16_HANDLER( grainbow_mcu_w )
 		case (0x012/2): { prot_data[1] = cop_mcu_ram[offset]; dma_src = (prot_data[0]&0xffff)|((prot_data[1]&0xffff)<<16); break; }
 		case (0x014/2): { prot_data[0] = cop_mcu_ram[offset]; dma_src = (prot_data[0]&0xffff)|((prot_data[1]&0xffff)<<16); break; }
 		#endif
-
-		/*Layer Enable,bit wise active low*/
-		case (0x21c/2):
-		{
-			/*
-            ---x ---- (used in test mode)
-            ---- x--- Text Layer
-            ---- -x-- Foreground Layer
-            ---- --x- Midground Layer
-            ---- ---x Background Layer
-            */
-			grainbow_pri_n = cop_mcu_ram[offset] & 0xf;
-			break;
-		}
-
-		/* TODO: tilemaps x-axis are offset,we use a temporary kludge for now */
-		case (0x220/2):	{ legionna_scrollram16[0] = 0x10 + cop_mcu_ram[offset]; break; }
-		case (0x222/2): { legionna_scrollram16[1] = cop_mcu_ram[offset]; break; }
-		case (0x224/2): { legionna_scrollram16[2] = 0x10 + cop_mcu_ram[offset]; break; }
-		case (0x226/2): { legionna_scrollram16[3] = cop_mcu_ram[offset]; break; }
-		case (0x228/2): { legionna_scrollram16[4] = 0x10 + cop_mcu_ram[offset]; break; }
-		case (0x22a/2): { legionna_scrollram16[5] = cop_mcu_ram[offset]; break; }
-
-		/* scroll mirrors? */
-		case (0x22c/2):
-		case (0x22e/2):
-		case (0x230/2):
-		case (0x232/2):
-		case (0x234/2):
-		case (0x236/2):
-			break;
-
-
-		/* Text Layer scroll registers */
-		case (0x238/2): { legionna_scrollram16[6] = 0x38 + cop_mcu_ram[offset]; break; }
-		case (0x23a/2): { legionna_scrollram16[7] = cop_mcu_ram[offset]; break; }
-		/*C.R.T. Controller (note:game calls it OBJ register)*/
-		case (0x244/2):
-			{
-				/*
-                data = setting
-                0x01e = 320x256
-                0x0e1 = 320x256 REVERSE
-                0x016 = 320x240
-                0x0e9 = 320x240 REVERSE
-                0x004 = 320x224
-                0x10b = 320x224 REVERSE
-                It is like to be per cases and not per bits.
-                */
-				switch(data)
-				{
-					case 0x0000:
-					case 0x0003:
-					case 0x001e: CRT_MODE(320,224,0); break;
-					case 0x00e1: CRT_MODE(320,224,1); break;
-					case 0x0016: CRT_MODE(320,256,0); break;
-					case 0x00e9: CRT_MODE(320,256,1); break;
-					case 0x0004: CRT_MODE(320,240,0); break;
-					case 0x00fb: CRT_MODE(320,240,1); break;
-					default:
-					#ifdef MAME_DEBUG
-					popmessage("Warning: Undefined CRT Mode %04x",data);
-					#endif
-					CRT_MODE(320,256,0);
-				}
-			}
-			break;
-
-		/* Seems a mirror for the choices in the test menu... */
-		//case (0x27c/2): break;
-		//case (0x280/2): break;
-		//case (0x6fc/2): break;
 
 		case (0x300/2):	{ seibu_main_word_w(space,0,cop_mcu_ram[offset],0x00ff); break; }
 		case (0x304/2):	{ seibu_main_word_w(space,1,cop_mcu_ram[offset],0x00ff); break; }
@@ -3081,29 +2857,17 @@ WRITE16_HANDLER( legionna_mcu_w )
 {
 	COMBINE_DATA(&cop_mcu_ram[offset]);
 
-	seibu_cop_log("%06x: Legionna write data %04x at offset %04x\n", cpu_get_pc(space->cpu), data, offset*2);
-
+	if(offset >= 0x200/2 && offset <= 0x24f/2)
+	{
+		seibu_common_video_regs_w(space,offset-0x200/2,cop_mcu_ram[offset],mem_mask);
+		return;
+	}
 
 	switch (offset)
 	{
 		default:
 			generic_cop_w(space, offset, data, mem_mask);
 			break;
-
-
-		/*********************************************************************
-        600-6ff - Video Registers
-        *********************************************************************/
-
-		// 61a bit 0 is flipscreen
-		// 61c probably layer disables, like Dcon
-
-		case (0x220/2): { legionna_scrollram16[0] = cop_mcu_ram[offset]; break; }
-		case (0x222/2): { legionna_scrollram16[1] = cop_mcu_ram[offset]; break; }
-		case (0x224/2): { legionna_scrollram16[2] = cop_mcu_ram[offset]; break; }
-		case (0x226/2): { legionna_scrollram16[3] = cop_mcu_ram[offset]; break; }
-		case (0x228/2): { legionna_scrollram16[4] = cop_mcu_ram[offset]; break; }
-		case (0x22a/2): { legionna_scrollram16[5] = cop_mcu_ram[offset]; break; }
 
 		/*********************************************************************
         700-7ff - Output (Seibu Sound System)
@@ -3116,67 +2880,3 @@ WRITE16_HANDLER( legionna_mcu_w )
 	}
 }
 
-
-/**********************************************************************************************
-  Raiden 2 / Zero Team
-**********************************************************************************************/
-
-READ16_HANDLER( raiden2_mcu_r )
-{
-	switch (offset)
-	{
-		default:
-			return generic_cop_r(space, offset, mem_mask);
-
-		case (0x340/2): return input_port_read(space->machine, "DSWA") | (input_port_read(space->machine, "DSWB") << 8);
-		case (0x344/2): return input_port_read(space->machine, "P1") | (input_port_read(space->machine, "P2") << 8);
-		case (0x34c/2): return input_port_read(space->machine, "SYSTEM") | 0xff00;
-
-		/* Inputs */
-		case (0x308/2):	return seibu_main_word_r(space,2,0xffff);
-		case (0x30c/2):	return seibu_main_word_r(space,3,0xffff);
-		case (0x314/2): return seibu_main_word_r(space,5,0xffff);
-
-	}
-}
-
-WRITE16_HANDLER( raiden2_mcu_w )
-{
-	COMBINE_DATA(&cop_mcu_ram[offset]);
-
-	seibu_cop_log("%06x: raiden2 write data %04x at offset %04x\n", cpu_get_pc(space->cpu), data, offset*2);
-
-	switch (offset)
-	{
-		default:
-			generic_cop_w(space, offset, data, mem_mask);
-			break;
-#if 0
-
-		case (0x2a0/2): sprcpt_val_1_w(space,offset,data,mem_mask); break;
-		case (0x2a2/2): sprcpt_val_1_w(space,offset,data,mem_mask); break;
-		case (0x2a4/2): sprcpt_data_3_w(space,offset,data,mem_mask); break;
-		case (0x2a6/2): sprcpt_data_3_w(space,offset,data,mem_mask); break;
-		case (0x2a8/2): sprcpt_data_4_w(space,offset,data,mem_mask); break;
-		case (0x2aa/2): sprcpt_data_4_w(space,offset,data,mem_mask); break;
-		case (0x2ac/2): sprcpt_flags_1_w(space,offset,data,mem_mask); break;
-		case (0x2ae/2): sprcpt_flags_1_w(space,offset,data,mem_mask); break;
-		case (0x2b0/2): sprcpt_data_1_w(space,offset,data,mem_mask); break;
-		case (0x2b2/2): sprcpt_data_1_w(space,offset,data,mem_mask); break;
-		case (0x2b4/2): sprcpt_data_2_w(space,offset,data,mem_mask); break;
-		case (0x2b6/2): sprcpt_data_2_w(space,offset,data,mem_mask); break;
-		case (0x2b8/2): sprcpt_val_2_w(space,offset,data,mem_mask); break;
-		case (0x2ba/2): sprcpt_val_2_w(space,offset,data,mem_mask); break;
-		case (0x2bc/2): sprcpt_adr_w(space,offset,data,mem_mask); break;
-		case (0x2be/2): sprcpt_adr_w(space,offset,data,mem_mask); break;
-		case (0x2ce/2): sprcpt_flags_2_w(space,offset,data,mem_mask); break;
-#endif
-
-		case (0x300/2):	{ seibu_main_word_w(space,0,cop_mcu_ram[offset],0x00ff); break; }
-		case (0x304/2):	{ seibu_main_word_w(space,1,cop_mcu_ram[offset],0x00ff); break; }
-		case (0x310/2):	{ seibu_main_word_w(space,4,cop_mcu_ram[offset],0x00ff); break; }
-		case (0x318/2):	{ seibu_main_word_w(space,6,cop_mcu_ram[offset],0x00ff); break; }
-
-
-	}
-}

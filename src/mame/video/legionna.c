@@ -35,30 +35,6 @@ void denjinmk_setgfxbank(UINT16 data)
 	tilemap_mark_all_tiles_dirty (text_layer);
 }
 
-#ifdef UNUSED_FUNCTION
-WRITE16_HANDLER( legionna_control_w )
-{
-	if (ACCESSING_BITS_0_7)
-	{
-		legionna_enable=data;
-		if ((legionna_enable&4)==4)
-			tilemap_set_enable(foreground_layer,0);
-		else
-			tilemap_set_enable(foreground_layer,1);
-
-		if ((legionna_enable&2)==2)
-			tilemap_set_enable(midground_layer,0);
-		else
-			tilemap_set_enable(midground_layer,1);
-
-		if ((legionna_enable&1)==1)
-			tilemap_set_enable(background_layer,0);
-		else
-			tilemap_set_enable(background_layer,1);
-	}
-}
-#endif
-
 WRITE16_HANDLER( legionna_background_w )
 {
 	COMBINE_DATA(&legionna_back_data[offset]);
@@ -165,7 +141,6 @@ VIDEO_START( legionna )
 	foreground_layer = tilemap_create(machine, get_fore_tile_info,tilemap_scan_rows,16,16,32,32);
 	midground_layer =  tilemap_create(machine, get_mid_tile_info, tilemap_scan_rows,16,16,32,32);
 	text_layer =       tilemap_create(machine, get_text_tile_info,tilemap_scan_rows,  8,8,64,32);
-	legionna_layer_disable = 0x0000;
 
 	legionna_scrollram16 = auto_alloc_array(machine, UINT16, 0x60/2);
 
@@ -181,7 +156,6 @@ VIDEO_START( denjinmk )
 	foreground_layer = tilemap_create(machine, get_fore_tile_info_denji,tilemap_scan_rows,16,16,32,32);
 	midground_layer =  tilemap_create(machine, get_mid_tile_info_denji, tilemap_scan_rows,16,16,32,32);
 	text_layer =       tilemap_create(machine, get_text_tile_info,tilemap_scan_rows,  8,8,64,32);
-	legionna_layer_disable = 0x0000;
 
 	legionna_scrollram16 = auto_alloc_array(machine, UINT16, 0x60/2);
 
@@ -197,7 +171,6 @@ VIDEO_START( cupsoc )
 	foreground_layer = tilemap_create(machine, get_fore_tile_info,tilemap_scan_rows,16,16,32,32);
 	midground_layer =  tilemap_create(machine, get_mid_tile_info_cupsoc, tilemap_scan_rows,16,16,32,32);
 	text_layer =       tilemap_create(machine, get_text_tile_info,tilemap_scan_rows,  8,8,64,32);
-	legionna_layer_disable = 0x0000;
 
 	legionna_scrollram16 = auto_alloc_array(machine, UINT16, 0x60/2);
 
@@ -414,18 +387,16 @@ VIDEO_UPDATE( grainbow )
 	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
 	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 
-	if(!(grainbow_pri_n & 1))
+	if(!(legionna_layer_disable & 1))
 		tilemap_draw(bitmap,cliprect,background_layer,0,0);
 
-	if(!(grainbow_pri_n & 2))
+	if(!(legionna_layer_disable & 2))
 		tilemap_draw(bitmap,cliprect,midground_layer,0,0);
 
-
-	if(!(grainbow_pri_n & 4))
+	if(!(legionna_layer_disable & 4))
 		tilemap_draw(bitmap,cliprect,foreground_layer,0,1);
 
-
-	if(!(grainbow_pri_n & 8))
+	if(!(legionna_layer_disable & 8))
 		tilemap_draw(bitmap,cliprect,text_layer,0,2);
 
 	draw_sprites(screen->machine,bitmap,cliprect);
