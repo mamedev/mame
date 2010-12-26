@@ -1975,11 +1975,15 @@ static READ16_HANDLER( generic_cop_r )
 		case 0x180/2:
 			return cop_hit_status;
 
+		/* these two controls facing direction in Godzilla opponents (only vs.)*/
 		case 0x182/2:
 			return (cop_hit_val & 0xffff0000) >> 16;
 
 		case 0x184/2:
 			return cop_hit_val & 0xffff;
+
+		case 0x1a4/2:
+			return 0x0002;
 
 		case 0x1b0/2:
 			return cop_status;
@@ -1995,6 +1999,8 @@ static READ16_HANDLER( generic_cop_r )
 			return retvalue;
 	}
 }
+
+static UINT32 fill_val;
 
 static WRITE16_HANDLER( generic_cop_w )
 {
@@ -2025,12 +2031,25 @@ static WRITE16_HANDLER( generic_cop_w )
             */
 			break;
 
+		case (0x028/2):
+		case (0x02a/2):
+			fill_val = (cop_mcu_ram[0x028/2]) | (cop_mcu_ram[0x02a/2] << 16);
+			break;
+
 		/* Command tables for 0x500 / 0x502 commands */
 		case (0x032/2): { copd2_set_tabledata(space->machine, data); break; }
 		case (0x034/2): { copd2_set_tableoffset(space->machine, data); break; }
 		case (0x038/2):	{ cop_438 = data; break; }
 		case (0x03a/2):	{ cop_43a = data; break; }
 		case (0x03c/2): { cop_43c = data; break; }
+
+		/* brightness control? */
+		case (0x05a/2):
+		case (0x05c/2):
+			break;
+
+		case (0x280/2):
+			break;
 
 		/* DMA / layer clearing */
 		case (0x076/2):
@@ -2394,13 +2413,18 @@ static WRITE16_HANDLER( generic_cop_w )
 				if(cop_dma_dst[cop_dma_trigger] != 0x0000) // Invalid?
 					return;
 
-				address = cop_dma_src[cop_dma_trigger] << 6;
+				address = (cop_dma_src[cop_dma_trigger] << 6);
 				length = (cop_dma_size[cop_dma_trigger]+1) << 5;
 
+				/* Godzilla hack */
+				//if(length & 0x23ff)
+				//	return;
 
-				for (i=address;i<address+length;i+=2)
+				//printf("%08x %08x\n",address,length);
+
+				for (i=address;i<address+length;i+=4)
 				{
-					space->write_word(i, 0x0000); //FIXME: 0x428 has the fixed value to copy
+					space->write_dword(i, fill_val);
 				}
 
 				return;
@@ -2683,6 +2707,9 @@ WRITE16_HANDLER( godzilla_mcu_w )
 		default:
 			generic_cop_w(space, offset, data, mem_mask);
 			break;
+
+		case (0x070/2): { denjinmk_setgfxbank(cop_mcu_ram[offset]); break; }
+
 
 		case (0x300/2):	{ seibu_main_word_w(space,0,cop_mcu_ram[offset],0x00ff); break; }
 		case (0x304/2):	{ seibu_main_word_w(space,1,cop_mcu_ram[offset],0x00ff); break; }
