@@ -15,7 +15,7 @@
 
 #ifdef SDLMAME_UNIX
 #ifndef SDLMAME_MACOSX
-#include <SDL_ttf.h>
+#include <SDL/SDL_ttf.h>
 #include <fontconfig/fontconfig.h>
 #endif
 #ifdef SDLMAME_MACOSX

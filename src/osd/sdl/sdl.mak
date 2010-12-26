@@ -347,12 +347,23 @@ endif
 endif
 
 ifndef SDL_INSTALL_ROOT
-INCPATH += `sdl-config --cflags`
+INCPATH += `sdl-config --cflags  | sed 's:/SDL::'`
 LIBS += -lm `sdl-config --libs`
+
 else
-INCPATH += -I$(SDL_INSTALL_ROOT)/include
-CCOMFLAGS += -D_GNU_SOURCE=1
-LIBS += -lm -L$(SDL_INSTALL_ROOT)/lib -Wl,-rpath,$(SDL_INSTALL_ROOT)/lib -lSDL
+# The commented out statements document what sdl-config returns when build from svn.
+# sdl-config --libs on ubuntu returns "-L/usr/lib -lSDL" which is not what we really
+# want in a multi-version SDL environment. Should the svn sdl-config at some point 
+# return the same output, we need the commented out section again.
+ 
+#INCPATH += -I$(SDL_INSTALL_ROOT)/include
+#CCOMFLAGS += -D_GNU_SOURCE=1
+#LIBS += -lm -L$(SDL_INSTALL_ROOT)/lib -Wl,-rpath,$(SDL_INSTALL_ROOT)/lib -lSDL
+
+# FIXME: remove the directfb ref. later. This is just there for now to work around an issue with SDL1.3.
+INCPATH += -I$(SDL_INSTALL_ROOT)/include/directfb
+INCPATH += `$(SDL_INSTALL_ROOT)/bin/sdl-config --cflags  | sed 's:/SDL::'`
+LIBS += -lm `$(SDL_INSTALL_ROOT)/bin/sdl-config --libs`
 endif
 
 INCPATH += `pkg-config --cflags fontconfig`
