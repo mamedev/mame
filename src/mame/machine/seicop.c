@@ -2247,8 +2247,8 @@ static WRITE16_HANDLER( generic_cop_w )
 				cop_dist = sqrt((double)(dx*dx+dy*dy));
 
 
-				/* is this the only difference? */
-				if(0)
+				/* is this the only difference? no, that's not it, check Legionnaire */
+				//if(0)
 				{
 					space->write_byte(cop_register[0]+(0x34^3), cop_angle);
 					space->write_word(cop_register[0]+(0x38^2), cop_dist);
