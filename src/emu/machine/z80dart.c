@@ -995,6 +995,12 @@ UINT8 z80dart_device::dart_channel::control_read()
 
 	int reg = m_wr[0] & WR0_REGISTER_MASK;
 
+	if (reg != 0)
+	{
+		// mask out register index
+		m_wr[0] &= ~WR0_REGISTER_MASK;
+	}
+
 	switch (reg)
 	{
 	case 0:
@@ -1125,6 +1131,9 @@ void z80dart_device::dart_channel::control_write(UINT8 data)
 
 	case 2:
 		// interrupt vector
+		if (m_index == CHANNEL_B)
+			m_rr[2] = ( m_rr[2] & 0x0e ) | ( m_wr[2] & 0xF1);;
+
 		m_device->check_interrupts();
 		LOG(("Z80DART \"%s\" Channel %c : Interrupt Vector %02x\n", m_device->tag(), 'A' + m_index, data));
 		break;
