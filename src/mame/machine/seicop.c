@@ -2434,7 +2434,7 @@ static WRITE16_HANDLER( generic_cop_w )
 				return;
 			}
 
-			/* Godzilla, hack (and imperfect) implementation until we understand ... */
+			/* Godzilla specific */
 			if (cop_dma_trigger == 0x116)
 			{
 				UINT32 length, address;
@@ -2444,11 +2444,10 @@ static WRITE16_HANDLER( generic_cop_w )
 				//	return;
 
 				address = (cop_dma_src[cop_dma_trigger] << 6);
-				length = ((cop_dma_size[cop_dma_trigger]+1) << 5);
+				length = ((cop_dma_size[cop_dma_trigger]+1) << 4);
 
-				printf("%08x %08x\n",address,length);
-
-				if(length & 0x23ff)
+				/* guess: palette can't be cleared by this, only by 0x8* commands? */
+				if((address & 0x11f000) == 0x104000)
 					return;
 
 				for (i=address;i<address+length;i+=4)
