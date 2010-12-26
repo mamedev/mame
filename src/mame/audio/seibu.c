@@ -338,10 +338,12 @@ MACHINE_RESET( seibu_sound )
 	sound_cpu = machine->device("audiocpu");
 	update_irq_lines(machine, VECTOR_INIT);
 	if (romlength > 0x10000)
+	{
 		memory_configure_bank(machine, "bank1", 0, (romlength - 0x10000) / 0x8000, rom + 0x10000, 0x8000);
 
-	/* Denjin Makai definitely needs this at start-up, it never writes to the bankswitch */
-	memory_set_bank(machine, "bank1", 0);
+		/* Denjin Makai definitely needs this at start-up, it never writes to the bankswitch */
+		memory_set_bank(machine, "bank1", 0);
+	}
 }
 
 /***************************************************************************/
