@@ -2416,10 +2416,6 @@ static WRITE16_HANDLER( generic_cop_w )
 				address = (cop_dma_src[cop_dma_trigger] << 6);
 				length = (cop_dma_size[cop_dma_trigger]+1) << 5;
 
-				/* Godzilla hack */
-				//if(length & 0x23ff)
-				//	return;
-
 				//printf("%08x %08x\n",address,length);
 
 				for (i=address;i<address+length;i+=4)
@@ -2429,6 +2425,32 @@ static WRITE16_HANDLER( generic_cop_w )
 
 				return;
 			}
+
+			/* Godzilla, hack (and imperfect) implementation until we understand ... */
+			if (cop_dma_trigger == 0x116)
+			{
+				UINT32 length, address;
+				int i;
+
+				//if(cop_dma_dst[cop_dma_trigger] != 0x0000) // Invalid?
+				//	return;
+
+				address = (cop_dma_src[cop_dma_trigger] << 6);
+				length = ((cop_dma_size[cop_dma_trigger]+1) << 5);
+
+				printf("%08x %08x\n",address,length);
+
+				if(length & 0x23ff)
+					return;
+
+				for (i=address;i<address+length;i+=4)
+				{
+					space->write_dword(i, fill_val);
+				}
+
+				return;
+			}
+
 
 			/* private buffer copies */
 			if ((cop_dma_trigger==0x14) || (cop_dma_trigger==0x15)) return;

@@ -330,6 +330,8 @@ VIDEO_UPDATE( legionna )
 	tilemap_set_scrolly( midground_layer,  0, legionna_scrollram16[3] );
 	tilemap_set_scrollx( foreground_layer, 0, legionna_scrollram16[4] );
 	tilemap_set_scrolly( foreground_layer, 0, legionna_scrollram16[5] );
+	tilemap_set_scrollx( text_layer, 0,  0/*legionna_scrollram16[6]*/ );
+	tilemap_set_scrolly( text_layer, 0,  0/*legionna_scrollram16[7]*/ );
 
 	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
 	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));	/* wrong color? */
@@ -358,6 +360,9 @@ VIDEO_UPDATE( godzilla )
 	tilemap_set_scrolly( midground_layer,  0, legionna_scrollram16[3] );
 	tilemap_set_scrollx( foreground_layer, 0, legionna_scrollram16[4] );
 	tilemap_set_scrolly( foreground_layer, 0, legionna_scrollram16[5] );
+	tilemap_set_scrollx( text_layer, 0,  0/*legionna_scrollram16[6]*/ );
+	tilemap_set_scrolly( text_layer, 0,  0/*legionna_scrollram16[7]*/ );
+
 
 	bitmap_fill(bitmap,cliprect,0x0200);
 	bitmap_fill(screen->machine->priority_bitmap,cliprect,0);
