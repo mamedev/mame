@@ -1963,7 +1963,6 @@ static UINT16 u1,u2;
 	copd2_table[command+4] == _5_ && copd2_table[command+5] == _6_ && copd2_table[command+6] == _7_ && copd2_table[command+7] == _8_ && \
 	u1 == _u1_ && u2 == _u2_) \
 
-
 static READ16_HANDLER( generic_cop_r )
 {
 	UINT16 retvalue;
@@ -1982,8 +1981,17 @@ static READ16_HANDLER( generic_cop_r )
 		case 0x184/2:
 			return cop_hit_val & 0xffff;
 
+		/* BCD */
+		case 0x190/2:
+		case 0x192/2:
+		case 0x194/2:
+		case 0x196/2:
+		case 0x198/2:
+			return retvalue;
+
+		/* needed by Godzilla for selecting a character ... rng? PIT? */
 		case 0x1a4/2:
-			return 0x0002;
+			return mame_rand(space->machine);
 
 		case 0x1b0/2:
 			return cop_status;
