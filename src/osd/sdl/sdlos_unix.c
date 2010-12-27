@@ -153,11 +153,17 @@ char *osd_get_clipboard_text(void)
 		return NULL;
 	if ( info.subsystem != SDL_SYSWM_X11 )
 		return NULL;
+#if (SDL_VERSION_ATLEAST(1,3,0))
+	if ( (display = info.x11.display) == NULL )
+		return NULL;
+	if ( (our_win = info.x11.window) == None )
+		return NULL;
+#else
 	if ( (display = info.info.x11.display) == NULL )
 		return NULL;
 	if ( (our_win = info.info.x11.window) == None )
 		return NULL;
-
+#endif
 	/* request data to owner */
 	selection_win = XGetSelectionOwner( display, XA_PRIMARY );
 	if ( selection_win == None )

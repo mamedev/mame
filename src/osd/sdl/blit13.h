@@ -119,9 +119,11 @@ INLINE void texcopy_##_name (texture_info *texture, const render_texinfo *texsou
 	for (y = 0; y < texsource->height; y++) { \
 		_src_type *src = (_src_type *)texsource->base + y * texsource->rowpixels / (_len_div); \
 		_dest_type *dst = (_dest_type *)((UINT8 *)texture->pixels + y * texture->pitch); \
-		for (x = 0; x < texsource->width / (_len_div); x++) { \
+		x = texsource->width / (_len_div); \
+		while (x > 0) { \
 			*dst++ = _op(*src); \
 			src++; \
+			x--; \
 		} \
 	} \
 }
@@ -140,11 +142,13 @@ INLINE void texcopy_rot_##_name (texture_info *texture, const render_texinfo *te
 		INT32 curu = setup->startu + y * setup->dudy; \
 		INT32 curv = setup->startv + y * setup->dvdy; \
 		_dest_type *dst = (_dest_type *)((UINT8 *)texture->pixels + y * texture->pitch); \
-		for (x = 0; x < setup->rotwidth; x++) { \
+		x = setup->rotwidth; \
+		while (x>0) { \
 			_src_type *src = (_src_type *) texsource->base + (curv >> 16) * texsource->rowpixels + (curu >> 16); \
 			*dst++ = _op(*src); \
 			curu += dudx; \
 			curv += dvdx; \
+			x--; \
 		} \
 	} \
 }
