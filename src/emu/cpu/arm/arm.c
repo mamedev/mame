@@ -321,6 +321,17 @@ INLINE void SetRegister( ARM_REGS* cpustate, int rIndex, UINT32 value )
 	cpustate->sArmRegister[sRegisterTable[MODE][rIndex]] = value;
 }
 
+INLINE UINT32 GetModeRegister( ARM_REGS* cpustate, int mode, int rIndex )
+{
+	return cpustate->sArmRegister[sRegisterTable[mode][rIndex]];
+}
+
+INLINE void SetModeRegister( ARM_REGS* cpustate, int mode, int rIndex, UINT32 value )
+{
+	cpustate->sArmRegister[sRegisterTable[mode][rIndex]] = value;
+}
+
+
 /***************************************************************************/
 
 static CPU_RESET( arm )
@@ -1071,6 +1082,8 @@ static void HandleMemBlock( ARM_REGS* cpustate, UINT32 insn )
 		/* Loading */
 		if (insn & INSN_BDT_U)
 		{
+			int mode = MODE;
+
 			/* Incrementing */
 			if (!(insn & INSN_BDT_P)) rbp = rbp + (- 4);
 
@@ -1098,7 +1111,7 @@ static void HandleMemBlock( ARM_REGS* cpustate, UINT32 insn )
 					logerror("%08x:  Illegal LDRM writeback to r15\n",R15);
 
 				if ((insn&(1<<rb))==0)
-					SetRegister(cpustate,rb,GetRegister(cpustate, rb)+result*4);
+					SetModeRegister(cpustate, mode, rb, GetModeRegister(cpustate, mode, rb) + result * 4);
 				else if (ARM_DEBUG_CORE)
 					logerror("%08x:  Illegal LDRM writeback to base register (%d)\n",R15, rb);
 			}
