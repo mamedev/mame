@@ -1379,7 +1379,7 @@ static UINT16 cop_43c;
 static UINT16 cop_dma_src[0x200];
 static UINT16 cop_dma_size[0x200];
 static UINT16 cop_dma_dst[0x200];
-static UINT16 cop_dma_src_param[0x200];
+static UINT16 cop_dma_fade_table;
 static UINT16 cop_dma_trigger = 0;
 static UINT16 cop_scale;
 
@@ -2010,6 +2010,8 @@ static READ16_HANDLER( generic_cop_r )
 
 static UINT32 fill_val;
 
+static UINT8 pal_brightness_val,pal_brightness_mode;
+
 static WRITE16_HANDLER( generic_cop_w )
 {
 	static UINT32 temp32;
@@ -2051,42 +2053,42 @@ static WRITE16_HANDLER( generic_cop_w )
 		case (0x03a/2):	{ cop_43a = data; break; }
 		case (0x03c/2): { cop_43c = data; break; }
 
-		/* brightness control? */
-		case (0x05a/2):
-		case (0x05c/2):
-			break;
+		/* brightness control */
+		case (0x05a/2): pal_brightness_val = data & 0xff; break;
+		case (0x05c/2): pal_brightness_mode = data & 0xff; break;
 
 		case (0x280/2):
 			break;
 
 		/* DMA / layer clearing */
+
+		/* used in palette DMAs, for fading effects */
 		case (0x076/2):
-			cop_dma_src_param[cop_dma_trigger] = data;
+			cop_dma_fade_table = data;
 			break;
 
-		case (0x078/2): /* clear address */
+		case (0x078/2): /* DMA source address */
 		{
 			cop_dma_src[cop_dma_trigger] = data; // << 6 to get actual address
 			//seibu_cop_log("%06x: COPX set layer clear address to %04x (actual %08x)\n", cpu_get_pc(space->cpu), data, data<<6);
 			break;
 		}
 
-		case (0x07a/2): /* clear length */
+		case (0x07a/2): /* DMA length */
 		{
 			cop_dma_size[cop_dma_trigger] = data;
 			//seibu_cop_log("%06x: COPX set layer clear length to %04x (actual %08x)\n", cpu_get_pc(space->cpu), data, data<<5);
 			break;
 		}
 
-		case (0x07c/2): /* clear value? */
+		case (0x07c/2): /* DMA destination */
 		{
 			cop_dma_dst[cop_dma_trigger] = data;
 			//seibu_cop_log("%06x: COPX set layer clear value to %04x (actual %08x)\n", cpu_get_pc(space->cpu), data, data<<6);
 			break;
 		}
 
-		/* unknown, related to clears? / DMA? */
-		case (0x07e/2):
+		case (0x07e/2): /* DMA parameter */
 		{
 			cop_dma_trigger = data;
 			//seibu_cop_log("%06x: COPX set layer clear trigger? to %04x\n", cpu_get_pc(space->cpu), data);
@@ -2118,7 +2120,6 @@ static WRITE16_HANDLER( generic_cop_w )
 		case (0x0a6/2): { cop_register[3] = (cop_register[3]&0x0000ffff)|(cop_mcu_ram[offset]<<16); break; }
 		case (0x0c6/2): { cop_register[3] = (cop_register[3]&0xffff0000)|(cop_mcu_ram[offset]<<0);   break; }
 
-		/* was dma_dst */
 		case (0x0a8/2): { cop_register[4] = (cop_register[4]&0x0000ffff)|(cop_mcu_ram[offset]<<16); break; }
 		case (0x0c8/2): { cop_register[4] = (cop_register[4]&0xffff0000)|(cop_mcu_ram[offset]<<0);   break; }
 
@@ -2366,20 +2367,22 @@ static WRITE16_HANDLER( generic_cop_w )
 			{
 				static UINT32 src,dst,size,i;
 
-				/* TODO: understand all the differences between triggers!
-                0x80 is used by Legionnaire (plain DMA)
-                0x81 is used by SD Gundam and Godzilla (unknown purpose)
-                0x86 is used by Seibu Cup Soccer (DMA with a table, doesn't yet work)
-                0x87 is used by Denjin Makai (DMA with inverted word endianess)
+				/*
+				Apparently all of those are just different DMA channels, brightness effects are done thru a RAM table and the pal_brightness_val / mode (Not yet done)
+                0x80 is used by Legionnaire
+                0x81 is used by SD Gundam and Godzilla
+                0x86 is used by Seibu Cup Soccer
+                0x87 is used by Denjin Makai
                 */
 
 				//if(dma_trigger != 0x87)
-				//  printf("SRC: %08x %08x DST:%08x SIZE:%08x TRIGGER: %08x\n",dma_src,cop_dma_src_param,dma_dst,dma_size,dma_trigger);
+				printf("SRC: %08x %08x DST:%08x SIZE:%08x TRIGGER: %08x %02x %02x\n",cop_dma_src[cop_dma_trigger] << 6,cop_dma_fade_table * 0x400,cop_dma_dst[cop_dma_trigger] << 6,cop_dma_size[cop_dma_trigger] << 5,cop_dma_trigger,pal_brightness_val,pal_brightness_mode);
+
 
 				if(cop_dma_trigger == 0x81)
-					src = (cop_dma_src[cop_dma_trigger] << 6); //FIXME: SD Gundam doesn't like the extra param, maybe it has a different flag?
+					src = (cop_dma_src[cop_dma_trigger] << 6);
 				else
-					src = (cop_dma_src[cop_dma_trigger] << 6) + (cop_dma_src_param[cop_dma_trigger] * 0x400);
+					src = (cop_dma_src[cop_dma_trigger] << 6) + (cop_dma_fade_table * 0x400);
 
 				dst = (cop_dma_dst[cop_dma_trigger] << 6);
 				size = ((cop_dma_size[cop_dma_trigger] << 5) - (cop_dma_dst[cop_dma_trigger] << 6) + 0x20)/2;
@@ -2458,13 +2461,10 @@ static WRITE16_HANDLER( generic_cop_w )
 				return;
 			}
 
-
 			/* private buffer copies */
 			if ((cop_dma_trigger==0x14) || (cop_dma_trigger==0x15)) return;
 
-			printf("SRC: %08x %08x DST:%08x SIZE:%08x TRIGGER: %08x\n",cop_dma_src[cop_dma_trigger] << 6,cop_dma_src_param[cop_dma_trigger] * 0x400,cop_dma_dst[cop_dma_trigger] << 6,cop_dma_size[cop_dma_trigger] << 5,cop_dma_trigger);
-
-			//printf("SRC: %08x DST:%08x SIZE:%08x TRIGGER: %08x\n",dma_src,dma_dst,dma_size,dma_trigger);
+			printf("SRC: %08x %08x DST:%08x SIZE:%08x TRIGGER: %08x\n",cop_dma_src[cop_dma_trigger] << 6,cop_dma_fade_table,cop_dma_dst[cop_dma_trigger] << 6,cop_dma_size[cop_dma_trigger] << 5,cop_dma_trigger);
 
 			break;
 		}
@@ -2789,10 +2789,7 @@ WRITE16_HANDLER( denjinmk_mcu_w )
 			generic_cop_w(space, offset, data, mem_mask);
 			break;
 
-		//case (0x05a/2): { /* brightness?? */ break; }
 		case (0x070/2): { denjinmk_setgfxbank(cop_mcu_ram[offset]); break; }
-
-		//case (0x280/2): { /* trigger.. something */ break; }
 
 		case (0x300/2):	{ seibu_main_word_w(space,0,cop_mcu_ram[offset],0x00ff); break; }
 		case (0x304/2):	{ seibu_main_word_w(space,1,cop_mcu_ram[offset],0x00ff); break; }
