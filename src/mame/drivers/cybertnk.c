@@ -1,17 +1,16 @@
 /*******************************************************************************************
 
-Cyber Tank HW (c) 1987 Coreland Technology
+Cyber Tank HW (c) 1987/1988 Coreland Technology
 
 preliminary driver by Angelo Salese
 
 Maybe it has some correlation with WEC Le Mans HW? (supposely that was originally done by Coreland too)
 
 TODO:
-- sprite emulation (very likely that it can do zooming);
+- improve sprite emulation
 - road emulation;
 - tilemap scrolling /-color banking;
 - inputs doesn't work in-game?
-- dual screen output.
 
 ============================================================================================
 
@@ -45,23 +44,6 @@ Master reads at 0x00005E3C
 
 It is tested as every odd byte from 0x100021 to 0x1003e8,
 and cleared as every odd byte from 0x100021 up to 0x100fff)
-
-- Missing ROM data
-IC03 and IC04 are missing from the set.
-These look like "logical" ICs rather that physical ones.
-The main program code is dumped as 2x128k files p1a and p2a.
-The checksum routine does 4x64k checks, going by the routine.
-IC01 is the first half of p1a, IC02 is the first half of p2a,
-IC03 is the second half of p1a and IC04 is the second half of p2a.
-
-IC01 FEFF bytes @ 0x00200 code at 0x000019FE CHKSUM A5 (00200 offset is just after where the checksum is recorded)
-IC02 FEFF bytes @ 0x00201 code at 0x00001A24 CHKSUM 87
-IC03 FFFF bytes @ 0x20000 code at 0x00001A46 CHKSUM 61
-IC04 FFFF bytes @ 0x20001 code at 0x00001A6A CHKSUM E0
-
-Unfortunately the second half of p1a and p2a are empty, all 0xff.
-No other ROMs in the entire set match the checksums used in the POST.
-I am guessing they are bad dumps.
 
 - Unmapped reads/writes
 CPU1 reads at 0x07fff8 and 0x07fffa are the slave reading validation values
@@ -181,6 +163,7 @@ lev 7 : 0x7c : 0000 07e0 - input device clear?
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "sound/8950intf.h"
+#include "rendlay.h"
 
 static tilemap_t *tx_tilemap;
 static UINT16 *tx_vram,*bg_vram,*fg_vram,*spr_ram;
@@ -204,9 +187,37 @@ static VIDEO_START( cybertnk )
 	tilemap_set_transparent_pen(tx_tilemap,0);
 }
 
+static void draw_pixel( bitmap_t* bitmap, const rectangle *cliprect, int y, int x, int pen)
+{
+	if (x>cliprect->max_x) return;
+	if (x<cliprect->min_x) return;
+	if (y>cliprect->max_y) return;
+	if (y<cliprect->min_y) return;
+
+	*BITMAP_ADDR16(bitmap, y, x) = pen;
+}
+
 static VIDEO_UPDATE( cybertnk )
 {
+	running_device *left_screen  = screen->machine->device("lscreen");
+	running_device *right_screen = screen->machine->device("rscreen");
+	int screen_shift = 0;
+
+	if (screen==left_screen)
+	{
+		screen_shift = 0;
+
+	}
+	else if (screen==right_screen)
+	{
+		screen_shift = -256;
+	}
+
+	tilemap_set_scrolldx(tx_tilemap, screen_shift, screen_shift);
+
+
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+
 
 	{
 		int count,x,y;
@@ -221,7 +232,7 @@ static VIDEO_UPDATE( cybertnk )
 				UINT16 tile = bg_vram[count] & 0x1fff;
 				UINT16 color = (fg_vram[count] & 0xe000) >> 13;
 
-				drawgfx_transpen(bitmap,cliprect,gfx,tile,color+0x194,0,0,x*8,(y*8),0);
+				drawgfx_transpen(bitmap,cliprect,gfx,tile,color+0x194,0,0,(x*8)+screen_shift,(y*8),0);
 
 				count++;
 
@@ -242,7 +253,7 @@ static VIDEO_UPDATE( cybertnk )
 				UINT16 tile = fg_vram[count] & 0x1fff;
 				UINT16 color = (fg_vram[count] & 0xe000) >> 13;
 
-				drawgfx_transpen(bitmap,cliprect,gfx,tile,color+0x1c0,0,0,x*8,(y*8),0);
+				drawgfx_transpen(bitmap,cliprect,gfx,tile,color+0x1c0,0,0,(x*8)+screen_shift,(y*8),0);
 
 				count++;
 
@@ -306,13 +317,11 @@ static VIDEO_UPDATE( cybertnk )
 							dot|= col_bank<<4;
 							if(fx)
 							{
-								if(((x+xsize-(xz)) < screen->visible_area().max_x) && ((y+yi) < screen->visible_area().max_y))
-									*BITMAP_ADDR16(bitmap, y+yz, x+xsize-(xz)) = screen->machine->pens[dot];
+								draw_pixel(bitmap, cliprect, y+yz, x+xsize-(xz)+screen_shift, screen->machine->pens[dot]);
 							}
 							else
 							{
-								if(((x+xz) < screen->visible_area().max_x) && ((y+yi) < screen->visible_area().max_y))
-									*BITMAP_ADDR16(bitmap, y+yz, x+xz) = screen->machine->pens[dot];
+								draw_pixel(bitmap, cliprect, y+yz, x+xz+screen_shift, screen->machine->pens[dot]);
 							}
 						}
 						xf+=zoom;
@@ -340,13 +349,11 @@ static VIDEO_UPDATE( cybertnk )
 							dot|= col_bank<<4;
 							if(fx)
 							{
-								if(((x+xsize-(xz)) < screen->visible_area().max_x) && ((y+yi) < screen->visible_area().max_y))
-									*BITMAP_ADDR16(bitmap, y+yz, x+xsize-(xz)) = screen->machine->pens[dot];
+								draw_pixel(bitmap, cliprect, y+yz, x+xsize-(xz)+screen_shift, screen->machine->pens[dot]);
 							}
 							else
 							{
-								if(((x+x_dec+xi) < screen->visible_area().max_x) && ((y+yi) < screen->visible_area().max_y))
-									*BITMAP_ADDR16(bitmap, y+yz, x+xz) = screen->machine->pens[dot];
+								draw_pixel(bitmap, cliprect, y+yz, x+xz+screen_shift, screen->machine->pens[dot]);
 							}
 						}
 						xf+=zoom;
@@ -384,103 +391,102 @@ static VIDEO_UPDATE( cybertnk )
 //0x62 0x9a 1c2d0
 //0x62 0x9a 1e1e4
 //0x20 0x9c 2011c
-
-if(0) //sprite gfx debug viewer
-{
-	int x,y,count;
-	static int test_x, test_y, start_offs,color_pen;
-	const UINT8 *blit_ram = memory_region(screen->machine,"spr_gfx");
-
-	if(input_code_pressed(screen->machine, KEYCODE_Z))
-		test_x++;
-
-	if(input_code_pressed(screen->machine, KEYCODE_X))
-		test_x--;
-
-	if(input_code_pressed(screen->machine, KEYCODE_A))
-		test_y++;
-
-	if(input_code_pressed(screen->machine, KEYCODE_S))
-		test_y--;
-
-	if(input_code_pressed(screen->machine, KEYCODE_Q))
-		start_offs+=0x200;
-
-	if(input_code_pressed(screen->machine, KEYCODE_W))
-		start_offs-=0x200;
-
-	if(input_code_pressed_once(screen->machine, KEYCODE_T))
-		start_offs+=0x20000;
-
-	if(input_code_pressed_once(screen->machine, KEYCODE_Y))
-		start_offs-=0x20000;
-
-	if(input_code_pressed(screen->machine, KEYCODE_E))
-		start_offs+=4;
-
-	if(input_code_pressed(screen->machine, KEYCODE_R))
-		start_offs-=4;
-
-	if(input_code_pressed(screen->machine, KEYCODE_D))
-		color_pen++;
-
-	if(input_code_pressed(screen->machine, KEYCODE_F))
-		color_pen--;
-
-	popmessage("%02x %02x %04x %02x",test_x,test_y,start_offs,color_pen);
-
-	bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
-
-	count = (start_offs);
-
-	for(y=0;y<test_y;y++)
+	if (screen==left_screen)
 	{
-		for(x=0;x<test_x;x+=8)
+		if(0) //sprite gfx debug viewer
 		{
-			UINT32 color;
-			UINT8 dot;
+			int x,y,count;
+			static int test_x, test_y, start_offs,color_pen;
+			const UINT8 *blit_ram = memory_region(screen->machine,"spr_gfx");
 
-			color = ((blit_ram[count+0] & 0xff) << 24);
-			color|= ((blit_ram[count+1] & 0xff) << 16);
-			color|= ((blit_ram[count+2] & 0xff) << 8);
-			color|= ((blit_ram[count+3] & 0xff) << 0);
+			if(input_code_pressed(screen->machine, KEYCODE_Z))
+			test_x++;
 
-			dot = (color & 0xf0000000) >> 28;
-			*BITMAP_ADDR16(bitmap, y, x+0) = screen->machine->pens[dot+(color_pen<<4)];
+			if(input_code_pressed(screen->machine, KEYCODE_X))
+			test_x--;
 
-			dot = (color & 0x0f000000) >> 24;
-			*BITMAP_ADDR16(bitmap, y, x+4) = screen->machine->pens[dot+(color_pen<<4)];
+			if(input_code_pressed(screen->machine, KEYCODE_A))
+			test_y++;
 
-			dot = (color & 0x00f00000) >> 20;
-			*BITMAP_ADDR16(bitmap, y, x+1) = screen->machine->pens[dot+(color_pen<<4)];
+			if(input_code_pressed(screen->machine, KEYCODE_S))
+			test_y--;
 
-			dot = (color & 0x000f0000) >> 16;
-			*BITMAP_ADDR16(bitmap, y, x+5) = screen->machine->pens[dot+(color_pen<<4)];
+			if(input_code_pressed(screen->machine, KEYCODE_Q))
+			start_offs+=0x200;
 
-			dot = (color & 0x0000f000) >> 12;
-			*BITMAP_ADDR16(bitmap, y, x+2) = screen->machine->pens[dot+(color_pen<<4)];
+			if(input_code_pressed(screen->machine, KEYCODE_W))
+			start_offs-=0x200;
 
-			dot = (color & 0x00000f00) >> 8;
-			*BITMAP_ADDR16(bitmap, y, x+6) = screen->machine->pens[dot+(color_pen<<4)];
+			if(input_code_pressed_once(screen->machine, KEYCODE_T))
+			start_offs+=0x20000;
 
-			dot = (color & 0x000000f0) >> 4;
-			*BITMAP_ADDR16(bitmap, y, x+3) = screen->machine->pens[dot+(color_pen<<4)];
+			if(input_code_pressed_once(screen->machine, KEYCODE_Y))
+			start_offs-=0x20000;
 
-			dot = (color & 0x0000000f) >> 0;
-			*BITMAP_ADDR16(bitmap, y, x+7) = screen->machine->pens[dot+(color_pen<<4)];
+			if(input_code_pressed(screen->machine, KEYCODE_E))
+			start_offs+=4;
 
-			count+=4;
+			if(input_code_pressed(screen->machine, KEYCODE_R))
+			start_offs-=4;
+
+			if(input_code_pressed(screen->machine, KEYCODE_D))
+			color_pen++;
+
+			if(input_code_pressed(screen->machine, KEYCODE_F))
+			color_pen--;
+
+			popmessage("%02x %02x %04x %02x",test_x,test_y,start_offs,color_pen);
+
+			bitmap_fill(bitmap,cliprect,get_black_pen(screen->machine));
+
+			count = (start_offs);
+
+			for(y=0;y<test_y;y++)
+			{
+				for(x=0;x<test_x;x+=8)
+				{
+					UINT32 color;
+					UINT8 dot;
+
+					color = ((blit_ram[count+0] & 0xff) << 24);
+					color|= ((blit_ram[count+1] & 0xff) << 16);
+					color|= ((blit_ram[count+2] & 0xff) << 8);
+					color|= ((blit_ram[count+3] & 0xff) << 0);
+
+					dot = (color & 0xf0000000) >> 28;
+					*BITMAP_ADDR16(bitmap, y, x+0) = screen->machine->pens[dot+(color_pen<<4)];
+
+					dot = (color & 0x0f000000) >> 24;
+					*BITMAP_ADDR16(bitmap, y, x+4) = screen->machine->pens[dot+(color_pen<<4)];
+
+					dot = (color & 0x00f00000) >> 20;
+					*BITMAP_ADDR16(bitmap, y, x+1) = screen->machine->pens[dot+(color_pen<<4)];
+
+					dot = (color & 0x000f0000) >> 16;
+					*BITMAP_ADDR16(bitmap, y, x+5) = screen->machine->pens[dot+(color_pen<<4)];
+
+					dot = (color & 0x0000f000) >> 12;
+					*BITMAP_ADDR16(bitmap, y, x+2) = screen->machine->pens[dot+(color_pen<<4)];
+
+					dot = (color & 0x00000f00) >> 8;
+					*BITMAP_ADDR16(bitmap, y, x+6) = screen->machine->pens[dot+(color_pen<<4)];
+
+					dot = (color & 0x000000f0) >> 4;
+					*BITMAP_ADDR16(bitmap, y, x+3) = screen->machine->pens[dot+(color_pen<<4)];
+
+					dot = (color & 0x0000000f) >> 0;
+					*BITMAP_ADDR16(bitmap, y, x+7) = screen->machine->pens[dot+(color_pen<<4)];
+
+					count+=4;
+				}
+			}
 		}
 	}
-}
+
 
 	return 0;
 }
 
-static DRIVER_INIT( cybertnk )
-{
-
-}
 
 static WRITE16_HANDLER( tx_vram_w )
 {
@@ -779,10 +785,13 @@ static const gfx_layout tile_8x8x4 =
     8*8
 };
 
+static GFXLAYOUT_RAW( roadlayout, 4, 1024, 1, 1024*4, 1024*4 )
+
 static GFXDECODE_START( cybertnk )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_8x8x4,     0x1400, 16 ) /*Pal offset???*/
 	GFXDECODE_ENTRY( "gfx2", 0, tile_8x8x4,     0,      0x400 )
 	GFXDECODE_ENTRY( "gfx3", 0, tile_8x8x4,     0,      0x400 )
+	GFXDECODE_ENTRY( "road_data", 0, roadlayout,     0,      0x400 )
 GFXDECODE_END
 
 #if 0
@@ -812,11 +821,11 @@ static const y8950_interface y8950_config = {
 static MACHINE_CONFIG_START( cybertnk, driver_device )
 	MDRV_CPU_ADD("maincpu", M68000,20000000/2)
 	MDRV_CPU_PROGRAM_MAP(master_mem)
-	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
+	MDRV_CPU_VBLANK_INT("lscreen", irq1_line_hold)
 
 	MDRV_CPU_ADD("slave", M68000,20000000/2)
 	MDRV_CPU_PROGRAM_MAP(slave_mem)
-	MDRV_CPU_VBLANK_INT("screen", irq3_line_hold)
+	MDRV_CPU_VBLANK_INT("lscreen", irq3_line_hold)
 
 	MDRV_CPU_ADD("audiocpu", Z80,3579500)
 	MDRV_CPU_PROGRAM_MAP(sound_mem)
@@ -824,12 +833,21 @@ static MACHINE_CONFIG_START( cybertnk, driver_device )
 	MDRV_QUANTUM_TIME(HZ(6000))//arbitrary value,needed to get the communication to work
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
+	MDRV_DEFAULT_LAYOUT(layout_dualhsxs)
+
+	MDRV_SCREEN_ADD("lscreen", RASTER)
+	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_SIZE(32*8, 32*8)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
+
+	MDRV_SCREEN_ADD("rscreen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 0*8, 32*8-1)
+	MDRV_SCREEN_REFRESH_RATE(60)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MDRV_SCREEN_SIZE(32*8, 32*8)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 
 	MDRV_GFXDECODE(cybertnk)
 	MDRV_PALETTE_LENGTH(0x4000)
@@ -914,7 +932,7 @@ ROM_START( cybertnk )
 	ROM_LOAD32_BYTE( "c15.117", 0x000003, 0x20000, CRC(f163d768) SHA1(e54e31a6f956f7de52b59bcdd0cd4ac1662b5664) )
 	ROM_LOAD32_BYTE( "c16.116", 0x000002, 0x20000, CRC(5e5017c4) SHA1(586cd729630f00cbaf10d1036edebed1672bc532) )
 
-	ROM_REGION( 0x200000, "road_data", 0 )
+	ROM_REGION( 0x40000, "road_data", 0 )
 	ROM_LOAD16_BYTE( "road_chl" , 0x000000, 0x20000, CRC(862b109c) SHA1(9f81918362218ddc0a6bf0a5317c5150e514b699) )
 	ROM_LOAD16_BYTE( "road_chh" , 0x000001, 0x20000, CRC(9dedc988) SHA1(10bae1be0e35320872d4994f7e882cd1de988c90) )
 
@@ -936,5 +954,20 @@ ROM_START( cybertnk )
 	ROM_LOAD( "ic29", 0x0240, 0x0020, CRC(95b32c0f) SHA1(5a19f441ced983bacbf3bc1aaee94ca768166447) )
 	ROM_LOAD( "ic30", 0x0260, 0x0020, CRC(2bb6033f) SHA1(eb994108734d7d04f8e293eca21bb3051a63cfe9) )
 ROM_END
+
+DRIVER_INIT( cybertnk )
+{
+	/* make the gfx decode easier by swapping bits around */
+/*
+	UINT8* road_data;
+	int i;
+
+	road_data = memory_region(machine, "road_data");
+	for (i=0;i < 0x40000;i++)
+	{
+		road_data[i] = BITSWAP8(road_data[i],3,2,1,0,7,6,5,4);
+	}
+*/
+}
 
 GAME( 1988, cybertnk,  0,       cybertnk,  cybertnk,  cybertnk, ROT0, "Coreland", "Cyber Tank (v1.04)", GAME_NOT_WORKING )
