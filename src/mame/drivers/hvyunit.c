@@ -757,6 +757,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1988, hvyunit, 0,        hvyunit, hvyunit, 0, ROT0, "Kaneko / Taito", "Heavy Unit (World)", GAME_NOT_WORKING )
-GAME( 1988, hvyunitj, hvyunit, hvyunit, hvyunit, 0, ROT0, "Kaneko / Taito", "Heavy Unit (Japan, Newer)", GAME_NOT_WORKING )
-GAME( 1988, hvyunito, hvyunit, hvyunit, hvyunit, 0, ROT0, "Kaneko / Taito", "Heavy Unit (Japan, Older)", GAME_NOT_WORKING )
+GAME( 1988, hvyunit, 0,        hvyunit, hvyunit, 0, ROT0, "Kaneko / Taito", "Heavy Unit (World)", 0 )
+GAME( 1988, hvyunitj, hvyunit, hvyunit, hvyunit, 0, ROT0, "Kaneko / Taito", "Heavy Unit (Japan, Newer)", 0 )
+GAME( 1988, hvyunito, hvyunit, hvyunit, hvyunit, 0, ROT0, "Kaneko / Taito", "Heavy Unit (Japan, Older)", 0 )
