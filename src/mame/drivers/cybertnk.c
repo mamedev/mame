@@ -168,6 +168,7 @@ lev 7 : 0x7c : 0000 07e0 - input device clear?
 static tilemap_t *tx_tilemap;
 static UINT16 *tx_vram,*bg_vram,*fg_vram,*spr_ram;
 static UINT16 *io_ram;
+static UINT16 *cybertnk_roadram;
 
 #define LOG_UNKNOWN_WRITE logerror("unknown io write CPU '%s':%08x  0x%08x 0x%04x & 0x%04x\n", space->cpu->tag(), cpu_get_pc(space->cpu), offset*2, data, mem_mask);
 
@@ -217,6 +218,23 @@ static VIDEO_UPDATE( cybertnk )
 
 
 	bitmap_fill(bitmap, cliprect, get_black_pen(screen->machine));
+
+	{
+		int i;
+		const gfx_element *gfx = screen->machine->gfx[3];
+
+
+		for (i=0;i<0x1000/4;i+=4)
+		{
+			UINT16 param1 = cybertnk_roadram[i+2];
+			UINT16 param2 = cybertnk_roadram[i+0];
+
+			drawgfx_transpen(bitmap,cliprect,gfx,param1,0,0,0,-param2+screen_shift,i/4,0);
+
+
+		}
+
+	}
 
 
 	{
@@ -648,7 +666,7 @@ ADDRESS_MAP_END
 static ADDRESS_MAP_START( slave_mem, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x01ffff) AM_ROM
 	AM_RANGE(0x080000, 0x083fff) AM_RAM /*Work RAM*/
-	AM_RANGE(0x0c0000, 0x0c0fff) AM_RAM
+	AM_RANGE(0x0c0000, 0x0c0fff) AM_RAM AM_BASE(&cybertnk_roadram)
 	AM_RANGE(0x100000, 0x100fff) AM_RAM AM_SHARE("sharedram")
 	AM_RANGE(0x140000, 0x140003) AM_NOP /*Watchdog? Written during loops and interrupts*/
 ADDRESS_MAP_END
@@ -785,7 +803,7 @@ static const gfx_layout tile_8x8x4 =
     8*8
 };
 
-static GFXLAYOUT_RAW( roadlayout, 4, 1024, 1, 1024*4, 1024*4 )
+static GFXLAYOUT_RAW( roadlayout, 4, 1024, 1, 1024*4, 1024*4 ) // could be wrong.. needs to be 512 wide, might not be 8bpp
 
 static GFXDECODE_START( cybertnk )
 	GFXDECODE_ENTRY( "gfx1", 0, tile_8x8x4,     0x1400, 16 ) /*Pal offset???*/
@@ -840,14 +858,14 @@ static MACHINE_CONFIG_START( cybertnk, driver_device )
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
 
 	MDRV_SCREEN_ADD("rscreen", RASTER)
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	MDRV_SCREEN_REFRESH_RATE(60)
 	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
+	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
 
 	MDRV_GFXDECODE(cybertnk)
 	MDRV_PALETTE_LENGTH(0x4000)
@@ -933,8 +951,8 @@ ROM_START( cybertnk )
 	ROM_LOAD32_BYTE( "c16.116", 0x000002, 0x20000, CRC(5e5017c4) SHA1(586cd729630f00cbaf10d1036edebed1672bc532) )
 
 	ROM_REGION( 0x40000, "road_data", 0 )
-	ROM_LOAD16_BYTE( "road_chl" , 0x000000, 0x20000, CRC(862b109c) SHA1(9f81918362218ddc0a6bf0a5317c5150e514b699) )
-	ROM_LOAD16_BYTE( "road_chh" , 0x000001, 0x20000, CRC(9dedc988) SHA1(10bae1be0e35320872d4994f7e882cd1de988c90) )
+	ROM_LOAD16_BYTE( "road_chl" , 0x000001, 0x20000, CRC(862b109c) SHA1(9f81918362218ddc0a6bf0a5317c5150e514b699) )
+	ROM_LOAD16_BYTE( "road_chh" , 0x000000, 0x20000, CRC(9dedc988) SHA1(10bae1be0e35320872d4994f7e882cd1de988c90) )
 
 	/*The following ROM regions aren't checked yet*/
 	ROM_REGION( 0x30000, "user3", 0 )
