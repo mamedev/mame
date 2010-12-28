@@ -9787,11 +9787,6 @@ Other Sun games
 	DRIVER( cfever1k )	/* (c) 2000 High Video */
 	DRIVER( girotutt )	/* (c) 2000 High Video */
 
-	/* 68000+MCU+blitter gambling games */
-	DRIVER( steaser )	/* (c) 1993 unknown */
-	DRIVER( ilpag )		/* (c) 199? unknown */
-	DRIVER( cjffruit )	/* (c) 1998 Cadillac Jack */
-
 	/* Sure games */
 	DRIVER( mil4000 )	/* (c) 2000 Sure Milano */
 	DRIVER( mil4000a )	/* (c) 2000 Sure Milano */
@@ -10541,6 +10536,20 @@ Other Sun games
 	DRIVER( megadpkr )	/* (c) 1990 Blitz System Inc */
 	DRIVER( megadpkrb )	/* (c) 1990 Blitz System Inc */
 
+	/* Blitz System Inc. 68k + Blitter Hardware */
+	DRIVER( megadblj )	/* (c) 1990 Blitz Systems Inc. */
+	DRIVER( megadble )	/* (c) 1990 Blitz Systems Inc. */
+	DRIVER( maxidbl )	/* (c) 1992 Blitz Systems Inc. */
+	DRIVER( bankrob )	/* (c) 1993 Entertainment Technology Corp. */
+	DRIVER( bankroba )	/* (c) 1993 Entertainment Technology Corp. */
+	DRIVER( poker52 )	/* (c) 1993 Blitz Systems Inc. ? */
+	DRIVER( steaser )	/* (c) 1993 unknown */
+	DRIVER( dualgame )	/* (c) 1995 Labtronix Technologies */
+	DRIVER( hermit )	/* (c) 1995 Dugamex */
+	DRIVER( deucesw2 )	/* (c) 1997 */
+	DRIVER( cjffruit )	/* (c) 1998 Cadillac Jack */
+	DRIVER( ilpag )		/* (c) 199? unknown */
+
 	/* Olympic Video Gaming */
 	DRIVER( hotstuff )
 
@@ -10559,9 +10568,6 @@ Other Sun games
 
 	/* NSM */
 	DRIVER( nsmpoker )
-
-	/* Labtronix Technologies */
-	DRIVER( dualgame )	/* (c) 1995 Labtronix Technologies */
 
 	/* Advanced Video Technologies */
 	DRIVER( avtsym14 )	/* (c) 1985 AVT */
