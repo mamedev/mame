@@ -1477,7 +1477,7 @@ static void copd2_set_tabledata(running_machine *machine, UINT16 data)
 #endif
 }
 
-static UINT32 cop_register[6];
+static UINT32 cop_register[8];
 static UINT16 seibu_vregs[0x50/2];
 
 static WRITE16_HANDLER( seibu_common_video_regs_w )
@@ -1953,7 +1953,7 @@ READ16_HANDLER( raiden2_cop2_r )
 
 static UINT16 cop_status,cop_dist,cop_angle;
 static UINT16 cop_hit_status,cop_hit_internal_status;
-static UINT32 cop_hit_val;
+static UINT32 cop_hit_val_x,cop_hit_val_y;
 static UINT32 cop_sort_lookup,cop_sort_ram_addr,cop_sort_param;
 
 static const UINT8 fade_table[0x400] = {
@@ -2037,15 +2037,26 @@ static READ16_HANDLER( generic_cop_r )
 
 	switch (offset)
 	{
+		/* DMA mode register readback */
+		case 0x07e/2:
+			return retvalue;
+
 		case 0x180/2:
 			return cop_hit_status;
 
-		/* these two controls facing direction in Godzilla opponents (only vs.)*/
-		case 0x182/2:
-			return (cop_hit_val & 0xffff0000) >> 16;
-
+		/* these two controls facing direction in Godzilla opponents (only vs.) - x value compare? */
 		case 0x184/2:
-			return cop_hit_val & 0xffff;
+			return (cop_hit_val_x & 0xffff0000) >> 16;
+
+		case 0x182/2:
+			return cop_hit_val_x & 0xffff;
+
+		/* Legionnaire only - y value compare? */
+		case 0x188/2:
+			return (cop_hit_val_y & 0xffff0000) >> 16;
+
+		case 0x186/2:
+			return cop_hit_val_y & 0xffff;
 
 		/* BCD */
 		case 0x190/2:
@@ -2189,6 +2200,13 @@ static WRITE16_HANDLER( generic_cop_w )
 		case (0x0a8/2): { cop_register[4] = (cop_register[4]&0x0000ffff)|(cop_mcu_ram[offset]<<16); break; }
 		case (0x0c8/2): { cop_register[4] = (cop_register[4]&0xffff0000)|(cop_mcu_ram[offset]<<0);   break; }
 
+		case (0x0aa/2): { cop_register[5] = (cop_register[5]&0x0000ffff)|(cop_mcu_ram[offset]<<16); break; }
+		case (0x0ca/2): { cop_register[5] = (cop_register[5]&0xffff0000)|(cop_mcu_ram[offset]<<0);   break; }
+
+		case (0x0ac/2): { cop_register[6] = (cop_register[6]&0x0000ffff)|(cop_mcu_ram[offset]<<16); break; }
+		case (0x0cc/2): { cop_register[6] = (cop_register[6]&0xffff0000)|(cop_mcu_ram[offset]<<0);   break; }
+
+
 		case (0x100/2):
 		case (0x102/2):
 		case (0x104/2):
@@ -2196,7 +2214,7 @@ static WRITE16_HANDLER( generic_cop_w )
 			int i;
 			int command;
 
-			seibu_cop_log("%06x: COPX execute table macro command %04x %04x | regs %08x %08x %08x %08x %08x\n", cpu_get_pc(space->cpu), data, cop_mcu_ram[offset], cop_register[0], cop_register[1], cop_register[2], cop_register[3], cop_register[4]);
+			//seibu_cop_log("%06x: COPX execute table macro command %04x %04x | regs %08x %08x %08x %08x %08x\n", cpu_get_pc(space->cpu), data, cop_mcu_ram[offset], cop_register[0], cop_register[1], cop_register[2], cop_register[3], cop_register[4]);
 
 			command = -1;
 			/* search the uploaded 'trigger' table for a matching trigger*/
@@ -2205,7 +2223,7 @@ static WRITE16_HANDLER( generic_cop_w )
 			{
 				if (cop_mcu_ram[offset]==copd2_table_4[i])
 				{
-					seibu_cop_log("    Cop Command %04x found in slot %02x with other params %04x %04x\n", cop_mcu_ram[offset], i, copd2_table_2[i], copd2_table_3[i]);
+					//seibu_cop_log("    Cop Command %04x found in slot %02x with other params %04x %04x\n", cop_mcu_ram[offset], i, copd2_table_2[i], copd2_table_3[i]);
 
 					u1 = copd2_table_2[i] & 0x000f;
 					u2 = copd2_table_3[i] & 0xffff;
@@ -2215,19 +2233,19 @@ static WRITE16_HANDLER( generic_cop_w )
 
 			if (command==-1)
 			{
-				seibu_cop_log("    Cop Command %04x NOT IN TABLE!\n", cop_mcu_ram[offset]);
+				//seibu_cop_log("    Cop Command %04x NOT IN TABLE!\n", cop_mcu_ram[offset]);
 				break;
 			}
 			else
 			{
-				int j;
+				//int j;
 				command*=0x8;
-				seibu_cop_log("     Sequence: ");
-				for (j=0;j<0x8;j++)
-				{
-					seibu_cop_log("%04x ", copd2_table[command+j]);
-				}
-				seibu_cop_log("\n");
+				//seibu_cop_log("     Sequence: ");
+				//for (j=0;j<0x8;j++)
+				//{
+				//	seibu_cop_log("%04x ", copd2_table[command+j]);
+				//}
+				//seibu_cop_log("\n");
 			}
 
 			//printf("%04x %04x %04x\n",cop_mcu_ram[offset],u1,u2);
@@ -2355,8 +2373,10 @@ static WRITE16_HANDLER( generic_cop_w )
 			/* note: these four are bad! */
 			if(COP_CMD(0xb80,0xb82,0xb84,0xb86,0x000,0x000,0x000,0x000,0,0xffff))
 			{
-				int dy = space->read_dword(cop_register[1]+4) - space->read_dword(cop_register[0]+4);
+				int dy = space->read_dword(cop_register[0]+4) - space->read_dword(cop_register[1]+4);
 				int hb = space->read_dword(cop_register[3]) - space->read_dword(cop_register[2]);
+
+				cop_hit_val_y = dy;
 
 				if(dy <= (hb))
 					cop_hit_internal_status &= ~1;
@@ -2371,7 +2391,7 @@ static WRITE16_HANDLER( generic_cop_w )
 			//(heatbrl)  | 9 | ffff | b080 | b40 bc0 bc2
 			if(COP_CMD(0xb40,0xbc0,0xbc2,0x000,0x000,0x000,0x000,0x000,9,0xffff))
 			{
-				int dy = space->read_dword(cop_register[1]+4) - space->read_dword(cop_register[0]+4);
+				int dy = space->read_dword(cop_register[0]+4) - space->read_dword(cop_register[1]+4);
 
 				if(dy >= 0)
 					cop_hit_internal_status &= ~2;
@@ -2385,8 +2405,10 @@ static WRITE16_HANDLER( generic_cop_w )
 
 			if(COP_CMD(0xba0,0xba2,0xba4,0xba6,0x000,0x000,0x000,0x000,15,0xffff))
 			{
-				int dx = space->read_dword(cop_register[1]+8) - space->read_dword(cop_register[0]+8);
+				int dx = space->read_dword(cop_register[0]+8) - space->read_dword(cop_register[1]+8);
 				int hb = space->read_dword(cop_register[3]) - space->read_dword(cop_register[2]);
+
+				cop_hit_val_x = dx;
 
 				if(dx <= (hb))
 					cop_hit_internal_status &= ~4;
@@ -2401,12 +2423,13 @@ static WRITE16_HANDLER( generic_cop_w )
 			//(heatbrl)  | 6 | ffff | b880 | b60 be0 be2
 			if(COP_CMD(0xb60,0xbe0,0xbe2,0x000,0x000,0x000,0x000,0x000,6,0xffff))
 			{
-				int dx = space->read_dword(cop_register[1]+8) - space->read_dword(cop_register[0]+8);
+				int dx = space->read_dword(cop_register[0]+8) - space->read_dword(cop_register[1]+8);
 
 				//printf("4: %08x %08x\n",dx_0,dx_1);
 
 				//if((space->read_word(cop_register[3]) & 0xff00) == 0x0600)
-				popmessage("%04x %04x %04x %04x %04x %04x %08x %08x\n",space->read_word(cop_register[0]+4),space->read_word(cop_register[0]+8),space->read_word(cop_register[1]+4),space->read_word(cop_register[1]+8),space->read_word(cop_register[2]),space->read_word(cop_register[3]),cop_register[2],cop_register[3]);
+//				popmessage("%04x %04x %04x %04x %04x %04x %08x %08x\n",space->read_word(cop_register[0]+4),space->read_word(cop_register[0]+8),space->read_word(cop_register[1]+4),space->read_word(cop_register[1]+8),space->read_word(cop_register[2]),space->read_word(cop_register[3]),cop_register[2],cop_register[3]);
+				popmessage("%08x %08x",cop_hit_val_x,cop_hit_val_y);
 
 				if(dx >= 0)
 					cop_hit_internal_status &= ~8;
@@ -2454,7 +2477,7 @@ static WRITE16_HANDLER( generic_cop_w )
 
 				for(i = 0;i < size;i++)
 				{
-					static UINT32 pal_val;
+					static UINT16 pal_val;
 					int r,g,b;
 					int rt,gt,bt;
 
@@ -2479,7 +2502,7 @@ static WRITE16_HANDLER( generic_cop_w )
 					}
 					else if(pal_brightness_mode == 4) //Denjin Makai, TODO
 					{
-						pal_val = space->read_word(src);
+						pal_val = space->read_word(src + (cop_dma_fade_table * 0x400));
 					}
 					else
 					{
@@ -2768,9 +2791,16 @@ WRITE16_HANDLER( cupsocs_mcu_w )
 {
 	COMBINE_DATA(&cop_mcu_ram[offset]);
 
-	if(offset >= 0x240/2 && offset <= 0x28f/2)
+	if(offset >= 0x240/2 && offset <= 0x27f/2)
 	{
 		seibu_common_video_regs_w(space,offset-0x240/2,cop_mcu_ram[offset],mem_mask);
+		return;
+	}
+
+
+	if(offset >= 0x200/2 && offset <= 0x20f/2)
+	{
+		seibu_common_video_regs_w(space,(offset-0x200/2)+(0x40/2),cop_mcu_ram[offset],mem_mask);
 		return;
 	}
 
