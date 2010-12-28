@@ -13,7 +13,7 @@
     - Sound is currently ugly in both games, recognizable but still nowhere near perfection
     - ertictac: 'music' dip-sw makes the game to just hang, BGM doesn't play either for
                 whatever reason (should be triggered as soon as it executes the POST)
-    - poizone: ARM core bugs causes it to crash at some point.
+    - poizone: video timings are off, causing various glitches.
     - Does this Arcade conversion have I2C device? It seems unused afaik.
     - Need PCB for identify the exact model of AA, available RAM, what kind of i/o "podule"
       it has etc.
@@ -184,7 +184,7 @@ static INPUT_PORTS_START( poizone )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
 INPUT_PORTS_END
 
-static DRIVER_INIT( ertictac)
+static DRIVER_INIT( ertictac )
 {
 	archimedes_driver_init(machine);
 }
@@ -229,7 +229,7 @@ static MACHINE_CONFIG_START( ertictac, driver_device )
 
 	MDRV_SCREEN_ADD("screen", RASTER)
 	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	MDRV_SCREEN_SIZE(1280, 1024)
 	MDRV_SCREEN_VISIBLE_AREA(0, 1280-1, 0, 1024-1)
@@ -311,5 +311,5 @@ ROM_START( poizone )
 ROM_END
 
 GAME( 1990, ertictac, 0, ertictac, ertictac, ertictac, ROT0, "Sisteme", "Erotictac/Tactic" ,GAME_IMPERFECT_SOUND)
-GAME( 1991, poizone,  0, ertictac, poizone, ertictac,  ROT0, "Eterna" ,"Poizone" ,GAME_IMPERFECT_SOUND|GAME_NOT_WORKING)
+GAME( 1991, poizone,  0, ertictac, poizone, ertictac,  ROT0, "Eterna" ,"Poizone" ,GAME_IMPERFECT_SOUND|GAME_IMPERFECT_GRAPHICS)
 
