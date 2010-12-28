@@ -604,11 +604,17 @@ static void HandleMemSingle( ARM_REGS* cpustate, UINT32 insn )
 		/* Pre-indexed addressing */
 		if (insn & INSN_SDT_U)
 		{
-			rnv = (GetRegister(cpustate, rn) + off);
+			if (rn != eR15)
+				rnv = (GetRegister(cpustate, rn) + off);
+			else
+				rnv = (R15 & ADDRESS_MASK) + off;
 		}
 		else
 		{
-			rnv = (GetRegister(cpustate, rn) - off);
+			if (rn != eR15)
+				rnv = (GetRegister(cpustate, rn) - off);
+			else
+				rnv = (R15 & ADDRESS_MASK) - off;
 		}
 
 		if (insn & INSN_SDT_W)
@@ -619,7 +625,7 @@ static void HandleMemSingle( ARM_REGS* cpustate, UINT32 insn )
 		}
 		else if (rn == eR15)
 		{
-			rnv = (rnv & ADDRESS_MASK) + 8;
+			rnv = rnv + 8;
 		}
 	}
 	else
