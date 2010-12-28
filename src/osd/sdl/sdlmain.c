@@ -779,6 +779,109 @@ bitmap_t *sdl_osd_interface::font_get_bitmap(osd_font font, unicode_char chnum, 
    return bitmap;
 }
 #else // UNIX but not OSX
+
+static TTF_Font *search_font_config(astring name, bool bold, bool italic, bool underline, bool &bakedstyles)
+{
+	TTF_Font *font = (TTF_Font *)NULL;
+	FcConfig *config;
+	FcPattern *pat;
+	FcObjectSet *os;
+	FcFontSet *fontset;
+	FcValue val;
+
+	config = FcConfigGetCurrent();
+	pat = FcPatternCreate();
+	os = FcObjectSetCreate();
+	FcPatternAddString(pat, FC_FAMILY, (const FcChar8 *)name.cstr());
+
+	// try and get a font with the requested styles baked-in
+	if (bold)
+	{
+		if (italic)
+		{
+			FcPatternAddString(pat, FC_STYLE, (const FcChar8 *)"Bold Italic");
+		}
+		else
+		{
+			FcPatternAddString(pat, FC_STYLE, (const FcChar8 *)"Bold");
+		}
+	}
+	else if (italic)
+	{
+		FcPatternAddString(pat, FC_STYLE, (const FcChar8 *)"Italic");
+	}
+	else
+	{
+		FcPatternAddString(pat, FC_STYLE, (const FcChar8 *)"Regular");
+	}
+
+	FcPatternAddString(pat, FC_FONTFORMAT, (const FcChar8 *)"TrueType");
+
+	FcObjectSetAdd(os, FC_FILE);
+	fontset = FcFontList(config, pat, os);
+
+	for (int i = 0; i < fontset->nfont; i++)
+	{
+		if (FcPatternGet(fontset->fonts[i], FC_FILE, 0, &val) != FcResultMatch)
+		{
+			continue;
+		}
+
+		if (val.type != FcTypeString)
+		{
+			continue;
+		}
+
+		mame_printf_verbose("Matching font: %s\n", val.u.s);
+		font = TTF_OpenFont((const char*)val.u.s, POINT_SIZE);
+
+		if (font)
+		{
+			bakedstyles = true;
+			break;
+		}
+	}
+
+	// didn't get a font above?  try again with no baked-in styles
+	if (!font)
+	{
+		FcPatternDestroy(pat);
+		FcFontSetDestroy(fontset);
+
+		pat = FcPatternCreate();
+		FcPatternAddString(pat, FC_FAMILY, (const FcChar8 *)name.cstr());
+		FcPatternAddString(pat, FC_STYLE, (const FcChar8 *)"Regular");
+		FcPatternAddString(pat, FC_FONTFORMAT, (const FcChar8 *)"TrueType");
+		fontset = FcFontList(config, pat, os);
+
+		for (int i = 0; i < fontset->nfont; i++)
+		{
+			if (FcPatternGet(fontset->fonts[i], FC_FILE, 0, &val) != FcResultMatch)
+			{
+				continue;
+			}
+
+			if (val.type != FcTypeString)
+			{
+				continue;
+			}
+
+			mame_printf_verbose("Matching unstyled font: %s\n", val.u.s);
+			font = TTF_OpenFont((const char*)val.u.s, POINT_SIZE);
+
+			if (font)
+			{
+				break;
+			}
+		}
+	}
+
+	FcPatternDestroy(pat);
+	FcObjectSetDestroy(os);
+	FcFontSetDestroy(fontset);
+	return font;
+}
+
 //-------------------------------------------------
 //  font_open - attempt to "open" a handle to the
 //  font with the given name
@@ -787,13 +890,8 @@ bitmap_t *sdl_osd_interface::font_get_bitmap(osd_font font, unicode_char chnum, 
 osd_font sdl_osd_interface::font_open(const char *_name, int &height)
 {
 	TTF_Font *font = (TTF_Font *)NULL;
-	int style = 0;
-	FcConfig *config;
-	FcPattern *pat;
-	FcObjectSet *os;
-	FcFontSet *fontset;
-	FcValue val;
 	bool bakedstyles = false;
+	int style = 0;
 
 	// accept qualifiers from the name
 	astring name(_name);
@@ -815,99 +913,27 @@ osd_font sdl_osd_interface::font_open(const char *_name, int &height)
 	// first up, try it as a filename
 	font = TTF_OpenFont(name.cstr(), POINT_SIZE);
 
+	// if no success, try the font path
+
+	if (!font)
+	{
+		mame_file *t;
+
+		mame_printf_verbose("Searching font %s in -%s\n", name.cstr(), SEARCHPATH_FONT);
+		if (mame_fopen(SEARCHPATH_FONT, name.cstr(), OPEN_FLAG_READ, &t) == FILERR_NONE)
+		{
+			astring full_name = mame_file_full_name(t);
+			mame_fclose(t);
+			font = TTF_OpenFont(full_name.cstr(), POINT_SIZE);
+			if (font)
+				mame_printf_verbose("Found font %s\n", full_name.cstr());
+		}
+	}
+
 	// if that didn't work, crank up the FontConfig database
 	if (!font)
 	{
-		config = FcConfigGetCurrent();
-		pat = FcPatternCreate();
-		os = FcObjectSetCreate();
-		FcPatternAddString(pat, FC_FAMILY, (const FcChar8 *)name.cstr());
-
-		// try and get a font with the requested styles baked-in
-		if (bold)
-		{
-			if (italic)
-			{
-				FcPatternAddString(pat, FC_STYLE, (const FcChar8 *)"Bold Italic");
-			}
-			else
-			{
-				FcPatternAddString(pat, FC_STYLE, (const FcChar8 *)"Bold");
-			}
-		}
-		else if (italic)
-		{
-			FcPatternAddString(pat, FC_STYLE, (const FcChar8 *)"Italic");
-		}
-		else
-		{
-			FcPatternAddString(pat, FC_STYLE, (const FcChar8 *)"Regular");
-		}
-
-		FcPatternAddString(pat, FC_FONTFORMAT, (const FcChar8 *)"TrueType");
-
-		FcObjectSetAdd(os, FC_FILE);
-		fontset = FcFontList(config, pat, os);
-
-		for (int i = 0; i < fontset->nfont; i++)
-		{
-			if (FcPatternGet(fontset->fonts[i], FC_FILE, 0, &val) != FcResultMatch)
-			{
-				continue;
-			}
-
-			if (val.type != FcTypeString)
-			{
-				continue;
-			}
-
-			mame_printf_verbose("Matching font: %s\n", val.u.s);
-			font = TTF_OpenFont((const char*)val.u.s, POINT_SIZE);
-
-			if (font)
-			{
-				bakedstyles = true;
-				break;
-			}
-		}
-
-		// didn't get a font above?  try again with no baked-in styles
-		if (!font)
-		{
-			FcPatternDestroy(pat);
-			FcFontSetDestroy(fontset);
-
-			pat = FcPatternCreate();
-			FcPatternAddString(pat, FC_FAMILY, (const FcChar8 *)name.cstr());
-			FcPatternAddString(pat, FC_STYLE, (const FcChar8 *)"Regular");
-			FcPatternAddString(pat, FC_FONTFORMAT, (const FcChar8 *)"TrueType");
-			fontset = FcFontList(config, pat, os);
-
-			for (int i = 0; i < fontset->nfont; i++)
-			{
-				if (FcPatternGet(fontset->fonts[i], FC_FILE, 0, &val) != FcResultMatch)
-				{
-					continue;
-				}
-
-				if (val.type != FcTypeString)
-				{
-					continue;
-				}
-
-				mame_printf_verbose("Matching unstyled font: %s\n", val.u.s);
-				font = TTF_OpenFont((const char*)val.u.s, POINT_SIZE);
-
-				if (font)
-				{
-					break;
-				}
-			}
-		}
-
-		FcPatternDestroy(pat);
-		FcObjectSetDestroy(os);
-		FcFontSetDestroy(fontset);
+		font = search_font_config(name, bold, italic, underline, bakedstyles);
 	}
 
 	if (!font)
