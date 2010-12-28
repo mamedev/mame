@@ -627,10 +627,12 @@ static render_primitive_list &drawsdl_window_get_primitives(sdl_window_info *win
 	{
 		sdlwindow_blit_surface_size(window, window->monitor->center_width, window->monitor->center_height);
 	}
+
 	if (!sdl->scale_mode->is_scale)
 		window->target->set_bounds(window->blitwidth, window->blitheight, sdlvideo_monitor_get_aspect(window->monitor));
 	else
 		window->target->set_bounds(sdl->hw_scale_width, sdl->hw_scale_height);
+
 	return window->target->get_primitives();
 }
 

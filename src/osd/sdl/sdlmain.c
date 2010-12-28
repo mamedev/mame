@@ -904,11 +904,7 @@ osd_font sdl_osd_interface::font_open(const char *_name, int &height)
 	bool bold = (name.replace(0, "[B]", "") + name.replace(0, "[b]", "") > 0);
 	bool italic = (name.replace(0, "[I]", "") + name.replace(0, "[i]", "") > 0);
 	bool underline = (name.replace(0, "[U]", "") + name.replace(0, "[u]", "") > 0);
-#if TTF_MAJOR_VERSION >= 2
-#if TTF_PATCHLEVEL >= 10  // SDL_ttf 2.0.9 and earlier does not define TTF_STYLE_STRIKETHROUGH
 	bool strike = (name.replace(0, "[S]", "") + name.replace(0, "[s]", "") > 0);
-#endif // MAJOR_VERSION
-#endif // PATCHLEVEL
 
 	// first up, try it as a filename
 	font = TTF_OpenFont(name.cstr(), POINT_SIZE);
@@ -949,10 +945,12 @@ osd_font sdl_osd_interface::font_open(const char *_name, int &height)
 		style |= italic ? TTF_STYLE_ITALIC : 0;
 	}
 	style |= underline ? TTF_STYLE_UNDERLINE : 0;
-#if TTF_MAJOR_VERSION >= 2
-#if TTF_PATCHLEVEL >= 10
+	// SDL_ttf 2.0.9 and earlier does not define TTF_STYLE_STRIKETHROUGH
+#if SDL_VERSIONNUM(TTF_MAJOR_VERSION, TTF_MINOR_VERSION, TTF_PATCHLEVEL) > SDL_VERSIONNUM(2,0,9)
 	style |= strike ? TTF_STYLE_STRIKETHROUGH : 0;
-#endif // MAJOR_VERSION
+#else
+	if (strike)
+		mame_printf_warning("Ignoring strikethrough for SDL_TTF with version less 2.0.10\n");
 #endif // PATCHLEVEL
 	TTF_SetFontStyle(font, style);
 
