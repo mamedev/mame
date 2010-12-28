@@ -1121,12 +1121,12 @@ ROM_END
 
 ROM_START( riskchal )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "rc_h0.rom",    0x00001, 0x40000, CRC(4c9b5344) SHA1(61e26950a672c6404e2386acdd098536b61b9933) )
-	ROM_LOAD16_BYTE( "rc_l0.rom",    0x00000, 0x40000, CRC(0455895a) SHA1(1072b8d280f7ccc48cd8fbd81323e1f8c8d0db95) )
+	ROM_LOAD16_BYTE( "rc_h0.ic77",    0x00001, 0x40000, CRC(4c9b5344) SHA1(61e26950a672c6404e2386acdd098536b61b9933) )
+	ROM_LOAD16_BYTE( "rc_l0.ic79",    0x00000, 0x40000, CRC(0455895a) SHA1(1072b8d280f7ccc48cd8fbd81323e1f8c8d0db95) )
 	ROM_COPY( "maincpu", 0x7fff0,  0xffff0, 0x10 )	/* start vector */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "rc_sp.rom",    0x0000, 0x10000, CRC(bb80094e) SHA1(1c62e702c395b7ebb666a79af1912b270d5f95aa) )
+	ROM_LOAD( "l4_a-sp.ic33",    0x0000, 0x10000, CRC(bb80094e) SHA1(1c62e702c395b7ebb666a79af1912b270d5f95aa) )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )
 	ROM_LOAD( "rc_c0.rom",    0x000000, 0x80000, CRC(84d0b907) SHA1(a686ccd67d068e5e4ba41bb8b73fdc1cad8eb5ee) )
@@ -1140,12 +1140,12 @@ ROM_END
 
 ROM_START( gussun )
 	ROM_REGION( CODE_SIZE, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "l4_h0.rom",    0x00001, 0x40000, CRC(9d585e61) SHA1(e108a9dc2dc1b75c1439271a2391f943c3a53fe1) )
-	ROM_LOAD16_BYTE( "l4_l0.rom",    0x00000, 0x40000, CRC(c7b4c519) SHA1(44887ccf54f5e507d2db4f09a7c2b7b9ea217058) )
+	ROM_LOAD16_BYTE( "l4_a-h0.ic77",    0x00001, 0x40000, CRC(9d585e61) SHA1(e108a9dc2dc1b75c1439271a2391f943c3a53fe1) )
+	ROM_LOAD16_BYTE( "l4_a-l0.ic79",    0x00000, 0x40000, CRC(c7b4c519) SHA1(44887ccf54f5e507d2db4f09a7c2b7b9ea217058) )
 	ROM_COPY( "maincpu", 0x7fff0,  0xffff0, 0x10 )	/* start vector */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
-	ROM_LOAD( "rc_sp.rom",    0x0000, 0x10000, CRC(bb80094e) SHA1(1c62e702c395b7ebb666a79af1912b270d5f95aa) )
+	ROM_LOAD( "l4_a-sp.ic33",    0x0000, 0x10000, CRC(bb80094e) SHA1(1c62e702c395b7ebb666a79af1912b270d5f95aa) )
 
 	ROM_REGION( 0x200000, "gfx1", 0 )
 	ROM_LOAD( "rc_c0.rom",    0x000000, 0x80000, CRC(84d0b907) SHA1(a686ccd67d068e5e4ba41bb8b73fdc1cad8eb5ee) )
@@ -1159,8 +1159,8 @@ ROM_END
 
 ROM_START( matchit2 )
 	ROM_REGION( CODE_SIZE * 2, "maincpu", 0 )
-	ROM_LOAD16_BYTE( "sis2-h0b.bin", 0x00001, 0x40000, CRC(9a2556ac) SHA1(3e4d5ac2869c703c5d5b769c2a09e501b5e6462e) ) /* Actually labeled as "SIS2-H0-B" */
-	ROM_LOAD16_BYTE( "sis2-l0b.bin", 0x00000, 0x40000, CRC(d35d948a) SHA1(e4f119fa00fd8ede2533323e14d94ad4d5fabbc5) ) /* Actually labeled as "SIS2-L0-B" */
+	ROM_LOAD16_BYTE( "sis2-h0-b.bin", 0x00001, 0x40000, CRC(9a2556ac) SHA1(3e4d5ac2869c703c5d5b769c2a09e501b5e6462e) ) /* Actually labeled as "SIS2-H0-B" */
+	ROM_LOAD16_BYTE( "sis2-l0-b.bin", 0x00000, 0x40000, CRC(d35d948a) SHA1(e4f119fa00fd8ede2533323e14d94ad4d5fabbc5) ) /* Actually labeled as "SIS2-L0-B" */
 	ROM_COPY( "maincpu", 0x7fff0,  0xffff0, 0x10 )	/* start vector */
 
 	ROM_REGION( 0x10000, "soundcpu", 0 )
