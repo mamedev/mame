@@ -1509,12 +1509,7 @@ player-1 priorities list:
 1086f0: sprite x axis
 
 Sprite DMA TODO:
--sprite priorities,likely to be a protection issue because in-game sprites MUST
- be behind the foreground layer but the attract mode logos (the ones used when
- the story is explained) should be above it.They both use 0 as priority number.
--sprites at the very left border disappears.
--some bullets STILL remains on screen?
--3rd mid-boss disappears (0x1f0),2nd boss lasers wrong positioning
+- various bits not yet understood in the sprite src tables and in the 0x400/0x402 sprite param;
 
 spriteram DMA [1]
 001DE4: 3086                     move.w  D6, (A0) ;$100400,color + other stuff
@@ -1539,10 +1534,10 @@ spriteram DMA [1]
 001E26: 3143 00A8                move.w  D3, ($a8,A0)
 001E2A: 45EA 0004                lea     ($4,A2), A2
 //at this point we're ready for DMAing
-001E2E: 317C A180 0100           move.w  #$a180, ($100,A0) ;<-DMA parameters!?
-001E34: 317C 6980 0102           move.w  #$6980, ($102,A0) ;<-""
-001E3A: 317C C480 0102           move.w  #$c480, ($102,A0) ;<-""
-001E40: 317C 0000 0010           move.w  #$0, ($10,A0)     ;<-""
+001E2E: 317C A180 0100           move.w  #$a180, ($100,A0) ;<-get x/y from sprite
+001E34: 317C 6980 0102           move.w  #$6980, ($102,A0) ;<-adjust sprite x/y
+001E3A: 317C C480 0102           move.w  #$c480, ($102,A0) ;<-load sprite offset
+001E40: 317C 0000 0010           move.w  #$0, ($10,A0)     ;<-do the job?
 001E46: 302A 0002                move.w  ($2,A2), D0
 001E4A: 816B 0006                or.w    D0, ($6,A3)
 001E4E: 45EA 0006                lea     ($6,A2), A2
@@ -1563,7 +1558,6 @@ spriteram DMA [1]
 001E8C: 6500 000C                bcs     $1e9a
 001E90: 0069 0002 0002           ori.w   #$2, ($2,A1)
 001E96: 6000 000C                bra     $1ea4
-//Note: I believe the above program is there just for protection copy
 001E9A: 3028 01B0                move.w  ($1b0,A0), D0 ;bit 1 = DMA job finished
 001E9E: 0240 0002                andi.w  #$2, D0
 001EA2: 6790                     beq     $1e34
@@ -1591,39 +1585,6 @@ x/y check [2]
 //then reads at $580
 
 */
-
-#ifdef UNUSED_FUNCTION
-static UINT16 s_i;
-
-static void dma_transfer(address_space *space)
-{
-	static UINT16 rel_xy;
-	static UINT16 abs_x,abs_y;
-	static UINT16 param;
-
-	//for(s_i = dma_size;s_i > 0;s_i--)
-	{
-		/*Sprite Color*/
-		param = space->read_word(0x100400) & 0x3f;
-		/*Write the entire parameters [offs+0]*/
-		space->write_word(cop_register[5]+4,space->read_word(dma_src) + param);
-		/*Sprite Priority (guess)*/
-		//param = ((space->read_word(0x100400) & 0x40) ? 0x4000 : 0);
-		/*Write the sprite number [offs+1]*/
-		space->write_word(cop_register[5]+6,space->read_word(dma_src+2));
-		/*Sprite Relative x/y coords*/
-		rel_xy = space->read_word(dma_src+4); /*???*/
-		/*temporary hardwired,it should point to 0x4c0/0x4a0*/
-		abs_x = (space->read_word(0x110008) - space->read_word(0x10048e));
-		abs_y = (space->read_word(0x110004) - space->read_word(0x10048c));
-		space->write_word(cop_register[5]+8,((rel_xy & 0x7f) + (abs_x) - ((rel_xy & 0x80) ? 0x80 : 0)) & 0x1ff);
-		space->write_word(cop_register[5]+10,(((rel_xy & 0x7f00) >> 8) + (abs_y) + (0x10) - ((rel_xy & 0x8000) ? 0x80 : 0)) & 0x1ff);
-		cop_register[5]+=8;
-		dma_src+=6;
-	}
-}
-#endif
-
 
 /********************************************************************************************
 
@@ -1956,6 +1917,7 @@ static UINT16 cop_hit_status,cop_hit_internal_status;
 static UINT32 cop_hit_val_x,cop_hit_val_y;
 static UINT32 cop_sort_lookup,cop_sort_ram_addr,cop_sort_param;
 
+/* Taken from Seibu Cup Soccer bootleg (TODO: understand the algorythm and remove this) */
 static const UINT8 fade_table[0x400] = {
 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
 0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,0x00,
@@ -2086,8 +2048,9 @@ static READ16_HANDLER( generic_cop_r )
 }
 
 static UINT32 fill_val;
-
 static UINT8 pal_brightness_val,pal_brightness_mode;
+static UINT32 cop_sprite_dma_src;
+static int cop_sprite_dma_abs_x,cop_sprite_dma_abs_y,cop_sprite_dma_param,cop_sprite_dma_size;
 
 static WRITE16_HANDLER( generic_cop_w )
 {
@@ -2098,6 +2061,44 @@ static WRITE16_HANDLER( generic_cop_w )
 		default:
 			seibu_cop_log("%06x: COPX unhandled write data %04x at offset %04x\n", cpu_get_pc(space->cpu), data, offset*2);
 			break;
+
+		/* Sprite DMA */
+		case (0x000/2):
+			cop_sprite_dma_param = cop_mcu_ram[offset];
+			break;
+
+		/* another parameter (priority?) */
+		//case (0x002/2):
+		//	break;
+
+		case (0x00c/2): { cop_sprite_dma_size = cop_mcu_ram[offset]; break; }
+		case (0x010/2):
+		{
+			if(data)
+				printf("Warning: COP RAM 0x410 used with %04x\n",data);
+			else
+			{
+				/* guess */
+				cop_register[4]+=8;
+				cop_sprite_dma_src+=6;
+
+				cop_sprite_dma_size--;
+
+				if(cop_sprite_dma_size > 0)
+					cop_status &= ~2;
+				else
+					cop_status |= 2;
+			}
+			break;
+		}
+
+		case (0x012/2):
+		case (0x014/2):
+			cop_sprite_dma_src = (cop_mcu_ram[0x014/2]) | (cop_mcu_ram[0x012/2] << 16);
+			break;
+
+		case (0x08c/2): cop_sprite_dma_abs_y = (cop_mcu_ram[0x08c/2]); break;
+		case (0x08e/2): cop_sprite_dma_abs_x = (cop_mcu_ram[0x08e/2]); break;
 
 		/* BCD Protection */
 		case (0x020/2):
@@ -2223,7 +2224,7 @@ static WRITE16_HANDLER( generic_cop_w )
 			{
 				if (cop_mcu_ram[offset]==copd2_table_4[i])
 				{
-					//seibu_cop_log("    Cop Command %04x found in slot %02x with other params %04x %04x\n", cop_mcu_ram[offset], i, copd2_table_2[i], copd2_table_3[i]);
+					seibu_cop_log("    Cop Command %04x found in slot %02x with other params %04x %04x\n", cop_mcu_ram[offset], i, copd2_table_2[i], copd2_table_3[i]);
 
 					u1 = copd2_table_2[i] & 0x000f;
 					u2 = copd2_table_3[i] & 0xffff;
@@ -2233,19 +2234,19 @@ static WRITE16_HANDLER( generic_cop_w )
 
 			if (command==-1)
 			{
-				//seibu_cop_log("    Cop Command %04x NOT IN TABLE!\n", cop_mcu_ram[offset]);
+				seibu_cop_log("    Cop Command %04x NOT IN TABLE!\n", cop_mcu_ram[offset]);
 				break;
 			}
 			else
 			{
-				//int j;
+				int j;
 				command*=0x8;
-				//seibu_cop_log("     Sequence: ");
-				//for (j=0;j<0x8;j++)
-				//{
-				//	seibu_cop_log("%04x ", copd2_table[command+j]);
-				//}
-				//seibu_cop_log("\n");
+				seibu_cop_log("     Sequence: ");
+				for (j=0;j<0x8;j++)
+				{
+					seibu_cop_log("%04x ", copd2_table[command+j]);
+				}
+				seibu_cop_log("\n");
 			}
 
 			//printf("%04x %04x %04x\n",cop_mcu_ram[offset],u1,u2);
@@ -2441,6 +2442,35 @@ static WRITE16_HANDLER( generic_cop_w )
 				return;
 			}
 
+			// grainbow 0d | a | fff3 | 6980 | b80 ba0
+			if(COP_CMD(0xb80,0xba0,0x000,0x000,0x000,0x000,0x000,0x000,10,0xfff3))
+			{
+				static UINT8 offs;
+				static int abs_x,abs_y,rel_xy;
+
+				offs = (offset & 3) * 4;
+
+				/* TODO: I really suspect that following two are actually taken from the 0xa180 macro command then internally loaded */
+				/* TODO: +16 is a temp hack, we need to find the sprite X/Y global register */
+				abs_x = space->read_word(cop_register[0] + 8) - cop_sprite_dma_abs_x + 16;
+				abs_y = space->read_word(cop_register[0] + 4) - cop_sprite_dma_abs_y;
+				rel_xy = space->read_word(cop_sprite_dma_src + 4 + offs);
+
+				space->write_word(cop_register[4] + offs + 4,(((rel_xy & 0x7f) + (abs_x) - ((rel_xy & 0x80) ? 0x80 : 0)) & 0x1ff));
+				space->write_word(cop_register[4] + offs + 6,(((rel_xy & 0x7f00) >> 8) + (abs_y) + (0x10) - ((rel_xy & 0x8000) ? 0x80 : 0)) & 0x1ff);
+			}
+
+			// grainbow 18 | a | ff00 | c480 | 080 882
+			if(COP_CMD(0x080,0x882,0x000,0x000,0x000,0x000,0x000,0x000,10,0xff00))
+			{
+				static UINT8 offs;
+
+				offs = (offset & 3) * 4;
+
+				space->write_word(cop_register[4] + offs,space->read_word(cop_sprite_dma_src + offs) + (cop_sprite_dma_param & 0x3f));
+				//space->write_word(cop_register[4] + offs ,space->read_word(cop_sprite_dma_src+2 + offs));
+			}
+
 			//printf("%04x\n",cop_mcu_ram[offset]);
 
 			break;
@@ -2465,7 +2495,9 @@ static WRITE16_HANDLER( generic_cop_w )
                 0x87 is used by Denjin Makai
 
                 TODO:
-                Denjin Makai triggers mode 4
+                - Denjin Makai triggers mode 4
+                - SD Gundam doesn't fade colors correctly, it should have the text layer / sprites with normal gradient and the rest dimmed in most cases,
+                  presumably bad RAM table or bad algorythm
                 */
 
 				//if(dma_trigger != 0x87)
@@ -2480,7 +2512,6 @@ static WRITE16_HANDLER( generic_cop_w )
 					static UINT16 pal_val;
 					int r,g,b;
 					int rt,gt,bt;
-
 
 					if(pal_brightness_mode == 5)
 					{
@@ -2976,17 +3007,6 @@ WRITE16_HANDLER( grainbow_mcu_w )
 		default:
 			generic_cop_w(space, offset, data, mem_mask);
 			break;
-
-		/*********************************************************************
-        400-5ff -  Protection writes
-        *********************************************************************/
-
-		#if 0
-		case (0x00c/2): { dma_size = cop_mcu_ram[offset]; break; }
-		/*DMA source address*/
-		case (0x012/2): { prot_data[1] = cop_mcu_ram[offset]; dma_src = (prot_data[0]&0xffff)|((prot_data[1]&0xffff)<<16); break; }
-		case (0x014/2): { prot_data[0] = cop_mcu_ram[offset]; dma_src = (prot_data[0]&0xffff)|((prot_data[1]&0xffff)<<16); break; }
-		#endif
 
 		case (0x300/2):	{ seibu_main_word_w(space,0,cop_mcu_ram[offset],0x00ff); break; }
 		case (0x304/2):	{ seibu_main_word_w(space,1,cop_mcu_ram[offset],0x00ff); break; }
