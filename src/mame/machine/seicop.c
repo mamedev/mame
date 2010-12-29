@@ -2451,8 +2451,7 @@ static WRITE16_HANDLER( generic_cop_w )
 				offs = (offset & 3) * 4;
 
 				/* TODO: I really suspect that following two are actually taken from the 0xa180 macro command then internally loaded */
-				/* TODO: +16 is a temp hack, we need to find the X/Y global register ... also this probably should go into video file rather than here ... */
-				abs_x = space->read_word(cop_register[0] + 8) - cop_sprite_dma_abs_x + 16;
+				abs_x = space->read_word(cop_register[0] + 8) - cop_sprite_dma_abs_x;
 				abs_y = space->read_word(cop_register[0] + 4) - cop_sprite_dma_abs_y;
 				rel_xy = space->read_word(cop_sprite_dma_src + 4 + offs);
 

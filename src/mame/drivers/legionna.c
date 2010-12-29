@@ -1225,7 +1225,7 @@ static MACHINE_CONFIG_START( grainbow, driver_device )
 	MDRV_GFXDECODE(grainbow)
 	MDRV_PALETTE_LENGTH(128*16)
 
-	MDRV_VIDEO_START(legionna)
+	MDRV_VIDEO_START(grainbow)
 	MDRV_VIDEO_UPDATE(grainbow)
 
 	/* sound hardware */
