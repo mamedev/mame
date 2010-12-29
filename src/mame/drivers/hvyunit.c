@@ -298,7 +298,6 @@ static WRITE8_HANDLER( sound_bankswitch_w )
 {
 	unsigned char *ROM = memory_region(space->machine, "soundcpu");
 	int bank = data & 0x3;
-
 	ROM = &ROM[0x4000 * bank];
 
 	memory_set_bankptr(space->machine, "bank3", ROM);
@@ -415,8 +414,7 @@ static ADDRESS_MAP_START( master_memory, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x8000, 0xbfff) AM_ROMBANK("bank1")
 	AM_RANGE(0xc000, 0xcfff) AM_DEVREADWRITE("pandora", pandora_spriteram_r, pandora_spriteram_w)
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xf000, 0xffff) AM_RAM
+	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( master_io, ADDRESS_SPACE_IO, 8 )
@@ -435,8 +433,7 @@ static ADDRESS_MAP_START( slave_memory, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0xd000, 0xd1ff) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_split2_w) AM_BASE_GENERIC(paletteram2)
 	AM_RANGE(0xd800, 0xd9ff) AM_RAM_WRITE(paletteram_xxxxRRRRGGGGBBBB_split1_w) AM_BASE_GENERIC(paletteram)
 	AM_RANGE(0xd000, 0xdfff) AM_RAM
-	AM_RANGE(0xe000, 0xefff) AM_RAM AM_SHARE("share1")
-	AM_RANGE(0xf000, 0xffff) AM_RAM
+	AM_RANGE(0xe000, 0xffff) AM_RAM AM_SHARE("share1")
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( slave_io, ADDRESS_SPACE_IO, 8 )
@@ -523,7 +520,7 @@ static INPUT_PORTS_START( hvyunit )
 	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Service_Mode ) )		PORT_DIPLOCATION("DSW1:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-        PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "DSW1:4")
+	PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "DSW1:4")
 	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )			PORT_DIPLOCATION("DSW1:5,6")
 	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
@@ -555,7 +552,7 @@ static INPUT_PORTS_START( hvyunit )
 	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )		PORT_DIPLOCATION("DSW2:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-        PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "DSW2:8")
+	PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "DSW2:8")
 INPUT_PORTS_END
 
 
@@ -618,12 +615,12 @@ static const kaneko_pandora_interface hvyunit_pandora_config =
 
 static MACHINE_CONFIG_START( hvyunit, hvyunit_state )
 
-	MDRV_CPU_ADD("master", Z80,6000000)
+	MDRV_CPU_ADD("master", Z80, 6000000)
 	MDRV_CPU_PROGRAM_MAP(master_memory)
 	MDRV_CPU_IO_MAP(master_io)
 	MDRV_CPU_VBLANK_INT_HACK(hvyunit_interrupt, 2)
 
-	MDRV_CPU_ADD("slave", Z80,6000000)
+	MDRV_CPU_ADD("slave", Z80, 6000000)
 	MDRV_CPU_PROGRAM_MAP(slave_memory)
 	MDRV_CPU_IO_MAP(slave_io)
 	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
@@ -712,15 +709,15 @@ ROM_START( hvyunitj )
 	ROM_REGION( 0x1000, "mermaid", 0 )
 	ROM_LOAD( "mermaid.bin",  0x0000, 0x0e00, CRC(88c5dd27) SHA1(5043fed7fd192891be7e4096f2c5daaae1538bc4) )
 
-	ROM_REGION( 0x200000, "gfx1", 0 ) // TODO: The order is different to the other sets - verify
+	ROM_REGION( 0x200000, "gfx1", 0 )
 	ROM_LOAD( "b73_08.2f",  0x000000, 0x080000, CRC(f83dd808) SHA1(09d5f1e86fad3a0d2d3ac1845103d3f2833c6793) )
 	ROM_LOAD( "b73_07.2c",  0x100000, 0x010000, CRC(5cffa42c) SHA1(687e047345039479b35d5099e56dbc1d57284ed9) )
+	ROM_LOAD( "b73_06.2b",  0x110000, 0x010000, CRC(a98e4aea) SHA1(560fef03ad818894c9c7578c6282d55b646e8129) )
 	ROM_LOAD( "b73_01.1b",  0x120000, 0x010000, CRC(3a8a4489) SHA1(a01d7300015f90ce6dd571ad93e7a58270a99e47) )
+	ROM_LOAD( "b73_02.1c",  0x130000, 0x010000, CRC(025c536c) SHA1(075e95cc39e792049ae656404e7f7440df064391) )
 	ROM_LOAD( "b73_03.1d",  0x140000, 0x010000, CRC(ec6020cf) SHA1(2973aa2dc3deb2f27c9f1bad07a7664bad95b3f2) )
+	ROM_LOAD( "b73_04.1f",  0x150000, 0x010000, CRC(f7badbb2) SHA1(d824ab4aba94d7ca02401f4f6f34213143c282ec) )
 	ROM_LOAD( "b73_05.1h",  0x160000, 0x010000, CRC(b8e829d2) SHA1(31102358500d7b58173d4f18647decf5db744416) )
-	ROM_LOAD( "b73_06.2b",  0x180000, 0x010000, CRC(a98e4aea) SHA1(560fef03ad818894c9c7578c6282d55b646e8129) ) // ?
-	ROM_LOAD( "b73_02.1c",  0x180000, 0x010000, CRC(025c536c) SHA1(075e95cc39e792049ae656404e7f7440df064391) ) // ?
-	ROM_LOAD( "b73_04.1f",  0x1c0000, 0x010000, CRC(f7badbb2) SHA1(d824ab4aba94d7ca02401f4f6f34213143c282ec) ) // ?
 
 	ROM_REGION( 0x80000, "gfx2", 0 )
 	ROM_LOAD( "b73_09.2p",  0x000000, 0x080000, CRC(537c647f) SHA1(941c0f4e251bc68e53d62e70b033a3a6c145bb7e) )
