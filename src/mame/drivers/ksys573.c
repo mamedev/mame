@@ -2839,6 +2839,63 @@ static DRIVER_INIT( hyperbbc )
 	state_save_register_global( machine, state->hyperbbc_lamp_strobe2 );
 }
 
+/* Mambo A Go Go */
+
+static void mamboagg_output_callback( running_machine *machine, int offset, int data )
+{
+	switch( offset )
+	{
+	case 4:
+		output_set_value( "fire lamp left", !data );
+		break;
+	case 5:
+		output_set_value( "fire fan left", !data );
+		break;
+	case 6:
+		output_set_value( "fire fan right", !data );
+		break;
+	case 7:
+		output_set_value( "fire lamp right", !data );
+		break;
+	case 28:
+		output_set_value( "conga left", !data );
+		break;
+	case 29:
+		output_set_value( "conga right", !data );
+		break;
+	case 31:
+		output_set_value( "conga centre", !data );
+		break;
+	}
+}
+
+static WRITE32_HANDLER( mamboagg_io_w )
+{
+	verboselog( space->machine, 2, "mamboagg_io_w( %08x, %08x ) %08x\n", offset, mem_mask, data );
+
+	switch( offset )
+	{
+	case 0:
+		output_set_led_value( 0, !( ( data >> 3 ) & 1 ) ); // start 1p
+		output_set_value( "select right", !( ( data >> 4 ) & 1 ) );
+		output_set_value( "select left", !( ( data >> 5 ) & 1 ) );
+		break;
+
+	default:
+		verboselog( space->machine, 0, "mamboagg_io_w: unhandled offset %08x, %08x\n", offset, mem_mask );
+		break;
+	}
+}
+
+static DRIVER_INIT( mamboagg )
+{
+	DRIVER_INIT_CALL(konami573);
+
+	gx894pwbba_init( machine, mamboagg_output_callback );
+
+	memory_install_write32_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x1f600000, 0x1f6000ff, 0, 0, mamboagg_io_w );
+}
+
 
 /* ADC0834 Interface */
 
@@ -3223,6 +3280,36 @@ static INPUT_PORTS_START( hyperbbc )
 
 	PORT_MODIFY("IN2")
 	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_START2 ) /* P1 UP */
+INPUT_PORTS_END
+
+static INPUT_PORTS_START( mamboagg )
+	PORT_INCLUDE( konami573 )
+
+	PORT_MODIFY("IN1")
+	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME( "Right Pad 1 (Top Right)" ) /* COIN2 */
+
+	PORT_MODIFY("IN2")
+	PORT_BIT( 0x00000400, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_PLAYER(1) PORT_NAME( "Centre Pad 3 (Middle Right)" ) /* P1 UP */
+	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME( "Centre Pad 1 (Top Right)" ) /* P1 DOWN */
+	PORT_BIT( 0x00001000, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME( "Left Pad 2 (Bottom Left)" ) /* P1 BUTTON 1 */
+	PORT_BIT( 0x00002000, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME( "Left Pad 1 (Top Left)" ) /* P1 BUTTON 2 */
+	PORT_BIT( 0x00004000, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(1) PORT_NAME( "Left Pad 3 (Bottom Right)" ) /* P1 BUTTON 3 */
+	PORT_BIT( 0x00000001, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME( "Centre Pad 2 (Bottom Left)" ) /* P2 LEFT */
+	PORT_BIT( 0x00000002, IP_ACTIVE_LOW, IPT_BUTTON8 ) PORT_PLAYER(1) PORT_NAME( "Centre Pad 3 (Bottom Right)" ) /* P2 RIGHT */
+	PORT_BIT( 0x00000004, IP_ACTIVE_LOW, IPT_BUTTON2 ) PORT_PLAYER(1) PORT_NAME( "Centre Pad 1 (Top Left)" ) /* P2 UP */
+	PORT_BIT( 0x00000008, IP_ACTIVE_LOW, IPT_BUTTON5 ) PORT_PLAYER(1) PORT_NAME( "Centre Pad 2 (Middle Left)" ) /* P2 DOWN */
+	PORT_BIT( 0x00000010, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1) PORT_NAME( "Right Pad 2 (Bottom Left)" ) /* P2 BUTTON1 */
+	PORT_BIT( 0x00000020, IP_ACTIVE_LOW, IPT_BUTTON3 ) PORT_PLAYER(1) PORT_NAME( "Right Pad 1 (Top Left)" ) /* P2 BUTTON2 */
+	PORT_BIT( 0x00000040, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_PLAYER(1) PORT_NAME( "Right Pad 3 (Bottom Right)" ) /* P2 BUTTON3 */
+	PORT_BIT( 0x00000080, IP_ACTIVE_LOW, IPT_BUTTON1 ) PORT_PLAYER(1) PORT_NAME( "Left Pad 1 (Top Right)" ) /* P2 START */
+
+	PORT_MODIFY("IN3")
+	PORT_BIT( 0x00000100, IP_ACTIVE_LOW, IPT_BUTTON7 ) PORT_PLAYER(1) PORT_NAME( "Left Pad 3 (Middle Right)" ) /* P1 BUTTON4 */
+	PORT_BIT( 0x00000200, IP_ACTIVE_LOW, IPT_BUTTON4 ) PORT_PLAYER(1) PORT_NAME( "Left Pad 2 (Middle Left)" ) /* P1 BUTTON5 */
+	PORT_BIT( 0x00000800, IP_ACTIVE_LOW, IPT_UNUSED ) /* P1 BUTTON6 */
+	PORT_BIT( 0x01000000, IP_ACTIVE_LOW, IPT_BUTTON9 ) PORT_PLAYER(1) PORT_NAME( "Right Pad 3 (Middle Right)" ) /* P2 BUTTON4 */
+	PORT_BIT( 0x02000000, IP_ACTIVE_LOW, IPT_BUTTON6 ) PORT_PLAYER(1) PORT_NAME( "Right Pad 2 (Middle Left)" ) /* P2 BUTTON5 */
+	PORT_BIT( 0x08000000, IP_ACTIVE_LOW, IPT_UNUSED ) /* P2 BUTTON6 */
 INPUT_PORTS_END
 
 #define SYS573_BIOS_A ROM_LOAD( "700a01.22g",   0x0000000, 0x080000, CRC(11812ef8) SHA1(e1284add4aaddd5337bd7f4e27614460d52b5b48))
@@ -4409,6 +4496,20 @@ ROM_START( konam80u )
 	DISK_IMAGE_READONLY( "826uaa01", 0, SHA1(be5f8b31fd18ba631fe98c2132c56abf20193419) )
 ROM_END
 
+ROM_START( mamboagg )
+	ROM_REGION32_LE( 0x080000, "user1", 0 )
+	SYS573_BIOS_A
+
+	ROM_REGION( 0x0001014, "user2", 0 ) /* security cart eeprom */
+	ROM_LOAD( "gqa40jab.u1",  0x000000, 0x001014, BAD_DUMP CRC(fd9e7c1f) SHA1(6dd4790589d48803f58328d099c908f0565b2c01) )
+
+	ROM_REGION( 0x000008, "user9", 0 ) /* security cart id */
+	ROM_LOAD( "gqa40jab.u6",  0x000000, 0x000008, BAD_DUMP CRC(ce84419e) SHA1(839e8ee080ecfc79021a06417d930e8b32dfc6a1) )
+
+	DISK_REGION( "cdrom0" )
+	DISK_IMAGE_READONLY( "a40jab02", 0, SHA1(a914842442b2f63465e16f979f06da0b78a5f13e) )
+ROM_END
+
 ROM_START( pbballex )
 	ROM_REGION32_LE( 0x080000, "user1", 0 )
 	SYS573_BIOS_A
@@ -4529,6 +4630,7 @@ GAME( 2000, fmania,   sys573,   konami573, konami573, konami573,  ROT0, "Konami"
 GAME( 2001, gtrfrk5m, sys573,   pccard1,   gtrfrks,   gtrfrkdigital,ROT0, "Konami", "Guitar Freaks 5th Mix (G*A26 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.9 */
 GAME( 2001, ddr5m,    sys573,   pccard2,   ddr,       ddrdigital, ROT0, "Konami", "Dance Dance Revolution 5th Mix (G*A27 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.9 */
 GAME( 2001, dmx2majp, sys573,   konami573, dmx,       dmx,        ROT0, "Konami", "Dance Maniax 2nd Mix Append J-Paradise (G*A38 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.9 */
+GAME( 2001, mamboagg, sys573,   konami573, mamboagg,  mamboagg,   ROT0, "Konami", "Mambo A Go-Go (GQA40 VER. JAB)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.95 */
 GAME( 2001, gtrfrk6m, sys573,   pccard1,   gtrfrks,   gtrfrkdigital,ROT0, "Konami", "Guitar Freaks 6th Mix (G*B06 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.9 */
 GAME( 2001, gtrfrk7m, sys573,   pccard1,   gtrfrks,   gtrfrkdigital,ROT0, "Konami", "Guitar Freaks 7th Mix (G*B17 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.95 */
 GAME( 2001, ddrmax,   sys573,   pccard2,   ddr,       ddrdigital, ROT0, "Konami", "DDR Max - Dance Dance Revolution 6th Mix (G*B19 VER. JAA)", GAME_IMPERFECT_GRAPHICS | GAME_IMPERFECT_SOUND | GAME_NOT_WORKING ) /* BOOT VER 1.9 */
