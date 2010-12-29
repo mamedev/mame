@@ -49,7 +49,7 @@
 USE_DISPATCH_GL = 1
 
 # uncomment and change the next line to compile and link to specific
-# SDL library. This is currently only supported for unix!
+# SDL library. This is currently supported for unix and win32.
 # There is no need to play with this option unless you are doing
 # active development on sdlmame or SDL.
 
