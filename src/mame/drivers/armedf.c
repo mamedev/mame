@@ -1120,6 +1120,7 @@ ROM_START( legion )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Z80 code (sound) */
 	ROM_LOAD( "legion.1h", 0x00000, 0x04000, CRC(2ca4f7f0) SHA1(7cf997af9dd74ced9d28c047069ccfb67d72e257) ) // lg9
+	ROM_LOAD( "legion.1i", 0x04000, 0x08000, CRC(79f4a827) SHA1(25e4c1b5b8466627244b7226310e67e4261333b6) ) // lg10
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "lg8.bin", 0x00000, 0x08000, CRC(e0596570) SHA1(68ddc950efc55a16e6abc699e3bad18ea19d579f) )
@@ -1137,9 +1138,6 @@ ROM_START( legion )
 
 	ROM_REGION( 0x4000, "gfx5", 0 )	/* data for mcu/blitter */
 	ROM_LOAD ( "lg7.bin", 0x0000, 0x4000, CRC(533e2b58) SHA1(a13ea4a530038760ffa87713903c59a932452717) )
-
-	ROM_REGION( 0x8000, "user1", 0 )	/* ? */
-	ROM_LOAD( "legion.1i",        0x0000, 0x8000, CRC(79f4a827) SHA1(25e4c1b5b8466627244b7226310e67e4261333b6) ) // lg10
 ROM_END
 
 ROM_START( legiono )
@@ -1151,6 +1149,7 @@ ROM_START( legiono )
 
 	ROM_REGION( 0x10000, "audiocpu", 0 )	/* Z80 code (sound) */
 	ROM_LOAD( "legion.1h", 0x00000, 0x04000, CRC(2ca4f7f0) SHA1(7cf997af9dd74ced9d28c047069ccfb67d72e257) )
+	ROM_LOAD( "legion.1i", 0x04000, 0x08000, CRC(79f4a827) SHA1(25e4c1b5b8466627244b7226310e67e4261333b6) )
 
 	ROM_REGION( 0x08000, "gfx1", 0 )
 	ROM_LOAD( "legion.1g", 0x00000, 0x08000, CRC(c50b0125) SHA1(83b5e9707152d97777fb65fa8820ba34ec2fac8d) )
@@ -1167,9 +1166,7 @@ ROM_START( legiono )
 	ROM_LOAD( "legion.1j", 0x010000, 0x010000, CRC(bae220c8) SHA1(392ae0fb0351dcad7b0e8e0ed4a1dc6e07f493df) )
 
 	/* should lg7.bin be loaded here too? The ROM wasn't included in this set */
-
-	ROM_REGION( 0x8000, "user1", 0 )	/* ? */
-	ROM_LOAD( "legion.1i",        0x0000, 0x8000, CRC(79f4a827) SHA1(25e4c1b5b8466627244b7226310e67e4261333b6) )
+	
 ROM_END
 
 ROM_START( terraf )
