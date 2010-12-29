@@ -99,6 +99,7 @@ static TILE_GET_INFO( get_mid_tile_info_cupsoc )
 	tile &= 0xfff;
 
 	tile |= 0x1000;
+	color += 0x10;
 
 	SET_TILE_INFO(1,tile,color,0);
 }

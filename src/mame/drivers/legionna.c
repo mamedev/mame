@@ -1012,7 +1012,7 @@ GFXDECODE_END
 
 static GFXDECODE_START( cupsoc )
 	GFXDECODE_ENTRY( "gfx1", 0, legionna_new_charlayout,    48*16, 16 )
-	GFXDECODE_ENTRY( "gfx3", 0, legionna_tilelayout,   16*16, 16 )
+	GFXDECODE_ENTRY( "gfx3", 0, legionna_tilelayout,   0, 32 )
 	GFXDECODE_ENTRY( "gfx4", 0, legionna_tilelayout,   32*16, 16 ) /* unused */
 	GFXDECODE_ENTRY( "gfx2", 0, legionna_spritelayout,  0*16, 8*16 )
 	GFXDECODE_ENTRY( "gfx5", 0, legionna_tilelayout,   32*16, 16 )
