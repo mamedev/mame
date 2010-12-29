@@ -48,6 +48,13 @@ Notes:
       PANDORA      : KANEKO PX79480FP-3 PANDORA-CHIP (C) KANEKO 1988
 
 
+To Do:
+------
+
+- Fix cocktail mode
+- Fix Flip Screen (currently displays an information screen and emulation hangs)
+
+
 ***************************************************************************************/
 
 #include "emu.h"
@@ -507,52 +514,48 @@ static INPUT_PORTS_START( hvyunit )
 	PORT_BIT( 0x80, IP_ACTIVE_LOW, IPT_UNKNOWN )
 
 	PORT_START("DSW1")
-	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )
+	PORT_DIPNAME( 0x01, 0x00, DEF_STR( Cabinet ) )			PORT_DIPLOCATION("DSW1:1")
 	PORT_DIPSETTING(    0x00, DEF_STR( Upright ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Cocktail ) )
-	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )
+	PORT_DIPNAME( 0x02, 0x02, DEF_STR( Flip_Screen ) )		PORT_DIPLOCATION("DSW1:2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Service_Mode ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Service_Mode ) )		PORT_DIPLOCATION("DSW1:3")
 	PORT_DIPSETTING(    0x04, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x08, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )
+        PORT_DIPUNUSED_DIPLOC( 0x08, 0x08, "DSW1:4")
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Coin_A ) )			PORT_DIPLOCATION("DSW1:5,6")
 	PORT_DIPSETTING(    0x10, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0x30, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0x20, DEF_STR( 1C_2C ) )
-	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) )
+	PORT_DIPNAME( 0xc0, 0xc0, DEF_STR( Coin_B ) )			PORT_DIPLOCATION("DSW1:7,8")
 	PORT_DIPSETTING(    0x40, DEF_STR( 2C_1C ) )
 	PORT_DIPSETTING(    0xc0, DEF_STR( 1C_1C ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0x80, DEF_STR( 1C_2C ) )
 
 	PORT_START("DSW2")
-	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )
+	PORT_DIPNAME( 0x03, 0x03, DEF_STR( Difficulty ) )		PORT_DIPLOCATION("DSW2:1,2")
 	PORT_DIPSETTING(    0x02, DEF_STR( Easy ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( Normal ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( Hard ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( Hardest ) )
-	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Allow_Continue ) )
+	PORT_DIPNAME( 0x04, 0x04, DEF_STR( Allow_Continue ) )	PORT_DIPLOCATION("DSW2:3")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x04, DEF_STR( On ) )
-	PORT_DIPNAME( 0x08, 0x00, "Bonus" )
+	PORT_DIPNAME( 0x08, 0x00, "Bonus" )						PORT_DIPLOCATION("DSW2:4")
 	PORT_DIPSETTING(    0x08, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
-	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )
+	PORT_DIPNAME( 0x30, 0x30, DEF_STR( Lives ) )			PORT_DIPLOCATION("DSW2:5,6")
 	PORT_DIPSETTING(    0x30, "3" )
 	PORT_DIPSETTING(    0x20, "4" )
 	PORT_DIPSETTING(    0x10, "5" )
 	PORT_DIPSETTING(    0x00, "7" )
-	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )
+	PORT_DIPNAME( 0x40, 0x40, DEF_STR( Demo_Sounds ) )		PORT_DIPLOCATION("DSW2:7")
 	PORT_DIPSETTING(    0x00, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x40, DEF_STR( On ) )
-	PORT_DIPNAME( 0x80, 0x80, DEF_STR( Unused ) )
-	PORT_DIPSETTING(    0x80, DEF_STR( Off ) )
-	PORT_DIPSETTING(    0x00, DEF_STR( On ) )
+        PORT_DIPUNUSED_DIPLOC( 0x80, 0x80, "DSW2:8")
 INPUT_PORTS_END
 
 
@@ -757,6 +760,6 @@ ROM_END
  *
  *************************************/
 
-GAME( 1988, hvyunit, 0,        hvyunit, hvyunit, 0, ROT0, "Kaneko / Taito", "Heavy Unit (World)", 0 )
-GAME( 1988, hvyunitj, hvyunit, hvyunit, hvyunit, 0, ROT0, "Kaneko / Taito", "Heavy Unit (Japan, Newer)", 0 )
-GAME( 1988, hvyunito, hvyunit, hvyunit, hvyunit, 0, ROT0, "Kaneko / Taito", "Heavy Unit (Japan, Older)", 0 )
+GAME( 1988, hvyunit, 0,        hvyunit, hvyunit, 0, ROT0, "Kaneko / Taito", "Heavy Unit (World)", GAME_NO_COCKTAIL )
+GAME( 1988, hvyunitj, hvyunit, hvyunit, hvyunit, 0, ROT0, "Kaneko / Taito", "Heavy Unit (Japan, Newer)", GAME_NO_COCKTAIL )
+GAME( 1988, hvyunito, hvyunit, hvyunit, hvyunit, 0, ROT0, "Kaneko / Taito", "Heavy Unit (Japan, Older)", GAME_NO_COCKTAIL )
