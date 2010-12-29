@@ -2451,13 +2451,13 @@ static WRITE16_HANDLER( generic_cop_w )
 				offs = (offset & 3) * 4;
 
 				/* TODO: I really suspect that following two are actually taken from the 0xa180 macro command then internally loaded */
-				/* TODO: +16 is a temp hack, we need to find the sprite X/Y global register */
+				/* TODO: +16 is a temp hack, we need to find the X/Y global register ... also this probably should go into video file rather than here ... */
 				abs_x = space->read_word(cop_register[0] + 8) - cop_sprite_dma_abs_x + 16;
 				abs_y = space->read_word(cop_register[0] + 4) - cop_sprite_dma_abs_y;
 				rel_xy = space->read_word(cop_sprite_dma_src + 4 + offs);
 
-				space->write_word(cop_register[4] + offs + 4,(((rel_xy & 0x7f) + (abs_x) - ((rel_xy & 0x80) ? 0x80 : 0)) & 0x1ff));
-				space->write_word(cop_register[4] + offs + 6,(((rel_xy & 0x7f00) >> 8) + (abs_y) + (0x10) - ((rel_xy & 0x8000) ? 0x80 : 0)) & 0x1ff);
+				space->write_word(cop_register[4] + offs + 4,(((rel_xy & 0x7f) + (abs_x) - ((rel_xy & 0x80) ? 0x80 : 0))));
+				space->write_word(cop_register[4] + offs + 6,(((rel_xy & 0x7f00) >> 8) + (abs_y) + (0x10) - ((rel_xy & 0x8000) ? 0x80 : 0)));
 			}
 
 			// grainbow 18 | a | ff00 | c480 | 080 882
