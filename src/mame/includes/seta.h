@@ -50,6 +50,8 @@ public:
 	int tilemaps_flip;
 	int samples_bank;
 	int taitox_banknum;
+	int color_mode_shift;
+	int current_tilemap_mode[2];
 
 	uPD71054_state uPD71054;
 	const game_offset *global_offsets;

@@ -42,7 +42,7 @@ P0-063-A                91 Rezon                                Allumer
 P0-068-B (M6100723A)    92 Block Carnival                       Visco
 P0-072-2 (prototype)    92 Blandia (prototype)                  Allumer
 P0-077-A (BP922)        92 Ultraman Club                        Banpresto
-PO-078-A                92 Blandia                              Allumer
+PO-078-A                92 Blandia (7)                          Allumer
 P0-079-A                92 Zing Zing Zip                        Allumer / Tecmo
 P0-079-A                94 Eight Forces                         Tecmo
 PO-080-A (BP923)        92 SD Gundam Neo Battling (3)           Banpresto
@@ -79,6 +79,8 @@ PO-122-A (SZR-001)      95 Zombie Raid                          American Sammy
     sprites not leaving the screen correctly) its possible the custom hw
     doesn't behave *exactly* the same as the original seta hw
 (6) To enter test mode press 9 (open door), then F2 (turn function key), then E (bet 3-4).
+(7) Bad tilemaps colors in demo mode are real game bug. Fade-in and fade-out "bad" colors are also right.
+    Bad sprites priorities are real game bugs.
 
 Notes:
 - The NEC D4701 used by Caliber 50 is a mouse interface IC (uPD4701c).
@@ -126,6 +128,7 @@ TODO:
   all scene: when you beat enemies or yellow walking eggs
   stage 1: weasels throw eggs, white animals (shaking trees) are damaged, rabbit jump
   stage 2: when BOX-MEN gets angry
+- games using 6bpp gfx switch tilemaps color mode. Only blandia uses both, while the other ones use only mode 1, thus mode 0 is untested for them
 
 ***************************************************************************/
 
@@ -1801,7 +1804,7 @@ static ADDRESS_MAP_START( blandia_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x000000, 0x1fffff) AM_ROM								// ROM (up to 2MB)
 	AM_RANGE(0x200000, 0x20ffff) AM_RAM								// RAM (main ram for zingzip, wrofaero writes to 20f000-20ffff)
 	AM_RANGE(0x210000, 0x21ffff) AM_RAM								// RAM (gundhara)
-	AM_RANGE(0x300000, 0x30ffff) AM_RAM								// RAM (wrofaero only?)
+	AM_RANGE(0x300000, 0x30ffff) AM_RAM								// RAM (wrofaero and blandia only?)
 	AM_RANGE(0x400000, 0x400001) AM_READ_PORT("P1")					// P1
 	AM_RANGE(0x400002, 0x400003) AM_READ_PORT("P2")					// P2
 	AM_RANGE(0x400004, 0x400005) AM_READ_PORT("COINS")				// Coins
@@ -1809,7 +1812,7 @@ static ADDRESS_MAP_START( blandia_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x600000, 0x600003) AM_READ(seta_dsw_r)				// DSW
 	AM_RANGE(0x700000, 0x7003ff) AM_RAM								// (rezon,jjsquawk)
 	AM_RANGE(0x700400, 0x700fff) AM_RAM AM_BASE_SIZE_MEMBER(seta_state, paletteram, paletteram_size)	// Palette
-	AM_RANGE(0x701000, 0x70ffff) AM_RAM								//
+	AM_RANGE(0x703c00, 0x7047ff) AM_RAM								// 2nd palette (?), written in the stage with the tilemap blending (?) effect, or just mirror
 /**/AM_RANGE(0x800000, 0x800607) AM_RAM AM_BASE_MEMBER(seta_state, spriteram)		// Sprites Y
 	AM_RANGE(0x880000, 0x880001) AM_RAM								// ? 0xc000
 	AM_RANGE(0x900000, 0x903fff) AM_RAM AM_BASE_MEMBER(seta_state, spriteram2)		// Sprites Code + X + Attr
@@ -1843,7 +1846,7 @@ static ADDRESS_MAP_START( blandiap_map, ADDRESS_SPACE_PROGRAM, 16 )
 	AM_RANGE(0x600000, 0x600003) AM_READ(seta_dsw_r)				// DSW
 	AM_RANGE(0x700000, 0x7003ff) AM_RAM								// (rezon,jjsquawk)
 	AM_RANGE(0x700400, 0x700fff) AM_RAM AM_BASE_SIZE_MEMBER(seta_state, paletteram, paletteram_size)	// Palette
-	AM_RANGE(0x701000, 0x70ffff) AM_RAM								//
+	AM_RANGE(0x703c00, 0x7047ff) AM_RAM								// 2nd palette (?), written in the stage with the tilemap blending (?) effect, or just mirror
 	AM_RANGE(0x800000, 0x803fff) AM_RAM_WRITE(seta_vram_0_w) AM_BASE_MEMBER(seta_state, vram_0)	// VRAM 0&1
 	AM_RANGE(0x804000, 0x80ffff) AM_RAM								// (jjsquawk)
 	AM_RANGE(0x880000, 0x883fff) AM_RAM_WRITE(seta_vram_2_w) AM_BASE_MEMBER(seta_state, vram_2)	// VRAM 2&3
@@ -6630,9 +6633,11 @@ static const gfx_layout layout_packed_6bits_2roms =
 ***************************************************************************/
 
 static GFXDECODE_START( blandia )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_planes_2roms,       0,           32 ) // [0] Sprites
-	GFXDECODE_ENTRY( "gfx2", 0, layout_packed_6bits_3roms, 16*32+64*32, 32 ) // [1] Layer 1
-	GFXDECODE_ENTRY( "gfx3", 0, layout_packed_6bits_3roms, 16*32,       32 ) // [2] Layer 2
+	GFXDECODE_ENTRY( "gfx1", 0, layout_planes_2roms,       0,             32 ) // [0] Sprites
+	GFXDECODE_ENTRY( "gfx2", 0, layout_packed_6bits_3roms, 16*32+64*32*1, 32 ) // [1] Layer 1
+	GFXDECODE_ENTRY( "gfx3", 0, layout_packed_6bits_3roms, 16*32+64*32*0, 32 ) // [2] Layer 2
+	GFXDECODE_ENTRY( "gfx2", 0, layout_packed_6bits_3roms, 16*32+64*32*3, 32 ) // [3] Layer 1
+	GFXDECODE_ENTRY( "gfx3", 0, layout_packed_6bits_3roms, 16*32+64*32*2, 32 ) // [4] Layer 2
 GFXDECODE_END
 
 /***************************************************************************
@@ -6659,8 +6664,10 @@ GFXDECODE_END
 
 static GFXDECODE_START( jjsquawk )
 	GFXDECODE_ENTRY( "gfx1", 0, layout_planes_2roms,       0,             32 ) // [0] Sprites
-	GFXDECODE_ENTRY( "gfx2", 0, layout_packed_6bits_2roms, 512 + 64*32*0, 32 ) // [1] Layer 1
-	GFXDECODE_ENTRY( "gfx3", 0, layout_packed_6bits_2roms, 512 + 64*32*1, 32 ) // [2] Layer 2
+	GFXDECODE_ENTRY( "gfx2", 0, layout_packed_6bits_2roms, 16*32+64*32*0, 32 ) // [1] Layer 1
+	GFXDECODE_ENTRY( "gfx3", 0, layout_packed_6bits_2roms, 16*32+64*32*1, 32 ) // [2] Layer 2
+	GFXDECODE_ENTRY( "gfx2", 0, layout_packed_6bits_2roms, 16*32+64*32*2, 32 ) // [3] Layer 1
+	GFXDECODE_ENTRY( "gfx3", 0, layout_packed_6bits_2roms, 16*32+64*32*3, 32 ) // [4] Layer 2
 GFXDECODE_END
 
 /***************************************************************************
@@ -6749,8 +6756,9 @@ GFXDECODE_END
 ***************************************************************************/
 
 static GFXDECODE_START( usclssic )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_planes_2roms,       0, 32 ) // [0] Sprites
-	GFXDECODE_ENTRY( "gfx2", 0, layout_packed_6bits_3roms, 512, 32 ) // [1] Layer 1
+	GFXDECODE_ENTRY( "gfx1", 0, layout_planes_2roms,       0, 			32 ) // [0] Sprites
+	GFXDECODE_ENTRY( "gfx2", 0, layout_packed_6bits_3roms, 512+64*32*0, 32 ) // [1] Layer 1
+	GFXDECODE_ENTRY( "gfx2", 0, layout_packed_6bits_3roms, 512+64*32*1, 32 ) // [2] Layer 1
 GFXDECODE_END
 
 
@@ -6759,9 +6767,10 @@ GFXDECODE_END
 ***************************************************************************/
 
 static GFXDECODE_START( zingzip )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_planes_2roms,       512*0, 32 ) // [0] Sprites
-	GFXDECODE_ENTRY( "gfx2", 0, layout_packed_6bits_2roms, 512*2, 32 ) // [1] Layer 1
-	GFXDECODE_ENTRY( "gfx3", 0, layout_packed,             512*1, 32 ) // [2] Layer 2
+	GFXDECODE_ENTRY( "gfx1", 0, layout_planes_2roms,       16*32*0, 		32 ) // [0] Sprites
+	GFXDECODE_ENTRY( "gfx2", 0, layout_packed_6bits_2roms, 16*32*2, 		32 ) // [1] Layer 1
+	GFXDECODE_ENTRY( "gfx3", 0, layout_packed,             16*32*1, 		32 ) // [2] Layer 2
+	GFXDECODE_ENTRY( "gfx2", 0, layout_packed_6bits_2roms, 16*32*2+64*32*1, 32 ) // [3] Layer 1
 GFXDECODE_END
 
 
@@ -6770,9 +6779,11 @@ GFXDECODE_END
 ***************************************************************************/
 
 static GFXDECODE_START( crazyfgt )
-	GFXDECODE_ENTRY( "gfx1", 0, layout_planes,             0,           32 ) // [0] Sprites
-	GFXDECODE_ENTRY( "gfx2", 0, layout_packed_6bits_3roms, 16*32+64*32, 32 ) // [1] Layer 1
-	GFXDECODE_ENTRY( "gfx3", 0, layout_packed_6bits_3roms, 16*32,       32 ) // [2] Layer 2
+	GFXDECODE_ENTRY( "gfx1", 0, layout_planes,             0,             32 ) // [0] Sprites
+	GFXDECODE_ENTRY( "gfx2", 0, layout_packed_6bits_3roms, 16*32+64*32*1, 32 ) // [1] Layer 1
+	GFXDECODE_ENTRY( "gfx3", 0, layout_packed_6bits_3roms, 16*32+64*32*0, 32 ) // [2] Layer 2
+	GFXDECODE_ENTRY( "gfx2", 0, layout_packed_6bits_3roms, 16*32+64*32*3, 32 ) // [1] Layer 1
+	GFXDECODE_ENTRY( "gfx3", 0, layout_packed_6bits_3roms, 16*32+64*32*2, 32 ) // [2] Layer 2
 GFXDECODE_END
 
 /***************************************************************************
@@ -7019,7 +7030,7 @@ static MACHINE_CONFIG_START( usclssic, seta_state )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 
 	MDRV_GFXDECODE(usclssic)
-	MDRV_PALETTE_LENGTH(16*32 + 64*32)		/* sprites, layer */
+	MDRV_PALETTE_LENGTH(16*32 + 64*32*2)		/* sprites, layer */
 
 	MDRV_PALETTE_INIT(usclssic)	/* layer is 6 planes deep */
 	MDRV_VIDEO_START(seta_1_layer)
@@ -7182,7 +7193,7 @@ static MACHINE_CONFIG_START( blandia, seta_state )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 
 	MDRV_GFXDECODE(blandia)
-	MDRV_PALETTE_LENGTH(16*32+64*32+64*32)	/* sprites, layer1, layer2 */
+	MDRV_PALETTE_LENGTH(16*32+64*32*4)	/* sprites, layer1, layer2 */
 
 	MDRV_PALETTE_INIT(blandia)				/* layers 1&2 are 6 planes deep */
 	MDRV_VIDEO_START(seta_2_layers)
@@ -7214,7 +7225,7 @@ static MACHINE_CONFIG_START( blandiap, seta_state )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 
 	MDRV_GFXDECODE(blandia)
-	MDRV_PALETTE_LENGTH(16*32+64*32+64*32)	/* sprites, layer1, layer2 */
+	MDRV_PALETTE_LENGTH(16*32+64*32*4)	/* sprites, layer1, layer2 */
 
 	MDRV_PALETTE_INIT(blandia)				/* layers 1&2 are 6 planes deep */
 	MDRV_VIDEO_START(seta_2_layers)
@@ -7483,7 +7494,7 @@ static MACHINE_CONFIG_START( extdwnhl, seta_state )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 
 	MDRV_GFXDECODE(zingzip)
-	MDRV_PALETTE_LENGTH(16*32+16*32+64*32)	/* sprites, layer2, layer1 */
+	MDRV_PALETTE_LENGTH(16*32+16*32+64*32*2)	/* sprites, layer2, layer1 */
 
 	MDRV_PALETTE_INIT(zingzip)			/* layer 1 gfx is 6 planes deep */
 	MDRV_VIDEO_START(seta_2_layers)
@@ -7544,7 +7555,7 @@ static MACHINE_CONFIG_START( gundhara, seta_state )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 
 	MDRV_GFXDECODE(jjsquawk)
-	MDRV_PALETTE_LENGTH(16*32+64*32+64*32)	/* sprites, layer2, layer1 */
+	MDRV_PALETTE_LENGTH(16*32+64*32*4)	/* sprites, layer2, layer1 */
 
 	MDRV_PALETTE_INIT(gundhara)				/* layers are 6 planes deep (but have only 4 palettes) */
 	MDRV_VIDEO_START(seta_2_layers)
@@ -7584,7 +7595,7 @@ static MACHINE_CONFIG_START( jjsquawk, seta_state )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 
 	MDRV_GFXDECODE(jjsquawk)
-	MDRV_PALETTE_LENGTH(16*32+64*32+64*32)	/* sprites, layer2, layer1 */
+	MDRV_PALETTE_LENGTH(16*32+64*32*4)	/* sprites, layer2, layer1 */
 
 	MDRV_PALETTE_INIT(jjsquawk)				/* layers are 6 planes deep */
 	MDRV_VIDEO_START(seta_2_layers)
@@ -7615,7 +7626,7 @@ static MACHINE_CONFIG_START( jjsquawb, seta_state )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 
 	MDRV_GFXDECODE(jjsquawk)
-	MDRV_PALETTE_LENGTH(16*32+64*32+64*32)	/* sprites, layer2, layer1 */
+	MDRV_PALETTE_LENGTH(16*32+64*32*4)	/* sprites, layer2, layer1 */
 
 	MDRV_PALETTE_INIT(jjsquawk)				/* layers are 6 planes deep */
 	MDRV_VIDEO_START(seta_2_layers)
@@ -7803,7 +7814,7 @@ static MACHINE_CONFIG_START( madshark, seta_state )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8, 30*8-1)
 
 	MDRV_GFXDECODE(jjsquawk)
-	MDRV_PALETTE_LENGTH(16*32+64*32+64*32)	/* sprites, layer2, layer1 */
+	MDRV_PALETTE_LENGTH(16*32+64*32*4)	/* sprites, layer2, layer1 */
 
 	MDRV_PALETTE_INIT(jjsquawk)				/* layers are 6 planes deep */
 
@@ -8263,7 +8274,7 @@ static MACHINE_CONFIG_START( zingzip, seta_state )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 1*8, 31*8-1)
 
 	MDRV_GFXDECODE(zingzip)
-	MDRV_PALETTE_LENGTH(16*32+16*32+64*32)	/* sprites, layer2, layer1 */
+	MDRV_PALETTE_LENGTH(16*32+16*32+64*32*2)	/* sprites, layer2, layer1 */
 
 	MDRV_PALETTE_INIT(zingzip)				/* layer 1 gfx is 6 planes deep */
 	MDRV_VIDEO_START(seta_2_layers)
@@ -8342,7 +8353,7 @@ static MACHINE_CONFIG_START( crazyfgt, seta_state )
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 2*8-4, 30*8-1-4)
 
 	MDRV_GFXDECODE(crazyfgt)
-	MDRV_PALETTE_LENGTH(16*32+64*32+64*32)	/* sprites, layer1, layer2 */
+	MDRV_PALETTE_LENGTH(16*32+64*32*4)	/* sprites, layer1, layer2 */
 
 	MDRV_PALETTE_INIT(gundhara)				/* layers are 6 planes deep (but have only 4 palettes) */
 	MDRV_VIDEO_START(seta_2_layers)

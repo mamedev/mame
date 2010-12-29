@@ -353,6 +353,7 @@ Offset + 0x0:                               Scroll X
 Offset + 0x2:                               Scroll Y
 Offset + 0x4:
                     fedc ba98 7654 3210     -
+					---- ---- ---4 ----     Tilemap color mode switch (used in blandia and the other games using 6bpp graphics)
                     ---- ---- ---- 3---     Tilemap Select (There Are 2 Tilemaps Per Layer)
                     ---- ---- ---- -21-     0 (1 only in eightfrc, when flip is on!)
                     ---- ---- ---- ---0     ?
@@ -377,11 +378,22 @@ static TILE_GET_INFO( twineagl_get_tile_info_1 ) { twineagl_tile_info( machine, 
 INLINE void get_tile_info( running_machine *machine, tile_data *tileinfo, int tile_index, int layer, int offset )
 {
 	seta_state *state = machine->driver_data<seta_state>();
+	int gfx = 1 + layer;
 	UINT16 *vram = (layer == 0) ? state->vram_0 + offset : state->vram_2 + offset;
+	UINT16 *vctrl = (layer == 0) ? state->vctrl_0 : state->vctrl_2;
 	UINT16 code =	vram[ tile_index ];
 	UINT16 attr =	vram[ tile_index + 0x800 ];
+	
+	if(machine->gfx[gfx + ((vctrl[ 4/2 ] & 0x10) >> state->color_mode_shift)] != NULL)
+	{
+		gfx += (vctrl[ 4/2 ] & 0x10) >> state->color_mode_shift;
+	}
+	else
+	{
+		popmessage("Missing Color Mode = 1 for Layer = %d. Contact MAMETesters.",layer);
+	}
 
-	SET_TILE_INFO( 1 + layer, state->tiles_offset + (code & 0x3fff), attr & 0x1f, TILE_FLIPXY((code & 0xc000) >> 14) );
+	SET_TILE_INFO( gfx, state->tiles_offset + (code & 0x3fff), attr & 0x1f, TILE_FLIPXY((code & 0xc000) >> 14) );
 }
 
 static TILE_GET_INFO( get_tile_info_0 ) { get_tile_info( machine, tileinfo, tile_index, 0, 0x0000 ); }
@@ -454,6 +466,7 @@ VIDEO_START( seta_2_layers )
 								 16,16, 64,32 );
 
 	state->tilemaps_flip = 0;
+	state->color_mode_shift = 3;
 
 	tilemap_set_transparent_pen(state->tilemap_0, 0);
 	tilemap_set_transparent_pen(state->tilemap_1, 0);
@@ -479,6 +492,8 @@ VIDEO_START( seta_1_layer )
 	state->tilemap_1 = tilemap_create(	machine, get_tile_info_1, tilemap_scan_rows,
 								 16,16, 64,32 );
 
+	state->color_mode_shift = 4;
+								 
 	tilemap_set_transparent_pen(state->tilemap_0, 0);
 	tilemap_set_transparent_pen(state->tilemap_1, 0);
 }
@@ -540,12 +555,10 @@ VIDEO_START( oisipuzl_2_layers )
 ***************************************************************************/
 
 
-/* 2 layers, 6 bit deep. The color codes have a 16 color granularity.
+/* 2 layers, 6 bit deep. 
 
-   One layer repeats every 16 colors to fill the 64 colors for the 6bpp gfx
-
-   The other uses the first 64 colors of the palette regardless of
-   the color code!
+   The game can select to repeat every 16 colors to fill the 64 colors for the 6bpp gfx
+   or to use the first 64 colors of the palette regardless of the color code!
 */
 PALETTE_INIT( blandia )
 {
@@ -556,9 +569,14 @@ PALETTE_INIT( blandia )
 
 	for (color = 0; color < 0x20; color++)
 		for (pen = 0; pen < 0x40; pen++)
-		{
-			colortable_entry_set_value(machine->colortable, 0x200 + ((color << 6) | pen), 0x200 + ((color << 4) | (pen & 0x0f)));
-			colortable_entry_set_value(machine->colortable, 0xa00 + ((color << 6) | pen), 0x400 + pen);
+		{		
+			// layer 2-3
+			colortable_entry_set_value(machine->colortable, 0x0200 + ((color << 6) | pen), 0x200 + ((color << 4) | (pen & 0x0f)));
+			colortable_entry_set_value(machine->colortable, 0x1200 + ((color << 6) | pen), 0x200 + pen);
+
+			// layer 0-1
+			colortable_entry_set_value(machine->colortable, 0x0a00 + ((color << 6) | pen), 0x400 + ((color << 4) | (pen & 0x0f)));
+			colortable_entry_set_value(machine->colortable, 0x1a00 + ((color << 6) | pen), 0x400 + pen);
 		}
 }
 
@@ -576,8 +594,11 @@ PALETTE_INIT( gundhara )
 	for (color = 0; color < 0x20; color++)
 		for (pen = 0; pen < 0x40; pen++)
 		{
-			colortable_entry_set_value(machine->colortable, 0x200 + ((color << 6) | pen), 0x400 + ((((color & ~3) << 4) + pen) & 0x1ff));
-			colortable_entry_set_value(machine->colortable, 0xa00 + ((color << 6) | pen), 0x200 + ((((color & ~3) << 4) + pen) & 0x1ff));
+			colortable_entry_set_value(machine->colortable, 0x0200 + ((color << 6) | pen), 0x400 + pen); // untested
+			colortable_entry_set_value(machine->colortable, 0x1200 + ((color << 6) | pen), 0x400 + ((((color & ~3) << 4) + pen) & 0x1ff));
+			
+			colortable_entry_set_value(machine->colortable, 0x0a00 + ((color << 6) | pen), 0x200 + pen); // untested
+			colortable_entry_set_value(machine->colortable, 0x1a00 + ((color << 6) | pen), 0x200 + ((((color & ~3) << 4) + pen) & 0x1ff));
 		}
 }
 
@@ -594,8 +615,11 @@ PALETTE_INIT( jjsquawk )
 	for (color = 0; color < 0x20; color++)
 		for (pen = 0; pen < 0x40; pen++)
 		{
-			colortable_entry_set_value(machine->colortable, 0x200 + ((color << 6) | pen), 0x400 + (((color << 4) + pen) & 0x1ff));
-			colortable_entry_set_value(machine->colortable, 0xa00 + ((color << 6) | pen), 0x200 + (((color << 4) + pen) & 0x1ff));
+			colortable_entry_set_value(machine->colortable, 0x0200 + ((color << 6) | pen), 0x400 + pen); // untested
+			colortable_entry_set_value(machine->colortable, 0x1200 + ((color << 6) | pen), 0x400 + ((((color & ~3) << 4) + pen) & 0x1ff));
+			
+			colortable_entry_set_value(machine->colortable, 0x0a00 + ((color << 6) | pen), 0x200 + pen); // untested
+			colortable_entry_set_value(machine->colortable, 0x1a00 + ((color << 6) | pen), 0x200 + ((((color & ~3) << 4) + pen) & 0x1ff));
 		}
 }
 
@@ -610,7 +634,10 @@ PALETTE_INIT( zingzip )
 
 	for (color = 0; color < 0x20; color++)
 		for (pen = 0; pen < 0x40; pen++)
-			colortable_entry_set_value(machine->colortable, 0x400 + ((color << 6) | pen), 0x400 + (((color << 4) + pen) & 0x1ff));
+		{
+			colortable_entry_set_value(machine->colortable, 0x400 + ((color << 6) | pen), 0x400 + pen); // untested
+			colortable_entry_set_value(machine->colortable, 0xc00 + ((color << 6) | pen), 0x400 + ((((color & ~3) << 4) + pen) & 0x1ff));
+		}
 }
 
 // color prom
@@ -655,7 +682,10 @@ PALETTE_INIT( usclssic )
 
 	for (color = 0; color < 0x20; color++)
 		for (pen = 0; pen < 0x40; pen++)
-			colortable_entry_set_value(machine->colortable, 0x200 + ((color << 6) | pen), 0x200 + (((color << 4) + pen) & 0x1ff));
+		{
+			colortable_entry_set_value(machine->colortable, 0x200 + ((color << 6) | pen), 0x200 + pen); // untested
+			colortable_entry_set_value(machine->colortable, 0xa00 + ((color << 6) | pen), 0x200 + ((((color & ~3) << 4) + pen) & 0x1ff));
+		}
 }
 
 
@@ -905,6 +935,26 @@ static VIDEO_UPDATE( seta_layers )
 
 	const rectangle &visarea = screen->visible_area();
 	int vis_dimy = visarea.max_y - visarea.min_y + 1;
+	
+	
+	// check tilemaps color modes
+
+	if(state->current_tilemap_mode[0] != (state->vctrl_0[ 4/2 ] & 0x10))
+	{
+		state->current_tilemap_mode[0] = state->vctrl_0[ 4/2 ] & 0x10;
+		tilemap_mark_all_tiles_dirty(state->tilemap_0);
+		tilemap_mark_all_tiles_dirty(state->tilemap_1);
+	}
+
+	if(state->tilemap_2 != NULL && state->tilemap_3 != NULL)
+	{
+		if(state->current_tilemap_mode[1] != (state->vctrl_2[ 4/2 ] & 0x10))
+		{
+			state->current_tilemap_mode[1] = state->vctrl_2[ 4/2 ] & 0x10;
+			tilemap_mark_all_tiles_dirty(state->tilemap_2);
+			tilemap_mark_all_tiles_dirty(state->tilemap_3);
+		}
+	}
 
 	flip ^= state->tilemaps_flip;
 
