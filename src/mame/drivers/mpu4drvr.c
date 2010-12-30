@@ -1105,25 +1105,31 @@ static READ8_DEVICE_HANDLER( pia_ic5_porta_track_r )
 	/* The SWP trackball interface connects a standard trackball to the AUX1 port on the MPU4
     mainboard. As per usual, they've taken the cheap route here, reading and processing the
     raw quadrature signal from the encoder wheels for a 4 bit interface, rather than use any
-    additional hardware to simplify matters. For our purposes, two fake ports give the X and Y positions,
+    additional hardware to simplify matters. What makes matters worse is that there is a 45 degree rotation to take into account.
+    For our purposes, two fake ports give the X and Y positions,
     which are then worked back into the signal levels.
     We invert the X and Y data at source due to the use of Schmitt triggers in the interface, which
     clean up the pulses and flip the active phase.*/
 
 	LOG(("%s: IC5 PIA Read of Port A (AUX1)\n",cpuexec_describe_context(device->machine)));
 
+	static INT8 cur[2];
+
 	UINT8 data = input_port_read(device->machine, "AUX1");
 
-	UINT16 dx = input_port_read(device->machine, "TRACKX");
-	UINT16 dy = input_port_read(device->machine, "TRACKY");
+	INT8 dx = input_port_read(device->machine, "TRACKX");
+	INT8 dy = input_port_read(device->machine, "TRACKY");
+
+	cur[0] = dy + dx;
+	cur[1] = dy - dx;
 
 	UINT8 xa, xb, ya, yb;
 
 	/* generate pulses for the input port (A and B are 1 unit out of phase for direction sensing)*/
-	xa = ((dx + 1) & 3) <= 1;
-	xb = (dx & 3) <= 1;
-	ya = ((dy + 1) & 3) <= 1;
-	yb = (dy & 3) <= 1;
+	xa = ((cur[0] + 1) & 3) <= 1;
+	xb = (cur[0] & 3) <= 1;
+	ya = ((cur[1] + 1) & 3) <= 1;
+	yb = (cur[1] & 3) <= 1;
 
 	data |= (xa << 4); // XA
 	data |= (ya << 5); // YA
