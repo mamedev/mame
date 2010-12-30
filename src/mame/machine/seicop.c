@@ -2224,7 +2224,7 @@ static WRITE16_HANDLER( generic_cop_w )
 			{
 				if (cop_mcu_ram[offset]==copd2_table_4[i])
 				{
-					seibu_cop_log("    Cop Command %04x found in slot %02x with other params %04x %04x\n", cop_mcu_ram[offset], i, copd2_table_2[i], copd2_table_3[i]);
+					//seibu_cop_log("    Cop Command %04x found in slot %02x with other params %04x %04x\n", cop_mcu_ram[offset], i, copd2_table_2[i], copd2_table_3[i]);
 
 					u1 = copd2_table_2[i] & 0x000f;
 					u2 = copd2_table_3[i] & 0xffff;
@@ -2239,14 +2239,14 @@ static WRITE16_HANDLER( generic_cop_w )
 			}
 			else
 			{
-				int j;
+				//int j;
 				command*=0x8;
-				seibu_cop_log("     Sequence: ");
-				for (j=0;j<0x8;j++)
-				{
-					seibu_cop_log("%04x ", copd2_table[command+j]);
-				}
-				seibu_cop_log("\n");
+				//seibu_cop_log("     Sequence: ");
+				//for (j=0;j<0x8;j++)
+				//{
+				//	seibu_cop_log("%04x ", copd2_table[command+j]);
+				//}
+				//seibu_cop_log("\n");
 			}
 
 			//printf("%04x %04x %04x\n",cop_mcu_ram[offset],u1,u2);
@@ -2272,6 +2272,8 @@ static WRITE16_HANDLER( generic_cop_w )
 			}
 
 			/* SINE math - 0x8100 */
+			/* FIXME: going up is slower than going down */
+			/* FIXME: cop scale is unreliable */
 			if(COP_CMD(0xb9a,0xb88,0x888,0x000,0x000,0x000,0x000,0x000,7,0xfdfb))
 			{
 				double angle = (space->read_word(cop_register[0]+(0x34^2)) & 0xff) * M_PI / 128;
@@ -2282,6 +2284,8 @@ static WRITE16_HANDLER( generic_cop_w )
 			}
 
 			/* COSINE math - 0x8900 */
+			/* FIXME: going left is slower than going right */
+			/* FIXME: cop scale is unreliable */
 			if(COP_CMD(0xb9a,0xb8a,0x88a,0x000,0x000,0x000,0x000,0x000,7,0xfdfb))
 			{
 				double angle = (space->read_word(cop_register[0]+(0x34^2)) & 0xff) * M_PI / 128;
@@ -2468,6 +2472,28 @@ static WRITE16_HANDLER( generic_cop_w )
 
 				space->write_word(cop_register[4] + offs,space->read_word(cop_sprite_dma_src + offs) + (cop_sprite_dma_param & 0x3f));
 				//space->write_word(cop_register[4] + offs ,space->read_word(cop_sprite_dma_src+2 + offs));
+			}
+
+			// cupsoc 1b | 5 | 7ff7 | dde5 | f80 aa2 984 0c2
+			/* radar x/y positions */
+			/* FIXME: x/ys are offsetted */
+			if(COP_CMD(0xf80,0xaa2,0x984,0x0c2,0x000,0x000,0x000,0x000,5,0x7ff7))
+			{
+				static UINT8 offs;
+				static int div;
+				static INT16 offs_val;
+
+				//printf("%08x %08x %08x %08x %08x %08x %08x\n",cop_register[0],cop_register[1],cop_register[2],cop_register[3],cop_register[4],cop_register[5],cop_register[6]);
+
+				offs = (offset & 3) * 4;
+
+				div = space->read_word(cop_register[4] + offs) + 1;
+				offs_val = space->read_word(cop_register[3] + offs);
+				//420 / 180 = 500 : 400 = 30 / 50 = 98 / 18
+
+				if(div == 0) { div = 1; }
+
+				space->write_word((cop_register[6] + offs + 4), ((space->read_word(cop_register[5] + offs + 4)) / div));
 			}
 
 			//printf("%04x\n",cop_mcu_ram[offset]);
