@@ -4240,6 +4240,6 @@ GAME(  198?, genie,    0,        genie,    genie,    0,        ROT0,   "Video Fu
 GAMEL( 198?, superdbl, goldnpkr, goldnpkr, goldnpkr, 0,        ROT0,   "Karateco",                 "Super Double (French)",                   0,                layout_goldnpkr )
 
 GAMEL( 1983, silverga, goldnpkr, goldnpkr, goldnpkr, 0,        ROT0,   "<unknown>",                "Silver Game",                             0,                layout_goldnpkr )
-GAME(  198?, pokerdub, goldnpkr, goldnpkr, goldnpkr, 0,        ROT0,   "<unknown>",                "Unknown french poker game",               GAME_NOT_WORKING )	// lacks of 2nd program ROM.
-GAME(  198?, pokerduc, goldnpkr, goldnpkr, goldnpkr, ipc1db,   ROT0,   "<unknown>",                "Unknown encrypted poker game",            GAME_NOT_WORKING )	// encrypted.
+GAME(  198?, pokerdub, goldnpkr, goldnpkr, goldnpkr, 0,        ROT0,   "<unknown>",                "unknown French poker game",               GAME_NOT_WORKING )	// lacks of 2nd program ROM.
+GAME(  198?, pokerduc, goldnpkr, goldnpkr, goldnpkr, ipc1db,   ROT0,   "<unknown>",                "unknown encrypted poker game",            GAME_NOT_WORKING )	// encrypted.
 
