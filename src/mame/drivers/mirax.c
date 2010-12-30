@@ -8,6 +8,7 @@ Angelo Salese
 Olivier Galibert
 
 TODO:
+- sound is hacky at the moment, so it can't be 100% trusted
 - sprite offsets?
 - score / credits display should stay above the sprites?
 
@@ -465,7 +466,6 @@ ROM_START( miraxa )
 	ROM_REGION( 0x0060, "proms", 0 ) // data ? encrypted roms for cpu1 ?
 	ROM_LOAD( "mra3.prm",   0x0000, 0x0020, CRC(ae7e1a63) SHA1(f5596db77c1e352ef7845465db3e54e19cd5df9e) )
 	ROM_LOAD( "mrb3.prm",   0x0020, 0x0020, CRC(e3f3d0f5) SHA1(182b06c9db5bec1e3030f705247763bd2380ba83) )
-	ROM_LOAD( "mirax.prm",	0x0040, 0x0020, NO_DUMP )
 ROM_END
 
 
@@ -486,5 +486,5 @@ static DRIVER_INIT( mirax )
 
 }
 
-GAME( 1985, mirax,  0,     mirax, mirax, mirax, ROT90, "Current Technologies", "Mirax",         0 )
-GAME( 1985, miraxa, mirax, mirax, mirax, mirax, ROT90, "Current Technologies", "Mirax (set 2)", 0 )
+GAME( 1985, mirax,  0,     mirax, mirax, mirax, ROT90, "Current Technologies", "Mirax",         GAME_IMPERFECT_SOUND )
+GAME( 1985, miraxa, mirax, mirax, mirax, mirax, ROT90, "Current Technologies", "Mirax (set 2)", GAME_IMPERFECT_SOUND )
