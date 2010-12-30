@@ -1166,7 +1166,6 @@ ROM_START( legiono )
 	ROM_LOAD( "legion.1j", 0x010000, 0x010000, CRC(bae220c8) SHA1(392ae0fb0351dcad7b0e8e0ed4a1dc6e07f493df) )
 
 	/* should lg7.bin be loaded here too? The ROM wasn't included in this set */
-	
 ROM_END
 
 ROM_START( terraf )

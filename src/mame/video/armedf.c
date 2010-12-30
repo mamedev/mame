@@ -43,6 +43,29 @@ static TILE_GET_INFO( get_tx_tile_info )
 			0);
 }
 
+static TILE_GET_INFO( get_legion_tx_tile_info )
+{
+	armedf_state *state = machine->driver_data<armedf_state>();
+	
+	int tile_number = state->text_videoram[tile_index] & 0xff;
+	
+	if(tile_index<0x10) tile_number=0x20;
+	
+	int attributes;
+
+	if (state->scroll_type == 1)
+		attributes = state->text_videoram[tile_index + 0x800] & 0xff;
+	else
+		attributes = state->text_videoram[tile_index + 0x400] & 0xff;
+
+	SET_TILE_INFO(
+			0,
+			tile_number + 256 * (attributes & 0x3),
+			attributes >> 4,
+			0);
+}
+
+
 static TILE_GET_INFO( get_fg_tile_info )
 {
 	armedf_state *state = machine->driver_data<armedf_state>();
@@ -97,6 +120,9 @@ VIDEO_START( armedf )
 		break;
 
 	case 3: /* legion */
+		state->tx_tilemap = tilemap_create(machine, get_legion_tx_tile_info, armedf_scan_type3, 8, 8, 64, 32);
+		break;
+		
 	case 6: /* legiono */
 		state->tx_tilemap = tilemap_create(machine, get_tx_tile_info, armedf_scan_type3, 8, 8, 64, 32);
 		break;
@@ -128,15 +154,16 @@ WRITE16_HANDLER( armedf_text_videoram_w )
 		tilemap_mark_tile_dirty(state->tx_tilemap, offset & 0x7ff);
 	else
 		tilemap_mark_tile_dirty(state->tx_tilemap, offset & 0xbff);
-
-/*  if (offset < 0x10)
+/*
+  if (offset < 0x10)
         logerror("%04x %04x %04x %04x %04x %04x %04x %04x-%04x %04x %04x %04x %04x %04x %04x %04x (%04x)\n",
             state->text_videoram[0], state->text_videoram[1], state->text_videoram[2],
             state->text_videoram[3], state->text_videoram[4], state->text_videoram[5],
             state->text_videoram[6], state->text_videoram[7], state->text_videoram[8],
             state->text_videoram[9], state->text_videoram[10], state->text_videoram[11],
             state->text_videoram[12], state->text_videoram[13], state->text_videoram[14],
-            state->text_videoram[15], offset);*/
+            state->text_videoram[15], offset);
+*/
 }
 
 WRITE16_HANDLER( armedf_fg_videoram_w )
@@ -256,7 +283,53 @@ static void draw_sprites( running_machine *machine, bitmap_t *bitmap, const rect
 	}
 }
 
+static void copy_textmap(running_machine *machine, int index)
+{
+	/*
+		(not simulated)
+		1st half of the MCU ROM contains various strings and
+		gfx elements (copied by MCU to textram)
+				
+		
+		(partially simulated)
+		2nd half of the MCu external ROM contains text tilemaps:
 
+		 4 - title screen
+		 5 - ??? - should be (when comapred with legiono set) displayed(? inivisble? different prority?) during game 
+		 6 - test mode screen
+		 7 - portraits (title)
+
+	*/
+
+	armedf_state *state = machine->driver_data<armedf_state>();
+	UINT8 * data = (UINT8 *)memory_region(machine, "gfx5");
+	
+	for(int i=0;i<0x400;++i)
+	{
+		if(i<0x10) continue;
+	
+		if(index>0)
+		{
+			int tile=data[0x800*index+i];
+			int bank=data[0x800*index+i+0x400]&3;
+			
+			if( (tile|(bank<<8))!=0x20)
+			{
+				state->text_videoram[i]=tile;
+				state->text_videoram[i+0x400]=data[0x800*index+i+0x400];
+			}
+		}
+		else
+		{
+			//clear - not used
+			state->text_videoram[i]=0x20;
+			state->text_videoram[i+0x400]=0;
+		}
+	}
+	
+	tilemap_mark_all_tiles_dirty(state->tx_tilemap);
+	
+}
 
 VIDEO_UPDATE( armedf )
 {
@@ -288,7 +361,7 @@ VIDEO_UPDATE( armedf )
 			//logerror("MCU Change => %04x\n", state->mcu_mode);
 		}
 	}
-
+	
 	switch (state->scroll_type)
 	{
 		case 0: /* terra force */
@@ -362,6 +435,39 @@ VIDEO_UPDATE( armedf )
 
 	if (sprite_enable)
 		draw_sprites(screen->machine, bitmap, cliprect, 0);
+		
+		
+	if(state->scroll_type == 3) /* legion */
+	{
+		/*  Hack to clear the garbage draw in place of "GAME OVER" after
+			continue. Game code copies there '@ABCDEFG' (from location $13fad),
+			to fix tilemap (index 5) currently not displayed in game 
+			(visible in legiono (unprotected) set - it covers the playfield,
+			but should be not visible? or draw under the tilemaps)
+		*/	
+			
+		if(	(state->text_videoram[0]&0xff) == 0x0e && 
+			(state->text_videoram[0x40e/2]&0xff)==' ' && 
+			(state->text_videoram[0x410/2]&0xff)=='@' && 
+			(state->text_videoram[0x412/2]&0xff)=='A')
+		{
+			for(int i=0;i<16;++i)
+			{
+				state->text_videoram[0x410/2+i]=0x20;
+				state->text_videoram[0x410/2+i+0x400]=0;
+			}
+			tilemap_mark_all_tiles_dirty(state->tx_tilemap);
+		}
+		
+		switch(state->text_videoram[1]&0xff)
+		{
+			case 1: copy_textmap(screen->machine, 4); break; /* title screen */
+			case 6: copy_textmap(screen->machine, 7); break; /* portraits on title screen */
+			/* display tilemap 5 during game .. but it makes the game unplayable */
+		}
+		
+	}
+	
 
 	return 0;
 }
