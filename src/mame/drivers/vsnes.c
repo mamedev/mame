@@ -2070,7 +2070,7 @@ ROM_START( ladygolf )
 	PALETTE_2C04_0002
 ROM_END
 
-ROM_START( ldygolfe ) /* Vs. Stroke & Match Golf (Ladies Version, set E) */
+ROM_START( ladygolfe ) /* Vs. Stroke & Match Golf (Ladies Version, set E) */
 	ROM_REGION( 0x10000,"maincpu", 0  ) /* 6502 memory */
 	ROM_LOAD( "mds-lg4 e.1d or 6d", 0x8000, 0x2000, CRC(408ea247) SHA1(48cbcf9b87e522b20599bcf2b61df81bfd55db7b) )
 	ROM_LOAD( "mds-lg4 e.1c or 6c", 0xa000, 0x2000, CRC(75214cf3) SHA1(8024a2a89573700250c1c12ab8f59f4848f87f78) )
@@ -2652,7 +2652,7 @@ GAME( 1984, smgolf,   0,        vsnes,   golf4s,   vsnormal, ROT0, "Nintendo",  
 GAME( 1984, smgolfb,  smgolf,   vsnes,   golf,     vsnormal, ROT0, "Nintendo",	"Vs. Stroke & Match Golf (Men Version, set 2)", 0 )
 GAME( 1984, smgolfj,  smgolf,   vsnes,   golf,     vsnormal, ROT0, "Nintendo",  "Vs. Stroke & Match Golf (Men Version) (Japan)", 0 )
 GAME( 1984, ladygolf, smgolf,   vsnes,   golf,     vsnormal, ROT0, "Nintendo",  "Vs. Stroke & Match Golf (Ladies Version, set ?)", 0 )
-GAME( 1984, ldygolfe, smgolf,   vsnes,   golf,     vsnormal, ROT0, "Nintendo",  "Vs. Stroke & Match Golf (Ladies Version, set E)", 0 )
+GAME( 1984, ladygolfe,smgolf,   vsnes,   golf,     vsnormal, ROT0, "Nintendo",  "Vs. Stroke & Match Golf (Ladies Version, set E)", 0 )
 GAME( 1984, vspinbal, 0,        vsnes,   vspinbal, vsnormal, ROT0, "Nintendo",  "Vs. Pinball", 0 )
 GAME( 1984, vspinbalj,vspinbal, vsnes,   vspinblj, vsnormal, ROT0, "Nintendo",  "Vs. Pinball (Japan)", 0 )
 GAME( 1986, vsslalom, 0,        vsnes,   vsslalom, vsnormal, ROT0, "Rare",      "Vs. Slalom", GAME_IMPERFECT_GRAPHICS )
