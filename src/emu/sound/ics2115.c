@@ -9,7 +9,8 @@
 #include "ics2115.h"
 #include <cmath>
 
-#define ICS2115_DEBUG 0
+//#define ICS2115_DEBUG
+//#define ICS2115_ISOLATE 6
 
 const device_type ICS2115 = ics2115_device_config::static_alloc_device_config;
 
@@ -51,29 +52,20 @@ void ics2115_device::device_start()
     m_stream = stream_create(this, 0, 2, 33075, this, static_stream_generate);
 
     //Exact formula as per patent 5809466
-    //This seems to give the best fit.
-    double maxvol = ((1 << volume_bits) - 1) * pow(2., (double)1/0x100);
+    //This seems to give the ok fit but it is not good enough.
+    /*double maxvol = ((1 << volume_bits) - 1) * pow(2., (double)1/0x100);
     for (int i = 0; i < 0x1000; i++) {
            m_volume[i] = floor(maxvol * pow(2.,(double)i/256 - 16) + 0.5);
-    }
-
-    //Log rule -- wayyyy too much compression
-    /*
-    for(int i=0; i<4096; i++) {
-        m_volume[i] = (UINT16)((double)0x1000 * log2(i+12270) / 7.);
     }*/
 
     //austere's table, derived from patent 5809466:
     //See section V starting from page 195
     //Subsection F (column 124, page 198) onwards
-    //NOTE: This is 15-bit to maintain decent dynamic range -- shift values down accordingly
-    //This on its own does not sound correct, but it follows the poor GF-1 documentation
-    //There is a possible logarithmic compression step that follows this later!
-    /*for (int i = 0; i<4096; i++) {
-        m_volume[i] = ((256 + i & 0xff)<<6) >> (15 - (i >> 8));
-    }*/
+    for (int i = 0; i<4096; i++) {
+        m_volume[i] = ((0x100 | (i & 0xff)) << (volume_bits-9)) >> (15 - (i>>8));
+    }
 
-    //As per MIL-STD-188-113
+    //u-Law table as per MIL-STD-188-113
     UINT16 lut[8];
     UINT16 lut_initial = 33 << 2;   //shift up 2-bits for 16-bit range.
     for(int i = 0; i < 8; i++)
@@ -97,7 +89,7 @@ void ics2115_device::device_start()
 	state_save_register_device_item(this, 0, m_irq_pending);
 	state_save_register_device_item(this, 0, m_irq_on);
 	state_save_register_device_item(this, 0, m_active_osc);
-	state_save_register_device_item(this, 0, m_outhalt);
+	state_save_register_device_item(this, 0, m_vmode);
 
 	for(int i = 0; i < 32; i++) {
 		state_save_register_device_item(this, i, m_voice[i].osc_conf.value);
@@ -131,7 +123,7 @@ void ics2115_device::device_reset()
 	m_active_osc = 31;
 	m_osc_select = 0;
 	m_reg_select = 0;
-    m_outhalt = 0;
+    m_vmode = 0;
 	memset(m_voice, 0, sizeof(m_voice));
 	timer_adjust_oneshot(m_timer[0].timer, attotime_never, 0);
 	timer_adjust_oneshot(m_timer[1].timer, attotime_never, 0);
@@ -176,7 +168,6 @@ int ics2115_voice::update_volume_envelope()
 		vol.left = vol.end - vol.acc;
 	}
 
-    //> instead of >= to stop crackling?
 	if(vol.left > 0)
 		return ret;
 
@@ -208,6 +199,21 @@ int ics2115_voice::update_volume_envelope()
 	return ret;
 }
 
+/*UINT32 ics2115_voice::next_address()
+{
+    //Patent 6,246,774 B1, Column 111, Row 25
+    //LEN   BLEN    DIR     BC      NextAddress
+    //x     x       0       0       add+fc
+    //x     x       1       0       add-fc
+    //0     x       x       1       add
+    //1     0       0       1       start-(end-(add+fc))
+    //1     0       1       1       end+((add+fc)-start)
+    //1     1       0       1       end+(end-(add+fc))
+    //1     1       1       1       start-((add-fc)-start)
+
+}*/
+
+
 int ics2115_voice::update_oscillator()
 {
 	int ret = 0;
@@ -228,20 +234,23 @@ int ics2115_voice::update_oscillator()
         ret = 1;
 	}
 	if(osc_conf.loop) {
-        //This possibly does not function correctly, sometimes it starts playing sounds continuously
-        //For example, the PGM test after deactivating shortly after activation. The possible problem
-        //Might be masked by the keyoff command, uncomment voice.state.on = false to reveal it.
 		if(osc_conf.loop_bidir)
 			osc_conf.invert = !osc_conf.invert;
+        //else
+        //    printf("click!\n");
 
-		if(osc_conf.invert)
+		if(osc_conf.invert) {
 			osc.acc = osc.end + osc.left;
-		else
+            osc.left = osc.acc - osc.start;
+        }
+		else {
 			osc.acc = osc.start - osc.left;
-	}else{
+            osc.left = osc.end - osc.acc;
+        }
+	} else {
 		state.on = false;
 		osc_conf.stop = true;
-		if(osc_conf.invert)
+		if(!osc_conf.invert)
 			osc.acc = osc.end;
 		else
 			osc.acc = osc.start;
@@ -249,8 +258,21 @@ int ics2115_voice::update_oscillator()
 	return ret;
 }
 
-stream_sample_t ics2115_device::get_sample(ics2115_voice& voice, UINT32 curaddr)
+//TODO: proper interpolation for uLaw (fill_output doesn't use this) and 8-bit samples (looping)
+stream_sample_t ics2115_device::get_sample(ics2115_voice& voice)
 {
+    UINT32 curaddr = ((voice.osc.saddr << 20) & 0xffffff) | (voice.osc.acc >> 12);
+    UINT32 nextaddr;
+
+    if (voice.state.on && voice.osc_conf.loop && !voice.osc_conf.loop_bidir &&
+            (voice.osc.left < (voice.osc.fc <<2))) {
+        //printf("C?[%x:%x]", voice.osc.left, voice.osc.acc);
+        nextaddr = ((voice.osc.saddr << 20) & 0xffffff) | (voice.osc.start >> 12);
+    }
+    else
+        nextaddr = curaddr + 2;
+
+
     INT16 sample1, sample2;
     if (voice.osc_conf.eightbit) {
         sample1 = ((INT8)m_rom[curaddr]) << 8;
@@ -258,15 +280,21 @@ stream_sample_t ics2115_device::get_sample(ics2115_voice& voice, UINT32 curaddr)
     }
     else {
         sample1 = m_rom[curaddr + 0] | (((INT8)m_rom[curaddr + 1]) << 8);
-        sample2 = m_rom[curaddr + 2] | (((INT8)m_rom[curaddr + 3]) << 8);
+        sample2 = m_rom[nextaddr+ 0] | (((INT8)m_rom[nextaddr+ 1]) << 8);
+        //sample2 = m_rom[curaddr + 2] | (((INT8)m_rom[curaddr + 3]) << 8);
     }
+
+    //no need for interpolation since it's around 1 note a cycle?
+    //if(voice.osc.fc >> 10)
+    //    return sample1;
     
-    //linear interpolation -- TODO: program the case where FC skips over samples
-    //may cause some glitches at the end -- probably needs special termination condition
+    //linear interpolation as in US patent 6,246,774 B1, column 2 row 59
+    //LEN=1, BLEN=0, DIR=0, start+end interpolation
     INT32 sample, diff;
     UINT16 fract;
     diff = sample2 - sample1;
     fract = (voice.osc.acc >> 3) & 0x1ff;
+    
     sample = (((INT32)sample1 << 9) + diff * fract) >> 9;
     //sample = sample1;
     return sample;
@@ -277,6 +305,21 @@ bool ics2115_voice::playing()
     return state.on && !((vol_ctrl.done || vol_ctrl.stop) && osc_conf.stop);
 }
 
+void ics2115_voice::update_ramp() {
+    //slow attack
+    if (state.on && !osc_conf.stop) {
+        if (state.ramp < 0x40)
+            state.ramp += 0x1;
+        else
+            state.ramp = 0x40;
+    }
+    //slow release
+    else {
+        if (state.ramp)
+            state.ramp -= 0x1;
+    }
+}
+
 int ics2115_device::fill_output(ics2115_voice& voice, stream_sample_t *outputs[2], int samples)
 {
     bool irq_invalid = false;
@@ -285,27 +328,31 @@ int ics2115_device::fill_output(ics2115_voice& voice, stream_sample_t *outputs[2
 
     for (int i = 0; i < samples; i++) {
         UINT32 volacc = (voice.vol.acc >> 10) & 0xffff;
-        UINT16 vleft = m_volume[volacc >> 4]; //* (255 - voice.vol.pan) / 0x80];
-        UINT16 vright = m_volume[volacc >> 4]; //* (voice.vol.pan + 1) / 0x80];
+        UINT32 volume = (m_volume[volacc >> 4] * voice.state.ramp) >> 6;
+        UINT16 vleft = volume; //* (255 - voice.vol.pan) / 0x80];
+        UINT16 vright = volume; //* (voice.vol.pan + 1) / 0x80];
         
         //From GUS doc:
         //In general, it is necessary to remember that all voices are being summed in to the
         //final output, even if they are not running.  This means that whatever data value
         //that the voice is pointing at is contributing to the summation.
         //(austere note: this will of course fix some of the glitches due to multiple transition)
-        UINT32 curaddr = ((voice.osc.saddr << 20) & 0xffffff) | (voice.osc.acc >> 12);
         stream_sample_t sample;
-        if(voice.osc_conf.ulaw)
+        if(voice.osc_conf.ulaw) {
+            UINT32 curaddr = ((voice.osc.saddr << 20) & 0xffffff) | (voice.osc.acc >> 12);
             sample = m_ulaw[m_rom[curaddr]];
+        }
         else
-            sample = get_sample(voice, curaddr);
+            sample = get_sample(voice);
         
         //15-bit volume + (5-bit worth of 32 channel sum) + 16-bit samples = 4-bit extra
-        if (!m_outhalt || voice.playing()) {
+        if (!m_vmode || voice.playing()) {
+        //if (voice.playing()) {
             outputs[0][i] += (sample * vleft) >> (5 + volume_bits - 16);
             outputs[1][i] += (sample * vright) >> (5 + volume_bits - 16);
         }
 
+        voice.update_ramp();
         if (voice.playing()) {
             if (voice.update_oscillator())
                 irq_invalid = true;
@@ -325,13 +372,51 @@ void ics2115_device::stream_generate(stream_sample_t **inputs, stream_sample_t *
 	for(int osc = 0; osc <= m_active_osc; osc++) {
 		ics2115_voice& voice = m_voice[osc];
 
+#ifdef ICS2115_ISOLATE
+        if(osc != ICS2115_ISOLATE)
+            continue;
+#endif
+/*
+#ifdef ICS2115_DEBUG
+        UINT32 curaddr = ((voice.osc.saddr << 20) & 0xffffff) | (voice.osc.acc >> 12);
+        stream_sample_t sample;
+        if(voice.osc_conf.ulaw)
+            sample = m_ulaw[m_rom[curaddr]];
+        else
+            sample = get_sample(voice);
+        printf("[%06x=%04x]", curaddr, (INT16)sample);
+#endif
+*/
 		if(fill_output(voice, outputs, samples))
 			irq_invalid = true;
-#if ICS2115_DEBUG
-        if(voice.playing())
-            printf("%d ", osc);
+
+#ifdef ICS2115_DEBUG
+        if(voice.playing()) {
+            printf("%d", osc);
+            if (voice.osc_conf.invert)
+                printf("+");
+            else if ((voice.osc.fc >> 1) > 0x1ff)
+                printf("*");
+            printf(" ");
+
+            /*int min = 0x7fffffff, max = 0x80000000;
+            double average = 0;
+            for (int i = 0; i < samples; i++) {
+                if (outputs[0][i] > max) max = outputs[0][i];
+                if (outputs[0][i] < min) min = outputs[0][i];
+                average += fabs(outputs[0][i]);
+            }
+            average /= samples;
+            average /= 1 << 16;
+            printf("<Mi:%d Mx:%d Av:%g>", min >> 16, max >> 16, average);*/
+        }
 #endif
 	}
+
+#ifdef ICS2115_DEBUG
+    printf("|");
+#endif
+
 	//rescale
 	for (int i = 0; i < samples; i++) {
         outputs[0][i] >>= 16;
@@ -378,17 +463,14 @@ UINT16 ics2115_device::reg_read() {
 			break;
 
 		case 0x06: // [osc] Volume Increment
-			//ret = v->Vol.Incr;
 			ret = voice.vol.incr;
 			break;
 
 		case 0x07: // [osc] Volume Start
-			//ret = v->Vol.Start;
 			ret = voice.vol.start >> (10+8);
 			break;
 
 		case 0x08: // [osc] Volume End
-			//ret = v->Vol.End;
 			ret = voice.vol.end >> (10+8);
 			break;
 
@@ -398,18 +480,15 @@ UINT16 ics2115_device::reg_read() {
 			break;
 
 		case 0x0A: // [osc] Wavesample address
-			//ret = (v->Osc.Acc >> 16) & 0xFFFF;
 			ret = (voice.osc.acc >> 16) & 0xffff;
 			break;
 
 		case 0x0B: // [osc] Wavesample address
-			//ret = (v->Osc.Acc >> 0) & 0xFFF8;
 			ret = (voice.osc.acc >> 0) & 0xfff8;
 			break;
 
 
 		case 0x0C: // [osc] Pan
-			//ret = v->Vol.Pan << 8;
 			ret = voice.vol.pan << 8;
 			break;
 
@@ -427,7 +506,7 @@ UINT16 ics2115_device::reg_read() {
 			// may expect |8 on voice irq with &40 == 0
 			// may expect |8 on reg 0 on voice irq with &80 == 0
 			// ret = 0xFF;
-            if (!m_outhalt)
+            if (!m_vmode)
 			    ret = voice.vol_ctrl.irq ? 0x81 : 0x01;
             else
                 ret = 0x01;
@@ -495,7 +574,7 @@ UINT16 ics2115_device::reg_read() {
 			break;
 
 		default:
-#if ICS2115_DEBUG
+#ifdef ICS2115_DEBUG
             printf("ICS2115: Unhandled read %x\n", m_reg_select);
 #endif
             ret = 0;
@@ -576,6 +655,12 @@ void ics2115_device::reg_write(UINT8 data, bool msb) {
 			break;
 
 		case 0x0A: // [osc] Wavesample address high
+#ifdef ICS2115_DEBUG
+#ifdef ICS2115_ISOLATE
+            if(m_osc_select == ICS2115_ISOLATE)
+#endif
+                printf("<%d:oa:H[%d]=%x>", m_osc_select, msb, data); 
+#endif
 			if(msb)
 				voice.osc.acc = (voice.osc.acc & 0x00ffffff) | (data << 24);
 			else
@@ -583,6 +668,12 @@ void ics2115_device::reg_write(UINT8 data, bool msb) {
 			break;
 
 		case 0x0B: // [osc] Wavesample address low
+#ifdef ICS2115_DEBUG
+#ifdef ICS2115_ISOLATE
+            if(m_osc_select == ICS2115_ISOLATE)
+#endif
+                printf("<%d:oa:L[%d]=%x>", m_osc_select, msb, data); 
+#endif
 			if(msb)
 				voice.osc.acc = (voice.osc.acc & 0xffff00ff) | (data << 8);
 			else
@@ -618,18 +709,21 @@ void ics2115_device::reg_write(UINT8 data, bool msb) {
                     keyon();
                 //guessing here
                 else if(data == 0xf) {
-#if ICS2115_DEBUG
+#ifdef ICS2115_DEBUG
+#ifdef ICS2115_ISOLATE
+                    if (m_osc_select == ICS2115_ISOLATE)
+#endif
                     if (!voice.osc_conf.stop || !voice.vol_ctrl.stop)
                         printf("[%02d STOP]\n", m_osc_select);
 #endif
-                    if (!m_outhalt) {
+                    if (!m_vmode) {
                         voice.osc_conf.stop = true;
                         voice.vol_ctrl.stop = true;
                         //try to key it off as well!
                         voice.state.on = false;
                     }
                 }
-#if ICS2115_DEBUG
+#ifdef ICS2115_DEBUG
                 else
                     printf("ICS2115: Unhandled* data write %d onto 0x10.\n", data);
 #endif
@@ -644,7 +738,7 @@ void ics2115_device::reg_write(UINT8 data, bool msb) {
         case 0x12:
             //Could be per voice! -- investigate.
             if (msb)
-                m_outhalt = data;
+                m_vmode = data;
             break;
 		case 0x40: // Timer 1 Preset
 		case 0x41: // Timer 2 Preset
@@ -675,7 +769,7 @@ void ics2115_device::reg_write(UINT8 data, bool msb) {
 			}
 			break;
         default:
-#if ICS2115_DEBUG
+#ifdef ICS2115_DEBUG
             printf("ICS2115: Unhandled write %x onto %x(%d) [voice = %d]\n", data, m_reg_select, msb, m_osc_select);
 #endif
             break;
@@ -696,7 +790,7 @@ READ8_DEVICE_HANDLER(ics2115_device::read)
                 if (chip->m_irq_enabled && (chip->m_irq_pending & 3))
                     ret |= 1;
                 for (int i = 0; i <= chip->m_active_osc; i++) {
-                    if (chip->m_voice[i].vol_ctrl.irq_pending ||
+                    if (//chip->m_voice[i].vol_ctrl.irq_pending ||
                         chip->m_voice[i].osc_conf.irq_pending) {
                         ret |= 2;
                         break;
@@ -715,7 +809,7 @@ READ8_DEVICE_HANDLER(ics2115_device::read)
             ret = chip->reg_read() >> 8;
             break;
         default:
-#if ICS2115_DEBUG
+#ifdef ICS2115_DEBUG
             printf("ICS2115: Unhandled memory read at %x\n", offset);
 #endif
             break;
@@ -738,7 +832,7 @@ WRITE8_DEVICE_HANDLER(ics2115_device::write)
             chip->reg_write(data,1);
             break;
         default:
-#if ICS2115_DEBUG
+#ifdef ICS2115_DEBUG
             printf("ICS2115: Unhandled memory write %02x to %x\n", data, offset);
 #endif
             break;
@@ -747,10 +841,16 @@ WRITE8_DEVICE_HANDLER(ics2115_device::write)
 
 void ics2115_device::keyon()
 {
+#ifdef ICS2115_ISOLATE
+    if (m_osc_select != ICS2115_ISOLATE)
+        return;
+#endif
     //set initial condition (may need to invert?) -- does NOT work since these are set to zero even
     m_voice[m_osc_select].state.on = true;
+    //no ramp up...
+    m_voice[m_osc_select].state.ramp = 0x40;
 
-#if ICS2115_DEBUG
+#ifdef ICS2115_DEBUG
     printf("[%02d vs:%04x ve:%04x va:%04x vi:%02x vc:%02x os:%06x oe:%06x oa:%06x of:%04x SA:%02x oc:%02x][%04x]\n", m_osc_select,
            m_voice[m_osc_select].vol.start >> 10,
            m_voice[m_osc_select].vol.end >> 10,
@@ -813,26 +913,3 @@ void ics2115_device::recalc_timer(int timer)
 			timer_adjust_oneshot(m_timer[timer].timer, attotime_never, 0);
 	}
 }
-
-//Unused code -- might be useful in the future.
-
-/*
-//0000MMMMMMMMXXXX -> MMMMMMMM
-//EEEEMMMMMMMMXXXX -> MMMMMMMM.XXXX << EEEE
-UINT32 vol_16float2int(UINT16 x) {
-    UINT8 extra = x & 0xf;
-    UINT8 mantissa = (x & 0xff0) >> 4;
-    INT8 exponent = (x & 0xf000) >> 12;
-
-    UINT8 extrashift = (4 - exponent > 0) ? (4-exponent) : 0;
-
-    return (mantissa<< exponent) | ((extra >> extrashift) << (exponent - 4));
-}
-
-//0000MMMM -> MMMM0000
-UINT32 vol_8float2int(UINT8 x) {
-    UINT8 mantissa = (x & 0xf);
-    UINT8 exponent = (x & 0x70) >> 4;
-
-    return mantissa<< (exponent + 4);
-}*/

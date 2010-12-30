@@ -77,9 +77,7 @@ struct ics2115_voice {
     union {
         struct {
             UINT8 on         : 1;
-            //UINT8 waveirq    : 1;
-            //UINT8 volirq     : 1;
-            //irq == (volirq | waveirq)
+            UINT8 ramp       : 7;       // 100 0000 = 0x40 maximum
         };
         UINT8 value;
     } state;
@@ -87,6 +85,7 @@ struct ics2115_voice {
     bool playing();
     int update_volume_envelope();
     int update_oscillator();
+    void update_ramp();
 };
 
 // ======================> ics2115_device_config
@@ -167,7 +166,7 @@ protected:
 
     //Unknown variable, seems to be effected by 0x12. Further investigation
     //Required.
-    UINT8 m_outhalt;
+    UINT8 m_vmode;
 
 	//internal register helper functions
 	UINT16 reg_read();
@@ -178,7 +177,7 @@ protected:
 
 	//stream helper functions
 	int fill_output(ics2115_voice& voice, stream_sample_t *outputs[2], int samples);
-	stream_sample_t get_sample(ics2115_voice& voice, UINT32 curaddr);
+	stream_sample_t get_sample(ics2115_voice& voice);
 };
 
 
