@@ -889,6 +889,7 @@ static READ8_HANDLER( prot_io_r )
 }
 
 static UINT8 semicom_prot_offset = 0x00;
+static UINT16 protbase = 0x0000;
 
 // probably not endian safe
 static WRITE8_HANDLER( prot_io_w )
@@ -899,17 +900,19 @@ static WRITE8_HANDLER( prot_io_w )
 	{
 		case 0x00:
 		{
-			UINT16 word = state->mainram[(0x0000/2) + semicom_prot_offset];
+			UINT16 word = state->mainram[(protbase/2) + semicom_prot_offset];
 			word = (word & 0xff00) | (data << 0);
-			state->mainram[(0x0000/2) + semicom_prot_offset] = word;
+			state->mainram[(protbase/2) + semicom_prot_offset] = word;
+
 			break;
 		}
 
 		case 0x01:
 		{
-			UINT16 word = state->mainram[(0x0000/2) + semicom_prot_offset];
+			UINT16 word = state->mainram[(protbase/2) + semicom_prot_offset];
 			word = (word & 0x00ff) | (data << 8);
-			state->mainram[(0x0000/2) + semicom_prot_offset] = word;
+			state->mainram[(protbase/2) + semicom_prot_offset] = word;
+			
 			break;
 		}
 
@@ -3208,14 +3211,6 @@ ROM_START( wondl96 )
 	ROM_REGION( 0x10000, "protection", 0 ) /* Intel 87C52 MCU Code */
 	ROM_LOAD( "87c52.mcu", 0x00000, 0x2000, CRC(6f4c659a) SHA1(7a1453531d9ceb37af21b96becfa9b06bff0a528) ) /* decapped */
 
-/*
- For some reason the MCU doesn't drop right in. We still need the data below to get it to work. Why?
-*/
-
-	ROM_REGION16_BE( 0x400, "user1", ROMREGION_ERASE00 ) /* Data from Shared RAM */
-	/* this is not a real rom but instead the data extracted from shared ram, the MCU puts it there */
-	ROM_LOAD16_WORD( "protdata.bin", 0x00200, 0x200 , CRC(d7578b1e) SHA1(b674005a5e46c602086b596be0358040cc175131) )
-
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "uc1.bin", 0x00000, 0x40000,  CRC(0e7913e6) SHA1(9a44bd7ca4030627a26010583216ce1c8032ee1b) )
 
@@ -3753,18 +3748,14 @@ static DRIVER_INIT( wlstar )
 
 	/* slightly different banking */
 	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x100002, 0x100003, 0, 0, wlstar_tilebank_w);
-}
 
-/******************
-Wonder League '96 still needs the protdata.bin and copy routine to work??
-******************/
+	protbase = 0x0000;
+}
 
 static DRIVER_INIT( wondl96 )
 {
-	DRIVER_INIT_CALL(htchctch);
-
-	/* slightly different banking */
-	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x100002, 0x100003, 0, 0, wlstar_tilebank_w);
+	DRIVER_INIT_CALL( wlstar );
+	protbase = 0x0200;
 }
 
 static DRIVER_INIT ( dquizgo )
