@@ -29,7 +29,9 @@ public:
 	DECLARE_READ16_MEMBER ( cop_status_r );
 	DECLARE_READ16_MEMBER ( cop_dist_r );
 	DECLARE_READ16_MEMBER ( cop_angle_r );
+
 	DECLARE_WRITE16_MEMBER ( cop_dma_trigger_w );
+	DECLARE_WRITE16_MEMBER ( raiden2_bank_w );
 	DECLARE_WRITE16_MEMBER ( cop_tile_bank_2_w );
 	DECLARE_WRITE16_MEMBER ( tilemap_enable_w );
 	DECLARE_WRITE16_MEMBER ( tile_scroll_w );

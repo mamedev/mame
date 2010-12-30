@@ -859,6 +859,8 @@ static MACHINE_RESET(raiden2)
 	sprcpt_init();
 	MACHINE_RESET_CALL(seibu_sound);
 
+	memory_set_bank(machine, "mainbank", 1);
+
 	//cop_init();
 }
 
@@ -870,6 +872,22 @@ static MACHINE_RESET(zeroteam)
 	state->mid_bank = 1;
 	sprcpt_init();
 	MACHINE_RESET_CALL(seibu_sound);
+
+	memory_set_bank(machine, "mainbank", 1);
+
+	//cop_init();
+}
+
+static MACHINE_RESET(xsedae)
+{
+	raiden2_state *state = machine->driver_data<raiden2_state>();
+	state->bg_bank = 0;
+	state->fg_bank = 2;
+	state->mid_bank = 1;
+	sprcpt_init();
+	MACHINE_RESET_CALL(seibu_sound);
+
+	//memory_set_bank(machine, "mainbank", 1);
 
 	//cop_init();
 }
@@ -897,6 +915,13 @@ WRITE16_MEMBER(raiden2_state::raiden2_sound_comms_w)
 	}
 }
 
+WRITE16_MEMBER(raiden2_state::raiden2_bank_w)
+{
+	if(ACCESSING_BITS_8_15) {
+		logerror("select bank %d %04x\n", (data >> 15) & 1, data);
+		memory_set_bank(space.machine, "mainbank", !((data >> 15) & 1));
+	}
+}
 
 /* MEMORY MAPS */
 static ADDRESS_MAP_START( raiden2_cop_mem, ADDRESS_SPACE_PROGRAM, 16, raiden2_state )
@@ -920,7 +945,7 @@ static ADDRESS_MAP_START( raiden2_cop_mem, ADDRESS_SPACE_PROGRAM, 16, raiden2_st
 	AM_RANGE(0x0047e, 0x0047f) AM_WRITE(cop_dma_mode_w)
 	AM_RANGE(0x004a0, 0x004a7) AM_READWRITE(cop_reg_high_r, cop_reg_high_w)
 	AM_RANGE(0x004c0, 0x004c7) AM_READWRITE(cop_reg_low_r, cop_reg_low_w)
-	AM_RANGE(0x00500, 0x00503) AM_WRITE(cop_cmd_w)
+	AM_RANGE(0x00500, 0x00505) AM_WRITE(cop_cmd_w)
 	AM_RANGE(0x00590, 0x00599) AM_READ(cop_itoa_digits_r)
 	AM_RANGE(0x005b0, 0x005b1) AM_READ(cop_status_r)
 	AM_RANGE(0x005b2, 0x005b3) AM_READ(cop_dist_r)
@@ -936,6 +961,7 @@ static ADDRESS_MAP_START( raiden2_cop_mem, ADDRESS_SPACE_PROGRAM, 16, raiden2_st
 	AM_RANGE(0x006b4, 0x006b7) AM_WRITE(sprcpt_data_2_w)
 	AM_RANGE(0x006b8, 0x006bb) AM_WRITE(sprcpt_val_2_w)
 	AM_RANGE(0x006bc, 0x006bf) AM_WRITE(sprcpt_adr_w)
+	AM_RANGE(0x006ca, 0x006cb) AM_WRITE(raiden2_bank_w)
 	AM_RANGE(0x006cc, 0x006cd) AM_WRITE(tile_bank_01_w)
 	AM_RANGE(0x006ce, 0x006cf) AM_WRITE(sprcpt_flags_2_w)
 	AM_RANGE(0x006fc, 0x006fd) AM_WRITE(cop_dma_trigger_w)
@@ -1405,7 +1431,7 @@ static MACHINE_CONFIG_DERIVED( xsedae, raiden2 )
 	MDRV_CPU_MODIFY("maincpu")
 	MDRV_CPU_PROGRAM_MAP(xsedae_mem)
 
-	MDRV_MACHINE_RESET(zeroteam)
+	MDRV_MACHINE_RESET(xsedae)
 
 	MDRV_SCREEN_MODIFY("screen")
 	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0, 32*8-1)
