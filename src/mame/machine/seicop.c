@@ -1364,6 +1364,7 @@ hardware, but the game never writes directly to it.
 #include "machine/seicop.h"
 
 #define seibu_cop_log logerror
+#define LOG_CMDS 1
 
 UINT16 *cop_mcu_ram;
 
@@ -2004,7 +2005,7 @@ static READ16_HANDLER( generic_cop_r )
 			return retvalue;
 
 		case 0x180/2:
-			return cop_hit_status;
+			return cop_hit_status ^= 0x8000;
 
 		/* these two controls facing direction in Godzilla opponents (only vs.) - x value compare? */
 		case 0x184/2:
@@ -2096,6 +2097,9 @@ static WRITE16_HANDLER( generic_cop_w )
 		case (0x014/2):
 			cop_sprite_dma_src = (cop_mcu_ram[0x014/2]) | (cop_mcu_ram[0x012/2] << 16);
 			break;
+
+		/* triggered before 0x6200 in Seibu Cup, looks like an angle value ... */
+		//case (0x1c/2): break;
 
 		case (0x08c/2): cop_sprite_dma_abs_y = (cop_mcu_ram[0x08c/2]); break;
 		case (0x08e/2): cop_sprite_dma_abs_x = (cop_mcu_ram[0x08e/2]); break;
@@ -2215,7 +2219,9 @@ static WRITE16_HANDLER( generic_cop_w )
 			int i;
 			int command;
 
-			//seibu_cop_log("%06x: COPX execute table macro command %04x %04x | regs %08x %08x %08x %08x %08x\n", cpu_get_pc(space->cpu), data, cop_mcu_ram[offset], cop_register[0], cop_register[1], cop_register[2], cop_register[3], cop_register[4]);
+			#if LOG_CMDS
+			seibu_cop_log("%06x: COPX execute table macro command %04x %04x | regs %08x %08x %08x %08x %08x\n", cpu_get_pc(space->cpu), data, cop_mcu_ram[offset], cop_register[0], cop_register[1], cop_register[2], cop_register[3], cop_register[4]);
+			#endif
 
 			command = -1;
 			/* search the uploaded 'trigger' table for a matching trigger*/
@@ -2224,7 +2230,9 @@ static WRITE16_HANDLER( generic_cop_w )
 			{
 				if (cop_mcu_ram[offset]==copd2_table_4[i])
 				{
-					//seibu_cop_log("    Cop Command %04x found in slot %02x with other params %04x %04x\n", cop_mcu_ram[offset], i, copd2_table_2[i], copd2_table_3[i]);
+					#if LOG_CMDS
+					seibu_cop_log("    Cop Command %04x found in slot %02x with other params %04x %04x\n", cop_mcu_ram[offset], i, copd2_table_2[i], copd2_table_3[i]);
+					#endif
 
 					u1 = copd2_table_2[i] & 0x000f;
 					u2 = copd2_table_3[i] & 0xffff;
@@ -2239,14 +2247,18 @@ static WRITE16_HANDLER( generic_cop_w )
 			}
 			else
 			{
-				//int j;
 				command*=0x8;
-				//seibu_cop_log("     Sequence: ");
-				//for (j=0;j<0x8;j++)
-				//{
-				//	seibu_cop_log("%04x ", copd2_table[command+j]);
-				//}
-				//seibu_cop_log("\n");
+				#if LOG_CMDS
+				{
+					int j;
+					seibu_cop_log("     Sequence: ");
+					for (j=0;j<0x8;j++)
+					{
+						seibu_cop_log("%04x ", copd2_table[command+j]);
+					}
+					seibu_cop_log("\n");
+				}
+				#endif
 			}
 
 			//printf("%04x %04x %04x\n",cop_mcu_ram[offset],u1,u2);
@@ -2333,7 +2345,6 @@ static WRITE16_HANDLER( generic_cop_w )
 				dx = dx >> 16;
 				dy = dy >> 16;
 				cop_dist = sqrt((double)(dx*dx+dy*dy));
-
 
 				/* is this the only difference? no, that's not it, check Legionnaire */
 				//if(0)
@@ -2494,6 +2505,13 @@ static WRITE16_HANDLER( generic_cop_w )
 				if(div == 0) { div = 1; }
 
 				space->write_word((cop_register[6] + offs + 4), ((space->read_word(cop_register[5] + offs + 4)) / div));
+				return;
+			}
+
+			//(cupsoc)   | 8 | f3e7 | 6200 | 3a0 3a6 380 aa0 2a6
+			if(COP_CMD(0x3a0,0x3a6,0x380,0xaa0,0x2a6,0x000,0x000,0x000,8,0xf3e7))
+			{
+				//space->write_byte(cop_register[0]+(0x34^3), test ^ 0x80);
 			}
 
 			//printf("%04x\n",cop_mcu_ram[offset]);
@@ -2501,8 +2519,7 @@ static WRITE16_HANDLER( generic_cop_w )
 			break;
 		}
 
-
-		/* hmm, this would be strange the 6xx range should be video regs?? */
+		/* DMA go register */
 		case (0x2fc/2):
 		{
 			//seibu_cop_log("%06x: COPX execute current layer clear??? %04x\n", cpu_get_pc(space->cpu), data);
