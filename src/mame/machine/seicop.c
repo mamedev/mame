@@ -2226,9 +2226,11 @@ static WRITE16_HANDLER( generic_cop_w )
 			command = -1;
 			/* search the uploaded 'trigger' table for a matching trigger*/
 			/* note, I don't know what the 'mask' or 'value' tables are... probably important, might determine what actually gets executed! */
+			/* note: Zero Team triggers macro 0x904 instead of 0x905, Seibu Cup Soccer triggers 0xe30e instead of 0xe38e. I highly doubt that AT LEAST
+			   it isn't supposed to do anything, especially in the former case (it definitely NEED that sprites have an ark movement when they are knocked down). */
 			for (i=0;i<32;i++)
 			{
-				if (cop_mcu_ram[offset]==copd2_table_4[i])
+				if ((cop_mcu_ram[offset] & 0xff00) == (copd2_table_4[i] & 0xff00))
 				{
 					#if LOG_CMDS
 					seibu_cop_log("    Cop Command %04x found in slot %02x with other params %04x %04x\n", cop_mcu_ram[offset], i, copd2_table_2[i], copd2_table_3[i]);
@@ -2281,6 +2283,15 @@ static WRITE16_HANDLER( generic_cop_w )
 
 				space->write_dword(cop_register[0] + 4 + offs, space->read_dword(cop_register[0] + 4 + offs) + space->read_dword(cop_register[0] + 16 + offs));
 				return;
+			}
+
+			if(COP_CMD(0x194,0x288,0x088,0x000,0x000,0x000,0x000,0x000,6,0xfbfb))
+			{
+				//static UINT8 offs;
+
+				//offs = (offset & 3) * 4;
+
+				//space->write_dword(cop_register[0] + 16 + offs, space->read_dword(cop_register[0] + 16 + offs) + 0x2000);
 			}
 
 			/* SINE math - 0x8100 */
@@ -2365,13 +2376,6 @@ static WRITE16_HANDLER( generic_cop_w )
 				space->write_word(cop_register[0]+(0x38^2), (space->read_word(cop_register[0]+(0x38^2)) << (5-cop_scale)) / div);
 				return;
 			}
-
-			#if 0
-			if(COP_CMD(0x194,0x288,0x088,0x000,0x000,0x000,0x000,0x000,6,0xfbfb))
-			{
-
-			}
-			#endif
 
 			/*
 				collision detection:
