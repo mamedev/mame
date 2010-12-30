@@ -333,12 +333,12 @@ DIRECT_UPDATE_HANDLER( plygonet_dsp56k_direct_handler )
 	/* If the requested region wasn't in there, see if it needs to be caught driver-side */
 	if (address >= (0x7000<<1) && address <= (0x7fff<<1))
 	{
-		direct.explicit_configure(0x7000<<1, 0x7fff<<1, 0xfff<<1, state->dsp56k_p_mirror);
+		direct.explicit_configure(0x7000<<1, 0x7fff<<1, (0xfff<<1) | 1, state->dsp56k_p_mirror);
 		return ~0;
 	}
 	else if (address >= (0x8000<<1) && address <= (0x87ff<<1))
 	{
-		direct.explicit_configure(0x8000<<1, 0x87ff<<1, 0x7ff<<1, state->dsp56k_p_8000);
+		direct.explicit_configure(0x8000<<1, 0x87ff<<1, (0x7ff<<1) | 1, state->dsp56k_p_8000);
 		return ~0;
 	}
 
@@ -550,7 +550,7 @@ static ADDRESS_MAP_START( dsp_program_map, ADDRESS_SPACE_PROGRAM, 16 )
 ADDRESS_MAP_END
 
 static ADDRESS_MAP_START( dsp_data_map, ADDRESS_SPACE_DATA, 16 )
-	AM_RANGE(0x0800, 0x5fff) AM_RAM			/* Appears to not be affected by banking? */
+	AM_RANGE(0x0800, 0x5fff) AM_RAM      /* Appears to not be affected by banking? */
 	AM_RANGE(0x6000, 0x6fff) AM_READWRITE(dsp56k_ram_bank00_read, dsp56k_ram_bank00_write)
 	AM_RANGE(0x7000, 0x7fff) AM_READWRITE(dsp56k_ram_bank01_read, dsp56k_ram_bank01_write)	/* Mirrored in program space @ 0x7000 */
 	AM_RANGE(0x8000, 0xbfff) AM_READWRITE(dsp56k_ram_bank02_read, dsp56k_ram_bank02_write)
@@ -766,6 +766,8 @@ static DRIVER_INIT(polygonet)
 	state->dsp56k_update_handler = space->set_direct_update_handler(direct_update_delegate_create_static(plygonet_dsp56k_direct_handler, *machine));
 
     /* save states */
+	state_save_register_global_pointer(machine, state->dsp56k_p_mirror,      2 * 0x1000);
+	state_save_register_global_pointer(machine, state->dsp56k_p_8000,        2 * 0x800);
 	state_save_register_global_pointer(machine, state->dsp56k_bank00_ram,    2 * 8 * dsp56k_bank00_size);
 	state_save_register_global_pointer(machine, state->dsp56k_bank01_ram,    2 * 8 * dsp56k_bank01_size);
 	state_save_register_global_pointer(machine, state->dsp56k_bank02_ram,    2 * 8 * dsp56k_bank02_size);
