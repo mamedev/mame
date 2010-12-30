@@ -57,6 +57,14 @@ static TILE_GET_INFO( get_legion_tx_tile_info )
 		attributes = state->text_videoram[tile_index + 0x800] & 0xff;
 	else
 		attributes = state->text_videoram[tile_index + 0x400] & 0xff;
+		
+		
+	tileinfo->category = 0;
+
+	if((attributes & 0x3) == 3)
+	{
+		tileinfo->category = 1;	
+	}
 
 	SET_TILE_INFO(
 			0,
@@ -120,11 +128,8 @@ VIDEO_START( armedf )
 		break;
 
 	case 3: /* legion */
-		state->tx_tilemap = tilemap_create(machine, get_legion_tx_tile_info, armedf_scan_type3, 8, 8, 64, 32);
-		break;
-		
 	case 6: /* legiono */
-		state->tx_tilemap = tilemap_create(machine, get_tx_tile_info, armedf_scan_type3, 8, 8, 64, 32);
+		state->tx_tilemap = tilemap_create(machine, get_legion_tx_tile_info, armedf_scan_type3, 8, 8, 64, 32);
 		break;
 
 	default:
@@ -295,8 +300,8 @@ static void copy_textmap(running_machine *machine, int index)
 		2nd half of the MCu external ROM contains text tilemaps:
 
 		 4 - title screen
-		 5 - ??? - should be (when comapred with legiono set) displayed(? inivisble? different prority?) during game 
-		 6 - test mode screen
+		 5 - bottom layer gfx, visible  in later levels, during boss fight
+		 6 - test mode screen (not hooked up)
 		 7 - portraits (title)
 
 	*/
@@ -307,24 +312,16 @@ static void copy_textmap(running_machine *machine, int index)
 	for(int i=0;i<0x400;++i)
 	{
 		if(i<0x10) continue;
-	
-		if(index>0)
-		{
-			int tile=data[0x800*index+i];
-			int bank=data[0x800*index+i+0x400]&3;
+
+		int tile=data[0x800*index+i];
+		int bank=data[0x800*index+i+0x400]&3;
 			
-			if( (tile|(bank<<8))!=0x20)
-			{
-				state->text_videoram[i]=tile;
-				state->text_videoram[i+0x400]=data[0x800*index+i+0x400];
-			}
-		}
-		else
+		if( (tile|(bank<<8))!=0x20)
 		{
-			//clear - not used
-			state->text_videoram[i]=0x20;
-			state->text_videoram[i+0x400]=0;
+			state->text_videoram[i]=tile;
+			state->text_videoram[i+0x400]=data[0x800*index+i+0x400];
 		}
+	
 	}
 	
 	tilemap_mark_all_tiles_dirty(state->tx_tilemap);
@@ -401,6 +398,12 @@ VIDEO_UPDATE( armedf )
 
 
 	bitmap_fill(bitmap, cliprect , 0xff);
+	
+	if(state->scroll_type == 3 || state->scroll_type == 6) /* legion / legiono */
+	{
+		tilemap_draw(bitmap, cliprect, state->tx_tilemap, 1, 0);
+	}
+
 	if (state->vreg & 0x0800)
 		tilemap_draw(bitmap, cliprect, state->bg_tilemap, 0, 0);
 	/*
@@ -412,6 +415,8 @@ VIDEO_UPDATE( armedf )
     {
         bitmap_fill(bitmap, cliprect , get_black_pen(screen->machine) & 0x0f);
     }*/
+
+
 
 	if ((state->mcu_mode & 0x0030) == 0x0030)
 		tilemap_draw(bitmap, cliprect, state->tx_tilemap, 0, 0);
@@ -436,41 +441,30 @@ VIDEO_UPDATE( armedf )
 	if (sprite_enable)
 		draw_sprites(screen->machine, bitmap, cliprect, 0);
 		
-		
 	if(state->scroll_type == 3) /* legion */
 	{
-		/*  Hack to clear the garbage draw in place of "GAME OVER" after
-			continue. Game code copies there '@ABCDEFG' (from location $13fad),
-			to fix tilemap (index 5) currently not displayed in game 
-			(visible in legiono (unprotected) set - it covers the playfield,
-			but should be not visible? or draw under the tilemaps)
-		*/	
-			
-		if(	(state->text_videoram[0]&0xff) == 0x0e && 
-			(state->text_videoram[0x40e/2]&0xff)==' ' && 
-			(state->text_videoram[0x410/2]&0xff)=='@' && 
-			(state->text_videoram[0x412/2]&0xff)=='A')
+		static int oldmode=-1;	
+	
+		int mode=state->text_videoram[1]&0xff;
+		
+		if (mode != oldmode)
 		{
-			for(int i=0;i<16;++i)
+			oldmode=mode;
+			switch(mode)
 			{
-				state->text_videoram[0x410/2+i]=0x20;
-				state->text_videoram[0x410/2+i+0x400]=0;
+				case 0x01: copy_textmap(screen->machine, 4); break; /* title screen */
+				case 0x06: copy_textmap(screen->machine, 7); break; /* portraits on title screen */
+				case 0x1c: copy_textmap(screen->machine, 5); break; /* bottom, in-game layer */
+				default: logerror("unknown mode %d\n", mode); break;
 			}
-			tilemap_mark_all_tiles_dirty(state->tx_tilemap);
 		}
-		
-		switch(state->text_videoram[1]&0xff)
-		{
-			case 1: copy_textmap(screen->machine, 4); break; /* title screen */
-			case 6: copy_textmap(screen->machine, 7); break; /* portraits on title screen */
-			/* display tilemap 5 during game .. but it makes the game unplayable */
-		}
-		
+			
 	}
 	
 
 	return 0;
 }
+
 
 VIDEO_EOF( armedf )
 {
