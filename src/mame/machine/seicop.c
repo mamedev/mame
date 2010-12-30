@@ -2005,7 +2005,7 @@ static READ16_HANDLER( generic_cop_r )
 			return retvalue;
 
 		case 0x180/2:
-			return cop_hit_status ^= 0x8000;
+			return cop_hit_status;
 
 		/* these two controls facing direction in Godzilla opponents (only vs.) - x value compare? */
 		case 0x184/2:
