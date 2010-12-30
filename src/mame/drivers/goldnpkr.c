@@ -11,7 +11,6 @@
     * Golden Poker Double Up (Big Boy).         1981, Bonanza Enterprises, Ltd.
     * Golden Poker Double Up (Mini Boy).        1981, Bonanza Enterprises, Ltd.
     * PlayMan Poker (german).                   1981, PlayMan.
-    * Super Double (french).                    198?, Karateco.
     * Jack Potten's Poker (set 1).              198?, Bootleg.
     * Jack Potten's Poker (set 2).              198?, Bootleg in Coinmaster H/W.
     * Jack Potten's Poker (set 3).              198?, Bootleg.
@@ -28,6 +27,9 @@
     * Witch Card (German, set 1).               1994, Proma.
     * Witch Card (German, set 2).               1994, Unknown.
     * Witch Card (English, witch game, lamps).  1985, PlayMan.
+    * Witch Card (Falcon, enhanced sound).      199?, Falcon.
+    * Witch Card (German, set 3, alt gfx).      1994, TV Game Elektronik.
+    * Witch Game (Video Klein).                 1991, Video Klein.
     * Super Loco 93 (Spanish, set 1).           1993, Unknown.
     * Super Loco 93 (Spanish, set 2).           1993, Unknown.
     * Maverik.                                  198?, Unknown.
@@ -56,6 +58,13 @@
     * Buena Suerte (Spanish, set 21).           1991, Unknown.
     * Buena Suerte (Spanish, set 22).           1991, Unknown.
     * Genie.                                    198?, Video Fun Games Ltd.
+    * Falcons Wild - World Wide Poker.          1983, Falcon.
+    * Falcons Wild - World Wide Poker.          1990, Video Klein.
+    * Falcons Wild - Wild Card 1991.            1991, TVG.
+    * Super Double (french).                    198?, Karateco.
+    * Silver Game.                              1983, Unknown.
+    * "Unknown french poker game".              198?, Unknown.
+    * "Unknown encrypted poker game".           198?, Unknown.
 
 
 *******************************************************************************
@@ -3892,6 +3901,106 @@ ROM_START( superdbl )
 	ROM_LOAD( "tbp24sa10n.7d",		0x0000, 0x0100, BAD_DUMP CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) ) /* PROM dump needed */
 ROM_END
 
+/****************************************************
+
+  Silver Game.
+  1983.
+
+  6502 CPU
+  2*6821 ios
+  mc6845 video chip
+  10mhz (?) xtal
+
+  There are french strings related to the game, so maybe is
+  a leftover, or maybe there is a unknown way to switch the
+  language.
+  
+
+*****************************************************/
+
+ROM_START( silverga )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "14",	0x5000, 0x1000, CRC(e4691878) SHA1(376c3910030f27517d798aac759553d5634b8ffc) )
+	ROM_LOAD( "55",	0x6000, 0x2000, CRC(aad57b3c) SHA1(9508026c1a7b227a70d89ad2f7245e75a615b932) )
+
+	ROM_REGION( 0x3000, "gfx1", 0 )
+	ROM_FILL(			0x0000, 0x2000, 0 ) /* filling the R-G bitplanes */
+	ROM_LOAD( "13",	  	0x2000, 0x1000, CRC(98b8cb4f) SHA1(420ea544a41e24478a8eb1c7076f4569607d0379) )    /* text layer */
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "11",		0x0000, 0x0800, CRC(1f41c541) SHA1(00df5079193f78db0617a6b8a613d8a0616fc8e9) )    /* cards deck gfx, bitplane1 */
+	ROM_LOAD( "12",		0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )    /* cards deck gfx, bitplane2 */
+	ROM_COPY( "gfx1",	0x2800, 0x1000, 0x0800 )    /* cards deck gfx, bitplane3. found in the 2nd half of the char rom */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "s287",		0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+ROM_END
+
+/****************************************************
+
+  Unknown poker game, set 1.
+  198?.
+
+  There are french strings related to the game into
+  the program ROM.
+  
+  The dump lacks of 1 program ROM located at 17a.
+  (empty socket in the PCB picture)
+
+*****************************************************/
+
+ROM_START( pokerdub )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "15a_f_83.15a",	0x2000, 0x1000, CRC(06571884) SHA1(6823f5d4a2fc5adf51f1588273f808a2a25a15bc) )
+	ROM_LOAD( "unknown.17a",	0x3000, 0x1000, NO_DUMP )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_FILL(			0x0000, 0x1000, 0 ) /* filling the R-G bitplanes */
+	ROM_LOAD( "4.8a",	0x1000, 0x0800, CRC(1e1d4e33) SHA1(22831984489fdf712ca616c1af3c874a5b12b522) )    /* char gen (cracked title) */
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "1.4a",	0x0000, 0x0800, CRC(f2f94661) SHA1(f37f7c0dff680fd02897dae64e13e297d0fdb3e7) )    /* cards deck gfx, bitplane1 */
+	ROM_LOAD( "2.6a",	0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )    /* cards deck gfx, bitplane2 */
+	ROM_LOAD( "3.7a",	0x1000, 0x0800, CRC(6e3e9b1d) SHA1(14eb8d14ce16719a6ad7d13db01e47c8f05955f0) )    /* cards deck gfx, bitplane3 */
+	
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "s287.8c",	0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+ROM_END
+
+/****************************************************
+
+  Unknown poker game, set 2.
+  198?.
+
+  This one is totally encrypted.
+  The PCB has a daughterboard coated with some plastic
+  or epoxy resin.
+  
+  Char ROM is identical to the Witch Card one. 
+  
+*****************************************************/
+
+ROM_START( pokerduc )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "b",	0x5000, 0x1000, CRC(8627fba5) SHA1(b94665f0bf425ff71f78c1258f910323c2a948f0) )
+	ROM_LOAD( "c",	0x6000, 0x1000, CRC(b35b4108) SHA1(6504ba55511637334c65e88ee5c60b1503b854b3) )
+	ROM_LOAD( "d",	0x7000, 0x1000, CRC(c48096ed) SHA1(279ba433369c7dc9cd902a19200e889eea45d115) )
+
+	ROM_REGION( 0x1800, "gfx1", 0 )
+	ROM_FILL(			0x0000, 0x1000, 0 ) /* filling the R-G bitplanes */
+	ROM_LOAD( "a.8a",	0x1000, 0x0800, CRC(c70a3e49) SHA1(eb2f15b344f4dec5f05701415848c854bb27aaa3) )    /* char gen (cracked title) */
+
+	ROM_REGION( 0x1800, "gfx2", 0 )
+	ROM_LOAD( "1.4a",	0x0000, 0x0800, CRC(f2f94661) SHA1(f37f7c0dff680fd02897dae64e13e297d0fdb3e7) )    /* cards deck gfx, bitplane1 */
+	ROM_LOAD( "2.6a",	0x0800, 0x0800, CRC(6bbb1e2d) SHA1(51ee282219bf84218886ad11a24bc6a8e7337527) )    /* cards deck gfx, bitplane2 */
+	ROM_LOAD( "3.7a",	0x1000, 0x0800, CRC(232374f3) SHA1(b75907edbf769b8c46fb1ebdb301c325c556e6c2) )    /* cards deck gfx, bitplane3 */
+	ROM_IGNORE(                 0x0800)	/* identical halves */
+
+	ROM_REGION( 0x0100, "proms", 0 )
+	ROM_LOAD( "tbp24s10.9c",	0x0000, 0x0100, CRC(7f31066b) SHA1(15420780ec6b2870fc4539ec3afe4f0c58eedf12) )
+ROM_END
+
+
 
 /*********************************************
 *                Driver Init                 *
@@ -3981,6 +4090,87 @@ static DRIVER_INIT( flcnw )
 }
 
 
+/***********************************************
+
+  IPC1 Daughterboard encryption
+  
+  The PCB has a daughterboard coated with some plastic
+  or epoxy resin.
+  
+  pattern:
+
+  0000:  FF FF FF FF FF FF FF FF | FB FB FB FB FB FB FB FB
+  0010:  FD FD FD FD FD FD FD FD | F9 F9 F9 F9 F9 F9 F9 F9
+  0020:  FF FF FF FF FF FF FF FF | FB FB FB FB FB FB FB FB
+  0030:  FD FD FD FD FD FD FD FD | F9 F9 F9 F9 F9 F9 F9 F9
+
+  0040:  FE FE FE FE FE FE FE FE | FA FA FA FA FA FA FA FA
+  0050:  FC FC FC FC FC FC FC FC | F8 F8 F8 F8 F8 F8 F8 F8
+  0060:  FE FE FE FE FE FE FE FE | FA FA FA FA FA FA FA FA
+  0070:  FC FC FC FC FC FC FC FC | F8 F8 F8 F8 F8 F8 F8 F8
+
+  0080:  BF BF BF BF BF BF BF BF | BB BB BB BB BB BB BB BB
+  0090:  BD BD BD BD BD BD BD BD | B9 B9 B9 B9 B9 B9 B9 B9
+  00A0:  BF BF BF BF BF BF BF BF | BB BB BB BB BB BB BB BB
+  00B0:  BD BD BD BD BD BD BD BD | B9 B9 B9 B9 B9 B9 B9 B9
+
+  00C0:  BE BE BE BE BE BE BE BE | BA BA BA BA BA BA BA BA
+  00D0:  BC BC BC BC BC BC BC BC | B8 B8 B8 B8 B8 B8 B8 B8
+  00E0:  BE BE BE BE BE BE BE BE | BA BA BA BA BA BA BA BA
+  00F0:  BC BC BC BC BC BC BC BC | B8 B8 B8 B8 B8 B8 B8 B8
+
+  And repeat for every 0x100 segments...
+
+  So...
+
+  0000-0007 ok.
+  0008-000f XOR 0x04
+  0010-0017 XOR 0x02
+  0018-001f XOR 0x06
+
+  0020-0027 ok.
+  0028-002f XOR 0x04
+  0030-0037 XOR 0x02
+  0038-003f XOR 0x06
+
+  0040-0047 XOR 0x01
+  0048-004f XOR 0x05
+  0050-0057 XOR 0x03
+  0058-005f XOR 0x07
+
+  0060-0067 XOR 0x01
+  0068-006f XOR 0x05
+  0070-0077 XOR 0x03
+  0078-007f XOR 0x07
+
+  0080-0087 XOR 0x40
+  0088-008f XOR 0x44
+  0090-0097 XOR 0x42
+  0098-009f XOR 0x46
+
+  00a0-00a7 XOR 0x40
+  00a8-00af XOR 0x44
+  00b0-00b7 XOR 0x42
+  00b8-00bf XOR 0x46
+
+  00c0-00c7 XOR 0x41
+  00c8-00cf XOR 0x45
+  00d0-00d7 XOR 0x43
+  00d8-00df XOR 0x47
+
+  00e0-00e7 XOR 0x41
+  00e8-00ef XOR 0x45
+  00f0-00f7 XOR 0x43
+  00f8-00ff XOR 0x47
+
+***********************************************/
+
+static DRIVER_INIT( ipc1db )
+{
+	/* nothing yet... */
+}
+
+
 /*********************************************
 *                Game Drivers                *
 *********************************************/
@@ -4048,3 +4238,8 @@ GAMEL( 1989, brasil89, 0,        witchcrd, bsuerte,  0,        ROT0,   "<unknown
 GAME(  1991, poker91,  0,        witchcrd, poker91,  0,        ROT0,   "<unknown>",                "Poker 91",                                0 )
 GAME(  198?, genie,    0,        genie,    genie,    0,        ROT0,   "Video Fun Games Ltd.",     "Genie",                                   0 )
 GAMEL( 198?, superdbl, goldnpkr, goldnpkr, goldnpkr, 0,        ROT0,   "Karateco",                 "Super Double (French)",                   0,                layout_goldnpkr )
+
+GAMEL( 1983, silverga, goldnpkr, goldnpkr, goldnpkr, 0,        ROT0,   "<unknown>",                "Silver Game",                             0,                layout_goldnpkr )
+GAME(  198?, pokerdub, goldnpkr, goldnpkr, goldnpkr, 0,        ROT0,   "<unknown>",                "Unknown french poker game",               GAME_NOT_WORKING )	// lacks of 2nd program ROM.
+GAME(  198?, pokerduc, goldnpkr, goldnpkr, goldnpkr, ipc1db,   ROT0,   "<unknown>",                "Unknown encrypted poker game",            GAME_NOT_WORKING )	// encrypted.
+

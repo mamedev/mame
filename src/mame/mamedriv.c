@@ -9589,6 +9589,9 @@ Other Sun games
 	DRIVER( poker91 )	/* 1991, Unknown */
 	DRIVER( genie )		/* (c) 198? Video Fun Games Ltd. */
 	DRIVER( superdbl )	/* 198? Karateco */
+	DRIVER( silverga )	/* 1983, Unknown */
+	DRIVER( pokerdub )	/* 198?, Unknown */
+	DRIVER( pokerduc )	/* 198?, Unknown */
 
 	/* Cal Omega */
 	DRIVER( comg074 )	/* (c) 1981 Cal Omega Inc. */
