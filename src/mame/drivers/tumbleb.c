@@ -312,6 +312,7 @@ Stephh's notes (based on the games M68000 code and some tests) :
 #include "cpu/z80/z80.h"
 #include "cpu/m68000/m68000.h"
 #include "cpu/h6280/h6280.h"
+#include "cpu/mcs51/mcs51.h" // for semicom mcu
 #include "includes/decocrpt.h"
 #include "sound/2151intf.h"
 #include "sound/3812intf.h"
@@ -878,6 +879,62 @@ static ADDRESS_MAP_START( jumpkids_sound_map, ADDRESS_SPACE_PROGRAM, 8 )
 	AM_RANGE(0x9000, 0x9000) AM_WRITE(jumpkids_oki_bank_w)
 	AM_RANGE(0x9800, 0x9800) AM_DEVREADWRITE_MODERN("oki", okim6295_device, read, write)
 	AM_RANGE(0xa000, 0xa000) AM_READ(soundlatch_r)
+ADDRESS_MAP_END
+
+
+static READ8_HANDLER( prot_io_r )
+{
+	// never read?
+	return 0x00;
+}
+
+static UINT8 semicom_prot_offset = 0x00;
+
+// probably not endian safe
+static WRITE8_HANDLER( prot_io_w )
+{
+	tumbleb_state *state = space->machine->driver_data<tumbleb_state>();
+
+	switch (offset)
+	{
+		case 0x00:
+		{
+			UINT16 word = state->mainram[(0x0000/2) + semicom_prot_offset];
+			word = (word & 0xff00) | (data << 0);
+			state->mainram[(0x0000/2) + semicom_prot_offset] = word;
+			break;
+		}
+
+		case 0x01:
+		{
+			UINT16 word = state->mainram[(0x0000/2) + semicom_prot_offset];
+			word = (word & 0x00ff) | (data << 8);
+			state->mainram[(0x0000/2) + semicom_prot_offset] = word;
+			break;
+		}
+
+		case 0x02: // offset
+		{
+			semicom_prot_offset = data;
+			break;
+		}
+
+		case 0x03: // ??
+		{
+			//logerror("offset %02x data %02x\n",offset,data);
+			break;
+		}
+	}
+}
+
+
+/* Semicom AT89C52 MCU */
+static ADDRESS_MAP_START( protection_map, ADDRESS_SPACE_PROGRAM, 8 )
+	AM_RANGE(0x0000, 0x1fff) AM_ROM
+ADDRESS_MAP_END
+
+static ADDRESS_MAP_START( protection_iomap, ADDRESS_SPACE_IO, 8 )
+	AM_RANGE(MCS51_PORT_P0, MCS51_PORT_P3) AM_READWRITE(prot_io_r,prot_io_w)
 ADDRESS_MAP_END
 
 /******************************************************************************/
@@ -2220,6 +2277,17 @@ static MACHINE_CONFIG_DERIVED( cookbib, htchctch )
 	MDRV_VIDEO_UPDATE( semicom_altoffsets )
 MACHINE_CONFIG_END
 
+static MACHINE_CONFIG_DERIVED( cookbib_mcu, htchctch )
+
+	/* basic machine hardware */
+	MDRV_CPU_ADD("protection", I8052, 16000000)  // AT89C52
+	MDRV_CPU_PROGRAM_MAP(protection_map)
+	MDRV_CPU_IO_MAP(protection_iomap)
+
+	/* video hardware */
+	MDRV_VIDEO_UPDATE( semicom_altoffsets )
+MACHINE_CONFIG_END
+
 static MACHINE_CONFIG_DERIVED( bcstory, htchctch )
 	MDRV_VIDEO_UPDATE(bcstory)
 
@@ -2652,7 +2720,7 @@ ROM_START( metlsavr )
 	ROM_LOAD( "first-2.ua7", 0x00000, 0x10000, CRC(49505edf) SHA1(ea3007f1adbe8e2597ee6201bbd5d07fa9f7c733) )
 
 	ROM_REGION( 0x10000, "cpu2", 0 ) /* Intel 87C52 MCU Code */
-	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x2000, NO_DUMP ) /* can't be dumped */
 
 	ROM_REGION16_BE( 0x200, "user1", 0 ) /* Data from Shared RAM */
 	/* this is not a real rom but instead the data extracted from shared ram, the MCU puts it there */
@@ -2688,7 +2756,7 @@ ROM_START( bcstry )
 	ROM_CONTINUE( 0x8000, 0x4000 )
 
 	ROM_REGION( 0x10000, "cpu2", 0 ) /* Intel 87C52 MCU Code */
-	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x2000, NO_DUMP ) /* can't be dumped */
 
 	ROM_REGION16_BE( 0x200, "user1", 0 ) /* Data from Shared RAM */
 	/* this is not a real rom but instead the data extracted from shared ram, the MCU puts it there */
@@ -2741,7 +2809,7 @@ ROM_START( bcstrya )
 	ROM_CONTINUE( 0x8000, 0x4000 )
 
 	ROM_REGION( 0x10000, "cpu2", 0 ) /* Intel 87C52 MCU Code */
-	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x2000, NO_DUMP ) /* can't be dumped */
 
 	ROM_REGION16_BE( 0x200, "user1", 0 ) /* Data from Shared RAM */
 	/* this is not a real rom but instead the data extracted from shared ram, the MCU puts it there */
@@ -2836,7 +2904,7 @@ ROM_START( htchctch )
 	ROM_LOAD( "p02.b5", 0x00000, 0x10000 , CRC(c5a03186) SHA1(42561ab36e6d7a43828d3094e64bd1229ab893ba) )
 
 	ROM_REGION( 0x10000, "cpu2", 0 ) /* Intel 87C52 MCU Code */
-	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x2000, NO_DUMP ) /* can't be dumped */
 
 	ROM_REGION16_BE( 0x200, "user1", 0 ) /* Data from Shared RAM */
 	/* this is not a real rom but instead the data extracted from shared ram, the MCU puts it there */
@@ -2867,7 +2935,7 @@ ROM_START( cookbib )
 	ROM_LOAD( "prg-s.ub5", 0x00000, 0x10000 , CRC(547d6ea3) SHA1(42929e453c4f1c90c29197a9bed953139cfe2873) )
 
 	ROM_REGION( 0x10000, "cpu2", 0 ) /* Intel 87C52 MCU Code */
-	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x2000, NO_DUMP ) /* can't be dumped */
 
 	ROM_REGION16_BE( 0x200, "user1", 0 ) /* Data from Shared RAM */
 	/* this is not a real rom but instead the data extracted from shared ram, the MCU puts it there */
@@ -2898,7 +2966,7 @@ ROM_START( chokchok )
 	ROM_LOAD( "ub5.bin", 0x00000, 0x10000 , CRC(30c2171d) SHA1(3954e286d57b955af6ba9b1a0b49c442d7f295ae) )
 
 	ROM_REGION( 0x10000, "cpu2", 0 ) /* Intel 87C52 MCU Code */
-	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x2000, NO_DUMP ) /* can't be dumped */
 
 	ROM_REGION16_BE( 0x200, "user1", 0 ) /* Data from Shared RAM */
 	/* this is not a real rom but instead the data extracted from shared ram, the MCU puts it there */
@@ -2935,7 +3003,7 @@ ROM_START( dquizgo )
 	ROM_LOAD( "ub5",    0x00000, 0x10000, CRC(e40481da) SHA1(1c1fabcb67693235eaa6ff59ae12a35854b5564a) )
 
 	ROM_REGION( 0x10000, "cpu2", 0 ) /* Intel 87C52 MCU Code */
-	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x2000, NO_DUMP ) /* can't be dumped */
 
 	ROM_REGION16_BE( 0x400, "user1", ROMREGION_ERASE00 ) /* Data from Shared RAM */
 	/* this is not a real rom but instead the data extracted from shared ram, the MCU puts it there */
@@ -3012,7 +3080,7 @@ ROM_START( sdfight )
 	ROM_LOAD( "ua7", 0x00000, 0x10000 , CRC(c3d36da4) SHA1(7290a977bfa9a3d5e0c98a0f589d877e38aa10a1) )
 
 	ROM_REGION( 0x10000, "cpu2", 0 ) /* Intel 87C52 MCU Code */
-	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x2000, NO_DUMP ) /* can't be dumped */
 
 	ROM_REGION16_BE( 0x200, "user1", ROMREGION_ERASE00 ) /* Data from Shared RAM */
 	/* this is not a real rom but instead the data extracted from shared ram, the MCU puts it there */
@@ -3104,12 +3172,8 @@ ROM_START( wlstar )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "ua7", 0x00000, 0x10000, CRC(90cafa5f) SHA1(2d2ba8e395544e49899cac662d87585592b12040) )
 
-	ROM_REGION( 0x10000, "cpu2", 0 ) /* Intel 87C52 MCU Code */
-	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
-
-	ROM_REGION16_BE( 0x400, "user1", ROMREGION_ERASE00 ) /* Data from Shared RAM */
-	/* this is not a real rom but instead the data extracted from shared ram, the MCU puts it there */
-	ROM_LOAD16_WORD( "protdata.bin", 0x00000, 0x200 , CRC(b7ffde5b) SHA1(6c370199e5df9c2e03293d0259612c5c4a9061cf) )
+	ROM_REGION( 0x10000, "protection", 0 ) /* Intel 87C52 MCU Code */
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x2000, CRC(ab5e2a7e) SHA1(9d3dbbbf0fac12ed82184222a077d81243abb39d) ) /* decapped */
 
 	ROM_REGION( 0x040000, "oki", 0 ) /* Samples */
 	ROM_LOAD( "ua1", 0x00000, 0x40000,  CRC(de217d30) SHA1(5d7a6f82b106dd1185c7dcde193177cc46c4782f) )
@@ -3141,8 +3205,12 @@ ROM_START( wondl96 )
 	ROM_REGION( 0x10000, "audiocpu", 0 ) /* Z80 Code */
 	ROM_LOAD( "ub5.bin", 0x00000, 0x10000, CRC(d99d19c4) SHA1(a7fae11275bb156cdbf2805fcc3aec44892d0817) )
 
-	ROM_REGION( 0x10000, "cpu2", 0 ) /* Intel 87C52 MCU Code */
-	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
+	ROM_REGION( 0x10000, "protection", 0 ) /* Intel 87C52 MCU Code */
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x2000, CRC(6f4c659a) SHA1(7a1453531d9ceb37af21b96becfa9b06bff0a528) ) /* decapped */
+
+/*
+ For some reason the MCU doesn't drop right in. We still need the data below to get it to work. Why?
+*/
 
 	ROM_REGION16_BE( 0x400, "user1", ROMREGION_ERASE00 ) /* Data from Shared RAM */
 	/* this is not a real rom but instead the data extracted from shared ram, the MCU puts it there */
@@ -3235,7 +3303,7 @@ ROM_START( semibase )
 	ROM_CONTINUE( 0x8000, 0x4000 )
 
 	ROM_REGION( 0x10000, "cpu2", 0 ) /* Intel 87C52 MCU Code */
-	ROM_LOAD( "87c52.mcu", 0x00000, 0x10000 , NO_DUMP ) /* can't be dumped */
+	ROM_LOAD( "87c52.mcu", 0x00000, 0x2000, NO_DUMP ) /* can't be dumped */
 
 	ROM_REGION16_BE( 0x200, "user1", 0 ) /* Data from Shared RAM */
 	/* this is not a real rom but instead the data extracted from shared ram, the MCU puts it there */
@@ -3681,6 +3749,18 @@ static DRIVER_INIT( chokchok )
 
 static DRIVER_INIT( wlstar )
 {
+	tumblepb_gfx1_rearrange(machine);
+
+	/* slightly different banking */
+	memory_install_write16_handler(cputag_get_address_space(machine, "maincpu", ADDRESS_SPACE_PROGRAM), 0x100002, 0x100003, 0, 0, wlstar_tilebank_w);
+}
+
+/******************
+Wonder League '96 still needs the protdata.bin and copy routine to work??
+******************/
+
+static DRIVER_INIT( wondl96 )
+{
 	DRIVER_INIT_CALL(htchctch);
 
 	/* slightly different banking */
@@ -3695,22 +3775,22 @@ static DRIVER_INIT ( dquizgo )
 
 /******************************************************************************/
 
-GAME( 1991, tumbleb,  tumblep, tumblepb,  tumblepb, tumblepb, ROT0, "bootleg", "Tumble Pop (bootleg set 1)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE  )
-GAME( 1991, tumbleb2, tumblep, tumbleb2,  tumblepb, tumbleb2, ROT0, "bootleg", "Tumble Pop (bootleg set 2)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE  ) // PIC is protected, sound simulation not 100%
-GAME( 1993, jumpkids, 0,       jumpkids,  tumblepb, jumpkids, ROT0, "Comad", "Jump Kids", GAME_SUPPORTS_SAVE )
-GAME( 1994, metlsavr, 0,       metlsavr,  metlsavr, chokchok, ROT0, "First Amusement", "Metal Saver", GAME_SUPPORTS_SAVE )
-GAME( 1994, pangpang, 0,       pangpang,  tumblepb, tumbleb2, ROT0, "Dong Gue La Mi Ltd.", "Pang Pang", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE  ) // PIC is protected, sound simulation not 100%
-GAME( 1994, suprtrio, 0,       suprtrio,  suprtrio, suprtrio, ROT0, "Gameace", "Super Trio", GAME_SUPPORTS_SAVE )
+GAME( 1991, tumbleb,  tumblep, tumblepb,    tumblepb, tumblepb, ROT0, "bootleg", "Tumble Pop (bootleg set 1)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE  )
+GAME( 1991, tumbleb2, tumblep, tumbleb2,    tumblepb, tumbleb2, ROT0, "bootleg", "Tumble Pop (bootleg set 2)", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE  ) // PIC is protected, sound simulation not 100%
+GAME( 1993, jumpkids, 0,       jumpkids,    tumblepb, jumpkids, ROT0, "Comad",    "Jump Kids", GAME_SUPPORTS_SAVE )
+GAME( 1994, metlsavr, 0,       metlsavr,    metlsavr, chokchok, ROT0, "First Amusement", "Metal Saver", GAME_SUPPORTS_SAVE )
+GAME( 1994, pangpang, 0,       pangpang,    tumblepb, tumbleb2, ROT0, "Dong Gue La Mi Ltd.", "Pang Pang", GAME_IMPERFECT_SOUND | GAME_SUPPORTS_SAVE  ) // PIC is protected, sound simulation not 100%
+GAME( 1994, suprtrio, 0,       suprtrio,    suprtrio, suprtrio, ROT0, "Gameace", "Super Trio", GAME_SUPPORTS_SAVE )
 // Should also be 'Magicball Fighting' (c)1994
-GAME( 1995, htchctch, 0,       htchctch,  htchctch, htchctch, ROT0, "SemiCom", "Hatch Catch" , GAME_SUPPORTS_SAVE ) // not 100% sure about gfx offsets
-GAME( 1995, cookbib,  0,       cookbib,   cookbib,  htchctch, ROT0, "SemiCom", "Cookie & Bibi" , GAME_SUPPORTS_SAVE ) // not 100% sure about gfx offsets
-GAME( 1995, chokchok, 0,       cookbib,   chokchok, chokchok, ROT0, "SemiCom", "Choky! Choky!", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE  ) // corruption during attract mode (tmap disable?)
-GAME( 1995, wlstar,   0,       cookbib,   wlstar,   wlstar,   ROT0, "Mijin", "Wonder League Star - Sok-Magicball Fighting (Korea)", GAME_SUPPORTS_SAVE ) // translates to 'Wonder League Star - Return of Magicball Fighting'
-GAME( 1996, wondl96,  0,       cookbib,   wondl96,  wlstar,   ROT0, "SemiCom", "Wonder League '96 (Korea)", GAME_SUPPORTS_SAVE )
-GAME( 1996, fncywld,  0,       fncywld,   fncywld,  fncywld,  ROT0, "Unico", "Fancy World - Earth of Crisis" , GAME_SUPPORTS_SAVE ) // game says 1996, testmode 1995?
-GAME( 1996, sdfight,  0,       sdfight,   sdfight,  bcstory,  ROT0, "SemiCom", "SD Fighters (Korea)", GAME_SUPPORTS_SAVE )
-GAME( 1997, bcstry,   0,       bcstory,   bcstory,  bcstory,  ROT0, "SemiCom", "B.C. Story (set 1)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ) // gfx offsets?
-GAME( 1997, bcstrya,  bcstry,  bcstory,   bcstory,  bcstory,  ROT0, "SemiCom", "B.C. Story (set 2)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ) // gfx offsets?
-GAME( 1997, semibase, 0,       semibase,  semibase, bcstory,  ROT0, "SemiCom", "MuHanSeungBu (SemiCom Baseball) (Korea)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )// sprite offsets..
-GAME( 1998, dquizgo,  0,       cookbib,   dquizgo,  dquizgo,  ROT0, "SemiCom", "Date Quiz Go Go (Korea)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ) // check layer offsets
-GAME( 2001, jumppop,  0,       jumppop,   jumppop,  0,        ORIENTATION_FLIP_X, "ESD", "Jumping Pop", GAME_SUPPORTS_SAVE )
+GAME( 1995, htchctch, 0,       htchctch,    htchctch, htchctch, ROT0, "SemiCom", "Hatch Catch" , GAME_SUPPORTS_SAVE ) // not 100% sure about gfx offsets
+GAME( 1995, cookbib,  0,       cookbib,     cookbib,  htchctch, ROT0, "SemiCom", "Cookie & Bibi" , GAME_SUPPORTS_SAVE ) // not 100% sure about gfx offsets
+GAME( 1995, chokchok, 0,       cookbib,     chokchok, chokchok, ROT0, "SemiCom", "Choky! Choky!", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE  ) // corruption during attract mode (tmap disable?)
+GAME( 1995, wlstar,   0,       cookbib_mcu, wlstar,   wlstar,   ROT0, "Mijin",   "Wonder League Star - Sok-Magicball Fighting (Korea)", GAME_SUPPORTS_SAVE ) // translates to 'Wonder League Star - Return of Magicball Fighting'
+GAME( 1996, wondl96,  0,       cookbib_mcu, wondl96,  wondl96,  ROT0, "SemiCom", "Wonder League '96 (Korea)", GAME_SUPPORTS_SAVE )
+GAME( 1996, fncywld,  0,       fncywld,     fncywld,  fncywld,  ROT0, "Unico",   "Fancy World - Earth of Crisis" , GAME_SUPPORTS_SAVE ) // game says 1996, testmode 1995?
+GAME( 1996, sdfight,  0,       sdfight,     sdfight,  bcstory,  ROT0, "SemiCom", "SD Fighters (Korea)", GAME_SUPPORTS_SAVE )
+GAME( 1997, bcstry,   0,       bcstory,     bcstory,  bcstory,  ROT0, "SemiCom", "B.C. Story (set 1)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ) // gfx offsets?
+GAME( 1997, bcstrya,  bcstry,  bcstory,     bcstory,  bcstory,  ROT0, "SemiCom", "B.C. Story (set 2)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ) // gfx offsets?
+GAME( 1997, semibase, 0,       semibase,    semibase, bcstory,  ROT0, "SemiCom", "MuHanSeungBu (SemiCom Baseball) (Korea)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE )// sprite offsets..
+GAME( 1998, dquizgo,  0,       cookbib,     dquizgo,  dquizgo,  ROT0, "SemiCom", "Date Quiz Go Go (Korea)", GAME_IMPERFECT_GRAPHICS | GAME_SUPPORTS_SAVE ) // check layer offsets
+GAME( 2001, jumppop,  0,       jumppop,     jumppop,  0,        ORIENTATION_FLIP_X, "ESD", "Jumping Pop", GAME_SUPPORTS_SAVE )
