@@ -1193,6 +1193,7 @@ const game_driver * const drivers[] =
 	DRIVER( iceclimb )	/* (c) 1984 Nintendo */
 	DRIVER( iceclimbj )	/* (c) 1984 Nintendo */
 	DRIVER( ladygolf )	/* (c) 1984 Nintendo */
+    DRIVER( ldygolfe )  /* (c) 1984 Nintendo */
 	DRIVER( machridr )	/* (c) 1985 Nintendo */
 	DRIVER( machridrj )	/* (c) 1985 Nintendo */
 	DRIVER( rbibb )		/* (c) 1987 Namco */
