@@ -60,7 +60,11 @@
 	    raddr = pc & (~1);
 	    if ( COPRO_CTRL & COPRO_CTRL_MMU_EN )
 	    {
-	    	raddr = arm7_tlb_translate(cpustate, raddr);
+	    	raddr = arm7_tlb_translate(cpustate, raddr, 1);
+	    	if (cpustate->pendingAbtP != 0)
+	    	{
+	    		goto skip_exec;
+	    	}
 	    }
             insn = cpustate->direct->read_decrypted_word(raddr);
             ARM7_ICOUNT -= (3 - thumbCycles[insn >> 8]);
@@ -1170,7 +1174,11 @@
             pc = R15;
 	    if ( COPRO_CTRL & COPRO_CTRL_MMU_EN )
 	    {
-	    	pc = arm7_tlb_translate(cpustate, pc);
+	    	pc = arm7_tlb_translate(cpustate, pc, 1);
+	    	if (cpustate->pendingAbtP != 0)
+	    	{
+	    		goto skip_exec;
+	    	}
 	    }
             insn = cpustate->direct->read_decrypted_dword(pc);
 
@@ -1596,6 +1604,8 @@
                         ARM7_ICOUNT +=2;    //Any unexecuted instruction only takes 1 cycle (page 193)
             }
         }
+
+skip_exec:
 
         ARM7_CHECKIRQ;
 

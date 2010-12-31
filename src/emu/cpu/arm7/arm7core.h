@@ -136,10 +136,22 @@ enum
 #define COPRO_CTRL_INTVEC_F                 1
 #define COPRO_CTRL_MASK                     0x0000338f
 
+#define COPRO_DOMAIN_ACCESS_CONTROL        	cpustate->domainAccessControl
+
+#define COPRO_FAULT_STATUS        	cpustate->faultStatus
+
+#define COPRO_FAULT_ADDRESS       	cpustate->faultAddress
+
+#define COPRO_FCSE_PID       	cpustate->fcsePID
+
 /* Coprocessor Registers */
 #define ARM7COPRO_REGS \
     UINT32 control; \
-    UINT32 tlbBase;
+    UINT32 tlbBase; \
+    UINT32 faultStatus; \
+    UINT32 faultAddress; \
+    UINT32 fcsePID; \
+    UINT32 domainAccessControl;
 
 enum
 {
