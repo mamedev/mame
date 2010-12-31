@@ -1,9 +1,84 @@
 /**********************************************************************************************
- *
- *   Ensoniq ES5505/6 driver
- *   by Aaron Giles
- *
- **********************************************************************************************/
+  
+     Ensoniq ES5505/6 driver
+     by Aaron Giles
+
+Ensoniq OTIS - ES5505                                            Ensoniq OTTO - ES5506
+
+  OTIS is a VLSI device designed in a 2 micron double metal        OTTO is a VLSI device designed in a 1.5 micron double metal
+   CMOS process. The device is the next generation of audio         CMOS process. The device is the next generation of audio
+   technology from ENSONIQ. This new chip achieves a new            technology from ENSONIQ. All calculations in the device are
+   level of audio fidelity performance. These improvements          made with at least 18-bit accuracy.
+   are achieved through the use of frequency interpolation
+   and on board real time digital filters. All calculations       The major features of OTTO are:
+   in the device are made with at least 16 bit accuracy.           - 68 pin PLCC package
+                                                                   - On chip real time digital filters
+ The major features of OTIS are:                                   - Frequency interpolation
+  - 48 Pin dual in line package                                    - 32 independent voices
+  - On chip real time digital filters                              - Loop start and stop posistions for each voice
+  - Frequency interpolation                                        - Bidirectional and reverse looping
+  - 32 independent voices (up from 25 in DOCII)                    - 68000 compatibility for asynchronous bus communication
+  - Loop start and stop positions for each voice                   - Seperate host and sound memory interface
+  - Bidirectional and reverse looping                              - 6 channel stereo serial communication port
+  - 68000 compatibility for asynchronous bus communication         - Programmable clocks for defining serial protocol
+  - On board pulse width modulation D to A                         - Internal volume multiplication and stereo panning
+  - 4 channel stereo serial communication port                     - A to D input for pots and wheels
+  - Internal volume multiplication and stereo panning              - Hardware support for envelopes
+  - A to D input for pots and wheels                               - Support for dual OTTO systems
+  - Up to 10MHz operation                                          - Optional compressed data format for sample data
+                                                                   - Up to 16MHz operation
+              ______    ______
+            _|o     \__/      |_
+ A17/D13 - |_|1             48|_| - VSS                                                           A A A A A A
+            _|                |_                                                                  2 1 1 1 1 1 A
+ A18/D14 - |_|2             47|_| - A16/D12                                                       0 9 8 7 6 5 1
+            _|                |_                                                                  / / / / / / 4
+ A19/D15 - |_|3             46|_| - A15/D11                                   H H H H H H H V V H D D D D D D /
+            _|                |_                                              D D D D D D D S D D 1 1 1 1 1 1 D
+      BS - |_|4             45|_| - A14/D10                                   0 1 2 3 4 5 6 S D 7 5 4 3 2 1 0 9
+            _|                |_                                             ------------------------------------+
+  PWZERO - |_|5             44|_| - A13/D9                                  / 9 8 7 6 5 4 3 2 1 6 6 6 6 6 6 6 6  |
+            _|                |_                                           /                    8 7 6 5 4 3 2 1  |
+    SER0 - |_|6             43|_| - A12/D8                                |                                      |
+            _|       E        |_                                      SER0|10                                  60|A13/D8
+    SER1 - |_|7      N      42|_| - A11/D7                            SER1|11                                  59|A12/D7
+            _|       S        |_                                      SER2|12                                  58|A11/D6
+    SER2 - |_|8      O      41|_| - A10/D6                            SER3|13              ENSONIQ             57|A10/D5
+            _|       N        |_                                      SER4|14                                  56|A9/D4
+    SER3 - |_|9      I      40|_| - A9/D5                             SER5|15                                  55|A8/D3
+            _|       Q        |_                                      WCLK|16                                  54|A7/D2
+ SERWCLK - |_|10            39|_| - A8/D4                            LRCLK|17               ES5506             53|A6/D1
+            _|                |_                                      BCLK|18                                  52|A5/D0
+   SERLR - |_|11            38|_| - A7/D3                             RESB|19                                  51|A4
+            _|                |_                                       HA5|20                                  50|A3
+ SERBCLK - |_|12     E      37|_| - A6/D2                              HA4|21                OTTO              49|A2
+            _|       S        |_                                       HA3|22                                  48|A1
+     RLO - |_|13     5      36|_| - A5/D1                              HA2|23                                  47|A0
+            _|       5        |_                                       HA1|24                                  46|BS1
+     RHI - |_|14     0      35|_| - A4/D0                              HA0|25                                  45|BS0
+            _|       5        |_                                    POT_IN|26                                  44|DTACKB
+     LLO - |_|15            34|_| - CLKIN                                 |   2 2 2 3 3 3 3 3 3 3 3 3 3 4 4 4 4  |
+            _|                |_                                          |   7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3  |
+     LHI - |_|16            33|_| - CAS                                   +--------------------------------------+
+            _|                |_                                              B E E B E B B D S B B B E K B W W
+     POT - |_|17     O      32|_| - AMUX                                      S B L N L S S D S S X S   L Q / /
+            _|       T        |_                                              E E R E H M C V V A U A   C R R R
+   DTACK - |_|18     I      31|_| - RAS                                       R R D H           R M C     I M
+            _|       S        |_                                              _ D                 A
+     R/W - |_|19            30|_| - E                                         T
+            _|                |_                                              O
+      MS - |_|20            29|_| - IRQ                                       P
+            _|                |_
+      CS - |_|21            28|_| - A3
+            _|                |_
+     RES - |_|22            27|_| - A2
+            _|                |_
+     VSS - |_|23            26|_| - A1
+            _|                |_
+     VDD - |_|24            25|_| - A0
+             |________________|
+
+***********************************************************************************************/
 
 #include "emu.h"
 #include "streams.h"
