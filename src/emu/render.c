@@ -356,8 +356,19 @@ void render_primitive_list::append_or_return(render_primitive &prim, bool clippe
 //-------------------------------------------------
 
 render_texture::render_texture()
+	: m_manager(NULL),
+	  m_next(NULL),
+	  m_bitmap(NULL),
+	  m_palette(NULL),
+	  m_format(TEXFORMAT_ARGB32),
+	  m_scaler(NULL),
+	  m_param(NULL),
+	  m_curseq(0),
+	  m_bcglookup(NULL),
+	  m_bcglookup_entries(0)
 {
-	// no initialization because we rely on reset() to do it
+	m_sbounds.min_x = m_sbounds.min_y = m_sbounds.max_x = m_sbounds.max_y = 0;
+	memset(m_scaled, 0, sizeof(m_scaled));
 }
 
 
@@ -367,22 +378,7 @@ render_texture::render_texture()
 
 render_texture::~render_texture()
 {
-	// free all scaled versions
-	for (int scalenum = 0; scalenum < ARRAY_LENGTH(m_scaled); scalenum++)
-	{
-		m_manager->invalidate_all(m_scaled[scalenum].bitmap);
-		auto_free(&m_manager->machine(), m_scaled[scalenum].bitmap);
-	}
-
-	// invalidate references to the original bitmap as well
-	m_manager->invalidate_all(m_bitmap);
-
-	// release palette references
-	if (m_palette != NULL)
-		palette_deref(m_palette);
-
-	// free any B/C/G lookup tables
-	auto_free(&m_manager->machine(), m_bcglookup);
+	release();
 }
 
 
@@ -394,10 +390,42 @@ render_texture::~render_texture()
 void render_texture::reset(render_manager &manager, texture_scaler_func scaler, void *param)
 {
 	m_manager = &manager;
-	memset(&m_next, 0, FPTR(&m_bcglookup_entries + 1) - FPTR(&m_next));
-	m_format = TEXFORMAT_ARGB32;
 	m_scaler = scaler;
 	m_param = param;
+}
+
+
+//-------------------------------------------------
+//  release - release resources when we are freed
+//-------------------------------------------------
+
+void render_texture::release()
+{
+	// free all scaled versions
+	for (int scalenum = 0; scalenum < ARRAY_LENGTH(m_scaled); scalenum++)
+	{
+		m_manager->invalidate_all(m_scaled[scalenum].bitmap);
+		auto_free(&m_manager->machine(), m_scaled[scalenum].bitmap);
+		m_scaled[scalenum].bitmap = NULL;
+		m_scaled[scalenum].seqid = 0;
+	}
+
+	// invalidate references to the original bitmap as well
+	m_manager->invalidate_all(m_bitmap);
+	m_bitmap = NULL;
+	m_sbounds.min_x = m_sbounds.min_y = m_sbounds.max_x = m_sbounds.max_y = 0;
+	m_format = TEXFORMAT_ARGB32;
+	m_curseq = 0;
+
+	// release palette references
+	if (m_palette != NULL)
+		palette_deref(m_palette);
+	m_palette = NULL;
+
+	// free any B/C/G lookup tables
+	auto_free(&m_manager->machine(), m_bcglookup);
+	m_bcglookup = NULL;
+	m_bcglookup_entries = 0;
 }
 
 
@@ -2580,7 +2608,10 @@ render_texture *render_manager::texture_alloc(texture_scaler_func scaler, void *
 void render_manager::texture_free(render_texture *texture)
 {
 	if (texture != NULL)
+	{
 		m_live_textures--;
+		texture->release();
+	}
 	m_texture_allocator.reclaim(texture);
 }
 
