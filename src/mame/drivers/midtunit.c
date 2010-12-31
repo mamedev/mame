@@ -604,36 +604,36 @@ static const tms34010_config tms_config =
 static MACHINE_CONFIG_START( tunit_core, midtunit_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", TMS34010, CPU_CLOCK)
-	MDRV_CPU_CONFIG(tms_config)
-	MDRV_CPU_PROGRAM_MAP(main_map)
+	MCFG_CPU_ADD("maincpu", TMS34010, CPU_CLOCK)
+	MCFG_CPU_CONFIG(tms_config)
+	MCFG_CPU_PROGRAM_MAP(main_map)
 
-	MDRV_MACHINE_RESET(midtunit)
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_MACHINE_RESET(midtunit)
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MDRV_PALETTE_LENGTH(32768)
+	MCFG_PALETTE_LENGTH(32768)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK * 2, 505, 0, 399, 289, 0, 253)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK * 2, 505, 0, 399, 289, 0, 253)
 
-	MDRV_VIDEO_START(midtunit)
-	MDRV_VIDEO_UPDATE(tms340x0)
+	MCFG_VIDEO_START(midtunit)
+	MCFG_VIDEO_UPDATE(tms340x0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( tunit_adpcm, tunit_core )
 
 	/* basic machine hardware */
-	MDRV_FRAGMENT_ADD(williams_adpcm_sound)
+	MCFG_FRAGMENT_ADD(williams_adpcm_sound)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( tunit_dcs, tunit_core )
 
 	/* basic machine hardware */
-	MDRV_FRAGMENT_ADD(dcs_audio_2k)
+	MCFG_FRAGMENT_ADD(dcs_audio_2k)
 MACHINE_CONFIG_END
 
 

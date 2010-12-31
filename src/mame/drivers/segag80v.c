@@ -912,78 +912,78 @@ static const samples_interface zektor_samples_interface =
 static MACHINE_CONFIG_START( g80v_base, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK/2)
-	MDRV_CPU_PROGRAM_MAP(main_map)
-	MDRV_CPU_IO_MAP(main_portmap)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK/2)
+	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_CPU_IO_MAP(main_portmap)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_MACHINE_START(g80v)
-	MDRV_MACHINE_RESET(g80v)
+	MCFG_MACHINE_START(g80v)
+	MCFG_MACHINE_RESET(g80v)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", VECTOR)
-	MDRV_SCREEN_REFRESH_RATE(40)
-	MDRV_SCREEN_SIZE(400, 300)
-	MDRV_SCREEN_VISIBLE_AREA(512, 1536, 640-32, 1408+32)
+	MCFG_SCREEN_ADD("screen", VECTOR)
+	MCFG_SCREEN_REFRESH_RATE(40)
+	MCFG_SCREEN_SIZE(400, 300)
+	MCFG_SCREEN_VISIBLE_AREA(512, 1536, 640-32, 1408+32)
 
-	MDRV_VIDEO_START(segag80v)
-	MDRV_VIDEO_UPDATE(segag80v)
+	MCFG_VIDEO_START(segag80v)
+	MCFG_VIDEO_UPDATE(segag80v)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( elim2, g80v_base )
 
 	/* custom sound board */
-	MDRV_SOUND_ADD("samples", SAMPLES, 0)
-	MDRV_SOUND_CONFIG(elim2_samples_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SOUND_CONFIG(elim2_samples_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( spacfury, g80v_base )
 
 	/* custom sound board */
-	MDRV_SOUND_ADD("samples", SAMPLES, 0)
-	MDRV_SOUND_CONFIG(spacfury_samples_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SOUND_CONFIG(spacfury_samples_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
 	/* speech board */
-	MDRV_FRAGMENT_ADD(sega_speech_board)
+	MCFG_FRAGMENT_ADD(sega_speech_board)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( zektor, g80v_base )
 
 	/* custom sound board */
-	MDRV_SOUND_ADD("samples", SAMPLES, 0)
-	MDRV_SOUND_CONFIG(zektor_samples_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SOUND_CONFIG(zektor_samples_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MDRV_SOUND_ADD("aysnd", AY8910, CPU_CLOCK/2/2)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
+	MCFG_SOUND_ADD("aysnd", AY8910, CPU_CLOCK/2/2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 
 	/* speech board */
-	MDRV_FRAGMENT_ADD(sega_speech_board)
+	MCFG_FRAGMENT_ADD(sega_speech_board)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( tacscan, g80v_base )
 
 	/* universal sound board */
-	MDRV_FRAGMENT_ADD(sega_universal_sound_board)
+	MCFG_FRAGMENT_ADD(sega_universal_sound_board)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( startrek, g80v_base )
 
 	/* speech board */
-	MDRV_FRAGMENT_ADD(sega_speech_board)
+	MCFG_FRAGMENT_ADD(sega_speech_board)
 
 	/* universal sound board */
-	MDRV_FRAGMENT_ADD(sega_universal_sound_board)
+	MCFG_FRAGMENT_ADD(sega_universal_sound_board)
 MACHINE_CONFIG_END
 
 

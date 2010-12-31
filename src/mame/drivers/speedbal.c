@@ -221,37 +221,37 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( speedbal, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(main_cpu_map)
-	MDRV_CPU_IO_MAP(main_cpu_io_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz ??? */
+	MCFG_CPU_PROGRAM_MAP(main_cpu_map)
+	MCFG_CPU_IO_MAP(main_cpu_io_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audiocpu", Z80, 2660000)	/* 2.66 MHz ???  Maybe yes */
-	MDRV_CPU_PROGRAM_MAP(sound_cpu_map)
-	MDRV_CPU_IO_MAP(sound_cpu_io_map)
-	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,8)
+	MCFG_CPU_ADD("audiocpu", Z80, 2660000)	/* 2.66 MHz ???  Maybe yes */
+	MCFG_CPU_PROGRAM_MAP(sound_cpu_map)
+	MCFG_CPU_IO_MAP(sound_cpu_io_map)
+	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,8)
 
-	MDRV_NVRAM_ADD_1FILL("nvram")
+	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(speedbal)
-	MDRV_PALETTE_LENGTH(768)
+	MCFG_GFXDECODE(speedbal)
+	MCFG_PALETTE_LENGTH(768)
 
-	MDRV_VIDEO_START(speedbal)
-	MDRV_VIDEO_UPDATE(speedbal)
+	MCFG_VIDEO_START(speedbal)
+	MCFG_VIDEO_UPDATE(speedbal)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM3812, 3600000)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM3812, 3600000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 

@@ -24,8 +24,8 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MDRV_I2CMEM_ADD( _tag, _interface ) \
-	MDRV_DEVICE_ADD( _tag, I2CMEM, 0 ) \
+#define MCFG_I2CMEM_ADD( _tag, _interface ) \
+	MCFG_DEVICE_ADD( _tag, I2CMEM, 0 ) \
 	i2cmem_device_config::static_set_interface(device, _interface);
 
 

@@ -50,36 +50,36 @@ struct _latch8_config
 ***************************************************************************/
 
 /* add device */
-#define MDRV_LATCH8_ADD(_tag) \
-	MDRV_DEVICE_ADD(_tag, LATCH8, 0)
+#define MCFG_LATCH8_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, LATCH8, 0)
 
 /* Bit mask specifying bits to be masked *out* */
-#define MDRV_LATCH8_MASKOUT(_maskout) \
-	MDRV_DEVICE_CONFIG_DATA32(latch8_config, maskout, _maskout)
+#define MCFG_LATCH8_MASKOUT(_maskout) \
+	MCFG_DEVICE_CONFIG_DATA32(latch8_config, maskout, _maskout)
 
 /* Bit mask specifying bits to be inverted */
-#define MDRV_LATCH8_INVERT(_xor) \
-	MDRV_DEVICE_CONFIG_DATA32(latch8_config, xorvalue, _xor)
+#define MCFG_LATCH8_INVERT(_xor) \
+	MCFG_DEVICE_CONFIG_DATA32(latch8_config, xorvalue, _xor)
 
 /* Bit mask specifying bits not needing cpu synchronization. */
-#define MDRV_LATCH8_NOSYNC(_nosync) \
-	MDRV_DEVICE_CONFIG_DATA32(latch8_config, nosync, _nosync)
+#define MCFG_LATCH8_NOSYNC(_nosync) \
+	MCFG_DEVICE_CONFIG_DATA32(latch8_config, nosync, _nosync)
 
 /* Write bit to discrete node */
-#define MDRV_LATCH8_DISCRETE_NODE(_device, _bit, _node) \
-	MDRV_DEVICE_CONFIG_DATAPTR_ARRAY(latch8_config, node_device, _bit, _device) \
-	MDRV_DEVICE_CONFIG_DATA32_ARRAY(latch8_config, node_map, _bit, _node)
+#define MCFG_LATCH8_DISCRETE_NODE(_device, _bit, _node) \
+	MCFG_DEVICE_CONFIG_DATAPTR_ARRAY(latch8_config, node_device, _bit, _device) \
+	MCFG_DEVICE_CONFIG_DATA32_ARRAY(latch8_config, node_map, _bit, _node)
 
 /* Upon read, replace bits by reading from another device handler */
-#define MDRV_LATCH8_DEVREAD(_bit, _tag, _handler, _from_bit) \
-	MDRV_DEVICE_CONFIG_DATA32_ARRAY_MEMBER(latch8_config, devread, _bit, latch8_devread, from_bit, _from_bit) \
-	MDRV_DEVICE_CONFIG_DATAPTR_ARRAY_MEMBER(latch8_config, devread, _bit, latch8_devread, tag, _tag) \
-	MDRV_DEVICE_CONFIG_DATAPTR_ARRAY_MEMBER(latch8_config, devread, _bit, latch8_devread, devread_handler, _handler) \
+#define MCFG_LATCH8_DEVREAD(_bit, _tag, _handler, _from_bit) \
+	MCFG_DEVICE_CONFIG_DATA32_ARRAY_MEMBER(latch8_config, devread, _bit, latch8_devread, from_bit, _from_bit) \
+	MCFG_DEVICE_CONFIG_DATAPTR_ARRAY_MEMBER(latch8_config, devread, _bit, latch8_devread, tag, _tag) \
+	MCFG_DEVICE_CONFIG_DATAPTR_ARRAY_MEMBER(latch8_config, devread, _bit, latch8_devread, devread_handler, _handler) \
 
 /* Upon read, replace bits by reading from another machine handler */
-#define MDRV_LATCH8_READ(_bit, _handler, _from_bit) \
-	MDRV_DEVICE_CONFIG_DATA32_ARRAY_MEMBER(latch8_config, devread, _bit, latch8_devread, from_bit, _from_bit) \
-	MDRV_DEVICE_CONFIG_DATAPTR_ARRAY_MEMBER(latch8_config, devread, _bit, latch8_devread, read_handler, _handler) \
+#define MCFG_LATCH8_READ(_bit, _handler, _from_bit) \
+	MCFG_DEVICE_CONFIG_DATA32_ARRAY_MEMBER(latch8_config, devread, _bit, latch8_devread, from_bit, _from_bit) \
+	MCFG_DEVICE_CONFIG_DATAPTR_ARRAY_MEMBER(latch8_config, devread, _bit, latch8_devread, read_handler, _handler) \
 
 /* Accessor macros */
 

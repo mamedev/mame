@@ -588,55 +588,55 @@ ADDRESS_MAP_END
 MACHINE_CONFIG_FRAGMENT( spacefev_sound )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("audiocpu", I8035, 6000000)
-	MDRV_CPU_PROGRAM_MAP(n8080_sound_cpu_map)
-	MDRV_CPU_IO_MAP(n8080_sound_io_map)
+	MCFG_CPU_ADD("audiocpu", I8035, 6000000)
+	MCFG_CPU_PROGRAM_MAP(n8080_sound_cpu_map)
+	MCFG_CPU_IO_MAP(n8080_sound_io_map)
 
-	MDRV_TIMER_ADD_PERIODIC("vco_timer", spacefev_vco_voltage_timer, HZ(1000))
+	MCFG_TIMER_ADD_PERIODIC("vco_timer", spacefev_vco_voltage_timer, HZ(1000))
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MDRV_SOUND_ADD("snsnd", SN76477, 0)
-	MDRV_SOUND_CONFIG(spacefev_sn76477_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
+	MCFG_SOUND_ADD("snsnd", SN76477, 0)
+	MCFG_SOUND_CONFIG(spacefev_sn76477_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_FRAGMENT( sheriff_sound )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("audiocpu", I8035, 6000000)
-	MDRV_CPU_PROGRAM_MAP(n8080_sound_cpu_map)
-	MDRV_CPU_IO_MAP(n8080_sound_io_map)
+	MCFG_CPU_ADD("audiocpu", I8035, 6000000)
+	MCFG_CPU_PROGRAM_MAP(n8080_sound_cpu_map)
+	MCFG_CPU_IO_MAP(n8080_sound_io_map)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MDRV_SOUND_ADD("snsnd", SN76477, 0)
-	MDRV_SOUND_CONFIG(sheriff_sn76477_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
+	MCFG_SOUND_ADD("snsnd", SN76477, 0)
+	MCFG_SOUND_CONFIG(sheriff_sn76477_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_FRAGMENT( helifire_sound )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("audiocpu", I8035, 6000000)
-	MDRV_CPU_PROGRAM_MAP(n8080_sound_cpu_map)
-	MDRV_CPU_IO_MAP(helifire_sound_io_map)
+	MCFG_CPU_ADD("audiocpu", I8035, 6000000)
+	MCFG_CPU_PROGRAM_MAP(n8080_sound_cpu_map)
+	MCFG_CPU_IO_MAP(helifire_sound_io_map)
 
-	MDRV_TIMER_ADD_PERIODIC("helifire_dac", helifire_dac_volume_timer, HZ(1000) )
+	MCFG_TIMER_ADD_PERIODIC("helifire_dac", helifire_dac_volume_timer, HZ(1000) )
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END

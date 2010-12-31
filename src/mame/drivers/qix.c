@@ -552,28 +552,28 @@ static const m6809_config encryption_config =
 static MACHINE_CONFIG_START( qix_base, qix_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6809, MAIN_CLOCK_OSC/4/4)	/* 1.25 MHz */
-	MDRV_CPU_PROGRAM_MAP(main_map)
-	MDRV_CPU_CONFIG(encryption_config)	// for kram3
+	MCFG_CPU_ADD("maincpu", M6809, MAIN_CLOCK_OSC/4/4)	/* 1.25 MHz */
+	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_CPU_CONFIG(encryption_config)	// for kram3
 
 	/* high interleave needed to ensure correct text in service mode */
 	/* Zookeeper settings and high score table seem especially sensitive to this */
-	MDRV_QUANTUM_PERFECT_CPU("maincpu")
+	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MDRV_MACHINE_RESET(qix)
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_MACHINE_RESET(qix)
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MDRV_PIA6821_ADD("pia0", qix_pia_0_intf)
-	MDRV_PIA6821_ADD("pia1", qix_pia_1_intf)
-	MDRV_PIA6821_ADD("pia2", qix_pia_2_intf)
+	MCFG_PIA6821_ADD("pia0", qix_pia_0_intf)
+	MCFG_PIA6821_ADD("pia1", qix_pia_1_intf)
+	MCFG_PIA6821_ADD("pia2", qix_pia_2_intf)
 
 	/* video hardware */
-	MDRV_FRAGMENT_ADD(qix_video)
+	MCFG_FRAGMENT_ADD(qix_video)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( qix, qix_base )
-	MDRV_FRAGMENT_ADD(qix_audio)
+	MCFG_FRAGMENT_ADD(qix_audio)
 MACHINE_CONFIG_END
 
 
@@ -581,13 +581,13 @@ static MACHINE_CONFIG_DERIVED( mcu, qix )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_ADD("mcu", M68705, COIN_CLOCK_OSC)	/* 1.00 MHz */
-	MDRV_CPU_PROGRAM_MAP(mcu_map)
+	MCFG_CPU_ADD("mcu", M68705, COIN_CLOCK_OSC)	/* 1.00 MHz */
+	MCFG_CPU_PROGRAM_MAP(mcu_map)
 
-	MDRV_MACHINE_START(qixmcu)
+	MCFG_MACHINE_START(qixmcu)
 
-	MDRV_PIA6821_MODIFY("pia0", qixmcu_pia_0_intf)
-	MDRV_PIA6821_MODIFY("pia2", qixmcu_pia_2_intf)
+	MCFG_PIA6821_MODIFY("pia0", qixmcu_pia_0_intf)
+	MCFG_PIA6821_MODIFY("pia2", qixmcu_pia_2_intf)
 MACHINE_CONFIG_END
 
 
@@ -595,11 +595,11 @@ static MACHINE_CONFIG_DERIVED( zookeep, mcu )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(zoo_main_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(zoo_main_map)
 
 	/* video hardware */
-	MDRV_FRAGMENT_ADD(zookeep_video)
+	MCFG_FRAGMENT_ADD(zookeep_video)
 MACHINE_CONFIG_END
 
 
@@ -607,17 +607,17 @@ static MACHINE_CONFIG_DERIVED( slither, qix_base )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_CLOCK(SLITHER_CLOCK_OSC/4/4)	/* 1.34 MHz */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_CLOCK(SLITHER_CLOCK_OSC/4/4)	/* 1.34 MHz */
 
-	MDRV_PIA6821_MODIFY("pia1", slither_pia_1_intf)
-	MDRV_PIA6821_MODIFY("pia2", slither_pia_2_intf)
+	MCFG_PIA6821_MODIFY("pia1", slither_pia_1_intf)
+	MCFG_PIA6821_MODIFY("pia2", slither_pia_2_intf)
 
 	/* video hardware */
-	MDRV_FRAGMENT_ADD(slither_video)
+	MCFG_FRAGMENT_ADD(slither_video)
 
 	/* audio hardware */
-	MDRV_FRAGMENT_ADD(slither_audio)
+	MCFG_FRAGMENT_ADD(slither_audio)
 MACHINE_CONFIG_END
 
 

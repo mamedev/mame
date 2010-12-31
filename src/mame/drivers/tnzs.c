@@ -1610,312 +1610,312 @@ static const samples_interface tnzs_samples_interface =
 static MACHINE_CONFIG_START( arknoid2, tnzs_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(main_map)
-	MDRV_CPU_VBLANK_INT("screen", arknoid2_interrupt)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)	/* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_CPU_VBLANK_INT("screen", arknoid2_interrupt)
 
-	MDRV_CPU_ADD("sub", Z80, XTAL_12MHz/2)	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(sub_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("sub", Z80, XTAL_12MHz/2)	/* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(sub_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_QUANTUM_PERFECT_CPU("maincpu")
+	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MDRV_MACHINE_START(tnzs)
-	MDRV_MACHINE_RESET(tnzs)
+	MCFG_MACHINE_START(tnzs)
+	MCFG_MACHINE_RESET(tnzs)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(tnzs)
-	MDRV_PALETTE_LENGTH(512)
+	MCFG_GFXDECODE(tnzs)
+	MCFG_PALETTE_LENGTH(512)
 
-	MDRV_PALETTE_INIT(arknoid2)
-	MDRV_VIDEO_UPDATE(tnzs)
-	MDRV_VIDEO_EOF(tnzs)
+	MCFG_PALETTE_INIT(arknoid2)
+	MCFG_VIDEO_UPDATE(tnzs)
+	MCFG_VIDEO_EOF(tnzs)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/4) /* verified on pcb */
-	MDRV_SOUND_CONFIG(ym2203_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/4) /* verified on pcb */
+	MCFG_SOUND_CONFIG(ym2203_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( drtoppel, tnzs_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80,XTAL_12MHz/2)		/* 6.0 MHz ??? - Main board Crystal is 12MHz */
-	MDRV_CPU_PROGRAM_MAP(main_map)
-	MDRV_CPU_VBLANK_INT("screen", arknoid2_interrupt)
+	MCFG_CPU_ADD("maincpu", Z80,XTAL_12MHz/2)		/* 6.0 MHz ??? - Main board Crystal is 12MHz */
+	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_CPU_VBLANK_INT("screen", arknoid2_interrupt)
 
-	MDRV_CPU_ADD("sub", Z80,XTAL_12MHz/2)		/* 6.0 MHz ??? - Main board Crystal is 12MHz */
-	MDRV_CPU_PROGRAM_MAP(sub_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("sub", Z80,XTAL_12MHz/2)		/* 6.0 MHz ??? - Main board Crystal is 12MHz */
+	MCFG_CPU_PROGRAM_MAP(sub_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_QUANTUM_PERFECT_CPU("maincpu")
+	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MDRV_MACHINE_START(tnzs)
-	MDRV_MACHINE_RESET(tnzs)
+	MCFG_MACHINE_START(tnzs)
+	MCFG_MACHINE_RESET(tnzs)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(tnzs)
-	MDRV_PALETTE_LENGTH(512)
+	MCFG_GFXDECODE(tnzs)
+	MCFG_PALETTE_LENGTH(512)
 
-	MDRV_PALETTE_INIT(arknoid2)
-	MDRV_VIDEO_UPDATE(tnzs)
-	MDRV_VIDEO_EOF(tnzs)
+	MCFG_PALETTE_INIT(arknoid2)
+	MCFG_VIDEO_UPDATE(tnzs)
+	MCFG_VIDEO_EOF(tnzs)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/4)
-	MDRV_SOUND_CONFIG(ym2203_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/4)
+	MCFG_SOUND_CONFIG(ym2203_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( tnzs, tnzs_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80,XTAL_12MHz/2)		/* 6.0 MHz ??? - Main board Crystal is 12MHz */
-	MDRV_CPU_PROGRAM_MAP(main_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("maincpu", Z80,XTAL_12MHz/2)		/* 6.0 MHz ??? - Main board Crystal is 12MHz */
+	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("sub", Z80,XTAL_12MHz/2)		/* 6.0 MHz ??? - Main board Crystal is 12MHz */
-	MDRV_CPU_PROGRAM_MAP(sub_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("sub", Z80,XTAL_12MHz/2)		/* 6.0 MHz ??? - Main board Crystal is 12MHz */
+	MCFG_CPU_PROGRAM_MAP(sub_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("mcu", I8742 ,12000000/2)	/* 400KHz ??? - Main board Crystal is 12MHz */
-	MDRV_CPU_IO_MAP(i8742_io_map)
+	MCFG_CPU_ADD("mcu", I8742 ,12000000/2)	/* 400KHz ??? - Main board Crystal is 12MHz */
+	MCFG_CPU_IO_MAP(i8742_io_map)
 
-	MDRV_QUANTUM_PERFECT_CPU("maincpu")
+	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MDRV_MACHINE_START(tnzs)
-	MDRV_MACHINE_RESET(tnzs)
+	MCFG_MACHINE_START(tnzs)
+	MCFG_MACHINE_RESET(tnzs)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(59.15)   /* it should be the same as the newer pcb vsync */
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(59.15)   /* it should be the same as the newer pcb vsync */
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(tnzs)
-	MDRV_PALETTE_LENGTH(512)
+	MCFG_GFXDECODE(tnzs)
+	MCFG_PALETTE_LENGTH(512)
 
-	MDRV_VIDEO_UPDATE(tnzs)
-	MDRV_VIDEO_EOF(tnzs)
+	MCFG_VIDEO_UPDATE(tnzs)
+	MCFG_VIDEO_EOF(tnzs)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/4)
-	MDRV_SOUND_CONFIG(ym2203_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/4)
+	MCFG_SOUND_CONFIG(ym2203_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( insectx, tnzs_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(main_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)	/* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("sub", Z80, XTAL_12MHz/2)	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(sub_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("sub", Z80, XTAL_12MHz/2)	/* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(sub_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_QUANTUM_PERFECT_CPU("maincpu")
+	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MDRV_MACHINE_START(tnzs)
-	MDRV_MACHINE_RESET(tnzs)
+	MCFG_MACHINE_START(tnzs)
+	MCFG_MACHINE_RESET(tnzs)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(insectx)
-	MDRV_PALETTE_LENGTH(512)
+	MCFG_GFXDECODE(insectx)
+	MCFG_PALETTE_LENGTH(512)
 
-	MDRV_VIDEO_UPDATE(tnzs)
-	MDRV_VIDEO_EOF(tnzs)
+	MCFG_VIDEO_UPDATE(tnzs)
+	MCFG_VIDEO_EOF(tnzs)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/4) /* verified on pcb */
-	MDRV_SOUND_CONFIG(ym2203_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/4) /* verified on pcb */
+	MCFG_SOUND_CONFIG(ym2203_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( kageki, tnzs_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz/2) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(main_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2) /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("sub", Z80, XTAL_12MHz/2) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(kageki_sub_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("sub", Z80, XTAL_12MHz/2) /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(kageki_sub_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_QUANTUM_PERFECT_CPU("maincpu")
+	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MDRV_MACHINE_START(tnzs)
-	MDRV_MACHINE_RESET(tnzs)
+	MCFG_MACHINE_START(tnzs)
+	MCFG_MACHINE_RESET(tnzs)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(tnzs)
-	MDRV_PALETTE_LENGTH(512)
+	MCFG_GFXDECODE(tnzs)
+	MCFG_PALETTE_LENGTH(512)
 
-	MDRV_VIDEO_UPDATE(tnzs)
-	MDRV_VIDEO_EOF(tnzs)
+	MCFG_VIDEO_UPDATE(tnzs)
+	MCFG_VIDEO_EOF(tnzs)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/4) /* verified on pcb */
-	MDRV_SOUND_CONFIG(kageki_ym2203_interface)
-	MDRV_SOUND_ROUTE(0, "mono", 0.15)
-	MDRV_SOUND_ROUTE(1, "mono", 0.15)
-	MDRV_SOUND_ROUTE(2, "mono", 0.15)
-	MDRV_SOUND_ROUTE(3, "mono", 0.35)
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/4) /* verified on pcb */
+	MCFG_SOUND_CONFIG(kageki_ym2203_interface)
+	MCFG_SOUND_ROUTE(0, "mono", 0.15)
+	MCFG_SOUND_ROUTE(1, "mono", 0.15)
+	MCFG_SOUND_ROUTE(2, "mono", 0.15)
+	MCFG_SOUND_ROUTE(3, "mono", 0.35)
 
-	MDRV_SOUND_ADD("samples", SAMPLES, 0)
-	MDRV_SOUND_CONFIG(tnzs_samples_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SOUND_CONFIG(tnzs_samples_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( tnzsb, tnzs_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz/2) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(cpu0_type2)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2) /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(cpu0_type2)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("sub", Z80, XTAL_12MHz/2) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(tnzsb_cpu1_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("sub", Z80, XTAL_12MHz/2) /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(tnzsb_cpu1_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audiocpu", Z80, XTAL_12MHz/2) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(tnzsb_cpu2_map)
-	MDRV_CPU_IO_MAP(tnzsb_io_map)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_12MHz/2) /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(tnzsb_cpu2_map)
+	MCFG_CPU_IO_MAP(tnzsb_io_map)
 
-	MDRV_QUANTUM_PERFECT_CPU("maincpu")
+	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MDRV_MACHINE_START(tnzs)
-	MDRV_MACHINE_RESET(tnzs)
+	MCFG_MACHINE_START(tnzs)
+	MCFG_MACHINE_RESET(tnzs)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(59.15)   /* verified on pcb */
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(59.15)   /* verified on pcb */
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(tnzs)
-	MDRV_PALETTE_LENGTH(512)
+	MCFG_GFXDECODE(tnzs)
+	MCFG_PALETTE_LENGTH(512)
 
-	MDRV_VIDEO_UPDATE(tnzs)
-	MDRV_VIDEO_EOF(tnzs)
+	MCFG_VIDEO_UPDATE(tnzs)
+	MCFG_VIDEO_EOF(tnzs)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/4) /* verified on pcb */
-	MDRV_SOUND_CONFIG(ym2203b_interface)
-	MDRV_SOUND_ROUTE(0, "mono", 1.0)
-	MDRV_SOUND_ROUTE(1, "mono", 1.0)
-	MDRV_SOUND_ROUTE(2, "mono", 1.0)
-	MDRV_SOUND_ROUTE(3, "mono", 2.0)
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/4) /* verified on pcb */
+	MCFG_SOUND_CONFIG(ym2203b_interface)
+	MCFG_SOUND_ROUTE(0, "mono", 1.0)
+	MCFG_SOUND_ROUTE(1, "mono", 1.0)
+	MCFG_SOUND_ROUTE(2, "mono", 1.0)
+	MCFG_SOUND_ROUTE(3, "mono", 2.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( kabukiz, tnzsb )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("sub")
-	MDRV_CPU_PROGRAM_MAP(kabukiz_cpu1_map)
+	MCFG_CPU_MODIFY("sub")
+	MCFG_CPU_PROGRAM_MAP(kabukiz_cpu1_map)
 
-	MDRV_CPU_MODIFY("audiocpu")
-	MDRV_CPU_PROGRAM_MAP(kabukiz_cpu2_map)
+	MCFG_CPU_MODIFY("audiocpu")
+	MCFG_CPU_PROGRAM_MAP(kabukiz_cpu2_map)
 
-	MDRV_SOUND_MODIFY("ymsnd")
-	MDRV_SOUND_CONFIG(kabukiz_ym2203_interface)
-	MDRV_SOUND_ROUTE(0, "mono", 1.0)
-	MDRV_SOUND_ROUTE(1, "mono", 1.0)
-	MDRV_SOUND_ROUTE(2, "mono", 1.0)
-	MDRV_SOUND_ROUTE(3, "mono", 2.0)
+	MCFG_SOUND_MODIFY("ymsnd")
+	MCFG_SOUND_CONFIG(kabukiz_ym2203_interface)
+	MCFG_SOUND_ROUTE(0, "mono", 1.0)
+	MCFG_SOUND_ROUTE(1, "mono", 1.0)
+	MCFG_SOUND_ROUTE(2, "mono", 1.0)
+	MCFG_SOUND_ROUTE(3, "mono", 2.0)
 
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( jpopnics, tnzs_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80,XTAL_12MHz/2) /* Not verified - Main board Crystal is 12MHz */
-	MDRV_CPU_PROGRAM_MAP(jpopnics_main_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("maincpu", Z80,XTAL_12MHz/2) /* Not verified - Main board Crystal is 12MHz */
+	MCFG_CPU_PROGRAM_MAP(jpopnics_main_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("sub", Z80,XTAL_12MHz/2)	/* Not verified - Main board Crystal is 12MHz */
-	MDRV_CPU_PROGRAM_MAP(jpopnics_sub_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("sub", Z80,XTAL_12MHz/2)	/* Not verified - Main board Crystal is 12MHz */
+	MCFG_CPU_PROGRAM_MAP(jpopnics_sub_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_QUANTUM_PERFECT_CPU("maincpu")
+	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MDRV_MACHINE_START(jpopnics)
-	MDRV_MACHINE_RESET(jpopnics)
+	MCFG_MACHINE_START(jpopnics)
+	MCFG_MACHINE_RESET(jpopnics)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(tnzs)
-	MDRV_PALETTE_LENGTH(1024)
+	MCFG_GFXDECODE(tnzs)
+	MCFG_PALETTE_LENGTH(1024)
 
-	MDRV_VIDEO_UPDATE(tnzs)
-	MDRV_VIDEO_EOF(tnzs)
+	MCFG_VIDEO_UPDATE(tnzs)
+	MCFG_VIDEO_EOF(tnzs)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2151, XTAL_12MHz/4) /* Not verified - Main board Crystal is 12MHz */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ADD("ymsnd", YM2151, XTAL_12MHz/4) /* Not verified - Main board Crystal is 12MHz */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
 

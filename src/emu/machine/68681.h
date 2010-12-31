@@ -17,9 +17,9 @@ struct _duart68681_config
 
 DECLARE_LEGACY_DEVICE(DUART68681, duart68681);
 
-#define MDRV_DUART68681_ADD(_tag, _clock, _config) \
-	MDRV_DEVICE_ADD(_tag, DUART68681, _clock) \
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_DUART68681_ADD(_tag, _clock, _config) \
+	MCFG_DEVICE_ADD(_tag, DUART68681, _clock) \
+	MCFG_DEVICE_CONFIG(_config)
 
 
 READ8_DEVICE_HANDLER(duart68681_r);

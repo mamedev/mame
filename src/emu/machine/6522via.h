@@ -24,9 +24,9 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MDRV_VIA6522_ADD(_tag, _clock, _intrf) \
-    MDRV_DEVICE_ADD(_tag, VIA6522, _clock) \
-    MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_VIA6522_ADD(_tag, _clock, _intrf) \
+    MCFG_DEVICE_ADD(_tag, VIA6522, _clock) \
+    MCFG_DEVICE_CONFIG(_intrf)
 
 
 

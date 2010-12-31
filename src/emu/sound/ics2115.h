@@ -9,15 +9,15 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MDRV_ICS2115_ADD(_tag, _clock, _irqf) \
-	MDRV_DEVICE_ADD(_tag, ICS2115, _clock) \
-	MDRV_IRQ_FUNC(_irqf) \
+#define MCFG_ICS2115_ADD(_tag, _clock, _irqf) \
+	MCFG_DEVICE_ADD(_tag, ICS2115, _clock) \
+	MCFG_IRQ_FUNC(_irqf) \
 
-#define MDRV_ICS2115_REPLACE(_tag, _clock, _irqf) \
-	MDRV_DEVICE_REPLACE(_tag, ICS2115, _clock) \
-	MDRV_IRQ_FUNC(_irqf)
+#define MCFG_ICS2115_REPLACE(_tag, _clock, _irqf) \
+	MCFG_DEVICE_REPLACE(_tag, ICS2115, _clock) \
+	MCFG_IRQ_FUNC(_irqf)
 
-#define MDRV_IRQ_FUNC(_irqf) \
+#define MCFG_IRQ_FUNC(_irqf) \
 	ics2115_device_config::static_set_irqf(device, _irqf); \
 
 //**************************************************************************

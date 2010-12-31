@@ -17,8 +17,8 @@
 
 DECLARE_LEGACY_DEVICE(UPD4701, upd4701);
 
-#define MDRV_UPD4701_ADD(_tag) \
-	MDRV_DEVICE_ADD(_tag, UPD4701, 0)
+#define MCFG_UPD4701_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, UPD4701, 0)
 
 
 /***************************************************************************

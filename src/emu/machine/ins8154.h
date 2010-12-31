@@ -41,9 +41,9 @@
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_INS8154_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, INS8154, 0) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_INS8154_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, INS8154, 0) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
 
 /***************************************************************************

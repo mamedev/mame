@@ -2232,117 +2232,117 @@ static TIMER_DEVICE_CALLBACK( scanline_timer_callback )
 
 
 static MACHINE_CONFIG_START( mpu4_vid, driver_device )
-	MDRV_CPU_ADD("maincpu", M6809, MPU4_MASTER_CLOCK/4 )
-	MDRV_CPU_PROGRAM_MAP(mpu4_6809_map)
-	MDRV_TIMER_ADD_PERIODIC("50hz",gen_50hz, HZ(100))
+	MCFG_CPU_ADD("maincpu", M6809, MPU4_MASTER_CLOCK/4 )
+	MCFG_CPU_PROGRAM_MAP(mpu4_6809_map)
+	MCFG_TIMER_ADD_PERIODIC("50hz",gen_50hz, HZ(100))
 
-	MDRV_NVRAM_ADD_0FILL("nvram")				/* confirm */
+	MCFG_NVRAM_ADD_0FILL("nvram")				/* confirm */
 
 	/* 6840 PTM */
-	MDRV_PTM6840_ADD("6840ptm", ptm_ic2_intf)
+	MCFG_PTM6840_ADD("6840ptm", ptm_ic2_intf)
 
-	MDRV_PIA6821_ADD("pia_ic3", pia_ic3_intf)
-	MDRV_PIA6821_ADD("pia_ic4", pia_ic4_intf)
-	MDRV_PIA6821_ADD("pia_ic5", pia_ic5_intf)
-	MDRV_PIA6821_ADD("pia_ic6", pia_ic6_intf)
-	MDRV_PIA6821_ADD("pia_ic7", pia_ic7_intf)
-	MDRV_PIA6821_ADD("pia_ic8", pia_ic8_intf)
+	MCFG_PIA6821_ADD("pia_ic3", pia_ic3_intf)
+	MCFG_PIA6821_ADD("pia_ic4", pia_ic4_intf)
+	MCFG_PIA6821_ADD("pia_ic5", pia_ic5_intf)
+	MCFG_PIA6821_ADD("pia_ic6", pia_ic6_intf)
+	MCFG_PIA6821_ADD("pia_ic7", pia_ic7_intf)
+	MCFG_PIA6821_ADD("pia_ic8", pia_ic8_intf)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(64*8, 40*8) // note this directly affects the scanline counters used below, and thus the timing of everything
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 63*8-1, 0*8, 37*8-1)
-	MDRV_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_SIZE(64*8, 40*8) // note this directly affects the scanline counters used below, and thus the timing of everything
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 63*8-1, 0*8, 37*8-1)
+	MCFG_SCREEN_REFRESH_RATE(50)
 
-	MDRV_CPU_ADD("video", M68000, VIDEO_MASTER_CLOCK )
-	MDRV_CPU_PROGRAM_MAP(mpu4_68k_map)
+	MCFG_CPU_ADD("video", M68000, VIDEO_MASTER_CLOCK )
+	MCFG_CPU_PROGRAM_MAP(mpu4_68k_map)
 
-	MDRV_QUANTUM_TIME(HZ(960))
+	MCFG_QUANTUM_TIME(HZ(960))
 
-	MDRV_MACHINE_START(mpu4_vid)
-	MDRV_MACHINE_RESET(mpu4_vid)
-	MDRV_VIDEO_START (mpu4_vid)
-	MDRV_VIDEO_UPDATE(mpu4_vid)
+	MCFG_MACHINE_START(mpu4_vid)
+	MCFG_MACHINE_RESET(mpu4_vid)
+	MCFG_VIDEO_START (mpu4_vid)
+	MCFG_VIDEO_UPDATE(mpu4_vid)
 
-	MDRV_PALETTE_LENGTH(16)
+	MCFG_PALETTE_LENGTH(16)
 
-	MDRV_PTM6840_ADD("6840ptm_68k", ptm_vid_intf)
+	MCFG_PTM6840_ADD("6840ptm_68k", ptm_vid_intf)
 
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("ay8913",AY8913, MPU4_MASTER_CLOCK/4)
-	MDRV_SOUND_CONFIG(ay8910_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("ay8913",AY8913, MPU4_MASTER_CLOCK/4)
+	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* Present on all video cards */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MDRV_SOUND_ADD("saa", SAA1099, 8000000)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 0.5)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 0.5)
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SOUND_ADD("saa", SAA1099, 8000000)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.5)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.5)
 
-	MDRV_ACIA6850_ADD("acia6850_0", m6809_acia_if)
-	MDRV_ACIA6850_ADD("acia6850_1", m68k_acia_if)
+	MCFG_ACIA6850_ADD("acia6850_0", m6809_acia_if)
+	MCFG_ACIA6850_ADD("acia6850_1", m68k_acia_if)
 
 	// for the video timing
-	MDRV_TIMER_ADD_SCANLINE("scan_timer", scanline_timer_callback, "screen", 0, 1)
+	MCFG_TIMER_ADD_SCANLINE("scan_timer", scanline_timer_callback, "screen", 0, 1)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( crmaze, mpu4_vid )
-	MDRV_PIA6821_MODIFY("pia_ic5", pia_ic5t_intf)
+	MCFG_PIA6821_MODIFY("pia_ic5", pia_ic5t_intf)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mating, crmaze )
 
-	MDRV_SOUND_ADD("oki", OKIM6376, 64000) //?
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("oki", OKIM6376, 64000) //?
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( vgpoker, mpu4_vid )
-	MDRV_CPU_MODIFY("video")
-	MDRV_CPU_PROGRAM_MAP(vp_68k_map)
+	MCFG_CPU_MODIFY("video")
+	MCFG_CPU_PROGRAM_MAP(vp_68k_map)
 MACHINE_CONFIG_END
 
 
 
 /* machine driver for Zenitone Deal 'Em board */
 static MACHINE_CONFIG_START( dealem, driver_device )
-	MDRV_MACHINE_START(mpu4mod2)							/* main mpu4 board initialisation */
-	MDRV_MACHINE_RESET(mpu4_vid)
-	MDRV_CPU_ADD("maincpu", M6809, MPU4_MASTER_CLOCK/4)
-	MDRV_CPU_PROGRAM_MAP(dealem_memmap)
+	MCFG_MACHINE_START(mpu4mod2)							/* main mpu4 board initialisation */
+	MCFG_MACHINE_RESET(mpu4_vid)
+	MCFG_CPU_ADD("maincpu", M6809, MPU4_MASTER_CLOCK/4)
+	MCFG_CPU_PROGRAM_MAP(dealem_memmap)
 
-	MDRV_TIMER_ADD_PERIODIC("50hz",gen_50hz, HZ(100))
+	MCFG_TIMER_ADD_PERIODIC("50hz",gen_50hz, HZ(100))
 
-	MDRV_PTM6840_ADD("6840ptm", ptm_ic2_intf)
+	MCFG_PTM6840_ADD("6840ptm", ptm_ic2_intf)
 
-	MDRV_PIA6821_ADD("pia_ic3", pia_ic3_intf)
-	MDRV_PIA6821_ADD("pia_ic4", pia_ic4_intf)
-	MDRV_PIA6821_ADD("pia_ic5", pia_ic5_intf)
-	MDRV_PIA6821_ADD("pia_ic6", pia_ic6_intf)
-	MDRV_PIA6821_ADD("pia_ic7", pia_ic7_intf)
-	MDRV_PIA6821_ADD("pia_ic8", pia_ic8_intf)
+	MCFG_PIA6821_ADD("pia_ic3", pia_ic3_intf)
+	MCFG_PIA6821_ADD("pia_ic4", pia_ic4_intf)
+	MCFG_PIA6821_ADD("pia_ic5", pia_ic5_intf)
+	MCFG_PIA6821_ADD("pia_ic6", pia_ic6_intf)
+	MCFG_PIA6821_ADD("pia_ic7", pia_ic7_intf)
+	MCFG_PIA6821_ADD("pia_ic8", pia_ic8_intf)
 
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("ay8913",AY8913, MPU4_MASTER_CLOCK/4)
-	MDRV_SOUND_CONFIG(ay8910_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("ay8913",AY8913, MPU4_MASTER_CLOCK/4)
+	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE((54+1)*8, (32+1)*8)					/* Taken from 6845 init, registers 00 & 04. Normally programmed with (value-1) */
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 31*8-1)		/* Taken from 6845 init, registers 01 & 06 */
-	MDRV_SCREEN_REFRESH_RATE(56)							/* Measured accurately from the flip-flop, but 6845 handles this */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE((54+1)*8, (32+1)*8)					/* Taken from 6845 init, registers 00 & 04. Normally programmed with (value-1) */
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 31*8-1)		/* Taken from 6845 init, registers 01 & 06 */
+	MCFG_SCREEN_REFRESH_RATE(56)							/* Measured accurately from the flip-flop, but 6845 handles this */
 
-	MDRV_GFXDECODE(dealem)
-	MDRV_VIDEO_UPDATE(dealem)
+	MCFG_GFXDECODE(dealem)
+	MCFG_VIDEO_UPDATE(dealem)
 
-	MDRV_PALETTE_LENGTH(32)
-	MDRV_PALETTE_INIT(dealem)
+	MCFG_PALETTE_LENGTH(32)
+	MCFG_PALETTE_INIT(dealem)
 
-	MDRV_MC6845_ADD("crtc", HD6845, MPU4_MASTER_CLOCK / 4 / 8, hd6845_intf)	/* HD68B45 */
+	MCFG_MC6845_ADD("crtc", HD6845, MPU4_MASTER_CLOCK / 4 / 8, hd6845_intf)	/* HD68B45 */
 MACHINE_CONFIG_END
 
 

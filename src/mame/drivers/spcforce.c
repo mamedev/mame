@@ -242,39 +242,39 @@ static MACHINE_CONFIG_START( spcforce, spcforce_state )
 
 	/* basic machine hardware */
 	/* FIXME: The 8085A had a max clock of 6MHz, internally divided by 2! */
-	MDRV_CPU_ADD("maincpu", I8085A, 8000000 * 2)        /* 4.00 MHz??? */
-	MDRV_CPU_PROGRAM_MAP(spcforce_map)
-	MDRV_CPU_VBLANK_INT("screen", irq3_line_pulse)
+	MCFG_CPU_ADD("maincpu", I8085A, 8000000 * 2)        /* 4.00 MHz??? */
+	MCFG_CPU_PROGRAM_MAP(spcforce_map)
+	MCFG_CPU_VBLANK_INT("screen", irq3_line_pulse)
 
-	MDRV_CPU_ADD("audiocpu", I8035, 6144000)		/* divisor ??? */
-	MDRV_CPU_PROGRAM_MAP(spcforce_sound_map)
-	MDRV_CPU_IO_MAP(spcforce_sound_io_map)
+	MCFG_CPU_ADD("audiocpu", I8035, 6144000)		/* divisor ??? */
+	MCFG_CPU_PROGRAM_MAP(spcforce_sound_map)
+	MCFG_CPU_IO_MAP(spcforce_sound_io_map)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
 
-	MDRV_GFXDECODE(spcforce)
-	MDRV_PALETTE_LENGTH(sizeof(colortable_source) / sizeof(colortable_source[0]))
+	MCFG_GFXDECODE(spcforce)
+	MCFG_PALETTE_LENGTH(sizeof(colortable_source) / sizeof(colortable_source[0]))
 
-	MDRV_PALETTE_INIT(spcforce)
-	MDRV_VIDEO_UPDATE(spcforce)
+	MCFG_PALETTE_INIT(spcforce)
+	MCFG_VIDEO_UPDATE(spcforce)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("sn1", SN76496, 2000000)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("sn1", SN76496, 2000000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("sn2", SN76496, 2000000)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("sn2", SN76496, 2000000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("sn3", SN76496, 2000000)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("sn3", SN76496, 2000000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 

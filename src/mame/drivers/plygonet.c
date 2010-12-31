@@ -638,54 +638,54 @@ static const k053936_interface polygonet_k053936_intf =
 
 static MACHINE_CONFIG_START( plygonet, polygonet_state )
 
-	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)	/* 16 MHz (xtal is 32.0 MHz) */
-	MDRV_CPU_PROGRAM_MAP(main_map)
-	MDRV_CPU_VBLANK_INT("screen", polygonet_interrupt)
+	MCFG_CPU_ADD("maincpu", M68EC020, 16000000)	/* 16 MHz (xtal is 32.0 MHz) */
+	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_CPU_VBLANK_INT("screen", polygonet_interrupt)
 
-	MDRV_CPU_ADD("dsp", DSP56156, 40000000)		/* xtal is 40.0 MHz, DSP has an internal divide-by-2 */
-	MDRV_CPU_PROGRAM_MAP(dsp_program_map)
-	MDRV_CPU_DATA_MAP(dsp_data_map)
+	MCFG_CPU_ADD("dsp", DSP56156, 40000000)		/* xtal is 40.0 MHz, DSP has an internal divide-by-2 */
+	MCFG_CPU_PROGRAM_MAP(dsp_program_map)
+	MCFG_CPU_DATA_MAP(dsp_data_map)
 
-	MDRV_CPU_ADD("soundcpu", Z80, 8000000)
-	MDRV_CPU_PROGRAM_MAP(sound_map)
-	MDRV_CPU_PERIODIC_INT(audio_interrupt, 480)
+	MCFG_CPU_ADD("soundcpu", Z80, 8000000)
+	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_CPU_PERIODIC_INT(audio_interrupt, 480)
 
-	MDRV_MACHINE_START(polygonet)
+	MCFG_MACHINE_START(polygonet)
 
-	MDRV_GFXDECODE(plygonet)
+	MCFG_GFXDECODE(plygonet)
 
-	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
 
 	/* TODO: TEMPORARY!  UNTIL A MORE LOCALIZED SYNC CAN BE MADE */
-	MDRV_QUANTUM_TIME(HZ(1200000))
+	MCFG_QUANTUM_TIME(HZ(1200000))
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(64, 64+368-1, 0, 32*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(64, 64+368-1, 0, 32*8-1)
 
-	MDRV_PALETTE_LENGTH(32768)
+	MCFG_PALETTE_LENGTH(32768)
 
-	MDRV_VIDEO_START(polygonet)
-	MDRV_VIDEO_UPDATE(polygonet)
+	MCFG_VIDEO_START(polygonet)
+	MCFG_VIDEO_UPDATE(polygonet)
 
-	MDRV_K053936_ADD("k053936", polygonet_k053936_intf)
+	MCFG_K053936_ADD("k053936", polygonet_k053936_intf)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("konami1", K054539, 48000)
-	MDRV_SOUND_CONFIG(k054539_config)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 0.75)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 0.75)
+	MCFG_SOUND_ADD("konami1", K054539, 48000)
+	MCFG_SOUND_CONFIG(k054539_config)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
 
-	MDRV_SOUND_ADD("konami2", K054539, 48000)
-	MDRV_SOUND_CONFIG(k054539_config)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 0.75)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 0.75)
+	MCFG_SOUND_ADD("konami2", K054539, 48000)
+	MCFG_SOUND_CONFIG(k054539_config)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
 MACHINE_CONFIG_END
 
 

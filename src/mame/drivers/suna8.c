@@ -1497,46 +1497,46 @@ static const samples_interface suna8_samples_interface =
 static MACHINE_CONFIG_START( hardhead, suna8_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(hardhead_map)
-	MDRV_CPU_IO_MAP(hardhead_io_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)		/* No NMI */
+	MCFG_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)	/* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(hardhead_map)
+	MCFG_CPU_IO_MAP(hardhead_io_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)		/* No NMI */
 
-	MDRV_CPU_ADD("audiocpu", Z80, SUNA8_MASTER_CLOCK / 8)	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(hardhead_sound_map)
-	MDRV_CPU_IO_MAP(hardhead_sound_io_map)
-	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)		/* No NMI */
+	MCFG_CPU_ADD("audiocpu", Z80, SUNA8_MASTER_CLOCK / 8)	/* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(hardhead_sound_map)
+	MCFG_CPU_IO_MAP(hardhead_sound_io_map)
+	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,4)		/* No NMI */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(59.10)  /* verified on pcb */
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-16-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(59.10)  /* verified on pcb */
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-16-1)
 
-	MDRV_GFXDECODE(suna8)
-	MDRV_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE(suna8)
+	MCFG_PALETTE_LENGTH(256)
 
-	MDRV_VIDEO_START(suna8_textdim12)
-	MDRV_VIDEO_UPDATE(suna8)
+	MCFG_VIDEO_START(suna8_textdim12)
+	MCFG_VIDEO_UPDATE(suna8)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymsnd", YM3812, SUNA8_MASTER_CLOCK / 8)		/* verified on pcb */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM3812, SUNA8_MASTER_CLOCK / 8)		/* verified on pcb */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MDRV_SOUND_ADD("aysnd", AY8910, SUNA8_MASTER_CLOCK / 16)	/* verified on pcb */
-	MDRV_SOUND_CONFIG(hardhead_ay8910_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
+	MCFG_SOUND_ADD("aysnd", AY8910, SUNA8_MASTER_CLOCK / 16)	/* verified on pcb */
+	MCFG_SOUND_CONFIG(hardhead_ay8910_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 
-	MDRV_SOUND_ADD("samples", SAMPLES, 0)
-	MDRV_SOUND_CONFIG(suna8_samples_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SOUND_CONFIG(suna8_samples_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END
 
 
@@ -1563,45 +1563,45 @@ static const ym2203_interface rranger_ym2203_interface =
 static MACHINE_CONFIG_START( rranger, suna8_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)					/* ? */
-	MDRV_CPU_PROGRAM_MAP(rranger_map)
-	MDRV_CPU_IO_MAP(rranger_io_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)	/* IRQ & NMI ! */
+	MCFG_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)					/* ? */
+	MCFG_CPU_PROGRAM_MAP(rranger_map)
+	MCFG_CPU_IO_MAP(rranger_io_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)	/* IRQ & NMI ! */
 
-	MDRV_CPU_ADD("audiocpu", Z80, SUNA8_MASTER_CLOCK / 4)					/* ? */
-	MDRV_CPU_PROGRAM_MAP(rranger_sound_map)
-	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)	/* NMI = retn */
+	MCFG_CPU_ADD("audiocpu", Z80, SUNA8_MASTER_CLOCK / 4)					/* ? */
+	MCFG_CPU_PROGRAM_MAP(rranger_sound_map)
+	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,4)	/* NMI = retn */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-16-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-16-1)
 
-	MDRV_GFXDECODE(suna8)
-	MDRV_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE(suna8)
+	MCFG_PALETTE_LENGTH(256)
 
-	MDRV_VIDEO_START(suna8_textdim8)
-	MDRV_VIDEO_UPDATE(suna8)
+	MCFG_VIDEO_START(suna8_textdim8)
+	MCFG_VIDEO_UPDATE(suna8)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ym1", YM2203, SUNA8_MASTER_CLOCK / 6)
-	MDRV_SOUND_CONFIG(rranger_ym2203_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
+	MCFG_SOUND_ADD("ym1", YM2203, SUNA8_MASTER_CLOCK / 6)
+	MCFG_SOUND_CONFIG(rranger_ym2203_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
 
-	MDRV_SOUND_ADD("ym2", YM2203, SUNA8_MASTER_CLOCK / 6)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
+	MCFG_SOUND_ADD("ym2", YM2203, SUNA8_MASTER_CLOCK / 6)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
 
-	MDRV_SOUND_ADD("samples", SAMPLES, 0)
-	MDRV_SOUND_CONFIG(suna8_samples_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SOUND_CONFIG(suna8_samples_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END
 
 
@@ -1625,55 +1625,55 @@ static INTERRUPT_GEN( brickzn_interrupt )
 static MACHINE_CONFIG_START( brickzn, suna8_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)		/* SUNA PROTECTION BLOCK */
-	MDRV_CPU_PROGRAM_MAP(brickzn_map)
-//  MDRV_CPU_VBLANK_INT_HACK(brickzn_interrupt, 2)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)	// nmi breaks ramtest but is needed!
+	MCFG_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)		/* SUNA PROTECTION BLOCK */
+	MCFG_CPU_PROGRAM_MAP(brickzn_map)
+//  MCFG_CPU_VBLANK_INT_HACK(brickzn_interrupt, 2)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)	// nmi breaks ramtest but is needed!
 
-	MDRV_CPU_ADD("audiocpu", Z80, SUNA8_MASTER_CLOCK / 4)	/* Z0840006PSC */
-	MDRV_CPU_PROGRAM_MAP(brickzn_sound_map)
+	MCFG_CPU_ADD("audiocpu", Z80, SUNA8_MASTER_CLOCK / 4)	/* Z0840006PSC */
+	MCFG_CPU_PROGRAM_MAP(brickzn_sound_map)
 
-	MDRV_CPU_ADD("pcm", Z80, SUNA8_MASTER_CLOCK / 4)	/* Z0840006PSC */
-	MDRV_CPU_PROGRAM_MAP(brickzn_pcm_map)
-	MDRV_CPU_IO_MAP(brickzn_pcm_io_map)
+	MCFG_CPU_ADD("pcm", Z80, SUNA8_MASTER_CLOCK / 4)	/* Z0840006PSC */
+	MCFG_CPU_PROGRAM_MAP(brickzn_pcm_map)
+	MCFG_CPU_IO_MAP(brickzn_pcm_io_map)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)	// we're using IPT_VBLANK
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-16-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)	// we're using IPT_VBLANK
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-16-1)
 
-	MDRV_GFXDECODE(suna8)
-	MDRV_PALETTE_LENGTH(512)
+	MCFG_GFXDECODE(suna8)
+	MCFG_PALETTE_LENGTH(512)
 
-	MDRV_VIDEO_START(suna8_textdim0)
-	MDRV_VIDEO_UPDATE(suna8)
+	MCFG_VIDEO_START(suna8_textdim0)
+	MCFG_VIDEO_UPDATE(suna8)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymsnd", YM3812, SUNA8_MASTER_CLOCK / 6)
-	MDRV_SOUND_CONFIG(brickzn_ym3812_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM3812, SUNA8_MASTER_CLOCK / 6)
+	MCFG_SOUND_CONFIG(brickzn_ym3812_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MDRV_SOUND_ADD("aysnd", AY8910, SUNA8_MASTER_CLOCK / 16)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.33)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.33)
+	MCFG_SOUND_ADD("aysnd", AY8910, SUNA8_MASTER_CLOCK / 16)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.33)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.33)
 
-	MDRV_SOUND_ADD("dac1", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.17)
+	MCFG_SOUND_ADD("dac1", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.17)
 
-	MDRV_SOUND_ADD("dac2", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.17)
+	MCFG_SOUND_ADD("dac2", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.17)
 
-	MDRV_SOUND_ADD("dac3", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.17)
+	MCFG_SOUND_ADD("dac3", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.17)
 
-	MDRV_SOUND_ADD("dac4", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.17)
+	MCFG_SOUND_ADD("dac4", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.17)
 MACHINE_CONFIG_END
 
 
@@ -1700,12 +1700,12 @@ static MACHINE_RESET( hardhea2 )
 }
 
 static MACHINE_CONFIG_DERIVED( hardhea2, brickzn )
-	MDRV_CPU_MODIFY("maincpu")			/* SUNA T568009 */
-	MDRV_CPU_PROGRAM_MAP(hardhea2_map)
-	MDRV_CPU_VBLANK_INT_HACK(hardhea2_interrupt,2)	/* IRQ & NMI */
+	MCFG_CPU_MODIFY("maincpu")			/* SUNA T568009 */
+	MCFG_CPU_PROGRAM_MAP(hardhea2_map)
+	MCFG_CPU_VBLANK_INT_HACK(hardhea2_interrupt,2)	/* IRQ & NMI */
 
-	MDRV_MACHINE_RESET(hardhea2)
-	MDRV_PALETTE_LENGTH(256)
+	MCFG_MACHINE_RESET(hardhea2)
+	MCFG_PALETTE_LENGTH(256)
 MACHINE_CONFIG_END
 
 
@@ -1726,46 +1726,46 @@ static const ay8910_interface starfigh_ay8910_interface =
 static MACHINE_CONFIG_START( starfigh, suna8_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)					/* ? */
-	MDRV_CPU_PROGRAM_MAP(starfigh_map)
-	MDRV_CPU_VBLANK_INT_HACK(brickzn_interrupt,2)	/* IRQ & NMI */
+	MCFG_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)					/* ? */
+	MCFG_CPU_PROGRAM_MAP(starfigh_map)
+	MCFG_CPU_VBLANK_INT_HACK(brickzn_interrupt,2)	/* IRQ & NMI */
 
 	/* The sound section is identical to that of hardhead */
-	MDRV_CPU_ADD("audiocpu", Z80, SUNA8_MASTER_CLOCK / 4)					/* ? */
-	MDRV_CPU_PROGRAM_MAP(hardhead_sound_map)
-	MDRV_CPU_IO_MAP(hardhead_sound_io_map)
-	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)	/* No NMI */
+	MCFG_CPU_ADD("audiocpu", Z80, SUNA8_MASTER_CLOCK / 4)					/* ? */
+	MCFG_CPU_PROGRAM_MAP(hardhead_sound_map)
+	MCFG_CPU_IO_MAP(hardhead_sound_io_map)
+	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,4)	/* No NMI */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-16-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-16-1)
 
-	MDRV_GFXDECODE(suna8)
-	MDRV_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE(suna8)
+	MCFG_PALETTE_LENGTH(256)
 
-	MDRV_VIDEO_START(suna8_textdim0)
-	MDRV_VIDEO_UPDATE(suna8)
+	MCFG_VIDEO_START(suna8_textdim0)
+	MCFG_VIDEO_UPDATE(suna8)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymsnd", YM3812, SUNA8_MASTER_CLOCK / 6)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM3812, SUNA8_MASTER_CLOCK / 6)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MDRV_SOUND_ADD("aysnd", AY8910, SUNA8_MASTER_CLOCK / 16)
-	MDRV_SOUND_CONFIG(starfigh_ay8910_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	MCFG_SOUND_ADD("aysnd", AY8910, SUNA8_MASTER_CLOCK / 16)
+	MCFG_SOUND_CONFIG(starfigh_ay8910_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
-	MDRV_SOUND_ADD("samples", SAMPLES, 0)
-	MDRV_SOUND_CONFIG(suna8_samples_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SOUND_CONFIG(suna8_samples_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END
 
 
@@ -1786,45 +1786,45 @@ static INTERRUPT_GEN( sparkman_interrupt )
 static MACHINE_CONFIG_START( sparkman, suna8_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)					/* ? */
-	MDRV_CPU_PROGRAM_MAP(sparkman_map)
-	MDRV_CPU_VBLANK_INT_HACK(sparkman_interrupt,2)	/* IRQ & NMI */
+	MCFG_CPU_ADD("maincpu", Z80, SUNA8_MASTER_CLOCK / 4)					/* ? */
+	MCFG_CPU_PROGRAM_MAP(sparkman_map)
+	MCFG_CPU_VBLANK_INT_HACK(sparkman_interrupt,2)	/* IRQ & NMI */
 
-	MDRV_CPU_ADD("audiocpu", Z80, SUNA8_MASTER_CLOCK / 4)				/* ? */
-	MDRV_CPU_PROGRAM_MAP(hardhead_sound_map)
-	MDRV_CPU_IO_MAP(hardhead_sound_io_map)
-	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)	/* No NMI */
+	MCFG_CPU_ADD("audiocpu", Z80, SUNA8_MASTER_CLOCK / 4)				/* ? */
+	MCFG_CPU_PROGRAM_MAP(hardhead_sound_map)
+	MCFG_CPU_IO_MAP(hardhead_sound_io_map)
+	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,4)	/* No NMI */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-16-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-16-1)
 
-	MDRV_GFXDECODE(suna8)
-	MDRV_PALETTE_LENGTH(512)
+	MCFG_GFXDECODE(suna8)
+	MCFG_PALETTE_LENGTH(512)
 
-	MDRV_VIDEO_START(suna8_textdim0)
-	MDRV_VIDEO_UPDATE(suna8)
+	MCFG_VIDEO_START(suna8_textdim0)
+	MCFG_VIDEO_UPDATE(suna8)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymsnd", YM3812, SUNA8_MASTER_CLOCK / 6)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM3812, SUNA8_MASTER_CLOCK / 6)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MDRV_SOUND_ADD("aysnd", AY8910, SUNA8_MASTER_CLOCK / 16)
-	MDRV_SOUND_CONFIG(hardhead_ay8910_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
+	MCFG_SOUND_ADD("aysnd", AY8910, SUNA8_MASTER_CLOCK / 16)
+	MCFG_SOUND_CONFIG(hardhead_ay8910_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.30)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.30)
 
-	MDRV_SOUND_ADD("samples", SAMPLES, 0)
-	MDRV_SOUND_CONFIG(suna8_samples_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SOUND_CONFIG(suna8_samples_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END
 
 

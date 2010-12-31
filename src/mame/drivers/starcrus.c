@@ -137,32 +137,32 @@ static const samples_interface starcrus_samples_interface =
 static MACHINE_CONFIG_START( starcrus, starcrus_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", I8080,9750000/9)  /* 8224 chip is a divide by 9 */
-	MDRV_CPU_PROGRAM_MAP(starcrus_map)
-	MDRV_CPU_IO_MAP(starcrus_io_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("maincpu", I8080,9750000/9)  /* 8224 chip is a divide by 9 */
+	MCFG_CPU_PROGRAM_MAP(starcrus_map)
+	MCFG_CPU_IO_MAP(starcrus_io_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(57)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(57)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 
-	MDRV_GFXDECODE(starcrus)
-	MDRV_PALETTE_LENGTH(2)
+	MCFG_GFXDECODE(starcrus)
+	MCFG_PALETTE_LENGTH(2)
 
-	MDRV_PALETTE_INIT(black_and_white)
-	MDRV_VIDEO_START(starcrus)
-	MDRV_VIDEO_UPDATE(starcrus)
+	MCFG_PALETTE_INIT(black_and_white)
+	MCFG_VIDEO_START(starcrus)
+	MCFG_VIDEO_UPDATE(starcrus)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("samples", SAMPLES, 0)
-	MDRV_SOUND_CONFIG(starcrus_samples_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SOUND_CONFIG(starcrus_samples_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 /***************************************************************************

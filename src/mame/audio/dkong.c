@@ -1370,20 +1370,20 @@ const tms5110_interface tms_interface = {
 
 MACHINE_CONFIG_FRAGMENT( dkong2b_audio )
 
-	MDRV_SOUND_START( dkong )
+	MCFG_SOUND_START( dkong )
 
 	/* sound latches */
 
-	MDRV_LATCH8_ADD("ls175.3d") /* sound cmd latch */
-	MDRV_LATCH8_MASKOUT(0xf0)
-	MDRV_LATCH8_INVERT(0x0F)
+	MCFG_LATCH8_ADD("ls175.3d") /* sound cmd latch */
+	MCFG_LATCH8_MASKOUT(0xf0)
+	MCFG_LATCH8_INVERT(0x0F)
 
-	MDRV_LATCH8_ADD("ls259.6h")
-	MDRV_LATCH8_DISCRETE_NODE("discrete", 0, DS_SOUND0_INP)
-	MDRV_LATCH8_DISCRETE_NODE("discrete", 1, DS_SOUND1_INP)
-	MDRV_LATCH8_DISCRETE_NODE("discrete", 2, DS_SOUND2_INP)
-	MDRV_LATCH8_DISCRETE_NODE("discrete", 6, DS_SOUND6_INP)
-	MDRV_LATCH8_DISCRETE_NODE("discrete", 7, DS_SOUND7_INP)
+	MCFG_LATCH8_ADD("ls259.6h")
+	MCFG_LATCH8_DISCRETE_NODE("discrete", 0, DS_SOUND0_INP)
+	MCFG_LATCH8_DISCRETE_NODE("discrete", 1, DS_SOUND1_INP)
+	MCFG_LATCH8_DISCRETE_NODE("discrete", 2, DS_SOUND2_INP)
+	MCFG_LATCH8_DISCRETE_NODE("discrete", 6, DS_SOUND6_INP)
+	MCFG_LATCH8_DISCRETE_NODE("discrete", 7, DS_SOUND7_INP)
 
 	/*   If P2.Bit7 -> is apparently an external signal decay or other output control
      *   If P2.Bit6 -> activates the external compressed sample ROM (not radarscp1)
@@ -1392,46 +1392,46 @@ MACHINE_CONFIG_FRAGMENT( dkong2b_audio )
      *   P2.Bit2-0  -> select the 256 byte bank for external ROM
      */
 
-	MDRV_LATCH8_ADD( "virtual_p2" )	/* virtual latch for port B */
-	MDRV_LATCH8_INVERT( 0x20 )		/* signal is inverted       */
-	MDRV_LATCH8_DEVREAD(5, "ls259.6h", latch8_r, 3)
-	MDRV_LATCH8_DISCRETE_NODE("discrete", 7, DS_DISCHARGE_INV)
+	MCFG_LATCH8_ADD( "virtual_p2" )	/* virtual latch for port B */
+	MCFG_LATCH8_INVERT( 0x20 )		/* signal is inverted       */
+	MCFG_LATCH8_DEVREAD(5, "ls259.6h", latch8_r, 3)
+	MCFG_LATCH8_DISCRETE_NODE("discrete", 7, DS_DISCHARGE_INV)
 
-	MDRV_CPU_ADD("soundcpu", MB8884, I8035_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(dkong_sound_map)
-	MDRV_CPU_IO_MAP(dkong_sound_io_map)
+	MCFG_CPU_ADD("soundcpu", MB8884, I8035_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(dkong_sound_map)
+	MCFG_CPU_IO_MAP(dkong_sound_io_map)
 
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG_DISCRETE(dkong2b)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_SOUND_CONFIG_DISCRETE(dkong2b)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED( radarscp_audio, dkong2b_audio )
-	MDRV_SOUND_MODIFY("discrete")
-	MDRV_SOUND_CONFIG_DISCRETE(radarscp)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.7)
+	MCFG_SOUND_MODIFY("discrete")
+	MCFG_SOUND_CONFIG_DISCRETE(radarscp)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.7)
 
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_DERIVED( radarscp1_audio, radarscp_audio )
-	MDRV_CPU_MODIFY("soundcpu")
-	MDRV_CPU_IO_MAP(radarscp1_sound_io_map)
+	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_CPU_IO_MAP(radarscp1_sound_io_map)
 
 	/* virtual_p2 is not read -see memory map-, all bits are output bits */
-	MDRV_LATCH8_ADD( "virtual_p1" )	/* virtual latch for port A */
-	MDRV_LATCH8_INVERT( 0x80 )		/* signal is inverted       */
-	MDRV_LATCH8_DEVREAD(7, "ls259.6h", latch8_r, 3)
-	MDRV_LATCH8_DEVREAD(6, "tms", m58817_status_r, 0)
+	MCFG_LATCH8_ADD( "virtual_p1" )	/* virtual latch for port A */
+	MCFG_LATCH8_INVERT( 0x80 )		/* signal is inverted       */
+	MCFG_LATCH8_DEVREAD(7, "ls259.6h", latch8_r, 3)
+	MCFG_LATCH8_DEVREAD(6, "tms", m58817_status_r, 0)
 
 	/* tms memory controller */
-	MDRV_DEVICE_ADD("m58819", M58819, 0)
+	MCFG_DEVICE_ADD("m58819", M58819, 0)
 
-	MDRV_SOUND_ADD("tms", M58817, XTAL_640kHz)
-	MDRV_DEVICE_CONFIG(tms_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("tms", M58817, XTAL_640kHz)
+	MCFG_DEVICE_CONFIG(tms_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_CONFIG_END
 
@@ -1439,62 +1439,62 @@ MACHINE_CONFIG_FRAGMENT( dkongjr_audio )
 
 	/* sound latches */
 
-	MDRV_LATCH8_ADD("ls174.3d")
-	MDRV_LATCH8_MASKOUT(0xE0)
+	MCFG_LATCH8_ADD("ls174.3d")
+	MCFG_LATCH8_MASKOUT(0xE0)
 
-	MDRV_LATCH8_ADD( "ls259.6h")
-	MDRV_LATCH8_DISCRETE_NODE("discrete", 0, DS_SOUND0_INP)
-	MDRV_LATCH8_DISCRETE_NODE("discrete", 1, DS_SOUND1_INP)
-	MDRV_LATCH8_DISCRETE_NODE("discrete", 2, DS_SOUND2_INP)
-	MDRV_LATCH8_DISCRETE_NODE("discrete", 7, DS_SOUND7_INP)
+	MCFG_LATCH8_ADD( "ls259.6h")
+	MCFG_LATCH8_DISCRETE_NODE("discrete", 0, DS_SOUND0_INP)
+	MCFG_LATCH8_DISCRETE_NODE("discrete", 1, DS_SOUND1_INP)
+	MCFG_LATCH8_DISCRETE_NODE("discrete", 2, DS_SOUND2_INP)
+	MCFG_LATCH8_DISCRETE_NODE("discrete", 7, DS_SOUND7_INP)
 
-	MDRV_LATCH8_ADD( "ls259.5h")
-	MDRV_LATCH8_DISCRETE_NODE("discrete", 1, DS_SOUND9_INP)
+	MCFG_LATCH8_ADD( "ls259.5h")
+	MCFG_LATCH8_DISCRETE_NODE("discrete", 1, DS_SOUND9_INP)
 
-	MDRV_LATCH8_ADD( "ls259.4h")
+	MCFG_LATCH8_ADD( "ls259.4h")
 
-	MDRV_LATCH8_ADD( "virtual_p2" )	/* virtual latch for port B */
-	MDRV_LATCH8_INVERT( 0x70 )		/* all signals are inverted */
-	MDRV_LATCH8_DEVREAD(6, "ls259.4h", latch8_r, 1)
-	MDRV_LATCH8_DEVREAD(5, "ls259.6h", latch8_r, 3)
-	MDRV_LATCH8_DEVREAD(4, "ls259.6h", latch8_r, 6)
-	MDRV_LATCH8_DISCRETE_NODE("discrete", 7, DS_DISCHARGE_INV)
+	MCFG_LATCH8_ADD( "virtual_p2" )	/* virtual latch for port B */
+	MCFG_LATCH8_INVERT( 0x70 )		/* all signals are inverted */
+	MCFG_LATCH8_DEVREAD(6, "ls259.4h", latch8_r, 1)
+	MCFG_LATCH8_DEVREAD(5, "ls259.6h", latch8_r, 3)
+	MCFG_LATCH8_DEVREAD(4, "ls259.6h", latch8_r, 6)
+	MCFG_LATCH8_DISCRETE_NODE("discrete", 7, DS_DISCHARGE_INV)
 
-	MDRV_CPU_ADD("soundcpu", MB8884, I8035_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(dkong_sound_map)
-	MDRV_CPU_IO_MAP(dkongjr_sound_io_map)
+	MCFG_CPU_ADD("soundcpu", MB8884, I8035_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(dkong_sound_map)
+	MCFG_CPU_IO_MAP(dkongjr_sound_io_map)
 
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG_DISCRETE(dkongjr)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_SOUND_CONFIG_DISCRETE(dkongjr)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_FRAGMENT( dkong3_audio )
 
-	MDRV_CPU_ADD("n2a03a", N2A03,N2A03_DEFAULTCLOCK)
-	MDRV_CPU_PROGRAM_MAP(dkong3_sound1_map)
-	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_ADD("n2a03a", N2A03,N2A03_DEFAULTCLOCK)
+	MCFG_CPU_PROGRAM_MAP(dkong3_sound1_map)
+	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-	MDRV_CPU_ADD("n2a03b", N2A03,N2A03_DEFAULTCLOCK)
-	MDRV_CPU_PROGRAM_MAP(dkong3_sound2_map)
-	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_ADD("n2a03b", N2A03,N2A03_DEFAULTCLOCK)
+	MCFG_CPU_PROGRAM_MAP(dkong3_sound2_map)
+	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	/* sound latches */
-	MDRV_LATCH8_ADD( "latch1")
-	MDRV_LATCH8_ADD( "latch2")
-	MDRV_LATCH8_ADD( "latch3")
+	MCFG_LATCH8_ADD( "latch1")
+	MCFG_LATCH8_ADD( "latch2")
+	MCFG_LATCH8_ADD( "latch3")
 
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("nes1", NES, N2A03_DEFAULTCLOCK)
-	MDRV_SOUND_CONFIG(nes_interface_1)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("nes1", NES, N2A03_DEFAULTCLOCK)
+	MCFG_SOUND_CONFIG(nes_interface_1)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD("nes2", NES, N2A03_DEFAULTCLOCK)
-	MDRV_SOUND_CONFIG(nes_interface_2)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("nes2", NES, N2A03_DEFAULTCLOCK)
+	MCFG_SOUND_CONFIG(nes_interface_2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 MACHINE_CONFIG_END
 

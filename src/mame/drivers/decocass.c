@@ -629,248 +629,248 @@ static PALETTE_INIT( decocass )
 static MACHINE_CONFIG_START( decocass, decocass_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6502, HCLK4)
-	MDRV_CPU_PROGRAM_MAP(decocass_map)
+	MCFG_CPU_ADD("maincpu", M6502, HCLK4)
+	MCFG_CPU_PROGRAM_MAP(decocass_map)
 
-	MDRV_CPU_ADD("audiocpu", M6502, HCLK1/3/2)
-	MDRV_CPU_PROGRAM_MAP(decocass_sound_map)
-	MDRV_TIMER_ADD_SCANLINE("audionmi", decocass_audio_nmi_gen, "screen", 0, 8)
+	MCFG_CPU_ADD("audiocpu", M6502, HCLK1/3/2)
+	MCFG_CPU_PROGRAM_MAP(decocass_sound_map)
+	MCFG_TIMER_ADD_SCANLINE("audionmi", decocass_audio_nmi_gen, "screen", 0, 8)
 
-	MDRV_CPU_ADD("mcu", I8041, HCLK)
-	MDRV_CPU_IO_MAP(decocass_mcu_portmap)
+	MCFG_CPU_ADD("mcu", I8041, HCLK)
+	MCFG_CPU_IO_MAP(decocass_mcu_portmap)
 
-	MDRV_QUANTUM_TIME(HZ(4200))				/* interleave CPUs */
+	MCFG_QUANTUM_TIME(HZ(4200))				/* interleave CPUs */
 
-	MDRV_MACHINE_START(decocass)
-	MDRV_MACHINE_RESET(decocass)
+	MCFG_MACHINE_START(decocass)
+	MCFG_MACHINE_RESET(decocass)
 
-	MDRV_DECOCASS_TAPE_ADD("cassette")
+	MCFG_DECOCASS_TAPE_ADD("cassette")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(HCLK, 384, 8, 248, 272, 8, 248)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_RAW_PARAMS(HCLK, 384, 8, 248, 272, 8, 248)
 
-	MDRV_GFXDECODE(decocass)
-	MDRV_PALETTE_LENGTH(32+2*8+2*4)
+	MCFG_GFXDECODE(decocass)
+	MCFG_PALETTE_LENGTH(32+2*8+2*4)
 
-	MDRV_PALETTE_INIT(decocass)
-	MDRV_VIDEO_START(decocass)
-	MDRV_VIDEO_UPDATE(decocass)
+	MCFG_PALETTE_INIT(decocass)
+	MCFG_VIDEO_START(decocass)
+	MCFG_VIDEO_UPDATE(decocass)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay1", AY8910, HCLK2)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	MCFG_SOUND_ADD("ay1", AY8910, HCLK2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-	MDRV_SOUND_ADD("ay2", AY8910, HCLK2)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	MCFG_SOUND_ADD("ay2", AY8910, HCLK2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( ctsttape, decocass )
 
 	/* basic machine hardware */
-	MDRV_MACHINE_RESET(ctsttape)
+	MCFG_MACHINE_RESET(ctsttape)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( chwy, decocass )
 
 	/* basic machine hardware */
-	MDRV_MACHINE_RESET(chwy)
+	MCFG_MACHINE_RESET(chwy)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( clocknch, decocass )
 
 	/* basic machine hardware */
-	MDRV_MACHINE_RESET(clocknch)
+	MCFG_MACHINE_RESET(clocknch)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( ctisland, decocass )
 
 	/* basic machine hardware */
-	MDRV_MACHINE_RESET(ctisland)
+	MCFG_MACHINE_RESET(ctisland)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( csuperas, decocass )
 
 	/* basic machine hardware */
-	MDRV_MACHINE_RESET(csuperas)
+	MCFG_MACHINE_RESET(csuperas)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( castfant, decocass )
 
 	/* basic machine hardware */
-	MDRV_MACHINE_RESET(castfant)
+	MCFG_MACHINE_RESET(castfant)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( cluckypo, decocass )
 
 	/* basic machine hardware */
-	MDRV_MACHINE_RESET(cluckypo)
+	MCFG_MACHINE_RESET(cluckypo)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( cterrani, decocass )
 
 	/* basic machine hardware */
-	MDRV_MACHINE_RESET(cterrani)
+	MCFG_MACHINE_RESET(cterrani)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( cexplore, decocass )
 
 	/* basic machine hardware */
-	MDRV_MACHINE_RESET(cexplore)
+	MCFG_MACHINE_RESET(cexplore)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( cprogolf, decocass )
 
 	/* basic machine hardware */
-	MDRV_MACHINE_RESET(cprogolf)
+	MCFG_MACHINE_RESET(cprogolf)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( cmissnx, decocass )
 
 	/* basic machine hardware */
-	MDRV_MACHINE_RESET(cmissnx)
+	MCFG_MACHINE_RESET(cmissnx)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( cdiscon1, decocass )
 
 	/* basic machine hardware */
-	MDRV_MACHINE_RESET(cdiscon1)
+	MCFG_MACHINE_RESET(cdiscon1)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( cptennis, decocass )
 
 	/* basic machine hardware */
-	MDRV_MACHINE_RESET(cptennis)
+	MCFG_MACHINE_RESET(cptennis)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( ctornado, decocass )
 
 	/* basic machine hardware */
-	MDRV_MACHINE_RESET(ctornado)
+	MCFG_MACHINE_RESET(ctornado)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( cbnj, decocass )
 
 	/* basic machine hardware */
-	MDRV_MACHINE_RESET(cbnj)
+	MCFG_MACHINE_RESET(cbnj)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( cburnrub, decocass )
 
 	/* basic machine hardware */
-	MDRV_MACHINE_RESET(cburnrub)
+	MCFG_MACHINE_RESET(cburnrub)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( cbtime, decocass )
 
 	/* basic machine hardware */
-	MDRV_MACHINE_RESET(cbtime)
+	MCFG_MACHINE_RESET(cbtime)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( cgraplop, decocass )
 
 	/* basic machine hardware */
-	MDRV_MACHINE_RESET(cgraplop)
+	MCFG_MACHINE_RESET(cgraplop)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( cgraplop2, decocass )
 
 	/* basic machine hardware */
-	MDRV_MACHINE_RESET(cgraplop2)
+	MCFG_MACHINE_RESET(cgraplop2)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( clapapa, decocass )
 
 	/* basic machine hardware */
-	MDRV_MACHINE_RESET(clapapa)
+	MCFG_MACHINE_RESET(clapapa)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( cfghtice, decocass )
 
 	/* basic machine hardware */
-	MDRV_MACHINE_RESET(cfghtice)
+	MCFG_MACHINE_RESET(cfghtice)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( cprobowl, decocass )
 
 	/* basic machine hardware */
-	MDRV_MACHINE_RESET(cprobowl)
+	MCFG_MACHINE_RESET(cprobowl)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( cnightst, decocass )
 
 	/* basic machine hardware */
-	MDRV_MACHINE_RESET(cnightst)
+	MCFG_MACHINE_RESET(cnightst)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( cprosocc, decocass )
 
 	/* basic machine hardware */
-	MDRV_MACHINE_RESET(cprosocc)
+	MCFG_MACHINE_RESET(cprosocc)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( cppicf, decocass )
 
 	/* basic machine hardware */
-	MDRV_MACHINE_RESET(cppicf)
+	MCFG_MACHINE_RESET(cppicf)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( cbdash, decocass )
 
 	/* basic machine hardware */
-	MDRV_MACHINE_RESET(cbdash)
+	MCFG_MACHINE_RESET(cbdash)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( cscrtry, decocass )
 
 	/* basic machine hardware */
-	MDRV_MACHINE_RESET(cscrtry)
+	MCFG_MACHINE_RESET(cscrtry)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( cflyball, decocass )
 
 	/* basic machine hardware */
-	MDRV_MACHINE_RESET(cflyball)
+	MCFG_MACHINE_RESET(cflyball)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( czeroize, decocass )
 
 	/* basic machine hardware */
-	MDRV_MACHINE_RESET(czeroize)
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(1*8, 32*8-1, 1*8, 31*8-1)
+	MCFG_MACHINE_RESET(czeroize)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(1*8, 32*8-1, 1*8, 31*8-1)
 MACHINE_CONFIG_END
 
 

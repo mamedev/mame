@@ -984,133 +984,133 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( root, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/3/2)	/* 3.072 MHz */
-	MDRV_CPU_PROGRAM_MAP(cclimber_map)
-	MDRV_CPU_IO_MAP(cclimber_portmap)
-	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/3/2)	/* 3.072 MHz */
+	MCFG_CPU_PROGRAM_MAP(cclimber_map)
+	MCFG_CPU_IO_MAP(cclimber_portmap)
+	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-	MDRV_MACHINE_RESET(cclimber)
+	MCFG_MACHINE_RESET(cclimber)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(cclimber)
-	MDRV_PALETTE_LENGTH(16*4+8*4)
+	MCFG_GFXDECODE(cclimber)
+	MCFG_PALETTE_LENGTH(16*4+8*4)
 
-	MDRV_PALETTE_INIT(cclimber)
-	MDRV_VIDEO_START(cclimber)
-	MDRV_VIDEO_UPDATE(cclimber)
+	MCFG_PALETTE_INIT(cclimber)
+	MCFG_VIDEO_START(cclimber)
+	MCFG_VIDEO_UPDATE(cclimber)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( cclimber, root )
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK/3/2/2)
-	MDRV_SOUND_CONFIG(cclimber_ay8910_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK/3/2/2)
+	MCFG_SOUND_CONFIG(cclimber_ay8910_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD("samples", SAMPLES, 0)
-	MDRV_SOUND_CONFIG(cclimber_samples_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SOUND_CONFIG(cclimber_samples_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( cannonb, cclimber )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(cannonb_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(cannonb_map)
 
 	/* video hardware */
-	MDRV_GFXDECODE(cannonb)
+	MCFG_GFXDECODE(cannonb)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( yamato, root )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(yamato_map)
-	MDRV_CPU_IO_MAP(yamato_portmap)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(yamato_map)
+	MCFG_CPU_IO_MAP(yamato_portmap)
 
-	MDRV_CPU_ADD("audiocpu", Z80, 3072000) /* 3.072 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(yamato_audio_map)
-	MDRV_CPU_IO_MAP(yamato_audio_portmap)
+	MCFG_CPU_ADD("audiocpu", Z80, 3072000) /* 3.072 MHz ? */
+	MCFG_CPU_PROGRAM_MAP(yamato_audio_map)
+	MCFG_CPU_IO_MAP(yamato_audio_portmap)
 
 	/* video hardware */
-	MDRV_PALETTE_LENGTH(16*4+8*4+256)
-	MDRV_PALETTE_INIT(yamato)
-	MDRV_VIDEO_UPDATE(yamato)
+	MCFG_PALETTE_LENGTH(16*4+8*4+256)
+	MCFG_PALETTE_INIT(yamato)
+	MCFG_VIDEO_UPDATE(yamato)
 
 	/* audio hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay1", AY8910, 1536000)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("ay1", AY8910, 1536000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD("ay2", AY8910, 1536000)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("ay2", AY8910, 1536000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( toprollr, cclimber )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(toprollr_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(toprollr_map)
 
 	/* video hardware */
-	MDRV_GFXDECODE(toprollr)
-	MDRV_PALETTE_LENGTH(32*5)
-	MDRV_PALETTE_INIT(toprollr)
+	MCFG_GFXDECODE(toprollr)
+	MCFG_PALETTE_LENGTH(32*5)
+	MCFG_PALETTE_INIT(toprollr)
 
-	MDRV_VIDEO_START(toprollr)
-	MDRV_VIDEO_UPDATE(toprollr)
+	MCFG_VIDEO_START(toprollr)
+	MCFG_VIDEO_UPDATE(toprollr)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( swimmer, driver_device )
 
 	/* basic machine hardware */
-    MDRV_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)    /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(swimmer_map)
-	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
+    MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/6)    /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(swimmer_map)
+	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-    MDRV_CPU_ADD("audiocpu", Z80,XTAL_4MHz/2)  /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(swimmer_audio_map)
-	MDRV_CPU_IO_MAP(swimmer_audio_portmap)
-	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, (double)4000000/16384) /* IRQs are triggered by the main CPU */
+    MCFG_CPU_ADD("audiocpu", Z80,XTAL_4MHz/2)  /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(swimmer_audio_map)
+	MCFG_CPU_IO_MAP(swimmer_audio_portmap)
+	MCFG_CPU_PERIODIC_INT(nmi_line_pulse, (double)4000000/16384) /* IRQs are triggered by the main CPU */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-    MDRV_SCREEN_REFRESH_RATE(60.57) /* verified on pcb */
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+    MCFG_SCREEN_REFRESH_RATE(60.57) /* verified on pcb */
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(swimmer)
-	MDRV_PALETTE_LENGTH(32*8+4*8+1)
+	MCFG_GFXDECODE(swimmer)
+	MCFG_PALETTE_LENGTH(32*8+4*8+1)
 
-	MDRV_PALETTE_INIT(swimmer)
-	MDRV_VIDEO_START(swimmer)
-	MDRV_VIDEO_UPDATE(swimmer)
+	MCFG_PALETTE_INIT(swimmer)
+	MCFG_VIDEO_START(swimmer)
+	MCFG_VIDEO_UPDATE(swimmer)
 
 	/* audio hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-    MDRV_SOUND_ADD("ay1", AY8910, XTAL_4MHz/2)  /* verified on pcb */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+    MCFG_SOUND_ADD("ay1", AY8910, XTAL_4MHz/2)  /* verified on pcb */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-    MDRV_SOUND_ADD("ay2", AY8910, XTAL_4MHz/2)  /* verified on pcb */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+    MCFG_SOUND_ADD("ay2", AY8910, XTAL_4MHz/2)  /* verified on pcb */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 

@@ -19,8 +19,8 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MDRV_MC146818_ADD(_tag, _type) \
-	MDRV_DEVICE_ADD(_tag, MC146818, 0) \
+#define MCFG_MC146818_ADD(_tag, _type) \
+	MCFG_DEVICE_ADD(_tag, MC146818, 0) \
 	mc146818_device_config::static_set_type(device, mc146818_device_config::_type); \
 
 

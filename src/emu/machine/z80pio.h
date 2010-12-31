@@ -40,9 +40,9 @@
 //  DEVICE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MDRV_Z80PIO_ADD(_tag, _clock, _intrf) \
-	MDRV_DEVICE_ADD(_tag, Z80PIO, _clock) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_Z80PIO_ADD(_tag, _clock, _intrf) \
+	MCFG_DEVICE_ADD(_tag, Z80PIO, _clock) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
 #define Z80PIO_INTERFACE(_name) \
 	const z80pio_interface (_name) =

@@ -502,118 +502,118 @@ static MACHINE_RESET( wwjgtin )
 static MACHINE_CONFIG_START( base, lasso_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6502, 11289000/16)	/* guess */
-	MDRV_CPU_PROGRAM_MAP(lasso_main_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("maincpu", M6502, 11289000/16)	/* guess */
+	MCFG_CPU_PROGRAM_MAP(lasso_main_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audiocpu", M6502, 600000)
-	MDRV_CPU_PROGRAM_MAP(lasso_audio_map)
+	MCFG_CPU_ADD("audiocpu", M6502, 600000)
+	MCFG_CPU_PROGRAM_MAP(lasso_audio_map)
 
-	MDRV_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(HZ(6000))
 
-	MDRV_MACHINE_START(lasso)
-	MDRV_MACHINE_RESET(lasso)
+	MCFG_MACHINE_START(lasso)
+	MCFG_MACHINE_RESET(lasso)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(57)	/* guess, but avoids glitching of Chameleon's high score table */
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(57)	/* guess, but avoids glitching of Chameleon's high score table */
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(lasso)
-	MDRV_PALETTE_LENGTH(0x40)
+	MCFG_GFXDECODE(lasso)
+	MCFG_PALETTE_LENGTH(0x40)
 
-	MDRV_PALETTE_INIT(lasso)
-	MDRV_VIDEO_START(lasso)
-	MDRV_VIDEO_UPDATE(lasso)
+	MCFG_PALETTE_INIT(lasso)
+	MCFG_VIDEO_START(lasso)
+	MCFG_VIDEO_UPDATE(lasso)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("sn76489.1", SN76489, 2000000)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("sn76489.1", SN76489, 2000000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("sn76489.2", SN76489, 2000000)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("sn76489.2", SN76489, 2000000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( lasso, base )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("blitter", M6502, 11289000/16)	/* guess */
-	MDRV_CPU_PROGRAM_MAP(lasso_coprocessor_map)
+	MCFG_CPU_ADD("blitter", M6502, 11289000/16)	/* guess */
+	MCFG_CPU_PROGRAM_MAP(lasso_coprocessor_map)
 
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( chameleo, base )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(chameleo_main_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(chameleo_main_map)
 
-	MDRV_CPU_MODIFY("audiocpu")
-	MDRV_CPU_PROGRAM_MAP(chameleo_audio_map)
+	MCFG_CPU_MODIFY("audiocpu")
+	MCFG_CPU_PROGRAM_MAP(chameleo_audio_map)
 
 	/* video hardware */
-	MDRV_VIDEO_UPDATE(chameleo)
+	MCFG_VIDEO_UPDATE(chameleo)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( wwjgtin, base )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(wwjgtin_main_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(wwjgtin_main_map)
 
-	MDRV_CPU_MODIFY("audiocpu")
-	MDRV_CPU_PROGRAM_MAP(wwjgtin_audio_map)
+	MCFG_CPU_MODIFY("audiocpu")
+	MCFG_CPU_PROGRAM_MAP(wwjgtin_audio_map)
 
-	MDRV_MACHINE_START(wwjgtin)
-	MDRV_MACHINE_RESET(wwjgtin)
+	MCFG_MACHINE_START(wwjgtin)
+	MCFG_MACHINE_RESET(wwjgtin)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)	// Smaller visible area?
-	MDRV_GFXDECODE(wwjgtin)	// Has 1 additional layer
-	MDRV_PALETTE_LENGTH(0x40 + 16*16)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)	// Smaller visible area?
+	MCFG_GFXDECODE(wwjgtin)	// Has 1 additional layer
+	MCFG_PALETTE_LENGTH(0x40 + 16*16)
 
-	MDRV_PALETTE_INIT(wwjgtin)
-	MDRV_VIDEO_START(wwjgtin)
-	MDRV_VIDEO_UPDATE(wwjgtin)
+	MCFG_PALETTE_INIT(wwjgtin)
+	MCFG_VIDEO_START(wwjgtin)
+	MCFG_VIDEO_UPDATE(wwjgtin)
 
 	/* sound hardware */
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pinbo, base )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(pinbo_main_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(pinbo_main_map)
 
-	MDRV_CPU_REPLACE("audiocpu", Z80, 3000000)
-	MDRV_CPU_PROGRAM_MAP(pinbo_audio_map)
-	MDRV_CPU_IO_MAP(pinbo_audio_io_map)
+	MCFG_CPU_REPLACE("audiocpu", Z80, 3000000)
+	MCFG_CPU_PROGRAM_MAP(pinbo_audio_map)
+	MCFG_CPU_IO_MAP(pinbo_audio_io_map)
 
 	/* video hardware */
-	MDRV_GFXDECODE(pinbo)
-	MDRV_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE(pinbo)
+	MCFG_PALETTE_LENGTH(256)
 
-	MDRV_PALETTE_INIT(RRRR_GGGG_BBBB)
-	MDRV_VIDEO_START(pinbo)
-	MDRV_VIDEO_UPDATE(pinbo)
+	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
+	MCFG_VIDEO_START(pinbo)
+	MCFG_VIDEO_UPDATE(pinbo)
 
 	/* sound hardware */
-	MDRV_DEVICE_REMOVE("sn76489.1")
-	MDRV_DEVICE_REMOVE("sn76489.2")
+	MCFG_DEVICE_REMOVE("sn76489.1")
+	MCFG_DEVICE_REMOVE("sn76489.2")
 
-	MDRV_SOUND_ADD("ay1", AY8910, 1250000)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.55)
+	MCFG_SOUND_ADD("ay1", AY8910, 1250000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.55)
 
-	MDRV_SOUND_ADD("ay2", AY8910, 1250000)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.55)
+	MCFG_SOUND_ADD("ay2", AY8910, 1250000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.55)
 MACHINE_CONFIG_END
 
 

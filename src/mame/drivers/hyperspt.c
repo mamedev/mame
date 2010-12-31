@@ -272,62 +272,62 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( hyperspt, hyperspt_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6809, XTAL_18_432MHz/12)	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(hyperspt_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("maincpu", M6809, XTAL_18_432MHz/12)	/* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(hyperspt_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audiocpu", Z80,XTAL_14_31818MHz/4) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(sound_map)
+	MCFG_CPU_ADD("audiocpu", Z80,XTAL_14_31818MHz/4) /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(hyperspt)
-	MDRV_PALETTE_LENGTH(16*16+16*16)
+	MCFG_GFXDECODE(hyperspt)
+	MCFG_PALETTE_LENGTH(16*16+16*16)
 
-	MDRV_PALETTE_INIT(hyperspt)
-	MDRV_VIDEO_START(hyperspt)
-	MDRV_VIDEO_UPDATE(hyperspt)
+	MCFG_PALETTE_INIT(hyperspt)
+	MCFG_VIDEO_START(hyperspt)
+	MCFG_VIDEO_UPDATE(hyperspt)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("trackfld_audio", TRACKFLD_AUDIO, 0)
+	MCFG_SOUND_ADD("trackfld_audio", TRACKFLD_AUDIO, 0)
 
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MDRV_SOUND_ADD("snsnd", SN76496, XTAL_14_31818MHz/8) /* verified on pcb */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("snsnd", SN76496, XTAL_14_31818MHz/8) /* verified on pcb */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("vlm", VLM5030, XTAL_3_579545MHz) /* verified on pcb */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("vlm", VLM5030, XTAL_3_579545MHz) /* verified on pcb */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( hypersptb, hyperspt )
-	MDRV_DEVICE_REMOVE("vlm")
+	MCFG_DEVICE_REMOVE("vlm")
 
-	MDRV_CPU_MODIFY("audiocpu")
-	MDRV_CPU_PROGRAM_MAP(soundb_map)
+	MCFG_CPU_MODIFY("audiocpu")
+	MCFG_CPU_PROGRAM_MAP(soundb_map)
 
-	MDRV_FRAGMENT_ADD(hyprolyb_adpcm)
+	MCFG_FRAGMENT_ADD(hyprolyb_adpcm)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( roadf, hyperspt )
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(roadf_map)
-	MDRV_GFXDECODE(roadf)
-	MDRV_VIDEO_START(roadf)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(roadf_map)
+	MCFG_GFXDECODE(roadf)
+	MCFG_VIDEO_START(roadf)
 MACHINE_CONFIG_END
 
 

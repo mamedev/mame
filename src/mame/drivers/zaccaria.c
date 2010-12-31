@@ -579,57 +579,57 @@ static const tms5220_interface tms5220_config =
 static MACHINE_CONFIG_START( zaccaria, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80,XTAL_18_432MHz/6)	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(main_map)
-	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
-	MDRV_QUANTUM_TIME(HZ(1000000))
+	MCFG_CPU_ADD("maincpu", Z80,XTAL_18_432MHz/6)	/* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_QUANTUM_TIME(HZ(1000000))
 
-	MDRV_CPU_ADD("audiocpu", M6802,XTAL_3_579545MHz) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(sound_map_1)
-	MDRV_CPU_PERIODIC_INT(zaccaria_cb1_toggle,(double)XTAL_3_579545MHz/4096)
-	MDRV_QUANTUM_TIME(HZ(1000000))
+	MCFG_CPU_ADD("audiocpu", M6802,XTAL_3_579545MHz) /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(sound_map_1)
+	MCFG_CPU_PERIODIC_INT(zaccaria_cb1_toggle,(double)XTAL_3_579545MHz/4096)
+	MCFG_QUANTUM_TIME(HZ(1000000))
 
-	MDRV_CPU_ADD("audio2", M6802,XTAL_3_579545MHz) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(sound_map_2)
-	MDRV_QUANTUM_TIME(HZ(1000000))
+	MCFG_CPU_ADD("audio2", M6802,XTAL_3_579545MHz) /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(sound_map_2)
+	MCFG_QUANTUM_TIME(HZ(1000000))
 
-	MDRV_PPI8255_ADD( "ppi8255", ppi8255_config )
-	MDRV_PIA6821_ADD( "pia0", pia_0_config )
-	MDRV_PIA6821_ADD( "pia1", pia_1_config )
+	MCFG_PPI8255_ADD( "ppi8255", ppi8255_config )
+	MCFG_PIA6821_ADD( "pia0", pia_0_config )
+	MCFG_PIA6821_ADD( "pia1", pia_1_config )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60.57) /* verified on pcb */
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60.57) /* verified on pcb */
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(zaccaria)
-	MDRV_PALETTE_LENGTH(32*8+32*8)
+	MCFG_GFXDECODE(zaccaria)
+	MCFG_PALETTE_LENGTH(32*8+32*8)
 
-	MDRV_PALETTE_INIT(zaccaria)
-	MDRV_VIDEO_START(zaccaria)
-	MDRV_VIDEO_UPDATE(zaccaria)
+	MCFG_PALETTE_INIT(zaccaria)
+	MCFG_VIDEO_START(zaccaria)
+	MCFG_VIDEO_UPDATE(zaccaria)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay1", AY8910, XTAL_3_579545MHz/2) /* verified on pcb */
-	MDRV_SOUND_CONFIG(ay8910_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL_3_579545MHz/2) /* verified on pcb */
+	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MDRV_SOUND_ADD("ay2", AY8910, XTAL_3_579545MHz/2) /* verified on pcb */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL_3_579545MHz/2) /* verified on pcb */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MDRV_SOUND_ADD("dac2", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_SOUND_ADD("dac2", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
 	/* There is no xtal, the clock is obtained from a RC oscillator as shown in the TMS5220 datasheet (R=100kOhm C=22pF) */
 	/* 162kHz measured on pin 3 20 minutesa fter power on. Clock would then be 162*4=648kHz. */
-	MDRV_SOUND_ADD("tms", TMS5200, 649200) /* ROMCLK pin measured at 162.3Khz, OSC is exactly *4 of that) */
-	MDRV_SOUND_CONFIG(tms5220_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_SOUND_ADD("tms", TMS5200, 649200) /* ROMCLK pin measured at 162.3Khz, OSC is exactly *4 of that) */
+	MCFG_SOUND_CONFIG(tms5220_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
 

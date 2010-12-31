@@ -292,31 +292,31 @@ static const samples_interface tankbatt_samples_interface =
 static MACHINE_CONFIG_START( tankbatt, tankbatt_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6502, 1000000)	/* 1 MHz ???? */
-	MDRV_CPU_PROGRAM_MAP(main_map)
-	MDRV_CPU_VBLANK_INT("screen", tankbatt_interrupt)
+	MCFG_CPU_ADD("maincpu", M6502, 1000000)	/* 1 MHz ???? */
+	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_CPU_VBLANK_INT("screen", tankbatt_interrupt)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(tankbatt)
-	MDRV_PALETTE_LENGTH(256*2)
+	MCFG_GFXDECODE(tankbatt)
+	MCFG_PALETTE_LENGTH(256*2)
 
-	MDRV_PALETTE_INIT(tankbatt)
-	MDRV_VIDEO_START(tankbatt)
-	MDRV_VIDEO_UPDATE(tankbatt)
+	MCFG_PALETTE_INIT(tankbatt)
+	MCFG_VIDEO_START(tankbatt)
+	MCFG_VIDEO_UPDATE(tankbatt)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("samples", SAMPLES, 0)
-	MDRV_SOUND_CONFIG(tankbatt_samples_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SOUND_CONFIG(tankbatt_samples_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 

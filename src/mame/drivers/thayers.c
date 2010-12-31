@@ -757,31 +757,31 @@ static COP400_INTERFACE( thayers_cop_intf )
 
 static MACHINE_CONFIG_START( thayers, driver_device )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, XTAL_4MHz)
-	MDRV_CPU_PROGRAM_MAP(thayers_map)
-	MDRV_CPU_IO_MAP(thayers_io_map)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz)
+	MCFG_CPU_PROGRAM_MAP(thayers_map)
+	MCFG_CPU_IO_MAP(thayers_io_map)
 
-	MDRV_CPU_ADD("mcu", COP421, XTAL_4MHz/2) // COP421L-PCA/N
-	MDRV_CPU_IO_MAP(thayers_cop_io_map)
-	MDRV_CPU_CONFIG(thayers_cop_intf)
+	MCFG_CPU_ADD("mcu", COP421, XTAL_4MHz/2) // COP421L-PCA/N
+	MCFG_CPU_IO_MAP(thayers_cop_io_map)
+	MCFG_CPU_CONFIG(thayers_cop_intf)
 
-	MDRV_MACHINE_START(thayers)
-	MDRV_MACHINE_RESET(thayers)
+	MCFG_MACHINE_START(thayers)
+	MCFG_MACHINE_RESET(thayers)
 
-	MDRV_LASERDISC_ADD("laserdisc", PIONEER_PR7820, "screen", "ldsound")
+	MCFG_LASERDISC_ADD("laserdisc", PIONEER_PR7820, "screen", "ldsound")
 
 	/* video hardware */
-	MDRV_LASERDISC_SCREEN_ADD_NTSC("screen", BITMAP_FORMAT_RGB32)
+	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", BITMAP_FORMAT_RGB32)
 
-	MDRV_PALETTE_LENGTH(256)
+	MCFG_PALETTE_LENGTH(256)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 	// SSI 263 @ 2MHz
 
-	MDRV_SOUND_ADD("ldsound", LASERDISC_SOUND, 0)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("ldsound", LASERDISC_SOUND, 0)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 /* ROMs */

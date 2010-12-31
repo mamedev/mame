@@ -126,7 +126,7 @@ private:
 	screen_type_enum	m_type;						// type of screen
 	int					m_width, m_height;			// default total width/height (HTOTAL, VTOTAL)
 	rectangle			m_visarea;					// default visible area (HBLANK end/start, VBLANK end/start)
-	bool				m_oldstyle_vblank_supplied;	// MDRV_SCREEN_VBLANK_TIME macro used
+	bool				m_oldstyle_vblank_supplied;	// MCFG_SCREEN_VBLANK_TIME macro used
 	attoseconds_t		m_refresh;					// default refresh period
 	attoseconds_t		m_vblank;					// duration of a VBLANK
 	bitmap_format		m_format;					// bitmap format
@@ -270,35 +270,35 @@ private:
 //  SCREEN DEVICE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MDRV_SCREEN_ADD(_tag, _type) \
-	MDRV_DEVICE_ADD(_tag, SCREEN, 0) \
-	MDRV_SCREEN_TYPE(_type) \
+#define MCFG_SCREEN_ADD(_tag, _type) \
+	MCFG_DEVICE_ADD(_tag, SCREEN, 0) \
+	MCFG_SCREEN_TYPE(_type) \
 
-#define MDRV_SCREEN_MODIFY(_tag) \
-	MDRV_DEVICE_MODIFY(_tag)
+#define MCFG_SCREEN_MODIFY(_tag) \
+	MCFG_DEVICE_MODIFY(_tag)
 
-#define MDRV_SCREEN_FORMAT(_format) \
+#define MCFG_SCREEN_FORMAT(_format) \
 	screen_device_config::static_set_format(device, _format); \
 
-#define MDRV_SCREEN_TYPE(_type) \
+#define MCFG_SCREEN_TYPE(_type) \
 	screen_device_config::static_set_type(device, SCREEN_TYPE_##_type); \
 
-#define MDRV_SCREEN_RAW_PARAMS(_pixclock, _htotal, _hbend, _hbstart, _vtotal, _vbend, _vbstart) \
+#define MCFG_SCREEN_RAW_PARAMS(_pixclock, _htotal, _hbend, _hbstart, _vtotal, _vbend, _vbstart) \
 	screen_device_config::static_set_raw(device, _pixclock, _htotal, _hbend, _hbstart, _vtotal, _vbend, _vbstart);
 
-#define MDRV_SCREEN_REFRESH_RATE(_rate) \
+#define MCFG_SCREEN_REFRESH_RATE(_rate) \
 	screen_device_config::static_set_refresh(device, HZ_TO_ATTOSECONDS(_rate)); \
 
-#define MDRV_SCREEN_VBLANK_TIME(_time) \
+#define MCFG_SCREEN_VBLANK_TIME(_time) \
 	screen_device_config::static_set_vblank_time(device, _time); \
 
-#define MDRV_SCREEN_SIZE(_width, _height) \
+#define MCFG_SCREEN_SIZE(_width, _height) \
 	screen_device_config::static_set_size(device, _width, _height); \
 
-#define MDRV_SCREEN_VISIBLE_AREA(_minx, _maxx, _miny, _maxy) \
+#define MCFG_SCREEN_VISIBLE_AREA(_minx, _maxx, _miny, _maxy) \
 	screen_device_config::static_set_visarea(device, _minx, _maxx, _miny, _maxy); \
 
-#define MDRV_SCREEN_DEFAULT_POSITION(_xscale, _xoffs, _yscale, _yoffs)	\
+#define MCFG_SCREEN_DEFAULT_POSITION(_xscale, _xoffs, _yscale, _yoffs)	\
 	screen_device_config::static_set_default_position(device, _xscale, _xoffs, _yscale, _yoffs); \
 
 

@@ -1568,106 +1568,106 @@ static INTERRUPT_GEN( cischeat_interrupt )
 static MACHINE_CONFIG_START( bigrun, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("cpu1", M68000, 10000000)
-	MDRV_CPU_PROGRAM_MAP(bigrun_map)
-	MDRV_CPU_VBLANK_INT_HACK(cischeat_interrupt,CISCHEAT_INTERRUPT_NUM)
+	MCFG_CPU_ADD("cpu1", M68000, 10000000)
+	MCFG_CPU_PROGRAM_MAP(bigrun_map)
+	MCFG_CPU_VBLANK_INT_HACK(cischeat_interrupt,CISCHEAT_INTERRUPT_NUM)
 
-	MDRV_CPU_ADD("cpu2", M68000, 10000000)
-	MDRV_CPU_PROGRAM_MAP(bigrun_map2)
-	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
+	MCFG_CPU_ADD("cpu2", M68000, 10000000)
+	MCFG_CPU_PROGRAM_MAP(bigrun_map2)
+	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold)
 
-	MDRV_CPU_ADD("cpu3", M68000, 10000000)
-	MDRV_CPU_PROGRAM_MAP(bigrun_map3)
-	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
+	MCFG_CPU_ADD("cpu3", M68000, 10000000)
+	MCFG_CPU_PROGRAM_MAP(bigrun_map3)
+	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold)
 
-	MDRV_CPU_ADD("soundcpu", M68000, 6000000)
-	MDRV_CPU_PROGRAM_MAP(bigrun_sound_map)
-	MDRV_CPU_VBLANK_INT_HACK(irq4_line_hold,CISCHEAT_SOUND_INTERRUPT_NUM)
+	MCFG_CPU_ADD("soundcpu", M68000, 6000000)
+	MCFG_CPU_PROGRAM_MAP(bigrun_sound_map)
+	MCFG_CPU_VBLANK_INT_HACK(irq4_line_hold,CISCHEAT_SOUND_INTERRUPT_NUM)
 
-	MDRV_QUANTUM_TIME(HZ(1200))
+	MCFG_QUANTUM_TIME(HZ(1200))
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK | VIDEO_HAS_SHADOWS)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK | VIDEO_HAS_SHADOWS)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(30)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 256-1,	0+16, 256-16-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(30)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 256-1,	0+16, 256-16-1)
 
-	MDRV_GFXDECODE(bigrun)
-	MDRV_PALETTE_LENGTH(16*16 * 3 + 64*16 * 2 + 64*16)	/* scroll 0,1,2; road 0,1; sprites */
+	MCFG_GFXDECODE(bigrun)
+	MCFG_PALETTE_LENGTH(16*16 * 3 + 64*16 * 2 + 64*16)	/* scroll 0,1,2; road 0,1; sprites */
 
-	MDRV_VIDEO_START(bigrun)
-	MDRV_VIDEO_UPDATE(bigrun)
+	MCFG_VIDEO_START(bigrun)
+	MCFG_VIDEO_UPDATE(bigrun)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymsnd", YM2151, STD_FM_CLOCK)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 0.75)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 0.75)
+	MCFG_SOUND_ADD("ymsnd", YM2151, STD_FM_CLOCK)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.75)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.75)
 
-	MDRV_OKIM6295_ADD("oki1", STD_OKI_CLOCK, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_OKIM6295_ADD("oki1", STD_OKI_CLOCK, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 
-	MDRV_OKIM6295_ADD("oki2", STD_OKI_CLOCK, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_OKIM6295_ADD("oki2", STD_OKI_CLOCK, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( cischeat, bigrun )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("cpu1")
-	MDRV_CPU_PROGRAM_MAP(cischeat_map)
+	MCFG_CPU_MODIFY("cpu1")
+	MCFG_CPU_PROGRAM_MAP(cischeat_map)
 
-	MDRV_CPU_MODIFY("cpu2")
-	MDRV_CPU_PROGRAM_MAP(cischeat_map2)
+	MCFG_CPU_MODIFY("cpu2")
+	MCFG_CPU_PROGRAM_MAP(cischeat_map2)
 
-	MDRV_CPU_MODIFY("cpu3")
-	MDRV_CPU_PROGRAM_MAP(cischeat_map3)
+	MCFG_CPU_MODIFY("cpu3")
+	MCFG_CPU_PROGRAM_MAP(cischeat_map3)
 
-	MDRV_CPU_MODIFY("soundcpu")
-	MDRV_CPU_PROGRAM_MAP(cischeat_sound_map)
+	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_CPU_PROGRAM_MAP(cischeat_sound_map)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0, 256-1,	0+16, 256-16-8-1)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(0, 256-1,	0+16, 256-16-8-1)
 
-	MDRV_GFXDECODE(cischeat)
-	MDRV_PALETTE_LENGTH(32*16 * 3 + 64*16 * 2 + 128*16)	/* scroll 0,1,2; road 0,1; sprites */
+	MCFG_GFXDECODE(cischeat)
+	MCFG_PALETTE_LENGTH(32*16 * 3 + 64*16 * 2 + 128*16)	/* scroll 0,1,2; road 0,1; sprites */
 
-	MDRV_VIDEO_START(cischeat)
-	MDRV_VIDEO_UPDATE(cischeat)
+	MCFG_VIDEO_START(cischeat)
+	MCFG_VIDEO_UPDATE(cischeat)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( f1gpstar, bigrun )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("cpu1")
-	MDRV_CPU_CLOCK(12000000)
-	MDRV_CPU_PROGRAM_MAP(f1gpstar_map)
+	MCFG_CPU_MODIFY("cpu1")
+	MCFG_CPU_CLOCK(12000000)
+	MCFG_CPU_PROGRAM_MAP(f1gpstar_map)
 
-	MDRV_CPU_MODIFY("cpu2")
-	MDRV_CPU_CLOCK(12000000)
-	MDRV_CPU_PROGRAM_MAP(f1gpstar_map2)
+	MCFG_CPU_MODIFY("cpu2")
+	MCFG_CPU_CLOCK(12000000)
+	MCFG_CPU_PROGRAM_MAP(f1gpstar_map2)
 
-	MDRV_CPU_MODIFY("cpu3")
-	MDRV_CPU_CLOCK(12000000)
-	MDRV_CPU_PROGRAM_MAP(f1gpstar_map3)
+	MCFG_CPU_MODIFY("cpu3")
+	MCFG_CPU_CLOCK(12000000)
+	MCFG_CPU_PROGRAM_MAP(f1gpstar_map3)
 
-	MDRV_CPU_MODIFY("soundcpu")
-	MDRV_CPU_PROGRAM_MAP(f1gpstar_sound_map)
+	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_CPU_PROGRAM_MAP(f1gpstar_sound_map)
 
 	/* video hardware */
-	MDRV_GFXDECODE(f1gpstar)
-	MDRV_PALETTE_LENGTH(16*16 * 3 + 64*16 * 2 + 128*16)	/* scroll 0,1,2; road 0,1; sprites */
+	MCFG_GFXDECODE(f1gpstar)
+	MCFG_PALETTE_LENGTH(16*16 * 3 + 64*16 * 2 + 128*16)	/* scroll 0,1,2; road 0,1; sprites */
 
-	MDRV_VIDEO_START(f1gpstar)
-	MDRV_VIDEO_UPDATE(f1gpstar)
+	MCFG_VIDEO_START(f1gpstar)
+	MCFG_VIDEO_UPDATE(f1gpstar)
 MACHINE_CONFIG_END
 
 
@@ -1675,15 +1675,15 @@ static MACHINE_CONFIG_DERIVED( f1gpstr2, f1gpstar )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_MODIFY("cpu1")
-	MDRV_CPU_PROGRAM_MAP(f1gpstr2_map)
+	MCFG_CPU_MODIFY("cpu1")
+	MCFG_CPU_PROGRAM_MAP(f1gpstr2_map)
 
-	MDRV_CPU_MODIFY("soundcpu")
-	MDRV_CPU_PROGRAM_MAP(f1gpstr2_sound_map)
+	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_CPU_PROGRAM_MAP(f1gpstr2_sound_map)
 
-	MDRV_CPU_ADD("cpu5", M68000, 12000000/* was 10000000 */)
-	MDRV_CPU_PROGRAM_MAP(f1gpstr2_io_map)
-	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
+	MCFG_CPU_ADD("cpu5", M68000, 12000000/* was 10000000 */)
+	MCFG_CPU_PROGRAM_MAP(f1gpstr2_io_map)
+	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold)
 MACHINE_CONFIG_END
 
 
@@ -1713,36 +1713,36 @@ static INTERRUPT_GEN( interrupt_scudhamm )
 static MACHINE_CONFIG_START( scudhamm, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",M68000, 12000000)
-	MDRV_CPU_PROGRAM_MAP(scudhamm_map)
-	MDRV_CPU_VBLANK_INT_HACK(interrupt_scudhamm,INTERRUPT_NUM_SCUDHAMM)
+	MCFG_CPU_ADD("maincpu",M68000, 12000000)
+	MCFG_CPU_PROGRAM_MAP(scudhamm_map)
+	MCFG_CPU_VBLANK_INT_HACK(interrupt_scudhamm,INTERRUPT_NUM_SCUDHAMM)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK | VIDEO_HAS_SHADOWS)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_AFTER_VBLANK | VIDEO_HAS_SHADOWS)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(30)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500 * 3) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 0 +16, 256-1 -16)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(30)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500 * 3) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0 +16, 256-1 -16)
 
-	MDRV_GFXDECODE(scudhamm)
-	MDRV_PALETTE_LENGTH(16*16+16*16+128*16)
+	MCFG_GFXDECODE(scudhamm)
+	MCFG_PALETTE_LENGTH(16*16+16*16+128*16)
 
-	MDRV_VIDEO_START(f1gpstar)
-	MDRV_VIDEO_UPDATE(scudhamm)
+	MCFG_VIDEO_START(f1gpstar)
+	MCFG_VIDEO_UPDATE(scudhamm)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_OKIM6295_ADD("oki1", 2112000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_OKIM6295_ADD("oki1", 2112000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MDRV_OKIM6295_ADD("oki2", 2112000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_OKIM6295_ADD("oki2", 2112000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -1764,9 +1764,9 @@ static INTERRUPT_GEN( interrupt_armchmp2)
 static MACHINE_CONFIG_DERIVED( armchmp2, scudhamm )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(armchmp2_map)
-	MDRV_CPU_VBLANK_INT_HACK(interrupt_armchmp2,INTERRUPT_NUM_SCUDHAMM)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(armchmp2_map)
+	MCFG_CPU_VBLANK_INT_HACK(interrupt_armchmp2,INTERRUPT_NUM_SCUDHAMM)
 
 MACHINE_CONFIG_END
 

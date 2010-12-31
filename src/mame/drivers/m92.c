@@ -920,165 +920,165 @@ void m92_sprite_interrupt(running_machine *machine)
 static MACHINE_CONFIG_START( m92, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",V33,18000000/2)	/* NEC V33, 18 MHz clock */
-	MDRV_CPU_PROGRAM_MAP(m92_map)
-	MDRV_CPU_IO_MAP(m92_portmap)
+	MCFG_CPU_ADD("maincpu",V33,18000000/2)	/* NEC V33, 18 MHz clock */
+	MCFG_CPU_PROGRAM_MAP(m92_map)
+	MCFG_CPU_IO_MAP(m92_portmap)
 
-	MDRV_CPU_ADD("soundcpu" ,V35, 14318180/2)	/* 14.31818 MHz */
-	MDRV_CPU_PROGRAM_MAP(sound_map)
+	MCFG_CPU_ADD("soundcpu" ,V35, 14318180/2)	/* 14.31818 MHz */
+	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MDRV_MACHINE_START(m92)
-	MDRV_MACHINE_RESET(m92)
+	MCFG_MACHINE_START(m92)
+	MCFG_MACHINE_RESET(m92)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(512, 256)
-	MDRV_SCREEN_VISIBLE_AREA(80, 511-112, 8, 247) /* 320 x 240 */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(512, 256)
+	MCFG_SCREEN_VISIBLE_AREA(80, 511-112, 8, 247) /* 320 x 240 */
 
-	MDRV_GFXDECODE(m92)
-	MDRV_PALETTE_LENGTH(2048)
+	MCFG_GFXDECODE(m92)
+	MCFG_PALETTE_LENGTH(2048)
 
-	MDRV_VIDEO_START(m92)
-	MDRV_VIDEO_UPDATE(m92)
+	MCFG_VIDEO_START(m92)
+	MCFG_VIDEO_UPDATE(m92)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2151, 14318180/4)
-	MDRV_SOUND_CONFIG(ym2151_config)
-	MDRV_SOUND_ROUTE(0, "mono", 0.40)
-	MDRV_SOUND_ROUTE(1, "mono", 0.40)
+	MCFG_SOUND_ADD("ymsnd", YM2151, 14318180/4)
+	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_SOUND_ROUTE(0, "mono", 0.40)
+	MCFG_SOUND_ROUTE(1, "mono", 0.40)
 
-	MDRV_SOUND_ADD("irem", IREMGA20, 14318180/4)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("irem", IREMGA20, 14318180/4)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 static const nec_config gunforce_config ={	gunforce_decryption_table, };
 static MACHINE_CONFIG_DERIVED( gunforce, m92 )
-	MDRV_CPU_MODIFY("soundcpu")
-	MDRV_CPU_CONFIG(gunforce_config)
+	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_CPU_CONFIG(gunforce_config)
 MACHINE_CONFIG_END
 
 static const nec_config bmaster_config ={ bomberman_decryption_table, };
 static MACHINE_CONFIG_DERIVED( bmaster, m92 )
-	MDRV_CPU_MODIFY("soundcpu")
-	MDRV_CPU_CONFIG(bmaster_config)
+	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_CPU_CONFIG(bmaster_config)
 MACHINE_CONFIG_END
 
 static const nec_config lethalth_config ={ lethalth_decryption_table, };
 static MACHINE_CONFIG_DERIVED( lethalth, m92 )
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(lethalth_map)
-	MDRV_CPU_MODIFY("soundcpu")
-	MDRV_CPU_CONFIG(lethalth_config)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(lethalth_map)
+	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_CPU_CONFIG(lethalth_config)
 MACHINE_CONFIG_END
 
 static const nec_config uccops_config ={ dynablaster_decryption_table, };
 static MACHINE_CONFIG_DERIVED( uccops, m92 )
-	MDRV_CPU_MODIFY("soundcpu")
-	MDRV_CPU_CONFIG(uccops_config)
+	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_CPU_CONFIG(uccops_config)
 MACHINE_CONFIG_END
 
 static const nec_config mysticri_config ={ mysticri_decryption_table, };
 static MACHINE_CONFIG_DERIVED( mysticri, m92 )
-	MDRV_CPU_MODIFY("soundcpu")
-	MDRV_CPU_CONFIG(mysticri_config)
+	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_CPU_CONFIG(mysticri_config)
 MACHINE_CONFIG_END
 
 static const nec_config majtitl2_config ={ majtitl2_decryption_table, };
 static MACHINE_CONFIG_DERIVED( majtitl2, m92 )
-	MDRV_CPU_MODIFY("soundcpu")
-	MDRV_CPU_CONFIG(majtitl2_config)
+	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_CPU_CONFIG(majtitl2_config)
 MACHINE_CONFIG_END
 
 static const nec_config hook_config ={ hook_decryption_table, };
 static MACHINE_CONFIG_DERIVED( hook, m92 )
-	MDRV_CPU_MODIFY("soundcpu")
-	MDRV_CPU_CONFIG(hook_config)
+	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_CPU_CONFIG(hook_config)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( ppan, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",V33,18000000/2)
-	MDRV_CPU_PROGRAM_MAP(m92_map)
-	MDRV_CPU_IO_MAP(m92_portmap)
+	MCFG_CPU_ADD("maincpu",V33,18000000/2)
+	MCFG_CPU_PROGRAM_MAP(m92_map)
+	MCFG_CPU_IO_MAP(m92_portmap)
 
 	/* no Sound CPU */
 
-	MDRV_MACHINE_START(m92)
-	MDRV_MACHINE_RESET(m92)
+	MCFG_MACHINE_START(m92)
+	MCFG_MACHINE_RESET(m92)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(512, 256)
-	MDRV_SCREEN_VISIBLE_AREA(80, 511-112, 8, 247) /* 320 x 240 */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(512, 256)
+	MCFG_SCREEN_VISIBLE_AREA(80, 511-112, 8, 247) /* 320 x 240 */
 
-	MDRV_GFXDECODE(m92)
-	MDRV_PALETTE_LENGTH(2048)
+	MCFG_GFXDECODE(m92)
+	MCFG_PALETTE_LENGTH(2048)
 
-	MDRV_VIDEO_START(m92)
-	MDRV_VIDEO_UPDATE(m92)
+	MCFG_VIDEO_START(m92)
+	MCFG_VIDEO_UPDATE(m92)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 static const nec_config rtypeleo_config ={ rtypeleo_decryption_table, };
 static MACHINE_CONFIG_DERIVED( rtypeleo, m92 )
-	MDRV_CPU_MODIFY("soundcpu")
-	MDRV_CPU_CONFIG(rtypeleo_config)
+	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_CPU_CONFIG(rtypeleo_config)
 MACHINE_CONFIG_END
 
 
 static const nec_config inthunt_config ={ inthunt_decryption_table, };
 static MACHINE_CONFIG_DERIVED( inthunt, m92 )
-	MDRV_CPU_MODIFY("soundcpu")
-	MDRV_CPU_CONFIG(inthunt_config)
+	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_CPU_CONFIG(inthunt_config)
 MACHINE_CONFIG_END
 
 
 static const nec_config nbbatman_config ={ leagueman_decryption_table, };
 static MACHINE_CONFIG_DERIVED( nbbatman, m92 )
-	MDRV_CPU_MODIFY("soundcpu")
-	MDRV_CPU_CONFIG(nbbatman_config)
+	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_CPU_CONFIG(nbbatman_config)
 MACHINE_CONFIG_END
 
 
 static const nec_config psoldier_config ={ psoldier_decryption_table, };
 static MACHINE_CONFIG_DERIVED( psoldier, m92 )
-	MDRV_CPU_MODIFY("soundcpu")
-	MDRV_CPU_CONFIG(psoldier_config)
+	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_CPU_CONFIG(psoldier_config)
 	/* video hardware */
-	MDRV_GFXDECODE(2)
+	MCFG_GFXDECODE(2)
 MACHINE_CONFIG_END
 
 static const nec_config dsoccr94_config ={ dsoccr94_decryption_table, };
 static MACHINE_CONFIG_DERIVED( dsoccr94j, m92 )
-	MDRV_CPU_MODIFY("soundcpu")
-	MDRV_CPU_CONFIG(dsoccr94_config)
+	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_CPU_CONFIG(dsoccr94_config)
 	/* video hardware */
-	MDRV_GFXDECODE(2)
+	MCFG_GFXDECODE(2)
 MACHINE_CONFIG_END
 
 static const nec_config gunforc2_config ={ lethalth_decryption_table, };
 static MACHINE_CONFIG_DERIVED( gunforc2, m92 )
-	MDRV_CPU_MODIFY("soundcpu")
-	MDRV_CPU_CONFIG(gunforc2_config)
+	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_CPU_CONFIG(gunforc2_config)
 MACHINE_CONFIG_END
 
 

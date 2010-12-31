@@ -573,42 +573,42 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( zodiack, zodiack_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 4000000)        /* 4.00 MHz??? */
-	MDRV_CPU_PROGRAM_MAP(main_map)
-	MDRV_CPU_VBLANK_INT_HACK(zodiac_master_interrupt,2)
+	MCFG_CPU_ADD("maincpu", Z80, 4000000)        /* 4.00 MHz??? */
+	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_CPU_VBLANK_INT_HACK(zodiac_master_interrupt,2)
 
-	MDRV_CPU_ADD("audiocpu", Z80, 14318000/8)	/* 1.78975 MHz??? */
-	MDRV_CPU_PROGRAM_MAP(sound_map)
-	MDRV_CPU_IO_MAP(io_map)
-	MDRV_CPU_VBLANK_INT_HACK(zodiac_sound_nmi_gen,8)	/* IRQs are triggered by the main CPU */
+	MCFG_CPU_ADD("audiocpu", Z80, 14318000/8)	/* 1.78975 MHz??? */
+	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_CPU_IO_MAP(io_map)
+	MCFG_CPU_VBLANK_INT_HACK(zodiac_sound_nmi_gen,8)	/* IRQs are triggered by the main CPU */
 
-	MDRV_MACHINE_RESET(zodiack)
-	MDRV_MACHINE_START(zodiack)
+	MCFG_MACHINE_RESET(zodiack)
+	MCFG_MACHINE_START(zodiack)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */  /* frames per second, vblank duration */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */  /* frames per second, vblank duration */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(zodiack)
-	MDRV_PALETTE_LENGTH(4*8+2*8+2*1)
+	MCFG_GFXDECODE(zodiack)
+	MCFG_PALETTE_LENGTH(4*8+2*8+2*1)
 
-	MDRV_PALETTE_INIT(zodiack)
-	MDRV_VIDEO_START(zodiack)
-	MDRV_VIDEO_UPDATE(zodiack)
+	MCFG_PALETTE_INIT(zodiack)
+	MCFG_VIDEO_START(zodiack)
+	MCFG_VIDEO_UPDATE(zodiack)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("aysnd", AY8910, 1789750)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("aysnd", AY8910, 1789750)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( percuss, zodiack )
-	MDRV_MACHINE_START(percuss)
+	MCFG_MACHINE_START(percuss)
 MACHINE_CONFIG_END
 
 

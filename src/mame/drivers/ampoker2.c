@@ -1166,36 +1166,36 @@ static const ay8910_interface ay8910_config =
 static MACHINE_CONFIG_START( ampoker2, ampoker2_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/2)		/* 3 MHz */
-	MDRV_CPU_PROGRAM_MAP(ampoker2_map)
-	MDRV_CPU_IO_MAP(ampoker2_io_map)
-	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 1536)
-	MDRV_WATCHDOG_TIME_INIT(MSEC(200))	/* 200 ms, measured */
+	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/2)		/* 3 MHz */
+	MCFG_CPU_PROGRAM_MAP(ampoker2_map)
+	MCFG_CPU_IO_MAP(ampoker2_io_map)
+	MCFG_CPU_PERIODIC_INT(nmi_line_pulse, 1536)
+	MCFG_WATCHDOG_TIME_INIT(MSEC(200))	/* 200 ms, measured */
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
 	/*  if VBLANK is used, the watchdog timer stop to work.
-    MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
     */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(20*8, 56*8-1, 2*8, 32*8-1)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(20*8, 56*8-1, 2*8, 32*8-1)
 
-	MDRV_GFXDECODE(ampoker2)
-	MDRV_PALETTE_LENGTH(512)
+	MCFG_GFXDECODE(ampoker2)
+	MCFG_PALETTE_LENGTH(512)
 
-	MDRV_PALETTE_INIT(ampoker2)
-	MDRV_VIDEO_START(ampoker2)
-	MDRV_VIDEO_UPDATE(ampoker2)
+	MCFG_PALETTE_INIT(ampoker2)
+	MCFG_VIDEO_START(ampoker2)
+	MCFG_VIDEO_UPDATE(ampoker2)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("aysnd", AY8910,MASTER_CLOCK/4)	/* 1.5 MHz, measured */
-	MDRV_SOUND_CONFIG(ay8910_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("aysnd", AY8910,MASTER_CLOCK/4)	/* 1.5 MHz, measured */
+	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( sigma2k, ampoker2 )
@@ -1203,8 +1203,8 @@ static MACHINE_CONFIG_DERIVED( sigma2k, ampoker2 )
 	/* basic machine hardware */
 
 	/* video hardware */
-	MDRV_GFXDECODE(sigma2k)
-	MDRV_VIDEO_START(sigma2k)
+	MCFG_GFXDECODE(sigma2k)
+	MCFG_VIDEO_START(sigma2k)
 MACHINE_CONFIG_END
 
 

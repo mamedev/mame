@@ -33,22 +33,22 @@ void namcoc7x_set_host_ram(UINT32 *hostram);
 	ROM_LOAD( "pr1data.8k", 0x80000, 0x80000, BAD_DUMP CRC(2e5767a4) SHA1(390bf05c90044d841fe2dd4a427177fa1570b9a6) )
 
 #define NAMCO_C7X_MCU(clock)	\
-	MDRV_CPU_ADD("mcu", M37702, clock)	\
-	MDRV_CPU_PROGRAM_MAP(namcoc7x_mcu_map)	\
-	MDRV_CPU_IO_MAP(namcoc7x_mcu_io)	\
-	MDRV_CPU_VBLANK_INT_HACK(namcoc7x_interrupt, 2)
+	MCFG_CPU_ADD("mcu", M37702, clock)	\
+	MCFG_CPU_PROGRAM_MAP(namcoc7x_mcu_map)	\
+	MCFG_CPU_IO_MAP(namcoc7x_mcu_io)	\
+	MCFG_CPU_VBLANK_INT_HACK(namcoc7x_interrupt, 2)
 
 #define NAMCO_C7X_MCU_SHARED(clock)	\
-	MDRV_CPU_ADD("mcu", M37702, clock)	\
-	MDRV_CPU_PROGRAM_MAP(namcoc7x_mcu_share_map)	\
-	MDRV_CPU_IO_MAP(namcoc7x_mcu_io)	\
-	MDRV_CPU_VBLANK_INT_HACK(namcoc7x_interrupt, 2)
+	MCFG_CPU_ADD("mcu", M37702, clock)	\
+	MCFG_CPU_PROGRAM_MAP(namcoc7x_mcu_share_map)	\
+	MCFG_CPU_IO_MAP(namcoc7x_mcu_io)	\
+	MCFG_CPU_VBLANK_INT_HACK(namcoc7x_interrupt, 2)
 
 #define NAMCO_C7X_SOUND(clock)	\
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")	\
-	MDRV_SOUND_ADD("c352", C352, clock)	\
-	MDRV_SOUND_ROUTE(0, "rspeaker", 1.00)	\
-	MDRV_SOUND_ROUTE(1, "lspeaker", 1.00)	\
-	MDRV_SOUND_ROUTE(2, "rspeaker", 1.00)	\
-	MDRV_SOUND_ROUTE(3, "lspeaker", 1.00)
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")	\
+	MCFG_SOUND_ADD("c352", C352, clock)	\
+	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)	\
+	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)	\
+	MCFG_SOUND_ROUTE(2, "rspeaker", 1.00)	\
+	MCFG_SOUND_ROUTE(3, "lspeaker", 1.00)
 

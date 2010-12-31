@@ -16,8 +16,8 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MDRV_MB3773_ADD(_tag) \
-	MDRV_DEVICE_ADD(_tag, MB3773, 0)
+#define MCFG_MB3773_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, MB3773, 0)
 
 
 // ======================> mb3773_device_config

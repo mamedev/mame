@@ -709,36 +709,36 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( spiders, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6809, 2800000)
-	MDRV_CPU_PROGRAM_MAP(spiders_main_map)
-	MDRV_CPU_PERIODIC_INT(update_pia_1, 25)
+	MCFG_CPU_ADD("maincpu", M6809, 2800000)
+	MCFG_CPU_PROGRAM_MAP(spiders_main_map)
+	MCFG_CPU_PERIODIC_INT(update_pia_1, 25)
 
-	MDRV_CPU_ADD("audiocpu", M6802, 3000000)
-	MDRV_CPU_PROGRAM_MAP(spiders_audio_map)
+	MCFG_CPU_ADD("audiocpu", M6802, 3000000)
+	MCFG_CPU_PROGRAM_MAP(spiders_audio_map)
 
-	MDRV_MACHINE_START(spiders)
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_MACHINE_START(spiders)
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MDRV_VIDEO_UPDATE(spiders)
+	MCFG_VIDEO_UPDATE(spiders)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 256, 0, 256, 256, 0, 256)	/* temporary, CRTC will configure screen */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 256, 0, 256, 256, 0, 256)	/* temporary, CRTC will configure screen */
 
-	MDRV_MC6845_ADD("crtc", MC6845, CRTC_CLOCK, mc6845_intf)
+	MCFG_MC6845_ADD("crtc", MC6845, CRTC_CLOCK, mc6845_intf)
 
 	/* 74LS123 */
 
-	MDRV_PIA6821_ADD("pia1", pia_1_intf)
-	MDRV_PIA6821_ADD("pia2", pia_2_intf)
-	MDRV_PIA6821_ADD("pia3", pia_3_intf)
-	MDRV_PIA6821_ADD("pia4", pia_4_intf)
+	MCFG_PIA6821_ADD("pia1", pia_1_intf)
+	MCFG_PIA6821_ADD("pia2", pia_2_intf)
+	MCFG_PIA6821_ADD("pia3", pia_3_intf)
+	MCFG_PIA6821_ADD("pia4", pia_4_intf)
 
-	MDRV_TTL74123_ADD("ic60", ic60_intf)
+	MCFG_TTL74123_ADD("ic60", ic60_intf)
 
 	/* audio hardware */
-	MDRV_FRAGMENT_ADD(spiders_audio)
+	MCFG_FRAGMENT_ADD(spiders_audio)
 
 MACHINE_CONFIG_END
 

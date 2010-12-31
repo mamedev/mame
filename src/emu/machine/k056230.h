@@ -17,9 +17,9 @@
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_K056230_ADD(_tag, _config) \
-	MDRV_DEVICE_ADD(_tag, K0506230, 0) \
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_K056230_ADD(_tag, _config) \
+	MCFG_DEVICE_ADD(_tag, K0506230, 0) \
+	MCFG_DEVICE_CONFIG(_config)
 
 
 /***************************************************************************

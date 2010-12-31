@@ -274,37 +274,37 @@ static MACHINE_RESET( amspdwy )
 static MACHINE_CONFIG_START( amspdwy, amspdwy_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80,3000000)
-	MDRV_CPU_PROGRAM_MAP(amspdwy_map)
-	MDRV_CPU_IO_MAP(amspdwy_portmap)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)	/* IRQ: 60Hz, NMI: retn */
+	MCFG_CPU_ADD("maincpu", Z80,3000000)
+	MCFG_CPU_PROGRAM_MAP(amspdwy_map)
+	MCFG_CPU_IO_MAP(amspdwy_portmap)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)	/* IRQ: 60Hz, NMI: retn */
 
-	MDRV_CPU_ADD("audiocpu", Z80,3000000)	/* Can't be disabled: the YM2151 timers must work */
-	MDRV_CPU_PROGRAM_MAP(amspdwy_sound_map)
+	MCFG_CPU_ADD("audiocpu", Z80,3000000)	/* Can't be disabled: the YM2151 timers must work */
+	MCFG_CPU_PROGRAM_MAP(amspdwy_sound_map)
 
-	MDRV_MACHINE_START(amspdwy)
-	MDRV_MACHINE_RESET(amspdwy)
+	MCFG_MACHINE_START(amspdwy)
+	MCFG_MACHINE_RESET(amspdwy)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-16-1)
-	MDRV_GFXDECODE(amspdwy)
-	MDRV_PALETTE_LENGTH(32)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-16-1)
+	MCFG_GFXDECODE(amspdwy)
+	MCFG_PALETTE_LENGTH(32)
 
-	MDRV_VIDEO_START(amspdwy)
-	MDRV_VIDEO_UPDATE(amspdwy)
+	MCFG_VIDEO_START(amspdwy)
+	MCFG_VIDEO_UPDATE(amspdwy)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymsnd", YM2151, 3000000)
-	MDRV_SOUND_CONFIG(amspdwy_ym2151_interface)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM2151, 3000000)
+	MCFG_SOUND_CONFIG(amspdwy_ym2151_interface)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 

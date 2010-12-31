@@ -411,36 +411,36 @@ INPUT_PORTS_END
 
 static MACHINE_CONFIG_START( ssingles, ssingles_state )
 
-	MDRV_CPU_ADD("maincpu", Z80,4000000)		 /* ? MHz */
-	MDRV_CPU_PROGRAM_MAP(ssingles_map)
-	MDRV_CPU_IO_MAP(ssingles_io_map)
-	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_ADD("maincpu", Z80,4000000)		 /* ? MHz */
+	MCFG_CPU_PROGRAM_MAP(ssingles_map)
+	MCFG_CPU_IO_MAP(ssingles_io_map)
+	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_RAW_PARAMS(4000000, 256, 0, 256, 256, 0, 256)	/* temporary, CRTC will configure screen */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_RAW_PARAMS(4000000, 256, 0, 256, 256, 0, 256)	/* temporary, CRTC will configure screen */
 
-	MDRV_PALETTE_LENGTH(4) //guess
+	MCFG_PALETTE_LENGTH(4) //guess
 
-	MDRV_VIDEO_START(ssingles)
-	MDRV_VIDEO_UPDATE(ssingles)
+	MCFG_VIDEO_START(ssingles)
+	MCFG_VIDEO_UPDATE(ssingles)
 
-	MDRV_MC6845_ADD("crtc", MC6845, 1000000 /* ? MHz */, mc6845_intf)
+	MCFG_MC6845_ADD("crtc", MC6845, 1000000 /* ? MHz */, mc6845_intf)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay1", AY8910, 1500000) /* ? MHz */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	MCFG_SOUND_ADD("ay1", AY8910, 1500000) /* ? MHz */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MDRV_SOUND_ADD("ay2", AY8910, 1500000) /* ? MHz */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	MCFG_SOUND_ADD("ay2", AY8910, 1500000) /* ? MHz */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( atamanot, ssingles )
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(atamanot_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(atamanot_map)
 MACHINE_CONFIG_END
 
 ROM_START( ssingles )

@@ -206,37 +206,37 @@ static const ym3812_interface ym3812_config =
 static MACHINE_CONFIG_START( prehisle, prehisle_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, XTAL_18MHz/2)	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(prehisle_map)
-	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_18MHz/2)	/* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(prehisle_map)
+	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold)
 
-	MDRV_CPU_ADD("audiocpu", Z80, XTAL_4MHz)	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(prehisle_sound_map)
-	MDRV_CPU_IO_MAP(prehisle_sound_io_map)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_4MHz)	/* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(prehisle_sound_map)
+	MCFG_CPU_IO_MAP(prehisle_sound_io_map)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(prehisle)
-	MDRV_PALETTE_LENGTH(1024)
+	MCFG_GFXDECODE(prehisle)
+	MCFG_PALETTE_LENGTH(1024)
 
-	MDRV_VIDEO_START(prehisle)
-	MDRV_VIDEO_UPDATE(prehisle)
+	MCFG_VIDEO_START(prehisle)
+	MCFG_VIDEO_UPDATE(prehisle)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM3812, XTAL_4MHz)	/* verified on pcb */
-	MDRV_SOUND_CONFIG(ym3812_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_4MHz)	/* verified on pcb */
+	MCFG_SOUND_CONFIG(ym3812_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
+	MCFG_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.90)
 MACHINE_CONFIG_END
 
 /******************************************************************************/

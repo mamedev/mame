@@ -526,28 +526,28 @@ static MACHINE_CONFIG_DERIVED( megatech, megadriv )
 	/* basic machine hardware */
 
 	/* Megatech has an extra SMS based bios *and* an additional screen */
-	MDRV_CPU_ADD("mtbios", Z80, MASTER_CLOCK / 15) /* ?? */
-	MDRV_CPU_PROGRAM_MAP(megatech_bios_map)
-	MDRV_CPU_IO_MAP(megatech_bios_portmap)
+	MCFG_CPU_ADD("mtbios", Z80, MASTER_CLOCK / 15) /* ?? */
+	MCFG_CPU_PROGRAM_MAP(megatech_bios_map)
+	MCFG_CPU_IO_MAP(megatech_bios_portmap)
 
-	MDRV_MACHINE_RESET(mtnew)
+	MCFG_MACHINE_RESET(mtnew)
 
-	MDRV_VIDEO_START(mtnew)
-	MDRV_VIDEO_UPDATE(mtnew)
-	MDRV_VIDEO_EOF(mtnew)
+	MCFG_VIDEO_START(mtnew)
+	MCFG_VIDEO_UPDATE(mtnew)
+	MCFG_VIDEO_EOF(mtnew)
 
-	MDRV_DEFAULT_LAYOUT(layout_dualhovu)
+	MCFG_DEFAULT_LAYOUT(layout_dualhovu)
 
-	MDRV_SCREEN_ADD("menu", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_SIZE(342,262)
-	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 0, 224-1)
+	MCFG_SCREEN_ADD("menu", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_SIZE(342,262)
+	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 224-1)
 
 	/* sound hardware */
-	MDRV_SOUND_ADD("sn2", SN76496, MASTER_CLOCK/15)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 0.50)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 0.50)
+	MCFG_SOUND_ADD("sn2", SN76496, MASTER_CLOCK/15)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 MACHINE_CONFIG_END
 
 

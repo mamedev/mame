@@ -56,9 +56,9 @@
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_TTL74123_ADD(_tag, _config) \
-	MDRV_DEVICE_ADD(_tag, TTL74123, 0) \
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_TTL74123_ADD(_tag, _config) \
+	MCFG_DEVICE_ADD(_tag, TTL74123, 0) \
+	MCFG_DEVICE_CONFIG(_config)
 
 /* constants for the different ways the cap/res can be connected.
    This determines the formula for calculating the pulse width */

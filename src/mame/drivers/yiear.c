@@ -259,39 +259,39 @@ static MACHINE_RESET( yiear )
 static MACHINE_CONFIG_START( yiear, yiear_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6809,XTAL_18_432MHz/12)   /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(main_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
-	MDRV_CPU_PERIODIC_INT(yiear_nmi_interrupt,480)	/* music tempo (correct frequency unknown) */
+	MCFG_CPU_ADD("maincpu", M6809,XTAL_18_432MHz/12)   /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_PERIODIC_INT(yiear_nmi_interrupt,480)	/* music tempo (correct frequency unknown) */
 
-	MDRV_MACHINE_START(yiear)
-	MDRV_MACHINE_RESET(yiear)
+	MCFG_MACHINE_START(yiear)
+	MCFG_MACHINE_RESET(yiear)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60.58)   /* verified on pcb */
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60.58)   /* verified on pcb */
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(yiear)
-	MDRV_PALETTE_LENGTH(32)
+	MCFG_GFXDECODE(yiear)
+	MCFG_PALETTE_LENGTH(32)
 
-	MDRV_PALETTE_INIT(yiear)
-	MDRV_VIDEO_START(yiear)
-	MDRV_VIDEO_UPDATE(yiear)
+	MCFG_PALETTE_INIT(yiear)
+	MCFG_VIDEO_START(yiear)
+	MCFG_VIDEO_UPDATE(yiear)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("trackfld_audio", TRACKFLD_AUDIO, 0)
+	MCFG_SOUND_ADD("trackfld_audio", TRACKFLD_AUDIO, 0)
 
-	MDRV_SOUND_ADD("snsnd", SN76489A, XTAL_18_432MHz/12)   /* verified on pcb */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("snsnd", SN76489A, XTAL_18_432MHz/12)   /* verified on pcb */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("vlm", VLM5030, XTAL_3_579545MHz)   /* verified on pcb */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("vlm", VLM5030, XTAL_3_579545MHz)   /* verified on pcb */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 

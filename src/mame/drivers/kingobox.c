@@ -477,52 +477,52 @@ static MACHINE_RESET( kingofb )
 static MACHINE_CONFIG_START( kingofb, kingofb_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 4000000)        /* 4.0 MHz */
-	MDRV_CPU_PROGRAM_MAP(kingobox_map)
-	MDRV_CPU_VBLANK_INT("screen", kingofb_interrupt)
+	MCFG_CPU_ADD("maincpu", Z80, 4000000)        /* 4.0 MHz */
+	MCFG_CPU_PROGRAM_MAP(kingobox_map)
+	MCFG_CPU_VBLANK_INT("screen", kingofb_interrupt)
 
-	MDRV_CPU_ADD("video", Z80, 4000000)        /* 4.0 MHz */
-	MDRV_CPU_PROGRAM_MAP(kingobox_video_map)
-	MDRV_CPU_VBLANK_INT("screen", kingofb_interrupt)
+	MCFG_CPU_ADD("video", Z80, 4000000)        /* 4.0 MHz */
+	MCFG_CPU_PROGRAM_MAP(kingobox_video_map)
+	MCFG_CPU_VBLANK_INT("screen", kingofb_interrupt)
 
-	MDRV_CPU_ADD("sprite", Z80, 4000000)        /* 4.0 MHz */
-	MDRV_CPU_PROGRAM_MAP(kingobox_sprite_map)
-	MDRV_CPU_VBLANK_INT("screen", kingofb_interrupt)
+	MCFG_CPU_ADD("sprite", Z80, 4000000)        /* 4.0 MHz */
+	MCFG_CPU_PROGRAM_MAP(kingobox_sprite_map)
+	MCFG_CPU_VBLANK_INT("screen", kingofb_interrupt)
 
-	MDRV_CPU_ADD("audiocpu", Z80, 4000000)        /* 4.0 MHz */
-	MDRV_CPU_PROGRAM_MAP(kingobox_sound_map)
-	MDRV_CPU_IO_MAP(kingobox_sound_io_map)
-	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 6000)	/* Hz */
+	MCFG_CPU_ADD("audiocpu", Z80, 4000000)        /* 4.0 MHz */
+	MCFG_CPU_PROGRAM_MAP(kingobox_sound_map)
+	MCFG_CPU_IO_MAP(kingobox_sound_io_map)
+	MCFG_CPU_PERIODIC_INT(nmi_line_pulse, 6000)	/* Hz */
 
-	MDRV_QUANTUM_TIME(HZ(6000)) /* We really need heavy synching among the processors */
+	MCFG_QUANTUM_TIME(HZ(6000)) /* We really need heavy synching among the processors */
 
-	MDRV_MACHINE_START(kingofb)
-	MDRV_MACHINE_RESET(kingofb)
+	MCFG_MACHINE_START(kingofb)
+	MCFG_MACHINE_RESET(kingofb)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(kingobox)
-	MDRV_PALETTE_LENGTH(256+8*2)
+	MCFG_GFXDECODE(kingobox)
+	MCFG_PALETTE_LENGTH(256+8*2)
 
-	MDRV_PALETTE_INIT(kingofb)
-	MDRV_VIDEO_START(kingofb)
-	MDRV_VIDEO_UPDATE(kingofb)
+	MCFG_PALETTE_INIT(kingofb)
+	MCFG_VIDEO_START(kingofb)
+	MCFG_VIDEO_UPDATE(kingofb)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("aysnd", AY8910, 1500000)
-	MDRV_SOUND_CONFIG(ay8910_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("aysnd", AY8910, 1500000)
+	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 
@@ -530,52 +530,52 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( ringking, kingofb_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 4000000)        /* 4.0 MHz */
-	MDRV_CPU_PROGRAM_MAP(ringking_map)
-	MDRV_CPU_VBLANK_INT("screen", kingofb_interrupt)
+	MCFG_CPU_ADD("maincpu", Z80, 4000000)        /* 4.0 MHz */
+	MCFG_CPU_PROGRAM_MAP(ringking_map)
+	MCFG_CPU_VBLANK_INT("screen", kingofb_interrupt)
 
-	MDRV_CPU_ADD("video", Z80, 4000000)        /* 4.0 MHz */
-	MDRV_CPU_PROGRAM_MAP(ringking_video_map)
-	MDRV_CPU_VBLANK_INT("screen", kingofb_interrupt)
+	MCFG_CPU_ADD("video", Z80, 4000000)        /* 4.0 MHz */
+	MCFG_CPU_PROGRAM_MAP(ringking_video_map)
+	MCFG_CPU_VBLANK_INT("screen", kingofb_interrupt)
 
-	MDRV_CPU_ADD("sprite", Z80, 4000000)        /* 4.0 MHz */
-	MDRV_CPU_PROGRAM_MAP(ringking_sprite_map)
-	MDRV_CPU_VBLANK_INT("screen", kingofb_interrupt)
+	MCFG_CPU_ADD("sprite", Z80, 4000000)        /* 4.0 MHz */
+	MCFG_CPU_PROGRAM_MAP(ringking_sprite_map)
+	MCFG_CPU_VBLANK_INT("screen", kingofb_interrupt)
 
-	MDRV_CPU_ADD("audiocpu", Z80, 4000000)        /* 4.0 MHz */
-	MDRV_CPU_PROGRAM_MAP(kingobox_sound_map)
-	MDRV_CPU_IO_MAP(ringking_sound_io_map)
-	MDRV_CPU_PERIODIC_INT(nmi_line_pulse, 6000)	/* Hz */
+	MCFG_CPU_ADD("audiocpu", Z80, 4000000)        /* 4.0 MHz */
+	MCFG_CPU_PROGRAM_MAP(kingobox_sound_map)
+	MCFG_CPU_IO_MAP(ringking_sound_io_map)
+	MCFG_CPU_PERIODIC_INT(nmi_line_pulse, 6000)	/* Hz */
 
-	MDRV_QUANTUM_TIME(HZ(6000)) /* We really need heavy synching among the processors */
+	MCFG_QUANTUM_TIME(HZ(6000)) /* We really need heavy synching among the processors */
 
-	MDRV_MACHINE_START(kingofb)
-	MDRV_MACHINE_RESET(kingofb)
+	MCFG_MACHINE_START(kingofb)
+	MCFG_MACHINE_RESET(kingofb)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(rk)
-	MDRV_PALETTE_LENGTH(256+8*2)
+	MCFG_GFXDECODE(rk)
+	MCFG_PALETTE_LENGTH(256+8*2)
 
-	MDRV_PALETTE_INIT(ringking)
-	MDRV_VIDEO_START(ringking)
-	MDRV_VIDEO_UPDATE(ringking)
+	MCFG_PALETTE_INIT(ringking)
+	MCFG_VIDEO_START(ringking)
+	MCFG_VIDEO_UPDATE(ringking)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("aysnd", AY8910, 1500000)
-	MDRV_SOUND_CONFIG(ay8910_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("aysnd", AY8910, 1500000)
+	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 

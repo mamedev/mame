@@ -651,32 +651,32 @@ static const ptm6840_interface ptm_intf =
 static MACHINE_CONFIG_START( vpoker, vpoker_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",M6809,XTAL_4MHz)
-	MDRV_CPU_PROGRAM_MAP(main_map)
-//  MDRV_CPU_VBLANK_INT("screen",irq0_line_hold) //irq0 valid too
+	MCFG_CPU_ADD("maincpu",M6809,XTAL_4MHz)
+	MCFG_CPU_PROGRAM_MAP(main_map)
+//  MCFG_CPU_VBLANK_INT("screen",irq0_line_hold) //irq0 valid too
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not accurate
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(512, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 480-1, 0*8, 240-1)
-//  MDRV_SCREEN_VISIBLE_AREA(0*8, 512-1, 0*8, 256-1)
-	MDRV_GFXDECODE(vpoker)
-	MDRV_PALETTE_LENGTH(8)
-	MDRV_PALETTE_INIT(vpoker)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) // not accurate
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(512, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 480-1, 0*8, 240-1)
+//  MCFG_SCREEN_VISIBLE_AREA(0*8, 512-1, 0*8, 256-1)
+	MCFG_GFXDECODE(vpoker)
+	MCFG_PALETTE_LENGTH(8)
+	MCFG_PALETTE_INIT(vpoker)
 
-	MDRV_VIDEO_START(vpoker)
-	MDRV_VIDEO_UPDATE(vpoker)
+	MCFG_VIDEO_START(vpoker)
+	MCFG_VIDEO_UPDATE(vpoker)
 
 	/* 6840 PTM */
-	MDRV_PTM6840_ADD("6840ptm", ptm_intf)
+	MCFG_PTM6840_ADD("6840ptm", ptm_intf)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-//  MDRV_SOUND_ADD("aysnd", AY8910, 8000000/4 /* guess */)
-//  MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+//  MCFG_SOUND_ADD("aysnd", AY8910, 8000000/4 /* guess */)
+//  MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
 /***************************************************************************

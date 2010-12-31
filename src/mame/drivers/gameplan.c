@@ -1010,48 +1010,48 @@ static MACHINE_RESET( gameplan )
 static MACHINE_CONFIG_START( gameplan, gameplan_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6502, GAMEPLAN_MAIN_CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(gameplan_main_map)
+	MCFG_CPU_ADD("maincpu", M6502, GAMEPLAN_MAIN_CPU_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(gameplan_main_map)
 
-	MDRV_CPU_ADD("audiocpu", M6502, GAMEPLAN_AUDIO_CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(gameplan_audio_map)
+	MCFG_CPU_ADD("audiocpu", M6502, GAMEPLAN_AUDIO_CPU_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(gameplan_audio_map)
 
-	MDRV_RIOT6532_ADD("riot", GAMEPLAN_AUDIO_CPU_CLOCK, r6532_interface)
+	MCFG_RIOT6532_ADD("riot", GAMEPLAN_AUDIO_CPU_CLOCK, r6532_interface)
 
-	MDRV_MACHINE_START(gameplan)
-	MDRV_MACHINE_RESET(gameplan)
+	MCFG_MACHINE_START(gameplan)
+	MCFG_MACHINE_RESET(gameplan)
 
 	/* video hardware */
-	MDRV_FRAGMENT_ADD(gameplan_video)
+	MCFG_FRAGMENT_ADD(gameplan_video)
 
 	/* audio hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("aysnd", AY8910, GAMEPLAN_AY8910_CLOCK)
-	MDRV_SOUND_CONFIG(ay8910_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
+	MCFG_SOUND_ADD("aysnd", AY8910, GAMEPLAN_AY8910_CLOCK)
+	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 
 	/* via */
-	MDRV_VIA6522_ADD("via6522_0", 0, gameplan_via_0_interface)
-	MDRV_VIA6522_ADD("via6522_1", 0, via_1_interface)
-	MDRV_VIA6522_ADD("via6522_2", 0, via_2_interface)
+	MCFG_VIA6522_ADD("via6522_0", 0, gameplan_via_0_interface)
+	MCFG_VIA6522_ADD("via6522_1", 0, via_1_interface)
+	MCFG_VIA6522_ADD("via6522_2", 0, via_2_interface)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( leprechn, gameplan )
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_CLOCK(LEPRECHAUN_MAIN_CPU_CLOCK)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_CLOCK(LEPRECHAUN_MAIN_CPU_CLOCK)
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("audiocpu")
-	MDRV_CPU_PROGRAM_MAP(leprechn_audio_map)
+	MCFG_CPU_MODIFY("audiocpu")
+	MCFG_CPU_PROGRAM_MAP(leprechn_audio_map)
 
 	/* video hardware */
-	MDRV_FRAGMENT_ADD(leprechn_video)
+	MCFG_FRAGMENT_ADD(leprechn_video)
 
 	/* via */
-	MDRV_DEVICE_REMOVE("via6522_0")
-	MDRV_VIA6522_ADD("via6522_0", 0, leprechn_via_0_interface)
+	MCFG_DEVICE_REMOVE("via6522_0")
+	MCFG_VIA6522_ADD("via6522_0", 0, leprechn_via_0_interface)
 MACHINE_CONFIG_END
 
 

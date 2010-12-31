@@ -233,48 +233,48 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( carpolo, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6502, XTAL_11_289MHz/12)		/* 940.75 kHz */
-	MDRV_CPU_PROGRAM_MAP(main_map)
-	MDRV_CPU_VBLANK_INT("screen", carpolo_timer_interrupt)	/* this not strictly VBLANK,
+	MCFG_CPU_ADD("maincpu", M6502, XTAL_11_289MHz/12)		/* 940.75 kHz */
+	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_CPU_VBLANK_INT("screen", carpolo_timer_interrupt)	/* this not strictly VBLANK,
                                                        but it's supposed to happen 60
                                                        times a sec, so it's a good place */
-	MDRV_MACHINE_START(carpolo)
-	MDRV_MACHINE_RESET(carpolo)
+	MCFG_MACHINE_START(carpolo)
+	MCFG_MACHINE_RESET(carpolo)
 
-	MDRV_PIA6821_ADD("pia0", carpolo_pia0_intf)
-	MDRV_PIA6821_ADD("pia1", carpolo_pia1_intf)
+	MCFG_PIA6821_ADD("pia0", carpolo_pia0_intf)
+	MCFG_PIA6821_ADD("pia1", carpolo_pia1_intf)
 
-	MDRV_7474_ADD("7474_2s_1", "74148_3s", NULL, carpolo_7474_2s_1_q_cb)
-	MDRV_7474_ADD("7474_2s_2", "74148_3s", NULL, carpolo_7474_2s_2_q_cb)
-	MDRV_7474_ADD("7474_2u_1", "74148_3s", NULL, carpolo_7474_2u_1_q_cb)
-	MDRV_7474_ADD("7474_2u_2", "74148_3s", NULL, carpolo_7474_2u_2_q_cb)
-	MDRV_7474_ADD("7474_1f_1", NULL, NULL, NULL)
-	MDRV_7474_ADD("7474_1f_2", NULL, NULL, NULL)
-	MDRV_7474_ADD("7474_1d_1", NULL, NULL, NULL)
-	MDRV_7474_ADD("7474_1d_2", NULL, NULL, NULL)
-	MDRV_7474_ADD("7474_1c_1", NULL, NULL, NULL)
-	MDRV_7474_ADD("7474_1c_2", NULL, NULL, NULL)
-	MDRV_7474_ADD("7474_1a_1", NULL, NULL, NULL)
-	MDRV_7474_ADD("7474_1a_2", NULL, NULL, NULL)
+	MCFG_7474_ADD("7474_2s_1", "74148_3s", NULL, carpolo_7474_2s_1_q_cb)
+	MCFG_7474_ADD("7474_2s_2", "74148_3s", NULL, carpolo_7474_2s_2_q_cb)
+	MCFG_7474_ADD("7474_2u_1", "74148_3s", NULL, carpolo_7474_2u_1_q_cb)
+	MCFG_7474_ADD("7474_2u_2", "74148_3s", NULL, carpolo_7474_2u_2_q_cb)
+	MCFG_7474_ADD("7474_1f_1", NULL, NULL, NULL)
+	MCFG_7474_ADD("7474_1f_2", NULL, NULL, NULL)
+	MCFG_7474_ADD("7474_1d_1", NULL, NULL, NULL)
+	MCFG_7474_ADD("7474_1d_2", NULL, NULL, NULL)
+	MCFG_7474_ADD("7474_1c_1", NULL, NULL, NULL)
+	MCFG_7474_ADD("7474_1c_2", NULL, NULL, NULL)
+	MCFG_7474_ADD("7474_1a_1", NULL, NULL, NULL)
+	MCFG_7474_ADD("7474_1a_2", NULL, NULL, NULL)
 
-	MDRV_74148_ADD("74148_3s", carpolo_74148_3s_cb)
-	MDRV_74153_ADD("74153_1k", NULL)
+	MCFG_74148_ADD("74148_3s", carpolo_74148_3s_cb)
+	MCFG_74153_ADD("74153_1k", NULL)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 239, 0, 255)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 239, 0, 255)
 
-	MDRV_GFXDECODE(carpolo)
-	MDRV_PALETTE_LENGTH(12*2+2*16+4*2)
+	MCFG_GFXDECODE(carpolo)
+	MCFG_PALETTE_LENGTH(12*2+2*16+4*2)
 
-	MDRV_PALETTE_INIT(carpolo)
-	MDRV_VIDEO_START(carpolo)
-	MDRV_VIDEO_UPDATE(carpolo)
-	MDRV_VIDEO_EOF(carpolo)
+	MCFG_PALETTE_INIT(carpolo)
+	MCFG_VIDEO_START(carpolo)
+	MCFG_VIDEO_UPDATE(carpolo)
+	MCFG_VIDEO_EOF(carpolo)
 MACHINE_CONFIG_END
 
 

@@ -297,16 +297,16 @@ ADDRESS_MAP_END
 
 
 MACHINE_CONFIG_FRAGMENT( carnival_audio )
-	MDRV_CPU_ADD("audiocpu", I8039, 3579545)
-	MDRV_CPU_PROGRAM_MAP(carnival_audio_map)
-	MDRV_CPU_IO_MAP(carnival_audio_io_map)
+	MCFG_CPU_ADD("audiocpu", I8039, 3579545)
+	MCFG_CPU_PROGRAM_MAP(carnival_audio_map)
+	MCFG_CPU_IO_MAP(carnival_audio_io_map)
 
-	MDRV_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(HZ(600))
 
-	MDRV_SOUND_ADD("psg", AY8910, PSG_CLOCK)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	MCFG_SOUND_ADD("psg", AY8910, PSG_CLOCK)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MDRV_SOUND_ADD("samples", SAMPLES, 0)
-	MDRV_SOUND_CONFIG(carnival_samples_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SOUND_CONFIG(carnival_samples_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END

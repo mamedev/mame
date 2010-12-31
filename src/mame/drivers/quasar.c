@@ -362,44 +362,44 @@ static MACHINE_RESET( quasar )
 static MACHINE_CONFIG_START( quasar, cvs_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", S2650, 14318000/4)	/* 14 mhz crystal divide by 4 on board */
-	MDRV_CPU_PROGRAM_MAP(quasar)
-	MDRV_CPU_IO_MAP(quasar_io)
-	MDRV_CPU_VBLANK_INT("screen", quasar_interrupt)
+	MCFG_CPU_ADD("maincpu", S2650, 14318000/4)	/* 14 mhz crystal divide by 4 on board */
+	MCFG_CPU_PROGRAM_MAP(quasar)
+	MCFG_CPU_IO_MAP(quasar_io)
+	MCFG_CPU_VBLANK_INT("screen", quasar_interrupt)
 
-	MDRV_CPU_ADD("soundcpu",I8035,6000000)			/* 6MHz crystal divide by 15 in CPU */
-	MDRV_CPU_PROGRAM_MAP(sound_map)
-	MDRV_CPU_IO_MAP(sound_portmap)
+	MCFG_CPU_ADD("soundcpu",I8035,6000000)			/* 6MHz crystal divide by 15 in CPU */
+	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_CPU_IO_MAP(sound_portmap)
 
-	MDRV_MACHINE_START(quasar)
-	MDRV_MACHINE_RESET(quasar)
+	MCFG_MACHINE_START(quasar)
+	MCFG_MACHINE_RESET(quasar)
 
-	MDRV_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(HZ(6000))
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(50)							/* From dot clock */
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(1*8+1, 29*8-1, 2*8, 32*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)							/* From dot clock */
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(1*8+1, 29*8-1, 2*8, 32*8-1)
 
-	MDRV_GFXDECODE(quasar)
-	MDRV_PALETTE_LENGTH((64+1)*8+(4*256))
+	MCFG_GFXDECODE(quasar)
+	MCFG_PALETTE_LENGTH((64+1)*8+(4*256))
 
-	MDRV_S2636_ADD("s2636_0", s2636_0_config)
-	MDRV_S2636_ADD("s2636_1", s2636_1_config)
-	MDRV_S2636_ADD("s2636_2", s2636_2_config)
+	MCFG_S2636_ADD("s2636_0", s2636_0_config)
+	MCFG_S2636_ADD("s2636_1", s2636_1_config)
+	MCFG_S2636_ADD("s2636_2", s2636_2_config)
 
-	MDRV_PALETTE_INIT(quasar)
-	MDRV_VIDEO_START(quasar)
-	MDRV_VIDEO_UPDATE(quasar)
+	MCFG_PALETTE_INIT(quasar)
+	MCFG_VIDEO_START(quasar)
+	MCFG_VIDEO_UPDATE(quasar)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 ROM_START( quasar )

@@ -463,18 +463,18 @@ ADDRESS_MAP_END
 
 /********* machine driver ***********/
 MACHINE_CONFIG_FRAGMENT(mcr_ssio)
-	MDRV_CPU_ADD("ssiocpu", Z80, SSIO_CLOCK/2/4)
-	MDRV_CPU_PROGRAM_MAP(ssio_map)
-	MDRV_CPU_PERIODIC_INT(ssio_14024_clock, SSIO_CLOCK/2/16/10)
+	MCFG_CPU_ADD("ssiocpu", Z80, SSIO_CLOCK/2/4)
+	MCFG_CPU_PROGRAM_MAP(ssio_map)
+	MCFG_CPU_PERIODIC_INT(ssio_14024_clock, SSIO_CLOCK/2/16/10)
 
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MDRV_SOUND_ADD("ssio.1", AY8910, SSIO_CLOCK/2/4)
-	MDRV_SOUND_CONFIG(ssio_ay8910_interface_1)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.33)
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SOUND_ADD("ssio.1", AY8910, SSIO_CLOCK/2/4)
+	MCFG_SOUND_CONFIG(ssio_ay8910_interface_1)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.33)
 
-	MDRV_SOUND_ADD("ssio.2", AY8910, SSIO_CLOCK/2/4)
-	MDRV_SOUND_CONFIG(ssio_ay8910_interface_2)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.33)
+	MCFG_SOUND_ADD("ssio.2", AY8910, SSIO_CLOCK/2/4)
+	MCFG_SOUND_CONFIG(ssio_ay8910_interface_2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.33)
 MACHINE_CONFIG_END
 
 
@@ -594,25 +594,25 @@ static const pia6821_interface csdeluxe_pia_intf =
 
 /********* machine driver ***********/
 MACHINE_CONFIG_FRAGMENT(chip_squeak_deluxe)
-	MDRV_CPU_ADD("csdcpu", M68000, CSDELUXE_CLOCK/2)
-	MDRV_CPU_PROGRAM_MAP(csdeluxe_map)
+	MCFG_CPU_ADD("csdcpu", M68000, CSDELUXE_CLOCK/2)
+	MCFG_CPU_PROGRAM_MAP(csdeluxe_map)
 
-	MDRV_PIA6821_ADD("csdpia", csdeluxe_pia_intf)
+	MCFG_PIA6821_ADD("csdpia", csdeluxe_pia_intf)
 
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("csddac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("csddac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_FRAGMENT(chip_squeak_deluxe_stereo)
-	MDRV_CPU_ADD("csdcpu", M68000, CSDELUXE_CLOCK/2)
-	MDRV_CPU_PROGRAM_MAP(csdeluxe_map)
+	MCFG_CPU_ADD("csdcpu", M68000, CSDELUXE_CLOCK/2)
+	MCFG_CPU_PROGRAM_MAP(csdeluxe_map)
 
-	MDRV_PIA6821_ADD("csdpia", csdeluxe_pia_intf)
+	MCFG_PIA6821_ADD("csdpia", csdeluxe_pia_intf)
 
-	MDRV_SOUND_ADD("csddac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("csddac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -713,14 +713,14 @@ static const pia6821_interface soundsgood_pia_intf =
 
 /********* machine driver ***********/
 MACHINE_CONFIG_FRAGMENT(sounds_good)
-	MDRV_CPU_ADD("sgcpu", M68000, SOUNDSGOOD_CLOCK/2)
-	MDRV_CPU_PROGRAM_MAP(soundsgood_map)
+	MCFG_CPU_ADD("sgcpu", M68000, SOUNDSGOOD_CLOCK/2)
+	MCFG_CPU_PROGRAM_MAP(soundsgood_map)
 
-	MDRV_PIA6821_ADD("sgpia", soundsgood_pia_intf)
+	MCFG_PIA6821_ADD("sgpia", soundsgood_pia_intf)
 
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("sgdac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("sgdac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -815,14 +815,14 @@ static const pia6821_interface turbocs_pia_intf =
 
 /********* machine driver ***********/
 MACHINE_CONFIG_FRAGMENT(turbo_chip_squeak)
-	MDRV_CPU_ADD("tcscpu", M6809E, TURBOCS_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(turbocs_map)
+	MCFG_CPU_ADD("tcscpu", M6809E, TURBOCS_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(turbocs_map)
 
-	MDRV_PIA6821_ADD("tcspia", turbocs_pia_intf)
+	MCFG_PIA6821_ADD("tcspia", turbocs_pia_intf)
 
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("tcsdac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("tcsdac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -976,16 +976,16 @@ static const pia6821_interface squawkntalk_pia1_intf =
 
 /********* machine driver ***********/
 MACHINE_CONFIG_FRAGMENT(squawk_n_talk)
-	MDRV_CPU_ADD("sntcpu", M6802, SQUAWKTALK_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(squawkntalk_map)
+	MCFG_CPU_ADD("sntcpu", M6802, SQUAWKTALK_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(squawkntalk_map)
 
-	MDRV_PIA6821_ADD("sntpia0", squawkntalk_pia0_intf)
-	MDRV_PIA6821_ADD("sntpia1", squawkntalk_pia1_intf)
+	MCFG_PIA6821_ADD("sntpia0", squawkntalk_pia0_intf)
+	MCFG_PIA6821_ADD("sntpia1", squawkntalk_pia1_intf)
 
 	/* only used on Discs of Tron, which is stereo */
-	MDRV_SOUND_ADD("sntspeech", TMS5200, 640000)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
+	MCFG_SOUND_ADD("sntspeech", TMS5200, 640000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
 
 	/* the board also supports an AY-8912 and/or an 8-bit DAC, neither of */
 	/* which are populated on the Discs of Tron board */

@@ -2965,41 +2965,41 @@ static MACHINE_START( qsound )
 static MACHINE_CONFIG_START( cps1_10MHz, cps_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, XTAL_10MHz )	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(main_map)
-	MDRV_CPU_VBLANK_INT("screen", cps1_interrupt)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz )	/* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_CPU_VBLANK_INT("screen", cps1_interrupt)
 
-	MDRV_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)  /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(sub_map)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)  /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(sub_map)
 
-	MDRV_MACHINE_START(cps1)
+	MCFG_MACHINE_START(cps1)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(59.61) /* verified on one of the input gates of the 74ls08@4J on GNG romboard 88620-b-2 */
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 2*8, 30*8-1 )
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(59.61) /* verified on one of the input gates of the 74ls08@4J on GNG romboard 88620-b-2 */
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 2*8, 30*8-1 )
 
-	MDRV_GFXDECODE(cps1)
-	MDRV_PALETTE_LENGTH(0xc00)
+	MCFG_GFXDECODE(cps1)
+	MCFG_PALETTE_LENGTH(0xc00)
 
-	MDRV_VIDEO_START(cps1)
-	MDRV_VIDEO_EOF(cps1)
-	MDRV_VIDEO_UPDATE(cps1)
+	MCFG_VIDEO_START(cps1)
+	MCFG_VIDEO_EOF(cps1)
+	MCFG_VIDEO_UPDATE(cps1)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("2151", YM2151, XTAL_3_579545MHz)  /* verified on pcb */
-	MDRV_SOUND_CONFIG(ym2151_config)
-	MDRV_SOUND_ROUTE(0, "mono", 0.35)
-	MDRV_SOUND_ROUTE(1, "mono", 0.35)
+	MCFG_SOUND_ADD("2151", YM2151, XTAL_3_579545MHz)  /* verified on pcb */
+	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_SOUND_ROUTE(0, "mono", 0.35)
+	MCFG_SOUND_ROUTE(1, "mono", 0.35)
 
 	/* CPS PPU is fed by a 16mhz clock,pin 117 outputs a 4mhz clock which is divided by 4 using 2 74ls74 */
-	MDRV_OKIM6295_ADD("oki", XTAL_16MHz/4/4, OKIM6295_PIN7_HIGH) // pin 7 can be changed by the game code, see f006 on z80
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/4/4, OKIM6295_PIN7_HIGH) // pin 7 can be changed by the game code, see f006 on z80
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
 #ifndef MESS
@@ -3007,43 +3007,43 @@ static MACHINE_CONFIG_DERIVED( cps1_12MHz, cps1_10MHz )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_CLOCK( XTAL_12MHz )	/* verified on pcb */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_CLOCK( XTAL_12MHz )	/* verified on pcb */
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pang3, cps1_12MHz )
 
 	/* basic machine hardware */
 
-	MDRV_EEPROM_ADD("eeprom", pang3_eeprom_interface)
+	MCFG_EEPROM_ADD("eeprom", pang3_eeprom_interface)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( qsound, cps1_12MHz )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_REPLACE("maincpu", M68000, XTAL_12MHz )	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(qsound_main_map)
-	MDRV_CPU_VBLANK_INT("screen", cps1_qsound_interrupt)  /* ??? interrupts per frame */
+	MCFG_CPU_REPLACE("maincpu", M68000, XTAL_12MHz )	/* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(qsound_main_map)
+	MCFG_CPU_VBLANK_INT("screen", cps1_qsound_interrupt)  /* ??? interrupts per frame */
 
-	MDRV_CPU_REPLACE("audiocpu", Z80, XTAL_8MHz)  /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(qsound_sub_map)
-	MDRV_CPU_PERIODIC_INT(irq0_line_hold, 250)	/* ?? */
+	MCFG_CPU_REPLACE("audiocpu", Z80, XTAL_8MHz)  /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(qsound_sub_map)
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 250)	/* ?? */
 
-	MDRV_MACHINE_START(qsound)
+	MCFG_MACHINE_START(qsound)
 
-	MDRV_EEPROM_ADD("eeprom", qsound_eeprom_interface)
+	MCFG_EEPROM_ADD("eeprom", qsound_eeprom_interface)
 
 	/* sound hardware */
-	MDRV_DEVICE_REMOVE("mono")
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_DEVICE_REMOVE("mono")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_DEVICE_REMOVE("2151")
-	MDRV_DEVICE_REMOVE("oki")
+	MCFG_DEVICE_REMOVE("2151")
+	MCFG_DEVICE_REMOVE("oki")
 
-	MDRV_SOUND_ADD("qsound", QSOUND, QSOUND_CLOCK)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("qsound", QSOUND, QSOUND_CLOCK)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 /* bootlegs with PIC */
@@ -3051,42 +3051,42 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( cpspicb, cps_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 12000000)
-	MDRV_CPU_PROGRAM_MAP(main_map)
-	MDRV_CPU_VBLANK_INT("screen", cps1_qsound_interrupt)
+	MCFG_CPU_ADD("maincpu", M68000, 12000000)
+	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_CPU_VBLANK_INT("screen", cps1_qsound_interrupt)
 
-	MDRV_CPU_ADD("audiocpu", PIC16C57, 12000000)
-	MDRV_DEVICE_DISABLE() /* no valid dumps .. */
+	MCFG_CPU_ADD("audiocpu", PIC16C57, 12000000)
+	MCFG_DEVICE_DISABLE() /* no valid dumps .. */
 
-	MDRV_MACHINE_START(common)
+	MCFG_MACHINE_START(common)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 2*8, 30*8-1 )
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 2*8, 30*8-1 )
 
-	MDRV_GFXDECODE(cps1)
-	MDRV_PALETTE_LENGTH(0xc00)
+	MCFG_GFXDECODE(cps1)
+	MCFG_PALETTE_LENGTH(0xc00)
 
-	MDRV_VIDEO_START(cps1)
-	MDRV_VIDEO_EOF(cps1)
-	MDRV_VIDEO_UPDATE(cps1)
+	MCFG_VIDEO_START(cps1)
+	MCFG_VIDEO_EOF(cps1)
+	MCFG_VIDEO_UPDATE(cps1)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( wofhfh, cps1_12MHz )
 
 	/* basic machine hardware */
 
-	MDRV_EEPROM_ADD("eeprom", qsound_eeprom_interface)
+	MCFG_EEPROM_ADD("eeprom", qsound_eeprom_interface)
 MACHINE_CONFIG_END
 
 /* incomplete */
@@ -3126,46 +3126,46 @@ static const msm5205_interface msm5205_interface2 =
 static MACHINE_CONFIG_START( sf2mdt, cps_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 12000000)
-	MDRV_CPU_PROGRAM_MAP(main_map)
-	MDRV_CPU_VBLANK_INT("screen", cps1_interrupt)
+	MCFG_CPU_ADD("maincpu", M68000, 12000000)
+	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_CPU_VBLANK_INT("screen", cps1_interrupt)
 
-	MDRV_CPU_ADD("audiocpu", Z80, 3579545)
-	MDRV_CPU_PROGRAM_MAP(sf2mdt_z80map)
+	MCFG_CPU_ADD("audiocpu", Z80, 3579545)
+	MCFG_CPU_PROGRAM_MAP(sf2mdt_z80map)
 
-	MDRV_MACHINE_START(common)
+	MCFG_MACHINE_START(common)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 2*8, 30*8-1 )
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 2*8, 30*8-1 )
 
-	MDRV_GFXDECODE(cps1)
-	MDRV_PALETTE_LENGTH(0xc00)
+	MCFG_GFXDECODE(cps1)
+	MCFG_PALETTE_LENGTH(0xc00)
 
-	MDRV_VIDEO_START(cps1)
-	MDRV_VIDEO_EOF(cps1)
-	MDRV_VIDEO_UPDATE(cps1)
+	MCFG_VIDEO_START(cps1)
+	MCFG_VIDEO_EOF(cps1)
+	MCFG_VIDEO_UPDATE(cps1)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("2151", YM2151, 3579545)
-	MDRV_SOUND_CONFIG(ym2151_config)
-	MDRV_SOUND_ROUTE(0, "mono", 0.35)
-	MDRV_SOUND_ROUTE(1, "mono", 0.35)
+	MCFG_SOUND_ADD("2151", YM2151, 3579545)
+	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_SOUND_ROUTE(0, "mono", 0.35)
+	MCFG_SOUND_ROUTE(1, "mono", 0.35)
 
 	/* has 2x MSM5205 instead of OKI6295 */
-	MDRV_SOUND_ADD("msm1", MSM5205, 24000000/64)	/* ? */
-	MDRV_SOUND_CONFIG(msm5205_interface1)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("msm1", MSM5205, 24000000/64)	/* ? */
+	MCFG_SOUND_CONFIG(msm5205_interface1)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD("msm2", MSM5205, 24000000/64)	/* ? */
-	MDRV_SOUND_CONFIG(msm5205_interface2)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("msm2", MSM5205, 24000000/64)	/* ? */
+	MCFG_SOUND_CONFIG(msm5205_interface2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 /*
@@ -3211,46 +3211,46 @@ Note:
 static MACHINE_CONFIG_START( knightsb, cps_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 24000000 / 2)
-	MDRV_CPU_PROGRAM_MAP(main_map)
-	MDRV_CPU_VBLANK_INT("screen", cps1_interrupt)
+	MCFG_CPU_ADD("maincpu", M68000, 24000000 / 2)
+	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_CPU_VBLANK_INT("screen", cps1_interrupt)
 
-	MDRV_CPU_ADD("audiocpu", Z80, 29821000 / 8)
-	MDRV_CPU_PROGRAM_MAP(sf2mdt_z80map)
+	MCFG_CPU_ADD("audiocpu", Z80, 29821000 / 8)
+	MCFG_CPU_PROGRAM_MAP(sf2mdt_z80map)
 
-	MDRV_MACHINE_START(common)
+	MCFG_MACHINE_START(common)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 2*8, 30*8-1 )
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(8*8, (64-8)*8-1, 2*8, 30*8-1 )
 
-	MDRV_GFXDECODE(cps1)
-	MDRV_PALETTE_LENGTH(0xc00)
+	MCFG_GFXDECODE(cps1)
+	MCFG_PALETTE_LENGTH(0xc00)
 
-	MDRV_VIDEO_START(cps1)
-	MDRV_VIDEO_EOF(cps1)
-	MDRV_VIDEO_UPDATE(cps1)
+	MCFG_VIDEO_START(cps1)
+	MCFG_VIDEO_EOF(cps1)
+	MCFG_VIDEO_UPDATE(cps1)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("2151", YM2151, 29821000 / 8)
-	MDRV_SOUND_CONFIG(ym2151_config)
-	MDRV_SOUND_ROUTE(0, "mono", 0.35)
-	MDRV_SOUND_ROUTE(1, "mono", 0.35)
+	MCFG_SOUND_ADD("2151", YM2151, 29821000 / 8)
+	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_SOUND_ROUTE(0, "mono", 0.35)
+	MCFG_SOUND_ROUTE(1, "mono", 0.35)
 
 	/* has 2x MSM5205 instead of OKI6295 */
-	MDRV_SOUND_ADD("msm1", MSM5205, 24000000/64)	/* ? */
-	MDRV_SOUND_CONFIG(msm5205_interface1)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("msm1", MSM5205, 24000000/64)	/* ? */
+	MCFG_SOUND_CONFIG(msm5205_interface1)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD("msm2", MSM5205, 24000000/64)	/* ? */
-	MDRV_SOUND_CONFIG(msm5205_interface2)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("msm2", MSM5205, 24000000/64)	/* ? */
+	MCFG_SOUND_CONFIG(msm5205_interface2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 

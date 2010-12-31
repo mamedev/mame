@@ -859,66 +859,66 @@ static MACHINE_RESET( nightgal )
 static MACHINE_CONFIG_START( royalqn, nightgal_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80,MASTER_CLOCK / 8)		 /* ? MHz */
-	MDRV_CPU_PROGRAM_MAP(royalqn_map)
-	MDRV_CPU_IO_MAP(royalqn_io)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("maincpu", Z80,MASTER_CLOCK / 8)		 /* ? MHz */
+	MCFG_CPU_PROGRAM_MAP(royalqn_map)
+	MCFG_CPU_IO_MAP(royalqn_io)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("sub", NSC8105, MASTER_CLOCK / 8)
-	MDRV_CPU_PROGRAM_MAP(royalqn_nsc_map)
+	MCFG_CPU_ADD("sub", NSC8105, MASTER_CLOCK / 8)
+	MCFG_CPU_PROGRAM_MAP(royalqn_nsc_map)
 
-	MDRV_QUANTUM_PERFECT_CPU("maincpu")
+	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
-	MDRV_MACHINE_START(nightgal)
-	MDRV_MACHINE_RESET(nightgal)
+	MCFG_MACHINE_START(nightgal)
+	MCFG_MACHINE_RESET(nightgal)
 
 	/* video hardware */
 	/* TODO: blitter clock is MASTER_CLOCK / 4, 320 x 264 pixels, 256 x 224 of visible area */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
-	MDRV_PALETTE_INIT(nightgal)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
+	MCFG_PALETTE_INIT(nightgal)
 
-	MDRV_PALETTE_LENGTH(0x10)
+	MCFG_PALETTE_LENGTH(0x10)
 
-	MDRV_VIDEO_START(nightgal)
-	MDRV_VIDEO_UPDATE(nightgal)
+	MCFG_VIDEO_START(nightgal)
+	MCFG_VIDEO_UPDATE(nightgal)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK / 8)
-	MDRV_SOUND_CONFIG(ay8910_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	MCFG_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK / 8)
+	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( sexygal, royalqn )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(sexygal_map)
-	MDRV_CPU_IO_MAP(sexygal_io)
-	MDRV_CPU_PERIODIC_INT(nmi_line_pulse,244)//???
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(sexygal_map)
+	MCFG_CPU_IO_MAP(sexygal_io)
+	MCFG_CPU_PERIODIC_INT(nmi_line_pulse,244)//???
 
-	MDRV_CPU_MODIFY("sub")
-	MDRV_CPU_PROGRAM_MAP(sexygal_nsc_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_MODIFY("sub")
+	MCFG_CPU_PROGRAM_MAP(sexygal_nsc_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_DEVICE_REMOVE("aysnd")
+	MCFG_DEVICE_REMOVE("aysnd")
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, MASTER_CLOCK / 8)
-	MDRV_SOUND_CONFIG(ay8910_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	MCFG_SOUND_ADD("ymsnd", YM2203, MASTER_CLOCK / 8)
+	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ngalsumr, royalqn )
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(royalqn_map)
-	MDRV_CPU_IO_MAP(royalqn_io)
-	MDRV_CPU_PERIODIC_INT(nmi_line_pulse,244)//???
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(royalqn_map)
+	MCFG_CPU_IO_MAP(royalqn_io)
+	MCFG_CPU_PERIODIC_INT(nmi_line_pulse,244)//???
 MACHINE_CONFIG_END
 
 /*

@@ -685,78 +685,78 @@ static const ay8910_interface ay8910_config =
 static MACHINE_CONFIG_START( dlair_base, dlair_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK_US/4)
-	MDRV_CPU_PROGRAM_MAP(dlus_map)
-	MDRV_CPU_VBLANK_INT("screen", vblank_callback)
-	MDRV_CPU_PERIODIC_INT(irq0_line_hold, (double)MASTER_CLOCK_US/8/16/16/16/16)
+	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK_US/4)
+	MCFG_CPU_PROGRAM_MAP(dlus_map)
+	MCFG_CPU_VBLANK_INT("screen", vblank_callback)
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold, (double)MASTER_CLOCK_US/8/16/16/16/16)
 
-	MDRV_MACHINE_START(dlair)
-	MDRV_MACHINE_RESET(dlair)
+	MCFG_MACHINE_START(dlair)
+	MCFG_MACHINE_RESET(dlair)
 
 	/* video hardware */
-	MDRV_LASERDISC_SCREEN_ADD_NTSC("screen", BITMAP_FORMAT_RGB32)
+	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", BITMAP_FORMAT_RGB32)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK_US/8)
-	MDRV_SOUND_CONFIG(ay8910_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.33)
+	MCFG_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK_US/8)
+	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.33)
 
-	MDRV_SOUND_ADD("ldsound", LASERDISC_SOUND, 0)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("ldsound", LASERDISC_SOUND, 0)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( dlair_pr7820, dlair_base )
-	MDRV_LASERDISC_ADD("laserdisc", PIONEER_PR7820, "screen", "ldsound")
+	MCFG_LASERDISC_ADD("laserdisc", PIONEER_PR7820, "screen", "ldsound")
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( dlair_ldv1000, dlair_base )
-	MDRV_LASERDISC_ADD("laserdisc", PIONEER_LDV1000, "screen", "ldsound")
+	MCFG_LASERDISC_ADD("laserdisc", PIONEER_LDV1000, "screen", "ldsound")
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( dleuro, dlair_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK_EURO/4)
-	MDRV_CPU_CONFIG(dleuro_daisy_chain)
-	MDRV_CPU_PROGRAM_MAP(dleuro_map)
-	MDRV_CPU_IO_MAP(dleuro_io_map)
-	MDRV_CPU_VBLANK_INT("screen", vblank_callback)
+	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK_EURO/4)
+	MCFG_CPU_CONFIG(dleuro_daisy_chain)
+	MCFG_CPU_PROGRAM_MAP(dleuro_map)
+	MCFG_CPU_IO_MAP(dleuro_io_map)
+	MCFG_CPU_VBLANK_INT("screen", vblank_callback)
 
-	MDRV_Z80CTC_ADD("ctc", MASTER_CLOCK_EURO/4 /* same as "maincpu" */, ctc_intf)
-	MDRV_Z80SIO_ADD("sio", MASTER_CLOCK_EURO/4 /* same as "maincpu" */, sio_intf)
+	MCFG_Z80CTC_ADD("ctc", MASTER_CLOCK_EURO/4 /* same as "maincpu" */, ctc_intf)
+	MCFG_Z80SIO_ADD("sio", MASTER_CLOCK_EURO/4 /* same as "maincpu" */, sio_intf)
 
-	MDRV_WATCHDOG_TIME_INIT(HZ(MASTER_CLOCK_EURO/(16*16*16*16*16*8)))
+	MCFG_WATCHDOG_TIME_INIT(HZ(MASTER_CLOCK_EURO/(16*16*16*16*16*8)))
 
-	MDRV_MACHINE_START(dlair)
-	MDRV_MACHINE_RESET(dlair)
+	MCFG_MACHINE_START(dlair)
+	MCFG_MACHINE_RESET(dlair)
 
-	MDRV_LASERDISC_ADD("laserdisc", PHILLIPS_22VP932, "screen", "ldsound")
-	MDRV_LASERDISC_OVERLAY(dleuro, 256, 256, BITMAP_FORMAT_INDEXED16)
+	MCFG_LASERDISC_ADD("laserdisc", PHILLIPS_22VP932, "screen", "ldsound")
+	MCFG_LASERDISC_OVERLAY(dleuro, 256, 256, BITMAP_FORMAT_INDEXED16)
 
 	/* video hardware */
-	MDRV_LASERDISC_SCREEN_ADD_PAL("screen", BITMAP_FORMAT_INDEXED16)
+	MCFG_LASERDISC_SCREEN_ADD_PAL("screen", BITMAP_FORMAT_INDEXED16)
 
-	MDRV_GFXDECODE(dlair)
-	MDRV_PALETTE_LENGTH(16)
+	MCFG_GFXDECODE(dlair)
+	MCFG_PALETTE_LENGTH(16)
 
-	MDRV_PALETTE_INIT(dleuro)
+	MCFG_PALETTE_INIT(dleuro)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("beep", BEEP, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.33)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.33)
+	MCFG_SOUND_ADD("beep", BEEP, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.33)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.33)
 
-	MDRV_SOUND_ADD("ldsound", LASERDISC_SOUND, 0)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("ldsound", LASERDISC_SOUND, 0)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 

@@ -30,9 +30,9 @@ DECLARE_LEGACY_DEVICE(MB87078, mb87078);
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_MB87078_ADD(_tag, _interface) \
-	MDRV_DEVICE_ADD(_tag, MB87078, 0) \
-	MDRV_DEVICE_CONFIG(_interface)
+#define MCFG_MB87078_ADD(_tag, _interface) \
+	MCFG_DEVICE_ADD(_tag, MB87078, 0) \
+	MCFG_DEVICE_CONFIG(_interface)
 
 
 /***************************************************************************

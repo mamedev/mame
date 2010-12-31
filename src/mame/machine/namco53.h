@@ -13,9 +13,9 @@ struct _namco_53xx_interface
 };
 
 
-#define MDRV_NAMCO_53XX_ADD(_tag, _clock, _interface) \
-	MDRV_DEVICE_ADD(_tag, NAMCO_53XX, _clock) \
-	MDRV_DEVICE_CONFIG(_interface)
+#define MCFG_NAMCO_53XX_ADD(_tag, _clock, _interface) \
+	MCFG_DEVICE_ADD(_tag, NAMCO_53XX, _clock) \
+	MCFG_DEVICE_CONFIG(_interface)
 
 
 void namco_53xx_read_request(running_device *device);

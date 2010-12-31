@@ -210,12 +210,12 @@ static const samples_interface astrob_samples_interface =
 
 MACHINE_CONFIG_FRAGMENT( astrob_sound_board )
 
-	MDRV_SOUND_START(astrob)
+	MCFG_SOUND_START(astrob)
 
 	/* sound hardware */
-	MDRV_SOUND_ADD("samples", SAMPLES, 0)
-	MDRV_SOUND_CONFIG(astrob_samples_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SOUND_CONFIG(astrob_samples_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 
@@ -438,17 +438,17 @@ static const ppi8255_interface ppi8255_005_intf =
 
 MACHINE_CONFIG_FRAGMENT( 005_sound_board )
 
-	MDRV_PPI8255_ADD( "ppi8255", ppi8255_005_intf )
+	MCFG_PPI8255_ADD( "ppi8255", ppi8255_005_intf )
 
 	/* sound hardware */
-	MDRV_SOUND_START(sega005)
+	MCFG_SOUND_START(sega005)
 
-	MDRV_SOUND_ADD("samples", SAMPLES, 0)
-	MDRV_SOUND_CONFIG(sega005_samples_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SOUND_CONFIG(sega005_samples_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD("005", SEGA005, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("005", SEGA005, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 
@@ -676,11 +676,11 @@ static const samples_interface spaceod_samples_interface =
 MACHINE_CONFIG_FRAGMENT( spaceod_sound_board )
 
 	/* sound hardware */
-	MDRV_SOUND_START(spaceod)
+	MCFG_SOUND_START(spaceod)
 
-	MDRV_SOUND_ADD("samples", SAMPLES, 0)
-	MDRV_SOUND_CONFIG(spaceod_samples_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SOUND_CONFIG(spaceod_samples_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 
@@ -842,27 +842,27 @@ static const ppi8255_interface monsterb_ppi_intf =
 
 MACHINE_CONFIG_FRAGMENT( monsterb_sound_board )
 
-	MDRV_PPI8255_ADD( "ppi8255", monsterb_ppi_intf )
+	MCFG_PPI8255_ADD( "ppi8255", monsterb_ppi_intf )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("audiocpu", N7751, 6000000)
-	MDRV_CPU_IO_MAP(monsterb_7751_portmap)
+	MCFG_CPU_ADD("audiocpu", N7751, 6000000)
+	MCFG_CPU_IO_MAP(monsterb_7751_portmap)
 
-	MDRV_I8243_ADD("audio_8243", NULL, n7751_rom_control_w)
+	MCFG_I8243_ADD("audio_8243", NULL, n7751_rom_control_w)
 
 	/* sound hardware */
-	MDRV_SOUND_START(monsterb)
+	MCFG_SOUND_START(monsterb)
 
-	MDRV_SOUND_ADD("samples", SAMPLES, 0)
-	MDRV_SOUND_CONFIG(monsterb_samples_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SOUND_CONFIG(monsterb_samples_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD("music", TMS36XX, 247)
-	MDRV_SOUND_CONFIG(monsterb_tms3617_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("music", TMS36XX, 247)
+	MCFG_SOUND_CONFIG(monsterb_tms3617_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 

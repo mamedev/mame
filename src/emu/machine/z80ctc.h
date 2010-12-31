@@ -49,9 +49,9 @@ const int NOTIMER_3 = (1<<3);
 	const z80ctc_interface (name)=
 
 
-#define MDRV_Z80CTC_ADD(_tag, _clock, _intrf) \
-	MDRV_DEVICE_ADD(_tag, Z80CTC, _clock) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_Z80CTC_ADD(_tag, _clock, _intrf) \
+	MCFG_DEVICE_ADD(_tag, Z80CTC, _clock) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
 
 

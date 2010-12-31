@@ -601,88 +601,88 @@ static const sn76477_interface sn76477_intf =
 static MACHINE_CONFIG_START( route16, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("cpu1", Z80, 2500000)	/* 10MHz / 4 = 2.5MHz */
-	MDRV_CPU_PROGRAM_MAP(route16_cpu1_map)
-	MDRV_CPU_IO_MAP(cpu1_io_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("cpu1", Z80, 2500000)	/* 10MHz / 4 = 2.5MHz */
+	MCFG_CPU_PROGRAM_MAP(route16_cpu1_map)
+	MCFG_CPU_IO_MAP(cpu1_io_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("cpu2", Z80, 2500000)	/* 10MHz / 4 = 2.5MHz */
-	MDRV_CPU_PROGRAM_MAP(route16_cpu2_map)
+	MCFG_CPU_ADD("cpu2", Z80, 2500000)	/* 10MHz / 4 = 2.5MHz */
+	MCFG_CPU_PROGRAM_MAP(route16_cpu2_map)
 
 	/* video hardware */
-	MDRV_VIDEO_UPDATE(route16)
+	MCFG_VIDEO_UPDATE(route16)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
-	MDRV_SCREEN_REFRESH_RATE(57)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)	/* frames per second, vblank duration */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-1)
+	MCFG_SCREEN_REFRESH_RATE(57)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)	/* frames per second, vblank duration */
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("ay8910", AY8910, 10000000/8)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("ay8910", AY8910, 10000000/8)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( routex, route16 )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("cpu1")
-	MDRV_CPU_PROGRAM_MAP(routex_cpu1_map)
+	MCFG_CPU_MODIFY("cpu1")
+	MCFG_CPU_PROGRAM_MAP(routex_cpu1_map)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( stratvox, route16 )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("cpu1")
-	MDRV_CPU_PROGRAM_MAP(stratvox_cpu1_map)
+	MCFG_CPU_MODIFY("cpu1")
+	MCFG_CPU_PROGRAM_MAP(stratvox_cpu1_map)
 
-	MDRV_CPU_MODIFY("cpu2")
-	MDRV_CPU_PROGRAM_MAP(stratvox_cpu2_map)
+	MCFG_CPU_MODIFY("cpu2")
+	MCFG_CPU_PROGRAM_MAP(stratvox_cpu2_map)
 
 	/* video hardware */
-	MDRV_VIDEO_UPDATE(stratvox)
+	MCFG_VIDEO_UPDATE(stratvox)
 
 	/* sound hardware */
-	MDRV_SOUND_MODIFY("ay8910")
-	MDRV_SOUND_CONFIG(stratvox_ay8910_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_MODIFY("ay8910")
+	MCFG_SOUND_CONFIG(stratvox_ay8910_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD("snsnd", SN76477, 0)
-	MDRV_SOUND_CONFIG(sn76477_intf)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("snsnd", SN76477, 0)
+	MCFG_SOUND_CONFIG(sn76477_intf)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( speakres, stratvox )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("cpu1")
-	MDRV_CPU_PROGRAM_MAP(speakres_cpu1_map)
+	MCFG_CPU_MODIFY("cpu1")
+	MCFG_CPU_PROGRAM_MAP(speakres_cpu1_map)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( spacecho, speakres )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("cpu2")
-	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,48)
+	MCFG_CPU_MODIFY("cpu2")
+	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,48)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( ttmahjng, route16 )
-	MDRV_CPU_MODIFY("cpu1")
-	MDRV_CPU_PROGRAM_MAP(ttmahjng_cpu1_map)
-	MDRV_CPU_IO_MAP(0)
+	MCFG_CPU_MODIFY("cpu1")
+	MCFG_CPU_PROGRAM_MAP(ttmahjng_cpu1_map)
+	MCFG_CPU_IO_MAP(0)
 
 	/* video hardware */
-	MDRV_VIDEO_UPDATE(ttmahjng)
+	MCFG_VIDEO_UPDATE(ttmahjng)
 MACHINE_CONFIG_END
 
 

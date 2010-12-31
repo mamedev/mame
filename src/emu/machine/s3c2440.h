@@ -13,9 +13,9 @@
 
 #define S3C2440_TAG "s3c2440"
 
-#define MDRV_S3C2440_ADD(_tag, _clock, _config) \
-    MDRV_DEVICE_ADD(_tag, S3C2440, _clock) \
-    MDRV_DEVICE_CONFIG(_config)
+#define MCFG_S3C2440_ADD(_tag, _clock, _config) \
+    MCFG_DEVICE_ADD(_tag, S3C2440, _clock) \
+    MCFG_DEVICE_CONFIG(_config)
 
 #define S3C2440_INTERFACE(name) \
 	const s3c2440_interface(name) =

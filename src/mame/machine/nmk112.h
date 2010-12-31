@@ -26,9 +26,9 @@ DECLARE_LEGACY_DEVICE(NMK112, nmk112);
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_NMK112_ADD(_tag, _interface) \
-	MDRV_DEVICE_ADD(_tag, NMK112, 0) \
-	MDRV_DEVICE_CONFIG(_interface)
+#define MCFG_NMK112_ADD(_tag, _interface) \
+	MCFG_DEVICE_ADD(_tag, NMK112, 0) \
+	MCFG_DEVICE_CONFIG(_interface)
 
 /***************************************************************************
     DEVICE I/O FUNCTIONS

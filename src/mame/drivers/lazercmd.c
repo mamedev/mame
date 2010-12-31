@@ -627,114 +627,114 @@ static MACHINE_RESET( lazercmd )
 static MACHINE_CONFIG_START( lazercmd, lazercmd_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", S2650,MASTER_CLOCK/12)				/* 672 kHz? */
+	MCFG_CPU_ADD("maincpu", S2650,MASTER_CLOCK/12)				/* 672 kHz? */
 /*  Main Clock is 8MHz divided by 12
     but memory and IO access is only possible
     within the line and frame blanking period
     thus requiring an extra loading of approx 3-5 */
-	MDRV_CPU_PROGRAM_MAP(lazercmd_map)
-	MDRV_CPU_IO_MAP(lazercmd_portmap)
-	MDRV_CPU_VBLANK_INT_HACK(lazercmd_timer, 128)	/* 7680 Hz */
+	MCFG_CPU_PROGRAM_MAP(lazercmd_map)
+	MCFG_CPU_IO_MAP(lazercmd_portmap)
+	MCFG_CPU_VBLANK_INT_HACK(lazercmd_timer, 128)	/* 7680 Hz */
 
-	MDRV_MACHINE_START(lazercmd)
-	MDRV_MACHINE_RESET(lazercmd)
+	MCFG_MACHINE_START(lazercmd)
+	MCFG_MACHINE_RESET(lazercmd)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(HORZ_RES * HORZ_CHR, VERT_RES * VERT_CHR)
-	MDRV_SCREEN_VISIBLE_AREA(0 * HORZ_CHR, HORZ_RES * HORZ_CHR - 1,
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(HORZ_RES * HORZ_CHR, VERT_RES * VERT_CHR)
+	MCFG_SCREEN_VISIBLE_AREA(0 * HORZ_CHR, HORZ_RES * HORZ_CHR - 1,
 						0 * VERT_CHR, (VERT_RES - 1) * VERT_CHR - 1)
 
-	MDRV_GFXDECODE(lazercmd)
-	MDRV_PALETTE_LENGTH(5)
+	MCFG_GFXDECODE(lazercmd)
+	MCFG_PALETTE_LENGTH(5)
 
-	MDRV_PALETTE_INIT(lazercmd)
-	MDRV_VIDEO_UPDATE(lazercmd)
+	MCFG_PALETTE_INIT(lazercmd)
+	MCFG_VIDEO_UPDATE(lazercmd)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( medlanes, lazercmd_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", S2650,MASTER_CLOCK/12)				/* 666 kHz */
+	MCFG_CPU_ADD("maincpu", S2650,MASTER_CLOCK/12)				/* 666 kHz */
 /*  Main Clock is 8MHz divided by 12
     but memory and IO access is only possible
     within the line and frame blanking period
     thus requiring an extra loading of approx 3-5 */
-	MDRV_CPU_PROGRAM_MAP(medlanes_map)
-	MDRV_CPU_IO_MAP(lazercmd_portmap)
-	MDRV_CPU_VBLANK_INT_HACK(lazercmd_timer, 128)	/* 7680 Hz */
+	MCFG_CPU_PROGRAM_MAP(medlanes_map)
+	MCFG_CPU_IO_MAP(lazercmd_portmap)
+	MCFG_CPU_VBLANK_INT_HACK(lazercmd_timer, 128)	/* 7680 Hz */
 
-	MDRV_MACHINE_START(lazercmd)
-	MDRV_MACHINE_RESET(lazercmd)
+	MCFG_MACHINE_START(lazercmd)
+	MCFG_MACHINE_RESET(lazercmd)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(HORZ_RES * HORZ_CHR, VERT_RES * VERT_CHR)
-	MDRV_SCREEN_VISIBLE_AREA(0 * HORZ_CHR, HORZ_RES * HORZ_CHR - 1,
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(HORZ_RES * HORZ_CHR, VERT_RES * VERT_CHR)
+	MCFG_SCREEN_VISIBLE_AREA(0 * HORZ_CHR, HORZ_RES * HORZ_CHR - 1,
 						 0 * VERT_CHR, VERT_RES * VERT_CHR - 1)
 
-	MDRV_GFXDECODE(lazercmd)
-	MDRV_PALETTE_LENGTH(5)
+	MCFG_GFXDECODE(lazercmd)
+	MCFG_PALETTE_LENGTH(5)
 
-	MDRV_PALETTE_INIT(lazercmd)
-	MDRV_VIDEO_UPDATE(lazercmd)
+	MCFG_PALETTE_INIT(lazercmd)
+	MCFG_VIDEO_UPDATE(lazercmd)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( bbonk, lazercmd_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", S2650,MASTER_CLOCK/12)				/* 666 kHz */
+	MCFG_CPU_ADD("maincpu", S2650,MASTER_CLOCK/12)				/* 666 kHz */
 /*  Main Clock is 8MHz divided by 12
     but memory and IO access is only possible
     within the line and frame blanking period
     thus requiring an extra loading of approx 3-5 */
-	MDRV_CPU_PROGRAM_MAP(bbonk_map)
-	MDRV_CPU_IO_MAP(lazercmd_portmap)
-	MDRV_CPU_VBLANK_INT_HACK(bbonk_timer, 128)	/* 7680 Hz */
+	MCFG_CPU_PROGRAM_MAP(bbonk_map)
+	MCFG_CPU_IO_MAP(lazercmd_portmap)
+	MCFG_CPU_VBLANK_INT_HACK(bbonk_timer, 128)	/* 7680 Hz */
 
-	MDRV_MACHINE_START(lazercmd)
-	MDRV_MACHINE_RESET(lazercmd)
+	MCFG_MACHINE_START(lazercmd)
+	MCFG_MACHINE_RESET(lazercmd)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(HORZ_RES * HORZ_CHR, VERT_RES * VERT_CHR)
-	MDRV_SCREEN_VISIBLE_AREA(0 * HORZ_CHR, HORZ_RES * HORZ_CHR - 1,
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(HORZ_RES * HORZ_CHR, VERT_RES * VERT_CHR)
+	MCFG_SCREEN_VISIBLE_AREA(0 * HORZ_CHR, HORZ_RES * HORZ_CHR - 1,
 						0 * VERT_CHR, (VERT_RES - 1) * VERT_CHR - 1)
 
-	MDRV_GFXDECODE(lazercmd)
-	MDRV_PALETTE_LENGTH(5)
+	MCFG_GFXDECODE(lazercmd)
+	MCFG_PALETTE_LENGTH(5)
 
-	MDRV_PALETTE_INIT(lazercmd)
-	MDRV_VIDEO_UPDATE(lazercmd)
+	MCFG_PALETTE_INIT(lazercmd)
+	MCFG_VIDEO_UPDATE(lazercmd)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 /***************************************************************************

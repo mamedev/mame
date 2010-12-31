@@ -3461,28 +3461,28 @@ GFXDECODE_END
 #endif
 
 static MACHINE_CONFIG_START( igs011_base, driver_device )
-	MDRV_CPU_ADD("maincpu",M68000, XTAL_22MHz/3)
+	MCFG_CPU_ADD("maincpu",M68000, XTAL_22MHz/3)
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(512, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 512-1, 0, 240-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(512, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 0, 240-1)
 
-	MDRV_PALETTE_LENGTH(0x800)
-//  MDRV_GFXDECODE(igs011)
+	MCFG_PALETTE_LENGTH(0x800)
+//  MCFG_GFXDECODE(igs011)
 
-	MDRV_VIDEO_START( igs011 )
-	MDRV_VIDEO_UPDATE( igs011 )
+	MCFG_VIDEO_START( igs011 )
+	MCFG_VIDEO_UPDATE( igs011 )
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_OKIM6295_ADD("oki", XTAL_22MHz/21, OKIM6295_PIN7_HIGH)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_OKIM6295_ADD("oki", XTAL_22MHz/21, OKIM6295_PIN7_HIGH)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 static INTERRUPT_GEN( drgnwrld_interrupt )
@@ -3496,17 +3496,17 @@ static INTERRUPT_GEN( drgnwrld_interrupt )
 }
 
 static MACHINE_CONFIG_DERIVED( drgnwrld, igs011_base )
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(drgnwrld)
-	MDRV_CPU_VBLANK_INT_HACK(drgnwrld_interrupt,1+4)	// lev5 frequency drives the music tempo
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(drgnwrld)
+	MCFG_CPU_VBLANK_INT_HACK(drgnwrld_interrupt,1+4)	// lev5 frequency drives the music tempo
 
-	MDRV_SOUND_ADD("ymsnd", YM3812, 3579545)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
+	MCFG_SOUND_ADD("ymsnd", YM3812, 3579545)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( drgnwrld_igs012, drgnwrld )
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(drgnwrld_igs012)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(drgnwrld_igs012)
 MACHINE_CONFIG_END
 
 
@@ -3527,9 +3527,9 @@ static INTERRUPT_GEN( lhb_interrupt )
 }
 
 static MACHINE_CONFIG_DERIVED( lhb, igs011_base )
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(lhb)
-	MDRV_CPU_VBLANK_INT_HACK(lhb_interrupt,3+1)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(lhb)
+	MCFG_CPU_VBLANK_INT_HACK(lhb_interrupt,3+1)
 MACHINE_CONFIG_END
 
 
@@ -3544,30 +3544,30 @@ static INTERRUPT_GEN( wlcc_interrupt )
 }
 
 static MACHINE_CONFIG_DERIVED( wlcc, igs011_base )
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(wlcc)
-	MDRV_CPU_VBLANK_INT_HACK(wlcc_interrupt,2)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(wlcc)
+	MCFG_CPU_VBLANK_INT_HACK(wlcc_interrupt,2)
 MACHINE_CONFIG_END
 
 
 
 static MACHINE_CONFIG_DERIVED( xymg, igs011_base )
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(xymg)
-	MDRV_CPU_VBLANK_INT_HACK(wlcc_interrupt,2)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(xymg)
+	MCFG_CPU_VBLANK_INT_HACK(wlcc_interrupt,2)
 MACHINE_CONFIG_END
 
 
 
 static MACHINE_CONFIG_DERIVED( lhb2, igs011_base )
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(lhb2)
-	MDRV_CPU_VBLANK_INT_HACK(drgnwrld_interrupt,1+4)	// lev5 frequency drives the music tempo
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(lhb2)
+	MCFG_CPU_VBLANK_INT_HACK(drgnwrld_interrupt,1+4)	// lev5 frequency drives the music tempo
 
-//  MDRV_GFXDECODE(igs011_hi)
+//  MCFG_GFXDECODE(igs011_hi)
 
-	MDRV_SOUND_ADD("ymsnd", YM2413, 3579545)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
+	MCFG_SOUND_ADD("ymsnd", YM2413, 3579545)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 MACHINE_CONFIG_END
 
 
@@ -3594,18 +3594,18 @@ static INTERRUPT_GEN( vbowl_interrupt )
 }
 
 static MACHINE_CONFIG_DERIVED( vbowl, igs011_base )
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(vbowl)
-	MDRV_CPU_VBLANK_INT_HACK(vbowl_interrupt,3+4)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(vbowl)
+	MCFG_CPU_VBLANK_INT_HACK(vbowl_interrupt,3+4)
 
-	MDRV_VIDEO_EOF(vbowl)	// trackball
-//  MDRV_GFXDECODE(igs011_hi)
+	MCFG_VIDEO_EOF(vbowl)	// trackball
+//  MCFG_GFXDECODE(igs011_hi)
 
-	MDRV_DEVICE_REMOVE("oki")
-//	MDRV_SOUND_ADD("ics", ICS2115, 0)
-	MDRV_ICS2115_ADD("ics", 0, sound_irq)
-//	MDRV_SOUND_CONFIG(vbowl_ics2115_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 5.0)
+	MCFG_DEVICE_REMOVE("oki")
+//	MCFG_SOUND_ADD("ics", ICS2115, 0)
+	MCFG_ICS2115_ADD("ics", 0, sound_irq)
+//	MCFG_SOUND_CONFIG(vbowl_ics2115_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 5.0)
 MACHINE_CONFIG_END
 
 

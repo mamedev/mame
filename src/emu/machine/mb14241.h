@@ -16,8 +16,8 @@ DECLARE_LEGACY_DEVICE(MB14241, mb14241);
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_MB14241_ADD(_tag) \
-	MDRV_DEVICE_ADD(_tag, MB14241, 0)
+#define MCFG_MB14241_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, MB14241, 0)
 
 
 /***************************************************************************

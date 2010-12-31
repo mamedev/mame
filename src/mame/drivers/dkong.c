@@ -1661,118 +1661,118 @@ static void braze_decrypt_rom(running_machine *machine, UINT8 *dest)
 static MACHINE_CONFIG_START( dkong_base, dkong_state )
 
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu", Z80, CLOCK_1H)
-    MDRV_CPU_PROGRAM_MAP(dkong_map)
-    MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
+    MCFG_CPU_ADD("maincpu", Z80, CLOCK_1H)
+    MCFG_CPU_PROGRAM_MAP(dkong_map)
+    MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-    MDRV_MACHINE_START(dkong2b)
-    MDRV_MACHINE_RESET(dkong)
+    MCFG_MACHINE_START(dkong2b)
+    MCFG_MACHINE_RESET(dkong)
 
-    MDRV_I8257_ADD("dma8257", CLOCK_1H, dk_dma)
+    MCFG_I8257_ADD("dma8257", CLOCK_1H, dk_dma)
 
     /* video hardware */
-    MDRV_SCREEN_ADD("screen", RASTER)
-    MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
+    MCFG_SCREEN_ADD("screen", RASTER)
+    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+    MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 
-    MDRV_GFXDECODE(dkong)
-    MDRV_PALETTE_LENGTH(DK2B_PALETTE_LENGTH)
+    MCFG_GFXDECODE(dkong)
+    MCFG_PALETTE_LENGTH(DK2B_PALETTE_LENGTH)
 
-    MDRV_PALETTE_INIT(dkong2b)
-    MDRV_VIDEO_START(dkong)
-    MDRV_VIDEO_UPDATE(dkong)
+    MCFG_PALETTE_INIT(dkong2b)
+    MCFG_VIDEO_START(dkong)
+    MCFG_VIDEO_UPDATE(dkong)
 
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( radarscp, dkong_base )
 
-    MDRV_MACHINE_START(radarscp)
-    MDRV_PALETTE_LENGTH(RS_PALETTE_LENGTH)
-    MDRV_PALETTE_INIT(radarscp)
+    MCFG_MACHINE_START(radarscp)
+    MCFG_PALETTE_LENGTH(RS_PALETTE_LENGTH)
+    MCFG_PALETTE_INIT(radarscp)
 
     /* sound hardware */
-    MDRV_FRAGMENT_ADD(radarscp_audio)
+    MCFG_FRAGMENT_ADD(radarscp_audio)
 
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( radarscp1, dkong_base )
 
-    MDRV_MACHINE_START(radarscp1)
-    MDRV_PALETTE_LENGTH(RS_PALETTE_LENGTH)
-    MDRV_PALETTE_INIT(radarscp1)
+    MCFG_MACHINE_START(radarscp1)
+    MCFG_PALETTE_LENGTH(RS_PALETTE_LENGTH)
+    MCFG_PALETTE_INIT(radarscp1)
 
     /* sound hardware */
-    MDRV_FRAGMENT_ADD(radarscp1_audio)
+    MCFG_FRAGMENT_ADD(radarscp1_audio)
 
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( dkong2b, dkong_base )
 
-    MDRV_MACHINE_START(dkong2b)
-    MDRV_PALETTE_LENGTH(DK2B_PALETTE_LENGTH)
+    MCFG_MACHINE_START(dkong2b)
+    MCFG_PALETTE_LENGTH(DK2B_PALETTE_LENGTH)
 
     /* sound hardware */
-    MDRV_FRAGMENT_ADD(dkong2b_audio)
+    MCFG_FRAGMENT_ADD(dkong2b_audio)
 
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( braze, dkong2b )
 
-	MDRV_EEPROM_ADD("eeprom", braze_eeprom_intf)
+	MCFG_EEPROM_ADD("eeprom", braze_eeprom_intf)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( dkong3, dkong_state )
 
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu", Z80, XTAL_8MHz / 2) /* verified in schematics */
-    MDRV_CPU_PROGRAM_MAP(dkong3_map)
-    MDRV_CPU_IO_MAP(dkong3_io_map)
-    MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
+    MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz / 2) /* verified in schematics */
+    MCFG_CPU_PROGRAM_MAP(dkong3_map)
+    MCFG_CPU_IO_MAP(dkong3_io_map)
+    MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-    MDRV_MACHINE_START(dkong3)
+    MCFG_MACHINE_START(dkong3)
 
-    MDRV_Z80DMA_ADD("z80dma", CLOCK_1H, dk3_dma)
+    MCFG_Z80DMA_ADD("z80dma", CLOCK_1H, dk3_dma)
 
     /* video hardware */
-    MDRV_SCREEN_ADD("screen", RASTER)
-    MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-    MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
+    MCFG_SCREEN_ADD("screen", RASTER)
+    MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+    MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 
-    MDRV_GFXDECODE(dkong)
-    MDRV_PALETTE_LENGTH(DK3_PALETTE_LENGTH)
+    MCFG_GFXDECODE(dkong)
+    MCFG_PALETTE_LENGTH(DK3_PALETTE_LENGTH)
 
-    MDRV_PALETTE_INIT(dkong3)
-    MDRV_VIDEO_START(dkong)
-    MDRV_VIDEO_UPDATE(dkong)
+    MCFG_PALETTE_INIT(dkong3)
+    MCFG_VIDEO_START(dkong)
+    MCFG_VIDEO_UPDATE(dkong)
 
     /* sound hardware */
-    MDRV_FRAGMENT_ADD(dkong3_audio)
+    MCFG_FRAGMENT_ADD(dkong3_audio)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( dkongjr, dkong_base )
 
-    MDRV_CPU_MODIFY("maincpu")
-    MDRV_CPU_PROGRAM_MAP(dkongjr_map)
+    MCFG_CPU_MODIFY("maincpu")
+    MCFG_CPU_PROGRAM_MAP(dkongjr_map)
 
     /* sound hardware */
-    MDRV_FRAGMENT_ADD(dkongjr_audio)
+    MCFG_FRAGMENT_ADD(dkongjr_audio)
 
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pestplce, dkongjr )
 
-    MDRV_GFXDECODE(pestplce)
-    MDRV_PALETTE_LENGTH(DK2B_PALETTE_LENGTH)
-    MDRV_PALETTE_INIT(dkong2b)  /* wrong! */
-    MDRV_VIDEO_UPDATE(pestplce)
+    MCFG_GFXDECODE(pestplce)
+    MCFG_PALETTE_LENGTH(DK2B_PALETTE_LENGTH)
+    MCFG_PALETTE_INIT(dkong2b)  /* wrong! */
+    MCFG_VIDEO_UPDATE(pestplce)
 
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( dkong3b, dkongjr )
 
 	/* basic machine hardware */
-    MDRV_PALETTE_INIT(dkong3)
+    MCFG_PALETTE_INIT(dkong3)
 MACHINE_CONFIG_END
 
 /*************************************
@@ -1784,25 +1784,25 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( s2650, dkong2b )
 
     /* basic machine hardware */
-    MDRV_CPU_REPLACE("maincpu", S2650, CLOCK_1H / 2)    /* ??? */
-    MDRV_CPU_PROGRAM_MAP(s2650_map)
-    MDRV_CPU_IO_MAP(s2650_io_map)
-    MDRV_CPU_VBLANK_INT("screen", s2650_interrupt)
+    MCFG_CPU_REPLACE("maincpu", S2650, CLOCK_1H / 2)    /* ??? */
+    MCFG_CPU_PROGRAM_MAP(s2650_map)
+    MCFG_CPU_IO_MAP(s2650_io_map)
+    MCFG_CPU_VBLANK_INT("screen", s2650_interrupt)
 
-    MDRV_DEVICE_MODIFY("dma8257")
-    MDRV_DEVICE_CONFIG(hb_dma)
+    MCFG_DEVICE_MODIFY("dma8257")
+    MCFG_DEVICE_CONFIG(hb_dma)
 
-    MDRV_MACHINE_START(s2650)
+    MCFG_MACHINE_START(s2650)
 
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( spclforc, s2650 )
 
 	/* basic machine hardware */
-    MDRV_DEVICE_REMOVE("soundcpu")
+    MCFG_DEVICE_REMOVE("soundcpu")
 
     /* video hardware */
-    MDRV_VIDEO_UPDATE(spclforc)
+    MCFG_VIDEO_UPDATE(spclforc)
 
 MACHINE_CONFIG_END
 
@@ -1816,30 +1816,30 @@ static MACHINE_CONFIG_DERIVED( strtheat, dkong2b )
 
 	/* basic machine hardware */
 
-    MDRV_CPU_MODIFY("maincpu")
-    MDRV_CPU_IO_MAP(epos_readport)
+    MCFG_CPU_MODIFY("maincpu")
+    MCFG_CPU_IO_MAP(epos_readport)
 
-    MDRV_MACHINE_RESET(strtheat)
+    MCFG_MACHINE_RESET(strtheat)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( drakton, dkong2b )
 
 	/* basic machine hardware */
 
-    MDRV_CPU_MODIFY("maincpu")
-    MDRV_CPU_IO_MAP(epos_readport)
+    MCFG_CPU_MODIFY("maincpu")
+    MCFG_CPU_IO_MAP(epos_readport)
 
-    MDRV_MACHINE_RESET(drakton)
+    MCFG_MACHINE_RESET(drakton)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( drktnjr, dkongjr )
 
 	/* basic machine hardware */
 
-    MDRV_CPU_MODIFY("maincpu")
-    MDRV_CPU_IO_MAP(epos_readport)
+    MCFG_CPU_MODIFY("maincpu")
+    MCFG_CPU_IO_MAP(epos_readport)
 
-    MDRV_MACHINE_RESET(drakton)
+    MCFG_MACHINE_RESET(drakton)
 MACHINE_CONFIG_END
 
 /*************************************

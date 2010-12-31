@@ -334,42 +334,42 @@ static const pokey_interface pokey_interface_2 =
 static MACHINE_CONFIG_START( cloak, cloak_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6502, 1000000)		/* 1 MHz ???? */
-	MDRV_CPU_PROGRAM_MAP(master_map)
-	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold, 4)
+	MCFG_CPU_ADD("maincpu", M6502, 1000000)		/* 1 MHz ???? */
+	MCFG_CPU_PROGRAM_MAP(master_map)
+	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold, 4)
 
-	MDRV_CPU_ADD("slave", M6502, 1250000)		/* 1.25 MHz ???? */
-	MDRV_CPU_PROGRAM_MAP(slave_map)
-	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold, 2)
+	MCFG_CPU_ADD("slave", M6502, 1250000)		/* 1.25 MHz ???? */
+	MCFG_CPU_PROGRAM_MAP(slave_map)
+	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold, 2)
 
-	MDRV_QUANTUM_TIME(HZ(1000))
+	MCFG_QUANTUM_TIME(HZ(1000))
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 3*8, 32*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 3*8, 32*8-1)
 
-	MDRV_GFXDECODE(cloak)
-	MDRV_PALETTE_LENGTH(64)
+	MCFG_GFXDECODE(cloak)
+	MCFG_PALETTE_LENGTH(64)
 
-	MDRV_VIDEO_START(cloak)
-	MDRV_VIDEO_UPDATE(cloak)
+	MCFG_VIDEO_START(cloak)
+	MCFG_VIDEO_UPDATE(cloak)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("pokey1", POKEY, XTAL_10MHz/8)		/* Accurate to recording */
-	MDRV_SOUND_CONFIG(pokey_interface_1)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("pokey1", POKEY, XTAL_10MHz/8)		/* Accurate to recording */
+	MCFG_SOUND_CONFIG(pokey_interface_1)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD("pokey2", POKEY, XTAL_10MHz/8)		/* Accurate to recording */
-	MDRV_SOUND_CONFIG(pokey_interface_2)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("pokey2", POKEY, XTAL_10MHz/8)		/* Accurate to recording */
+	MCFG_SOUND_CONFIG(pokey_interface_2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 

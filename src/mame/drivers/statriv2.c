@@ -588,54 +588,54 @@ static const tms9927_interface tms9927_intf =
 static MACHINE_CONFIG_START( statriv2, statriv2_state )
 	/* basic machine hardware */
 	/* FIXME: The 8085A had a max clock of 6MHz, internally divided by 2! */
-    MDRV_CPU_ADD("maincpu", I8085A, MASTER_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(statriv2_map)
-	MDRV_CPU_IO_MAP(statriv2_io_map)
-	MDRV_CPU_VBLANK_INT("screen", statriv2_interrupt)
+    MCFG_CPU_ADD("maincpu", I8085A, MASTER_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(statriv2_map)
+	MCFG_CPU_IO_MAP(statriv2_io_map)
+	MCFG_CPU_VBLANK_INT("screen", statriv2_interrupt)
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* 1x 8255 */
-	MDRV_PPI8255_ADD("ppi", ppi8255_intf)
+	MCFG_PPI8255_ADD("ppi", ppi8255_intf)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 384, 0, 320, 270, 0, 240)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 384, 0, 320, 270, 0, 240)
 
-	MDRV_TMS9927_ADD("tms", MASTER_CLOCK/2, tms9927_intf)
+	MCFG_TMS9927_ADD("tms", MASTER_CLOCK/2, tms9927_intf)
 
-	MDRV_GFXDECODE(horizontal)
-	MDRV_PALETTE_LENGTH(2*64)
+	MCFG_GFXDECODE(horizontal)
+	MCFG_PALETTE_LENGTH(2*64)
 
-	MDRV_PALETTE_INIT(statriv2)
-	MDRV_VIDEO_START(horizontal)
-	MDRV_VIDEO_UPDATE(statriv2)
+	MCFG_PALETTE_INIT(statriv2)
+	MCFG_VIDEO_START(horizontal)
+	MCFG_VIDEO_UPDATE(statriv2)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK/8)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK/8)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( statriv2v, statriv2 )
 
 	/* basic machine hardware */
 
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 392, 0, 256, 262, 0, 256)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/2, 392, 0, 256, 262, 0, 256)
 
-	MDRV_VIDEO_START(vertical)
-	MDRV_GFXDECODE(vertical)
+	MCFG_VIDEO_START(vertical)
+	MCFG_GFXDECODE(vertical)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( funcsino, statriv2 )
 
 	/* basic machine hardware */
 
-    MDRV_CPU_MODIFY("maincpu")
-    MDRV_CPU_CLOCK(MASTER_CLOCK/2)	/* 3 MHz?? seems accurate */
+    MCFG_CPU_MODIFY("maincpu")
+    MCFG_CPU_CLOCK(MASTER_CLOCK/2)	/* 3 MHz?? seems accurate */
 MACHINE_CONFIG_END
 
 

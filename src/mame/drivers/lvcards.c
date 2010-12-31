@@ -464,56 +464,56 @@ static const ay8910_interface lcay8910_interface =
 
 static MACHINE_CONFIG_START( lvcards, driver_device )
 	// basic machine hardware
-	MDRV_CPU_ADD("maincpu",Z80, 18432000/6)	// 3.072 MHz ?
+	MCFG_CPU_ADD("maincpu",Z80, 18432000/6)	// 3.072 MHz ?
 
-	MDRV_CPU_PROGRAM_MAP(lvcards_map)
-	MDRV_CPU_IO_MAP(lvcards_io_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_PROGRAM_MAP(lvcards_map)
+	MCFG_CPU_IO_MAP(lvcards_io_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	// video hardware
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(8*0, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(8*0, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(lvcards)
-	MDRV_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE(lvcards)
+	MCFG_PALETTE_LENGTH(256)
 
-	MDRV_PALETTE_INIT(lvcards)
-	MDRV_VIDEO_START(lvcards)
-	MDRV_VIDEO_UPDATE(lvcards)
+	MCFG_PALETTE_INIT(lvcards)
+	MCFG_VIDEO_START(lvcards)
+	MCFG_VIDEO_UPDATE(lvcards)
 
 	// sound hardware
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("aysnd", AY8910, 18432000/12)
-	MDRV_SOUND_CONFIG(lcay8910_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("aysnd", AY8910, 18432000/12)
+	MCFG_SOUND_CONFIG(lcay8910_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( lvpoker, lvcards )
 
 	// basic machine hardware
-	MDRV_NVRAM_ADD_1FILL("nvram")
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(lvpoker_map)
-	MDRV_MACHINE_START(lvpoker)
-	MDRV_MACHINE_RESET(lvpoker)
+	MCFG_NVRAM_ADD_1FILL("nvram")
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(lvpoker_map)
+	MCFG_MACHINE_START(lvpoker)
+	MCFG_MACHINE_RESET(lvpoker)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ponttehk, lvcards )
 
 	// basic machine hardware
-	MDRV_NVRAM_ADD_1FILL("nvram")
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(ponttehk_map)
-	MDRV_MACHINE_RESET(lvpoker)
+	MCFG_NVRAM_ADD_1FILL("nvram")
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(ponttehk_map)
+	MCFG_MACHINE_RESET(lvpoker)
 
 	// video hardware
-	MDRV_PALETTE_INIT(ponttehk)
+	MCFG_PALETTE_INIT(ponttehk)
 MACHINE_CONFIG_END
 
 ROM_START( lvpoker )

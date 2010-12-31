@@ -240,30 +240,30 @@ static const pia6821_interface slithersnd_pia_0_intf =
  *************************************/
 
 MACHINE_CONFIG_FRAGMENT( qix_audio )
-	MDRV_CPU_ADD("audiocpu", M6802, SOUND_CLOCK_OSC/2)		/* 0.92 MHz */
-	MDRV_CPU_PROGRAM_MAP(audio_map)
+	MCFG_CPU_ADD("audiocpu", M6802, SOUND_CLOCK_OSC/2)		/* 0.92 MHz */
+	MCFG_CPU_PROGRAM_MAP(audio_map)
 
-	MDRV_PIA6821_ADD("sndpia0", qixsnd_pia_0_intf)
-	MDRV_PIA6821_ADD("sndpia1", qixsnd_pia_1_intf)
-	MDRV_PIA6821_ADD("sndpia2", qixsnd_pia_2_intf)
+	MCFG_PIA6821_ADD("sndpia0", qixsnd_pia_0_intf)
+	MCFG_PIA6821_ADD("sndpia1", qixsnd_pia_1_intf)
+	MCFG_PIA6821_ADD("sndpia2", qixsnd_pia_2_intf)
 
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG_DISCRETE(qix)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_SOUND_CONFIG_DISCRETE(qix)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_FRAGMENT( slither_audio )
-	MDRV_PIA6821_ADD("sndpia0", slithersnd_pia_0_intf)
+	MCFG_PIA6821_ADD("sndpia0", slithersnd_pia_0_intf)
 
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("sn1", SN76489, SLITHER_CLOCK_OSC/4/4)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("sn1", SN76489, SLITHER_CLOCK_OSC/4/4)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD("sn2", SN76489, SLITHER_CLOCK_OSC/4/4)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("sn2", SN76489, SLITHER_CLOCK_OSC/4/4)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END

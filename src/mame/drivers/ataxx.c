@@ -313,32 +313,32 @@ static const eeprom_interface eeprom_intf =
 static MACHINE_CONFIG_START( ataxx, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("master", Z80, 6000000)
-	MDRV_CPU_PROGRAM_MAP(master_map_program)
-	MDRV_CPU_IO_MAP(master_map_io)
+	MCFG_CPU_ADD("master", Z80, 6000000)
+	MCFG_CPU_PROGRAM_MAP(master_map_program)
+	MCFG_CPU_IO_MAP(master_map_io)
 
-	MDRV_CPU_ADD("slave", Z80, 6000000)
-	MDRV_CPU_PROGRAM_MAP(slave_map_program)
-	MDRV_CPU_IO_MAP(slave_map_io)
+	MCFG_CPU_ADD("slave", Z80, 6000000)
+	MCFG_CPU_PROGRAM_MAP(slave_map_program)
+	MCFG_CPU_IO_MAP(slave_map_io)
 
-	MDRV_CPU_ADD("audiocpu", I80186, XTAL_16MHz)
-	MDRV_CPU_PROGRAM_MAP(leland_80186_map_program)
-	MDRV_CPU_IO_MAP(ataxx_80186_map_io)
+	MCFG_CPU_ADD("audiocpu", I80186, XTAL_16MHz)
+	MCFG_CPU_PROGRAM_MAP(leland_80186_map_program)
+	MCFG_CPU_IO_MAP(ataxx_80186_map_io)
 
-	MDRV_MACHINE_START(ataxx)
-	MDRV_MACHINE_RESET(ataxx)
+	MCFG_MACHINE_START(ataxx)
+	MCFG_MACHINE_RESET(ataxx)
 
-	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
-	MDRV_NVRAM_ADD_0FILL("battery")
+	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_NVRAM_ADD_0FILL("battery")
 
 	/* video hardware */
-	MDRV_FRAGMENT_ADD(ataxx_video)
+	MCFG_FRAGMENT_ADD(ataxx_video)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("custom", LELAND_80186, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("custom", LELAND_80186, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -347,9 +347,9 @@ static MACHINE_CONFIG_DERIVED( wsf, ataxx )
 	/* basic machine hardware */
 
 	/* sound hardware */
-	MDRV_SOUND_ADD("ymsnd", YM2151, 4000000)
-	MDRV_SOUND_ROUTE(0, "mono", 0.40)
-	MDRV_SOUND_ROUTE(1, "mono", 0.40)
+	MCFG_SOUND_ADD("ymsnd", YM2151, 4000000)
+	MCFG_SOUND_ROUTE(0, "mono", 0.40)
+	MCFG_SOUND_ROUTE(1, "mono", 0.40)
 MACHINE_CONFIG_END
 
 

@@ -1274,59 +1274,59 @@ static const z80_daisy_config tenpin_daisy_chain[] =
 static MACHINE_CONFIG_START( astrocade_base, astrocde_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, ASTROCADE_CLOCK/4)
+	MCFG_CPU_ADD("maincpu", Z80, ASTROCADE_CLOCK/4)
 	/* each game has its own map */
 
-	MDRV_MACHINE_START(astrocde)
+	MCFG_MACHINE_START(astrocde)
 
 	/* video hardware */
-	MDRV_PALETTE_LENGTH(512)
+	MCFG_PALETTE_LENGTH(512)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(ASTROCADE_CLOCK, 455, 0, 352, 262, 0, 240)
-	MDRV_SCREEN_DEFAULT_POSITION(1.1, 0.0, 1.18, -0.018)	/* clip out borders */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_RAW_PARAMS(ASTROCADE_CLOCK, 455, 0, 352, 262, 0, 240)
+	MCFG_SCREEN_DEFAULT_POSITION(1.1, 0.0, 1.18, -0.018)	/* clip out borders */
 
-	MDRV_PALETTE_INIT(astrocde)
-	MDRV_VIDEO_START(astrocde)
-	MDRV_VIDEO_UPDATE(astrocde)
+	MCFG_PALETTE_INIT(astrocde)
+	MCFG_VIDEO_START(astrocde)
+	MCFG_VIDEO_UPDATE(astrocde)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( astrocade_16color_base, astrocade_base )
 
 	/* basic machine hardware */
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MDRV_PALETTE_LENGTH(4096)
+	MCFG_PALETTE_LENGTH(4096)
 
-	MDRV_PALETTE_INIT(profpac)
-	MDRV_VIDEO_START(profpac)
-	MDRV_VIDEO_UPDATE(profpac)
+	MCFG_PALETTE_INIT(profpac)
+	MCFG_VIDEO_START(profpac)
+	MCFG_VIDEO_UPDATE(profpac)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_FRAGMENT( astrocade_mono_sound )
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("astrocade1",  ASTROCADE, ASTROCADE_CLOCK/4)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("astrocade1",  ASTROCADE, ASTROCADE_CLOCK/4)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_FRAGMENT( astrocade_stereo_sound )
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("astrocade1",  ASTROCADE, ASTROCADE_CLOCK/4)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ADD("astrocade1",  ASTROCADE, ASTROCADE_CLOCK/4)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 
-	MDRV_SOUND_ADD("astrocade2",  ASTROCADE, ASTROCADE_CLOCK/4)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("astrocade2",  ASTROCADE, ASTROCADE_CLOCK/4)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -1340,147 +1340,147 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( seawolf2, astrocade_base )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(seawolf2_map)
-	MDRV_CPU_IO_MAP(port_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(seawolf2_map)
+	MCFG_CPU_IO_MAP(port_map)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("samples", SAMPLES, 0)
-	MDRV_SOUND_CONFIG(seawolf2_samples_interface)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 0.25)
-	MDRV_SOUND_ROUTE(1, "lspeaker", 0.25)
-	MDRV_SOUND_ROUTE(2, "lspeaker", 0.25)
-	MDRV_SOUND_ROUTE(3, "lspeaker", 0.25)
-	MDRV_SOUND_ROUTE(4, "lspeaker", 0.25)
-	MDRV_SOUND_ROUTE(5, "rspeaker", 0.25)
-	MDRV_SOUND_ROUTE(6, "rspeaker", 0.25)
-	MDRV_SOUND_ROUTE(7, "rspeaker", 0.25)
-	MDRV_SOUND_ROUTE(8, "rspeaker", 0.25)
-	MDRV_SOUND_ROUTE(9, "rspeaker", 0.25)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SOUND_CONFIG(seawolf2_samples_interface)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.25)
+	MCFG_SOUND_ROUTE(1, "lspeaker", 0.25)
+	MCFG_SOUND_ROUTE(2, "lspeaker", 0.25)
+	MCFG_SOUND_ROUTE(3, "lspeaker", 0.25)
+	MCFG_SOUND_ROUTE(4, "lspeaker", 0.25)
+	MCFG_SOUND_ROUTE(5, "rspeaker", 0.25)
+	MCFG_SOUND_ROUTE(6, "rspeaker", 0.25)
+	MCFG_SOUND_ROUTE(7, "rspeaker", 0.25)
+	MCFG_SOUND_ROUTE(8, "rspeaker", 0.25)
+	MCFG_SOUND_ROUTE(9, "rspeaker", 0.25)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( ebases, astrocade_base )
-	MDRV_FRAGMENT_ADD(astrocade_mono_sound)
+	MCFG_FRAGMENT_ADD(astrocade_mono_sound)
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(ebases_map)
-	MDRV_CPU_IO_MAP(port_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(ebases_map)
+	MCFG_CPU_IO_MAP(port_map)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( spacezap, astrocade_base )
-	MDRV_FRAGMENT_ADD(astrocade_mono_sound)
+	MCFG_FRAGMENT_ADD(astrocade_mono_sound)
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(spacezap_map)
-	MDRV_CPU_IO_MAP(port_map_mono_pattern)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(spacezap_map)
+	MCFG_CPU_IO_MAP(port_map_mono_pattern)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( wow, astrocade_base )
-	MDRV_FRAGMENT_ADD(astrocade_stereo_sound)
+	MCFG_FRAGMENT_ADD(astrocade_stereo_sound)
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(wow_map)
-	MDRV_CPU_IO_MAP(port_map_stereo_pattern)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(wow_map)
+	MCFG_CPU_IO_MAP(port_map_stereo_pattern)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_DEFAULT_POSITION(1.0, 0.0, 1.0, 0.0)	/* adjusted to match screenshots */
-//  MDRV_SCREEN_DEFAULT_POSITION(1.066, -0.004, 1.048, -0.026)  /* adjusted to match flyer */
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_DEFAULT_POSITION(1.0, 0.0, 1.0, 0.0)	/* adjusted to match screenshots */
+//  MCFG_SCREEN_DEFAULT_POSITION(1.066, -0.004, 1.048, -0.026)  /* adjusted to match flyer */
 
 	/* sound hardware */
-	MDRV_SPEAKER_ADD("center", 0.0, 0.0, 1.0)
+	MCFG_SPEAKER_ADD("center", 0.0, 0.0, 1.0)
 
-	MDRV_SOUND_ADD("samples", SAMPLES, 0)
-	MDRV_SOUND_CONFIG(wow_samples_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "center", 0.85)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SOUND_CONFIG(wow_samples_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "center", 0.85)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( gorf, astrocade_base )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(wow_map)
-	MDRV_CPU_IO_MAP(port_map_stereo_pattern)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(wow_map)
+	MCFG_CPU_IO_MAP(port_map_stereo_pattern)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_DEFAULT_POSITION(1.0, 0.0, 1.0, 0.0)	/* adjusted to match flyer */
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_DEFAULT_POSITION(1.0, 0.0, 1.0, 0.0)	/* adjusted to match flyer */
 
 	/* sound hardware */
-	MDRV_SPEAKER_ADD("upper", 0.0, 0.0, 1.0)
-	MDRV_SPEAKER_ADD("lower", 0.0, -0.5, 1.0)
+	MCFG_SPEAKER_ADD("upper", 0.0, 0.0, 1.0)
+	MCFG_SPEAKER_ADD("lower", 0.0, -0.5, 1.0)
 
-	MDRV_SOUND_ADD("astrocade1",  ASTROCADE, ASTROCADE_CLOCK/4)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "upper", 1.0)
+	MCFG_SOUND_ADD("astrocade1",  ASTROCADE, ASTROCADE_CLOCK/4)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "upper", 1.0)
 
-	MDRV_SOUND_ADD("astrocade2",  ASTROCADE, ASTROCADE_CLOCK/4)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lower", 1.0)
+	MCFG_SOUND_ADD("astrocade2",  ASTROCADE, ASTROCADE_CLOCK/4)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lower", 1.0)
 
-	MDRV_SOUND_ADD("samples", SAMPLES, 0)
-	MDRV_SOUND_CONFIG(gorf_samples_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "upper", 0.85)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SOUND_CONFIG(gorf_samples_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "upper", 0.85)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( robby, astrocade_base )
-	MDRV_FRAGMENT_ADD(astrocade_stereo_sound)
+	MCFG_FRAGMENT_ADD(astrocade_stereo_sound)
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(robby_map)
-	MDRV_CPU_IO_MAP(port_map_stereo_pattern)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(robby_map)
+	MCFG_CPU_IO_MAP(port_map_stereo_pattern)
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( profpac, astrocade_16color_base )
-	MDRV_FRAGMENT_ADD(astrocade_stereo_sound)
+	MCFG_FRAGMENT_ADD(astrocade_stereo_sound)
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(profpac_map)
-	MDRV_CPU_IO_MAP(port_map_16col_pattern)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(profpac_map)
+	MCFG_CPU_IO_MAP(port_map_16col_pattern)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( demndrgn, astrocade_16color_base )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(demndrgn_map)
-	MDRV_CPU_IO_MAP(port_map_16col_pattern_nosound)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(demndrgn_map)
+	MCFG_CPU_IO_MAP(port_map_16col_pattern_nosound)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( tenpindx, astrocade_16color_base )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(profpac_map)
-	MDRV_CPU_IO_MAP(port_map_16col_pattern_nosound)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(profpac_map)
+	MCFG_CPU_IO_MAP(port_map_16col_pattern_nosound)
 
-	MDRV_CPU_ADD("sub", Z80, ASTROCADE_CLOCK/4)	/* real clock unknown */
-	MDRV_CPU_CONFIG(tenpin_daisy_chain)
-	MDRV_CPU_PROGRAM_MAP(tenpin_sub_map)
-	MDRV_CPU_IO_MAP(tenpin_sub_io_map)
+	MCFG_CPU_ADD("sub", Z80, ASTROCADE_CLOCK/4)	/* real clock unknown */
+	MCFG_CPU_CONFIG(tenpin_daisy_chain)
+	MCFG_CPU_PROGRAM_MAP(tenpin_sub_map)
+	MCFG_CPU_IO_MAP(tenpin_sub_io_map)
 
-	MDRV_Z80CTC_ADD("ctc", ASTROCADE_CLOCK/4 /* same as "sub" */, ctc_intf)
+	MCFG_Z80CTC_ADD("ctc", ASTROCADE_CLOCK/4 /* same as "sub" */, ctc_intf)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("aysnd", AY8912, ASTROCADE_CLOCK/4)	/* real clock unknown */
-	MDRV_SOUND_CONFIG(ay8912_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("aysnd", AY8912, ASTROCADE_CLOCK/4)	/* real clock unknown */
+	MCFG_SOUND_CONFIG(ay8912_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_CONFIG_END
 
 

@@ -99,13 +99,13 @@ device_t *_ConfigClass::alloc_device(running_machine &machine) const					\
 //**************************************************************************
 
 // configure devices
-#define MDRV_DEVICE_CONFIG(_config) \
+#define MCFG_DEVICE_CONFIG(_config) \
 	device_config::static_set_static_config(device, &(_config)); \
 
-#define MDRV_DEVICE_CONFIG_CLEAR() \
+#define MCFG_DEVICE_CONFIG_CLEAR() \
 	device_config::static_set_static_config(device, NULL); \
 
-#define MDRV_DEVICE_CLOCK(_clock) \
+#define MCFG_DEVICE_CLOCK(_clock) \
 	device_config::static_set_clock(device, _clock); \
 
 

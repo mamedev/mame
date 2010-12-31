@@ -2186,49 +2186,49 @@ static READ16_HANDLER( dual_pcb_masterslave )
 static MACHINE_CONFIG_START( system32, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", V60, MASTER_CLOCK/2)
-	MDRV_CPU_PROGRAM_MAP(system32_map)
-	MDRV_CPU_VBLANK_INT("screen", start_of_vblank_int)
+	MCFG_CPU_ADD("maincpu", V60, MASTER_CLOCK/2)
+	MCFG_CPU_PROGRAM_MAP(system32_map)
+	MCFG_CPU_VBLANK_INT("screen", start_of_vblank_int)
 
-	MDRV_CPU_ADD("soundcpu", Z80, MASTER_CLOCK/4)
-	MDRV_CPU_PROGRAM_MAP(system32_sound_map)
-	MDRV_CPU_IO_MAP(system32_sound_portmap)
+	MCFG_CPU_ADD("soundcpu", Z80, MASTER_CLOCK/4)
+	MCFG_CPU_PROGRAM_MAP(system32_sound_map)
+	MCFG_CPU_IO_MAP(system32_sound_portmap)
 
-	MDRV_MACHINE_RESET(system32)
+	MCFG_MACHINE_RESET(system32)
 
-	MDRV_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_93C46_ADD("eeprom")
 
-	MDRV_TIMER_ADD("v60_irq0", signal_v60_irq_callback)
-	MDRV_TIMER_ADD("v60_irq1", signal_v60_irq_callback)
+	MCFG_TIMER_ADD("v60_irq0", signal_v60_irq_callback)
+	MCFG_TIMER_ADD("v60_irq1", signal_v60_irq_callback)
 
 	/* video hardware */
-	MDRV_GFXDECODE(segas32)
-	MDRV_PALETTE_LENGTH(0x4000)
+	MCFG_GFXDECODE(segas32)
+	MCFG_PALETTE_LENGTH(0x4000)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_SIZE(52*8, 262)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 52*8-1, 0*8, 28*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_SIZE(52*8, 262)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 52*8-1, 0*8, 28*8-1)
 
-	MDRV_VIDEO_START(system32)
-	MDRV_VIDEO_UPDATE(system32)
+	MCFG_VIDEO_START(system32)
+	MCFG_VIDEO_UPDATE(system32)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ym1", YM3438, MASTER_CLOCK/4)
-	MDRV_SOUND_CONFIG(ym3438_config)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 0.40)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 0.40)
+	MCFG_SOUND_ADD("ym1", YM3438, MASTER_CLOCK/4)
+	MCFG_SOUND_CONFIG(ym3438_config)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.40)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.40)
 
-	MDRV_SOUND_ADD("ym2", YM3438, MASTER_CLOCK/4)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 0.40)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 0.40)
+	MCFG_SOUND_ADD("ym2", YM3438, MASTER_CLOCK/4)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.40)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.40)
 
-	MDRV_SOUND_ADD("rfsnd", RF5C68, RFC_CLOCK/4)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 0.55)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 0.55)
+	MCFG_SOUND_ADD("rfsnd", RF5C68, RFC_CLOCK/4)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.55)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.55)
 MACHINE_CONFIG_END
 
 
@@ -2237,61 +2237,61 @@ static const nec_config ga2_v25_config ={ ga2_v25_opcode_table, };
 static MACHINE_CONFIG_DERIVED( system32_v25, system32 )
 
 	/* add a V25 for protection */
-	MDRV_CPU_ADD("mcu", V25, 10000000)
-	MDRV_CPU_PROGRAM_MAP(ga2_v25_map)
-	MDRV_CPU_CONFIG(ga2_v25_config)
+	MCFG_CPU_ADD("mcu", V25, 10000000)
+	MCFG_CPU_PROGRAM_MAP(ga2_v25_map)
+	MCFG_CPU_CONFIG(ga2_v25_config)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( multi32, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", V70, MULTI32_CLOCK/2)
-	MDRV_CPU_PROGRAM_MAP(multi32_map)
-	MDRV_CPU_VBLANK_INT("lscreen", start_of_vblank_int)
+	MCFG_CPU_ADD("maincpu", V70, MULTI32_CLOCK/2)
+	MCFG_CPU_PROGRAM_MAP(multi32_map)
+	MCFG_CPU_VBLANK_INT("lscreen", start_of_vblank_int)
 
-	MDRV_CPU_ADD("soundcpu", Z80, MASTER_CLOCK/4)
-	MDRV_CPU_PROGRAM_MAP(multi32_sound_map)
-	MDRV_CPU_IO_MAP(multi32_sound_portmap)
+	MCFG_CPU_ADD("soundcpu", Z80, MASTER_CLOCK/4)
+	MCFG_CPU_PROGRAM_MAP(multi32_sound_map)
+	MCFG_CPU_IO_MAP(multi32_sound_portmap)
 
-	MDRV_MACHINE_RESET(system32)
+	MCFG_MACHINE_RESET(system32)
 
-	MDRV_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_93C46_ADD("eeprom")
 
-	MDRV_TIMER_ADD("v60_irq0", signal_v60_irq_callback)
-	MDRV_TIMER_ADD("v60_irq1", signal_v60_irq_callback)
+	MCFG_TIMER_ADD("v60_irq0", signal_v60_irq_callback)
+	MCFG_TIMER_ADD("v60_irq1", signal_v60_irq_callback)
 
 	/* video hardware */
-	MDRV_GFXDECODE(segas32)
-	MDRV_PALETTE_LENGTH(0x8000)
-	MDRV_DEFAULT_LAYOUT(layout_dualhsxs)
+	MCFG_GFXDECODE(segas32)
+	MCFG_PALETTE_LENGTH(0x8000)
+	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 
-	MDRV_SCREEN_ADD("lscreen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_SIZE(52*8, 262)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 52*8-1, 0*8, 28*8-1)
+	MCFG_SCREEN_ADD("lscreen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_SIZE(52*8, 262)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 52*8-1, 0*8, 28*8-1)
 
-	MDRV_SCREEN_ADD("rscreen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_SIZE(52*8, 262)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 52*8-1, 0*8, 28*8-1)
+	MCFG_SCREEN_ADD("rscreen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_SIZE(52*8, 262)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 52*8-1, 0*8, 28*8-1)
 
-	MDRV_VIDEO_START(multi32)
-	MDRV_VIDEO_UPDATE(multi32)
+	MCFG_VIDEO_START(multi32)
+	MCFG_VIDEO_UPDATE(multi32)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymsnd", YM3438, MASTER_CLOCK/4)
-	MDRV_SOUND_CONFIG(ym3438_config)
-	MDRV_SOUND_ROUTE(1, "lspeaker", 0.40)
-	MDRV_SOUND_ROUTE(0, "rspeaker", 0.40)
+	MCFG_SOUND_ADD("ymsnd", YM3438, MASTER_CLOCK/4)
+	MCFG_SOUND_CONFIG(ym3438_config)
+	MCFG_SOUND_ROUTE(1, "lspeaker", 0.40)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 0.40)
 
-	MDRV_SOUND_ADD("sega", MULTIPCM, MASTER_CLOCK/4)
-	MDRV_SOUND_ROUTE(1, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(0, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("sega", MULTIPCM, MASTER_CLOCK/4)
+	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 

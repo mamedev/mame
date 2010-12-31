@@ -134,9 +134,9 @@ ADDRESS_MAP_END
 
 
 static MACHINE_CONFIG_FRAGMENT( vp931 )
-	MDRV_CPU_ADD("vp931", I8049, XTAL_11MHz)
-	MDRV_CPU_IO_MAP(vp931_portmap)
-	MDRV_TIMER_ADD("tracktimer", track_timer)
+	MCFG_CPU_ADD("vp931", I8049, XTAL_11MHz)
+	MCFG_CPU_IO_MAP(vp931_portmap)
+	MCFG_TIMER_ADD("tracktimer", track_timer)
 MACHINE_CONFIG_END
 
 

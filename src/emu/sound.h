@@ -123,16 +123,16 @@ extern const device_type SPEAKER;
 ***************************************************************************/
 
 /* add/remove speakers */
-#define MDRV_SPEAKER_ADD(_tag, _x, _y, _z) \
-	MDRV_DEVICE_ADD(_tag, SPEAKER, 0) \
+#define MCFG_SPEAKER_ADD(_tag, _x, _y, _z) \
+	MCFG_DEVICE_ADD(_tag, SPEAKER, 0) \
 	speaker_device_config::static_set_position(device, _x, _y, _z); \
 
-#define MDRV_SPEAKER_STANDARD_MONO(_tag) \
-	MDRV_SPEAKER_ADD(_tag, 0.0, 0.0, 1.0)
+#define MCFG_SPEAKER_STANDARD_MONO(_tag) \
+	MCFG_SPEAKER_ADD(_tag, 0.0, 0.0, 1.0)
 
-#define MDRV_SPEAKER_STANDARD_STEREO(_tagl, _tagr) \
-	MDRV_SPEAKER_ADD(_tagl, -0.2, 0.0, 1.0) \
-	MDRV_SPEAKER_ADD(_tagr, 0.2, 0.0, 1.0)
+#define MCFG_SPEAKER_STANDARD_STEREO(_tagl, _tagr) \
+	MCFG_SPEAKER_ADD(_tagl, -0.2, 0.0, 1.0) \
+	MCFG_SPEAKER_ADD(_tagr, 0.2, 0.0, 1.0)
 
 
 

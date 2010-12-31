@@ -16,8 +16,8 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MDRV_AT28C16_ADD( _tag, _interface ) \
-	MDRV_DEVICE_ADD( _tag, AT28C16, 0 )
+#define MCFG_AT28C16_ADD( _tag, _interface ) \
+	MCFG_DEVICE_ADD( _tag, AT28C16, 0 )
 
 
 //**************************************************************************

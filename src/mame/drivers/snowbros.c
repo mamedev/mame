@@ -1449,76 +1449,76 @@ static const kaneko_pandora_interface snowbros_pandora_config =
 static MACHINE_CONFIG_START( snowbros, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 8000000) /* 8 Mhz - confirmed */
-	MDRV_CPU_PROGRAM_MAP(snowbros_map)
-	MDRV_CPU_VBLANK_INT_HACK(snowbros_interrupt,3)
+	MCFG_CPU_ADD("maincpu", M68000, 8000000) /* 8 Mhz - confirmed */
+	MCFG_CPU_PROGRAM_MAP(snowbros_map)
+	MCFG_CPU_VBLANK_INT_HACK(snowbros_interrupt,3)
 
-	MDRV_CPU_ADD("soundcpu", Z80, 6000000) /* 6 MHz - confirmed */
-	MDRV_CPU_PROGRAM_MAP(sound_map)
-	MDRV_CPU_IO_MAP(sound_io_map)
+	MCFG_CPU_ADD("soundcpu", Z80, 6000000) /* 6 MHz - confirmed */
+	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_CPU_IO_MAP(sound_io_map)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(57.5) /* ~57.5 - confirmed */
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(57.5) /* ~57.5 - confirmed */
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(snowbros)
-	MDRV_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE(snowbros)
+	MCFG_PALETTE_LENGTH(256)
 
-	MDRV_VIDEO_UPDATE(snowbros)
-	MDRV_VIDEO_EOF(snowbros)
+	MCFG_VIDEO_UPDATE(snowbros)
+	MCFG_VIDEO_EOF(snowbros)
 
-	MDRV_KANEKO_PANDORA_ADD("pandora", snowbros_pandora_config)
+	MCFG_KANEKO_PANDORA_ADD("pandora", snowbros_pandora_config)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM3812, 3000000)
-	MDRV_SOUND_CONFIG(ym3812_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM3812, 3000000)
+	MCFG_SOUND_CONFIG(ym3812_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( wintbob, snowbros )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_CLOCK(10000000) /* 10mhz - Confirmed */
-	MDRV_CPU_PROGRAM_MAP(wintbob_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_CLOCK(10000000) /* 10mhz - Confirmed */
+	MCFG_CPU_PROGRAM_MAP(wintbob_map)
 
-	MDRV_DEVICE_REMOVE("pandora")
+	MCFG_DEVICE_REMOVE("pandora")
 
 	/* video hardware */
-	MDRV_GFXDECODE(wb)
-	MDRV_VIDEO_UPDATE(wintbob)
-	MDRV_VIDEO_EOF(0)
+	MCFG_GFXDECODE(wb)
+	MCFG_VIDEO_UPDATE(wintbob)
+	MCFG_VIDEO_EOF(0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( semicom, snowbros )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_CLOCK(16000000) /* 16mhz or 12mhz ? */
-	MDRV_CPU_PROGRAM_MAP(hyperpac_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_CLOCK(16000000) /* 16mhz or 12mhz ? */
+	MCFG_CPU_PROGRAM_MAP(hyperpac_map)
 
-	MDRV_CPU_MODIFY("soundcpu")
-	MDRV_CPU_CLOCK(4000000) /* 4.0 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(hyperpac_sound_map)
+	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_CPU_CLOCK(4000000) /* 4.0 MHz ??? */
+	MCFG_CPU_PROGRAM_MAP(hyperpac_sound_map)
 
-	MDRV_GFXDECODE(hyperpac)
+	MCFG_GFXDECODE(hyperpac)
 
 	/* sound hardware */
-	MDRV_SOUND_REPLACE("ymsnd", YM2151, 4000000)
-	MDRV_SOUND_CONFIG(ym2151_config)
-	MDRV_SOUND_ROUTE(0, "mono", 0.10)
-	MDRV_SOUND_ROUTE(1, "mono", 0.10)
+	MCFG_SOUND_REPLACE("ymsnd", YM2151, 4000000)
+	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_SOUND_ROUTE(0, "mono", 0.10)
+	MCFG_SOUND_ROUTE(1, "mono", 0.10)
 
-	MDRV_OKIM6295_ADD("oki", 999900, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_OKIM6295_ADD("oki", 999900, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -1527,14 +1527,14 @@ static MACHINE_CONFIG_DERIVED( semicom_mcu, semicom )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_ADD("protection", I8052, 16000000)  // AT89C52
-	MDRV_CPU_PROGRAM_MAP(protection_map)
-	MDRV_CPU_IO_MAP(protection_iomap)
+	MCFG_CPU_ADD("protection", I8052, 16000000)  // AT89C52
+	MCFG_CPU_PROGRAM_MAP(protection_map)
+	MCFG_CPU_IO_MAP(protection_iomap)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( semiprot, semicom )
-	MDRV_MACHINE_RESET ( semiprot )
+	MCFG_MACHINE_RESET ( semiprot )
 MACHINE_CONFIG_END
 
 /*
@@ -1560,72 +1560,72 @@ See included pics
 static MACHINE_CONFIG_START( honeydol, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 16000000)
-	MDRV_CPU_PROGRAM_MAP(honeydol_map)
-	MDRV_CPU_VBLANK_INT_HACK(snowbros_interrupt,3)
+	MCFG_CPU_ADD("maincpu", M68000, 16000000)
+	MCFG_CPU_PROGRAM_MAP(honeydol_map)
+	MCFG_CPU_VBLANK_INT_HACK(snowbros_interrupt,3)
 
-	MDRV_CPU_ADD("soundcpu", Z80, 4000000)
-	MDRV_CPU_PROGRAM_MAP(honeydol_sound_map)
-	MDRV_CPU_IO_MAP(honeydol_sound_io_map)
+	MCFG_CPU_ADD("soundcpu", Z80, 4000000)
+	MCFG_CPU_PROGRAM_MAP(honeydol_sound_map)
+	MCFG_CPU_IO_MAP(honeydol_sound_io_map)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(57.5)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(57.5)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(honeydol)
-	MDRV_PALETTE_LENGTH(0x800/2)
+	MCFG_GFXDECODE(honeydol)
+	MCFG_PALETTE_LENGTH(0x800/2)
 
-	MDRV_VIDEO_UPDATE(honeydol)
-
-	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_VIDEO_UPDATE(honeydol)
 
 	/* sound hardware */
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM3812, 3000000)
-	MDRV_SOUND_CONFIG(ym3812_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	/* sound hardware */
+
+	MCFG_SOUND_ADD("ymsnd", YM3812, 3000000)
+	MCFG_SOUND_CONFIG(ym3812_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 
-	MDRV_OKIM6295_ADD("oki", 999900, OKIM6295_PIN7_HIGH) /* freq? */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_OKIM6295_ADD("oki", 999900, OKIM6295_PIN7_HIGH) /* freq? */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( twinadv, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 16000000) // or 12
-	MDRV_CPU_PROGRAM_MAP(twinadv_map)
-	MDRV_CPU_VBLANK_INT_HACK(snowbros_interrupt,3)
+	MCFG_CPU_ADD("maincpu", M68000, 16000000) // or 12
+	MCFG_CPU_PROGRAM_MAP(twinadv_map)
+	MCFG_CPU_VBLANK_INT_HACK(snowbros_interrupt,3)
 
-	MDRV_CPU_ADD("soundcpu", Z80, 4000000)
-	MDRV_CPU_PROGRAM_MAP(sound_map)
-	MDRV_CPU_IO_MAP(twinadv_sound_io_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("soundcpu", Z80, 4000000)
+	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_CPU_IO_MAP(twinadv_sound_io_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(57.5)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(57.5)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(twinadv)
-	MDRV_PALETTE_LENGTH(0x100)
+	MCFG_GFXDECODE(twinadv)
+	MCFG_PALETTE_LENGTH(0x100)
 
-	MDRV_VIDEO_UPDATE(twinadv)
-
-	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_VIDEO_UPDATE(twinadv)
 
 	/* sound hardware */
-	MDRV_OKIM6295_ADD("oki", 12000000/12, OKIM6295_PIN7_HIGH) /* freq? */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+
+	/* sound hardware */
+	MCFG_OKIM6295_ADD("oki", 12000000/12, OKIM6295_PIN7_HIGH) /* freq? */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -1649,56 +1649,56 @@ Intel P8752 (mcu)
 
 static MACHINE_CONFIG_DERIVED( finalttr, semicom )
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_CLOCK(12000000)
-	MDRV_CPU_PROGRAM_MAP(finalttr_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_CLOCK(12000000)
+	MCFG_CPU_PROGRAM_MAP(finalttr_map)
 
-	MDRV_CPU_MODIFY("soundcpu")
-	MDRV_CPU_CLOCK(3578545)
+	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_CPU_CLOCK(3578545)
 
-	MDRV_MACHINE_RESET ( finalttr )
+	MCFG_MACHINE_RESET ( finalttr )
 
-	MDRV_SOUND_REPLACE("ymsnd", YM2151, 4000000)
-	MDRV_SOUND_CONFIG(ym2151_config)
-	MDRV_SOUND_ROUTE(0, "mono", 0.08)
-	MDRV_SOUND_ROUTE(1, "mono", 0.08)
+	MCFG_SOUND_REPLACE("ymsnd", YM2151, 4000000)
+	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_SOUND_ROUTE(0, "mono", 0.08)
+	MCFG_SOUND_ROUTE(1, "mono", 0.08)
 
-	MDRV_OKIM6295_REPLACE("oki", 999900, OKIM6295_PIN7_HIGH)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	MCFG_OKIM6295_REPLACE("oki", 999900, OKIM6295_PIN7_HIGH)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( _4in1, semicom )
 
 	/* basic machine hardware */
-	MDRV_GFXDECODE(snowbros)
+	MCFG_GFXDECODE(snowbros)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( snowbro3, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 16000000) /* 16mhz or 12mhz ? */
-	MDRV_CPU_PROGRAM_MAP(snowbros3_map)
-	MDRV_CPU_VBLANK_INT_HACK(snowbro3_interrupt,3)
+	MCFG_CPU_ADD("maincpu", M68000, 16000000) /* 16mhz or 12mhz ? */
+	MCFG_CPU_PROGRAM_MAP(snowbros3_map)
+	MCFG_CPU_VBLANK_INT_HACK(snowbro3_interrupt,3)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(sb3)
-	MDRV_PALETTE_LENGTH(512)
+	MCFG_GFXDECODE(sb3)
+	MCFG_PALETTE_LENGTH(512)
 
-	MDRV_VIDEO_UPDATE(snowbro3)
+	MCFG_VIDEO_UPDATE(snowbro3)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_OKIM6295_ADD("oki", 999900, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_OKIM6295_ADD("oki", 999900, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 /***************************************************************************

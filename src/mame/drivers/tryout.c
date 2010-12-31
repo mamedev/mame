@@ -187,33 +187,33 @@ GFXDECODE_END
 
 static MACHINE_CONFIG_START( tryout, tryout_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6502, 2000000)		/* ? */
-	MDRV_CPU_PROGRAM_MAP(main_cpu)
+	MCFG_CPU_ADD("maincpu", M6502, 2000000)		/* ? */
+	MCFG_CPU_PROGRAM_MAP(main_cpu)
 
-	MDRV_CPU_ADD("audiocpu", M6502, 1500000)	/* ? */
-	MDRV_CPU_PROGRAM_MAP(sound_cpu)
-	MDRV_CPU_PERIODIC_INT(nmi_line_pulse,1000) /* controls BGM tempo, 1000 is an hand-tuned value to match a side-by-side video */
+	MCFG_CPU_ADD("audiocpu", M6502, 1500000)	/* ? */
+	MCFG_CPU_PROGRAM_MAP(sound_cpu)
+	MCFG_CPU_PERIODIC_INT(nmi_line_pulse,1000) /* controls BGM tempo, 1000 is an hand-tuned value to match a side-by-side video */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 
-	MDRV_GFXDECODE(tryout)
-	MDRV_PALETTE_LENGTH(0x20)
-	MDRV_PALETTE_INIT(tryout)
+	MCFG_GFXDECODE(tryout)
+	MCFG_PALETTE_LENGTH(0x20)
+	MCFG_PALETTE_INIT(tryout)
 
-	MDRV_VIDEO_START(tryout)
-	MDRV_VIDEO_UPDATE(tryout)
+	MCFG_VIDEO_START(tryout)
+	MCFG_VIDEO_UPDATE(tryout)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, 1500000)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("ymsnd", YM2203, 1500000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 ROM_START( tryout )

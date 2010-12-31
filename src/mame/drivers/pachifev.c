@@ -362,33 +362,33 @@ static const struct tms9995reset_param pachifev_processor_config =
 static MACHINE_CONFIG_START( pachifev, pachifev_state )
 
     /* basic machine hardware */
-    MDRV_CPU_ADD("maincpu", TMS9995, XTAL_12MHz)
-    MDRV_CPU_CONFIG(pachifev_processor_config)
-    MDRV_CPU_PROGRAM_MAP(pachifev_map)
-    MDRV_CPU_IO_MAP(pachifev_cru)
-    MDRV_CPU_VBLANK_INT("screen",pachifev_vblank_irq)
+    MCFG_CPU_ADD("maincpu", TMS9995, XTAL_12MHz)
+    MCFG_CPU_CONFIG(pachifev_processor_config)
+    MCFG_CPU_PROGRAM_MAP(pachifev_map)
+    MCFG_CPU_IO_MAP(pachifev_cru)
+    MCFG_CPU_VBLANK_INT("screen",pachifev_vblank_irq)
 
-    MDRV_MACHINE_START(pachifev)
-    MDRV_MACHINE_RESET(pachifev)
+    MCFG_MACHINE_START(pachifev)
+    MCFG_MACHINE_RESET(pachifev)
 
     /* video hardware */
 
-    MDRV_FRAGMENT_ADD(tms9928a)
-    MDRV_SCREEN_MODIFY("screen")
-    MDRV_SCREEN_REFRESH_RATE((float)XTAL_10_738635MHz/2/342/262)
-    MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(4395)) /* 69 lines */
+    MCFG_FRAGMENT_ADD(tms9928a)
+    MCFG_SCREEN_MODIFY("screen")
+    MCFG_SCREEN_REFRESH_RATE((float)XTAL_10_738635MHz/2/342/262)
+    MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(4395)) /* 69 lines */
 
     /* sound hardware */
-    MDRV_SPEAKER_STANDARD_MONO("mono")
+    MCFG_SPEAKER_STANDARD_MONO("mono")
 #if USE_MSM
-    MDRV_SOUND_ADD("adpcm", MSM5205, XTAL_384kHz)  /* guess */
-    MDRV_SOUND_CONFIG(msm5205_config)
-    MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+    MCFG_SOUND_ADD("adpcm", MSM5205, XTAL_384kHz)  /* guess */
+    MCFG_SOUND_CONFIG(msm5205_config)
+    MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 #endif
-    MDRV_SOUND_ADD("sn76_1", SN76489A, XTAL_10_738635MHz/3) /* guess */
-    MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
-    MDRV_SOUND_ADD("sn76_2", SN76489A, XTAL_10_738635MHz/3) /* guess */
-    MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+    MCFG_SOUND_ADD("sn76_1", SN76489A, XTAL_10_738635MHz/3) /* guess */
+    MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+    MCFG_SOUND_ADD("sn76_2", SN76489A, XTAL_10_738635MHz/3) /* guess */
+    MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
 ROM_START( pachifev )

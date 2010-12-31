@@ -2456,8 +2456,8 @@ ADDRESS_MAP_END
 
 MACHINE_CONFIG_DERIVED( md_bootleg, megadriv )
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(md_bootleg_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(md_bootleg_map)
 MACHINE_CONFIG_END
 
 
@@ -6359,17 +6359,17 @@ INPUT_PORTS_END
 
 MACHINE_CONFIG_DERIVED( megdsvp, megadriv )
 
-	MDRV_CPU_ADD("svp", SSP1601, MASTER_CLOCK_NTSC / 7 * 3) /* ~23 MHz (guessed) */
-	MDRV_CPU_PROGRAM_MAP(svp_ssp_map)
-	MDRV_CPU_IO_MAP(svp_ext_map)
+	MCFG_CPU_ADD("svp", SSP1601, MASTER_CLOCK_NTSC / 7 * 3) /* ~23 MHz (guessed) */
+	MCFG_CPU_PROGRAM_MAP(svp_ssp_map)
+	MCFG_CPU_IO_MAP(svp_ext_map)
 	/* IRQs are not used by this CPU */
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED( megdsvppal, megadpal )
 
-	MDRV_CPU_ADD("svp", SSP1601, MASTER_CLOCK_PAL / 7 * 3) /* ~23 MHz (guessed) */
-	MDRV_CPU_PROGRAM_MAP(svp_ssp_map)
-	MDRV_CPU_IO_MAP(svp_ext_map)
+	MCFG_CPU_ADD("svp", SSP1601, MASTER_CLOCK_PAL / 7 * 3) /* ~23 MHz (guessed) */
+	MCFG_CPU_PROGRAM_MAP(svp_ssp_map)
+	MCFG_CPU_IO_MAP(svp_ext_map)
 	/* IRQs are not used by this CPU */
 MACHINE_CONFIG_END
 
@@ -8690,104 +8690,104 @@ static NVRAM_HANDLER( megadriv )
 
 
 MACHINE_CONFIG_FRAGMENT( megadriv_timers )
-	MDRV_TIMER_ADD("frame_timer", frame_timer_callback)
-	MDRV_TIMER_ADD("scanline_timer", scanline_timer_callback)
-	MDRV_TIMER_ADD("render_timer", render_timer_callback)
-	MDRV_TIMER_ADD("irq6_timer", irq6_on_callback)
-	MDRV_TIMER_ADD("irq4_timer", irq4_on_callback)
+	MCFG_TIMER_ADD("frame_timer", frame_timer_callback)
+	MCFG_TIMER_ADD("scanline_timer", scanline_timer_callback)
+	MCFG_TIMER_ADD("render_timer", render_timer_callback)
+	MCFG_TIMER_ADD("irq6_timer", irq6_on_callback)
+	MCFG_TIMER_ADD("irq4_timer", irq4_on_callback)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_START( megadriv, driver_device )
-	MDRV_CPU_ADD("maincpu", M68000, MASTER_CLOCK_NTSC / 7) /* 7.67 MHz */
-	MDRV_CPU_PROGRAM_MAP(megadriv_map)
+	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK_NTSC / 7) /* 7.67 MHz */
+	MCFG_CPU_PROGRAM_MAP(megadriv_map)
 	/* IRQs are handled via the timers */
 
-	MDRV_CPU_ADD("genesis_snd_z80", Z80, MASTER_CLOCK_NTSC / 15) /* 3.58 MHz */
-	MDRV_CPU_PROGRAM_MAP(megadriv_z80_map)
-	MDRV_CPU_IO_MAP(megadriv_z80_io_map)
+	MCFG_CPU_ADD("genesis_snd_z80", Z80, MASTER_CLOCK_NTSC / 15) /* 3.58 MHz */
+	MCFG_CPU_PROGRAM_MAP(megadriv_z80_map)
+	MCFG_CPU_IO_MAP(megadriv_z80_io_map)
 	/* IRQ handled via the timers */
 
-	MDRV_MACHINE_START(megadriv)
-	MDRV_MACHINE_RESET(megadriv)
+	MCFG_MACHINE_START(megadriv)
+	MCFG_MACHINE_RESET(megadriv)
 
-	MDRV_FRAGMENT_ADD(megadriv_timers)
+	MCFG_FRAGMENT_ADD(megadriv_timers)
 
-	MDRV_SCREEN_ADD("megadriv", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)) // Vblank handled manually.
-	MDRV_SCREEN_SIZE(64*8, 64*8)
-	MDRV_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 28*8-1)
+	MCFG_SCREEN_ADD("megadriv", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)) // Vblank handled manually.
+	MCFG_SCREEN_SIZE(64*8, 64*8)
+	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 28*8-1)
 
 #ifndef MESS
-	MDRV_NVRAM_HANDLER(megadriv)
+	MCFG_NVRAM_HANDLER(megadriv)
 #endif
 
-	MDRV_PALETTE_LENGTH(0x200)
+	MCFG_PALETTE_LENGTH(0x200)
 
-	MDRV_VIDEO_START(megadriv)
-	MDRV_VIDEO_UPDATE(megadriv) /* Copies a bitmap */
-	MDRV_VIDEO_EOF(megadriv) /* Used to Sync the timing */
-
-	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-
-	MDRV_SOUND_ADD("ymsnd", YM2612, MASTER_CLOCK_NTSC/7) /* 7.67 MHz */
-	MDRV_SOUND_ROUTE(0, "lspeaker", 0.50)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 0.50)
+	MCFG_VIDEO_START(megadriv)
+	MCFG_VIDEO_UPDATE(megadriv) /* Copies a bitmap */
+	MCFG_VIDEO_EOF(megadriv) /* Used to Sync the timing */
 
 	/* sound hardware */
-	MDRV_SOUND_ADD("snsnd", SMSIII, MASTER_CLOCK_NTSC/15)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) /* 3.58 MHz */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25) /* 3.58 MHz */
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_SOUND_ADD("ymsnd", YM2612, MASTER_CLOCK_NTSC/7) /* 7.67 MHz */
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
+
+	/* sound hardware */
+	MCFG_SOUND_ADD("snsnd", SMSIII, MASTER_CLOCK_NTSC/15)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) /* 3.58 MHz */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25) /* 3.58 MHz */
 MACHINE_CONFIG_END
 
 /************ PAL hardware has a different master clock *************/
 
 MACHINE_CONFIG_START( megadpal, driver_device )
-	MDRV_CPU_ADD("maincpu", M68000, MASTER_CLOCK_PAL / 7) /* 7.67 MHz */
-	MDRV_CPU_PROGRAM_MAP(megadriv_map)
+	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK_PAL / 7) /* 7.67 MHz */
+	MCFG_CPU_PROGRAM_MAP(megadriv_map)
 	/* IRQs are handled via the timers */
 
-	MDRV_CPU_ADD("genesis_snd_z80", Z80, MASTER_CLOCK_PAL / 15) /* 3.58 MHz */
-	MDRV_CPU_PROGRAM_MAP(megadriv_z80_map)
-	MDRV_CPU_IO_MAP(megadriv_z80_io_map)
+	MCFG_CPU_ADD("genesis_snd_z80", Z80, MASTER_CLOCK_PAL / 15) /* 3.58 MHz */
+	MCFG_CPU_PROGRAM_MAP(megadriv_z80_map)
+	MCFG_CPU_IO_MAP(megadriv_z80_io_map)
 	/* IRQ handled via the timers */
 
-	MDRV_MACHINE_START(megadriv)
-	MDRV_MACHINE_RESET(megadriv)
+	MCFG_MACHINE_START(megadriv)
+	MCFG_MACHINE_RESET(megadriv)
 
-	MDRV_FRAGMENT_ADD(megadriv_timers)
+	MCFG_FRAGMENT_ADD(megadriv_timers)
 
-	MDRV_SCREEN_ADD("megadriv", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)) // Vblank handled manually.
-	MDRV_SCREEN_SIZE(64*8, 64*8)
-	MDRV_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 28*8-1)
+	MCFG_SCREEN_ADD("megadriv", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB15)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)) // Vblank handled manually.
+	MCFG_SCREEN_SIZE(64*8, 64*8)
+	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 0, 28*8-1)
 
 #ifndef MESS
-	MDRV_NVRAM_HANDLER(megadriv)
+	MCFG_NVRAM_HANDLER(megadriv)
 #endif
 
-	MDRV_PALETTE_LENGTH(0x200)
+	MCFG_PALETTE_LENGTH(0x200)
 
-	MDRV_VIDEO_START(megadriv)
-	MDRV_VIDEO_UPDATE(megadriv) /* Copies a bitmap */
-	MDRV_VIDEO_EOF(megadriv) /* Used to Sync the timing */
-
-	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-
-	MDRV_SOUND_ADD("ymsnd", YM2612, MASTER_CLOCK_PAL/7) /* 7.67 MHz */
-	MDRV_SOUND_ROUTE(0, "lspeaker", 0.50)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 0.50)
+	MCFG_VIDEO_START(megadriv)
+	MCFG_VIDEO_UPDATE(megadriv) /* Copies a bitmap */
+	MCFG_VIDEO_EOF(megadriv) /* Used to Sync the timing */
 
 	/* sound hardware */
-	MDRV_SOUND_ADD("snsnd", SMSIII, MASTER_CLOCK_PAL/15)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) /* 3.58 MHz */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25) /* 3.58 MHz */
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+
+	MCFG_SOUND_ADD("ymsnd", YM2612, MASTER_CLOCK_PAL/7) /* 7.67 MHz */
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
+
+	/* sound hardware */
+	MCFG_SOUND_ADD("snsnd", SMSIII, MASTER_CLOCK_PAL/15)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) /* 3.58 MHz */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25) /* 3.58 MHz */
 MACHINE_CONFIG_END
 
 
@@ -8815,19 +8815,19 @@ static const sh2_cpu_core sh2_conf_slave  = { 1, NULL, _32x_fifo_available_callb
 MACHINE_CONFIG_DERIVED( genesis_32x, megadriv )
 
 #ifndef _32X_SWAP_MASTER_SLAVE_HACK
-	MDRV_CPU_ADD("32x_master_sh2", SH2, (MASTER_CLOCK_NTSC*3)/7 )
-	MDRV_CPU_PROGRAM_MAP(sh2_main_map)
-	MDRV_CPU_CONFIG(sh2_conf_master)
+	MCFG_CPU_ADD("32x_master_sh2", SH2, (MASTER_CLOCK_NTSC*3)/7 )
+	MCFG_CPU_PROGRAM_MAP(sh2_main_map)
+	MCFG_CPU_CONFIG(sh2_conf_master)
 #endif
 
-	MDRV_CPU_ADD("32x_slave_sh2", SH2, (MASTER_CLOCK_NTSC*3)/7 )
-	MDRV_CPU_PROGRAM_MAP(sh2_slave_map)
-	MDRV_CPU_CONFIG(sh2_conf_slave)
+	MCFG_CPU_ADD("32x_slave_sh2", SH2, (MASTER_CLOCK_NTSC*3)/7 )
+	MCFG_CPU_PROGRAM_MAP(sh2_slave_map)
+	MCFG_CPU_CONFIG(sh2_conf_slave)
 
 #ifdef _32X_SWAP_MASTER_SLAVE_HACK
-	MDRV_CPU_ADD("32x_master_sh2", SH2, (MASTER_CLOCK_NTSC*3)/7 )
-	MDRV_CPU_PROGRAM_MAP(sh2_main_map)
-	MDRV_CPU_CONFIG(sh2_conf_master)
+	MCFG_CPU_ADD("32x_master_sh2", SH2, (MASTER_CLOCK_NTSC*3)/7 )
+	MCFG_CPU_PROGRAM_MAP(sh2_main_map)
+	MCFG_CPU_CONFIG(sh2_conf_master)
 #endif
 
 	// brutal needs at least 30000 or the backgrounds don't animate properly / lock up, and the game
@@ -8835,47 +8835,47 @@ MACHINE_CONFIG_DERIVED( genesis_32x, megadriv )
 	//
 	// boosting the interleave here actually makes Kolibri run incorrectly however, that
 	// one works best just boosting the interleave on communications?!
-	MDRV_QUANTUM_TIME(HZ(1800000))
+	MCFG_QUANTUM_TIME(HZ(1800000))
 
 	// we need to remove and re-add the sound system because the balance is different
 	// due to MAME / MESS having severe issues if the dac output is > 0.40? (sound is corrupted even if DAC is slient?!)
-	MDRV_DEVICE_REMOVE("ymsnd")
-	MDRV_DEVICE_REMOVE("snsnd")
+	MCFG_DEVICE_REMOVE("ymsnd")
+	MCFG_DEVICE_REMOVE("snsnd")
 
 
-	MDRV_SOUND_ADD("ymsnd", YM2612, MASTER_CLOCK_NTSC/7)
-	MDRV_SOUND_ROUTE(0, "lspeaker", (0.50)/2)
-	MDRV_SOUND_ROUTE(1, "rspeaker", (0.50)/2)
+	MCFG_SOUND_ADD("ymsnd", YM2612, MASTER_CLOCK_NTSC/7)
+	MCFG_SOUND_ROUTE(0, "lspeaker", (0.50)/2)
+	MCFG_SOUND_ROUTE(1, "rspeaker", (0.50)/2)
 
 	/* sound hardware */
-	MDRV_SOUND_ADD("snsnd", SMSIII, MASTER_CLOCK_NTSC/15)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", (0.25)/2)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", (0.25)/2)
+	MCFG_SOUND_ADD("snsnd", SMSIII, MASTER_CLOCK_NTSC/15)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", (0.25)/2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", (0.25)/2)
 
-	MDRV_SOUND_ADD("lch_pwm", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
+	MCFG_SOUND_ADD("lch_pwm", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 
-	MDRV_SOUND_ADD("rch_pwm", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
+	MCFG_SOUND_ADD("rch_pwm", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_DERIVED( genesis_32x_pal, megadpal )
 
 #ifndef _32X_SWAP_MASTER_SLAVE_HACK
-	MDRV_CPU_ADD("32x_master_sh2", SH2, (MASTER_CLOCK_PAL*3)/7 )
-	MDRV_CPU_PROGRAM_MAP(sh2_main_map)
-	MDRV_CPU_CONFIG(sh2_conf_master)
+	MCFG_CPU_ADD("32x_master_sh2", SH2, (MASTER_CLOCK_PAL*3)/7 )
+	MCFG_CPU_PROGRAM_MAP(sh2_main_map)
+	MCFG_CPU_CONFIG(sh2_conf_master)
 #endif
 
-	MDRV_CPU_ADD("32x_slave_sh2", SH2, (MASTER_CLOCK_PAL*3)/7 )
-	MDRV_CPU_PROGRAM_MAP(sh2_slave_map)
-	MDRV_CPU_CONFIG(sh2_conf_slave)
+	MCFG_CPU_ADD("32x_slave_sh2", SH2, (MASTER_CLOCK_PAL*3)/7 )
+	MCFG_CPU_PROGRAM_MAP(sh2_slave_map)
+	MCFG_CPU_CONFIG(sh2_conf_slave)
 
 #ifdef _32X_SWAP_MASTER_SLAVE_HACK
-	MDRV_CPU_ADD("32x_master_sh2", SH2, (MASTER_CLOCK_PAL*3)/7 )
-	MDRV_CPU_PROGRAM_MAP(sh2_main_map)
-	MDRV_CPU_CONFIG(sh2_conf_master)
+	MCFG_CPU_ADD("32x_master_sh2", SH2, (MASTER_CLOCK_PAL*3)/7 )
+	MCFG_CPU_PROGRAM_MAP(sh2_main_map)
+	MCFG_CPU_CONFIG(sh2_conf_master)
 #endif
 
 	// brutal needs at least 30000 or the backgrounds don't animate properly / lock up, and the game
@@ -8883,65 +8883,65 @@ MACHINE_CONFIG_DERIVED( genesis_32x_pal, megadpal )
 	//
 	// boosting the interleave here actually makes Kolibri run incorrectly however, that
 	// one works best just boosting the interleave on communications?!
-	MDRV_QUANTUM_TIME(HZ(1800000))
+	MCFG_QUANTUM_TIME(HZ(1800000))
 
 	// we need to remove and re-add the sound system because the balance is different
 	// due to MAME / MESS having severe issues if the dac output is > 0.40? (sound is corrupted even if DAC is slient?!)
-	MDRV_DEVICE_REMOVE("ymsnd")
-	MDRV_DEVICE_REMOVE("snsnd")
+	MCFG_DEVICE_REMOVE("ymsnd")
+	MCFG_DEVICE_REMOVE("snsnd")
 
 
-	MDRV_SOUND_ADD("ymsnd", YM2612, MASTER_CLOCK_PAL/7)
-	MDRV_SOUND_ROUTE(0, "lspeaker", (0.50)/2)
-	MDRV_SOUND_ROUTE(1, "rspeaker", (0.50)/2)
+	MCFG_SOUND_ADD("ymsnd", YM2612, MASTER_CLOCK_PAL/7)
+	MCFG_SOUND_ROUTE(0, "lspeaker", (0.50)/2)
+	MCFG_SOUND_ROUTE(1, "rspeaker", (0.50)/2)
 
 	/* sound hardware */
-	MDRV_SOUND_ADD("snsnd", SMSIII, MASTER_CLOCK_PAL/15)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", (0.25)/2)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", (0.25)/2)
+	MCFG_SOUND_ADD("snsnd", SMSIII, MASTER_CLOCK_PAL/15)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", (0.25)/2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", (0.25)/2)
 
-	MDRV_SOUND_ADD("lch_pwm", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
+	MCFG_SOUND_ADD("lch_pwm", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 
-	MDRV_SOUND_ADD("rch_pwm", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
+	MCFG_SOUND_ADD("rch_pwm", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 MACHINE_CONFIG_END
 
 
 
 MACHINE_CONFIG_DERIVED( genesis_scd, megadriv )
 
-	MDRV_CPU_ADD("segacd_68k", M68000, SEGACD_CLOCK ) /* 12.5 MHz */
-	MDRV_CPU_PROGRAM_MAP(segacd_map)
+	MCFG_CPU_ADD("segacd_68k", M68000, SEGACD_CLOCK ) /* 12.5 MHz */
+	MCFG_CPU_PROGRAM_MAP(segacd_map)
 
-	MDRV_SOUND_ADD( "cdda", CDDA, 0 )
-	MDRV_SOUND_ROUTE( 0, "lspeaker", 1.00 )
-	MDRV_SOUND_ROUTE( 1, "rspeaker", 1.00 )
+	MCFG_SOUND_ADD( "cdda", CDDA, 0 )
+	MCFG_SOUND_ROUTE( 0, "lspeaker", 1.00 )
+	MCFG_SOUND_ROUTE( 1, "rspeaker", 1.00 )
 
-	MDRV_SOUND_ADD("rfsnd", RF5C68, SEGACD_CLOCK) // RF5C164!
-	MDRV_SOUND_ROUTE( 0, "lspeaker", 0.25 )
-	MDRV_SOUND_ROUTE( 1, "rspeaker", 0.25 )
+	MCFG_SOUND_ADD("rfsnd", RF5C68, SEGACD_CLOCK) // RF5C164!
+	MCFG_SOUND_ROUTE( 0, "lspeaker", 0.25 )
+	MCFG_SOUND_ROUTE( 1, "rspeaker", 0.25 )
 
 	#ifdef MESS
-	MDRV_CDROM_ADD( "cdrom" )
+	MCFG_CDROM_ADD( "cdrom" )
 	#endif
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED( genesis_32x_scd, genesis_32x )
 
-	MDRV_CPU_ADD("segacd_68k", M68000, SEGACD_CLOCK ) /* 12.5 MHz */
-	MDRV_CPU_PROGRAM_MAP(segacd_map)
+	MCFG_CPU_ADD("segacd_68k", M68000, SEGACD_CLOCK ) /* 12.5 MHz */
+	MCFG_CPU_PROGRAM_MAP(segacd_map)
 
-	MDRV_SOUND_ADD( "cdda", CDDA, 0 )
-	MDRV_SOUND_ROUTE( 0, "lspeaker", 1.00 )
-	MDRV_SOUND_ROUTE( 1, "rspeaker", 1.00 )
+	MCFG_SOUND_ADD( "cdda", CDDA, 0 )
+	MCFG_SOUND_ROUTE( 0, "lspeaker", 1.00 )
+	MCFG_SOUND_ROUTE( 1, "rspeaker", 1.00 )
 
-	MDRV_SOUND_ADD("rfsnd", RF5C68, SEGACD_CLOCK) // RF5C164
-	MDRV_SOUND_ROUTE( 0, "lspeaker", 0.25 )
-	MDRV_SOUND_ROUTE( 1, "rspeaker", 0.25 )
+	MCFG_SOUND_ADD("rfsnd", RF5C68, SEGACD_CLOCK) // RF5C164
+	MCFG_SOUND_ROUTE( 0, "lspeaker", 0.25 )
+	MCFG_SOUND_ROUTE( 1, "rspeaker", 0.25 )
 
 	#ifdef MESS
-	MDRV_CDROM_ADD( "cdrom" )
+	MCFG_CDROM_ADD( "cdrom" )
 	#endif
 MACHINE_CONFIG_END
 

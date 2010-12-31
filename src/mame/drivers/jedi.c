@@ -345,20 +345,20 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( jedi, jedi_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6502, JEDI_MAIN_CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(main_map)
+	MCFG_CPU_ADD("maincpu", M6502, JEDI_MAIN_CPU_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(main_map)
 
-	MDRV_QUANTUM_TIME(HZ(240))
+	MCFG_QUANTUM_TIME(HZ(240))
 
-	MDRV_MACHINE_START(jedi)
-	MDRV_MACHINE_RESET(jedi)
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_MACHINE_START(jedi)
+	MCFG_MACHINE_RESET(jedi)
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MDRV_FRAGMENT_ADD(jedi_video)
+	MCFG_FRAGMENT_ADD(jedi_video)
 
 	/* audio hardware */
-	MDRV_FRAGMENT_ADD(jedi_audio)
+	MCFG_FRAGMENT_ADD(jedi_audio)
 MACHINE_CONFIG_END
 
 

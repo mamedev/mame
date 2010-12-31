@@ -408,44 +408,44 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( dcheese, dcheese_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, MAIN_OSC)
-	MDRV_CPU_PROGRAM_MAP(main_cpu_map)
-	MDRV_CPU_VBLANK_INT("screen", dcheese_vblank)
+	MCFG_CPU_ADD("maincpu", M68000, MAIN_OSC)
+	MCFG_CPU_PROGRAM_MAP(main_cpu_map)
+	MCFG_CPU_VBLANK_INT("screen", dcheese_vblank)
 
-	MDRV_CPU_ADD("audiocpu", M6809, SOUND_OSC/16)
-	MDRV_CPU_PROGRAM_MAP(sound_cpu_map)
-	MDRV_CPU_PERIODIC_INT(irq1_line_hold, 480)	/* accurate for fredmem */
+	MCFG_CPU_ADD("audiocpu", M6809, SOUND_OSC/16)
+	MCFG_CPU_PROGRAM_MAP(sound_cpu_map)
+	MCFG_CPU_PERIODIC_INT(irq1_line_hold, 480)	/* accurate for fredmem */
 
-	MDRV_MACHINE_START(dcheese)
+	MCFG_MACHINE_START(dcheese)
 
-	MDRV_EEPROM_93C46_ADD("eeprom")
-	MDRV_TICKET_DISPENSER_ADD("ticket", 200, TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
+	MCFG_EEPROM_93C46_ADD("eeprom")
+	MCFG_TICKET_DISPENSER_ADD("ticket", 200, TICKET_MOTOR_ACTIVE_HIGH, TICKET_STATUS_ACTIVE_LOW)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(360, 262)	/* guess, need to see what the games write to the vid registers */
-	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(360, 262)	/* guess, need to see what the games write to the vid registers */
+	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
-	MDRV_PALETTE_LENGTH(65534)
+	MCFG_PALETTE_LENGTH(65534)
 
-	MDRV_PALETTE_INIT(dcheese)
-	MDRV_VIDEO_START(dcheese)
-	MDRV_VIDEO_UPDATE(dcheese)
+	MCFG_PALETTE_INIT(dcheese)
+	MCFG_VIDEO_START(dcheese)
+	MCFG_VIDEO_UPDATE(dcheese)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("bsmt", BSMT2000, SOUND_OSC)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.2)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.2)
+	MCFG_SOUND_ADD("bsmt", BSMT2000, SOUND_OSC)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.2)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.2)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( fredmem, dcheese )
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0, 359, 0, 239)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(0, 359, 0, 239)
 MACHINE_CONFIG_END
 
 

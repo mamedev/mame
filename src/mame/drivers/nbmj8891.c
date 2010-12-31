@@ -2609,62 +2609,62 @@ static const ay8910_interface ay8910_config =
 static MACHINE_CONFIG_START( gionbana, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 20000000/4)	/* 5.00 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(gionbana_map)
-	MDRV_CPU_IO_MAP(gionbana_io_map)
-//  MDRV_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 132)    // nmiclock = 60
-	MDRV_CPU_VBLANK_INT("screen", nb1413m3_interrupt)
+	MCFG_CPU_ADD("maincpu", Z80, 20000000/4)	/* 5.00 MHz ? */
+	MCFG_CPU_PROGRAM_MAP(gionbana_map)
+	MCFG_CPU_IO_MAP(gionbana_io_map)
+//  MCFG_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 132)    // nmiclock = 60
+	MCFG_CPU_VBLANK_INT("screen", nb1413m3_interrupt)
 
-	MDRV_MACHINE_RESET(nb1413m3)
+	MCFG_MACHINE_RESET(nb1413m3)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(512, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 512-1, 8, 248-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(512, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 8, 248-1)
 
-	MDRV_PALETTE_LENGTH(256)
+	MCFG_PALETTE_LENGTH(256)
 
-	MDRV_VIDEO_START(nbmj8891_2layer)
-	MDRV_VIDEO_UPDATE(nbmj8891)
+	MCFG_VIDEO_START(nbmj8891_2layer)
+	MCFG_VIDEO_UPDATE(nbmj8891)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("fmsnd", YM3812, 2500000)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("fmsnd", YM3812, 2500000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( mgion, gionbana )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mgion_map)
-	MDRV_CPU_IO_MAP(mgion_io_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(mgion_map)
+	MCFG_CPU_IO_MAP(mgion_io_map)
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( omotesnd, gionbana )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(omotesnd_map)
-	MDRV_CPU_IO_MAP(omotesnd_io_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(omotesnd_map)
+	MCFG_CPU_IO_MAP(omotesnd_io_map)
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* sound hardware */
-	MDRV_SOUND_REPLACE("fmsnd", AY8910, 1250000)
-	MDRV_SOUND_CONFIG(ay8910_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
+	MCFG_SOUND_REPLACE("fmsnd", AY8910, 1250000)
+	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 MACHINE_CONFIG_END
 
 
@@ -2672,55 +2672,55 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( mjcamerb, gionbana )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(hanamomo_io_map)
-//  MDRV_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 142)    // ?
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(hanamomo_io_map)
+//  MCFG_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 142)    // ?
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0, 512-1, 16, 240-1)
-	MDRV_VIDEO_START(nbmj8891_1layer)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 16, 240-1)
+	MCFG_VIDEO_START(nbmj8891_1layer)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mmcamera, gionbana )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(hanamomo_io_map)
-//  MDRV_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 128)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(hanamomo_io_map)
+//  MCFG_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 128)
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0, 512-1, 16, 240-1)
-	MDRV_VIDEO_START(nbmj8891_1layer)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 16, 240-1)
+	MCFG_VIDEO_START(nbmj8891_1layer)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( hanamomo, gionbana )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(hanamomo_map)
-	MDRV_CPU_IO_MAP(hanamomo_io_map)
-//  MDRV_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 128)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(hanamomo_map)
+	MCFG_CPU_IO_MAP(hanamomo_io_map)
+//  MCFG_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 128)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0, 512-1, 16, 240-1)
-	MDRV_VIDEO_START(nbmj8891_1layer)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 16, 240-1)
+	MCFG_VIDEO_START(nbmj8891_1layer)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( msjiken, hanamomo )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(gionbana_map)
-	MDRV_CPU_IO_MAP(msjiken_io_map)
-//  MDRV_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 142)    // nmiclock = 70
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(gionbana_map)
+	MCFG_CPU_IO_MAP(msjiken_io_map)
+//  MCFG_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 142)    // nmiclock = 70
 MACHINE_CONFIG_END
 
 
@@ -2729,19 +2729,19 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( telmahjn, gionbana )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-//  MDRV_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 142)    // nmiclock = 70
+	MCFG_CPU_MODIFY("maincpu")
+//  MCFG_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 142)    // nmiclock = 70
 
 	/* video hardware */
-	MDRV_VIDEO_START(nbmj8891_1layer)
+	MCFG_VIDEO_START(nbmj8891_1layer)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( mgmen89, telmahjn )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-//  MDRV_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 128)
+	MCFG_CPU_MODIFY("maincpu")
+//  MCFG_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 128)
 MACHINE_CONFIG_END
 
 
@@ -2751,7 +2751,7 @@ static MACHINE_CONFIG_DERIVED( mjfocus, gionbana )
 	/* basic machine hardware */
 
 	/* video hardware */
-	MDRV_VIDEO_START(nbmj8891_1layer)
+	MCFG_VIDEO_START(nbmj8891_1layer)
 MACHINE_CONFIG_END
 
 
@@ -2759,83 +2759,83 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( mjnanpas, gionbana )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(club90s_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(club90s_map)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( maiko, mjnanpas )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(maiko_map)
-	MDRV_CPU_IO_MAP(maiko_io_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(maiko_map)
+	MCFG_CPU_IO_MAP(maiko_io_map)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( mmaiko, maiko )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mmaiko_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(mmaiko_map)
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( lovehous, mjnanpas )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(lovehous_map)
-	MDRV_CPU_IO_MAP(lovehous_io_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(lovehous_map)
+	MCFG_CPU_IO_MAP(lovehous_io_map)
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( hanaoji, maiko )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(hanaoji_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(hanaoji_map)
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( hnxmasev, maiko )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(hnxmasev_map)
-	MDRV_CPU_IO_MAP(maiko_io_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(hnxmasev_map)
+	MCFG_CPU_IO_MAP(maiko_io_map)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( hnageman, maiko )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(hnageman_map)
-	MDRV_CPU_IO_MAP(maiko_io_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(hnageman_map)
+	MCFG_CPU_IO_MAP(maiko_io_map)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( scandal, hanamomo )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(scandalm_map)
-	MDRV_CPU_IO_MAP(scandal_io_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(scandalm_map)
+	MCFG_CPU_IO_MAP(scandal_io_map)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( bananadr, mjnanpas )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(scandalm_map)
-	MDRV_CPU_IO_MAP(bananadr_io_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(scandalm_map)
+	MCFG_CPU_IO_MAP(bananadr_io_map)
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
 
@@ -2843,44 +2843,44 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( mjfocusm, gionbana )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(scandalm_map)
-	MDRV_CPU_IO_MAP(scandalm_io_map)
-//  MDRV_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 128)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(scandalm_map)
+	MCFG_CPU_IO_MAP(scandalm_io_map)
+//  MCFG_CPU_VBLANK_INT_HACK(nb1413m3_interrupt, 128)
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0, 512-1, 16, 240-1)
-	MDRV_VIDEO_START(nbmj8891_1layer)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 16, 240-1)
+	MCFG_VIDEO_START(nbmj8891_1layer)
 
 	/* sound hardware */
-	MDRV_SOUND_REPLACE("fmsnd", AY8910, 1250000)
-	MDRV_SOUND_CONFIG(ay8910_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
+	MCFG_SOUND_REPLACE("fmsnd", AY8910, 1250000)
+	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( taiwanmb, gionbana )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(taiwanmb_map)
-	MDRV_CPU_IO_MAP(taiwanmb_io_map)
-//  MDRV_CPU_VBLANK_INT("screen", nb1413m3_interrupt)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(taiwanmb_map)
+	MCFG_CPU_IO_MAP(taiwanmb_io_map)
+//  MCFG_CPU_VBLANK_INT("screen", nb1413m3_interrupt)
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0, 512-1, 16, 240-1)
-	MDRV_VIDEO_START(nbmj8891_1layer)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 16, 240-1)
+	MCFG_VIDEO_START(nbmj8891_1layer)
 
 	/* sound hardware */
-	MDRV_SOUND_REPLACE("fmsnd", AY8910, 1250000)
-	MDRV_SOUND_CONFIG(ay8910_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
+	MCFG_SOUND_REPLACE("fmsnd", AY8910, 1250000)
+	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 MACHINE_CONFIG_END
 
 

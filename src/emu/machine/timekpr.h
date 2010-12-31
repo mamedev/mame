@@ -24,17 +24,17 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MDRV_M48T02_ADD(_tag) \
-	MDRV_DEVICE_ADD(_tag, M48T02, 0)
+#define MCFG_M48T02_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, M48T02, 0)
 
-#define MDRV_M48T35_ADD(_tag) \
-	MDRV_DEVICE_ADD(_tag, M48T35, 0)
+#define MCFG_M48T35_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, M48T35, 0)
 
-#define MDRV_M48T58_ADD(_tag) \
-	MDRV_DEVICE_ADD(_tag, M48T58, 0)
+#define MCFG_M48T58_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, M48T58, 0)
 
-#define MDRV_MK48T08_ADD(_tag) \
-	MDRV_DEVICE_ADD(_tag, MK48T08, 0)
+#define MCFG_MK48T08_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, MK48T08, 0)
 
 
 

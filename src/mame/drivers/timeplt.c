@@ -380,52 +380,52 @@ static MACHINE_RESET( timeplt )
 static MACHINE_CONFIG_START( timeplt, timeplt_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/3/2)	/* not confirmed, but common for Konami games of the era */
-	MDRV_CPU_PROGRAM_MAP(timeplt_main_map)
-	MDRV_CPU_VBLANK_INT("screen", timeplt_interrupt)
+	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/3/2)	/* not confirmed, but common for Konami games of the era */
+	MCFG_CPU_PROGRAM_MAP(timeplt_main_map)
+	MCFG_CPU_VBLANK_INT("screen", timeplt_interrupt)
 
-	MDRV_MACHINE_START(timeplt)
-	MDRV_MACHINE_RESET(timeplt)
+	MCFG_MACHINE_START(timeplt)
+	MCFG_MACHINE_RESET(timeplt)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_SCANLINE)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(timeplt)
-	MDRV_PALETTE_LENGTH(32*4+64*4)
+	MCFG_GFXDECODE(timeplt)
+	MCFG_PALETTE_LENGTH(32*4+64*4)
 
-	MDRV_PALETTE_INIT(timeplt)
-	MDRV_VIDEO_START(timeplt)
-	MDRV_VIDEO_UPDATE(timeplt)
+	MCFG_PALETTE_INIT(timeplt)
+	MCFG_VIDEO_START(timeplt)
+	MCFG_VIDEO_UPDATE(timeplt)
 
 	/* sound hardware */
-	MDRV_FRAGMENT_ADD(timeplt_sound)
+	MCFG_FRAGMENT_ADD(timeplt_sound)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( psurge, timeplt )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(psurge_main_map)
-	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(psurge_main_map)
+	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-	MDRV_MACHINE_START(common)
-	MDRV_MACHINE_RESET(0)
+	MCFG_MACHINE_START(common)
+	MCFG_MACHINE_RESET(0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( chkun, timeplt )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(chkun_main_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(chkun_main_map)
 
-	MDRV_VIDEO_START(chkun)
+	MCFG_VIDEO_START(chkun)
 MACHINE_CONFIG_END
 
 /*************************************

@@ -465,44 +465,44 @@ static MACHINE_RESET( discoboy )
 static MACHINE_CONFIG_START( discoboy, discoboy_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80,12000000/2)		 /* 6 MHz? */
-	MDRV_CPU_PROGRAM_MAP(discoboy_map)
-	MDRV_CPU_IO_MAP(io_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("maincpu", Z80,12000000/2)		 /* 6 MHz? */
+	MCFG_CPU_PROGRAM_MAP(discoboy_map)
+	MCFG_CPU_IO_MAP(io_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audiocpu", Z80,10000000/2)		 /* 5 MHz? */
-	MDRV_CPU_PROGRAM_MAP(sound_map)
-//  MDRV_CPU_IO_MAP(sound_io_map)
-//  MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
-	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,32)
+	MCFG_CPU_ADD("audiocpu", Z80,10000000/2)		 /* 5 MHz? */
+	MCFG_CPU_PROGRAM_MAP(sound_map)
+//  MCFG_CPU_IO_MAP(sound_io_map)
+//  MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_VBLANK_INT_HACK(nmi_line_pulse,32)
 
-	MDRV_MACHINE_START( discoboy )
-	MDRV_MACHINE_RESET( discoboy )
+	MCFG_MACHINE_START( discoboy )
+	MCFG_MACHINE_RESET( discoboy )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_SIZE(512, 256)
-	MDRV_SCREEN_VISIBLE_AREA(8*8, 512-1-8*8, 0+8, 256-1-8)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(512, 256)
+	MCFG_SCREEN_VISIBLE_AREA(8*8, 512-1-8*8, 0+8, 256-1-8)
 
-	MDRV_GFXDECODE(discoboy)
-	MDRV_PALETTE_LENGTH(0x1000)
+	MCFG_GFXDECODE(discoboy)
+	MCFG_PALETTE_LENGTH(0x1000)
 
-	MDRV_VIDEO_START(discoboy)
-	MDRV_VIDEO_UPDATE(discoboy)
+	MCFG_VIDEO_START(discoboy)
+	MCFG_VIDEO_UPDATE(discoboy)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM3812, 2500000)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
+	MCFG_SOUND_ADD("ymsnd", YM3812, 2500000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
 
-	MDRV_SOUND_ADD("msm", MSM5205, 384000) // ???? unknown
-	MDRV_SOUND_CONFIG(discoboy_msm5205_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_SOUND_ADD("msm", MSM5205, 384000) // ???? unknown
+	MCFG_SOUND_CONFIG(discoboy_msm5205_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
 

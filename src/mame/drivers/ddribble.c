@@ -285,59 +285,59 @@ static MACHINE_RESET( ddribble )
 static MACHINE_CONFIG_START( ddribble, ddribble_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6809,	XTAL_18_432MHz/12)	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(cpu0_map)
-	MDRV_CPU_VBLANK_INT("screen", ddribble_interrupt_0)
+	MCFG_CPU_ADD("maincpu", M6809,	XTAL_18_432MHz/12)	/* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(cpu0_map)
+	MCFG_CPU_VBLANK_INT("screen", ddribble_interrupt_0)
 
-	MDRV_CPU_ADD("cpu1", M6809,	XTAL_18_432MHz/12)	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(cpu1_map)
-	MDRV_CPU_VBLANK_INT("screen", ddribble_interrupt_1)
+	MCFG_CPU_ADD("cpu1", M6809,	XTAL_18_432MHz/12)	/* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(cpu1_map)
+	MCFG_CPU_VBLANK_INT("screen", ddribble_interrupt_1)
 
-	MDRV_CPU_ADD("cpu2", M6809,	XTAL_18_432MHz/12)	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(cpu2_map)
+	MCFG_CPU_ADD("cpu2", M6809,	XTAL_18_432MHz/12)	/* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(cpu2_map)
 
-	MDRV_QUANTUM_TIME(HZ(6000))	/* we need heavy synch */
+	MCFG_QUANTUM_TIME(HZ(6000))	/* we need heavy synch */
 
-	MDRV_MACHINE_START(ddribble)
-	MDRV_MACHINE_RESET(ddribble)
+	MCFG_MACHINE_START(ddribble)
+	MCFG_MACHINE_RESET(ddribble)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-/*  MDRV_SCREEN_SIZE(64*8, 32*8)
-    MDRV_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1) */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+/*  MCFG_SCREEN_SIZE(64*8, 32*8)
+    MCFG_SCREEN_VISIBLE_AREA(0*8, 64*8-1, 2*8, 30*8-1) */
 
-	MDRV_GFXDECODE(ddribble)
-	MDRV_PALETTE_LENGTH(64 + 256)
+	MCFG_GFXDECODE(ddribble)
+	MCFG_PALETTE_LENGTH(64 + 256)
 
-	MDRV_PALETTE_INIT(ddribble)
-	MDRV_VIDEO_START(ddribble)
-	MDRV_VIDEO_UPDATE(ddribble)
+	MCFG_PALETTE_INIT(ddribble)
+	MCFG_VIDEO_START(ddribble)
+	MCFG_VIDEO_UPDATE(ddribble)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, XTAL_3_579545MHz) /* verified on pcb */
-	MDRV_SOUND_CONFIG(ym2203_config)
-	MDRV_SOUND_ROUTE(0, "filter1", 0.25)
-	MDRV_SOUND_ROUTE(1, "filter2", 0.25)
-	MDRV_SOUND_ROUTE(2, "filter3", 0.25)
-	MDRV_SOUND_ROUTE(3, "mono", 0.25)
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_3_579545MHz) /* verified on pcb */
+	MCFG_SOUND_CONFIG(ym2203_config)
+	MCFG_SOUND_ROUTE(0, "filter1", 0.25)
+	MCFG_SOUND_ROUTE(1, "filter2", 0.25)
+	MCFG_SOUND_ROUTE(2, "filter3", 0.25)
+	MCFG_SOUND_ROUTE(3, "mono", 0.25)
 
-	MDRV_SOUND_ADD("vlm", VLM5030, XTAL_3_579545MHz) /* verified on pcb */
-	MDRV_SOUND_CONFIG(vlm5030_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("vlm", VLM5030, XTAL_3_579545MHz) /* verified on pcb */
+	MCFG_SOUND_CONFIG(vlm5030_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("filter1", FILTER_RC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MDRV_SOUND_ADD("filter2", FILTER_RC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MDRV_SOUND_ADD("filter3", FILTER_RC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("filter1", FILTER_RC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("filter2", FILTER_RC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("filter3", FILTER_RC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 

@@ -1114,33 +1114,33 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( driver_nomsp, harddriv_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68010, 32000000/4)
-	MDRV_CPU_PROGRAM_MAP(driver_68k_map)
-	MDRV_CPU_VBLANK_INT("screen", atarigen_video_int_gen)
-	MDRV_CPU_PERIODIC_INT(hd68k_irq_gen, (double)32000000/16/16/16/16/2)
+	MCFG_CPU_ADD("maincpu", M68010, 32000000/4)
+	MCFG_CPU_PROGRAM_MAP(driver_68k_map)
+	MCFG_CPU_VBLANK_INT("screen", atarigen_video_int_gen)
+	MCFG_CPU_PERIODIC_INT(hd68k_irq_gen, (double)32000000/16/16/16/16/2)
 
-	MDRV_CPU_ADD("gsp", TMS34010, 48000000)
-	MDRV_CPU_PROGRAM_MAP(driver_gsp_map)
-	MDRV_CPU_CONFIG(gsp_config_driver)
+	MCFG_CPU_ADD("gsp", TMS34010, 48000000)
+	MCFG_CPU_PROGRAM_MAP(driver_gsp_map)
+	MCFG_CPU_CONFIG(gsp_config_driver)
 
-	MDRV_QUANTUM_TIME(HZ(30000))
+	MCFG_QUANTUM_TIME(HZ(30000))
 
-	MDRV_MACHINE_START(harddriv)
-	MDRV_MACHINE_RESET(harddriv)
-	MDRV_NVRAM_ADD_1FILL("eeprom")
+	MCFG_MACHINE_START(harddriv)
+	MCFG_MACHINE_RESET(harddriv)
+	MCFG_NVRAM_ADD_1FILL("eeprom")
 
-	MDRV_TIMER_ADD("duart_timer", hd68k_duart_callback)
+	MCFG_TIMER_ADD("duart_timer", hd68k_duart_callback)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MDRV_PALETTE_LENGTH(1024)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	MCFG_PALETTE_LENGTH(1024)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(4000000*4, 160*4, 0, 127*4, 417, 0, 384)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_RAW_PARAMS(4000000*4, 160*4, 0, 127*4, 417, 0, 384)
 
-	MDRV_VIDEO_START(harddriv)
-	MDRV_VIDEO_UPDATE(tms340x0)
+	MCFG_VIDEO_START(harddriv)
+	MCFG_VIDEO_UPDATE(tms340x0)
 MACHINE_CONFIG_END
 
 
@@ -1148,9 +1148,9 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( driver_msp, driver_nomsp )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("msp", TMS34010, 50000000)
-	MDRV_CPU_PROGRAM_MAP(driver_msp_map)
-	MDRV_CPU_CONFIG(msp_config)
+	MCFG_CPU_ADD("msp", TMS34010, 50000000)
+	MCFG_CPU_PROGRAM_MAP(driver_msp_map)
+	MCFG_CPU_CONFIG(msp_config)
 MACHINE_CONFIG_END
 
 
@@ -1158,16 +1158,16 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( multisync_nomsp, driver_nomsp )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(multisync_68k_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(multisync_68k_map)
 
-	MDRV_CPU_MODIFY("gsp")
-	MDRV_CPU_CONFIG(gsp_config_multisync)
-	MDRV_CPU_PROGRAM_MAP(multisync_gsp_map)
+	MCFG_CPU_MODIFY("gsp")
+	MCFG_CPU_CONFIG(gsp_config_multisync)
+	MCFG_CPU_PROGRAM_MAP(multisync_gsp_map)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_RAW_PARAMS(6000000*2, 323*2, 0, 256*2, 308, 0, 288)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_RAW_PARAMS(6000000*2, 323*2, 0, 256*2, 308, 0, 288)
 MACHINE_CONFIG_END
 
 
@@ -1175,9 +1175,9 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( multisync_msp, multisync_nomsp )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("msp", TMS34010, 50000000)
-	MDRV_CPU_PROGRAM_MAP(driver_msp_map)
-	MDRV_CPU_CONFIG(msp_config)
+	MCFG_CPU_ADD("msp", TMS34010, 50000000)
+	MCFG_CPU_PROGRAM_MAP(driver_msp_map)
+	MCFG_CPU_CONFIG(msp_config)
 MACHINE_CONFIG_END
 
 
@@ -1185,11 +1185,11 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( multisync2, multisync_nomsp )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(multisync2_68k_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(multisync2_68k_map)
 
-	MDRV_CPU_MODIFY("gsp")
-	MDRV_CPU_PROGRAM_MAP(multisync2_gsp_map)
+	MCFG_CPU_MODIFY("gsp")
+	MCFG_CPU_PROGRAM_MAP(multisync2_gsp_map)
 MACHINE_CONFIG_END
 
 
@@ -1204,9 +1204,9 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_FRAGMENT( adsp )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("adsp", ADSP2100, 8000000)
-	MDRV_CPU_PROGRAM_MAP(adsp_program_map)
-	MDRV_CPU_DATA_MAP(adsp_data_map)
+	MCFG_CPU_ADD("adsp", ADSP2100, 8000000)
+	MCFG_CPU_PROGRAM_MAP(adsp_program_map)
+	MCFG_CPU_DATA_MAP(adsp_data_map)
 MACHINE_CONFIG_END
 
 
@@ -1214,11 +1214,11 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_FRAGMENT( ds3 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("adsp", ADSP2101, 12000000)
-	MDRV_CPU_PROGRAM_MAP(ds3_program_map)
-	MDRV_CPU_DATA_MAP(ds3_data_map)
+	MCFG_CPU_ADD("adsp", ADSP2101, 12000000)
+	MCFG_CPU_PROGRAM_MAP(ds3_program_map)
+	MCFG_CPU_DATA_MAP(ds3_data_map)
 
-	MDRV_QUANTUM_TIME(HZ(60000))
+	MCFG_QUANTUM_TIME(HZ(60000))
 MACHINE_CONFIG_END
 
 
@@ -1226,23 +1226,23 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_FRAGMENT( ds4 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("adsp", ADSP2101, 12000000)
-	MDRV_CPU_PROGRAM_MAP(ds3_program_map)
-	MDRV_CPU_DATA_MAP(ds3_data_map)
+	MCFG_CPU_ADD("adsp", ADSP2101, 12000000)
+	MCFG_CPU_PROGRAM_MAP(ds3_program_map)
+	MCFG_CPU_DATA_MAP(ds3_data_map)
 
-//  MDRV_CPU_ADD("ds4cpu1", ADSP2105, 10000000)
-//  MDRV_CPU_PROGRAM_MAP(ds3snd_program_map)
+//  MCFG_CPU_ADD("ds4cpu1", ADSP2105, 10000000)
+//  MCFG_CPU_PROGRAM_MAP(ds3snd_program_map)
 
-//  MDRV_CPU_ADD("ds4cpu2", ADSP2105, 10000000)
-//  MDRV_CPU_PROGRAM_MAP(ds3snd_program_map)
+//  MCFG_CPU_ADD("ds4cpu2", ADSP2105, 10000000)
+//  MCFG_CPU_PROGRAM_MAP(ds3snd_program_map)
 
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("dac1", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ADD("dac1", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 
-	MDRV_SOUND_ADD("dac2", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("dac2", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -1257,12 +1257,12 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_FRAGMENT( dsk )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("dsp32", DSP32C, 40000000)
-	MDRV_CPU_CONFIG(dsp32c_config)
-	MDRV_CPU_PROGRAM_MAP(dsk_dsp32_map)
+	MCFG_CPU_ADD("dsp32", DSP32C, 40000000)
+	MCFG_CPU_CONFIG(dsp32c_config)
+	MCFG_CPU_PROGRAM_MAP(dsk_dsp32_map)
 
 	/* ASIC65 */
-	MDRV_FRAGMENT_ADD( asic65 )
+	MCFG_FRAGMENT_ADD( asic65 )
 MACHINE_CONFIG_END
 
 
@@ -1270,12 +1270,12 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_FRAGMENT( dsk2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("dsp32", DSP32C, 40000000)
-	MDRV_CPU_CONFIG(dsp32c_config)
-	MDRV_CPU_PROGRAM_MAP(dsk2_dsp32_map)
+	MCFG_CPU_ADD("dsp32", DSP32C, 40000000)
+	MCFG_CPU_CONFIG(dsp32c_config)
+	MCFG_CPU_PROGRAM_MAP(dsk2_dsp32_map)
 
 	/* ASIC65 */
-	MDRV_FRAGMENT_ADD( asic65 )
+	MCFG_FRAGMENT_ADD( asic65 )
 MACHINE_CONFIG_END
 
 
@@ -1289,19 +1289,19 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_FRAGMENT( driversnd )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("soundcpu", M68000, 16000000/2)
-	MDRV_CPU_PROGRAM_MAP(driversnd_68k_map)
+	MCFG_CPU_ADD("soundcpu", M68000, 16000000/2)
+	MCFG_CPU_PROGRAM_MAP(driversnd_68k_map)
 
-	MDRV_CPU_ADD("sounddsp", TMS32010, 20000000)
-	MDRV_CPU_PROGRAM_MAP(driversnd_dsp_program_map)
+	MCFG_CPU_ADD("sounddsp", TMS32010, 20000000)
+	MCFG_CPU_PROGRAM_MAP(driversnd_dsp_program_map)
 	/* Data Map is internal to the CPU */
-	MDRV_CPU_IO_MAP(driversnd_dsp_io_map)
+	MCFG_CPU_IO_MAP(driversnd_dsp_io_map)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -1315,73 +1315,73 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( harddriv, driver_msp )
 
 	/* basic machine hardware */		/* original driver board with MSP */
-	MDRV_FRAGMENT_ADD( adsp )			/* ADSP board */
-	MDRV_FRAGMENT_ADD( driversnd )		/* driver sound board */
+	MCFG_FRAGMENT_ADD( adsp )			/* ADSP board */
+	MCFG_FRAGMENT_ADD( driversnd )		/* driver sound board */
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( harddrivc, multisync_msp )
 
 	/* basic machine hardware */	/* multisync board with MSP */
-	MDRV_FRAGMENT_ADD( adsp )			/* ADSP board */
-	MDRV_FRAGMENT_ADD( driversnd )		/* driver sound board */
+	MCFG_FRAGMENT_ADD( adsp )			/* ADSP board */
+	MCFG_FRAGMENT_ADD( driversnd )		/* driver sound board */
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( racedriv, driver_nomsp )
 
 	/* basic machine hardware */	/* original driver board without MSP */
-	MDRV_FRAGMENT_ADD( adsp )			/* ADSP board */
-	MDRV_FRAGMENT_ADD( dsk )				/* DSK board */
-	MDRV_FRAGMENT_ADD( driversnd )		/* driver sound board */
+	MCFG_FRAGMENT_ADD( adsp )			/* ADSP board */
+	MCFG_FRAGMENT_ADD( dsk )				/* DSK board */
+	MCFG_FRAGMENT_ADD( driversnd )		/* driver sound board */
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( racedrivc, multisync_nomsp )
 
 	/* basic machine hardware */	/* multisync board without MSP */
-	MDRV_FRAGMENT_ADD( adsp )			/* ADSP board */
-	MDRV_FRAGMENT_ADD( dsk )				/* DSK board */
-	MDRV_FRAGMENT_ADD( driversnd )		/* driver sound board */
+	MCFG_FRAGMENT_ADD( adsp )			/* ADSP board */
+	MCFG_FRAGMENT_ADD( dsk )				/* DSK board */
+	MCFG_FRAGMENT_ADD( driversnd )		/* driver sound board */
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( stunrun, multisync_nomsp )
 
 	/* basic machine hardware */	/* multisync board without MSP */
-	MDRV_CPU_MODIFY("gsp")
-	MDRV_CPU_CONFIG(gsp_config_multisync_stunrun)
-	MDRV_FRAGMENT_ADD( adsp )			/* ADSP board */
-	MDRV_FRAGMENT_ADD( jsa_ii_mono )		/* JSA II sound board */
+	MCFG_CPU_MODIFY("gsp")
+	MCFG_CPU_CONFIG(gsp_config_multisync_stunrun)
+	MCFG_FRAGMENT_ADD( adsp )			/* ADSP board */
+	MCFG_FRAGMENT_ADD( jsa_ii_mono )		/* JSA II sound board */
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_RAW_PARAMS(5000000*2, 317*2, 0, 256*2, 262, 0, 228)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_RAW_PARAMS(5000000*2, 317*2, 0, 256*2, 262, 0, 228)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( strtdriv, multisync_nomsp )
 
 	/* basic machine hardware */	/* multisync board */
-	MDRV_FRAGMENT_ADD( ds3 )				/* DS III board */
-	MDRV_FRAGMENT_ADD( dsk )				/* DSK board */
+	MCFG_FRAGMENT_ADD( ds3 )				/* DS III board */
+	MCFG_FRAGMENT_ADD( dsk )				/* DSK board */
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( steeltal, multisync_msp )
 
 	/* basic machine hardware */	/* multisync board with MSP */
-	MDRV_FRAGMENT_ADD( ds3 )				/* DS III board */
-	MDRV_FRAGMENT_ADD( jsa_iii_mono )	/* JSA III sound board */
-	MDRV_FRAGMENT_ADD( asic65 )			/* ASIC65 on DSPCOM board */
+	MCFG_FRAGMENT_ADD( ds3 )				/* DS III board */
+	MCFG_FRAGMENT_ADD( jsa_iii_mono )	/* JSA III sound board */
+	MCFG_FRAGMENT_ADD( asic65 )			/* ASIC65 on DSPCOM board */
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( hdrivair, multisync2 )
 
 	/* basic machine hardware */		/* multisync II board */
-	MDRV_FRAGMENT_ADD( ds4 )				/* DS IV board */
-	MDRV_FRAGMENT_ADD( dsk2 )			/* DSK II board */
+	MCFG_FRAGMENT_ADD( ds4 )				/* DS IV board */
+	MCFG_FRAGMENT_ADD( dsk2 )			/* DSK II board */
 MACHINE_CONFIG_END
 
 

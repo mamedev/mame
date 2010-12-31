@@ -679,103 +679,103 @@ static const msm5205_interface msm5205_config =
 static MACHINE_CONFIG_START( gsword, gsword_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, XTAL_18MHz/6) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(cpu1_map)
-	MDRV_CPU_IO_MAP(cpu1_io_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_18MHz/6) /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(cpu1_map)
+	MCFG_CPU_IO_MAP(cpu1_io_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("sub", Z80, XTAL_18MHz/6) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(cpu2_map)
-	MDRV_CPU_IO_MAP(cpu2_io_map)
-	MDRV_CPU_VBLANK_INT_HACK(gsword_snd_interrupt,4)
+	MCFG_CPU_ADD("sub", Z80, XTAL_18MHz/6) /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(cpu2_map)
+	MCFG_CPU_IO_MAP(cpu2_io_map)
+	MCFG_CPU_VBLANK_INT_HACK(gsword_snd_interrupt,4)
 
-	MDRV_CPU_ADD("audiocpu", Z80, XTAL_18MHz/6) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(cpu3_map)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_18MHz/6) /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(cpu3_map)
 
-	MDRV_QUANTUM_TIME(HZ(12000)) /* Allow time for 2nd cpu to interleave*/
+	MCFG_QUANTUM_TIME(HZ(12000)) /* Allow time for 2nd cpu to interleave*/
 
-	MDRV_MACHINE_RESET(gsword)
+	MCFG_MACHINE_RESET(gsword)
 
 #if 1
 	/* to MCU timeout champbbj */
-	MDRV_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(HZ(6000))
 #endif
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(gsword)
-	MDRV_PALETTE_LENGTH(64*4+64*4)
+	MCFG_GFXDECODE(gsword)
+	MCFG_PALETTE_LENGTH(64*4+64*4)
 
-	MDRV_PALETTE_INIT(gsword)
-	MDRV_VIDEO_START(gsword)
-	MDRV_VIDEO_UPDATE(gsword)
+	MCFG_PALETTE_INIT(gsword)
+	MCFG_VIDEO_START(gsword)
+	MCFG_VIDEO_UPDATE(gsword)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay1", AY8910, XTAL_18MHz/12) /* verified on pcb */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL_18MHz/12) /* verified on pcb */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MDRV_SOUND_ADD("ay2", AY8910, 1500000)
-	MDRV_SOUND_CONFIG(ay8910_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ADD("ay2", AY8910, 1500000)
+	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MDRV_SOUND_ADD("msm", MSM5205, XTAL_400kHz) /* verified on pcb */
-	MDRV_SOUND_CONFIG(msm5205_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
+	MCFG_SOUND_ADD("msm", MSM5205, XTAL_400kHz) /* verified on pcb */
+	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( josvolly, gsword_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 18000000/6) /* ? */
-	MDRV_CPU_PROGRAM_MAP(cpu1_map)
-	MDRV_CPU_IO_MAP(josvolly_cpu1_io_map)
-	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
+	MCFG_CPU_ADD("maincpu", Z80, 18000000/6) /* ? */
+	MCFG_CPU_PROGRAM_MAP(cpu1_map)
+	MCFG_CPU_IO_MAP(josvolly_cpu1_io_map)
+	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 
-	MDRV_CPU_ADD("audiocpu", Z80, 12000000/4) /* ? */
-	MDRV_CPU_PROGRAM_MAP(josvolly_cpu2_map)
-	MDRV_CPU_IO_MAP(josvolly_cpu2_io_map)
-//  MDRV_CPU_VBLANK_INT("screen", gsword_snd_interrupt)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("audiocpu", Z80, 12000000/4) /* ? */
+	MCFG_CPU_PROGRAM_MAP(josvolly_cpu2_map)
+	MCFG_CPU_IO_MAP(josvolly_cpu2_io_map)
+//  MCFG_CPU_VBLANK_INT("screen", gsword_snd_interrupt)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_MACHINE_RESET(josvolly)
+	MCFG_MACHINE_RESET(josvolly)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(gsword)
-	MDRV_PALETTE_LENGTH(64*4+64*4)
+	MCFG_GFXDECODE(gsword)
+	MCFG_PALETTE_LENGTH(64*4+64*4)
 
-	MDRV_PALETTE_INIT(josvolly)
-	MDRV_VIDEO_START(gsword)
-	MDRV_VIDEO_UPDATE(gsword)
+	MCFG_PALETTE_INIT(josvolly)
+	MCFG_VIDEO_START(gsword)
+	MCFG_VIDEO_UPDATE(gsword)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay1", AY8910, 1500000)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ADD("ay1", AY8910, 1500000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MDRV_SOUND_ADD("ay2", AY8910, 1500000)
-	MDRV_SOUND_CONFIG(ay8910_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ADD("ay2", AY8910, 1500000)
+	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
 #if 0
-	MDRV_SOUND_ADD("msm", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
+	MCFG_SOUND_ADD("msm", MSM5205, 384000)
+	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 #endif
 MACHINE_CONFIG_END
 

@@ -366,39 +366,39 @@ static MACHINE_RESET( jackal )
 static MACHINE_CONFIG_START( jackal, jackal_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("master", M6809, MASTER_CLOCK/12) // verified on pcb
-	MDRV_CPU_PROGRAM_MAP(master_map)
-	MDRV_CPU_VBLANK_INT("screen", jackal_interrupt)
+	MCFG_CPU_ADD("master", M6809, MASTER_CLOCK/12) // verified on pcb
+	MCFG_CPU_PROGRAM_MAP(master_map)
+	MCFG_CPU_VBLANK_INT("screen", jackal_interrupt)
 
-	MDRV_CPU_ADD("slave", M6809, MASTER_CLOCK/12) // verified on pcb
-	MDRV_CPU_PROGRAM_MAP(slave_map)
+	MCFG_CPU_ADD("slave", M6809, MASTER_CLOCK/12) // verified on pcb
+	MCFG_CPU_PROGRAM_MAP(slave_map)
 
-	MDRV_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(HZ(6000))
 
-	MDRV_MACHINE_START(jackal)
-	MDRV_MACHINE_RESET(jackal)
+	MCFG_MACHINE_START(jackal)
+	MCFG_MACHINE_RESET(jackal)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(jackal)
-	MDRV_PALETTE_LENGTH(0x300)
+	MCFG_GFXDECODE(jackal)
+	MCFG_PALETTE_LENGTH(0x300)
 
-	MDRV_PALETTE_INIT(jackal)
-	MDRV_VIDEO_START(jackal)
-	MDRV_VIDEO_UPDATE(jackal)
+	MCFG_PALETTE_INIT(jackal)
+	MCFG_VIDEO_START(jackal)
+	MCFG_VIDEO_UPDATE(jackal)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymsnd", YM2151, SOUND_CLOCK) // verified on pcb
-	MDRV_SOUND_ROUTE(0, "lspeaker", 0.50)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 0.50)
+	MCFG_SOUND_ADD("ymsnd", YM2151, SOUND_CLOCK) // verified on pcb
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 MACHINE_CONFIG_END
 
 /*************************************

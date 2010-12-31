@@ -675,78 +675,78 @@ static MACHINE_RESET( kickgoal )
 static MACHINE_CONFIG_START( kickgoal, kickgoal_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
-	MDRV_CPU_PROGRAM_MAP(kickgoal_program_map)
-	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
-	MDRV_CPU_PERIODIC_INT(kickgoal_interrupt, 240)
+	MCFG_CPU_ADD("maincpu", M68000, 12000000)	/* 12 MHz */
+	MCFG_CPU_PROGRAM_MAP(kickgoal_program_map)
+	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)
+	MCFG_CPU_PERIODIC_INT(kickgoal_interrupt, 240)
 
-	MDRV_CPU_ADD("audiocpu", PIC16C57, 12000000/4)	/* 3MHz ? */
-	MDRV_DEVICE_DISABLE()	/* Disables since the internal rom isn't dumped */
+	MCFG_CPU_ADD("audiocpu", PIC16C57, 12000000/4)	/* 3MHz ? */
+	MCFG_DEVICE_DISABLE()	/* Disables since the internal rom isn't dumped */
 	/* Program and Data Maps are internal to the MCU */
-	MDRV_CPU_IO_MAP(kickgoal_sound_io_map)
+	MCFG_CPU_IO_MAP(kickgoal_sound_io_map)
 
-	MDRV_MACHINE_START(kickgoal)
-	MDRV_MACHINE_RESET(kickgoal)
+	MCFG_MACHINE_START(kickgoal)
+	MCFG_MACHINE_RESET(kickgoal)
 
-	MDRV_EEPROM_93C46_ADD("eeprom")
-	MDRV_EEPROM_DATA(kickgoal_default_eeprom_type1, 128)
+	MCFG_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_DATA(kickgoal_default_eeprom_type1, 128)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 64*8)
-	MDRV_SCREEN_VISIBLE_AREA(9*8, 55*8-1, 4*8, 60*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 64*8)
+	MCFG_SCREEN_VISIBLE_AREA(9*8, 55*8-1, 4*8, 60*8-1)
 
-	MDRV_GFXDECODE(kickgoal)
-	MDRV_PALETTE_LENGTH(1024)
+	MCFG_GFXDECODE(kickgoal)
+	MCFG_PALETTE_LENGTH(1024)
 
-	MDRV_VIDEO_START(kickgoal)
-	MDRV_VIDEO_UPDATE(kickgoal)
+	MCFG_VIDEO_START(kickgoal)
+	MCFG_VIDEO_UPDATE(kickgoal)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_OKIM6295_ADD("oki", 12000000/8, OKIM6295_PIN7_LOW)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_OKIM6295_ADD("oki", 12000000/8, OKIM6295_PIN7_LOW)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( actionhw, kickgoal_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, XTAL_12MHz)	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(kickgoal_program_map)
-	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz)	/* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(kickgoal_program_map)
+	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)
 
-	MDRV_CPU_ADD("audiocpu", PIC16C57, XTAL_12MHz/3)	/* verified on pcb */
-	MDRV_DEVICE_DISABLE() /* Disables since the internal rom isn't dumped */
+	MCFG_CPU_ADD("audiocpu", PIC16C57, XTAL_12MHz/3)	/* verified on pcb */
+	MCFG_DEVICE_DISABLE() /* Disables since the internal rom isn't dumped */
 	/* Program and Data Maps are internal to the MCU */
-	MDRV_CPU_IO_MAP(actionhw_io_map)
+	MCFG_CPU_IO_MAP(actionhw_io_map)
 
-	MDRV_MACHINE_START(kickgoal)
-	MDRV_MACHINE_RESET(kickgoal)
+	MCFG_MACHINE_START(kickgoal)
+	MCFG_MACHINE_RESET(kickgoal)
 
-	MDRV_EEPROM_93C46_ADD("eeprom")
-	MDRV_EEPROM_DATA(kickgoal_default_eeprom_type1, 128)
+	MCFG_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_DATA(kickgoal_default_eeprom_type1, 128)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 64*8)
-	MDRV_SCREEN_VISIBLE_AREA(10*8+2, 54*8-1+2, 0*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 64*8)
+	MCFG_SCREEN_VISIBLE_AREA(10*8+2, 54*8-1+2, 0*8, 30*8-1)
 
-	MDRV_GFXDECODE(actionhw)
-	MDRV_PALETTE_LENGTH(1024)
+	MCFG_GFXDECODE(actionhw)
+	MCFG_PALETTE_LENGTH(1024)
 
-	MDRV_VIDEO_START(actionhw)
-	MDRV_VIDEO_UPDATE(actionhw)
+	MCFG_VIDEO_START(actionhw)
+	MCFG_VIDEO_UPDATE(actionhw)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_OKIM6295_ADD("oki", XTAL_12MHz/12, OKIM6295_PIN7_HIGH) /* verified on pcb */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_OKIM6295_ADD("oki", XTAL_12MHz/12, OKIM6295_PIN7_HIGH) /* verified on pcb */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
 

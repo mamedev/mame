@@ -19,13 +19,13 @@
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_PPI8255_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, PPI8255, 0) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_PPI8255_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, PPI8255, 0) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
-#define MDRV_PPI8255_RECONFIG(_tag, _intrf) \
-	MDRV_DEVICE_MODIFY(_tag) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_PPI8255_RECONFIG(_tag, _intrf) \
+	MCFG_DEVICE_MODIFY(_tag) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
 
 /***************************************************************************

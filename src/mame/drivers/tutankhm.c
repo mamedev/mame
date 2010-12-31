@@ -222,25 +222,25 @@ static MACHINE_RESET( tutankhm )
 static MACHINE_CONFIG_START( tutankhm, tutankhm_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6809, XTAL_18_432MHz/12)	/* 1.5 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(main_map)
-	MDRV_CPU_VBLANK_INT("screen", tutankhm_interrupt)
+	MCFG_CPU_ADD("maincpu", M6809, XTAL_18_432MHz/12)	/* 1.5 MHz ??? */
+	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_CPU_VBLANK_INT("screen", tutankhm_interrupt)
 
-	MDRV_MACHINE_START(tutankhm)
-	MDRV_MACHINE_RESET(tutankhm)
+	MCFG_MACHINE_START(tutankhm)
+	MCFG_MACHINE_RESET(tutankhm)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)	/* not sure about the visible area */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)	/* not sure about the visible area */
 
-	MDRV_VIDEO_UPDATE(tutankhm)
+	MCFG_VIDEO_UPDATE(tutankhm)
 
 	/* sound hardware */
-	MDRV_FRAGMENT_ADD(timeplt_sound)
+	MCFG_FRAGMENT_ADD(timeplt_sound)
 MACHINE_CONFIG_END
 
 

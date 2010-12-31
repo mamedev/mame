@@ -3788,83 +3788,83 @@ static const ymz280b_interface ymz280b_config =
 static MACHINE_CONFIG_START( tekipaki, toaplan2_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, XTAL_10MHz)			/* 10MHz Oscillator */
-	MDRV_CPU_PROGRAM_MAP(tekipaki_68k_mem)
-	MDRV_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)			/* 10MHz Oscillator */
+	MCFG_CPU_PROGRAM_MAP(tekipaki_68k_mem)
+	MCFG_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
 
 #ifdef USE_HD64x180
-	MDRV_CPU_ADD("mcu", Z180, XTAL_10MHz)			/* HD647180 CPU actually */
-	MDRV_CPU_PROGRAM_MAP(hd647180_mem)
+	MCFG_CPU_ADD("mcu", Z180, XTAL_10MHz)			/* HD647180 CPU actually */
+	MCFG_CPU_PROGRAM_MAP(hd647180_mem)
 #endif
 
-	MDRV_MACHINE_RESET(toaplan2)
+	MCFG_MACHINE_RESET(toaplan2)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(432, 262)
-	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(432, 262)
+	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
-	MDRV_GFXDECODE(toaplan2)
-	MDRV_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
-
-
-	MDRV_DEVICE_ADD_VDP0
+	MCFG_GFXDECODE(toaplan2)
+	MCFG_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
 
 
-	MDRV_VIDEO_START(toaplan2)
-	MDRV_VIDEO_EOF(toaplan2)
-	MDRV_VIDEO_UPDATE(toaplan2)
+	MCFG_DEVICE_ADD_VDP0
+
+
+	MCFG_VIDEO_START(toaplan2)
+	MCFG_VIDEO_EOF(toaplan2)
+	MCFG_VIDEO_UPDATE(toaplan2)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM3812, XTAL_27MHz/8)
-	MDRV_SOUND_CONFIG(ym3812_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_27MHz/8)
+	MCFG_SOUND_CONFIG(ym3812_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( ghox, toaplan2_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, XTAL_10MHz)			/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(ghox_68k_mem)
-	MDRV_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)			/* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(ghox_68k_mem)
+	MCFG_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
 
 #ifdef USE_HD64x180
-	MDRV_CPU_ADD("mcu", Z180, XTAL_10MHz)			/* HD647180 CPU actually */
-	MDRV_CPU_PROGRAM_MAP(hd647180_mem)
+	MCFG_CPU_ADD("mcu", Z180, XTAL_10MHz)			/* HD647180 CPU actually */
+	MCFG_CPU_PROGRAM_MAP(hd647180_mem)
 #endif
 
-	MDRV_MACHINE_RESET(ghox)
+	MCFG_MACHINE_RESET(ghox)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(432, 262)
-	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(432, 262)
+	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
-	MDRV_GFXDECODE(toaplan2)
-	MDRV_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
+	MCFG_GFXDECODE(toaplan2)
+	MCFG_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
 
-	MDRV_DEVICE_ADD_VDP0
+	MCFG_DEVICE_ADD_VDP0
 
-	MDRV_VIDEO_START(toaplan2)
-	MDRV_VIDEO_EOF(toaplan2)
-	MDRV_VIDEO_UPDATE(toaplan2)
+	MCFG_VIDEO_START(toaplan2)
+	MCFG_VIDEO_EOF(toaplan2)
+	MCFG_VIDEO_UPDATE(toaplan2)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2151, XTAL_27MHz/8) /* verified on pcb */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM2151, XTAL_27MHz/8) /* verified on pcb */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 /* x = modified to match batsugun 'unencrypted' code */
@@ -3896,53 +3896,53 @@ static const nec_config ts002mach_config ={ ts002mach_decryption_table, };
 static MACHINE_CONFIG_START( dogyuun, toaplan2_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, XTAL_25MHz/2)			/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(dogyuun_68k_mem)
-	MDRV_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_25MHz/2)			/* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(dogyuun_68k_mem)
+	MCFG_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
 
-	MDRV_CPU_ADD("audiocpu", V25, XTAL_25MHz/2)			/* NEC V25+ type Toaplan marked CPU ??? */
-	MDRV_CPU_PROGRAM_MAP(V25_rambased_mem)
-	MDRV_CPU_CONFIG(ts002mach_config)
+	MCFG_CPU_ADD("audiocpu", V25, XTAL_25MHz/2)			/* NEC V25+ type Toaplan marked CPU ??? */
+	MCFG_CPU_PROGRAM_MAP(V25_rambased_mem)
+	MCFG_CPU_CONFIG(ts002mach_config)
 
-	MDRV_MACHINE_RESET(dogyuun)
+	MCFG_MACHINE_RESET(dogyuun)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE( (XTAL_27MHz / 4) / (432 * 263) )	/* 27MHz Oscillator */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(432, 262)
-	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE( (XTAL_27MHz / 4) / (432 * 263) )	/* 27MHz Oscillator */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(432, 262)
+	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
 #ifdef DUAL_SCREEN_VDPS
-	MDRV_SCREEN_ADD("screen2", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(432, 262)
-	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
+	MCFG_SCREEN_ADD("screen2", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(432, 262)
+	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
-	MDRV_DEFAULT_LAYOUT(layout_dualhsxs)
+	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 #endif
 
-	MDRV_GFXDECODE(2)
-	MDRV_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
+	MCFG_GFXDECODE(2)
+	MCFG_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
 
-	MDRV_DEVICE_ADD_VDP0
-	MDRV_DEVICE_ADD_VDP1
+	MCFG_DEVICE_ADD_VDP0
+	MCFG_DEVICE_ADD_VDP1
 
-	MDRV_VIDEO_START(toaplan2)
-	MDRV_VIDEO_EOF(toaplan2)
-	MDRV_VIDEO_UPDATE(dogyuun)
+	MCFG_VIDEO_START(toaplan2)
+	MCFG_VIDEO_EOF(toaplan2)
+	MCFG_VIDEO_UPDATE(dogyuun)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2151, XTAL_27MHz/8) /* verified on pcb */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM2151, XTAL_27MHz/8) /* verified on pcb */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_OKIM6295_ADD("oki", XTAL_25MHz/24, OKIM6295_PIN7_HIGH) /* verified on pcb */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_OKIM6295_ADD("oki", XTAL_25MHz/24, OKIM6295_PIN7_HIGH) /* verified on pcb */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 /* x = modified to match batsugun 'unencrypted' code - '?' likewise, but not so sure about them
@@ -3997,244 +3997,244 @@ static MACHINE_RESET(kbash)
 static MACHINE_CONFIG_START( kbash, toaplan2_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz)			/* 16MHz Oscillator */
-	MDRV_CPU_PROGRAM_MAP(kbash_68k_mem)
-	MDRV_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)			/* 16MHz Oscillator */
+	MCFG_CPU_PROGRAM_MAP(kbash_68k_mem)
+	MCFG_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
 
 	/* ROM based v25 */
-	MDRV_CPU_ADD("mcu", V25, XTAL_16MHz)			/* NEC V25+ type Toaplan marked CPU ??? */
-	MDRV_CPU_PROGRAM_MAP(V25_kbash_mem)
-	MDRV_CPU_IO_MAP(V25_kbash_port)
-	MDRV_CPU_CONFIG(ts004dash_config)
+	MCFG_CPU_ADD("mcu", V25, XTAL_16MHz)			/* NEC V25+ type Toaplan marked CPU ??? */
+	MCFG_CPU_PROGRAM_MAP(V25_kbash_mem)
+	MCFG_CPU_IO_MAP(V25_kbash_port)
+	MCFG_CPU_CONFIG(ts004dash_config)
 
 
-	MDRV_MACHINE_RESET(kbash)
+	MCFG_MACHINE_RESET(kbash)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(432, 262)
-	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(432, 262)
+	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
-	MDRV_GFXDECODE(toaplan2)
-	MDRV_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
+	MCFG_GFXDECODE(toaplan2)
+	MCFG_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
 
-	MDRV_DEVICE_ADD_VDP0
+	MCFG_DEVICE_ADD_VDP0
 
-	MDRV_VIDEO_START(toaplan2)
-	MDRV_VIDEO_EOF(toaplan2)
-	MDRV_VIDEO_UPDATE(toaplan2)
+	MCFG_VIDEO_START(toaplan2)
+	MCFG_VIDEO_EOF(toaplan2)
+	MCFG_VIDEO_UPDATE(toaplan2)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2151, XTAL_27MHz/8)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM2151, XTAL_27MHz/8)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_OKIM6295_ADD("oki", XTAL_32MHz/32, OKIM6295_PIN7_HIGH)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_OKIM6295_ADD("oki", XTAL_32MHz/32, OKIM6295_PIN7_HIGH)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( kbash2, toaplan2_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz)			/* 16MHz Oscillator */
-	MDRV_CPU_PROGRAM_MAP(kbash2_68k_mem)
-	MDRV_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)			/* 16MHz Oscillator */
+	MCFG_CPU_PROGRAM_MAP(kbash2_68k_mem)
+	MCFG_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
 
-	MDRV_MACHINE_RESET(toaplan2)
+	MCFG_MACHINE_RESET(toaplan2)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(432, 262)
-	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(432, 262)
+	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
-	MDRV_GFXDECODE(toaplan2)
-	MDRV_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
+	MCFG_GFXDECODE(toaplan2)
+	MCFG_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
 
-	MDRV_DEVICE_ADD_VDP0
+	MCFG_DEVICE_ADD_VDP0
 
-	MDRV_VIDEO_START(toaplan2)
-	MDRV_VIDEO_EOF(toaplan2)
-	MDRV_VIDEO_UPDATE(toaplan2)
+	MCFG_VIDEO_START(toaplan2)
+	MCFG_VIDEO_EOF(toaplan2)
+	MCFG_VIDEO_UPDATE(toaplan2)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_OKIM6295_ADD("oki1", XTAL_16MHz/16, OKIM6295_PIN7_HIGH)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_OKIM6295_ADD("oki1", XTAL_16MHz/16, OKIM6295_PIN7_HIGH)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_OKIM6295_ADD("oki2", XTAL_16MHz/16, OKIM6295_PIN7_HIGH)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_OKIM6295_ADD("oki2", XTAL_16MHz/16, OKIM6295_PIN7_HIGH)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( truxton2, toaplan2_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz)			/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(truxton2_68k_mem)
-	MDRV_CPU_VBLANK_INT("screen", toaplan2_vblank_irq2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)			/* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(truxton2_68k_mem)
+	MCFG_CPU_VBLANK_INT("screen", toaplan2_vblank_irq2)
 
-	MDRV_MACHINE_RESET(toaplan2)
+	MCFG_MACHINE_RESET(toaplan2)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE( (XTAL_27MHz / 4) / (432 * 263) )	/* 27MHz Oscillator */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(432, 262)
-	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE( (XTAL_27MHz / 4) / (432 * 263) )	/* 27MHz Oscillator */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(432, 262)
+	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
-	MDRV_GFXDECODE(truxton2)
-	MDRV_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
+	MCFG_GFXDECODE(truxton2)
+	MCFG_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
 
-	MDRV_DEVICE_ADD_VDP0
+	MCFG_DEVICE_ADD_VDP0
 
-	MDRV_VIDEO_START(truxton2)
-	MDRV_VIDEO_EOF(toaplan2)
-	MDRV_VIDEO_UPDATE(truxton2)
+	MCFG_VIDEO_START(truxton2)
+	MCFG_VIDEO_EOF(toaplan2)
+	MCFG_VIDEO_UPDATE(truxton2)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2151, XTAL_27MHz/8) /* verified on pcb */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM2151, XTAL_27MHz/8) /* verified on pcb */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_OKIM6295_ADD("oki", XTAL_16MHz/4, OKIM6295_PIN7_LOW) /* verified on pcb */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/4, OKIM6295_PIN7_LOW) /* verified on pcb */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( pipibibs, toaplan2_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, XTAL_10MHz)			/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(pipibibs_68k_mem)
-	MDRV_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)			/* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(pipibibs_68k_mem)
+	MCFG_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
 
-	MDRV_CPU_ADD("audiocpu", Z80, XTAL_27MHz/8)			/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(pipibibs_sound_z80_mem)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_27MHz/8)			/* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(pipibibs_sound_z80_mem)
 
-	MDRV_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(HZ(600))
 
-	MDRV_MACHINE_RESET(toaplan2)
+	MCFG_MACHINE_RESET(toaplan2)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(432, 262)
-	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(432, 262)
+	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
-	MDRV_GFXDECODE(toaplan2)
-	MDRV_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
+	MCFG_GFXDECODE(toaplan2)
+	MCFG_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
 
-	MDRV_DEVICE_ADD_VDP0
+	MCFG_DEVICE_ADD_VDP0
 
-	MDRV_VIDEO_START(toaplan2)
-	MDRV_VIDEO_EOF(toaplan2)
-	MDRV_VIDEO_UPDATE(toaplan2)
+	MCFG_VIDEO_START(toaplan2)
+	MCFG_VIDEO_EOF(toaplan2)
+	MCFG_VIDEO_UPDATE(toaplan2)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM3812, XTAL_27MHz/8)			/* verified on pcb */
-	MDRV_SOUND_CONFIG(ym3812_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_27MHz/8)			/* verified on pcb */
+	MCFG_SOUND_CONFIG(ym3812_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( whoopee, toaplan2_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, XTAL_10MHz)			/* 10MHz Oscillator */
-	MDRV_CPU_PROGRAM_MAP(tekipaki_68k_mem)
-	MDRV_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)			/* 10MHz Oscillator */
+	MCFG_CPU_PROGRAM_MAP(tekipaki_68k_mem)
+	MCFG_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
 
 #ifdef USE_HD64x180
-	MDRV_CPU_ADD("mcu", Z180, XTAL_10MHz)			/* HD647180 CPU actually */
-	MDRV_CPU_PROGRAM_MAP(hd647180_mem)
+	MCFG_CPU_ADD("mcu", Z180, XTAL_10MHz)			/* HD647180 CPU actually */
+	MCFG_CPU_PROGRAM_MAP(hd647180_mem)
 #endif
 
-	MDRV_MACHINE_RESET(toaplan2)
+	MCFG_MACHINE_RESET(toaplan2)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(432, 262)
-	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(432, 262)
+	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
-	MDRV_GFXDECODE(toaplan2)
-	MDRV_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
+	MCFG_GFXDECODE(toaplan2)
+	MCFG_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
 
-	MDRV_DEVICE_ADD_VDP0
+	MCFG_DEVICE_ADD_VDP0
 
-	MDRV_VIDEO_START(toaplan2)
-	MDRV_VIDEO_EOF(toaplan2)
-	MDRV_VIDEO_UPDATE(toaplan2)
+	MCFG_VIDEO_START(toaplan2)
+	MCFG_VIDEO_EOF(toaplan2)
+	MCFG_VIDEO_UPDATE(toaplan2)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM3812, XTAL_27MHz/8)
-	MDRV_SOUND_CONFIG(ym3812_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_27MHz/8)
+	MCFG_SOUND_CONFIG(ym3812_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( pipibibi_bootleg, toaplan2_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, XTAL_10MHz)			/* 10MHz Oscillator */
-	MDRV_CPU_PROGRAM_MAP(pipibibi_bootleg_68k_mem)
-	MDRV_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)			/* 10MHz Oscillator */
+	MCFG_CPU_PROGRAM_MAP(pipibibi_bootleg_68k_mem)
+	MCFG_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
 
-	MDRV_CPU_ADD("audiocpu", Z80, XTAL_27MHz/8)			/* ??? 3.37MHz */
-	MDRV_CPU_PROGRAM_MAP(pipibibs_sound_z80_mem)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_27MHz/8)			/* ??? 3.37MHz */
+	MCFG_CPU_PROGRAM_MAP(pipibibs_sound_z80_mem)
 
-	MDRV_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(HZ(600))
 
-	MDRV_MACHINE_RESET(toaplan2)
+	MCFG_MACHINE_RESET(toaplan2)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(432, 262)
-	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(432, 262)
+	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
-	MDRV_GFXDECODE(toaplan2)
-	MDRV_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
+	MCFG_GFXDECODE(toaplan2)
+	MCFG_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
 
-	MDRV_DEVICE_ADD_VDP0
+	MCFG_DEVICE_ADD_VDP0
 
-	MDRV_VIDEO_START(toaplan2)
-	MDRV_VIDEO_EOF(toaplan2)
-	MDRV_VIDEO_UPDATE(toaplan2)
+	MCFG_VIDEO_START(toaplan2)
+	MCFG_VIDEO_EOF(toaplan2)
+	MCFG_VIDEO_UPDATE(toaplan2)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM3812, XTAL_27MHz/8)
-	MDRV_SOUND_CONFIG(ym3812_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_27MHz/8)
+	MCFG_SOUND_CONFIG(ym3812_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 /* x = modified to match batsugun 'unencrypted' code - '?' likewise, but not so sure about them */
@@ -4267,81 +4267,81 @@ static const nec_config ts001turbo_config ={ ts001turbo_decryption_table, };
 static MACHINE_CONFIG_START( fixeight, toaplan2_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz)			/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(fixeight_68k_mem)
-	MDRV_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)			/* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(fixeight_68k_mem)
+	MCFG_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
 
-	MDRV_CPU_ADD("audiocpu", V25, XTAL_16MHz)			/* NEC V25+ type Toaplan marked CPU ??? */
-	MDRV_CPU_PROGRAM_MAP(V25_rambased_mem)
-	MDRV_CPU_CONFIG(ts001turbo_config)
-	//MDRV_CPU_IO_MAP(V25_port)
+	MCFG_CPU_ADD("audiocpu", V25, XTAL_16MHz)			/* NEC V25+ type Toaplan marked CPU ??? */
+	MCFG_CPU_PROGRAM_MAP(V25_rambased_mem)
+	MCFG_CPU_CONFIG(ts001turbo_config)
+	//MCFG_CPU_IO_MAP(V25_port)
 
-	MDRV_MACHINE_RESET(batsugun)
-//  MDRV_MACHINE_RESET(toaplan2)
+	MCFG_MACHINE_RESET(batsugun)
+//  MCFG_MACHINE_RESET(toaplan2)
 
-	//  MDRV_NVRAM_HANDLER(fixeight)        /* See 37B6 code */
+	//  MCFG_NVRAM_HANDLER(fixeight)        /* See 37B6 code */
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE( (XTAL_27MHz / 4) / (432 * 263) )	/* 27MHz Oscillator */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(432, 262)
-	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE( (XTAL_27MHz / 4) / (432 * 263) )	/* 27MHz Oscillator */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(432, 262)
+	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
-	MDRV_GFXDECODE(truxton2)
-	MDRV_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
+	MCFG_GFXDECODE(truxton2)
+	MCFG_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
 
-	MDRV_DEVICE_ADD_VDP0
+	MCFG_DEVICE_ADD_VDP0
 
-	MDRV_VIDEO_START(truxton2)
-	MDRV_VIDEO_EOF(toaplan2)
-	MDRV_VIDEO_UPDATE(truxton2)
+	MCFG_VIDEO_START(truxton2)
+	MCFG_VIDEO_EOF(toaplan2)
+	MCFG_VIDEO_UPDATE(truxton2)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2151, XTAL_27MHz/8) /* verified on pcb */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM2151, XTAL_27MHz/8) /* verified on pcb */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_OKIM6295_ADD("oki", XTAL_16MHz/16, OKIM6295_PIN7_HIGH) /* verified on pcb */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/16, OKIM6295_PIN7_HIGH) /* verified on pcb */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( fixeighb, toaplan2_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, XTAL_10MHz)			/* 10MHz Oscillator */
-	MDRV_CPU_PROGRAM_MAP(fixeighb_68k_mem)
-	MDRV_CPU_VBLANK_INT("screen", toaplan2_vblank_irq2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_10MHz)			/* 10MHz Oscillator */
+	MCFG_CPU_PROGRAM_MAP(fixeighb_68k_mem)
+	MCFG_CPU_VBLANK_INT("screen", toaplan2_vblank_irq2)
 
-	MDRV_MACHINE_RESET(toaplan2)
+	MCFG_MACHINE_RESET(toaplan2)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(432, 262)
-	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(432, 262)
+	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
-	MDRV_GFXDECODE(fixeighb)
-	MDRV_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
+	MCFG_GFXDECODE(fixeighb)
+	MCFG_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
 
-	MDRV_DEVICE_ADD_VDP0
+	MCFG_DEVICE_ADD_VDP0
 
-	MDRV_VIDEO_START(fixeighb)
-	MDRV_VIDEO_EOF(toaplan2)
-	MDRV_VIDEO_UPDATE(truxton2)
+	MCFG_VIDEO_START(fixeighb)
+	MCFG_VIDEO_EOF(toaplan2)
+	MCFG_VIDEO_UPDATE(truxton2)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_OKIM6295_ADD("oki", XTAL_14MHz/16, OKIM6295_PIN7_LOW)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_OKIM6295_ADD("oki", XTAL_14MHz/16, OKIM6295_PIN7_LOW)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 /* according to the comments this chip has the same markings as the Batsugun chip,
@@ -4379,39 +4379,39 @@ static const nec_config ts007spy_vfive_config ={ ts007spy_vfive_decryption_table
 static MACHINE_CONFIG_START( vfive, toaplan2_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, XTAL_20MHz/2)	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(vfive_68k_mem)
-	MDRV_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz/2)	/* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(vfive_68k_mem)
+	MCFG_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
 
-	MDRV_CPU_ADD("audiocpu", V25, XTAL_20MHz/2)	/* Verified on pcb, NEC V25+ type Toaplan mark scratched out */
-	MDRV_CPU_PROGRAM_MAP(V25_rambased_mem)
-	MDRV_CPU_CONFIG(ts007spy_vfive_config)
+	MCFG_CPU_ADD("audiocpu", V25, XTAL_20MHz/2)	/* Verified on pcb, NEC V25+ type Toaplan mark scratched out */
+	MCFG_CPU_PROGRAM_MAP(V25_rambased_mem)
+	MCFG_CPU_CONFIG(ts007spy_vfive_config)
 
-	MDRV_MACHINE_RESET(vfive)
+	MCFG_MACHINE_RESET(vfive)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE( (XTAL_27MHz / 4) / (432 * 263) )	/* verified on pcb */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(432, 262)
-	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE( (XTAL_27MHz / 4) / (432 * 263) )	/* verified on pcb */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(432, 262)
+	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
-	MDRV_DEVICE_ADD_VDP0
+	MCFG_DEVICE_ADD_VDP0
 
-	MDRV_GFXDECODE(toaplan2)
-	MDRV_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
+	MCFG_GFXDECODE(toaplan2)
+	MCFG_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
 
-	MDRV_VIDEO_START(toaplan2)
-	MDRV_VIDEO_EOF(toaplan2)
-	MDRV_VIDEO_UPDATE(toaplan2)
+	MCFG_VIDEO_START(toaplan2)
+	MCFG_VIDEO_EOF(toaplan2)
+	MCFG_VIDEO_UPDATE(toaplan2)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2151, XTAL_27MHz/8) /* verified on pcb */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM2151, XTAL_27MHz/8) /* verified on pcb */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_RESET(batsugun)
@@ -4471,323 +4471,323 @@ static const nmk112_interface batrider_nmk112_intf =
 static MACHINE_CONFIG_START( batsugun, toaplan2_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)			/* 16MHz , 32MHz Oscillator */
-	MDRV_CPU_PROGRAM_MAP(batsugun_68k_mem)
-	MDRV_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)			/* 16MHz , 32MHz Oscillator */
+	MCFG_CPU_PROGRAM_MAP(batsugun_68k_mem)
+	MCFG_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
 
-	MDRV_CPU_ADD("audiocpu", V25, XTAL_32MHz/2)			/* NEC V25+ type Toaplan marked CPU ??? */
-	MDRV_CPU_PROGRAM_MAP(V25_rambased_mem)
-	MDRV_CPU_CONFIG(ts007spy_config)
+	MCFG_CPU_ADD("audiocpu", V25, XTAL_32MHz/2)			/* NEC V25+ type Toaplan marked CPU ??? */
+	MCFG_CPU_PROGRAM_MAP(V25_rambased_mem)
+	MCFG_CPU_CONFIG(ts007spy_config)
 
-	//MDRV_CPU_IO_MAP(V25_port)
+	//MCFG_CPU_IO_MAP(V25_port)
 
-	MDRV_MACHINE_RESET(batsugun)
+	MCFG_MACHINE_RESET(batsugun)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(432, 262)
-	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(432, 262)
+	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
 #ifdef DUAL_SCREEN_VDPS
-	MDRV_SCREEN_ADD("screen2", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(432, 262)
-	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
+	MCFG_SCREEN_ADD("screen2", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(432, 262)
+	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
-	MDRV_DEFAULT_LAYOUT(layout_dualhsxs)
+	MCFG_DEFAULT_LAYOUT(layout_dualhsxs)
 #endif
 
-	MDRV_GFXDECODE(2)
-	MDRV_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
+	MCFG_GFXDECODE(2)
+	MCFG_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
 
-	MDRV_DEVICE_ADD_VDP0
-	MDRV_DEVICE_ADD_VDP1
+	MCFG_DEVICE_ADD_VDP0
+	MCFG_DEVICE_ADD_VDP1
 
-	MDRV_VIDEO_START(toaplan2)
-	MDRV_VIDEO_EOF(toaplan2)
-	MDRV_VIDEO_UPDATE(batsugun)
+	MCFG_VIDEO_START(toaplan2)
+	MCFG_VIDEO_EOF(toaplan2)
+	MCFG_VIDEO_UPDATE(batsugun)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2151, XTAL_27MHz/8)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MDRV_SOUND_CONFIG(batsugun_ym2151_interface)
+	MCFG_SOUND_ADD("ymsnd", YM2151, XTAL_27MHz/8)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_CONFIG(batsugun_ym2151_interface)
 
-	MDRV_OKIM6295_ADD("oki", XTAL_32MHz/8, OKIM6295_PIN7_LOW)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_OKIM6295_ADD("oki", XTAL_32MHz/8, OKIM6295_PIN7_LOW)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( snowbro2, toaplan2_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz)
-	MDRV_CPU_PROGRAM_MAP(snowbro2_68k_mem)
-	MDRV_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz)
+	MCFG_CPU_PROGRAM_MAP(snowbro2_68k_mem)
+	MCFG_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
 
-	MDRV_MACHINE_RESET(toaplan2)
+	MCFG_MACHINE_RESET(toaplan2)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(432, 262)
-	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(432, 262)
+	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
-	MDRV_GFXDECODE(toaplan2)
-	MDRV_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
+	MCFG_GFXDECODE(toaplan2)
+	MCFG_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
 
-	MDRV_DEVICE_ADD_VDP0
+	MCFG_DEVICE_ADD_VDP0
 
-	MDRV_VIDEO_START(toaplan2)
-	MDRV_VIDEO_EOF(toaplan2)
-	MDRV_VIDEO_UPDATE(toaplan2)
+	MCFG_VIDEO_START(toaplan2)
+	MCFG_VIDEO_EOF(toaplan2)
+	MCFG_VIDEO_UPDATE(toaplan2)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2151, XTAL_27MHz/8)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM2151, XTAL_27MHz/8)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_OKIM6295_ADD("oki", XTAL_27MHz/10, OKIM6295_PIN7_HIGH)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_OKIM6295_ADD("oki", XTAL_27MHz/10, OKIM6295_PIN7_HIGH)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( mahoudai, toaplan2_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)		/* 16MHz , 32MHz Oscillator */
-	MDRV_CPU_PROGRAM_MAP(mahoudai_68k_mem)
-	MDRV_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)		/* 16MHz , 32MHz Oscillator */
+	MCFG_CPU_PROGRAM_MAP(mahoudai_68k_mem)
+	MCFG_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
 
-	MDRV_CPU_ADD("audiocpu", Z80, XTAL_32MHz/8)		/* 4MHz , 32MHz Oscillator */
-	MDRV_CPU_PROGRAM_MAP(raizing_sound_z80_mem)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_32MHz/8)		/* 4MHz , 32MHz Oscillator */
+	MCFG_CPU_PROGRAM_MAP(raizing_sound_z80_mem)
 
-	MDRV_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(HZ(600))
 
-	MDRV_MACHINE_RESET(toaplan2)
+	MCFG_MACHINE_RESET(toaplan2)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(432, 262)
-	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(432, 262)
+	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
-	MDRV_GFXDECODE(raizing)
-	MDRV_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
+	MCFG_GFXDECODE(raizing)
+	MCFG_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
 
-	MDRV_DEVICE_ADD_VDP0
+	MCFG_DEVICE_ADD_VDP0
 
-	MDRV_VIDEO_START(bgaregga)
-	MDRV_VIDEO_EOF(toaplan2)
-	MDRV_VIDEO_UPDATE(truxton2)
+	MCFG_VIDEO_START(bgaregga)
+	MCFG_VIDEO_EOF(toaplan2)
+	MCFG_VIDEO_UPDATE(truxton2)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2151, XTAL_27MHz/8)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM2151, XTAL_27MHz/8)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_OKIM6295_ADD("oki", XTAL_32MHz/32, OKIM6295_PIN7_HIGH)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_OKIM6295_ADD("oki", XTAL_32MHz/32, OKIM6295_PIN7_HIGH)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( shippumd, toaplan2_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)		/* 16MHz , 32MHz Oscillator */
-	MDRV_CPU_PROGRAM_MAP(shippumd_68k_mem)
-	MDRV_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)		/* 16MHz , 32MHz Oscillator */
+	MCFG_CPU_PROGRAM_MAP(shippumd_68k_mem)
+	MCFG_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
 
-	MDRV_CPU_ADD("audiocpu", Z80, XTAL_32MHz/8)		/* 4MHz , 32MHz Oscillator */
-	MDRV_CPU_PROGRAM_MAP(raizing_sound_z80_mem)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_32MHz/8)		/* 4MHz , 32MHz Oscillator */
+	MCFG_CPU_PROGRAM_MAP(raizing_sound_z80_mem)
 
-	MDRV_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(HZ(600))
 
-	MDRV_MACHINE_RESET(toaplan2)
+	MCFG_MACHINE_RESET(toaplan2)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(432, 262)
-	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(432, 262)
+	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
-	MDRV_DEVICE_ADD_VDP0
+	MCFG_DEVICE_ADD_VDP0
 
-	MDRV_GFXDECODE(raizing)
-	MDRV_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
+	MCFG_GFXDECODE(raizing)
+	MCFG_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
 
-	MDRV_VIDEO_START(bgaregga)
-	MDRV_VIDEO_EOF(toaplan2)
-	MDRV_VIDEO_UPDATE(truxton2)
+	MCFG_VIDEO_START(bgaregga)
+	MCFG_VIDEO_EOF(toaplan2)
+	MCFG_VIDEO_UPDATE(truxton2)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2151, XTAL_27MHz/8)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono",1.0)
+	MCFG_SOUND_ADD("ymsnd", YM2151, XTAL_27MHz/8)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono",1.0)
 
-	MDRV_OKIM6295_ADD("oki", XTAL_32MHz/32, OKIM6295_PIN7_HIGH)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_OKIM6295_ADD("oki", XTAL_32MHz/32, OKIM6295_PIN7_HIGH)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( bgaregga, toaplan2_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)		/* 16MHz , 32MHz Oscillator */
-	MDRV_CPU_PROGRAM_MAP(bgaregga_68k_mem)
-	MDRV_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)		/* 16MHz , 32MHz Oscillator */
+	MCFG_CPU_PROGRAM_MAP(bgaregga_68k_mem)
+	MCFG_CPU_VBLANK_INT("screen", toaplan2_vblank_irq4)
 
-	MDRV_CPU_ADD("audiocpu", Z80, XTAL_32MHz/8)		/* 4MHz , 32MHz Oscillator */
-	MDRV_CPU_PROGRAM_MAP(bgaregga_sound_z80_mem)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_32MHz/8)		/* 4MHz , 32MHz Oscillator */
+	MCFG_CPU_PROGRAM_MAP(bgaregga_sound_z80_mem)
 
-	MDRV_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(HZ(6000))
 
-	MDRV_MACHINE_RESET(bgaregga)
+	MCFG_MACHINE_RESET(bgaregga)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(432, 262)
-	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(432, 262)
+	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
-	MDRV_GFXDECODE(raizing)
-	MDRV_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
+	MCFG_GFXDECODE(raizing)
+	MCFG_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
 
-	MDRV_DEVICE_ADD_VDP0
+	MCFG_DEVICE_ADD_VDP0
 
-	MDRV_VIDEO_START(bgaregga)
-	MDRV_VIDEO_EOF(toaplan2)
-	MDRV_VIDEO_UPDATE(truxton2)
+	MCFG_VIDEO_START(bgaregga)
+	MCFG_VIDEO_EOF(toaplan2)
+	MCFG_VIDEO_UPDATE(truxton2)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2151, XTAL_32MHz/8)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM2151, XTAL_32MHz/8)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_OKIM6295_ADD("oki", XTAL_32MHz/16, OKIM6295_PIN7_HIGH)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_OKIM6295_ADD("oki", XTAL_32MHz/16, OKIM6295_PIN7_HIGH)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_NMK112_ADD("nmk112", bgaregga_nmk112_intf)
+	MCFG_NMK112_ADD("nmk112", bgaregga_nmk112_intf)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( batrider, toaplan2_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)		/* 16MHz , 32MHz Oscillator */
-	MDRV_CPU_PROGRAM_MAP(batrider_68k_mem)
-	MDRV_CPU_VBLANK_INT("screen", toaplan2_vblank_irq2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)		/* 16MHz , 32MHz Oscillator */
+	MCFG_CPU_PROGRAM_MAP(batrider_68k_mem)
+	MCFG_CPU_VBLANK_INT("screen", toaplan2_vblank_irq2)
 
-	MDRV_CPU_ADD("audiocpu", Z80, XTAL_32MHz/8)		/* 4MHz , 32MHz Oscillator */
-	MDRV_CPU_PROGRAM_MAP(batrider_sound_z80_mem)
-	MDRV_CPU_IO_MAP(batrider_sound_z80_port)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_32MHz/8)		/* 4MHz , 32MHz Oscillator */
+	MCFG_CPU_PROGRAM_MAP(batrider_sound_z80_mem)
+	MCFG_CPU_IO_MAP(batrider_sound_z80_port)
 
-	MDRV_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(HZ(600))
 
-	MDRV_MACHINE_RESET(bgaregga)
+	MCFG_MACHINE_RESET(bgaregga)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(432, 262)
-	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(432, 262)
+	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
-	MDRV_GFXDECODE(batrider)
-	MDRV_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
+	MCFG_GFXDECODE(batrider)
+	MCFG_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
 
-	MDRV_DEVICE_ADD_VDP0
+	MCFG_DEVICE_ADD_VDP0
 
-	MDRV_VIDEO_START(batrider)
-	MDRV_VIDEO_UPDATE(batrider)
+	MCFG_VIDEO_START(batrider)
+	MCFG_VIDEO_UPDATE(batrider)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2151, XTAL_32MHz/8)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM2151, XTAL_32MHz/8)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_OKIM6295_ADD("oki1", XTAL_32MHz/10, OKIM6295_PIN7_HIGH)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_OKIM6295_ADD("oki1", XTAL_32MHz/10, OKIM6295_PIN7_HIGH)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_OKIM6295_ADD("oki2", XTAL_32MHz/10, OKIM6295_PIN7_LOW)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_OKIM6295_ADD("oki2", XTAL_32MHz/10, OKIM6295_PIN7_LOW)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_NMK112_ADD("nmk112", batrider_nmk112_intf)
+	MCFG_NMK112_ADD("nmk112", batrider_nmk112_intf)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( bbakraid, toaplan2_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)		/* 16MHz , 32MHz Oscillator */
-	MDRV_CPU_PROGRAM_MAP(bbakraid_68k_mem)
-	MDRV_CPU_VBLANK_INT("screen", toaplan2_vblank_irq1)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_32MHz/2)		/* 16MHz , 32MHz Oscillator */
+	MCFG_CPU_PROGRAM_MAP(bbakraid_68k_mem)
+	MCFG_CPU_VBLANK_INT("screen", toaplan2_vblank_irq1)
 
-	MDRV_CPU_ADD("audiocpu", Z80, XTAL_32MHz/6)		/* 5.3333MHz , 32MHz Oscillator */
-	MDRV_CPU_PROGRAM_MAP(bbakraid_sound_z80_mem)
-	MDRV_CPU_IO_MAP(bbakraid_sound_z80_port)
-	MDRV_CPU_PERIODIC_INT(bbakraid_snd_interrupt, 448)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_32MHz/6)		/* 5.3333MHz , 32MHz Oscillator */
+	MCFG_CPU_PROGRAM_MAP(bbakraid_sound_z80_mem)
+	MCFG_CPU_IO_MAP(bbakraid_sound_z80_port)
+	MCFG_CPU_PERIODIC_INT(bbakraid_snd_interrupt, 448)
 
-	MDRV_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(HZ(600))
 
-	MDRV_MACHINE_RESET(toaplan2)
-	MDRV_EEPROM_ADD("eeprom", bbakraid_93C66_intf)
+	MCFG_MACHINE_RESET(toaplan2)
+	MCFG_EEPROM_ADD("eeprom", bbakraid_93C66_intf)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(432, 262)
-	MDRV_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(432, 262)
+	MCFG_SCREEN_VISIBLE_AREA(0, 319, 0, 239)
 
-	MDRV_GFXDECODE(batrider)
-	MDRV_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
+	MCFG_GFXDECODE(batrider)
+	MCFG_PALETTE_LENGTH(0x10000) // we encode priority with colour in the tilemaps, so need a larger palette
 
-	MDRV_DEVICE_ADD_VDP0
+	MCFG_DEVICE_ADD_VDP0
 
-	MDRV_VIDEO_START(batrider)
-	MDRV_VIDEO_UPDATE(batrider)
+	MCFG_VIDEO_START(batrider)
+	MCFG_VIDEO_UPDATE(batrider)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
-	MDRV_SOUND_CONFIG(ymz280b_config)
-	MDRV_SOUND_ROUTE(0, "mono", 1.0)
-	MDRV_SOUND_ROUTE(1, "mono", 1.0)
+	MCFG_SOUND_ADD("ymz", YMZ280B, XTAL_16_9344MHz)
+	MCFG_SOUND_CONFIG(ymz280b_config)
+	MCFG_SOUND_ROUTE(0, "mono", 1.0)
+	MCFG_SOUND_ROUTE(1, "mono", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( bbakradu, bbakraid )
 
-	MDRV_DEVICE_REMOVE("eeprom")
-	MDRV_EEPROM_ADD("eeprom", bbakraid_93C66_intf)
-	MDRV_EEPROM_DATA(bbakraid_unlim_default, 512)
+	MCFG_DEVICE_REMOVE("eeprom")
+	MCFG_EEPROM_ADD("eeprom", bbakraid_93C66_intf)
+	MCFG_EEPROM_DATA(bbakraid_unlim_default, 512)
 MACHINE_CONFIG_END
 
 

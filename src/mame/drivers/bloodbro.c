@@ -422,28 +422,28 @@ GFXDECODE_END
 
 static MACHINE_CONFIG_START( bloodbro, driver_device )
 	// basic machine hardware
-	MDRV_CPU_ADD("maincpu", M68000, XTAL_20MHz/2) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(bloodbro_map)
-	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz/2) /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(bloodbro_map)
+	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold)
 
 	SEIBU_SOUND_SYSTEM_CPU(XTAL_7_15909MHz/2) /* verified on pcb */
 
-	MDRV_MACHINE_RESET(seibu_sound)
+	MCFG_MACHINE_RESET(seibu_sound)
 
 	// video hardware
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(59.39)    /* verified on pcb */
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(59.39)    /* verified on pcb */
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(bloodbro)
-	MDRV_PALETTE_LENGTH(2048)
+	MCFG_GFXDECODE(bloodbro)
+	MCFG_PALETTE_LENGTH(2048)
 
-	MDRV_VIDEO_START(bloodbro)
-	MDRV_VIDEO_UPDATE(bloodbro)
+	MCFG_VIDEO_START(bloodbro)
+	MCFG_VIDEO_UPDATE(bloodbro)
 
 	// sound hardware
 	SEIBU_SOUND_SYSTEM_YM3812_RAIDEN_INTERFACE(XTAL_7_15909MHz/2, XTAL_12MHz/12)
@@ -451,22 +451,22 @@ MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( weststry, bloodbro )
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(weststry_map)
-	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(weststry_map)
+	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)
 
-	MDRV_GFXDECODE(weststry)
-	MDRV_PALETTE_LENGTH(1024)
+	MCFG_GFXDECODE(weststry)
+	MCFG_PALETTE_LENGTH(1024)
 
-	MDRV_VIDEO_UPDATE(weststry)
+	MCFG_VIDEO_UPDATE(weststry)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( skysmash, bloodbro )
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_VBLANK_INT("screen", irq2_line_hold)
 
-	MDRV_VIDEO_UPDATE(skysmash)
+	MCFG_VIDEO_UPDATE(skysmash)
 MACHINE_CONFIG_END
 
 /* ROMs */

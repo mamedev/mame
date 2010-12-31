@@ -867,70 +867,70 @@ static const namco_interface namco_config =
 static MACHINE_CONFIG_START( polepos, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/8)	/* 3.072 MHz */
-	MDRV_CPU_PROGRAM_MAP(z80_map)
-	MDRV_CPU_IO_MAP(z80_io)
-	MDRV_CPU_VBLANK_INT_HACK(irq0_line_assert,2)	/* 64V */
+	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/8)	/* 3.072 MHz */
+	MCFG_CPU_PROGRAM_MAP(z80_map)
+	MCFG_CPU_IO_MAP(z80_io)
+	MCFG_CPU_VBLANK_INT_HACK(irq0_line_assert,2)	/* 64V */
 
-	MDRV_CPU_ADD("sub", Z8002, MASTER_CLOCK/8)	/* 3.072 MHz */
-	MDRV_CPU_PROGRAM_MAP(z8002_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
+	MCFG_CPU_ADD("sub", Z8002, MASTER_CLOCK/8)	/* 3.072 MHz */
+	MCFG_CPU_PROGRAM_MAP(z8002_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_assert)
 
-	MDRV_CPU_ADD("sub2", Z8002, MASTER_CLOCK/8)	/* 3.072 MHz */
-	MDRV_CPU_PROGRAM_MAP(z8002_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
+	MCFG_CPU_ADD("sub2", Z8002, MASTER_CLOCK/8)	/* 3.072 MHz */
+	MCFG_CPU_PROGRAM_MAP(z8002_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_assert)
 
-	MDRV_NAMCO_51XX_ADD("51xx", MASTER_CLOCK/8/2, namco_51xx_intf)		/* 1.536 MHz */
-	MDRV_NAMCO_52XX_ADD("52xx", MASTER_CLOCK/8/2, namco_52xx_intf)		/* 1.536 MHz */
-	MDRV_NAMCO_53XX_ADD("53xx", MASTER_CLOCK/8/2, namco_53xx_intf)		/* 1.536 MHz */
-	MDRV_NAMCO_54XX_ADD("54xx", MASTER_CLOCK/8/2, "discrete", NODE_01)	/* 1.536 MHz */
+	MCFG_NAMCO_51XX_ADD("51xx", MASTER_CLOCK/8/2, namco_51xx_intf)		/* 1.536 MHz */
+	MCFG_NAMCO_52XX_ADD("52xx", MASTER_CLOCK/8/2, namco_52xx_intf)		/* 1.536 MHz */
+	MCFG_NAMCO_53XX_ADD("53xx", MASTER_CLOCK/8/2, namco_53xx_intf)		/* 1.536 MHz */
+	MCFG_NAMCO_54XX_ADD("54xx", MASTER_CLOCK/8/2, "discrete", NODE_01)	/* 1.536 MHz */
 
-	MDRV_NAMCO_06XX_ADD("06xx", MASTER_CLOCK/8/64, "maincpu", "51xx", "53xx", "52xx", "54xx")
+	MCFG_NAMCO_06XX_ADD("06xx", MASTER_CLOCK/8/64, "maincpu", "51xx", "53xx", "52xx", "54xx")
 
-	MDRV_WATCHDOG_VBLANK_INIT(16)	// 128V clocks the same as VBLANK
+	MCFG_WATCHDOG_VBLANK_INIT(16)	// 128V clocks the same as VBLANK
 
-	MDRV_QUANTUM_TIME(HZ(6000))	/* some interleaving */
+	MCFG_QUANTUM_TIME(HZ(6000))	/* some interleaving */
 
-	MDRV_MACHINE_RESET(polepos)
-	MDRV_NVRAM_ADD_1FILL("nvram")
+	MCFG_MACHINE_RESET(polepos)
+	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE((double)MASTER_CLOCK/4/384/264)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE((double)MASTER_CLOCK/4/384/264)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
 	/* should be correct, but makes polepos2 and clones fail to boot */
-//  MDRV_SCREEN_RAW_PARAMS(MASTER_CLOCK/4, 384, 0, 256, 264, 16, 224+16)
+//  MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK/4, 384, 0, 256, 264, 16, 224+16)
 
-	MDRV_GFXDECODE(polepos)
-	MDRV_PALETTE_LENGTH(0x0f00)
-	MDRV_DEFAULT_LAYOUT(layout_polepos)
+	MCFG_GFXDECODE(polepos)
+	MCFG_PALETTE_LENGTH(0x0f00)
+	MCFG_DEFAULT_LAYOUT(layout_polepos)
 
-	MDRV_PALETTE_INIT(polepos)
-	MDRV_VIDEO_START(polepos)
-	MDRV_VIDEO_UPDATE(polepos)
+	MCFG_PALETTE_INIT(polepos)
+	MCFG_VIDEO_START(polepos)
+	MCFG_VIDEO_UPDATE(polepos)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("namco", NAMCO, MASTER_CLOCK/512)
-	MDRV_SOUND_CONFIG(namco_config)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 0.80)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 0.80)
+	MCFG_SOUND_ADD("namco", NAMCO, MASTER_CLOCK/512)
+	MCFG_SOUND_CONFIG(namco_config)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 
 	/* discrete circuit on the 54XX outputs */
-	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG_DISCRETE(polepos)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
+	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_SOUND_CONFIG_DISCRETE(polepos)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90)
 
 	/* engine sound */
-	MDRV_SOUND_ADD("polepos", POLEPOS, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90 * 0.77)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90 * 0.77)
+	MCFG_SOUND_ADD("polepos", POLEPOS, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90 * 0.77)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90 * 0.77)
 MACHINE_CONFIG_END
 
 /* doesn't exist on the bootleg, but required for now or the game only boots in test mode!
@@ -953,58 +953,58 @@ static const namco_51xx_interface namco_51xx_bl_intf =
 static MACHINE_CONFIG_START( topracern, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/8)	/* 3.072 MHz */
-	MDRV_CPU_PROGRAM_MAP(z80_map)
-	MDRV_CPU_IO_MAP(z80_io)
-	MDRV_CPU_VBLANK_INT_HACK(irq0_line_assert,2)	/* 64V */
+	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/8)	/* 3.072 MHz */
+	MCFG_CPU_PROGRAM_MAP(z80_map)
+	MCFG_CPU_IO_MAP(z80_io)
+	MCFG_CPU_VBLANK_INT_HACK(irq0_line_assert,2)	/* 64V */
 
-	MDRV_CPU_ADD("sub", Z8002, MASTER_CLOCK/8)	/* 3.072 MHz */
-	MDRV_CPU_PROGRAM_MAP(z8002_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
+	MCFG_CPU_ADD("sub", Z8002, MASTER_CLOCK/8)	/* 3.072 MHz */
+	MCFG_CPU_PROGRAM_MAP(z8002_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_assert)
 
-	MDRV_CPU_ADD("sub2", Z8002, MASTER_CLOCK/8)	/* 3.072 MHz */
-	MDRV_CPU_PROGRAM_MAP(z8002_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
+	MCFG_CPU_ADD("sub2", Z8002, MASTER_CLOCK/8)	/* 3.072 MHz */
+	MCFG_CPU_PROGRAM_MAP(z8002_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_assert)
 
 	/* todo, remove these devices too, this bootleg doesn't have them, but the emulation doesn't boot without them.. */
-	MDRV_NAMCO_51XX_ADD("51xx", MASTER_CLOCK/8/2, namco_51xx_bl_intf)		/* 1.536 MHz */
-	MDRV_NAMCO_06XX_ADD("06xx", MASTER_CLOCK/8/64, "maincpu", "51xx", NULL, NULL, NULL)
+	MCFG_NAMCO_51XX_ADD("51xx", MASTER_CLOCK/8/2, namco_51xx_bl_intf)		/* 1.536 MHz */
+	MCFG_NAMCO_06XX_ADD("06xx", MASTER_CLOCK/8/64, "maincpu", "51xx", NULL, NULL, NULL)
 
-	MDRV_WATCHDOG_VBLANK_INIT(16)	// 128V clocks the same as VBLANK
+	MCFG_WATCHDOG_VBLANK_INIT(16)	// 128V clocks the same as VBLANK
 
-	MDRV_QUANTUM_TIME(HZ(6000))	/* some interleaving */
+	MCFG_QUANTUM_TIME(HZ(6000))	/* some interleaving */
 
-	MDRV_MACHINE_RESET(polepos)
-	MDRV_NVRAM_ADD_1FILL("nvram")
+	MCFG_MACHINE_RESET(polepos)
+	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE((double)MASTER_CLOCK/4/384/264)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE((double)MASTER_CLOCK/4/384/264)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(polepos)
-	MDRV_PALETTE_LENGTH(0x0f00)
-	MDRV_DEFAULT_LAYOUT(layout_topracer)
+	MCFG_GFXDECODE(polepos)
+	MCFG_PALETTE_LENGTH(0x0f00)
+	MCFG_DEFAULT_LAYOUT(layout_topracer)
 
-	MDRV_PALETTE_INIT(polepos)
-	MDRV_VIDEO_START(polepos)
-	MDRV_VIDEO_UPDATE(polepos)
+	MCFG_PALETTE_INIT(polepos)
+	MCFG_VIDEO_START(polepos)
+	MCFG_VIDEO_UPDATE(polepos)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("namco", NAMCO, MASTER_CLOCK/512)
-	MDRV_SOUND_CONFIG(namco_config)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 0.80)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 0.80)
+	MCFG_SOUND_ADD("namco", NAMCO, MASTER_CLOCK/512)
+	MCFG_SOUND_CONFIG(namco_config)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.80)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.80)
 
 	/* engine sound */
-	MDRV_SOUND_ADD("polepos", POLEPOS, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90 * 0.77)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90 * 0.77)
+	MCFG_SOUND_ADD("polepos", POLEPOS, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.90 * 0.77)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.90 * 0.77)
 MACHINE_CONFIG_END
 
 
@@ -1019,13 +1019,13 @@ ADDRESS_MAP_END
 
 static MACHINE_CONFIG_DERIVED( polepos2bi, topracern )
 
-	MDRV_CPU_ADD("soundz80bl", Z80, MASTER_CLOCK/8)	/*? MHz */
-	MDRV_CPU_PROGRAM_MAP(sound_z80_bootleg_map)
-	MDRV_CPU_IO_MAP(sound_z80_bootleg_iomap)
+	MCFG_CPU_ADD("soundz80bl", Z80, MASTER_CLOCK/8)	/*? MHz */
+	MCFG_CPU_PROGRAM_MAP(sound_z80_bootleg_map)
+	MCFG_CPU_IO_MAP(sound_z80_bootleg_iomap)
 
-	MDRV_SOUND_ADD("tms", TMS5220, 600000)	/* ? Mhz */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
+	MCFG_SOUND_ADD("tms", TMS5220, 600000)	/* ? Mhz */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 MACHINE_CONFIG_END
 
 

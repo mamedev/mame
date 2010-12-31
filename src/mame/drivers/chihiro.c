@@ -301,36 +301,36 @@ static MACHINE_START( chihiro )
 static MACHINE_CONFIG_START( chihiro_base, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", PENTIUM, 733333333) /* Wrong! */
-	MDRV_CPU_PROGRAM_MAP(xbox_map)
-	MDRV_CPU_IO_MAP(xbox_map_io)
+	MCFG_CPU_ADD("maincpu", PENTIUM, 733333333) /* Wrong! */
+	MCFG_CPU_PROGRAM_MAP(xbox_map)
+	MCFG_CPU_IO_MAP(xbox_map_io)
 
-	MDRV_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(HZ(6000))
 
-	MDRV_PCI_BUS_ADD("pcibus", 0)
-	MDRV_PCI_BUS_DEVICE(0, "PCI Bridge Device - Host Bridge", dummy_pci_r, dummy_pci_w)
-	MDRV_PCI_BUS_DEVICE(1, "HUB Interface - ISA Bridge", dummy_pci_r, dummy_pci_w)
-	MDRV_PCI_BUS_DEVICE(2, "OHCI USB Controller 1", dummy_pci_r, dummy_pci_w)
-	MDRV_PCI_BUS_DEVICE(3, "OHCI USB Controller 2", dummy_pci_r, dummy_pci_w)
-	MDRV_PCI_BUS_DEVICE(30, "AGP Host to PCI Bridge", dummy_pci_r, dummy_pci_w)
-	MDRV_PCI_BUS_ADD("agpbus", 1)
-	MDRV_PCI_BUS_SIBLING("pcibus")
-	MDRV_PCI_BUS_DEVICE(0, "NV2A GeForce 3MX Integrated GPU/Northbridge", dummy_pci_r, dummy_pci_w)
+	MCFG_PCI_BUS_ADD("pcibus", 0)
+	MCFG_PCI_BUS_DEVICE(0, "PCI Bridge Device - Host Bridge", dummy_pci_r, dummy_pci_w)
+	MCFG_PCI_BUS_DEVICE(1, "HUB Interface - ISA Bridge", dummy_pci_r, dummy_pci_w)
+	MCFG_PCI_BUS_DEVICE(2, "OHCI USB Controller 1", dummy_pci_r, dummy_pci_w)
+	MCFG_PCI_BUS_DEVICE(3, "OHCI USB Controller 2", dummy_pci_r, dummy_pci_w)
+	MCFG_PCI_BUS_DEVICE(30, "AGP Host to PCI Bridge", dummy_pci_r, dummy_pci_w)
+	MCFG_PCI_BUS_ADD("agpbus", 1)
+	MCFG_PCI_BUS_SIBLING("pcibus")
+	MCFG_PCI_BUS_DEVICE(0, "NV2A GeForce 3MX Integrated GPU/Northbridge", dummy_pci_r, dummy_pci_w)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(640, 480)
-	MDRV_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_SIZE(640, 480)
+	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 
-	MDRV_MACHINE_START(chihiro)
+	MCFG_MACHINE_START(chihiro)
 
-	MDRV_PALETTE_LENGTH(65536)
+	MCFG_PALETTE_LENGTH(65536)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( chihirogd, chihiro_base )
-	MDRV_NAOMI_DIMM_BOARD_ADD("rom_board", "gdrom", "user1", "picreturn")
+	MCFG_NAOMI_DIMM_BOARD_ADD("rom_board", "gdrom", "user1", "picreturn")
 MACHINE_CONFIG_END
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \

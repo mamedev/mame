@@ -820,44 +820,44 @@ static MACHINE_RESET( jack )
 static MACHINE_CONFIG_START( jack, jack_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 18000000/6)	/* 3 MHz */
-	MDRV_CPU_PROGRAM_MAP(jack_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold) /* jack needs 1 or its too fast */
+	MCFG_CPU_ADD("maincpu", Z80, 18000000/6)	/* 3 MHz */
+	MCFG_CPU_PROGRAM_MAP(jack_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold) /* jack needs 1 or its too fast */
 
-	MDRV_CPU_ADD("audiocpu", Z80,18000000/12)	/* 1.5 MHz */
-	MDRV_CPU_PROGRAM_MAP(sound_map)
-	MDRV_CPU_IO_MAP(sound_io_map)
+	MCFG_CPU_ADD("audiocpu", Z80,18000000/12)	/* 1.5 MHz */
+	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_CPU_IO_MAP(sound_io_map)
 
-	MDRV_MACHINE_START(jack)
-	MDRV_MACHINE_RESET(jack)
+	MCFG_MACHINE_START(jack)
+	MCFG_MACHINE_RESET(jack)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(jack)
-	MDRV_PALETTE_LENGTH(32)
+	MCFG_GFXDECODE(jack)
+	MCFG_PALETTE_LENGTH(32)
 
-	MDRV_VIDEO_START(jack)
-	MDRV_VIDEO_UPDATE(jack)
+	MCFG_VIDEO_START(jack)
+	MCFG_VIDEO_UPDATE(jack)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("aysnd", AY8910, 18000000/12)
-	MDRV_SOUND_CONFIG(ay8910_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("aysnd", AY8910, 18000000/12)
+	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( tripool, jack )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2) /* tripool needs 2 or the palette is broken */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,2) /* tripool needs 2 or the palette is broken */
 MACHINE_CONFIG_END
 
 static INTERRUPT_GEN( joinem_interrupts )
@@ -874,38 +874,38 @@ static INTERRUPT_GEN( joinem_interrupts )
 static MACHINE_CONFIG_DERIVED( joinem, jack )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(joinem_map)
-	MDRV_CPU_VBLANK_INT_HACK(joinem_interrupts,3)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(joinem_map)
+	MCFG_CPU_VBLANK_INT_HACK(joinem_interrupts,3)
 
-	MDRV_GFXDECODE(joinem)
-	MDRV_PALETTE_LENGTH(0x100)
+	MCFG_GFXDECODE(joinem)
+	MCFG_PALETTE_LENGTH(0x100)
 
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
 
-	MDRV_PALETTE_INIT(joinem)
-	MDRV_VIDEO_START(joinem)
-	MDRV_VIDEO_UPDATE(joinem)
+	MCFG_PALETTE_INIT(joinem)
+	MCFG_VIDEO_START(joinem)
+	MCFG_VIDEO_UPDATE(joinem)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( loverboy, jack )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(joinem_map)
-	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(joinem_map)
+	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-	MDRV_GFXDECODE(joinem)
-	MDRV_PALETTE_LENGTH(0x100)
+	MCFG_GFXDECODE(joinem)
+	MCFG_PALETTE_LENGTH(0x100)
 
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 2*8, 30*8-1)
 
-	MDRV_PALETTE_INIT(joinem)
-	MDRV_VIDEO_START(joinem)
-	MDRV_VIDEO_UPDATE(joinem)
+	MCFG_PALETTE_INIT(joinem)
+	MCFG_VIDEO_START(joinem)
+	MCFG_VIDEO_UPDATE(joinem)
 MACHINE_CONFIG_END
 
 /*************************************

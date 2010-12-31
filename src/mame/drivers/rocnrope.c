@@ -186,27 +186,27 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( rocnrope, rocnrope_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6809, MASTER_CLOCK / 3 / 4)        /* Verified in schematics */
-	MDRV_CPU_PROGRAM_MAP(rocnrope_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK / 3 / 4)        /* Verified in schematics */
+	MCFG_CPU_PROGRAM_MAP(rocnrope_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(rocnrope)
-	MDRV_PALETTE_LENGTH(16*16+16*16)
+	MCFG_GFXDECODE(rocnrope)
+	MCFG_PALETTE_LENGTH(16*16+16*16)
 
-	MDRV_PALETTE_INIT(rocnrope)
-	MDRV_VIDEO_START(rocnrope)
-	MDRV_VIDEO_UPDATE(rocnrope)
+	MCFG_PALETTE_INIT(rocnrope)
+	MCFG_VIDEO_START(rocnrope)
+	MCFG_VIDEO_UPDATE(rocnrope)
 
 	/* sound hardware */
-	MDRV_FRAGMENT_ADD(timeplt_sound)
+	MCFG_FRAGMENT_ADD(timeplt_sound)
 MACHINE_CONFIG_END
 
 /*************************************

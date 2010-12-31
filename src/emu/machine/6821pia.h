@@ -30,21 +30,21 @@
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_PIA6821_ADD(_tag, _intrf) \
-    MDRV_DEVICE_ADD(_tag, PIA6821, 0) \
-    MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_PIA6821_ADD(_tag, _intrf) \
+    MCFG_DEVICE_ADD(_tag, PIA6821, 0) \
+    MCFG_DEVICE_CONFIG(_intrf)
 
-#define MDRV_PIA6821_MODIFY(_tag, _intrf) \
-    MDRV_DEVICE_MODIFY(_tag) \
-    MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_PIA6821_MODIFY(_tag, _intrf) \
+    MCFG_DEVICE_MODIFY(_tag) \
+    MCFG_DEVICE_CONFIG(_intrf)
 
-#define MDRV_PIA6822_ADD(_tag, _intrf) \
-    MDRV_DEVICE_ADD(_tag, PIA6822, 0) \
-    MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_PIA6822_ADD(_tag, _intrf) \
+    MCFG_DEVICE_ADD(_tag, PIA6822, 0) \
+    MCFG_DEVICE_CONFIG(_intrf)
 
-#define MDRV_PIA6822_MODIFY(_tag, _intrf) \
-    MDRV_DEVICE_MODIFY(_tag) \
-    MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_PIA6822_MODIFY(_tag, _intrf) \
+    MCFG_DEVICE_MODIFY(_tag) \
+    MCFG_DEVICE_CONFIG(_intrf)
 
 
 

@@ -75,33 +75,33 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( beezer, beezer_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6809, 1000000)        /* 1 MHz */
-	MDRV_CPU_PROGRAM_MAP(main_map)
-	MDRV_CPU_VBLANK_INT_HACK(beezer_interrupt,128)
+	MCFG_CPU_ADD("maincpu", M6809, 1000000)        /* 1 MHz */
+	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_CPU_VBLANK_INT_HACK(beezer_interrupt,128)
 
-	MDRV_CPU_ADD("audiocpu", M6809, 1000000)        /* 1 MHz */
-	MDRV_CPU_PROGRAM_MAP(sound_map)
+	MCFG_CPU_ADD("audiocpu", M6809, 1000000)        /* 1 MHz */
+	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 384)
-	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 16, 303)
-	MDRV_PALETTE_LENGTH(16)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 384)
+	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 303)
+	MCFG_PALETTE_LENGTH(16)
 
-	MDRV_VIDEO_UPDATE(beezer)
+	MCFG_VIDEO_UPDATE(beezer)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* via */
-	MDRV_VIA6522_ADD("via6522_0", 0, b_via_0_interface)
-	MDRV_VIA6522_ADD("via6522_1", 0, b_via_1_interface)
+	MCFG_VIA6522_ADD("via6522_0", 0, b_via_0_interface)
+	MCFG_VIA6522_ADD("via6522_1", 0, b_via_1_interface)
 MACHINE_CONFIG_END
 
 /***************************************************************************

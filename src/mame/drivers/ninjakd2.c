@@ -908,108 +908,108 @@ static const samples_interface ninjakd2_samples_interface =
 static MACHINE_CONFIG_START( ninjakd2, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, MAIN_CLOCK_12/2)		/* verified */
-	MDRV_CPU_PROGRAM_MAP(ninjakd2_main_cpu)
-	MDRV_CPU_VBLANK_INT("screen", ninjakd2_interrupt)
+	MCFG_CPU_ADD("maincpu", Z80, MAIN_CLOCK_12/2)		/* verified */
+	MCFG_CPU_PROGRAM_MAP(ninjakd2_main_cpu)
+	MCFG_CPU_VBLANK_INT("screen", ninjakd2_interrupt)
 
-	MDRV_CPU_ADD("soundcpu", Z80, MAIN_CLOCK_5)		/* verified */
-	MDRV_CPU_PROGRAM_MAP(ninjakd2_sound_cpu)
-	MDRV_CPU_IO_MAP(ninjakd2_sound_io)
+	MCFG_CPU_ADD("soundcpu", Z80, MAIN_CLOCK_5)		/* verified */
+	MCFG_CPU_PROGRAM_MAP(ninjakd2_sound_cpu)
+	MCFG_CPU_IO_MAP(ninjakd2_sound_io)
 
-	MDRV_MACHINE_RESET(ninjakd2)
+	MCFG_MACHINE_RESET(ninjakd2)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(59.61)    /* verified on pcb */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 28*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(59.61)    /* verified on pcb */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 28*8-1)
 
-	MDRV_GFXDECODE(ninjakd2)
-	MDRV_PALETTE_LENGTH(0x300)
+	MCFG_GFXDECODE(ninjakd2)
+	MCFG_PALETTE_LENGTH(0x300)
 
-	MDRV_VIDEO_START(ninjakd2)
-	MDRV_VIDEO_UPDATE(ninjakd2)
-	MDRV_VIDEO_EOF(ninjakd2)
+	MCFG_VIDEO_START(ninjakd2)
+	MCFG_VIDEO_UPDATE(ninjakd2)
+	MCFG_VIDEO_EOF(ninjakd2)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("2203.1", YM2203, MAIN_CLOCK_12/8)		/* verified */
-	MDRV_SOUND_CONFIG(ym2203_config)
-	MDRV_SOUND_ROUTE(0, "mono", 0.10)
-	MDRV_SOUND_ROUTE(1, "mono", 0.10)
-	MDRV_SOUND_ROUTE(2, "mono", 0.10)
-	MDRV_SOUND_ROUTE(3, "mono", 0.50)
+	MCFG_SOUND_ADD("2203.1", YM2203, MAIN_CLOCK_12/8)		/* verified */
+	MCFG_SOUND_CONFIG(ym2203_config)
+	MCFG_SOUND_ROUTE(0, "mono", 0.10)
+	MCFG_SOUND_ROUTE(1, "mono", 0.10)
+	MCFG_SOUND_ROUTE(2, "mono", 0.10)
+	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
-	MDRV_SOUND_ADD("2203.2", YM2203, MAIN_CLOCK_12/8)		/* verified */
-	MDRV_SOUND_ROUTE(0, "mono", 0.10)
-	MDRV_SOUND_ROUTE(1, "mono", 0.10)
-	MDRV_SOUND_ROUTE(2, "mono", 0.10)
-	MDRV_SOUND_ROUTE(3, "mono", 0.50)
+	MCFG_SOUND_ADD("2203.2", YM2203, MAIN_CLOCK_12/8)		/* verified */
+	MCFG_SOUND_ROUTE(0, "mono", 0.10)
+	MCFG_SOUND_ROUTE(1, "mono", 0.10)
+	MCFG_SOUND_ROUTE(2, "mono", 0.10)
+	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
-	MDRV_SOUND_ADD("pcm", SAMPLES, 0)
-	MDRV_SOUND_CONFIG(ninjakd2_samples_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_SOUND_ADD("pcm", SAMPLES, 0)
+	MCFG_SOUND_CONFIG(ninjakd2_samples_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mnight, ninjakd2 )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mnight_main_cpu)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(mnight_main_cpu)
 
 	/* video hardware */
-	MDRV_VIDEO_START(mnight)
+	MCFG_VIDEO_START(mnight)
 
 	/* sound hardware */
-	MDRV_DEVICE_REMOVE("pcm")
+	MCFG_DEVICE_REMOVE("pcm")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( arkarea, ninjakd2 )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mnight_main_cpu)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(mnight_main_cpu)
 
 	/* video hardware */
-	MDRV_VIDEO_START(arkarea)
+	MCFG_VIDEO_START(arkarea)
 
 	/* sound hardware */
-	MDRV_DEVICE_REMOVE("pcm")
+	MCFG_DEVICE_REMOVE("pcm")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( robokid, mnight )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(robokid_main_cpu)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(robokid_main_cpu)
 
-	MDRV_MACHINE_RESET(robokid)
+	MCFG_MACHINE_RESET(robokid)
 
 	/* video hardware */
-	MDRV_GFXDECODE(robokid)
-	MDRV_PALETTE_LENGTH(0x400)	// RAM is this large, but still only 0x300 colors used
+	MCFG_GFXDECODE(robokid)
+	MCFG_PALETTE_LENGTH(0x400)	// RAM is this large, but still only 0x300 colors used
 
-	MDRV_VIDEO_START(robokid)
-	MDRV_VIDEO_UPDATE(robokid)
+	MCFG_VIDEO_START(robokid)
+	MCFG_VIDEO_UPDATE(robokid)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( omegaf, robokid )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(omegaf_main_cpu)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(omegaf_main_cpu)
 
-	MDRV_MACHINE_RESET(omegaf)
+	MCFG_MACHINE_RESET(omegaf)
 
 	/* video hardware */
-	MDRV_VIDEO_START(omegaf)
-	MDRV_VIDEO_UPDATE(omegaf)
+	MCFG_VIDEO_START(omegaf)
+	MCFG_VIDEO_UPDATE(omegaf)
 MACHINE_CONFIG_END
 
 

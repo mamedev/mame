@@ -196,99 +196,99 @@ DECLARE_LEGACY_DEVICE(K037122, k037122);
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_K007121_ADD(_tag) \
-	MDRV_DEVICE_ADD(_tag, K007121, 0)
+#define MCFG_K007121_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, K007121, 0)
 
-#define MDRV_K007342_ADD(_tag, _interface) \
-	MDRV_DEVICE_ADD(_tag, K007342, 0) \
-	MDRV_DEVICE_CONFIG(_interface)
+#define MCFG_K007342_ADD(_tag, _interface) \
+	MCFG_DEVICE_ADD(_tag, K007342, 0) \
+	MCFG_DEVICE_CONFIG(_interface)
 
-#define MDRV_K007420_ADD(_tag, _interface) \
-	MDRV_DEVICE_ADD(_tag, K007420, 0) \
-	MDRV_DEVICE_CONFIG(_interface)
+#define MCFG_K007420_ADD(_tag, _interface) \
+	MCFG_DEVICE_ADD(_tag, K007420, 0) \
+	MCFG_DEVICE_CONFIG(_interface)
 
-#define MDRV_K052109_ADD(_tag, _interface) \
-	MDRV_DEVICE_ADD(_tag, K052109, 0) \
-	MDRV_DEVICE_CONFIG(_interface)
+#define MCFG_K052109_ADD(_tag, _interface) \
+	MCFG_DEVICE_ADD(_tag, K052109, 0) \
+	MCFG_DEVICE_CONFIG(_interface)
 
-#define MDRV_K051960_ADD(_tag, _interface) \
-	MDRV_DEVICE_ADD(_tag, K051960, 0) \
-	MDRV_DEVICE_CONFIG(_interface)
+#define MCFG_K051960_ADD(_tag, _interface) \
+	MCFG_DEVICE_ADD(_tag, K051960, 0) \
+	MCFG_DEVICE_CONFIG(_interface)
 
-#define MDRV_K053244_ADD(_tag, _interface) \
-	MDRV_DEVICE_ADD(_tag, K053244, 0) \
-	MDRV_DEVICE_CONFIG(_interface)
+#define MCFG_K053244_ADD(_tag, _interface) \
+	MCFG_DEVICE_ADD(_tag, K053244, 0) \
+	MCFG_DEVICE_CONFIG(_interface)
 
-#define MDRV_K053245_ADD(_tag, _interface) \
-	MDRV_DEVICE_ADD(_tag, K053245, 0) \
-	MDRV_DEVICE_CONFIG(_interface)
+#define MCFG_K053245_ADD(_tag, _interface) \
+	MCFG_DEVICE_ADD(_tag, K053245, 0) \
+	MCFG_DEVICE_CONFIG(_interface)
 
-#define MDRV_K053246_ADD(_tag, _interface) \
-	MDRV_DEVICE_ADD(_tag, K053246, 0) \
-	MDRV_DEVICE_CONFIG(_interface)
+#define MCFG_K053246_ADD(_tag, _interface) \
+	MCFG_DEVICE_ADD(_tag, K053246, 0) \
+	MCFG_DEVICE_CONFIG(_interface)
 
-#define MDRV_K053247_ADD(_tag, _interface) \
-	MDRV_DEVICE_ADD(_tag, K053247, 0) \
-	MDRV_DEVICE_CONFIG(_interface)
+#define MCFG_K053247_ADD(_tag, _interface) \
+	MCFG_DEVICE_ADD(_tag, K053247, 0) \
+	MCFG_DEVICE_CONFIG(_interface)
 
-#define MDRV_K055673_ADD(_tag, _interface) \
-	MDRV_DEVICE_ADD(_tag, K055673, 0) \
-	MDRV_DEVICE_CONFIG(_interface)
+#define MCFG_K055673_ADD(_tag, _interface) \
+	MCFG_DEVICE_ADD(_tag, K055673, 0) \
+	MCFG_DEVICE_CONFIG(_interface)
 
-#define MDRV_K051316_ADD(_tag, _interface) \
-	MDRV_DEVICE_ADD(_tag, K051316, 0) \
-	MDRV_DEVICE_CONFIG(_interface)
+#define MCFG_K051316_ADD(_tag, _interface) \
+	MCFG_DEVICE_ADD(_tag, K051316, 0) \
+	MCFG_DEVICE_CONFIG(_interface)
 
-#define MDRV_K053936_ADD(_tag, _interface) \
-	MDRV_DEVICE_ADD(_tag, K053936, 0) \
-	MDRV_DEVICE_CONFIG(_interface)
+#define MCFG_K053936_ADD(_tag, _interface) \
+	MCFG_DEVICE_ADD(_tag, K053936, 0) \
+	MCFG_DEVICE_CONFIG(_interface)
 
-#define MDRV_K053251_ADD(_tag) \
-	MDRV_DEVICE_ADD(_tag, K053251, 0)
+#define MCFG_K053251_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, K053251, 0)
 
-#define MDRV_K054000_ADD(_tag) \
-	MDRV_DEVICE_ADD(_tag, K054000, 0)
+#define MCFG_K054000_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, K054000, 0)
 
-#define MDRV_K051733_ADD(_tag) \
-	MDRV_DEVICE_ADD(_tag, K051733, 0)
+#define MCFG_K051733_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, K051733, 0)
 
-#define MDRV_K056832_ADD(_tag, _interface) \
-	MDRV_DEVICE_ADD(_tag, K056832, 0) \
-	MDRV_DEVICE_CONFIG(_interface)
+#define MCFG_K056832_ADD(_tag, _interface) \
+	MCFG_DEVICE_ADD(_tag, K056832, 0) \
+	MCFG_DEVICE_CONFIG(_interface)
 
-#define MDRV_K055555_ADD(_tag) \
-	MDRV_DEVICE_ADD(_tag, K055555, 0)
+#define MCFG_K055555_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, K055555, 0)
 
-#define MDRV_K054338_ADD(_tag, _interface) \
-	MDRV_DEVICE_ADD(_tag, K054338, 0) \
-	MDRV_DEVICE_CONFIG(_interface)
+#define MCFG_K054338_ADD(_tag, _interface) \
+	MCFG_DEVICE_ADD(_tag, K054338, 0) \
+	MCFG_DEVICE_CONFIG(_interface)
 
-#define MDRV_K053250_ADD(_tag, _interface) \
-	MDRV_DEVICE_ADD(_tag, K053250, 0) \
-	MDRV_DEVICE_CONFIG(_interface)
+#define MCFG_K053250_ADD(_tag, _interface) \
+	MCFG_DEVICE_ADD(_tag, K053250, 0) \
+	MCFG_DEVICE_CONFIG(_interface)
 
-#define MDRV_K053252_ADD(_tag) \
-	MDRV_DEVICE_ADD(_tag, K053252, 0)
-
-
-#define MDRV_K001006_ADD(_tag, _interface) \
-	MDRV_DEVICE_ADD(_tag, K001006, 0) \
-	MDRV_DEVICE_CONFIG(_interface)
+#define MCFG_K053252_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, K053252, 0)
 
 
-#define MDRV_K001005_ADD(_tag, _interface) \
-	MDRV_DEVICE_ADD(_tag, K001005, 0) \
-	MDRV_DEVICE_CONFIG(_interface)
+#define MCFG_K001006_ADD(_tag, _interface) \
+	MCFG_DEVICE_ADD(_tag, K001006, 0) \
+	MCFG_DEVICE_CONFIG(_interface)
 
 
-#define MDRV_K001604_ADD(_tag, _interface) \
-	MDRV_DEVICE_ADD(_tag, K001604, 0) \
-	MDRV_DEVICE_CONFIG(_interface)
+#define MCFG_K001005_ADD(_tag, _interface) \
+	MCFG_DEVICE_ADD(_tag, K001005, 0) \
+	MCFG_DEVICE_CONFIG(_interface)
 
 
-#define MDRV_K037122_ADD(_tag, _interface) \
-	MDRV_DEVICE_ADD(_tag, K037122, 0) \
-	MDRV_DEVICE_CONFIG(_interface)
+#define MCFG_K001604_ADD(_tag, _interface) \
+	MCFG_DEVICE_ADD(_tag, K001604, 0) \
+	MCFG_DEVICE_CONFIG(_interface)
+
+
+#define MCFG_K037122_ADD(_tag, _interface) \
+	MCFG_DEVICE_ADD(_tag, K037122, 0) \
+	MCFG_DEVICE_CONFIG(_interface)
 
 
 /***************************************************************************

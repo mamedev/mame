@@ -478,36 +478,36 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( galsnew, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 12000000)
-	MDRV_CPU_PROGRAM_MAP(galsnew_map)
-	MDRV_CPU_VBLANK_INT_HACK(galsnew_interrupt,3)
+	MCFG_CPU_ADD("maincpu", M68000, 12000000)
+	MCFG_CPU_PROGRAM_MAP(galsnew_map)
+	MCFG_CPU_VBLANK_INT_HACK(galsnew_interrupt,3)
 
 	/* CALC01 MCU @ 16Mhz (unknown type, simulated) */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-32-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0, 256-32-1)
 
-	MDRV_GFXDECODE(1x4bit_1x4bit)
-	MDRV_PALETTE_LENGTH(2048 + 32768)
-	MDRV_MACHINE_RESET( galsnew )
+	MCFG_GFXDECODE(1x4bit_1x4bit)
+	MCFG_PALETTE_LENGTH(2048 + 32768)
+	MCFG_MACHINE_RESET( galsnew )
 
-	MDRV_VIDEO_START(galsnew)
-	MDRV_VIDEO_UPDATE(galsnew)
-	MDRV_PALETTE_INIT(berlwall)
+	MCFG_VIDEO_START(galsnew)
+	MCFG_VIDEO_UPDATE(galsnew)
+	MCFG_PALETTE_INIT(berlwall)
 
 	/* arm watchdog */
-	MDRV_WATCHDOG_TIME_INIT(SEC(3))	/* a guess, and certainly wrong */
+	MCFG_WATCHDOG_TIME_INIT(SEC(3))	/* a guess, and certainly wrong */
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_OKIM6295_ADD("oki", 12000000/6, OKIM6295_PIN7_LOW)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_OKIM6295_ADD("oki", 12000000/6, OKIM6295_PIN7_LOW)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_CONFIG_END
 
@@ -515,10 +515,10 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( fantasia, galsnew )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(fantasia_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(fantasia_map)
 
-	MDRV_WATCHDOG_TIME_INIT(SEC(0))	/* a guess, and certainly wrong */
+	MCFG_WATCHDOG_TIME_INIT(SEC(0))	/* a guess, and certainly wrong */
 
 MACHINE_CONFIG_END
 

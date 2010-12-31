@@ -556,71 +556,71 @@ static MACHINE_RESET( atarifb )
 static MACHINE_CONFIG_START( atarifb, atarifb_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6502, 750000)
-	MDRV_CPU_PROGRAM_MAP(atarifb_map)
-	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
+	MCFG_CPU_ADD("maincpu", M6502, 750000)
+	MCFG_CPU_PROGRAM_MAP(atarifb_map)
+	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
 
-	MDRV_MACHINE_START(atarifb)
-	MDRV_MACHINE_RESET(atarifb)
+	MCFG_MACHINE_START(atarifb)
+	MCFG_MACHINE_RESET(atarifb)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2037)	/* 16.3ms * 1/8 = 2037.5. Is it 1/8th or 3/32nds? (1528?) */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(38*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 38*8-1, 1*8, 31*8-1)
-	MDRV_GFXDECODE(atarifb)
-	MDRV_PALETTE_LENGTH(12)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2037)	/* 16.3ms * 1/8 = 2037.5. Is it 1/8th or 3/32nds? (1528?) */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(38*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 38*8-1, 1*8, 31*8-1)
+	MCFG_GFXDECODE(atarifb)
+	MCFG_PALETTE_LENGTH(12)
 
-	MDRV_PALETTE_INIT(atarifb)
-	MDRV_VIDEO_START(atarifb)
-	MDRV_VIDEO_UPDATE(atarifb)
+	MCFG_PALETTE_INIT(atarifb)
+	MCFG_VIDEO_START(atarifb)
+	MCFG_VIDEO_UPDATE(atarifb)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG_DISCRETE(atarifb)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.18)
+	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_SOUND_CONFIG_DISCRETE(atarifb)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.18)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( atarifb4, atarifb )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(atarifb4_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(atarifb4_map)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( abaseb, atarifb )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(abaseb_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(abaseb_map)
 
 	/* video hardware */
-	MDRV_VIDEO_UPDATE(abaseb)
+	MCFG_VIDEO_UPDATE(abaseb)
 
 	/* sound hardware */
-	MDRV_SOUND_REPLACE("discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG_DISCRETE(abaseb)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.24)
+	MCFG_SOUND_REPLACE("discrete", DISCRETE, 0)
+	MCFG_SOUND_CONFIG_DISCRETE(abaseb)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.24)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( soccer, atarifb )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(soccer_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(soccer_map)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 38*8-1, 2*8, 32*8-1)
-	MDRV_GFXDECODE(soccer)
-	MDRV_VIDEO_UPDATE(soccer)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 38*8-1, 2*8, 32*8-1)
+	MCFG_GFXDECODE(soccer)
+	MCFG_VIDEO_UPDATE(soccer)
 MACHINE_CONFIG_END
 
 

@@ -653,23 +653,23 @@ static MACHINE_CONFIG_DERIVED( mpnew, megadriv )
 
 	/* The Megaplay has an extra BIOS cpu which drives an SMS VDP
        which includes an SN76496 for sound */
-	MDRV_CPU_ADD("mtbios", Z80, MASTER_CLOCK / 15) /* ?? */
-	MDRV_CPU_PROGRAM_MAP(megaplay_bios_map)
-	MDRV_CPU_IO_MAP(megaplay_bios_io_map)
-	//MDRV_CPU_VBLANK_INT_HACK(megaplay_bios_irq, 262)
+	MCFG_CPU_ADD("mtbios", Z80, MASTER_CLOCK / 15) /* ?? */
+	MCFG_CPU_PROGRAM_MAP(megaplay_bios_map)
+	MCFG_CPU_IO_MAP(megaplay_bios_io_map)
+	//MCFG_CPU_VBLANK_INT_HACK(megaplay_bios_irq, 262)
 
-	MDRV_MACHINE_RESET( mpnew )
-	MDRV_VIDEO_EOF( mpnew )
+	MCFG_MACHINE_RESET( mpnew )
+	MCFG_VIDEO_EOF( mpnew )
 
-	MDRV_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(HZ(6000))
 
-	MDRV_SOUND_ADD("sn2", SN76496, MASTER_CLOCK/15)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) /* 3.58 MHz */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25) /* 3.58 MHz */
+	MCFG_SOUND_ADD("sn2", SN76496, MASTER_CLOCK/15)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25) /* 3.58 MHz */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker",0.25) /* 3.58 MHz */
 
 	/* New update functions to handle the extra layer */
-	MDRV_VIDEO_START(megplay)
-	MDRV_VIDEO_UPDATE(megplay)
+	MCFG_VIDEO_START(megplay)
+	MCFG_VIDEO_UPDATE(megplay)
 MACHINE_CONFIG_END
 
 

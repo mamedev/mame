@@ -619,68 +619,68 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( fastfred, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, CLOCK/6)     /* 3.072 MHz */
-	MDRV_CPU_PROGRAM_MAP(fastfred_map)
-	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_ADD("maincpu", Z80, CLOCK/6)     /* 3.072 MHz */
+	MCFG_CPU_PROGRAM_MAP(fastfred_map)
+	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-	MDRV_CPU_ADD("audiocpu", Z80, CLOCK/12)	 /* 1.536 MHz */
-	MDRV_CPU_PROGRAM_MAP(sound_map)
-	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,4)
+	MCFG_CPU_ADD("audiocpu", Z80, CLOCK/12)	 /* 1.536 MHz */
+	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_CPU_VBLANK_INT_HACK(nmi_line_pulse,4)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))	//CLOCK/16/60
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))	//CLOCK/16/60
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(fastfred)
-	MDRV_PALETTE_LENGTH(32*8)
+	MCFG_GFXDECODE(fastfred)
+	MCFG_PALETTE_LENGTH(32*8)
 
-	MDRV_PALETTE_INIT(fastfred)
-	MDRV_VIDEO_START(fastfred)
-	MDRV_VIDEO_UPDATE(fastfred)
+	MCFG_PALETTE_INIT(fastfred)
+	MCFG_VIDEO_START(fastfred)
+	MCFG_VIDEO_UPDATE(fastfred)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay8910.1", AY8910, CLOCK/12)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("ay8910.1", AY8910, CLOCK/12)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD("ay8910.2", AY8910, CLOCK/12)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("ay8910.2", AY8910, CLOCK/12)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( jumpcoas, fastfred )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(jumpcoas_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(jumpcoas_map)
 
-	MDRV_DEVICE_REMOVE("audiocpu")
+	MCFG_DEVICE_REMOVE("audiocpu")
 
 	/* video hardware */
-	MDRV_GFXDECODE(jumpcoas)
+	MCFG_GFXDECODE(jumpcoas)
 
 	/* sound hardware */
-	MDRV_DEVICE_REMOVE("ay8910.2")
+	MCFG_DEVICE_REMOVE("ay8910.2")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( imago, fastfred )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(imago_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(imago_map)
 
-	MDRV_MACHINE_START(imago)
+	MCFG_MACHINE_START(imago)
 
 	/* video hardware */
-	MDRV_PALETTE_LENGTH(256+64+2) /* 256 for characters, 64 for the stars and 2 for the web */
-	MDRV_GFXDECODE(imago)
+	MCFG_PALETTE_LENGTH(256+64+2) /* 256 for characters, 64 for the stars and 2 for the web */
+	MCFG_GFXDECODE(imago)
 
-	MDRV_VIDEO_START(imago)
-	MDRV_VIDEO_UPDATE(imago)
+	MCFG_VIDEO_START(imago)
+	MCFG_VIDEO_UPDATE(imago)
 MACHINE_CONFIG_END
 
 #undef CLOCK

@@ -17,9 +17,9 @@
 //  DEVICE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MDRV_Z80SIO_ADD(_tag, _clock, _intrf) \
-	MDRV_DEVICE_ADD(_tag, Z80SIO, _clock) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_Z80SIO_ADD(_tag, _clock, _intrf) \
+	MCFG_DEVICE_ADD(_tag, Z80SIO, _clock) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
 
 

@@ -371,36 +371,36 @@ static const tc0480scp_interface superchs_tc0480scp_intf =
 static MACHINE_CONFIG_START( superchs, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)	/* 16 MHz */
-	MDRV_CPU_PROGRAM_MAP(superchs_map)
-	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold)/* VBL */
+	MCFG_CPU_ADD("maincpu", M68EC020, 16000000)	/* 16 MHz */
+	MCFG_CPU_PROGRAM_MAP(superchs_map)
+	MCFG_CPU_VBLANK_INT("screen", irq2_line_hold)/* VBL */
 
-	MDRV_CPU_ADD("sub", M68000, 16000000)	/* 16 MHz */
-	MDRV_CPU_PROGRAM_MAP(superchs_cpub_map)
-	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)/* VBL */
+	MCFG_CPU_ADD("sub", M68000, 16000000)	/* 16 MHz */
+	MCFG_CPU_PROGRAM_MAP(superchs_cpub_map)
+	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold)/* VBL */
 
-	MDRV_QUANTUM_TIME(HZ(480))	/* CPU slices - Need to interleave Cpu's 1 & 3 */
+	MCFG_QUANTUM_TIME(HZ(480))	/* CPU slices - Need to interleave Cpu's 1 & 3 */
 
-	MDRV_EEPROM_ADD("eeprom", superchs_eeprom_interface)
+	MCFG_EEPROM_ADD("eeprom", superchs_eeprom_interface)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(40*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0, 40*8-1, 2*8, 32*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(40*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 2*8, 32*8-1)
 
-	MDRV_GFXDECODE(superchs)
-	MDRV_PALETTE_LENGTH(8192)
+	MCFG_GFXDECODE(superchs)
+	MCFG_PALETTE_LENGTH(8192)
 
-	MDRV_VIDEO_START(superchs)
-	MDRV_VIDEO_UPDATE(superchs)
+	MCFG_VIDEO_START(superchs)
+	MCFG_VIDEO_UPDATE(superchs)
 
-	MDRV_TC0480SCP_ADD("tc0480scp", superchs_tc0480scp_intf)
+	MCFG_TC0480SCP_ADD("tc0480scp", superchs_tc0480scp_intf)
 
 	/* sound hardware */
-	MDRV_FRAGMENT_ADD(taito_f3_sound)
+	MCFG_FRAGMENT_ADD(taito_f3_sound)
 MACHINE_CONFIG_END
 
 /***************************************************************************/

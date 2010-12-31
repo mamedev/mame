@@ -441,46 +441,46 @@ static const kaneko_pandora_interface sandscrp_pandora_config =
 static MACHINE_CONFIG_START( sandscrp, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000,12000000)	/* TMP68HC000N-12 */
-	MDRV_CPU_PROGRAM_MAP(sandscrp)
-	MDRV_CPU_VBLANK_INT("screen", sandscrp_interrupt)
+	MCFG_CPU_ADD("maincpu", M68000,12000000)	/* TMP68HC000N-12 */
+	MCFG_CPU_PROGRAM_MAP(sandscrp)
+	MCFG_CPU_VBLANK_INT("screen", sandscrp_interrupt)
 
-	MDRV_CPU_ADD("audiocpu", Z80,4000000)	/* Z8400AB1, Reads the DSWs: it can't be disabled */
-	MDRV_CPU_PROGRAM_MAP(sandscrp_soundmem)
-	MDRV_CPU_IO_MAP(sandscrp_soundport)
+	MCFG_CPU_ADD("audiocpu", Z80,4000000)	/* Z8400AB1, Reads the DSWs: it can't be disabled */
+	MCFG_CPU_PROGRAM_MAP(sandscrp_soundmem)
+	MCFG_CPU_IO_MAP(sandscrp_soundport)
 
-	MDRV_WATCHDOG_TIME_INIT(SEC(3))	/* a guess, and certainly wrong */
+	MCFG_WATCHDOG_TIME_INIT(SEC(3))	/* a guess, and certainly wrong */
 
-	MDRV_MACHINE_RESET(sandscrp)
+	MCFG_MACHINE_RESET(sandscrp)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME( ATTOSECONDS_IN_USEC(2500) /* not accurate */ )
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-16-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME( ATTOSECONDS_IN_USEC(2500) /* not accurate */ )
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-16-1)
 
-	MDRV_GFXDECODE(sandscrp)
-	MDRV_PALETTE_LENGTH(2048)
+	MCFG_GFXDECODE(sandscrp)
+	MCFG_PALETTE_LENGTH(2048)
 
-	MDRV_KANEKO_PANDORA_ADD("pandora", sandscrp_pandora_config)
+	MCFG_KANEKO_PANDORA_ADD("pandora", sandscrp_pandora_config)
 
-	MDRV_VIDEO_START(sandscrp_1xVIEW2)
-	MDRV_VIDEO_EOF(sandscrp)
-	MDRV_VIDEO_UPDATE(sandscrp)
+	MCFG_VIDEO_START(sandscrp_1xVIEW2)
+	MCFG_VIDEO_EOF(sandscrp)
+	MCFG_VIDEO_UPDATE(sandscrp)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_OKIM6295_ADD("oki", 12000000/6, OKIM6295_PIN7_HIGH)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
+	MCFG_OKIM6295_ADD("oki", 12000000/6, OKIM6295_PIN7_HIGH)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, 4000000)
-	MDRV_SOUND_CONFIG(ym2203_intf_sandscrp)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
+	MCFG_SOUND_ADD("ymsnd", YM2203, 4000000)
+	MCFG_SOUND_CONFIG(ym2203_intf_sandscrp)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
 MACHINE_CONFIG_END
 
 

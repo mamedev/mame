@@ -141,33 +141,33 @@ static const TMS9928a_interface tms9928a_interface =
 
 static MACHINE_CONFIG_START( kingpin, driver_device )
 /*  MAIN CPU */
-	MDRV_CPU_ADD("maincpu", Z80, 3579545)
-	MDRV_CPU_PROGRAM_MAP(kingpin_program_map)
-	MDRV_CPU_IO_MAP(kingpin_io_map)
-	MDRV_CPU_VBLANK_INT("screen", kingpin_video_interrupt)
+	MCFG_CPU_ADD("maincpu", Z80, 3579545)
+	MCFG_CPU_PROGRAM_MAP(kingpin_program_map)
+	MCFG_CPU_IO_MAP(kingpin_io_map)
+	MCFG_CPU_VBLANK_INT("screen", kingpin_video_interrupt)
 
 /*  SOUND CPU */
-	MDRV_CPU_ADD("audiocpu", Z80, 3579545)
-	MDRV_CPU_PROGRAM_MAP(kingpin_sound_map)
-	/*MDRV_CPU_IO_MAP(sound_io_map)*/
+	MCFG_CPU_ADD("audiocpu", Z80, 3579545)
+	MCFG_CPU_PROGRAM_MAP(kingpin_sound_map)
+	/*MCFG_CPU_IO_MAP(sound_io_map)*/
 
 /*  VIDEO */
-	MDRV_FRAGMENT_ADD(tms9928a)
+	MCFG_FRAGMENT_ADD(tms9928a)
 
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 /* Sound chip is a AY-3-8912 */
 /*
-    MDRV_SPEAKER_STANDARD_MONO("mono")
+    MCFG_SPEAKER_STANDARD_MONO("mono")
 
-    MDRV_SOUND_ADD("aysnd", AY8912, 1500000)
-    MDRV_SOUND_CONFIG(ay8912_interface)
-    MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+    MCFG_SOUND_ADD("aysnd", AY8912, 1500000)
+    MCFG_SOUND_CONFIG(ay8912_interface)
+    MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 */
 MACHINE_CONFIG_END
 

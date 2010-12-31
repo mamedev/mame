@@ -1247,35 +1247,35 @@ static NVRAM_HANDLER( sfbonus )
 
 
 static MACHINE_CONFIG_START( sfbonus, driver_device )
-	MDRV_CPU_ADD("maincpu", Z80, 6000000) // custom packaged z80 CPU ?? Mhz
-	MDRV_CPU_PROGRAM_MAP(sfbonus_map)
-	MDRV_CPU_IO_MAP(sfbonus_io)
-	MDRV_CPU_VBLANK_INT("screen",irq0_line_hold)
-	//MDRV_CPU_PERIODIC_INT(nmi_line_pulse,100)
+	MCFG_CPU_ADD("maincpu", Z80, 6000000) // custom packaged z80 CPU ?? Mhz
+	MCFG_CPU_PROGRAM_MAP(sfbonus_map)
+	MCFG_CPU_IO_MAP(sfbonus_io)
+	MCFG_CPU_VBLANK_INT("screen",irq0_line_hold)
+	//MCFG_CPU_PERIODIC_INT(nmi_line_pulse,100)
 
-	MDRV_MACHINE_RESET( sfbonus )
+	MCFG_MACHINE_RESET( sfbonus )
 
-	MDRV_NVRAM_HANDLER(sfbonus)
+	MCFG_NVRAM_HANDLER(sfbonus)
 
 
-	MDRV_GFXDECODE(sfbonus)
+	MCFG_GFXDECODE(sfbonus)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(128*8, 64*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 512-1, 0*8, 288-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(128*8, 64*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 512-1, 0*8, 288-1)
 
-	MDRV_PALETTE_LENGTH(0x100*2) // *2 for priority workaraound / custom drawing
+	MCFG_PALETTE_LENGTH(0x100*2) // *2 for priority workaraound / custom drawing
 
-	MDRV_VIDEO_START(sfbonus)
-	MDRV_VIDEO_UPDATE(sfbonus)
+	MCFG_VIDEO_START(sfbonus)
+	MCFG_VIDEO_UPDATE(sfbonus)
 
 	/* Parrot 3 seems fine at 1 Mhz, but Double Challenge isn't? */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_OKIM6295_ADD("oki", 1000000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
 

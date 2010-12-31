@@ -770,33 +770,33 @@ static const mc6845_interface mc6845_intf =
 static MACHINE_CONFIG_START( megadpkr, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6502, CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(megadpkr_map)
-	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_ADD("maincpu", M6502, CPU_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(megadpkr_map)
+	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-//  MDRV_CPU_ADD("mcu", M68705, CPU_CLOCK) /* unknown */
-//  MDRV_CPU_PROGRAM_MAP(mcu_map)
+//  MCFG_CPU_ADD("mcu", M68705, CPU_CLOCK) /* unknown */
+//  MCFG_CPU_PROGRAM_MAP(mcu_map)
 
-//  MDRV_NVRAM_ADD_0FILL("nvram")
+//  MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MDRV_PIA6821_ADD("pia0", megadpkr_pia0_intf)
-	MDRV_PIA6821_ADD("pia1", megadpkr_pia1_intf)
+	MCFG_PIA6821_ADD("pia0", megadpkr_pia0_intf)
+	MCFG_PIA6821_ADD("pia1", megadpkr_pia1_intf)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE((32)*8, (32)*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE((32)*8, (32)*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 
-	MDRV_MC6845_ADD("crtc", MC6845, CPU_CLOCK, mc6845_intf)
+	MCFG_MC6845_ADD("crtc", MC6845, CPU_CLOCK, mc6845_intf)
 
-	MDRV_GFXDECODE(megadpkr)
-	MDRV_PALETTE_INIT(megadpkr)
-	MDRV_PALETTE_LENGTH(256)
-	MDRV_VIDEO_START(megadpkr)
-	MDRV_VIDEO_UPDATE(megadpkr)
+	MCFG_GFXDECODE(megadpkr)
+	MCFG_PALETTE_INIT(megadpkr)
+	MCFG_PALETTE_LENGTH(256)
+	MCFG_VIDEO_START(megadpkr)
+	MCFG_VIDEO_UPDATE(megadpkr)
 
 MACHINE_CONFIG_END
 

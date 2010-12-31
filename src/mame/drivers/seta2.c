@@ -2281,123 +2281,123 @@ static const x1_010_interface x1_010_sound_intf =
 static MACHINE_CONFIG_START( mj4simai, seta2_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",M68000,50000000/3)			/* !! TMP68301 @ 16.666666MHz !! */
-	MDRV_CPU_PROGRAM_MAP(mj4simai_map)
-	MDRV_CPU_VBLANK_INT("screen", seta2_interrupt)
+	MCFG_CPU_ADD("maincpu",M68000,50000000/3)			/* !! TMP68301 @ 16.666666MHz !! */
+	MCFG_CPU_PROGRAM_MAP(mj4simai_map)
+	MCFG_CPU_VBLANK_INT("screen", seta2_interrupt)
 
-	MDRV_MACHINE_START( tmp68301 )
-	MDRV_MACHINE_RESET( tmp68301 )
+	MCFG_MACHINE_START( tmp68301 )
+	MCFG_MACHINE_RESET( tmp68301 )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(0x200, 0x200)
-	MDRV_SCREEN_VISIBLE_AREA(0x40, 0x1c0-1, 0x80, 0x170-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(0x200, 0x200)
+	MCFG_SCREEN_VISIBLE_AREA(0x40, 0x1c0-1, 0x80, 0x170-1)
 
-	MDRV_GFXDECODE(seta2)
-	MDRV_PALETTE_LENGTH(0x8000+0xf0)	/* extra 0xf0 because we might draw 256-color object with 16-color granularity */
+	MCFG_GFXDECODE(seta2)
+	MCFG_PALETTE_LENGTH(0x8000+0xf0)	/* extra 0xf0 because we might draw 256-color object with 16-color granularity */
 
-	MDRV_VIDEO_START(seta2)
-	MDRV_VIDEO_UPDATE(seta2)
-	MDRV_VIDEO_EOF(seta2)
+	MCFG_VIDEO_START(seta2)
+	MCFG_VIDEO_UPDATE(seta2)
+	MCFG_VIDEO_EOF(seta2)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("x1snd", X1_010, 50000000/3)
-	MDRV_SOUND_CONFIG(x1_010_sound_intf)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("x1snd", X1_010, 50000000/3)
+	MCFG_SOUND_CONFIG(x1_010_sound_intf)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( gundamex, mj4simai )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(gundamex_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(gundamex_map)
 
-	MDRV_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0x00, 0x180-1, 0x100, 0x1e0-1)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(0x00, 0x180-1, 0x100, 0x1e0-1)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( grdians, mj4simai )
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(grdians_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(grdians_map)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0x80, 0x80 + 0x130 -1, 0x80, 0x80 + 0xe8 -1)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(0x80, 0x80 + 0x130 -1, 0x80, 0x80 + 0xe8 -1)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( myangel, mj4simai )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(myangel_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(myangel_map)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0, 0x178-1, 0x00, 0xf0-1)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(0, 0x178-1, 0x00, 0xf0-1)
 
-	MDRV_VIDEO_START(seta2_offset)
+	MCFG_VIDEO_START(seta2_offset)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( myangel2, mj4simai )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(myangel2_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(myangel2_map)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0, 0x178-1, 0x00, 0xf0-1)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(0, 0x178-1, 0x00, 0xf0-1)
 
-	MDRV_VIDEO_START(seta2_offset)
+	MCFG_VIDEO_START(seta2_offset)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( pzlbowl, mj4simai )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(pzlbowl_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(pzlbowl_map)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0x10, 0x190-1, 0x100, 0x1f0-1)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(0x10, 0x190-1, 0x100, 0x1f0-1)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( penbros, mj4simai )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(penbros_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(penbros_map)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0, 0x140-1, 0x80, 0x160-1)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(0, 0x140-1, 0x80, 0x160-1)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( samshoot, mj4simai )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(samshoot_map)
-	MDRV_CPU_VBLANK_INT_HACK(samshoot_interrupt,2)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(samshoot_map)
+	MCFG_CPU_VBLANK_INT_HACK(samshoot_interrupt,2)
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0x40, 0x180-1, 0x40, 0x130-1)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(0x40, 0x180-1, 0x40, 0x130-1)
 MACHINE_CONFIG_END
 
 
@@ -2453,33 +2453,33 @@ static MACHINE_RESET( funcube )
 
 static MACHINE_CONFIG_START( funcube, seta2_state )
 
-	MDRV_CPU_ADD("maincpu", M68040, XTAL_25_447MHz) // !! XCF5206 actually !!
-	MDRV_CPU_PROGRAM_MAP(funcube_map)
-	MDRV_CPU_VBLANK_INT_HACK(funcube_interrupt,2)
+	MCFG_CPU_ADD("maincpu", M68040, XTAL_25_447MHz) // !! XCF5206 actually !!
+	MCFG_CPU_PROGRAM_MAP(funcube_map)
+	MCFG_CPU_VBLANK_INT_HACK(funcube_interrupt,2)
 
-	MDRV_CPU_ADD("sub", H83007, FUNCUBE_SUB_CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(funcube_sub_map)
-	MDRV_CPU_IO_MAP(funcube_sub_io)
-	MDRV_CPU_PERIODIC_INT(funcube_sub_timer_irq, 60*10 )
+	MCFG_CPU_ADD("sub", H83007, FUNCUBE_SUB_CPU_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(funcube_sub_map)
+	MCFG_CPU_IO_MAP(funcube_sub_io)
+	MCFG_CPU_PERIODIC_INT(funcube_sub_timer_irq, 60*10 )
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MDRV_MACHINE_RESET( funcube )
+	MCFG_MACHINE_RESET( funcube )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))	// not accurate
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(0x200, 0x200)
-	MDRV_SCREEN_VISIBLE_AREA(0x0, 0x140-1, 0x80, 0x170-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))	// not accurate
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(0x200, 0x200)
+	MCFG_SCREEN_VISIBLE_AREA(0x0, 0x140-1, 0x80, 0x170-1)
 
-	MDRV_GFXDECODE(funcube)
-	MDRV_PALETTE_LENGTH(0x8000+0xf0)	/* extra 0xf0 because we might draw 256-color object with 16-color granularity */
+	MCFG_GFXDECODE(funcube)
+	MCFG_PALETTE_LENGTH(0x8000+0xf0)	/* extra 0xf0 because we might draw 256-color object with 16-color granularity */
 
-	MDRV_VIDEO_START(seta2)
-	MDRV_VIDEO_UPDATE(seta2)
-	MDRV_VIDEO_EOF(seta2)
+	MCFG_VIDEO_START(seta2)
+	MCFG_VIDEO_UPDATE(seta2)
+	MCFG_VIDEO_EOF(seta2)
 
 	/* sound hardware */
 

@@ -90,56 +90,56 @@ struct _laserdisc_config
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_LASERDISC_ADD(_tag, _type, _screen, _sound) \
-	MDRV_DEVICE_ADD(_tag, LASERDISC, 0) \
-	MDRV_DEVICE_CONFIG_DATA32(laserdisc_config, type, LASERDISC_TYPE_##_type) \
-	MDRV_DEVICE_CONFIG_DATAPTR(laserdisc_config, screen, _screen) \
-	MDRV_DEVICE_CONFIG_DATAPTR(laserdisc_config, sound, _sound) \
+#define MCFG_LASERDISC_ADD(_tag, _type, _screen, _sound) \
+	MCFG_DEVICE_ADD(_tag, LASERDISC, 0) \
+	MCFG_DEVICE_CONFIG_DATA32(laserdisc_config, type, LASERDISC_TYPE_##_type) \
+	MCFG_DEVICE_CONFIG_DATAPTR(laserdisc_config, screen, _screen) \
+	MCFG_DEVICE_CONFIG_DATAPTR(laserdisc_config, sound, _sound) \
 
-#define MDRV_LASERDISC_GET_DISC(_func) \
-	MDRV_DEVICE_CONFIG_DATAPTR(laserdisc_config, getdisc, _func)
+#define MCFG_LASERDISC_GET_DISC(_func) \
+	MCFG_DEVICE_CONFIG_DATAPTR(laserdisc_config, getdisc, _func)
 
-#define MDRV_LASERDISC_AUDIO(_func) \
-	MDRV_DEVICE_CONFIG_DATAPTR(laserdisc_config, audio, _func)
+#define MCFG_LASERDISC_AUDIO(_func) \
+	MCFG_DEVICE_CONFIG_DATAPTR(laserdisc_config, audio, _func)
 
-#define MDRV_LASERDISC_OVERLAY(_update, _width, _height, _format) \
-	MDRV_DEVICE_CONFIG_DATAPTR(laserdisc_config, overupdate, VIDEO_UPDATE_NAME(_update)) \
-	MDRV_DEVICE_CONFIG_DATA32(laserdisc_config, overwidth, _width) \
-	MDRV_DEVICE_CONFIG_DATA32(laserdisc_config, overheight, _height) \
-	MDRV_DEVICE_CONFIG_DATA32(laserdisc_config, overformat, _format)
+#define MCFG_LASERDISC_OVERLAY(_update, _width, _height, _format) \
+	MCFG_DEVICE_CONFIG_DATAPTR(laserdisc_config, overupdate, VIDEO_UPDATE_NAME(_update)) \
+	MCFG_DEVICE_CONFIG_DATA32(laserdisc_config, overwidth, _width) \
+	MCFG_DEVICE_CONFIG_DATA32(laserdisc_config, overheight, _height) \
+	MCFG_DEVICE_CONFIG_DATA32(laserdisc_config, overformat, _format)
 
-#define MDRV_LASERDISC_OVERLAY_CLIP(_minx, _maxx, _miny, _maxy) \
-	MDRV_DEVICE_CONFIG_DATA32(laserdisc_config, overclip.min_x, _minx) \
-	MDRV_DEVICE_CONFIG_DATA32(laserdisc_config, overclip.max_x, _maxx) \
-	MDRV_DEVICE_CONFIG_DATA32(laserdisc_config, overclip.min_y, _miny) \
-	MDRV_DEVICE_CONFIG_DATA32(laserdisc_config, overclip.max_y, _maxy)
+#define MCFG_LASERDISC_OVERLAY_CLIP(_minx, _maxx, _miny, _maxy) \
+	MCFG_DEVICE_CONFIG_DATA32(laserdisc_config, overclip.min_x, _minx) \
+	MCFG_DEVICE_CONFIG_DATA32(laserdisc_config, overclip.max_x, _maxx) \
+	MCFG_DEVICE_CONFIG_DATA32(laserdisc_config, overclip.min_y, _miny) \
+	MCFG_DEVICE_CONFIG_DATA32(laserdisc_config, overclip.max_y, _maxy)
 
-#define MDRV_LASERDISC_OVERLAY_POSITION(_posx, _posy) \
-	MDRV_DEVICE_CONFIG_DATAFP32(laserdisc_config, overposx, _posx, 24) \
-	MDRV_DEVICE_CONFIG_DATAFP32(laserdisc_config, overposy, _posy, 24)
+#define MCFG_LASERDISC_OVERLAY_POSITION(_posx, _posy) \
+	MCFG_DEVICE_CONFIG_DATAFP32(laserdisc_config, overposx, _posx, 24) \
+	MCFG_DEVICE_CONFIG_DATAFP32(laserdisc_config, overposy, _posy, 24)
 
-#define MDRV_LASERDISC_OVERLAY_SCALE(_scalex, _scaley) \
-	MDRV_DEVICE_CONFIG_DATAFP32(laserdisc_config, overscalex, _scalex, 24) \
-	MDRV_DEVICE_CONFIG_DATAFP32(laserdisc_config, overscaley, _scaley, 24)
+#define MCFG_LASERDISC_OVERLAY_SCALE(_scalex, _scaley) \
+	MCFG_DEVICE_CONFIG_DATAFP32(laserdisc_config, overscalex, _scalex, 24) \
+	MCFG_DEVICE_CONFIG_DATAFP32(laserdisc_config, overscaley, _scaley, 24)
 
 
 /* use these to add laserdisc screens with proper video update parameters */
-#define MDRV_LASERDISC_SCREEN_ADD_NTSC(_tag, _overlayformat) \
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_SELF_RENDER) \
-	MDRV_VIDEO_UPDATE(laserdisc) \
+#define MCFG_LASERDISC_SCREEN_ADD_NTSC(_tag, _overlayformat) \
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_SELF_RENDER) \
+	MCFG_VIDEO_UPDATE(laserdisc) \
 	\
-	MDRV_SCREEN_ADD(_tag, RASTER) \
-	MDRV_SCREEN_FORMAT(_overlayformat) \
-	MDRV_SCREEN_RAW_PARAMS(XTAL_14_31818MHz*2, 910, 0, 704, 525, 44, 524) \
+	MCFG_SCREEN_ADD(_tag, RASTER) \
+	MCFG_SCREEN_FORMAT(_overlayformat) \
+	MCFG_SCREEN_RAW_PARAMS(XTAL_14_31818MHz*2, 910, 0, 704, 525, 44, 524) \
 
 /* not correct yet; fix me... */
-#define MDRV_LASERDISC_SCREEN_ADD_PAL(_tag, _format) \
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_SELF_RENDER) \
-	MDRV_VIDEO_UPDATE(laserdisc) \
+#define MCFG_LASERDISC_SCREEN_ADD_PAL(_tag, _format) \
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_SELF_RENDER) \
+	MCFG_VIDEO_UPDATE(laserdisc) \
 	\
-	MDRV_SCREEN_ADD(_tag, RASTER) \
-	MDRV_SCREEN_FORMAT(_format) \
-	MDRV_SCREEN_RAW_PARAMS(XTAL_14_31818MHz, 910, 0, 704, 525.0/2, 0, 480/2) \
+	MCFG_SCREEN_ADD(_tag, RASTER) \
+	MCFG_SCREEN_FORMAT(_format) \
+	MCFG_SCREEN_RAW_PARAMS(XTAL_14_31818MHz, 910, 0, 704, 525.0/2, 0, 480/2) \
 
 
 

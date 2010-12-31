@@ -156,44 +156,44 @@ static const z80_daisy_config daisy_chain[] =
 static MACHINE_CONFIG_START( cchasm, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000,CCHASM_68K_CLOCK)	/* 8 MHz (from schematics) */
-	MDRV_CPU_PROGRAM_MAP(memmap)
+	MCFG_CPU_ADD("maincpu", M68000,CCHASM_68K_CLOCK)	/* 8 MHz (from schematics) */
+	MCFG_CPU_PROGRAM_MAP(memmap)
 
-	MDRV_CPU_ADD("audiocpu", Z80,3584229)		/* 3.58  MHz (from schematics) */
-	MDRV_CPU_CONFIG(daisy_chain)
-	MDRV_CPU_PROGRAM_MAP(sound_memmap)
-	MDRV_CPU_IO_MAP(sound_portmap)
+	MCFG_CPU_ADD("audiocpu", Z80,3584229)		/* 3.58  MHz (from schematics) */
+	MCFG_CPU_CONFIG(daisy_chain)
+	MCFG_CPU_PROGRAM_MAP(sound_memmap)
+	MCFG_CPU_IO_MAP(sound_portmap)
 
-	MDRV_Z80CTC_ADD("ctc", 3584229 /* same as "audiocpu" */, cchasm_ctc_intf)
+	MCFG_Z80CTC_ADD("ctc", 3584229 /* same as "audiocpu" */, cchasm_ctc_intf)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", VECTOR)
-	MDRV_SCREEN_REFRESH_RATE(40)
-	MDRV_SCREEN_SIZE(400, 300)
-	MDRV_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 768-1)
+	MCFG_SCREEN_ADD("screen", VECTOR)
+	MCFG_SCREEN_REFRESH_RATE(40)
+	MCFG_SCREEN_SIZE(400, 300)
+	MCFG_SCREEN_VISIBLE_AREA(0, 1024-1, 0, 768-1)
 
-	MDRV_VIDEO_START(cchasm)
-	MDRV_VIDEO_UPDATE(vector)
+	MCFG_VIDEO_START(cchasm)
+	MCFG_VIDEO_UPDATE(vector)
 
 	/* sound hardware */
-	MDRV_SOUND_START(cchasm)
+	MCFG_SOUND_START(cchasm)
 
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay1", AY8910, 1818182)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_SOUND_ADD("ay1", AY8910, 1818182)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MDRV_SOUND_ADD("ay2", AY8910, 1818182)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_SOUND_ADD("ay2", AY8910, 1818182)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MDRV_SOUND_ADD("dac1", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("dac1", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD("dac2", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("dac2", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
 	/* 6840 PTM */
-	MDRV_PTM6840_ADD("6840ptm", cchasm_6840_intf)
+	MCFG_PTM6840_ADD("6840ptm", cchasm_6840_intf)
 MACHINE_CONFIG_END
 
 

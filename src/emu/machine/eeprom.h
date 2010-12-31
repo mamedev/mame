@@ -17,20 +17,20 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MDRV_EEPROM_ADD(_tag, _interface) \
-	MDRV_DEVICE_ADD(_tag, EEPROM, 0) \
+#define MCFG_EEPROM_ADD(_tag, _interface) \
+	MCFG_DEVICE_ADD(_tag, EEPROM, 0) \
 	eeprom_device_config::static_set_interface(device, _interface); \
 
-#define MDRV_EEPROM_93C46_ADD(_tag) \
-	MDRV_EEPROM_ADD(_tag, eeprom_interface_93C46)
+#define MCFG_EEPROM_93C46_ADD(_tag) \
+	MCFG_EEPROM_ADD(_tag, eeprom_interface_93C46)
 
-#define MDRV_EEPROM_93C66B_ADD(_tag) \
-	MDRV_EEPROM_ADD(_tag, eeprom_interface_93C66B)
+#define MCFG_EEPROM_93C66B_ADD(_tag) \
+	MCFG_EEPROM_ADD(_tag, eeprom_interface_93C66B)
 
-#define MDRV_EEPROM_DATA(_data, _size) \
+#define MCFG_EEPROM_DATA(_data, _size) \
 	eeprom_device_config::static_set_default_data(device, _data, _size); \
 
-#define MDRV_EEPROM_DEFAULT_VALUE(_value) \
+#define MCFG_EEPROM_DEFAULT_VALUE(_value) \
 	eeprom_device_config::static_set_default_value(device, _value); \
 
 

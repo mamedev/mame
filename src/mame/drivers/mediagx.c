@@ -1101,53 +1101,53 @@ static const struct pit8253_config mediagx_pit8254_config =
 static MACHINE_CONFIG_START( mediagx, mediagx_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", MEDIAGX, 166000000)
-	MDRV_CPU_PROGRAM_MAP(mediagx_map)
-	MDRV_CPU_IO_MAP(mediagx_io)
+	MCFG_CPU_ADD("maincpu", MEDIAGX, 166000000)
+	MCFG_CPU_PROGRAM_MAP(mediagx_map)
+	MCFG_CPU_IO_MAP(mediagx_io)
 
-	MDRV_MACHINE_START(mediagx)
-	MDRV_MACHINE_RESET(mediagx)
+	MCFG_MACHINE_START(mediagx)
+	MCFG_MACHINE_RESET(mediagx)
 
-	MDRV_PCI_BUS_ADD("pcibus", 0)
-	MDRV_PCI_BUS_DEVICE(18, NULL, cx5510_pci_r, cx5510_pci_w)
+	MCFG_PCI_BUS_ADD("pcibus", 0)
+	MCFG_PCI_BUS_DEVICE(18, NULL, cx5510_pci_r, cx5510_pci_w)
 
-	MDRV_PIT8254_ADD( "pit8254", mediagx_pit8254_config )
+	MCFG_PIT8254_ADD( "pit8254", mediagx_pit8254_config )
 
-	MDRV_I8237_ADD( "dma8237_1", XTAL_14_31818MHz/3, dma8237_1_config )
+	MCFG_I8237_ADD( "dma8237_1", XTAL_14_31818MHz/3, dma8237_1_config )
 
-	MDRV_I8237_ADD( "dma8237_2", XTAL_14_31818MHz/3, dma8237_2_config )
+	MCFG_I8237_ADD( "dma8237_2", XTAL_14_31818MHz/3, dma8237_2_config )
 
-	MDRV_PIC8259_ADD( "pic8259_master", mediagx_pic8259_1_config )
+	MCFG_PIC8259_ADD( "pic8259_master", mediagx_pic8259_1_config )
 
-	MDRV_PIC8259_ADD( "pic8259_slave", mediagx_pic8259_2_config )
+	MCFG_PIC8259_ADD( "pic8259_slave", mediagx_pic8259_2_config )
 
-	MDRV_IDE_CONTROLLER_ADD("ide", ide_interrupt)
+	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt)
 
-	MDRV_TIMER_ADD("sound_timer", sound_timer_callback)
+	MCFG_TIMER_ADD("sound_timer", sound_timer_callback)
 
-	MDRV_MC146818_ADD( "rtc", MC146818_STANDARD )
+	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(640, 480)
-	MDRV_SCREEN_VISIBLE_AREA(0, 639, 0, 239)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_SIZE(640, 480)
+	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 239)
 
-	MDRV_GFXDECODE(CGA)
-	MDRV_PALETTE_LENGTH(16)
+	MCFG_GFXDECODE(CGA)
+	MCFG_PALETTE_LENGTH(16)
 
-	MDRV_VIDEO_START(mediagx)
-	MDRV_VIDEO_UPDATE(mediagx)
+	MCFG_VIDEO_START(mediagx)
+	MCFG_VIDEO_UPDATE(mediagx)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("dac1", DMADAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ADD("dac1", DMADAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 
-	MDRV_SOUND_ADD("dac2", DMADAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("dac2", DMADAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 static void set_gate_a20(running_machine *machine, int a20)

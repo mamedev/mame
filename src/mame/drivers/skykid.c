@@ -428,40 +428,40 @@ static const namco_interface namco_config =
 static MACHINE_CONFIG_START( skykid, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6809,49152000/32)
-	MDRV_CPU_PROGRAM_MAP(skykid_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
+	MCFG_CPU_ADD("maincpu", M6809,49152000/32)
+	MCFG_CPU_PROGRAM_MAP(skykid_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_assert)
 
-	MDRV_CPU_ADD("mcu", HD63701,49152000/8)	/* or compatible 6808 with extra instructions */
-	MDRV_CPU_PROGRAM_MAP(mcu_map)
-	MDRV_CPU_IO_MAP(mcu_port_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
+	MCFG_CPU_ADD("mcu", HD63701,49152000/8)	/* or compatible 6808 with extra instructions */
+	MCFG_CPU_PROGRAM_MAP(mcu_map)
+	MCFG_CPU_IO_MAP(mcu_port_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_assert)
 
-	MDRV_QUANTUM_TIME(HZ(6000))	/* we need heavy synch */
+	MCFG_QUANTUM_TIME(HZ(6000))	/* we need heavy synch */
 
-	MDRV_MACHINE_START(skykid)
+	MCFG_MACHINE_START(skykid)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60.606060)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(36*8, 28*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60.606060)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(36*8, 28*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
 
-	MDRV_GFXDECODE(skykid)
-	MDRV_PALETTE_LENGTH(64*4+128*4+64*8)
+	MCFG_GFXDECODE(skykid)
+	MCFG_PALETTE_LENGTH(64*4+128*4+64*8)
 
-	MDRV_PALETTE_INIT(skykid)
-	MDRV_VIDEO_START(skykid)
-	MDRV_VIDEO_UPDATE(skykid)
+	MCFG_PALETTE_INIT(skykid)
+	MCFG_VIDEO_START(skykid)
+	MCFG_VIDEO_UPDATE(skykid)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("namco", NAMCO_CUS30, 49152000/2048)
-	MDRV_SOUND_CONFIG(namco_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("namco", NAMCO_CUS30, 49152000/2048)
+	MCFG_SOUND_CONFIG(namco_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 

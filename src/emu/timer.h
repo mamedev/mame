@@ -76,31 +76,31 @@ struct timer_execution_state
 //  TIMER DEVICE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MDRV_TIMER_ADD(_tag, _callback) \
-	MDRV_DEVICE_ADD(_tag, TIMER, 0) \
+#define MCFG_TIMER_ADD(_tag, _callback) \
+	MCFG_DEVICE_ADD(_tag, TIMER, 0) \
 	timer_device_config::static_configure_generic(device, _callback); \
 
-#define MDRV_TIMER_ADD_PERIODIC(_tag, _callback, _period) \
-	MDRV_DEVICE_ADD(_tag, TIMER, 0) \
+#define MCFG_TIMER_ADD_PERIODIC(_tag, _callback, _period) \
+	MCFG_DEVICE_ADD(_tag, TIMER, 0) \
 	timer_device_config::static_configure_periodic(device, _callback, ATTOTIME_IN_##_period); \
 
-#define MDRV_TIMER_ADD_SCANLINE(_tag, _callback, _screen, _first_vpos, _increment) \
-	MDRV_DEVICE_ADD(_tag, TIMER, 0) \
+#define MCFG_TIMER_ADD_SCANLINE(_tag, _callback, _screen, _first_vpos, _increment) \
+	MCFG_DEVICE_ADD(_tag, TIMER, 0) \
 	timer_device_config::static_configure_scanline(device, _callback, _screen, _first_vpos, _increment); \
 
-#define MDRV_TIMER_MODIFY(_tag) \
-	MDRV_DEVICE_MODIFY(_tag)
+#define MCFG_TIMER_MODIFY(_tag) \
+	MCFG_DEVICE_MODIFY(_tag)
 
-#define MDRV_TIMER_CALLBACK(_callback) \
+#define MCFG_TIMER_CALLBACK(_callback) \
 	timer_device_config::static_set_callback(device, _callback); \
 
-#define MDRV_TIMER_START_DELAY(_start_delay) \
+#define MCFG_TIMER_START_DELAY(_start_delay) \
 	timer_device_config::static_set_start_delay(device, ATTOTIME_IN_##_start_delay); \
 
-#define MDRV_TIMER_PARAM(_param) \
+#define MCFG_TIMER_PARAM(_param) \
 	timer_device_config::static_set_param(device, _param); \
 
-#define MDRV_TIMER_PTR(_ptr) \
+#define MCFG_TIMER_PTR(_ptr) \
 	timer_device_config::static_set_ptr(device, (void *)(_ptr)); \
 
 

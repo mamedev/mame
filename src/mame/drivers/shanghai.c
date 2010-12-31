@@ -427,109 +427,109 @@ static const hd63484_interface shanghai_hd63484_intf = { 0 };
 static MACHINE_CONFIG_START( shanghai, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", V30,16000000/2)	/* ? */
-	MDRV_CPU_PROGRAM_MAP(shanghai_map)
-	MDRV_CPU_IO_MAP(shanghai_portmap)
-	MDRV_CPU_VBLANK_INT("screen", shanghai_interrupt)
+	MCFG_CPU_ADD("maincpu", V30,16000000/2)	/* ? */
+	MCFG_CPU_PROGRAM_MAP(shanghai_map)
+	MCFG_CPU_IO_MAP(shanghai_portmap)
+	MCFG_CPU_VBLANK_INT("screen", shanghai_interrupt)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(30)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(384, 280)
-	MDRV_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1) // Base Screen is 384 pixel
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(30)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(384, 280)
+	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1) // Base Screen is 384 pixel
 
-	MDRV_PALETTE_LENGTH(256)
+	MCFG_PALETTE_LENGTH(256)
 
-	MDRV_PALETTE_INIT(shanghai)
-	MDRV_VIDEO_START(shanghai)
-	MDRV_VIDEO_UPDATE(shanghai)
+	MCFG_PALETTE_INIT(shanghai)
+	MCFG_VIDEO_START(shanghai)
+	MCFG_VIDEO_UPDATE(shanghai)
 
-	MDRV_HD63484_ADD("hd63484", shanghai_hd63484_intf)
+	MCFG_HD63484_ADD("hd63484", shanghai_hd63484_intf)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, 16000000/4)
-	MDRV_SOUND_CONFIG(sh_ym2203_interface)
-	MDRV_SOUND_ROUTE(0, "mono", 0.15)
-	MDRV_SOUND_ROUTE(1, "mono", 0.15)
-	MDRV_SOUND_ROUTE(2, "mono", 0.15)
-	MDRV_SOUND_ROUTE(3, "mono", 0.80)
+	MCFG_SOUND_ADD("ymsnd", YM2203, 16000000/4)
+	MCFG_SOUND_CONFIG(sh_ym2203_interface)
+	MCFG_SOUND_ROUTE(0, "mono", 0.15)
+	MCFG_SOUND_ROUTE(1, "mono", 0.15)
+	MCFG_SOUND_ROUTE(2, "mono", 0.15)
+	MCFG_SOUND_ROUTE(3, "mono", 0.80)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( shangha2, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", V30,16000000/2)	/* ? */
-	MDRV_CPU_PROGRAM_MAP(shangha2_map)
-	MDRV_CPU_IO_MAP(shangha2_portmap)
-	MDRV_CPU_VBLANK_INT("screen", shanghai_interrupt)
+	MCFG_CPU_ADD("maincpu", V30,16000000/2)	/* ? */
+	MCFG_CPU_PROGRAM_MAP(shangha2_map)
+	MCFG_CPU_IO_MAP(shangha2_portmap)
+	MCFG_CPU_VBLANK_INT("screen", shanghai_interrupt)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(30)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(384, 280)
-	MDRV_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1) // Base Screen is 384 pixel
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(30)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(384, 280)
+	MCFG_SCREEN_VISIBLE_AREA(0, 384-1, 0, 280-1) // Base Screen is 384 pixel
 
-	MDRV_PALETTE_LENGTH(256)
+	MCFG_PALETTE_LENGTH(256)
 
-	MDRV_VIDEO_START(shanghai)
-	MDRV_VIDEO_UPDATE(shanghai)
+	MCFG_VIDEO_START(shanghai)
+	MCFG_VIDEO_UPDATE(shanghai)
 
-	MDRV_HD63484_ADD("hd63484", shanghai_hd63484_intf)
+	MCFG_HD63484_ADD("hd63484", shanghai_hd63484_intf)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, 16000000/4)
-	MDRV_SOUND_CONFIG(sh_ym2203_interface)
-	MDRV_SOUND_ROUTE(0, "mono", 0.15)
-	MDRV_SOUND_ROUTE(1, "mono", 0.15)
-	MDRV_SOUND_ROUTE(2, "mono", 0.15)
-	MDRV_SOUND_ROUTE(3, "mono", 0.80)
+	MCFG_SOUND_ADD("ymsnd", YM2203, 16000000/4)
+	MCFG_SOUND_CONFIG(sh_ym2203_interface)
+	MCFG_SOUND_ROUTE(0, "mono", 0.15)
+	MCFG_SOUND_ROUTE(1, "mono", 0.15)
+	MCFG_SOUND_ROUTE(2, "mono", 0.15)
+	MCFG_SOUND_ROUTE(3, "mono", 0.80)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( kothello, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", V30,16000000/2)	/* ? */
-	MDRV_CPU_PROGRAM_MAP(kothello_map)
-	MDRV_CPU_VBLANK_INT("screen", shanghai_interrupt)
+	MCFG_CPU_ADD("maincpu", V30,16000000/2)	/* ? */
+	MCFG_CPU_PROGRAM_MAP(kothello_map)
+	MCFG_CPU_VBLANK_INT("screen", shanghai_interrupt)
 
 	SEIBU3A_SOUND_SYSTEM_CPU(14318180/4)
 
-	MDRV_QUANTUM_TIME(HZ(12000))
+	MCFG_QUANTUM_TIME(HZ(12000))
 
-	MDRV_MACHINE_RESET(seibu_sound)
+	MCFG_MACHINE_RESET(seibu_sound)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(30)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(384, 280)
-	MDRV_SCREEN_VISIBLE_AREA(8, 384-1, 0, 250-1) // Base Screen is 376 pixel
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(30)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(384, 280)
+	MCFG_SCREEN_VISIBLE_AREA(8, 384-1, 0, 250-1) // Base Screen is 376 pixel
 
-	MDRV_PALETTE_LENGTH(256)
+	MCFG_PALETTE_LENGTH(256)
 
-	MDRV_VIDEO_START(shanghai)
-	MDRV_VIDEO_UPDATE(shanghai)
+	MCFG_VIDEO_START(shanghai)
+	MCFG_VIDEO_UPDATE(shanghai)
 
-	MDRV_HD63484_ADD("hd63484", shanghai_hd63484_intf)
+	MCFG_HD63484_ADD("hd63484", shanghai_hd63484_intf)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	/* same as standard seibu ym2203, but "ym1" also reads "DSW" */
-	MDRV_SOUND_ADD("ym1", YM2203, 14318180/4)
-	MDRV_SOUND_CONFIG(kothello_ym2203_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	MCFG_SOUND_ADD("ym1", YM2203, 14318180/4)
+	MCFG_SOUND_CONFIG(kothello_ym2203_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MDRV_SOUND_ADD("ym2", YM2203, 14318180/4)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	MCFG_SOUND_ADD("ym2", YM2203, 14318180/4)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
 	SEIBU_SOUND_SYSTEM_ADPCM_INTERFACE
 MACHINE_CONFIG_END

@@ -609,35 +609,35 @@ static const adsp21xx_config adsp_config =
 
 /* Basic DCS system with ADSP-2105 and 2k of SRAM (T-unit, V-unit, Killer Instinct) */
 MACHINE_CONFIG_FRAGMENT( dcs_audio_2k )
-	MDRV_CPU_ADD("dcs", ADSP2105, XTAL_10MHz)
-	MDRV_ADSP21XX_CONFIG(adsp_config)
-	MDRV_CPU_PROGRAM_MAP(dcs_2k_program_map)
-	MDRV_CPU_DATA_MAP(dcs_2k_data_map)
+	MCFG_CPU_ADD("dcs", ADSP2105, XTAL_10MHz)
+	MCFG_ADSP21XX_CONFIG(adsp_config)
+	MCFG_CPU_PROGRAM_MAP(dcs_2k_program_map)
+	MCFG_CPU_DATA_MAP(dcs_2k_data_map)
 
-	MDRV_TIMER_ADD("dcs_reg_timer", dcs_irq)
-	MDRV_TIMER_ADD("dcs_int_timer", internal_timer_callback)
+	MCFG_TIMER_ADD("dcs_reg_timer", dcs_irq)
+	MCFG_TIMER_ADD("dcs_int_timer", internal_timer_callback)
 
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("dac", DMADAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("dac", DMADAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 /* Basic DCS system with ADSP-2105 and 2k of SRAM, using a UART for communications (X-unit) */
 MACHINE_CONFIG_DERIVED( dcs_audio_2k_uart, dcs_audio_2k )
 
-	MDRV_CPU_MODIFY("dcs")
-	MDRV_CPU_DATA_MAP(dcs_2k_uart_data_map)
+	MCFG_CPU_MODIFY("dcs")
+	MCFG_CPU_DATA_MAP(dcs_2k_uart_data_map)
 MACHINE_CONFIG_END
 
 
 /* Basic DCS system with ADSP-2105 and 8k of SRAM (Wolf-unit) */
 MACHINE_CONFIG_DERIVED( dcs_audio_8k, dcs_audio_2k )
 
-	MDRV_CPU_MODIFY("dcs")
-	MDRV_CPU_PROGRAM_MAP(dcs_8k_program_map)
-	MDRV_CPU_DATA_MAP(dcs_8k_data_map)
+	MCFG_CPU_MODIFY("dcs")
+	MCFG_CPU_PROGRAM_MAP(dcs_8k_program_map)
+	MCFG_CPU_DATA_MAP(dcs_8k_data_map)
 MACHINE_CONFIG_END
 
 
@@ -649,31 +649,31 @@ MACHINE_CONFIG_END
  *************************************/
 
 MACHINE_CONFIG_FRAGMENT( dcs2_audio_2115 )
-	MDRV_CPU_ADD("dcs2", ADSP2115, XTAL_16MHz)
-	MDRV_ADSP21XX_CONFIG(adsp_config)
-	MDRV_CPU_PROGRAM_MAP(dcs2_2115_program_map)
-	MDRV_CPU_DATA_MAP(dcs2_2115_data_map)
+	MCFG_CPU_ADD("dcs2", ADSP2115, XTAL_16MHz)
+	MCFG_ADSP21XX_CONFIG(adsp_config)
+	MCFG_CPU_PROGRAM_MAP(dcs2_2115_program_map)
+	MCFG_CPU_DATA_MAP(dcs2_2115_data_map)
 
-	MDRV_TIMER_ADD("dcs_reg_timer", dcs_irq)
-	MDRV_TIMER_ADD("dcs_sport_timer", sport0_irq)
-	MDRV_TIMER_ADD("dcs_int_timer", internal_timer_callback)
-	MDRV_TIMER_ADD("dcs_hle_timer", transfer_watchdog_callback)
+	MCFG_TIMER_ADD("dcs_reg_timer", dcs_irq)
+	MCFG_TIMER_ADD("dcs_sport_timer", sport0_irq)
+	MCFG_TIMER_ADD("dcs_int_timer", internal_timer_callback)
+	MCFG_TIMER_ADD("dcs_hle_timer", transfer_watchdog_callback)
 
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("dac1", DMADAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("dac1", DMADAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MDRV_SOUND_ADD("dac2", DMADAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ADD("dac2", DMADAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_DERIVED( dcs2_audio_2104, dcs2_audio_2115 )
-	MDRV_CPU_REPLACE("dcs2", ADSP2104, XTAL_16MHz)
-	MDRV_ADSP21XX_CONFIG(adsp_config)
-	MDRV_CPU_PROGRAM_MAP(dcs2_2104_program_map)
-	MDRV_CPU_DATA_MAP(dcs2_2104_data_map)
+	MCFG_CPU_REPLACE("dcs2", ADSP2104, XTAL_16MHz)
+	MCFG_ADSP21XX_CONFIG(adsp_config)
+	MCFG_CPU_PROGRAM_MAP(dcs2_2104_program_map)
+	MCFG_CPU_DATA_MAP(dcs2_2104_data_map)
 MACHINE_CONFIG_END
 
 
@@ -685,19 +685,19 @@ MACHINE_CONFIG_END
  *************************************/
 
 MACHINE_CONFIG_FRAGMENT( dcs2_audio_dsio )
-	MDRV_CPU_ADD("dsio", ADSP2181, XTAL_32MHz)
-	MDRV_ADSP21XX_CONFIG(adsp_config)
-	MDRV_CPU_PROGRAM_MAP(dsio_program_map)
-	MDRV_CPU_DATA_MAP(dsio_data_map)
-	MDRV_CPU_IO_MAP(dsio_io_map)
+	MCFG_CPU_ADD("dsio", ADSP2181, XTAL_32MHz)
+	MCFG_ADSP21XX_CONFIG(adsp_config)
+	MCFG_CPU_PROGRAM_MAP(dsio_program_map)
+	MCFG_CPU_DATA_MAP(dsio_data_map)
+	MCFG_CPU_IO_MAP(dsio_io_map)
 
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("dac1", DMADAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("dac1", DMADAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MDRV_SOUND_ADD("dac2", DMADAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ADD("dac2", DMADAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -709,31 +709,31 @@ MACHINE_CONFIG_END
  *************************************/
 
 MACHINE_CONFIG_FRAGMENT( dcs2_audio_denver )
-	MDRV_CPU_ADD("denver", ADSP2181, XTAL_33_333MHz)
-	MDRV_ADSP21XX_CONFIG(adsp_config)
-	MDRV_CPU_PROGRAM_MAP(denver_program_map)
-	MDRV_CPU_DATA_MAP(denver_data_map)
-	MDRV_CPU_IO_MAP(denver_io_map)
+	MCFG_CPU_ADD("denver", ADSP2181, XTAL_33_333MHz)
+	MCFG_ADSP21XX_CONFIG(adsp_config)
+	MCFG_CPU_PROGRAM_MAP(denver_program_map)
+	MCFG_CPU_DATA_MAP(denver_data_map)
+	MCFG_CPU_IO_MAP(denver_io_map)
 
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("dac1", DMADAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("dac1", DMADAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MDRV_SOUND_ADD("dac2", DMADAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ADD("dac2", DMADAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 
-	MDRV_SOUND_ADD("dac3", DMADAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("dac3", DMADAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MDRV_SOUND_ADD("dac4", DMADAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ADD("dac4", DMADAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 
-	MDRV_SOUND_ADD("dac5", DMADAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("dac5", DMADAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MDRV_SOUND_ADD("dac6", DMADAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ADD("dac6", DMADAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 MACHINE_CONFIG_END
 
 

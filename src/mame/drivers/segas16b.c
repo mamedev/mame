@@ -3271,49 +3271,49 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( system16b, segas1x_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, MASTER_CLOCK_10MHz)
-	MDRV_CPU_PROGRAM_MAP(system16b_map)
-	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
+	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK_10MHz)
+	MCFG_CPU_PROGRAM_MAP(system16b_map)
+	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold)
 
-	MDRV_CPU_ADD("soundcpu", Z80, MASTER_CLOCK_10MHz/2)
-	MDRV_CPU_PROGRAM_MAP(sound_map)
-	MDRV_CPU_IO_MAP(sound_portmap)
+	MCFG_CPU_ADD("soundcpu", Z80, MASTER_CLOCK_10MHz/2)
+	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_CPU_IO_MAP(sound_portmap)
 
-	MDRV_MACHINE_RESET(system16b)
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_MACHINE_RESET(system16b)
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MDRV_GFXDECODE(segas16b)
-	MDRV_PALETTE_LENGTH(2048*3)
+	MCFG_GFXDECODE(segas16b)
+	MCFG_PALETTE_LENGTH(2048*3)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(MASTER_CLOCK_25MHz/4, 400, 0, 320, 262, 0, 224)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_RAW_PARAMS(MASTER_CLOCK_25MHz/4, 400, 0, 320, 262, 0, 224)
 
-	MDRV_VIDEO_START(system16b)
-	MDRV_VIDEO_UPDATE(system16b)
+	MCFG_VIDEO_START(system16b)
+	MCFG_VIDEO_UPDATE(system16b)
 
-	MDRV_SEGA16SP_ADD_16B("segaspr1")
+	MCFG_SEGA16SP_ADD_16B("segaspr1")
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2151, MASTER_CLOCK_8MHz/2)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.43)
+	MCFG_SOUND_ADD("ymsnd", YM2151, MASTER_CLOCK_8MHz/2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.43)
 
-	MDRV_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
-	MDRV_SOUND_CONFIG(upd7759_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.48)
+	MCFG_SOUND_ADD("upd", UPD7759, UPD7759_STANDARD_CLOCK)
+	MCFG_SOUND_CONFIG(upd7759_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.48)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( system16b_8751, system16b )
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_VBLANK_INT("screen", i8751_main_cpu_vblank)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_VBLANK_INT("screen", i8751_main_cpu_vblank)
 
-	MDRV_CPU_ADD("mcu", I8751, MASTER_CLOCK_8MHz)
-	MDRV_CPU_IO_MAP(mcu_io_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_pulse)
+	MCFG_CPU_ADD("mcu", I8751, MASTER_CLOCK_8MHz)
+	MCFG_CPU_IO_MAP(mcu_io_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_pulse)
 MACHINE_CONFIG_END
 
 /* same as the above, but with custom Sega ICs */
@@ -3325,16 +3325,16 @@ static const ic_315_5250_interface sys16b_5250_intf =
 
 static MACHINE_CONFIG_DERIVED( system16b_5248, system16b )
 
-	MDRV_315_5248_ADD("315_5248")
-	MDRV_315_5250_ADD("315_5250_1", sys16b_5250_intf)
-	MDRV_315_5250_ADD("315_5250_2", sys16b_5250_intf)
+	MCFG_315_5248_ADD("315_5248")
+	MCFG_315_5250_ADD("315_5250_1", sys16b_5250_intf)
+	MCFG_315_5250_ADD("315_5250_2", sys16b_5250_intf)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( system16b_8751_5248, system16b_8751 )
 
-	MDRV_315_5248_ADD("315_5248")
-	MDRV_315_5250_ADD("315_5250_1", sys16b_5250_intf)
-	MDRV_315_5250_ADD("315_5250_2", sys16b_5250_intf)
+	MCFG_315_5248_ADD("315_5248")
+	MCFG_315_5250_ADD("315_5250_1", sys16b_5250_intf)
+	MCFG_315_5250_ADD("315_5250_2", sys16b_5250_intf)
 MACHINE_CONFIG_END
 
 
@@ -3348,21 +3348,21 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( atomicp, system16b ) /* 10MHz CPU Clock verified */
 
 	/* basic machine hardware */
-	MDRV_DEVICE_REMOVE("soundcpu")
+	MCFG_DEVICE_REMOVE("soundcpu")
 
-	MDRV_MACHINE_START(atomicp)
-	MDRV_TIMER_ADD_PERIODIC("atomicp_timer", atomicp_sound_irq, HZ(10000))
+	MCFG_MACHINE_START(atomicp)
+	MCFG_TIMER_ADD_PERIODIC("atomicp_timer", atomicp_sound_irq, HZ(10000))
 
 	/* sound hardware */
-	MDRV_SOUND_REPLACE("ymsnd", YM2413, XTAL_20MHz/4) /* 20MHz OSC divided by 4 (verified) */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_REPLACE("ymsnd", YM2413, XTAL_20MHz/4) /* 20MHz OSC divided by 4 (verified) */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_DEVICE_REMOVE("upd")
+	MCFG_DEVICE_REMOVE("upd")
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( timescan, system16b )
-	MDRV_VIDEO_START(timscanr)
+	MCFG_VIDEO_START(timscanr)
 MACHINE_CONFIG_END
 
 
@@ -7149,14 +7149,14 @@ static MACHINE_RESET( isgsm )
 static MACHINE_CONFIG_DERIVED( isgsm, system16b )
 	/* basic machine hardware */
 
-	MDRV_DEVICE_REMOVE("maincpu")
+	MCFG_DEVICE_REMOVE("maincpu")
 
-	MDRV_CPU_ADD("maincpu", M68000, 16000000) // no obvious CPU, but seems to be clocked faster than an original system16 based on the boot times
-	MDRV_CPU_PROGRAM_MAP(isgsm_map)
-	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
+	MCFG_CPU_ADD("maincpu", M68000, 16000000) // no obvious CPU, but seems to be clocked faster than an original system16 based on the boot times
+	MCFG_CPU_PROGRAM_MAP(isgsm_map)
+	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold)
 
-	MDRV_MACHINE_START(isgsm)
-	MDRV_MACHINE_RESET(isgsm)
+	MCFG_MACHINE_START(isgsm)
+	MCFG_MACHINE_RESET(isgsm)
 
 MACHINE_CONFIG_END
 

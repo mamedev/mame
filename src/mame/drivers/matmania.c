@@ -311,44 +311,44 @@ static MACHINE_START( matmania )
 static MACHINE_CONFIG_START( matmania, matmania_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6502, 1500000)	/* 1.5 MHz ???? */
-	MDRV_CPU_PROGRAM_MAP(matmania_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("maincpu", M6502, 1500000)	/* 1.5 MHz ???? */
+	MCFG_CPU_PROGRAM_MAP(matmania_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audiocpu", M6502, 1200000)	/* 1.2 MHz ???? */
-	MDRV_CPU_PROGRAM_MAP(matmania_sound_map)
-	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,15)	/* ???? */
+	MCFG_CPU_ADD("audiocpu", M6502, 1200000)	/* 1.2 MHz ???? */
+	MCFG_CPU_PROGRAM_MAP(matmania_sound_map)
+	MCFG_CPU_VBLANK_INT_HACK(nmi_line_pulse,15)	/* ???? */
 								/* IRQs are caused by the main CPU */
-	MDRV_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(HZ(600))
 
-	MDRV_MACHINE_START(matmania)
+	MCFG_MACHINE_START(matmania)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 
-	MDRV_GFXDECODE(matmania)
-	MDRV_PALETTE_LENGTH(64+16)
+	MCFG_GFXDECODE(matmania)
+	MCFG_PALETTE_LENGTH(64+16)
 
-	MDRV_PALETTE_INIT(matmania)
-	MDRV_VIDEO_START(matmania)
-	MDRV_VIDEO_UPDATE(matmania)
+	MCFG_PALETTE_INIT(matmania)
+	MCFG_VIDEO_START(matmania)
+	MCFG_VIDEO_UPDATE(matmania)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay1", AY8910, 1500000)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ADD("ay1", AY8910, 1500000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MDRV_SOUND_ADD("ay2", AY8910, 1500000)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ADD("ay2", AY8910, 1500000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
 
@@ -409,46 +409,46 @@ static MACHINE_RESET( maniach )
 static MACHINE_CONFIG_START( maniach, matmania_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6502, 1500000)	/* 1.5 MHz ???? */
-	MDRV_CPU_PROGRAM_MAP(maniach_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("maincpu", M6502, 1500000)	/* 1.5 MHz ???? */
+	MCFG_CPU_PROGRAM_MAP(maniach_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audiocpu", M6809, 1500000)	/* 1.5 MHz ???? */
-	MDRV_CPU_PROGRAM_MAP(maniach_sound_map)
+	MCFG_CPU_ADD("audiocpu", M6809, 1500000)	/* 1.5 MHz ???? */
+	MCFG_CPU_PROGRAM_MAP(maniach_sound_map)
 								/* IRQs are caused by the main CPU */
 
-	MDRV_CPU_ADD("mcu", M68705, 1500000*2)	/* (don't know really how fast, but it doesn't need to even be this fast) */
-	MDRV_CPU_PROGRAM_MAP(maniach_mcu_map)
+	MCFG_CPU_ADD("mcu", M68705, 1500000*2)	/* (don't know really how fast, but it doesn't need to even be this fast) */
+	MCFG_CPU_PROGRAM_MAP(maniach_mcu_map)
 
-	MDRV_QUANTUM_TIME(HZ(6000))	/* 100 CPU slice per frame - high interleaving to sync main and mcu */
+	MCFG_QUANTUM_TIME(HZ(6000))	/* 100 CPU slice per frame - high interleaving to sync main and mcu */
 
-	MDRV_MACHINE_START(maniach)
-	MDRV_MACHINE_RESET(maniach)
+	MCFG_MACHINE_START(maniach)
+	MCFG_MACHINE_RESET(maniach)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 
-	MDRV_GFXDECODE(maniach)
-	MDRV_PALETTE_LENGTH(64+16)
+	MCFG_GFXDECODE(maniach)
+	MCFG_PALETTE_LENGTH(64+16)
 
-	MDRV_PALETTE_INIT(matmania)
-	MDRV_VIDEO_START(matmania)
-	MDRV_VIDEO_UPDATE(maniach)
+	MCFG_PALETTE_INIT(matmania)
+	MCFG_VIDEO_START(matmania)
+	MCFG_VIDEO_UPDATE(maniach)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM3526, 3600000)
-	MDRV_SOUND_CONFIG(ym3526_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM3526, 3600000)
+	MCFG_SOUND_CONFIG(ym3526_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
 /*************************************

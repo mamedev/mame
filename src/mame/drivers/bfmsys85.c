@@ -435,21 +435,21 @@ ADDRESS_MAP_END
 // machine driver for system85 board //////////////////////////////////////
 
 static MACHINE_CONFIG_START( bfmsys85, driver_device )
-	MDRV_MACHINE_START(bfm_sys85)						// main system85 board initialisation
-	MDRV_MACHINE_RESET(bfm_sys85)
-	MDRV_CPU_ADD("maincpu", M6809, MASTER_CLOCK/4)			// 6809 CPU at 1 Mhz
-	MDRV_CPU_PROGRAM_MAP(memmap)						// setup read and write memorymap
-	MDRV_CPU_PERIODIC_INT(timer_irq, 1000 )				// generate 1000 IRQ's per second
+	MCFG_MACHINE_START(bfm_sys85)						// main system85 board initialisation
+	MCFG_MACHINE_RESET(bfm_sys85)
+	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/4)			// 6809 CPU at 1 Mhz
+	MCFG_CPU_PROGRAM_MAP(memmap)						// setup read and write memorymap
+	MCFG_CPU_PERIODIC_INT(timer_irq, 1000 )				// generate 1000 IRQ's per second
 
-	MDRV_ACIA6850_ADD("acia6850_0", m6809_acia_if)
+	MCFG_ACIA6850_ADD("acia6850_0", m6809_acia_if)
 
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("aysnd",AY8912, MASTER_CLOCK/4)			// add AY8912 soundchip
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("aysnd",AY8912, MASTER_CLOCK/4)			// add AY8912 soundchip
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_NVRAM_ADD_0FILL("nvram")						// load/save nv RAM
+	MCFG_NVRAM_ADD_0FILL("nvram")						// load/save nv RAM
 
-	MDRV_DEFAULT_LAYOUT(layout_awpvid16)
+	MCFG_DEFAULT_LAYOUT(layout_awpvid16)
 MACHINE_CONFIG_END
 
 // input ports for system85 board /////////////////////////////////////////

@@ -320,24 +320,24 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( mario_base, mario_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, Z80_CLOCK)	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(mario_map)
-	MDRV_CPU_IO_MAP(mario_io_map)
-	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_ADD("maincpu", Z80, Z80_CLOCK)	/* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(mario_map)
+	MCFG_CPU_IO_MAP(mario_io_map)
+	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	/* devices */
-	MDRV_Z80DMA_ADD("z80dma", Z80_CLOCK, mario_dma)
+	MCFG_Z80DMA_ADD("z80dma", Z80_CLOCK, mario_dma)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
-	MDRV_GFXDECODE(mario)
-	MDRV_PALETTE_LENGTH(512)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
+	MCFG_GFXDECODE(mario)
+	MCFG_PALETTE_LENGTH(512)
 
-	MDRV_PALETTE_INIT(mario)
-	MDRV_VIDEO_START(mario)
-	MDRV_VIDEO_UPDATE(mario)
+	MCFG_PALETTE_INIT(mario)
+	MCFG_VIDEO_START(mario)
+	MCFG_VIDEO_UPDATE(mario)
 
 MACHINE_CONFIG_END
 
@@ -346,7 +346,7 @@ static MACHINE_CONFIG_DERIVED( mario, mario_base )
 	/* basic machine hardware */
 
 	/* sound hardware */
-	MDRV_FRAGMENT_ADD(mario_audio)
+	MCFG_FRAGMENT_ADD(mario_audio)
 MACHINE_CONFIG_END
 
 
@@ -354,12 +354,12 @@ static MACHINE_CONFIG_DERIVED( masao, mario_base )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_CLOCK(4000000)        /* 4.000 MHz (?) */
-	MDRV_CPU_PROGRAM_MAP(masao_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_CLOCK(4000000)        /* 4.000 MHz (?) */
+	MCFG_CPU_PROGRAM_MAP(masao_map)
 
 	/* sound hardware */
-	MDRV_FRAGMENT_ADD(masao_audio)
+	MCFG_FRAGMENT_ADD(masao_audio)
 MACHINE_CONFIG_END
 
 

@@ -956,70 +956,70 @@ static const tms32031_config tms_config =
 static MACHINE_CONFIG_START( gaelco3d, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 15000000)
-	MDRV_CPU_PROGRAM_MAP(main_map)
-	MDRV_CPU_VBLANK_INT("screen", vblank_gen)
+	MCFG_CPU_ADD("maincpu", M68000, 15000000)
+	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_CPU_VBLANK_INT("screen", vblank_gen)
 
-	MDRV_CPU_ADD("tms", TMS32031, 60000000)
-	MDRV_CPU_CONFIG(tms_config)
-	MDRV_CPU_PROGRAM_MAP(tms_map)
+	MCFG_CPU_ADD("tms", TMS32031, 60000000)
+	MCFG_CPU_CONFIG(tms_config)
+	MCFG_CPU_PROGRAM_MAP(tms_map)
 
-	MDRV_CPU_ADD("adsp", ADSP2115, 16000000)
-	MDRV_ADSP21XX_CONFIG(adsp_config)
-	MDRV_CPU_PROGRAM_MAP(adsp_program_map)
-	MDRV_CPU_DATA_MAP(adsp_data_map)
+	MCFG_CPU_ADD("adsp", ADSP2115, 16000000)
+	MCFG_ADSP21XX_CONFIG(adsp_config)
+	MCFG_CPU_PROGRAM_MAP(adsp_program_map)
+	MCFG_CPU_DATA_MAP(adsp_data_map)
 
-	MDRV_MACHINE_START(gaelco3d)
-	MDRV_MACHINE_RESET(gaelco3d)
+	MCFG_MACHINE_START(gaelco3d)
+	MCFG_MACHINE_RESET(gaelco3d)
 
-	MDRV_EEPROM_93C66B_ADD("eeprom")
+	MCFG_EEPROM_93C66B_ADD("eeprom")
 
-	MDRV_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(HZ(6000))
 
-	MDRV_TIMER_ADD("adsp_timer", adsp_autobuffer_irq)
+	MCFG_TIMER_ADD("adsp_timer", adsp_autobuffer_irq)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(576, 432)
-	MDRV_SCREEN_VISIBLE_AREA(0, 575, 0, 431)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(576, 432)
+	MCFG_SCREEN_VISIBLE_AREA(0, 575, 0, 431)
 
-	MDRV_PALETTE_LENGTH(32768)
+	MCFG_PALETTE_LENGTH(32768)
 
-	MDRV_PALETTE_INIT(RRRRR_GGGGG_BBBBB)
-	MDRV_VIDEO_START(gaelco3d)
-	MDRV_VIDEO_UPDATE(gaelco3d)
+	MCFG_PALETTE_INIT(RRRRR_GGGGG_BBBBB)
+	MCFG_VIDEO_START(gaelco3d)
+	MCFG_VIDEO_UPDATE(gaelco3d)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("dac1", DMADAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)	/* speedup: front mono */
+	MCFG_SOUND_ADD("dac1", DMADAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)	/* speedup: front mono */
 
-	MDRV_SOUND_ADD("dac2", DMADAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)	/* speedup: left rear */
+	MCFG_SOUND_ADD("dac2", DMADAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)	/* speedup: left rear */
 
-	MDRV_SOUND_ADD("dac3", DMADAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)	/* speedup: right rear */
+	MCFG_SOUND_ADD("dac3", DMADAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)	/* speedup: right rear */
 
-	MDRV_SOUND_ADD("dac4", DMADAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)	/* speedup: seat speaker */
+	MCFG_SOUND_ADD("dac4", DMADAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)	/* speedup: seat speaker */
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( gaelco3d2, gaelco3d )
 
 	/* basic machine hardware */
-	MDRV_CPU_REPLACE("maincpu", M68EC020, 25000000)
-	MDRV_CPU_PROGRAM_MAP(main020_map)
-	MDRV_CPU_VBLANK_INT("screen", vblank_gen)
+	MCFG_CPU_REPLACE("maincpu", M68EC020, 25000000)
+	MCFG_CPU_PROGRAM_MAP(main020_map)
+	MCFG_CPU_VBLANK_INT("screen", vblank_gen)
 
-	MDRV_CPU_MODIFY("tms")
-	MDRV_CPU_CLOCK(50000000)
+	MCFG_CPU_MODIFY("tms")
+	MCFG_CPU_CLOCK(50000000)
 
-	MDRV_MACHINE_RESET(gaelco3d2)
+	MCFG_MACHINE_RESET(gaelco3d2)
 MACHINE_CONFIG_END
 
 

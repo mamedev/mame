@@ -194,30 +194,30 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( xybots, xybots_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
-	MDRV_CPU_PROGRAM_MAP(main_map)
-	MDRV_CPU_VBLANK_INT("screen", atarigen_video_int_gen)
+	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
+	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_CPU_VBLANK_INT("screen", atarigen_video_int_gen)
 
-	MDRV_MACHINE_START(xybots)
-	MDRV_MACHINE_RESET(xybots)
-	MDRV_NVRAM_ADD_1FILL("eeprom")
+	MCFG_MACHINE_START(xybots)
+	MCFG_MACHINE_RESET(xybots)
+	MCFG_NVRAM_ADD_1FILL("eeprom")
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MDRV_GFXDECODE(xybots)
-	MDRV_PALETTE_LENGTH(1024)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	MCFG_GFXDECODE(xybots)
+	MCFG_PALETTE_LENGTH(1024)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses a SYNGEN chip to generate video signals */
-	MDRV_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
+	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
 
-	MDRV_VIDEO_START(xybots)
-	MDRV_VIDEO_UPDATE(xybots)
+	MCFG_VIDEO_START(xybots)
+	MCFG_VIDEO_UPDATE(xybots)
 
 	/* sound hardware */
-	MDRV_FRAGMENT_ADD(jsa_i_stereo_swapped)
+	MCFG_FRAGMENT_ADD(jsa_i_stereo_swapped)
 MACHINE_CONFIG_END
 
 

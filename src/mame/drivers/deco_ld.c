@@ -503,48 +503,48 @@ static MACHINE_START( rblaster )
 static MACHINE_CONFIG_START( rblaster, deco_ld_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",M6502,8000000/2)
-	MDRV_CPU_PROGRAM_MAP(rblaster_map)
-//  MDRV_CPU_VBLANK_INT("screen",irq0_line_hold)
-	MDRV_CPU_VBLANK_INT("screen",nmi_line_pulse)
+	MCFG_CPU_ADD("maincpu",M6502,8000000/2)
+	MCFG_CPU_PROGRAM_MAP(rblaster_map)
+//  MCFG_CPU_VBLANK_INT("screen",irq0_line_hold)
+	MCFG_CPU_VBLANK_INT("screen",nmi_line_pulse)
 
-	MDRV_CPU_ADD("audiocpu",M6502,8000000/2)
-	MDRV_CPU_PROGRAM_MAP(rblaster_sound_map)
-//  MDRV_CPU_VBLANK_INT("screen",irq0_line_hold) //test
-	MDRV_CPU_PERIODIC_INT(sound_interrupt, 640)
+	MCFG_CPU_ADD("audiocpu",M6502,8000000/2)
+	MCFG_CPU_PROGRAM_MAP(rblaster_sound_map)
+//  MCFG_CPU_VBLANK_INT("screen",irq0_line_hold) //test
+	MCFG_CPU_PERIODIC_INT(sound_interrupt, 640)
 
-	MDRV_LASERDISC_ADD("laserdisc", PIONEER_LDV1000, "screen", "ldsound") //Sony LDP-1000A, is it truly compatible with the Pioneer?
-	MDRV_LASERDISC_OVERLAY(rblaster, 256, 256, BITMAP_FORMAT_INDEXED16)
+	MCFG_LASERDISC_ADD("laserdisc", PIONEER_LDV1000, "screen", "ldsound") //Sony LDP-1000A, is it truly compatible with the Pioneer?
+	MCFG_LASERDISC_OVERLAY(rblaster, 256, 256, BITMAP_FORMAT_INDEXED16)
 
 	/* video hardware */
-	MDRV_LASERDISC_SCREEN_ADD_NTSC("screen", BITMAP_FORMAT_INDEXED16)
-	MDRV_GFXDECODE(rblaster)
-	MDRV_PALETTE_LENGTH(512)
-	MDRV_MACHINE_START(rblaster)
+	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", BITMAP_FORMAT_INDEXED16)
+	MCFG_GFXDECODE(rblaster)
+	MCFG_PALETTE_LENGTH(512)
+	MCFG_MACHINE_START(rblaster)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MDRV_SOUND_ADD("ay1", AY8910, 1500000)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SOUND_ADD("ay1", AY8910, 1500000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 
-	MDRV_SOUND_ADD("ay2", AY8910, 1500000)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	MCFG_SOUND_ADD("ay2", AY8910, 1500000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
-	MDRV_SOUND_ADD("ldsound", LASERDISC_SOUND, 0)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("ldsound", LASERDISC_SOUND, 0)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( begas, rblaster )
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(begas_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(begas_map)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( cobra, rblaster )
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(cobra_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(cobra_map)
 
-	MDRV_DEVICE_REMOVE("audiocpu")
+	MCFG_DEVICE_REMOVE("audiocpu")
 MACHINE_CONFIG_END
 
 /***************************************************************************

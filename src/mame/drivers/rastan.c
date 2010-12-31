@@ -412,47 +412,47 @@ static const tc0140syt_interface rastan_tc0140syt_intf =
 static MACHINE_CONFIG_START( rastan, rastan_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(rastan_map)
-	MDRV_CPU_VBLANK_INT("screen", irq5_line_hold)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz/2)	/* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(rastan_map)
+	MCFG_CPU_VBLANK_INT("screen", irq5_line_hold)
 
-	MDRV_CPU_ADD("audiocpu", Z80, XTAL_16MHz/4)	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(rastan_s_map)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_16MHz/4)	/* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(rastan_s_map)
 
-	MDRV_QUANTUM_TIME(HZ(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
+	MCFG_QUANTUM_TIME(HZ(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
-	MDRV_MACHINE_START(rastan)
-	MDRV_MACHINE_RESET(rastan)
+	MCFG_MACHINE_START(rastan)
+	MCFG_MACHINE_RESET(rastan)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(40*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(40*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 
-	MDRV_GFXDECODE(rastan)
-	MDRV_PALETTE_LENGTH(8192)
+	MCFG_GFXDECODE(rastan)
+	MCFG_PALETTE_LENGTH(8192)
 
-	MDRV_VIDEO_UPDATE(rastan)
+	MCFG_VIDEO_UPDATE(rastan)
 
-	MDRV_PC080SN_ADD("pc080sn", rastan_pc080sn_intf)
-	MDRV_PC090OJ_ADD("pc090oj", rastan_pc090oj_intf)
+	MCFG_PC080SN_ADD("pc080sn", rastan_pc080sn_intf)
+	MCFG_PC090OJ_ADD("pc090oj", rastan_pc090oj_intf)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2151, XTAL_16MHz/4)	/* verified on pcb */
-	MDRV_SOUND_CONFIG(ym2151_config)
-	MDRV_SOUND_ROUTE(0, "mono", 0.50)
-	MDRV_SOUND_ROUTE(1, "mono", 0.50)
+	MCFG_SOUND_ADD("ymsnd", YM2151, XTAL_16MHz/4)	/* verified on pcb */
+	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_SOUND_ROUTE(0, "mono", 0.50)
+	MCFG_SOUND_ROUTE(1, "mono", 0.50)
 
-	MDRV_SOUND_ADD("msm", MSM5205, XTAL_384kHz)	/* verified on pcb */
-	MDRV_SOUND_CONFIG(msm5205_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
+	MCFG_SOUND_ADD("msm", MSM5205, XTAL_384kHz)	/* verified on pcb */
+	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 
-	MDRV_TC0140SYT_ADD("tc0140syt", rastan_tc0140syt_intf)
+	MCFG_TC0140SYT_ADD("tc0140syt", rastan_tc0140syt_intf)
 MACHINE_CONFIG_END
 
 

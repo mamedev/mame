@@ -958,31 +958,31 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( base, astrof_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6502, MAIN_CPU_CLOCK)
-	MDRV_TIMER_ADD_SCANLINE("vblank", irq_callback, "screen", VBSTART, 0)
+	MCFG_CPU_ADD("maincpu", M6502, MAIN_CPU_CLOCK)
+	MCFG_TIMER_ADD_SCANLINE("vblank", irq_callback, "screen", VBSTART, 0)
 
 	/* video hardware */
-	MDRV_VIDEO_START(astrof)
+	MCFG_VIDEO_START(astrof)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( astrof, base )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(astrof_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(astrof_map)
 
-	MDRV_MACHINE_START(astrof)
+	MCFG_MACHINE_START(astrof)
 
 	/* video hardware */
-	MDRV_VIDEO_UPDATE(astrof)
+	MCFG_VIDEO_UPDATE(astrof)
 
 	/* audio hardware */
-	MDRV_FRAGMENT_ADD(astrof_audio)
+	MCFG_FRAGMENT_ADD(astrof_audio)
 MACHINE_CONFIG_END
 
 
@@ -990,40 +990,40 @@ static MACHINE_CONFIG_DERIVED( abattle, astrof )
 
 	/* basic machine hardware */
 
-	MDRV_MACHINE_START(abattle)
-	MDRV_MACHINE_RESET(abattle)
+	MCFG_MACHINE_START(abattle)
+	MCFG_MACHINE_RESET(abattle)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( spfghmk2, base )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(spfghmk2_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(spfghmk2_map)
 
-	MDRV_MACHINE_START(spfghmk2)
+	MCFG_MACHINE_START(spfghmk2)
 
 	/* video hardware */
-	MDRV_VIDEO_UPDATE(astrof)
+	MCFG_VIDEO_UPDATE(astrof)
 
 	/* audio hardware */
-	MDRV_FRAGMENT_ADD(spfghmk2_audio)
+	MCFG_FRAGMENT_ADD(spfghmk2_audio)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( tomahawk, base )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(tomahawk_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(tomahawk_map)
 
-	MDRV_MACHINE_START(tomahawk)
+	MCFG_MACHINE_START(tomahawk)
 
 	/* video hardware */
-	MDRV_VIDEO_UPDATE(tomahawk)
+	MCFG_VIDEO_UPDATE(tomahawk)
 
 	/* audio hardware */
-	MDRV_FRAGMENT_ADD(tomahawk_audio)
+	MCFG_FRAGMENT_ADD(tomahawk_audio)
 MACHINE_CONFIG_END
 
 

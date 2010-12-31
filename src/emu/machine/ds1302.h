@@ -19,8 +19,8 @@
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_DS1302_ADD(_tag) \
-	MDRV_DEVICE_ADD(_tag, DS1302, 0)
+#define MCFG_DS1302_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, DS1302, 0)
 
 
 /***************************************************************************

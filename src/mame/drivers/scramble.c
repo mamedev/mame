@@ -1236,150 +1236,150 @@ ADDRESS_MAP_END
 static MACHINE_CONFIG_START( scramble, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 18432000/6)	/* 3.072 MHz */
-	MDRV_CPU_PROGRAM_MAP(scramble_map)
+	MCFG_CPU_ADD("maincpu", Z80, 18432000/6)	/* 3.072 MHz */
+	MCFG_CPU_PROGRAM_MAP(scramble_map)
 
-	MDRV_CPU_ADD("audiocpu", Z80, 14318000/8)	/* 1.78975 MHz */
-	MDRV_CPU_PROGRAM_MAP(scramble_sound_map)
-	MDRV_CPU_IO_MAP(scramble_sound_io_map)
+	MCFG_CPU_ADD("audiocpu", Z80, 14318000/8)	/* 1.78975 MHz */
+	MCFG_CPU_PROGRAM_MAP(scramble_sound_map)
+	MCFG_CPU_IO_MAP(scramble_sound_io_map)
 
-	MDRV_7474_ADD("7474_9m_1", "7474_9m_1", galaxold_7474_9m_1_callback, NULL)
-	MDRV_7474_ADD("7474_9m_2", "7474_9m_1", NULL, galaxold_7474_9m_2_q_callback)
+	MCFG_7474_ADD("7474_9m_1", "7474_9m_1", galaxold_7474_9m_1_callback, NULL)
+	MCFG_7474_ADD("7474_9m_2", "7474_9m_1", NULL, galaxold_7474_9m_2_q_callback)
 
-	MDRV_7474_ADD("konami_7474", "konami_7474", NULL, scramble_sh_7474_q_callback)
+	MCFG_7474_ADD("konami_7474", "konami_7474", NULL, scramble_sh_7474_q_callback)
 
-	MDRV_TIMER_ADD("int_timer", galaxold_interrupt_timer)
+	MCFG_TIMER_ADD("int_timer", galaxold_interrupt_timer)
 
-	MDRV_MACHINE_RESET(scramble)
+	MCFG_MACHINE_RESET(scramble)
 
-	MDRV_PPI8255_ADD( "ppi8255_0", scramble_ppi_0_intf )
-	MDRV_PPI8255_ADD( "ppi8255_1", scramble_ppi_1_intf )
+	MCFG_PPI8255_ADD( "ppi8255_0", scramble_ppi_0_intf )
+	MCFG_PPI8255_ADD( "ppi8255_1", scramble_ppi_1_intf )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(16000.0/132/2)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(16000.0/132/2)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(scramble)
-	MDRV_PALETTE_LENGTH(32+64+2+1)	/* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
+	MCFG_GFXDECODE(scramble)
+	MCFG_PALETTE_LENGTH(32+64+2+1)	/* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
 
-	MDRV_PALETTE_INIT(scrambold)
-	MDRV_VIDEO_START(scrambold)
-	MDRV_VIDEO_UPDATE(galaxold)
+	MCFG_PALETTE_INIT(scrambold)
+	MCFG_VIDEO_START(scrambold)
+	MCFG_VIDEO_UPDATE(galaxold)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("8910.1", AY8910, 14318000/8)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.16)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("8910.1", AY8910, 14318000/8)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.16)
 
-	MDRV_SOUND_ADD("8910.2", AY8910, 14318000/8)
-	MDRV_SOUND_CONFIG(scramble_ay8910_interface_2)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.16)
+	MCFG_SOUND_ADD("8910.2", AY8910, 14318000/8)
+	MCFG_SOUND_CONFIG(scramble_ay8910_interface_2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.16)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mars, scramble )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mars_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(mars_map)
 
 	/* video hardware */
-	MDRV_PALETTE_LENGTH(32+64+2+0)	/* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
-	MDRV_PALETTE_INIT(galaxold)
+	MCFG_PALETTE_LENGTH(32+64+2+0)	/* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
+	MCFG_PALETTE_INIT(galaxold)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( devilfsh, scramble )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mars_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(mars_map)
 
 	/* video hardware */
-	MDRV_GFXDECODE(devilfsh)
-	MDRV_PALETTE_LENGTH(32+64+2+0)	/* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
-	MDRV_PALETTE_INIT(galaxold)
+	MCFG_GFXDECODE(devilfsh)
+	MCFG_PALETTE_LENGTH(32+64+2+0)	/* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
+	MCFG_PALETTE_INIT(galaxold)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( newsin7, scramble )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(newsin7_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(newsin7_map)
 
 	/* video hardware */
-	MDRV_GFXDECODE(newsin7)
-	MDRV_PALETTE_LENGTH(32+64+2+0)	/* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
-	MDRV_PALETTE_INIT(galaxold)
-	MDRV_VIDEO_START(newsin7)
+	MCFG_GFXDECODE(newsin7)
+	MCFG_PALETTE_LENGTH(32+64+2+0)	/* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
+	MCFG_PALETTE_INIT(galaxold)
+	MCFG_VIDEO_START(newsin7)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mrkougar, scramble )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mrkougar_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(mrkougar_map)
 
-	MDRV_PPI8255_RECONFIG( "ppi8255_1", mrkougar_ppi_1_intf )
+	MCFG_PPI8255_RECONFIG( "ppi8255_1", mrkougar_ppi_1_intf )
 
 	/* video hardware */
-	MDRV_GFXDECODE(mrkougar)
-	MDRV_PALETTE_LENGTH(32+64+2+0)	/* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
-	MDRV_PALETTE_INIT(galaxold)
+	MCFG_GFXDECODE(mrkougar)
+	MCFG_PALETTE_LENGTH(32+64+2+0)	/* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
+	MCFG_PALETTE_INIT(galaxold)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mrkougb, scramble )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mrkougar_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(mrkougar_map)
 
-	MDRV_PPI8255_RECONFIG( "ppi8255_1", mrkougar_ppi_1_intf )
+	MCFG_PPI8255_RECONFIG( "ppi8255_1", mrkougar_ppi_1_intf )
 
 	/* video hardware */
-	MDRV_PALETTE_LENGTH(32+64+2+0)	/* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
-	MDRV_PALETTE_INIT(galaxold)
+	MCFG_PALETTE_LENGTH(32+64+2+0)	/* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
+	MCFG_PALETTE_INIT(galaxold)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ckongs, scramble )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(ckongs_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(ckongs_map)
 
 	/* video hardware */
-	MDRV_PALETTE_LENGTH(32+64+2+0)	/* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
-	MDRV_PALETTE_INIT(galaxold)
-	MDRV_VIDEO_START(ckongs)
+	MCFG_PALETTE_LENGTH(32+64+2+0)	/* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
+	MCFG_PALETTE_INIT(galaxold)
+	MCFG_VIDEO_START(ckongs)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( hotshock, scramble )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(hotshock_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(hotshock_map)
 
-	MDRV_DEVICE_REMOVE( "ppi8255_0" )
-	MDRV_DEVICE_REMOVE( "ppi8255_1" )
+	MCFG_DEVICE_REMOVE( "ppi8255_0" )
+	MCFG_DEVICE_REMOVE( "ppi8255_1" )
 
-	MDRV_CPU_MODIFY("audiocpu")
-	MDRV_CPU_IO_MAP(hotshock_sound_io_map)
+	MCFG_CPU_MODIFY("audiocpu")
+	MCFG_CPU_IO_MAP(hotshock_sound_io_map)
 
-	MDRV_MACHINE_RESET(galaxold)
+	MCFG_MACHINE_RESET(galaxold)
 
 	/* video hardware */
-	MDRV_PALETTE_LENGTH(32+64+2+0)	/* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
-	MDRV_PALETTE_INIT(galaxold)
-	MDRV_VIDEO_START(pisces)
+	MCFG_PALETTE_LENGTH(32+64+2+0)	/* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
+	MCFG_PALETTE_INIT(galaxold)
+	MCFG_VIDEO_START(pisces)
 
-	MDRV_SOUND_MODIFY("8910.1")
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
+	MCFG_SOUND_MODIFY("8910.1")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 
-	MDRV_SOUND_MODIFY("8910.2")
-	MDRV_SOUND_CONFIG(hotshock_ay8910_interface_2)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
+	MCFG_SOUND_MODIFY("8910.2")
+	MCFG_SOUND_CONFIG(hotshock_ay8910_interface_2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( cavelon, scramble )
@@ -1387,42 +1387,42 @@ static MACHINE_CONFIG_DERIVED( cavelon, scramble )
 	/* basic machine hardware */
 
 	/* video hardware */
-	MDRV_PALETTE_LENGTH(32+64+2+0)	/* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
-	MDRV_PALETTE_INIT(galaxold)
-	MDRV_VIDEO_START(ckongs)
+	MCFG_PALETTE_LENGTH(32+64+2+0)	/* 32 for characters, 64 for stars, 2 for bullets, 0/1 for background */
+	MCFG_PALETTE_INIT(galaxold)
+	MCFG_VIDEO_START(ckongs)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mimonscr, scramble )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mimonscr_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(mimonscr_map)
 
 	/* video hardware */
-	MDRV_VIDEO_START(mimonkey)
+	MCFG_VIDEO_START(mimonkey)
 MACHINE_CONFIG_END
 
 /* Triple Punch and Mariner are different - only one CPU, one 8910 */
 static MACHINE_CONFIG_DERIVED( triplep, scramble )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(triplep_io_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(triplep_io_map)
 
-	MDRV_DEVICE_REMOVE("audiocpu")
+	MCFG_DEVICE_REMOVE("audiocpu")
 
 	/* video hardware */
-	MDRV_PALETTE_LENGTH(32+64+2+0)	/* 32 for characters, 64 for stars, 2 for bullets */
+	MCFG_PALETTE_LENGTH(32+64+2+0)	/* 32 for characters, 64 for stars, 2 for bullets */
 
-	MDRV_PALETTE_INIT(galaxold)
+	MCFG_PALETTE_INIT(galaxold)
 
 	/* sound hardware */
-	MDRV_SOUND_MODIFY("8910.1")
-	MDRV_SOUND_CLOCK(18432000/12) // triple punch/knock out ay clock is 1.535MHz, derived from main cpu xtal; verified on hardware
-	MDRV_SOUND_CONFIG(triplep_ay8910_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_MODIFY("8910.1")
+	MCFG_SOUND_CLOCK(18432000/12) // triple punch/knock out ay clock is 1.535MHz, derived from main cpu xtal; verified on hardware
+	MCFG_SOUND_CONFIG(triplep_ay8910_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_DEVICE_REMOVE("8910.2")
+	MCFG_DEVICE_REMOVE("8910.2")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mariner, triplep )
@@ -1430,78 +1430,78 @@ static MACHINE_CONFIG_DERIVED( mariner, triplep )
 	/* basic machine hardware */
 
 	/* video hardware */
-	MDRV_PALETTE_LENGTH(32+64+2+16)	/* 32 for characters, 64 for stars, 2 for bullets, 16 for background */
+	MCFG_PALETTE_LENGTH(32+64+2+16)	/* 32 for characters, 64 for stars, 2 for bullets, 16 for background */
 
-	MDRV_PALETTE_INIT(mariner)
-	MDRV_VIDEO_START(mariner)
+	MCFG_PALETTE_INIT(mariner)
+	MCFG_VIDEO_START(mariner)
 MACHINE_CONFIG_END
 
 /* Hunchback replaces the Z80 with a S2650 CPU */
 static MACHINE_CONFIG_DERIVED( hunchbks, scramble )
 
 	/* basic machine hardware */
-	MDRV_CPU_REPLACE("maincpu", S2650, 18432000/6)
-	MDRV_CPU_PROGRAM_MAP(hunchbks_map)
-	MDRV_CPU_IO_MAP(hunchbks_readport)
-	MDRV_CPU_VBLANK_INT("screen", hunchbks_vh_interrupt)
+	MCFG_CPU_REPLACE("maincpu", S2650, 18432000/6)
+	MCFG_CPU_PROGRAM_MAP(hunchbks_map)
+	MCFG_CPU_IO_MAP(hunchbks_readport)
+	MCFG_CPU_VBLANK_INT("screen", hunchbks_vh_interrupt)
 
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500))
 
 	/* video hardware */
-	MDRV_PALETTE_LENGTH(32+64+2+0)	/* 32 for characters, 64 for stars, 2 for bullets */
+	MCFG_PALETTE_LENGTH(32+64+2+0)	/* 32 for characters, 64 for stars, 2 for bullets */
 
-	MDRV_PALETTE_INIT(galaxold)
+	MCFG_PALETTE_INIT(galaxold)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( hncholms, hunchbks )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_CLOCK(18432000/6/2/2)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_CLOCK(18432000/6/2/2)
 
-	MDRV_VIDEO_START(scorpion)
+	MCFG_VIDEO_START(scorpion)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( ad2083, driver_device )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 18432000/6)	/* 3.072 MHz */
-	MDRV_CPU_PROGRAM_MAP(ad2083_map)
+	MCFG_CPU_ADD("maincpu", Z80, 18432000/6)	/* 3.072 MHz */
+	MCFG_CPU_PROGRAM_MAP(ad2083_map)
 
-	MDRV_7474_ADD("konami_7474", "konami_7474", NULL, scramble_sh_7474_q_callback)
-	MDRV_7474_ADD("7474_9m_1", "7474_9m_1", galaxold_7474_9m_1_callback, NULL)
-	MDRV_7474_ADD("7474_9m_2", "7474_9m_1", NULL, galaxold_7474_9m_2_q_callback)
+	MCFG_7474_ADD("konami_7474", "konami_7474", NULL, scramble_sh_7474_q_callback)
+	MCFG_7474_ADD("7474_9m_1", "7474_9m_1", galaxold_7474_9m_1_callback, NULL)
+	MCFG_7474_ADD("7474_9m_2", "7474_9m_1", NULL, galaxold_7474_9m_2_q_callback)
 
-	MDRV_TIMER_ADD("int_timer", galaxold_interrupt_timer)
+	MCFG_TIMER_ADD("int_timer", galaxold_interrupt_timer)
 
-	MDRV_MACHINE_RESET(galaxold)
+	MCFG_MACHINE_RESET(galaxold)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(16000.0/132/2)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(16000.0/132/2)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(ad2083)
-	MDRV_PALETTE_LENGTH(32+64+2+8)	/* 32 for characters, 64 for stars, 2 for bullets, 8 for background */
+	MCFG_GFXDECODE(ad2083)
+	MCFG_PALETTE_LENGTH(32+64+2+8)	/* 32 for characters, 64 for stars, 2 for bullets, 8 for background */
 
-	MDRV_PALETTE_INIT(turtles)
-	MDRV_VIDEO_START(ad2083)
-	MDRV_VIDEO_UPDATE(galaxold)
+	MCFG_PALETTE_INIT(turtles)
+	MCFG_VIDEO_START(ad2083)
+	MCFG_VIDEO_UPDATE(galaxold)
 
 	/* sound hardware */
 
-	MDRV_FRAGMENT_ADD(ad2083_audio)
+	MCFG_FRAGMENT_ADD(ad2083_audio)
 
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( turpins, scramble )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(turpins_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(turpins_map)
 
 MACHINE_CONFIG_END
 

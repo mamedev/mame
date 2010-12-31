@@ -43,17 +43,17 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MDRV_MOS6526R1_ADD(_tag, _clock, _config) \
-	MDRV_DEVICE_ADD(_tag, MOS6526R1, _clock) \
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_MOS6526R1_ADD(_tag, _clock, _config) \
+	MCFG_DEVICE_ADD(_tag, MOS6526R1, _clock) \
+	MCFG_DEVICE_CONFIG(_config)
 
-#define MDRV_MOS6526R2_ADD(_tag, _clock, _config) \
-	MDRV_DEVICE_ADD(_tag, MOS6526R2, _clock) \
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_MOS6526R2_ADD(_tag, _clock, _config) \
+	MCFG_DEVICE_ADD(_tag, MOS6526R2, _clock) \
+	MCFG_DEVICE_CONFIG(_config)
 
-#define MDRV_MOS8520_ADD(_tag, _clock, _config) \
-	MDRV_DEVICE_ADD(_tag, MOS8520, _clock) \
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_MOS8520_ADD(_tag, _clock, _config) \
+	MCFG_DEVICE_ADD(_tag, MOS8520, _clock) \
+	MCFG_DEVICE_CONFIG(_config)
 
 #define MOS6526_INTERFACE(name) \
 	const mos6526_interface (name)=

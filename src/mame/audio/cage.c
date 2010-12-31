@@ -650,41 +650,41 @@ ADDRESS_MAP_END
 MACHINE_CONFIG_FRAGMENT( cage )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("cage", TMS32031, 33868800)
-	MDRV_CPU_CONFIG(cage_config)
-	MDRV_CPU_PROGRAM_MAP(cage_map)
+	MCFG_CPU_ADD("cage", TMS32031, 33868800)
+	MCFG_CPU_CONFIG(cage_config)
+	MCFG_CPU_PROGRAM_MAP(cage_map)
 
-	MDRV_TIMER_ADD("cage_dma_timer", dma_timer_callback)
-	MDRV_TIMER_ADD("cage_timer0", cage_timer_callback)
-	MDRV_TIMER_ADD("cage_timer1", cage_timer_callback)
+	MCFG_TIMER_ADD("cage_dma_timer", dma_timer_callback)
+	MCFG_TIMER_ADD("cage_timer0", cage_timer_callback)
+	MCFG_TIMER_ADD("cage_timer1", cage_timer_callback)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
 #if (DAC_BUFFER_CHANNELS == 4)
-	MDRV_SOUND_ADD("dac1", DMADAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	MCFG_SOUND_ADD("dac1", DMADAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 
-	MDRV_SOUND_ADD("dac2", DMADAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
+	MCFG_SOUND_ADD("dac2", DMADAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 
-	MDRV_SOUND_ADD("dac3", DMADAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
+	MCFG_SOUND_ADD("dac3", DMADAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 
-	MDRV_SOUND_ADD("dac4", DMADAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	MCFG_SOUND_ADD("dac4", DMADAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 #else
-	MDRV_SOUND_ADD("dac1", DMADAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ADD("dac1", DMADAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 
-	MDRV_SOUND_ADD("dac2", DMADAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("dac2", DMADAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 #endif
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_DERIVED( cage_seattle, cage )
 
-	MDRV_CPU_MODIFY("cage")
-	MDRV_CPU_PROGRAM_MAP(cage_map_seattle)
+	MCFG_CPU_MODIFY("cage")
+	MCFG_CPU_PROGRAM_MAP(cage_map_seattle)
 MACHINE_CONFIG_END

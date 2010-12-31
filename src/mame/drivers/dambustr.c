@@ -233,34 +233,34 @@ static DRIVER_INIT(dambustr)
 
 static MACHINE_CONFIG_START( dambustr, driver_device )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 18432000/6)	/* 3.072 MHz */
-	MDRV_CPU_PROGRAM_MAP(dambustr_map)
+	MCFG_CPU_ADD("maincpu", Z80, 18432000/6)	/* 3.072 MHz */
+	MCFG_CPU_PROGRAM_MAP(dambustr_map)
 
-	MDRV_MACHINE_RESET(galaxold)
+	MCFG_MACHINE_RESET(galaxold)
 
-	MDRV_7474_ADD("7474_9m_1", "7474_9m_1", galaxold_7474_9m_1_callback, NULL)
-	MDRV_7474_ADD("7474_9m_2", "7474_9m_1", NULL, galaxold_7474_9m_2_q_callback)
+	MCFG_7474_ADD("7474_9m_1", "7474_9m_1", galaxold_7474_9m_1_callback, NULL)
+	MCFG_7474_ADD("7474_9m_2", "7474_9m_1", NULL, galaxold_7474_9m_2_q_callback)
 
-	MDRV_TIMER_ADD("int_timer", galaxold_interrupt_timer)
+	MCFG_TIMER_ADD("int_timer", galaxold_interrupt_timer)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(16000.0/132/2)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(16000.0/132/2)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(dambustr)
-	MDRV_PALETTE_LENGTH(32+2+64+8)		/* 32 for the characters, 2 for the bullets, 64 for the stars, 8 for the background */
+	MCFG_GFXDECODE(dambustr)
+	MCFG_PALETTE_LENGTH(32+2+64+8)		/* 32 for the characters, 2 for the bullets, 64 for the stars, 8 for the background */
 
-	MDRV_PALETTE_INIT(dambustr)
-	MDRV_VIDEO_START(dambustr)
-	MDRV_VIDEO_UPDATE(dambustr)
+	MCFG_PALETTE_INIT(dambustr)
+	MCFG_VIDEO_START(dambustr)
+	MCFG_VIDEO_UPDATE(dambustr)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_FRAGMENT_ADD(galaxian_audio)
+	MCFG_FRAGMENT_ADD(galaxian_audio)
 MACHINE_CONFIG_END
 
 

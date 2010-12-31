@@ -16,8 +16,8 @@
 
 DECLARE_LEGACY_DEVICE(RP5H01, rp5h01);
 
-#define MDRV_RP5H01_ADD(_tag) \
-	MDRV_DEVICE_ADD(_tag, RP5H01, 0)
+#define MCFG_RP5H01_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, RP5H01, 0)
 
 /*
  * Device uses memory region

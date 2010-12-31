@@ -2738,40 +2738,40 @@ static const mc6845_interface mc6845_intf =
 
 static MACHINE_CONFIG_START( sys903, driver_device )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6502, CPU_CLOCK)	/* confirmed */
-	MDRV_CPU_PROGRAM_MAP(sys903_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("maincpu", M6502, CPU_CLOCK)	/* confirmed */
+	MCFG_CPU_PROGRAM_MAP(sys903_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MDRV_PIA6821_ADD("pia0", sys903_pia0_intf)
-	MDRV_PIA6821_ADD("pia1", sys903_pia1_intf)
+	MCFG_PIA6821_ADD("pia0", sys903_pia0_intf)
+	MCFG_PIA6821_ADD("pia1", sys903_pia1_intf)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE((39+1)*8, (31+1)*8)                  /* Taken from MC6845 init, registers 00 & 04. Normally programmed with (value-1) */
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 31*8-1)    /* Taken from MC6845 init, registers 01 & 06 */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE((39+1)*8, (31+1)*8)                  /* Taken from MC6845 init, registers 00 & 04. Normally programmed with (value-1) */
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 31*8-1)    /* Taken from MC6845 init, registers 01 & 06 */
 
-	MDRV_GFXDECODE(calomega)
-	MDRV_PALETTE_LENGTH(1024)
+	MCFG_GFXDECODE(calomega)
+	MCFG_PALETTE_LENGTH(1024)
 
-	MDRV_PALETTE_INIT(calomega)
-	MDRV_VIDEO_START(calomega)
-	MDRV_VIDEO_UPDATE(calomega)
+	MCFG_PALETTE_INIT(calomega)
+	MCFG_VIDEO_START(calomega)
+	MCFG_VIDEO_UPDATE(calomega)
 
-	MDRV_MC6845_ADD("crtc", MC6845, CPU_CLOCK, mc6845_intf)	/* 6845 @ CPU clock */
+	MCFG_MC6845_ADD("crtc", MC6845, CPU_CLOCK, mc6845_intf)	/* 6845 @ CPU clock */
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("ay8912", AY8912, SND_CLOCK)	/* confirmed */
-	MDRV_SOUND_CONFIG(sys903_ay8912_intf)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("ay8912", AY8912, SND_CLOCK)	/* confirmed */
+	MCFG_SOUND_CONFIG(sys903_ay8912_intf)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	/* acia */
-	MDRV_ACIA6850_ADD("acia6850_0", acia6850_intf)
+	MCFG_ACIA6850_ADD("acia6850_0", acia6850_intf)
 MACHINE_CONFIG_END
 
 
@@ -2779,15 +2779,15 @@ static MACHINE_CONFIG_DERIVED( s903mod, sys903 )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(s903mod_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(s903mod_map)
 
 	/* sound hardware */
-	MDRV_SOUND_MODIFY("ay8912")
-	MDRV_SOUND_CONFIG(sys905_ay8912_intf)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	MCFG_SOUND_MODIFY("ay8912")
+	MCFG_SOUND_CONFIG(sys905_ay8912_intf)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-	MDRV_DEVICE_REMOVE("acia6850_0")
+	MCFG_DEVICE_REMOVE("acia6850_0")
 MACHINE_CONFIG_END
 
 
@@ -2795,18 +2795,18 @@ static MACHINE_CONFIG_DERIVED( sys905, sys903 )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(sys905_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(sys905_map)
 
-	MDRV_PIA6821_MODIFY("pia0", sys905_pia0_intf)
-	MDRV_PIA6821_MODIFY("pia1", sys905_pia1_intf)
+	MCFG_PIA6821_MODIFY("pia0", sys905_pia0_intf)
+	MCFG_PIA6821_MODIFY("pia1", sys905_pia1_intf)
 
 	/* sound hardware */
-	MDRV_SOUND_MODIFY("ay8912")
-	MDRV_SOUND_CONFIG(sys905_ay8912_intf)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	MCFG_SOUND_MODIFY("ay8912")
+	MCFG_SOUND_CONFIG(sys905_ay8912_intf)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-	MDRV_DEVICE_REMOVE("acia6850_0")
+	MCFG_DEVICE_REMOVE("acia6850_0")
 MACHINE_CONFIG_END
 
 
@@ -2814,20 +2814,20 @@ static MACHINE_CONFIG_DERIVED( sys906, sys903 )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_REPLACE("maincpu", M65C02, CPU_CLOCK)	/* guess */
-	MDRV_CPU_PROGRAM_MAP(sys906_map)
+	MCFG_CPU_REPLACE("maincpu", M65C02, CPU_CLOCK)	/* guess */
+	MCFG_CPU_PROGRAM_MAP(sys906_map)
 
-	MDRV_PIA6821_MODIFY("pia0", sys906_pia0_intf)
-	MDRV_PIA6821_MODIFY("pia1", sys906_pia1_intf)
+	MCFG_PIA6821_MODIFY("pia0", sys906_pia0_intf)
+	MCFG_PIA6821_MODIFY("pia1", sys906_pia1_intf)
 
-	MDRV_GFXDECODE(sys906)
+	MCFG_GFXDECODE(sys906)
 
 	/* sound hardware */
-	MDRV_SOUND_MODIFY("ay8912")
-	MDRV_SOUND_CONFIG(sys906_ay8912_intf)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	MCFG_SOUND_MODIFY("ay8912")
+	MCFG_SOUND_CONFIG(sys906_ay8912_intf)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
-	MDRV_DEVICE_REMOVE("acia6850_0")
+	MCFG_DEVICE_REMOVE("acia6850_0")
 MACHINE_CONFIG_END
 
 

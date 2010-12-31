@@ -659,94 +659,94 @@ static const ym2203_interface ym2203_config =
 static MACHINE_CONFIG_START( psychic5, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)
-	MDRV_CPU_PROGRAM_MAP(psychic5_main_map)
-	MDRV_CPU_VBLANK_INT_HACK(psychic5_interrupt,2)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)
+	MCFG_CPU_PROGRAM_MAP(psychic5_main_map)
+	MCFG_CPU_VBLANK_INT_HACK(psychic5_interrupt,2)
 
-	MDRV_CPU_ADD("audiocpu", Z80, XTAL_12MHz/2)
-	MDRV_CPU_PROGRAM_MAP(psychic5_sound_map)
-	MDRV_CPU_IO_MAP(psychic5_soundport_map)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_12MHz/2)
+	MCFG_CPU_PROGRAM_MAP(psychic5_sound_map)
+	MCFG_CPU_IO_MAP(psychic5_soundport_map)
 
-	MDRV_QUANTUM_TIME(HZ(600))      /* Allow time for 2nd cpu to interleave */
-	MDRV_MACHINE_RESET(psychic5)
+	MCFG_QUANTUM_TIME(HZ(600))      /* Allow time for 2nd cpu to interleave */
+	MCFG_MACHINE_RESET(psychic5)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(53.8)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(53.8)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
 	/* frames per second hand tuned to match game and music speed */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(psychic5)
-	MDRV_PALETTE_LENGTH(768)
+	MCFG_GFXDECODE(psychic5)
+	MCFG_PALETTE_LENGTH(768)
 
-	MDRV_VIDEO_START(psychic5)
-	MDRV_VIDEO_RESET(psychic5)
-	MDRV_VIDEO_UPDATE(psychic5)
+	MCFG_VIDEO_START(psychic5)
+	MCFG_VIDEO_RESET(psychic5)
+	MCFG_VIDEO_UPDATE(psychic5)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym1", YM2203, XTAL_12MHz/8)
-	MDRV_SOUND_CONFIG(ym2203_config)
-	MDRV_SOUND_ROUTE(0, "mono", 0.15)
-	MDRV_SOUND_ROUTE(1, "mono", 0.15)
-	MDRV_SOUND_ROUTE(2, "mono", 0.15)
-	MDRV_SOUND_ROUTE(3, "mono", 0.50)
+	MCFG_SOUND_ADD("ym1", YM2203, XTAL_12MHz/8)
+	MCFG_SOUND_CONFIG(ym2203_config)
+	MCFG_SOUND_ROUTE(0, "mono", 0.15)
+	MCFG_SOUND_ROUTE(1, "mono", 0.15)
+	MCFG_SOUND_ROUTE(2, "mono", 0.15)
+	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
-	MDRV_SOUND_ADD("ym2", YM2203, XTAL_12MHz/8)
-	MDRV_SOUND_ROUTE(0, "mono", 0.15)
-	MDRV_SOUND_ROUTE(1, "mono", 0.15)
-	MDRV_SOUND_ROUTE(2, "mono", 0.15)
-	MDRV_SOUND_ROUTE(3, "mono", 0.50)
+	MCFG_SOUND_ADD("ym2", YM2203, XTAL_12MHz/8)
+	MCFG_SOUND_ROUTE(0, "mono", 0.15)
+	MCFG_SOUND_ROUTE(1, "mono", 0.15)
+	MCFG_SOUND_ROUTE(2, "mono", 0.15)
+	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( bombsa, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz/2 ) /* 6 MHz */
-	MDRV_CPU_PROGRAM_MAP(bombsa_main_map)
-	MDRV_CPU_VBLANK_INT_HACK(psychic5_interrupt,2)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2 ) /* 6 MHz */
+	MCFG_CPU_PROGRAM_MAP(bombsa_main_map)
+	MCFG_CPU_VBLANK_INT_HACK(psychic5_interrupt,2)
 
-	MDRV_CPU_ADD("audiocpu", Z80, XTAL_5MHz )
-	MDRV_CPU_PROGRAM_MAP(bombsa_sound_map)
-	MDRV_CPU_IO_MAP(bombsa_soundport_map)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_5MHz )
+	MCFG_CPU_PROGRAM_MAP(bombsa_sound_map)
+	MCFG_CPU_IO_MAP(bombsa_soundport_map)
 
-	MDRV_QUANTUM_TIME(HZ(600))
-	MDRV_MACHINE_RESET(psychic5)
+	MCFG_QUANTUM_TIME(HZ(600))
+	MCFG_MACHINE_RESET(psychic5)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(54)				/* Guru says : VSync - 54Hz . HSync - 15.25kHz */
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(54)				/* Guru says : VSync - 54Hz . HSync - 15.25kHz */
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(bombsa)
-	MDRV_PALETTE_LENGTH(768)
+	MCFG_GFXDECODE(bombsa)
+	MCFG_PALETTE_LENGTH(768)
 
-	MDRV_VIDEO_START(bombsa)
-	MDRV_VIDEO_RESET(bombsa)
-	MDRV_VIDEO_UPDATE(bombsa)
+	MCFG_VIDEO_START(bombsa)
+	MCFG_VIDEO_RESET(bombsa)
+	MCFG_VIDEO_UPDATE(bombsa)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym1", YM2203, XTAL_12MHz/8)
-	MDRV_SOUND_CONFIG(ym2203_config)
-	MDRV_SOUND_ROUTE(0, "mono", 0.30)
-	MDRV_SOUND_ROUTE(1, "mono", 0.30)
-	MDRV_SOUND_ROUTE(2, "mono", 0.30)
-	MDRV_SOUND_ROUTE(3, "mono", 1.0)
+	MCFG_SOUND_ADD("ym1", YM2203, XTAL_12MHz/8)
+	MCFG_SOUND_CONFIG(ym2203_config)
+	MCFG_SOUND_ROUTE(0, "mono", 0.30)
+	MCFG_SOUND_ROUTE(1, "mono", 0.30)
+	MCFG_SOUND_ROUTE(2, "mono", 0.30)
+	MCFG_SOUND_ROUTE(3, "mono", 1.0)
 
-	MDRV_SOUND_ADD("ym2", YM2203, XTAL_12MHz/8)
-	MDRV_SOUND_ROUTE(0, "mono", 0.30)
-	MDRV_SOUND_ROUTE(1, "mono", 0.30)
-	MDRV_SOUND_ROUTE(2, "mono", 0.30)
-	MDRV_SOUND_ROUTE(3, "mono", 1.0)
+	MCFG_SOUND_ADD("ym2", YM2203, XTAL_12MHz/8)
+	MCFG_SOUND_ROUTE(0, "mono", 0.30)
+	MCFG_SOUND_ROUTE(1, "mono", 0.30)
+	MCFG_SOUND_ROUTE(2, "mono", 0.30)
+	MCFG_SOUND_ROUTE(3, "mono", 1.0)
 MACHINE_CONFIG_END
 
 

@@ -262,38 +262,38 @@ static const ym3526_interface ym3526_config =
 static MACHINE_CONFIG_START( sidepckt, sidepckt_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6809, 2000000)        /* 2 MHz */
-	MDRV_CPU_PROGRAM_MAP(sidepckt_map)
-	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_ADD("maincpu", M6809, 2000000)        /* 2 MHz */
+	MCFG_CPU_PROGRAM_MAP(sidepckt_map)
+	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-	MDRV_CPU_ADD("audiocpu", M6502, 1500000)        /* 1.5 MHz */
-	MDRV_CPU_PROGRAM_MAP(sound_map)
+	MCFG_CPU_ADD("audiocpu", M6502, 1500000)        /* 1.5 MHz */
+	MCFG_CPU_PROGRAM_MAP(sound_map)
 								/* NMIs are triggered by the main cpu */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(58)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */  /* VERIFY:  May be 55 or 56 */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(58)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */  /* VERIFY:  May be 55 or 56 */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(sidepckt)
-	MDRV_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE(sidepckt)
+	MCFG_PALETTE_LENGTH(256)
 
-	MDRV_PALETTE_INIT(sidepckt)
-	MDRV_VIDEO_START(sidepckt)
-	MDRV_VIDEO_UPDATE(sidepckt)
+	MCFG_PALETTE_INIT(sidepckt)
+	MCFG_VIDEO_START(sidepckt)
+	MCFG_VIDEO_UPDATE(sidepckt)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym1", YM2203, 1500000)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("ym1", YM2203, 1500000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD("ym2", YM3526, 3000000)
-	MDRV_SOUND_CONFIG(ym3526_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("ym2", YM3526, 3000000)
+	MCFG_SOUND_CONFIG(ym3526_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 

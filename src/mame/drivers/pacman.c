@@ -3165,30 +3165,30 @@ static const namco_interface namco_config =
 static MACHINE_CONFIG_START( pacman, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)
-	MDRV_CPU_PROGRAM_MAP(pacman_map)
-	MDRV_CPU_IO_MAP(writeport)
-	MDRV_CPU_VBLANK_INT_HACK(pacman_interrupt,2)
-	MDRV_WATCHDOG_VBLANK_INIT(16)
+	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/6)
+	MCFG_CPU_PROGRAM_MAP(pacman_map)
+	MCFG_CPU_IO_MAP(writeport)
+	MCFG_CPU_VBLANK_INT_HACK(pacman_interrupt,2)
+	MCFG_WATCHDOG_VBLANK_INIT(16)
 
 	/* video hardware */
-	MDRV_GFXDECODE(pacman)
-	MDRV_PALETTE_LENGTH(128*4)
+	MCFG_GFXDECODE(pacman)
+	MCFG_PALETTE_LENGTH(128*4)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 
-	MDRV_PALETTE_INIT(pacman)
-	MDRV_VIDEO_START(pacman)
-	MDRV_VIDEO_UPDATE(pacman)
+	MCFG_PALETTE_INIT(pacman)
+	MCFG_VIDEO_START(pacman)
+	MCFG_VIDEO_UPDATE(pacman)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("namco", NAMCO, MASTER_CLOCK/6/32)
-	MDRV_SOUND_CONFIG(namco_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("namco", NAMCO, MASTER_CLOCK/6/32)
+	MCFG_SOUND_CONFIG(namco_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -3196,8 +3196,8 @@ static MACHINE_CONFIG_DERIVED( piranha, pacman )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(piranha_portmap)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(piranha_portmap)
 MACHINE_CONFIG_END
 
 
@@ -3205,8 +3205,8 @@ static MACHINE_CONFIG_DERIVED( nmouse, pacman )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(nmouse_portmap)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(nmouse_portmap)
 MACHINE_CONFIG_END
 
 
@@ -3214,8 +3214,8 @@ static MACHINE_CONFIG_DERIVED( mspacman, pacman )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mspacman_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(mspacman_map)
 MACHINE_CONFIG_END
 
 
@@ -3223,8 +3223,8 @@ static MACHINE_CONFIG_DERIVED( woodpek, pacman )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(woodpek_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(woodpek_map)
 
 MACHINE_CONFIG_END
 
@@ -3233,9 +3233,9 @@ static MACHINE_CONFIG_DERIVED( alibaba, pacman )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(alibaba_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(alibaba_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 MACHINE_CONFIG_END
 
 
@@ -3243,14 +3243,14 @@ static MACHINE_CONFIG_DERIVED( dremshpr, pacman )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(dremshpr_map)
-	MDRV_CPU_IO_MAP(dremshpr_portmap)
-	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(dremshpr_map)
+	MCFG_CPU_IO_MAP(dremshpr_portmap)
+	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	/* sound hardware */
-	MDRV_SOUND_REPLACE("namco", AY8910, 14318000/8)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_REPLACE("namco", AY8910, 14318000/8)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 
@@ -3258,12 +3258,12 @@ static MACHINE_CONFIG_DERIVED( theglobp, pacman )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(epos_map)
-	MDRV_CPU_IO_MAP(theglobp_portmap)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(epos_map)
+	MCFG_CPU_IO_MAP(theglobp_portmap)
 
-	MDRV_MACHINE_START(theglobp)
-	MDRV_MACHINE_RESET(theglobp)
+	MCFG_MACHINE_START(theglobp)
+	MCFG_MACHINE_RESET(theglobp)
 MACHINE_CONFIG_END
 
 
@@ -3271,12 +3271,12 @@ static MACHINE_CONFIG_DERIVED( acitya, pacman )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(epos_map)
-	MDRV_CPU_IO_MAP(acitya_portmap)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(epos_map)
+	MCFG_CPU_IO_MAP(acitya_portmap)
 
-	MDRV_MACHINE_START(acitya)
-	MDRV_MACHINE_RESET(acitya)
+	MCFG_MACHINE_START(acitya)
+	MCFG_MACHINE_RESET(acitya)
 MACHINE_CONFIG_END
 
 
@@ -3284,20 +3284,20 @@ static MACHINE_CONFIG_DERIVED( vanvan, pacman )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(vanvan_map)
-	MDRV_CPU_IO_MAP(vanvan_portmap)
-	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(vanvan_map)
+	MCFG_CPU_IO_MAP(vanvan_portmap)
+	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(2*8, 34*8-1, 0*8, 28*8-1)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(2*8, 34*8-1, 0*8, 28*8-1)
 
 	/* sound hardware */
-	MDRV_SOUND_REPLACE("namco", SN76496, 1789750)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
-	MDRV_SOUND_ADD("sn2", SN76496, 1789750)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	MCFG_SOUND_REPLACE("namco", SN76496, 1789750)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	MCFG_SOUND_ADD("sn2", SN76496, 1789750)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
 
@@ -3305,13 +3305,13 @@ static MACHINE_CONFIG_DERIVED( bigbucks, pacman )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(bigbucks_map)
-	MDRV_CPU_IO_MAP(bigbucks_portmap)
-	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,20)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(bigbucks_map)
+	MCFG_CPU_IO_MAP(bigbucks_portmap)
+	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,20)
 
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
 MACHINE_CONFIG_END
 
 
@@ -3319,24 +3319,24 @@ static MACHINE_CONFIG_DERIVED( s2650games, pacman )
 
 	/* basic machine hardware */
 
-	MDRV_DEVICE_REMOVE("maincpu")
-	MDRV_CPU_ADD("maincpu", S2650, MASTER_CLOCK/6/2)	/* 2H */
-	MDRV_CPU_PROGRAM_MAP(s2650games_map)
-	MDRV_CPU_VBLANK_INT("screen", s2650_interrupt)
+	MCFG_DEVICE_REMOVE("maincpu")
+	MCFG_CPU_ADD("maincpu", S2650, MASTER_CLOCK/6/2)	/* 2H */
+	MCFG_CPU_PROGRAM_MAP(s2650games_map)
+	MCFG_CPU_VBLANK_INT("screen", s2650_interrupt)
 
-	MDRV_GFXDECODE(s2650games)
+	MCFG_GFXDECODE(s2650games)
 
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
 
-	MDRV_VIDEO_START(s2650games)
-	MDRV_VIDEO_UPDATE(s2650games)
+	MCFG_VIDEO_START(s2650games)
+	MCFG_VIDEO_UPDATE(s2650games)
 
 	/* sound hardware */
-	MDRV_SOUND_REPLACE("namco", SN76496, MASTER_CLOCK/6)	/* 1H */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	MCFG_SOUND_REPLACE("namco", SN76496, MASTER_CLOCK/6)	/* 1H */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
 
@@ -3344,8 +3344,8 @@ static MACHINE_CONFIG_DERIVED( drivfrcp, s2650games )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(drivfrcp_portmap)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(drivfrcp_portmap)
 MACHINE_CONFIG_END
 
 
@@ -3353,8 +3353,8 @@ static MACHINE_CONFIG_DERIVED( 8bpm, s2650games )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(_8bpm_portmap)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(_8bpm_portmap)
 MACHINE_CONFIG_END
 
 
@@ -3362,8 +3362,8 @@ static MACHINE_CONFIG_DERIVED( porky, s2650games )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(porky_portmap)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(porky_portmap)
 MACHINE_CONFIG_END
 
 
@@ -3371,12 +3371,12 @@ static MACHINE_CONFIG_DERIVED( rocktrv2, pacman )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(rocktrv2_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(rocktrv2_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
 MACHINE_CONFIG_END
 
 
@@ -3384,12 +3384,12 @@ static MACHINE_CONFIG_DERIVED( mschamp, pacman )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mschamp_map)
-	MDRV_CPU_IO_MAP(mschamp_portmap)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(mschamp_map)
+	MCFG_CPU_IO_MAP(mschamp_portmap)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_MACHINE_RESET(mschamp)
+	MCFG_MACHINE_RESET(mschamp)
 MACHINE_CONFIG_END
 
 
@@ -3397,7 +3397,7 @@ static MACHINE_CONFIG_DERIVED( crush4, mschamp )
 
 	/* basic machine hardware */
 
-	MDRV_GFXDECODE(crush4)
+	MCFG_GFXDECODE(crush4)
 MACHINE_CONFIG_END
 
 static const ay8910_interface crushs_ay8910_interface =
@@ -3414,14 +3414,14 @@ static MACHINE_CONFIG_DERIVED( crushs, pacman )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(crushs_map)
-	MDRV_CPU_IO_MAP(crushs_portmap)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(crushs_map)
+	MCFG_CPU_IO_MAP(crushs_portmap)
 
 	/* sound hardware */
-	MDRV_SOUND_REPLACE("namco", AY8912, 1789750)
-	MDRV_SOUND_CONFIG(crushs_ay8910_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	MCFG_SOUND_REPLACE("namco", AY8912, 1789750)
+	MCFG_SOUND_CONFIG(crushs_ay8910_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
 

@@ -771,89 +771,89 @@ static MACHINE_RESET( laserbat )
 static MACHINE_CONFIG_START( laserbat, laserbat_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", S2650, 14318180/4) // ???
-	MDRV_CPU_PROGRAM_MAP(laserbat_map)
-	MDRV_CPU_IO_MAP(laserbat_io_map)
-	MDRV_CPU_VBLANK_INT("screen", laserbat_interrupt)
+	MCFG_CPU_ADD("maincpu", S2650, 14318180/4) // ???
+	MCFG_CPU_PROGRAM_MAP(laserbat_map)
+	MCFG_CPU_IO_MAP(laserbat_io_map)
+	MCFG_CPU_VBLANK_INT("screen", laserbat_interrupt)
 
-	MDRV_MACHINE_START(laserbat)
-	MDRV_MACHINE_RESET(laserbat)
+	MCFG_MACHINE_START(laserbat)
+	MCFG_MACHINE_RESET(laserbat)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(50)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(1*8, 29*8-1, 2*8, 32*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(50)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(1*8, 29*8-1, 2*8, 32*8-1)
 
-	MDRV_GFXDECODE(laserbat)
-	MDRV_PALETTE_LENGTH(1024)
+	MCFG_GFXDECODE(laserbat)
+	MCFG_PALETTE_LENGTH(1024)
 
-	MDRV_S2636_ADD("s2636_1", s2636_1_config)
-	MDRV_S2636_ADD("s2636_2", s2636_2_config)
-	MDRV_S2636_ADD("s2636_3", s2636_3_config)
+	MCFG_S2636_ADD("s2636_1", s2636_1_config)
+	MCFG_S2636_ADD("s2636_2", s2636_2_config)
+	MCFG_S2636_ADD("s2636_3", s2636_3_config)
 
-	MDRV_VIDEO_START(laserbat)
-	MDRV_VIDEO_UPDATE(laserbat)
+	MCFG_VIDEO_START(laserbat)
+	MCFG_VIDEO_UPDATE(laserbat)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("snsnd", SN76477, 0) // output not connected
-	MDRV_SOUND_CONFIG(laserbat_sn76477_interface)
+	MCFG_SOUND_ADD("snsnd", SN76477, 0) // output not connected
+	MCFG_SOUND_CONFIG(laserbat_sn76477_interface)
 
-	MDRV_SOUND_ADD("tms1", TMS3615, 4000000/8/2) // 250 kHz, from second chip's clock out
-	MDRV_SOUND_ROUTE(TMS3615_FOOTAGE_8, "mono", 1.0)
+	MCFG_SOUND_ADD("tms1", TMS3615, 4000000/8/2) // 250 kHz, from second chip's clock out
+	MCFG_SOUND_ROUTE(TMS3615_FOOTAGE_8, "mono", 1.0)
 
-	MDRV_SOUND_ADD("tms2", TMS3615, 4000000/8) // 500 kHz
-	MDRV_SOUND_ROUTE(TMS3615_FOOTAGE_8, "mono", 1.0)
+	MCFG_SOUND_ADD("tms2", TMS3615, 4000000/8) // 500 kHz
+	MCFG_SOUND_ROUTE(TMS3615_FOOTAGE_8, "mono", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( catnmous, laserbat_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", S2650, 14318000/4)	/* ? */
-	MDRV_CPU_PROGRAM_MAP(laserbat_map)
-	MDRV_CPU_IO_MAP(catnmous_io_map)
-	MDRV_CPU_VBLANK_INT("screen", laserbat_interrupt)
+	MCFG_CPU_ADD("maincpu", S2650, 14318000/4)	/* ? */
+	MCFG_CPU_PROGRAM_MAP(laserbat_map)
+	MCFG_CPU_IO_MAP(catnmous_io_map)
+	MCFG_CPU_VBLANK_INT("screen", laserbat_interrupt)
 
-	MDRV_CPU_ADD("audiocpu", M6802,3580000) /* ? */
-	MDRV_CPU_PROGRAM_MAP(catnmous_sound_map)
-	MDRV_CPU_PERIODIC_INT(zaccaria_cb1_toggle, (double)3580000/4096)
+	MCFG_CPU_ADD("audiocpu", M6802,3580000) /* ? */
+	MCFG_CPU_PROGRAM_MAP(catnmous_sound_map)
+	MCFG_CPU_PERIODIC_INT(zaccaria_cb1_toggle, (double)3580000/4096)
 
-	MDRV_PIA6821_ADD("pia", pia_intf)
+	MCFG_PIA6821_ADD("pia", pia_intf)
 
-	MDRV_MACHINE_START(laserbat)
-	MDRV_MACHINE_RESET(laserbat)
+	MCFG_MACHINE_START(laserbat)
+	MCFG_MACHINE_RESET(laserbat)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 32*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 32*8-1)
 
-	MDRV_GFXDECODE(laserbat)
-	MDRV_PALETTE_LENGTH(1024)
+	MCFG_GFXDECODE(laserbat)
+	MCFG_PALETTE_LENGTH(1024)
 
-	MDRV_S2636_ADD("s2636_1", s2636_1_config)
-	MDRV_S2636_ADD("s2636_2", s2636_2_config)
-	MDRV_S2636_ADD("s2636_3", s2636_3_config)
+	MCFG_S2636_ADD("s2636_1", s2636_1_config)
+	MCFG_S2636_ADD("s2636_2", s2636_2_config)
+	MCFG_S2636_ADD("s2636_3", s2636_3_config)
 
-	MDRV_VIDEO_START(laserbat)
-	MDRV_VIDEO_UPDATE(laserbat)
+	MCFG_VIDEO_START(laserbat)
+	MCFG_VIDEO_UPDATE(laserbat)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay1", AY8910, 3580000/2) // ?
-	MDRV_SOUND_CONFIG(ay8910_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("ay1", AY8910, 3580000/2) // ?
+	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("ay2", AY8910, 3580000/2) // ?
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("ay2", AY8910, 3580000/2) // ?
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 

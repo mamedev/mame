@@ -382,22 +382,22 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_DERIVED( invadpt2, mw8080bw_root )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(invadpt2_io_map)
-	MDRV_MACHINE_START(extra_8080bw)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(invadpt2_io_map)
+	MCFG_MACHINE_START(extra_8080bw)
 
 	/* 60 Hz signal clocks two LS161. Ripple carry will */
 	/* reset circuit, if LS161 not cleared before.      */
-	MDRV_WATCHDOG_VBLANK_INIT(255)
+	MCFG_WATCHDOG_VBLANK_INIT(255)
 
 	/* add shifter */
-	MDRV_MB14241_ADD("mb14241")
+	MCFG_MB14241_ADD("mb14241")
 
 	/* video hardware */
-	MDRV_VIDEO_UPDATE(invadpt2)
+	MCFG_VIDEO_UPDATE(invadpt2)
 
 	/* sound hardware */
-	MDRV_FRAGMENT_ADD(invaders_samples_audio)
+	MCFG_FRAGMENT_ADD(invaders_samples_audio)
 
 MACHINE_CONFIG_END
 
@@ -440,19 +440,19 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_DERIVED( spcewars, mw8080bw_root )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(spcewars_io_map)
-	MDRV_MACHINE_START(extra_8080bw)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(spcewars_io_map)
+	MCFG_MACHINE_START(extra_8080bw)
 
 	/* add shifter */
-	MDRV_MB14241_ADD("mb14241")
+	MCFG_MB14241_ADD("mb14241")
 
 	/* sound hardware */
-	MDRV_FRAGMENT_ADD(invaders_samples_audio)
+	MCFG_FRAGMENT_ADD(invaders_samples_audio)
 
 	/* extra audio channel */
-	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 MACHINE_CONFIG_END
 
@@ -514,8 +514,8 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_DERIVED( astropal, invaders )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(astropal_io_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(astropal_io_map)
 
 MACHINE_CONFIG_END
 
@@ -563,16 +563,16 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_DERIVED( cosmo, mw8080bw_root )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(cosmo_map)
-	MDRV_CPU_IO_MAP(cosmo_io_map)
-	MDRV_MACHINE_START(extra_8080bw)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(cosmo_map)
+	MCFG_CPU_IO_MAP(cosmo_io_map)
+	MCFG_MACHINE_START(extra_8080bw)
 
 	/* video hardware */
-	MDRV_VIDEO_UPDATE(cosmo)
+	MCFG_VIDEO_UPDATE(cosmo)
 
 	/* sound hardware */
-	MDRV_FRAGMENT_ADD(invaders_samples_audio)
+	MCFG_FRAGMENT_ADD(invaders_samples_audio)
 
 MACHINE_CONFIG_END
 
@@ -685,14 +685,14 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_DERIVED( invrvnge, mw8080bw_root )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(invrvnge_io_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(invrvnge_io_map)
 
 	/* add shifter */
-	MDRV_MB14241_ADD("mb14241")
+	MCFG_MB14241_ADD("mb14241")
 
 	/* sound hardware */
-	MDRV_FRAGMENT_ADD(invaders_samples_audio)
+	MCFG_FRAGMENT_ADD(invaders_samples_audio)
 
 MACHINE_CONFIG_END
 
@@ -790,26 +790,26 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_DERIVED( lrescue, mw8080bw_root )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(lrescue_io_map)
-	MDRV_MACHINE_START(extra_8080bw)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(lrescue_io_map)
+	MCFG_MACHINE_START(extra_8080bw)
 
 	/* add shifter */
-	MDRV_MB14241_ADD("mb14241")
+	MCFG_MB14241_ADD("mb14241")
 
 	/* video hardware */
-	MDRV_VIDEO_UPDATE(invadpt2)
+	MCFG_VIDEO_UPDATE(invadpt2)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("samples", SAMPLES, 0)
-	MDRV_SOUND_CONFIG(lrescue_samples_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SOUND_CONFIG(lrescue_samples_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 	/* extra audio channel */
-	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 MACHINE_CONFIG_END
 
@@ -938,18 +938,18 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_DERIVED( rollingc, mw8080bw_root )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(rollingc_map)
-	MDRV_CPU_IO_MAP(rollingc_io_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(rollingc_map)
+	MCFG_CPU_IO_MAP(rollingc_io_map)
 
 	/* add shifter */
-	MDRV_MB14241_ADD("mb14241")
+	MCFG_MB14241_ADD("mb14241")
 
 	/* video hardware */
-	MDRV_VIDEO_UPDATE(rollingc)
+	MCFG_VIDEO_UPDATE(rollingc)
 
 	/* sound hardware */
-	MDRV_FRAGMENT_ADD(invaders_samples_audio)
+	MCFG_FRAGMENT_ADD(invaders_samples_audio)
 
 MACHINE_CONFIG_END
 
@@ -1052,29 +1052,29 @@ static MACHINE_RESET( schaser )
 static MACHINE_CONFIG_DERIVED( schaser, mw8080bw_root )
 
 	/* basic machine hardware */
-	MDRV_CPU_REPLACE("maincpu",I8080,1996800)   	/* 19.968MHz / 10 */
-	MDRV_CPU_PROGRAM_MAP(schaser_map)
-	MDRV_CPU_IO_MAP(schaser_io_map)
-	MDRV_WATCHDOG_VBLANK_INIT(255)
-	MDRV_MACHINE_START(schaser)
-	MDRV_MACHINE_RESET(schaser)
+	MCFG_CPU_REPLACE("maincpu",I8080,1996800)   	/* 19.968MHz / 10 */
+	MCFG_CPU_PROGRAM_MAP(schaser_map)
+	MCFG_CPU_IO_MAP(schaser_io_map)
+	MCFG_WATCHDOG_VBLANK_INIT(255)
+	MCFG_MACHINE_START(schaser)
+	MCFG_MACHINE_RESET(schaser)
 
 	/* add shifter */
-	MDRV_MB14241_ADD("mb14241")
+	MCFG_MB14241_ADD("mb14241")
 
 	/* video hardware */
-	MDRV_VIDEO_UPDATE(schaser)
+	MCFG_VIDEO_UPDATE(schaser)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("snsnd", SN76477, 0)
-	MDRV_SOUND_CONFIG(schaser_sn76477_interface)
-	MDRV_SOUND_ROUTE_EX(0, "discrete", 1.0, 0)
+	MCFG_SOUND_ADD("snsnd", SN76477, 0)
+	MCFG_SOUND_CONFIG(schaser_sn76477_interface)
+	MCFG_SOUND_ROUTE_EX(0, "discrete", 1.0, 0)
 
-	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG_DISCRETE(schaser)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_SOUND_CONFIG_DISCRETE(schaser)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_CONFIG_END
 
@@ -1122,22 +1122,22 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_DERIVED( schasercv, mw8080bw_root )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(schaser_map)
-	MDRV_CPU_IO_MAP(schasercv_io_map)
-	MDRV_MACHINE_START(extra_8080bw)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(schaser_map)
+	MCFG_CPU_IO_MAP(schasercv_io_map)
+	MCFG_MACHINE_START(extra_8080bw)
 
 	/* add shifter */
-	MDRV_MB14241_ADD("mb14241")
+	MCFG_MB14241_ADD("mb14241")
 
 	/* video hardware */
-	MDRV_VIDEO_UPDATE(schasercv)
+	MCFG_VIDEO_UPDATE(schasercv)
 
 	/* sound hardware */
-	MDRV_FRAGMENT_ADD(invaders_samples_audio)
+	MCFG_FRAGMENT_ADD(invaders_samples_audio)
 
-	MDRV_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("speaker", SPEAKER_SOUND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 MACHINE_CONFIG_END
 
@@ -1213,16 +1213,16 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_DERIVED( sflush, mw8080bw_root )
 
 	/* basic machine hardware */
-	MDRV_CPU_REPLACE("maincpu",M6800,2000000)   	/* ?? */
-	MDRV_CPU_PROGRAM_MAP(sflush_map)
-	MDRV_CPU_VBLANK_INT_HACK(irq0_line_pulse,2)
-	MDRV_MACHINE_START(sflush)
+	MCFG_CPU_REPLACE("maincpu",M6800,2000000)   	/* ?? */
+	MCFG_CPU_PROGRAM_MAP(sflush_map)
+	MCFG_CPU_VBLANK_INT_HACK(irq0_line_pulse,2)
+	MCFG_MACHINE_START(sflush)
 
 	/* add shifter */
-	MDRV_MB14241_ADD("mb14241")
+	MCFG_MB14241_ADD("mb14241")
 
 	/* video hardware */
-	MDRV_VIDEO_UPDATE(sflush)
+	MCFG_VIDEO_UPDATE(sflush)
 
 MACHINE_CONFIG_END
 
@@ -1320,37 +1320,37 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_DERIVED( lupin3, mw8080bw_root )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(lupin3_io_map)
-	MDRV_MACHINE_START(extra_8080bw)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(lupin3_io_map)
+	MCFG_MACHINE_START(extra_8080bw)
 
 	/* add shifter */
-	MDRV_MB14241_ADD("mb14241")
+	MCFG_MB14241_ADD("mb14241")
 
 	/* video hardware */
-	MDRV_VIDEO_UPDATE(indianbt)
+	MCFG_VIDEO_UPDATE(indianbt)
 
 	/* sound hardware */
-	MDRV_FRAGMENT_ADD(invaders_samples_audio)
+	MCFG_FRAGMENT_ADD(invaders_samples_audio)
 
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( lupin3a, mw8080bw_root )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(schaser_map)
-	MDRV_CPU_IO_MAP(lupin3_io_map)
-	MDRV_MACHINE_START(extra_8080bw)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(schaser_map)
+	MCFG_CPU_IO_MAP(lupin3_io_map)
+	MCFG_MACHINE_START(extra_8080bw)
 
 	/* add shifter */
-	MDRV_MB14241_ADD("mb14241")
+	MCFG_MB14241_ADD("mb14241")
 
 	/* video hardware */
-	MDRV_VIDEO_UPDATE(lupin3)
+	MCFG_VIDEO_UPDATE(lupin3)
 
 	/* sound hardware */
-	MDRV_FRAGMENT_ADD(invaders_samples_audio)
+	MCFG_FRAGMENT_ADD(invaders_samples_audio)
 
 MACHINE_CONFIG_END
 
@@ -1456,25 +1456,25 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_DERIVED( polaris, mw8080bw_root )
 
 	/* basic machine hardware */
-	MDRV_CPU_REPLACE("maincpu",I8080,1996800)   	/* 19.968MHz / 10 */
-	MDRV_CPU_PROGRAM_MAP(schaser_map)
-	MDRV_CPU_IO_MAP(polaris_io_map)
-	MDRV_WATCHDOG_VBLANK_INIT(255)
-	MDRV_CPU_VBLANK_INT("screen", polaris_interrupt)
-	MDRV_MACHINE_START(polaris)
+	MCFG_CPU_REPLACE("maincpu",I8080,1996800)   	/* 19.968MHz / 10 */
+	MCFG_CPU_PROGRAM_MAP(schaser_map)
+	MCFG_CPU_IO_MAP(polaris_io_map)
+	MCFG_WATCHDOG_VBLANK_INIT(255)
+	MCFG_CPU_VBLANK_INT("screen", polaris_interrupt)
+	MCFG_MACHINE_START(polaris)
 
 	/* add shifter */
-	MDRV_MB14241_ADD("mb14241")
+	MCFG_MB14241_ADD("mb14241")
 
 	/* video hardware */
-	MDRV_VIDEO_UPDATE(polaris)
+	MCFG_VIDEO_UPDATE(polaris)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG_DISCRETE(polaris)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_SOUND_CONFIG_DISCRETE(polaris)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_CONFIG_END
 
@@ -1581,18 +1581,18 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_DERIVED( ballbomb, mw8080bw_root )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(ballbomb_io_map)
-	MDRV_MACHINE_START(extra_8080bw)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(ballbomb_io_map)
+	MCFG_MACHINE_START(extra_8080bw)
 
 	/* add shifter */
-	MDRV_MB14241_ADD("mb14241")
+	MCFG_MB14241_ADD("mb14241")
 
 	/* video hardware */
-	MDRV_VIDEO_UPDATE(ballbomb)
+	MCFG_VIDEO_UPDATE(ballbomb)
 
 	/* sound hardware */
-	MDRV_FRAGMENT_ADD(invaders_samples_audio)
+	MCFG_FRAGMENT_ADD(invaders_samples_audio)
 
 MACHINE_CONFIG_END
 
@@ -1657,13 +1657,13 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_DERIVED( yosakdon, mw8080bw_root )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(yosakdon_map)
-	MDRV_CPU_IO_MAP(yosakdon_io_map)
-	MDRV_MACHINE_START(extra_8080bw)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(yosakdon_map)
+	MCFG_CPU_IO_MAP(yosakdon_io_map)
+	MCFG_MACHINE_START(extra_8080bw)
 
 	/* sound hardware */
-	MDRV_FRAGMENT_ADD(invaders_samples_audio)
+	MCFG_FRAGMENT_ADD(invaders_samples_audio)
 
 MACHINE_CONFIG_END
 
@@ -1754,22 +1754,22 @@ ADDRESS_MAP_END
 static MACHINE_CONFIG_DERIVED( indianbt, mw8080bw_root )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(indianbt_io_map)
-	MDRV_MACHINE_START(extra_8080bw)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(indianbt_io_map)
+	MCFG_MACHINE_START(extra_8080bw)
 
 	/* add shifter */
-	MDRV_MB14241_ADD("mb14241")
+	MCFG_MB14241_ADD("mb14241")
 
 	/* video hardware */
-	MDRV_VIDEO_UPDATE(indianbt)
+	MCFG_VIDEO_UPDATE(indianbt)
 
 	/* sound hardware */
-	MDRV_FRAGMENT_ADD(invaders_samples_audio)
+	MCFG_FRAGMENT_ADD(invaders_samples_audio)
 
-	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG_DISCRETE(indianbt)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_SOUND_CONFIG_DISCRETE(indianbt)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 MACHINE_CONFIG_END
 
@@ -1827,18 +1827,18 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_DERIVED( steelwkr, mw8080bw_root )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(steelwkr_io_map)
-	MDRV_MACHINE_START(extra_8080bw)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(steelwkr_io_map)
+	MCFG_MACHINE_START(extra_8080bw)
 
 	/* add shifter */
-	MDRV_MB14241_ADD("mb14241")
+	MCFG_MB14241_ADD("mb14241")
 
 	/* video hardware */
-	MDRV_VIDEO_UPDATE(invadpt2)
+	MCFG_VIDEO_UPDATE(invadpt2)
 
 	/* sound hardware */
-	MDRV_FRAGMENT_ADD(invaders_samples_audio)
+	MCFG_FRAGMENT_ADD(invaders_samples_audio)
 
 MACHINE_CONFIG_END
 
@@ -1962,18 +1962,18 @@ ADDRESS_MAP_END
 static MACHINE_CONFIG_DERIVED( shuttlei, mw8080bw_root )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(shuttlei_map)
-	MDRV_CPU_IO_MAP(shuttlei_io_map)
-	MDRV_MACHINE_START(extra_8080bw)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(shuttlei_map)
+	MCFG_CPU_IO_MAP(shuttlei_io_map)
+	MCFG_MACHINE_START(extra_8080bw)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 24*8-1)
-	MDRV_VIDEO_UPDATE(shuttlei)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 24*8-1)
+	MCFG_VIDEO_UPDATE(shuttlei)
 
 	/* sound hardware */
-	MDRV_FRAGMENT_ADD(invaders_samples_audio)
+	MCFG_FRAGMENT_ADD(invaders_samples_audio)
 
 MACHINE_CONFIG_END
 
@@ -2071,13 +2071,13 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_DERIVED( darthvdr, mw8080bw_root )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(darthvdr_map)
-	MDRV_CPU_IO_MAP(darthvdr_io_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(darthvdr_map)
+	MCFG_CPU_IO_MAP(darthvdr_io_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_MACHINE_START(darthvdr)
-	MDRV_MACHINE_RESET(darthvdr)
+	MCFG_MACHINE_START(darthvdr)
+	MCFG_MACHINE_RESET(darthvdr)
 
 MACHINE_CONFIG_END
 
@@ -2143,20 +2143,20 @@ INPUT_PORTS_END
 MACHINE_CONFIG_DERIVED( vortex, mw8080bw_root )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(vortex_io_map)
-	MDRV_MACHINE_START(extra_8080bw)
-	MDRV_WATCHDOG_TIME_INIT(USEC(255000000 / (MW8080BW_PIXEL_CLOCK / MW8080BW_HTOTAL / MW8080BW_VTOTAL)))
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(vortex_io_map)
+	MCFG_MACHINE_START(extra_8080bw)
+	MCFG_WATCHDOG_TIME_INIT(USEC(255000000 / (MW8080BW_PIXEL_CLOCK / MW8080BW_HTOTAL / MW8080BW_VTOTAL)))
 
 	/* video hardware */
 	// TODO: replace with modified invaders color renderer code allowing midscanline color writes
-	MDRV_VIDEO_UPDATE(invaders)
+	MCFG_VIDEO_UPDATE(invaders)
 
 	/* add shifter */
-	MDRV_MB14241_ADD("mb14241")
+	MCFG_MB14241_ADD("mb14241")
 
 	/* audio hardware */
-	MDRV_FRAGMENT_ADD(invaders_audio)
+	MCFG_FRAGMENT_ADD(invaders_audio)
 
 MACHINE_CONFIG_END
 
@@ -2349,8 +2349,8 @@ ADDRESS_MAP_END
 MACHINE_CONFIG_DERIVED( modelr, invaders )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(modelr_io_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(modelr_io_map)
 
 MACHINE_CONFIG_END
 

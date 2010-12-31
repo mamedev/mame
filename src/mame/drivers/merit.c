@@ -1219,104 +1219,104 @@ static MACHINE_START(casino5)
 }
 
 static MACHINE_CONFIG_START( pitboss, merit_state )
-	MDRV_CPU_ADD("maincpu",Z80, CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(pitboss_map)
-	MDRV_CPU_IO_MAP(trvwhiz_io_map)
+	MCFG_CPU_ADD("maincpu",Z80, CPU_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(pitboss_map)
+	MCFG_CPU_IO_MAP(trvwhiz_io_map)
 
-	MDRV_PPI8255_ADD( "ppi8255_0", ppi8255_intf[0] )
-	MDRV_PPI8255_ADD( "ppi8255_1", ppi8255_intf[1] )
+	MCFG_PPI8255_ADD( "ppi8255_0", ppi8255_intf[0] )
+	MCFG_PPI8255_ADD( "ppi8255_1", ppi8255_intf[1] )
 
-	MDRV_MACHINE_START(merit)
+	MCFG_MACHINE_START(merit)
 	/* video hardware */
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 512, 0, 512, 256, 0, 256)	/* temporary, CRTC will configure screen */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 512, 0, 512, 256, 0, 256)	/* temporary, CRTC will configure screen */
 
-	MDRV_MC6845_ADD("crtc", MC6845, CRTC_CLOCK, mc6845_intf)
+	MCFG_MC6845_ADD("crtc", MC6845, CRTC_CLOCK, mc6845_intf)
 
-	MDRV_VIDEO_UPDATE(merit)
+	MCFG_VIDEO_UPDATE(merit)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("aysnd", AY8910, CRTC_CLOCK)
-	MDRV_SOUND_CONFIG(merit_ay8912_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
+	MCFG_SOUND_ADD("aysnd", AY8910, CRTC_CLOCK)
+	MCFG_SOUND_CONFIG(merit_ay8912_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.33)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( casino5, pitboss )
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(casino5_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(casino5_map)
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MDRV_MACHINE_START(casino5)
+	MCFG_MACHINE_START(casino5)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( bigappg, pitboss )
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(bigappg_map)
-	MDRV_CPU_IO_MAP(tictac_io_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(bigappg_map)
+	MCFG_CPU_IO_MAP(tictac_io_map)
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( dodge, pitboss )
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(dodge_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(dodge_map)
 
-	MDRV_NVRAM_REPLACE_CUSTOM("nvram", merit_state, dodge_nvram_init)
+	MCFG_NVRAM_REPLACE_CUSTOM("nvram", merit_state, dodge_nvram_init)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( tictac, pitboss )
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(tictac_map)
-	MDRV_CPU_IO_MAP(tictac_io_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(tictac_map)
+	MCFG_CPU_IO_MAP(tictac_io_map)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( trvwhiz, pitboss )
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(trvwhiz_map)
-	MDRV_CPU_IO_MAP(trvwhiz_io_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(trvwhiz_map)
+	MCFG_CPU_IO_MAP(trvwhiz_io_map)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( dtrvwz5, pitboss )
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(dtrvwz5_map)
-	MDRV_CPU_IO_MAP(tictac_io_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(dtrvwz5_map)
+	MCFG_CPU_IO_MAP(tictac_io_map)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( phrcraze, pitboss )
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(phrcraze_map)
-	MDRV_CPU_IO_MAP(phrcraze_io_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(phrcraze_map)
+	MCFG_CPU_IO_MAP(phrcraze_io_map)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( trvwhziv, pitboss )
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(trvwhziv_map)
-	MDRV_CPU_IO_MAP(tictac_io_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(trvwhziv_map)
+	MCFG_CPU_IO_MAP(tictac_io_map)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( couple, pitboss )
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(couple_map)
-	MDRV_CPU_IO_MAP(tictac_io_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(couple_map)
+	MCFG_CPU_IO_MAP(tictac_io_map)
 
-	MDRV_DEVICE_MODIFY("ppi8255_0")
-	MDRV_DEVICE_CONFIG( ppi8255_couple_intf[0])
-	MDRV_DEVICE_MODIFY("ppi8255_1")
-	MDRV_DEVICE_CONFIG( ppi8255_couple_intf[1])
+	MCFG_DEVICE_MODIFY("ppi8255_0")
+	MCFG_DEVICE_CONFIG( ppi8255_couple_intf[0])
+	MCFG_DEVICE_MODIFY("ppi8255_1")
+	MCFG_DEVICE_CONFIG( ppi8255_couple_intf[1])
 MACHINE_CONFIG_END
 
 

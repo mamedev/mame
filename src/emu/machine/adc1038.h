@@ -33,9 +33,9 @@ struct _adc1038_interface
 
 DECLARE_LEGACY_DEVICE(ADC1038, adc1038);
 
-#define MDRV_ADC1038_ADD(_tag, _config) \
-	MDRV_DEVICE_ADD(_tag, ADC1038, 0) \
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_ADC1038_ADD(_tag, _config) \
+	MCFG_DEVICE_ADD(_tag, ADC1038, 0) \
+	MCFG_DEVICE_CONFIG(_config)
 
 
 /***************************************************************************

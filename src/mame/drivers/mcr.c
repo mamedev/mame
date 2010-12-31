@@ -1570,37 +1570,37 @@ static const samples_interface journey_samples_interface =
 static MACHINE_CONFIG_START( mcr_90009, mcr_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, MAIN_OSC_MCR_I/8)
-	MDRV_CPU_CONFIG(mcr_daisy_chain)
-	MDRV_CPU_PROGRAM_MAP(cpu_90009_map)
-	MDRV_CPU_IO_MAP(cpu_90009_portmap)
-	MDRV_CPU_VBLANK_INT_HACK(mcr_interrupt,2)
+	MCFG_CPU_ADD("maincpu", Z80, MAIN_OSC_MCR_I/8)
+	MCFG_CPU_CONFIG(mcr_daisy_chain)
+	MCFG_CPU_PROGRAM_MAP(cpu_90009_map)
+	MCFG_CPU_IO_MAP(cpu_90009_portmap)
+	MCFG_CPU_VBLANK_INT_HACK(mcr_interrupt,2)
 
-	MDRV_Z80CTC_ADD("ctc", MAIN_OSC_MCR_I/8 /* same as "maincpu" */, mcr_ctc_intf)
+	MCFG_Z80CTC_ADD("ctc", MAIN_OSC_MCR_I/8 /* same as "maincpu" */, mcr_ctc_intf)
 
-	MDRV_WATCHDOG_VBLANK_INIT(16)
-	MDRV_MACHINE_START(mcr)
-	MDRV_MACHINE_RESET(mcr)
-	MDRV_NVRAM_ADD_1FILL("nvram")
+	MCFG_WATCHDOG_VBLANK_INIT(16)
+	MCFG_MACHINE_START(mcr)
+	MCFG_MACHINE_RESET(mcr)
+	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(30)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*16, 30*16)
-	MDRV_SCREEN_VISIBLE_AREA(0*16, 32*16-1, 0*16, 30*16-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(30)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*16, 30*16)
+	MCFG_SCREEN_VISIBLE_AREA(0*16, 32*16-1, 0*16, 30*16-1)
 
-	MDRV_GFXDECODE(mcr)
-	MDRV_PALETTE_LENGTH(32)
+	MCFG_GFXDECODE(mcr)
+	MCFG_PALETTE_LENGTH(32)
 
-	MDRV_VIDEO_START(mcr)
-	MDRV_VIDEO_UPDATE(mcr)
+	MCFG_VIDEO_START(mcr)
+	MCFG_VIDEO_UPDATE(mcr)
 
 	/* sound hardware */
-	MDRV_FRAGMENT_ADD(mcr_ssio)
+	MCFG_FRAGMENT_ADD(mcr_ssio)
 MACHINE_CONFIG_END
 
 
@@ -1608,12 +1608,12 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( mcr_90010, mcr_90009 )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(cpu_90010_map)
-	MDRV_CPU_IO_MAP(cpu_90010_portmap)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(cpu_90010_map)
+	MCFG_CPU_IO_MAP(cpu_90010_portmap)
 
 	/* video hardware */
-	MDRV_PALETTE_LENGTH(64)
+	MCFG_PALETTE_LENGTH(64)
 MACHINE_CONFIG_END
 
 
@@ -1621,13 +1621,13 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( mcr_91475, mcr_90010 )
 
 	/* video hardware */
-	MDRV_PALETTE_LENGTH(128)
+	MCFG_PALETTE_LENGTH(128)
 
 	/* sound hardware */
-	MDRV_SOUND_ADD("samples", SAMPLES, 0)
-	MDRV_SOUND_CONFIG(journey_samples_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SOUND_CONFIG(journey_samples_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.25)
 MACHINE_CONFIG_END
 
 
@@ -1635,13 +1635,13 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( mcr_91490, mcr_90010 )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_CLOCK(5000000)
-	MDRV_CPU_PROGRAM_MAP(cpu_91490_map)
-	MDRV_CPU_IO_MAP(cpu_91490_portmap)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_CLOCK(5000000)
+	MCFG_CPU_PROGRAM_MAP(cpu_91490_map)
+	MCFG_CPU_IO_MAP(cpu_91490_portmap)
 
-	MDRV_DEVICE_MODIFY("ctc")
-	MDRV_DEVICE_CLOCK(5000000 /* same as "maincpu" */)
+	MCFG_DEVICE_MODIFY("ctc")
+	MCFG_DEVICE_CLOCK(5000000 /* same as "maincpu" */)
 MACHINE_CONFIG_END
 
 
@@ -1649,7 +1649,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( mcr_91490_snt, mcr_91490 )
 
 	/* basic machine hardware */
-	MDRV_FRAGMENT_ADD(squawk_n_talk)
+	MCFG_FRAGMENT_ADD(squawk_n_talk)
 MACHINE_CONFIG_END
 
 
@@ -1657,18 +1657,18 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( mcr_91490_ipu, mcr_91490_snt )
 
 	/* basic machine hardware */
-	MDRV_MACHINE_START(nflfoot)
+	MCFG_MACHINE_START(nflfoot)
 
-	MDRV_CPU_ADD("ipu", Z80, 7372800/2)
-	MDRV_CPU_CONFIG(mcr_ipu_daisy_chain)
-	MDRV_CPU_PROGRAM_MAP(ipu_91695_map)
-	MDRV_CPU_IO_MAP(ipu_91695_portmap)
-	MDRV_CPU_VBLANK_INT_HACK(mcr_ipu_interrupt,2)
+	MCFG_CPU_ADD("ipu", Z80, 7372800/2)
+	MCFG_CPU_CONFIG(mcr_ipu_daisy_chain)
+	MCFG_CPU_PROGRAM_MAP(ipu_91695_map)
+	MCFG_CPU_IO_MAP(ipu_91695_portmap)
+	MCFG_CPU_VBLANK_INT_HACK(mcr_ipu_interrupt,2)
 
-	MDRV_Z80CTC_ADD("ipu_ctc", 7372800/2 /* same as "ipu" */, nflfoot_ctc_intf)
-	MDRV_Z80PIO_ADD("ipu_pio0", 7372800/2, nflfoot_pio_intf)
-	MDRV_Z80PIO_ADD("ipu_pio1", 7372800/2, nflfoot_pio_intf)
-	MDRV_Z80SIO_ADD("ipu_sio", 7372800/2 /* same as "ipu" */, nflfoot_sio_intf)
+	MCFG_Z80CTC_ADD("ipu_ctc", 7372800/2 /* same as "ipu" */, nflfoot_ctc_intf)
+	MCFG_Z80PIO_ADD("ipu_pio0", 7372800/2, nflfoot_pio_intf)
+	MCFG_Z80PIO_ADD("ipu_pio1", 7372800/2, nflfoot_pio_intf)
+	MCFG_Z80SIO_ADD("ipu_sio", 7372800/2 /* same as "ipu" */, nflfoot_sio_intf)
 MACHINE_CONFIG_END
 
 
@@ -1676,7 +1676,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( mcr_91490_tcs, mcr_91490 )
 
 	/* basic machine hardware */
-	MDRV_FRAGMENT_ADD(turbo_chip_squeak)
+	MCFG_FRAGMENT_ADD(turbo_chip_squeak)
 MACHINE_CONFIG_END
 
 

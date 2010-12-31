@@ -21,17 +21,17 @@ DECLARE_LEGACY_DEVICE(ADC12130, adc12130);
 DECLARE_LEGACY_DEVICE(ADC12132, adc12132);
 DECLARE_LEGACY_DEVICE(ADC12138, adc12138);
 
-#define MDRV_ADC12130_ADD(_tag, _config) \
-	MDRV_DEVICE_ADD(_tag, ADC12130, 0) \
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_ADC12130_ADD(_tag, _config) \
+	MCFG_DEVICE_ADD(_tag, ADC12130, 0) \
+	MCFG_DEVICE_CONFIG(_config)
 
-#define MDRV_ADC12132_ADD(_tag, _config) \
-	MDRV_DEVICE_ADD(_tag, ADC12132, 0) \
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_ADC12132_ADD(_tag, _config) \
+	MCFG_DEVICE_ADD(_tag, ADC12132, 0) \
+	MCFG_DEVICE_CONFIG(_config)
 
-#define MDRV_ADC12138_ADD(_tag, _config) \
-	MDRV_DEVICE_ADD(_tag, ADC12138, 0) \
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_ADC12138_ADD(_tag, _config) \
+	MCFG_DEVICE_ADD(_tag, ADC12138, 0) \
+	MCFG_DEVICE_CONFIG(_config)
 
 
 /***************************************************************************

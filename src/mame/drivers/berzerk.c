@@ -1047,41 +1047,41 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( berzerk, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, MAIN_CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(berzerk_map)
-	MDRV_CPU_IO_MAP(berzerk_io_map)
+	MCFG_CPU_ADD("maincpu", Z80, MAIN_CPU_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(berzerk_map)
+	MCFG_CPU_IO_MAP(berzerk_io_map)
 
-	MDRV_MACHINE_START(berzerk)
-	MDRV_MACHINE_RESET(berzerk)
+	MCFG_MACHINE_START(berzerk)
+	MCFG_MACHINE_RESET(berzerk)
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MDRV_VIDEO_START(berzerk)
-	MDRV_VIDEO_UPDATE(berzerk)
+	MCFG_VIDEO_START(berzerk)
+	MCFG_VIDEO_UPDATE(berzerk)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 
 	/* audio hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_RESET(berzerk)
+	MCFG_SOUND_RESET(berzerk)
 
-	MDRV_SOUND_ADD("speech", S14001A, 0)	/* placeholder - the clock is software controllable */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("speech", S14001A, 0)	/* placeholder - the clock is software controllable */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD("exidy", EXIDY, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("exidy", EXIDY, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( frenzy, berzerk )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(frenzy_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(frenzy_map)
 MACHINE_CONFIG_END
 
 

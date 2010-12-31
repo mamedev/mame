@@ -122,48 +122,48 @@ DECLARE_LEGACY_DEVICE(TC0180VCU, tc0180vcu);
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_PC080SN_ADD(_tag, _interface) \
-	MDRV_DEVICE_ADD(_tag, PC080SN, 0) \
-	MDRV_DEVICE_CONFIG(_interface)
+#define MCFG_PC080SN_ADD(_tag, _interface) \
+	MCFG_DEVICE_ADD(_tag, PC080SN, 0) \
+	MCFG_DEVICE_CONFIG(_interface)
 
-#define MDRV_PC090OJ_ADD(_tag, _interface) \
-	MDRV_DEVICE_ADD(_tag, PC090OJ, 0) \
-	MDRV_DEVICE_CONFIG(_interface)
+#define MCFG_PC090OJ_ADD(_tag, _interface) \
+	MCFG_DEVICE_ADD(_tag, PC090OJ, 0) \
+	MCFG_DEVICE_CONFIG(_interface)
 
-#define MDRV_TC0080VCO_ADD(_tag, _interface) \
-	MDRV_DEVICE_ADD(_tag, TC0080VCO, 0) \
-	MDRV_DEVICE_CONFIG(_interface)
+#define MCFG_TC0080VCO_ADD(_tag, _interface) \
+	MCFG_DEVICE_ADD(_tag, TC0080VCO, 0) \
+	MCFG_DEVICE_CONFIG(_interface)
 
-#define MDRV_TC0100SCN_ADD(_tag, _interface) \
-	MDRV_DEVICE_ADD(_tag, TC0100SCN, 0) \
-	MDRV_DEVICE_CONFIG(_interface)
+#define MCFG_TC0100SCN_ADD(_tag, _interface) \
+	MCFG_DEVICE_ADD(_tag, TC0100SCN, 0) \
+	MCFG_DEVICE_CONFIG(_interface)
 
-#define MDRV_TC0280GRD_ADD(_tag, _interface) \
-	MDRV_DEVICE_ADD(_tag, TC0280GRD, 0) \
-	MDRV_DEVICE_CONFIG(_interface)
+#define MCFG_TC0280GRD_ADD(_tag, _interface) \
+	MCFG_DEVICE_ADD(_tag, TC0280GRD, 0) \
+	MCFG_DEVICE_CONFIG(_interface)
 
-#define MDRV_TC0430GRW_ADD(_tag, _interface) \
-	MDRV_DEVICE_ADD(_tag, TC0430GRW, 0) \
-	MDRV_DEVICE_CONFIG(_interface)
+#define MCFG_TC0430GRW_ADD(_tag, _interface) \
+	MCFG_DEVICE_ADD(_tag, TC0430GRW, 0) \
+	MCFG_DEVICE_CONFIG(_interface)
 
-#define MDRV_TC0360PRI_ADD(_tag) \
-	MDRV_DEVICE_ADD(_tag, TC0360PRI, 0)
+#define MCFG_TC0360PRI_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, TC0360PRI, 0)
 
-#define MDRV_TC0150ROD_ADD(_tag, _interface) \
-	MDRV_DEVICE_ADD(_tag, TC0150ROD, 0) \
-	MDRV_DEVICE_CONFIG(_interface)
+#define MCFG_TC0150ROD_ADD(_tag, _interface) \
+	MCFG_DEVICE_ADD(_tag, TC0150ROD, 0) \
+	MCFG_DEVICE_CONFIG(_interface)
 
-#define MDRV_TC0480SCP_ADD(_tag, _interface) \
-	MDRV_DEVICE_ADD(_tag, TC0480SCP, 0) \
-	MDRV_DEVICE_CONFIG(_interface)
+#define MCFG_TC0480SCP_ADD(_tag, _interface) \
+	MCFG_DEVICE_ADD(_tag, TC0480SCP, 0) \
+	MCFG_DEVICE_CONFIG(_interface)
 
-#define MDRV_TC0110PCR_ADD(_tag, _interface) \
-	MDRV_DEVICE_ADD(_tag, TC0110PCR, 0) \
-	MDRV_DEVICE_CONFIG(_interface)
+#define MCFG_TC0110PCR_ADD(_tag, _interface) \
+	MCFG_DEVICE_ADD(_tag, TC0110PCR, 0) \
+	MCFG_DEVICE_CONFIG(_interface)
 
-#define MDRV_TC0180VCU_ADD(_tag, _interface) \
-	MDRV_DEVICE_ADD(_tag, TC0180VCU, 0) \
-	MDRV_DEVICE_CONFIG(_interface)
+#define MCFG_TC0180VCU_ADD(_tag, _interface) \
+	MCFG_DEVICE_ADD(_tag, TC0180VCU, 0) \
+	MCFG_DEVICE_CONFIG(_interface)
 
 
 /***************************************************************************

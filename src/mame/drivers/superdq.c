@@ -325,35 +325,35 @@ static MACHINE_START( superdq )
 static MACHINE_CONFIG_START( superdq, superdq_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/8)
-	MDRV_CPU_PROGRAM_MAP(superdq_map)
-	MDRV_CPU_IO_MAP(superdq_io)
-	MDRV_CPU_VBLANK_INT("screen", superdq_vblank)
+	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/8)
+	MCFG_CPU_PROGRAM_MAP(superdq_map)
+	MCFG_CPU_IO_MAP(superdq_io)
+	MCFG_CPU_VBLANK_INT("screen", superdq_vblank)
 
-	MDRV_MACHINE_START(superdq)
-	MDRV_MACHINE_RESET(superdq)
+	MCFG_MACHINE_START(superdq)
+	MCFG_MACHINE_RESET(superdq)
 
-	MDRV_LASERDISC_ADD("laserdisc", PIONEER_LDV1000, "screen", "ldsound")
-	MDRV_LASERDISC_OVERLAY(superdq, 256, 256, BITMAP_FORMAT_INDEXED16)
+	MCFG_LASERDISC_ADD("laserdisc", PIONEER_LDV1000, "screen", "ldsound")
+	MCFG_LASERDISC_OVERLAY(superdq, 256, 256, BITMAP_FORMAT_INDEXED16)
 
 	/* video hardware */
-	MDRV_LASERDISC_SCREEN_ADD_NTSC("screen", BITMAP_FORMAT_INDEXED16)
+	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", BITMAP_FORMAT_INDEXED16)
 
-	MDRV_GFXDECODE(superdq)
-	MDRV_PALETTE_LENGTH(32)
+	MCFG_GFXDECODE(superdq)
+	MCFG_PALETTE_LENGTH(32)
 
-	MDRV_PALETTE_INIT(superdq)
-	MDRV_VIDEO_START(superdq)
+	MCFG_PALETTE_INIT(superdq)
+	MCFG_VIDEO_START(superdq)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("snsnd", SN76496, MASTER_CLOCK/8)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.8)
+	MCFG_SOUND_ADD("snsnd", SN76496, MASTER_CLOCK/8)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.8)
 
-	MDRV_SOUND_ADD("ldsound", LASERDISC_SOUND, 0)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("ldsound", LASERDISC_SOUND, 0)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 

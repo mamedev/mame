@@ -247,36 +247,36 @@ GFXDECODE_END
 
 static MACHINE_CONFIG_START( wrally, driver_device )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000,XTAL_24MHz/2)		/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(wrally_map)
-	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
+	MCFG_CPU_ADD("maincpu", M68000,XTAL_24MHz/2)		/* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(wrally_map)
+	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)
 
-	MDRV_CPU_ADD("mcu", DS5002FP, XTAL_24MHz/2)	/* verified on pcb */
-	MDRV_CPU_CONFIG(dallas_config)
-	MDRV_CPU_PROGRAM_MAP(dallas_rom)
-	MDRV_CPU_IO_MAP(dallas_ram)
+	MCFG_CPU_ADD("mcu", DS5002FP, XTAL_24MHz/2)	/* verified on pcb */
+	MCFG_CPU_CONFIG(dallas_config)
+	MCFG_CPU_PROGRAM_MAP(dallas_rom)
+	MCFG_CPU_IO_MAP(dallas_ram)
 
-	MDRV_QUANTUM_TIME(HZ(38400))					/* heavy sync */
+	MCFG_QUANTUM_TIME(HZ(38400))					/* heavy sync */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*16, 32*16)
-	MDRV_SCREEN_VISIBLE_AREA(8, 24*16-8-1, 16, 16*16-8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*16, 32*16)
+	MCFG_SCREEN_VISIBLE_AREA(8, 24*16-8-1, 16, 16*16-8-1)
 
-	MDRV_GFXDECODE(wrally)
-	MDRV_PALETTE_LENGTH(1024*8)
+	MCFG_GFXDECODE(wrally)
+	MCFG_PALETTE_LENGTH(1024*8)
 
-	MDRV_VIDEO_START(wrally)
-	MDRV_VIDEO_UPDATE(wrally)
+	MCFG_VIDEO_START(wrally)
+	MCFG_VIDEO_UPDATE(wrally)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_OKIM6295_ADD("oki", XTAL_1MHz, OKIM6295_PIN7_HIGH)					/* verified on pcb */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_OKIM6295_ADD("oki", XTAL_1MHz, OKIM6295_PIN7_HIGH)					/* verified on pcb */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 

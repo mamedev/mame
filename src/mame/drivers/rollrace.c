@@ -200,47 +200,47 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( rollrace, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80,XTAL_24MHz/8) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(rollrace_map)
-	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_ADD("maincpu", Z80,XTAL_24MHz/8) /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(rollrace_map)
+	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-	MDRV_CPU_ADD("audiocpu", Z80,XTAL_24MHz/16) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(rollrace_sound_map)
-	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,4)
+	MCFG_CPU_ADD("audiocpu", Z80,XTAL_24MHz/16) /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(rollrace_sound_map)
+	MCFG_CPU_VBLANK_INT_HACK(nmi_line_pulse,4)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(16,255,16, 255-16)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(16,255,16, 255-16)
 
-	MDRV_GFXDECODE(rollrace)
-	MDRV_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE(rollrace)
+	MCFG_PALETTE_LENGTH(256)
 
-	MDRV_PALETTE_INIT(wiz)
-	MDRV_VIDEO_UPDATE(rollrace)
+	MCFG_PALETTE_INIT(wiz)
+	MCFG_VIDEO_UPDATE(rollrace)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ay1", AY8910,XTAL_24MHz/16) /* verified on pcb */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
+	MCFG_SOUND_ADD("ay1", AY8910,XTAL_24MHz/16) /* verified on pcb */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
 
-	MDRV_SOUND_ADD("ay2", AY8910,XTAL_24MHz/16) /* verified on pcb */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
+	MCFG_SOUND_ADD("ay2", AY8910,XTAL_24MHz/16) /* verified on pcb */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.10)
 
-	MDRV_SOUND_ADD("ay3", AY8910,XTAL_24MHz/16) /* verified on pcb */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
+	MCFG_SOUND_ADD("ay3", AY8910,XTAL_24MHz/16) /* verified on pcb */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.10)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( rollace2, rollrace )
 
 	/* basic machine hardware */
 
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0,255-24,16, 255-16)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(0,255-24,16, 255-16)
 MACHINE_CONFIG_END
 
 

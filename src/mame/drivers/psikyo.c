@@ -1063,41 +1063,41 @@ static const ym2610_interface sngkace_ym2610_interface =
 static MACHINE_CONFIG_START( sngkace, psikyo_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68EC020, XTAL_32MHz/2) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(psikyo_map)
-	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
+	MCFG_CPU_ADD("maincpu", M68EC020, XTAL_32MHz/2) /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(psikyo_map)
+	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
 
-	MDRV_CPU_ADD("audiocpu", Z80, XTAL_32MHz/8) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(sngkace_sound_map)
-	MDRV_CPU_IO_MAP(sngkace_sound_io_map)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_32MHz/8) /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(sngkace_sound_map)
+	MCFG_CPU_IO_MAP(sngkace_sound_io_map)
 
-	MDRV_MACHINE_START(psikyo)
-	MDRV_MACHINE_RESET(psikyo)
+	MCFG_MACHINE_START(psikyo)
+	MCFG_MACHINE_RESET(psikyo)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(59.3)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)	// we're using IPT_VBLANK
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(320, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-32-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(59.3)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)	// we're using IPT_VBLANK
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(320, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-32-1)
 
-	MDRV_GFXDECODE(psikyo)
-	MDRV_PALETTE_LENGTH(0x1000)
+	MCFG_GFXDECODE(psikyo)
+	MCFG_PALETTE_LENGTH(0x1000)
 
-	MDRV_VIDEO_START(sngkace)
-	MDRV_VIDEO_EOF(psikyo)
-	MDRV_VIDEO_UPDATE(psikyo)
+	MCFG_VIDEO_START(sngkace)
+	MCFG_VIDEO_EOF(psikyo)
+	MCFG_VIDEO_UPDATE(psikyo)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymsnd", YM2610, XTAL_32MHz/4) /* verified on pcb */
-	MDRV_SOUND_CONFIG(sngkace_ym2610_interface)
-	MDRV_SOUND_ROUTE(0, "lspeaker",  1.2)
-	MDRV_SOUND_ROUTE(0, "rspeaker", 1.2)
-	MDRV_SOUND_ROUTE(1, "lspeaker",  1.0)
-	MDRV_SOUND_ROUTE(2, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_32MHz/4) /* verified on pcb */
+	MCFG_SOUND_CONFIG(sngkace_ym2610_interface)
+	MCFG_SOUND_ROUTE(0, "lspeaker",  1.2)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 1.2)
+	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
+	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -1115,74 +1115,74 @@ static const ym2610_interface gunbird_ym2610_interface =
 static MACHINE_CONFIG_START( gunbird, psikyo_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)
-	MDRV_CPU_PROGRAM_MAP(psikyo_map)
-	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
+	MCFG_CPU_ADD("maincpu", M68EC020, 16000000)
+	MCFG_CPU_PROGRAM_MAP(psikyo_map)
+	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
 
-	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* ! LZ8420M (Z80 core) ! */
-	MDRV_CPU_PROGRAM_MAP(gunbird_sound_map)
-	MDRV_CPU_IO_MAP(gunbird_sound_io_map)
+	MCFG_CPU_ADD("audiocpu", Z80, 4000000)	/* ! LZ8420M (Z80 core) ! */
+	MCFG_CPU_PROGRAM_MAP(gunbird_sound_map)
+	MCFG_CPU_IO_MAP(gunbird_sound_io_map)
 
-	MDRV_MACHINE_START(psikyo)
-	MDRV_MACHINE_RESET(psikyo)
+	MCFG_MACHINE_START(psikyo)
+	MCFG_MACHINE_RESET(psikyo)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(59.3)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)	// we're using IPT_VBLANK
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(320, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-32-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(59.3)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)	// we're using IPT_VBLANK
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(320, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-32-1)
 
-	MDRV_GFXDECODE(psikyo)
-	MDRV_PALETTE_LENGTH(0x1000)
+	MCFG_GFXDECODE(psikyo)
+	MCFG_PALETTE_LENGTH(0x1000)
 
-	MDRV_VIDEO_START(psikyo)
-	MDRV_VIDEO_EOF(psikyo)
-	MDRV_VIDEO_UPDATE(psikyo)
+	MCFG_VIDEO_START(psikyo)
+	MCFG_VIDEO_EOF(psikyo)
+	MCFG_VIDEO_UPDATE(psikyo)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymsnd", YM2610, 8000000)
-	MDRV_SOUND_CONFIG(gunbird_ym2610_interface)
-	MDRV_SOUND_ROUTE(0, "lspeaker",  1.2)
-	MDRV_SOUND_ROUTE(0, "rspeaker", 1.2)
-	MDRV_SOUND_ROUTE(1, "lspeaker",  1.0)
-	MDRV_SOUND_ROUTE(2, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM2610, 8000000)
+	MCFG_SOUND_CONFIG(gunbird_ym2610_interface)
+	MCFG_SOUND_ROUTE(0, "lspeaker",  1.2)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 1.2)
+	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
+	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( s1945bl, psikyo_state ) /* Bootleg hardware based on the unprotected Japanese Strikers 1945 set */
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)
-	MDRV_CPU_PROGRAM_MAP(psikyo_bootleg_map)
-	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
+	MCFG_CPU_ADD("maincpu", M68EC020, 16000000)
+	MCFG_CPU_PROGRAM_MAP(psikyo_bootleg_map)
+	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
 
-	MDRV_MACHINE_START(psikyo)
-	MDRV_MACHINE_RESET(psikyo)
+	MCFG_MACHINE_START(psikyo)
+	MCFG_MACHINE_RESET(psikyo)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(59.3)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)	// we're using IPT_VBLANK
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(320, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-32-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(59.3)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)	// we're using IPT_VBLANK
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(320, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-32-1)
 
-	MDRV_GFXDECODE(psikyo)
-	MDRV_PALETTE_LENGTH(0x1000)
+	MCFG_GFXDECODE(psikyo)
+	MCFG_PALETTE_LENGTH(0x1000)
 
-	MDRV_VIDEO_START(psikyo)
-	MDRV_VIDEO_UPDATE(psikyo_bootleg)
-	MDRV_VIDEO_EOF(psikyo)
+	MCFG_VIDEO_START(psikyo)
+	MCFG_VIDEO_UPDATE(psikyo_bootleg)
+	MCFG_VIDEO_EOF(psikyo)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_OKIM6295_ADD("oki", XTAL_16MHz/16, OKIM6295_PIN7_LOW) // ?? clock
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MDRV_DEVICE_ADDRESS_MAP(0, s1945bl_oki_map)
+	MCFG_OKIM6295_ADD("oki", XTAL_16MHz/16, OKIM6295_PIN7_LOW) // ?? clock
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_DEVICE_ADDRESS_MAP(0, s1945bl_oki_map)
 MACHINE_CONFIG_END
 
 
@@ -1206,41 +1206,41 @@ static const ymf278b_interface ymf278b_config =
 static MACHINE_CONFIG_START( s1945, psikyo_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)
-	MDRV_CPU_PROGRAM_MAP(psikyo_map)
-	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
+	MCFG_CPU_ADD("maincpu", M68EC020, 16000000)
+	MCFG_CPU_PROGRAM_MAP(psikyo_map)
+	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
 
-	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* ! LZ8420M (Z80 core) ! */
-	MDRV_CPU_PROGRAM_MAP(gunbird_sound_map)
-	MDRV_CPU_IO_MAP(s1945_sound_io_map)
+	MCFG_CPU_ADD("audiocpu", Z80, 4000000)	/* ! LZ8420M (Z80 core) ! */
+	MCFG_CPU_PROGRAM_MAP(gunbird_sound_map)
+	MCFG_CPU_IO_MAP(s1945_sound_io_map)
 
 	/* MCU should go here */
 
-	MDRV_MACHINE_START(psikyo)
-	MDRV_MACHINE_RESET(psikyo)
+	MCFG_MACHINE_START(psikyo)
+	MCFG_MACHINE_RESET(psikyo)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(59.90)    /* verified on pcb */
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)	// we're using IPT_VBLANK
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(320, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-32-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(59.90)    /* verified on pcb */
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)	// we're using IPT_VBLANK
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(320, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 256-32-1)
 
-	MDRV_GFXDECODE(psikyo)
-	MDRV_PALETTE_LENGTH(0x1000)
+	MCFG_GFXDECODE(psikyo)
+	MCFG_PALETTE_LENGTH(0x1000)
 
-	MDRV_VIDEO_START(psikyo)
-	MDRV_VIDEO_EOF(psikyo)
-	MDRV_VIDEO_UPDATE(psikyo)
+	MCFG_VIDEO_START(psikyo)
+	MCFG_VIDEO_EOF(psikyo)
+	MCFG_VIDEO_UPDATE(psikyo)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymf", YMF278B, YMF278B_STD_CLOCK)
-	MDRV_SOUND_CONFIG(ymf278b_config)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("ymf", YMF278B, YMF278B_STD_CLOCK)
+	MCFG_SOUND_CONFIG(ymf278b_config)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 

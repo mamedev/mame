@@ -51,14 +51,14 @@ static const zsg2_interface zsg2_taito_config =
 };
 
 MACHINE_CONFIG_FRAGMENT( taito_zoom_sound )
-	MDRV_CPU_ADD("mn10200", MN10200, 25000000/2)
-	MDRV_CPU_PROGRAM_MAP(taitozoom_map)
-	MDRV_CPU_IO_MAP(taitozoom_io_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_pulse)
+	MCFG_CPU_ADD("mn10200", MN10200, 25000000/2)
+	MCFG_CPU_PROGRAM_MAP(taitozoom_map)
+	MCFG_CPU_IO_MAP(taitozoom_io_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_pulse)
 
 	// we assume the parent machine has created lspeaker/rspeaker
-	MDRV_SOUND_ADD("zsg2", ZSG2, 25000000/2)
-	MDRV_SOUND_CONFIG(zsg2_taito_config)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("zsg2", ZSG2, 25000000/2)
+	MCFG_SOUND_CONFIG(zsg2_taito_config)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END

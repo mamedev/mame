@@ -806,17 +806,17 @@ static const ym2151_interface ym2151_config =
 MACHINE_CONFIG_FRAGMENT( jsa_i_stereo )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("jsa", M6502, JSA_MASTER_CLOCK/2)
-	MDRV_CPU_PROGRAM_MAP(atarijsa1_map)
-	MDRV_CPU_PERIODIC_INT(atarigen_6502_irq_gen, (double)JSA_MASTER_CLOCK/4/16/16/14)
+	MCFG_CPU_ADD("jsa", M6502, JSA_MASTER_CLOCK/2)
+	MCFG_CPU_PROGRAM_MAP(atarijsa1_map)
+	MCFG_CPU_PERIODIC_INT(atarigen_6502_irq_gen, (double)JSA_MASTER_CLOCK/4/16/16/14)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymsnd", YM2151, JSA_MASTER_CLOCK)
-	MDRV_SOUND_CONFIG(ym2151_config)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 0.60)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 0.60)
+	MCFG_SOUND_ADD("ymsnd", YM2151, JSA_MASTER_CLOCK)
+	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
 MACHINE_CONFIG_END
 
 
@@ -826,10 +826,10 @@ MACHINE_CONFIG_DERIVED( jsa_i_stereo_swapped, jsa_i_stereo )
 	/* basic machine hardware */
 
 	/* sound hardware */
-	MDRV_SOUND_REPLACE("ymsnd", YM2151, JSA_MASTER_CLOCK)
-	MDRV_SOUND_CONFIG(ym2151_config)
-	MDRV_SOUND_ROUTE(0, "rspeaker", 0.60)
-	MDRV_SOUND_ROUTE(1, "lspeaker", 0.60)
+	MCFG_SOUND_REPLACE("ymsnd", YM2151, JSA_MASTER_CLOCK)
+	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 0.60)
+	MCFG_SOUND_ROUTE(1, "lspeaker", 0.60)
 MACHINE_CONFIG_END
 
 
@@ -839,9 +839,9 @@ MACHINE_CONFIG_DERIVED( jsa_i_stereo_pokey, jsa_i_stereo )
 	/* basic machine hardware */
 
 	/* sound hardware */
-	MDRV_SOUND_ADD("pokey", POKEY, JSA_MASTER_CLOCK/2)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
+	MCFG_SOUND_ADD("pokey", POKEY, JSA_MASTER_CLOCK/2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 MACHINE_CONFIG_END
 
 
@@ -849,20 +849,20 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_FRAGMENT( jsa_i_mono_speech )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("jsa", M6502, JSA_MASTER_CLOCK/2)
-	MDRV_CPU_PROGRAM_MAP(atarijsa1_map)
-	MDRV_CPU_PERIODIC_INT(atarigen_6502_irq_gen, (double)JSA_MASTER_CLOCK/4/16/16/14)
+	MCFG_CPU_ADD("jsa", M6502, JSA_MASTER_CLOCK/2)
+	MCFG_CPU_PROGRAM_MAP(atarijsa1_map)
+	MCFG_CPU_PERIODIC_INT(atarigen_6502_irq_gen, (double)JSA_MASTER_CLOCK/4/16/16/14)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2151, JSA_MASTER_CLOCK)
-	MDRV_SOUND_CONFIG(ym2151_config)
-	MDRV_SOUND_ROUTE(0, "mono", 0.60)
-	MDRV_SOUND_ROUTE(1, "mono", 0.60)
+	MCFG_SOUND_ADD("ymsnd", YM2151, JSA_MASTER_CLOCK)
+	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_SOUND_ROUTE(0, "mono", 0.60)
+	MCFG_SOUND_ROUTE(1, "mono", 0.60)
 
-	MDRV_SOUND_ADD("tms", TMS5220C, JSA_MASTER_CLOCK*2/11) /* potentially JSA_MASTER_CLOCK/9 as well */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("tms", TMS5220C, JSA_MASTER_CLOCK*2/11) /* potentially JSA_MASTER_CLOCK/9 as well */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -870,20 +870,20 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_FRAGMENT( jsa_ii_mono )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("jsa", M6502, JSA_MASTER_CLOCK/2)
-	MDRV_CPU_PROGRAM_MAP(atarijsa2_map)
-	MDRV_CPU_PERIODIC_INT(atarigen_6502_irq_gen, (double)JSA_MASTER_CLOCK/4/16/16/14)
+	MCFG_CPU_ADD("jsa", M6502, JSA_MASTER_CLOCK/2)
+	MCFG_CPU_PROGRAM_MAP(atarijsa2_map)
+	MCFG_CPU_PERIODIC_INT(atarigen_6502_irq_gen, (double)JSA_MASTER_CLOCK/4/16/16/14)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2151, JSA_MASTER_CLOCK)
-	MDRV_SOUND_CONFIG(ym2151_config)
-	MDRV_SOUND_ROUTE(0, "mono", 0.60)
-	MDRV_SOUND_ROUTE(1, "mono", 0.60)
+	MCFG_SOUND_ADD("ymsnd", YM2151, JSA_MASTER_CLOCK)
+	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_SOUND_ROUTE(0, "mono", 0.60)
+	MCFG_SOUND_ROUTE(1, "mono", 0.60)
 
-	MDRV_OKIM6295_ADD("adpcm", JSA_MASTER_CLOCK/3, OKIM6295_PIN7_HIGH)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	MCFG_OKIM6295_ADD("adpcm", JSA_MASTER_CLOCK/3, OKIM6295_PIN7_HIGH)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
 
@@ -891,11 +891,11 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_DERIVED( jsa_iii_mono, jsa_ii_mono )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("jsa")
-	MDRV_CPU_PROGRAM_MAP(atarijsa3_map)
+	MCFG_CPU_MODIFY("jsa")
+	MCFG_CPU_PROGRAM_MAP(atarijsa3_map)
 
-	MDRV_DEVICE_MODIFY("adpcm")
-	MDRV_DEVICE_ADDRESS_MAP(0, jsa3_oki_map)
+	MCFG_DEVICE_MODIFY("adpcm")
+	MCFG_DEVICE_ADDRESS_MAP(0, jsa3_oki_map)
 MACHINE_CONFIG_END
 
 
@@ -905,7 +905,7 @@ MACHINE_CONFIG_DERIVED( jsa_iii_mono_noadpcm, jsa_iii_mono )
 	/* basic machine hardware */
 
 	/* sound hardware */
-	MDRV_DEVICE_REMOVE("adpcm")
+	MCFG_DEVICE_REMOVE("adpcm")
 MACHINE_CONFIG_END
 
 
@@ -913,25 +913,25 @@ MACHINE_CONFIG_END
 MACHINE_CONFIG_FRAGMENT( jsa_iiis_stereo )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("jsa", M6502, JSA_MASTER_CLOCK/2)
-	MDRV_CPU_PROGRAM_MAP(atarijsa3s_map)
-	MDRV_CPU_PERIODIC_INT(atarigen_6502_irq_gen, (double)JSA_MASTER_CLOCK/4/16/16/14)
+	MCFG_CPU_ADD("jsa", M6502, JSA_MASTER_CLOCK/2)
+	MCFG_CPU_PROGRAM_MAP(atarijsa3s_map)
+	MCFG_CPU_PERIODIC_INT(atarigen_6502_irq_gen, (double)JSA_MASTER_CLOCK/4/16/16/14)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymsnd", YM2151, JSA_MASTER_CLOCK)
-	MDRV_SOUND_CONFIG(ym2151_config)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 0.60)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 0.60)
+	MCFG_SOUND_ADD("ymsnd", YM2151, JSA_MASTER_CLOCK)
+	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
 
-	MDRV_OKIM6295_ADD("adpcml", JSA_MASTER_CLOCK/3, OKIM6295_PIN7_HIGH)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
-	MDRV_DEVICE_ADDRESS_MAP(0, jsa3_oki_map)
+	MCFG_OKIM6295_ADD("adpcml", JSA_MASTER_CLOCK/3, OKIM6295_PIN7_HIGH)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.75)
+	MCFG_DEVICE_ADDRESS_MAP(0, jsa3_oki_map)
 
-	MDRV_OKIM6295_ADD("adpcmr", JSA_MASTER_CLOCK/3, OKIM6295_PIN7_HIGH)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
-	MDRV_DEVICE_ADDRESS_MAP(0, jsa3_oki2_map)
+	MCFG_OKIM6295_ADD("adpcmr", JSA_MASTER_CLOCK/3, OKIM6295_PIN7_HIGH)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.75)
+	MCFG_DEVICE_ADDRESS_MAP(0, jsa3_oki2_map)
 MACHINE_CONFIG_END
 
 

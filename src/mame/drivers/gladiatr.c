@@ -663,100 +663,100 @@ static const msm5205_interface msm5205_config =
 static MACHINE_CONFIG_START( ppking, gladiatr_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz/2) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(ppking_cpu1_map)
-	MDRV_CPU_IO_MAP(ppking_cpu1_io)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2) /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(ppking_cpu1_map)
+	MCFG_CPU_IO_MAP(ppking_cpu1_io)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("sub", Z80, XTAL_12MHz/4) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(cpu2_map)
-	MDRV_CPU_IO_MAP(ppking_cpu2_io)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("sub", Z80, XTAL_12MHz/4) /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(cpu2_map)
+	MCFG_CPU_IO_MAP(ppking_cpu2_io)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audiocpu", M6809, XTAL_12MHz/16) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(ppking_cpu3_map)
+	MCFG_CPU_ADD("audiocpu", M6809, XTAL_12MHz/16) /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(ppking_cpu3_map)
 
-	MDRV_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(HZ(6000))
 
-	MDRV_MACHINE_RESET(ppking)
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_MACHINE_RESET(ppking)
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(ppking)
-	MDRV_PALETTE_LENGTH(1024)
+	MCFG_GFXDECODE(ppking)
+	MCFG_PALETTE_LENGTH(1024)
 
-	MDRV_VIDEO_START(ppking)
-	MDRV_VIDEO_UPDATE(ppking)
+	MCFG_VIDEO_START(ppking)
+	MCFG_VIDEO_UPDATE(ppking)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/8) /* verified on pcb */
-	MDRV_SOUND_CONFIG(ppking_ym2203_interface)
-	MDRV_SOUND_ROUTE(0, "mono", 0.60)
-	MDRV_SOUND_ROUTE(1, "mono", 0.60)
-	MDRV_SOUND_ROUTE(2, "mono", 0.60)
-	MDRV_SOUND_ROUTE(3, "mono", 0.50)
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/8) /* verified on pcb */
+	MCFG_SOUND_CONFIG(ppking_ym2203_interface)
+	MCFG_SOUND_ROUTE(0, "mono", 0.60)
+	MCFG_SOUND_ROUTE(1, "mono", 0.60)
+	MCFG_SOUND_ROUTE(2, "mono", 0.60)
+	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
-	MDRV_SOUND_ADD("msm", MSM5205, XTAL_455kHz) /* verified on pcb */
-	MDRV_SOUND_CONFIG(msm5205_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
+	MCFG_SOUND_ADD("msm", MSM5205, XTAL_455kHz) /* verified on pcb */
+	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( gladiatr, gladiatr_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz/2) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(gladiatr_cpu1_map)
-	MDRV_CPU_IO_MAP(gladiatr_cpu1_io)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2) /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(gladiatr_cpu1_map)
+	MCFG_CPU_IO_MAP(gladiatr_cpu1_io)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("sub", Z80, XTAL_12MHz/4) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(cpu2_map)
-	MDRV_CPU_IO_MAP(gladiatr_cpu2_io)
+	MCFG_CPU_ADD("sub", Z80, XTAL_12MHz/4) /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(cpu2_map)
+	MCFG_CPU_IO_MAP(gladiatr_cpu2_io)
 
-	MDRV_CPU_ADD("audiocpu", M6809, XTAL_12MHz/16) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(gladiatr_cpu3_map)
+	MCFG_CPU_ADD("audiocpu", M6809, XTAL_12MHz/16) /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(gladiatr_cpu3_map)
 
-	MDRV_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(HZ(600))
 
-	MDRV_MACHINE_RESET(gladiator)
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_MACHINE_RESET(gladiator)
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(gladiatr)
-	MDRV_PALETTE_LENGTH(1024)
+	MCFG_GFXDECODE(gladiatr)
+	MCFG_PALETTE_LENGTH(1024)
 
-	MDRV_VIDEO_START(gladiatr)
-	MDRV_VIDEO_UPDATE(gladiatr)
+	MCFG_VIDEO_START(gladiatr)
+	MCFG_VIDEO_UPDATE(gladiatr)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/8) /* verified on pcb */
-	MDRV_SOUND_CONFIG(gladiatr_ym2203_interface)
-	MDRV_SOUND_ROUTE(0, "mono", 0.60)
-	MDRV_SOUND_ROUTE(1, "mono", 0.60)
-	MDRV_SOUND_ROUTE(2, "mono", 0.60)
-	MDRV_SOUND_ROUTE(3, "mono", 0.50)
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/8) /* verified on pcb */
+	MCFG_SOUND_CONFIG(gladiatr_ym2203_interface)
+	MCFG_SOUND_ROUTE(0, "mono", 0.60)
+	MCFG_SOUND_ROUTE(1, "mono", 0.60)
+	MCFG_SOUND_ROUTE(2, "mono", 0.60)
+	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
-	MDRV_SOUND_ADD("msm", MSM5205, XTAL_455kHz) /* verified on pcb */
-	MDRV_SOUND_CONFIG(msm5205_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
+	MCFG_SOUND_ADD("msm", MSM5205, XTAL_455kHz) /* verified on pcb */
+	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.60)
 MACHINE_CONFIG_END
 
 /***************************************************************************

@@ -793,32 +793,32 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( atarigt, atarigt_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68EC020, ATARI_CLOCK_50MHz/2)
-	MDRV_CPU_PROGRAM_MAP(main_map)
-	MDRV_CPU_VBLANK_INT("screen", atarigen_video_int_gen)
-	MDRV_CPU_PERIODIC_INT(atarigen_scanline_int_gen, 250)
+	MCFG_CPU_ADD("maincpu", M68EC020, ATARI_CLOCK_50MHz/2)
+	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_CPU_VBLANK_INT("screen", atarigen_video_int_gen)
+	MCFG_CPU_PERIODIC_INT(atarigen_scanline_int_gen, 250)
 
-	MDRV_MACHINE_START(atarigt)
-	MDRV_MACHINE_RESET(atarigt)
-	MDRV_NVRAM_ADD_1FILL("eeprom")
+	MCFG_MACHINE_START(atarigt)
+	MCFG_MACHINE_RESET(atarigt)
+	MCFG_NVRAM_ADD_1FILL("eeprom")
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MDRV_GFXDECODE(atarigt)
-	MDRV_PALETTE_LENGTH(32768)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	MCFG_GFXDECODE(atarigt)
+	MCFG_PALETTE_LENGTH(32768)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses a pair of GALs to determine H and V parameters */
-	MDRV_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
+	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
 
-	MDRV_VIDEO_START(atarigt)
-	MDRV_VIDEO_EOF(atarirle)
-	MDRV_VIDEO_UPDATE(atarigt)
+	MCFG_VIDEO_START(atarigt)
+	MCFG_VIDEO_EOF(atarirle)
+	MCFG_VIDEO_UPDATE(atarigt)
 
 	/* sound hardware */
-	MDRV_FRAGMENT_ADD(cage)
+	MCFG_FRAGMENT_ADD(cage)
 MACHINE_CONFIG_END
 
 

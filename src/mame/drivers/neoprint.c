@@ -355,40 +355,40 @@ static const ym2610_interface ym2610_config =
 
 
 static MACHINE_CONFIG_START( neoprint, neoprint_state )
-	MDRV_CPU_ADD("maincpu", M68000, 12000000)
-	MDRV_CPU_PROGRAM_MAP(neoprint_map)
-	MDRV_CPU_PERIODIC_INT(irq3_line_hold,45) /* camera / printer irq, unknown timing */
-	MDRV_CPU_VBLANK_INT("screen", irq2_line_hold) // lv1,2,3 valid?
+	MCFG_CPU_ADD("maincpu", M68000, 12000000)
+	MCFG_CPU_PROGRAM_MAP(neoprint_map)
+	MCFG_CPU_PERIODIC_INT(irq3_line_hold,45) /* camera / printer irq, unknown timing */
+	MCFG_CPU_VBLANK_INT("screen", irq2_line_hold) // lv1,2,3 valid?
 
-	MDRV_CPU_ADD("audiocpu", Z80, 4000000)
-	MDRV_CPU_PROGRAM_MAP(neoprint_audio_map)
-	MDRV_CPU_IO_MAP(neoprint_audio_io_map)
+	MCFG_CPU_ADD("audiocpu", Z80, 4000000)
+	MCFG_CPU_PROGRAM_MAP(neoprint_audio_map)
+	MCFG_CPU_IO_MAP(neoprint_audio_io_map)
 
-	MDRV_UPD4990A_ADD("upd4990a")
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_UPD4990A_ADD("upd4990a")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MDRV_GFXDECODE(neoprint)
+	MCFG_GFXDECODE(neoprint)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 0*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 48*8-1, 0*8, 30*8-1)
 
-	MDRV_PALETTE_LENGTH(0x10000)
+	MCFG_PALETTE_LENGTH(0x10000)
 
-	MDRV_VIDEO_START(neoprint)
-	MDRV_VIDEO_UPDATE(neoprint)
+	MCFG_VIDEO_START(neoprint)
+	MCFG_VIDEO_UPDATE(neoprint)
 
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymsnd", YM2610, 24000000 / 3)
-	MDRV_SOUND_CONFIG(ym2610_config)
-	MDRV_SOUND_ROUTE(0, "lspeaker",  0.60)
-	MDRV_SOUND_ROUTE(0, "rspeaker", 0.60)
-	MDRV_SOUND_ROUTE(1, "lspeaker",  1.0)
-	MDRV_SOUND_ROUTE(2, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM2610, 24000000 / 3)
+	MCFG_SOUND_CONFIG(ym2610_config)
+	MCFG_SOUND_ROUTE(0, "lspeaker",  0.60)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 0.60)
+	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
+	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 

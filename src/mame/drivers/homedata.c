@@ -1255,42 +1255,42 @@ static MACHINE_RESET( reikaids )
 static MACHINE_CONFIG_START( mrokumei, homedata_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6809, 16000000/4)	/* 4MHz ? */
-	MDRV_CPU_PROGRAM_MAP(mrokumei_map)
-	MDRV_CPU_VBLANK_INT("screen", homedata_irq)	/* also triggered by the blitter */
+	MCFG_CPU_ADD("maincpu", M6809, 16000000/4)	/* 4MHz ? */
+	MCFG_CPU_PROGRAM_MAP(mrokumei_map)
+	MCFG_CPU_VBLANK_INT("screen", homedata_irq)	/* also triggered by the blitter */
 
-	MDRV_CPU_ADD("audiocpu", Z80, 16000000/4)	/* 4MHz ? */
-	MDRV_CPU_PROGRAM_MAP(mrokumei_sound_map)
-	MDRV_CPU_IO_MAP(mrokumei_sound_io_map)
+	MCFG_CPU_ADD("audiocpu", Z80, 16000000/4)	/* 4MHz ? */
+	MCFG_CPU_PROGRAM_MAP(mrokumei_sound_map)
+	MCFG_CPU_IO_MAP(mrokumei_sound_io_map)
 
-	MDRV_MACHINE_START(homedata)
-	MDRV_MACHINE_RESET(homedata)
+	MCFG_MACHINE_START(homedata)
+	MCFG_MACHINE_RESET(homedata)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(59)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(59)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
 	// visible area can be changed at runtime
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 54*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 54*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(mrokumei)
-	MDRV_PALETTE_LENGTH(0x8000)
+	MCFG_GFXDECODE(mrokumei)
+	MCFG_PALETTE_LENGTH(0x8000)
 
-	MDRV_PALETTE_INIT(mrokumei)
-	MDRV_VIDEO_START(mrokumei)
-	MDRV_VIDEO_UPDATE(mrokumei)
-	MDRV_VIDEO_EOF(homedata)
+	MCFG_PALETTE_INIT(mrokumei)
+	MCFG_VIDEO_START(mrokumei)
+	MCFG_VIDEO_UPDATE(mrokumei)
+	MCFG_VIDEO_EOF(homedata)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("snsnd", SN76489A, 16000000/4)     // SN76489AN actually
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("snsnd", SN76489A, 16000000/4)     // SN76489AN actually
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -1321,49 +1321,49 @@ static const UPD7810_CONFIG upd_config =
 static MACHINE_CONFIG_START( reikaids, homedata_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6809, 16000000/4)	/* 4MHz ? */
-	MDRV_CPU_PROGRAM_MAP(reikaids_map)
-	MDRV_CPU_VBLANK_INT("screen", homedata_irq)	/* also triggered by the blitter */
+	MCFG_CPU_ADD("maincpu", M6809, 16000000/4)	/* 4MHz ? */
+	MCFG_CPU_PROGRAM_MAP(reikaids_map)
+	MCFG_CPU_VBLANK_INT("screen", homedata_irq)	/* also triggered by the blitter */
 
-	MDRV_CPU_ADD("audiocpu", UPD7807, 8000000)	/* ??? MHz (max speed for the 7807 is 12MHz) */
-	MDRV_CPU_CONFIG(upd_config)
-	MDRV_CPU_PROGRAM_MAP(reikaids_upd7807_map)
-	MDRV_CPU_IO_MAP(reikaids_upd7807_io_map)
-	MDRV_CPU_VBLANK_INT("screen", upd7807_irq)
+	MCFG_CPU_ADD("audiocpu", UPD7807, 8000000)	/* ??? MHz (max speed for the 7807 is 12MHz) */
+	MCFG_CPU_CONFIG(upd_config)
+	MCFG_CPU_PROGRAM_MAP(reikaids_upd7807_map)
+	MCFG_CPU_IO_MAP(reikaids_upd7807_io_map)
+	MCFG_CPU_VBLANK_INT("screen", upd7807_irq)
 
-	MDRV_QUANTUM_TIME(HZ(30000))	// very high interleave required to sync for startup tests
+	MCFG_QUANTUM_TIME(HZ(30000))	// very high interleave required to sync for startup tests
 
-	MDRV_MACHINE_START(reikaids)
-	MDRV_MACHINE_RESET(reikaids)
+	MCFG_MACHINE_START(reikaids)
+	MCFG_MACHINE_RESET(reikaids)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(59)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 255, 16, 256-1-16)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(59)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 255, 16, 256-1-16)
 
-	MDRV_GFXDECODE(reikaids)
-	MDRV_PALETTE_LENGTH(0x8000)
+	MCFG_GFXDECODE(reikaids)
+	MCFG_PALETTE_LENGTH(0x8000)
 
-	MDRV_PALETTE_INIT(reikaids)
-	MDRV_VIDEO_START(reikaids)
-	MDRV_VIDEO_UPDATE(reikaids)
-	MDRV_VIDEO_EOF(homedata)
+	MCFG_PALETTE_INIT(reikaids)
+	MCFG_VIDEO_START(reikaids)
+	MCFG_VIDEO_UPDATE(reikaids)
+	MCFG_VIDEO_EOF(homedata)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, 3000000)
-	MDRV_SOUND_CONFIG(ym2203_config)
-	MDRV_SOUND_ROUTE(0, "mono", 0.25)
-	MDRV_SOUND_ROUTE(1, "mono", 0.25)
-	MDRV_SOUND_ROUTE(2, "mono", 0.25)
-	MDRV_SOUND_ROUTE(3, "mono", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM2203, 3000000)
+	MCFG_SOUND_CONFIG(ym2203_config)
+	MCFG_SOUND_ROUTE(0, "mono", 0.25)
+	MCFG_SOUND_ROUTE(1, "mono", 0.25)
+	MCFG_SOUND_ROUTE(2, "mono", 0.25)
+	MCFG_SOUND_ROUTE(3, "mono", 1.0)
 
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
 
@@ -1372,60 +1372,60 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( pteacher, homedata_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6809, 16000000/4)	/* 4MHz ? */
-	MDRV_CPU_PROGRAM_MAP(pteacher_map)
-	MDRV_CPU_VBLANK_INT("screen", homedata_irq)	/* also triggered by the blitter */
+	MCFG_CPU_ADD("maincpu", M6809, 16000000/4)	/* 4MHz ? */
+	MCFG_CPU_PROGRAM_MAP(pteacher_map)
+	MCFG_CPU_VBLANK_INT("screen", homedata_irq)	/* also triggered by the blitter */
 
-	MDRV_CPU_ADD("audiocpu", UPD7807, 9000000)	/* 9MHz ? */
-	MDRV_CPU_CONFIG(upd_config)
-	MDRV_CPU_PROGRAM_MAP(pteacher_upd7807_map)
-	MDRV_CPU_IO_MAP(pteacher_upd7807_io_map)
-	MDRV_CPU_VBLANK_INT("screen", upd7807_irq)
+	MCFG_CPU_ADD("audiocpu", UPD7807, 9000000)	/* 9MHz ? */
+	MCFG_CPU_CONFIG(upd_config)
+	MCFG_CPU_PROGRAM_MAP(pteacher_upd7807_map)
+	MCFG_CPU_IO_MAP(pteacher_upd7807_io_map)
+	MCFG_CPU_VBLANK_INT("screen", upd7807_irq)
 
-	MDRV_QUANTUM_TIME(HZ(6000))	// should be enough
+	MCFG_QUANTUM_TIME(HZ(6000))	// should be enough
 
-	MDRV_MACHINE_START(pteacher)
-	MDRV_MACHINE_RESET(pteacher)
+	MCFG_MACHINE_START(pteacher)
+	MCFG_MACHINE_RESET(pteacher)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(59)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(59)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
 	// visible area can be changed at runtime
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 54*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 54*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(pteacher)
-	MDRV_PALETTE_LENGTH(0x8000)
+	MCFG_GFXDECODE(pteacher)
+	MCFG_PALETTE_LENGTH(0x8000)
 
-	MDRV_PALETTE_INIT(pteacher)
-	MDRV_VIDEO_START(pteacher)
-	MDRV_VIDEO_UPDATE(pteacher)
-	MDRV_VIDEO_EOF(homedata)
+	MCFG_PALETTE_INIT(pteacher)
+	MCFG_VIDEO_START(pteacher)
+	MCFG_VIDEO_UPDATE(pteacher)
+	MCFG_VIDEO_EOF(homedata)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("snsnd", SN76489A, 16000000/4)     // SN76489AN actually
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("snsnd", SN76489A, 16000000/4)     // SN76489AN actually
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mjkinjas, pteacher )
 
-	MDRV_CPU_MODIFY("audiocpu")
-	MDRV_CPU_CLOCK(11000000)	/* 11MHz ? */
+	MCFG_CPU_MODIFY("audiocpu")
+	MCFG_CPU_CLOCK(11000000)	/* 11MHz ? */
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( lemnangl, pteacher )
 
 	/* video hardware */
-	MDRV_GFXDECODE(lemnangl)
+	MCFG_GFXDECODE(lemnangl)
 
-	MDRV_VIDEO_START(lemnangl)
+	MCFG_VIDEO_START(lemnangl)
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( mirderby )
@@ -1536,46 +1536,46 @@ GFXDECODE_END
 
 static MACHINE_CONFIG_START( mirderby, homedata_state )
 
-	MDRV_CPU_ADD("maincpu", M6809, 16000000/8)	/* 2 Mhz */
-	MDRV_CPU_PROGRAM_MAP(cpu2_map)
+	MCFG_CPU_ADD("maincpu", M6809, 16000000/8)	/* 2 Mhz */
+	MCFG_CPU_PROGRAM_MAP(cpu2_map)
 
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("cpu0", Z80, 16000000/4)	/* 4 Mhz */
-	MDRV_DEVICE_DISABLE()
-	MDRV_CPU_PROGRAM_MAP(cpu0_map)
+	MCFG_CPU_ADD("cpu0", Z80, 16000000/4)	/* 4 Mhz */
+	MCFG_DEVICE_DISABLE()
+	MCFG_CPU_PROGRAM_MAP(cpu0_map)
 
-	MDRV_CPU_ADD("cpu1", M6809, 16000000/8)	/* 2 Mhz */
-	MDRV_CPU_PROGRAM_MAP(cpu1_map)
-	MDRV_DEVICE_DISABLE()
-	//MDRV_CPU_VBLANK_INT("screen", mirderby_irq)
+	MCFG_CPU_ADD("cpu1", M6809, 16000000/8)	/* 2 Mhz */
+	MCFG_CPU_PROGRAM_MAP(cpu1_map)
+	MCFG_DEVICE_DISABLE()
+	//MCFG_CPU_VBLANK_INT("screen", mirderby_irq)
 
 
-	MDRV_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(HZ(6000))
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(59)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 54*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(59)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 54*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(mirderby)
-	MDRV_PALETTE_LENGTH(0x8000)
+	MCFG_GFXDECODE(mirderby)
+	MCFG_PALETTE_LENGTH(0x8000)
 
-	MDRV_PALETTE_INIT(mirderby)
-	MDRV_VIDEO_START(mirderby)
-	MDRV_VIDEO_UPDATE(mirderby)
+	MCFG_PALETTE_INIT(mirderby)
+	MCFG_VIDEO_START(mirderby)
+	MCFG_VIDEO_UPDATE(mirderby)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, 2000000)
-	MDRV_SOUND_ROUTE(0, "mono", 0.25)
-	MDRV_SOUND_ROUTE(1, "mono", 0.25)
-	MDRV_SOUND_ROUTE(2, "mono", 0.25)
-	MDRV_SOUND_ROUTE(3, "mono", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM2203, 2000000)
+	MCFG_SOUND_ROUTE(0, "mono", 0.25)
+	MCFG_SOUND_ROUTE(1, "mono", 0.25)
+	MCFG_SOUND_ROUTE(2, "mono", 0.25)
+	MCFG_SOUND_ROUTE(3, "mono", 1.0)
 MACHINE_CONFIG_END
 
 /**************************************************************************/

@@ -746,200 +746,200 @@ static VIDEO_EOF( perfrman )
 static MACHINE_CONFIG_START( perfrman, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80,16000000/4)			/* 4MHz ???, 16MHz Oscillator */
-	MDRV_CPU_PROGRAM_MAP(perfrman_map)
-	MDRV_CPU_IO_MAP(slapfght_io_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("maincpu", Z80,16000000/4)			/* 4MHz ???, 16MHz Oscillator */
+	MCFG_CPU_PROGRAM_MAP(perfrman_map)
+	MCFG_CPU_IO_MAP(slapfght_io_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audiocpu", Z80,16000000/8)			/* 2MHz ???, 16MHz Oscillator */
-	MDRV_CPU_PROGRAM_MAP(perfrman_sound_map)
-	MDRV_CPU_VBLANK_INT_HACK(getstar_interrupt,4)	/* music speed, verified */
+	MCFG_CPU_ADD("audiocpu", Z80,16000000/8)			/* 2MHz ???, 16MHz Oscillator */
+	MCFG_CPU_PROGRAM_MAP(perfrman_sound_map)
+	MCFG_CPU_VBLANK_INT_HACK(getstar_interrupt,4)	/* music speed, verified */
 
-	MDRV_QUANTUM_TIME(HZ(600))		/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
+	MCFG_QUANTUM_TIME(HZ(600))		/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
-	MDRV_MACHINE_RESET(slapfight)
+	MCFG_MACHINE_RESET(slapfight)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(1*8, 34*8-1, 2*8, 32*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(1*8, 34*8-1, 2*8, 32*8-1)
 
-	MDRV_GFXDECODE(perfrman)
-	MDRV_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE(perfrman)
+	MCFG_PALETTE_LENGTH(256)
 
-	MDRV_PALETTE_INIT(RRRR_GGGG_BBBB)
-	MDRV_VIDEO_START(perfrman)
-	MDRV_VIDEO_EOF(perfrman)
-	MDRV_VIDEO_UPDATE(perfrman)
+	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
+	MCFG_VIDEO_START(perfrman)
+	MCFG_VIDEO_EOF(perfrman)
+	MCFG_VIDEO_UPDATE(perfrman)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay1", AY8910, 16000000/8)
-	MDRV_SOUND_CONFIG(ay8910_interface_1)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("ay1", AY8910, 16000000/8)
+	MCFG_SOUND_CONFIG(ay8910_interface_1)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD("ay2", AY8910, 16000000/8)
-	MDRV_SOUND_CONFIG(ay8910_interface_2)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("ay2", AY8910, 16000000/8)
+	MCFG_SOUND_CONFIG(ay8910_interface_2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( tigerhb, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 6000000)
-	MDRV_CPU_PROGRAM_MAP(tigerh_map)
-	MDRV_CPU_IO_MAP(tigerhb_io_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("maincpu", Z80, 6000000)
+	MCFG_CPU_PROGRAM_MAP(tigerh_map)
+	MCFG_CPU_IO_MAP(tigerhb_io_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audiocpu", Z80, 6000000)
-	MDRV_CPU_PROGRAM_MAP(slapfght_sound_map)
-	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,6)    /* ??? */
+	MCFG_CPU_ADD("audiocpu", Z80, 6000000)
+	MCFG_CPU_PROGRAM_MAP(slapfght_sound_map)
+	MCFG_CPU_VBLANK_INT_HACK(nmi_line_pulse,6)    /* ??? */
 
-	MDRV_QUANTUM_TIME(HZ(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
+	MCFG_QUANTUM_TIME(HZ(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
-	MDRV_MACHINE_RESET(slapfight)
+	MCFG_MACHINE_RESET(slapfight)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(1*8, 36*8-1, 2*8, 32*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(1*8, 36*8-1, 2*8, 32*8-1)
 
-	MDRV_GFXDECODE(slapfght)
-	MDRV_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE(slapfght)
+	MCFG_PALETTE_LENGTH(256)
 
-	MDRV_PALETTE_INIT(RRRR_GGGG_BBBB)
-	MDRV_VIDEO_START(slapfight)
-	MDRV_VIDEO_EOF(perfrman)
-	MDRV_VIDEO_UPDATE(slapfight)
+	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
+	MCFG_VIDEO_START(slapfight)
+	MCFG_VIDEO_EOF(perfrman)
+	MCFG_VIDEO_UPDATE(slapfight)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay1", AY8910, 1500000)
-	MDRV_SOUND_CONFIG(ay8910_interface_1)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("ay1", AY8910, 1500000)
+	MCFG_SOUND_CONFIG(ay8910_interface_1)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD("ay2", AY8910, 1500000)
-	MDRV_SOUND_CONFIG(ay8910_interface_2)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("ay2", AY8910, 1500000)
+	MCFG_SOUND_CONFIG(ay8910_interface_2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( tigerh, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, XTAL_36MHz/6) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(tigerh_map)
-	MDRV_CPU_IO_MAP(tigerh_io_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_36MHz/6) /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(tigerh_map)
+	MCFG_CPU_IO_MAP(tigerh_io_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audiocpu", Z80, XTAL_36MHz/12) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(slapfght_sound_map)
-	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,6)    /* ??? */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_36MHz/12) /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(slapfght_sound_map)
+	MCFG_CPU_VBLANK_INT_HACK(nmi_line_pulse,6)    /* ??? */
 
-	MDRV_CPU_ADD("mcu", M68705,XTAL_36MHz/12) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(tigerh_m68705_map)
+	MCFG_CPU_ADD("mcu", M68705,XTAL_36MHz/12) /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(tigerh_m68705_map)
 
-	MDRV_QUANTUM_TIME(HZ(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
+	MCFG_QUANTUM_TIME(HZ(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
-	MDRV_MACHINE_RESET(slapfight)
+	MCFG_MACHINE_RESET(slapfight)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(1*8, 36*8-1, 2*8, 32*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(1*8, 36*8-1, 2*8, 32*8-1)
 
-	MDRV_GFXDECODE(slapfght)
-	MDRV_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE(slapfght)
+	MCFG_PALETTE_LENGTH(256)
 
-	MDRV_PALETTE_INIT(RRRR_GGGG_BBBB)
-	MDRV_VIDEO_START(slapfight)
-	MDRV_VIDEO_EOF(perfrman)
-	MDRV_VIDEO_UPDATE(slapfight)
+	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
+	MCFG_VIDEO_START(slapfight)
+	MCFG_VIDEO_EOF(perfrman)
+	MCFG_VIDEO_UPDATE(slapfight)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay1", AY8910, XTAL_36MHz/24) /* verified on pcb */
-	MDRV_SOUND_CONFIG(ay8910_interface_1)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL_36MHz/24) /* verified on pcb */
+	MCFG_SOUND_CONFIG(ay8910_interface_1)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD("ay2", AY8910, XTAL_36MHz/24) /* verified on pcb */
-	MDRV_SOUND_CONFIG(ay8910_interface_2)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL_36MHz/24) /* verified on pcb */
+	MCFG_SOUND_CONFIG(ay8910_interface_2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( slapfigh, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",Z80, XTAL_36MHz/6) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(slapfght_map)
-	MDRV_CPU_IO_MAP(slapfght_io_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("maincpu",Z80, XTAL_36MHz/6) /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(slapfght_map)
+	MCFG_CPU_IO_MAP(slapfght_io_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audiocpu", Z80, XTAL_36MHz/12) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(slapfght_sound_map)
-	MDRV_CPU_VBLANK_INT_HACK(getstar_interrupt, 3)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_36MHz/12) /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(slapfght_sound_map)
+	MCFG_CPU_VBLANK_INT_HACK(getstar_interrupt, 3)
 
-	MDRV_CPU_ADD("mcu", M68705, XTAL_36MHz/12) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(slapfight_m68705_map)
+	MCFG_CPU_ADD("mcu", M68705, XTAL_36MHz/12) /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(slapfight_m68705_map)
 
-	MDRV_QUANTUM_TIME(HZ(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
+	MCFG_QUANTUM_TIME(HZ(600))	/* 10 CPU slices per frame - enough for the sound CPU to read all commands */
 
-	MDRV_MACHINE_RESET(slapfight)
+	MCFG_MACHINE_RESET(slapfight)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(1*8, 36*8-1, 2*8, 32*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(1*8, 36*8-1, 2*8, 32*8-1)
 
-	MDRV_GFXDECODE(slapfght)
-	MDRV_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE(slapfght)
+	MCFG_PALETTE_LENGTH(256)
 
-	MDRV_PALETTE_INIT(RRRR_GGGG_BBBB)
-	MDRV_VIDEO_START(slapfight)
-	MDRV_VIDEO_EOF(perfrman)
-	MDRV_VIDEO_UPDATE(slapfight)
+	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
+	MCFG_VIDEO_START(slapfight)
+	MCFG_VIDEO_EOF(perfrman)
+	MCFG_VIDEO_UPDATE(slapfight)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay1", AY8910, XTAL_36MHz/24) /* verified on pcb */
-	MDRV_SOUND_CONFIG(ay8910_interface_1)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL_36MHz/24) /* verified on pcb */
+	MCFG_SOUND_CONFIG(ay8910_interface_1)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD("ay2", AY8910, XTAL_36MHz/24) /* verified on pcb */
-	MDRV_SOUND_CONFIG(ay8910_interface_2)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL_36MHz/24) /* verified on pcb */
+	MCFG_SOUND_CONFIG(ay8910_interface_2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( slapfighb1, slapfigh )
 
 	/* basic machine hardware */
 
-	MDRV_DEVICE_REMOVE("mcu")
+	MCFG_DEVICE_REMOVE("mcu")
 MACHINE_CONFIG_END
 
 /* identical to slapfigh_ but the scroll registers are located elsewhere in memory */
@@ -947,10 +947,10 @@ static MACHINE_CONFIG_DERIVED( slapfighb2, slapfigh )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(slapfighb2_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(slapfighb2_map)
 
-	MDRV_DEVICE_REMOVE("mcu")
+	MCFG_DEVICE_REMOVE("mcu")
 MACHINE_CONFIG_END
 
 

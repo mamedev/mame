@@ -29,9 +29,9 @@
 
 DECLARE_LEGACY_SOUND_DEVICE(CDP1863, cdp1863);
 
-#define MDRV_CDP1863_ADD(_tag, _clock1, _clock2) \
-	MDRV_SOUND_ADD(_tag, CDP1863, _clock1) \
-	MDRV_DEVICE_CONFIG_DATA32(cdp1863_config, clock2, _clock2)
+#define MCFG_CDP1863_ADD(_tag, _clock1, _clock2) \
+	MCFG_SOUND_ADD(_tag, CDP1863, _clock1) \
+	MCFG_DEVICE_CONFIG_DATA32(cdp1863_config, clock2, _clock2)
 
 #define CDP1863_INTERFACE(name) \
 	const cdp1863_interface (name) =

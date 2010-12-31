@@ -30,9 +30,9 @@ DECLARE_LEGACY_DEVICE(KANEKO_PANDORA, kaneko_pandora);
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_KANEKO_PANDORA_ADD(_tag, _interface) \
-	MDRV_DEVICE_ADD(_tag, KANEKO_PANDORA, 0) \
-	MDRV_DEVICE_CONFIG(_interface)
+#define MCFG_KANEKO_PANDORA_ADD(_tag, _interface) \
+	MCFG_DEVICE_ADD(_tag, KANEKO_PANDORA, 0) \
+	MCFG_DEVICE_CONFIG(_interface)
 
 
 /***************************************************************************

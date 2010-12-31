@@ -285,32 +285,32 @@ GFXDECODE_END
 
 
 static MACHINE_CONFIG_START( wolfpack, driver_device )
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6502, 12096000 / 16)
-	MDRV_CPU_PROGRAM_MAP(main_map)
+	MCFG_CPU_ADD("maincpu", M6502, 12096000 / 16)
+	MCFG_CPU_PROGRAM_MAP(main_map)
 
 	/* video hardware */
-	MDRV_MACHINE_RESET(wolfpack)
+	MCFG_MACHINE_RESET(wolfpack)
 
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(512, 262)
-	MDRV_SCREEN_VISIBLE_AREA(0, 511, 16, 239)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(512, 262)
+	MCFG_SCREEN_VISIBLE_AREA(0, 511, 16, 239)
 
-	MDRV_GFXDECODE(wolfpack)
-	MDRV_PALETTE_LENGTH(12)
-	MDRV_PALETTE_INIT(wolfpack)
-	MDRV_VIDEO_START(wolfpack)
-	MDRV_VIDEO_UPDATE(wolfpack)
-	MDRV_VIDEO_EOF(wolfpack)
+	MCFG_GFXDECODE(wolfpack)
+	MCFG_PALETTE_LENGTH(12)
+	MCFG_PALETTE_INIT(wolfpack)
+	MCFG_VIDEO_START(wolfpack)
+	MCFG_VIDEO_UPDATE(wolfpack)
+	MCFG_VIDEO_EOF(wolfpack)
 
 	/* sound hardware */
-	MDRV_SOUND_ADD("speech", S14001A, 20000) /* RC Clock (C=100pf, R=470K-670K ohms, adjustable) ranging from 14925.37313hz to 21276.59574hz, likely factory set to 20000hz since anything below 19500 is too slow */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("speech", S14001A, 20000) /* RC Clock (C=100pf, R=470K-670K ohms, adjustable) ranging from 14925.37313hz to 21276.59574hz, likely factory set to 20000hz since anything below 19500 is too slow */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 

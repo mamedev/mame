@@ -1859,61 +1859,61 @@ static const ay8910_interface ay8910_config =
 /* machine driver for MOD 2 board */
 static MACHINE_CONFIG_START( mpu4mod2, driver_device )
 
-	MDRV_MACHINE_START(mpu4mod2)
-	MDRV_MACHINE_RESET(mpu4)
-	MDRV_CPU_ADD("maincpu", M6809, MPU4_MASTER_CLOCK/4)
-	MDRV_CPU_PROGRAM_MAP(mod2_memmap)
+	MCFG_MACHINE_START(mpu4mod2)
+	MCFG_MACHINE_RESET(mpu4)
+	MCFG_CPU_ADD("maincpu", M6809, MPU4_MASTER_CLOCK/4)
+	MCFG_CPU_PROGRAM_MAP(mod2_memmap)
 
-	MDRV_TIMER_ADD_PERIODIC("50hz",gen_50hz, HZ(100))
+	MCFG_TIMER_ADD_PERIODIC("50hz",gen_50hz, HZ(100))
 
 	/* 6840 PTM */
-	MDRV_PTM6840_ADD("6840ptm", ptm_ic2_intf)
+	MCFG_PTM6840_ADD("6840ptm", ptm_ic2_intf)
 
-	MDRV_PIA6821_ADD("pia_ic3", pia_ic3_intf)
-	MDRV_PIA6821_ADD("pia_ic4", pia_ic4_intf)
-	MDRV_PIA6821_ADD("pia_ic5", pia_ic5_intf)
-	MDRV_PIA6821_ADD("pia_ic6", pia_ic6_intf)
-	MDRV_PIA6821_ADD("pia_ic7", pia_ic7_intf)
-	MDRV_PIA6821_ADD("pia_ic8", pia_ic8_intf)
+	MCFG_PIA6821_ADD("pia_ic3", pia_ic3_intf)
+	MCFG_PIA6821_ADD("pia_ic4", pia_ic4_intf)
+	MCFG_PIA6821_ADD("pia_ic5", pia_ic5_intf)
+	MCFG_PIA6821_ADD("pia_ic6", pia_ic6_intf)
+	MCFG_PIA6821_ADD("pia_ic7", pia_ic7_intf)
+	MCFG_PIA6821_ADD("pia_ic8", pia_ic8_intf)
 
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("ay8913",AY8913, MPU4_MASTER_CLOCK/4)
-	MDRV_SOUND_CONFIG(ay8910_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("ay8913",AY8913, MPU4_MASTER_CLOCK/4)
+	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MDRV_DEFAULT_LAYOUT(layout_mpu4)
+	MCFG_DEFAULT_LAYOUT(layout_mpu4)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mod4yam, mpu4mod2 )
-	MDRV_MACHINE_START(mpu4mod4)
+	MCFG_MACHINE_START(mpu4mod4)
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mod4_yam_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(mod4_yam_map)
 
-	MDRV_DEVICE_REMOVE("ay8913")
-	MDRV_SOUND_ADD("ym2413", YM2413, MPU4_MASTER_CLOCK/4)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	MCFG_DEVICE_REMOVE("ay8913")
+	MCFG_SOUND_ADD("ym2413", YM2413, MPU4_MASTER_CLOCK/4)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mod4oki, mpu4mod2 )
-	MDRV_MACHINE_START(mpu4mod4)
+	MCFG_MACHINE_START(mpu4mod4)
 
-	MDRV_PIA6821_ADD("pia_gamebd", pia_gameboard_intf)
+	MCFG_PIA6821_ADD("pia_gamebd", pia_gameboard_intf)
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mod4_oki_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(mod4_oki_map)
 
-	MDRV_DEVICE_REMOVE("ay8913")
-	MDRV_SOUND_ADD("msm6376", OKIM6376, 4000000) //?
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_DEVICE_REMOVE("ay8913")
+	MCFG_SOUND_ADD("msm6376", OKIM6376, 4000000) //?
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mpu4dutch, mod4oki )
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(dutch_memmap)				// setup read and write memorymap
-	MDRV_MACHINE_START(mpu4dutch)						// main mpu4 board initialisation
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(dutch_memmap)				// setup read and write memorymap
+	MCFG_MACHINE_START(mpu4dutch)						// main mpu4 board initialisation
 MACHINE_CONFIG_END
 
 static DRIVER_INIT (connect4)

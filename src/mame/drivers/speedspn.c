@@ -270,33 +270,33 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( speedspn, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",Z80,6000000)		 /* 6 MHz */
-	MDRV_CPU_PROGRAM_MAP(speedspn_map)
-	MDRV_CPU_IO_MAP(speedspn_io_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("maincpu",Z80,6000000)		 /* 6 MHz */
+	MCFG_CPU_PROGRAM_MAP(speedspn_map)
+	MCFG_CPU_IO_MAP(speedspn_io_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audiocpu", Z80,6000000)		 /* 6 MHz */
-	MDRV_CPU_PROGRAM_MAP(speedspn_sound_map)
+	MCFG_CPU_ADD("audiocpu", Z80,6000000)		 /* 6 MHz */
+	MCFG_CPU_PROGRAM_MAP(speedspn_sound_map)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(8*8, 56*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(8*8, 56*8-1, 1*8, 31*8-1)
 
-	MDRV_GFXDECODE(speedspn)
-	MDRV_PALETTE_LENGTH(0x400)
+	MCFG_GFXDECODE(speedspn)
+	MCFG_PALETTE_LENGTH(0x400)
 
-	MDRV_VIDEO_START(speedspn)
-	MDRV_VIDEO_UPDATE(speedspn)
+	MCFG_VIDEO_START(speedspn)
+	MCFG_VIDEO_UPDATE(speedspn)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_OKIM6295_ADD("oki", 1122000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_OKIM6295_ADD("oki", 1122000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 /*** ROM LOADING *************************************************************/

@@ -374,60 +374,60 @@ static INTERRUPT_GEN( sauro_interrupt )
 static MACHINE_CONFIG_START( tecfri, sauro_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, XTAL_20MHz/4)       /* verified on pcb */
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_20MHz/4)       /* verified on pcb */
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_NVRAM_ADD_1FILL("nvram")
+	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(55.72)   /* verified on pcb */
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(5000))  // frames per second, vblank duration (otherwise sprites lag)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32 * 8, 32 * 8)
-	MDRV_SCREEN_VISIBLE_AREA(1 * 8, 31 * 8 - 1, 2 * 8, 30 * 8 - 1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(55.72)   /* verified on pcb */
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(5000))  // frames per second, vblank duration (otherwise sprites lag)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32 * 8, 32 * 8)
+	MCFG_SCREEN_VISIBLE_AREA(1 * 8, 31 * 8 - 1, 2 * 8, 30 * 8 - 1)
 
-	MDRV_PALETTE_LENGTH(1024)
-	MDRV_PALETTE_INIT(RRRR_GGGG_BBBB)
+	MCFG_PALETTE_LENGTH(1024)
+	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM3812, XTAL_20MHz/8)       /* verified on pcb */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_20MHz/8)       /* verified on pcb */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( trckydoc, tecfri )
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(trckydoc_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(trckydoc_map)
 
-	MDRV_GFXDECODE(trckydoc)
+	MCFG_GFXDECODE(trckydoc)
 
-	MDRV_VIDEO_START(trckydoc)
-	MDRV_VIDEO_UPDATE(trckydoc)
+	MCFG_VIDEO_START(trckydoc)
+	MCFG_VIDEO_UPDATE(trckydoc)
 
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( sauro, tecfri )
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(sauro_map)
-	MDRV_CPU_IO_MAP(sauro_io_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(sauro_map)
+	MCFG_CPU_IO_MAP(sauro_io_map)
 
-	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	// 4 MHz?
-	MDRV_CPU_PROGRAM_MAP(sauro_sound_map)
-	MDRV_CPU_PERIODIC_INT(sauro_interrupt, 8*60) // ?
+	MCFG_CPU_ADD("audiocpu", Z80, 4000000)	// 4 MHz?
+	MCFG_CPU_PROGRAM_MAP(sauro_sound_map)
+	MCFG_CPU_PERIODIC_INT(sauro_interrupt, 8*60) // ?
 
-	MDRV_GFXDECODE(sauro)
+	MCFG_GFXDECODE(sauro)
 
-	MDRV_VIDEO_START(sauro)
-	MDRV_VIDEO_UPDATE(sauro)
+	MCFG_VIDEO_START(sauro)
+	MCFG_VIDEO_UPDATE(sauro)
 
-	MDRV_SOUND_ADD("speech", SP0256, 3120000)
-	MDRV_SOUND_CONFIG(sauro_sp256)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("speech", SP0256, 3120000)
+	MCFG_SOUND_CONFIG(sauro_sp256)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 /***************************************************************************

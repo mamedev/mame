@@ -1478,75 +1478,75 @@ static const ay8910_interface ay8910_config =
 static MACHINE_CONFIG_START( nbmjdrv1, driver_device )	// galkoku
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 25000000/5)		/* 5.00 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(galkoku_map)
-	MDRV_CPU_IO_MAP(galkoku_io_map)
-	MDRV_CPU_VBLANK_INT("screen", nb1413m3_interrupt)
+	MCFG_CPU_ADD("maincpu", Z80, 25000000/5)		/* 5.00 MHz ? */
+	MCFG_CPU_PROGRAM_MAP(galkoku_map)
+	MCFG_CPU_IO_MAP(galkoku_io_map)
+	MCFG_CPU_VBLANK_INT("screen", nb1413m3_interrupt)
 
-	MDRV_MACHINE_RESET(nbmj8991)
+	MCFG_MACHINE_RESET(nbmj8991)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(1024, 512)
-	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 240-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(1024, 512)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 240-1)
 
-	MDRV_PALETTE_LENGTH(256)
+	MCFG_PALETTE_LENGTH(256)
 
-	MDRV_VIDEO_START(nbmj8991)
-	MDRV_VIDEO_UPDATE(nbmj8991_type1)
+	MCFG_VIDEO_START(nbmj8991)
+	MCFG_VIDEO_UPDATE(nbmj8991_type1)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("fmsnd", YM3812, 25000000/10)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("fmsnd", YM3812, 25000000/10)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( nbmjdrv2, driver_device )	// pstadium
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 6000000/2)	/* 3.00 MHz */
-	MDRV_CPU_PROGRAM_MAP(pstadium_map)
-	MDRV_CPU_IO_MAP(pstadium_io_map)
-	MDRV_CPU_VBLANK_INT("screen", nb1413m3_interrupt)
+	MCFG_CPU_ADD("maincpu", Z80, 6000000/2)	/* 3.00 MHz */
+	MCFG_CPU_PROGRAM_MAP(pstadium_map)
+	MCFG_CPU_IO_MAP(pstadium_io_map)
+	MCFG_CPU_VBLANK_INT("screen", nb1413m3_interrupt)
 
-	MDRV_CPU_ADD("audiocpu", Z80, 4000000)					/* 4.00 MHz */
-	MDRV_CPU_PROGRAM_MAP(nbmj8991_sound_map)
-	MDRV_CPU_IO_MAP(nbmj8991_sound_io_map)
-	MDRV_CPU_PERIODIC_INT(irq0_line_hold, 128*60) // ?
+	MCFG_CPU_ADD("audiocpu", Z80, 4000000)					/* 4.00 MHz */
+	MCFG_CPU_PROGRAM_MAP(nbmj8991_sound_map)
+	MCFG_CPU_IO_MAP(nbmj8991_sound_io_map)
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 128*60) // ?
 
-	MDRV_MACHINE_RESET(nbmj8991)
+	MCFG_MACHINE_RESET(nbmj8991)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(1024, 512)
-	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 240-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(1024, 512)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 240-1)
 
-	MDRV_PALETTE_LENGTH(256)
+	MCFG_PALETTE_LENGTH(256)
 
-	MDRV_VIDEO_START(nbmj8991)
-	MDRV_VIDEO_UPDATE(nbmj8991_type2)
+	MCFG_VIDEO_START(nbmj8991)
+	MCFG_VIDEO_UPDATE(nbmj8991_type2)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("fmsnd", YM3812, 25000000/6.25)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
+	MCFG_SOUND_ADD("fmsnd", YM3812, 25000000/6.25)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 
-	MDRV_SOUND_ADD("dac1", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("dac1", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD("dac2", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("dac2", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 
@@ -1555,9 +1555,9 @@ static MACHINE_CONFIG_DERIVED( nbmjdrv3, nbmjdrv1 )
 	/* basic machine hardware */
 
 	/* sound hardware */
-	MDRV_SOUND_REPLACE("fmsnd", AY8910, 1250000)
-	MDRV_SOUND_CONFIG(ay8910_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
+	MCFG_SOUND_REPLACE("fmsnd", AY8910, 1250000)
+	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 MACHINE_CONFIG_END
 
 
@@ -1572,26 +1572,26 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( galkaika, nbmjdrv1 )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(galkaika_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(galkaika_map)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( tokyogal, nbmjdrv1 )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(tokyogal_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(tokyogal_map)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( tokimbsj, nbmjdrv1 )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(galkaika_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(galkaika_map)
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
 
@@ -1610,10 +1610,10 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( hyouban, nbmjdrv3 )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(hyouban_io_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(hyouban_io_map)
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
 
@@ -1626,16 +1626,16 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( triplew1, nbmjdrv2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(triplew1_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(triplew1_map)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( triplew2, nbmjdrv2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(triplew2_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(triplew2_map)
 MACHINE_CONFIG_END
 
 
@@ -1648,8 +1648,8 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( mjlstory, nbmjdrv2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mjlstory_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(mjlstory_map)
 MACHINE_CONFIG_END
 
 
@@ -1662,7 +1662,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( finalbny, nbmjdrv2 )
 
 	/* basic machine hardware */
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
 
@@ -1675,28 +1675,28 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( mjgottub, nbmjdrv2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(triplew1_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(triplew1_map)
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( av2mj1bb, nbmjdrv2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(av2mj1bb_map)
-	MDRV_CPU_IO_MAP(av2mj1bb_io_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(av2mj1bb_map)
+	MCFG_CPU_IO_MAP(av2mj1bb_io_map)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( av2mj2rg, nbmjdrv2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(av2mj2rg_map)
-	MDRV_CPU_IO_MAP(av2mj1bb_io_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(av2mj2rg_map)
+	MCFG_CPU_IO_MAP(av2mj1bb_io_map)
 MACHINE_CONFIG_END
 
 

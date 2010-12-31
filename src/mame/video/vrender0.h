@@ -19,9 +19,9 @@ struct _vr0video_interface
 
 DECLARE_LEGACY_DEVICE(VIDEO_VRENDER0, vr0video);
 
-#define MDRV_VIDEO_VRENDER0_ADD(_tag, _interface) \
-MDRV_DEVICE_ADD(_tag, VIDEO_VRENDER0, 0) \
-MDRV_DEVICE_CONFIG(_interface)
+#define MCFG_VIDEO_VRENDER0_ADD(_tag, _interface) \
+MCFG_DEVICE_ADD(_tag, VIDEO_VRENDER0, 0) \
+MCFG_DEVICE_CONFIG(_interface)
 
 
 /***************************************************************************

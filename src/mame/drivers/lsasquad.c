@@ -619,106 +619,106 @@ static MACHINE_RESET( lsasquad )
 static MACHINE_CONFIG_START( lsasquad, lsasquad_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK / 4)
-	MDRV_CPU_PROGRAM_MAP(lsasquad_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK / 4)
+	MCFG_CPU_PROGRAM_MAP(lsasquad_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audiocpu", Z80, MASTER_CLOCK / 8)
-	MDRV_CPU_PROGRAM_MAP(lsasquad_sound_map)
+	MCFG_CPU_ADD("audiocpu", Z80, MASTER_CLOCK / 8)
+	MCFG_CPU_PROGRAM_MAP(lsasquad_sound_map)
 								/* IRQs are triggered by the YM2203 */
-	MDRV_CPU_ADD("mcu", M68705, MASTER_CLOCK / 8)
-	MDRV_CPU_PROGRAM_MAP(lsasquad_m68705_map)
+	MCFG_CPU_ADD("mcu", M68705, MASTER_CLOCK / 8)
+	MCFG_CPU_PROGRAM_MAP(lsasquad_m68705_map)
 
-	MDRV_QUANTUM_TIME(HZ(30000))	/* 500 CPU slices per frame - an high value to ensure proper */
+	MCFG_QUANTUM_TIME(HZ(30000))	/* 500 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 							/* main<->sound synchronization depends on this */
 
-	MDRV_MACHINE_START(lsasquad)
-	MDRV_MACHINE_RESET(lsasquad)
+	MCFG_MACHINE_START(lsasquad)
+	MCFG_MACHINE_RESET(lsasquad)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(lsasquad)
-	MDRV_PALETTE_LENGTH(512)
+	MCFG_GFXDECODE(lsasquad)
+	MCFG_PALETTE_LENGTH(512)
 
-	MDRV_PALETTE_INIT(RRRR_GGGG_BBBB)
-	MDRV_VIDEO_UPDATE(lsasquad)
+	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
+	MCFG_VIDEO_UPDATE(lsasquad)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK / 8)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.12)
+	MCFG_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK / 8)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.12)
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, MASTER_CLOCK / 8)
-	MDRV_SOUND_CONFIG(ym2203_config)
-	MDRV_SOUND_ROUTE(0, "mono", 0.12)
-	MDRV_SOUND_ROUTE(1, "mono", 0.12)
-	MDRV_SOUND_ROUTE(2, "mono", 0.12)
-	MDRV_SOUND_ROUTE(3, "mono", 0.63)
+	MCFG_SOUND_ADD("ymsnd", YM2203, MASTER_CLOCK / 8)
+	MCFG_SOUND_CONFIG(ym2203_config)
+	MCFG_SOUND_ROUTE(0, "mono", 0.12)
+	MCFG_SOUND_ROUTE(1, "mono", 0.12)
+	MCFG_SOUND_ROUTE(2, "mono", 0.12)
+	MCFG_SOUND_ROUTE(3, "mono", 0.63)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( storming, lsasquad )
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(storming_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(storming_map)
 
-	MDRV_DEVICE_REMOVE("mcu")
+	MCFG_DEVICE_REMOVE("mcu")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( daikaiju, lsasquad_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK / 4)
-	MDRV_CPU_PROGRAM_MAP(daikaiju_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK / 4)
+	MCFG_CPU_PROGRAM_MAP(daikaiju_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audiocpu", Z80, MASTER_CLOCK / 8)
-	MDRV_CPU_PROGRAM_MAP(daikaiju_sound_map)
+	MCFG_CPU_ADD("audiocpu", Z80, MASTER_CLOCK / 8)
+	MCFG_CPU_PROGRAM_MAP(daikaiju_sound_map)
 	/* IRQs are triggered by the YM2203 */
 
-	MDRV_CPU_ADD("mcu", M68705, MASTER_CLOCK / 8)
-	MDRV_CPU_PROGRAM_MAP(lsasquad_m68705_map)
+	MCFG_CPU_ADD("mcu", M68705, MASTER_CLOCK / 8)
+	MCFG_CPU_PROGRAM_MAP(lsasquad_m68705_map)
 
-	MDRV_QUANTUM_TIME(HZ(30000))	/* 500 CPU slices per frame - an high value to ensure proper */
+	MCFG_QUANTUM_TIME(HZ(30000))	/* 500 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 							/* main<->sound synchronization depends on this */
 
-	MDRV_MACHINE_START(lsasquad)
-	MDRV_MACHINE_RESET(lsasquad)
+	MCFG_MACHINE_START(lsasquad)
+	MCFG_MACHINE_RESET(lsasquad)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(lsasquad)
-	MDRV_PALETTE_LENGTH(512)
+	MCFG_GFXDECODE(lsasquad)
+	MCFG_PALETTE_LENGTH(512)
 
-	MDRV_PALETTE_INIT(RRRR_GGGG_BBBB)
-	MDRV_VIDEO_UPDATE(daikaiju)
+	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
+	MCFG_VIDEO_UPDATE(daikaiju)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK / 8)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.12)
+	MCFG_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK / 8)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.12)
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, MASTER_CLOCK / 8)
-	MDRV_SOUND_CONFIG(ym2203_config)
-	MDRV_SOUND_ROUTE(0, "mono", 0.12)
-	MDRV_SOUND_ROUTE(1, "mono", 0.12)
-	MDRV_SOUND_ROUTE(2, "mono", 0.12)
-	MDRV_SOUND_ROUTE(3, "mono", 0.63)
+	MCFG_SOUND_ADD("ymsnd", YM2203, MASTER_CLOCK / 8)
+	MCFG_SOUND_CONFIG(ym2203_config)
+	MCFG_SOUND_ROUTE(0, "mono", 0.12)
+	MCFG_SOUND_ROUTE(1, "mono", 0.12)
+	MCFG_SOUND_ROUTE(2, "mono", 0.12)
+	MCFG_SOUND_ROUTE(3, "mono", 0.63)
 MACHINE_CONFIG_END
 
 

@@ -81,17 +81,17 @@ const int TRANSLATE_FETCH_DEBUG		= (TRANSLATE_FETCH | TRANSLATE_DEBUG_MASK);
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MDRV_DEVICE_ADDRESS_MAP(_space, _map) \
+#define MCFG_DEVICE_ADDRESS_MAP(_space, _map) \
 	device_config_memory_interface::static_set_addrmap(device, _space, ADDRESS_MAP_NAME(_map));
 
-#define MDRV_DEVICE_PROGRAM_MAP(_map) \
-	MDRV_DEVICE_ADDRESS_MAP(AS_PROGRAM, _map)
+#define MCFG_DEVICE_PROGRAM_MAP(_map) \
+	MCFG_DEVICE_ADDRESS_MAP(AS_PROGRAM, _map)
 
-#define MDRV_DEVICE_DATA_MAP(_map) \
-	MDRV_DEVICE_ADDRESS_MAP(AS_DATA, _map)
+#define MCFG_DEVICE_DATA_MAP(_map) \
+	MCFG_DEVICE_ADDRESS_MAP(AS_DATA, _map)
 
-#define MDRV_DEVICE_IO_MAP(_map) \
-	MDRV_DEVICE_ADDRESS_MAP(AS_IO, _map)
+#define MCFG_DEVICE_IO_MAP(_map) \
+	MCFG_DEVICE_ADDRESS_MAP(AS_IO, _map)
 
 
 

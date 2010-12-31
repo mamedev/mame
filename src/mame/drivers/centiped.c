@@ -1593,35 +1593,35 @@ static const pokey_interface warlords_pokey_interface =
 static MACHINE_CONFIG_START( centiped, centiped_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6502, 12096000/8)	/* 1.512 MHz (slows down to 0.75MHz while accessing playfield RAM) */
-	MDRV_CPU_PROGRAM_MAP(centiped_map)
+	MCFG_CPU_ADD("maincpu", M6502, 12096000/8)	/* 1.512 MHz (slows down to 0.75MHz while accessing playfield RAM) */
+	MCFG_CPU_PROGRAM_MAP(centiped_map)
 
-	MDRV_MACHINE_START(centiped)
-	MDRV_MACHINE_RESET(centiped)
+	MCFG_MACHINE_START(centiped)
+	MCFG_MACHINE_RESET(centiped)
 
-	MDRV_ATARIVGEAROM_ADD("earom")
+	MCFG_ATARIVGEAROM_ADD("earom")
 
 	/* timer */
-	MDRV_TIMER_ADD_SCANLINE("32v", generate_interrupt, "screen", 0, 16)
+	MCFG_TIMER_ADD_SCANLINE("32v", generate_interrupt, "screen", 0, 16)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
 
-	MDRV_GFXDECODE(centiped)
-	MDRV_PALETTE_LENGTH(4+4*4*4*4)
+	MCFG_GFXDECODE(centiped)
+	MCFG_PALETTE_LENGTH(4+4*4*4*4)
 
-	MDRV_VIDEO_START(centiped)
-	MDRV_VIDEO_UPDATE(centiped)
+	MCFG_VIDEO_START(centiped)
+	MCFG_VIDEO_UPDATE(centiped)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("pokey", POKEY, 12096000/8)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("pokey", POKEY, 12096000/8)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -1630,117 +1630,117 @@ static MACHINE_CONFIG_DERIVED( caterplr, centiped )
 	/* basic machine hardware */
 
 	/* sound hardware */
-	MDRV_SOUND_REPLACE("pokey", AY8910, 12096000/8)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_REPLACE("pokey", AY8910, 12096000/8)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( centipdb, centiped )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(centipdb_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(centipdb_map)
 
 	/* sound hardware */
-	MDRV_SOUND_REPLACE("pokey", AY8910, 12096000/8)
-	MDRV_SOUND_CONFIG(centipdb_ay8910_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
+	MCFG_SOUND_REPLACE("pokey", AY8910, 12096000/8)
+	MCFG_SOUND_CONFIG(centipdb_ay8910_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( magworm, centiped )
 
 	/* basic machine hardware */
-	MDRV_MACHINE_RESET(magworm)
+	MCFG_MACHINE_RESET(magworm)
 
 	/* sound hardware */
-	MDRV_SOUND_REPLACE("pokey", AY8910, 12096000/8)
-	MDRV_SOUND_CONFIG(centipdb_ay8910_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
+	MCFG_SOUND_REPLACE("pokey", AY8910, 12096000/8)
+	MCFG_SOUND_CONFIG(centipdb_ay8910_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( milliped, centiped )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(milliped_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(milliped_map)
 
 	/* video hardware */
-	MDRV_GFXDECODE(milliped)
-	MDRV_PALETTE_LENGTH(4*4+4*4*4*4*4)
+	MCFG_GFXDECODE(milliped)
+	MCFG_PALETTE_LENGTH(4*4+4*4*4*4*4)
 
-	MDRV_VIDEO_START(milliped)
-	MDRV_VIDEO_UPDATE(milliped)
+	MCFG_VIDEO_START(milliped)
+	MCFG_VIDEO_UPDATE(milliped)
 
 	/* sound hardware */
-	MDRV_SOUND_REPLACE("pokey", POKEY, 12096000/8)
-	MDRV_SOUND_CONFIG(milliped_pokey_interface_1)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_REPLACE("pokey", POKEY, 12096000/8)
+	MCFG_SOUND_CONFIG(milliped_pokey_interface_1)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD("pokey2", POKEY, 12096000/8)
-	MDRV_SOUND_CONFIG(milliped_pokey_interface_2)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("pokey2", POKEY, 12096000/8)
+	MCFG_SOUND_CONFIG(milliped_pokey_interface_2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( warlords, centiped )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(warlords_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(warlords_map)
 
 	/* video hardware */
-	MDRV_GFXDECODE(warlords)
-	MDRV_PALETTE_LENGTH(8*4+8*4)
+	MCFG_GFXDECODE(warlords)
+	MCFG_PALETTE_LENGTH(8*4+8*4)
 
-	MDRV_PALETTE_INIT(warlords)
-	MDRV_VIDEO_START(warlords)
-	MDRV_VIDEO_UPDATE(warlords)
+	MCFG_PALETTE_INIT(warlords)
+	MCFG_VIDEO_START(warlords)
+	MCFG_VIDEO_UPDATE(warlords)
 
 	/* sound hardware */
-	MDRV_SOUND_REPLACE("pokey", POKEY, 12096000/8)
-	MDRV_SOUND_CONFIG(warlords_pokey_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_REPLACE("pokey", POKEY, 12096000/8)
+	MCFG_SOUND_CONFIG(warlords_pokey_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( mazeinv, milliped )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mazeinv_map)
-	MDRV_VIDEO_UPDATE(centiped)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(mazeinv_map)
+	MCFG_VIDEO_UPDATE(centiped)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( bullsdrt, centiped_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", S2650, 12096000/8)
-	MDRV_CPU_PROGRAM_MAP(bullsdrt_map)
-	MDRV_CPU_IO_MAP(bullsdrt_port_map)
+	MCFG_CPU_ADD("maincpu", S2650, 12096000/8)
+	MCFG_CPU_PROGRAM_MAP(bullsdrt_map)
+	MCFG_CPU_IO_MAP(bullsdrt_port_map)
 
-	MDRV_ATARIVGEAROM_ADD("earom")
+	MCFG_ATARIVGEAROM_ADD("earom")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 30*8-1)
 
-	MDRV_GFXDECODE(centiped)
-	MDRV_PALETTE_LENGTH(4+4*4*4*4)
+	MCFG_GFXDECODE(centiped)
+	MCFG_PALETTE_LENGTH(4+4*4*4*4)
 
-	MDRV_VIDEO_START(bullsdrt)
-	MDRV_VIDEO_UPDATE(bullsdrt)
+	MCFG_VIDEO_START(bullsdrt)
+	MCFG_VIDEO_UPDATE(bullsdrt)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("snsnd", SN76496, 12096000/8)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("snsnd", SN76496, 12096000/8)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 

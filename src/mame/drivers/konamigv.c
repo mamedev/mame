@@ -345,40 +345,40 @@ static const psx_spu_interface konamigv_psxspu_interface =
 
 static MACHINE_CONFIG_START( konamigv, konamigv_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD( "maincpu", PSXCPU, XTAL_67_7376MHz )
-	MDRV_CPU_PROGRAM_MAP( konamigv_map)
-	MDRV_CPU_VBLANK_INT("screen", psx_vblank)
+	MCFG_CPU_ADD( "maincpu", PSXCPU, XTAL_67_7376MHz )
+	MCFG_CPU_PROGRAM_MAP( konamigv_map)
+	MCFG_CPU_VBLANK_INT("screen", psx_vblank)
 
-	MDRV_MACHINE_START( konamigv )
-	MDRV_MACHINE_RESET( konamigv )
+	MCFG_MACHINE_START( konamigv )
+	MCFG_MACHINE_RESET( konamigv )
 
-	MDRV_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_93C46_ADD("eeprom")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE( 60 )
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC( 0 ))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE( 1024, 512 )
-	MDRV_SCREEN_VISIBLE_AREA( 0, 639, 0, 479 )
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE( 60 )
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC( 0 ))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE( 1024, 512 )
+	MCFG_SCREEN_VISIBLE_AREA( 0, 639, 0, 479 )
 
-	MDRV_PALETTE_LENGTH( 65536 )
+	MCFG_PALETTE_LENGTH( 65536 )
 
-	MDRV_PALETTE_INIT( psx )
-	MDRV_VIDEO_START( psx_type2 )
-	MDRV_VIDEO_UPDATE( psx )
+	MCFG_PALETTE_INIT( psx )
+	MCFG_VIDEO_START( psx_type2 )
+	MCFG_VIDEO_UPDATE( psx )
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD( "spu", PSXSPU, 0 )
-	MDRV_SOUND_CONFIG( konamigv_psxspu_interface )
-	MDRV_SOUND_ROUTE( 0, "lspeaker", 0.75 )
-	MDRV_SOUND_ROUTE( 1, "rspeaker", 0.75 )
+	MCFG_SOUND_ADD( "spu", PSXSPU, 0 )
+	MCFG_SOUND_CONFIG( konamigv_psxspu_interface )
+	MCFG_SOUND_ROUTE( 0, "lspeaker", 0.75 )
+	MCFG_SOUND_ROUTE( 1, "rspeaker", 0.75 )
 
-	MDRV_SOUND_ADD( "cdda", CDDA, 0 )
-	MDRV_SOUND_ROUTE( 0, "lspeaker", 1.0 )
-	MDRV_SOUND_ROUTE( 1, "rspeaker", 1.0 )
+	MCFG_SOUND_ADD( "cdda", CDDA, 0 )
+	MCFG_SOUND_ROUTE( 0, "lspeaker", 1.0 )
+	MCFG_SOUND_ROUTE( 1, "rspeaker", 1.0 )
 MACHINE_CONFIG_END
 
 
@@ -553,10 +553,10 @@ static DRIVER_INIT( simpbowl )
 }
 
 static MACHINE_CONFIG_DERIVED( simpbowl, konamigv )
-	MDRV_FUJITSU_29F016A_ADD("flash0")
-	MDRV_FUJITSU_29F016A_ADD("flash1")
-	MDRV_FUJITSU_29F016A_ADD("flash2")
-	MDRV_FUJITSU_29F016A_ADD("flash3")
+	MCFG_FUJITSU_29F016A_ADD("flash0")
+	MCFG_FUJITSU_29F016A_ADD("flash1")
+	MCFG_FUJITSU_29F016A_ADD("flash2")
+	MCFG_FUJITSU_29F016A_ADD("flash3")
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( simpbowl )
@@ -646,7 +646,7 @@ static DRIVER_INIT( btchamp )
 }
 
 static MACHINE_CONFIG_DERIVED( btchamp, konamigv )
-	MDRV_SHARP_LH28F400_ADD("flash")
+	MCFG_SHARP_LH28F400_ADD("flash")
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( btchamp )
@@ -738,7 +738,7 @@ static DRIVER_INIT( kdeadeye )
 }
 
 static MACHINE_CONFIG_DERIVED( kdeadeye, konamigv )
-	MDRV_SHARP_LH28F400_ADD("flash")
+	MCFG_SHARP_LH28F400_ADD("flash")
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( kdeadeye )

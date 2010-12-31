@@ -508,70 +508,70 @@ static void zn_machine_init( running_machine *machine )
 
 static MACHINE_CONFIG_START( zn1_1mb_vram, zn_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD( "maincpu", PSXCPU, XTAL_67_7376MHz )
-	MDRV_CPU_PROGRAM_MAP( zn_map)
-	MDRV_CPU_VBLANK_INT("screen", psx_vblank)
+	MCFG_CPU_ADD( "maincpu", PSXCPU, XTAL_67_7376MHz )
+	MCFG_CPU_PROGRAM_MAP( zn_map)
+	MCFG_CPU_VBLANK_INT("screen", psx_vblank)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE( 60 )
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE( 1024, 512 )
-	MDRV_SCREEN_VISIBLE_AREA( 0, 639, 0, 479 )
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE( 60 )
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE( 1024, 512 )
+	MCFG_SCREEN_VISIBLE_AREA( 0, 639, 0, 479 )
 
-	MDRV_PALETTE_LENGTH( 65536 )
+	MCFG_PALETTE_LENGTH( 65536 )
 
-	MDRV_PALETTE_INIT( psx )
-	MDRV_VIDEO_START( psx_type2 )
-	MDRV_VIDEO_UPDATE( psx )
+	MCFG_PALETTE_INIT( psx )
+	MCFG_VIDEO_START( psx_type2 )
+	MCFG_VIDEO_UPDATE( psx )
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD( "spu", PSXSPU, 0 )
-	MDRV_SOUND_CONFIG( psxspu_interface )
-	MDRV_SOUND_ROUTE(0, "lspeaker", 0.35)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 0.35)
+	MCFG_SOUND_ADD( "spu", PSXSPU, 0 )
+	MCFG_SOUND_CONFIG( psxspu_interface )
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.35)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.35)
 
-	MDRV_AT28C16_ADD( "at28c16", NULL )
+	MCFG_AT28C16_ADD( "at28c16", NULL )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( zn1_2mb_vram, zn1_1mb_vram )
 
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_SIZE( 1024, 1024 )
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_SIZE( 1024, 1024 )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( zn2, zn_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD( "maincpu", PSXCPU, XTAL_100MHz )
-	MDRV_CPU_PROGRAM_MAP( zn_map)
-	MDRV_CPU_VBLANK_INT("screen", psx_vblank)
+	MCFG_CPU_ADD( "maincpu", PSXCPU, XTAL_100MHz )
+	MCFG_CPU_PROGRAM_MAP( zn_map)
+	MCFG_CPU_VBLANK_INT("screen", psx_vblank)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE( 60 )
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE( 1024, 1024 )
-	MDRV_SCREEN_VISIBLE_AREA( 0, 639, 0, 479 )
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE( 60 )
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE( 1024, 1024 )
+	MCFG_SCREEN_VISIBLE_AREA( 0, 639, 0, 479 )
 
-	MDRV_PALETTE_LENGTH( 65536 )
+	MCFG_PALETTE_LENGTH( 65536 )
 
-	MDRV_PALETTE_INIT( psx )
-	MDRV_VIDEO_START( psx_type2 )
-	MDRV_VIDEO_UPDATE( psx )
+	MCFG_PALETTE_INIT( psx )
+	MCFG_VIDEO_START( psx_type2 )
+	MCFG_VIDEO_UPDATE( psx )
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD( "spu", PSXSPU, 0 )
-	MDRV_SOUND_CONFIG( psxspu_interface )
-	MDRV_SOUND_ROUTE(0, "lspeaker", 0.35)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 0.35)
+	MCFG_SOUND_ADD( "spu", PSXSPU, 0 )
+	MCFG_SOUND_CONFIG( psxspu_interface )
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.35)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.35)
 
-	MDRV_AT28C16_ADD( "at28c16", NULL )
+	MCFG_AT28C16_ADD( "at28c16", NULL )
 MACHINE_CONFIG_END
 
 /*
@@ -761,30 +761,30 @@ ADDRESS_MAP_END
 
 static MACHINE_CONFIG_DERIVED( coh1000c, zn1_1mb_vram )
 
-	MDRV_CPU_ADD( "audiocpu", Z80, 8000000 )  /* 8MHz ?? */
-	MDRV_CPU_PROGRAM_MAP( qsound_map)
-	MDRV_CPU_IO_MAP( qsound_portmap)
-	MDRV_CPU_VBLANK_INT_HACK( qsound_interrupt, 4 ) /* 4 interrupts per frame ?? */
+	MCFG_CPU_ADD( "audiocpu", Z80, 8000000 )  /* 8MHz ?? */
+	MCFG_CPU_PROGRAM_MAP( qsound_map)
+	MCFG_CPU_IO_MAP( qsound_portmap)
+	MCFG_CPU_VBLANK_INT_HACK( qsound_interrupt, 4 ) /* 4 interrupts per frame ?? */
 
-	MDRV_MACHINE_RESET( coh1000c )
+	MCFG_MACHINE_RESET( coh1000c )
 
-	MDRV_SOUND_ADD( "qsound", QSOUND, QSOUND_CLOCK )
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD( "qsound", QSOUND, QSOUND_CLOCK )
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( coh1002c, zn1_2mb_vram )
 
-	MDRV_CPU_ADD( "audiocpu", Z80, 8000000 )  /* 8MHz ?? */
-	MDRV_CPU_PROGRAM_MAP( qsound_map)
-	MDRV_CPU_IO_MAP( qsound_portmap)
-	MDRV_CPU_VBLANK_INT_HACK( qsound_interrupt, 4 ) /* 4 interrupts per frame ?? */
+	MCFG_CPU_ADD( "audiocpu", Z80, 8000000 )  /* 8MHz ?? */
+	MCFG_CPU_PROGRAM_MAP( qsound_map)
+	MCFG_CPU_IO_MAP( qsound_portmap)
+	MCFG_CPU_VBLANK_INT_HACK( qsound_interrupt, 4 ) /* 4 interrupts per frame ?? */
 
-	MDRV_MACHINE_RESET( coh1000c )
+	MCFG_MACHINE_RESET( coh1000c )
 
-	MDRV_SOUND_ADD( "qsound", QSOUND, QSOUND_CLOCK )
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD( "qsound", QSOUND, QSOUND_CLOCK )
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 /*
@@ -955,16 +955,16 @@ static MACHINE_RESET( coh3002c )
 
 static MACHINE_CONFIG_DERIVED( coh3002c, zn2 )
 
-	MDRV_CPU_ADD("audiocpu", Z80, 8000000 )	/* 8MHz ?? */
-	MDRV_CPU_PROGRAM_MAP( qsound_map)
-	MDRV_CPU_IO_MAP( qsound_portmap)
-	MDRV_CPU_VBLANK_INT_HACK( qsound_interrupt, 4 ) /* 4 interrupts per frame ?? */
+	MCFG_CPU_ADD("audiocpu", Z80, 8000000 )	/* 8MHz ?? */
+	MCFG_CPU_PROGRAM_MAP( qsound_map)
+	MCFG_CPU_IO_MAP( qsound_portmap)
+	MCFG_CPU_VBLANK_INT_HACK( qsound_interrupt, 4 ) /* 4 interrupts per frame ?? */
 
-	MDRV_MACHINE_RESET( coh3002c )
+	MCFG_MACHINE_RESET( coh3002c )
 
-	MDRV_SOUND_ADD( "qsound", QSOUND, QSOUND_CLOCK )
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD( "qsound", QSOUND, QSOUND_CLOCK )
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 /*
@@ -1271,21 +1271,21 @@ static const tc0140syt_interface coh1000ta_tc0140syt_intf =
 
 static MACHINE_CONFIG_DERIVED( coh1000ta, zn1_1mb_vram )
 
-	MDRV_CPU_ADD("audiocpu", Z80, 16000000 / 4 )	/* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP( fx1a_sound_map)
-	MDRV_MACHINE_RESET( coh1000ta )
-	MDRV_NVRAM_ADD_0FILL("eeprom1")
+	MCFG_CPU_ADD("audiocpu", Z80, 16000000 / 4 )	/* 4 MHz */
+	MCFG_CPU_PROGRAM_MAP( fx1a_sound_map)
+	MCFG_MACHINE_RESET( coh1000ta )
+	MCFG_NVRAM_ADD_0FILL("eeprom1")
 
-	MDRV_SOUND_ADD("ymsnd", YM2610B, 16000000/2)
-	MDRV_SOUND_CONFIG(ym2610_config)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 0.25)
-	MDRV_SOUND_ROUTE(0, "rspeaker", 0.25)
-	MDRV_SOUND_ROUTE(1, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(2, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM2610B, 16000000/2)
+	MCFG_SOUND_CONFIG(ym2610_config)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.25)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
+	MCFG_SOUND_ROUTE(1, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
 
-	MDRV_MB3773_ADD("mb3773")
+	MCFG_MB3773_ADD("mb3773")
 
-	MDRV_TC0140SYT_ADD("tc0140syt", coh1000ta_tc0140syt_intf)
+	MCFG_TC0140SYT_ADD("tc0140syt", coh1000ta_tc0140syt_intf)
 MACHINE_CONFIG_END
 
 static WRITE32_HANDLER( taitofx1b_volume_w )
@@ -1338,13 +1338,13 @@ static MACHINE_RESET( coh1000tb )
 
 static MACHINE_CONFIG_DERIVED( coh1000tb, zn1_2mb_vram )
 
-	MDRV_MACHINE_RESET( coh1000tb )
-	MDRV_NVRAM_ADD_0FILL("eeprom1")
-	MDRV_NVRAM_ADD_0FILL("eeprom2")
+	MCFG_MACHINE_RESET( coh1000tb )
+	MCFG_NVRAM_ADD_0FILL("eeprom1")
+	MCFG_NVRAM_ADD_0FILL("eeprom2")
 
-	MDRV_MB3773_ADD("mb3773")
+	MCFG_MB3773_ADD("mb3773")
 
-	MDRV_FRAGMENT_ADD( taito_zoom_sound )
+	MCFG_FRAGMENT_ADD( taito_zoom_sound )
 MACHINE_CONFIG_END
 
 /*
@@ -1526,9 +1526,9 @@ static MACHINE_RESET( coh1000w )
 
 static MACHINE_CONFIG_DERIVED( coh1000w, zn1_2mb_vram )
 
-	MDRV_MACHINE_RESET( coh1000w )
+	MCFG_MACHINE_RESET( coh1000w )
 
-	MDRV_IDE_CONTROLLER_ADD("ide", atpsx_interrupt)
+	MCFG_IDE_CONTROLLER_ADD("ide", atpsx_interrupt)
 MACHINE_CONFIG_END
 
 /*
@@ -1719,14 +1719,14 @@ ADDRESS_MAP_END
 
 static MACHINE_CONFIG_DERIVED( coh1002e, zn1_2mb_vram )
 
-	MDRV_CPU_ADD("audiocpu", M68000, 12000000 )
-	MDRV_CPU_PROGRAM_MAP( psarc_snd_map)
+	MCFG_CPU_ADD("audiocpu", M68000, 12000000 )
+	MCFG_CPU_PROGRAM_MAP( psarc_snd_map)
 
-	MDRV_MACHINE_RESET( coh1002e )
+	MCFG_MACHINE_RESET( coh1002e )
 
-	MDRV_SOUND_ADD( "ymf", YMF271, 16934400 )
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD( "ymf", YMF271, 16934400 )
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -1859,7 +1859,7 @@ static MACHINE_RESET( bam2 )
 
 static MACHINE_CONFIG_DERIVED( bam2, zn1_2mb_vram )
 
-	MDRV_MACHINE_RESET( bam2 )
+	MCFG_MACHINE_RESET( bam2 )
 MACHINE_CONFIG_END
 
 /*
@@ -2200,17 +2200,17 @@ static MACHINE_RESET( coh1000a )
 
 static MACHINE_CONFIG_DERIVED( coh1000a, zn1_2mb_vram )
 
-	MDRV_MACHINE_RESET( coh1000a )
+	MCFG_MACHINE_RESET( coh1000a )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( coh1000a_ide, zn1_2mb_vram )
 
-	MDRV_CPU_MODIFY( "maincpu" )
-	MDRV_CPU_VBLANK_INT("screen", jdredd_vblank)
+	MCFG_CPU_MODIFY( "maincpu" )
+	MCFG_CPU_VBLANK_INT("screen", jdredd_vblank)
 
-	MDRV_MACHINE_RESET( coh1000a )
+	MCFG_MACHINE_RESET( coh1000a )
 
-	MDRV_IDE_CONTROLLER_ADD("ide", jdredd_ide_interrupt)
+	MCFG_IDE_CONTROLLER_ADD("ide", jdredd_ide_interrupt)
 MACHINE_CONFIG_END
 
 /*
@@ -2350,12 +2350,12 @@ static MACHINE_RESET( coh1001l )
 
 static MACHINE_CONFIG_DERIVED( coh1001l, zn1_2mb_vram )
 
-//  MDRV_CPU_ADD("audiocpu", M68000, 10000000 )
-//  MDRV_CPU_PROGRAM_MAP( atlus_snd_map)
+//  MCFG_CPU_ADD("audiocpu", M68000, 10000000 )
+//  MCFG_CPU_PROGRAM_MAP( atlus_snd_map)
 
-	MDRV_MACHINE_RESET( coh1001l )
+	MCFG_MACHINE_RESET( coh1001l )
 
-//  MDRV_SOUND_ADD( "ymz", wYMZ280B, ymz280b_intf )
+//  MCFG_SOUND_ADD( "ymz", wYMZ280B, ymz280b_intf )
 MACHINE_CONFIG_END
 
 /*
@@ -2394,7 +2394,7 @@ static MACHINE_RESET( coh1002v )
 
 static MACHINE_CONFIG_DERIVED( coh1002v, zn1_2mb_vram )
 
-	MDRV_MACHINE_RESET( coh1002v )
+	MCFG_MACHINE_RESET( coh1002v )
 MACHINE_CONFIG_END
 
 /*
@@ -2635,28 +2635,28 @@ ADDRESS_MAP_END
 
 static MACHINE_CONFIG_DERIVED( coh1002m, zn1_2mb_vram )
 
-	MDRV_MACHINE_RESET( coh1002m )
+	MCFG_MACHINE_RESET( coh1002m )
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( coh1002msnd, zn1_2mb_vram )
 
-	MDRV_CPU_ADD("audiocpu", Z80, 32000000/8 )
-	MDRV_CPU_PROGRAM_MAP( cbaj_z80_map)
-	MDRV_CPU_IO_MAP( cbaj_z80_port_map)
+	MCFG_CPU_ADD("audiocpu", Z80, 32000000/8 )
+	MCFG_CPU_PROGRAM_MAP( cbaj_z80_map)
+	MCFG_CPU_IO_MAP( cbaj_z80_port_map)
 
-	MDRV_MACHINE_RESET( coh1002m )
+	MCFG_MACHINE_RESET( coh1002m )
 
-	MDRV_SOUND_ADD("ymz", YMZ280B, 16934400)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("ymz", YMZ280B, 16934400)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( coh1002ml, zn1_2mb_vram )
 
-	MDRV_CPU_ADD("link", Z80, 8000000 )
-	MDRV_CPU_PROGRAM_MAP( link_map)
+	MCFG_CPU_ADD("link", Z80, 8000000 )
+	MCFG_CPU_PROGRAM_MAP( link_map)
 
-	MDRV_MACHINE_RESET( coh1002m )
+	MCFG_MACHINE_RESET( coh1002m )
 MACHINE_CONFIG_END
 
 static INPUT_PORTS_START( zn )

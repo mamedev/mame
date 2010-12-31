@@ -361,51 +361,51 @@ static const ay8910_interface ay8910_interface_2 =
 static MACHINE_CONFIG_START( taxidrvr, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80,4000000)	/* 4 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(main_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("maincpu", Z80,4000000)	/* 4 MHz ??? */
+	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("sub", Z80,4000000)	/* 4 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(cpu2_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)	/* ??? */
+	MCFG_CPU_ADD("sub", Z80,4000000)	/* 4 MHz ??? */
+	MCFG_CPU_PROGRAM_MAP(cpu2_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)	/* ??? */
 
-	MDRV_CPU_ADD("audiocpu", Z80,4000000)	/* 4 MHz ??? */
-	MDRV_CPU_PROGRAM_MAP(cpu3_map)
-	MDRV_CPU_IO_MAP(cpu3_port_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)	/* ??? */
+	MCFG_CPU_ADD("audiocpu", Z80,4000000)	/* 4 MHz ??? */
+	MCFG_CPU_PROGRAM_MAP(cpu3_map)
+	MCFG_CPU_IO_MAP(cpu3_port_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)	/* ??? */
 
-	MDRV_QUANTUM_TIME(HZ(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
+	MCFG_QUANTUM_TIME(HZ(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 
-	MDRV_PPI8255_ADD( "ppi8255_0", ppi8255_intf[0] )
-	MDRV_PPI8255_ADD( "ppi8255_1", ppi8255_intf[1] )
-	MDRV_PPI8255_ADD( "ppi8255_2", ppi8255_intf[2] )
-	MDRV_PPI8255_ADD( "ppi8255_3", ppi8255_intf[3] )
-	MDRV_PPI8255_ADD( "ppi8255_4", ppi8255_intf[4] )
+	MCFG_PPI8255_ADD( "ppi8255_0", ppi8255_intf[0] )
+	MCFG_PPI8255_ADD( "ppi8255_1", ppi8255_intf[1] )
+	MCFG_PPI8255_ADD( "ppi8255_2", ppi8255_intf[2] )
+	MCFG_PPI8255_ADD( "ppi8255_3", ppi8255_intf[3] )
+	MCFG_PPI8255_ADD( "ppi8255_4", ppi8255_intf[4] )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 27*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 27*8-1)
 
-	MDRV_GFXDECODE(taxidrvr)
-	MDRV_PALETTE_LENGTH(16)
+	MCFG_GFXDECODE(taxidrvr)
+	MCFG_PALETTE_LENGTH(16)
 
-	MDRV_VIDEO_UPDATE(taxidrvr)
+	MCFG_VIDEO_UPDATE(taxidrvr)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay1", AY8910, 1250000)
-	MDRV_SOUND_CONFIG(ay8910_interface_1)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("ay1", AY8910, 1250000)
+	MCFG_SOUND_CONFIG(ay8910_interface_1)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD("ay2", AY8910, 1250000)
-	MDRV_SOUND_CONFIG(ay8910_interface_2)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("ay2", AY8910, 1250000)
+	MCFG_SOUND_CONFIG(ay8910_interface_2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 

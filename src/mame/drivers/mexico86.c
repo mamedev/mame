@@ -474,49 +474,49 @@ static MACHINE_RESET( mexico86 )
 static MACHINE_CONFIG_START( mexico86, mexico86_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",Z80, 24000000/4)      /* 6 MHz, Uses clock divided 24MHz OSC */
-	MDRV_CPU_PROGRAM_MAP(mexico86_map)
+	MCFG_CPU_ADD("maincpu",Z80, 24000000/4)      /* 6 MHz, Uses clock divided 24MHz OSC */
+	MCFG_CPU_PROGRAM_MAP(mexico86_map)
 
-	MDRV_CPU_ADD("audiocpu", Z80, 24000000/4)      /* 6 MHz, Uses clock divided 24MHz OSC */
-	MDRV_CPU_PROGRAM_MAP(mexico86_sound_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("audiocpu", Z80, 24000000/4)      /* 6 MHz, Uses clock divided 24MHz OSC */
+	MCFG_CPU_PROGRAM_MAP(mexico86_sound_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("mcu", M68705, 4000000) /* xtal is 4MHz, divided by 4 internally */
-	MDRV_CPU_PROGRAM_MAP(mexico86_m68705_map)
-	MDRV_CPU_VBLANK_INT_HACK(mexico86_m68705_interrupt,2)
+	MCFG_CPU_ADD("mcu", M68705, 4000000) /* xtal is 4MHz, divided by 4 internally */
+	MCFG_CPU_PROGRAM_MAP(mexico86_m68705_map)
+	MCFG_CPU_VBLANK_INT_HACK(mexico86_m68705_interrupt,2)
 
-	MDRV_CPU_ADD("sub", Z80, 8000000/2)      /* 4 MHz, Uses 8Mhz OSC */
-	MDRV_CPU_PROGRAM_MAP(mexico86_sub_cpu_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("sub", Z80, 8000000/2)      /* 4 MHz, Uses 8Mhz OSC */
+	MCFG_CPU_PROGRAM_MAP(mexico86_sub_cpu_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_QUANTUM_TIME(HZ(6000))    /* 100 CPU slices per frame - an high value to ensure proper synchronization of the CPUs */
+	MCFG_QUANTUM_TIME(HZ(6000))    /* 100 CPU slices per frame - an high value to ensure proper synchronization of the CPUs */
 
-	MDRV_MACHINE_START(mexico86)
-	MDRV_MACHINE_RESET(mexico86)
+	MCFG_MACHINE_START(mexico86)
+	MCFG_MACHINE_RESET(mexico86)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)  /* frames per second, vblank duration */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)  /* frames per second, vblank duration */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(mexico86)
-	MDRV_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE(mexico86)
+	MCFG_PALETTE_LENGTH(256)
 
-	MDRV_PALETTE_INIT(RRRR_GGGG_BBBB)
-	MDRV_VIDEO_UPDATE(mexico86)
+	MCFG_PALETTE_INIT(RRRR_GGGG_BBBB)
+	MCFG_VIDEO_UPDATE(mexico86)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, 3000000)
-	MDRV_SOUND_CONFIG(ym2203_config)
-	MDRV_SOUND_ROUTE(0, "mono", 0.30)
-	MDRV_SOUND_ROUTE(1, "mono", 0.30)
-	MDRV_SOUND_ROUTE(2, "mono", 0.30)
-	MDRV_SOUND_ROUTE(3, "mono", 1.00)
+	MCFG_SOUND_ADD("ymsnd", YM2203, 3000000)
+	MCFG_SOUND_CONFIG(ym2203_config)
+	MCFG_SOUND_ROUTE(0, "mono", 0.30)
+	MCFG_SOUND_ROUTE(1, "mono", 0.30)
+	MCFG_SOUND_ROUTE(2, "mono", 0.30)
+	MCFG_SOUND_ROUTE(3, "mono", 1.00)
 MACHINE_CONFIG_END
 
 
@@ -524,10 +524,10 @@ static MACHINE_CONFIG_DERIVED( knightb, mexico86 )
 
 	/* basic machine hardware */
 
-	MDRV_DEVICE_REMOVE("sub")
+	MCFG_DEVICE_REMOVE("sub")
 
 	/* video hardware */
-	MDRV_VIDEO_UPDATE(kikikai)
+	MCFG_VIDEO_UPDATE(kikikai)
 MACHINE_CONFIG_END
 
 
@@ -535,13 +535,13 @@ static MACHINE_CONFIG_DERIVED( kikikai, knightb )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_VBLANK_INT("screen", kikikai_interrupt) // IRQs should be triggered by the MCU, but we don't have it
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_VBLANK_INT("screen", kikikai_interrupt) // IRQs should be triggered by the MCU, but we don't have it
 
-	MDRV_DEVICE_REMOVE("mcu")	// we don't have code for the MC6801U4
+	MCFG_DEVICE_REMOVE("mcu")	// we don't have code for the MC6801U4
 
 	/* video hardware */
-	MDRV_VIDEO_UPDATE(kikikai)
+	MCFG_VIDEO_UPDATE(kikikai)
 MACHINE_CONFIG_END
 
 

@@ -4336,46 +4336,46 @@ static const msm5205_interface hanamai_msm5205_interface =
 static MACHINE_CONFIG_START( hanamai, dynax_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",Z80,22000000 / 4)	/* 5.5MHz */
-	MDRV_CPU_PROGRAM_MAP(sprtmtch_mem_map)
-	MDRV_CPU_IO_MAP(hanamai_io_map)
-	MDRV_CPU_VBLANK_INT("screen", sprtmtch_vblank_interrupt)	/* IM 0 needs an opcode on the data bus */
+	MCFG_CPU_ADD("maincpu",Z80,22000000 / 4)	/* 5.5MHz */
+	MCFG_CPU_PROGRAM_MAP(sprtmtch_mem_map)
+	MCFG_CPU_IO_MAP(hanamai_io_map)
+	MCFG_CPU_VBLANK_INT("screen", sprtmtch_vblank_interrupt)	/* IM 0 needs an opcode on the data bus */
 
-	MDRV_MACHINE_START(hanamai)
-	MDRV_MACHINE_RESET(dynax)
+	MCFG_MACHINE_START(hanamai)
+	MCFG_MACHINE_RESET(dynax)
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(512, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 512-1-4, 16+8, 255-8)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(512, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 512-1-4, 16+8, 255-8)
 
-	MDRV_PALETTE_LENGTH(512)
+	MCFG_PALETTE_LENGTH(512)
 
-	MDRV_PALETTE_INIT(sprtmtch)			// static palette
-	MDRV_VIDEO_START(hanamai)
-	MDRV_VIDEO_UPDATE(hanamai)
+	MCFG_PALETTE_INIT(sprtmtch)			// static palette
+	MCFG_VIDEO_START(hanamai)
+	MCFG_VIDEO_UPDATE(hanamai)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("aysnd", AY8910, 22000000 / 8)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_SOUND_ADD("aysnd", AY8910, 22000000 / 8)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, 22000000 / 8)
-	MDRV_SOUND_CONFIG(hanamai_ym2203_interface)
-	MDRV_SOUND_ROUTE(0, "mono", 0.20)
-	MDRV_SOUND_ROUTE(1, "mono", 0.20)
-	MDRV_SOUND_ROUTE(2, "mono", 0.20)
-	MDRV_SOUND_ROUTE(3, "mono", 0.50)
+	MCFG_SOUND_ADD("ymsnd", YM2203, 22000000 / 8)
+	MCFG_SOUND_CONFIG(hanamai_ym2203_interface)
+	MCFG_SOUND_ROUTE(0, "mono", 0.20)
+	MCFG_SOUND_ROUTE(1, "mono", 0.20)
+	MCFG_SOUND_ROUTE(2, "mono", 0.20)
+	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
-	MDRV_SOUND_ADD("msm", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(hanamai_msm5205_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("msm", MSM5205, 384000)
+	MCFG_SOUND_CONFIG(hanamai_msm5205_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -4394,42 +4394,42 @@ static const ay8910_interface hnoridur_ay8910_interface =
 static MACHINE_CONFIG_START( hnoridur, dynax_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",Z80,22000000 / 4)	/* 5.5MHz */
-	MDRV_CPU_PROGRAM_MAP(hnoridur_mem_map)
-	MDRV_CPU_IO_MAP(hnoridur_io_map)
-	MDRV_CPU_VBLANK_INT("screen", sprtmtch_vblank_interrupt)	/* IM 0 needs an opcode on the data bus */
+	MCFG_CPU_ADD("maincpu",Z80,22000000 / 4)	/* 5.5MHz */
+	MCFG_CPU_PROGRAM_MAP(hnoridur_mem_map)
+	MCFG_CPU_IO_MAP(hnoridur_io_map)
+	MCFG_CPU_VBLANK_INT("screen", sprtmtch_vblank_interrupt)	/* IM 0 needs an opcode on the data bus */
 
-	MDRV_MACHINE_START(hnoridur)
-	MDRV_MACHINE_RESET(dynax)
+	MCFG_MACHINE_START(hnoridur)
+	MCFG_MACHINE_RESET(dynax)
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(512, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 512-1-4, 16, 256-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(512, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 512-1-4, 16, 256-1)
 
-	MDRV_PALETTE_LENGTH(16*256)
+	MCFG_PALETTE_LENGTH(16*256)
 
-	MDRV_VIDEO_START(hnoridur)
-	MDRV_VIDEO_UPDATE(hnoridur)
+	MCFG_VIDEO_START(hnoridur)
+	MCFG_VIDEO_UPDATE(hnoridur)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("aysnd", AY8910, 22000000 / 16)
-	MDRV_SOUND_CONFIG(hnoridur_ay8910_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_SOUND_ADD("aysnd", AY8910, 22000000 / 16)
+	MCFG_SOUND_CONFIG(hnoridur_ay8910_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MDRV_SOUND_ADD("ymsnd", YM2413, 3579545)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM2413, 3579545)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("msm", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(hanamai_msm5205_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("msm", MSM5205, 384000)
+	MCFG_SOUND_CONFIG(hanamai_msm5205_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -4440,42 +4440,42 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( hjingi, dynax_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",Z80, XTAL_22MHz / 4)
-	MDRV_CPU_PROGRAM_MAP(hjingi_mem_map)
-	MDRV_CPU_IO_MAP(hjingi_io_map)
-	MDRV_CPU_VBLANK_INT("screen", sprtmtch_vblank_interrupt)	/* IM 0 needs an opcode on the data bus */
+	MCFG_CPU_ADD("maincpu",Z80, XTAL_22MHz / 4)
+	MCFG_CPU_PROGRAM_MAP(hjingi_mem_map)
+	MCFG_CPU_IO_MAP(hjingi_io_map)
+	MCFG_CPU_VBLANK_INT("screen", sprtmtch_vblank_interrupt)	/* IM 0 needs an opcode on the data bus */
 
-	MDRV_MACHINE_START(hnoridur)
-	MDRV_MACHINE_RESET(dynax)
+	MCFG_MACHINE_START(hnoridur)
+	MCFG_MACHINE_RESET(dynax)
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(512, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 512-1-4, 16, 256-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(512, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 512-1-4, 16, 256-1)
 
-	MDRV_PALETTE_LENGTH(16*256)
+	MCFG_PALETTE_LENGTH(16*256)
 
-	MDRV_VIDEO_START(hnoridur)
-	MDRV_VIDEO_UPDATE(hnoridur)
+	MCFG_VIDEO_START(hnoridur)
+	MCFG_VIDEO_UPDATE(hnoridur)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("aysnd", AY8910, XTAL_22MHz / 16)
-	MDRV_SOUND_CONFIG(hnoridur_ay8910_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_22MHz / 16)
+	MCFG_SOUND_CONFIG(hnoridur_ay8910_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MDRV_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz )
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_3_579545MHz )
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("msm", MSM5205, XTAL_384kHz )
-	MDRV_SOUND_CONFIG(hanamai_msm5205_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("msm", MSM5205, XTAL_384kHz )
+	MCFG_SOUND_CONFIG(hanamai_msm5205_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -4499,39 +4499,39 @@ static const ym2203_interface sprtmtch_ym2203_interface =
 static MACHINE_CONFIG_START( sprtmtch, dynax_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80,22000000 / 4)	/* 5.5MHz */
-	MDRV_CPU_PROGRAM_MAP(sprtmtch_mem_map)
-	MDRV_CPU_IO_MAP(sprtmtch_io_map)
-	MDRV_CPU_VBLANK_INT("screen", sprtmtch_vblank_interrupt)	/* IM 0 needs an opcode on the data bus */
+	MCFG_CPU_ADD("maincpu", Z80,22000000 / 4)	/* 5.5MHz */
+	MCFG_CPU_PROGRAM_MAP(sprtmtch_mem_map)
+	MCFG_CPU_IO_MAP(sprtmtch_io_map)
+	MCFG_CPU_VBLANK_INT("screen", sprtmtch_vblank_interrupt)	/* IM 0 needs an opcode on the data bus */
 
-	MDRV_MACHINE_START(hanamai)
-	MDRV_MACHINE_RESET(dynax)
+	MCFG_MACHINE_START(hanamai)
+	MCFG_MACHINE_RESET(dynax)
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(512, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 512-1, 16, 256-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(512, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 16, 256-1)
 
-	MDRV_PALETTE_LENGTH(512)
+	MCFG_PALETTE_LENGTH(512)
 
-	MDRV_PALETTE_INIT(sprtmtch)			// static palette
-	MDRV_VIDEO_START(sprtmtch)
-	MDRV_VIDEO_UPDATE(sprtmtch)
+	MCFG_PALETTE_INIT(sprtmtch)			// static palette
+	MCFG_VIDEO_START(sprtmtch)
+	MCFG_VIDEO_UPDATE(sprtmtch)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, 22000000 / 8)
-	MDRV_SOUND_CONFIG(sprtmtch_ym2203_interface)
-	MDRV_SOUND_ROUTE(0, "mono", 0.20)
-	MDRV_SOUND_ROUTE(1, "mono", 0.20)
-	MDRV_SOUND_ROUTE(2, "mono", 0.20)
-	MDRV_SOUND_ROUTE(3, "mono", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM2203, 22000000 / 8)
+	MCFG_SOUND_CONFIG(sprtmtch_ym2203_interface)
+	MCFG_SOUND_ROUTE(0, "mono", 0.20)
+	MCFG_SOUND_ROUTE(1, "mono", 0.20)
+	MCFG_SOUND_ROUTE(2, "mono", 0.20)
+	MCFG_SOUND_ROUTE(3, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -4542,35 +4542,35 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( mjfriday, dynax_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",Z80,24000000/4)	/* 6 MHz? */
-	MDRV_CPU_PROGRAM_MAP(sprtmtch_mem_map)
-	MDRV_CPU_IO_MAP(mjfriday_io_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("maincpu",Z80,24000000/4)	/* 6 MHz? */
+	MCFG_CPU_PROGRAM_MAP(sprtmtch_mem_map)
+	MCFG_CPU_IO_MAP(mjfriday_io_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_MACHINE_START(hanamai)
-	MDRV_MACHINE_RESET(dynax)
+	MCFG_MACHINE_START(hanamai)
+	MCFG_MACHINE_RESET(dynax)
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-1)
 
-	MDRV_PALETTE_LENGTH(512)
+	MCFG_PALETTE_LENGTH(512)
 
-	MDRV_PALETTE_INIT(sprtmtch)			// static palette
-	MDRV_VIDEO_START(mjdialq2)
-	MDRV_VIDEO_UPDATE(mjdialq2)
+	MCFG_PALETTE_INIT(sprtmtch)			// static palette
+	MCFG_VIDEO_START(mjdialq2)
+	MCFG_VIDEO_UPDATE(mjdialq2)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2413, 24000000/6)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM2413, 24000000/6)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -4581,8 +4581,8 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( mjdialq2, mjfriday )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mjdialq2_mem_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(mjdialq2_mem_map)
 MACHINE_CONFIG_END
 
 
@@ -4610,19 +4610,19 @@ static INTERRUPT_GEN( yarunara_clock_interrupt )
 static MACHINE_CONFIG_DERIVED( yarunara, hnoridur )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(yarunara_mem_map)
-	MDRV_CPU_IO_MAP(yarunara_io_map)
-	MDRV_CPU_PERIODIC_INT(yarunara_clock_interrupt, 60)	// RTC
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(yarunara_mem_map)
+	MCFG_CPU_IO_MAP(yarunara_io_map)
+	MCFG_CPU_PERIODIC_INT(yarunara_clock_interrupt, 60)	// RTC
 
-	MDRV_NVRAM_REPLACE_0FILL("nvram")
+	MCFG_NVRAM_REPLACE_0FILL("nvram")
 
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_VISIBLE_AREA(0, 336-1, 8, 256-1-8-1)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_VISIBLE_AREA(0, 336-1, 8, 256-1-8-1)
 
 	/* devices */
-	MDRV_MSM6242_ADD("rtc")
+	MCFG_MSM6242_ADD("rtc")
 MACHINE_CONFIG_END
 
 
@@ -4631,11 +4631,11 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 static MACHINE_CONFIG_DERIVED( mcnpshnt, hnoridur )
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mcnpshnt_mem_map)
-	MDRV_CPU_IO_MAP(mcnpshnt_io_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(mcnpshnt_mem_map)
+	MCFG_CPU_IO_MAP(mcnpshnt_io_map)
 
-	MDRV_VIDEO_START(mcnpshnt)	// different priorities
+	MCFG_VIDEO_START(mcnpshnt)	// different priorities
 MACHINE_CONFIG_END
 
 
@@ -4644,9 +4644,9 @@ MACHINE_CONFIG_END
 ***************************************************************************/
 
 static MACHINE_CONFIG_DERIVED( nanajign, hnoridur )
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(nanajign_mem_map)
-	MDRV_CPU_IO_MAP(nanajign_io_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(nanajign_mem_map)
+	MCFG_CPU_IO_MAP(nanajign_io_map)
 MACHINE_CONFIG_END
 
 
@@ -4690,62 +4690,62 @@ static MACHINE_START( jantouki )
 static MACHINE_CONFIG_START( jantouki, dynax_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",Z80,22000000 / 4)	/* 5.5MHz */
-	MDRV_CPU_PROGRAM_MAP(jantouki_mem_map)
-	MDRV_CPU_IO_MAP(jantouki_io_map)
-	MDRV_CPU_VBLANK_INT("top", jantouki_vblank_interrupt)	/* IM 0 needs an opcode on the data bus */
+	MCFG_CPU_ADD("maincpu",Z80,22000000 / 4)	/* 5.5MHz */
+	MCFG_CPU_PROGRAM_MAP(jantouki_mem_map)
+	MCFG_CPU_IO_MAP(jantouki_io_map)
+	MCFG_CPU_VBLANK_INT("top", jantouki_vblank_interrupt)	/* IM 0 needs an opcode on the data bus */
 
-	MDRV_CPU_ADD("soundcpu",Z80,22000000 / 4)	/* 5.5MHz */
-	MDRV_CPU_PROGRAM_MAP(jantouki_sound_mem_map)
-	MDRV_CPU_IO_MAP(jantouki_sound_io_map)
-	MDRV_CPU_VBLANK_INT("top", jantouki_sound_vblank_interrupt)	/* IM 0 needs an opcode on the data bus */
+	MCFG_CPU_ADD("soundcpu",Z80,22000000 / 4)	/* 5.5MHz */
+	MCFG_CPU_PROGRAM_MAP(jantouki_sound_mem_map)
+	MCFG_CPU_IO_MAP(jantouki_sound_io_map)
+	MCFG_CPU_VBLANK_INT("top", jantouki_sound_vblank_interrupt)	/* IM 0 needs an opcode on the data bus */
 
-	MDRV_MACHINE_START(jantouki)
-	MDRV_MACHINE_RESET(dynax)
+	MCFG_MACHINE_START(jantouki)
+	MCFG_MACHINE_RESET(dynax)
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MDRV_PALETTE_LENGTH(512)
-	MDRV_DEFAULT_LAYOUT(layout_dualhuov)
+	MCFG_PALETTE_LENGTH(512)
+	MCFG_DEFAULT_LAYOUT(layout_dualhuov)
 
-	MDRV_SCREEN_ADD("top", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_SIZE(512, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 512-1, 16, 256-1)
+	MCFG_SCREEN_ADD("top", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(512, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 16, 256-1)
 
-	MDRV_SCREEN_ADD("bottom", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_SIZE(512, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 512-1, 16, 256-1)
+	MCFG_SCREEN_ADD("bottom", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_SIZE(512, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 512-1, 16, 256-1)
 
-	MDRV_PALETTE_INIT(sprtmtch)			// static palette
-	MDRV_VIDEO_START(jantouki)
-	MDRV_VIDEO_UPDATE(jantouki)
+	MCFG_PALETTE_INIT(sprtmtch)			// static palette
+	MCFG_VIDEO_START(jantouki)
+	MCFG_VIDEO_UPDATE(jantouki)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("aysnd", AY8910, 22000000 / 8)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_SOUND_ADD("aysnd", AY8910, 22000000 / 8)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, 22000000 / 8)
-	MDRV_SOUND_CONFIG(jantouki_ym2203_interface)
-	MDRV_SOUND_ROUTE(0, "mono", 0.20)
-	MDRV_SOUND_ROUTE(1, "mono", 0.20)
-	MDRV_SOUND_ROUTE(2, "mono", 0.20)
-	MDRV_SOUND_ROUTE(3, "mono", 0.50)
+	MCFG_SOUND_ADD("ymsnd", YM2203, 22000000 / 8)
+	MCFG_SOUND_CONFIG(jantouki_ym2203_interface)
+	MCFG_SOUND_ROUTE(0, "mono", 0.20)
+	MCFG_SOUND_ROUTE(1, "mono", 0.20)
+	MCFG_SOUND_ROUTE(2, "mono", 0.20)
+	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
-	MDRV_SOUND_ADD("msm", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(jantouki_msm5205_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("msm", MSM5205, 384000)
+	MCFG_SOUND_CONFIG(jantouki_msm5205_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* devices */
-	MDRV_MSM6242_ADD("rtc")
+	MCFG_MSM6242_ADD("rtc")
 MACHINE_CONFIG_END
 
 
@@ -4774,12 +4774,12 @@ static INTERRUPT_GEN( mjelctrn_vblank_interrupt )
 }
 
 static MACHINE_CONFIG_DERIVED( mjelctrn, hnoridur )
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(nanajign_mem_map)
-	MDRV_CPU_IO_MAP(mjelctrn_io_map)
-	MDRV_CPU_VBLANK_INT("screen", mjelctrn_vblank_interrupt)	/* IM 2 needs a vector on the data bus */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(nanajign_mem_map)
+	MCFG_CPU_IO_MAP(mjelctrn_io_map)
+	MCFG_CPU_VBLANK_INT("screen", mjelctrn_vblank_interrupt)	/* IM 2 needs a vector on the data bus */
 
-	MDRV_VIDEO_START(mjelctrn)
+	MCFG_VIDEO_START(mjelctrn)
 MACHINE_CONFIG_END
 
 
@@ -4814,10 +4814,10 @@ static INTERRUPT_GEN( neruton_vblank_interrupt )
 }
 
 static MACHINE_CONFIG_DERIVED( neruton, mjelctrn )
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_VBLANK_INT_HACK(neruton_vblank_interrupt,1+10)	/* IM 2 needs a vector on the data bus */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_VBLANK_INT_HACK(neruton_vblank_interrupt,1+10)	/* IM 2 needs a vector on the data bus */
 
-	MDRV_VIDEO_START(neruton)
+	MCFG_VIDEO_START(neruton)
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -4839,8 +4839,8 @@ static INTERRUPT_GEN( majxtal7_vblank_interrupt )
 }
 
 static MACHINE_CONFIG_DERIVED( majxtal7, neruton )
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_VBLANK_INT("screen", majxtal7_vblank_interrupt)	/* IM 2 needs a vector on the data bus */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_VBLANK_INT("screen", majxtal7_vblank_interrupt)	/* IM 2 needs a vector on the data bus */
 
 MACHINE_CONFIG_END
 
@@ -4861,43 +4861,43 @@ static const ay8910_interface htengoku_ay8910_interface =
 static MACHINE_CONFIG_START( htengoku, dynax_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",Z80,20000000 / 4)
-	MDRV_CPU_PROGRAM_MAP(yarunara_mem_map)
-	MDRV_CPU_IO_MAP(htengoku_io_map)
-	MDRV_CPU_VBLANK_INT("screen", sprtmtch_vblank_interrupt)	/* IM 0 needs an opcode on the data bus */
-	MDRV_CPU_PERIODIC_INT(yarunara_clock_interrupt, 60)	// RTC
+	MCFG_CPU_ADD("maincpu",Z80,20000000 / 4)
+	MCFG_CPU_PROGRAM_MAP(yarunara_mem_map)
+	MCFG_CPU_IO_MAP(htengoku_io_map)
+	MCFG_CPU_VBLANK_INT("screen", sprtmtch_vblank_interrupt)	/* IM 0 needs an opcode on the data bus */
+	MCFG_CPU_PERIODIC_INT(yarunara_clock_interrupt, 60)	// RTC
 
-	MDRV_MACHINE_START(htengoku)
-	MDRV_MACHINE_RESET(dynax)
+	MCFG_MACHINE_START(htengoku)
+	MCFG_MACHINE_RESET(dynax)
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(512, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 336-1, 0+8, 256-1-8)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(512, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 336-1, 0+8, 256-1-8)
 
-	MDRV_PALETTE_LENGTH(16*256)
+	MCFG_PALETTE_LENGTH(16*256)
 
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MDRV_VIDEO_START(htengoku)
-	MDRV_VIDEO_UPDATE(htengoku)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
+	MCFG_VIDEO_START(htengoku)
+	MCFG_VIDEO_UPDATE(htengoku)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("aysnd", AY8910, 20000000 / 16)
-	MDRV_SOUND_CONFIG(htengoku_ay8910_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_SOUND_ADD("aysnd", AY8910, 20000000 / 16)
+	MCFG_SOUND_CONFIG(htengoku_ay8910_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MDRV_SOUND_ADD("ymsnd", YM2413, 3579545)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM2413, 3579545)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* devices */
-	MDRV_MSM6242_ADD("rtc")
+	MCFG_MSM6242_ADD("rtc")
 MACHINE_CONFIG_END
 
 
@@ -4939,46 +4939,46 @@ static MACHINE_START( tenkai )
 static MACHINE_CONFIG_START( tenkai, dynax_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",TMP91640, 21472700 / 2)
-	MDRV_CPU_PROGRAM_MAP(tenkai_map)
-	MDRV_CPU_IO_MAP(tenkai_io_map)
-	MDRV_CPU_VBLANK_INT_HACK(tenkai_interrupt,3)
+	MCFG_CPU_ADD("maincpu",TMP91640, 21472700 / 2)
+	MCFG_CPU_PROGRAM_MAP(tenkai_map)
+	MCFG_CPU_IO_MAP(tenkai_io_map)
+	MCFG_CPU_VBLANK_INT_HACK(tenkai_interrupt,3)
 
-	MDRV_MACHINE_START(tenkai)
-	MDRV_MACHINE_RESET(dynax)
+	MCFG_MACHINE_START(tenkai)
+	MCFG_MACHINE_RESET(dynax)
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(512, 256)
-	MDRV_SCREEN_VISIBLE_AREA(4, 512-1, 4, 255-8-4)	// hide first 4 horizontal pixels (see scroll of gal 4 in test mode)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(512, 256)
+	MCFG_SCREEN_VISIBLE_AREA(4, 512-1, 4, 255-8-4)	// hide first 4 horizontal pixels (see scroll of gal 4 in test mode)
 
-	MDRV_PALETTE_LENGTH(16*256)
+	MCFG_PALETTE_LENGTH(16*256)
 
-	MDRV_VIDEO_START(mjelctrn)
-	MDRV_VIDEO_UPDATE(hnoridur)
+	MCFG_VIDEO_START(mjelctrn)
+	MCFG_VIDEO_UPDATE(hnoridur)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("aysnd", AY8910, 22000000 / 16)
-	MDRV_SOUND_CONFIG(tenkai_ay8910_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_SOUND_ADD("aysnd", AY8910, 22000000 / 16)
+	MCFG_SOUND_CONFIG(tenkai_ay8910_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MDRV_SOUND_ADD("ymsnd", YM2413, 3579545)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM2413, 3579545)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 	/* devices */
-	MDRV_MSM6242_ADD("rtc")
+	MCFG_MSM6242_ADD("rtc")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( majrjhdx, tenkai )
-	MDRV_PALETTE_LENGTH(512)
-	MDRV_PALETTE_INIT(sprtmtch)			// static palette
+	MCFG_PALETTE_LENGTH(512)
+	MCFG_PALETTE_INIT(sprtmtch)			// static palette
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -5009,38 +5009,38 @@ static MACHINE_RESET( gekisha )
 static MACHINE_CONFIG_START( gekisha, dynax_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",TMP90841, XTAL_10MHz )	// ?
-	MDRV_CPU_PROGRAM_MAP(gekisha_map)
-	MDRV_CPU_IO_MAP(gekisha_io_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("maincpu",TMP90841, XTAL_10MHz )	// ?
+	MCFG_CPU_PROGRAM_MAP(gekisha_map)
+	MCFG_CPU_IO_MAP(gekisha_io_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_MACHINE_START(gekisha)
-	MDRV_MACHINE_RESET(gekisha)
+	MCFG_MACHINE_START(gekisha)
+	MCFG_MACHINE_RESET(gekisha)
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(2, 256-1, 16, 256-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(2, 256-1, 16, 256-1)
 
-	MDRV_PALETTE_LENGTH(512)
-	MDRV_PALETTE_INIT(sprtmtch)			// static palette
-	MDRV_VIDEO_START(mjdialq2)
-	MDRV_VIDEO_UPDATE(mjdialq2)
+	MCFG_PALETTE_LENGTH(512)
+	MCFG_PALETTE_INIT(sprtmtch)			// static palette
+	MCFG_VIDEO_START(mjdialq2)
+	MCFG_VIDEO_UPDATE(mjdialq2)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("aysnd", AY8910, XTAL_24MHz / 16)	// ?
-	MDRV_SOUND_CONFIG(tenkai_ay8910_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_24MHz / 16)	// ?
+	MCFG_SOUND_CONFIG(tenkai_ay8910_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 
-	MDRV_SOUND_ADD("ymsnd", YM2413, XTAL_24MHz / 8)	// ?
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM2413, XTAL_24MHz / 8)	// ?
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 

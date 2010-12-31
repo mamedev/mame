@@ -554,99 +554,99 @@ static MACHINE_START( slapshot )
 static MACHINE_CONFIG_START( slapshot, slapshot_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 14346000)	/* 28.6860 MHz / 2 ??? */
-	MDRV_CPU_PROGRAM_MAP(slapshot_map)
-	MDRV_CPU_VBLANK_INT("screen", slapshot_interrupt)
+	MCFG_CPU_ADD("maincpu", M68000, 14346000)	/* 28.6860 MHz / 2 ??? */
+	MCFG_CPU_PROGRAM_MAP(slapshot_map)
+	MCFG_CPU_VBLANK_INT("screen", slapshot_interrupt)
 
-	MDRV_CPU_ADD("audiocpu", Z80,32000000/8)	/* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(opwolf3_z80_sound_map)
+	MCFG_CPU_ADD("audiocpu", Z80,32000000/8)	/* 4 MHz */
+	MCFG_CPU_PROGRAM_MAP(opwolf3_z80_sound_map)
 
-	MDRV_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(HZ(600))
 
-	MDRV_MACHINE_START(slapshot)
+	MCFG_MACHINE_START(slapshot)
 
-	MDRV_TC0640FIO_ADD("tc0640fio", slapshot_io_intf)
+	MCFG_TC0640FIO_ADD("tc0640fio", slapshot_io_intf)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(40*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(40*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(slapshot)
-	MDRV_PALETTE_LENGTH(8192)
+	MCFG_GFXDECODE(slapshot)
+	MCFG_PALETTE_LENGTH(8192)
 
-	MDRV_VIDEO_START(slapshot)
-	MDRV_VIDEO_EOF(taito_no_buffer)
-	MDRV_VIDEO_UPDATE(slapshot)
+	MCFG_VIDEO_START(slapshot)
+	MCFG_VIDEO_EOF(taito_no_buffer)
+	MCFG_VIDEO_UPDATE(slapshot)
 
-	MDRV_TC0480SCP_ADD("tc0480scp", slapshot_tc0480scp_intf)
-	MDRV_TC0360PRI_ADD("tc0360pri")
+	MCFG_TC0480SCP_ADD("tc0480scp", slapshot_tc0480scp_intf)
+	MCFG_TC0360PRI_ADD("tc0360pri")
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymsnd", YM2610B, 16000000/2)
-	MDRV_SOUND_CONFIG(ym2610_config)
-	MDRV_SOUND_ROUTE(0, "lspeaker",  0.25)
-	MDRV_SOUND_ROUTE(0, "rspeaker", 0.25)
-	MDRV_SOUND_ROUTE(1, "lspeaker",  1.0)
-	MDRV_SOUND_ROUTE(2, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM2610B, 16000000/2)
+	MCFG_SOUND_CONFIG(ym2610_config)
+	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
+	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
+	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
 
-	MDRV_MK48T08_ADD( "mk48t08" )
+	MCFG_MK48T08_ADD( "mk48t08" )
 
-	MDRV_TC0140SYT_ADD("tc0140syt", slapshot_tc0140syt_intf)
+	MCFG_TC0140SYT_ADD("tc0140syt", slapshot_tc0140syt_intf)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( opwolf3, slapshot_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 14346000)	/* 28.6860 MHz / 2 ??? */
-	MDRV_CPU_PROGRAM_MAP(opwolf3_map)
-	MDRV_CPU_VBLANK_INT("screen", slapshot_interrupt)
+	MCFG_CPU_ADD("maincpu", M68000, 14346000)	/* 28.6860 MHz / 2 ??? */
+	MCFG_CPU_PROGRAM_MAP(opwolf3_map)
+	MCFG_CPU_VBLANK_INT("screen", slapshot_interrupt)
 
-	MDRV_CPU_ADD("audiocpu", Z80,32000000/8)	/* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(opwolf3_z80_sound_map)
+	MCFG_CPU_ADD("audiocpu", Z80,32000000/8)	/* 4 MHz */
+	MCFG_CPU_PROGRAM_MAP(opwolf3_z80_sound_map)
 
-	MDRV_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(HZ(600))
 
-	MDRV_MACHINE_START(slapshot)
+	MCFG_MACHINE_START(slapshot)
 
-	MDRV_TC0640FIO_ADD("tc0640fio", slapshot_io_intf)
+	MCFG_TC0640FIO_ADD("tc0640fio", slapshot_io_intf)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(40*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(40*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(slapshot)
-	MDRV_PALETTE_LENGTH(8192)
+	MCFG_GFXDECODE(slapshot)
+	MCFG_PALETTE_LENGTH(8192)
 
-	MDRV_VIDEO_START(slapshot)
-	MDRV_VIDEO_EOF(taito_no_buffer)
-	MDRV_VIDEO_UPDATE(slapshot)
+	MCFG_VIDEO_START(slapshot)
+	MCFG_VIDEO_EOF(taito_no_buffer)
+	MCFG_VIDEO_UPDATE(slapshot)
 
-	MDRV_TC0480SCP_ADD("tc0480scp", slapshot_tc0480scp_intf)
-	MDRV_TC0360PRI_ADD("tc0360pri")
+	MCFG_TC0480SCP_ADD("tc0480scp", slapshot_tc0480scp_intf)
+	MCFG_TC0360PRI_ADD("tc0360pri")
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymsnd", YM2610B, 16000000/2)
-	MDRV_SOUND_CONFIG(ym2610_config)
-	MDRV_SOUND_ROUTE(0, "lspeaker",  0.25)
-	MDRV_SOUND_ROUTE(0, "rspeaker", 0.25)
-	MDRV_SOUND_ROUTE(1, "lspeaker",  1.0)
-	MDRV_SOUND_ROUTE(2, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM2610B, 16000000/2)
+	MCFG_SOUND_CONFIG(ym2610_config)
+	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
+	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
+	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
 
-	MDRV_MK48T08_ADD( "mk48t08" )
+	MCFG_MK48T08_ADD( "mk48t08" )
 
-	MDRV_TC0140SYT_ADD("tc0140syt", slapshot_tc0140syt_intf)
+	MCFG_TC0140SYT_ADD("tc0140syt", slapshot_tc0140syt_intf)
 MACHINE_CONFIG_END
 
 /***************************************************************************

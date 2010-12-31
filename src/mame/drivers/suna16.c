@@ -752,55 +752,55 @@ static INTERRUPT_GEN( bssoccer_interrupt )
 static MACHINE_CONFIG_START( bssoccer, suna16_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 8000000)	/* ? */
-	MDRV_CPU_PROGRAM_MAP(bssoccer_map)
-	MDRV_CPU_VBLANK_INT_HACK(bssoccer_interrupt,2)
+	MCFG_CPU_ADD("maincpu", M68000, 8000000)	/* ? */
+	MCFG_CPU_PROGRAM_MAP(bssoccer_map)
+	MCFG_CPU_VBLANK_INT_HACK(bssoccer_interrupt,2)
 
-	MDRV_CPU_ADD("audiocpu", Z80, 3579545)		/* Z80B */
-	MDRV_CPU_PROGRAM_MAP(bssoccer_sound_map)
+	MCFG_CPU_ADD("audiocpu", Z80, 3579545)		/* Z80B */
+	MCFG_CPU_PROGRAM_MAP(bssoccer_sound_map)
 
-	MDRV_CPU_ADD("pcm1", Z80, 5000000)		/* Z80B */
-	MDRV_CPU_PROGRAM_MAP(bssoccer_pcm_1_map)
-	MDRV_CPU_IO_MAP(bssoccer_pcm_1_io_map)
+	MCFG_CPU_ADD("pcm1", Z80, 5000000)		/* Z80B */
+	MCFG_CPU_PROGRAM_MAP(bssoccer_pcm_1_map)
+	MCFG_CPU_IO_MAP(bssoccer_pcm_1_io_map)
 
-	MDRV_CPU_ADD("pcm2", Z80, 5000000)		/* Z80B */
-	MDRV_CPU_PROGRAM_MAP(bssoccer_pcm_2_map)
-	MDRV_CPU_IO_MAP(bssoccer_pcm_2_io_map)
+	MCFG_CPU_ADD("pcm2", Z80, 5000000)		/* Z80B */
+	MCFG_CPU_PROGRAM_MAP(bssoccer_pcm_2_map)
+	MCFG_CPU_IO_MAP(bssoccer_pcm_2_io_map)
 
-	MDRV_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(HZ(6000))
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-16-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-16-1)
 
-	MDRV_GFXDECODE(suna16)
-	MDRV_PALETTE_LENGTH(512)
+	MCFG_GFXDECODE(suna16)
+	MCFG_PALETTE_LENGTH(512)
 
-	MDRV_VIDEO_START(suna16)
-	MDRV_VIDEO_UPDATE(suna16)
+	MCFG_VIDEO_START(suna16)
+	MCFG_VIDEO_UPDATE(suna16)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymsnd", YM2151, 3579545)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 0.20)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 0.20)
+	MCFG_SOUND_ADD("ymsnd", YM2151, 3579545)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.20)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.20)
 
-	MDRV_SOUND_ADD("dac1", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
+	MCFG_SOUND_ADD("dac1", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 
-	MDRV_SOUND_ADD("dac2", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
+	MCFG_SOUND_ADD("dac2", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 
-	MDRV_SOUND_ADD("dac3", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
+	MCFG_SOUND_ADD("dac3", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 
-	MDRV_SOUND_ADD("dac4", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
+	MCFG_SOUND_ADD("dac4", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 MACHINE_CONFIG_END
 
 
@@ -812,49 +812,49 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( uballoon, suna16_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 8000000)
-	MDRV_CPU_PROGRAM_MAP(uballoon_map)
-	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
+	MCFG_CPU_ADD("maincpu", M68000, 8000000)
+	MCFG_CPU_PROGRAM_MAP(uballoon_map)
+	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
 
-	MDRV_CPU_ADD("audiocpu", Z80, 3579545)	/* ? */
-	MDRV_CPU_PROGRAM_MAP(uballoon_sound_map)
+	MCFG_CPU_ADD("audiocpu", Z80, 3579545)	/* ? */
+	MCFG_CPU_PROGRAM_MAP(uballoon_sound_map)
 
-	MDRV_CPU_ADD("pcm1", Z80, 5000000)	/* ? */
-	MDRV_CPU_PROGRAM_MAP(uballoon_pcm_1_map)
-	MDRV_CPU_IO_MAP(uballoon_pcm_1_io_map)
+	MCFG_CPU_ADD("pcm1", Z80, 5000000)	/* ? */
+	MCFG_CPU_PROGRAM_MAP(uballoon_pcm_1_map)
+	MCFG_CPU_IO_MAP(uballoon_pcm_1_io_map)
 
 	/* 2nd PCM Z80 missing */
 
-	MDRV_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(HZ(6000))
 
-	MDRV_MACHINE_RESET(uballoon)
+	MCFG_MACHINE_RESET(uballoon)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-16-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-16-1)
 
-	MDRV_GFXDECODE(suna16)
-	MDRV_PALETTE_LENGTH(512)
+	MCFG_GFXDECODE(suna16)
+	MCFG_PALETTE_LENGTH(512)
 
-	MDRV_VIDEO_START(suna16)
-	MDRV_VIDEO_UPDATE(suna16)
+	MCFG_VIDEO_START(suna16)
+	MCFG_VIDEO_UPDATE(suna16)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymsnd", YM2151, 3579545)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 0.50)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 0.50)
+	MCFG_SOUND_ADD("ymsnd", YM2151, 3579545)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MDRV_SOUND_ADD("dac1", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
+	MCFG_SOUND_ADD("dac1", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 
-	MDRV_SOUND_ADD("dac2", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	MCFG_SOUND_ADD("dac2", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -864,47 +864,47 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( sunaq, suna16_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 24000000/4)
-	MDRV_CPU_PROGRAM_MAP(sunaq_map)
-	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
+	MCFG_CPU_ADD("maincpu", M68000, 24000000/4)
+	MCFG_CPU_PROGRAM_MAP(sunaq_map)
+	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
 
-	MDRV_CPU_ADD("audiocpu", Z80, 14318000/4)
-	MDRV_CPU_PROGRAM_MAP(sunaq_sound_map)
+	MCFG_CPU_ADD("audiocpu", Z80, 14318000/4)
+	MCFG_CPU_PROGRAM_MAP(sunaq_sound_map)
 
-	MDRV_CPU_ADD("pcm1", Z80, 24000000/4)		/* Z80B */
-	MDRV_CPU_PROGRAM_MAP(bssoccer_pcm_1_map)
-	MDRV_CPU_IO_MAP(bssoccer_pcm_1_io_map)
+	MCFG_CPU_ADD("pcm1", Z80, 24000000/4)		/* Z80B */
+	MCFG_CPU_PROGRAM_MAP(bssoccer_pcm_1_map)
+	MCFG_CPU_IO_MAP(bssoccer_pcm_1_io_map)
 
 	/* 2nd PCM Z80 missing */
 
-	MDRV_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(HZ(6000))
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-16-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-16-1)
 
-	MDRV_GFXDECODE(suna16)
-	MDRV_PALETTE_LENGTH(512)
+	MCFG_GFXDECODE(suna16)
+	MCFG_PALETTE_LENGTH(512)
 
-	MDRV_VIDEO_START(suna16)
-	MDRV_VIDEO_UPDATE(suna16)
+	MCFG_VIDEO_START(suna16)
+	MCFG_VIDEO_UPDATE(suna16)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymsnd", YM2151, 14318000/4)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 0.50)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 0.50)
+	MCFG_SOUND_ADD("ymsnd", YM2151, 14318000/4)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MDRV_SOUND_ADD("dac1", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
+	MCFG_SOUND_ADD("dac1", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.50)
 
-	MDRV_SOUND_ADD("dac2", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
+	MCFG_SOUND_ADD("dac2", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.50)
 MACHINE_CONFIG_END
 
 /***************************************************************************
@@ -937,59 +937,59 @@ static const ay8910_interface bestbest_ay8910_interface =
 static MACHINE_CONFIG_START( bestbest, suna16_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 24000000/4)
-	MDRV_CPU_PROGRAM_MAP(bestbest_map)
-	MDRV_CPU_VBLANK_INT_HACK(bssoccer_interrupt,2)
+	MCFG_CPU_ADD("maincpu", M68000, 24000000/4)
+	MCFG_CPU_PROGRAM_MAP(bestbest_map)
+	MCFG_CPU_VBLANK_INT_HACK(bssoccer_interrupt,2)
 
-	MDRV_CPU_ADD("audiocpu", Z80, 24000000/4)
-	MDRV_CPU_PROGRAM_MAP(bestbest_sound_map)
+	MCFG_CPU_ADD("audiocpu", Z80, 24000000/4)
+	MCFG_CPU_PROGRAM_MAP(bestbest_sound_map)
 
-	MDRV_CPU_ADD("pcm1", Z80, 24000000/4)
-	MDRV_CPU_PROGRAM_MAP(bestbest_pcm_1_map)
-	MDRV_CPU_IO_MAP(bestbest_pcm_1_iomap)
+	MCFG_CPU_ADD("pcm1", Z80, 24000000/4)
+	MCFG_CPU_PROGRAM_MAP(bestbest_pcm_1_map)
+	MCFG_CPU_IO_MAP(bestbest_pcm_1_iomap)
 
 	/* 2nd PCM Z80 missing */
 
-	MDRV_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(HZ(6000))
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(59.1734)    // measured on pcb (15.6218kHz HSync)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-16-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(59.1734)    // measured on pcb (15.6218kHz HSync)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-16-1)
 
-	MDRV_GFXDECODE(bestbest)
-	MDRV_PALETTE_LENGTH(256*8)
+	MCFG_GFXDECODE(bestbest)
+	MCFG_PALETTE_LENGTH(256*8)
 
-	MDRV_VIDEO_START(suna16)
-	MDRV_VIDEO_UPDATE(bestbest)
+	MCFG_VIDEO_START(suna16)
+	MCFG_VIDEO_UPDATE(bestbest)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("aysnd", AY8910, 24000000/16)
-	MDRV_SOUND_CONFIG(bestbest_ay8910_interface)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("aysnd", AY8910, 24000000/16)
+	MCFG_SOUND_CONFIG(bestbest_ay8910_interface)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 
-	MDRV_SOUND_ADD("ymsnd", YM3526, 24000000/8)
-	MDRV_SOUND_CONFIG(bestbest_ym3526_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM3526, 24000000/8)
+	MCFG_SOUND_CONFIG(bestbest_ym3526_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MDRV_SOUND_ADD("dac1", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
+	MCFG_SOUND_ADD("dac1", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 
-	MDRV_SOUND_ADD("dac2", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
+	MCFG_SOUND_ADD("dac2", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 
-	MDRV_SOUND_ADD("dac3", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
+	MCFG_SOUND_ADD("dac3", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
 
-	MDRV_SOUND_ADD("dac4", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
+	MCFG_SOUND_ADD("dac4", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 MACHINE_CONFIG_END
 
 /***************************************************************************

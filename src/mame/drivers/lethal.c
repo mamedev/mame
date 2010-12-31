@@ -664,56 +664,56 @@ static const k05324x_interface lethalej_k05324x_intf =
 static MACHINE_CONFIG_START( lethalen, lethal_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", HD6309, MAIN_CLOCK/2)    /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(le_main)
-	MDRV_CPU_VBLANK_INT("screen", lethalen_interrupt)
+	MCFG_CPU_ADD("maincpu", HD6309, MAIN_CLOCK/2)    /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(le_main)
+	MCFG_CPU_VBLANK_INT("screen", lethalen_interrupt)
 
-	MDRV_CPU_ADD("soundcpu", Z80, MAIN_CLOCK/4)  /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(le_sound)
+	MCFG_CPU_ADD("soundcpu", Z80, MAIN_CLOCK/4)  /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(le_sound)
 
-	MDRV_MACHINE_START(lethalen)
-	MDRV_MACHINE_RESET(lethalen)
+	MCFG_MACHINE_START(lethalen)
+	MCFG_MACHINE_RESET(lethalen)
 
-	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
-	MDRV_EEPROM_DATA(lethalen_default_eeprom, 48)
+	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_EEPROM_DATA(lethalen_default_eeprom, 48)
 
-	MDRV_GFXDECODE(lethal)
+	MCFG_GFXDECODE(lethal)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(59.62)  /* verified on pcb */
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(216, 504-1, 16, 240-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(59.62)  /* verified on pcb */
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(216, 504-1, 16, 240-1)
 
-	MDRV_PALETTE_LENGTH(7168+1)
+	MCFG_PALETTE_LENGTH(7168+1)
 
-	MDRV_VIDEO_START(lethalen)
-	MDRV_VIDEO_UPDATE(lethalen)
+	MCFG_VIDEO_START(lethalen)
+	MCFG_VIDEO_UPDATE(lethalen)
 
-	MDRV_K056832_ADD("k056832", lethalen_k056832_intf)
-	MDRV_K053244_ADD("k053244", lethalen_k05324x_intf)
-	MDRV_K054000_ADD("k054000")
+	MCFG_K056832_ADD("k056832", lethalen_k056832_intf)
+	MCFG_K053244_ADD("k053244", lethalen_k05324x_intf)
+	MCFG_K054000_ADD("k054000")
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("k054539", K054539, 48000)
-	MDRV_SOUND_CONFIG(k054539_config)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("k054539", K054539, 48000)
+	MCFG_SOUND_CONFIG(k054539_config)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( lethalej, lethalen )
 
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(224, 512-1, 16, 240-1)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(224, 512-1, 16, 240-1)
 
-	MDRV_DEVICE_REMOVE("k053244")
-	MDRV_K053244_ADD("k053244", lethalej_k05324x_intf)
+	MCFG_DEVICE_REMOVE("k053244")
+	MCFG_K053244_ADD("k053244", lethalej_k05324x_intf)
 MACHINE_CONFIG_END
 
 ROM_START( lethalen )	// US version UAE

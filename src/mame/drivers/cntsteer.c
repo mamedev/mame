@@ -851,94 +851,94 @@ static const ay8910_interface ay8910_config =
 static MACHINE_CONFIG_START( cntsteer, cntsteer_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6809, 2000000)		 /* ? */
-	MDRV_CPU_PROGRAM_MAP(cntsteer_cpu1_map)
-	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse) /* ? */
+	MCFG_CPU_ADD("maincpu", M6809, 2000000)		 /* ? */
+	MCFG_CPU_PROGRAM_MAP(cntsteer_cpu1_map)
+	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse) /* ? */
 
-	MDRV_CPU_ADD("subcpu", M6809, 2000000)		 /* ? */
-	MDRV_CPU_PROGRAM_MAP(cntsteer_cpu2_map)
-//  MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse) /* ? */
+	MCFG_CPU_ADD("subcpu", M6809, 2000000)		 /* ? */
+	MCFG_CPU_PROGRAM_MAP(cntsteer_cpu2_map)
+//  MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse) /* ? */
 
-	MDRV_CPU_ADD("audiocpu", M6502, 1500000)        /* ? */
-	MDRV_CPU_PROGRAM_MAP(sound_map)
-	MDRV_CPU_PERIODIC_INT(sound_interrupt, 480)
+	MCFG_CPU_ADD("audiocpu", M6502, 1500000)        /* ? */
+	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_CPU_PERIODIC_INT(sound_interrupt, 480)
 
-	MDRV_MACHINE_START(cntsteer)
-	MDRV_MACHINE_RESET(cntsteer)
+	MCFG_MACHINE_START(cntsteer)
+	MCFG_MACHINE_RESET(cntsteer)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 
-	MDRV_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(HZ(6000))
 
-	MDRV_GFXDECODE(cntsteer)
-	MDRV_PALETTE_LENGTH(256)
-//  MDRV_PALETTE_INIT(zerotrgt)
+	MCFG_GFXDECODE(cntsteer)
+	MCFG_PALETTE_LENGTH(256)
+//  MCFG_PALETTE_INIT(zerotrgt)
 
-	MDRV_VIDEO_START(cntsteer)
-	MDRV_VIDEO_UPDATE(cntsteer)
+	MCFG_VIDEO_START(cntsteer)
+	MCFG_VIDEO_UPDATE(cntsteer)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("ay1", AY8910, 1500000)
-	MDRV_SOUND_CONFIG(ay8910_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("ay1", AY8910, 1500000)
+	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD("ay2", AY8910, 1500000)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("ay2", AY8910, 1500000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( zerotrgt, cntsteer_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6809, 2000000)		 /* ? */
-	MDRV_CPU_PROGRAM_MAP(gekitsui_cpu1_map)
-	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse) /* ? */
+	MCFG_CPU_ADD("maincpu", M6809, 2000000)		 /* ? */
+	MCFG_CPU_PROGRAM_MAP(gekitsui_cpu1_map)
+	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse) /* ? */
 
-	MDRV_CPU_ADD("subcpu", M6809, 2000000)		 /* ? */
-	MDRV_CPU_PROGRAM_MAP(gekitsui_cpu2_map)
-//  MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse) /* ? */
+	MCFG_CPU_ADD("subcpu", M6809, 2000000)		 /* ? */
+	MCFG_CPU_PROGRAM_MAP(gekitsui_cpu2_map)
+//  MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse) /* ? */
 
-	MDRV_CPU_ADD("audiocpu", M6502, 1500000)		/* ? */
-	MDRV_CPU_PROGRAM_MAP(sound_map)
-	MDRV_CPU_PERIODIC_INT(sound_interrupt, 480)
+	MCFG_CPU_ADD("audiocpu", M6502, 1500000)		/* ? */
+	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_CPU_PERIODIC_INT(sound_interrupt, 480)
 
-	MDRV_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(HZ(6000))
 
-	MDRV_MACHINE_START(zerotrgt)
-	MDRV_MACHINE_RESET(zerotrgt)
+	MCFG_MACHINE_START(zerotrgt)
+	MCFG_MACHINE_RESET(zerotrgt)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 
-	MDRV_GFXDECODE(zerotrgt)
-	MDRV_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE(zerotrgt)
+	MCFG_PALETTE_LENGTH(256)
 
-	MDRV_PALETTE_INIT(zerotrgt)
-	MDRV_VIDEO_START(zerotrgt)
-	MDRV_VIDEO_UPDATE(zerotrgt)
+	MCFG_PALETTE_INIT(zerotrgt)
+	MCFG_VIDEO_START(zerotrgt)
+	MCFG_VIDEO_UPDATE(zerotrgt)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay1", AY8910, 1500000)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("ay1", AY8910, 1500000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD("ay2", AY8910, 1500000)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("ay2", AY8910, 1500000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 /***************************************************************************/

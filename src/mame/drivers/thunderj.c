@@ -286,35 +286,35 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( thunderj, thunderj_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
-	MDRV_CPU_PROGRAM_MAP(main_map)
+	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
+	MCFG_CPU_PROGRAM_MAP(main_map)
 
-	MDRV_CPU_ADD("extra", M68000, ATARI_CLOCK_14MHz/2)
-	MDRV_CPU_PROGRAM_MAP(extra_map)
+	MCFG_CPU_ADD("extra", M68000, ATARI_CLOCK_14MHz/2)
+	MCFG_CPU_PROGRAM_MAP(extra_map)
 
-	MDRV_MACHINE_START(thunderj)
-	MDRV_MACHINE_RESET(thunderj)
-	MDRV_NVRAM_ADD_1FILL("eeprom")
+	MCFG_MACHINE_START(thunderj)
+	MCFG_MACHINE_RESET(thunderj)
+	MCFG_NVRAM_ADD_1FILL("eeprom")
 
 	/* perfect synchronization due to shared RAM */
-	MDRV_QUANTUM_PERFECT_CPU("maincpu")
+	MCFG_QUANTUM_PERFECT_CPU("maincpu")
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MDRV_GFXDECODE(thunderj)
-	MDRV_PALETTE_LENGTH(2048)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	MCFG_GFXDECODE(thunderj)
+	MCFG_PALETTE_LENGTH(2048)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses a VAD chip to generate video signals */
-	MDRV_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
+	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
 
-	MDRV_VIDEO_START(thunderj)
-	MDRV_VIDEO_UPDATE(thunderj)
+	MCFG_VIDEO_START(thunderj)
+	MCFG_VIDEO_UPDATE(thunderj)
 
 	/* sound hardware */
-	MDRV_FRAGMENT_ADD(jsa_ii_mono)
+	MCFG_FRAGMENT_ADD(jsa_ii_mono)
 MACHINE_CONFIG_END
 
 

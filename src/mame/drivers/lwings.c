@@ -777,88 +777,88 @@ static MACHINE_RESET( lwings )
 static MACHINE_CONFIG_START( lwings, lwings_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)	/* verified on PCB */
-	MDRV_CPU_PROGRAM_MAP(lwings_map)
-	MDRV_CPU_VBLANK_INT("screen", lwings_interrupt)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)	/* verified on PCB */
+	MCFG_CPU_PROGRAM_MAP(lwings_map)
+	MCFG_CPU_VBLANK_INT("screen", lwings_interrupt)
 
-	MDRV_CPU_ADD("soundcpu", Z80, XTAL_12MHz/4)	/* verified on PCB */
-	MDRV_CPU_PROGRAM_MAP(lwings_sound_map)
-	MDRV_CPU_PERIODIC_INT(irq0_line_hold,4*60)	/* ??? */
+	MCFG_CPU_ADD("soundcpu", Z80, XTAL_12MHz/4)	/* verified on PCB */
+	MCFG_CPU_PROGRAM_MAP(lwings_sound_map)
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold,4*60)	/* ??? */
 
-	MDRV_MACHINE_START(lwings)
-	MDRV_MACHINE_RESET(lwings)
+	MCFG_MACHINE_START(lwings)
+	MCFG_MACHINE_RESET(lwings)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 31*8-1)
 
-	MDRV_GFXDECODE(lwings)
-	MDRV_PALETTE_LENGTH(1024)
+	MCFG_GFXDECODE(lwings)
+	MCFG_PALETTE_LENGTH(1024)
 
-	MDRV_VIDEO_START(lwings)
-	MDRV_VIDEO_EOF(lwings)
-	MDRV_VIDEO_UPDATE(lwings)
+	MCFG_VIDEO_START(lwings)
+	MCFG_VIDEO_EOF(lwings)
+	MCFG_VIDEO_UPDATE(lwings)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("2203a", YM2203, XTAL_12MHz/8)	/* verified on PCB */
-	MDRV_SOUND_ROUTE(0, "mono", 0.20)
-	MDRV_SOUND_ROUTE(1, "mono", 0.20)
-	MDRV_SOUND_ROUTE(2, "mono", 0.20)
-	MDRV_SOUND_ROUTE(3, "mono", 0.10)
+	MCFG_SOUND_ADD("2203a", YM2203, XTAL_12MHz/8)	/* verified on PCB */
+	MCFG_SOUND_ROUTE(0, "mono", 0.20)
+	MCFG_SOUND_ROUTE(1, "mono", 0.20)
+	MCFG_SOUND_ROUTE(2, "mono", 0.20)
+	MCFG_SOUND_ROUTE(3, "mono", 0.10)
 
-	MDRV_SOUND_ADD("2203b", YM2203, XTAL_12MHz/8)	/* verified on PCB */
-	MDRV_SOUND_ROUTE(0, "mono", 0.20)
-	MDRV_SOUND_ROUTE(1, "mono", 0.20)
-	MDRV_SOUND_ROUTE(2, "mono", 0.20)
-	MDRV_SOUND_ROUTE(3, "mono", 0.10)
+	MCFG_SOUND_ADD("2203b", YM2203, XTAL_12MHz/8)	/* verified on PCB */
+	MCFG_SOUND_ROUTE(0, "mono", 0.20)
+	MCFG_SOUND_ROUTE(1, "mono", 0.20)
+	MCFG_SOUND_ROUTE(2, "mono", 0.20)
+	MCFG_SOUND_ROUTE(3, "mono", 0.10)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( trojan, lwings )
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_CLOCK(XTAL_12MHz/4)			/* verified on PCB */
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_CLOCK(XTAL_12MHz/4)			/* verified on PCB */
 
-	MDRV_CPU_PROGRAM_MAP(trojan_map)
+	MCFG_CPU_PROGRAM_MAP(trojan_map)
 
-	MDRV_CPU_MODIFY("soundcpu")
-	MDRV_CPU_CLOCK(XTAL_12MHz/4)			/* verified on PCB */
+	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_CPU_CLOCK(XTAL_12MHz/4)			/* verified on PCB */
 
-	MDRV_CPU_ADD("adpcm", Z80, XTAL_12MHz/4)	/* verified on PCB */
-	MDRV_CPU_PROGRAM_MAP(trojan_adpcm_map)
-	MDRV_CPU_IO_MAP(trojan_adpcm_io_map)
-	MDRV_CPU_PERIODIC_INT(irq0_line_hold, 4000)
+	MCFG_CPU_ADD("adpcm", Z80, XTAL_12MHz/4)	/* verified on PCB */
+	MCFG_CPU_PROGRAM_MAP(trojan_adpcm_map)
+	MCFG_CPU_IO_MAP(trojan_adpcm_io_map)
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 4000)
 
 	/* video hardware */
-	MDRV_GFXDECODE(trojan)
+	MCFG_GFXDECODE(trojan)
 
-	MDRV_VIDEO_START(trojan)
-	MDRV_VIDEO_UPDATE(trojan)
+	MCFG_VIDEO_START(trojan)
+	MCFG_VIDEO_UPDATE(trojan)
 
 	/* sound hardware */
-	MDRV_SOUND_ADD("5205", MSM5205, XTAL_455kHz)	/* verified on PCB */
-	MDRV_SOUND_CONFIG(msm5205_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("5205", MSM5205, XTAL_455kHz)	/* verified on PCB */
+	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( avengers, trojan )
 
-	MDRV_CPU_MODIFY("maincpu") //AT: (avengers37b16gre)
-	MDRV_CPU_PROGRAM_MAP(avengers_map)
-	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse) // RST 38h triggered by software
+	MCFG_CPU_MODIFY("maincpu") //AT: (avengers37b16gre)
+	MCFG_CPU_PROGRAM_MAP(avengers_map)
+	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse) // RST 38h triggered by software
 
-	MDRV_CPU_MODIFY("adpcm")
-	MDRV_CPU_IO_MAP(avengers_adpcm_io_map)
+	MCFG_CPU_MODIFY("adpcm")
+	MCFG_CPU_IO_MAP(avengers_adpcm_io_map)
 
 	/* video hardware */
-	MDRV_VIDEO_START(avengers)
+	MCFG_VIDEO_START(avengers)
 MACHINE_CONFIG_END
 
 /*************************************

@@ -193,40 +193,40 @@ static MACHINE_RESET( mouser )
 static MACHINE_CONFIG_START( mouser, mouser_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz ? */
-	MDRV_CPU_PROGRAM_MAP(mouser_map)
-	MDRV_CPU_VBLANK_INT("screen", mouser_nmi_interrupt) /* NMI is masked externally */
+	MCFG_CPU_ADD("maincpu", Z80, 4000000)	/* 4 MHz ? */
+	MCFG_CPU_PROGRAM_MAP(mouser_map)
+	MCFG_CPU_VBLANK_INT("screen", mouser_nmi_interrupt) /* NMI is masked externally */
 
-	MDRV_CPU_ADD("audiocpu", Z80, 4000000)	/* ??? */
-	MDRV_CPU_PROGRAM_MAP(mouser_sound_map)
-	MDRV_CPU_IO_MAP(mouser_sound_io_map)
-	MDRV_CPU_VBLANK_INT_HACK(nmi_line_pulse,4) /* ??? This controls the sound tempo */
+	MCFG_CPU_ADD("audiocpu", Z80, 4000000)	/* ??? */
+	MCFG_CPU_PROGRAM_MAP(mouser_sound_map)
+	MCFG_CPU_IO_MAP(mouser_sound_io_map)
+	MCFG_CPU_VBLANK_INT_HACK(nmi_line_pulse,4) /* ??? This controls the sound tempo */
 
-	MDRV_MACHINE_START(mouser)
-	MDRV_MACHINE_RESET(mouser)
+	MCFG_MACHINE_START(mouser)
+	MCFG_MACHINE_RESET(mouser)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(mouser)
-	MDRV_PALETTE_LENGTH(64)
+	MCFG_GFXDECODE(mouser)
+	MCFG_PALETTE_LENGTH(64)
 
-	MDRV_PALETTE_INIT(mouser)
-	MDRV_VIDEO_UPDATE(mouser)
+	MCFG_PALETTE_INIT(mouser)
+	MCFG_VIDEO_UPDATE(mouser)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay1", AY8910, 4000000/2)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("ay1", AY8910, 4000000/2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD("ay2", AY8910, 4000000/2)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("ay2", AY8910, 4000000/2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 

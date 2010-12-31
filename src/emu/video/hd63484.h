@@ -28,9 +28,9 @@ struct _hd63484_interface
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_HD63484_ADD(_tag, _interface) \
-	MDRV_DEVICE_ADD(_tag, HD63484, 0) \
-	MDRV_DEVICE_CONFIG(_interface)
+#define MCFG_HD63484_ADD(_tag, _interface) \
+	MCFG_DEVICE_ADD(_tag, HD63484, 0) \
+	MCFG_DEVICE_CONFIG(_interface)
 
 
 /***************************************************************************

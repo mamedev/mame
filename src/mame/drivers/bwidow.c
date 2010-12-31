@@ -712,31 +712,31 @@ static const pokey_interface pokey_interface_2 =
 static MACHINE_CONFIG_START( bwidow, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 8)
-	MDRV_CPU_PROGRAM_MAP(bwidow_map)
-	MDRV_CPU_PERIODIC_INT(irq0_line_assert, (double)MASTER_CLOCK / 4096 / 12)
+	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK / 8)
+	MCFG_CPU_PROGRAM_MAP(bwidow_map)
+	MCFG_CPU_PERIODIC_INT(irq0_line_assert, (double)MASTER_CLOCK / 4096 / 12)
 
-	MDRV_ATARIVGEAROM_ADD("earom")
+	MCFG_ATARIVGEAROM_ADD("earom")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", VECTOR)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_SIZE(400, 300)
-	MDRV_SCREEN_VISIBLE_AREA(0, 480, 0, 440)
+	MCFG_SCREEN_ADD("screen", VECTOR)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_SIZE(400, 300)
+	MCFG_SCREEN_VISIBLE_AREA(0, 480, 0, 440)
 
-	MDRV_VIDEO_START(avg)
-	MDRV_VIDEO_UPDATE(vector)
+	MCFG_VIDEO_START(avg)
+	MCFG_VIDEO_UPDATE(vector)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("pokey1", POKEY, MASTER_CLOCK / 8)
-	MDRV_SOUND_CONFIG(pokey_interface_1)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("pokey1", POKEY, MASTER_CLOCK / 8)
+	MCFG_SOUND_CONFIG(pokey_interface_1)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD("pokey2", POKEY, MASTER_CLOCK / 8)
-	MDRV_SOUND_CONFIG(pokey_interface_2)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("pokey2", POKEY, MASTER_CLOCK / 8)
+	MCFG_SOUND_CONFIG(pokey_interface_2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 
@@ -745,34 +745,34 @@ static MACHINE_CONFIG_DERIVED( gravitar, bwidow )
 	/* basic machine hardware */
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0, 420, 0, 400)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(0, 420, 0, 400)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( lunarbat, gravitar )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(spacduel_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(spacduel_map)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_REFRESH_RATE(45)
-	MDRV_SCREEN_VISIBLE_AREA(0, 500, 0, 440)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_REFRESH_RATE(45)
+	MCFG_SCREEN_VISIBLE_AREA(0, 500, 0, 440)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( spacduel, gravitar )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(spacduel_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(spacduel_map)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_REFRESH_RATE(45)
-	MDRV_SCREEN_VISIBLE_AREA(0, 540, 0, 400)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_REFRESH_RATE(45)
+	MCFG_SCREEN_VISIBLE_AREA(0, 540, 0, 400)
 MACHINE_CONFIG_END
 
 

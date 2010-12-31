@@ -14,9 +14,9 @@ struct _rtc65271_config
 };
 
 
-#define MDRV_RTC65271_ADD(_tag, _callback) \
-	MDRV_DEVICE_ADD(_tag, RTC65271, 0) \
-	MDRV_DEVICE_CONFIG_DATAPTR(rtc65271_config, interrupt_callback, _callback)
+#define MCFG_RTC65271_ADD(_tag, _callback) \
+	MCFG_DEVICE_ADD(_tag, RTC65271, 0) \
+	MCFG_DEVICE_CONFIG_DATAPTR(rtc65271_config, interrupt_callback, _callback)
 
 
 UINT8 rtc65271_r(running_device *device, int xramsel, offs_t offset);

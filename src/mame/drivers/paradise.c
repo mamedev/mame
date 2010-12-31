@@ -565,71 +565,71 @@ static MACHINE_RESET( paradise )
 static MACHINE_CONFIG_START( paradise, paradise_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)			/* Z8400B - 6mhz Verified */
-	MDRV_CPU_PROGRAM_MAP(paradise_map)
-	MDRV_CPU_IO_MAP(paradise_io_map)
-	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)	/* No nmi routine */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_12MHz/2)			/* Z8400B - 6mhz Verified */
+	MCFG_CPU_PROGRAM_MAP(paradise_map)
+	MCFG_CPU_IO_MAP(paradise_io_map)
+	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,4)	/* No nmi routine */
 
-	MDRV_MACHINE_START(paradise)
-	MDRV_MACHINE_RESET(paradise)
+	MCFG_MACHINE_START(paradise)
+	MCFG_MACHINE_RESET(paradise)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(54) /* 54 verified */
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */	/* we're using IPT_VBLANK */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-1-16)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(54) /* 54 verified */
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */	/* we're using IPT_VBLANK */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 0+16, 256-1-16)
 
-	MDRV_GFXDECODE(paradise)
-	MDRV_PALETTE_LENGTH(0x800 + 16)
+	MCFG_GFXDECODE(paradise)
+	MCFG_PALETTE_LENGTH(0x800 + 16)
 
-	MDRV_VIDEO_START(paradise)
-	MDRV_VIDEO_UPDATE(paradise)
+	MCFG_VIDEO_START(paradise)
+	MCFG_VIDEO_UPDATE(paradise)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_OKIM6295_ADD("oki1", XTAL_12MHz/12, OKIM6295_PIN7_HIGH)	/* verified on pcb */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_OKIM6295_ADD("oki1", XTAL_12MHz/12, OKIM6295_PIN7_HIGH)	/* verified on pcb */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_OKIM6295_ADD("oki2", XTAL_12MHz/12, OKIM6295_PIN7_HIGH) /* verified on pcb */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_OKIM6295_ADD("oki2", XTAL_12MHz/12, OKIM6295_PIN7_HIGH) /* verified on pcb */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( tgtball, paradise )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(tgtball_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(tgtball_map)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( torus, paradise )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(torus_map)
-	MDRV_CPU_IO_MAP(torus_io_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(torus_map)
+	MCFG_CPU_IO_MAP(torus_io_map)
 
-	MDRV_GFXDECODE(torus)
+	MCFG_GFXDECODE(torus)
 
-	MDRV_VIDEO_UPDATE(torus)
+	MCFG_VIDEO_UPDATE(torus)
 
-	MDRV_DEVICE_REMOVE("oki2")
+	MCFG_DEVICE_REMOVE("oki2")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( madball, paradise )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(torus_map)
-	MDRV_CPU_IO_MAP(torus_io_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(torus_map)
+	MCFG_CPU_IO_MAP(torus_io_map)
 
-	MDRV_GFXDECODE(madball)
+	MCFG_GFXDECODE(madball)
 
-	MDRV_VIDEO_UPDATE(madball)
+	MCFG_VIDEO_UPDATE(madball)
 
-	MDRV_DEVICE_REMOVE("oki2")
+	MCFG_DEVICE_REMOVE("oki2")
 MACHINE_CONFIG_END
 
 

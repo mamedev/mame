@@ -60,28 +60,28 @@ const int ALL_OUTPUTS		= MAX_OUTPUTS;	// special value indicating all outputs fo
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MDRV_SOUND_ADD(_tag, _type, _clock) \
-	MDRV_DEVICE_ADD(_tag, _type, _clock) \
+#define MCFG_SOUND_ADD(_tag, _type, _clock) \
+	MCFG_DEVICE_ADD(_tag, _type, _clock) \
 
-#define MDRV_SOUND_MODIFY(_tag) \
-	MDRV_DEVICE_MODIFY(_tag)
+#define MCFG_SOUND_MODIFY(_tag) \
+	MCFG_DEVICE_MODIFY(_tag)
 
-#define MDRV_SOUND_CLOCK(_clock) \
-	MDRV_DEVICE_CLOCK(_clock)
+#define MCFG_SOUND_CLOCK(_clock) \
+	MCFG_DEVICE_CLOCK(_clock)
 
-#define MDRV_SOUND_REPLACE(_tag, _type, _clock) \
-	MDRV_DEVICE_REPLACE(_tag, _type, _clock)
+#define MCFG_SOUND_REPLACE(_tag, _type, _clock) \
+	MCFG_DEVICE_REPLACE(_tag, _type, _clock)
 
-#define MDRV_SOUND_CONFIG(_config) \
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_SOUND_CONFIG(_config) \
+	MCFG_DEVICE_CONFIG(_config)
 
-#define MDRV_SOUND_ROUTE_EX(_output, _target, _gain, _input) \
+#define MCFG_SOUND_ROUTE_EX(_output, _target, _gain, _input) \
 	device_config_sound_interface::static_add_route(device, _output, _target, _gain, _input); \
 
-#define MDRV_SOUND_ROUTE(_output, _target, _gain) \
-	MDRV_SOUND_ROUTE_EX(_output, _target, _gain, 0)
+#define MCFG_SOUND_ROUTE(_output, _target, _gain) \
+	MCFG_SOUND_ROUTE_EX(_output, _target, _gain, 0)
 
-#define MDRV_SOUND_ROUTES_RESET() \
+#define MCFG_SOUND_ROUTES_RESET() \
 	device_config_sound_interface::static_reset_routes(device); \
 
 

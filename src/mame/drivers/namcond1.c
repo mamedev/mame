@@ -284,51 +284,51 @@ static INTERRUPT_GEN( mcu_interrupt )
 static MACHINE_CONFIG_START( namcond1, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 12288000)
-	MDRV_CPU_PROGRAM_MAP(namcond1_map)
-	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
+	MCFG_CPU_ADD("maincpu", M68000, 12288000)
+	MCFG_CPU_PROGRAM_MAP(namcond1_map)
+	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
 
 	// I've disabled this for now, I don't think it's correct, it breaks ncv2 'game options' in test
 	// mode (and could also be responsible for the random resets?)
 	// also, if you log the timing of it and the scanlines on which the interrupt fires, it doesn't
 	// seem correct for the intended purpose?
-	//MDRV_CPU_PERIODIC_INT(ygv608_timed_interrupt, 1000)
+	//MCFG_CPU_PERIODIC_INT(ygv608_timed_interrupt, 1000)
 
 
-	MDRV_CPU_ADD("mcu", H83002, 16384000 )
-	MDRV_CPU_PROGRAM_MAP( nd1h8rwmap)
-	MDRV_CPU_IO_MAP( nd1h8iomap)
-	MDRV_CPU_VBLANK_INT("screen", mcu_interrupt)
+	MCFG_CPU_ADD("mcu", H83002, 16384000 )
+	MCFG_CPU_PROGRAM_MAP( nd1h8rwmap)
+	MCFG_CPU_IO_MAP( nd1h8iomap)
+	MCFG_CPU_VBLANK_INT("screen", mcu_interrupt)
 
-	MDRV_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(HZ(6000))
 
-	MDRV_MACHINE_START(namcond1)
-	MDRV_MACHINE_RESET(namcond1)
+	MCFG_MACHINE_START(namcond1)
+	MCFG_MACHINE_RESET(namcond1)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60.0)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(288, 224)   // maximum display resolution (512x512 in theory)
-	MDRV_SCREEN_VISIBLE_AREA(0, 287, 0, 223)   // default visible area
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60.0)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(288, 224)   // maximum display resolution (512x512 in theory)
+	MCFG_SCREEN_VISIBLE_AREA(0, 287, 0, 223)   // default visible area
 
-	MDRV_GFXDECODE(namcond1)
-	MDRV_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE(namcond1)
+	MCFG_PALETTE_LENGTH(256)
 
-	MDRV_VIDEO_START(ygv608)
-	MDRV_VIDEO_UPDATE(ygv608)
+	MCFG_VIDEO_START(ygv608)
+	MCFG_VIDEO_UPDATE(ygv608)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("c352", C352, 16384000)
-	MDRV_SOUND_ROUTE(0, "rspeaker", 1.00)
-	MDRV_SOUND_ROUTE(1, "lspeaker", 1.00)
-	MDRV_SOUND_ROUTE(2, "rspeaker", 1.00)
-	MDRV_SOUND_ROUTE(3, "lspeaker", 1.00)
+	MCFG_SOUND_ADD("c352", C352, 16384000)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
+	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
+	MCFG_SOUND_ROUTE(2, "rspeaker", 1.00)
+	MCFG_SOUND_ROUTE(3, "lspeaker", 1.00)
 
-	MDRV_AT28C16_ADD( "at28c16", NULL )
+	MCFG_AT28C16_ADD( "at28c16", NULL )
 MACHINE_CONFIG_END
 
 ROM_START( ncv1 )

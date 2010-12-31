@@ -958,202 +958,202 @@ static MACHINE_RESET( m62 )
 static MACHINE_CONFIG_START( ldrun, m62_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 24000000/6)
-	MDRV_CPU_PROGRAM_MAP(ldrun_map)
-	MDRV_CPU_IO_MAP(kungfum_io_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("maincpu", Z80, 24000000/6)
+	MCFG_CPU_PROGRAM_MAP(ldrun_map)
+	MCFG_CPU_IO_MAP(kungfum_io_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_MACHINE_START(m62)
-	MDRV_MACHINE_RESET(m62)
+	MCFG_MACHINE_START(m62)
+	MCFG_MACHINE_RESET(m62)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(55)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1790) /* frames per second and vblank duration from the Lode Runner manual */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA((64*8-384)/2, 64*8-(64*8-384)/2-1, 0*8, 32*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(55)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(1790) /* frames per second and vblank duration from the Lode Runner manual */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA((64*8-384)/2, 64*8-(64*8-384)/2-1, 0*8, 32*8-1)
 
-	MDRV_GFXDECODE(ldrun)
-	MDRV_PALETTE_LENGTH(512)
+	MCFG_GFXDECODE(ldrun)
+	MCFG_PALETTE_LENGTH(512)
 
-	MDRV_PALETTE_INIT(m62)
-	MDRV_VIDEO_START(ldrun)
-	MDRV_VIDEO_UPDATE(ldrun)
+	MCFG_PALETTE_INIT(m62)
+	MCFG_VIDEO_START(ldrun)
+	MCFG_VIDEO_UPDATE(ldrun)
 
 	/* sound hardware */
-	MDRV_FRAGMENT_ADD(m62_audio)
+	MCFG_FRAGMENT_ADD(m62_audio)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( kungfum, ldrun )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_CLOCK(18432000/6)
-	MDRV_CPU_PROGRAM_MAP(kungfum_map)
-	MDRV_CPU_IO_MAP(kungfum_io_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_CLOCK(18432000/6)
+	MCFG_CPU_PROGRAM_MAP(kungfum_map)
+	MCFG_CPU_IO_MAP(kungfum_io_map)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA((64*8-256)/2, 64*8-(64*8-256)/2-1, 0*8, 32*8-1)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA((64*8-256)/2, 64*8-(64*8-256)/2-1, 0*8, 32*8-1)
 
-	MDRV_VIDEO_START(kungfum)
-	MDRV_VIDEO_UPDATE(kungfum)
+	MCFG_VIDEO_START(kungfum)
+	MCFG_VIDEO_UPDATE(kungfum)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( battroad, ldrun )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_CLOCK(18432000/6)
-	MDRV_CPU_PROGRAM_MAP(battroad_map)
-	MDRV_CPU_IO_MAP(battroad_io_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_CLOCK(18432000/6)
+	MCFG_CPU_PROGRAM_MAP(battroad_map)
+	MCFG_CPU_IO_MAP(battroad_io_map)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA((64*8-256)/2, 64*8-(64*8-256)/2-1, 0*8, 32*8-1)
-	MDRV_GFXDECODE(battroad)
-	MDRV_PALETTE_LENGTH(544)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA((64*8-256)/2, 64*8-(64*8-256)/2-1, 0*8, 32*8-1)
+	MCFG_GFXDECODE(battroad)
+	MCFG_PALETTE_LENGTH(544)
 
-	MDRV_PALETTE_INIT(battroad)
-	MDRV_VIDEO_START(battroad)
-	MDRV_VIDEO_UPDATE(battroad)
+	MCFG_PALETTE_INIT(battroad)
+	MCFG_VIDEO_START(battroad)
+	MCFG_VIDEO_UPDATE(battroad)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( ldrun2, ldrun )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(ldrun2_map)
-	MDRV_CPU_IO_MAP(ldrun2_io_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(ldrun2_map)
+	MCFG_CPU_IO_MAP(ldrun2_io_map)
 
-	MDRV_VIDEO_START(ldrun2)
-	MDRV_VIDEO_UPDATE(ldrun)
+	MCFG_VIDEO_START(ldrun2)
+	MCFG_VIDEO_UPDATE(ldrun)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( ldrun3, ldrun )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(ldrun3_map)
-	MDRV_CPU_IO_MAP(ldrun3_io_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(ldrun3_map)
+	MCFG_CPU_IO_MAP(ldrun3_io_map)
 
 	/* video hardware */
-	MDRV_GFXDECODE(ldrun3)
-	MDRV_VIDEO_START(ldrun2)
-	MDRV_VIDEO_UPDATE(ldrun3)
+	MCFG_GFXDECODE(ldrun3)
+	MCFG_VIDEO_START(ldrun2)
+	MCFG_VIDEO_UPDATE(ldrun3)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( ldrun4, ldrun )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(ldrun4_map)
-	MDRV_CPU_IO_MAP(ldrun4_io_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(ldrun4_map)
+	MCFG_CPU_IO_MAP(ldrun4_io_map)
 
 	/* video hardware */
-	MDRV_GFXDECODE(ldrun3)
-	MDRV_VIDEO_START(ldrun4)
-	MDRV_VIDEO_UPDATE(ldrun4)
+	MCFG_GFXDECODE(ldrun3)
+	MCFG_VIDEO_START(ldrun4)
+	MCFG_VIDEO_UPDATE(ldrun4)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( lotlot, ldrun )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(lotlot_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(lotlot_map)
 
 	/* video hardware */
-	MDRV_GFXDECODE(lotlot)
-	MDRV_PALETTE_LENGTH(768)
+	MCFG_GFXDECODE(lotlot)
+	MCFG_PALETTE_LENGTH(768)
 
-	MDRV_PALETTE_INIT(lotlot)
-	MDRV_VIDEO_START(lotlot)
-	MDRV_VIDEO_UPDATE(lotlot)
+	MCFG_PALETTE_INIT(lotlot)
+	MCFG_VIDEO_START(lotlot)
+	MCFG_VIDEO_UPDATE(lotlot)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( kidniki, ldrun )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(kidniki_map)
-	MDRV_CPU_IO_MAP(kidniki_io_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(kidniki_map)
+	MCFG_CPU_IO_MAP(kidniki_io_map)
 
 	/* video hardware */
-	MDRV_GFXDECODE(kidniki)
+	MCFG_GFXDECODE(kidniki)
 
-	MDRV_VIDEO_START(kidniki)
-	MDRV_VIDEO_UPDATE(kidniki)
+	MCFG_VIDEO_START(kidniki)
+	MCFG_VIDEO_UPDATE(kidniki)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( spelunkr, ldrun )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(spelunkr_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(spelunkr_map)
 
 	/* video hardware */
-	MDRV_GFXDECODE(spelunkr)
+	MCFG_GFXDECODE(spelunkr)
 
-	MDRV_VIDEO_START(spelunkr)
-	MDRV_VIDEO_UPDATE(spelunkr)
+	MCFG_VIDEO_START(spelunkr)
+	MCFG_VIDEO_UPDATE(spelunkr)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( spelunk2, ldrun )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(spelunk2_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(spelunk2_map)
 
 	/* video hardware */
-	MDRV_GFXDECODE(spelunk2)
-	MDRV_PALETTE_LENGTH(768)
+	MCFG_GFXDECODE(spelunk2)
+	MCFG_PALETTE_LENGTH(768)
 
-	MDRV_PALETTE_INIT(spelunk2)
-	MDRV_VIDEO_START(spelunk2)
-	MDRV_VIDEO_UPDATE(spelunk2)
+	MCFG_PALETTE_INIT(spelunk2)
+	MCFG_VIDEO_START(spelunk2)
+	MCFG_VIDEO_UPDATE(spelunk2)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( youjyudn, ldrun )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_CLOCK(18432000/6)
-	MDRV_CPU_PROGRAM_MAP(youjyudn_map)
-	MDRV_CPU_IO_MAP(youjyudn_io_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_CLOCK(18432000/6)
+	MCFG_CPU_PROGRAM_MAP(youjyudn_map)
+	MCFG_CPU_IO_MAP(youjyudn_io_map)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA((64*8-256)/2, 64*8-(64*8-256)/2-1, 0*8, 32*8-1)
-	MDRV_GFXDECODE(youjyudn)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA((64*8-256)/2, 64*8-(64*8-256)/2-1, 0*8, 32*8-1)
+	MCFG_GFXDECODE(youjyudn)
 
-	MDRV_VIDEO_START(youjyudn)
-	MDRV_VIDEO_UPDATE(youjyudn)
+	MCFG_VIDEO_START(youjyudn)
+	MCFG_VIDEO_UPDATE(youjyudn)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( horizon, ldrun )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(horizon_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(horizon_map)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA((64*8-256)/2, 64*8-(64*8-256)/2-1, 0*8, 32*8-1)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA((64*8-256)/2, 64*8-(64*8-256)/2-1, 0*8, 32*8-1)
 
-	MDRV_VIDEO_START(horizon)
-	MDRV_VIDEO_UPDATE(horizon)
+	MCFG_VIDEO_START(horizon)
+	MCFG_VIDEO_UPDATE(horizon)
 MACHINE_CONFIG_END
 
 

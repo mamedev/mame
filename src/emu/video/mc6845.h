@@ -22,9 +22,9 @@ DECLARE_LEGACY_DEVICE(SY6545_1, sy6545_1);
 DECLARE_LEGACY_DEVICE(SY6845E, sy6845e);
 
 
-#define MDRV_MC6845_ADD(_tag, _variant, _clock, _config) \
-	MDRV_DEVICE_ADD(_tag, _variant, _clock) \
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_MC6845_ADD(_tag, _variant, _clock, _config) \
+	MCFG_DEVICE_ADD(_tag, _variant, _clock) \
+	MCFG_DEVICE_CONFIG(_config)
 
 
 /* callback definitions */

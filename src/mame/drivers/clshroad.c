@@ -229,71 +229,71 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( firebatl, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 3000000)	/* ? */
-	MDRV_CPU_PROGRAM_MAP(clshroad_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)	/* IRQ, no NMI */
+	MCFG_CPU_ADD("maincpu", Z80, 3000000)	/* ? */
+	MCFG_CPU_PROGRAM_MAP(clshroad_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)	/* IRQ, no NMI */
 
-	MDRV_CPU_ADD("audiocpu", Z80, 3000000)	/* ? */
-	MDRV_CPU_PROGRAM_MAP(clshroad_sound_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)	/* IRQ, no NMI */
+	MCFG_CPU_ADD("audiocpu", Z80, 3000000)	/* ? */
+	MCFG_CPU_PROGRAM_MAP(clshroad_sound_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)	/* IRQ, no NMI */
 
-	MDRV_MACHINE_RESET(clshroad)
+	MCFG_MACHINE_RESET(clshroad)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(0x120, 0x100)
-	MDRV_SCREEN_VISIBLE_AREA(0, 0x120-1, 0x0+16, 0x100-16-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(0x120, 0x100)
+	MCFG_SCREEN_VISIBLE_AREA(0, 0x120-1, 0x0+16, 0x100-16-1)
 
-	MDRV_GFXDECODE(firebatl)
-	MDRV_PALETTE_LENGTH(512+64*4)
+	MCFG_GFXDECODE(firebatl)
+	MCFG_PALETTE_LENGTH(512+64*4)
 
-	MDRV_PALETTE_INIT(firebatl)
-	MDRV_VIDEO_START(firebatl)
-	MDRV_VIDEO_UPDATE(clshroad)
+	MCFG_PALETTE_INIT(firebatl)
+	MCFG_VIDEO_START(firebatl)
+	MCFG_VIDEO_UPDATE(clshroad)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("custom", WIPING, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("custom", WIPING, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( clshroad, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/4)	/* ? real speed unknown. 3MHz is too low and causes problems */
-	MDRV_CPU_PROGRAM_MAP(clshroad_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)	/* IRQ, no NMI */
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_18_432MHz/4)	/* ? real speed unknown. 3MHz is too low and causes problems */
+	MCFG_CPU_PROGRAM_MAP(clshroad_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)	/* IRQ, no NMI */
 
-	MDRV_CPU_ADD("audiocpu", Z80, XTAL_18_432MHz/6)	/* ? */
-	MDRV_CPU_PROGRAM_MAP(clshroad_sound_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)	/* IRQ, no NMI */
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_18_432MHz/6)	/* ? */
+	MCFG_CPU_PROGRAM_MAP(clshroad_sound_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)	/* IRQ, no NMI */
 
-	MDRV_MACHINE_RESET(clshroad)
+	MCFG_MACHINE_RESET(clshroad)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(0x120, 0x100)
-	MDRV_SCREEN_VISIBLE_AREA(0, 0x120-1, 0x0+16, 0x100-16-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(0x120, 0x100)
+	MCFG_SCREEN_VISIBLE_AREA(0, 0x120-1, 0x0+16, 0x100-16-1)
 
-	MDRV_GFXDECODE(clshroad)
-	MDRV_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE(clshroad)
+	MCFG_PALETTE_LENGTH(256)
 
-	MDRV_PALETTE_INIT(clshroad)
-	MDRV_VIDEO_START(clshroad)
-	MDRV_VIDEO_UPDATE(clshroad)
+	MCFG_PALETTE_INIT(clshroad)
+	MCFG_VIDEO_START(clshroad)
+	MCFG_VIDEO_UPDATE(clshroad)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("custom", WIPING, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("custom", WIPING, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 

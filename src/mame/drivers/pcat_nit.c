@@ -225,23 +225,23 @@ static MACHINE_START( streetg2 )
 
 static MACHINE_CONFIG_START( pcat_nit, driver_device )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", I386, 14318180*2)	/* I386 ?? Mhz */
-	MDRV_CPU_PROGRAM_MAP(pcat_map)
-	MDRV_CPU_IO_MAP(pcat_nit_io)
+	MCFG_CPU_ADD("maincpu", I386, 14318180*2)	/* I386 ?? Mhz */
+	MCFG_CPU_PROGRAM_MAP(pcat_map)
+	MCFG_CPU_IO_MAP(pcat_nit_io)
 
 	/* video hardware */
-	MDRV_FRAGMENT_ADD( pcvideo_vga )
+	MCFG_FRAGMENT_ADD( pcvideo_vga )
 
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500)) /* not accurate */
 
-	MDRV_MACHINE_START(streetg2)
-	MDRV_MC146818_ADD( "rtc", MC146818_STANDARD )
+	MCFG_MACHINE_START(streetg2)
+	MCFG_MC146818_ADD( "rtc", MC146818_STANDARD )
 
-//  MDRV_FRAGMENT_ADD( at_kbdc8042 )
-	MDRV_FRAGMENT_ADD( pcat_common )
-	MDRV_NS16450_ADD( "ns16450_0", pcat_nit_com0_interface )
+//  MCFG_FRAGMENT_ADD( at_kbdc8042 )
+	MCFG_FRAGMENT_ADD( pcat_common )
+	MCFG_NS16450_ADD( "ns16450_0", pcat_nit_com0_interface )
 
 MACHINE_CONFIG_END
 

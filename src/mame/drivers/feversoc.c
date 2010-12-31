@@ -237,27 +237,27 @@ static INTERRUPT_GEN( feversoc_irq )
 static MACHINE_CONFIG_START( feversoc, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",SH2,MASTER_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(feversoc_map)
-	MDRV_CPU_VBLANK_INT("screen",feversoc_irq)
+	MCFG_CPU_ADD("maincpu",SH2,MASTER_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(feversoc_map)
+	MCFG_CPU_VBLANK_INT("screen",feversoc_irq)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(40*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1) //dynamic resolution?
-	MDRV_GFXDECODE(feversoc)
-	MDRV_PALETTE_LENGTH(0x1000)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(40*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 0*8, 30*8-1) //dynamic resolution?
+	MCFG_GFXDECODE(feversoc)
+	MCFG_PALETTE_LENGTH(0x1000)
 
-	MDRV_VIDEO_START(feversoc)
-	MDRV_VIDEO_UPDATE(feversoc)
+	MCFG_VIDEO_START(feversoc)
+	MCFG_VIDEO_UPDATE(feversoc)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_OKIM6295_ADD("oki", MASTER_CLOCK/16, OKIM6295_PIN7_LOW) //pin 7 & frequency not verified (clock should be 28,6363 / n)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.6)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_OKIM6295_ADD("oki", MASTER_CLOCK/16, OKIM6295_PIN7_LOW) //pin 7 & frequency not verified (clock should be 28,6363 / n)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.6)
 MACHINE_CONFIG_END
 
 /***************************************************************************

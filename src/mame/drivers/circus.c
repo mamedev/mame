@@ -290,152 +290,152 @@ static MACHINE_RESET( circus )
 static MACHINE_CONFIG_START( circus, circus_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6502, XTAL_11_289MHz / 16) /* 705.562kHz */
-	MDRV_CPU_PROGRAM_MAP(circus_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("maincpu", M6502, XTAL_11_289MHz / 16) /* 705.562kHz */
+	MCFG_CPU_PROGRAM_MAP(circus_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_MACHINE_START(circus)
-	MDRV_MACHINE_RESET(circus)
+	MCFG_MACHINE_START(circus)
+	MCFG_MACHINE_RESET(circus)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(57)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(3500)  /* frames per second, vblank duration (complete guess) */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 31*8-1, 0*8, 32*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(57)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(3500)  /* frames per second, vblank duration (complete guess) */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 31*8-1, 0*8, 32*8-1)
 
-	MDRV_GFXDECODE(circus)
-	MDRV_PALETTE_LENGTH(2)
+	MCFG_GFXDECODE(circus)
+	MCFG_PALETTE_LENGTH(2)
 
-	MDRV_PALETTE_INIT(black_and_white)
-	MDRV_VIDEO_START(circus)
-	MDRV_VIDEO_UPDATE(circus)
+	MCFG_PALETTE_INIT(black_and_white)
+	MCFG_VIDEO_START(circus)
+	MCFG_VIDEO_UPDATE(circus)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("samples", SAMPLES, 0)
-	MDRV_SOUND_CONFIG(circus_samples_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SOUND_CONFIG(circus_samples_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG_DISCRETE(circus)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_SOUND_CONFIG_DISCRETE(circus)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( robotbwl, circus_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6502, XTAL_11_289MHz / 16) /* 705.562kHz */
+	MCFG_CPU_ADD("maincpu", M6502, XTAL_11_289MHz / 16) /* 705.562kHz */
 
 	/* driver data */
-	MDRV_CPU_PROGRAM_MAP(circus_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_PROGRAM_MAP(circus_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_MACHINE_START(circus)
-	MDRV_MACHINE_RESET(circus)
+	MCFG_MACHINE_START(circus)
+	MCFG_MACHINE_RESET(circus)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(57)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(3500)  /* frames per second, vblank duration (complete guess) */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 31*8-1, 0*8, 32*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(57)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(3500)  /* frames per second, vblank duration (complete guess) */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 31*8-1, 0*8, 32*8-1)
 
-	MDRV_GFXDECODE(robotbwl)
-	MDRV_PALETTE_LENGTH(2)
+	MCFG_GFXDECODE(robotbwl)
+	MCFG_PALETTE_LENGTH(2)
 
-	MDRV_PALETTE_INIT(black_and_white)
-	MDRV_VIDEO_START(circus)
-	MDRV_VIDEO_UPDATE(robotbwl)
+	MCFG_PALETTE_INIT(black_and_white)
+	MCFG_VIDEO_START(circus)
+	MCFG_VIDEO_UPDATE(robotbwl)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("samples", SAMPLES, 0)
-	MDRV_SOUND_CONFIG(robotbwl_samples_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SOUND_CONFIG(robotbwl_samples_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG_DISCRETE(robotbwl)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_SOUND_CONFIG_DISCRETE(robotbwl)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( crash, circus_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6502, XTAL_11_289MHz / 16) /* 705.562kHz */
-	MDRV_CPU_PROGRAM_MAP(circus_map)
-	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
+	MCFG_CPU_ADD("maincpu", M6502, XTAL_11_289MHz / 16) /* 705.562kHz */
+	MCFG_CPU_PROGRAM_MAP(circus_map)
+	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 
-	MDRV_MACHINE_START(circus)
-	MDRV_MACHINE_RESET(circus)
+	MCFG_MACHINE_START(circus)
+	MCFG_MACHINE_RESET(circus)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(57)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(3500)  /* frames per second, vblank duration (complete guess) */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 31*8-1, 0*8, 32*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(57)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(3500)  /* frames per second, vblank duration (complete guess) */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 31*8-1, 0*8, 32*8-1)
 
-	MDRV_GFXDECODE(circus)
-	MDRV_PALETTE_LENGTH(2)
+	MCFG_GFXDECODE(circus)
+	MCFG_PALETTE_LENGTH(2)
 
-	MDRV_PALETTE_INIT(black_and_white)
-	MDRV_VIDEO_START(circus)
-	MDRV_VIDEO_UPDATE(crash)
+	MCFG_PALETTE_INIT(black_and_white)
+	MCFG_VIDEO_START(circus)
+	MCFG_VIDEO_UPDATE(crash)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("samples", SAMPLES, 0)
-	MDRV_SOUND_CONFIG(crash_samples_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SOUND_CONFIG(crash_samples_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG_DISCRETE(crash)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_SOUND_CONFIG_DISCRETE(crash)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( ripcord, circus_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6502, XTAL_11_289MHz / 16) /* 705.562kHz */
-	MDRV_CPU_PROGRAM_MAP(circus_map)
-	//MDRV_CPU_VBLANK_INT("screen", ripcord_interrupt) //AT
+	MCFG_CPU_ADD("maincpu", M6502, XTAL_11_289MHz / 16) /* 705.562kHz */
+	MCFG_CPU_PROGRAM_MAP(circus_map)
+	//MCFG_CPU_VBLANK_INT("screen", ripcord_interrupt) //AT
 
-	MDRV_MACHINE_START(circus)
-	MDRV_MACHINE_RESET(circus)
+	MCFG_MACHINE_START(circus)
+	MCFG_MACHINE_RESET(circus)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(57)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(3500)  /* frames per second, vblank duration (complete guess) */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 31*8-1, 0*8, 32*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(57)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(3500)  /* frames per second, vblank duration (complete guess) */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 31*8-1, 0*8, 32*8-1)
 
-	MDRV_GFXDECODE(circus)
-	MDRV_PALETTE_LENGTH(2)
+	MCFG_GFXDECODE(circus)
+	MCFG_PALETTE_LENGTH(2)
 
-	MDRV_PALETTE_INIT(black_and_white)
-	MDRV_VIDEO_START(circus)
-	MDRV_VIDEO_UPDATE(ripcord)
+	MCFG_PALETTE_INIT(black_and_white)
+	MCFG_VIDEO_START(circus)
+	MCFG_VIDEO_UPDATE(ripcord)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("samples", SAMPLES, 0)
-	MDRV_SOUND_CONFIG(ripcord_samples_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SOUND_CONFIG(ripcord_samples_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG_DISCRETE(circus)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_SOUND_CONFIG_DISCRETE(circus)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 

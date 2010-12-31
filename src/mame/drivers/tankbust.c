@@ -325,46 +325,46 @@ static MACHINE_RESET( tankbust )
 static MACHINE_CONFIG_START( tankbust, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, XTAL_14_31818MHz/2)	/* Verified on PCB */
-	MDRV_CPU_PROGRAM_MAP(main_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_14_31818MHz/2)	/* Verified on PCB */
+	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("sub", Z80, XTAL_14_31818MHz/4)		/* Verified on PCB */
-//  MDRV_CPU_ADD("sub", Z80, XTAL_14_31818MHz/3)        /* Accurate to audio recording, but apparently incorrect clock */
+	MCFG_CPU_ADD("sub", Z80, XTAL_14_31818MHz/4)		/* Verified on PCB */
+//  MCFG_CPU_ADD("sub", Z80, XTAL_14_31818MHz/3)        /* Accurate to audio recording, but apparently incorrect clock */
 
-	MDRV_CPU_PROGRAM_MAP(map_cpu2)
-	MDRV_CPU_IO_MAP(port_map_cpu2)
+	MCFG_CPU_PROGRAM_MAP(map_cpu2)
+	MCFG_CPU_IO_MAP(port_map_cpu2)
 
-	MDRV_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(HZ(6000))
 
-	MDRV_MACHINE_RESET( tankbust )
+	MCFG_MACHINE_RESET( tankbust )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE   ( 64*8, 32*8 )
-	MDRV_SCREEN_VISIBLE_AREA  ( 16*8, 56*8-1, 1*8, 31*8-1 )
-//  MDRV_SCREEN_VISIBLE_AREA  (  0*8, 64*8-1, 1*8, 31*8-1 )
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE   ( 64*8, 32*8 )
+	MCFG_SCREEN_VISIBLE_AREA  ( 16*8, 56*8-1, 1*8, 31*8-1 )
+//  MCFG_SCREEN_VISIBLE_AREA  (  0*8, 64*8-1, 1*8, 31*8-1 )
 
-	MDRV_GFXDECODE( tankbust )
+	MCFG_GFXDECODE( tankbust )
 
-	MDRV_PALETTE_LENGTH( 128 )
-	MDRV_PALETTE_INIT  ( tankbust )
+	MCFG_PALETTE_LENGTH( 128 )
+	MCFG_PALETTE_INIT  ( tankbust )
 
-	MDRV_VIDEO_START   ( tankbust )
-	MDRV_VIDEO_UPDATE  ( tankbust )
+	MCFG_VIDEO_START   ( tankbust )
+	MCFG_VIDEO_UPDATE  ( tankbust )
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay1", AY8910, XTAL_14_31818MHz/16)	/* Verified on PCB */
-	MDRV_SOUND_CONFIG(ay8910_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL_14_31818MHz/16)	/* Verified on PCB */
+	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MDRV_SOUND_ADD("ay2", AY8910, XTAL_14_31818MHz/16)	/* Verified on PCB */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL_14_31818MHz/16)	/* Verified on PCB */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
 
 

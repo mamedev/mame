@@ -633,47 +633,47 @@ static const ay8910_interface ay8910_config =
 static MACHINE_CONFIG_START( thepit, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, PIXEL_CLOCK/2)     /* 3.072 MHz */
-	MDRV_CPU_PROGRAM_MAP(thepit_main_map)
-	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_ADD("maincpu", Z80, PIXEL_CLOCK/2)     /* 3.072 MHz */
+	MCFG_CPU_PROGRAM_MAP(thepit_main_map)
+	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-	MDRV_CPU_ADD("audiocpu", Z80, SOUND_CLOCK/4)     /* 2.5 MHz */
-	MDRV_CPU_PROGRAM_MAP(audio_map)
-	MDRV_CPU_IO_MAP(audio_io_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("audiocpu", Z80, SOUND_CLOCK/4)     /* 2.5 MHz */
+	MCFG_CPU_PROGRAM_MAP(audio_map)
+	MCFG_CPU_IO_MAP(audio_io_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
-	MDRV_GFXDECODE(thepit)
-	MDRV_PALETTE_LENGTH(32+8)
+	MCFG_GFXDECODE(thepit)
+	MCFG_PALETTE_LENGTH(32+8)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 
-	MDRV_PALETTE_INIT(thepit)
-	MDRV_VIDEO_START(thepit)
-	MDRV_VIDEO_UPDATE(thepit)
+	MCFG_PALETTE_INIT(thepit)
+	MCFG_VIDEO_START(thepit)
+	MCFG_VIDEO_UPDATE(thepit)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay1", AY8910, PIXEL_CLOCK/4)
-	MDRV_SOUND_CONFIG(ay8910_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("ay1", AY8910, PIXEL_CLOCK/4)
+	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD("ay2", AY8910, PIXEL_CLOCK/4)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("ay2", AY8910, PIXEL_CLOCK/4)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( intrepid, thepit )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(intrepid_main_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(intrepid_main_map)
 
 	/* video hardware */
-	MDRV_GFXDECODE(intrepid)
+	MCFG_GFXDECODE(intrepid)
 MACHINE_CONFIG_END
 
 
@@ -682,8 +682,8 @@ static MACHINE_CONFIG_DERIVED( suprmous, intrepid )
 	/* basic machine hardware */
 
 	/* video hardware */
-	MDRV_PALETTE_INIT(suprmous)
-	MDRV_GFXDECODE(suprmous)
+	MCFG_PALETTE_INIT(suprmous)
+	MCFG_GFXDECODE(suprmous)
 MACHINE_CONFIG_END
 
 

@@ -314,31 +314,31 @@ static const tc0480scp_interface galastrm_tc0480scp_intf =
 
 static MACHINE_CONFIG_START( galastrm, driver_device )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)	/* 16 MHz */
-	MDRV_CPU_PROGRAM_MAP(galastrm_map)
-	MDRV_CPU_VBLANK_INT("screen", galastrm_interrupt) /* VBL */
+	MCFG_CPU_ADD("maincpu", M68EC020, 16000000)	/* 16 MHz */
+	MCFG_CPU_PROGRAM_MAP(galastrm_map)
+	MCFG_CPU_VBLANK_INT("screen", galastrm_interrupt) /* VBL */
 
-	MDRV_EEPROM_ADD("eeprom", galastrm_eeprom_interface)
+	MCFG_EEPROM_ADD("eeprom", galastrm_eeprom_interface)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 50*8)
-	MDRV_SCREEN_VISIBLE_AREA(0+96, 40*8-1+96, 3*8+60, 32*8-1+60)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 50*8)
+	MCFG_SCREEN_VISIBLE_AREA(0+96, 40*8-1+96, 3*8+60, 32*8-1+60)
 
-	MDRV_GFXDECODE(galastrm)
-	MDRV_PALETTE_LENGTH(4096)
+	MCFG_GFXDECODE(galastrm)
+	MCFG_PALETTE_LENGTH(4096)
 
-	MDRV_VIDEO_START(galastrm)
-	MDRV_VIDEO_UPDATE(galastrm)
+	MCFG_VIDEO_START(galastrm)
+	MCFG_VIDEO_UPDATE(galastrm)
 
-	MDRV_TC0100SCN_ADD("tc0100scn", galastrm_tc0100scn_intf)
-	MDRV_TC0480SCP_ADD("tc0480scp", galastrm_tc0480scp_intf)
+	MCFG_TC0100SCN_ADD("tc0100scn", galastrm_tc0100scn_intf)
+	MCFG_TC0480SCP_ADD("tc0480scp", galastrm_tc0480scp_intf)
 
 	/* sound hardware */
-	MDRV_FRAGMENT_ADD(taito_f3_sound)
+	MCFG_FRAGMENT_ADD(taito_f3_sound)
 MACHINE_CONFIG_END
 
 /***************************************************************************/

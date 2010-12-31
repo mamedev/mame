@@ -546,57 +546,57 @@ static const namcoio_interface intf2 =
 static MACHINE_CONFIG_START( liblrabl, toypop_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6809, 1536000)	/* 1.536 MHz (measured on Libble Rabble board) */
-	MDRV_CPU_PROGRAM_MAP(liblrabl_map)
-	MDRV_CPU_VBLANK_INT("screen", toypop_main_interrupt)
+	MCFG_CPU_ADD("maincpu", M6809, 1536000)	/* 1.536 MHz (measured on Libble Rabble board) */
+	MCFG_CPU_PROGRAM_MAP(liblrabl_map)
+	MCFG_CPU_VBLANK_INT("screen", toypop_main_interrupt)
 
-	MDRV_CPU_ADD("audiocpu", M6809, 1536000)
-	MDRV_CPU_PROGRAM_MAP(sound_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
+	MCFG_CPU_ADD("audiocpu", M6809, 1536000)
+	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_assert)
 
-	MDRV_CPU_ADD("sub", M68000, 6144000)	/* 6.144 MHz (measured on Libble Rabble board) */
-	MDRV_CPU_PROGRAM_MAP(m68k_map)
-	MDRV_CPU_VBLANK_INT("screen", toypop_m68000_interrupt)
+	MCFG_CPU_ADD("sub", M68000, 6144000)	/* 6.144 MHz (measured on Libble Rabble board) */
+	MCFG_CPU_PROGRAM_MAP(m68k_map)
+	MCFG_CPU_VBLANK_INT("screen", toypop_m68000_interrupt)
 
-	MDRV_QUANTUM_TIME(HZ(6000))    /* 100 CPU slices per frame - an high value to ensure proper */
+	MCFG_QUANTUM_TIME(HZ(6000))    /* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
-	MDRV_MACHINE_RESET(toypop)
+	MCFG_MACHINE_RESET(toypop)
 
-	MDRV_NAMCO58XX_ADD("58xx", intf0)
-	MDRV_NAMCO56XX_ADD("56xx_1", intf1)
-	MDRV_NAMCO56XX_ADD("56xx_2", intf2)
+	MCFG_NAMCO58XX_ADD("58xx", intf0)
+	MCFG_NAMCO56XX_ADD("56xx_1", intf1)
+	MCFG_NAMCO56XX_ADD("56xx_2", intf2)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60.606060)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(36*8, 28*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60.606060)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(36*8, 28*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
 
-	MDRV_GFXDECODE(toypop)
-	MDRV_PALETTE_LENGTH(128*4+64*4+16*2)
+	MCFG_GFXDECODE(toypop)
+	MCFG_PALETTE_LENGTH(128*4+64*4+16*2)
 
-	MDRV_PALETTE_INIT(toypop)
-	MDRV_VIDEO_START(toypop)
-	MDRV_VIDEO_UPDATE(toypop)
+	MCFG_PALETTE_INIT(toypop)
+	MCFG_VIDEO_START(toypop)
+	MCFG_VIDEO_UPDATE(toypop)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("namco", NAMCO_15XX, 24000)
-	MDRV_SOUND_CONFIG(namco_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("namco", NAMCO_15XX, 24000)
+	MCFG_SOUND_CONFIG(namco_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( toypop, liblrabl )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(toypop_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(toypop_map)
 
-	MDRV_DEVICE_REMOVE("58xx")
-	MDRV_NAMCO58XX_ADD("58xx", intf0_coin)
+	MCFG_DEVICE_REMOVE("58xx")
+	MCFG_NAMCO58XX_ADD("58xx", intf0_coin)
 MACHINE_CONFIG_END
 
 

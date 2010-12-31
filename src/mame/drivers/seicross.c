@@ -394,53 +394,53 @@ static const ay8910_interface ay8910_config =
 static MACHINE_CONFIG_START( nvram, seicross_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 3072000)	/* 3.072 MHz? */
-	MDRV_CPU_PROGRAM_MAP(main_map)
-	MDRV_CPU_IO_MAP(main_portmap)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("maincpu", Z80, 3072000)	/* 3.072 MHz? */
+	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_CPU_IO_MAP(main_portmap)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("mcu", NSC8105, 6000000)	/* ??? */
-	MDRV_CPU_PROGRAM_MAP(mcu_nvram_map)
+	MCFG_CPU_ADD("mcu", NSC8105, 6000000)	/* ??? */
+	MCFG_CPU_PROGRAM_MAP(mcu_nvram_map)
 
-	MDRV_QUANTUM_TIME(HZ(1200))	/* 20 CPU slices per frame - an high value to ensure proper */
+	MCFG_QUANTUM_TIME(HZ(1200))	/* 20 CPU slices per frame - an high value to ensure proper */
 						/* synchronization of the CPUs */
-	MDRV_MACHINE_RESET(friskyt)
-	MDRV_NVRAM_HANDLER(seicross)
+	MCFG_MACHINE_RESET(friskyt)
+	MCFG_NVRAM_HANDLER(seicross)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */	/* frames per second, vblank duration */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */	/* frames per second, vblank duration */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(seicross)
-	MDRV_PALETTE_LENGTH(64)
+	MCFG_GFXDECODE(seicross)
+	MCFG_PALETTE_LENGTH(64)
 
-	MDRV_PALETTE_INIT(seicross)
-	MDRV_VIDEO_START(seicross)
-	MDRV_VIDEO_UPDATE(seicross)
+	MCFG_PALETTE_INIT(seicross)
+	MCFG_VIDEO_START(seicross)
+	MCFG_VIDEO_UPDATE(seicross)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("aysnd", AY8910, 1536000)
-	MDRV_SOUND_CONFIG(ay8910_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("aysnd", AY8910, 1536000)
+	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( no_nvram, nvram )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("mcu")
-	MDRV_CPU_PROGRAM_MAP(mcu_no_nvram_map)
+	MCFG_CPU_MODIFY("mcu")
+	MCFG_CPU_PROGRAM_MAP(mcu_no_nvram_map)
 
-	MDRV_NVRAM_HANDLER(0)
+	MCFG_NVRAM_HANDLER(0)
 MACHINE_CONFIG_END
 
 

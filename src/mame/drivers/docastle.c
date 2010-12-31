@@ -595,84 +595,84 @@ static MACHINE_START( docastle )
 static MACHINE_CONFIG_START( docastle, docastle_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, XTAL_4MHz)
-	MDRV_CPU_PROGRAM_MAP(docastle_map)
-	MDRV_CPU_IO_MAP(docastle_io_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_4MHz)
+	MCFG_CPU_PROGRAM_MAP(docastle_map)
+	MCFG_CPU_IO_MAP(docastle_io_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("slave", Z80, XTAL_4MHz)
-	MDRV_CPU_PROGRAM_MAP(docastle_map2)
-	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold, 8)
+	MCFG_CPU_ADD("slave", Z80, XTAL_4MHz)
+	MCFG_CPU_PROGRAM_MAP(docastle_map2)
+	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold, 8)
 
-	MDRV_CPU_ADD("cpu3", Z80, XTAL_4MHz)
-	MDRV_CPU_PROGRAM_MAP(docastle_map3)
-	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_ADD("cpu3", Z80, XTAL_4MHz)
+	MCFG_CPU_PROGRAM_MAP(docastle_map3)
+	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(59.60)	// measured on pcb, real refresh rate should be derived from XTAL_9_828MHz, how?
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 4*8, 28*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(59.60)	// measured on pcb, real refresh rate should be derived from XTAL_9_828MHz, how?
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(1*8, 31*8-1, 4*8, 28*8-1)
 
-	MDRV_GFXDECODE(docastle)
-	MDRV_PALETTE_LENGTH(512)
+	MCFG_GFXDECODE(docastle)
+	MCFG_PALETTE_LENGTH(512)
 
-	MDRV_PALETTE_INIT(docastle)
-	MDRV_VIDEO_START(docastle)
-	MDRV_VIDEO_UPDATE(docastle)
+	MCFG_PALETTE_INIT(docastle)
+	MCFG_VIDEO_START(docastle)
+	MCFG_VIDEO_UPDATE(docastle)
 
-	MDRV_MACHINE_RESET( docastle )
-	MDRV_MACHINE_START( docastle )
+	MCFG_MACHINE_RESET( docastle )
+	MCFG_MACHINE_START( docastle )
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("sn1", SN76489A, XTAL_4MHz)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("sn1", SN76489A, XTAL_4MHz)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD("sn2", SN76489A, XTAL_4MHz)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("sn2", SN76489A, XTAL_4MHz)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD("sn3", SN76489A, XTAL_4MHz)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("sn3", SN76489A, XTAL_4MHz)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD("sn4", SN76489A, XTAL_4MHz)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("sn4", SN76489A, XTAL_4MHz)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( dorunrun, docastle )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(dorunrun_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(dorunrun_map)
 
-	MDRV_CPU_MODIFY("slave")
-	MDRV_CPU_PROGRAM_MAP(dorunrun_map2)
+	MCFG_CPU_MODIFY("slave")
+	MCFG_CPU_PROGRAM_MAP(dorunrun_map2)
 
 	/* video hardware */
-	MDRV_VIDEO_START(dorunrun)
+	MCFG_VIDEO_START(dorunrun)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( idsoccer, docastle )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(idsoccer_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(idsoccer_map)
 
-	MDRV_CPU_MODIFY("slave")
-	MDRV_CPU_PROGRAM_MAP(idsoccer_map2)
+	MCFG_CPU_MODIFY("slave")
+	MCFG_CPU_PROGRAM_MAP(idsoccer_map2)
 
 	/* video hardware */
-	MDRV_VIDEO_START(dorunrun)
+	MCFG_VIDEO_START(dorunrun)
 
 	/* sound hardware */
-	MDRV_SOUND_ADD("msm", MSM5205, XTAL_384kHz) /* Crystal verified on American Soccer board. */
-	MDRV_SOUND_CONFIG(msm5205_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	MCFG_SOUND_ADD("msm", MSM5205, XTAL_384kHz) /* Crystal verified on American Soccer board. */
+	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
 /* ROMs */

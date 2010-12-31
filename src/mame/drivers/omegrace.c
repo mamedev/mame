@@ -474,42 +474,42 @@ static MACHINE_CONFIG_START( omegrace, driver_device )
 	/* main CPU */
 	/* XTAL101 Crystal @ 12mhz */
 	/* through 74LS161, Pin 13 = divide by 4 */
-	MDRV_CPU_ADD("maincpu", Z80,12000000/4)
-	MDRV_CPU_PROGRAM_MAP(main_map)
-	MDRV_CPU_IO_MAP(port_map)
-	MDRV_CPU_PERIODIC_INT(irq0_line_hold,250)
+	MCFG_CPU_ADD("maincpu", Z80,12000000/4)
+	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_CPU_IO_MAP(port_map)
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold,250)
 
 	/* audio CPU */
 	/* XTAL101 Crystal @ 12mhz */
 	/* through 74LS161, Pin 12 = divide by 8 */
 	/* Fed to CPU as 1.5mhz though line J4-D */
-	MDRV_CPU_ADD("audiocpu", Z80,12000000/8)
-	MDRV_CPU_PROGRAM_MAP(sound_map)
-	MDRV_CPU_IO_MAP(sound_port)
-	MDRV_CPU_PERIODIC_INT(nmi_line_pulse,250)
+	MCFG_CPU_ADD("audiocpu", Z80,12000000/8)
+	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_CPU_IO_MAP(sound_port)
+	MCFG_CPU_PERIODIC_INT(nmi_line_pulse,250)
 
-	MDRV_MACHINE_RESET(omegrace)
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_MACHINE_RESET(omegrace)
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", VECTOR)
-	MDRV_SCREEN_REFRESH_RATE(40)
-	MDRV_SCREEN_SIZE(400, 300)
-	MDRV_SCREEN_VISIBLE_AREA(522, 1566, 522, 1566)
+	MCFG_SCREEN_ADD("screen", VECTOR)
+	MCFG_SCREEN_REFRESH_RATE(40)
+	MCFG_SCREEN_SIZE(400, 300)
+	MCFG_SCREEN_VISIBLE_AREA(522, 1566, 522, 1566)
 
-	MDRV_VIDEO_START(dvg)
-	MDRV_VIDEO_UPDATE(vector)
+	MCFG_VIDEO_START(dvg)
+	MCFG_VIDEO_UPDATE(vector)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
 	/* XTAL101 Crystal @ 12mhz */
 	/* through 74LS92, Pin 8 = divide by 12 */
-	MDRV_SOUND_ADD("ay1", AY8912, 12000000/12)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("ay1", AY8912, 12000000/12)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD("ay2", AY8912, 12000000/12)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("ay2", AY8912, 12000000/12)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 

@@ -101,7 +101,7 @@ void device_config_execute_interface::static_set_disable(device_config *device)
 {
 	device_config_execute_interface *exec = dynamic_cast<device_config_execute_interface *>(device);
 	if (exec == NULL)
-		throw emu_fatalerror("MDRV_DEVICE_DISABLE called on device '%s' with no execute interface", device->tag());
+		throw emu_fatalerror("MCFG_DEVICE_DISABLE called on device '%s' with no execute interface", device->tag());
 	exec->m_disabled = true;
 }
 
@@ -115,7 +115,7 @@ void device_config_execute_interface::static_set_vblank_int(device_config *devic
 {
 	device_config_execute_interface *exec = dynamic_cast<device_config_execute_interface *>(device);
 	if (exec == NULL)
-		throw emu_fatalerror("MDRV_DEVICE_VBLANK_INT called on device '%s' with no execute interface", device->tag());
+		throw emu_fatalerror("MCFG_DEVICE_VBLANK_INT called on device '%s' with no execute interface", device->tag());
 	exec->m_vblank_interrupt = function;
 	exec->m_vblank_interrupts_per_frame = rate;
 	exec->m_vblank_interrupt_screen = tag;
@@ -131,7 +131,7 @@ void device_config_execute_interface::static_set_periodic_int(device_config *dev
 {
 	device_config_execute_interface *exec = dynamic_cast<device_config_execute_interface *>(device);
 	if (exec == NULL)
-		throw emu_fatalerror("MDRV_DEVICE_PERIODIC_INT called on device '%s' with no execute interface", device->tag());
+		throw emu_fatalerror("MCFG_DEVICE_PERIODIC_INT called on device '%s' with no execute interface", device->tag());
 	exec->m_timed_interrupt = function;
 	exec->m_timed_interrupt_period = rate;
 }

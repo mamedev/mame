@@ -558,30 +558,30 @@ static const pokey_interface redbaron_pokey_interface =
 static MACHINE_CONFIG_START( bzone_base, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6502, BZONE_MASTER_CLOCK / 8)
-	MDRV_CPU_PROGRAM_MAP(bzone_map)
-	MDRV_CPU_PERIODIC_INT(bzone_interrupt, (double)BZONE_MASTER_CLOCK / 4096 / 12)
+	MCFG_CPU_ADD("maincpu", M6502, BZONE_MASTER_CLOCK / 8)
+	MCFG_CPU_PROGRAM_MAP(bzone_map)
+	MCFG_CPU_PERIODIC_INT(bzone_interrupt, (double)BZONE_MASTER_CLOCK / 4096 / 12)
 
-	MDRV_MACHINE_START(bzone)
+	MCFG_MACHINE_START(bzone)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", VECTOR)
-	MDRV_SCREEN_REFRESH_RATE(40)
-	MDRV_SCREEN_SIZE(400, 300)
-	MDRV_SCREEN_VISIBLE_AREA(0, 580, 0, 400)
+	MCFG_SCREEN_ADD("screen", VECTOR)
+	MCFG_SCREEN_REFRESH_RATE(40)
+	MCFG_SCREEN_SIZE(400, 300)
+	MCFG_SCREEN_VISIBLE_AREA(0, 580, 0, 400)
 
-	MDRV_VIDEO_START(avg_bzone)
-	MDRV_VIDEO_UPDATE(vector)
+	MCFG_VIDEO_START(avg_bzone)
+	MCFG_VIDEO_UPDATE(vector)
 
 	/* Drivers */
-	MDRV_MATHBOX_ADD("mathbox")
+	MCFG_MATHBOX_ADD("mathbox")
 
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( bzone, bzone_base )
 
 	/* sound hardware */
-	MDRV_FRAGMENT_ADD(bzone_audio)
+	MCFG_FRAGMENT_ADD(bzone_audio)
 
 MACHINE_CONFIG_END
 
@@ -590,31 +590,31 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( redbaron, bzone_base )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(redbaron_map)
-	MDRV_CPU_PERIODIC_INT(bzone_interrupt, (double)BZONE_MASTER_CLOCK / 4096 / 12)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(redbaron_map)
+	MCFG_CPU_PERIODIC_INT(bzone_interrupt, (double)BZONE_MASTER_CLOCK / 4096 / 12)
 
-	MDRV_MACHINE_START(redbaron)
+	MCFG_MACHINE_START(redbaron)
 
-	MDRV_ATARIVGEAROM_ADD("earom")
+	MCFG_ATARIVGEAROM_ADD("earom")
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VISIBLE_AREA(0, 520, 0, 400)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VISIBLE_AREA(0, 520, 0, 400)
 
-	MDRV_VIDEO_START(avg_bzone)
+	MCFG_VIDEO_START(avg_bzone)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("pokey", POKEY, 1500000)
-	MDRV_SOUND_CONFIG(redbaron_pokey_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("pokey", POKEY, 1500000)
+	MCFG_SOUND_CONFIG(redbaron_pokey_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("custom", REDBARON, 0)
+	MCFG_SOUND_ADD("custom", REDBARON, 0)
 
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 

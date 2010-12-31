@@ -50,25 +50,25 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MDRV_7474_ADD(_tag, _target_tag, _output_cb, _comp_output_cb) \
-    MDRV_DEVICE_ADD(_tag, MACHINE_TTL7474, 0) \
-    MDRV_7474_TARGET_TAG(_target_tag) \
-    MDRV_7474_OUTPUT_CB(_output_cb) \
-    MDRV_7474_COMP_OUTPUT_CB(_comp_output_cb)
+#define MCFG_7474_ADD(_tag, _target_tag, _output_cb, _comp_output_cb) \
+    MCFG_DEVICE_ADD(_tag, MACHINE_TTL7474, 0) \
+    MCFG_7474_TARGET_TAG(_target_tag) \
+    MCFG_7474_OUTPUT_CB(_output_cb) \
+    MCFG_7474_COMP_OUTPUT_CB(_comp_output_cb)
 
-#define MDRV_7474_REPLACE(_tag, _target_tag, _output_cb, _comp_output_cb) \
-    MDRV_DEVICE_REPLACE(_tag, TTL7474, 0) \
-    MDRV_7474_TARGET_TAG(_target_tag) \
-    MDRV_7474_OUTPUT_CB(_output_cb) \
-    MDRV_7474_COMP_OUTPUT_CB(_comp_output_cb)
+#define MCFG_7474_REPLACE(_tag, _target_tag, _output_cb, _comp_output_cb) \
+    MCFG_DEVICE_REPLACE(_tag, TTL7474, 0) \
+    MCFG_7474_TARGET_TAG(_target_tag) \
+    MCFG_7474_OUTPUT_CB(_output_cb) \
+    MCFG_7474_COMP_OUTPUT_CB(_comp_output_cb)
 
-#define MDRV_7474_TARGET_TAG(_target_tag) \
+#define MCFG_7474_TARGET_TAG(_target_tag) \
 	ttl7474_device_config::static_set_target_tag(device, _target_tag); \
 
-#define MDRV_7474_OUTPUT_CB(_cb) \
+#define MCFG_7474_OUTPUT_CB(_cb) \
 	ttl7474_device_config::static_set_output_cb(device, _cb); \
 
-#define MDRV_7474_COMP_OUTPUT_CB(_cb) \
+#define MCFG_7474_COMP_OUTPUT_CB(_cb) \
 	ttl7474_device_config::static_set_comp_output_cb(device, _cb); \
 
 

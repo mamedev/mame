@@ -39,17 +39,17 @@ struct _ide_config
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_IDE_CONTROLLER_ADD(_tag, _callback) \
-	MDRV_DEVICE_ADD(_tag, IDE_CONTROLLER, 0) \
-	MDRV_DEVICE_CONFIG_DATAPTR(ide_config, interrupt, _callback)
+#define MCFG_IDE_CONTROLLER_ADD(_tag, _callback) \
+	MCFG_DEVICE_ADD(_tag, IDE_CONTROLLER, 0) \
+	MCFG_DEVICE_CONFIG_DATAPTR(ide_config, interrupt, _callback)
 
-#define MDRV_IDE_CONTROLLER_REGIONS(_master, _slave) \
-	MDRV_DEVICE_CONFIG_DATAPTR(ide_config, master, _master) \
-	MDRV_DEVICE_CONFIG_DATAPTR(ide_config, master, _slave)
+#define MCFG_IDE_CONTROLLER_REGIONS(_master, _slave) \
+	MCFG_DEVICE_CONFIG_DATAPTR(ide_config, master, _master) \
+	MCFG_DEVICE_CONFIG_DATAPTR(ide_config, master, _slave)
 
-#define MDRV_IDE_BUS_MASTER_SPACE(_cpu, _space) \
-	MDRV_DEVICE_CONFIG_DATAPTR(ide_config, bmcpu, _cpu) \
-	MDRV_DEVICE_CONFIG_DATA32(ide_config, bmspace, ADDRESS_SPACE_##_space)
+#define MCFG_IDE_BUS_MASTER_SPACE(_cpu, _space) \
+	MCFG_DEVICE_CONFIG_DATAPTR(ide_config, bmcpu, _cpu) \
+	MCFG_DEVICE_CONFIG_DATA32(ide_config, bmspace, ADDRESS_SPACE_##_space)
 
 
 

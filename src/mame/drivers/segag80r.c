@@ -832,26 +832,26 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( g80r_base, segag80r_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, VIDEO_CLOCK/4)
-	MDRV_CPU_PROGRAM_MAP(main_map)
-	MDRV_CPU_IO_MAP(main_portmap)
-	MDRV_CPU_VBLANK_INT("screen", segag80r_vblank_start)
+	MCFG_CPU_ADD("maincpu", Z80, VIDEO_CLOCK/4)
+	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_CPU_IO_MAP(main_portmap)
+	MCFG_CPU_VBLANK_INT("screen", segag80r_vblank_start)
 
-	MDRV_MACHINE_START(g80r)
+	MCFG_MACHINE_START(g80r)
 
 	/* video hardware */
-	MDRV_GFXDECODE(segag80r)
-	MDRV_PALETTE_LENGTH(64)
+	MCFG_GFXDECODE(segag80r)
+	MCFG_PALETTE_LENGTH(64)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 
-	MDRV_VIDEO_START(segag80r)
-	MDRV_VIDEO_UPDATE(segag80r)
+	MCFG_VIDEO_START(segag80r)
+	MCFG_VIDEO_UPDATE(segag80r)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 MACHINE_CONFIG_END
 
 
@@ -860,8 +860,8 @@ static MACHINE_CONFIG_DERIVED( astrob, g80r_base )
 	/* basic machine hardware */
 
 	/* sound boards */
-	MDRV_FRAGMENT_ADD(astrob_sound_board)
-	MDRV_FRAGMENT_ADD(sega_speech_board)
+	MCFG_FRAGMENT_ADD(astrob_sound_board)
+	MCFG_FRAGMENT_ADD(sega_speech_board)
 MACHINE_CONFIG_END
 
 
@@ -869,11 +869,11 @@ static MACHINE_CONFIG_DERIVED( 005, g80r_base )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(main_ppi8255_portmap)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(main_ppi8255_portmap)
 
 	/* sound boards */
-	MDRV_FRAGMENT_ADD(005_sound_board)
+	MCFG_FRAGMENT_ADD(005_sound_board)
 MACHINE_CONFIG_END
 
 
@@ -882,14 +882,14 @@ static MACHINE_CONFIG_DERIVED( spaceod, g80r_base )
 	/* basic machine hardware */
 
 	/* background board changes */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_GFXDECODE(spaceod)
-	MDRV_PALETTE_LENGTH(64+64)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_GFXDECODE(spaceod)
+	MCFG_PALETTE_LENGTH(64+64)
 
 	/* sound boards */
-	MDRV_FRAGMENT_ADD(spaceod_sound_board)
+	MCFG_FRAGMENT_ADD(spaceod_sound_board)
 MACHINE_CONFIG_END
 
 
@@ -897,15 +897,15 @@ static MACHINE_CONFIG_DERIVED( monsterb, g80r_base )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(main_ppi8255_portmap)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(main_ppi8255_portmap)
 
 	/* background board changes */
-	MDRV_GFXDECODE(monsterb)
-	MDRV_PALETTE_LENGTH(64+64)
+	MCFG_GFXDECODE(monsterb)
+	MCFG_PALETTE_LENGTH(64+64)
 
 	/* sound boards */
-	MDRV_FRAGMENT_ADD(monsterb_sound_board)
+	MCFG_FRAGMENT_ADD(monsterb_sound_board)
 MACHINE_CONFIG_END
 
 
@@ -914,40 +914,40 @@ static MACHINE_CONFIG_DERIVED( pignewt, g80r_base )
 	/* basic machine hardware */
 
 	/* background board changes */
-	MDRV_GFXDECODE(monsterb)
-	MDRV_PALETTE_LENGTH(64+64)
+	MCFG_GFXDECODE(monsterb)
+	MCFG_PALETTE_LENGTH(64+64)
 
 	/* sound boards */
-	MDRV_MACHINE_RESET(pignewt)
-	MDRV_FRAGMENT_ADD(sega_universal_sound_board)
+	MCFG_MACHINE_RESET(pignewt)
+	MCFG_FRAGMENT_ADD(sega_universal_sound_board)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( sindbadm, g80r_base )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(sindbadm_portmap)
-	MDRV_CPU_VBLANK_INT("screen", sindbadm_vblank_start)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(sindbadm_portmap)
+	MCFG_CPU_VBLANK_INT("screen", sindbadm_vblank_start)
 
-	MDRV_PPI8255_ADD( "ppi8255", sindbadm_ppi_intf )
+	MCFG_PPI8255_ADD( "ppi8255", sindbadm_ppi_intf )
 
 	/* video hardware */
-	MDRV_GFXDECODE(monsterb)
-	MDRV_PALETTE_LENGTH(64+64)
+	MCFG_GFXDECODE(monsterb)
+	MCFG_PALETTE_LENGTH(64+64)
 
 	/* sound boards */
 
-	MDRV_CPU_ADD("audiocpu", Z80, SINDBADM_SOUND_CLOCK/2)
-	MDRV_CPU_PROGRAM_MAP(sindbadm_sound_map)
-	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
+	MCFG_CPU_ADD("audiocpu", Z80, SINDBADM_SOUND_CLOCK/2)
+	MCFG_CPU_PROGRAM_MAP(sindbadm_sound_map)
+	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,4)
 
 	/* sound hardware */
-	MDRV_SOUND_ADD("sn1", SN76496, SINDBADM_SOUND_CLOCK/4)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("sn1", SN76496, SINDBADM_SOUND_CLOCK/4)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("sn2", SN76496, SINDBADM_SOUND_CLOCK/2)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("sn2", SN76496, SINDBADM_SOUND_CLOCK/2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 

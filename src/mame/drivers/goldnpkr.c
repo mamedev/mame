@@ -2629,161 +2629,161 @@ static const ay8910_interface ay8910_config =
 static MACHINE_CONFIG_START( goldnpkr_base, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6502, CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(goldnpkr_map)
-	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_ADD("maincpu", M6502, CPU_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(goldnpkr_map)
+	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MDRV_PIA6821_ADD("pia0", goldnpkr_pia0_intf)
-	MDRV_PIA6821_ADD("pia1", goldnpkr_pia1_intf)
+	MCFG_PIA6821_ADD("pia0", goldnpkr_pia0_intf)
+	MCFG_PIA6821_ADD("pia1", goldnpkr_pia1_intf)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE((39+1)*8, (31+1)*8)                  /* From MC6845 init, registers 00 & 04 (programmed with value-1). */
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 29*8-1)    /* From MC6845 init, registers 01 & 06. */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE((39+1)*8, (31+1)*8)                  /* From MC6845 init, registers 00 & 04 (programmed with value-1). */
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 29*8-1)    /* From MC6845 init, registers 01 & 06. */
 
-	MDRV_MC6845_ADD("crtc", MC6845, CPU_CLOCK, mc6845_intf)	/* 68B45 or 6845s @ CPU clock */
+	MCFG_MC6845_ADD("crtc", MC6845, CPU_CLOCK, mc6845_intf)	/* 68B45 or 6845s @ CPU clock */
 
-	MDRV_GFXDECODE(goldnpkr)
-	MDRV_PALETTE_INIT(goldnpkr)
-	MDRV_PALETTE_LENGTH(256)
-	MDRV_VIDEO_START(goldnpkr)
-	MDRV_VIDEO_UPDATE(goldnpkr)
+	MCFG_GFXDECODE(goldnpkr)
+	MCFG_PALETTE_INIT(goldnpkr)
+	MCFG_PALETTE_LENGTH(256)
+	MCFG_VIDEO_START(goldnpkr)
+	MCFG_VIDEO_UPDATE(goldnpkr)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( goldnpkr, goldnpkr_base )
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG_DISCRETE(goldnpkr)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_SOUND_CONFIG_DISCRETE(goldnpkr)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( pottnpkr, goldnpkr_base )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(pottnpkr_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(pottnpkr_map)
 
-	MDRV_PIA6821_MODIFY("pia0", pottnpkr_pia0_intf)
+	MCFG_PIA6821_MODIFY("pia0", pottnpkr_pia0_intf)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG_DISCRETE(pottnpkr)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_SOUND_CONFIG_DISCRETE(pottnpkr)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( witchcrd, goldnpkr_base )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(witchcrd_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(witchcrd_map)
 
-	MDRV_PIA6821_MODIFY("pia0", pottnpkr_pia0_intf)
+	MCFG_PIA6821_MODIFY("pia0", pottnpkr_pia0_intf)
 
 	/* video hardware */
-	MDRV_PALETTE_INIT(witchcrd)
+	MCFG_PALETTE_INIT(witchcrd)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG_DISCRETE(goldnpkr)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_SOUND_CONFIG_DISCRETE(goldnpkr)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( wcfalcon, goldnpkr_base )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(witchcrd_falcon_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(witchcrd_falcon_map)
 
-	MDRV_PIA6821_MODIFY("pia0", wcfalcon_pia0_intf)
-	MDRV_PIA6821_MODIFY("pia1", wcfalcon_pia1_intf)
+	MCFG_PIA6821_MODIFY("pia0", wcfalcon_pia0_intf)
+	MCFG_PIA6821_MODIFY("pia1", wcfalcon_pia1_intf)
 
 	/* video hardware */
-	MDRV_PALETTE_INIT(witchcrd)
+	MCFG_PALETTE_INIT(witchcrd)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("ay8910", AY8910, MASTER_CLOCK/4)	/* guess, seems ok */
-	MDRV_SOUND_CONFIG(ay8910_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("ay8910", AY8910, MASTER_CLOCK/4)	/* guess, seems ok */
+	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( wildcard, goldnpkr_base )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(wildcard_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(wildcard_map)
 
-	MDRV_PIA6821_MODIFY("pia0", pottnpkr_pia0_intf)
+	MCFG_PIA6821_MODIFY("pia0", pottnpkr_pia0_intf)
 
 	/* video hardware */
-//  MDRV_GFXDECODE(wildcard)
-	MDRV_PALETTE_INIT(witchcrd)
-//  MDRV_VIDEO_START(wildcard)
+//  MCFG_GFXDECODE(wildcard)
+	MCFG_PALETTE_INIT(witchcrd)
+//  MCFG_VIDEO_START(wildcard)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG_DISCRETE(goldnpkr)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_SOUND_CONFIG_DISCRETE(goldnpkr)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( wildcrdb, goldnpkr_base )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(wildcrdb_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(wildcrdb_map)
 
-	MDRV_CPU_ADD("mcu", Z80, MASTER_CLOCK/4)	/* guess */
-	MDRV_CPU_PROGRAM_MAP(wildcrdb_mcu_map)
-	MDRV_CPU_IO_MAP(wildcrdb_mcu_io_map)
+	MCFG_CPU_ADD("mcu", Z80, MASTER_CLOCK/4)	/* guess */
+	MCFG_CPU_PROGRAM_MAP(wildcrdb_mcu_map)
+	MCFG_CPU_IO_MAP(wildcrdb_mcu_io_map)
 
-	MDRV_PIA6821_MODIFY("pia0", wcfalcon_pia0_intf)
-	MDRV_PIA6821_MODIFY("pia1", wcfalcon_pia1_intf)
+	MCFG_PIA6821_MODIFY("pia0", wcfalcon_pia0_intf)
+	MCFG_PIA6821_MODIFY("pia1", wcfalcon_pia1_intf)
 
 	/* video hardware */
-//  MDRV_GFXDECODE(wildcard)
-	MDRV_PALETTE_INIT(witchcrd)
-//  MDRV_VIDEO_START(wildcard)
+//  MCFG_GFXDECODE(wildcard)
+	MCFG_PALETTE_INIT(witchcrd)
+//  MCFG_VIDEO_START(wildcard)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("ay8910", AY8910, MASTER_CLOCK/4)	/* guess, seems ok */
-	MDRV_SOUND_CONFIG(ay8910_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("ay8910", AY8910, MASTER_CLOCK/4)	/* guess, seems ok */
+	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.00)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( genie, goldnpkr_base )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(genie_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(genie_map)
 
-	MDRV_PIA6821_MODIFY("pia0", pottnpkr_pia0_intf)
+	MCFG_PIA6821_MODIFY("pia0", pottnpkr_pia0_intf)
 
 	/* video hardware */
-	MDRV_PALETTE_INIT(witchcrd)
+	MCFG_PALETTE_INIT(witchcrd)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG_DISCRETE(goldnpkr)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_SOUND_CONFIG_DISCRETE(goldnpkr)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 

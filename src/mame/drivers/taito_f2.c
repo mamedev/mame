@@ -3368,616 +3368,616 @@ static MACHINE_START( f2 )
 static MACHINE_CONFIG_START( taito_f2, taitof2_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 24000000/2)	/* 12 MHz */
-	MDRV_CPU_VBLANK_INT("screen", taitof2_interrupt)
+	MCFG_CPU_ADD("maincpu", M68000, 24000000/2)	/* 12 MHz */
+	MCFG_CPU_VBLANK_INT("screen", taitof2_interrupt)
 
-	MDRV_CPU_ADD("audiocpu", Z80, 24000000/6)	/* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(sound_map)
+	MCFG_CPU_ADD("audiocpu", Z80, 24000000/6)	/* 4 MHz */
+	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MDRV_MACHINE_START(f2)
+	MCFG_MACHINE_START(f2)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)	/* frames per second, vblank duration */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(40*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0)	/* frames per second, vblank duration */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(40*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(taitof2)
-	MDRV_PALETTE_LENGTH(4096)
+	MCFG_GFXDECODE(taitof2)
+	MCFG_PALETTE_LENGTH(4096)
 
-	MDRV_VIDEO_START(taitof2_default)
-	MDRV_VIDEO_EOF(taitof2_no_buffer)
-	MDRV_VIDEO_UPDATE(taitof2)
+	MCFG_VIDEO_START(taitof2_default)
+	MCFG_VIDEO_EOF(taitof2_no_buffer)
+	MCFG_VIDEO_UPDATE(taitof2)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymsnd", YM2610, 24000000/3) /* Was 16000000/2, but only a 24Mhz OSC */
-	MDRV_SOUND_CONFIG(ym2610_config)
-	MDRV_SOUND_ROUTE(0, "lspeaker",  0.25)
-	MDRV_SOUND_ROUTE(0, "rspeaker", 0.25)
-	MDRV_SOUND_ROUTE(1, "lspeaker",  1.0)
-	MDRV_SOUND_ROUTE(2, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM2610, 24000000/3) /* Was 16000000/2, but only a 24Mhz OSC */
+	MCFG_SOUND_CONFIG(ym2610_config)
+	MCFG_SOUND_ROUTE(0, "lspeaker",  0.25)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 0.25)
+	MCFG_SOUND_ROUTE(1, "lspeaker",  1.0)
+	MCFG_SOUND_ROUTE(2, "rspeaker", 1.0)
 
-	MDRV_TC0140SYT_ADD("tc0140syt", taitof2_tc0140syt_intf)
+	MCFG_TC0140SYT_ADD("tc0140syt", taitof2_tc0140syt_intf)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( taito_f2_tc0220ioc, taito_f2 )
 
 	/* basic machine hardware */
 
-	MDRV_TC0220IOC_ADD("tc0220ioc", taitof2_io220_intf)
+	MCFG_TC0220IOC_ADD("tc0220ioc", taitof2_io220_intf)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( taito_f2_tc0510nio, taito_f2 )
 
 	/* basic machine hardware */
 
-	MDRV_TC0510NIO_ADD("tc0510nio", taitof2_io510_intf)
+	MCFG_TC0510NIO_ADD("tc0510nio", taitof2_io510_intf)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( finalb, taito_f2_tc0220ioc )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(finalb_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(finalb_map)
 
 	/* video hardware */
-	MDRV_GFXDECODE(finalb)
-	MDRV_VIDEO_START(taitof2_finalb)
-	MDRV_VIDEO_EOF(taitof2_partial_buffer_delayed)
+	MCFG_GFXDECODE(finalb)
+	MCFG_VIDEO_START(taitof2_finalb)
+	MCFG_VIDEO_EOF(taitof2_partial_buffer_delayed)
 
-	MDRV_TC0100SCN_ADD("tc0100scn", finalb_tc0100scn_intf)
-	MDRV_TC0110PCR_ADD("tc0110pcr", taitof2_tc0110pcr_intf)
+	MCFG_TC0100SCN_ADD("tc0100scn", finalb_tc0100scn_intf)
+	MCFG_TC0110PCR_ADD("tc0110pcr", taitof2_tc0110pcr_intf)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( dondokod, taito_f2_tc0220ioc )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(dondokod_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(dondokod_map)
 
 	/* video hardware */
-	MDRV_GFXDECODE(pivot)
-	MDRV_VIDEO_START(taitof2_dondokod)
-	MDRV_VIDEO_EOF(taitof2_partial_buffer_delayed)
-	MDRV_VIDEO_UPDATE(taitof2_pri_roz)
+	MCFG_GFXDECODE(pivot)
+	MCFG_VIDEO_START(taitof2_dondokod)
+	MCFG_VIDEO_EOF(taitof2_partial_buffer_delayed)
+	MCFG_VIDEO_UPDATE(taitof2_pri_roz)
 
-	MDRV_TC0100SCN_ADD("tc0100scn", dondokod_tc0100scn_intf)
-	MDRV_TC0430GRW_ADD("tc0280grd", taitof2_tc0280grd_intf)
-	MDRV_TC0360PRI_ADD("tc0360pri")
+	MCFG_TC0100SCN_ADD("tc0100scn", dondokod_tc0100scn_intf)
+	MCFG_TC0430GRW_ADD("tc0280grd", taitof2_tc0280grd_intf)
+	MCFG_TC0360PRI_ADD("tc0360pri")
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( megab, taito_f2_tc0220ioc )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(megab_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(megab_map)
 
 	/* video hardware */
-	MDRV_VIDEO_START(taitof2_megab)
-	MDRV_VIDEO_UPDATE(taitof2_pri)
+	MCFG_VIDEO_START(taitof2_megab)
+	MCFG_VIDEO_UPDATE(taitof2_pri)
 
-	MDRV_TC0100SCN_ADD("tc0100scn", liquidk_tc0100scn_intf)
-	MDRV_TC0360PRI_ADD("tc0360pri")
+	MCFG_TC0100SCN_ADD("tc0100scn", liquidk_tc0100scn_intf)
+	MCFG_TC0360PRI_ADD("tc0360pri")
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( thundfox, taito_f2_tc0220ioc )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(thundfox_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(thundfox_map)
 
 	/* video hardware */
-	MDRV_GFXDECODE(thundfox)
-	MDRV_VIDEO_START(taitof2_thundfox)
-	MDRV_VIDEO_EOF(taitof2_partial_buffer_delayed_thundfox)
-	MDRV_VIDEO_UPDATE(taitof2_thundfox)
+	MCFG_GFXDECODE(thundfox)
+	MCFG_VIDEO_START(taitof2_thundfox)
+	MCFG_VIDEO_EOF(taitof2_partial_buffer_delayed_thundfox)
+	MCFG_VIDEO_UPDATE(taitof2_thundfox)
 
-	MDRV_TC0100SCN_ADD("tc0100scn_1", thundfox_tc0100scn_intf_1)
-	MDRV_TC0100SCN_ADD("tc0100scn_2", thundfox_tc0100scn_intf_2)
-	MDRV_TC0360PRI_ADD("tc0360pri")
+	MCFG_TC0100SCN_ADD("tc0100scn_1", thundfox_tc0100scn_intf_1)
+	MCFG_TC0100SCN_ADD("tc0100scn_2", thundfox_tc0100scn_intf_2)
+	MCFG_TC0360PRI_ADD("tc0360pri")
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( cameltry, taito_f2_tc0220ioc )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(cameltry_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(cameltry_map)
 
 	/* video hardware */
-	MDRV_GFXDECODE(pivot)
-	MDRV_VIDEO_START(taitof2_dondokod)
-	MDRV_VIDEO_UPDATE(taitof2_pri_roz)
+	MCFG_GFXDECODE(pivot)
+	MCFG_VIDEO_START(taitof2_dondokod)
+	MCFG_VIDEO_UPDATE(taitof2_pri_roz)
 
-	MDRV_TC0100SCN_ADD("tc0100scn", dondokod_tc0100scn_intf)
-	MDRV_TC0430GRW_ADD("tc0280grd", taitof2_tc0280grd_intf)
-	MDRV_TC0360PRI_ADD("tc0360pri")
+	MCFG_TC0100SCN_ADD("tc0100scn", dondokod_tc0100scn_intf)
+	MCFG_TC0430GRW_ADD("tc0280grd", taitof2_tc0280grd_intf)
+	MCFG_TC0360PRI_ADD("tc0360pri")
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( qtorimon, taito_f2_tc0220ioc )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(qtorimon_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(qtorimon_map)
 
 	/* video hardware */
-	MDRV_GFXDECODE(yuyugogo)
-	MDRV_VIDEO_EOF(taitof2_partial_buffer_delayed)
+	MCFG_GFXDECODE(yuyugogo)
+	MCFG_VIDEO_EOF(taitof2_partial_buffer_delayed)
 
-	MDRV_TC0100SCN_ADD("tc0100scn", taitof2_tc0100scn_intf)
-	MDRV_TC0110PCR_ADD("tc0110pcr", taitof2_tc0110pcr_intf)
+	MCFG_TC0100SCN_ADD("tc0100scn", taitof2_tc0100scn_intf)
+	MCFG_TC0110PCR_ADD("tc0110pcr", taitof2_tc0110pcr_intf)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( liquidk, taito_f2_tc0220ioc )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(liquidk_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(liquidk_map)
 
 	/* video hardware */
-	MDRV_VIDEO_START(taitof2_megab)
-	MDRV_VIDEO_EOF(taitof2_partial_buffer_delayed)
-	MDRV_VIDEO_UPDATE(taitof2_pri)
+	MCFG_VIDEO_START(taitof2_megab)
+	MCFG_VIDEO_EOF(taitof2_partial_buffer_delayed)
+	MCFG_VIDEO_UPDATE(taitof2_pri)
 
-	MDRV_TC0100SCN_ADD("tc0100scn", liquidk_tc0100scn_intf)
-	MDRV_TC0360PRI_ADD("tc0360pri")
+	MCFG_TC0100SCN_ADD("tc0100scn", liquidk_tc0100scn_intf)
+	MCFG_TC0360PRI_ADD("tc0360pri")
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( quizhq, taito_f2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(quizhq_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(quizhq_map)
 
 	/* video hardware */
-	MDRV_GFXDECODE(yuyugogo)
-	MDRV_VIDEO_EOF(taitof2_partial_buffer_delayed)
+	MCFG_GFXDECODE(yuyugogo)
+	MCFG_VIDEO_EOF(taitof2_partial_buffer_delayed)
 
-	MDRV_TC0100SCN_ADD("tc0100scn", taitof2_tc0100scn_intf)
-	MDRV_TC0110PCR_ADD("tc0110pcr", taitof2_tc0110pcr_intf)
+	MCFG_TC0100SCN_ADD("tc0100scn", taitof2_tc0100scn_intf)
+	MCFG_TC0110PCR_ADD("tc0110pcr", taitof2_tc0110pcr_intf)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( ssi, taito_f2_tc0510nio )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(ssi_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(ssi_map)
 
 	/* video hardware */
-	MDRV_VIDEO_START(taitof2_ssi)
-	MDRV_VIDEO_EOF(taitof2_partial_buffer_delayed_thundfox)	// buffer_delayed_thundfox instead of buffer_delayed fixes the butterfly powerup
-	MDRV_VIDEO_UPDATE(taitof2_ssi)
+	MCFG_VIDEO_START(taitof2_ssi)
+	MCFG_VIDEO_EOF(taitof2_partial_buffer_delayed_thundfox)	// buffer_delayed_thundfox instead of buffer_delayed fixes the butterfly powerup
+	MCFG_VIDEO_UPDATE(taitof2_ssi)
 
-	MDRV_TC0100SCN_ADD("tc0100scn", liquidk_tc0100scn_intf)
+	MCFG_TC0100SCN_ADD("tc0100scn", liquidk_tc0100scn_intf)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( gunfront, taito_f2_tc0510nio )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(gunfront_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(gunfront_map)
 
 	/* video hardware */
-	MDRV_VIDEO_START(taitof2_gunfront)
-	MDRV_VIDEO_UPDATE(taitof2_pri)
+	MCFG_VIDEO_START(taitof2_gunfront)
+	MCFG_VIDEO_UPDATE(taitof2_pri)
 
-	MDRV_TC0100SCN_ADD("tc0100scn", liquidk_tc0100scn_intf)
-	MDRV_TC0360PRI_ADD("tc0360pri")
+	MCFG_TC0100SCN_ADD("tc0100scn", liquidk_tc0100scn_intf)
+	MCFG_TC0360PRI_ADD("tc0360pri")
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( growl, taito_f2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(growl_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(growl_map)
 
 	/* video hardware */
-	MDRV_VIDEO_START(taitof2_growl)
-	MDRV_VIDEO_UPDATE(taitof2_pri)
+	MCFG_VIDEO_START(taitof2_growl)
+	MCFG_VIDEO_UPDATE(taitof2_pri)
 
-	MDRV_TC0100SCN_ADD("tc0100scn", liquidk_tc0100scn_intf)
-	MDRV_TC0360PRI_ADD("tc0360pri")
+	MCFG_TC0100SCN_ADD("tc0100scn", liquidk_tc0100scn_intf)
+	MCFG_TC0360PRI_ADD("tc0360pri")
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( mjnquest, taito_f2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mjnquest_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(mjnquest_map)
 
 	/* video hardware */
-	MDRV_VIDEO_START(taitof2_mjnquest)
+	MCFG_VIDEO_START(taitof2_mjnquest)
 
-	MDRV_TC0100SCN_ADD("tc0100scn", taitof2_tc0100scn_intf)
-	MDRV_TC0110PCR_ADD("tc0110pcr", taitof2_tc0110pcr_intf)
+	MCFG_TC0100SCN_ADD("tc0100scn", taitof2_tc0100scn_intf)
+	MCFG_TC0110PCR_ADD("tc0110pcr", taitof2_tc0110pcr_intf)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( footchmp, taito_f2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(footchmp_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(footchmp_map)
 
 	/* video hardware */
-	MDRV_GFXDECODE(deadconx)
-	MDRV_VIDEO_START(taitof2_footchmp)
-	MDRV_VIDEO_EOF(taitof2_full_buffer_delayed)
-	MDRV_VIDEO_UPDATE(taitof2_deadconx)
+	MCFG_GFXDECODE(deadconx)
+	MCFG_VIDEO_START(taitof2_footchmp)
+	MCFG_VIDEO_EOF(taitof2_full_buffer_delayed)
+	MCFG_VIDEO_UPDATE(taitof2_deadconx)
 
-	MDRV_TC0480SCP_ADD("tc0480scp", footchmp_tc0480scp_intf)
-	MDRV_TC0360PRI_ADD("tc0360pri")
+	MCFG_TC0480SCP_ADD("tc0480scp", footchmp_tc0480scp_intf)
+	MCFG_TC0360PRI_ADD("tc0360pri")
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( hthero, taito_f2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(footchmp_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(footchmp_map)
 
 	/* video hardware */
-	MDRV_GFXDECODE(deadconx)
-	MDRV_VIDEO_START(taitof2_hthero)
-	MDRV_VIDEO_EOF(taitof2_full_buffer_delayed)
-	MDRV_VIDEO_UPDATE(taitof2_deadconx)
+	MCFG_GFXDECODE(deadconx)
+	MCFG_VIDEO_START(taitof2_hthero)
+	MCFG_VIDEO_EOF(taitof2_full_buffer_delayed)
+	MCFG_VIDEO_UPDATE(taitof2_deadconx)
 
-	MDRV_TC0360PRI_ADD("tc0360pri")
-	MDRV_TC0480SCP_ADD("tc0480scp", hthero_tc0480scp_intf)
+	MCFG_TC0360PRI_ADD("tc0360pri")
+	MCFG_TC0480SCP_ADD("tc0480scp", hthero_tc0480scp_intf)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( koshien, taito_f2_tc0510nio )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(koshien_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(koshien_map)
 
 	/* video hardware */
-	MDRV_VIDEO_START(taitof2_koshien)
-	MDRV_VIDEO_UPDATE(taitof2_pri)
+	MCFG_VIDEO_START(taitof2_koshien)
+	MCFG_VIDEO_UPDATE(taitof2_pri)
 
-	MDRV_TC0100SCN_ADD("tc0100scn", koshien_tc0100scn_intf)
-	MDRV_TC0360PRI_ADD("tc0360pri")
+	MCFG_TC0100SCN_ADD("tc0100scn", koshien_tc0100scn_intf)
+	MCFG_TC0360PRI_ADD("tc0360pri")
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( yuyugogo, taito_f2_tc0510nio )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(yuyugogo_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(yuyugogo_map)
 
 	/* video hardware */
-	MDRV_GFXDECODE(yuyugogo)
-	MDRV_VIDEO_START(taitof2_yuyugogo)
-	MDRV_VIDEO_UPDATE(taitof2_yesnoj)
+	MCFG_GFXDECODE(yuyugogo)
+	MCFG_VIDEO_START(taitof2_yuyugogo)
+	MCFG_VIDEO_UPDATE(taitof2_yesnoj)
 
-	MDRV_TC0100SCN_ADD("tc0100scn", liquidk_tc0100scn_intf)
+	MCFG_TC0100SCN_ADD("tc0100scn", liquidk_tc0100scn_intf)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( ninjak, taito_f2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(ninjak_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(ninjak_map)
 
 	/* video hardware */
-	MDRV_VIDEO_START(taitof2_ninjak)
-	MDRV_VIDEO_UPDATE(taitof2_pri)
+	MCFG_VIDEO_START(taitof2_ninjak)
+	MCFG_VIDEO_UPDATE(taitof2_pri)
 
-	MDRV_TC0100SCN_ADD("tc0100scn", finalb_tc0100scn_intf)
-	MDRV_TC0360PRI_ADD("tc0360pri")
+	MCFG_TC0100SCN_ADD("tc0100scn", finalb_tc0100scn_intf)
+	MCFG_TC0360PRI_ADD("tc0360pri")
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( solfigtr, taito_f2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(solfigtr_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(solfigtr_map)
 
 	/* video hardware */
-	MDRV_VIDEO_START(taitof2_solfigtr)
-	MDRV_VIDEO_UPDATE(taitof2_pri)
+	MCFG_VIDEO_START(taitof2_solfigtr)
+	MCFG_VIDEO_UPDATE(taitof2_pri)
 
-	MDRV_TC0100SCN_ADD("tc0100scn", solfigtr_tc0100scn_intf)
-	MDRV_TC0360PRI_ADD("tc0360pri")
+	MCFG_TC0100SCN_ADD("tc0100scn", solfigtr_tc0100scn_intf)
+	MCFG_TC0360PRI_ADD("tc0360pri")
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( qzquest, taito_f2_tc0510nio )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(qzquest_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(qzquest_map)
 
 	/* video hardware */
-	MDRV_VIDEO_EOF(taitof2_partial_buffer_delayed)
+	MCFG_VIDEO_EOF(taitof2_partial_buffer_delayed)
 
-	MDRV_TC0100SCN_ADD("tc0100scn", taitof2_tc0100scn_intf)
+	MCFG_TC0100SCN_ADD("tc0100scn", taitof2_tc0100scn_intf)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( pulirula, taito_f2_tc0510nio )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(pulirula_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(pulirula_map)
 
 	/* video hardware */
-	MDRV_GFXDECODE(pivot)
-	MDRV_VIDEO_START(taitof2_pulirula)
-	MDRV_VIDEO_UPDATE(taitof2_pri_roz)
+	MCFG_GFXDECODE(pivot)
+	MCFG_VIDEO_START(taitof2_pulirula)
+	MCFG_VIDEO_UPDATE(taitof2_pri_roz)
 
-	MDRV_TC0100SCN_ADD("tc0100scn", dondokod_tc0100scn_intf)
-	MDRV_TC0430GRW_ADD("tc0430grw", taitof2_tc0430grw_intf)
-	MDRV_TC0360PRI_ADD("tc0360pri")
+	MCFG_TC0100SCN_ADD("tc0100scn", dondokod_tc0100scn_intf)
+	MCFG_TC0430GRW_ADD("tc0430grw", taitof2_tc0430grw_intf)
+	MCFG_TC0360PRI_ADD("tc0360pri")
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( metalb, taito_f2_tc0510nio )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(metalb_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(metalb_map)
 
 	/* video hardware */
-	MDRV_GFXDECODE(deadconx)
-	MDRV_PALETTE_LENGTH(8192)
-	MDRV_VIDEO_START(taitof2_metalb)
-	MDRV_VIDEO_UPDATE(taitof2_metalb)
+	MCFG_GFXDECODE(deadconx)
+	MCFG_PALETTE_LENGTH(8192)
+	MCFG_VIDEO_START(taitof2_metalb)
+	MCFG_VIDEO_UPDATE(taitof2_metalb)
 
-	MDRV_TC0480SCP_ADD("tc0480scp", metalb_tc0480scp_intf)
-	MDRV_TC0360PRI_ADD("tc0360pri")
+	MCFG_TC0480SCP_ADD("tc0480scp", metalb_tc0480scp_intf)
+	MCFG_TC0360PRI_ADD("tc0360pri")
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( qzchikyu, taito_f2_tc0510nio )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(qzchikyu_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(qzchikyu_map)
 
 	/* video hardware */
-	MDRV_VIDEO_START(taitof2_qzchikyu)
-	MDRV_VIDEO_EOF(taitof2_partial_buffer_delayed_qzchikyu)
+	MCFG_VIDEO_START(taitof2_qzchikyu)
+	MCFG_VIDEO_EOF(taitof2_partial_buffer_delayed_qzchikyu)
 
-	MDRV_TC0100SCN_ADD("tc0100scn", qzchikyu_tc0100scn_intf)
+	MCFG_TC0100SCN_ADD("tc0100scn", qzchikyu_tc0100scn_intf)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( yesnoj, taito_f2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(yesnoj_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(yesnoj_map)
 
 	/* video hardware */
-	MDRV_GFXDECODE(yuyugogo)
-	MDRV_VIDEO_START(taitof2_yesnoj)
-	MDRV_VIDEO_UPDATE(taitof2_yesnoj)
+	MCFG_GFXDECODE(yuyugogo)
+	MCFG_VIDEO_START(taitof2_yesnoj)
+	MCFG_VIDEO_UPDATE(taitof2_yesnoj)
 
-	MDRV_TC0100SCN_ADD("tc0100scn", liquidk_tc0100scn_intf)
+	MCFG_TC0100SCN_ADD("tc0100scn", liquidk_tc0100scn_intf)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( deadconx, taito_f2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(deadconx_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(deadconx_map)
 
 	/* video hardware */
-	MDRV_GFXDECODE(deadconx)
-	MDRV_VIDEO_START(taitof2_deadconx)
-	MDRV_VIDEO_UPDATE(taitof2_deadconx)
+	MCFG_GFXDECODE(deadconx)
+	MCFG_VIDEO_START(taitof2_deadconx)
+	MCFG_VIDEO_UPDATE(taitof2_deadconx)
 
-	MDRV_TC0480SCP_ADD("tc0480scp", deadconx_tc0480scp_intf)
-	MDRV_TC0360PRI_ADD("tc0360pri")
+	MCFG_TC0480SCP_ADD("tc0480scp", deadconx_tc0480scp_intf)
+	MCFG_TC0360PRI_ADD("tc0360pri")
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( deadconxj, taito_f2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(deadconx_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(deadconx_map)
 
 	/* video hardware */
-	MDRV_GFXDECODE(deadconx)
-	MDRV_VIDEO_START(taitof2_deadconxj)
-	MDRV_VIDEO_UPDATE(taitof2_deadconx)
+	MCFG_GFXDECODE(deadconx)
+	MCFG_VIDEO_START(taitof2_deadconxj)
+	MCFG_VIDEO_UPDATE(taitof2_deadconx)
 
-	MDRV_TC0480SCP_ADD("tc0480scp", deadconxj_tc0480scp_intf)
-	MDRV_TC0360PRI_ADD("tc0360pri")
+	MCFG_TC0480SCP_ADD("tc0480scp", deadconxj_tc0480scp_intf)
+	MCFG_TC0360PRI_ADD("tc0360pri")
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( dinorex, taito_f2_tc0510nio )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(dinorex_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(dinorex_map)
 
 	/* video hardware */
-	MDRV_VIDEO_START(taitof2_dinorex)
-	MDRV_VIDEO_UPDATE(taitof2_pri)
+	MCFG_VIDEO_START(taitof2_dinorex)
+	MCFG_VIDEO_UPDATE(taitof2_pri)
 
-	MDRV_TC0100SCN_ADD("tc0100scn", liquidk_tc0100scn_intf)
-	MDRV_TC0360PRI_ADD("tc0360pri")
+	MCFG_TC0100SCN_ADD("tc0100scn", liquidk_tc0100scn_intf)
+	MCFG_TC0360PRI_ADD("tc0360pri")
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( qjinsei, taito_f2_tc0510nio )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(qjinsei_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(qjinsei_map)
 
 	/* video hardware */
-	MDRV_VIDEO_START(taitof2_quiz)
-	MDRV_VIDEO_UPDATE(taitof2_pri)
+	MCFG_VIDEO_START(taitof2_quiz)
+	MCFG_VIDEO_UPDATE(taitof2_pri)
 
-	MDRV_TC0100SCN_ADD("tc0100scn", liquidk_tc0100scn_intf)
-	MDRV_TC0360PRI_ADD("tc0360pri")
+	MCFG_TC0100SCN_ADD("tc0100scn", liquidk_tc0100scn_intf)
+	MCFG_TC0360PRI_ADD("tc0360pri")
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( qcrayon, taito_f2_tc0510nio )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(qcrayon_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(qcrayon_map)
 
 	/* video hardware */
-	MDRV_VIDEO_START(taitof2_quiz)
-	MDRV_VIDEO_UPDATE(taitof2_pri)
+	MCFG_VIDEO_START(taitof2_quiz)
+	MCFG_VIDEO_UPDATE(taitof2_pri)
 
-	MDRV_TC0100SCN_ADD("tc0100scn", liquidk_tc0100scn_intf)
-	MDRV_TC0360PRI_ADD("tc0360pri")
+	MCFG_TC0100SCN_ADD("tc0100scn", liquidk_tc0100scn_intf)
+	MCFG_TC0360PRI_ADD("tc0360pri")
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( qcrayon2, taito_f2_tc0510nio )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(qcrayon2_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(qcrayon2_map)
 
 	/* video hardware */
-	MDRV_VIDEO_START(taitof2_quiz)
-	MDRV_VIDEO_UPDATE(taitof2_pri)
+	MCFG_VIDEO_START(taitof2_quiz)
+	MCFG_VIDEO_UPDATE(taitof2_pri)
 
-	MDRV_TC0100SCN_ADD("tc0100scn", liquidk_tc0100scn_intf)
-	MDRV_TC0360PRI_ADD("tc0360pri")
+	MCFG_TC0100SCN_ADD("tc0100scn", liquidk_tc0100scn_intf)
+	MCFG_TC0360PRI_ADD("tc0360pri")
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( driftout, taito_f2_tc0510nio )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(driftout_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(driftout_map)
 
 	/* video hardware */
-	MDRV_GFXDECODE(pivot)
-	MDRV_VIDEO_START(taitof2_driftout)
-	MDRV_VIDEO_UPDATE(taitof2_pri_roz)
+	MCFG_GFXDECODE(pivot)
+	MCFG_VIDEO_START(taitof2_driftout)
+	MCFG_VIDEO_UPDATE(taitof2_pri_roz)
 
-	MDRV_TC0100SCN_ADD("tc0100scn", dondokod_tc0100scn_intf)
-	MDRV_TC0430GRW_ADD("tc0430grw", taitof2_tc0430grw_intf)
-	MDRV_TC0360PRI_ADD("tc0360pri")
+	MCFG_TC0100SCN_ADD("tc0100scn", dondokod_tc0100scn_intf)
+	MCFG_TC0430GRW_ADD("tc0430grw", taitof2_tc0430grw_intf)
+	MCFG_TC0360PRI_ADD("tc0360pri")
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( cameltrya, taitof2_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000,24000000/2)	/* verified on pcb  */
-	MDRV_CPU_PROGRAM_MAP(cameltry_map)
-	MDRV_CPU_VBLANK_INT("screen", taitof2_interrupt)
+	MCFG_CPU_ADD("maincpu", M68000,24000000/2)	/* verified on pcb  */
+	MCFG_CPU_PROGRAM_MAP(cameltry_map)
+	MCFG_CPU_VBLANK_INT("screen", taitof2_interrupt)
 
-	MDRV_CPU_ADD("audiocpu", Z80,24000000/4)	/* verifed on pcb */
-	MDRV_CPU_PROGRAM_MAP(cameltrya_sound_map)
+	MCFG_CPU_ADD("audiocpu", Z80,24000000/4)	/* verifed on pcb */
+	MCFG_CPU_PROGRAM_MAP(cameltrya_sound_map)
 
-	MDRV_MACHINE_START(common)
+	MCFG_MACHINE_START(common)
 
-	MDRV_TC0220IOC_ADD("tc0220ioc", taitof2_io220_intf)
+	MCFG_TC0220IOC_ADD("tc0220ioc", taitof2_io220_intf)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(40*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(40*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(pivot)
-	MDRV_PALETTE_LENGTH(4096)
+	MCFG_GFXDECODE(pivot)
+	MCFG_PALETTE_LENGTH(4096)
 
-	MDRV_VIDEO_START(taitof2_dondokod)
-	MDRV_VIDEO_EOF(taitof2_no_buffer)
-	MDRV_VIDEO_UPDATE(taitof2_pri_roz)
+	MCFG_VIDEO_START(taitof2_dondokod)
+	MCFG_VIDEO_EOF(taitof2_no_buffer)
+	MCFG_VIDEO_UPDATE(taitof2_pri_roz)
 
-	MDRV_TC0100SCN_ADD("tc0100scn", dondokod_tc0100scn_intf)
-	MDRV_TC0430GRW_ADD("tc0280grd", taitof2_tc0280grd_intf)
-	MDRV_TC0360PRI_ADD("tc0360pri")
+	MCFG_TC0100SCN_ADD("tc0100scn", dondokod_tc0100scn_intf)
+	MCFG_TC0430GRW_ADD("tc0280grd", taitof2_tc0280grd_intf)
+	MCFG_TC0360PRI_ADD("tc0360pri")
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, 24000000/8) /* verified on pcb  */
-	MDRV_SOUND_CONFIG(ym2203_config)
-	MDRV_SOUND_ROUTE(0, "mono", 0.20)
-	MDRV_SOUND_ROUTE(1, "mono", 0.20)
-	MDRV_SOUND_ROUTE(2, "mono", 0.20)
-	MDRV_SOUND_ROUTE(3, "mono", 0.60)
+	MCFG_SOUND_ADD("ymsnd", YM2203, 24000000/8) /* verified on pcb  */
+	MCFG_SOUND_CONFIG(ym2203_config)
+	MCFG_SOUND_ROUTE(0, "mono", 0.20)
+	MCFG_SOUND_ROUTE(1, "mono", 0.20)
+	MCFG_SOUND_ROUTE(2, "mono", 0.20)
+	MCFG_SOUND_ROUTE(3, "mono", 0.60)
 
-	MDRV_OKIM6295_ADD("oki", 4224000/4, OKIM6295_PIN7_HIGH) /* verified on pcb */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	MCFG_OKIM6295_ADD("oki", 4224000/4, OKIM6295_PIN7_HIGH) /* verified on pcb */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MDRV_TC0140SYT_ADD("tc0140syt", taitof2_tc0140syt_intf)
+	MCFG_TC0140SYT_ADD("tc0140syt", taitof2_tc0140syt_intf)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( driveout, taitof2_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000,24000000/2)	/* 12 MHz */
-	MDRV_CPU_PROGRAM_MAP(driveout_map)
-	MDRV_CPU_VBLANK_INT("screen", taitof2_interrupt)
+	MCFG_CPU_ADD("maincpu", M68000,24000000/2)	/* 12 MHz */
+	MCFG_CPU_PROGRAM_MAP(driveout_map)
+	MCFG_CPU_VBLANK_INT("screen", taitof2_interrupt)
 
-	MDRV_CPU_ADD("audiocpu", Z80,24000000/6)	/* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(driveout_sound_map)
+	MCFG_CPU_ADD("audiocpu", Z80,24000000/6)	/* 4 MHz */
+	MCFG_CPU_PROGRAM_MAP(driveout_sound_map)
 
-	MDRV_MACHINE_START(common)
+	MCFG_MACHINE_START(common)
 
-	MDRV_TC0510NIO_ADD("tc0510nio", taitof2_io510_intf)
+	MCFG_TC0510NIO_ADD("tc0510nio", taitof2_io510_intf)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(40*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(40*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(pivot)
-	MDRV_PALETTE_LENGTH(4096)
+	MCFG_GFXDECODE(pivot)
+	MCFG_PALETTE_LENGTH(4096)
 
-	MDRV_VIDEO_START(taitof2_driftout)
-	MDRV_VIDEO_EOF(taitof2_no_buffer)
-	MDRV_VIDEO_UPDATE(taitof2_pri_roz)
+	MCFG_VIDEO_START(taitof2_driftout)
+	MCFG_VIDEO_EOF(taitof2_no_buffer)
+	MCFG_VIDEO_UPDATE(taitof2_pri_roz)
 
-	MDRV_TC0100SCN_ADD("tc0100scn", dondokod_tc0100scn_intf)
-	MDRV_TC0430GRW_ADD("tc0430grw", taitof2_tc0430grw_intf)
-	MDRV_TC0360PRI_ADD("tc0360pri")
+	MCFG_TC0100SCN_ADD("tc0100scn", dondokod_tc0100scn_intf)
+	MCFG_TC0430GRW_ADD("tc0430grw", taitof2_tc0430grw_intf)
+	MCFG_TC0360PRI_ADD("tc0360pri")
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")   /* does it ? */
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")   /* does it ? */
 
-	MDRV_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MDRV_TC0140SYT_ADD("tc0140syt", taitof2_tc0140syt_intf)
+	MCFG_TC0140SYT_ADD("tc0140syt", taitof2_tc0140syt_intf)
 MACHINE_CONFIG_END
 
 

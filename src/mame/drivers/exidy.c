@@ -792,19 +792,19 @@ static MACHINE_START( teetert )
 static MACHINE_CONFIG_START( base, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6502, EXIDY_CPU_CLOCK)
-	MDRV_CPU_VBLANK_INT("screen", exidy_vblank_interrupt)
+	MCFG_CPU_ADD("maincpu", M6502, EXIDY_CPU_CLOCK)
+	MCFG_CPU_VBLANK_INT("screen", exidy_vblank_interrupt)
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
-	MDRV_VIDEO_START(exidy)
-	MDRV_VIDEO_UPDATE(exidy)
-	MDRV_GFXDECODE(exidy)
-	MDRV_PALETTE_LENGTH(8)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_ALWAYS_UPDATE)
+	MCFG_VIDEO_START(exidy)
+	MCFG_VIDEO_UPDATE(exidy)
+	MCFG_GFXDECODE(exidy)
+	MCFG_PALETTE_LENGTH(8)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(EXIDY_PIXEL_CLOCK, EXIDY_HTOTAL, EXIDY_HBEND, EXIDY_HBSTART, EXIDY_VTOTAL, EXIDY_VBEND, EXIDY_VBSTART)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_RAW_PARAMS(EXIDY_PIXEL_CLOCK, EXIDY_HTOTAL, EXIDY_HBEND, EXIDY_HBSTART, EXIDY_VTOTAL, EXIDY_VBEND, EXIDY_VBSTART)
 
 MACHINE_CONFIG_END
 
@@ -812,64 +812,64 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( sidetrac, base )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(sidetrac_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(sidetrac_map)
 
 	/* audio hardware */
-	MDRV_FRAGMENT_ADD(spectar_audio)
+	MCFG_FRAGMENT_ADD(spectar_audio)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( targ, base )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(targ_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(targ_map)
 
 	/* audio hardware */
-	MDRV_FRAGMENT_ADD(targ_audio)
+	MCFG_FRAGMENT_ADD(targ_audio)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( spectar, base )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(spectar_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(spectar_map)
 
 	/* audio hardware */
-	MDRV_FRAGMENT_ADD(spectar_audio)
+	MCFG_FRAGMENT_ADD(spectar_audio)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( rallys, spectar )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(rallys_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(rallys_map)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( venture, base )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(venture_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(venture_map)
 
-	MDRV_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(HZ(600))
 
 	/* audio hardware */
-	MDRV_FRAGMENT_ADD(venture_audio)
+	MCFG_FRAGMENT_ADD(venture_audio)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( teetert, venture )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_VBLANK_INT_HACK(teetert_vblank_interrupt,10)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_VBLANK_INT_HACK(teetert_vblank_interrupt,10)
 
-	MDRV_MACHINE_START( teetert )
+	MCFG_MACHINE_START( teetert )
 
 MACHINE_CONFIG_END
 
@@ -878,26 +878,26 @@ static MACHINE_CONFIG_DERIVED( mtrap, venture )
 
 	/* basic machine hardware */
 
-	MDRV_QUANTUM_TIME(HZ(1920))
+	MCFG_QUANTUM_TIME(HZ(1920))
 
 	/* audio hardware */
-	MDRV_FRAGMENT_ADD(mtrap_cvsd_audio)
+	MCFG_FRAGMENT_ADD(mtrap_cvsd_audio)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( pepper2, venture )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(pepper2_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(pepper2_map)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( fax, pepper2 )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(fax_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(fax_map)
 MACHINE_CONFIG_END
 
 

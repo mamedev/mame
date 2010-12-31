@@ -455,46 +455,46 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( sprint8, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6800, 11055000 / 11) /* ? */
-	MDRV_CPU_PROGRAM_MAP(sprint8_map)
+	MCFG_CPU_ADD("maincpu", M6800, 11055000 / 11) /* ? */
+	MCFG_CPU_PROGRAM_MAP(sprint8_map)
 
-	MDRV_MACHINE_RESET(sprint8)
+	MCFG_MACHINE_RESET(sprint8)
 
-	MDRV_TIMER_ADD_PERIODIC("input_timer", input_callback, HZ(60))
+	MCFG_TIMER_ADD_PERIODIC("input_timer", input_callback, HZ(60))
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(512, 261)
-	MDRV_SCREEN_VISIBLE_AREA(0, 495, 0, 231)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(512, 261)
+	MCFG_SCREEN_VISIBLE_AREA(0, 495, 0, 231)
 
-	MDRV_GFXDECODE(sprint8)
-	MDRV_PALETTE_LENGTH(36)
+	MCFG_GFXDECODE(sprint8)
+	MCFG_PALETTE_LENGTH(36)
 
-	MDRV_PALETTE_INIT(sprint8)
-	MDRV_VIDEO_START(sprint8)
-	MDRV_VIDEO_UPDATE(sprint8)
-	MDRV_VIDEO_EOF(sprint8)
+	MCFG_PALETTE_INIT(sprint8)
+	MCFG_VIDEO_START(sprint8)
+	MCFG_VIDEO_UPDATE(sprint8)
+	MCFG_VIDEO_EOF(sprint8)
 
 
 	/* sound hardware */
 	/* the proper way is to hook up 4 speakers, but they are not really
      * F/R/L/R speakers.  Though you can pretend the 1-2 mix is the front. */
-	MDRV_SPEAKER_ADD("speaker_1_2", 0.0, 0.0, 1.0)		/* front */
-	MDRV_SPEAKER_ADD("speaker_3_7", -0.2, 0.0, 1.0)		/* left */
-	MDRV_SPEAKER_ADD("speaker_5_6",  0.0, 0.0, -0.5)	/* back */
-	MDRV_SPEAKER_ADD("speaker_4_8", 0.2, 0.0, 1.0)		/* right */
+	MCFG_SPEAKER_ADD("speaker_1_2", 0.0, 0.0, 1.0)		/* front */
+	MCFG_SPEAKER_ADD("speaker_3_7", -0.2, 0.0, 1.0)		/* left */
+	MCFG_SPEAKER_ADD("speaker_5_6",  0.0, 0.0, -0.5)	/* back */
+	MCFG_SPEAKER_ADD("speaker_4_8", 0.2, 0.0, 1.0)		/* right */
 
-	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG_DISCRETE(sprint8)
-	MDRV_SOUND_ROUTE(0, "speaker_1_2", 1.0)
+	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_SOUND_CONFIG_DISCRETE(sprint8)
+	MCFG_SOUND_ROUTE(0, "speaker_1_2", 1.0)
 	/* volumes on other channels defaulted to off, */
 	/* user can turn them up if needed. */
 	/* The game does not sound good with all channels mixed to stereo. */
-	MDRV_SOUND_ROUTE(1, "speaker_3_7", 0.0)
-	MDRV_SOUND_ROUTE(2, "speaker_5_6", 0.0)
-	MDRV_SOUND_ROUTE(3, "speaker_4_8", 0.0)
+	MCFG_SOUND_ROUTE(1, "speaker_3_7", 0.0)
+	MCFG_SOUND_ROUTE(2, "speaker_5_6", 0.0)
+	MCFG_SOUND_ROUTE(3, "speaker_4_8", 0.0)
 MACHINE_CONFIG_END
 
 

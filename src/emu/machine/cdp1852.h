@@ -36,9 +36,9 @@
 
 DECLARE_LEGACY_DEVICE(CDP1852, cdp1852);
 
-#define MDRV_CDP1852_ADD(_tag, _clock, _config) \
-	MDRV_DEVICE_ADD(_tag, CDP1852, _clock) \
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_CDP1852_ADD(_tag, _clock, _config) \
+	MCFG_DEVICE_ADD(_tag, CDP1852, _clock) \
+	MCFG_DEVICE_CONFIG(_config)
 
 #define CDP1852_INTERFACE(_name) \
 	const cdp1852_interface (_name)=

@@ -17,19 +17,19 @@
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_DS2404_ADD(_tag, _ref_year, _ref_month, _ref_day) \
-	MDRV_DEVICE_ADD(_tag, DS2404, 0) \
-	MDRV_DS2404_REF_YEAR(_ref_year) \
-	MDRV_DS2404_REF_MONTH(_ref_month) \
-	MDRV_DS2404_REF_DAY(_ref_day)
+#define MCFG_DS2404_ADD(_tag, _ref_year, _ref_month, _ref_day) \
+	MCFG_DEVICE_ADD(_tag, DS2404, 0) \
+	MCFG_DS2404_REF_YEAR(_ref_year) \
+	MCFG_DS2404_REF_MONTH(_ref_month) \
+	MCFG_DS2404_REF_DAY(_ref_day)
 
-#define MDRV_DS2404_REF_YEAR(_ref_year) \
+#define MCFG_DS2404_REF_YEAR(_ref_year) \
 	ds2404_device_config::static_set_ref_year(device, _ref_year);
 
-#define MDRV_DS2404_REF_MONTH(_ref_month) \
+#define MCFG_DS2404_REF_MONTH(_ref_month) \
 	ds2404_device_config::static_set_ref_month(device, _ref_month);
 
-#define MDRV_DS2404_REF_DAY(_ref_day) \
+#define MCFG_DS2404_REF_DAY(_ref_day) \
 	ds2404_device_config::static_set_ref_day(device, _ref_day);
 
 

@@ -381,75 +381,75 @@ static MACHINE_RESET( mlc )
 static MACHINE_CONFIG_START( avengrgs, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", SH2,42000000/2) /* 21 MHz clock confirmed on real board */
-	MDRV_CPU_PROGRAM_MAP(decomlc_map)
+	MCFG_CPU_ADD("maincpu", SH2,42000000/2) /* 21 MHz clock confirmed on real board */
+	MCFG_CPU_PROGRAM_MAP(decomlc_map)
 
-	MDRV_MACHINE_RESET(mlc)
-	MDRV_EEPROM_93C46_ADD("eeprom") /* Actually 93c45 */
+	MCFG_MACHINE_RESET(mlc)
+	MCFG_EEPROM_93C46_ADD("eeprom") /* Actually 93c45 */
 
-	MDRV_TIMER_ADD("int_timer", interrupt_gen)
+	MCFG_TIMER_ADD("int_timer", interrupt_gen)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(58)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(40*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(58)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_SIZE(40*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 
-	MDRV_GFXDECODE(deco_mlc)
-	MDRV_PALETTE_LENGTH(2048)
+	MCFG_GFXDECODE(deco_mlc)
+	MCFG_PALETTE_LENGTH(2048)
 
-	MDRV_VIDEO_START(mlc)
-	MDRV_VIDEO_UPDATE(mlc)
-	MDRV_VIDEO_EOF(mlc)
+	MCFG_VIDEO_START(mlc)
+	MCFG_VIDEO_UPDATE(mlc)
+	MCFG_VIDEO_EOF(mlc)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymz", YMZ280B, 42000000 / 3)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("ymz", YMZ280B, 42000000 / 3)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( mlc, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", ARM,42000000/6) /* 42 MHz -> 7MHz clock confirmed on real board */
-	MDRV_CPU_PROGRAM_MAP(decomlc_map)
+	MCFG_CPU_ADD("maincpu", ARM,42000000/6) /* 42 MHz -> 7MHz clock confirmed on real board */
+	MCFG_CPU_PROGRAM_MAP(decomlc_map)
 
-	MDRV_MACHINE_RESET(mlc)
-	MDRV_EEPROM_93C46_ADD("eeprom") /* Actually 93c45 */
+	MCFG_MACHINE_RESET(mlc)
+	MCFG_EEPROM_93C46_ADD("eeprom") /* Actually 93c45 */
 
-	MDRV_TIMER_ADD("int_timer", interrupt_gen)
+	MCFG_TIMER_ADD("int_timer", interrupt_gen)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(58)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(40*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(58)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_SIZE(40*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 
-	MDRV_GFXDECODE(deco_mlc)
-	MDRV_PALETTE_LENGTH(2048)
+	MCFG_GFXDECODE(deco_mlc)
+	MCFG_PALETTE_LENGTH(2048)
 
-	MDRV_VIDEO_START(mlc)
-	MDRV_VIDEO_UPDATE(mlc)
-	MDRV_VIDEO_EOF(mlc)
+	MCFG_VIDEO_START(mlc)
+	MCFG_VIDEO_UPDATE(mlc)
+	MCFG_VIDEO_EOF(mlc)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymz", YMZ280B, 42000000 / 3)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("ymz", YMZ280B, 42000000 / 3)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mlc_6bpp, mlc )
-	MDRV_GFXDECODE(6bpp)
+	MCFG_GFXDECODE(6bpp)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mlc_5bpp, mlc )
-	MDRV_GFXDECODE(5bpp)
+	MCFG_GFXDECODE(5bpp)
 MACHINE_CONFIG_END
 
 /***************************************************************************/

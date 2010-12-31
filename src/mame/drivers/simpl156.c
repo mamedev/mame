@@ -418,68 +418,68 @@ static const deco16ic_interface simpl156_deco16ic_intf =
 static MACHINE_CONFIG_START( chainrec, simpl156_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", ARM, 28000000 /* /4 */)	/*DE156*/ /* 7.000 MHz */ /* measured at 7.. seems to need 28? */
-	MDRV_CPU_PROGRAM_MAP(chainrec_map)
-	MDRV_CPU_VBLANK_INT("screen", simpl156_vbl_interrupt)
+	MCFG_CPU_ADD("maincpu", ARM, 28000000 /* /4 */)	/*DE156*/ /* 7.000 MHz */ /* measured at 7.. seems to need 28? */
+	MCFG_CPU_PROGRAM_MAP(chainrec_map)
+	MCFG_CPU_VBLANK_INT("screen", simpl156_vbl_interrupt)
 
-	MDRV_EEPROM_93C46_ADD("eeprom")  // 93C45
+	MCFG_EEPROM_93C46_ADD("eeprom")  // 93C45
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(58)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(800))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(58)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(800))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 1*8, 31*8-1)
 
-	MDRV_PALETTE_LENGTH(4096)
-	MDRV_GFXDECODE(simpl156)
-	MDRV_VIDEO_START(simpl156)
-	MDRV_VIDEO_UPDATE(simpl156)
+	MCFG_PALETTE_LENGTH(4096)
+	MCFG_GFXDECODE(simpl156)
+	MCFG_VIDEO_START(simpl156)
+	MCFG_VIDEO_UPDATE(simpl156)
 
-	MDRV_DECO16IC_ADD("deco_custom", simpl156_deco16ic_intf)
+	MCFG_DECO16IC_ADD("deco_custom", simpl156_deco16ic_intf)
 
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_OKIM6295_ADD("okisfx", 32220000/32, OKIM6295_PIN7_HIGH)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.6)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.6)
+	MCFG_OKIM6295_ADD("okisfx", 32220000/32, OKIM6295_PIN7_HIGH)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.6)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.6)
 
-	MDRV_OKIM6295_ADD("okimusic", 32220000/16, OKIM6295_PIN7_HIGH)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.2)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.2)
+	MCFG_OKIM6295_ADD("okimusic", 32220000/16, OKIM6295_PIN7_HIGH)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.2)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( magdrop, chainrec )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(magdrop_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(magdrop_map)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( magdropp, chainrec )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(magdropp_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(magdropp_map)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( joemacr, chainrec )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(joemacr_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(joemacr_map)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mitchell156, chainrec )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mitchell156_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(mitchell156_map)
 
-	MDRV_OKIM6295_REPLACE("okimusic", 32220000/32, OKIM6295_PIN7_HIGH)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.2)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.2)
+	MCFG_OKIM6295_REPLACE("okimusic", 32220000/32, OKIM6295_PIN7_HIGH)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.2)
 MACHINE_CONFIG_END
 
 

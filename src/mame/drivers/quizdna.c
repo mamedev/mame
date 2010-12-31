@@ -444,45 +444,45 @@ static const ym2203_interface ym2203_config =
 static MACHINE_CONFIG_START( quizdna, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, MCLK/2) /* 8.000 MHz */
-	MDRV_CPU_PROGRAM_MAP(quizdna_map)
-	MDRV_CPU_IO_MAP(quizdna_io_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("maincpu", Z80, MCLK/2) /* 8.000 MHz */
+	MCFG_CPU_PROGRAM_MAP(quizdna_map)
+	MCFG_CPU_IO_MAP(quizdna_io_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(8*8, 56*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(8*8, 56*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(quizdna)
-	MDRV_PALETTE_LENGTH(2048)
+	MCFG_GFXDECODE(quizdna)
+	MCFG_PALETTE_LENGTH(2048)
 
-	MDRV_VIDEO_START(quizdna)
-	MDRV_VIDEO_UPDATE(quizdna)
+	MCFG_VIDEO_START(quizdna)
+	MCFG_VIDEO_UPDATE(quizdna)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, MCLK/4)
-	MDRV_SOUND_CONFIG(ym2203_config)
-	MDRV_SOUND_ROUTE(0, "mono", 0.10)
-	MDRV_SOUND_ROUTE(1, "mono", 0.10)
-	MDRV_SOUND_ROUTE(2, "mono", 0.10)
-	MDRV_SOUND_ROUTE(3, "mono", 0.40)
+	MCFG_SOUND_ADD("ymsnd", YM2203, MCLK/4)
+	MCFG_SOUND_CONFIG(ym2203_config)
+	MCFG_SOUND_ROUTE(0, "mono", 0.10)
+	MCFG_SOUND_ROUTE(1, "mono", 0.10)
+	MCFG_SOUND_ROUTE(2, "mono", 0.10)
+	MCFG_SOUND_ROUTE(3, "mono", 0.40)
 
-	MDRV_OKIM6295_ADD("oki", (MCLK/1024)*132, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_OKIM6295_ADD("oki", (MCLK/1024)*132, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( gakupara, quizdna )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(gakupara_io_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(gakupara_io_map)
 
 MACHINE_CONFIG_END
 
@@ -490,9 +490,9 @@ static MACHINE_CONFIG_DERIVED( gekiretu, quizdna )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(gekiretu_map)
-	MDRV_CPU_IO_MAP(gekiretu_io_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(gekiretu_map)
+	MCFG_CPU_IO_MAP(gekiretu_io_map)
 
 MACHINE_CONFIG_END
 

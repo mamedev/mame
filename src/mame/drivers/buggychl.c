@@ -396,58 +396,58 @@ static MACHINE_RESET( buggychl )
 static MACHINE_CONFIG_START( buggychl, buggychl_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 4000000) /* 4 MHz??? */
-	MDRV_CPU_PROGRAM_MAP(buggychl_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("maincpu", Z80, 4000000) /* 4 MHz??? */
+	MCFG_CPU_PROGRAM_MAP(buggychl_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audiocpu", Z80, 4000000) /* 4 MHz??? */
-	MDRV_CPU_PROGRAM_MAP(sound_map)
-	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,60)	/* irq is timed, tied to the cpu clock and not to vblank */
+	MCFG_CPU_ADD("audiocpu", Z80, 4000000) /* 4 MHz??? */
+	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,60)	/* irq is timed, tied to the cpu clock and not to vblank */
 							/* nmi is caused by the main cpu */
 
-	MDRV_CPU_ADD("mcu", M68705,8000000/2)  /* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(buggychl_mcu_map)
-	MDRV_DEVICE_ADD("bmcu", BUGGYCHL_MCU, 0)
+	MCFG_CPU_ADD("mcu", M68705,8000000/2)  /* 4 MHz */
+	MCFG_CPU_PROGRAM_MAP(buggychl_mcu_map)
+	MCFG_DEVICE_ADD("bmcu", BUGGYCHL_MCU, 0)
 
-	MDRV_MACHINE_START(buggychl)
-	MDRV_MACHINE_RESET(buggychl)
+	MCFG_MACHINE_START(buggychl)
+	MCFG_MACHINE_RESET(buggychl)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(buggychl)
-	MDRV_PALETTE_LENGTH(128+128)
+	MCFG_GFXDECODE(buggychl)
+	MCFG_PALETTE_LENGTH(128+128)
 
-	MDRV_PALETTE_INIT(buggychl)
-	MDRV_VIDEO_START(buggychl)
-	MDRV_VIDEO_UPDATE(buggychl)
+	MCFG_PALETTE_INIT(buggychl)
+	MCFG_VIDEO_START(buggychl)
+	MCFG_VIDEO_UPDATE(buggychl)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay1", AY8910, 8000000/4)
-	MDRV_SOUND_CONFIG(ay8910_interface_1)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("ay1", AY8910, 8000000/4)
+	MCFG_SOUND_CONFIG(ay8910_interface_1)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD("ay2", AY8910, 8000000/4)
-	MDRV_SOUND_CONFIG(ay8910_interface_2)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("ay2", AY8910, 8000000/4)
+	MCFG_SOUND_CONFIG(ay8910_interface_2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD("msm", MSM5232, 2000000)
-	MDRV_SOUND_CONFIG(msm5232_config)
-	MDRV_SOUND_ROUTE(0, "mono", 1.0)	// pin 28  2'-1
-	MDRV_SOUND_ROUTE(1, "mono", 1.0)	// pin 29  4'-1
-	MDRV_SOUND_ROUTE(2, "mono", 1.0)	// pin 30  8'-1
-	MDRV_SOUND_ROUTE(3, "mono", 1.0)	// pin 31 16'-1
-	MDRV_SOUND_ROUTE(4, "mono", 1.0)	// pin 36  2'-2
-	MDRV_SOUND_ROUTE(5, "mono", 1.0)	// pin 35  4'-2
-	MDRV_SOUND_ROUTE(6, "mono", 1.0)	// pin 34  8'-2
-	MDRV_SOUND_ROUTE(7, "mono", 1.0)	// pin 33 16'-2
+	MCFG_SOUND_ADD("msm", MSM5232, 2000000)
+	MCFG_SOUND_CONFIG(msm5232_config)
+	MCFG_SOUND_ROUTE(0, "mono", 1.0)	// pin 28  2'-1
+	MCFG_SOUND_ROUTE(1, "mono", 1.0)	// pin 29  4'-1
+	MCFG_SOUND_ROUTE(2, "mono", 1.0)	// pin 30  8'-1
+	MCFG_SOUND_ROUTE(3, "mono", 1.0)	// pin 31 16'-1
+	MCFG_SOUND_ROUTE(4, "mono", 1.0)	// pin 36  2'-2
+	MCFG_SOUND_ROUTE(5, "mono", 1.0)	// pin 35  4'-2
+	MCFG_SOUND_ROUTE(6, "mono", 1.0)	// pin 34  8'-2
+	MCFG_SOUND_ROUTE(7, "mono", 1.0)	// pin 33 16'-2
 	// pin 1 SOLO  8'       not mapped
 	// pin 2 SOLO 16'       not mapped
 	// pin 22 Noise Output  not mapped

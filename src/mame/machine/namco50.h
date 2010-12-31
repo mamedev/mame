@@ -4,8 +4,8 @@
 #include "devlegcy.h"
 
 
-#define MDRV_NAMCO_50XX_ADD(_tag, _clock) \
-	MDRV_DEVICE_ADD(_tag, NAMCO_50XX, _clock) \
+#define MCFG_NAMCO_50XX_ADD(_tag, _clock) \
+	MCFG_DEVICE_ADD(_tag, NAMCO_50XX, _clock) \
 
 
 READ8_DEVICE_HANDLER( namco_50xx_read );

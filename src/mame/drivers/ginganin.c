@@ -340,39 +340,39 @@ static MACHINE_RESET( ginganin )
 static MACHINE_CONFIG_START( ginganin, ginganin_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 6000000)	/* ? */
-	MDRV_CPU_PROGRAM_MAP(ginganin_map)
-	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold) /* ? (vectors 1-7 cointain the same address) */
+	MCFG_CPU_ADD("maincpu", M68000, 6000000)	/* ? */
+	MCFG_CPU_PROGRAM_MAP(ginganin_map)
+	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold) /* ? (vectors 1-7 cointain the same address) */
 
-	MDRV_CPU_ADD("audiocpu", M6809, 1000000)
-	MDRV_CPU_PROGRAM_MAP(sound_map)
-	MDRV_CPU_VBLANK_INT_HACK(ginganin_sound_interrupt,60)	/* Takahiro Nogi. 1999/09/27 (1 -> 60) */
+	MCFG_CPU_ADD("audiocpu", M6809, 1000000)
+	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_CPU_VBLANK_INT_HACK(ginganin_sound_interrupt,60)	/* Takahiro Nogi. 1999/09/27 (1 -> 60) */
 
-	MDRV_MACHINE_START(ginganin)
-	MDRV_MACHINE_RESET(ginganin)
+	MCFG_MACHINE_START(ginganin)
+	MCFG_MACHINE_RESET(ginganin)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 255, 0 + 16 , 255 - 16)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 255, 0 + 16 , 255 - 16)
 
-	MDRV_GFXDECODE(ginganin)
-	MDRV_PALETTE_LENGTH(1024)
+	MCFG_GFXDECODE(ginganin)
+	MCFG_PALETTE_LENGTH(1024)
 
-	MDRV_VIDEO_START(ginganin)
-	MDRV_VIDEO_UPDATE(ginganin)
+	MCFG_VIDEO_START(ginganin)
+	MCFG_VIDEO_UPDATE(ginganin)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("aysnd", AY8910, 3579545 / 2)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	MCFG_SOUND_ADD("aysnd", AY8910, 3579545 / 2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MDRV_SOUND_ADD("ymsnd", Y8950, 3579545)	/* The Y8950 is basically a YM3526 with ADPCM built in */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("ymsnd", Y8950, 3579545)	/* The Y8950 is basically a YM3526 with ADPCM built in */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 

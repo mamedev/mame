@@ -17,9 +17,9 @@
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_K033906_ADD(_tag, _config) \
-	MDRV_DEVICE_ADD(_tag, K033906, 0) \
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_K033906_ADD(_tag, _config) \
+	MCFG_DEVICE_ADD(_tag, K033906, 0) \
+	MCFG_DEVICE_CONFIG(_config)
 
 
 /***************************************************************************

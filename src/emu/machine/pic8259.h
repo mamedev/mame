@@ -45,9 +45,9 @@ struct pic8259_interface
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_PIC8259_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, PIC8259, 0) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_PIC8259_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, PIC8259, 0) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
 
 /* device interface */

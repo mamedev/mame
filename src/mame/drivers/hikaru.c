@@ -374,37 +374,37 @@ ADDRESS_MAP_END
 
 static MACHINE_CONFIG_START( hikaru, driver_device )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", SH4, CPU_CLOCK)
-//  MDRV_CPU_CONFIG(sh4cpu_config)
-	MDRV_CPU_PROGRAM_MAP(hikaru_map)
-//  MDRV_CPU_IO_MAP(hikaru_port)
-//  MDRV_CPU_VBLANK_INT("screen", hikaru,vblank)
-	MDRV_CPU_ADD("slave", SH4, CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(hikaru_map_slave)
+	MCFG_CPU_ADD("maincpu", SH4, CPU_CLOCK)
+//  MCFG_CPU_CONFIG(sh4cpu_config)
+	MCFG_CPU_PROGRAM_MAP(hikaru_map)
+//  MCFG_CPU_IO_MAP(hikaru_port)
+//  MCFG_CPU_VBLANK_INT("screen", hikaru,vblank)
+	MCFG_CPU_ADD("slave", SH4, CPU_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(hikaru_map_slave)
 
-//  MDRV_MACHINE_START( hikaru )
-//  MDRV_MACHINE_RESET( hikaru )
+//  MCFG_MACHINE_START( hikaru )
+//  MCFG_MACHINE_RESET( hikaru )
 
-//  MDRV_NVRAM_HANDLER(hikaru_eeproms)
+//  MCFG_NVRAM_HANDLER(hikaru_eeproms)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(640, 480)
-	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_SIZE(640, 480)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 
-	MDRV_PALETTE_LENGTH(0x1000)
+	MCFG_PALETTE_LENGTH(0x1000)
 
-	MDRV_VIDEO_START(hikaru)
-	MDRV_VIDEO_UPDATE(hikaru)
+	MCFG_VIDEO_START(hikaru)
+	MCFG_VIDEO_UPDATE(hikaru)
 
-//  MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-//  MDRV_SOUND_ADD("aica", AICA, 0)
-//  MDRV_SOUND_CONFIG(aica_config)
-//  MDRV_SOUND_ROUTE(0, "lspeaker", 2.0)
-//  MDRV_SOUND_ROUTE(0, "rspeaker", 2.0)
+//  MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+//  MCFG_SOUND_ADD("aica", AICA, 0)
+//  MCFG_SOUND_CONFIG(aica_config)
+//  MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
+//  MCFG_SOUND_ROUTE(0, "rspeaker", 2.0)
 MACHINE_CONFIG_END
 
 

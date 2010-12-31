@@ -290,41 +290,41 @@ static const sega16sp_interface xboard_sega16sp_intf =
 
 
 
-#define MDRV_SEGA16SP_ADD(_tag, _interface) \
-	MDRV_DEVICE_ADD(_tag, SEGA16SP, 0) \
-	MDRV_DEVICE_CONFIG(_interface)
+#define MCFG_SEGA16SP_ADD(_tag, _interface) \
+	MCFG_DEVICE_ADD(_tag, SEGA16SP, 0) \
+	MCFG_DEVICE_CONFIG(_interface)
 
-#define MDRV_SEGA16SP_ADD_HANGON(_tag) \
-	MDRV_DEVICE_ADD(_tag, SEGA16SP, 0) \
-	MDRV_DEVICE_CONFIG(hangon_sega16sp_intf)
+#define MCFG_SEGA16SP_ADD_HANGON(_tag) \
+	MCFG_DEVICE_ADD(_tag, SEGA16SP, 0) \
+	MCFG_DEVICE_CONFIG(hangon_sega16sp_intf)
 
-#define MDRV_SEGA16SP_ADD_SHARRIER(_tag) \
-	MDRV_DEVICE_ADD(_tag, SEGA16SP, 0) \
-	MDRV_DEVICE_CONFIG(sharrier_sega16sp_intf)
+#define MCFG_SEGA16SP_ADD_SHARRIER(_tag) \
+	MCFG_DEVICE_ADD(_tag, SEGA16SP, 0) \
+	MCFG_DEVICE_CONFIG(sharrier_sega16sp_intf)
 
-#define MDRV_SEGA16SP_ADD_YBOARD(_tag) \
-	MDRV_DEVICE_ADD(_tag, SEGA16SP, 0) \
-	MDRV_DEVICE_CONFIG(yboard_sega16sp_intf)
+#define MCFG_SEGA16SP_ADD_YBOARD(_tag) \
+	MCFG_DEVICE_ADD(_tag, SEGA16SP, 0) \
+	MCFG_DEVICE_CONFIG(yboard_sega16sp_intf)
 
-#define MDRV_SEGA16SP_ADD_YBOARD_16B(_tag) \
-	MDRV_DEVICE_ADD(_tag, SEGA16SP, 0) \
-	MDRV_DEVICE_CONFIG(yboard_16b_sega16sp_intf)
+#define MCFG_SEGA16SP_ADD_YBOARD_16B(_tag) \
+	MCFG_DEVICE_ADD(_tag, SEGA16SP, 0) \
+	MCFG_DEVICE_CONFIG(yboard_16b_sega16sp_intf)
 
-#define MDRV_SEGA16SP_ADD_16A(_tag) \
-	MDRV_DEVICE_ADD(_tag, SEGA16SP, 0) \
-	MDRV_DEVICE_CONFIG(s16a_sega16sp_intf)
+#define MCFG_SEGA16SP_ADD_16A(_tag) \
+	MCFG_DEVICE_ADD(_tag, SEGA16SP, 0) \
+	MCFG_DEVICE_CONFIG(s16a_sega16sp_intf)
 
-#define MDRV_SEGA16SP_ADD_16B(_tag) \
-	MDRV_DEVICE_ADD(_tag, SEGA16SP, 0) \
-	MDRV_DEVICE_CONFIG(s16b_sega16sp_intf)
+#define MCFG_SEGA16SP_ADD_16B(_tag) \
+	MCFG_DEVICE_ADD(_tag, SEGA16SP, 0) \
+	MCFG_DEVICE_CONFIG(s16b_sega16sp_intf)
 
-#define MDRV_SEGA16SP_ADD_OUTRUN(_tag) \
-	MDRV_DEVICE_ADD(_tag, SEGA16SP, 0) \
-	MDRV_DEVICE_CONFIG(outrun_sega16sp_intf)
+#define MCFG_SEGA16SP_ADD_OUTRUN(_tag) \
+	MCFG_DEVICE_ADD(_tag, SEGA16SP, 0) \
+	MCFG_DEVICE_CONFIG(outrun_sega16sp_intf)
 
-#define MDRV_SEGA16SP_ADD_XBOARD(_tag) \
-	MDRV_DEVICE_ADD(_tag, SEGA16SP, 0) \
-	MDRV_DEVICE_CONFIG(xboard_sega16sp_intf)
+#define MCFG_SEGA16SP_ADD_XBOARD(_tag) \
+	MCFG_DEVICE_ADD(_tag, SEGA16SP, 0) \
+	MCFG_DEVICE_CONFIG(xboard_sega16sp_intf)
 
 
 extern struct palette_info segaic16_palette;

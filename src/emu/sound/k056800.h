@@ -30,9 +30,9 @@ DECLARE_LEGACY_DEVICE(K056800, k056800);
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_K056800_ADD(_tag, _interface) \
-	MDRV_DEVICE_ADD(_tag, K056800, 0) \
-	MDRV_DEVICE_CONFIG(_interface)
+#define MCFG_K056800_ADD(_tag, _interface) \
+	MCFG_DEVICE_ADD(_tag, K056800, 0) \
+	MCFG_DEVICE_CONFIG(_interface)
 
 
 /***************************************************************************

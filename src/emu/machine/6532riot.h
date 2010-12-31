@@ -17,9 +17,9 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MDRV_RIOT6532_ADD(_tag, _clock, _intrf) \
-    MDRV_DEVICE_ADD(_tag, RIOT6532, _clock) \
-    MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_RIOT6532_ADD(_tag, _clock, _intrf) \
+    MCFG_DEVICE_ADD(_tag, RIOT6532, _clock) \
+    MCFG_DEVICE_CONFIG(_intrf)
 
 
 

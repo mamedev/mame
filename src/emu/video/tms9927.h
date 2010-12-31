@@ -19,14 +19,14 @@ DECLARE_LEGACY_DEVICE(CRT5037, crt5037);
 DECLARE_LEGACY_DEVICE(CRT5057, crt5057);
 
 
-#define MDRV_TMS9927_ADD(_tag, _clock, _config) \
-	MDRV_DEVICE_ADD(_tag, TMS9927, _clock) \
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_TMS9927_ADD(_tag, _clock, _config) \
+	MCFG_DEVICE_ADD(_tag, TMS9927, _clock) \
+	MCFG_DEVICE_CONFIG(_config)
 
-#define MDRV_TMS9927_RECONFIG(_tag, _clock, _config) \
-	MDRV_DEVICE_MODIFY(_tag) \
-	MDRV_DEVICE_CLOCK(_clock) \
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_TMS9927_RECONFIG(_tag, _clock, _config) \
+	MCFG_DEVICE_MODIFY(_tag) \
+	MCFG_DEVICE_CLOCK(_clock) \
+	MCFG_DEVICE_CONFIG(_config)
 
 
 

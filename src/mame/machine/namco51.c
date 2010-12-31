@@ -358,9 +358,9 @@ ADDRESS_MAP_END
 
 
 static MACHINE_CONFIG_FRAGMENT( namco_51xx )
-	MDRV_CPU_ADD("mcu", MB8843, DERIVED_CLOCK(1,1))		/* parent clock, internally divided by 6 */
-	MDRV_CPU_IO_MAP(namco_51xx_map_io)
-	MDRV_DEVICE_DISABLE()
+	MCFG_CPU_ADD("mcu", MB8843, DERIVED_CLOCK(1,1))		/* parent clock, internally divided by 6 */
+	MCFG_CPU_IO_MAP(namco_51xx_map_io)
+	MCFG_DEVICE_DISABLE()
 MACHINE_CONFIG_END
 
 

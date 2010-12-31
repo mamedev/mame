@@ -639,41 +639,41 @@ static MACHINE_RESET( jollyjgr )
 static MACHINE_CONFIG_START( jollyjgr, jollyjgr_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 3579545)		 /* 3,579545 MHz */
-	MDRV_CPU_PROGRAM_MAP(jollyjgr_map)
-	MDRV_CPU_VBLANK_INT("screen", jollyjgr_interrupt)
+	MCFG_CPU_ADD("maincpu", Z80, 3579545)		 /* 3,579545 MHz */
+	MCFG_CPU_PROGRAM_MAP(jollyjgr_map)
+	MCFG_CPU_VBLANK_INT("screen", jollyjgr_interrupt)
 
-	MDRV_MACHINE_START(jollyjgr)
-	MDRV_MACHINE_RESET(jollyjgr)
+	MCFG_MACHINE_START(jollyjgr)
+	MCFG_MACHINE_RESET(jollyjgr)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(jollyjgr)
-	MDRV_PALETTE_LENGTH(32+8) /* 32 for tilemap and sprites + 8 for the bitmap */
+	MCFG_GFXDECODE(jollyjgr)
+	MCFG_PALETTE_LENGTH(32+8) /* 32 for tilemap and sprites + 8 for the bitmap */
 
-	MDRV_PALETTE_INIT(jollyjgr)
-	MDRV_VIDEO_START(jollyjgr)
-	MDRV_VIDEO_UPDATE(jollyjgr)
+	MCFG_PALETTE_INIT(jollyjgr)
+	MCFG_VIDEO_START(jollyjgr)
+	MCFG_VIDEO_UPDATE(jollyjgr)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("aysnd", AY8910, 3579545)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
+	MCFG_SOUND_ADD("aysnd", AY8910, 3579545)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.45)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( fspider, jollyjgr )
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(fspider_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(fspider_map)
 
-	MDRV_VIDEO_UPDATE(fspider)
+	MCFG_VIDEO_UPDATE(fspider)
 
 MACHINE_CONFIG_END
 

@@ -130,36 +130,36 @@ READ8_DEVICE_HANDLER( ppu2c0x_r );
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_PPU2C02_ADD(_tag, _intrf)   \
-	MDRV_DEVICE_ADD(_tag, PPU_2C02, 0) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_PPU2C02_ADD(_tag, _intrf)   \
+	MCFG_DEVICE_ADD(_tag, PPU_2C02, 0) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
-#define MDRV_PPU2C03B_ADD(_tag, _intrf)   \
-	MDRV_DEVICE_ADD(_tag, PPU_2C03B, 0) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_PPU2C03B_ADD(_tag, _intrf)   \
+	MCFG_DEVICE_ADD(_tag, PPU_2C03B, 0) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
-#define MDRV_PPU2C04_ADD(_tag, _intrf)   \
-	MDRV_DEVICE_ADD(_tag, PPU_2C04, 0) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_PPU2C04_ADD(_tag, _intrf)   \
+	MCFG_DEVICE_ADD(_tag, PPU_2C04, 0) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
-#define MDRV_PPU2C05_01_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, PPU_2C05_01, 0) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_PPU2C05_01_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, PPU_2C05_01, 0) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
-#define MDRV_PPU2C05_02_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, PPU_2C05_02, 0) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_PPU2C05_02_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, PPU_2C05_02, 0) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
-#define MDRV_PPU2C05_03_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, PPU_2C05_03, 0) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_PPU2C05_03_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, PPU_2C05_03, 0) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
-#define MDRV_PPU2C05_04_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, PPU_2C05_04, 0) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_PPU2C05_04_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, PPU_2C05_04, 0) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
-#define MDRV_PPU2C07_ADD(_tag, _intrf)   \
-	MDRV_DEVICE_ADD(_tag, PPU_2C07, 0) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_PPU2C07_ADD(_tag, _intrf)   \
+	MCFG_DEVICE_ADD(_tag, PPU_2C07, 0) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
 #endif /* __PPU_2C0X_H__ */

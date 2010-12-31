@@ -895,119 +895,119 @@ static const msm5205_interface msm5205_config =
 static MACHINE_CONFIG_START( tubep, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",Z80,16000000 / 4)	/* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(tubep_main_map)
-	MDRV_CPU_IO_MAP(tubep_main_portmap)
+	MCFG_CPU_ADD("maincpu",Z80,16000000 / 4)	/* 4 MHz */
+	MCFG_CPU_PROGRAM_MAP(tubep_main_map)
+	MCFG_CPU_IO_MAP(tubep_main_portmap)
 
-	MDRV_CPU_ADD("slave",Z80,16000000 / 4)	/* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(tubep_second_map)
-	MDRV_CPU_IO_MAP(tubep_second_portmap)
+	MCFG_CPU_ADD("slave",Z80,16000000 / 4)	/* 4 MHz */
+	MCFG_CPU_PROGRAM_MAP(tubep_second_map)
+	MCFG_CPU_IO_MAP(tubep_second_portmap)
 
-	MDRV_CPU_ADD("soundcpu",Z80,19968000 / 8)	/* X2 19968000 Hz divided by LS669 (on Qc output) (signal RH0) */
-	MDRV_CPU_PROGRAM_MAP(tubep_sound_map)
-	MDRV_CPU_IO_MAP(tubep_sound_portmap)
+	MCFG_CPU_ADD("soundcpu",Z80,19968000 / 8)	/* X2 19968000 Hz divided by LS669 (on Qc output) (signal RH0) */
+	MCFG_CPU_PROGRAM_MAP(tubep_sound_map)
+	MCFG_CPU_IO_MAP(tubep_sound_portmap)
 
-	MDRV_CPU_ADD("mcu",NSC8105,6000000)	/* 6 MHz Xtal - divided internally ??? */
-	MDRV_CPU_PROGRAM_MAP(nsc_map)
+	MCFG_CPU_ADD("mcu",NSC8105,6000000)	/* 6 MHz Xtal - divided internally ??? */
+	MCFG_CPU_PROGRAM_MAP(nsc_map)
 
-	MDRV_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(HZ(6000))
 
-	MDRV_MACHINE_START(tubep)
-	MDRV_MACHINE_RESET(tubep)
+	MCFG_MACHINE_START(tubep)
+	MCFG_MACHINE_RESET(tubep)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 264)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 264)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_PALETTE_LENGTH(32 + 256*64)
+	MCFG_PALETTE_LENGTH(32 + 256*64)
 
-	MDRV_PALETTE_INIT(tubep)
-	MDRV_VIDEO_START(tubep)
-	MDRV_VIDEO_RESET(tubep)
-	MDRV_VIDEO_UPDATE(tubep)
+	MCFG_PALETTE_INIT(tubep)
+	MCFG_VIDEO_START(tubep)
+	MCFG_VIDEO_RESET(tubep)
+	MCFG_VIDEO_UPDATE(tubep)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay1", AY8910, 19968000 / 8 / 2)
-	MDRV_SOUND_CONFIG(ay8910_interface_1)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	MCFG_SOUND_ADD("ay1", AY8910, 19968000 / 8 / 2)
+	MCFG_SOUND_CONFIG(ay8910_interface_1)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MDRV_SOUND_ADD("ay2", AY8910, 19968000 / 8 / 2)
-	MDRV_SOUND_CONFIG(ay8910_interface_2)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	MCFG_SOUND_ADD("ay2", AY8910, 19968000 / 8 / 2)
+	MCFG_SOUND_CONFIG(ay8910_interface_2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MDRV_SOUND_ADD("ay3", AY8910, 19968000 / 8 / 2)
-	MDRV_SOUND_CONFIG(ay8910_interface_3)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	MCFG_SOUND_ADD("ay3", AY8910, 19968000 / 8 / 2)
+	MCFG_SOUND_CONFIG(ay8910_interface_3)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( tubepb, tubep )
 
-	MDRV_CPU_REPLACE("mcu", M6802,6000000) /* ? MHz Xtal */
-	MDRV_CPU_PROGRAM_MAP(nsc_map)
-	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_REPLACE("mcu", M6802,6000000) /* ? MHz Xtal */
+	MCFG_CPU_PROGRAM_MAP(nsc_map)
+	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( rjammer, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",Z80,16000000 / 4)	/* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(rjammer_main_map)
-	MDRV_CPU_IO_MAP(rjammer_main_portmap)
+	MCFG_CPU_ADD("maincpu",Z80,16000000 / 4)	/* 4 MHz */
+	MCFG_CPU_PROGRAM_MAP(rjammer_main_map)
+	MCFG_CPU_IO_MAP(rjammer_main_portmap)
 
-	MDRV_CPU_ADD("slave",Z80,16000000 / 4)	/* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(rjammer_second_map)
-	MDRV_CPU_IO_MAP(rjammer_second_portmap)
+	MCFG_CPU_ADD("slave",Z80,16000000 / 4)	/* 4 MHz */
+	MCFG_CPU_PROGRAM_MAP(rjammer_second_map)
+	MCFG_CPU_IO_MAP(rjammer_second_portmap)
 
-	MDRV_CPU_ADD("soundcpu",Z80,19968000 / 8)	/* X2 19968000 Hz divided by LS669 (on Qc output) (signal RH0) */
-	MDRV_CPU_PROGRAM_MAP(rjammer_sound_map)
-	MDRV_CPU_IO_MAP(rjammer_sound_portmap)
+	MCFG_CPU_ADD("soundcpu",Z80,19968000 / 8)	/* X2 19968000 Hz divided by LS669 (on Qc output) (signal RH0) */
+	MCFG_CPU_PROGRAM_MAP(rjammer_sound_map)
+	MCFG_CPU_IO_MAP(rjammer_sound_portmap)
 
-	MDRV_CPU_ADD("mcu",NSC8105,6000000)	/* 6 MHz Xtal - divided internally ??? */
-	MDRV_CPU_PROGRAM_MAP(nsc_map)
+	MCFG_CPU_ADD("mcu",NSC8105,6000000)	/* 6 MHz Xtal - divided internally ??? */
+	MCFG_CPU_PROGRAM_MAP(nsc_map)
 
-	MDRV_MACHINE_START(rjammer)
-	MDRV_MACHINE_RESET(rjammer)
+	MCFG_MACHINE_START(rjammer)
+	MCFG_MACHINE_RESET(rjammer)
 
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 264)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 264)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_PALETTE_LENGTH(64)
+	MCFG_PALETTE_LENGTH(64)
 
-	MDRV_PALETTE_INIT(rjammer)
-	MDRV_VIDEO_START(tubep)
-	MDRV_VIDEO_RESET(tubep)
-	MDRV_VIDEO_UPDATE(rjammer)
+	MCFG_PALETTE_INIT(rjammer)
+	MCFG_VIDEO_START(tubep)
+	MCFG_VIDEO_RESET(tubep)
+	MCFG_VIDEO_UPDATE(rjammer)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay1", AY8910, 19968000 / 8 / 2)
-	MDRV_SOUND_CONFIG(ay8910_interface_1)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	MCFG_SOUND_ADD("ay1", AY8910, 19968000 / 8 / 2)
+	MCFG_SOUND_CONFIG(ay8910_interface_1)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MDRV_SOUND_ADD("ay2", AY8910, 19968000 / 8 / 2)
-	MDRV_SOUND_CONFIG(ay8910_interface_2)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	MCFG_SOUND_ADD("ay2", AY8910, 19968000 / 8 / 2)
+	MCFG_SOUND_CONFIG(ay8910_interface_2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MDRV_SOUND_ADD("ay3", AY8910, 19968000 / 8 / 2)
-	MDRV_SOUND_CONFIG(ay8910_interface_3)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
+	MCFG_SOUND_ADD("ay3", AY8910, 19968000 / 8 / 2)
+	MCFG_SOUND_CONFIG(ay8910_interface_3)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.10)
 
-	MDRV_SOUND_ADD("msm", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("msm", MSM5205, 384000)
+	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 

@@ -986,19 +986,19 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( exidy440, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6809, MAIN_CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(exidy440_map)
-	MDRV_CPU_VBLANK_INT("screen", exidy440_vblank_interrupt)
+	MCFG_CPU_ADD("maincpu", M6809, MAIN_CPU_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(exidy440_map)
+	MCFG_CPU_VBLANK_INT("screen", exidy440_vblank_interrupt)
 
-	MDRV_MACHINE_START(exidy440)
-	MDRV_MACHINE_RESET(exidy440)
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_MACHINE_START(exidy440)
+	MCFG_MACHINE_RESET(exidy440)
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MDRV_FRAGMENT_ADD(exidy440_video)
+	MCFG_FRAGMENT_ADD(exidy440_video)
 
 	/* audio hardware */
-	MDRV_FRAGMENT_ADD(exidy440_audio)
+	MCFG_FRAGMENT_ADD(exidy440_audio)
 MACHINE_CONFIG_END
 
 
@@ -1007,7 +1007,7 @@ static MACHINE_CONFIG_DERIVED( topsecex, exidy440 )
 	/* basic machine hardware */
 
 	/* video hardware */
-	MDRV_FRAGMENT_ADD(topsecex_video)
+	MCFG_FRAGMENT_ADD(topsecex_video)
 MACHINE_CONFIG_END
 
 

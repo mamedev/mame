@@ -34,9 +34,9 @@
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_ACIA6850_ADD(_tag, _config) \
-	MDRV_DEVICE_ADD(_tag, ACIA6850, 0) \
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_ACIA6850_ADD(_tag, _config) \
+	MCFG_DEVICE_ADD(_tag, ACIA6850, 0) \
+	MCFG_DEVICE_CONFIG(_config)
 
 #define ACIA6850_INTERFACE(_name) \
 	const acia6850_interface(_name) =

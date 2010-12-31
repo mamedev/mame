@@ -11,8 +11,8 @@
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_MATHBOX_ADD(_tag) \
-	MDRV_DEVICE_ADD(_tag, MATHBOX, 0)
+#define MCFG_MATHBOX_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, MATHBOX, 0)
 
 
 

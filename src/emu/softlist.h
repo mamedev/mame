@@ -97,26 +97,26 @@ struct _software_list_config
 #define SOFTWARE_LIST_ORIGINAL_SYSTEM		0
 #define SOFTWARE_LIST_COMPATIBLE_SYSTEM		1
 
-#define MDRV_SOFTWARE_LIST_CONFIG(_idx,_list,_list_type)								\
-	MDRV_DEVICE_CONFIG_DATAPTR_ARRAY(software_list_config, list_name, _idx, _list)	\
-	MDRV_DEVICE_CONFIG_DATA32(software_list_config, list_type, _list_type)
+#define MCFG_SOFTWARE_LIST_CONFIG(_idx,_list,_list_type)								\
+	MCFG_DEVICE_CONFIG_DATAPTR_ARRAY(software_list_config, list_name, _idx, _list)	\
+	MCFG_DEVICE_CONFIG_DATA32(software_list_config, list_type, _list_type)
 
-#define MDRV_SOFTWARE_LIST_ADD( _tag, _list )										\
-	MDRV_DEVICE_ADD( _tag, SOFTWARE_LIST, 0 )				\
-	MDRV_SOFTWARE_LIST_CONFIG(0,_list, SOFTWARE_LIST_ORIGINAL_SYSTEM)
-
-
-#define MDRV_SOFTWARE_LIST_COMPATIBLE_ADD( _tag, _list )										\
-	MDRV_DEVICE_ADD( _tag, SOFTWARE_LIST, 0 )				\
-	MDRV_SOFTWARE_LIST_CONFIG(0,_list, SOFTWARE_LIST_COMPATIBLE_SYSTEM)
+#define MCFG_SOFTWARE_LIST_ADD( _tag, _list )										\
+	MCFG_DEVICE_ADD( _tag, SOFTWARE_LIST, 0 )				\
+	MCFG_SOFTWARE_LIST_CONFIG(0,_list, SOFTWARE_LIST_ORIGINAL_SYSTEM)
 
 
-#define MDRV_SOFTWARE_LIST_MODIFY( _tag, _list )									\
-	MDRV_DEVICE_MODIFY( _tag )								\
-	MDRV_SOFTWARE_LIST_CONFIG(0,_list, SOFTWARE_LIST_ORIGINAL_SYSTEM)
+#define MCFG_SOFTWARE_LIST_COMPATIBLE_ADD( _tag, _list )										\
+	MCFG_DEVICE_ADD( _tag, SOFTWARE_LIST, 0 )				\
+	MCFG_SOFTWARE_LIST_CONFIG(0,_list, SOFTWARE_LIST_COMPATIBLE_SYSTEM)
 
-#define MDRV_SOFTWARE_LIST_COMPATIBLE_MODIFY( _tag, _list )									\
-	MDRV_DEVICE_MODIFY( _tag )								\
-	MDRV_SOFTWARE_LIST_CONFIG(0,_list, SOFTWARE_LIST_COMPATIBLE_SYSTEM)
+
+#define MCFG_SOFTWARE_LIST_MODIFY( _tag, _list )									\
+	MCFG_DEVICE_MODIFY( _tag )								\
+	MCFG_SOFTWARE_LIST_CONFIG(0,_list, SOFTWARE_LIST_ORIGINAL_SYSTEM)
+
+#define MCFG_SOFTWARE_LIST_COMPATIBLE_MODIFY( _tag, _list )									\
+	MCFG_DEVICE_MODIFY( _tag )								\
+	MCFG_SOFTWARE_LIST_CONFIG(0,_list, SOFTWARE_LIST_COMPATIBLE_SYSTEM)
 
 #endif

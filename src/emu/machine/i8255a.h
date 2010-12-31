@@ -41,9 +41,9 @@
 
 DECLARE_LEGACY_DEVICE(I8255A, i8255a);
 
-#define MDRV_I8255A_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, I8255A, 0) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_I8255A_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, I8255A, 0) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
 #define I8255A_INTERFACE(name) \
 	const i8255a_interface (name)=

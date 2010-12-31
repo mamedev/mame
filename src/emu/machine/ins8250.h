@@ -56,19 +56,19 @@ typedef struct
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_INS8250_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, INS8250, 0) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_INS8250_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, INS8250, 0) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
 
-#define MDRV_NS16450_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, NS16450, 0) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_NS16450_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, NS16450, 0) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
 
-#define MDRV_NS16550_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, NS16550, 0) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_NS16550_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, NS16550, 0) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
 
 /***************************************************************************

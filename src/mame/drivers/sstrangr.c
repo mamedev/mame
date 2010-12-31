@@ -194,19 +194,19 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( sstrangr, sstrangr_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",I8080,1996800)	/* clock is a guess, taken from mw8080bw */
-	MDRV_CPU_PROGRAM_MAP(sstrangr_map)
-	MDRV_CPU_IO_MAP(sstrangr_io_map)
-	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
+	MCFG_CPU_ADD("maincpu",I8080,1996800)	/* clock is a guess, taken from mw8080bw */
+	MCFG_CPU_PROGRAM_MAP(sstrangr_map)
+	MCFG_CPU_IO_MAP(sstrangr_io_map)
+	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,2)
 
 	/* video hardware */
-	MDRV_VIDEO_UPDATE(sstrangr)
+	MCFG_VIDEO_UPDATE(sstrangr)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(32*8, 262)		/* vert size is a guess, taken from mw8080bw */
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 32*8-1)
-	MDRV_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_SIZE(32*8, 262)		/* vert size is a guess, taken from mw8080bw */
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 32*8-1)
+	MCFG_SCREEN_REFRESH_RATE(60)
 
 	/* sound hardware */
 
@@ -268,7 +268,7 @@ static MACHINE_CONFIG_DERIVED( sstrngr2, sstrangr )
 	/* basic machine hardware */
 
 	/* video hardware */
-	MDRV_VIDEO_UPDATE(sstrngr2)
+	MCFG_VIDEO_UPDATE(sstrngr2)
 
 MACHINE_CONFIG_END
 

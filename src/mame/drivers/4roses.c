@@ -372,36 +372,36 @@ static const mc6845_interface mc6845_intf =
 
 static MACHINE_CONFIG_START( 4roses, driver_device )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M65C02, MASTER_CLOCK/8)	/* 2MHz, guess */
-	MDRV_CPU_PROGRAM_MAP(4roses_map)
-	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_ADD("maincpu", M65C02, MASTER_CLOCK/8)	/* 2MHz, guess */
+	MCFG_CPU_PROGRAM_MAP(4roses_map)
+	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-//  MDRV_NVRAM_ADD_0FILL("nvram")
+//  MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE((124+1)*4, (30+1)*8)				/* guess. taken from funworld games */
-	MDRV_SCREEN_VISIBLE_AREA(0*4, 96*4-1, 0*8, 29*8-1)	/* guess. taken from funworld games */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE((124+1)*4, (30+1)*8)				/* guess. taken from funworld games */
+	MCFG_SCREEN_VISIBLE_AREA(0*4, 96*4-1, 0*8, 29*8-1)	/* guess. taken from funworld games */
 
-	MDRV_GFXDECODE(4roses)
+	MCFG_GFXDECODE(4roses)
 
-	MDRV_PALETTE_LENGTH(0x1000)
-	MDRV_PALETTE_INIT(funworld)
-	MDRV_VIDEO_START(funworld)
-	MDRV_VIDEO_UPDATE(funworld)
+	MCFG_PALETTE_LENGTH(0x1000)
+	MCFG_PALETTE_INIT(funworld)
+	MCFG_VIDEO_START(funworld)
+	MCFG_VIDEO_UPDATE(funworld)
 
-	MDRV_MC6845_ADD("crtc", MC6845, MASTER_CLOCK/8, mc6845_intf) /* 2MHz, guess */
+	MCFG_MC6845_ADD("crtc", MC6845, MASTER_CLOCK/8, mc6845_intf) /* 2MHz, guess */
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay8910", AY8910, MASTER_CLOCK/8)	/* 2MHz, guess */
-	MDRV_SOUND_CONFIG(ay8910_intf)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.5)
+	MCFG_SOUND_ADD("ay8910", AY8910, MASTER_CLOCK/8)	/* 2MHz, guess */
+	MCFG_SOUND_CONFIG(ay8910_intf)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.5)
 MACHINE_CONFIG_END
 
 

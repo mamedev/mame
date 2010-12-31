@@ -2474,84 +2474,84 @@ static const mips3_config r5000_config =
 static MACHINE_CONFIG_START( seattle_common, seattle_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", R5000LE, SYSTEM_CLOCK*3)
-	MDRV_CPU_CONFIG(r5000_config)
-	MDRV_CPU_PROGRAM_MAP(seattle_map)
+	MCFG_CPU_ADD("maincpu", R5000LE, SYSTEM_CLOCK*3)
+	MCFG_CPU_CONFIG(r5000_config)
+	MCFG_CPU_PROGRAM_MAP(seattle_map)
 
-	MDRV_MACHINE_START(seattle)
-	MDRV_MACHINE_RESET(seattle)
-	MDRV_NVRAM_ADD_1FILL("nvram")
+	MCFG_MACHINE_START(seattle)
+	MCFG_MACHINE_RESET(seattle)
+	MCFG_NVRAM_ADD_1FILL("nvram")
 
-	MDRV_IDE_CONTROLLER_ADD("ide", ide_interrupt)
-	MDRV_IDE_BUS_MASTER_SPACE("maincpu", PROGRAM)
+	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt)
+	MCFG_IDE_BUS_MASTER_SPACE("maincpu", PROGRAM)
 
-	MDRV_3DFX_VOODOO_1_ADD("voodoo", STD_VOODOO_1_CLOCK, 2, "screen")
-	MDRV_3DFX_VOODOO_CPU("maincpu")
-	MDRV_3DFX_VOODOO_TMU_MEMORY(0, 4)
-	MDRV_3DFX_VOODOO_VBLANK(vblank_assert)
-	MDRV_3DFX_VOODOO_STALL(voodoo_stall)
+	MCFG_3DFX_VOODOO_1_ADD("voodoo", STD_VOODOO_1_CLOCK, 2, "screen")
+	MCFG_3DFX_VOODOO_CPU("maincpu")
+	MCFG_3DFX_VOODOO_TMU_MEMORY(0, 4)
+	MCFG_3DFX_VOODOO_VBLANK(vblank_assert)
+	MCFG_3DFX_VOODOO_STALL(voodoo_stall)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(57)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(640, 480)
-	MDRV_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(57)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_SIZE(640, 480)
+	MCFG_SCREEN_VISIBLE_AREA(0, 639, 0, 479)
 
-	MDRV_VIDEO_UPDATE(seattle)
+	MCFG_VIDEO_UPDATE(seattle)
 
 	/* sound hardware */
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( phoenixsa, seattle_common )
-	MDRV_FRAGMENT_ADD(dcs2_audio_2115)
+	MCFG_FRAGMENT_ADD(dcs2_audio_2115)
 
-	MDRV_CPU_REPLACE("maincpu", R4700LE, SYSTEM_CLOCK*2)
-	MDRV_CPU_CONFIG(r5000_config)
-	MDRV_CPU_PROGRAM_MAP(seattle_map)
+	MCFG_CPU_REPLACE("maincpu", R4700LE, SYSTEM_CLOCK*2)
+	MCFG_CPU_CONFIG(r5000_config)
+	MCFG_CPU_PROGRAM_MAP(seattle_map)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( seattle150, seattle_common )
-	MDRV_FRAGMENT_ADD(dcs2_audio_2115)
+	MCFG_FRAGMENT_ADD(dcs2_audio_2115)
 
-	MDRV_CPU_REPLACE("maincpu", R5000LE, SYSTEM_CLOCK*3)
-	MDRV_CPU_CONFIG(r5000_config)
-	MDRV_CPU_PROGRAM_MAP(seattle_map)
+	MCFG_CPU_REPLACE("maincpu", R5000LE, SYSTEM_CLOCK*3)
+	MCFG_CPU_CONFIG(r5000_config)
+	MCFG_CPU_PROGRAM_MAP(seattle_map)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( seattle150_widget, seattle150 )
-	MDRV_SMC91C94_ADD("ethernet", ethernet_interrupt)
+	MCFG_SMC91C94_ADD("ethernet", ethernet_interrupt)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( seattle200, seattle_common )
-	MDRV_FRAGMENT_ADD(dcs2_audio_2115)
+	MCFG_FRAGMENT_ADD(dcs2_audio_2115)
 
-	MDRV_CPU_REPLACE("maincpu", R5000LE, SYSTEM_CLOCK*4)
-	MDRV_CPU_CONFIG(r5000_config)
-	MDRV_CPU_PROGRAM_MAP(seattle_map)
+	MCFG_CPU_REPLACE("maincpu", R5000LE, SYSTEM_CLOCK*4)
+	MCFG_CPU_CONFIG(r5000_config)
+	MCFG_CPU_PROGRAM_MAP(seattle_map)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( seattle200_widget, seattle200 )
-	MDRV_SMC91C94_ADD("ethernet", ethernet_interrupt)
+	MCFG_SMC91C94_ADD("ethernet", ethernet_interrupt)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( flagstaff, seattle_common )
-	MDRV_FRAGMENT_ADD(cage_seattle)
+	MCFG_FRAGMENT_ADD(cage_seattle)
 
-	MDRV_CPU_REPLACE("maincpu", R5000LE, SYSTEM_CLOCK*4)
-	MDRV_CPU_CONFIG(r5000_config)
-	MDRV_CPU_PROGRAM_MAP(seattle_map)
+	MCFG_CPU_REPLACE("maincpu", R5000LE, SYSTEM_CLOCK*4)
+	MCFG_CPU_CONFIG(r5000_config)
+	MCFG_CPU_PROGRAM_MAP(seattle_map)
 
-	MDRV_SMC91C94_ADD("ethernet", ethernet_interrupt)
+	MCFG_SMC91C94_ADD("ethernet", ethernet_interrupt)
 
-	MDRV_3DFX_VOODOO_MODIFY("voodoo")
-	MDRV_3DFX_VOODOO_TMU_MEMORY(1, 4)
+	MCFG_3DFX_VOODOO_MODIFY("voodoo")
+	MCFG_3DFX_VOODOO_TMU_MEMORY(1, 4)
 MACHINE_CONFIG_END
 
 

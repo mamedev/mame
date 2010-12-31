@@ -1934,54 +1934,54 @@ static const ay8910_interface ay8910_config =
 
 
 static MACHINE_CONFIG_START( halleys, driver_device )
-	MDRV_CPU_ADD("maincpu", M6809, XTAL_19_968MHz/12) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(halleys_map)
-	MDRV_CPU_VBLANK_INT_HACK(halleys_interrupt, 4)
+	MCFG_CPU_ADD("maincpu", M6809, XTAL_19_968MHz/12) /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(halleys_map)
+	MCFG_CPU_VBLANK_INT_HACK(halleys_interrupt, 4)
 
-	MDRV_CPU_ADD("audiocpu", Z80, XTAL_6MHz/2) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(sound_map)
-	MDRV_CPU_PERIODIC_INT(irq0_line_hold, (double)6000000/(4*16*16*10*16))
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_6MHz/2) /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold, (double)6000000/(4*16*16*10*16))
 
-	MDRV_MACHINE_RESET(halleys)
+	MCFG_MACHINE_RESET(halleys)
 
 	// video hardware
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(59.50)	/* verified on PCB */
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(SCREEN_WIDTH, SCREEN_HEIGHT)
-	MDRV_SCREEN_VISIBLE_AREA(VIS_MINX, VIS_MAXX, VIS_MINY, VIS_MAXY)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(59.50)	/* verified on PCB */
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(SCREEN_WIDTH, SCREEN_HEIGHT)
+	MCFG_SCREEN_VISIBLE_AREA(VIS_MINX, VIS_MAXX, VIS_MINY, VIS_MAXY)
 
-	MDRV_PALETTE_LENGTH(PALETTE_SIZE)
-	MDRV_PALETTE_INIT(halleys)
+	MCFG_PALETTE_LENGTH(PALETTE_SIZE)
+	MCFG_PALETTE_INIT(halleys)
 
-	MDRV_VIDEO_START(halleys)
-	MDRV_VIDEO_UPDATE(halleys)
+	MCFG_VIDEO_START(halleys)
+	MCFG_VIDEO_UPDATE(halleys)
 
 	// sound hardware
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay1", AY8910, XTAL_6MHz/4) /* verified on pcb */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL_6MHz/4) /* verified on pcb */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MDRV_SOUND_ADD("ay2", AY8910, XTAL_6MHz/4) /* verified on pcb */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL_6MHz/4) /* verified on pcb */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MDRV_SOUND_ADD("ay3", AY8910, XTAL_6MHz/4) /* verified on pcb */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	MCFG_SOUND_ADD("ay3", AY8910, XTAL_6MHz/4) /* verified on pcb */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MDRV_SOUND_ADD("ay4", AY8910, XTAL_6MHz/4) /* verified on pcb */
-	MDRV_SOUND_CONFIG(ay8910_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	MCFG_SOUND_ADD("ay4", AY8910, XTAL_6MHz/4) /* verified on pcb */
+	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( benberob, halleys )
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_CLOCK(XTAL_19_968MHz/12) /* not verified but pcb identical to halley's comet */
-	MDRV_CPU_VBLANK_INT_HACK(benberob_interrupt, 4)
-	MDRV_VIDEO_UPDATE(benberob)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_CLOCK(XTAL_19_968MHz/12) /* not verified but pcb identical to halley's comet */
+	MCFG_CPU_VBLANK_INT_HACK(benberob_interrupt, 4)
+	MCFG_VIDEO_UPDATE(benberob)
 MACHINE_CONFIG_END
 
 

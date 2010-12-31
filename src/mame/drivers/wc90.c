@@ -309,44 +309,44 @@ static const ym2608_interface ym2608_config =
 static MACHINE_CONFIG_START( wc90, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, XTAL_8MHz)		/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(wc90_map_1)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_8MHz)		/* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(wc90_map_1)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("sub", Z80, XTAL_8MHz)		/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(wc90_map_2)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("sub", Z80, XTAL_8MHz)		/* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(wc90_map_2)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2)	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(sound_map)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_8MHz/2)	/* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(sound_map)
 	/* NMIs are triggered by the main CPU */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(59.17)			/* verified on pcb */
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(59.17)			/* verified on pcb */
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(wc90)
-	MDRV_PALETTE_LENGTH(1024)
+	MCFG_GFXDECODE(wc90)
+	MCFG_PALETTE_LENGTH(1024)
 
-	MDRV_VIDEO_START(wc90)
-	MDRV_VIDEO_UPDATE(wc90)
+	MCFG_VIDEO_START(wc90)
+	MCFG_VIDEO_UPDATE(wc90)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2608, XTAL_8MHz)	/* verified on pcb */
-	MDRV_SOUND_CONFIG(ym2608_config)
-	MDRV_SOUND_ROUTE(0, "mono", 0.50)
-	MDRV_SOUND_ROUTE(1, "mono", 1.0)
-	MDRV_SOUND_ROUTE(2, "mono", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM2608, XTAL_8MHz)	/* verified on pcb */
+	MCFG_SOUND_CONFIG(ym2608_config)
+	MCFG_SOUND_ROUTE(0, "mono", 0.50)
+	MCFG_SOUND_ROUTE(1, "mono", 1.0)
+	MCFG_SOUND_ROUTE(2, "mono", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( wc90t, wc90 )
-	MDRV_VIDEO_START( wc90t )
+	MCFG_VIDEO_START( wc90t )
 MACHINE_CONFIG_END
 
 ROM_START( wc90 )

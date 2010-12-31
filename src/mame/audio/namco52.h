@@ -17,9 +17,9 @@ struct _namco_52xx_interface
 };
 
 
-#define MDRV_NAMCO_52XX_ADD(_tag, _clock, _interface) \
-	MDRV_DEVICE_ADD(_tag, NAMCO_52XX, _clock) \
-	MDRV_DEVICE_CONFIG(_interface)
+#define MCFG_NAMCO_52XX_ADD(_tag, _clock, _interface) \
+	MCFG_DEVICE_ADD(_tag, NAMCO_52XX, _clock) \
+	MCFG_DEVICE_CONFIG(_interface)
 
 
 WRITE8_DEVICE_HANDLER( namco_52xx_write );

@@ -478,75 +478,75 @@ void cidelsa_state::machine_reset()
 
 static MACHINE_CONFIG_START( destryer, cidelsa_state )
 	/* basic system hardware */
-	MDRV_CPU_ADD(CDP1802_TAG, COSMAC, DESTRYER_CHR1)
-	MDRV_CPU_PROGRAM_MAP(destryer_map)
-	MDRV_CPU_IO_MAP(destryer_io_map)
-	MDRV_CPU_CONFIG(cidelsa_cdp1802_config)
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_CPU_ADD(CDP1802_TAG, COSMAC, DESTRYER_CHR1)
+	MCFG_CPU_PROGRAM_MAP(destryer_map)
+	MCFG_CPU_IO_MAP(destryer_io_map)
+	MCFG_CPU_CONFIG(cidelsa_cdp1802_config)
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MDRV_MACHINE_START(cidelsa)
+	MCFG_MACHINE_START(cidelsa)
 
 	/* sound and video hardware */
-	MDRV_FRAGMENT_ADD(destryer_video)
+	MCFG_FRAGMENT_ADD(destryer_video)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( destryera, cidelsa_state )
 	/* basic system hardware */
-	MDRV_CPU_ADD(CDP1802_TAG, COSMAC, DESTRYER_CHR1)
-	MDRV_CPU_PROGRAM_MAP(destryera_map)
-	MDRV_CPU_IO_MAP(destryer_io_map)
-	MDRV_CPU_CONFIG(cidelsa_cdp1802_config)
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_CPU_ADD(CDP1802_TAG, COSMAC, DESTRYER_CHR1)
+	MCFG_CPU_PROGRAM_MAP(destryera_map)
+	MCFG_CPU_IO_MAP(destryer_io_map)
+	MCFG_CPU_CONFIG(cidelsa_cdp1802_config)
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MDRV_MACHINE_START(cidelsa)
+	MCFG_MACHINE_START(cidelsa)
 
 	/* sound and video hardware */
-	MDRV_FRAGMENT_ADD(destryer_video)
+	MCFG_FRAGMENT_ADD(destryer_video)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( altair, cidelsa_state )
 	/* basic system hardware */
-	MDRV_CPU_ADD(CDP1802_TAG, COSMAC, ALTAIR_CHR1)
-	MDRV_CPU_PROGRAM_MAP(altair_map)
-	MDRV_CPU_IO_MAP(altair_io_map)
-	MDRV_CPU_CONFIG(cidelsa_cdp1802_config)
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_CPU_ADD(CDP1802_TAG, COSMAC, ALTAIR_CHR1)
+	MCFG_CPU_PROGRAM_MAP(altair_map)
+	MCFG_CPU_IO_MAP(altair_io_map)
+	MCFG_CPU_CONFIG(cidelsa_cdp1802_config)
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MDRV_MACHINE_START(cidelsa)
+	MCFG_MACHINE_START(cidelsa)
 
 	/* input/output hardware */
-	MDRV_CDP1852_ADD("ic23", CDP1852_CLOCK_HIGH, cidelsa_cdp1852_in0_intf)	/* clock is really tied to CDP1869 CMSEL (pin 37) */
-	MDRV_CDP1852_ADD("ic24", CDP1852_CLOCK_HIGH, cidelsa_cdp1852_in1_intf)
-	MDRV_CDP1852_ADD("ic25", CDP1852_CLOCK_HIGH, cidelsa_cdp1852_in2_intf)
-	MDRV_CDP1852_ADD("ic26", ALTAIR_CHR1 / 8, altair_cdp1852_out1_intf)		/* clock is CDP1802 TPB */
+	MCFG_CDP1852_ADD("ic23", CDP1852_CLOCK_HIGH, cidelsa_cdp1852_in0_intf)	/* clock is really tied to CDP1869 CMSEL (pin 37) */
+	MCFG_CDP1852_ADD("ic24", CDP1852_CLOCK_HIGH, cidelsa_cdp1852_in1_intf)
+	MCFG_CDP1852_ADD("ic25", CDP1852_CLOCK_HIGH, cidelsa_cdp1852_in2_intf)
+	MCFG_CDP1852_ADD("ic26", ALTAIR_CHR1 / 8, altair_cdp1852_out1_intf)		/* clock is CDP1802 TPB */
 
 	/* sound and video hardware */
-	MDRV_FRAGMENT_ADD(altair_video)
+	MCFG_FRAGMENT_ADD(altair_video)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( draco, cidelsa_state )
 	/* basic system hardware */
-	MDRV_CPU_ADD(CDP1802_TAG, COSMAC, DRACO_CHR1)
-	MDRV_CPU_PROGRAM_MAP(draco_map)
-	MDRV_CPU_IO_MAP(draco_io_map)
-	MDRV_CPU_CONFIG(cidelsa_cdp1802_config)
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_CPU_ADD(CDP1802_TAG, COSMAC, DRACO_CHR1)
+	MCFG_CPU_PROGRAM_MAP(draco_map)
+	MCFG_CPU_IO_MAP(draco_io_map)
+	MCFG_CPU_CONFIG(cidelsa_cdp1802_config)
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MDRV_MACHINE_START(draco)
+	MCFG_MACHINE_START(draco)
 
-	MDRV_CPU_ADD(COP402N_TAG, COP402, DRACO_SND_CHR1)
-	MDRV_CPU_PROGRAM_MAP(draco_sound_map)
-	MDRV_CPU_IO_MAP(draco_sound_io_map)
-	MDRV_CPU_CONFIG(draco_cop_intf)
+	MCFG_CPU_ADD(COP402N_TAG, COP402, DRACO_SND_CHR1)
+	MCFG_CPU_PROGRAM_MAP(draco_sound_map)
+	MCFG_CPU_IO_MAP(draco_sound_io_map)
+	MCFG_CPU_CONFIG(draco_cop_intf)
 
 	/* input/output hardware */
-	MDRV_CDP1852_ADD("ic29", CDP1852_CLOCK_HIGH, cidelsa_cdp1852_in0_intf)	/* clock is really tied to CDP1876 CMSEL (pin 32) */
-	MDRV_CDP1852_ADD("ic30", CDP1852_CLOCK_HIGH, cidelsa_cdp1852_in1_intf)
-	MDRV_CDP1852_ADD("ic31", CDP1852_CLOCK_HIGH, cidelsa_cdp1852_in2_intf)
-	MDRV_CDP1852_ADD("ic32", DRACO_CHR1 / 8, draco_cdp1852_out1_intf)		/* clock is CDP1802 TPB */
+	MCFG_CDP1852_ADD("ic29", CDP1852_CLOCK_HIGH, cidelsa_cdp1852_in0_intf)	/* clock is really tied to CDP1876 CMSEL (pin 32) */
+	MCFG_CDP1852_ADD("ic30", CDP1852_CLOCK_HIGH, cidelsa_cdp1852_in1_intf)
+	MCFG_CDP1852_ADD("ic31", CDP1852_CLOCK_HIGH, cidelsa_cdp1852_in2_intf)
+	MCFG_CDP1852_ADD("ic32", DRACO_CHR1 / 8, draco_cdp1852_out1_intf)		/* clock is CDP1802 TPB */
 
 	/* sound and video hardware */
-	MDRV_FRAGMENT_ADD(draco_video)
+	MCFG_FRAGMENT_ADD(draco_video)
 MACHINE_CONFIG_END
 
 /* ROMs */

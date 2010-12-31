@@ -30,9 +30,9 @@ DECLARE_LEGACY_DEVICE(TLC34076, tlc34076);
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_TLC34076_ADD(_tag, _res_sel) \
-	MDRV_DEVICE_ADD(_tag, TLC34076, 0) \
-	MDRV_DEVICE_CONFIG_DATA32(tlc34076_config, res_sel, _res_sel)
+#define MCFG_TLC34076_ADD(_tag, _res_sel) \
+	MCFG_DEVICE_ADD(_tag, TLC34076, 0) \
+	MCFG_DEVICE_CONFIG_DATA32(tlc34076_config, res_sel, _res_sel)
 
 
 /***************************************************************************

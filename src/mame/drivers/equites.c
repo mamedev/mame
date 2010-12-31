@@ -1142,42 +1142,42 @@ static const samples_interface alphamc07_samples_interface =
 // the sound board is the same in all games
 static MACHINE_CONFIG_FRAGMENT( common_sound )
 
-	MDRV_CPU_ADD("audiocpu", I8085A, XTAL_6_144MHz)	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(sound_map)
-	MDRV_CPU_IO_MAP(sound_portmap)
+	MCFG_CPU_ADD("audiocpu", I8085A, XTAL_6_144MHz)	/* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_CPU_IO_MAP(sound_portmap)
 
-	MDRV_SOUND_START(equites)
+	MCFG_SOUND_START(equites)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("msm", MSM5232, MSM5232_MAX_CLOCK)	// will be adjusted at runtime through PORT_ADJUSTER
-	MDRV_SOUND_CONFIG(equites_5232intf)
-	MDRV_SOUND_ROUTE(0, "mono", MSM5232_BASE_VOLUME/2.2)	// pin 28  2'-1 : 22k resistor
-	MDRV_SOUND_ROUTE(1, "mono", MSM5232_BASE_VOLUME/1.5)	// pin 29  4'-1 : 15k resistor
-	MDRV_SOUND_ROUTE(2, "mono", MSM5232_BASE_VOLUME)		// pin 30  8'-1 : 10k resistor
-	MDRV_SOUND_ROUTE(3, "mono", MSM5232_BASE_VOLUME)		// pin 31 16'-1 : 10k resistor
-	MDRV_SOUND_ROUTE(4, "mono", MSM5232_BASE_VOLUME/2.2)	// pin 36  2'-2 : 22k resistor
-	MDRV_SOUND_ROUTE(5, "mono", MSM5232_BASE_VOLUME/1.5)	// pin 35  4'-2 : 15k resistor
-	MDRV_SOUND_ROUTE(6, "mono", MSM5232_BASE_VOLUME)		// pin 34  8'-2 : 10k resistor
-	MDRV_SOUND_ROUTE(7, "mono", MSM5232_BASE_VOLUME)		// pin 33 16'-2 : 10k resistor
-	MDRV_SOUND_ROUTE(8, "mono", 1.0)		// pin 1 SOLO  8' (this actually feeds an analog section)
-	MDRV_SOUND_ROUTE(9, "mono", 1.0)		// pin 2 SOLO 16' (this actually feeds an analog section)
-	MDRV_SOUND_ROUTE(10,"mono", 0.12)		// pin 22 Noise Output (this actually feeds an analog section)
+	MCFG_SOUND_ADD("msm", MSM5232, MSM5232_MAX_CLOCK)	// will be adjusted at runtime through PORT_ADJUSTER
+	MCFG_SOUND_CONFIG(equites_5232intf)
+	MCFG_SOUND_ROUTE(0, "mono", MSM5232_BASE_VOLUME/2.2)	// pin 28  2'-1 : 22k resistor
+	MCFG_SOUND_ROUTE(1, "mono", MSM5232_BASE_VOLUME/1.5)	// pin 29  4'-1 : 15k resistor
+	MCFG_SOUND_ROUTE(2, "mono", MSM5232_BASE_VOLUME)		// pin 30  8'-1 : 10k resistor
+	MCFG_SOUND_ROUTE(3, "mono", MSM5232_BASE_VOLUME)		// pin 31 16'-1 : 10k resistor
+	MCFG_SOUND_ROUTE(4, "mono", MSM5232_BASE_VOLUME/2.2)	// pin 36  2'-2 : 22k resistor
+	MCFG_SOUND_ROUTE(5, "mono", MSM5232_BASE_VOLUME/1.5)	// pin 35  4'-2 : 15k resistor
+	MCFG_SOUND_ROUTE(6, "mono", MSM5232_BASE_VOLUME)		// pin 34  8'-2 : 10k resistor
+	MCFG_SOUND_ROUTE(7, "mono", MSM5232_BASE_VOLUME)		// pin 33 16'-2 : 10k resistor
+	MCFG_SOUND_ROUTE(8, "mono", 1.0)		// pin 1 SOLO  8' (this actually feeds an analog section)
+	MCFG_SOUND_ROUTE(9, "mono", 1.0)		// pin 2 SOLO 16' (this actually feeds an analog section)
+	MCFG_SOUND_ROUTE(10,"mono", 0.12)		// pin 22 Noise Output (this actually feeds an analog section)
 
-	MDRV_SOUND_ADD("aysnd", AY8910, XTAL_6_144MHz/4) /* verified on pcb */
-	MDRV_SOUND_CONFIG(equites_8910intf)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	MCFG_SOUND_ADD("aysnd", AY8910, XTAL_6_144MHz/4) /* verified on pcb */
+	MCFG_SOUND_CONFIG(equites_8910intf)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MDRV_SOUND_ADD("dac1", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("dac1", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD("dac2", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("dac2", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD("samples", SAMPLES, 0)
-	MDRV_SOUND_CONFIG(alphamc07_samples_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ADD("samples", SAMPLES, 0)
+	MCFG_SOUND_CONFIG(alphamc07_samples_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 MACHINE_CONFIG_END
 
 /******************************************************************************/
@@ -1245,37 +1245,37 @@ static MACHINE_RESET( equites )
 static MACHINE_CONFIG_START( equites, equites_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, XTAL_12MHz/4) /* 68000P8 running at 3mhz! verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(equites_map)
-	MDRV_CPU_VBLANK_INT_HACK(equites_interrupt, 2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_12MHz/4) /* 68000P8 running at 3mhz! verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(equites_map)
+	MCFG_CPU_VBLANK_INT_HACK(equites_interrupt, 2)
 
-	MDRV_FRAGMENT_ADD(common_sound)
+	MCFG_FRAGMENT_ADD(common_sound)
 
-	MDRV_CPU_ADD("mcu", ALPHA8301, 4000000/8)
-	MDRV_CPU_PROGRAM_MAP(mcu_map)
+	MCFG_CPU_ADD("mcu", ALPHA8301, 4000000/8)
+	MCFG_CPU_PROGRAM_MAP(mcu_map)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 3*8, 29*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 3*8, 29*8-1)
 
-	MDRV_GFXDECODE(equites)
-	MDRV_PALETTE_LENGTH(0x180)
-	MDRV_PALETTE_INIT(equites)
-	MDRV_VIDEO_START(equites)
-	MDRV_VIDEO_UPDATE(equites)
+	MCFG_GFXDECODE(equites)
+	MCFG_PALETTE_LENGTH(0x180)
+	MCFG_PALETTE_INIT(equites)
+	MCFG_VIDEO_START(equites)
+	MCFG_VIDEO_UPDATE(equites)
 
-	MDRV_MACHINE_START(equites)
-	MDRV_MACHINE_RESET(equites)
+	MCFG_MACHINE_START(equites)
+	MCFG_MACHINE_RESET(equites)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( gekisou, equites )
 
 	// gekisou has battery-backed RAM to store settings
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 MACHINE_CONFIG_END
 
@@ -1283,30 +1283,30 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( splndrbt, equites_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, XTAL_24MHz/4) /* 68000P8 running at 6mhz, verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(splndrbt_map)
-	MDRV_CPU_VBLANK_INT_HACK(equites_interrupt, 2)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_24MHz/4) /* 68000P8 running at 6mhz, verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(splndrbt_map)
+	MCFG_CPU_VBLANK_INT_HACK(equites_interrupt, 2)
 
-	MDRV_FRAGMENT_ADD(common_sound)
+	MCFG_FRAGMENT_ADD(common_sound)
 
-	MDRV_CPU_ADD("mcu", ALPHA8301, 4000000/8)
-	MDRV_CPU_PROGRAM_MAP(mcu_map)
+	MCFG_CPU_ADD("mcu", ALPHA8301, 4000000/8)
+	MCFG_CPU_PROGRAM_MAP(mcu_map)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 28*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 4*8, 28*8-1)
 
-	MDRV_GFXDECODE(splndrbt)
-	MDRV_PALETTE_LENGTH(0x280)
-	MDRV_PALETTE_INIT(splndrbt)
-	MDRV_VIDEO_START(splndrbt)
-	MDRV_VIDEO_UPDATE(splndrbt)
+	MCFG_GFXDECODE(splndrbt)
+	MCFG_PALETTE_LENGTH(0x280)
+	MCFG_PALETTE_INIT(splndrbt)
+	MCFG_VIDEO_START(splndrbt)
+	MCFG_VIDEO_UPDATE(splndrbt)
 
-	MDRV_MACHINE_START(equites)
-	MDRV_MACHINE_RESET(equites)
+	MCFG_MACHINE_START(equites)
+	MCFG_MACHINE_RESET(equites)
 MACHINE_CONFIG_END
 
 

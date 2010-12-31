@@ -444,49 +444,49 @@ static MACHINE_START( mcatadv )
 static MACHINE_CONFIG_START( mcatadv, mcatadv_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, XTAL_16MHz) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(mcatadv_map)
-	MDRV_CPU_VBLANK_INT("screen", irq1_line_hold)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_16MHz) /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(mcatadv_map)
+	MCFG_CPU_VBLANK_INT("screen", irq1_line_hold)
 
-	MDRV_CPU_ADD("soundcpu", Z80, XTAL_16MHz/4) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(mcatadv_sound_map)
-	MDRV_CPU_IO_MAP(mcatadv_sound_io_map)
+	MCFG_CPU_ADD("soundcpu", Z80, XTAL_16MHz/4) /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(mcatadv_sound_map)
+	MCFG_CPU_IO_MAP(mcatadv_sound_io_map)
 
-	MDRV_MACHINE_START(mcatadv)
+	MCFG_MACHINE_START(mcatadv)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(320, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(320, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0, 224-1)
 
-	MDRV_GFXDECODE(mcatadv)
-	MDRV_PALETTE_LENGTH(0x2000/2)
+	MCFG_GFXDECODE(mcatadv)
+	MCFG_PALETTE_LENGTH(0x2000/2)
 
-	MDRV_WATCHDOG_TIME_INIT(SEC(3))	/* a guess, and certainly wrong */
+	MCFG_WATCHDOG_TIME_INIT(SEC(3))	/* a guess, and certainly wrong */
 
-	MDRV_VIDEO_START(mcatadv)
-	MDRV_VIDEO_EOF(mcatadv) // Buffer Spriteram
-	MDRV_VIDEO_UPDATE(mcatadv)
+	MCFG_VIDEO_START(mcatadv)
+	MCFG_VIDEO_EOF(mcatadv) // Buffer Spriteram
+	MCFG_VIDEO_UPDATE(mcatadv)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymsnd", YM2610, XTAL_16MHz/2) /* verified on pcb */
-	MDRV_SOUND_CONFIG(mcatadv_ym2610_interface)
-	MDRV_SOUND_ROUTE(0, "lspeaker",  0.32)
-	MDRV_SOUND_ROUTE(0, "rspeaker", 0.32)
-	MDRV_SOUND_ROUTE(1, "lspeaker",  0.5)
-	MDRV_SOUND_ROUTE(2, "rspeaker", 0.5)
+	MCFG_SOUND_ADD("ymsnd", YM2610, XTAL_16MHz/2) /* verified on pcb */
+	MCFG_SOUND_CONFIG(mcatadv_ym2610_interface)
+	MCFG_SOUND_ROUTE(0, "lspeaker",  0.32)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 0.32)
+	MCFG_SOUND_ROUTE(1, "lspeaker",  0.5)
+	MCFG_SOUND_ROUTE(2, "rspeaker", 0.5)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( nost, mcatadv )
 
-	MDRV_CPU_MODIFY("soundcpu")
-	MDRV_CPU_PROGRAM_MAP(nost_sound_map)
-	MDRV_CPU_IO_MAP(nost_sound_io_map)
+	MCFG_CPU_MODIFY("soundcpu")
+	MCFG_CPU_PROGRAM_MAP(nost_sound_map)
+	MCFG_CPU_IO_MAP(nost_sound_io_map)
 MACHINE_CONFIG_END
 
 

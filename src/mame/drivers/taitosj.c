@@ -1793,56 +1793,56 @@ static const ay8910_interface ay8910_interface_4 =
 static MACHINE_CONFIG_START( nomcu, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",Z80,8000000/2)      /* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(taitosj_main_nomcu_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("maincpu",Z80,8000000/2)      /* 4 MHz */
+	MCFG_CPU_PROGRAM_MAP(taitosj_main_nomcu_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audiocpu", Z80,6000000/2)    /* 3 MHz */
-	MDRV_CPU_PROGRAM_MAP(taitosj_audio_map)
+	MCFG_CPU_ADD("audiocpu", Z80,6000000/2)    /* 3 MHz */
+	MCFG_CPU_PROGRAM_MAP(taitosj_audio_map)
 			/* interrupts: */
 			/* - no interrupts synced with vblank */
 			/* - NMI triggered by the main CPU */
 			/* - periodic IRQ, with frequency 6000000/(4*16*16*10*16) = 36.621 Hz, */
-	MDRV_CPU_PERIODIC_INT(irq0_line_hold, (double)6000000/(4*16*16*10*16))
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold, (double)6000000/(4*16*16*10*16))
 
-	MDRV_MACHINE_START(taitosj)
-	MDRV_MACHINE_RESET(taitosj)
+	MCFG_MACHINE_START(taitosj)
+	MCFG_MACHINE_RESET(taitosj)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(taitosj)
-	MDRV_PALETTE_LENGTH(64)
+	MCFG_GFXDECODE(taitosj)
+	MCFG_PALETTE_LENGTH(64)
 
-	MDRV_VIDEO_START(taitosj)
-	MDRV_VIDEO_UPDATE(taitosj)
+	MCFG_VIDEO_START(taitosj)
+	MCFG_VIDEO_UPDATE(taitosj)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay1", AY8910, 6000000/4)
-	MDRV_SOUND_CONFIG(ay8910_interface_1)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	MCFG_SOUND_ADD("ay1", AY8910, 6000000/4)
+	MCFG_SOUND_CONFIG(ay8910_interface_1)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MDRV_SOUND_ADD("ay2", AY8910, 6000000/4)
-	MDRV_SOUND_CONFIG(ay8910_interface_2)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	MCFG_SOUND_ADD("ay2", AY8910, 6000000/4)
+	MCFG_SOUND_CONFIG(ay8910_interface_2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MDRV_SOUND_ADD("ay3", AY8910, 6000000/4)
-	MDRV_SOUND_CONFIG(ay8910_interface_3)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	MCFG_SOUND_ADD("ay3", AY8910, 6000000/4)
+	MCFG_SOUND_CONFIG(ay8910_interface_3)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MDRV_SOUND_ADD("ay4", AY8910, 6000000/4)
-	MDRV_SOUND_CONFIG(ay8910_interface_4)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
+	MCFG_SOUND_ADD("ay4", AY8910, 6000000/4)
+	MCFG_SOUND_CONFIG(ay8910_interface_4)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.30)
 
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
 
@@ -1850,23 +1850,23 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( mcu, nomcu )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(taitosj_main_mcu_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(taitosj_main_mcu_map)
 
-	MDRV_CPU_ADD("mcu", M68705,3000000)      /* xtal is 3MHz, divided by 4 internally */
-	MDRV_CPU_PROGRAM_MAP(taitosj_mcu_map)
+	MCFG_CPU_ADD("mcu", M68705,3000000)      /* xtal is 3MHz, divided by 4 internally */
+	MCFG_CPU_PROGRAM_MAP(taitosj_mcu_map)
 
-	MDRV_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(HZ(6000))
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( kikstart, mcu )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(kikstart_main_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(kikstart_main_map)
 
-	MDRV_VIDEO_UPDATE(kikstart)
+	MCFG_VIDEO_UPDATE(kikstart)
 MACHINE_CONFIG_END
 
 

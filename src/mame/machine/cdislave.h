@@ -30,11 +30,11 @@ TODO:
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MDRV_CDISLAVE_ADD(_tag) \
-    MDRV_DEVICE_ADD(_tag, MACHINE_CDISLAVE, 0) \
+#define MCFG_CDISLAVE_ADD(_tag) \
+    MCFG_DEVICE_ADD(_tag, MACHINE_CDISLAVE, 0) \
 
-#define MDRV_CDISLAVE_REPLACE(_tag) \
-    MDRV_DEVICE_REPLACE(_tag, MACHINE_CDISLAVE, 0) \
+#define MCFG_CDISLAVE_REPLACE(_tag) \
+    MCFG_DEVICE_REPLACE(_tag, MACHINE_CDISLAVE, 0) \
 
 //**************************************************************************
 //  TYPE DEFINITIONS

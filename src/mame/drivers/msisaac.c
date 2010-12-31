@@ -481,56 +481,56 @@ static MACHINE_RESET( msisaac )
 static MACHINE_CONFIG_START( msisaac, msisaac_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 4000000)
-	MDRV_CPU_PROGRAM_MAP(msisaac_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("maincpu", Z80, 4000000)
+	MCFG_CPU_PROGRAM_MAP(msisaac_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audiocpu", Z80, 4000000)
-	MDRV_CPU_PROGRAM_MAP(msisaac_sound_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)	/* source of IRQs is unknown */
+	MCFG_CPU_ADD("audiocpu", Z80, 4000000)
+	MCFG_CPU_PROGRAM_MAP(msisaac_sound_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)	/* source of IRQs is unknown */
 
 #ifdef USE_MCU
-	MDRV_CPU_ADD("mcu", M68705,8000000/2)  /* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(buggychl_mcu_map)
-	MDRV_DEVICE_ADD("bmcu", BUGGYCHL_MCU, 0)
+	MCFG_CPU_ADD("mcu", M68705,8000000/2)  /* 4 MHz */
+	MCFG_CPU_PROGRAM_MAP(buggychl_mcu_map)
+	MCFG_DEVICE_ADD("bmcu", BUGGYCHL_MCU, 0)
 #endif
 
-	MDRV_MACHINE_START(msisaac)
-	MDRV_MACHINE_RESET(msisaac)
+	MCFG_MACHINE_START(msisaac)
+	MCFG_MACHINE_RESET(msisaac)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0, 32*8-1, 1*8, 31*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 1*8, 31*8-1)
 
-	MDRV_GFXDECODE(msisaac)
-	MDRV_PALETTE_LENGTH(1024)
+	MCFG_GFXDECODE(msisaac)
+	MCFG_PALETTE_LENGTH(1024)
 
-	MDRV_VIDEO_START(msisaac)
-	MDRV_VIDEO_UPDATE(msisaac)
+	MCFG_VIDEO_START(msisaac)
+	MCFG_VIDEO_UPDATE(msisaac)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay1", AY8910, 2000000)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	MCFG_SOUND_ADD("ay1", AY8910, 2000000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MDRV_SOUND_ADD("ay2", AY8910, 2000000)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	MCFG_SOUND_ADD("ay2", AY8910, 2000000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MDRV_SOUND_ADD("msm", MSM5232, 2000000)
-	MDRV_SOUND_CONFIG(msm5232_config)
-	MDRV_SOUND_ROUTE(0, "mono", 1.0)	// pin 28  2'-1
-	MDRV_SOUND_ROUTE(1, "mono", 1.0)	// pin 29  4'-1
-	MDRV_SOUND_ROUTE(2, "mono", 1.0)	// pin 30  8'-1
-	MDRV_SOUND_ROUTE(3, "mono", 1.0)	// pin 31 16'-1
-	MDRV_SOUND_ROUTE(4, "mono", 1.0)	// pin 36  2'-2
-	MDRV_SOUND_ROUTE(5, "mono", 1.0)	// pin 35  4'-2
-	MDRV_SOUND_ROUTE(6, "mono", 1.0)	// pin 34  8'-2
-	MDRV_SOUND_ROUTE(7, "mono", 1.0)	// pin 33 16'-2
+	MCFG_SOUND_ADD("msm", MSM5232, 2000000)
+	MCFG_SOUND_CONFIG(msm5232_config)
+	MCFG_SOUND_ROUTE(0, "mono", 1.0)	// pin 28  2'-1
+	MCFG_SOUND_ROUTE(1, "mono", 1.0)	// pin 29  4'-1
+	MCFG_SOUND_ROUTE(2, "mono", 1.0)	// pin 30  8'-1
+	MCFG_SOUND_ROUTE(3, "mono", 1.0)	// pin 31 16'-1
+	MCFG_SOUND_ROUTE(4, "mono", 1.0)	// pin 36  2'-2
+	MCFG_SOUND_ROUTE(5, "mono", 1.0)	// pin 35  4'-2
+	MCFG_SOUND_ROUTE(6, "mono", 1.0)	// pin 34  8'-2
+	MCFG_SOUND_ROUTE(7, "mono", 1.0)	// pin 33 16'-2
 	// pin 1 SOLO  8'       not mapped
 	// pin 2 SOLO 16'       not mapped
 	// pin 22 Noise Output  not mapped

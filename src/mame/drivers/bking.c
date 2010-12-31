@@ -479,64 +479,64 @@ static MACHINE_RESET( bking3 )
 static MACHINE_CONFIG_START( bking, bking_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("main_cpu", Z80, XTAL_12MHz/4)	/* 3 MHz */
-	MDRV_CPU_PROGRAM_MAP(bking_map)
-	MDRV_CPU_IO_MAP(bking_io_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("main_cpu", Z80, XTAL_12MHz/4)	/* 3 MHz */
+	MCFG_CPU_PROGRAM_MAP(bking_map)
+	MCFG_CPU_IO_MAP(bking_io_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audiocpu", Z80, XTAL_6MHz/2)	/* 3 MHz */
-	MDRV_CPU_PROGRAM_MAP(bking_audio_map)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_6MHz/2)	/* 3 MHz */
+	MCFG_CPU_PROGRAM_MAP(bking_audio_map)
 	/* interrupts (from Jungle King hardware, might be wrong): */
 	/* - no interrupts synced with vblank */
 	/* - NMI triggered by the main CPU */
 	/* - periodic IRQ, with frequency 6000000/(4*16*16*10*16) = 36.621 Hz, */
-	MDRV_CPU_PERIODIC_INT(irq0_line_hold, (double)6000000/(4*16*16*10*16))
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold, (double)6000000/(4*16*16*10*16))
 
-	MDRV_MACHINE_START(bking)
-	MDRV_MACHINE_RESET(bking)
+	MCFG_MACHINE_START(bking)
+	MCFG_MACHINE_RESET(bking)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(bking)
-	MDRV_PALETTE_LENGTH(4*8+4*4+4*2+4*2)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_GFXDECODE(bking)
+	MCFG_PALETTE_LENGTH(4*8+4*4+4*2+4*2)
 
-	MDRV_PALETTE_INIT(bking)
-	MDRV_VIDEO_START(bking)
-	MDRV_VIDEO_UPDATE(bking)
-	MDRV_VIDEO_EOF(bking)
+	MCFG_PALETTE_INIT(bking)
+	MCFG_VIDEO_START(bking)
+	MCFG_VIDEO_UPDATE(bking)
+	MCFG_VIDEO_EOF(bking)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay1", AY8910, XTAL_6MHz/4)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL_6MHz/4)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD("ay2", AY8910, XTAL_6MHz/4)
-	MDRV_SOUND_CONFIG(ay8910_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL_6MHz/4)
+	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( bking3, bking )
 
-	MDRV_CPU_MODIFY("main_cpu")
-	MDRV_CPU_IO_MAP(bking3_io_map)
+	MCFG_CPU_MODIFY("main_cpu")
+	MCFG_CPU_IO_MAP(bking3_io_map)
 
-	MDRV_CPU_ADD("mcu", M68705, XTAL_3MHz)      /* xtal is 3MHz, divided by 4 internally */
-	MDRV_CPU_PROGRAM_MAP(buggychl_mcu_map)
-	MDRV_DEVICE_ADD("bmcu", BUGGYCHL_MCU, 0)
+	MCFG_CPU_ADD("mcu", M68705, XTAL_3MHz)      /* xtal is 3MHz, divided by 4 internally */
+	MCFG_CPU_PROGRAM_MAP(buggychl_mcu_map)
+	MCFG_DEVICE_ADD("bmcu", BUGGYCHL_MCU, 0)
 
-	MDRV_MACHINE_START(bking3)
-	MDRV_MACHINE_RESET(bking3)
+	MCFG_MACHINE_START(bking3)
+	MCFG_MACHINE_RESET(bking3)
 
-	MDRV_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(HZ(6000))
 MACHINE_CONFIG_END
 
 /***************************************************************************

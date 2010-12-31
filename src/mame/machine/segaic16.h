@@ -62,15 +62,15 @@ DECLARE_LEGACY_DEVICE(_315_5248, ic_315_5248);
 DECLARE_LEGACY_DEVICE(_315_5249, ic_315_5249);
 DECLARE_LEGACY_DEVICE(_315_5250, ic_315_5250);
 
-#define MDRV_315_5248_ADD(_tag) \
-	MDRV_DEVICE_ADD(_tag, _315_5248, 0)
+#define MCFG_315_5248_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, _315_5248, 0)
 
-#define MDRV_315_5249_ADD(_tag) \
-	MDRV_DEVICE_ADD(_tag, _315_5249, 0)
+#define MCFG_315_5249_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, _315_5249, 0)
 
-#define MDRV_315_5250_ADD(_tag, _interface) \
-	MDRV_DEVICE_ADD(_tag, _315_5250, 0) \
-	MDRV_DEVICE_CONFIG(_interface)
+#define MCFG_315_5250_ADD(_tag, _interface) \
+	MCFG_DEVICE_ADD(_tag, _315_5250, 0) \
+	MCFG_DEVICE_CONFIG(_interface)
 
 
 /***************************************************************************

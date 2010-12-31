@@ -342,34 +342,34 @@ static PALETTE_INIT( lions )
 
 static MACHINE_CONFIG_START( lions, driver_device )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6809, MAIN_CLOCK/4)		 /* 3 MHz.(guess) */
-	MDRV_CPU_PROGRAM_MAP(lions_map)
-	MDRV_CPU_VBLANK_INT("screen", lions_irq )
+	MCFG_CPU_ADD("maincpu", M6809, MAIN_CLOCK/4)		 /* 3 MHz.(guess) */
+	MCFG_CPU_PROGRAM_MAP(lions_map)
+	MCFG_CPU_VBLANK_INT("screen", lions_irq )
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(304, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 304-1, 0, 216-1)	/* from the crtc registers... updated by crtc */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(304, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 304-1, 0, 216-1)	/* from the crtc registers... updated by crtc */
 
-	MDRV_GFXDECODE(lions)
-	MDRV_PALETTE_LENGTH(64)
-	MDRV_PALETTE_INIT(lions)
+	MCFG_GFXDECODE(lions)
+	MCFG_PALETTE_LENGTH(64)
+	MCFG_PALETTE_INIT(lions)
 
-	MDRV_VIDEO_START(lions)
-	MDRV_VIDEO_UPDATE(lions)
+	MCFG_VIDEO_START(lions)
+	MCFG_VIDEO_UPDATE(lions)
 
-	MDRV_VIA6522_ADD("via6522_0", MAIN_CLOCK/12, via_interface)	/* 1 MHz.(only 1 or 2 MHz.are valid) */
+	MCFG_VIA6522_ADD("via6522_0", MAIN_CLOCK/12, via_interface)	/* 1 MHz.(only 1 or 2 MHz.are valid) */
 
-	MDRV_MC6845_ADD("crtc", MC6845, MAIN_CLOCK/8, mc6845_intf)	/* 1.5 MHz.(logical guess to get a decent 59.6374 Hz.) */
+	MCFG_MC6845_ADD("crtc", MC6845, MAIN_CLOCK/8, mc6845_intf)	/* 1.5 MHz.(logical guess to get a decent 59.6374 Hz.) */
 
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("aysnd", AY8910, MAIN_CLOCK/8)	/* 1.5 MHz.(guess) */
-	MDRV_SOUND_CONFIG(ay8910_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	MCFG_SOUND_ADD("aysnd", AY8910, MAIN_CLOCK/8)	/* 1.5 MHz.(guess) */
+	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
 

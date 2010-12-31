@@ -108,33 +108,33 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( vertigo, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 8000000)
-	MDRV_CPU_PROGRAM_MAP(vertigo_map)
-	MDRV_CPU_PERIODIC_INT(vertigo_interrupt,60)
+	MCFG_CPU_ADD("maincpu", M68000, 8000000)
+	MCFG_CPU_PROGRAM_MAP(vertigo_map)
+	MCFG_CPU_PERIODIC_INT(vertigo_interrupt,60)
 
-	MDRV_FRAGMENT_ADD(exidy440_audio)
+	MCFG_FRAGMENT_ADD(exidy440_audio)
 
-	MDRV_PIT8254_ADD( "pit8254", vertigo_pit8254_config )
+	MCFG_PIT8254_ADD( "pit8254", vertigo_pit8254_config )
 
-	MDRV_74148_ADD( "74148", vertigo_update_irq )
+	MCFG_74148_ADD( "74148", vertigo_update_irq )
 
 	/* motor controller */
 	/*
-    MDRV_CPU_ADD("motor", M6805, 1000000)
-    MDRV_CPU_PROGRAM_MAP(vertigo_motor)
+    MCFG_CPU_ADD("motor", M6805, 1000000)
+    MCFG_CPU_PROGRAM_MAP(vertigo_motor)
     */
-	MDRV_MACHINE_START(vertigo)
-	MDRV_MACHINE_RESET(vertigo)
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_MACHINE_START(vertigo)
+	MCFG_MACHINE_RESET(vertigo)
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", VECTOR)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_SIZE(400, 300)
-	MDRV_SCREEN_VISIBLE_AREA(0, 510, 0, 400)
+	MCFG_SCREEN_ADD("screen", VECTOR)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_SIZE(400, 300)
+	MCFG_SCREEN_VISIBLE_AREA(0, 510, 0, 400)
 
-	MDRV_VIDEO_START(vector)
-	MDRV_VIDEO_UPDATE(vector)
+	MCFG_VIDEO_START(vector)
+	MCFG_VIDEO_UPDATE(vector)
 MACHINE_CONFIG_END
 
 

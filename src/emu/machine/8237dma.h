@@ -43,9 +43,9 @@
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_I8237_ADD(_tag, _clock, _config) \
-	MDRV_DEVICE_ADD(_tag, I8237, _clock) \
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_I8237_ADD(_tag, _clock, _config) \
+	MCFG_DEVICE_ADD(_tag, I8237, _clock) \
+	MCFG_DEVICE_CONFIG(_config)
 
 #define I8237_INTERFACE(_name) \
 	const i8237_interface (_name) =

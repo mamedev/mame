@@ -108,13 +108,13 @@ enum
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MDRV_DEVICE_DISABLE() \
+#define MCFG_DEVICE_DISABLE() \
 	device_config_execute_interface::static_set_disable(device); \
 
-#define MDRV_DEVICE_VBLANK_INT(_tag, _func) \
+#define MCFG_DEVICE_VBLANK_INT(_tag, _func) \
 	device_config_execute_interface::static_set_vblank_int(device, _func, _tag); \
 
-#define MDRV_DEVICE_PERIODIC_INT(_func, _rate)	\
+#define MCFG_DEVICE_PERIODIC_INT(_func, _rate)	\
 	device_config_execute_interface::static_set_periodic_int(device, _func, ATTOTIME_IN_HZ(_rate)); \
 
 

@@ -937,87 +937,87 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( root, zaxxon_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/16)
-	MDRV_CPU_PROGRAM_MAP(zaxxon_map)
-	MDRV_CPU_VBLANK_INT("screen", vblank_int)
+	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/16)
+	MCFG_CPU_PROGRAM_MAP(zaxxon_map)
+	MCFG_CPU_VBLANK_INT("screen", vblank_int)
 
-	MDRV_MACHINE_START(zaxxon)
+	MCFG_MACHINE_START(zaxxon)
 
-	MDRV_PPI8255_ADD( "ppi8255", zaxxon_ppi_intf )
+	MCFG_PPI8255_ADD( "ppi8255", zaxxon_ppi_intf )
 
 	/* video hardware */
-	MDRV_GFXDECODE(zaxxon)
-	MDRV_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE(zaxxon)
+	MCFG_PALETTE_LENGTH(256)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, HTOTAL, HBEND, HBSTART, VTOTAL, VBEND, VBSTART)
 
-	MDRV_PALETTE_INIT(zaxxon)
-	MDRV_VIDEO_START(zaxxon)
-	MDRV_VIDEO_UPDATE(zaxxon)
+	MCFG_PALETTE_INIT(zaxxon)
+	MCFG_VIDEO_START(zaxxon)
+	MCFG_VIDEO_UPDATE(zaxxon)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( zaxxon, root )
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_FRAGMENT_ADD(zaxxon_samples)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_FRAGMENT_ADD(zaxxon_samples)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( futspy, root )
 
 	/* video hardware */
-	MDRV_VIDEO_UPDATE(futspy)
+	MCFG_VIDEO_UPDATE(futspy)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_FRAGMENT_ADD(zaxxon_samples)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_FRAGMENT_ADD(zaxxon_samples)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( razmataz, root )
 
-	MDRV_MACHINE_RESET(razmataz)
+	MCFG_MACHINE_RESET(razmataz)
 
 	/* video hardware */
-	MDRV_VIDEO_START(razmataz)
-	MDRV_VIDEO_UPDATE(razmataz)
+	MCFG_VIDEO_START(razmataz)
+	MCFG_VIDEO_UPDATE(razmataz)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_FRAGMENT_ADD(sega_universal_sound_board_rom)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_FRAGMENT_ADD(sega_universal_sound_board_rom)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( congo, root )
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(congo_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(congo_map)
 
-	MDRV_PPI8255_RECONFIG( "ppi8255", congo_ppi_intf )
+	MCFG_PPI8255_RECONFIG( "ppi8255", congo_ppi_intf )
 
-	MDRV_CPU_ADD("audiocpu", Z80, SOUND_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(congo_sound_map)
-	MDRV_CPU_PERIODIC_INT(irq0_line_hold, (double)SOUND_CLOCK/16/16/16/4)
+	MCFG_CPU_ADD("audiocpu", Z80, SOUND_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(congo_sound_map)
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold, (double)SOUND_CLOCK/16/16/16/4)
 
 	/* video hardware */
-	MDRV_PALETTE_LENGTH(512)
-	MDRV_VIDEO_START(congo)
-	MDRV_VIDEO_UPDATE(congo)
+	MCFG_PALETTE_LENGTH(512)
+	MCFG_VIDEO_START(congo)
+	MCFG_VIDEO_UPDATE(congo)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("sn1", SN76496, SOUND_CLOCK)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("sn1", SN76496, SOUND_CLOCK)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("sn2", SN76496, SOUND_CLOCK/4)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("sn2", SN76496, SOUND_CLOCK/4)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_FRAGMENT_ADD(congo_samples)
+	MCFG_FRAGMENT_ADD(congo_samples)
 MACHINE_CONFIG_END
 
 

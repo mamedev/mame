@@ -327,16 +327,16 @@ ADDRESS_MAP_END
  *************************************/
 
 MACHINE_CONFIG_FRAGMENT( gottlieb_soundrev1 )
-	MDRV_SOUND_START(gottlieb1)
+	MCFG_SOUND_START(gottlieb1)
 
-	MDRV_RIOT6532_ADD("riot", SOUND1_CLOCK/4, gottlieb_riot6532_intf)
+	MCFG_RIOT6532_ADD("riot", SOUND1_CLOCK/4, gottlieb_riot6532_intf)
 
-	MDRV_CPU_ADD("audiocpu", M6502, SOUND1_CLOCK/4)	/* the board can be set to /2 as well */
-	MDRV_CPU_PROGRAM_MAP(gottlieb_sound1_map)
+	MCFG_CPU_ADD("audiocpu", M6502, SOUND1_CLOCK/4)	/* the board can be set to /2 as well */
+	MCFG_CPU_PROGRAM_MAP(gottlieb_sound1_map)
 
 	/* sound hardware */
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 
@@ -577,29 +577,29 @@ ADDRESS_MAP_END
 
 MACHINE_CONFIG_FRAGMENT( gottlieb_soundrev2 )
 	/* audio CPUs */
-	MDRV_CPU_ADD("audiocpu", M6502, SOUND2_CLOCK/4)
-	MDRV_CPU_PROGRAM_MAP(gottlieb_audio2_map)
+	MCFG_CPU_ADD("audiocpu", M6502, SOUND2_CLOCK/4)
+	MCFG_CPU_PROGRAM_MAP(gottlieb_audio2_map)
 
-	MDRV_CPU_ADD("speech", M6502, SOUND2_CLOCK/4)
-	MDRV_CPU_PROGRAM_MAP(gottlieb_speech2_map)
+	MCFG_CPU_ADD("speech", M6502, SOUND2_CLOCK/4)
+	MCFG_CPU_PROGRAM_MAP(gottlieb_speech2_map)
 
 	/* sound hardware */
-	MDRV_SOUND_START( gottlieb2 )
+	MCFG_SOUND_START( gottlieb2 )
 
-	MDRV_SOUND_ADD("dac1", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	MCFG_SOUND_ADD("dac1", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MDRV_SOUND_ADD("dac2", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	MCFG_SOUND_ADD("dac2", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MDRV_SOUND_ADD("ay1", AY8913, SOUND2_CLOCK/2)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	MCFG_SOUND_ADD("ay1", AY8913, SOUND2_CLOCK/2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MDRV_SOUND_ADD("ay2", AY8913, SOUND2_CLOCK/2)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	MCFG_SOUND_ADD("ay2", AY8913, SOUND2_CLOCK/2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MDRV_SOUND_ADD("spsnd", SP0250, SOUND2_SPEECH_CLOCK)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("spsnd", SP0250, SOUND2_SPEECH_CLOCK)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 

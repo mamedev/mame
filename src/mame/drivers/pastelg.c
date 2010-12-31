@@ -408,38 +408,38 @@ static const ay8910_interface ay8910_config =
 static MACHINE_CONFIG_START( pastelg, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 19968000/4)	/* unknown divider, galds definitely relies on this for correct voice pitch */
-	MDRV_CPU_PROGRAM_MAP(pastelg_map)
-	MDRV_CPU_IO_MAP(pastelg_io_map)
-//  MDRV_CPU_VBLANK_INT_HACK(nb1413m3_interrupt,96)  // nmiclock not written, chip is 1411M1 instead of 1413M3
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
+	MCFG_CPU_ADD("maincpu", Z80, 19968000/4)	/* unknown divider, galds definitely relies on this for correct voice pitch */
+	MCFG_CPU_PROGRAM_MAP(pastelg_map)
+	MCFG_CPU_IO_MAP(pastelg_io_map)
+//  MCFG_CPU_VBLANK_INT_HACK(nb1413m3_interrupt,96)  // nmiclock not written, chip is 1411M1 instead of 1413M3
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_assert)
 
-	MDRV_MACHINE_RESET(nb1413m3)
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_MACHINE_RESET(nb1413m3)
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 16, 240-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 240-1)
 
-	MDRV_PALETTE_LENGTH(32)
+	MCFG_PALETTE_LENGTH(32)
 
-	MDRV_PALETTE_INIT(pastelg)
-	MDRV_VIDEO_START(pastelg)
-	MDRV_VIDEO_UPDATE(pastelg)
+	MCFG_PALETTE_INIT(pastelg)
+	MCFG_VIDEO_START(pastelg)
+	MCFG_VIDEO_UPDATE(pastelg)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("aysnd", AY8910, 1250000)
-	MDRV_SOUND_CONFIG(ay8910_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
+	MCFG_SOUND_ADD("aysnd", AY8910, 1250000)
+	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 /*
@@ -468,37 +468,37 @@ Note
 static MACHINE_CONFIG_START( threeds, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, 19968000/4)	/* unknown divider, galds definitely relies on this for correct voice pitch */
-	MDRV_CPU_PROGRAM_MAP(pastelg_map)
-	MDRV_CPU_IO_MAP(threeds_io_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_assert)
+	MCFG_CPU_ADD("maincpu", Z80, 19968000/4)	/* unknown divider, galds definitely relies on this for correct voice pitch */
+	MCFG_CPU_PROGRAM_MAP(pastelg_map)
+	MCFG_CPU_IO_MAP(threeds_io_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_assert)
 
-	MDRV_MACHINE_RESET(nb1413m3)
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_MACHINE_RESET(nb1413m3)
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 16, 240-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 240-1)
 
-	MDRV_PALETTE_LENGTH(32)
+	MCFG_PALETTE_LENGTH(32)
 
-	MDRV_PALETTE_INIT(pastelg)
-	MDRV_VIDEO_START(pastelg)
-	MDRV_VIDEO_UPDATE(pastelg)
+	MCFG_PALETTE_INIT(pastelg)
+	MCFG_VIDEO_START(pastelg)
+	MCFG_VIDEO_UPDATE(pastelg)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("aysnd", AY8910, 1250000)
-	MDRV_SOUND_CONFIG(ay8910_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
+	MCFG_SOUND_ADD("aysnd", AY8910, 1250000)
+	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.35)
 
-	MDRV_SOUND_ADD("dac", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("dac", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 

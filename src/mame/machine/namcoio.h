@@ -24,17 +24,17 @@ DECLARE_LEGACY_DEVICE(NAMCO56XX, namcoio);
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_NAMCO56XX_ADD(_tag, _interface) \
-	MDRV_DEVICE_ADD(_tag, NAMCO56XX, 0) \
-	MDRV_DEVICE_CONFIG(_interface)
+#define MCFG_NAMCO56XX_ADD(_tag, _interface) \
+	MCFG_DEVICE_ADD(_tag, NAMCO56XX, 0) \
+	MCFG_DEVICE_CONFIG(_interface)
 
-#define MDRV_NAMCO58XX_ADD(_tag, _interface) \
-	MDRV_DEVICE_ADD(_tag, NAMCO58XX, 0) \
-	MDRV_DEVICE_CONFIG(_interface)
+#define MCFG_NAMCO58XX_ADD(_tag, _interface) \
+	MCFG_DEVICE_ADD(_tag, NAMCO58XX, 0) \
+	MCFG_DEVICE_CONFIG(_interface)
 
-#define MDRV_NAMCO59XX_ADD(_tag, _interface) \
-	MDRV_DEVICE_ADD(_tag, NAMCO59XX, 0) \
-	MDRV_DEVICE_CONFIG(_interface)
+#define MCFG_NAMCO59XX_ADD(_tag, _interface) \
+	MCFG_DEVICE_ADD(_tag, NAMCO59XX, 0) \
+	MCFG_DEVICE_CONFIG(_interface)
 
 
 /***************************************************************************

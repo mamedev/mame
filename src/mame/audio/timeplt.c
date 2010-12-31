@@ -215,46 +215,46 @@ static const ay8910_interface timeplt_ay8910_interface =
 MACHINE_CONFIG_FRAGMENT( timeplt_sound )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("tpsound",Z80,MASTER_CLOCK/8)
-	MDRV_CPU_PROGRAM_MAP(timeplt_sound_map)
+	MCFG_CPU_ADD("tpsound",Z80,MASTER_CLOCK/8)
+	MCFG_CPU_PROGRAM_MAP(timeplt_sound_map)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("timeplt_audio", TIMEPLT_AUDIO, 0)
+	MCFG_SOUND_ADD("timeplt_audio", TIMEPLT_AUDIO, 0)
 
-	MDRV_SOUND_ADD("ay1", AY8910, MASTER_CLOCK/8)
-	MDRV_SOUND_CONFIG(timeplt_ay8910_interface)
-	MDRV_SOUND_ROUTE(0, "filter.0.0", 0.60)
-	MDRV_SOUND_ROUTE(1, "filter.0.1", 0.60)
-	MDRV_SOUND_ROUTE(2, "filter.0.2", 0.60)
+	MCFG_SOUND_ADD("ay1", AY8910, MASTER_CLOCK/8)
+	MCFG_SOUND_CONFIG(timeplt_ay8910_interface)
+	MCFG_SOUND_ROUTE(0, "filter.0.0", 0.60)
+	MCFG_SOUND_ROUTE(1, "filter.0.1", 0.60)
+	MCFG_SOUND_ROUTE(2, "filter.0.2", 0.60)
 
-	MDRV_SOUND_ADD("ay2", AY8910, MASTER_CLOCK/8)
-	MDRV_SOUND_ROUTE(0, "filter.1.0", 0.60)
-	MDRV_SOUND_ROUTE(1, "filter.1.1", 0.60)
-	MDRV_SOUND_ROUTE(2, "filter.1.2", 0.60)
+	MCFG_SOUND_ADD("ay2", AY8910, MASTER_CLOCK/8)
+	MCFG_SOUND_ROUTE(0, "filter.1.0", 0.60)
+	MCFG_SOUND_ROUTE(1, "filter.1.1", 0.60)
+	MCFG_SOUND_ROUTE(2, "filter.1.2", 0.60)
 
-	MDRV_SOUND_ADD("filter.0.0", FILTER_RC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MDRV_SOUND_ADD("filter.0.1", FILTER_RC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MDRV_SOUND_ADD("filter.0.2", FILTER_RC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("filter.0.0", FILTER_RC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("filter.0.1", FILTER_RC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("filter.0.2", FILTER_RC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("filter.1.0", FILTER_RC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MDRV_SOUND_ADD("filter.1.1", FILTER_RC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MDRV_SOUND_ADD("filter.1.2", FILTER_RC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("filter.1.0", FILTER_RC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("filter.1.1", FILTER_RC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("filter.1.2", FILTER_RC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_DERIVED( locomotn_sound, timeplt_sound )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("tpsound")
-	MDRV_CPU_PROGRAM_MAP(locomotn_sound_map)
+	MCFG_CPU_MODIFY("tpsound")
+	MCFG_CPU_PROGRAM_MAP(locomotn_sound_map)
 MACHINE_CONFIG_END
 
 /*****************************************************************************

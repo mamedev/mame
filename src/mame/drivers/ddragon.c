@@ -977,161 +977,161 @@ static const msm5205_interface msm5205_config =
 static MACHINE_CONFIG_START( ddragon, ddragon_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", HD6309, MAIN_CLOCK)		/* 12 MHz / 4 internally */
-	MDRV_CPU_PROGRAM_MAP(ddragon_map)
-	MDRV_TIMER_ADD_SCANLINE("scantimer", ddragon_scanline, "screen", 0, 1)
+	MCFG_CPU_ADD("maincpu", HD6309, MAIN_CLOCK)		/* 12 MHz / 4 internally */
+	MCFG_CPU_PROGRAM_MAP(ddragon_map)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", ddragon_scanline, "screen", 0, 1)
 
-	MDRV_CPU_ADD("sub", HD63701, MAIN_CLOCK / 2)	/* 6 MHz / 4 internally */
-	MDRV_CPU_PROGRAM_MAP(sub_map)
+	MCFG_CPU_ADD("sub", HD63701, MAIN_CLOCK / 2)	/* 6 MHz / 4 internally */
+	MCFG_CPU_PROGRAM_MAP(sub_map)
 
-	MDRV_CPU_ADD("soundcpu", M6809, MAIN_CLOCK / 8)	/* 1.5 MHz */
-	MDRV_CPU_PROGRAM_MAP(sound_map)
+	MCFG_CPU_ADD("soundcpu", M6809, MAIN_CLOCK / 8)	/* 1.5 MHz */
+	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MDRV_QUANTUM_TIME(HZ(60000))	/* heavy interleaving to sync up sprite<->main cpu's */
+	MCFG_QUANTUM_TIME(HZ(60000))	/* heavy interleaving to sync up sprite<->main cpu's */
 
-	MDRV_MACHINE_START(ddragon)
-	MDRV_MACHINE_RESET(ddragon)
+	MCFG_MACHINE_START(ddragon)
+	MCFG_MACHINE_RESET(ddragon)
 
 	/* video hardware */
-	MDRV_GFXDECODE(ddragon)
-	MDRV_PALETTE_LENGTH(384)
+	MCFG_GFXDECODE(ddragon)
+	MCFG_PALETTE_LENGTH(384)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 256, 272, 0, 240)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 256, 272, 0, 240)
 
-	MDRV_VIDEO_START(ddragon)
-	MDRV_VIDEO_UPDATE(ddragon)
+	MCFG_VIDEO_START(ddragon)
+	MCFG_VIDEO_UPDATE(ddragon)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("fmsnd", YM2151, SOUND_CLOCK)
-	MDRV_SOUND_CONFIG(ym2151_config)
-	MDRV_SOUND_ROUTE(0, "mono", 0.60)
-	MDRV_SOUND_ROUTE(1, "mono", 0.60)
+	MCFG_SOUND_ADD("fmsnd", YM2151, SOUND_CLOCK)
+	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_SOUND_ROUTE(0, "mono", 0.60)
+	MCFG_SOUND_ROUTE(1, "mono", 0.60)
 
-	MDRV_SOUND_ADD("adpcm1", MSM5205, MAIN_CLOCK/32)
-	MDRV_SOUND_CONFIG(msm5205_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("adpcm1", MSM5205, MAIN_CLOCK/32)
+	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD("adpcm2", MSM5205, MAIN_CLOCK/32)
-	MDRV_SOUND_CONFIG(msm5205_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("adpcm2", MSM5205, MAIN_CLOCK/32)
+	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( ddragonb, ddragon )
 
 	/* basic machine hardware */
-	MDRV_CPU_REPLACE("sub", M6809, MAIN_CLOCK / 8)	/* 1.5Mhz */
-	MDRV_CPU_PROGRAM_MAP(sub_map)
+	MCFG_CPU_REPLACE("sub", M6809, MAIN_CLOCK / 8)	/* 1.5Mhz */
+	MCFG_CPU_PROGRAM_MAP(sub_map)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( ddragonba, ddragon )
 
 	/* basic machine hardware */
-	MDRV_CPU_REPLACE("sub", M6803, MAIN_CLOCK / 2)	/* 6Mhz / 4 internally */
-	MDRV_CPU_PROGRAM_MAP(ddragonba_sub_map)
-	MDRV_CPU_IO_MAP(ddragonba_sub_portmap)
+	MCFG_CPU_REPLACE("sub", M6803, MAIN_CLOCK / 2)	/* 6Mhz / 4 internally */
+	MCFG_CPU_PROGRAM_MAP(ddragonba_sub_map)
+	MCFG_CPU_IO_MAP(ddragonba_sub_portmap)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( ddragon6809, ddragon_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6809, MAIN_CLOCK / 8)	/* 1.5 MHz */
-	MDRV_CPU_PROGRAM_MAP(ddragon_map)
-	MDRV_TIMER_ADD_SCANLINE("scantimer", ddragon_scanline, "screen", 0, 1)
+	MCFG_CPU_ADD("maincpu", M6809, MAIN_CLOCK / 8)	/* 1.5 MHz */
+	MCFG_CPU_PROGRAM_MAP(ddragon_map)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", ddragon_scanline, "screen", 0, 1)
 
-	MDRV_CPU_ADD("sub", M6809, MAIN_CLOCK / 8)	/* 1.5 Mhz */
-	MDRV_CPU_PROGRAM_MAP(sub_map)
+	MCFG_CPU_ADD("sub", M6809, MAIN_CLOCK / 8)	/* 1.5 Mhz */
+	MCFG_CPU_PROGRAM_MAP(sub_map)
 
-	MDRV_CPU_ADD("soundcpu", M6809, MAIN_CLOCK / 8)	/* 1.5 MHz */
-	MDRV_CPU_PROGRAM_MAP(sound_map)
+	MCFG_CPU_ADD("soundcpu", M6809, MAIN_CLOCK / 8)	/* 1.5 MHz */
+	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MDRV_QUANTUM_TIME(HZ(60000)) /* heavy interleaving to sync up sprite<->main cpu's */
+	MCFG_QUANTUM_TIME(HZ(60000)) /* heavy interleaving to sync up sprite<->main cpu's */
 
-	MDRV_MACHINE_START(ddragon)
-	MDRV_MACHINE_RESET(ddragon)
+	MCFG_MACHINE_START(ddragon)
+	MCFG_MACHINE_RESET(ddragon)
 
 	/* video hardware */
-	MDRV_GFXDECODE(ddragon)
-	MDRV_PALETTE_LENGTH(384)
+	MCFG_GFXDECODE(ddragon)
+	MCFG_PALETTE_LENGTH(384)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 256, 272, 0, 240)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 256, 272, 0, 240)
 
-	MDRV_VIDEO_START(ddragon)
-	MDRV_VIDEO_UPDATE(ddragon)
+	MCFG_VIDEO_START(ddragon)
+	MCFG_VIDEO_UPDATE(ddragon)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("fmsnd", YM2151, SOUND_CLOCK)
-	MDRV_SOUND_CONFIG(ym2151_config)
-	MDRV_SOUND_ROUTE(0, "mono", 0.60)
-	MDRV_SOUND_ROUTE(1, "mono", 0.60)
+	MCFG_SOUND_ADD("fmsnd", YM2151, SOUND_CLOCK)
+	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_SOUND_ROUTE(0, "mono", 0.60)
+	MCFG_SOUND_ROUTE(1, "mono", 0.60)
 
-	MDRV_SOUND_ADD("adpcm1", MSM5205, MAIN_CLOCK/32)
-	MDRV_SOUND_CONFIG(msm5205_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("adpcm1", MSM5205, MAIN_CLOCK/32)
+	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD("adpcm2", MSM5205, MAIN_CLOCK/32)
-	MDRV_SOUND_CONFIG(msm5205_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("adpcm2", MSM5205, MAIN_CLOCK/32)
+	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( ddragon2, ddragon_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", HD6309, MAIN_CLOCK)		/* 12 MHz / 4 internally */
-	MDRV_CPU_PROGRAM_MAP(dd2_map)
-	MDRV_TIMER_ADD_SCANLINE("scantimer", ddragon_scanline, "screen", 0, 1)
+	MCFG_CPU_ADD("maincpu", HD6309, MAIN_CLOCK)		/* 12 MHz / 4 internally */
+	MCFG_CPU_PROGRAM_MAP(dd2_map)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", ddragon_scanline, "screen", 0, 1)
 
-	MDRV_CPU_ADD("sub", Z80, MAIN_CLOCK / 3)		/* 4 MHz */
-	MDRV_CPU_PROGRAM_MAP(dd2_sub_map)
+	MCFG_CPU_ADD("sub", Z80, MAIN_CLOCK / 3)		/* 4 MHz */
+	MCFG_CPU_PROGRAM_MAP(dd2_sub_map)
 
-	MDRV_CPU_ADD("soundcpu", Z80, 3579545)
-	MDRV_CPU_PROGRAM_MAP(dd2_sound_map)
+	MCFG_CPU_ADD("soundcpu", Z80, 3579545)
+	MCFG_CPU_PROGRAM_MAP(dd2_sound_map)
 
-	MDRV_QUANTUM_TIME(HZ(60000)) /* heavy interleaving to sync up sprite<->main cpu's */
+	MCFG_QUANTUM_TIME(HZ(60000)) /* heavy interleaving to sync up sprite<->main cpu's */
 
-	MDRV_MACHINE_START(ddragon)
-	MDRV_MACHINE_RESET(ddragon)
+	MCFG_MACHINE_START(ddragon)
+	MCFG_MACHINE_RESET(ddragon)
 
 	/* video hardware */
-	MDRV_GFXDECODE(ddragon)
-	MDRV_PALETTE_LENGTH(384)
+	MCFG_GFXDECODE(ddragon)
+	MCFG_PALETTE_LENGTH(384)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 256, 272, 0, 240)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 384, 0, 256, 272, 0, 240)
 
-	MDRV_VIDEO_START(ddragon)
-	MDRV_VIDEO_UPDATE(ddragon)
+	MCFG_VIDEO_START(ddragon)
+	MCFG_VIDEO_UPDATE(ddragon)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("fmsnd", YM2151, SOUND_CLOCK)
-	MDRV_SOUND_CONFIG(ym2151_config)
-	MDRV_SOUND_ROUTE(0, "mono", 0.60)
-	MDRV_SOUND_ROUTE(1, "mono", 0.60)
+	MCFG_SOUND_ADD("fmsnd", YM2151, SOUND_CLOCK)
+	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_SOUND_ROUTE(0, "mono", 0.60)
+	MCFG_SOUND_ROUTE(1, "mono", 0.60)
 
-	MDRV_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
+	MCFG_OKIM6295_ADD("oki", 1056000, OKIM6295_PIN7_HIGH) // clock frequency & pin 7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.20)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( darktowr, ddragon )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("mcu", M68705,XTAL_4MHz)
-	MDRV_CPU_PROGRAM_MAP(mcu_map)
+	MCFG_CPU_ADD("mcu", M68705,XTAL_4MHz)
+	MCFG_CPU_PROGRAM_MAP(mcu_map)
 
 	/* video hardware */
 MACHINE_CONFIG_END
@@ -1140,11 +1140,11 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( toffy, ddragon )
 
 	/* basic machine hardware */
-	MDRV_DEVICE_REMOVE("sub")
+	MCFG_DEVICE_REMOVE("sub")
 
 	/* sound hardware */
-	MDRV_DEVICE_REMOVE("adpcm1")
-	MDRV_DEVICE_REMOVE("adpcm2")
+	MCFG_DEVICE_REMOVE("adpcm1")
+	MCFG_DEVICE_REMOVE("adpcm2")
 MACHINE_CONFIG_END
 
 

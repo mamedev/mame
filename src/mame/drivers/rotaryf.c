@@ -151,19 +151,19 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( rotaryf, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu",I8085A,4000000) /* 8080? */ /* 2 MHz? */
-	MDRV_CPU_PROGRAM_MAP(rotaryf_map)
-	MDRV_CPU_IO_MAP(rotaryf_io_map)
-	MDRV_CPU_VBLANK_INT_HACK(rotaryf_interrupt,5)
+	MCFG_CPU_ADD("maincpu",I8085A,4000000) /* 8080? */ /* 2 MHz? */
+	MCFG_CPU_PROGRAM_MAP(rotaryf_map)
+	MCFG_CPU_IO_MAP(rotaryf_io_map)
+	MCFG_CPU_VBLANK_INT_HACK(rotaryf_interrupt,5)
 
 	/* video hardware */
-	MDRV_VIDEO_UPDATE(rotaryf)
+	MCFG_VIDEO_UPDATE(rotaryf)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(32*8, 262)		/* vert size is a guess, taken from mw8080bw */
-	MDRV_SCREEN_VISIBLE_AREA(1*8, 30*8-1, 0*8, 32*8-1)
-	MDRV_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_SIZE(32*8, 262)		/* vert size is a guess, taken from mw8080bw */
+	MCFG_SCREEN_VISIBLE_AREA(1*8, 30*8-1, 0*8, 32*8-1)
+	MCFG_SCREEN_REFRESH_RATE(60)
 
 MACHINE_CONFIG_END
 

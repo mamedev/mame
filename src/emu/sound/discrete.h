@@ -4420,7 +4420,7 @@ enum
  *
  *************************************/
 
-#define MDRV_SOUND_CONFIG_DISCRETE(name) MDRV_SOUND_CONFIG(name##_discrete_interface)
+#define MCFG_SOUND_CONFIG_DISCRETE(name) MCFG_SOUND_CONFIG(name##_discrete_interface)
 
 #define DISCRETE_SOUND_EXTERN(name) extern const discrete_sound_block name##_discrete_interface[]
 #define DISCRETE_SOUND_START(name) const discrete_sound_block name##_discrete_interface[] = {

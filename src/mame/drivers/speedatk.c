@@ -318,36 +318,36 @@ static const ay8910_interface ay8910_config =
 
 static MACHINE_CONFIG_START( speedatk, speedatk_state )
 
-	MDRV_CPU_ADD("maincpu", Z80,MASTER_CLOCK/2) //divider is unknown
-	MDRV_CPU_PROGRAM_MAP(speedatk_mem)
-	MDRV_CPU_IO_MAP(speedatk_io)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("maincpu", Z80,MASTER_CLOCK/2) //divider is unknown
+	MCFG_CPU_PROGRAM_MAP(speedatk_mem)
+	MCFG_CPU_IO_MAP(speedatk_io)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_WATCHDOG_VBLANK_INIT(8) // timing is unknown
+	MCFG_WATCHDOG_VBLANK_INIT(8) // timing is unknown
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(320, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(320, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 32*8-1)
 
-	MDRV_MC6845_ADD("crtc", H46505, MASTER_CLOCK/16, mc6845_intf)	/* hand tuned to get ~60 fps */
+	MCFG_MC6845_ADD("crtc", H46505, MASTER_CLOCK/16, mc6845_intf)	/* hand tuned to get ~60 fps */
 
-	MDRV_GFXDECODE(speedatk)
-	MDRV_PALETTE_LENGTH(0x100)
-	MDRV_PALETTE_INIT(speedatk)
+	MCFG_GFXDECODE(speedatk)
+	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_PALETTE_INIT(speedatk)
 
-	MDRV_VIDEO_START(speedatk)
-	MDRV_VIDEO_UPDATE(speedatk)
+	MCFG_VIDEO_START(speedatk)
+	MCFG_VIDEO_UPDATE(speedatk)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK/4) //divider is unknown
-	MDRV_SOUND_CONFIG(ay8910_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	MCFG_SOUND_ADD("aysnd", AY8910, MASTER_CLOCK/4) //divider is unknown
+	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 MACHINE_CONFIG_END
 
 ROM_START( speedatk )

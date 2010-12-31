@@ -734,37 +734,37 @@ static const eeprom_interface eeprom_intf =
 static MACHINE_CONFIG_START( leland, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("master", Z80, MASTER_CLOCK/2)
-	MDRV_CPU_PROGRAM_MAP(master_map_program)
-	MDRV_CPU_IO_MAP(master_map_io)
-	MDRV_CPU_VBLANK_INT("screen", leland_master_interrupt)
+	MCFG_CPU_ADD("master", Z80, MASTER_CLOCK/2)
+	MCFG_CPU_PROGRAM_MAP(master_map_program)
+	MCFG_CPU_IO_MAP(master_map_io)
+	MCFG_CPU_VBLANK_INT("screen", leland_master_interrupt)
 
-	MDRV_CPU_ADD("slave", Z80, MASTER_CLOCK/2)
-	MDRV_CPU_PROGRAM_MAP(slave_small_map_program)
-	MDRV_CPU_IO_MAP(slave_map_io)
+	MCFG_CPU_ADD("slave", Z80, MASTER_CLOCK/2)
+	MCFG_CPU_PROGRAM_MAP(slave_small_map_program)
+	MCFG_CPU_IO_MAP(slave_map_io)
 
-	MDRV_MACHINE_START(leland)
-	MDRV_MACHINE_RESET(leland)
+	MCFG_MACHINE_START(leland)
+	MCFG_MACHINE_RESET(leland)
 
-	MDRV_EEPROM_ADD("eeprom", eeprom_intf)
-	MDRV_NVRAM_ADD_0FILL("battery")
+	MCFG_EEPROM_ADD("eeprom", eeprom_intf)
+	MCFG_NVRAM_ADD_0FILL("battery")
 
 	/* video hardware */
-	MDRV_FRAGMENT_ADD(leland_video)
+	MCFG_FRAGMENT_ADD(leland_video)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay8910.1", AY8910, 10000000/6)
-	MDRV_SOUND_CONFIG(ay8910_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("ay8910.1", AY8910, 10000000/6)
+	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD("ay8910.2", AY8910, 10000000/6)
-	MDRV_SOUND_CONFIG(ay8910_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("ay8910.2", AY8910, 10000000/6)
+	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD("custom", LELAND, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("custom", LELAND, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 
@@ -772,13 +772,13 @@ static MACHINE_CONFIG_DERIVED( redline, leland )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_ADD("audiocpu", I80186, MCU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(leland_80186_map_program)
-	MDRV_CPU_IO_MAP(redline_80186_map_io)
+	MCFG_CPU_ADD("audiocpu", I80186, MCU_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(leland_80186_map_program)
+	MCFG_CPU_IO_MAP(redline_80186_map_io)
 
 	/* sound hardware */
-	MDRV_SOUND_REPLACE("custom", REDLINE_80186, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_REPLACE("custom", REDLINE_80186, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -786,12 +786,12 @@ static MACHINE_CONFIG_DERIVED( quarterb, redline )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_MODIFY("audiocpu")
-	MDRV_CPU_IO_MAP(leland_80186_map_io)
+	MCFG_CPU_MODIFY("audiocpu")
+	MCFG_CPU_IO_MAP(leland_80186_map_io)
 
 	/* sound hardware */
-	MDRV_SOUND_REPLACE("custom", LELAND_80186, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_REPLACE("custom", LELAND_80186, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -799,8 +799,8 @@ static MACHINE_CONFIG_DERIVED( lelandi, quarterb )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_MODIFY("slave")
-	MDRV_CPU_PROGRAM_MAP(slave_large_map_program)
+	MCFG_CPU_MODIFY("slave")
+	MCFG_CPU_PROGRAM_MAP(slave_large_map_program)
 MACHINE_CONFIG_END
 
 

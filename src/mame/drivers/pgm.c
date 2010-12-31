@@ -1372,55 +1372,55 @@ static MACHINE_RESET( pgm )
 static MACHINE_CONFIG_START( pgm, pgm_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 20000000) /* 20 mhz! verified on real board */
-	MDRV_CPU_PROGRAM_MAP(pgm_mem)
-	MDRV_CPU_VBLANK_INT("screen", irq6_line_hold)
+	MCFG_CPU_ADD("maincpu", M68000, 20000000) /* 20 mhz! verified on real board */
+	MCFG_CPU_PROGRAM_MAP(pgm_mem)
+	MCFG_CPU_VBLANK_INT("screen", irq6_line_hold)
 
-	MDRV_CPU_ADD("soundcpu", Z80, 33868800/4)
-	MDRV_CPU_PROGRAM_MAP(z80_mem)
-	MDRV_CPU_IO_MAP(z80_io)
+	MCFG_CPU_ADD("soundcpu", Z80, 33868800/4)
+	MCFG_CPU_PROGRAM_MAP(z80_mem)
+	MCFG_CPU_IO_MAP(z80_io)
 
-	MDRV_MACHINE_START( pgm )
-	MDRV_MACHINE_RESET( pgm )
-	MDRV_NVRAM_ADD_0FILL("sram")
+	MCFG_MACHINE_START( pgm )
+	MCFG_MACHINE_RESET( pgm )
+	MCFG_NVRAM_ADD_0FILL("sram")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60) // killing blade won't boot (just displays 'error') if this is lower than 59.9 or higher than 60.1 .. are actual PGM boards different to the Cave one?
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 64*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 56*8-1, 0*8, 28*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60) // killing blade won't boot (just displays 'error') if this is lower than 59.9 or higher than 60.1 .. are actual PGM boards different to the Cave one?
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 64*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 56*8-1, 0*8, 28*8-1)
 
-	MDRV_GFXDECODE(pgm)
-	MDRV_PALETTE_LENGTH(0x1200/2)
+	MCFG_GFXDECODE(pgm)
+	MCFG_PALETTE_LENGTH(0x1200/2)
 
-	MDRV_VIDEO_START(pgm)
-	MDRV_VIDEO_EOF(pgm)
-	MDRV_VIDEO_UPDATE(pgm)
+	MCFG_VIDEO_START(pgm)
+	MCFG_VIDEO_EOF(pgm)
+	MCFG_VIDEO_UPDATE(pgm)
 
 	/*sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-    MDRV_ICS2115_ADD("ics", 0, sound_irq)
-//	MDRV_SOUND_ADD("ics", ICS2115, 0)
-//	MDRV_SOUND_CONFIG(pgm_ics2115_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 5.0)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+    MCFG_ICS2115_ADD("ics", 0, sound_irq)
+//	MCFG_SOUND_ADD("ics", ICS2115, 0)
+//	MCFG_SOUND_CONFIG(pgm_ics2115_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 5.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( drgw2, pgm )
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_VBLANK_INT_HACK(drgw_interrupt,2) // needs an extra IRQ, puzzli2 doesn't want this irq!
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_VBLANK_INT_HACK(drgw_interrupt,2) // needs an extra IRQ, puzzli2 doesn't want this irq!
 MACHINE_CONFIG_END
 
 static MACHINE_RESET( killbld );
 
 static MACHINE_CONFIG_DERIVED( killbld, pgm )
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(killbld_mem)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(killbld_mem)
 
-	MDRV_MACHINE_RESET(killbld)
+	MCFG_MACHINE_RESET(killbld)
 
 MACHINE_CONFIG_END
 
@@ -1428,11 +1428,11 @@ static MACHINE_RESET( dw3 );
 
 static MACHINE_CONFIG_DERIVED( dw3, pgm )
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(killbld_mem)
-	MDRV_CPU_VBLANK_INT_HACK(drgw_interrupt,2) // needs an extra IRQ, puzzli2 doesn't want this irq!
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(killbld_mem)
+	MCFG_CPU_VBLANK_INT_HACK(drgw_interrupt,2) // needs an extra IRQ, puzzli2 doesn't want this irq!
 
-	MDRV_MACHINE_RESET(dw3)
+	MCFG_MACHINE_RESET(dw3)
 
 MACHINE_CONFIG_END
 
@@ -1440,55 +1440,55 @@ static MACHINE_RESET( olds );
 
 static MACHINE_CONFIG_DERIVED( olds, pgm )
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(olds_mem)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(olds_mem)
 
-	MDRV_MACHINE_RESET(olds)
+	MCFG_MACHINE_RESET(olds)
 
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( kov, pgm )
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(kovsh_mem)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(kovsh_mem)
 
 	/* protection CPU */
-	MDRV_CPU_ADD("prot", ARM7, 20000000)	// 55857E/F/G
-	MDRV_CPU_PROGRAM_MAP(kovsh_arm7_map)
+	MCFG_CPU_ADD("prot", ARM7, 20000000)	// 55857E/F/G
+	MCFG_CPU_PROGRAM_MAP(kovsh_arm7_map)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( kov_disabled_arm, pgm )
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(kovsh_mem)
-	MDRV_CPU_VBLANK_INT_HACK(drgw_interrupt,2) // needs an extra IRQ, puzzli2 doesn't want this irq!
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(kovsh_mem)
+	MCFG_CPU_VBLANK_INT_HACK(drgw_interrupt,2) // needs an extra IRQ, puzzli2 doesn't want this irq!
 
 	/* protection CPU */
-	MDRV_CPU_ADD("prot", ARM7, 20000000)	// 55857E/F/G
-	MDRV_CPU_PROGRAM_MAP(kovsh_arm7_map)
-	MDRV_DEVICE_DISABLE()
+	MCFG_CPU_ADD("prot", ARM7, 20000000)	// 55857E/F/G
+	MCFG_CPU_PROGRAM_MAP(kovsh_arm7_map)
+	MCFG_DEVICE_DISABLE()
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( kov2, pgm )
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(kov2_mem)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(kov2_mem)
 
 	/* protection CPU */
-	MDRV_CPU_ADD("prot", ARM7, 20000000)	// 55857F
-	MDRV_CPU_PROGRAM_MAP(arm7_map)
+	MCFG_CPU_ADD("prot", ARM7, 20000000)	// 55857F
+	MCFG_CPU_PROGRAM_MAP(arm7_map)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( svg, pgm )
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(svg_68k_mem)
-	MDRV_CPU_VBLANK_INT_HACK(drgw_interrupt,2) // needs an extra IRQ, puzzli2 doesn't want this irq!
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(svg_68k_mem)
+	MCFG_CPU_VBLANK_INT_HACK(drgw_interrupt,2) // needs an extra IRQ, puzzli2 doesn't want this irq!
 
 	/* protection CPU */
-	MDRV_CPU_ADD("prot", ARM7, 20000000)	// 55857G
-	MDRV_CPU_PROGRAM_MAP(svg_arm7_map)
+	MCFG_CPU_ADD("prot", ARM7, 20000000)	// 55857G
+	MCFG_CPU_PROGRAM_MAP(svg_arm7_map)
 MACHINE_CONFIG_END
 
 class cavepgm_state : public pgm_state
@@ -1524,40 +1524,40 @@ static MACHINE_START( cavepgm )
 static MACHINE_CONFIG_START( cavepgm, cavepgm_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 20000000)
+	MCFG_CPU_ADD("maincpu", M68000, 20000000)
 
-	MDRV_CPU_PROGRAM_MAP(cavepgm_mem)
-	MDRV_CPU_VBLANK_INT_HACK(drgw_interrupt,2)
+	MCFG_CPU_PROGRAM_MAP(cavepgm_mem)
+	MCFG_CPU_VBLANK_INT_HACK(drgw_interrupt,2)
 
-	MDRV_CPU_ADD("soundcpu", Z80, 33868800/4)
-	MDRV_CPU_PROGRAM_MAP(z80_mem)
-	MDRV_CPU_IO_MAP(z80_io)
+	MCFG_CPU_ADD("soundcpu", Z80, 33868800/4)
+	MCFG_CPU_PROGRAM_MAP(z80_mem)
+	MCFG_CPU_IO_MAP(z80_io)
 
-	MDRV_MACHINE_START( cavepgm )
-	MDRV_MACHINE_RESET( pgm )
-	MDRV_NVRAM_ADD_0FILL("sram")
+	MCFG_MACHINE_START( cavepgm )
+	MCFG_MACHINE_RESET( pgm )
+	MCFG_NVRAM_ADD_0FILL("sram")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(59.17) // verified on pcb
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 64*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 56*8-1, 0*8, 28*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(59.17) // verified on pcb
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 64*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 56*8-1, 0*8, 28*8-1)
 
-	MDRV_GFXDECODE(pgm)
-	MDRV_PALETTE_LENGTH(0x1200/2)
+	MCFG_GFXDECODE(pgm)
+	MCFG_PALETTE_LENGTH(0x1200/2)
 
-	MDRV_VIDEO_START(pgm)
-	MDRV_VIDEO_EOF(pgm)
-	MDRV_VIDEO_UPDATE(pgm)
+	MCFG_VIDEO_START(pgm)
+	MCFG_VIDEO_EOF(pgm)
+	MCFG_VIDEO_UPDATE(pgm)
 
 	/*sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-    MDRV_ICS2115_ADD("ics", 0, sound_irq)
-    //MDRV_SOUND_ADD("ics", ICS2115, 0)
-	//MDRV_SOUND_CONFIG(pgm_ics2115_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 5.0)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+    MCFG_ICS2115_ADD("ics", 0, sound_irq)
+    //MCFG_SOUND_ADD("ics", ICS2115, 0)
+	//MCFG_SOUND_CONFIG(pgm_ics2115_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 5.0)
 MACHINE_CONFIG_END
 
 /*** Rom Loading *************************************************************/

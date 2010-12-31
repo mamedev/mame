@@ -342,77 +342,77 @@ static const nmk112_interface powerins_nmk112_intf =
 static MACHINE_CONFIG_START( powerins, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 12000000)	/* 12MHz */
-	MDRV_CPU_PROGRAM_MAP(powerins_map)
-	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
+	MCFG_CPU_ADD("maincpu", M68000, 12000000)	/* 12MHz */
+	MCFG_CPU_PROGRAM_MAP(powerins_map)
+	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold)
 
-	MDRV_CPU_ADD("soundcpu", Z80, 6000000) /* 6 MHz */
-	MDRV_CPU_PROGRAM_MAP(powerins_sound_map)
-	MDRV_CPU_IO_MAP(powerins_sound_io_map)
+	MCFG_CPU_ADD("soundcpu", Z80, 6000000) /* 6 MHz */
+	MCFG_CPU_PROGRAM_MAP(powerins_sound_map)
+	MCFG_CPU_IO_MAP(powerins_sound_io_map)
 
-	MDRV_MACHINE_RESET(powerins)
+	MCFG_MACHINE_RESET(powerins)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(56)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(320, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 320-1, 0+16, 256-16-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(56)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(320, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 320-1, 0+16, 256-16-1)
 
-	MDRV_GFXDECODE(powerins)
-	MDRV_PALETTE_LENGTH(2048)
+	MCFG_GFXDECODE(powerins)
+	MCFG_PALETTE_LENGTH(2048)
 
-	MDRV_VIDEO_START(powerins)
-	MDRV_VIDEO_UPDATE(powerins)
+	MCFG_VIDEO_START(powerins)
+	MCFG_VIDEO_UPDATE(powerins)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_OKIM6295_ADD("oki1", 4000000, OKIM6295_PIN7_LOW)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	MCFG_OKIM6295_ADD("oki1", 4000000, OKIM6295_PIN7_LOW)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MDRV_OKIM6295_ADD("oki2", 4000000, OKIM6295_PIN7_LOW)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
+	MCFG_OKIM6295_ADD("oki2", 4000000, OKIM6295_PIN7_LOW)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.15)
 
-	MDRV_SOUND_ADD("ym2203", YM2203, 12000000 / 8)
-	MDRV_SOUND_CONFIG(ym2203_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
+	MCFG_SOUND_ADD("ym2203", YM2203, 12000000 / 8)
+	MCFG_SOUND_CONFIG(ym2203_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 2.0)
 
-	MDRV_NMK112_ADD("nmk112", powerins_nmk112_intf)
+	MCFG_NMK112_ADD("nmk112", powerins_nmk112_intf)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( powerina, powerins )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(powerina_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(powerina_map)
 
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_REFRESH_RATE(60)
 
-	MDRV_DEVICE_REMOVE("soundcpu")
+	MCFG_DEVICE_REMOVE("soundcpu")
 
-	MDRV_OKIM6295_REPLACE("oki1", 990000, OKIM6295_PIN7_LOW) // pin7 not verified
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_OKIM6295_REPLACE("oki1", 990000, OKIM6295_PIN7_LOW) // pin7 not verified
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_DEVICE_REMOVE("oki2")
-	MDRV_DEVICE_REMOVE("ym2203")
+	MCFG_DEVICE_REMOVE("oki2")
+	MCFG_DEVICE_REMOVE("ym2203")
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( powerinb, powerins )
 
 	/* basic machine hardware */
 
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_REFRESH_RATE(60)
 
-	MDRV_CPU_MODIFY("soundcpu") /* 6 MHz */
-	MDRV_CPU_IO_MAP(powerinb_sound_io_map)
-	MDRV_CPU_PERIODIC_INT(irq0_line_hold, 120)	// YM2203 rate is at 150??
+	MCFG_CPU_MODIFY("soundcpu") /* 6 MHz */
+	MCFG_CPU_IO_MAP(powerinb_sound_io_map)
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold, 120)	// YM2203 rate is at 150??
 
-	MDRV_DEVICE_REMOVE("ym2203")	// Sound code talks to one, but it's not fitted on the board
+	MCFG_DEVICE_REMOVE("ym2203")	// Sound code talks to one, but it's not fitted on the board
 MACHINE_CONFIG_END
 
 

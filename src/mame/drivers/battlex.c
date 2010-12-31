@@ -213,31 +213,31 @@ static MACHINE_RESET( battlex )
 static MACHINE_CONFIG_START( battlex, battlex_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80,10000000/2 )		 /* 10 MHz, divided ? (Z80A CPU) */
-	MDRV_CPU_PROGRAM_MAP(battlex_map)
-	MDRV_CPU_IO_MAP(io_map)
-	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,8) /* controls game speed? */
+	MCFG_CPU_ADD("maincpu", Z80,10000000/2 )		 /* 10 MHz, divided ? (Z80A CPU) */
+	MCFG_CPU_PROGRAM_MAP(battlex_map)
+	MCFG_CPU_IO_MAP(io_map)
+	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,8) /* controls game speed? */
 
-	MDRV_MACHINE_RESET(battlex)
+	MCFG_MACHINE_RESET(battlex)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(56) /* The video syncs at 15.8k H and 56 V (www.klov.com) */
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(battlex)
-	MDRV_PALETTE_LENGTH(16*8+64)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(56) /* The video syncs at 15.8k H and 56 V (www.klov.com) */
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_GFXDECODE(battlex)
+	MCFG_PALETTE_LENGTH(16*8+64)
 
-	MDRV_PALETTE_INIT(battlex)
-	MDRV_VIDEO_START(battlex)
-	MDRV_VIDEO_UPDATE(battlex)
+	MCFG_PALETTE_INIT(battlex)
+	MCFG_VIDEO_START(battlex)
+	MCFG_VIDEO_UPDATE(battlex)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("aysnd", AY8910, 10000000/8)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("aysnd", AY8910, 10000000/8)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 MACHINE_CONFIG_END
 
 

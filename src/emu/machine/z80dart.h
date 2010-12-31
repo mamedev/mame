@@ -107,32 +107,32 @@
 //  DEVICE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MDRV_Z80DART_ADD(_tag, _clock, _config) \
-	MDRV_DEVICE_ADD(_tag, Z80DART, _clock) \
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_Z80DART_ADD(_tag, _clock, _config) \
+	MCFG_DEVICE_ADD(_tag, Z80DART, _clock) \
+	MCFG_DEVICE_CONFIG(_config)
 
-#define MDRV_Z80SIO0_ADD(_tag, _clock, _config) \
-	MDRV_DEVICE_ADD(_tag, Z80SIO0, _clock) \
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_Z80SIO0_ADD(_tag, _clock, _config) \
+	MCFG_DEVICE_ADD(_tag, Z80SIO0, _clock) \
+	MCFG_DEVICE_CONFIG(_config)
 
-#define MDRV_Z80SIO1_ADD(_tag, _clock, _config) \
-	MDRV_DEVICE_ADD(_tag, Z80SIO1, _clock) \
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_Z80SIO1_ADD(_tag, _clock, _config) \
+	MCFG_DEVICE_ADD(_tag, Z80SIO1, _clock) \
+	MCFG_DEVICE_CONFIG(_config)
 
-#define MDRV_Z80SIO2_ADD(_tag, _clock, _config) \
-	MDRV_DEVICE_ADD(_tag, Z80SIO2, _clock) \
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_Z80SIO2_ADD(_tag, _clock, _config) \
+	MCFG_DEVICE_ADD(_tag, Z80SIO2, _clock) \
+	MCFG_DEVICE_CONFIG(_config)
 
-#define MDRV_Z80SIO3_ADD(_tag, _clock, _config) \
-	MDRV_DEVICE_ADD(_tag, Z80SIO3, _clock) \
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_Z80SIO3_ADD(_tag, _clock, _config) \
+	MCFG_DEVICE_ADD(_tag, Z80SIO3, _clock) \
+	MCFG_DEVICE_CONFIG(_config)
 
-#define MDRV_Z80SIO4_ADD(_tag, _clock, _config) \
-	MDRV_DEVICE_ADD(_tag, Z80SIO4, _clock) \
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_Z80SIO4_ADD(_tag, _clock, _config) \
+	MCFG_DEVICE_ADD(_tag, Z80SIO4, _clock) \
+	MCFG_DEVICE_CONFIG(_config)
 
-#define MDRV_Z80DART_REMOVE(_tag) \
-	MDRV_DEVICE_REMOVE(_tag)
+#define MCFG_Z80DART_REMOVE(_tag) \
+	MCFG_DEVICE_REMOVE(_tag)
 
 #define Z80DART_INTERFACE(_name) \
 	const z80dart_interface (_name) =

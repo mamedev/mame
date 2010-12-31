@@ -48,8 +48,8 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MDRV_ER2055_ADD(_tag) \
-	MDRV_DEVICE_ADD(_tag, ER2055, 0) \
+#define MCFG_ER2055_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, ER2055, 0) \
 
 
 

@@ -388,57 +388,57 @@ INPUT_PORTS_END
 static MACHINE_CONFIG_START( redalert, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6502, MAIN_CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(redalert_main_map)
-	MDRV_CPU_VBLANK_INT("screen", redalert_vblank_interrupt)
+	MCFG_CPU_ADD("maincpu", M6502, MAIN_CPU_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(redalert_main_map)
+	MCFG_CPU_VBLANK_INT("screen", redalert_vblank_interrupt)
 
 	/* video hardware */
-	MDRV_FRAGMENT_ADD(redalert_video)
+	MCFG_FRAGMENT_ADD(redalert_video)
 
 	/* audio hardware */
-	MDRV_FRAGMENT_ADD(redalert_audio)
+	MCFG_FRAGMENT_ADD(redalert_audio)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( ww3, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6502, MAIN_CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(ww3_main_map)
-	MDRV_CPU_VBLANK_INT("screen", redalert_vblank_interrupt)
+	MCFG_CPU_ADD("maincpu", M6502, MAIN_CPU_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(ww3_main_map)
+	MCFG_CPU_VBLANK_INT("screen", redalert_vblank_interrupt)
 
 	/* video hardware */
-	MDRV_FRAGMENT_ADD(ww3_video)
+	MCFG_FRAGMENT_ADD(ww3_video)
 
 	/* audio hardware */
-	MDRV_FRAGMENT_ADD(ww3_audio)
+	MCFG_FRAGMENT_ADD(ww3_audio)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( panther, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6502, MAIN_CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(panther_main_map)
-	MDRV_CPU_VBLANK_INT("screen", redalert_vblank_interrupt)
+	MCFG_CPU_ADD("maincpu", M6502, MAIN_CPU_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(panther_main_map)
+	MCFG_CPU_VBLANK_INT("screen", redalert_vblank_interrupt)
 
 	/* video hardware */
-	MDRV_FRAGMENT_ADD(panther_video)
+	MCFG_FRAGMENT_ADD(panther_video)
 
 	/* audio hardware */
-	MDRV_FRAGMENT_ADD(ww3_audio)
+	MCFG_FRAGMENT_ADD(ww3_audio)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( demoneye, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6502, MAIN_CPU_CLOCK)
-	MDRV_CPU_PROGRAM_MAP(demoneye_main_map)
-	MDRV_CPU_VBLANK_INT("screen", redalert_vblank_interrupt)
+	MCFG_CPU_ADD("maincpu", M6502, MAIN_CPU_CLOCK)
+	MCFG_CPU_PROGRAM_MAP(demoneye_main_map)
+	MCFG_CPU_VBLANK_INT("screen", redalert_vblank_interrupt)
 
 	/* video hardware */
-	MDRV_FRAGMENT_ADD(demoneye_video)
+	MCFG_FRAGMENT_ADD(demoneye_video)
 
 	/* audio hardware */
-	MDRV_FRAGMENT_ADD(demoneye_audio)
+	MCFG_FRAGMENT_ADD(demoneye_audio)
 MACHINE_CONFIG_END
 
 

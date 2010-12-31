@@ -651,41 +651,41 @@ static const ym3812_interface lordgun_ym3812_interface =
 };
 
 static MACHINE_CONFIG_START( lordgun, driver_device )
-	MDRV_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2)
-	MDRV_CPU_PROGRAM_MAP(lordgun_map)
-	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2)
+	MCFG_CPU_PROGRAM_MAP(lordgun_map)
+	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold)
 
-	MDRV_CPU_ADD("soundcpu", Z80, XTAL_20MHz / 4)
-	MDRV_CPU_PROGRAM_MAP(lordgun_soundmem_map)
-	MDRV_CPU_IO_MAP(lordgun_soundio_map)
+	MCFG_CPU_ADD("soundcpu", Z80, XTAL_20MHz / 4)
+	MCFG_CPU_PROGRAM_MAP(lordgun_soundmem_map)
+	MCFG_CPU_IO_MAP(lordgun_soundio_map)
 
-	MDRV_PPI8255_ADD( "ppi8255_0", lordgun_ppi8255_intf[0] )
-	MDRV_PPI8255_ADD( "ppi8255_1", lordgun_ppi8255_intf[1] )
+	MCFG_PPI8255_ADD( "ppi8255_0", lordgun_ppi8255_intf[0] )
+	MCFG_PPI8255_ADD( "ppi8255_1", lordgun_ppi8255_intf[1] )
 
-	MDRV_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_93C46_ADD("eeprom")
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(0x200, 0x100)
-	MDRV_SCREEN_VISIBLE_AREA(0,0x1c0-1, 0,0xe0-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(0x200, 0x100)
+	MCFG_SCREEN_VISIBLE_AREA(0,0x1c0-1, 0,0xe0-1)
 
-	MDRV_GFXDECODE(lordgun)
-	MDRV_PALETTE_LENGTH(0x800 * 8)	// 0x800 real colors, repeated per priority level
+	MCFG_GFXDECODE(lordgun)
+	MCFG_PALETTE_LENGTH(0x800 * 8)	// 0x800 real colors, repeated per priority level
 
-	MDRV_VIDEO_START(lordgun)
-	MDRV_VIDEO_UPDATE(lordgun)
+	MCFG_VIDEO_START(lordgun)
+	MCFG_VIDEO_UPDATE(lordgun)
 
 	// sound hardware
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM3812, XTAL_3_579545MHz)
-	MDRV_SOUND_CONFIG(lordgun_ym3812_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM3812, XTAL_3_579545MHz)
+	MCFG_SOUND_CONFIG(lordgun_ym3812_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_OKIM6295_ADD("oki", XTAL_20MHz / 20, OKIM6295_PIN7_HIGH)	// ? 5MHz can't be right!
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_OKIM6295_ADD("oki", XTAL_20MHz / 20, OKIM6295_PIN7_HIGH)	// ? 5MHz can't be right!
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -695,44 +695,44 @@ static const ymf278b_interface ymf278b_config =
 };
 
 static MACHINE_CONFIG_START( aliencha, driver_device )
-	MDRV_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2)
-	MDRV_CPU_PROGRAM_MAP(aliencha_map)
-	MDRV_CPU_VBLANK_INT("screen", irq4_line_hold)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2)
+	MCFG_CPU_PROGRAM_MAP(aliencha_map)
+	MCFG_CPU_VBLANK_INT("screen", irq4_line_hold)
 
-	MDRV_CPU_ADD("soundcpu", Z80, XTAL_20MHz / 4)
-	MDRV_CPU_PROGRAM_MAP(lordgun_soundmem_map)
-	MDRV_CPU_IO_MAP(aliencha_soundio_map)
+	MCFG_CPU_ADD("soundcpu", Z80, XTAL_20MHz / 4)
+	MCFG_CPU_PROGRAM_MAP(lordgun_soundmem_map)
+	MCFG_CPU_IO_MAP(aliencha_soundio_map)
 
-	MDRV_PPI8255_ADD( "ppi8255_0", aliencha_ppi8255_intf[0] )
-	MDRV_PPI8255_ADD( "ppi8255_1", aliencha_ppi8255_intf[1] )
+	MCFG_PPI8255_ADD( "ppi8255_0", aliencha_ppi8255_intf[0] )
+	MCFG_PPI8255_ADD( "ppi8255_1", aliencha_ppi8255_intf[1] )
 
-	MDRV_EEPROM_93C46_ADD("eeprom")
+	MCFG_EEPROM_93C46_ADD("eeprom")
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(0x200, 0x100)
-	MDRV_SCREEN_VISIBLE_AREA(0,0x1c0-1, 0,0xe0-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(0x200, 0x100)
+	MCFG_SCREEN_VISIBLE_AREA(0,0x1c0-1, 0,0xe0-1)
 
-	MDRV_GFXDECODE(lordgun)
-	MDRV_PALETTE_LENGTH(0x800 * 8)	// 0x800 real colors, repeated per priority level
+	MCFG_GFXDECODE(lordgun)
+	MCFG_PALETTE_LENGTH(0x800 * 8)	// 0x800 real colors, repeated per priority level
 
-	MDRV_VIDEO_START(lordgun)
-	MDRV_VIDEO_UPDATE(lordgun)
+	MCFG_VIDEO_START(lordgun)
+	MCFG_VIDEO_UPDATE(lordgun)
 
 	// sound hardware
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymf", YMF278B, 26000000)			// ? 26MHz matches video (decrease for faster music tempo)
-	MDRV_SOUND_CONFIG(ymf278b_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
+	MCFG_SOUND_ADD("ymf", YMF278B, 26000000)			// ? 26MHz matches video (decrease for faster music tempo)
+	MCFG_SOUND_CONFIG(ymf278b_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.5)
 
-	MDRV_OKIM6295_ADD("oki", XTAL_20MHz / 20, OKIM6295_PIN7_HIGH)	// ? 5MHz can't be right
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_OKIM6295_ADD("oki", XTAL_20MHz / 20, OKIM6295_PIN7_HIGH)	// ? 5MHz can't be right
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_OKIM6295_ADD("oki2", XTAL_20MHz / 20, OKIM6295_PIN7_HIGH)	// ? 5MHz can't be right
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_OKIM6295_ADD("oki2", XTAL_20MHz / 20, OKIM6295_PIN7_HIGH)	// ? 5MHz can't be right
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 

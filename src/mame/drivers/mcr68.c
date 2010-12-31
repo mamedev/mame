@@ -975,61 +975,61 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( zwackery, mcr68_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 7652400)	/* should be XTAL_16MHz/2 */
-	MDRV_CPU_PROGRAM_MAP(zwackery_map)
-	MDRV_CPU_VBLANK_INT("screen", mcr68_interrupt)
+	MCFG_CPU_ADD("maincpu", M68000, 7652400)	/* should be XTAL_16MHz/2 */
+	MCFG_CPU_PROGRAM_MAP(zwackery_map)
+	MCFG_CPU_VBLANK_INT("screen", mcr68_interrupt)
 
-//  MDRV_WATCHDOG_VBLANK_INIT(8)
-	MDRV_MACHINE_START(zwackery)
-	MDRV_MACHINE_RESET(zwackery)
+//  MCFG_WATCHDOG_VBLANK_INIT(8)
+	MCFG_MACHINE_START(zwackery)
+	MCFG_MACHINE_RESET(zwackery)
 
-	MDRV_PIA6821_ADD("pia0", zwackery_pia0_intf)
-	MDRV_PIA6821_ADD("pia1", zwackery_pia1_intf)
-	MDRV_PIA6821_ADD("pia2", zwackery_pia2_intf)
+	MCFG_PIA6821_ADD("pia0", zwackery_pia0_intf)
+	MCFG_PIA6821_ADD("pia1", zwackery_pia1_intf)
+	MCFG_PIA6821_ADD("pia2", zwackery_pia2_intf)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(30)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*16, 30*16)
-	MDRV_SCREEN_VISIBLE_AREA(0, 32*16-1, 0, 30*16-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(30)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*16, 30*16)
+	MCFG_SCREEN_VISIBLE_AREA(0, 32*16-1, 0, 30*16-1)
 
-	MDRV_GFXDECODE(zwackery)
-	MDRV_PALETTE_LENGTH(4096)
+	MCFG_GFXDECODE(zwackery)
+	MCFG_PALETTE_LENGTH(4096)
 
-	MDRV_VIDEO_START(zwackery)
-	MDRV_VIDEO_UPDATE(zwackery)
+	MCFG_VIDEO_START(zwackery)
+	MCFG_VIDEO_UPDATE(zwackery)
 
 	/* sound hardware */
-	MDRV_FRAGMENT_ADD(chip_squeak_deluxe)
+	MCFG_FRAGMENT_ADD(chip_squeak_deluxe)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( mcr68, mcr68_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 7723800)
-	MDRV_CPU_PROGRAM_MAP(mcr68_map)
-	MDRV_CPU_VBLANK_INT("screen", mcr68_interrupt)
+	MCFG_CPU_ADD("maincpu", M68000, 7723800)
+	MCFG_CPU_PROGRAM_MAP(mcr68_map)
+	MCFG_CPU_VBLANK_INT("screen", mcr68_interrupt)
 
-	MDRV_WATCHDOG_VBLANK_INIT(8)
-	MDRV_MACHINE_START(mcr68)
-	MDRV_MACHINE_RESET(mcr68)
+	MCFG_WATCHDOG_VBLANK_INIT(8)
+	MCFG_MACHINE_START(mcr68)
+	MCFG_MACHINE_RESET(mcr68)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(30)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*16, 30*16)
-	MDRV_SCREEN_VISIBLE_AREA(0, 32*16-1, 0, 30*16-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(30)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*16, 30*16)
+	MCFG_SCREEN_VISIBLE_AREA(0, 32*16-1, 0, 30*16-1)
 
-	MDRV_GFXDECODE(mcr68)
-	MDRV_PALETTE_LENGTH(64)
+	MCFG_GFXDECODE(mcr68)
+	MCFG_PALETTE_LENGTH(64)
 
-	MDRV_VIDEO_START(mcr68)
-	MDRV_VIDEO_UPDATE(mcr68)
+	MCFG_VIDEO_START(mcr68)
+	MCFG_VIDEO_UPDATE(mcr68)
 
 	/* sound hardware -- determined by specific machine */
 MACHINE_CONFIG_END
@@ -1038,53 +1038,53 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( xenophob, mcr68 )
 
 	/* basic machine hardware */
-	MDRV_FRAGMENT_ADD(sounds_good)
+	MCFG_FRAGMENT_ADD(sounds_good)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( intlaser, mcr68 )
 
 	/* basic machine hardware */
-	MDRV_FRAGMENT_ADD(sounds_good)
+	MCFG_FRAGMENT_ADD(sounds_good)
 
-	MDRV_WATCHDOG_VBLANK_INIT(800)
+	MCFG_WATCHDOG_VBLANK_INIT(800)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( spyhunt2, mcr68 )
 
 	/* basic machine hardware */
-	MDRV_FRAGMENT_ADD(sounds_good)
-	MDRV_DEVICE_REMOVE("mono")
-	MDRV_FRAGMENT_ADD(turbo_chip_squeak)
+	MCFG_FRAGMENT_ADD(sounds_good)
+	MCFG_DEVICE_REMOVE("mono")
+	MCFG_FRAGMENT_ADD(turbo_chip_squeak)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( archrivl, mcr68 )
 
 	/* basic machine hardware */
-	MDRV_FRAGMENT_ADD(williams_cvsd_sound)
+	MCFG_FRAGMENT_ADD(williams_cvsd_sound)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( pigskin, mcr68 )
 
 	/* basic machine hardware */
-	MDRV_FRAGMENT_ADD(williams_cvsd_sound)
+	MCFG_FRAGMENT_ADD(williams_cvsd_sound)
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(pigskin_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(pigskin_map)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( trisport, mcr68 )
 
 	/* basic machine hardware */
-	MDRV_FRAGMENT_ADD(williams_cvsd_sound)
+	MCFG_FRAGMENT_ADD(williams_cvsd_sound)
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(trisport_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(trisport_map)
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 MACHINE_CONFIG_END
 
 

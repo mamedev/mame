@@ -367,31 +367,31 @@ static INTERRUPT_GEN( groundfx_interrupt )
 static MACHINE_CONFIG_START( groundfx, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68EC020, 16000000)	/* 16 MHz */
-	MDRV_CPU_PROGRAM_MAP(groundfx_map)
-	MDRV_CPU_VBLANK_INT("screen", groundfx_interrupt)
+	MCFG_CPU_ADD("maincpu", M68EC020, 16000000)	/* 16 MHz */
+	MCFG_CPU_PROGRAM_MAP(groundfx_map)
+	MCFG_CPU_VBLANK_INT("screen", groundfx_interrupt)
 
-	MDRV_EEPROM_ADD("eeprom", groundfx_eeprom_interface)
+	MCFG_EEPROM_ADD("eeprom", groundfx_eeprom_interface)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(40*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0, 40*8-1, 3*8, 32*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(40*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 3*8, 32*8-1)
 
-	MDRV_GFXDECODE(groundfx)
-	MDRV_PALETTE_LENGTH(16384)
+	MCFG_GFXDECODE(groundfx)
+	MCFG_PALETTE_LENGTH(16384)
 
-	MDRV_VIDEO_START(groundfx)
-	MDRV_VIDEO_UPDATE(groundfx)
+	MCFG_VIDEO_START(groundfx)
+	MCFG_VIDEO_UPDATE(groundfx)
 
-	MDRV_TC0100SCN_ADD("tc0100scn", groundfx_tc0100scn_intf)
-	MDRV_TC0480SCP_ADD("tc0480scp", groundfx_tc0480scp_intf)
+	MCFG_TC0100SCN_ADD("tc0100scn", groundfx_tc0100scn_intf)
+	MCFG_TC0480SCP_ADD("tc0480scp", groundfx_tc0480scp_intf)
 
 	/* sound hardware */
-	MDRV_FRAGMENT_ADD(taito_f3_sound)
+	MCFG_FRAGMENT_ADD(taito_f3_sound)
 MACHINE_CONFIG_END
 
 /***************************************************************************

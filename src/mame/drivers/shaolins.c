@@ -191,43 +191,43 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( shaolins, shaolins_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6809, MASTER_CLOCK/12)        /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(shaolins_map)
-	MDRV_CPU_VBLANK_INT_HACK(shaolins_interrupt,16)	/* 1 IRQ + 8 NMI */
+	MCFG_CPU_ADD("maincpu", M6809, MASTER_CLOCK/12)        /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(shaolins_map)
+	MCFG_CPU_VBLANK_INT_HACK(shaolins_interrupt,16)	/* 1 IRQ + 8 NMI */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(shaolins)
-	MDRV_PALETTE_LENGTH(16*8*16+16*8*16)
+	MCFG_GFXDECODE(shaolins)
+	MCFG_PALETTE_LENGTH(16*8*16+16*8*16)
 
-	MDRV_PALETTE_INIT(shaolins)
-	MDRV_VIDEO_START(shaolins)
-	MDRV_VIDEO_UPDATE(shaolins)
+	MCFG_PALETTE_INIT(shaolins)
+	MCFG_VIDEO_START(shaolins)
+	MCFG_VIDEO_UPDATE(shaolins)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("sn1", SN76489A, MASTER_CLOCK/12)        /* verified on pcb */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("sn1", SN76489A, MASTER_CLOCK/12)        /* verified on pcb */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_ADD("sn2", SN76489A, MASTER_CLOCK/6)        /* verified on pcb */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("sn2", SN76489A, MASTER_CLOCK/6)        /* verified on pcb */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 #if 0 // a bootleg board was found with downgraded sound hardware, but is otherwise the same
 static MACHINE_CONFIG_DERIVED( shaolinb, shaolins )
 
-	MDRV_SOUND_REPLACE("sn1", SN76489, MASTER_CLOCK/12) /* only type verified on pcb */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_REPLACE("sn1", SN76489, MASTER_CLOCK/12) /* only type verified on pcb */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
-	MDRV_SOUND_REPLACE("sn2", SN76489, MASTER_CLOCK/6)  /* only type verified on pcb */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_REPLACE("sn2", SN76489, MASTER_CLOCK/6)  /* only type verified on pcb */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 #endif
 

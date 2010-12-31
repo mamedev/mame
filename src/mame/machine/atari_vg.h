@@ -11,8 +11,8 @@
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_ATARIVGEAROM_ADD(_tag) \
-	MDRV_DEVICE_ADD(_tag, ATARIVGEAROM, 0)
+#define MCFG_ATARIVGEAROM_ADD(_tag) \
+	MCFG_DEVICE_ADD(_tag, ATARIVGEAROM, 0)
 
 
 /***************************************************************************

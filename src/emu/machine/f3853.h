@@ -45,9 +45,9 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MDRV_F3853_ADD(_tag, _clock, _intrf) \
-	MDRV_DEVICE_ADD(_tag, F3853, _clock) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_F3853_ADD(_tag, _clock, _intrf) \
+	MCFG_DEVICE_ADD(_tag, F3853, _clock) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
 
 

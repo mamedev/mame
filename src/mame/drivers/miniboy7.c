@@ -432,35 +432,35 @@ static const ay8910_interface miniboy7_ay8910_intf =
 static MACHINE_CONFIG_START( miniboy7, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6502, MASTER_CLOCK/16)	/* guess */
-	MDRV_CPU_PROGRAM_MAP(miniboy7_map)
-	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_ADD("maincpu", M6502, MASTER_CLOCK/16)	/* guess */
+	MCFG_CPU_PROGRAM_MAP(miniboy7_map)
+	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
-	MDRV_PIA6821_ADD("pia0", miniboy7_pia0_intf)
+	MCFG_NVRAM_ADD_0FILL("nvram")
+	MCFG_PIA6821_ADD("pia0", miniboy7_pia0_intf)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE((47+1)*8, (39+1)*8)                  /* Taken from MC6845, registers 00 & 04. Normally programmed with (value-1) */
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 37*8-1, 0*8, 37*8-1)    /* Taken from MC6845, registers 01 & 06 */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE((47+1)*8, (39+1)*8)                  /* Taken from MC6845, registers 00 & 04. Normally programmed with (value-1) */
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 37*8-1, 0*8, 37*8-1)    /* Taken from MC6845, registers 01 & 06 */
 
-	MDRV_GFXDECODE(miniboy7)
+	MCFG_GFXDECODE(miniboy7)
 
-	MDRV_PALETTE_INIT(miniboy7)
-	MDRV_PALETTE_LENGTH(256)
-	MDRV_VIDEO_START(miniboy7)
-	MDRV_VIDEO_UPDATE(miniboy7)
+	MCFG_PALETTE_INIT(miniboy7)
+	MCFG_PALETTE_LENGTH(256)
+	MCFG_VIDEO_START(miniboy7)
+	MCFG_VIDEO_UPDATE(miniboy7)
 
-	MDRV_MC6845_ADD("crtc", MC6845, MASTER_CLOCK/12, mc6845_intf) /* guess */
+	MCFG_MC6845_ADD("crtc", MC6845, MASTER_CLOCK/12, mc6845_intf) /* guess */
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("ay8910", AY8910, MASTER_CLOCK/8)	/* guess */
-	MDRV_SOUND_CONFIG(miniboy7_ay8910_intf)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("ay8910", AY8910, MASTER_CLOCK/8)	/* guess */
+	MCFG_SOUND_CONFIG(miniboy7_ay8910_intf)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 
 MACHINE_CONFIG_END
 

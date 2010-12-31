@@ -76,7 +76,7 @@ void device_config_sound_interface::static_add_route(device_config *device, UINT
 {
 	device_config_sound_interface *sound = dynamic_cast<device_config_sound_interface *>(device);
 	if (sound == NULL)
-		throw emu_fatalerror("MDRV_SOUND_ROUTE called on device '%s' with no sound interface", device->tag());
+		throw emu_fatalerror("MCFG_SOUND_ROUTE called on device '%s' with no sound interface", device->tag());
 
 	sound_route **routeptr;
 	for (routeptr = &sound->m_route_list; *routeptr != NULL; routeptr = &(*routeptr)->m_next) ;
@@ -93,7 +93,7 @@ void device_config_sound_interface::static_reset_routes(device_config *device)
 {
 	device_config_sound_interface *sound = dynamic_cast<device_config_sound_interface *>(device);
 	if (sound == NULL)
-		throw emu_fatalerror("MDRV_SOUND_ROUTES_RESET called on device '%s' with no sound interface", device->tag());
+		throw emu_fatalerror("MCFG_SOUND_ROUTES_RESET called on device '%s' with no sound interface", device->tag());
 
 	sound->reset_routes();
 }

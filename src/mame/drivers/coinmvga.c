@@ -656,36 +656,36 @@ static INTERRUPT_GEN( vblank_irq )
 static MACHINE_CONFIG_START( coinmvga, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", H83007, CPU_CLOCK)	/* xtal */
-	MDRV_CPU_PROGRAM_MAP(coinmvga_map)
-	MDRV_CPU_IO_MAP(coinmvga_io_map)
-	MDRV_CPU_VBLANK_INT("screen", vblank_irq)	/* wrong, fix me */
+	MCFG_CPU_ADD("maincpu", H83007, CPU_CLOCK)	/* xtal */
+	MCFG_CPU_PROGRAM_MAP(coinmvga_map)
+	MCFG_CPU_IO_MAP(coinmvga_io_map)
+	MCFG_CPU_VBLANK_INT("screen", vblank_irq)	/* wrong, fix me */
 
-//  MDRV_NVRAM_ADD_0FILL("nvram")
+//  MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(640,480)
-	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(640,480)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 
-	MDRV_GFXDECODE(coinmvga)
+	MCFG_GFXDECODE(coinmvga)
 
-	MDRV_PALETTE_INIT(coinmvga)
-	MDRV_PALETTE_LENGTH(512)
+	MCFG_PALETTE_INIT(coinmvga)
+	MCFG_PALETTE_LENGTH(512)
 
-	MDRV_VIDEO_START(coinmvga)
-	MDRV_VIDEO_UPDATE(coinmvga)
+	MCFG_VIDEO_START(coinmvga)
+	MCFG_VIDEO_UPDATE(coinmvga)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymz", YMZ280B, SND_CLOCK)
-	MDRV_SOUND_CONFIG(ymz280b_intf)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("ymz", YMZ280B, SND_CLOCK)
+	MCFG_SOUND_CONFIG(ymz280b_intf)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 

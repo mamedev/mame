@@ -229,31 +229,31 @@ static const pokey_interface pokey_interface_2 =
 static MACHINE_CONFIG_START( quantum, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, MASTER_CLOCK / 2)
-	MDRV_CPU_PROGRAM_MAP(main_map)
-	MDRV_CPU_PERIODIC_INT(irq1_line_hold, (double)MASTER_CLOCK / 4096 / 12)
+	MCFG_CPU_ADD("maincpu", M68000, MASTER_CLOCK / 2)
+	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_CPU_PERIODIC_INT(irq1_line_hold, (double)MASTER_CLOCK / 4096 / 12)
 
-	MDRV_NVRAM_ADD_1FILL("nvram")
+	MCFG_NVRAM_ADD_1FILL("nvram")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", VECTOR)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_SIZE(400, 300)
-	MDRV_SCREEN_VISIBLE_AREA(0, 900, 0, 600)
+	MCFG_SCREEN_ADD("screen", VECTOR)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_SIZE(400, 300)
+	MCFG_SCREEN_VISIBLE_AREA(0, 900, 0, 600)
 
-	MDRV_VIDEO_START(avg_quantum)
-	MDRV_VIDEO_UPDATE(vector)
+	MCFG_VIDEO_START(avg_quantum)
+	MCFG_VIDEO_UPDATE(vector)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("pokey1", POKEY, 600000)
-	MDRV_SOUND_CONFIG(pokey_interface_1)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("pokey1", POKEY, 600000)
+	MCFG_SOUND_CONFIG(pokey_interface_1)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD("pokey2", POKEY, 600000)
-	MDRV_SOUND_CONFIG(pokey_interface_2)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("pokey2", POKEY, 600000)
+	MCFG_SOUND_CONFIG(pokey_interface_2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 

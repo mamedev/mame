@@ -211,90 +211,90 @@ device_config *MACHINE_CONFIG_NAME(_name)(machine_config &config, device_config 
 
 
 // importing data from other machine drivers
-#define MDRV_FRAGMENT_ADD(_name) \
+#define MCFG_FRAGMENT_ADD(_name) \
 	MACHINE_CONFIG_NAME(_name)(config, owner);
 
 
 // core parameters
-#define MDRV_QUANTUM_TIME(_time) \
+#define MCFG_QUANTUM_TIME(_time) \
 	config.m_minimum_quantum = ATTOTIME_IN_##_time; \
 
-#define MDRV_QUANTUM_PERFECT_CPU(_cputag) \
+#define MCFG_QUANTUM_PERFECT_CPU(_cputag) \
 	config.m_perfect_cpu_quantum = _cputag; \
 
-#define MDRV_WATCHDOG_VBLANK_INIT(_count) \
+#define MCFG_WATCHDOG_VBLANK_INIT(_count) \
 	config.m_watchdog_vblank_count = _count; \
 
-#define MDRV_WATCHDOG_TIME_INIT(_time) \
+#define MCFG_WATCHDOG_TIME_INIT(_time) \
 	config.m_watchdog_time = ATTOTIME_IN_##_time; \
 
 
 // core functions
-#define MDRV_NVRAM_HANDLER(_func) \
+#define MCFG_NVRAM_HANDLER(_func) \
 	config.m_nvram_handler = NVRAM_HANDLER_NAME(_func); \
 
-#define MDRV_MEMCARD_HANDLER(_func) \
+#define MCFG_MEMCARD_HANDLER(_func) \
 	config.m_memcard_handler = MEMCARD_HANDLER_NAME(_func); \
 
 
 // core video parameters
-#define MDRV_VIDEO_ATTRIBUTES(_flags) \
+#define MCFG_VIDEO_ATTRIBUTES(_flags) \
 	config.m_video_attributes = _flags; \
 
-#define MDRV_GFXDECODE(_gfx) \
+#define MCFG_GFXDECODE(_gfx) \
 	config.m_gfxdecodeinfo = GFXDECODE_NAME(_gfx); \
 
-#define MDRV_PALETTE_LENGTH(_length) \
+#define MCFG_PALETTE_LENGTH(_length) \
 	config.m_total_colors = _length; \
 
-#define MDRV_DEFAULT_LAYOUT(_layout) \
+#define MCFG_DEFAULT_LAYOUT(_layout) \
 	config.m_default_layout = &(_layout)[0]; \
 
 
 // core machine functions
-#define MDRV_MACHINE_START(_func) \
+#define MCFG_MACHINE_START(_func) \
 	driver_device_config_base::static_set_callback(owner, driver_device_config_base::CB_MACHINE_START, MACHINE_START_NAME(_func)); \
 
-#define MDRV_MACHINE_RESET(_func) \
+#define MCFG_MACHINE_RESET(_func) \
 	driver_device_config_base::static_set_callback(owner, driver_device_config_base::CB_MACHINE_RESET, MACHINE_RESET_NAME(_func)); \
 
 
 // core sound functions
-#define MDRV_SOUND_START(_func) \
+#define MCFG_SOUND_START(_func) \
 	driver_device_config_base::static_set_callback(owner, driver_device_config_base::CB_SOUND_START, SOUND_START_NAME(_func)); \
 
-#define MDRV_SOUND_RESET(_func) \
+#define MCFG_SOUND_RESET(_func) \
 	driver_device_config_base::static_set_callback(owner, driver_device_config_base::CB_SOUND_RESET, SOUND_RESET_NAME(_func)); \
 
 
 // core video functions
-#define MDRV_PALETTE_INIT(_func) \
+#define MCFG_PALETTE_INIT(_func) \
 	driver_device_config_base::static_set_palette_init(owner, PALETTE_INIT_NAME(_func)); \
 
-#define MDRV_VIDEO_START(_func) \
+#define MCFG_VIDEO_START(_func) \
 	driver_device_config_base::static_set_callback(owner, driver_device_config_base::CB_VIDEO_START, VIDEO_START_NAME(_func)); \
 
-#define MDRV_VIDEO_RESET(_func) \
+#define MCFG_VIDEO_RESET(_func) \
 	driver_device_config_base::static_set_callback(owner, driver_device_config_base::CB_VIDEO_RESET, VIDEO_RESET_NAME(_func)); \
 
-#define MDRV_VIDEO_EOF(_func) \
+#define MCFG_VIDEO_EOF(_func) \
 	driver_device_config_base::static_set_callback(owner, driver_device_config_base::CB_VIDEO_EOF, VIDEO_EOF_NAME(_func)); \
 
-#define MDRV_VIDEO_UPDATE(_func) \
+#define MCFG_VIDEO_UPDATE(_func) \
 	driver_device_config_base::static_set_video_update(owner, VIDEO_UPDATE_NAME(_func)); \
 
 
 // add/remove devices
-#define MDRV_DEVICE_ADD(_tag, _type, _clock) \
+#define MCFG_DEVICE_ADD(_tag, _type, _clock) \
 	device = config.device_add(owner, _tag, _type, _clock); \
 
-#define MDRV_DEVICE_REPLACE(_tag, _type, _clock) \
+#define MCFG_DEVICE_REPLACE(_tag, _type, _clock) \
 	device = config.device_replace(owner, _tag, _type, _clock); \
 
-#define MDRV_DEVICE_REMOVE(_tag) \
+#define MCFG_DEVICE_REMOVE(_tag) \
 	device = config.device_remove(owner, _tag); \
 
-#define MDRV_DEVICE_MODIFY(_tag)	\
+#define MCFG_DEVICE_MODIFY(_tag)	\
 	device = config.device_find(owner, _tag); \
 
 

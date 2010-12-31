@@ -220,33 +220,33 @@ static INTERRUPT_GEN( deadang_interrupt )
 static MACHINE_CONFIG_START( deadang, deadang_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", V30,XTAL_16MHz/2) /* Sony 8623h9 CXQ70116D-8 (V30 compatible) */
-	MDRV_CPU_PROGRAM_MAP(main_map)
-	MDRV_CPU_VBLANK_INT_HACK(deadang_interrupt,2)
+	MCFG_CPU_ADD("maincpu", V30,XTAL_16MHz/2) /* Sony 8623h9 CXQ70116D-8 (V30 compatible) */
+	MCFG_CPU_PROGRAM_MAP(main_map)
+	MCFG_CPU_VBLANK_INT_HACK(deadang_interrupt,2)
 
-	MDRV_CPU_ADD("sub", V30,XTAL_16MHz/2) /* Sony 8623h9 CXQ70116D-8 (V30 compatible) */
-	MDRV_CPU_PROGRAM_MAP(sub_map)
-	MDRV_CPU_VBLANK_INT_HACK(deadang_interrupt,2)
+	MCFG_CPU_ADD("sub", V30,XTAL_16MHz/2) /* Sony 8623h9 CXQ70116D-8 (V30 compatible) */
+	MCFG_CPU_PROGRAM_MAP(sub_map)
+	MCFG_CPU_VBLANK_INT_HACK(deadang_interrupt,2)
 
 	SEIBU3A_SOUND_SYSTEM_CPU(XTAL_14_31818MHz/4)
 
-	MDRV_QUANTUM_TIME(HZ(60)) // the game stops working with higher interleave rates..
+	MCFG_QUANTUM_TIME(HZ(60)) // the game stops working with higher interleave rates..
 
-	MDRV_MACHINE_RESET(seibu_sound)
+	MCFG_MACHINE_RESET(seibu_sound)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(deadang)
-	MDRV_PALETTE_LENGTH(2048)
+	MCFG_GFXDECODE(deadang)
+	MCFG_PALETTE_LENGTH(2048)
 
-	MDRV_VIDEO_START(deadang)
-	MDRV_VIDEO_UPDATE(deadang)
+	MCFG_VIDEO_START(deadang)
+	MCFG_VIDEO_UPDATE(deadang)
 
 	/* sound hardware */
 	SEIBU_SOUND_SYSTEM_YM2203_INTERFACE(XTAL_14_31818MHz/4)

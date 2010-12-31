@@ -2023,76 +2023,76 @@ static const tc0140syt_interface taitol_tc0140syt_intf =
 static MACHINE_CONFIG_START( fhawk, taitol_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, XTAL_13_33056MHz/2)	/* verified freq on pin122 of TC0090LVC cpu */
-	MDRV_CPU_PROGRAM_MAP(fhawk_map)
-	MDRV_CPU_VBLANK_INT_HACK(vbl_interrupt,3)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_13_33056MHz/2)	/* verified freq on pin122 of TC0090LVC cpu */
+	MCFG_CPU_PROGRAM_MAP(fhawk_map)
+	MCFG_CPU_VBLANK_INT_HACK(vbl_interrupt,3)
 
-	MDRV_CPU_ADD("audiocpu", Z80, XTAL_12MHz/3)		/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(fhawk_3_map)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_12MHz/3)		/* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(fhawk_3_map)
 
-	MDRV_CPU_ADD("slave", Z80, XTAL_12MHz/3)		/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(fhawk_2_map)
-	MDRV_CPU_VBLANK_INT_HACK(irq0_line_hold,3) /* fixes slow down problems */
+	MCFG_CPU_ADD("slave", Z80, XTAL_12MHz/3)		/* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(fhawk_2_map)
+	MCFG_CPU_VBLANK_INT_HACK(irq0_line_hold,3) /* fixes slow down problems */
 
-	MDRV_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(HZ(6000))
 
-	MDRV_MACHINE_START(taito_l)
-	MDRV_MACHINE_RESET(fhawk)
+	MCFG_MACHINE_START(taito_l)
+	MCFG_MACHINE_RESET(fhawk)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(40*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(40*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(2)
-	MDRV_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE(2)
+	MCFG_PALETTE_LENGTH(256)
 
-	MDRV_VIDEO_START(taitol)
-	MDRV_VIDEO_EOF(taitol)
-	MDRV_VIDEO_UPDATE(taitol)
+	MCFG_VIDEO_START(taitol)
+	MCFG_VIDEO_EOF(taitol)
+	MCFG_VIDEO_UPDATE(taitol)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/4)		/* verified on pcb */
-	MDRV_SOUND_CONFIG(ym2203_interface_triple)
-	MDRV_SOUND_ROUTE(0, "mono", 0.20)
-	MDRV_SOUND_ROUTE(1, "mono", 0.20)
-	MDRV_SOUND_ROUTE(2, "mono", 0.20)
-	MDRV_SOUND_ROUTE(3, "mono", 0.80)
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/4)		/* verified on pcb */
+	MCFG_SOUND_CONFIG(ym2203_interface_triple)
+	MCFG_SOUND_ROUTE(0, "mono", 0.20)
+	MCFG_SOUND_ROUTE(1, "mono", 0.20)
+	MCFG_SOUND_ROUTE(2, "mono", 0.20)
+	MCFG_SOUND_ROUTE(3, "mono", 0.80)
 
-	MDRV_TC0140SYT_ADD("tc0140syt", taitol_tc0140syt_intf)
+	MCFG_TC0140SYT_ADD("tc0140syt", taitol_tc0140syt_intf)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( champwr, fhawk )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(champwr_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(champwr_map)
 
-	MDRV_CPU_MODIFY("audiocpu")
-	MDRV_CPU_PROGRAM_MAP(champwr_3_map)
+	MCFG_CPU_MODIFY("audiocpu")
+	MCFG_CPU_PROGRAM_MAP(champwr_3_map)
 
-	MDRV_CPU_MODIFY("slave")
-	MDRV_CPU_PROGRAM_MAP(champwr_2_map)
+	MCFG_CPU_MODIFY("slave")
+	MCFG_CPU_PROGRAM_MAP(champwr_2_map)
 
-	MDRV_MACHINE_RESET(champwr)
+	MCFG_MACHINE_RESET(champwr)
 
 	/* sound hardware */
-	MDRV_SOUND_MODIFY("ymsnd")
-	MDRV_SOUND_CONFIG(ym2203_interface_champwr)
-	MDRV_SOUND_ROUTE(0, "mono", 0.20)
-	MDRV_SOUND_ROUTE(1, "mono", 0.20)
-	MDRV_SOUND_ROUTE(2, "mono", 0.20)
-	MDRV_SOUND_ROUTE(3, "mono", 0.80)
+	MCFG_SOUND_MODIFY("ymsnd")
+	MCFG_SOUND_CONFIG(ym2203_interface_champwr)
+	MCFG_SOUND_ROUTE(0, "mono", 0.20)
+	MCFG_SOUND_ROUTE(1, "mono", 0.20)
+	MCFG_SOUND_ROUTE(2, "mono", 0.20)
+	MCFG_SOUND_ROUTE(3, "mono", 0.80)
 
-	MDRV_SOUND_ADD("msm", MSM5205, XTAL_384kHz)
-	MDRV_SOUND_CONFIG(msm5205_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_SOUND_ADD("msm", MSM5205, XTAL_384kHz)
+	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
 
@@ -2100,67 +2100,67 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( raimais, fhawk )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(raimais_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(raimais_map)
 
-	MDRV_CPU_MODIFY("audiocpu")
-	MDRV_CPU_PROGRAM_MAP(raimais_3_map)
+	MCFG_CPU_MODIFY("audiocpu")
+	MCFG_CPU_PROGRAM_MAP(raimais_3_map)
 
-	MDRV_CPU_MODIFY("slave")
-	MDRV_CPU_PROGRAM_MAP(raimais_2_map)
+	MCFG_CPU_MODIFY("slave")
+	MCFG_CPU_PROGRAM_MAP(raimais_2_map)
 
-	MDRV_MACHINE_RESET(raimais)
+	MCFG_MACHINE_RESET(raimais)
 
 	/* sound hardware */
-	MDRV_SOUND_REPLACE("ymsnd", YM2610, XTAL_8MHz)		/* verified on pcb (8Mhz OSC is also for the 2nd z80) */
-	MDRV_SOUND_CONFIG(ym2610_config)
-	MDRV_SOUND_ROUTE(0, "mono", 0.25)
-	MDRV_SOUND_ROUTE(1, "mono", 1.0)
-	MDRV_SOUND_ROUTE(2, "mono", 1.0)
+	MCFG_SOUND_REPLACE("ymsnd", YM2610, XTAL_8MHz)		/* verified on pcb (8Mhz OSC is also for the 2nd z80) */
+	MCFG_SOUND_CONFIG(ym2610_config)
+	MCFG_SOUND_ROUTE(0, "mono", 0.25)
+	MCFG_SOUND_ROUTE(1, "mono", 1.0)
+	MCFG_SOUND_ROUTE(2, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( kurikint, taitol_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, XTAL_13_33056MHz/2)	/* verified freq on pin122 of TC0090LVC cpu */
-	MDRV_CPU_PROGRAM_MAP(kurikint_map)
-	MDRV_CPU_VBLANK_INT_HACK(vbl_interrupt,3)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_13_33056MHz/2)	/* verified freq on pin122 of TC0090LVC cpu */
+	MCFG_CPU_PROGRAM_MAP(kurikint_map)
+	MCFG_CPU_VBLANK_INT_HACK(vbl_interrupt,3)
 
-	MDRV_CPU_ADD("audiocpu",  Z80, XTAL_12MHz/3)		/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(kurikint_2_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("audiocpu",  Z80, XTAL_12MHz/3)		/* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(kurikint_2_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(HZ(6000))
 
-	MDRV_MACHINE_START(taito_l)
-	MDRV_MACHINE_RESET(kurikint)
+	MCFG_MACHINE_START(taito_l)
+	MCFG_MACHINE_RESET(kurikint)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(40*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(40*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(2)
-	MDRV_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE(2)
+	MCFG_PALETTE_LENGTH(256)
 
-	MDRV_VIDEO_START(taitol)
-	MDRV_VIDEO_EOF(taitol)
-	MDRV_VIDEO_UPDATE(taitol)
+	MCFG_VIDEO_START(taitol)
+	MCFG_VIDEO_EOF(taitol)
+	MCFG_VIDEO_UPDATE(taitol)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/4)		/* verified on pcb */
-	MDRV_SOUND_ROUTE(0, "mono", 0.20)
-	MDRV_SOUND_ROUTE(1, "mono", 0.20)
-	MDRV_SOUND_ROUTE(2, "mono", 0.20)
-	MDRV_SOUND_ROUTE(3, "mono", 0.80)
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/4)		/* verified on pcb */
+	MCFG_SOUND_ROUTE(0, "mono", 0.20)
+	MCFG_SOUND_ROUTE(1, "mono", 0.20)
+	MCFG_SOUND_ROUTE(2, "mono", 0.20)
+	MCFG_SOUND_ROUTE(3, "mono", 0.80)
 
-	MDRV_TC0140SYT_ADD("tc0140syt", taitol_tc0140syt_intf)
+	MCFG_TC0140SYT_ADD("tc0140syt", taitol_tc0140syt_intf)
 MACHINE_CONFIG_END
 
 
@@ -2169,152 +2169,152 @@ static MACHINE_CONFIG_DERIVED( kurikinta, kurikint )
 	/* basic machine hardware */
 
 	/* video hardware */
-	MDRV_GFXDECODE(1)
+	MCFG_GFXDECODE(1)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( plotting, taitol_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, XTAL_13_33056MHz/2)	/* verified freq on pin122 of TC0090LVC cpu */
-	MDRV_CPU_PROGRAM_MAP(plotting_map)
-	MDRV_CPU_VBLANK_INT_HACK(vbl_interrupt,3)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_13_33056MHz/2)	/* verified freq on pin122 of TC0090LVC cpu */
+	MCFG_CPU_PROGRAM_MAP(plotting_map)
+	MCFG_CPU_VBLANK_INT_HACK(vbl_interrupt,3)
 
-	MDRV_MACHINE_START(taito_l)
-	MDRV_MACHINE_RESET(plotting)
+	MCFG_MACHINE_START(taito_l)
+	MCFG_MACHINE_RESET(plotting)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(40*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(40*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(1)
-	MDRV_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE(1)
+	MCFG_PALETTE_LENGTH(256)
 
-	MDRV_VIDEO_START(taitol)
-	MDRV_VIDEO_EOF(taitol)
-	MDRV_VIDEO_UPDATE(taitol)
+	MCFG_VIDEO_START(taitol)
+	MCFG_VIDEO_EOF(taitol)
+	MCFG_VIDEO_UPDATE(taitol)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, XTAL_13_33056MHz/4)	/* verified on pcb */
-	MDRV_SOUND_CONFIG(ym2203_interface_single)
-	MDRV_SOUND_ROUTE(0, "mono", 0.20)
-	MDRV_SOUND_ROUTE(1, "mono", 0.20)
-	MDRV_SOUND_ROUTE(2, "mono", 0.20)
-	MDRV_SOUND_ROUTE(3, "mono", 0.80)
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_13_33056MHz/4)	/* verified on pcb */
+	MCFG_SOUND_CONFIG(ym2203_interface_single)
+	MCFG_SOUND_ROUTE(0, "mono", 0.20)
+	MCFG_SOUND_ROUTE(1, "mono", 0.20)
+	MCFG_SOUND_ROUTE(2, "mono", 0.20)
+	MCFG_SOUND_ROUTE(3, "mono", 0.80)
 
-	MDRV_TC0140SYT_ADD("tc0140syt", taitol_tc0140syt_intf)
+	MCFG_TC0140SYT_ADD("tc0140syt", taitol_tc0140syt_intf)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( puzznic, plotting )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(puzznic_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(puzznic_map)
 
-	MDRV_MACHINE_RESET(puzznic)
+	MCFG_MACHINE_RESET(puzznic)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( puzznici, plotting )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(puzznici_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(puzznici_map)
 
-	MDRV_MACHINE_RESET(puzznic)
+	MCFG_MACHINE_RESET(puzznic)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( horshoes, plotting )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(horshoes_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(horshoes_map)
 
-	MDRV_MACHINE_RESET(horshoes)
+	MCFG_MACHINE_RESET(horshoes)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( palamed, plotting )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(palamed_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(palamed_map)
 
-	MDRV_MACHINE_RESET(palamed)
+	MCFG_MACHINE_RESET(palamed)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_DERIVED( cachat, plotting )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(cachat_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(cachat_map)
 
-	MDRV_MACHINE_RESET(cachat)
+	MCFG_MACHINE_RESET(cachat)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_START( evilston, taitol_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, XTAL_13_33056MHz/2)	/* not verified */
-	MDRV_CPU_PROGRAM_MAP(evilston_map)
-	MDRV_CPU_VBLANK_INT_HACK(vbl_interrupt,3)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_13_33056MHz/2)	/* not verified */
+	MCFG_CPU_PROGRAM_MAP(evilston_map)
+	MCFG_CPU_VBLANK_INT_HACK(vbl_interrupt,3)
 
-	MDRV_CPU_ADD("audiocpu", Z80, XTAL_12MHz/3)		/* not verified */
-	MDRV_CPU_PROGRAM_MAP(evilston_2_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_12MHz/3)		/* not verified */
+	MCFG_CPU_PROGRAM_MAP(evilston_2_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_QUANTUM_TIME(HZ(6000))
+	MCFG_QUANTUM_TIME(HZ(6000))
 
-	MDRV_MACHINE_START(taito_l)
-	MDRV_MACHINE_RESET(evilston)
+	MCFG_MACHINE_START(taito_l)
+	MCFG_MACHINE_RESET(evilston)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(40*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(40*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 40*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(2)
-	MDRV_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE(2)
+	MCFG_PALETTE_LENGTH(256)
 
-	MDRV_VIDEO_START(taitol)
-	MDRV_VIDEO_EOF(taitol)
-	MDRV_VIDEO_UPDATE(taitol)
+	MCFG_VIDEO_START(taitol)
+	MCFG_VIDEO_EOF(taitol)
+	MCFG_VIDEO_UPDATE(taitol)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/4)		/* not verified */
-	MDRV_SOUND_ROUTE(0, "mono", 0.00)
-	MDRV_SOUND_ROUTE(1, "mono", 0.00)
-	MDRV_SOUND_ROUTE(2, "mono", 0.00)
-	MDRV_SOUND_ROUTE(3, "mono", 0.80)
+	MCFG_SOUND_ADD("ymsnd", YM2203, XTAL_12MHz/4)		/* not verified */
+	MCFG_SOUND_ROUTE(0, "mono", 0.00)
+	MCFG_SOUND_ROUTE(1, "mono", 0.00)
+	MCFG_SOUND_ROUTE(2, "mono", 0.00)
+	MCFG_SOUND_ROUTE(3, "mono", 0.80)
 
-	MDRV_TC0140SYT_ADD("tc0140syt", taitol_tc0140syt_intf)
+	MCFG_TC0140SYT_ADD("tc0140syt", taitol_tc0140syt_intf)
 MACHINE_CONFIG_END
 
 #ifdef UNUSED_CODE
 static MACHINE_CONFIG_DERIVED( lagirl, plotting )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_CLOCK(XTAL_27_2109MHz/4)
-	MDRV_CPU_PROGRAM_MAP(cachat_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_CLOCK(XTAL_27_2109MHz/4)
+	MCFG_CPU_PROGRAM_MAP(cachat_map)
 
 	/* sound hardware */
-	MDRV_SOUND_REPLACE("ymsnd", YM2203, XTAL_27_2109MHz/8)
+	MCFG_SOUND_REPLACE("ymsnd", YM2203, XTAL_27_2109MHz/8)
 
-	MDRV_MACHINE_RESET(cachat)
+	MCFG_MACHINE_RESET(cachat)
 MACHINE_CONFIG_END
 #endif
 

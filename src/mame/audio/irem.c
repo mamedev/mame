@@ -414,74 +414,74 @@ ADDRESS_MAP_END
 static MACHINE_CONFIG_FRAGMENT( irem_audio_base )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("iremsound", M6803, XTAL_3_579545MHz) /* verified on pcb */
-	MDRV_CPU_IO_MAP(irem_sound_portmap)
+	MCFG_CPU_ADD("iremsound", M6803, XTAL_3_579545MHz) /* verified on pcb */
+	MCFG_CPU_IO_MAP(irem_sound_portmap)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("irem_audio", IREM_AUDIO, 0)
+	MCFG_SOUND_ADD("irem_audio", IREM_AUDIO, 0)
 
-	MDRV_SOUND_ADD("ay1", AY8910, XTAL_3_579545MHz/4) /* verified on pcb */
-	MDRV_SOUND_CONFIG(irem_ay8910_interface_1)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL_3_579545MHz/4) /* verified on pcb */
+	MCFG_SOUND_CONFIG(irem_ay8910_interface_1)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MDRV_SOUND_ADD("ay2", AY8910, XTAL_3_579545MHz/4) /* verified on pcb */
-	MDRV_SOUND_CONFIG(irem_ay8910_interface_2)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL_3_579545MHz/4) /* verified on pcb */
+	MCFG_SOUND_CONFIG(irem_ay8910_interface_2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MDRV_SOUND_ADD("msm1", MSM5205, XTAL_384kHz) /* verified on pcb */
-	MDRV_SOUND_CONFIG(irem_msm5205_interface_1)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_SOUND_ADD("msm1", MSM5205, XTAL_384kHz) /* verified on pcb */
+	MCFG_SOUND_CONFIG(irem_msm5205_interface_1)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 
-	MDRV_SOUND_ADD("msm2", MSM5205, XTAL_384kHz) /* verified on pcb */
-	MDRV_SOUND_CONFIG(irem_msm5205_interface_2)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_SOUND_ADD("msm2", MSM5205, XTAL_384kHz) /* verified on pcb */
+	MCFG_SOUND_CONFIG(irem_msm5205_interface_2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_FRAGMENT( m52_sound_c_audio )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("iremsound", M6803, XTAL_3_579545MHz) /* verified on pcb */
-	MDRV_CPU_IO_MAP(irem_sound_portmap)
-	MDRV_CPU_PROGRAM_MAP(m52_small_sound_map)
+	MCFG_CPU_ADD("iremsound", M6803, XTAL_3_579545MHz) /* verified on pcb */
+	MCFG_CPU_IO_MAP(irem_sound_portmap)
+	MCFG_CPU_PROGRAM_MAP(m52_small_sound_map)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("irem_audio", IREM_AUDIO, 0)
+	MCFG_SOUND_ADD("irem_audio", IREM_AUDIO, 0)
 
-	MDRV_SOUND_ADD("ay1", AY8910, XTAL_3_579545MHz/4) /* verified on pcb */
-	MDRV_SOUND_CONFIG(irem_ay8910_interface_1)
-	MDRV_SOUND_ROUTE_EX(0, "filtermix", 1.0, 0)
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL_3_579545MHz/4) /* verified on pcb */
+	MCFG_SOUND_CONFIG(irem_ay8910_interface_1)
+	MCFG_SOUND_ROUTE_EX(0, "filtermix", 1.0, 0)
 
-	MDRV_SOUND_ADD("ay2", AY8910, XTAL_3_579545MHz/4) /* verified on pcb */
-	MDRV_SOUND_CONFIG(irem_ay8910_interface_2)
-	MDRV_SOUND_ROUTE_EX(0, "filtermix", 1.0, 1)
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL_3_579545MHz/4) /* verified on pcb */
+	MCFG_SOUND_CONFIG(irem_ay8910_interface_2)
+	MCFG_SOUND_ROUTE_EX(0, "filtermix", 1.0, 1)
 
-	MDRV_SOUND_ADD("msm1", MSM5205, XTAL_384kHz) /* verified on pcb */
-	MDRV_SOUND_CONFIG(irem_msm5205_interface_1)
-	MDRV_SOUND_ROUTE_EX(0, "filtermix", 1.0, 2)
+	MCFG_SOUND_ADD("msm1", MSM5205, XTAL_384kHz) /* verified on pcb */
+	MCFG_SOUND_CONFIG(irem_msm5205_interface_1)
+	MCFG_SOUND_ROUTE_EX(0, "filtermix", 1.0, 2)
 
-	MDRV_SOUND_ADD("filtermix", DISCRETE, 0)
-	MDRV_SOUND_CONFIG_DISCRETE(m52_sound_c)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("filtermix", DISCRETE, 0)
+	MCFG_SOUND_CONFIG_DISCRETE(m52_sound_c)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 
 MACHINE_CONFIG_END
 
 MACHINE_CONFIG_DERIVED( m52_large_audio, irem_audio_base )	/* 10 yard fight */
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("iremsound")
-	MDRV_CPU_PROGRAM_MAP(m52_large_sound_map)
+	MCFG_CPU_MODIFY("iremsound")
+	MCFG_CPU_PROGRAM_MAP(m52_large_sound_map)
 MACHINE_CONFIG_END
 
 
 MACHINE_CONFIG_DERIVED( m62_audio, irem_audio_base )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("iremsound")
-	MDRV_CPU_PROGRAM_MAP(m62_sound_map)
+	MCFG_CPU_MODIFY("iremsound")
+	MCFG_CPU_PROGRAM_MAP(m62_sound_map)
 MACHINE_CONFIG_END
 
 /*****************************************************************************

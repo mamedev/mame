@@ -1077,32 +1077,32 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( mcr3_base, mcr_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
-	MDRV_CPU_CONFIG(mcr_daisy_chain)
-	MDRV_CPU_VBLANK_INT_HACK(mcr_interrupt,2)
+	MCFG_CPU_ADD("maincpu", Z80, MASTER_CLOCK/4)
+	MCFG_CPU_CONFIG(mcr_daisy_chain)
+	MCFG_CPU_VBLANK_INT_HACK(mcr_interrupt,2)
 
-	MDRV_Z80CTC_ADD("ctc", MASTER_CLOCK/4 /* same as "maincpu" */, mcr_ctc_intf)
+	MCFG_Z80CTC_ADD("ctc", MASTER_CLOCK/4 /* same as "maincpu" */, mcr_ctc_intf)
 
-	MDRV_WATCHDOG_VBLANK_INIT(16)
-	MDRV_MACHINE_START(mcr)
-	MDRV_MACHINE_RESET(mcr)
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_WATCHDOG_VBLANK_INIT(16)
+	MCFG_MACHINE_START(mcr)
+	MCFG_MACHINE_RESET(mcr)
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(30)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*16, 30*16)
-	MDRV_SCREEN_VISIBLE_AREA(0*16, 32*16-1, 0*16, 30*16-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(30)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*16, 30*16)
+	MCFG_SCREEN_VISIBLE_AREA(0*16, 32*16-1, 0*16, 30*16-1)
 
-	MDRV_GFXDECODE(mcr3)
-	MDRV_PALETTE_LENGTH(64)
+	MCFG_GFXDECODE(mcr3)
+	MCFG_PALETTE_LENGTH(64)
 
-	MDRV_VIDEO_START(mcr)
-	MDRV_VIDEO_UPDATE(mcr)
+	MCFG_VIDEO_START(mcr)
+	MCFG_VIDEO_UPDATE(mcr)
 MACHINE_CONFIG_END
 
 
@@ -1114,13 +1114,13 @@ static MACHINE_CONFIG_DERIVED( mcrmono, mcr3_base )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mcrmono_map)
-	MDRV_CPU_IO_MAP(mcrmono_portmap)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(mcrmono_map)
+	MCFG_CPU_IO_MAP(mcrmono_portmap)
 
 	/* video hardware */
-	MDRV_VIDEO_START(mcrmono)
-	MDRV_VIDEO_UPDATE(mcr3)
+	MCFG_VIDEO_START(mcrmono)
+	MCFG_VIDEO_UPDATE(mcr3)
 MACHINE_CONFIG_END
 
 
@@ -1128,7 +1128,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( mono_tcs, mcrmono )
 
 	/* basic machine hardware */
-	MDRV_FRAGMENT_ADD(turbo_chip_squeak)
+	MCFG_FRAGMENT_ADD(turbo_chip_squeak)
 MACHINE_CONFIG_END
 
 
@@ -1136,7 +1136,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( mono_sg, mcrmono )
 
 	/* basic machine hardware */
-	MDRV_FRAGMENT_ADD(sounds_good)
+	MCFG_FRAGMENT_ADD(sounds_good)
 MACHINE_CONFIG_END
 
 
@@ -1147,22 +1147,22 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( mcrscroll, mcr3_base )
 
 	/* basic machine hardware */
-	MDRV_FRAGMENT_ADD(mcr_ssio)
+	MCFG_FRAGMENT_ADD(mcr_ssio)
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(spyhunt_map)
-	MDRV_CPU_IO_MAP(spyhunt_portmap)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(spyhunt_map)
+	MCFG_CPU_IO_MAP(spyhunt_portmap)
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_SIZE(30*16, 30*16)
-	MDRV_SCREEN_VISIBLE_AREA(0, 30*16-1, 0, 30*16-1)
-	MDRV_GFXDECODE(spyhunt)
-	MDRV_PALETTE_LENGTH(64+4)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_SIZE(30*16, 30*16)
+	MCFG_SCREEN_VISIBLE_AREA(0, 30*16-1, 0, 30*16-1)
+	MCFG_GFXDECODE(spyhunt)
+	MCFG_PALETTE_LENGTH(64+4)
 
-	MDRV_PALETTE_INIT(spyhunt)
-	MDRV_VIDEO_START(spyhunt)
-	MDRV_VIDEO_UPDATE(spyhunt)
+	MCFG_PALETTE_INIT(spyhunt)
+	MCFG_VIDEO_START(spyhunt)
+	MCFG_VIDEO_UPDATE(spyhunt)
 MACHINE_CONFIG_END
 
 
@@ -1170,7 +1170,7 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_DERIVED( mcrsc_csd, mcrscroll )
 
 	/* basic machine hardware */
-	MDRV_FRAGMENT_ADD(chip_squeak_deluxe_stereo)
+	MCFG_FRAGMENT_ADD(chip_squeak_deluxe_stereo)
 MACHINE_CONFIG_END
 
 

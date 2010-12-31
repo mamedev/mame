@@ -41,9 +41,9 @@ DECLARE_LEGACY_DEVICE(DECO16IC, deco16ic);
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_DECO16IC_ADD(_tag, _interface) \
-	MDRV_DEVICE_ADD(_tag, DECO16IC, 0) \
-	MDRV_DEVICE_CONFIG(_interface)
+#define MCFG_DECO16IC_ADD(_tag, _interface) \
+	MCFG_DEVICE_ADD(_tag, DECO16IC, 0) \
+	MCFG_DEVICE_CONFIG(_interface)
 
 /***************************************************************************
     DEVICE I/O FUNCTIONS

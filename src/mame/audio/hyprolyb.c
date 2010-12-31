@@ -126,14 +126,14 @@ static const msm5205_interface hyprolyb_msm5205_config =
 };
 
 MACHINE_CONFIG_FRAGMENT( hyprolyb_adpcm )
-	MDRV_CPU_ADD("adpcm", M6802, XTAL_14_31818MHz/8)	/* unknown clock */
-	MDRV_CPU_PROGRAM_MAP(hyprolyb_adpcm_map)
+	MCFG_CPU_ADD("adpcm", M6802, XTAL_14_31818MHz/8)	/* unknown clock */
+	MCFG_CPU_PROGRAM_MAP(hyprolyb_adpcm_map)
 
-	MDRV_SOUND_ADD("hyprolyb_adpcm", HYPROLYB_ADPCM, 0)
+	MCFG_SOUND_ADD("hyprolyb_adpcm", HYPROLYB_ADPCM, 0)
 
-	MDRV_SOUND_ADD("msm", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(hyprolyb_msm5205_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("msm", MSM5205, 384000)
+	MCFG_SOUND_CONFIG(hyprolyb_msm5205_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 /*****************************************************************************

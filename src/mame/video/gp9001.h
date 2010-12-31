@@ -96,13 +96,13 @@ const device_type gp9001vdp_ = gp9001vdp_device_config::static_alloc_device_conf
 
 
 /* vdp map 0, gfx region 0 */
-#define MDRV_DEVICE_ADD_VDP0 \
-	MDRV_DEVICE_ADD("gp9001vdp0", gp9001vdp_, 0) \
+#define MCFG_DEVICE_ADD_VDP0 \
+	MCFG_DEVICE_ADD("gp9001vdp0", gp9001vdp_, 0) \
 	gp9001vdp_device_config::static_set_gfx_region(device, 0); \
 
 /* vdp map 1, gfx region 2 */
-#define MDRV_DEVICE_ADD_VDP1 \
-	MDRV_DEVICE_ADD("gp9001vdp1", gp9001vdp_, 0) \
+#define MCFG_DEVICE_ADD_VDP1 \
+	MCFG_DEVICE_ADD("gp9001vdp1", gp9001vdp_, 0) \
 	gp9001vdp_device_config::static_set_gfx_region(device, 2); \
 
 

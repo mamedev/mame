@@ -767,41 +767,41 @@ static MACHINE_RESET( tokio )
 static MACHINE_CONFIG_START( tokio, bublbobl_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, MAIN_XTAL/4)	// 6 MHz
-	MDRV_CPU_PROGRAM_MAP(tokio_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("maincpu", Z80, MAIN_XTAL/4)	// 6 MHz
+	MCFG_CPU_PROGRAM_MAP(tokio_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("slave", Z80, MAIN_XTAL/4)	// 6 MHz
-	MDRV_CPU_PROGRAM_MAP(tokio_slave_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("slave", Z80, MAIN_XTAL/4)	// 6 MHz
+	MCFG_CPU_PROGRAM_MAP(tokio_slave_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audiocpu", Z80, MAIN_XTAL/8)	// 3 MHz
-	MDRV_CPU_PROGRAM_MAP(tokio_sound_map) // NMIs are triggered by the main CPU, IRQs are triggered by the YM2203
+	MCFG_CPU_ADD("audiocpu", Z80, MAIN_XTAL/8)	// 3 MHz
+	MCFG_CPU_PROGRAM_MAP(tokio_sound_map) // NMIs are triggered by the main CPU, IRQs are triggered by the YM2203
 
-	MDRV_QUANTUM_TIME(HZ(6000)) // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
+	MCFG_QUANTUM_TIME(HZ(6000)) // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
 
-	MDRV_MACHINE_START(tokio)
-	MDRV_MACHINE_RESET(tokio)
+	MCFG_MACHINE_START(tokio)
+	MCFG_MACHINE_RESET(tokio)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(MAIN_XTAL/4, 384, 0, 256, 264, 16, 240)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_RAW_PARAMS(MAIN_XTAL/4, 384, 0, 256, 264, 16, 240)
 
-	MDRV_GFXDECODE(bublbobl)
-	MDRV_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE(bublbobl)
+	MCFG_PALETTE_LENGTH(256)
 
-	MDRV_VIDEO_UPDATE(bublbobl)
+	MCFG_VIDEO_UPDATE(bublbobl)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, MAIN_XTAL/8)
-	MDRV_SOUND_CONFIG(ym2203_config)
-	MDRV_SOUND_ROUTE(0, "mono", 0.08)
-	MDRV_SOUND_ROUTE(1, "mono", 0.08)
-	MDRV_SOUND_ROUTE(2, "mono", 0.08)
-	MDRV_SOUND_ROUTE(3, "mono", 1.0)
+	MCFG_SOUND_ADD("ymsnd", YM2203, MAIN_XTAL/8)
+	MCFG_SOUND_CONFIG(ym2203_config)
+	MCFG_SOUND_ROUTE(0, "mono", 0.08)
+	MCFG_SOUND_ROUTE(1, "mono", 0.08)
+	MCFG_SOUND_ROUTE(2, "mono", 0.08)
+	MCFG_SOUND_ROUTE(3, "mono", 1.0)
 MACHINE_CONFIG_END
 
 
@@ -848,45 +848,45 @@ static MACHINE_RESET( bublbobl )
 static MACHINE_CONFIG_START( bublbobl, bublbobl_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, MAIN_XTAL/4)	// 6 MHz
-	MDRV_CPU_PROGRAM_MAP(master_map)
+	MCFG_CPU_ADD("maincpu", Z80, MAIN_XTAL/4)	// 6 MHz
+	MCFG_CPU_PROGRAM_MAP(master_map)
 	// IRQs are triggered by the MCU
 
-	MDRV_CPU_ADD("slave", Z80, MAIN_XTAL/4)	// 6 MHz
-	MDRV_CPU_PROGRAM_MAP(slave_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("slave", Z80, MAIN_XTAL/4)	// 6 MHz
+	MCFG_CPU_PROGRAM_MAP(slave_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audiocpu", Z80, MAIN_XTAL/8)	// 3 MHz
-	MDRV_CPU_PROGRAM_MAP(sound_map) // IRQs are triggered by the YM2203
+	MCFG_CPU_ADD("audiocpu", Z80, MAIN_XTAL/8)	// 3 MHz
+	MCFG_CPU_PROGRAM_MAP(sound_map) // IRQs are triggered by the YM2203
 
-	MDRV_CPU_ADD("mcu", M6801, 4000000)	// actually 6801U4  // xtal is 4MHz, divided by 4 internally
-	MDRV_CPU_PROGRAM_MAP(mcu_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_pulse) // comes from the same clock that latches the INT pin on the second Z80
+	MCFG_CPU_ADD("mcu", M6801, 4000000)	// actually 6801U4  // xtal is 4MHz, divided by 4 internally
+	MCFG_CPU_PROGRAM_MAP(mcu_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_pulse) // comes from the same clock that latches the INT pin on the second Z80
 
-	MDRV_QUANTUM_TIME(HZ(6000)) // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
+	MCFG_QUANTUM_TIME(HZ(6000)) // 100 CPU slices per frame - a high value to ensure proper synchronization of the CPUs
 
-	MDRV_MACHINE_START(bublbobl)
-	MDRV_MACHINE_RESET(bublbobl)
+	MCFG_MACHINE_START(bublbobl)
+	MCFG_MACHINE_RESET(bublbobl)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(MAIN_XTAL/4, 384, 0, 256, 264, 16, 240)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_RAW_PARAMS(MAIN_XTAL/4, 384, 0, 256, 264, 16, 240)
 
-	MDRV_GFXDECODE(bublbobl)
-	MDRV_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE(bublbobl)
+	MCFG_PALETTE_LENGTH(256)
 
-	MDRV_VIDEO_UPDATE(bublbobl)
+	MCFG_VIDEO_UPDATE(bublbobl)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ym1", YM2203, MAIN_XTAL/8)
-	MDRV_SOUND_CONFIG(ym2203_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("ym1", YM2203, MAIN_XTAL/8)
+	MCFG_SOUND_CONFIG(ym2203_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD("ym2", YM3526, MAIN_XTAL/8)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("ym2", YM3526, MAIN_XTAL/8)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 
@@ -912,14 +912,14 @@ static MACHINE_RESET( boblbobl )
 
 static MACHINE_CONFIG_DERIVED( boblbobl, bublbobl )
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(bootleg_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)	// interrupt mode 1, unlike Bubble Bobble
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(bootleg_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)	// interrupt mode 1, unlike Bubble Bobble
 
-	MDRV_MACHINE_START(boblbobl)
-	MDRV_MACHINE_RESET(boblbobl)
+	MCFG_MACHINE_START(boblbobl)
+	MCFG_MACHINE_RESET(boblbobl)
 
-	MDRV_DEVICE_REMOVE("mcu")
+	MCFG_DEVICE_REMOVE("mcu")
 MACHINE_CONFIG_END
 
 
@@ -956,14 +956,14 @@ static MACHINE_RESET( bub68705 )
 }
 
 static MACHINE_CONFIG_DERIVED( bub68705, bublbobl )
-	MDRV_DEVICE_REMOVE("mcu")
+	MCFG_DEVICE_REMOVE("mcu")
 
-	MDRV_CPU_ADD("mcu", M68705, 4000000)	// xtal is 4MHz, divided by 4 internally
-	MDRV_CPU_PROGRAM_MAP(bootlegmcu_map)
-	MDRV_CPU_VBLANK_INT_HACK(bublbobl_m68705_interrupt, 2) // ??? should come from the same clock which latches the INT pin on the second Z80
+	MCFG_CPU_ADD("mcu", M68705, 4000000)	// xtal is 4MHz, divided by 4 internally
+	MCFG_CPU_PROGRAM_MAP(bootlegmcu_map)
+	MCFG_CPU_VBLANK_INT_HACK(bublbobl_m68705_interrupt, 2) // ??? should come from the same clock which latches the INT pin on the second Z80
 
-	MDRV_MACHINE_START(bub68705)
-	MDRV_MACHINE_RESET(bub68705)
+	MCFG_MACHINE_START(bub68705)
+	MCFG_MACHINE_RESET(bub68705)
 MACHINE_CONFIG_END
 
 

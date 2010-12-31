@@ -593,63 +593,63 @@ static MACHINE_RESET( ddragon3 )
 static MACHINE_CONFIG_START( ddragon3, ddragon3_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2)
-	MDRV_CPU_PROGRAM_MAP(ddragon3_map)
-	MDRV_TIMER_ADD_SCANLINE("scantimer", ddragon3_scanline, "screen", 0, 1)
+	MCFG_CPU_ADD("maincpu", M68000, XTAL_20MHz / 2)
+	MCFG_CPU_PROGRAM_MAP(ddragon3_map)
+	MCFG_TIMER_ADD_SCANLINE("scantimer", ddragon3_scanline, "screen", 0, 1)
 
-	MDRV_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)
-	MDRV_CPU_PROGRAM_MAP(sound_map)
+	MCFG_CPU_ADD("audiocpu", Z80, XTAL_3_579545MHz)
+	MCFG_CPU_PROGRAM_MAP(sound_map)
 
-	MDRV_MACHINE_START(ddragon3)
-	MDRV_MACHINE_RESET(ddragon3)
+	MCFG_MACHINE_START(ddragon3)
+	MCFG_MACHINE_RESET(ddragon3)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 448, 0, 320, 272, 8, 248)	/* HTOTAL and VTOTAL are guessed */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 448, 0, 320, 272, 8, 248)	/* HTOTAL and VTOTAL are guessed */
 
-	MDRV_GFXDECODE(ddragon3)
-	MDRV_PALETTE_LENGTH(768)
+	MCFG_GFXDECODE(ddragon3)
+	MCFG_PALETTE_LENGTH(768)
 
-	MDRV_VIDEO_START(ddragon3)
-	MDRV_VIDEO_UPDATE(ddragon3)
+	MCFG_VIDEO_START(ddragon3)
+	MCFG_VIDEO_UPDATE(ddragon3)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ym2151", YM2151, XTAL_3_579545MHz)
-	MDRV_SOUND_CONFIG(ym2151_config)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 0.50)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 0.50)
+	MCFG_SOUND_ADD("ym2151", YM2151, XTAL_3_579545MHz)
+	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 
-	MDRV_OKIM6295_ADD("oki", XTAL_1_056MHz, OKIM6295_PIN7_HIGH)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.50)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.50)
+	MCFG_OKIM6295_ADD("oki", XTAL_1_056MHz, OKIM6295_PIN7_HIGH)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.50)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.50)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ddragon3b, ddragon3 )
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(dd3b_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(dd3b_map)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( ctribe, ddragon3 )
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(ctribe_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(ctribe_map)
 
-	MDRV_CPU_MODIFY("audiocpu")
-	MDRV_CPU_PROGRAM_MAP(ctribe_sound_map)
+	MCFG_CPU_MODIFY("audiocpu")
+	MCFG_CPU_PROGRAM_MAP(ctribe_sound_map)
 
-	MDRV_VIDEO_UPDATE(ctribe)
+	MCFG_VIDEO_UPDATE(ctribe)
 
-	MDRV_SOUND_MODIFY("ym2151")
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.20)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.20)
+	MCFG_SOUND_MODIFY("ym2151")
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.20)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.20)
 
-	MDRV_SOUND_MODIFY("oki")
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
+	MCFG_SOUND_MODIFY("oki")
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.80)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.80)
 MACHINE_CONFIG_END
 
 /*************************************

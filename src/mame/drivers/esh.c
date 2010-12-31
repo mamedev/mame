@@ -281,32 +281,32 @@ static MACHINE_START( esh )
 static MACHINE_CONFIG_START( esh, driver_device )
 
 	/* main cpu */
-	MDRV_CPU_ADD("maincpu", Z80, PCB_CLOCK/6)						/* The denominator is a Daphne guess based on PacMan's hardware */
-	MDRV_CPU_PROGRAM_MAP(z80_0_mem)
-	MDRV_CPU_IO_MAP(z80_0_io)
-	MDRV_CPU_VBLANK_INT("screen", vblank_callback_esh)
+	MCFG_CPU_ADD("maincpu", Z80, PCB_CLOCK/6)						/* The denominator is a Daphne guess based on PacMan's hardware */
+	MCFG_CPU_PROGRAM_MAP(z80_0_mem)
+	MCFG_CPU_IO_MAP(z80_0_io)
+	MCFG_CPU_VBLANK_INT("screen", vblank_callback_esh)
 
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
-	MDRV_MACHINE_START(esh)
+	MCFG_MACHINE_START(esh)
 
-	MDRV_LASERDISC_ADD("laserdisc", PIONEER_LDV1000, "screen", "ldsound")
-	MDRV_LASERDISC_OVERLAY(esh, 256, 256, BITMAP_FORMAT_INDEXED16)
+	MCFG_LASERDISC_ADD("laserdisc", PIONEER_LDV1000, "screen", "ldsound")
+	MCFG_LASERDISC_OVERLAY(esh, 256, 256, BITMAP_FORMAT_INDEXED16)
 
 	/* video hardware */
-	MDRV_LASERDISC_SCREEN_ADD_NTSC("screen", BITMAP_FORMAT_INDEXED16)
+	MCFG_LASERDISC_SCREEN_ADD_NTSC("screen", BITMAP_FORMAT_INDEXED16)
 
-	MDRV_PALETTE_LENGTH(256)
-	MDRV_PALETTE_INIT(esh)
+	MCFG_PALETTE_LENGTH(256)
+	MCFG_PALETTE_INIT(esh)
 
-	MDRV_GFXDECODE(esh)
+	MCFG_GFXDECODE(esh)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ldsound", LASERDISC_SOUND, 0)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 1.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("ldsound", LASERDISC_SOUND, 0)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 1.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 1.0)
 MACHINE_CONFIG_END
 
 

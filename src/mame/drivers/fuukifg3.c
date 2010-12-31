@@ -550,39 +550,39 @@ static const ymf278b_interface fuuki32_ymf278b_interface =
 static MACHINE_CONFIG_START( fuuki32, fuuki32_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68EC020, CPU_CLOCK) /* 20MHz verified */
-	MDRV_CPU_PROGRAM_MAP(fuuki32_map)
+	MCFG_CPU_ADD("maincpu", M68EC020, CPU_CLOCK) /* 20MHz verified */
+	MCFG_CPU_PROGRAM_MAP(fuuki32_map)
 
-	MDRV_CPU_ADD("soundcpu", Z80, SOUND_CPU_CLOCK) /* 6MHz verified */
-	MDRV_CPU_PROGRAM_MAP(fuuki32_sound_map)
-	MDRV_CPU_IO_MAP(fuuki32_sound_io_map)
+	MCFG_CPU_ADD("soundcpu", Z80, SOUND_CPU_CLOCK) /* 6MHz verified */
+	MCFG_CPU_PROGRAM_MAP(fuuki32_sound_map)
+	MCFG_CPU_IO_MAP(fuuki32_sound_io_map)
 
-	MDRV_MACHINE_START(fuuki32)
-	MDRV_MACHINE_RESET(fuuki32)
+	MCFG_MACHINE_START(fuuki32)
+	MCFG_MACHINE_RESET(fuuki32)
 
 	/* video hardware */
-	//MDRV_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM) // Buffered by 2 frames
+	//MCFG_VIDEO_ATTRIBUTES(VIDEO_BUFFERS_SPRITERAM) // Buffered by 2 frames
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0, 40*8-1, 0, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0, 40*8-1, 0, 30*8-1)
 
-	MDRV_GFXDECODE(fuuki32)
-	MDRV_PALETTE_LENGTH(0x4000/2)
+	MCFG_GFXDECODE(fuuki32)
+	MCFG_PALETTE_LENGTH(0x4000/2)
 
-	MDRV_VIDEO_START(fuuki32)
-	MDRV_VIDEO_UPDATE(fuuki32)
-	MDRV_VIDEO_EOF(fuuki32)
+	MCFG_VIDEO_START(fuuki32)
+	MCFG_VIDEO_UPDATE(fuuki32)
+	MCFG_VIDEO_EOF(fuuki32)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymf", YMF278B, YMF278B_STD_CLOCK) /* YMF278B_STD_CLOCK = OSC 33.8688MHz */
-	MDRV_SOUND_CONFIG(fuuki32_ymf278b_interface)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 0.50)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 0.50)
+	MCFG_SOUND_ADD("ymf", YMF278B, YMF278B_STD_CLOCK) /* YMF278B_STD_CLOCK = OSC 33.8688MHz */
+	MCFG_SOUND_CONFIG(fuuki32_ymf278b_interface)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.50)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.50)
 MACHINE_CONFIG_END
 
 /***************************************************************************

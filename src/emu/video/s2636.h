@@ -37,9 +37,9 @@ struct _s2636_interface
 
 DECLARE_LEGACY_DEVICE(S2636, s2636);
 
-#define MDRV_S2636_ADD(_tag, _interface) \
-	MDRV_DEVICE_ADD(_tag, S2636, 0) \
-	MDRV_DEVICE_CONFIG(_interface)
+#define MCFG_S2636_ADD(_tag, _interface) \
+	MCFG_DEVICE_ADD(_tag, S2636, 0) \
+	MCFG_DEVICE_CONFIG(_interface)
 
 
 /*************************************

@@ -13,10 +13,10 @@ struct _namco_54xx_config
 };
 
 
-#define MDRV_NAMCO_54XX_ADD(_tag, _clock, _discrete, _firstnode) \
-	MDRV_DEVICE_ADD(_tag, NAMCO_54XX, _clock) \
-	MDRV_DEVICE_CONFIG_DATAPTR(namco_54xx_config, discrete, _discrete) \
-	MDRV_DEVICE_CONFIG_DATA32(namco_54xx_config, firstnode, _firstnode)
+#define MCFG_NAMCO_54XX_ADD(_tag, _clock, _discrete, _firstnode) \
+	MCFG_DEVICE_ADD(_tag, NAMCO_54XX, _clock) \
+	MCFG_DEVICE_CONFIG_DATAPTR(namco_54xx_config, discrete, _discrete) \
+	MCFG_DEVICE_CONFIG_DATA32(namco_54xx_config, firstnode, _firstnode)
 
 
 WRITE8_DEVICE_HANDLER( namco_54xx_write );

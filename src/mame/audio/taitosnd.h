@@ -21,9 +21,9 @@ DECLARE_LEGACY_DEVICE(TC0140SYT, tc0140syt);
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_TC0140SYT_ADD(_tag, _interface) \
-	MDRV_DEVICE_ADD(_tag, TC0140SYT, 0) \
-	MDRV_DEVICE_CONFIG(_interface)
+#define MCFG_TC0140SYT_ADD(_tag, _interface) \
+	MCFG_DEVICE_ADD(_tag, TC0140SYT, 0) \
+	MCFG_DEVICE_CONFIG(_interface)
 
 /***************************************************************************
     DEVICE I/O FUNCTIONS

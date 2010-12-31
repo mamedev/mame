@@ -55,17 +55,17 @@ DECLARE_LEGACY_DEVICE(TC0640FIO, tc0640fio);
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_TC0220IOC_ADD(_tag, _interface) \
-	MDRV_DEVICE_ADD(_tag, TC0220IOC, 0) \
-	MDRV_DEVICE_CONFIG(_interface)
+#define MCFG_TC0220IOC_ADD(_tag, _interface) \
+	MCFG_DEVICE_ADD(_tag, TC0220IOC, 0) \
+	MCFG_DEVICE_CONFIG(_interface)
 
-#define MDRV_TC0510NIO_ADD(_tag, _interface) \
-	MDRV_DEVICE_ADD(_tag, TC0510NIO, 0) \
-	MDRV_DEVICE_CONFIG(_interface)
+#define MCFG_TC0510NIO_ADD(_tag, _interface) \
+	MCFG_DEVICE_ADD(_tag, TC0510NIO, 0) \
+	MCFG_DEVICE_CONFIG(_interface)
 
-#define MDRV_TC0640FIO_ADD(_tag, _interface) \
-	MDRV_DEVICE_ADD(_tag, TC0640FIO, 0) \
-	MDRV_DEVICE_CONFIG(_interface)
+#define MCFG_TC0640FIO_ADD(_tag, _interface) \
+	MCFG_DEVICE_ADD(_tag, TC0640FIO, 0) \
+	MCFG_DEVICE_CONFIG(_interface)
 
 
 /***************************************************************************

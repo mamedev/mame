@@ -768,58 +768,58 @@ static const z80_daisy_config daisy_chain_sound[] =
 static MACHINE_CONFIG_START( niyanpai, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 12288000/2)	/* TMP68301, 6.144 MHz */
-	MDRV_CPU_PROGRAM_MAP(niyanpai_map)
-	MDRV_CPU_VBLANK_INT("screen", niyanpai_interrupt)
+	MCFG_CPU_ADD("maincpu", M68000, 12288000/2)	/* TMP68301, 6.144 MHz */
+	MCFG_CPU_PROGRAM_MAP(niyanpai_map)
+	MCFG_CPU_VBLANK_INT("screen", niyanpai_interrupt)
 
-	MDRV_CPU_ADD("audiocpu", Z80, 8000000)					/* TMPZ84C011, 8.00 MHz */
-	MDRV_CPU_CONFIG(daisy_chain_sound)
-	MDRV_CPU_PROGRAM_MAP(niyanpai_sound_map)
-	MDRV_CPU_IO_MAP(niyanpai_sound_io_map)
+	MCFG_CPU_ADD("audiocpu", Z80, 8000000)					/* TMPZ84C011, 8.00 MHz */
+	MCFG_CPU_CONFIG(daisy_chain_sound)
+	MCFG_CPU_PROGRAM_MAP(niyanpai_sound_map)
+	MCFG_CPU_IO_MAP(niyanpai_sound_io_map)
 
-	MDRV_Z80CTC_ADD("ctc", 8000000 /* same as "audiocpu" */, ctc_intf)
+	MCFG_Z80CTC_ADD("ctc", 8000000 /* same as "audiocpu" */, ctc_intf)
 
-	MDRV_MACHINE_RESET(niyanpai)
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_MACHINE_RESET(niyanpai)
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(1024, 512)
-	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 240-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(1024, 512)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 240-1)
 
-	MDRV_PALETTE_LENGTH(768)
+	MCFG_PALETTE_LENGTH(768)
 
-	MDRV_VIDEO_START(niyanpai)
-	MDRV_VIDEO_UPDATE(niyanpai)
+	MCFG_VIDEO_START(niyanpai)
+	MCFG_VIDEO_UPDATE(niyanpai)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM3812, 4000000)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
+	MCFG_SOUND_ADD("ymsnd", YM3812, 4000000)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.70)
 
-	MDRV_SOUND_ADD("dac1", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("dac1", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 
-	MDRV_SOUND_ADD("dac2", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
+	MCFG_SOUND_ADD("dac2", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.75)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( musobana, niyanpai )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(musobana_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(musobana_map)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( mhhonban, niyanpai )
 
 	/* basic machine hardware */
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(mhhonban_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(mhhonban_map)
 MACHINE_CONFIG_END
 
 

@@ -594,34 +594,34 @@ static const ay8910_interface scarn_ay8910_config =
 static MACHINE_CONFIG_START( slotcarn, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, CPU_CLOCK) // 2.5 Mhz?
-	MDRV_CPU_PROGRAM_MAP(slotcarn_map)
-	MDRV_CPU_IO_MAP(spielbud_io_map)
+	MCFG_CPU_ADD("maincpu", Z80, CPU_CLOCK) // 2.5 Mhz?
+	MCFG_CPU_PROGRAM_MAP(slotcarn_map)
+	MCFG_CPU_IO_MAP(spielbud_io_map)
 
 	/* 3x 8255 */
-	MDRV_PPI8255_ADD( "ppi8255_0", scarn_ppi8255_intf[0] )
-	MDRV_PPI8255_ADD( "ppi8255_1", scarn_ppi8255_intf[1] )
-	MDRV_PPI8255_ADD( "ppi8255_2", scarn_ppi8255_intf[2] )
+	MCFG_PPI8255_ADD( "ppi8255_0", scarn_ppi8255_intf[0] )
+	MCFG_PPI8255_ADD( "ppi8255_1", scarn_ppi8255_intf[1] )
+	MCFG_PPI8255_ADD( "ppi8255_2", scarn_ppi8255_intf[2] )
 
-	MDRV_MACHINE_START(merit)
+	MCFG_MACHINE_START(merit)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 512, 0, 512, 256, 0, 256)	/* temporary, CRTC will configure screen */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_RAW_PARAMS(PIXEL_CLOCK, 512, 0, 512, 256, 0, 256)	/* temporary, CRTC will configure screen */
 
-	MDRV_MC6845_ADD("crtc", MC6845, CRTC_CLOCK, mc6845_intf)
+	MCFG_MC6845_ADD("crtc", MC6845, CRTC_CLOCK, mc6845_intf)
 
-	MDRV_GFXDECODE(slotcarn)
-	MDRV_PALETTE_LENGTH(0x400)
-	MDRV_VIDEO_UPDATE(slotcarn)
+	MCFG_GFXDECODE(slotcarn)
+	MCFG_PALETTE_LENGTH(0x400)
+	MCFG_VIDEO_UPDATE(slotcarn)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("aysnd",AY8910, SND_CLOCK)
-	MDRV_SOUND_CONFIG(scarn_ay8910_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SOUND_ADD("aysnd",AY8910, SND_CLOCK)
+	MCFG_SOUND_CONFIG(scarn_ay8910_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 

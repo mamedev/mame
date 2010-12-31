@@ -633,59 +633,59 @@ static const kaneko_pandora_interface airbustr_pandora_config =
 static MACHINE_CONFIG_START( airbustr, airbustr_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("master", Z80, 6000000)	// ???
-	MDRV_CPU_PROGRAM_MAP(master_map)
-	MDRV_CPU_IO_MAP(master_io_map)
-	MDRV_CPU_VBLANK_INT_HACK(master_interrupt, 2)	// nmi caused by sub cpu?, ?
+	MCFG_CPU_ADD("master", Z80, 6000000)	// ???
+	MCFG_CPU_PROGRAM_MAP(master_map)
+	MCFG_CPU_IO_MAP(master_io_map)
+	MCFG_CPU_VBLANK_INT_HACK(master_interrupt, 2)	// nmi caused by sub cpu?, ?
 
-	MDRV_CPU_ADD("slave", Z80, 6000000)	// ???
-	MDRV_CPU_PROGRAM_MAP(slave_map)
-	MDRV_CPU_IO_MAP(slave_io_map)
-	MDRV_CPU_VBLANK_INT_HACK(slave_interrupt, 2)		// nmi caused by main cpu, ?
+	MCFG_CPU_ADD("slave", Z80, 6000000)	// ???
+	MCFG_CPU_PROGRAM_MAP(slave_map)
+	MCFG_CPU_IO_MAP(slave_io_map)
+	MCFG_CPU_VBLANK_INT_HACK(slave_interrupt, 2)		// nmi caused by main cpu, ?
 
-	MDRV_CPU_ADD("audiocpu", Z80, 6000000)	// ???
-	MDRV_CPU_PROGRAM_MAP(sound_map)
-	MDRV_CPU_IO_MAP(sound_io_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)		// nmi are caused by sub cpu writing a sound command
+	MCFG_CPU_ADD("audiocpu", Z80, 6000000)	// ???
+	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_CPU_IO_MAP(sound_io_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)		// nmi are caused by sub cpu writing a sound command
 
-	MDRV_QUANTUM_TIME(HZ(6000))	// Palette RAM is filled by sub cpu with data supplied by main cpu
+	MCFG_QUANTUM_TIME(HZ(6000))	// Palette RAM is filled by sub cpu with data supplied by main cpu
 							// Maybe a high value is safer in order to avoid glitches
-	MDRV_MACHINE_START(airbustr)
-	MDRV_MACHINE_RESET(airbustr)
-	MDRV_WATCHDOG_TIME_INIT(SEC(3))	/* a guess, and certainly wrong */
+	MCFG_MACHINE_START(airbustr)
+	MCFG_MACHINE_RESET(airbustr)
+	MCFG_WATCHDOG_TIME_INIT(SEC(3))	/* a guess, and certainly wrong */
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
-	MDRV_GFXDECODE(airbustr)
-	MDRV_PALETTE_LENGTH(768)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0, 32*8-1, 2*8, 30*8-1)
+	MCFG_GFXDECODE(airbustr)
+	MCFG_PALETTE_LENGTH(768)
 
-	MDRV_KANEKO_PANDORA_ADD("pandora", airbustr_pandora_config)
+	MCFG_KANEKO_PANDORA_ADD("pandora", airbustr_pandora_config)
 
-	MDRV_VIDEO_START(airbustr)
-	MDRV_VIDEO_UPDATE(airbustr)
-	MDRV_VIDEO_EOF(airbustr)
+	MCFG_VIDEO_START(airbustr)
+	MCFG_VIDEO_UPDATE(airbustr)
+	MCFG_VIDEO_EOF(airbustr)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, 3000000)
-	MDRV_SOUND_CONFIG(ym2203_config)
-	MDRV_SOUND_ROUTE(0, "mono", 0.25)
-	MDRV_SOUND_ROUTE(1, "mono", 0.25)
-	MDRV_SOUND_ROUTE(2, "mono", 0.25)
-	MDRV_SOUND_ROUTE(3, "mono", 0.50)
+	MCFG_SOUND_ADD("ymsnd", YM2203, 3000000)
+	MCFG_SOUND_CONFIG(ym2203_config)
+	MCFG_SOUND_ROUTE(0, "mono", 0.25)
+	MCFG_SOUND_ROUTE(1, "mono", 0.25)
+	MCFG_SOUND_ROUTE(2, "mono", 0.25)
+	MCFG_SOUND_ROUTE(3, "mono", 0.50)
 
-	MDRV_OKIM6295_ADD("oki", 12000000/4, OKIM6295_PIN7_LOW)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
+	MCFG_OKIM6295_ADD("oki", 12000000/4, OKIM6295_PIN7_LOW)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.80)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( airbustrb, airbustr )
-	MDRV_WATCHDOG_TIME_INIT(SEC(0)) // no protection device or watchdog
+	MCFG_WATCHDOG_TIME_INIT(SEC(0)) // no protection device or watchdog
 MACHINE_CONFIG_END
 
 

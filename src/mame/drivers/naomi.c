@@ -1921,40 +1921,40 @@ static MACHINE_RESET( naomi )
 
 static MACHINE_CONFIG_START( naomi_base, driver_device )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", SH4, CPU_CLOCK) // SH4!!!
-	MDRV_CPU_CONFIG(sh4cpu_config)
-	MDRV_CPU_PROGRAM_MAP(naomi_map)
-	MDRV_CPU_IO_MAP(naomi_port)
+	MCFG_CPU_ADD("maincpu", SH4, CPU_CLOCK) // SH4!!!
+	MCFG_CPU_CONFIG(sh4cpu_config)
+	MCFG_CPU_PROGRAM_MAP(naomi_map)
+	MCFG_CPU_IO_MAP(naomi_port)
 
-	MDRV_CPU_ADD("soundcpu", ARM7, ((XTAL_33_8688MHz*2)/3)/8)	// AICA bus clock is 2/3rds * 33.8688.  ARM7 gets 1 bus cycle out of each 8.
-	MDRV_CPU_PROGRAM_MAP(dc_audio_map)
+	MCFG_CPU_ADD("soundcpu", ARM7, ((XTAL_33_8688MHz*2)/3)/8)	// AICA bus clock is 2/3rds * 33.8688.  ARM7 gets 1 bus cycle out of each 8.
+	MCFG_CPU_PROGRAM_MAP(dc_audio_map)
 
-	MDRV_MACHINE_START( dc )
-	MDRV_MACHINE_RESET( naomi )
+	MCFG_MACHINE_START( dc )
+	MCFG_MACHINE_RESET( naomi )
 
-	MDRV_EEPROM_93C46_ADD("main_eeprom")
-	MDRV_EEPROM_DEFAULT_VALUE(0)
+	MCFG_EEPROM_93C46_ADD("main_eeprom")
+	MCFG_EEPROM_DEFAULT_VALUE(0)
 
-	MDRV_NVRAM_HANDLER(naomi_eeproms)
+	MCFG_NVRAM_HANDLER(naomi_eeproms)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(640, 480)
-	MDRV_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_SIZE(640, 480)
+	MCFG_SCREEN_VISIBLE_AREA(0, 640-1, 0, 480-1)
 
-	MDRV_PALETTE_LENGTH(0x1000)
+	MCFG_PALETTE_LENGTH(0x1000)
 
-	MDRV_VIDEO_START(dc)
-	MDRV_VIDEO_UPDATE(dc)
+	MCFG_VIDEO_START(dc)
+	MCFG_VIDEO_UPDATE(dc)
 
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
-	MDRV_SOUND_ADD("aica", AICA, 0)
-	MDRV_SOUND_CONFIG(aica_config)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 2.0)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 2.0)
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SOUND_ADD("aica", AICA, 0)
+	MCFG_SOUND_CONFIG(aica_config)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 2.0)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 2.0)
 MACHINE_CONFIG_END
 
 /*
@@ -1962,7 +1962,7 @@ MACHINE_CONFIG_END
  */
 
 static MACHINE_CONFIG_DERIVED( naomi, naomi_base )
-	MDRV_NAOMI_ROM_BOARD_ADD("rom_board", "user1")
+	MCFG_NAOMI_ROM_BOARD_ADD("rom_board", "user1")
 MACHINE_CONFIG_END
 
 /*
@@ -1970,7 +1970,7 @@ MACHINE_CONFIG_END
  */
 
 static MACHINE_CONFIG_DERIVED( naomigd, naomi_base )
-	MDRV_NAOMI_DIMM_BOARD_ADD("rom_board", "gdrom", "user1", "picreturn")
+	MCFG_NAOMI_DIMM_BOARD_ADD("rom_board", "gdrom", "user1", "picreturn")
 MACHINE_CONFIG_END
 
 /*
@@ -1990,11 +1990,11 @@ MACHINE_CONFIG_END
  */
 
 static MACHINE_CONFIG_DERIVED( aw, naomi_base )
-//  MDRV_DEVICE_REMOVE("main_eeprom")
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(aw_map)
-	MDRV_MACRONIX_29L001MC_ADD("awflash")
-	MDRV_AW_ROM_BOARD_ADD("rom_board", "user1")
+//  MCFG_DEVICE_REMOVE("main_eeprom")
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(aw_map)
+	MCFG_MACRONIX_29L001MC_ADD("awflash")
+	MCFG_AW_ROM_BOARD_ADD("rom_board", "user1")
 MACHINE_CONFIG_END
 
 #define ROM_LOAD16_WORD_SWAP_BIOS(bios,name,offset,length,hash) \

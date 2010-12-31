@@ -30,7 +30,7 @@
  *
  *************************************/
 
-#define MDRV_CPU_VBLANK_INT_HACK(_func, _rate) \
+#define MCFG_CPU_VBLANK_INT_HACK(_func, _rate) \
 	device_config_execute_interface::static_set_vblank_int(device, _func, NULL, _rate); \
 
 

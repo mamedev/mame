@@ -196,29 +196,29 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( vindictr, vindictr_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68010, ATARI_CLOCK_14MHz/2)
-	MDRV_CPU_PROGRAM_MAP(main_map)
+	MCFG_CPU_ADD("maincpu", M68010, ATARI_CLOCK_14MHz/2)
+	MCFG_CPU_PROGRAM_MAP(main_map)
 
-	MDRV_MACHINE_START(vindictr)
-	MDRV_MACHINE_RESET(vindictr)
-	MDRV_NVRAM_ADD_1FILL("eeprom")
+	MCFG_MACHINE_START(vindictr)
+	MCFG_MACHINE_RESET(vindictr)
+	MCFG_NVRAM_ADD_1FILL("eeprom")
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MDRV_GFXDECODE(vindictr)
-	MDRV_PALETTE_LENGTH(2048*8)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	MCFG_GFXDECODE(vindictr)
+	MCFG_PALETTE_LENGTH(2048*8)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses a SYNGEN chip to generate video signals */
-	MDRV_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
+	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz/2, 456, 0, 336, 262, 0, 240)
 
-	MDRV_VIDEO_START(vindictr)
-	MDRV_VIDEO_UPDATE(vindictr)
+	MCFG_VIDEO_START(vindictr)
+	MCFG_VIDEO_UPDATE(vindictr)
 
 	/* sound hardware */
-	MDRV_FRAGMENT_ADD(jsa_i_stereo_pokey)
+	MCFG_FRAGMENT_ADD(jsa_i_stereo_pokey)
 MACHINE_CONFIG_END
 
 

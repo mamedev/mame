@@ -232,43 +232,43 @@ static const c6280_interface c6280_config =
 static MACHINE_CONFIG_START( battlera, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", H6280,21477200/3)
-	MDRV_CPU_PROGRAM_MAP(battlera_map)
-	MDRV_CPU_IO_MAP(battlera_portmap)
-	MDRV_CPU_VBLANK_INT_HACK(battlera_interrupt,256) /* 8 prelines, 232 lines, 16 vblank? */
+	MCFG_CPU_ADD("maincpu", H6280,21477200/3)
+	MCFG_CPU_PROGRAM_MAP(battlera_map)
+	MCFG_CPU_IO_MAP(battlera_portmap)
+	MCFG_CPU_VBLANK_INT_HACK(battlera_interrupt,256) /* 8 prelines, 232 lines, 16 vblank? */
 
-	MDRV_CPU_ADD("audiocpu", H6280,21477200/3)
-	MDRV_CPU_PROGRAM_MAP(sound_map)
+	MCFG_CPU_ADD("audiocpu", H6280,21477200/3)
+	MCFG_CPU_PROGRAM_MAP(sound_map)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 30*8-1)
-	MDRV_GFXDECODE(battlera)
-	MDRV_PALETTE_LENGTH(512)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 1*8, 30*8-1)
+	MCFG_GFXDECODE(battlera)
+	MCFG_PALETTE_LENGTH(512)
 
-	MDRV_VIDEO_START(battlera)
-	MDRV_VIDEO_UPDATE(battlera)
+	MCFG_VIDEO_START(battlera)
+	MCFG_VIDEO_UPDATE(battlera)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymsnd", YM2203, 12000000 / 8)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
+	MCFG_SOUND_ADD("ymsnd", YM2203, 12000000 / 8)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.40)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.40)
 
-	MDRV_SOUND_ADD("msm", MSM5205, 384000)
-	MDRV_SOUND_CONFIG(msm5205_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.85)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.85)
+	MCFG_SOUND_ADD("msm", MSM5205, 384000)
+	MCFG_SOUND_CONFIG(msm5205_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.85)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.85)
 
-	MDRV_SOUND_ADD("c6280", C6280, 21477270/6)
-	MDRV_SOUND_CONFIG(c6280_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
+	MCFG_SOUND_ADD("c6280", C6280, 21477270/6)
+	MCFG_SOUND_CONFIG(c6280_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 0.60)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 0.60)
 MACHINE_CONFIG_END
 
 /******************************************************************************/

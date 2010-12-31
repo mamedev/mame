@@ -1199,48 +1199,48 @@ static MACHINE_RESET( aristmk4 )
 static MACHINE_CONFIG_START( aristmk4, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6809, MAIN_CLOCK/8) // 1.5mhz (goldenc needs a bit faster for some reason)
-	MDRV_CPU_PROGRAM_MAP(aristmk4_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
-	MDRV_MACHINE_START(aristmk4)
-    MDRV_MACHINE_RESET(aristmk4 )
-	MDRV_NVRAM_ADD_0FILL("nvram")
+	MCFG_CPU_ADD("maincpu", M6809, MAIN_CLOCK/8) // 1.5mhz (goldenc needs a bit faster for some reason)
+	MCFG_CPU_PROGRAM_MAP(aristmk4_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_MACHINE_START(aristmk4)
+    MCFG_MACHINE_RESET(aristmk4 )
+	MCFG_NVRAM_ADD_0FILL("nvram")
 
     /* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(320, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 304-1, 0, 216-1)	/* from the crtc registers... updated by crtc */
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(320, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 304-1, 0, 216-1)	/* from the crtc registers... updated by crtc */
 
-	MDRV_GFXDECODE(aristmk4)
-	MDRV_PALETTE_LENGTH(512)
-	MDRV_PALETTE_INIT(aristmk4)
+	MCFG_GFXDECODE(aristmk4)
+	MCFG_PALETTE_LENGTH(512)
+	MCFG_PALETTE_INIT(aristmk4)
 
-	MDRV_VIDEO_START(aristmk4)
-	MDRV_VIDEO_UPDATE(aristmk4)
+	MCFG_VIDEO_START(aristmk4)
+	MCFG_VIDEO_UPDATE(aristmk4)
 
-	MDRV_PPI8255_ADD( "ppi8255_0", ppi8255_intf1 )
-	MDRV_VIA6522_ADD("via6522_0", 0, via_interface)	/* 1 MHz.(only 1 or 2 MHz.are valid) */
-	MDRV_PIA6821_ADD("pia6821_0", aristmk4_pia1_intf)
-    MDRV_MC6845_ADD("crtc", MC6845, MAIN_CLOCK/8, mc6845_intf)
-    MDRV_MC146818_ADD("rtc", MC146818_IGNORE_CENTURY)
+	MCFG_PPI8255_ADD( "ppi8255_0", ppi8255_intf1 )
+	MCFG_VIA6522_ADD("via6522_0", 0, via_interface)	/* 1 MHz.(only 1 or 2 MHz.are valid) */
+	MCFG_PIA6821_ADD("pia6821_0", aristmk4_pia1_intf)
+    MCFG_MC6845_ADD("crtc", MC6845, MAIN_CLOCK/8, mc6845_intf)
+    MCFG_MC146818_ADD("rtc", MC146818_IGNORE_CENTURY)
 
-    MDRV_SPEAKER_STANDARD_MONO("mono")
+    MCFG_SPEAKER_STANDARD_MONO("mono")
 
     // the Mark IV has X 2 AY8910 sound chips which are tied to the VIA
-    MDRV_SOUND_ADD("ay1", AY8910 , MAIN_CLOCK/8)
-    MDRV_SOUND_CONFIG(ay8910_config1)
-    MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+    MCFG_SOUND_ADD("ay1", AY8910 , MAIN_CLOCK/8)
+    MCFG_SOUND_CONFIG(ay8910_config1)
+    MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-    MDRV_SOUND_ADD("ay2", AY8910 , MAIN_CLOCK/8)
-    MDRV_SOUND_CONFIG(ay8910_config2)
-    MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
+    MCFG_SOUND_ADD("ay2", AY8910 , MAIN_CLOCK/8)
+    MCFG_SOUND_CONFIG(ay8910_config2)
+    MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.40)
 
-    MDRV_SOUND_ADD("samples", SAMPLES, 0)
-    MDRV_SOUND_CONFIG(meter_samples_interface)
-    MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
+    MCFG_SOUND_ADD("samples", SAMPLES, 0)
+    MCFG_SOUND_CONFIG(meter_samples_interface)
+    MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.05)
 
 
 MACHINE_CONFIG_END

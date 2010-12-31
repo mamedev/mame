@@ -312,36 +312,36 @@ static const ay8910_interface ay8910_config =
 
 static MACHINE_CONFIG_START( unclepoo, driver_device )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80,18000000/6)		 /* ? MHz */
-	MDRV_CPU_PROGRAM_MAP(unclepoo_main_map)
-	MDRV_CPU_IO_MAP(unclepoo_main_portmap)
-	MDRV_CPU_VBLANK_INT("screen", nmi_line_pulse)
-	MDRV_CPU_PERIODIC_INT(irq0_line_hold,256) // ??? controls game speed
+	MCFG_CPU_ADD("maincpu", Z80,18000000/6)		 /* ? MHz */
+	MCFG_CPU_PROGRAM_MAP(unclepoo_main_map)
+	MCFG_CPU_IO_MAP(unclepoo_main_portmap)
+	MCFG_CPU_VBLANK_INT("screen", nmi_line_pulse)
+	MCFG_CPU_PERIODIC_INT(irq0_line_hold,256) // ??? controls game speed
 
-	MDRV_CPU_ADD("subcpu", Z80,18000000/12)		 /* ? MHz */
-	MDRV_CPU_PROGRAM_MAP(unclepoo_sub_map)
-	MDRV_CPU_IO_MAP(unclepoo_sub_portmap)
-//  MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("subcpu", Z80,18000000/12)		 /* ? MHz */
+	MCFG_CPU_PROGRAM_MAP(unclepoo_sub_map)
+	MCFG_CPU_IO_MAP(unclepoo_sub_portmap)
+//  MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(256, 256)
-	MDRV_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(256, 256)
+	MCFG_SCREEN_VISIBLE_AREA(0, 256-1, 16, 256-1)
 
-	MDRV_GFXDECODE(unclepoo)
-	MDRV_PALETTE_LENGTH(0x100)
-	MDRV_PALETTE_INIT(unclepoo)
+	MCFG_GFXDECODE(unclepoo)
+	MCFG_PALETTE_LENGTH(0x100)
+	MCFG_PALETTE_INIT(unclepoo)
 
-	MDRV_VIDEO_START(unclepoo)
-	MDRV_VIDEO_UPDATE(unclepoo)
+	MCFG_VIDEO_START(unclepoo)
+	MCFG_VIDEO_UPDATE(unclepoo)
 
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("ay", AY8910, 18000000/12) /* ? Mhz */
-	MDRV_SOUND_CONFIG(ay8910_config)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("ay", AY8910, 18000000/12) /* ? Mhz */
+	MCFG_SOUND_CONFIG(ay8910_config)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 

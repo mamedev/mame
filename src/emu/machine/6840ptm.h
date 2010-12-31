@@ -19,9 +19,9 @@
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_PTM6840_ADD(_tag, _config) \
-	MDRV_DEVICE_ADD(_tag, PTM6840, 0) \
-	MDRV_DEVICE_CONFIG(_config)
+#define MCFG_PTM6840_ADD(_tag, _config) \
+	MCFG_DEVICE_ADD(_tag, PTM6840, 0) \
+	MCFG_DEVICE_CONFIG(_config)
 
 
 /***************************************************************************

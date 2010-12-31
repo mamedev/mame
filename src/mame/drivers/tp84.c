@@ -277,60 +277,60 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( tp84, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("cpu1",M6809, XTAL_18_432MHz/12) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(tp84_cpu1_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("cpu1",M6809, XTAL_18_432MHz/12) /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(tp84_cpu1_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("sub", M6809, XTAL_18_432MHz/12)	/* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(cpu2_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("sub", M6809, XTAL_18_432MHz/12)	/* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(cpu2_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_CPU_ADD("audiocpu", Z80,XTAL_14_31818MHz/4) /* verified on pcb */
-	MDRV_CPU_PROGRAM_MAP(audio_map)
+	MCFG_CPU_ADD("audiocpu", Z80,XTAL_14_31818MHz/4) /* verified on pcb */
+	MCFG_CPU_PROGRAM_MAP(audio_map)
 
-	MDRV_QUANTUM_TIME(HZ(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
+	MCFG_QUANTUM_TIME(HZ(6000))	/* 100 CPU slices per frame - an high value to ensure proper */
 							/* synchronization of the CPUs */
 
-	MDRV_MACHINE_START(tp84)
+	MCFG_MACHINE_START(tp84)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 2*8, 30*8-1)
 
-	MDRV_GFXDECODE(tp84)
-	MDRV_PALETTE_LENGTH(4096)
+	MCFG_GFXDECODE(tp84)
+	MCFG_PALETTE_LENGTH(4096)
 
-	MDRV_PALETTE_INIT(tp84)
-	MDRV_VIDEO_START(tp84)
-	MDRV_VIDEO_UPDATE(tp84)
+	MCFG_PALETTE_INIT(tp84)
+	MCFG_VIDEO_START(tp84)
+	MCFG_VIDEO_UPDATE(tp84)
 
 	/* audio hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("sn1", SN76489A, XTAL_14_31818MHz/8) /* verified on pcb */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "filter1", 0.75)
+	MCFG_SOUND_ADD("sn1", SN76489A, XTAL_14_31818MHz/8) /* verified on pcb */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter1", 0.75)
 
-	MDRV_SOUND_ADD("sn2", SN76489A, XTAL_14_31818MHz/8) /* verified on pcb */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "filter2", 0.75)
+	MCFG_SOUND_ADD("sn2", SN76489A, XTAL_14_31818MHz/8) /* verified on pcb */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter2", 0.75)
 
-	MDRV_SOUND_ADD("sn3", SN76489A, XTAL_14_31818MHz/8) /* verified on pcb */
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "filter3", 0.75)
+	MCFG_SOUND_ADD("sn3", SN76489A, XTAL_14_31818MHz/8) /* verified on pcb */
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "filter3", 0.75)
 
-	MDRV_SOUND_ADD("filter1", FILTER_RC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MDRV_SOUND_ADD("filter2", FILTER_RC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
-	MDRV_SOUND_ADD("filter3", FILTER_RC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("filter1", FILTER_RC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("filter2", FILTER_RC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("filter3", FILTER_RC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( tp84b, tp84 )
-	MDRV_CPU_MODIFY("cpu1")
-	MDRV_CPU_PROGRAM_MAP(tp84b_cpu1_map)
+	MCFG_CPU_MODIFY("cpu1")
+	MCFG_CPU_PROGRAM_MAP(tp84b_cpu1_map)
 MACHINE_CONFIG_END
 
 /***************************************************************************

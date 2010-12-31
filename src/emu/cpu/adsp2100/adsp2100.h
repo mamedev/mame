@@ -55,7 +55,7 @@
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MDRV_ADSP21XX_CONFIG(_config) \
+#define MCFG_ADSP21XX_CONFIG(_config) \
 	adsp21xx_device_config::static_set_config(device, _config); \
 
 

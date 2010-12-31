@@ -39,20 +39,20 @@ enum
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MDRV_ASC_ADD(_tag, _clock, _type, _irqf) \
-	MDRV_DEVICE_ADD(_tag, ASC, _clock) \
-	MDRV_ASC_TYPE(_type) \
-	MDRV_IRQ_FUNC(_irqf)
+#define MCFG_ASC_ADD(_tag, _clock, _type, _irqf) \
+	MCFG_DEVICE_ADD(_tag, ASC, _clock) \
+	MCFG_ASC_TYPE(_type) \
+	MCFG_IRQ_FUNC(_irqf)
 
-#define MDRV_ASC_REPLACE(_tag, _clock, _type, _irqf) \
-	MDRV_DEVICE_REPLACE(_tag, ASC, _clock) \
-	MDRV_ASC_TYPE(_type) \
-	MDRV_IRQ_FUNC(_irqf)
+#define MCFG_ASC_REPLACE(_tag, _clock, _type, _irqf) \
+	MCFG_DEVICE_REPLACE(_tag, ASC, _clock) \
+	MCFG_ASC_TYPE(_type) \
+	MCFG_IRQ_FUNC(_irqf)
 
-#define MDRV_ASC_TYPE(_type) \
+#define MCFG_ASC_TYPE(_type) \
 	asc_device_config::static_set_type(device, _type); \
 
-#define MDRV_IRQ_FUNC(_irqf) \
+#define MCFG_IRQ_FUNC(_irqf) \
 	asc_device_config::static_set_irqf(device, _irqf); \
 
 

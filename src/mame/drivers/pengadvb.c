@@ -268,28 +268,28 @@ static INTERRUPT_GEN( pengadvb_interrupt )
 
 static MACHINE_CONFIG_START( pengadvb, driver_device )
 
-	MDRV_CPU_ADD("maincpu", Z80, XTAL_10_738635MHz/3)		  /* 3.579545 Mhz */
-	MDRV_CPU_PROGRAM_MAP(program_mem)
-	MDRV_CPU_IO_MAP(io_mem)
-	MDRV_CPU_VBLANK_INT("screen",pengadvb_interrupt)
+	MCFG_CPU_ADD("maincpu", Z80, XTAL_10_738635MHz/3)		  /* 3.579545 Mhz */
+	MCFG_CPU_PROGRAM_MAP(program_mem)
+	MCFG_CPU_IO_MAP(io_mem)
+	MCFG_CPU_VBLANK_INT("screen",pengadvb_interrupt)
 
-	MDRV_MACHINE_START( pengadvb )
-	MDRV_MACHINE_RESET( pengadvb )
+	MCFG_MACHINE_START( pengadvb )
+	MCFG_MACHINE_RESET( pengadvb )
 
-    MDRV_I8255A_ADD( "ppi8255", pengadvb_ppi8255_interface)
+    MCFG_I8255A_ADD( "ppi8255", pengadvb_ppi8255_interface)
 
 	/* video hardware */
-	MDRV_FRAGMENT_ADD(tms9928a)
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_REFRESH_RATE((float)XTAL_10_738635MHz/2/342/262)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(4395)) /* 69 lines */
+	MCFG_FRAGMENT_ADD(tms9928a)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_REFRESH_RATE((float)XTAL_10_738635MHz/2/342/262)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(4395)) /* 69 lines */
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
-	MDRV_SOUND_ADD("aysnd", AY8910, (float)XTAL_10_738635MHz/6)
-	MDRV_SOUND_CONFIG(pengadvb_ay8910_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
+	MCFG_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SOUND_ADD("aysnd", AY8910, (float)XTAL_10_738635MHz/6)
+	MCFG_SOUND_CONFIG(pengadvb_ay8910_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.50)
 MACHINE_CONFIG_END
 
 static void pengadvb_decrypt(running_machine *machine, const char* region)

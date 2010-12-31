@@ -215,30 +215,30 @@ static INTERRUPT_GEN( trvquest_interrupt )
 
 static MACHINE_CONFIG_START( trvquest, gameplan_state )
 
-	MDRV_CPU_ADD("maincpu", M6809,XTAL_6MHz/4)
-	MDRV_CPU_PROGRAM_MAP(cpu_map)
-	MDRV_CPU_VBLANK_INT("screen", trvquest_interrupt)
+	MCFG_CPU_ADD("maincpu", M6809,XTAL_6MHz/4)
+	MCFG_CPU_PROGRAM_MAP(cpu_map)
+	MCFG_CPU_VBLANK_INT("screen", trvquest_interrupt)
 
-	MDRV_NVRAM_ADD_1FILL("nvram")
-	MDRV_MACHINE_START(trvquest)
-	MDRV_MACHINE_RESET(trvquest)
+	MCFG_NVRAM_ADD_1FILL("nvram")
+	MCFG_MACHINE_START(trvquest)
+	MCFG_MACHINE_RESET(trvquest)
 
 	/* video hardware */
-	MDRV_FRAGMENT_ADD(trvquest_video)
+	MCFG_FRAGMENT_ADD(trvquest_video)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("ay1", AY8910, XTAL_6MHz/2)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("ay1", AY8910, XTAL_6MHz/2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
-	MDRV_SOUND_ADD("ay2", AY8910, XTAL_6MHz/2)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("ay2", AY8910, XTAL_6MHz/2)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 
 	/* via */
-	MDRV_VIA6522_ADD("via6522_0", 0, trvquest_via_0_interface)
-	MDRV_VIA6522_ADD("via6522_1", 0, via_1_interface)
-	MDRV_VIA6522_ADD("via6522_2", 0, via_2_interface)
+	MCFG_VIA6522_ADD("via6522_0", 0, trvquest_via_0_interface)
+	MCFG_VIA6522_ADD("via6522_1", 0, via_1_interface)
+	MCFG_VIA6522_ADD("via6522_2", 0, via_2_interface)
 MACHINE_CONFIG_END
 
 ROM_START( trvquest )

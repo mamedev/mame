@@ -996,56 +996,56 @@ static const mc6845_interface h46505_intf =
 
 
 static MACHINE_CONFIG_START( coinmstr, coinmstr_state )
-	MDRV_CPU_ADD("maincpu",Z80,8000000) // ?
-	MDRV_CPU_PROGRAM_MAP(coinmstr_map)
-	MDRV_CPU_VBLANK_INT("screen", irq0_line_hold)
+	MCFG_CPU_ADD("maincpu",Z80,8000000) // ?
+	MCFG_CPU_PROGRAM_MAP(coinmstr_map)
+	MCFG_CPU_VBLANK_INT("screen", irq0_line_hold)
 
-	MDRV_PIA6821_ADD("pia0", pia_0_intf)
-	MDRV_PIA6821_ADD("pia1", pia_1_intf)
-	MDRV_PIA6821_ADD("pia2", pia_2_intf)
+	MCFG_PIA6821_ADD("pia0", pia_0_intf)
+	MCFG_PIA6821_ADD("pia1", pia_1_intf)
+	MCFG_PIA6821_ADD("pia2", pia_2_intf)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(64*8, 64*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 46*8-1, 0*8, 32*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(0))
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(64*8, 64*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 46*8-1, 0*8, 32*8-1)
 
-	MDRV_GFXDECODE(coinmstr)
-	MDRV_PALETTE_LENGTH(46*32*4)
+	MCFG_GFXDECODE(coinmstr)
+	MCFG_PALETTE_LENGTH(46*32*4)
 
-	MDRV_VIDEO_START(coinmstr)
-	MDRV_VIDEO_UPDATE(coinmstr)
+	MCFG_VIDEO_START(coinmstr)
+	MCFG_VIDEO_UPDATE(coinmstr)
 
-	MDRV_MC6845_ADD("crtc", H46505, 14000000 / 16, h46505_intf)
+	MCFG_MC6845_ADD("crtc", H46505, 14000000 / 16, h46505_intf)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("aysnd", AY8910, 1500000)
-	MDRV_SOUND_CONFIG(ay8912_interface)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
+	MCFG_SOUND_ADD("aysnd", AY8910, 1500000)
+	MCFG_SOUND_CONFIG(ay8912_interface)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 0.25)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( quizmstr, coinmstr )
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(quizmstr_io_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(quizmstr_io_map)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( trailblz, coinmstr )
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(trailblz_io_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(trailblz_io_map)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( supnudg2, coinmstr )
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(supnudg2_io_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(supnudg2_io_map)
 MACHINE_CONFIG_END
 
 static MACHINE_CONFIG_DERIVED( pokeroul, coinmstr )
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_IO_MAP(pokeroul_io_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_IO_MAP(pokeroul_io_map)
 MACHINE_CONFIG_END
 
 /*

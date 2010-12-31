@@ -45,14 +45,14 @@ DECLARE_LEGACY_DEVICE(PIT8254, pit8254);
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_PIT8253_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, PIT8253, 0) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_PIT8253_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, PIT8253, 0) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
 
-#define MDRV_PIT8254_ADD(_tag, _intrf) \
-	MDRV_DEVICE_ADD(_tag, PIT8254, 0) \
-	MDRV_DEVICE_CONFIG(_intrf)
+#define MCFG_PIT8254_ADD(_tag, _intrf) \
+	MCFG_DEVICE_ADD(_tag, PIT8254, 0) \
+	MCFG_DEVICE_CONFIG(_intrf)
 
 
 READ8_DEVICE_HANDLER( pit8253_r );

@@ -31,15 +31,15 @@ enum
 //  INTERFACE CONFIGURATION MACROS
 //**************************************************************************
 
-#define MDRV_OKIM6295_ADD(_tag, _clock, _pin7) \
-	MDRV_DEVICE_ADD(_tag, OKIM6295, _clock) \
-	MDRV_OKIM6295_PIN7(_pin7)
+#define MCFG_OKIM6295_ADD(_tag, _clock, _pin7) \
+	MCFG_DEVICE_ADD(_tag, OKIM6295, _clock) \
+	MCFG_OKIM6295_PIN7(_pin7)
 
-#define MDRV_OKIM6295_REPLACE(_tag, _clock, _pin7) \
-	MDRV_DEVICE_REPLACE(_tag, OKIM6295, _clock) \
-	MDRV_OKIM6295_PIN7(_pin7)
+#define MCFG_OKIM6295_REPLACE(_tag, _clock, _pin7) \
+	MCFG_DEVICE_REPLACE(_tag, OKIM6295, _clock) \
+	MCFG_OKIM6295_PIN7(_pin7)
 
-#define MDRV_OKIM6295_PIN7(_pin7) \
+#define MCFG_OKIM6295_PIN7(_pin7) \
 	okim6295_device_config::static_set_pin7(device, _pin7); \
 
 

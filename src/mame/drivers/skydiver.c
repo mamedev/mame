@@ -374,34 +374,34 @@ GFXDECODE_END
 static MACHINE_CONFIG_START( skydiver, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M6800,MASTER_CLOCK/16)	   /* ???? */
-	MDRV_CPU_PROGRAM_MAP(skydiver_map)
-	MDRV_CPU_VBLANK_INT_HACK(skydiver_interrupt, 5)
-	MDRV_WATCHDOG_VBLANK_INIT(8)	// 128V clocks the same as VBLANK
+	MCFG_CPU_ADD("maincpu", M6800,MASTER_CLOCK/16)	   /* ???? */
+	MCFG_CPU_PROGRAM_MAP(skydiver_map)
+	MCFG_CPU_VBLANK_INT_HACK(skydiver_interrupt, 5)
+	MCFG_WATCHDOG_VBLANK_INIT(8)	// 128V clocks the same as VBLANK
 
-	MDRV_MACHINE_RESET(skydiver)
+	MCFG_MACHINE_RESET(skydiver)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(32*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(32*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 32*8-1, 0*8, 28*8-1)
 
-	MDRV_GFXDECODE(skydiver)
-	MDRV_PALETTE_LENGTH(sizeof(colortable_source) / sizeof(colortable_source[0]))
+	MCFG_GFXDECODE(skydiver)
+	MCFG_PALETTE_LENGTH(sizeof(colortable_source) / sizeof(colortable_source[0]))
 
-	MDRV_PALETTE_INIT(skydiver)
-	MDRV_VIDEO_START(skydiver)
-	MDRV_VIDEO_UPDATE(skydiver)
+	MCFG_PALETTE_INIT(skydiver)
+	MCFG_VIDEO_START(skydiver)
+	MCFG_VIDEO_UPDATE(skydiver)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("discrete", DISCRETE, 0)
-	MDRV_SOUND_CONFIG_DISCRETE(skydiver)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
+	MCFG_SOUND_ADD("discrete", DISCRETE, 0)
+	MCFG_SOUND_CONFIG_DISCRETE(skydiver)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "mono", 1.0)
 MACHINE_CONFIG_END
 
 

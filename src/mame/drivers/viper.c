@@ -617,36 +617,36 @@ static MACHINE_RESET(viper)
 static MACHINE_CONFIG_START( viper, driver_device )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", MPC8240, 200000000)
-	MDRV_CPU_CONFIG(viper_ppc_cfg)
-	MDRV_CPU_PROGRAM_MAP(viper_map)
-	MDRV_CPU_VBLANK_INT("screen", viper_vblank)
+	MCFG_CPU_ADD("maincpu", MPC8240, 200000000)
+	MCFG_CPU_CONFIG(viper_ppc_cfg)
+	MCFG_CPU_PROGRAM_MAP(viper_map)
+	MCFG_CPU_VBLANK_INT("screen", viper_vblank)
 
-	MDRV_MACHINE_RESET(viper)
+	MCFG_MACHINE_RESET(viper)
 
-	MDRV_PCI_BUS_ADD("pcibus", 0)
-	MDRV_PCI_BUS_DEVICE(0, NULL, mpc8240_pci_r, mpc8240_pci_w)
-	MDRV_PCI_BUS_DEVICE(12, "voodoo", voodoo3_pci_r, voodoo3_pci_w)
+	MCFG_PCI_BUS_ADD("pcibus", 0)
+	MCFG_PCI_BUS_DEVICE(0, NULL, mpc8240_pci_r, mpc8240_pci_w)
+	MCFG_PCI_BUS_DEVICE(12, "voodoo", voodoo3_pci_r, voodoo3_pci_w)
 
-	MDRV_IDE_CONTROLLER_ADD("ide", ide_interrupt)
-	MDRV_3DFX_VOODOO_3_ADD("voodoo", STD_VOODOO_3_CLOCK, 16, "screen")
-	MDRV_3DFX_VOODOO_CPU("maincpu")
+	MCFG_IDE_CONTROLLER_ADD("ide", ide_interrupt)
+	MCFG_3DFX_VOODOO_3_ADD("voodoo", STD_VOODOO_3_CLOCK, 16, "screen")
+	MCFG_3DFX_VOODOO_CPU("maincpu")
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
-	MDRV_SCREEN_SIZE(800, 600)
-	MDRV_SCREEN_VISIBLE_AREA(0, 799, 0, 599)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_RGB32)
+	MCFG_SCREEN_SIZE(800, 600)
+	MCFG_SCREEN_VISIBLE_AREA(0, 799, 0, 599)
 
-	MDRV_PALETTE_LENGTH(65536)
+	MCFG_PALETTE_LENGTH(65536)
 
-	MDRV_VIDEO_UPDATE(viper)
+	MCFG_VIDEO_UPDATE(viper)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_M48T58_ADD( "m48t58" )
+	MCFG_M48T58_ADD( "m48t58" )
 MACHINE_CONFIG_END
 
 /*****************************************************************************/

@@ -437,35 +437,35 @@ static const tms36xx_interface tms3615_interface =
 static MACHINE_CONFIG_START( naughtyb, naughtyb_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, CLOCK_XTAL / 4) /* 12 MHz clock, divided by 4. CPU is a Z80A */
-	MDRV_CPU_PROGRAM_MAP(naughtyb_map)
-	MDRV_CPU_VBLANK_INT("screen", naughtyb_interrupt)
+	MCFG_CPU_ADD("maincpu", Z80, CLOCK_XTAL / 4) /* 12 MHz clock, divided by 4. CPU is a Z80A */
+	MCFG_CPU_PROGRAM_MAP(naughtyb_map)
+	MCFG_CPU_VBLANK_INT("screen", naughtyb_interrupt)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(36*8, 28*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(36*8, 28*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
 
-	MDRV_GFXDECODE(naughtyb)
-	MDRV_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE(naughtyb)
+	MCFG_PALETTE_LENGTH(256)
 
-	MDRV_PALETTE_INIT(naughtyb)
-	MDRV_VIDEO_START(naughtyb)
-	MDRV_VIDEO_UPDATE(naughtyb)
+	MCFG_PALETTE_INIT(naughtyb)
+	MCFG_VIDEO_START(naughtyb)
+	MCFG_VIDEO_UPDATE(naughtyb)
 
 	/* sound hardware */
 	/* uses the TMS3615NS for sound */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("tms", TMS36XX, 350)
-	MDRV_SOUND_CONFIG(tms3615_interface)
-	MDRV_SOUND_ROUTE(0, "mono", 0.60)
+	MCFG_SOUND_ADD("tms", TMS36XX, 350)
+	MCFG_SOUND_CONFIG(tms3615_interface)
+	MCFG_SOUND_ROUTE(0, "mono", 0.60)
 
-	MDRV_SOUND_ADD("cust", NAUGHTYB, 0)
-	MDRV_SOUND_ROUTE(0, "mono", 0.40)
+	MCFG_SOUND_ADD("cust", NAUGHTYB, 0)
+	MCFG_SOUND_ROUTE(0, "mono", 0.40)
 MACHINE_CONFIG_END
 
 
@@ -473,34 +473,34 @@ MACHINE_CONFIG_END
 static MACHINE_CONFIG_START( popflame, naughtyb_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", Z80, CLOCK_XTAL / 4) /* 12 MHz clock, divided by 4. CPU is a Z80A */
-	MDRV_CPU_PROGRAM_MAP(popflame_map)
-	MDRV_CPU_VBLANK_INT("screen", naughtyb_interrupt)
+	MCFG_CPU_ADD("maincpu", Z80, CLOCK_XTAL / 4) /* 12 MHz clock, divided by 4. CPU is a Z80A */
+	MCFG_CPU_PROGRAM_MAP(popflame_map)
+	MCFG_CPU_VBLANK_INT("screen", naughtyb_interrupt)
 
 	/* video hardware */
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(36*8, 28*8)
-	MDRV_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(36*8, 28*8)
+	MCFG_SCREEN_VISIBLE_AREA(0*8, 36*8-1, 0*8, 28*8-1)
 
-	MDRV_GFXDECODE(naughtyb)
-	MDRV_PALETTE_LENGTH(256)
+	MCFG_GFXDECODE(naughtyb)
+	MCFG_PALETTE_LENGTH(256)
 
-	MDRV_PALETTE_INIT(naughtyb)
-	MDRV_VIDEO_START(naughtyb)
-	MDRV_VIDEO_UPDATE(naughtyb)
+	MCFG_PALETTE_INIT(naughtyb)
+	MCFG_VIDEO_START(naughtyb)
+	MCFG_VIDEO_UPDATE(naughtyb)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_MONO("mono")
+	MCFG_SPEAKER_STANDARD_MONO("mono")
 
-	MDRV_SOUND_ADD("tms", TMS36XX, 350)
-	MDRV_SOUND_CONFIG(tms3615_interface)
-	MDRV_SOUND_ROUTE(0, "mono", 0.60)
+	MCFG_SOUND_ADD("tms", TMS36XX, 350)
+	MCFG_SOUND_CONFIG(tms3615_interface)
+	MCFG_SOUND_ROUTE(0, "mono", 0.60)
 
-	MDRV_SOUND_ADD("cust", POPFLAME, 0)
-	MDRV_SOUND_ROUTE(0, "mono", 1.0)
+	MCFG_SOUND_ADD("cust", POPFLAME, 0)
+	MCFG_SOUND_ROUTE(0, "mono", 1.0)
 MACHINE_CONFIG_END
 
 

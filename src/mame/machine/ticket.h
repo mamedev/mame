@@ -23,10 +23,10 @@ struct _ticket_config
 };
 
 
-#define MDRV_TICKET_DISPENSER_ADD(_tag, _clock, _motorhigh, _statushigh) \
-	MDRV_DEVICE_ADD(_tag, TICKET_DISPENSER, _clock) \
-	MDRV_DEVICE_CONFIG_DATA32(ticket_config, motorhigh, _motorhigh) \
-	MDRV_DEVICE_CONFIG_DATA32(ticket_config, statushigh, _statushigh)
+#define MCFG_TICKET_DISPENSER_ADD(_tag, _clock, _motorhigh, _statushigh) \
+	MCFG_DEVICE_ADD(_tag, TICKET_DISPENSER, _clock) \
+	MCFG_DEVICE_CONFIG_DATA32(ticket_config, motorhigh, _motorhigh) \
+	MCFG_DEVICE_CONFIG_DATA32(ticket_config, statushigh, _statushigh)
 
 
 READ8_DEVICE_HANDLER( ticket_dispenser_r );

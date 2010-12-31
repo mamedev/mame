@@ -94,9 +94,9 @@ DECLARE_LEGACY_SOUND_DEVICE(MOS656X, mos6560);
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_MOS656X_ADD(_tag, _interface) \
-	MDRV_SOUND_ADD(_tag, MOS656X, 0) \
-	MDRV_DEVICE_CONFIG(_interface)
+#define MCFG_MOS656X_ADD(_tag, _interface) \
+	MCFG_SOUND_ADD(_tag, MOS656X, 0) \
+	MCFG_DEVICE_CONFIG(_interface)
 
 
 /***************************************************************************

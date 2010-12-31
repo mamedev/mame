@@ -32,9 +32,9 @@ DECLARE_LEGACY_DEVICE(SAA5050, saa5050);
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_SAA5050_ADD(_tag, _interface) \
-	MDRV_DEVICE_ADD(_tag, SAA5050, 0) \
-	MDRV_DEVICE_CONFIG(_interface)
+#define MCFG_SAA5050_ADD(_tag, _interface) \
+	MCFG_DEVICE_ADD(_tag, SAA5050, 0) \
+	MCFG_DEVICE_CONFIG(_interface)
 
 
 /***************************************************************************

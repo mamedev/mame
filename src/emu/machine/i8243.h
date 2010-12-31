@@ -22,15 +22,15 @@
     DEVICE CONFIGURATION MACROS
 ***************************************************************************/
 
-#define MDRV_I8243_ADD(_tag, _read, _write) \
-	MDRV_DEVICE_ADD(_tag, I8243, 0) \
-	MDRV_I8243_READHANDLER(_read) \
-	MDRV_I8243_WRITEHANDLER(_write) \
+#define MCFG_I8243_ADD(_tag, _read, _write) \
+	MCFG_DEVICE_ADD(_tag, I8243, 0) \
+	MCFG_I8243_READHANDLER(_read) \
+	MCFG_I8243_WRITEHANDLER(_write) \
 
-#define MDRV_I8243_READHANDLER(_read) \
+#define MCFG_I8243_READHANDLER(_read) \
 	i8243_device_config::static_set_read_handler(device, _read); \
 
-#define MDRV_I8243_WRITEHANDLER(_write) \
+#define MCFG_I8243_WRITEHANDLER(_write) \
 	i8243_device_config::static_set_write_handler(device, _write); \
 
 /***************************************************************************

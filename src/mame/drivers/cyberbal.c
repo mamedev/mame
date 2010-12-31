@@ -432,90 +432,90 @@ static const ym2151_interface ym2151_config =
 static MACHINE_CONFIG_START( cyberbal, cyberbal_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
-	MDRV_CPU_PROGRAM_MAP(main_map)
+	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
+	MCFG_CPU_PROGRAM_MAP(main_map)
 
-	MDRV_CPU_ADD("audiocpu", M6502, ATARI_CLOCK_14MHz/8)
-	MDRV_CPU_PROGRAM_MAP(sound_map)
-	MDRV_CPU_PERIODIC_INT(atarigen_6502_irq_gen, (double)ATARI_CLOCK_14MHz/4/4/16/16/14)
+	MCFG_CPU_ADD("audiocpu", M6502, ATARI_CLOCK_14MHz/8)
+	MCFG_CPU_PROGRAM_MAP(sound_map)
+	MCFG_CPU_PERIODIC_INT(atarigen_6502_irq_gen, (double)ATARI_CLOCK_14MHz/4/4/16/16/14)
 
-	MDRV_CPU_ADD("extra", M68000, ATARI_CLOCK_14MHz/2)
-	MDRV_CPU_PROGRAM_MAP(extra_map)
-	MDRV_CPU_VBLANK_INT("lscreen", atarigen_video_int_gen)	/* or is it "right?" */
+	MCFG_CPU_ADD("extra", M68000, ATARI_CLOCK_14MHz/2)
+	MCFG_CPU_PROGRAM_MAP(extra_map)
+	MCFG_CPU_VBLANK_INT("lscreen", atarigen_video_int_gen)	/* or is it "right?" */
 
-	MDRV_CPU_ADD("dac", M68000, ATARI_CLOCK_14MHz/2)
-	MDRV_CPU_PROGRAM_MAP(sound_68k_map)
-	MDRV_CPU_PERIODIC_INT(cyberbal_sound_68k_irq_gen, 10000)
+	MCFG_CPU_ADD("dac", M68000, ATARI_CLOCK_14MHz/2)
+	MCFG_CPU_PROGRAM_MAP(sound_68k_map)
+	MCFG_CPU_PERIODIC_INT(cyberbal_sound_68k_irq_gen, 10000)
 
-	MDRV_QUANTUM_TIME(HZ(600))
+	MCFG_QUANTUM_TIME(HZ(600))
 
-	MDRV_MACHINE_START(cyberbal)
-	MDRV_MACHINE_RESET(cyberbal)
-	MDRV_NVRAM_ADD_1FILL("eeprom")
+	MCFG_MACHINE_START(cyberbal)
+	MCFG_MACHINE_RESET(cyberbal)
+	MCFG_NVRAM_ADD_1FILL("eeprom")
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MDRV_GFXDECODE(interleaved)
-	MDRV_PALETTE_LENGTH(4096)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	MCFG_GFXDECODE(interleaved)
+	MCFG_PALETTE_LENGTH(4096)
 
-	MDRV_SCREEN_ADD("lscreen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_ADD("lscreen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses an SOS-2 chip to generate video signals */
-	MDRV_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz, 456*2, 0, 336*2, 262, 0, 240)
+	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz, 456*2, 0, 336*2, 262, 0, 240)
 
-	MDRV_SCREEN_ADD("rscreen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_ADD("rscreen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses an SOS-2 chip to generate video signals */
-	MDRV_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz, 456*2, 0, 336*2, 262, 0, 240)
+	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz, 456*2, 0, 336*2, 262, 0, 240)
 
-	MDRV_VIDEO_START(cyberbal)
-	MDRV_VIDEO_UPDATE(cyberbal)
+	MCFG_VIDEO_START(cyberbal)
+	MCFG_VIDEO_UPDATE(cyberbal)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("ymsnd", YM2151, ATARI_CLOCK_14MHz/4)
-	MDRV_SOUND_CONFIG(ym2151_config)
-	MDRV_SOUND_ROUTE(0, "lspeaker", 0.60)
-	MDRV_SOUND_ROUTE(1, "rspeaker", 0.60)
+	MCFG_SOUND_ADD("ymsnd", YM2151, ATARI_CLOCK_14MHz/4)
+	MCFG_SOUND_CONFIG(ym2151_config)
+	MCFG_SOUND_ROUTE(0, "lspeaker", 0.60)
+	MCFG_SOUND_ROUTE(1, "rspeaker", 0.60)
 
-	MDRV_SOUND_ADD("dac1", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
+	MCFG_SOUND_ADD("dac1", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "rspeaker", 1.0)
 
-	MDRV_SOUND_ADD("dac2", DAC, 0)
-	MDRV_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
+	MCFG_SOUND_ADD("dac2", DAC, 0)
+	MCFG_SOUND_ROUTE(ALL_OUTPUTS, "lspeaker", 1.0)
 MACHINE_CONFIG_END
 
 
 static MACHINE_CONFIG_START( cyberbal2p, cyberbal_state )
 
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
-	MDRV_CPU_PROGRAM_MAP(cyberbal2p_map)
-	MDRV_CPU_VBLANK_INT("screen", atarigen_video_int_gen)
+	MCFG_CPU_ADD("maincpu", M68000, ATARI_CLOCK_14MHz/2)
+	MCFG_CPU_PROGRAM_MAP(cyberbal2p_map)
+	MCFG_CPU_VBLANK_INT("screen", atarigen_video_int_gen)
 
-	MDRV_MACHINE_START(cyberbal)
-	MDRV_MACHINE_RESET(cyberbal2p)
-	MDRV_NVRAM_ADD_1FILL("eeprom")
+	MCFG_MACHINE_START(cyberbal)
+	MCFG_MACHINE_RESET(cyberbal2p)
+	MCFG_NVRAM_ADD_1FILL("eeprom")
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
-	MDRV_GFXDECODE(cyberbal)
-	MDRV_PALETTE_LENGTH(2048)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_UPDATE_BEFORE_VBLANK)
+	MCFG_GFXDECODE(cyberbal)
+	MCFG_PALETTE_LENGTH(2048)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses an SOS-2 chip to generate video signals */
-	MDRV_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz, 456*2, 0, 336*2, 262, 0, 240)
+	MCFG_SCREEN_RAW_PARAMS(ATARI_CLOCK_14MHz, 456*2, 0, 336*2, 262, 0, 240)
 
-	MDRV_VIDEO_START(cyberbal2p)
-	MDRV_VIDEO_UPDATE(cyberbal)
+	MCFG_VIDEO_START(cyberbal2p)
+	MCFG_VIDEO_UPDATE(cyberbal)
 
 	/* sound hardware */
-	MDRV_FRAGMENT_ADD(jsa_ii_mono)
+	MCFG_FRAGMENT_ADD(jsa_ii_mono)
 MACHINE_CONFIG_END
 
 

@@ -1006,42 +1006,42 @@ static const c140_interface C140_interface_typeA =
 /* cropped at sides */
 static MACHINE_CONFIG_START( namcona1, namcona1_state )
 	/* basic machine hardware */
-	MDRV_CPU_ADD("maincpu", M68000, 50113000/4)
-	MDRV_CPU_PROGRAM_MAP(namcona1_main_map)
-	MDRV_CPU_VBLANK_INT_HACK(namcona1_interrupt,5)
+	MCFG_CPU_ADD("maincpu", M68000, 50113000/4)
+	MCFG_CPU_PROGRAM_MAP(namcona1_main_map)
+	MCFG_CPU_VBLANK_INT_HACK(namcona1_interrupt,5)
 
-	MDRV_CPU_ADD("mcu", M37702, 50113000/4)
-	MDRV_CPU_PROGRAM_MAP(namcona1_mcu_map)
-	MDRV_CPU_IO_MAP( namcona1_mcu_io_map)
-	MDRV_CPU_VBLANK_INT_HACK(mcu_interrupt, 2)
+	MCFG_CPU_ADD("mcu", M37702, 50113000/4)
+	MCFG_CPU_PROGRAM_MAP(namcona1_mcu_map)
+	MCFG_CPU_IO_MAP( namcona1_mcu_io_map)
+	MCFG_CPU_VBLANK_INT_HACK(mcu_interrupt, 2)
 
-	MDRV_NVRAM_HANDLER(namcosna1)
-	MDRV_MACHINE_START(namcona1)
-	MDRV_MACHINE_RESET(namcona1_mcu)
-	MDRV_QUANTUM_TIME(HZ(2400))
+	MCFG_NVRAM_HANDLER(namcosna1)
+	MCFG_MACHINE_START(namcona1)
+	MCFG_MACHINE_RESET(namcona1_mcu)
+	MCFG_QUANTUM_TIME(HZ(2400))
 
 	/* video hardware */
-	MDRV_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
+	MCFG_VIDEO_ATTRIBUTES(VIDEO_HAS_SHADOWS)
 
-	MDRV_SCREEN_ADD("screen", RASTER)
-	MDRV_SCREEN_REFRESH_RATE(60)
-	MDRV_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
-	MDRV_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
-	MDRV_SCREEN_SIZE(38*8, 32*8)
-	MDRV_SCREEN_VISIBLE_AREA(8, 38*8-1-8, 4*8, 32*8-1)
+	MCFG_SCREEN_ADD("screen", RASTER)
+	MCFG_SCREEN_REFRESH_RATE(60)
+	MCFG_SCREEN_VBLANK_TIME(ATTOSECONDS_IN_USEC(2500) /* not accurate */)
+	MCFG_SCREEN_FORMAT(BITMAP_FORMAT_INDEXED16)
+	MCFG_SCREEN_SIZE(38*8, 32*8)
+	MCFG_SCREEN_VISIBLE_AREA(8, 38*8-1-8, 4*8, 32*8-1)
 
-	MDRV_PALETTE_LENGTH(0x2000)
+	MCFG_PALETTE_LENGTH(0x2000)
 
-	MDRV_VIDEO_START(namcona1)
-	MDRV_VIDEO_UPDATE(namcona1)
+	MCFG_VIDEO_START(namcona1)
+	MCFG_VIDEO_UPDATE(namcona1)
 
 	/* sound hardware */
-	MDRV_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
+	MCFG_SPEAKER_STANDARD_STEREO("lspeaker", "rspeaker")
 
-	MDRV_SOUND_ADD("c140", C140, 44100)
-	MDRV_SOUND_CONFIG(C140_interface_typeA)
-	MDRV_SOUND_ROUTE(0, "rspeaker", 1.00)
-	MDRV_SOUND_ROUTE(1, "lspeaker", 1.00)
+	MCFG_SOUND_ADD("c140", C140, 44100)
+	MCFG_SOUND_CONFIG(C140_interface_typeA)
+	MCFG_SOUND_ROUTE(0, "rspeaker", 1.00)
+	MCFG_SOUND_ROUTE(1, "lspeaker", 1.00)
 MACHINE_CONFIG_END
 
 
@@ -1051,8 +1051,8 @@ static MACHINE_CONFIG_DERIVED( namcona1w, namcona1 )
 	/* basic machine hardware */
 
 	/* video hardware */
-	MDRV_SCREEN_MODIFY("screen")
-	MDRV_SCREEN_VISIBLE_AREA(0, 38*8-1-0, 4*8, 32*8-1)
+	MCFG_SCREEN_MODIFY("screen")
+	MCFG_SCREEN_VISIBLE_AREA(0, 38*8-1-0, 4*8, 32*8-1)
 MACHINE_CONFIG_END
 
 
@@ -1060,8 +1060,8 @@ static MACHINE_CONFIG_DERIVED( namcona2, namcona1 )
 
 	/* basic machine hardware */
 
-	MDRV_CPU_MODIFY("maincpu")
-	MDRV_CPU_PROGRAM_MAP(namcona2_main_map)
+	MCFG_CPU_MODIFY("maincpu")
+	MCFG_CPU_PROGRAM_MAP(namcona2_main_map)
 MACHINE_CONFIG_END
 
 
